@@ -1,8 +1,11 @@
-package com.mapbox.mapboxgl.lib;
+package com.mapbox.mapboxgl.views;
 
+import android.graphics.PointF;
 import android.view.Surface;
 
-import com.mapbox.mapboxgl.lib.geometry.LatLng;
+import com.mapbox.mapboxgl.geometry.LatLng;
+import com.mapbox.mapboxgl.geometry.LatLngZoom;
+import com.mapbox.mapboxgl.geometry.ProjectedMeters;
 
 import java.util.List;
 
@@ -12,9 +15,6 @@ class NativeMapView {
     //
     // Static members
     //
-
-    // Tag used for logging
-    private static final String TAG = "NativeMapView";
 
     //
     // Instance members
@@ -248,11 +248,11 @@ class NativeMapView {
     }
 
     public void setLatLng(LatLng latLng, long duration) {
-        nativeSetLonLat(mNativeMapViewPtr, latLng, duration);
+        nativeSetLatLng(mNativeMapViewPtr, latLng, duration);
     }
 
     public LatLng getLatLng() {
-        return nativeGetLonLat(mNativeMapViewPtr);
+        return nativeGetLatLng(mNativeMapViewPtr);
     }
 
     public void startPanning() {
@@ -307,16 +307,16 @@ class NativeMapView {
         return nativeGetZoom(mNativeMapViewPtr);
     }
 
-    public void setLatLngZoom(LatLngZoom lonLatZoom) {
-        setLatLngZoom(lonLatZoom, 0);
+    public void setLatLngZoom(LatLngZoom latLngZoom) {
+        setLatLngZoom(latLngZoom, 0);
     }
 
-    public void setLatLngZoom(LatLngZoom lonLatZoom, long duration) {
-        nativeSetLonLatZoom(mNativeMapViewPtr, lonLatZoom, duration);
+    public void setLatLngZoom(LatLngZoom latLngZoom, long duration) {
+        nativeSetLatLngZoom(mNativeMapViewPtr, latLngZoom, duration);
     }
 
     public LatLngZoom getLatLngZoom() {
-        return nativeGetLonLatZoom(mNativeMapViewPtr);
+        return nativeGetLatLngZoom(mNativeMapViewPtr);
     }
 
     public void resetZoom() {
@@ -390,6 +390,30 @@ class NativeMapView {
 
     public void setReachability(boolean status) {
         nativeSetReachability(mNativeMapViewPtr, status);
+    }
+
+    //public void getWorldBoundsMeters();
+
+    //public void getWorldBoundsLatLng();
+
+    public double getMetersPerPixelAtLatitude(double lat, double zoom) {
+        return nativeGetMetersPerPixelAtLatitude(mNativeMapViewPtr, lat, zoom);
+    }
+
+    public ProjectedMeters projectedMetersForLatLng(LatLng latLng) {
+        return nativeProjectedMetersForLatLng(mNativeMapViewPtr, latLng);
+    }
+
+    public LatLng latLngForProjectedMeters(ProjectedMeters projectedMeters) {
+        return nativeLatLngForProjectedMeters(mNativeMapViewPtr, projectedMeters);
+    }
+
+    public PointF pixelForLatLng(LatLng latLng) {
+        return nativePixelForLatLng(mNativeMapViewPtr, latLng);
+    }
+
+    public LatLng latLngForPixel(PointF pixel) {
+        return nativeLatLngForPixel(mNativeMapViewPtr, pixel);
     }
 
     //
@@ -490,10 +514,10 @@ class NativeMapView {
     private native void nativeMoveBy(long nativeMapViewPtr, double dx,
             double dy, long duration);
 
-    private native void nativeSetLonLat(long nativeMapViewPtr, LatLng latLng,
+    private native void nativeSetLatLng(long nativeMapViewPtr, LatLng latLng,
                                         long duration);
 
-    private native LatLng nativeGetLonLat(long nativeMapViewPtr);
+    private native LatLng nativeGetLatLng(long nativeMapViewPtr);
 
     private native void nativeStartPanning(long nativeMapViewPtr);
 
@@ -514,10 +538,10 @@ class NativeMapView {
 
     private native double nativeGetZoom(long nativeMapViewPtr);
 
-    private native void nativeSetLonLatZoom(long nativeMapViewPtr,
+    private native void nativeSetLatLngZoom(long nativeMapViewPtr,
             LatLngZoom lonLatZoom, long duration);
 
-    private native LatLngZoom nativeGetLonLatZoom(long nativeMapViewPtr);
+    private native LatLngZoom nativeGetLatLngZoom(long nativeMapViewPtr);
 
     private native void nativeResetZoom(long nativeMapViewPtr);
 
@@ -553,4 +577,18 @@ class NativeMapView {
     private native boolean nativeGetDebug(long nativeMapViewPtr);
 
     private native void nativeSetReachability(long nativeMapViewPtr, boolean status);
+
+    //private native void nativeGetWorldBoundsMeters(long nativeMapViewPtr);
+
+    //private native void nativeGetWorldBoundsLatLng(long nativeMapViewPtr);
+
+    private native double nativeGetMetersPerPixelAtLatitude(long nativeMapViewPtr, double lat, double zoom);
+
+    private native ProjectedMeters nativeProjectedMetersForLatLng(long nativeMapViewPtr, LatLng latLng);
+
+    private native LatLng nativeLatLngForProjectedMeters(long nativeMapViewPtr, ProjectedMeters projectedMeters);
+
+    private native PointF nativePixelForLatLng(long nativeMapViewPtr, LatLng latLng);
+
+    private native LatLng nativeLatLngForPixel(long nativeMapViewPtr, PointF pixel);
 }

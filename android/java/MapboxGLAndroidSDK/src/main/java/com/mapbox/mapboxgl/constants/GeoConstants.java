@@ -1,6 +1,6 @@
-package com.mapbox.mapboxgl.lib.constants;
+package com.mapbox.mapboxgl.constants;
 
-public interface GeoConstants {
+public class GeoConstants {
     // http://en.wikipedia.org/wiki/Earth_radius#Equatorial_radius
     public static final int RADIUS_EARTH_METERS = 6378137;
     public static final double MIN_LATITUDE = -85.05112878;

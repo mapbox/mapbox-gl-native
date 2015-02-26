@@ -24,12 +24,13 @@
     </android.support.v7.widget.Toolbar>
 
     <FrameLayout
+        android:id="@+id/layout_map"
         android:layout_width="match_parent"
         android:layout_height="fill_parent"
         android:orientation="vertical">
 
         <fragment
-            android:name="com.mapbox.mapboxgl.app.MapFragment"
+            android:name="com.mapbox.mapboxgl.testapp.MapFragment"
             android:id="@+id/fragment_map"
             android:layout_width="match_parent"
             android:layout_height="match_parent"
@@ -41,17 +42,17 @@
             android:layout_width="48dp"
             android:layout_height="48dp"
             android:layout_gravity="end|top"
-            android:padding="10dp"
+            android:layout_margin="10dp"
             android:contentDescription="@string/compass_desc"
             android:src="@drawable/compass"/>
 
         <TextView
-                android:id="@+id/view_fps"
-                android:layout_width="wrap_content"
-                android:layout_height="wrap_content"
-                android:textAppearance="?android:attr/textAppearanceLarge"
-                android:text="@string/label_fps"
-                android:padding="10dp" />
+            android:id="@+id/view_fps"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:textAppearance="?android:attr/textAppearanceLarge"
+            android:text="@string/label_fps"
+            android:layout_margin="10dp" />
 
     </FrameLayout>
 </LinearLayout>

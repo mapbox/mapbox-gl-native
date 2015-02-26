@@ -1,4 +1,4 @@
-package com.mapbox.mapboxgl.lib;
+package com.mapbox.mapboxgl.views;
 
 import android.annotation.TargetApi;
 import android.content.BroadcastReceiver;
@@ -18,7 +18,6 @@ import android.support.v4.view.ScaleGestureDetectorCompat;
 import android.view.GestureDetector;
 import android.view.ScaleGestureDetector;
 import android.util.AttributeSet;
-import android.util.Log;
 import android.view.InputDevice;
 import android.view.KeyEvent;
 import android.view.MotionEvent;
@@ -30,7 +29,8 @@ import android.widget.ZoomButtonsController;
 
 import com.almeros.android.multitouch.gesturedetectors.RotateGestureDetector;
 import com.almeros.android.multitouch.gesturedetectors.TwoFingerGestureDetector;
-import com.mapbox.mapboxgl.lib.geometry.LatLng;
+import com.mapbox.mapboxgl.geometry.LatLng;
+import com.mapbox.mapboxgl.geometry.LatLngZoom;
 
 import org.apache.commons.validator.routines.UrlValidator;
 
@@ -44,9 +44,6 @@ public class MapView extends SurfaceView {
     //
     // Static members
     //
-
-    // Tag used for logging
-    private static final String TAG = "MapView";
 
     // Used for animation
     private static final long ANIMATION_DURATION = 300;
@@ -129,14 +126,12 @@ public class MapView extends SurfaceView {
 
     // Common initialization code goes here
     private void initialize(Context context, AttributeSet attrs) {
-        Log.v(TAG, "initialize");
 
         // Save the context
         mContext = context;
 
         // Check if we are in Eclipse UI editor
         if (isInEditMode()) {
-            // TODO editor does not load properly because we don't implement this
             return;
         }
 
@@ -352,10 +347,6 @@ public class MapView extends SurfaceView {
         return mNativeMapView.getAccessToken();
     }
 
-    //
-    // Style methods
-    //
-
     public List<String> getClasses() {
         return mNativeMapView.getClasses();
     }
@@ -387,8 +378,16 @@ public class MapView extends SurfaceView {
 
     public void removeAllClasses(long transitionDuration) {
         mNativeMapView.setDefaultTransitionDuration(transitionDuration);
-        ArrayList<String> classes = new ArrayList<String>(0);
+        ArrayList<String> classes = new ArrayList<>(0);
         setClasses(classes);
+    }
+
+    public LatLng fromScreenLocation(PointF point) {
+        return mNativeMapView.latLngForPixel(point);
+    }
+
+    public PointF toScreenLocation(LatLng location) {
+        return mNativeMapView.pixelForLatLng(location);
     }
 
     //
@@ -398,7 +397,6 @@ public class MapView extends SurfaceView {
     // Called when we need to restore instance state
     // Must be called from Activity onCreate
     public void onCreate(Bundle savedInstanceState) {
-        Log.v(TAG, "onCreate");
         if (savedInstanceState != null) {
             setCenterCoordinate((LatLng) savedInstanceState.getParcelable(STATE_CENTER_COORDINATE));
             setZoomLevel(savedInstanceState.getDouble(STATE_ZOOM_LEVEL)); // need to set zoom level first because of limitation on rotating when zoomed out
@@ -427,7 +425,6 @@ public class MapView extends SurfaceView {
     // Called when we need to save instance state
     // Must be called from Activity onSaveInstanceState
     public void onSaveInstanceState(Bundle outState) {
-        Log.v(TAG, "onSaveInstanceState");
         outState.putParcelable(STATE_CENTER_COORDINATE, getCenterCoordinate());
         outState.putDouble(STATE_ZOOM_LEVEL, getZoomLevel()); // need to set zoom level first because of limitation on rotating when zoomed out
         outState.putDouble(STATE_CENTER_DIRECTION, getDirection());
@@ -437,14 +434,13 @@ public class MapView extends SurfaceView {
         outState.putBoolean(STATE_DEBUG_ACTIVE, isDebugActive());
         outState.putString(STATE_STYLE_URL, mStyleUrl);
         outState.putString(STATE_ACCESS_TOKEN, getAccessToken());
-        outState.putStringArrayList(STATE_CLASSES, new ArrayList<String>(getClasses()));
+        outState.putStringArrayList(STATE_CLASSES, new ArrayList<>(getClasses()));
         outState.putLong(STATE_DEFAULT_TRANSITION_DURATION, mNativeMapView.getDefaultTransitionDuration());
     }
 
     // Called when we need to clean up
     // Must be called from Activity onDestroy
     public void onDestroy() {
-        Log.v(TAG, "onDestroy");
         mNativeMapView.stop();
         mNativeMapView.terminateContext();
         mNativeMapView.terminateDisplay();
@@ -453,21 +449,17 @@ public class MapView extends SurfaceView {
     // Called when we need to create the GL context
     // Must be called from Activity onStart
     public void onStart() {
-        Log.v(TAG, "onStart");
+        // Do nothing
     }
 
     // Called when we need to terminate the GL context
     // Must be called from Activity onPause
     public void onStop() {
-        Log.v(TAG, "onStop");
-        //mNativeMapView.stop();
     }
 
     // Called when we need to stop the render thread
     // Must be called from Activity onPause
     public void onPause() {
-        Log.v(TAG, "onPause");
-
         // Register for connectivity changes
         getContext().unregisterReceiver(mConnectivityReceiver);
         mConnectivityReceiver = null;
@@ -479,8 +471,6 @@ public class MapView extends SurfaceView {
     // Must be called from Activity onResume
 
     public void onResume() {
-        Log.v(TAG, "onResume");
-
         // Register for connectivity changes
         mConnectivityReceiver = new ConnectivityReceiver();
         mContext.registerReceiver(mConnectivityReceiver, new IntentFilter(ConnectivityManager.CONNECTIVITY_ACTION));
@@ -495,7 +485,6 @@ public class MapView extends SurfaceView {
         // Must do all EGL/GL ES initialization here
         @Override
         public void surfaceCreated(SurfaceHolder holder) {
-            Log.v(TAG, "surfaceCreated");
             mNativeMapView.createSurface(holder.getSurface());
         }
 
@@ -503,7 +492,6 @@ public class MapView extends SurfaceView {
         // Must do all EGL/GL ES destruction here
         @Override
         public void surfaceDestroyed(SurfaceHolder holder) {
-            Log.v(TAG, "surfaceDestroyed");
             mNativeMapView.destroySurface();
         }
 
@@ -513,8 +501,6 @@ public class MapView extends SurfaceView {
         @Override
         public void surfaceChanged(SurfaceHolder holder, int format, int width,
                                    int height) {
-            Log.v(TAG, "surfaceChanged");
-            Log.i(TAG, "resize " + format + " " + width + " " + height);
             mNativeMapView.resize((int) (width / mScreenDensity), (int) (height / mScreenDensity), mScreenDensity, width, height);
         }
     }
@@ -527,12 +513,9 @@ public class MapView extends SurfaceView {
         // flicker (see Android SDK documentation)
         @Override
         public void surfaceRedrawNeeded(SurfaceHolder holder) {
-            Log.v(TAG, "surfaceRedrawNeeded");
             mNativeMapView.update();
         }
     }
-
-    // TODO examine how GLSurvaceView hadles attach/detach from window
 
     // Called when view is no longer connected
     @Override
@@ -561,10 +544,6 @@ public class MapView extends SurfaceView {
     // Draw events
     //
 
-    // TODO: onDraw for UI editor mockup?
-    // By default it just shows a gray screen with "MapView"
-    // Not too important but perhaps we could put a static demo map image there
-
     //
     // Input events
     //
@@ -590,7 +569,7 @@ public class MapView extends SurfaceView {
     @Override @TargetApi(14)
     public boolean onTouchEvent(@NonNull MotionEvent event) {
         // Check and ignore non touch or left clicks
-        if ((android.os.Build.VERSION.SDK_INT >= 14) && (event.getButtonState() != 0) && (event.getButtonState() != MotionEvent.BUTTON_PRIMARY)) {
+        if ((android.os.Build.VERSION.SDK_INT >= Build.VERSION_CODES.ICE_CREAM_SANDWICH) && (event.getButtonState() != 0) && (event.getButtonState() != MotionEvent.BUTTON_PRIMARY)) {
             return false;
         }
 
@@ -783,7 +762,7 @@ public class MapView extends SurfaceView {
                 return false;
             }
 
-            // TODO complex decision between roate or scale or both (see Google
+            // TODO complex decision between rotate or scale or both (see Google
             // Maps app)
 
             // Cancel any animation
@@ -1012,7 +991,6 @@ public class MapView extends SurfaceView {
 
     // Called for trackball events, all motions are relative in device specific
     // units
-    // TODO: test trackball click and long click
     @Override
     public boolean onTrackballEvent(MotionEvent event) {
         // Choose the action
@@ -1106,8 +1084,6 @@ public class MapView extends SurfaceView {
     @Override @TargetApi(12)
     public boolean onGenericMotionEvent(MotionEvent event) {
         // Mouse events
-        // TODO: SOURCE_TOUCH_NAVIGATION?
-        // TODO: source device resolution?
         //if (event.isFromSource(InputDevice.SOURCE_CLASS_POINTER)) { // this is not available before API 18
         if ((event.getSource() & InputDevice.SOURCE_CLASS_POINTER) == InputDevice.SOURCE_CLASS_POINTER) {
             // Choose the action
@@ -1174,7 +1150,6 @@ public class MapView extends SurfaceView {
         // Called when an action we are listening to in the manifest has been sent
         @Override
         public void onReceive(Context context, Intent intent) {
-            Log.v(TAG, "ConnectivityReceiver.onReceive: action = " + intent.getAction());
             if (intent.getAction().equals(ConnectivityManager.CONNECTIVITY_ACTION)) {
                 boolean noConnectivity = intent.getBooleanExtra(ConnectivityManager.EXTRA_NO_CONNECTIVITY, false);
                 onConnectivityChanged(!noConnectivity);
@@ -1184,7 +1159,6 @@ public class MapView extends SurfaceView {
 
     // Called when our Internet connectivity has changed
     private void onConnectivityChanged(boolean isConnected) {
-        Log.v(TAG, "onConnectivityChanged: " + isConnected);
         mNativeMapView.setReachability(isConnected);
     }
 

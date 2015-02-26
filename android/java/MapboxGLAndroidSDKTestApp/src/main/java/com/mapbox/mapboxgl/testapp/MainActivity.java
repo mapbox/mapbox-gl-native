@@ -1,24 +1,35 @@
-package com.mapbox.mapboxgl.app;
+package com.mapbox.mapboxgl.testapp;
 
+import android.content.Context;
+import android.graphics.Matrix;
+import android.graphics.PointF;
+import android.hardware.GeomagneticField;
+import android.hardware.Sensor;
+import android.hardware.SensorEvent;
+import android.hardware.SensorEventListener;
+import android.hardware.SensorManager;
 import android.location.Location;
 import android.os.Bundle;
 import android.support.v7.app.ActionBarActivity;
 import android.support.v7.widget.Toolbar;
-import android.util.Log;
 import android.view.Menu;
 import android.view.MenuInflater;
 import android.view.MenuItem;
 import android.view.View;
 import android.widget.AdapterView;
 import android.widget.ArrayAdapter;
+import android.widget.FrameLayout;
 import android.widget.ImageView;
 import android.widget.Spinner;
 import android.widget.TextView;
-import com.mapbox.mapboxgl.lib.LatLngZoom;
-import com.mapbox.mapboxgl.lib.MapView;
-import com.mapzen.android.lost.LocationClient;
-import com.mapzen.android.lost.LocationListener;
-import com.mapzen.android.lost.LocationRequest;
+
+import com.mapbox.mapboxgl.geometry.LatLng;
+import com.mapbox.mapboxgl.views.MapView;
+import com.mapzen.android.lost.api.LocationListener;
+import com.mapzen.android.lost.api.LocationRequest;
+import com.mapzen.android.lost.api.LocationServices;
+import com.mapzen.android.lost.api.LostApiClient;
+
 import java.util.ArrayList;
 
 public class MainActivity extends ActionBarActivity {
@@ -27,36 +38,44 @@ public class MainActivity extends ActionBarActivity {
     // Static members
     //
 
-    // Tag used for logging
-    private static final String TAG = "MainActivity";
-
-    // Rotation State
-    private static final String IS_GPS_ON = "isGPSOn";
+    // Used for saving instance state
+    private static final String STATE_IS_GPS_ON = "isGpsOn";
 
     //
     // Instance members
     //
 
-    // Holds the MapFragment
+    // Used for the UI
     private MapFragment mMapFragment;
-
-    // The FPS label
     private TextView mFpsTextView;
-
-    // The compass
     private ImageView mCompassView;
+    private FrameLayout mMapFrameLayout;
+    private float mDensity;
+    private Spinner mClassSpinner;
+    private ArrayAdapter mOutdoorsClassAdapter;
+    private ArrayAdapter mSatelliteClassAdapter;
 
     // Used for GPS
     private boolean mIsGpsOn = false;
-    private LocationClient mLocationClient;
-    private LocationListener mLocationListener;
+    private LostApiClient mLocationClient;
+    private GpsListener mGpsListener;
     private LocationRequest mLocationRequest;
-    private MenuItem gpsMenuItem = null;
+    private ImageView mGpsMarker;
+    private Location mGpsLocation;
+    private MenuItem mGpsMenuItem;
 
-    // Used for the class spinner
-    Spinner mClassSpinner;
-    ArrayAdapter mOutdoorsClassAdapter;
-    ArrayAdapter mSatelliteClassAdapter;
+    // Used for compass
+    private SensorManager mSensorManager;
+    private Sensor mSensorAccelerometer;
+    private Sensor mSensorMagneticField;
+    private CompassListener mCompassListener;
+    private float[] mValuesAccelerometer = new float[3];
+    private float[] mValuesMagneticField = new float[3];
+    private float[] mMatrixR = new float[9];
+    private float[] mMatrixI = new float[9];
+    private float[] mMatrixValues = new float[3];
+    private float mCompassBearing;
+    private boolean mCompassValid = false;
 
     //
     // Lifecycle events
@@ -66,7 +85,12 @@ public class MainActivity extends ActionBarActivity {
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
-        Log.v(TAG, "onCreate");
+
+        if (savedInstanceState != null) {
+            mIsGpsOn = savedInstanceState.getBoolean(STATE_IS_GPS_ON, false);
+        }
+
+        mDensity = getResources().getDisplayMetrics().density;
 
         // Load the layout
         setContentView(R.layout.activity_main);
@@ -80,6 +104,14 @@ public class MainActivity extends ActionBarActivity {
         mCompassView = (ImageView) findViewById(R.id.view_compass);
         mCompassView.setOnClickListener(new CompassOnClickListener());
 
+        mGpsMarker = new ImageView(getApplicationContext());
+        mGpsMarker.setVisibility(View.INVISIBLE);
+        mGpsMarker.setImageResource(R.drawable.location_marker);
+        mGpsMarker.setLayoutParams(new FrameLayout.LayoutParams((int) (27.0f * mDensity), (int) (27.0f * mDensity)));
+        mGpsMarker.requestLayout();
+
+        mMapFrameLayout = (FrameLayout) findViewById(R.id.layout_map);
+        mMapFrameLayout.addView(mGpsMarker);
         // Add a toolbar as the action bar
         Toolbar mainToolbar = (Toolbar) findViewById(R.id.toolbar_main);
         setSupportActionBar(mainToolbar);
@@ -100,71 +132,44 @@ public class MainActivity extends ActionBarActivity {
                 R.array.satellite_class_list, android.R.layout.simple_spinner_dropdown_item);
 
         // Prepare for GPS
-        mLocationRequest = LocationRequest.create();
-        mLocationRequest.setInterval(0);
-        mLocationRequest.setSmallestDisplacement(0);
+        mLocationClient = new LostApiClient.Builder(this).build();
+        mLocationRequest = LocationRequest.create()
+                .setInterval(1000)
+                .setSmallestDisplacement(1)
+                .setPriority(LocationRequest.PRIORITY_HIGH_ACCURACY);
+        mGpsListener = new GpsListener();
 
-        mLocationClient = new LocationClient(getApplicationContext(), new LocationClient.ConnectionCallbacks() {
-            @Override
-            public void onConnected(Bundle connectionHint) {
-                updateLocation(mLocationClient.getLastLocation());
-
-                mLocationListener = new LocationListener() {
-                    @Override
-                    public void onLocationChanged(Location location) {
-                        //Toast.makeText(getApplicationContext(), "Location: " + location.toString(), Toast.LENGTH_SHORT).show();
-                        updateLocation(location);
-                    }
-                };
-
-                mLocationClient.requestLocationUpdates(mLocationRequest, mLocationListener);
-            }
-
-            @Override
-            public void onDisconnected() {
-                mLocationListener = null;
-            }
-        });
-
-        if (savedInstanceState != null) {
-            // Restore any state that the app saved
-            mIsGpsOn = savedInstanceState.getBoolean(IS_GPS_ON);
-        }
+        mSensorManager = (SensorManager) getApplicationContext().getSystemService(Context.SENSOR_SERVICE);
+        mSensorAccelerometer = mSensorManager.getDefaultSensor(Sensor.TYPE_ACCELEROMETER);
+        mSensorMagneticField = mSensorManager.getDefaultSensor(Sensor.TYPE_MAGNETIC_FIELD);
+        mCompassListener = new CompassListener();
     }
 
     // Called when our app goes into the background
     @Override
     public void onPause()  {
         super.onPause();
-        Log.v(TAG, "onPause");
 
         // Cancel GPS
-        if (mIsGpsOn) {
-            mLocationClient.disconnect();
-        }
+        toggleGps(false);
     }
 
     // Called when our app comes into the foreground
     @Override
     public void onResume() {
         super.onResume();
-        Log.v(TAG, "onResume");
-
         // Restart GPS
-        // Cancel any outstanding GPS
-        if (mIsGpsOn) {
-            mLocationClient.connect();
-        }
+        toggleGps(true);
     }
 
+    // Called when we need to save instance state
     @Override
     protected void onSaveInstanceState(Bundle outState) {
-
-        // Persist any state the app needs to retain
-        outState.putBoolean(IS_GPS_ON, mIsGpsOn);
-
         super.onSaveInstanceState(outState);
+
+        outState.putBoolean(STATE_IS_GPS_ON, mIsGpsOn);
     }
+
 
     //
     // Other events
@@ -175,10 +180,12 @@ public class MainActivity extends ActionBarActivity {
     public boolean onCreateOptionsMenu(Menu menu) {
         MenuInflater inflater = getMenuInflater();
         inflater.inflate(R.menu.menu_main, menu);
-        gpsMenuItem = menu.findItem(R.id.action_gps);
-
-        // Set Menu UI to match state (ie, from restore)
-        toggleGPS(mIsGpsOn);
+        mGpsMenuItem = menu.findItem(R.id.action_gps);
+        if (mIsGpsOn) {
+            mGpsMenuItem.setIcon(R.drawable.ic_action_location_found);
+        } else {
+            mGpsMenuItem.setIcon(R.drawable.ic_action_location_searching);
+        }
         return super.onCreateOptionsMenu(menu);
     }
 
@@ -187,7 +194,9 @@ public class MainActivity extends ActionBarActivity {
     public boolean onOptionsItemSelected(MenuItem item) {
         switch (item.getItemId()) {
             case R.id.action_gps:
-                toggleGPS(!mIsGpsOn);
+                // Toggle GPS position updates
+                toggleGps(!mIsGpsOn);
+                updateMap();
                 return true;
 
             case R.id.action_debug:
@@ -209,29 +218,98 @@ public class MainActivity extends ActionBarActivity {
     }
 
     /**
-     * Enabled / Disable GPS along with updating the UI
-     * @param enableGPS true if GPS is to be enabled, false if GPS is to be disabled
+     * Enabled / Disable GPS location updates along with updating the UI
+     * @param enableGps true if GPS is to be enabled, false if GPS is to be disabled
      */
-    private void toggleGPS(boolean enableGPS) {
+    private void toggleGps(boolean enableGps) {
 
-       if (enableGPS) {
-           mIsGpsOn = true;
-           gpsMenuItem.setIcon(R.drawable.ic_action_location_found);
-           mLocationClient.connect();
-       } else {
-           mIsGpsOn = false;
-           gpsMenuItem.setIcon(R.drawable.ic_action_location_searching);
-           mLocationClient.disconnect();
-       }
+        if (enableGps) {
+            if (!mIsGpsOn) {
+                mIsGpsOn = true;
+                if (mGpsMenuItem != null) {
+                    mGpsMenuItem.setIcon(R.drawable.ic_action_location_found);
+                }
+                mGpsLocation = null;
+                mLocationClient.connect();
+                updateLocation(LocationServices.FusedLocationApi.getLastLocation());
+                LocationServices.FusedLocationApi.requestLocationUpdates(mLocationRequest, new GpsListener());
+                mSensorManager.registerListener(mCompassListener, mSensorAccelerometer, SensorManager.SENSOR_DELAY_UI);
+                mSensorManager.registerListener(mCompassListener, mSensorMagneticField, SensorManager.SENSOR_DELAY_UI);
+            }
+        } else {
+            if (mIsGpsOn) {
+                mIsGpsOn = false;
+                if (mGpsMenuItem != null) {
+                    mGpsMenuItem.setIcon(R.drawable.ic_action_location_searching);
+                }
+                LocationServices.FusedLocationApi.removeLocationUpdates(mGpsListener);
+                mLocationClient.disconnect();
+                mSensorManager.unregisterListener(mCompassListener, mSensorAccelerometer);
+                mSensorManager.unregisterListener(mCompassListener, mSensorMagneticField);
+                mGpsLocation = null;
+            }
+        }
     }
 
+    // This class forwards location updates to updateLocation()
+    private class GpsListener implements LocationListener {
+
+        @Override
+        public void onLocationChanged(Location location) {
+            updateLocation(location);
+        }
+    }
+
+    // This class handles sensor updates to calculate compass bearing
+    private class CompassListener implements SensorEventListener {
+
+        @Override
+        public void onSensorChanged(SensorEvent event) {
+            switch (event.sensor.getType()) {
+                case Sensor.TYPE_ACCELEROMETER:
+                    System.arraycopy(event.values, 0, mValuesAccelerometer, 0, 3);
+                    break;
+                case Sensor.TYPE_MAGNETIC_FIELD:
+                    System.arraycopy(event.values, 0, mValuesMagneticField, 0, 3);
+                    break;
+            }
+
+            boolean valid = SensorManager.getRotationMatrix(mMatrixR, mMatrixI,
+                    mValuesAccelerometer,
+                    mValuesMagneticField);
+
+            if (valid) {
+                SensorManager.getOrientation(mMatrixR, mMatrixValues);
+                //mAzimuthRadians.putValue(mMatrixValues[0]);
+                //mAzimuth = Math.toDegrees(mAzimuthRadians.getAverage());
+
+                if (mGpsLocation != null) {
+                    GeomagneticField geomagneticField = new GeomagneticField(
+                            (float) mGpsLocation.getLatitude(),
+                            (float) mGpsLocation.getLongitude(),
+                            (float) mGpsLocation.getAltitude(),
+                            System.currentTimeMillis());
+                    mCompassBearing = (float) Math.toDegrees(mMatrixValues[0]) + geomagneticField.getDeclination();
+                    mCompassValid = true;
+                }
+            }
+
+            updateMap();
+        }
+
+        @Override
+        public void onAccuracyChanged(Sensor sensor, int accuracy) {
+            // TODO: ignore unreliable stuff
+        }
+    }
 
     // Handles location updates from GPS
     private void updateLocation(Location location) {
         if (location != null) {
-            LatLngZoom coordinate = new LatLngZoom(location.getLatitude(), location.getLongitude(), 16);
-            mMapFragment.getMap().setCenterCoordinate(coordinate, true);
+            mGpsLocation = location;
         }
+
+        updateMap();
     }
 
     // This class handles style change events
@@ -311,7 +389,7 @@ public class MainActivity extends ActionBarActivity {
 
         @Override
         public void onItemSelected(AdapterView<?> parent, View view, int position, long id) {
-            ArrayList<String> classes = new ArrayList<String>(1);
+            ArrayList<String> classes = new ArrayList<>(1);
 
             switch (position) {
                 // Day
@@ -343,7 +421,7 @@ public class MainActivity extends ActionBarActivity {
 
         @Override
         public void onItemSelected(AdapterView<?> parent, View view, int position, long id) {
-            ArrayList<String> classes = new ArrayList<String>(2);
+            ArrayList<String> classes = new ArrayList<>(2);
 
             switch (position) {
                 // Labels + Contours
@@ -377,7 +455,7 @@ public class MainActivity extends ActionBarActivity {
     }
 
     // Called when FPS changes
-    public class MyOnFpsChangedListener implements MapView.OnFpsChangedListener {
+    private class MyOnFpsChangedListener implements MapView.OnFpsChangedListener {
 
         @Override
         public void onFpsChanged(double fps) {
@@ -385,17 +463,58 @@ public class MainActivity extends ActionBarActivity {
         }
     }
 
+    // Rotates an ImageView - does not work if the ImageView has padding, use margins
+    private void rotateImageView(ImageView imageView, float angle) {
+        Matrix matrix = new Matrix();
+        matrix.setScale((float) imageView.getWidth() / (float) imageView.getDrawable().getIntrinsicWidth(), (float) imageView.getHeight() / (float) imageView.getDrawable().getIntrinsicHeight());
+        matrix.postRotate(angle, (float) imageView.getWidth() / 2.0f, (float) imageView.getHeight() / 2.0f);
+        imageView.setImageMatrix(matrix);
+        imageView.setScaleType(ImageView.ScaleType.MATRIX);
+    }
+
+    // Updates the UI to match the current map's position
+    private void updateMap() {
+        rotateImageView(mCompassView, (float) mMapFragment.getMap().getDirection());
+
+        if (mGpsLocation != null) {
+            mGpsMarker.setVisibility(View.VISIBLE);
+            LatLng coordinate = new LatLng(mGpsLocation);
+            PointF screenLocation = mMapFragment.getMap().toScreenLocation(coordinate);
+
+            if (mGpsLocation.hasBearing() || mCompassValid) {
+                mGpsMarker.setImageResource(R.drawable.direction_arrow);
+                FrameLayout.LayoutParams lp = new FrameLayout.LayoutParams((int) (54.0f * mDensity), (int) (54.0f * mDensity));
+                lp.leftMargin = (int) ((screenLocation.x - 54.0f / 2.0f) * mDensity);
+                lp.topMargin = mMapFrameLayout.getHeight() - (int) ((screenLocation.y + 54.0f / 2.0f) * mDensity);
+                mGpsMarker.setLayoutParams(lp);
+                float bearing = mGpsLocation.hasBearing() ? mGpsLocation.getBearing() : mCompassBearing;
+                rotateImageView(mGpsMarker, bearing);
+                mGpsMarker.requestLayout();
+            } else {
+                mGpsMarker.setImageResource(R.drawable.location_marker);
+                FrameLayout.LayoutParams lp = new FrameLayout.LayoutParams((int) (27.0f * mDensity), (int) (27.0f * mDensity));
+                lp.leftMargin = (int) ((screenLocation.x - 27.0f / 2.0f) * mDensity);
+                lp.topMargin = mMapFrameLayout.getHeight() - (int) ((screenLocation.y + 27.0f / 2.0f) * mDensity);
+                mGpsMarker.setLayoutParams(lp);
+                rotateImageView(mGpsMarker, 0.0f);
+                mGpsMarker.requestLayout();
+            }
+        } else {
+            mGpsMarker.setVisibility(View.INVISIBLE);
+        }
+    }
+
     // Called when map state changes
-    public class MyOnMapChangedListener implements MapView.OnMapChangedListener {
+    private class MyOnMapChangedListener implements MapView.OnMapChangedListener {
 
         @Override
         public void onMapChanged() {
-            mCompassView.setRotation((float) mMapFragment.getMap().getDirection());
+            updateMap();
         }
     }
 
     // Called when someone presses the compass
-    public class CompassOnClickListener implements View.OnClickListener {
+    private class CompassOnClickListener implements View.OnClickListener {
 
         @Override
         public void onClick(View view) {

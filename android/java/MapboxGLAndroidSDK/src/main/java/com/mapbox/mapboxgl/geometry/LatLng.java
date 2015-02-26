@@ -1,13 +1,15 @@
-package com.mapbox.mapboxgl.lib.geometry;
+package com.mapbox.mapboxgl.geometry;
 
 import android.location.Location;
 import android.os.Parcel;
 import android.os.Parcelable;
-import com.mapbox.mapboxgl.lib.constants.GeoConstants;
-import com.mapbox.mapboxgl.lib.constants.MathConstants;
+
+import com.mapbox.mapboxgl.constants.GeoConstants;
+import com.mapbox.mapboxgl.constants.MathConstants;
+
 import java.io.Serializable;
 
-public class LatLng implements ILatLng, GeoConstants, MathConstants, Parcelable, Serializable {
+public class LatLng implements ILatLng, Parcelable, Serializable {
 
     public static final Parcelable.Creator<LatLng> CREATOR = new Parcelable.Creator<LatLng>() {
         public LatLng createFromParcel(Parcel in) {
@@ -19,14 +21,14 @@ public class LatLng implements ILatLng, GeoConstants, MathConstants, Parcelable,
         }
     };
 
-    private double longitude;
     private double latitude;
-    private double altitude = 0f;
+    private double longitude;
+    private double altitude = 0.0;
 
     /**
      * Construct a new latitude, longitude point given float arguments
      * @param latitude Latitude in degrees
-     * @param longitude Longitude in degress
+     * @param longitude Longitude in degrees
      */
     public LatLng(double latitude, double longitude) {
         this.latitude = latitude;
@@ -39,7 +41,7 @@ public class LatLng implements ILatLng, GeoConstants, MathConstants, Parcelable,
      * @param longitude Longitude in degress
      * @param altitude Altitude in meters
      */
-    public LatLng(final double latitude, final double longitude, final double altitude) {
+    public LatLng(double latitude, double longitude, double altitude) {
         this.latitude = latitude;
         this.longitude = longitude;
         this.altitude = altitude;
@@ -49,7 +51,7 @@ public class LatLng implements ILatLng, GeoConstants, MathConstants, Parcelable,
      * Transform a Location into a LatLng point
      * @param location Android Location
      */
-    public LatLng(final Location location) {
+    public LatLng(Location location) {
         this(location.getLatitude(), location.getLongitude(), location.getAltitude());
     }
 
@@ -57,15 +59,15 @@ public class LatLng implements ILatLng, GeoConstants, MathConstants, Parcelable,
      * Clone an existing latitude longitude point
      * @param aLatLng LatLng
      */
-    public LatLng(final LatLng aLatLng) {
+    public LatLng(LatLng aLatLng) {
         this.latitude = aLatLng.latitude;
         this.longitude = aLatLng.longitude;
         this.altitude = aLatLng.altitude;
     }
 
     protected LatLng(Parcel in) {
-        longitude = in.readDouble();
         latitude = in.readDouble();
+        longitude = in.readDouble();
         altitude = in.readDouble();
     }
 
@@ -85,30 +87,46 @@ public class LatLng implements ILatLng, GeoConstants, MathConstants, Parcelable,
     }
 
     @Override
-    public boolean equals(final Object obj) {
-        if (obj == null) {
-            return false;
-        }
-        if (obj == this) {
+    public boolean equals(Object o) {
+        if (this == o) {
             return true;
         }
-        if (!obj.getClass().equals(this.getClass())) {
+        if (o == null || getClass() != o.getClass()) {
             return false;
         }
-        final LatLng rhs = (LatLng) obj;
-        return rhs.latitude == this.latitude
-                && rhs.longitude == this.longitude
-                && rhs.altitude == this.altitude;
+
+        LatLng latLng = (LatLng) o;
+
+        if (Double.compare(latLng.altitude, altitude) != 0) {
+            return false;
+        }
+
+        if (Double.compare(latLng.latitude, latitude) != 0) {
+            return false;
+        }
+        if (Double.compare(latLng.longitude, longitude) != 0) {
+            return false;
+        }
+
+        return true;
     }
 
     @Override
     public int hashCode() {
-        return (int) (37.0 * (17.0 * latitude * 1E6d + longitude * 1E6d) + altitude);
+        int result;
+        long temp;
+        temp = Double.doubleToLongBits(latitude);
+        result = (int) (temp ^ (temp >>> 32));
+        temp = Double.doubleToLongBits(longitude);
+        result = 31 * result + (int) (temp ^ (temp >>> 32));
+        temp = Double.doubleToLongBits(altitude);
+        result = 31 * result + (int) (temp ^ (temp >>> 32));
+        return result;
     }
 
     @Override
     public String toString() {
-        return "LatLng [longitude=" + longitude + ", latitude=" + latitude + "]";
+        return "LatLng [longitude=" + longitude + ", latitude=" + latitude + ", altitude=" + altitude + "]";
     }
 
     @Override
@@ -118,8 +136,8 @@ public class LatLng implements ILatLng, GeoConstants, MathConstants, Parcelable,
 
     @Override
     public void writeToParcel(Parcel out, int flags) {
-        out.writeDouble(longitude);
         out.writeDouble(latitude);
+        out.writeDouble(longitude);
         out.writeDouble(altitude);
     }
 
@@ -128,12 +146,12 @@ public class LatLng implements ILatLng, GeoConstants, MathConstants, Parcelable,
      * @param other Other LatLng to compare to
      * @return distance in meters
      */
-    public int distanceTo(final LatLng other) {
+    public double distanceTo(LatLng other) {
 
-        final double a1 = DEG2RAD * this.latitude;
-        final double a2 = DEG2RAD * this.longitude;
-        final double b1 = DEG2RAD * other.getLatitude();
-        final double b2 = DEG2RAD * other.getLongitude();
+        final double a1 = MathConstants.DEG2RAD * this.latitude;
+        final double a2 = MathConstants.DEG2RAD * this.longitude;
+        final double b1 = MathConstants.DEG2RAD * other.getLatitude();
+        final double b2 = MathConstants.DEG2RAD * other.getLongitude();
 
         final double cosa1 = Math.cos(a1);
         final double cosb1 = Math.cos(b1);
@@ -143,6 +161,6 @@ public class LatLng implements ILatLng, GeoConstants, MathConstants, Parcelable,
         final double t3 = Math.sin(a1) * Math.sin(b1);
         final double tt = Math.acos(t1 + t2 + t3);
 
-        return (int) (RADIUS_EARTH_METERS * tt);
+        return GeoConstants.RADIUS_EARTH_METERS * tt;
     }
 }

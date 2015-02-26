@@ -1,4 +1,4 @@
-package com.mapbox.mapboxgl.lib.geometry;
+package com.mapbox.mapboxgl.geometry;
 
 /**
  * A Latitude, Longitude point.

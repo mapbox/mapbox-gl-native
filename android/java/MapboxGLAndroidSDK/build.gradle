@@ -54,7 +54,8 @@ android {
 
     lintOptions {
         checkAllWarnings true
-        disable 'IconMissingDensityFolder'
+        warningsAsErrors true
+        disable 'InvalidPackage'
     }
 
     buildTypes {
@@ -83,8 +84,7 @@ android.libraryVariants.all { variant ->
         failOnError = false
         destinationDir = new File(destinationDir, variant.baseName)
         source = files(variant.javaCompile.source)
-        ext.androidJar = "${android.sdkDirectory}/platforms/${android.compileSdkVersion}/android.jar"
-        classpath = files(variant.javaCompile.classpath.files) + files(ext.androidJar)
+        classpath = files(variant.javaCompile.classpath.files) + files(android.bootClasspath)
         options.links("http://docs.oracle.com/javase/7/docs/api/")
         options.links("http://d.android.com/reference/")
         exclude '**/R.html', '**/R.*.html'
@@ -234,9 +234,8 @@ afterEvaluate { project ->
     }
 
     task androidJavadocs(type: Javadoc) {
-        failOnError false
         source = android.sourceSets.main.java.sourceFiles
-        classpath += project.files(android.getBootClasspath().join(File.pathSeparator))
+        classpath = files(android.bootClasspath)
     }
 
     task androidJavadocsJar(type: Jar, dependsOn: androidJavadocs) {

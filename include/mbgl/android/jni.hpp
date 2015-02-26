@@ -19,16 +19,16 @@ extern std::string androidRelease;
 extern jmethodID onMapChangedId;
 extern jmethodID onFpsChangedId;
 
-extern jclass lonLatClass;
-extern jmethodID lonLatConstructorId;
-extern jfieldID lonLatLonId;
-extern jfieldID lonLatLatId;
+extern jclass latLngClass;
+extern jmethodID latLngConstructorId;
+extern jfieldID latLngLatitudeId;
+extern jfieldID latLngLongitudeId;
 
-extern jclass lonLatZoomClass;
-extern jmethodID lonLatZoomConstructorId;
-extern jfieldID lonLatZoomLonId;
-extern jfieldID lonLatZoomLatId;
-extern jfieldID lonLatZoomZoomId;
+extern jclass latLngZoomClass;
+extern jmethodID latLngZoomConstructorId;
+extern jfieldID latLngZoomLatitudeId;
+extern jfieldID latLngZoomLongitudeId;
+extern jfieldID latLngZoomZoomId;
 
 extern jclass runtimeExceptionClass;
 extern jclass nullPointerExceptionClass;
@@ -38,6 +38,16 @@ extern jmethodID listToArrayId;
 extern jclass arrayListClass;
 extern jmethodID arrayListConstructorId;
 extern jmethodID arrayListAddId;
+
+extern jclass projectedMetersClass;
+extern jmethodID projectedMetersConstructorId;
+extern jfieldID projectedMetersNorthingId;
+extern jfieldID projectedMetersEastingId;
+
+extern jclass pointFClass;
+extern jmethodID pointFConstructorId;
+extern jfieldID pointFXId;
+extern jfieldID pointFYId;
 
 }
 }

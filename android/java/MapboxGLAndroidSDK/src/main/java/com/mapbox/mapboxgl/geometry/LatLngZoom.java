@@ -1,10 +1,11 @@
-package com.mapbox.mapboxgl.lib;
+package com.mapbox.mapboxgl.geometry;
 
 import android.os.Parcel;
 import android.os.Parcelable;
-import com.mapbox.mapboxgl.lib.geometry.LatLng;
 
-public class LatLngZoom extends LatLng implements Parcelable {
+import java.io.Serializable;
+
+public class LatLngZoom extends LatLng implements Parcelable, Serializable {
 
     public static final Parcelable.Creator<LatLngZoom> CREATOR = new Parcelable.Creator<LatLngZoom>() {
         public LatLngZoom createFromParcel(Parcel in) {
@@ -18,8 +19,8 @@ public class LatLngZoom extends LatLng implements Parcelable {
 
     private double zoom;
 
-    public LatLngZoom(double lat, double lon, double zoom) {
-        super(lat, lon);
+    public LatLngZoom(double latitude, double longitude, double zoom) {
+        super(latitude, longitude);
         this.zoom = zoom;
     }
 
@@ -42,33 +43,38 @@ public class LatLngZoom extends LatLng implements Parcelable {
     }
 
     @Override
+    public boolean equals(Object o) {
+        if (this == o) {
+            return true;
+        }
+        if (o == null || getClass() != o.getClass()) {
+            return false;
+        }
+        if (!super.equals(o)) {
+            return false;
+        }
+
+        LatLngZoom that = (LatLngZoom) o;
+
+        if (Double.compare(that.zoom, zoom) != 0) {
+            return false;
+        }
+
+        return true;
+    }
+
+    @Override
     public int hashCode() {
-        final int prime = 31;
-        int result = 1;
+        int result = super.hashCode();
         long temp;
-        temp = super.hashCode();
-        result = prime * result + (int) (temp ^ (temp >>> 32));
+        temp = Double.doubleToLongBits(zoom);
+        result = 31 * result + (int) (temp ^ (temp >>> 32));
         return result;
     }
 
     @Override
-    public boolean equals(Object obj) {
-        if (this == obj) {
-            return true;
-        }
-        if (obj == null) {
-            return false;
-        }
-        if (getClass() != obj.getClass()) {
-            return false;
-        }
-        LatLngZoom other = (LatLngZoom) obj;
-        return super.equals(obj) && Double.doubleToLongBits(zoom) == Double.doubleToLongBits(other.zoom);
-    }
-
-    @Override
     public String toString() {
-        return "LatLngZoom [lat=" + super.getLatitude() + ", lon=" + super.getLongitude() + ", zoom=" + zoom + "]";
+        return "LatLngZoom [latitude=" + super.getLatitude() + ", longitude=" + super.getLongitude() + ", altitude=" + super.getAltitude() + ", zoom=" + zoom + "]";
     }
 
     @Override
