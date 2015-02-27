@@ -9,6 +9,7 @@ namespace mapbox {
 
 std::string normalizeSourceURL(const std::string& url, const std::string& accessToken);
 std::string normalizeGlyphsURL(const std::string& url, const std::string& accessToken);
+std::string normalizeTileURL(const std::string& url, const std::string& sourceURL);
 
 }
 }
