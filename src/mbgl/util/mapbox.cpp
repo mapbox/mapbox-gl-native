@@ -1,7 +1,6 @@
 #include <mbgl/util/mapbox.hpp>
 
 #include <stdexcept>
-#include <regex>
 
 namespace mbgl {
 namespace util {
@@ -44,8 +43,23 @@ std::string normalizeTileURL(const std::string& url, const std::string& sourceUR
     if (sourceURL.empty() || sourceURL.compare(0, mapbox.length(), mapbox) != 0)
         return url;
     
-    static std::regex extension_re("\\.((?:png|jpg)\\d*)(?=$|\\?)");
-    return std::regex_replace(url, extension_re, std::string("{ratio}.$1"));
+    std::string::size_type queryIdx = url.rfind("?");
+    // Trim off the right end but never touch anything before the extension dot.
+    std::string urlSansParams((queryIdx == std::string::npos) ? url : url.substr(0, queryIdx));
+    
+    while (!urlSansParams.empty() && isdigit(urlSansParams.back()))
+        urlSansParams.pop_back();
+    
+    std::string::size_type extensionIdx = urlSansParams.length() - 4;
+    if (extensionIdx <= 0)
+        return url;
+    std::string extension = urlSansParams.substr(extensionIdx);
+    if (extension.compare(".png") != 0 && extension.compare(".jpg") != 0)
+        return url;
+    
+    std::string normalizedURL(url);
+    normalizedURL.insert(extensionIdx, "{ratio}");
+    return normalizedURL;
 }
 
 }
