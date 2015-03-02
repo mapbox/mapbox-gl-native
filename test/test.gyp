@@ -41,6 +41,7 @@
         'miscellaneous/comparisons.cpp',
         'miscellaneous/enums.cpp',
         'miscellaneous/functions.cpp',
+        'miscellaneous/mapbox.cpp',
         'miscellaneous/merge_lines.cpp',
         'miscellaneous/rotation_range.cpp',
         'miscellaneous/style_parser.cpp',
