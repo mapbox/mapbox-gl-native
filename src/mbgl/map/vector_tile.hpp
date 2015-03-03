@@ -1,117 +1,68 @@
 #ifndef MBGL_MAP_VECTOR_TILE
 #define MBGL_MAP_VECTOR_TILE
 
+#include <mbgl/map/geometry_tile.hpp>
 #include <mbgl/style/filter_expression.hpp>
-#include <mbgl/style/value.hpp>
-#include <mbgl/text/glyph.hpp>
 #include <mbgl/util/pbf.hpp>
-#include <mbgl/util/optional.hpp>
-
-#include <cstdint>
-#include <iosfwd>
-#include <map>
-#include <string>
-#include <unordered_map>
-#include <vector>
 
 namespace mbgl {
 
 class VectorTileLayer;
 
-enum class FeatureType {
-    Unknown = 0,
-    Point = 1,
-    LineString = 2,
-    Polygon = 3
-};
-
-std::ostream& operator<<(std::ostream&, const FeatureType& type);
-
-class VectorTileFeature {
+class VectorTileFeature : public GeometryTileFeature<pbf> {
 public:
-    VectorTileFeature(pbf feature, const VectorTileLayer& layer);
-
-    uint64_t id = 0;
-    FeatureType type = FeatureType::Unknown;
-    std::map<std::string, Value> properties;
-    pbf geometry;
-};
-
-std::ostream& operator<<(std::ostream&, const VectorTileFeature& feature);
-
-
-class VectorTileTagExtractor {
-public:
-    VectorTileTagExtractor(const VectorTileLayer &layer);
-
-    void setTags(const pbf &pbf);
-    mapbox::util::optional<Value> getValue(const std::string &key) const;
-    void setType(FeatureType type);
-    FeatureType getType() const;
+    VectorTileFeature(pbf, const VectorTileLayer&);
 
 private:
-    const VectorTileLayer &layer_;
-    pbf tags_;
-    FeatureType type_ = FeatureType::Unknown;
+    const pbf feature_pbf;
 };
 
-/*
- * Allows iterating over the features of a VectorTileLayer using a
- * BucketDescription as filter. Only features matching the descriptions will
- * be returned (as pbf).
- */
-class FilteredVectorTileLayer {
+std::ostream& operator<<(std::ostream&, const GeometryTileFeature<pbf>&);
+
+class VectorTileTagExtractor : public GeometryTileTagExtractor<pbf> {
 public:
-    class iterator {
+    VectorTileTagExtractor(const VectorTileLayer&);
+
+    void setTags(const pbf&);
+    mapbox::util::optional<Value> getValue(const std::string &key) const;
+
+private:
+    pbf tags_pbf;
+};
+
+class FilteredVectorTileLayer : public GeometryFilteredTileLayer<pbf> {
+public:
+    class iterator : public GeometryFilteredTileLayer<pbf>::iterator {
     public:
-        iterator(const FilteredVectorTileLayer& filter, const pbf& data);
+        iterator(const FilteredVectorTileLayer&, const pbf&);
         void operator++();
         bool operator!=(const iterator& other) const;
         const pbf& operator*() const;
 
     private:
-        const FilteredVectorTileLayer& parent;
-        bool valid = false;
-        pbf feature;
-        pbf data;
+        pbf feature_pbf;
+        pbf data_pbf;
     };
 
 public:
-    FilteredVectorTileLayer(const VectorTileLayer& layer, const FilterExpression &filterExpression);
+    FilteredVectorTileLayer(const VectorTileLayer&, const FilterExpression&);
 
     iterator begin() const;
     iterator end() const;
-
-private:
-    const VectorTileLayer& layer;
-    const FilterExpression& filterExpression;
 };
 
-std::ostream& operator<<(std::ostream&, const PositionedGlyph& placement);
-
-class VectorTileLayer {
+class VectorTileLayer : public GeometryTileLayer {
 public:
-    VectorTileLayer(pbf data);
+    VectorTileLayer(pbf);
 
-    const pbf data;
-    std::string name;
-    uint32_t extent = 4096;
-    std::vector<std::string> keys;
-    std::unordered_map<std::string, uint32_t> key_index;
-    std::vector<Value> values;
-    std::map<std::string, std::map<Value, Shaping>> shaping;
-};
-
-class VectorTile {
 public:
-    VectorTile();
-    VectorTile(pbf data);
-    VectorTile& operator=(VectorTile&& other);
-
-    std::map<std::string, const VectorTileLayer> layers;
+    const pbf layer_pbf;
 };
 
-
+class VectorTile : public GeometryTile {
+public:
+    VectorTile(pbf);
+};
 
 }
 
