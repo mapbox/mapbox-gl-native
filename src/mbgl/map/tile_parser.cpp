@@ -29,14 +29,14 @@ namespace mbgl {
 // its header file.
 TileParser::~TileParser() = default;
 
-TileParser::TileParser(const std::string& raw_data_,
+TileParser::TileParser(const std::string& rawData_,
                        VectorTileData& tile_,
                        const util::ptr<const Style>& style_,
                        GlyphAtlas& glyphAtlas_,
                        GlyphStore& glyphStore_,
                        SpriteAtlas& spriteAtlas_,
                        const util::ptr<Sprite>& sprite_)
-    : vector_tile(pbf((const uint8_t *)raw_data_.data(), raw_data_.size())),
+    : vectorTile(pbf((const uint8_t *)rawData_.data(), rawData_.size())),
       tile(tile_),
       style(style_),
       glyphAtlas(glyphAtlas_),
@@ -181,31 +181,31 @@ std::unique_ptr<StyleLayoutSymbol> parseStyleLayoutSymbol(const StyleBucket &buc
     return symbolPtr;
 }
 
-std::unique_ptr<Bucket> TileParser::createBucket(const StyleBucket &bucket_desc) {
+std::unique_ptr<Bucket> TileParser::createBucket(const StyleBucket &bucketDesc) {
     // Skip this bucket if we are to not render this
-    if (tile.id.z < std::floor(bucket_desc.min_zoom) && std::floor(bucket_desc.min_zoom) < tile.source.max_zoom) return nullptr;
-    if (tile.id.z >= std::ceil(bucket_desc.max_zoom)) return nullptr;
-    if (bucket_desc.visibility == mbgl::VisibilityType::None) return nullptr;
+    if (tile.id.z < std::floor(bucketDesc.min_zoom) && std::floor(bucketDesc.min_zoom) < tile.source.max_zoom) return nullptr;
+    if (tile.id.z >= std::ceil(bucketDesc.max_zoom)) return nullptr;
+    if (bucketDesc.visibility == mbgl::VisibilityType::None) return nullptr;
 
-    auto layer_it = vector_tile.layers.find(bucket_desc.source_layer);
-    if (layer_it != vector_tile.layers.end()) {
+    auto layer_it = vectorTile.layers.find(bucketDesc.source_layer);
+    if (layer_it != vectorTile.layers.end()) {
         const VectorTileLayer &layer = layer_it->second;
-        if (bucket_desc.type == StyleLayerType::Fill) {
-            return createFillBucket(layer, bucket_desc);
-        } else if (bucket_desc.type == StyleLayerType::Line) {
-            return createLineBucket(layer, bucket_desc);
-        } else if (bucket_desc.type == StyleLayerType::Symbol) {
-            return createSymbolBucket(layer, bucket_desc);
-        } else if (bucket_desc.type == StyleLayerType::Raster) {
+        if (bucketDesc.type == StyleLayerType::Fill) {
+            return createFillBucket(layer, bucketDesc);
+        } else if (bucketDesc.type == StyleLayerType::Line) {
+            return createLineBucket(layer, bucketDesc);
+        } else if (bucketDesc.type == StyleLayerType::Symbol) {
+            return createSymbolBucket(layer, bucketDesc);
+        } else if (bucketDesc.type == StyleLayerType::Raster) {
             return nullptr;
         } else {
-            fprintf(stderr, "[WARNING] unknown bucket render type for layer '%s' (source layer '%s')\n", bucket_desc.name.c_str(), bucket_desc.source_layer.c_str());
+            fprintf(stderr, "[WARNING] unknown bucket render type for layer '%s' (source layer '%s')\n", bucketDesc.name.c_str(), bucketDesc.source_layer.c_str());
         }
     } else {
         // The layer specified in the bucket does not exist. Do nothing.
         if (debug::tileParseWarnings) {
             fprintf(stderr, "[WARNING] layer '%s' does not exist in tile %d/%d/%d\n",
-                    bucket_desc.source_layer.c_str(), tile.id.z, tile.id.x, tile.id.y);
+                    bucketDesc.source_layer.c_str(), tile.id.z, tile.id.x, tile.id.y);
         }
     }
 

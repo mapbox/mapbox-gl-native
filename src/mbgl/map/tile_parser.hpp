@@ -35,7 +35,7 @@ class TexturePool;
 class TileParser : private util::noncopyable
 {
 public:
-    TileParser(const std::string& raw_data,
+    TileParser(const std::string& rawData,
                VectorTileData& tile,
                const util::ptr<const Style>& style,
                GlyphAtlas& glyphAtlas,
@@ -51,22 +51,22 @@ private:
     bool obsolete() const;
     void parseStyleLayers(util::ptr<const StyleLayerGroup> group);
 
-    std::unique_ptr<Bucket> createBucket(const StyleBucket& bucket_desc);
-    std::unique_ptr<Bucket> createFillBucket(const VectorTileLayer& layer, const StyleBucket& bucket_desc);
-    std::unique_ptr<Bucket> createLineBucket(const VectorTileLayer& layer, const StyleBucket& bucket_desc);
-    std::unique_ptr<Bucket> createSymbolBucket(const VectorTileLayer& layer, const StyleBucket& bucket_desc);
+    std::unique_ptr<Bucket> createBucket(const StyleBucket& bucketDesc);
+    std::unique_ptr<Bucket> createFillBucket(const VectorTileLayer& layer, const StyleBucket& bucketDesc);
+    std::unique_ptr<Bucket> createLineBucket(const VectorTileLayer& layer, const StyleBucket& bucketDesc);
+    std::unique_ptr<Bucket> createSymbolBucket(const VectorTileLayer& layer, const StyleBucket& bucketDesc);
 
     template <class Bucket> void addBucketGeometries(Bucket& bucket, const VectorTileLayer& layer, const FilterExpression& filter);
 
 private:
-    const VectorTile vector_tile;
+    const VectorTile vectorTile;
     VectorTileData& tile;
 
     // Cross-thread shared data.
     util::ptr<const Style> style;
-    GlyphAtlas & glyphAtlas;
-    GlyphStore & glyphStore;
-    SpriteAtlas & spriteAtlas;
+    GlyphAtlas& glyphAtlas;
+    GlyphStore& glyphStore;
+    SpriteAtlas& spriteAtlas;
     util::ptr<Sprite> sprite;
 
     std::unique_ptr<Collision> collision;
