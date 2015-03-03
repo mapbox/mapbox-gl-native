@@ -9,10 +9,10 @@
 static UIColor *const kTintColor = [UIColor colorWithRed:0.120 green:0.550 blue:0.670 alpha:1.000];
 
 static NSDictionary *const kStyles = @{
-    @"bright-v6":    @"Bright",
-    @"basic-v6":     @"Basic",
-    @"outdoors-v6":  @"Outdoors",
-    @"satellite-v6": @"Satellite"
+    @"bright-v7":    @"Bright",
+    @"basic-v7":     @"Basic",
+    @"outdoors-v7":  @"Outdoors",
+    @"satellite-v7": @"Satellite"
 };
 
 @interface MBXViewController () <UIActionSheetDelegate, CLLocationManagerDelegate>
