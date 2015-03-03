@@ -1473,6 +1473,8 @@ mbgl::DefaultFileSource *mbglFileSource = nullptr;
 
             if (self.isAnimatingGesture) return;
 
+            [self snapCompassIfNeeded];
+
             [NSObject cancelPreviousPerformRequestsWithTarget:self selector:@selector(unsuspendRegionChangeDelegateQueue) object:nil];
             [self performSelector:@selector(unsuspendRegionChangeDelegateQueue) withObject:nil afterDelay:0];
 
@@ -1547,6 +1549,18 @@ mbgl::DefaultFileSource *mbglFileSource = nullptr;
                              self.compass.alpha = 1;
                          }
                          completion:nil];
+    }
+}
+
+- (void)snapCompassIfNeeded
+{
+    double degrees = mbglMap->getBearing() * -1;
+    while (degrees >= 360) degrees -= 360;
+    while (degrees < 0) degrees += 360;
+    
+    if ((degrees < 7 || degrees > 353) && self.compass.alpha > 0)
+    {
+        [self resetNorthAnimated:YES];
     }
 }
 
