@@ -1,18 +1,18 @@
-#include <mbgl/map/vector_tile.hpp>
+#include <mbgl/map/geometry_tile.hpp>
 #include <mbgl/platform/log.hpp>
 
 namespace mbgl {
 
 Value parseFeatureType(const Value& value) {
     if (value == std::string("Point")) {
-        return Value(uint64_t(FeatureType::Point));
+        return Value(uint64_t(GeometryFeatureType::Point));
     } else if (value == std::string("LineString")) {
-        return Value(uint64_t(FeatureType::LineString));
+        return Value(uint64_t(GeometryFeatureType::LineString));
     } else if (value == std::string("Polygon")) {
-        return Value(uint64_t(FeatureType::Polygon));
+        return Value(uint64_t(GeometryFeatureType::Polygon));
     } else {
         Log::Warning(Event::ParseStyle, "value for $type filter must be Point, LineString, or Polygon");
-        return Value(uint64_t(FeatureType::Unknown));
+        return Value(uint64_t(GeometryFeatureType::Unknown));
     }
 }
 
