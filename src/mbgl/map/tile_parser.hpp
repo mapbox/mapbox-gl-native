@@ -35,12 +35,13 @@ class TexturePool;
 class TileParser : private util::noncopyable
 {
 public:
-    TileParser(const std::string &data, VectorTileData &tile,
-               const util::ptr<const Style> &style,
-               GlyphAtlas & glyphAtlas,
-               GlyphStore & glyphStore,
-               SpriteAtlas & spriteAtlas,
-               const util::ptr<Sprite> &sprite);
+    TileParser(const std::string& raw_data,
+               VectorTileData& tile,
+               const util::ptr<const Style>& style,
+               GlyphAtlas& glyphAtlas,
+               GlyphStore& glyphStore,
+               SpriteAtlas& spriteAtlas,
+               const util::ptr<Sprite>& sprite);
     ~TileParser();
 
 public:
@@ -50,15 +51,15 @@ private:
     bool obsolete() const;
     void parseStyleLayers(util::ptr<const StyleLayerGroup> group);
 
-    std::unique_ptr<Bucket> createBucket(const StyleBucket &bucket_desc);
-    std::unique_ptr<Bucket> createFillBucket(const VectorTileLayer &layer, const StyleBucket &bucket_desc);
-    std::unique_ptr<Bucket> createLineBucket(const VectorTileLayer& layer, const StyleBucket &bucket_desc);
-    std::unique_ptr<Bucket> createSymbolBucket(const VectorTileLayer& layer, const StyleBucket &bucket_desc);
+    std::unique_ptr<Bucket> createBucket(const StyleBucket& bucket_desc);
+    std::unique_ptr<Bucket> createFillBucket(const VectorTileLayer& layer, const StyleBucket& bucket_desc);
+    std::unique_ptr<Bucket> createLineBucket(const VectorTileLayer& layer, const StyleBucket& bucket_desc);
+    std::unique_ptr<Bucket> createSymbolBucket(const VectorTileLayer& layer, const StyleBucket& bucket_desc);
 
-    template <class Bucket> void addBucketGeometries(Bucket& bucket, const VectorTileLayer& layer, const FilterExpression &filter);
+    template <class Bucket> void addBucketGeometries(Bucket& bucket, const VectorTileLayer& layer, const FilterExpression& filter);
 
 private:
-    const VectorTile vector_data;
+    const VectorTile vector_tile;
     VectorTileData& tile;
 
     // Cross-thread shared data.

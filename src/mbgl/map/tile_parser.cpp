@@ -29,13 +29,14 @@ namespace mbgl {
 // its header file.
 TileParser::~TileParser() = default;
 
-TileParser::TileParser(const std::string &data, VectorTileData &tile_,
-                       const util::ptr<const Style> &style_,
-                       GlyphAtlas & glyphAtlas_,
-                       GlyphStore & glyphStore_,
-                       SpriteAtlas & spriteAtlas_,
-                       const util::ptr<Sprite> &sprite_)
-    : vector_data(pbf((const uint8_t *)data.data(), data.size())),
+TileParser::TileParser(const std::string& raw_data_,
+                       VectorTileData& tile_,
+                       const util::ptr<const Style>& style_,
+                       GlyphAtlas& glyphAtlas_,
+                       GlyphStore& glyphStore_,
+                       SpriteAtlas& spriteAtlas_,
+                       const util::ptr<Sprite>& sprite_)
+    : vector_tile(pbf((const uint8_t *)raw_data_.data(), raw_data_.size())),
       tile(tile_),
       style(style_),
       glyphAtlas(glyphAtlas_),
@@ -186,8 +187,8 @@ std::unique_ptr<Bucket> TileParser::createBucket(const StyleBucket &bucket_desc)
     if (tile.id.z >= std::ceil(bucket_desc.max_zoom)) return nullptr;
     if (bucket_desc.visibility == mbgl::VisibilityType::None) return nullptr;
 
-    auto layer_it = vector_data.layers.find(bucket_desc.source_layer);
-    if (layer_it != vector_data.layers.end()) {
+    auto layer_it = vector_tile.layers.find(bucket_desc.source_layer);
+    if (layer_it != vector_tile.layers.end()) {
         const VectorTileLayer &layer = layer_it->second;
         if (bucket_desc.type == StyleLayerType::Fill) {
             return createFillBucket(layer, bucket_desc);
