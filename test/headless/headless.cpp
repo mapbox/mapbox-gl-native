@@ -120,8 +120,6 @@ TEST_P(HeadlessTest, render) {
 
         if (value.HasMember("center")) ASSERT_TRUE(value["center"].IsArray());
 
-        static const std::string actual_image = "test/suite/tests/" + base + "/" + name +  "/actual.png";
-
         const double zoom = value.HasMember("zoom") ? value["zoom"].GetDouble() : 0;
         const double bearing = value.HasMember("bearing") ? value["bearing"].GetDouble() : 0;
         const double latitude = value.HasMember("center") ? value["center"][rapidjson::SizeType(0)].GetDouble() : 0;
@@ -152,20 +150,25 @@ TEST_P(HeadlessTest, render) {
         map.setLatLngZoom(mbgl::LatLng(latitude, longitude), zoom);
         map.setBearing(bearing);
 
+        struct Data {
+            std::string path;
+            std::unique_ptr<const StillImage> image;
+        };
 
         uv_async_t *async = new uv_async_t;
+        async->data = new Data { "test/suite/tests/" + base + "/" + name +  "/actual.png", nullptr };
         uv_async_init(uv_default_loop(), async, [](uv_async_t *as, int) {
-            std::unique_ptr<const StillImage> image(reinterpret_cast<const StillImage *>(as->data));
+            auto data = std::unique_ptr<Data>(reinterpret_cast<Data *>(as->data));
             uv_close(reinterpret_cast<uv_handle_t *>(as), [](uv_handle_t *handle) {
                 delete reinterpret_cast<uv_async_t *>(handle);
             });
 
-            const std::string png = util::compress_png(image->width, image->height, image->pixels.get());
-            util::write_file(actual_image, png);
+            const std::string png = util::compress_png(data->image->width, data->image->height, data->image->pixels.get());
+            util::write_file(data->path, png);
         });
 
         map.renderStill([async](std::unique_ptr<const StillImage> image) {
-            async->data = const_cast<StillImage *>(image.release());
+            reinterpret_cast<Data *>(async->data)->image = std::move(image);
             uv_async_send(async);
         });
 
