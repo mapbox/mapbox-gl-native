@@ -13,7 +13,8 @@ class StyleLayer;
 
 class Bucket : private util::noncopyable {
 public:
-    virtual void render(Painter& painter, util::ptr<StyleLayer> layer_desc, const Tile::ID& id, const mat4 &matrix) = 0;
+    virtual void render(Painter &painter, const StyleLayer &layer_desc, const Tile::ID &id,
+                        const mat4 &matrix) = 0;
     virtual bool hasData() const = 0;
     virtual ~Bucket() {}
 

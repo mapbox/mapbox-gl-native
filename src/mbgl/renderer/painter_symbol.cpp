@@ -112,13 +112,13 @@ void Painter::renderSDF(SymbolBucket &bucket,
     }
 }
 
-void Painter::renderSymbol(SymbolBucket &bucket, util::ptr<StyleLayer> layer_desc, const Tile::ID &id, const mat4 &matrix) {
+void Painter::renderSymbol(SymbolBucket &bucket, const StyleLayer &layer_desc, const Tile::ID &id, const mat4 &matrix) {
     // Abort early.
     if (pass == RenderPass::Opaque) {
         return;
     }
 
-    const auto &properties = layer_desc->getProperties<SymbolProperties>();
+    const auto &properties = layer_desc.getProperties<SymbolProperties>();
     const auto &layout = *bucket.styleLayout;
 
     MBGL_CHECK_ERROR(glDisable(GL_STENCIL_TEST));

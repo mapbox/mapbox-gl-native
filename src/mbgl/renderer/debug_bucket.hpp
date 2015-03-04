@@ -19,8 +19,9 @@ class DebugBucket : public Bucket {
 public:
     DebugBucket(DebugFontBuffer& fontBuffer);
 
-    virtual void render(Painter& painter, util::ptr<StyleLayer> layer_desc, const Tile::ID& id, const mat4 &matrix);
-    virtual bool hasData() const;
+    void render(Painter &painter, const StyleLayer &layer_desc, const Tile::ID &id,
+                const mat4 &matrix) override;
+    bool hasData() const override;
 
     void drawLines(PlainShader& shader);
     void drawPoints(PlainShader& shader);

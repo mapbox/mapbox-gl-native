@@ -24,7 +24,7 @@ class StyleLayer {
 public:
     StyleLayer(const std::string &id, std::map<ClassID, ClassProperties> &&styles);
 
-    template <typename T> const T &getProperties() {
+    template <typename T> const T &getProperties() const {
         if (properties.is<T>()) {
             return properties.get<T>();
         } else {
