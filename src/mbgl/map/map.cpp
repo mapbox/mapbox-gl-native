@@ -1,4 +1,5 @@
 #include <mbgl/map/map.hpp>
+#include <mbgl/map/environment.hpp>
 #include <mbgl/map/view.hpp>
 #include <mbgl/platform/platform.hpp>
 #include <mbgl/map/source.hpp>
@@ -58,18 +59,17 @@ const static bool uvVersionCheck = []() {
 
 using namespace mbgl;
 
-Map::Map(View& view_, FileSource& fileSource_, RenderMode mode_)
-    : view(view_),
-      fileSource(fileSource_),
+Map::Map(View& view_, FileSource& fileSource, RenderMode mode_)
+    : env(util::make_unique<Environment>(fileSource)),
+      view(view_),
       renderMode(mode_),
-      loop(util::make_unique<uv::loop>()),
       uiThread(std::this_thread::get_id()),
       transform(view_),
       active(false)
 {
     // Setup async notifications
-    asyncTerminate = util::make_unique<uv::async>(**loop, [this]() { terminate(); });
-    asyncUpdate = util::make_unique<uv::async>(**loop, [this]() { updated(); });
+    asyncTerminate = util::make_unique<uv::async>(env->loop, [this]() { terminate(); });
+    asyncUpdate = util::make_unique<uv::async>(env->loop, [this]() { updated(); });
 
     // Initialize the OpenGL context
     view.initialize(this);
@@ -205,13 +205,15 @@ void Map::run() {
 
     view.discard();
 
+    env->setup();
+
     glyphAtlas = util::make_unique<GlyphAtlas>(1024, 1024);
-    glyphStore = std::make_shared<GlyphStore>(fileSource);
+    glyphStore = std::make_shared<GlyphStore>(*env);
     spriteAtlas = util::make_unique<SpriteAtlas>(512, 512);
     lineAtlas = util::make_unique<LineAtlas>(512, 512);
     texturePool = std::make_shared<TexturePool>();
     painter = util::make_unique<Painter>(*spriteAtlas, *glyphAtlas, *lineAtlas);
-    workers = util::make_unique<uv::worker>(**loop, 4, "Tile Worker");
+    workers = util::make_unique<uv::worker>(env->loop, 4, "Tile Worker");
 
     setup();
 
@@ -254,7 +256,7 @@ void Map::runContinuous() {
 
     // This loop will terminate once we Map object's destructor gets called and sends the
     // asyncTerminate signal.
-    uv_run(**loop, UV_RUN_DEFAULT);
+    uv_run(env->loop, UV_RUN_DEFAULT);
 }
 
 void Map::updatedContinuous() {
@@ -270,7 +272,7 @@ void Map::runStillImage() {
     // When rendering still images, the Map event loop will terminate after every map image. However,
     // the map thread stays alive, so we are restarting the event loop after every map image.
     while (true) {
-        uv_run(**loop, UV_RUN_DEFAULT);
+        uv_run(env->loop, UV_RUN_DEFAULT);
 
         // After the loop terminated, these async handles may have been deleted if the terminate()
         // callback was fired. In this case, we are exiting the loop.
@@ -323,6 +325,8 @@ void Map::terminate() {
     // Closes all open handles on the loop. This means that the loop will automatically terminate.
     asyncUpdate.reset();
     asyncTerminate.reset();
+
+    env->terminate();
 }
 
 #pragma mark - Setup
@@ -345,7 +349,7 @@ void Map::loadStyleURL() {
     sprite.reset();
     style = std::make_shared<Style>();
 
-    fileSource.request({ Resource::Kind::JSON, styleURL}, **loop, [&](const Response &res) {
+    env->request({ Resource::Kind::JSON, styleURL}, [&](const Response &res) {
         if (res.status == Response::Successful) {
             // Calculate the base
             const size_t pos = styleURL.rfind('/');
@@ -390,7 +394,7 @@ util::ptr<Sprite> Map::getSprite() {
     const float pixelRatio = state.getPixelRatio();
     const std::string &sprite_url = style->getSpriteURL();
     if (!sprite || sprite->pixelRatio != pixelRatio) {
-        sprite = Sprite::Create(sprite_url, pixelRatio, fileSource);
+        sprite = Sprite::Create(sprite_url, pixelRatio, *env);
     }
 
     return sprite;
@@ -667,7 +671,7 @@ void Map::updateSources() {
         if (source->enabled) {
             if (!source->source) {
                 source->source = std::make_shared<Source>(source->info);
-                source->source->load(*this, fileSource);
+                source->source->load(*this, *env);
             }
         } else {
             source->source.reset();
@@ -694,10 +698,8 @@ void Map::updateSources(const util::ptr<StyleLayerGroup> &group) {
 
 void Map::updateTiles() {
     for (const auto& source : activeSources) {
-        source->source->update(*this, getWorker(),
-                               style, *glyphAtlas, *glyphStore,
-                               *spriteAtlas, getSprite(),
-                               *texturePool, fileSource, ***loop, [this](){ rerender(); });
+        source->source->update(*this, *env, getWorker(), style, *glyphAtlas, *glyphStore,
+                               *spriteAtlas, getSprite(), *texturePool, [this]() { rerender(); });
     }
 }
 

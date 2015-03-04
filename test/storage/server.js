@@ -85,6 +85,13 @@ app.get('/temporary-error', function(req, res) {
     temporaryErrorCounter++;
 });
 
+app.get('/delayed', function(req, res) {
+    setTimeout(function() {
+        res.status(200).send('Response');
+    }, 200);
+});
+
+
 app.get('/load/:number(\\d+)', function(req, res) {
     res.send('Request ' + req.params.number);
 });

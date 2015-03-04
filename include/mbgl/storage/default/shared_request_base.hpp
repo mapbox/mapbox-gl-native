@@ -4,11 +4,13 @@
 #include <mbgl/storage/resource.hpp>
 #include <mbgl/storage/file_cache.hpp>
 #include <mbgl/storage/default_file_source.hpp>
+#include <mbgl/storage/default/request.hpp>
 #include <mbgl/util/util.hpp>
 #include <mbgl/util/noncopyable.hpp>
 
 #include <string>
 #include <set>
+#include <vector>
 #include <cassert>
 
 typedef struct uv_loop_s uv_loop_t;
@@ -45,20 +47,12 @@ public:
         observers.insert(request);
     }
 
-    void unsubscribeAll() {
-        MBGL_VERIFY_THREAD(tid);
-
-        source = nullptr;
-        observers.clear();
-        cancel();
-    }
-
     void unsubscribe(Request *request) {
         MBGL_VERIFY_THREAD(tid);
 
         observers.erase(request);
 
-        if (observers.empty()) {
+        if (abandoned()) {
             // There are no observers anymore. We are initiating cancelation.
             if (source) {
                 // First, remove this SharedRequestBase from the source.
@@ -68,6 +62,29 @@ public:
             // Then, initiate cancelation of this request
             cancel();
         }
+    }
+
+    bool abandoned() const {
+        return observers.empty();
+    }
+
+    std::vector<Request *> removeAllInEnvironment(const Environment &env) {
+        MBGL_VERIFY_THREAD(tid);
+
+        std::vector<Request *> result;
+
+        // Removes all Requests in the supplied environment and returns a list
+        // of them.
+        util::erase_if(observers, [&](Request *req) -> bool {
+            if (&req->env == &env) {
+                result.push_back(req);
+                return true;
+            } else {
+                return false;
+            }
+        });
+
+        return result;
     }
 
 protected:

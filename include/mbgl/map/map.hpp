@@ -37,6 +37,7 @@ class GlyphAtlas;
 class SpriteAtlas;
 class LineAtlas;
 class StillImage;
+class Environment;
 
 class Map : private util::noncopyable {
     friend class View;
@@ -188,11 +189,11 @@ private:
     void updated();
 
 private:
+    const std::unique_ptr<Environment> env;
     View &view;
-    FileSource& fileSource;
+
     const RenderMode renderMode;
-public: // TODO: Make this private again.
-    std::unique_ptr<uv::loop> loop;
+
 private:
     const std::thread::id uiThread;
     std::thread::id mapThread;

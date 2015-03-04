@@ -14,6 +14,25 @@
         '../include',
       ],
 
+      'variables': {
+        'cflags_cc': [
+          '<@(uv_cflags)',
+          '<@(curl_cflags)',
+          '<@(boost_cflags)',
+        ],
+        'ldflags': [
+          '<@(uv_ldflags)',
+          '<@(curl_ldflags)',
+        ],
+        'libraries': [
+          '<@(uv_static_libs)',
+          '<@(curl_static_libs)',
+        ],
+        'defines': [
+          '-DMBGL_HTTP_CURL'
+        ],
+      },
+
       'conditions': [
         ['host == "android"', {
           'variables': {
@@ -32,19 +51,17 @@
         }],
       ],
 
-      'variables': {
-        'cflags_cc': [
-          '<@(uv_cflags)',
-          '<@(curl_cflags)',
-          '<@(boost_cflags)',
-        ],
-        'ldflags': [
-          '<@(uv_ldflags)',
-          '<@(curl_ldflags)',
-        ],
-        'libraries': [
-          '<@(uv_static_libs)',
-          '<@(curl_static_libs)',
+      'direct_dependent_settings': {
+        'conditions': [
+          ['OS == "mac"', {
+            'xcode_settings': {
+              'OTHER_CFLAGS': [ '<@(defines)' ],
+              'OTHER_CPLUSPLUSFLAGS': [ '<@(defines)' ],
+            }
+          }, {
+            'cflags': [ '<@(defines)' ],
+            'cflags_cc': [ '<@(defines)' ],
+          }]
         ],
       },
 

@@ -18,11 +18,11 @@
 namespace mbgl {
 
 class Map;
+class Environment;
 class GlyphAtlas;
 class GlyphStore;
 class SpriteAtlas;
 class Sprite;
-class FileSource;
 class TexturePool;
 class Style;
 class Painter;
@@ -34,13 +34,9 @@ class Source : public std::enable_shared_from_this<Source>, private util::noncop
 public:
     Source(SourceInfo&);
 
-    void load(Map&, FileSource&);
-    void update(Map&, uv::worker&,
-                util::ptr<Style>,
-                GlyphAtlas&, GlyphStore&,
-                SpriteAtlas&, util::ptr<Sprite>,
-                TexturePool&, FileSource&, uv_loop_t& loop,
-                std::function<void ()> callback);
+    void load(Map &, Environment &);
+    void update(Map &, Environment &, uv::worker &, util::ptr<Style>, GlyphAtlas &, GlyphStore &,
+                SpriteAtlas &, util::ptr<Sprite>, TexturePool &, std::function<void()> callback);
 
     void updateMatrices(const mat4 &projMatrix, const TransformState &transform);
     void drawClippingMasks(Painter &painter);
@@ -59,13 +55,9 @@ private:
     int32_t coveringZoomLevel(const TransformState&) const;
     std::forward_list<Tile::ID> coveringTiles(const TransformState&) const;
 
-    TileData::State addTile(Map&, uv::worker&,
-                            util::ptr<Style>,
-                            GlyphAtlas&, GlyphStore&,
-                            SpriteAtlas&, util::ptr<Sprite>,
-                            FileSource&, uv_loop_t &, TexturePool&,
-                            const Tile::ID&,
-                            std::function<void ()> callback);
+    TileData::State addTile(Map &, Environment &, uv::worker &, util::ptr<Style>, GlyphAtlas &,
+                            GlyphStore &, SpriteAtlas &, util::ptr<Sprite>, TexturePool &,
+                            const Tile::ID &, std::function<void()> callback);
 
     TileData::State hasTile(const Tile::ID& id);
 
