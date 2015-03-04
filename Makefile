@@ -21,10 +21,13 @@ config/%.gypi: CMD = ./configure config/$*.gypi
 config/%.gypi: configure
 	@$(ENV_$*) ./scripts/flock.py build/Configure.lock ./configure config/$*.gypi
 
+styles/styles:
+	git submodule update --init styles
+
 #### Library builds ############################################################
 
 .PRECIOUS: Makefile/mbgl
-Makefile/mbgl: config/$(HOST).gypi
+Makefile/mbgl: config/$(HOST).gypi styles/styles
 	deps/run_gyp mbgl.gyp $(CONFIG_$(HOST)) $(LIBS_$(HOST)) --generator-output=./build/$(HOST) -f make
 
 mbgl: Makefile/mbgl
@@ -37,13 +40,13 @@ install: Makefile/mbgl
 	LINK=`pwd`/gyp/link.py $(MAKE) -C build/$(HOST) BUILDTYPE=$(BUILDTYPE) install
 
 .PRECIOUS: Xcode/mbgl
-Xcode/mbgl: config/$(HOST).gypi
+Xcode/mbgl: config/$(HOST).gypi styles/styles
 	deps/run_gyp mbgl.gyp $(CONFIG_$(HOST)) $(LIBS_$(HOST)) --generator-output=./build/$(HOST) -f xcode
 
 ##### Test builds ##############################################################
 
 .PRECIOUS: Makefile/test
-Makefile/test: test/test.gyp config/$(HOST).gypi
+Makefile/test: test/test.gyp config/$(HOST).gypi styles/styles
 	deps/run_gyp test/test.gyp $(CONFIG_$(HOST)) $(LIBS_$(HOST)) --generator-output=./build/$(HOST) -f make
 
 test: Makefile/test
@@ -54,7 +57,7 @@ test-%: test
 
 
 .PRECIOUS: Xcode/test
-Xcode/test: test/test.gyp config/osx.gypi
+Xcode/test: test/test.gyp config/osx.gypi styles/styles
 	deps/run_gyp test/test.gyp $(CONFIG_osx) $(LIBS_osx) --generator-output=./build/osx -f xcode
 
 .PHONY: lproj lbuild run-xlinux
@@ -71,7 +74,7 @@ xtest-%: xtest
 #### Mac OS X application builds ###############################################
 
 .PRECIOUS: Makefile/osx
-Makefile/osx: macosx/mapboxgl-app.gyp config/osx.gypi
+Makefile/osx: macosx/mapboxgl-app.gyp config/osx.gypi styles/styles
 	deps/run_gyp macosx/mapboxgl-app.gyp $(CONFIG_osx) $(LIBS_osx) --generator-output=./build/osx -f make
 
 .PHONY: osx run-osx
@@ -83,7 +86,7 @@ run-osx: osx
 
 
 .PRECIOUS: Xcode/osx
-Xcode/osx: macosx/mapboxgl-app.gyp config/osx.gypi
+Xcode/osx: macosx/mapboxgl-app.gyp config/osx.gypi styles/styles
 	deps/run_gyp macosx/mapboxgl-app.gyp $(CONFIG_osx) $(LIBS_osx) --generator-output=./build/osx -f xcode
 
 .PHONY: xosx-proj xosx run-xosx
@@ -104,7 +107,7 @@ xproj: xosx-proj
 #### iOS application builds ####################################################
 
 .PRECIOUS: Xcode/ios
-Xcode/ios: ios/app/mapboxgl-app.gyp config/ios.gypi
+Xcode/ios: ios/app/mapboxgl-app.gyp config/ios.gypi styles/styles
 	deps/run_gyp ios/app/mapboxgl-app.gyp $(CONFIG_ios) $(LIBS_ios) --generator-output=./build/ios -f xcode
 
 .PHONY: ios-proj ios run-ios
@@ -124,7 +127,7 @@ iproj: ios-proj
 #### Linux application builds ##################################################
 
 .PRECIOUS: Makefile/linux
-Makefile/linux: linux/mapboxgl-app.gyp config/$(HOST).gypi
+Makefile/linux: linux/mapboxgl-app.gyp config/$(HOST).gypi styles/styles
 	deps/run_gyp linux/mapboxgl-app.gyp $(CONFIG_$(HOST)) $(LIBS_linux) --generator-output=./build/$(HOST) -f make
 
 .PHONY: linux run-linux
@@ -136,7 +139,7 @@ run-linux: linux
 
 
 .PRECIOUS: Xcode/linux
-Xcode/linux: linux/mapboxgl-app.gyp config/osx.gypi
+Xcode/linux: linux/mapboxgl-app.gyp config/osx.gypi styles/styles
 	deps/run_gyp linux/mapboxgl-app.gyp $(CONFIG_osx) $(LIBS_linux) --generator-output=./build/osx -f xcode
 
 .PHONY: lproj lbuild run-xlinux
@@ -157,7 +160,7 @@ lproj: xlinux-proj
 
 .PRECIOUS: Makefile/android-%
 Makefile/android-%: CMD = deps/run_gyp android/mapboxgl-app.gyp $(CONFIG_android-$*) $(LIBS_android) --generator-output=./build/android-$* -f make-android
-Makefile/android-%: config/android-%.gypi
+Makefile/android-%: config/android-%.gypi styles/styles
 	@echo $(CMD)
 	@$(ENV_android-$*) $(CMD)
 
