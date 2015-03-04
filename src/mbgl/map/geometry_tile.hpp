@@ -5,17 +5,18 @@
 #include <mbgl/style/value.hpp>
 #include <mbgl/text/glyph.hpp>
 #include <mbgl/util/optional.hpp>
+#include <mbgl/util/variant.hpp>
+#include <mbgl/util/vec.hpp>
 
 #include <cstdint>
 #include <iosfwd>
 #include <map>
 #include <string>
+#include <type_traits>
 #include <unordered_map>
 #include <vector>
 
 namespace mbgl {
-
-class GeometryTileLayer;
 
 enum class GeometryFeatureType {
     Unknown = 0,
@@ -24,58 +25,54 @@ enum class GeometryFeatureType {
     Polygon = 3
 };
 
+typedef Coordinate GeometryPoint;
+typedef std::vector<GeometryPoint> GeometryLine;
+typedef std::vector<GeometryLine> GeometryPolygon;
+
+using Geometry = mapbox::util::variant<std::false_type, GeometryPoint, GeometryLine, GeometryPolygon>;
+
 std::ostream& operator<<(std::ostream&, const GeometryFeatureType& type);
 
-template <typename T>
+class GeometryTileLayer;
+
 class GeometryTileFeature {
+public:
+    GeometryTileFeature();
+
+    virtual Geometry nextGeometry();
+
 public:
     uint64_t id = 0;
     GeometryFeatureType type = GeometryFeatureType::Unknown;
     std::map<std::string, Value> properties;
-    T geometries;
 };
 
-template <typename T>
-std::ostream& operator<<(std::ostream&, const GeometryTileFeature<T>& feature);
+std::ostream& operator<<(std::ostream&, const GeometryTileFeature& feature);
 
 template <typename T>
 class GeometryTileTagExtractor {
 public:
     GeometryTileTagExtractor(const GeometryTileLayer&);
 
-    void setTags(const T&);
-    virtual mapbox::util::optional<Value> getValue(const std::string &key) const;
+    inline void setTags(const T& tags_) { tags = tags_; }
+    mapbox::util::optional<Value> getValue(const std::string &key) const;
+
     inline void setType(GeometryFeatureType type_) { type = type_; }
-    GeometryFeatureType getType() const { return type; }
+    inline GeometryFeatureType getType() const { return type; }
 
 protected:
-    const GeometryTileLayer &layer;
+    const GeometryTileLayer& layer;
+    T tags;
     GeometryFeatureType type = GeometryFeatureType::Unknown;
 };
 
-
-template <typename T>
 class GeometryFilteredTileLayer {
-public:
-    class iterator {
-    public:
-        iterator(const GeometryFilteredTileLayer&);
-        virtual void operator++();
-        virtual bool operator!=(const iterator& other) const;
-        virtual const T& operator*() const;
-
-    protected:
-        const GeometryFilteredTileLayer& parent;
-        bool valid = false;
-    };
-
 public:
     GeometryFilteredTileLayer(const GeometryTileLayer&, const FilterExpression&);
 
-    iterator begin() const;
-    iterator end() const;
+    virtual GeometryTileFeature nextMatchingFeature();
 
-public:
+protected:
     const GeometryTileLayer& layer;
     const FilterExpression& filterExpression;
 };
@@ -83,6 +80,9 @@ public:
 std::ostream& operator<<(std::ostream&, const PositionedGlyph&);
 
 class GeometryTileLayer {
+public:
+    virtual GeometryTileFeature nextFeature();
+
 public:
     std::string name;
     uint32_t extent = 4096;

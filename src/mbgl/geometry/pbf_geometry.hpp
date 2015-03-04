@@ -1,5 +1,5 @@
-#ifndef MBGL_GEOMETRY_GEOMETRY
-#define MBGL_GEOMETRY_GEOMETRY
+#ifndef MBGL_GEOMETRY_PBF_GEOMETRY
+#define MBGL_GEOMETRY_PBF_GEOMETRY
 
 #include <mbgl/util/pbf.hpp>
 #include <mbgl/util/noncopyable.hpp>
@@ -8,10 +8,10 @@
 
 namespace mbgl {
 
-class Geometry : private util::noncopyable {
+class PBFGeometry : private util::noncopyable {
 
 public:
-    inline explicit Geometry(pbf& data);
+    inline explicit PBFGeometry(pbf& data);
 
     enum command : uint8_t {
         end = 0,
@@ -30,14 +30,14 @@ private:
     int32_t ox, oy;
 };
 
-Geometry::Geometry(pbf& data_)
+PBFGeometry::PBFGeometry(pbf& data_)
     : data(data_),
       cmd(1),
       length(0),
       x(0), y(0),
       ox(0), oy(0) {}
 
-Geometry::command Geometry::next(int32_t &rx, int32_t &ry) {
+PBFGeometry::command PBFGeometry::next(int32_t &rx, int32_t &ry) {
     if (data.data < data.end) {
         if (length == 0) {
             uint32_t cmd_length = static_cast<uint32_t>(data.varint());
