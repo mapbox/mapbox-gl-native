@@ -30,7 +30,7 @@ map.render({}, function(err, image) {
 });
 ```
 
-The first argument passed to `map.render` is an options object, all key are optional:
+The first argument passed to `map.render` is an options object, all keys are optional:
 
 ```js
 {
