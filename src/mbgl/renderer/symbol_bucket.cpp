@@ -1,10 +1,10 @@
-#include <mbgl/style/style_layout.hpp>
 #include <mbgl/renderer/symbol_bucket.hpp>
+#include <mbgl/map/geometry_tile.hpp>
+#include <mbgl/style/style_layout.hpp>
 #include <mbgl/geometry/text_buffer.hpp>
 #include <mbgl/geometry/icon_buffer.hpp>
 #include <mbgl/geometry/glyph_atlas.hpp>
 #include <mbgl/geometry/sprite_atlas.hpp>
-#include <mbgl/geometry/geometry.hpp>
 #include <mbgl/geometry/anchor.hpp>
 #include <mbgl/geometry/resample.hpp>
 #include <mbgl/renderer/painter.hpp>
@@ -47,7 +47,7 @@ void SymbolBucket::addGlyphsToAtlas(uint64_t tileid, const std::string stackname
     glyphAtlas.addGlyphs(tileid, text, stackname, fontStack,face);
 }
 
-std::vector<SymbolFeature> SymbolBucket::processFeatures(const VectorTileLayer &layer,
+std::vector<SymbolFeature> SymbolBucket::processFeatures(const GeometryTileLayer &layer,
                                                          const FilterExpression &filter,
                                                          GlyphStore &glyphStore,
                                                          const Sprite &sprite) {
@@ -64,9 +64,9 @@ std::vector<SymbolFeature> SymbolBucket::processFeatures(const VectorTileLayer &
     // Determine and load glyph ranges
     std::set<GlyphRange> ranges;
 
-    FilteredVectorTileLayer filtered_layer(layer, filter);
-    for (const pbf &feature_pbf : filtered_layer) {
-        const VectorTileFeature feature{feature_pbf, layer};
+    GeometryFilteredTileLayer filtered_layer(layer, filter);
+    GeometryTileFeature feature = filtered_layer.nextMatchingFeature();
+    while (feature.type != GeometryFeatureType::Unknown) {
 
         SymbolFeature ft;
 
@@ -97,22 +97,21 @@ std::vector<SymbolFeature> SymbolBucket::processFeatures(const VectorTileLayer &
 
             auto &multiline = ft.geometry;
 
-            // Decode line
-            Geometry::command cmd;
-            pbf geom(feature.geometry);
-            Geometry geometry(geom);
+            Geometry geometry = feature.nextGeometry();
+            const GeometryLine& line = geometry.get<GeometryLine>();
             bool first = true;
-            int32_t x, y;
-            while ((cmd = geometry.next(x, y)) != Geometry::end) {
-                if (first || cmd == Geometry::move_to) {
+            for (auto point_it = line.begin(); point_it != line.end(); point_it++) {
+                if (first) {
                     multiline.emplace_back();
                     first = false;
                 }
-                multiline.back().emplace_back(x, y);
+                multiline.back().emplace_back(point_it->x, point_it->y);
             }
 
             features.push_back(std::move(ft));
         }
+
+        feature = filtered_layer.nextMatchingFeature();
     }
 
     if (layout.placement == PlacementType::Line) {
@@ -125,7 +124,7 @@ std::vector<SymbolFeature> SymbolBucket::processFeatures(const VectorTileLayer &
     return features;
 }
 
-void SymbolBucket::addFeatures(const VectorTileLayer &layer, const FilterExpression &filter,
+void SymbolBucket::addFeatures(const GeometryTileLayer &layer, const FilterExpression &filter,
                                const Tile::ID &id, SpriteAtlas &spriteAtlas, Sprite &sprite,
                                GlyphAtlas & glyphAtlas, GlyphStore &glyphStore) {
     auto &layout = *styleLayout;

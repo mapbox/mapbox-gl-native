@@ -1,16 +1,11 @@
 #include <mbgl/renderer/fill_bucket.hpp>
 #include <mbgl/geometry/fill_buffer.hpp>
 #include <mbgl/geometry/elements_buffer.hpp>
-#include <mbgl/geometry/geometry.hpp>
-
 #include <mbgl/renderer/painter.hpp>
 #include <mbgl/style/style.hpp>
 #include <mbgl/style/style_layout.hpp>
-#include <mbgl/map/vector_tile.hpp>
 #include <mbgl/util/std.hpp>
-
 #include <mbgl/platform/gl.hpp>
-
 
 #include <cassert>
 
@@ -69,24 +64,13 @@ FillBucket::~FillBucket() {
     }
 }
 
-void FillBucket::addGeometry(pbf& geom) {
-    Geometry::command cmd;
+void FillBucket::addGeometry(const Geometry& fill) {
+    const GeometryPolygon& polygon = fill.get<GeometryPolygon>();
 
-    Coordinate coord;
-    Geometry geometry(geom);
-    int32_t x, y;
-    while ((cmd = geometry.next(x, y)) != Geometry::end) {
-        if (cmd == Geometry::move_to) {
-            if (line.size()) {
-                clipper.AddPath(line, ClipperLib::ptSubject, true);
-                line.clear();
-                hasVertices = true;
-            }
+    for (auto line_it = polygon.begin(); line_it != polygon.end(); line_it++) {
+        for (auto point_it = line_it->begin(); point_it != line_it->end(); point_it++) {
+            line.emplace_back(point_it->x, point_it->y);
         }
-        line.emplace_back(x, y);
-    }
-
-    if (line.size()) {
         clipper.AddPath(line, ClipperLib::ptSubject, true);
         line.clear();
         hasVertices = true;

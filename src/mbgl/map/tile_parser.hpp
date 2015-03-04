@@ -1,6 +1,7 @@
 #ifndef MBGL_MAP_TILE_PARSER
 #define MBGL_MAP_TILE_PARSER
 
+#include <mbgl/map/geometry_tile.hpp>
 #include <mbgl/map/vector_tile.hpp>
 #include <mbgl/style/filter_expression.hpp>
 #include <mbgl/style/class_properties.hpp>
@@ -52,11 +53,11 @@ private:
     void parseStyleLayers(util::ptr<const StyleLayerGroup> group);
 
     std::unique_ptr<Bucket> createBucket(const StyleBucket& bucketDesc);
-    std::unique_ptr<Bucket> createFillBucket(const VectorTileLayer& layer, const StyleBucket& bucketDesc);
-    std::unique_ptr<Bucket> createLineBucket(const VectorTileLayer& layer, const StyleBucket& bucketDesc);
-    std::unique_ptr<Bucket> createSymbolBucket(const VectorTileLayer& layer, const StyleBucket& bucketDesc);
+    std::unique_ptr<Bucket> createFillBucket(const GeometryTileLayer& layer, const StyleBucket& bucketDesc);
+    std::unique_ptr<Bucket> createLineBucket(const GeometryTileLayer& layer, const StyleBucket& bucketDesc);
+    std::unique_ptr<Bucket> createSymbolBucket(const GeometryTileLayer& layer, const StyleBucket& bucketDesc);
 
-    template <class Bucket> void addBucketGeometries(Bucket& bucket, const VectorTileLayer& layer, const FilterExpression& filter);
+    template <class Bucket> void addBucketGeometries(Bucket& bucket, const GeometryTileLayer& layer, const FilterExpression& filter);
 
 private:
     const VectorTile vectorTile;

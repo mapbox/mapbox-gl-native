@@ -1,12 +1,9 @@
 #include <mbgl/renderer/line_bucket.hpp>
-#include <mbgl/geometry/elements_buffer.hpp>
-#include <mbgl/geometry/geometry.hpp>
 
+#include <mbgl/geometry/elements_buffer.hpp>
 #include <mbgl/renderer/painter.hpp>
 #include <mbgl/style/style.hpp>
 #include <mbgl/style/style_layout.hpp>
-#include <mbgl/map/vector_tile.hpp>
-
 #include <mbgl/util/math.hpp>
 #include <mbgl/util/std.hpp>
 #include <mbgl/platform/gl.hpp>
@@ -37,28 +34,6 @@ LineBucket::~LineBucket() {
     // Do not remove. header file only contains forward definitions to unique pointers.
 }
 
-
-void LineBucket::addGeometry(pbf& geom) {
-    std::vector<Coordinate> line;
-    Geometry::command cmd;
-
-    Coordinate coord;
-    Geometry geometry(geom);
-    int32_t x, y;
-    while ((cmd = geometry.next(x, y)) != Geometry::end) {
-        if (cmd == Geometry::move_to) {
-            if (!line.empty()) {
-                addGeometry(line);
-                line.clear();
-            }
-        }
-        line.emplace_back(x, y);
-    }
-    if (line.size()) {
-        addGeometry(line);
-    }
-}
-
 struct TriangleElement {
     TriangleElement(uint16_t a_, uint16_t b_, uint16_t c_) : a(a_), b(b_), c(c_) {}
     uint16_t a, b, c;
@@ -66,7 +41,9 @@ struct TriangleElement {
 
 typedef uint16_t PointElement;
 
-void LineBucket::addGeometry(const std::vector<Coordinate>& vertices) {
+void LineBucket::addGeometry(const Geometry &line) {
+    const GeometryLine& vertices = line.get<GeometryLine>();
+
     auto &layout = *styleLayout;
     // TODO: use roundLimit
     // const float roundLimit = geometry.round_limit;
