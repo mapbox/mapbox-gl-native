@@ -14,7 +14,7 @@
 
 namespace mbgl {
 
-class FileSource;
+class Environment;
 
 class SpritePosition {
 public:
@@ -34,11 +34,12 @@ public:
 class Sprite : public std::enable_shared_from_this<Sprite>, private util::noncopyable {
 private:
     struct Key {};
-    void load(FileSource& fileSource);
+    void load(Environment &env);
 
 public:
     Sprite(const Key &, const std::string& base_url, float pixelRatio);
-    static util::ptr<Sprite> Create(const std::string& base_url, float pixelRatio, FileSource& fileSource);
+    static util::ptr<Sprite>
+    Create(const std::string &base_url, float pixelRatio, Environment &env);
 
     const SpritePosition &getSpritePosition(const std::string& name) const;
 

@@ -12,9 +12,12 @@ TEST_F(Storage, HTTPReading) {
 
     DefaultFileSource fs(nullptr, uv_default_loop());
 
+    auto &env = *static_cast<const Environment *>(nullptr);
+
     const auto mainThread = uv_thread_self();
 
-    fs.request({ Resource::Unknown, "http://127.0.0.1:3000/test" }, uv_default_loop(), [&](const Response &res) {
+    fs.request({ Resource::Unknown, "http://127.0.0.1:3000/test" }, uv_default_loop(), env,
+               [&](const Response &res) {
         EXPECT_EQ(uv_thread_self(), mainThread);
         EXPECT_EQ(Response::Successful, res.status);
         EXPECT_EQ("Hello World!", res.data);
@@ -25,7 +28,8 @@ TEST_F(Storage, HTTPReading) {
         HTTPTest.finish();
     });
 
-    fs.request({ Resource::Unknown, "http://127.0.0.1:3000/doesnotexist" }, uv_default_loop(), [&](const Response &res) {
+    fs.request({ Resource::Unknown, "http://127.0.0.1:3000/doesnotexist" }, uv_default_loop(),
+               env, [&](const Response &res) {
         EXPECT_EQ(uv_thread_self(), mainThread);
         EXPECT_EQ(Response::Error, res.status);
         EXPECT_EQ("HTTP status code 404", res.message);
@@ -45,7 +49,10 @@ TEST_F(Storage, HTTPNoCallback) {
 
     DefaultFileSource fs(nullptr, uv_default_loop());
 
-    fs.request({ Resource::Unknown, "http://127.0.0.1:3000/test" }, uv_default_loop(), nullptr);
+    auto &env = *static_cast<const Environment *>(nullptr);
+
+    fs.request({ Resource::Unknown, "http://127.0.0.1:3000/test" }, uv_default_loop(), env,
+               nullptr);
 
     uv_run(uv_default_loop(), UV_RUN_DEFAULT);
 
@@ -59,7 +66,9 @@ TEST_F(Storage, HTTPNoCallbackNoLoop) {
 
     DefaultFileSource fs(nullptr, uv_default_loop());
 
-    fs.request({ Resource::Unknown, "http://127.0.0.1:3000/test" }, nullptr);
+    auto &env = *static_cast<const Environment *>(nullptr);
+
+    fs.request({ Resource::Unknown, "http://127.0.0.1:3000/test" }, env, nullptr);
 
     uv_run(uv_default_loop(), UV_RUN_DEFAULT);
 

@@ -14,6 +14,8 @@ TEST_F(Storage, HTTPCoalescing) {
 
     DefaultFileSource fs(nullptr, uv_default_loop());
 
+    auto &env = *static_cast<const Environment *>(nullptr);
+
     static const Response *reference = nullptr;
 
     const auto complete = [&](const Response &res) {
@@ -41,7 +43,7 @@ TEST_F(Storage, HTTPCoalescing) {
     const Resource resource { Resource::Unknown, "http://127.0.0.1:3000/test" };
 
     for (int i = 0; i < total; i++) {
-        fs.request(resource, uv_default_loop(), complete);
+        fs.request(resource, uv_default_loop(), env, complete);
     }
 
     uv_run(uv_default_loop(), UV_RUN_DEFAULT);

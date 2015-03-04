@@ -1,4 +1,5 @@
 #include <mbgl/map/map.hpp>
+#include <mbgl/map/environment.hpp>
 #include <mbgl/map/view.hpp>
 #include <mbgl/platform/platform.hpp>
 #include <mbgl/map/source.hpp>
@@ -25,6 +26,7 @@
 #include <mbgl/util/string.hpp>
 #include <mbgl/util/uv.hpp>
 #include <mbgl/util/mapbox.hpp>
+#include <mbgl/util/exception.hpp>
 
 #include <algorithm>
 #include <iostream>
@@ -57,16 +59,14 @@ const static bool uvVersionCheck = []() {
 using namespace mbgl;
 
 Map::Map(View& view_, FileSource& fileSource_)
-    : loop(util::make_unique<uv::loop>()),
+    : env(util::make_unique<Environment>(fileSource_)),
       view(view_),
-#ifdef DEBUG
       mainThread(std::this_thread::get_id()),
       mapThread(mainThread),
-#endif
       transform(view_),
       fileSource(fileSource_),
       glyphAtlas(util::make_unique<GlyphAtlas>(1024, 1024)),
-      glyphStore(std::make_shared<GlyphStore>(fileSource)),
+      glyphStore(std::make_shared<GlyphStore>(*env)),
       spriteAtlas(util::make_unique<SpriteAtlas>(512, 512)),
       lineAtlas(util::make_unique<LineAtlas>(512, 512)),
       texturePool(std::make_shared<TexturePool>()),
@@ -92,7 +92,7 @@ Map::~Map() {
     texturePool.reset();
     workers.reset();
 
-    uv_run(**loop, UV_RUN_DEFAULT);
+    uv_run(env->loop, UV_RUN_DEFAULT);
 }
 
 uv::worker &Map::getWorker() {
@@ -112,7 +112,7 @@ void Map::start(bool startPaused) {
     isStopped = false;
 
     // Setup async notifications
-    asyncTerminate = util::make_unique<uv::async>(**loop, [this]() {
+    asyncTerminate = util::make_unique<uv::async>(env->loop, [this]() {
         assert(std::this_thread::get_id() == mapThread);
 
         // Remove all of these to make sure they are destructed in the correct thread.
@@ -127,7 +127,7 @@ void Map::start(bool startPaused) {
         asyncTerminate.reset();
     });
 
-    asyncRender = util::make_unique<uv::async>(**loop, [this]() {
+    asyncRender = util::make_unique<uv::async>(env->loop, [this]() {
         assert(std::this_thread::get_id() == mapThread);
 
         if (state.hasSize()) {
@@ -207,7 +207,7 @@ void Map::pause(bool waitForPause) {
     pausing = true;
     mutexRun.unlock();
 
-    uv_stop(**loop);
+    uv_stop(env->loop);
     rerender(); // Needed to ensure uv_stop is seen and uv_run exits, otherwise we deadlock on wait_for_pause
 
     if (waitForPause) {
@@ -242,12 +242,14 @@ void Map::run() {
     }
 
     if (mode == Mode::Static && !style && styleURL.empty()) {
-        throw exception("Style is not set");
+        throw util::Exception("Style is not set");
     }
 
     view.activate();
 
-    workers = util::make_unique<uv::worker>(**loop, 4, "Tile Worker");
+    workers = util::make_unique<uv::worker>(env->loop, 4, "Tile Worker");
+
+    env->setup();
 
     setup();
     prepare();
@@ -255,15 +257,15 @@ void Map::run() {
     if (mode == Mode::Continuous) {
         terminating = false;
         while(!terminating) {
-            uv_run(**loop, UV_RUN_DEFAULT);
+            uv_run(env->loop, UV_RUN_DEFAULT);
             checkForPause();
         }
     } else {
-        uv_run(**loop, UV_RUN_DEFAULT);
+        uv_run(env->loop, UV_RUN_DEFAULT);
     }
 
     // Run the event loop once more to make sure our async delete handlers are called.
-    uv_run(**loop, UV_RUN_ONCE);
+    uv_run(env->loop, UV_RUN_ONCE);
 
     // If the map rendering wasn't started asynchronously, we perform one render
     // *after* all events have been processed.
@@ -376,7 +378,7 @@ util::ptr<Sprite> Map::getSprite() {
     const float pixelRatio = state.getPixelRatio();
     const std::string &sprite_url = style->getSpriteURL();
     if (!sprite || sprite->pixelRatio != pixelRatio) {
-        sprite = Sprite::Create(sprite_url, pixelRatio, fileSource);
+        sprite = Sprite::Create(sprite_url, pixelRatio, *env);
     }
 
     return sprite;
@@ -621,7 +623,7 @@ void Map::updateSources() {
         if (source->enabled) {
             if (!source->source) {
                 source->source = std::make_shared<Source>(source->info);
-                source->source->load(*this, fileSource);
+                source->source->load(*this, *env);
             }
         } else {
             source->source.reset();
@@ -648,10 +650,8 @@ void Map::updateSources(const util::ptr<StyleLayerGroup> &group) {
 
 void Map::updateTiles() {
     for (const auto& source : activeSources) {
-        source->source->update(*this, getWorker(),
-                               style, *glyphAtlas, *glyphStore,
-                               *spriteAtlas, getSprite(),
-                               *texturePool, fileSource, ***loop, [this](){ update(); });
+        source->source->update(*this, *env, getWorker(), style, *glyphAtlas, *glyphStore,
+                               *spriteAtlas, getSprite(), *texturePool, [this]() { update(); });
     }
 }
 
@@ -659,7 +659,7 @@ void Map::prepare() {
     if (!style) {
         style = std::make_shared<Style>();
 
-        fileSource.request({ Resource::Kind::JSON, styleURL}, **loop, [&](const Response &res) {
+        env->request({ Resource::Kind::JSON, styleURL}, [&](const Response &res) {
             if (res.status == Response::Successful) {
                 // Calculate the base
                 const size_t pos = styleURL.rfind('/');

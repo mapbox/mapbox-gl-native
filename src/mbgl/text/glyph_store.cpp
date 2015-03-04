@@ -1,5 +1,6 @@
 #include <mbgl/text/glyph_store.hpp>
 
+#include <mbgl/map/environment.hpp>
 #include <mbgl/util/std.hpp>
 #include <mbgl/util/string.hpp>
 #include <mbgl/util/utf.hpp>
@@ -137,9 +138,11 @@ void FontStack::lineWrap(Shaping &shaping, const float lineHeight, const float m
     align(shaping, justify, horizontalAlign, verticalAlign, maxLineLength, lineHeight, line);
 }
 
-GlyphPBF::GlyphPBF(const std::string &glyphURL, const std::string &fontStack, GlyphRange glyphRange, FileSource& fileSource)
-    : future(promise.get_future().share())
-{
+GlyphPBF::GlyphPBF(const std::string &glyphURL,
+                   const std::string &fontStack,
+                   GlyphRange glyphRange,
+                   Environment &env)
+    : future(promise.get_future().share()) {
     // Load the glyph set URL
     std::string url = util::replaceTokens(glyphURL, [&](const std::string &name) -> std::string {
         if (name == "fontstack") return util::percentEncode(fontStack);
@@ -148,7 +151,7 @@ GlyphPBF::GlyphPBF(const std::string &glyphURL, const std::string &fontStack, Gl
     });
 
     // The prepare call jumps back to the main thread.
-    fileSource.request({ Resource::Kind::Glyphs, url }, [&, url](const Response &res) {
+    env.requestAsync({ Resource::Kind::Glyphs, url }, [&, url](const Response &res) {
         if (res.status != Response::Successful) {
             // Something went wrong with loading the glyph pbf. Pass on the error to the future listeners.
             const std::string msg = std::string { "[ERROR] failed to load glyphs: " } + res.message;
@@ -223,7 +226,7 @@ void GlyphPBF::parse(FontStack &stack) {
     data.clear();
 }
 
-GlyphStore::GlyphStore(FileSource& fileSource_) : fileSource(fileSource_), mtx(util::make_unique<uv::mutex>()) {}
+GlyphStore::GlyphStore(Environment& env_) : env(env_), mtx(util::make_unique<uv::mutex>()) {}
 
 void GlyphStore::setURL(const std::string &url) {
     glyphURL = url;
@@ -265,7 +268,7 @@ std::shared_future<GlyphPBF &> GlyphStore::loadGlyphRange(const std::string &fon
     auto range_it = rangeSets.find(range);
     if (range_it == rangeSets.end()) {
         // We don't have this glyph set yet for this font stack.
-        range_it = rangeSets.emplace(range, util::make_unique<GlyphPBF>(glyphURL, fontStack, range, fileSource)).first;
+        range_it = rangeSets.emplace(range, util::make_unique<GlyphPBF>(glyphURL, fontStack, range, env)).first;
     }
 
     return range_it->second->getFuture();

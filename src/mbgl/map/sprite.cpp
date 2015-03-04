@@ -5,7 +5,9 @@
 
 #include <string>
 #include <mbgl/platform/platform.hpp>
-#include <mbgl/storage/file_source.hpp>
+#include <mbgl/map/environment.hpp>
+#include <mbgl/storage/resource.hpp>
+#include <mbgl/storage/response.hpp>
 #include <mbgl/util/uv_detail.hpp>
 #include <mbgl/util/std.hpp>
 
@@ -22,9 +24,9 @@ SpritePosition::SpritePosition(uint16_t x_, uint16_t y_, uint16_t width_, uint16
       sdf(sdf_) {
 }
 
-util::ptr<Sprite> Sprite::Create(const std::string& base_url, float pixelRatio, FileSource& fileSource) {
+util::ptr<Sprite> Sprite::Create(const std::string &base_url, float pixelRatio, Environment &env) {
     util::ptr<Sprite> sprite(std::make_shared<Sprite>(Key(), base_url, pixelRatio));
-    sprite->load(fileSource);
+    sprite->load(env);
     return sprite;
 }
 
@@ -51,7 +53,7 @@ Sprite::operator bool() const {
 // Note: This is a separate function that must be called exactly once after creation
 // The reason this isn't part of the constructor is that calling shared_from_this() in
 // the constructor fails.
-void Sprite::load(FileSource& fileSource) {
+void Sprite::load(Environment &env) {
 
     if (!valid) {
         // Treat a non-existent sprite as a successfully loaded empty sprite.
@@ -63,29 +65,25 @@ void Sprite::load(FileSource& fileSource) {
 
     util::ptr<Sprite> sprite = shared_from_this();
 
-    fileSource.request({ Resource::Kind::JSON, jsonURL }, [sprite](const Response &res) {
+    env.request({ Resource::Kind::JSON, jsonURL }, [sprite](const Response &res) {
         if (res.status == Response::Successful) {
             sprite->body = res.data;
             sprite->parseJSON();
             sprite->complete();
         } else {
             Log::Warning(Event::Sprite, "Failed to load sprite info: %s", res.message.c_str());
-            if (!sprite->future.valid()) {
-                sprite->promise.set_exception(std::make_exception_ptr(std::runtime_error(res.message)));
-            }
+            sprite->promise.set_exception(std::make_exception_ptr(std::runtime_error(res.message)));
         }
     });
 
-    fileSource.request({ Resource::Kind::Image, spriteURL }, [sprite](const Response &res) {
+    env.request({ Resource::Kind::Image, spriteURL }, [sprite](const Response &res) {
         if (res.status == Response::Successful) {
             sprite->image = res.data;
             sprite->parseImage();
             sprite->complete();
         } else {
             Log::Warning(Event::Sprite, "Failed to load sprite image: %s", res.message.c_str());
-            if (!sprite->future.valid()) {
-                sprite->promise.set_exception(std::make_exception_ptr(std::runtime_error(res.message)));
-            }
+            sprite->promise.set_exception(std::make_exception_ptr(std::runtime_error(res.message)));
         }
     });
 }

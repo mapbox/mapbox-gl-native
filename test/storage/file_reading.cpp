@@ -16,9 +16,10 @@ TEST_F(Storage, AssetEmptyFile) {
     DefaultFileSource fs(nullptr, uv_default_loop());
 #endif
 
-    fs.request({ Resource::Unknown, "asset://TEST_DATA/fixtures/storage/empty" },
-               uv_default_loop(),
-               [&](const Response &res) {
+    auto &env = *static_cast<const Environment *>(nullptr);
+
+    fs.request({ Resource::Unknown, "asset://TEST_DATA/fixtures/storage/empty" }, uv_default_loop(),
+               env, [&](const Response &res) {
         EXPECT_EQ(Response::Successful, res.status);
         EXPECT_EQ(0ul, res.data.size());
         EXPECT_EQ(0, res.expires);
@@ -42,9 +43,10 @@ TEST_F(Storage, AssetNonEmptyFile) {
     DefaultFileSource fs(nullptr, uv_default_loop());
 #endif
 
+    auto &env = *static_cast<const Environment *>(nullptr);
+
     fs.request({ Resource::Unknown, "asset://TEST_DATA/fixtures/storage/nonempty" },
-               uv_default_loop(),
-               [&](const Response &res) {
+               uv_default_loop(), env, [&](const Response &res) {
         EXPECT_EQ(Response::Successful, res.status);
         EXPECT_EQ(16ul, res.data.size());
         EXPECT_EQ(0, res.expires);
@@ -69,9 +71,10 @@ TEST_F(Storage, AssetNonExistentFile) {
     DefaultFileSource fs(nullptr, uv_default_loop());
 #endif
 
+    auto &env = *static_cast<const Environment *>(nullptr);
+
     fs.request({ Resource::Unknown, "asset://TEST_DATA/fixtures/storage/does_not_exist" },
-               uv_default_loop(),
-               [&](const Response &res) {
+               uv_default_loop(), env, [&](const Response &res) {
         EXPECT_EQ(Response::Error, res.status);
         EXPECT_EQ(0ul, res.data.size());
         EXPECT_EQ(0, res.expires);

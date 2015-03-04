@@ -11,13 +11,17 @@ TEST_F(Storage, HTTPLoad) {
 
     DefaultFileSource fs(nullptr, uv_default_loop());
 
+    auto &env = *static_cast<const Environment *>(nullptr);
+
     const int concurrency = 50;
     const int max = 10000;
     int number = 1;
 
     std::function<void()> req = [&]() {
         const auto current = number++;
-        fs.request({ Resource::Unknown, std::string("http://127.0.0.1:3000/load/") +  std::to_string(current) }, uv_default_loop(), [&, current](const Response &res) {
+        fs.request({ Resource::Unknown,
+                     std::string("http://127.0.0.1:3000/load/") + std::to_string(current) },
+                   uv_default_loop(), env, [&, current](const Response &res) {
             EXPECT_EQ(Response::Successful, res.status);
             EXPECT_EQ(std::string("Request ") +  std::to_string(current), res.data);
             EXPECT_EQ(0, res.expires);

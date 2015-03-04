@@ -36,11 +36,7 @@ class View;
 class GlyphAtlas;
 class SpriteAtlas;
 class LineAtlas;
-
-struct exception : std::runtime_error {
-    inline exception(const char *msg) : std::runtime_error(msg) {
-    }
-};
+class Environment;
 
 class Map : private util::noncopyable {
     friend class View;
@@ -182,8 +178,8 @@ private:
 
     Mode mode = Mode::None;
 
-public: // TODO: make private again
-    std::unique_ptr<uv::loop> loop;
+    const std::unique_ptr<Environment> env;
+    View &view;
 
 private:
     std::unique_ptr<uv::worker> workers;
@@ -214,12 +210,8 @@ private:
     // Stores whether the map thread has been stopped already.
     std::atomic_bool isStopped;
 
-    View &view;
-
-#ifdef DEBUG
     const std::thread::id mainThread;
     std::thread::id mapThread;
-#endif
 
     Transform transform;
     TransformState state;

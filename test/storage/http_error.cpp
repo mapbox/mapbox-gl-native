@@ -22,9 +22,12 @@ TEST_F(Storage, HTTPError) {
 
     DefaultFileSource fs(nullptr, uv_default_loop());
 
+    auto &env = *static_cast<const Environment *>(nullptr);
+
     auto start = uv_hrtime();
 
-    fs.request({ Resource::Unknown, "http://127.0.0.1:3000/temporary-error" }, uv_default_loop(), [&](const Response &res) {
+    fs.request({ Resource::Unknown, "http://127.0.0.1:3000/temporary-error" }, uv_default_loop(),
+               env, [&](const Response &res) {
         const auto duration = double(uv_hrtime() - start) / 1e9;
         EXPECT_LT(1, duration) << "Backoff timer didn't wait 1 second";
         EXPECT_GT(1.2, duration) << "Backoff timer fired too late";
@@ -38,20 +41,27 @@ TEST_F(Storage, HTTPError) {
         HTTPTemporaryError.finish();
     });
 
-    fs.request({ Resource::Unknown, "http://127.0.0.1:3001/" }, uv_default_loop(), [&](const Response &res) {
+    fs.request({ Resource::Unknown, "http://127.0.0.1:3001/" }, uv_default_loop(), env,
+               [&](const Response &res) {
         const auto duration = double(uv_hrtime() - start) / 1e9;
         // 1.5 seconds == 4 retries, with a 500ms timeout (see above).
         EXPECT_LT(1.5, duration) << "Resource wasn't retried the correct number of times";
         EXPECT_GT(1.7, duration) << "Resource wasn't retried the correct number of times";
         EXPECT_EQ(Response::Error, res.status);
-        EXPECT_TRUE(res.message == "Couldn't connect to server: couldn't connect to host" || res.message == "The operation couldn’t be completed. (NSURLErrorDomain error -1004.)") << res.message;
+#ifdef MBGL_HTTP_NSURL
+        EXPECT_STREQ(res.message.c_str(), "The operation couldn’t be completed. (NSURLErrorDomain error -1004.)");
+#elif MBGL_HTTP_CURL
+        const std::string prefix { "Couldn't connect to server: " };
+        EXPECT_STREQ(prefix.c_str(), res.message.substr(0, prefix.size()).c_str()) << "Full message is: \"" << res.message << "\"";
+#else
+        FAIL();
+#endif
         EXPECT_EQ("", res.data);
         EXPECT_EQ(0, res.expires);
         EXPECT_EQ(0, res.modified);
         EXPECT_EQ("", res.etag);
         HTTPConnectionError.finish();
     });
-
 
     uv_run(uv_default_loop(), UV_RUN_DEFAULT);
 

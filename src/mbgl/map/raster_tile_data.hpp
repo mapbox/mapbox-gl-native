@@ -17,7 +17,7 @@ class RasterTileData : public TileData {
     friend class TileParser;
 
 public:
-    RasterTileData(Tile::ID const& id, TexturePool&, const SourceInfo&, FileSource &);
+    RasterTileData(Tile::ID const &id, TexturePool &, const SourceInfo &, Environment &);
     ~RasterTileData();
 
     void parse() override;

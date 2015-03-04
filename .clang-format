@@ -2,7 +2,7 @@ Standard: Cpp11
 IndentWidth: 4
 AccessModifierOffset: -4
 UseTab: Never
-BinPackParameters: false
+BinPackParameters: true
 AllowShortIfStatementsOnASingleLine: false
 AllowShortLoopsOnASingleLine: false
 AllowShortBlocksOnASingleLine: false

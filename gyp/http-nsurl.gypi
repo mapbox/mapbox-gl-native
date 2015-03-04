@@ -25,11 +25,21 @@
         'libraries': [
           '<@(uv_static_libs)',
         ],
+        'defines': [
+          '-DMBGL_HTTP_NSURL'
+        ],
       },
 
       'xcode_settings': {
         'OTHER_CPLUSPLUSFLAGS': [ '<@(cflags_cc)' ],
         'CLANG_ENABLE_OBJC_ARC': 'NO',
+      },
+
+      'direct_dependent_settings': {
+        'xcode_settings': {
+          'OTHER_CFLAGS': [ '<@(defines)' ],
+          'OTHER_CPLUSPLUSFLAGS': [ '<@(defines)' ],
+        }
       },
 
       'link_settings': {

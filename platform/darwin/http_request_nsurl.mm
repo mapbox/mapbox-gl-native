@@ -188,6 +188,7 @@ void HTTPRequestImpl::handleResponse() {
         }
 
         context->removeRequest(request);
+        request->ptr = nullptr;
         delete request;
         request = nullptr;
     }
@@ -206,6 +207,8 @@ void HTTPRequestImpl::cancel() {
         [task cancel];
         [task release];
         task = nullptr;
+    } else {
+        delete this;
     }
 }
 

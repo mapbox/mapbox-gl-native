@@ -50,6 +50,10 @@ struct DefaultFileSource::ResultAction {
 struct DefaultFileSource::StopAction {
 };
 
+struct DefaultFileSource::AbortAction {
+    const Environment &env;
+};
+
 
 DefaultFileSource::DefaultFileSource(FileCache *cache_, const std::string &root)
     : assetRoot(root.empty() ? platform::assetRoot() : root),
@@ -105,8 +109,9 @@ SharedRequestBase *DefaultFileSource::find(const Resource &resource) {
     return nullptr;
 }
 
-Request *DefaultFileSource::request(const Resource &resource, uv_loop_t *l, Callback callback) {
-    auto req = new Request(resource, l, std::move(callback));
+Request *DefaultFileSource::request(const Resource &resource, uv_loop_t *l, const Environment &env,
+                                    Callback callback) {
+    auto req = new Request(resource, l, env, std::move(callback));
 
     // This function can be called from any thread. Make sure we're executing the actual call in the
     // file source loop by sending it over the queue. It will be processed in processAction().
@@ -114,8 +119,9 @@ Request *DefaultFileSource::request(const Resource &resource, uv_loop_t *l, Call
     return req;
 }
 
-void DefaultFileSource::request(const Resource &resource, Callback callback) {
-    auto req = new Request(resource, nullptr, std::move(callback));
+void DefaultFileSource::request(const Resource &resource, const Environment &env,
+                                Callback callback) {
+    auto req = new Request(resource, nullptr, env, std::move(callback));
 
     // This function can be called from any thread. Make sure we're executing the actual call in the
     // file source loop by sending it over the queue. It will be processed in processAction().
@@ -129,6 +135,11 @@ void DefaultFileSource::cancel(Request *req) {
     // file source loop by sending it over the queue. It will be processed in processAction().
     queue->send(RemoveRequestAction{ req });
 }
+
+void DefaultFileSource::abort(const Environment &env) {
+    queue->send(AbortAction{ env });
+}
+
 
 void DefaultFileSource::process(AddRequestAction &action) {
     const Resource &resource = action.request->resource;
@@ -209,16 +220,43 @@ void DefaultFileSource::process(ResultAction &action) {
     }
 }
 
+// A stop action means the file source is about to be destructed. We need to cancel all requests
+// for all environments.
 void DefaultFileSource::process(StopAction &) {
-    // Cancel all remaining requests.
-    for (auto it : pending) {
-        it.second->unsubscribeAll();
-    }
-    pending.clear();
-
+    // There may not be any pending requests in this file source anymore. You must terminate all
+    // Map objects before deleting the FileSource.
+    assert(pending.empty());
     assert(queue);
     queue->stop();
     queue = nullptr;
+}
+
+// Aborts all requests that are part of the current environment.
+void DefaultFileSource::process(AbortAction &action) {
+    // Construct a cancellation response.
+    auto res = util::make_unique<Response>();
+    res->status = Response::Error;
+    res->message = "Environment is terminating";
+    std::shared_ptr<const Response> response = std::move(res);
+
+    // Iterate through all pending requests and remove them in case they're abandoned.
+    util::erase_if(pending, [&](const std::pair<Resource, SharedRequestBase *> &it) -> bool {
+        // Obtain all pending requests that are in the current environment.
+        const auto aborted = it.second->removeAllInEnvironment(action.env);
+
+        // Notify all observers.
+        for (auto req : aborted) {
+            req->notify(response);
+        }
+
+        // Finally, remove all requests that are now abandoned.
+        if (it.second->abandoned()) {
+            it.second->cancel();
+            return true;
+        } else {
+            return false;
+        }
+    });
 }
 
 void DefaultFileSource::notify(SharedRequestBase *sharedRequest,
@@ -235,8 +273,8 @@ void DefaultFileSource::notify(SharedRequestBase *sharedRequest,
         }
 
         // Notify all observers.
-        for (auto it : observers) {
-            it->notify(response);
+        for (auto req : observers) {
+            req->notify(response);
         }
     }
 
