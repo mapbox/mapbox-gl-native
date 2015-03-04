@@ -31,10 +31,11 @@ public:
                LineVertexBuffer &vertexBuffer,
                TriangleElementsBuffer &triangleElementsBuffer,
                PointElementsBuffer &pointElementsBuffer);
-    ~LineBucket();
+    ~LineBucket() override;
 
-    virtual void render(Painter& painter, util::ptr<StyleLayer> layer_desc, const Tile::ID& id, const mat4 &matrix);
-    virtual bool hasData() const;
+    void render(Painter &painter, const StyleLayer &layer_desc, const Tile::ID &id,
+                const mat4 &matrix) override;
+    bool hasData() const override;
 
     void addGeometry(pbf& data);
     void addGeometry(const std::vector<Coordinate>& line);

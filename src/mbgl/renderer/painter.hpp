@@ -81,11 +81,11 @@ public:
                 TransformState state,
                 std::chrono::steady_clock::time_point time);
 
-    void renderLayers(util::ptr<StyleLayerGroup> group);
-    void renderLayer(util::ptr<StyleLayer> layer_desc, const Tile::ID* id = nullptr, const mat4* matrix = nullptr);
+    void renderLayers(const StyleLayerGroup &group);
+    void renderLayer(const StyleLayer &layer_desc, const Tile::ID* id = nullptr, const mat4* matrix = nullptr);
 
     // Renders a particular layer from a tile.
-    void renderTileLayer(const Tile& tile, util::ptr<StyleLayer> layer_desc, const mat4 &matrix);
+    void renderTileLayer(const Tile& tile, const StyleLayer &layer_desc, const mat4 &matrix);
 
     // Renders debug information for a tile.
     void renderTileDebug(const Tile& tile);
@@ -95,11 +95,11 @@ public:
 
     void renderDebugText(DebugBucket& bucket, const mat4 &matrix);
     void renderDebugText(const std::vector<std::string> &strings);
-    void renderFill(FillBucket& bucket, util::ptr<StyleLayer> layer_desc, const Tile::ID& id, const mat4 &matrix);
-    void renderLine(LineBucket& bucket, util::ptr<StyleLayer> layer_desc, const Tile::ID& id, const mat4 &matrix);
-    void renderSymbol(SymbolBucket& bucket, util::ptr<StyleLayer> layer_desc, const Tile::ID& id, const mat4 &matrix);
-    void renderRaster(RasterBucket& bucket, util::ptr<StyleLayer> layer_desc, const Tile::ID& id, const mat4 &matrix);
-    void renderBackground(util::ptr<StyleLayer> layer_desc);
+    void renderFill(FillBucket& bucket, const StyleLayer &layer_desc, const Tile::ID& id, const mat4 &matrix);
+    void renderLine(LineBucket& bucket, const StyleLayer &layer_desc, const Tile::ID& id, const mat4 &matrix);
+    void renderSymbol(SymbolBucket& bucket, const StyleLayer &layer_desc, const Tile::ID& id, const mat4 &matrix);
+    void renderRaster(RasterBucket& bucket, const StyleLayer &layer_desc, const Tile::ID& id, const mat4 &matrix);
+    void renderBackground(const StyleLayer &layer_desc);
 
     float saturationFactor(float saturation);
     float contrastFactor(float contrast);
@@ -109,7 +109,7 @@ public:
 
     void renderPrerenderedTexture(RasterBucket &bucket, const mat4 &matrix, const RasterProperties& properties);
 
-    void createPrerendered(RasterBucket& bucket, util::ptr<StyleLayer> layer_desc, const Tile::ID& id);
+    void createPrerendered(RasterBucket& bucket, const StyleLayer &layer_desc, const Tile::ID& id);
 
     void resize();
 

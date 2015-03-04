@@ -10,12 +10,12 @@
 
 using namespace mbgl;
 
-void Painter::renderLine(LineBucket& bucket, util::ptr<StyleLayer> layer_desc, const Tile::ID& id, const mat4 &matrix) {
+void Painter::renderLine(LineBucket& bucket, const StyleLayer &layer_desc, const Tile::ID& id, const mat4 &matrix) {
     // Abort early.
     if (pass == RenderPass::Opaque) return;
     if (!bucket.hasData()) return;
 
-    const auto &properties = layer_desc->getProperties<LineProperties>();
+    const auto &properties = layer_desc.getProperties<LineProperties>();
     const auto &layout = *bucket.styleLayout;
 
     // the distance over which the line edge fades out.

@@ -56,12 +56,13 @@ class SymbolBucket : public Bucket {
 
 public:
     SymbolBucket(std::unique_ptr<const StyleLayoutSymbol> styleLayout, Collision &collision);
-    ~SymbolBucket();
+    ~SymbolBucket() override;
 
-    virtual void render(Painter &painter, util::ptr<StyleLayer> layer_desc, const Tile::ID &id, const mat4 &matrix);
-    virtual bool hasData() const;
-    virtual bool hasTextData() const;
-    virtual bool hasIconData() const;
+    void render(Painter &painter, const StyleLayer &layer_desc, const Tile::ID &id,
+                const mat4 &matrix) override;
+    bool hasData() const override;
+    bool hasTextData() const;
+    bool hasIconData() const;
 
     void addFeatures(const VectorTileLayer &layer, const FilterExpression &filter,
                      const Tile::ID &id, SpriteAtlas &spriteAtlas, Sprite &sprite,

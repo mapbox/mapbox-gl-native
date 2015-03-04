@@ -18,8 +18,9 @@ class RasterBucket : public Bucket {
 public:
     RasterBucket(TexturePool&, const StyleLayoutRaster&);
 
-    virtual void render(Painter& painter, util::ptr<StyleLayer> layer_desc, const Tile::ID& id, const mat4 &matrix);
-    virtual bool hasData() const;
+    void render(Painter &painter, const StyleLayer &layer_desc, const Tile::ID &id,
+                const mat4 &matrix) override;
+    bool hasData() const override;
 
     bool setImage(const std::string &data);
 

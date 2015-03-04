@@ -20,9 +20,9 @@ public:
     RasterTileData(Tile::ID const& id, TexturePool&, const SourceInfo&, FileSource &);
     ~RasterTileData();
 
-    virtual void parse();
-    virtual void render(Painter &painter, util::ptr<StyleLayer> layer_desc, const mat4 &matrix);
-    virtual bool hasData(StyleLayer const& layer_desc) const;
+    void parse() override;
+    void render(Painter &painter, const StyleLayer &layer_desc, const mat4 &matrix) override;
+    bool hasData(StyleLayer const &layer_desc) const override;
 
 protected:
     StyleLayoutRaster layout;

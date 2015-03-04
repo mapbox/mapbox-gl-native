@@ -25,7 +25,7 @@ void RasterTileData::parse() {
     }
 }
 
-void RasterTileData::render(Painter &painter, util::ptr<StyleLayer> layer_desc, const mat4 &matrix) {
+void RasterTileData::render(Painter &painter, const StyleLayer &layer_desc, const mat4 &matrix) {
     bucket.render(painter, layer_desc, id, matrix);
 }
 

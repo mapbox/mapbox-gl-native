@@ -95,8 +95,8 @@ void Source::drawClippingMasks(Painter &painter) {
     }
 }
 
-void Source::render(Painter &painter, util::ptr<StyleLayer> layer_desc) {
-    gl::group group(std::string { "layer: " } + layer_desc->id);
+void Source::render(Painter &painter, const StyleLayer &layer_desc) {
+    gl::group group(std::string { "layer: " } + layer_desc.id);
     for (const std::pair<const Tile::ID, std::unique_ptr<Tile>> &pair : tiles) {
         Tile &tile = *pair.second;
         if (tile.data && tile.data->state == TileData::State::parsed) {
@@ -105,7 +105,7 @@ void Source::render(Painter &painter, util::ptr<StyleLayer> layer_desc) {
     }
 }
 
-void Source::render(Painter &painter, util::ptr<StyleLayer> layer_desc, const Tile::ID &id, const mat4 &matrix) {
+void Source::render(Painter &painter, const StyleLayer &layer_desc, const Tile::ID &id, const mat4 &matrix) {
     auto it = tiles.find(id);
     if (it != tiles.end() && it->second->data && it->second->data->state == TileData::State::parsed) {
         painter.renderTileLayer(*it->second, layer_desc, matrix);

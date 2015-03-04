@@ -235,7 +235,9 @@ void Painter::render(const Style& style, const std::set<util::ptr<StyleSource>>&
 
     // Actually render the layers
     if (debug::renderTree) { std::cout << "{" << std::endl; indent++; }
-    renderLayers(style.layers);
+    if (style.layers) {
+        renderLayers(*style.layers);
+    }
     if (debug::renderTree) { std::cout << "}" << std::endl; indent--; }
 
     // Finalize the rendering, e.g. by calling debug render calls per tile.
@@ -247,14 +249,9 @@ void Painter::render(const Style& style, const std::set<util::ptr<StyleSource>>&
     }
 }
 
-void Painter::renderLayers(util::ptr<StyleLayerGroup> group) {
-    if (!group) {
-        // Make sure that we actually do have a layer group.
-        return;
-    }
-
+void Painter::renderLayers(const StyleLayerGroup &group) {
     // TODO: Correctly compute the number of layers recursively beforehand.
-    float strata_thickness = 1.0f / (group->layers.size() + 1);
+    float strata_thickness = 1.0f / (group.layers.size() + 1);
 
     // - FIRST PASS ------------------------------------------------------------
     // Render everything top-to-bottom by using reverse iterators. Render opaque
@@ -264,10 +261,10 @@ void Painter::renderLayers(util::ptr<StyleLayerGroup> group) {
         std::cout << std::string(indent++ * 4, ' ') << "OPAQUE {" << std::endl;
     }
     int i = 0;
-    for (auto it = group->layers.rbegin(), end = group->layers.rend(); it != end; ++it, ++i) {
+    for (auto it = group.layers.rbegin(), end = group.layers.rend(); it != end; ++it, ++i) {
         setOpaque();
         setStrata(i * strata_thickness);
-        renderLayer(*it);
+        renderLayer(**it);
     }
     if (debug::renderTree) {
         std::cout << std::string(--indent * 4, ' ') << "}" << std::endl;
@@ -280,40 +277,40 @@ void Painter::renderLayers(util::ptr<StyleLayerGroup> group) {
         std::cout << std::string(indent++ * 4, ' ') << "TRANSLUCENT {" << std::endl;
     }
     --i;
-    for (auto it = group->layers.begin(), end = group->layers.end(); it != end; ++it, --i) {
+    for (auto it = group.layers.begin(), end = group.layers.end(); it != end; ++it, --i) {
         setTranslucent();
         setStrata(i * strata_thickness);
-        renderLayer(*it);
+        renderLayer(**it);
     }
     if (debug::renderTree) {
         std::cout << std::string(--indent * 4, ' ') << "}" << std::endl;
     }
 }
 
-void Painter::renderLayer(util::ptr<StyleLayer> layer_desc, const Tile::ID* id, const mat4* matrix) {
-    if (layer_desc->bucket->visibility == VisibilityType::None) return;
-    if (layer_desc->type == StyleLayerType::Background) {
+void Painter::renderLayer(const StyleLayer &layer_desc, const Tile::ID* id, const mat4* matrix) {
+    if (layer_desc.bucket->visibility == VisibilityType::None) return;
+    if (layer_desc.type == StyleLayerType::Background) {
         // This layer defines a background color/image.
 
         if (debug::renderTree) {
-            std::cout << std::string(indent * 4, ' ') << "- " << layer_desc->id << " ("
-                      << layer_desc->type << ")" << std::endl;
+            std::cout << std::string(indent * 4, ' ') << "- " << layer_desc.id << " ("
+                      << layer_desc.type << ")" << std::endl;
         }
 
         renderBackground(layer_desc);
     } else {
         // This is a singular layer.
-        if (!layer_desc->bucket) {
-            fprintf(stderr, "[WARNING] layer '%s' is missing bucket\n", layer_desc->id.c_str());
+        if (!layer_desc.bucket) {
+            fprintf(stderr, "[WARNING] layer '%s' is missing bucket\n", layer_desc.id.c_str());
             return;
         }
 
-        if (!layer_desc->bucket->style_source) {
-            fprintf(stderr, "[WARNING] can't find source for layer '%s'\n", layer_desc->id.c_str());
+        if (!layer_desc.bucket->style_source) {
+            fprintf(stderr, "[WARNING] can't find source for layer '%s'\n", layer_desc.id.c_str());
             return;
         }
 
-        StyleSource const& style_source = *layer_desc->bucket->style_source;
+        StyleSource const& style_source = *layer_desc.bucket->style_source;
 
         // Skip this layer if there is no data.
         if (!style_source.source) {
@@ -324,36 +321,36 @@ void Painter::renderLayer(util::ptr<StyleLayer> layer_desc, const Tile::ID* id, 
         // This may occur when there /is/ a bucket created for this layer, but the min/max-zoom
         // is set to a fractional value, or value that is larger than the source maxzoom.
         const double zoom = state.getZoom();
-        if (layer_desc->bucket->min_zoom > zoom ||
-            layer_desc->bucket->max_zoom <= zoom) {
+        if (layer_desc.bucket->min_zoom > zoom ||
+            layer_desc.bucket->max_zoom <= zoom) {
             return;
         }
 
         // Abort early if we can already deduce from the bucket type that
         // we're not going to render anything anyway during this pass.
-        switch (layer_desc->type) {
+        switch (layer_desc.type) {
             case StyleLayerType::Fill:
-                if (!layer_desc->getProperties<FillProperties>().isVisible()) return;
+                if (!layer_desc.getProperties<FillProperties>().isVisible()) return;
                 break;
             case StyleLayerType::Line:
                 if (pass == RenderPass::Opaque) return;
-                if (!layer_desc->getProperties<LineProperties>().isVisible()) return;
+                if (!layer_desc.getProperties<LineProperties>().isVisible()) return;
                 break;
             case StyleLayerType::Symbol:
                 if (pass == RenderPass::Opaque) return;
-                if (!layer_desc->getProperties<SymbolProperties>().isVisible()) return;
+                if (!layer_desc.getProperties<SymbolProperties>().isVisible()) return;
                 break;
             case StyleLayerType::Raster:
                 if (pass == RenderPass::Opaque) return;
-                if (!layer_desc->getProperties<RasterProperties>().isVisible()) return;
+                if (!layer_desc.getProperties<RasterProperties>().isVisible()) return;
                 break;
             default:
                 break;
         }
 
         if (debug::renderTree) {
-            std::cout << std::string(indent * 4, ' ') << "- " << layer_desc->id << " ("
-                      << layer_desc->type << ")" << std::endl;
+            std::cout << std::string(indent * 4, ' ') << "- " << layer_desc.id << " ("
+                      << layer_desc.type << ")" << std::endl;
         }
         if (!id) {
             style_source.source->render(*this, layer_desc);
@@ -363,17 +360,17 @@ void Painter::renderLayer(util::ptr<StyleLayer> layer_desc, const Tile::ID* id, 
     }
 }
 
-void Painter::renderTileLayer(const Tile& tile, util::ptr<StyleLayer> layer_desc, const mat4 &matrix) {
+void Painter::renderTileLayer(const Tile& tile, const StyleLayer &layer_desc, const mat4 &matrix) {
     assert(tile.data);
-    if (tile.data->hasData(*layer_desc) || layer_desc->type == StyleLayerType::Raster) {
+    if (tile.data->hasData(layer_desc) || layer_desc.type == StyleLayerType::Raster) {
         gl::group group(std::string { "render " } + tile.data->name);
         prepareTile(tile);
         tile.data->render(*this, layer_desc, matrix);
     }
 }
 
-void Painter::renderBackground(util::ptr<StyleLayer> layer_desc) {
-    const BackgroundProperties& properties = layer_desc->getProperties<BackgroundProperties>();
+void Painter::renderBackground(const StyleLayer &layer_desc) {
+    const BackgroundProperties& properties = layer_desc.getProperties<BackgroundProperties>();
 
     if (properties.image.to.size()) {
         if ((properties.opacity >= 1.0f) != (pass == RenderPass::Opaque))
