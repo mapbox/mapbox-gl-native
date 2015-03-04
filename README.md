@@ -35,13 +35,32 @@ The first argument passed to `map.render` is an options object, all keys are opt
 ```js
 {
     zoom: {zoom}, // number, defaults to 0
-    width: {width}, // number (px), defaults to 256
-    height: {height}, // number (px), defaults to 256
+    width: {width}, // number (px), defaults to 512
+    height: {height}, // number (px), defaults to 512
     latitude: {latitude}, // number (coordinate), defaults to 0
     longitude: {longitude}, // number (coordinate), defaults to 0
-    bearing: {bearing}, // number (degree), defaults to 0
-    ratio: {ratio} // number (scale factor), defaults to 1.0
+    bearing: {bearing}, // number (in degrees, counter-clockwise from north), defaults to 0
+    ratio: {ratio} // number (scale factor), defaults to 1.0,
+    classes: {classes} // array of strings, optional *
 }
+```
+
+* More about classes: https://github.com/mapbox/mapbox-gl-js/blob/master/API.md#working-with-style-classes
+
+## Mapbox API Access tokens
+
+To use styles that rely on Mapbox vector tiles, you must register a [API access token](https://www.mapbox.com/developers/api/#access-tokens) on the map. Use the `setAccessToken` method before load:
+
+```js
+var map = mbgl.Map(fileSource);
+var style = mapboxStyle; // includes a datasource with a reference to something like `mapbox://mapbox.mapbox-streets-v6`
+map.setAccessToken(process.env.MAPBOX_ACCESS_TOKEN);
+map.load(style);
+map.render({}, function(err, image) {
+    if (err) throw err;
+    fs.writeFileSync('image.png', image);
+});
+
 ```
 
 ## Testing
