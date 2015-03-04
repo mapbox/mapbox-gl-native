@@ -30,6 +30,20 @@ map.render({}, function(err, image) {
 });
 ```
 
+The first argument passed to `map.render` is an options object, all keys are optional:
+
+```js
+{
+    zoom: {zoom}, // number, defaults to 0
+    width: {width}, // number (px), defaults to 256
+    height: {height}, // number (px), defaults to 256
+    latitude: {latitude}, // number (coordinate), defaults to 0
+    longitude: {longitude}, // number (coordinate), defaults to 0
+    bearing: {bearing}, // number (degree), defaults to 0
+    ratio: {ratio} // number (scale factor), defaults to 1.0
+}
+```
+
 ## Testing
 
 ```
