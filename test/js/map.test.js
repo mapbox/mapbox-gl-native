@@ -7,6 +7,7 @@ var mbgl = require('../..');
 var fs = require('fs');
 var path = require('path');
 var mkdirp = require('mkdirp');
+var suitePath = path.dirname(require.resolve('mapbox-gl-test-suite/package.json'));
 
 mkdirp.sync('test/results');
 
