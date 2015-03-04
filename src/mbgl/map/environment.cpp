@@ -27,9 +27,9 @@ Request *Environment::request(const Resource &resource, std::function<void(const
     return fileSource.request(resource, loop, *this, std::move(callback));
 }
 
-void Environment::cancelRequest(Request *request) {
+void Environment::cancelRequest(Request *req) {
     assert(inMapThread());
-    fileSource.cancel(request);
+    fileSource.cancel(req);
 }
 
 void Environment::terminate() {
