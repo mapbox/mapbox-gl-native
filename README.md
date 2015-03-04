@@ -141,7 +141,8 @@ var fileSource = new mbgl.FileSource();
 fileSource.request = function(req) {
     request({
         url: req.url,
-        encoding: null
+        encoding: null,
+        gzip: true
     }, function (err, res, body) {
         if (req.canceled) {
             return;
