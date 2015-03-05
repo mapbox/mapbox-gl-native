@@ -36,7 +36,8 @@
   "scripts": {
     "install": "node-pre-gyp install || make",
     "test": "make test",
-    "rebuild": "make clean && make"
+    "rebuild": "make clean && make",
+    "build": "make"
   },
   "gypfile": true,
   "binary": {
