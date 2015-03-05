@@ -92,7 +92,9 @@ NSTimeInterval const MGLAnimationDuration = 0.3;
 
 @end
 
-@implementation MGLMapView
+@implementation MGLMapView {
+    NSMutableArray *_bundledStyleNames;
+}
 
 #pragma mark - Setup & Teardown -
 
@@ -938,16 +940,40 @@ mbgl::DefaultFileSource *mbglFileSource = nullptr;
 
 - (NSArray *)bundledStyleNames
 {
-    NSString *stylesPath = [[MGLMapView resourceBundlePath] stringByAppendingString:@"/styles"];
+    static dispatch_once_t onceToken;
+    dispatch_once(&onceToken, ^{
+        if (!_bundledStyleNames) {
+            NSString *stylesPath = [[MGLMapView resourceBundlePath] stringByAppendingString:@"/styles"];
+            
+            _bundledStyleNames = [[[NSFileManager defaultManager] contentsOfDirectoryAtPath:stylesPath error:nil] mutableCopy];
+            
+            // Add hybrids
+            NSString *hybridStylePrefix = @"hybrid-";
+            NSString *satelliteStylePrefix = @"satellite-";
+            NSMutableArray *hybridStyleNames = [NSMutableArray array];
+            for (NSString *styleName in _bundledStyleNames) {
+                if ([styleName hasPrefix:satelliteStylePrefix]) {
+                    [hybridStyleNames addObject:[hybridStylePrefix stringByAppendingString:[styleName substringFromIndex:[satelliteStylePrefix length]]]];
+                }
+            }
+            [_bundledStyleNames addObjectsFromArray:hybridStyleNames];
+        }
+    });
 
-    NSArray *styleNames = [[NSFileManager defaultManager] contentsOfDirectoryAtPath:stylesPath error:nil];
-
-    return styleNames;
+    return _bundledStyleNames;
 }
 
 - (void)useBundledStyleNamed:(NSString *)styleName
 {
+    NSString *hybridStylePrefix = @"hybrid-";
+    BOOL isHybrid = [styleName hasPrefix:hybridStylePrefix];
+    if (isHybrid) {
+        styleName = [@"satellite-" stringByAppendingString:[styleName substringFromIndex:[hybridStylePrefix length]]];
+    }
     [self setStyleURL:[NSString stringWithFormat:@"styles/%@.json", styleName]];
+    if (isHybrid) {
+        [self setAppliedStyleClasses:@[@"contours", @"labels"]];
+    }
 }
 
 - (NSArray *)getStyleOrderedLayerNames
