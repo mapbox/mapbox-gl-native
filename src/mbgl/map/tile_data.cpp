@@ -5,6 +5,7 @@
 
 #include <mbgl/util/token.hpp>
 #include <mbgl/util/string.hpp>
+#include <mbgl/util/mapbox.hpp>
 #include <mbgl/storage/file_source.hpp>
 #include <mbgl/util/uv_detail.hpp>
 #include <mbgl/platform/log.hpp>
@@ -37,6 +38,7 @@ void TileData::request(uv::worker &worker, float pixelRatio, std::function<void(
         return;
 
     std::string url = source.tiles[(id.x + id.y) % source.tiles.size()];
+    url = util::mapbox::normalizeTileURL(url, source.url, source.type);
     url = util::replaceTokens(url, [&](const std::string &token) -> std::string {
         if (token == "z") return util::toString(id.z);
         if (token == "x") return util::toString(id.x);
