@@ -19,12 +19,15 @@ TEST(Mapbox, GlyphsURL) {
 
 TEST(Mapbox, TileURL) {
     try {
-        EXPECT_EQ(mbgl::util::mapbox::normalizeTileURL("http://path.png/tile.png", "mapbox://user.map"), "http://path.png/tile{ratio}.png");
-        EXPECT_EQ(mbgl::util::mapbox::normalizeTileURL("http://path.png/tile.png32", "mapbox://user.map"), "http://path.png/tile{ratio}.png32");
-        EXPECT_EQ(mbgl::util::mapbox::normalizeTileURL("http://path.png/tile.png70", "mapbox://user.map"), "http://path.png/tile{ratio}.png70");
-        EXPECT_EQ(mbgl::util::mapbox::normalizeTileURL("http://path.png/tile.png?access_token=foo", "mapbox://user.map"), "http://path.png/tile{ratio}.png?access_token=foo");
-        EXPECT_EQ(mbgl::util::mapbox::normalizeTileURL("http://path.png", "http://path"), "http://path.png");
-        EXPECT_EQ(mbgl::util::mapbox::normalizeTileURL("http://path.png", ""), "http://path.png");
+        EXPECT_EQ(mbgl::util::mapbox::normalizeTileURL("http://path.png/tile.png", "mapbox://user.map", SourceType::Raster), "http://path.png/tile{ratio}.png");
+        EXPECT_EQ(mbgl::util::mapbox::normalizeTileURL("http://path.png/tile.png32", "mapbox://user.map", SourceType::Raster), "http://path.png/tile{ratio}.png32");
+        EXPECT_EQ(mbgl::util::mapbox::normalizeTileURL("http://path.png/tile.png70", "mapbox://user.map", SourceType::Raster), "http://path.png/tile{ratio}.png70");
+        EXPECT_EQ(mbgl::util::mapbox::normalizeTileURL("http://path.png/tile.png?access_token=foo", "mapbox://user.map", SourceType::Raster), "http://path.png/tile{ratio}.png?access_token=foo");
+        EXPECT_EQ(mbgl::util::mapbox::normalizeTileURL("http://path.png", "http://path", SourceType::Raster), "http://path.png");
+        EXPECT_EQ(mbgl::util::mapbox::normalizeTileURL("http://path.png", "", SourceType::Raster), "http://path.png");
+        EXPECT_EQ(mbgl::util::mapbox::normalizeTileURL("http://path.png/tile.png", "mapbox://user.map", SourceType::Vector), "http://path.png/tile.png");
+        EXPECT_EQ(mbgl::util::mapbox::normalizeTileURL("http://path.png/tile.pbf", "mapbox://user.map", SourceType::Raster), "http://path.png/tile{ratio}.pbf");
+        EXPECT_EQ(mbgl::util::mapbox::normalizeTileURL("http://path.png/tile.pbf", "mapbox://user.map", SourceType::Vector), "http://path.png/tile.pbf");
     } catch (const std::regex_error& e) {
         std::cout << "regex_error caught: " << e.what() << '\n';
         std::cout << e.code() << '\n';
@@ -57,5 +60,6 @@ TEST(Mapbox, TileURL) {
             default:
                 break;
         }
+        throw e;
     }
 }

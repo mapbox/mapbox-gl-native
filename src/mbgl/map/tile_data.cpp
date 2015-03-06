@@ -38,7 +38,8 @@ void TileData::request(uv::worker &worker, float pixelRatio, std::function<void(
         return;
 
     std::string url = source.tiles[(id.x + id.y) % source.tiles.size()];
-    url = util::replaceTokens(util::mapbox::normalizeTileURL(url, source.url), [&](const std::string &token) -> std::string {
+    url = util::mapbox::normalizeTileURL(url, source.url, source.type);
+    url = util::replaceTokens(url, [&](const std::string &token) -> std::string {
         if (token == "z") return util::toString(id.z);
         if (token == "x") return util::toString(id.x);
         if (token == "y") return util::toString(id.y);
