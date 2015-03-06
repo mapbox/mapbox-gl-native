@@ -8,7 +8,7 @@
 
 using namespace mbgl;
 
-VectorTileFeature::VectorTileFeature(pbf feature_pbf, const GeometryTileLayer& layer) {
+VectorTileFeature::VectorTileFeature(pbf feature_pbf, const util::ptr<GeometryTileLayer> layer) {
     while (feature_pbf.next()) {
         if (feature_pbf.tag == 1) { // id
             id = feature_pbf.varint<uint64_t>();
@@ -18,17 +18,17 @@ VectorTileFeature::VectorTileFeature(pbf feature_pbf, const GeometryTileLayer& l
             while (tags) {
                 uint32_t tag_key = tags.varint();
 
-                if (layer.keys.size() <= tag_key) {
+                if (layer->keys.size() <= tag_key) {
                     throw std::runtime_error("feature referenced out of range key");
                 }
 
                 if (tags) {
                     uint32_t tag_val = tags.varint();
-                    if (layer.values.size() <= tag_val) {
+                    if (layer->values.size() <= tag_val) {
                         throw std::runtime_error("feature referenced out of range value");
                     }
 
-                    properties.emplace(layer.keys[tag_key], layer.values[tag_val]);
+                    properties.emplace(layer->keys[tag_key], layer->values[tag_val]);
                 } else {
                     throw std::runtime_error("uneven number of feature tag ids");
                 }
@@ -93,18 +93,23 @@ Geometry VectorTileFeature::nextGeometry() {
     return std::move(result);
 }
 
-VectorTile::VectorTile(pbf tile) {
-    while (tile.next()) {
-        if (tile.tag == 3) { // layer
-            VectorTileLayer layer(tile.message());
-            layers.emplace(layer.name, std::forward<VectorTileLayer>(layer));
+VectorTile::VectorTile(pbf tile_pbf) {
+    while (tile_pbf.next()) {
+        if (tile_pbf.tag == 3) { // layer
+            util::ptr<VectorTileLayer> layer = std::make_shared<VectorTileLayer>(tile_pbf.message());
+            layers.emplace(layer->name, std::forward<util::ptr<VectorTileLayer>>(layer));
         } else {
-            tile.skip();
+            tile_pbf.skip();
         }
     }
 }
 
-VectorTileLayer::VectorTileLayer(pbf layer) : feature_pbf(layer) {
+void VectorTile::logDebug() const {
+    printf("got here for VectorTile\n");
+}
+
+VectorTileLayer::VectorTileLayer(pbf layer_pbf)
+    : feature_pbf(layer_pbf) {
     while (feature_pbf.next()) {
         if (feature_pbf.tag == 1) { // name
             name = feature_pbf.string();
@@ -121,13 +126,13 @@ VectorTileLayer::VectorTileLayer(pbf layer) : feature_pbf(layer) {
     }
 }
 
-FilteredVectorTileLayer::FilteredVectorTileLayer(const VectorTileLayer& layer_, const FilterExpression& filterExpression_)
+FilteredVectorTileLayer::FilteredVectorTileLayer(const util::ptr<VectorTileLayer> layer_, const FilterExpression& filterExpression_)
     : GeometryFilteredTileLayer(layer_, filterExpression_) {
-      feature_pbf = layer_.feature_pbf;
+    feature_pbf = layer_->feature_pbf;
 }
 
 template <>
-GeometryTileTagExtractor<pbf>::GeometryTileTagExtractor(const GeometryTileLayer& layer_)
+GeometryTileTagExtractor<pbf>::GeometryTileTagExtractor(const util::ptr<GeometryTileLayer> layer_)
     : layer(layer_) {}
 
 template <>
@@ -138,8 +143,8 @@ mapbox::util::optional<Value> GeometryTileTagExtractor<pbf>::getValue(const std:
 
     mapbox::util::optional<Value> value;
 
-    auto field_it = layer.key_index.find(key);
-    if (field_it != layer.key_index.end()) {
+    auto field_it = layer->key_index.find(key);
+    if (field_it != layer->key_index.end()) {
         const uint32_t filter_key = field_it->second;
 
         // Now loop through all the key/value pair tags.
@@ -157,8 +162,8 @@ mapbox::util::optional<Value> GeometryTileTagExtractor<pbf>::getValue(const std:
             tag_val = tags_pbf_.varint();
 
             if (tag_key == filter_key) {
-                if (layer.values.size() > tag_val) {
-                    value = layer.values[tag_val];
+                if (layer->values.size() > tag_val) {
+                    value = layer->values[tag_val];
                 } else {
                     fprintf(stderr, "[WARNING] feature references out of range value\n");
                     break;
@@ -172,10 +177,8 @@ mapbox::util::optional<Value> GeometryTileTagExtractor<pbf>::getValue(const std:
 
 template bool mbgl::evaluate(const FilterExpression&, const GeometryTileTagExtractor<pbf>&);
 
-GeometryTileFeature FilteredVectorTileLayer::nextMatchingFeature() {
-    GeometryTileFeature result;
-
-    if (feature_pbf.next(2)) {
+util::ptr<GeometryTileFeature> FilteredVectorTileLayer::nextMatchingFeature() {
+    while (feature_pbf.next(2)) {
         pbf current_feature_pbf = feature_pbf.message();
 
         GeometryTileTagExtractor<pbf> extractor(layer);
@@ -191,19 +194,21 @@ GeometryTileFeature FilteredVectorTileLayer::nextMatchingFeature() {
         }
 
         if (evaluate(filterExpression, extractor)) {
-            result = VectorTileFeature(current_feature_pbf.message(), layer);
+            return std::move(std::make_shared<VectorTileFeature>(current_feature_pbf.message(), layer));
         }
     }
 
-    return std::move(result);
+    return std::move(std::make_shared<VectorTileFeature>(pbf(), layer));
 }
 
-GeometryTileFeature VectorTileLayer::nextFeature() {
-    GeometryTileFeature result;
+util::ptr<GeometryFilteredTileLayer> VectorTileLayer::createFilter(const FilterExpression& filterExpression) {
+    return std::make_shared<FilteredVectorTileLayer>(shared_from_this(), filterExpression);
+}
 
-    if (feature_pbf.next(2)) {
-        result = VectorTileFeature(feature_pbf.message(), *this);
+util::ptr<GeometryTileFeature> VectorTileLayer::nextFeature() {
+    while (feature_pbf.next(2)) {
+        return std::move(std::make_shared<VectorTileFeature>(feature_pbf.message(), shared_from_this()));
     }
 
-    return std::move(result);
+    return std::move(std::make_shared<VectorTileFeature>(pbf(), shared_from_this()));
 }

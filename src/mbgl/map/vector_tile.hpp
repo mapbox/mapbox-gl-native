@@ -4,6 +4,7 @@
 #include <mbgl/map/geometry_tile.hpp>
 #include <mbgl/geometry/pbf_geometry.hpp>
 #include <mbgl/style/filter_expression.hpp>
+#include <mbgl/util/ptr.hpp>
 #include <mbgl/util/pbf.hpp>
 
 namespace mbgl {
@@ -12,7 +13,7 @@ class VectorTileLayer;
 
 class VectorTileFeature : public GeometryTileFeature {
 public:
-    VectorTileFeature(pbf, const GeometryTileLayer&);
+    VectorTileFeature(pbf, const util::ptr<GeometryTileLayer>);
 
     Geometry nextGeometry();
 
@@ -23,21 +24,22 @@ private:
 
 class FilteredVectorTileLayer : public GeometryFilteredTileLayer {
 public:
-    FilteredVectorTileLayer(const VectorTileLayer&, const FilterExpression&);
+    FilteredVectorTileLayer(const util::ptr<VectorTileLayer>, const FilterExpression&);
 
-    GeometryTileFeature nextMatchingFeature();
+    virtual util::ptr<GeometryTileFeature> nextMatchingFeature();
 
 private:
     pbf feature_pbf;
 
 };
 
-class VectorTileLayer : public GeometryTileLayer {
+class VectorTileLayer : public GeometryTileLayer, public std::enable_shared_from_this<VectorTileLayer> {
     friend class FilteredVectorTileLayer;
 public:
     VectorTileLayer(pbf);
 
-    GeometryTileFeature nextFeature();
+    virtual util::ptr<GeometryFilteredTileLayer> createFilter(const FilterExpression&);
+    virtual util::ptr<GeometryTileFeature> nextFeature();
 
 private:
     pbf feature_pbf;
@@ -46,6 +48,8 @@ private:
 class VectorTile : public GeometryTile {
 public:
     VectorTile(pbf);
+
+    virtual void logDebug() const;
 };
 
 }
