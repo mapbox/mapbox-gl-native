@@ -17,9 +17,9 @@ include config/defaults.mk
 
 # Wildcard targets get removed after build by default, but we want to preserve the config.
 .PRECIOUS: config/%.gypi
-config/%.gypi: CMD = ./configure config/$*.gypi
-config/%.gypi: configure
-	@$(ENV_$*) ./scripts/flock.py build/Configure.lock ./configure config/$*.gypi
+config/%.gypi: CMD = ./scripts/configure.sh config/$*.gypi
+config/%.gypi: scripts/configure.sh
+	@$(ENV_$*) ./scripts/flock.py build/Configure.lock ./scripts/configure.sh config/$*.gypi
 
 styles/styles:
 	git submodule update --init styles
