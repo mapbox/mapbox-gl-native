@@ -29,7 +29,6 @@ public:
 
     void abort(const Environment &env) override;
 
-    enum class CacheHint : uint8_t { Full, Refresh, No };
     void notify(SharedRequestBase *sharedRequest, const std::set<Request *> &observers,
                 std::shared_ptr<const Response> response, FileCache::Hint hint);
 
