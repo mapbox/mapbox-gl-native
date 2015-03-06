@@ -206,7 +206,7 @@ util::ptr<GeometryFilteredTileLayer> VectorTileLayer::createFilter(const FilterE
 }
 
 util::ptr<GeometryTileFeature> VectorTileLayer::nextFeature() {
-    while (feature_pbf.next(2)) {
+    if (feature_pbf.next(2)) {
         return std::move(std::make_shared<VectorTileFeature>(feature_pbf.message(), shared_from_this()));
     }
 
