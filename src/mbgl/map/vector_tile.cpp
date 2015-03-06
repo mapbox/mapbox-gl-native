@@ -110,18 +110,18 @@ void VectorTile::logDebug() const {
 
 VectorTileLayer::VectorTileLayer(pbf layer_pbf)
     : feature_pbf(layer_pbf) {
-    while (feature_pbf.next()) {
-        if (feature_pbf.tag == 1) { // name
-            name = feature_pbf.string();
-        } else if (feature_pbf.tag == 3) { // keys
-            keys.emplace_back(feature_pbf.string());
+    while (layer_pbf.next()) {
+        if (layer_pbf.tag == 1) { // name
+            name = layer_pbf.string();
+        } else if (layer_pbf.tag == 3) { // keys
+            keys.emplace_back(layer_pbf.string());
             key_index.emplace(keys.back(), keys.size() - 1);
-        } else if (feature_pbf.tag == 4) { // values
-            values.emplace_back(std::move(parseValue(feature_pbf.message())));
-        } else if (feature_pbf.tag == 5) { // extent
-            extent = feature_pbf.varint();
+        } else if (layer_pbf.tag == 4) { // values
+            values.emplace_back(std::move(parseValue(layer_pbf.message())));
+        } else if (layer_pbf.tag == 5) { // extent
+            extent = layer_pbf.varint();
         } else {
-            feature_pbf.skip();
+            layer_pbf.skip();
         }
     }
 }
