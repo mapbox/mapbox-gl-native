@@ -269,9 +269,9 @@ mbgl::DefaultFileSource *mbglFileSource = nullptr;
 
     // setup compass
     //
-    _compass = [[UIImageView alloc] initWithImage:[MGLMapView resourceImageNamed:@"Compass.png"]];
+    _compass = [[UIImageView alloc] initWithImage:[self compassImageLocalized]];
     _compass.accessibilityLabel = @"Compass";
-    UIImage *compassImage = [MGLMapView resourceImageNamed:@"Compass.png"];
+    UIImage *compassImage = _compass.image;
     _compass.frame = CGRectMake(0, 0, compassImage.size.width, compassImage.size.height);
     _compass.alpha = 0;
     UIView *container = [[UIView alloc] initWithFrame:CGRectMake(self.bounds.size.width - compassImage.size.width - 5, 5, compassImage.size.width, compassImage.size.height)];
@@ -1548,6 +1548,83 @@ mbgl::DefaultFileSource *mbglFileSource = nullptr;
                          }
                          completion:nil];
     }
+}
+
+- (UIImage*)compassImageLocalized
+{
+    NSString *text = [self stringForNorthLocalized];
+    UIImage *image;
+    UIFont *font;
+    
+    // setup blank compass background from file for drawing upon
+    // we can't rely on automatic @2x/@3x resource picking here, unfortunately
+    CGFloat deviceScale = [UIScreen mainScreen].scale;
+    NSString *scale = (deviceScale > 2.0f) ? @"@3x" : @"@2x";
+    image = [MGLMapView resourceImageNamed:[NSString stringWithFormat:@"CompassBlank%@.png", scale]];
+    
+    // switch to appropriate font for chinese or latin characters
+    // FIX: don't hardcode symbol for north
+    font = ([text isEqualToString:@"北"]) ? [UIFont fontWithName:@"HiraKakuProN-W3" size:10] : [UIFont fontWithName:@"Helvetica" size:9];
+
+    UIGraphicsBeginImageContextWithOptions((image.size), NO, deviceScale);
+    
+    // draw compass background
+    [image drawInRect:CGRectMake(0,0,image.size.width,image.size.height)];
+
+    // get compass image size
+    CGRect rect = CGRectMake(0, 0, image.size.width, image.size.height);
+    
+    // get the bounding box for the text as it will be formatted
+    CGRect textRect = [text boundingRectWithSize:rect.size
+                                     options:NSStringDrawingUsesDeviceMetrics
+                                  attributes:@{ NSFontAttributeName:font }
+                                     context:nil];
+
+    // center the text horizontally, then two-thirds down vertically
+    float x_pos = (float)(rect.size.width - textRect.size.width) * 0.5;
+    float y_pos = (float)(rect.size.height - textRect.size.height) * 0.66;
+    
+    // draw text (not an attributed string but takes those params anyway)
+    [text drawAtPoint:CGPointMake(rect.origin.x + x_pos, rect.origin.y + y_pos)
+       withAttributes:@{ NSFontAttributeName:font,
+                         NSForegroundColorAttributeName:[UIColor colorWithWhite:1.0f alpha:0.9f] }];
+    
+    // put together the fruits of our labor in a new UIImage
+    UIImage *outputImage = UIGraphicsGetImageFromCurrentImageContext();
+    
+    UIGraphicsEndImageContext();
+    
+    return outputImage;
+}
+
+// temporary, until/if proper localization happens
+// abbreviatons via FormatterKit: https://github.com/mattt/FormatterKit/tree/master/Localizations
+- (NSString *)stringForNorthLocalized
+{
+    NSLocale *locale = [NSLocale currentLocale];
+    NSString *localLanguage = [locale objectForKey:NSLocaleLanguageCode];
+    
+    NSString *north = @"N";
+    
+    if ([localLanguage isEqualToString:@"ja"] ||
+        [localLanguage isEqualToString:@"zh"])
+        north = @"北";
+    else if ([localLanguage isEqualToString:@"cs"])
+        north = @"S";
+    else if ([localLanguage isEqualToString:@"el"])
+        north = @"Β";
+    else if ([localLanguage isEqualToString:@"id"])
+        north = @"BL";
+    else if ([localLanguage isEqualToString:@"ko"])
+        north = @"북";
+    else if ([localLanguage isEqualToString:@"ru"])
+        north = @"С";
+    else if ([localLanguage isEqualToString:@"tr"])
+        north = @"K";
+    else if ([localLanguage isEqualToString:@"uk"])
+        north = @"Пн/";
+    
+    return north;
 }
 
 + (UIImage *)resourceImageNamed:(NSString *)imageName
