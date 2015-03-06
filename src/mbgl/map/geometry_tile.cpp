@@ -15,14 +15,6 @@ std::ostream& mbgl::operator<<(std::ostream& os, const GeometryFeatureType& type
     }
 }
 
-GeometryTileFeature::GeometryTileFeature() {}
-
-Geometry GeometryTileFeature::nextGeometry() {
-    Geometry result;
-    result.set<std::false_type>();
-    return result;
-}
-
 std::ostream& mbgl::operator<<(std::ostream& os, const GeometryTileFeature& feature) {
     os << "Feature(" << feature.id << "): " << feature.type << std::endl;
     for (const auto& prop : feature.properties) {
@@ -31,19 +23,9 @@ std::ostream& mbgl::operator<<(std::ostream& os, const GeometryTileFeature& feat
     return os;
 }
 
-GeometryFilteredTileLayer::GeometryFilteredTileLayer(const GeometryTileLayer& layer_, const FilterExpression& filterExpression_)
+GeometryFilteredTileLayer::GeometryFilteredTileLayer(const util::ptr<GeometryTileLayer> layer_, const FilterExpression& filterExpression_)
     : layer(layer_),
       filterExpression(filterExpression_) {}
-
-GeometryTileFeature GeometryFilteredTileLayer::nextMatchingFeature() {
-    GeometryTileFeature result;
-    result.type = GeometryFeatureType::Unknown;
-    return result;
-}
-
-GeometryTileFeature GeometryTileLayer::nextFeature() {
-    return GeometryTileFeature();
-}
 
 GeometryTile& GeometryTile::operator=(GeometryTile&& other) {
     if (this != &other) {

@@ -5,6 +5,7 @@
 #include <mbgl/style/value.hpp>
 #include <mbgl/text/glyph.hpp>
 #include <mbgl/util/optional.hpp>
+#include <mbgl/util/ptr.hpp>
 #include <mbgl/util/variant.hpp>
 #include <mbgl/util/vec.hpp>
 
@@ -18,7 +19,7 @@
 
 namespace mbgl {
 
-enum class GeometryFeatureType {
+enum class GeometryFeatureType : uint8_t {
     Unknown = 0,
     Point = 1,
     LineString = 2,
@@ -37,9 +38,7 @@ class GeometryTileLayer;
 
 class GeometryTileFeature {
 public:
-    GeometryTileFeature();
-
-    virtual Geometry nextGeometry();
+    virtual Geometry nextGeometry() = 0;
 
 public:
     uint64_t id = 0;
@@ -49,31 +48,33 @@ public:
 
 std::ostream& operator<<(std::ostream&, const GeometryTileFeature& feature);
 
-template <typename T>
+template <typename Tags>
 class GeometryTileTagExtractor {
 public:
-    GeometryTileTagExtractor(const GeometryTileLayer&);
+    GeometryTileTagExtractor(const util::ptr<GeometryTileLayer>);
 
-    inline void setTags(const T& tags_) { tags = tags_; }
-    mapbox::util::optional<Value> getValue(const std::string &key) const;
+    inline void setTags(const Tags& tags_) { tags = tags_; }
+    virtual mapbox::util::optional<Value> getValue(const std::string &key) const;
 
     inline void setType(GeometryFeatureType type_) { type = type_; }
     inline GeometryFeatureType getType() const { return type; }
 
-protected:
-    const GeometryTileLayer& layer;
-    T tags;
+public:
     GeometryFeatureType type = GeometryFeatureType::Unknown;
+    Tags tags;
+
+protected:
+    const util::ptr<GeometryTileLayer> layer;
 };
 
 class GeometryFilteredTileLayer {
 public:
-    GeometryFilteredTileLayer(const GeometryTileLayer&, const FilterExpression&);
+    GeometryFilteredTileLayer(const util::ptr<GeometryTileLayer>, const FilterExpression&);
 
-    virtual GeometryTileFeature nextMatchingFeature();
+    virtual util::ptr<GeometryTileFeature> nextMatchingFeature() = 0;
 
 protected:
-    const GeometryTileLayer& layer;
+    const util::ptr<GeometryTileLayer> layer;
     const FilterExpression& filterExpression;
 };
 
@@ -81,7 +82,8 @@ std::ostream& operator<<(std::ostream&, const PositionedGlyph&);
 
 class GeometryTileLayer {
 public:
-    virtual GeometryTileFeature nextFeature();
+    virtual util::ptr<GeometryFilteredTileLayer> createFilter(const FilterExpression&) = 0;
+    virtual util::ptr<GeometryTileFeature> nextFeature() = 0;
 
 public:
     std::string name;
@@ -96,8 +98,10 @@ class GeometryTile {
 public:
     GeometryTile& operator=(GeometryTile&& other);
 
+    virtual void logDebug() const = 0;
+
 public:
-    std::map<std::string, const GeometryTileLayer> layers;
+    std::map<std::string, const util::ptr<GeometryTileLayer>> layers;
 };
 
 }

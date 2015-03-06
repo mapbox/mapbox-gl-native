@@ -10,6 +10,7 @@
 #include <mbgl/text/types.hpp>
 #include <mbgl/text/glyph.hpp>
 #include <mbgl/style/style_bucket.hpp>
+#include <mbgl/util/ptr.hpp>
 
 #include <memory>
 #include <map>
@@ -64,7 +65,7 @@ public:
     bool hasTextData() const;
     bool hasIconData() const;
 
-    void addFeatures(const GeometryTileLayer &layer, const FilterExpression &filter,
+    void addFeatures(const util::ptr<GeometryTileLayer> layer, const FilterExpression &filter,
                      const Tile::ID &id, SpriteAtlas &spriteAtlas, Sprite &sprite,
                      GlyphAtlas &glyphAtlas, GlyphStore &glyphStore);
 
@@ -77,7 +78,7 @@ public:
 
 private:
 
-    std::vector<SymbolFeature> processFeatures(const GeometryTileLayer &layer, const FilterExpression &filter, GlyphStore &glyphStore, const Sprite &sprite);
+    std::vector<SymbolFeature> processFeatures(const util::ptr<GeometryTileLayer> layer, const FilterExpression &filter, GlyphStore &glyphStore, const Sprite &sprite);
 
     void addFeature(const GeometryLine &line, const Shaping &shaping, const GlyphPositions &face, const Rect<uint16_t> &image);
 
