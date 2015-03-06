@@ -53,8 +53,8 @@ std::string normalizeTileURL(const std::string& url, const std::string& sourceUR
         urlSansParams.pop_back();
     }
     
-    std::string::size_type basenameIdx = url.rfind("/");
-    std::string::size_type extensionIdx = url.rfind(".");
+    std::string::size_type basenameIdx = url.rfind("/", queryIdx);
+    std::string::size_type extensionIdx = url.rfind(".", queryIdx);
     if (basenameIdx == std::string::npos || extensionIdx == std::string::npos ||
         basenameIdx > extensionIdx) {
         // No file extension: probably not a file name we can tack a ratio onto.

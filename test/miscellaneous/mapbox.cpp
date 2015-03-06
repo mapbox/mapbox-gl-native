@@ -28,6 +28,10 @@ TEST(Mapbox, TileURL) {
         EXPECT_EQ(mbgl::util::mapbox::normalizeTileURL("http://path.png/tile.png", "mapbox://user.map", SourceType::Vector), "http://path.png/tile.png");
         EXPECT_EQ(mbgl::util::mapbox::normalizeTileURL("http://path.png/tile.pbf", "mapbox://user.map", SourceType::Raster), "http://path.png/tile{ratio}.pbf");
         EXPECT_EQ(mbgl::util::mapbox::normalizeTileURL("http://path.png/tile.pbf", "mapbox://user.map", SourceType::Vector), "http://path.png/tile.pbf");
+        EXPECT_EQ(mbgl::util::mapbox::normalizeTileURL("http://path.png/tile.pbf?access_token=foo", "mapbox://user.map", SourceType::Raster), "http://path.png/tile{ratio}.pbf?access_token=foo");
+        EXPECT_EQ(mbgl::util::mapbox::normalizeTileURL("http://path.png/tile.pbf?access_token=foo.png", "mapbox://user.map", SourceType::Raster), "http://path.png/tile{ratio}.pbf?access_token=foo.png");
+        EXPECT_EQ(mbgl::util::mapbox::normalizeTileURL("http://path.png/tile.pbf?access_token=foo.png/bar", "mapbox://user.map", SourceType::Raster), "http://path.png/tile{ratio}.pbf?access_token=foo.png/bar");
+        EXPECT_EQ(mbgl::util::mapbox::normalizeTileURL("http://path.png/tile.pbf?access_token=foo.png/bar.png", "mapbox://user.map", SourceType::Raster), "http://path.png/tile{ratio}.pbf?access_token=foo.png/bar.png");
     } catch (const std::regex_error& e) {
         std::cout << "regex_error caught: " << e.what() << '\n';
         std::cout << e.code() << '\n';
