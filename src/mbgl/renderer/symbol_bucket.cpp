@@ -97,15 +97,14 @@ std::vector<SymbolFeature> SymbolBucket::processFeatures(const util::ptr<Geometr
 
             auto &multiline = ft.geometry;
 
-            Geometry geometry = feature->nextGeometry();
-            const GeometryLine& line = geometry.get<GeometryLine>();
-            bool first = true;
-            for (auto point_it = line.begin(); point_it != line.end(); point_it++) {
-                if (first) {
-                    multiline.emplace_back();
-                    first = false;
+            GeometryCollection geometryCollection = feature->nextGeometry();
+            multiline.emplace_back();
+            for (auto& geometry : geometryCollection) {
+                const GeometryLine& line = geometry.get<GeometryLine>();
+                multiline.emplace_back();
+                for (auto& point : line) {
+                    multiline.back().emplace_back(point.x, point.y);
                 }
-                multiline.back().emplace_back(point_it->x, point_it->y);
             }
 
             features.push_back(std::move(ft));

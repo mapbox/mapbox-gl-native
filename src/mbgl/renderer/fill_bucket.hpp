@@ -49,7 +49,7 @@ public:
                 const mat4 &matrix) override;
     bool hasData() const override;
 
-    void addGeometry(const Geometry& fill);
+    void addGeometry(const GeometryCollection&);
     void tessellate();
 
     void drawElements(PlainShader& shader);

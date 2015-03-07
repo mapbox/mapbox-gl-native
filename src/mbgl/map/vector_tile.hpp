@@ -15,11 +15,10 @@ class VectorTileFeature : public GeometryTileFeature {
 public:
     VectorTileFeature(pbf, const util::ptr<GeometryTileLayer>);
 
-    Geometry nextGeometry();
+    GeometryCollection nextGeometry();
 
 private:
     pbf geometry_pbf;
-    bool multigeometry = false;
 };
 
 class FilteredVectorTileLayer : public GeometryFilteredTileLayer {

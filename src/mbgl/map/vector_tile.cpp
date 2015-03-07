@@ -43,47 +43,50 @@ VectorTileFeature::VectorTileFeature(pbf feature_pbf, const util::ptr<GeometryTi
     }
 }
 
-Geometry VectorTileFeature::nextGeometry() {
+GeometryCollection VectorTileFeature::nextGeometry() {
+
+    GeometryCollection result;
+
     pbf current_geometry_pbf = geometry_pbf.message();
     PBFGeometry current_geometry(current_geometry_pbf);
     int32_t x, y;
-    Geometry result;
-    result.set<std::false_type>();
 
-    if (multigeometry || geometry_pbf.next(4)) {
+    while (geometry_pbf.next(4)) { // geometry
         if (type == GeometryFeatureType::Point) {
             current_geometry.next(x, y);
             GeometryPoint point(x, y);
-            result.set<GeometryPoint>(point);
+            result.emplace_back(GeometryPoint(x, y));
         } else if (type == GeometryFeatureType::LineString) {
             GeometryLine line;
             PBFGeometry::command cmd;
             while ((cmd = current_geometry.next(x, y)) != PBFGeometry::end) {
                 if (cmd == PBFGeometry::move_to) {
-                    multigeometry = true;
-                    result.set<GeometryLine>(line);
-                    break;
-                } else {
-                    line.emplace_back(x, y);
+                    if (!line.empty()) {
+                        result.push_back(line);
+                        line.clear();
+                    }
                 }
+                line.emplace_back(x, y);
             }
-            if (!multigeometry) {
-                result.set<GeometryLine>(line);
+            if (line.size()) {
+                result.push_back(line);
             }
         } else if (type == GeometryFeatureType::Polygon) {
-            GeometryPolygon polygon;
+            GeometryLine line;
             PBFGeometry::command cmd;
             while ((cmd = current_geometry.next(x, y)) != PBFGeometry::end) {
                 if (cmd == PBFGeometry::move_to) {
-                    multigeometry = true;
-                    result.set<GeometryPolygon>(polygon);
-                    break;
-                } else {
-//                    polygon.emplace_back(x, y);
+                    if (line.size()) {
+                        result.push_back(line);
+                        line.clear();
+                    }
                 }
+                line.emplace_back(x, y);
             }
-            if (!multigeometry) {
-                result.set<GeometryPolygon>(polygon);
+
+            if (line.size()) {
+                result.push_back(line);
+                line.clear();
             }
         } else {
             throw std::runtime_error("unrecognized geometry type");

@@ -32,13 +32,15 @@ typedef std::vector<GeometryLine> GeometryPolygon;
 
 using Geometry = mapbox::util::variant<std::false_type, GeometryPoint, GeometryLine, GeometryPolygon>;
 
+typedef std::vector<Geometry> GeometryCollection;
+
 std::ostream& operator<<(std::ostream&, const GeometryFeatureType& type);
 
 class GeometryTileLayer;
 
 class GeometryTileFeature {
 public:
-    virtual Geometry nextGeometry() = 0;
+    virtual GeometryCollection nextGeometry() = 0;
 
 public:
     uint64_t id = 0;
