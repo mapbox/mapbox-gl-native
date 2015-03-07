@@ -38,7 +38,6 @@ public:
     VectorTileLayer(pbf);
 
     virtual util::ptr<GeometryFilteredTileLayer> createFilter(const FilterExpression&);
-    virtual util::ptr<GeometryTileFeature> nextFeature();
 
 private:
     pbf feature_pbf;
