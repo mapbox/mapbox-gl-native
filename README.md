@@ -41,27 +41,11 @@ The first argument passed to `map.render` is an options object, all keys are opt
     longitude: {longitude}, // number (coordinate), defaults to 0
     bearing: {bearing}, // number (in degrees, counter-clockwise from north), defaults to 0
     ratio: {ratio} // number (scale factor), defaults to 1.0,
-    classes: {classes} // array of strings, optional *
+    classes: {classes} // array of strings, optional
 }
 ```
 
-* More about classes: https://github.com/mapbox/mapbox-gl-js/blob/master/API.md#working-with-style-classes
-
-## Mapbox API Access tokens
-
-To use styles that rely on Mapbox vector tiles, you must register a [API access token](https://www.mapbox.com/developers/api/#access-tokens) on the map. Use the `setAccessToken` method before load:
-
-```js
-var map = mbgl.Map(fileSource);
-var style = mapboxStyle; // includes a datasource with a reference to something like `mapbox://mapbox.mapbox-streets-v6`
-map.setAccessToken(process.env.MAPBOX_ACCESS_TOKEN);
-map.load(style);
-map.render({}, function(err, image) {
-    if (err) throw err;
-    fs.writeFileSync('image.png', image);
-});
-
-```
+_More about classes: https://github.com/mapbox/mapbox-gl-js/blob/master/API.md#working-with-style-classes_
 
 ## Testing
 
@@ -170,3 +154,20 @@ fileSource.cancel = function(req) {
 ```
 
 Note that in reality, Mapbox GL uses two types of protocols: `asset://` for files that should be loaded from some local static system, and `http://` (and `https://`), which should be loaded from the internet. However, stylesheets are free to use other protocols too, if your implementation of FileSource supports these; e.g. you could use `s3://` to indicate that files are supposed to be loaded from S3.
+
+## Mapbox API Access tokens
+
+To use styles that rely on Mapbox vector tiles, you must register a [API access token](https://www.mapbox.com/developers/api/#access-tokens) on the map. Use the `setAccessToken` method before load:
+
+```js
+var map = mbgl.Map(fileSource);
+var style = mapboxStyle; // includes a datasource with a reference to something like `mapbox://mapbox.mapbox-streets-v6`
+map.setAccessToken(process.env.MAPBOX_ACCESS_TOKEN);
+map.load(style);
+map.render({}, function(err, image) {
+    if (err) throw err;
+    fs.writeFileSync('image.png', image);
+});
+
+```
+

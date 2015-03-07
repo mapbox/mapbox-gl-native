@@ -10,15 +10,9 @@ var mkdirp = require('mkdirp');
 var http = require('http');
 var request = require('request');
 var st = require('st');
-
-/*
-FIX: In all cases style-gz fails, and in all cases, style.json passes,
-regardless of how gzip is set in either st or request.
-*/
 var style = require('../test/fixtures/style.json');
-// var style = require('../test/fixtures/style-gz.json');
 
-mkdirp.sync('results');
+mkdirp.sync('test/results');
 
 var server = http.createServer(st({path: __dirname}));
 server.listen(2900);
@@ -34,7 +28,10 @@ function getFileSource(gzip, t) {
         request({
             url: 'http://localhost:2900' + path.join('/', req.url),
             encoding: null,
-            gzip: gzip
+            gzip: gzip,
+            headers: {
+                'Accept-Encoding': 'gzip'
+            }
         }, function (err, res, body) {
             t.error(err);
             var response = {};
@@ -52,42 +49,36 @@ test('before tests', function(t) {
     server.listen(2900, t.end);
 });
 
-test('gzip passes', function(t) {
+test('unpacked gzip', function(t) {
 
-    /*
-    FIX: I think need to turn OFF this event listener before this test
-    is done so next test doesn't accidentally use it.
-    */
     mbgl.on('message', function(msg) {
-        t.error(msg);
+        t.error(msg, 'doesn\'t emit warning');
     });
 
     setup(getFileSource(true, t), function(map) {
         map.load(style);
         map.render({}, function(err, image) {
             mbgl.compressPNG(image, function(err, data) {
-                fs.writeFileSync('results/image-pgf-gz-false.png', data);
+                fs.writeFileSync('test/results/image-gz-success.png', data);
+                mbgl.removeAllListeners('message');
                 t.end();
             });
         });
     });
 });
 
-test('gzip fails', function(t) {
+test('unhandled gzip', function(t) {
 
-    /*
-    FIX: No message will be emmitted if gzip doesn't fail,
-    so this test is pointless
-    */
     mbgl.on('message', function(msg) {
-        t.equal(msg === null, 'gzipped pbf fails when gzip:false');
+        t.ok(msg, 'emits warning');
     });
 
     setup(getFileSource(false, t), function(map) {
         map.load(style);
         map.render({}, function(err, image) {
             mbgl.compressPNG(image, function(err, data) {
-                fs.writeFileSync('results/image-pgf-gz-true.png', data);
+                fs.writeFileSync('test/results/image-gz-fail.png', data);
+                t.ok(fs.statSync('test/results/image-gz-success.png')['size'] > fs.statSync('test/results/image-gz-fail.png')['size'], 'render is smaller than unpacked render');
                 server.close(t.end);
             });
         });
