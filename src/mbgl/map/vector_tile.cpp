@@ -132,6 +132,7 @@ VectorTileLayer::VectorTileLayer(pbf layer_pbf)
 FilteredVectorTileLayer::FilteredVectorTileLayer(const util::ptr<VectorTileLayer> layer_, const FilterExpression& filterExpression_)
     : GeometryFilteredTileLayer(layer_, filterExpression_) {
     feature_pbf = layer_->feature_pbf;
+    nextMatchingFeature();
 }
 
 template <>
