@@ -179,13 +179,14 @@ template bool mbgl::evaluate(const FilterExpression&, const GeometryTileTagExtra
 
 util::ptr<GeometryTileFeature> FilteredVectorTileLayer::nextMatchingFeature() {
     while (feature_pbf.next(2)) {
-        pbf current_feature_pbf = feature_pbf.message();
+        pbf matching_feature_pbf = feature_pbf.message();
+        pbf current_feature_pbf = matching_feature_pbf;
 
         GeometryTileTagExtractor<pbf> extractor(layer);
 
         while (current_feature_pbf.next()) {
             if (current_feature_pbf.tag == 2) { // tags
-                extractor.setTags(current_feature_pbf);
+                extractor.setTags(current_feature_pbf.message());
             } else if (current_feature_pbf.tag == 3) { // geometry type
                 extractor.setType(GeometryFeatureType(current_feature_pbf.varint()));
             } else {
@@ -194,7 +195,7 @@ util::ptr<GeometryTileFeature> FilteredVectorTileLayer::nextMatchingFeature() {
         }
 
         if (evaluate(filterExpression, extractor)) {
-            return std::move(std::make_shared<VectorTileFeature>(current_feature_pbf.message(), layer));
+            return std::move(std::make_shared<VectorTileFeature>(matching_feature_pbf, layer));
         }
     }
 
