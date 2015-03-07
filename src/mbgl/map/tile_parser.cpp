@@ -221,11 +221,9 @@ template <class Bucket>
             return;
 
         GeometryCollection geometry = feature->nextGeometry();
-        if (geometry.size()) {
+        while (geometry.size()) {
             bucket->addGeometry(geometry);
             geometry = feature->nextGeometry();
-        } else if (debug::tileParseWarnings) {
-            fprintf(stderr, "[WARNING] geometry is empty\n");
         }
 
         feature = filtered_layer->nextMatchingFeature();
