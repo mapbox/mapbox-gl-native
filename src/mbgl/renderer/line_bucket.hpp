@@ -37,7 +37,7 @@ public:
                 const mat4 &matrix) override;
     bool hasData() const override;
 
-    void addGeometry(const Geometry& line);
+    void addGeometry(const GeometryCollection&);
 
     bool hasPoints() const;
 

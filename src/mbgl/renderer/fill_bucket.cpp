@@ -64,12 +64,11 @@ FillBucket::~FillBucket() {
     }
 }
 
-void FillBucket::addGeometry(const Geometry& fill) {
-    const GeometryPolygon& polygon = fill.get<GeometryPolygon>();
-
-    for (auto line_it = polygon.begin(); line_it != polygon.end(); line_it++) {
-        for (auto point_it = line_it->begin(); point_it != line_it->end(); point_it++) {
-            line.emplace_back(point_it->x, point_it->y);
+void FillBucket::addGeometry(const GeometryCollection& geometryCollection) {
+    for (auto& line_ : geometryCollection) {
+        const GeometryLine& vertices = line_.get<GeometryLine>();
+        for (auto& v : vertices) {
+            line.emplace_back(ClipperLib::IntPoint(v.x, v.y));
         }
         clipper.AddPath(line, ClipperLib::ptSubject, true);
         line.clear();
