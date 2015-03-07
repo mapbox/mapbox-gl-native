@@ -47,18 +47,18 @@ GeometryCollection VectorTileFeature::nextGeometry() {
 
     GeometryCollection result;
 
-    pbf current_geometry_pbf = geometry_pbf.message();
-    PBFGeometry current_geometry(current_geometry_pbf);
-    int32_t x, y;
-
     while (geometry_pbf.next(4)) { // geometry
+        pbf current_geometry_pbf = geometry_pbf.message();
+        PBFGeometry current_geometry(current_geometry_pbf);
+        PBFGeometry::command cmd;
+        int32_t x, y;
+
         if (type == GeometryFeatureType::Point) {
             current_geometry.next(x, y);
             GeometryPoint point(x, y);
             result.emplace_back(GeometryPoint(x, y));
         } else if (type == GeometryFeatureType::LineString) {
             GeometryLine line;
-            PBFGeometry::command cmd;
             while ((cmd = current_geometry.next(x, y)) != PBFGeometry::end) {
                 if (cmd == PBFGeometry::move_to) {
                     if (!line.empty()) {
@@ -73,7 +73,6 @@ GeometryCollection VectorTileFeature::nextGeometry() {
             }
         } else if (type == GeometryFeatureType::Polygon) {
             GeometryLine line;
-            PBFGeometry::command cmd;
             while ((cmd = current_geometry.next(x, y)) != PBFGeometry::end) {
                 if (cmd == PBFGeometry::move_to) {
                     if (line.size()) {
