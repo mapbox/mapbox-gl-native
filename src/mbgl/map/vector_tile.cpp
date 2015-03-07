@@ -54,9 +54,10 @@ GeometryCollection VectorTileFeature::nextGeometry() {
         int32_t x, y;
 
         if (type == GeometryFeatureType::Point) {
-            current_geometry.next(x, y);
-            GeometryPoint point(x, y);
-            result.emplace_back(GeometryPoint(x, y));
+            if ((cmd = current_geometry.next(x, y)) != PBFGeometry::end) {
+                GeometryPoint point(x, y);
+                result.emplace_back(GeometryPoint(x, y));
+            }
         } else if (type == GeometryFeatureType::LineString) {
             GeometryLine line;
             while ((cmd = current_geometry.next(x, y)) != PBFGeometry::end) {
