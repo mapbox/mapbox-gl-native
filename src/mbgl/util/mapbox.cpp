@@ -26,8 +26,7 @@ std::string normalizeSourceURL(const std::string& url, const std::string& access
 
     // TileJSON requests need a secure flag appended to their URLs so
     // that the server knows to send SSL-ified resource references.
-    if (url.compare(0, 5, "https") == 0)
-        result += "&secure";
+    result += "&secure";
 
     return result;
 }

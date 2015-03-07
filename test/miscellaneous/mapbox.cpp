@@ -7,8 +7,8 @@
 using namespace mbgl;
 
 TEST(Mapbox, SourceURL) {
-    EXPECT_EQ(mbgl::util::mapbox::normalizeSourceURL("mapbox://user.map", "key"), "https://api.tiles.mapbox.com/v4/user.map.json?access_token=key");
-    EXPECT_EQ(mbgl::util::mapbox::normalizeSourceURL("mapbox://user.map", "token"), "https://api.tiles.mapbox.com/v4/user.map.json?access_token=token");
+    EXPECT_EQ(mbgl::util::mapbox::normalizeSourceURL("mapbox://user.map", "key"), "https://api.tiles.mapbox.com/v4/user.map.json?access_token=key&secure");
+    EXPECT_EQ(mbgl::util::mapbox::normalizeSourceURL("mapbox://user.map", "token"), "https://api.tiles.mapbox.com/v4/user.map.json?access_token=token&secure");
     EXPECT_THROW(mbgl::util::mapbox::normalizeSourceURL("mapbox://user.map", ""), std::runtime_error);
 }
 
