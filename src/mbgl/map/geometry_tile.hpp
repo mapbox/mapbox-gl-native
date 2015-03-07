@@ -85,7 +85,6 @@ std::ostream& operator<<(std::ostream&, const PositionedGlyph&);
 class GeometryTileLayer {
 public:
     virtual util::ptr<GeometryFilteredTileLayer> createFilter(const FilterExpression&) = 0;
-    virtual util::ptr<GeometryTileFeature> nextFeature() = 0;
 
 public:
     std::string name;
