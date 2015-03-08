@@ -3,6 +3,7 @@
 
 #include <mbgl/map/geometry_tile.hpp>
 #include <mbgl/style/filter_expression.hpp>
+#include <mbgl/util/ptr.hpp>
 
 namespace mbgl {
 
@@ -82,7 +83,7 @@ public:
     VectorTile(pbf);
 
     VectorTile& operator=(VectorTile&&);
-    virtual std::map<std::string, const GeometryTileLayer> getLayers() const;
+    virtual const util::ptr<const GeometryTileLayer> getLayer(const std::string&) const;
 
 private:
     std::map<std::string, const VectorTileLayer> layers;

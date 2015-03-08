@@ -119,6 +119,14 @@ VectorTile& VectorTile::operator=(VectorTile&& other) {
     return *this;
 }
 
+const util::ptr<const GeometryTileLayer> VectorTile::getLayer(const std::string& name) const {
+    auto layer_it = layers.find(name);
+    if (layer_it != layers.end()) {
+        return std::make_shared<const VectorTileLayer>(layer_it->second);
+    }
+    return nullptr;
+}
+
 VectorTileLayer::VectorTileLayer(pbf layer_pbf)
     : feature_pbf(layer_pbf) {
     while (layer_pbf.next()) {

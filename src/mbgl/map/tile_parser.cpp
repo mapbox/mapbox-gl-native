@@ -187,9 +187,8 @@ std::unique_ptr<Bucket> TileParser::createBucket(const StyleBucket &bucketDesc) 
     if (tile.id.z >= std::ceil(bucketDesc.max_zoom)) return nullptr;
     if (bucketDesc.visibility == mbgl::VisibilityType::None) return nullptr;
 
-    auto layer_it = vectorTile.getLayers().find(bucketDesc.source_layer);
-    if (layer_it != vectorTile.getLayers().end()) {
-        const GeometryTileLayer& layer = layer_it->second;
+    const util::ptr<const GeometryTileLayer> layer = vectorTile.getLayer(bucketDesc.source_layer);
+    if (layer.get() != nullptr) {
         if (bucketDesc.type == StyleLayerType::Fill) {
             return createFillBucket(layer, bucketDesc);
         } else if (bucketDesc.type == StyleLayerType::Line) {
@@ -213,9 +212,9 @@ std::unique_ptr<Bucket> TileParser::createBucket(const StyleBucket &bucketDesc) 
 }
 
 template <class Bucket>
-void TileParser::addBucketGeometries(Bucket& bucket, const GeometryTileLayer& layer, const FilterExpression &filter) {
+void TileParser::addBucketGeometries(Bucket& bucket, const util::ptr<const GeometryTileLayer> layer, const FilterExpression &filter) {
 
-    std::unique_ptr<GeometryFilteredTileLayer> filtered_layer = layer.createFilteredTileLayer(filter);
+    std::unique_ptr<GeometryFilteredTileLayer> filtered_layer = layer->createFilteredTileLayer(filter);
 
     for (auto feature_it = filtered_layer->begin(); feature_it != filtered_layer->end(); ++feature_it) {
 
@@ -230,7 +229,7 @@ void TileParser::addBucketGeometries(Bucket& bucket, const GeometryTileLayer& la
     }
 }
 
-std::unique_ptr<Bucket> TileParser::createFillBucket(const GeometryTileLayer& layer,
+std::unique_ptr<Bucket> TileParser::createFillBucket(const util::ptr<const GeometryTileLayer> layer,
                                                      const StyleBucket &bucket_desc) {
     auto fill = parseStyleLayoutFill(bucket_desc, tile.id.z);
     auto bucket = util::make_unique<FillBucket>(std::move(fill),
@@ -241,7 +240,7 @@ std::unique_ptr<Bucket> TileParser::createFillBucket(const GeometryTileLayer& la
     return obsolete() ? nullptr : std::move(bucket);
 }
 
-std::unique_ptr<Bucket> TileParser::createLineBucket(const GeometryTileLayer& layer,
+std::unique_ptr<Bucket> TileParser::createLineBucket(const util::ptr<const GeometryTileLayer> layer,
                                                      const StyleBucket &bucket_desc) {
     auto line = parseStyleLayoutLine(bucket_desc, tile.id.z);
     auto bucket = util::make_unique<LineBucket>(std::move(line),
@@ -252,7 +251,7 @@ std::unique_ptr<Bucket> TileParser::createLineBucket(const GeometryTileLayer& la
     return obsolete() ? nullptr : std::move(bucket);
 }
 
-std::unique_ptr<Bucket> TileParser::createSymbolBucket(const GeometryTileLayer& layer,
+std::unique_ptr<Bucket> TileParser::createSymbolBucket(const util::ptr<const GeometryTileLayer> layer,
                                                        const StyleBucket &bucket_desc) {
     auto symbol = parseStyleLayoutSymbol(bucket_desc, tile.id.z);
     auto bucket = util::make_unique<SymbolBucket>(std::move(symbol), *collision);
