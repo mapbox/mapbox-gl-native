@@ -217,14 +217,15 @@ void TileParser::addBucketGeometries(Bucket& bucket, const GeometryTileLayer& la
 
     std::unique_ptr<GeometryFilteredTileLayer> filtered_layer = layer.createFilteredTileLayer(filter);
 
-    for (auto feature : *filtered_layer) {
+    for (auto feature_it = filtered_layer->begin(); feature_it != filtered_layer->end(); ++feature_it) {
+
         if (obsolete())
             return;
 
-        GeometryCollection geometry = feature.nextGeometry();
+        GeometryCollection geometry = (*feature_it).nextGeometry();
         while (geometry.size()) {
             bucket->addGeometry(geometry);
-            geometry = feature.nextGeometry();
+            geometry = (*feature_it).nextGeometry();
         }
     }
 }

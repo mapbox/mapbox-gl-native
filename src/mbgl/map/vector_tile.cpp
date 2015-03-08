@@ -241,6 +241,7 @@ bool FilteredVectorTileLayer::iterator::operator!=(const iterator& other) const 
     return !(feature == other.feature);
 }
 
-const VectorTileFeature& FilteredVectorTileLayer::iterator::operator*() const {
-    return feature;
+VectorTileFeature& FilteredVectorTileLayer::iterator::operator*() const {
+    VectorTileFeature* f = const_cast<VectorTileFeature *>(&feature);
+    return *f;
 }
