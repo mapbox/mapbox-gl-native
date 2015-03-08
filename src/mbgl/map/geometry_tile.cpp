@@ -16,20 +16,9 @@ std::ostream& mbgl::operator<<(std::ostream& os, const GeometryFeatureType& type
 }
 
 std::ostream& mbgl::operator<<(std::ostream& os, const GeometryTileFeature& feature) {
-    os << "Feature(" << feature.id << "): " << feature.type << std::endl;
-    for (const auto& prop : feature.properties) {
+    os << "Feature(" << feature.getID() << "): " << feature.getType() << std::endl;
+    for (const auto& prop : feature.getProperties()) {
         os << "  - " << prop.first << ": " << &prop.second << std::endl;
     }
     return os;
-}
-
-GeometryFilteredTileLayer::GeometryFilteredTileLayer(const util::ptr<GeometryTileLayer> layer_, const FilterExpression& filterExpression_)
-    : layer(layer_),
-      filterExpression(filterExpression_) {}
-
-GeometryTile& GeometryTile::operator=(GeometryTile&& other) {
-    if (this != &other) {
-        layers.swap(other.layers);
-    }
-    return *this;
 }

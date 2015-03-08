@@ -1,5 +1,6 @@
 #include <mbgl/renderer/symbol_bucket.hpp>
 #include <mbgl/map/geometry_tile.hpp>
+#include <mbgl/map/vector_tile.hpp>
 #include <mbgl/style/style_layout.hpp>
 #include <mbgl/geometry/text_buffer.hpp>
 #include <mbgl/geometry/icon_buffer.hpp>
@@ -18,6 +19,7 @@
 #include <mbgl/util/token.hpp>
 #include <mbgl/util/math.hpp>
 #include <mbgl/util/merge_lines.hpp>
+#include <mbgl/util/std.hpp>
 
 namespace mbgl {
 
@@ -47,7 +49,7 @@ void SymbolBucket::addGlyphsToAtlas(uint64_t tileid, const std::string stackname
     glyphAtlas.addGlyphs(tileid, text, stackname, fontStack,face);
 }
 
-std::vector<SymbolFeature> SymbolBucket::processFeatures(const util::ptr<GeometryTileLayer> layer,
+std::vector<SymbolFeature> SymbolBucket::processFeatures(const GeometryTileLayer& layer,
                                                          const FilterExpression &filter,
                                                          GlyphStore &glyphStore,
                                                          const Sprite &sprite) {
@@ -64,14 +66,14 @@ std::vector<SymbolFeature> SymbolBucket::processFeatures(const util::ptr<Geometr
     // Determine and load glyph ranges
     std::set<GlyphRange> ranges;
 
-    util::ptr<GeometryFilteredTileLayer> filtered_layer = layer->createFilter(filter);
-    util::ptr<GeometryTileFeature> feature = filtered_layer->nextMatchingFeature();
-    while (feature->type != GeometryFeatureType::Unknown) {
+    std::unique_ptr<GeometryFilteredTileLayer> filtered_layer = layer.createFilteredTileLayer(filter);
+
+    for (auto feature : *filtered_layer) {
 
         SymbolFeature ft;
 
         if (has_text) {
-            std::string u8string = util::replaceTokens(layout.text.field, feature->properties);
+            std::string u8string = util::replaceTokens(layout.text.field, feature.getProperties());
 
             if (layout.text.transform == TextTransformType::Uppercase) {
                 u8string = platform::uppercase(u8string);
@@ -90,14 +92,14 @@ std::vector<SymbolFeature> SymbolBucket::processFeatures(const util::ptr<Geometr
         }
 
         if (has_icon) {
-            ft.sprite = util::replaceTokens(layout.icon.image, feature->properties);
+            ft.sprite = util::replaceTokens(layout.icon.image, feature.getProperties());
         }
 
         if (ft.label.length() || ft.sprite.length()) {
 
             auto &multiline = ft.geometry;
 
-            GeometryCollection geometryCollection = feature->nextGeometry();
+            GeometryCollection geometryCollection = feature.nextGeometry();
             multiline.emplace_back();
             for (auto& geometry : geometryCollection) {
                 const GeometryLine& line = geometry.get<GeometryLine>();
@@ -109,8 +111,6 @@ std::vector<SymbolFeature> SymbolBucket::processFeatures(const util::ptr<Geometr
 
             features.push_back(std::move(ft));
         }
-
-        feature = filtered_layer->nextMatchingFeature();
     }
 
     if (layout.placement == PlacementType::Line) {
@@ -123,7 +123,7 @@ std::vector<SymbolFeature> SymbolBucket::processFeatures(const util::ptr<Geometr
     return features;
 }
 
-void SymbolBucket::addFeatures(const util::ptr<GeometryTileLayer> layer, const FilterExpression &filter,
+void SymbolBucket::addFeatures(const GeometryTileLayer& layer, const FilterExpression &filter,
                                const Tile::ID &id, SpriteAtlas &spriteAtlas, Sprite &sprite,
                                GlyphAtlas & glyphAtlas, GlyphStore &glyphStore) {
     auto &layout = *styleLayout;

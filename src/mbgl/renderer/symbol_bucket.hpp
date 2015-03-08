@@ -65,7 +65,7 @@ public:
     bool hasTextData() const;
     bool hasIconData() const;
 
-    void addFeatures(const util::ptr<GeometryTileLayer> layer, const FilterExpression &filter,
+    void addFeatures(const GeometryTileLayer& layer, const FilterExpression &filter,
                      const Tile::ID &id, SpriteAtlas &spriteAtlas, Sprite &sprite,
                      GlyphAtlas &glyphAtlas, GlyphStore &glyphStore);
 
@@ -78,9 +78,9 @@ public:
 
 private:
 
-    std::vector<SymbolFeature> processFeatures(const util::ptr<GeometryTileLayer> layer, const FilterExpression &filter, GlyphStore &glyphStore, const Sprite &sprite);
+    std::vector<SymbolFeature> processFeatures(const GeometryTileLayer& layer, const FilterExpression &filter, GlyphStore &glyphStore, const Sprite &sprite);
 
-    void addFeature(const GeometryLine &line, const Shaping &shaping, const GlyphPositions &face, const Rect<uint16_t> &image);
+    void addFeature(const std::vector<Coordinate> &line, const Shaping &shaping, const GlyphPositions &face, const Rect<uint16_t> &image);
 
     // Adds placed items to the buffer.
     template <typename Buffer, typename GroupType>
