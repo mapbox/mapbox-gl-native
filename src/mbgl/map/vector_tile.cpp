@@ -199,13 +199,13 @@ util::ptr<GeometryTileFeature> FilteredVectorTileLayer::nextMatchingFeature() {
         }
 
         if (evaluate(filterExpression, extractor)) {
-            return std::move(std::make_shared<VectorTileFeature>(matching_feature_pbf, layer));
+            return std::make_shared<VectorTileFeature>(matching_feature_pbf, layer);
         }
     }
 
-    return std::move(std::make_shared<VectorTileFeature>(pbf(), layer));
+    return std::make_shared<VectorTileFeature>(pbf(), layer);
 }
 
 util::ptr<GeometryFilteredTileLayer> VectorTileLayer::createFilter(const FilterExpression& filterExpression) {
-    return std::move(std::make_shared<FilteredVectorTileLayer>(shared_from_this(), filterExpression));
+    return std::make_shared<FilteredVectorTileLayer>(shared_from_this(), filterExpression);
 }
