@@ -73,7 +73,17 @@ protected:
 
 class GeometryFilteredTileLayer {
 public:
-    class iterator {};
+    class iterator {
+    public:
+        virtual ~iterator();
+
+        void operator++();
+        bool operator!=(const iterator&) const;
+        GeometryTileFeature& operator*() const;
+
+    protected:
+        iterator();
+    };
 
 public:
     virtual ~GeometryFilteredTileLayer();

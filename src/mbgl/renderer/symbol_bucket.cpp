@@ -68,12 +68,12 @@ std::vector<SymbolFeature> SymbolBucket::processFeatures(const GeometryTileLayer
 
     std::unique_ptr<GeometryFilteredTileLayer> filtered_layer = layer.createFilteredTileLayer(filter);
 
-    for (auto feature : *filtered_layer) {
+    for (auto feature_it = filtered_layer->begin(); feature_it != filtered_layer->end(); ++feature_it) {
 
         SymbolFeature ft;
 
         if (has_text) {
-            std::string u8string = util::replaceTokens(layout.text.field, feature.getProperties());
+            std::string u8string = util::replaceTokens(layout.text.field, (*feature_it).getProperties());
 
             if (layout.text.transform == TextTransformType::Uppercase) {
                 u8string = platform::uppercase(u8string);
@@ -92,14 +92,14 @@ std::vector<SymbolFeature> SymbolBucket::processFeatures(const GeometryTileLayer
         }
 
         if (has_icon) {
-            ft.sprite = util::replaceTokens(layout.icon.image, feature.getProperties());
+            ft.sprite = util::replaceTokens(layout.icon.image, (*feature_it).getProperties());
         }
 
         if (ft.label.length() || ft.sprite.length()) {
 
             auto &multiline = ft.geometry;
 
-            GeometryCollection geometryCollection = feature.nextGeometry();
+            GeometryCollection geometryCollection = (*feature_it).nextGeometry();
             multiline.emplace_back();
             for (auto& geometry : geometryCollection) {
                 const GeometryLine& line = geometry.get<GeometryLine>();

@@ -33,7 +33,7 @@ public:
         iterator(const FilteredVectorTileLayer&, const pbf&);
         void operator++();
         bool operator!=(const iterator&) const;
-        const VectorTileFeature& operator*() const;
+        VectorTileFeature& operator*() const;
 
     private:
         const FilteredVectorTileLayer& parent;
