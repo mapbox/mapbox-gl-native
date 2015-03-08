@@ -1,7 +1,6 @@
 #include <mbgl/map/vector_tile.hpp>
 #include <mbgl/geometry/pbf_geometry.hpp>
 #include <mbgl/style/filter_expression_private.hpp>
-#include <mbgl/util/std.hpp>
 #include <mbgl/util/pbf.hpp>
 
 #include <type_traits>
@@ -145,8 +144,8 @@ VectorTileLayer::VectorTileLayer(pbf layer_pbf)
     }
 }
 
-std::unique_ptr<GeometryFilteredTileLayer> VectorTileLayer::createFilteredTileLayer(const FilterExpression& filterExpression) const {
-    return util::make_unique<FilteredVectorTileLayer>(*this, filterExpression);
+util::ptr<GeometryFilteredTileLayer> VectorTileLayer::createFilteredTileLayer(const FilterExpression& filterExpression) const {
+    return std::make_shared<FilteredVectorTileLayer>(*this, filterExpression);
 }
 
 FilteredVectorTileLayer::FilteredVectorTileLayer(const VectorTileLayer& layer_, const FilterExpression& filterExpression_)
