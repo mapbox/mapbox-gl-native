@@ -1,5 +1,4 @@
 #include <mbgl/geometry/glyph_atlas.hpp>
-#include <mbgl/map/vector_tile.hpp>
 
 #include <mbgl/platform/gl.hpp>
 #include <mbgl/platform/platform.hpp>

@@ -5,7 +5,6 @@
 #include <mbgl/style/value.hpp>
 #include <mbgl/text/glyph.hpp>
 #include <mbgl/util/optional.hpp>
-#include <mbgl/util/ptr.hpp>
 #include <mbgl/util/variant.hpp>
 #include <mbgl/util/vec.hpp>
 
@@ -40,12 +39,15 @@ class GeometryTileLayer;
 
 class GeometryTileFeature {
 public:
+    virtual ~GeometryTileFeature();
+
+    virtual uint64_t getID() const = 0;
+    virtual GeometryFeatureType getType() const = 0;
+    virtual std::map<std::string, Value> getProperties() const = 0;
     virtual GeometryCollection nextGeometry() = 0;
 
-public:
-    uint64_t id = 0;
-    GeometryFeatureType type = GeometryFeatureType::Unknown;
-    std::map<std::string, Value> properties;
+protected:
+    GeometryTileFeature();
 };
 
 std::ostream& operator<<(std::ostream&, const GeometryTileFeature& feature);
@@ -53,7 +55,7 @@ std::ostream& operator<<(std::ostream&, const GeometryTileFeature& feature);
 template <typename Tags>
 class GeometryTileTagExtractor {
 public:
-    GeometryTileTagExtractor(const util::ptr<GeometryTileLayer>);
+    GeometryTileTagExtractor(const GeometryTileLayer&);
 
     inline void setTags(const Tags& tags_) { tags = tags_; }
     virtual mapbox::util::optional<Value> getValue(const std::string &key) const;
@@ -66,43 +68,49 @@ public:
     Tags tags;
 
 protected:
-    const util::ptr<GeometryTileLayer> layer;
+    const GeometryTileLayer& layer;
 };
 
 class GeometryFilteredTileLayer {
 public:
-    GeometryFilteredTileLayer(const util::ptr<GeometryTileLayer>, const FilterExpression&);
+    class iterator {};
 
-    virtual util::ptr<GeometryTileFeature> nextMatchingFeature() = 0;
+public:
+    virtual ~GeometryFilteredTileLayer();
+
+    virtual iterator begin() const = 0;
+    virtual iterator end() const = 0;
 
 protected:
-    const util::ptr<GeometryTileLayer> layer;
-    const FilterExpression& filterExpression;
+    GeometryFilteredTileLayer();
 };
 
 std::ostream& operator<<(std::ostream&, const PositionedGlyph&);
 
 class GeometryTileLayer {
 public:
-    virtual util::ptr<GeometryFilteredTileLayer> createFilter(const FilterExpression&) = 0;
+    virtual ~GeometryTileLayer();
 
-public:
-    std::string name;
-    uint32_t extent = 4096;
-    std::vector<std::string> keys;
-    std::unordered_map<std::string, uint32_t> key_index;
-    std::vector<Value> values;
-    std::map<std::string, std::map<Value, Shaping>> shaping;
+    virtual const std::string getName() const = 0;
+    virtual uint32_t getExtent() const = 0;
+    virtual const std::vector<std::string> getKeys() const = 0;
+    virtual const std::unordered_map<std::string, uint32_t> getKeyIndex() const = 0;
+    virtual const std::vector<Value> getValues() const = 0;
+    virtual const std::map<std::string, std::map<Value, Shaping>> getShaping() const = 0;
+    virtual std::unique_ptr<GeometryFilteredTileLayer> createFilteredTileLayer(const FilterExpression&) const = 0;
+
+protected:
+    GeometryTileLayer();
 };
 
 class GeometryTile {
 public:
-    GeometryTile& operator=(GeometryTile&& other);
+    virtual ~GeometryTile();
 
-    virtual void logDebug() const = 0;
+    virtual std::map<std::string, const GeometryTileLayer> getLayers() const = 0;
 
-public:
-    std::map<std::string, const util::ptr<GeometryTileLayer>> layers;
+protected:
+    GeometryTile();
 };
 
 }

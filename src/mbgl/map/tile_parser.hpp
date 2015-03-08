@@ -53,11 +53,11 @@ private:
     void parseStyleLayers(util::ptr<const StyleLayerGroup> group);
 
     std::unique_ptr<Bucket> createBucket(const StyleBucket& bucketDesc);
-    std::unique_ptr<Bucket> createFillBucket(const util::ptr<GeometryTileLayer> layer, const StyleBucket& bucketDesc);
-    std::unique_ptr<Bucket> createLineBucket(const util::ptr<GeometryTileLayer> layer, const StyleBucket& bucketDesc);
-    std::unique_ptr<Bucket> createSymbolBucket(const util::ptr<GeometryTileLayer> layer, const StyleBucket& bucketDesc);
+    std::unique_ptr<Bucket> createFillBucket(const GeometryTileLayer& layer, const StyleBucket& bucketDesc);
+    std::unique_ptr<Bucket> createLineBucket(const GeometryTileLayer& layer, const StyleBucket& bucketDesc);
+    std::unique_ptr<Bucket> createSymbolBucket(const GeometryTileLayer& layer, const StyleBucket& bucketDesc);
 
-    template <class Bucket> void addBucketGeometries(Bucket& bucket, const util::ptr<GeometryTileLayer> layer, const FilterExpression& filter);
+    template <class Bucket> void addBucketGeometries(Bucket& bucket, const GeometryTileLayer& layer, const FilterExpression& filter);
 
 private:
     const VectorTile vectorTile;
