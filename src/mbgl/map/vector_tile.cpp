@@ -97,6 +97,10 @@ GeometryCollection VectorTileFeature::nextGeometry() {
     return std::move(result);
 }
 
+bool VectorTileFeature::operator==(const VectorTileFeature& other) const {
+    return (geometry_pbf == other.geometry_pbf);
+}
+
 VectorTile::VectorTile(pbf tile_pbf) {
     while (tile_pbf.next()) {
         if (tile_pbf.tag == 3) { // layer
@@ -234,7 +238,7 @@ void FilteredVectorTileLayer::iterator::operator++() {
 }
 
 bool FilteredVectorTileLayer::iterator::operator!=(const iterator& other) const {
-    return !(feature_pbf.data == other.feature_pbf.data && feature_pbf.end == other.feature_pbf.end && valid == other.valid);
+    return !(feature == other.feature);
 }
 
 const VectorTileFeature& FilteredVectorTileLayer::iterator::operator*() const {

@@ -17,6 +17,7 @@ public:
     virtual inline GeometryFeatureType getType() const { return type; }
     virtual inline std::map<std::string, Value> getProperties() const { return properties; }
     virtual GeometryCollection nextGeometry();
+    bool operator==(const VectorTileFeature&) const;
 
 private:
     uint64_t id = 0;
