@@ -59,12 +59,12 @@ class VectorTileLayer : public GeometryTileLayer {
 public:
     VectorTileLayer(pbf);
 
-    virtual inline const std::string getName() const { return name; }
+    virtual inline const std::string& getName() const { return name; }
     virtual inline uint32_t getExtent() const { return extent; }
-    virtual inline const std::vector<std::string> getKeys() const { return keys; }
-    virtual inline const std::unordered_map<std::string, uint32_t> getKeyIndex() const { return key_index; }
-    virtual inline const std::vector<Value> getValues() const { return values; }
-    virtual inline const std::map<std::string, std::map<Value, Shaping>> getShaping() const { return shaping; }
+    virtual inline const std::vector<std::string>& getKeys() const { return keys; }
+    virtual inline const std::unordered_map<std::string, uint32_t>& getKeyIndex() const { return key_index; }
+    virtual inline const std::vector<Value>& getValues() const { return values; }
+    virtual inline const std::map<std::string, std::map<Value, Shaping>>& getShaping() const { return shaping; }
 
     virtual std::unique_ptr<GeometryFilteredTileLayer> createFilteredTileLayer(const FilterExpression&) const;
 
