@@ -66,7 +66,7 @@ std::vector<SymbolFeature> SymbolBucket::processFeatures(const util::ptr<const G
     // Determine and load glyph ranges
     std::set<GlyphRange> ranges;
 
-    std::unique_ptr<GeometryFilteredTileLayer> filtered_layer = layer->createFilteredTileLayer(filter);
+    util::ptr<GeometryFilteredTileLayer> filtered_layer = layer->createFilteredTileLayer(filter);
 
     for (auto feature_it = filtered_layer->begin(); feature_it != filtered_layer->end(); ++feature_it) {
 

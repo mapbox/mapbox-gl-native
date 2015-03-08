@@ -91,7 +91,7 @@ public:
     virtual const std::unordered_map<std::string, uint32_t>& getKeyIndex() const = 0;
     virtual const std::vector<Value>& getValues() const = 0;
     virtual const std::map<std::string, std::map<Value, Shaping>>& getShaping() const = 0;
-    virtual std::unique_ptr<GeometryFilteredTileLayer> createFilteredTileLayer(const FilterExpression&) const = 0;
+    virtual util::ptr<GeometryFilteredTileLayer> createFilteredTileLayer(const FilterExpression&) const = 0;
 };
 
 class GeometryTile {

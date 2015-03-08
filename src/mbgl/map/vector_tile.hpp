@@ -66,7 +66,7 @@ public:
     virtual inline const std::vector<Value>& getValues() const { return values; }
     virtual inline const std::map<std::string, std::map<Value, Shaping>>& getShaping() const { return shaping; }
 
-    virtual std::unique_ptr<GeometryFilteredTileLayer> createFilteredTileLayer(const FilterExpression&) const;
+    virtual util::ptr<GeometryFilteredTileLayer> createFilteredTileLayer(const FilterExpression&) const;
 
 private:
     std::string name;
