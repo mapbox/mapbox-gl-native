@@ -49,7 +49,7 @@ void SymbolBucket::addGlyphsToAtlas(uint64_t tileid, const std::string stackname
     glyphAtlas.addGlyphs(tileid, text, stackname, fontStack,face);
 }
 
-std::vector<SymbolFeature> SymbolBucket::processFeatures(const GeometryTileLayer& layer,
+std::vector<SymbolFeature> SymbolBucket::processFeatures(const util::ptr<const GeometryTileLayer> layer,
                                                          const FilterExpression &filter,
                                                          GlyphStore &glyphStore,
                                                          const Sprite &sprite) {
@@ -66,7 +66,7 @@ std::vector<SymbolFeature> SymbolBucket::processFeatures(const GeometryTileLayer
     // Determine and load glyph ranges
     std::set<GlyphRange> ranges;
 
-    std::unique_ptr<GeometryFilteredTileLayer> filtered_layer = layer.createFilteredTileLayer(filter);
+    std::unique_ptr<GeometryFilteredTileLayer> filtered_layer = layer->createFilteredTileLayer(filter);
 
     for (auto feature_it = filtered_layer->begin(); feature_it != filtered_layer->end(); ++feature_it) {
 
@@ -123,7 +123,7 @@ std::vector<SymbolFeature> SymbolBucket::processFeatures(const GeometryTileLayer
     return features;
 }
 
-void SymbolBucket::addFeatures(const GeometryTileLayer& layer, const FilterExpression &filter,
+void SymbolBucket::addFeatures(const util::ptr<const GeometryTileLayer> layer, const FilterExpression &filter,
                                const Tile::ID &id, SpriteAtlas &spriteAtlas, Sprite &sprite,
                                GlyphAtlas & glyphAtlas, GlyphStore &glyphStore) {
     auto &layout = *styleLayout;

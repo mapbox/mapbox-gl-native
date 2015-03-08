@@ -5,6 +5,7 @@
 #include <mbgl/style/value.hpp>
 #include <mbgl/text/glyph.hpp>
 #include <mbgl/util/optional.hpp>
+#include <mbgl/util/ptr.hpp>
 #include <mbgl/util/variant.hpp>
 #include <mbgl/util/vec.hpp>
 
@@ -39,15 +40,10 @@ class GeometryTileLayer;
 
 class GeometryTileFeature {
 public:
-    virtual ~GeometryTileFeature();
-
     virtual uint64_t getID() const = 0;
     virtual GeometryFeatureType getType() const = 0;
     virtual std::map<std::string, Value> getProperties() const = 0;
     virtual GeometryCollection nextGeometry() = 0;
-
-protected:
-    GeometryTileFeature();
 };
 
 std::ostream& operator<<(std::ostream&, const GeometryTileFeature& feature);
@@ -75,32 +71,20 @@ class GeometryFilteredTileLayer {
 public:
     class iterator {
     public:
-        virtual ~iterator();
-
         void operator++();
         bool operator!=(const iterator&) const;
         GeometryTileFeature& operator*() const;
-
-    protected:
-        iterator();
     };
 
 public:
-    virtual ~GeometryFilteredTileLayer();
-
     virtual iterator begin() const = 0;
     virtual iterator end() const = 0;
-
-protected:
-    GeometryFilteredTileLayer();
 };
 
 std::ostream& operator<<(std::ostream&, const PositionedGlyph&);
 
 class GeometryTileLayer {
 public:
-    virtual ~GeometryTileLayer();
-
     virtual const std::string getName() const = 0;
     virtual uint32_t getExtent() const = 0;
     virtual const std::vector<std::string> getKeys() const = 0;
@@ -108,19 +92,11 @@ public:
     virtual const std::vector<Value> getValues() const = 0;
     virtual const std::map<std::string, std::map<Value, Shaping>> getShaping() const = 0;
     virtual std::unique_ptr<GeometryFilteredTileLayer> createFilteredTileLayer(const FilterExpression&) const = 0;
-
-protected:
-    GeometryTileLayer();
 };
 
 class GeometryTile {
 public:
-    virtual ~GeometryTile();
-
-    virtual std::map<std::string, const GeometryTileLayer> getLayers() const = 0;
-
-protected:
-    GeometryTile();
+    virtual const util::ptr<const GeometryTileLayer> getLayer(const std::string&) const = 0;
 };
 
 }
