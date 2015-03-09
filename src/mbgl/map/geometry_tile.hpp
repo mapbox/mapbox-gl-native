@@ -8,9 +8,9 @@
 #include <mbgl/util/ptr.hpp>
 #include <mbgl/util/variant.hpp>
 #include <mbgl/util/vec.hpp>
+#include <mbgl/util/noncopyable.hpp>
 
 #include <cstdint>
-#include <iosfwd>
 #include <map>
 #include <string>
 #include <type_traits>
@@ -34,69 +34,33 @@ using Geometry = mapbox::util::variant<std::false_type, GeometryPoint, GeometryL
 
 typedef std::vector<Geometry> GeometryCollection;
 
-std::ostream& operator<<(std::ostream&, const GeometryFeatureType& type);
-
-class GeometryTileLayer;
-
-class GeometryTileFeature {
+class GeometryTileFeature : public mbgl::util::noncopyable {
 public:
-    virtual uint64_t getID() const = 0;
     virtual GeometryFeatureType getType() const = 0;
-    virtual std::map<std::string, Value> getProperties() const = 0;
-    virtual GeometryCollection nextGeometry() = 0;
+    virtual mapbox::util::optional<Value> getValue(const std::string& key) const = 0;
+    virtual GeometryCollection getGeometries() const = 0;
 };
 
-std::ostream& operator<<(std::ostream&, const GeometryTileFeature& feature);
-
-template <typename Tags>
-class GeometryTileTagExtractor {
+class GeometryTileLayer : public mbgl::util::noncopyable {
 public:
-    GeometryTileTagExtractor(const GeometryTileLayer&);
-
-    inline void setTags(const Tags& tags_) { tags = tags_; }
-    virtual mapbox::util::optional<Value> getValue(const std::string &key) const;
-
-    inline void setType(GeometryFeatureType type_) { type = type_; }
-    inline GeometryFeatureType getType() const { return type; }
-
-public:
-    GeometryFeatureType type = GeometryFeatureType::Unknown;
-    Tags tags;
-
-protected:
-    const GeometryTileLayer& layer;
+    virtual std::size_t featureCount() const = 0;
+    virtual const util::ptr<const GeometryTileFeature> feature(std::size_t i) const = 0;
 };
 
-class GeometryFilteredTileLayer {
-public:
-    class iterator {
-    public:
-        void operator++();
-        bool operator!=(const iterator&) const;
-        GeometryTileFeature& operator*() const;
-    };
-
-public:
-    virtual iterator begin() const = 0;
-    virtual iterator end() const = 0;
-};
-
-std::ostream& operator<<(std::ostream&, const PositionedGlyph&);
-
-class GeometryTileLayer {
-public:
-    virtual const std::string& getName() const = 0;
-    virtual uint32_t getExtent() const = 0;
-    virtual const std::vector<std::string>& getKeys() const = 0;
-    virtual const std::unordered_map<std::string, uint32_t>& getKeyIndex() const = 0;
-    virtual const std::vector<Value>& getValues() const = 0;
-    virtual const std::map<std::string, std::map<Value, Shaping>>& getShaping() const = 0;
-    virtual util::ptr<GeometryFilteredTileLayer> createFilteredTileLayer(const FilterExpression&) const = 0;
-};
-
-class GeometryTile {
+class GeometryTile : public mbgl::util::noncopyable {
 public:
     virtual const util::ptr<const GeometryTileLayer> getLayer(const std::string&) const = 0;
+};
+
+class GeometryTileFeatureExtractor {
+public:
+    GeometryTileFeatureExtractor(const GeometryTileFeature& feature_)
+        : feature(feature_) {}
+
+    mapbox::util::optional<Value> getValue(const std::string& key) const;
+
+private:
+    const GeometryTileFeature& feature;
 };
 
 }
