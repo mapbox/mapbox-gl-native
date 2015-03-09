@@ -1,4 +1,4 @@
-#include <mbgl/platform/android/log_android.hpp>
+#include <mbgl/platform/log.hpp>
 
 #define __STDC_FORMAT_MACROS // NDK bug workaround: https://code.google.com/p/android/issues/detail?id=72349
 #include <cinttypes>
@@ -7,7 +7,9 @@
 
 namespace mbgl {
 
-int AndroidLogBackend::severityToPriority(EventSeverity severity) {
+namespace {
+
+int severityToPriority(EventSeverity severity) {
     switch(severity) {
     case EventSeverity::Debug:
         return ANDROID_LOG_DEBUG;
@@ -26,7 +28,9 @@ int AndroidLogBackend::severityToPriority(EventSeverity severity) {
     }
 }
 
-void AndroidLogBackend::record(EventSeverity severity, Event event, int64_t code, const std::string &msg) {
+} // namespace
+
+void Log::platformRecord(EventSeverity severity, Event event, int64_t code, const std::string &msg) {
     __android_log_print(severityToPriority(severity), EventClass(event).c_str(), "(%" PRId64 ") %s", code, msg.c_str());
 }
 

@@ -10,17 +10,6 @@
 
 namespace mbgl {
 
-class LogBackend {
-public:
-    virtual inline ~LogBackend() = default;
-
-    void record(EventSeverity severity, Event event, const std::string &msg);
-    void record(EventSeverity severity, Event event, const char* format, ...);
-    void record(EventSeverity severity, Event event, int64_t code);
-
-    virtual void record(EventSeverity severity, Event event, int64_t code, const std::string &msg) = 0;
-};
-
 class Log {
 private:
     template <typename T, size_t N>
@@ -54,20 +43,20 @@ public:
         if (!includes(severity, disabledEventSeverities) &&
             !includes(event, disabledEvents) &&
             !includes({ severity, event }, disabledEventPermutations)) {
-            if (Backend) {
-                Backend->record(severity, event, ::std::forward<Args>(args)...);
-            }
+                record(severity, event, ::std::forward<Args>(args)...);
         }
     }
 
-    template<typename T, typename ...Args>
-    static inline const T &Set(Args&& ...args) {
-        Backend = util::make_unique<T>(::std::forward<Args>(args)...);
-        return *reinterpret_cast<T *>(Backend.get());
-    }
-
 private:
-    static std::unique_ptr<LogBackend> Backend;
+    static void record(EventSeverity severity, Event event, const std::string &msg);
+    static void record(EventSeverity severity, Event event, const char* format, ...);
+    static void record(EventSeverity severity, Event event, int64_t code);
+    static void record(EventSeverity severity, Event event, int64_t code, const std::string &msg);
+
+    // This method is the data sink that must be implemented by each platform we
+    // support. It should ideally output the error message in a human readable
+    // format to the developer.
+    static void platformRecord(EventSeverity severity, Event event, int64_t code, const std::string &msg);
 };
 
 }

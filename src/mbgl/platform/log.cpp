@@ -4,13 +4,11 @@
 
 namespace mbgl {
 
-std::unique_ptr<LogBackend> Log::Backend;
-
-void LogBackend::record(EventSeverity severity, Event event, const std::string &msg) {
+void Log::record(EventSeverity severity, Event event, const std::string &msg) {
     record(severity, event, -1, msg);
 }
 
-void LogBackend::record(EventSeverity severity, Event event, const char* format, ...) {
+void Log::record(EventSeverity severity, Event event, const char* format, ...) {
     va_list args;
     va_start(args, format);
     char msg[4096];
@@ -20,8 +18,12 @@ void LogBackend::record(EventSeverity severity, Event event, const char* format,
     record(severity, event, -1, msg);
 }
 
-void LogBackend::record(EventSeverity severity, Event event, int64_t code) {
+void Log::record(EventSeverity severity, Event event, int64_t code) {
     record(severity, event, code, std::string());
+}
+
+void Log::record(EventSeverity severity, Event event, int64_t code, const std::string &msg) {
+    platformRecord(severity, event, code, msg);
 }
 
 }

@@ -15,7 +15,6 @@
 #include <mbgl/android/jni.hpp>
 #include <mbgl/android/native_map_view.hpp>
 #include <mbgl/map/map.hpp>
-#include <mbgl/platform/android/log_android.hpp>
 #include <mbgl/platform/event.hpp>
 #include <mbgl/platform/log.hpp>
 #include <mbgl/storage/network_status.hpp>
@@ -827,8 +826,6 @@ jobject JNICALL nativeLatLngForPixel(JNIEnv *env, jobject obj, jlong nativeMapVi
 extern "C" {
 
 extern "C" JNIEXPORT jint JNICALL JNI_OnLoad(JavaVM *vm, void *reserved) {
-    mbgl::Log::Set<mbgl::AndroidLogBackend>();
-
     mbgl::Log::Debug(mbgl::Event::JNI, "JNI_OnLoad");
 
     JNIEnv *env = nullptr;
