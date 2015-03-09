@@ -13,9 +13,11 @@ namespace mbgl {
 class LogBackend {
 public:
     virtual inline ~LogBackend() = default;
-    virtual void record(EventSeverity severity, Event event, const std::string &msg) = 0;
-    virtual void record(EventSeverity severity, Event event, const char* format, ...) = 0;
-    virtual void record(EventSeverity severity, Event event, int64_t code) = 0;
+
+    void record(EventSeverity severity, Event event, const std::string &msg);
+    void record(EventSeverity severity, Event event, const char* format, ...);
+    void record(EventSeverity severity, Event event, int64_t code);
+
     virtual void record(EventSeverity severity, Event event, int64_t code, const std::string &msg) = 0;
 };
 
