@@ -38,14 +38,6 @@ std::string replaceTokens(const std::string &source, const Lookup &lookup) {
     return result;
 }
 
-template <typename T>
-inline std::string replaceTokens(const std::string &source, const std::map<std::string, T> &properties) {
-    return replaceTokens(source, [&properties](const std::string &token) -> std::string {
-        const auto it_prop = properties.find(token);
-        return it_prop != properties.end() ? toString(it_prop->second) : "";
-    });
-}
-
 } // end namespace util
 } // end namespace mbgl
 

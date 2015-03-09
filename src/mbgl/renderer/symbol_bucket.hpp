@@ -65,9 +65,13 @@ public:
     bool hasTextData() const;
     bool hasIconData() const;
 
-    void addFeatures(const util::ptr<const GeometryTileLayer> layer, const FilterExpression &filter,
-                     const Tile::ID &id, SpriteAtlas &spriteAtlas, Sprite &sprite,
-                     GlyphAtlas &glyphAtlas, GlyphStore &glyphStore);
+    void addFeatures(const GeometryTileLayer&,
+                     const FilterExpression&,
+                     const Tile::ID&,
+                     SpriteAtlas&,
+                     Sprite&,
+                     GlyphAtlas&,
+                     GlyphStore&);
 
     void addGlyphs(const PlacedGlyphs &glyphs, float placementZoom, PlacementRange placementRange,
                    float zoom);
@@ -77,8 +81,10 @@ public:
     void drawIcons(IconShader& shader);
 
 private:
-
-    std::vector<SymbolFeature> processFeatures(const util::ptr<const GeometryTileLayer> layer, const FilterExpression &filter, GlyphStore &glyphStore, const Sprite &sprite);
+    std::vector<SymbolFeature> processFeatures(const GeometryTileLayer&,
+                                               const FilterExpression&,
+                                               GlyphStore&,
+                                               const Sprite&);
 
     void addFeature(const std::vector<Coordinate> &line, const Shaping &shaping, const GlyphPositions &face, const Rect<uint16_t> &image);
 
