@@ -8,7 +8,7 @@ var fs = require('fs');
 var path = require('path');
 var mkdirp = require('mkdirp');
 
-mkdirp.sync('test/results');
+mkdirp.sync('test/actual');
 
 var style = require('../fixtures/style.json');
 
@@ -177,7 +177,7 @@ test('Map', function(t) {
                     t.error(err);
                     mbgl.compressPNG(image, function(err, data) {
                         t.error(err);
-                        fs.writeFileSync('test/results/image.png', data);
+                        fs.writeFileSync('test/actual/image.png', data);
                         t.end();
                     });
                 });
