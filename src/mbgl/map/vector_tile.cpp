@@ -101,7 +101,7 @@ VectorTile::VectorTile(pbf tile_pbf) {
     }
 }
 
-const util::ptr<const GeometryTileLayer> VectorTile::getLayer(const std::string& name) const {
+util::ptr<const GeometryTileLayer> VectorTile::getLayer(const std::string& name) const {
     auto layer_it = layers.find(name);
     if (layer_it != layers.end()) {
         return layer_it->second;
@@ -127,6 +127,6 @@ VectorTileLayer::VectorTileLayer(pbf layer_pbf) {
     }
 }
 
-const util::ptr<const GeometryTileFeature> VectorTileLayer::feature(std::size_t i) const {
+util::ptr<const GeometryTileFeature> VectorTileLayer::feature(std::size_t i) const {
     return std::make_shared<VectorTileFeature>(features.at(i), *this);
 }

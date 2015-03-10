@@ -28,7 +28,7 @@ public:
     VectorTileLayer(pbf);
 
     virtual std::size_t featureCount() const { return features.size(); }
-    virtual const util::ptr<const GeometryTileFeature> feature(std::size_t) const;
+    virtual util::ptr<const GeometryTileFeature> feature(std::size_t) const;
 
 private:
     friend class VectorTile;
@@ -45,7 +45,7 @@ class VectorTile : public GeometryTile {
 public:
     VectorTile(pbf);
 
-    virtual const util::ptr<const GeometryTileLayer> getLayer(const std::string&) const;
+    virtual util::ptr<const GeometryTileLayer> getLayer(const std::string&) const;
 
 private:
     std::map<std::string, util::ptr<const GeometryTileLayer>> layers;
