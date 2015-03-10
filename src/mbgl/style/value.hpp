@@ -2,7 +2,6 @@
 #define MBGL_STYLE_VALUE
 
 #include <mbgl/util/variant.hpp>
-#include <mbgl/util/pbf.hpp>
 #include <rapidjson/document.h>
 
 #include <cstdlib>
@@ -14,7 +13,6 @@ typedef mapbox::util::variant<bool, int64_t, uint64_t, double, std::string> Valu
 
 std::string toString(const Value &value);
 
-Value parseValue(pbf data);
 Value parseValue(const rapidjson::Value&);
 
 namespace util {
