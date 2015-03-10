@@ -12,13 +12,13 @@ class VectorTileFeature : public GeometryTileFeature {
 public:
     VectorTileFeature(pbf, const VectorTileLayer&);
 
-    virtual GeometryFeatureType getType() const { return type; }
+    virtual FeatureType getType() const { return type; }
     virtual mapbox::util::optional<Value> getValue(const std::string&) const;
     virtual GeometryCollection getGeometries() const;
 
 private:
     uint64_t id = 0;
-    GeometryFeatureType type = GeometryFeatureType::Unknown;
+    FeatureType type = FeatureType::Unknown;
     std::map<std::string, Value> properties;
     pbf geometry_pbf;
 };

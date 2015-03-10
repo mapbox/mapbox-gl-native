@@ -19,7 +19,7 @@
 
 namespace mbgl {
 
-enum class GeometryFeatureType : uint8_t {
+enum class FeatureType : uint8_t {
     Unknown = 0,
     Point = 1,
     LineString = 2,
@@ -30,7 +30,7 @@ typedef std::vector<std::vector<Coordinate>> GeometryCollection;
 
 class GeometryTileFeature : public mbgl::util::noncopyable {
 public:
-    virtual GeometryFeatureType getType() const = 0;
+    virtual FeatureType getType() const = 0;
     virtual mapbox::util::optional<Value> getValue(const std::string& key) const = 0;
     virtual GeometryCollection getGeometries() const = 0;
 };

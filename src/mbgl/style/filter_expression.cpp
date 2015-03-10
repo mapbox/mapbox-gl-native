@@ -5,14 +5,14 @@ namespace mbgl {
 
 Value parseFeatureType(const Value& value) {
     if (value == std::string("Point")) {
-        return Value(uint64_t(GeometryFeatureType::Point));
+        return Value(uint64_t(FeatureType::Point));
     } else if (value == std::string("LineString")) {
-        return Value(uint64_t(GeometryFeatureType::LineString));
+        return Value(uint64_t(FeatureType::LineString));
     } else if (value == std::string("Polygon")) {
-        return Value(uint64_t(GeometryFeatureType::Polygon));
+        return Value(uint64_t(FeatureType::Polygon));
     } else {
         Log::Warning(Event::ParseStyle, "value for $type filter must be Point, LineString, or Polygon");
-        return Value(uint64_t(GeometryFeatureType::Unknown));
+        return Value(uint64_t(FeatureType::Unknown));
     }
 }
 
