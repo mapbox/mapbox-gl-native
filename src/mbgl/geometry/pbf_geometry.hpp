@@ -11,7 +11,7 @@ namespace mbgl {
 class PBFGeometry : private util::noncopyable {
 
 public:
-    inline explicit PBFGeometry(pbf& data);
+    inline explicit PBFGeometry(pbf data);
 
     enum command : uint8_t {
         end = 0,
@@ -23,14 +23,14 @@ public:
     inline command next(int32_t &rx, int32_t &ry);
 
 private:
-    pbf& data;
+    pbf data;
     uint8_t cmd;
     uint32_t length;
     int32_t x, y;
     int32_t ox, oy;
 };
 
-PBFGeometry::PBFGeometry(pbf& data_)
+PBFGeometry::PBFGeometry(pbf data_)
     : data(data_),
       cmd(1),
       length(0),
