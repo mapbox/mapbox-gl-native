@@ -72,7 +72,7 @@ test('unpacked gzip', function(t) {
 
 test('unhandled gzip', function(t) {
 
-    mbgl.on('message', function(msg) {
+    mbgl.once('message', function(msg) {
         t.ok(msg, 'emits error');
         t.equal(msg.class, 'ParseTile');
         t.equal(msg.severity, 'ERROR');
