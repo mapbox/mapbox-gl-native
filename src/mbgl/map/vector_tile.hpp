@@ -4,6 +4,8 @@
 #include <mbgl/map/geometry_tile.hpp>
 #include <mbgl/util/pbf.hpp>
 
+#include <map>
+
 namespace mbgl {
 
 class VectorTileLayer;
