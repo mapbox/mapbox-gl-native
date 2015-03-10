@@ -3,18 +3,18 @@
 /* jshint node: true */
 
 var test = require('tape');
-var mbgl = require('../');
+var mbgl = require('../..');
 var fs = require('fs');
 var path = require('path');
 var mkdirp = require('mkdirp');
 var http = require('http');
 var request = require('request');
 var st = require('st');
-var style = require('../test/fixtures/style.json');
+var style = require('../../test/fixtures/style.json');
 
 mkdirp.sync('test/results');
 
-var server = http.createServer(st({path: __dirname}));
+var server = http.createServer(st({path: __dirname + '/..'}));
 server.listen(2900);
 
 function setup(fileSource, callback) {
@@ -25,10 +25,13 @@ function getFileSource(gzip, t) {
     var fileSource = new mbgl.FileSource();
 
     fileSource.request = function(req) {
+        var parts = req.url.split('.');
+        var filetype = parts[parts.length - 1];
+
         request({
             url: 'http://localhost:2900' + path.join('/', req.url),
             encoding: null,
-            gzip: gzip,
+            gzip: filetype === 'pbf' ? gzip : true,
             headers: {
                 'Accept-Encoding': 'gzip'
             }
@@ -52,7 +55,7 @@ test('before tests', function(t) {
 test('unpacked gzip', function(t) {
 
     mbgl.on('message', function(msg) {
-        t.error(msg, 'doesn\'t emit warning');
+        t.error(msg);
     });
 
     setup(getFileSource(true, t), function(map) {
@@ -70,7 +73,10 @@ test('unpacked gzip', function(t) {
 test('unhandled gzip', function(t) {
 
     mbgl.on('message', function(msg) {
-        t.ok(msg, 'emits warning');
+        t.ok(msg, 'emits error');
+        t.equal(msg.class, 'ParseTile');
+        t.equal(msg.severity, 'ERROR');
+        t.equal(msg.text, 'Parsing [0/0/0] failed: pbf unknown field type exception');
     });
 
     setup(getFileSource(false, t), function(map) {
