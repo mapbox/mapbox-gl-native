@@ -38,6 +38,7 @@ public:
     bool hasData() const override;
 
     void addGeometry(const GeometryCollection&);
+    void addGeometry(const std::vector<Coordinate>& line);
 
     bool hasPoints() const;
 

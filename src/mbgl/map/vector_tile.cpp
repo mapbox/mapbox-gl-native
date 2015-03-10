@@ -53,52 +53,25 @@ mapbox::util::optional<Value> VectorTileFeature::getValue(const std::string& key
 
 GeometryCollection VectorTileFeature::getGeometries() const {
     GeometryCollection result;
-    pbf geom_pbf = geometry_pbf;
 
-    while (geom_pbf.next(4)) { // geometry
-        pbf current_geometry_pbf = geom_pbf.message();
-        PBFGeometry current_geometry(current_geometry_pbf);
-        PBFGeometry::command cmd;
-        int32_t x, y;
+    PBFGeometry geometry(geometry_pbf);
+    PBFGeometry::command cmd;
+    int32_t x, y;
 
-        if (type == GeometryFeatureType::Point) {
-            if ((cmd = current_geometry.next(x, y)) != PBFGeometry::end) {
-                GeometryPoint point(x, y);
-                result.emplace_back(GeometryPoint(x, y));
-            }
-        } else if (type == GeometryFeatureType::LineString) {
-            GeometryLine line;
-            while ((cmd = current_geometry.next(x, y)) != PBFGeometry::end) {
-                if (cmd == PBFGeometry::move_to) {
-                    if (!line.empty()) {
-                        result.push_back(line);
-                        line.clear();
-                    }
-                }
-                line.emplace_back(x, y);
-            }
-            if (line.size()) {
-                result.push_back(line);
-            }
-        } else if (type == GeometryFeatureType::Polygon) {
-            GeometryLine line;
-            while ((cmd = current_geometry.next(x, y)) != PBFGeometry::end) {
-                if (cmd == PBFGeometry::move_to) {
-                    if (line.size()) {
-                        result.push_back(line);
-                        line.clear();
-                    }
-                }
-                line.emplace_back(x, y);
-            }
+    std::vector<Coordinate> line;
 
-            if (line.size()) {
+    while ((cmd = geometry.next(x, y)) != PBFGeometry::end) {
+        if (cmd == PBFGeometry::move_to) {
+            if (!line.empty()) {
                 result.push_back(line);
                 line.clear();
             }
-        } else {
-            throw std::runtime_error("unrecognized geometry type");
         }
+        line.emplace_back(x, y);
+    }
+
+    if (!line.empty()) {
+        result.push_back(line);
     }
 
     return std::move(result);

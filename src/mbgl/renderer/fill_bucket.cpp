@@ -66,13 +66,14 @@ FillBucket::~FillBucket() {
 
 void FillBucket::addGeometry(const GeometryCollection& geometryCollection) {
     for (auto& line_ : geometryCollection) {
-        const GeometryLine& vertices = line_.get<GeometryLine>();
-        for (auto& v : vertices) {
-            line.emplace_back(ClipperLib::IntPoint(v.x, v.y));
+        for (auto& v : line_) {
+            line.emplace_back(v.x, v.y);
         }
-        clipper.AddPath(line, ClipperLib::ptSubject, true);
-        line.clear();
-        hasVertices = true;
+        if (line.size()) {
+            clipper.AddPath(line, ClipperLib::ptSubject, true);
+            line.clear();
+            hasVertices = true;
+        }
     }
 
     tessellate();

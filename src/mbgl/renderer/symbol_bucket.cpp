@@ -107,9 +107,7 @@ std::vector<SymbolFeature> SymbolBucket::processFeatures(const GeometryTileLayer
             auto &multiline = ft.geometry;
 
             GeometryCollection geometryCollection = feature->getGeometries();
-            multiline.emplace_back();
-            for (auto& geometry : geometryCollection) {
-                const GeometryLine& line = geometry.get<GeometryLine>();
+            for (auto& line : geometryCollection) {
                 multiline.emplace_back();
                 for (auto& point : line) {
                     multiline.back().emplace_back(point.x, point.y);

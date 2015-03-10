@@ -26,13 +26,7 @@ enum class GeometryFeatureType : uint8_t {
     Polygon = 3
 };
 
-typedef Coordinate GeometryPoint;
-typedef std::vector<GeometryPoint> GeometryLine;
-typedef std::vector<GeometryLine> GeometryPolygon;
-
-using Geometry = mapbox::util::variant<std::false_type, GeometryPoint, GeometryLine, GeometryPolygon>;
-
-typedef std::vector<Geometry> GeometryCollection;
+typedef std::vector<std::vector<Coordinate>> GeometryCollection;
 
 class GeometryTileFeature : public mbgl::util::noncopyable {
 public:
