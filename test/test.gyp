@@ -32,8 +32,8 @@
         'fixtures/main.cpp',
         'fixtures/util.hpp',
         'fixtures/util.cpp',
-        'fixtures/fixture_log.hpp',
-        'fixtures/fixture_log.cpp',
+        'fixtures/fixture_log_observer.hpp',
+        'fixtures/fixture_log_observer.cpp',
 
         'headless/headless.cpp',
 

@@ -11,6 +11,18 @@
 namespace mbgl {
 
 class Log {
+public:
+    class Observer {
+    public:
+        virtual ~Observer() = default;
+
+        // When an observer is set, this function will be called for every log
+        // message. Returning true will consume the message.
+        virtual bool onRecord(EventSeverity severity, Event event, int64_t code, const std::string &msg) = 0;
+    };
+
+    static void setObserver(std::unique_ptr<Observer> Observer);
+
 private:
     template <typename T, size_t N>
     constexpr static bool includes(const T e, const T (&l)[N], const size_t i = 0) {

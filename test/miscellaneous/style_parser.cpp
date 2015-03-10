@@ -5,7 +5,7 @@
 
 #include <rapidjson/document.h>
 
-#include "../fixtures/fixture_log.hpp"
+#include "../fixtures/fixture_log_observer.hpp"
 
 #include <iostream>
 #include <fstream>
@@ -36,7 +36,8 @@ TEST_P(StyleParserTest, ParseStyle) {
     std::stringstream stylejson;
     stylejson << stylefile.rdbuf();
 
-    const FixtureLogBackend &log = Log::Set<FixtureLogBackend>();
+    FixtureLogObserver* observer = new FixtureLogObserver();
+    Log::setObserver(std::unique_ptr<Log::Observer>(observer));
 
     Style style;
     style.loadJSON((const uint8_t *)stylejson.str().c_str());
@@ -54,17 +55,18 @@ TEST_P(StyleParserTest, ParseStyle) {
                 ASSERT_EQ(true, js_entry.IsArray());
 
                 const uint32_t count = js_entry[rapidjson::SizeType(0)].GetUint();
-                const FixtureLogBackend::LogMessage message {
+                const FixtureLogObserver::LogMessage message {
                     EventSeverityClass(js_entry[rapidjson::SizeType(1)].GetString()),
                     EventClass(js_entry[rapidjson::SizeType(2)].GetString()),
+                    int64_t(-1),
                     js_entry[rapidjson::SizeType(3)].GetString()
                 };
 
-                EXPECT_EQ(count, log.count(message)) << "Message: " << message << std::endl;
+                EXPECT_EQ(count, observer->count(message)) << "Message: " << message << std::endl;
             }
         }
 
-        const auto &unchecked = log.unchecked();
+        const auto &unchecked = observer->unchecked();
         if (unchecked.size()) {
             std::cerr << "Unchecked Log Messages (" << base << "/" << name << "): " << std::endl << unchecked;
         }
