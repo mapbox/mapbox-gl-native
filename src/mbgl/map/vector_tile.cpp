@@ -29,7 +29,8 @@ Value parseValue(pbf data) {
     return false;
 }
 
-VectorTileFeature::VectorTileFeature(pbf feature_pbf, const VectorTileLayer& layer) {
+VectorTileFeature::VectorTileFeature(pbf feature_pbf, const VectorTileLayer& layer_)
+    : layer(layer_) {
     while (feature_pbf.next()) {
         if (feature_pbf.tag == 1) { // id
             id = feature_pbf.varint<uint64_t>();
@@ -43,16 +44,16 @@ VectorTileFeature::VectorTileFeature(pbf feature_pbf, const VectorTileLayer& lay
                     throw std::runtime_error("feature referenced out of range key");
                 }
 
-                if (tags) {
-                    uint32_t tag_val = tags.varint();
-                    if (layer.values.size() <= tag_val) {
-                        throw std::runtime_error("feature referenced out of range value");
-                    }
-
-                    properties.emplace(layer.keys[tag_key], layer.values[tag_val]);
-                } else {
+                if (!tags) {
                     throw std::runtime_error("uneven number of feature tag ids");
                 }
+
+                uint32_t tag_val = tags.varint();
+                if (layer.values.size() <= tag_val) {
+                    throw std::runtime_error("feature referenced out of range value");
+                }
+
+                properties.emplace(tag_key, tag_val);
             }
         } else if (feature_pbf.tag == 3) { // type
             type = (FeatureType)feature_pbf.varint();
@@ -65,11 +66,15 @@ VectorTileFeature::VectorTileFeature(pbf feature_pbf, const VectorTileLayer& lay
 }
 
 mapbox::util::optional<Value> VectorTileFeature::getValue(const std::string& key) const {
-    auto it = properties.find(key);
-    if (it != properties.end()) {
-        return it->second;
+    auto keyIter = layer.keys.find(key);
+    if (keyIter == layer.keys.end()) {
+        return mapbox::util::optional<Value>();
     }
-    return mapbox::util::optional<Value>();
+    auto propIter = properties.find(keyIter->second);
+    if (propIter == properties.end()) {
+        return mapbox::util::optional<Value>();
+    }
+    return layer.values[propIter->second];
 }
 
 GeometryCollection VectorTileFeature::getGeometries() const {
@@ -143,7 +148,7 @@ VectorTileLayer::VectorTileLayer(pbf layer_pbf) {
         } else if (layer_pbf.tag == 2) { // feature
             features.push_back(layer_pbf.message());
         } else if (layer_pbf.tag == 3) { // keys
-            keys.emplace_back(layer_pbf.string());
+            keys.emplace(layer_pbf.string(), keys.size());
         } else if (layer_pbf.tag == 4) { // values
             values.emplace_back(std::move(parseValue(layer_pbf.message())));
         } else if (layer_pbf.tag == 5) { // extent

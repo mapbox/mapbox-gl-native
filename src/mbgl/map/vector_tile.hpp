@@ -4,7 +4,7 @@
 #include <mbgl/map/geometry_tile.hpp>
 #include <mbgl/util/pbf.hpp>
 
-#include <map>
+#include <unordered_map>
 
 namespace mbgl {
 
@@ -19,9 +19,10 @@ public:
     GeometryCollection getGeometries() const override;
 
 private:
+    const VectorTileLayer& layer;
     uint64_t id = 0;
     FeatureType type = FeatureType::Unknown;
-    std::map<std::string, Value> properties;
+    std::unordered_map<uint32_t, uint32_t> properties;
     pbf geometry_pbf;
 };
 
@@ -38,7 +39,7 @@ private:
 
     std::string name;
     uint32_t extent = 4096;
-    std::vector<std::string> keys;
+    std::unordered_map<std::string, uint32_t> keys;
     std::vector<Value> values;
     std::vector<pbf> features;
 };
@@ -50,7 +51,7 @@ public:
     util::ptr<const GeometryTileLayer> getLayer(const std::string&) const override;
 
 private:
-    std::map<std::string, util::ptr<const GeometryTileLayer>> layers;
+    std::unordered_map<std::string, util::ptr<const GeometryTileLayer>> layers;
 };
 
 }
