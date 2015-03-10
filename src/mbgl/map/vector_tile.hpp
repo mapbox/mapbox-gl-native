@@ -12,9 +12,9 @@ class VectorTileFeature : public GeometryTileFeature {
 public:
     VectorTileFeature(pbf, const VectorTileLayer&);
 
-    virtual FeatureType getType() const { return type; }
-    virtual mapbox::util::optional<Value> getValue(const std::string&) const;
-    virtual GeometryCollection getGeometries() const;
+    FeatureType getType() const override { return type; }
+    mapbox::util::optional<Value> getValue(const std::string&) const override;
+    GeometryCollection getGeometries() const override;
 
 private:
     uint64_t id = 0;
@@ -27,8 +27,8 @@ class VectorTileLayer : public GeometryTileLayer {
 public:
     VectorTileLayer(pbf);
 
-    virtual std::size_t featureCount() const { return features.size(); }
-    virtual util::ptr<const GeometryTileFeature> feature(std::size_t) const;
+    std::size_t featureCount() const override { return features.size(); }
+    util::ptr<const GeometryTileFeature> feature(std::size_t) const override;
 
 private:
     friend class VectorTile;
@@ -45,7 +45,7 @@ class VectorTile : public GeometryTile {
 public:
     VectorTile(pbf);
 
-    virtual util::ptr<const GeometryTileLayer> getLayer(const std::string&) const;
+    util::ptr<const GeometryTileLayer> getLayer(const std::string&) const override;
 
 private:
     std::map<std::string, util::ptr<const GeometryTileLayer>> layers;
