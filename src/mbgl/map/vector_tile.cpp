@@ -1,10 +1,4 @@
 #include <mbgl/map/vector_tile.hpp>
-#include <mbgl/geometry/pbf_geometry.hpp>
-#include <mbgl/style/filter_expression_private.hpp>
-#include <mbgl/util/pbf.hpp>
-
-#include <type_traits>
-#include <ostream>
 
 using namespace mbgl;
 
@@ -52,29 +46,48 @@ mapbox::util::optional<Value> VectorTileFeature::getValue(const std::string& key
 }
 
 GeometryCollection VectorTileFeature::getGeometries() const {
-    GeometryCollection result;
+    pbf data(geometry_pbf);
+    uint8_t cmd = 1;
+    uint32_t length = 0;
+    int32_t x = 0;
+    int32_t y = 0;
 
-    PBFGeometry geometry(geometry_pbf);
-    PBFGeometry::command cmd;
-    int32_t x, y;
+    GeometryCollection lines;
 
-    std::vector<Coordinate> line;
+    lines.emplace_back();
+    std::vector<Coordinate>* line = &lines.back();
 
-    while ((cmd = geometry.next(x, y)) != PBFGeometry::end) {
-        if (cmd == PBFGeometry::move_to) {
-            if (!line.empty()) {
-                result.push_back(line);
-                line.clear();
-            }
+    while (data.data < data.end) {
+        if (length == 0) {
+            uint32_t cmd_length = data.varint();
+            cmd = cmd_length & 0x7;
+            length = cmd_length >> 3;
         }
-        line.emplace_back(x, y);
+
+        --length;
+
+        if (cmd == 1 || cmd == 2) {
+            x += data.svarint();
+            y += data.svarint();
+
+            if (cmd == 1 && !line->empty()) { // moveTo
+                lines.emplace_back();
+                line = &lines.back();
+            }
+
+            line->emplace_back(x, y);
+
+        } else if (cmd == 7) { // closePolygon
+            if (!line->empty()) {
+                line->push_back((*line)[0]);
+            }
+
+        } else {
+            throw std::runtime_error("unknown command");
+        }
     }
 
-    if (!line.empty()) {
-        result.push_back(line);
-    }
-
-    return std::move(result);
+    return lines;
 }
 
 VectorTile::VectorTile(pbf tile_pbf) {
