@@ -944,7 +944,13 @@ mbgl::DefaultFileSource *mbglFileSource = nullptr;
     if (!_bundledStyleNames) {
         NSString *stylesPath = [[MGLMapView resourceBundlePath] stringByAppendingString:@"/styles"];
 
-        _bundledStyleNames = [[[NSFileManager defaultManager] contentsOfDirectoryAtPath:stylesPath error:nil] mutableCopy];
+        _bundledStyleNames = [NSMutableArray array];
+        
+        NSArray *bundledStyleNamesWithExtensions = [[NSFileManager defaultManager] contentsOfDirectoryAtPath:stylesPath error:nil];
+        // Remove file extension for issue 968
+        for (NSString *styleName in bundledStyleNamesWithExtensions) {
+            [_bundledStyleNames addObject:[styleName stringByDeletingPathExtension]];
+        }
 
         // Add satellite raster & "hybrid" (satellite raster + vector contours & labels)
         NSString *hybridStylePrefix = @"hybrid-";
