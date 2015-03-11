@@ -6,18 +6,11 @@
 
 // Check sqlite3 library version.
 const static bool sqliteVersionCheck = []() {
-    if (sqlite3_libversion_number() != SQLITE_VERSION_NUMBER) {
+    if (sqlite3_libversion_number() / 1000000 != SQLITE_VERSION_NUMBER / 1000000) {
         char message[96];
         snprintf(message, 96,
                  "sqlite3 libversion mismatch: headers report %d, but library reports %d",
                  SQLITE_VERSION_NUMBER, sqlite3_libversion_number());
-        throw std::runtime_error(message);
-    }
-    if (strcmp(sqlite3_sourceid(), SQLITE_SOURCE_ID) != 0) {
-        char message[256];
-        snprintf(message, 256,
-                 "sqlite3 sourceid mismatch: headers report \"%s\", but library reports \"%s\"",
-                 SQLITE_SOURCE_ID, sqlite3_sourceid());
         throw std::runtime_error(message);
     }
 
