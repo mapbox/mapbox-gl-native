@@ -1,4 +1,4 @@
-#include <mbgl/map/vector_tile.hpp>
+#include <mbgl/map/geometry_tile.hpp>
 #include <mbgl/platform/log.hpp>
 
 namespace mbgl {

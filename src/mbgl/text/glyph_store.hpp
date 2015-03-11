@@ -2,7 +2,6 @@
 #define MBGL_TEXT_GLYPH_STORE
 
 #include <mbgl/text/glyph.hpp>
-#include <mbgl/util/pbf.hpp>
 #include <mbgl/util/vec.hpp>
 #include <mbgl/util/ptr.hpp>
 #include <mbgl/util/uv.hpp>

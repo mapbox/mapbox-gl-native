@@ -66,6 +66,7 @@ NSTimeInterval const MGLAnimationDuration = 0.3;
 @property (nonatomic) UIPinchGestureRecognizer *pinch;
 @property (nonatomic) UIRotationGestureRecognizer *rotate;
 @property (nonatomic) UILongPressGestureRecognizer *quickZoom;
+@property (nonatomic) NSMutableArray *bundledStyleNames;
 @property (nonatomic, readonly) NSDictionary *allowedStyleTypes;
 @property (nonatomic) CGPoint centerPoint;
 @property (nonatomic) CGFloat scale;
@@ -93,6 +94,8 @@ NSTimeInterval const MGLAnimationDuration = 0.3;
 @end
 
 @implementation MGLMapView
+
+@synthesize bundledStyleNames=_bundledStyleNames;
 
 #pragma mark - Setup & Teardown -
 
@@ -938,16 +941,37 @@ mbgl::DefaultFileSource *mbglFileSource = nullptr;
 
 - (NSArray *)bundledStyleNames
 {
-    NSString *stylesPath = [[MGLMapView resourceBundlePath] stringByAppendingString:@"/styles"];
+    if (!_bundledStyleNames) {
+        NSString *stylesPath = [[MGLMapView resourceBundlePath] stringByAppendingString:@"/styles"];
 
-    NSArray *styleNames = [[NSFileManager defaultManager] contentsOfDirectoryAtPath:stylesPath error:nil];
+        _bundledStyleNames = [[[NSFileManager defaultManager] contentsOfDirectoryAtPath:stylesPath error:nil] mutableCopy];
 
-    return styleNames;
+        // Add satellite raster & "hybrid" (satellite raster + vector contours & labels)
+        NSString *hybridStylePrefix = @"hybrid-";
+        NSString *satelliteStylePrefix = @"satellite-";
+        NSMutableArray *hybridStyleNames = [NSMutableArray array];
+        for (NSString *styleName in _bundledStyleNames) {
+            if ([styleName hasPrefix:satelliteStylePrefix]) {
+                [hybridStyleNames addObject:[hybridStylePrefix stringByAppendingString:[styleName substringFromIndex:[satelliteStylePrefix length]]]];
+            }
+        }
+        [_bundledStyleNames addObjectsFromArray:hybridStyleNames];
+    }
+
+    return [NSArray arrayWithArray:_bundledStyleNames];
 }
 
 - (void)useBundledStyleNamed:(NSString *)styleName
 {
+    NSString *hybridStylePrefix = @"hybrid-";
+    BOOL isHybrid = [styleName hasPrefix:hybridStylePrefix];
+    if (isHybrid) {
+        styleName = [@"satellite-" stringByAppendingString:[styleName substringFromIndex:[hybridStylePrefix length]]];
+    }
     [self setStyleURL:[NSString stringWithFormat:@"styles/%@.json", styleName]];
+    if (isHybrid) {
+        [self setAppliedStyleClasses:@[@"contours", @"labels"]];
+    }
 }
 
 - (NSArray *)getStyleOrderedLayerNames

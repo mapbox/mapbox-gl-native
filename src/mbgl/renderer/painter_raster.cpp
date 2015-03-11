@@ -14,8 +14,6 @@ void Painter::renderRaster(RasterBucket& bucket, const StyleLayer &layer_desc, c
     const RasterProperties &properties = layer_desc.getProperties<RasterProperties>();
 
     if (bucket.hasData()) {
-        depthMask(false);
-
         useProgram(rasterShader->program);
         rasterShader->u_matrix = matrix;
         rasterShader->u_buffer = 0;
@@ -29,8 +27,6 @@ void Painter::renderRaster(RasterBucket& bucket, const StyleLayer &layer_desc, c
         depthRange(strata + strata_epsilon, 1.0f);
 
         bucket.drawRaster(*rasterShader, tileStencilBuffer, coveringRasterArray);
-
-        depthMask(true);
     }
 }
 

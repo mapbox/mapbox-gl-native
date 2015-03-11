@@ -946,7 +946,7 @@ void StyleParser::parseBucket(JSVal value, util::ptr<StyleLayer> &layer) {
     if (value.HasMember("maxzoom")) {
         JSVal max_zoom = value["maxzoom"];
         if (max_zoom.IsNumber()) {
-            bucket->min_zoom = max_zoom.GetDouble();
+            bucket->max_zoom = max_zoom.GetDouble();
         } else {
             Log::Warning(Event::ParseStyle, "maxzoom of layer %s must be numeric", layer->id.c_str());
         }
