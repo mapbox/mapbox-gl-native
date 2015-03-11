@@ -1,5 +1,4 @@
 var spawn = require('child_process').spawn;
-var fs = require('fs');
 
 function compare(actual, expected, diff, t, callback) {
     var compare = spawn('compare', ['-metric', 'MAE', actual, expected, diff]);

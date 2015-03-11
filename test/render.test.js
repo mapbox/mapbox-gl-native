@@ -9,8 +9,6 @@ var path = require('path');
 var mkdirp = require('mkdirp');
 var compare = require('./compare.js');
 var suitePath = path.dirname(require.resolve('mapbox-gl-test-suite/package.json'));
-var actualDir = 'test/actual';
-var expectedDir = 'test/expected';
 
 function template(name) {
     return fs.readFileSync(require.resolve('mapbox-gl-test-suite/templates/' + name + '.html.tmpl')).toString();
@@ -28,6 +26,7 @@ function format(tmpl, kwargs) {
 }
 
 function renderTest(style, info, base, key) {
+    var dir = path.join(suitePath, 'tests', base, key);
     return function(t) {
         var watchdog = setTimeout(function() {
             t.fail('timed out after 20 seconds');
@@ -53,12 +52,11 @@ function renderTest(style, info, base, key) {
             t.error(err);
             mbgl.compressPNG(image, function(err, image) {
                 t.error(err);
-                mkdirp.sync(actualDir);
-                mkdirp.sync(expectedDir);
+                mkdirp.sync(dir);
 
-                var expected = path.join(expectedDir, 'expected.png');
-                var actual = path.join(actualDir, 'actual.png');
-                var diff = path.join(actualDir, 'diff.png');
+                var expected = path.join(dir, 'expected.png');
+                var actual = path.join(dir, 'actual.png');
+                var diff = path.join(dir, 'diff.png');
 
                 if (process.env.UPDATE) {
                     fs.writeFile(expected, image, function(err) {
