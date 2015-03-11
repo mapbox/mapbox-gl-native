@@ -60,8 +60,7 @@ void Source::load(Map &map, Environment &env) {
         source->info.parseTileJSONProperties(d);
         source->loaded = true;
 
-        map.update();
-
+        map.triggerUpdate();
     });
 }
 
@@ -293,8 +292,9 @@ void Source::update(Map &map,
                     util::ptr<Sprite> sprite,
                     TexturePool &texturePool,
                     std::function<void()> callback) {
-    if (!loaded || map.getTime() <= updated)
+    if (!loaded || map.getTime() <= updated) {
         return;
+    }
 
     bool changed = false;
 

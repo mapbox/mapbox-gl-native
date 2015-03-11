@@ -93,24 +93,8 @@ class NativeMapView {
         nativeRun(mNativeMapViewPtr);
     }
 
-    public void rerender() {
-        nativeRerender(mNativeMapViewPtr);
-    }
-
     public void update() {
         nativeUpdate(mNativeMapViewPtr);
-    }
-
-    public void terminate() {
-        nativeTerminate(mNativeMapViewPtr);
-    }
-
-    public boolean needsSwap() {
-        return nativeNeedsSwap(mNativeMapViewPtr);
-    }
-
-    public void swapped() {
-        nativeSwapped(mNativeMapViewPtr);
     }
 
     public void resize(int width, int height, float ratio, int fbWidth,
@@ -440,15 +424,9 @@ class NativeMapView {
 
     private native void nativeRun(long nativeMapViewPtr);
 
-    private native void nativeRerender(long nativeMapViewPtr);
-
     private native void nativeUpdate(long nativeMapViewPtr);
 
     private native void nativeTerminate(long nativeMapViewPtr);
-
-    private native boolean nativeNeedsSwap(long nativeMapViewPtr);
-
-    private native void nativeSwapped(long nativeMapViewPtr);
 
     private native void nativeResize(long nativeMapViewPtr, int width,
             int height, float ratio, int fbWidth, int fbHeight);

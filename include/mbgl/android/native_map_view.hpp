@@ -22,10 +22,9 @@ public:
 
     void activate() override;
     void deactivate() override;
-
-    void swap() override;
-
     void notify() override;
+    void invalidate() override;
+
     void notifyMapChange(mbgl::MapChange change, std::chrono::steady_clock::duration delay = std::chrono::steady_clock::duration::zero()) override;
 
     mbgl::Map &getMap();

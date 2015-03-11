@@ -121,16 +121,17 @@ void NativeMapView::deactivate() {
     }
 }
 
-void NativeMapView::swap() {
-    mbgl::Log::Debug(mbgl::Event::Android, "NativeMapView::swap");
+void NativeMapView::invalidate() {
+    mbgl::Log::Debug(mbgl::Event::Android, "NativeMapView::invalidate");
 
-    if (map.needsSwap() && (display != EGL_NO_DISPLAY) && (surface != EGL_NO_SURFACE)) {
+    if ((display != EGL_NO_DISPLAY) && (surface != EGL_NO_SURFACE)) {
+        map.render();
+
         if (!eglSwapBuffers(display, surface)) {
             mbgl::Log::Error(mbgl::Event::OpenGL, "eglSwapBuffers() returned error %d",
                              eglGetError());
             throw new std::runtime_error("eglSwapBuffers() failed");
         }
-        map.swapped();
         updateFps();
     } else {
         mbgl::Log::Info(mbgl::Event::Android, "Not swapping as we are not ready");

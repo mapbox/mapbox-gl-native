@@ -4,12 +4,15 @@
 *.actual.png
 *.diff.png
 *.pyc
+/android/debug
+/android/sdk
 /mason_packages
 /config/*.gypi
 /build
 /macosx/build
 /linux/build
 /ios/build
+/ios/app/build
 /test/build
 /test/node_modules
 /include/mbgl/shader/shaders.hpp

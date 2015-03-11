@@ -297,14 +297,11 @@ void GLFWView::notify() {
     glfwPostEmptyEvent();
 }
 
-void GLFWView::swap() {
+void GLFWView::invalidate() {
+    assert(map);
+    map->render();
     glfwSwapBuffers(window);
-    map->swapped();
     fps();
-}
-
-void GLFWView::notifyMapChange(mbgl::MapChange /*change*/, std::chrono::steady_clock::duration /*delay*/) {
-    // no-op
 }
 
 void GLFWView::fps() {

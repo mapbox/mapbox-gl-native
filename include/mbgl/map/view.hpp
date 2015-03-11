@@ -22,13 +22,7 @@ enum MapChange : uint8_t {
 
 class View {
 public:
-    virtual void initialize(Map *map_) {
-        map = map_;
-    }
-
-    // Called from the render (=GL) thread. Signals that the context should
-    // swap the front and the back buffer.
-    virtual void swap() = 0;
+    virtual void initialize(Map *map_);
 
     // Called from the render thread. Makes the GL context active in the current
     // thread. This is typically just called once at the beginning of the
@@ -41,10 +35,16 @@ public:
 
     virtual void notify() = 0;
 
+    // Called from the render thread. The implementation must trigger a rerender.
+    // (i.e. map->renderSync() or map->renderAsync() must be called as a result of this)
+    virtual void invalidate() = 0;
+
     // Notifies a watcher of map x/y/scale/rotation changes.
     // Must only be called from the same thread that caused the change.
     // Must not be called from the render thread.
-    virtual void notifyMapChange(MapChange change, std::chrono::steady_clock::duration delay = std::chrono::steady_clock::duration::zero()) = 0;
+    virtual void notifyMapChange(
+        MapChange change,
+        std::chrono::steady_clock::duration delay = std::chrono::steady_clock::duration::zero());
 
 protected:
     // Resizes the view

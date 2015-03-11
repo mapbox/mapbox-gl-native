@@ -13,20 +13,17 @@ public:
     GLFWView(bool fullscreen = false);
     ~GLFWView();
 
-    void initialize(mbgl::Map *map);
-    void swap();
-    void activate();
-    void deactivate();
-    void notify();
-    void notifyMapChange(mbgl::MapChange change, std::chrono::steady_clock::duration delay = std::chrono::steady_clock::duration::zero());
+    void initialize(mbgl::Map *map) override;
+    void activate() override;
+    void deactivate() override;
+    void notify() override;
+    void invalidate() override;
 
     static void onKey(GLFWwindow *window, int key, int scancode, int action, int mods);
     static void onScroll(GLFWwindow *window, double xoffset, double yoffset);
     static void onResize(GLFWwindow *window, int width, int height);
     static void onMouseClick(GLFWwindow *window, int button, int action, int modifiers);
     static void onMouseMove(GLFWwindow *window, double x, double y);
-
-    static void eventloop(void *arg);
 
     int run();
     void fps();

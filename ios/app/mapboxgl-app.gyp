@@ -33,6 +33,7 @@
       'xcode_settings': {
         'SDKROOT': 'iphoneos',
         'SUPPORTED_PLATFORMS': 'iphonesimulator iphoneos',
+        'IPHONEOS_DEPLOYMENT_TARGET': '7.0',
         'INFOPLIST_FILE': 'app-info.plist',
         'TARGETED_DEVICE_FAMILY': '1,2',
         'COMBINE_HIDPI_IMAGES': 'NO', # don't merge @2x.png images into .tiff files

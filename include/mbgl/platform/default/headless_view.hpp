@@ -13,7 +13,7 @@ typedef long unsigned int XID;
 typedef XID GLXPbuffer;
 #endif
 
-#include <mbgl/map/view.hpp>
+#include <mbgl/mbgl.hpp>
 #include <mbgl/platform/gl.hpp>
 
 #include <memory>
@@ -34,11 +34,10 @@ public:
     void resize(uint16_t width, uint16_t height, float pixelRatio);
     std::unique_ptr<uint32_t[]> readPixels();
 
-    void notify();
-    void notifyMapChange(MapChange change, std::chrono::steady_clock::duration delay = std::chrono::steady_clock::duration::zero());
-    void activate();
-    void deactivate();
-    void swap();
+    void activate() override;
+    void deactivate() override;
+    void notify() override;
+    void invalidate() override;
 
 private:
     void clearBuffers();

@@ -2,12 +2,13 @@ BUILDTYPE ?= Release
 PYTHON ?= python
 PREFIX ?= /usr/local
 ANDROID_ABI ?= arm-v7
-JOBS ?= 1
 
 ifeq ($(shell uname -s), Darwin)
 HOST ?= osx
+JOBS ?= $(shell sysctl -n hw.ncpu)
 endif
 HOST ?= linux
+JOBS ?= 1
 
 all: mbgl
 
@@ -65,7 +66,7 @@ xtest-proj: Xcode/test
 	open ./build/osx/test/test.xcodeproj
 
 xtest: Xcode/test
-	xcodebuild -project ./build/osx/test/test.xcodeproj -configuration $(BUILDTYPE) -target test -jobs `sysctl -n hw.ncpu`
+	xcodebuild -project ./build/osx/test/test.xcodeproj -configuration $(BUILDTYPE) -target test -jobs $(JOBS)
 
 xtest-%: xtest
 	./scripts/run_tests.sh "build/osx/Build/Products/$(BUILDTYPE)/test" --gtest_filter=$*
@@ -94,7 +95,7 @@ xosx-proj: Xcode/osx
 	open ./build/osx/macosx/mapboxgl-app.xcodeproj
 
 xosx: Xcode/osx
-	xcodebuild -project ./build/osx/macosx/mapboxgl-app.xcodeproj -configuration $(BUILDTYPE) -target osxapp -jobs `sysctl -n hw.ncpu`
+	xcodebuild -project ./build/osx/macosx/mapboxgl-app.xcodeproj -configuration $(BUILDTYPE) -target osxapp -jobs $(JOBS)
 
 run-xosx: xosx
 	"build/osx/Build/Products/$(BUILDTYPE)/Mapbox GL.app/Contents/MacOS/Mapbox GL"
@@ -115,10 +116,10 @@ ios-proj: Xcode/ios
 	open ./build/ios/ios/app/mapboxgl-app.xcodeproj
 
 ios: Xcode/ios
-	xcodebuild -sdk iphoneos ARCHS="arm64 armv7 armv7s" PROVISIONING_PROFILE="2b532944-bf3d-4bf4-aa6c-a81676984ae8" -project ./build/ios/ios/app/mapboxgl-app.xcodeproj -configuration Release -target iosapp -jobs `sysctl -n hw.ncpu`
+	xcodebuild -sdk iphoneos ARCHS="arm64 armv7 armv7s" PROVISIONING_PROFILE="2b532944-bf3d-4bf4-aa6c-a81676984ae8" -project ./build/ios/ios/app/mapboxgl-app.xcodeproj -configuration Release -target iosapp -jobs $(JOBS)
 
 isim: Xcode/ios
-	xcodebuild -sdk iphonesimulator ARCHS="x86_64 i386" -project ./build/ios/ios/app/mapboxgl-app.xcodeproj -configuration Debug -target iosapp -jobs `sysctl -n hw.ncpu`
+	xcodebuild -sdk iphonesimulator ARCHS="x86_64 i386" -project ./build/ios/ios/app/mapboxgl-app.xcodeproj -configuration Debug -target iosapp -jobs $(JOBS)
 
 # Legacy name
 iproj: ios-proj
@@ -193,6 +194,14 @@ Makefile/render: bin/render.gyp config/$(HOST).gypi
 
 render: Makefile/render
 	$(MAKE) -C build/$(HOST) BUILDTYPE=$(BUILDTYPE) mbgl-render
+
+.PRECIOUS: Xcode/render
+Xcode/render: bin/render.gyp config/osx.gypi styles/styles
+	deps/run_gyp bin/render.gyp $(CONFIG_osx) $(LIBS_osx) --generator-output=./build/osx -f xcode
+
+.PHONY: xrender-proj
+xrender-proj: Xcode/render
+	open ./build/osx/bin/render.xcodeproj
 
 
 ##### Maintenace operations ####################################################
