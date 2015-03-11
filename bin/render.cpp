@@ -102,7 +102,6 @@ int main(int argc, char *argv[]) {
     map.setClasses(classes);
 
     view.resize(width, height, pixelRatio);
-    map.resize(width, height, pixelRatio);
     map.setLatLngZoom({ lat, lon }, zoom);
     map.setBearing(bearing);
 
