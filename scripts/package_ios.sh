@@ -6,7 +6,7 @@ set -u
 
 NAME=MapboxGL
 OUTPUT=build/ios/pkg
-IOS_SDK_VERSION=8.1
+IOS_SDK_VERSION=`xcrun --sdk iphoneos --show-sdk-version`
 LIBUV_VERSION=0.10.28
 
 function step { >&2 echo -e "\033[1m\033[36m* $@\033[0m"; }
