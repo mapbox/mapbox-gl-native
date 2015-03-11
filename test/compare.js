@@ -1,6 +1,6 @@
 var spawn = require('child_process').spawn;
 
-function compare(actual, expected, diff, t, callback) {
+module.exports = function compare(actual, expected, diff, t, callback) {
     var compare = spawn('compare', ['-metric', 'MAE', actual, expected, diff]);
     var error = '';
 
@@ -24,7 +24,4 @@ function compare(actual, expected, diff, t, callback) {
     });
 
     compare.stdin.end();
-
-}
-
-module.exports = compare;
+};
