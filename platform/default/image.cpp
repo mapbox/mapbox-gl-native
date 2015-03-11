@@ -32,14 +32,14 @@ std::string compress_png(int width, int height, void *rgba) {
     png_voidp error_ptr = 0;
     png_structp png_ptr = png_create_write_struct(PNG_LIBPNG_VER_STRING, error_ptr, NULL, NULL);
     if (!png_ptr) {
-        Log::Error(Event::Image, "Couldn't create png_ptr");
+        Log::Error(Event::Image, "couldn't create png_ptr");
         return "";
     }
 
     png_infop info_ptr = png_create_info_struct(png_ptr);
     if (!png_ptr) {
         png_destroy_write_struct(&png_ptr, (png_infopp)0);
-        Log::Error(Event::Image, "Couldn't create info_ptr");
+        Log::Error(Event::Image, "couldn't create info_ptr");
         return "";
     }
 
@@ -87,7 +87,7 @@ Image::Image(std::string const& data)
     }
     catch (ImageReaderException const& ex)
     {
-        fprintf(stderr, "Image: %s\n", ex.what());
+        Log::Error(Event::Image, ex.what());
         img.reset();
         width = 0;
         height = 0;
@@ -95,7 +95,7 @@ Image::Image(std::string const& data)
     }
     catch (...) // catch the rest
     {
-        fprintf(stderr, "Image: exception in constructor");
+        Log::Error(Event::Image, "exception in constructor");
         img.reset();
         width = 0;
         height = 0;

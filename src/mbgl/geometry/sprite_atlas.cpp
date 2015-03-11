@@ -1,5 +1,6 @@
 #include <mbgl/geometry/sprite_atlas.hpp>
 #include <mbgl/platform/gl.hpp>
+#include <mbgl/platform/log.hpp>
 #include <mbgl/platform/platform.hpp>
 #include <mbgl/util/math.hpp>
 #include <mbgl/util/std.hpp>
@@ -129,7 +130,7 @@ Rect<SpriteAtlas::dimension> SpriteAtlas::getImage(const std::string& name, cons
     Rect<dimension> rect = allocateImage(pos.width / pos.pixelRatio, pos.height / pos.pixelRatio);
     if (rect.w == 0) {
         if (debug::spriteWarnings) {
-            fprintf(stderr, "[WARNING] sprite atlas bitmap overflow\n");
+            Log::Warning(Event::Sprite, "sprite atlas bitmap overflow");
         }
         return rect;
     }
@@ -210,7 +211,7 @@ void SpriteAtlas::setSprite(util::ptr<Sprite> sprite_) {
         const SpritePosition& src = sprite->getSpritePosition(name);
         if (!src) {
             if (debug::spriteWarnings) {
-                fprintf(stderr, "[WARNING] sprite doesn't have image with name '%s'\n", name.c_str());
+                Log::Warning(Event::Sprite, "sprite doesn't have image with name '%s'", name.c_str());
             }
             return true;
         }
@@ -220,7 +221,7 @@ void SpriteAtlas::setSprite(util::ptr<Sprite> sprite_) {
             return true;
         } else {
             if (debug::spriteWarnings) {
-                fprintf(stderr, "[WARNING] sprite icon dimension mismatch\n");
+                Log::Warning(Event::Sprite, "sprite icon dimension mismatch");
             }
             return false;
         }

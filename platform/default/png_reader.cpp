@@ -1,4 +1,5 @@
 #include <mbgl/platform/default/png_reader.hpp>
+#include <mbgl/platform/log.hpp>
 #include <iostream>
 extern "C"
 {
@@ -23,8 +24,7 @@ void user_error_fn(png_structp /*png_ptr*/, png_const_charp error_msg)
 
 void user_warning_fn(png_structp /*png_ptr*/, png_const_charp warning_msg)
 {
-    fprintf(stderr, "ImageReader (PNG): %s\n", warning_msg);
-
+    Log::Warning(Event::Image, "ImageReader (PNG): %s", warning_msg);
 }
 
 template <typename T>

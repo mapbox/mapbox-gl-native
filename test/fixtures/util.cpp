@@ -1,5 +1,7 @@
 #include "util.hpp"
 
+#include <mbgl/platform/log.hpp>
+
 #include <csignal>
 
 namespace mbgl {
@@ -17,7 +19,7 @@ pid_t startServer(const char *executable) {
         int ret = execv(executable, args);
         // This call should not return. In case execve failed, we exit anyway.
         if (ret < 0) {
-            fprintf(stderr, "Failed to start server: %s\n", strerror(errno));
+            Log::Error(Event::Setup, "failed to start server: %s", strerror(errno));
         }
         exit(0);
     } else {

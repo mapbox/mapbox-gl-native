@@ -75,7 +75,7 @@ template<> bool StyleParser::parseRenderProperty(JSVal value, bool &target, cons
             target = property.GetBool();
             return true;
         } else {
-            fprintf(stderr, "[WARNING] '%s' must be a boolean\n", name);
+            Log::Warning(Event::ParseStyle, "'%s' must be a boolean", name);
         }
     }
     return false;
