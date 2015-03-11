@@ -183,6 +183,7 @@ android-all: $(ANDROID_ABIS)
 android-deploy: $(ANDROID_ABIS)
 	cd android/java/MapboxGLAndroidSDK && chmod ugo+x deploy.sh && ./deploy.sh
 
+android-project: android-lib
 
 ##### Render builds ############################################################
 
