@@ -1,9 +1,7 @@
 #ifndef MBGL_MAP_GEOMETRY_TILE
 #define MBGL_MAP_GEOMETRY_TILE
 
-#include <mbgl/style/filter_expression.hpp>
 #include <mbgl/style/value.hpp>
-#include <mbgl/text/glyph.hpp>
 #include <mbgl/util/optional.hpp>
 #include <mbgl/util/ptr.hpp>
 #include <mbgl/util/variant.hpp>
@@ -11,10 +9,7 @@
 #include <mbgl/util/noncopyable.hpp>
 
 #include <cstdint>
-#include <map>
 #include <string>
-#include <type_traits>
-#include <unordered_map>
 #include <vector>
 
 namespace mbgl {

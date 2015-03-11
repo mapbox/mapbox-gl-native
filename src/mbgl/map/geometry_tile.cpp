@@ -1,4 +1,5 @@
 #include <mbgl/map/geometry_tile.hpp>
+#include <mbgl/style/filter_expression.hpp>
 #include <mbgl/style/filter_expression_private.hpp>
 
 namespace mbgl {

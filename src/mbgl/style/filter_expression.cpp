@@ -1,3 +1,4 @@
+#include <mbgl/style/filter_expression.hpp>
 #include <mbgl/map/geometry_tile.hpp>
 #include <mbgl/platform/log.hpp>
 
