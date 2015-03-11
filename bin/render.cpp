@@ -14,7 +14,14 @@
 #include <mbgl/platform/default/log_stderr.hpp>
 #endif
 
+#pragma GCC diagnostic push
+#ifndef __clang__
+#pragma GCC diagnostic ignored "-Wunused-local-typedefs"
+#pragma GCC diagnostic ignored "-Wshadow"
+#endif
 #include <boost/program_options.hpp>
+#pragma GCC diagnostic pop
+
 namespace po = boost::program_options;
 
 #include <cassert>
@@ -95,7 +102,6 @@ int main(int argc, char *argv[]) {
     map.setClasses(classes);
 
     view.resize(width, height, pixelRatio);
-    map.resize(width, height, pixelRatio);
     map.setLatLngZoom({ lat, lon }, zoom);
     map.setBearing(bearing);
 
