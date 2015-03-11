@@ -108,8 +108,8 @@ test('unhandled gzip', function(t) {
             mbgl.compressPNG(image, function(err, image) {
                 t.error(err);
 
-                var expected = path.join(expectedDir, 'gz-fail-expected.png');
-                var actual = path.join(actualDir, 'gz-fail-actual.png');
+                var expected = path.join(expectedDir, 'gz-fail.png');
+                var actual = path.join(actualDir, 'gz-fail.png');
                 var diff = path.join(actualDir, 'gz-fail-diff.png');
 
                 if (process.env.UPDATE) {
