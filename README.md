@@ -86,7 +86,7 @@ Finally, install Boost. If you're running Ubuntu 12.04 or older, you need to ins
 
 Otherwise, you can just install
 
-    sudo apt-get install libboost-dev
+    sudo apt-get install libboost-dev libboost-program-options-dev
 
 Once you're done installing the build dependencies, you can get started by running
 
