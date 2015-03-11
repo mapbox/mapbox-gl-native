@@ -947,7 +947,6 @@ mbgl::DefaultFileSource *mbglFileSource = nullptr;
 
 - (void)useBundledStyleNamed:(NSString *)styleName
 {
-    NSLog(@"styleName: %@", styleName);
     [self setStyleURL:[NSString stringWithFormat:@"styles/%@.json", styleName]];
 }
 
