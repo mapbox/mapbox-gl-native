@@ -211,7 +211,7 @@ mbgl::DefaultFileSource *mbglFileSource = nullptr;
     [self addSubview:_glView];
 
     _glView.contentMode = UIViewContentModeCenter;
-    [self setBackgroundColor:[UIColor whiteColor]];
+    [self setBackgroundColor:[UIColor blackColor]];
 
     // load extensions
     //
