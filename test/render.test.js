@@ -7,8 +7,7 @@ var mbgl = require('..');
 var fs = require('fs');
 var path = require('path');
 var mkdirp = require('mkdirp');
-var spawn = require('child_process').spawn;
-
+var compare = require('./compare.js');
 var suitePath = path.dirname(require.resolve('mapbox-gl-test-suite/package.json'));
 
 function template(name) {
@@ -56,8 +55,8 @@ function renderTest(style, info, base, key) {
                 mkdirp.sync(dir);
 
                 var expected = path.join(dir, 'expected.png');
-                var actual   = path.join(dir, 'actual.png');
-                var diff     = path.join(dir, 'diff.png');
+                var actual = path.join(dir, 'actual.png');
+                var diff = path.join(dir, 'diff.png');
 
                 if (process.env.UPDATE) {
                     fs.writeFile(expected, image, function(err) {
@@ -67,32 +66,7 @@ function renderTest(style, info, base, key) {
                 } else {
                     fs.writeFile(actual, image, function(err) {
                         t.error(err);
-
-                        var compare = spawn('compare', ['-metric', 'MAE', actual, expected, diff]);
-                        var error = '';
-
-                        compare.stderr.on('data', function (data) {
-                            error += data.toString();
-                        });
-
-                        compare.on('error', function(err) {
-                            t.error(err);
-                        });
-
-                        compare.on('exit', function (code) {
-                            // The compare program returns 2 on error otherwise 0 if the images are similar or 1 if they are dissimilar.
-                            if (code === 2) {
-                                writeResult(error.trim(), Infinity);
-                            } else {
-                                var match = error.match(/^\d+(?:\.\d+)?\s+\(([^\)]+)\)\s*$/);
-                                var difference = match ? parseFloat(match[1]) : Infinity;
-                                writeResult(match ? '' : error, difference);
-                            }
-                        });
-
-                        compare.stdin.end();
-
-                        function writeResult(error, difference) {
+                        compare(actual, expected, diff, t, function(error, difference) {
                             var allowedDifference = ('diff' in info) ? info.diff : 0.001;
                             var color = difference <= allowedDifference ? 'green' : 'red';
 
@@ -111,7 +85,7 @@ function renderTest(style, info, base, key) {
 
                             t.ok(difference <= allowedDifference, 'actual matches expected');
                             t.end();
-                        }
+                        });
                     });
                 }
             });

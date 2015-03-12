@@ -7,10 +7,17 @@ var mbgl = require('../..');
 var fs = require('fs');
 var path = require('path');
 var mkdirp = require('mkdirp');
-
-mkdirp.sync('test/results');
-
 var style = require('../fixtures/style.json');
+var compare = require('../compare.js');
+
+function filePath(name) {
+    return ['expected', 'actual', 'diff'].reduce(function(prev, key) {
+        var dir = path.join('test', key, 'map');
+        mkdirp.sync(dir);
+        prev[key] = path.join(dir, name);
+        return prev;
+    }, {});
+}
 
 function setup(fileSource, callback) {
     callback(new mbgl.Map(fileSource));
@@ -175,10 +182,25 @@ test('Map', function(t) {
                 map.load(style);
                 map.render({}, function(err, image) {
                     t.error(err);
-                    mbgl.compressPNG(image, function(err, data) {
+                    mbgl.compressPNG(image, function(err, image) {
                         t.error(err);
-                        fs.writeFileSync('test/results/image.png', data);
-                        t.end();
+
+                        var filename = filePath('image.png');
+
+                        if (process.env.UPDATE) {
+                            fs.writeFile(filename.expected, image, function(err) {
+                                t.error(err);
+                                t.end();
+                            });
+                        } else {
+                            fs.writeFile(filename.actual, image, function(err) {
+                                t.error(err);
+                                compare(filename.actual, filename.expected, filename.diff, t, function(error, difference) {
+                                    t.ok(difference <= 0.01, 'actual matches expected');
+                                    t.end();
+                                });
+                            });
+                        }
                     });
                 });
             });
