@@ -13,7 +13,7 @@ var compare = require('../compare.js');
 function filePath(name) {
     return ['expected', 'actual', 'diff'].reduce(function(prev, key) {
         var dir = path.join('test', key, 'map');
-        mkdirp(dir);
+        mkdirp.sync(dir);
         prev[key] = path.join(dir, name);
         return prev;
     }, {});
@@ -196,7 +196,7 @@ test('Map', function(t) {
                             fs.writeFile(filename.actual, image, function(err) {
                                 t.error(err);
                                 compare(filename.actual, filename.expected, filename.diff, t, function(error, difference) {
-                                    t.ok(difference <= 0.001, 'actual matches expected');
+                                    t.ok(difference <= 0.01, 'actual matches expected');
                                     t.end();
                                 });
                             });
