@@ -69,6 +69,8 @@ private:
     template <typename T>
     bool parseOptionalProperty(const char *property_name, PropertyKey key, ClassProperties &klass, JSVal value);
     template <typename T>
+    bool parseOptionalPropertyFont(const char *property_name, PropertyKey key, ClassProperties &klass, JSVal value);
+    template <typename T>
     bool parseOptionalProperty(const char *property_name, PropertyKey key, ClassProperties &klass, JSVal value, const char *transition_name);
     template <typename T>
     bool setProperty(JSVal value, const char *property_name, PropertyKey key, ClassProperties &klass);

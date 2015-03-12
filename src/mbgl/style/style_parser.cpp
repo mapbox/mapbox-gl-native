@@ -14,6 +14,8 @@ namespace mbgl {
 
 using JSVal = const rapidjson::Value&;
 
+typedef std::string Font;
+
 StyleParser::StyleParser() {
 }
 
@@ -241,6 +243,23 @@ std::tuple<bool, std::array<float, 2>> StyleParser::parseProperty(JSVal value, c
     } else {
         Log::Warning(Event::ParseStyle, "value must be array of two numbers");
         return std::tuple<bool, std::array<float, 2>> { false, {{ 0.0f, 0.0f }} };
+    }
+}
+
+template <>
+std::tuple<bool, Font> StyleParser::parseProperty(JSVal value, const char* property_name) {
+    if (value.IsArray()) {
+        std::string joinedFonts = "";
+        for (rapidjson::SizeType i = 0; i < value.Size(); ++i) {
+            joinedFonts += replaceConstant(value[i]).GetString();
+            if (i < value.Size() - 1) {
+                joinedFonts += ",";
+            }
+        }
+        return std::tuple<bool, std::string> { true, joinedFonts };
+    } else {
+        Log::Warning(Event::ParseStyle, "value of '%s' must be an array of strings", property_name);
+        return std::tuple<bool, std::string> { false, "" };
     }
 }
 
@@ -850,7 +869,7 @@ void StyleParser::parseLayout(JSVal value, util::ptr<StyleBucket> &bucket) {
     parseOptionalProperty<Function<std::array<float, 2>>>("icon-offset", Key::IconOffset, bucket->layout, value);
     parseOptionalProperty<Function<RotationAlignmentType>>("text-rotation-alignment", Key::TextRotationAlignment, bucket->layout, value);
     parseOptionalProperty<Function<std::string>>("text-field", Key::TextField, bucket->layout, value);
-    parseOptionalProperty<Function<std::string>>("text-font", Key::TextFont, bucket->layout, value);
+    parseOptionalProperty<Function<Font>>("text-font", Key::TextFont, bucket->layout, value);
     parseOptionalProperty<Function<float>>("text-max-size", Key::TextMaxSize, bucket->layout, value);
     parseOptionalProperty<Function<float>>("text-max-width", Key::TextMaxWidth, bucket->layout, value);
     parseOptionalProperty<Function<float>>("text-line-height", Key::TextLineHeight, bucket->layout, value);
