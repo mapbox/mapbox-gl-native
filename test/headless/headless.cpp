@@ -1,5 +1,5 @@
 #include "../fixtures/util.hpp"
-#include "../fixtures/fixture_log.hpp"
+#include "../fixtures/fixture_log_observer.hpp"
 
 #include <mbgl/map/map.hpp>
 #include <mbgl/util/image.hpp>
@@ -101,7 +101,7 @@ TEST_P(HeadlessTest, render) {
     ASSERT_FALSE(infoDoc.HasParseError());
     ASSERT_TRUE(infoDoc.IsObject());
 
-    Log::Set<FixtureLogBackend>();
+    Log::setObserver(util::make_unique<FixtureLogObserver>());
 
     Log::Info(Event::General, "test fixture %s", base.c_str());
 

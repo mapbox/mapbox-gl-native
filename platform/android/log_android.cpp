@@ -1,7 +1,5 @@
-#include <mbgl/platform/android/log_android.hpp>
+#include <mbgl/platform/log.hpp>
 
-#include <iostream>
-#include <cstdarg>
 #define __STDC_FORMAT_MACROS // NDK bug workaround: https://code.google.com/p/android/issues/detail?id=72349
 #include <cinttypes>
 
@@ -9,7 +7,9 @@
 
 namespace mbgl {
 
-int AndroidLogBackend::severityToPriority(EventSeverity severity) {
+namespace {
+
+int severityToPriority(EventSeverity severity) {
     switch(severity) {
     case EventSeverity::Debug:
         return ANDROID_LOG_DEBUG;
@@ -28,31 +28,9 @@ int AndroidLogBackend::severityToPriority(EventSeverity severity) {
     }
 }
 
-void AndroidLogBackend::record(EventSeverity severity, Event event, const std::string &msg) {
-    __android_log_print(severityToPriority(severity), EventClass(event).c_str(), "%s", msg.c_str());
-}
+} // namespace
 
-void AndroidLogBackend::record(EventSeverity severity, Event event, const char* format, ...) {
-    va_list args;
-    va_start(args, format);
-
-    const int len = vsnprintf(nullptr, 0, format, args) + 1;
-    char* buf = new char[len];
-    vsnprintf(buf, len, format, args);
-
-    va_end(args);
-
-    __android_log_print(severityToPriority(severity), EventClass(event).c_str(), "%s", buf);
-
-    delete buf;
-    buf  = nullptr;
-}
-
-void AndroidLogBackend::record(EventSeverity severity, Event event, int64_t code) {
-    __android_log_print(severityToPriority(severity), EventClass(event).c_str(), "(%" PRId64 ")", code);
-}
-
-void AndroidLogBackend::record(EventSeverity severity, Event event, int64_t code, const std::string &msg) {
+void Log::platformRecord(EventSeverity severity, Event event, int64_t code, const std::string &msg) {
     __android_log_print(severityToPriority(severity), EventClass(event).c_str(), "(%" PRId64 ") %s", code, msg.c_str());
 }
 

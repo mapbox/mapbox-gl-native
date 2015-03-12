@@ -10,16 +10,19 @@
 
 namespace mbgl {
 
-class LogBackend {
-public:
-    virtual inline ~LogBackend() = default;
-    virtual void record(EventSeverity severity, Event event, const std::string &msg) = 0;
-    virtual void record(EventSeverity severity, Event event, const char* format, ...) = 0;
-    virtual void record(EventSeverity severity, Event event, int64_t code) = 0;
-    virtual void record(EventSeverity severity, Event event, int64_t code, const std::string &msg) = 0;
-};
-
 class Log {
+public:
+    class Observer {
+    public:
+        virtual ~Observer() = default;
+
+        // When an observer is set, this function will be called for every log
+        // message. Returning true will consume the message.
+        virtual bool onRecord(EventSeverity severity, Event event, int64_t code, const std::string &msg) = 0;
+    };
+
+    static void setObserver(std::unique_ptr<Observer> Observer);
+
 private:
     template <typename T, size_t N>
     constexpr static bool includes(const T e, const T (&l)[N], const size_t i = 0) {
@@ -52,20 +55,20 @@ public:
         if (!includes(severity, disabledEventSeverities) &&
             !includes(event, disabledEvents) &&
             !includes({ severity, event }, disabledEventPermutations)) {
-            if (Backend) {
-                Backend->record(severity, event, ::std::forward<Args>(args)...);
-            }
+                record(severity, event, ::std::forward<Args>(args)...);
         }
     }
 
-    template<typename T, typename ...Args>
-    static inline const T &Set(Args&& ...args) {
-        Backend = util::make_unique<T>(::std::forward<Args>(args)...);
-        return *reinterpret_cast<T *>(Backend.get());
-    }
-
 private:
-    static std::unique_ptr<LogBackend> Backend;
+    static void record(EventSeverity severity, Event event, const std::string &msg);
+    static void record(EventSeverity severity, Event event, const char* format, ...);
+    static void record(EventSeverity severity, Event event, int64_t code);
+    static void record(EventSeverity severity, Event event, int64_t code, const std::string &msg);
+
+    // This method is the data sink that must be implemented by each platform we
+    // support. It should ideally output the error message in a human readable
+    // format to the developer.
+    static void platformRecord(EventSeverity severity, Event event, int64_t code, const std::string &msg);
 };
 
 }

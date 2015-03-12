@@ -1,6 +1,6 @@
 #import "MGLMapView.h"
 
-#import <mbgl/platform/darwin/log_nslog.hpp>
+#import <mbgl/platform/log.hpp>
 #import <mbgl/platform/gl.hpp>
 
 #import <GLKit/GLKit.h>
@@ -181,10 +181,6 @@ mbgl::DefaultFileSource *mbglFileSource = nullptr;
 
 - (BOOL)commonInit
 {
-    // set logging backend
-    //
-    mbgl::Log::Set<mbgl::NSLogBackend>();
-
     // create context
     //
     _context = [[EAGLContext alloc] initWithAPI:kEAGLRenderingAPIOpenGLES2];

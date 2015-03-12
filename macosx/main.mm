@@ -1,6 +1,6 @@
+#include <mbgl/platform/log.hpp>
 #include <mbgl/platform/platform.hpp>
 #include <mbgl/platform/darwin/settings_nsuserdefaults.hpp>
-#include <mbgl/platform/darwin/log_nslog.hpp>
 #include <mbgl/platform/darwin/Reachability.h>
 #include <mbgl/platform/default/glfw_view.hpp>
 #include <mbgl/storage/default_file_source.hpp>
@@ -101,8 +101,6 @@ const std::string &defaultCacheDatabase() {
 }
 
 int main() {
-    mbgl::Log::Set<mbgl::NSLogBackend>();
-
     GLFWView view;
 
     mbgl::SQLiteCache cache(defaultCacheDatabase());
