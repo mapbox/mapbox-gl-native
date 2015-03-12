@@ -947,18 +947,17 @@ mbgl::DefaultFileSource *mbglFileSource = nullptr;
         _bundledStyleNames = [NSMutableArray array];
 
         NSArray *bundledStyleNamesWithExtensions = [[NSFileManager defaultManager] contentsOfDirectoryAtPath:stylesPath error:nil];
-        // Add satellite raster & "hybrid" (satellite raster + vector contours & labels)
         NSString *hybridStylePrefix = @"hybrid-";
         NSString *satelliteStylePrefix = @"satellite-";
-        NSMutableArray *hybridStyleNames = [NSMutableArray array];
-        for (NSString *styleName in bundledStyleNamesWithExtensions) {
-            [_bundledStyleNames addObject:[styleName stringByDeletingPathExtension]];
+        for (NSString *fileName in bundledStyleNamesWithExtensions) {
+            NSString *styleName = [fileName stringByDeletingPathExtension];
+            [_bundledStyleNames addObject:styleName];
 
+            // Add satellite raster & "hybrid" (satellite raster + vector contours & labels)
             if ([styleName hasPrefix:satelliteStylePrefix]) {
-                [hybridStyleNames addObject:[hybridStylePrefix stringByAppendingString:[[styleName substringFromIndex:[satelliteStylePrefix length]] stringByDeletingPathExtension]]];
+                [_bundledStyleNames addObject:[hybridStylePrefix stringByAppendingString:[styleName substringFromIndex:[satelliteStylePrefix length]]]];
             }
         }
-        [_bundledStyleNames addObjectsFromArray:hybridStyleNames];
     }
 
     return [NSArray arrayWithArray:_bundledStyleNames];
