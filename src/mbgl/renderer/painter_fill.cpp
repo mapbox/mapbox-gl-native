@@ -60,8 +60,8 @@ void Painter::renderFill(FillBucket& bucket, const StyleLayer &layer_desc, const
     if (pattern) {
         // Image fill.
         if (pass == RenderPass::Translucent) {
-            const SpriteAtlasPosition posA = spriteAtlas.getPosition(properties.image.from, true);
-            const SpriteAtlasPosition posB = spriteAtlas.getPosition(properties.image.to, true);
+            const SpriteAtlasPosition posA = spriteAtlas->getPosition(properties.image.from, true);
+            const SpriteAtlasPosition posB = spriteAtlas->getPosition(properties.image.to, true);
             float factor = 8.0 / std::pow(2, state.getIntegerZoom() - id.z);
 
             mat3 patternMatrixA;
@@ -88,7 +88,7 @@ void Painter::renderFill(FillBucket& bucket, const StyleLayer &layer_desc, const
             patternShader->u_patternmatrix_b = patternMatrixB;
 
             MBGL_CHECK_ERROR(glActiveTexture(GL_TEXTURE0));
-            spriteAtlas.bind(true);
+            spriteAtlas->bind(true);
 
             // Draw the actual triangles into the color & stencil buffer.
             depthRange(strata, 1.0f);

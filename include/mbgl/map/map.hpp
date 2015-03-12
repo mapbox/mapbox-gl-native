@@ -23,7 +23,6 @@
 namespace mbgl {
 
 class Painter;
-class GlyphStore;
 class LayerDescription;
 class Sprite;
 class Style;
@@ -33,9 +32,6 @@ class StyleSource;
 class TexturePool;
 class FileSource;
 class View;
-class GlyphAtlas;
-class SpriteAtlas;
-class LineAtlas;
 class Environment;
 
 class Map : private util::noncopyable {
@@ -153,7 +149,6 @@ private:
     void resize(uint16_t width, uint16_t height, float ratio = 1);
     void resize(uint16_t width, uint16_t height, float ratio, uint16_t fbWidth, uint16_t fbHeight);
 
-    util::ptr<Sprite> getSprite();
     uv::worker& getWorker();
 
     // Checks if render thread needs to pause
@@ -163,8 +158,6 @@ private:
     void setup();
 
     void updateTiles();
-    void updateSources();
-    void updateSources(const util::ptr<StyleLayerGroup> &group);
 
     // Prepares a map render by updating the tiles we need for the current view, as well as updating
     // the stylesheet.
@@ -213,11 +206,6 @@ private:
     FileSource& fileSource;
 
     util::ptr<Style> style;
-    const std::unique_ptr<GlyphAtlas> glyphAtlas;
-    util::ptr<GlyphStore> glyphStore;
-    const std::unique_ptr<SpriteAtlas> spriteAtlas;
-    util::ptr<Sprite> sprite;
-    const std::unique_ptr<LineAtlas> lineAtlas;
     util::ptr<TexturePool> texturePool;
 
     const std::unique_ptr<Painter> painter;
@@ -231,8 +219,6 @@ private:
 
     bool debug = false;
     std::chrono::steady_clock::time_point animationTime = std::chrono::steady_clock::time_point::min();
-
-    std::set<util::ptr<StyleSource>> activeSources;
 };
 
 }

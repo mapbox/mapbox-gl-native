@@ -24,11 +24,7 @@ using namespace mbgl;
 
 #define BUFFER_OFFSET(i) ((char *)nullptr + (i))
 
-Painter::Painter(SpriteAtlas& spriteAtlas_, GlyphAtlas& glyphAtlas_, LineAtlas& lineAtlas_)
-    : spriteAtlas(spriteAtlas_)
-    , glyphAtlas(glyphAtlas_)
-    , lineAtlas(lineAtlas_)
-{
+Painter::Painter() {
 }
 
 Painter::~Painter() {
@@ -219,6 +215,10 @@ void Painter::render(const Style& style, const std::set<util::ptr<StyleSource>>&
                      TransformState state_, std::chrono::steady_clock::time_point time) {
     state = state_;
 
+    glyphAtlas = style.glyphAtlas.get();
+    spriteAtlas = style.spriteAtlas.get();
+    lineAtlas = style.lineAtlas.get();
+
     clear();
     resize();
     changeMatrix();
@@ -377,8 +377,8 @@ void Painter::renderBackground(const StyleLayer &layer_desc) {
         if ((properties.opacity >= 1.0f) != (pass == RenderPass::Opaque))
             return;
 
-        SpriteAtlasPosition imagePosA = spriteAtlas.getPosition(properties.image.from, true);
-        SpriteAtlasPosition imagePosB = spriteAtlas.getPosition(properties.image.to, true);
+        SpriteAtlasPosition imagePosA = spriteAtlas->getPosition(properties.image.from, true);
+        SpriteAtlasPosition imagePosB = spriteAtlas->getPosition(properties.image.to, true);
         float zoomFraction = state.getZoomFraction();
 
         useProgram(patternShader->program);
@@ -427,7 +427,7 @@ void Painter::renderBackground(const StyleLayer &layer_desc) {
 
         backgroundBuffer.bind();
         patternShader->bind(0);
-        spriteAtlas.bind(true);
+        spriteAtlas->bind(true);
     } else {
         Color color = properties.color;
         color[0] *= properties.opacity;

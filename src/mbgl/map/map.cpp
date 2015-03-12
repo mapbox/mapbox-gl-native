@@ -2,7 +2,6 @@
 #include <mbgl/map/environment.hpp>
 #include <mbgl/map/view.hpp>
 #include <mbgl/platform/platform.hpp>
-#include <mbgl/map/source.hpp>
 #include <mbgl/renderer/painter.hpp>
 #include <mbgl/map/sprite.hpp>
 #include <mbgl/util/transition.hpp>
@@ -13,19 +12,14 @@
 #include <mbgl/util/uv_detail.hpp>
 #include <mbgl/util/std.hpp>
 #include <mbgl/style/style.hpp>
-#include <mbgl/text/glyph_store.hpp>
-#include <mbgl/geometry/glyph_atlas.hpp>
 #include <mbgl/style/style_layer.hpp>
 #include <mbgl/style/style_layer_group.hpp>
 #include <mbgl/style/style_bucket.hpp>
 #include <mbgl/util/texture_pool.hpp>
-#include <mbgl/geometry/sprite_atlas.hpp>
-#include <mbgl/geometry/line_atlas.hpp>
 #include <mbgl/storage/file_source.hpp>
 #include <mbgl/platform/log.hpp>
 #include <mbgl/util/string.hpp>
 #include <mbgl/util/uv.hpp>
-#include <mbgl/util/mapbox.hpp>
 #include <mbgl/util/exception.hpp>
 
 #include <algorithm>
@@ -65,12 +59,8 @@ Map::Map(View& view_, FileSource& fileSource_)
       mapThread(mainThread),
       transform(view_),
       fileSource(fileSource_),
-      glyphAtlas(util::make_unique<GlyphAtlas>(1024, 1024)),
-      glyphStore(std::make_shared<GlyphStore>(*env)),
-      spriteAtlas(util::make_unique<SpriteAtlas>(512, 512)),
-      lineAtlas(util::make_unique<LineAtlas>(512, 512)),
       texturePool(std::make_shared<TexturePool>()),
-      painter(util::make_unique<Painter>(*spriteAtlas, *glyphAtlas, *lineAtlas))
+      painter(util::make_unique<Painter>())
 {
     view.initialize(this);
 }
@@ -81,9 +71,6 @@ Map::~Map() {
     }
 
     // Explicitly reset all pointers.
-    activeSources.clear();
-    sprite.reset();
-    glyphStore.reset();
     style.reset();
     texturePool.reset();
     workers.reset();
@@ -114,7 +101,6 @@ void Map::start(bool startPaused) {
         // Remove all of these to make sure they are destructed in the correct thread.
         style.reset();
         workers.reset();
-        activeSources.clear();
 
         terminating = true;
 
@@ -351,9 +337,9 @@ void Map::setStyleURL(const std::string &url) {
 void Map::setStyleJSON(std::string newStyleJSON, const std::string &base) {
     // TODO: Make threadsafe.
     styleJSON.swap(newStyleJSON);
-    sprite.reset();
+
     if (!style) {
-        style = std::make_shared<Style>();
+        style = std::make_shared<Style>(*env);
     }
 
     style->base = base;
@@ -361,24 +347,11 @@ void Map::setStyleJSON(std::string newStyleJSON, const std::string &base) {
     style->cascadeClasses(classes);
     style->setDefaultTransitionDuration(defaultTransitionDuration);
 
-    const std::string glyphURL = util::mapbox::normalizeGlyphsURL(style->glyph_url, getAccessToken());
-    glyphStore->setURL(glyphURL);
-
     triggerUpdate();
 }
 
 std::string Map::getStyleJSON() const {
     return styleJSON;
-}
-
-util::ptr<Sprite> Map::getSprite() {
-    const float pixelRatio = state.getPixelRatio();
-    const std::string &sprite_url = style->getSpriteURL();
-    if (!sprite || sprite->pixelRatio != pixelRatio) {
-        sprite = Sprite::Create(sprite_url, pixelRatio, *env);
-    }
-
-    return sprite;
 }
 
 
@@ -604,64 +577,11 @@ std::chrono::steady_clock::duration Map::getDefaultTransitionDuration() {
     return defaultTransitionDuration;
 }
 
-void Map::updateSources() {
-    assert(std::this_thread::get_id() == mapThread);
-
-    // First, disable all existing sources.
-    for (const auto& source : activeSources) {
-        source->enabled = false;
-    }
-
-    // Then, reenable all of those that we actually use when drawing this layer.
-    updateSources(style->layers);
-
-    // Then, construct or destroy the actual source object, depending on enabled state.
-    for (const auto& source : activeSources) {
-        if (source->enabled) {
-            if (!source->source) {
-                source->source = std::make_shared<Source>(source->info);
-                source->source->load(*this, *env);
-            }
-        } else {
-            source->source.reset();
-        }
-    }
-
-    // Finally, remove all sources that are disabled.
-    util::erase_if(activeSources, [](util::ptr<StyleSource> source){
-        return !source->enabled;
-    });
-}
-
-void Map::updateSources(const util::ptr<StyleLayerGroup> &group) {
-    assert(std::this_thread::get_id() == mapThread);
-    if (!group) {
-        return;
-    }
-    for (const util::ptr<StyleLayer> &layer : group->layers) {
-        if (!layer) continue;
-        if (layer->bucket && layer->bucket->style_source) {
-            (*activeSources.emplace(layer->bucket->style_source).first)->enabled = true;
-        }
-    }
-}
-
-void Map::updateTiles() {
-    assert(std::this_thread::get_id() == mapThread);
-    for (const auto &source : activeSources) {
-        source->source->update(*this, *env, getWorker(), style, *glyphAtlas, *glyphStore,
-                               *spriteAtlas, getSprite(), *texturePool, [this]() {
-            assert(std::this_thread::get_id() == mapThread);
-            triggerUpdate();
-        });
-    }
-}
-
 void Map::prepare() {
     assert(std::this_thread::get_id() == mapThread);
 
     if (!style) {
-        style = std::make_shared<Style>();
+        style = std::make_shared<Style>(*env);
 
         env->request({ Resource::Kind::JSON, styleURL}, [&](const Response &res) {
             if (res.status == Response::Successful) {
@@ -688,14 +608,13 @@ void Map::prepare() {
     state = transform.currentState();
 
     animationTime = std::chrono::steady_clock::now();
-    updateSources();
+
+    style->updateSources(*this, *env, *workers, *texturePool, [this]() {
+        assert(std::this_thread::get_id() == mapThread);
+        triggerUpdate();
+    });
+
     style->updateProperties(state.getNormalizedZoom(), animationTime);
-
-    // Allow the sprite atlas to potentially pull new sprite images if needed.
-    spriteAtlas->resize(state.getPixelRatio());
-    spriteAtlas->setSprite(getSprite());
-
-    updateTiles();
 
     if (mode == Mode::Continuous) {
         view.invalidate();
@@ -705,7 +624,7 @@ void Map::prepare() {
 void Map::render() {
     assert(std::this_thread::get_id() == mapThread);
     assert(painter);
-    painter->render(*style, activeSources,
+    painter->render(*style, style->activeSources,
                     state, animationTime);
     // Schedule another rerender when we definitely need a next frame.
     if (transform.needsTransition() || style->hasTransitions()) {
