@@ -14,8 +14,6 @@ namespace mbgl {
 
 using JSVal = const rapidjson::Value&;
 
-typedef struct { std::string name; } Font;
-
 StyleParser::StyleParser() {
 }
 
@@ -384,10 +382,9 @@ std::tuple<bool, PiecewiseConstantFunction<T>> StyleParser::parsePiecewiseConsta
     return std::tuple<bool, PiecewiseConstantFunction<T>> { true, { std::get<1>(stops), duration } };
 }
 
-bool StyleParser::setPropertyInternal(Font font, PropertyKey key, ClassProperties &klass) {
-    std::string res = font.name;
+bool StyleParser::setPropertyInternal(Font res, PropertyKey key, ClassProperties &klass) {
     if (std::get<0>(res)) {
-        klass.set(key, std::get<1>(res));
+        klass.set(key, std::get<1>(res).name);
     }
     return std::get<0>(res);
 }

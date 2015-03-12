@@ -16,6 +16,8 @@ namespace mbgl {
 
 enum class ClassID : uint32_t;
 
+struct Font { std::string name; };
+
 class StyleLayer;
 class StyleLayerGroup;
 
@@ -72,7 +74,6 @@ private:
     bool parseOptionalPropertyFont(const char *property_name, PropertyKey key, ClassProperties &klass, JSVal value);
     template <typename T>
     bool parseOptionalProperty(const char *property_name, PropertyKey key, ClassProperties &klass, JSVal value, const char *transition_name);
-    template <typename T>
     bool setPropertyInternal(Font res, PropertyKey key, ClassProperties &klass);
     template <typename T>
     bool setPropertyInternal(T res, PropertyKey key, ClassProperties &klass);
