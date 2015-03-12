@@ -264,10 +264,6 @@ void HeadlessView::notify() {
     // no-op
 }
 
-void HeadlessView::notifyMapChange(mbgl::MapChange /*change*/, std::chrono::steady_clock::duration /*delay*/) {
-    // no-op
-}
-
 void HeadlessView::activate() {
 #if MBGL_USE_CGL
     CGLError error = CGLSetCurrentContext(glContext);
@@ -298,6 +294,9 @@ void HeadlessView::deactivate() {
 #endif
 }
 
-void HeadlessView::swap() {}
+void HeadlessView::invalidate() {
+    assert(map);
+    map->render();
+}
 
 }

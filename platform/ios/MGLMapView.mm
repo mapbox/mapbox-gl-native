@@ -204,7 +204,7 @@ mbgl::DefaultFileSource *mbglFileSource = nullptr;
     //
     _glView = [[GLKView alloc] initWithFrame:self.bounds context:_context];
     _glView.autoresizingMask = UIViewAutoresizingFlexibleWidth | UIViewAutoresizingFlexibleHeight;
-    _glView.enableSetNeedsDisplay = NO;
+    _glView.enableSetNeedsDisplay = YES;
     _glView.drawableStencilFormat = GLKViewDrawableStencilFormat8;
     _glView.drawableDepthFormat = GLKViewDrawableDepthFormat16;
     if ([UIScreen instancesRespondToSelector:@selector(nativeScale)]) {
@@ -214,6 +214,8 @@ mbgl::DefaultFileSource *mbglFileSource = nullptr;
     [_glView bindDrawable];
     [self addSubview:_glView];
 
+    _glView.contentMode = UIViewContentModeCenter;
+    [self setBackgroundColor:[UIColor whiteColor]];
 
     // load extensions
     //
@@ -492,16 +494,18 @@ mbgl::DefaultFileSource *mbglFileSource = nullptr;
     [super updateConstraints];
 }
 
+// This is the delegate of the GLKView object's display call.
 - (void)glkView:(GLKView *)view drawInRect:(CGRect)rect
 {
     mbglView->resize(rect.size.width, rect.size.height, view.contentScaleFactor, view.drawableWidth, view.drawableHeight);
+    mbglMap->renderSync();
 }
 
+// This gets called when the view dimension changes, e.g. because the device is being rotated.
 - (void)layoutSubviews
 {
-    mbglMap->update();
-
     [super layoutSubviews];
+    mbglMap->triggerUpdate();
 }
 
 #pragma mark - Life Cycle -
@@ -1604,13 +1608,10 @@ mbgl::DefaultFileSource *mbglFileSource = nullptr;
     return resourceBundlePath;
 }
 
-- (void)swap
+- (void)invalidate
 {
-    if (mbglMap->needsSwap())
-    {
-        [self.glView display];
-        mbglMap->swapped();
-    }
+    // This is run in the main/UI thread.
+    [self.glView setNeedsDisplay];
 }
 
 class MBGLView : public mbgl::View
@@ -1620,12 +1621,12 @@ class MBGLView : public mbgl::View
         virtual ~MBGLView() {}
 
 
-    void notify()
+    void notify() override
     {
         // no-op
     }
 
-    void notifyMapChange(mbgl::MapChange change, std::chrono::steady_clock::duration delay = std::chrono::steady_clock::duration::zero())
+    void notifyMapChange(mbgl::MapChange change, std::chrono::steady_clock::duration delay = std::chrono::steady_clock::duration::zero()) override
     {
         if (delay != std::chrono::steady_clock::duration::zero())
         {
@@ -1647,12 +1648,12 @@ class MBGLView : public mbgl::View
         }
     }
 
-    void activate()
+    void activate() override
     {
         [EAGLContext setCurrentContext:nativeView.context];
     }
 
-    void deactivate()
+    void deactivate() override
     {
         [EAGLContext setCurrentContext:nil];
     }
@@ -1661,9 +1662,9 @@ class MBGLView : public mbgl::View
         View::resize(width, height, ratio, fbWidth, fbHeight);
     }
 
-    void swap()
+    void invalidate() override
     {
-        [nativeView performSelectorOnMainThread:@selector(swap)
+        [nativeView performSelectorOnMainThread:@selector(invalidate)
                                      withObject:nil
                                   waitUntilDone:NO];
     }
