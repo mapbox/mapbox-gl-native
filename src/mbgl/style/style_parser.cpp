@@ -14,7 +14,7 @@ namespace mbgl {
 
 using JSVal = const rapidjson::Value&;
 
-typedef std::string Font;
+typedef struct { std::string name; } Font;
 
 StyleParser::StyleParser() {
 }
@@ -256,10 +256,10 @@ std::tuple<bool, Font> StyleParser::parseProperty(JSVal value, const char* prope
                 joinedFonts += ",";
             }
         }
-        return std::tuple<bool, std::string> { true, joinedFonts };
+        return std::tuple<bool, Font> { true, { joinedFonts } };
     } else {
         Log::Warning(Event::ParseStyle, "value of '%s' must be an array of strings", property_name);
-        return std::tuple<bool, std::string> { false, "" };
+        return std::tuple<bool, Font> { false, { "" } };
     }
 }
 
@@ -384,13 +384,26 @@ std::tuple<bool, PiecewiseConstantFunction<T>> StyleParser::parsePiecewiseConsta
     return std::tuple<bool, PiecewiseConstantFunction<T>> { true, { std::get<1>(stops), duration } };
 }
 
-template <typename T>
-bool StyleParser::setProperty(JSVal value, const char *property_name, PropertyKey key, ClassProperties &klass) {
-    auto res = parseProperty<T>(value, property_name);
+bool StyleParser::setPropertyInternal(Font font, PropertyKey key, ClassProperties &klass) {
+    std::string res = font.name;
     if (std::get<0>(res)) {
         klass.set(key, std::get<1>(res));
     }
     return std::get<0>(res);
+}
+
+template <typename T>
+bool StyleParser::setPropertyInternal(T res, PropertyKey key, ClassProperties &klass) {
+    if (std::get<0>(res)) {
+        klass.set(key, std::get<1>(res));
+    }
+    return std::get<0>(res);
+}
+
+template <typename T>
+bool StyleParser::setProperty(JSVal value, const char *property_name, PropertyKey key, ClassProperties &klass) {
+    auto res = parseProperty<T>(value, property_name);
+    return setPropertyInternal(res, key, klass);
 }
 
 template <typename T>
