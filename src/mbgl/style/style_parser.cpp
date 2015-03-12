@@ -382,15 +382,17 @@ std::tuple<bool, PiecewiseConstantFunction<T>> StyleParser::parsePiecewiseConsta
     return std::tuple<bool, PiecewiseConstantFunction<T>> { true, { std::get<1>(stops), duration } };
 }
 
-bool StyleParser::setPropertyInternal(Font res, PropertyKey key, ClassProperties &klass) {
+bool StyleParser::setPropertyInternal(std::tuple<bool, Font> res, PropertyKey key, ClassProperties &klass) {
     if (std::get<0>(res)) {
-        klass.set(key, std::get<1>(res).name);
+        Font font = std::get<1>(res);
+        std::string name = font.name;
+        klass.set(key, name);
     }
     return std::get<0>(res);
 }
 
 template <typename T>
-bool StyleParser::setPropertyInternal(T res, PropertyKey key, ClassProperties &klass) {
+bool StyleParser::setPropertyInternal(std::tuple<bool, T> res, PropertyKey key, ClassProperties &klass) {
     if (std::get<0>(res)) {
         klass.set(key, std::get<1>(res));
     }
