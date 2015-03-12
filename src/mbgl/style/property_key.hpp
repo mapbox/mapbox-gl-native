@@ -28,7 +28,7 @@ enum class PropertyKey {
     LineRoundLimit,
 
     SymbolPlacement,
-    SymbolMinDistance,
+    SymbolSpacing,
     SymbolAvoidEdges,
 
     IconOpacity,

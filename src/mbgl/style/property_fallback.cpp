@@ -56,7 +56,7 @@ const std::map<PropertyKey, PropertyValue> PropertyFallbackValue::properties = {
     { PropertyKey::LineRoundLimit, defaultStyleLayout<StyleLayoutLine>().round_limit },
 
     { PropertyKey::SymbolPlacement, defaultStyleLayout<StyleLayoutSymbol>().placement },
-    { PropertyKey::SymbolMinDistance, defaultStyleLayout<StyleLayoutSymbol>().min_distance },
+    { PropertyKey::SymbolSpacing, defaultStyleLayout<StyleLayoutSymbol>().spacing },
     { PropertyKey::SymbolAvoidEdges, defaultStyleLayout<StyleLayoutSymbol>().avoid_edges },
 
     { PropertyKey::IconAllowOverlap, defaultStyleLayout<StyleLayoutSymbol>().icon.allow_overlap },

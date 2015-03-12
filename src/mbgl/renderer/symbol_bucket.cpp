@@ -277,7 +277,7 @@ void SymbolBucket::addFeature(const std::vector<std::vector<Coordinate>> &lines,
     const float fontScale = layout.text.max_size / glyphSize;
     const float textBoxScale = collision.tilePixelRatio * fontScale;
     const float iconBoxScale = collision.tilePixelRatio * layout.icon.max_size;
-    const float symbolSpacing = collision.tilePixelRatio * layout.min_distance;
+    const float symbolSpacing = collision.tilePixelRatio * layout.spacing;
     const bool avoidEdges = layout.avoid_edges && layout.placement != PlacementType::Line;
     const float textPadding = layout.text.padding * collision.tilePixelRatio;
     const float iconPadding = layout.icon.padding * collision.tilePixelRatio;
