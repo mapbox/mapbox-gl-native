@@ -60,7 +60,7 @@ function getFileSource(gzip, t) {
 test('gzip', function(t) {
     t.test('success', function(t) {
         mbgl.on('message', function(msg) {
-            t.error(msg);
+            if (msg.severity == 'ERROR') t.error(msg);
         });
 
         setup(getFileSource(true, t), function(map) {
@@ -92,16 +92,19 @@ test('gzip', function(t) {
     });
 
     t.test('unhandled', function(t) {
-        mbgl.once('message', function(msg) {
-            t.ok(msg, 'emits error');
-            t.equal(msg.class, 'ParseTile');
-            t.equal(msg.severity, 'ERROR');
-            t.ok(msg.text.match(/failed: pbf unknown field type exception/), 'pbf unknown field type exception');
+        mbgl.on('message', function(msg) {
+            if (msg.severity == 'ERROR') {
+                t.ok(msg, 'emits error');
+                t.equal(msg.class, 'ParseTile');
+                t.equal(msg.severity, 'ERROR');
+                t.ok(msg.text.match(/failed: pbf unknown field type exception/), 'pbf unknown field type exception');
+            }
         });
 
         setup(getFileSource(false, t), function(map) {
             map.load(style);
             map.render({}, function(err, image) {
+                mbgl.removeAllListeners('message');
                 mbgl.compressPNG(image, function(err, image) {
                     t.error(err);
 
