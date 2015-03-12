@@ -233,7 +233,7 @@ void GlyphStore::setURL(const std::string &url) {
 }
 
 
-void GlyphStore::waitForGlyphRanges(const std::string &fontStack, const std::set<GlyphRange> &glyphRanges) {
+void GlyphStore::waitForGlyphRanges(const std::vector<std::string> &fontStack, const std::set<GlyphRange> &glyphRanges) {
     // We are implementing a blocking wait with futures: Every GlyphSet has a future that we are
     // waiting for until it is loaded.
     if (glyphRanges.empty()) {
@@ -264,7 +264,7 @@ void GlyphStore::waitForGlyphRanges(const std::string &fontStack, const std::set
     }
 }
 
-std::shared_future<GlyphPBF &> GlyphStore::loadGlyphRange(const std::string &fontStack, std::map<GlyphRange, std::unique_ptr<GlyphPBF>> &rangeSets, const GlyphRange range) {
+std::shared_future<GlyphPBF &> GlyphStore::loadGlyphRange(const std::vector<std::string> &fontStack, std::map<GlyphRange, std::unique_ptr<GlyphPBF>> &rangeSets, const GlyphRange range) {
     auto range_it = rangeSets.find(range);
     if (range_it == rangeSets.end()) {
         // We don't have this glyph set yet for this font stack.
@@ -274,7 +274,7 @@ std::shared_future<GlyphPBF &> GlyphStore::loadGlyphRange(const std::string &fon
     return range_it->second->getFuture();
 }
 
-FontStack &GlyphStore::createFontStack(const std::string &fontStack) {
+FontStack &GlyphStore::createFontStack(const std::vector<std::string> &fontStack) {
     auto stack_it = stacks.find(fontStack);
     if (stack_it == stacks.end()) {
         stack_it = stacks.emplace(fontStack, util::make_unique<FontStack>()).first;
@@ -283,7 +283,7 @@ FontStack &GlyphStore::createFontStack(const std::string &fontStack) {
     return *stack_it->second.get();
 }
 
-uv::exclusive<FontStack> GlyphStore::getFontStack(const std::string &fontStack) {
+uv::exclusive<FontStack> GlyphStore::getFontStack(const std::vector<std::string> &fontStack) {
     uv::exclusive<FontStack> stack(mtx);
     stack << createFontStack(fontStack);
     return stack;
