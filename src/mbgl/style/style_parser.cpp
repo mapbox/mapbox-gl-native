@@ -480,15 +480,29 @@ std::string normalizeFontStack(const std::string &name) {
 }
 
 template<> std::tuple<bool, std::string> StyleParser::parseProperty(JSVal value, const char *property_name) {
-    if (!value.IsString()) {
+    if (strncmp(property_name, "text-font", 9) == 0) {
+        if (!value.IsArray()) {
+            Log::Warning(Event::ParseStyle, "value of '%s' must be an array of strings", property_name);
+            return std::tuple<bool, std::string> { false, std::string() };
+        } else {
+            std::string result = "";
+            for (rapidjson::SizeType i = 0; i < value.Size(); ++i) {
+                JSVal stop = value[i];
+                if (stop.IsString()) {
+                    result += stop.GetString();
+                    if (i < value.Size()) {
+                        result += ",";
+                    }
+                } else {
+                    Log::Warning(Event::ParseStyle, "text-font members must be strings");
+                    return std::tuple<bool, std::string> { false, {}};
+                }
+            }
+            return std::tuple<bool, std::string> { true, { result, result.length() } };
+        }
+    } else if (!value.IsString()) {
         Log::Warning(Event::ParseStyle, "value of '%s' must be a string", property_name);
         return std::tuple<bool, std::string> { false, std::string() };
-    }
-
-    if (std::string { "text-font" } == property_name) {
-        return std::tuple<bool, std::string> {
-            true, normalizeFontStack({ value.GetString(), value.GetStringLength() })
-        };
     } else {
         return std::tuple<bool, std::string> { true, { value.GetString(), value.GetStringLength() } };
     }
