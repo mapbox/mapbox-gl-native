@@ -173,11 +173,11 @@ android-lib: android-lib-$(ANDROID_ABI)
 
 # Builds the selected/default Android library
 android: android-lib-$(ANDROID_ABI)
-	cd android/java && ./gradlew --parallel-threads=$(JOBS) assembleRelease
+	cd android/java && ./gradlew --parallel-threads=$(JOBS) assemble$(BUILDTYPE)
 
 # Builds all android architectures.
 android-all: $(ANDROID_ABIS)
-	cd android/java && ./gradlew --parallel-threads=$(JOBS) assembleRelease
+	cd android/java && ./gradlew --parallel-threads=$(JOBS) assemble$(BUILDTYPE)
 
 # Full build of GL Core for each architecture, build the Android Library, publish to Maven Central
 android-deploy: $(ANDROID_ABIS)
