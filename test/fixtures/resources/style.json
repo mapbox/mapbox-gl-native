@@ -20,7 +20,7 @@
     "source": "vectorsource",
     "source-layer": "road_label",
     "layout": {
-      "text-font": "Open Sans Regular, Arial Unicode MS Regular",
+      "text-font": ["Open Sans Regular", "Arial Unicode MS Regular"],
       "text-field": "{name_en}"
     }
   }, {
@@ -29,7 +29,7 @@
     "source": "vectorsource",
     "source-layer": "poi_label",
     "layout": {
-      "text-font": "Open Sans Regular, Arial Unicode MS Regular",
+      "text-font": ["Open Sans Regular", "Arial Unicode MS Regular"],
       "icon-image": "{maki}_icon"
     }
   }]
