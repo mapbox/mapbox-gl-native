@@ -42,7 +42,7 @@ public:
     StyleLayoutSymbol& operator=(const StyleLayoutSymbol &) = delete;
 
     PlacementType placement = PlacementType::Point;
-    float min_distance = 250.0f;
+    float spacing = 250.0f;
     bool avoid_edges = false;
 
     struct {
