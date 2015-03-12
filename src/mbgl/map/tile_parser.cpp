@@ -1,5 +1,6 @@
 #include <mbgl/map/tile_parser.hpp>
 #include <mbgl/map/vector_tile_data.hpp>
+#include <mbgl/platform/log.hpp>
 #include <mbgl/style/style.hpp>
 #include <mbgl/style/style_layer.hpp>
 #include <mbgl/style/style_layer_group.hpp>
@@ -85,7 +86,7 @@ void TileParser::parseStyleLayers(util::ptr<const StyleLayerGroup> group) {
                 }
             }
         } else {
-            fprintf(stderr, "[WARNING] layer '%s' does not have buckets\n", layer_desc->id.c_str());
+            Log::Warning(Event::ParseTile, "layer '%s' does not have buckets", layer_desc->id.c_str());
         }
     }
 }
@@ -198,12 +199,13 @@ std::unique_ptr<Bucket> TileParser::createBucket(const StyleBucket &bucketDesc) 
         } else if (bucketDesc.type == StyleLayerType::Raster) {
             return nullptr;
         } else {
-            fprintf(stderr, "[WARNING] unknown bucket render type for layer '%s' (source layer '%s')\n", bucketDesc.name.c_str(), bucketDesc.source_layer.c_str());
+            Log::Warning(Event::ParseTile, "unknown bucket render type for layer '%s' (source layer '%s')",
+                    bucketDesc.name.c_str(), bucketDesc.source_layer.c_str());
         }
     } else {
         // The layer specified in the bucket does not exist. Do nothing.
         if (debug::tileParseWarnings) {
-            fprintf(stderr, "[WARNING] layer '%s' does not exist in tile %d/%d/%d\n",
+            Log::Warning(Event::ParseTile, "layer '%s' does not exist in tile %d/%d/%d",
                     bucketDesc.source_layer.c_str(), tile.id.z, tile.id.x, tile.id.y);
         }
     }

@@ -25,7 +25,7 @@ void GLFWView::initialize(mbgl::Map *map_) {
     glfwSetErrorCallback(glfwError);
 
     if (!glfwInit()) {
-        fprintf(stderr, "Failed to initialize glfw\n");
+        mbgl::Log::Error(mbgl::Event::OpenGL, "failed to initialize glfw");
         exit(1);
     }
 
@@ -54,7 +54,7 @@ void GLFWView::initialize(mbgl::Map *map_) {
     window = glfwCreateWindow(1024, 768, "Mapbox GL", monitor, NULL);
     if (!window) {
         glfwTerminate();
-        fprintf(stderr, "Failed to initialize window\n");
+        mbgl::Log::Error(mbgl::Event::OpenGL, "failed to initialize window");
         exit(1);
     }
 
@@ -312,7 +312,7 @@ void GLFWView::fps() {
     double currentTime = glfwGetTime();
 
     if (currentTime - timeElapsed >= 1) {
-        fprintf(stderr, "FPS: %4.2f\n", frames / (currentTime - timeElapsed));
+        mbgl::Log::Info(mbgl::Event::OpenGL, "FPS: %4.2f", frames / (currentTime - timeElapsed));
         timeElapsed = currentTime;
         frames = 0;
     }

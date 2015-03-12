@@ -1,6 +1,7 @@
 #include <mbgl/util/clip_ids.hpp>
 #include <mbgl/map/tile.hpp>
 
+#include <mbgl/platform/log.hpp>
 #include <mbgl/util/math.hpp>
 
 #include <list>
@@ -89,7 +90,7 @@ void ClipIDGenerator::update(std::forward_list<Tile *> tiles) {
     }
 
     if (bit_offset > 8) {
-        fprintf(stderr, "stencil mask overflow\n");
+        Log::Error(Event::OpenGL, "stencil mask overflow");
     }
 }
 

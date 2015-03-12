@@ -1,5 +1,6 @@
 #include <mbgl/geometry/line_atlas.hpp>
 #include <mbgl/platform/gl.hpp>
+#include <mbgl/platform/log.hpp>
 #include <mbgl/platform/platform.hpp>
 
 #include <sstream>
@@ -46,7 +47,7 @@ LinePatternPos LineAtlas::addDash(const std::vector<float> &dasharray, bool roun
     const uint8_t offset = 128;
 
     if (nextRow + dashheight > height) {
-        fprintf(stderr, "[WARNING] line atlas bitmap overflow\n");
+        Log::Warning(Event::OpenGL, "line atlas bitmap overflow");
         return LinePatternPos();
     }
 

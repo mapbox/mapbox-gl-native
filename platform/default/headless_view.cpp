@@ -125,7 +125,7 @@ void HeadlessView::createContext() {
         glContext = glXCreateNewContext(xDisplay, fbConfigs[0], GLX_RGBA_TYPE, None, True);
         if (glContext) {
             if (!glXIsDirect(xDisplay, glContext)) {
-                mbgl::Log::Error(mbgl::Event::OpenGL, "Failed to create direct OpenGL Legacy context");
+                Log::Error(Event::OpenGL, "failed to create direct OpenGL Legacy context");
                 glXDestroyContext(xDisplay, glContext);
                 glContext = 0;
             }

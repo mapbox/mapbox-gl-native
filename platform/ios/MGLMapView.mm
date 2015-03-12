@@ -187,7 +187,7 @@ mbgl::DefaultFileSource *mbglFileSource = nullptr;
 
     if ( ! _context)
     {
-        mbgl::Log::Error(mbgl::Event::Setup, "Failed to create OpenGL ES context");
+        mbgl::Log::Error(mbgl::Event::Setup, "failed to create OpenGL ES context");
 
         return NO;
     }

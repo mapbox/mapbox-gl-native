@@ -6,6 +6,7 @@
 #include <mbgl/style/style_layout.hpp>
 #include <mbgl/util/std.hpp>
 #include <mbgl/platform/gl.hpp>
+#include <mbgl/platform/log.hpp>
 
 #include <cassert>
 
@@ -173,12 +174,12 @@ void FillBucket::tessellate() {
                 } else {
 #if defined(DEBUG)
                     // TODO: We're missing a vertex that was not part of the line.
-                    fprintf(stderr, "undefined element buffer\n");
+                    Log::Error(Event::OpenGL, "undefined element buffer");
 #endif
                 }
             } else {
 #if defined(DEBUG)
-                fprintf(stderr, "undefined element buffer\n");
+                Log::Error(Event::OpenGL, "undefined element buffer");
 #endif
             }
         }
@@ -187,7 +188,7 @@ void FillBucket::tessellate() {
         triangleGroup.elements_length += triangle_count;
     } else {
 #if defined(DEBUG)
-        fprintf(stderr, "tessellation failed\n");
+        Log::Error(Event::OpenGL, "tessellation failed");
 #endif
     }
 

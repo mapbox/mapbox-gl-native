@@ -1,6 +1,7 @@
 #include <mbgl/geometry/glyph_atlas.hpp>
 
 #include <mbgl/platform/gl.hpp>
+#include <mbgl/platform/log.hpp>
 #include <mbgl/platform/platform.hpp>
 
 #include <cassert>
@@ -60,7 +61,7 @@ Rect<uint16_t> GlyphAtlas::addGlyph_impl(uint64_t tile_id, const std::string& fa
 
     Rect<uint16_t> rect = bin.allocate(pack_width, pack_height);
     if (rect.w == 0) {
-        fprintf(stderr, "glyph bitmap overflow");
+        Log::Error(Event::OpenGL, "glyph bitmap overflow");
         return rect;
     }
 

@@ -1,5 +1,6 @@
 #include <mbgl/platform/platform.hpp>
 #include <mbgl/platform/gl.hpp>
+#include <mbgl/platform/log.hpp>
 
 #include <mbgl/util/raster.hpp>
 #include <mbgl/util/uv_detail.hpp>
@@ -40,7 +41,7 @@ bool Raster::load(const std::string &data) {
 
 void Raster::bind(bool linear) {
     if (!width || !height) {
-        fprintf(stderr, "trying to bind texture without dimension\n");
+        Log::Error(Event::OpenGL, "trying to bind texture without dimension");
         return;
     }
 

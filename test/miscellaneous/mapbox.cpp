@@ -1,5 +1,6 @@
 #include "../fixtures/util.hpp"
 
+#include <mbgl/platform/log.hpp>
 #include <mbgl/util/mapbox.hpp>
 #include <regex>
 #include <iostream>
@@ -33,37 +34,36 @@ TEST(Mapbox, TileURL) {
         EXPECT_EQ(mbgl::util::mapbox::normalizeTileURL("http://path.png/tile.pbf?access_token=foo.png/bar", "mapbox://user.map", SourceType::Raster), "http://path.png/tile{ratio}.pbf?access_token=foo.png/bar");
         EXPECT_EQ(mbgl::util::mapbox::normalizeTileURL("http://path.png/tile.pbf?access_token=foo.png/bar.png", "mapbox://user.map", SourceType::Raster), "http://path.png/tile{ratio}.pbf?access_token=foo.png/bar.png");
     } catch (const std::regex_error& e) {
-        std::cout << "regex_error caught: " << e.what() << '\n';
-        std::cout << e.code() << '\n';
+        const char *error = "unknown";
         switch (e.code()) {
             case std::regex_constants::error_collate:
-                std::cout << "error_collate" << '\n'; break;
+                error = "error_collate"; break;
             case std::regex_constants::error_ctype:
-                std::cout << "error_ctype" << '\n'; break;
+                error = "error_ctype"; break;
             case std::regex_constants::error_escape:
-                std::cout << "error_escape" << '\n'; break;
+                error = "error_escape"; break;
             case std::regex_constants::error_backref:
-                std::cout << "error_backref" << '\n'; break;
+                error = "error_backref"; break;
             case std::regex_constants::error_paren:
-                std::cout << "error_paren" << '\n'; break;
+                error = "error_paren"; break;
             case std::regex_constants::error_brace:
-                std::cout << "error_brace" << '\n'; break;
+                error = "error_brace"; break;
             case std::regex_constants::error_badbrace:
-                std::cout << "error_badbrace" << '\n'; break;
+                error = "error_badbrace"; break;
             case std::regex_constants::error_range:
-                std::cout << "error_range" << '\n'; break;
+                error = "error_range"; break;
             case std::regex_constants::error_space:
-                std::cout << "error_space" << '\n'; break;
+                error = "error_space"; break;
             case std::regex_constants::error_badrepeat:
-                std::cout << "error_badrepeat" << '\n'; break;
+                error = "error_badrepeat"; break;
             case std::regex_constants::error_complexity:
-                std::cout << "error_complexity" << '\n'; break;
+                error = "error_complexity"; break;
             case std::regex_constants::error_stack:
-                std::cout << "error_stack" << '\n'; break;
-                
+                error = "error_stack"; break;
             default:
                 break;
         }
+        mbgl::Log::Error(mbgl::Event::General, "regex_error caught: %s - %s (%d)", e.what(), error, e.code());
         throw e;
     }
 }
