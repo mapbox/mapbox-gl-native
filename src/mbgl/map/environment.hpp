@@ -20,6 +20,7 @@ enum class ThreadType : uint8_t {
     Unknown    = 0,
     Main       = 1 << 0,
     Map        = 1 << 1,
+    TileWorker = 1 << 2,
 };
 
 class Environment final : private util::noncopyable {
@@ -33,25 +34,25 @@ public:
         std::thread::id id;
     };
 
-    Environment(FileSource &);
+    Environment(FileSource&);
 
     static Environment& Get();
     static bool inScope();
     static bool currentlyOn(ThreadType);
     static std::string threadName();
 
-    void requestAsync(const Resource &, std::function<void(const Response &)>);
-    Request *request(const Resource &, std::function<void(const Response &)>);
-    void cancelRequest(Request *);
+    void requestAsync(const Resource&, std::function<void(const Response&)>);
+    Request* request(const Resource&, std::function<void(const Response&)>);
+    void cancelRequest(Request*);
 
     // Request to terminate the environment.
     void terminate();
 
 private:
-    FileSource &fileSource;
+    FileSource& fileSource;
 
 public:
-    uv_loop_t *const loop;
+    uv_loop_t* const loop;
 };
 
 }

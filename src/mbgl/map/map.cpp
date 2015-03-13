@@ -694,7 +694,7 @@ void Map::updateSources(const util::ptr<StyleLayerGroup> &group) {
 void Map::updateTiles() {
     assert(Environment::currentlyOn(ThreadType::Map));
     for (const auto &source : activeSources) {
-        source->source->update(*this, *env, getWorker(), style, *glyphAtlas, *glyphStore,
+        source->source->update(*this, getWorker(), style, *glyphAtlas, *glyphStore,
                                *spriteAtlas, getSprite(), *texturePool, [this]() {
             assert(Environment::currentlyOn(ThreadType::Map));
             triggerUpdate();

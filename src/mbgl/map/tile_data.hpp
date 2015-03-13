@@ -48,7 +48,7 @@ public:
     };
 
 public:
-    TileData(Tile::ID const &id, const SourceInfo &, Environment &);
+    TileData(Tile::ID const &id, const SourceInfo &);
     ~TileData();
 
     void request(uv::worker&, float pixelRatio, std::function<void ()> callback);
@@ -72,7 +72,7 @@ public:
 
 public:
     const SourceInfo& source;
-    Environment &env;
+    Environment& env;
 
 protected:
     Request *req = nullptr;

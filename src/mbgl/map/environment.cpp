@@ -35,7 +35,7 @@ public:
         // FIXME: We should never need to overwrite a thread here and we only allow
         // this today because on the Static mode, the Map thread and the Main thread
         // are same. Replace this with emplace() when this gets fixed.
-        threadSet[std::this_thread::get_id()] = ThreadInfo{env, type, name};
+        threadSet[std::this_thread::get_id()] = ThreadInfo{ env, type, name };
     }
 
     void unregisterThread() {
@@ -80,7 +80,7 @@ Environment::Scope::~Scope() {
     threadInfoStore.unregisterThread();
 }
 
-Environment::Environment(FileSource &fs) : fileSource(fs), loop(uv_loop_new()) {
+Environment::Environment(FileSource& fs) : fileSource(fs), loop(uv_loop_new()) {
 }
 
 Environment& Environment::Get() {
@@ -102,16 +102,18 @@ std::string Environment::threadName() {
     return threadInfoStore.getThreadInfo().name;
 }
 
-void Environment::requestAsync(const Resource &resource, std::function<void(const Response &)> callback) {
+void Environment::requestAsync(const Resource& resource,
+                               std::function<void(const Response&)> callback) {
     fileSource.request(resource, *this, std::move(callback));
 }
 
-Request *Environment::request(const Resource &resource, std::function<void(const Response &)> callback) {
+Request* Environment::request(const Resource& resource,
+                              std::function<void(const Response&)> callback) {
     assert(currentlyOn(ThreadType::Map));
     return fileSource.request(resource, loop, *this, std::move(callback));
 }
 
-void Environment::cancelRequest(Request *req) {
+void Environment::cancelRequest(Request* req) {
     assert(currentlyOn(ThreadType::Map));
     fileSource.cancel(req);
 }
