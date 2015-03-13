@@ -40,10 +40,6 @@ public:
     static bool currentlyOn(ThreadType);
     static std::string threadName();
 
-    void setup();
-
-    bool inMapThread() const;
-
     void requestAsync(const Resource &, std::function<void(const Response &)>);
     Request *request(const Resource &, std::function<void(const Response &)>);
     void cancelRequest(Request *);

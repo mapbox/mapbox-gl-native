@@ -217,9 +217,6 @@ private:
     // Stores whether the map thread has been stopped already.
     std::atomic_bool isStopped;
 
-    const std::thread::id mainThread;
-    std::thread::id mapThread;
-
     Transform transform;
     TransformState state;
 

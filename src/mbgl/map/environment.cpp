@@ -102,25 +102,17 @@ std::string Environment::threadName() {
     return threadInfoStore.getThreadInfo().name;
 }
 
-void Environment::setup() {
-    mapThread = std::this_thread::get_id();
-}
-
-bool Environment::inMapThread() const {
-    return std::this_thread::get_id() == mapThread;
-}
-
 void Environment::requestAsync(const Resource &resource, std::function<void(const Response &)> callback) {
     fileSource.request(resource, *this, std::move(callback));
 }
 
 Request *Environment::request(const Resource &resource, std::function<void(const Response &)> callback) {
-    assert(inMapThread());
+    assert(currentlyOn(ThreadType::Map));
     return fileSource.request(resource, loop, *this, std::move(callback));
 }
 
 void Environment::cancelRequest(Request *req) {
-    assert(inMapThread());
+    assert(currentlyOn(ThreadType::Map));
     fileSource.cancel(req);
 }
 
