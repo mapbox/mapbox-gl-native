@@ -67,22 +67,15 @@
       ],
       'libraries': [
         '<@(uv_static_libs)',
-        '<@(glfw3_static_libs)',
-        '<@(sqlite3_static_libs)',
-        '<@(zlib_static_libs)',
-        '<@(curl_static_libs)',
       ],
       'variables': {
         'cflags_cc': [
           '<@(uv_cflags)',
+          '<@(opengl_cflags)',
           '<@(boost_cflags)',
         ],
         'ldflags': [
           '<@(uv_ldflags)',
-          '<@(glfw3_ldflags)',
-          '<@(sqlite3_ldflags)',
-          '<@(zlib_ldflags)',
-          '<@(curl_ldflags)',
         ],
       },
       'conditions': [

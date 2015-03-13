@@ -29,14 +29,17 @@
       'variables': {
         'cflags_cc': [
           '<@(uv_cflags)',
+          '<@(opengl_cflags)',
           '<@(boost_cflags)',
         ],
         'cflags': [
           '<@(uv_cflags)',
+          '<@(opengl_cflags)',
           '-fPIC'
         ],
         'ldflags': [
           '<@(uv_ldflags)',
+          '<@(opengl_ldflags)',
         ],
         'libraries': [
           '<@(uv_static_libs)',

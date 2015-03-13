@@ -29,6 +29,8 @@
           '-framework Foundation',
           '-framework ImageIO',
           '-framework CoreServices',
+          '-framework OpenGL',
+          '-framework ApplicationServices',
         ],
       },
 
