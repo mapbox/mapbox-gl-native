@@ -73,9 +73,6 @@ public:
                      GlyphAtlas&,
                      GlyphStore&);
 
-    void addGlyphs(const PlacedGlyphs &glyphs, float placementZoom, PlacementRange placementRange,
-                   float zoom);
-
     void drawGlyphs(SDFShader& shader);
     void drawIcons(SDFShader& shader);
     void drawIcons(IconShader& shader);
