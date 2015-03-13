@@ -16,9 +16,29 @@ class Request;
 class Response;
 struct Resource;
 
-class Environment : private util::noncopyable {
+enum class ThreadType : uint8_t {
+    Unknown    = 0,
+    Main       = 1 << 0,
+    Map        = 1 << 1,
+};
+
+class Environment final : private util::noncopyable {
 public:
+    class Scope final {
+    public:
+        Scope(Environment&, ThreadType, const std::string& name);
+        ~Scope();
+
+    private:
+        std::thread::id id;
+    };
+
     Environment(FileSource &);
+
+    static Environment& Get();
+    static bool inScope();
+    static bool currentlyOn(ThreadType);
+    static std::string threadName();
 
     void setup();
 
@@ -33,7 +53,6 @@ public:
 
 private:
     FileSource &fileSource;
-    std::thread::id mapThread;
 
 public:
     uv_loop_t *const loop;
