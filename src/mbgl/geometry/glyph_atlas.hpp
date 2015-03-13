@@ -15,6 +15,19 @@ namespace mbgl {
 
 class GlyphAtlas : public util::noncopyable {
 public:
+    GlyphAtlas(uint16_t width, uint16_t height);
+
+    void addGlyphs(uint64_t tileID,
+                   const std::u32string& text,
+                   const std::string& stackName,
+                   const FontStack&,
+                   GlyphPositions&);
+    void removeGlyphs(uint64_t tile_id);
+
+    void bind();
+
+    const uint16_t width = 0;
+    const uint16_t height = 0;
 
 private:
     struct GlyphValue {
@@ -24,23 +37,10 @@ private:
         std::set<uint64_t> ids;
     };
 
-    Rect<uint16_t> addGlyph_impl(uint64_t tile_id, const std::string& face_name,
-                                 const SDFGlyph& glyph);
-public:
-    GlyphAtlas(uint16_t width, uint16_t height);
+    Rect<uint16_t> addGlyph(uint64_t tileID,
+                            const std::string& stackName,
+                            const SDFGlyph&);
 
-    Rect<uint16_t> addGlyph(uint64_t tile_id, const std::string& face_name,
-                            const SDFGlyph& glyph);
-    void addGlyphs(uint64_t tileid, std::u32string const& text, std::string const& stackname,
-                   FontStack const& fontStack, GlyphPositions & face);
-    void removeGlyphs(uint64_t tile_id);
-    void bind();
-
-public:
-    const uint16_t width = 0;
-    const uint16_t height = 0;
-
-private:
     std::mutex mtx;
     BinPack<uint16_t> bin;
     std::map<std::string, std::map<uint32_t, GlyphValue>> index;
