@@ -92,8 +92,11 @@ test('gzip', function(t) {
     });
 
     t.test('unhandled', function(t) {
+        var errorEmitted = false;
+
         mbgl.on('message', function(msg) {
             if (msg.severity == 'ERROR') {
+                errorEmitted = true;
                 t.ok(msg, 'emits error');
                 t.equal(msg.class, 'ParseTile');
                 t.equal(msg.severity, 'ERROR');
@@ -104,6 +107,7 @@ test('gzip', function(t) {
         setup(getFileSource(false, t), function(map) {
             map.load(style);
             map.render({}, function(err, image) {
+                if (!errorEmitted) t.fail('no error emitted');
                 mbgl.removeAllListeners('message');
                 mbgl.compressPNG(image, function(err, image) {
                     t.error(err);
