@@ -67,7 +67,7 @@ public:
 
     void addFeatures(const GeometryTileLayer&,
                      const FilterExpression&,
-                     const Tile::ID&,
+                     uintptr_t tileUID,
                      SpriteAtlas&,
                      Sprite&,
                      GlyphAtlas&,

@@ -17,12 +17,12 @@ class GlyphAtlas : public util::noncopyable {
 public:
     GlyphAtlas(uint16_t width, uint16_t height);
 
-    void addGlyphs(uint64_t tileID,
+    void addGlyphs(uintptr_t tileUID,
                    const std::u32string& text,
                    const std::string& stackName,
                    const FontStack&,
                    GlyphPositions&);
-    void removeGlyphs(uint64_t tile_id);
+    void removeGlyphs(uintptr_t tileUID);
 
     void bind();
 
@@ -31,13 +31,13 @@ public:
 
 private:
     struct GlyphValue {
-        GlyphValue(const Rect<uint16_t>& rect_, uint64_t id)
+        GlyphValue(const Rect<uint16_t>& rect_, uintptr_t id)
             : rect(rect_), ids({ id }) {}
         Rect<uint16_t> rect;
-        std::set<uint64_t> ids;
+        std::set<uintptr_t> ids;
     };
 
-    Rect<uint16_t> addGlyph(uint64_t tileID,
+    Rect<uint16_t> addGlyph(uintptr_t tileID,
                             const std::string& stackName,
                             const SDFGlyph&);
 

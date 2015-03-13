@@ -256,7 +256,7 @@ std::unique_ptr<Bucket> TileParser::createSymbolBucket(const GeometryTileLayer& 
     auto symbol = parseStyleLayoutSymbol(bucket_desc, tile.id.z);
     auto bucket = util::make_unique<SymbolBucket>(std::move(symbol), *collision);
     bucket->addFeatures(
-        layer, bucket_desc.filter, tile.id, spriteAtlas, *sprite, glyphAtlas, glyphStore);
+        layer, bucket_desc.filter, reinterpret_cast<uintptr_t>(&tile), spriteAtlas, *sprite, glyphAtlas, glyphStore);
     return obsolete() ? nullptr : std::move(bucket);
 }
 }

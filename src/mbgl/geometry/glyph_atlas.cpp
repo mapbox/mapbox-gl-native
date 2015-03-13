@@ -18,7 +18,7 @@ GlyphAtlas::GlyphAtlas(uint16_t width_, uint16_t height_)
       dirty(true) {
 }
 
-void GlyphAtlas::addGlyphs(uint64_t tileID,
+void GlyphAtlas::addGlyphs(uintptr_t tileUID,
                            const std::u32string& text,
                            const std::string& stackName,
                            const FontStack& fontStack,
@@ -36,12 +36,12 @@ void GlyphAtlas::addGlyphs(uint64_t tileID,
         }
 
         const SDFGlyph& sdf = sdf_it->second;
-        Rect<uint16_t> rect = addGlyph(tileID, stackName, sdf);
+        Rect<uint16_t> rect = addGlyph(tileUID, stackName, sdf);
         face.emplace(chr, Glyph{rect, sdf.metrics});
     }
 }
 
-Rect<uint16_t> GlyphAtlas::addGlyph(uint64_t tileID,
+Rect<uint16_t> GlyphAtlas::addGlyph(uintptr_t tileUID,
                                     const std::string& stackName,
                                     const SDFGlyph& glyph)
 {
@@ -54,7 +54,7 @@ Rect<uint16_t> GlyphAtlas::addGlyph(uint64_t tileID,
     // The glyph is already in this texture.
     if (it != face.end()) {
         GlyphValue& value = it->second;
-        value.ids.insert(tileID);
+        value.ids.insert(tileUID);
         return value.rect;
     }
 
@@ -85,7 +85,7 @@ Rect<uint16_t> GlyphAtlas::addGlyph(uint64_t tileID,
     assert(rect.x + rect.w <= width);
     assert(rect.y + rect.h <= height);
 
-    face.emplace(glyph.id, GlyphValue { rect, tileID });
+    face.emplace(glyph.id, GlyphValue { rect, tileUID });
 
     // Copy the bitmap
     char *target = data.get();
@@ -103,14 +103,14 @@ Rect<uint16_t> GlyphAtlas::addGlyph(uint64_t tileID,
     return rect;
 }
 
-void GlyphAtlas::removeGlyphs(uint64_t tile_id) {
+void GlyphAtlas::removeGlyphs(uintptr_t tileUID) {
     std::lock_guard<std::mutex> lock(mtx);
 
     for (auto& faces : index) {
         std::map<uint32_t, GlyphValue>& face = faces.second;
         for (auto it = face.begin(); it != face.end(); /* we advance in the body */) {
             GlyphValue& value = it->second;
-            value.ids.erase(tile_id);
+            value.ids.erase(tileUID);
 
             if (!value.ids.size()) {
                 const Rect<uint16_t>& rect = value.rect;

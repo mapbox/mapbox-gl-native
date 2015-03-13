@@ -25,7 +25,7 @@ VectorTileData::VectorTileData(Tile::ID const& id_,
 }
 
 VectorTileData::~VectorTileData() {
-    glyphAtlas.removeGlyphs(id.to_uint64());
+    glyphAtlas.removeGlyphs(reinterpret_cast<uintptr_t>(this));
 }
 
 

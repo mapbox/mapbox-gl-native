@@ -124,8 +124,11 @@ std::vector<SymbolFeature> SymbolBucket::processFeatures(const GeometryTileLayer
 
 void SymbolBucket::addFeatures(const GeometryTileLayer& layer,
                                const FilterExpression& filter,
-                               const Tile::ID &id, SpriteAtlas &spriteAtlas, Sprite &sprite,
-                               GlyphAtlas & glyphAtlas, GlyphStore &glyphStore) {
+                               uintptr_t tileUID,
+                               SpriteAtlas& spriteAtlas,
+                               Sprite& sprite,
+                               GlyphAtlas& glyphAtlas,
+                               GlyphStore& glyphStore) {
     auto &layout = *styleLayout;
     const std::vector<SymbolFeature> features = processFeatures(layer, filter, glyphStore, sprite);
 
@@ -193,7 +196,7 @@ void SymbolBucket::addFeatures(const GeometryTileLayer& layer,
 
             // Add the glyphs we need for this label to the glyph atlas.
             if (shaping.size()) {
-                glyphAtlas.addGlyphs(id.to_uint64(), feature.label, layout.text.font, fontStack, face);
+                glyphAtlas.addGlyphs(tileUID, feature.label, layout.text.font, fontStack, face);
             }
         }
 
