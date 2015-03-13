@@ -42,12 +42,6 @@ bool SymbolBucket::hasTextData() const { return !text.groups.empty(); }
 
 bool SymbolBucket::hasIconData() const { return !icon.groups.empty(); }
 
-void SymbolBucket::addGlyphsToAtlas(uint64_t tileid, const std::string stackname,
-                                    const std::u32string &text, const FontStack &fontStack,
-                                    GlyphAtlas &glyphAtlas, GlyphPositions &face) {
-    glyphAtlas.addGlyphs(tileid, text, stackname, fontStack,face);
-}
-
 std::vector<SymbolFeature> SymbolBucket::processFeatures(const GeometryTileLayer& layer,
                                                          const FilterExpression& filter,
                                                          GlyphStore &glyphStore,
@@ -199,8 +193,7 @@ void SymbolBucket::addFeatures(const GeometryTileLayer& layer,
 
             // Add the glyphs we need for this label to the glyph atlas.
             if (shaping.size()) {
-                SymbolBucket::addGlyphsToAtlas(id.to_uint64(), layout.text.font, feature.label, fontStack,
-                                               glyphAtlas, face);
+                glyphAtlas.addGlyphs(id.to_uint64(), feature.label, layout.text.font, fontStack, face);
             }
         }
 

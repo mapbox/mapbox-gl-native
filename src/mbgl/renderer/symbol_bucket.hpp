@@ -92,10 +92,6 @@ private:
     template <typename Buffer, typename GroupType>
     void addSymbols(Buffer &buffer, const PlacedGlyphs &symbols, float scale, PlacementRange placementRange);
 
-    // Adds glyphs to the glyph atlas so that they have a left/top/width/height coordinates associated to them that we can use for writing to a buffer.
-    static void addGlyphsToAtlas(uint64_t tileid, const std::string stackname, const std::u32string &string,
-                          const FontStack &fontStack, GlyphAtlas &glyphAtlas, GlyphPositions &face);
-
 public:
     const std::unique_ptr<const StyleLayoutSymbol> styleLayout;
     bool sdfIcons = false;
