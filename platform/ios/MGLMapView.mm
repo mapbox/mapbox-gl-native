@@ -972,7 +972,7 @@ mbgl::DefaultFileSource *mbglFileSource = nullptr;
     }
     [self setStyleURL:[NSString stringWithFormat:@"styles/%@.json", styleName]];
     if (isHybrid) {
-        [self setAppliedStyleClasses:@[@"contours", @"labels"]];
+        [self setStyleClasses:@[@"contours", @"labels"]];
     }
 }
 
@@ -1031,12 +1031,12 @@ mbgl::DefaultFileSource *mbglFileSource = nullptr;
     return returnArray;
 }
 
-- (void)setAppliedStyleClasses:(NSArray *)appliedClasses
+- (void)setStyleClasses:(NSArray *)appliedClasses
 {
-    [self setAppliedStyleClasses:appliedClasses transitionDuration:0];
+    [self setStyleClasses:appliedClasses transitionDuration:0];
 }
 
-- (void)setAppliedStyleClasses:(NSArray *)appliedClasses transitionDuration:(NSTimeInterval)transitionDuration
+- (void)setStyleClasses:(NSArray *)appliedClasses transitionDuration:(NSTimeInterval)transitionDuration
 {
     std::vector<std::string> newAppliedClasses;
 
