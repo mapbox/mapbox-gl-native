@@ -93,8 +93,15 @@ function renderTest(style, info, base, key) {
     };
 }
 
-function rewriteLocalSchema(uri) {
-    return uri.replace(/^local:\/\//, '');
+function rewriteLocalSchema(url) {
+    var regex = /^local:\/\//;
+    if (url instanceof Array) {
+        return url.map(function(str) {
+            return str.replace(regex, '');
+        });
+    } else if (url instanceof String) {
+        return url.replace(regex, '');
+    }
 }
 
 var tests;
