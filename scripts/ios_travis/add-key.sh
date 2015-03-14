@@ -1,5 +1,9 @@
 #!/bin/sh
 
+openssl aes-256-cbc -k "$IOS_ENCRYPTION_SECRET" -in scripts/ios_travis/ios-in-house.mobileprovision.enc -d -a -out scripts/ios_travis/ios-in-house.mobileprovision
+openssl aes-256-cbc -k "$IOS_ENCRYPTION_SECRET" -in scripts/ios_travis/ios-dist.cer.enc                 -d -a -out scripts/ios_travis/ios-dist.cer
+openssl aes-256-cbc -k "$IOS_ENCRYPTION_SECRET" -in scripts/ios_travis/ios-dist.p12.enc                 -d -a -out scripts/ios_travis/ios-dist.p12
+
 # This is all taken from http://www.objc.io/issue-6/travis-ci.html
 
 # Create a custom keychain

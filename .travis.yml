@@ -72,18 +72,13 @@ install:
 before_script:
  # Set the core file limit to unlimited so a core file is generated upon crash
  - ulimit -c unlimited -S
- # begin iOS code signing
- - openssl aes-256-cbc -k "$IOS_ENCRYPTION_SECRET" -in scripts/ios_travis/ios-in-house.mobileprovision.enc -d -a -out scripts/ios_travis/ios-in-house.mobileprovision
- - openssl aes-256-cbc -k "$IOS_ENCRYPTION_SECRET" -in scripts/ios_travis/ios-dist.cer.enc                 -d -a -out scripts/ios_travis/ios-dist.cer
- - openssl aes-256-cbc -k "$IOS_ENCRYPTION_SECRET" -in scripts/ios_travis/ios-dist.p12.enc                 -d -a -out scripts/ios_travis/ios-dist.p12
- - ./scripts/ios_travis/add-key.sh
- # end iOS code signing
+ - if [[ ${TRAVIS_SECURE_ENV_VARS} == true ]]; then ./scripts/ios_travis/add-key.sh; fi
 
 script:
 - ./scripts/travis_script.sh
 
 after_script:
-- ./scripts/ios_travis/remove-key.sh
+- if [[ ${TRAVIS_SECURE_ENV_VARS} == true ]]; then ./scripts/ios_travis/remove-key.sh; fi
 
 notifications:
   slack:
