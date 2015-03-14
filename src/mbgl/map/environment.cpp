@@ -3,6 +3,7 @@
 
 #include <uv.h>
 
+#include <atomic>
 #include <cassert>
 #include <mutex>
 #include <unordered_map>
@@ -66,6 +67,11 @@ private:
     mutable std::mutex mtx;
 };
 
+unsigned makeEnvironmentID() {
+    static std::atomic<unsigned> id(0);
+    return id++;
+}
+
 ThreadInfoStore threadInfoStore;
 
 } // namespace
@@ -80,7 +86,8 @@ Environment::Scope::~Scope() {
     threadInfoStore.unregisterThread();
 }
 
-Environment::Environment(FileSource& fs) : fileSource(fs), loop(uv_loop_new()) {
+Environment::Environment(FileSource& fs)
+    : id(makeEnvironmentID()), fileSource(fs), loop(uv_loop_new()) {
 }
 
 Environment& Environment::Get() {
@@ -100,6 +107,10 @@ bool Environment::currentlyOn(ThreadType type) {
 
 std::string Environment::threadName() {
     return threadInfoStore.getThreadInfo().name;
+}
+
+unsigned Environment::getID() const {
+    return id;
 }
 
 void Environment::requestAsync(const Resource& resource,

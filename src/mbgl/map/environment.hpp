@@ -41,6 +41,7 @@ public:
     static bool currentlyOn(ThreadType);
     static std::string threadName();
 
+    unsigned getID() const;
     void requestAsync(const Resource&, std::function<void(const Response&)>);
     Request* request(const Resource&, std::function<void(const Response&)>);
     void cancelRequest(Request*);
@@ -49,6 +50,7 @@ public:
     void terminate();
 
 private:
+    unsigned id;
     FileSource& fileSource;
 
 public:
