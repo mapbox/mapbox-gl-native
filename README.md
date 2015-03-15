@@ -37,8 +37,7 @@ The first argument passed to `map.render` is an options object, all keys are opt
     zoom: {zoom}, // number, defaults to 0
     width: {width}, // number (px), defaults to 512
     height: {height}, // number (px), defaults to 512
-    latitude: {latitude}, // number (coordinate), defaults to 0
-    longitude: {longitude}, // number (coordinate), defaults to 0
+    center: [{latitude}, {longitude}], // array of numbers (coordinates), defaults to [0,0]
     bearing: {bearing}, // number (in degrees, counter-clockwise from north), defaults to 0
     ratio: {ratio} // number (scale factor), defaults to 1.0,
     classes: {classes} // array of strings, optional
