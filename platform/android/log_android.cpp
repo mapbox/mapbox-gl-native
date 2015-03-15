@@ -1,8 +1,5 @@
 #include <mbgl/platform/log.hpp>
 
-#define __STDC_FORMAT_MACROS // NDK bug workaround: https://code.google.com/p/android/issues/detail?id=72349
-#include <cinttypes>
-
 #include <android/log.h>
 
 namespace mbgl {
@@ -30,8 +27,8 @@ int severityToPriority(EventSeverity severity) {
 
 } // namespace
 
-void Log::platformRecord(EventSeverity severity, Event event, int64_t code, const std::string &msg) {
-    __android_log_print(severityToPriority(severity), EventClass(event).c_str(), "(%" PRId64 ") %s", code, msg.c_str());
+void Log::platformRecord(EventSeverity severity, const std::string &msg) {
+    __android_log_print(severityToPriority(severity), "mbgl", "%s", msg.c_str());
 }
 
 }

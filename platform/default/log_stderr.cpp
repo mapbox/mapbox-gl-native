@@ -4,8 +4,8 @@
 
 namespace mbgl {
 
-void Log::platformRecord(EventSeverity severity, Event event, int64_t code, const std::string &msg) {
-    std::cerr << "[" << severity << "] " << event << ": (" << code << ") " << msg << std::endl;
+void Log::platformRecord(EventSeverity severity, const std::string &msg) {
+    std::cerr << "[" << severity << "] " << msg << std::endl;
 }
 
 }

@@ -68,7 +68,7 @@ private:
     // This method is the data sink that must be implemented by each platform we
     // support. It should ideally output the error message in a human readable
     // format to the developer.
-    static void platformRecord(EventSeverity severity, Event event, int64_t code, const std::string &msg);
+    static void platformRecord(EventSeverity severity, const std::string &msg);
 };
 
 }
