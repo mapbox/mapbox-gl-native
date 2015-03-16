@@ -46,7 +46,24 @@ Target OS X: 10.9+
 
 ## iOS
 
-If you merely want to install the library for iOS and try it out as an Objective-C consumer, run `./scripts/package_ios.sh`. It requires the Boost headers to be installed, so use [Homebrew](http://brew.sh/) to install them (`brew install boost`). The packaging script will produce the statically-linked `libMapboxGL.a`, `MapboxGL.bundle` for resources, and a `Headers` folder.
+If you merely want to install the library for iOS and try it out as an Objective-C consumer:
+
+0. Use [Homebrew](http://brew.sh/) to install Boost headers: `brew install boost`.
+1. Run `./scripts/package_ios.sh`. The packaging script will produce the statically-linked `libMapboxGL.a`, `MapboxGL.bundle` for resources, and a `Headers` folder.
+2. Copy the contents of `build/ios/pkg/static` into your project. It should happen automatically, but ensure that:
+   - `Headers` is in your *Header Search Paths* (`HEADER_SEARCH_PATHS`) build setting.
+   - `MapboxGL.bundle` is in your target's *Copy Bundle Resources* build phase.
+   - `libMapboxGL.a` is in your target's *Link Binary With Libraries* build phase.
+3. Add the following Cocoa framework dependencies to your target's *Link Binary With Libraries* build phase:
+   - `GLKit.framework`
+   - `ImageIO.framework`
+   - `MobileCoreServices.framework`
+   - `SystemConfiguration.framework`
+   - `libc++.dylib`
+   - `libsqlite3.dylib`
+   - `libz.dylib`
+4. [Set the Mapbox API access token](#mapbox-api-access-tokens).
+5. `#import "MGLMapView.h"`
 
 If you want to build from source and/or contribute to development of the project, run `make iproj`, which will create and open an Xcode project which can build the entire library from source as well as an Objective-C test app.
 
