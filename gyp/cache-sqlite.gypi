@@ -10,12 +10,11 @@
         '../platform/default/sqlite_cache.cpp',
         '../platform/default/sqlite3.hpp',
         '../platform/default/sqlite3.cpp',
-        '../platform/default/compression.hpp',
-        '../platform/default/compression.cpp',
       ],
 
       'include_dirs': [
         '../include',
+        '../src',
       ],
 
       'variables': {

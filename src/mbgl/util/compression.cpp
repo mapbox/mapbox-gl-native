@@ -87,7 +87,7 @@ std::string decompress(const std::string &raw) {
     inflateEnd(&inflate_stream);
 
     if (code != Z_STREAM_END) {
-        throw std::runtime_error(inflate_stream.msg);
+        throw std::runtime_error(inflate_stream.msg ? inflate_stream.msg : "decompression error");
     }
 
     return result;

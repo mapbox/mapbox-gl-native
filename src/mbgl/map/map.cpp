@@ -374,7 +374,7 @@ std::string Map::getStyleJSON() const {
 util::ptr<Sprite> Map::getSprite() {
     const float pixelRatio = state.getPixelRatio();
     const std::string &sprite_url = style->getSpriteURL();
-    if (!sprite || sprite->pixelRatio != pixelRatio) {
+    if (!sprite || !sprite->hasPixelRatio(pixelRatio)) {
         sprite = Sprite::Create(sprite_url, pixelRatio, *env);
     }
 

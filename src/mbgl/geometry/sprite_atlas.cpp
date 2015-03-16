@@ -5,6 +5,7 @@
 #include <mbgl/util/math.hpp>
 #include <mbgl/util/std.hpp>
 #include <mbgl/util/constants.hpp>
+#include <mbgl/util/scaling.hpp>
 
 #include <mbgl/map/sprite.hpp>
 
@@ -64,34 +65,6 @@ bool SpriteAtlas::resize(const float newRatio) {
     }
 
     return dirty;
-}
-
-void copy_bitmap(const uint32_t *src, const int src_stride, const int src_x, const int src_y,
-                uint32_t *dst, const int dst_stride, const int dst_height, const int dst_x, const int dst_y,
-                const int width, const int height, const bool wrap) {
-    if (wrap) {
-
-        for (int y = -1; y <= height; y++) {
-            int dst_y_wrapped = (y + dst_y + dst_height) % dst_height;
-            int src_y_wrapped = ((y + height) % height) + src_y;
-            int srcI = src_y_wrapped * src_stride + src_x;
-            int dstI = dst_y_wrapped * dst_stride;
-            for (int x = -1; x <= width; x++) {
-                int dst_x_wrapped = (x + dst_x + dst_stride) % dst_stride;
-                int src_x_wrapped = (x + width) % width;
-                dst[dstI + dst_x_wrapped] = src[srcI + src_x_wrapped];
-            }
-        }
-
-    } else {
-        dst += dst_y * dst_stride + dst_x;
-        src += src_y * src_stride + src_x;
-        for (int y = 0; y < height; y++, src += src_stride, dst += dst_stride) {
-            for (int x = 0; x < width; x++) {
-                dst[x] = src[x];
-            }
-        }
-    }
 }
 
 Rect<SpriteAtlas::dimension> SpriteAtlas::allocateImage(const size_t pixel_width, const size_t pixel_height) {
@@ -176,25 +149,53 @@ void SpriteAtlas::allocate() {
 
 void SpriteAtlas::copy(const Rect<dimension>& dst, const SpritePosition& src, const bool wrap) {
     if (!sprite->raster) return;
-    const uint32_t *src_img = reinterpret_cast<const uint32_t *>(sprite->raster->getData());
-    if (!src_img) return;
-    allocate();
-    uint32_t *dst_img = reinterpret_cast<uint32_t *>(data);
 
-    copy_bitmap(
-        /* source buffer */  src_img,
-        /* source stride */  sprite->raster->getWidth(),
-        /* source x */       src.x,
-        /* source y */       src.y,
-        /* dest buffer */    dst_img,
-        /* dest stride */    width * pixelRatio,
-        /* dest height */    height * pixelRatio,
-        /* dest x */         dst.x * pixelRatio,
-        /* dest y */         dst.y * pixelRatio,
-        /* icon dimension */ src.width,
-        /* icon dimension */ src.height,
-        /* wrap padding */   wrap
-    );
+    const uint32_t *srcData = reinterpret_cast<const uint32_t *>(sprite->raster->getData());
+    if (!srcData) return;
+    const vec2<uint32_t> srcSize { sprite->raster->getWidth(), sprite->raster->getHeight() };
+    const Rect<uint32_t> srcPos { src.x, src.y, src.width, src.height };
+
+    allocate();
+    uint32_t *dstData = reinterpret_cast<uint32_t *>(data);
+    const vec2<uint32_t> dstSize { static_cast<unsigned int>(width * pixelRatio),
+                                   static_cast<unsigned int>(height * pixelRatio) };
+    const Rect<uint32_t> dstPos { static_cast<uint32_t>(dst.x * pixelRatio),
+                                  static_cast<uint32_t>(dst.y * pixelRatio),
+                                  static_cast<uint32_t>(dst.originalW * pixelRatio),
+                                  static_cast<uint32_t>(dst.originalH * pixelRatio) };
+
+    util::bilinearScale(srcData, srcSize, srcPos, dstData, dstSize, dstPos);
+
+    // Add borders around the copied image if required.
+    if (wrap) {
+        // We're copying from the same image so we don't have to scale again.
+        const uint32_t border = 1;
+        // Left border
+        if (dstPos.x >= border) {
+            util::nearestNeighborScale(
+                dstData, dstSize, { dstPos.x + dstPos.w - border - 1, dstPos.y, border, dstPos.h },
+                dstData, dstSize, { dstPos.x - border, dstPos.y, border, dstPos.h });
+        }
+        // Right border
+        util::nearestNeighborScale(dstData, dstSize, { dstPos.x, dstPos.y, border, dstPos.h },
+                                   dstData, dstSize,
+                                   { dstPos.x + dstPos.w, dstPos.y, border, dstPos.h });
+
+        // Top border
+        if (dstPos.y >= border) {
+            util::nearestNeighborScale(
+                dstData, dstSize, { dstPos.x - border, dstPos.y + dstPos.h - border - 1,
+                                    dstPos.w + 2 * border, border },
+                dstData, dstSize,
+                { dstPos.x - border, dstPos.y - border, dstPos.w + 2 * border, border });
+        }
+
+        // Bottom border
+        util::nearestNeighborScale(
+            dstData, dstSize, { dstPos.x - border, dstPos.y, dstPos.w + 2 * border, border },
+            dstData, dstSize,
+            { dstPos.x - border, dstPos.y + dstPos.h, dstPos.w + 2 * border, border });
+    }
 
     dirty = true;
 }
@@ -236,8 +237,10 @@ void SpriteAtlas::bind(bool linear) {
 #ifndef GL_ES_VERSION_2_0
         MBGL_CHECK_ERROR(glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MAX_LEVEL, 0));
 #endif
-        MBGL_CHECK_ERROR(glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_WRAP_S, GL_REPEAT));
-        MBGL_CHECK_ERROR(glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_WRAP_T, GL_REPEAT));
+        // We are using clamp to edge here since OpenGL ES doesn't allow GL_REPEAT on NPOT textures.
+        // We use those when the pixelRatio isn't a power of two, e.g. on iPhone 6 Plus.
+        MBGL_CHECK_ERROR(glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_WRAP_S, GL_CLAMP_TO_EDGE));
+        MBGL_CHECK_ERROR(glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_WRAP_T, GL_CLAMP_TO_EDGE));
         first = true;
     } else {
         MBGL_CHECK_ERROR(glBindTexture(GL_TEXTURE_2D, texture));
@@ -255,7 +258,7 @@ void SpriteAtlas::bind(bool linear) {
         allocate();
 
         if (first) {
-            glTexImage2D(
+            MBGL_CHECK_ERROR(glTexImage2D(
                 GL_TEXTURE_2D, // GLenum target
                 0, // GLint level
                 GL_RGBA, // GLint internalformat
@@ -265,9 +268,9 @@ void SpriteAtlas::bind(bool linear) {
                 GL_RGBA, // GLenum format
                 GL_UNSIGNED_BYTE, // GLenum type
                 data // const GLvoid * data
-            );
+            ));
         } else {
-            glTexSubImage2D(
+            MBGL_CHECK_ERROR(glTexSubImage2D(
                 GL_TEXTURE_2D, // GLenum target
                 0, // GLint level
                 0, // GLint xoffset
@@ -277,12 +280,14 @@ void SpriteAtlas::bind(bool linear) {
                 GL_RGBA, // GLenum format
                 GL_UNSIGNED_BYTE, // GLenum type
                 data // const GLvoid *pixels
-            );
+            ));
         }
 
         dirty = false;
 
-        // platform::show_color_debug_image("Sprite Atlas", reinterpret_cast<const char *>(data), width, height, width * pixelRatio, height * pixelRatio);
+#ifndef GL_ES_VERSION_2_0
+        // platform::showColorDebugImage("Sprite Atlas", reinterpret_cast<const char *>(data), width * pixelRatio, height * pixelRatio, width * pixelRatio, height * pixelRatio);
+#endif
     }
 };
 

@@ -32,7 +32,7 @@ util::ptr<Sprite> Sprite::Create(const std::string &base_url, float pixelRatio, 
 
 Sprite::Sprite(const Key &, const std::string& base_url, float pixelRatio_)
     : valid(base_url.length() > 0),
-      pixelRatio(pixelRatio_),
+      pixelRatio(pixelRatio_ > 1 ? 2 : 1),
       spriteURL(base_url + (pixelRatio_ > 1 ? "@2x" : "") + ".png"),
       jsonURL(base_url + (pixelRatio_ > 1 ? "@2x" : "") + ".json"),
       raster(),
@@ -40,6 +40,11 @@ Sprite::Sprite(const Key &, const std::string& base_url, float pixelRatio_)
       loadedJSON(false),
       future(promise.get_future()) {
 }
+
+bool Sprite::hasPixelRatio(float ratio) const {
+    return pixelRatio == (ratio > 1 ? 2 : 1);
+}
+
 
 void Sprite::waitUntilLoaded() const {
     future.wait();

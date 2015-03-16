@@ -24,10 +24,10 @@ const std::string &applicationRoot();
 const std::string &assetRoot();
 
 // Shows an alpha image with the specified dimensions in a named window.
-void show_debug_image(std::string name, const char *data, size_t width, size_t height);
+void showDebugImage(std::string name, const char *data, size_t width, size_t height);
 
 // Shows an alpha image with the specified dimensions in a named window.
-void show_color_debug_image(std::string name, const char *data, size_t logical_width, size_t logical_height, size_t width, size_t height);
+void showColorDebugImage(std::string name, const char *data, size_t logical_width, size_t logical_height, size_t width, size_t height);
 }
 }
 

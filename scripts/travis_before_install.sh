@@ -31,6 +31,9 @@ if [[ ${TRAVIS_OS_NAME} == "linux" ]]; then
                                 x11proto-xf86vidmode-dev libxxf86vm-dev \
                                 libxcursor-dev libxinerama-dev \
                                 llvm-3.4 # required for mesa
+
+        mapbox_time "install_mesa" \
+        mason install mesa 10.4.3
     fi
 
     mapbox_time "install_awscli" \
