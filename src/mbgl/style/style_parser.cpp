@@ -245,23 +245,6 @@ std::tuple<bool, std::array<float, 2>> StyleParser::parseProperty(JSVal value, c
 }
 
 template <>
-std::tuple<bool, Font> StyleParser::parseProperty(JSVal value, const char* property_name) {
-    if (value.IsArray()) {
-        std::string joinedFonts = "";
-        for (rapidjson::SizeType i = 0; i < value.Size(); ++i) {
-            joinedFonts += replaceConstant(value[i]).GetString();
-            if (i < value.Size() - 1) {
-                joinedFonts += ",";
-            }
-        }
-        return std::tuple<bool, Font> { true, { joinedFonts } };
-    } else {
-        Log::Warning(Event::ParseStyle, "value of '%s' must be an array of strings", property_name);
-        return std::tuple<bool, Font> { false, { "" } };
-    }
-}
-
-template <>
 std::tuple<bool, float> StyleParser::parseProperty(JSVal value, const char* property_name) {
     JSVal rvalue = replaceConstant(value);
     if (rvalue.IsNumber()) {
@@ -382,27 +365,13 @@ std::tuple<bool, PiecewiseConstantFunction<T>> StyleParser::parsePiecewiseConsta
     return std::tuple<bool, PiecewiseConstantFunction<T>> { true, { std::get<1>(stops), duration } };
 }
 
-bool StyleParser::setPropertyInternal(std::tuple<bool, Font> res, PropertyKey key, ClassProperties &klass) {
-    if (std::get<0>(res)) {
-        Font font = std::get<1>(res);
-        std::string name = font.name;
-        klass.set(key, name);
-    }
-    return std::get<0>(res);
-}
-
 template <typename T>
-bool StyleParser::setPropertyInternal(std::tuple<bool, T> res, PropertyKey key, ClassProperties &klass) {
+bool StyleParser::setProperty(JSVal value, const char *property_name, PropertyKey key, ClassProperties &klass) {
+    auto res = parseProperty<T>(value, property_name);
     if (std::get<0>(res)) {
         klass.set(key, std::get<1>(res));
     }
     return std::get<0>(res);
-}
-
-template <typename T>
-bool StyleParser::setProperty(JSVal value, const char *property_name, PropertyKey key, ClassProperties &klass) {
-    auto res = parseProperty<T>(value, property_name);
-    return setPropertyInternal(res, key, klass);
 }
 
 template <typename T>
@@ -451,12 +420,32 @@ bool StyleParser::parseOptionalProperty(const char *property_name, PropertyKey k
 
 
 template<> std::tuple<bool, std::string> StyleParser::parseProperty(JSVal value, const char *property_name) {
-    if (!value.IsString()) {
+    if (strncmp(property_name, "text-font", 9) == 0) {
+        if (!value.IsArray()) {
+            Log::Warning(Event::ParseStyle, "value of '%s' must be an array of strings", property_name);
+            return std::tuple<bool, std::string> { false, std::string() };
+        } else {
+            std::string result = "";
+            for (rapidjson::SizeType i = 0; i < value.Size(); ++i) {
+                JSVal stop = value[i];
+                if (stop.IsString()) {
+                    result += stop.GetString();
+                    if (i < value.Size()) {
+                        result += ",";
+                    }
+                } else {
+                    Log::Warning(Event::ParseStyle, "text-font members must be strings");
+                    return std::tuple<bool, std::string> { false, {}};
+                }
+            }
+            return std::tuple<bool, std::string> { true, { result, result.length() } };
+        }
+    } else if (!value.IsString()) {
         Log::Warning(Event::ParseStyle, "value of '%s' must be a string", property_name);
         return std::tuple<bool, std::string> { false, std::string() };
+    } else {
+        return std::tuple<bool, std::string> { true, { value.GetString(), value.GetStringLength() } };
     }
-
-    return std::tuple<bool, std::string> { true, { value.GetString(), value.GetStringLength() } };
 }
 
 template<> std::tuple<bool, bool> StyleParser::parseProperty(JSVal value, const char *property_name) {
@@ -881,7 +870,7 @@ void StyleParser::parseLayout(JSVal value, util::ptr<StyleBucket> &bucket) {
     parseOptionalProperty<Function<std::array<float, 2>>>("icon-offset", Key::IconOffset, bucket->layout, value);
     parseOptionalProperty<Function<RotationAlignmentType>>("text-rotation-alignment", Key::TextRotationAlignment, bucket->layout, value);
     parseOptionalProperty<Function<std::string>>("text-field", Key::TextField, bucket->layout, value);
-    parseOptionalProperty<Function<Font>>("text-font", Key::TextFont, bucket->layout, value);
+    parseOptionalProperty<Function<std::string>>("text-font", Key::TextFont, bucket->layout, value);
     parseOptionalProperty<Function<float>>("text-max-size", Key::TextMaxSize, bucket->layout, value);
     parseOptionalProperty<Function<float>>("text-max-width", Key::TextMaxWidth, bucket->layout, value);
     parseOptionalProperty<Function<float>>("text-line-height", Key::TextLineHeight, bucket->layout, value);
