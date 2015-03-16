@@ -128,8 +128,8 @@ if [ ! -z ${GLFW_VERSION} ]; then
 fi
 
 if [ ${MASON_PLATFORM} == 'linux' ]; then
-    CONFIG+="    'opengl_cflags%': $(quote_flags $(pkg-config gl --cflags)),"$LN
-    CONFIG+="    'opengl_ldflags%': $(quote_flags $(pkg-config gl --libs)),"$LN
+    CONFIG+="    'opengl_cflags%': $(quote_flags $(pkg-config gl x11 --cflags)),"$LN
+    CONFIG+="    'opengl_ldflags%': $(quote_flags $(pkg-config gl x11 --libs)),"$LN
 else
     CONFIG+="    'opengl_cflags%': $(quote_flags),"$LN
     CONFIG+="    'opengl_ldflags%': $(quote_flags),"$LN
