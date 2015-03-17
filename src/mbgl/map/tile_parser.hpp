@@ -58,7 +58,7 @@ protected:
     template <class Bucket>
     void addBucketGeometries(Bucket&, const GeometryTileLayer&, const FilterExpression&);
 
-protected:
+private:
     const GeometryTile* geometryTile;
     VectorTileData& tile;
 
