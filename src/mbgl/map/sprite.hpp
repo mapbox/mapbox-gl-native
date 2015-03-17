@@ -43,6 +43,8 @@ public:
 
     const SpritePosition &getSpritePosition(const std::string& name) const;
 
+    bool hasPixelRatio(float ratio) const;
+
     void waitUntilLoaded() const;
     bool isLoaded() const;
 

@@ -38,6 +38,7 @@
         'headless/headless.cpp',
 
         'miscellaneous/clip_ids.cpp',
+        'miscellaneous/bilinear.cpp',
         'miscellaneous/comparisons.cpp',
         'miscellaneous/enums.cpp',
         'miscellaneous/functions.cpp',
