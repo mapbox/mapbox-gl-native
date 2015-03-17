@@ -23,22 +23,22 @@ enum class FeatureType : uint8_t {
 
 typedef std::vector<std::vector<Coordinate>> GeometryCollection;
 
-class GeometryTileFeature : public mbgl::util::noncopyable {
+class GeometryTileFeature : private util::noncopyable {
 public:
     virtual FeatureType getType() const = 0;
     virtual mapbox::util::optional<Value> getValue(const std::string& key) const = 0;
     virtual GeometryCollection getGeometries() const = 0;
 };
 
-class GeometryTileLayer : public mbgl::util::noncopyable {
+class GeometryTileLayer : private util::noncopyable {
 public:
     virtual std::size_t featureCount() const = 0;
-    virtual util::ptr<const GeometryTileFeature> feature(std::size_t i) const = 0;
+    virtual util::ptr<const GeometryTileFeature> feature(std::size_t) const = 0;
 };
 
-class GeometryTile : public mbgl::util::noncopyable {
+class GeometryTile : private util::noncopyable {
 public:
-    virtual util::ptr<const GeometryTileLayer> getLayer(const std::string&) const = 0;
+    virtual util::ptr<GeometryTileLayer> getLayer(const std::string&) const = 0;
 };
 
 class GeometryTileFeatureExtractor {
