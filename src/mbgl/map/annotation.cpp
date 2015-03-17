@@ -112,10 +112,9 @@ std::vector<Tile::ID> AnnotationManager::removeAnnotations(std::vector<uint32_t>
             for (auto& tile_it : annotationTiles) {
                 auto features_it = annotation->tileFeatures.find(tile_it.first);
                 if (features_it != annotation->tileFeatures.end()) {
-                    auto layer = tile_it.second.second->getLayer(util::ANNOTATIONS_POINTS_LAYER_ID);
-                    auto liveLayer = std::static_pointer_cast<LiveTileLayer>(layer);
+                    auto layer = tile_it.second.second->getMutableLayer(util::ANNOTATIONS_POINTS_LAYER_ID);
                     auto& features = features_it->second;
-                    liveLayer->removeFeature(features[0]);
+                    layer->removeFeature(features[0]);
                     affectedTiles.push_back(tile_it.first);
                 }
             }
