@@ -159,7 +159,7 @@ public:
 
     inline const TransformState &getState() const { return state; }
     inline std::chrono::steady_clock::time_point getTime() const { return animationTime; }
-    inline util::ptr<AnnotationManager> getAnnotationManager() const { return annotationManager; }
+    inline AnnotationManager& getAnnotationManager() const { return *annotationManager; }
 
 private:
     // This may only be called by the View object.
