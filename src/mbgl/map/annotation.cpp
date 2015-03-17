@@ -74,9 +74,8 @@ std::pair<std::vector<Tile::ID>, std::vector<uint32_t>> AnnotationManager::addPo
             auto tile_it = annotationTiles.find(tileID);
             if (tile_it != annotationTiles.end()) {
                 // get point layer & add feature
-                auto layer = tile_it->second.second->getLayer(util::ANNOTATIONS_POINTS_LAYER_ID);
-                auto liveLayer = std::static_pointer_cast<LiveTileLayer>(layer);
-                liveLayer->addFeature(feature);
+                auto layer = tile_it->second.second->getMutableLayer(util::ANNOTATIONS_POINTS_LAYER_ID);
+                layer->addFeature(feature);
                 // record annotation association with tile
                 tile_it->second.first.push_back(annotationID);
             } else {

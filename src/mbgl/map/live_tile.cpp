@@ -42,6 +42,10 @@ void LiveTile::addLayer(const std::string& name, util::ptr<LiveTileLayer> layer)
 }
 
 util::ptr<GeometryTileLayer> LiveTile::getLayer(const std::string& name) const {
+    return getMutableLayer(name);
+}
+
+util::ptr<LiveTileLayer> LiveTile::getMutableLayer(const std::string& name) const {
     auto layer_it = layers.find(name);
     if (layer_it != layers.end()) {
         return layer_it->second;

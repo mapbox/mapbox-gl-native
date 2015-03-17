@@ -41,6 +41,7 @@ public:
 
     void addLayer(const std::string&, util::ptr<LiveTileLayer>);
     util::ptr<GeometryTileLayer> getLayer(const std::string&) const override;
+    util::ptr<LiveTileLayer> getMutableLayer(const std::string&) const;
     bool operator()(const LiveTile&) const { return layers.size() > 0; }
 
 private:
