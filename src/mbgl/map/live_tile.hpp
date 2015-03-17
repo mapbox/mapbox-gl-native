@@ -7,7 +7,7 @@
 
 namespace mbgl {
 
-class LiveTileFeature : public GeometryTileFeature, private util::noncopyable {
+class LiveTileFeature : public GeometryTileFeature {
 public:
     LiveTileFeature(FeatureType, GeometryCollection, std::map<std::string, std::string> = {{}});
 
@@ -21,7 +21,7 @@ private:
     GeometryCollection geometries;
 };
 
-    class LiveTileLayer : public GeometryTileLayer, private util::noncopyable {
+    class LiveTileLayer : public GeometryTileLayer {
 public:
     LiveTileLayer();
 
@@ -35,7 +35,7 @@ private:
     std::vector<util::ptr<const LiveTileFeature>> features;
 };
 
-class LiveTile : public GeometryTile, private util::noncopyable {
+class LiveTile : public GeometryTile {
 public:
     LiveTile();
 
