@@ -39,6 +39,8 @@ class LineAtlas;
 class Environment;
 class AnnotationManager;
 
+typedef std::vector<LatLng> AnnotationSegment;
+
 class Map : private util::noncopyable {
     friend class View;
 
