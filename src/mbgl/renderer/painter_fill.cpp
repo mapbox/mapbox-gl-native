@@ -36,8 +36,8 @@ void Painter::renderFill(FillBucket& bucket, const StyleLayer &layer_desc, const
 
     const bool pattern = properties.image.from.size();
 
-    bool outline = properties.antialias && !pattern && properties.stroke_color != properties.fill_color;
-    bool fringeline = properties.antialias && !pattern && properties.stroke_color == properties.fill_color;
+    bool outline = properties.antialias && !pattern && stroke_color != fill_color;
+    bool fringeline = properties.antialias && !pattern && stroke_color == fill_color;
 
     // Because we're drawing top-to-bottom, and we update the stencil mask
     // befrom, we have to draw the outline first (!)
