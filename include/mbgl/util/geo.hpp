@@ -25,6 +25,13 @@ struct LatLngBounds {
 
     inline LatLngBounds(LatLng sw_ = {90, 180}, LatLng ne_ = {-90, -180})
         : sw(sw_), ne(ne_) {}
+
+    inline void extend(const LatLng& point) {
+        if (point.latitude < sw.latitude) sw.latitude = point.latitude;
+        if (point.latitude > ne.latitude) ne.latitude = point.latitude;
+        if (point.longitude < sw.longitude) sw.longitude = point.longitude;
+        if (point.longitude > ne.longitude) ne.longitude = point.longitude;
+    }
 };
 
 }

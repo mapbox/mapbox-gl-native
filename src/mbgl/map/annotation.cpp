@@ -12,16 +12,11 @@ Annotation::Annotation(AnnotationType type_, std::vector<AnnotationSegment> geom
     if (type == AnnotationType::Point) {
         bounds = LatLngBounds(getPoint(), getPoint());
     } else {
-        LatLng sw, ne;
         for (auto segment : geometry) {
             for (auto point : segment) {
-                if (point.latitude < sw.latitude) sw.latitude = point.latitude;
-                if (point.latitude > ne.latitude) ne.latitude = point.latitude;
-                if (point.longitude < sw.longitude) sw.longitude = point.longitude;
-                if (point.longitude > ne.longitude) ne.longitude = point.longitude;
+                bounds.extend(point);
             }
         }
-        bounds = LatLngBounds(sw, ne);
     }
 }
 
