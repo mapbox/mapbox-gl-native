@@ -158,19 +158,15 @@ std::vector<uint32_t> AnnotationManager::getAnnotationsInBounds(LatLngBounds que
 }
 
 LatLngBounds AnnotationManager::getBoundsForAnnotations(std::vector<uint32_t> ids) const {
-    LatLng sw, ne;
+    LatLngBounds bounds;
     for (auto id : ids) {
         auto annotation_it = annotations.find(id);
         if (annotation_it != annotations.end()) {
-            auto bounds = annotation_it->second->getBounds();
-            if (bounds.sw.latitude < sw.latitude) sw.latitude = bounds.sw.latitude;
-            if (bounds.ne.latitude > ne.latitude) ne.latitude = bounds.ne.latitude;
-            if (bounds.sw.longitude < sw.longitude) sw.longitude = bounds.sw.longitude;
-            if (bounds.ne.longitude > ne.longitude) ne.longitude = bounds.ne.longitude;
+            bounds.extend(annotation_it->second->getPoint());
         }
     }
 
-    return LatLngBounds(sw, ne);
+    return bounds;
 }
 
 const std::unique_ptr<LiveTile>& AnnotationManager::getTile(Tile::ID const& id) {
