@@ -148,7 +148,6 @@ std::vector<uint32_t> AnnotationManager::getAnnotationsInBoundingBox(BoundingBox
                     // check tile's annotations' bounding boxes
                     std::copy_if(tile.second.first.begin(), tile.second.first.end(),
                                  std::back_inserter(matchingAnnotations), [&](const uint32_t annotationID) -> bool {
-                        printf("checking annotation %i\n", annotationID);
                         BoundingBox annoBbox = this->annotations.find(annotationID)->second->getBoundingBox();
                         return (annoBbox.sw.latitude >= queryBbox.sw.latitude &&
                                 annoBbox.ne.latitude <= queryBbox.ne.latitude &&
