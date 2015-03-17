@@ -17,7 +17,6 @@
 #include <mbgl/text/collision.hpp>
 #include <mbgl/text/glyph.hpp>
 #include <mbgl/map/map.hpp>
-
 #include <mbgl/util/std.hpp>
 #include <mbgl/util/utf.hpp>
 
@@ -30,14 +29,14 @@ namespace mbgl {
 // its header file.
 TileParser::~TileParser() = default;
 
-TileParser::TileParser(const std::string& rawData_,
+TileParser::TileParser(const GeometryTile& geometryTile_,
                        VectorTileData& tile_,
                        const util::ptr<const Style>& style_,
                        GlyphAtlas& glyphAtlas_,
                        GlyphStore& glyphStore_,
                        SpriteAtlas& spriteAtlas_,
                        const util::ptr<Sprite>& sprite_)
-    : vectorTile(pbf((const uint8_t *)rawData_.data(), rawData_.size())),
+    : geometryTile(geometryTile_),
       tile(tile_),
       style(style_),
       glyphAtlas(glyphAtlas_),
@@ -188,7 +187,7 @@ std::unique_ptr<Bucket> TileParser::createBucket(const StyleBucket &bucketDesc) 
     if (tile.id.z >= std::ceil(bucketDesc.max_zoom)) return nullptr;
     if (bucketDesc.visibility == mbgl::VisibilityType::None) return nullptr;
 
-    auto layer = vectorTile.getLayer(bucketDesc.source_layer);
+    auto layer = geometryTile.getLayer(bucketDesc.source_layer);
     if (layer) {
         if (bucketDesc.type == StyleLayerType::Fill) {
             return createFillBucket(*layer, bucketDesc);

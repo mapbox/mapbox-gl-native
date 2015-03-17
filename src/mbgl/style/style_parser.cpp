@@ -29,6 +29,37 @@ void StyleParser::parse(JSVal document) {
     if (document.HasMember("layers")) {
         root = createLayers(document["layers"]);
         parseLayers();
+
+        // create point annotations layer
+        //
+        std::string id = util::ANNOTATIONS_POINTS_LAYER_ID;
+
+        std::map<ClassID, ClassProperties> paints;
+        util::ptr<StyleLayer> annotations = std::make_shared<StyleLayer>(id, std::move(paints));
+        annotations->type = StyleLayerType::Symbol;
+        layers.emplace(id, std::pair<JSVal, util::ptr<StyleLayer>> { JSVal(id), annotations });
+        root->layers.emplace_back(annotations);
+
+        util::ptr<StyleBucket> pointBucket = std::make_shared<StyleBucket>(annotations->type);
+        pointBucket->name = annotations->id;
+        pointBucket->source_layer = annotations->id;
+
+        rapidjson::Document d;
+        rapidjson::Value iconImage(rapidjson::kObjectType);
+        iconImage.AddMember("icon-image", "{sprite}", d.GetAllocator());
+        parseLayout(iconImage, pointBucket);
+        rapidjson::Value iconOverlap(rapidjson::kObjectType);
+        iconOverlap.AddMember("icon-allow-overlap", true, d.GetAllocator());
+        parseLayout(iconOverlap, pointBucket);
+
+        SourceInfo& info = sources.emplace(id, std::make_shared<StyleSource>()).first->second->info;
+        info.type = SourceType::Annotations;
+
+        auto source_it = sources.find(id);
+        pointBucket->style_source = source_it->second;
+        annotations->bucket = pointBucket;
+        //
+        // end point annotations
     }
 
     if (document.HasMember("sprite")) {

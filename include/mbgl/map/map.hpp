@@ -37,6 +37,7 @@ class GlyphAtlas;
 class SpriteAtlas;
 class LineAtlas;
 class Environment;
+class AnnotationManager;
 
 class Map : private util::noncopyable {
     friend class View;
@@ -140,6 +141,15 @@ public:
     inline const vec2<double> pixelForLatLng(const LatLng latLng) const { return state.pixelForLatLng(latLng); }
     inline const LatLng latLngForPixel(const vec2<double> pixel) const { return state.latLngForPixel(pixel); }
 
+    // Annotations
+    void setDefaultPointAnnotationSymbol(std::string&);
+    uint32_t addPointAnnotation(LatLng, std::string& symbol);
+    std::vector<uint32_t> addPointAnnotations(std::vector<LatLng>, std::vector<std::string>& symbols);
+    void removeAnnotation(uint32_t);
+    void removeAnnotations(std::vector<uint32_t>);
+    std::vector<uint32_t> getAnnotationsInBounds(LatLngBounds) const;
+    LatLngBounds getBoundsForAnnotations(std::vector<uint32_t>) const;
+
     // Debug
     void setDebug(bool value);
     void toggleDebug();
@@ -147,6 +157,7 @@ public:
 
     inline const TransformState &getState() const { return state; }
     inline std::chrono::steady_clock::time_point getTime() const { return animationTime; }
+    inline AnnotationManager& getAnnotationManager() const { return *annotationManager; }
 
 private:
     // This may only be called by the View object.
@@ -169,6 +180,8 @@ private:
     // Prepares a map render by updating the tiles we need for the current view, as well as updating
     // the stylesheet.
     void prepare();
+
+    void updateAnnotationTiles(std::vector<Tile::ID>&);
 
     enum class Mode : uint8_t {
         None, // we're not doing any processing
@@ -219,8 +232,8 @@ private:
     util::ptr<Sprite> sprite;
     const std::unique_ptr<LineAtlas> lineAtlas;
     util::ptr<TexturePool> texturePool;
-
     const std::unique_ptr<Painter> painter;
+    util::ptr<AnnotationManager> annotationManager;
 
     std::string styleURL;
     std::string styleJSON = "";

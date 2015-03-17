@@ -4,6 +4,7 @@
 #include <mbgl/platform/platform.hpp>
 #include <mbgl/map/source.hpp>
 #include <mbgl/renderer/painter.hpp>
+#include <mbgl/map/annotation.hpp>
 #include <mbgl/map/sprite.hpp>
 #include <mbgl/util/transition.hpp>
 #include <mbgl/util/math.hpp>
@@ -70,7 +71,8 @@ Map::Map(View& view_, FileSource& fileSource_)
       spriteAtlas(util::make_unique<SpriteAtlas>(512, 512)),
       lineAtlas(util::make_unique<LineAtlas>(512, 512)),
       texturePool(std::make_shared<TexturePool>()),
-      painter(util::make_unique<Painter>(*spriteAtlas, *glyphAtlas, *lineAtlas))
+      painter(util::make_unique<Painter>(*spriteAtlas, *glyphAtlas, *lineAtlas)),
+      annotationManager(util::make_unique<AnnotationManager>())
 {
     view.initialize(this);
 }
@@ -536,6 +538,57 @@ const std::string &Map::getAccessToken() const {
     return accessToken;
 }
 
+#pragma mark - Annotations
+
+void Map::setDefaultPointAnnotationSymbol(std::string& symbol) {
+    assert(std::this_thread::get_id() == mainThread);
+    annotationManager->setDefaultPointAnnotationSymbol(symbol);
+}
+
+uint32_t Map::addPointAnnotation(LatLng point, std::string& symbol) {
+    assert(std::this_thread::get_id() == mainThread);
+    std::vector<LatLng> points({ point });
+    std::vector<std::string> symbols({ symbol });
+    return addPointAnnotations(points, symbols)[0];
+}
+
+std::vector<uint32_t> Map::addPointAnnotations(std::vector<LatLng> points, std::vector<std::string>& symbols) {
+    assert(std::this_thread::get_id() == mainThread);
+    auto result = annotationManager->addPointAnnotations(points, symbols, *this);
+    updateAnnotationTiles(result.first);
+    return result.second;
+}
+
+void Map::removeAnnotation(uint32_t annotation) {
+    assert(std::this_thread::get_id() == mainThread);
+    removeAnnotations({ annotation });
+}
+
+void Map::removeAnnotations(std::vector<uint32_t> annotations) {
+    assert(std::this_thread::get_id() == mainThread);
+    auto result = annotationManager->removeAnnotations(annotations);
+    updateAnnotationTiles(result);
+}
+
+std::vector<uint32_t> Map::getAnnotationsInBounds(LatLngBounds bounds) const {
+    assert(std::this_thread::get_id() == mainThread);
+    return annotationManager->getAnnotationsInBounds(bounds, *this);
+}
+
+LatLngBounds Map::getBoundsForAnnotations(std::vector<uint32_t> annotations) const {
+    assert(std::this_thread::get_id() == mainThread);
+    return annotationManager->getBoundsForAnnotations(annotations);
+}
+
+void Map::updateAnnotationTiles(std::vector<Tile::ID>& ids) {
+    for (const auto &source : activeSources) {
+        if (source->info.type == SourceType::Annotations) {
+            source->source->invalidateTiles(*this, ids);
+            return;
+        }
+    }
+}
+
 #pragma mark - Toggles
 
 void Map::setDebug(bool value) {
@@ -643,6 +696,7 @@ void Map::updateSources(const util::ptr<StyleLayerGroup> &group) {
         if (layer->bucket && layer->bucket->style_source) {
             (*activeSources.emplace(layer->bucket->style_source).first)->enabled = true;
         }
+
     }
 }
 

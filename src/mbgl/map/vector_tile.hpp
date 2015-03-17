@@ -48,10 +48,10 @@ class VectorTile : public GeometryTile {
 public:
     VectorTile(pbf);
 
-    util::ptr<const GeometryTileLayer> getLayer(const std::string&) const override;
+    util::ptr<GeometryTileLayer> getLayer(const std::string&) const override;
 
 private:
-    std::unordered_map<std::string, util::ptr<const GeometryTileLayer>> layers;
+    std::unordered_map<std::string, util::ptr<GeometryTileLayer>> layers;
 };
 
 }
