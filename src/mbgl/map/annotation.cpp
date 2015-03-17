@@ -10,7 +10,7 @@ Annotation::Annotation(AnnotationType type_, std::vector<AnnotationSegment> geom
     : type(type_),
       geometry(geometry_) {
     if (type == AnnotationType::Point) {
-        bbox = BoundingBox(getPoint(), getPoint());
+        bounds = LatLngBounds(getPoint(), getPoint());
     } else {
         LatLng sw, ne;
         for (auto segment : geometry) {
@@ -21,7 +21,7 @@ Annotation::Annotation(AnnotationType type_, std::vector<AnnotationSegment> geom
                 if (point.longitude > ne.longitude) ne.longitude = point.longitude;
             }
         }
-        bbox = BoundingBox(sw, ne);
+        bounds = LatLngBounds(sw, ne);
     }
 }
 
@@ -125,11 +125,11 @@ std::vector<Tile::ID> AnnotationManager::removeAnnotations(std::vector<uint32_t>
     return affectedTiles;
 }
 
-std::vector<uint32_t> AnnotationManager::getAnnotationsInBoundingBox(BoundingBox queryBbox) const {
+std::vector<uint32_t> AnnotationManager::getAnnotationsInBounds(LatLngBounds queryBounds) const {
     uint8_t z = map.getMaxZoom();
     uint32_t z2 = 1 << z;
-    vec2<double> swPoint = projectPoint(queryBbox.sw);
-    vec2<double> nePoint = projectPoint(queryBbox.ne);
+    vec2<double> swPoint = projectPoint(queryBounds.sw);
+    vec2<double> nePoint = projectPoint(queryBounds.ne);
 
     // tiles number y from top down
     Tile::ID nwTile(z, swPoint.x * z2, nePoint.y * z2);
@@ -148,11 +148,11 @@ std::vector<uint32_t> AnnotationManager::getAnnotationsInBoundingBox(BoundingBox
                     // check tile's annotations' bounding boxes
                     std::copy_if(tile.second.first.begin(), tile.second.first.end(),
                                  std::back_inserter(matchingAnnotations), [&](const uint32_t annotationID) -> bool {
-                        BoundingBox annoBbox = this->annotations.find(annotationID)->second->getBoundingBox();
-                        return (annoBbox.sw.latitude >= queryBbox.sw.latitude &&
-                                annoBbox.ne.latitude <= queryBbox.ne.latitude &&
-                                annoBbox.sw.longitude >= queryBbox.sw.longitude &&
-                                annoBbox.ne.longitude <= queryBbox.ne.longitude);
+                        LatLngBounds annoBounds = this->annotations.find(annotationID)->second->getBounds();
+                        return (annoBounds.sw.latitude >= queryBounds.sw.latitude &&
+                                annoBounds.ne.latitude <= queryBounds.ne.latitude &&
+                                annoBounds.sw.longitude >= queryBounds.sw.longitude &&
+                                annoBounds.ne.longitude <= queryBounds.ne.longitude);
                     });
                 }
             }
@@ -162,20 +162,20 @@ std::vector<uint32_t> AnnotationManager::getAnnotationsInBoundingBox(BoundingBox
     return matchingAnnotations;
 }
 
-BoundingBox AnnotationManager::getBoundingBoxForAnnotations(std::vector<uint32_t> ids) const {
+LatLngBounds AnnotationManager::getBoundsForAnnotations(std::vector<uint32_t> ids) const {
     LatLng sw, ne;
     for (auto id : ids) {
         auto annotation_it = annotations.find(id);
         if (annotation_it != annotations.end()) {
-            auto bbox = annotation_it->second->getBoundingBox();
-            if (bbox.sw.latitude < sw.latitude) sw.latitude = bbox.sw.latitude;
-            if (bbox.ne.latitude > ne.latitude) ne.latitude = bbox.ne.latitude;
-            if (bbox.sw.longitude < sw.longitude) sw.longitude = bbox.sw.longitude;
-            if (bbox.ne.longitude > ne.longitude) ne.longitude = bbox.ne.longitude;
+            auto bounds = annotation_it->second->getBounds();
+            if (bounds.sw.latitude < sw.latitude) sw.latitude = bounds.sw.latitude;
+            if (bounds.ne.latitude > ne.latitude) ne.latitude = bounds.ne.latitude;
+            if (bounds.sw.longitude < sw.longitude) sw.longitude = bounds.sw.longitude;
+            if (bounds.ne.longitude > ne.longitude) ne.longitude = bounds.ne.longitude;
         }
     }
 
-    return BoundingBox(sw, ne);
+    return LatLngBounds(sw, ne);
 }
 
 const std::unique_ptr<LiveTile>& AnnotationManager::getTile(Tile::ID const& id) {

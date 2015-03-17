@@ -570,14 +570,14 @@ void Map::removeAnnotations(std::vector<uint32_t> annotations) {
     updateAnnotationTiles(result);
 }
 
-std::vector<uint32_t> Map::getAnnotationsInBoundingBox(BoundingBox bbox) const {
+std::vector<uint32_t> Map::getAnnotationsInBounds(LatLngBounds bounds) const {
     assert(std::this_thread::get_id() == mainThread);
-    return annotationManager->getAnnotationsInBoundingBox(bbox);
+    return annotationManager->getAnnotationsInBounds(bounds);
 }
 
-BoundingBox Map::getBoundingBoxForAnnotations(std::vector<uint32_t> annotations) const {
+LatLngBounds Map::getBoundsForAnnotations(std::vector<uint32_t> annotations) const {
     assert(std::this_thread::get_id() == mainThread);
-    return annotationManager->getBoundingBoxForAnnotations(annotations);
+    return annotationManager->getBoundsForAnnotations(annotations);
 }
 
 void Map::updateAnnotationTiles(std::vector<Tile::ID>& ids) {

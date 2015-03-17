@@ -31,8 +31,8 @@ public:
     void setDefaultPointAnnotationSymbol(std::string& symbol) { defaultPointAnnotationSymbol = symbol; }
     std::pair<std::vector<Tile::ID>, std::vector<uint32_t>> addPointAnnotations(std::vector<LatLng>, std::vector<std::string>& symbols);
     std::vector<Tile::ID> removeAnnotations(std::vector<uint32_t>);
-    std::vector<uint32_t> getAnnotationsInBoundingBox(BoundingBox) const;
-    BoundingBox getBoundingBoxForAnnotations(std::vector<uint32_t>) const;
+    std::vector<uint32_t> getAnnotationsInBounds(LatLngBounds) const;
+    LatLngBounds getBoundsForAnnotations(std::vector<uint32_t>) const;
 
     const std::unique_ptr<LiveTile>& getTile(Tile::ID const& id);
 
@@ -55,7 +55,7 @@ public:
     Annotation(AnnotationType, std::vector<AnnotationSegment>);
 
     LatLng getPoint() const { return geometry[0][0]; }
-    BoundingBox getBoundingBox() const { return bbox; }
+    LatLngBounds getBounds() const { return bounds; }
 
 public:
     const AnnotationType type = AnnotationType::Point;
@@ -63,7 +63,7 @@ public:
     std::map<Tile::ID, std::vector<std::weak_ptr<const LiveTileFeature>>> tileFeatures;
 
 private:
-    BoundingBox bbox;
+    LatLngBounds bounds;
 };
 
 }

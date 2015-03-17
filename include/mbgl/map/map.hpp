@@ -149,8 +149,8 @@ public:
     std::vector<uint32_t> addPointAnnotations(std::vector<LatLng>, std::vector<std::string>& symbols);
     void removeAnnotation(uint32_t);
     void removeAnnotations(std::vector<uint32_t>);
-    std::vector<uint32_t> getAnnotationsInBoundingBox(BoundingBox) const;
-    BoundingBox getBoundingBoxForAnnotations(std::vector<uint32_t>) const;
+    std::vector<uint32_t> getAnnotationsInBounds(LatLngBounds) const;
+    LatLngBounds getBoundsForAnnotations(std::vector<uint32_t>) const;
 
     // Debug
     void setDebug(bool value);
