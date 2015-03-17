@@ -1,7 +1,6 @@
 #ifndef MBGL_MAP_ANNOTATIONS
 #define MBGL_MAP_ANNOTATIONS
 
-#include <mbgl/map/map.hpp>
 #include <mbgl/map/tile.hpp>
 #include <mbgl/map/live_tile.hpp>
 #include <mbgl/util/geo.hpp>
@@ -18,6 +17,9 @@
 namespace mbgl {
 
 class Annotation;
+class Map;
+
+typedef std::vector<LatLng> AnnotationSegment;
 
 enum class AnnotationType : uint8_t {
     Point,
@@ -26,12 +28,12 @@ enum class AnnotationType : uint8_t {
 
 class AnnotationManager : private util::noncopyable {
 public:
-    AnnotationManager(Map&);
+    AnnotationManager();
 
     void setDefaultPointAnnotationSymbol(std::string& symbol) { defaultPointAnnotationSymbol = symbol; }
-    std::pair<std::vector<Tile::ID>, std::vector<uint32_t>> addPointAnnotations(std::vector<LatLng>, std::vector<std::string>& symbols);
+    std::pair<std::vector<Tile::ID>, std::vector<uint32_t>> addPointAnnotations(std::vector<LatLng>, std::vector<std::string>& symbols, const Map&);
     std::vector<Tile::ID> removeAnnotations(std::vector<uint32_t>);
-    std::vector<uint32_t> getAnnotationsInBounds(LatLngBounds) const;
+    std::vector<uint32_t> getAnnotationsInBounds(LatLngBounds, const Map&) const;
     LatLngBounds getBoundsForAnnotations(std::vector<uint32_t>) const;
 
     const std::unique_ptr<LiveTile>& getTile(Tile::ID const& id);
@@ -42,7 +44,6 @@ private:
 
 private:
     std::mutex mtx;
-    Map& map;
     std::string defaultPointAnnotationSymbol;
     std::map<uint32_t, std::unique_ptr<Annotation>> annotations;
     std::map<Tile::ID, std::pair<std::vector<uint32_t>, std::unique_ptr<LiveTile>>> annotationTiles;
@@ -56,7 +57,7 @@ public:
     Annotation(AnnotationType, std::vector<AnnotationSegment>);
 
 private:
-    LatLng getPoint() const { return geometry[0][0]; }
+    LatLng getPoint() const;
     LatLngBounds getBounds() const { return bounds; }
 
 private:

@@ -72,7 +72,7 @@ Map::Map(View& view_, FileSource& fileSource_)
       lineAtlas(util::make_unique<LineAtlas>(512, 512)),
       texturePool(std::make_shared<TexturePool>()),
       painter(util::make_unique<Painter>(*spriteAtlas, *glyphAtlas, *lineAtlas)),
-      annotationManager(util::make_unique<AnnotationManager>(*this))
+      annotationManager(util::make_unique<AnnotationManager>())
 {
     view.initialize(this);
 }
@@ -554,7 +554,7 @@ uint32_t Map::addPointAnnotation(LatLng point, std::string& symbol) {
 
 std::vector<uint32_t> Map::addPointAnnotations(std::vector<LatLng> points, std::vector<std::string>& symbols) {
     assert(std::this_thread::get_id() == mainThread);
-    auto result = annotationManager->addPointAnnotations(points, symbols);
+    auto result = annotationManager->addPointAnnotations(points, symbols, *this);
     updateAnnotationTiles(result.first);
     return result.second;
 }
@@ -572,7 +572,7 @@ void Map::removeAnnotations(std::vector<uint32_t> annotations) {
 
 std::vector<uint32_t> Map::getAnnotationsInBounds(LatLngBounds bounds) const {
     assert(std::this_thread::get_id() == mainThread);
-    return annotationManager->getAnnotationsInBounds(bounds);
+    return annotationManager->getAnnotationsInBounds(bounds, *this);
 }
 
 LatLngBounds Map::getBoundsForAnnotations(std::vector<uint32_t> annotations) const {

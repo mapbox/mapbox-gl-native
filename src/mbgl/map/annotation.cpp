@@ -1,4 +1,5 @@
 #include <mbgl/map/annotation.hpp>
+#include <mbgl/map/map.hpp>
 #include <mbgl/util/ptr.hpp>
 
 #include <algorithm>
@@ -20,9 +21,12 @@ Annotation::Annotation(AnnotationType type_, std::vector<AnnotationSegment> geom
     }
 }
 
-AnnotationManager::AnnotationManager(Map& map_)
-    : map(map_),
-    nullTile(util::make_unique<LiveTile>()) {}
+LatLng Annotation::getPoint() const {
+    return geometry[0][0];
+}
+
+AnnotationManager::AnnotationManager()
+    : nullTile(util::make_unique<LiveTile>()) {}
 
 vec2<double> AnnotationManager::projectPoint(LatLng& point) {
     double sine = std::sin(point.latitude * M_PI / 180);
@@ -31,7 +35,7 @@ vec2<double> AnnotationManager::projectPoint(LatLng& point) {
     return vec2<double>(x, y);
 }
 
-std::pair<std::vector<Tile::ID>, std::vector<uint32_t>> AnnotationManager::addPointAnnotations(std::vector<LatLng> points, std::vector<std::string>& symbols) {
+std::pair<std::vector<Tile::ID>, std::vector<uint32_t>> AnnotationManager::addPointAnnotations(std::vector<LatLng> points, std::vector<std::string>& symbols, const Map& map) {
 
     uint16_t extent = 4096;
 
@@ -120,7 +124,7 @@ std::vector<Tile::ID> AnnotationManager::removeAnnotations(std::vector<uint32_t>
     return affectedTiles;
 }
 
-std::vector<uint32_t> AnnotationManager::getAnnotationsInBounds(LatLngBounds queryBounds) const {
+std::vector<uint32_t> AnnotationManager::getAnnotationsInBounds(LatLngBounds queryBounds, const Map& map) const {
     uint8_t z = map.getMaxZoom();
     uint32_t z2 = 1 << z;
     vec2<double> swPoint = projectPoint(queryBounds.sw);
