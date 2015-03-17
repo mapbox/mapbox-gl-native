@@ -46,11 +46,11 @@ public:
 public:
     void parse();
 
-protected:
+private:
     bool obsolete() const;
     void parseStyleLayers(util::ptr<const StyleLayerGroup> group);
 
-    virtual std::unique_ptr<Bucket> createBucket(const StyleBucket&);
+    std::unique_ptr<Bucket> createBucket(const StyleBucket&);
     std::unique_ptr<Bucket> createFillBucket(const GeometryTileLayer&, const StyleBucket&);
     std::unique_ptr<Bucket> createLineBucket(const GeometryTileLayer&, const StyleBucket&);
     std::unique_ptr<Bucket> createSymbolBucket(const GeometryTileLayer&, const StyleBucket&);
