@@ -43,7 +43,7 @@ void LiveTileData::parse() {
                 // Parsing creates state that is encapsulated in TileParser. While parsing,
                 // the TileParser object writes results into this objects. All other state
                 // is going to be discarded afterwards.
-                TileParser parser(&*tile, *this, style, glyphAtlas, glyphStore, spriteAtlas, sprite);
+                TileParser parser(*tile, *this, style, glyphAtlas, glyphStore, spriteAtlas, sprite);
 
                 // Clear the style so that we don't have a cycle in the shared_ptr references.
                 style.reset();

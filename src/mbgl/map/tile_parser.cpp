@@ -29,7 +29,7 @@ namespace mbgl {
 // its header file.
 TileParser::~TileParser() = default;
 
-TileParser::TileParser(const GeometryTile* geometryTile_,
+TileParser::TileParser(const GeometryTile& geometryTile_,
                        VectorTileData& tile_,
                        const util::ptr<const Style>& style_,
                        GlyphAtlas& glyphAtlas_,
@@ -187,7 +187,7 @@ std::unique_ptr<Bucket> TileParser::createBucket(const StyleBucket &bucketDesc) 
     if (tile.id.z >= std::ceil(bucketDesc.max_zoom)) return nullptr;
     if (bucketDesc.visibility == mbgl::VisibilityType::None) return nullptr;
 
-    auto layer = geometryTile->getLayer(bucketDesc.source_layer);
+    auto layer = geometryTile.getLayer(bucketDesc.source_layer);
     if (layer) {
         if (bucketDesc.type == StyleLayerType::Fill) {
             return createFillBucket(*layer, bucketDesc);
