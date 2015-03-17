@@ -9,7 +9,7 @@ namespace mbgl {
 
 class LiveTileFeature : public GeometryTileFeature {
 public:
-    LiveTileFeature(FeatureType, GeometryCollection, std::map<std::string, std::string> = {{}});
+    LiveTileFeature(FeatureType, GeometryCollection, std::map<std::string, std::string> properties = {{}});
 
     FeatureType getType() const override { return type; }
     mapbox::util::optional<Value> getValue(const std::string&) const override;
