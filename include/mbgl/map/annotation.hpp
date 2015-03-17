@@ -51,18 +51,18 @@ private:
 };
 
 class Annotation : private util::noncopyable {
+    friend class AnnotationManager;
 public:
     Annotation(AnnotationType, std::vector<AnnotationSegment>);
 
+private:
     LatLng getPoint() const { return geometry[0][0]; }
     LatLngBounds getBounds() const { return bounds; }
 
-public:
+private:
     const AnnotationType type = AnnotationType::Point;
     const std::vector<AnnotationSegment> geometry;
     std::map<Tile::ID, std::vector<std::weak_ptr<const LiveTileFeature>>> tileFeatures;
-
-private:
     LatLngBounds bounds;
 };
 
