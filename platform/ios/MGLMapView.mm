@@ -113,7 +113,7 @@ MBGLView *mbglView = nullptr;
 mbgl::SQLiteCache *mbglFileCache = nullptr;
 mbgl::DefaultFileSource *mbglFileSource = nullptr;
 
-- (instancetype)initWithFrame:(CGRect)frame styleJSON:(NSString *)styleJSON accessToken:(NSString *)accessToken
+- (instancetype)initWithFrame:(CGRect)frame accessToken:(NSString *)accessToken styleJSON:(NSString *)styleJSON
 {
     self = [super initWithFrame:frame];
 
@@ -133,9 +133,22 @@ mbgl::DefaultFileSource *mbglFileSource = nullptr;
     return self;
 }
 
+- (instancetype)initWithFrame:(CGRect)frame accessToken:(NSString *)accessToken bundledStyleNamed:(NSString *)styleName
+{
+    self = [super initWithFrame:frame];
+    
+    if (self && [self commonInit])
+    {
+        if (accessToken) [self setAccessToken:accessToken];
+        if (styleName) [self useBundledStyleNamed:styleName];
+    }
+    
+    return self;
+}
+
 - (instancetype)initWithFrame:(CGRect)frame accessToken:(NSString *)accessToken
 {
-    return [self initWithFrame:frame styleJSON:nil accessToken:accessToken];
+    return [self initWithFrame:frame accessToken:accessToken styleJSON:nil];
 }
 
 - (instancetype)initWithCoder:(NSCoder *)decoder
