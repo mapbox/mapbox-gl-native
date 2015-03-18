@@ -8,6 +8,8 @@ const double mbgl::util::M2PI = 2 * M_PI;
 const double mbgl::util::EARTH_RADIUS_M = 6378137;
 const double mbgl::util::LATITUDE_MAX = 85.05112878;
 
+const std::string mbgl::util::ANNOTATIONS_POINTS_LAYER_ID = "com.mapbox.annotations.points";
+
 #if defined(DEBUG)
 const bool mbgl::debug::tileParseWarnings = false;
 const bool mbgl::debug::styleParseWarnings = false;

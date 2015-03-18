@@ -60,7 +60,7 @@ std::vector<SymbolFeature> SymbolBucket::processFeatures(const GeometryTileLayer
     std::set<GlyphRange> ranges;
 
     for (std::size_t i = 0; i < layer.featureCount(); i++) {
-        auto feature = layer.feature(i);
+        auto feature = layer.getFeature(i);
 
         GeometryTileFeatureExtractor extractor(*feature);
         if (!evaluate(filter, extractor))

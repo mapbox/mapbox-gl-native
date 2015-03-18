@@ -48,7 +48,8 @@ enum class SourceType : uint8_t {
     Vector,
     Raster,
     GeoJSON,
-    Video
+    Video,
+    Annotations
 };
 
 MBGL_DEFINE_ENUM_CLASS(SourceTypeClass, SourceType, {
@@ -56,6 +57,7 @@ MBGL_DEFINE_ENUM_CLASS(SourceTypeClass, SourceType, {
     { SourceType::Raster, "raster" },
     { SourceType::GeoJSON, "geojson" },
     { SourceType::Video, "video" },
+    { SourceType::Annotations, "annotations" },
 });
 
 // -------------------------------------------------------------------------------------------------

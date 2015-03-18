@@ -21,6 +21,7 @@
 
 #include <mbgl/map/vector_tile_data.hpp>
 #include <mbgl/map/raster_tile_data.hpp>
+#include <mbgl/map/live_tile_data.hpp>
 
 #include <algorithm>
 
@@ -190,13 +191,22 @@ TileData::State Source::addTile(Map &map, Environment &env, uv::worker &worker,
                                                              glyphAtlas, glyphStore,
                                                              spriteAtlas, sprite,
                                                              info, env);
+            new_tile.data->request(worker, map.getState().getPixelRatio(), callback);
         } else if (info.type == SourceType::Raster) {
             new_tile.data = std::make_shared<RasterTileData>(normalized_id, texturePool, info, env);
+            new_tile.data->request(worker, map.getState().getPixelRatio(), callback);
+        } else if (info.type == SourceType::Annotations) {
+            AnnotationManager& annotationManager = map.getAnnotationManager();
+            new_tile.data = std::make_shared<LiveTileData>(normalized_id,
+                                                           annotationManager,
+                                                           map.getMaxZoom(), style,
+                                                           glyphAtlas, glyphStore,
+                                                           spriteAtlas, sprite,
+                                                           info, env);
+            new_tile.data->reparse(worker, callback);
         } else {
             throw std::runtime_error("source type not implemented");
         }
-
-        new_tile.data->request(worker, map.getState().getPixelRatio(), callback);
         tile_data.emplace(new_tile.data->id, new_tile.data);
     }
 
@@ -366,6 +376,14 @@ void Source::update(Map &map,
     });
 
     updated = map.getTime();
+}
+
+void Source::invalidateTiles(Map& map, std::vector<Tile::ID>& ids) {
+    for (auto& id : ids) {
+        tiles.erase(id);
+        tile_data.erase(id);
+    }
+    map.triggerUpdate();
 }
 
 }
