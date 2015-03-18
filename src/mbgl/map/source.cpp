@@ -196,7 +196,7 @@ TileData::State Source::addTile(Map &map, Environment &env, uv::worker &worker,
             new_tile.data = std::make_shared<RasterTileData>(normalized_id, texturePool, info, env);
             new_tile.data->request(worker, map.getState().getPixelRatio(), callback);
         } else if (info.type == SourceType::Annotations) {
-            util::ptr<AnnotationManager> annotationManager = map.getAnnotationManager();
+            AnnotationManager& annotationManager = map.getAnnotationManager();
             new_tile.data = std::make_shared<LiveTileData>(normalized_id,
                                                            annotationManager,
                                                            map.getMaxZoom(), style,

@@ -8,7 +8,7 @@
 using namespace mbgl;
 
 LiveTileData::LiveTileData(Tile::ID const& id_,
-                           util::ptr<AnnotationManager> annotationManager_,
+                           AnnotationManager& annotationManager_,
                            float mapMaxZoom,
                            util::ptr<Style> style_,
                            GlyphAtlas& glyphAtlas_,
@@ -37,7 +37,7 @@ void LiveTileData::parse() {
         }
 
         if (source.type == SourceType::Annotations) {
-            const std::unique_ptr<LiveTile>& tile = annotationManager->getTile(id);
+            const std::unique_ptr<LiveTile>& tile = annotationManager.getTile(id);
 
             if (tile) {
                 // Parsing creates state that is encapsulated in TileParser. While parsing,

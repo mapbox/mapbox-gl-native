@@ -10,7 +10,7 @@ class AnnotationManager;
 class LiveTileData : public VectorTileData {
 public:
     LiveTileData(Tile::ID const&,
-                 util::ptr<AnnotationManager>,
+                 AnnotationManager&,
                  float mapMaxZoom,
                  util::ptr<Style>,
                  GlyphAtlas&,
@@ -24,7 +24,7 @@ public:
     void parse() override;
 
 private:
-    util::ptr<AnnotationManager> annotationManager;
+    AnnotationManager& annotationManager;
 };
 
 }
