@@ -1,6 +1,7 @@
 #include <mbgl/map/annotation.hpp>
 #include <mbgl/map/map.hpp>
 #include <mbgl/util/ptr.hpp>
+#include <mbgl/util/std.hpp>
 
 #include <algorithm>
 #include <memory>
@@ -109,6 +110,11 @@ std::vector<Tile::ID> AnnotationManager::removeAnnotations(std::vector<uint32_t>
         if (annotation_it != annotations.end()) {
             auto& annotation = annotation_it->second;
             for (auto& tile_it : annotationTiles) {
+                auto& tileAnnotations = tile_it.second.first;
+                util::erase_if(tileAnnotations, tileAnnotations.begin(),
+                               tileAnnotations.end(), [&](const uint32_t annotationID_) -> bool {
+                                   return (annotationID_ == annotationID);
+                               });
                 auto features_it = annotation->tileFeatures.find(tile_it.first);
                 if (features_it != annotation->tileFeatures.end()) {
                     auto layer = tile_it.second.second->getMutableLayer(util::ANNOTATIONS_POINTS_LAYER_ID);
