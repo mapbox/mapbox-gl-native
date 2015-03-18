@@ -31,7 +31,7 @@ public:
     VectorTileLayer(pbf);
 
     std::size_t featureCount() const override { return features.size(); }
-    util::ptr<const GeometryTileFeature> feature(std::size_t) const override;
+    util::ptr<const GeometryTileFeature> getFeature(std::size_t) const override;
 
 private:
     friend class VectorTile;

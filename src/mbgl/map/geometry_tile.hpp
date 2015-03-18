@@ -33,7 +33,7 @@ public:
 class GeometryTileLayer : private util::noncopyable {
 public:
     virtual std::size_t featureCount() const = 0;
-    virtual util::ptr<const GeometryTileFeature> feature(std::size_t) const = 0;
+    virtual util::ptr<const GeometryTileFeature> getFeature(std::size_t) const = 0;
 };
 
 class GeometryTile : private util::noncopyable {

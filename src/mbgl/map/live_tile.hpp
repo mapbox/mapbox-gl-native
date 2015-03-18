@@ -29,7 +29,7 @@ public:
     void addFeature(util::ptr<const LiveTileFeature>);
     void removeFeature(util::ptr<const LiveTileFeature>);
     std::size_t featureCount() const override { return features.size(); }
-    util::ptr<const GeometryTileFeature> feature(std::size_t i) const override { return features[i]; }
+    util::ptr<const GeometryTileFeature> getFeature(std::size_t i) const override { return features[i]; }
 
 private:
     std::vector<util::ptr<const LiveTileFeature>> features;

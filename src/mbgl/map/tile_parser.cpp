@@ -215,7 +215,7 @@ std::unique_ptr<Bucket> TileParser::createBucket(const StyleBucket &bucketDesc) 
 template <class Bucket>
 void TileParser::addBucketGeometries(Bucket& bucket, const GeometryTileLayer& layer, const FilterExpression &filter) {
     for (std::size_t i = 0; i < layer.featureCount(); i++) {
-        auto feature = layer.feature(i);
+        auto feature = layer.getFeature(i);
 
         if (obsolete())
             return;
