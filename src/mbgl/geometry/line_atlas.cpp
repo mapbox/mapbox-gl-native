@@ -19,6 +19,7 @@ LineAtlas::~LineAtlas() {
     std::lock_guard<std::recursive_mutex> lock(mtx);
 
     MBGL_CHECK_ERROR(glDeleteTextures(1, &texture));
+    delete[] data;
     texture = 0;
 }
 
