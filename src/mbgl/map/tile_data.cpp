@@ -12,12 +12,12 @@
 
 using namespace mbgl;
 
-TileData::TileData(Tile::ID const& id_, const SourceInfo& source_, Environment& env_)
+TileData::TileData(Tile::ID const& id_, const SourceInfo& source_)
     : id(id_),
       name(id),
       state(State::initial),
       source(source_),
-      env(env_),
+      env(Environment::Get()),
       debugBucket(debugFontBuffer) {
     // Initialize tile debug coordinates
     debugFontBuffer.addText(name.c_str(), 50, 200, 5);
@@ -96,7 +96,8 @@ void TileData::reparse(uv::worker& worker, std::function<void()> callback)
     // the after work handler
     new uv::work<util::ptr<TileData>>(
         worker,
-        [](util::ptr<TileData>& tile) {
+        [this](util::ptr<TileData>& tile) {
+            Environment::Scope scope(env, ThreadType::TileWorker, "TileWorker_" + tile->name);
             tile->parse();
         },
         [callback](util::ptr<TileData>&) {

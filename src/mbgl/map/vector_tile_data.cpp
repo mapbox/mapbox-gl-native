@@ -17,9 +17,8 @@ VectorTileData::VectorTileData(Tile::ID const& id_,
                                GlyphStore& glyphStore_,
                                SpriteAtlas& spriteAtlas_,
                                util::ptr<Sprite> sprite_,
-                               const SourceInfo& source_,
-                               Environment& env_)
-    : TileData(id_, source_, env_),
+                               const SourceInfo& source_)
+    : TileData(id_, source_),
       glyphAtlas(glyphAtlas_),
       glyphStore(glyphStore_),
       spriteAtlas(spriteAtlas_),

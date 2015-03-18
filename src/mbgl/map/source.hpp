@@ -35,7 +35,7 @@ public:
     Source(SourceInfo&);
 
     void load(Map &, Environment &);
-    void update(Map &, Environment &, uv::worker &, util::ptr<Style>, GlyphAtlas &, GlyphStore &,
+    void update(Map &, uv::worker &, util::ptr<Style>, GlyphAtlas &, GlyphStore &,
                 SpriteAtlas &, util::ptr<Sprite>, TexturePool &, std::function<void()> callback);
     void invalidateTiles(Map&, std::vector<Tile::ID>&);
 
@@ -56,7 +56,7 @@ private:
     int32_t coveringZoomLevel(const TransformState&) const;
     std::forward_list<Tile::ID> coveringTiles(const TransformState&) const;
 
-    TileData::State addTile(Map &, Environment &, uv::worker &, util::ptr<Style>, GlyphAtlas &,
+    TileData::State addTile(Map &, uv::worker &, util::ptr<Style>, GlyphAtlas &,
                             GlyphStore &, SpriteAtlas &, util::ptr<Sprite>, TexturePool &,
                             const Tile::ID &, std::function<void()> callback);
 

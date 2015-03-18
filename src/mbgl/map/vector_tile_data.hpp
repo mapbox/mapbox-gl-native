@@ -37,8 +37,7 @@ public:
                    GlyphStore&,
                    SpriteAtlas&,
                    util::ptr<Sprite>,
-                   const SourceInfo&,
-                   Environment&);
+                   const SourceInfo&);
     ~VectorTileData();
 
     void parse() override;
