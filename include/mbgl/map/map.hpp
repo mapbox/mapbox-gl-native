@@ -37,6 +37,7 @@ class GlyphAtlas;
 class SpriteAtlas;
 class LineAtlas;
 class Environment;
+class EnvironmentScope;
 class AnnotationManager;
 
 class Map : private util::noncopyable {
@@ -192,6 +193,7 @@ private:
     Mode mode = Mode::None;
 
     const std::unique_ptr<Environment> env;
+    std::unique_ptr<EnvironmentScope> scope;
     View &view;
 
 private:
@@ -223,13 +225,13 @@ private:
     FileSource& fileSource;
 
     util::ptr<Style> style;
-    const std::unique_ptr<GlyphAtlas> glyphAtlas;
+    std::unique_ptr<GlyphAtlas> glyphAtlas;
     util::ptr<GlyphStore> glyphStore;
-    const std::unique_ptr<SpriteAtlas> spriteAtlas;
+    std::unique_ptr<SpriteAtlas> spriteAtlas;
     util::ptr<Sprite> sprite;
-    const std::unique_ptr<LineAtlas> lineAtlas;
+    std::unique_ptr<LineAtlas> lineAtlas;
     util::ptr<TexturePool> texturePool;
-    const std::unique_ptr<Painter> painter;
+    std::unique_ptr<Painter> painter;
     util::ptr<AnnotationManager> annotationManager;
 
     std::string styleURL;

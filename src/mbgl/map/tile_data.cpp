@@ -97,7 +97,7 @@ void TileData::reparse(uv::worker& worker, std::function<void()> callback)
     new uv::work<util::ptr<TileData>>(
         worker,
         [this](util::ptr<TileData>& tile) {
-            Environment::Scope scope(env, ThreadType::TileWorker, "TileWorker_" + tile->name);
+            EnvironmentScope scope(env, ThreadType::TileWorker, "TileWorker_" + tile->name);
             tile->parse();
         },
         [callback](util::ptr<TileData>&) {

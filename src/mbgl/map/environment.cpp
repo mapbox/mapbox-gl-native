@@ -1,5 +1,6 @@
 #include <mbgl/map/environment.hpp>
 #include <mbgl/storage/file_source.hpp>
+#include <mbgl/platform/gl.hpp>
 
 #include <uv.h>
 
@@ -76,18 +77,24 @@ ThreadInfoStore threadInfoStore;
 
 } // namespace
 
-Environment::Scope::Scope(Environment& env, ThreadType type, const std::string& name)
+EnvironmentScope::EnvironmentScope(Environment& env, ThreadType type, const std::string& name)
     : id(std::this_thread::get_id()) {
     threadInfoStore.registerThread(&env, type, name);
 }
 
-Environment::Scope::~Scope() {
+EnvironmentScope::~EnvironmentScope() {
     assert(id == std::this_thread::get_id());
     threadInfoStore.unregisterThread();
 }
 
 Environment::Environment(FileSource& fs)
     : id(makeEnvironmentID()), fileSource(fs), loop(uv_loop_new()) {
+}
+
+Environment::~Environment() {
+    assert(abandonedVAOs.empty());
+    assert(abandonedTextures.empty());
+    assert(abandonedBuffers.empty());
 }
 
 Environment& Environment::Get() {
@@ -128,6 +135,50 @@ void Environment::cancelRequest(Request* req) {
     assert(currentlyOn(ThreadType::Map));
     fileSource.cancel(req);
 }
+
+// #############################################################################################
+
+#pragma mark - OpenGL cleanup
+
+void Environment::abandonVAO(uint32_t vao) {
+    assert(currentlyOn(ThreadType::Map));
+    abandonedVAOs.emplace_back(vao);
+}
+
+void Environment::abandonBuffer(uint32_t buffer) {
+    assert(currentlyOn(ThreadType::Map));
+    abandonedBuffers.emplace_back(buffer);
+}
+
+void Environment::abandonTexture(uint32_t texture) {
+    assert(currentlyOn(ThreadType::Map));
+    abandonedTextures.emplace_back(texture);
+}
+
+// Actually remove the objects we marked as abandoned with the above methods.
+void Environment::performCleanup() {
+    assert(currentlyOn(ThreadType::Map));
+
+    if (!abandonedVAOs.empty()) {
+        MBGL_CHECK_ERROR(gl::DeleteVertexArrays(static_cast<GLsizei>(abandonedVAOs.size()),
+                                                abandonedVAOs.data()));
+        abandonedVAOs.clear();
+    }
+
+    if (!abandonedTextures.empty()) {
+        MBGL_CHECK_ERROR(glDeleteTextures(static_cast<GLsizei>(abandonedTextures.size()),
+                                          abandonedTextures.data()));
+        abandonedTextures.clear();
+    }
+
+    if (!abandonedBuffers.empty()) {
+        MBGL_CHECK_ERROR(glDeleteBuffers(static_cast<GLsizei>(abandonedBuffers.size()),
+                                         abandonedBuffers.data()));
+        abandonedBuffers.clear();
+    }
+}
+
+// #############################################################################################
 
 void Environment::terminate() {
     fileSource.abort(*this);
