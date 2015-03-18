@@ -133,7 +133,7 @@ VectorTile::VectorTile(pbf tile_pbf) {
     }
 }
 
-util::ptr<const GeometryTileLayer> VectorTile::getLayer(const std::string& name) const {
+util::ptr<GeometryTileLayer> VectorTile::getLayer(const std::string& name) const {
     auto layer_it = layers.find(name);
     if (layer_it != layers.end()) {
         return layer_it->second;

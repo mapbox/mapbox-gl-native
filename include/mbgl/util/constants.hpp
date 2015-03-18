@@ -2,6 +2,7 @@
 #define MBGL_UTIL_CONSTANTS
 
 #include <cmath>
+#include <string>
 
 namespace mbgl {
 
@@ -14,6 +15,8 @@ extern const double RAD2DEG;
 extern const double M2PI;
 extern const double EARTH_RADIUS_M;
 extern const double LATITUDE_MAX;
+
+extern const std::string ANNOTATIONS_POINTS_LAYER_ID;
 
 }
 
