@@ -18,16 +18,6 @@
         '../platform/darwin/reachability.m',
         '../include/mbgl/ios/MGLMapView.h',
         '../platform/ios/MGLMapView.mm',
-        '../include/mbgl/ios/MGLStyleFunctionValue.h',
-        '../platform/ios/MGLStyleFunctionValue.m',
-        '../include/mbgl/ios/MGLTypes.h',
-        '../platform/ios/MGLTypes.m',
-        '../include/mbgl/ios/NSArray+MGLAdditions.h',
-        '../platform/ios/NSArray+MGLAdditions.m',
-        '../include/mbgl/ios/NSDictionary+MGLAdditions.h',
-        '../platform/ios/NSDictionary+MGLAdditions.m',
-        '../include/mbgl/ios/UIColor+MGLAdditions.h',
-        '../platform/ios/UIColor+MGLAdditions.m',
       ],
 
       'variables': {
