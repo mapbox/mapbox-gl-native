@@ -17,14 +17,13 @@ typedef struct uv_loop_s uv_loop_t;
 namespace mbgl {
 
 class Response;
-class Environment;
 
 class Request : private util::noncopyable {
     MBGL_STORE_THREAD(tid)
 
 public:
     using Callback = std::function<void(const Response &)>;
-    Request(const Resource &resource, uv_loop_t *loop, const Environment &env, Callback callback);
+    Request(const Resource &resource, uv_loop_t *loop, uint32_t id, Callback callback);
 
 public:
     // May be called from any thread.
@@ -49,10 +48,10 @@ private:
 public:
     const Resource resource;
 
-    // The environment ref is used to associate requests with a particular environment. This allows
+    // The environment ID is used to associate requests with a particular environment. This allows
     // us to only terminate requests associated with that environment, e.g. when the map the env
     // belongs to is discarded.
-    const Environment &env;
+    uint32_t env;
 };
 
 }

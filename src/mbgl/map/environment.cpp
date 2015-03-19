@@ -122,13 +122,13 @@ uint32_t Environment::getID() const {
 
 void Environment::requestAsync(const Resource& resource,
                                std::function<void(const Response&)> callback) {
-    fileSource.request(resource, *this, std::move(callback));
+    fileSource.request(resource, std::move(callback));
 }
 
 Request* Environment::request(const Resource& resource,
                               std::function<void(const Response&)> callback) {
     assert(currentlyOn(ThreadType::Map));
-    return fileSource.request(resource, loop, *this, std::move(callback));
+    return fileSource.request(resource, loop, std::move(callback));
 }
 
 void Environment::cancelRequest(Request* req) {
@@ -181,7 +181,7 @@ void Environment::performCleanup() {
 // #############################################################################################
 
 void Environment::terminate() {
-    fileSource.abort(*this);
+    fileSource.abort(id);
 }
 
 }
