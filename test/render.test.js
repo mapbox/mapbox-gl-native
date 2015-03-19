@@ -99,7 +99,7 @@ function rewriteLocalSchema(url) {
         return url.map(function(str) {
             return str.replace(regex, '');
         });
-    } else if (url instanceof String) {
+    } else if (typeof url === "string") {
         return url.replace(regex, '');
     }
 }
