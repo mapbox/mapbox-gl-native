@@ -30,6 +30,28 @@
         '../../platform/darwin/settings_nsuserdefaults.mm',
       ],
 
+      'variables': {
+        'libraries': [
+          './vendor/HockeySDK.framework',
+        ],
+        'ldflags': [
+          '-framework AssetsLibrary',
+          '-framework CoreGraphics',
+          '-framework CoreText',
+          '-framework QuartzCore',
+          '-framework QuickLook',
+          '-framework Security',
+        ],
+      },
+
+      'link_settings': {
+        'libraries': [ '<@(libraries)' ],
+        'xcode_settings': {
+          'OTHER_LDFLAGS': [ '<@(ldflags)' ],
+          'FRAMEWORK_SEARCH_PATHS': './vendor',
+        },
+      },
+
       'xcode_settings': {
         'SDKROOT': 'iphoneos',
         'SUPPORTED_PLATFORMS': 'iphonesimulator iphoneos',
