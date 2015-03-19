@@ -34,7 +34,7 @@ public:
     static bool currentlyOn(ThreadType);
     static std::string threadName();
 
-    unsigned getID() const;
+    uint32_t getID() const;
 
     // #############################################################################################
 
@@ -60,7 +60,7 @@ public:
     void terminate();
 
 private:
-    unsigned id;
+    uint32_t id;
     FileSource& fileSource;
 
     // Stores OpenGL objects that we marked for deletion

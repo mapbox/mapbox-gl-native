@@ -68,8 +68,8 @@ private:
     mutable std::mutex mtx;
 };
 
-unsigned makeEnvironmentID() {
-    static std::atomic<unsigned> id(0);
+uint32_t makeEnvironmentID() {
+    static std::atomic<uint32_t> id(0);
     return id++;
 }
 
@@ -116,7 +116,7 @@ std::string Environment::threadName() {
     return threadInfoStore.getThreadInfo().name;
 }
 
-unsigned Environment::getID() const {
+uint32_t Environment::getID() const {
     return id;
 }
 
