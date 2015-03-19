@@ -44,6 +44,8 @@ public:
     std::string getGlyphURL() const {
         return glyph_url;
     }
+    
+    Color parseColor(JSVal value, std::unordered_map<std::string, const rapidjson::Value *>);
 
 private:
     void parseConstants(JSVal value);
@@ -98,8 +100,11 @@ private:
     std::tuple<bool,std::vector<float>> parseFloatArray(JSVal value);
 
     FilterExpression parseFilter(JSVal);
+    
+
 
 private:
+    
     std::unordered_map<std::string, const rapidjson::Value *> constants;
 
     std::uint8_t version;

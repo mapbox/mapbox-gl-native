@@ -8,6 +8,7 @@
 #include <mbgl/util/uv_detail.hpp>
 #include <mbgl/platform/log.hpp>
 #include <csscolorparser/csscolorparser.hpp>
+#include <mbgl/style/color_operations.hpp>
 
 #pragma GCC diagnostic push
 #pragma GCC diagnostic ignored "-Wshadow"
@@ -250,21 +251,24 @@ void StyleParser::parseSources(JSVal value) {
 
 #pragma mark - Parse Style Properties
 
-Color parseColor(JSVal value) {
-    if (!value.IsString()) {
-        Log::Warning(Event::ParseStyle, "color value must be a string");
+Color parseColor(JSVal value, std::unordered_map<std::string, const rapidjson::Value *> constants) {
+    if (!value.IsString() && !value.IsArray()) {
+        Log::Warning(Event::ParseStyle, "color value must be a string or an array");
         return Color{{ 0, 0, 0, 0 }};
     }
-
-    CSSColorParser::Color css_color = CSSColorParser::parse({ value.GetString(), value.GetStringLength() });
+    CSSColorParser::Color css_color;
+    if (value.IsArray()) {
+        css_color = parseColorOp(value, constants);
+    }
+    css_color = CSSColorParser::parse({ value.GetString(), value.GetStringLength()});
 
     // Premultiply the color.
     const float factor = css_color.a / 255;
-
+    
     return Color{{(float)css_color.r * factor,
                   (float)css_color.g * factor,
                   (float)css_color.b * factor,
-                  css_color.a}};
+                   css_color.a}};
 }
 
 std::tuple<bool,std::vector<float>> StyleParser::parseFloatArray(JSVal value) {
@@ -314,7 +318,7 @@ std::tuple<bool, float> StyleParser::parseProperty(JSVal value, const char* prop
 template <>
 std::tuple<bool, Color> StyleParser::parseProperty(JSVal value, const char*) {
     JSVal rvalue = replaceConstant(value);
-    return std::tuple<bool, Color> { true, parseColor(rvalue) };
+    return std::tuple<bool, Color> { true, parseColor(rvalue, constants) };
 }
 
 template <>
