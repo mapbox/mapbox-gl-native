@@ -1423,7 +1423,7 @@ mbgl::DefaultFileSource *mbglFileSource = nullptr;
 {
     // The core bulk deletion API is efficient with respect to indexing
     // and screen refreshes, thus we should defer to it even for
-    // invidividal deletes.
+    // individual deletes.
     //
     [self removeAnnotations:@[ annotation ]];
 }
