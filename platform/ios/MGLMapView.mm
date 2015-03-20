@@ -170,7 +170,7 @@ mbgl::DefaultFileSource *mbglFileSource = nullptr;
     if (accessToken)
     {
         mbglMap->setAccessToken((std::string)[accessToken cStringUsingEncoding:[NSString defaultCStringEncoding]]);
-        [[MGLMapboxEvents sharedManager] setAccessToken:accessToken];
+        [[MGLMapboxEvents sharedManager] setToken:accessToken];
     }
 }
 
