@@ -16,12 +16,10 @@
 @interface MGLMetricsLocationManager()
 
 @property (atomic) CLLocationManager *locationManager;
-@property (atomic) BOOL isBackground;
 
 @end
 
 @implementation MGLMetricsLocationManager
-
 
 static MGLMetricsLocationManager *sharedManager = nil;
 
@@ -75,10 +73,6 @@ static MGLMetricsLocationManager *sharedManager = nil;
     }
 }
 
-- (void) setBackgroundStatus:(BOOL)isBackground {
-    self.isBackground = isBackground;
-}
-
 - (void) startUpdatingLocation {
     [self.locationManager startUpdatingLocation];
 }
@@ -105,7 +99,6 @@ static MGLMetricsLocationManager *sharedManager = nil;
         NSMutableDictionary *evt = [[NSMutableDictionary alloc] init];
         [evt setValue:[[NSNumber alloc] initWithDouble:loc.coordinate.latitude] forKey:@"lat"];
         [evt setValue:[[NSNumber alloc] initWithDouble:loc.coordinate.longitude] forKey:@"lng"];
-        [evt setValue:[[NSNumber alloc] initWithBool:_isBackground] forKey:@"isBackground"];
         [[MGLMapboxEvents sharedManager] pushEvent:@"location" withAttributes:evt];
     }
 }

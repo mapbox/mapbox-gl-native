@@ -19,6 +19,4 @@
 - (void) startUpdatingLocation;
 - (void) stopUpdatingLocation;
 
-- (void) setBackgroundStatus:(BOOL)isBackground;
-
 @end
