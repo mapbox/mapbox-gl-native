@@ -1433,10 +1433,22 @@ mbgl::DefaultFileSource *mbglFileSource = nullptr;
 
 - (void)addAnnotations:(NSArray *)annotations
 {
+    std::vector<mbgl::LatLng> latLngs;
+    latLngs.reserve(annotations.count);
+
     for (id <MGLAnnotation> annotation in annotations)
     {
-        [self.annotationsStore setObject:@{ MGLAnnotationIDKey : @(self.annotationsStore.count) }
-                                  forKey:annotation];
+        latLngs.push_back(mbgl::LatLng(annotation.coordinate.latitude, annotation.coordinate.longitude));
+    }
+
+    std::vector<std::string> symbols(annotations.count, std::string("marker-24"));
+
+    std::vector<uint32_t> annotationIDs = mbglMap->addPointAnnotations(latLngs, symbols);
+
+    for (size_t i = 0; i < annotationIDs.size(); ++i)
+    {
+        [self.annotationsStore setObject:@{ MGLAnnotationIDKey : @(annotationIDs[i]) }
+                                  forKey:annotations[i]];
     }
 }
 
@@ -1451,15 +1463,16 @@ mbgl::DefaultFileSource *mbglFileSource = nullptr;
 
 - (void)removeAnnotations:(NSArray *)annotations
 {
-    NSMutableArray *annotationIDsToRemove = [NSMutableArray array];
+    std::vector<uint32_t> annotationIDsToRemove;
+    annotationIDsToRemove.reserve(annotations.count);
 
     for (id <MGLAnnotation> annotation in annotations)
     {
-        [annotationIDsToRemove addObject:[self.annotationsStore objectForKey:annotation]];
+        annotationIDsToRemove.push_back([[self.annotationsStore objectForKey:annotation] unsignedIntValue]);
         [self.annotationsStore removeObjectForKey:annotation];
     }
 
-    // pass to mbglMap
+    mbglMap->removeAnnotations(annotationIDsToRemove);
 }
 
 #pragma mark - Utility -
