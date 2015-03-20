@@ -24,7 +24,6 @@ namespace mbgl {
         virtual ~ColorOperation() {}
         std::array<double, 4> toHSL();
         double clamp(double);
-        CSSColorParser::Color toColor(std::array<double, 4>);
 
     };
     

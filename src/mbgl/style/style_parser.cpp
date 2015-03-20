@@ -234,8 +234,9 @@ Color parseColor(JSVal value, std::unordered_map<std::string, const rapidjson::V
     CSSColorParser::Color css_color;
     if (value.IsArray()) {
         css_color = parseColorOp(value, constants);
+    } else {
+        css_color = CSSColorParser::parse({ value.GetString(), value.GetStringLength()});
     }
-    css_color = CSSColorParser::parse({ value.GetString(), value.GetStringLength()});
 
     // Premultiply the color.
     const float factor = css_color.a / 255;

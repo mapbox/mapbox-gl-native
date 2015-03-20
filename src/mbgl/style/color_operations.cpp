@@ -33,25 +33,25 @@ namespace mbgl {
         CSSColorParser::Color result;
 
         if (op == "darken") {
-            Darken * dark = dynamic_cast<Darken*> (&opResult);
+            Darken * dark = static_cast<Darken*> (&opResult);
             result = dark->evaluate();
         } else if (op == "lighten") {
-            Lighten * light = dynamic_cast<Lighten*> (&opResult);
+            Lighten * light = static_cast<Lighten*> (&opResult);
             result = light->evaluate();
         } else if (op == "desaturate") {
-            Desaturate * desaturate = dynamic_cast<Desaturate*> (&opResult);
+            Desaturate * desaturate = static_cast<Desaturate*> (&opResult);
             result = desaturate->evaluate();
         } else if (op == "saturate") {
-            Saturate * saturate = dynamic_cast<Saturate*> (&opResult);
+            Saturate * saturate = static_cast<Saturate*> (&opResult);
             result = saturate->evaluate();
         } else if (op == "fadeout") {
-            Fadeout * fadeout = dynamic_cast<Fadeout*> (&opResult);
+            Fadeout * fadeout = static_cast<Fadeout*> (&opResult);
             result = fadeout->evaluate();
         } else if (op == "fadein") {
-            Fadein * fadein = dynamic_cast<Fadein*> (&opResult);
+            Fadein * fadein = static_cast<Fadein*> (&opResult);
             result = fadein->evaluate();
         } else if (op == "spin") {
-            Spin * spin = dynamic_cast<Spin*> (&opResult);
+            Spin * spin = static_cast<Spin*> (&opResult);
             result = spin->evaluate();
         } else if (op == "mix") {
             if (!value[3u].IsString() && !value[3u].IsArray()) {
@@ -70,7 +70,7 @@ namespace mbgl {
     CSSColorParser::Color parseColorarr(const rapidjson::Value& color,  std::unordered_map<std::string, const rapidjson::Value *> constants) {
         CSSColorParser::Color css_color;
         if (color.IsArray()) {
-            css_color = parse(color, constants);
+            css_color = parseColorarr(color, constants);
         } else if (color.IsString()) {
             css_color = CSSColorParser::parse( {color.GetString(), color.GetStringLength()});
         } else {
@@ -81,6 +81,7 @@ namespace mbgl {
     }
     
     std::array<double, 4> ColorOperation::toHSL() {
+
         double r = color_.r / 255;
         double g = color_.g / 255;
         double b = color_.b / 255;
