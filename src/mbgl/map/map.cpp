@@ -604,6 +604,10 @@ bool Map::getDebug() const {
     return data->getDebug();
 }
 
+std::chrono::steady_clock::time_point Map::getTime() const {
+    return data->getAnimationTime();
+}
+
 void Map::addClass(const std::string& klass) {
     if (hasClass(klass)) return;
     classes.push_back(klass);
@@ -770,14 +774,14 @@ void Map::prepare() {
     }
 
     // Update transform transitions.
-    animationTime = std::chrono::steady_clock::now();
+
+    const auto animationTime = std::chrono::steady_clock::now();
+    data->setAnimationTime(animationTime);
     if (transform.needsTransition()) {
         transform.updateTransitions(animationTime);
     }
 
     state = transform.currentState();
-
-    animationTime = std::chrono::steady_clock::now();
 
     if (style) {
         updateSources();
@@ -803,7 +807,7 @@ void Map::render() {
 
     assert(painter);
     painter->render(*style, activeSources,
-                    state, animationTime);
+                    state, data->getAnimationTime());
     // Schedule another rerender when we definitely need a next frame.
     if (transform.needsTransition() || style->hasTransitions()) {
         triggerUpdate();

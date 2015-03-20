@@ -4,6 +4,7 @@
 #include <string>
 #include <mutex>
 #include <atomic>
+#include <chrono>
 
 namespace mbgl {
 
@@ -17,6 +18,10 @@ class MapData {
     using Lock = std::lock_guard<std::mutex>;
 
 public:
+    inline MapData() {
+        setAnimationTime(std::chrono::steady_clock::time_point::min());
+    }
+
     inline StyleInfo getStyleInfo() const {
         Lock lock(mtx);
         return styleInfo;
@@ -26,15 +31,31 @@ public:
         styleInfo = info;
     }
 
-    inline bool getDebug() const { return debug; }
-    inline bool toggleDebug() { return debug ^= 1u; }
-    inline void setDebug(bool value) { debug = value; }
+    inline bool getDebug() const {
+        return debug;
+    }
+    inline bool toggleDebug() {
+        return debug ^= 1u;
+    }
+    inline void setDebug(bool value) {
+        debug = value;
+    }
+
+    inline std::chrono::steady_clock::time_point getAnimationTime() const {
+        // We're casting the time_point to and from a duration because libstdc++
+        // has a bug that doesn't allow time_points to be atomic.
+        return std::chrono::steady_clock::time_point(animationTime);
+    }
+    inline void setAnimationTime(std::chrono::steady_clock::time_point timePoint) {
+        animationTime = timePoint.time_since_epoch();
+    };
 
 private:
     mutable std::mutex mtx;
 
     StyleInfo styleInfo;
-    std::atomic<uint8_t> debug;
+    std::atomic<uint8_t> debug { false };
+    std::atomic<std::chrono::steady_clock::time_point::duration> animationTime;
 };
 
 }

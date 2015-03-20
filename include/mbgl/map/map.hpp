@@ -164,7 +164,7 @@ public:
     bool getDebug() const;
 
     inline const TransformState &getState() const { return state; }
-    inline std::chrono::steady_clock::time_point getTime() const { return animationTime; }
+    std::chrono::steady_clock::time_point getTime() const;
     inline AnnotationManager& getAnnotationManager() const { return *annotationManager; }
 
 private:
@@ -254,8 +254,6 @@ private:
     std::string accessToken;
 
     std::chrono::steady_clock::duration defaultTransitionDuration;
-
-    std::chrono::steady_clock::time_point animationTime = std::chrono::steady_clock::time_point::min();
 
     std::set<util::ptr<StyleSource>> activeSources;
 
