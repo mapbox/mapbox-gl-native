@@ -21,8 +21,8 @@
 #import "NSArray+MGLAdditions.h"
 #import "NSDictionary+MGLAdditions.h"
 
+#import "MGLMapboxEvents.h"
 #import "MGLMetricsLocationManager.h"
-
 
 // Returns the path to the default cache database on this system.
 const std::string &defaultCacheDatabase() {
@@ -170,6 +170,7 @@ mbgl::DefaultFileSource *mbglFileSource = nullptr;
     if (accessToken)
     {
         mbglMap->setAccessToken((std::string)[accessToken cStringUsingEncoding:[NSString defaultCStringEncoding]]);
+        [[MGLMapboxEvents sharedManager] setAccessToken:accessToken];
     }
 }
 
@@ -210,6 +211,17 @@ mbgl::DefaultFileSource *mbglFileSource = nullptr;
     // setup accessibility
     //
     self.accessibilityLabel = @"Map";
+    
+    // setup Metrics
+    MGLMapboxEvents *events = [MGLMapboxEvents sharedManager];
+    NSString *appName = [[NSBundle mainBundle] objectForInfoDictionaryKey:@"CFBundleName"];
+    NSString *appVersion = [[NSBundle mainBundle] objectForInfoDictionaryKey:@"CFBundleShortVersionString"];
+    if (appName != nil) {
+        events.appName = appName;
+    }
+    if (appVersion != nil) {
+        events.appVersion = appVersion;
+    }
 
     // create GL view
     //
