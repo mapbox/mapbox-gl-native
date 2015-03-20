@@ -23,6 +23,7 @@ Annotation::Annotation(AnnotationType type_, std::vector<AnnotationSegment> geom
 }
 
 LatLng Annotation::getPoint() const {
+    // Return the first line's first point. Shortcut for point annotations.
     return geometry[0][0];
 }
 
@@ -30,6 +31,7 @@ AnnotationManager::AnnotationManager()
     : nullTile(util::make_unique<LiveTile>()) {}
 
 vec2<double> AnnotationManager::projectPoint(LatLng& point) {
+    // Project a coordinate into unit space in a square map.
     double sine = std::sin(point.latitude * M_PI / 180);
     double x = point.longitude / 360 + 0.5;
     double y = 0.5 - 0.25 * std::log((1 + sine) / (1 - sine)) / M_PI;
@@ -121,6 +123,7 @@ std::pair<std::vector<Tile::ID>, std::vector<uint32_t>> AnnotationManager::addPo
         annotationIDs.push_back(annotationID);
     }
 
+    // Return Tile:IDs that need refreshed and the annotation identifiers held onto by the client.
     return std::make_pair(affectedTiles, annotationIDs);
 }
 
@@ -151,6 +154,7 @@ std::vector<Tile::ID> AnnotationManager::removeAnnotations(std::vector<uint32_t>
         }
     }
 
+    // Return Tile::IDs for tiles that need refreshed.
     return affectedTiles;
 }
 
@@ -176,7 +180,7 @@ std::vector<uint32_t> AnnotationManager::getAnnotationsInBounds(LatLngBounds que
                     std::copy(tile.second.first.begin(), tile.second.first.end(), std::back_inserter(matchingAnnotations));
                 } else {
                     // This tile is intersected by the query bounds. We need to check the
-                    // tile's annotations' bounding boxes individually. 
+                    // tile's annotations' bounding boxes individually.
                     std::copy_if(tile.second.first.begin(), tile.second.first.end(),
                                  std::back_inserter(matchingAnnotations), [&](const uint32_t annotationID) -> bool {
                         LatLngBounds annoBounds = this->annotations.find(annotationID)->second->getBounds();
@@ -190,6 +194,7 @@ std::vector<uint32_t> AnnotationManager::getAnnotationsInBounds(LatLngBounds que
         }
     }
 
+    // Return IDs (uint32_t) of matching annotations.
     return matchingAnnotations;
 }
 
