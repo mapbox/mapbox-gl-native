@@ -1450,6 +1450,10 @@ mbgl::DefaultFileSource *mbglFileSource = nullptr;
             symbols.push_back([[self.delegate mapView:self
                               symbolNameForAnnotation:annotation] cStringUsingEncoding:[NSString defaultCStringEncoding]]);
         }
+        else
+        {
+            symbols.push_back("marker-12");
+        }
     }
 
     std::vector<uint32_t> annotationIDs = mbglMap->addPointAnnotations(latLngs, symbols);

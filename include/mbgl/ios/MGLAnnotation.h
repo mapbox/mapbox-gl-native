@@ -8,7 +8,7 @@
 
 #import <Foundation/Foundation.h>
 
-@protocol MGLAnnotation <NSObject, NSCopying>
+@protocol MGLAnnotation <NSObject>
 
 //! The receiver’s center, expressed as a coordinate on the containing map.
 @property (nonatomic, readonly) CLLocationCoordinate2D coordinate;
