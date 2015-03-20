@@ -33,7 +33,6 @@ private:
     const LatLngBounds bounds;
 };
 
-
 Annotation::Annotation(AnnotationType type_, const AnnotationSegments& geometry_)
     : type(type_),
       geometry(geometry_),
@@ -53,6 +52,7 @@ Annotation::Annotation(AnnotationType type_, const AnnotationSegments& geometry_
 }
 
 LatLng Annotation::getPoint() const {
+    // Return the first line's first point. Shortcut for point annotations.
     assert(!geometry.empty());
     assert(!geometry[0].empty());
     return geometry[0][0];
@@ -75,6 +75,7 @@ uint32_t AnnotationManager::nextID() {
 }
 
 vec2<double> AnnotationManager::projectPoint(const LatLng& point) {
+    // Project a coordinate into unit space in a square map.
     const double sine = std::sin(point.latitude * M_PI / 180.0);
     const double x = point.longitude / 360.0 + 0.5;
     const double y = 0.5 - 0.25 * std::log((1.0 + sine) / (1.0 - sine)) / M_PI;
@@ -85,14 +86,22 @@ std::pair<std::vector<Tile::ID>, AnnotationIDs> AnnotationManager::addPointAnnot
     const std::vector<LatLng>& points, const std::vector<std::string>& symbols, const Map& map) {
     std::lock_guard<std::mutex> lock(mtx);
 
+    // We pre-generate tiles to contain each annotation up to the map's max zoom.
+    // We do this for fast rendering without projection conversions on the fly, as well as
+    // to simplify bounding box queries of annotations later. Tiles get invalidated when
+    // annotations are added or removed in order to refresh the map render without
+    // touching the base map underneath.
+
     const uint16_t extent = 4096;
 
-    AnnotationIDs annotationIDs(points.size());
+    AnnotationIDs annotationIDs;
+    annotationIDs.reserve(points.size());
     std::vector<Tile::ID> affectedTiles;
 
     for (size_t i = 0; i < points.size(); ++i) {
         const uint32_t annotationID = nextID();
 
+        // track the annotation global ID and its geometry
         auto anno_it = annotations.emplace(
             annotationID,
             util::make_unique<Annotation>(AnnotationType::Point,
@@ -100,8 +109,10 @@ std::pair<std::vector<Tile::ID>, AnnotationIDs> AnnotationManager::addPointAnnot
 
         const uint8_t maxZoom = map.getMaxZoom();
 
+        // side length of map at this zoom
         uint32_t z2 = 1 << maxZoom;
 
+        // projection conversion into unit space
         const vec2<double> p = projectPoint(points[i]);
 
         uint32_t x = p.x * z2;
@@ -111,10 +122,12 @@ std::pair<std::vector<Tile::ID>, AnnotationIDs> AnnotationManager::addPointAnnot
             affectedTiles.emplace_back(z, x, y);
             Tile::ID tileID = affectedTiles.back();
 
+            // calculate tile coordinate
             const Coordinate coordinate(extent * (p.x * z2 - x), extent * (p.y * z2 - y));
 
             const GeometryCollection geometries({ { { { coordinate } } } });
 
+            // at render time we style the annotation according to its {sprite} field
             const std::map<std::string, std::string> properties = {
                 { "sprite", (symbols[i].length() ? symbols[i] : defaultPointAnnotationSymbol) }
             };
@@ -124,6 +137,9 @@ std::pair<std::vector<Tile::ID>, AnnotationIDs> AnnotationManager::addPointAnnot
 
             auto tile_it = annotationTiles.find(tileID);
             if (tile_it != annotationTiles.end()) {
+                //
+                // We have this tile created already. Add this feature to it.
+                //
                 // get point layer & add feature
                 auto layer =
                     tile_it->second.second->getMutableLayer(layerID);
@@ -131,6 +147,9 @@ std::pair<std::vector<Tile::ID>, AnnotationIDs> AnnotationManager::addPointAnnot
                 // record annotation association with tile
                 tile_it->second.first.push_back(annotationID);
             } else {
+                //
+                // We need to create a new tile for this feature.
+                //
                 // create point layer & add feature
                 util::ptr<LiveTileLayer> layer = std::make_shared<LiveTileLayer>();
                 layer->addFeature(feature);
@@ -142,10 +161,12 @@ std::pair<std::vector<Tile::ID>, AnnotationIDs> AnnotationManager::addPointAnnot
                 tile_pos.first->second.second->addLayer(layerID, layer);
             }
 
-            // record annotation association with tile feature
+            // Record annotation association with tile and tile feature. This is used to determine stale tiles,
+            // as well as to remove the feature from the tile upon annotation deletion.
             anno_it.first->second->tileFeatures.emplace(
                 tileID, std::vector<std::weak_ptr<const LiveTileFeature>>({ feature }));
 
+            // get ready for the next-lower zoom number
             z2 /= 2;
             x /= 2;
             y /= 2;
@@ -154,6 +175,7 @@ std::pair<std::vector<Tile::ID>, AnnotationIDs> AnnotationManager::addPointAnnot
         annotationIDs.push_back(annotationID);
     }
 
+    // Tile:IDs that need refreshed and the annotation identifiers held onto by the client.
     return std::make_pair(affectedTiles, annotationIDs);
 }
 
@@ -167,10 +189,12 @@ std::vector<Tile::ID> AnnotationManager::removeAnnotations(const AnnotationIDs& 
         if (annotation_it != annotations.end()) {
             auto& annotation = annotation_it->second;
             for (auto& tile_it : annotationTiles) {
+                // clean up tile -> annotation mapping used for bounds queries
                 auto& tileAnnotations = tile_it.second.first;
                 util::erase_if(tileAnnotations, tileAnnotations.begin(), tileAnnotations.end(),
                                [&](const uint32_t annotationID_)
                                    -> bool { return (annotationID_ == annotationID); });
+                // remove annotation feature from tile layer
                 auto features_it = annotation->tileFeatures.find(tile_it.first);
                 if (features_it != annotation->tileFeatures.end()) {
                     const auto layer =
@@ -185,6 +209,7 @@ std::vector<Tile::ID> AnnotationManager::removeAnnotations(const AnnotationIDs& 
         }
     }
 
+    // Tile::IDs for tiles that need refreshed.
     return affectedTiles;
 }
 
@@ -208,11 +233,13 @@ std::vector<uint32_t> AnnotationManager::getAnnotationsInBounds(const LatLngBoun
         if (id.z == z) {
             if (id.x >= nwTile.x && id.x <= seTile.x && id.y >= nwTile.y && id.y <= seTile.y) {
                 if (id.x > nwTile.x && id.x < seTile.x && id.y > nwTile.y && id.y < seTile.y) {
-                    // trivial accept; grab all of the tile's annotations
+                    // Trivial accept; this tile is completely inside the query bounds, so
+                    // we'll return all of its annotations.
                     std::copy(tile.second.first.begin(), tile.second.first.end(),
                               std::back_inserter(matchingAnnotations));
                 } else {
-                    // check tile's annotations' bounding boxes
+                    // This tile is intersected by the query bounds. We need to check the
+                    // tile's annotations' bounding boxes individually.
                     std::copy_if(tile.second.first.begin(), tile.second.first.end(),
                                  std::back_inserter(matchingAnnotations),
                                  [&](const uint32_t annotationID) -> bool {
@@ -260,6 +287,5 @@ const LiveTile* AnnotationManager::getTile(Tile::ID const& id) {
 }
 
 const std::string AnnotationManager::layerID = "com.mapbox.annotations.points";
-
 
 }
