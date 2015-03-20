@@ -1436,12 +1436,21 @@ mbgl::DefaultFileSource *mbglFileSource = nullptr;
     std::vector<mbgl::LatLng> latLngs;
     latLngs.reserve(annotations.count);
 
+    std::vector<std::string> symbols;
+    symbols.reserve(annotations.count);
+
+    BOOL delegateImplementsSymbolLookup = [self.delegate respondsToSelector:@selector(mapView:symbolNameForAnnotation:)];
+
     for (id <MGLAnnotation> annotation in annotations)
     {
         latLngs.push_back(mbgl::LatLng(annotation.coordinate.latitude, annotation.coordinate.longitude));
-    }
 
-    std::vector<std::string> symbols(annotations.count, std::string("marker-24"));
+        if (delegateImplementsSymbolLookup)
+        {
+            symbols.push_back([[self.delegate mapView:self
+                              symbolNameForAnnotation:annotation] cStringUsingEncoding:[NSString defaultCStringEncoding]]);
+        }
+    }
 
     std::vector<uint32_t> annotationIDs = mbglMap->addPointAnnotations(latLngs, symbols);
 
