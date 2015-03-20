@@ -9,7 +9,7 @@
 #import <Foundation/Foundation.h>
 #import "CoreLocation/CoreLocation.h"
 
-@interface MBLocationManager : NSObject <CLLocationManagerDelegate>
+@interface MGLMetricsLocationManager : NSObject <CLLocationManagerDelegate>
 
 + (id)sharedManager;
 

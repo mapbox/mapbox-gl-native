@@ -9,20 +9,20 @@
 //  Copyright (c) 2015 Mapbox. All rights reserved.
 //
 
-#import "MBLocationManager.h"
+#import "MGLMetricsLocationManager.h"
 #import "CoreLocation/CoreLocation.h"
 
-@interface MBLocationManager()
+@interface MGLMetricsLocationManager()
 
 @property (atomic) CLLocationManager *locationManager;
 @property (atomic) BOOL isBackground;
 
 @end
 
-@implementation MBLocationManager
+@implementation MGLMetricsLocationManager
 
 
-static MBLocationManager *sharedManager = nil;
+static MGLMetricsLocationManager *sharedManager = nil;
 
 - (id) init {
     if (self = [super init]) {
@@ -119,24 +119,24 @@ static MBLocationManager *sharedManager = nil;
             break;
         case kCLAuthorizationStatusDenied:
             newStatus = @"User Explcitly Denied";
-            [[MBLocationManager sharedManager] stopUpdatingLocation];
+            [[MGLMetricsLocationManager sharedManager] stopUpdatingLocation];
             break;
         case kCLAuthorizationStatusAuthorized:
             newStatus = @"User Has Authorized / Authorized Always";
-            [[MBLocationManager sharedManager] startUpdatingLocation];
+            [[MGLMetricsLocationManager sharedManager] startUpdatingLocation];
             break;
             //        case kCLAuthorizationStatusAuthorizedAlways:
             //            newStatus = @"Not Determined";
             //            break;
         case kCLAuthorizationStatusAuthorizedWhenInUse:
             newStatus = @"User Has Authorized When In Use Only";
-            [[MBLocationManager sharedManager] startUpdatingLocation];
+            [[MGLMetricsLocationManager sharedManager] startUpdatingLocation];
             break;
         default:
             newStatus = @"Unknown";
             break;
     }
-    NSLog(@"MBLocationManager didChangeAuthorizationStatus() called.  New Status = %@", newStatus);
+    NSLog(@"MGLMetricsLocationManager didChangeAuthorizationStatus() called.  New Status = %@", newStatus);
 }
 
 @end

@@ -21,7 +21,7 @@
 #import "NSArray+MGLAdditions.h"
 #import "NSDictionary+MGLAdditions.h"
 
-#import "MBLocationManager.h"
+#import "MGLMetricsLocationManager.h"
 
 
 // Returns the path to the default cache database on this system.
@@ -341,7 +341,7 @@ mbgl::DefaultFileSource *mbglFileSource = nullptr;
     [[NSNotificationCenter defaultCenter] addObserver:self selector:@selector(appWillForeground:) name:UIApplicationWillEnterForegroundNotification object:nil];
 
     // Setup MBLocationManager for metrics
-    [MBLocationManager sharedManager];
+    [MGLMetricsLocationManager sharedManager];
     
     // set initial position
     //
