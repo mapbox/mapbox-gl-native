@@ -1,6 +1,7 @@
 #include <mbgl/map/map.hpp>
 #include <mbgl/map/environment.hpp>
 #include <mbgl/map/view.hpp>
+#include <mbgl/map/map_data.hpp>
 #include <mbgl/platform/platform.hpp>
 #include <mbgl/map/source.hpp>
 #include <mbgl/renderer/painter.hpp>
@@ -71,7 +72,8 @@ Map::Map(View& view_, FileSource& fileSource_)
       lineAtlas(util::make_unique<LineAtlas>(512, 512)),
       texturePool(std::make_shared<TexturePool>()),
       painter(util::make_unique<Painter>(*spriteAtlas, *glyphAtlas, *lineAtlas)),
-      annotationManager(util::make_unique<AnnotationManager>())
+      annotationManager(util::make_unique<AnnotationManager>()),
+      data(util::make_unique<MapData>())
 {
     view.initialize(this);
 }
@@ -138,11 +140,7 @@ void Map::start(bool startPaused) {
     });
 
     asyncUpdate = util::make_unique<uv::async>(env->loop, [this] {
-        assert(Environment::currentlyOn(ThreadType::Map));
-
-        if (state.hasSize()) {
-            prepare();
-        }
+        update();
     });
 
     asyncRender = util::make_unique<uv::async>(env->loop, [this] {
@@ -175,6 +173,8 @@ void Map::start(bool startPaused) {
         isStopped = true;
         view.notify();
     });
+
+    triggerUpdate();
 }
 
 void Map::stop(std::function<void ()> callback) {
@@ -252,7 +252,9 @@ void Map::run() {
         checkForPause();
     }
 
-    if (mode == Mode::Static && !style && styleURL.empty()) {
+    auto styleInfo = data->getStyleInfo();
+
+    if (mode == Mode::Static && !style && (styleInfo.url.empty() && styleInfo.json.empty())) {
         throw util::Exception("Style is not set");
     }
 
@@ -297,7 +299,9 @@ void Map::renderSync() {
     rendered = false;
 }
 
-void Map::triggerUpdate() {
+void Map::triggerUpdate(const Update u) {
+    updated |= static_cast<UpdateType>(u);
+
     if (mode == Mode::Static) {
         prepare();
     } else if (asyncUpdate) {
@@ -345,36 +349,27 @@ void Map::setup() {
 }
 
 void Map::setStyleURL(const std::string &url) {
-    // TODO: Make threadsafe.
+    assert(Environment::currentlyOn(ThreadType::Main));
 
-    styleURL = url;
-    if (mode == Mode::Continuous) {
-        stop();
-        start();
+    const size_t pos = url.rfind('/');
+    std::string base = "";
+    if (pos != std::string::npos) {
+        base = url.substr(0, pos + 1);
     }
+
+    data->setStyleInfo({ url, base, "" });
+    triggerUpdate(Update::StyleInfo);
 }
 
-void Map::setStyleJSON(std::string newStyleJSON, const std::string &base) {
-    // TODO: Make threadsafe.
-    styleJSON.swap(newStyleJSON);
-    sprite.reset();
-    if (!style) {
-        style = std::make_shared<Style>();
-    }
+void Map::setStyleJSON(const std::string& json, const std::string& base) {
+    assert(Environment::currentlyOn(ThreadType::Main));
 
-    style->base = base;
-    style->loadJSON((const uint8_t *)styleJSON.c_str());
-    style->cascadeClasses(classes);
-    style->setDefaultTransitionDuration(defaultTransitionDuration);
-
-    const std::string glyphURL = util::mapbox::normalizeGlyphsURL(style->glyph_url, getAccessToken());
-    glyphStore->setURL(glyphURL);
-
-    triggerUpdate();
+    data->setStyleInfo({ "", base, json });
+    triggerUpdate(Update::StyleInfo);
 }
 
 std::string Map::getStyleJSON() const {
-    return styleJSON;
+    return data->getStyleInfo().json;
 }
 
 util::ptr<Sprite> Map::getSprite() {
@@ -670,7 +665,9 @@ void Map::updateSources() {
     }
 
     // Then, reenable all of those that we actually use when drawing this layer.
-    updateSources(style->layers);
+    if (style) {
+        updateSources(style->layers);
+    }
 
     // Then, construct or destroy the actual source object, depending on enabled state.
     for (const auto& source : activeSources) {
@@ -715,26 +712,58 @@ void Map::updateTiles() {
     }
 }
 
-void Map::prepare() {
+void Map::update() {
     assert(Environment::currentlyOn(ThreadType::Map));
 
-    if (!style) {
-        style = std::make_shared<Style>();
+    if (state.hasSize()) {
+        prepare();
+    }
+}
 
-        env->request({ Resource::Kind::JSON, styleURL}, [&](const Response &res) {
+void Map::reloadStyle() {
+    assert(Environment::currentlyOn(ThreadType::Map));
+
+    style = std::make_shared<Style>();
+
+    const auto styleInfo = data->getStyleInfo();
+
+    if (!styleInfo.url.empty()) {
+        // We have a style URL
+        env->request({ Resource::Kind::JSON, styleInfo.url }, [&](const Response &res) {
             if (res.status == Response::Successful) {
-                // Calculate the base
-                const size_t pos = styleURL.rfind('/');
-                std::string base = "";
-                if (pos != std::string::npos) {
-                    base = styleURL.substr(0, pos + 1);
-                }
-
-                setStyleJSON(res.data, base);
+                loadStyleJSON(res.data, styleInfo.base);
             } else {
                 Log::Error(Event::Setup, "loading style failed: %s", res.message.c_str());
             }
         });
+    } else {
+        // We got JSON data directly.
+        loadStyleJSON(styleInfo.json, styleInfo.base);
+    }
+}
+
+void Map::loadStyleJSON(const std::string& json, const std::string& base) {
+    assert(Environment::currentlyOn(ThreadType::Map));
+
+    sprite.reset();
+    style = std::make_shared<Style>();
+    style->base = base;
+    style->loadJSON((const uint8_t *)json.c_str());
+    style->cascadeClasses(classes);
+    style->setDefaultTransitionDuration(defaultTransitionDuration);
+
+    const std::string glyphURL = util::mapbox::normalizeGlyphsURL(style->glyph_url, getAccessToken());
+    glyphStore->setURL(glyphURL);
+
+    triggerUpdate();
+}
+
+void Map::prepare() {
+    assert(Environment::currentlyOn(ThreadType::Map));
+
+    const auto u = updated.exchange(static_cast<UpdateType>(Update::Nothing));
+    if (u & static_cast<UpdateType>(Update::StyleInfo)) {
+        reloadStyle();
     }
 
     // Update transform transitions.
@@ -746,14 +775,17 @@ void Map::prepare() {
     state = transform.currentState();
 
     animationTime = std::chrono::steady_clock::now();
-    updateSources();
-    style->updateProperties(state.getNormalizedZoom(), animationTime);
 
-    // Allow the sprite atlas to potentially pull new sprite images if needed.
-    spriteAtlas->resize(state.getPixelRatio());
-    spriteAtlas->setSprite(getSprite());
+    if (style) {
+        updateSources();
+        style->updateProperties(state.getNormalizedZoom(), animationTime);
 
-    updateTiles();
+        // Allow the sprite atlas to potentially pull new sprite images if needed.
+        spriteAtlas->resize(state.getPixelRatio());
+        spriteAtlas->setSprite(getSprite());
+
+        updateTiles();
+    }
 
     if (mode == Mode::Continuous) {
         view.invalidate();

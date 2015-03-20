@@ -39,6 +39,7 @@ class LineAtlas;
 class Environment;
 class EnvironmentScope;
 class AnnotationManager;
+class MapData;
 
 class Map : private util::noncopyable {
     friend class View;
@@ -75,7 +76,12 @@ public:
     void render();
 
     // Notifies the Map thread that the state has changed and an update might be necessary.
-    void triggerUpdate();
+    using UpdateType = uint32_t;
+    enum class Update : UpdateType {
+        Nothing   = 0,
+        StyleInfo = 1 << 0,
+    };
+    void triggerUpdate(Update = Update::Nothing);
 
     // Triggers a render. Can be called from any thread.
     void triggerRender();
@@ -92,8 +98,8 @@ public:
 
     void setDefaultTransitionDuration(std::chrono::steady_clock::duration duration = std::chrono::steady_clock::duration::zero());
     std::chrono::steady_clock::duration getDefaultTransitionDuration();
-    void setStyleURL(const std::string &url);
-    void setStyleJSON(std::string newStyleJSON, const std::string &base = "");
+    void setStyleURL(const std::string& url);
+    void setStyleJSON(const std::string& json, const std::string& base = "");
     std::string getStyleJSON() const;
 
     // Transition
@@ -178,6 +184,13 @@ private:
     void updateSources();
     void updateSources(const util::ptr<StyleLayerGroup> &group);
 
+    // Triggered by triggerUpdate();
+    void update();
+
+    // Loads the style set in the data object. Called by Update::StyleInfo
+    void reloadStyle();
+    void loadStyleJSON(const std::string& json, const std::string& base);
+
     // Prepares a map render by updating the tiles we need for the current view, as well as updating
     // the stylesheet.
     void prepare();
@@ -234,8 +247,8 @@ private:
     std::unique_ptr<Painter> painter;
     util::ptr<AnnotationManager> annotationManager;
 
-    std::string styleURL;
-    std::string styleJSON = "";
+    const std::unique_ptr<MapData> data;
+
     std::vector<std::string> classes;
     std::string accessToken;
 
@@ -245,6 +258,8 @@ private:
     std::chrono::steady_clock::time_point animationTime = std::chrono::steady_clock::time_point::min();
 
     std::set<util::ptr<StyleSource>> activeSources;
+
+    std::atomic<UpdateType> updated;
 };
 
 }
