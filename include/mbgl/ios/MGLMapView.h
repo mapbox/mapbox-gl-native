@@ -2,6 +2,7 @@
 #import <CoreLocation/CoreLocation.h>
 
 @protocol MGLMapViewDelegate;
+@protocol MGLAnnotation;
 
 /** An MGLMapView object provides an embeddable map interface, similar to the one provided by Apple's MapKit. You use this class to display map information and to manipulate the map contents from your application. You can center the map on a given coordinate, specify the size of the area you want to display, and style the features of the map to fit your application's use case.
 *
@@ -184,6 +185,15 @@
 *   @param styleName The map style name to use. */
 - (void)useBundledStyleNamed:(NSString *)styleName;
 
+#pragma mark - Annotating the map
+
+@property (nonatomic, readonly) NSArray *annotations;
+
+- (void)addAnnotation:(id <MGLAnnotation>)annotation;
+- (void)addAnnotations:(NSArray *)annotations;
+- (void)removeAnnotation:(id <MGLAnnotation>)annotation;
+- (void)removeAnnotations:(NSArray *)annotations;
+
 #pragma mark - Debugging
 
 /** @name Debugging */
@@ -205,6 +215,9 @@
 @protocol MGLMapViewDelegate <NSObject>
 
 @optional
+
+//! Delegates implement this method to return a string containing the name of a symbol to use for the given annotation.
+- (NSString *)mapView:(MGLMapView *)mapView symbolNameForAnnotation:(id <MGLAnnotation>)symbolName;
 
 // Responding to Map Position Changes
 

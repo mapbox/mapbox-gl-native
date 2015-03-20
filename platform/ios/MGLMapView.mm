@@ -16,6 +16,7 @@
 
 #import "MGLTypes.h"
 #import "MGLStyleFunctionValue.h"
+#import "MGLAnnotation.h"
 
 #import "UIColor+MGLAdditions.h"
 #import "NSArray+MGLAdditions.h"
