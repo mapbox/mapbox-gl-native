@@ -530,11 +530,11 @@ void Map::stopRotating() {
 #pragma mark - Access Token
 
 void Map::setAccessToken(const std::string &token) {
-    accessToken = token;
+    data->setAccessToken(token);
 }
 
-const std::string &Map::getAccessToken() const {
-    return accessToken;
+std::string Map::getAccessToken() const {
+    return data->getAccessToken();
 }
 
 #pragma mark - Annotations

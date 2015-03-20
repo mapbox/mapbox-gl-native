@@ -139,7 +139,7 @@ public:
 
     // API
     void setAccessToken(const std::string &token);
-    const std::string &getAccessToken() const;
+    std::string getAccessToken() const;
 
     // Projection
     inline void getWorldBoundsMeters(ProjectedMeters &sw, ProjectedMeters &ne) const { Projection::getWorldBoundsMeters(sw, ne); }
@@ -252,7 +252,6 @@ private:
     const std::unique_ptr<MapData> data;
 
     std::vector<std::string> classes;
-    std::string accessToken;
 
     std::set<util::ptr<StyleSource>> activeSources;
 

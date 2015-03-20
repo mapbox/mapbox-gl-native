@@ -32,6 +32,15 @@ public:
         styleInfo = info;
     }
 
+    inline std::string getAccessToken() const {
+        Lock lock(mtx);
+        return accessToken;
+    }
+    inline void setAccessToken(const std::string &token) {
+        Lock lock(mtx);
+        accessToken = token;
+    }
+
     inline bool getDebug() const {
         return debug;
     }
@@ -62,6 +71,7 @@ private:
     mutable std::mutex mtx;
 
     StyleInfo styleInfo;
+    std::string accessToken;
     std::atomic<uint8_t> debug { false };
     std::atomic<std::chrono::steady_clock::time_point::duration> animationTime;
     std::atomic<std::chrono::steady_clock::duration> defaultTransitionDuration;
