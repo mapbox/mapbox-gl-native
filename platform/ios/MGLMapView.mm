@@ -53,6 +53,8 @@ extern NSString *const MGLStyleValueFunctionAllowed;
 
 NSTimeInterval const MGLAnimationDuration = 0.3;
 
+NSString *const MGLAnnotationIDKey = @"MGLAnnotationIDKey";
+
 #pragma mark - Private -
 
 @interface MGLMapView () <UIGestureRecognizerDelegate, GLKViewDelegate>
@@ -68,6 +70,7 @@ NSTimeInterval const MGLAnimationDuration = 0.3;
 @property (nonatomic) UIRotationGestureRecognizer *rotate;
 @property (nonatomic) UILongPressGestureRecognizer *quickZoom;
 @property (nonatomic) NSMutableArray *bundledStyleNames;
+@property (nonatomic) NSMutableDictionary *annotationsStore;
 @property (nonatomic, readonly) NSDictionary *allowedStyleTypes;
 @property (nonatomic) CGPoint centerPoint;
 @property (nonatomic) CGFloat scale;
@@ -1400,6 +1403,11 @@ mbgl::DefaultFileSource *mbglFileSource = nullptr;
 
 - (NSArray *)annotations
 {
+    if ([_annotationsStore count])
+    {
+        return [self.annotationsStore valueForKey:MGLAnnotationIDKey];
+    }
+
     return @[];
 }
 
@@ -1415,7 +1423,8 @@ mbgl::DefaultFileSource *mbglFileSource = nullptr;
 {
     for (id <MGLAnnotation> annotation in annotations)
     {
-        NSLog(@"here we would add annotation %p", annotation);
+        [self.annotationsStore setObject:@{ MGLAnnotationIDKey : @(self.annotationsStore.count) }
+                                  forKey:annotation];
     }
 }
 
@@ -1430,10 +1439,14 @@ mbgl::DefaultFileSource *mbglFileSource = nullptr;
 
 - (void)removeAnnotations:(NSArray *)annotations
 {
+    NSMutableArray *annotationIDsToRemove = [NSMutableArray array];
+
     for (id <MGLAnnotation> annotation in annotations)
     {
-        NSLog(@"here we would remove the annotation %p", annotation);
+        [annotationIDsToRemove addObject:[self.annotationsStore objectForKey:annotation]];
     }
+
+    // pass to mbglMap
 }
 
 #pragma mark - Utility -
