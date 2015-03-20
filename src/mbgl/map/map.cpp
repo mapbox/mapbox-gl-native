@@ -609,43 +609,28 @@ std::chrono::steady_clock::time_point Map::getTime() const {
 }
 
 void Map::addClass(const std::string& klass) {
-    if (hasClass(klass)) return;
-    classes.push_back(klass);
-    if (style) {
-        style->cascadeClasses(classes);
-        if (style->hasTransitions()) {
-            triggerUpdate();
-        }
+    if (data->addClass(klass)) {
+        triggerUpdate(Update::Classes);
     }
 }
 
 void Map::removeClass(const std::string& klass) {
-    if (!hasClass(klass)) return;
-    classes.erase(std::remove(classes.begin(), classes.end(), klass), classes.end());
-    if (style) {
-        style->cascadeClasses(classes);
-        if (style->hasTransitions()) {
-            triggerUpdate();
-        }
+    if (data->removeClass(klass)) {
+        triggerUpdate(Update::Classes);
     }
 }
 
-void Map::setClasses(const std::vector<std::string>& classes_) {
-    classes = classes_;
-    if (style) {
-        style->cascadeClasses(classes);
-        if (style->hasTransitions()) {
-            triggerUpdate();
-        }
-    }
+void Map::setClasses(const std::vector<std::string>& classes) {
+    data->setClasses(classes);
+    triggerUpdate(Update::Classes);
 }
 
 bool Map::hasClass(const std::string& klass) const {
-    return std::find(classes.begin(), classes.end(), klass) != classes.end();
+    return data->hasClass(klass);
 }
 
 std::vector<std::string> Map::getClasses() const {
-   return classes;
+    return data->getClasses();
 }
 
 void Map::setDefaultTransitionDuration(std::chrono::steady_clock::duration duration) {
@@ -753,7 +738,7 @@ void Map::loadStyleJSON(const std::string& json, const std::string& base) {
     style = std::make_shared<Style>();
     style->base = base;
     style->loadJSON((const uint8_t *)json.c_str());
-    style->cascadeClasses(classes);
+    style->cascadeClasses(data->getClasses());
     style->setDefaultTransitionDuration(data->getDefaultTransitionDuration());
 
     const std::string glyphURL = util::mapbox::normalizeGlyphsURL(style->glyph_url, getAccessToken());
@@ -776,6 +761,11 @@ void Map::prepare() {
     if (u & static_cast<UpdateType>(Update::DefaultTransitionDuration)) {
         if (style) {
             style->setDefaultTransitionDuration(data->getDefaultTransitionDuration());
+        }
+    }
+    if (u & static_cast<UpdateType>(Update::Classes)) {
+        if (style) {
+            style->cascadeClasses(data->getClasses());
         }
     }
 

@@ -82,6 +82,7 @@ public:
         StyleInfo                 = 1 << 0,
         Debug                     = 1 << 1,
         DefaultTransitionDuration = 1 << 2,
+        Classes                   = 1 << 3,
     };
     void triggerUpdate(Update = Update::Nothing);
 
@@ -250,8 +251,6 @@ private:
     util::ptr<AnnotationManager> annotationManager;
 
     const std::unique_ptr<MapData> data;
-
-    std::vector<std::string> classes;
 
     std::set<util::ptr<StyleSource>> activeSources;
 
