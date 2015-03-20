@@ -185,13 +185,20 @@
 *   @param styleName The map style name to use. */
 - (void)useBundledStyleNamed:(NSString *)styleName;
 
-#pragma mark - Annotating the map
+#pragma mark - Annotating the Map
 
 @property (nonatomic, readonly) NSArray *annotations;
 
+// TODO
 - (void)addAnnotation:(id <MGLAnnotation>)annotation;
+
+// TODO
 - (void)addAnnotations:(NSArray *)annotations;
+
+// TODO
 - (void)removeAnnotation:(id <MGLAnnotation>)annotation;
+
+// TODO
 - (void)removeAnnotations:(NSArray *)annotations;
 
 #pragma mark - Debugging

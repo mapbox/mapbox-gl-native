@@ -1396,6 +1396,46 @@ mbgl::DefaultFileSource *mbglFileSource = nullptr;
     return MGLStyleAllowedTypes;
 }
 
+#pragma mark - Annotations -
+
+- (NSArray *)annotations
+{
+    return @[];
+}
+
+- (void)addAnnotation:(id <MGLAnnotation>)annotation
+{
+    // The core bulk add API is efficient with respect to indexing and
+    // screen refreshes, thus we should defer to it even for individual adds.
+    //
+    [self addAnnotations:@[ annotation ]];
+}
+
+- (void)addAnnotations:(NSArray *)annotations
+{
+    for (id <MGLAnnotation> annotation in annotations)
+    {
+        NSLog(@"here we would add annotation %p", annotation);
+    }
+}
+
+- (void)removeAnnotation:(id <MGLAnnotation>)annotation
+{
+    // The core bulk deletion API is efficient with respect to indexing
+    // and screen refreshes, thus we should defer to it even for
+    // invidividal deletes.
+    //
+    [self removeAnnotations:@[ annotation ]];
+}
+
+- (void)removeAnnotations:(NSArray *)annotations
+{
+    for (id <MGLAnnotation> annotation in annotations)
+    {
+        NSLog(@"here we would remove the annotation %p", annotation);
+    }
+}
+
 #pragma mark - Utility -
 
 + (CGFloat)degreesToRadians:(CGFloat)degrees
