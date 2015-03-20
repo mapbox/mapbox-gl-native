@@ -11,6 +11,7 @@
 
 #import "MGLMetricsLocationManager.h"
 #import "CoreLocation/CoreLocation.h"
+#import "MGLMapboxEvents.h"
 
 @interface MGLMetricsLocationManager()
 
@@ -90,12 +91,14 @@ static MGLMetricsLocationManager *sharedManager = nil;
 - (void)locationManager:(CLLocationManager *)manager didUpdateLocations:(NSArray *)locations {
     CLLocation *loc = (CLLocation *)[locations objectAtIndex:0];
     NSLog(@"didUpdateLocations() called  with %lu location in array.  First Location = %f, %f", (unsigned long)locations.count, loc.coordinate.latitude, loc.coordinate.longitude);
-    
+
+    // TODO Add Opt Out Checking When Built
 /**
     if (![[NSUserDefaults standardUserDefaults] boolForKey:@"mapbox_metrics_enabled_preference"]) {
         NSLog(@"Mapbox Metrics are not enabled, so return without sending in data.");
         return;
     }
+*/
     
     //  Iterate through locations to pass all data
     for (CLLocation *loc in locations) {
@@ -103,9 +106,8 @@ static MGLMetricsLocationManager *sharedManager = nil;
         [evt setValue:[[NSNumber alloc] initWithDouble:loc.coordinate.latitude] forKey:@"lat"];
         [evt setValue:[[NSNumber alloc] initWithDouble:loc.coordinate.longitude] forKey:@"lng"];
         [evt setValue:[[NSNumber alloc] initWithBool:_isBackground] forKey:@"isBackground"];
-        [[MapboxEvents sharedManager] pushEvent:@"location" withAttributes:evt];
+        [[MGLMapboxEvents sharedManager] pushEvent:@"location" withAttributes:evt];
     }
-*/
 }
 
 - (void)locationManager:(CLLocationManager *)manager didChangeAuthorizationStatus:(CLAuthorizationStatus)status {
