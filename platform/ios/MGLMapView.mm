@@ -70,7 +70,7 @@ NSString *const MGLAnnotationIDKey = @"MGLAnnotationIDKey";
 @property (nonatomic) UIRotationGestureRecognizer *rotate;
 @property (nonatomic) UILongPressGestureRecognizer *quickZoom;
 @property (nonatomic) NSMutableArray *bundledStyleNames;
-@property (nonatomic) NSMutableDictionary *annotationsStore;
+@property (nonatomic) NSMapTable *annotationsStore;
 @property (nonatomic, readonly) NSDictionary *allowedStyleTypes;
 @property (nonatomic) CGPoint centerPoint;
 @property (nonatomic) CGFloat scale;
@@ -269,6 +269,10 @@ mbgl::DefaultFileSource *mbglFileSource = nullptr;
 
     Reachability* reachability = [Reachability reachabilityForInternetConnection];
     [reachability startNotifier];
+
+    // setup annotations
+    //
+    _annotationsStore = [NSMapTable mapTableWithKeyOptions:NSMapTableStrongMemory valueOptions:NSMapTableStrongMemory];
 
     // setup logo bug
     //
@@ -1403,12 +1407,20 @@ mbgl::DefaultFileSource *mbglFileSource = nullptr;
 
 - (NSArray *)annotations
 {
+    NSMutableArray *result = [NSMutableArray array];
+
     if ([_annotationsStore count])
     {
-        return [self.annotationsStore valueForKey:MGLAnnotationIDKey];
+        NSEnumerator *keyEnumerator = [_annotationsStore keyEnumerator];
+        id <MGLAnnotation> annotation;
+
+        while (annotation = [keyEnumerator nextObject])
+        {
+            [result addObject:annotation];
+        }
     }
 
-    return @[];
+    return [NSArray arrayWithArray:result];
 }
 
 - (void)addAnnotation:(id <MGLAnnotation>)annotation
@@ -1444,6 +1456,7 @@ mbgl::DefaultFileSource *mbglFileSource = nullptr;
     for (id <MGLAnnotation> annotation in annotations)
     {
         [annotationIDsToRemove addObject:[self.annotationsStore objectForKey:annotation]];
+        [self.annotationsStore removeObjectForKey:annotation];
     }
 
     // pass to mbglMap
