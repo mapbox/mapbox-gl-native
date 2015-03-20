@@ -16,6 +16,8 @@
         '../platform/darwin/asset_root.mm',
         '../platform/darwin/image.mm',
         '../platform/darwin/reachability.m',
+        '../include/mbgl/ios/MBLocationManager.h',
+        '../platform/ios/MBLocationManager.m',
         '../include/mbgl/ios/MGLMapView.h',
         '../platform/ios/MGLMapView.mm',
         '../include/mbgl/ios/MGLStyleFunctionValue.h',
