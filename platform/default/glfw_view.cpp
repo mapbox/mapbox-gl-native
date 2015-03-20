@@ -11,6 +11,7 @@ GLFWView::GLFWView(bool fullscreen_) : fullscreen(fullscreen_) {
 }
 
 GLFWView::~GLFWView() {
+    glfwDestroyWindow(window);
     glfwTerminate();
 }
 

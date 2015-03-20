@@ -1,0 +1,91 @@
+{
+   Valgrind gets confused with buffers managed by the graphics driver
+   Memcheck:Leak
+   ...
+   obj:/usr/*/dri/r600_dri.so
+   ...
+}
+{
+   GLFW _glfwCreateCursor()
+   Memcheck:Leak
+   match-leak-kinds: reachable
+   ...
+   obj:/usr/*/libX11.so.6.3.0
+   ...
+   fun:_glfwCreateCursor
+   ...
+}
+{
+   GLFW _glfwPlatform*()
+   Memcheck:Leak
+   match-leak-kinds: reachable
+   ...
+   fun:_glfwPlatform*
+   ...
+}
+{
+   Buffer managed by OpenGL?
+   Memcheck:Cond
+   ...
+   fun:_ZN4mbgl*Uniform*
+   ...
+   fun:_ZN8GLFWView10invalidateEv
+   ...
+}
+{
+   Buffer managed by OpenGL?
+   Memcheck:Cond
+   fun:_ZNSt7__equalILb0EE5equalIPKfS3_EEbT_S4_T0_
+   ...
+   fun:_ZN4mbgl7Painter11renderLayerERKNS_10StyleLayerEPKNS_4Tile2IDEPKSt5arrayIfLm16EE
+}
+{
+   Valgrind doesn't like our make_unique (C++14 polyfill)
+   Memcheck:Leak
+   match-leak-kinds: reachable
+   fun:malloc
+   ...
+   fun:_ZN4mbgl4util11make_unique*
+   ...
+}
+{
+   dlopen doing its magic
+   Memcheck:Leak
+   match-leak-kinds: reachable
+   ...
+   fun:_dl_open
+   ...
+}
+{
+   X11 false positive
+   Memcheck:Leak
+   match-leak-kinds: reachable
+   ...
+   obj:/usr/*/libX11.so.6.3.0
+   ...
+   fun:_XrmInitParseInfo
+   ...
+}
+{
+   OpenSSL false positive
+   Memcheck:Leak
+   ...
+   fun:CRYPTO_malloc
+   ...
+}
+{
+   OpenSSL false positive
+   Memcheck:Leak
+   ...
+   fun:CRYPTO_realloc
+   ...
+}
+{
+   Libcurl false positive
+   Memcheck:Leak
+   fun:malloc
+   ...
+   obj:/usr/*/libcurl.so.4.3.0
+   fun:curl_multi_socket_action
+   ...
+}
