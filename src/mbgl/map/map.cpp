@@ -591,18 +591,17 @@ void Map::updateAnnotationTiles(std::vector<Tile::ID>& ids) {
 #pragma mark - Toggles
 
 void Map::setDebug(bool value) {
-    debug = value;
-    assert(painter);
-    painter->setDebug(debug);
-    triggerUpdate();
+    data->setDebug(value);
+    triggerUpdate(Update::Debug);
 }
 
 void Map::toggleDebug() {
-    setDebug(!debug);
+    data->toggleDebug();
+    triggerUpdate(Update::Debug);
 }
 
 bool Map::getDebug() const {
-    return debug;
+    return data->getDebug();
 }
 
 void Map::addClass(const std::string& klass) {
@@ -764,6 +763,10 @@ void Map::prepare() {
     const auto u = updated.exchange(static_cast<UpdateType>(Update::Nothing));
     if (u & static_cast<UpdateType>(Update::StyleInfo)) {
         reloadStyle();
+    }
+    if (u & static_cast<UpdateType>(Update::Debug)) {
+        assert(painter);
+        painter->setDebug(data->getDebug());
     }
 
     // Update transform transitions.

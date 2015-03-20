@@ -3,6 +3,7 @@
 
 #include <string>
 #include <mutex>
+#include <atomic>
 
 namespace mbgl {
 
@@ -25,10 +26,15 @@ public:
         styleInfo = info;
     }
 
+    inline bool getDebug() const { return debug; }
+    inline bool toggleDebug() { return debug ^= 1u; }
+    inline void setDebug(bool value) { debug = value; }
+
 private:
     mutable std::mutex mtx;
 
     StyleInfo styleInfo;
+    std::atomic<uint8_t> debug;
 };
 
 }

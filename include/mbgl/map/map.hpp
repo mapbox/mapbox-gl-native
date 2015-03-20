@@ -80,6 +80,7 @@ public:
     enum class Update : UpdateType {
         Nothing   = 0,
         StyleInfo = 1 << 0,
+        Debug     = 1 << 1,
     };
     void triggerUpdate(Update = Update::Nothing);
 
@@ -254,7 +255,6 @@ private:
 
     std::chrono::steady_clock::duration defaultTransitionDuration;
 
-    bool debug = false;
     std::chrono::steady_clock::time_point animationTime = std::chrono::steady_clock::time_point::min();
 
     std::set<util::ptr<StyleSource>> activeSources;
