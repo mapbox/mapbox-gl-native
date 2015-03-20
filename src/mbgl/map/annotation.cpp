@@ -38,7 +38,7 @@ vec2<double> AnnotationManager::projectPoint(LatLng& point) {
 
 std::pair<std::vector<Tile::ID>, std::vector<uint32_t>> AnnotationManager::addPointAnnotations(std::vector<LatLng> points, std::vector<std::string>& symbols, const Map& map) {
     //
-    // We pre-generate tiles to contain each annotations up to the map's max zoom.
+    // We pre-generate tiles to contain each annotation up to the map's max zoom.
     // We do this for fast rendering without projection conversions on the fly, as well as
     // to simplify bounding box queries of annotations later. Tiles get invalidated when
     // annotations are added or removed in order to refresh the map render without
@@ -58,10 +58,10 @@ std::pair<std::vector<Tile::ID>, std::vector<uint32_t>> AnnotationManager::addPo
 
         uint8_t maxZoom = map.getMaxZoom();
 
-        // side length of map at zoom
+        // side length of map at this zoom
         uint32_t z2 = 1 << maxZoom;
 
-        // actual projection conversion into unit space
+        // projection conversion into unit space
         vec2<double> p = projectPoint(points[i]);
 
         uint32_t x = p.x * z2;
@@ -76,7 +76,7 @@ std::pair<std::vector<Tile::ID>, std::vector<uint32_t>> AnnotationManager::addPo
 
             GeometryCollection geometries({{ {{ coordinate }} }});
 
-            // at render we style the annotation according to its {sprite} field
+            // at render time we style the annotation according to its {sprite} field
             std::map<std::string, std::string> properties = {{ "sprite", (symbols[i].length() ? symbols[i] : defaultPointAnnotationSymbol) }};
 
             auto feature = std::make_shared<const LiveTileFeature>(FeatureType::Point,
@@ -108,7 +108,7 @@ std::pair<std::vector<Tile::ID>, std::vector<uint32_t>> AnnotationManager::addPo
                 tile_pos.first->second.second->addLayer(util::ANNOTATIONS_POINTS_LAYER_ID, layer);
             }
 
-            // Record annotation association with tile and tile feature. This is used to determine stales tiles,
+            // Record annotation association with tile and tile feature. This is used to determine stale tiles,
             // as well as to remove the feature from the tile upon annotation deletion.
             anno_it.first->second->tileFeatures.emplace(tileID, std::vector<std::weak_ptr<const LiveTileFeature>>({ feature }));
 
@@ -171,10 +171,12 @@ std::vector<uint32_t> AnnotationManager::getAnnotationsInBounds(LatLngBounds que
         if (id.z == z) {
             if (id.x >= nwTile.x && id.x <= seTile.x && id.y >= nwTile.y && id.y <= seTile.y) {
                 if (id.x > nwTile.x && id.x < seTile.x && id.y > nwTile.y && id.y < seTile.y) {
-                    // trivial accept; grab all of the tile's annotations
+                    // Trivial accept; this tile is completely inside the query bounds, so
+                    // we'll return all of its annotations.
                     std::copy(tile.second.first.begin(), tile.second.first.end(), std::back_inserter(matchingAnnotations));
                 } else {
-                    // check tile's annotations' bounding boxes individually
+                    // This tile is intersected by the query bounds. We need to check the
+                    // tile's annotations' bounding boxes individually. 
                     std::copy_if(tile.second.first.begin(), tile.second.first.end(),
                                  std::back_inserter(matchingAnnotations), [&](const uint32_t annotationID) -> bool {
                         LatLngBounds annoBounds = this->annotations.find(annotationID)->second->getBounds();
