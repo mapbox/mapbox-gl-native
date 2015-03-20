@@ -78,9 +78,10 @@ public:
     // Notifies the Map thread that the state has changed and an update might be necessary.
     using UpdateType = uint32_t;
     enum class Update : UpdateType {
-        Nothing   = 0,
-        StyleInfo = 1 << 0,
-        Debug     = 1 << 1,
+        Nothing                   = 0,
+        StyleInfo                 = 1 << 0,
+        Debug                     = 1 << 1,
+        DefaultTransitionDuration = 1 << 2,
     };
     void triggerUpdate(Update = Update::Nothing);
 
@@ -252,8 +253,6 @@ private:
 
     std::vector<std::string> classes;
     std::string accessToken;
-
-    std::chrono::steady_clock::duration defaultTransitionDuration;
 
     std::set<util::ptr<StyleSource>> activeSources;
 

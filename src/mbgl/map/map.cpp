@@ -649,14 +649,15 @@ std::vector<std::string> Map::getClasses() const {
 }
 
 void Map::setDefaultTransitionDuration(std::chrono::steady_clock::duration duration) {
-    defaultTransitionDuration = duration;
-    if (style) {
-        style->setDefaultTransitionDuration(duration);
-    }
+    assert(Environment::currentlyOn(ThreadType::Main));
+
+    data->setDefaultTransitionDuration(duration);
+    triggerUpdate(Update::DefaultTransitionDuration);
 }
 
 std::chrono::steady_clock::duration Map::getDefaultTransitionDuration() {
-    return defaultTransitionDuration;
+    assert(Environment::currentlyOn(ThreadType::Main));
+    return data->getDefaultTransitionDuration();
 }
 
 void Map::updateSources() {
@@ -753,7 +754,7 @@ void Map::loadStyleJSON(const std::string& json, const std::string& base) {
     style->base = base;
     style->loadJSON((const uint8_t *)json.c_str());
     style->cascadeClasses(classes);
-    style->setDefaultTransitionDuration(defaultTransitionDuration);
+    style->setDefaultTransitionDuration(data->getDefaultTransitionDuration());
 
     const std::string glyphURL = util::mapbox::normalizeGlyphsURL(style->glyph_url, getAccessToken());
     glyphStore->setURL(glyphURL);
@@ -771,6 +772,11 @@ void Map::prepare() {
     if (u & static_cast<UpdateType>(Update::Debug)) {
         assert(painter);
         painter->setDebug(data->getDebug());
+    }
+    if (u & static_cast<UpdateType>(Update::DefaultTransitionDuration)) {
+        if (style) {
+            style->setDefaultTransitionDuration(data->getDefaultTransitionDuration());
+        }
     }
 
     // Update transform transitions.

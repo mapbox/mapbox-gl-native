@@ -20,6 +20,7 @@ class MapData {
 public:
     inline MapData() {
         setAnimationTime(std::chrono::steady_clock::time_point::min());
+        setDefaultTransitionDuration(std::chrono::steady_clock::duration::zero());
     }
 
     inline StyleInfo getStyleInfo() const {
@@ -50,12 +51,20 @@ public:
         animationTime = timePoint.time_since_epoch();
     };
 
+    inline std::chrono::steady_clock::duration getDefaultTransitionDuration() const {
+        return defaultTransitionDuration;
+    }
+    inline void setDefaultTransitionDuration(std::chrono::steady_clock::duration duration) {
+        defaultTransitionDuration = duration;
+    };
+
 private:
     mutable std::mutex mtx;
 
     StyleInfo styleInfo;
     std::atomic<uint8_t> debug { false };
     std::atomic<std::chrono::steady_clock::time_point::duration> animationTime;
+    std::atomic<std::chrono::steady_clock::duration> defaultTransitionDuration;
 };
 
 }
