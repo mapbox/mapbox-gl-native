@@ -5,6 +5,7 @@
 #import <mbgl/platform/darwin/settings_nsuserdefaults.hpp>
 
 #import <CoreLocation/CoreLocation.h>
+#import "MBLocationManager.h"
 
 static UIColor *const kTintColor = [UIColor colorWithRed:0.120 green:0.550 blue:0.670 alpha:1.000];
 
@@ -39,6 +40,7 @@ mbgl::Settings_NSUserDefaults *settings = nullptr;
     {
         [[NSNotificationCenter defaultCenter] addObserver:self selector:@selector(saveState:) name:UIApplicationDidEnterBackgroundNotification object:nil];
         [[NSNotificationCenter defaultCenter] addObserver:self selector:@selector(restoreState:) name:UIApplicationWillEnterForegroundNotification object:nil];
+        [MBLocationManager sharedManager];
     }
 
     return self;
