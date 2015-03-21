@@ -1493,6 +1493,23 @@ mbgl::DefaultFileSource *mbglFileSource = nullptr;
     mbglMap->removeAnnotations(annotationIDsToRemove);
 }
 
+- (NSArray *)selectedAnnotations
+{
+    return _selectedAnnotations;
+}
+
+- (void)selectAnnotation:(id <MGLAnnotation>)annotation animated:(BOOL)animated
+{
+    (void)annotation;
+    (void)animated;
+}
+
+- (void)deselectAnnotation:(id <MGLAnnotation>)annotation animated:(BOOL)animated
+{
+    (void)annotation;
+    (void)animated;
+}
+
 #pragma mark - Utility -
 
 + (CGFloat)degreesToRadians:(CGFloat)degrees

@@ -201,6 +201,15 @@
 // TODO
 - (void)removeAnnotations:(NSArray *)annotations;
 
+// TODO
+@property (nonatomic, copy) NSArray *selectedAnnotations;
+
+// TODO
+- (void)selectAnnotation:(id <MGLAnnotation>)annotation animated:(BOOL)animated;
+
+// TODO
+- (void)deselectAnnotation:(id <MGLAnnotation>)annotation animated:(BOOL)animated;
+
 #pragma mark - Debugging
 
 /** @name Debugging */
