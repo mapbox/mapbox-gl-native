@@ -175,7 +175,7 @@ mbgl::DefaultFileSource *mbglFileSource = nullptr;
 {
     if ( ! styleJSON)
     {
-        [self useBundledStyleNamed:@"bright-v7"];
+        [self useBundledStyleNamed:@"emerald-v7"];
     }
     else
     {
