@@ -74,6 +74,7 @@ NSString *const MGLAnnotationIDKey = @"MGLAnnotationIDKey";
 @property (nonatomic) UILongPressGestureRecognizer *quickZoom;
 @property (nonatomic) NSMutableArray *bundledStyleNames;
 @property (nonatomic) NSMapTable *annotationsStore;
+@property (nonatomic) id <MGLAnnotation> selectedAnnotation;
 @property (nonatomic, readonly) NSDictionary *allowedStyleTypes;
 @property (nonatomic) CGPoint centerPoint;
 @property (nonatomic) CGFloat scale;
@@ -1495,19 +1496,26 @@ mbgl::DefaultFileSource *mbglFileSource = nullptr;
 
 - (NSArray *)selectedAnnotations
 {
-    return _selectedAnnotations;
+    return @[ self.selectedAnnotation ];
+}
+
+- (void)setSelectedAnnotations:(NSArray *)selectedAnnotations
+{
+    self.selectedAnnotation = selectedAnnotations[0];
 }
 
 - (void)selectAnnotation:(id <MGLAnnotation>)annotation animated:(BOOL)animated
 {
-    (void)annotation;
     (void)animated;
+
+    self.selectedAnnotation = annotation;
 }
 
 - (void)deselectAnnotation:(id <MGLAnnotation>)annotation animated:(BOOL)animated
 {
-    (void)annotation;
     (void)animated;
+
+    if ([self.selectedAnnotation isEqual:annotation]) self.selectedAnnotation = nil;
 }
 
 #pragma mark - Utility -
