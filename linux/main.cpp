@@ -1,4 +1,5 @@
 #include <mbgl/mbgl.hpp>
+#include <mbgl/util/std.hpp>
 #include <mbgl/util/uv.hpp>
 #include <mbgl/platform/log.hpp>
 #include <mbgl/platform/platform.hpp>
@@ -13,7 +14,7 @@
 #include <sstream>
 
 
-GLFWView *view = nullptr;
+std::unique_ptr<GLFWView> view;
 
 void quit_handler(int) {
     if (view) {
@@ -62,7 +63,7 @@ int main(int argc, char *argv[]) {
     sigIntHandler.sa_flags = 0;
     sigaction(SIGINT, &sigIntHandler, NULL);
 
-    view = new GLFWView();
+    view = mbgl::util::make_unique<GLFWView>();
 
     mbgl::SQLiteCache cache("/tmp/mbgl-cache.db");
     mbgl::DefaultFileSource fileSource(&cache);

@@ -61,6 +61,7 @@ using namespace mbgl;
 
 Map::Map(View& view_, FileSource& fileSource_)
     : env(util::make_unique<Environment>(fileSource_)),
+      scope(util::make_unique<EnvironmentScope>(*env, ThreadType::Main, "Main")),
       view(view_),
       transform(view_),
       fileSource(fileSource_),
@@ -80,15 +81,28 @@ Map::~Map() {
         stop();
     }
 
+    // Extend the scope to include both Main and Map thread types to ease cleanup.
+    scope.reset();
+    scope = util::make_unique<EnvironmentScope>(
+        *env, static_cast<ThreadType>(static_cast<uint8_t>(ThreadType::Main) |
+                                      static_cast<uint8_t>(ThreadType::Map)),
+        "MapandMain");
+
     // Explicitly reset all pointers.
     activeSources.clear();
     sprite.reset();
     glyphStore.reset();
     style.reset();
-    texturePool.reset();
     workers.reset();
+    painter.reset();
+    annotationManager.reset();
+    lineAtlas.reset();
+    spriteAtlas.reset();
+    glyphAtlas.reset();
 
     uv_run(env->loop, UV_RUN_DEFAULT);
+
+    env->performCleanup();
 }
 
 uv::worker &Map::getWorker() {
@@ -113,7 +127,6 @@ void Map::start(bool startPaused) {
 
         // Remove all of these to make sure they are destructed in the correct thread.
         style.reset();
-        workers.reset();
         activeSources.clear();
 
         terminating = true;
@@ -233,7 +246,7 @@ void Map::run() {
         threadName += "andMain";
     }
 
-    Environment::Scope scope(*env, threadType, threadName);
+    EnvironmentScope mapScope(*env, threadType, threadName);
 
     if (mode == Mode::Continuous) {
         checkForPause();
@@ -749,6 +762,10 @@ void Map::prepare() {
 
 void Map::render() {
     assert(Environment::currentlyOn(ThreadType::Map));
+
+    // Cleanup OpenGL objects that we abandoned since the last render call.
+    env->performCleanup();
+
     assert(painter);
     painter->render(*style, activeSources,
                     state, animationTime);
