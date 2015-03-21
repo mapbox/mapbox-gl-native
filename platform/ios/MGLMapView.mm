@@ -40,6 +40,9 @@ const std::string &defaultCacheDatabase() {
 
 static dispatch_once_t loadGLExtensions;
 
+NSString *const MGLDefaultStyleName = @"Bright";
+NSString *const MGLStyleVersion = @"v7";
+
 extern NSString *const MGLStyleKeyGeneric;
 extern NSString *const MGLStyleKeyFill;
 extern NSString *const MGLStyleKeyLine;
@@ -179,7 +182,9 @@ mbgl::DefaultFileSource *mbglFileSource = nullptr;
 {
     if ( ! styleJSON)
     {
-        [self useBundledStyleNamed:@"bright-v7"];
+        [self useBundledStyleNamed:[[[MGLDefaultStyleName lowercaseString]
+                                        stringByAppendingString:@"-"]
+                                        stringByAppendingString:MGLStyleVersion]];
     }
     else
     {
@@ -1452,7 +1457,7 @@ mbgl::DefaultFileSource *mbglFileSource = nullptr;
         }
         else
         {
-            symbols.push_back("marker-12");
+            symbols.push_back("marker-12"); // all styles have this currently
         }
     }
 
