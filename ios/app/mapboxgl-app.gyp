@@ -10,6 +10,7 @@
       'mac_bundle': 1,
       'mac_bundle_resources': [
         '<!@(find ./img -type f)',
+        './vendor/HockeySDK.framework'
       ],
 
       'dependencies': [
