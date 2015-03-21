@@ -66,7 +66,7 @@ namespace mbgl {
         return result;
 
     }
-    
+
     CSSColorParser::Color parseColorarr(const rapidjson::Value& color,  std::unordered_map<std::string, const rapidjson::Value *> constants) {
         CSSColorParser::Color css_color;
         if (color.IsArray()) {
@@ -79,7 +79,7 @@ namespace mbgl {
         }
         return css_color;
     }
-    
+
     std::array<double, 4> ColorOperation::toHSL() {
 
         double r = color_.r / 255.0;
@@ -118,7 +118,7 @@ namespace mbgl {
         double max = std::max(0.0, val);
         return std::min(1.0, max);
     }
-    
+
     CSSColorParser::Color toColor(std::array<double, 4> hsl) {
         std::string str = "hsla(";
         str.append(std::to_string(hsl[0]));
@@ -127,11 +127,11 @@ namespace mbgl {
         str = str + "%, ";
         str.append(std::to_string(hsl[2]*100));
         str = str + "%, ";
-        str.append(std::to_string(hsl[3]*100));
+        str.append(std::to_string(hsl[3]));
         str = str + ")";
         return CSSColorParser::parse(str);
     }
-    
+
     CSSColorParser::Color Darken::evaluate() {
         std::array<double, 4> hsl = this->toHSL();
         
@@ -139,7 +139,7 @@ namespace mbgl {
         hsl[2] = clamp(hsl[2]);
         return toColor(hsl);
     }
-    
+
     CSSColorParser::Color Lighten::evaluate() {
         std::array<double, 4> hsl = this->toHSL();
         
@@ -147,7 +147,7 @@ namespace mbgl {
         hsl[2] = clamp(hsl[2]);
         return toColor(hsl);
     }
-    
+
     CSSColorParser::Color Desaturate::evaluate() {
         std::array<double, 4> hsl = this->toHSL();
         
@@ -155,7 +155,7 @@ namespace mbgl {
         hsl[1] = clamp(hsl[1]);
         return toColor(hsl);
     }
-    
+
     CSSColorParser::Color Saturate::evaluate() {
         std::array<double, 4> hsl = this->toHSL();
         
@@ -163,23 +163,23 @@ namespace mbgl {
         hsl[1] = clamp(hsl[1]);
         return toColor(hsl);
     }
-    
+
     CSSColorParser::Color Fadeout::evaluate() {
         std::array<double, 4> hsl = this->toHSL();
 
-        hsl[4] -= this->degree_ / 100.0;
-        hsl[4] = clamp(hsl[4]);
+        hsl[3] -= this->degree_ / 100.0;
+        hsl[3] = clamp(hsl[3]);
         return toColor(hsl);
     }
-    
+
     CSSColorParser::Color Fadein::evaluate() {
         std::array<double, 4> hsl = this->toHSL();
         
-        hsl[4] += this->degree_ / 100.0;
-        hsl[4] = clamp(hsl[4]);
+        hsl[3] += this->degree_ / 100.0;
+        hsl[3] = clamp(hsl[3]);
         return toColor(hsl);
     }
-    
+
     CSSColorParser::Color Spin::evaluate() {
         std::array<double, 4> hsl = this->toHSL();
         
@@ -191,7 +191,7 @@ namespace mbgl {
         }
         return toColor(hsl);
     }
-    
+
     CSSColorParser::Color Mix::evaluate() {
         double p = this->degree_ / 100.0;
         double w = p * 2 - 1;

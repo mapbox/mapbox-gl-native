@@ -90,11 +90,8 @@ private:
     std::tuple<bool,std::vector<float>> parseFloatArray(JSVal value);
 
     FilterExpression parseFilter(JSVal);
-    
-
 
 private:
-    
     std::unordered_map<std::string, const rapidjson::Value *> constants;
 
     std::unordered_map<std::string, const util::ptr<StyleSource>> sources;
