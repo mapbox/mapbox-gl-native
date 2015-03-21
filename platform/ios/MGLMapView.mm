@@ -40,7 +40,7 @@ const std::string &defaultCacheDatabase() {
 
 static dispatch_once_t loadGLExtensions;
 
-NSString *const MGLDefaultStyleName = @"Bright";
+NSString *const MGLDefaultStyleName = @"Emerald";
 NSString *const MGLStyleVersion = @"v7";
 
 extern NSString *const MGLStyleKeyGeneric;

@@ -3,6 +3,7 @@
 
 #include <mbgl/platform/gl.hpp>
 #include <mbgl/util/noncopyable.hpp>
+#include <mbgl/map/environment.hpp>
 
 #include <cstdlib>
 #include <cassert>
@@ -21,7 +22,7 @@ public:
     ~Buffer() {
         cleanup();
         if (buffer != 0) {
-            MBGL_CHECK_ERROR(glDeleteBuffers(1, &buffer));
+            Environment::Get().abandonBuffer(buffer);
             buffer = 0;
         }
     }
