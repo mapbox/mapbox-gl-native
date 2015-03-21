@@ -247,7 +247,7 @@ void Map::run() {
         threadName += "andMain";
     }
 
-    EnvironmentScope mapScope(*env, threadType, threadName);
+    EnvironmentScope mapScope(*env, threadType, threadName, env->loop);
 
     if (mode == Mode::Continuous) {
         checkForPause();

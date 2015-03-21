@@ -9,6 +9,7 @@
 #include <mbgl/util/util.hpp>
 
 #include <functional>
+#include <thread>
 
 typedef struct uv_loop_s uv_loop_t;
 
@@ -28,7 +29,7 @@ public:
 
     // These can be called from any thread. The callback will be invoked in the loop.
     // You can only cancel a request from the same thread it was created in.
-    virtual Request *request(const Resource &resource, uv_loop_t *loop, Callback callback) = 0;
+    virtual Request *request(const Resource &resource, const std::thread::id& id, Callback callback) = 0;
     virtual void cancel(Request *request) = 0;
 
     // These can be called from any thread. The callback will be invoked in an arbitrary other thread.

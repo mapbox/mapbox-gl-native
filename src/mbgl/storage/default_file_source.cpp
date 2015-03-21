@@ -110,8 +110,8 @@ SharedRequestBase *DefaultFileSource::find(const Resource &resource) {
     return nullptr;
 }
 
-Request *DefaultFileSource::request(const Resource &resource, uv_loop_t *l, Callback callback) {
-    auto req = new Request(resource, l, Environment::Get().getID(), std::move(callback));
+Request *DefaultFileSource::request(const Resource &resource, const std::thread::id &tid_, Callback callback) {
+    auto req = new Request(resource, tid_, Environment::Get().getID(), std::move(callback));
 
     // This function can be called from any thread. Make sure we're executing the actual call in the
     // file source loop by sending it over the queue. It will be processed in processAction().
@@ -120,7 +120,7 @@ Request *DefaultFileSource::request(const Resource &resource, uv_loop_t *l, Call
 }
 
 void DefaultFileSource::request(const Resource &resource, Callback callback) {
-    auto req = new Request(resource, nullptr, Environment::Get().getID(), std::move(callback));
+    auto req = new Request(resource, std::thread::id(), Environment::Get().getID(), std::move(callback));
 
     // This function can be called from any thread. Make sure we're executing the actual call in the
     // file source loop by sending it over the queue. It will be processed in processAction().

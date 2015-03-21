@@ -169,7 +169,7 @@ void Environment::requestAsync(const Resource& resource,
 Request* Environment::request(const Resource& resource,
                               std::function<void(const Response&)> callback) {
     assert(currentlyOn(ThreadType::Map));
-    return fileSource.request(resource, loop, std::move(callback));
+    return fileSource.request(resource, std::this_thread::get_id(), std::move(callback));
 }
 
 void Environment::cancelRequest(Request* req) {
