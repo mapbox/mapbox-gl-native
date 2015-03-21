@@ -17,6 +17,8 @@ class Request;
 class Response;
 struct Resource;
 
+typedef std::function<void()> Closure;
+
 enum class ThreadType : uint8_t {
     Unknown    = 0,
     Main       = 1 << 0,
@@ -33,6 +35,8 @@ public:
     static bool inScope();
     static bool currentlyOn(ThreadType);
     static std::string threadName();
+
+    static bool postTask(const std::thread::id& to, const Closure& task);
 
     uint32_t getID() const;
 
@@ -74,11 +78,11 @@ public:
 
 class EnvironmentScope final {
 public:
-    EnvironmentScope(Environment&, ThreadType, const std::string& name);
+    EnvironmentScope(Environment&, ThreadType, const std::string& name, uv_loop_t* loop = nullptr);
     ~EnvironmentScope();
 
 private:
-    std::thread::id id;
+    std::thread::id tid;
 };
 
 }
