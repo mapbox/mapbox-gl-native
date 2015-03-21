@@ -1,4 +1,5 @@
 #include <mbgl/util/texture_pool.hpp>
+#include <mbgl/map/environment.hpp>
 
 #include <vector>
 
@@ -42,17 +43,9 @@ void TexturePool::removeTextureID(GLuint texture_id) {
 }
 
 void TexturePool::clearTextureIDs() {
-    std::vector<GLuint> ids_to_remove;
-    ids_to_remove.reserve(texture_ids.size());
-
-    for (std::set<GLuint>::iterator id_iterator = texture_ids.begin();
-         id_iterator != texture_ids.end(); ++id_iterator) {
-        ids_to_remove.push_back(*id_iterator);
+    auto& env = Environment::Get();
+    for (auto texture : texture_ids) {
+        env.abandonTexture(texture);
     }
-
-    if (!ids_to_remove.empty()) {
-        MBGL_CHECK_ERROR(glDeleteTextures((GLsizei)ids_to_remove.size(), &ids_to_remove[0]));
-    }
-
     texture_ids.clear();
 }
