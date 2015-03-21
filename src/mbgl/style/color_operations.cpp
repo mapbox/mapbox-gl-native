@@ -82,22 +82,22 @@ namespace mbgl {
     
     std::array<double, 4> ColorOperation::toHSL() {
 
-        double r = color_.r / 255;
-        double g = color_.g / 255;
-        double b = color_.b / 255;
-        double a = color_.a / 255;
+        double r = color_.r / 255.0;
+        double g = color_.g / 255.0;
+        double b = color_.b / 255.0;
+        double a = color_.a;
         
         double max = std::max(r, std::max(g, b)),
-        min = std::min(r, std::min(g, b));
+            min = std::min(r, std::min(g, b));
         
         double h, s, l = (max + min) / 2,
-        d = max - min;
+            d = max - min;
         
         if (max == min) {
             h = s = 0;
         } else {
             if (l > 0.5) {
-                s = 2 - max - min;
+                s = d / (2 - max - min);
             } else {
                 s = d / (max + min);
             }
@@ -113,21 +113,21 @@ namespace mbgl {
         h *= 360;
         return {{h, s, l, a}};
     }
-    
+
     double ColorOperation::clamp(double val) {
-        double max = std::max(0, (int) val);
-        return std::min(1, (int) max);
+        double max = std::max(0.0, val);
+        return std::min(1.0, max);
     }
     
     CSSColorParser::Color toColor(std::array<double, 4> hsl) {
         std::string str = "hsla(";
         str.append(std::to_string(hsl[0]));
         str = str + ", ";
-        str.append(std::to_string(hsl[1]));
+        str.append(std::to_string(hsl[1]*100));
         str = str + "%, ";
-        str.append(std::to_string(hsl[2]));
+        str.append(std::to_string(hsl[2]*100));
         str = str + "%, ";
-        str.append(std::to_string(hsl[3]));
+        str.append(std::to_string(hsl[3]*100));
         str = str + ")";
         return CSSColorParser::parse(str);
     }
@@ -166,9 +166,9 @@ namespace mbgl {
     
     CSSColorParser::Color Fadeout::evaluate() {
         std::array<double, 4> hsl = this->toHSL();
-        
-        hsl[3] -= this->degree_ / 100.0;
-        hsl[3] = clamp(hsl[3]);
+
+        hsl[4] -= this->degree_ / 100.0;
+        hsl[4] = clamp(hsl[4]);
         return toColor(hsl);
     }
     
