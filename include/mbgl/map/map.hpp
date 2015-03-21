@@ -20,6 +20,8 @@
 #include <functional>
 #include <chrono>
 
+typedef struct uv_loop_s uv_loop_t;
+
 namespace mbgl {
 
 class Painter;
@@ -213,6 +215,7 @@ private:
     const std::unique_ptr<Environment> env;
     std::unique_ptr<EnvironmentScope> scope;
     View &view;
+    uv_loop_t *loop;
 
 private:
     std::unique_ptr<uv::worker> workers;

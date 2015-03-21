@@ -125,7 +125,7 @@ EnvironmentScope::~EnvironmentScope() {
 }
 
 Environment::Environment(FileSource& fs)
-    : id(makeEnvironmentID()), fileSource(fs), loop(uv_loop_new()) {
+    : id(makeEnvironmentID()), fileSource(fs) {
 }
 
 Environment::~Environment() {

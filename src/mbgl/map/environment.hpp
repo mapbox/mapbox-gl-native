@@ -71,9 +71,6 @@ private:
     std::vector<uint32_t> abandonedVAOs;
     std::vector<uint32_t> abandonedBuffers;
     std::vector<uint32_t> abandonedTextures;
-
-public:
-    uv_loop_t* const loop;
 };
 
 class EnvironmentScope final {
