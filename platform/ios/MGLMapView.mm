@@ -1643,7 +1643,7 @@ CLLocationCoordinate2D latLngToCoordinate(mbgl::LatLng latLng)
     {
         assert([annotation conformsToProtocol:@protocol(MGLAnnotation)]);
 
-        annotationIDsToRemove.push_back([[self.annotationsStore objectForKey:annotation] unsignedIntValue]);
+        annotationIDsToRemove.push_back([[[self.annotationsStore objectForKey:annotation] objectForKey:MGLAnnotationIDKey] unsignedIntValue]);
         [self.annotationsStore removeObjectForKey:annotation];
     }
 
