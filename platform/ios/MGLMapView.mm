@@ -1572,15 +1572,14 @@ mbgl::DefaultFileSource *mbglFileSource = nullptr;
     {
         latLngs.push_back(mbgl::LatLng(annotation.coordinate.latitude, annotation.coordinate.longitude));
 
+        NSString *symbolName = nil;
+
         if (delegateImplementsSymbolLookup)
         {
-            symbols.push_back([[self.delegate mapView:self
-                              symbolNameForAnnotation:annotation] cStringUsingEncoding:[NSString defaultCStringEncoding]]);
+            symbolName = [self.delegate mapView:self symbolNameForAnnotation:annotation];
         }
-        else
-        {
-            symbols.push_back("");
-        }
+
+        symbols.push_back((symbolName ? [symbolName cStringUsingEncoding:[NSString defaultCStringEncoding]] : ""));
     }
 
     std::vector<uint32_t> annotationIDs = mbglMap->addPointAnnotations(latLngs, symbols);
