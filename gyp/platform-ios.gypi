@@ -16,6 +16,7 @@
         '../platform/darwin/asset_root.mm',
         '../platform/darwin/image.mm',
         '../platform/darwin/reachability.m',
+        '../include/mbgl/ios/MapboxGL.h',
         '../include/mbgl/ios/MGLMapView.h',
         '../platform/ios/MGLMapView.mm',
         '../include/mbgl/ios/MGLAnnotation.h',
