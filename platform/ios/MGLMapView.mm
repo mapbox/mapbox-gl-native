@@ -1576,6 +1576,8 @@ CLLocationCoordinate2D latLngToCoordinate(mbgl::LatLng latLng)
 
 - (void)addAnnotation:(id <MGLAnnotation>)annotation
 {
+    if ( ! annotation) return;
+
     // The core bulk add API is efficient with respect to indexing and
     // screen refreshes, thus we should defer to it even for individual adds.
     //
@@ -1584,6 +1586,8 @@ CLLocationCoordinate2D latLngToCoordinate(mbgl::LatLng latLng)
 
 - (void)addAnnotations:(NSArray *)annotations
 {
+    if ( ! annotations) return;
+
     std::vector<mbgl::LatLng> latLngs;
     latLngs.reserve(annotations.count);
 
@@ -1594,6 +1598,8 @@ CLLocationCoordinate2D latLngToCoordinate(mbgl::LatLng latLng)
 
     for (id <MGLAnnotation> annotation in annotations)
     {
+        assert([annotation conformsToProtocol:@protocol(MGLAnnotation)]);
+
         latLngs.push_back(coordinateToLatLng(annotation.coordinate));
 
         NSString *symbolName = nil;
@@ -1617,6 +1623,8 @@ CLLocationCoordinate2D latLngToCoordinate(mbgl::LatLng latLng)
 
 - (void)removeAnnotation:(id <MGLAnnotation>)annotation
 {
+    if ( ! annotation) return;
+
     // The core bulk deletion API is efficient with respect to indexing
     // and screen refreshes, thus we should defer to it even for
     // individual deletes.
@@ -1626,11 +1634,15 @@ CLLocationCoordinate2D latLngToCoordinate(mbgl::LatLng latLng)
 
 - (void)removeAnnotations:(NSArray *)annotations
 {
+    if ( ! annotations) return;
+
     std::vector<uint32_t> annotationIDsToRemove;
     annotationIDsToRemove.reserve(annotations.count);
 
     for (id <MGLAnnotation> annotation in annotations)
     {
+        assert([annotation conformsToProtocol:@protocol(MGLAnnotation)]);
+
         annotationIDsToRemove.push_back([[self.annotationsStore objectForKey:annotation] unsignedIntValue]);
         [self.annotationsStore removeObjectForKey:annotation];
     }
@@ -1645,7 +1657,11 @@ CLLocationCoordinate2D latLngToCoordinate(mbgl::LatLng latLng)
 
 - (void)setSelectedAnnotations:(NSArray *)selectedAnnotations
 {
+    if ( ! selectedAnnotations.count) return;
+
     id <MGLAnnotation> firstAnnotation = selectedAnnotations[0];
+
+    assert([firstAnnotation conformsToProtocol:@protocol(MGLAnnotation)]);
 
     if ( ! [self viewportBounds].contains(coordinateToLatLng(firstAnnotation.coordinate))) return;
 
@@ -1656,6 +1672,8 @@ CLLocationCoordinate2D latLngToCoordinate(mbgl::LatLng latLng)
 {
     (void)animated;
 
+    if ( ! annotation) return;
+
     if ( ! [self viewportBounds].contains(coordinateToLatLng(annotation.coordinate))) return;
 
     self.selectedAnnotation = annotation;
@@ -1664,6 +1682,8 @@ CLLocationCoordinate2D latLngToCoordinate(mbgl::LatLng latLng)
 - (void)deselectAnnotation:(id <MGLAnnotation>)annotation animated:(BOOL)animated
 {
     (void)animated;
+
+    if ( ! annotation) return;
 
     if ([self.selectedAnnotation isEqual:annotation]) self.selectedAnnotation = nil;
 }
