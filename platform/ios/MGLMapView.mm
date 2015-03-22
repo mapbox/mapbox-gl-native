@@ -1534,10 +1534,10 @@ mbgl::DefaultFileSource *mbglFileSource = nullptr;
 
 - (NSArray *)annotations
 {
-    NSMutableArray *result = [NSMutableArray array];
-
     if ([_annotationsStore count])
     {
+        NSMutableArray *result = [NSMutableArray array];
+
         NSEnumerator *keyEnumerator = [_annotationsStore keyEnumerator];
         id <MGLAnnotation> annotation;
 
@@ -1545,9 +1545,11 @@ mbgl::DefaultFileSource *mbglFileSource = nullptr;
         {
             [result addObject:annotation];
         }
+
+        return [NSArray arrayWithArray:result];
     }
 
-    return [NSArray arrayWithArray:result];
+    return nil;
 }
 
 - (void)addAnnotation:(id <MGLAnnotation>)annotation
