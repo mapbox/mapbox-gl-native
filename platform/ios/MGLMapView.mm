@@ -1652,7 +1652,7 @@ CLLocationCoordinate2D latLngToCoordinate(mbgl::LatLng latLng)
 
 - (NSArray *)selectedAnnotations
 {
-    return @[ self.selectedAnnotation ];
+    return (self.selectedAnnotation ? @[ self.selectedAnnotation ] : @[]);
 }
 
 - (void)setSelectedAnnotations:(NSArray *)selectedAnnotations
