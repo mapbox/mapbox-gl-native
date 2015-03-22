@@ -216,10 +216,6 @@
 *   @param annotations The array of annotations to remove. Objects in the array must conform to the MGLAnnotation protocol. */
 - (void)removeAnnotations:(NSArray *)annotations;
 
-//- (void)showAnnotations:(NSArray *)annotations animated:(BOOL)animated;
-
-//- (NSSet *)annotationsInMapRect:(MKMapRect)mapRect
-
 /** The annotations that are currently selected.
 *
 *   Assigning a new array to this property selects only the first annotation in the array. */
