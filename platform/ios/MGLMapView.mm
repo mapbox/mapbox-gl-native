@@ -42,6 +42,7 @@ static dispatch_once_t loadGLExtensions;
 
 NSString *const MGLDefaultStyleName = @"Emerald";
 NSString *const MGLStyleVersion = @"v7";
+NSString *const MGLDefaultStyleMarkerSymbolName = @"default_marker";
 
 extern NSString *const MGLStyleKeyGeneric;
 extern NSString *const MGLStyleKeyFill;
@@ -279,6 +280,8 @@ mbgl::DefaultFileSource *mbglFileSource = nullptr;
     // setup annotations
     //
     _annotationsStore = [NSMapTable mapTableWithKeyOptions:NSMapTableStrongMemory valueOptions:NSMapTableStrongMemory];
+    std::string defaultSymbolName([MGLDefaultStyleMarkerSymbolName cStringUsingEncoding:[NSString defaultCStringEncoding]]);
+    mbglMap->setDefaultPointAnnotationSymbol(defaultSymbolName);
 
     // setup logo bug
     //
@@ -1458,7 +1461,7 @@ mbgl::DefaultFileSource *mbglFileSource = nullptr;
         }
         else
         {
-            symbols.push_back("marker-12"); // all styles have this currently
+            symbols.push_back("");
         }
     }
 
