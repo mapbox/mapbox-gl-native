@@ -10,7 +10,6 @@
 
 #include <string>
 #include <vector>
-#include <map>
 #include <mutex>
 #include <memory>
 #include <unordered_map>
@@ -46,7 +45,7 @@ private:
 private:
     std::mutex mtx;
     std::string defaultPointAnnotationSymbol;
-    std::map<uint32_t, std::unique_ptr<Annotation>> annotations;
+    std::unordered_map<uint32_t, std::unique_ptr<Annotation>> annotations;
     std::unordered_map<Tile::ID, std::pair<std::vector<uint32_t>, std::unique_ptr<LiveTile>>, Tile::ID::Hash> annotationTiles;
     std::unique_ptr<LiveTile> nullTile;
     uint32_t nextID_ = 0;
