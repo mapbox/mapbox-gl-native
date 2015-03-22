@@ -5,7 +5,7 @@ if [ -z `which appledoc` ]; then
     exit 1
 fi
 
-VERSION=$( git tag | sort -r | sed -n '1p' )
+VERSION=$( git tag | grep ^[0-9] | sort -r | sed -n '1p' )
 echo "Creating new docs for $VERSION..."
 echo
 
@@ -15,10 +15,4 @@ appledoc \
     --project-company Mapbox \
     --create-docset \
     --company-id com.mapbox \
-    --ignore app \
-    --ignore dist \
-    --ignore pkg \
-    --ignore test \
-    --ignore .m \
-    --ignore .mm \
-    .
+    ../../include/mbgl/ios
