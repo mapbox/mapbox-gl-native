@@ -107,20 +107,20 @@ std::pair<std::vector<Tile::ID>, std::vector<uint32_t>> AnnotationManager::addPo
 std::vector<Tile::ID> AnnotationManager::removeAnnotations(std::vector<uint32_t> ids) {
     std::vector<Tile::ID> affectedTiles;
 
-    for (auto& annotationID : ids) {
-        auto annotation_it = annotations.find(annotationID);
+    for (const auto& annotationID : ids) {
+        const auto& annotation_it = annotations.find(annotationID);
         if (annotation_it != annotations.end()) {
-            auto& annotation = annotation_it->second;
+            const auto& annotation = annotation_it->second;
             for (auto& tile_it : annotationTiles) {
                 auto& tileAnnotations = tile_it.second.first;
                 util::erase_if(tileAnnotations, tileAnnotations.begin(),
-                               tileAnnotations.end(), [&](const uint32_t annotationID_) -> bool {
+                               tileAnnotations.end(), [&annotationID](const uint32_t annotationID_) -> bool {
                                    return (annotationID_ == annotationID);
                                });
-                auto features_it = annotation->tileFeatures.find(tile_it.first);
+                const auto& features_it = annotation->tileFeatures.find(tile_it.first);
                 if (features_it != annotation->tileFeatures.end()) {
-                    auto layer = tile_it.second.second->getMutableLayer(util::ANNOTATIONS_POINTS_LAYER_ID);
-                    auto& features = features_it->second;
+                    const auto& layer = tile_it.second.second->getMutableLayer(util::ANNOTATIONS_POINTS_LAYER_ID);
+                    const auto& features = features_it->second;
                     layer->removeFeature(features[0]);
                     affectedTiles.push_back(tile_it.first);
                 }
