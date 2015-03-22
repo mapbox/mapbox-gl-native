@@ -975,7 +975,7 @@ mbgl::DefaultFileSource *mbglFileSource = nullptr;
 {
     CGFloat duration = (animated ? MGLAnimationDuration : 0);
 
-    mbglMap->setLatLng(mbgl::LatLng(coordinate.latitude, coordinate.longitude), secondsAsDuration(duration));
+    mbglMap->setLatLng(coordinateToLatLng(coordinate), secondsAsDuration(duration));
 }
 
 - (void)setCenterCoordinate:(CLLocationCoordinate2D)centerCoordinate
@@ -985,16 +985,14 @@ mbgl::DefaultFileSource *mbglFileSource = nullptr;
 
 - (CLLocationCoordinate2D)centerCoordinate
 {
-    mbgl::LatLng latLng = mbglMap->getLatLng();
-
-    return CLLocationCoordinate2DMake(latLng.latitude, latLng.longitude);
+    return latLngToCoordinate(mbglMap->getLatLng());
 }
 
 - (void)setCenterCoordinate:(CLLocationCoordinate2D)centerCoordinate zoomLevel:(double)zoomLevel animated:(BOOL)animated
 {
     CGFloat duration = (animated ? MGLAnimationDuration : 0);
 
-    mbglMap->setLatLngZoom(mbgl::LatLng(centerCoordinate.latitude, centerCoordinate.longitude), zoomLevel, secondsAsDuration(duration));
+    mbglMap->setLatLngZoom(coordinateToLatLng(centerCoordinate), zoomLevel, secondsAsDuration(duration));
 
     [self unrotateIfNeededAnimated:animated];
 }
@@ -1050,9 +1048,7 @@ mbgl::DefaultFileSource *mbglFileSource = nullptr;
     //
     convertedPoint.y = self.bounds.size.height - convertedPoint.y;
 
-    mbgl::LatLng latLng = mbglMap->latLngForPixel(mbgl::vec2<double>(convertedPoint.x, convertedPoint.y));
-
-    return CLLocationCoordinate2DMake(latLng.latitude, latLng.longitude);
+    return latLngToCoordinate(mbglMap->latLngForPixel(mbgl::vec2<double>(convertedPoint.x, convertedPoint.y)));
 }
 
 - (CGPoint)convertCoordinate:(CLLocationCoordinate2D)coordinate toPointToView:(UIView *)view
@@ -1069,6 +1065,32 @@ mbgl::DefaultFileSource *mbglFileSource = nullptr;
 - (CLLocationDistance)metersPerPixelAtLatitude:(CLLocationDegrees)latitude
 {
     return mbglMap->getMetersPerPixelAtLatitude(latitude, self.zoomLevel);
+}
+
+mbgl::LatLng coordinateToLatLng(CLLocationCoordinate2D coordinate)
+{
+    return mbgl::LatLng(coordinate.latitude, coordinate.longitude);
+}
+
+CLLocationCoordinate2D latLngToCoordinate(mbgl::LatLng latLng)
+{
+    return CLLocationCoordinate2DMake(latLng.latitude, latLng.longitude);
+}
+
+- (mbgl::LatLngBounds)viewportBounds
+{
+    mbgl::LatLngBounds bounds;
+
+    bounds.extend(coordinateToLatLng(
+        [self convertPoint:CGPointMake(0, 0) toCoordinateFromView:self]));
+    bounds.extend(coordinateToLatLng(
+        [self convertPoint:CGPointMake(self.bounds.size.width, 0) toCoordinateFromView:self]));
+    bounds.extend(coordinateToLatLng(
+        [self convertPoint:CGPointMake(0, self.bounds.size.height) toCoordinateFromView:self]));
+    bounds.extend(coordinateToLatLng(
+        [self convertPoint:CGPointMake(self.bounds.size.width, self.bounds.size.height) toCoordinateFromView:self]));
+
+    return bounds;
 }
 
 #pragma mark - Styling -
@@ -1572,7 +1594,7 @@ mbgl::DefaultFileSource *mbglFileSource = nullptr;
 
     for (id <MGLAnnotation> annotation in annotations)
     {
-        latLngs.push_back(mbgl::LatLng(annotation.coordinate.latitude, annotation.coordinate.longitude));
+        latLngs.push_back(coordinateToLatLng(annotation.coordinate));
 
         NSString *symbolName = nil;
 
@@ -1623,12 +1645,18 @@ mbgl::DefaultFileSource *mbglFileSource = nullptr;
 
 - (void)setSelectedAnnotations:(NSArray *)selectedAnnotations
 {
-    self.selectedAnnotation = selectedAnnotations[0];
+    id <MGLAnnotation> firstAnnotation = selectedAnnotations[0];
+
+    if ( ! [self viewportBounds].contains(coordinateToLatLng(firstAnnotation.coordinate))) return;
+
+    self.selectedAnnotation = firstAnnotation;
 }
 
 - (void)selectAnnotation:(id <MGLAnnotation>)annotation animated:(BOOL)animated
 {
     (void)animated;
+
+    if ( ! [self viewportBounds].contains(coordinateToLatLng(annotation.coordinate))) return;
 
     self.selectedAnnotation = annotation;
 }
