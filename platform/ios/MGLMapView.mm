@@ -755,7 +755,7 @@ mbgl::DefaultFileSource *mbglFileSource = nullptr;
             // the selection candidates haven't changed; cycle through them
             if (self.selectedAnnotation &&
                 [[[self.annotationsStore objectForKey:self.selectedAnnotation]
-                    objectForKey:MGLAnnotationIDKey] integerValue] == self.annotationsNearbyLastTap.back())
+                    objectForKey:MGLAnnotationIDKey] unsignedIntValue] == self.annotationsNearbyLastTap.back())
             {
                 // the selected annotation is the last in the set; cycle back to the first
                 // note: this could be the selected annotation if only one in set
