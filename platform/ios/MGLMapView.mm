@@ -74,7 +74,7 @@ NSString *const MGLAnnotationIDKey = @"MGLAnnotationIDKey";
 @property (nonatomic) UILongPressGestureRecognizer *quickZoom;
 @property (nonatomic) NSMutableArray *bundledStyleNames;
 @property (nonatomic) NSMapTable *annotationsStore;
-@property (nonatomic) id <MGLAnnotation> selectedAnnotation;
+@property (nonatomic, weak) id <MGLAnnotation> selectedAnnotation;
 @property (nonatomic, readonly) NSDictionary *allowedStyleTypes;
 @property (nonatomic) CGPoint centerPoint;
 @property (nonatomic) CGFloat scale;
