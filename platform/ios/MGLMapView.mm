@@ -703,6 +703,8 @@ mbgl::DefaultFileSource *mbglFileSource = nullptr;
 
         [self unrotateIfNeededAnimated:YES];
 
+        [self snapCompassIfNeeded];
+
         [self notifyMapChange:@(mbgl::MapChangeRegionDidChangeAnimated)];
     }
 }
@@ -1710,7 +1712,7 @@ CLLocationCoordinate2D latLngToCoordinate(mbgl::LatLng latLng)
     return (self.zoomLevel > 3);
 }
 
-// correct rotations to north as needed
+// correct rotations to north as needed at low zooms
 //
 - (void)unrotateIfNeededAnimated:(BOOL)animated
 {
@@ -1881,6 +1883,22 @@ CLLocationCoordinate2D latLngToCoordinate(mbgl::LatLng latLng)
                              self.compass.alpha = 1;
                          }
                          completion:nil];
+    }
+}
+
+// reset north on very small gesture-induced angles
+//
+- (void)snapCompassIfNeeded
+{
+    double degrees = mbglMap->getBearing() * -1;
+    while (degrees >= 360) degrees -= 360;
+    while (degrees < 0) degrees += 360;
+
+    double tolerance = 7;
+
+    if (self.compass.alpha > 0 && (degrees < tolerance || degrees > 360 - tolerance))
+    {
+        [self resetNorthAnimated:YES];
     }
 }
 
