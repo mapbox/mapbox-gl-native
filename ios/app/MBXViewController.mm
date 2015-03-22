@@ -139,10 +139,10 @@ mbgl::Settings_NSUserDefaults *settings = nullptr;
                                               otherButtonTitles:@"Reset North",
                                                                 @"Reset Position",
                                                                 @"Toggle Debug",
-                                                                @"100 Annotations",
-                                                                @"1,000 Annotations",
-                                                                @"10,000 Annotations",
-                                                                @"Remove Annotations",
+                                                                @"Add 100 Points",
+                                                                @"Add 1,000 Points",
+                                                                @"Add 10,000 Points",
+                                                                @"Remove Points",
                                                                 nil];
 
     [sheet showFromBarButtonItem:self.navigationItem.leftBarButtonItem animated:YES];
