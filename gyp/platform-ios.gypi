@@ -18,6 +18,7 @@
         '../platform/darwin/reachability.m',
         '../include/mbgl/ios/MGLMapView.h',
         '../platform/ios/MGLMapView.mm',
+        '../include/mbgl/ios/MGLAnnotation.h',
         '../include/mbgl/ios/MGLStyleFunctionValue.h',
         '../platform/ios/MGLStyleFunctionValue.m',
         '../include/mbgl/ios/MGLTypes.h',
