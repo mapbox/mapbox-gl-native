@@ -187,27 +187,55 @@
 
 #pragma mark - Annotating the Map
 
+/** @name Annotating the Map */
+
+/** The complete list of annotations associated with the receiver. (read-only)
+*
+*   The objects in this array must adopt the MGLAnnotation protocol. If no annotations are associated with the map view, the value of this property is `nil`. */
 @property (nonatomic, readonly) NSArray *annotations;
 
-// TODO
+/** Adds the specified annotation to the map view.
+*   @param annotation The annotation object to add to the receiver. This object must conform to the MGLAnnotation protocol. The map view retains the specified object. */
 - (void)addAnnotation:(id <MGLAnnotation>)annotation;
 
-// TODO
+/** Adds an array of annotation objects to the map view.
+*   @param annotations An array of annotation objects. Each object in the array must conform to the MGLAnnotation protocol. The map view retains the individual annotation objects. */
 - (void)addAnnotations:(NSArray *)annotations;
 
-// TODO
+/** Removes the specified annotation object from the map view.
+*
+*   Removing an annotation object disassociates it from the map view entirely, preventing it from being displayed on the map. Thus, you would typically call this method only when you want to hide or delete a given annotation.
+*
+*   @param annotation The annotation object to remove. This object must conform to the MGLAnnotation protocol. */
 - (void)removeAnnotation:(id <MGLAnnotation>)annotation;
 
-// TODO
+/** Removes an array of annotation objects from the map view.
+*
+*   Removing annotation objects disassociates them from the map view entirely, preventing them from being displayed on the map. Thus, you would typically call this method only when you want to hide or delete the specified annotations.
+*
+*   @param annotations The array of annotations to remove. Objects in the array must conform to the MGLAnnotation protocol. */
 - (void)removeAnnotations:(NSArray *)annotations;
 
-// TODO
+//- (void)showAnnotations:(NSArray *)annotations animated:(BOOL)animated;
+
+//- (NSSet *)annotationsInMapRect:(MKMapRect)mapRect
+
+/** The annotations that are currently selected.
+*
+*   Assigning a new array to this property selects only the first annotation in the array. */
 @property (nonatomic, copy) NSArray *selectedAnnotations;
 
-// TODO
+/** Selects the specified annotation and displays a callout view for it.
+*
+*   If the specified annotation is not onscreen, this method has no effect.
+*
+*   @param annotation The annotation object to select.
+*   @param animated If `YES`, the callout view is animated into position. */
 - (void)selectAnnotation:(id <MGLAnnotation>)annotation animated:(BOOL)animated;
 
-// TODO
+/** Deselects the specified annotation and hides its callout view.
+*   @param annotation The annotation object to deselect.
+*   @param animated If `YES`, the callout view is animated offscreen. */
 - (void)deselectAnnotation:(id <MGLAnnotation>)annotation animated:(BOOL)animated;
 
 #pragma mark - Debugging
@@ -227,12 +255,17 @@
 
 @end
 
-// TODO
+/** The MGLMapViewDelegate protocol defines a set of optional methods that you can use to receive map-related update messages. Because many map operations require the MGLMapView class to load data asynchronously, the map view calls these methods to notify your application when specific operations complete. The map view also uses these methods to request annotation marker symbology and to manage interactions with those markers. */
 @protocol MGLMapViewDelegate <NSObject>
 
 @optional
 
-//! Delegates implement this method to return a string containing the name of a symbol to use for the given annotation.
+/** @name Managing the Display of Annotations */
+
+/** Returns the style's symbol name to use for the marker for the specified point annotation object.
+*   @param mapView The map view that requested the annotation symbol name.
+*   @param annotation The object representing the annotation that is about to be displayed. 
+*   @return The marker symbol to display for the specified annotation or `nil` if you want to display the default symbol. */
 - (NSString *)mapView:(MGLMapView *)mapView symbolNameForAnnotation:(id <MGLAnnotation>)annotation;
 
 // Responding to Map Position Changes
