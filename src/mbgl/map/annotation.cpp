@@ -40,7 +40,9 @@ std::pair<std::vector<Tile::ID>, std::vector<uint32_t>> AnnotationManager::addPo
 
     uint16_t extent = 4096;
 
-    std::vector<uint32_t> annotationIDs(points.size());
+    std::vector<uint32_t> annotationIDs;
+    annotationIDs.reserve(points.size());
+
     std::vector<Tile::ID> affectedTiles;
 
     for (uint32_t i = 0; i < points.size(); ++i) {

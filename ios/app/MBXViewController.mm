@@ -233,7 +233,7 @@ mbgl::Settings_NSUserDefaults *settings = nullptr;
     }
 }
 
-#pragma mark - Location
+#pragma mark - CLLocationManagerDelegate
 
 - (void)locationManager:(CLLocationManager *)manager didChangeAuthorizationStatus:(CLAuthorizationStatus)status
 {
