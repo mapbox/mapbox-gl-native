@@ -144,8 +144,7 @@ std::vector<Tile::ID> AnnotationManager::removeAnnotations(std::vector<uint32_t>
                 const auto& features_it = annotation->tileFeatures.find(tid);
                 if (features_it != annotation->tileFeatures.end()) {
                     const auto& layer = tiles[tid].second->getMutableLayer(util::ANNOTATIONS_POINTS_LAYER_ID);
-                    const auto& features = features_it->second;
-                    layer->removeFeature(features[0]);
+                    layer->removeFeature(features_it->second[0]);
                     affectedTiles.push_back(tid);
                 }
             }
