@@ -2,7 +2,6 @@
 #define MBGL_MAP_LIVE_TILE
 
 #include <map>
-#include <unordered_map>
 
 #include <mbgl/map/geometry_tile.hpp>
 
@@ -26,17 +25,14 @@ class LiveTileLayer : public GeometryTileLayer {
 public:
     LiveTileLayer();
 
-    std::size_t addFeature(util::ptr<const LiveTileFeature>);
-    void removeFeature(std::size_t i) { features.erase(i); }
+    void prepareToAddFeatures(size_t count);
+    void addFeature(util::ptr<const LiveTileFeature>);
+    void removeFeature(util::ptr<const LiveTileFeature>);
     std::size_t featureCount() const override { return features.size(); }
-    util::ptr<const GeometryTileFeature> getFeature(std::size_t) const override;
+    util::ptr<const GeometryTileFeature> getFeature(std::size_t i) const override { return features[i]; }
 
 private:
-    std::size_t nextID() { return nextID_++; }
-
-private:
-    std::unordered_map<std::size_t, util::ptr<const LiveTileFeature>> features;
-    std::size_t nextID_ = 0;
+    std::vector<util::ptr<const LiveTileFeature>> features;
 };
 
 class LiveTile : public GeometryTile {
