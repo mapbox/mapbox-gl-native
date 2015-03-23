@@ -129,6 +129,7 @@ void Map::start(bool startPaused) {
 
         // Remove all of these to make sure they are destructed in the correct thread.
         style.reset();
+        workers.reset();
         activeSources.clear();
 
         terminating = true;
