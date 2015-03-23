@@ -114,9 +114,6 @@ std::vector<Tile::ID> AnnotationManager::removeAnnotations(std::vector<uint32_t>
         z2s.emplace_back(1<< z);
     }
 
-    std::vector<Tile::ID> annotationTiles;
-    annotationTiles.reserve(zoomCount);
-
     LatLng latLng;
     vec2<double> p;
     uint32_t x, y;
