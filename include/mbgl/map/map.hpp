@@ -24,16 +24,12 @@ namespace uv { class async; }
 
 namespace mbgl {
 
-class Painter;
 class GlyphStore;
 class Sprite;
 class Style;
 class TexturePool;
 class FileSource;
 class View;
-class GlyphAtlas;
-class SpriteAtlas;
-class LineAtlas;
 class Environment;
 class EnvironmentScope;
 class MapData;
@@ -246,14 +242,10 @@ private:
 
     FileSource& fileSource;
 
-    util::ptr<Style> style;
-    std::unique_ptr<GlyphAtlas> glyphAtlas;
     util::ptr<GlyphStore> glyphStore;
-    std::unique_ptr<SpriteAtlas> spriteAtlas;
+    util::ptr<Style> style;
     util::ptr<Sprite> sprite;
-    std::unique_ptr<LineAtlas> lineAtlas;
     util::ptr<TexturePool> texturePool;
-    std::unique_ptr<Painter> painter;
 
     std::atomic<UpdateType> updated;
 
