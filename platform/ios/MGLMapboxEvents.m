@@ -129,6 +129,7 @@ NSNumber *scale;
     [evt setValue:[[NSNumber alloc] initWithFloat:(100 * [UIDevice currentDevice].batteryLevel)] forKey:@"batteryLevel"];
     [evt setValue:scale forKey:@"resolution"];
     [evt setValue:carrier forKey:@"carrier"];
+    [evt setValue:[NSNumber numberWithInt:[self getContentSizeScale]] forKey:@"accessibilityFontScale"];
     
     for (NSString *key in [attributeDictionary allKeys]) {
         [evt setObject:[attributeDictionary valueForKey:key] forKey:key];
@@ -242,6 +243,38 @@ NSNumber *scale;
             break;
     }
 }
+
+- (int) getContentSizeScale {
+    NSString *sc = [UIApplication sharedApplication].preferredContentSizeCategory;
+    
+    if ([sc isEqualToString:UIContentSizeCategoryExtraSmall]) {
+        return -3;
+    } else if ([sc isEqualToString:UIContentSizeCategorySmall]) {
+        return -2;
+    } else if ([sc isEqualToString:UIContentSizeCategoryMedium]) {
+        return -1;
+    } else if ([sc isEqualToString:UIContentSizeCategoryLarge]) {
+        return 0;
+    } else if ([sc isEqualToString:UIContentSizeCategoryExtraLarge]) {
+        return 1;
+    } else if ([sc isEqualToString:UIContentSizeCategoryExtraExtraLarge]) {
+        return 2;
+    } else if ([sc isEqualToString:UIContentSizeCategoryExtraExtraExtraLarge]) {
+        return 3;
+    } else if ([sc isEqualToString:UIContentSizeCategoryAccessibilityMedium]) {
+        return -11;
+    } else if ([sc isEqualToString:UIContentSizeCategoryAccessibilityLarge]) {
+        return 10;
+    } else if ([sc isEqualToString:UIContentSizeCategoryAccessibilityExtraLarge]) {
+        return 11;
+    } else if ([sc isEqualToString:UIContentSizeCategoryAccessibilityExtraExtraLarge]) {
+        return 12;
+    } else if ([sc isEqualToString:UIContentSizeCategoryAccessibilityExtraExtraExtraLarge]) {
+        return 13;
+    }
+    return -9999;
+}
+
 
 - (NSString *)getSysInfoByName:(char *)typeSpecifier
 {
