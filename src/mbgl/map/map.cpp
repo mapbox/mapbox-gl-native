@@ -74,12 +74,13 @@ public:
     }
 
 public:
-    std::unique_ptr<GlyphStore> glyphStore;
-    std::unique_ptr<GlyphAtlas> glyphAtlas;
-    std::unique_ptr<SpriteAtlas> spriteAtlas;
-    std::unique_ptr<LineAtlas> lineAtlas;
-    std::unique_ptr<TexturePool> texturePool;
-    std::unique_ptr<Painter> painter;
+    const std::unique_ptr<GlyphStore> glyphStore;
+    const std::unique_ptr<GlyphAtlas> glyphAtlas;
+    const std::unique_ptr<SpriteAtlas> spriteAtlas;
+    const std::unique_ptr<LineAtlas> lineAtlas;
+    const std::unique_ptr<TexturePool> texturePool;
+    const std::unique_ptr<Painter> painter;
+    util::ptr<Sprite> sprite;
 };
 
 
@@ -107,7 +108,6 @@ Map::~Map() {
         "MapandMain");
 
     // Explicitly reset all pointers.
-    sprite.reset();
     style.reset();
     workers.reset();
     context.reset();
@@ -463,13 +463,12 @@ util::ptr<Sprite> Map::getSprite() {
     assert(Environment::currentlyOn(ThreadType::Map));
     const float pixelRatio = data->getTransformState().getPixelRatio();
     const std::string &sprite_url = style->getSpriteURL();
-    if (!sprite || !sprite->hasPixelRatio(pixelRatio)) {
-        sprite = Sprite::Create(sprite_url, pixelRatio, *env);
+    if (!context->sprite || !context->sprite->hasPixelRatio(pixelRatio)) {
+        context->sprite = Sprite::Create(sprite_url, pixelRatio, *env);
     }
 
-    return sprite;
+    return context->sprite;
 }
-
 
 #pragma mark - Size
 
@@ -654,8 +653,8 @@ void Map::setDefaultPointAnnotationSymbol(const std::string& symbol) {
 double Map::getTopOffsetPixelsForAnnotationSymbol(const std::string& symbol) {
     assert(Environment::currentlyOn(ThreadType::Main));
     return invokeSyncTask([&] {
-        assert(sprite);
-        const SpritePosition pos = sprite->getSpritePosition(symbol);
+        assert(context->sprite);
+        const SpritePosition pos = context->sprite->getSpritePosition(symbol);
         return -pos.height / pos.pixelRatio / 2;
     });
 }
@@ -810,7 +809,7 @@ void Map::reloadStyle() {
 void Map::loadStyleJSON(const std::string& json, const std::string& base) {
     assert(Environment::currentlyOn(ThreadType::Map));
 
-    sprite.reset();
+    context->sprite.reset();
     style = std::make_shared<Style>();
     style->base = base;
     style->loadJSON((const uint8_t *)json.c_str());
