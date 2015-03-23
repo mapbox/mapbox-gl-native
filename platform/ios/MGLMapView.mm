@@ -922,7 +922,7 @@ mbgl::DefaultFileSource *mbglFileSource = nullptr;
 
 - (void)handleQuickZoomGesture:(UILongPressGestureRecognizer *)quickZoom
 {
-    [self trackGestureEvent:@"LongPress" forRecognizer:quickZoom];
+    [self trackGestureEvent:@"QuickZoom" forRecognizer:quickZoom];
     
     if ( ! self.isZoomEnabled) return;
 
