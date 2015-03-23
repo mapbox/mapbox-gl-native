@@ -270,6 +270,9 @@
 - (void)mapView:(MGLMapView *)mapView regionWillChangeAnimated:(BOOL)animated;
 
 // TODO
+- (void)mapViewRegionIsChanging:(MGLMapView *)mapView;
+
+// TODO
 - (void)mapView:(MGLMapView *)mapView regionDidChangeAnimated:(BOOL)animated;
 
 // Loading the Map Data

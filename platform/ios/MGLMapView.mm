@@ -18,6 +18,8 @@
 #import "MGLStyleFunctionValue.h"
 #import "MGLAnnotation.h"
 
+#import "SMCalloutView.h"
+
 #import "UIColor+MGLAdditions.h"
 #import "NSArray+MGLAdditions.h"
 #import "NSDictionary+MGLAdditions.h"
@@ -78,6 +80,7 @@ NSString *const MGLAnnotationIDKey = @"MGLAnnotationIDKey";
 @property (nonatomic) NSMapTable *annotationIDsByAnnotation;
 @property (nonatomic) std::vector<uint32_t> annotationsNearbyLastTap;
 @property (nonatomic, weak) id <MGLAnnotation> selectedAnnotation;
+@property (nonatomic, strong) SMCalloutView *selectedAnnotationCalloutView;
 @property (nonatomic, readonly) NSDictionary *allowedStyleTypes;
 @property (nonatomic) CGPoint centerPoint;
 @property (nonatomic) CGFloat scale;
@@ -85,6 +88,8 @@ NSString *const MGLAnnotationIDKey = @"MGLAnnotationIDKey";
 @property (nonatomic) CGFloat quickZoomStart;
 @property (nonatomic, getter=isAnimatingGesture) BOOL animatingGesture;
 @property (nonatomic, readonly, getter=isRotationAllowed) BOOL rotationAllowed;
+@property (nonatomic) CLLocationCoordinate2D lastCenter;
+@property (nonatomic) CGFloat lastZoom;
 
 @end
 
@@ -105,8 +110,6 @@ NSString *const MGLAnnotationIDKey = @"MGLAnnotationIDKey";
 @end
 
 @implementation MGLMapView
-
-@synthesize bundledStyleNames=_bundledStyleNames;
 
 #pragma mark - Setup & Teardown -
 
@@ -597,6 +600,8 @@ mbgl::DefaultFileSource *mbglFileSource = nullptr;
         mbglMap->moveBy(delta.x, delta.y);
 
         self.centerPoint = CGPointMake(self.centerPoint.x + delta.x, self.centerPoint.y + delta.y);
+        
+        [self notifyMapChange:@(mbgl::MapChangeRegionDidChangeAnimated)];
     }
     else if (pan.state == UIGestureRecognizerStateEnded || pan.state == UIGestureRecognizerStateCancelled)
     {
@@ -1675,17 +1680,38 @@ CLLocationCoordinate2D latLngToCoordinate(mbgl::LatLng latLng)
     if ( ! annotation) return;
 
     if ( ! [self viewportBounds].contains(coordinateToLatLng(annotation.coordinate))) return;
+    
+    if (annotation == self.selectedAnnotation) return;
 
+    [self deselectAnnotation:self.selectedAnnotation animated:animated];
     self.selectedAnnotation = annotation;
+    self.selectedAnnotationCalloutView = [self calloutViewForAnnotation:annotation];
+    CGPoint calloutAnchorPoint = [self convertCoordinate:annotation.coordinate toPointToView:self];
+    CGRect calloutBounds = CGRectMake(calloutAnchorPoint.x, calloutAnchorPoint.y, 0, 0);
+    [self.selectedAnnotationCalloutView presentCalloutFromRect:calloutBounds inView:self.glView constrainedToView:self.glView animated:animated];
+}
+
+- (SMCalloutView *)calloutViewForAnnotation:(id <MGLAnnotation>)annotation
+{
+    SMCalloutView *calloutView = [SMCalloutView platformCalloutView];
+    if ([annotation respondsToSelector:@selector(title)]) {
+        calloutView.title = annotation.title;
+    }
+    if ([annotation respondsToSelector:@selector(subtitle)]) {
+        calloutView.subtitle = annotation.subtitle;
+    }
+    return calloutView;
 }
 
 - (void)deselectAnnotation:(id <MGLAnnotation>)annotation animated:(BOOL)animated
 {
-    (void)animated;
-
     if ( ! annotation) return;
 
-    if ([self.selectedAnnotation isEqual:annotation]) self.selectedAnnotation = nil;
+    if ([self.selectedAnnotation isEqual:annotation]) {
+        [self.selectedAnnotationCalloutView dismissCalloutAnimated:animated];
+        self.selectedAnnotationCalloutView = nil;
+        self.selectedAnnotation = nil;
+    }
 }
 
 #pragma mark - Utility -
@@ -1794,6 +1820,15 @@ CLLocationCoordinate2D latLngToCoordinate(mbgl::LatLng latLng)
                 }
             }
             break;
+        }
+        case mbgl::MapChangeRegionIsChanging:
+        {
+            [self deselectAnnotation:self.selectedAnnotation animated:YES];
+            
+            if ([self.delegate respondsToSelector:@selector(mapViewRegionIsChanging:)])
+            {
+                [self.delegate mapViewRegionIsChanging:self];
+            }
         }
         case mbgl::MapChangeRegionDidChange:
         case mbgl::MapChangeRegionDidChangeAnimated:
@@ -1916,6 +1951,7 @@ CLLocationCoordinate2D latLngToCoordinate(mbgl::LatLng latLng)
 {
     // This is run in the main/UI thread.
     [self.glView setNeedsDisplay];
+    [self notifyMapChange:@(mbgl::MapChangeRegionIsChanging)];
 }
 
 class MBGLView : public mbgl::View
@@ -1943,12 +1979,7 @@ class MBGLView : public mbgl::View
         }
         else
         {
-            dispatch_async(dispatch_get_main_queue(), ^
-            {
-                [nativeView performSelector:@selector(notifyMapChange:)
-                                 withObject:@(change)
-                                 afterDelay:0];
-            });
+            [nativeView notifyMapChange:@(change)];
         }
     }
 

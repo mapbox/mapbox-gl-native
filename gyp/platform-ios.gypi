@@ -30,6 +30,8 @@
         '../platform/ios/NSDictionary+MGLAdditions.m',
         '../include/mbgl/ios/UIColor+MGLAdditions.h',
         '../platform/ios/UIColor+MGLAdditions.m',
+        '../platform/ios/calloutview/SMCalloutView.h',
+        '../platform/ios/calloutview/SMCalloutView.m',
       ],
 
       'variables': {
@@ -62,7 +64,7 @@
       },
 
       'link_settings': {
-        'libraries': [ '<@(libraries)' ],
+        'libraries': [ '<@(libraries)', 'QuartzCore.framework' ],
         'xcode_settings': {
           'OTHER_LDFLAGS': [ '<@(ldflags)' ],
         },

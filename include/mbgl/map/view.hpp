@@ -10,14 +10,15 @@ class Map;
 enum MapChange : uint8_t {
     MapChangeRegionWillChange = 0,
     MapChangeRegionWillChangeAnimated = 1,
-    MapChangeRegionDidChange = 2,
-    MapChangeRegionDidChangeAnimated = 3,
-    MapChangeWillStartLoadingMap = 4,
-    MapChangeDidFinishLoadingMap = 5,
-    MapChangeDidFailLoadingMap = 6,
-    MapChangeWillStartRenderingMap = 7,
-    MapChangeDidFinishRenderingMap = 8,
-    MapChangeDidFinishRenderingMapFullyRendered = 9
+    MapChangeRegionIsChanging = 2,
+    MapChangeRegionDidChange = 3,
+    MapChangeRegionDidChangeAnimated = 4,
+    MapChangeWillStartLoadingMap = 5,
+    MapChangeDidFinishLoadingMap = 6,
+    MapChangeDidFailLoadingMap = 7,
+    MapChangeWillStartRenderingMap = 8,
+    MapChangeDidFinishRenderingMap = 9,
+    MapChangeDidFinishRenderingMapFullyRendered = 10
 };
 
 class View {
