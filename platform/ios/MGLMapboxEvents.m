@@ -99,6 +99,16 @@ NSNumber *scale;
 
 - (void) pushEvent:(NSString *)event withAttributes:(NSDictionary *)attributeDictionary {
     
+    // TODO Add Opt Out Checking When Built
+    /**
+     if (![[NSUserDefaults standardUserDefaults] boolForKey:@"mapbox_metrics_enabled_preference"]) {
+     NSLog(@"Mapbox Metrics are not enabled, so return without sending in data.");
+     return;
+     }
+     */
+
+    // TODO - Add Metrics Disabled App Wide Check
+    
     if (!event) {
         return;
     }
