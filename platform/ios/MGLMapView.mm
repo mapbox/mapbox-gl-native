@@ -659,6 +659,16 @@ mbgl::DefaultFileSource *mbglFileSource = nullptr;
                 [weakSelf notifyMapChange:@(mbgl::MapChangeRegionDidChangeAnimated)];
             }];
         }
+        
+        // Send Map Drag End Event
+        CGPoint ptInView = CGPointMake([pan locationInView:pan.view].x, [pan locationInView:pan.view].y);
+        CLLocationCoordinate2D coord = [self convertPoint:ptInView toCoordinateFromView:pan.view];
+        NSMutableDictionary *dict = [[NSMutableDictionary alloc] init];
+        [dict setValue:[[NSNumber alloc] initWithDouble:coord.latitude] forKey:@"lat"];
+        [dict setValue:[[NSNumber alloc] initWithDouble:coord.longitude] forKey:@"lng"];
+        [dict setValue:[[NSNumber alloc] initWithDouble:[self zoomLevel]] forKey:@"zoom"];
+        
+        [[MGLMapboxEvents sharedManager] pushEvent:@"map.dragend" withAttributes:dict];
     }
 }
 
