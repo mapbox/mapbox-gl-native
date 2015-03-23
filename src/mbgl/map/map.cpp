@@ -85,7 +85,6 @@ Map::Map(View& view_, FileSource& fileSource_)
       view(view_),
       data(util::make_unique<MapData>(view_)),
       context(util::make_unique<MapContext>()),
-      fileSource(fileSource_),
       glyphStore(std::make_shared<GlyphStore>(*env)),
       texturePool(std::make_shared<TexturePool>()),
       updated(static_cast<UpdateType>(Update::Nothing))

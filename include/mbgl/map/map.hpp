@@ -240,8 +240,6 @@ private:
     // Stores whether the map thread has been stopped already.
     std::atomic_bool isStopped;
 
-    FileSource& fileSource;
-
     util::ptr<GlyphStore> glyphStore;
     util::ptr<Style> style;
     util::ptr<Sprite> sprite;
