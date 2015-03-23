@@ -943,6 +943,16 @@ mbgl::DefaultFileSource *mbglFileSource = nullptr;
         [self unrotateIfNeededAnimated:YES];
 
         [self notifyMapChange:@(mbgl::MapChangeRegionDidChangeAnimated)];
+
+        // Send Map Zoom Event
+        CGPoint ptInView = CGPointMake([quickZoom locationInView:quickZoom.view].x, [quickZoom locationInView:quickZoom.view].y);
+        CLLocationCoordinate2D coord = [self convertPoint:ptInView toCoordinateFromView:quickZoom.view];
+        NSMutableDictionary *dict = [[NSMutableDictionary alloc] init];
+        [dict setValue:[[NSNumber alloc] initWithDouble:coord.latitude] forKey:@"lat"];
+        [dict setValue:[[NSNumber alloc] initWithDouble:coord.longitude] forKey:@"lng"];
+        [dict setValue:[[NSNumber alloc] initWithDouble:[self zoomLevel]] forKey:@"zoom"];
+        
+        [[MGLMapboxEvents sharedManager] pushEvent:@"map.click" withAttributes:dict];
     }
 }
 
