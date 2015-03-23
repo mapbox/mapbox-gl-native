@@ -387,6 +387,14 @@ mbgl::DefaultFileSource *mbglFileSource = nullptr;
     _regionChangeDelegateQueue = [NSOperationQueue new];
     _regionChangeDelegateQueue.maxConcurrentOperationCount = 1;
 
+    
+    // Fire map.load
+    NSMutableDictionary *evt = [[NSMutableDictionary alloc] init];
+    [evt setValue:[[NSNumber alloc] initWithDouble:mbglMap->getLatLng().latitude] forKey:@"lat"];
+    [evt setValue:[[NSNumber alloc] initWithDouble:mbglMap->getLatLng().longitude] forKey:@"lng"];
+    [evt setValue:[[NSNumber alloc] initWithDouble:mbglMap->getZoom()] forKey:@"zoom"];
+    [[MGLMapboxEvents sharedManager] pushEvent:@"map.load" withAttributes:evt];
+    
     return YES;
 }
 
