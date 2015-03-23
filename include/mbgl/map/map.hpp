@@ -26,10 +26,8 @@ namespace mbgl {
 
 class Painter;
 class GlyphStore;
-class LayerDescription;
 class Sprite;
 class Style;
-class StyleLayer;
 class TexturePool;
 class FileSource;
 class View;
@@ -38,11 +36,11 @@ class SpriteAtlas;
 class LineAtlas;
 class Environment;
 class EnvironmentScope;
-class AnnotationManager;
 class MapData;
 class Worker;
 class StillImage;
 class TileID;
+class MapContext;
 
 class Map : private util::noncopyable {
     friend class View;
@@ -220,6 +218,7 @@ private:
     std::unique_ptr<EnvironmentScope> scope;
     View &view;
     const std::unique_ptr<MapData> data;
+    const std::unique_ptr<MapContext> context;
 
 private:
     std::unique_ptr<Worker> workers;

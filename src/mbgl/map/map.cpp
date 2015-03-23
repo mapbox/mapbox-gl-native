@@ -58,13 +58,19 @@ const static bool uvVersionCheck = []() {
     return true;
 }();
 
-using namespace mbgl;
+namespace mbgl {
+
+class MapContext {
+public:
+};
+
 
 Map::Map(View& view_, FileSource& fileSource_)
     : env(util::make_unique<Environment>(fileSource_)),
       scope(util::make_unique<EnvironmentScope>(*env, ThreadType::Main, "Main")),
       view(view_),
       data(util::make_unique<MapData>(view_)),
+      context(util::make_unique<MapContext>()),
       fileSource(fileSource_),
       glyphAtlas(util::make_unique<GlyphAtlas>(1024, 1024)),
       glyphStore(std::make_shared<GlyphStore>(*env)),
@@ -688,7 +694,7 @@ LatLngBounds Map::getBoundsForAnnotations(const std::vector<uint32_t>& annotatio
 }
 
 void Map::updateAnnotationTiles(const std::vector<TileID>& ids) {
-    assert(Environment::currentlyOn(ThreadType::Map));
+    assert(Environment::currentlyOn(ThreadType::Main));
     if (!style) return;
     for (const auto &source : style->sources) {
         if (source->info.type == SourceType::Annotations) {
@@ -921,4 +927,6 @@ void Map::onLowMemory() {
         }
         env->performCleanup();
     });
-};
+}
+
+}
