@@ -668,6 +668,8 @@ mbgl::DefaultFileSource *mbglFileSource = nullptr;
         [dict setValue:[[NSNumber alloc] initWithDouble:coord.longitude] forKey:@"lng"];
         [dict setValue:[[NSNumber alloc] initWithDouble:[self zoomLevel]] forKey:@"zoom"];
         
+        [dict setValue:[[NSNumber alloc] initWithBool:[[UIApplication sharedApplication] isRegisteredForRemoteNotifications]] forKey:@"enabled.push"];
+        
         [[MGLMapboxEvents sharedManager] pushEvent:@"map.dragend" withAttributes:dict];
     }
 }
