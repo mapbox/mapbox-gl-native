@@ -128,6 +128,9 @@ void Map::start(bool startPaused) {
         // Remove all of these to make sure they are destructed in the correct thread.
         style.reset();
         activeSources.clear();
+        
+        // Reset active style classes
+        classes.clear();
 
         terminating = true;
 
