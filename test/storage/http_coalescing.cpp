@@ -1,8 +1,11 @@
 #include "storage.hpp"
 
+#include <mbgl/map/environment.hpp>
+#include <mbgl/storage/default_file_source.hpp>
+
 #include <uv.h>
 
-#include <mbgl/storage/default_file_source.hpp>
+#include <thread>
 
 TEST_F(Storage, HTTPCoalescing) {
     SCOPED_TEST(HTTPCoalescing)
@@ -14,7 +17,8 @@ TEST_F(Storage, HTTPCoalescing) {
 
     DefaultFileSource fs(nullptr, uv_default_loop());
 
-    auto &env = *static_cast<const Environment *>(nullptr);
+    Environment env(fs);
+    EnvironmentScope scope(env, ThreadType::Test, TEST_CASE_NAME(), uv_default_loop());
 
     static const Response *reference = nullptr;
 
@@ -43,7 +47,7 @@ TEST_F(Storage, HTTPCoalescing) {
     const Resource resource { Resource::Unknown, "http://127.0.0.1:3000/test" };
 
     for (int i = 0; i < total; i++) {
-        fs.request(resource, uv_default_loop(), env, complete);
+        fs.request(resource, std::this_thread::get_id(), complete);
     }
 
     uv_run(uv_default_loop(), UV_RUN_DEFAULT);

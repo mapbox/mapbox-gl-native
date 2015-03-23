@@ -1,8 +1,11 @@
 #include "storage.hpp"
 
+#include <mbgl/map/environment.hpp>
+#include <mbgl/storage/default_file_source.hpp>
+
 #include <uv.h>
 
-#include <mbgl/storage/default_file_source.hpp>
+#include <thread>
 
 TEST_F(Storage, HTTPOtherLoop) {
     SCOPED_TEST(HTTPOtherLoop)
@@ -12,9 +15,10 @@ TEST_F(Storage, HTTPOtherLoop) {
     // This file source launches a separate thread to do the processing.
     DefaultFileSource fs(nullptr);
 
-    auto &env = *static_cast<const Environment *>(nullptr);
+    Environment env(fs);
+    EnvironmentScope scope(env, ThreadType::Test, TEST_CASE_NAME(), uv_default_loop());
 
-    fs.request({ Resource::Unknown, "http://127.0.0.1:3000/test" }, uv_default_loop(), env,
+    fs.request({ Resource::Unknown, "http://127.0.0.1:3000/test" }, std::this_thread::get_id(),
                [&](const Response &res) {
         EXPECT_EQ(Response::Successful, res.status);
         EXPECT_EQ("Hello World!", res.data);

@@ -1,8 +1,11 @@
 #include "storage.hpp"
 
+#include <mbgl/map/environment.hpp>
+#include <mbgl/storage/default_file_source.hpp>
+
 #include <uv.h>
 
-#include <mbgl/storage/default_file_source.hpp>
+#include <thread>
 
 TEST_F(Storage, HTTPReading) {
     SCOPED_TEST(HTTPTest)
@@ -12,11 +15,12 @@ TEST_F(Storage, HTTPReading) {
 
     DefaultFileSource fs(nullptr, uv_default_loop());
 
-    auto &env = *static_cast<const Environment *>(nullptr);
+    Environment env(fs);
+    EnvironmentScope scope(env, ThreadType::Test, TEST_CASE_NAME(), uv_default_loop());
 
     const auto mainThread = uv_thread_self();
 
-    fs.request({ Resource::Unknown, "http://127.0.0.1:3000/test" }, uv_default_loop(), env,
+    fs.request({ Resource::Unknown, "http://127.0.0.1:3000/test" }, std::this_thread::get_id(),
                [&](const Response &res) {
         EXPECT_EQ(uv_thread_self(), mainThread);
         EXPECT_EQ(Response::Successful, res.status);
@@ -28,8 +32,8 @@ TEST_F(Storage, HTTPReading) {
         HTTPTest.finish();
     });
 
-    fs.request({ Resource::Unknown, "http://127.0.0.1:3000/doesnotexist" }, uv_default_loop(),
-               env, [&](const Response &res) {
+    fs.request({ Resource::Unknown, "http://127.0.0.1:3000/doesnotexist" },
+            std::this_thread::get_id(), [&](const Response &res) {
         EXPECT_EQ(uv_thread_self(), mainThread);
         EXPECT_EQ(Response::Error, res.status);
         EXPECT_EQ("HTTP status code 404", res.message);
@@ -49,14 +53,15 @@ TEST_F(Storage, HTTPNoCallback) {
 
     DefaultFileSource fs(nullptr, uv_default_loop());
 
-    auto &env = *static_cast<const Environment *>(nullptr);
+    Environment env(fs);
+    EnvironmentScope scope(env, ThreadType::Test, TEST_CASE_NAME(), uv_default_loop());
 
-    fs.request({ Resource::Unknown, "http://127.0.0.1:3000/test" }, uv_default_loop(), env,
+    fs.request({ Resource::Unknown, "http://127.0.0.1:3000/test" }, std::this_thread::get_id(),
                nullptr);
 
-    uv_run(uv_default_loop(), UV_RUN_DEFAULT);
-
     HTTPTest.finish();
+
+    uv_run(uv_default_loop(), UV_RUN_DEFAULT);
 }
 
 TEST_F(Storage, HTTPNoCallbackNoLoop) {
@@ -66,11 +71,12 @@ TEST_F(Storage, HTTPNoCallbackNoLoop) {
 
     DefaultFileSource fs(nullptr, uv_default_loop());
 
-    auto &env = *static_cast<const Environment *>(nullptr);
+    Environment env(fs);
+    EnvironmentScope scope(env, ThreadType::Test, TEST_CASE_NAME(), uv_default_loop());
 
-    fs.request({ Resource::Unknown, "http://127.0.0.1:3000/test" }, env, nullptr);
-
-    uv_run(uv_default_loop(), UV_RUN_DEFAULT);
+    fs.request({ Resource::Unknown, "http://127.0.0.1:3000/test" }, nullptr);
 
     HTTPTest.finish();
+
+    uv_run(uv_default_loop(), UV_RUN_DEFAULT);
 }

@@ -1,8 +1,11 @@
 #include "storage.hpp"
 
+#include <mbgl/map/environment.hpp>
+#include <mbgl/storage/default_file_source.hpp>
+
 #include <uv.h>
 
-#include <mbgl/storage/default_file_source.hpp>
+#include <thread>
 
 TEST_F(Storage, HTTPLoad) {
     SCOPED_TEST(HTTPLoad)
@@ -11,7 +14,8 @@ TEST_F(Storage, HTTPLoad) {
 
     DefaultFileSource fs(nullptr, uv_default_loop());
 
-    auto &env = *static_cast<const Environment *>(nullptr);
+    Environment env(fs);
+    EnvironmentScope scope(env, ThreadType::Test, TEST_CASE_NAME(), uv_default_loop());
 
     const int concurrency = 50;
     const int max = 10000;
@@ -21,7 +25,7 @@ TEST_F(Storage, HTTPLoad) {
         const auto current = number++;
         fs.request({ Resource::Unknown,
                      std::string("http://127.0.0.1:3000/load/") + std::to_string(current) },
-                   uv_default_loop(), env, [&, current](const Response &res) {
+                   std::this_thread::get_id(), [&, current](const Response &res) {
             EXPECT_EQ(Response::Successful, res.status);
             EXPECT_EQ(std::string("Request ") +  std::to_string(current), res.data);
             EXPECT_EQ(0, res.expires);

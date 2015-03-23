@@ -24,6 +24,7 @@ enum class ThreadType : uint8_t {
     Main       = 1 << 0,
     Map        = 1 << 1,
     TileWorker = 1 << 2,
+    Test       = 1 << 3,
 };
 
 class Environment final : private util::noncopyable {

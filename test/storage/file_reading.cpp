@@ -1,9 +1,12 @@
 #include "storage.hpp"
 
-#include <uv.h>
-
+#include <mbgl/map/environment.hpp>
 #include <mbgl/storage/default_file_source.hpp>
 #include <mbgl/platform/platform.hpp>
+
+#include <uv.h>
+
+#include <thread>
 
 TEST_F(Storage, AssetEmptyFile) {
     SCOPED_TEST(EmptyFile)
@@ -16,10 +19,11 @@ TEST_F(Storage, AssetEmptyFile) {
     DefaultFileSource fs(nullptr, uv_default_loop());
 #endif
 
-    auto &env = *static_cast<const Environment *>(nullptr);
+    Environment env(fs);
+    EnvironmentScope scope(env, ThreadType::Test, TEST_CASE_NAME(), uv_default_loop());
 
-    fs.request({ Resource::Unknown, "asset://TEST_DATA/fixtures/storage/empty" }, uv_default_loop(),
-               env, [&](const Response &res) {
+    fs.request({ Resource::Unknown, "asset://TEST_DATA/fixtures/storage/empty" },
+               std::this_thread::get_id(), [&](const Response& res) {
         EXPECT_EQ(Response::Successful, res.status);
         EXPECT_EQ(0ul, res.data.size());
         EXPECT_EQ(0, res.expires);
@@ -43,10 +47,11 @@ TEST_F(Storage, AssetNonEmptyFile) {
     DefaultFileSource fs(nullptr, uv_default_loop());
 #endif
 
-    auto &env = *static_cast<const Environment *>(nullptr);
+    Environment env(fs);
+    EnvironmentScope scope(env, ThreadType::Test, TEST_CASE_NAME(), uv_default_loop());
 
     fs.request({ Resource::Unknown, "asset://TEST_DATA/fixtures/storage/nonempty" },
-               uv_default_loop(), env, [&](const Response &res) {
+               std::this_thread::get_id(), [&](const Response& res) {
         EXPECT_EQ(Response::Successful, res.status);
         EXPECT_EQ(16ul, res.data.size());
         EXPECT_EQ(0, res.expires);
@@ -71,10 +76,11 @@ TEST_F(Storage, AssetNonExistentFile) {
     DefaultFileSource fs(nullptr, uv_default_loop());
 #endif
 
-    auto &env = *static_cast<const Environment *>(nullptr);
+    Environment env(fs);
+    EnvironmentScope scope(env, ThreadType::Test, TEST_CASE_NAME(), uv_default_loop());
 
     fs.request({ Resource::Unknown, "asset://TEST_DATA/fixtures/storage/does_not_exist" },
-               uv_default_loop(), env, [&](const Response &res) {
+               std::this_thread::get_id(), [&](const Response& res) {
         EXPECT_EQ(Response::Error, res.status);
         EXPECT_EQ(0ul, res.data.size());
         EXPECT_EQ(0, res.expires);

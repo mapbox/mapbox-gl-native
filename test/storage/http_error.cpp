@@ -1,11 +1,13 @@
 #include "storage.hpp"
 
-#include <uv.h>
-
+#include <mbgl/map/environment.hpp>
 #include <mbgl/storage/default_file_source.hpp>
 #include <mbgl/storage/network_status.hpp>
 
+#include <uv.h>
+
 #include <cmath>
+#include <thread>
 
 TEST_F(Storage, HTTPError) {
     SCOPED_TEST(HTTPTemporaryError)
@@ -22,12 +24,13 @@ TEST_F(Storage, HTTPError) {
 
     DefaultFileSource fs(nullptr, uv_default_loop());
 
-    auto &env = *static_cast<const Environment *>(nullptr);
+    Environment env(fs);
+    EnvironmentScope scope(env, ThreadType::Test, TEST_CASE_NAME(), uv_default_loop());
 
     auto start = uv_hrtime();
 
-    fs.request({ Resource::Unknown, "http://127.0.0.1:3000/temporary-error" }, uv_default_loop(),
-               env, [&](const Response &res) {
+    fs.request({ Resource::Unknown, "http://127.0.0.1:3000/temporary-error" },
+               std::this_thread::get_id(), [&](const Response& res) {
         const auto duration = double(uv_hrtime() - start) / 1e9;
         EXPECT_LT(1, duration) << "Backoff timer didn't wait 1 second";
         EXPECT_GT(1.2, duration) << "Backoff timer fired too late";
@@ -41,8 +44,8 @@ TEST_F(Storage, HTTPError) {
         HTTPTemporaryError.finish();
     });
 
-    fs.request({ Resource::Unknown, "http://127.0.0.1:3001/" }, uv_default_loop(), env,
-               [&](const Response &res) {
+    fs.request({ Resource::Unknown, "http://127.0.0.1:3001/" },
+               std::this_thread::get_id(), [&](const Response& res) {
         const auto duration = double(uv_hrtime() - start) / 1e9;
         // 1.5 seconds == 4 retries, with a 500ms timeout (see above).
         EXPECT_LT(1.5, duration) << "Resource wasn't retried the correct number of times";
