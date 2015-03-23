@@ -1310,8 +1310,8 @@ mbgl::DefaultFileSource *mbglFileSource = nullptr;
     CLLocationCoordinate2D center = CLLocationCoordinate2DMake((northEastCoordinate.latitude + southWestCoordinate.latitude) / 2, (northEastCoordinate.longitude + southWestCoordinate.longitude) / 2);
     
     CGFloat scale = mbglMap->getScale();
-    CGFloat scaleX = mbglMap->getState().getWidth() / (northEastCoordinate.longitude - southWestCoordinate.longitude);
-    CGFloat scaleY = mbglMap->getState().getHeight() / (northEastCoordinate.latitude - southWestCoordinate.latitude);
+    CGFloat scaleX = mbglMap->getWidth() / (northEastCoordinate.longitude - southWestCoordinate.longitude);
+    CGFloat scaleY = mbglMap->getHeight() / (northEastCoordinate.latitude - southWestCoordinate.latitude);
     CGFloat minZoom = mbglMap->getMinZoom();
     CGFloat maxZoom = mbglMap->getMaxZoom();
     CGFloat zoomLevel = MAX(MIN(log(scale * MIN(scaleX, scaleY)) / log(2), maxZoom), minZoom);

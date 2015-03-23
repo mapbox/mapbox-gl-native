@@ -10,7 +10,9 @@
 #include <cassert>
 
 #include <mbgl/map/environment.hpp>
+#include <mbgl/map/transform.hpp>
 #include <mbgl/map/transform_state.hpp>
+#include <mbgl/map/annotation.hpp>
 
 namespace mbgl {
 
@@ -24,7 +26,7 @@ class MapData {
     using Lock = std::lock_guard<std::mutex>;
 
 public:
-    inline MapData() {
+    inline MapData(View& view) : transform(view) {
         setAnimationTime(TimePoint::min());
         setDefaultTransitionDuration(Duration::zero());
     }
@@ -100,6 +102,10 @@ public:
         assert(Environment::currentlyOn(ThreadType::Map));
         transformState = state;
     }
+
+public:
+    Transform transform;
+    AnnotationManager annotationManager;
 
 private:
     mutable std::mutex mtx;

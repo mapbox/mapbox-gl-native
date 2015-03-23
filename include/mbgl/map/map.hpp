@@ -1,7 +1,6 @@
 #ifndef MBGL_MAP_MAP
 #define MBGL_MAP_MAP
 
-#include <mbgl/map/transform.hpp>
 #include <mbgl/util/chrono.hpp>
 #include <mbgl/map/update.hpp>
 #include <mbgl/util/geo.hpp>
@@ -43,6 +42,7 @@ class AnnotationManager;
 class MapData;
 class Worker;
 class StillImage;
+class TileID;
 
 class Map : private util::noncopyable {
     friend class View;
@@ -134,18 +134,22 @@ public:
     double getBearing() const;
     void resetNorth();
 
+    // Size
+    uint16_t getWidth() const;
+    uint16_t getHeight() const;
+
     // API
     void setAccessToken(const std::string &token);
     std::string getAccessToken() const;
 
     // Projection
-    inline void getWorldBoundsMeters(ProjectedMeters &sw, ProjectedMeters &ne) const { Projection::getWorldBoundsMeters(sw, ne); }
-    inline void getWorldBoundsLatLng(LatLng &sw, LatLng &ne) const { Projection::getWorldBoundsLatLng(sw, ne); }
-    inline double getMetersPerPixelAtLatitude(const double lat, const double zoom) const { return Projection::getMetersPerPixelAtLatitude(lat, zoom); }
-    inline const ProjectedMeters projectedMetersForLatLng(const LatLng latLng) const { return Projection::projectedMetersForLatLng(latLng); }
-    inline const LatLng latLngForProjectedMeters(const ProjectedMeters projectedMeters) const { return Projection::latLngForProjectedMeters(projectedMeters); }
-    inline const vec2<double> pixelForLatLng(const LatLng latLng) const { return transform.currentState().pixelForLatLng(latLng); }
-    inline const LatLng latLngForPixel(const vec2<double> pixel) const { return transform.currentState().latLngForPixel(pixel); }
+    void getWorldBoundsMeters(ProjectedMeters &sw, ProjectedMeters &ne) const;
+    void getWorldBoundsLatLng(LatLng &sw, LatLng &ne) const;
+    double getMetersPerPixelAtLatitude(const double lat, const double zoom) const;
+    const ProjectedMeters projectedMetersForLatLng(const LatLng latLng) const;
+    const LatLng latLngForProjectedMeters(const ProjectedMeters projectedMeters) const;
+    const vec2<double> pixelForLatLng(const LatLng latLng) const;
+    const LatLng latLngForPixel(const vec2<double> pixel) const;
 
     // Annotations
     void setDefaultPointAnnotationSymbol(const std::string&);
@@ -167,8 +171,6 @@ public:
     void setDebug(bool value);
     void toggleDebug();
     bool getDebug() const;
-
-    inline AnnotationManager& getAnnotationManager() const { return *annotationManager; }
 
 private:
     // Runs the map event loop. ONLY run this function when you want to get render a single frame
@@ -217,6 +219,7 @@ private:
     const std::unique_ptr<Environment> env;
     std::unique_ptr<EnvironmentScope> scope;
     View &view;
+    const std::unique_ptr<MapData> data;
 
 private:
     std::unique_ptr<Worker> workers;
@@ -242,8 +245,6 @@ private:
     // Stores whether the map thread has been stopped already.
     std::atomic_bool isStopped;
 
-    Transform transform;
-
     FileSource& fileSource;
 
     util::ptr<Style> style;
@@ -254,9 +255,6 @@ private:
     std::unique_ptr<LineAtlas> lineAtlas;
     util::ptr<TexturePool> texturePool;
     std::unique_ptr<Painter> painter;
-    std::unique_ptr<AnnotationManager> annotationManager;
-
-    const std::unique_ptr<MapData> data;
 
     std::atomic<UpdateType> updated;
 

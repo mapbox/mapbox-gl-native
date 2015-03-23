@@ -1,26 +1,20 @@
 #include <mbgl/map/source.hpp>
-#include <mbgl/map/map.hpp>
 #include <mbgl/map/map_data.hpp>
 #include <mbgl/map/environment.hpp>
 #include <mbgl/map/transform.hpp>
 #include <mbgl/map/tile.hpp>
 #include <mbgl/renderer/painter.hpp>
 #include <mbgl/util/constants.hpp>
-#include <mbgl/util/raster.hpp>
-#include <mbgl/util/string.hpp>
-#include <mbgl/util/texture_pool.hpp>
 #include <mbgl/storage/resource.hpp>
 #include <mbgl/storage/response.hpp>
-#include <mbgl/util/vec.hpp>
 #include <mbgl/util/math.hpp>
-#include <mbgl/util/std.hpp>
 #include <mbgl/util/box.hpp>
 #include <mbgl/util/mapbox.hpp>
-#include <mbgl/geometry/glyph_atlas.hpp>
 #include <mbgl/style/style_layer.hpp>
 #include <mbgl/platform/log.hpp>
 #include <mbgl/util/uv_detail.hpp>
 #include <mbgl/util/token.hpp>
+#include <mbgl/util/string.hpp>
 #include <mbgl/util/tile_cover.hpp>
 
 #include <mbgl/map/vector_tile_data.hpp>
@@ -216,8 +210,7 @@ TileData::State Source::hasTile(const TileID& id) {
     return TileData::State::invalid;
 }
 
-TileData::State Source::addTile(Map& map,
-                                MapData& data,
+TileData::State Source::addTile(MapData& data,
                                 Worker& worker,
                                 util::ptr<Style> style,
                                 GlyphAtlas& glyphAtlas,
@@ -259,16 +252,15 @@ TileData::State Source::addTile(Map& map,
         // If we don't find working tile data, we're just going to load it.
         if (info.type == SourceType::Vector) {
             new_tile.data =
-                std::make_shared<VectorTileData>(normalized_id, map.getMaxZoom(), style, glyphAtlas,
+                std::make_shared<VectorTileData>(normalized_id, data.transform.getMaxZoom(), style, glyphAtlas,
                                                  glyphStore, spriteAtlas, sprite, info);
             new_tile.data->request(worker, data.getTransformState().getPixelRatio(), callback);
         } else if (info.type == SourceType::Raster) {
             new_tile.data = std::make_shared<RasterTileData>(normalized_id, texturePool, info);
             new_tile.data->request(worker, data.getTransformState().getPixelRatio(), callback);
         } else if (info.type == SourceType::Annotations) {
-            AnnotationManager& annotationManager = map.getAnnotationManager();
-            new_tile.data = std::make_shared<LiveTileData>(normalized_id, annotationManager,
-                                                           map.getMaxZoom(), style, glyphAtlas,
+            new_tile.data = std::make_shared<LiveTileData>(normalized_id, data.annotationManager,
+                                                           data.transform.getMaxZoom(), style, glyphAtlas,
                                                            glyphStore, spriteAtlas, sprite, info);
             new_tile.data->reparse(worker, callback);
         } else {
@@ -359,8 +351,7 @@ bool Source::findLoadedParent(const TileID& id, int32_t minCoveringZoom, std::fo
     return false;
 }
 
-void Source::update(Map &map,
-                    MapData& data,
+void Source::update(MapData& data,
                     Worker& worker,
                     util::ptr<Style> style,
                     GlyphAtlas& glyphAtlas,
@@ -387,7 +378,7 @@ void Source::update(Map &map,
 
     // Add existing child/parent tiles if the actual tile is not yet loaded
     for (const auto& id : required) {
-        const TileData::State state = addTile(map, data, worker, style, glyphAtlas, glyphStore,
+        const TileData::State state = addTile(data, worker, style, glyphAtlas, glyphStore,
                                               spriteAtlas, sprite, texturePool, id, callback);
 
         if (state != TileData::State::parsed) {
