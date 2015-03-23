@@ -450,7 +450,8 @@ std::string Map::getStyleJSON() const {
 }
 
 util::ptr<Sprite> Map::getSprite() {
-    const float pixelRatio = state.getPixelRatio();
+    assert(Environment::currentlyOn(ThreadType::Map));
+    const float pixelRatio = data->getTransformState().getPixelRatio();
     const std::string &sprite_url = style->getSpriteURL();
     if (!sprite || !sprite->hasPixelRatio(pixelRatio)) {
         sprite = Sprite::Create(sprite_url, pixelRatio, *env);
@@ -672,10 +673,6 @@ bool Map::getDebug() const {
     return data->getDebug();
 }
 
-TimePoint Map::getTime() const {
-    return data->getAnimationTime();
-}
-
 void Map::addClass(const std::string& klass) {
     if (data->addClass(klass)) {
         triggerUpdate(Update::Classes);
@@ -717,7 +714,7 @@ void Map::updateTiles() {
     assert(Environment::currentlyOn(ThreadType::Map));
     if (!style) return;
     for (const auto& source : style->sources) {
-        source->update(*this, getWorker(), style, *glyphAtlas, *glyphStore,
+        source->update(*this, *data, getWorker(), style, *glyphAtlas, *glyphStore,
                                *spriteAtlas, getSprite(), *texturePool, [this]() {
             assert(Environment::currentlyOn(ThreadType::Map));
             triggerUpdate();
@@ -728,7 +725,7 @@ void Map::updateTiles() {
 void Map::update() {
     assert(Environment::currentlyOn(ThreadType::Map));
 
-    if (state.hasSize()) {
+    if (data->getTransformState().hasSize()) {
         prepare();
     }
 }
@@ -792,7 +789,7 @@ void Map::prepare() {
         u |= static_cast<UpdateType>(Update::StyleInfo);
     }
 
-    state = transform.currentState();
+    data->setTransformState(transform.currentState());
 
     if (u & static_cast<UpdateType>(Update::StyleInfo)) {
         reloadStyle();
@@ -828,11 +825,11 @@ void Map::prepare() {
         if (u & static_cast<UpdateType>(Update::StyleInfo) ||
             u & static_cast<UpdateType>(Update::Classes) ||
             u & static_cast<UpdateType>(Update::Zoom)) {
-            style->recalculate(state.getNormalizedZoom(), now);
+            style->recalculate(data->getTransformState().getNormalizedZoom(), now);
         }
 
         // Allow the sprite atlas to potentially pull new sprite images if needed.
-        spriteAtlas->resize(state.getPixelRatio());
+        spriteAtlas->resize(data->getTransformState().getPixelRatio());
         spriteAtlas->setSprite(getSprite());
 
         updateTiles();
@@ -854,7 +851,7 @@ void Map::render() {
     assert(style);
     assert(painter);
 
-    painter->render(*style, state, data->getAnimationTime());
+    painter->render(*style, data->getTransformState(), data->getAnimationTime());
 
     // Schedule another rerender when we definitely need a next frame.
     if (transform.needsTransition() || style->hasTransitions()) {

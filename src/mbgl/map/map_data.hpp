@@ -7,6 +7,10 @@
 #include <mutex>
 #include <atomic>
 #include <vector>
+#include <cassert>
+
+#include <mbgl/map/environment.hpp>
+#include <mbgl/map/transform_state.hpp>
 
 namespace mbgl {
 
@@ -87,12 +91,23 @@ public:
         defaultTransitionDuration = duration;
     };
 
+    // Make sure the state is only accessible/modifiable from the Map thread.
+    inline const TransformState& getTransformState() const {
+        assert(Environment::currentlyOn(ThreadType::Map));
+        return transformState;
+    }
+    inline void setTransformState(const TransformState& state) {
+        assert(Environment::currentlyOn(ThreadType::Map));
+        transformState = state;
+    }
+
 private:
     mutable std::mutex mtx;
 
     StyleInfo styleInfo;
     std::string accessToken;
     std::vector<std::string> classes;
+    TransformState transformState;
     std::atomic<uint8_t> debug { false };
     std::atomic<Duration> animationTime;
     std::atomic<Duration> defaultTransitionDuration;

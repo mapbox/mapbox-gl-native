@@ -144,8 +144,8 @@ public:
     inline double getMetersPerPixelAtLatitude(const double lat, const double zoom) const { return Projection::getMetersPerPixelAtLatitude(lat, zoom); }
     inline const ProjectedMeters projectedMetersForLatLng(const LatLng latLng) const { return Projection::projectedMetersForLatLng(latLng); }
     inline const LatLng latLngForProjectedMeters(const ProjectedMeters projectedMeters) const { return Projection::latLngForProjectedMeters(projectedMeters); }
-    inline const vec2<double> pixelForLatLng(const LatLng latLng) const { return state.pixelForLatLng(latLng); }
-    inline const LatLng latLngForPixel(const vec2<double> pixel) const { return state.latLngForPixel(pixel); }
+    inline const vec2<double> pixelForLatLng(const LatLng latLng) const { return transform.currentState().pixelForLatLng(latLng); }
+    inline const LatLng latLngForPixel(const vec2<double> pixel) const { return transform.currentState().latLngForPixel(pixel); }
 
     // Annotations
     void setDefaultPointAnnotationSymbol(const std::string&);
@@ -168,8 +168,6 @@ public:
     void toggleDebug();
     bool getDebug() const;
 
-    inline const TransformState &getState() const { return state; }
-    TimePoint getTime() const;
     inline AnnotationManager& getAnnotationManager() const { return *annotationManager; }
 
 private:
@@ -245,7 +243,6 @@ private:
     std::atomic_bool isStopped;
 
     Transform transform;
-    TransformState state;
 
     FileSource& fileSource;
 
