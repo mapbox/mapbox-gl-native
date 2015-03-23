@@ -146,7 +146,7 @@ std::unique_ptr<StyleLayoutSymbol> parseStyleLayoutSymbol(const StyleBucket &buc
         symbol.icon.rotation_alignment = RotationAlignmentType::Map;
         symbol.text.rotation_alignment = RotationAlignmentType::Map;
     };
-    applyLayoutProperty(PropertyKey::SymbolMinDistance, bucket_desc.layout, symbol.min_distance, z);
+    applyLayoutProperty(PropertyKey::SymbolSpacing, bucket_desc.layout, symbol.spacing, z);
     applyLayoutProperty(PropertyKey::SymbolAvoidEdges, bucket_desc.layout, symbol.avoid_edges, z);
 
     applyLayoutProperty(PropertyKey::IconAllowOverlap, bucket_desc.layout, symbol.icon.allow_overlap, z);

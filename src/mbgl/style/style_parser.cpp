@@ -451,12 +451,32 @@ bool StyleParser::parseOptionalProperty(const char *property_name, PropertyKey k
 
 
 template<> std::tuple<bool, std::string> StyleParser::parseProperty(JSVal value, const char *property_name) {
-    if (!value.IsString()) {
+    if (strncmp(property_name, "text-font", 9) == 0) {
+        if (!value.IsArray()) {
+            Log::Warning(Event::ParseStyle, "value of '%s' must be an array of strings", property_name);
+            return std::tuple<bool, std::string> { false, std::string() };
+        } else {
+            std::string result = "";
+            for (rapidjson::SizeType i = 0; i < value.Size(); ++i) {
+                JSVal stop = value[i];
+                if (stop.IsString()) {
+                    result += stop.GetString();
+                    if (i < value.Size()) {
+                        result += ",";
+                    }
+                } else {
+                    Log::Warning(Event::ParseStyle, "text-font members must be strings");
+                    return std::tuple<bool, std::string> { false, {}};
+                }
+            }
+            return std::tuple<bool, std::string> { true, { result, result.length() } };
+        }
+    } else if (!value.IsString()) {
         Log::Warning(Event::ParseStyle, "value of '%s' must be a string", property_name);
         return std::tuple<bool, std::string> { false, std::string() };
+    } else {
+        return std::tuple<bool, std::string> { true, { value.GetString(), value.GetStringLength() } };
     }
-
-    return std::tuple<bool, std::string> { true, { value.GetString(), value.GetStringLength() } };
 }
 
 template<> std::tuple<bool, bool> StyleParser::parseProperty(JSVal value, const char *property_name) {
@@ -867,7 +887,7 @@ void StyleParser::parseLayout(JSVal value, util::ptr<StyleBucket> &bucket) {
     parseOptionalProperty<Function<float>>("line-round-limit", Key::LineRoundLimit, bucket->layout, value);
 
     parseOptionalProperty<Function<PlacementType>>("symbol-placement", Key::SymbolPlacement, bucket->layout, value);
-    parseOptionalProperty<Function<float>>("symbol-min-distance", Key::SymbolMinDistance, bucket->layout, value);
+    parseOptionalProperty<Function<float>>("symbol-spacing", Key::SymbolSpacing, bucket->layout, value);
     parseOptionalProperty<Function<bool>>("symbol-avoid-edges", Key::SymbolAvoidEdges, bucket->layout, value);
     parseOptionalProperty<Function<bool>>("icon-allow-overlap", Key::IconAllowOverlap, bucket->layout, value);
     parseOptionalProperty<Function<bool>>("icon-ignore-placement", Key::IconIgnorePlacement, bucket->layout, value);
