@@ -39,6 +39,7 @@ class LineAtlas;
 class Environment;
 class EnvironmentScope;
 class AnnotationManager;
+class MapData;
 
 class Map : private util::noncopyable {
     friend class View;
@@ -75,7 +76,15 @@ public:
     void render();
 
     // Notifies the Map thread that the state has changed and an update might be necessary.
-    void triggerUpdate();
+    using UpdateType = uint32_t;
+    enum class Update : UpdateType {
+        Nothing                   = 0,
+        StyleInfo                 = 1 << 0,
+        Debug                     = 1 << 1,
+        DefaultTransitionDuration = 1 << 2,
+        Classes                   = 1 << 3,
+    };
+    void triggerUpdate(Update = Update::Nothing);
 
     // Triggers a render. Can be called from any thread.
     void triggerRender();
@@ -92,8 +101,8 @@ public:
 
     void setDefaultTransitionDuration(std::chrono::steady_clock::duration duration = std::chrono::steady_clock::duration::zero());
     std::chrono::steady_clock::duration getDefaultTransitionDuration();
-    void setStyleURL(const std::string &url);
-    void setStyleJSON(std::string newStyleJSON, const std::string &base = "");
+    void setStyleURL(const std::string& url);
+    void setStyleJSON(const std::string& json, const std::string& base = "");
     std::string getStyleJSON() const;
 
     // Transition
@@ -131,7 +140,7 @@ public:
 
     // API
     void setAccessToken(const std::string &token);
-    const std::string &getAccessToken() const;
+    std::string getAccessToken() const;
 
     // Projection
     inline void getWorldBoundsMeters(ProjectedMeters &sw, ProjectedMeters &ne) const { Projection::getWorldBoundsMeters(sw, ne); }
@@ -157,7 +166,7 @@ public:
     bool getDebug() const;
 
     inline const TransformState &getState() const { return state; }
-    inline std::chrono::steady_clock::time_point getTime() const { return animationTime; }
+    std::chrono::steady_clock::time_point getTime() const;
     inline AnnotationManager& getAnnotationManager() const { return *annotationManager; }
 
 private:
@@ -177,6 +186,13 @@ private:
     void updateTiles();
     void updateSources();
     void updateSources(const util::ptr<StyleLayerGroup> &group);
+
+    // Triggered by triggerUpdate();
+    void update();
+
+    // Loads the style set in the data object. Called by Update::StyleInfo
+    void reloadStyle();
+    void loadStyleJSON(const std::string& json, const std::string& base);
 
     // Prepares a map render by updating the tiles we need for the current view, as well as updating
     // the stylesheet.
@@ -234,17 +250,11 @@ private:
     std::unique_ptr<Painter> painter;
     util::ptr<AnnotationManager> annotationManager;
 
-    std::string styleURL;
-    std::string styleJSON = "";
-    std::vector<std::string> classes;
-    std::string accessToken;
-
-    std::chrono::steady_clock::duration defaultTransitionDuration;
-
-    bool debug = false;
-    std::chrono::steady_clock::time_point animationTime = std::chrono::steady_clock::time_point::min();
+    const std::unique_ptr<MapData> data;
 
     std::set<util::ptr<StyleSource>> activeSources;
+
+    std::atomic<UpdateType> updated;
 };
 
 }
