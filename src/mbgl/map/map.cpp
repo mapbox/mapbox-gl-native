@@ -66,6 +66,7 @@ public:
       glyphAtlas(util::make_unique<GlyphAtlas>(1024, 1024)),
       spriteAtlas(util::make_unique<SpriteAtlas>(512, 512)),
       lineAtlas(util::make_unique<LineAtlas>(512, 512)),
+      texturePool(util::make_unique<TexturePool>()),
       painter(util::make_unique<Painter>(*spriteAtlas, *glyphAtlas, *lineAtlas))
     {
 
@@ -75,6 +76,7 @@ public:
     std::unique_ptr<GlyphAtlas> glyphAtlas;
     std::unique_ptr<SpriteAtlas> spriteAtlas;
     std::unique_ptr<LineAtlas> lineAtlas;
+    std::unique_ptr<TexturePool> texturePool;
     std::unique_ptr<Painter> painter;
 };
 
@@ -86,7 +88,6 @@ Map::Map(View& view_, FileSource& fileSource_)
       data(util::make_unique<MapData>(view_)),
       context(util::make_unique<MapContext>()),
       glyphStore(std::make_shared<GlyphStore>(*env)),
-      texturePool(std::make_shared<TexturePool>()),
       updated(static_cast<UpdateType>(Update::Nothing))
 {
     view.initialize(this);
@@ -109,10 +110,7 @@ Map::~Map() {
     glyphStore.reset();
     style.reset();
     workers.reset();
-    context->painter.reset();
-    context->lineAtlas.reset();
-    context->spriteAtlas.reset();
-    context->glyphAtlas.reset();
+    context.reset();
 
     uv_run(env->loop, UV_RUN_DEFAULT);
 
@@ -771,7 +769,7 @@ void Map::updateTiles() {
     if (!style) return;
     for (const auto& source : style->sources) {
         source->update(*data, getWorker(), style, *context->glyphAtlas, *glyphStore,
-                       *context->spriteAtlas, getSprite(), *texturePool, [this]() {
+                       *context->spriteAtlas, getSprite(), *context->texturePool, [this]() {
             assert(Environment::currentlyOn(ThreadType::Map));
             triggerUpdate();
         });
