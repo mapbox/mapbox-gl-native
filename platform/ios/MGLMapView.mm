@@ -1143,6 +1143,8 @@ CLLocationCoordinate2D latLngToCoordinate(mbgl::LatLng latLng)
     [self setStyleURL:[NSString stringWithFormat:@"styles/%@.json", styleName]];
     if (isHybrid) {
         [self setStyleClasses:@[@"contours", @"labels"]];
+    } else {
+        [self setStyleClasses:nil];
     }
 }
 
