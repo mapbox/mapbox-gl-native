@@ -18,21 +18,16 @@ mapbox::util::optional<Value> LiveTileFeature::getValue(const std::string& key) 
 
 LiveTileLayer::LiveTileLayer() {}
 
-void LiveTileLayer::prepareToAddFeatures(size_t count) {
-    features.reserve(features.size() + count);
+std::size_t LiveTileLayer::addFeature(util::ptr<const LiveTileFeature> feature) {
+    std::size_t i = nextID();
+    features.emplace(i, std::move(feature));
+    return i;
 }
 
-void LiveTileLayer::addFeature(util::ptr<const LiveTileFeature> feature) {
-    features.push_back(std::move(feature));
-}
-
-void LiveTileLayer::removeFeature(util::ptr<const LiveTileFeature> feature) {
-    for (auto it = features.begin(); it != features.end(); ++it) {
-        if (feature == *it) {
-            features.erase(it);
-            return;
-        }
-    }
+util::ptr<const GeometryTileFeature> LiveTileLayer::getFeature(std::size_t i) const {
+    auto it = features.begin();
+    std::advance(it, i);
+    return it->second;
 }
 
 LiveTile::LiveTile() {}

@@ -74,16 +74,17 @@ std::pair<std::vector<Tile::ID>, std::vector<uint32_t>> AnnotationManager::addPo
                                                                    properties);
 
             auto tile_it = tiles.find(tileID);
+            size_t featureIndex;
             if (tile_it != tiles.end()) {
                 // get point layer & add feature
                 auto layer = tile_it->second.second->getMutableLayer(util::ANNOTATIONS_POINTS_LAYER_ID);
-                layer->addFeature(feature);
+                featureIndex = layer->addFeature(feature);
                 // record annotation association with tile
                 tile_it->second.first.push_back(annotationID);
             } else {
                 // create point layer & add feature
                 util::ptr<LiveTileLayer> layer = std::make_shared<LiveTileLayer>();
-                layer->addFeature(feature);
+                featureIndex = layer->addFeature(feature);
                 // create tile & record annotation association
                 auto tile_pos = tiles.emplace(tileID, std::make_pair(std::vector<uint32_t>({ annotationID }), util::make_unique<LiveTile>()));
                 // add point layer to tile
@@ -91,7 +92,7 @@ std::pair<std::vector<Tile::ID>, std::vector<uint32_t>> AnnotationManager::addPo
             }
 
             // record annotation association with tile feature
-            anno_it.first->second->tileFeatures.emplace(tileID, std::vector<std::weak_ptr<const LiveTileFeature>>({ feature }));
+            anno_it.first->second->tileFeatures.emplace(tileID, std::vector<size_t>({ featureIndex }));
 
             z2 /= 2;
             x /= 2;
