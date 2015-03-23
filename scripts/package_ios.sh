@@ -70,6 +70,7 @@ cp -pv include/mbgl/ios/* "${OUTPUT}/static/Headers"
 # complications between faked GYP bundles-as-executables, device build
 # dependencies, and code signing.
 step "Copying Resources..."
+cp -pv LICENSE.md "${OUTPUT}/static"
 mkdir -p "${OUTPUT}/static/${NAME}.bundle"
 cp -pv platform/ios/resources/* "${OUTPUT}/static/${NAME}.bundle"
 cp -prv styles/styles "${OUTPUT}/static/${NAME}.bundle/styles"

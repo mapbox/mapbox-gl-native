@@ -1,6 +1,7 @@
 #include <mbgl/geometry/vao.hpp>
 #include <mbgl/platform/log.hpp>
 #include <mbgl/util/string.hpp>
+#include <mbgl/map/environment.hpp>
 
 namespace mbgl {
 
@@ -11,7 +12,7 @@ VertexArrayObject::~VertexArrayObject() {
     if (!gl::DeleteVertexArrays) return;
 
     if (vao) {
-        MBGL_CHECK_ERROR(gl::DeleteVertexArrays(1, &vao));
+        Environment::Get().abandonVAO(vao);
     }
 }
 

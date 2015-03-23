@@ -1,6 +1,7 @@
 #include <mbgl/map/map.hpp>
 #include <mbgl/map/environment.hpp>
 #include <mbgl/map/view.hpp>
+#include <mbgl/map/map_data.hpp>
 #include <mbgl/platform/platform.hpp>
 #include <mbgl/map/source.hpp>
 #include <mbgl/renderer/painter.hpp>
@@ -61,6 +62,7 @@ using namespace mbgl;
 
 Map::Map(View& view_, FileSource& fileSource_)
     : env(util::make_unique<Environment>(fileSource_)),
+      scope(util::make_unique<EnvironmentScope>(*env, ThreadType::Main, "Main")),
       view(view_),
       transform(view_),
       fileSource(fileSource_),
@@ -70,7 +72,8 @@ Map::Map(View& view_, FileSource& fileSource_)
       lineAtlas(util::make_unique<LineAtlas>(512, 512)),
       texturePool(std::make_shared<TexturePool>()),
       painter(util::make_unique<Painter>(*spriteAtlas, *glyphAtlas, *lineAtlas)),
-      annotationManager(util::make_unique<AnnotationManager>())
+      annotationManager(util::make_unique<AnnotationManager>()),
+      data(util::make_unique<MapData>())
 {
     view.initialize(this);
 }
@@ -80,15 +83,28 @@ Map::~Map() {
         stop();
     }
 
+    // Extend the scope to include both Main and Map thread types to ease cleanup.
+    scope.reset();
+    scope = util::make_unique<EnvironmentScope>(
+        *env, static_cast<ThreadType>(static_cast<uint8_t>(ThreadType::Main) |
+                                      static_cast<uint8_t>(ThreadType::Map)),
+        "MapandMain");
+
     // Explicitly reset all pointers.
     activeSources.clear();
     sprite.reset();
     glyphStore.reset();
     style.reset();
-    texturePool.reset();
     workers.reset();
+    painter.reset();
+    annotationManager.reset();
+    lineAtlas.reset();
+    spriteAtlas.reset();
+    glyphAtlas.reset();
 
     uv_run(env->loop, UV_RUN_DEFAULT);
+
+    env->performCleanup();
 }
 
 uv::worker &Map::getWorker() {
@@ -125,11 +141,7 @@ void Map::start(bool startPaused) {
     });
 
     asyncUpdate = util::make_unique<uv::async>(env->loop, [this] {
-        assert(Environment::currentlyOn(ThreadType::Map));
-
-        if (state.hasSize()) {
-            prepare();
-        }
+        update();
     });
 
     asyncRender = util::make_unique<uv::async>(env->loop, [this] {
@@ -162,6 +174,8 @@ void Map::start(bool startPaused) {
         isStopped = true;
         view.notify();
     });
+
+    triggerUpdate();
 }
 
 void Map::stop(std::function<void ()> callback) {
@@ -233,13 +247,15 @@ void Map::run() {
         threadName += "andMain";
     }
 
-    Environment::Scope scope(*env, threadType, threadName);
+    EnvironmentScope mapScope(*env, threadType, threadName);
 
     if (mode == Mode::Continuous) {
         checkForPause();
     }
 
-    if (mode == Mode::Static && !style && styleURL.empty()) {
+    auto styleInfo = data->getStyleInfo();
+
+    if (mode == Mode::Static && !style && (styleInfo.url.empty() && styleInfo.json.empty())) {
         throw util::Exception("Style is not set");
     }
 
@@ -284,7 +300,9 @@ void Map::renderSync() {
     rendered = false;
 }
 
-void Map::triggerUpdate() {
+void Map::triggerUpdate(const Update u) {
+    updated |= static_cast<UpdateType>(u);
+
     if (mode == Mode::Static) {
         prepare();
     } else if (asyncUpdate) {
@@ -332,36 +350,27 @@ void Map::setup() {
 }
 
 void Map::setStyleURL(const std::string &url) {
-    // TODO: Make threadsafe.
+    assert(Environment::currentlyOn(ThreadType::Main));
 
-    styleURL = url;
-    if (mode == Mode::Continuous) {
-        stop();
-        start();
+    const size_t pos = url.rfind('/');
+    std::string base = "";
+    if (pos != std::string::npos) {
+        base = url.substr(0, pos + 1);
     }
+
+    data->setStyleInfo({ url, base, "" });
+    triggerUpdate(Update::StyleInfo);
 }
 
-void Map::setStyleJSON(std::string newStyleJSON, const std::string &base) {
-    // TODO: Make threadsafe.
-    styleJSON.swap(newStyleJSON);
-    sprite.reset();
-    if (!style) {
-        style = std::make_shared<Style>();
-    }
+void Map::setStyleJSON(const std::string& json, const std::string& base) {
+    assert(Environment::currentlyOn(ThreadType::Main));
 
-    style->base = base;
-    style->loadJSON((const uint8_t *)styleJSON.c_str());
-    style->cascadeClasses(classes);
-    style->setDefaultTransitionDuration(defaultTransitionDuration);
-
-    const std::string glyphURL = util::mapbox::normalizeGlyphsURL(style->glyph_url, getAccessToken());
-    glyphStore->setURL(glyphURL);
-
-    triggerUpdate();
+    data->setStyleInfo({ "", base, json });
+    triggerUpdate(Update::StyleInfo);
 }
 
 std::string Map::getStyleJSON() const {
-    return styleJSON;
+    return data->getStyleInfo().json;
 }
 
 util::ptr<Sprite> Map::getSprite() {
@@ -522,11 +531,11 @@ void Map::stopRotating() {
 #pragma mark - Access Token
 
 void Map::setAccessToken(const std::string &token) {
-    accessToken = token;
+    data->setAccessToken(token);
 }
 
-const std::string &Map::getAccessToken() const {
-    return accessToken;
+std::string Map::getAccessToken() const {
+    return data->getAccessToken();
 }
 
 #pragma mark - Annotations
@@ -584,69 +593,58 @@ void Map::updateAnnotationTiles(const std::vector<Tile::ID>& ids) {
 #pragma mark - Toggles
 
 void Map::setDebug(bool value) {
-    debug = value;
-    assert(painter);
-    painter->setDebug(debug);
-    triggerUpdate();
+    data->setDebug(value);
+    triggerUpdate(Update::Debug);
 }
 
 void Map::toggleDebug() {
-    setDebug(!debug);
+    data->toggleDebug();
+    triggerUpdate(Update::Debug);
 }
 
 bool Map::getDebug() const {
-    return debug;
+    return data->getDebug();
+}
+
+std::chrono::steady_clock::time_point Map::getTime() const {
+    return data->getAnimationTime();
 }
 
 void Map::addClass(const std::string& klass) {
-    if (hasClass(klass)) return;
-    classes.push_back(klass);
-    if (style) {
-        style->cascadeClasses(classes);
-        if (style->hasTransitions()) {
-            triggerUpdate();
-        }
+    if (data->addClass(klass)) {
+        triggerUpdate(Update::Classes);
     }
 }
 
 void Map::removeClass(const std::string& klass) {
-    if (!hasClass(klass)) return;
-    classes.erase(std::remove(classes.begin(), classes.end(), klass), classes.end());
-    if (style) {
-        style->cascadeClasses(classes);
-        if (style->hasTransitions()) {
-            triggerUpdate();
-        }
+    if (data->removeClass(klass)) {
+        triggerUpdate(Update::Classes);
     }
 }
 
-void Map::setClasses(const std::vector<std::string>& classes_) {
-    classes = classes_;
-    if (style) {
-        style->cascadeClasses(classes);
-        if (style->hasTransitions()) {
-            triggerUpdate();
-        }
-    }
+void Map::setClasses(const std::vector<std::string>& classes) {
+    data->setClasses(classes);
+    triggerUpdate(Update::Classes);
 }
 
 bool Map::hasClass(const std::string& klass) const {
-    return std::find(classes.begin(), classes.end(), klass) != classes.end();
+    return data->hasClass(klass);
 }
 
 std::vector<std::string> Map::getClasses() const {
-   return classes;
+    return data->getClasses();
 }
 
 void Map::setDefaultTransitionDuration(std::chrono::steady_clock::duration duration) {
-    defaultTransitionDuration = duration;
-    if (style) {
-        style->setDefaultTransitionDuration(duration);
-    }
+    assert(Environment::currentlyOn(ThreadType::Main));
+
+    data->setDefaultTransitionDuration(duration);
+    triggerUpdate(Update::DefaultTransitionDuration);
 }
 
 std::chrono::steady_clock::duration Map::getDefaultTransitionDuration() {
-    return defaultTransitionDuration;
+    assert(Environment::currentlyOn(ThreadType::Main));
+    return data->getDefaultTransitionDuration();
 }
 
 void Map::updateSources() {
@@ -658,7 +656,9 @@ void Map::updateSources() {
     }
 
     // Then, reenable all of those that we actually use when drawing this layer.
-    updateSources(style->layers);
+    if (style) {
+        updateSources(style->layers);
+    }
 
     // Then, construct or destroy the actual source object, depending on enabled state.
     for (const auto& source : activeSources) {
@@ -703,45 +703,94 @@ void Map::updateTiles() {
     }
 }
 
-void Map::prepare() {
+void Map::update() {
     assert(Environment::currentlyOn(ThreadType::Map));
 
-    if (!style) {
-        style = std::make_shared<Style>();
+    if (state.hasSize()) {
+        prepare();
+    }
+}
 
-        env->request({ Resource::Kind::JSON, styleURL}, [&](const Response &res) {
+void Map::reloadStyle() {
+    assert(Environment::currentlyOn(ThreadType::Map));
+
+    style = std::make_shared<Style>();
+
+    const auto styleInfo = data->getStyleInfo();
+
+    if (!styleInfo.url.empty()) {
+        // We have a style URL
+        env->request({ Resource::Kind::JSON, styleInfo.url }, [&](const Response &res) {
             if (res.status == Response::Successful) {
-                // Calculate the base
-                const size_t pos = styleURL.rfind('/');
-                std::string base = "";
-                if (pos != std::string::npos) {
-                    base = styleURL.substr(0, pos + 1);
-                }
-
-                setStyleJSON(res.data, base);
+                loadStyleJSON(res.data, styleInfo.base);
             } else {
                 Log::Error(Event::Setup, "loading style failed: %s", res.message.c_str());
             }
         });
+    } else {
+        // We got JSON data directly.
+        loadStyleJSON(styleInfo.json, styleInfo.base);
+    }
+}
+
+void Map::loadStyleJSON(const std::string& json, const std::string& base) {
+    assert(Environment::currentlyOn(ThreadType::Map));
+
+    sprite.reset();
+    style = std::make_shared<Style>();
+    style->base = base;
+    style->loadJSON((const uint8_t *)json.c_str());
+    style->cascadeClasses(data->getClasses());
+    style->setDefaultTransitionDuration(data->getDefaultTransitionDuration());
+
+    const std::string glyphURL = util::mapbox::normalizeGlyphsURL(style->glyph_url, getAccessToken());
+    glyphStore->setURL(glyphURL);
+
+    triggerUpdate();
+}
+
+void Map::prepare() {
+    assert(Environment::currentlyOn(ThreadType::Map));
+
+    const auto u = updated.exchange(static_cast<UpdateType>(Update::Nothing));
+    if (u & static_cast<UpdateType>(Update::StyleInfo)) {
+        reloadStyle();
+    }
+    if (u & static_cast<UpdateType>(Update::Debug)) {
+        assert(painter);
+        painter->setDebug(data->getDebug());
+    }
+    if (u & static_cast<UpdateType>(Update::DefaultTransitionDuration)) {
+        if (style) {
+            style->setDefaultTransitionDuration(data->getDefaultTransitionDuration());
+        }
+    }
+    if (u & static_cast<UpdateType>(Update::Classes)) {
+        if (style) {
+            style->cascadeClasses(data->getClasses());
+        }
     }
 
     // Update transform transitions.
-    animationTime = std::chrono::steady_clock::now();
+
+    const auto animationTime = std::chrono::steady_clock::now();
+    data->setAnimationTime(animationTime);
     if (transform.needsTransition()) {
         transform.updateTransitions(animationTime);
     }
 
     state = transform.currentState();
 
-    animationTime = std::chrono::steady_clock::now();
-    updateSources();
-    style->updateProperties(state.getNormalizedZoom(), animationTime);
+    if (style) {
+        updateSources();
+        style->updateProperties(state.getNormalizedZoom(), animationTime);
 
-    // Allow the sprite atlas to potentially pull new sprite images if needed.
-    spriteAtlas->resize(state.getPixelRatio());
-    spriteAtlas->setSprite(getSprite());
+        // Allow the sprite atlas to potentially pull new sprite images if needed.
+        spriteAtlas->resize(state.getPixelRatio());
+        spriteAtlas->setSprite(getSprite());
 
-    updateTiles();
+        updateTiles();
+    }
 
     if (mode == Mode::Continuous) {
         view.invalidate();
@@ -750,9 +799,13 @@ void Map::prepare() {
 
 void Map::render() {
     assert(Environment::currentlyOn(ThreadType::Map));
+
+    // Cleanup OpenGL objects that we abandoned since the last render call.
+    env->performCleanup();
+
     assert(painter);
     painter->render(*style, activeSources,
-                    state, animationTime);
+                    state, data->getAnimationTime());
     // Schedule another rerender when we definitely need a next frame.
     if (transform.needsTransition() || style->hasTransitions()) {
         triggerUpdate();

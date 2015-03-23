@@ -1,3 +1,4 @@
+#include <mbgl/map/environment.hpp>
 #include <mbgl/geometry/line_atlas.hpp>
 #include <mbgl/platform/gl.hpp>
 #include <mbgl/platform/log.hpp>
@@ -18,8 +19,10 @@ LineAtlas::LineAtlas(uint16_t w, uint16_t h)
 LineAtlas::~LineAtlas() {
     std::lock_guard<std::recursive_mutex> lock(mtx);
 
-    MBGL_CHECK_ERROR(glDeleteTextures(1, &texture));
+    Environment::Get().abandonTexture(texture);
     texture = 0;
+
+    delete[] data;
 }
 
 LinePatternPos LineAtlas::getDashPosition(const std::vector<float> &dasharray, bool round) {

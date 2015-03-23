@@ -94,8 +94,9 @@ std::pair<std::vector<Tile::ID>, AnnotationIDs> AnnotationManager::addPointAnnot
 
     const uint16_t extent = 4096;
 
-    AnnotationIDs annotationIDs;
+    std::vector<uint32_t> annotationIDs;
     annotationIDs.reserve(points.size());
+
     std::vector<Tile::ID> affectedTiles;
 
     for (size_t i = 0; i < points.size(); ++i) {
