@@ -24,10 +24,8 @@ namespace uv { class async; }
 
 namespace mbgl {
 
-class GlyphStore;
 class Sprite;
 class Style;
-class TexturePool;
 class FileSource;
 class View;
 class Environment;
