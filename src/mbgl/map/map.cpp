@@ -131,6 +131,9 @@ void Map::start(bool startPaused) {
         style.reset();
         workers.reset();
         activeSources.clear();
+        
+        // Reset active style classes
+        classes.clear();
 
         terminating = true;
 
