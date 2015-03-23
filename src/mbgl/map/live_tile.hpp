@@ -22,7 +22,7 @@ private:
     GeometryCollection geometries;
 };
 
-    class LiveTileLayer : public GeometryTileLayer {
+class LiveTileLayer : public GeometryTileLayer {
 public:
     LiveTileLayer();
 
