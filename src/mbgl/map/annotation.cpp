@@ -73,8 +73,8 @@ std::pair<std::vector<Tile::ID>, std::vector<uint32_t>> AnnotationManager::addPo
                                                                    geometries,
                                                                    properties);
 
-            auto tile_it = annotationTiles.find(tileID);
-            if (tile_it != annotationTiles.end()) {
+            auto tile_it = tiles.find(tileID);
+            if (tile_it != tiles.end()) {
                 // get point layer & add feature
                 auto layer = tile_it->second.second->getMutableLayer(util::ANNOTATIONS_POINTS_LAYER_ID);
                 layer->addFeature(feature);
@@ -85,7 +85,7 @@ std::pair<std::vector<Tile::ID>, std::vector<uint32_t>> AnnotationManager::addPo
                 util::ptr<LiveTileLayer> layer = std::make_shared<LiveTileLayer>();
                 layer->addFeature(feature);
                 // create tile & record annotation association
-                auto tile_pos = annotationTiles.emplace(tileID, std::make_pair(std::vector<uint32_t>({ annotationID }), util::make_unique<LiveTile>()));
+                auto tile_pos = tiles.emplace(tileID, std::make_pair(std::vector<uint32_t>({ annotationID }), util::make_unique<LiveTile>()));
                 // add point layer to tile
                 tile_pos.first->second.second->addLayer(util::ANNOTATIONS_POINTS_LAYER_ID, layer);
             }
@@ -104,25 +104,49 @@ std::pair<std::vector<Tile::ID>, std::vector<uint32_t>> AnnotationManager::addPo
     return std::make_pair(affectedTiles, annotationIDs);
 }
 
-std::vector<Tile::ID> AnnotationManager::removeAnnotations(std::vector<uint32_t> ids) {
+std::vector<Tile::ID> AnnotationManager::removeAnnotations(std::vector<uint32_t> ids, const Map& map) {
     std::vector<Tile::ID> affectedTiles;
 
+    std::vector<uint32_t> z2s;
+    uint8_t zoomCount = map.getMaxZoom() + 1;
+    z2s.reserve(zoomCount);
+    for (uint8_t z = 0; z < zoomCount; ++z) {
+        z2s.emplace_back(1<< z);
+    }
+
+    std::vector<Tile::ID> annotationTiles;
+    annotationTiles.reserve(zoomCount);
+
+    LatLng latLng;
+    vec2<double> p;
+    uint32_t x, y;
+
+    // iterate annotation id's passed
     for (const auto& annotationID : ids) {
+        // grab annotation object
         const auto& annotation_it = annotations.find(annotationID);
         if (annotation_it != annotations.end()) {
             const auto& annotation = annotation_it->second;
-            for (auto& tile_it : annotationTiles) {
-                auto& tileAnnotations = tile_it.second.first;
+            // calculate annotation's affected tile for each zoom
+            for (uint8_t z = 0; z < zoomCount; ++z) {
+                latLng = annotation->getPoint();
+                p = projectPoint(latLng);
+                x = z2s[z] * p.x;
+                y = z2s[z] * p.y;
+                Tile::ID tid(z, x, y);
+                // erase annotation from tile's list
+                auto& tileAnnotations = tiles[tid].first;
                 util::erase_if(tileAnnotations, tileAnnotations.begin(),
                                tileAnnotations.end(), [&annotationID](const uint32_t annotationID_) -> bool {
                                    return (annotationID_ == annotationID);
                                });
-                const auto& features_it = annotation->tileFeatures.find(tile_it.first);
+                // remove annotation's features from tile
+                const auto& features_it = annotation->tileFeatures.find(tid);
                 if (features_it != annotation->tileFeatures.end()) {
-                    const auto& layer = tile_it.second.second->getMutableLayer(util::ANNOTATIONS_POINTS_LAYER_ID);
+                    const auto& layer = tiles[tid].second->getMutableLayer(util::ANNOTATIONS_POINTS_LAYER_ID);
                     const auto& features = features_it->second;
                     layer->removeFeature(features[0]);
-                    affectedTiles.push_back(tile_it.first);
+                    affectedTiles.push_back(tid);
                 }
             }
             annotations.erase(annotationID);
@@ -144,7 +168,7 @@ std::vector<uint32_t> AnnotationManager::getAnnotationsInBounds(LatLngBounds que
 
     std::vector<uint32_t> matchingAnnotations;
 
-    for (auto& tile : annotationTiles) {
+    for (auto& tile : tiles) {
         Tile::ID id = tile.first;
         if (id.z == z) {
             if (id.x >= nwTile.x && id.x <= seTile.x && id.y >= nwTile.y && id.y <= seTile.y) {
@@ -184,8 +208,8 @@ LatLngBounds AnnotationManager::getBoundsForAnnotations(std::vector<uint32_t> id
 const std::unique_ptr<LiveTile>& AnnotationManager::getTile(Tile::ID const& id) {
     std::lock_guard<std::mutex> lock(mtx);
 
-    auto tile_it = annotationTiles.find(id);
-    if (tile_it != annotationTiles.end()) {
+    auto tile_it = tiles.find(id);
+    if (tile_it != tiles.end()) {
         return tile_it->second.second;
     }
     return nullTile;

@@ -32,7 +32,7 @@ public:
 
     void setDefaultPointAnnotationSymbol(std::string& symbol) { defaultPointAnnotationSymbol = symbol; }
     std::pair<std::vector<Tile::ID>, std::vector<uint32_t>> addPointAnnotations(std::vector<LatLng>, std::vector<std::string>& symbols, const Map&);
-    std::vector<Tile::ID> removeAnnotations(std::vector<uint32_t>);
+    std::vector<Tile::ID> removeAnnotations(std::vector<uint32_t>, const Map&);
     std::vector<uint32_t> getAnnotationsInBounds(LatLngBounds, const Map&) const;
     LatLngBounds getBoundsForAnnotations(std::vector<uint32_t>) const;
 
@@ -46,7 +46,7 @@ private:
     std::mutex mtx;
     std::string defaultPointAnnotationSymbol;
     std::unordered_map<uint32_t, std::unique_ptr<Annotation>> annotations;
-    std::unordered_map<Tile::ID, std::pair<std::vector<uint32_t>, std::unique_ptr<LiveTile>>, Tile::ID::Hash> annotationTiles;
+    std::unordered_map<Tile::ID, std::pair<std::vector<uint32_t>, std::unique_ptr<LiveTile>>, Tile::ID::Hash> tiles;
     std::unique_ptr<LiveTile> nullTile;
     uint32_t nextID_ = 0;
 };
