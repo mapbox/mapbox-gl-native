@@ -75,7 +75,7 @@ NSString *const MGLAnnotationIDKey = @"MGLAnnotationIDKey";
 @property (nonatomic) UIRotationGestureRecognizer *rotate;
 @property (nonatomic) UILongPressGestureRecognizer *quickZoom;
 @property (nonatomic) NSMutableArray *bundledStyleNames;
-@property (nonatomic) NSMapTable *annotationsStore;
+@property (nonatomic) NSMapTable *annotationIDsByAnnotation;
 @property (nonatomic) std::vector<uint32_t> annotationsNearbyLastTap;
 @property (nonatomic, weak) id <MGLAnnotation> selectedAnnotation;
 @property (nonatomic, readonly) NSDictionary *allowedStyleTypes;
@@ -281,7 +281,7 @@ mbgl::DefaultFileSource *mbglFileSource = nullptr;
 
     // setup annotations
     //
-    _annotationsStore = [NSMapTable mapTableWithKeyOptions:NSMapTableStrongMemory valueOptions:NSMapTableStrongMemory];
+    _annotationIDsByAnnotation = [NSMapTable mapTableWithKeyOptions:NSMapTableStrongMemory valueOptions:NSMapTableStrongMemory];
     std::string defaultSymbolName([MGLDefaultStyleMarkerSymbolName cStringUsingEncoding:[NSString defaultCStringEncoding]]);
     mbglMap->setDefaultPointAnnotationSymbol(defaultSymbolName);
 
@@ -754,7 +754,7 @@ mbgl::DefaultFileSource *mbglFileSource = nullptr;
         {
             // the selection candidates haven't changed; cycle through them
             if (self.selectedAnnotation &&
-                [[[self.annotationsStore objectForKey:self.selectedAnnotation]
+                [[[self.annotationIDsByAnnotation objectForKey:self.selectedAnnotation]
                     objectForKey:MGLAnnotationIDKey] unsignedIntValue] == self.annotationsNearbyLastTap.back())
             {
                 // the selected annotation is the last in the set; cycle back to the first
@@ -764,7 +764,7 @@ mbgl::DefaultFileSource *mbglFileSource = nullptr;
             else if (self.selectedAnnotation)
             {
                 // otherwise increment the selection through the candidates
-                uint32_t currentID = [[[self.annotationsStore objectForKey:self.selectedAnnotation] objectForKey:MGLAnnotationIDKey] unsignedIntValue];
+                uint32_t currentID = [[[self.annotationIDsByAnnotation objectForKey:self.selectedAnnotation] objectForKey:MGLAnnotationIDKey] unsignedIntValue];
                 auto result = std::find(self.annotationsNearbyLastTap.begin(), self.annotationsNearbyLastTap.end(), currentID);
                 auto distance = std::distance(self.annotationsNearbyLastTap.begin(), result);
                 newSelectedAnnotationID = self.annotationsNearbyLastTap[distance + 1];
@@ -793,11 +793,11 @@ mbgl::DefaultFileSource *mbglFileSource = nullptr;
     if (newSelectedAnnotationID >= 0)
     {
         // find & select model object for selection
-        NSEnumerator *enumerator = self.annotationsStore.keyEnumerator;
+        NSEnumerator *enumerator = self.annotationIDsByAnnotation.keyEnumerator;
 
         while (id <MGLAnnotation> annotation = enumerator.nextObject)
         {
-            if ([[[self.annotationsStore objectForKey:annotation] objectForKey:MGLAnnotationIDKey] integerValue] == newSelectedAnnotationID)
+            if ([[[self.annotationIDsByAnnotation objectForKey:annotation] objectForKey:MGLAnnotationIDKey] integerValue] == newSelectedAnnotationID)
             {
                 // only change selection status if not the currently selected annotation
                 if ( ! [annotation isEqual:self.selectedAnnotation])
@@ -1556,11 +1556,11 @@ CLLocationCoordinate2D latLngToCoordinate(mbgl::LatLng latLng)
 
 - (NSArray *)annotations
 {
-    if ([_annotationsStore count])
+    if ([_annotationIDsByAnnotation count])
     {
         NSMutableArray *result = [NSMutableArray array];
 
-        NSEnumerator *keyEnumerator = [_annotationsStore keyEnumerator];
+        NSEnumerator *keyEnumerator = [_annotationIDsByAnnotation keyEnumerator];
         id <MGLAnnotation> annotation;
 
         while (annotation = [keyEnumerator nextObject])
@@ -1616,7 +1616,7 @@ CLLocationCoordinate2D latLngToCoordinate(mbgl::LatLng latLng)
 
     for (size_t i = 0; i < annotationIDs.size(); ++i)
     {
-        [self.annotationsStore setObject:@{ MGLAnnotationIDKey : @(annotationIDs[i]) }
+        [self.annotationIDsByAnnotation setObject:@{ MGLAnnotationIDKey : @(annotationIDs[i]) }
                                   forKey:annotations[i]];
     }
 }
@@ -1643,8 +1643,8 @@ CLLocationCoordinate2D latLngToCoordinate(mbgl::LatLng latLng)
     {
         assert([annotation conformsToProtocol:@protocol(MGLAnnotation)]);
 
-        annotationIDsToRemove.push_back([[self.annotationsStore objectForKey:annotation] unsignedIntValue]);
-        [self.annotationsStore removeObjectForKey:annotation];
+        annotationIDsToRemove.push_back([[self.annotationIDsByAnnotation objectForKey:annotation] unsignedIntValue]);
+        [self.annotationIDsByAnnotation removeObjectForKey:annotation];
     }
 
     mbglMap->removeAnnotations(annotationIDsToRemove);
