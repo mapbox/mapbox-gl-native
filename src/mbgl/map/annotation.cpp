@@ -79,13 +79,13 @@ std::pair<std::vector<Tile::ID>, std::vector<uint32_t>> AnnotationManager::addPo
                 auto layer = tile_it->second.second->getMutableLayer(util::ANNOTATIONS_POINTS_LAYER_ID);
                 layer->addFeature(feature);
                 // record annotation association with tile
-                tile_it->second.first.push_back(annotationID);
+                tile_it->second.first.insert(annotationID);
             } else {
                 // create point layer & add feature
                 util::ptr<LiveTileLayer> layer = std::make_shared<LiveTileLayer>();
                 layer->addFeature(feature);
                 // create tile & record annotation association
-                auto tile_pos = tiles.emplace(tileID, std::make_pair(std::vector<uint32_t>({ annotationID }), util::make_unique<LiveTile>()));
+                auto tile_pos = tiles.emplace(tileID, std::make_pair(std::unordered_set<uint32_t>({ annotationID }), util::make_unique<LiveTile>()));
                 // add point layer to tile
                 tile_pos.first->second.second->addLayer(util::ANNOTATIONS_POINTS_LAYER_ID, layer);
             }
@@ -136,10 +136,7 @@ std::vector<Tile::ID> AnnotationManager::removeAnnotations(std::vector<uint32_t>
                 Tile::ID tid(z, x, y);
                 // erase annotation from tile's list
                 auto& tileAnnotations = tiles[tid].first;
-                util::erase_if(tileAnnotations, tileAnnotations.begin(),
-                               tileAnnotations.end(), [&annotationID](const uint32_t annotationID_) -> bool {
-                                   return (annotationID_ == annotationID);
-                               });
+                tileAnnotations.erase(annotationID);
                 // remove annotation's features from tile
                 const auto& features_it = annotation->tileFeatures.find(tid);
                 if (features_it != annotation->tileFeatures.end()) {

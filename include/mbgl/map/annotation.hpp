@@ -13,6 +13,7 @@
 #include <mutex>
 #include <memory>
 #include <unordered_map>
+#include <unordered_set>
 
 namespace mbgl {
 
@@ -46,7 +47,7 @@ private:
     std::mutex mtx;
     std::string defaultPointAnnotationSymbol;
     std::unordered_map<uint32_t, std::unique_ptr<Annotation>> annotations;
-    std::unordered_map<Tile::ID, std::pair<std::vector<uint32_t>, std::unique_ptr<LiveTile>>, Tile::ID::Hash> tiles;
+    std::unordered_map<Tile::ID, std::pair<std::unordered_set<uint32_t>, std::unique_ptr<LiveTile>>, Tile::ID::Hash> tiles;
     std::unique_ptr<LiveTile> nullTile;
     uint32_t nextID_ = 0;
 };
