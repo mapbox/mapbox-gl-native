@@ -1,6 +1,6 @@
 #import "MBXViewController.h"
 
-#import <mbgl/ios/MGLMapView.h>
+#import <mbgl/ios/MapboxGL.h>
 
 #import <mbgl/platform/darwin/settings_nsuserdefaults.hpp>
 
@@ -9,6 +9,7 @@
 static UIColor *const kTintColor = [UIColor colorWithRed:0.120 green:0.550 blue:0.670 alpha:1.000];
 
 static NSArray *const kStyleNames = @[
+    @"Emerald",
     @"Bright",
     @"Basic",
     @"Outdoors",
@@ -232,7 +233,7 @@ mbgl::Settings_NSUserDefaults *settings = nullptr;
     }
 }
 
-#pragma mark - Location
+#pragma mark - CLLocationManagerDelegate
 
 - (void)locationManager:(CLLocationManager *)manager didChangeAuthorizationStatus:(CLAuthorizationStatus)status
 {
