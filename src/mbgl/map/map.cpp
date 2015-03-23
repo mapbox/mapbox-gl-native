@@ -62,7 +62,8 @@ namespace mbgl {
 
 class MapContext {
 public:
-    MapContext() :
+    MapContext(Environment& env) :
+      glyphStore(util::make_unique<GlyphStore>(env)),
       glyphAtlas(util::make_unique<GlyphAtlas>(1024, 1024)),
       spriteAtlas(util::make_unique<SpriteAtlas>(512, 512)),
       lineAtlas(util::make_unique<LineAtlas>(512, 512)),
@@ -73,6 +74,7 @@ public:
     }
 
 public:
+    std::unique_ptr<GlyphStore> glyphStore;
     std::unique_ptr<GlyphAtlas> glyphAtlas;
     std::unique_ptr<SpriteAtlas> spriteAtlas;
     std::unique_ptr<LineAtlas> lineAtlas;
@@ -86,8 +88,7 @@ Map::Map(View& view_, FileSource& fileSource_)
       scope(util::make_unique<EnvironmentScope>(*env, ThreadType::Main, "Main")),
       view(view_),
       data(util::make_unique<MapData>(view_)),
-      context(util::make_unique<MapContext>()),
-      glyphStore(std::make_shared<GlyphStore>(*env)),
+      context(util::make_unique<MapContext>(*env)),
       updated(static_cast<UpdateType>(Update::Nothing))
 {
     view.initialize(this);
@@ -107,7 +108,6 @@ Map::~Map() {
 
     // Explicitly reset all pointers.
     sprite.reset();
-    glyphStore.reset();
     style.reset();
     workers.reset();
     context.reset();
@@ -768,7 +768,7 @@ void Map::updateTiles() {
     assert(Environment::currentlyOn(ThreadType::Map));
     if (!style) return;
     for (const auto& source : style->sources) {
-        source->update(*data, getWorker(), style, *context->glyphAtlas, *glyphStore,
+        source->update(*data, getWorker(), style, *context->glyphAtlas, *context->glyphStore,
                        *context->spriteAtlas, getSprite(), *context->texturePool, [this]() {
             assert(Environment::currentlyOn(ThreadType::Map));
             triggerUpdate();
@@ -818,7 +818,7 @@ void Map::loadStyleJSON(const std::string& json, const std::string& base) {
     style->setDefaultTransitionDuration(data->getDefaultTransitionDuration());
 
     const std::string glyphURL = util::mapbox::normalizeGlyphsURL(style->glyph_url, getAccessToken());
-    glyphStore->setURL(glyphURL);
+    context->glyphStore->setURL(glyphURL);
 
     for (const auto& source : style->sources) {
         source->load(getAccessToken(), *env, [this]() {
