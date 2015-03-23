@@ -606,6 +606,8 @@ mbgl::DefaultFileSource *mbglFileSource = nullptr;
 
 - (void)handlePanGesture:(UIPanGestureRecognizer *)pan
 {
+    [self trackGestureEvent:@"Pan" forRecognizer:pan];
+    
     if ( ! self.isScrollEnabled) return;
 
     mbglMap->cancelTransitions();
@@ -662,6 +664,8 @@ mbgl::DefaultFileSource *mbglFileSource = nullptr;
 
 - (void)handlePinchGesture:(UIPinchGestureRecognizer *)pinch
 {
+    [self trackGestureEvent:@"Pinch" forRecognizer:pinch];
+    
     if ( ! self.isZoomEnabled) return;
 
     if (mbglMap->getZoom() <= mbglMap->getMinZoom() && pinch.scale < 1) return;
@@ -696,6 +700,8 @@ mbgl::DefaultFileSource *mbglFileSource = nullptr;
 
 - (void)handleRotateGesture:(UIRotationGestureRecognizer *)rotate
 {
+    [self trackGestureEvent:@"Rotation" forRecognizer:rotate];
+    
     if ( ! self.isRotateEnabled) return;
 
     mbglMap->cancelTransitions();
@@ -734,8 +740,10 @@ mbgl::DefaultFileSource *mbglFileSource = nullptr;
 
 - (void)handleSingleTapGesture:(UITapGestureRecognizer *)singleTap
 {
+    [self trackGestureEvent:@"SingleTap" forRecognizer:singleTap];
+    
     CGPoint tapPoint = [singleTap locationInView:self];
-
+    
     // tolerances based on touch size & typical marker aspect ratio
     CGFloat toleranceWidth  = 50;
     CGFloat toleranceHeight = 75;
@@ -846,6 +854,8 @@ mbgl::DefaultFileSource *mbglFileSource = nullptr;
 
 - (void)handleDoubleTapGesture:(UITapGestureRecognizer *)doubleTap
 {
+    [self trackGestureEvent:@"DoubleTap" forRecognizer:doubleTap];
+    
     if ( ! self.isZoomEnabled) return;
 
     mbglMap->cancelTransitions();
@@ -865,22 +875,14 @@ mbgl::DefaultFileSource *mbglFileSource = nullptr;
             [weakSelf unrotateIfNeededAnimated:YES];
 
             [weakSelf notifyMapChange:@(mbgl::MapChangeRegionDidChangeAnimated)];
-
-            // Send Map Zoom Event
-            CGPoint ptInView = CGPointMake([doubleTap locationInView:doubleTap.view].x, [doubleTap locationInView:doubleTap.view].y);
-            CLLocationCoordinate2D coord = [self convertPoint:ptInView toCoordinateFromView:doubleTap.view];
-            NSMutableDictionary *dict = [[NSMutableDictionary alloc] init];
-            [dict setValue:[[NSNumber alloc] initWithDouble:coord.latitude] forKey:@"lat"];
-            [dict setValue:[[NSNumber alloc] initWithDouble:coord.longitude] forKey:@"lng"];
-            [dict setValue:[[NSNumber alloc] initWithDouble:[weakSelf zoomLevel]] forKey:@"zoom"];
-            
-            [[MGLMapboxEvents sharedManager] pushEvent:@"map.click" withAttributes:dict];
         }];
     }
 }
 
 - (void)handleTwoFingerTapGesture:(UITapGestureRecognizer *)twoFingerTap
 {
+    [self trackGestureEvent:@"TwoFingerTap" forRecognizer:twoFingerTap];
+    
     if ( ! self.isZoomEnabled) return;
 
     if (mbglMap->getZoom() == mbglMap->getMinZoom()) return;
@@ -902,22 +904,14 @@ mbgl::DefaultFileSource *mbglFileSource = nullptr;
             [weakSelf unrotateIfNeededAnimated:YES];
 
             [weakSelf notifyMapChange:@(mbgl::MapChangeRegionDidChangeAnimated)];
-            
-            // Send Map Zoom Event
-            CGPoint ptInView = CGPointMake([twoFingerTap locationInView:twoFingerTap.view].x, [twoFingerTap locationInView:twoFingerTap.view].y);
-            CLLocationCoordinate2D coord = [self convertPoint:ptInView toCoordinateFromView:twoFingerTap.view];
-            NSMutableDictionary *dict = [[NSMutableDictionary alloc] init];
-            [dict setValue:[[NSNumber alloc] initWithDouble:coord.latitude] forKey:@"lat"];
-            [dict setValue:[[NSNumber alloc] initWithDouble:coord.longitude] forKey:@"lng"];
-            [dict setValue:[[NSNumber alloc] initWithDouble:[weakSelf zoomLevel]] forKey:@"zoom"];
-            
-            [[MGLMapboxEvents sharedManager] pushEvent:@"map.click" withAttributes:dict];
         }];
     }
 }
 
 - (void)handleQuickZoomGesture:(UILongPressGestureRecognizer *)quickZoom
 {
+    [self trackGestureEvent:@"LongPress" forRecognizer:quickZoom];
+    
     if ( ! self.isZoomEnabled) return;
 
     mbglMap->cancelTransitions();
@@ -943,16 +937,6 @@ mbgl::DefaultFileSource *mbglFileSource = nullptr;
         [self unrotateIfNeededAnimated:YES];
 
         [self notifyMapChange:@(mbgl::MapChangeRegionDidChangeAnimated)];
-
-        // Send Map Zoom Event
-        CGPoint ptInView = CGPointMake([quickZoom locationInView:quickZoom.view].x, [quickZoom locationInView:quickZoom.view].y);
-        CLLocationCoordinate2D coord = [self convertPoint:ptInView toCoordinateFromView:quickZoom.view];
-        NSMutableDictionary *dict = [[NSMutableDictionary alloc] init];
-        [dict setValue:[[NSNumber alloc] initWithDouble:coord.latitude] forKey:@"lat"];
-        [dict setValue:[[NSNumber alloc] initWithDouble:coord.longitude] forKey:@"lng"];
-        [dict setValue:[[NSNumber alloc] initWithDouble:[self zoomLevel]] forKey:@"zoom"];
-        
-        [[MGLMapboxEvents sharedManager] pushEvent:@"map.click" withAttributes:dict];
     }
 }
 
@@ -961,6 +945,20 @@ mbgl::DefaultFileSource *mbglFileSource = nullptr;
     NSArray *validSimultaneousGestures = @[ self.pan, self.pinch, self.rotate ];
 
     return ([validSimultaneousGestures containsObject:gestureRecognizer] && [validSimultaneousGestures containsObject:otherGestureRecognizer]);
+}
+
+- (void) trackGestureEvent:(NSString *) gesture forRecognizer:(UIGestureRecognizer  *) recognizer
+{
+    // Send Map Zoom Event
+    CGPoint ptInView = CGPointMake([recognizer locationInView:recognizer.view].x, [recognizer locationInView:recognizer.view].y);
+    CLLocationCoordinate2D coord = [self convertPoint:ptInView toCoordinateFromView:recognizer.view];
+    NSMutableDictionary *dict = [[NSMutableDictionary alloc] init];
+    [dict setValue:[[NSNumber alloc] initWithDouble:coord.latitude] forKey:@"lat"];
+    [dict setValue:[[NSNumber alloc] initWithDouble:coord.longitude] forKey:@"lng"];
+    [dict setValue:[[NSNumber alloc] initWithDouble:[self zoomLevel]] forKey:@"zoom"];
+    [dict setValue:gesture forKey:@"gesture"];
+    
+    [[MGLMapboxEvents sharedManager] pushEvent:@"map.click" withAttributes:dict];
 }
 
 #pragma mark - Properties -
