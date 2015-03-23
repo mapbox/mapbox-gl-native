@@ -4,7 +4,6 @@
 #include <mbgl/style/style_layout.hpp>
 #include <mbgl/geometry/glyph_atlas.hpp>
 #include <mbgl/geometry/sprite_atlas.hpp>
-#include <mbgl/map/map.hpp>
 #include <mbgl/util/math.hpp>
 
 #include <cmath>

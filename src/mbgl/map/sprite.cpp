@@ -1,5 +1,4 @@
 #include <mbgl/map/sprite.hpp>
-#include <mbgl/map/map.hpp>
 #include <mbgl/util/raster.hpp>
 #include <mbgl/platform/log.hpp>
 

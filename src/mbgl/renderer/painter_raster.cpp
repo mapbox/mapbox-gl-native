@@ -3,7 +3,6 @@
 #include <mbgl/renderer/raster_bucket.hpp>
 #include <mbgl/style/style_layer.hpp>
 #include <mbgl/util/std.hpp>
-#include <mbgl/map/map.hpp>
 
 using namespace mbgl;
 

@@ -1,7 +1,4 @@
 #include <mbgl/renderer/painter.hpp>
-#include <mbgl/renderer/fill_bucket.hpp>
-#include <mbgl/map/map.hpp>
-#include <mbgl/map/tile.hpp>
 #include <mbgl/map/source.hpp>
 #include <mbgl/util/clip_id.hpp>
 

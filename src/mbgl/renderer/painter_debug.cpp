@@ -1,6 +1,5 @@
 #include <mbgl/renderer/painter.hpp>
 #include <mbgl/renderer/debug_bucket.hpp>
-#include <mbgl/map/map.hpp>
 #include <mbgl/map/tile.hpp>
 #include <mbgl/util/string.hpp>
 

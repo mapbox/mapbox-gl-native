@@ -6,7 +6,6 @@
 #include <mbgl/map/sprite.hpp>
 #include <mbgl/geometry/sprite_atlas.hpp>
 #include <mbgl/geometry/line_atlas.hpp>
-#include <mbgl/map/map.hpp>
 
 using namespace mbgl;
 
