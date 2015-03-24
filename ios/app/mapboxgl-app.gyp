@@ -10,6 +10,7 @@
       'mac_bundle': 1,
       'mac_bundle_resources': [
         '<!@(find ./img -type f)',
+        './features.geojson'
       ],
 
       'dependencies': [
@@ -27,6 +28,8 @@
         './MBXAppDelegate.m',
         './MBXViewController.h',
         './MBXViewController.mm',
+        './MBXAnnotation.h',
+        './MBXAnnotation.m',
         '../../platform/darwin/settings_nsuserdefaults.mm',
       ],
 
