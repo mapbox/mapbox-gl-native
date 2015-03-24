@@ -1,5 +1,6 @@
 #include <mbgl/map/map.hpp>
 #include <mbgl/map/environment.hpp>
+#include <mbgl/map/map_context.hpp>
 #include <mbgl/map/view.hpp>
 #include <mbgl/map/map_data.hpp>
 #include <mbgl/map/still_image.hpp>
@@ -59,30 +60,6 @@ const static bool uvVersionCheck = []() {
 }();
 
 namespace mbgl {
-
-class MapContext {
-public:
-    MapContext(Environment& env) :
-      glyphStore(util::make_unique<GlyphStore>(env)),
-      glyphAtlas(util::make_unique<GlyphAtlas>(1024, 1024)),
-      spriteAtlas(util::make_unique<SpriteAtlas>(512, 512)),
-      lineAtlas(util::make_unique<LineAtlas>(512, 512)),
-      texturePool(util::make_unique<TexturePool>()),
-      painter(util::make_unique<Painter>(*spriteAtlas, *glyphAtlas, *lineAtlas))
-    {
-
-    }
-
-public:
-    const std::unique_ptr<GlyphStore> glyphStore;
-    const std::unique_ptr<GlyphAtlas> glyphAtlas;
-    const std::unique_ptr<SpriteAtlas> spriteAtlas;
-    const std::unique_ptr<LineAtlas> lineAtlas;
-    const std::unique_ptr<TexturePool> texturePool;
-    const std::unique_ptr<Painter> painter;
-    util::ptr<Sprite> sprite;
-};
-
 
 Map::Map(View& view_, FileSource& fileSource_)
     : env(util::make_unique<Environment>(fileSource_)),
