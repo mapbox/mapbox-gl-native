@@ -1683,7 +1683,7 @@ CLLocationCoordinate2D latLngToCoordinate(mbgl::LatLng latLng)
     
     if (annotation == self.selectedAnnotation) return;
 
-    [self deselectAnnotation:self.selectedAnnotation animated:animated];
+    [self deselectAnnotation:self.selectedAnnotation animated:NO];
     self.selectedAnnotation = annotation;
     self.selectedAnnotationCalloutView = [self calloutViewForAnnotation:annotation];
     CGPoint calloutAnchorPoint = [self convertCoordinate:annotation.coordinate toPointToView:self];
@@ -1823,7 +1823,7 @@ CLLocationCoordinate2D latLngToCoordinate(mbgl::LatLng latLng)
         }
         case mbgl::MapChangeRegionIsChanging:
         {
-            [self deselectAnnotation:self.selectedAnnotation animated:YES];
+            [self deselectAnnotation:self.selectedAnnotation animated:NO];
             
             if ([self.delegate respondsToSelector:@selector(mapViewRegionIsChanging:)])
             {
