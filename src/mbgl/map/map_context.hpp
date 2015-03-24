@@ -8,6 +8,7 @@
 namespace mbgl {
 
 class Environment;
+class MapData;
 class GlyphStore;
 class GlyphAtlas;
 class SpriteAtlas;
@@ -20,12 +21,17 @@ class Worker;
 
 class MapContext {
 public:
-    MapContext(Environment&);
+    MapContext(Environment&, MapData&);
 
     Worker& getWorker();
+    util::ptr<Sprite> getSprite();
 
 public:
     std::unique_ptr<Worker> workers;
+
+public:
+    Environment& env;
+    MapData& data;
     const std::unique_ptr<GlyphStore> glyphStore;
     const std::unique_ptr<GlyphAtlas> glyphAtlas;
     const std::unique_ptr<SpriteAtlas> spriteAtlas;

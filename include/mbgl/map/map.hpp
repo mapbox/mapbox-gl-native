@@ -173,8 +173,6 @@ private:
     void resize(uint16_t width, uint16_t height, float ratio = 1);
     void resize(uint16_t width, uint16_t height, float ratio, uint16_t fbWidth, uint16_t fbHeight);
 
-    util::ptr<Sprite> getSprite();
-
     // Checks if render thread needs to pause
     void checkForPause();
 

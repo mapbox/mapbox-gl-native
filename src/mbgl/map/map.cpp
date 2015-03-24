@@ -66,7 +66,7 @@ Map::Map(View& view_, FileSource& fileSource_)
       scope(util::make_unique<EnvironmentScope>(*env, ThreadType::Main, "Main")),
       view(view_),
       data(util::make_unique<MapData>(view_)),
-      context(util::make_unique<MapContext>(*env)),
+      context(util::make_unique<MapContext>(*env, *data)),
       updated(static_cast<UpdateType>(Update::Nothing))
 {
     view.initialize(this);
@@ -430,17 +430,6 @@ std::string Map::getStyleJSON() const {
     return data->getStyleInfo().json;
 }
 
-util::ptr<Sprite> Map::getSprite() {
-    assert(Environment::currentlyOn(ThreadType::Map));
-    const float pixelRatio = data->getTransformState().getPixelRatio();
-    const std::string &sprite_url = context->style->getSpriteURL();
-    if (!context->sprite || !context->sprite->hasPixelRatio(pixelRatio)) {
-        context->sprite = Sprite::Create(sprite_url, pixelRatio, *env);
-    }
-
-    return context->sprite;
-}
-
 #pragma mark - Size
 
 void Map::resize(uint16_t width, uint16_t height, float ratio) {
@@ -739,7 +728,7 @@ void Map::updateTiles() {
     if (!context->style) return;
     for (const auto& source : context->style->sources) {
         source->update(*data, context->getWorker(), context->style, *context->glyphAtlas, *context->glyphStore,
-                       *context->spriteAtlas, getSprite(), *context->texturePool, [this]() {
+                       *context->spriteAtlas, context->getSprite(), *context->texturePool, [this]() {
             assert(Environment::currentlyOn(ThreadType::Map));
             triggerUpdate();
         });
@@ -854,7 +843,7 @@ void Map::prepare() {
 
         // Allow the sprite atlas to potentially pull new sprite images if needed.
         context->spriteAtlas->resize(data->getTransformState().getPixelRatio());
-        context->spriteAtlas->setSprite(getSprite());
+        context->spriteAtlas->setSprite(context->getSprite());
 
         updateTiles();
     }
