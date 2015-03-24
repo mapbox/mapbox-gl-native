@@ -40,6 +40,8 @@ NSNumber *scale;
 - (id) init {
     self = [super init];
     if (self) {
+                
+        // Configure Events Infrastructure
         _queue = [[NSMutableArray alloc] init];
         _flushAt = 20;
         _flushAfter = 10000;
@@ -64,9 +66,6 @@ NSNumber *scale;
             _anonid = [[[UIDevice currentDevice] identifierForVendor] UUIDString];
         }
         
-        
-        // Get Vendor ID
-        anonId = [[[UIDevice currentDevice] identifierForVendor] UUIDString];
         model = [self getSysInfoByName:"hw.machine"];
         iOSVersion = [NSString stringWithFormat:@"%@ %@", [UIDevice currentDevice].systemName, [UIDevice currentDevice].systemVersion];
         if ([UIScreen instancesRespondToSelector:@selector(nativeScale)]) {
