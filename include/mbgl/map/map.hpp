@@ -3,6 +3,7 @@
 
 #include <mbgl/util/chrono.hpp>
 #include <mbgl/map/update.hpp>
+#include <mbgl/map/mode.hpp>
 #include <mbgl/util/geo.hpp>
 #include <mbgl/util/projection.hpp>
 #include <mbgl/util/noncopyable.hpp>
@@ -39,18 +40,12 @@ class Map : private util::noncopyable {
     friend class View;
 
 public:
-    enum class Mode : uint8_t {
-        None, // we're not doing any processing
-        Continuous, // continually updating map
-        Still, // a once-off still image.
-    };
-
     explicit Map(View&, FileSource&);
     ~Map();
 
     // Start the map render thread. It is asynchronous.
-    void start(bool startPaused = false, Mode mode = Mode::Continuous);
-    inline void start(Mode renderMode) { start(false, renderMode); }
+    void start(bool startPaused = false, MapMode mode = MapMode::Continuous);
+    inline void start(MapMode renderMode) { start(false, renderMode); }
 
     // Stop the map render thread. This call will block until the map rendering thread stopped.
     // The optional callback function will be invoked repeatedly until the map thread is stopped.
@@ -198,8 +193,6 @@ private:
     void updateAnnotationTiles(const std::vector<TileID>&);
 
     size_t sourceCacheSize;
-
-    Mode mode = Mode::None;
 
     const std::unique_ptr<Environment> env;
     std::unique_ptr<EnvironmentScope> scope;

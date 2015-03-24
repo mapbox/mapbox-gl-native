@@ -48,6 +48,7 @@ util::ptr<Sprite> MapContext::getSprite() {
 }
 
 void MapContext::triggerRender() {
+    assert(data.mode == MapMode::Continuous);
     assert(asyncRender);
     asyncRender->send();
 }

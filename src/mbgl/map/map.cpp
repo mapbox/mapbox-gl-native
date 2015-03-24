@@ -73,7 +73,7 @@ Map::Map(View& view_, FileSource& fileSource_)
 }
 
 Map::~Map() {
-    if (mode != Mode::None) {
+    if (data->mode != MapMode::None) {
         stop();
     }
 
@@ -93,13 +93,13 @@ Map::~Map() {
     env->performCleanup();
 }
 
-void Map::start(bool startPaused, Mode renderMode) {
+void Map::start(bool startPaused, MapMode renderMode) {
     assert(Environment::currentlyOn(ThreadType::Main));
-    assert(mode == Mode::None);
+    assert(data->mode == MapMode::None);
 
     // When starting map rendering in another thread, we perform async/continuously
     // updated rendering. Only in these cases, we attach the async handlers.
-    mode = renderMode;
+    data->mode = renderMode;
 
     // Reset the flag.
     isStopped = false;
@@ -172,7 +172,7 @@ void Map::start(bool startPaused, Mode renderMode) {
 
 void Map::stop(std::function<void ()> cb) {
     assert(Environment::currentlyOn(ThreadType::Main));
-    assert(mode != Mode::None);
+    assert(data->mode != MapMode::None);
 
     asyncTerminate->send();
 
@@ -194,12 +194,12 @@ void Map::stop(std::function<void ()> cb) {
     // already finished executing.
     thread.join();
 
-    mode = Mode::None;
+    data->mode = MapMode::None;
 }
 
 void Map::pause(bool waitForPause) {
     assert(Environment::currentlyOn(ThreadType::Main));
-    assert(mode == Mode::Continuous);
+    assert(data->mode == MapMode::Continuous);
     mutexRun.lock();
     pausing = true;
     mutexRun.unlock();
@@ -217,7 +217,7 @@ void Map::pause(bool waitForPause) {
 
 void Map::resume() {
     assert(Environment::currentlyOn(ThreadType::Main));
-    assert(mode != Mode::None);
+    assert(data->mode != MapMode::None);
 
     mutexRun.lock();
     pausing = false;
@@ -228,7 +228,7 @@ void Map::resume() {
 void Map::renderStill(StillImageCallback fn) {
     assert(Environment::currentlyOn(ThreadType::Main));
 
-    if (mode != Mode::Still) {
+    if (data->mode != MapMode::Still) {
         throw util::Exception("Map is not in still image render mode");
     }
 
@@ -236,7 +236,7 @@ void Map::renderStill(StillImageCallback fn) {
         throw util::Exception("Map is currently rendering an image");
     }
 
-    assert(mode == Mode::Still);
+    assert(data->mode == MapMode::Still);
 
     callback = std::move(fn);
 
@@ -246,13 +246,11 @@ void Map::renderStill(StillImageCallback fn) {
 void Map::run() {
     EnvironmentScope mapScope(*env, ThreadType::Map, "Map");
     assert(Environment::currentlyOn(ThreadType::Map));
-    assert(mode != Mode::None);
+    assert(data->mode != MapMode::None);
 
-    if (mode == Mode::Continuous) {
+    if (data->mode == MapMode::Continuous) {
         checkForPause();
     }
-
-    auto styleInfo = data->getStyleInfo();
 
     view.activate();
     view.discard();
@@ -262,13 +260,13 @@ void Map::run() {
     setup();
     prepare();
 
-    if (mode == Mode::Continuous) {
+    if (data->mode == MapMode::Continuous) {
         terminating = false;
         while (!terminating) {
             uv_run(env->loop, UV_RUN_DEFAULT);
             checkForPause();
         }
-    } else if (mode == Mode::Still) {
+    } else if (data->mode == MapMode::Still) {
         terminating = false;
         while (!terminating) {
             uv_run(env->loop, UV_RUN_DEFAULT);
@@ -845,7 +843,7 @@ void Map::prepare() {
         updateTiles();
     }
 
-    if (mode == Mode::Continuous) {
+    if (data->mode == MapMode::Continuous) {
         view.invalidate();
     }
 }

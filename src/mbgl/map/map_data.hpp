@@ -9,6 +9,7 @@
 #include <vector>
 #include <cassert>
 
+#include <mbgl/map/mode.hpp>
 #include <mbgl/map/environment.hpp>
 #include <mbgl/map/transform.hpp>
 #include <mbgl/map/transform_state.hpp>
@@ -106,6 +107,7 @@ public:
 public:
     Transform transform;
     AnnotationManager annotationManager;
+    MapMode mode = MapMode::None;
 
 private:
     mutable std::mutex mtx;

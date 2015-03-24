@@ -1,0 +1,16 @@
+#ifndef MBGL_MAP_MODE
+#define MBGL_MAP_MODE
+
+#include <cstdint>
+
+namespace mbgl {
+
+enum class MapMode : uint8_t {
+    None, // we're not doing any processing
+    Continuous, // continually updating map
+    Still, // a once-off still image
+};
+
+}
+
+#endif
