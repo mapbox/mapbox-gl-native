@@ -156,13 +156,17 @@ NSNumber *scale;
         return;
     }
     
+    
+    int upper = (int)_flushAt;
     if (_flushAt > [_queue count]) {
-        NSLog(@"flush() flushAt (%lu) is greater than current queue count (%lu) so just return", _flushAt, [_queue count]);
-        return;
+        if ([_queue count] == 0) {
+            return;
+        }
+        upper = (int)[_queue count];
     }
     
     // Create Array of Events to push to the Server
-    NSRange theRange = NSMakeRange(0, (int)_flushAt);
+    NSRange theRange = NSMakeRange(0, upper);
     NSArray *events = [_queue subarrayWithRange:theRange];
     
     // Update Queue to remove events sent to server

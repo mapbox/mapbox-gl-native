@@ -407,10 +407,6 @@ mbgl::DefaultFileSource *mbglFileSource = nullptr;
             email = [NSString stringWithFormat:@"%i", sendMail];
         }
         [evt setValue:email forKey:@"enabled.email"];
-        
-
-
-        
     });
     
     return YES;
@@ -590,6 +586,9 @@ mbgl::DefaultFileSource *mbglFileSource = nullptr;
 
 - (void)appDidBackground:(NSNotification *)notification
 {
+    // Flush Any Events Still In Queue
+    [[MGLMapboxEvents sharedManager] flush];
+    
     mbglMap->stop();
 
     [self.glView deleteDrawable];
