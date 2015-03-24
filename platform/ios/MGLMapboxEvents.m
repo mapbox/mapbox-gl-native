@@ -40,6 +40,24 @@ NSNumber *scale;
     self = [super init];
     if (self) {
         
+        // Put Settings bundle into memory
+        NSString *settingsBundle = [[NSBundle mainBundle] pathForResource:@"Settings" ofType:@"bundle"];
+        if(!settingsBundle) {
+            NSLog(@"Could not find Settings.bundle");
+        } else {
+            NSDictionary *settings = [NSDictionary dictionaryWithContentsOfFile:[settingsBundle stringByAppendingPathComponent:@"Root.plist"]];
+            NSArray *preferences = [settings objectForKey:@"PreferenceSpecifiers"];
+            NSMutableDictionary *defaultsToRegister = [[NSMutableDictionary alloc] initWithCapacity:[preferences count]];
+            for(NSDictionary *prefSpecification in preferences) {
+                NSString *key = [prefSpecification objectForKey:@"Key"];
+                if(key && [[prefSpecification allKeys] containsObject:@"DefaultValue"]) {
+                    [defaultsToRegister setObject:[prefSpecification objectForKey:@"DefaultValue"] forKey:key];
+                }
+            }
+            
+            [[NSUserDefaults standardUserDefaults] registerDefaults:defaultsToRegister];
+        }
+        
         // Configure Events Infrastructure
         _queue = [[NSMutableArray alloc] init];
         _flushAt = 20;
