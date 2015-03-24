@@ -9,9 +9,10 @@
 
 #include <string>
 #include <vector>
-#include <map>
 #include <mutex>
 #include <memory>
+#include <unordered_map>
+#include <unordered_set>
 
 namespace mbgl {
 
@@ -29,7 +30,7 @@ public:
     void setDefaultPointAnnotationSymbol(const std::string& symbol);
     std::pair<std::vector<Tile::ID>, AnnotationIDs> addPointAnnotations(
         const std::vector<LatLng>&, const std::vector<std::string>& symbols, const Map&);
-    std::vector<Tile::ID> removeAnnotations(const AnnotationIDs&);
+    std::vector<Tile::ID> removeAnnotations(const AnnotationIDs&, const Map&);
     AnnotationIDs getAnnotationsInBounds(const LatLngBounds&, const Map&) const;
     LatLngBounds getBoundsForAnnotations(const AnnotationIDs&) const;
 
@@ -44,8 +45,8 @@ private:
 private:
     mutable std::mutex mtx;
     std::string defaultPointAnnotationSymbol;
-    std::map<uint32_t, std::unique_ptr<Annotation>> annotations;
-    std::map<Tile::ID, std::pair<AnnotationIDs, std::unique_ptr<LiveTile>>> annotationTiles;
+    std::unordered_map<uint32_t, std::unique_ptr<Annotation>> annotations;
+    std::unordered_map<Tile::ID, std::pair<std::unordered_set<uint32_t>, std::unique_ptr<LiveTile>>, Tile::ID::Hash> tiles;
     uint32_t nextID_ = 0;
 };
 
