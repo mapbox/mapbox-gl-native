@@ -10,6 +10,7 @@
 			<key>Type</key>
 			<string>PSGroupSpecifier</string>
 		</dict>
+<!--
         <dict>
             <key>DefaultValue</key>
             <true/>
@@ -24,7 +25,7 @@
             <key>FalseValue</key>
             <false/>
         </dict>
-<!--
+ -->
 		<dict>
 			<key>DefaultValue</key>
 			<true/>
@@ -39,7 +40,6 @@
 			<key>FalseValue</key>
 			<false/>
 		</dict>
- -->
 	</array>
 	<key>StringsTable</key>
 	<string>Root</string>
