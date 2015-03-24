@@ -903,6 +903,15 @@ mbgl::DefaultFileSource *mbglFileSource = nullptr;
     }
 }
 
+- (void)handleCalloutAccessoryTapGesture:(UITapGestureRecognizer *)tap
+{
+    if ([self.delegate respondsToSelector:@selector(mapView:annotation:calloutAccessoryControlTapped:)])
+    {
+        [self.delegate mapView:self annotation:self.selectedAnnotation
+            calloutAccessoryControlTapped:(UIControl *)tap.view];
+    }
+}
+
 - (BOOL)gestureRecognizer:(UIGestureRecognizer *)gestureRecognizer shouldRecognizeSimultaneouslyWithGestureRecognizer:(UIGestureRecognizer *)otherGestureRecognizer
 {
     NSArray *validSimultaneousGestures = @[ self.pan, self.pinch, self.rotate ];
@@ -1699,27 +1708,57 @@ CLLocationCoordinate2D latLngToCoordinate(mbgl::LatLng latLng)
 
     self.selectedAnnotation = annotation;
 
-    // build the callout
-    self.selectedAnnotationCalloutView = [self calloutViewForAnnotation:annotation];
-
-    // determine symbol in use for point
-    NSString *symbol = MGLDefaultStyleMarkerSymbolName;
-    if ([self.delegate respondsToSelector:@selector(mapView:symbolNameForAnnotation:)])
+    if ([self.delegate respondsToSelector:@selector(mapView:annotationCanShowCallout:)] &&
+        [self.delegate mapView:self annotationCanShowCallout:annotation])
     {
-        symbol = [self.delegate mapView:self symbolNameForAnnotation:annotation];
+        // build the callout
+        self.selectedAnnotationCalloutView = [self calloutViewForAnnotation:annotation];
+
+        // determine symbol in use for point
+        NSString *symbol = MGLDefaultStyleMarkerSymbolName;
+        if ([self.delegate respondsToSelector:@selector(mapView:symbolNameForAnnotation:)])
+        {
+            symbol = [self.delegate mapView:self symbolNameForAnnotation:annotation];
+        }
+        std::string symbolName([symbol cStringUsingEncoding:[NSString defaultCStringEncoding]]);
+
+        // determine anchor point based on symbol
+        CGPoint calloutAnchorPoint = [self convertCoordinate:annotation.coordinate toPointToView:self];
+        double y = mbglMap->getTopOffsetPixelsForAnnotationSymbol(symbolName);
+        CGRect calloutBounds = CGRectMake(calloutAnchorPoint.x, calloutAnchorPoint.y + y, 0, 0);
+
+        // consult delegate for left and/or right accessory views
+        UITapGestureRecognizer *calloutAccessoryTap = [[UITapGestureRecognizer alloc] initWithTarget:self
+                                                          action:@selector(handleCalloutAccessoryTapGesture:)];
+
+        if ([self.delegate respondsToSelector:@selector(mapView:leftCalloutAccessoryViewForAnnotation:)])
+        {
+            self.selectedAnnotationCalloutView.leftAccessoryView =
+                [self.delegate mapView:self leftCalloutAccessoryViewForAnnotation:annotation];
+
+            if ([self.selectedAnnotationCalloutView.leftAccessoryView isKindOfClass:[UIControl class]])
+            {
+                [self.selectedAnnotationCalloutView.leftAccessoryView addGestureRecognizer:calloutAccessoryTap];
+            }
+        }
+
+        if ([self.delegate respondsToSelector:@selector(mapView:rightCalloutAccessoryViewForAnnotation:)])
+        {
+            self.selectedAnnotationCalloutView.rightAccessoryView =
+                [self.delegate mapView:self rightCalloutAccessoryViewForAnnotation:annotation];
+
+            if ([self.selectedAnnotationCalloutView.rightAccessoryView isKindOfClass:[UIControl class]])
+            {
+                [self.selectedAnnotationCalloutView.rightAccessoryView addGestureRecognizer:calloutAccessoryTap];
+            }
+        }
+
+        // present popup
+        [self.selectedAnnotationCalloutView presentCalloutFromRect:calloutBounds
+                                                            inView:self.glView
+                                                 constrainedToView:self.glView
+                                                          animated:animated];
     }
-    std::string symbolName([symbol cStringUsingEncoding:[NSString defaultCStringEncoding]]);
-
-    // determine anchor point based on symbol
-    CGPoint calloutAnchorPoint = [self convertCoordinate:annotation.coordinate toPointToView:self];
-    double y = mbglMap->getTopOffsetPixelsForAnnotationSymbol(symbolName);
-    CGRect calloutBounds = CGRectMake(calloutAnchorPoint.x, calloutAnchorPoint.y + y, 0, 0);
-
-    // present popup
-    [self.selectedAnnotationCalloutView presentCalloutFromRect:calloutBounds
-                                                        inView:self.glView
-                                             constrainedToView:self.glView
-                                                      animated:animated];
 
     // notify delegate
     if ([self.delegate respondsToSelector:@selector(mapView:didSelectAnnotation:)])
