@@ -1681,7 +1681,7 @@ CLLocationCoordinate2D latLngToCoordinate(mbgl::LatLng latLng)
 
     if ( ! [self viewportBounds].contains(coordinateToLatLng(firstAnnotation.coordinate))) return;
 
-    self.selectedAnnotation = firstAnnotation;
+    [self selectAnnotation:firstAnnotation animated:NO];
 }
 
 - (void)selectAnnotation:(id <MGLAnnotation>)annotation animated:(BOOL)animated
