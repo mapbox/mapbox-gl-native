@@ -6,6 +6,8 @@
 
 #import <CoreLocation/CoreLocation.h>
 
+#import "MBXAnnotation.h"
+
 static UIColor *const kTintColor = [UIColor colorWithRed:0.120 green:0.550 blue:0.670 alpha:1.000];
 
 static NSArray *const kStyleNames = @[
@@ -134,7 +136,14 @@ mbgl::Settings_NSUserDefaults *settings = nullptr;
                                                        delegate:self
                                               cancelButtonTitle:@"Cancel"
                                          destructiveButtonTitle:nil
-                                              otherButtonTitles:@"Reset North", @"Reset Position", @"Toggle Debug", nil];
+                                              otherButtonTitles:@"Reset North",
+                                                                @"Reset Position",
+                                                                @"Toggle Debug",
+                                                                @"Add 100 Points",
+                                                                @"Add 1,000 Points",
+                                                                @"Add 10,000 Points",
+                                                                @"Remove Points",
+                                                                nil];
 
     [sheet showFromBarButtonItem:self.navigationItem.leftBarButtonItem animated:YES];
 }
@@ -153,6 +162,67 @@ mbgl::Settings_NSUserDefaults *settings = nullptr;
     {
         [self.mapView toggleDebug];
     }
+    else if (buttonIndex == actionSheet.firstOtherButtonIndex + 3)
+    {
+        [self parseFeaturesAddingCount:100];
+    }
+    else if (buttonIndex == actionSheet.firstOtherButtonIndex + 4)
+    {
+        [self parseFeaturesAddingCount:1000];
+    }
+    else if (buttonIndex == actionSheet.firstOtherButtonIndex + 5)
+    {
+        [self parseFeaturesAddingCount:10000];
+    }
+    else if (buttonIndex == actionSheet.firstOtherButtonIndex + 6)
+    {
+        [self.mapView removeAnnotations:self.mapView.annotations];
+    }
+}
+
+- (void)parseFeaturesAddingCount:(NSUInteger)featuresCount
+{
+    [self.mapView removeAnnotations:self.mapView.annotations];
+
+    dispatch_async(dispatch_get_global_queue(DISPATCH_QUEUE_PRIORITY_DEFAULT, 0), ^
+    {
+        NSData *featuresData = [NSData dataWithContentsOfFile:[[NSBundle mainBundle] pathForResource:@"features" ofType:@"geojson"]];
+
+        id features = [NSJSONSerialization JSONObjectWithData:featuresData
+                                                      options:0
+                                                        error:nil];
+
+        if ([features isKindOfClass:[NSDictionary class]])
+        {
+            NSMutableArray *annotations = [NSMutableArray array];
+
+            for (NSDictionary *feature in features[@"features"])
+            {
+                CLLocationCoordinate2D coordinate = CLLocationCoordinate2DMake([feature[@"geometry"][@"coordinates"][1] doubleValue],
+                                                                               [feature[@"geometry"][@"coordinates"][0] doubleValue]);
+                NSString *title = feature[@"properties"][@"NAME"];
+
+                MBXAnnotation *annotation = [MBXAnnotation annotationWithLocation:coordinate
+                                                                            title:title
+                                                                         subtitle:nil];
+
+                [annotations addObject:annotation];
+
+                if (annotations.count == featuresCount) break;
+            }
+
+            dispatch_async(dispatch_get_main_queue(), ^
+            {
+                [self.mapView addAnnotations:annotations];
+
+                [self.mapView setCenterCoordinate:CLLocationCoordinate2DMake(38.904722, -77.016389)
+                                        zoomLevel:10
+                                         animated:NO];
+
+                [self.mapView setDirection:0];
+            });
+        }
+    });
 }
 
 - (void)cycleStyles

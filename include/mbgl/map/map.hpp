@@ -152,13 +152,14 @@ public:
     inline const LatLng latLngForPixel(const vec2<double> pixel) const { return state.latLngForPixel(pixel); }
 
     // Annotations
-    void setDefaultPointAnnotationSymbol(std::string&);
-    uint32_t addPointAnnotation(LatLng, std::string& symbol);
-    std::vector<uint32_t> addPointAnnotations(std::vector<LatLng>, std::vector<std::string>& symbols);
+    void setDefaultPointAnnotationSymbol(const std::string&);
+    uint32_t addPointAnnotation(const LatLng&, const std::string& symbol);
+    std::vector<uint32_t> addPointAnnotations(const std::vector<LatLng>&,
+                                              const std::vector<std::string>& symbols);
     void removeAnnotation(uint32_t);
-    void removeAnnotations(std::vector<uint32_t>);
-    std::vector<uint32_t> getAnnotationsInBounds(LatLngBounds) const;
-    LatLngBounds getBoundsForAnnotations(std::vector<uint32_t>) const;
+    void removeAnnotations(const std::vector<uint32_t>&);
+    std::vector<uint32_t> getAnnotationsInBounds(const LatLngBounds&) const;
+    LatLngBounds getBoundsForAnnotations(const std::vector<uint32_t>&) const;
 
     // Debug
     void setDebug(bool value);
@@ -198,7 +199,7 @@ private:
     // the stylesheet.
     void prepare();
 
-    void updateAnnotationTiles(std::vector<Tile::ID>&);
+    void updateAnnotationTiles(const std::vector<Tile::ID>&);
 
     enum class Mode : uint8_t {
         None, // we're not doing any processing
@@ -248,7 +249,7 @@ private:
     std::unique_ptr<LineAtlas> lineAtlas;
     util::ptr<TexturePool> texturePool;
     std::unique_ptr<Painter> painter;
-    util::ptr<AnnotationManager> annotationManager;
+    std::unique_ptr<AnnotationManager> annotationManager;
 
     const std::unique_ptr<MapData> data;
 

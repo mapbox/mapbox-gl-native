@@ -540,19 +540,19 @@ std::string Map::getAccessToken() const {
 
 #pragma mark - Annotations
 
-void Map::setDefaultPointAnnotationSymbol(std::string& symbol) {
+void Map::setDefaultPointAnnotationSymbol(const std::string& symbol) {
     assert(Environment::currentlyOn(ThreadType::Main));
     annotationManager->setDefaultPointAnnotationSymbol(symbol);
 }
 
-uint32_t Map::addPointAnnotation(LatLng point, std::string& symbol) {
+uint32_t Map::addPointAnnotation(const LatLng& point, const std::string& symbol) {
     assert(Environment::currentlyOn(ThreadType::Main));
     std::vector<LatLng> points({ point });
     std::vector<std::string> symbols({ symbol });
     return addPointAnnotations(points, symbols)[0];
 }
 
-std::vector<uint32_t> Map::addPointAnnotations(std::vector<LatLng> points, std::vector<std::string>& symbols) {
+std::vector<uint32_t> Map::addPointAnnotations(const std::vector<LatLng>& points, const std::vector<std::string>& symbols) {
     assert(Environment::currentlyOn(ThreadType::Main));
     auto result = annotationManager->addPointAnnotations(points, symbols, *this);
     updateAnnotationTiles(result.first);
@@ -564,23 +564,24 @@ void Map::removeAnnotation(uint32_t annotation) {
     removeAnnotations({ annotation });
 }
 
-void Map::removeAnnotations(std::vector<uint32_t> annotations) {
+void Map::removeAnnotations(const std::vector<uint32_t>& annotations) {
     assert(Environment::currentlyOn(ThreadType::Main));
-    auto result = annotationManager->removeAnnotations(annotations);
+    auto result = annotationManager->removeAnnotations(annotations, *this);
     updateAnnotationTiles(result);
 }
 
-std::vector<uint32_t> Map::getAnnotationsInBounds(LatLngBounds bounds) const {
+std::vector<uint32_t> Map::getAnnotationsInBounds(const LatLngBounds& bounds) const {
     assert(Environment::currentlyOn(ThreadType::Main));
     return annotationManager->getAnnotationsInBounds(bounds, *this);
 }
 
-LatLngBounds Map::getBoundsForAnnotations(std::vector<uint32_t> annotations) const {
+LatLngBounds Map::getBoundsForAnnotations(const std::vector<uint32_t>& annotations) const {
     assert(Environment::currentlyOn(ThreadType::Main));
     return annotationManager->getBoundsForAnnotations(annotations);
 }
 
-void Map::updateAnnotationTiles(std::vector<Tile::ID>& ids) {
+void Map::updateAnnotationTiles(const std::vector<Tile::ID>& ids) {
+    assert(Environment::currentlyOn(ThreadType::Main));
     for (const auto &source : activeSources) {
         if (source->info.type == SourceType::Annotations) {
             source->source->invalidateTiles(*this, ids);
@@ -718,10 +719,11 @@ void Map::reloadStyle() {
     const auto styleInfo = data->getStyleInfo();
 
     if (!styleInfo.url.empty()) {
+        const auto base = styleInfo.base;
         // We have a style URL
-        env->request({ Resource::Kind::JSON, styleInfo.url }, [&](const Response &res) {
+        env->request({ Resource::Kind::JSON, styleInfo.url }, [this, base](const Response &res) {
             if (res.status == Response::Successful) {
-                loadStyleJSON(res.data, styleInfo.base);
+                loadStyleJSON(res.data, base);
             } else {
                 Log::Error(Event::Setup, "loading style failed: %s", res.message.c_str());
             }
