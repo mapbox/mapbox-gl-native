@@ -123,7 +123,12 @@ NSNumber *scale;
         return;
     }
 
-    // TODO - Add Metrics Disabled App Wide Check
+    // Add Metrics Disabled App Wide Check
+    if ([[NSUserDefaults standardUserDefaults] objectForKey:@"mapbox_metrics_disabled"] != nil) {
+        NSLog(@"Mapbox Metrics have been disabled for this app.");
+        [_queue removeAllObjects];
+        return;
+    }
     
     if (!event) {
         return;
@@ -172,7 +177,6 @@ NSNumber *scale;
         NSLog(@"token hasn't been set yet, so no events can be sent. return");
         return;
     }
-    
     
     int upper = (int)_flushAt;
     if (_flushAt > [_queue count]) {
