@@ -88,8 +88,6 @@ NSString *const MGLAnnotationIDKey = @"MGLAnnotationIDKey";
 @property (nonatomic) CGFloat quickZoomStart;
 @property (nonatomic, getter=isAnimatingGesture) BOOL animatingGesture;
 @property (nonatomic, readonly, getter=isRotationAllowed) BOOL rotationAllowed;
-@property (nonatomic) CLLocationCoordinate2D lastCenter;
-@property (nonatomic) CGFloat lastZoom;
 
 @end
 
