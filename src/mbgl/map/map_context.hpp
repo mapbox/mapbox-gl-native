@@ -5,6 +5,10 @@
 
 #include <set>
 
+namespace uv {
+class async;
+}
+
 namespace mbgl {
 
 class Environment;
@@ -23,15 +27,19 @@ class MapContext {
 public:
     MapContext(Environment&, MapData&);
 
+    // These can only be called from the Map thread.
     Worker& getWorker();
     util::ptr<Sprite> getSprite();
 
-public:
-    std::unique_ptr<Worker> workers;
+    // Triggers a render. Can be called from any thread.
+    void triggerRender();
 
 public:
     Environment& env;
     MapData& data;
+
+    std::unique_ptr<uv::async> asyncRender;
+    std::unique_ptr<Worker> workers;
     const std::unique_ptr<GlyphStore> glyphStore;
     const std::unique_ptr<GlyphAtlas> glyphAtlas;
     const std::unique_ptr<SpriteAtlas> spriteAtlas;

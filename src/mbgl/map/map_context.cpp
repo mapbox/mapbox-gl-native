@@ -47,4 +47,9 @@ util::ptr<Sprite> MapContext::getSprite() {
     return sprite;
 }
 
+void MapContext::triggerRender() {
+    assert(asyncRender);
+    asyncRender->send();
+}
+
 }
