@@ -1,5 +1,6 @@
 #include <mbgl/map/annotation.hpp>
 #include <mbgl/map/live_tile_data.hpp>
+#include <mbgl/map/live_tile.hpp>
 #include <mbgl/map/tile_parser.hpp>
 #include <mbgl/style/style_source.hpp>
 #include <mbgl/map/vector_tile.hpp>
@@ -36,7 +37,7 @@ void LiveTileData::parse() {
         }
 
         if (source.type == SourceType::Annotations) {
-            const std::unique_ptr<LiveTile>& tile = annotationManager.getTile(id);
+            const LiveTile* tile = annotationManager.getTile(id);
 
             if (tile) {
                 // Parsing creates state that is encapsulated in TileParser. While parsing,

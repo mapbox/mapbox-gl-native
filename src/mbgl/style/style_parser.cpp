@@ -1,6 +1,7 @@
 #include <mbgl/style/style_source.hpp>
 #include <mbgl/style/style_parser.hpp>
 #include <mbgl/style/style_layer_group.hpp>
+#include <mbgl/map/annotation.hpp>
 #include <mbgl/util/constants.hpp>
 #include <mbgl/util/std.hpp>
 #include <mbgl/util/vec.hpp>
@@ -32,7 +33,7 @@ void StyleParser::parse(JSVal document) {
 
         // create point annotations layer
         //
-        std::string id = util::ANNOTATIONS_POINTS_LAYER_ID;
+        const std::string& id = AnnotationManager::layerID;
 
         std::map<ClassID, ClassProperties> paints;
         util::ptr<StyleLayer> annotations = std::make_shared<StyleLayer>(id, std::move(paints));
