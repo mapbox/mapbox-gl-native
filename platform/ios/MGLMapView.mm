@@ -819,8 +819,6 @@ mbgl::DefaultFileSource *mbglFileSource = nullptr;
         // deselect any selected annotation
         if (self.selectedAnnotation) [self deselectAnnotation:self.selectedAnnotation animated:YES];
     }
-
-    NSLog(@"%i (%@)", newSelectedAnnotationID, self.selectedAnnotation.title);
 }
 
 - (void)handleDoubleTapGesture:(UITapGestureRecognizer *)doubleTap
