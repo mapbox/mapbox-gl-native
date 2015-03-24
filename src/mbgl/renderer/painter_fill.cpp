@@ -60,6 +60,7 @@ void Painter::renderFill(FillBucket& bucket, const StyleLayer &layer_desc, const
     if (pattern) {
         // Image fill.
         if (pass == RenderPass::Translucent) {
+
             const SpriteAtlasPosition posA = spriteAtlas.getPosition(properties.image.from, true);
             const SpriteAtlasPosition posB = spriteAtlas.getPosition(properties.image.to, true);
             float factor = 8.0 / std::pow(2, state.getIntegerZoom() - id.z);
@@ -91,6 +92,7 @@ void Painter::renderFill(FillBucket& bucket, const StyleLayer &layer_desc, const
             spriteAtlas.bind(true);
 
             // Draw the actual triangles into the color & stencil buffer.
+            depthMask(true);
             depthRange(strata, 1.0f);
             bucket.drawElements(*patternShader);
         }
@@ -107,6 +109,7 @@ void Painter::renderFill(FillBucket& bucket, const StyleLayer &layer_desc, const
             plainShader->u_color = fill_color;
 
             // Draw the actual triangles into the color & stencil buffer.
+            depthMask(true);
             depthRange(strata + strata_epsilon, 1.0f);
             bucket.drawElements(*plainShader);
         }
@@ -127,7 +130,7 @@ void Painter::renderFill(FillBucket& bucket, const StyleLayer &layer_desc, const
             static_cast<float>(state.getFramebufferHeight())
         }};
 
-        depthRange(strata + strata_epsilon, 1.0f);
+        depthRange(strata + strata_epsilon + strata_epsilon, 1.0f);
         bucket.drawVertices(*outlineShader);
     }
 }
