@@ -91,7 +91,7 @@ std::pair<std::vector<Tile::ID>, std::vector<uint32_t>> AnnotationManager::addPo
             }
 
             // record annotation association with tile feature
-            anno_it.first->second->tileFeatures.emplace(tileID, std::vector<std::weak_ptr<const LiveTileFeature>>({ feature }));
+            anno_it.first->second->tileFeatures.emplace(tileID, std::weak_ptr<const LiveTileFeature>(feature ));
 
             z2 /= 2;
             x /= 2;
@@ -138,7 +138,7 @@ std::vector<Tile::ID> AnnotationManager::removeAnnotations(std::vector<uint32_t>
                 const auto& features_it = annotation->tileFeatures.find(tid);
                 if (features_it != annotation->tileFeatures.end()) {
                     const auto& layer = tiles[tid].second->getMutableLayer(util::ANNOTATIONS_POINTS_LAYER_ID);
-                    layer->removeFeature(features_it->second[0]);
+                    layer->removeFeature(features_it->second);
                     affectedTiles.push_back(tid);
                 }
             }
