@@ -251,10 +251,14 @@
 
 @end
 
+#pragma mark - MGLMapViewDelegate
+
 /** The MGLMapViewDelegate protocol defines a set of optional methods that you can use to receive map-related update messages. Because many map operations require the MGLMapView class to load data asynchronously, the map view calls these methods to notify your application when specific operations complete. The map view also uses these methods to request annotation marker symbology and to manage interactions with those markers. */
 @protocol MGLMapViewDelegate <NSObject>
 
 @optional
+
+#pragma mark - Managing the Display of Annotations
 
 /** @name Managing the Display of Annotations */
 
@@ -263,6 +267,8 @@
 *   @param annotation The object representing the annotation that is about to be displayed. 
 *   @return The marker symbol to display for the specified annotation or `nil` if you want to display the default symbol. */
 - (NSString *)mapView:(MGLMapView *)mapView symbolNameForAnnotation:(id <MGLAnnotation>)annotation;
+
+#pragma mark - Responding to Map Position Changes
 
 // Responding to Map Position Changes
 
@@ -274,6 +280,8 @@
 
 // TODO
 - (void)mapView:(MGLMapView *)mapView regionDidChangeAnimated:(BOOL)animated;
+
+#pragma mark - Loading the Map Data
 
 // Loading the Map Data
 
@@ -291,5 +299,23 @@
 
 // TODO
 - (void)mapViewDidFinishRenderingMap:(MGLMapView *)mapView fullyRendered:(BOOL)fullyRendered;
+
+#pragma mark - Selecting Annotations
+
+/** @name Selecting Annotations */
+
+/* Tells the delegate that one of its annotations was selected.
+*
+*  You can use this method to track changes in the selection state of annotations.
+*  @param mapView The map view containing the annotation.
+*  @param annotation The annotation that was selected. */
+- (void)mapView:(MGLMapView *)mapView didSelectAnnotation:(id <MGLAnnotation>)annotation;
+
+/* Tells the delegate that one of its annotations was deselected.
+*
+*  You can use this method to track changes in the selection state of annotations.
+*  @param mapView The map view containing the annotation.
+*  @param annotation The annotation that was deselected. */
+- (void)mapView:(MGLMapView *)mapView didDeselectAnnotation:(id <MGLAnnotation>)annotation;
 
 @end
