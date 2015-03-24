@@ -1948,8 +1948,10 @@ CLLocationCoordinate2D latLngToCoordinate(mbgl::LatLng latLng)
 
 - (void)invalidate
 {
-    // This is run in the main/UI thread.
+    assert([[NSThread currentThread] isMainThread]);
+
     [self.glView setNeedsDisplay];
+
     [self notifyMapChange:@(mbgl::MapChangeRegionIsChanging)];
 }
 
@@ -1978,6 +1980,8 @@ class MBGLView : public mbgl::View
         }
         else
         {
+            assert([[NSThread currentThread] isMainThread]);
+
             [nativeView notifyMapChange:@(change)];
         }
     }
