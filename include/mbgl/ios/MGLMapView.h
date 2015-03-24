@@ -300,6 +300,20 @@
 // TODO
 - (void)mapViewDidFinishRenderingMap:(MGLMapView *)mapView fullyRendered:(BOOL)fullyRendered;
 
+#pragma mark - Managing Annotations
+
+/** @name Managing Annotations */
+
+/* Tells the delegate that the user tapped one of the annotation's accessory buttons.
+*
+*  Accessory views contain custom content and are positioned on either side of the annotation title text. If a view you specify is a descendant of the `UIControl` class, the map view calls this method as a convenience whenever the user taps your view. You can use this method to respond to taps and perform any actions associated with that control. For example, if your control displayed additional information about the annotation, you could use this method to present a modal panel with that information.
+*
+*  If your custom accessory views are not descendants of the `UIControl` class, the map view does not call this method.
+*  @param mapView The map view containing the specified annotation.
+*  @param annotation The annotation whose button was tapped.
+*  @param control The control that was tapped. */
+- (void)mapView:(MGLMapView *)mapView annotation:(id <MGLAnnotation>)annotation calloutAccessoryControlTapped:(UIControl *)control;
+
 #pragma mark - Selecting Annotations
 
 /** @name Selecting Annotations */
