@@ -249,6 +249,12 @@
  */
 @property (nonatomic, assign) BOOL showsUserLocation;
 
+/// Returns a Boolean value indicating whether the user currently sees the user location annotation.
+@property (nonatomic, assign, readonly, getter=isUserLocationVisible) BOOL userLocationVisible;
+
+/// Returns the annotation object indicating the user’s current location.
+@property (nonatomic, readonly) MGLUserLocation *userLocation;
+
 /** The annotation object representing the user’s current location. (read-only) */
 @property (nonatomic, strong, readonly) MGLUserLocationAnnotationView *userLocationAnnotationView;
 

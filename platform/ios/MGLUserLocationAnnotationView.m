@@ -27,33 +27,11 @@
 // POSSIBILITY OF SUCH DAMAGE.
 
 #import "MGLUserLocationAnnotationView.h"
+#import "MGLUserLocation_Private.h"
 #import "MGLAnnotation.h"
 #import "MGLMapView.h"
 
 const CGFloat MGLTrackingDotRingWidth = 24.0;
-
-@implementation MGLUserLocation {
-    CLLocationCoordinate2D _coordinate;
-}
-
-@synthesize coordinate = _coordinate;
-
-- (instancetype)init {
-    if (self = [super init]) {
-        _coordinate = CLLocationCoordinate2DMake(MAXFLOAT, MAXFLOAT);
-    }
-    return self;
-}
-
-- (id)copyWithZone:(NSZone *)zone {
-    MGLUserLocation *annotation = [(MGLUserLocation *)[[self class] allocWithZone:zone] init];
-    if (annotation) {
-        annotation->_coordinate = _coordinate;
-    }
-    return annotation;
-}
-
-@end
 
 @interface MGLUserLocationAnnotationView ()
 
@@ -89,7 +67,7 @@ const CGFloat MGLTrackingDotRingWidth = 24.0;
 
 - (void)setupLayers {
     if (CLLocationCoordinate2DIsValid(self.annotation.coordinate)) {
-        if (!_accuracyRingLayer && _location.horizontalAccuracy) {
+        if (!_accuracyRingLayer && self.annotation.location.horizontalAccuracy) {
             UIImage *accuracyRingImage = [self accuracyRingImage];
             _accuracyRingLayer = [CALayer layer];
             _haloLayer.bounds = CGRectMake(0, 0, accuracyRingImage.size.width, accuracyRingImage.size.height);
@@ -187,7 +165,7 @@ const CGFloat MGLTrackingDotRingWidth = 24.0;
 
 - (UIImage *)accuracyRingImage {
     CGFloat latRadians = self.annotation.coordinate.latitude * M_PI / 180.0f;
-    CGFloat pixelRadius = _location.horizontalAccuracy / cos(latRadians) / [self.mapView metersPerPixelAtLatitude:self.annotation.coordinate.latitude];
+    CGFloat pixelRadius = self.annotation.location.horizontalAccuracy / cos(latRadians) / [self.mapView metersPerPixelAtLatitude:self.annotation.coordinate.latitude];
     UIGraphicsBeginImageContextWithOptions(CGSizeMake(pixelRadius * 2, pixelRadius * 2), NO, [[UIScreen mainScreen] scale]);
     
     CGContextSetStrokeColorWithColor(UIGraphicsGetCurrentContext(), [[UIColor colorWithRed:0.378 green:0.552 blue:0.827 alpha:0.7] CGColor]);
@@ -227,34 +205,6 @@ const CGFloat MGLTrackingDotRingWidth = 24.0;
     UIGraphicsEndImageContext();
     
     return tintedForeground;
-}
-
-- (void)setLocation:(CLLocation *)newLocation
-{
-    if ([newLocation distanceFromLocation:_location] && newLocation.coordinate.latitude != 0 && newLocation.coordinate.longitude != 0)
-    {
-        [self willChangeValueForKey:@"location"];
-        _location = newLocation;
-        MGLUserLocation *annotation = self.annotation;
-        annotation.coordinate = _location.coordinate;
-        [self setupLayers];
-        [self didChangeValueForKey:@"location"];
-    }
-}
-
-- (void)setHeading:(CLHeading *)newHeading
-{
-    if (newHeading.trueHeading != _heading.trueHeading)
-    {
-        [self willChangeValueForKey:@"heading"];
-        _heading = newHeading;
-        [self didChangeValueForKey:@"heading"];
-    }
-}
-
-- (BOOL)isUserLocationAnnotation
-{
-    return YES;
 }
 
 @end

@@ -29,15 +29,9 @@
 #import <UIKit/UIKit.h>
 #import <CoreLocation/CoreLocation.h>
 
-#import "MGLAnnotation.h"
+#import "MGLUserLocation.h"
 
 @class MGLMapView;
-
-@interface MGLUserLocation : NSObject <MGLAnnotation>
-
-@property (nonatomic, readwrite) CLLocationCoordinate2D coordinate;
-
-@end
 
 /** The MGLUserLocationAnnotationView class defines a specific type of annotation that identifies the user’s current location. You do not create instances of this class directly. Instead, you retrieve an existing MGLUserLocationAnnotationView object from the userLocation property of the map view displayed in your application. */
 @interface MGLUserLocationAnnotationView : UIImageView
@@ -49,16 +43,6 @@
 
 /** A Boolean value indicating whether the user’s location is currently being updated. (read-only) */
 @property (nonatomic, readonly, getter=isUpdating) BOOL updating;
-
-/** The current location of the device. (read-only)
-*
-*   This property contains `nil` if the map view is not currently showing the user location or if the user’s location has not yet been determined. */
-@property (nonatomic, strong) CLLocation *location;
-
-/** The heading of the user location. (read-only)
-*
-* This property is `nil` if the user location tracking mode is not `RMUserTrackingModeFollowWithHeading`. */
-@property (nonatomic, strong) CLHeading *heading;
 
 @property (nonatomic, strong, readonly) CALayer *haloLayer;
 

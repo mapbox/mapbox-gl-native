@@ -43,6 +43,7 @@
 #import "MGLStyleFunctionValue.h"
 #import "MGLAnnotation.h"
 #import "MGLUserLocationAnnotationView.h"
+#import "MGLUserLocation_Private.h"
 
 #import "SMCalloutView.h"
 
@@ -85,6 +86,7 @@ extern NSString *const MGLStyleKeyBackground;
 extern NSString *const MGLStyleValueFunctionAllowed;
 
 NSTimeInterval const MGLAnimationDuration = 0.3;
+const CGSize MGLAnnotationUpdateViewportOutset = {150, 150};
 
 NSString *const MGLAnnotationIDKey = @"MGLAnnotationIDKey";
 
@@ -108,6 +110,7 @@ NSString *const MGLAnnotationIDKey = @"MGLAnnotationIDKey";
 @property (nonatomic, weak) id <MGLAnnotation> selectedAnnotation;
 @property (nonatomic, strong) SMCalloutView *selectedAnnotationCalloutView;
 @property (nonatomic, strong, readwrite) MGLUserLocationAnnotationView *userLocationAnnotationView;
+@property (nonatomic, strong) CLLocationManager *locationManager;
 @property (nonatomic, readonly) NSDictionary *allowedStyleTypes;
 @property (nonatomic) CGPoint centerPoint;
 @property (nonatomic) CGFloat scale;
@@ -137,8 +140,6 @@ NSString *const MGLAnnotationIDKey = @"MGLAnnotationIDKey";
 @end
 
 @implementation MGLMapView {
-    CLLocationManager *_locationManager;
-    
     BOOL _delegateHasBeforeMapMove;
     BOOL _delegateHasAfterMapMove;
     BOOL _delegateHasBeforeMapZoom;
@@ -1853,12 +1854,12 @@ CLLocationCoordinate2D latLngToCoordinate(mbgl::LatLng latLng)
     if (showsUserLocation)
     {
         if (_delegateHasWillStartLocatingUser) {
-            [_delegate mapViewWillStartLocatingUser:self];
+            [self.delegate mapViewWillStartLocatingUser:self];
         }
         
         self.userLocationAnnotationView = [[MGLUserLocationAnnotationView alloc] initInMapView:self];
         
-        _locationManager = [[CLLocationManager alloc] init];
+        self.locationManager = [[CLLocationManager alloc] init];
         
 #if __IPHONE_OS_VERSION_MAX_ALLOWED >= 80000
         // enable iOS 8+ location authorization API
@@ -1868,23 +1869,23 @@ CLLocationCoordinate2D latLngToCoordinate(mbgl::LatLng latLng)
             BOOL hasLocationDescription = [[NSBundle mainBundle] objectForInfoDictionaryKey:@"NSLocationWhenInUseUsageDescription"] ||
             [[NSBundle mainBundle] objectForInfoDictionaryKey:@"NSLocationAlwaysUsageDescription"];
             NSAssert(hasLocationDescription, @"For iOS 8 and above, your app must have a value for NSLocationWhenInUseUsageDescription or NSLocationAlwaysUsageDescription in its Info.plist");
-            [_locationManager requestWhenInUseAuthorization];
+            [self.locationManager requestWhenInUseAuthorization];
         }
 #endif
         
-        _locationManager.headingFilter = 5.0;
-        _locationManager.delegate = self;
-        [_locationManager startUpdatingLocation];
+        self.locationManager.headingFilter = 5.0;
+        self.locationManager.delegate = self;
+        [self.locationManager startUpdatingLocation];
     }
     else
     {
-        [_locationManager stopUpdatingLocation];
-        [_locationManager stopUpdatingHeading];
-        _locationManager.delegate = nil;
-        _locationManager = nil;
+        [self.locationManager stopUpdatingLocation];
+        [self.locationManager stopUpdatingHeading];
+        self.locationManager.delegate = nil;
+        self.locationManager = nil;
         
         if (_delegateHasDidStopLocatingUser) {
-            [_delegate mapViewDidStopLocatingUser:self];
+            [self.delegate mapViewDidStopLocatingUser:self];
         }
         
         [self setUserTrackingMode:MGLUserTrackingModeNone animated:YES];
@@ -1900,16 +1901,24 @@ CLLocationCoordinate2D latLngToCoordinate(mbgl::LatLng latLng)
         _userLocationAnnotationView = newAnnotationView;
 }
 
++ (NSSet *)keyPathsForValuesAffectingUserLocation {
+    return [NSSet setWithObject:@"userLocationAnnotationView"];
+}
+
+- (MGLUserLocation *)userLocation {
+    return self.userLocationAnnotationView.annotation;
+}
+
 - (BOOL)isUserLocationVisible
 {
     if (self.userLocationAnnotationView)
     {
-        CGPoint locationPoint = [self convertCoordinate:self.userLocationAnnotationView.annotation.coordinate toPointToView:self];
+        CGPoint locationPoint = [self convertCoordinate:self.userLocation.coordinate toPointToView:self];
 
-        CGRect locationRect = CGRectMake(locationPoint.x - self.userLocationAnnotationView.location.horizontalAccuracy,
-                                         locationPoint.y - self.userLocationAnnotationView.location.horizontalAccuracy,
-                                         self.userLocationAnnotationView.location.horizontalAccuracy * 2,
-                                         self.userLocationAnnotationView.location.horizontalAccuracy * 2);
+        CGRect locationRect = CGRectMake(locationPoint.x - self.userLocation.location.horizontalAccuracy,
+                                         locationPoint.y - self.userLocation.location.horizontalAccuracy,
+                                         self.userLocation.location.horizontalAccuracy * 2,
+                                         self.userLocation.location.horizontalAccuracy * 2);
 
         return CGRectIntersectsRect([self bounds], locationRect);
     }
@@ -1927,7 +1936,7 @@ CLLocationCoordinate2D latLngToCoordinate(mbgl::LatLng latLng)
     if (mode == _userTrackingMode)
         return;
 
-    if (mode == MGLUserTrackingModeFollowWithHeading && ! CLLocationCoordinate2DIsValid(self.userLocationAnnotationView.annotation.coordinate))
+    if (mode == MGLUserTrackingModeFollowWithHeading && ! CLLocationCoordinate2DIsValid(self.userLocation.coordinate))
         mode = MGLUserTrackingModeNone;
 
     _userTrackingMode = mode;
@@ -1937,7 +1946,7 @@ CLLocationCoordinate2D latLngToCoordinate(mbgl::LatLng latLng)
         case MGLUserTrackingModeNone:
         default:
         {
-            [_locationManager stopUpdatingHeading];
+            [self.locationManager stopUpdatingHeading];
 
             break;
         }
@@ -1945,12 +1954,12 @@ CLLocationCoordinate2D latLngToCoordinate(mbgl::LatLng latLng)
         {
             self.showsUserLocation = YES;
 
-            [_locationManager stopUpdatingHeading];
+            [self.locationManager stopUpdatingHeading];
 
             if (self.userLocationAnnotationView)
                 #pragma clang diagnostic push
                 #pragma clang diagnostic ignored "-Wdeprecated-declarations"
-                [self locationManager:_locationManager didUpdateToLocation:self.userLocationAnnotationView.location fromLocation:self.userLocationAnnotationView.location];
+                [self locationManager:self.locationManager didUpdateToLocation:self.userLocation.location fromLocation:self.userLocation.location];
                 #pragma clang diagnostic pop
 
             break;
@@ -1966,19 +1975,19 @@ CLLocationCoordinate2D latLngToCoordinate(mbgl::LatLng latLng)
             if (self.userLocationAnnotationView)
                 #pragma clang diagnostic push
                 #pragma clang diagnostic ignored "-Wdeprecated-declarations"
-                [self locationManager:_locationManager didUpdateToLocation:self.userLocationAnnotationView.location fromLocation:self.userLocationAnnotationView.location];
+                [self locationManager:self.locationManager didUpdateToLocation:self.userLocation.location fromLocation:self.userLocation.location];
                 #pragma clang diagnostic pop
 
             [self updateHeadingForDeviceOrientation];
 
-            [_locationManager startUpdatingHeading];
+            [self.locationManager startUpdatingHeading];
 
             break;
         }
     }
 
     if (_delegateHasDidChangeUserTrackingMode) {
-        [_delegate mapView:self didChangeUserTrackingMode:_userTrackingMode animated:animated];
+        [self.delegate mapView:self didChangeUserTrackingMode:_userTrackingMode animated:animated];
     }
 }
 
@@ -1990,11 +1999,11 @@ CLLocationCoordinate2D latLngToCoordinate(mbgl::LatLng latLng)
 
     if ([newLocation distanceFromLocation:oldLocation])
     {
-        MGLUserLocationAnnotationView *annotationView = self.userLocationAnnotationView;
-        annotationView.location = newLocation;
+        self.userLocation.location = newLocation;
+        [self.userLocationAnnotationView setupLayers];
 
         if (_delegateHasDidUpdateUserLocation) {
-            [_delegate mapView:self didUpdateUserLocation:self.userLocationAnnotationView.annotation];
+            [self.delegate mapView:self didUpdateUserLocation:self.userLocation];
 
             if (!_showsUserLocation) {
                 return;
@@ -2007,7 +2016,7 @@ CLLocationCoordinate2D latLngToCoordinate(mbgl::LatLng latLng)
         // center on user location unless we're already centered there (or very close)
         //
         CGPoint mapCenterPoint    = [self convertPoint:self.center fromView:self.superview];
-        CGPoint userLocationPoint = [self convertCoordinate:self.userLocationAnnotationView.annotation.coordinate toPointToView:self];
+        CGPoint userLocationPoint = [self convertCoordinate:self.userLocation.coordinate toPointToView:self];
 
         if (std::abs(userLocationPoint.x - mapCenterPoint.x) > 1.0 || std::abs(userLocationPoint.y - mapCenterPoint.y) > 1.0)
         {
@@ -2015,7 +2024,7 @@ CLLocationCoordinate2D latLngToCoordinate(mbgl::LatLng latLng)
             {
                 // at sufficient detail, just re-center the map; don't zoom
                 //
-                [self setCenterCoordinate:self.userLocationAnnotationView.location.coordinate animated:YES];
+                [self setCenterCoordinate:self.userLocation.location.coordinate animated:YES];
             }
             else
             {
@@ -2045,9 +2054,9 @@ CLLocationCoordinate2D latLngToCoordinate(mbgl::LatLng latLng)
         }
     }
 
-    self.userLocationAnnotationView.layer.hidden = !CLLocationCoordinate2DIsValid(self.userLocationAnnotationView.annotation.coordinate);
+    self.userLocationAnnotationView.layer.hidden = !CLLocationCoordinate2DIsValid(self.userLocation.coordinate);
 
-    _userLocationAnnotationView.haloLayer.hidden = !CLLocationCoordinate2DIsValid(self.userLocationAnnotationView.annotation.coordinate) || newLocation.horizontalAccuracy > 10;
+    self.userLocationAnnotationView.haloLayer.hidden = !CLLocationCoordinate2DIsValid(self.userLocation.coordinate) || newLocation.horizontalAccuracy > 10;
 
     if (!self.userLocationAnnotationView.superview) {
         [self.glView addSubview:self.userLocationAnnotationView];
@@ -2059,7 +2068,7 @@ CLLocationCoordinate2D latLngToCoordinate(mbgl::LatLng latLng)
 {
     (void)manager;
     if (self.displayHeadingCalibration)
-        [_locationManager performSelector:@selector(dismissHeadingCalibrationDisplay) withObject:nil afterDelay:10.0];
+        [self.locationManager performSelector:@selector(dismissHeadingCalibrationDisplay) withObject:nil afterDelay:10.0];
 
     return self.displayHeadingCalibration;
 }
@@ -2070,10 +2079,10 @@ CLLocationCoordinate2D latLngToCoordinate(mbgl::LatLng latLng)
     if ( ! _showsUserLocation || self.pan.state == UIGestureRecognizerStateBegan || newHeading.headingAccuracy < 0)
         return;
 
-    self.userLocationAnnotationView.heading = newHeading;
+    self.userLocation.heading = newHeading;
 
     if (_delegateHasDidUpdateUserLocation) {
-        [_delegate mapView:self didUpdateUserLocation:self.userLocationAnnotationView.annotation];
+        [self.delegate mapView:self didUpdateUserLocation:self.userLocation];
 
         if (!_showsUserLocation) {
             return;
@@ -2106,14 +2115,14 @@ CLLocationCoordinate2D latLngToCoordinate(mbgl::LatLng latLng)
         self.showsUserLocation = NO;
 
         if (_delegateHasDidFailToLocateUserWithError) {
-            [_delegate mapView:self didFailToLocateUserWithError:error];
+            [self.delegate mapView:self didFailToLocateUserWithError:error];
         }
     }
 }
 
 - (void)updateHeadingForDeviceOrientation
 {
-    if (_locationManager)
+    if (self.locationManager)
     {
         // note that right/left device and interface orientations are opposites (see UIApplication.h)
         //
@@ -2121,23 +2130,23 @@ CLLocationCoordinate2D latLngToCoordinate(mbgl::LatLng latLng)
         {
             case (UIInterfaceOrientationLandscapeLeft):
             {
-                _locationManager.headingOrientation = CLDeviceOrientationLandscapeRight;
+                self.locationManager.headingOrientation = CLDeviceOrientationLandscapeRight;
                 break;
             }
             case (UIInterfaceOrientationLandscapeRight):
             {
-                _locationManager.headingOrientation = CLDeviceOrientationLandscapeLeft;
+                self.locationManager.headingOrientation = CLDeviceOrientationLandscapeLeft;
                 break;
             }
             case (UIInterfaceOrientationPortraitUpsideDown):
             {
-                _locationManager.headingOrientation = CLDeviceOrientationPortraitUpsideDown;
+                self.locationManager.headingOrientation = CLDeviceOrientationPortraitUpsideDown;
                 break;
             }
             case (UIInterfaceOrientationPortrait):
             default:
             {
-                _locationManager.headingOrientation = CLDeviceOrientationPortrait;
+                self.locationManager.headingOrientation = CLDeviceOrientationPortrait;
                 break;
             }
         }
@@ -2332,7 +2341,10 @@ CLLocationCoordinate2D latLngToCoordinate(mbgl::LatLng latLng)
 
 - (void)updateUserLocationAnnotationView
 {
-    self.userLocationAnnotationView.center = [self convertCoordinate:self.userLocationAnnotationView.annotation.coordinate toPointToView:self];
+    CGPoint center = [self convertCoordinate:self.userLocation.coordinate toPointToView:self];
+    if (CGRectContainsPoint(CGRectInset(self.bounds, -MGLAnnotationUpdateViewportOutset.width, MGLAnnotationUpdateViewportOutset.height), center)) {
+        self.userLocationAnnotationView.center = [self convertCoordinate:self.userLocation.coordinate toPointToView:self];
+    }
     [self.userLocationAnnotationView setupLayers];
 }
 
