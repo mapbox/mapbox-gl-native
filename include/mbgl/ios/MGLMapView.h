@@ -3,7 +3,7 @@
 
 #import "MGLTypes.h"
 
-@class MGLUserLocationAnnotation, MGLUserLocationAnnotationView;
+@class MGLUserLocation, MGLUserLocationAnnotationView;
 @protocol MGLMapViewDelegate;
 @protocol MGLAnnotation;
 
@@ -325,7 +325,7 @@
 - (void)mapViewDidStopLocatingUser:(MGLMapView *)mapView;
 
 /// Tells the delegate that the map view has updated the user’s location to the given location.
-- (void)mapView:(MGLMapView *)mapView didUpdateUserLocation:(MGLUserLocationAnnotation *)userLocation;
+- (void)mapView:(MGLMapView *)mapView didUpdateUserLocation:(MGLUserLocation *)userLocation;
 
 /// Tells the delegate that the map view has failed to locate the user.
 - (void)mapView:(MGLMapView *)mapView didFailToLocateUserWithError:(NSError *)error;

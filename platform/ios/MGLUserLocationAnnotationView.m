@@ -32,7 +32,7 @@
 
 const CGFloat MGLTrackingDotRingWidth = 24.0;
 
-@implementation MGLUserLocationAnnotation {
+@implementation MGLUserLocation {
     CLLocationCoordinate2D _coordinate;
 }
 
@@ -46,7 +46,7 @@ const CGFloat MGLTrackingDotRingWidth = 24.0;
 }
 
 - (id)copyWithZone:(NSZone *)zone {
-    MGLUserLocationAnnotation *annotation = [(MGLUserLocationAnnotation *)[[self class] allocWithZone:zone] init];
+    MGLUserLocation *annotation = [(MGLUserLocation *)[[self class] allocWithZone:zone] init];
     if (annotation) {
         annotation->_coordinate = _coordinate;
     }
@@ -72,7 +72,7 @@ const CGFloat MGLTrackingDotRingWidth = 24.0;
 
 - (instancetype)initInMapView:(MGLMapView *)mapView {
     if (self = [super init]) {
-        self.annotation = [[MGLUserLocationAnnotation alloc] init];
+        self.annotation = [[MGLUserLocation alloc] init];
         _mapView = mapView;
         [self setupLayers];
     }
@@ -235,7 +235,7 @@ const CGFloat MGLTrackingDotRingWidth = 24.0;
     {
         [self willChangeValueForKey:@"location"];
         _location = newLocation;
-        MGLUserLocationAnnotation *annotation = self.annotation;
+        MGLUserLocation *annotation = self.annotation;
         annotation.coordinate = _location.coordinate;
         [self setupLayers];
         [self didChangeValueForKey:@"location"];

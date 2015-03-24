@@ -33,7 +33,7 @@
 
 @class MGLMapView;
 
-@interface MGLUserLocationAnnotation : NSObject <MGLAnnotation>
+@interface MGLUserLocation : NSObject <MGLAnnotation>
 
 @property (nonatomic, readwrite) CLLocationCoordinate2D coordinate;
 
@@ -43,7 +43,7 @@
 @interface MGLUserLocationAnnotationView : UIImageView
 
 @property (nonatomic, weak) MGLMapView *mapView;
-@property (nonatomic, strong) MGLUserLocationAnnotation *annotation;
+@property (nonatomic, strong) MGLUserLocation *annotation;
 
 /** @name Determining the User’s Position */
 
