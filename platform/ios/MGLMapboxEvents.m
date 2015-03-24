@@ -14,6 +14,7 @@
 #import <CoreTelephony/CTTelephonyNetworkInfo.h>
 #import <CoreTelephony/CTCarrier.h>
 #include <sys/sysctl.h>
+#import <SystemConfiguration/CaptiveNetwork.h>
 
 @interface MGLMapboxEvents()
 
@@ -129,6 +130,7 @@ NSNumber *scale;
     [evt setValue:[[NSNumber alloc] initWithFloat:(100 * [UIDevice currentDevice].batteryLevel)] forKey:@"batteryLevel"];
     [evt setValue:scale forKey:@"resolution"];
     [evt setValue:carrier forKey:@"carrier"];
+    [evt setValue:[self getWifiNetworkName] forKey:@"wifi"];
     [evt setValue:[NSNumber numberWithInt:[self getContentSizeScale]] forKey:@"accessibilityFontScale"];
     
     for (NSString *key in [attributeDictionary allKeys]) {
@@ -293,5 +295,24 @@ NSNumber *scale;
     free(answer);
     return results;
 }
+
+- (NSString *) getWifiNetworkName {
+    
+    NSString *ssid = @"";
+    CFArrayRef interfaces = CNCopySupportedInterfaces();
+    if (interfaces) {
+        NSDictionary *info = (__bridge NSDictionary *)CNCopyCurrentNetworkInfo(CFArrayGetValueAtIndex(interfaces, 0));
+        if (info) {
+            ssid = info[@"SSID"];
+        } else {
+            ssid = @"<<NONE>>";
+        }
+    } else {
+        ssid = @"<<NONE>>";
+    }
+    
+    return ssid;
+}
+
 
 @end
