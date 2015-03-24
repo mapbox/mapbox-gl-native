@@ -1,6 +1,9 @@
 #import <UIKit/UIKit.h>
 #import <CoreLocation/CoreLocation.h>
 
+#import "MGLTypes.h"
+
+@class MGLUserLocationAnnotation, MGLUserLocationAnnotationView;
 @protocol MGLMapViewDelegate;
 @protocol MGLAnnotation;
 
@@ -234,6 +237,27 @@
 *   @param animated If `YES`, the callout view is animated offscreen. */
 - (void)deselectAnnotation:(id <MGLAnnotation>)annotation animated:(BOOL)animated;
 
+#pragma mark - Locating the user
+
+/** A Boolean value indicating whether the map may display the user location.
+ 
+    This property does not indicate whether the user’s position is actually visible on the map, only whether the map view is allowed to display it. To determine whether the user’s position is visible, use the userLocationVisible property. The default value of this property is `NO`.
+
+    Setting this property to `YES` causes the map view to use the Core Location framework to find the current location. As long as this property is `YES`, the map view continues to track the user’s location and update it periodically.
+
+    On iOS 8 and above, your app must specify a value for `NSLocationWhenInUseUsageDescription` in its `Info.plist` to satisfy the requirements of the underlying Core Location framework when enabling this property.
+ */
+@property (nonatomic, assign) BOOL showsUserLocation;
+
+/** The annotation object representing the user’s current location. (read-only) */
+@property (nonatomic, strong, readonly) MGLUserLocationAnnotationView *userLocationAnnotationView;
+
+/** The mode used to track the user location. */
+@property (nonatomic, assign) MGLUserTrackingMode userTrackingMode;
+
+/** Whether the map view should display a heading calibration alert when necessary. The default value is `YES`. */
+@property (nonatomic, assign) BOOL displayHeadingCalibration;
+
 #pragma mark - Debugging
 
 /** @name Debugging */
@@ -264,7 +288,7 @@
 *   @return The marker symbol to display for the specified annotation or `nil` if you want to display the default symbol. */
 - (NSString *)mapView:(MGLMapView *)mapView symbolNameForAnnotation:(id <MGLAnnotation>)annotation;
 
-// Responding to Map Position Changes
+#pragma mark - Responding to Map Position Changes
 
 // TODO
 - (void)mapView:(MGLMapView *)mapView regionWillChangeAnimated:(BOOL)animated;
@@ -275,7 +299,7 @@
 // TODO
 - (void)mapView:(MGLMapView *)mapView regionDidChangeAnimated:(BOOL)animated;
 
-// Loading the Map Data
+#pragma mark - Loading the Map Data
 
 // TODO
 - (void)mapViewWillStartLoadingMap:(MGLMapView *)mapView;
@@ -291,5 +315,26 @@
 
 // TODO
 - (void)mapViewDidFinishRenderingMap:(MGLMapView *)mapView fullyRendered:(BOOL)fullyRendered;
+
+#pragma mark - Locating the user
+
+/// Tells the delegate that the map view will begin tracking the user’s location.
+- (void)mapViewWillStartLocatingUser:(MGLMapView *)mapView;
+
+/// Tells the delegate that the map view has stopped tracking the user’s location.
+- (void)mapViewDidStopLocatingUser:(MGLMapView *)mapView;
+
+/// Tells the delegate that the map view has updated the user’s location to the given location.
+- (void)mapView:(MGLMapView *)mapView didUpdateUserLocation:(MGLUserLocationAnnotation *)userLocation;
+
+/// Tells the delegate that the map view has failed to locate the user.
+- (void)mapView:(MGLMapView *)mapView didFailToLocateUserWithError:(NSError *)error;
+
+/**
+    Tells the delegate that the map view’s user tracking mode has changed.
+ 
+    This method is called after the map view asynchronously changes to reflect the new user tracking mode, for example by beginning to zoom or rotate.
+ */
+- (void)mapView:(MGLMapView *)mapView didChangeUserTrackingMode:(MGLUserTrackingMode)mode animated:(BOOL)animated;
 
 @end

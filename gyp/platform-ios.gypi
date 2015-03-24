@@ -20,6 +20,8 @@
         '../include/mbgl/ios/MGLMapView.h',
         '../platform/ios/MGLMapView.mm',
         '../include/mbgl/ios/MGLAnnotation.h',
+        '../platform/ios/MGLUserLocationAnnotationView.h',
+        '../platform/ios/MGLUserLocationAnnotationView.m',
         '../include/mbgl/ios/MGLStyleFunctionValue.h',
         '../platform/ios/MGLStyleFunctionValue.m',
         '../include/mbgl/ios/MGLTypes.h',

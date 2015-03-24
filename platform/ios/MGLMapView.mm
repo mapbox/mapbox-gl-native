@@ -1,3 +1,28 @@
+//
+// Copyright (c) 2008-2013, Route-Me Contributors
+// All rights reserved.
+//
+// Redistribution and use in source and binary forms, with or without
+// modification, are permitted provided that the following conditions are met:
+//
+// * Redistributions of source code must retain the above copyright notice, this
+//   list of conditions and the following disclaimer.
+// * Redistributions in binary form must reproduce the above copyright notice,
+//   this list of conditions and the following disclaimer in the documentation
+//   and/or other materials provided with the distribution.
+//
+// THIS SOFTWARE IS PROVIDED BY THE COPYRIGHT HOLDERS AND CONTRIBUTORS "AS IS"
+// AND ANY EXPRESS OR IMPLIED WARRANTIES, INCLUDING, BUT NOT LIMITED TO, THE
+// IMPLIED WARRANTIES OF MERCHANTABILITY AND FITNESS FOR A PARTICULAR PURPOSE
+// ARE DISCLAIMED. IN NO EVENT SHALL THE COPYRIGHT OWNER OR CONTRIBUTORS BE
+// LIABLE FOR ANY DIRECT, INDIRECT, INCIDENTAL, SPECIAL, EXEMPLARY, OR
+// CONSEQUENTIAL DAMAGES (INCLUDING, BUT NOT LIMITED TO, PROCUREMENT OF
+// SUBSTITUTE GOODS OR SERVICES; LOSS OF USE, DATA, OR PROFITS; OR BUSINESS
+// INTERRUPTION) HOWEVER CAUSED AND ON ANY THEORY OF LIABILITY, WHETHER IN
+// CONTRACT, STRICT LIABILITY, OR TORT (INCLUDING NEGLIGENCE OR OTHERWISE)
+// ARISING IN ANY WAY OUT OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE
+// POSSIBILITY OF SUCH DAMAGE.
+
 #import "MGLMapView.h"
 
 #import <mbgl/platform/log.hpp>
@@ -17,6 +42,7 @@
 #import "MGLTypes.h"
 #import "MGLStyleFunctionValue.h"
 #import "MGLAnnotation.h"
+#import "MGLUserLocationAnnotationView.h"
 
 #import "SMCalloutView.h"
 
@@ -64,7 +90,7 @@ NSString *const MGLAnnotationIDKey = @"MGLAnnotationIDKey";
 
 #pragma mark - Private -
 
-@interface MGLMapView () <UIGestureRecognizerDelegate, GLKViewDelegate>
+@interface MGLMapView () <UIGestureRecognizerDelegate, GLKViewDelegate, CLLocationManagerDelegate>
 
 @property (nonatomic) EAGLContext *context;
 @property (nonatomic) GLKView *glView;
@@ -81,6 +107,7 @@ NSString *const MGLAnnotationIDKey = @"MGLAnnotationIDKey";
 @property (nonatomic) std::vector<uint32_t> annotationsNearbyLastTap;
 @property (nonatomic, weak) id <MGLAnnotation> selectedAnnotation;
 @property (nonatomic, strong) SMCalloutView *selectedAnnotationCalloutView;
+@property (nonatomic, strong, readwrite) MGLUserLocationAnnotationView *userLocationAnnotationView;
 @property (nonatomic, readonly) NSDictionary *allowedStyleTypes;
 @property (nonatomic) CGPoint centerPoint;
 @property (nonatomic) CGFloat scale;
@@ -109,7 +136,38 @@ NSString *const MGLAnnotationIDKey = @"MGLAnnotationIDKey";
 
 @end
 
-@implementation MGLMapView
+@implementation MGLMapView {
+    CLLocationManager *_locationManager;
+    
+    BOOL _delegateHasBeforeMapMove;
+    BOOL _delegateHasAfterMapMove;
+    BOOL _delegateHasBeforeMapZoom;
+    BOOL _delegateHasAfterMapZoom;
+    BOOL _delegateHasMapViewRegionDidChange;
+    BOOL _delegateHasDoubleTapOnMap;
+    BOOL _delegateHasSingleTapOnMap;
+    BOOL _delegateHasSingleTapTwoFingersOnMap;
+    BOOL _delegateHasLongPressOnMap;
+    BOOL _delegateHasTapOnAnnotation;
+    BOOL _delegateHasDoubleTapOnAnnotation;
+    BOOL _delegateHasLongPressOnAnnotation;
+    BOOL _delegateHasTapOnCalloutAccessoryControlForAnnotation;
+    BOOL _delegateHasTapOnLabelForAnnotation;
+    BOOL _delegateHasDoubleTapOnLabelForAnnotation;
+    BOOL _delegateHasShouldDragAnnotation;
+    BOOL _delegateHasDidChangeDragState;
+    BOOL _delegateHasLayerForAnnotation;
+    BOOL _delegateHasAnnotationSorting;
+    BOOL _delegateHasWillHideLayerForAnnotation;
+    BOOL _delegateHasDidHideLayerForAnnotation;
+    BOOL _delegateHasDidSelectAnnotation;
+    BOOL _delegateHasDidDeselectAnnotation;
+    BOOL _delegateHasWillStartLocatingUser;
+    BOOL _delegateHasDidStopLocatingUser;
+    BOOL _delegateHasDidUpdateUserLocation;
+    BOOL _delegateHasDidFailToLocateUserWithError;
+    BOOL _delegateHasDidChangeUserTrackingMode;
+}
 
 #pragma mark - Setup & Teardown -
 
@@ -414,6 +472,51 @@ mbgl::DefaultFileSource *mbglFileSource = nullptr;
     }
 }
 
+- (void)setDelegate:(id<MGLMapViewDelegate>)delegate {
+    if (_delegate == delegate) {
+        return;
+    }
+    
+    _delegate = delegate;
+    
+    _delegateHasBeforeMapMove = [_delegate respondsToSelector:@selector(beforeMapMove:byUser:)];
+    _delegateHasAfterMapMove  = [_delegate respondsToSelector:@selector(afterMapMove:byUser:)];
+    
+    _delegateHasBeforeMapZoom = [_delegate respondsToSelector:@selector(beforeMapZoom:byUser:)];
+    _delegateHasAfterMapZoom  = [_delegate respondsToSelector:@selector(afterMapZoom:byUser:)];
+    
+    _delegateHasMapViewRegionDidChange = [_delegate respondsToSelector:@selector(mapViewRegionDidChange:)];
+    
+    _delegateHasDoubleTapOnMap = [_delegate respondsToSelector:@selector(doubleTapOnMap:at:)];
+    _delegateHasSingleTapOnMap = [_delegate respondsToSelector:@selector(singleTapOnMap:at:)];
+    _delegateHasSingleTapTwoFingersOnMap = [_delegate respondsToSelector:@selector(singleTapTwoFingersOnMap:at:)];
+    _delegateHasLongPressOnMap = [_delegate respondsToSelector:@selector(longPressOnMap:at:)];
+    
+    _delegateHasTapOnAnnotation = [_delegate respondsToSelector:@selector(tapOnAnnotation:onMap:)];
+    _delegateHasDoubleTapOnAnnotation = [_delegate respondsToSelector:@selector(doubleTapOnAnnotation:onMap:)];
+    _delegateHasLongPressOnAnnotation = [_delegate respondsToSelector:@selector(longPressOnAnnotation:onMap:)];
+    _delegateHasTapOnCalloutAccessoryControlForAnnotation = [_delegate respondsToSelector:@selector(tapOnCalloutAccessoryControl:forAnnotation:onMap:)];
+    _delegateHasTapOnLabelForAnnotation = [_delegate respondsToSelector:@selector(tapOnLabelForAnnotation:onMap:)];
+    _delegateHasDoubleTapOnLabelForAnnotation = [_delegate respondsToSelector:@selector(doubleTapOnLabelForAnnotation:onMap:)];
+    
+    _delegateHasShouldDragAnnotation = [_delegate respondsToSelector:@selector(mapView:shouldDragAnnotation:)];
+    _delegateHasDidChangeDragState = [_delegate respondsToSelector:@selector(mapView:annotation:didChangeDragState:fromOldState:)];
+    
+    _delegateHasLayerForAnnotation = [_delegate respondsToSelector:@selector(mapView:layerForAnnotation:)];
+    _delegateHasAnnotationSorting = [_delegate respondsToSelector:@selector(annotationSortingComparatorForMapView:)];
+    _delegateHasWillHideLayerForAnnotation = [_delegate respondsToSelector:@selector(mapView:willHideLayerForAnnotation:)];
+    _delegateHasDidHideLayerForAnnotation = [_delegate respondsToSelector:@selector(mapView:didHideLayerForAnnotation:)];
+    
+    _delegateHasDidSelectAnnotation = [_delegate respondsToSelector:@selector(mapView:didSelectAnnotation:)];
+    _delegateHasDidDeselectAnnotation = [_delegate respondsToSelector:@selector(mapView:didDeselectAnnotation:)];
+    
+    _delegateHasWillStartLocatingUser = [_delegate respondsToSelector:@selector(mapViewWillStartLocatingUser:)];
+    _delegateHasDidStopLocatingUser = [_delegate respondsToSelector:@selector(mapViewDidStopLocatingUser:)];
+    _delegateHasDidUpdateUserLocation = [_delegate respondsToSelector:@selector(mapView:didUpdateUserLocation:)];
+    _delegateHasDidFailToLocateUserWithError = [_delegate respondsToSelector:@selector(mapView:didFailToLocateUserWithError:)];
+    _delegateHasDidChangeUserTrackingMode = [_delegate respondsToSelector:@selector(mapView:didChangeUserTrackingMode:animated:)];
+}
+
 #pragma mark - Layout -
 
 - (void)setFrame:(CGRect)frame
@@ -578,6 +681,9 @@ mbgl::DefaultFileSource *mbglFileSource = nullptr;
 - (void)handleCompassTapGesture:(id)sender
 {
     [self resetNorthAnimated:YES];
+    if (self.userTrackingMode == MGLUserTrackingModeFollowWithHeading) {
+        self.userTrackingMode = MGLUserTrackingModeFollow;
+    }
 }
 
 #pragma clang diagnostic pop
@@ -587,6 +693,7 @@ mbgl::DefaultFileSource *mbglFileSource = nullptr;
     if ( ! self.isScrollEnabled) return;
 
     mbglMap->cancelTransitions();
+    self.userTrackingMode = MGLUserTrackingModeNone;
 
     if (pan.state == UIGestureRecognizerStateBegan)
     {
@@ -647,6 +754,7 @@ mbgl::DefaultFileSource *mbglFileSource = nullptr;
     if (mbglMap->getZoom() <= mbglMap->getMinZoom() && pinch.scale < 1) return;
 
     mbglMap->cancelTransitions();
+    self.userTrackingMode = MGLUserTrackingModeNone;
 
     if (pinch.state == UIGestureRecognizerStateBegan)
     {
@@ -679,6 +787,7 @@ mbgl::DefaultFileSource *mbglFileSource = nullptr;
     if ( ! self.isRotateEnabled) return;
 
     mbglMap->cancelTransitions();
+    self.userTrackingMode = MGLUserTrackingModeNone;
 
     if (rotate.state == UIGestureRecognizerStateBegan)
     {
@@ -760,7 +869,7 @@ mbgl::DefaultFileSource *mbglFileSource = nullptr;
             // the selection candidates haven't changed; cycle through them
             if (self.selectedAnnotation &&
                 [[[self.annotationIDsByAnnotation objectForKey:self.selectedAnnotation]
-                    objectForKey:MGLAnnotationIDKey] unsignedIntValue] == self.annotationsNearbyLastTap.back())
+                  objectForKey:MGLAnnotationIDKey] unsignedIntValue] == self.annotationsNearbyLastTap.back())
             {
                 // the selected annotation is the last in the set; cycle back to the first
                 // note: this could be the selected annotation if only one in set
@@ -829,6 +938,7 @@ mbgl::DefaultFileSource *mbglFileSource = nullptr;
     if ( ! self.isZoomEnabled) return;
 
     mbglMap->cancelTransitions();
+    self.userTrackingMode = MGLUserTrackingModeNone;
 
     if (doubleTap.state == UIGestureRecognizerStateEnded)
     {
@@ -856,6 +966,7 @@ mbgl::DefaultFileSource *mbglFileSource = nullptr;
     if (mbglMap->getZoom() == mbglMap->getMinZoom()) return;
 
     mbglMap->cancelTransitions();
+    self.userTrackingMode = MGLUserTrackingModeNone;
 
     if (twoFingerTap.state == UIGestureRecognizerStateEnded)
     {
@@ -881,6 +992,7 @@ mbgl::DefaultFileSource *mbglFileSource = nullptr;
     if ( ! self.isZoomEnabled) return;
 
     mbglMap->cancelTransitions();
+    self.userTrackingMode = MGLUserTrackingModeNone;
 
     if (quickZoom.state == UIGestureRecognizerStateBegan)
     {
@@ -1019,6 +1131,20 @@ mbgl::DefaultFileSource *mbglFileSource = nullptr;
 - (void)setZoomLevel:(double)zoomLevel
 {
     [self setZoomLevel:zoomLevel animated:NO];
+}
+
+- (void)zoomToSouthWestCoordinate:(CLLocationCoordinate2D)southWestCoordinate northEastCoordinate:(CLLocationCoordinate2D)northEastCoordinate animated:(BOOL)animated
+{
+    CLLocationCoordinate2D center = CLLocationCoordinate2DMake((northEastCoordinate.latitude + southWestCoordinate.latitude) / 2, (northEastCoordinate.longitude + southWestCoordinate.longitude) / 2);
+    
+    CGFloat scale = mbglMap->getScale();
+    CGFloat scaleX = mbglMap->getState().getWidth() / (northEastCoordinate.longitude - southWestCoordinate.longitude);
+    CGFloat scaleY = mbglMap->getState().getHeight() / (northEastCoordinate.latitude - southWestCoordinate.latitude);
+    CGFloat minZoom = mbglMap->getMinZoom();
+    CGFloat maxZoom = mbglMap->getMaxZoom();
+    CGFloat zoomLevel = MAX(MIN(log(scale * MIN(scaleX, scaleY)) / log(2), maxZoom), minZoom);
+    
+    [self setCenterCoordinate:center zoomLevel:zoomLevel animated:animated];
 }
 
 - (CLLocationDirection)direction
@@ -1622,7 +1748,7 @@ CLLocationCoordinate2D latLngToCoordinate(mbgl::LatLng latLng)
     for (size_t i = 0; i < annotationIDs.size(); ++i)
     {
         [self.annotationIDsByAnnotation setObject:@{ MGLAnnotationIDKey : @(annotationIDs[i]) }
-                                  forKey:annotations[i]];
+                                           forKey:annotations[i]];
     }
 }
 
@@ -1683,6 +1809,7 @@ CLLocationCoordinate2D latLngToCoordinate(mbgl::LatLng latLng)
     
     if (annotation == self.selectedAnnotation) return;
 
+    self.userTrackingMode = MGLUserTrackingModeNone;
     [self deselectAnnotation:self.selectedAnnotation animated:animated];
     self.selectedAnnotation = annotation;
     self.selectedAnnotationCalloutView = [self calloutViewForAnnotation:annotation];
@@ -1711,6 +1838,309 @@ CLLocationCoordinate2D latLngToCoordinate(mbgl::LatLng latLng)
         [self.selectedAnnotationCalloutView dismissCalloutAnimated:animated];
         self.selectedAnnotationCalloutView = nil;
         self.selectedAnnotation = nil;
+    }
+}
+
+#pragma mark - Locating the user
+
+- (void)setShowsUserLocation:(BOOL)showsUserLocation
+{
+    if (showsUserLocation == _showsUserLocation)
+        return;
+    
+    _showsUserLocation = showsUserLocation;
+    
+    if (showsUserLocation)
+    {
+        if (_delegateHasWillStartLocatingUser) {
+            [_delegate mapViewWillStartLocatingUser:self];
+        }
+        
+        self.userLocationAnnotationView = [[MGLUserLocationAnnotationView alloc] initInMapView:self];
+        
+        _locationManager = [[CLLocationManager alloc] init];
+        
+#if __IPHONE_OS_VERSION_MAX_ALLOWED >= 80000
+        // enable iOS 8+ location authorization API
+        //
+        if ([CLLocationManager instancesRespondToSelector:@selector(requestWhenInUseAuthorization)])
+        {
+            BOOL hasLocationDescription = [[NSBundle mainBundle] objectForInfoDictionaryKey:@"NSLocationWhenInUseUsageDescription"] ||
+            [[NSBundle mainBundle] objectForInfoDictionaryKey:@"NSLocationAlwaysUsageDescription"];
+            NSAssert(hasLocationDescription, @"For iOS 8 and above, your app must have a value for NSLocationWhenInUseUsageDescription or NSLocationAlwaysUsageDescription in its Info.plist");
+            [_locationManager requestWhenInUseAuthorization];
+        }
+#endif
+        
+        _locationManager.headingFilter = 5.0;
+        _locationManager.delegate = self;
+        [_locationManager startUpdatingLocation];
+    }
+    else
+    {
+        [_locationManager stopUpdatingLocation];
+        [_locationManager stopUpdatingHeading];
+        _locationManager.delegate = nil;
+        _locationManager = nil;
+        
+        if (_delegateHasDidStopLocatingUser) {
+            [_delegate mapViewDidStopLocatingUser:self];
+        }
+        
+        [self setUserTrackingMode:MGLUserTrackingModeNone animated:YES];
+        
+        [self.userLocationAnnotationView removeFromSuperview];
+        self.userLocationAnnotationView = nil;
+    }
+}
+
+- (void)setUserLocationAnnotationView:(MGLUserLocationAnnotationView *)newAnnotationView
+{
+    if (![newAnnotationView isEqual:_userLocationAnnotationView])
+        _userLocationAnnotationView = newAnnotationView;
+}
+
+- (BOOL)isUserLocationVisible
+{
+    if (self.userLocationAnnotationView)
+    {
+        CGPoint locationPoint = [self convertCoordinate:self.userLocationAnnotationView.annotation.coordinate toPointToView:self];
+
+        CGRect locationRect = CGRectMake(locationPoint.x - self.userLocationAnnotationView.location.horizontalAccuracy,
+                                         locationPoint.y - self.userLocationAnnotationView.location.horizontalAccuracy,
+                                         self.userLocationAnnotationView.location.horizontalAccuracy * 2,
+                                         self.userLocationAnnotationView.location.horizontalAccuracy * 2);
+
+        return CGRectIntersectsRect([self bounds], locationRect);
+    }
+
+    return NO;
+}
+
+- (void)setUserTrackingMode:(MGLUserTrackingMode)mode
+{
+    [self setUserTrackingMode:mode animated:YES];
+}
+
+- (void)setUserTrackingMode:(MGLUserTrackingMode)mode animated:(BOOL)animated
+{
+    if (mode == _userTrackingMode)
+        return;
+
+    if (mode == MGLUserTrackingModeFollowWithHeading && ! CLLocationCoordinate2DIsValid(self.userLocationAnnotationView.annotation.coordinate))
+        mode = MGLUserTrackingModeNone;
+
+    _userTrackingMode = mode;
+
+    switch (_userTrackingMode)
+    {
+        case MGLUserTrackingModeNone:
+        default:
+        {
+            [_locationManager stopUpdatingHeading];
+
+            break;
+        }
+        case MGLUserTrackingModeFollow:
+        {
+            self.showsUserLocation = YES;
+
+            [_locationManager stopUpdatingHeading];
+
+            if (self.userLocationAnnotationView)
+                #pragma clang diagnostic push
+                #pragma clang diagnostic ignored "-Wdeprecated-declarations"
+                [self locationManager:_locationManager didUpdateToLocation:self.userLocationAnnotationView.location fromLocation:self.userLocationAnnotationView.location];
+                #pragma clang diagnostic pop
+
+            break;
+        }
+        case MGLUserTrackingModeFollowWithHeading:
+        {
+            self.showsUserLocation = YES;
+
+            if (self.zoomLevel < 3) {
+                [self setZoomLevel:3 animated:YES];
+            }
+
+            if (self.userLocationAnnotationView)
+                #pragma clang diagnostic push
+                #pragma clang diagnostic ignored "-Wdeprecated-declarations"
+                [self locationManager:_locationManager didUpdateToLocation:self.userLocationAnnotationView.location fromLocation:self.userLocationAnnotationView.location];
+                #pragma clang diagnostic pop
+
+            [self updateHeadingForDeviceOrientation];
+
+            [_locationManager startUpdatingHeading];
+
+            break;
+        }
+    }
+
+    if (_delegateHasDidChangeUserTrackingMode) {
+        [_delegate mapView:self didChangeUserTrackingMode:_userTrackingMode animated:animated];
+    }
+}
+
+- (void)locationManager:(CLLocationManager *)manager didUpdateToLocation:(CLLocation *)newLocation fromLocation:(CLLocation *)oldLocation
+{
+    (void)manager;
+    if ( ! _showsUserLocation || self.pan.state == UIGestureRecognizerStateBegan || ! newLocation || ! CLLocationCoordinate2DIsValid(newLocation.coordinate))
+        return;
+
+    if ([newLocation distanceFromLocation:oldLocation])
+    {
+        MGLUserLocationAnnotationView *annotationView = self.userLocationAnnotationView;
+        annotationView.location = newLocation;
+
+        if (_delegateHasDidUpdateUserLocation) {
+            [_delegate mapView:self didUpdateUserLocation:self.userLocationAnnotationView.annotation];
+
+            if (!_showsUserLocation) {
+                return;
+            }
+        }
+    }
+
+    if (self.userTrackingMode != MGLUserTrackingModeNone)
+    {
+        // center on user location unless we're already centered there (or very close)
+        //
+        CGPoint mapCenterPoint    = [self convertPoint:self.center fromView:self.superview];
+        CGPoint userLocationPoint = [self convertCoordinate:self.userLocationAnnotationView.annotation.coordinate toPointToView:self];
+
+        if (std::abs(userLocationPoint.x - mapCenterPoint.x) > 1.0 || std::abs(userLocationPoint.y - mapCenterPoint.y) > 1.0)
+        {
+            if (round(self.zoomLevel) >= 10)
+            {
+                // at sufficient detail, just re-center the map; don't zoom
+                //
+                [self setCenterCoordinate:self.userLocationAnnotationView.location.coordinate animated:YES];
+            }
+            else
+            {
+                // otherwise re-center and zoom in to near accuracy confidence
+                //
+                float delta = (newLocation.horizontalAccuracy / 110000) * 1.2; // approx. meter per degree latitude, plus some margin
+
+                CLLocationCoordinate2D desiredSouthWest = CLLocationCoordinate2DMake(newLocation.coordinate.latitude  - delta,
+                                                                                     newLocation.coordinate.longitude - delta);
+
+                CLLocationCoordinate2D desiredNorthEast = CLLocationCoordinate2DMake(newLocation.coordinate.latitude  + delta,
+                                                                                     newLocation.coordinate.longitude + delta);
+
+                CGFloat pixelRadius = fminf(self.bounds.size.width, self.bounds.size.height) / 2;
+
+                CLLocationCoordinate2D actualSouthWest = [self convertPoint:CGPointMake(userLocationPoint.x - pixelRadius, userLocationPoint.y - pixelRadius) toCoordinateFromView:self];
+                CLLocationCoordinate2D actualNorthEast = [self convertPoint:CGPointMake(userLocationPoint.x + pixelRadius, userLocationPoint.y + pixelRadius) toCoordinateFromView:self];
+                
+                if (desiredNorthEast.latitude  != actualNorthEast.latitude  ||
+                    desiredNorthEast.longitude != actualNorthEast.longitude ||
+                    desiredSouthWest.latitude  != actualSouthWest.latitude  ||
+                    desiredSouthWest.longitude != actualSouthWest.longitude)
+                {
+                    [self zoomToSouthWestCoordinate:desiredSouthWest northEastCoordinate:desiredNorthEast animated:YES];
+                }
+            }
+        }
+    }
+
+    self.userLocationAnnotationView.layer.hidden = !CLLocationCoordinate2DIsValid(self.userLocationAnnotationView.annotation.coordinate);
+
+    _userLocationAnnotationView.haloLayer.hidden = !CLLocationCoordinate2DIsValid(self.userLocationAnnotationView.annotation.coordinate) || newLocation.horizontalAccuracy > 10;
+
+    if (!self.userLocationAnnotationView.superview) {
+        [self.glView addSubview:self.userLocationAnnotationView];
+    }
+    [self updateUserLocationAnnotationView];
+}
+
+- (BOOL)locationManagerShouldDisplayHeadingCalibration:(CLLocationManager *)manager
+{
+    (void)manager;
+    if (self.displayHeadingCalibration)
+        [_locationManager performSelector:@selector(dismissHeadingCalibrationDisplay) withObject:nil afterDelay:10.0];
+
+    return self.displayHeadingCalibration;
+}
+
+- (void)locationManager:(CLLocationManager *)manager didUpdateHeading:(CLHeading *)newHeading
+{
+    (void)manager;
+    if ( ! _showsUserLocation || self.pan.state == UIGestureRecognizerStateBegan || newHeading.headingAccuracy < 0)
+        return;
+
+    self.userLocationAnnotationView.heading = newHeading;
+
+    if (_delegateHasDidUpdateUserLocation) {
+        [_delegate mapView:self didUpdateUserLocation:self.userLocationAnnotationView.annotation];
+
+        if (!_showsUserLocation) {
+            return;
+        }
+    }
+
+    CLLocationDirection headingDirection = (newHeading.trueHeading > 0 ? newHeading.trueHeading : newHeading.magneticHeading);
+
+    if (headingDirection > 0 && self.userTrackingMode == MGLUserTrackingModeFollowWithHeading) {
+        mbglMap->setBearing(headingDirection, secondsAsDuration(MGLAnimationDuration));
+    }
+}
+
+- (void)locationManager:(CLLocationManager *)manager didChangeAuthorizationStatus:(CLAuthorizationStatus)status
+{
+    (void)manager;
+    if (status == kCLAuthorizationStatusDenied || status == kCLAuthorizationStatusRestricted)
+    {
+        self.userTrackingMode  = MGLUserTrackingModeNone;
+        self.showsUserLocation = NO;
+    }
+}
+
+- (void)locationManager:(CLLocationManager *)manager didFailWithError:(NSError *)error
+{
+    (void)manager;
+    if ([error code] == kCLErrorDenied)
+    {
+        self.userTrackingMode  = MGLUserTrackingModeNone;
+        self.showsUserLocation = NO;
+
+        if (_delegateHasDidFailToLocateUserWithError) {
+            [_delegate mapView:self didFailToLocateUserWithError:error];
+        }
+    }
+}
+
+- (void)updateHeadingForDeviceOrientation
+{
+    if (_locationManager)
+    {
+        // note that right/left device and interface orientations are opposites (see UIApplication.h)
+        //
+        switch ([[UIApplication sharedApplication] statusBarOrientation])
+        {
+            case (UIInterfaceOrientationLandscapeLeft):
+            {
+                _locationManager.headingOrientation = CLDeviceOrientationLandscapeRight;
+                break;
+            }
+            case (UIInterfaceOrientationLandscapeRight):
+            {
+                _locationManager.headingOrientation = CLDeviceOrientationLandscapeLeft;
+                break;
+            }
+            case (UIInterfaceOrientationPortraitUpsideDown):
+            {
+                _locationManager.headingOrientation = CLDeviceOrientationPortraitUpsideDown;
+                break;
+            }
+            case (UIInterfaceOrientationPortrait):
+            default:
+            {
+                _locationManager.headingOrientation = CLDeviceOrientationPortrait;
+                break;
+            }
+        }
     }
 }
 
@@ -1825,6 +2255,8 @@ CLLocationCoordinate2D latLngToCoordinate(mbgl::LatLng latLng)
         {
             [self deselectAnnotation:self.selectedAnnotation animated:YES];
             
+            [self updateUserLocationAnnotationView];
+            
             if ([self.delegate respondsToSelector:@selector(mapViewRegionIsChanging:)])
             {
                 [self.delegate mapViewRegionIsChanging:self];
@@ -1896,6 +2328,12 @@ CLLocationCoordinate2D latLngToCoordinate(mbgl::LatLng latLng)
             break;
         }
     }
+}
+
+- (void)updateUserLocationAnnotationView
+{
+    self.userLocationAnnotationView.center = [self convertCoordinate:self.userLocationAnnotationView.annotation.coordinate toPointToView:self];
+    [self.userLocationAnnotationView setupLayers];
 }
 
 - (void)updateCompass
