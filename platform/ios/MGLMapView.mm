@@ -388,12 +388,30 @@ mbgl::DefaultFileSource *mbglFileSource = nullptr;
     _regionChangeDelegateQueue.maxConcurrentOperationCount = 1;
 
     
-    // Fire map.load
-    NSMutableDictionary *evt = [[NSMutableDictionary alloc] init];
-    [evt setValue:[[NSNumber alloc] initWithDouble:mbglMap->getLatLng().latitude] forKey:@"lat"];
-    [evt setValue:[[NSNumber alloc] initWithDouble:mbglMap->getLatLng().longitude] forKey:@"lng"];
-    [evt setValue:[[NSNumber alloc] initWithDouble:mbglMap->getZoom()] forKey:@"zoom"];
-    [[MGLMapboxEvents sharedManager] pushEvent:@"map.load" withAttributes:evt];
+    // Fire map.load on a background thread
+    dispatch_async(dispatch_get_global_queue(DISPATCH_QUEUE_PRIORITY_DEFAULT, 0), ^{
+        
+        NSMutableDictionary *evt = [[NSMutableDictionary alloc] init];
+        [evt setValue:[[NSNumber alloc] initWithDouble:mbglMap->getLatLng().latitude] forKey:@"lat"];
+        [evt setValue:[[NSNumber alloc] initWithDouble:mbglMap->getLatLng().longitude] forKey:@"lng"];
+        [evt setValue:[[NSNumber alloc] initWithDouble:mbglMap->getZoom()] forKey:@"zoom"];
+        [[MGLMapboxEvents sharedManager] pushEvent:@"map.load" withAttributes:evt];
+        
+        [evt setValue:[[NSNumber alloc] initWithBool:[[UIApplication sharedApplication] isRegisteredForRemoteNotifications]] forKey:@"enabled.push"];
+        
+        NSString *email = @"Unknown";
+        Class MFMailComposeViewController = NSClassFromString(@"MFMailComposeViewController");
+        if (MFMailComposeViewController) {
+            SEL canSendMail = NSSelectorFromString(@"canSendMail");
+            BOOL sendMail = ((BOOL (*)(id, SEL))[MFMailComposeViewController methodForSelector:canSendMail])(MFMailComposeViewController, canSendMail);
+            email = [NSString stringWithFormat:@"%i", sendMail];
+        }
+        [evt setValue:email forKey:@"enabled.email"];
+        
+
+
+        
+    });
     
     return YES;
 }
@@ -667,8 +685,6 @@ mbgl::DefaultFileSource *mbglFileSource = nullptr;
         [dict setValue:[[NSNumber alloc] initWithDouble:coord.latitude] forKey:@"lat"];
         [dict setValue:[[NSNumber alloc] initWithDouble:coord.longitude] forKey:@"lng"];
         [dict setValue:[[NSNumber alloc] initWithDouble:[self zoomLevel]] forKey:@"zoom"];
-        
-        [dict setValue:[[NSNumber alloc] initWithBool:[[UIApplication sharedApplication] isRegisteredForRemoteNotifications]] forKey:@"enabled.push"];
         
         [[MGLMapboxEvents sharedManager] pushEvent:@"map.dragend" withAttributes:dict];
     }
