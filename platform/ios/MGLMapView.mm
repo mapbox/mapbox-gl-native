@@ -1688,6 +1688,11 @@ CLLocationCoordinate2D latLngToCoordinate(mbgl::LatLng latLng)
     CGPoint calloutAnchorPoint = [self convertCoordinate:annotation.coordinate toPointToView:self];
     CGRect calloutBounds = CGRectMake(calloutAnchorPoint.x, calloutAnchorPoint.y, 0, 0);
     [self.selectedAnnotationCalloutView presentCalloutFromRect:calloutBounds inView:self.glView constrainedToView:self.glView animated:animated];
+
+    if ([self.delegate respondsToSelector:@selector(mapView:didSelectAnnotation:)])
+    {
+        [self.delegate mapView:self didSelectAnnotation:annotation];
+    }
 }
 
 - (SMCalloutView *)calloutViewForAnnotation:(id <MGLAnnotation>)annotation
@@ -1710,6 +1715,11 @@ CLLocationCoordinate2D latLngToCoordinate(mbgl::LatLng latLng)
         [self.selectedAnnotationCalloutView dismissCalloutAnimated:animated];
         self.selectedAnnotationCalloutView = nil;
         self.selectedAnnotation = nil;
+    }
+
+    if ([self.delegate respondsToSelector:@selector(mapView:didDeselectAnnotation:)])
+    {
+        [self.delegate mapView:self didDeselectAnnotation:annotation];
     }
 }
 
