@@ -1698,12 +1698,32 @@ CLLocationCoordinate2D latLngToCoordinate(mbgl::LatLng latLng)
     if (annotation == self.selectedAnnotation) return;
 
     [self deselectAnnotation:self.selectedAnnotation animated:NO];
-    self.selectedAnnotation = annotation;
-    self.selectedAnnotationCalloutView = [self calloutViewForAnnotation:annotation];
-    CGPoint calloutAnchorPoint = [self convertCoordinate:annotation.coordinate toPointToView:self];
-    CGRect calloutBounds = CGRectMake(calloutAnchorPoint.x, calloutAnchorPoint.y, 0, 0);
-    [self.selectedAnnotationCalloutView presentCalloutFromRect:calloutBounds inView:self.glView constrainedToView:self.glView animated:animated];
 
+    self.selectedAnnotation = annotation;
+
+    // build the callout
+    self.selectedAnnotationCalloutView = [self calloutViewForAnnotation:annotation];
+
+    // determine symbol in use for point
+    NSString *symbol = MGLDefaultStyleMarkerSymbolName;
+    if ([self.delegate respondsToSelector:@selector(mapView:symbolNameForAnnotation:)])
+    {
+        symbol = [self.delegate mapView:self symbolNameForAnnotation:annotation];
+    }
+    std::string symbolName([symbol cStringUsingEncoding:[NSString defaultCStringEncoding]]);
+
+    // determine anchor point based on symbol
+    CGPoint calloutAnchorPoint = [self convertCoordinate:annotation.coordinate toPointToView:self];
+    double y = mbglMap->getTopOffsetPixelsForAnnotationSymbol(symbolName);
+    CGRect calloutBounds = CGRectMake(calloutAnchorPoint.x, calloutAnchorPoint.y + y, 0, 0);
+
+    // present popup
+    [self.selectedAnnotationCalloutView presentCalloutFromRect:calloutBounds
+                                                        inView:self.glView
+                                             constrainedToView:self.glView
+                                                      animated:animated];
+
+    // notify delegate
     if ([self.delegate respondsToSelector:@selector(mapView:didSelectAnnotation:)])
     {
         [self.delegate mapView:self didSelectAnnotation:annotation];
@@ -1713,12 +1733,10 @@ CLLocationCoordinate2D latLngToCoordinate(mbgl::LatLng latLng)
 - (SMCalloutView *)calloutViewForAnnotation:(id <MGLAnnotation>)annotation
 {
     SMCalloutView *calloutView = [SMCalloutView platformCalloutView];
-    if ([annotation respondsToSelector:@selector(title)]) {
-        calloutView.title = annotation.title;
-    }
-    if ([annotation respondsToSelector:@selector(subtitle)]) {
-        calloutView.subtitle = annotation.subtitle;
-    }
+
+    if ([annotation respondsToSelector:@selector(title)]) calloutView.title = annotation.title;
+    if ([annotation respondsToSelector:@selector(subtitle)]) calloutView.subtitle = annotation.subtitle;
+
     return calloutView;
 }
 
@@ -1726,12 +1744,17 @@ CLLocationCoordinate2D latLngToCoordinate(mbgl::LatLng latLng)
 {
     if ( ! annotation) return;
 
-    if ([self.selectedAnnotation isEqual:annotation]) {
+    if ([self.selectedAnnotation isEqual:annotation])
+    {
+        // dismiss popup
         [self.selectedAnnotationCalloutView dismissCalloutAnimated:animated];
+
+        // clean up
         self.selectedAnnotationCalloutView = nil;
         self.selectedAnnotation = nil;
     }
 
+    // notify delegate
     if ([self.delegate respondsToSelector:@selector(mapView:didDeselectAnnotation:)])
     {
         [self.delegate mapView:self didDeselectAnnotation:annotation];

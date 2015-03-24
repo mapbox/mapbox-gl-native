@@ -545,6 +545,12 @@ void Map::setDefaultPointAnnotationSymbol(const std::string& symbol) {
     annotationManager->setDefaultPointAnnotationSymbol(symbol);
 }
 
+double Map::getTopOffsetPixelsForAnnotationSymbol(const std::string& symbol) {
+    SpritePosition pos = sprite->getSpritePosition(symbol);
+
+    return -pos.height / pos.pixelRatio / 2;
+}
+
 uint32_t Map::addPointAnnotation(const LatLng& point, const std::string& symbol) {
     assert(Environment::currentlyOn(ThreadType::Main));
     std::vector<LatLng> points({ point });
