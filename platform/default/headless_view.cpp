@@ -328,9 +328,8 @@ void HeadlessView::deactivate() {
 #endif
 }
 
-void HeadlessView::invalidate() {
-    assert(map);
-    map->render();
+void HeadlessView::invalidate(std::function<void()> render) {
+    render();
 }
 
 }

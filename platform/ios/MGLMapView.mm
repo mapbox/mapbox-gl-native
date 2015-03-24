@@ -645,7 +645,7 @@ mbgl::DefaultFileSource *mbglFileSource = nullptr;
     
     if ( ! _isTargetingInterfaceBuilder)
     {
-        mbglMap->triggerUpdate();
+        mbglMap->update();
     }
 }
 
@@ -2532,7 +2532,7 @@ class MBGLView : public mbgl::View
         View::resize(width, height, ratio, fbWidth, fbHeight);
     }
 
-    void invalidate() override
+    void invalidate(std::function<void()>) override
     {
         [nativeView performSelectorOnMainThread:@selector(invalidate)
                                      withObject:nil

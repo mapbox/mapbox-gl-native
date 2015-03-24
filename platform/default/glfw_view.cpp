@@ -275,9 +275,6 @@ int GLFWView::run() {
         glfwWaitEvents();
     });
 
-    // Terminate here to save binary shaders
-    map->terminate();
-
     return 0;
 }
 
@@ -293,9 +290,8 @@ void GLFWView::notify() {
     glfwPostEmptyEvent();
 }
 
-void GLFWView::invalidate() {
-    assert(map);
-    map->render();
+void GLFWView::invalidate(std::function<void()> render) {
+    render();
     glfwSwapBuffers(window);
     fps();
 }

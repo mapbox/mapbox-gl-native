@@ -106,24 +106,6 @@ void Painter::setupShaders() {
     if (!gaussianShader) gaussianShader = util::make_unique<GaussianShader>();
 }
 
-void Painter::deleteShaders() {
-    plainShader = nullptr;
-    outlineShader = nullptr;
-    lineShader = nullptr;
-    linepatternShader = nullptr;
-    patternShader = nullptr;
-    iconShader = nullptr;
-    rasterShader = nullptr;
-    sdfGlyphShader = nullptr;
-    sdfIconShader = nullptr;
-    dotShader = nullptr;
-    gaussianShader = nullptr;
-}
-
-void Painter::terminate() {
-    deleteShaders();
-}
-
 void Painter::resize() {
     if (gl_viewport != state.getFramebufferDimensions()) {
         gl_viewport = state.getFramebufferDimensions();

@@ -62,11 +62,6 @@ public:
 
     void setup();
 
-    // Perform cleanup tasks that prepare shutting down the app. This doesn't mean that the
-    // app will be shut down. That means all operations must be automatically be reversed (e.g. through
-    // lazy initialization) in case rendering continues.
-    void terminate();
-
     // Renders the backdrop of the OpenGL view. This also paints in areas where we don't have any
     // tiles whatsoever.
     void clear();
@@ -132,7 +127,6 @@ public:
 
 private:
     void setupShaders();
-    void deleteShaders();
     mat4 translatedMatrix(const mat4& matrix, const std::array<float, 2> &translation, const TileID &id, TranslateAnchorType anchor);
 
     void prepareTile(const Tile& tile);

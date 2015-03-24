@@ -396,8 +396,6 @@ class NativeMapView {
 
     private native void nativeUpdate(long nativeMapViewPtr);
 
-    private native void nativeTerminate(long nativeMapViewPtr);
-
     private native void nativeResize(long nativeMapViewPtr, int width,
             int height, float ratio, int fbWidth, int fbHeight);
 

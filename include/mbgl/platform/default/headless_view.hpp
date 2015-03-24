@@ -33,7 +33,7 @@ public:
     void activate() override;
     void deactivate() override;
     void notify() override;
-    void invalidate() override;
+    void invalidate(std::function<void()> render) override;
     void discard() override;
     std::unique_ptr<StillImage> readStillImage() override;
 

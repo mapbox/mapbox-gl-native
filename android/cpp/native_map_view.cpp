@@ -121,11 +121,11 @@ void NativeMapView::deactivate() {
     }
 }
 
-void NativeMapView::invalidate() {
+void NativeMapView::invalidate(std::function<void()> render) {
     mbgl::Log::Debug(mbgl::Event::Android, "NativeMapView::invalidate");
 
     if ((display != EGL_NO_DISPLAY) && (surface != EGL_NO_SURFACE)) {
-        map.render();
+        render();
 
         if (!eglSwapBuffers(display, surface)) {
             mbgl::Log::Error(mbgl::Event::OpenGL, "eglSwapBuffers() returned error %d",

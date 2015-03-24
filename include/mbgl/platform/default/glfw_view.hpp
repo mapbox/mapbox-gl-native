@@ -17,7 +17,7 @@ public:
     void activate() override;
     void deactivate() override;
     void notify() override;
-    void invalidate() override;
+    void invalidate(std::function<void()> render) override;
 
     static void onKey(GLFWwindow *window, int key, int scancode, int action, int mods);
     static void onScroll(GLFWwindow *window, double xoffset, double yoffset);
