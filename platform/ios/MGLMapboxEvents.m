@@ -30,7 +30,6 @@
 
 static MGLMapboxEvents *sharedManager = nil;
 
-NSString *anonId = nil;
 NSDateFormatter *rfc3339DateFormatter = nil;
 NSString *model;
 NSString *iOSVersion;
@@ -40,7 +39,7 @@ NSNumber *scale;
 - (id) init {
     self = [super init];
     if (self) {
-                
+        
         // Configure Events Infrastructure
         _queue = [[NSMutableArray alloc] init];
         _flushAt = 20;
