@@ -566,7 +566,7 @@ void Map::removeAnnotation(uint32_t annotation) {
 
 void Map::removeAnnotations(const std::vector<uint32_t>& annotations) {
     assert(Environment::currentlyOn(ThreadType::Main));
-    auto result = annotationManager->removeAnnotations(annotations);
+    auto result = annotationManager->removeAnnotations(annotations, *this);
     updateAnnotationTiles(result);
 }
 
@@ -719,10 +719,11 @@ void Map::reloadStyle() {
     const auto styleInfo = data->getStyleInfo();
 
     if (!styleInfo.url.empty()) {
+        const auto base = styleInfo.base;
         // We have a style URL
-        env->request({ Resource::Kind::JSON, styleInfo.url }, [&](const Response &res) {
+        env->request({ Resource::Kind::JSON, styleInfo.url }, [this, base](const Response &res) {
             if (res.status == Response::Successful) {
-                loadStyleJSON(res.data, styleInfo.base);
+                loadStyleJSON(res.data, base);
             } else {
                 Log::Error(Event::Setup, "loading style failed: %s", res.message.c_str());
             }

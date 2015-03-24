@@ -195,17 +195,13 @@ mbgl::DefaultFileSource *mbglFileSource = nullptr;
     }
     else
     {
-        if ([@(mbglMap->getStyleJSON().c_str()) length]) mbglMap->stop();
         mbglMap->setStyleJSON((std::string)[styleJSON cStringUsingEncoding:[NSString defaultCStringEncoding]]);
-        mbglMap->start();
     }
 }
 
 - (void)setStyleURL:(NSString *)filePathURL
 {
-    if ([@(mbglMap->getStyleJSON().c_str()) length]) mbglMap->stop();
     mbglMap->setStyleURL(std::string("asset://") + [filePathURL UTF8String]);
-    mbglMap->start();
 }
 
 - (BOOL)commonInit
@@ -372,6 +368,9 @@ mbgl::DefaultFileSource *mbglFileSource = nullptr;
     //
     _regionChangeDelegateQueue = [NSOperationQueue new];
     _regionChangeDelegateQueue.maxConcurrentOperationCount = 1;
+
+    // start the main loop
+    mbglMap->start();
 
     return YES;
 }
@@ -1648,7 +1647,7 @@ CLLocationCoordinate2D latLngToCoordinate(mbgl::LatLng latLng)
     {
         assert([annotation conformsToProtocol:@protocol(MGLAnnotation)]);
 
-        annotationIDsToRemove.push_back([[self.annotationIDsByAnnotation objectForKey:annotation] unsignedIntValue]);
+        annotationIDsToRemove.push_back([[[self.annotationIDsByAnnotation objectForKey:annotation] objectForKey:MGLAnnotationIDKey] unsignedIntValue]);
         [self.annotationIDsByAnnotation removeObjectForKey:annotation];
     }
 
