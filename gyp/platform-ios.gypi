@@ -49,6 +49,7 @@
           '-framework GLKit',
           '-framework MobileCoreServices',
           '-framework OpenGLES',
+          '-framework QuartzCore',
           '-framework SystemConfiguration',
           '-framework UIKit',
         ],
@@ -64,7 +65,7 @@
       },
 
       'link_settings': {
-        'libraries': [ '<@(libraries)', 'QuartzCore.framework' ],
+        'libraries': [ '<@(libraries)' ],
         'xcode_settings': {
           'OTHER_LDFLAGS': [ '<@(ldflags)' ],
         },
