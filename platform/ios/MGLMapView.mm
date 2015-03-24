@@ -597,8 +597,6 @@ mbgl::DefaultFileSource *mbglFileSource = nullptr;
         mbglMap->moveBy(delta.x, delta.y);
 
         self.centerPoint = CGPointMake(self.centerPoint.x + delta.x, self.centerPoint.y + delta.y);
-
-        [self notifyMapChange:@(mbgl::MapChangeRegionDidChangeAnimated)];
     }
     else if (pan.state == UIGestureRecognizerStateEnded || pan.state == UIGestureRecognizerStateCancelled)
     {
@@ -634,6 +632,10 @@ mbgl::DefaultFileSource *mbglFileSource = nullptr;
                 [weakSelf notifyMapChange:@(mbgl::MapChangeRegionDidChangeAnimated)];
             }];
         }
+        else
+        {
+            [self notifyMapChange:@(mbgl::MapChangeRegionDidChange)];
+        }
     }
 }
 
@@ -667,7 +669,7 @@ mbgl::DefaultFileSource *mbglFileSource = nullptr;
 
         [self unrotateIfNeededAnimated:YES];
 
-        [self notifyMapChange:@(mbgl::MapChangeRegionDidChangeAnimated)];
+        [self notifyMapChange:@(mbgl::MapChangeRegionDidChange)];
     }
 }
 
@@ -705,7 +707,7 @@ mbgl::DefaultFileSource *mbglFileSource = nullptr;
 
         [self unrotateIfNeededAnimated:YES];
 
-        [self notifyMapChange:@(mbgl::MapChangeRegionDidChangeAnimated)];
+        [self notifyMapChange:@(mbgl::MapChangeRegionDidChange)];
     }
 }
 
@@ -899,7 +901,7 @@ mbgl::DefaultFileSource *mbglFileSource = nullptr;
     {
         [self unrotateIfNeededAnimated:YES];
 
-        [self notifyMapChange:@(mbgl::MapChangeRegionDidChangeAnimated)];
+        [self notifyMapChange:@(mbgl::MapChangeRegionDidChange)];
     }
 }
 
@@ -952,6 +954,8 @@ mbgl::DefaultFileSource *mbglFileSource = nullptr;
                      {
                          if (finished)
                          {
+                             [self notifyMapChange:@(animated ? mbgl::MapChangeRegionDidChangeAnimated : mbgl::MapChangeRegionDidChange)];
+
                              [UIView animateWithDuration:MGLAnimationDuration
                                               animations:^
                                               {
@@ -964,6 +968,8 @@ mbgl::DefaultFileSource *mbglFileSource = nullptr;
 - (void)resetPosition
 {
     mbglMap->resetPosition();
+
+    [self notifyMapChange:@(mbgl::MapChangeRegionDidChange)];
 }
 
 - (void)toggleDebug
@@ -978,6 +984,8 @@ mbgl::DefaultFileSource *mbglFileSource = nullptr;
     CGFloat duration = (animated ? MGLAnimationDuration : 0);
 
     mbglMap->setLatLng(coordinateToLatLng(coordinate), secondsAsDuration(duration));
+
+    [self notifyMapChange:@(animated ? mbgl::MapChangeRegionDidChangeAnimated : mbgl::MapChangeRegionDidChange)];
 }
 
 - (void)setCenterCoordinate:(CLLocationCoordinate2D)centerCoordinate
@@ -997,6 +1005,8 @@ mbgl::DefaultFileSource *mbglFileSource = nullptr;
     mbglMap->setLatLngZoom(coordinateToLatLng(centerCoordinate), zoomLevel, secondsAsDuration(duration));
 
     [self unrotateIfNeededAnimated:animated];
+
+    [self notifyMapChange:@(animated ? mbgl::MapChangeRegionDidChangeAnimated : mbgl::MapChangeRegionDidChange)];
 }
 
 - (double)zoomLevel
@@ -1011,6 +1021,8 @@ mbgl::DefaultFileSource *mbglFileSource = nullptr;
     mbglMap->setZoom(zoomLevel, secondsAsDuration(duration));
 
     [self unrotateIfNeededAnimated:animated];
+
+    [self notifyMapChange:@(animated ? mbgl::MapChangeRegionDidChangeAnimated : mbgl::MapChangeRegionDidChange)];
 }
 
 - (void)setZoomLevel:(double)zoomLevel
@@ -1035,6 +1047,8 @@ mbgl::DefaultFileSource *mbglFileSource = nullptr;
     CGFloat duration = (animated ? MGLAnimationDuration : 0);
 
     mbglMap->setBearing(direction * -1, secondsAsDuration(duration));
+
+    [self notifyMapChange:@(animated ? mbgl::MapChangeRegionDidChangeAnimated : mbgl::MapChangeRegionDidChange)];
 }
 
 - (void)setDirection:(CLLocationDirection)direction
@@ -1798,6 +1812,8 @@ CLLocationCoordinate2D latLngToCoordinate(mbgl::LatLng latLng)
         case mbgl::MapChangeRegionWillChange:
         case mbgl::MapChangeRegionWillChangeAnimated:
         {
+            [self deselectAnnotation:self.selectedAnnotation animated:NO];
+
             BOOL animated = ([change unsignedIntegerValue] == mbgl::MapChangeRegionWillChangeAnimated);
 
             @synchronized (self.regionChangeDelegateQueue)
@@ -1840,6 +1856,8 @@ CLLocationCoordinate2D latLngToCoordinate(mbgl::LatLng latLng)
         case mbgl::MapChangeRegionDidChange:
         case mbgl::MapChangeRegionDidChangeAnimated:
         {
+            [self deselectAnnotation:self.selectedAnnotation animated:NO];
+
             [self updateCompass];
 
             if (self.pan.state       == UIGestureRecognizerStateChanged ||
