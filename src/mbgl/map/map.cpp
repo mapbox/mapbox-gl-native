@@ -40,26 +40,6 @@
 
 #include <uv.h>
 
-// Check libuv library version.
-const static bool uvVersionCheck = []() {
-    const unsigned int version = uv_version();
-    const unsigned int major = (version >> 16) & 0xFF;
-    const unsigned int minor = (version >> 8) & 0xFF;
-    const unsigned int patch = version & 0xFF;
-
-#ifndef UV_VERSION_PATCH
-    // 0.10 doesn't have UV_VERSION_PATCH defined, so we "fake" it by using the library patch level.
-    const unsigned int UV_VERSION_PATCH = version & 0xFF;
-#endif
-
-    if (major != UV_VERSION_MAJOR || minor != UV_VERSION_MINOR || patch != UV_VERSION_PATCH) {
-        throw std::runtime_error(mbgl::util::sprintf<96>(
-            "libuv version mismatch: headers report %d.%d.%d, but library reports %d.%d.%d", UV_VERSION_MAJOR,
-            UV_VERSION_MINOR, UV_VERSION_PATCH, major, minor, patch));
-    }
-    return true;
-}();
-
 namespace mbgl {
 
 Map::Map(View& view_, FileSource& fileSource_)
