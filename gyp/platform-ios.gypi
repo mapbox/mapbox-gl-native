@@ -30,8 +30,8 @@
         '../platform/ios/NSDictionary+MGLAdditions.m',
         '../include/mbgl/ios/UIColor+MGLAdditions.h',
         '../platform/ios/UIColor+MGLAdditions.m',
-        '../platform/ios/calloutview/SMCalloutView.h',
-        '../platform/ios/calloutview/SMCalloutView.m',
+        '../platform/ios/vendor/SMCalloutView/SMCalloutView.h',
+        '../platform/ios/vendor/SMCalloutView/SMCalloutView.m',
       ],
 
       'variables': {
