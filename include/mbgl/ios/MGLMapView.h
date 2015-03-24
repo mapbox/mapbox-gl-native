@@ -268,6 +268,15 @@
 *   @return The marker symbol to display for the specified annotation or `nil` if you want to display the default symbol. */
 - (NSString *)mapView:(MGLMapView *)mapView symbolNameForAnnotation:(id <MGLAnnotation>)annotation;
 
+// TODO
+- (BOOL)mapView:(MGLMapView *)mapView annotationCanShowCallout:(id <MGLAnnotation>)annotation;
+
+// TODO
+- (UIView *)mapView:(MGLMapView *)mapView leftCalloutAccessoryViewForAnnotation:(id <MGLAnnotation>)annotation;
+
+// TODO
+- (UIView *)mapView:(MGLMapView *)mapView rightCalloutAccessoryViewForAnnotation:(id <MGLAnnotation>)annotation;
+
 #pragma mark - Responding to Map Position Changes
 
 // Responding to Map Position Changes
