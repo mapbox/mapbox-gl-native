@@ -11,6 +11,7 @@
 
 #include <mbgl/util/std.hpp>
 #include <mbgl/util/uv_detail.hpp>
+#include <mbgl/util/worker.hpp>
 #include <mbgl/util/texture_pool.hpp>
 
 namespace mbgl {
@@ -22,6 +23,11 @@ MapContext::MapContext(Environment& env)
       lineAtlas(util::make_unique<LineAtlas>(512, 512)),
       texturePool(util::make_unique<TexturePool>()),
       painter(util::make_unique<Painter>(*spriteAtlas, *glyphAtlas, *lineAtlas)) {
+}
+
+Worker& MapContext::getWorker() {
+    assert(workers);
+    return *workers;
 }
 
 }

@@ -17,12 +17,16 @@ class Painter;
 class Sprite;
 class StyleSource;
 class StyleLayerGroup;
+class Worker;
 
 class MapContext {
 public:
     MapContext(Environment&);
 
+    Worker& getWorker();
+
 public:
+    std::unique_ptr<Worker> workers;
     const std::unique_ptr<GlyphStore> glyphStore;
     const std::unique_ptr<GlyphAtlas> glyphAtlas;
     const std::unique_ptr<SpriteAtlas> spriteAtlas;
