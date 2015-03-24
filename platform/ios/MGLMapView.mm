@@ -599,7 +599,7 @@ mbgl::DefaultFileSource *mbglFileSource = nullptr;
         mbglMap->moveBy(delta.x, delta.y);
 
         self.centerPoint = CGPointMake(self.centerPoint.x + delta.x, self.centerPoint.y + delta.y);
-        
+
         [self notifyMapChange:@(mbgl::MapChangeRegionDidChangeAnimated)];
     }
     else if (pan.state == UIGestureRecognizerStateEnded || pan.state == UIGestureRecognizerStateCancelled)
@@ -1679,7 +1679,7 @@ CLLocationCoordinate2D latLngToCoordinate(mbgl::LatLng latLng)
     if ( ! annotation) return;
 
     if ( ! [self viewportBounds].contains(coordinateToLatLng(annotation.coordinate))) return;
-    
+
     if (annotation == self.selectedAnnotation) return;
 
     [self deselectAnnotation:self.selectedAnnotation animated:NO];
@@ -1833,7 +1833,7 @@ CLLocationCoordinate2D latLngToCoordinate(mbgl::LatLng latLng)
         case mbgl::MapChangeRegionIsChanging:
         {
             [self deselectAnnotation:self.selectedAnnotation animated:NO];
-            
+
             if ([self.delegate respondsToSelector:@selector(mapViewRegionIsChanging:)])
             {
                 [self.delegate mapViewRegionIsChanging:self];
