@@ -566,7 +566,7 @@ void Map::removeAnnotation(uint32_t annotation) {
 
 void Map::removeAnnotations(const std::vector<uint32_t>& annotations) {
     assert(Environment::currentlyOn(ThreadType::Main));
-    auto result = annotationManager->removeAnnotations(annotations);
+    auto result = annotationManager->removeAnnotations(annotations, *this);
     updateAnnotationTiles(result);
 }
 
