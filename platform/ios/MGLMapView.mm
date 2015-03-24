@@ -1661,6 +1661,11 @@ CLLocationCoordinate2D latLngToCoordinate(mbgl::LatLng latLng)
 
         annotationIDsToRemove.push_back([[[self.annotationIDsByAnnotation objectForKey:annotation] objectForKey:MGLAnnotationIDKey] unsignedIntValue]);
         [self.annotationIDsByAnnotation removeObjectForKey:annotation];
+
+        if (annotation == self.selectedAnnotation)
+        {
+            [self deselectAnnotation:annotation animated:NO];
+        }
     }
 
     mbglMap->removeAnnotations(annotationIDsToRemove);
