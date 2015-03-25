@@ -1113,10 +1113,15 @@ mbgl::DefaultFileSource *mbglFileSource = nullptr;
 
 #pragma mark - Geography -
 
+- (void)setCenterCoordinate:(CLLocationCoordinate2D)coordinate animated:(BOOL)animated preservingTracking:(BOOL)tracking
+{
+    self.userTrackingMode = (tracking ? self.userTrackingMode : MGLUserTrackingModeNone);
+
+    [self setCenterCoordinate:coordinate animated:animated];
+}
+
 - (void)setCenterCoordinate:(CLLocationCoordinate2D)coordinate animated:(BOOL)animated
 {
-    self.userTrackingMode = MGLUserTrackingModeNone;
-
     CGFloat duration = (animated ? MGLAnimationDuration : 0);
 
     mbglMap->setLatLng(coordinateToLatLng(coordinate), secondsAsDuration(duration));
@@ -1172,7 +1177,7 @@ mbgl::DefaultFileSource *mbglFileSource = nullptr;
 
 - (void)zoomToSouthWestCoordinate:(CLLocationCoordinate2D)southWestCoordinate northEastCoordinate:(CLLocationCoordinate2D)northEastCoordinate animated:(BOOL)animated
 {
-    self.userTrackingMode = MGLUserTrackingModeNone;
+    // NOTE: does not disrupt tracking mode
 
     CLLocationCoordinate2D center = CLLocationCoordinate2DMake((northEastCoordinate.latitude + southWestCoordinate.latitude) / 2, (northEastCoordinate.longitude + southWestCoordinate.longitude) / 2);
     
@@ -2162,7 +2167,7 @@ CLLocationCoordinate2D latLngToCoordinate(mbgl::LatLng latLng)
             {
                 // at sufficient detail, just re-center the map; don't zoom
                 //
-                [self setCenterCoordinate:self.userLocation.location.coordinate animated:YES];
+                [self setCenterCoordinate:self.userLocation.location.coordinate animated:YES preservingTracking:YES];
             }
             else
             {
@@ -2191,6 +2196,7 @@ CLLocationCoordinate2D latLngToCoordinate(mbgl::LatLng latLng)
                     desiredSouthWest.latitude  != actualSouthWest.latitude  ||
                     desiredSouthWest.longitude != actualSouthWest.longitude)
                 {
+                    // assumes we won't disrupt tracking mode
                     [self zoomToSouthWestCoordinate:desiredSouthWest northEastCoordinate:desiredNorthEast animated:YES];
                 }
             }
