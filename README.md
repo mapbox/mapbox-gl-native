@@ -55,9 +55,11 @@ If you merely want to install the library for iOS and try it out as an Objective
    - `MapboxGL.bundle` is in your target's *Copy Bundle Resources* build phase.
    - `libMapboxGL.a` is in your target's *Link Binary With Libraries* build phase.
 3. Add the following Cocoa framework dependencies to your target's *Link Binary With Libraries* build phase:
+   - `CoreTelephony.framework`
    - `GLKit.framework`
    - `ImageIO.framework`
    - `MobileCoreServices.framework`
+   - `QuartzCore.framework`
    - `SystemConfiguration.framework`
    - `libc++.dylib`
    - `libsqlite3.dylib`

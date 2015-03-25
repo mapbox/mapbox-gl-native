@@ -73,7 +73,7 @@ Rect<SpriteAtlas::dimension> SpriteAtlas::allocateImage(const size_t pixel_width
     // This is so we can scale down the texture coordinates and pack them
     // into 2 bytes rather than 4 bytes.
     const uint16_t pack_width = (pixel_width + 1) + (4 - (pixel_width + 1) % 4);
-    const uint16_t pack_height = (pixel_height + 1) + (4 - (pixel_width + 1) % 4);
+    const uint16_t pack_height = (pixel_height + 1) + (4 - (pixel_height + 1) % 4);
 
     // We have to allocate a new area in the bin, and store an empty image in it.
     // Add a 1px border around every image.
