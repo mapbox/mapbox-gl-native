@@ -25,24 +25,6 @@ static MGLMetricsLocationManager *sharedManager = nil;
 
 - (id) init {
     if (self = [super init]) {
-        
-        NSString *settingsBundle = [[NSBundle mainBundle] pathForResource:@"Settings" ofType:@"bundle"];
-        if(!settingsBundle) {
-            NSLog(@"Could not find Settings.bundle");
-        } else {
-            NSDictionary *settings = [NSDictionary dictionaryWithContentsOfFile:[settingsBundle stringByAppendingPathComponent:@"Root.plist"]];
-            NSArray *preferences = [settings objectForKey:@"PreferenceSpecifiers"];
-            NSMutableDictionary *defaultsToRegister = [[NSMutableDictionary alloc] initWithCapacity:[preferences count]];
-            for(NSDictionary *prefSpecification in preferences) {
-                NSString *key = [prefSpecification objectForKey:@"Key"];
-                if(key && [[prefSpecification allKeys] containsObject:@"DefaultValue"]) {
-                    [defaultsToRegister setObject:[prefSpecification objectForKey:@"DefaultValue"] forKey:key];
-                }
-            }
-            
-            [[NSUserDefaults standardUserDefaults] registerDefaults:defaultsToRegister];
-        }
-        
         _locationManager = [[CLLocationManager alloc] init];
         _locationManager.distanceFilter = 2;
         _locationManager.desiredAccuracy = kCLLocationAccuracyBest;
@@ -83,9 +65,6 @@ static MGLMetricsLocationManager *sharedManager = nil;
 
 #pragma mark CLLocationManagerDelegate
 - (void)locationManager:(CLLocationManager *)manager didUpdateLocations:(NSArray *)locations {
-    CLLocation *loc = (CLLocation *)[locations objectAtIndex:0];
-    NSLog(@"didUpdateLocations() called  with %lu location in array.  First Location = %f, %f", (unsigned long)locations.count, loc.coordinate.latitude, loc.coordinate.longitude);
-    
     //  Iterate through locations to pass all data
     for (CLLocation *loc in locations) {
         NSMutableDictionary *evt = [[NSMutableDictionary alloc] init];
@@ -123,7 +102,6 @@ static MGLMetricsLocationManager *sharedManager = nil;
             newStatus = @"Unknown";
             break;
     }
-    NSLog(@"MGLMetricsLocationManager didChangeAuthorizationStatus() called.  New Status = %@", newStatus);
 }
 
 @end

@@ -118,14 +118,12 @@ NSNumber *scale;
     
     // Opt Out Checking When Built
     if (![[NSUserDefaults standardUserDefaults] boolForKey:@"mapbox_metrics_enabled_preference"]) {
-        NSLog(@"Mapbox Metrics are not enabled, so clear any currently stored events, and return without sending in data.");
         [_queue removeAllObjects];
         return;
     }
 
     // Add Metrics Disabled App Wide Check
     if ([[NSUserDefaults standardUserDefaults] objectForKey:@"mapbox_metrics_disabled"] != nil) {
-        NSLog(@"Mapbox Metrics have been disabled for this app.");
         [_queue removeAllObjects];
         return;
     }
@@ -143,13 +141,14 @@ NSNumber *scale;
     [evt setObject:self.anonid forKey:@"anonid"];
     
     // mapbox-events-ios stock attributes
-    [evt setValue:[rfc3339DateFormatter stringFromDate:[NSDate date]] forKey:@"deviceTimestamp"];
+    [evt setValue:[rfc3339DateFormatter stringFromDate:[NSDate date]] forKey:@"created"];
     [evt setValue:model forKey:@"model"];
     [evt setValue:iOSVersion forKey:@"operatingSystem"];
     [evt setValue:[self getDeviceOrientation] forKey:@"orientation"];
     [evt setValue:[[NSNumber alloc] initWithFloat:(100 * [UIDevice currentDevice].batteryLevel)] forKey:@"batteryLevel"];
     [evt setValue:scale forKey:@"resolution"];
     [evt setValue:carrier forKey:@"carrier"];
+    [evt setValue:[self getCurrentCellularNetworkConnectionType] forKey:@"cellularNetworkType"];
     [evt setValue:[self getWifiNetworkName] forKey:@"wifi"];
     [evt setValue:[NSNumber numberWithInt:[self getContentSizeScale]] forKey:@"accessibilityFontScale"];
     
@@ -174,7 +173,6 @@ NSNumber *scale;
 
 - (void) flush {
     if (_token == nil) {
-        NSLog(@"token hasn't been set yet, so no events can be sent. return");
         return;
     }
     
@@ -324,14 +322,48 @@ NSNumber *scale;
         if (info) {
             ssid = info[@"SSID"];
         } else {
-            ssid = @"<<NONE>>";
+            ssid = @"NONE";
         }
     } else {
-        ssid = @"<<NONE>>";
+        ssid = @"NONE";
     }
     
     return ssid;
 }
+
+- (NSString *) getCurrentCellularNetworkConnectionType {
+    CTTelephonyNetworkInfo *telephonyInfo = [CTTelephonyNetworkInfo new];
+    NSString *radioTech = telephonyInfo.currentRadioAccessTechnology;
+    
+    if (radioTech == nil) {
+        return @"NONE";
+    } else if ([radioTech isEqualToString:CTRadioAccessTechnologyGPRS]) {
+        return @"GPRS";
+    } else if ([radioTech isEqualToString:CTRadioAccessTechnologyEdge]) {
+        return @"EDGE";
+    } else if ([radioTech isEqualToString:CTRadioAccessTechnologyWCDMA]) {
+        return @"WCDMA";
+    } else if ([radioTech isEqualToString:CTRadioAccessTechnologyHSDPA]) {
+        return @"HSDPA";
+    } else if ([radioTech isEqualToString:CTRadioAccessTechnologyHSUPA]) {
+        return @"HSUPA";
+    } else if ([radioTech isEqualToString:CTRadioAccessTechnologyCDMA1x]) {
+        return @"CDMA1x";
+    } else if ([radioTech isEqualToString:CTRadioAccessTechnologyCDMAEVDORev0]) {
+        return @"CDMAEVDORev0";
+    } else if ([radioTech isEqualToString:CTRadioAccessTechnologyCDMAEVDORevA]) {
+        return @"CDMAEVDORevA";
+    } else if ([radioTech isEqualToString:CTRadioAccessTechnologyCDMAEVDORevB]) {
+        return @"CDMAEVDORevB";
+    } else if ([radioTech isEqualToString:CTRadioAccessTechnologyeHRPD]) {
+        return @"HRPD";
+    } else if ([radioTech isEqualToString:CTRadioAccessTechnologyLTE]) {
+        return @"LTE";
+    } else {
+        return @"Unknown";
+    }
+}
+
 
 
 @end
