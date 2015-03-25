@@ -141,7 +141,7 @@ NSNumber *scale;
     [evt setObject:self.anonid forKey:@"anonid"];
     
     // mapbox-events-ios stock attributes
-    [evt setValue:[rfc3339DateFormatter stringFromDate:[NSDate date]] forKey:@"deviceTimestamp"];
+    [evt setValue:[rfc3339DateFormatter stringFromDate:[NSDate date]] forKey:@"created"];
     [evt setValue:model forKey:@"model"];
     [evt setValue:iOSVersion forKey:@"operatingSystem"];
     [evt setValue:[self getDeviceOrientation] forKey:@"orientation"];
