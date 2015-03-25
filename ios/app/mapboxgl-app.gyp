@@ -10,7 +10,8 @@
       'mac_bundle': 1,
       'mac_bundle_resources': [
         '<!@(find ./img -type f)',
-        './features.geojson'
+        './features.geojson',
+        './Settings.bundle/'
       ],
 
       'dependencies': [
