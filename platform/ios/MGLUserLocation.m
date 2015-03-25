@@ -1,30 +1,36 @@
 #import "MGLUserLocation_Private.h"
 
-@implementation MGLUserLocation {
+@implementation MGLUserLocation
+{
     CLLocationCoordinate2D _coordinate;
 }
 
 @synthesize coordinate = _coordinate;
 
-- (instancetype)init {
-    if (self = [super init]) {
+- (instancetype)init
+{
+    if (self = [super init])
+    {
         _coordinate = CLLocationCoordinate2DMake(MAXFLOAT, MAXFLOAT);
     }
+
     return self;
 }
 
 + (BOOL)automaticallyNotifiesObserversForKey:(NSString *)key
 {
-    return ![key isEqualToString:@"location"] && ![key isEqualToString:@"heading"];
+    return ! [key isEqualToString:@"location"] && ! [key isEqualToString:@"heading"];
 }
 
-+ (NSSet *)keyPathsForValuesAffectingCoordinate {
++ (NSSet *)keyPathsForValuesAffectingCoordinate
+{
     return [NSSet setWithObject:@"location"];
 }
 
 - (void)setLocation:(CLLocation *)newLocation
 {
-    if ([newLocation distanceFromLocation:_location] && newLocation.coordinate.latitude != 0 && newLocation.coordinate.longitude != 0)
+    if ([newLocation distanceFromLocation:_location] && newLocation.coordinate.latitude != 0 &&
+            newLocation.coordinate.longitude != 0)
     {
         [self willChangeValueForKey:@"location"];
         _location = newLocation;

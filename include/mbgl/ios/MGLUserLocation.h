@@ -15,4 +15,3 @@
 @property (nonatomic, readonly) CLHeading *heading;
 
 @end
-

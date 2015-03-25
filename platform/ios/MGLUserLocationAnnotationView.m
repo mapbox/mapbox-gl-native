@@ -14,15 +14,18 @@ const CGFloat MGLTrackingDotRingWidth = 24.0;
 
 #pragma mark -
 
-@implementation MGLUserLocationAnnotationView {
+@implementation MGLUserLocationAnnotationView
+{
     CALayer *_accuracyRingLayer;
     CALayer *_dotBorderLayer;
     CALayer *_dotLayer;
     UIColor *_tintColor;
 }
 
-- (instancetype)initInMapView:(MGLMapView *)mapView {
-    if (self = [super init]) {
+- (instancetype)initInMapView:(MGLMapView *)mapView
+{
+    if (self = [super init])
+    {
         self.annotation = [[MGLUserLocation alloc] init];
         _mapView = mapView;
         [self setupLayers];
@@ -30,7 +33,8 @@ const CGFloat MGLTrackingDotRingWidth = 24.0;
     return self;
 }
 
-- (void)setTintColor:(UIColor *)tintColor {
+- (void)setTintColor:(UIColor *)tintColor
+{
     [super setTintColor:tintColor];
     
     UIImage *tintedForeground = [self dotImage];
@@ -38,9 +42,12 @@ const CGFloat MGLTrackingDotRingWidth = 24.0;
     _dotLayer.contents = (__bridge id)[tintedForeground CGImage];
 }
 
-- (void)setupLayers {
-    if (CLLocationCoordinate2DIsValid(self.annotation.coordinate)) {
-        if (!_accuracyRingLayer && self.annotation.location.horizontalAccuracy) {
+- (void)setupLayers
+{
+    if (CLLocationCoordinate2DIsValid(self.annotation.coordinate))
+    {
+        if ( ! _accuracyRingLayer && self.annotation.location.horizontalAccuracy)
+        {
             UIImage *accuracyRingImage = [self accuracyRingImage];
             _accuracyRingLayer = [CALayer layer];
             _haloLayer.bounds = CGRectMake(0, 0, accuracyRingImage.size.width, accuracyRingImage.size.height);
@@ -50,7 +57,8 @@ const CGFloat MGLTrackingDotRingWidth = 24.0;
             [self.layer addSublayer:_accuracyRingLayer];
         }
         
-        if (!_haloLayer) {
+        if ( ! _haloLayer)
+        {
             UIImage *haloImage = [self trackingDotHaloImage];
             _haloLayer = [CALayer layer];
             _haloLayer.bounds = CGRectMake(0, 0, haloImage.size.width, haloImage.size.height);
@@ -89,7 +97,8 @@ const CGFloat MGLTrackingDotRingWidth = 24.0;
         
         // white dot background with shadow
         //
-        if (!_dotBorderLayer) {
+        if ( ! _dotBorderLayer)
+        {
             CGRect rect = CGRectMake(0, 0, MGLTrackingDotRingWidth * 1.25, MGLTrackingDotRingWidth * 1.25);
             
             UIGraphicsBeginImageContextWithOptions(rect.size, NO, [[UIScreen mainScreen] scale]);
@@ -113,7 +122,8 @@ const CGFloat MGLTrackingDotRingWidth = 24.0;
 
         // pulsing, tinted dot sublayer
         //
-        if (!_dotLayer) {
+        if ( ! _dotLayer)
+        {
             _dotLayer = [CALayer layer];
             _dotLayer.position = CGPointMake(super.layer.bounds.size.width / 2.0, super.layer.bounds.size.height / 2.0);
             
@@ -136,7 +146,8 @@ const CGFloat MGLTrackingDotRingWidth = 24.0;
     }
 }
 
-- (UIImage *)accuracyRingImage {
+- (UIImage *)accuracyRingImage
+{
     CGFloat latRadians = self.annotation.coordinate.latitude * M_PI / 180.0f;
     CGFloat pixelRadius = self.annotation.location.horizontalAccuracy / cos(latRadians) / [self.mapView metersPerPixelAtLatitude:self.annotation.coordinate.latitude];
     UIGraphicsBeginImageContextWithOptions(CGSizeMake(pixelRadius * 2, pixelRadius * 2), NO, [[UIScreen mainScreen] scale]);
@@ -162,7 +173,8 @@ const CGFloat MGLTrackingDotRingWidth = 24.0;
     return finalImage;
 }
 
-- (UIImage *)dotImage {
+- (UIImage *)dotImage
+{
     CGFloat tintedWidth = MGLTrackingDotRingWidth * 0.7;
     
     CGRect rect = CGRectMake(0, 0, tintedWidth, tintedWidth);
