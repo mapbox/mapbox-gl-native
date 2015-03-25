@@ -12,6 +12,7 @@
 #include <forward_list>
 #include <iosfwd>
 #include <string>
+#include <functional>
 
 namespace mbgl {
 
@@ -43,6 +44,12 @@ public:
         inline uint64_t to_uint64() const {
             return ((std::pow(2, z) * y + x) * 32) + z;
         }
+
+        struct Hash {
+            std::size_t operator()(ID const& i) const {
+                return std::hash<uint64_t>()(i.to_uint64());
+            }
+        };
 
         inline bool operator==(const ID& rhs) const {
             return w == rhs.w && z == rhs.z && x == rhs.x && y == rhs.y;

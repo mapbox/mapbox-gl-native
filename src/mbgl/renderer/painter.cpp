@@ -87,6 +87,9 @@ void Painter::setup() {
     // Stencil test
     MBGL_CHECK_ERROR(glEnable(GL_STENCIL_TEST));
     MBGL_CHECK_ERROR(glStencilOp(GL_KEEP, GL_KEEP, GL_REPLACE));
+
+    // Depth test
+    glDepthFunc(GL_LEQUAL);
 }
 
 void Painter::setupShaders() {
@@ -193,7 +196,6 @@ void Painter::setOpaque() {
     if (pass != RenderPass::Opaque) {
         pass = RenderPass::Opaque;
         MBGL_CHECK_ERROR(glDisable(GL_BLEND));
-        depthMask(true);
     }
 }
 
@@ -201,7 +203,6 @@ void Painter::setTranslucent() {
     if (pass != RenderPass::Translucent) {
         pass = RenderPass::Translucent;
         MBGL_CHECK_ERROR(glEnable(GL_BLEND));
-        depthMask(false);
     }
 }
 
