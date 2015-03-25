@@ -19,7 +19,6 @@ const CGFloat MGLTrackingDotRingWidth = 24.0;
     CALayer *_accuracyRingLayer;
     CALayer *_dotBorderLayer;
     CALayer *_dotLayer;
-    UIColor *_tintColor;
 }
 
 - (instancetype)initInMapView:(MGLMapView *)mapView
@@ -29,6 +28,7 @@ const CGFloat MGLTrackingDotRingWidth = 24.0;
         self.annotation = [[MGLUserLocation alloc] init];
         _mapView = mapView;
         [self setupLayers];
+        self.tintColor = _mapView.tintColor;
     }
     return self;
 }
@@ -36,10 +36,14 @@ const CGFloat MGLTrackingDotRingWidth = 24.0;
 - (void)setTintColor:(UIColor *)tintColor
 {
     [super setTintColor:tintColor];
+
+    UIImage *trackingDotHaloImage = [self trackingDotHaloImage];
+    _haloLayer.bounds = CGRectMake(0, 0, trackingDotHaloImage.size.width, trackingDotHaloImage.size.height);
+    _haloLayer.contents = (__bridge id)[trackingDotHaloImage CGImage];
     
-    UIImage *tintedForeground = [self dotImage];
-    _dotLayer.bounds = CGRectMake(0, 0, tintedForeground.size.width, tintedForeground.size.height);
-    _dotLayer.contents = (__bridge id)[tintedForeground CGImage];
+    UIImage *dotImage = [self dotImage];
+    _dotLayer.bounds = CGRectMake(0, 0, dotImage.size.width, dotImage.size.height);
+    _dotLayer.contents = (__bridge id)[dotImage CGImage];
 }
 
 - (void)setupLayers
@@ -124,10 +128,11 @@ const CGFloat MGLTrackingDotRingWidth = 24.0;
         //
         if ( ! _dotLayer)
         {
+            UIImage *dotImage = [self dotImage];
             _dotLayer = [CALayer layer];
+            _dotLayer.bounds = CGRectMake(0, 0, dotImage.size.width, dotImage.size.height);
+            _dotLayer.contents = (__bridge id)[dotImage CGImage];
             _dotLayer.position = CGPointMake(super.layer.bounds.size.width / 2.0, super.layer.bounds.size.height / 2.0);
-            
-            self.tintColor = _mapView.tintColor;
             
             CABasicAnimation *animation = [CABasicAnimation animationWithKeyPath:@"transform"];
             animation.repeatCount = MAXFLOAT;
@@ -165,7 +170,7 @@ const CGFloat MGLTrackingDotRingWidth = 24.0;
 - (UIImage *)trackingDotHaloImage
 {
     UIGraphicsBeginImageContextWithOptions(CGSizeMake(100, 100), NO, [[UIScreen mainScreen] scale]);
-    CGContextSetFillColorWithColor(UIGraphicsGetCurrentContext(), [[self.mapView.tintColor colorWithAlphaComponent:0.75] CGColor]);
+    CGContextSetFillColorWithColor(UIGraphicsGetCurrentContext(), [[self.tintColor colorWithAlphaComponent:0.75] CGColor]);
     CGContextFillEllipseInRect(UIGraphicsGetCurrentContext(), CGRectMake(0, 0, 100, 100));
     UIImage *finalImage = UIGraphicsGetImageFromCurrentImageContext();
     UIGraphicsEndImageContext();
@@ -182,7 +187,7 @@ const CGFloat MGLTrackingDotRingWidth = 24.0;
     UIGraphicsBeginImageContextWithOptions(rect.size, NO, [[UIScreen mainScreen] scale]);
     CGContextRef context = UIGraphicsGetCurrentContext();
     
-    CGContextSetFillColorWithColor(context, [self.mapView.tintColor CGColor]);
+    CGContextSetFillColorWithColor(context, [self.tintColor CGColor]);
     CGContextFillEllipseInRect(context, CGRectMake((rect.size.width - tintedWidth) / 2.0, (rect.size.height - tintedWidth) / 2.0, tintedWidth, tintedWidth));
     
     UIImage *tintedForeground = UIGraphicsGetImageFromCurrentImageContext();
