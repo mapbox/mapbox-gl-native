@@ -1808,9 +1808,6 @@ CLLocationCoordinate2D latLngToCoordinate(mbgl::LatLng latLng)
         CGRect calloutBounds = CGRectMake(calloutAnchorPoint.x, calloutAnchorPoint.y + y, 0, 0);
 
         // consult delegate for left and/or right accessory views
-        UITapGestureRecognizer *calloutAccessoryTap = [[UITapGestureRecognizer alloc] initWithTarget:self
-                                                          action:@selector(handleCalloutAccessoryTapGesture:)];
-
         if ([self.delegate respondsToSelector:@selector(mapView:leftCalloutAccessoryViewForAnnotation:)])
         {
             self.selectedAnnotationCalloutView.leftAccessoryView =
@@ -1818,6 +1815,9 @@ CLLocationCoordinate2D latLngToCoordinate(mbgl::LatLng latLng)
 
             if ([self.selectedAnnotationCalloutView.leftAccessoryView isKindOfClass:[UIControl class]])
             {
+                UITapGestureRecognizer *calloutAccessoryTap = [[UITapGestureRecognizer alloc] initWithTarget:self
+                                                                  action:@selector(handleCalloutAccessoryTapGesture:)];
+
                 [self.selectedAnnotationCalloutView.leftAccessoryView addGestureRecognizer:calloutAccessoryTap];
             }
         }
@@ -1829,6 +1829,9 @@ CLLocationCoordinate2D latLngToCoordinate(mbgl::LatLng latLng)
 
             if ([self.selectedAnnotationCalloutView.rightAccessoryView isKindOfClass:[UIControl class]])
             {
+                UITapGestureRecognizer *calloutAccessoryTap = [[UITapGestureRecognizer alloc] initWithTarget:self
+                                                                  action:@selector(handleCalloutAccessoryTapGesture:)];
+
                 [self.selectedAnnotationCalloutView.rightAccessoryView addGestureRecognizer:calloutAccessoryTap];
             }
         }
