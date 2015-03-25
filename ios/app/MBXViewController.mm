@@ -270,4 +270,16 @@ mbgl::Settings_NSUserDefaults *settings = nullptr;
     }
 }
 
+#pragma clang diagnostic push
+#pragma clang diagnostic ignored "-Wunused-parameter"
+
+#pragma mark - MGLMapViewDelegate
+
+- (BOOL)mapView:(MGLMapView *)mapView annotationCanShowCallout:(id <MGLAnnotation>)annotation
+{
+    return YES;
+}
+
+#pragma clang diagnostic pop
+
 @end
