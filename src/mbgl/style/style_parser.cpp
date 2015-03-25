@@ -347,9 +347,6 @@ std::tuple<bool, std::vector<std::pair<float, T>>> StyleParser::parseStops(JSVal
     return std::tuple<bool, std::vector<std::pair<float, T>>>(true, stops);
 }
 
-template <typename T> inline float defaultBaseValue() { return 1.75; }
-template <> inline float defaultBaseValue<Color>() { return 1.0; }
-
 template <typename T>
 std::tuple<bool, Function<T>> StyleParser::parseFunction(JSVal value, const char *property_name) {
     if (!value.IsObject()) {
@@ -361,7 +358,7 @@ std::tuple<bool, Function<T>> StyleParser::parseFunction(JSVal value, const char
         return std::tuple<bool, Function<T>> { false, ConstantFunction<T>(T()) };
     }
 
-    float base = defaultBaseValue<T>();
+    float base = 1.0f;
 
     if (value.HasMember("base")) {
         JSVal value_base = value["base"];

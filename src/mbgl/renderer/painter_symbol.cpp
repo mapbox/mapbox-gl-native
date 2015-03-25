@@ -122,6 +122,7 @@ void Painter::renderSymbol(SymbolBucket &bucket, const StyleLayer &layer_desc, c
     const auto &layout = *bucket.styleLayout;
 
     MBGL_CHECK_ERROR(glDisable(GL_STENCIL_TEST));
+    depthMask(false);
 
     if (bucket.hasIconData()) {
         bool sdf = bucket.sdfIcons;

@@ -15,6 +15,8 @@ void Painter::renderLine(LineBucket& bucket, const StyleLayer &layer_desc, const
     if (pass == RenderPass::Opaque) return;
     if (!bucket.hasData()) return;
 
+    depthMask(false);
+
     const auto &properties = layer_desc.getProperties<LineProperties>();
     const auto &layout = *bucket.styleLayout;
 

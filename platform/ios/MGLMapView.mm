@@ -25,6 +25,8 @@
 #import "NSDictionary+MGLAdditions.h"
 
 #import <algorithm>
+#import "MGLMapboxEvents.h"
+#import "MGLMetricsLocationManager.h"
 
 // Returns the path to the default cache database on this system.
 const std::string &defaultCacheDatabase() {
@@ -180,6 +182,7 @@ mbgl::DefaultFileSource *mbglFileSource = nullptr;
     if (accessToken)
     {
         mbglMap->setAccessToken((std::string)[accessToken cStringUsingEncoding:[NSString defaultCStringEncoding]]);
+        [[MGLMapboxEvents sharedManager] setToken:accessToken];
     }
 }
 
@@ -218,6 +221,17 @@ mbgl::DefaultFileSource *mbglFileSource = nullptr;
     // setup accessibility
     //
     self.accessibilityLabel = @"Map";
+    
+    // setup Metrics
+    MGLMapboxEvents *events = [MGLMapboxEvents sharedManager];
+    NSString *appName = [[NSBundle mainBundle] objectForInfoDictionaryKey:@"CFBundleName"];
+    NSString *appVersion = [[NSBundle mainBundle] objectForInfoDictionaryKey:@"CFBundleShortVersionString"];
+    if (appName != nil) {
+        events.appName = appName;
+    }
+    if (appVersion != nil) {
+        events.appVersion = appVersion;
+    }
 
     // create GL view
     //
@@ -358,6 +372,9 @@ mbgl::DefaultFileSource *mbglFileSource = nullptr;
     [[NSNotificationCenter defaultCenter] addObserver:self selector:@selector(appDidBackground:) name:UIApplicationDidEnterBackgroundNotification object:nil];
     [[NSNotificationCenter defaultCenter] addObserver:self selector:@selector(appWillForeground:) name:UIApplicationWillEnterForegroundNotification object:nil];
 
+    // Setup MBLocationManager for metrics
+    [MGLMetricsLocationManager sharedManager];
+    
     // set initial position
     //
     mbglMap->setLatLngZoom(mbgl::LatLng(0, 0), mbglMap->getMinZoom());
@@ -370,6 +387,28 @@ mbgl::DefaultFileSource *mbglFileSource = nullptr;
     // start the main loop
     mbglMap->start();
 
+    
+    // Fire map.load on a background thread
+    dispatch_async(dispatch_get_global_queue(DISPATCH_QUEUE_PRIORITY_DEFAULT, 0), ^{
+        
+        NSMutableDictionary *evt = [[NSMutableDictionary alloc] init];
+        [evt setValue:[[NSNumber alloc] initWithDouble:mbglMap->getLatLng().latitude] forKey:@"lat"];
+        [evt setValue:[[NSNumber alloc] initWithDouble:mbglMap->getLatLng().longitude] forKey:@"lng"];
+        [evt setValue:[[NSNumber alloc] initWithDouble:mbglMap->getZoom()] forKey:@"zoom"];
+        [[MGLMapboxEvents sharedManager] pushEvent:@"map.load" withAttributes:evt];
+        
+        [evt setValue:[[NSNumber alloc] initWithBool:[[UIApplication sharedApplication] isRegisteredForRemoteNotifications]] forKey:@"enabled.push"];
+        
+        NSString *email = @"Unknown";
+        Class MFMailComposeViewController = NSClassFromString(@"MFMailComposeViewController");
+        if (MFMailComposeViewController) {
+            SEL canSendMail = NSSelectorFromString(@"canSendMail");
+            BOOL sendMail = ((BOOL (*)(id, SEL))[MFMailComposeViewController methodForSelector:canSendMail])(MFMailComposeViewController, canSendMail);
+            email = [NSString stringWithFormat:@"%i", sendMail];
+        }
+        [evt setValue:email forKey:@"enabled.email"];
+    });
+    
     return YES;
 }
 
@@ -547,6 +586,9 @@ mbgl::DefaultFileSource *mbglFileSource = nullptr;
 
 - (void)appDidBackground:(NSNotification *)notification
 {
+    // Flush Any Events Still In Queue
+    [[MGLMapboxEvents sharedManager] flush];
+    
     mbglMap->stop();
 
     [self.glView deleteDrawable];
@@ -581,6 +623,8 @@ mbgl::DefaultFileSource *mbglFileSource = nullptr;
 
 - (void)handlePanGesture:(UIPanGestureRecognizer *)pan
 {
+    [self trackGestureEvent:@"Pan" forRecognizer:pan];
+    
     if ( ! self.isScrollEnabled) return;
 
     mbglMap->cancelTransitions();
@@ -636,11 +680,23 @@ mbgl::DefaultFileSource *mbglFileSource = nullptr;
         {
             [self notifyMapChange:@(mbgl::MapChangeRegionDidChange)];
         }
+
+        // Send Map Drag End Event
+        CGPoint ptInView = CGPointMake([pan locationInView:pan.view].x, [pan locationInView:pan.view].y);
+        CLLocationCoordinate2D coord = [self convertPoint:ptInView toCoordinateFromView:pan.view];
+        NSMutableDictionary *dict = [[NSMutableDictionary alloc] init];
+        [dict setValue:[[NSNumber alloc] initWithDouble:coord.latitude] forKey:@"lat"];
+        [dict setValue:[[NSNumber alloc] initWithDouble:coord.longitude] forKey:@"lng"];
+        [dict setValue:[[NSNumber alloc] initWithDouble:[self zoomLevel]] forKey:@"zoom"];
+
+        [[MGLMapboxEvents sharedManager] pushEvent:@"map.dragend" withAttributes:dict];
     }
 }
 
 - (void)handlePinchGesture:(UIPinchGestureRecognizer *)pinch
 {
+    [self trackGestureEvent:@"Pinch" forRecognizer:pinch];
+    
     if ( ! self.isZoomEnabled) return;
 
     if (mbglMap->getZoom() <= mbglMap->getMinZoom() && pinch.scale < 1) return;
@@ -675,6 +731,8 @@ mbgl::DefaultFileSource *mbglFileSource = nullptr;
 
 - (void)handleRotateGesture:(UIRotationGestureRecognizer *)rotate
 {
+    [self trackGestureEvent:@"Rotation" forRecognizer:rotate];
+    
     if ( ! self.isRotateEnabled) return;
 
     mbglMap->cancelTransitions();
@@ -713,8 +771,10 @@ mbgl::DefaultFileSource *mbglFileSource = nullptr;
 
 - (void)handleSingleTapGesture:(UITapGestureRecognizer *)singleTap
 {
+    [self trackGestureEvent:@"SingleTap" forRecognizer:singleTap];
+    
     CGPoint tapPoint = [singleTap locationInView:self];
-
+    
     // tolerances based on touch size & typical marker aspect ratio
     CGFloat toleranceWidth  = 50;
     CGFloat toleranceHeight = 75;
@@ -823,6 +883,8 @@ mbgl::DefaultFileSource *mbglFileSource = nullptr;
 
 - (void)handleDoubleTapGesture:(UITapGestureRecognizer *)doubleTap
 {
+    [self trackGestureEvent:@"DoubleTap" forRecognizer:doubleTap];
+    
     if ( ! self.isZoomEnabled) return;
 
     mbglMap->cancelTransitions();
@@ -848,6 +910,8 @@ mbgl::DefaultFileSource *mbglFileSource = nullptr;
 
 - (void)handleTwoFingerTapGesture:(UITapGestureRecognizer *)twoFingerTap
 {
+    [self trackGestureEvent:@"TwoFingerTap" forRecognizer:twoFingerTap];
+    
     if ( ! self.isZoomEnabled) return;
 
     if (mbglMap->getZoom() == mbglMap->getMinZoom()) return;
@@ -875,6 +939,8 @@ mbgl::DefaultFileSource *mbglFileSource = nullptr;
 
 - (void)handleQuickZoomGesture:(UILongPressGestureRecognizer *)quickZoom
 {
+    [self trackGestureEvent:@"QuickZoom" forRecognizer:quickZoom];
+    
     if ( ! self.isZoomEnabled) return;
 
     mbglMap->cancelTransitions();
@@ -917,6 +983,20 @@ mbgl::DefaultFileSource *mbglFileSource = nullptr;
     NSArray *validSimultaneousGestures = @[ self.pan, self.pinch, self.rotate ];
 
     return ([validSimultaneousGestures containsObject:gestureRecognizer] && [validSimultaneousGestures containsObject:otherGestureRecognizer]);
+}
+
+- (void) trackGestureEvent:(NSString *) gesture forRecognizer:(UIGestureRecognizer  *) recognizer
+{
+    // Send Map Zoom Event
+    CGPoint ptInView = CGPointMake([recognizer locationInView:recognizer.view].x, [recognizer locationInView:recognizer.view].y);
+    CLLocationCoordinate2D coord = [self convertPoint:ptInView toCoordinateFromView:recognizer.view];
+    NSMutableDictionary *dict = [[NSMutableDictionary alloc] init];
+    [dict setValue:[[NSNumber alloc] initWithDouble:coord.latitude] forKey:@"lat"];
+    [dict setValue:[[NSNumber alloc] initWithDouble:coord.longitude] forKey:@"lng"];
+    [dict setValue:[[NSNumber alloc] initWithDouble:[self zoomLevel]] forKey:@"zoom"];
+    [dict setValue:gesture forKey:@"gesture"];
+    
+    [[MGLMapboxEvents sharedManager] pushEvent:@"map.click" withAttributes:dict];
 }
 
 #pragma mark - Properties -
