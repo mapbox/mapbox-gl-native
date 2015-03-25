@@ -21,7 +21,7 @@ static NSArray *const kStyleNames = @[
 
 static NSString *const kStyleVersion = @"v7";
 
-@interface MBXViewController () <UIActionSheetDelegate, CLLocationManagerDelegate>
+@interface MBXViewController () <UIActionSheetDelegate, CLLocationManagerDelegate, MGLMapViewDelegate>
 
 @property (nonatomic) MGLMapView *mapView;
 @property (nonatomic) CLLocationManager *locationManager;
@@ -69,6 +69,8 @@ mbgl::Settings_NSUserDefaults *settings = nullptr;
     [self.view addSubview:self.mapView];
 
     self.mapView.viewControllerForLayoutGuides = self;
+
+    self.mapView.delegate = self;
 
     self.view.tintColor = kTintColor;
     self.navigationController.navigationBar.tintColor = kTintColor;
@@ -336,6 +338,13 @@ mbgl::Settings_NSUserDefaults *settings = nullptr;
     }
 
     [self.locationManager stopUpdatingLocation];
+}
+
+#pragma mark - MGLMapViewDelegate
+
+- (BOOL)mapView:(MGLMapView *)mapView annotationCanShowCallout:(id <MGLAnnotation>)annotation
+{
+    return YES;
 }
 
 #pragma clang diagnostic pop
