@@ -1708,7 +1708,7 @@ CLLocationCoordinate2D latLngToCoordinate(mbgl::LatLng latLng)
 
     self.selectedAnnotation = annotation;
 
-    if ([self.delegate respondsToSelector:@selector(mapView:annotationCanShowCallout:)] &&
+    if (annotation.title && [self.delegate respondsToSelector:@selector(mapView:annotationCanShowCallout:)] &&
         [self.delegate mapView:self annotationCanShowCallout:annotation])
     {
         // build the callout
