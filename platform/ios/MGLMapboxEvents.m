@@ -322,10 +322,10 @@ NSNumber *scale;
         if (info) {
             ssid = info[@"SSID"];
         } else {
-            ssid = @"<<NONE>>";
+            ssid = @"NONE";
         }
     } else {
-        ssid = @"<<NONE>>";
+        ssid = @"NONE";
     }
     
     return ssid;
