@@ -107,6 +107,8 @@ mbgl::Settings_NSUserDefaults *settings = nullptr;
         settings->zoom = self.mapView.zoomLevel;
         settings->bearing = self.mapView.direction;
         settings->debug = self.mapView.isDebugActive;
+        settings->userTrackingMode = self.mapView.userTrackingMode;
+        settings->showsUserLocation = self.mapView.showsUserLocation;
         settings->save();
     }
 }
@@ -117,6 +119,8 @@ mbgl::Settings_NSUserDefaults *settings = nullptr;
         settings->load();
         [self.mapView setCenterCoordinate:CLLocationCoordinate2DMake(settings->latitude, settings->longitude) zoomLevel:settings->zoom animated:NO];
         self.mapView.direction = settings->bearing;
+        self.mapView.userTrackingMode = settings->userTrackingMode;
+        self.mapView.showsUserLocation = settings->showsUserLocation;
         [self.mapView setDebugActive:settings->debug];
     }
 }

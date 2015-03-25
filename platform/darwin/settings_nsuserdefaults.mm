@@ -6,11 +6,15 @@ using namespace mbgl;
 
 Settings_NSUserDefaults::Settings_NSUserDefaults()
 {
-    [[NSUserDefaults standardUserDefaults] registerDefaults:@{ @"longitude" : @(longitude),
-                                                               @"latitude"  : @(latitude),
-                                                               @"zoom"      : @(zoom),
-                                                               @"bearing"   : @(bearing),
-                                                               @"debug"     : @(debug) }];
+    [[NSUserDefaults standardUserDefaults] registerDefaults:@{
+        @"longitude"         : @(longitude),
+        @"latitude"          : @(latitude),
+        @"zoom"              : @(zoom),
+        @"bearing"           : @(bearing),
+        @"userTrackingMode"  : @(userTrackingMode),
+        @"showsUserLocation" : @(showsUserLocation),
+        @"debug"             : @(debug),
+    }];
     load();
 }
 
@@ -23,15 +27,27 @@ void Settings_NSUserDefaults::load()
     zoom      = [settings[@"zoom"]      doubleValue];
     bearing   = [settings[@"bearing"]   doubleValue];
     debug     = [settings[@"debug"]     boolValue];
+    
+    unsigned uncheckedTrackingMode = [settings[@"trackingMode"] unsignedIntValue];
+    if (uncheckedTrackingMode > MGLUserTrackingModeNone &&
+        uncheckedTrackingMode <= MGLUserTrackingModeFollowWithHeading)
+    {
+        userTrackingMode = (MGLUserTrackingMode)uncheckedTrackingMode;
+    }
+    showsUserLocation = [settings[@"showsUserLocation"] boolValue];
 }
 
 void Settings_NSUserDefaults::save()
 {
-    [[NSUserDefaults standardUserDefaults] setValuesForKeysWithDictionary:@{ @"longitude" : @(longitude),
-                                                                             @"latitude"  : @(latitude),
-                                                                             @"zoom"      : @(zoom),
-                                                                             @"bearing"   : @(bearing),
-                                                                             @"debug"     : @(debug) }];
+    [[NSUserDefaults standardUserDefaults] setValuesForKeysWithDictionary:@{
+        @"longitude"         : @(longitude),
+        @"latitude"          : @(latitude),
+        @"zoom"              : @(zoom),
+        @"bearing"           : @(bearing),
+        @"userTrackingMode"  : @(userTrackingMode),
+        @"showsUserLocation" : @(showsUserLocation),
+        @"debug"             : @(debug),
+    }];
     [[NSUserDefaults standardUserDefaults] synchronize];
 }
 
