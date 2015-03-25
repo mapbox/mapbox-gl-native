@@ -181,7 +181,7 @@ mbgl::DefaultFileSource *mbglFileSource = nullptr;
 {
     if (accessToken)
     {
-        mbglMap->setAccessToken((std::string)[accessToken cStringUsingEncoding:[NSString defaultCStringEncoding]]);
+        mbglMap->setAccessToken((std::string)[accessToken UTF8String]);
         [[MGLMapboxEvents sharedManager] setToken:accessToken];
     }
 }
@@ -196,7 +196,7 @@ mbgl::DefaultFileSource *mbglFileSource = nullptr;
     }
     else
     {
-        mbglMap->setStyleJSON((std::string)[styleJSON cStringUsingEncoding:[NSString defaultCStringEncoding]]);
+        mbglMap->setStyleJSON((std::string)[styleJSON UTF8String]);
     }
 }
 
@@ -293,7 +293,7 @@ mbgl::DefaultFileSource *mbglFileSource = nullptr;
     // setup annotations
     //
     _annotationIDsByAnnotation = [NSMapTable mapTableWithKeyOptions:NSMapTableStrongMemory valueOptions:NSMapTableStrongMemory];
-    std::string defaultSymbolName([MGLDefaultStyleMarkerSymbolName cStringUsingEncoding:[NSString defaultCStringEncoding]]);
+    std::string defaultSymbolName([MGLDefaultStyleMarkerSymbolName UTF8String]);
     mbglMap->setDefaultPointAnnotationSymbol(defaultSymbolName);
 
     // setup logo bug
@@ -1202,14 +1202,14 @@ CLLocationCoordinate2D latLngToCoordinate(mbgl::LatLng latLng)
 {
     const std::string styleJSON = mbglMap->getStyleJSON();
 
-    return [NSJSONSerialization JSONObjectWithData:[@(styleJSON.c_str()) dataUsingEncoding:[NSString defaultCStringEncoding]] options:0 error:nil];
+    return [NSJSONSerialization JSONObjectWithData:[@(styleJSON.c_str()) dataUsingEncoding:NSUTF8StringEncoding] options:0 error:nil];
 }
 
 - (void)setRawStyle:(NSDictionary *)style
 {
     NSData *data = [NSJSONSerialization dataWithJSONObject:style options:0 error:nil];
 
-    [self setStyleJSON:[[NSString alloc] initWithData:data encoding:[NSString defaultCStringEncoding]]];
+    [self setStyleJSON:[[NSString alloc] initWithData:data encoding:NSUTF8StringEncoding]];
 }
 
 - (NSArray *)bundledStyleNames
@@ -1315,7 +1315,7 @@ CLLocationCoordinate2D latLngToCoordinate(mbgl::LatLng latLng)
 
     for (NSString *appliedClass in appliedClasses)
     {
-        newAppliedClasses.insert(newAppliedClasses.end(), [appliedClass cStringUsingEncoding:[NSString defaultCStringEncoding]]);
+        newAppliedClasses.insert(newAppliedClasses.end(), [appliedClass UTF8String]);
     }
 
     mbglMap->setDefaultTransitionDuration(secondsAsDuration(transitionDuration));
@@ -1712,7 +1712,7 @@ CLLocationCoordinate2D latLngToCoordinate(mbgl::LatLng latLng)
             symbolName = [self.delegate mapView:self symbolNameForAnnotation:annotation];
         }
 
-        symbols.push_back((symbolName ? [symbolName cStringUsingEncoding:[NSString defaultCStringEncoding]] : ""));
+        symbols.push_back((symbolName ? [symbolName UTF8String] : ""));
     }
 
     std::vector<uint32_t> annotationIDs = mbglMap->addPointAnnotations(latLngs, symbols);
