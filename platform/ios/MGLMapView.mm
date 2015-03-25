@@ -2503,7 +2503,7 @@ CLLocationCoordinate2D latLngToCoordinate(mbgl::LatLng latLng)
     CGPoint userPoint = [self convertCoordinate:self.userLocation.coordinate toPointToView:self];
 
     if (CGRectContainsPoint(CGRectInset(self.bounds, -MGLAnnotationUpdateViewportOutset.width,
-        MGLAnnotationUpdateViewportOutset.height), userPoint))
+        -MGLAnnotationUpdateViewportOutset.height), userPoint))
     {
         self.userLocationAnnotationView.center = userPoint;
 
