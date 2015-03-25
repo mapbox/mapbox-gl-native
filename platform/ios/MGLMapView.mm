@@ -1800,7 +1800,7 @@ CLLocationCoordinate2D latLngToCoordinate(mbgl::LatLng latLng)
         {
             symbol = [self.delegate mapView:self symbolNameForAnnotation:annotation];
         }
-        std::string symbolName([symbol cStringUsingEncoding:[NSString defaultCStringEncoding]]);
+        std::string symbolName([symbol UTF8String]);
 
         // determine anchor point based on symbol
         CGPoint calloutAnchorPoint = [self convertCoordinate:annotation.coordinate toPointToView:self];
