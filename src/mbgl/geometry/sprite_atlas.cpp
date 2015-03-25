@@ -171,31 +171,31 @@ void SpriteAtlas::copy(const Rect<dimension>& dst, const SpritePosition& src, co
     if (wrap) {
         // We're copying from the same image so we don't have to scale again.
         const uint32_t border = 1;
+        const uint32_t borderX = dstPos.x != 0 ? border : 0;
+        const uint32_t borderY = dstPos.y != 0 ? border : 0;
+
         // Left border
-        if (dstPos.x >= border) {
-            util::nearestNeighborScale(
-                dstData, dstSize, { dstPos.x + dstPos.w - border - 1, dstPos.y, border, dstPos.h },
-                dstData, dstSize, { dstPos.x - border, dstPos.y, border, dstPos.h });
-        }
+        util::nearestNeighborScale(
+            dstData, dstSize, { dstPos.x + dstPos.w - borderX, dstPos.y, borderX, dstPos.h },
+            dstData, dstSize, { dstPos.x - borderX, dstPos.y, borderX, dstPos.h });
+
         // Right border
         util::nearestNeighborScale(dstData, dstSize, { dstPos.x, dstPos.y, border, dstPos.h },
                                    dstData, dstSize,
                                    { dstPos.x + dstPos.w, dstPos.y, border, dstPos.h });
 
         // Top border
-        if (dstPos.y >= border) {
-            util::nearestNeighborScale(
-                dstData, dstSize, { dstPos.x - border, dstPos.y + dstPos.h - border - 1,
-                                    dstPos.w + 2 * border, border },
-                dstData, dstSize,
-                { dstPos.x - border, dstPos.y - border, dstPos.w + 2 * border, border });
-        }
+        util::nearestNeighborScale(
+            dstData, dstSize, { dstPos.x - borderX, dstPos.y + dstPos.h - borderY,
+                                dstPos.w + border + borderX, borderY },
+            dstData, dstSize,
+            { dstPos.x - borderX, dstPos.y - borderY, dstPos.w + 2 * borderX, borderY });
 
         // Bottom border
         util::nearestNeighborScale(
-            dstData, dstSize, { dstPos.x - border, dstPos.y, dstPos.w + 2 * border, border },
+            dstData, dstSize, { dstPos.x - borderX, dstPos.y, dstPos.w + 2 * borderX, border },
             dstData, dstSize,
-            { dstPos.x - border, dstPos.y + dstPos.h, dstPos.w + 2 * border, border });
+            { dstPos.x - borderX, dstPos.y + dstPos.h, dstPos.w + border + borderX, border });
     }
 
     dirty = true;
