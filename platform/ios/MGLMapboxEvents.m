@@ -118,14 +118,12 @@ NSNumber *scale;
     
     // Opt Out Checking When Built
     if (![[NSUserDefaults standardUserDefaults] boolForKey:@"mapbox_metrics_enabled_preference"]) {
-        NSLog(@"Mapbox Metrics are not enabled, so clear any currently stored events, and return without sending in data.");
         [_queue removeAllObjects];
         return;
     }
 
     // Add Metrics Disabled App Wide Check
     if ([[NSUserDefaults standardUserDefaults] objectForKey:@"mapbox_metrics_disabled"] != nil) {
-        NSLog(@"Mapbox Metrics have been disabled for this app.");
         [_queue removeAllObjects];
         return;
     }
@@ -174,7 +172,6 @@ NSNumber *scale;
 
 - (void) flush {
     if (_token == nil) {
-        NSLog(@"token hasn't been set yet, so no events can be sent. return");
         return;
     }
     
