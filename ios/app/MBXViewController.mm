@@ -252,7 +252,18 @@ mbgl::Settings_NSUserDefaults *settings = nullptr;
 
 - (void)locateUser
 {
-    self.mapView.userTrackingMode = MGLUserTrackingModeFollowWithHeading;
+    if (self.mapView.userTrackingMode == MGLUserTrackingModeNone)
+    {
+        self.mapView.userTrackingMode = MGLUserTrackingModeFollow;
+    }
+    else if (self.mapView.userTrackingMode == MGLUserTrackingModeFollow)
+    {
+        self.mapView.userTrackingMode = MGLUserTrackingModeFollowWithHeading;
+    }
+    else
+    {
+        self.mapView.userTrackingMode = MGLUserTrackingModeNone;
+    }
 }
 
 #pragma mark - Destruction
