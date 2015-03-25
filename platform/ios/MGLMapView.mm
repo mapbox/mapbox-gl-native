@@ -2378,6 +2378,9 @@ CLLocationCoordinate2D latLngToCoordinate(mbgl::LatLng latLng)
         case mbgl::MapChangeRegionWillChange:
         case mbgl::MapChangeRegionWillChangeAnimated:
         {
+            [self updateUserLocationAnnotationView];
+            [self updateCompass];
+
             [self deselectAnnotation:self.selectedAnnotation animated:NO];
 
             BOOL animated = ([change unsignedIntegerValue] == mbgl::MapChangeRegionWillChangeAnimated);
@@ -2413,6 +2416,7 @@ CLLocationCoordinate2D latLngToCoordinate(mbgl::LatLng latLng)
         case mbgl::MapChangeRegionIsChanging:
         {
             [self updateUserLocationAnnotationView];
+            [self updateCompass];
 
             if ([self.delegate respondsToSelector:@selector(mapViewRegionIsChanging:)])
             {
@@ -2422,6 +2426,7 @@ CLLocationCoordinate2D latLngToCoordinate(mbgl::LatLng latLng)
         case mbgl::MapChangeRegionDidChange:
         case mbgl::MapChangeRegionDidChangeAnimated:
         {
+            [self updateUserLocationAnnotationView];
             [self updateCompass];
 
             if (self.pan.state       == UIGestureRecognizerStateChanged ||
