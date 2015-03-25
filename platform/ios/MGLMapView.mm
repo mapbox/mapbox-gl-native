@@ -797,7 +797,18 @@ mbgl::DefaultFileSource *mbglFileSource = nullptr;
     [self trackGestureEvent:@"SingleTap" forRecognizer:singleTap];
     
     CGPoint tapPoint = [singleTap locationInView:self];
-    
+
+    if (self.userLocationVisible && ! [self.selectedAnnotation isEqual:self.userLocation])
+    {
+        CGRect userLocationRect = CGRectMake(tapPoint.x - 15, tapPoint.y - 15, 30, 30);
+
+        if (CGRectContainsPoint(userLocationRect, [self convertCoordinate:self.userLocation.coordinate toPointToView:self]))
+        {
+            [self selectAnnotation:self.userLocation animated:YES];
+            return;
+        }
+    }
+
     // tolerances based on touch size & typical marker aspect ratio
     CGFloat toleranceWidth  = 40;
     CGFloat toleranceHeight = 60;
@@ -1840,18 +1851,28 @@ CLLocationCoordinate2D latLngToCoordinate(mbgl::LatLng latLng)
         // build the callout
         self.selectedAnnotationCalloutView = [self calloutViewForAnnotation:annotation];
 
-        // determine symbol in use for point
-        NSString *symbol = MGLDefaultStyleMarkerSymbolName;
-        if ([self.delegate respondsToSelector:@selector(mapView:symbolNameForAnnotation:)])
-        {
-            symbol = [self.delegate mapView:self symbolNameForAnnotation:annotation];
-        }
-        std::string symbolName([symbol cStringUsingEncoding:[NSString defaultCStringEncoding]]);
+        CGRect calloutBounds;
 
-        // determine anchor point based on symbol
-        CGPoint calloutAnchorPoint = [self convertCoordinate:annotation.coordinate toPointToView:self];
-        double y = mbglMap->getTopOffsetPixelsForAnnotationSymbol(symbolName);
-        CGRect calloutBounds = CGRectMake(calloutAnchorPoint.x, calloutAnchorPoint.y + y, 0, 0);
+        if ([annotation isEqual:self.userLocation])
+        {
+            CGPoint calloutAnchorPoint = [self convertCoordinate:annotation.coordinate toPointToView:self];
+            calloutBounds = CGRectMake(calloutAnchorPoint.x - 1, calloutAnchorPoint.y - 13, 0, 0);
+        }
+        else
+        {
+            // determine symbol in use for point
+            NSString *symbol = MGLDefaultStyleMarkerSymbolName;
+            if ([self.delegate respondsToSelector:@selector(mapView:symbolNameForAnnotation:)])
+            {
+                symbol = [self.delegate mapView:self symbolNameForAnnotation:annotation];
+            }
+            std::string symbolName([symbol cStringUsingEncoding:[NSString defaultCStringEncoding]]);
+
+            // determine anchor point based on symbol
+            CGPoint calloutAnchorPoint = [self convertCoordinate:annotation.coordinate toPointToView:self];
+            double y = mbglMap->getTopOffsetPixelsForAnnotationSymbol(symbolName);
+            calloutBounds = CGRectMake(calloutAnchorPoint.x - 1, calloutAnchorPoint.y + y, 0, 0);
+        }
 
         // consult delegate for left and/or right accessory views
         if ([self.delegate respondsToSelector:@selector(mapView:leftCalloutAccessoryViewForAnnotation:)])
