@@ -1905,6 +1905,8 @@ CLLocationCoordinate2D latLngToCoordinate(mbgl::LatLng latLng)
     if ([annotation respondsToSelector:@selector(title)]) calloutView.title = annotation.title;
     if ([annotation respondsToSelector:@selector(subtitle)]) calloutView.subtitle = annotation.subtitle;
 
+    calloutView.tintColor = self.tintColor;
+
     return calloutView;
 }
 
