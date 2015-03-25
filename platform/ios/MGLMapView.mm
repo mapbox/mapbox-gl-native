@@ -645,11 +645,11 @@ mbgl::DefaultFileSource *mbglFileSource = nullptr;
 
     mbglMap->cancelTransitions();
 
-    self.userTrackingMode = MGLUserTrackingModeNone;
-
     if (pan.state == UIGestureRecognizerStateBegan)
     {
         self.centerPoint = CGPointMake(0, 0);
+
+        self.userTrackingMode = MGLUserTrackingModeNone;
     }
     else if (pan.state == UIGestureRecognizerStateChanged)
     {
@@ -723,13 +723,13 @@ mbgl::DefaultFileSource *mbglFileSource = nullptr;
 
     mbglMap->cancelTransitions();
 
-    self.userTrackingMode = MGLUserTrackingModeNone;
-
     if (pinch.state == UIGestureRecognizerStateBegan)
     {
         mbglMap->startScaling();
 
         self.scale = mbglMap->getScale();
+
+        self.userTrackingMode = MGLUserTrackingModeNone;
     }
     else if (pinch.state == UIGestureRecognizerStateChanged)
     {
@@ -759,13 +759,13 @@ mbgl::DefaultFileSource *mbglFileSource = nullptr;
 
     mbglMap->cancelTransitions();
 
-    self.userTrackingMode = MGLUserTrackingModeNone;
-
     if (rotate.state == UIGestureRecognizerStateBegan)
     {
         mbglMap->startRotating();
 
         self.angle = [MGLMapView degreesToRadians:mbglMap->getBearing()] * -1;
+
+        self.userTrackingMode = MGLUserTrackingModeNone;
     }
     else if (rotate.state == UIGestureRecognizerStateChanged)
     {
@@ -924,9 +924,11 @@ mbgl::DefaultFileSource *mbglFileSource = nullptr;
 
     mbglMap->cancelTransitions();
 
-    self.userTrackingMode = MGLUserTrackingModeNone;
-
-    if (doubleTap.state == UIGestureRecognizerStateEnded)
+    if (doubleTap.state == UIGestureRecognizerStateBegan)
+    {
+        self.userTrackingMode = MGLUserTrackingModeNone;
+    }
+    else if (doubleTap.state == UIGestureRecognizerStateEnded)
     {
         mbglMap->scaleBy(2, [doubleTap locationInView:doubleTap.view].x, [doubleTap locationInView:doubleTap.view].y, secondsAsDuration(MGLAnimationDuration));
 
@@ -955,9 +957,11 @@ mbgl::DefaultFileSource *mbglFileSource = nullptr;
 
     mbglMap->cancelTransitions();
 
-    self.userTrackingMode = MGLUserTrackingModeNone;
-
-    if (twoFingerTap.state == UIGestureRecognizerStateEnded)
+    if (twoFingerTap.state == UIGestureRecognizerStateBegan)
+    {
+        self.userTrackingMode = MGLUserTrackingModeNone;
+    }
+    else if (twoFingerTap.state == UIGestureRecognizerStateEnded)
     {
         mbglMap->scaleBy(0.5, [twoFingerTap locationInView:twoFingerTap.view].x, [twoFingerTap locationInView:twoFingerTap.view].y, secondsAsDuration(MGLAnimationDuration));
 
@@ -984,13 +988,13 @@ mbgl::DefaultFileSource *mbglFileSource = nullptr;
 
     mbglMap->cancelTransitions();
 
-    self.userTrackingMode = MGLUserTrackingModeNone;
-
     if (quickZoom.state == UIGestureRecognizerStateBegan)
     {
         self.scale = mbglMap->getScale();
 
         self.quickZoomStart = [quickZoom locationInView:quickZoom.view].y;
+
+        self.userTrackingMode = MGLUserTrackingModeNone;
     }
     else if (quickZoom.state == UIGestureRecognizerStateChanged)
     {
@@ -1026,7 +1030,7 @@ mbgl::DefaultFileSource *mbglFileSource = nullptr;
     return ([validSimultaneousGestures containsObject:gestureRecognizer] && [validSimultaneousGestures containsObject:otherGestureRecognizer]);
 }
 
-- (void) trackGestureEvent:(NSString *) gesture forRecognizer:(UIGestureRecognizer  *) recognizer
+- (void)trackGestureEvent:(NSString *)gesture forRecognizer:(UIGestureRecognizer *)recognizer
 {
     // Send Map Zoom Event
     CGPoint ptInView = CGPointMake([recognizer locationInView:recognizer.view].x, [recognizer locationInView:recognizer.view].y);
