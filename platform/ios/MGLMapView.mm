@@ -140,30 +140,8 @@ NSString *const MGLAnnotationIDKey = @"MGLAnnotationIDKey";
 
 @end
 
-@implementation MGLMapView {
-    BOOL _delegateHasBeforeMapMove;
-    BOOL _delegateHasAfterMapMove;
-    BOOL _delegateHasBeforeMapZoom;
-    BOOL _delegateHasAfterMapZoom;
-    BOOL _delegateHasMapViewRegionDidChange;
-    BOOL _delegateHasDoubleTapOnMap;
-    BOOL _delegateHasSingleTapOnMap;
-    BOOL _delegateHasSingleTapTwoFingersOnMap;
-    BOOL _delegateHasLongPressOnMap;
-    BOOL _delegateHasTapOnAnnotation;
-    BOOL _delegateHasDoubleTapOnAnnotation;
-    BOOL _delegateHasLongPressOnAnnotation;
-    BOOL _delegateHasTapOnCalloutAccessoryControlForAnnotation;
-    BOOL _delegateHasTapOnLabelForAnnotation;
-    BOOL _delegateHasDoubleTapOnLabelForAnnotation;
-    BOOL _delegateHasShouldDragAnnotation;
-    BOOL _delegateHasDidChangeDragState;
-    BOOL _delegateHasLayerForAnnotation;
-    BOOL _delegateHasAnnotationSorting;
-    BOOL _delegateHasWillHideLayerForAnnotation;
-    BOOL _delegateHasDidHideLayerForAnnotation;
-    BOOL _delegateHasDidSelectAnnotation;
-    BOOL _delegateHasDidDeselectAnnotation;
+@implementation MGLMapView
+{
     BOOL _delegateHasWillStartLocatingUser;
     BOOL _delegateHasDidStopLocatingUser;
     BOOL _delegateHasDidUpdateUserLocation;
@@ -510,44 +488,14 @@ mbgl::DefaultFileSource *mbglFileSource = nullptr;
     }
 }
 
-- (void)setDelegate:(id<MGLMapViewDelegate>)delegate {
+- (void)setDelegate:(id<MGLMapViewDelegate>)delegate
+{
     if (_delegate == delegate) {
         return;
     }
     
     _delegate = delegate;
-    
-    _delegateHasBeforeMapMove = [_delegate respondsToSelector:@selector(beforeMapMove:byUser:)];
-    _delegateHasAfterMapMove  = [_delegate respondsToSelector:@selector(afterMapMove:byUser:)];
-    
-    _delegateHasBeforeMapZoom = [_delegate respondsToSelector:@selector(beforeMapZoom:byUser:)];
-    _delegateHasAfterMapZoom  = [_delegate respondsToSelector:@selector(afterMapZoom:byUser:)];
-    
-    _delegateHasMapViewRegionDidChange = [_delegate respondsToSelector:@selector(mapViewRegionDidChange:)];
-    
-    _delegateHasDoubleTapOnMap = [_delegate respondsToSelector:@selector(doubleTapOnMap:at:)];
-    _delegateHasSingleTapOnMap = [_delegate respondsToSelector:@selector(singleTapOnMap:at:)];
-    _delegateHasSingleTapTwoFingersOnMap = [_delegate respondsToSelector:@selector(singleTapTwoFingersOnMap:at:)];
-    _delegateHasLongPressOnMap = [_delegate respondsToSelector:@selector(longPressOnMap:at:)];
-    
-    _delegateHasTapOnAnnotation = [_delegate respondsToSelector:@selector(tapOnAnnotation:onMap:)];
-    _delegateHasDoubleTapOnAnnotation = [_delegate respondsToSelector:@selector(doubleTapOnAnnotation:onMap:)];
-    _delegateHasLongPressOnAnnotation = [_delegate respondsToSelector:@selector(longPressOnAnnotation:onMap:)];
-    _delegateHasTapOnCalloutAccessoryControlForAnnotation = [_delegate respondsToSelector:@selector(tapOnCalloutAccessoryControl:forAnnotation:onMap:)];
-    _delegateHasTapOnLabelForAnnotation = [_delegate respondsToSelector:@selector(tapOnLabelForAnnotation:onMap:)];
-    _delegateHasDoubleTapOnLabelForAnnotation = [_delegate respondsToSelector:@selector(doubleTapOnLabelForAnnotation:onMap:)];
-    
-    _delegateHasShouldDragAnnotation = [_delegate respondsToSelector:@selector(mapView:shouldDragAnnotation:)];
-    _delegateHasDidChangeDragState = [_delegate respondsToSelector:@selector(mapView:annotation:didChangeDragState:fromOldState:)];
-    
-    _delegateHasLayerForAnnotation = [_delegate respondsToSelector:@selector(mapView:layerForAnnotation:)];
-    _delegateHasAnnotationSorting = [_delegate respondsToSelector:@selector(annotationSortingComparatorForMapView:)];
-    _delegateHasWillHideLayerForAnnotation = [_delegate respondsToSelector:@selector(mapView:willHideLayerForAnnotation:)];
-    _delegateHasDidHideLayerForAnnotation = [_delegate respondsToSelector:@selector(mapView:didHideLayerForAnnotation:)];
-    
-    _delegateHasDidSelectAnnotation = [_delegate respondsToSelector:@selector(mapView:didSelectAnnotation:)];
-    _delegateHasDidDeselectAnnotation = [_delegate respondsToSelector:@selector(mapView:didDeselectAnnotation:)];
-    
+
     _delegateHasWillStartLocatingUser = [_delegate respondsToSelector:@selector(mapViewWillStartLocatingUser:)];
     _delegateHasDidStopLocatingUser = [_delegate respondsToSelector:@selector(mapViewDidStopLocatingUser:)];
     _delegateHasDidUpdateUserLocation = [_delegate respondsToSelector:@selector(mapView:didUpdateUserLocation:)];
