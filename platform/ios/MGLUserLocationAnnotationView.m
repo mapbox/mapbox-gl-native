@@ -165,7 +165,7 @@ const CGFloat MGLTrackingDotRingWidth = 24.0;
 - (UIImage *)trackingDotHaloImage
 {
     UIGraphicsBeginImageContextWithOptions(CGSizeMake(100, 100), NO, [[UIScreen mainScreen] scale]);
-    CGContextSetFillColorWithColor(UIGraphicsGetCurrentContext(), [[self.tintColor colorWithAlphaComponent:0.75] CGColor]);
+    CGContextSetFillColorWithColor(UIGraphicsGetCurrentContext(), [[self.mapView.tintColor colorWithAlphaComponent:0.75] CGColor]);
     CGContextFillEllipseInRect(UIGraphicsGetCurrentContext(), CGRectMake(0, 0, 100, 100));
     UIImage *finalImage = UIGraphicsGetImageFromCurrentImageContext();
     UIGraphicsEndImageContext();
