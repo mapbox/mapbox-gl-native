@@ -630,9 +630,8 @@ mbgl::DefaultFileSource *mbglFileSource = nullptr;
 - (void)handleCompassTapGesture:(id)sender
 {
     [self resetNorthAnimated:YES];
-    if (self.userTrackingMode == MGLUserTrackingModeFollowWithHeading) {
-        self.userTrackingMode = MGLUserTrackingModeFollow;
-    }
+
+    if (self.userTrackingMode == MGLUserTrackingModeFollowWithHeading) self.userTrackingMode = MGLUserTrackingModeFollow;
 }
 
 #pragma clang diagnostic pop
@@ -644,6 +643,7 @@ mbgl::DefaultFileSource *mbglFileSource = nullptr;
     if ( ! self.isScrollEnabled) return;
 
     mbglMap->cancelTransitions();
+
     self.userTrackingMode = MGLUserTrackingModeNone;
 
     if (pan.state == UIGestureRecognizerStateBegan)
@@ -721,6 +721,7 @@ mbgl::DefaultFileSource *mbglFileSource = nullptr;
     if (mbglMap->getZoom() <= mbglMap->getMinZoom() && pinch.scale < 1) return;
 
     mbglMap->cancelTransitions();
+
     self.userTrackingMode = MGLUserTrackingModeNone;
 
     if (pinch.state == UIGestureRecognizerStateBegan)
@@ -756,6 +757,7 @@ mbgl::DefaultFileSource *mbglFileSource = nullptr;
     if ( ! self.isRotateEnabled) return;
 
     mbglMap->cancelTransitions();
+
     self.userTrackingMode = MGLUserTrackingModeNone;
 
     if (rotate.state == UIGestureRecognizerStateBegan)
@@ -909,6 +911,7 @@ mbgl::DefaultFileSource *mbglFileSource = nullptr;
     if ( ! self.isZoomEnabled) return;
 
     mbglMap->cancelTransitions();
+
     self.userTrackingMode = MGLUserTrackingModeNone;
 
     if (doubleTap.state == UIGestureRecognizerStateEnded)
@@ -939,6 +942,7 @@ mbgl::DefaultFileSource *mbglFileSource = nullptr;
     if (mbglMap->getZoom() == mbglMap->getMinZoom()) return;
 
     mbglMap->cancelTransitions();
+
     self.userTrackingMode = MGLUserTrackingModeNone;
 
     if (twoFingerTap.state == UIGestureRecognizerStateEnded)
@@ -967,6 +971,7 @@ mbgl::DefaultFileSource *mbglFileSource = nullptr;
     if ( ! self.isZoomEnabled) return;
 
     mbglMap->cancelTransitions();
+
     self.userTrackingMode = MGLUserTrackingModeNone;
 
     if (quickZoom.state == UIGestureRecognizerStateBegan)
@@ -2447,9 +2452,14 @@ CLLocationCoordinate2D latLngToCoordinate(mbgl::LatLng latLng)
 - (void)updateUserLocationAnnotationView
 {
     CGPoint center = [self convertCoordinate:self.userLocation.coordinate toPointToView:self];
-    if (CGRectContainsPoint(CGRectInset(self.bounds, -MGLAnnotationUpdateViewportOutset.width, MGLAnnotationUpdateViewportOutset.height), center)) {
-        self.userLocationAnnotationView.center = [self convertCoordinate:self.userLocation.coordinate toPointToView:self];
+
+    if (CGRectContainsPoint(CGRectInset(self.bounds, -MGLAnnotationUpdateViewportOutset.width,
+        MGLAnnotationUpdateViewportOutset.height), center))
+    {
+        self.userLocationAnnotationView.center = [self convertCoordinate:self.userLocation.coordinate
+                                                           toPointToView:self];
     }
+
     [self.userLocationAnnotationView setupLayers];
 }
 
