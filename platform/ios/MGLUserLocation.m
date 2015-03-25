@@ -49,4 +49,9 @@
     }
 }
 
+- (NSString *)title
+{
+    if ( ! _title) return @"Current Location";
+}
+
 @end

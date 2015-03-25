@@ -14,4 +14,8 @@
 * This property is `nil` if the user location tracking mode is not `RMUserTrackingModeFollowWithHeading`. */
 @property (nonatomic, readonly) CLHeading *heading;
 
+@property (nonatomic, copy) NSString *title;
+
+@property (nonatomic, copy) NSString *subtitle;
+
 @end
