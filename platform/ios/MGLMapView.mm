@@ -1828,8 +1828,6 @@ CLLocationCoordinate2D latLngToCoordinate(mbgl::LatLng latLng)
     
     if (annotation == self.selectedAnnotation) return;
 
-    if (annotation == self.selectedAnnotation) return;
-
     self.userTrackingMode = MGLUserTrackingModeNone;
 
     [self deselectAnnotation:self.selectedAnnotation animated:NO];
