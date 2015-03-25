@@ -47,15 +47,14 @@
 
 #import "SMCalloutView.h"
 
-#import "SMCalloutView.h"
-
 #import "UIColor+MGLAdditions.h"
 #import "NSArray+MGLAdditions.h"
 #import "NSDictionary+MGLAdditions.h"
 
-#import <algorithm>
 #import "MGLMapboxEvents.h"
 #import "MGLMetricsLocationManager.h"
+
+#import <algorithm>
 
 // Returns the path to the default cache database on this system.
 const std::string &defaultCacheDatabase() {
