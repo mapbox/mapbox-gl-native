@@ -3,7 +3,8 @@
 
 #import "MGLTypes.h"
 
-@class MGLUserLocation, MGLUserLocationAnnotationView;
+@class MGLUserLocation;
+
 @protocol MGLMapViewDelegate;
 @protocol MGLAnnotation;
 
@@ -254,9 +255,6 @@
 
 /// Returns the annotation object indicating the user’s current location.
 @property (nonatomic, readonly) MGLUserLocation *userLocation;
-
-/** The annotation object representing the user’s current location. (read-only) */
-@property (nonatomic, strong, readonly) MGLUserLocationAnnotationView *userLocationAnnotationView;
 
 /** The mode used to track the user location. */
 @property (nonatomic, assign) MGLUserTrackingMode userTrackingMode;
