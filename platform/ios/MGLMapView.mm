@@ -2494,16 +2494,19 @@ CLLocationCoordinate2D latLngToCoordinate(mbgl::LatLng latLng)
 
 - (void)updateUserLocationAnnotationView
 {
-    CGPoint center = [self convertCoordinate:self.userLocation.coordinate toPointToView:self];
+    CGPoint userPoint = [self convertCoordinate:self.userLocation.coordinate toPointToView:self];
 
     if (CGRectContainsPoint(CGRectInset(self.bounds, -MGLAnnotationUpdateViewportOutset.width,
-        MGLAnnotationUpdateViewportOutset.height), center))
+        MGLAnnotationUpdateViewportOutset.height), userPoint))
     {
-        self.userLocationAnnotationView.center = [self convertCoordinate:self.userLocation.coordinate
-                                                           toPointToView:self];
-    }
+        self.userLocationAnnotationView.center = userPoint;
 
-    [self.userLocationAnnotationView setupLayers];
+        [self.userLocationAnnotationView setupLayers];
+    }
+    else
+    {
+        self.userLocationAnnotationView.layer.hidden = YES;
+    }
 }
 
 - (void)updateCompass
