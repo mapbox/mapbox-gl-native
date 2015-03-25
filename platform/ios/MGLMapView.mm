@@ -776,8 +776,8 @@ mbgl::DefaultFileSource *mbglFileSource = nullptr;
     CGPoint tapPoint = [singleTap locationInView:self];
     
     // tolerances based on touch size & typical marker aspect ratio
-    CGFloat toleranceWidth  = 50;
-    CGFloat toleranceHeight = 75;
+    CGFloat toleranceWidth  = 40;
+    CGFloat toleranceHeight = 60;
 
     // setup a recognition area weighted 2/3 of the way above the point to account for average marker imagery
     CGRect tapRect = CGRectMake(tapPoint.x - toleranceWidth / 2, tapPoint.y - 2 * toleranceHeight / 3, toleranceWidth, toleranceHeight);
