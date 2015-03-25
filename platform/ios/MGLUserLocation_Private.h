@@ -2,8 +2,8 @@
 
 @interface MGLUserLocation (Private)
 
-@property (nonatomic, assign, readwrite) CLLocationCoordinate2D coordinate;
-@property (nonatomic, strong, readwrite) CLLocation *location;
-@property (nonatomic, strong, readwrite) CLHeading *heading;
+@property (nonatomic, readwrite) CLLocationCoordinate2D coordinate;
+@property (nonatomic, readwrite) CLLocation *location;
+@property (nonatomic, readwrite) CLHeading *heading;
 
 @end

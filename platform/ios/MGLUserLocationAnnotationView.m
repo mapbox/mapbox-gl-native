@@ -35,7 +35,7 @@ const CGFloat MGLTrackingDotRingWidth = 24.0;
 
 @interface MGLUserLocationAnnotationView ()
 
-@property (nonatomic, strong, readwrite) CALayer *haloLayer;
+@property (nonatomic, readwrite) CALayer *haloLayer;
 
 @end
 

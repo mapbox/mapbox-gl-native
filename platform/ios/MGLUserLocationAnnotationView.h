@@ -37,14 +37,14 @@
 @interface MGLUserLocationAnnotationView : UIImageView
 
 @property (nonatomic, weak) MGLMapView *mapView;
-@property (nonatomic, strong) MGLUserLocation *annotation;
+@property (nonatomic) MGLUserLocation *annotation;
 
 /** @name Determining the User’s Position */
 
 /** A Boolean value indicating whether the user’s location is currently being updated. (read-only) */
 @property (nonatomic, readonly, getter=isUpdating) BOOL updating;
 
-@property (nonatomic, strong, readonly) CALayer *haloLayer;
+@property (nonatomic, readonly) CALayer *haloLayer;
 
 - (instancetype)initInMapView:(MGLMapView *)mapView;
 - (void)setupLayers;
