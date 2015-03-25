@@ -13,14 +13,6 @@
     return self;
 }
 
-- (id)copyWithZone:(NSZone *)zone {
-    MGLUserLocation *annotation = [(MGLUserLocation *)[[self class] allocWithZone:zone] init];
-    if (annotation) {
-        annotation->_coordinate = _coordinate;
-    }
-    return annotation;
-}
-
 + (BOOL)automaticallyNotifiesObserversForKey:(NSString *)key
 {
     return ![key isEqualToString:@"location"] && ![key isEqualToString:@"heading"];
