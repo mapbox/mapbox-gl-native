@@ -148,6 +148,7 @@ NSNumber *scale;
     [evt setValue:[[NSNumber alloc] initWithFloat:(100 * [UIDevice currentDevice].batteryLevel)] forKey:@"batteryLevel"];
     [evt setValue:scale forKey:@"resolution"];
     [evt setValue:carrier forKey:@"carrier"];
+    [evt setValue:[self getCurrentCellularNetworkConnectionType] forKey:@"cellularNetworkType"];
     [evt setValue:[self getWifiNetworkName] forKey:@"wifi"];
     [evt setValue:[NSNumber numberWithInt:[self getContentSizeScale]] forKey:@"accessibilityFontScale"];
     
@@ -329,6 +330,40 @@ NSNumber *scale;
     
     return ssid;
 }
+
+- (NSString *) getCurrentCellularNetworkConnectionType {
+    CTTelephonyNetworkInfo *telephonyInfo = [CTTelephonyNetworkInfo new];
+    NSString *radioTech = telephonyInfo.currentRadioAccessTechnology;
+    
+    if (radioTech == nil) {
+        return @"NONE";
+    } else if ([radioTech isEqualToString:CTRadioAccessTechnologyGPRS]) {
+        return @"GPRS";
+    } else if ([radioTech isEqualToString:CTRadioAccessTechnologyEdge]) {
+        return @"EDGE";
+    } else if ([radioTech isEqualToString:CTRadioAccessTechnologyWCDMA]) {
+        return @"WCDMA";
+    } else if ([radioTech isEqualToString:CTRadioAccessTechnologyHSDPA]) {
+        return @"HSDPA";
+    } else if ([radioTech isEqualToString:CTRadioAccessTechnologyHSUPA]) {
+        return @"HSUPA";
+    } else if ([radioTech isEqualToString:CTRadioAccessTechnologyCDMA1x]) {
+        return @"CDMA1x";
+    } else if ([radioTech isEqualToString:CTRadioAccessTechnologyCDMAEVDORev0]) {
+        return @"CDMAEVDORev0";
+    } else if ([radioTech isEqualToString:CTRadioAccessTechnologyCDMAEVDORevA]) {
+        return @"CDMAEVDORevA";
+    } else if ([radioTech isEqualToString:CTRadioAccessTechnologyCDMAEVDORevB]) {
+        return @"CDMAEVDORevB";
+    } else if ([radioTech isEqualToString:CTRadioAccessTechnologyeHRPD]) {
+        return @"HRPD";
+    } else if ([radioTech isEqualToString:CTRadioAccessTechnologyLTE]) {
+        return @"LTE";
+    } else {
+        return @"Unknown";
+    }
+}
+
 
 
 @end
