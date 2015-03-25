@@ -2135,13 +2135,9 @@ CLLocationCoordinate2D latLngToCoordinate(mbgl::LatLng latLng)
 {
     (void)manager;
 
-    if ( ! _showsUserLocation || self.pan.state == UIGestureRecognizerStateBegan ||
-         ! newLocation || ! CLLocationCoordinate2DIsValid(newLocation.coordinate))
-    {
-        return;
-    }
+    if ( ! _showsUserLocation || ! newLocation || ! CLLocationCoordinate2DIsValid(newLocation.coordinate)) return;
 
-    if ([newLocation distanceFromLocation:oldLocation])
+    if ([newLocation distanceFromLocation:oldLocation] || ! oldLocation)
     {
         self.userLocation.location = newLocation;
         [self.userLocationAnnotationView setupLayers];
