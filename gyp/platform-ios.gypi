@@ -34,6 +34,8 @@
         '../platform/ios/NSDictionary+MGLAdditions.m',
         '../include/mbgl/ios/UIColor+MGLAdditions.h',
         '../platform/ios/UIColor+MGLAdditions.m',
+        '../platform/ios/vendor/SMCalloutView/SMCalloutView.h',
+        '../platform/ios/vendor/SMCalloutView/SMCalloutView.m',
       ],
 
       'variables': {
@@ -52,6 +54,7 @@
           '-framework GLKit',
           '-framework MobileCoreServices',
           '-framework OpenGLES',
+          '-framework QuartzCore',
           '-framework SystemConfiguration',
           '-framework UIKit',
         ],

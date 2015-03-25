@@ -18,6 +18,8 @@
 #import "MGLStyleFunctionValue.h"
 #import "MGLAnnotation.h"
 
+#import "SMCalloutView.h"
+
 #import "UIColor+MGLAdditions.h"
 #import "NSArray+MGLAdditions.h"
 #import "NSDictionary+MGLAdditions.h"
@@ -77,9 +79,10 @@ NSString *const MGLAnnotationIDKey = @"MGLAnnotationIDKey";
 @property (nonatomic) UIRotationGestureRecognizer *rotate;
 @property (nonatomic) UILongPressGestureRecognizer *quickZoom;
 @property (nonatomic) NSMutableArray *bundledStyleNames;
-@property (nonatomic) NSMapTable *annotationsStore;
+@property (nonatomic) NSMapTable *annotationIDsByAnnotation;
 @property (nonatomic) std::vector<uint32_t> annotationsNearbyLastTap;
 @property (nonatomic, weak) id <MGLAnnotation> selectedAnnotation;
+@property (nonatomic) SMCalloutView *selectedAnnotationCalloutView;
 @property (nonatomic, readonly) NSDictionary *allowedStyleTypes;
 @property (nonatomic) CGPoint centerPoint;
 @property (nonatomic) CGFloat scale;
@@ -107,8 +110,6 @@ NSString *const MGLAnnotationIDKey = @"MGLAnnotationIDKey";
 @end
 
 @implementation MGLMapView
-
-@synthesize bundledStyleNames=_bundledStyleNames;
 
 #pragma mark - Setup & Teardown -
 
@@ -291,7 +292,7 @@ mbgl::DefaultFileSource *mbglFileSource = nullptr;
 
     // setup annotations
     //
-    _annotationsStore = [NSMapTable mapTableWithKeyOptions:NSMapTableStrongMemory valueOptions:NSMapTableStrongMemory];
+    _annotationIDsByAnnotation = [NSMapTable mapTableWithKeyOptions:NSMapTableStrongMemory valueOptions:NSMapTableStrongMemory];
     std::string defaultSymbolName([MGLDefaultStyleMarkerSymbolName cStringUsingEncoding:[NSString defaultCStringEncoding]]);
     mbglMap->setDefaultPointAnnotationSymbol(defaultSymbolName);
 
@@ -675,7 +676,11 @@ mbgl::DefaultFileSource *mbglFileSource = nullptr;
                 [weakSelf notifyMapChange:@(mbgl::MapChangeRegionDidChangeAnimated)];
             }];
         }
-        
+        else
+        {
+            [self notifyMapChange:@(mbgl::MapChangeRegionDidChange)];
+        }
+
         // Send Map Drag End Event
         CGPoint ptInView = CGPointMake([pan locationInView:pan.view].x, [pan locationInView:pan.view].y);
         CLLocationCoordinate2D coord = [self convertPoint:ptInView toCoordinateFromView:pan.view];
@@ -683,7 +688,7 @@ mbgl::DefaultFileSource *mbglFileSource = nullptr;
         [dict setValue:[[NSNumber alloc] initWithDouble:coord.latitude] forKey:@"lat"];
         [dict setValue:[[NSNumber alloc] initWithDouble:coord.longitude] forKey:@"lng"];
         [dict setValue:[[NSNumber alloc] initWithDouble:[self zoomLevel]] forKey:@"zoom"];
-        
+
         [[MGLMapboxEvents sharedManager] pushEvent:@"map.dragend" withAttributes:dict];
     }
 }
@@ -720,7 +725,7 @@ mbgl::DefaultFileSource *mbglFileSource = nullptr;
 
         [self unrotateIfNeededAnimated:YES];
 
-        [self notifyMapChange:@(mbgl::MapChangeRegionDidChangeAnimated)];
+        [self notifyMapChange:@(mbgl::MapChangeRegionDidChange)];
     }
 }
 
@@ -760,7 +765,7 @@ mbgl::DefaultFileSource *mbglFileSource = nullptr;
 
         [self unrotateIfNeededAnimated:YES];
 
-        [self notifyMapChange:@(mbgl::MapChangeRegionDidChangeAnimated)];
+        [self notifyMapChange:@(mbgl::MapChangeRegionDidChange)];
     }
 }
 
@@ -771,8 +776,8 @@ mbgl::DefaultFileSource *mbglFileSource = nullptr;
     CGPoint tapPoint = [singleTap locationInView:self];
     
     // tolerances based on touch size & typical marker aspect ratio
-    CGFloat toleranceWidth  = 50;
-    CGFloat toleranceHeight = 75;
+    CGFloat toleranceWidth  = 40;
+    CGFloat toleranceHeight = 60;
 
     // setup a recognition area weighted 2/3 of the way above the point to account for average marker imagery
     CGRect tapRect = CGRectMake(tapPoint.x - toleranceWidth / 2, tapPoint.y - 2 * toleranceHeight / 3, toleranceWidth, toleranceHeight);
@@ -813,7 +818,7 @@ mbgl::DefaultFileSource *mbglFileSource = nullptr;
         {
             // the selection candidates haven't changed; cycle through them
             if (self.selectedAnnotation &&
-                [[[self.annotationsStore objectForKey:self.selectedAnnotation]
+                [[[self.annotationIDsByAnnotation objectForKey:self.selectedAnnotation]
                     objectForKey:MGLAnnotationIDKey] unsignedIntValue] == self.annotationsNearbyLastTap.back())
             {
                 // the selected annotation is the last in the set; cycle back to the first
@@ -823,7 +828,7 @@ mbgl::DefaultFileSource *mbglFileSource = nullptr;
             else if (self.selectedAnnotation)
             {
                 // otherwise increment the selection through the candidates
-                uint32_t currentID = [[[self.annotationsStore objectForKey:self.selectedAnnotation] objectForKey:MGLAnnotationIDKey] unsignedIntValue];
+                uint32_t currentID = [[[self.annotationIDsByAnnotation objectForKey:self.selectedAnnotation] objectForKey:MGLAnnotationIDKey] unsignedIntValue];
                 auto result = std::find(self.annotationsNearbyLastTap.begin(), self.annotationsNearbyLastTap.end(), currentID);
                 auto distance = std::distance(self.annotationsNearbyLastTap.begin(), result);
                 newSelectedAnnotationID = self.annotationsNearbyLastTap[distance + 1];
@@ -852,11 +857,11 @@ mbgl::DefaultFileSource *mbglFileSource = nullptr;
     if (newSelectedAnnotationID >= 0)
     {
         // find & select model object for selection
-        NSEnumerator *enumerator = self.annotationsStore.keyEnumerator;
+        NSEnumerator *enumerator = self.annotationIDsByAnnotation.keyEnumerator;
 
         while (id <MGLAnnotation> annotation = enumerator.nextObject)
         {
-            if ([[[self.annotationsStore objectForKey:annotation] objectForKey:MGLAnnotationIDKey] integerValue] == newSelectedAnnotationID)
+            if ([[[self.annotationIDsByAnnotation objectForKey:annotation] objectForKey:MGLAnnotationIDKey] integerValue] == newSelectedAnnotationID)
             {
                 // only change selection status if not the currently selected annotation
                 if ( ! [annotation isEqual:self.selectedAnnotation])
@@ -874,8 +879,6 @@ mbgl::DefaultFileSource *mbglFileSource = nullptr;
         // deselect any selected annotation
         if (self.selectedAnnotation) [self deselectAnnotation:self.selectedAnnotation animated:YES];
     }
-
-    NSLog(@"%i (%@)", newSelectedAnnotationID, self.selectedAnnotation.title);
 }
 
 - (void)handleDoubleTapGesture:(UITapGestureRecognizer *)doubleTap
@@ -962,7 +965,16 @@ mbgl::DefaultFileSource *mbglFileSource = nullptr;
     {
         [self unrotateIfNeededAnimated:YES];
 
-        [self notifyMapChange:@(mbgl::MapChangeRegionDidChangeAnimated)];
+        [self notifyMapChange:@(mbgl::MapChangeRegionDidChange)];
+    }
+}
+
+- (void)handleCalloutAccessoryTapGesture:(UITapGestureRecognizer *)tap
+{
+    if ([self.delegate respondsToSelector:@selector(mapView:annotation:calloutAccessoryControlTapped:)])
+    {
+        [self.delegate mapView:self annotation:self.selectedAnnotation
+            calloutAccessoryControlTapped:(UIControl *)tap.view];
     }
 }
 
@@ -1029,6 +1041,8 @@ mbgl::DefaultFileSource *mbglFileSource = nullptr;
                      {
                          if (finished)
                          {
+                             [self notifyMapChange:@(animated ? mbgl::MapChangeRegionDidChangeAnimated : mbgl::MapChangeRegionDidChange)];
+
                              [UIView animateWithDuration:MGLAnimationDuration
                                               animations:^
                                               {
@@ -1041,6 +1055,8 @@ mbgl::DefaultFileSource *mbglFileSource = nullptr;
 - (void)resetPosition
 {
     mbglMap->resetPosition();
+
+    [self notifyMapChange:@(mbgl::MapChangeRegionDidChange)];
 }
 
 - (void)toggleDebug
@@ -1055,6 +1071,8 @@ mbgl::DefaultFileSource *mbglFileSource = nullptr;
     CGFloat duration = (animated ? MGLAnimationDuration : 0);
 
     mbglMap->setLatLng(coordinateToLatLng(coordinate), secondsAsDuration(duration));
+
+    [self notifyMapChange:@(animated ? mbgl::MapChangeRegionDidChangeAnimated : mbgl::MapChangeRegionDidChange)];
 }
 
 - (void)setCenterCoordinate:(CLLocationCoordinate2D)centerCoordinate
@@ -1074,6 +1092,8 @@ mbgl::DefaultFileSource *mbglFileSource = nullptr;
     mbglMap->setLatLngZoom(coordinateToLatLng(centerCoordinate), zoomLevel, secondsAsDuration(duration));
 
     [self unrotateIfNeededAnimated:animated];
+
+    [self notifyMapChange:@(animated ? mbgl::MapChangeRegionDidChangeAnimated : mbgl::MapChangeRegionDidChange)];
 }
 
 - (double)zoomLevel
@@ -1088,6 +1108,8 @@ mbgl::DefaultFileSource *mbglFileSource = nullptr;
     mbglMap->setZoom(zoomLevel, secondsAsDuration(duration));
 
     [self unrotateIfNeededAnimated:animated];
+
+    [self notifyMapChange:@(animated ? mbgl::MapChangeRegionDidChangeAnimated : mbgl::MapChangeRegionDidChange)];
 }
 
 - (void)setZoomLevel:(double)zoomLevel
@@ -1112,6 +1134,8 @@ mbgl::DefaultFileSource *mbglFileSource = nullptr;
     CGFloat duration = (animated ? MGLAnimationDuration : 0);
 
     mbglMap->setBearing(direction * -1, secondsAsDuration(duration));
+
+    [self notifyMapChange:@(animated ? mbgl::MapChangeRegionDidChangeAnimated : mbgl::MapChangeRegionDidChange)];
 }
 
 - (void)setDirection:(CLLocationDirection)direction
@@ -1635,11 +1659,11 @@ CLLocationCoordinate2D latLngToCoordinate(mbgl::LatLng latLng)
 
 - (NSArray *)annotations
 {
-    if ([_annotationsStore count])
+    if ([_annotationIDsByAnnotation count])
     {
         NSMutableArray *result = [NSMutableArray array];
 
-        NSEnumerator *keyEnumerator = [_annotationsStore keyEnumerator];
+        NSEnumerator *keyEnumerator = [_annotationIDsByAnnotation keyEnumerator];
         id <MGLAnnotation> annotation;
 
         while (annotation = [keyEnumerator nextObject])
@@ -1695,7 +1719,7 @@ CLLocationCoordinate2D latLngToCoordinate(mbgl::LatLng latLng)
 
     for (size_t i = 0; i < annotationIDs.size(); ++i)
     {
-        [self.annotationsStore setObject:@{ MGLAnnotationIDKey : @(annotationIDs[i]) }
+        [self.annotationIDsByAnnotation setObject:@{ MGLAnnotationIDKey : @(annotationIDs[i]) }
                                   forKey:annotations[i]];
     }
 }
@@ -1722,8 +1746,13 @@ CLLocationCoordinate2D latLngToCoordinate(mbgl::LatLng latLng)
     {
         assert([annotation conformsToProtocol:@protocol(MGLAnnotation)]);
 
-        annotationIDsToRemove.push_back([[[self.annotationsStore objectForKey:annotation] objectForKey:MGLAnnotationIDKey] unsignedIntValue]);
-        [self.annotationsStore removeObjectForKey:annotation];
+        annotationIDsToRemove.push_back([[[self.annotationIDsByAnnotation objectForKey:annotation] objectForKey:MGLAnnotationIDKey] unsignedIntValue]);
+        [self.annotationIDsByAnnotation removeObjectForKey:annotation];
+
+        if (annotation == self.selectedAnnotation)
+        {
+            [self deselectAnnotation:annotation animated:NO];
+        }
     }
 
     mbglMap->removeAnnotations(annotationIDsToRemove);
@@ -1744,27 +1773,112 @@ CLLocationCoordinate2D latLngToCoordinate(mbgl::LatLng latLng)
 
     if ( ! [self viewportBounds].contains(coordinateToLatLng(firstAnnotation.coordinate))) return;
 
-    self.selectedAnnotation = firstAnnotation;
+    [self selectAnnotation:firstAnnotation animated:NO];
 }
 
 - (void)selectAnnotation:(id <MGLAnnotation>)annotation animated:(BOOL)animated
 {
-    (void)animated;
-
     if ( ! annotation) return;
 
     if ( ! [self viewportBounds].contains(coordinateToLatLng(annotation.coordinate))) return;
 
+    if (annotation == self.selectedAnnotation) return;
+
+    [self deselectAnnotation:self.selectedAnnotation animated:NO];
+
     self.selectedAnnotation = annotation;
+
+    if (annotation.title && [self.delegate respondsToSelector:@selector(mapView:annotationCanShowCallout:)] &&
+        [self.delegate mapView:self annotationCanShowCallout:annotation])
+    {
+        // build the callout
+        self.selectedAnnotationCalloutView = [self calloutViewForAnnotation:annotation];
+
+        // determine symbol in use for point
+        NSString *symbol = MGLDefaultStyleMarkerSymbolName;
+        if ([self.delegate respondsToSelector:@selector(mapView:symbolNameForAnnotation:)])
+        {
+            symbol = [self.delegate mapView:self symbolNameForAnnotation:annotation];
+        }
+        std::string symbolName([symbol cStringUsingEncoding:[NSString defaultCStringEncoding]]);
+
+        // determine anchor point based on symbol
+        CGPoint calloutAnchorPoint = [self convertCoordinate:annotation.coordinate toPointToView:self];
+        double y = mbglMap->getTopOffsetPixelsForAnnotationSymbol(symbolName);
+        CGRect calloutBounds = CGRectMake(calloutAnchorPoint.x, calloutAnchorPoint.y + y, 0, 0);
+
+        // consult delegate for left and/or right accessory views
+        if ([self.delegate respondsToSelector:@selector(mapView:leftCalloutAccessoryViewForAnnotation:)])
+        {
+            self.selectedAnnotationCalloutView.leftAccessoryView =
+                [self.delegate mapView:self leftCalloutAccessoryViewForAnnotation:annotation];
+
+            if ([self.selectedAnnotationCalloutView.leftAccessoryView isKindOfClass:[UIControl class]])
+            {
+                UITapGestureRecognizer *calloutAccessoryTap = [[UITapGestureRecognizer alloc] initWithTarget:self
+                                                                  action:@selector(handleCalloutAccessoryTapGesture:)];
+
+                [self.selectedAnnotationCalloutView.leftAccessoryView addGestureRecognizer:calloutAccessoryTap];
+            }
+        }
+
+        if ([self.delegate respondsToSelector:@selector(mapView:rightCalloutAccessoryViewForAnnotation:)])
+        {
+            self.selectedAnnotationCalloutView.rightAccessoryView =
+                [self.delegate mapView:self rightCalloutAccessoryViewForAnnotation:annotation];
+
+            if ([self.selectedAnnotationCalloutView.rightAccessoryView isKindOfClass:[UIControl class]])
+            {
+                UITapGestureRecognizer *calloutAccessoryTap = [[UITapGestureRecognizer alloc] initWithTarget:self
+                                                                  action:@selector(handleCalloutAccessoryTapGesture:)];
+
+                [self.selectedAnnotationCalloutView.rightAccessoryView addGestureRecognizer:calloutAccessoryTap];
+            }
+        }
+
+        // present popup
+        [self.selectedAnnotationCalloutView presentCalloutFromRect:calloutBounds
+                                                            inView:self.glView
+                                                 constrainedToView:self.glView
+                                                          animated:animated];
+    }
+
+    // notify delegate
+    if ([self.delegate respondsToSelector:@selector(mapView:didSelectAnnotation:)])
+    {
+        [self.delegate mapView:self didSelectAnnotation:annotation];
+    }
+}
+
+- (SMCalloutView *)calloutViewForAnnotation:(id <MGLAnnotation>)annotation
+{
+    SMCalloutView *calloutView = [SMCalloutView platformCalloutView];
+
+    if ([annotation respondsToSelector:@selector(title)]) calloutView.title = annotation.title;
+    if ([annotation respondsToSelector:@selector(subtitle)]) calloutView.subtitle = annotation.subtitle;
+
+    return calloutView;
 }
 
 - (void)deselectAnnotation:(id <MGLAnnotation>)annotation animated:(BOOL)animated
 {
-    (void)animated;
-
     if ( ! annotation) return;
 
-    if ([self.selectedAnnotation isEqual:annotation]) self.selectedAnnotation = nil;
+    if ([self.selectedAnnotation isEqual:annotation])
+    {
+        // dismiss popup
+        [self.selectedAnnotationCalloutView dismissCalloutAnimated:animated];
+
+        // clean up
+        self.selectedAnnotationCalloutView = nil;
+        self.selectedAnnotation = nil;
+    }
+
+    // notify delegate
+    if ([self.delegate respondsToSelector:@selector(mapView:didDeselectAnnotation:)])
+    {
+        [self.delegate mapView:self didDeselectAnnotation:annotation];
+    }
 }
 
 #pragma mark - Utility -
@@ -1844,6 +1958,8 @@ CLLocationCoordinate2D latLngToCoordinate(mbgl::LatLng latLng)
         case mbgl::MapChangeRegionWillChange:
         case mbgl::MapChangeRegionWillChangeAnimated:
         {
+            [self deselectAnnotation:self.selectedAnnotation animated:NO];
+
             BOOL animated = ([change unsignedIntegerValue] == mbgl::MapChangeRegionWillChangeAnimated);
 
             @synchronized (self.regionChangeDelegateQueue)
@@ -1873,6 +1989,13 @@ CLLocationCoordinate2D latLngToCoordinate(mbgl::LatLng latLng)
                 }
             }
             break;
+        }
+        case mbgl::MapChangeRegionIsChanging:
+        {
+            if ([self.delegate respondsToSelector:@selector(mapViewRegionIsChanging:)])
+            {
+                [self.delegate mapViewRegionIsChanging:self];
+            }
         }
         case mbgl::MapChangeRegionDidChange:
         case mbgl::MapChangeRegionDidChangeAnimated:
@@ -1993,8 +2116,11 @@ CLLocationCoordinate2D latLngToCoordinate(mbgl::LatLng latLng)
 
 - (void)invalidate
 {
-    // This is run in the main/UI thread.
+    assert([[NSThread currentThread] isMainThread]);
+
     [self.glView setNeedsDisplay];
+
+    [self notifyMapChange:@(mbgl::MapChangeRegionIsChanging)];
 }
 
 class MBGLView : public mbgl::View
@@ -2022,12 +2148,9 @@ class MBGLView : public mbgl::View
         }
         else
         {
-            dispatch_async(dispatch_get_main_queue(), ^
-            {
-                [nativeView performSelector:@selector(notifyMapChange:)
-                                 withObject:@(change)
-                                 afterDelay:0];
-            });
+            assert([[NSThread currentThread] isMainThread]);
+
+            [nativeView notifyMapChange:@(change)];
         }
     }
 
