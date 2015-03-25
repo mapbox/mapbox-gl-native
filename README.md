@@ -59,6 +59,7 @@ If you merely want to install the library for iOS and try it out as an Objective
    - `GLKit.framework`
    - `ImageIO.framework`
    - `MobileCoreServices.framework`
+   - `QuartzCore.framework`
    - `SystemConfiguration.framework`
    - `libc++.dylib`
    - `libsqlite3.dylib`
