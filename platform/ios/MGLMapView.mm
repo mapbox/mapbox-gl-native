@@ -616,13 +616,14 @@ mbgl::DefaultFileSource *mbglFileSource = nullptr;
 
 - (void)tintColorDidChange
 {
-    for (UIView *subview in self.subviews)
-    {
-        if ([subview respondsToSelector:@selector(setTintColor:)])
-        {
-            subview.tintColor = self.tintColor;
-        }
-    }
+    for (UIView *subview in self.subviews) [self updateTintColorForView:subview];
+}
+
+- (void)updateTintColorForView:(UIView *)view
+{
+    if ([view respondsToSelector:@selector(setTintColor:)]) view.tintColor = self.tintColor;
+
+    for (UIView *subview in view.subviews) [self updateTintColorForView:subview];
 }
 
 #pragma mark - Gestures -
