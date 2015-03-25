@@ -1073,6 +1073,8 @@ mbgl::DefaultFileSource *mbglFileSource = nullptr;
 
 - (void)resetNorthAnimated:(BOOL)animated
 {
+    self.userTrackingMode = MGLUserTrackingModeNone;
+
     CGFloat duration = (animated ? MGLAnimationDuration : 0);
 
     mbglMap->setBearing(0, secondsAsDuration(duration));
@@ -1113,6 +1115,8 @@ mbgl::DefaultFileSource *mbglFileSource = nullptr;
 
 - (void)setCenterCoordinate:(CLLocationCoordinate2D)coordinate animated:(BOOL)animated
 {
+    self.userTrackingMode = MGLUserTrackingModeNone;
+
     CGFloat duration = (animated ? MGLAnimationDuration : 0);
 
     mbglMap->setLatLng(coordinateToLatLng(coordinate), secondsAsDuration(duration));
@@ -1132,6 +1136,8 @@ mbgl::DefaultFileSource *mbglFileSource = nullptr;
 
 - (void)setCenterCoordinate:(CLLocationCoordinate2D)centerCoordinate zoomLevel:(double)zoomLevel animated:(BOOL)animated
 {
+    self.userTrackingMode = MGLUserTrackingModeNone;
+
     CGFloat duration = (animated ? MGLAnimationDuration : 0);
 
     mbglMap->setLatLngZoom(coordinateToLatLng(centerCoordinate), zoomLevel, secondsAsDuration(duration));
@@ -1148,6 +1154,8 @@ mbgl::DefaultFileSource *mbglFileSource = nullptr;
 
 - (void)setZoomLevel:(double)zoomLevel animated:(BOOL)animated
 {
+    self.userTrackingMode = MGLUserTrackingModeNone;
+
     CGFloat duration = (animated ? MGLAnimationDuration : 0);
 
     mbglMap->setZoom(zoomLevel, secondsAsDuration(duration));
@@ -1164,6 +1172,8 @@ mbgl::DefaultFileSource *mbglFileSource = nullptr;
 
 - (void)zoomToSouthWestCoordinate:(CLLocationCoordinate2D)southWestCoordinate northEastCoordinate:(CLLocationCoordinate2D)northEastCoordinate animated:(BOOL)animated
 {
+    self.userTrackingMode = MGLUserTrackingModeNone;
+
     CLLocationCoordinate2D center = CLLocationCoordinate2DMake((northEastCoordinate.latitude + southWestCoordinate.latitude) / 2, (northEastCoordinate.longitude + southWestCoordinate.longitude) / 2);
     
     CGFloat scale = mbglMap->getScale();
@@ -1189,6 +1199,8 @@ mbgl::DefaultFileSource *mbglFileSource = nullptr;
 - (void)setDirection:(CLLocationDirection)direction animated:(BOOL)animated
 {
     if ( ! animated && ! self.rotationAllowed) return;
+
+    self.userTrackingMode = MGLUserTrackingModeNone;
 
     CGFloat duration = (animated ? MGLAnimationDuration : 0);
 
