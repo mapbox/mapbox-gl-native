@@ -262,10 +262,37 @@ mbgl::Settings_NSUserDefaults *settings = nullptr;
 
     if ([CLLocationManager authorizationStatus] == kCLAuthorizationStatusDenied)
     {
-        [[[UIAlertView alloc] initWithTitle:@"Authorization Denied"
-                                    message:@"Please enable location services for this app in Privacy settings."
-                                   delegate:nil
-                          cancelButtonTitle:nil otherButtonTitles:@"OK", nil] show];
+        // iOS 8+: Prompt users to open Settings.app if authorization was denied
+        if (&UIApplicationOpenSettingsURLString != NULL)
+        {
+            UIAlertController *alert = [UIAlertController alertControllerWithTitle:@"Authorization Denied"
+                                                                           message:@"Please enable location services for this app in Privacy settings."
+                                                                    preferredStyle:UIAlertControllerStyleAlert];
+
+            UIAlertAction *cancel = [UIAlertAction actionWithTitle:@"Cancel"
+                                                                   style:UIAlertActionStyleCancel
+                                                                 handler:nil];
+
+            UIAlertAction *ok = [UIAlertAction actionWithTitle:@"Open Settings"
+                                                         style:UIAlertActionStyleDefault
+                                                       handler:^(UIAlertAction __unused *action)
+                                                        {
+                                                            [[UIApplication sharedApplication] openURL:[NSURL URLWithString:UIApplicationOpenSettingsURLString]];
+                                                        }];
+
+            // added in the order that they'll appear, left to right
+            [alert addAction:cancel];
+            [alert addAction:ok];
+
+            [self presentViewController:alert animated:YES completion:nil];
+        }
+        else
+        {
+            [[[UIAlertView alloc] initWithTitle:@"Authorization Denied"
+                                        message:@"Please enable location services for this app in Privacy settings."
+                                       delegate:nil
+                              cancelButtonTitle:nil otherButtonTitles:@"OK", nil] show];
+        }
     }
     else
     {
