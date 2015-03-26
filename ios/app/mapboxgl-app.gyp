@@ -42,6 +42,7 @@
         'TARGETED_DEVICE_FAMILY': '1,2',
         'COMBINE_HIDPI_IMAGES': 'NO', # don't merge @2x.png images into .tiff files
         'CLANG_ENABLE_OBJC_ARC': 'YES',
+        'CLANG_ENABLE_MODULES': 'YES',
       },
 
       'configurations': {

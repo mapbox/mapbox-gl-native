@@ -52,16 +52,13 @@
           '<@(uv_static_libs)',
         ],
         'ldflags': [
-          '-framework CoreGraphics',
           '-framework CoreLocation',
           '-framework CoreTelephony',
-          '-framework ImageIO',
           '-framework GLKit',
+          '-framework ImageIO',
           '-framework MobileCoreServices',
-          '-framework OpenGLES',
           '-framework QuartzCore',
           '-framework SystemConfiguration',
-          '-framework UIKit',
         ],
       },
 
@@ -72,6 +69,7 @@
       'xcode_settings': {
         'OTHER_CPLUSPLUSFLAGS': [ '<@(cflags_cc)' ],
         'CLANG_ENABLE_OBJC_ARC': 'YES',
+        'CLANG_ENABLE_MODULES': 'YES',
       },
 
       'link_settings': {
