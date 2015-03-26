@@ -361,7 +361,7 @@ mbgl::DefaultFileSource *mbglFileSource = nullptr;
     mbglMap->start();
 
     
-    // Fire map.load on a background thread
+    // Fire load event on a background thread
     dispatch_async(dispatch_get_global_queue(DISPATCH_QUEUE_PRIORITY_BACKGROUND, 0), ^{
         
         NSMutableDictionary *evt = [[NSMutableDictionary alloc] init];
@@ -379,7 +379,7 @@ mbgl::DefaultFileSource *mbglFileSource = nullptr;
         }
         [evt setValue:email forKey:@"enabled.email"];
 
-        [[MGLMapboxEvents sharedManager] pushEvent:@"map.load" withAttributes:evt];
+        [[MGLMapboxEvents sharedManager] pushEvent:MGLEventMapLoad withAttributes:evt];
     });
     
     return YES;
@@ -606,7 +606,7 @@ mbgl::DefaultFileSource *mbglFileSource = nullptr;
 
 - (void)handlePanGesture:(UIPanGestureRecognizer *)pan
 {
-    [self trackGestureEvent:@"Pan" forRecognizer:pan];
+    [self trackGestureEvent:MGLEventMapPanStart forRecognizer:pan];
     
     if ( ! self.isScrollEnabled) return;
 
@@ -676,13 +676,13 @@ mbgl::DefaultFileSource *mbglFileSource = nullptr;
         [dict setValue:[[NSNumber alloc] initWithDouble:coord.longitude] forKey:@"lng"];
         [dict setValue:[[NSNumber alloc] initWithDouble:[self zoomLevel]] forKey:@"zoom"];
 
-        [[MGLMapboxEvents sharedManager] pushEvent:@"map.dragend" withAttributes:dict];
+        [[MGLMapboxEvents sharedManager] pushEvent:MGLEventMapPanEnd withAttributes:dict];
     }
 }
 
 - (void)handlePinchGesture:(UIPinchGestureRecognizer *)pinch
 {
-    [self trackGestureEvent:@"Pinch" forRecognizer:pinch];
+    [self trackGestureEvent:MGLEventMapPinchStart forRecognizer:pinch];
     
     if ( ! self.isZoomEnabled) return;
 
@@ -720,7 +720,7 @@ mbgl::DefaultFileSource *mbglFileSource = nullptr;
 
 - (void)handleRotateGesture:(UIRotationGestureRecognizer *)rotate
 {
-    [self trackGestureEvent:@"Rotation" forRecognizer:rotate];
+    [self trackGestureEvent:MGLEventMapRotateStart forRecognizer:rotate];
     
     if ( ! self.isRotateEnabled) return;
 
@@ -1009,7 +1009,7 @@ mbgl::DefaultFileSource *mbglFileSource = nullptr;
         [dict setValue:[[NSNumber alloc] initWithDouble:[self zoomLevel]] forKey:@"zoom"];
         [dict setValue:gesture forKey:@"gesture"];
         
-        [[MGLMapboxEvents sharedManager] pushEvent:@"map.click" withAttributes:dict];
+        [[MGLMapboxEvents sharedManager] pushEvent:MGLEventMapTap withAttributes:dict];
     });
 }
 

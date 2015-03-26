@@ -7,6 +7,16 @@
 
 #include <sys/sysctl.h>
 
+static NSString *const MGLMapboxEventsUserAgent = @"MapboxEventsiOS/1.0";
+static NSString *const MGLMapboxEventsAPIBase = @"https://api.tiles.mapbox.com";
+
+NSString *const MGLEventMapLoad = @"map.load";
+NSString *const MGLEventMapTap = @"map.click";
+NSString *const MGLEventMapPanStart = @"Pan";
+NSString *const MGLEventMapPanEnd = @"map.dragend";
+NSString *const MGLEventMapPinchStart = @"Pinch";
+NSString *const MGLEventMapRotateStart = @"Rotation";
+
 @interface MGLMapboxEvents()
 
 @property (atomic) NSUInteger flushAt;

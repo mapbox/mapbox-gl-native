@@ -1,7 +1,11 @@
 #import <Foundation/Foundation.h>
 
-static NSString *const MGLMapboxEventsUserAgent = @"MapboxEventsiOS/1.0";
-static NSString *const MGLMapboxEventsAPIBase = @"https://api.tiles.mapbox.com";
+extern NSString *const MGLEventMapLoad;
+extern NSString *const MGLEventMapTap;
+extern NSString *const MGLEventMapPanStart;
+extern NSString *const MGLEventMapPanEnd;
+extern NSString *const MGLEventMapPinchStart;
+extern NSString *const MGLEventMapRotateStart;
 
 @interface MGLMapboxEvents : NSObject
 
