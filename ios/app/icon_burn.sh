@@ -20,7 +20,7 @@ echo "Burning app icons..."
 #
 commit=`git rev-parse --short HEAD`
 branch=`git rev-parse --abbrev-ref HEAD`
-repo=`git remote show -n origin | grep 'Fetch URL' | sed -e 's/.*github\.com:mapbox\///' -e 's/\.git$//' -e 's/^mapbox-//'`
+repo=`git remote show -n origin | grep 'Fetch URL' | sed -e 's/.*github\.com\/.*\///' -e 's/\.git$//' -e 's/^mapbox-//'`
 
 #
 # work directly in app bundle

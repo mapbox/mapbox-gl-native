@@ -30,12 +30,12 @@
         '../../platform/darwin/settings_nsuserdefaults.mm',
       ],
 
-      'actions': [
+      'postbuilds': [
         {
-          'action_name': 'Icon Burning',
-          'inputs': [ './icon_burn.sh' ],
-          'outputs': [],
-          'action': ['<@(_inputs)'],
+          'postbuild_name': 'Icon Burning',
+          'action': [
+            './icon_burn.sh',
+          ],
         },
       ],
 
