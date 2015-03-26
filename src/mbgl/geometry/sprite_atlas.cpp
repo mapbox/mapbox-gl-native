@@ -165,7 +165,7 @@ void SpriteAtlas::copy(const Rect<dimension>& dst, const SpritePosition& src, co
                                   static_cast<uint32_t>(dst.originalW * pixelRatio),
                                   static_cast<uint32_t>(dst.originalH * pixelRatio) };
 
-    util::bilinearScale(srcData, srcSize, srcPos, dstData, dstSize, dstPos);
+    util::bilinearScale(srcData, srcSize, srcPos, dstData, dstSize, dstPos, wrap);
 
     // Add borders around the copied image if required.
     if (wrap) {

@@ -28,19 +28,19 @@ TEST(Bilinear, Scaling) {
     uint32_t *dstData = dst.get();
     std::fill(dstData, dstData + dstSize.x * dstSize.y, 0xFFFF00FF);
 
-    util::bilinearScale(srcData, srcSize, { 0, 0, 24, 24 }, dstData, dstSize, { 8, 8, 24, 24 });
-    util::bilinearScale(srcData, srcSize, { 26, 0, 24, 24 }, dstData, dstSize, { 0, 40, 48, 48 });
-    util::bilinearScale(srcData, srcSize, { 26, 26, 24, 24 }, dstData, dstSize, { 52, 40, 36, 36 });
-    util::bilinearScale(srcData, srcSize, { 26, 26, 24, 24 }, dstData, dstSize, { 52, 40, 36, 36 });
-    util::bilinearScale(srcData, srcSize, { 104, 0, 24, 24 }, dstData, dstSize, { 96, 0, 48, 48 });
-    util::bilinearScale(srcData, srcSize, { 52, 260, 24, 24 }, dstData, dstSize, { 108, 108, 38, 38 });
-    util::bilinearScale(srcData, srcSize, { 380, 0, 24, 24 }, dstData, dstSize, { 36, 0, 24, 24 });
-    util::bilinearScale(srcData, srcSize, { 396, 396, 24, 24 }, dstData, dstSize, { 0, 0, 50, 50 });
-    util::bilinearScale(srcData, srcSize, { 380, 182, 12, 12 }, dstData, dstSize, { 52, 80, 24, 24 });
+    util::bilinearScale(srcData, srcSize, { 0, 0, 24, 24 }, dstData, dstSize, { 8, 8, 24, 24 }, false);
+    util::bilinearScale(srcData, srcSize, { 26, 0, 24, 24 }, dstData, dstSize, { 0, 40, 48, 48 }, false);
+    util::bilinearScale(srcData, srcSize, { 26, 26, 24, 24 }, dstData, dstSize, { 52, 40, 36, 36 }, false);
+    util::bilinearScale(srcData, srcSize, { 26, 26, 24, 24 }, dstData, dstSize, { 52, 40, 36, 36 }, false);
+    util::bilinearScale(srcData, srcSize, { 104, 0, 24, 24 }, dstData, dstSize, { 96, 0, 48, 48 }, false);
+    util::bilinearScale(srcData, srcSize, { 52, 260, 24, 24 }, dstData, dstSize, { 108, 108, 38, 38 }, false);
+    util::bilinearScale(srcData, srcSize, { 380, 0, 24, 24 }, dstData, dstSize, { 36, 0, 24, 24 }, false);
+    util::bilinearScale(srcData, srcSize, { 396, 396, 24, 24 }, dstData, dstSize, { 0, 0, 50, 50 }, false);
+    util::bilinearScale(srcData, srcSize, { 380, 182, 12, 12 }, dstData, dstSize, { 52, 80, 24, 24 }, false);
 
     // From the bottom
-    util::bilinearScale(srcData, srcSize, { 252, 380, 12, 12 }, dstData, dstSize, { 0, 90, 12, 12 });
-    util::bilinearScale(srcData, srcSize, { 252, 380, 12, 12 }, dstData, dstSize, { 18, 90, 24, 24 });
+    util::bilinearScale(srcData, srcSize, { 252, 380, 12, 12 }, dstData, dstSize, { 0, 90, 12, 12 }, false);
+    util::bilinearScale(srcData, srcSize, { 252, 380, 12, 12 }, dstData, dstSize, { 18, 90, 24, 24 }, false);
 
     const std::string data { reinterpret_cast<char *>(dstData), dstSize.x * dstSize.y * sizeof(uint32_t) };
     util::write_file("test/fixtures/sprites/atlas_actual.png", util::compress_png(dstSize.x, dstSize.y, dstData));
