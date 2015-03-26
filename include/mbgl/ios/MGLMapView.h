@@ -1,7 +1,7 @@
+#import "MGLTypes.h"
+
 #import <UIKit/UIKit.h>
 #import <CoreLocation/CoreLocation.h>
-
-#import "MGLTypes.h"
 
 @class MGLUserLocation;
 

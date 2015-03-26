@@ -1,6 +1,7 @@
-#import "MGLMetricsLocationManager.h"
-#import "CoreLocation/CoreLocation.h"
 #import "MGLMapboxEvents.h"
+#import "MGLMetricsLocationManager.h"
+
+#import <CoreLocation/CoreLocation.h>
 
 @interface MGLMetricsLocationManager()
 
