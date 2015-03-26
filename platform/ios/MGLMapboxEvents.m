@@ -23,6 +23,8 @@
 @property (atomic) NSString *anonid;
 @property (atomic) NSTimer *timer;
 @property (atomic) NSString *userAgent;
+@property (atomic) dispatch_queue_t serialqPush;
+@property (atomic) dispatch_queue_t serialqFlush;
 
 @end
 
@@ -57,6 +59,10 @@ NSNumber *scale;
             
             [[NSUserDefaults standardUserDefaults] registerDefaults:defaultsToRegister];
         }
+        NSString *bundleID = [[NSBundle mainBundle] bundleIdentifier];
+        NSString *uniqueID = [[NSProcessInfo processInfo] globallyUniqueString];
+        _serialqPush = dispatch_queue_create([[NSString stringWithFormat:@"%@.%@.SERIALQPUSH", bundleID, uniqueID] UTF8String], DISPATCH_QUEUE_SERIAL);
+        _serialqFlush = dispatch_queue_create([[NSString stringWithFormat:@"%@.%@.SERIALQFLUSH", bundleID, uniqueID] UTF8String], DISPATCH_QUEUE_SERIAL);
         
         // Configure Events Infrastructure
         _queue = [[NSMutableArray alloc] init];
@@ -132,43 +138,47 @@ NSNumber *scale;
         return;
     }
     
-    NSMutableDictionary *evt = [[NSMutableDictionary alloc] init];
-    // mapbox-events stock attributes
-    [evt setObject:event forKey:@"event"];
-    [evt setObject:[NSNumber numberWithInt:1] forKey:@"version"];
-    [evt setObject:[self formatDate:[NSDate date]] forKey:@"created"];
-    [evt setObject:self.instance forKey:@"instance"];
-    [evt setObject:self.anonid forKey:@"anonid"];
-    
-    // mapbox-events-ios stock attributes
-    [evt setValue:[rfc3339DateFormatter stringFromDate:[NSDate date]] forKey:@"created"];
-    [evt setValue:model forKey:@"model"];
-    [evt setValue:iOSVersion forKey:@"operatingSystem"];
-    [evt setValue:[self getDeviceOrientation] forKey:@"orientation"];
-    [evt setValue:[[NSNumber alloc] initWithFloat:(100 * [UIDevice currentDevice].batteryLevel)] forKey:@"batteryLevel"];
-    [evt setValue:scale forKey:@"resolution"];
-    [evt setValue:carrier forKey:@"carrier"];
-    [evt setValue:[self getCurrentCellularNetworkConnectionType] forKey:@"cellularNetworkType"];
-    [evt setValue:[self getWifiNetworkName] forKey:@"wifi"];
-    [evt setValue:[NSNumber numberWithInt:[self getContentSizeScale]] forKey:@"accessibilityFontScale"];
-    
-    for (NSString *key in [attributeDictionary allKeys]) {
-        [evt setObject:[attributeDictionary valueForKey:key] forKey:key];
-    }
-    
-    // Make Immutable Version
-    NSDictionary *finalEvent = [NSDictionary dictionaryWithDictionary:evt];
-    
-    // Put On The Queue
-    [self.queue addObject:finalEvent];
-    
-    // Has Flush Limit Been Reached?
-    if ((int)_queue.count >= (int)_flushAt) {
-        [self flush];
-    }
-    
-    // Reset Timer (Initial Starting of Timer after first event is pushed)
-    [self startTimer];
+    dispatch_async(_serialqPush, ^{
+        
+        NSMutableDictionary *evt = [[NSMutableDictionary alloc] init];
+        // mapbox-events stock attributes
+        [evt setObject:event forKey:@"event"];
+        [evt setObject:[NSNumber numberWithInt:1] forKey:@"version"];
+        [evt setObject:[self formatDate:[NSDate date]] forKey:@"created"];
+        [evt setObject:self.instance forKey:@"instance"];
+        [evt setObject:self.anonid forKey:@"anonid"];
+        
+        // mapbox-events-ios stock attributes
+        [evt setValue:[rfc3339DateFormatter stringFromDate:[NSDate date]] forKey:@"created"];
+        [evt setValue:model forKey:@"model"];
+        [evt setValue:iOSVersion forKey:@"operatingSystem"];
+        [evt setValue:[self getDeviceOrientation] forKey:@"orientation"];
+        [evt setValue:[[NSNumber alloc] initWithFloat:(100 * [UIDevice currentDevice].batteryLevel)] forKey:@"batteryLevel"];
+        [evt setValue:scale forKey:@"resolution"];
+        [evt setValue:carrier forKey:@"carrier"];
+        [evt setValue:[self getCurrentCellularNetworkConnectionType] forKey:@"cellularNetworkType"];
+        [evt setValue:[self getWifiNetworkName] forKey:@"wifi"];
+        [evt setValue:[NSNumber numberWithInt:[self getContentSizeScale]] forKey:@"accessibilityFontScale"];
+        
+        for (NSString *key in [attributeDictionary allKeys]) {
+            [evt setObject:[attributeDictionary valueForKey:key] forKey:key];
+        }
+        
+        // Make Immutable Version
+        NSDictionary *finalEvent = [NSDictionary dictionaryWithDictionary:evt];
+        
+        // Put On The Queue
+        [self.queue addObject:finalEvent];
+        
+        // Has Flush Limit Been Reached?
+        if ((int)_queue.count >= (int)_flushAt) {
+            [self flush];
+        }
+        
+        // Reset Timer (Initial Starting of Timer after first event is pushed)
+        [self startTimer];
+        
+    });
 }
 
 - (void) flush {
@@ -176,24 +186,26 @@ NSNumber *scale;
         return;
     }
     
-    int upper = (int)_flushAt;
-    if (_flushAt > [_queue count]) {
-        if ([_queue count] == 0) {
-            return;
+    dispatch_async(_serialqFlush, ^{
+    
+        int upper = (int)_flushAt;
+        if (_flushAt > [_queue count]) {
+            if ([_queue count] == 0) {
+                return;
+            }
+            upper = (int)[_queue count];
         }
-        upper = (int)[_queue count];
-    }
     
-    // Create Array of Events to push to the Server
-    NSRange theRange = NSMakeRange(0, upper);
-    NSArray *events = [_queue subarrayWithRange:theRange];
+        // Create Array of Events to push to the Server
+        NSRange theRange = NSMakeRange(0, upper);
+        NSArray *events = [_queue subarrayWithRange:theRange];
     
-    // Update Queue to remove events sent to server
-    [_queue removeObjectsInRange:theRange];
+        // Update Queue to remove events sent to server
+        [_queue removeObjectsInRange:theRange];
     
-    // Send Array of Events to Server
-    [self postEvents:events];
-    
+        // Send Array of Events to Server
+        [self postEvents:events];
+    });
 }
 
 - (void) postEvents:(NSArray *)events {
