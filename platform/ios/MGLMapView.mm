@@ -2141,6 +2141,9 @@ CLLocationCoordinate2D latLngToCoordinate(mbgl::LatLng latLng)
     {
         self.userLocation.location = newLocation;
 
+        // deselect user if applicable since we don't do callout tracking yet
+        if ([self.selectedAnnotation isEqual:self.userLocation]) [self deselectAnnotation:self.userLocation animated:NO];
+
         if ([self.delegate respondsToSelector:@selector(mapView:didUpdateUserLocation:)])
         {
             [self.delegate mapView:self didUpdateUserLocation:self.userLocation];
