@@ -2201,8 +2201,6 @@ CLLocationCoordinate2D latLngToCoordinate(mbgl::LatLng latLng)
     self.userLocationAnnotationView.haloLayer.hidden = ! CLLocationCoordinate2DIsValid(self.userLocation.coordinate) ||
         newLocation.horizontalAccuracy > 10;
 
-    if ( ! self.userLocationAnnotationView.superview) [self.glView addSubview:self.userLocationAnnotationView];
-
     [self updateUserLocationAnnotationView];
 }
 
@@ -2493,6 +2491,8 @@ CLLocationCoordinate2D latLngToCoordinate(mbgl::LatLng latLng)
 
 - (void)updateUserLocationAnnotationView
 {
+    if ( ! self.userLocationAnnotationView.superview) [self.glView addSubview:self.userLocationAnnotationView];
+
     CGPoint userPoint = [self convertCoordinate:self.userLocation.coordinate toPointToView:self];
 
     if (CGRectContainsPoint(CGRectInset(self.bounds, -MGLAnnotationUpdateViewportOutset.width,
