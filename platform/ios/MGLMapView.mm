@@ -360,28 +360,18 @@ mbgl::DefaultFileSource *mbglFileSource = nullptr;
     // start the main loop
     mbglMap->start();
 
-    
-    // Fire load event on a background thread
-    dispatch_async(dispatch_get_global_queue(DISPATCH_QUEUE_PRIORITY_BACKGROUND, 0), ^{
-        
-        NSMutableDictionary *evt = [[NSMutableDictionary alloc] init];
-        [evt setValue:@(mbglMap->getLatLng().latitude) forKey:@"lat"];
-        [evt setValue:@(mbglMap->getLatLng().longitude) forKey:@"lng"];
-        [evt setValue:@(mbglMap->getZoom()) forKey:@"zoom"];
-        [evt setValue:@([[UIApplication sharedApplication] isRegisteredForRemoteNotifications]) forKey:@"enabled.push"];
-        
-        NSString *email = @"Unknown";
-        Class MFMailComposeViewController = NSClassFromString(@"MFMailComposeViewController");
-        if (MFMailComposeViewController) {
-            SEL canSendMail = NSSelectorFromString(@"canSendMail");
-            BOOL sendMail = ((BOOL (*)(id, SEL))[MFMailComposeViewController methodForSelector:canSendMail])(MFMailComposeViewController, canSendMail);
-            email = [NSString stringWithFormat:@"%i", sendMail];
-        }
-        [evt setValue:email forKey:@"enabled.email"];
+    // metrics: map load event
+    const mbgl::LatLng latLng = mbglMap->getLatLng();
+    const double zoom = mbglMap->getZoom();
 
-        [[MGLMapboxEvents sharedManager] pushEvent:MGLEventMapLoad withAttributes:evt];
-    });
-    
+    [[MGLMapboxEvents sharedManager] pushEvent:MGLEventMapLoad withAttributes:@{
+        @"lat": @(latLng.latitude),
+        @"lng": @(latLng.longitude),
+        @"zoom": @(zoom),
+        @"enabled.push": @([[MGLMapboxEvents sharedManager] checkPushEnabled]),
+        @"enabled.email": [[MGLMapboxEvents sharedManager] checkEmailEnabled]
+    }];
+
     return YES;
 }
 
@@ -668,15 +658,16 @@ mbgl::DefaultFileSource *mbglFileSource = nullptr;
             [self notifyMapChange:@(mbgl::MapChangeRegionDidChange)];
         }
 
-        // Send Map Drag End Event
-        CGPoint ptInView = CGPointMake([pan locationInView:pan.view].x, [pan locationInView:pan.view].y);
-        CLLocationCoordinate2D coord = [self convertPoint:ptInView toCoordinateFromView:pan.view];
-        NSMutableDictionary *dict = [[NSMutableDictionary alloc] init];
-        [dict setValue:@(coord.latitude) forKey:@"lat"];
-        [dict setValue:@(coord.longitude) forKey:@"lng"];
-        [dict setValue:@([self zoomLevel]) forKey:@"zoom"];
+        // metrics: pan end
+        CGPoint pointInView = CGPointMake([pan locationInView:pan.view].x, [pan locationInView:pan.view].y);
+        CLLocationCoordinate2D panCoordinate = [self convertPoint:pointInView toCoordinateFromView:pan.view];
+        double zoom = [self zoomLevel];
 
-        [[MGLMapboxEvents sharedManager] pushEvent:MGLEventMapPanEnd withAttributes:dict];
+        [[MGLMapboxEvents sharedManager] pushEvent:MGLEventMapPanEnd withAttributes:@{
+            @"lat": @(panCoordinate.latitude),
+            @"lng": @(panCoordinate.longitude),
+            @"zoom": @(zoom)
+        }];
     }
 }
 
@@ -762,7 +753,7 @@ mbgl::DefaultFileSource *mbglFileSource = nullptr;
 
 - (void)handleSingleTapGesture:(UITapGestureRecognizer *)singleTap
 {
-    [self trackGestureEvent:@"SingleTap" forRecognizer:singleTap];
+    [self trackGestureEvent:MGLEventMapSingleTap forRecognizer:singleTap];
     
     CGPoint tapPoint = [singleTap locationInView:self];
 
@@ -885,7 +876,7 @@ mbgl::DefaultFileSource *mbglFileSource = nullptr;
 
 - (void)handleDoubleTapGesture:(UITapGestureRecognizer *)doubleTap
 {
-    [self trackGestureEvent:@"DoubleTap" forRecognizer:doubleTap];
+    [self trackGestureEvent:MGLEventMapDoubleTap forRecognizer:doubleTap];
     
     if ( ! self.isZoomEnabled) return;
 
@@ -916,7 +907,7 @@ mbgl::DefaultFileSource *mbglFileSource = nullptr;
 
 - (void)handleTwoFingerTapGesture:(UITapGestureRecognizer *)twoFingerTap
 {
-    [self trackGestureEvent:@"TwoFingerTap" forRecognizer:twoFingerTap];
+    [self trackGestureEvent:MGLEventMapTwoFingerSingleTap forRecognizer:twoFingerTap];
     
     if ( ! self.isZoomEnabled) return;
 
@@ -949,7 +940,7 @@ mbgl::DefaultFileSource *mbglFileSource = nullptr;
 
 - (void)handleQuickZoomGesture:(UILongPressGestureRecognizer *)quickZoom
 {
-    [self trackGestureEvent:@"QuickZoom" forRecognizer:quickZoom];
+    [self trackGestureEvent:MGLEventMapQuickZoom forRecognizer:quickZoom];
     
     if ( ! self.isZoomEnabled) return;
 
@@ -997,20 +988,18 @@ mbgl::DefaultFileSource *mbglFileSource = nullptr;
     return ([validSimultaneousGestures containsObject:gestureRecognizer] && [validSimultaneousGestures containsObject:otherGestureRecognizer]);
 }
 
-- (void)trackGestureEvent:(NSString *)gesture forRecognizer:(UIGestureRecognizer *)recognizer
+- (void)trackGestureEvent:(NSString *)gestureID forRecognizer:(UIGestureRecognizer *)recognizer
 {
-    dispatch_async(dispatch_get_global_queue(DISPATCH_QUEUE_PRIORITY_BACKGROUND, 0), ^{
-        // Send Map Zoom Event
-        CGPoint ptInView = CGPointMake([recognizer locationInView:recognizer.view].x, [recognizer locationInView:recognizer.view].y);
-        CLLocationCoordinate2D coord = [self convertPoint:ptInView toCoordinateFromView:recognizer.view];
-        NSMutableDictionary *dict = [[NSMutableDictionary alloc] init];
-        [dict setValue:@(coord.latitude) forKey:@"lat"];
-        [dict setValue:@(coord.longitude) forKey:@"lng"];
-        [dict setValue:@([self zoomLevel]) forKey:@"zoom"];
-        [dict setValue:gesture forKey:@"gesture"];
-        
-        [[MGLMapboxEvents sharedManager] pushEvent:MGLEventMapTap withAttributes:dict];
-    });
+    CGPoint pointInView = CGPointMake([recognizer locationInView:recognizer.view].x, [recognizer locationInView:recognizer.view].y);
+    CLLocationCoordinate2D gestureCoordinate = [self convertPoint:pointInView toCoordinateFromView:recognizer.view];
+    double zoom = [self zoomLevel];
+
+    [[MGLMapboxEvents sharedManager] pushEvent:MGLEventMapTap withAttributes:@{
+        @"lat": @(gestureCoordinate.latitude),
+        @"lng": @(gestureCoordinate.longitude),
+        @"zoom": @(zoom),
+        @"gesture": gestureID
+    }];
 }
 
 #pragma mark - Properties -

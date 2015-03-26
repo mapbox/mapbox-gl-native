@@ -12,6 +12,10 @@ static NSString *const MGLMapboxEventsAPIBase = @"https://api.tiles.mapbox.com";
 
 NSString *const MGLEventMapLoad = @"map.load";
 NSString *const MGLEventMapTap = @"map.click";
+NSString *const MGLEventMapSingleTap = @"SingleTap";
+NSString *const MGLEventMapDoubleTap = @"DoubleTap";
+NSString *const MGLEventMapTwoFingerSingleTap = @"TwoFingerTap";
+NSString *const MGLEventMapQuickZoom = @"QuickZoom";
 NSString *const MGLEventMapPanStart = @"Pan";
 NSString *const MGLEventMapPanEnd = @"map.dragend";
 NSString *const MGLEventMapPinchStart = @"Pinch";
@@ -382,6 +386,20 @@ NSString *const MGLEventMapRotateStart = @"Rotation";
     }
 }
 
+- (NSString *) checkEmailEnabled {
+    NSString *email = @"Unknown";
+    Class MFMailComposeViewController = NSClassFromString(@"MFMailComposeViewController");
+    if (MFMailComposeViewController) {
+        SEL canSendMail = NSSelectorFromString(@"canSendMail");
+        BOOL sendMail = ((BOOL (*)(id, SEL))[MFMailComposeViewController methodForSelector:canSendMail])
+        (MFMailComposeViewController, canSendMail);
+        email = [NSString stringWithFormat:@"%i", sendMail];
+    }
+    return email;
+}
 
+- (BOOL) checkPushEnabled {
+    return[[UIApplication sharedApplication] isRegisteredForRemoteNotifications];
+}
 
 @end
