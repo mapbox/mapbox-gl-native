@@ -29,6 +29,7 @@
 #include <mbgl/util/uv.hpp>
 #include <mbgl/util/mapbox.hpp>
 #include <mbgl/util/exception.hpp>
+#include <mbgl/util/stopwatch.hpp>
 
 #include <algorithm>
 #include <iostream>
@@ -549,6 +550,8 @@ void Map::setDefaultPointAnnotationSymbol(const std::string& symbol) {
 }
 
 double Map::getTopOffsetPixelsForAnnotationSymbol(const std::string& symbol) {
+    assert(Environment::currentlyOn(ThreadType::Map));
+
     SpritePosition pos = sprite->getSpritePosition(symbol);
 
     return -pos.height / pos.pixelRatio / 2;
@@ -607,6 +610,18 @@ void Map::setDebug(bool value) {
 }
 
 void Map::toggleDebug() {
+    std::function<double()> syncTask =
+        std::bind(&Map::getTopOffsetPixelsForAnnotationSymbol, this, "foobar");
+
+    {
+        util::stopwatch stopwatch("sync task");
+
+        double ret;
+        if (Environment::postTaskSync(thread.get_id(), syncTask, ret)) {
+            std::cout << "Sync result: " << ret << std::endl;
+        }
+    }
+
     data->toggleDebug();
     triggerUpdate(Update::Debug);
 }
