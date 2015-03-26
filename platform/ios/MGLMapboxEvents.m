@@ -5,6 +5,8 @@
 #import <CoreTelephony/CTTelephonyNetworkInfo.h>
 #import <CoreTelephony/CTCarrier.h>
 
+#import "MGLMetricsLocationManager.h"
+
 #include <sys/sysctl.h>
 
 static NSString *const MGLMapboxEventsUserAgent = @"MapboxEventsiOS/1.0";
@@ -133,6 +135,8 @@ NSString *const MGLEventMapRotateStart = @"Rotation";
     static MGLMapboxEvents *_sharedManager;
     dispatch_once(&onceToken, ^{
         _sharedManager = [[self alloc] init];
+        // setup dedicated location manager on first use
+        [MGLMetricsLocationManager sharedManager];
     });
     return _sharedManager;
 }

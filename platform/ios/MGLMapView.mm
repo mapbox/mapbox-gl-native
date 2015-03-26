@@ -22,7 +22,6 @@
 #import "SMCalloutView.h"
 
 #import "MGLMapboxEvents.h"
-#import "MGLMetricsLocationManager.h"
 
 #import <algorithm>
 
@@ -340,9 +339,6 @@ mbgl::DefaultFileSource *mbglFileSource = nullptr;
     [[NSNotificationCenter defaultCenter] addObserver:self selector:@selector(appDidBackground:) name:UIApplicationDidEnterBackgroundNotification object:nil];
     [[NSNotificationCenter defaultCenter] addObserver:self selector:@selector(appWillForeground:) name:UIApplicationWillEnterForegroundNotification object:nil];
 
-    // setup dedicated location manager for metrics
-    [MGLMetricsLocationManager sharedManager];
-    
     // set initial position
     //
     mbglMap->setLatLngZoom(mbgl::LatLng(0, 0), mbglMap->getMinZoom());
