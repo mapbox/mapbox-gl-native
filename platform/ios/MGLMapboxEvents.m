@@ -333,7 +333,11 @@ NSNumber *scale;
         NSDictionary *info = (__bridge NSDictionary *)CNCopyCurrentNetworkInfo(CFArrayGetValueAtIndex(interfaces, 0));
         if (info) {
             ssid = info[@"SSID"];
+        } else {
+            ssid = @"NONE";
         }
+    } else {
+        ssid = @"NONE";
     }
     
     return ssid;
@@ -344,7 +348,7 @@ NSNumber *scale;
     NSString *radioTech = telephonyInfo.currentRadioAccessTechnology;
     
     if (radioTech == nil) {
-        return @"";
+        return @"NONE";
     } else if ([radioTech isEqualToString:CTRadioAccessTechnologyGPRS]) {
         return @"GPRS";
     } else if ([radioTech isEqualToString:CTRadioAccessTechnologyEdge]) {
