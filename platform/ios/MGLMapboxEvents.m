@@ -72,7 +72,7 @@ NSNumber *scale;
         _api = @"https://api.tiles.mapbox.com";
         _token = nil;
         _instance = [[NSUUID UUID] UUIDString];
-        _advertiserId = @"NONE";
+        _advertiserId = @"";
         Class ASIdentifierManagerClass = NSClassFromString(@"ASIdentifierManager");
         if (ASIdentifierManagerClass) {
             SEL sharedManagerSelector = NSSelectorFromString(@"sharedManager");
@@ -333,11 +333,7 @@ NSNumber *scale;
         NSDictionary *info = (__bridge NSDictionary *)CNCopyCurrentNetworkInfo(CFArrayGetValueAtIndex(interfaces, 0));
         if (info) {
             ssid = info[@"SSID"];
-        } else {
-            ssid = @"NONE";
         }
-    } else {
-        ssid = @"NONE";
     }
     
     return ssid;
@@ -348,7 +344,7 @@ NSNumber *scale;
     NSString *radioTech = telephonyInfo.currentRadioAccessTechnology;
     
     if (radioTech == nil) {
-        return @"NONE";
+        return @"";
     } else if ([radioTech isEqualToString:CTRadioAccessTechnologyGPRS]) {
         return @"GPRS";
     } else if ([radioTech isEqualToString:CTRadioAccessTechnologyEdge]) {
