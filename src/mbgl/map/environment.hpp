@@ -4,6 +4,7 @@
 #include <mbgl/util/noncopyable.hpp>
 #include <mbgl/util/util.hpp>
 
+#include <future>
 #include <thread>
 #include <functional>
 #include <vector>
@@ -38,6 +39,22 @@ public:
     static std::string threadName();
 
     static bool postTask(const std::thread::id& to, const Closure& task);
+
+    template<typename T>
+    static bool postTaskSync(const std::thread::id& to, const std::function<T()>& task, T& out) {
+        std::promise<T> promise;
+
+        auto syncTask = [&promise, task] {
+             promise.set_value(task());
+        };
+
+        if (!postTask(to, syncTask)) {
+            return false;
+        }
+
+        out = std::move(promise.get_future().get());
+        return true;
+    }
 
     uint32_t getID() const;
 
