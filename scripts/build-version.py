@@ -13,6 +13,8 @@ else:
     if sys.argv[2] == sys.argv[3]:
         tag = [0, 0, 0]
     else:
+        if "v" in sys.argv[2][-6:]:
+            sys.argv[2] = sys.argv[2][-6:].replace('v', '.')
         ver = re.sub("[^0-9.]", "", sys.argv[2])
         tag = map(int, ver.split('.'))
         rev = sys.argv[3][0:8]
