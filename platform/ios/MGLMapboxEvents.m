@@ -59,8 +59,10 @@ NSNumber *scale;
             
             [[NSUserDefaults standardUserDefaults] registerDefaults:defaultsToRegister];
         }
-        _serialqPush = dispatch_queue_create("SERIALQPUSH", DISPATCH_QUEUE_SERIAL);
-        _serialqFlush = dispatch_queue_create("SERIALQFLUSH", DISPATCH_QUEUE_SERIAL);
+        NSString *bundleID = [[NSBundle mainBundle] bundleIdentifier];
+        NSString *uniqueID = [[NSProcessInfo processInfo] globallyUniqueString];
+        _serialqPush = dispatch_queue_create([[NSString stringWithFormat:@"%@.%@.SERIALQPUSH", bundleID, uniqueID] UTF8String], DISPATCH_QUEUE_SERIAL);
+        _serialqFlush = dispatch_queue_create([[NSString stringWithFormat:@"%@.%@.SERIALQFLUSH", bundleID, uniqueID] UTF8String], DISPATCH_QUEUE_SERIAL);
         
         // Configure Events Infrastructure
         _queue = [[NSMutableArray alloc] init];
