@@ -2,7 +2,7 @@
 
 @interface MGLMetricsLocationManager : NSObject
 
-+ (id)sharedManager;
++ (instancetype)sharedManager;
 
 - (BOOL) isAuthorizedStatusDetermined;
 - (void) requestAlwaysAuthorization;

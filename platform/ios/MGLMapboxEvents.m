@@ -22,14 +22,13 @@
 @end
 
 @implementation MGLMapboxEvents
-
-static MGLMapboxEvents *sharedManager = nil;
-
-NSDateFormatter *rfc3339DateFormatter = nil;
-NSString *model;
-NSString *iOSVersion;
-NSString *carrier;
-CGFloat scale;
+{
+    NSDateFormatter *_rfc3339DateFormatter;
+    NSString *_model;
+    NSString *_iOSVersion;
+    NSString *_carrier;
+    CGFloat _scale;
+}
 
 - (id) init {
     self = [super init];
@@ -85,35 +84,36 @@ CGFloat scale;
             _anonid = [[[UIDevice currentDevice] identifierForVendor] UUIDString];
         }
         
-        model = [self getSysInfoByName:"hw.machine"];
-        iOSVersion = [NSString stringWithFormat:@"%@ %@", [UIDevice currentDevice].systemName, [UIDevice currentDevice].systemVersion];
+        _model = [self getSysInfoByName:"hw.machine"];
+        _iOSVersion = [NSString stringWithFormat:@"%@ %@", [UIDevice currentDevice].systemName, [UIDevice currentDevice].systemVersion];
         if ([UIScreen instancesRespondToSelector:@selector(nativeScale)]) {
-            scale = [UIScreen mainScreen].nativeScale;
+            _scale = [UIScreen mainScreen].nativeScale;
         } else {
-            scale = [UIScreen mainScreen].scale;
+            _scale = [UIScreen mainScreen].scale;
         }
         CTCarrier *carrierVendor = [[[CTTelephonyNetworkInfo alloc] init] subscriberCellularProvider];
-        carrier = [carrierVendor carrierName];
+        _carrier = [carrierVendor carrierName];
         
         _userAgent = MGLMapboxEventsUserAgent;
         
         // Setup Date Format
-        rfc3339DateFormatter = [[NSDateFormatter alloc] init];
+        _rfc3339DateFormatter = [[NSDateFormatter alloc] init];
         NSLocale *enUSPOSIXLocale = [[NSLocale alloc] initWithLocaleIdentifier:@"en_US_POSIX"];
         
-        [rfc3339DateFormatter setLocale:enUSPOSIXLocale];
-        [rfc3339DateFormatter setDateFormat:@"yyyy'-'MM'-'dd'T'HH':'mm':'ss'Z'"];
-        [rfc3339DateFormatter setTimeZone:[NSTimeZone timeZoneForSecondsFromGMT:0]];
+        [_rfc3339DateFormatter setLocale:enUSPOSIXLocale];
+        [_rfc3339DateFormatter setDateFormat:@"yyyy'-'MM'-'dd'T'HH':'mm':'ss'Z'"];
+        [_rfc3339DateFormatter setTimeZone:[NSTimeZone timeZoneForSecondsFromGMT:0]];
     }
     return self;
 }
 
 + (id)sharedManager {
     static dispatch_once_t onceToken;
+    static MGLMapboxEvents *_sharedManager;
     dispatch_once(&onceToken, ^{
-        sharedManager = [[self alloc] init];
+        _sharedManager = [[self alloc] init];
     });
-    return sharedManager;
+    return _sharedManager;
 }
 
 - (void) pushEvent:(NSString *)event withAttributes:(NSDictionary *)attributeDictionary {
@@ -139,22 +139,22 @@ CGFloat scale;
         NSMutableDictionary *evt = [[NSMutableDictionary alloc] init];
         // mapbox-events stock attributes
         [evt setObject:event forKey:@"event"];
-        [evt setObject:[NSNumber numberWithInt:1] forKey:@"version"];
+        [evt setObject:@(1) forKey:@"version"];
         [evt setObject:[self formatDate:[NSDate date]] forKey:@"created"];
         [evt setObject:self.instance forKey:@"instance"];
         [evt setObject:self.anonid forKey:@"anonid"];
         
         // mapbox-events-ios stock attributes
-        [evt setValue:[rfc3339DateFormatter stringFromDate:[NSDate date]] forKey:@"created"];
-        [evt setValue:model forKey:@"model"];
-        [evt setValue:iOSVersion forKey:@"operatingSystem"];
+        [evt setValue:[_rfc3339DateFormatter stringFromDate:[NSDate date]] forKey:@"created"];
+        [evt setValue:_model forKey:@"model"];
+        [evt setValue:_iOSVersion forKey:@"operatingSystem"];
         [evt setValue:[self getDeviceOrientation] forKey:@"orientation"];
-        [evt setValue:[[NSNumber alloc] initWithFloat:(100 * [UIDevice currentDevice].batteryLevel)] forKey:@"batteryLevel"];
-        [evt setValue:@(scale) forKey:@"resolution"];
-        [evt setValue:carrier forKey:@"carrier"];
+        [evt setValue:@(100 * [UIDevice currentDevice].batteryLevel) forKey:@"batteryLevel"];
+        [evt setValue:@(_scale) forKey:@"resolution"];
+        [evt setValue:_carrier forKey:@"carrier"];
         [evt setValue:[self getCurrentCellularNetworkConnectionType] forKey:@"cellularNetworkType"];
         [evt setValue:[self getWifiNetworkName] forKey:@"wifi"];
-        [evt setValue:[NSNumber numberWithInt:[self getContentSizeScale]] forKey:@"accessibilityFontScale"];
+        [evt setValue:@([self getContentSizeScale]) forKey:@"accessibilityFontScale"];
         
         for (NSString *key in [attributeDictionary allKeys]) {
             [evt setObject:[attributeDictionary valueForKey:key] forKey:key];
@@ -243,7 +243,7 @@ CGFloat scale;
 }
 
 - (NSString *) formatDate:(NSDate *)date {
-    return [rfc3339DateFormatter stringFromDate:date];
+    return [_rfc3339DateFormatter stringFromDate:date];
 }
 
 - (NSString *) getDeviceOrientation {

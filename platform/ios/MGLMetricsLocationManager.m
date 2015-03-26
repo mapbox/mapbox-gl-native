@@ -14,8 +14,6 @@
 
 @implementation MGLMetricsLocationManager
 
-static MGLMetricsLocationManager *sharedManager = nil;
-
 - (id) init {
     if (self = [super init]) {
         _locationManager = [[CLLocationManager alloc] init];
@@ -29,6 +27,7 @@ static MGLMetricsLocationManager *sharedManager = nil;
 
 + (id)sharedManager {
     static dispatch_once_t onceToken;
+    static MGLMetricsLocationManager *sharedManager;
     dispatch_once(&onceToken, ^{
         sharedManager = [[self alloc] init];
     });
@@ -61,8 +60,8 @@ static MGLMetricsLocationManager *sharedManager = nil;
     //  Iterate through locations to pass all data
     for (CLLocation *loc in locations) {
         NSMutableDictionary *evt = [[NSMutableDictionary alloc] init];
-        [evt setValue:[[NSNumber alloc] initWithDouble:loc.coordinate.latitude] forKey:@"lat"];
-        [evt setValue:[[NSNumber alloc] initWithDouble:loc.coordinate.longitude] forKey:@"lng"];
+        [evt setValue:@(loc.coordinate.latitude) forKey:@"lat"];
+        [evt setValue:@(loc.coordinate.longitude) forKey:@"lng"];
         [[MGLMapboxEvents sharedManager] pushEvent:@"location" withAttributes:evt];
     }
 }

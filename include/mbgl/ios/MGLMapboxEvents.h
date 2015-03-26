@@ -9,7 +9,7 @@ static NSString *const MGLMapboxEventsAPIBase = @"https://api.tiles.mapbox.com";
 @property (atomic) NSString *appName;
 @property (atomic) NSString *appVersion;
 
-+ (id)sharedManager;
++ (instancetype)sharedManager;
 
 - (void) pushEvent:(NSString *)event withAttributes:(NSDictionary *)attributeDictionary;
 
