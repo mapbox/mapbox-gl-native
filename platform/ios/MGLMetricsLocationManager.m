@@ -3,7 +3,7 @@
 
 #import <CoreLocation/CoreLocation.h>
 
-@interface MGLMetricsLocationManager()
+@interface MGLMetricsLocationManager() <CLLocationManagerDelegate>
 
 @property (atomic) CLLocationManager *locationManager;
 

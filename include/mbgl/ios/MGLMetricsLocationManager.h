@@ -1,7 +1,6 @@
 #import <Foundation/Foundation.h>
-#import <CoreLocation/CoreLocation.h>
 
-@interface MGLMetricsLocationManager : NSObject <CLLocationManagerDelegate>
+@interface MGLMetricsLocationManager : NSObject
 
 + (id)sharedManager;
 
