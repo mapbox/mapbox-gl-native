@@ -2,6 +2,7 @@
 #import "MGLMapView.h"
 #import "MGLStyleFunctionValue.h"
 #import "MGLTypes.h"
+#import "MGLUserLocation.h"
 #import "NSArray+MGLAdditions.h"
 #import "NSDictionary+MGLAdditions.h"
 #import "UIColor+MGLAdditions.h"
