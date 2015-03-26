@@ -1,14 +1,3 @@
-//
-//  MBLocationManager.m
-//  Hermes
-//
-//  Dynamic Settings.bundle loading based on:
-//  http://stackoverflow.com/questions/510216/can-you-make-the-settings-in-settings-bundle-default-even-if-you-dont-open-the
-//
-//  Created by Brad Leege on 3/8/15.
-//  Copyright (c) 2015 Mapbox. All rights reserved.
-//
-
 #import "MGLMetricsLocationManager.h"
 #import "CoreLocation/CoreLocation.h"
 #import "MGLMapboxEvents.h"

@@ -1,20 +1,11 @@
-//
-//  MapboxEvents.m
-//  MapboxEvents
-//
-//  Dynamic detection of ASIdentifierManager from Mixpanel
-//  https://github.com/mixpanel/mixpanel-iphone/blob/master/LICENSE
-//
-//  Created by Brad Leege on 3/5/15.
-//  Copyright (c) 2015 Mapbox. All rights reserved.
-//
-
 #import "MGLMapboxEvents.h"
+
 #import <UIKit/UIKit.h>
+#import <SystemConfiguration/CaptiveNetwork.h>
 #import <CoreTelephony/CTTelephonyNetworkInfo.h>
 #import <CoreTelephony/CTCarrier.h>
+
 #include <sys/sysctl.h>
-#import <SystemConfiguration/CaptiveNetwork.h>
 
 @interface MGLMapboxEvents()
 
@@ -47,6 +38,8 @@ NSNumber *scale;
         if(!settingsBundle) {
             NSLog(@"Could not find Settings.bundle");
         } else {
+            // Dynamic Settings.bundle loading based on:
+            // http://stackoverflow.com/questions/510216/can-you-make-the-settings-in-settings-bundle-default-even-if-you-dont-open-the
             NSDictionary *settings = [NSDictionary dictionaryWithContentsOfFile:[settingsBundle stringByAppendingPathComponent:@"Root.plist"]];
             NSArray *preferences = [settings objectForKey:@"PreferenceSpecifiers"];
             NSMutableDictionary *defaultsToRegister = [[NSMutableDictionary alloc] initWithCapacity:[preferences count]];
@@ -71,6 +64,8 @@ NSNumber *scale;
         _api = @"https://api.tiles.mapbox.com";
         _token = nil;
         _instance = [[NSUUID UUID] UUIDString];
+        // Dynamic detection of ASIdentifierManager from Mixpanel
+        // https://github.com/mixpanel/mixpanel-iphone/blob/master/LICENSE
         Class ASIdentifierManagerClass = NSClassFromString(@"ASIdentifierManager");
         if (ASIdentifierManagerClass) {
             SEL sharedManagerSelector = NSSelectorFromString(@"sharedManager");
