@@ -760,7 +760,7 @@ void Map::prepare() {
     assert(Environment::currentlyOn(ThreadType::Map));
 
     const auto u = updated.exchange(static_cast<UpdateType>(Update::Nothing));
-    if (u & static_cast<UpdateType>(Update::StyleInfo)) {
+    if ((u & static_cast<UpdateType>(Update::StyleInfo)) || !style) {
         reloadStyle();
     }
     if (u & static_cast<UpdateType>(Update::Debug)) {
@@ -810,6 +810,7 @@ void Map::render() {
     // Cleanup OpenGL objects that we abandoned since the last render call.
     env->performCleanup();
 
+    assert(style);
     assert(painter);
     painter->render(*style, activeSources,
                     state, data->getAnimationTime());
