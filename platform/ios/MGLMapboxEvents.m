@@ -22,6 +22,7 @@ NSString *const MGLEventMapPanStart = @"Pan";
 NSString *const MGLEventMapPanEnd = @"map.dragend";
 NSString *const MGLEventMapPinchStart = @"Pinch";
 NSString *const MGLEventMapRotateStart = @"Rotation";
+NSString *const MGLEventMapLocation = @"Location";
 
 @interface MGLMapboxEvents()
 

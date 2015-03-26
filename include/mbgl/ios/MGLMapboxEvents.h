@@ -10,6 +10,7 @@ extern NSString *const MGLEventMapPanStart;
 extern NSString *const MGLEventMapPanEnd;
 extern NSString *const MGLEventMapPinchStart;
 extern NSString *const MGLEventMapRotateStart;
+extern NSString *const MGLEventMapLocation;
 
 @interface MGLMapboxEvents : NSObject
 

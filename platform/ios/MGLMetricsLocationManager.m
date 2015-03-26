@@ -59,10 +59,10 @@
 - (void)locationManager:(CLLocationManager *)manager didUpdateLocations:(NSArray *)locations {
     //  Iterate through locations to pass all data
     for (CLLocation *loc in locations) {
-        NSMutableDictionary *evt = [[NSMutableDictionary alloc] init];
-        [evt setValue:@(loc.coordinate.latitude) forKey:@"lat"];
-        [evt setValue:@(loc.coordinate.longitude) forKey:@"lng"];
-        [MGLMapboxEvents pushEvent:@"location" withAttributes:evt];
+        [MGLMapboxEvents pushEvent:MGLEventMapLocation withAttributes:@{
+            @"lat": @(loc.coordinate.latitude),
+            @"lng": @(loc.coordinate.longitude)
+        }];
     }
 }
 
