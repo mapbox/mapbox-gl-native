@@ -1,5 +1,5 @@
 //
-//  MapboxEvents.m
+//  MGLMapboxEvents.m
 //  MapboxEvents
 //
 //  Dynamic detection of ASIdentifierManager from Mixpanel
@@ -344,7 +344,7 @@ NSNumber *scale;
 }
 
 - (NSString *) getCurrentCellularNetworkConnectionType {
-    CTTelephonyNetworkInfo *telephonyInfo = [CTTelephonyNetworkInfo new];
+    CTTelephonyNetworkInfo *telephonyInfo = [[CTTelephonyNetworkInfo alloc] init];
     NSString *radioTech = telephonyInfo.currentRadioAccessTechnology;
     
     if (radioTech == nil) {
@@ -375,7 +375,5 @@ NSNumber *scale;
         return @"Unknown";
     }
 }
-
-
 
 @end
