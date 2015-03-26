@@ -6,6 +6,9 @@
 
 @property (atomic) CLLocationManager *locationManager;
 
+- (void) startUpdatingLocation;
+- (void) stopUpdatingLocation;
+
 @end
 
 @implementation MGLMetricsLocationManager

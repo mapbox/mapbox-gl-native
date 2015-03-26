@@ -9,6 +9,8 @@
 
 @interface MGLMapboxEvents()
 
+@property (atomic) NSUInteger flushAt;
+@property (atomic) NSTimeInterval flushAfter;
 @property (atomic) NSMutableArray *queue;
 @property (atomic) NSString *instance;
 @property (atomic) NSString *anonid;
@@ -61,7 +63,6 @@ NSNumber *scale;
         _queue = [[NSMutableArray alloc] init];
         _flushAt = 20;
         _flushAfter = 10000;
-        _api = @"https://api.tiles.mapbox.com";
         _token = nil;
         _instance = [[NSUUID UUID] UUIDString];
         // Dynamic detection of ASIdentifierManager from Mixpanel
@@ -94,7 +95,7 @@ NSNumber *scale;
         CTCarrier *carrierVendor = [[[CTTelephonyNetworkInfo alloc] init] subscriberCellularProvider];
         carrier = [carrierVendor carrierName];
         
-        _userAgent = @"MapboxEventsiOS/1.0";
+        _userAgent = MGLMapboxEventsUserAgent;
         
         // Setup Date Format
         rfc3339DateFormatter = [[NSDateFormatter alloc] init];
@@ -166,7 +167,7 @@ NSNumber *scale;
         [self.queue addObject:finalEvent];
         
         // Has Flush Limit Been Reached?
-        if ((int)_queue.count >= (int)_flushAt) {
+        if (_queue.count >= _flushAt) {
             [self flush];
         }
         
@@ -183,12 +184,12 @@ NSNumber *scale;
     
     dispatch_async(_serialqFlush, ^{
     
-        int upper = (int)_flushAt;
+        NSUInteger upper = _flushAt;
         if (_flushAt > [_queue count]) {
             if ([_queue count] == 0) {
                 return;
             }
-            upper = (int)[_queue count];
+            upper = [_queue count];
         }
     
         // Create Array of Events to push to the Server
@@ -205,7 +206,7 @@ NSNumber *scale;
 
 - (void) postEvents:(NSArray *)events {
     // Setup URL Request
-    NSString *url = [NSString stringWithFormat:@"%@/events/v1?access_token=%@", _api, _token];
+    NSString *url = [NSString stringWithFormat:@"%@/events/v1?access_token=%@", MGLMapboxEventsAPIBase, _token];
     NSMutableURLRequest *request = [[NSMutableURLRequest alloc] initWithURL:[NSURL URLWithString:url]];
     [request setValue:[self getUserAgent] forHTTPHeaderField:@"User-Agent"];
     [request setValue:@"application/json" forHTTPHeaderField:@"Content-Type"];
@@ -229,7 +230,7 @@ NSNumber *scale;
     }
     
     // Start New Timer
-    NSTimeInterval interval = (double)((NSInteger)_flushAfter);
+    NSTimeInterval interval = _flushAfter;
     _timer = [NSTimer scheduledTimerWithTimeInterval:interval target:self selector:@selector(flush) userInfo:nil repeats:YES];
 }
 

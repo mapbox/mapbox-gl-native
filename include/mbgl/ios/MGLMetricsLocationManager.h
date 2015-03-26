@@ -8,7 +8,4 @@
 - (BOOL) isAuthorizedStatusDetermined;
 - (void) requestAlwaysAuthorization;
 
-- (void) startUpdatingLocation;
-- (void) stopUpdatingLocation;
-
 @end
