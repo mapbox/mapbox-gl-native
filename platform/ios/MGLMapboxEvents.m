@@ -132,43 +132,47 @@ NSNumber *scale;
         return;
     }
     
-    NSMutableDictionary *evt = [[NSMutableDictionary alloc] init];
-    // mapbox-events stock attributes
-    [evt setObject:event forKey:@"event"];
-    [evt setObject:[NSNumber numberWithInt:1] forKey:@"version"];
-    [evt setObject:[self formatDate:[NSDate date]] forKey:@"created"];
-    [evt setObject:self.instance forKey:@"instance"];
-    [evt setObject:self.anonid forKey:@"anonid"];
-    
-    // mapbox-events-ios stock attributes
-    [evt setValue:[rfc3339DateFormatter stringFromDate:[NSDate date]] forKey:@"created"];
-    [evt setValue:model forKey:@"model"];
-    [evt setValue:iOSVersion forKey:@"operatingSystem"];
-    [evt setValue:[self getDeviceOrientation] forKey:@"orientation"];
-    [evt setValue:[[NSNumber alloc] initWithFloat:(100 * [UIDevice currentDevice].batteryLevel)] forKey:@"batteryLevel"];
-    [evt setValue:scale forKey:@"resolution"];
-    [evt setValue:carrier forKey:@"carrier"];
-    [evt setValue:[self getCurrentCellularNetworkConnectionType] forKey:@"cellularNetworkType"];
-    [evt setValue:[self getWifiNetworkName] forKey:@"wifi"];
-    [evt setValue:[NSNumber numberWithInt:[self getContentSizeScale]] forKey:@"accessibilityFontScale"];
-    
-    for (NSString *key in [attributeDictionary allKeys]) {
-        [evt setObject:[attributeDictionary valueForKey:key] forKey:key];
-    }
-    
-    // Make Immutable Version
-    NSDictionary *finalEvent = [NSDictionary dictionaryWithDictionary:evt];
-    
-    // Put On The Queue
-    [self.queue addObject:finalEvent];
-    
-    // Has Flush Limit Been Reached?
-    if ((int)_queue.count >= (int)_flushAt) {
-        [self flush];
-    }
-    
-    // Reset Timer (Initial Starting of Timer after first event is pushed)
-    [self startTimer];
+    dispatch_sync(dispatch_get_global_queue(DISPATCH_QUEUE_PRIORITY_BACKGROUND, 0), ^{
+        
+        NSMutableDictionary *evt = [[NSMutableDictionary alloc] init];
+        // mapbox-events stock attributes
+        [evt setObject:event forKey:@"event"];
+        [evt setObject:[NSNumber numberWithInt:1] forKey:@"version"];
+        [evt setObject:[self formatDate:[NSDate date]] forKey:@"created"];
+        [evt setObject:self.instance forKey:@"instance"];
+        [evt setObject:self.anonid forKey:@"anonid"];
+        
+        // mapbox-events-ios stock attributes
+        [evt setValue:[rfc3339DateFormatter stringFromDate:[NSDate date]] forKey:@"created"];
+        [evt setValue:model forKey:@"model"];
+        [evt setValue:iOSVersion forKey:@"operatingSystem"];
+        [evt setValue:[self getDeviceOrientation] forKey:@"orientation"];
+        [evt setValue:[[NSNumber alloc] initWithFloat:(100 * [UIDevice currentDevice].batteryLevel)] forKey:@"batteryLevel"];
+        [evt setValue:scale forKey:@"resolution"];
+        [evt setValue:carrier forKey:@"carrier"];
+        [evt setValue:[self getCurrentCellularNetworkConnectionType] forKey:@"cellularNetworkType"];
+        [evt setValue:[self getWifiNetworkName] forKey:@"wifi"];
+        [evt setValue:[NSNumber numberWithInt:[self getContentSizeScale]] forKey:@"accessibilityFontScale"];
+        
+        for (NSString *key in [attributeDictionary allKeys]) {
+            [evt setObject:[attributeDictionary valueForKey:key] forKey:key];
+        }
+        
+        // Make Immutable Version
+        NSDictionary *finalEvent = [NSDictionary dictionaryWithDictionary:evt];
+        
+        // Put On The Queue
+        [self.queue addObject:finalEvent];
+        
+        // Has Flush Limit Been Reached?
+        if ((int)_queue.count >= (int)_flushAt) {
+            [self flush];
+        }
+        
+        // Reset Timer (Initial Starting of Timer after first event is pushed)
+        [self startTimer];
+        
+    });
 }
 
 - (void) flush {
