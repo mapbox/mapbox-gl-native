@@ -180,24 +180,26 @@ NSNumber *scale;
         return;
     }
     
-    int upper = (int)_flushAt;
-    if (_flushAt > [_queue count]) {
-        if ([_queue count] == 0) {
-            return;
+    dispatch_sync(dispatch_get_global_queue(DISPATCH_QUEUE_PRIORITY_BACKGROUND, 0), ^{
+    
+        int upper = (int)_flushAt;
+        if (_flushAt > [_queue count]) {
+            if ([_queue count] == 0) {
+                return;
+            }
+            upper = (int)[_queue count];
         }
-        upper = (int)[_queue count];
-    }
     
-    // Create Array of Events to push to the Server
-    NSRange theRange = NSMakeRange(0, upper);
-    NSArray *events = [_queue subarrayWithRange:theRange];
+        // Create Array of Events to push to the Server
+        NSRange theRange = NSMakeRange(0, upper);
+        NSArray *events = [_queue subarrayWithRange:theRange];
     
-    // Update Queue to remove events sent to server
-    [_queue removeObjectsInRange:theRange];
+        // Update Queue to remove events sent to server
+        [_queue removeObjectsInRange:theRange];
     
-    // Send Array of Events to Server
-    [self postEvents:events];
-    
+        // Send Array of Events to Server
+        [self postEvents:events];
+    });
 }
 
 - (void) postEvents:(NSArray *)events {
