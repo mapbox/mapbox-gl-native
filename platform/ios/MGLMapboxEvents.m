@@ -1,5 +1,5 @@
 //
-//  MapboxEvents.m
+//  MGLMapboxEvents.m
 //  MapboxEvents
 //
 //  Dynamic detection of ASIdentifierManager from Mixpanel
@@ -375,7 +375,5 @@ NSNumber *scale;
         return @"Unknown";
     }
 }
-
-
 
 @end
