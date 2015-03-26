@@ -389,14 +389,12 @@ mbgl::DefaultFileSource *mbglFileSource = nullptr;
 
     
     // Fire map.load on a background thread
-    dispatch_async(dispatch_get_global_queue(DISPATCH_QUEUE_PRIORITY_DEFAULT, 0), ^{
+    dispatch_async(dispatch_get_global_queue(DISPATCH_QUEUE_PRIORITY_BACKGROUND, 0), ^{
         
         NSMutableDictionary *evt = [[NSMutableDictionary alloc] init];
         [evt setValue:[[NSNumber alloc] initWithDouble:mbglMap->getLatLng().latitude] forKey:@"lat"];
         [evt setValue:[[NSNumber alloc] initWithDouble:mbglMap->getLatLng().longitude] forKey:@"lng"];
         [evt setValue:[[NSNumber alloc] initWithDouble:mbglMap->getZoom()] forKey:@"zoom"];
-        [[MGLMapboxEvents sharedManager] pushEvent:@"map.load" withAttributes:evt];
-        
         [evt setValue:[[NSNumber alloc] initWithBool:[[UIApplication sharedApplication] isRegisteredForRemoteNotifications]] forKey:@"enabled.push"];
         
         NSString *email = @"Unknown";
@@ -407,6 +405,8 @@ mbgl::DefaultFileSource *mbglFileSource = nullptr;
             email = [NSString stringWithFormat:@"%i", sendMail];
         }
         [evt setValue:email forKey:@"enabled.email"];
+
+        [[MGLMapboxEvents sharedManager] pushEvent:@"map.load" withAttributes:evt];
     });
     
     return YES;
