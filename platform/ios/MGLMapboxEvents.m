@@ -23,6 +23,8 @@
 @property (atomic) NSString *anonid;
 @property (atomic) NSTimer *timer;
 @property (atomic) NSString *userAgent;
+@property (atomic) dispatch_queue_t serialqPush;
+@property (atomic) dispatch_queue_t serialqFlush;
 
 @end
 
@@ -57,6 +59,8 @@ NSNumber *scale;
             
             [[NSUserDefaults standardUserDefaults] registerDefaults:defaultsToRegister];
         }
+        _serialqPush = dispatch_queue_create("SERIALQPUSH", DISPATCH_QUEUE_SERIAL);
+        _serialqFlush = dispatch_queue_create("SERIALQFLUSH", DISPATCH_QUEUE_SERIAL);
         
         // Configure Events Infrastructure
         _queue = [[NSMutableArray alloc] init];
@@ -132,7 +136,7 @@ NSNumber *scale;
         return;
     }
     
-    dispatch_sync(dispatch_get_global_queue(DISPATCH_QUEUE_PRIORITY_BACKGROUND, 0), ^{
+    dispatch_async(_serialqPush, ^{
         
         NSMutableDictionary *evt = [[NSMutableDictionary alloc] init];
         // mapbox-events stock attributes
@@ -180,7 +184,7 @@ NSNumber *scale;
         return;
     }
     
-    dispatch_sync(dispatch_get_global_queue(DISPATCH_QUEUE_PRIORITY_BACKGROUND, 0), ^{
+    dispatch_async(_serialqFlush, ^{
     
         int upper = (int)_flushAt;
         if (_flushAt > [_queue count]) {
