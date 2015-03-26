@@ -155,7 +155,7 @@ mbgl::DefaultFileSource *mbglFileSource = nullptr;
     if (accessToken)
     {
         mbglMap->setAccessToken((std::string)[accessToken UTF8String]);
-        [[MGLMapboxEvents sharedManager] setToken:accessToken];
+        [MGLMapboxEvents setToken:accessToken];
     }
 }
 
@@ -195,16 +195,11 @@ mbgl::DefaultFileSource *mbglFileSource = nullptr;
     //
     self.accessibilityLabel = @"Map";
     
-    // setup Metrics
-    MGLMapboxEvents *events = [MGLMapboxEvents sharedManager];
+    // metrics: initial setup
     NSString *appName = [[NSBundle mainBundle] objectForInfoDictionaryKey:@"CFBundleName"];
     NSString *appVersion = [[NSBundle mainBundle] objectForInfoDictionaryKey:@"CFBundleShortVersionString"];
-    if (appName != nil) {
-        events.appName = appName;
-    }
-    if (appVersion != nil) {
-        events.appVersion = appVersion;
-    }
+    if (appName != nil) [MGLMapboxEvents setAppName:appName];
+    if (appVersion != nil) [MGLMapboxEvents setAppVersion:appVersion];
 
     // create GL view
     //
@@ -364,12 +359,12 @@ mbgl::DefaultFileSource *mbglFileSource = nullptr;
     const mbgl::LatLng latLng = mbglMap->getLatLng();
     const double zoom = mbglMap->getZoom();
 
-    [[MGLMapboxEvents sharedManager] pushEvent:MGLEventMapLoad withAttributes:@{
+    [MGLMapboxEvents pushEvent:MGLEventMapLoad withAttributes:@{
         @"lat": @(latLng.latitude),
         @"lng": @(latLng.longitude),
         @"zoom": @(zoom),
-        @"enabled.push": @([[MGLMapboxEvents sharedManager] checkPushEnabled]),
-        @"enabled.email": [[MGLMapboxEvents sharedManager] checkEmailEnabled]
+        @"enabled.push": @([MGLMapboxEvents checkPushEnabled]),
+        @"enabled.email": [MGLMapboxEvents checkEmailEnabled]
     }];
 
     return YES;
@@ -557,7 +552,7 @@ mbgl::DefaultFileSource *mbglFileSource = nullptr;
 - (void)appDidBackground:(NSNotification *)notification
 {
     // Flush Any Events Still In Queue
-    [[MGLMapboxEvents sharedManager] flush];
+    [MGLMapboxEvents flush];
     
     mbglMap->stop();
 
@@ -663,7 +658,7 @@ mbgl::DefaultFileSource *mbglFileSource = nullptr;
         CLLocationCoordinate2D panCoordinate = [self convertPoint:pointInView toCoordinateFromView:pan.view];
         double zoom = [self zoomLevel];
 
-        [[MGLMapboxEvents sharedManager] pushEvent:MGLEventMapPanEnd withAttributes:@{
+        [MGLMapboxEvents pushEvent:MGLEventMapPanEnd withAttributes:@{
             @"lat": @(panCoordinate.latitude),
             @"lng": @(panCoordinate.longitude),
             @"zoom": @(zoom)
@@ -994,7 +989,7 @@ mbgl::DefaultFileSource *mbglFileSource = nullptr;
     CLLocationCoordinate2D gestureCoordinate = [self convertPoint:pointInView toCoordinateFromView:recognizer.view];
     double zoom = [self zoomLevel];
 
-    [[MGLMapboxEvents sharedManager] pushEvent:MGLEventMapTap withAttributes:@{
+    [MGLMapboxEvents pushEvent:MGLEventMapTap withAttributes:@{
         @"lat": @(gestureCoordinate.latitude),
         @"lng": @(gestureCoordinate.longitude),
         @"zoom": @(zoom),

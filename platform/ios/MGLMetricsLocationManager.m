@@ -62,7 +62,7 @@
         NSMutableDictionary *evt = [[NSMutableDictionary alloc] init];
         [evt setValue:@(loc.coordinate.latitude) forKey:@"lat"];
         [evt setValue:@(loc.coordinate.longitude) forKey:@"lng"];
-        [[MGLMapboxEvents sharedManager] pushEvent:@"location" withAttributes:evt];
+        [MGLMapboxEvents pushEvent:@"location" withAttributes:evt];
     }
 }
 

@@ -23,6 +23,9 @@ NSString *const MGLEventMapRotateStart = @"Rotation";
 
 @interface MGLMapboxEvents()
 
+@property (atomic) NSString *token;
+@property (atomic) NSString *appName;
+@property (atomic) NSString *appVersion;
 @property (atomic) NSUInteger flushAt;
 @property (atomic) NSTimeInterval flushAfter;
 @property (atomic) NSMutableArray *queue;
@@ -32,6 +35,10 @@ NSString *const MGLEventMapRotateStart = @"Rotation";
 @property (atomic) NSString *userAgent;
 @property (atomic) dispatch_queue_t serialqPush;
 @property (atomic) dispatch_queue_t serialqFlush;
+
++ (instancetype)sharedManager;
+
+- (void) pushEvent:(NSString *)event withAttributes:(NSDictionary *)attributeDictionary;
 
 @end
 
@@ -130,6 +137,22 @@ NSString *const MGLEventMapRotateStart = @"Rotation";
     return _sharedManager;
 }
 
++ (void) setToken:(NSString *)token {
+    [MGLMapboxEvents sharedManager].token = token;
+}
+
++ (void) setAppName:(NSString *)appName {
+    [MGLMapboxEvents sharedManager].appName = appName;
+}
+
++ (void) setAppVersion:(NSString *)appVersion {
+    [MGLMapboxEvents sharedManager].appVersion = appVersion;
+}
+
++ (void) pushEvent:(NSString *)event withAttributes:(NSDictionary *)attributeDictionary {
+    [[MGLMapboxEvents sharedManager] pushEvent:event withAttributes:attributeDictionary];
+}
+
 - (void) pushEvent:(NSString *)event withAttributes:(NSDictionary *)attributeDictionary {
     
     // Opt Out Checking When Built
@@ -189,6 +212,10 @@ NSString *const MGLEventMapRotateStart = @"Rotation";
         [self startTimer];
         
     });
+}
+
++ (void) flush {
+    [[MGLMapboxEvents sharedManager] flush];
 }
 
 - (void) flush {
@@ -386,7 +413,7 @@ NSString *const MGLEventMapRotateStart = @"Rotation";
     }
 }
 
-- (NSString *) checkEmailEnabled {
++ (NSString *) checkEmailEnabled {
     NSString *email = @"Unknown";
     Class MFMailComposeViewController = NSClassFromString(@"MFMailComposeViewController");
     if (MFMailComposeViewController) {
@@ -398,7 +425,7 @@ NSString *const MGLEventMapRotateStart = @"Rotation";
     return email;
 }
 
-- (BOOL) checkPushEnabled {
++ (BOOL) checkPushEnabled {
     return[[UIApplication sharedApplication] isRegisteredForRemoteNotifications];
 }
 

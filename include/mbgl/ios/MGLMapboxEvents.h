@@ -13,19 +13,17 @@ extern NSString *const MGLEventMapRotateStart;
 
 @interface MGLMapboxEvents : NSObject
 
-@property (atomic) NSString *token;
-@property (atomic) NSString *appName;
-@property (atomic) NSString *appVersion;
-
-+ (instancetype)sharedManager;
++ (void) setToken:(NSString *)token;
++ (void) setAppName:(NSString *)appName;
++ (void) setAppVersion:(NSString *)appVersion;
 
 // Events or attributes pushed could be access on non-main threads, so do not
 // reference UI elements from within any arguments!
-- (void) pushEvent:(NSString *)event withAttributes:(NSDictionary *)attributeDictionary;
++ (void) pushEvent:(NSString *)event withAttributes:(NSDictionary *)attributeDictionary;
 
-- (NSString *) checkEmailEnabled;
-- (BOOL) checkPushEnabled;
++ (NSString *) checkEmailEnabled;
++ (BOOL) checkPushEnabled;
 
-- (void) flush;
++ (void) flush;
 
 @end
