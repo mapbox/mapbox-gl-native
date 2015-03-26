@@ -2140,7 +2140,6 @@ CLLocationCoordinate2D latLngToCoordinate(mbgl::LatLng latLng)
     if ([newLocation distanceFromLocation:oldLocation] || ! oldLocation)
     {
         self.userLocation.location = newLocation;
-        [self.userLocationAnnotationView setupLayers];
 
         if ([self.delegate respondsToSelector:@selector(mapView:didUpdateUserLocation:)])
         {
