@@ -29,7 +29,7 @@ NSDateFormatter *rfc3339DateFormatter = nil;
 NSString *model;
 NSString *iOSVersion;
 NSString *carrier;
-NSNumber *scale;
+CGFloat scale;
 
 - (id) init {
     self = [super init];
@@ -88,9 +88,9 @@ NSNumber *scale;
         model = [self getSysInfoByName:"hw.machine"];
         iOSVersion = [NSString stringWithFormat:@"%@ %@", [UIDevice currentDevice].systemName, [UIDevice currentDevice].systemVersion];
         if ([UIScreen instancesRespondToSelector:@selector(nativeScale)]) {
-            scale = [[NSNumber alloc] initWithFloat:[UIScreen mainScreen].nativeScale];
+            scale = [UIScreen mainScreen].nativeScale;
         } else {
-            scale = [[NSNumber alloc] initWithFloat:[UIScreen mainScreen].scale];
+            scale = [UIScreen mainScreen].scale;
         }
         CTCarrier *carrierVendor = [[[CTTelephonyNetworkInfo alloc] init] subscriberCellularProvider];
         carrier = [carrierVendor carrierName];
@@ -150,7 +150,7 @@ NSNumber *scale;
         [evt setValue:iOSVersion forKey:@"operatingSystem"];
         [evt setValue:[self getDeviceOrientation] forKey:@"orientation"];
         [evt setValue:[[NSNumber alloc] initWithFloat:(100 * [UIDevice currentDevice].batteryLevel)] forKey:@"batteryLevel"];
-        [evt setValue:scale forKey:@"resolution"];
+        [evt setValue:@(scale) forKey:@"resolution"];
         [evt setValue:carrier forKey:@"carrier"];
         [evt setValue:[self getCurrentCellularNetworkConnectionType] forKey:@"cellularNetworkType"];
         [evt setValue:[self getWifiNetworkName] forKey:@"wifi"];
