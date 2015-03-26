@@ -987,16 +987,18 @@ mbgl::DefaultFileSource *mbglFileSource = nullptr;
 
 - (void) trackGestureEvent:(NSString *) gesture forRecognizer:(UIGestureRecognizer  *) recognizer
 {
-    // Send Map Zoom Event
-    CGPoint ptInView = CGPointMake([recognizer locationInView:recognizer.view].x, [recognizer locationInView:recognizer.view].y);
-    CLLocationCoordinate2D coord = [self convertPoint:ptInView toCoordinateFromView:recognizer.view];
-    NSMutableDictionary *dict = [[NSMutableDictionary alloc] init];
-    [dict setValue:[[NSNumber alloc] initWithDouble:coord.latitude] forKey:@"lat"];
-    [dict setValue:[[NSNumber alloc] initWithDouble:coord.longitude] forKey:@"lng"];
-    [dict setValue:[[NSNumber alloc] initWithDouble:[self zoomLevel]] forKey:@"zoom"];
-    [dict setValue:gesture forKey:@"gesture"];
-    
-    [[MGLMapboxEvents sharedManager] pushEvent:@"map.click" withAttributes:dict];
+    dispatch_async(dispatch_get_global_queue(DISPATCH_QUEUE_PRIORITY_BACKGROUND, 0), ^{
+        // Send Map Zoom Event
+        CGPoint ptInView = CGPointMake([recognizer locationInView:recognizer.view].x, [recognizer locationInView:recognizer.view].y);
+        CLLocationCoordinate2D coord = [self convertPoint:ptInView toCoordinateFromView:recognizer.view];
+        NSMutableDictionary *dict = [[NSMutableDictionary alloc] init];
+        [dict setValue:[[NSNumber alloc] initWithDouble:coord.latitude] forKey:@"lat"];
+        [dict setValue:[[NSNumber alloc] initWithDouble:coord.longitude] forKey:@"lng"];
+        [dict setValue:[[NSNumber alloc] initWithDouble:[self zoomLevel]] forKey:@"zoom"];
+        [dict setValue:gesture forKey:@"gesture"];
+        
+        [[MGLMapboxEvents sharedManager] pushEvent:@"map.click" withAttributes:dict];
+    });
 }
 
 #pragma mark - Properties -
