@@ -2145,8 +2145,6 @@ CLLocationCoordinate2D latLngToCoordinate(mbgl::LatLng latLng)
         if ([self.delegate respondsToSelector:@selector(mapView:didUpdateUserLocation:)])
         {
             [self.delegate mapView:self didUpdateUserLocation:self.userLocation];
-
-            if ( ! _showsUserLocation) return;
         }
     }
 
