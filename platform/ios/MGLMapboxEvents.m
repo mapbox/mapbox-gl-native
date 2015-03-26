@@ -20,7 +20,8 @@
 
 @property (atomic) NSMutableArray *queue;
 @property (atomic) NSString *instance;
-@property (atomic) NSString *anonid;
+@property (atomic) NSString *advertiserId;
+@property (atomic) NSString *vendorId;
 @property (atomic) NSTimer *timer;
 @property (atomic) NSString *userAgent;
 @property (atomic) dispatch_queue_t serialqPush;
@@ -71,6 +72,7 @@ NSNumber *scale;
         _api = @"https://api.tiles.mapbox.com";
         _token = nil;
         _instance = [[NSUUID UUID] UUIDString];
+        _advertiserId = @"NONE";
         Class ASIdentifierManagerClass = NSClassFromString(@"ASIdentifierManager");
         if (ASIdentifierManagerClass) {
             SEL sharedManagerSelector = NSSelectorFromString(@"sharedManager");
@@ -81,13 +83,10 @@ NSNumber *scale;
             if (trackingEnabled) {
                 SEL advertisingIdentifierSelector = NSSelectorFromString(@"advertisingIdentifier");
                 NSUUID *uuid = ((NSUUID* (*)(id, SEL))[sharedManager methodForSelector:advertisingIdentifierSelector])(sharedManager, advertisingIdentifierSelector);
-                _anonid = [uuid UUIDString];
-            } else {
-                _anonid = [[[UIDevice currentDevice] identifierForVendor] UUIDString];
+                _advertiserId = [uuid UUIDString];
             }
-        } else {
-            _anonid = [[[UIDevice currentDevice] identifierForVendor] UUIDString];
         }
+        _vendorId = [[[UIDevice currentDevice] identifierForVendor] UUIDString];
         
         model = [self getSysInfoByName:"hw.machine"];
         iOSVersion = [NSString stringWithFormat:@"%@ %@", [UIDevice currentDevice].systemName, [UIDevice currentDevice].systemVersion];
@@ -146,7 +145,8 @@ NSNumber *scale;
         [evt setObject:[NSNumber numberWithInt:1] forKey:@"version"];
         [evt setObject:[self formatDate:[NSDate date]] forKey:@"created"];
         [evt setObject:self.instance forKey:@"instance"];
-        [evt setObject:self.anonid forKey:@"anonid"];
+        [evt setObject:self.advertiserId forKey:@"advertiserId"];
+        [evt setObject:self.vendorId forKey:@"vendorId"];
         
         // mapbox-events-ios stock attributes
         [evt setValue:[rfc3339DateFormatter stringFromDate:[NSDate date]] forKey:@"created"];
