@@ -547,7 +547,6 @@ mbgl::DefaultFileSource *mbglFileSource = nullptr;
 
 - (void)appDidBackground:(NSNotification *)notification
 {
-    // Flush Any Events Still In Queue
     [MGLMapboxEvents flush];
     
     mbglMap->stop();

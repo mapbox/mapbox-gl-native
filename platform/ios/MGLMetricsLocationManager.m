@@ -14,7 +14,7 @@
 
 @implementation MGLMetricsLocationManager
 
-- (id) init {
+- (instancetype) init {
     if (self = [super init]) {
         _locationManager = [[CLLocationManager alloc] init];
         _locationManager.distanceFilter = 2;
@@ -25,7 +25,7 @@
     return self;
 }
 
-+ (id)sharedManager {
++ (instancetype)sharedManager {
     static dispatch_once_t onceToken;
     static MGLMetricsLocationManager *sharedManager;
     dispatch_once(&onceToken, ^{

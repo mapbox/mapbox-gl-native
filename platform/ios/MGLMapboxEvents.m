@@ -24,37 +24,63 @@ NSString *const MGLEventMapPinchStart = @"Pinch";
 NSString *const MGLEventMapRotateStart = @"Rotation";
 NSString *const MGLEventMapLocation = @"Location";
 
+//
+// Threadsafety conventions:
+//
+// All variables accessed from more than one thread are
+// designed `atomic` and accessed through dot syntax. The
+// main thread may use underscore syntax during the
+// initialization of the variable.
+//
+// All variables accessed outside of initialization and
+// from within a single thread use underscore syntax.
+//
+// All captures of `self` from within asynchronous
+// dispatches will use a `weakSelf` to avoid cyclical
+// strong references.
+//
+
 @interface MGLMapboxEvents()
 
+// All of the following properties are written to only from
+// the main thread, but can be read on any thread.
+//
 @property (atomic) NSString *token;
 @property (atomic) NSString *appName;
 @property (atomic) NSString *appVersion;
+@property (atomic) NSString *instanceID;
+@property (atomic) NSString *anonID;
+@property (atomic) NSString *userAgent;
+@property (atomic) NSString *model;
+@property (atomic) NSString *iOSVersion;
+@property (atomic) NSString *carrier;
 @property (atomic) NSUInteger flushAt;
 @property (atomic) NSTimeInterval flushAfter;
-@property (atomic) NSMutableArray *queue;
-@property (atomic) NSString *instance;
-@property (atomic) NSString *anonid;
-@property (atomic) NSTimer *timer;
-@property (atomic) NSString *userAgent;
-@property (atomic) dispatch_queue_t serialqPush;
-@property (atomic) dispatch_queue_t serialqFlush;
+@property (atomic) NSDateFormatter *rfc3339DateFormatter;
+@property (atomic) CGFloat scale;
 
-+ (instancetype)sharedManager;
+// The timer is only ever accessed from the main thread.
+//
+@property (nonatomic) NSTimer *timer;
 
-- (void) pushEvent:(NSString *)event withAttributes:(NSDictionary *)attributeDictionary;
+// This is an array of events to push. All access to it will be
+// from our own serial queue.
+//
+@property (nonatomic) NSMutableArray *eventQueue;
+
+// This is a custom serial queue for accessing the event queue.
+//
+@property (nonatomic) dispatch_queue_t serialQueue;
 
 @end
 
 @implementation MGLMapboxEvents
-{
-    NSDateFormatter *_rfc3339DateFormatter;
-    NSString *_model;
-    NSString *_iOSVersion;
-    NSString *_carrier;
-    CGFloat _scale;
-}
 
-- (id) init {
+// Must be called from the main thread. Only called internally.
+//
+- (instancetype) init {
+    assert([[NSThread currentThread] isMainThread]);
+
     self = [super init];
     if (self) {
         
@@ -79,15 +105,14 @@ NSString *const MGLEventMapLocation = @"Location";
         }
         NSString *bundleID = [[NSBundle mainBundle] bundleIdentifier];
         NSString *uniqueID = [[NSProcessInfo processInfo] globallyUniqueString];
-        _serialqPush = dispatch_queue_create([[NSString stringWithFormat:@"%@.%@.SERIALQPUSH", bundleID, uniqueID] UTF8String], DISPATCH_QUEUE_SERIAL);
-        _serialqFlush = dispatch_queue_create([[NSString stringWithFormat:@"%@.%@.SERIALQFLUSH", bundleID, uniqueID] UTF8String], DISPATCH_QUEUE_SERIAL);
-        
+        _serialQueue = dispatch_queue_create([[NSString stringWithFormat:@"%@.%@.events.serial", bundleID, uniqueID] UTF8String], DISPATCH_QUEUE_SERIAL);
+
         // Configure Events Infrastructure
-        _queue = [[NSMutableArray alloc] init];
+        _eventQueue = [[NSMutableArray alloc] init];
         _flushAt = 20;
         _flushAfter = 10000;
         _token = nil;
-        _instance = [[NSUUID UUID] UUIDString];
+        _instanceID = [[NSUUID UUID] UUIDString];
         // Dynamic detection of ASIdentifierManager from Mixpanel
         // https://github.com/mixpanel/mixpanel-iphone/blob/master/LICENSE
         Class ASIdentifierManagerClass = NSClassFromString(@"ASIdentifierManager");
@@ -100,12 +125,12 @@ NSString *const MGLEventMapLocation = @"Location";
             if (trackingEnabled) {
                 SEL advertisingIdentifierSelector = NSSelectorFromString(@"advertisingIdentifier");
                 NSUUID *uuid = ((NSUUID* (*)(id, SEL))[sharedManager methodForSelector:advertisingIdentifierSelector])(sharedManager, advertisingIdentifierSelector);
-                _anonid = [uuid UUIDString];
+                _anonID = [uuid UUIDString];
             } else {
-                _anonid = [[[UIDevice currentDevice] identifierForVendor] UUIDString];
+                _anonID = [[[UIDevice currentDevice] identifierForVendor] UUIDString];
             }
         } else {
-            _anonid = [[[UIDevice currentDevice] identifierForVendor] UUIDString];
+            _anonID = [[[UIDevice currentDevice] identifierForVendor] UUIDString];
         }
         
         _model = [self getSysInfoByName:"hw.machine"];
@@ -131,72 +156,99 @@ NSString *const MGLEventMapLocation = @"Location";
     return self;
 }
 
-+ (id)sharedManager {
+// Can be called from any thread. Called implicitly from any
+// public class convenience methods.
+//
++ (instancetype)sharedManager {
     static dispatch_once_t onceToken;
     static MGLMapboxEvents *_sharedManager;
     dispatch_once(&onceToken, ^{
-        _sharedManager = [[self alloc] init];
-        // setup dedicated location manager on first use
-        [MGLMetricsLocationManager sharedManager];
+        void (^setupBlock)() = ^{
+            _sharedManager = [[self alloc] init];
+            // setup dedicated location manager on first use
+            [MGLMetricsLocationManager sharedManager];
+        };
+        if ( ! [[NSThread currentThread] isMainThread]) {
+            dispatch_sync(dispatch_get_main_queue(), ^{
+                setupBlock();
+            });
+        } else {
+            setupBlock();
+        }
     });
     return _sharedManager;
 }
 
+// Must be called from the main thread.
+//
 + (void) setToken:(NSString *)token {
+    assert([[NSThread currentThread] isMainThread]);
     [MGLMapboxEvents sharedManager].token = token;
 }
 
+// Must be called from the main thread.
+//
 + (void) setAppName:(NSString *)appName {
+    assert([[NSThread currentThread] isMainThread]);
     [MGLMapboxEvents sharedManager].appName = appName;
 }
 
+// Must be called from the main thread.
+//
 + (void) setAppVersion:(NSString *)appVersion {
+    assert([[NSThread currentThread] isMainThread]);
     [MGLMapboxEvents sharedManager].appVersion = appVersion;
 }
 
+// Can be called from any thread. Can be called rapidly from
+// the UI thread, so performance is paramount.
+//
 + (void) pushEvent:(NSString *)event withAttributes:(NSDictionary *)attributeDictionary {
-    [[MGLMapboxEvents sharedManager] pushEvent:event withAttributes:attributeDictionary];
+    dispatch_async(dispatch_get_global_queue(DISPATCH_QUEUE_PRIORITY_BACKGROUND, 0), ^{
+        [[MGLMapboxEvents sharedManager] pushEvent:event withAttributes:attributeDictionary];
+    });
 }
 
+// Can be called from any thread. Called implicitly from public
+// use of +pushEvent:withAttributes:.
+//
 - (void) pushEvent:(NSString *)event withAttributes:(NSDictionary *)attributeDictionary {
-    
-    // Opt Out Checking When Built
-    if (![[NSUserDefaults standardUserDefaults] boolForKey:@"mapbox_metrics_enabled_preference"]) {
-        [_queue removeAllObjects];
-        return;
-    }
+    __weak MGLMapboxEvents *weakSelf = self;
 
-    // Add Metrics Disabled App Wide Check
-    if ([[NSUserDefaults standardUserDefaults] objectForKey:@"mapbox_metrics_disabled"] != nil) {
-        [_queue removeAllObjects];
-        return;
-    }
-    
-    if (!event) {
-        return;
-    }
-    
-    dispatch_async(_serialqPush, ^{
+    dispatch_async(_serialQueue, ^{
+        // Opt Out Checking When Built
+        if (![[NSUserDefaults standardUserDefaults] boolForKey:@"mapbox_metrics_enabled_preference"]) {
+            [_eventQueue removeAllObjects];
+            return;
+        }
+
+        // Add Metrics Disabled App Wide Check
+        if ([[NSUserDefaults standardUserDefaults] objectForKey:@"mapbox_metrics_disabled"] != nil) {
+            [_eventQueue removeAllObjects];
+            return;
+        }
         
+        if (!event) return;
+
         NSMutableDictionary *evt = [[NSMutableDictionary alloc] init];
         // mapbox-events stock attributes
         [evt setObject:event forKey:@"event"];
         [evt setObject:@(1) forKey:@"version"];
-        [evt setObject:[self formatDate:[NSDate date]] forKey:@"created"];
-        [evt setObject:self.instance forKey:@"instance"];
-        [evt setObject:self.anonid forKey:@"anonid"];
+        [evt setObject:[weakSelf formatDate:[NSDate date]] forKey:@"created"];
+        [evt setObject:weakSelf.instanceID forKey:@"instance"];
+        [evt setObject:weakSelf.anonID forKey:@"anonid"];
         
         // mapbox-events-ios stock attributes
-        [evt setValue:[_rfc3339DateFormatter stringFromDate:[NSDate date]] forKey:@"created"];
-        [evt setValue:_model forKey:@"model"];
-        [evt setValue:_iOSVersion forKey:@"operatingSystem"];
-        [evt setValue:[self getDeviceOrientation] forKey:@"orientation"];
+        [evt setValue:[weakSelf.rfc3339DateFormatter stringFromDate:[NSDate date]] forKey:@"created"];
+        [evt setValue:weakSelf.model forKey:@"model"];
+        [evt setValue:weakSelf.iOSVersion forKey:@"operatingSystem"];
+        [evt setValue:[weakSelf getDeviceOrientation] forKey:@"orientation"];
         [evt setValue:@(100 * [UIDevice currentDevice].batteryLevel) forKey:@"batteryLevel"];
-        [evt setValue:@(_scale) forKey:@"resolution"];
-        [evt setValue:_carrier forKey:@"carrier"];
-        [evt setValue:[self getCurrentCellularNetworkConnectionType] forKey:@"cellularNetworkType"];
-        [evt setValue:[self getWifiNetworkName] forKey:@"wifi"];
-        [evt setValue:@([self getContentSizeScale]) forKey:@"accessibilityFontScale"];
+        [evt setValue:@(weakSelf.scale) forKey:@"resolution"];
+        [evt setValue:weakSelf.carrier forKey:@"carrier"];
+        [evt setValue:[weakSelf getCurrentCellularNetworkConnectionType] forKey:@"cellularNetworkType"];
+        [evt setValue:[weakSelf getWifiNetworkName] forKey:@"wifi"];
+        [evt setValue:@([weakSelf getContentSizeScale]) forKey:@"accessibilityFontScale"];
         
         for (NSString *key in [attributeDictionary allKeys]) {
             [evt setObject:[attributeDictionary valueForKey:key] forKey:key];
@@ -206,121 +258,167 @@ NSString *const MGLEventMapLocation = @"Location";
         NSDictionary *finalEvent = [NSDictionary dictionaryWithDictionary:evt];
         
         // Put On The Queue
-        [self.queue addObject:finalEvent];
+        [_eventQueue addObject:finalEvent];
         
         // Has Flush Limit Been Reached?
-        if (_queue.count >= _flushAt) {
-            [self flush];
+        if (_eventQueue.count >= weakSelf.flushAt) {
+            [weakSelf flush];
         }
         
         // Reset Timer (Initial Starting of Timer after first event is pushed)
-        [self startTimer];
-        
+        [weakSelf startTimer];
     });
 }
 
+// Can be called from any thread.
+//
 + (void) flush {
     [[MGLMapboxEvents sharedManager] flush];
 }
 
+// Can be called from any thread.
+//
 - (void) flush {
-    if (_token == nil) {
-        return;
-    }
-    
-    dispatch_async(_serialqFlush, ^{
-    
-        NSUInteger upper = _flushAt;
-        if (_flushAt > [_queue count]) {
-            if ([_queue count] == 0) {
+    if (self.token == nil) return;
+
+    __weak MGLMapboxEvents *weakSelf = self;
+
+    dispatch_async(_serialQueue, ^{
+        __block NSArray *events;
+
+        NSUInteger upper = weakSelf.flushAt;
+        if (weakSelf.flushAt > [_eventQueue count]) {
+            if ([_eventQueue count] == 0) {
                 return;
             }
-            upper = [_queue count];
+            upper = [_eventQueue count];
         }
     
         // Create Array of Events to push to the Server
         NSRange theRange = NSMakeRange(0, upper);
-        NSArray *events = [_queue subarrayWithRange:theRange];
+        events = [_eventQueue subarrayWithRange:theRange];
     
         // Update Queue to remove events sent to server
-        [_queue removeObjectsInRange:theRange];
-    
+        [_eventQueue removeObjectsInRange:theRange];
+
         // Send Array of Events to Server
-        [self postEvents:events];
+        [weakSelf postEvents:events];
     });
 }
 
+// Can be called from any thread. Called implicitly from public
+// use of +flush. Posts an async network request to upload metrics.
+//
 - (void) postEvents:(NSArray *)events {
-    // Setup URL Request
-    NSString *url = [NSString stringWithFormat:@"%@/events/v1?access_token=%@", MGLMapboxEventsAPIBase, _token];
-    NSMutableURLRequest *request = [[NSMutableURLRequest alloc] initWithURL:[NSURL URLWithString:url]];
-    [request setValue:[self getUserAgent] forHTTPHeaderField:@"User-Agent"];
-    [request setValue:@"application/json" forHTTPHeaderField:@"Content-Type"];
-    [request setHTTPMethod:@"POST"];
-    
-    // Convert Array of Dictionaries to JSON
-    if ([NSJSONSerialization isValidJSONObject:events]) {
-        NSData *jsonData = [NSJSONSerialization dataWithJSONObject:events options:NSJSONWritingPrettyPrinted error:nil];
-        [request setHTTPBody:jsonData];
+    __weak MGLMapboxEvents *weakSelf = self;
+
+    dispatch_async(dispatch_get_global_queue(DISPATCH_QUEUE_PRIORITY_BACKGROUND, 0), ^{
+        // Setup URL Request
+        NSString *url = [NSString stringWithFormat:@"%@/events/v1?access_token=%@", MGLMapboxEventsAPIBase, weakSelf.token];
+        NSMutableURLRequest *request = [[NSMutableURLRequest alloc] initWithURL:[NSURL URLWithString:url]];
+        [request setValue:[weakSelf getUserAgent] forHTTPHeaderField:@"User-Agent"];
+        [request setValue:@"application/json" forHTTPHeaderField:@"Content-Type"];
+        [request setHTTPMethod:@"POST"];
         
-        // Send non blocking HTTP Request to server
-        [NSURLConnection sendAsynchronousRequest:request queue:[NSOperationQueue mainQueue] completionHandler:nil];
-    }
+        // Convert Array of Dictionaries to JSON
+        if ([NSJSONSerialization isValidJSONObject:events]) {
+            NSData *jsonData = [NSJSONSerialization dataWithJSONObject:events options:NSJSONWritingPrettyPrinted error:nil];
+            [request setHTTPBody:jsonData];
+
+            // Send non blocking HTTP Request to server
+            [NSURLConnection sendAsynchronousRequest:request
+                                               queue:nil
+                                   completionHandler:nil];
+        }
+    });
 }
 
+// Can be called from any thread.
 - (void) startTimer {
-    // Stop Timer if it already exists
-    if (_timer) {
-        [_timer invalidate];
-        _timer = nil;
+    void (^timerBlock)() = ^{
+        // Stop Timer if it already exists
+        if (_timer) {
+            [_timer invalidate];
+            _timer = nil;
+        }
+
+        // Start New Timer
+        NSTimeInterval interval = _flushAfter;
+        _timer = [NSTimer scheduledTimerWithTimeInterval:interval
+                                                  target:self
+                                                selector:@selector(flush)
+                                                userInfo:nil repeats:YES];
+    };
+
+    if ( ! [[NSThread currentThread] isMainThread]) {
+        dispatch_sync(dispatch_get_main_queue(), ^{
+            timerBlock();
+        });
+    } else {
+        timerBlock();
     }
-    
-    // Start New Timer
-    NSTimeInterval interval = _flushAfter;
-    _timer = [NSTimer scheduledTimerWithTimeInterval:interval target:self selector:@selector(flush) userInfo:nil repeats:YES];
 }
 
+// Can be called from any thread.
 - (NSString *) getUserAgent {
-    
-    if (_appName != nil && _appVersion != nil && ([_userAgent rangeOfString:_appName].location == NSNotFound)) {
-        _userAgent = [NSString stringWithFormat:@"%@/%@ %@", _appName, _appVersion, _userAgent];
+    if (self.appName != nil && self.appVersion != nil && ([self.userAgent rangeOfString:self.appName].location == NSNotFound)) {
+        self.userAgent = [NSString stringWithFormat:@"%@/%@ %@", self.appName, self.appVersion, self.userAgent];
     }
-    return _userAgent;
+    return self.userAgent;
 }
 
+// Can be called from any thread.
 - (NSString *) formatDate:(NSDate *)date {
-    return [_rfc3339DateFormatter stringFromDate:date];
+    return [self.rfc3339DateFormatter stringFromDate:date];
 }
 
+// Can be called from any thread.
 - (NSString *) getDeviceOrientation {
-    switch ([UIDevice currentDevice].orientation) {
-        case UIDeviceOrientationUnknown:
-            return @"Unknown";
-            break;
-        case UIDeviceOrientationPortrait:
-            return @"Portrait";
-            break;
-        case UIDeviceOrientationPortraitUpsideDown:
-            return @"PortraitUpsideDown";
-            break;
-        case UIDeviceOrientationLandscapeLeft:
-            return @"LandscapeLeft";
-            break;
-        case UIDeviceOrientationLandscapeRight:
-            return @"LandscapeRight";
-            break;
-        case UIDeviceOrientationFaceUp:
-            return @"FaceUp";
-            break;
-        case UIDeviceOrientationFaceDown:
-            return @"FaceDown";
-            break;
-        default:
-            return @"Default - Unknown";
-            break;
+    __block NSString *result;
+
+    NSString *(^deviceOrientationBlock)(void) = ^{
+        switch ([UIDevice currentDevice].orientation) {
+            case UIDeviceOrientationUnknown:
+                result = @"Unknown";
+                break;
+            case UIDeviceOrientationPortrait:
+                result = @"Portrait";
+                break;
+            case UIDeviceOrientationPortraitUpsideDown:
+                result = @"PortraitUpsideDown";
+                break;
+            case UIDeviceOrientationLandscapeLeft:
+                result = @"LandscapeLeft";
+                break;
+            case UIDeviceOrientationLandscapeRight:
+                result = @"LandscapeRight";
+                break;
+            case UIDeviceOrientationFaceUp:
+                result = @"FaceUp";
+                break;
+            case UIDeviceOrientationFaceDown:
+                result = @"FaceDown";
+                break;
+            default:
+                result = @"Default - Unknown";
+                break;
+        }
+
+        return result;
+    };
+
+    if ( ! [[NSThread currentThread] isMainThread]) {
+        dispatch_sync(dispatch_get_main_queue(), ^{
+            result = deviceOrientationBlock();
+        });
+    } else {
+        result = deviceOrientationBlock();
     }
+
+    return result;
 }
 
+// Can be called from any thread.
 - (NSInteger) getContentSizeScale {
     __block NSInteger result = -9999;
 
@@ -367,6 +465,7 @@ NSString *const MGLEventMapLocation = @"Location";
     return result;
 }
 
+// Can be called from any thread.
 - (NSString *)getSysInfoByName:(char *)typeSpecifier
 {
     size_t size;
@@ -381,6 +480,7 @@ NSString *const MGLEventMapLocation = @"Location";
     return results;
 }
 
+// Can be called from any thread.
 - (NSString *) getWifiNetworkName {
     
     NSString *ssid = @"";
@@ -399,6 +499,7 @@ NSString *const MGLEventMapLocation = @"Location";
     return ssid;
 }
 
+// Can be called from any thread.
 - (NSString *) getCurrentCellularNetworkConnectionType {
     CTTelephonyNetworkInfo *telephonyInfo = [CTTelephonyNetworkInfo new];
     NSString *radioTech = telephonyInfo.currentRadioAccessTechnology;
@@ -432,6 +533,7 @@ NSString *const MGLEventMapLocation = @"Location";
     }
 }
 
+// Can be called from any thread.
 + (NSString *) checkEmailEnabled {
     __block NSString *result;
 
@@ -458,6 +560,7 @@ NSString *const MGLEventMapLocation = @"Location";
     return result;
 }
 
+// Can be called from any thread.
 + (BOOL) checkPushEnabled {
     __block BOOL result;
 
