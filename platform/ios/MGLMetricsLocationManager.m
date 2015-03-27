@@ -34,19 +34,6 @@
     return sharedManager;
 }
 
-- (BOOL) isAuthorizedStatusDetermined {
-    return ([CLLocationManager authorizationStatus] != kCLAuthorizationStatusNotDetermined);
-}
-
-- (void) requestAlwaysAuthorization {
-    if ([self.locationManager respondsToSelector:@selector(requestAlwaysAuthorization)]) {
-        [self.locationManager requestAlwaysAuthorization];
-    } else {
-        // This is iOS 7 or below so Starting Location Updates will trigger authorization request
-        [self startUpdatingLocation];
-    }
-}
-
 - (void) startUpdatingLocation {
     [self.locationManager startUpdatingLocation];
 }

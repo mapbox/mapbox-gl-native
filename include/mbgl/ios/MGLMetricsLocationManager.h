@@ -2,11 +2,8 @@
 
 @interface MGLMetricsLocationManager : NSObject
 
-// All methods are able to be called from any thread.
+// This method can be called from any thread.
 //
 + (instancetype)sharedManager;
-
-- (BOOL) isAuthorizedStatusDetermined;
-- (void) requestAlwaysAuthorization;
 
 @end
