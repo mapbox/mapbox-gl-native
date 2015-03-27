@@ -120,6 +120,13 @@ NSNumber *scale;
     return sharedManager;
 }
 
++ (NSString *) booleanToString:(BOOL) booleanValue {
+    if (booleanValue) {
+        return @"true";
+    }
+    return @"false";
+}
+
 - (void) pushEvent:(NSString *)event withAttributes:(NSDictionary *)attributeDictionary {
     
     // Opt Out Checking When Built
