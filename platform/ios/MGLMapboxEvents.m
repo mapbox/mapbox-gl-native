@@ -110,7 +110,7 @@ NSString *const MGLEventMapLocation = @"Location";
         // Configure Events Infrastructure
         _eventQueue = [[NSMutableArray alloc] init];
         _flushAt = 20;
-        _flushAfter = 10000;
+        _flushAfter = 60;
         _token = nil;
         _instanceID = [[NSUUID UUID] UUIDString];
         // Dynamic detection of ASIdentifierManager from Mixpanel
