@@ -586,14 +586,14 @@ mbgl::DefaultFileSource *mbglFileSource = nullptr;
 
 - (void)handlePanGesture:(UIPanGestureRecognizer *)pan
 {
-    [self trackGestureEvent:MGLEventGesturePanStart forRecognizer:pan];
-    
     if ( ! self.isScrollEnabled) return;
 
     mbglMap->cancelTransitions();
 
     if (pan.state == UIGestureRecognizerStateBegan)
     {
+        [self trackGestureEvent:MGLEventGesturePanStart forRecognizer:pan];
+
         self.centerPoint = CGPointMake(0, 0);
 
         self.userTrackingMode = MGLUserTrackingModeNone;
@@ -663,8 +663,6 @@ mbgl::DefaultFileSource *mbglFileSource = nullptr;
 
 - (void)handlePinchGesture:(UIPinchGestureRecognizer *)pinch
 {
-    [self trackGestureEvent:MGLEventGesturePinchStart forRecognizer:pinch];
-    
     if ( ! self.isZoomEnabled) return;
 
     if (mbglMap->getZoom() <= mbglMap->getMinZoom() && pinch.scale < 1) return;
@@ -673,6 +671,8 @@ mbgl::DefaultFileSource *mbglFileSource = nullptr;
 
     if (pinch.state == UIGestureRecognizerStateBegan)
     {
+        [self trackGestureEvent:MGLEventGesturePinchStart forRecognizer:pinch];
+
         mbglMap->startScaling();
 
         self.scale = mbglMap->getScale();
@@ -701,14 +701,14 @@ mbgl::DefaultFileSource *mbglFileSource = nullptr;
 
 - (void)handleRotateGesture:(UIRotationGestureRecognizer *)rotate
 {
-    [self trackGestureEvent:MGLEventGestureRotateStart forRecognizer:rotate];
-    
     if ( ! self.isRotateEnabled) return;
 
     mbglMap->cancelTransitions();
 
     if (rotate.state == UIGestureRecognizerStateBegan)
     {
+        [self trackGestureEvent:MGLEventGestureRotateStart forRecognizer:rotate];
+
         mbglMap->startRotating();
 
         self.angle = [MGLMapView degreesToRadians:mbglMap->getBearing()] * -1;
@@ -743,137 +743,140 @@ mbgl::DefaultFileSource *mbglFileSource = nullptr;
 
 - (void)handleSingleTapGesture:(UITapGestureRecognizer *)singleTap
 {
-    [self trackGestureEvent:MGLEventGestureSingleTap forRecognizer:singleTap];
-    
-    CGPoint tapPoint = [singleTap locationInView:self];
-
-    if (self.userLocationVisible && ! [self.selectedAnnotation isEqual:self.userLocation])
+    if (singleTap.state == UIGestureRecognizerStateEnded)
     {
-        CGRect userLocationRect = CGRectMake(tapPoint.x - 15, tapPoint.y - 15, 30, 30);
+        [self trackGestureEvent:MGLEventGestureSingleTap forRecognizer:singleTap];
 
-        if (CGRectContainsPoint(userLocationRect, [self convertCoordinate:self.userLocation.coordinate toPointToView:self]))
+        CGPoint tapPoint = [singleTap locationInView:self];
+
+        if (self.userLocationVisible && ! [self.selectedAnnotation isEqual:self.userLocation])
         {
-            [self selectAnnotation:self.userLocation animated:YES];
-            return;
-        }
-    }
+            CGRect userLocationRect = CGRectMake(tapPoint.x - 15, tapPoint.y - 15, 30, 30);
 
-    // tolerances based on touch size & typical marker aspect ratio
-    CGFloat toleranceWidth  = 40;
-    CGFloat toleranceHeight = 60;
-
-    // setup a recognition area weighted 2/3 of the way above the point to account for average marker imagery
-    CGRect tapRect = CGRectMake(tapPoint.x - toleranceWidth / 2, tapPoint.y - 2 * toleranceHeight / 3, toleranceWidth, toleranceHeight);
-    CGPoint tapRectLowerLeft  = CGPointMake(tapRect.origin.x, tapRect.origin.y + tapRect.size.height);
-    CGPoint tapRectUpperLeft  = CGPointMake(tapRect.origin.x, tapRect.origin.y);
-    CGPoint tapRectUpperRight = CGPointMake(tapRect.origin.x + tapRect.size.width, tapRect.origin.y);
-    CGPoint tapRectLowerRight = CGPointMake(tapRect.origin.x + tapRect.size.width, tapRect.origin.y + tapRect.size.height);
-
-    // figure out what that means in coordinate space
-    CLLocationCoordinate2D coordinate;
-    mbgl::LatLngBounds tapBounds;
-
-    coordinate = [self convertPoint:tapRectLowerLeft  toCoordinateFromView:self];
-    tapBounds.extend(mbgl::LatLng(coordinate.latitude, coordinate.longitude));
-
-    coordinate = [self convertPoint:tapRectUpperLeft  toCoordinateFromView:self];
-    tapBounds.extend(mbgl::LatLng(coordinate.latitude, coordinate.longitude));
-
-    coordinate = [self convertPoint:tapRectUpperRight toCoordinateFromView:self];
-    tapBounds.extend(mbgl::LatLng(coordinate.latitude, coordinate.longitude));
-
-    coordinate = [self convertPoint:tapRectLowerRight toCoordinateFromView:self];
-    tapBounds.extend(mbgl::LatLng(coordinate.latitude, coordinate.longitude));
-
-    // query for nearby annotations
-    std::vector<uint32_t> nearbyAnnotations = mbglMap->getAnnotationsInBounds(tapBounds);
-
-    int32_t newSelectedAnnotationID = -1;
-
-    if (nearbyAnnotations.size())
-    {
-        // there is at least one nearby annotation; select one
-        //
-        // first, sort for comparison and iteration
-        std::sort(nearbyAnnotations.begin(), nearbyAnnotations.end());
-
-        if (nearbyAnnotations == self.annotationsNearbyLastTap)
-        {
-            // the selection candidates haven't changed; cycle through them
-            if (self.selectedAnnotation &&
-                [[[self.annotationIDsByAnnotation objectForKey:self.selectedAnnotation]
-                    objectForKey:MGLAnnotationIDKey] unsignedIntValue] == self.annotationsNearbyLastTap.back())
+            if (CGRectContainsPoint(userLocationRect, [self convertCoordinate:self.userLocation.coordinate toPointToView:self]))
             {
-                // the selected annotation is the last in the set; cycle back to the first
-                // note: this could be the selected annotation if only one in set
-                newSelectedAnnotationID = self.annotationsNearbyLastTap.front();
+                [self selectAnnotation:self.userLocation animated:YES];
+                return;
             }
-            else if (self.selectedAnnotation)
+        }
+
+        // tolerances based on touch size & typical marker aspect ratio
+        CGFloat toleranceWidth  = 40;
+        CGFloat toleranceHeight = 60;
+
+        // setup a recognition area weighted 2/3 of the way above the point to account for average marker imagery
+        CGRect tapRect = CGRectMake(tapPoint.x - toleranceWidth / 2, tapPoint.y - 2 * toleranceHeight / 3, toleranceWidth, toleranceHeight);
+        CGPoint tapRectLowerLeft  = CGPointMake(tapRect.origin.x, tapRect.origin.y + tapRect.size.height);
+        CGPoint tapRectUpperLeft  = CGPointMake(tapRect.origin.x, tapRect.origin.y);
+        CGPoint tapRectUpperRight = CGPointMake(tapRect.origin.x + tapRect.size.width, tapRect.origin.y);
+        CGPoint tapRectLowerRight = CGPointMake(tapRect.origin.x + tapRect.size.width, tapRect.origin.y + tapRect.size.height);
+
+        // figure out what that means in coordinate space
+        CLLocationCoordinate2D coordinate;
+        mbgl::LatLngBounds tapBounds;
+
+        coordinate = [self convertPoint:tapRectLowerLeft  toCoordinateFromView:self];
+        tapBounds.extend(mbgl::LatLng(coordinate.latitude, coordinate.longitude));
+
+        coordinate = [self convertPoint:tapRectUpperLeft  toCoordinateFromView:self];
+        tapBounds.extend(mbgl::LatLng(coordinate.latitude, coordinate.longitude));
+
+        coordinate = [self convertPoint:tapRectUpperRight toCoordinateFromView:self];
+        tapBounds.extend(mbgl::LatLng(coordinate.latitude, coordinate.longitude));
+
+        coordinate = [self convertPoint:tapRectLowerRight toCoordinateFromView:self];
+        tapBounds.extend(mbgl::LatLng(coordinate.latitude, coordinate.longitude));
+
+        // query for nearby annotations
+        std::vector<uint32_t> nearbyAnnotations = mbglMap->getAnnotationsInBounds(tapBounds);
+
+        int32_t newSelectedAnnotationID = -1;
+
+        if (nearbyAnnotations.size())
+        {
+            // there is at least one nearby annotation; select one
+            //
+            // first, sort for comparison and iteration
+            std::sort(nearbyAnnotations.begin(), nearbyAnnotations.end());
+
+            if (nearbyAnnotations == self.annotationsNearbyLastTap)
             {
-                // otherwise increment the selection through the candidates
-                uint32_t currentID = [[[self.annotationIDsByAnnotation objectForKey:self.selectedAnnotation] objectForKey:MGLAnnotationIDKey] unsignedIntValue];
-                auto result = std::find(self.annotationsNearbyLastTap.begin(), self.annotationsNearbyLastTap.end(), currentID);
-                auto distance = std::distance(self.annotationsNearbyLastTap.begin(), result);
-                newSelectedAnnotationID = self.annotationsNearbyLastTap[distance + 1];
+                // the selection candidates haven't changed; cycle through them
+                if (self.selectedAnnotation &&
+                    [[[self.annotationIDsByAnnotation objectForKey:self.selectedAnnotation]
+                        objectForKey:MGLAnnotationIDKey] unsignedIntValue] == self.annotationsNearbyLastTap.back())
+                {
+                    // the selected annotation is the last in the set; cycle back to the first
+                    // note: this could be the selected annotation if only one in set
+                    newSelectedAnnotationID = self.annotationsNearbyLastTap.front();
+                }
+                else if (self.selectedAnnotation)
+                {
+                    // otherwise increment the selection through the candidates
+                    uint32_t currentID = [[[self.annotationIDsByAnnotation objectForKey:self.selectedAnnotation] objectForKey:MGLAnnotationIDKey] unsignedIntValue];
+                    auto result = std::find(self.annotationsNearbyLastTap.begin(), self.annotationsNearbyLastTap.end(), currentID);
+                    auto distance = std::distance(self.annotationsNearbyLastTap.begin(), result);
+                    newSelectedAnnotationID = self.annotationsNearbyLastTap[distance + 1];
+                }
+                else
+                {
+                    // no current selection; select the first one
+                    newSelectedAnnotationID = self.annotationsNearbyLastTap.front();
+                }
             }
             else
             {
-                // no current selection; select the first one
+                // start tracking a new set of nearby annotations
+                self.annotationsNearbyLastTap = nearbyAnnotations;
+
+                // select the first one
                 newSelectedAnnotationID = self.annotationsNearbyLastTap.front();
             }
         }
         else
         {
-            // start tracking a new set of nearby annotations
-            self.annotationsNearbyLastTap = nearbyAnnotations;
-
-            // select the first one
-            newSelectedAnnotationID = self.annotationsNearbyLastTap.front();
+            // there are no nearby annotations; deselect if necessary
+            newSelectedAnnotationID = -1;
         }
-    }
-    else
-    {
-        // there are no nearby annotations; deselect if necessary
-        newSelectedAnnotationID = -1;
-    }
 
-    if (newSelectedAnnotationID >= 0)
-    {
-        // find & select model object for selection
-        NSEnumerator *enumerator = self.annotationIDsByAnnotation.keyEnumerator;
-
-        while (id <MGLAnnotation> annotation = enumerator.nextObject)
+        if (newSelectedAnnotationID >= 0)
         {
-            if ([[[self.annotationIDsByAnnotation objectForKey:annotation] objectForKey:MGLAnnotationIDKey] integerValue] == newSelectedAnnotationID)
-            {
-                // only change selection status if not the currently selected annotation
-                if ( ! [annotation isEqual:self.selectedAnnotation])
-                {
-                    [self selectAnnotation:annotation animated:YES];
-                }
+            // find & select model object for selection
+            NSEnumerator *enumerator = self.annotationIDsByAnnotation.keyEnumerator;
 
-                // either way, we should stop enumerating
-                break;
+            while (id <MGLAnnotation> annotation = enumerator.nextObject)
+            {
+                if ([[[self.annotationIDsByAnnotation objectForKey:annotation] objectForKey:MGLAnnotationIDKey] integerValue] == newSelectedAnnotationID)
+                {
+                    // only change selection status if not the currently selected annotation
+                    if ( ! [annotation isEqual:self.selectedAnnotation])
+                    {
+                        [self selectAnnotation:annotation animated:YES];
+                    }
+
+                    // either way, we should stop enumerating
+                    break;
+                }
             }
         }
-    }
-    else
-    {
-        // deselect any selected annotation
-        if (self.selectedAnnotation) [self deselectAnnotation:self.selectedAnnotation animated:YES];
+        else
+        {
+            // deselect any selected annotation
+            if (self.selectedAnnotation) [self deselectAnnotation:self.selectedAnnotation animated:YES];
+        }
     }
 }
 
 - (void)handleDoubleTapGesture:(UITapGestureRecognizer *)doubleTap
 {
-    [self trackGestureEvent:MGLEventGestureDoubleTap forRecognizer:doubleTap];
-    
     if ( ! self.isZoomEnabled) return;
 
     mbglMap->cancelTransitions();
 
     if (doubleTap.state == UIGestureRecognizerStateBegan)
     {
+        [self trackGestureEvent:MGLEventGestureDoubleTap forRecognizer:doubleTap];
+
         self.userTrackingMode = MGLUserTrackingModeNone;
     }
     else if (doubleTap.state == UIGestureRecognizerStateEnded)
@@ -897,8 +900,6 @@ mbgl::DefaultFileSource *mbglFileSource = nullptr;
 
 - (void)handleTwoFingerTapGesture:(UITapGestureRecognizer *)twoFingerTap
 {
-    [self trackGestureEvent:MGLEventGestureTwoFingerSingleTap forRecognizer:twoFingerTap];
-    
     if ( ! self.isZoomEnabled) return;
 
     if (mbglMap->getZoom() == mbglMap->getMinZoom()) return;
@@ -907,6 +908,8 @@ mbgl::DefaultFileSource *mbglFileSource = nullptr;
 
     if (twoFingerTap.state == UIGestureRecognizerStateBegan)
     {
+        [self trackGestureEvent:MGLEventGestureTwoFingerSingleTap forRecognizer:twoFingerTap];
+
         self.userTrackingMode = MGLUserTrackingModeNone;
     }
     else if (twoFingerTap.state == UIGestureRecognizerStateEnded)
@@ -930,14 +933,14 @@ mbgl::DefaultFileSource *mbglFileSource = nullptr;
 
 - (void)handleQuickZoomGesture:(UILongPressGestureRecognizer *)quickZoom
 {
-    [self trackGestureEvent:MGLEventGestureQuickZoom forRecognizer:quickZoom];
-    
     if ( ! self.isZoomEnabled) return;
 
     mbglMap->cancelTransitions();
 
     if (quickZoom.state == UIGestureRecognizerStateBegan)
     {
+        [self trackGestureEvent:MGLEventGestureQuickZoom forRecognizer:quickZoom];
+
         self.scale = mbglMap->getScale();
 
         self.quickZoomStart = [quickZoom locationInView:quickZoom.view].y;
