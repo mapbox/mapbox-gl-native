@@ -575,7 +575,18 @@ NSString *const MGLEventMapLocation = @"Location";
     __block BOOL result;
 
     BOOL (^pushCheckBlock)(void) = ^{
-        return [[UIApplication sharedApplication] isRegisteredForRemoteNotifications];
+        if ([[UIApplication sharedApplication] respondsToSelector:@selector(isRegisteredForRemoteNotifications)]) {
+            // iOS 8+
+            result = [[UIApplication sharedApplication] isRegisteredForRemoteNotifications];
+        } else {
+            // iOS 7
+#pragma clang diagnostic push
+#pragma clang diagnostic ignored "-Wdeprecated-declarations"
+            UIRemoteNotificationType types = [[UIApplication sharedApplication] enabledRemoteNotificationTypes];
+            result = (types == UIRemoteNotificationTypeNone) ? NO : YES;
+#pragma clang diagnostic pop
+        }
+        return result;
     };
 
     if ( ! [[NSThread currentThread] isMainThread]) {
