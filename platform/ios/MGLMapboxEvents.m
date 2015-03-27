@@ -334,6 +334,7 @@ NSString *const MGLEventMapLocation = @"Location";
 }
 
 // Can be called from any thread.
+//
 - (void) startTimer {
     void (^timerBlock)() = ^{
         // Stop Timer if it already exists
@@ -360,6 +361,7 @@ NSString *const MGLEventMapLocation = @"Location";
 }
 
 // Can be called from any thread.
+//
 - (NSString *) getUserAgent {
     if (self.appName != nil && self.appVersion != nil && ([self.userAgent rangeOfString:self.appName].location == NSNotFound)) {
         self.userAgent = [NSString stringWithFormat:@"%@/%@ %@", self.appName, self.appVersion, self.userAgent];
@@ -368,11 +370,13 @@ NSString *const MGLEventMapLocation = @"Location";
 }
 
 // Can be called from any thread.
+//
 - (NSString *) formatDate:(NSDate *)date {
     return [self.rfc3339DateFormatter stringFromDate:date];
 }
 
 // Can be called from any thread.
+//
 - (NSString *) getDeviceOrientation {
     __block NSString *result;
 
@@ -419,6 +423,7 @@ NSString *const MGLEventMapLocation = @"Location";
 }
 
 // Can be called from any thread.
+//
 - (NSInteger) getContentSizeScale {
     __block NSInteger result = -9999;
 
@@ -466,6 +471,7 @@ NSString *const MGLEventMapLocation = @"Location";
 }
 
 // Can be called from any thread.
+//
 - (NSString *)getSysInfoByName:(char *)typeSpecifier
 {
     size_t size;
@@ -481,6 +487,7 @@ NSString *const MGLEventMapLocation = @"Location";
 }
 
 // Can be called from any thread.
+//
 - (NSString *) getWifiNetworkName {
     
     NSString *ssid = @"";
@@ -500,6 +507,7 @@ NSString *const MGLEventMapLocation = @"Location";
 }
 
 // Can be called from any thread.
+//
 - (NSString *) getCurrentCellularNetworkConnectionType {
     CTTelephonyNetworkInfo *telephonyInfo = [CTTelephonyNetworkInfo new];
     NSString *radioTech = telephonyInfo.currentRadioAccessTechnology;
@@ -534,6 +542,7 @@ NSString *const MGLEventMapLocation = @"Location";
 }
 
 // Can be called from any thread.
+//
 + (NSString *) checkEmailEnabled {
     __block NSString *result;
 
@@ -561,6 +570,7 @@ NSString *const MGLEventMapLocation = @"Location";
 }
 
 // Can be called from any thread.
+//
 + (BOOL) checkPushEnabled {
     __block BOOL result;
 
