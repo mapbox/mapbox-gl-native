@@ -368,8 +368,19 @@ mbgl::DefaultFileSource *mbglFileSource = nullptr;
         [evt setValue:@(mbglMap->getLatLng().latitude) forKey:@"lat"];
         [evt setValue:@(mbglMap->getLatLng().longitude) forKey:@"lng"];
         [evt setValue:@(mbglMap->getZoom()) forKey:@"zoom"];
-        BOOL isRegisteredForRemoteNotifications = ([[UIApplication sharedApplication] respondsToSelector:@selector(isRegisteredForRemoteNotifications)]
-                                                   && [[UIApplication sharedApplication] isRegisteredForRemoteNotifications]);
+        
+        BOOL isRegisteredForRemoteNotifications;
+        if ([[UIApplication sharedApplication] respondsToSelector:@selector(isRegisteredForRemoteNotifications)]) {
+            // iOS 8+
+            isRegisteredForRemoteNotifications = [[UIApplication sharedApplication] isRegisteredForRemoteNotifications];
+        } else {
+            // iOS 7
+            #pragma clang diagnostic push
+            #pragma clang diagnostic ignored "-Wdeprecated-declarations"
+            UIRemoteNotificationType types = [[UIApplication sharedApplication] enabledRemoteNotificationTypes];
+            isRegisteredForRemoteNotifications = (types == UIRemoteNotificationTypeNone) ? NO : YES;
+            #pragma clang diagnostic pop
+        }
         [evt setValue:@(isRegisteredForRemoteNotifications) forKey:@"enabled.push"];
         
         NSString *email = @"Unknown";
