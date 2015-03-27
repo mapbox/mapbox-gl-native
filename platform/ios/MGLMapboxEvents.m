@@ -321,37 +321,51 @@ NSString *const MGLEventMapLocation = @"Location";
     }
 }
 
-- (int) getContentSizeScale {
-    NSString *sc = [UIApplication sharedApplication].preferredContentSizeCategory;
-    
-    if ([sc isEqualToString:UIContentSizeCategoryExtraSmall]) {
-        return -3;
-    } else if ([sc isEqualToString:UIContentSizeCategorySmall]) {
-        return -2;
-    } else if ([sc isEqualToString:UIContentSizeCategoryMedium]) {
-        return -1;
-    } else if ([sc isEqualToString:UIContentSizeCategoryLarge]) {
-        return 0;
-    } else if ([sc isEqualToString:UIContentSizeCategoryExtraLarge]) {
-        return 1;
-    } else if ([sc isEqualToString:UIContentSizeCategoryExtraExtraLarge]) {
-        return 2;
-    } else if ([sc isEqualToString:UIContentSizeCategoryExtraExtraExtraLarge]) {
-        return 3;
-    } else if ([sc isEqualToString:UIContentSizeCategoryAccessibilityMedium]) {
-        return -11;
-    } else if ([sc isEqualToString:UIContentSizeCategoryAccessibilityLarge]) {
-        return 10;
-    } else if ([sc isEqualToString:UIContentSizeCategoryAccessibilityExtraLarge]) {
-        return 11;
-    } else if ([sc isEqualToString:UIContentSizeCategoryAccessibilityExtraExtraLarge]) {
-        return 12;
-    } else if ([sc isEqualToString:UIContentSizeCategoryAccessibilityExtraExtraExtraLarge]) {
-        return 13;
-    }
-    return -9999;
-}
+- (NSInteger) getContentSizeScale {
+    __block NSInteger result = -9999;
 
+    NSInteger (^contentSizeScaleBlock)(void) = ^{
+        NSString *sc = [UIApplication sharedApplication].preferredContentSizeCategory;
+
+        if ([sc isEqualToString:UIContentSizeCategoryExtraSmall]) {
+            result = -3;
+        } else if ([sc isEqualToString:UIContentSizeCategorySmall]) {
+            result = -2;
+        } else if ([sc isEqualToString:UIContentSizeCategoryMedium]) {
+            result = -1;
+        } else if ([sc isEqualToString:UIContentSizeCategoryLarge]) {
+            result = 0;
+        } else if ([sc isEqualToString:UIContentSizeCategoryExtraLarge]) {
+            result = 1;
+        } else if ([sc isEqualToString:UIContentSizeCategoryExtraExtraLarge]) {
+            result = 2;
+        } else if ([sc isEqualToString:UIContentSizeCategoryExtraExtraExtraLarge]) {
+            result = 3;
+        } else if ([sc isEqualToString:UIContentSizeCategoryAccessibilityMedium]) {
+            result = -11;
+        } else if ([sc isEqualToString:UIContentSizeCategoryAccessibilityLarge]) {
+            result = 10;
+        } else if ([sc isEqualToString:UIContentSizeCategoryAccessibilityExtraLarge]) {
+            result = 11;
+        } else if ([sc isEqualToString:UIContentSizeCategoryAccessibilityExtraExtraLarge]) {
+            result = 12;
+        } else if ([sc isEqualToString:UIContentSizeCategoryAccessibilityExtraExtraExtraLarge]) {
+            result = 13;
+        }
+
+        return result;
+    };
+
+    if ( ! [[NSThread currentThread] isMainThread]) {
+        dispatch_sync(dispatch_get_main_queue(), ^{
+            result = contentSizeScaleBlock();
+        });
+    } else {
+        result = contentSizeScaleBlock();
+    }
+
+    return result;
+}
 
 - (NSString *)getSysInfoByName:(char *)typeSpecifier
 {
