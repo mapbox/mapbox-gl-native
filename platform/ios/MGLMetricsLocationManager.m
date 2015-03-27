@@ -43,9 +43,9 @@
 - (void)locationManager:(CLLocationManager *)manager didUpdateLocations:(NSArray *)locations {
     //  Iterate through locations to pass all data
     for (CLLocation *loc in locations) {
-        [MGLMapboxEvents pushEvent:MGLEventMapLocation withAttributes:@{
-            @"lat": @(loc.coordinate.latitude),
-            @"lng": @(loc.coordinate.longitude)
+        [MGLMapboxEvents pushEvent:MGLEventTypeLocation withAttributes:@{
+            MGLEventKeyLatitude: @(loc.coordinate.latitude),
+            MGLEventKeyLongitude: @(loc.coordinate.longitude)
         }];
     }
 }

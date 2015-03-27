@@ -12,17 +12,25 @@
 static NSString *const MGLMapboxEventsUserAgent = @"MapboxEventsiOS/1.0";
 static NSString *const MGLMapboxEventsAPIBase = @"https://api.tiles.mapbox.com";
 
-NSString *const MGLEventMapLoad = @"map.load";
-NSString *const MGLEventMapTap = @"map.click";
-NSString *const MGLEventMapSingleTap = @"SingleTap";
-NSString *const MGLEventMapDoubleTap = @"DoubleTap";
-NSString *const MGLEventMapTwoFingerSingleTap = @"TwoFingerTap";
-NSString *const MGLEventMapQuickZoom = @"QuickZoom";
-NSString *const MGLEventMapPanStart = @"Pan";
-NSString *const MGLEventMapPanEnd = @"map.dragend";
-NSString *const MGLEventMapPinchStart = @"Pinch";
-NSString *const MGLEventMapRotateStart = @"Rotation";
-NSString *const MGLEventMapLocation = @"Location";
+NSString *const MGLEventTypeMapLoad = @"map.load";
+NSString *const MGLEventTypeMapTap = @"map.click";
+NSString *const MGLEventTypeMapDragEnd = @"map.dragend";
+NSString *const MGLEventTypeLocation = @"Location";
+
+NSString *const MGLEventKeyLatitude = @"lat";
+NSString *const MGLEventKeyLongitude = @"lng";
+NSString *const MGLEventKeyZoomLevel = @"zoom";
+NSString *const MGLEventKeyPushEnabled = @"enabled.push";
+NSString *const MGLEventKeyEmailEnabled = @"enabled.email";
+NSString *const MGLEventKeyGestureID = @"gesture";
+
+NSString *const MGLEventGestureSingleTap = @"SingleTap";
+NSString *const MGLEventGestureDoubleTap = @"DoubleTap";
+NSString *const MGLEventGestureTwoFingerSingleTap = @"TwoFingerTap";
+NSString *const MGLEventGestureQuickZoom = @"QuickZoom";
+NSString *const MGLEventGesturePanStart = @"Pan";
+NSString *const MGLEventGesturePinchStart = @"Pinch";
+NSString *const MGLEventGestureRotateStart = @"Rotation";
 
 //
 // Threadsafety conventions:
