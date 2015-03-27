@@ -22,7 +22,6 @@
 #import "SMCalloutView.h"
 
 #import "MGLMapboxEvents.h"
-#import "MGLMetricsLocationManager.h"
 
 #import <algorithm>
 
@@ -155,7 +154,7 @@ mbgl::DefaultFileSource *mbglFileSource = nullptr;
     if (accessToken)
     {
         mbglMap->setAccessToken((std::string)[accessToken UTF8String]);
-        [[MGLMapboxEvents sharedManager] setToken:accessToken];
+        [MGLMapboxEvents setToken:accessToken];
     }
 }
 
@@ -195,16 +194,11 @@ mbgl::DefaultFileSource *mbglFileSource = nullptr;
     //
     self.accessibilityLabel = @"Map";
     
-    // setup Metrics
-    MGLMapboxEvents *events = [MGLMapboxEvents sharedManager];
+    // metrics: initial setup
     NSString *appName = [[NSBundle mainBundle] objectForInfoDictionaryKey:@"CFBundleName"];
     NSString *appVersion = [[NSBundle mainBundle] objectForInfoDictionaryKey:@"CFBundleShortVersionString"];
-    if (appName != nil) {
-        events.appName = appName;
-    }
-    if (appVersion != nil) {
-        events.appVersion = appVersion;
-    }
+    if (appName != nil) [MGLMapboxEvents setAppName:appName];
+    if (appVersion != nil) [MGLMapboxEvents setAppVersion:appVersion];
 
     // create GL view
     //
@@ -345,9 +339,6 @@ mbgl::DefaultFileSource *mbglFileSource = nullptr;
     [[NSNotificationCenter defaultCenter] addObserver:self selector:@selector(appDidBackground:) name:UIApplicationDidEnterBackgroundNotification object:nil];
     [[NSNotificationCenter defaultCenter] addObserver:self selector:@selector(appWillForeground:) name:UIApplicationWillEnterForegroundNotification object:nil];
 
-    // setup dedicated location manager for metrics
-    [MGLMetricsLocationManager sharedManager];
-    
     // set initial position
     //
     mbglMap->setLatLngZoom(mbgl::LatLng(0, 0), mbglMap->getMinZoom());
@@ -360,28 +351,18 @@ mbgl::DefaultFileSource *mbglFileSource = nullptr;
     // start the main loop
     mbglMap->start();
 
-    
-    // Fire map.load on a background thread
-    dispatch_async(dispatch_get_global_queue(DISPATCH_QUEUE_PRIORITY_BACKGROUND, 0), ^{
-        
-        NSMutableDictionary *evt = [[NSMutableDictionary alloc] init];
-        [evt setValue:[[NSNumber alloc] initWithDouble:mbglMap->getLatLng().latitude] forKey:@"lat"];
-        [evt setValue:[[NSNumber alloc] initWithDouble:mbglMap->getLatLng().longitude] forKey:@"lng"];
-        [evt setValue:[[NSNumber alloc] initWithDouble:mbglMap->getZoom()] forKey:@"zoom"];
-        [evt setValue:[[NSNumber alloc] initWithBool:[[UIApplication sharedApplication] isRegisteredForRemoteNotifications]] forKey:@"enabled.push"];
-        
-        NSString *email = @"Unknown";
-        Class MFMailComposeViewController = NSClassFromString(@"MFMailComposeViewController");
-        if (MFMailComposeViewController) {
-            SEL canSendMail = NSSelectorFromString(@"canSendMail");
-            BOOL sendMail = ((BOOL (*)(id, SEL))[MFMailComposeViewController methodForSelector:canSendMail])(MFMailComposeViewController, canSendMail);
-            email = [NSString stringWithFormat:@"%i", sendMail];
-        }
-        [evt setValue:email forKey:@"enabled.email"];
+    // metrics: map load event
+    const mbgl::LatLng latLng = mbglMap->getLatLng();
+    const double zoom = mbglMap->getZoom();
 
-        [[MGLMapboxEvents sharedManager] pushEvent:@"map.load" withAttributes:evt];
-    });
-    
+    [MGLMapboxEvents pushEvent:MGLEventMapLoad withAttributes:@{
+        @"lat": @(latLng.latitude),
+        @"lng": @(latLng.longitude),
+        @"zoom": @(zoom),
+        @"enabled.push": @([MGLMapboxEvents checkPushEnabled]),
+        @"enabled.email": [MGLMapboxEvents checkEmailEnabled]
+    }];
+
     return YES;
 }
 
@@ -566,8 +547,7 @@ mbgl::DefaultFileSource *mbglFileSource = nullptr;
 
 - (void)appDidBackground:(NSNotification *)notification
 {
-    // Flush Any Events Still In Queue
-    [[MGLMapboxEvents sharedManager] flush];
+    [MGLMapboxEvents flush];
     
     mbglMap->stop();
 
@@ -606,7 +586,7 @@ mbgl::DefaultFileSource *mbglFileSource = nullptr;
 
 - (void)handlePanGesture:(UIPanGestureRecognizer *)pan
 {
-    [self trackGestureEvent:@"Pan" forRecognizer:pan];
+    [self trackGestureEvent:MGLEventMapPanStart forRecognizer:pan];
     
     if ( ! self.isScrollEnabled) return;
 
@@ -668,21 +648,22 @@ mbgl::DefaultFileSource *mbglFileSource = nullptr;
             [self notifyMapChange:@(mbgl::MapChangeRegionDidChange)];
         }
 
-        // Send Map Drag End Event
-        CGPoint ptInView = CGPointMake([pan locationInView:pan.view].x, [pan locationInView:pan.view].y);
-        CLLocationCoordinate2D coord = [self convertPoint:ptInView toCoordinateFromView:pan.view];
-        NSMutableDictionary *dict = [[NSMutableDictionary alloc] init];
-        [dict setValue:[[NSNumber alloc] initWithDouble:coord.latitude] forKey:@"lat"];
-        [dict setValue:[[NSNumber alloc] initWithDouble:coord.longitude] forKey:@"lng"];
-        [dict setValue:[[NSNumber alloc] initWithDouble:[self zoomLevel]] forKey:@"zoom"];
+        // metrics: pan end
+        CGPoint pointInView = CGPointMake([pan locationInView:pan.view].x, [pan locationInView:pan.view].y);
+        CLLocationCoordinate2D panCoordinate = [self convertPoint:pointInView toCoordinateFromView:pan.view];
+        double zoom = [self zoomLevel];
 
-        [[MGLMapboxEvents sharedManager] pushEvent:@"map.dragend" withAttributes:dict];
+        [MGLMapboxEvents pushEvent:MGLEventMapPanEnd withAttributes:@{
+            @"lat": @(panCoordinate.latitude),
+            @"lng": @(panCoordinate.longitude),
+            @"zoom": @(zoom)
+        }];
     }
 }
 
 - (void)handlePinchGesture:(UIPinchGestureRecognizer *)pinch
 {
-    [self trackGestureEvent:@"Pinch" forRecognizer:pinch];
+    [self trackGestureEvent:MGLEventMapPinchStart forRecognizer:pinch];
     
     if ( ! self.isZoomEnabled) return;
 
@@ -720,7 +701,7 @@ mbgl::DefaultFileSource *mbglFileSource = nullptr;
 
 - (void)handleRotateGesture:(UIRotationGestureRecognizer *)rotate
 {
-    [self trackGestureEvent:@"Rotation" forRecognizer:rotate];
+    [self trackGestureEvent:MGLEventMapRotateStart forRecognizer:rotate];
     
     if ( ! self.isRotateEnabled) return;
 
@@ -762,7 +743,7 @@ mbgl::DefaultFileSource *mbglFileSource = nullptr;
 
 - (void)handleSingleTapGesture:(UITapGestureRecognizer *)singleTap
 {
-    [self trackGestureEvent:@"SingleTap" forRecognizer:singleTap];
+    [self trackGestureEvent:MGLEventMapSingleTap forRecognizer:singleTap];
     
     CGPoint tapPoint = [singleTap locationInView:self];
 
@@ -885,7 +866,7 @@ mbgl::DefaultFileSource *mbglFileSource = nullptr;
 
 - (void)handleDoubleTapGesture:(UITapGestureRecognizer *)doubleTap
 {
-    [self trackGestureEvent:@"DoubleTap" forRecognizer:doubleTap];
+    [self trackGestureEvent:MGLEventMapDoubleTap forRecognizer:doubleTap];
     
     if ( ! self.isZoomEnabled) return;
 
@@ -916,7 +897,7 @@ mbgl::DefaultFileSource *mbglFileSource = nullptr;
 
 - (void)handleTwoFingerTapGesture:(UITapGestureRecognizer *)twoFingerTap
 {
-    [self trackGestureEvent:@"TwoFingerTap" forRecognizer:twoFingerTap];
+    [self trackGestureEvent:MGLEventMapTwoFingerSingleTap forRecognizer:twoFingerTap];
     
     if ( ! self.isZoomEnabled) return;
 
@@ -949,7 +930,7 @@ mbgl::DefaultFileSource *mbglFileSource = nullptr;
 
 - (void)handleQuickZoomGesture:(UILongPressGestureRecognizer *)quickZoom
 {
-    [self trackGestureEvent:@"QuickZoom" forRecognizer:quickZoom];
+    [self trackGestureEvent:MGLEventMapQuickZoom forRecognizer:quickZoom];
     
     if ( ! self.isZoomEnabled) return;
 
@@ -997,20 +978,18 @@ mbgl::DefaultFileSource *mbglFileSource = nullptr;
     return ([validSimultaneousGestures containsObject:gestureRecognizer] && [validSimultaneousGestures containsObject:otherGestureRecognizer]);
 }
 
-- (void)trackGestureEvent:(NSString *)gesture forRecognizer:(UIGestureRecognizer *)recognizer
+- (void)trackGestureEvent:(NSString *)gestureID forRecognizer:(UIGestureRecognizer *)recognizer
 {
-    dispatch_async(dispatch_get_global_queue(DISPATCH_QUEUE_PRIORITY_BACKGROUND, 0), ^{
-        // Send Map Zoom Event
-        CGPoint ptInView = CGPointMake([recognizer locationInView:recognizer.view].x, [recognizer locationInView:recognizer.view].y);
-        CLLocationCoordinate2D coord = [self convertPoint:ptInView toCoordinateFromView:recognizer.view];
-        NSMutableDictionary *dict = [[NSMutableDictionary alloc] init];
-        [dict setValue:[[NSNumber alloc] initWithDouble:coord.latitude] forKey:@"lat"];
-        [dict setValue:[[NSNumber alloc] initWithDouble:coord.longitude] forKey:@"lng"];
-        [dict setValue:[[NSNumber alloc] initWithDouble:[self zoomLevel]] forKey:@"zoom"];
-        [dict setValue:gesture forKey:@"gesture"];
-        
-        [[MGLMapboxEvents sharedManager] pushEvent:@"map.click" withAttributes:dict];
-    });
+    CGPoint pointInView = CGPointMake([recognizer locationInView:recognizer.view].x, [recognizer locationInView:recognizer.view].y);
+    CLLocationCoordinate2D gestureCoordinate = [self convertPoint:pointInView toCoordinateFromView:recognizer.view];
+    double zoom = [self zoomLevel];
+
+    [MGLMapboxEvents pushEvent:MGLEventMapTap withAttributes:@{
+        @"lat": @(gestureCoordinate.latitude),
+        @"lng": @(gestureCoordinate.longitude),
+        @"zoom": @(zoom),
+        @"gesture": gestureID
+    }];
 }
 
 #pragma mark - Properties -
