@@ -57,7 +57,8 @@ NSString *const MGLEventGestureRotateStart = @"Rotation";
 @property (atomic) NSString *appName;
 @property (atomic) NSString *appVersion;
 @property (atomic) NSString *instanceID;
-@property (atomic) NSString *anonID;
+@property (atomic) NSString *advertiserId;
+@property (atomic) NSString *vendorId;
 @property (atomic) NSString *userAgent;
 @property (atomic) NSString *model;
 @property (atomic) NSString *iOSVersion;
@@ -126,6 +127,7 @@ NSString *const MGLEventGestureRotateStart = @"Rotation";
         _instanceID = [[NSUUID UUID] UUIDString];
         // Dynamic detection of ASIdentifierManager from Mixpanel
         // https://github.com/mixpanel/mixpanel-iphone/blob/master/LICENSE
+        _advertiserId = @"";
         Class ASIdentifierManagerClass = NSClassFromString(@"ASIdentifierManager");
         if (ASIdentifierManagerClass) {
             SEL sharedManagerSelector = NSSelectorFromString(@"sharedManager");
@@ -136,13 +138,10 @@ NSString *const MGLEventGestureRotateStart = @"Rotation";
             if (trackingEnabled) {
                 SEL advertisingIdentifierSelector = NSSelectorFromString(@"advertisingIdentifier");
                 NSUUID *uuid = ((NSUUID* (*)(id, SEL))[sharedManager methodForSelector:advertisingIdentifierSelector])(sharedManager, advertisingIdentifierSelector);
-                _anonID = [uuid UUIDString];
-            } else {
-                _anonID = [[[UIDevice currentDevice] identifierForVendor] UUIDString];
+                _advertiserId = [uuid UUIDString];
             }
-        } else {
-            _anonID = [[[UIDevice currentDevice] identifierForVendor] UUIDString];
         }
+        _vendorId = [[[UIDevice currentDevice] identifierForVendor] UUIDString];
         
         _model = [self getSysInfoByName:"hw.machine"];
         _iOSVersion = [NSString stringWithFormat:@"%@ %@", [UIDevice currentDevice].systemName, [UIDevice currentDevice].systemVersion];
@@ -263,7 +262,8 @@ NSString *const MGLEventGestureRotateStart = @"Rotation";
         [evt setObject:@(1) forKey:@"version"];
         [evt setObject:[weakSelf formatDate:[NSDate date]] forKey:@"created"];
         [evt setObject:weakSelf.instanceID forKey:@"instance"];
-        [evt setObject:weakSelf.anonID forKey:@"anonid"];
+        [evt setObject:weakSelf.advertiserId forKey:@"advertiserId"];
+        [evt setObject:weakSelf.vendorId forKey:@"vendorId"];
         
         // mapbox-events-ios stock attributes
         [evt setValue:[weakSelf.rfc3339DateFormatter stringFromDate:[NSDate date]] forKey:@"created"];
