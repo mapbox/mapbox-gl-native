@@ -223,22 +223,6 @@ NSString *const MGLEventGestureRotateStart = @"Rotation";
 // use of +pushEvent:withAttributes:.
 //
 - (void) pushEvent:(NSString *)event withAttributes:(NSDictionary *)attributeDictionary {
-    // conve+rt any BOOL types to string values written out like JS
-    NSMutableDictionary *newAttributeDictionary = [NSMutableDictionary dictionaryWithCapacity:[attributeDictionary count]];
-    NSString *key;
-    NSObject *value;
-    for (key in attributeDictionary) {
-        value = attributeDictionary[key];
-        if ([value isKindOfClass:[NSNumber class]]) {
-            // if of character type, treat as bool
-            if (strncmp([(NSNumber *)value objCType], "c", 1) == 0) {
-                value = ([(NSNumber *)value boolValue] ? @"true" : @"false");
-            }
-        }
-        newAttributeDictionary[key] = value;
-    }
-    attributeDictionary = newAttributeDictionary;
-
     __weak MGLMapboxEvents *weakSelf = self;
 
     dispatch_async(_serialQueue, ^{
