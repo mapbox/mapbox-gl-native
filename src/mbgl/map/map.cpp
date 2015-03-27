@@ -137,6 +137,7 @@ void Map::start(bool startPaused) {
         // Closes all open handles on the loop. This means that the loop will automatically terminate.
         asyncRender.reset();
         asyncUpdate.reset();
+        asyncInvoke.reset();
         asyncTerminate.reset();
     });
 
@@ -147,7 +148,6 @@ void Map::start(bool startPaused) {
     asyncInvoke = util::make_unique<uv::async>(env->loop, [this] {
         processTasks();
     });
-
 
     asyncRender = util::make_unique<uv::async>(env->loop, [this] {
         // Must be called in Map thread.
