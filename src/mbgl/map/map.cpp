@@ -144,6 +144,11 @@ void Map::start(bool startPaused) {
         update();
     });
 
+    asyncInvoke = util::make_unique<uv::async>(env->loop, [this] {
+        processTasks();
+    });
+
+
     asyncRender = util::make_unique<uv::async>(env->loop, [this] {
         // Must be called in Map thread.
         assert(Environment::currentlyOn(ThreadType::Map));
@@ -313,6 +318,42 @@ void Map::triggerUpdate(const Update u) {
 void Map::triggerRender() {
     assert(asyncRender);
     asyncRender->send();
+}
+
+// Runs the function in the map thread.
+void Map::invokeTask(std::function<void()>&& fn) {
+    {
+        std::lock_guard<std::mutex> lock(mutexTask);
+        tasks.emplace(::std::forward<std::function<void()>>(fn));
+    }
+
+    // TODO: Once we have aligned static and continuous rendering, this should always dispatch
+    // to the async queue.
+    if (asyncInvoke) {
+        asyncInvoke->send();
+    } else {
+        processTasks();
+    }
+}
+
+template <typename Fn> auto Map::invokeSyncTask(const Fn& fn) -> decltype(fn()) {
+    std::promise<decltype(fn())> promise;
+    invokeTask([&fn, &promise] { promise.set_value(fn()); });
+    return promise.get_future().get();
+}
+
+// Processes the functions that should be run in the map thread.
+void Map::processTasks() {
+    std::queue<std::function<void()>> queue;
+    {
+        std::lock_guard<std::mutex> lock(mutexTask);
+        queue.swap(tasks);
+    }
+
+    while (!queue.empty()) {
+        queue.front()();
+        queue.pop();
+    }
 }
 
 void Map::checkForPause() {
@@ -542,27 +583,31 @@ std::string Map::getAccessToken() const {
 
 void Map::setDefaultPointAnnotationSymbol(const std::string& symbol) {
     assert(Environment::currentlyOn(ThreadType::Main));
-    annotationManager->setDefaultPointAnnotationSymbol(symbol);
+    invokeTask([=] {
+        annotationManager->setDefaultPointAnnotationSymbol(symbol);
+    });
 }
 
 double Map::getTopOffsetPixelsForAnnotationSymbol(const std::string& symbol) {
-    SpritePosition pos = sprite->getSpritePosition(symbol);
-
-    return -pos.height / pos.pixelRatio / 2;
+    assert(Environment::currentlyOn(ThreadType::Main));
+    return invokeSyncTask([&] {
+        assert(sprite);
+        const SpritePosition pos = sprite->getSpritePosition(symbol);
+        return -pos.height / pos.pixelRatio / 2;
+    });
 }
 
 uint32_t Map::addPointAnnotation(const LatLng& point, const std::string& symbol) {
-    assert(Environment::currentlyOn(ThreadType::Main));
-    std::vector<LatLng> points({ point });
-    std::vector<std::string> symbols({ symbol });
-    return addPointAnnotations(points, symbols)[0];
+    return addPointAnnotations({ point }, { symbol }).front();
 }
 
 std::vector<uint32_t> Map::addPointAnnotations(const std::vector<LatLng>& points, const std::vector<std::string>& symbols) {
     assert(Environment::currentlyOn(ThreadType::Main));
-    auto result = annotationManager->addPointAnnotations(points, symbols, *this);
-    updateAnnotationTiles(result.first);
-    return result.second;
+    return invokeSyncTask([&] {
+        auto result = annotationManager->addPointAnnotations(points, symbols, *this);
+        updateAnnotationTiles(result.first);
+        return result.second;
+    });
 }
 
 void Map::removeAnnotation(uint32_t annotation) {
@@ -572,22 +617,28 @@ void Map::removeAnnotation(uint32_t annotation) {
 
 void Map::removeAnnotations(const std::vector<uint32_t>& annotations) {
     assert(Environment::currentlyOn(ThreadType::Main));
-    auto result = annotationManager->removeAnnotations(annotations, *this);
-    updateAnnotationTiles(result);
+    invokeTask([=] {
+        auto result = annotationManager->removeAnnotations(annotations, *this);
+        updateAnnotationTiles(result);
+    });
 }
 
-std::vector<uint32_t> Map::getAnnotationsInBounds(const LatLngBounds& bounds) const {
+std::vector<uint32_t> Map::getAnnotationsInBounds(const LatLngBounds& bounds) {
     assert(Environment::currentlyOn(ThreadType::Main));
-    return annotationManager->getAnnotationsInBounds(bounds, *this);
+    return invokeSyncTask([&] {
+        return annotationManager->getAnnotationsInBounds(bounds, *this);
+    });
 }
 
-LatLngBounds Map::getBoundsForAnnotations(const std::vector<uint32_t>& annotations) const {
+LatLngBounds Map::getBoundsForAnnotations(const std::vector<uint32_t>& annotations) {
     assert(Environment::currentlyOn(ThreadType::Main));
-    return annotationManager->getBoundsForAnnotations(annotations);
+    return invokeSyncTask([&] {
+        return annotationManager->getBoundsForAnnotations(annotations);
+    });
 }
 
 void Map::updateAnnotationTiles(const std::vector<Tile::ID>& ids) {
-    assert(Environment::currentlyOn(ThreadType::Main));
+    assert(Environment::currentlyOn(ThreadType::Map));
     for (const auto &source : activeSources) {
         if (source->info.type == SourceType::Annotations) {
             source->source->invalidateTiles(*this, ids);
