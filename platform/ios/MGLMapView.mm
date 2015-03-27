@@ -355,12 +355,12 @@ mbgl::DefaultFileSource *mbglFileSource = nullptr;
     const mbgl::LatLng latLng = mbglMap->getLatLng();
     const double zoom = mbglMap->getZoom();
 
-    [MGLMapboxEvents pushEvent:MGLEventMapLoad withAttributes:@{
-        @"lat": @(latLng.latitude),
-        @"lng": @(latLng.longitude),
-        @"zoom": @(zoom),
-        @"enabled.push": @([MGLMapboxEvents checkPushEnabled]),
-        @"enabled.email": [MGLMapboxEvents checkEmailEnabled]
+    [MGLMapboxEvents pushEvent:MGLEventTypeMapLoad withAttributes:@{
+        MGLEventKeyLatitude: @(latLng.latitude),
+        MGLEventKeyLongitude: @(latLng.longitude),
+        MGLEventKeyZoomLevel: @(zoom),
+        MGLEventKeyPushEnabled: @([MGLMapboxEvents checkPushEnabled]),
+        MGLEventKeyEmailEnabled: [MGLMapboxEvents checkEmailEnabled]
     }];
 
     return YES;
@@ -586,7 +586,7 @@ mbgl::DefaultFileSource *mbglFileSource = nullptr;
 
 - (void)handlePanGesture:(UIPanGestureRecognizer *)pan
 {
-    [self trackGestureEvent:MGLEventMapPanStart forRecognizer:pan];
+    [self trackGestureEvent:MGLEventGesturePanStart forRecognizer:pan];
     
     if ( ! self.isScrollEnabled) return;
 
@@ -653,17 +653,17 @@ mbgl::DefaultFileSource *mbglFileSource = nullptr;
         CLLocationCoordinate2D panCoordinate = [self convertPoint:pointInView toCoordinateFromView:pan.view];
         double zoom = [self zoomLevel];
 
-        [MGLMapboxEvents pushEvent:MGLEventMapPanEnd withAttributes:@{
-            @"lat": @(panCoordinate.latitude),
-            @"lng": @(panCoordinate.longitude),
-            @"zoom": @(zoom)
+        [MGLMapboxEvents pushEvent:MGLEventTypeMapDragEnd withAttributes:@{
+            MGLEventKeyLatitude: @(panCoordinate.latitude),
+            MGLEventKeyLongitude: @(panCoordinate.longitude),
+            MGLEventKeyZoomLevel: @(zoom)
         }];
     }
 }
 
 - (void)handlePinchGesture:(UIPinchGestureRecognizer *)pinch
 {
-    [self trackGestureEvent:MGLEventMapPinchStart forRecognizer:pinch];
+    [self trackGestureEvent:MGLEventGesturePinchStart forRecognizer:pinch];
     
     if ( ! self.isZoomEnabled) return;
 
@@ -701,7 +701,7 @@ mbgl::DefaultFileSource *mbglFileSource = nullptr;
 
 - (void)handleRotateGesture:(UIRotationGestureRecognizer *)rotate
 {
-    [self trackGestureEvent:MGLEventMapRotateStart forRecognizer:rotate];
+    [self trackGestureEvent:MGLEventGestureRotateStart forRecognizer:rotate];
     
     if ( ! self.isRotateEnabled) return;
 
@@ -743,7 +743,7 @@ mbgl::DefaultFileSource *mbglFileSource = nullptr;
 
 - (void)handleSingleTapGesture:(UITapGestureRecognizer *)singleTap
 {
-    [self trackGestureEvent:MGLEventMapSingleTap forRecognizer:singleTap];
+    [self trackGestureEvent:MGLEventGestureSingleTap forRecognizer:singleTap];
     
     CGPoint tapPoint = [singleTap locationInView:self];
 
@@ -866,7 +866,7 @@ mbgl::DefaultFileSource *mbglFileSource = nullptr;
 
 - (void)handleDoubleTapGesture:(UITapGestureRecognizer *)doubleTap
 {
-    [self trackGestureEvent:MGLEventMapDoubleTap forRecognizer:doubleTap];
+    [self trackGestureEvent:MGLEventGestureDoubleTap forRecognizer:doubleTap];
     
     if ( ! self.isZoomEnabled) return;
 
@@ -897,7 +897,7 @@ mbgl::DefaultFileSource *mbglFileSource = nullptr;
 
 - (void)handleTwoFingerTapGesture:(UITapGestureRecognizer *)twoFingerTap
 {
-    [self trackGestureEvent:MGLEventMapTwoFingerSingleTap forRecognizer:twoFingerTap];
+    [self trackGestureEvent:MGLEventGestureTwoFingerSingleTap forRecognizer:twoFingerTap];
     
     if ( ! self.isZoomEnabled) return;
 
@@ -930,7 +930,7 @@ mbgl::DefaultFileSource *mbglFileSource = nullptr;
 
 - (void)handleQuickZoomGesture:(UILongPressGestureRecognizer *)quickZoom
 {
-    [self trackGestureEvent:MGLEventMapQuickZoom forRecognizer:quickZoom];
+    [self trackGestureEvent:MGLEventGestureQuickZoom forRecognizer:quickZoom];
     
     if ( ! self.isZoomEnabled) return;
 
@@ -984,11 +984,11 @@ mbgl::DefaultFileSource *mbglFileSource = nullptr;
     CLLocationCoordinate2D gestureCoordinate = [self convertPoint:pointInView toCoordinateFromView:recognizer.view];
     double zoom = [self zoomLevel];
 
-    [MGLMapboxEvents pushEvent:MGLEventMapTap withAttributes:@{
-        @"lat": @(gestureCoordinate.latitude),
-        @"lng": @(gestureCoordinate.longitude),
-        @"zoom": @(zoom),
-        @"gesture": gestureID
+    [MGLMapboxEvents pushEvent:MGLEventTypeMapTap withAttributes:@{
+        MGLEventKeyLatitude: @(gestureCoordinate.latitude),
+        MGLEventKeyLongitude: @(gestureCoordinate.longitude),
+        MGLEventKeyZoomLevel: @(zoom),
+        MGLEventKeyGestureID: gestureID
     }];
 }
 

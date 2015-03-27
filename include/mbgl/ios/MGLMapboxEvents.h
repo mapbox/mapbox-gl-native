@@ -1,16 +1,24 @@
 #import <Foundation/Foundation.h>
 
-extern NSString *const MGLEventMapLoad;
-extern NSString *const MGLEventMapTap;
-extern NSString *const MGLEventMapSingleTap;
-extern NSString *const MGLEventMapDoubleTap;
-extern NSString *const MGLEventMapTwoFingerSingleTap;
-extern NSString *const MGLEventMapQuickZoom;
-extern NSString *const MGLEventMapPanStart;
-extern NSString *const MGLEventMapPanEnd;
-extern NSString *const MGLEventMapPinchStart;
-extern NSString *const MGLEventMapRotateStart;
-extern NSString *const MGLEventMapLocation;
+extern NSString *const MGLEventTypeMapLoad;
+extern NSString *const MGLEventTypeMapTap;
+extern NSString *const MGLEventTypeMapDragEnd;
+extern NSString *const MGLEventTypeLocation;
+
+extern NSString *const MGLEventKeyLatitude;
+extern NSString *const MGLEventKeyLongitude;
+extern NSString *const MGLEventKeyZoomLevel;
+extern NSString *const MGLEventKeyPushEnabled;
+extern NSString *const MGLEventKeyEmailEnabled;
+extern NSString *const MGLEventKeyGestureID;
+
+extern NSString *const MGLEventGestureSingleTap;
+extern NSString *const MGLEventGestureDoubleTap;
+extern NSString *const MGLEventGestureTwoFingerSingleTap;
+extern NSString *const MGLEventGestureQuickZoom;
+extern NSString *const MGLEventGesturePanStart;
+extern NSString *const MGLEventGesturePinchStart;
+extern NSString *const MGLEventGestureRotateStart;
 
 @interface MGLMapboxEvents : NSObject
 
