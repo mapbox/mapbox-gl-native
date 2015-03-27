@@ -55,13 +55,16 @@ NSString *const MGLEventMapLocation = @"Location";
 @property (atomic) NSString *iOSVersion;
 @property (atomic) NSString *carrier;
 @property (atomic) NSUInteger flushAt;
-@property (atomic) NSTimeInterval flushAfter;
 @property (atomic) NSDateFormatter *rfc3339DateFormatter;
 @property (atomic) CGFloat scale;
 
 // The timer is only ever accessed from the main thread.
 //
 @property (nonatomic) NSTimer *timer;
+
+// The flush expiration time is only ever accessed from the main thread.
+//
+@property (nonatomic) NSTimeInterval flushAfter;
 
 // This is an array of events to push. All access to it will be
 // from our own serial queue.
@@ -344,11 +347,11 @@ NSString *const MGLEventMapLocation = @"Location";
         }
 
         // Start New Timer
-        NSTimeInterval interval = _flushAfter;
-        _timer = [NSTimer scheduledTimerWithTimeInterval:interval
-                                                  target:self
+        _timer = [NSTimer scheduledTimerWithTimeInterval:_flushAfter
+                                                  target:[self class]
                                                 selector:@selector(flush)
-                                                userInfo:nil repeats:YES];
+                                                userInfo:nil
+                                                 repeats:YES];
     };
 
     if ( ! [[NSThread currentThread] isMainThread]) {
