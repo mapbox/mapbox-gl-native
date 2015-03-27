@@ -368,14 +368,14 @@ mbgl::DefaultFileSource *mbglFileSource = nullptr;
         [evt setValue:[[NSNumber alloc] initWithDouble:mbglMap->getLatLng().latitude] forKey:@"lat"];
         [evt setValue:[[NSNumber alloc] initWithDouble:mbglMap->getLatLng().longitude] forKey:@"lng"];
         [evt setValue:[[NSNumber alloc] initWithDouble:mbglMap->getZoom()] forKey:@"zoom"];
-        [evt setValue:[[NSNumber alloc] initWithBool:[[UIApplication sharedApplication] isRegisteredForRemoteNotifications]] forKey:@"enabled.push"];
+        [evt setValue:[MGLMapboxEvents booleanToString:[[UIApplication sharedApplication] isRegisteredForRemoteNotifications]] forKey:@"enabled.push"];
         
-        NSString *email = @"Unknown";
+        NSString *email = [MGLMapboxEvents booleanToString:NO];
         Class MFMailComposeViewController = NSClassFromString(@"MFMailComposeViewController");
         if (MFMailComposeViewController) {
             SEL canSendMail = NSSelectorFromString(@"canSendMail");
             BOOL sendMail = ((BOOL (*)(id, SEL))[MFMailComposeViewController methodForSelector:canSendMail])(MFMailComposeViewController, canSendMail);
-            email = [NSString stringWithFormat:@"%i", sendMail];
+            email = [MGLMapboxEvents booleanToString:sendMail];
         }
         [evt setValue:email forKey:@"enabled.email"];
 

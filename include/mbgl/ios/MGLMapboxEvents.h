@@ -18,9 +18,11 @@
 @property (atomic) NSString *appVersion;
 
 + (id)sharedManager;
++ (NSString *) booleanToString:(BOOL) booleanValue;
 
 - (void) pushEvent:(NSString *)event withAttributes:(NSDictionary *)attributeDictionary;
 
 - (void) flush;
+
 
 @end
