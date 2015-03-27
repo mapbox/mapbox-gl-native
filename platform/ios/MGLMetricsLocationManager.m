@@ -1,29 +1,17 @@
-//
-//  MBLocationManager.m
-//  Hermes
-//
-//  Dynamic Settings.bundle loading based on:
-//  http://stackoverflow.com/questions/510216/can-you-make-the-settings-in-settings-bundle-default-even-if-you-dont-open-the
-//
-//  Created by Brad Leege on 3/8/15.
-//  Copyright (c) 2015 Mapbox. All rights reserved.
-//
-
-#import "MGLMetricsLocationManager.h"
-#import "CoreLocation/CoreLocation.h"
 #import "MGLMapboxEvents.h"
+#import "MGLMetricsLocationManager.h"
 
-@interface MGLMetricsLocationManager()
+#import <CoreLocation/CoreLocation.h>
 
-@property (atomic) CLLocationManager *locationManager;
+@interface MGLMetricsLocationManager() <CLLocationManagerDelegate>
+
+@property (nonatomic) CLLocationManager *locationManager;
 
 @end
 
 @implementation MGLMetricsLocationManager
 
-static MGLMetricsLocationManager *sharedManager = nil;
-
-- (id) init {
+- (instancetype) init {
     if (self = [super init]) {
         _locationManager = [[CLLocationManager alloc] init];
         _locationManager.distanceFilter = 2;
@@ -34,43 +22,31 @@ static MGLMetricsLocationManager *sharedManager = nil;
     return self;
 }
 
-+ (id)sharedManager {
++ (instancetype)sharedManager {
     static dispatch_once_t onceToken;
+    static MGLMetricsLocationManager *sharedManager;
     dispatch_once(&onceToken, ^{
         sharedManager = [[self alloc] init];
     });
     return sharedManager;
 }
 
-- (BOOL) isAuthorizedStatusDetermined {
-    return ([CLLocationManager authorizationStatus] != kCLAuthorizationStatusNotDetermined);
++ (void) startUpdatingLocation {
+    [[MGLMetricsLocationManager sharedManager].locationManager startUpdatingLocation];
 }
 
-- (void) requestAlwaysAuthorization {
-    if ([self.locationManager respondsToSelector:@selector(requestAlwaysAuthorization)]) {
-        [self.locationManager requestAlwaysAuthorization];
-    } else {
-        // This is iOS 7 or below so Starting Location Updates will trigger authorization request
-        [self startUpdatingLocation];
-    }
-}
-
-- (void) startUpdatingLocation {
-    [self.locationManager startUpdatingLocation];
-}
-
-- (void) stopUpdatingLocation {
-    [self.locationManager stopUpdatingLocation];
++ (void) stopUpdatingLocation {
+    [[MGLMetricsLocationManager sharedManager].locationManager stopUpdatingLocation];
 }
 
 #pragma mark CLLocationManagerDelegate
 - (void)locationManager:(CLLocationManager *)manager didUpdateLocations:(NSArray *)locations {
     //  Iterate through locations to pass all data
     for (CLLocation *loc in locations) {
-        NSMutableDictionary *evt = [[NSMutableDictionary alloc] init];
-        [evt setValue:[[NSNumber alloc] initWithDouble:loc.coordinate.latitude] forKey:@"lat"];
-        [evt setValue:[[NSNumber alloc] initWithDouble:loc.coordinate.longitude] forKey:@"lng"];
-        [[MGLMapboxEvents sharedManager] pushEvent:@"location" withAttributes:evt];
+        [MGLMapboxEvents pushEvent:MGLEventMapLocation withAttributes:@{
+            @"lat": @(loc.coordinate.latitude),
+            @"lng": @(loc.coordinate.longitude)
+        }];
     }
 }
 
@@ -85,18 +61,18 @@ static MGLMetricsLocationManager *sharedManager = nil;
             break;
         case kCLAuthorizationStatusDenied:
             newStatus = @"User Explcitly Denied";
-            [[MGLMetricsLocationManager sharedManager] stopUpdatingLocation];
+            [MGLMetricsLocationManager stopUpdatingLocation];
             break;
         case kCLAuthorizationStatusAuthorized:
             newStatus = @"User Has Authorized / Authorized Always";
-            [[MGLMetricsLocationManager sharedManager] startUpdatingLocation];
+            [MGLMetricsLocationManager startUpdatingLocation];
             break;
             //        case kCLAuthorizationStatusAuthorizedAlways:
             //            newStatus = @"Not Determined";
             //            break;
         case kCLAuthorizationStatusAuthorizedWhenInUse:
             newStatus = @"User Has Authorized When In Use Only";
-            [[MGLMetricsLocationManager sharedManager] startUpdatingLocation];
+            [MGLMetricsLocationManager startUpdatingLocation];
             break;
         default:
             newStatus = @"Unknown";
