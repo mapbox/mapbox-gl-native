@@ -241,7 +241,7 @@ NSString *const MGLEventGestureRotateStart = @"Rotation";
         
         if (!event) return;
 
-        NSMutableDictionary *evt = [[NSMutableDictionary alloc] init];
+        NSMutableDictionary *evt = [[NSMutableDictionary alloc] initWithDictionary:attributeDictionary];
         // mapbox-events stock attributes
         [evt setObject:event forKey:@"event"];
         [evt setObject:@(1) forKey:@"version"];
@@ -260,11 +260,7 @@ NSString *const MGLEventGestureRotateStart = @"Rotation";
         [evt setValue:[weakSelf getCurrentCellularNetworkConnectionType] forKey:@"cellularNetworkType"];
         [evt setValue:[weakSelf getWifiNetworkName] forKey:@"wifi"];
         [evt setValue:@([weakSelf getContentSizeScale]) forKey:@"accessibilityFontScale"];
-        
-        for (NSString *key in [attributeDictionary allKeys]) {
-            [evt setObject:[attributeDictionary valueForKey:key] forKey:key];
-        }
-        
+
         // Make Immutable Version
         NSDictionary *finalEvent = [NSDictionary dictionaryWithDictionary:evt];
         
