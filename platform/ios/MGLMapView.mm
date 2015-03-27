@@ -360,7 +360,7 @@ mbgl::DefaultFileSource *mbglFileSource = nullptr;
         @"lng": @(latLng.longitude),
         @"zoom": @(zoom),
         @"enabled.push": @([MGLMapboxEvents checkPushEnabled]),
-        @"enabled.email": [MGLMapboxEvents checkEmailEnabled]
+        @"enabled.email": @([MGLMapboxEvents checkEmailEnabled])
     }];
 
     return YES;

@@ -33,7 +33,7 @@ extern NSString *const MGLEventMapLocation;
 
 // You can call these methods from any thread.
 //
-+ (NSString *) checkEmailEnabled;
++ (BOOL) checkEmailEnabled;
 + (BOOL) checkPushEnabled;
 
 // You can call this method from any thread.
