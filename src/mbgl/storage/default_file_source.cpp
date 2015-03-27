@@ -3,6 +3,7 @@
 #include <mbgl/storage/default/asset_request.hpp>
 #include <mbgl/storage/default/http_request.hpp>
 
+#include <mbgl/map/environment.hpp>
 #include <mbgl/storage/response.hpp>
 #include <mbgl/platform/platform.hpp>
 
@@ -51,7 +52,7 @@ struct DefaultFileSource::StopAction {
 };
 
 struct DefaultFileSource::AbortAction {
-    const Environment &env;
+    uint32_t env;
 };
 
 
@@ -109,9 +110,8 @@ SharedRequestBase *DefaultFileSource::find(const Resource &resource) {
     return nullptr;
 }
 
-Request *DefaultFileSource::request(const Resource &resource, uv_loop_t *l, const Environment &env,
-                                    Callback callback) {
-    auto req = new Request(resource, l, env, std::move(callback));
+Request *DefaultFileSource::request(const Resource &resource, const std::thread::id &tid_, Callback callback) {
+    auto req = new Request(resource, tid_, Environment::Get().getID(), std::move(callback));
 
     // This function can be called from any thread. Make sure we're executing the actual call in the
     // file source loop by sending it over the queue. It will be processed in processAction().
@@ -119,9 +119,8 @@ Request *DefaultFileSource::request(const Resource &resource, uv_loop_t *l, cons
     return req;
 }
 
-void DefaultFileSource::request(const Resource &resource, const Environment &env,
-                                Callback callback) {
-    auto req = new Request(resource, nullptr, env, std::move(callback));
+void DefaultFileSource::request(const Resource &resource, Callback callback) {
+    auto req = new Request(resource, std::thread::id(), Environment::Get().getID(), std::move(callback));
 
     // This function can be called from any thread. Make sure we're executing the actual call in the
     // file source loop by sending it over the queue. It will be processed in processAction().
@@ -136,8 +135,8 @@ void DefaultFileSource::cancel(Request *req) {
     queue->send(RemoveRequestAction{ req });
 }
 
-void DefaultFileSource::abort(const Environment &env) {
-    queue->send(AbortAction{ env });
+void DefaultFileSource::abort(uint32_t env) {
+    queue->send(AbortAction{env});
 }
 
 

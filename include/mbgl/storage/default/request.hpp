@@ -2,57 +2,46 @@
 #define MBGL_STORAGE_DEFAULT_REQUEST
 
 #include <mbgl/storage/resource.hpp>
-
-#include <mbgl/util/util.hpp>
 #include <mbgl/util/noncopyable.hpp>
+#include <mbgl/util/util.hpp>
 
-#include <mutex>
 #include <thread>
 #include <functional>
 #include <memory>
 
-typedef struct uv_async_s uv_async_t;
-typedef struct uv_loop_s uv_loop_t;
-
 namespace mbgl {
 
 class Response;
-class Environment;
 
 class Request : private util::noncopyable {
-    MBGL_STORE_THREAD(tid)
-
 public:
     using Callback = std::function<void(const Response &)>;
-    Request(const Resource &resource, uv_loop_t *loop, const Environment &env, Callback callback);
+    Request(const Resource &resource, std::thread::id tid, uint32_t env, Callback callback);
 
-public:
     // May be called from any thread.
     void notify(const std::shared_ptr<const Response> &response);
     void destruct();
-
-    // May be called only from the thread the Request was created in.
     void cancel();
 
 private:
-    ~Request();
+    ~Request() = default;
     void invoke();
     void notifyCallback();
 
-private:
-    uv_async_t *async = nullptr;
     struct Canceled;
     std::unique_ptr<Canceled> canceled;
+
     Callback callback;
     std::shared_ptr<const Response> response;
+    std::thread::id tid;
 
 public:
     const Resource resource;
 
-    // The environment ref is used to associate requests with a particular environment. This allows
+    // The environment ID is used to associate requests with a particular environment. This allows
     // us to only terminate requests associated with that environment, e.g. when the map the env
     // belongs to is discarded.
-    const Environment &env;
+    uint32_t env;
 };
 
 }

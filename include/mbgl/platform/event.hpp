@@ -24,6 +24,7 @@ MBGL_DEFINE_ENUM_CLASS(EventSeverityClass, EventSeverity, {
 
 enum class Event : uint8_t {
     General,
+    Thread,
     Setup,
     Shader,
     ParseStyle,
@@ -41,6 +42,7 @@ enum class Event : uint8_t {
 
 MBGL_DEFINE_ENUM_CLASS(EventClass, Event, {
     { Event::General, "General" },
+    { Event::Thread, "Thread" },
     { Event::Setup, "Setup" },
     { Event::Shader, "Shader" },
     { Event::ParseStyle, "ParseStyle" },

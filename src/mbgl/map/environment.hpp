@@ -4,6 +4,7 @@
 #include <mbgl/util/noncopyable.hpp>
 #include <mbgl/util/util.hpp>
 
+#include <future>
 #include <thread>
 #include <functional>
 #include <vector>
@@ -17,11 +18,14 @@ class Request;
 class Response;
 struct Resource;
 
+typedef std::function<void()> Closure;
+
 enum class ThreadType : uint8_t {
     Unknown    = 0,
     Main       = 1 << 0,
     Map        = 1 << 1,
     TileWorker = 1 << 2,
+    Test       = 1 << 3,
 };
 
 class Environment final : private util::noncopyable {
@@ -34,7 +38,25 @@ public:
     static bool currentlyOn(ThreadType);
     static std::string threadName();
 
-    unsigned getID() const;
+    static bool postTask(const std::thread::id& to, const Closure& task);
+
+    template<typename T>
+    static bool postTaskSync(const std::thread::id& to, const std::function<T()>& task, T& out) {
+        std::promise<T> promise;
+
+        auto syncTask = [&promise, task] {
+             promise.set_value(task());
+        };
+
+        if (!postTask(to, syncTask)) {
+            return false;
+        }
+
+        out = std::move(promise.get_future().get());
+        return true;
+    }
+
+    uint32_t getID() const;
 
     // #############################################################################################
 
@@ -60,25 +82,22 @@ public:
     void terminate();
 
 private:
-    unsigned id;
+    uint32_t id;
     FileSource& fileSource;
 
     // Stores OpenGL objects that we marked for deletion
     std::vector<uint32_t> abandonedVAOs;
     std::vector<uint32_t> abandonedBuffers;
     std::vector<uint32_t> abandonedTextures;
-
-public:
-    uv_loop_t* const loop;
 };
 
 class EnvironmentScope final {
 public:
-    EnvironmentScope(Environment&, ThreadType, const std::string& name);
+    EnvironmentScope(Environment&, ThreadType, const std::string& name, uv_loop_t* loop = nullptr);
     ~EnvironmentScope();
 
 private:
-    std::thread::id id;
+    std::thread::id tid;
 };
 
 }

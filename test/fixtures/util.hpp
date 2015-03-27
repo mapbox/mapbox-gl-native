@@ -11,6 +11,9 @@
         ~name() { if (!completed) ADD_FAILURE() << #name " didn't complete."; } \
     } name;
 
+#define TEST_CASE_NAME() \
+    ::testing::UnitTest::GetInstance()->current_test_info()->test_case_name()
+
 namespace mbgl {
 namespace test {
 

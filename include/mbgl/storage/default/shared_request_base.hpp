@@ -68,7 +68,7 @@ public:
         return observers.empty();
     }
 
-    std::vector<Request *> removeAllInEnvironment(const Environment &env) {
+    std::vector<Request *> removeAllInEnvironment(uint32_t env) {
         MBGL_VERIFY_THREAD(tid);
 
         std::vector<Request *> result;
@@ -76,7 +76,7 @@ public:
         // Removes all Requests in the supplied environment and returns a list
         // of them.
         util::erase_if(observers, [&](Request *req) -> bool {
-            if (&req->env == &env) {
+            if (req->env == env) {
                 result.push_back(req);
                 return true;
             } else {

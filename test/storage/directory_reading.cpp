@@ -1,11 +1,14 @@
 #include "storage.hpp"
 
-#include <uv.h>
-
+#include <mbgl/map/environment.hpp>
 #include <mbgl/storage/default_file_source.hpp>
 
+#include <uv.h>
+
+#include <thread>
+
 TEST_F(Storage, AssetReadDirectory) {
-    SCOPED_TEST(ReadDirectory)
+    SCOPED_TEST(ReadDirectory);
 
     using namespace mbgl;
 
@@ -15,10 +18,11 @@ TEST_F(Storage, AssetReadDirectory) {
     DefaultFileSource fs(nullptr, uv_default_loop());
 #endif
 
-    auto &env = *static_cast<const Environment *>(nullptr);
+    Environment env(fs);
+    EnvironmentScope scope(env, ThreadType::Test, TEST_CASE_NAME(), uv_default_loop());
 
-    fs.request({ Resource::Unknown, "asset://TEST_DATA/fixtures/storage" }, uv_default_loop(),
-               env, [&](const Response &res) {
+    fs.request({ Resource::Unknown, "asset://TEST_DATA/fixtures/storage" },
+               std::this_thread::get_id(), [&](const Response& res) {
         EXPECT_EQ(Response::Error, res.status);
         EXPECT_EQ(0ul, res.data.size());
         EXPECT_EQ(0, res.expires);
@@ -27,7 +31,7 @@ TEST_F(Storage, AssetReadDirectory) {
 #ifdef MBGL_ASSET_ZIP
         EXPECT_EQ("No such file", res.message);
 #elif MBGL_ASSET_FS
-                            EXPECT_EQ("illegal operation on a directory", res.message);
+                   EXPECT_EQ("illegal operation on a directory", res.message);
 #endif
         ReadDirectory.finish();
     });

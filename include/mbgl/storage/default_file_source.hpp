@@ -22,12 +22,11 @@ public:
     DefaultFileSource(FileCache *cache, uv_loop_t *loop, const std::string &root = "");
     ~DefaultFileSource() override;
 
-    Request *request(const Resource &resource, uv_loop_t *loop, const Environment &env,
-                     Callback callback) override;
+    Request *request(const Resource &resource, const std::thread::id &tid, Callback callback) override;
     void cancel(Request *request) override;
-    void request(const Resource &resource, const Environment &env, Callback callback) override;
+    void request(const Resource &resource, Callback callback) override;
 
-    void abort(const Environment &env) override;
+    void abort(uint32_t env) override;
 
     void notify(SharedRequestBase *sharedRequest, const std::set<Request *> &observers,
                 std::shared_ptr<const Response> response, FileCache::Hint hint);

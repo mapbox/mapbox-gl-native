@@ -29,6 +29,7 @@
 #include <mbgl/util/uv.hpp>
 #include <mbgl/util/mapbox.hpp>
 #include <mbgl/util/exception.hpp>
+#include <mbgl/util/stopwatch.hpp>
 
 #include <algorithm>
 #include <iostream>
@@ -64,6 +65,7 @@ Map::Map(View& view_, FileSource& fileSource_)
     : env(util::make_unique<Environment>(fileSource_)),
       scope(util::make_unique<EnvironmentScope>(*env, ThreadType::Main, "Main")),
       view(view_),
+      loop(uv_loop_new()),
       transform(view_),
       fileSource(fileSource_),
       glyphAtlas(util::make_unique<GlyphAtlas>(1024, 1024)),
@@ -102,9 +104,11 @@ Map::~Map() {
     spriteAtlas.reset();
     glyphAtlas.reset();
 
-    uv_run(env->loop, UV_RUN_DEFAULT);
+    uv_run(loop, UV_RUN_DEFAULT);
 
     env->performCleanup();
+
+    uv_loop_delete(loop);
 }
 
 uv::worker &Map::getWorker() {
@@ -124,7 +128,7 @@ void Map::start(bool startPaused) {
     isStopped = false;
 
     // Setup async notifications
-    asyncTerminate = util::make_unique<uv::async>(env->loop, [this]() {
+    asyncTerminate = util::make_unique<uv::async>(loop, [this]() {
         assert(Environment::currentlyOn(ThreadType::Map));
 
         // Remove all of these to make sure they are destructed in the correct thread.
@@ -140,11 +144,11 @@ void Map::start(bool startPaused) {
         asyncTerminate.reset();
     });
 
-    asyncUpdate = util::make_unique<uv::async>(env->loop, [this] {
+    asyncUpdate = util::make_unique<uv::async>(loop, [this] {
         update();
     });
 
-    asyncRender = util::make_unique<uv::async>(env->loop, [this] {
+    asyncRender = util::make_unique<uv::async>(loop, [this] {
         // Must be called in Map thread.
         assert(Environment::currentlyOn(ThreadType::Map));
 
@@ -212,7 +216,7 @@ void Map::pause(bool waitForPause) {
     pausing = true;
     mutexRun.unlock();
 
-    uv_stop(env->loop);
+    uv_stop(loop);
     triggerUpdate(); // Needed to ensure uv_stop is seen and uv_run exits, otherwise we deadlock on wait_for_pause
 
     if (waitForPause) {
@@ -247,7 +251,7 @@ void Map::run() {
         threadName += "andMain";
     }
 
-    EnvironmentScope mapScope(*env, threadType, threadName);
+    EnvironmentScope mapScope(*env, threadType, threadName, loop);
 
     if (mode == Mode::Continuous) {
         checkForPause();
@@ -261,7 +265,7 @@ void Map::run() {
 
     view.activate();
 
-    workers = util::make_unique<uv::worker>(env->loop, 4, "Tile Worker");
+    workers = util::make_unique<uv::worker>(loop, 4, "Tile Worker");
 
     setup();
     prepare();
@@ -269,15 +273,15 @@ void Map::run() {
     if (mode == Mode::Continuous) {
         terminating = false;
         while(!terminating) {
-            uv_run(env->loop, UV_RUN_DEFAULT);
+            uv_run(loop, UV_RUN_DEFAULT);
             checkForPause();
         }
     } else {
-        uv_run(env->loop, UV_RUN_DEFAULT);
+        uv_run(loop, UV_RUN_DEFAULT);
     }
 
     // Run the event loop once more to make sure our async delete handlers are called.
-    uv_run(env->loop, UV_RUN_ONCE);
+    uv_run(loop, UV_RUN_ONCE);
 
     // If the map rendering wasn't started asynchronously, we perform one render
     // *after* all events have been processed.
@@ -546,6 +550,8 @@ void Map::setDefaultPointAnnotationSymbol(const std::string& symbol) {
 }
 
 double Map::getTopOffsetPixelsForAnnotationSymbol(const std::string& symbol) {
+    assert(Environment::currentlyOn(ThreadType::Map));
+
     SpritePosition pos = sprite->getSpritePosition(symbol);
 
     return -pos.height / pos.pixelRatio / 2;
@@ -604,6 +610,18 @@ void Map::setDebug(bool value) {
 }
 
 void Map::toggleDebug() {
+    std::function<double()> syncTask =
+        std::bind(&Map::getTopOffsetPixelsForAnnotationSymbol, this, "foobar");
+
+    {
+        util::stopwatch stopwatch("sync task");
+
+        double ret;
+        if (Environment::postTaskSync(thread.get_id(), syncTask, ret)) {
+            std::cout << "Sync result: " << ret << std::endl;
+        }
+    }
+
     data->toggleDebug();
     triggerUpdate(Update::Debug);
 }

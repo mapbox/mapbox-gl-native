@@ -1,6 +1,9 @@
 #include <mbgl/map/environment.hpp>
-#include <mbgl/storage/file_source.hpp>
+
 #include <mbgl/platform/gl.hpp>
+#include <mbgl/platform/log.hpp>
+#include <mbgl/storage/file_source.hpp>
+#include <mbgl/util/async_queue.hpp>
 
 #include <uv.h>
 
@@ -19,11 +22,13 @@ private:
         Environment* env;
         ThreadType type;
         std::string name;
+        uv_loop_t* loop;
+        util::AsyncQueue<Closure>* queue;
     };
 
 public:
     ThreadInfoStore() {
-        registerThread(nullptr, ThreadType::Main, "Main");
+        registerThread(nullptr, ThreadType::Main, "Main", nullptr);
     }
 
     ~ThreadInfoStore() {
@@ -31,29 +36,41 @@ public:
         assert(threadSet.size() == 0);
     }
 
-    void registerThread(Environment* env, ThreadType type, const std::string& name) {
-        std::lock_guard<std::mutex> lock(mtx);
+    void registerThread(Environment* env, ThreadType type, const std::string& name, uv_loop_t* loop) {
+        std::lock_guard<std::recursive_mutex> lock(mtx);
+
+        util::AsyncQueue<Closure>* queue(nullptr);
+        if (loop) {
+            queue = new util::AsyncQueue<Closure>(loop, postTaskCallback);
+            queue->unref();
+        }
 
         // FIXME: We should never need to overwrite a thread here and we only allow
         // this today because on the Static mode, the Map thread and the Main thread
         // are same. Replace this with emplace() when this gets fixed.
-        threadSet[std::this_thread::get_id()] = ThreadInfo{ env, type, name };
+        threadSet[std::this_thread::get_id()] = ThreadInfo{env, type, name, loop, queue};
     }
 
     void unregisterThread() {
-        std::lock_guard<std::mutex> lock(mtx);
+        std::lock_guard<std::recursive_mutex> lock(mtx);
 
         ThreadSet::iterator it = threadSet.find(std::this_thread::get_id());
-        if (it != threadSet.end()) {
-            threadSet.erase(it);
+        if (it == threadSet.end()) {
+            return;
         }
+
+        if (it->second.queue) {
+            it->second.queue->stop();
+        }
+
+        threadSet.erase(it);
     }
 
-    const ThreadInfo& getThreadInfo() const {
+    const ThreadInfo& getThreadInfo(std::thread::id id = std::this_thread::get_id()) const {
         static ThreadInfo emptyInfo;
-        std::lock_guard<std::mutex> lock(mtx);
+        std::lock_guard<std::recursive_mutex> lock(mtx);
 
-        ThreadSet::const_iterator it = threadSet.find(std::this_thread::get_id());
+        ThreadSet::const_iterator it = threadSet.find(id);
         if (it != threadSet.end()) {
             return it->second;
         } else {
@@ -61,15 +78,32 @@ public:
         }
     }
 
+    bool postTask(const std::thread::id& to, const Closure& task) {
+        std::lock_guard<std::recursive_mutex> lock(mtx);
+
+        util::AsyncQueue<Closure>* queue = getThreadInfo(to).queue;
+        if (!queue) {
+            Log::Debug(mbgl::Event::Thread, "Queue not available, discarding task");
+            return false;
+        }
+
+        queue->send(Closure(task));
+        return true;
+    }
+
 private:
+    static void postTaskCallback(Closure& task) {
+        task();
+    }
+
     typedef std::unordered_map<std::thread::id, ThreadInfo> ThreadSet;
     ThreadSet threadSet;
 
-    mutable std::mutex mtx;
+    mutable std::recursive_mutex mtx;
 };
 
-unsigned makeEnvironmentID() {
-    static std::atomic<unsigned> id(0);
+uint32_t makeEnvironmentID() {
+    static std::atomic<uint32_t> id(0);
     return id++;
 }
 
@@ -77,18 +111,21 @@ ThreadInfoStore threadInfoStore;
 
 } // namespace
 
-EnvironmentScope::EnvironmentScope(Environment& env, ThreadType type, const std::string& name)
-    : id(std::this_thread::get_id()) {
-    threadInfoStore.registerThread(&env, type, name);
+EnvironmentScope::EnvironmentScope(Environment& env,
+                                   ThreadType type,
+                                   const std::string& name,
+                                   uv_loop_t* loop)
+    : tid(std::this_thread::get_id()) {
+    threadInfoStore.registerThread(&env, type, name, loop);
 }
 
 EnvironmentScope::~EnvironmentScope() {
-    assert(id == std::this_thread::get_id());
+    assert(tid == std::this_thread::get_id());
     threadInfoStore.unregisterThread();
 }
 
 Environment::Environment(FileSource& fs)
-    : id(makeEnvironmentID()), fileSource(fs), loop(uv_loop_new()) {
+    : id(makeEnvironmentID()), fileSource(fs) {
 }
 
 Environment::~Environment() {
@@ -116,19 +153,23 @@ std::string Environment::threadName() {
     return threadInfoStore.getThreadInfo().name;
 }
 
-unsigned Environment::getID() const {
+bool Environment::postTask(const std::thread::id& to, const Closure& task) {
+    return threadInfoStore.postTask(to, task);
+}
+
+uint32_t Environment::getID() const {
     return id;
 }
 
 void Environment::requestAsync(const Resource& resource,
                                std::function<void(const Response&)> callback) {
-    fileSource.request(resource, *this, std::move(callback));
+    fileSource.request(resource, std::move(callback));
 }
 
 Request* Environment::request(const Resource& resource,
                               std::function<void(const Response&)> callback) {
     assert(currentlyOn(ThreadType::Map));
-    return fileSource.request(resource, loop, *this, std::move(callback));
+    return fileSource.request(resource, std::this_thread::get_id(), std::move(callback));
 }
 
 void Environment::cancelRequest(Request* req) {
@@ -181,7 +222,7 @@ void Environment::performCleanup() {
 // #############################################################################################
 
 void Environment::terminate() {
-    fileSource.abort(*this);
+    fileSource.abort(id);
 }
 
 }
