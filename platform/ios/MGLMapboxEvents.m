@@ -28,8 +28,8 @@ NSString *const MGLEventMapLocation = @"Location";
 // Threadsafety conventions:
 //
 // All variables accessed from more than one thread are
-// designed `atomic` and accessed through dot syntax. The
-// main thread may use underscore syntax during the
+// designated `atomic` and accessed through dot syntax. The
+// main thread uses underscore syntax during the
 // initialization of the variable.
 //
 // All variables accessed outside of initialization and
