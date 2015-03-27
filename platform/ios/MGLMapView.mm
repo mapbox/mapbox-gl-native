@@ -360,7 +360,7 @@ mbgl::DefaultFileSource *mbglFileSource = nullptr;
         MGLEventKeyLongitude: @(latLng.longitude),
         MGLEventKeyZoomLevel: @(zoom),
         MGLEventKeyPushEnabled: @([MGLMapboxEvents checkPushEnabled]),
-        MGLEventKeyEmailEnabled: [MGLMapboxEvents checkEmailEnabled]
+        MGLEventKeyEmailEnabled: @([MGLMapboxEvents checkEmailEnabled])
     }];
 
     return YES;

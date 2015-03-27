@@ -224,6 +224,22 @@ NSString *const MGLEventGestureRotateStart = @"Rotation";
 // use of +pushEvent:withAttributes:.
 //
 - (void) pushEvent:(NSString *)event withAttributes:(NSDictionary *)attributeDictionary {
+    // conve+rt any BOOL types to string values written out like JS
+    NSMutableDictionary *newAttributeDictionary = [NSMutableDictionary dictionaryWithCapacity:[attributeDictionary count]];
+    NSString *key;
+    NSObject *value;
+    for (key in attributeDictionary) {
+        value = attributeDictionary[key];
+        if ([value isKindOfClass:[NSNumber class]]) {
+            // if of character type, treat as bool
+            if (strncmp([(NSNumber *)value objCType], "c", 1) == 0) {
+                value = ([(NSNumber *)value boolValue] ? @"true" : @"false");
+            }
+        }
+        newAttributeDictionary[key] = value;
+    }
+    attributeDictionary = newAttributeDictionary;
+
     __weak MGLMapboxEvents *weakSelf = self;
 
     dispatch_async(_serialQueue, ^{
@@ -550,20 +566,18 @@ NSString *const MGLEventGestureRotateStart = @"Rotation";
 
 // Can be called from any thread.
 //
-+ (NSString *) checkEmailEnabled {
-    __block NSString *result;
-
-    NSString *(^mailCheckBlock)(void) = ^{
-        NSString *email = @"Unknown";
++ (BOOL) checkEmailEnabled {
+    BOOL (^mailCheckBlock)(void) = ^{
+        BOOL blockResult;
         Class MFMailComposeViewController = NSClassFromString(@"MFMailComposeViewController");
         if (MFMailComposeViewController) {
             SEL canSendMail = NSSelectorFromString(@"canSendMail");
-            BOOL sendMail = ((BOOL (*)(id, SEL))[MFMailComposeViewController methodForSelector:canSendMail])
-            (MFMailComposeViewController, canSendMail);
-            email = [NSString stringWithFormat:@"%i", sendMail];
+            blockResult = ((BOOL (*)(id, SEL))[MFMailComposeViewController methodForSelector:canSendMail])(MFMailComposeViewController, canSendMail);
         }
-        return email;
+        return blockResult;
     };
+
+    __block BOOL result;
 
     if ( ! [[NSThread currentThread] isMainThread]) {
         dispatch_sync(dispatch_get_main_queue(), ^{
@@ -579,22 +593,23 @@ NSString *const MGLEventGestureRotateStart = @"Rotation";
 // Can be called from any thread.
 //
 + (BOOL) checkPushEnabled {
-    __block BOOL result;
-
     BOOL (^pushCheckBlock)(void) = ^{
+        BOOL blockResult;
         if ([[UIApplication sharedApplication] respondsToSelector:@selector(isRegisteredForRemoteNotifications)]) {
             // iOS 8+
-            result = [[UIApplication sharedApplication] isRegisteredForRemoteNotifications];
+            blockResult = [[UIApplication sharedApplication] isRegisteredForRemoteNotifications];
         } else {
             // iOS 7
 #pragma clang diagnostic push
 #pragma clang diagnostic ignored "-Wdeprecated-declarations"
             UIRemoteNotificationType types = [[UIApplication sharedApplication] enabledRemoteNotificationTypes];
-            result = (types == UIRemoteNotificationTypeNone) ? NO : YES;
+            blockResult = (types == UIRemoteNotificationTypeNone) ? NO : YES;
 #pragma clang diagnostic pop
         }
-        return result;
+        return blockResult;
     };
+
+    __block BOOL result;
 
     if ( ! [[NSThread currentThread] isMainThread]) {
         dispatch_sync(dispatch_get_main_queue(), ^{
