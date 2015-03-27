@@ -5,10 +5,7 @@
 
 @interface MGLMetricsLocationManager() <CLLocationManagerDelegate>
 
-@property (atomic) CLLocationManager *locationManager;
-
-- (void) startUpdatingLocation;
-- (void) stopUpdatingLocation;
+@property (nonatomic) CLLocationManager *locationManager;
 
 @end
 
@@ -34,12 +31,12 @@
     return sharedManager;
 }
 
-- (void) startUpdatingLocation {
-    [self.locationManager startUpdatingLocation];
++ (void) startUpdatingLocation {
+    [[MGLMetricsLocationManager sharedManager].locationManager startUpdatingLocation];
 }
 
-- (void) stopUpdatingLocation {
-    [self.locationManager stopUpdatingLocation];
++ (void) stopUpdatingLocation {
+    [[MGLMetricsLocationManager sharedManager].locationManager stopUpdatingLocation];
 }
 
 #pragma mark CLLocationManagerDelegate
@@ -64,18 +61,18 @@
             break;
         case kCLAuthorizationStatusDenied:
             newStatus = @"User Explcitly Denied";
-            [[MGLMetricsLocationManager sharedManager] stopUpdatingLocation];
+            [MGLMetricsLocationManager stopUpdatingLocation];
             break;
         case kCLAuthorizationStatusAuthorized:
             newStatus = @"User Has Authorized / Authorized Always";
-            [[MGLMetricsLocationManager sharedManager] startUpdatingLocation];
+            [MGLMetricsLocationManager startUpdatingLocation];
             break;
             //        case kCLAuthorizationStatusAuthorizedAlways:
             //            newStatus = @"Not Determined";
             //            break;
         case kCLAuthorizationStatusAuthorizedWhenInUse:
             newStatus = @"User Has Authorized When In Use Only";
-            [[MGLMetricsLocationManager sharedManager] startUpdatingLocation];
+            [MGLMetricsLocationManager startUpdatingLocation];
             break;
         default:
             newStatus = @"Unknown";
