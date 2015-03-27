@@ -129,8 +129,15 @@ void Map::start(bool startPaused) {
 
         // Remove all of these to make sure they are destructed in the correct thread.
         style.reset();
+
+        // Since we don't have a stylesheet anymore, this will disable all Sources and cancel
+        // their associated requests.
+        updateSources();
+        assert(activeSources.empty());
+
+        // It's now safe to destroy/join the workers since there won't be any more callbacks that
+        // could dispatch to the worker pool.
         workers.reset();
-        activeSources.clear();
 
         terminating = true;
 
