@@ -419,19 +419,47 @@ NSString *const MGLEventMapLocation = @"Location";
 }
 
 + (NSString *) checkEmailEnabled {
-    NSString *email = @"Unknown";
-    Class MFMailComposeViewController = NSClassFromString(@"MFMailComposeViewController");
-    if (MFMailComposeViewController) {
-        SEL canSendMail = NSSelectorFromString(@"canSendMail");
-        BOOL sendMail = ((BOOL (*)(id, SEL))[MFMailComposeViewController methodForSelector:canSendMail])
-        (MFMailComposeViewController, canSendMail);
-        email = [NSString stringWithFormat:@"%i", sendMail];
+    __block NSString *result;
+
+    NSString *(^mailCheckBlock)(void) = ^{
+        NSString *email = @"Unknown";
+        Class MFMailComposeViewController = NSClassFromString(@"MFMailComposeViewController");
+        if (MFMailComposeViewController) {
+            SEL canSendMail = NSSelectorFromString(@"canSendMail");
+            BOOL sendMail = ((BOOL (*)(id, SEL))[MFMailComposeViewController methodForSelector:canSendMail])
+            (MFMailComposeViewController, canSendMail);
+            email = [NSString stringWithFormat:@"%i", sendMail];
+        }
+        return email;
+    };
+
+    if ( ! [[NSThread currentThread] isMainThread]) {
+        dispatch_sync(dispatch_get_main_queue(), ^{
+            result = mailCheckBlock();
+        });
+    } else {
+        result = mailCheckBlock();
     }
-    return email;
+
+    return result;
 }
 
 + (BOOL) checkPushEnabled {
-    return[[UIApplication sharedApplication] isRegisteredForRemoteNotifications];
+    __block BOOL result;
+
+    BOOL (^pushCheckBlock)(void) = ^{
+        return [[UIApplication sharedApplication] isRegisteredForRemoteNotifications];
+    };
+
+    if ( ! [[NSThread currentThread] isMainThread]) {
+        dispatch_sync(dispatch_get_main_queue(), ^{
+            result = pushCheckBlock();
+        });
+    } else {
+        result = pushCheckBlock();
+    }
+
+    return result;
 }
 
 @end
