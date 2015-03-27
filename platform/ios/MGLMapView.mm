@@ -586,14 +586,14 @@ mbgl::DefaultFileSource *mbglFileSource = nullptr;
 
 - (void)handlePanGesture:(UIPanGestureRecognizer *)pan
 {
-    [self trackGestureEvent:MGLEventGesturePanStart forRecognizer:pan];
-    
     if ( ! self.isScrollEnabled) return;
 
     mbglMap->cancelTransitions();
 
     if (pan.state == UIGestureRecognizerStateBegan)
     {
+        [self trackGestureEvent:MGLEventGesturePanStart forRecognizer:pan];
+
         self.centerPoint = CGPointMake(0, 0);
 
         self.userTrackingMode = MGLUserTrackingModeNone;
@@ -663,8 +663,6 @@ mbgl::DefaultFileSource *mbglFileSource = nullptr;
 
 - (void)handlePinchGesture:(UIPinchGestureRecognizer *)pinch
 {
-    [self trackGestureEvent:MGLEventGesturePinchStart forRecognizer:pinch];
-    
     if ( ! self.isZoomEnabled) return;
 
     if (mbglMap->getZoom() <= mbglMap->getMinZoom() && pinch.scale < 1) return;
@@ -673,6 +671,8 @@ mbgl::DefaultFileSource *mbglFileSource = nullptr;
 
     if (pinch.state == UIGestureRecognizerStateBegan)
     {
+        [self trackGestureEvent:MGLEventGesturePinchStart forRecognizer:pinch];
+
         mbglMap->startScaling();
 
         self.scale = mbglMap->getScale();
@@ -701,14 +701,14 @@ mbgl::DefaultFileSource *mbglFileSource = nullptr;
 
 - (void)handleRotateGesture:(UIRotationGestureRecognizer *)rotate
 {
-    [self trackGestureEvent:MGLEventGestureRotateStart forRecognizer:rotate];
-    
     if ( ! self.isRotateEnabled) return;
 
     mbglMap->cancelTransitions();
 
     if (rotate.state == UIGestureRecognizerStateBegan)
     {
+        [self trackGestureEvent:MGLEventGestureRotateStart forRecognizer:rotate];
+
         mbglMap->startRotating();
 
         self.angle = [MGLMapView degreesToRadians:mbglMap->getBearing()] * -1;
@@ -866,14 +866,14 @@ mbgl::DefaultFileSource *mbglFileSource = nullptr;
 
 - (void)handleDoubleTapGesture:(UITapGestureRecognizer *)doubleTap
 {
-    [self trackGestureEvent:MGLEventGestureDoubleTap forRecognizer:doubleTap];
-    
     if ( ! self.isZoomEnabled) return;
 
     mbglMap->cancelTransitions();
 
     if (doubleTap.state == UIGestureRecognizerStateBegan)
     {
+        [self trackGestureEvent:MGLEventGestureDoubleTap forRecognizer:doubleTap];
+
         self.userTrackingMode = MGLUserTrackingModeNone;
     }
     else if (doubleTap.state == UIGestureRecognizerStateEnded)
@@ -897,8 +897,6 @@ mbgl::DefaultFileSource *mbglFileSource = nullptr;
 
 - (void)handleTwoFingerTapGesture:(UITapGestureRecognizer *)twoFingerTap
 {
-    [self trackGestureEvent:MGLEventGestureTwoFingerSingleTap forRecognizer:twoFingerTap];
-    
     if ( ! self.isZoomEnabled) return;
 
     if (mbglMap->getZoom() == mbglMap->getMinZoom()) return;
@@ -907,6 +905,8 @@ mbgl::DefaultFileSource *mbglFileSource = nullptr;
 
     if (twoFingerTap.state == UIGestureRecognizerStateBegan)
     {
+        [self trackGestureEvent:MGLEventGestureTwoFingerSingleTap forRecognizer:twoFingerTap];
+
         self.userTrackingMode = MGLUserTrackingModeNone;
     }
     else if (twoFingerTap.state == UIGestureRecognizerStateEnded)
@@ -930,14 +930,14 @@ mbgl::DefaultFileSource *mbglFileSource = nullptr;
 
 - (void)handleQuickZoomGesture:(UILongPressGestureRecognizer *)quickZoom
 {
-    [self trackGestureEvent:MGLEventGestureQuickZoom forRecognizer:quickZoom];
-    
     if ( ! self.isZoomEnabled) return;
 
     mbglMap->cancelTransitions();
 
     if (quickZoom.state == UIGestureRecognizerStateBegan)
     {
+        [self trackGestureEvent:MGLEventGestureQuickZoom forRecognizer:quickZoom];
+
         self.scale = mbglMap->getScale();
 
         self.quickZoomStart = [quickZoom locationInView:quickZoom.view].y;
