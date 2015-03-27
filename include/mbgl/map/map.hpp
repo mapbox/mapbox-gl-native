@@ -15,6 +15,7 @@
 #include <iosfwd>
 #include <set>
 #include <vector>
+#include <queue>
 #include <mutex>
 #include <condition_variable>
 #include <functional>
@@ -159,8 +160,8 @@ public:
                                               const std::vector<std::string>& symbols);
     void removeAnnotation(uint32_t);
     void removeAnnotations(const std::vector<uint32_t>&);
-    std::vector<uint32_t> getAnnotationsInBounds(const LatLngBounds&) const;
-    LatLngBounds getBoundsForAnnotations(const std::vector<uint32_t>&) const;
+    std::vector<uint32_t> getAnnotationsInBounds(const LatLngBounds&);
+    LatLngBounds getBoundsForAnnotations(const std::vector<uint32_t>&);
 
     // Debug
     void setDebug(bool value);
@@ -200,6 +201,12 @@ private:
     // the stylesheet.
     void prepare();
 
+    // Runs the function in the map thread.
+    void invokeTask(std::function<void()>&&);
+    template <typename Fn> auto invokeSyncTask(const Fn& fn) -> decltype(fn());
+
+    void processTasks();
+
     void updateAnnotationTiles(const std::vector<Tile::ID>&);
 
     enum class Mode : uint8_t {
@@ -219,6 +226,7 @@ private:
     std::thread thread;
     std::unique_ptr<uv::async> asyncTerminate;
     std::unique_ptr<uv::async> asyncUpdate;
+    std::unique_ptr<uv::async> asyncInvoke;
     std::unique_ptr<uv::async> asyncRender;
 
     bool terminating = false;
@@ -257,6 +265,9 @@ private:
     std::set<util::ptr<StyleSource>> activeSources;
 
     std::atomic<UpdateType> updated;
+
+    std::mutex mutexTask;
+    std::queue<std::function<void()>> tasks;
 };
 
 }
