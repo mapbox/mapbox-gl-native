@@ -359,8 +359,7 @@ mbgl::DefaultFileSource *mbglFileSource = nullptr;
         MGLEventKeyLatitude: @(latLng.latitude),
         MGLEventKeyLongitude: @(latLng.longitude),
         MGLEventKeyZoomLevel: @(zoom),
-        MGLEventKeyPushEnabled: @([MGLMapboxEvents checkPushEnabled]),
-        MGLEventKeyEmailEnabled: @([MGLMapboxEvents checkEmailEnabled])
+        MGLEventKeyPushEnabled: @([MGLMapboxEvents checkPushEnabled])
     }];
 
     return YES;
