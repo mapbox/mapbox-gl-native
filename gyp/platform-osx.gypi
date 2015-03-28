@@ -28,6 +28,7 @@
         'ldflags': [
           '-framework ImageIO',
           '-framework CoreServices',
+          '-framework OpenGL',
           '-framework ApplicationServices',
         ],
       },
