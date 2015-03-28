@@ -550,32 +550,6 @@ NSString *const MGLEventGestureRotateStart = @"Rotation";
 
 // Can be called from any thread.
 //
-+ (BOOL) checkEmailEnabled {
-    BOOL (^mailCheckBlock)(void) = ^{
-        BOOL blockResult;
-        Class MFMailComposeViewController = NSClassFromString(@"MFMailComposeViewController");
-        if (MFMailComposeViewController) {
-            SEL canSendMail = NSSelectorFromString(@"canSendMail");
-            blockResult = ((BOOL (*)(id, SEL))[MFMailComposeViewController methodForSelector:canSendMail])(MFMailComposeViewController, canSendMail);
-        }
-        return blockResult;
-    };
-
-    __block BOOL result;
-
-    if ( ! [[NSThread currentThread] isMainThread]) {
-        dispatch_sync(dispatch_get_main_queue(), ^{
-            result = mailCheckBlock();
-        });
-    } else {
-        result = mailCheckBlock();
-    }
-
-    return result;
-}
-
-// Can be called from any thread.
-//
 + (BOOL) checkPushEnabled {
     BOOL (^pushCheckBlock)(void) = ^{
         BOOL blockResult;
