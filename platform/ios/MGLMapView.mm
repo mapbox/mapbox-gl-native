@@ -775,16 +775,16 @@ mbgl::DefaultFileSource *mbglFileSource = nullptr;
         mbgl::LatLngBounds tapBounds;
 
         coordinate = [self convertPoint:tapRectLowerLeft  toCoordinateFromView:self];
-        tapBounds.extend(mbgl::LatLng(coordinate.latitude, coordinate.longitude));
+        tapBounds.extend(coordinateToLatLng(coordinate));
 
         coordinate = [self convertPoint:tapRectUpperLeft  toCoordinateFromView:self];
-        tapBounds.extend(mbgl::LatLng(coordinate.latitude, coordinate.longitude));
+        tapBounds.extend(coordinateToLatLng(coordinate));
 
         coordinate = [self convertPoint:tapRectUpperRight toCoordinateFromView:self];
-        tapBounds.extend(mbgl::LatLng(coordinate.latitude, coordinate.longitude));
+        tapBounds.extend(coordinateToLatLng(coordinate));
 
         coordinate = [self convertPoint:tapRectLowerRight toCoordinateFromView:self];
-        tapBounds.extend(mbgl::LatLng(coordinate.latitude, coordinate.longitude));
+        tapBounds.extend(coordinateToLatLng(coordinate));
 
         // query for nearby annotations
         std::vector<uint32_t> nearbyAnnotations = mbglMap->getAnnotationsInBounds(tapBounds);
@@ -875,12 +875,30 @@ mbgl::DefaultFileSource *mbglFileSource = nullptr;
     if (doubleTap.state == UIGestureRecognizerStateBegan)
     {
         [self trackGestureEvent:MGLEventGestureDoubleTap forRecognizer:doubleTap];
-
-        self.userTrackingMode = MGLUserTrackingModeNone;
     }
     else if (doubleTap.state == UIGestureRecognizerStateEnded)
     {
-        mbglMap->scaleBy(2, [doubleTap locationInView:doubleTap.view].x, [doubleTap locationInView:doubleTap.view].y, secondsAsDuration(MGLAnimationDuration));
+        CGPoint doubleTapPoint = [doubleTap locationInView:doubleTap.view];
+
+        CGPoint zoomInPoint;
+
+        if (self.userTrackingMode != MGLUserTrackingModeNone)
+        {
+            CGPoint userPoint = [self convertCoordinate:self.userLocation.coordinate toPointToView:self];
+            CGRect userLocationRect = CGRectMake(userPoint.x - 40, userPoint.y - 40, 80, 80);
+            if (CGRectContainsPoint(userLocationRect, doubleTapPoint))
+            {
+                zoomInPoint = userPoint;
+            }
+        }
+        else
+        {
+            self.userTrackingMode = MGLUserTrackingModeNone;
+
+            zoomInPoint = doubleTapPoint;
+        }
+
+        mbglMap->scaleBy(2, zoomInPoint.x, zoomInPoint.y, secondsAsDuration(MGLAnimationDuration));
 
         self.animatingGesture = YES;
 
@@ -908,12 +926,23 @@ mbgl::DefaultFileSource *mbglFileSource = nullptr;
     if (twoFingerTap.state == UIGestureRecognizerStateBegan)
     {
         [self trackGestureEvent:MGLEventGestureTwoFingerSingleTap forRecognizer:twoFingerTap];
-
-        self.userTrackingMode = MGLUserTrackingModeNone;
     }
     else if (twoFingerTap.state == UIGestureRecognizerStateEnded)
     {
-        mbglMap->scaleBy(0.5, [twoFingerTap locationInView:twoFingerTap.view].x, [twoFingerTap locationInView:twoFingerTap.view].y, secondsAsDuration(MGLAnimationDuration));
+        CGPoint zoomOutPoint;
+
+        if (self.userTrackingMode != MGLUserTrackingModeNone)
+        {
+            zoomOutPoint = self.center;
+        }
+        else
+        {
+            self.userTrackingMode = MGLUserTrackingModeNone;
+
+            zoomOutPoint = CGPointMake([twoFingerTap locationInView:twoFingerTap.view].x, [twoFingerTap locationInView:twoFingerTap.view].y);
+        }
+
+        mbglMap->scaleBy(0.5, zoomOutPoint.x, zoomOutPoint.y, secondsAsDuration(MGLAnimationDuration));
 
         self.animatingGesture = YES;
 
@@ -1182,7 +1211,7 @@ mbgl::DefaultFileSource *mbglFileSource = nullptr;
 
 - (CGPoint)convertCoordinate:(CLLocationCoordinate2D)coordinate toPointToView:(UIView *)view
 {
-    mbgl::vec2<double> pixel = mbglMap->pixelForLatLng(mbgl::LatLng(coordinate.latitude, coordinate.longitude));
+    mbgl::vec2<double> pixel = mbglMap->pixelForLatLng(coordinateToLatLng(coordinate));
 
     // flip y coordinate for iOS view origin in top left
     //
@@ -1775,8 +1804,6 @@ CLLocationCoordinate2D latLngToCoordinate(mbgl::LatLng latLng)
         }
     }
 
-    self.userLocationAnnotationView.layer.hidden = ! CLLocationCoordinate2DIsValid(self.userLocation.coordinate);
-
     self.userLocationAnnotationView.haloLayer.hidden = ! CLLocationCoordinate2DIsValid(self.userLocation.coordinate) ||
         newLocation.horizontalAccuracy > 10;
 
@@ -2070,6 +2097,11 @@ CLLocationCoordinate2D latLngToCoordinate(mbgl::LatLng latLng)
 
 - (void)updateUserLocationAnnotationView
 {
+    if ( ! CLLocationCoordinate2DIsValid(self.userLocation.coordinate)) {
+        self.userLocationAnnotationView.layer.hidden = YES;
+        return;
+    }
+
     if ( ! self.userLocationAnnotationView.superview) [self.glView addSubview:self.userLocationAnnotationView];
 
     CGPoint userPoint = [self convertCoordinate:self.userLocation.coordinate toPointToView:self];
@@ -2078,6 +2110,8 @@ CLLocationCoordinate2D latLngToCoordinate(mbgl::LatLng latLng)
         -MGLAnnotationUpdateViewportOutset.height), userPoint))
     {
         self.userLocationAnnotationView.center = userPoint;
+
+        self.userLocationAnnotationView.layer.hidden = NO;
 
         [self.userLocationAnnotationView setupLayers];
     }
