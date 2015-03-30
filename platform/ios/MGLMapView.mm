@@ -212,7 +212,7 @@ mbgl::DefaultFileSource *mbglFileSource = nullptr;
     }
     _glView.delegate = self;
     [_glView bindDrawable];
-    [self addSubview:_glView];
+    [self insertSubview:_glView atIndex:0];
 
     _glView.contentMode = UIViewContentModeCenter;
     [self setBackgroundColor:[UIColor clearColor]];
