@@ -9,6 +9,13 @@
 #include <mbgl/platform/log.hpp>
 #include <csscolorparser/csscolorparser.hpp>
 
+#pragma GCC diagnostic push
+#ifndef __clang__
+#pragma GCC diagnostic ignored "-Wunused-local-typedefs"
+#endif
+#include <boost/algorithm/string.hpp>
+#pragma GCC diagnostic pop
+
 #include <algorithm>
 
 namespace mbgl {
@@ -447,6 +454,13 @@ bool StyleParser::parseOptionalProperty(const char *property_name, PropertyKey k
     }
 }
 
+std::string normalizeFontStack(const std::string &name) {
+    namespace algo = boost::algorithm;
+    std::vector<std::string> parts;
+    algo::split(parts, name, algo::is_any_of(","), algo::token_compress_on);
+    std::for_each(parts.begin(), parts.end(), [](std::string& str) { algo::trim(str); });
+    return algo::join(parts, ", ");
+}
 
 template<> std::tuple<bool, std::string> StyleParser::parseProperty(JSVal value, const char *property_name) {
     if (!value.IsString()) {
@@ -454,7 +468,13 @@ template<> std::tuple<bool, std::string> StyleParser::parseProperty(JSVal value,
         return std::tuple<bool, std::string> { false, std::string() };
     }
 
-    return std::tuple<bool, std::string> { true, { value.GetString(), value.GetStringLength() } };
+    if (std::string { "text-font" } == property_name) {
+        return std::tuple<bool, std::string> {
+            true, normalizeFontStack({ value.GetString(), value.GetStringLength() })
+        };
+    } else {
+        return std::tuple<bool, std::string> { true, { value.GetString(), value.GetStringLength() } };
+    }
 }
 
 template<> std::tuple<bool, bool> StyleParser::parseProperty(JSVal value, const char *property_name) {
