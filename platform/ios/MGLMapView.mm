@@ -15,6 +15,7 @@
 #include <mbgl/util/geo.hpp>
 
 #import "MGLTypes.h"
+#import "NSString+MGLAdditions.h"
 #import "MGLAnnotation.h"
 #import "MGLUserLocationAnnotationView.h"
 #import "MGLUserLocation_Private.h"
@@ -43,7 +44,7 @@ const std::string &defaultCacheDatabase() {
 static dispatch_once_t loadGLExtensions;
 
 NSString *const MGLDefaultStyleName = @"Emerald";
-NSString *const MGLStyleVersion = @"v7";
+NSString *const MGLStyleVersion = @"7";
 NSString *const MGLDefaultStyleMarkerSymbolName = @"default_marker";
 
 const NSTimeInterval MGLAnimationDuration = 0.3;
@@ -106,7 +107,7 @@ mbgl::DefaultFileSource *mbglFileSource = nullptr;
 
     if (self && [self commonInit])
     {
-        if (accessToken) [self setAccessToken:accessToken];
+        [self setAccessToken:accessToken];
 
         if (styleJSON || accessToken)
         {
@@ -126,8 +127,8 @@ mbgl::DefaultFileSource *mbglFileSource = nullptr;
     
     if (self && [self commonInit])
     {
-        if (accessToken) [self setAccessToken:accessToken];
-        if (styleName) [self useBundledStyleNamed:styleName];
+        [self setAccessToken:accessToken];
+        if (styleName) [self setStyleName:styleName];
     }
     
     return self;
@@ -163,27 +164,33 @@ mbgl::DefaultFileSource *mbglFileSource = nullptr;
     return nil;
 }
 
+- (NSString *)accessToken
+{
+    return @(mbglMap->getAccessToken().c_str()).mgl_stringOrNilIfEmpty;
+}
+
 - (void)setAccessToken:(NSString *)accessToken
 {
-    if (accessToken)
-    {
-        mbglMap->setAccessToken((std::string)[accessToken UTF8String]);
-        [MGLMapboxEvents setToken:accessToken];
-    }
+    mbglMap->setAccessToken((std::string)[accessToken UTF8String]);
+    [MGLMapboxEvents setToken:accessToken.mgl_stringOrNilIfEmpty];
 }
 
 - (void)setStyleJSON:(NSString *)styleJSON
 {
     if ( ! styleJSON)
     {
-        [self useBundledStyleNamed:[[[MGLDefaultStyleName lowercaseString]
-                                        stringByAppendingString:@"-"]
-                                        stringByAppendingString:MGLStyleVersion]];
+        [self setStyleName:[NSString stringWithFormat:@"%@-v%@", MGLDefaultStyleName.lowercaseString, MGLStyleVersion]];
     }
     else
     {
         mbglMap->setStyleJSON((std::string)[styleJSON UTF8String]);
     }
+}
+
+- (NSURL *)styleURL
+{
+    NSString *styleURLString = @(mbglMap->getStyleURL().c_str()).mgl_stringOrNilIfEmpty;
+    return styleURLString ? [NSURL URLWithString:styleURLString] : nil;
 }
 
 - (void)setStyleURL:(NSURL *)styleURL
@@ -1322,7 +1329,21 @@ CLLocationCoordinate2D latLngToCoordinate(mbgl::LatLng latLng)
     return [NSArray arrayWithArray:_bundledStyleNames];
 }
 
-- (void)useBundledStyleNamed:(NSString *)styleName
+- (NSString *)styleName
+{
+    NSURL *styleURL = self.styleURL;
+    NSString *styleName;
+    if ([styleURL.scheme isEqualToString:@"asset"])
+    {
+        styleName = styleURL.lastPathComponent.stringByDeletingPathExtension;
+    }
+    else if ([styleURL.scheme isEqualToString:@"mapbox"]) {
+        styleName = styleURL.host;
+    }
+    return styleName.mgl_stringOrNilIfEmpty;
+}
+
+- (void)setStyleName:(NSString *)styleName
 {
     NSString *hybridStylePrefix = @"hybrid-";
     BOOL isHybrid = [styleName hasPrefix:hybridStylePrefix];

@@ -30,6 +30,8 @@
         '../include/mbgl/ios/MGLMetricsLocationManager.h',
         '../platform/ios/MGLMetricsLocationManager.m',
         '../include/mbgl/ios/MGLTypes.h',
+        '../platform/ios/NSString+MGLAdditions.h',
+        '../platform/ios/NSString+MGLAdditions.m',
         '../platform/ios/vendor/SMCalloutView/SMCalloutView.h',
         '../platform/ios/vendor/SMCalloutView/SMCalloutView.m',
       ],
@@ -50,6 +52,7 @@
           '-framework MobileCoreServices',
           '-framework QuartzCore',
           '-framework SystemConfiguration',
+          '-ObjC',
         ],
       },
 
