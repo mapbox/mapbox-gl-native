@@ -172,9 +172,18 @@ mbgl::DefaultFileSource *mbglFileSource = nullptr;
     }
 }
 
-- (void)setStyleURL:(NSString *)filePathURL
+- (void)setStyleURL:(NSString *)styleURLString
 {
-    mbglMap->setStyleURL(std::string("asset://") + [filePathURL UTF8String]);
+    std::string styleURL([styleURLString UTF8String]);
+
+    if ( ! [[NSURL URLWithString:styleURLString] scheme])
+    {
+        mbglMap->setStyleURL(std::string("asset://") + styleURL);
+    }
+    else
+    {
+        mbglMap->setStyleURL(styleURL);
+    }
 }
 
 - (BOOL)commonInit
