@@ -301,8 +301,6 @@ void Source::update(Map &map,
         return;
     }
 
-    bool changed = false;
-
     int32_t zoom = std::floor(getZoom(map.getState()));
     std::forward_list<Tile::ID> required = coveringTiles(map.getState());
 
@@ -334,21 +332,15 @@ void Source::update(Map &map,
                 findLoadedParent(id, minCoveringZoom, retain);
             }
         }
-
-        if (state == TileData::State::initial) {
-            changed = true;
-        }
     }
 
     // Remove tiles that we definitely don't need, i.e. tiles that are not on
     // the required list.
     std::set<Tile::ID> retain_data;
-    util::erase_if(tiles, [&retain, &retain_data, &changed](std::pair<const Tile::ID, std::unique_ptr<Tile>> &pair) {
+    util::erase_if(tiles, [&retain, &retain_data](std::pair<const Tile::ID, std::unique_ptr<Tile>> &pair) {
         Tile &tile = *pair.second;
         bool obsolete = std::find(retain.begin(), retain.end(), tile.id) == retain.end();
-        if (obsolete) {
-            changed = true;
-        } else {
+        if (!obsolete) {
             retain_data.insert(tile.data->id);
         }
         return obsolete;
