@@ -400,13 +400,15 @@ void Map::setup() {
 void Map::setStyleURL(const std::string &url) {
     assert(Environment::currentlyOn(ThreadType::Main));
 
-    const size_t pos = url.rfind('/');
+    const std::string styleURL = mbgl::util::mapbox::normalizeStyleURL(url, getAccessToken());
+
+    const size_t pos = styleURL.rfind('/');
     std::string base = "";
     if (pos != std::string::npos) {
-        base = url.substr(0, pos + 1);
+        base = styleURL.substr(0, pos + 1);
     }
 
-    data->setStyleInfo({ url, base, "" });
+    data->setStyleInfo({ styleURL, base, "" });
     triggerUpdate(Update::StyleInfo);
 }
 
