@@ -44,14 +44,9 @@ void Painter::renderSDF(SymbolBucket &bucket,
     sdfShader.u_exmatrix = exMatrix;
     sdfShader.u_texsize = texsize;
 
-    // Convert the -pi..pi to an int8 range.
-    float angle = std::round(state.getAngle() / M_PI * 128);
-
     // adjust min/max zooms for variable font sies
     float zoomAdjust = std::log(fontSize / bucketProperties.max_size) / std::log(2);
 
-    sdfShader.u_flip = (aligned_with_map && bucketProperties.keep_upright) ? 1 : 0;
-    sdfShader.u_angle = (int32_t)(angle + 256) % 256;
     sdfShader.u_zoom = (state.getNormalizedZoom() - zoomAdjust) * 10; // current zoom level
 
     FadeProperties f = frameHistory.getFadeProperties(std::chrono::milliseconds(300));
@@ -165,19 +160,10 @@ void Painter::renderSymbol(SymbolBucket &bucket, const StyleLayer &layer_desc, c
             iconShader->u_exmatrix = exMatrix;
             iconShader->u_texsize = {{ float(spriteAtlas.getWidth()) / 4.0f, float(spriteAtlas.getHeight()) / 4.0f }};
 
-            // Convert the -pi..pi to an int8 range.
-            const float angle = std::round(state.getAngle() / M_PI * 128);
-
             // adjust min/max zooms for variable font sies
             float zoomAdjust = std::log(fontSize / layout.icon.max_size) / std::log(2);
 
-            iconShader->u_angle = (int32_t)(angle + 256) % 256;
-
-            bool flip = (layout.icon.rotation_alignment == RotationAlignmentType::Map)
-                && layout.icon.keep_upright;
-            iconShader->u_flip = flip ? 1 : 0;
             iconShader->u_zoom = (state.getNormalizedZoom() - zoomAdjust) * 10; // current zoom level
-
             iconShader->u_fadedist = 0 * 10;
             iconShader->u_minfadezoom = state.getNormalizedZoom() * 10;
             iconShader->u_maxfadezoom = state.getNormalizedZoom() * 10;

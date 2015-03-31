@@ -87,7 +87,7 @@ private:
 
     // Adds placed items to the buffer.
     template <typename Buffer, typename GroupType>
-    void addSymbols(Buffer &buffer, const PlacedGlyphs &symbols, float scale, PlacementRange placementRange);
+    void addSymbols(Buffer &buffer, const PlacedGlyphs &symbols, float scale);
 
 public:
     const std::unique_ptr<const StyleLayoutSymbol> styleLayout;

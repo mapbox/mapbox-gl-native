@@ -344,21 +344,20 @@ void SymbolBucket::addFeature(const std::vector<Coordinate> &line, const Shaping
                 collision.insert(glyphPlacement.boxes, anchor, glyphScale, glyphRange,
                                  horizontalText);
             }
-            if (inside) addSymbols<TextBuffer, TextElementGroup>(text, glyphPlacement.shapes, glyphScale, glyphRange);
+            if (inside) addSymbols<TextBuffer, TextElementGroup>(text, glyphPlacement.shapes, glyphScale);
         }
 
         if (iconScale && std::isfinite(iconScale)) {
             if (!layout.icon.ignore_placement) {
                 collision.insert(iconPlacement.boxes, anchor, iconScale, iconRange, horizontalIcon);
             }
-            if (inside) addSymbols<IconBuffer, IconElementGroup>(icon, iconPlacement.shapes, iconScale, iconRange);
+            if (inside) addSymbols<IconBuffer, IconElementGroup>(icon, iconPlacement.shapes, iconScale);
         }
     }
 }
 
 template <typename Buffer, typename GroupType>
-void SymbolBucket::addSymbols(Buffer &buffer, const PlacedGlyphs &symbols, float scale,
-                              PlacementRange placementRange) {
+void SymbolBucket::addSymbols(Buffer &buffer, const PlacedGlyphs &symbols, float scale) {
     const float zoom = collision.zoom;
 
     const float placementZoom = std::log(scale) / std::log(2) + zoom;
@@ -369,7 +368,6 @@ void SymbolBucket::addSymbols(Buffer &buffer, const PlacedGlyphs &symbols, float
         const auto &bl = symbol.bl;
         const auto &br = symbol.br;
         const auto &tex = symbol.tex;
-        const auto &angle = symbol.angle;
 
         float minZoom =
             util::max(static_cast<float>(zoom + log(symbol.minScale) / log(2)), placementZoom);
@@ -400,14 +398,14 @@ void SymbolBucket::addSymbols(Buffer &buffer, const PlacedGlyphs &symbols, float
         uint32_t triangleIndex = triangleGroup.vertex_length;
 
         // coordinates (2 triangles)
-        buffer.vertices.add(glyphAnchor.x, glyphAnchor.y, tl.x, tl.y, tex.x, tex.y, angle, minZoom,
-                            placementRange, maxZoom, placementZoom);
-        buffer.vertices.add(glyphAnchor.x, glyphAnchor.y, tr.x, tr.y, tex.x + tex.w, tex.y, angle,
-                            minZoom, placementRange, maxZoom, placementZoom);
-        buffer.vertices.add(glyphAnchor.x, glyphAnchor.y, bl.x, bl.y, tex.x, tex.y + tex.h, angle,
-                            minZoom, placementRange, maxZoom, placementZoom);
+        buffer.vertices.add(glyphAnchor.x, glyphAnchor.y, tl.x, tl.y, tex.x, tex.y, minZoom,
+                            maxZoom, placementZoom);
+        buffer.vertices.add(glyphAnchor.x, glyphAnchor.y, tr.x, tr.y, tex.x + tex.w, tex.y,
+                            minZoom, maxZoom, placementZoom);
+        buffer.vertices.add(glyphAnchor.x, glyphAnchor.y, bl.x, bl.y, tex.x, tex.y + tex.h,
+                            minZoom, maxZoom, placementZoom);
         buffer.vertices.add(glyphAnchor.x, glyphAnchor.y, br.x, br.y, tex.x + tex.w, tex.y + tex.h,
-                            angle, minZoom, placementRange, maxZoom, placementZoom);
+                            minZoom, maxZoom, placementZoom);
 
         // add the two triangles, referencing the four coordinates we just inserted.
         buffer.triangles.add(triangleIndex + 0, triangleIndex + 1, triangleIndex + 2);

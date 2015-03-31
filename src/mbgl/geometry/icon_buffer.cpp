@@ -6,9 +6,7 @@
 
 namespace mbgl {
 
-const double IconVertexBuffer::angleFactor = 128.0 / M_PI;
-
-size_t IconVertexBuffer::add(int16_t x, int16_t y, float ox, float oy, int16_t tx, int16_t ty, float angle, float minzoom, std::array<float, 2> range, float maxzoom, float labelminzoom) {
+size_t IconVertexBuffer::add(int16_t x, int16_t y, float ox, float oy, int16_t tx, int16_t ty, float minzoom, float maxzoom, float labelminzoom) {
     const size_t idx = index();
     void *data = addElement();
 
@@ -23,13 +21,10 @@ size_t IconVertexBuffer::add(int16_t x, int16_t y, float ox, float oy, int16_t t
     ubytes[8] /* tex */ = tx / 4;
     ubytes[9] /* tex */ = ty / 4;
     ubytes[10] /* labelminzoom */ = labelminzoom * 10;
-    ubytes[11] /* angle */ = (int16_t)std::round(angle * angleFactor) % 256;
 
     // a_data2
     ubytes[12] /* minzoom */ = minzoom * 10; // 1/10 zoom levels: z16 == 160.
     ubytes[13] /* maxzoom */ = std::fmin(maxzoom, 25) * 10; // 1/10 zoom levels: z16 == 160.
-    ubytes[14] /* rangeend */ = util::max((int16_t)std::round(range[0] * angleFactor), (int16_t)0) % 256;
-    ubytes[15] /* rangestart */ = util::min((int16_t)std::round(range[1] * angleFactor), (int16_t)255) % 256;
 
     return idx;
 }
