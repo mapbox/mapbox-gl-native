@@ -18,7 +18,7 @@ void Painter::renderLine(LineBucket& bucket, const StyleLayer &layer_desc, const
     depthMask(false);
 
     const auto &properties = layer_desc.getProperties<LineProperties>();
-    const auto &layout = *bucket.styleLayout;
+    const auto &layout = bucket.layout;
 
     // the distance over which the line edge fades out.
     // Retina devices need a smaller distance to avoid aliasing.

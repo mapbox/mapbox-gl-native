@@ -4,7 +4,6 @@
 #include <mbgl/style/style.hpp>
 #include <mbgl/style/style_layer.hpp>
 #include <mbgl/style/style_layer_group.hpp>
-#include <mbgl/style/style_layout.hpp>
 #include <mbgl/renderer/fill_bucket.hpp>
 #include <mbgl/renderer/line_bucket.hpp>
 #include <mbgl/renderer/symbol_bucket.hpp>
@@ -49,13 +48,10 @@ TileParser::TileParser(const GeometryTile& geometryTile_,
     assert(collision);
 }
 
-void TileParser::parse() {
-    parseStyleLayers(style->layers);
-}
-
 bool TileParser::obsolete() const { return tile.state == TileData::State::obsolete; }
 
-void TileParser::parseStyleLayers(util::ptr<const StyleLayerGroup> group) {
+void TileParser::parse() {
+    util::ptr<const StyleLayerGroup> group = style->layers;
     if (!group) {
         return;
     }
@@ -122,65 +118,6 @@ void applyLayoutProperty(PropertyKey key, const ClassProperties &classProperties
     }
 }
 
-std::unique_ptr<StyleLayoutFill> parseStyleLayoutFill(const StyleBucket &/*bucket*/, const float /*z*/) {
-    // no-op; Fill buckets don't currently have any applicable layout properties
-    auto fillPtr = util::make_unique<StyleLayoutFill>();
-    return fillPtr;
-}
-
-std::unique_ptr<StyleLayoutLine> parseStyleLayoutLine(const StyleBucket &bucket_desc, const float z) {
-    auto linePtr = util::make_unique<StyleLayoutLine>();
-    auto &line = *linePtr;
-    applyLayoutProperty(PropertyKey::LineCap, bucket_desc.layout, line.cap, z);
-    applyLayoutProperty(PropertyKey::LineJoin, bucket_desc.layout, line.join, z);
-    applyLayoutProperty(PropertyKey::LineMiterLimit, bucket_desc.layout, line.miter_limit, z);
-    applyLayoutProperty(PropertyKey::LineRoundLimit, bucket_desc.layout, line.round_limit, z);
-    return linePtr;
-}
-
-std::unique_ptr<StyleLayoutSymbol> parseStyleLayoutSymbol(const StyleBucket &bucket_desc, const float z) {
-    auto symbolPtr = util::make_unique<StyleLayoutSymbol>();
-    auto &symbol = *symbolPtr;
-    applyLayoutProperty(PropertyKey::SymbolPlacement, bucket_desc.layout, symbol.placement, z);
-    if (symbol.placement == PlacementType::Line) {
-        symbol.icon.rotation_alignment = RotationAlignmentType::Map;
-        symbol.text.rotation_alignment = RotationAlignmentType::Map;
-    };
-    applyLayoutProperty(PropertyKey::SymbolMinDistance, bucket_desc.layout, symbol.min_distance, z);
-    applyLayoutProperty(PropertyKey::SymbolAvoidEdges, bucket_desc.layout, symbol.avoid_edges, z);
-
-    applyLayoutProperty(PropertyKey::IconAllowOverlap, bucket_desc.layout, symbol.icon.allow_overlap, z);
-    applyLayoutProperty(PropertyKey::IconIgnorePlacement, bucket_desc.layout, symbol.icon.ignore_placement, z);
-    applyLayoutProperty(PropertyKey::IconOptional, bucket_desc.layout, symbol.icon.optional, z);
-    applyLayoutProperty(PropertyKey::IconRotationAlignment, bucket_desc.layout, symbol.icon.rotation_alignment, z);
-    applyLayoutProperty(PropertyKey::IconMaxSize, bucket_desc.layout, symbol.icon.max_size, z);
-    applyLayoutProperty(PropertyKey::IconImage, bucket_desc.layout, symbol.icon.image, z);
-    applyLayoutProperty(PropertyKey::IconPadding, bucket_desc.layout, symbol.icon.padding, z);
-    applyLayoutProperty(PropertyKey::IconRotate, bucket_desc.layout, symbol.icon.rotate, z);
-    applyLayoutProperty(PropertyKey::IconKeepUpright, bucket_desc.layout, symbol.icon.keep_upright, z);
-    applyLayoutProperty(PropertyKey::IconOffset, bucket_desc.layout, symbol.icon.offset, z);
-
-    applyLayoutProperty(PropertyKey::TextRotationAlignment, bucket_desc.layout, symbol.text.rotation_alignment, z);
-    applyLayoutProperty(PropertyKey::TextField, bucket_desc.layout, symbol.text.field, z);
-    applyLayoutProperty(PropertyKey::TextFont, bucket_desc.layout, symbol.text.font, z);
-    applyLayoutProperty(PropertyKey::TextMaxSize, bucket_desc.layout, symbol.text.max_size, z);
-    applyLayoutProperty(PropertyKey::TextMaxWidth, bucket_desc.layout, symbol.text.max_width, z);
-    applyLayoutProperty(PropertyKey::TextLineHeight, bucket_desc.layout, symbol.text.line_height, z);
-    applyLayoutProperty(PropertyKey::TextLetterSpacing, bucket_desc.layout, symbol.text.letter_spacing, z);
-    applyLayoutProperty(PropertyKey::TextMaxAngle, bucket_desc.layout, symbol.text.max_angle, z);
-    applyLayoutProperty(PropertyKey::TextRotate, bucket_desc.layout, symbol.text.rotate, z);
-    applyLayoutProperty(PropertyKey::TextPadding, bucket_desc.layout, symbol.text.padding, z);
-    applyLayoutProperty(PropertyKey::TextIgnorePlacement, bucket_desc.layout, symbol.text.ignore_placement, z);
-    applyLayoutProperty(PropertyKey::TextOptional, bucket_desc.layout, symbol.text.optional, z);
-    applyLayoutProperty(PropertyKey::TextJustify, bucket_desc.layout, symbol.text.justify, z);
-    applyLayoutProperty(PropertyKey::TextAnchor, bucket_desc.layout, symbol.text.anchor, z);
-    applyLayoutProperty(PropertyKey::TextKeepUpright, bucket_desc.layout, symbol.text.keep_upright, z);
-    applyLayoutProperty(PropertyKey::TextTransform, bucket_desc.layout, symbol.text.transform, z);
-    applyLayoutProperty(PropertyKey::TextOffset, bucket_desc.layout, symbol.text.offset, z);
-    applyLayoutProperty(PropertyKey::TextAllowOverlap, bucket_desc.layout, symbol.text.allow_overlap, z);
-    return symbolPtr;
-}
-
 std::unique_ptr<Bucket> TileParser::createBucket(const StyleBucket &bucketDesc) {
     // Skip this bucket if we are to not render this
     if (tile.id.z < std::floor(bucketDesc.min_zoom) && std::floor(bucketDesc.min_zoom) < tile.source.max_zoom) return nullptr;
@@ -230,32 +167,78 @@ void TileParser::addBucketGeometries(Bucket& bucket, const GeometryTileLayer& la
 
 std::unique_ptr<Bucket> TileParser::createFillBucket(const GeometryTileLayer& layer,
                                                      const StyleBucket& bucket_desc) {
-    auto fill = parseStyleLayoutFill(bucket_desc, tile.id.z);
-    auto bucket = util::make_unique<FillBucket>(std::move(fill),
-                                                tile.fillVertexBuffer,
+    auto bucket = util::make_unique<FillBucket>(tile.fillVertexBuffer,
                                                 tile.triangleElementsBuffer,
                                                 tile.lineElementsBuffer);
     addBucketGeometries(bucket, layer, bucket_desc.filter);
-    return obsolete() ? nullptr : std::move(bucket);
+    return std::move(bucket);
 }
 
 std::unique_ptr<Bucket> TileParser::createLineBucket(const GeometryTileLayer& layer,
                                                      const StyleBucket& bucket_desc) {
-    auto line = parseStyleLayoutLine(bucket_desc, tile.id.z);
-    auto bucket = util::make_unique<LineBucket>(std::move(line),
-                                                tile.lineVertexBuffer,
+    auto bucket = util::make_unique<LineBucket>(tile.lineVertexBuffer,
                                                 tile.triangleElementsBuffer,
                                                 tile.pointElementsBuffer);
+
+    const float z = tile.id.z;
+    auto& layout = bucket->layout;
+
+    applyLayoutProperty(PropertyKey::LineCap, bucket_desc.layout, layout.cap, z);
+    applyLayoutProperty(PropertyKey::LineJoin, bucket_desc.layout, layout.join, z);
+    applyLayoutProperty(PropertyKey::LineMiterLimit, bucket_desc.layout, layout.miter_limit, z);
+    applyLayoutProperty(PropertyKey::LineRoundLimit, bucket_desc.layout, layout.round_limit, z);
+
     addBucketGeometries(bucket, layer, bucket_desc.filter);
-    return obsolete() ? nullptr : std::move(bucket);
+    return std::move(bucket);
 }
 
 std::unique_ptr<Bucket> TileParser::createSymbolBucket(const GeometryTileLayer& layer,
                                                        const StyleBucket& bucket_desc) {
-    auto symbol = parseStyleLayoutSymbol(bucket_desc, tile.id.z);
-    auto bucket = util::make_unique<SymbolBucket>(std::move(symbol), *collision);
+    auto bucket = util::make_unique<SymbolBucket>(*collision);
+
+    const float z = tile.id.z;
+    auto& layout = bucket->layout;
+
+    applyLayoutProperty(PropertyKey::SymbolPlacement, bucket_desc.layout, layout.placement, z);
+    if (layout.placement == PlacementType::Line) {
+        layout.icon.rotation_alignment = RotationAlignmentType::Map;
+        layout.text.rotation_alignment = RotationAlignmentType::Map;
+    };
+    applyLayoutProperty(PropertyKey::SymbolMinDistance, bucket_desc.layout, layout.min_distance, z);
+    applyLayoutProperty(PropertyKey::SymbolAvoidEdges, bucket_desc.layout, layout.avoid_edges, z);
+
+    applyLayoutProperty(PropertyKey::IconAllowOverlap, bucket_desc.layout, layout.icon.allow_overlap, z);
+    applyLayoutProperty(PropertyKey::IconIgnorePlacement, bucket_desc.layout, layout.icon.ignore_placement, z);
+    applyLayoutProperty(PropertyKey::IconOptional, bucket_desc.layout, layout.icon.optional, z);
+    applyLayoutProperty(PropertyKey::IconRotationAlignment, bucket_desc.layout, layout.icon.rotation_alignment, z);
+    applyLayoutProperty(PropertyKey::IconMaxSize, bucket_desc.layout, layout.icon.max_size, z);
+    applyLayoutProperty(PropertyKey::IconImage, bucket_desc.layout, layout.icon.image, z);
+    applyLayoutProperty(PropertyKey::IconPadding, bucket_desc.layout, layout.icon.padding, z);
+    applyLayoutProperty(PropertyKey::IconRotate, bucket_desc.layout, layout.icon.rotate, z);
+    applyLayoutProperty(PropertyKey::IconKeepUpright, bucket_desc.layout, layout.icon.keep_upright, z);
+    applyLayoutProperty(PropertyKey::IconOffset, bucket_desc.layout, layout.icon.offset, z);
+
+    applyLayoutProperty(PropertyKey::TextRotationAlignment, bucket_desc.layout, layout.text.rotation_alignment, z);
+    applyLayoutProperty(PropertyKey::TextField, bucket_desc.layout, layout.text.field, z);
+    applyLayoutProperty(PropertyKey::TextFont, bucket_desc.layout, layout.text.font, z);
+    applyLayoutProperty(PropertyKey::TextMaxSize, bucket_desc.layout, layout.text.max_size, z);
+    applyLayoutProperty(PropertyKey::TextMaxWidth, bucket_desc.layout, layout.text.max_width, z);
+    applyLayoutProperty(PropertyKey::TextLineHeight, bucket_desc.layout, layout.text.line_height, z);
+    applyLayoutProperty(PropertyKey::TextLetterSpacing, bucket_desc.layout, layout.text.letter_spacing, z);
+    applyLayoutProperty(PropertyKey::TextMaxAngle, bucket_desc.layout, layout.text.max_angle, z);
+    applyLayoutProperty(PropertyKey::TextRotate, bucket_desc.layout, layout.text.rotate, z);
+    applyLayoutProperty(PropertyKey::TextPadding, bucket_desc.layout, layout.text.padding, z);
+    applyLayoutProperty(PropertyKey::TextIgnorePlacement, bucket_desc.layout, layout.text.ignore_placement, z);
+    applyLayoutProperty(PropertyKey::TextOptional, bucket_desc.layout, layout.text.optional, z);
+    applyLayoutProperty(PropertyKey::TextJustify, bucket_desc.layout, layout.text.justify, z);
+    applyLayoutProperty(PropertyKey::TextAnchor, bucket_desc.layout, layout.text.anchor, z);
+    applyLayoutProperty(PropertyKey::TextKeepUpright, bucket_desc.layout, layout.text.keep_upright, z);
+    applyLayoutProperty(PropertyKey::TextTransform, bucket_desc.layout, layout.text.transform, z);
+    applyLayoutProperty(PropertyKey::TextOffset, bucket_desc.layout, layout.text.offset, z);
+    applyLayoutProperty(PropertyKey::TextAllowOverlap, bucket_desc.layout, layout.text.allow_overlap, z);
+
     bucket->addFeatures(
         layer, bucket_desc.filter, reinterpret_cast<uintptr_t>(&tile), spriteAtlas, *sprite, glyphAtlas, glyphStore);
-    return obsolete() ? nullptr : std::move(bucket);
+    return std::move(bucket);
 }
 }

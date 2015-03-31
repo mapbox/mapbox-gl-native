@@ -10,7 +10,7 @@
 #include <mbgl/text/types.hpp>
 #include <mbgl/text/glyph.hpp>
 #include <mbgl/style/style_bucket.hpp>
-#include <mbgl/util/ptr.hpp>
+#include <mbgl/style/style_layout.hpp>
 
 #include <memory>
 #include <map>
@@ -56,7 +56,7 @@ class SymbolBucket : public Bucket {
     typedef ElementGroup<2> IconElementGroup;
 
 public:
-    SymbolBucket(std::unique_ptr<const StyleLayoutSymbol> styleLayout, Collision &collision);
+    SymbolBucket(Collision &collision);
     ~SymbolBucket() override;
 
     void render(Painter &painter, const StyleLayer &layer_desc, const Tile::ID &id,
@@ -90,7 +90,7 @@ private:
     void addSymbols(Buffer &buffer, const PlacedGlyphs &symbols, float scale, PlacementRange placementRange);
 
 public:
-    const std::unique_ptr<const StyleLayoutSymbol> styleLayout;
+    StyleLayoutSymbol layout;
     bool sdfIcons = false;
 
 private:

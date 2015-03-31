@@ -14,18 +14,15 @@
 
 using namespace mbgl;
 
-LineBucket::LineBucket(std::unique_ptr<const StyleLayoutLine> styleLayout_,
-                       LineVertexBuffer &vertexBuffer_,
+LineBucket::LineBucket(LineVertexBuffer &vertexBuffer_,
                        TriangleElementsBuffer &triangleElementsBuffer_,
                        PointElementsBuffer &pointElementsBuffer_)
-    : styleLayout(std::move(styleLayout_)),
-      vertexBuffer(vertexBuffer_),
+    : vertexBuffer(vertexBuffer_),
       triangleElementsBuffer(triangleElementsBuffer_),
       pointElementsBuffer(pointElementsBuffer_),
       vertex_start(vertexBuffer_.index()),
       triangle_elements_start(triangleElementsBuffer_.index()),
       point_elements_start(pointElementsBuffer_.index()) {
-    assert(styleLayout);
 }
 
 LineBucket::~LineBucket() {
@@ -46,7 +43,6 @@ void LineBucket::addGeometry(const GeometryCollection& geometryCollection) {
 }
 
 void LineBucket::addGeometry(const std::vector<Coordinate>& vertices) {
-    auto &layout = *styleLayout;
     // TODO: use roundLimit
     // const float roundLimit = geometry.round_limit;
 
