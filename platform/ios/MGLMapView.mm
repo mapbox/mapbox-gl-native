@@ -53,6 +53,11 @@ const CGFloat MGLMinimumZoom = 3;
 
 NSString *const MGLAnnotationIDKey = @"MGLAnnotationIDKey";
 
+static NSURL *MGLURLForBundledStyleNamed(NSString *styleName)
+{
+    return [NSURL URLWithString:[NSString stringWithFormat:@"asset://styles/%@.json", styleName]];
+}
+
 #pragma mark - Private -
 
 @interface MGLMapView () <UIGestureRecognizerDelegate, GLKViewDelegate, CLLocationManagerDelegate>
@@ -67,7 +72,7 @@ NSString *const MGLAnnotationIDKey = @"MGLAnnotationIDKey";
 @property (nonatomic) UIPinchGestureRecognizer *pinch;
 @property (nonatomic) UIRotationGestureRecognizer *rotate;
 @property (nonatomic) UILongPressGestureRecognizer *quickZoom;
-@property (nonatomic) NSMutableArray *bundledStyleNames;
+@property (nonatomic) NSMutableArray *bundledStyleURLs;
 @property (nonatomic) NSMapTable *annotationIDsByAnnotation;
 @property (nonatomic) std::vector<uint32_t> annotationsNearbyLastTap;
 @property (nonatomic, weak) id <MGLAnnotation> selectedAnnotation;
@@ -101,7 +106,7 @@ MBGLView *mbglView = nullptr;
 mbgl::SQLiteCache *mbglFileCache = nullptr;
 mbgl::DefaultFileSource *mbglFileSource = nullptr;
 
-- (instancetype)initWithFrame:(CGRect)frame accessToken:(NSString *)accessToken styleJSON:(NSString *)styleJSON
+- (instancetype)initWithFrame:(CGRect)frame accessToken:(NSString *)accessToken
 {
     self = [super initWithFrame:frame];
 
@@ -109,28 +114,15 @@ mbgl::DefaultFileSource *mbglFileSource = nullptr;
     {
         [self setAccessToken:accessToken];
 
-        if (styleJSON || accessToken)
+        if (accessToken)
         {
             // If style is set directly, pass it on. If not, if we have an access
             // token, we can pass nil and use the default style.
             //
-            [self setStyleJSON:styleJSON];
+            self.styleURL = nil;
         }
     }
 
-    return self;
-}
-
-- (instancetype)initWithFrame:(CGRect)frame accessToken:(NSString *)accessToken bundledStyleNamed:(NSString *)styleName
-{
-    self = [super initWithFrame:frame];
-    
-    if (self && [self commonInit])
-    {
-        [self setAccessToken:accessToken];
-        if (styleName) [self setStyleName:styleName];
-    }
-    
     return self;
 }
 
@@ -140,16 +132,11 @@ mbgl::DefaultFileSource *mbglFileSource = nullptr;
 
     if (self && [self commonInit])
     {
-        if (accessToken) [self setAccessToken:accessToken];
-        if (styleURL) [self setStyleURL:styleURL];
+        self.accessToken = accessToken;
+        self.styleURL = styleURL;
     }
 
     return self;
-}
-
-- (instancetype)initWithFrame:(CGRect)frame accessToken:(NSString *)accessToken
-{
-    return [self initWithFrame:frame accessToken:accessToken styleJSON:nil];
 }
 
 - (instancetype)initWithCoder:(NSCoder *)decoder
@@ -158,6 +145,7 @@ mbgl::DefaultFileSource *mbglFileSource = nullptr;
 
     if (self && [self commonInit])
     {
+        self.styleURL = nil;
         return self;
     }
 
@@ -175,16 +163,8 @@ mbgl::DefaultFileSource *mbglFileSource = nullptr;
     [MGLMapboxEvents setToken:accessToken.mgl_stringOrNilIfEmpty];
 }
 
-- (void)setStyleJSON:(NSString *)styleJSON
-{
-    if ( ! styleJSON)
-    {
-        [self setStyleName:[NSString stringWithFormat:@"%@-v%@", MGLDefaultStyleName.lowercaseString, MGLStyleVersion]];
-    }
-    else
-    {
-        mbglMap->setStyleJSON((std::string)[styleJSON UTF8String]);
-    }
++ (NSSet *)keyPathsForValuesAffectingStyleURL {
+    return [NSSet setWithObjects:@"mapID", @"accessToken", nil];
 }
 
 - (NSURL *)styleURL
@@ -195,16 +175,20 @@ mbgl::DefaultFileSource *mbglFileSource = nullptr;
 
 - (void)setStyleURL:(NSURL *)styleURL
 {
-    std::string styleURLString([[styleURL absoluteString] UTF8String]);
-
+    if ( ! styleURL)
+    {
+        styleURL = MGLURLForBundledStyleNamed([NSString stringWithFormat:@"%@-v%@",
+                                               MGLDefaultStyleName.lowercaseString,
+                                               MGLStyleVersion]);
+    }
+    
     if ( ! [styleURL scheme])
     {
-        mbglMap->setStyleURL(std::string("asset://") + styleURLString);
+        // Assume a relative path into the developer’s bundle.
+        styleURL = [[NSBundle mainBundle] URLForResource:styleURL.path withExtension:nil];
     }
-    else
-    {
-        mbglMap->setStyleURL(styleURLString);
-    }
+    
+    mbglMap->setStyleURL([[styleURL absoluteString] UTF8String]);
 }
 
 - (BOOL)commonInit
@@ -1291,69 +1275,35 @@ CLLocationCoordinate2D latLngToCoordinate(mbgl::LatLng latLng)
 
 #pragma mark - Styling -
 
-- (NSDictionary *)getRawStyle
+- (NSArray *)bundledStyleURLs
 {
-    const std::string styleJSON = mbglMap->getStyleJSON();
+    if ( ! _bundledStyleURLs)
+    {
+        NSString *stylesPath = [[MGLMapView resourceBundlePath] stringByAppendingPathComponent:@"styles"];
 
-    return [NSJSONSerialization JSONObjectWithData:[@(styleJSON.c_str()) dataUsingEncoding:NSUTF8StringEncoding] options:0 error:nil];
-}
-
-- (void)setRawStyle:(NSDictionary *)style
-{
-    NSData *data = [NSJSONSerialization dataWithJSONObject:style options:0 error:nil];
-
-    [self setStyleJSON:[[NSString alloc] initWithData:data encoding:NSUTF8StringEncoding]];
-}
-
-- (NSArray *)bundledStyleNames
-{
-    if (!_bundledStyleNames) {
-        NSString *stylesPath = [[MGLMapView resourceBundlePath] stringByAppendingString:@"/styles"];
-
-        _bundledStyleNames = [NSMutableArray array];
+        _bundledStyleURLs = [NSMutableArray array];
 
         NSArray *bundledStyleNamesWithExtensions = [[NSFileManager defaultManager] contentsOfDirectoryAtPath:stylesPath error:nil];
-        NSString *hybridStylePrefix = @"hybrid-";
-        NSString *satelliteStylePrefix = @"satellite-";
-        for (NSString *fileName in bundledStyleNamesWithExtensions) {
-            NSString *styleName = [fileName stringByDeletingPathExtension];
-            [_bundledStyleNames addObject:styleName];
-
-            // Add satellite raster & "hybrid" (satellite raster + vector contours & labels)
-            if ([styleName hasPrefix:satelliteStylePrefix]) {
-                [_bundledStyleNames addObject:[hybridStylePrefix stringByAppendingString:[styleName substringFromIndex:[satelliteStylePrefix length]]]];
-            }
+        for (NSString *fileName in bundledStyleNamesWithExtensions)
+        {
+            [_bundledStyleURLs addObject:MGLURLForBundledStyleNamed([fileName stringByDeletingPathExtension])];
         }
     }
 
-    return [NSArray arrayWithArray:_bundledStyleNames];
+    return [NSArray arrayWithArray:_bundledStyleURLs];
 }
 
-- (NSString *)styleName
-{
++ (NSSet *)keyPathsForValuesAffectingMapID {
+    return [NSSet setWithObjects:@"styleURL", @"accessToken", nil];
+}
+
+- (NSString *)mapID {
     NSURL *styleURL = self.styleURL;
-    NSString *styleName;
-    if ([styleURL.scheme isEqualToString:@"asset"])
-    {
-        styleName = styleURL.lastPathComponent.stringByDeletingPathExtension;
-    }
-    else if ([styleURL.scheme isEqualToString:@"mapbox"]) {
-        styleName = styleURL.host;
-    }
-    return styleName.mgl_stringOrNilIfEmpty;
+    return [styleURL.scheme isEqualToString:@"mapbox"] ? styleURL.host.mgl_stringOrNilIfEmpty : nil;
 }
 
-- (void)setStyleName:(NSString *)styleName
-{
-    NSString *hybridStylePrefix = @"hybrid-";
-    BOOL isHybrid = [styleName hasPrefix:hybridStylePrefix];
-    if (isHybrid) {
-        styleName = [@"satellite-" stringByAppendingString:[styleName substringFromIndex:[hybridStylePrefix length]]];
-    }
-    [self setStyleURL:[NSURL URLWithString:[NSString stringWithFormat:@"styles/%@.json", styleName]]];
-    if (isHybrid) {
-        [self setStyleClasses:@[@"contours", @"labels"]];
-    }
+- (void)setMapID:(NSString *)mapID {
+    self.styleURL = [NSURL URLWithString:[NSString stringWithFormat:@"mapbox://%@", mapID]];
 }
 
 - (NSArray *)getAppliedStyleClasses

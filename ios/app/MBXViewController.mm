@@ -16,7 +16,6 @@ static NSArray *const kStyleNames = @[
     @"Basic",
     @"Outdoors",
     @"Satellite",
-    @"Hybrid",
 ];
 
 static NSString *const kStyleVersion = @"7";
@@ -246,7 +245,7 @@ mbgl::Settings_NSUserDefaults *settings = nullptr;
         styleName = [kStyleNames objectAtIndex:index];
     }
 
-    self.mapView.styleName = [NSString stringWithFormat:@"%@-v%@", styleName.lowercaseString, kStyleVersion];
+    self.mapView.styleURL = [NSURL URLWithString:[NSString stringWithFormat:@"asset://styles/%@-v%@.json", styleName.lowercaseString, kStyleVersion]];
 
     [titleButton setTitle:styleName forState:UIControlStateNormal];
 }

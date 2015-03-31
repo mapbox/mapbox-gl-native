@@ -19,20 +19,6 @@
 
 /** @name Initializing a Map View */
 
-/** Initialize a map view with a given frame, style, and access token.
-*   @param frame The frame with which to initialize the map view.
-*   @param accessToken A Mapbox API access token.
-*   @param styleJSON The map stylesheet as JSON text.
-*   @return An initialized map view, or `nil` if the map view was unable to be initialized. */
-- (instancetype)initWithFrame:(CGRect)frame accessToken:(NSString *)accessToken styleJSON:(NSString *)styleJSON;
-
-/** Initialize a map view with a given frame, bundled style name, and access token.
-*   @param frame The frame with which to initialize the map view.
-*   @param accessToken A Mapbox API access token.
-*   @param styleName The map style name to use.
-*   @return An initialized map view, or `nil` if the map view was unable to be initialized. */
-- (instancetype)initWithFrame:(CGRect)frame accessToken:(NSString *)accessToken bundledStyleNamed:(NSString *)styleName;
-
 /** Initialize a map view with a given frame, style URL, and access token.
 *   @param frame The frame with which to initialize the map view.
 *   @param accessToken A Mapbox API access token.
@@ -178,26 +164,19 @@
 
 /** @name Styling the Map */
 
-/** Sets the map style.
-*   @param styleJSON The map stylesheet as JSON text. */
-- (void)setStyleJSON:(NSString *)styleJSON;
+/** Mapbox map ID of the style currently displayed in the receiver, or `nil` if the style does not have a map ID.
+ 
+    The style may lack a map ID if it is located at an HTTP, HTTPS, or asset: URL. Use -styleURL to get the URL in these cases.
+ */
+@property (nonatomic) IBInspectable NSString *mapID;
 
-/** Returns the raw JSON style as a native dictionary object. */
-- (NSDictionary *)getRawStyle;
+/** Returns the URLs to the styles bundled with the library. */
+- (NSArray *)bundledStyleURLs;
 
-/** Sets the raw JSON style as a native dictionary object with a transition animation.
-*   @param style The style JSON as a dictionary object. */
-- (void)setRawStyle:(NSDictionary *)style;
-
-/** Returns the names of the styles bundled with the library. */
-- (NSArray *)bundledStyleNames;
-
-/** Sets the map style to a named, bundled style.
-*   @param styleName The map style name to use. */
-@property (nonatomic) IBInspectable NSString *styleName;
-
-/** Sets the map style URL to use.
-*   @param styleURL The map style URL to use. Can be either an HTTP/HTTPS URL or a Mapbox map ID style URL (`mapbox://<user.style>`). */
+/** URL of the style currently displayed in the receiver.
+    
+    The URL may be a full HTTP or HTTPS URL or a Mapbox URL indicating the style’s map ID (`mapbox://<user.style>`). To display the default style, set this property to `nil`.
+ */
 @property (nonatomic) NSURL *styleURL;
 
 #pragma mark - Annotating the Map
