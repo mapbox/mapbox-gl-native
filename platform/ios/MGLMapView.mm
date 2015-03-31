@@ -139,7 +139,7 @@ mbgl::DefaultFileSource *mbglFileSource = nullptr;
     if (self && [self commonInit])
     {
         if (accessToken) [self setAccessToken:accessToken];
-        if (styleURL) [self setStyleURL:[styleURL absoluteString]];
+        if (styleURL) [self setStyleURL:styleURL];
     }
 
     return self;
@@ -185,17 +185,17 @@ mbgl::DefaultFileSource *mbglFileSource = nullptr;
     }
 }
 
-- (void)setStyleURL:(NSString *)styleURLString
+- (void)setStyleURL:(NSURL *)styleURL
 {
-    std::string styleURL([styleURLString UTF8String]);
+    std::string styleURLString([[styleURL absoluteString] UTF8String]);
 
-    if ( ! [[NSURL URLWithString:styleURLString] scheme])
+    if ( ! [styleURL scheme])
     {
-        mbglMap->setStyleURL(std::string("asset://") + styleURL);
+        mbglMap->setStyleURL(std::string("asset://") + styleURLString);
     }
     else
     {
-        mbglMap->setStyleURL(styleURL);
+        mbglMap->setStyleURL(styleURLString);
     }
 }
 
@@ -1320,7 +1320,7 @@ CLLocationCoordinate2D latLngToCoordinate(mbgl::LatLng latLng)
     if (isHybrid) {
         styleName = [@"satellite-" stringByAppendingString:[styleName substringFromIndex:[hybridStylePrefix length]]];
     }
-    [self setStyleURL:[NSString stringWithFormat:@"styles/%@.json", styleName]];
+    [self setStyleURL:[NSURL URLWithString:[NSString stringWithFormat:@"styles/%@.json", styleName]]];
     if (isHybrid) {
         [self setStyleClasses:@[@"contours", @"labels"]];
     }
