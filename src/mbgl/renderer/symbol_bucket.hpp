@@ -9,6 +9,7 @@
 #include <mbgl/geometry/icon_buffer.hpp>
 #include <mbgl/text/types.hpp>
 #include <mbgl/text/glyph.hpp>
+#include <mbgl/text/shaping.hpp>
 #include <mbgl/style/style_bucket.hpp>
 #include <mbgl/util/ptr.hpp>
 
@@ -37,19 +38,23 @@ public:
     std::string sprite;
 };
 
+struct Anchor;
 
-class Symbol {
-public:
-    vec2<float> tl, tr, bl, br;
-    Rect<uint16_t> tex;
-    float angle;
-    float minScale = 0.0f;
-    float maxScale = std::numeric_limits<float>::infinity();
-    CollisionAnchor anchor;
+class SymbolInstance {
+    public:
+        explicit SymbolInstance(Anchor &anchor, const std::vector<Coordinate> &line,
+                const Shaping &shapedText, const PositionedIcon &shapedIcon,
+                const StyleLayoutSymbol &layout, const bool inside,
+                const float textBoxScale, const float textPadding, const float textAlongLine,
+                const float iconBoxScale, const float iconPadding, const float iconAlongLine,
+                const GlyphPositions &face);
+        const bool hasText;
+        const bool hasIcon;
+        const PlacedGlyphs glyphQuads;
+        const PlacedGlyphs iconQuads;
+        // text collision feature
+        // icon collision feature
 };
-
-typedef std::vector<Symbol> Symbols;
-
 
 class SymbolBucket : public Bucket {
     typedef ElementGroup<1> TextElementGroup;
@@ -82,8 +87,11 @@ private:
                                                const FilterExpression&,
                                                GlyphStore&,
                                                const Sprite&);
+    void addFeature(const std::vector<std::vector<Coordinate>> &lines,
+            const Shaping &shapedText, const PositionedIcon &shapedIcon,
+            const GlyphPositions &face);
 
-    void addFeature(const std::vector<Coordinate> &line, const Shaping &shaping, const GlyphPositions &face, const Rect<uint16_t> &image);
+    void placeFeatures();
 
     // Adds placed items to the buffer.
     template <typename Buffer, typename GroupType>
@@ -95,6 +103,7 @@ public:
 
 private:
     Collision &collision;
+    std::vector<SymbolInstance> symbolInstances;
 
     struct TextBuffer {
         TextVertexBuffer vertices;

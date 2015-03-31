@@ -64,6 +64,8 @@ class Shaping {
     int32_t bottom;
     int32_t left;
     int32_t right;
+
+    operator bool() const { return positionedGlyphs.size(); }
 };
 
 }

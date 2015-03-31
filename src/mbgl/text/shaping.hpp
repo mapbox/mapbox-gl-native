@@ -11,14 +11,16 @@ namespace mbgl {
     class PositionedIcon {
         public:
             inline explicit PositionedIcon() {}
-            inline explicit PositionedIcon(const Rect<uint16_t> _image,
+            inline explicit PositionedIcon(Rect<uint16_t> _image,
                     float _top, float _bottom, float _left, float _right) :
                 image(_image), top(_top), bottom(_bottom), left(_left), right(_right) {}
-            const Rect<uint16_t> image;
+            Rect<uint16_t> image;
             float top = 0;
             float bottom = 0;
             float left = 0;
             float right = 0;
+
+            operator bool() const { return image; }
     };
 
     class StyleLayoutSymbol;

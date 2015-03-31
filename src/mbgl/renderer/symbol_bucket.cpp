@@ -9,7 +9,6 @@
 #include <mbgl/geometry/resample.hpp>
 #include <mbgl/renderer/painter.hpp>
 #include <mbgl/text/glyph_store.hpp>
-#include <mbgl/text/shaping.hpp>
 #include <mbgl/text/quads.hpp>
 #include <mbgl/platform/log.hpp>
 #include <mbgl/text/collision.hpp>
@@ -22,6 +21,20 @@
 #include <mbgl/util/std.hpp>
 
 namespace mbgl {
+
+SymbolInstance::SymbolInstance(Anchor &anchor, const std::vector<Coordinate> &line,
+        const Shaping &shapedText, const PositionedIcon &shapedIcon, 
+        const StyleLayoutSymbol &layout, const bool inside,
+        const float textBoxScale, const float /*textPadding*/, const float textAlongLine,
+        const float /*iconBoxScale*/, const float /*iconPadding*/, const float iconAlongLine,
+        const GlyphPositions &face) :
+    hasText(shapedText), hasIcon(shapedIcon),
+    glyphQuads(inside && shapedText ?
+            getGlyphQuads(anchor, shapedText, textBoxScale, line, layout, textAlongLine, face) :
+            PlacedGlyphs()),
+    iconQuads(inside && shapedIcon ?
+            getIconQuads(anchor, shapedIcon, line, layout, iconAlongLine) :
+            PlacedGlyphs()) {};
 
 SymbolBucket::SymbolBucket(std::unique_ptr<const StyleLayoutSymbol> styleLayout_, Collision &collision_)
     : styleLayout(std::move(styleLayout_)), collision(collision_) {
@@ -170,22 +183,22 @@ void SymbolBucket::addFeatures(const GeometryTileLayer& layer,
             break;
     }
 
-    float justify = 0.5;
-    if (layout.text.justify == TextJustifyType::Right) justify = 1;
-    else if (layout.text.justify == TextJustifyType::Left) justify = 0;
+    const float justify = layout.text.justify == TextJustifyType::Right ? 1 :
+        layout.text.justify == TextJustifyType::Left ? 0 :
+        0.5;
 
     const auto &fontStack = glyphStore.getFontStack(layout.text.font);
 
     for (const SymbolFeature &feature : features) {
         if (!feature.geometry.size()) continue;
 
-        Shaping shaping;
-        Rect<uint16_t> image;
+        Shaping shapedText;
+        PositionedIcon shapedIcon;
         GlyphPositions face;
 
         // if feature has text, shape the text
         if (feature.label.length()) {
-            shaping = fontStack->getShaping(
+            shapedText = fontStack->getShaping(
                 /* string */ feature.label,
                 /* maxWidth: ems */ layout.text.max_width * 24,
                 /* lineHeight: ems */ layout.text.line_height * 24,
@@ -196,7 +209,7 @@ void SymbolBucket::addFeatures(const GeometryTileLayer& layer,
                 /* translate */ vec2<float>(layout.text.offset[0], layout.text.offset[1]));
 
             // Add the glyphs we need for this label to the glyph atlas.
-            if (shaping.positionedGlyphs.size()) {
+            if (shapedText) {
                 glyphAtlas.addGlyphs(tileUID, feature.label, layout.text.font, fontStack, face);
             }
         }
@@ -204,164 +217,101 @@ void SymbolBucket::addFeatures(const GeometryTileLayer& layer,
         // if feature has icon, get sprite atlas position
         if (feature.sprite.length()) {
             sprite.waitUntilLoaded();
-            image = spriteAtlas.getImage(feature.sprite, false);
+            Rect<uint16_t> image = spriteAtlas.getImage(feature.sprite, false);
+            shapedIcon = shapeIcon(image, layout);
 
             if (sprite.getSpritePosition(feature.sprite).sdf) {
                 sdfIcons = true;
             }
         }
 
-        // if either shaping or icon position is present, add the feature
-        if (shaping.positionedGlyphs.size() || image) {
-            for (const std::vector<Coordinate> &line : feature.geometry) {
-                if (line.size()) {
-                    addFeature(line, shaping, face, image);
-                }
-            }
+        // if either shapedText or icon position is present, add the feature
+        if (shapedText || shapedIcon) {
+            addFeature(feature.geometry, shapedText, shapedIcon, face);
         }
     }
+
+    placeFeatures();
 }
 
-bool byScale(const Anchor &a, const Anchor &b) { return a.scale < b.scale; }
 
-void SymbolBucket::addFeature(const std::vector<Coordinate> &line, const Shaping &shaping,
-                              const GlyphPositions &face, const Rect<uint16_t> &image) {
-    assert(line.size());
+void SymbolBucket::addFeature(const std::vector<std::vector<Coordinate>> &lines,
+                    const Shaping &shapedText, const PositionedIcon &shapedIcon, const GlyphPositions &face) {
     auto &layout = *styleLayout;
 
     const float minScale = 0.5f;
     const float glyphSize = 24.0f;
 
-    const bool horizontalText =
-        layout.text.rotation_alignment == RotationAlignmentType::Viewport;
-    const bool horizontalIcon =
-        layout.icon.rotation_alignment == RotationAlignmentType::Viewport;
     const float fontScale = layout.text.max_size / glyphSize;
     const float textBoxScale = collision.tilePixelRatio * fontScale;
-    //const float iconBoxScale = collision.tilePixelRatio * layout.icon.max_size;
-    const bool iconWithoutText = layout.text.optional || !shaping.positionedGlyphs.size();
-    const bool textWithoutIcon = layout.icon.optional || !image;
+    const float iconBoxScale = collision.tilePixelRatio * layout.icon.max_size;
+    //const float symbolSpacing = collision.tilePixelRatio * layout.min_distance;
     const bool avoidEdges = layout.avoid_edges && layout.placement != PlacementType::Line;
+    const float textPadding = layout.text.padding * collision.tilePixelRatio;
+    const float iconPadding = layout.icon.padding * collision.tilePixelRatio;
+    //const float textMaxAngle = layout.text.max_angle * M_PI / 180;
+    const bool textAlongLine =
+        layout.text.rotation_alignment != RotationAlignmentType::Viewport &&
+        layout.placement == PlacementType::Line;
+    const bool iconAlongLine =
+        layout.icon.rotation_alignment != RotationAlignmentType::Viewport &&
+        layout.placement == PlacementType::Line;
 
-    Anchors anchors;
+    // TODO clip lines here
 
-    if (layout.placement == PlacementType::Line) {
-        float resampleOffset = 0;
+    for (const std::vector<Coordinate> &line : lines) {
+        if (!line.size()) continue;
 
-        if (shaping.positionedGlyphs.size()) {
-            float minX = std::numeric_limits<float>::infinity();
-            float maxX = -std::numeric_limits<float>::infinity();
-            for (const auto &glyph : shaping.positionedGlyphs) {
-                minX = std::min(minX, glyph.x);
-                maxX = std::max(maxX, glyph.x);
-            }
-            const float labelLength = maxX - minX;
-            resampleOffset = (labelLength / 2.0 + glyphSize * 2.0) * fontScale;
+        // Calculate the anchor points around which you want to place labels
+        Anchors anchors = layout.placement == PlacementType::Line ?
+            resample(line, layout.min_distance, minScale, collision.maxPlacementScale, collision.tilePixelRatio, 0.0f) :
+            Anchors({ Anchor(float(line[0].x), float(line[0].y), 0, minScale) });
+
+
+        // For each potential label, create the placement features used to check for collisions, and the quads use for rendering.
+        for (Anchor &anchor : anchors) {
+
+            const bool inside = !(anchor.x < 0 || anchor.x > 4096 || anchor.y < 0 || anchor.y > 4096);
+
+            if (avoidEdges && !inside) continue;
+
+            symbolInstances.emplace_back(anchor, line, shapedText, shapedIcon, layout, inside,
+                    textBoxScale, textPadding, textAlongLine,
+                    iconBoxScale, iconPadding, iconAlongLine,
+                    face);
         }
-
-        // Line labels
-        anchors = resample(line, layout.min_distance, minScale, collision.maxPlacementScale,
-                           collision.tilePixelRatio, resampleOffset);
-
-        // Sort anchors by segment so that we can start placement with the
-        // anchors that can be shown at the lowest zoom levels.
-        std::sort(anchors.begin(), anchors.end(), byScale);
-
-    } else {
-        // Point labels
-        anchors = {Anchor{float(line[0].x), float(line[0].y), 0, minScale}};
     }
+}
 
-    // TODO: figure out correct ascender height.
-    const vec2<float> origin = {0, -17};
+void SymbolBucket::placeFeatures() {
 
-    for (Anchor &anchor : anchors) {
+    //auto &layout = *styleLayout;
 
-        // Calculate the scales at which the text and icons can be first shown without overlap
-        PlacedGlyphs placedGlyphs;
-        PlacedGlyphs placedIcons;
-        float glyphScale = 0;
-        float iconScale = 0;
-        const bool inside = !(anchor.x < 0 || anchor.x > 4096 || anchor.y < 0 || anchor.y > 4096);
+    for (SymbolInstance &symbolInstance : symbolInstances) {
 
-        if (avoidEdges && !inside) continue;
+        const bool hasText = symbolInstance.hasText;
+        const bool hasIcon = symbolInstance.hasIcon;
 
-        if (shaping.positionedGlyphs.size()) {
+        float glyphScale = 0.5f;
+        float iconScale = 0.5f;
 
-            placedGlyphs = getGlyphQuads(anchor, shaping, textBoxScale, line, layout, !horizontalText, face);
-            glyphScale = 0.5f;
-            /*
-                layout.text.allow_overlap
-                    ? glyphPlacement.minScale
-                    : collision.getPlacementScale(glyphPlacement.boxes, glyphPlacement.minScale, avoidEdges);
-                    */
-            if (!glyphScale && !iconWithoutText)
-                continue;
-        }
-
-        if (image) {
-            auto shapedImage = shapeIcon(image, layout);
-            placedIcons = getIconQuads(anchor, shapedImage, line, layout, !horizontalIcon);
-            iconScale = 0.5f;
-                /*
-                layout.icon.allow_overlap
-                    ? iconPlacement.minScale
-                    : collision.getPlacementScale(iconPlacement.boxes, iconPlacement.minScale, avoidEdges);
-                    */
-            if (!iconScale && !textWithoutIcon)
-                continue;
-        }
-
-        if (!iconWithoutText && !textWithoutIcon) {
-            iconScale = glyphScale = util::max(iconScale, glyphScale);
-        } else if (!textWithoutIcon && glyphScale) {
-            glyphScale = util::max(iconScale, glyphScale);
-        } else if (!iconWithoutText && iconScale) {
-            iconScale = util::max(iconScale, glyphScale);
-        }
-
-        // Get the rotation ranges it is safe to show the glyphs
         /*
-        PlacementRange glyphRange = fullRange;
-            (!glyphScale || layout.text.allow_overlap)
-                ? fullRange
-                : collision.getPlacementRange(glyphPlacement.boxes, glyphScale, horizontalText);
-        PlacementRange iconRange =
-            (!iconScale || layout.icon.allow_overlap)
-                ? fullRange
-                : collision.getPlacementRange(iconPlacement.boxes, iconScale, horizontalIcon);
-
-        const PlacementRange maxRange = {{
-            util::min(iconRange[0], glyphRange[0]), util::max(iconRange[1], glyphRange[1]),
-        }};
-
-        if (!iconWithoutText && !textWithoutIcon) {
-            iconRange = glyphRange = maxRange;
-        } else if (!textWithoutIcon) {
-            glyphRange = maxRange;
-        } else if (!iconWithoutText) {
-            iconRange = maxRange;
-        }
-                */
+           if (!iconWithoutText && !textWithoutIcon) {
+           iconScale = glyphScale = util::max(iconScale, glyphScale);
+           } else if (!textWithoutIcon && glyphScale) {
+           glyphScale = util::max(iconScale, glyphScale);
+           } else if (!iconWithoutText && iconScale) {
+           iconScale = util::max(iconScale, glyphScale);
+           }
+        */
 
         // Insert final placement into collision tree and add glyphs/icons to buffers
-        if (glyphScale && std::isfinite(glyphScale)) {
-            if (!layout.text.ignore_placement) {
-                /*
-                collision.insert(glyphPlacement.boxes, anchor, glyphScale, glyphRange,
-                                 horizontalText);
-                                 */
-            }
-            if (inside) addSymbols<TextBuffer, TextElementGroup>(text, placedGlyphs, glyphScale);
+        if (hasText && std::isfinite(glyphScale)) {
+            addSymbols<TextBuffer, TextElementGroup>(text, symbolInstance.glyphQuads, glyphScale);
         }
 
-        if (iconScale && std::isfinite(iconScale)) {
-            /*
-            if (!layout.icon.ignore_placement) {
-                collision.insert(iconPlacement.boxes, anchor, iconScale, iconRange, horizontalIcon);
-            }
-            */
-            if (inside) addSymbols<IconBuffer, IconElementGroup>(icon, placedIcons, iconScale);
+        if (hasIcon && std::isfinite(iconScale)) {
+            addSymbols<IconBuffer, IconElementGroup>(icon, symbolInstance.iconQuads, iconScale);
         }
     }
 }
