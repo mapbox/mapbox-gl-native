@@ -22,7 +22,7 @@ private:
     const VectorTileLayer& layer;
     uint64_t id = 0;
     FeatureType type = FeatureType::Unknown;
-    std::unordered_map<uint32_t, uint32_t> properties;
+    pbf tags_pbf;
     pbf geometry_pbf;
 };
 
