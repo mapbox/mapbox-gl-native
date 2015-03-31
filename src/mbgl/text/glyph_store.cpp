@@ -40,21 +40,24 @@ const Shaping FontStack::getShaping(const std::u32string &string, const float ma
                                     const float spacing, const vec2<float> &translate) const {
     std::lock_guard<std::mutex> lock(mtx);
 
-    Shaping shaping;
+    Shaping shaping(translate.x, translate.y);
+
+    // the y offset *should* be part of the font metadata
+    const int32_t yOffset = -17;
 
     int32_t x = std::round(translate.x * 24); // one em
-    const int32_t y = std::round(translate.y * 24); // one em
+    const int32_t y = std::round(translate.y * 24) + yOffset; // one em
 
     // Loop through all characters of this label and shape.
     for (uint32_t chr : string) {
-        shaping.emplace_back(chr, x, y);
+        shaping.positionedGlyphs.emplace_back(chr, x, y);
         auto metric = metrics.find(chr);
         if (metric != metrics.end()) {
             x += metric->second.advance + spacing;
         }
     }
 
-    if (!shaping.size())
+    if (!shaping.positionedGlyphs.size())
         return shaping;
 
     lineWrap(shaping, lineHeight, maxWidth, horizontalAlign, verticalAlign, justify);
@@ -68,22 +71,22 @@ void align(Shaping &shaping, const float justify, const float horizontalAlign,
     const float shiftX = (justify - horizontalAlign) * maxLineLength;
     const float shiftY = (-verticalAlign * (line + 1) + 0.5) * lineHeight;
 
-    for (PositionedGlyph &glyph : shaping) {
+    for (PositionedGlyph &glyph : shaping.positionedGlyphs) {
         glyph.x += shiftX;
         glyph.y += shiftY;
     }
 }
 
-void justifyLine(Shaping &shaping, const std::map<uint32_t, GlyphMetrics> &metrics, uint32_t start,
+void justifyLine(std::vector<PositionedGlyph> &positionedGlyphs, const std::map<uint32_t, GlyphMetrics> &metrics, uint32_t start,
                  uint32_t end, float justify) {
-    PositionedGlyph &glyph = shaping[end];
+    PositionedGlyph &glyph = positionedGlyphs[end];
     auto metric = metrics.find(glyph.glyph);
     if (metric != metrics.end()) {
         const uint32_t lastAdvance = metric->second.advance;
         const float lineIndent = float(glyph.x + lastAdvance) * justify;
 
         for (uint32_t j = start; j <= end; j++) {
-            shaping[j].x -= lineIndent;
+            positionedGlyphs[j].x -= lineIndent;
         }
     }
 }
@@ -99,25 +102,27 @@ void FontStack::lineWrap(Shaping &shaping, const float lineHeight, const float m
 
     uint32_t maxLineLength = 0;
 
+    std::vector<PositionedGlyph> &positionedGlyphs = shaping.positionedGlyphs;
+
     if (maxWidth) {
-        for (uint32_t i = 0; i < shaping.size(); i++) {
-            PositionedGlyph &shape = shaping[i];
+        for (uint32_t i = 0; i < positionedGlyphs.size(); i++) {
+            PositionedGlyph &shape = positionedGlyphs[i];
 
             shape.x -= lengthBeforeCurrentLine;
             shape.y += lineHeight * line;
 
             if (shape.x > maxWidth && lastSafeBreak > 0) {
 
-                uint32_t lineLength = shaping[lastSafeBreak + 1].x;
+                uint32_t lineLength = positionedGlyphs[lastSafeBreak + 1].x;
                 maxLineLength = util::max(lineLength, maxLineLength);
 
                 for (uint32_t k = lastSafeBreak + 1; k <= i; k++) {
-                    shaping[k].y += lineHeight;
-                    shaping[k].x -= lineLength;
+                    positionedGlyphs[k].y += lineHeight;
+                    positionedGlyphs[k].x -= lineLength;
                 }
 
                 if (justify) {
-                    justifyLine(shaping, metrics, lineStartIndex, lastSafeBreak - 1, justify);
+                    justifyLine(positionedGlyphs, metrics, lineStartIndex, lastSafeBreak - 1, justify);
                 }
 
                 lineStartIndex = lastSafeBreak + 1;
@@ -132,10 +137,22 @@ void FontStack::lineWrap(Shaping &shaping, const float lineHeight, const float m
         }
     }
 
-    if (!maxLineLength) maxLineLength = shaping.back().x;
+    const PositionedGlyph& lastPositionedGlyph = positionedGlyphs.back();
+    const auto lastGlyphMetric = metrics.find(lastPositionedGlyph.glyph);
+    assert(lastGlyphMetric != metrics.end());
+    const uint32_t lastLineLength = lastPositionedGlyph.x + lastGlyphMetric->second.advance;
+    maxLineLength = std::max(maxLineLength, lastLineLength);
 
-    justifyLine(shaping, metrics, lineStartIndex, uint32_t(shaping.size()) - 1, justify);
+    const uint32_t height = (line + 1) * lineHeight;
+
+    justifyLine(positionedGlyphs, metrics, lineStartIndex, uint32_t(positionedGlyphs.size()) - 1, justify);
     align(shaping, justify, horizontalAlign, verticalAlign, maxLineLength, lineHeight, line);
+
+     // Calculate the bounding box
+     shaping.top += -verticalAlign * height;
+     shaping.bottom = shaping.top + height;
+     shaping.left += -horizontalAlign * maxLineLength;
+     shaping.right = shaping.left + maxLineLength;
 }
 
 GlyphPBF::GlyphPBF(const std::string &glyphURL,

@@ -195,7 +195,7 @@ void SymbolBucket::addFeatures(const GeometryTileLayer& layer,
                 /* translate */ vec2<float>(layout.text.offset[0], layout.text.offset[1]));
 
             // Add the glyphs we need for this label to the glyph atlas.
-            if (shaping.size()) {
+            if (shaping.positionedGlyphs.size()) {
                 glyphAtlas.addGlyphs(tileUID, feature.label, layout.text.font, fontStack, face);
             }
         }
@@ -211,7 +211,7 @@ void SymbolBucket::addFeatures(const GeometryTileLayer& layer,
         }
 
         // if either shaping or icon position is present, add the feature
-        if (shaping.size() || image) {
+        if (shaping.positionedGlyphs.size() || image) {
             for (const std::vector<Coordinate> &line : feature.geometry) {
                 if (line.size()) {
                     addFeature(line, shaping, face, image);
@@ -240,7 +240,7 @@ void SymbolBucket::addFeature(const std::vector<Coordinate> &line, const Shaping
     const float fontScale = layout.text.max_size / glyphSize;
     const float textBoxScale = collision.tilePixelRatio * fontScale;
     const float iconBoxScale = collision.tilePixelRatio * layout.icon.max_size;
-    const bool iconWithoutText = layout.text.optional || !shaping.size();
+    const bool iconWithoutText = layout.text.optional || !shaping.positionedGlyphs.size();
     const bool textWithoutIcon = layout.icon.optional || !image;
     const bool avoidEdges = layout.avoid_edges && layout.placement != PlacementType::Line;
 
@@ -249,10 +249,10 @@ void SymbolBucket::addFeature(const std::vector<Coordinate> &line, const Shaping
     if (layout.placement == PlacementType::Line) {
         float resampleOffset = 0;
 
-        if (shaping.size()) {
+        if (shaping.positionedGlyphs.size()) {
             float minX = std::numeric_limits<float>::infinity();
             float maxX = -std::numeric_limits<float>::infinity();
-            for (const auto &glyph : shaping) {
+            for (const auto &glyph : shaping.positionedGlyphs) {
                 minX = std::min(minX, glyph.x);
                 maxX = std::max(maxX, glyph.x);
             }
@@ -287,7 +287,7 @@ void SymbolBucket::addFeature(const std::vector<Coordinate> &line, const Shaping
 
         if (avoidEdges && !inside) continue;
 
-        if (shaping.size()) {
+        if (shaping.positionedGlyphs.size()) {
             glyphPlacement = Placement::getGlyphs(anchor, origin, shaping, face, textBoxScale,
                                                   horizontalText, line, layout);
             glyphScale =

@@ -211,7 +211,7 @@ Placement Placement::getGlyphs(Anchor &anchor, const vec2<float> &origin, const 
 
     const uint32_t buffer = 3;
 
-    for (const PositionedGlyph &shape : shaping) {
+    for (const PositionedGlyph &shape : shaping.positionedGlyphs) {
         auto face_it = face.find(shape.glyph);
         if (face_it == face.end())
             continue;

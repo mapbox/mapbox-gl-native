@@ -54,7 +54,18 @@ public:
     float y = 0;
 };
 
-typedef std::vector<PositionedGlyph> Shaping;
+class Shaping {
+    public:
+    inline explicit Shaping() : top(0), bottom(0), left(0), right(0) {}
+    inline explicit Shaping(float x, float y)
+        : top(-y), bottom(y), left(-x), right(x) {}
+    std::vector<PositionedGlyph> positionedGlyphs;
+    int32_t top;
+    int32_t bottom;
+    int32_t left;
+    int32_t right;
+};
+
 }
 
 #endif
