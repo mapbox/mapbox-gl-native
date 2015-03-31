@@ -33,6 +33,13 @@
 *   @return An initialized map view, or `nil` if the map view was unable to be initialized. */
 - (instancetype)initWithFrame:(CGRect)frame accessToken:(NSString *)accessToken bundledStyleNamed:(NSString *)styleName;
 
+/** Initialize a map view with a given frame, style URL, and access token.
+*   @param frame The frame with which to initialize the map view.
+*   @param accessToken A Mapbox API access token.
+*   @param styleURL The map style URL to use. Can be either an HTTP/HTTPS URL or a Mapbox map ID style URL (`mapbox://<user.style>`).
+*   @return An initialized map view, or `nil` if the map view was unable to be initialized. */
+- (instancetype)initWithFrame:(CGRect)frame accessToken:(NSString *)accessToken styleURL:(NSURL *)styleURL;
+
 /** Initialize a map view with a given frame, the default style, and an access token.
 *   @param frame The frame with which to initialize the map view.
 *   @param accessToken A Mapbox API access token.
@@ -188,6 +195,10 @@
 /** Sets the map style to a named, bundled style.
 *   @param styleName The map style name to use. */
 - (void)useBundledStyleNamed:(NSString *)styleName;
+
+/** Sets the map style URL to use.
+*   @param styleURL The map style URL to use. Can be either an HTTP/HTTPS URL or a Mapbox map ID style URL (`mapbox://<user.style>`). */
+- (void)setStyleURL:(NSURL *)styleURL;
 
 #pragma mark - Annotating the Map
 
