@@ -9,8 +9,6 @@
 #include <mbgl/util/ptr.hpp>
 
 #include <atomic>
-#include <exception>
-#include <iosfwd>
 #include <string>
 #include <functional>
 
@@ -22,7 +20,6 @@ typedef struct uv_loop_s uv_loop_t;
 
 namespace mbgl {
 
-class Map;
 class Environment;
 class Painter;
 class SourceInfo;
@@ -32,12 +29,6 @@ class Request;
 class TileData : public std::enable_shared_from_this<TileData>,
              private util::noncopyable {
 public:
-    struct exception : std::exception {};
-    struct geometry_too_long_exception : exception {};
-
-public:
-    typedef util::ptr<TileData> Ptr;
-
     enum class State {
         invalid,
         initial,
@@ -47,7 +38,6 @@ public:
         obsolete
     };
 
-public:
     TileData(Tile::ID const &id, const SourceInfo &);
     ~TileData();
 
@@ -65,16 +55,14 @@ public:
     virtual void render(Painter &painter, const StyleLayer &layer_desc, const mat4 &matrix) = 0;
     virtual bool hasData(StyleLayer const &layer_desc) const = 0;
 
-public:
     const Tile::ID id;
     const std::string name;
     std::atomic<State> state;
 
-public:
+protected:
     const SourceInfo& source;
     Environment& env;
 
-protected:
     Request *req = nullptr;
     std::string data;
 

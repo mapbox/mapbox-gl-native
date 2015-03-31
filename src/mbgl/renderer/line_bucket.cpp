@@ -12,8 +12,6 @@
 
 #include <cassert>
 
-struct geometry_too_long_exception : std::exception {};
-
 using namespace mbgl;
 
 LineBucket::LineBucket(std::unique_ptr<const StyleLayoutLine> styleLayout_,
