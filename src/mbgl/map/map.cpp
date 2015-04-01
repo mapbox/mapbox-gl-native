@@ -749,7 +749,7 @@ void Map::updateSources(const util::ptr<StyleLayerGroup> &group) {
     if (!group) {
         return;
     }
-    for (const util::ptr<StyleLayer> &layer : group->layers) {
+    for (const auto& layer : group->layers) {
         if (!layer) continue;
         if (layer->bucket && layer->bucket->style_source) {
             (*activeSources.emplace(layer->bucket->style_source).first)->enabled = true;
@@ -760,7 +760,7 @@ void Map::updateSources(const util::ptr<StyleLayerGroup> &group) {
 
 void Map::updateTiles() {
     assert(Environment::currentlyOn(ThreadType::Map));
-    for (const auto &source : activeSources) {
+    for (const auto& source : activeSources) {
         source->source->update(*this, getWorker(), style, *glyphAtlas, *glyphStore,
                                *spriteAtlas, getSprite(), *texturePool, [this]() {
             assert(Environment::currentlyOn(ThreadType::Map));

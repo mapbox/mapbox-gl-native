@@ -172,7 +172,7 @@ void SymbolBucket::addFeatures(const GeometryTileLayer& layer,
 
     const auto &fontStack = glyphStore.getFontStack(layout.text.font);
 
-    for (const SymbolFeature &feature : features) {
+    for (const auto& feature : features) {
         if (!feature.geometry.size()) continue;
 
         Shaping shaping;
@@ -209,7 +209,7 @@ void SymbolBucket::addFeatures(const GeometryTileLayer& layer,
 
         // if either shaping or icon position is present, add the feature
         if (shaping.size() || image) {
-            for (const std::vector<Coordinate> &line : feature.geometry) {
+            for (const auto& line : feature.geometry) {
                 if (line.size()) {
                     addFeature(line, shaping, face, image);
                 }
@@ -272,7 +272,7 @@ void SymbolBucket::addFeature(const std::vector<Coordinate> &line, const Shaping
     // TODO: figure out correct ascender height.
     const vec2<float> origin = {0, -17};
 
-    for (Anchor &anchor : anchors) {
+    for (auto& anchor : anchors) {
 
         // Calculate the scales at which the text and icons can be first shown without overlap
         Placement glyphPlacement;
@@ -359,7 +359,7 @@ void SymbolBucket::addSymbols(Buffer &buffer, const PlacedGlyphs &symbols, float
 
     const float placementZoom = std::log(scale) / std::log(2) + zoom;
 
-    for (const PlacedGlyph &symbol : symbols) {
+    for (const auto& symbol : symbols) {
         const auto &tl = symbol.tl;
         const auto &tr = symbol.tr;
         const auto &bl = symbol.bl;

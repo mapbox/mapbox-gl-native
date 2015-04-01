@@ -68,7 +68,7 @@ void align(Shaping &shaping, const float justify, const float horizontalAlign,
     const float shiftX = (justify - horizontalAlign) * maxLineLength;
     const float shiftY = (-verticalAlign * (line + 1) + 0.5) * lineHeight;
 
-    for (PositionedGlyph &glyph : shaping) {
+    for (auto& glyph : shaping) {
         glyph.x += shiftX;
         glyph.y += shiftY;
     }
@@ -251,7 +251,7 @@ void GlyphStore::waitForGlyphRanges(const std::string &fontStack, const std::set
 
         // Attempt to load the glyph range. If the GlyphSet already exists, we are getting back
         // the same shared_future.
-        for (GlyphRange range : glyphRanges) {
+        for (const auto range : glyphRanges) {
             futures.emplace_back(loadGlyphRange(fontStack, rangeSets, range));
         }
     }
@@ -259,7 +259,7 @@ void GlyphStore::waitForGlyphRanges(const std::string &fontStack, const std::set
     // Now that we potentially created all GlyphSets, we are waiting for the results, one by one.
     // When we get a result (or the GlyphSet is aready loaded), we are attempting to parse the
     // GlyphSet.
-    for (std::shared_future<GlyphPBF &> &future : futures) {
+    for (const auto& future : futures) {
         future.get().parse(stack);
     }
 }

@@ -4,7 +4,7 @@ namespace mbgl {
 
 void StyleLayerGroup::setClasses(const std::vector<std::string> &class_names, std::chrono::steady_clock::time_point now,
                                  const PropertyTransition &defaultTransition) {
-    for (const util::ptr<StyleLayer> &layer : layers) {
+    for (const auto& layer : layers) {
         if (layer) {
             layer->setClasses(class_names, now, defaultTransition);
         }
@@ -12,7 +12,7 @@ void StyleLayerGroup::setClasses(const std::vector<std::string> &class_names, st
 }
 
 void StyleLayerGroup::updateProperties(float z, std::chrono::steady_clock::time_point now, ZoomHistory &zoomHistory) {
-    for (const util::ptr<StyleLayer> &layer: layers) {
+    for (const auto& layer : layers) {
         if (layer) {
             layer->updateProperties(z, now, zoomHistory);
         }
@@ -20,7 +20,7 @@ void StyleLayerGroup::updateProperties(float z, std::chrono::steady_clock::time_
 }
 
 bool StyleLayerGroup::hasTransitions() const {
-    for (const util::ptr<const StyleLayer> &layer: layers) {
+    for (const auto& layer : layers) {
         if (layer) {
             if (layer->hasTransitions()) {
                 return true;

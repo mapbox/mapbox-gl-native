@@ -296,7 +296,7 @@ void LineBucket::addGeometry(const std::vector<Coordinate>& vertices) {
 
         assert(triangleGroups.back());
         triangle_group_type& group = *triangleGroups.back();
-        for (const TriangleElement& triangle : triangle_store) {
+        for (const auto& triangle : triangle_store) {
             triangleElementsBuffer.add(
                 group.vertex_length + triangle.a,
                 group.vertex_length + triangle.b,
@@ -317,7 +317,7 @@ void LineBucket::addGeometry(const std::vector<Coordinate>& vertices) {
 
         assert(pointGroups.back());
         point_group_type& group = *pointGroups.back();
-        for (PointElement point : point_store) {
+        for (const auto point : point_store) {
             pointElementsBuffer.add(group.vertex_length + point);
         }
 

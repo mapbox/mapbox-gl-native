@@ -41,7 +41,7 @@ std::string
 getKey(const std::u32string &text, const std::vector<std::vector<Coordinate>> &geom, bool onRight) {
     const Coordinate &coord = onRight ? geom[0].back() : geom[0].front();
     std::ostringstream key;
-    for (const char32_t &c : text) {
+    for (const auto c : text) {
         key << (char)c;
     }
     key << ":" << coord.x << ":" << coord.y;

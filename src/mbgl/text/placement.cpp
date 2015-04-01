@@ -110,7 +110,7 @@ GlyphBox getMergedBoxes(const GlyphBoxes &glyphs, const Anchor &anchor) {
 
     CollisionRect &box = mergedglyphs.box;
 
-    for (const GlyphBox &glyph : glyphs) {
+    for (const auto& glyph : glyphs) {
         const CollisionRect &gbox = glyph.box;
         box.tl.x = util::min(box.tl.x, gbox.tl.x);
         box.tl.y = util::min(box.tl.y, gbox.tl.y);
@@ -211,7 +211,7 @@ Placement Placement::getGlyphs(Anchor &anchor, const vec2<float> &origin, const 
 
     const uint32_t buffer = 3;
 
-    for (const PositionedGlyph &shape : shaping) {
+    for (const auto& shape : shaping) {
         auto face_it = face.find(shape.glyph);
         if (face_it == face.end())
             continue;
@@ -250,7 +250,7 @@ Placement Placement::getGlyphs(Anchor &anchor, const vec2<float> &origin, const 
 
         const CollisionRect obox{boxScale * x1, boxScale * y1, boxScale * x2, boxScale * y2};
 
-        for (const GlyphInstance &instance : glyphInstances) {
+        for (const auto& instance : glyphInstances) {
             vec2<float> tl = otl;
             vec2<float> tr = otr;
             vec2<float> bl = obl;
@@ -301,7 +301,7 @@ Placement Placement::getGlyphs(Anchor &anchor, const vec2<float> &origin, const 
 
     const float minPlacementScale = anchor.scale;
     placement.minScale = std::numeric_limits<float>::infinity();
-    for (const GlyphBox &box : placement.boxes) {
+    for (const auto& box : placement.boxes) {
         placement.minScale = util::min(placement.minScale, box.minScale);
     }
     placement.minScale = util::max(minPlacementScale, Placement::globalMinScale);

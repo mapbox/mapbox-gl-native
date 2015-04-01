@@ -32,7 +32,7 @@ void StyleLayer::setClasses(const std::vector<std::string> &class_names, const s
 
     // Make sure that we also transition to the fallback value for keys that aren't changed by
     // any applied classes.
-    for (std::pair<const PropertyKey, AppliedClassProperties> &property_pair : appliedStyle) {
+    for (auto& property_pair : appliedStyle) {
         const PropertyKey key = property_pair.first;
         if (already_applied.find(key) != already_applied.end()) {
             // This property has already been set by a previous class, so we don't need to
@@ -66,7 +66,7 @@ void StyleLayer::applyClassProperties(const ClassID class_id,
     // Loop through all the properties in this style, and add transitions to them, if they're
     // not already the most recent transition.
     const ClassProperties &class_properties = style_it->second;
-    for (const std::pair<PropertyKey, PropertyValue> &property_pair : class_properties)  {
+    for (const auto& property_pair : class_properties) {
         PropertyKey key = property_pair.first;
         if (already_applied.find(key) != already_applied.end()) {
             // This property has already been set by a previous class.
@@ -126,7 +126,7 @@ void StyleLayer::applyStyleProperty(PropertyKey key, T &target, const float z, c
         AppliedClassProperties &applied = it->second;
         // Iterate through all properties that we need to apply in order.
         const PropertyEvaluator<T> evaluator(z, zoomHistory);
-        for (AppliedClassProperty &property : applied.properties) {
+        for (auto& property : applied.properties) {
             if (now >= property.begin) {
                 // We overwrite the current property with the new value.
                 target = mapbox::util::apply_visitor(evaluator, property.value);
@@ -144,7 +144,7 @@ void StyleLayer::applyTransitionedStyleProperty(PropertyKey key, T &target, cons
         AppliedClassProperties &applied = it->second;
         // Iterate through all properties that we need to apply in order.
         const PropertyEvaluator<T> evaluator(z, zoomHistory);
-        for (AppliedClassProperty &property : applied.properties) {
+        for (auto& property : applied.properties) {
             if (now >= property.end) {
                 // We overwrite the current property with the new value.
                 target = mapbox::util::apply_visitor(evaluator, property.value);
@@ -250,7 +250,7 @@ void StyleLayer::updateProperties(float z, const std::chrono::steady_clock::time
 }
 
 bool StyleLayer::hasTransitions() const {
-    for (const std::pair<PropertyKey, AppliedClassProperties> &pair : appliedStyle) {
+    for (const auto& pair : appliedStyle) {
         if (pair.second.hasTransitions()) {
             return true;
         }

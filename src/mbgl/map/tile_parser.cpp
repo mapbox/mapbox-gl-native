@@ -56,7 +56,7 @@ void TileParser::parse() {
         return;
     }
 
-    for (const util::ptr<const StyleLayer> &layer_desc : group->layers) {
+    for (const auto& layer_desc : group->layers) {
         // Cancel early when parsing.
         if (obsolete()) {
             return;
