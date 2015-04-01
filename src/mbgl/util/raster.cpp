@@ -89,18 +89,3 @@ void Raster::bind(const GLuint custom_texture) {
     }
 
 }
-
-void Raster::beginFadeInTransition() {
-    TimePoint start = Clock::now();
-    fade_transition = std::make_shared<util::ease_transition<double>>(opacity, 1.0, opacity, start, std::chrono::milliseconds(250));
-}
-
-bool Raster::needsTransition() const {
-    return fade_transition != nullptr;
-}
-
-void Raster::updateTransitions(TimePoint now) {
-    if (fade_transition->update(now) == util::transition::complete) {
-        fade_transition = nullptr;
-    }
-}
