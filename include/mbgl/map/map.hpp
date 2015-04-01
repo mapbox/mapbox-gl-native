@@ -105,8 +105,6 @@ public:
     void moveBy(double dx, double dy, Duration = Duration::zero());
     void setLatLng(LatLng latLng, Duration = Duration::zero());
     LatLng getLatLng() const;
-    void startPanning();
-    void stopPanning();
     void resetPosition();
 
     // Scale
@@ -117,8 +115,6 @@ public:
     double getZoom() const;
     void setLatLngZoom(LatLng latLng, double zoom, Duration = Duration::zero());
     void resetZoom();
-    void startScaling();
-    void stopScaling();
     double getMinZoom() const;
     double getMaxZoom() const;
 
@@ -128,8 +124,6 @@ public:
     void setBearing(double degrees, double cx, double cy);
     double getBearing() const;
     void resetNorth();
-    void startRotating();
-    void stopRotating();
 
     // API
     void setAccessToken(const std::string &token);

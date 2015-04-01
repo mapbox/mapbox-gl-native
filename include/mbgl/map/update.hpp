@@ -11,6 +11,7 @@ enum class Update : UpdateType {
     Debug                     = 1 << 1,
     DefaultTransitionDuration = 1 << 2,
     Classes                   = 1 << 3,
+    Zoom                      = 1 << 4,
 };
 
 }
