@@ -11,7 +11,7 @@
 #include <mbgl/text/glyph_store.hpp>
 #include <mbgl/text/quads.hpp>
 #include <mbgl/platform/log.hpp>
-#include <mbgl/text/collision.hpp>
+#include <mbgl/text/collision_tile.hpp>
 #include <mbgl/map/sprite.hpp>
 
 #include <mbgl/util/utf.hpp>
@@ -46,7 +46,7 @@ SymbolInstance::SymbolInstance(Anchor &anchor, const std::vector<Coordinate> &li
     iconCollisionFeature(line, anchor, shapedIcon, iconBoxScale, iconPadding, iconAlongLine) {};
 
 
-SymbolBucket::SymbolBucket(std::unique_ptr<const StyleLayoutSymbol> styleLayout_, Collision &collision_)
+SymbolBucket::SymbolBucket(std::unique_ptr<const StyleLayoutSymbol> styleLayout_, CollisionTile &collision_)
     : styleLayout(std::move(styleLayout_)), collision(collision_) {
     assert(styleLayout);
 }
@@ -263,10 +263,10 @@ void SymbolBucket::addFeature(const std::vector<std::vector<Coordinate>> &lines,
     const float iconPadding = layout.icon.padding * collision.tilePixelRatio;
     //const float textMaxAngle = layout.text.max_angle * M_PI / 180;
     const bool textAlongLine =
-        layout.text.rotation_alignment != RotationAlignmentType::Viewport &&
+        layout.text.rotation_alignment == RotationAlignmentType::Map &&
         layout.placement == PlacementType::Line;
     const bool iconAlongLine =
-        layout.icon.rotation_alignment != RotationAlignmentType::Viewport &&
+        layout.icon.rotation_alignment == RotationAlignmentType::Map &&
         layout.placement == PlacementType::Line;
 
     // TODO clip lines here
@@ -276,7 +276,7 @@ void SymbolBucket::addFeature(const std::vector<std::vector<Coordinate>> &lines,
 
         // Calculate the anchor points around which you want to place labels
         Anchors anchors = layout.placement == PlacementType::Line ?
-            resample(line, layout.min_distance, minScale, collision.maxPlacementScale, collision.tilePixelRatio, 0.0f) :
+            resample(line, layout.min_distance, minScale, 2.0f, collision.tilePixelRatio, 0.0f) :
             Anchors({ Anchor(float(line[0].x), float(line[0].y), 0, minScale) });
 
 
@@ -297,33 +297,67 @@ void SymbolBucket::addFeature(const std::vector<std::vector<Coordinate>> &lines,
 
 void SymbolBucket::placeFeatures() {
 
-    //auto &layout = *styleLayout;
+    // Calculate which labels can be shown and when they can be shown and
+    // create the bufers used for rendering.
+
+    auto &layout = *styleLayout;
+
+    /*
+    const bool textAlongLine =
+        layout.text.rotation_alignment == RotationAlignmentType::Map &&
+        layout.placement == PlacementType::Line;
+    const bool iconAlongLine =
+        layout.icon.rotation_alignment == RotationAlignmentType::Map &&
+        layout.placement == PlacementType::Line;
+        */
 
     for (SymbolInstance &symbolInstance : symbolInstances) {
 
         const bool hasText = symbolInstance.hasText;
         const bool hasIcon = symbolInstance.hasIcon;
 
-        float glyphScale = 0.5f;
-        float iconScale = 0.5f;
+        const bool iconWithoutText = layout.text.optional || !hasText;
+        const bool textWithoutIcon = layout.icon.optional || !hasIcon;
 
-        /*
-           if (!iconWithoutText && !textWithoutIcon) {
-           iconScale = glyphScale = util::max(iconScale, glyphScale);
-           } else if (!textWithoutIcon && glyphScale) {
-           glyphScale = util::max(iconScale, glyphScale);
-           } else if (!iconWithoutText && iconScale) {
-           iconScale = util::max(iconScale, glyphScale);
-           }
-        */
 
-        // Insert final placement into collision tree and add glyphs/icons to buffers
-        if (hasText && std::isfinite(glyphScale)) {
-            addSymbols<TextBuffer, TextElementGroup>(text, symbolInstance.glyphQuads, glyphScale);
+        // Calculate the scales at which the text and icon can be placed without collision.
+
+        float glyphScale = hasText && !layout.text.allow_overlap ?
+            collision.placeFeature(symbolInstance.textCollisionFeature) : collision.minScale;
+        float iconScale = hasIcon && !layout.icon.allow_overlap ?
+            collision.placeFeature(symbolInstance.iconCollisionFeature) : collision.minScale;
+
+        //if (glyphScale) fprintf(stderr, "glyphScale %f\n", glyphScale);
+
+        // Combine the scales for icons and text.
+
+        if (!iconWithoutText && !textWithoutIcon) {
+            iconScale = glyphScale = util::max(iconScale, glyphScale);
+        } else if (!textWithoutIcon && glyphScale) {
+            glyphScale = util::max(iconScale, glyphScale);
+        } else if (!iconWithoutText && iconScale) {
+            iconScale = util::max(iconScale, glyphScale);
         }
 
-        if (hasIcon && std::isfinite(iconScale)) {
-            addSymbols<IconBuffer, IconElementGroup>(icon, symbolInstance.iconQuads, iconScale);
+
+        // Insert final placement into collision tree and add glyphs/icons to buffers
+
+        if (hasText) {
+            if (!layout.text.ignore_placement) {
+                collision.insertFeature(symbolInstance.textCollisionFeature, glyphScale);
+            }
+            if (glyphScale < collision.maxScale) {
+                addSymbols<TextBuffer, TextElementGroup>(text, symbolInstance.glyphQuads, glyphScale);
+            }
+        }
+
+        if (hasIcon) {
+            if (!layout.icon.ignore_placement) {
+                collision.insertFeature(symbolInstance.iconCollisionFeature, iconScale);
+            }
+            if (iconScale < collision.maxScale) {
+                addSymbols<IconBuffer, IconElementGroup>(icon, symbolInstance.iconQuads, iconScale);
+            }
         }
     }
 

@@ -3,9 +3,6 @@
 
 namespace mbgl {
 
-const float minScale = 0.5f;
-const float maxScale = 2.0f;
-
 void CollisionTile::reset(const float _angle, const float pitch) {
     tree.clear();
     angle = _angle;
@@ -23,7 +20,7 @@ void CollisionTile::reset(const float _angle, const float pitch) {
     yStretch = std::pow(_yStretch, 1.3);
 }
 
-float CollisionTile::placeFeature(CollisionFeature &feature) {
+float CollisionTile::placeFeature(const CollisionFeature &feature) {
 
     float minPlacementScale = minScale;
 
@@ -47,7 +44,7 @@ float CollisionTile::placeFeature(CollisionFeature &feature) {
             if (std::isnan(s1) || std::isnan(s2)) s1 = s2 = 1;
             if (std::isnan(s3) || std::isnan(s4)) s3 = s4 = 1;
 
-            float collisionFreeScale = std::fmin(std::fmax(s1, s3), std::fmax(s3, s4));
+            float collisionFreeScale = std::fmin(std::fmax(s1, s2), std::fmax(s3, s4));
 
             if (collisionFreeScale > blocking.maxScale) {
                 // After a box's maxScale the label has shrunk enough that the box is no longer needed to cover it,

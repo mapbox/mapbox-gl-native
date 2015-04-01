@@ -6,6 +6,8 @@ CollisionFeature::CollisionFeature(const std::vector<Coordinate> &line, const An
         const float top, const float bottom, const float left, const float right,
         const float boxScale, const float padding, const bool alongLine) {
 
+    if (top == 0 && bottom == 0 && left == 0 && right == 0) return;
+
     const float y1 = top * boxScale - padding;
     const float y2 = bottom * boxScale + padding;
     const float x1 = left * boxScale - padding;

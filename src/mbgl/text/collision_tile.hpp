@@ -35,15 +35,18 @@ class CollisionTile {
 
     public:
     inline explicit CollisionTile(float _zoom, float tileExtent, float tileSize) :
-        zoom(_zoom), tilePixelRatio(tileExtent / tileSize) {}
+        zoom(_zoom), tilePixelRatio(tileExtent / tileSize) { reset(0, 0); }
 
     void reset(const float angle, const float pitch);
-    float placeFeature(CollisionFeature &feature);
+    float placeFeature(const CollisionFeature &feature);
     void insertFeature(CollisionFeature &feature, const float minPlacementScale);
 
     const float zoom;
     const float tilePixelRatio;
     float angle = 0;
+
+    const float minScale = 0.5f;
+    const float maxScale = 2.0f;
 
     private:
 

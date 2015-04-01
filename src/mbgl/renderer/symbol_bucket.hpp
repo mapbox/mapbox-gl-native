@@ -27,7 +27,7 @@ class SDFShader;
 class IconShader;
 class CollisionBoxShader;
 class DotShader;
-class Collision;
+class CollisionTile;
 class SpriteAtlas;
 class Sprite;
 class GlyphAtlas;
@@ -55,8 +55,8 @@ class SymbolInstance {
         const bool hasIcon;
         const PlacedGlyphs glyphQuads;
         const PlacedGlyphs iconQuads;
-        const CollisionFeature textCollisionFeature;
-        const CollisionFeature iconCollisionFeature;
+        CollisionFeature textCollisionFeature;
+        CollisionFeature iconCollisionFeature;
 };
 
 class SymbolBucket : public Bucket {
@@ -65,7 +65,7 @@ class SymbolBucket : public Bucket {
     typedef ElementGroup<1> CollisionBoxElementGroup;
 
 public:
-    SymbolBucket(std::unique_ptr<const StyleLayoutSymbol> styleLayout, Collision &collision);
+    SymbolBucket(std::unique_ptr<const StyleLayoutSymbol> styleLayout, CollisionTile &collision);
     ~SymbolBucket() override;
 
     void render(Painter &painter, const StyleLayer &layer_desc, const Tile::ID &id,
@@ -109,7 +109,7 @@ public:
     bool sdfIcons = false;
 
 private:
-    Collision &collision;
+    CollisionTile &collision;
     std::vector<SymbolInstance> symbolInstances;
 
     struct TextBuffer {

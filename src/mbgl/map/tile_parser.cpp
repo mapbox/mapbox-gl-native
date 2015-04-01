@@ -14,7 +14,7 @@
 #include <mbgl/util/token.hpp>
 #include <mbgl/geometry/glyph_atlas.hpp>
 #include <mbgl/text/glyph_store.hpp>
-#include <mbgl/text/collision.hpp>
+#include <mbgl/text/collision_tile.hpp>
 #include <mbgl/text/glyph.hpp>
 #include <mbgl/map/map.hpp>
 #include <mbgl/util/std.hpp>
@@ -43,7 +43,7 @@ TileParser::TileParser(const GeometryTile& geometryTile_,
       glyphStore(glyphStore_),
       spriteAtlas(spriteAtlas_),
       sprite(sprite_),
-      collision(util::make_unique<Collision>(tile.id.z, 4096, tile.source.tile_size, tile.depth)) {
+      collision(util::make_unique<CollisionTile>(tile.id.z, 4096, tile.source.tile_size)) {
     assert(style);
     assert(sprite);
     assert(collision);

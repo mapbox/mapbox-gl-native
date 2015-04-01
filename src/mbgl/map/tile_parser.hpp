@@ -30,7 +30,7 @@ class StyleLayoutLine;
 class StyleLayoutSymbol;
 class StyleLayerGroup;
 class VectorTileData;
-class Collision;
+class CollisionTile;
 
 class TileParser : private util::noncopyable {
 public:
@@ -69,7 +69,7 @@ private:
     SpriteAtlas& spriteAtlas;
     util::ptr<Sprite> sprite;
 
-    std::unique_ptr<Collision> collision;
+    std::unique_ptr<CollisionTile> collision;
 };
 
 }
