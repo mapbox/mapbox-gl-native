@@ -302,14 +302,12 @@ void SymbolBucket::placeFeatures() {
 
     auto &layout = *styleLayout;
 
-    /*
     const bool textAlongLine =
         layout.text.rotation_alignment == RotationAlignmentType::Map &&
         layout.placement == PlacementType::Line;
     const bool iconAlongLine =
         layout.icon.rotation_alignment == RotationAlignmentType::Map &&
         layout.placement == PlacementType::Line;
-        */
 
     for (SymbolInstance &symbolInstance : symbolInstances) {
 
@@ -327,7 +325,6 @@ void SymbolBucket::placeFeatures() {
         float iconScale = hasIcon && !layout.icon.allow_overlap ?
             collision.placeFeature(symbolInstance.iconCollisionFeature) : collision.minScale;
 
-        //if (glyphScale) fprintf(stderr, "glyphScale %f\n", glyphScale);
 
         // Combine the scales for icons and text.
 
@@ -347,7 +344,7 @@ void SymbolBucket::placeFeatures() {
                 collision.insertFeature(symbolInstance.textCollisionFeature, glyphScale);
             }
             if (glyphScale < collision.maxScale) {
-                addSymbols<TextBuffer, TextElementGroup>(text, symbolInstance.glyphQuads, glyphScale);
+                addSymbols<TextBuffer, TextElementGroup>(text, symbolInstance.glyphQuads, glyphScale, layout.text.keep_upright, textAlongLine);
             }
         }
 
@@ -356,7 +353,7 @@ void SymbolBucket::placeFeatures() {
                 collision.insertFeature(symbolInstance.iconCollisionFeature, iconScale);
             }
             if (iconScale < collision.maxScale) {
-                addSymbols<IconBuffer, IconElementGroup>(icon, symbolInstance.iconQuads, iconScale);
+                addSymbols<IconBuffer, IconElementGroup>(icon, symbolInstance.iconQuads, iconScale, layout.icon.keep_upright, iconAlongLine);
             }
         }
     }
@@ -365,7 +362,7 @@ void SymbolBucket::placeFeatures() {
 }
 
 template <typename Buffer, typename GroupType>
-void SymbolBucket::addSymbols(Buffer &buffer, const PlacedGlyphs &symbols, float scale) {
+void SymbolBucket::addSymbols(Buffer &buffer, const PlacedGlyphs &symbols, float scale, const bool keepUpright, const bool alongLine) {
     const float zoom = collision.zoom;
 
     const float placementZoom = std::log(scale) / std::log(2) + zoom;
@@ -381,6 +378,11 @@ void SymbolBucket::addSymbols(Buffer &buffer, const PlacedGlyphs &symbols, float
             util::max(static_cast<float>(zoom + log(symbol.minScale) / log(2)), placementZoom);
         float maxZoom = util::min(static_cast<float>(zoom + log(symbol.maxScale) / log(2)), 25.0f);
         const auto &glyphAnchor = symbol.anchor;
+
+        // drop upside down versions of glyphs
+        const float a = std::fmod(symbol.angle + collision.angle + M_PI, M_PI * 2);
+        if (keepUpright && alongLine && (a <= M_PI / 2 || a > M_PI * 3 / 2)) continue;
+
 
         if (maxZoom <= minZoom)
             continue;
