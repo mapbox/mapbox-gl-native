@@ -2,6 +2,7 @@
 #define MBGL_MAP_TRANSFORM
 
 #include <mbgl/map/transform_state.hpp>
+#include <mbgl/util/chrono.hpp>
 #include <mbgl/util/geo.hpp>
 #include <mbgl/util/noncopyable.hpp>
 #include <mbgl/util/vec.hpp>
@@ -10,7 +11,6 @@
 #include <cmath>
 #include <forward_list>
 #include <mutex>
-#include <chrono>
 
 namespace mbgl {
 
@@ -27,17 +27,17 @@ public:
                 uint16_t fb_width, uint16_t fb_height);
 
     // Position
-    void moveBy(double dx, double dy, std::chrono::steady_clock::duration duration = std::chrono::steady_clock::duration::zero());
-    void setLatLng(LatLng latLng, std::chrono::steady_clock::duration duration = std::chrono::steady_clock::duration::zero());
-    void setLatLngZoom(LatLng latLng, double zoom, std::chrono::steady_clock::duration duration = std::chrono::steady_clock::duration::zero());
+    void moveBy(double dx, double dy, Duration = Duration::zero());
+    void setLatLng(LatLng latLng, Duration = Duration::zero());
+    void setLatLngZoom(LatLng latLng, double zoom, Duration = Duration::zero());
     inline const LatLng getLatLng() const { return current.getLatLng(); }
     void startPanning();
     void stopPanning();
 
     // Zoom
-    void scaleBy(double ds, double cx = -1, double cy = -1, std::chrono::steady_clock::duration duration = std::chrono::steady_clock::duration::zero());
-    void setScale(double scale, double cx = -1, double cy = -1, std::chrono::steady_clock::duration duration = std::chrono::steady_clock::duration::zero());
-    void setZoom(double zoom, std::chrono::steady_clock::duration duration = std::chrono::steady_clock::duration::zero());
+    void scaleBy(double ds, double cx = -1, double cy = -1, Duration = Duration::zero());
+    void setScale(double scale, double cx = -1, double cy = -1, Duration = Duration::zero());
+    void setZoom(double zoom, Duration = Duration::zero());
     double getZoom() const;
     double getScale() const;
     void startScaling();
@@ -46,8 +46,8 @@ public:
     double getMaxZoom() const;
 
     // Angle
-    void rotateBy(double sx, double sy, double ex, double ey, std::chrono::steady_clock::duration duration = std::chrono::steady_clock::duration::zero());
-    void setAngle(double angle, std::chrono::steady_clock::duration duration = std::chrono::steady_clock::duration::zero());
+    void rotateBy(double sx, double sy, double ex, double ey, Duration = Duration::zero());
+    void setAngle(double angle, Duration = Duration::zero());
     void setAngle(double angle, double cx, double cy);
     double getAngle() const;
     void startRotating();
@@ -55,7 +55,7 @@ public:
 
     // Transitions
     bool needsTransition() const;
-    void updateTransitions(std::chrono::steady_clock::time_point now);
+    void updateTransitions(TimePoint now);
     void cancelTransitions();
 
     // Transform state
@@ -65,10 +65,10 @@ public:
 private:
     // Functions prefixed with underscores will *not* perform any locks. It is the caller's
     // responsibility to lock this object.
-    void _moveBy(double dx, double dy, std::chrono::steady_clock::duration duration = std::chrono::steady_clock::duration::zero());
-    void _setScale(double scale, double cx, double cy, std::chrono::steady_clock::duration duration = std::chrono::steady_clock::duration::zero());
-    void _setScaleXY(double new_scale, double xn, double yn, std::chrono::steady_clock::duration duration = std::chrono::steady_clock::duration::zero());
-    void _setAngle(double angle, std::chrono::steady_clock::duration duration = std::chrono::steady_clock::duration::zero());
+    void _moveBy(double dx, double dy, Duration = Duration::zero());
+    void _setScale(double scale, double cx, double cy, Duration = Duration::zero());
+    void _setScaleXY(double new_scale, double xn, double yn, Duration = Duration::zero());
+    void _setAngle(double angle, Duration = Duration::zero());
     void _clearPanning();
     void _clearRotating();
     void _clearScaling();

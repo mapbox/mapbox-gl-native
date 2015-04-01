@@ -1,7 +1,7 @@
 #ifndef MBGL_MAP_VIEW
 #define MBGL_MAP_VIEW
 
-#include <chrono>
+#include <mbgl/util/chrono.hpp>
 
 namespace mbgl {
 
@@ -45,7 +45,7 @@ public:
     // Must not be called from the render thread.
     virtual void notifyMapChange(
         MapChange change,
-        std::chrono::steady_clock::duration delay = std::chrono::steady_clock::duration::zero());
+        Duration delay = Duration::zero());
 
 protected:
     // Resizes the view

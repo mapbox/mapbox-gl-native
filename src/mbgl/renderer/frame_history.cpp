@@ -3,11 +3,11 @@
 using namespace mbgl;
 
 // Record frame history that will be used to calculate fading params
-void FrameHistory::record(std::chrono::steady_clock::time_point now, float zoom) {
+void FrameHistory::record(TimePoint now, float zoom) {
     // first frame ever
     if (!history.size()) {
-        history.emplace_back(FrameSnapshot{std::chrono::steady_clock::time_point::min(), zoom});
-        history.emplace_back(FrameSnapshot{std::chrono::steady_clock::time_point::min(), zoom});
+        history.emplace_back(FrameSnapshot{TimePoint::min(), zoom});
+        history.emplace_back(FrameSnapshot{TimePoint::min(), zoom});
     }
 
     if (history.size() > 0 || history.back().z != zoom) {
@@ -15,7 +15,7 @@ void FrameHistory::record(std::chrono::steady_clock::time_point now, float zoom)
     }
 }
 
-bool FrameHistory::needsAnimation(const std::chrono::steady_clock::duration duration) const {
+bool FrameHistory::needsAnimation(const Duration duration) const {
     if (!history.size()) {
         return false;
     }
@@ -47,9 +47,8 @@ bool FrameHistory::needsAnimation(const std::chrono::steady_clock::duration dura
     return false;
 }
 
-FadeProperties FrameHistory::getFadeProperties(std::chrono::steady_clock::duration duration)
-{
-    const std::chrono::steady_clock::time_point currentTime = std::chrono::steady_clock::now();
+FadeProperties FrameHistory::getFadeProperties(Duration duration) {
+    const TimePoint currentTime = Clock::now();
 
     // Remove frames until only one is outside the duration, or until there are only three
     while (history.size() > 3 && history[1].now + duration < currentTime) {

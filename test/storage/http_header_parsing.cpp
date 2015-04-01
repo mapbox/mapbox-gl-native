@@ -3,6 +3,7 @@
 #include <uv.h>
 
 #include <mbgl/storage/default_file_source.hpp>
+#include <mbgl/util/chrono.hpp>
 
 #include <cmath>
 
@@ -29,7 +30,7 @@ TEST_F(Storage, HTTPHeaderParsing) {
     });
 
     int64_t now = std::chrono::duration_cast<std::chrono::seconds>(
-                       std::chrono::system_clock::now().time_since_epoch()).count();
+                       SystemClock::now().time_since_epoch()).count();
 
     fs.request({ Resource::Unknown, "http://127.0.0.1:3000/test?cachecontrol=max-age=120" },
                uv_default_loop(), env, [&](const Response &res) {

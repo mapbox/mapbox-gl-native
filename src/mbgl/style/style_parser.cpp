@@ -385,7 +385,7 @@ std::tuple<bool, Function<T>> StyleParser::parseFunction(JSVal value, const char
 }
 
 template <typename T>
-std::tuple<bool, PiecewiseConstantFunction<T>> StyleParser::parsePiecewiseConstantFunction(JSVal value, std::chrono::steady_clock::duration duration) {
+std::tuple<bool, PiecewiseConstantFunction<T>> StyleParser::parsePiecewiseConstantFunction(JSVal value, Duration duration) {
     if (!value.HasMember("stops")) {
         Log::Warning(Event::ParseStyle, "function must specify a function type");
         return std::tuple<bool, PiecewiseConstantFunction<T>> { false, {} };
@@ -577,7 +577,7 @@ template<> std::tuple<bool, PropertyTransition> StyleParser::parseProperty(JSVal
         }
     }
 
-    if (transition.duration == std::chrono::steady_clock::duration::zero() && transition.delay == std::chrono::steady_clock::duration::zero()) {
+    if (transition.duration == Duration::zero() && transition.delay == Duration::zero()) {
         return std::tuple<bool, PropertyTransition> { false, std::move(transition) };
     }
 
@@ -642,7 +642,7 @@ template<> std::tuple<bool, Function<Color>> StyleParser::parseProperty(JSVal va
 }
 
 template<> std::tuple<bool, PiecewiseConstantFunction<Faded<std::vector<float>>>> StyleParser::parseProperty(JSVal value, const char *property_name, JSVal transition) {
-    std::chrono::steady_clock::duration duration = std::chrono::milliseconds(300);
+    Duration duration = std::chrono::milliseconds(300);
     if (transition.HasMember("duration")) {
         duration = std::chrono::milliseconds(transition["duration"].GetUint());
     }
@@ -662,7 +662,7 @@ template<> std::tuple<bool, PiecewiseConstantFunction<Faded<std::vector<float>>>
 
 template<> std::tuple<bool, PiecewiseConstantFunction<Faded<std::string>>> StyleParser::parseProperty(JSVal value, const char *property_name, JSVal transition) {
 
-    std::chrono::steady_clock::duration duration = std::chrono::milliseconds(300);
+    Duration duration = std::chrono::milliseconds(300);
     if (transition.HasMember("duration")) {
         duration = std::chrono::milliseconds(transition["duration"].GetUint());
     }

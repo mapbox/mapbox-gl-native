@@ -2,6 +2,7 @@
 #define MBGL_MAP_MAP
 
 #include <mbgl/map/transform.hpp>
+#include <mbgl/util/chrono.hpp>
 #include <mbgl/util/geo.hpp>
 #include <mbgl/util/projection.hpp>
 #include <mbgl/util/noncopyable.hpp>
@@ -19,7 +20,6 @@
 #include <mutex>
 #include <condition_variable>
 #include <functional>
-#include <chrono>
 
 namespace mbgl {
 
@@ -99,8 +99,8 @@ public:
     void setClasses(const std::vector<std::string>&);
     std::vector<std::string> getClasses() const;
 
-    void setDefaultTransitionDuration(std::chrono::steady_clock::duration duration = std::chrono::steady_clock::duration::zero());
-    std::chrono::steady_clock::duration getDefaultTransitionDuration();
+    void setDefaultTransitionDuration(Duration = Duration::zero());
+    Duration getDefaultTransitionDuration();
     void setStyleURL(const std::string& url);
     void setStyleJSON(const std::string& json, const std::string& base = "");
     std::string getStyleJSON() const;
@@ -109,20 +109,20 @@ public:
     void cancelTransitions();
 
     // Position
-    void moveBy(double dx, double dy, std::chrono::steady_clock::duration duration = std::chrono::steady_clock::duration::zero());
-    void setLatLng(LatLng latLng, std::chrono::steady_clock::duration duration = std::chrono::steady_clock::duration::zero());
+    void moveBy(double dx, double dy, Duration = Duration::zero());
+    void setLatLng(LatLng latLng, Duration = Duration::zero());
     LatLng getLatLng() const;
     void startPanning();
     void stopPanning();
     void resetPosition();
 
     // Scale
-    void scaleBy(double ds, double cx = -1, double cy = -1, std::chrono::steady_clock::duration duration = std::chrono::steady_clock::duration::zero());
-    void setScale(double scale, double cx = -1, double cy = -1, std::chrono::steady_clock::duration duration = std::chrono::steady_clock::duration::zero());
+    void scaleBy(double ds, double cx = -1, double cy = -1, Duration = Duration::zero());
+    void setScale(double scale, double cx = -1, double cy = -1, Duration = Duration::zero());
     double getScale() const;
-    void setZoom(double zoom, std::chrono::steady_clock::duration duration = std::chrono::steady_clock::duration::zero());
+    void setZoom(double zoom, Duration = Duration::zero());
     double getZoom() const;
-    void setLatLngZoom(LatLng latLng, double zoom, std::chrono::steady_clock::duration duration = std::chrono::steady_clock::duration::zero());
+    void setLatLngZoom(LatLng latLng, double zoom, Duration = Duration::zero());
     void resetZoom();
     void startScaling();
     void stopScaling();
@@ -130,8 +130,8 @@ public:
     double getMaxZoom() const;
 
     // Rotation
-    void rotateBy(double sx, double sy, double ex, double ey, std::chrono::steady_clock::duration duration = std::chrono::steady_clock::duration::zero());
-    void setBearing(double degrees, std::chrono::steady_clock::duration duration = std::chrono::steady_clock::duration::zero());
+    void rotateBy(double sx, double sy, double ex, double ey, Duration = Duration::zero());
+    void setBearing(double degrees, Duration = Duration::zero());
     void setBearing(double degrees, double cx, double cy);
     double getBearing() const;
     void resetNorth();
@@ -168,7 +168,7 @@ public:
     bool getDebug() const;
 
     inline const TransformState &getState() const { return state; }
-    std::chrono::steady_clock::time_point getTime() const;
+    TimePoint getTime() const;
     inline AnnotationManager& getAnnotationManager() const { return *annotationManager; }
 
 private:

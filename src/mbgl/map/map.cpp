@@ -456,12 +456,12 @@ void Map::cancelTransitions() {
 
 #pragma mark - Position
 
-void Map::moveBy(double dx, double dy, std::chrono::steady_clock::duration duration) {
+void Map::moveBy(double dx, double dy, Duration duration) {
     transform.moveBy(dx, dy, duration);
     triggerUpdate();
 }
 
-void Map::setLatLng(LatLng latLng, std::chrono::steady_clock::duration duration) {
+void Map::setLatLng(LatLng latLng, Duration duration) {
     transform.setLatLng(latLng, duration);
     triggerUpdate();
 }
@@ -490,12 +490,12 @@ void Map::resetPosition() {
 
 #pragma mark - Scale
 
-void Map::scaleBy(double ds, double cx, double cy, std::chrono::steady_clock::duration duration) {
+void Map::scaleBy(double ds, double cx, double cy, Duration duration) {
     transform.scaleBy(ds, cx, cy, duration);
     triggerUpdate();
 }
 
-void Map::setScale(double scale, double cx, double cy, std::chrono::steady_clock::duration duration) {
+void Map::setScale(double scale, double cx, double cy, Duration duration) {
     transform.setScale(scale, cx, cy, duration);
     triggerUpdate();
 }
@@ -504,7 +504,7 @@ double Map::getScale() const {
     return transform.getScale();
 }
 
-void Map::setZoom(double zoom, std::chrono::steady_clock::duration duration) {
+void Map::setZoom(double zoom, Duration duration) {
     transform.setZoom(zoom, duration);
     triggerUpdate();
 }
@@ -513,7 +513,7 @@ double Map::getZoom() const {
     return transform.getZoom();
 }
 
-void Map::setLatLngZoom(LatLng latLng, double zoom, std::chrono::steady_clock::duration duration) {
+void Map::setLatLngZoom(LatLng latLng, double zoom, Duration duration) {
     transform.setLatLngZoom(latLng, zoom, duration);
     triggerUpdate();
 }
@@ -543,12 +543,12 @@ double Map::getMaxZoom() const {
 
 #pragma mark - Rotation
 
-void Map::rotateBy(double sx, double sy, double ex, double ey, std::chrono::steady_clock::duration duration) {
+void Map::rotateBy(double sx, double sy, double ex, double ey, Duration duration) {
     transform.rotateBy(sx, sy, ex, ey, duration);
     triggerUpdate();
 }
 
-void Map::setBearing(double degrees, std::chrono::steady_clock::duration duration) {
+void Map::setBearing(double degrees, Duration duration) {
     transform.setAngle(-degrees * M_PI / 180, duration);
     triggerUpdate();
 }
@@ -671,7 +671,7 @@ bool Map::getDebug() const {
     return data->getDebug();
 }
 
-std::chrono::steady_clock::time_point Map::getTime() const {
+TimePoint Map::getTime() const {
     return data->getAnimationTime();
 }
 
@@ -700,14 +700,14 @@ std::vector<std::string> Map::getClasses() const {
     return data->getClasses();
 }
 
-void Map::setDefaultTransitionDuration(std::chrono::steady_clock::duration duration) {
+void Map::setDefaultTransitionDuration(Duration duration) {
     assert(Environment::currentlyOn(ThreadType::Main));
 
     data->setDefaultTransitionDuration(duration);
     triggerUpdate(Update::DefaultTransitionDuration);
 }
 
-std::chrono::steady_clock::duration Map::getDefaultTransitionDuration() {
+Duration Map::getDefaultTransitionDuration() {
     assert(Environment::currentlyOn(ThreadType::Main));
     return data->getDefaultTransitionDuration();
 }
@@ -829,7 +829,7 @@ void Map::prepare() {
 
     // Update transform transitions.
 
-    const auto animationTime = std::chrono::steady_clock::now();
+    const auto animationTime = Clock::now();
     data->setAnimationTime(animationTime);
     if (transform.needsTransition()) {
         transform.updateTransitions(animationTime);

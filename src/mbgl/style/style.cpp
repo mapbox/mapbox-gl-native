@@ -26,14 +26,14 @@ Style::Style()
 Style::~Style() {}
 
 void Style::cascade(const std::vector<std::string>& classes) {
-    std::chrono::steady_clock::time_point now = std::chrono::steady_clock::now();
+    TimePoint now = Clock::now();
 
     for (const auto& layer : layers) {
         layer->setClasses(classes, now, defaultTransition);
     }
 }
 
-void Style::recalculate(float z, std::chrono::steady_clock::time_point now) {
+void Style::recalculate(float z, TimePoint now) {
     uv::writelock lock(mtx);
 
     zoomHistory.update(z, now);
@@ -47,7 +47,7 @@ const std::string &Style::getSpriteURL() const {
     return sprite_url;
 }
 
-void Style::setDefaultTransitionDuration(std::chrono::steady_clock::duration duration) {
+void Style::setDefaultTransitionDuration(Duration duration) {
     defaultTransition.duration = duration;
 }
 

@@ -216,7 +216,7 @@ void Painter::prepareTile(const Tile& tile) {
 }
 
 void Painter::render(const Style& style, const std::set<util::ptr<StyleSource>>& sources,
-                     TransformState state_, std::chrono::steady_clock::time_point time) {
+                     TransformState state_, TimePoint time) {
     state = state_;
 
     clear();

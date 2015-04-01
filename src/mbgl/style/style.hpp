@@ -7,11 +7,11 @@
 #include <mbgl/util/uv.hpp>
 #include <mbgl/util/ptr.hpp>
 #include <mbgl/util/noncopyable.hpp>
+#include <mbgl/util/chrono.hpp>
 
 #include <cstdint>
 #include <string>
 #include <vector>
-#include <chrono>
 
 namespace mbgl {
 
@@ -25,9 +25,9 @@ public:
     void loadJSON(const uint8_t *const data);
 
     void cascade(const std::vector<std::string>&);
-    void recalculate(float z, std::chrono::steady_clock::time_point now);
+    void recalculate(float z, TimePoint now);
 
-    void setDefaultTransitionDuration(std::chrono::steady_clock::duration);
+    void setDefaultTransitionDuration(Duration);
     bool hasTransitions() const;
 
     const std::string &getSpriteURL() const;

@@ -25,7 +25,7 @@ public:
     void notify() override;
     void invalidate() override;
 
-    void notifyMapChange(mbgl::MapChange change, std::chrono::steady_clock::duration delay = std::chrono::steady_clock::duration::zero()) override;
+    void notifyMapChange(mbgl::MapChange change, Duration delay = Duration::zero()) override;
 
     mbgl::Map &getMap();
     mbgl::DefaultFileSource &getFileSource();
