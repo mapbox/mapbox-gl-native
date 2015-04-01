@@ -4,7 +4,8 @@
 #include <mbgl/util/mat4.hpp>
 #include <mbgl/util/std.hpp>
 #include <mbgl/util/math.hpp>
-#include <mbgl/util/transition.hpp>
+#include <mbgl/util/unitbezier.hpp>
+#include <mbgl/util/interpolate.hpp>
 #include <mbgl/platform/platform.hpp>
 
 #include <cstdio>
@@ -66,12 +67,19 @@ void Transform::_moveBy(const double dx, const double dy, const Duration duratio
         current.x = final.x;
         current.y = final.y;
     } else {
-        // Use a common start time for all of the transitions to avoid divergent transitions.
-        TimePoint start = Clock::now();
-        transitions.emplace_front(
-            std::make_shared<util::ease_transition<double>>(current.x, final.x, current.x, start, duration));
-        transitions.emplace_front(
-            std::make_shared<util::ease_transition<double>>(current.y, final.y, current.y, start, duration));
+        const double startX = current.x;
+        const double startY = current.y;
+        current.panning = true;
+
+        startTransition(
+            [=](double t) {
+                current.x = util::interpolate(startX, final.x, t);
+                current.y = util::interpolate(startY, final.y, t);
+                return Update::Nothing;
+            },
+            [=] {
+                current.panning = false;
+            }, duration);
     }
 
     view.notifyMapChange(duration != Duration::zero() ?
@@ -110,31 +118,6 @@ void Transform::setLatLngZoom(const LatLng latLng, const double zoom, const Dura
     _setScaleXY(new_scale, xn, yn, duration);
 }
 
-void Transform::startPanning() {
-    std::lock_guard<std::recursive_mutex> lock(mtx);
-
-    _clearPanning();
-
-    // Add a 200ms timeout for resetting this to false
-    current.panning = true;
-    TimePoint start = Clock::now();
-    pan_timeout = std::make_shared<util::timeout<bool>>(false, current.panning, start, std::chrono::milliseconds(200));
-    transitions.emplace_front(pan_timeout);
-}
-
-void Transform::stopPanning() {
-    std::lock_guard<std::recursive_mutex> lock(mtx);
-
-    _clearPanning();
-}
-
-void Transform::_clearPanning() {
-    current.panning = false;
-    if (pan_timeout) {
-        transitions.remove(pan_timeout);
-        pan_timeout.reset();
-    }
-}
 
 #pragma mark - Zoom
 
@@ -177,24 +160,6 @@ double Transform::getScale() const {
     return final.scale;
 }
 
-void Transform::startScaling() {
-    std::lock_guard<std::recursive_mutex> lock(mtx);
-
-    _clearScaling();
-
-    // Add a 200ms timeout for resetting this to false
-    current.scaling = true;
-    TimePoint start = Clock::now();
-    scale_timeout = std::make_shared<util::timeout<bool>>(false, current.scaling, start, std::chrono::milliseconds(200));
-    transitions.emplace_front(scale_timeout);
-}
-
-void Transform::stopScaling() {
-    std::lock_guard<std::recursive_mutex> lock(mtx);
-
-    _clearScaling();
-}
-
 double Transform::getMinZoom() const {
     double test_scale = current.scale;
     double test_y = current.y;
@@ -205,16 +170,6 @@ double Transform::getMinZoom() const {
 
 double Transform::getMaxZoom() const {
     return std::log2(max_scale);
-}
-
-void Transform::_clearScaling() {
-    // This is only called internally, so we don't need a lock here.
-
-    current.scaling = false;
-    if (scale_timeout) {
-        transitions.remove(scale_timeout);
-        scale_timeout.reset();
-    }
 }
 
 void Transform::_setScale(double new_scale, double cx, double cy, const Duration duration) {
@@ -269,14 +224,23 @@ void Transform::_setScaleXY(const double new_scale, const double xn, const doubl
         current.x = final.x;
         current.y = final.y;
     } else {
-        // Use a common start time for all of the transitions to avoid divergent transitions.
-        TimePoint start = Clock::now();
-        transitions.emplace_front(std::make_shared<util::ease_transition<double>>(
-            current.scale, final.scale, current.scale, start, duration));
-        transitions.emplace_front(
-            std::make_shared<util::ease_transition<double>>(current.x, final.x, current.x, start, duration));
-        transitions.emplace_front(
-            std::make_shared<util::ease_transition<double>>(current.y, final.y, current.y, start, duration));
+        const double startS = current.scale;
+        const double startX = current.x;
+        const double startY = current.y;
+        current.panning = true;
+        current.scaling = true;
+
+        startTransition(
+            [=](double t) {
+                current.scale = util::interpolate(startS, final.scale, t);
+                current.x = util::interpolate(startX, final.x, t);
+                current.y = util::interpolate(startY, final.y, t);
+                return Update::Zoom;
+            },
+            [=] {
+                current.panning = false;
+                current.scaling = false;
+            }, duration);
     }
 
     const double s = final.scale * util::tileSize;
@@ -376,9 +340,17 @@ void Transform::_setAngle(double new_angle, const Duration duration) {
     if (duration == Duration::zero()) {
         current.angle = final.angle;
     } else {
-        TimePoint start = Clock::now();
-        transitions.emplace_front(std::make_shared<util::ease_transition<double>>(
-            current.angle, final.angle, current.angle, start, duration));
+        const double startA = current.angle;
+        current.rotating = true;
+
+        startTransition(
+            [=](double t) {
+                current.angle = util::interpolate(startA, final.angle, t);
+                return Update::Nothing;
+            },
+            [=] {
+                current.rotating = false;
+            }, duration);
     }
 
     view.notifyMapChange(duration != Duration::zero() ?
@@ -393,55 +365,61 @@ double Transform::getAngle() const {
     return final.angle;
 }
 
-void Transform::startRotating() {
-    std::lock_guard<std::recursive_mutex> lock(mtx);
-
-    _clearRotating();
-
-    // Add a 200ms timeout for resetting this to false
-    current.rotating = true;
-    TimePoint start = Clock::now();
-    rotate_timeout = std::make_shared<util::timeout<bool>>(false, current.rotating, start, std::chrono::milliseconds(200));
-    transitions.emplace_front(rotate_timeout);
-}
-
-void Transform::stopRotating() {
-    std::lock_guard<std::recursive_mutex> lock(mtx);
-
-    _clearRotating();
-}
-
-void Transform::_clearRotating() {
-    // This is only called internally, so we don't need a lock here.
-
-    current.rotating = false;
-    if (rotate_timeout) {
-        transitions.remove(rotate_timeout);
-        rotate_timeout.reset();
-    }
-}
-
 
 #pragma mark - Transition
 
-bool Transform::needsTransition() const {
-    std::lock_guard<std::recursive_mutex> lock(mtx);
+void Transform::startTransition(std::function<Update(double)> frame,
+                                std::function<void()> finish,
+                                Duration duration) {
+    if (transitionFinishFn) {
+        transitionFinishFn();
+    }
 
-    return !transitions.empty();
+    transitionStart = Clock::now();
+    transitionDuration = duration;
+
+    transitionFrameFn = [frame, this](TimePoint now) {
+        float t = std::chrono::duration<float>(now - transitionStart) / transitionDuration;
+        if (t >= 1.0) {
+            Update result = frame(1.0);
+            transitionFinishFn();
+            transitionFrameFn = nullptr;
+            transitionFinishFn = nullptr;
+            return result;
+        } else {
+            util::UnitBezier ease(0, 0, 0.25, 1);
+            return frame(ease.solve(t, 0.001));
+        }
+    };
+
+    transitionFinishFn = finish;
 }
 
-void Transform::updateTransitions(const TimePoint now) {
+bool Transform::needsTransition() const {
     std::lock_guard<std::recursive_mutex> lock(mtx);
+    return !!transitionFrameFn;
+}
 
-    transitions.remove_if([now](const util::ptr<util::transition> &transition) {
-        return transition->update(now) == util::transition::complete;
-    });
+UpdateType Transform::updateTransitions(const TimePoint now) {
+    std::lock_guard<std::recursive_mutex> lock(mtx);
+    return static_cast<UpdateType>(transitionFrameFn ? transitionFrameFn(now) : Update::Nothing);
 }
 
 void Transform::cancelTransitions() {
     std::lock_guard<std::recursive_mutex> lock(mtx);
 
-    transitions.clear();
+    if (transitionFinishFn) {
+        transitionFinishFn();
+    }
+
+    transitionFrameFn = nullptr;
+    transitionFinishFn = nullptr;
+}
+
+void Transform::setGestureInProgress(bool inProgress) {
+    std::lock_guard<std::recursive_mutex> lock(mtx);
+
+    current.gestureInProgress = inProgress;
 }
 
 #pragma mark - Transform state

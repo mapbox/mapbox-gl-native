@@ -7,7 +7,6 @@
 #include <mbgl/renderer/painter.hpp>
 #include <mbgl/map/annotation.hpp>
 #include <mbgl/map/sprite.hpp>
-#include <mbgl/util/transition.hpp>
 #include <mbgl/util/math.hpp>
 #include <mbgl/util/clip_ids.hpp>
 #include <mbgl/util/string.hpp>
@@ -72,7 +71,8 @@ Map::Map(View& view_, FileSource& fileSource_)
       texturePool(std::make_shared<TexturePool>()),
       painter(util::make_unique<Painter>(*spriteAtlas, *glyphAtlas, *lineAtlas)),
       annotationManager(util::make_unique<AnnotationManager>()),
-      data(util::make_unique<MapData>())
+      data(util::make_unique<MapData>()),
+      updated(static_cast<UpdateType>(Update::Nothing))
 {
     view.initialize(this);
 }
@@ -449,10 +449,13 @@ void Map::resize(uint16_t width, uint16_t height, float ratio, uint16_t fbWidth,
 
 void Map::cancelTransitions() {
     transform.cancelTransitions();
-
     triggerUpdate();
 }
 
+void Map::setGestureInProgress(bool inProgress) {
+    transform.setGestureInProgress(inProgress);
+    triggerUpdate();
+}
 
 #pragma mark - Position
 
@@ -470,21 +473,11 @@ LatLng Map::getLatLng() const {
     return state.getLatLng();
 }
 
-void Map::startPanning() {
-    transform.startPanning();
-    triggerUpdate();
-}
-
-void Map::stopPanning() {
-    transform.stopPanning();
-    triggerUpdate();
-}
-
 void Map::resetPosition() {
     transform.setAngle(0);
     transform.setLatLng(LatLng(0, 0));
     transform.setZoom(0);
-    triggerUpdate();
+    triggerUpdate(Update::Zoom);
 }
 
 
@@ -492,12 +485,12 @@ void Map::resetPosition() {
 
 void Map::scaleBy(double ds, double cx, double cy, Duration duration) {
     transform.scaleBy(ds, cx, cy, duration);
-    triggerUpdate();
+    triggerUpdate(Update::Zoom);
 }
 
 void Map::setScale(double scale, double cx, double cy, Duration duration) {
     transform.setScale(scale, cx, cy, duration);
-    triggerUpdate();
+    triggerUpdate(Update::Zoom);
 }
 
 double Map::getScale() const {
@@ -506,7 +499,7 @@ double Map::getScale() const {
 
 void Map::setZoom(double zoom, Duration duration) {
     transform.setZoom(zoom, duration);
-    triggerUpdate();
+    triggerUpdate(Update::Zoom);
 }
 
 double Map::getZoom() const {
@@ -515,21 +508,11 @@ double Map::getZoom() const {
 
 void Map::setLatLngZoom(LatLng latLng, double zoom, Duration duration) {
     transform.setLatLngZoom(latLng, zoom, duration);
-    triggerUpdate();
+    triggerUpdate(Update::Zoom);
 }
 
 void Map::resetZoom() {
     setZoom(0);
-}
-
-void Map::startScaling() {
-    transform.startScaling();
-    triggerUpdate();
-}
-
-void Map::stopScaling() {
-    transform.stopScaling();
-    triggerUpdate();
 }
 
 double Map::getMinZoom() const {
@@ -564,16 +547,6 @@ double Map::getBearing() const {
 
 void Map::resetNorth() {
     transform.setAngle(0, std::chrono::milliseconds(500));
-    triggerUpdate();
-}
-
-void Map::startRotating() {
-    transform.startRotating();
-    triggerUpdate();
-}
-
-void Map::stopRotating() {
-    transform.stopRotating();
     triggerUpdate();
 }
 
@@ -802,44 +775,49 @@ void Map::loadStyleJSON(const std::string& json, const std::string& base) {
     const std::string glyphURL = util::mapbox::normalizeGlyphsURL(style->glyph_url, getAccessToken());
     glyphStore->setURL(glyphURL);
 
-    triggerUpdate();
+    triggerUpdate(Update::Zoom);
 }
 
 void Map::prepare() {
     assert(Environment::currentlyOn(ThreadType::Map));
 
-    const auto u = updated.exchange(static_cast<UpdateType>(Update::Nothing));
-    if ((u & static_cast<UpdateType>(Update::StyleInfo)) || !style) {
-        reloadStyle();
-    }
-    if (u & static_cast<UpdateType>(Update::Debug)) {
-        assert(painter);
-        painter->setDebug(data->getDebug());
-    }
-    if (u & static_cast<UpdateType>(Update::DefaultTransitionDuration)) {
-        if (style) {
-            style->setDefaultTransitionDuration(data->getDefaultTransitionDuration());
-        }
-    }
-    if (u & static_cast<UpdateType>(Update::Classes)) {
-        if (style) {
-            style->cascade(data->getClasses());
-        }
-    }
+    const auto now = Clock::now();
+    data->setAnimationTime(now);
 
-    // Update transform transitions.
+    auto u = updated.exchange(static_cast<UpdateType>(Update::Nothing)) |
+             transform.updateTransitions(now);
 
-    const auto animationTime = Clock::now();
-    data->setAnimationTime(animationTime);
-    if (transform.needsTransition()) {
-        transform.updateTransitions(animationTime);
+    if (!style) {
+        u |= static_cast<UpdateType>(Update::StyleInfo);
     }
 
     state = transform.currentState();
 
+    if (u & static_cast<UpdateType>(Update::StyleInfo)) {
+        reloadStyle();
+    }
+
+    if (u & static_cast<UpdateType>(Update::Debug)) {
+        assert(painter);
+        painter->setDebug(data->getDebug());
+    }
+
     if (style) {
+        if (u & static_cast<UpdateType>(Update::DefaultTransitionDuration)) {
+            style->setDefaultTransitionDuration(data->getDefaultTransitionDuration());
+        }
+
+        if (u & static_cast<UpdateType>(Update::Classes)) {
+            style->cascade(data->getClasses());
+        }
+
+        if (u & static_cast<UpdateType>(Update::StyleInfo) ||
+            u & static_cast<UpdateType>(Update::Classes) ||
+            u & static_cast<UpdateType>(Update::Zoom)) {
+            style->recalculate(state.getNormalizedZoom(), now);
+        }
+
         updateSources();
-        style->recalculate(state.getNormalizedZoom(), animationTime);
 
         // Allow the sprite atlas to potentially pull new sprite images if needed.
         spriteAtlas->resize(state.getPixelRatio());
@@ -863,6 +841,7 @@ void Map::render() {
     assert(painter);
     painter->render(*style, activeSources,
                     state, data->getAnimationTime());
+
     // Schedule another rerender when we definitely need a next frame.
     if (transform.needsTransition() || style->hasTransitions()) {
         triggerUpdate();

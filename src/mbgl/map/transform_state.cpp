@@ -249,7 +249,7 @@ const LatLng TransformState::latLngForPixel(const vec2<double> pixel) const {
 #pragma mark - Changing
 
 bool TransformState::isChanging() const {
-    return rotating || scaling || panning;
+    return rotating || scaling || panning || gestureInProgress;
 }
 
 

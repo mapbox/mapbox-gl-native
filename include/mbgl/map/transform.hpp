@@ -3,6 +3,7 @@
 
 #include <mbgl/map/transform_state.hpp>
 #include <mbgl/util/chrono.hpp>
+#include <mbgl/map/update.hpp>
 #include <mbgl/util/geo.hpp>
 #include <mbgl/util/noncopyable.hpp>
 #include <mbgl/util/vec.hpp>
@@ -31,8 +32,6 @@ public:
     void setLatLng(LatLng latLng, Duration = Duration::zero());
     void setLatLngZoom(LatLng latLng, double zoom, Duration = Duration::zero());
     inline const LatLng getLatLng() const { return current.getLatLng(); }
-    void startPanning();
-    void stopPanning();
 
     // Zoom
     void scaleBy(double ds, double cx = -1, double cy = -1, Duration = Duration::zero());
@@ -40,8 +39,6 @@ public:
     void setZoom(double zoom, Duration = Duration::zero());
     double getZoom() const;
     double getScale() const;
-    void startScaling();
-    void stopScaling();
     double getMinZoom() const;
     double getMaxZoom() const;
 
@@ -50,13 +47,14 @@ public:
     void setAngle(double angle, Duration = Duration::zero());
     void setAngle(double angle, double cx, double cy);
     double getAngle() const;
-    void startRotating();
-    void stopRotating();
 
     // Transitions
     bool needsTransition() const;
-    void updateTransitions(TimePoint now);
+    UpdateType updateTransitions(TimePoint now);
     void cancelTransitions();
+
+    // Gesture
+    void setGestureInProgress(bool);
 
     // Transform state
     const TransformState currentState() const;
@@ -69,13 +67,9 @@ private:
     void _setScale(double scale, double cx, double cy, Duration = Duration::zero());
     void _setScaleXY(double new_scale, double xn, double yn, Duration = Duration::zero());
     void _setAngle(double angle, Duration = Duration::zero());
-    void _clearPanning();
-    void _clearRotating();
-    void _clearScaling();
 
     void constrain(double& scale, double& y) const;
 
-private:
     View &view;
 
     mutable std::recursive_mutex mtx;
@@ -92,10 +86,14 @@ private:
     const double min_scale = std::pow(2, 0);
     const double max_scale = std::pow(2, 18);
 
-    std::forward_list<util::ptr<util::transition>> transitions;
-    util::ptr<util::transition> scale_timeout;
-    util::ptr<util::transition> rotate_timeout;
-    util::ptr<util::transition> pan_timeout;
+    void startTransition(std::function<Update(double)> frame,
+                         std::function<void()> finish,
+                         Duration);
+
+    TimePoint transitionStart;
+    Duration transitionDuration;
+    std::function<Update(TimePoint)> transitionFrameFn;
+    std::function<void()> transitionFinishFn;
 };
 
 }

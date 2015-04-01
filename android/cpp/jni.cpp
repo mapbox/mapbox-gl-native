@@ -461,20 +461,6 @@ jobject JNICALL nativeGetLatLng(JNIEnv *env, jobject obj, jlong nativeMapViewPtr
     return ret;
 }
 
-void JNICALL nativeStartPanning(JNIEnv *env, jobject obj, jlong nativeMapViewPtr) {
-    mbgl::Log::Debug(mbgl::Event::JNI, "nativeStartPanning");
-    assert(nativeMapViewPtr != 0);
-    NativeMapView *nativeMapView = reinterpret_cast<NativeMapView *>(nativeMapViewPtr);
-    nativeMapView->getMap().startPanning();
-}
-
-void JNICALL nativeStopPanning(JNIEnv *env, jobject obj, jlong nativeMapViewPtr) {
-    mbgl::Log::Debug(mbgl::Event::JNI, "nativeStopPanning");
-    assert(nativeMapViewPtr != 0);
-    NativeMapView *nativeMapView = reinterpret_cast<NativeMapView *>(nativeMapViewPtr);
-    nativeMapView->getMap().stopPanning();
-}
-
 void JNICALL nativeResetPosition(JNIEnv *env, jobject obj, jlong nativeMapViewPtr) {
     mbgl::Log::Debug(mbgl::Event::JNI, "nativeResetPosition");
     assert(nativeMapViewPtr != 0);
@@ -570,20 +556,6 @@ void JNICALL nativeResetZoom(JNIEnv *env, jobject obj, jlong nativeMapViewPtr) {
     nativeMapView->getMap().resetZoom();
 }
 
-void JNICALL nativeStartScaling(JNIEnv *env, jobject obj, jlong nativeMapViewPtr) {
-    mbgl::Log::Debug(mbgl::Event::JNI, "nativeStartScaling");
-    assert(nativeMapViewPtr != 0);
-    NativeMapView *nativeMapView = reinterpret_cast<NativeMapView *>(nativeMapViewPtr);
-    nativeMapView->getMap().startScaling();
-}
-
-void JNICALL nativeStopScaling(JNIEnv *env, jobject obj, jlong nativeMapViewPtr) {
-    mbgl::Log::Debug(mbgl::Event::JNI, "nativeStopScaling");
-    assert(nativeMapViewPtr != 0);
-    NativeMapView *nativeMapView = reinterpret_cast<NativeMapView *>(nativeMapViewPtr);
-    return nativeMapView->getMap().stopScaling();
-}
-
 jdouble JNICALL nativeGetMinZoom(JNIEnv *env, jobject obj, jlong nativeMapViewPtr) {
     mbgl::Log::Debug(mbgl::Event::JNI, "nativeGetMinZoom");
     assert(nativeMapViewPtr != 0);
@@ -634,20 +606,6 @@ void JNICALL nativeResetNorth(JNIEnv *env, jobject obj, jlong nativeMapViewPtr) 
     assert(nativeMapViewPtr != 0);
     NativeMapView *nativeMapView = reinterpret_cast<NativeMapView *>(nativeMapViewPtr);
     nativeMapView->getMap().resetNorth();
-}
-
-void JNICALL nativeStartRotating(JNIEnv *env, jobject obj, jlong nativeMapViewPtr) {
-    mbgl::Log::Debug(mbgl::Event::JNI, "nativeStartRotating");
-    assert(nativeMapViewPtr != 0);
-    NativeMapView *nativeMapView = reinterpret_cast<NativeMapView *>(nativeMapViewPtr);
-    nativeMapView->getMap().startRotating();
-}
-
-void JNICALL nativeStopRotating(JNIEnv *env, jobject obj, jlong nativeMapViewPtr) {
-    mbgl::Log::Debug(mbgl::Event::JNI, "nativeStopRotating");
-    assert(nativeMapViewPtr != 0);
-    NativeMapView *nativeMapView = reinterpret_cast<NativeMapView *>(nativeMapViewPtr);
-    nativeMapView->getMap().stopRotating();
 }
 
 void JNICALL nativeSetDebug(JNIEnv *env, jobject obj, jlong nativeMapViewPtr, jboolean debug) {
@@ -1029,8 +987,6 @@ extern "C" JNIEXPORT jint JNICALL JNI_OnLoad(JavaVM *vm, void *reserved) {
          reinterpret_cast<void *>(&nativeSetLatLng)},
         {"nativeGetLatLng", "(J)Lcom/mapbox/mapboxgl/geometry/LatLng;",
          reinterpret_cast<void *>(&nativeGetLatLng)},
-        {"nativeStartPanning", "(J)V", reinterpret_cast<void *>(&nativeStartPanning)},
-        {"nativeStopPanning", "(J)V", reinterpret_cast<void *>(&nativeStopPanning)},
         {"nativeResetPosition", "(J)V", reinterpret_cast<void *>(&nativeResetPosition)},
         {"nativeScaleBy", "(JDDDJ)V", reinterpret_cast<void *>(&nativeScaleBy)},
         {"nativeSetScale", "(JDDDJ)V", reinterpret_cast<void *>(&nativeSetScale)},
@@ -1042,8 +998,6 @@ extern "C" JNIEXPORT jint JNICALL JNI_OnLoad(JavaVM *vm, void *reserved) {
         {"nativeGetLatLngZoom", "(J)Lcom/mapbox/mapboxgl/geometry/LatLngZoom;",
          reinterpret_cast<void *>(&nativeGetLatLngZoom)},
         {"nativeResetZoom", "(J)V", reinterpret_cast<void *>(&nativeResetZoom)},
-        {"nativeStartPanning", "(J)V", reinterpret_cast<void *>(&nativeStartScaling)},
-        {"nativeStopPanning", "(J)V", reinterpret_cast<void *>(&nativeStopScaling)},
         {"nativeGetMinZoom", "(J)D", reinterpret_cast<void *>(&nativeGetMinZoom)},
         {"nativeGetMaxZoom", "(J)D", reinterpret_cast<void *>(&nativeGetMaxZoom)},
         {"nativeRotateBy", "(JDDDDJ)V", reinterpret_cast<void *>(&nativeRotateBy)},
@@ -1057,8 +1011,6 @@ extern "C" JNIEXPORT jint JNICALL JNI_OnLoad(JavaVM *vm, void *reserved) {
                  &nativeSetBearing))},
         {"nativeGetBearing", "(J)D", reinterpret_cast<void *>(&nativeGetBearing)},
         {"nativeResetNorth", "(J)V", reinterpret_cast<void *>(&nativeResetNorth)},
-        {"nativeStartRotating", "(J)V", reinterpret_cast<void *>(&nativeStartRotating)},
-        {"nativeStopRotating", "(J)V", reinterpret_cast<void *>(&nativeStopRotating)},
         {"nativeSetDebug", "(JZ)V", reinterpret_cast<void *>(&nativeSetDebug)},
         {"nativeToggleDebug", "(J)V", reinterpret_cast<void *>(&nativeToggleDebug)},
         {"nativeGetDebug", "(J)Z", reinterpret_cast<void *>(&nativeGetDebug)},

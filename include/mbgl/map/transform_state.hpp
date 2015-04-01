@@ -77,6 +77,7 @@ private:
     bool rotating = false;
     bool scaling = false;
     bool panning = false;
+    bool gestureInProgress = false;
 
     // map position
     double x = 0, y = 0;
