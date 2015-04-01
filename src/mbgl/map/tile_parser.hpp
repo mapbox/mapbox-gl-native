@@ -28,7 +28,6 @@ class StyleLayoutFill;
 class StyleLayoutRaster;
 class StyleLayoutLine;
 class StyleLayoutSymbol;
-class StyleLayerGroup;
 class VectorTileData;
 class Collision;
 

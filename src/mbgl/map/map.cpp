@@ -18,7 +18,6 @@
 #include <mbgl/text/glyph_store.hpp>
 #include <mbgl/geometry/glyph_atlas.hpp>
 #include <mbgl/style/style_layer.hpp>
-#include <mbgl/style/style_layer_group.hpp>
 #include <mbgl/style/style_bucket.hpp>
 #include <mbgl/util/texture_pool.hpp>
 #include <mbgl/geometry/sprite_atlas.hpp>
@@ -723,7 +722,11 @@ void Map::updateSources() {
 
     // Then, reenable all of those that we actually use when drawing this layer.
     if (style) {
-        updateSources(style->layers);
+        for (const auto& layer : style->layers) {
+            if (layer->bucket && layer->bucket->style_source) {
+                (*activeSources.emplace(layer->bucket->style_source).first)->enabled = true;
+            }
+        }
     }
 
     // Then, construct or destroy the actual source object, depending on enabled state.
@@ -742,20 +745,6 @@ void Map::updateSources() {
     util::erase_if(activeSources, [](util::ptr<StyleSource> source){
         return !source->enabled;
     });
-}
-
-void Map::updateSources(const util::ptr<StyleLayerGroup> &group) {
-    assert(Environment::currentlyOn(ThreadType::Map));
-    if (!group) {
-        return;
-    }
-    for (const auto& layer : group->layers) {
-        if (!layer) continue;
-        if (layer->bucket && layer->bucket->style_source) {
-            (*activeSources.emplace(layer->bucket->style_source).first)->enabled = true;
-        }
-
-    }
 }
 
 void Map::updateTiles() {
@@ -807,7 +796,7 @@ void Map::loadStyleJSON(const std::string& json, const std::string& base) {
     style = std::make_shared<Style>();
     style->base = base;
     style->loadJSON((const uint8_t *)json.c_str());
-    style->cascadeClasses(data->getClasses());
+    style->cascade(data->getClasses());
     style->setDefaultTransitionDuration(data->getDefaultTransitionDuration());
 
     const std::string glyphURL = util::mapbox::normalizeGlyphsURL(style->glyph_url, getAccessToken());
@@ -834,7 +823,7 @@ void Map::prepare() {
     }
     if (u & static_cast<UpdateType>(Update::Classes)) {
         if (style) {
-            style->cascadeClasses(data->getClasses());
+            style->cascade(data->getClasses());
         }
     }
 
@@ -850,7 +839,7 @@ void Map::prepare() {
 
     if (style) {
         updateSources();
-        style->updateProperties(state.getNormalizedZoom(), animationTime);
+        style->recalculate(state.getNormalizedZoom(), animationTime);
 
         // Allow the sprite atlas to potentially pull new sprite images if needed.
         spriteAtlas->resize(state.getPixelRatio());

@@ -1,6 +1,6 @@
 #include <mbgl/style/style.hpp>
 #include <mbgl/map/sprite.hpp>
-#include <mbgl/style/style_layer_group.hpp>
+#include <mbgl/style/style_layer.hpp>
 #include <mbgl/style/style_parser.hpp>
 #include <mbgl/style/style_bucket.hpp>
 #include <mbgl/util/constants.hpp>
@@ -25,19 +25,21 @@ Style::Style()
 // for deleting the std::unique_ptr<uv::rwlock>.
 Style::~Style() {}
 
-void Style::updateProperties(float z, std::chrono::steady_clock::time_point now) {
+void Style::cascade(const std::vector<std::string>& classes) {
+    std::chrono::steady_clock::time_point now = std::chrono::steady_clock::now();
+
+    for (const auto& layer : layers) {
+        layer->setClasses(classes, now, defaultTransition);
+    }
+}
+
+void Style::recalculate(float z, std::chrono::steady_clock::time_point now) {
     uv::writelock lock(mtx);
 
     zoomHistory.update(z, now);
 
-    if (layers) {
-        layers->updateProperties(z, now, zoomHistory);
-    }
-
-    // Apply transitions after the first time.
-    if (!initial_render_complete) {
-        initial_render_complete = true;
-        return;
+    for (const auto& layer : layers) {
+        layer->updateProperties(z, now, zoomHistory);
     }
 }
 
@@ -49,21 +51,14 @@ void Style::setDefaultTransitionDuration(std::chrono::steady_clock::duration dur
     defaultTransition.duration = duration;
 }
 
-void Style::cascadeClasses(const std::vector<std::string>& classes) {
-    if (layers) {
-        layers->setClasses(classes, std::chrono::steady_clock::now(), defaultTransition);
-    }
-}
-
 bool Style::hasTransitions() const {
-    if (layers) {
-        if (layers->hasTransitions()) {
+    for (const auto& layer : layers) {
+        if (layer->hasTransitions()) {
             return true;
         }
     }
     return false;
 }
-
 
 void Style::loadJSON(const uint8_t *const data) {
     uv::writelock lock(mtx);

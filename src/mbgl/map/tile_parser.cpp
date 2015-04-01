@@ -3,7 +3,7 @@
 #include <mbgl/platform/log.hpp>
 #include <mbgl/style/style.hpp>
 #include <mbgl/style/style_layer.hpp>
-#include <mbgl/style/style_layer_group.hpp>
+#include <mbgl/style/style_source.hpp>
 #include <mbgl/renderer/fill_bucket.hpp>
 #include <mbgl/renderer/line_bucket.hpp>
 #include <mbgl/renderer/symbol_bucket.hpp>
@@ -51,12 +51,7 @@ TileParser::TileParser(const GeometryTile& geometryTile_,
 bool TileParser::obsolete() const { return tile.state == TileData::State::obsolete; }
 
 void TileParser::parse() {
-    util::ptr<const StyleLayerGroup> group = style->layers;
-    if (!group) {
-        return;
-    }
-
-    for (const auto& layer_desc : group->layers) {
+    for (const auto& layer_desc : style->layers) {
         // Cancel early when parsing.
         if (obsolete()) {
             return;

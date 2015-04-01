@@ -17,7 +17,6 @@ namespace mbgl {
 enum class ClassID : uint32_t;
 
 class StyleLayer;
-class StyleLayerGroup;
 
 class StyleParser {
 public:
@@ -27,8 +26,8 @@ public:
 
     void parse(JSVal document);
 
-    util::ptr<StyleLayerGroup> getLayers() {
-        return root;
+    std::vector<util::ptr<StyleLayer>> getLayers() {
+        return layers;
     }
 
     std::string getSprite() const {
@@ -44,10 +43,7 @@ private:
     JSVal replaceConstant(JSVal value);
 
     void parseSources(JSVal value);
-
-    std::unique_ptr<StyleLayerGroup> createLayers(JSVal value);
-    util::ptr<StyleLayer> createLayer(JSVal value);
-    void parseLayers();
+    void parseLayers(JSVal value);
     void parseLayer(std::pair<JSVal, util::ptr<StyleLayer>> &pair);
     void parsePaints(JSVal value, std::map<ClassID, ClassProperties> &paints);
     void parsePaint(JSVal, ClassProperties &properties);
@@ -97,10 +93,10 @@ private:
     std::unordered_map<std::string, const util::ptr<StyleSource>> sources;
 
     // This stores the root layer.
-    util::ptr<StyleLayerGroup> root;
+    std::vector<util::ptr<StyleLayer>> layers;
 
     // This maps ids to Layer objects, with all items being at the root level.
-    std::unordered_map<std::string, std::pair<JSVal, util::ptr<StyleLayer>>> layers;
+    std::unordered_map<std::string, std::pair<JSVal, util::ptr<StyleLayer>>> layersMap;
 
     // Store a stack of layers we're parsing right now. This is to prevent reference cycles.
     std::forward_list<StyleLayer *> stack;
