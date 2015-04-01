@@ -25,7 +25,15 @@ Style::Style()
 // for deleting the std::unique_ptr<uv::rwlock>.
 Style::~Style() {}
 
-void Style::updateProperties(float z, std::chrono::steady_clock::time_point now) {
+void Style::cascade(const std::vector<std::string>& classes) {
+    std::chrono::steady_clock::time_point now = std::chrono::steady_clock::now();
+
+    for (const auto& layer : layers) {
+        layer->setClasses(classes, now, defaultTransition);
+    }
+}
+
+void Style::recalculate(float z, std::chrono::steady_clock::time_point now) {
     uv::writelock lock(mtx);
 
     zoomHistory.update(z, now);
@@ -41,13 +49,6 @@ const std::string &Style::getSpriteURL() const {
 
 void Style::setDefaultTransitionDuration(std::chrono::steady_clock::duration duration) {
     defaultTransition.duration = duration;
-}
-
-void Style::cascadeClasses(const std::vector<std::string>& classes) {
-    std::chrono::steady_clock::time_point now = std::chrono::steady_clock::now();
-    for (const auto& layer : layers) {
-        layer->setClasses(classes, now, defaultTransition);
-    }
 }
 
 bool Style::hasTransitions() const {

@@ -796,7 +796,7 @@ void Map::loadStyleJSON(const std::string& json, const std::string& base) {
     style = std::make_shared<Style>();
     style->base = base;
     style->loadJSON((const uint8_t *)json.c_str());
-    style->cascadeClasses(data->getClasses());
+    style->cascade(data->getClasses());
     style->setDefaultTransitionDuration(data->getDefaultTransitionDuration());
 
     const std::string glyphURL = util::mapbox::normalizeGlyphsURL(style->glyph_url, getAccessToken());
@@ -823,7 +823,7 @@ void Map::prepare() {
     }
     if (u & static_cast<UpdateType>(Update::Classes)) {
         if (style) {
-            style->cascadeClasses(data->getClasses());
+            style->cascade(data->getClasses());
         }
     }
 
@@ -839,7 +839,7 @@ void Map::prepare() {
 
     if (style) {
         updateSources();
-        style->updateProperties(state.getNormalizedZoom(), animationTime);
+        style->recalculate(state.getNormalizedZoom(), animationTime);
 
         // Allow the sprite atlas to potentially pull new sprite images if needed.
         spriteAtlas->resize(state.getPixelRatio());

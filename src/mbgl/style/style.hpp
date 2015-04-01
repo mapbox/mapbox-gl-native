@@ -24,11 +24,10 @@ public:
 
     void loadJSON(const uint8_t *const data);
 
-    void updateProperties(float z, std::chrono::steady_clock::time_point now);
+    void cascade(const std::vector<std::string>&);
+    void recalculate(float z, std::chrono::steady_clock::time_point now);
 
     void setDefaultTransitionDuration(std::chrono::steady_clock::duration);
-    void cascadeClasses(const std::vector<std::string>&);
-
     bool hasTransitions() const;
 
     const std::string &getSpriteURL() const;
