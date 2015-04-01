@@ -736,7 +736,7 @@ util::ptr<StyleLayer> StyleParser::createLayer(JSVal value) {
 }
 
 void StyleParser::parseLayers() {
-    for (std::pair<const std::string, std::pair<JSVal, util::ptr<StyleLayer>>> &pair : layers) {
+    for (auto &pair : layers) {
         parseLayer(pair.second);
     }
 }

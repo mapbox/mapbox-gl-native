@@ -77,7 +77,7 @@ void Painter::renderDebugText(const std::vector<std::string> &strings) {
 
     DebugFontBuffer debugFontBuffer;
     int line = 25;
-    for (const std::string &str : strings) {
+    for (const auto& str : strings) {
         debugFontBuffer.addText(str.c_str(), 10, line, 0.75);
         line += 20;
     }

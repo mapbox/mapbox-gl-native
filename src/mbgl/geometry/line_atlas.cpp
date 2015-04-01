@@ -58,7 +58,7 @@ LinePatternPos LineAtlas::addDash(const std::vector<float> &dasharray, bool roun
     }
 
     float length = 0;
-    for (const float &part : dasharray) {
+    for (const float part : dasharray) {
         length += part;
     }
 

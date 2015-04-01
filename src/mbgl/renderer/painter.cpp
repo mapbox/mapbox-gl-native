@@ -226,7 +226,7 @@ void Painter::render(const Style& style, const std::set<util::ptr<StyleSource>>&
 
     // Update all clipping IDs.
     ClipIDGenerator generator;
-    for (const util::ptr<StyleSource> &source : sources) {
+    for (const auto& source : sources) {
         generator.update(source->source->getLoadedTiles());
         source->source->updateMatrices(projMatrix, state);
     }
@@ -246,7 +246,7 @@ void Painter::render(const Style& style, const std::set<util::ptr<StyleSource>>&
     // This guarantees that we have at least one function per tile called.
     // When only rendering layers via the stylesheet, it's possible that we don't
     // ever visit a tile during rendering.
-    for (const util::ptr<StyleSource> &source : sources) {
+    for (const auto& source : sources) {
         source->source->finishRender(*this);
     }
 }

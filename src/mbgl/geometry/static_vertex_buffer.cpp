@@ -4,7 +4,7 @@
 namespace mbgl {
 
 StaticVertexBuffer::StaticVertexBuffer(std::initializer_list<std::pair<int16_t, int16_t>> init) {
-    for (const std::pair<int16_t, int16_t> &vertex : init) {
+    for (const auto& vertex : init) {
         vertex_type *vertices = static_cast<vertex_type *>(addElement());
         vertices[0] = vertex.first;
         vertices[1] = vertex.second;
