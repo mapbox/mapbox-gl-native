@@ -4,6 +4,8 @@
 #include <mbgl/platform/log.hpp>
 #include <mbgl/platform/platform.hpp>
 
+#include <boost/functional/hash.hpp>
+
 #include <sstream>
 #include <cmath>
 
@@ -26,21 +28,22 @@ LineAtlas::~LineAtlas() {
 }
 
 LinePatternPos LineAtlas::getDashPosition(const std::vector<float> &dasharray, bool round) {
+    size_t key = round ? std::numeric_limits<size_t>::min() : std::numeric_limits<size_t>::max();
+    for (const float part : dasharray) {
+        boost::hash_combine<float>(key, part);
+    }
+
+    // Note: We're not handling hash collisions here.
+
     std::lock_guard<std::recursive_mutex> lock(mtx);
-
-    std::ostringstream sskey;
-
-    for (const float &part : dasharray) {
-        sskey << part << "-";
+    const auto it = positions.find(key);
+    if (it == positions.end()) {
+        auto inserted = positions.emplace(key, addDash(dasharray, round));
+        assert(inserted.second);
+        return inserted.first->second;
+    } else {
+        return it->second;
     }
-    sskey << round;
-    std::string key = sskey.str();
-
-    if (positions.find(key) == positions.end()) {
-        positions[key] = addDash(dasharray, round);
-    }
-
-    return positions[key];
 }
 
 LinePatternPos LineAtlas::addDash(const std::vector<float> &dasharray, bool round) {
