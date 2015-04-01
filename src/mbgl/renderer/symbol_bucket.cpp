@@ -30,14 +30,21 @@ SymbolInstance::SymbolInstance(Anchor &anchor, const std::vector<Coordinate> &li
         const GlyphPositions &face) :
     hasText(shapedText),
     hasIcon(shapedIcon),
+
+    // Create the quads used for rendering the glyphs.
     glyphQuads(inside && shapedText ?
             getGlyphQuads(anchor, shapedText, textBoxScale, line, layout, textAlongLine, face) :
             PlacedGlyphs()),
+
+    // Create the quad used for rendering the icon.
     iconQuads(inside && shapedIcon ?
             getIconQuads(anchor, shapedIcon, line, layout, iconAlongLine) :
             PlacedGlyphs()),
+
+    // Create the collision features that will be used to check whether this symbol instance can be placed
     textCollisionFeature(line, anchor, shapedText, textBoxScale, textPadding, textAlongLine),
     iconCollisionFeature(line, anchor, shapedIcon, iconBoxScale, iconPadding, iconAlongLine) {};
+
 
 SymbolBucket::SymbolBucket(std::unique_ptr<const StyleLayoutSymbol> styleLayout_, Collision &collision_)
     : styleLayout(std::move(styleLayout_)), collision(collision_) {

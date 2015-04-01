@@ -38,7 +38,7 @@ class CollisionTile {
         zoom(_zoom), tilePixelRatio(tileExtent / tileSize) {}
 
     void reset(const float angle, const float pitch);
-    void placeFeature(CollisionFeature &feature);
+    float placeFeature(CollisionFeature &feature);
     void insertFeature(CollisionFeature &feature, const float minPlacementScale);
 
     const float zoom;
@@ -47,8 +47,10 @@ class CollisionTile {
 
     private:
 
+    Box getTreeBox(const Anchor &anchor, const CollisionBox &box);
+
     Tree tree;
-    std::array<float, 4> matrix;
+    std::array<float, 4> rotationMatrix;
     float yStretch;
 
 };
