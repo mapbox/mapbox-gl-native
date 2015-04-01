@@ -35,26 +35,7 @@ VectorTileFeature::VectorTileFeature(pbf feature_pbf, const VectorTileLayer& lay
         if (feature_pbf.tag == 1) { // id
             id = feature_pbf.varint<uint64_t>();
         } else if (feature_pbf.tag == 2) { // tags
-            // tags are packed varints. They should have an even length.
-            pbf tags = feature_pbf.message();
-            while (tags) {
-                uint32_t tag_key = tags.varint();
-
-                if (layer.keys.size() <= tag_key) {
-                    throw std::runtime_error("feature referenced out of range key");
-                }
-
-                if (!tags) {
-                    throw std::runtime_error("uneven number of feature tag ids");
-                }
-
-                uint32_t tag_val = tags.varint();
-                if (layer.values.size() <= tag_val) {
-                    throw std::runtime_error("feature referenced out of range value");
-                }
-
-                properties.emplace(tag_key, tag_val);
-            }
+            tags_pbf = feature_pbf.message();
         } else if (feature_pbf.tag == 3) { // type
             type = (FeatureType)feature_pbf.varint();
         } else if (feature_pbf.tag == 4) { // geometry
@@ -70,11 +51,30 @@ mapbox::util::optional<Value> VectorTileFeature::getValue(const std::string& key
     if (keyIter == layer.keys.end()) {
         return mapbox::util::optional<Value>();
     }
-    auto propIter = properties.find(keyIter->second);
-    if (propIter == properties.end()) {
-        return mapbox::util::optional<Value>();
+
+    pbf tags = tags_pbf;
+    while (tags) {
+        uint32_t tag_key = tags.varint();
+
+        if (layer.keys.size() <= tag_key) {
+            throw std::runtime_error("feature referenced out of range key");
+        }
+
+        if (!tags) {
+            throw std::runtime_error("uneven number of feature tag ids");
+        }
+
+        uint32_t tag_val = tags.varint();
+        if (layer.values.size() <= tag_val) {
+            throw std::runtime_error("feature referenced out of range value");
+        }
+
+        if (tag_key == keyIter->second) {
+            return layer.values[tag_val];
+        }
     }
-    return layer.values[propIter->second];
+
+    return mapbox::util::optional<Value>();
 }
 
 GeometryCollection VectorTileFeature::getGeometries() const {
