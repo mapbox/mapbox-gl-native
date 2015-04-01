@@ -3,6 +3,7 @@
 
 #include <mbgl/map/transform.hpp>
 #include <mbgl/util/chrono.hpp>
+#include <mbgl/map/update.hpp>
 #include <mbgl/util/geo.hpp>
 #include <mbgl/util/projection.hpp>
 #include <mbgl/util/noncopyable.hpp>
@@ -76,14 +77,6 @@ public:
     void render();
 
     // Notifies the Map thread that the state has changed and an update might be necessary.
-    using UpdateType = uint32_t;
-    enum class Update : UpdateType {
-        Nothing                   = 0,
-        StyleInfo                 = 1 << 0,
-        Debug                     = 1 << 1,
-        DefaultTransitionDuration = 1 << 2,
-        Classes                   = 1 << 3,
-    };
     void triggerUpdate(Update = Update::Nothing);
 
     // Triggers a render. Can be called from any thread.
