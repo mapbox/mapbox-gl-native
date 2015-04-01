@@ -40,7 +40,6 @@ public:
 private:
     std::string sprite_url;
     PropertyTransition defaultTransition;
-    bool initial_render_complete = false;
     std::unique_ptr<uv::rwlock> mtx;
     ZoomHistory zoomHistory;
 };

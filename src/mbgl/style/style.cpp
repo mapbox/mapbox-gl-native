@@ -33,12 +33,6 @@ void Style::updateProperties(float z, std::chrono::steady_clock::time_point now)
     for (const auto& layer : layers) {
         layer->updateProperties(z, now, zoomHistory);
     }
-
-    // Apply transitions after the first time.
-    if (!initial_render_complete) {
-        initial_render_complete = true;
-        return;
-    }
 }
 
 const std::string &Style::getSpriteURL() const {
