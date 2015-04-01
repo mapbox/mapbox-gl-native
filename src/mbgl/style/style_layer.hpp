@@ -8,6 +8,7 @@
 #include <mbgl/style/zoom_history.hpp>
 
 #include <mbgl/util/ptr.hpp>
+#include <mbgl/util/noncopyable.hpp>
 
 #include <vector>
 #include <string>
@@ -19,7 +20,7 @@ namespace mbgl {
 
 class StyleBucket;
 
-class StyleLayer {
+class StyleLayer : public util::noncopyable {
 public:
     StyleLayer(const std::string &id, std::map<ClassID, ClassProperties> &&styles);
 
