@@ -59,6 +59,8 @@ bool SymbolBucket::hasTextData() const { return !text.groups.empty(); }
 
 bool SymbolBucket::hasIconData() const { return !icon.groups.empty(); }
 
+bool SymbolBucket::hasCollisionBoxData() const { return !collisionBox.groups.empty(); }
+
 std::vector<SymbolFeature> SymbolBucket::processFeatures(const GeometryTileLayer& layer,
                                                          const FilterExpression& filter,
                                                          GlyphStore &glyphStore,
@@ -317,6 +319,8 @@ void SymbolBucket::placeFeatures() {
             addSymbols<IconBuffer, IconElementGroup>(icon, symbolInstance.iconQuads, iconScale);
         }
     }
+
+    addToDebugBuffers();
 }
 
 template <typename Buffer, typename GroupType>
@@ -379,6 +383,57 @@ void SymbolBucket::addSymbols(Buffer &buffer, const PlacedGlyphs &symbols, float
     }
 }
 
+void SymbolBucket::addToDebugBuffers() {
+
+    const float yStretch = 1.0f;
+    const float angle = 0.0f;
+    const float zoom = collision.zoom;
+    float angle_sin = std::sin(-angle);
+    float angle_cos = std::cos(-angle);
+    std::array<float, 4> matrix = {{angle_cos, -angle_sin, angle_sin, angle_cos}};
+
+    for (const SymbolInstance &symbolInstance : symbolInstances) {
+        for (int i = 0; i < 2; i++) {
+            auto& feature = i == 0 ?
+                symbolInstance.textCollisionFeature :
+                symbolInstance.iconCollisionFeature;
+
+            for (const CollisionBox &box : feature.boxes) {
+                auto& anchor = box.anchor;
+
+                vec2<float> tl{box.x1, box.y1 * yStretch};
+                vec2<float> tr{box.x2, box.y1 * yStretch};
+                vec2<float> bl{box.x1, box.y2 * yStretch};
+                vec2<float> br{box.x2, box.y2 * yStretch};
+                tl = tl.matMul(matrix);
+                tr = tr.matMul(matrix);
+                bl = bl.matMul(matrix);
+                br = br.matMul(matrix);
+
+                const float maxZoom = util::max(0.0f, util::min(25.0f, static_cast<float>(zoom + log(box.maxScale) / log(2))));
+                const float placementZoom= util::max(0.0f, util::min(25.0f, static_cast<float>(zoom + log(box.placementScale) / log(2))));
+
+                if (!collisionBox.groups.size()) {
+                    // Move to a new group because the old one can't hold the geometry.
+                    collisionBox.groups.emplace_back(util::make_unique<CollisionBoxElementGroup>());
+                }
+
+                collisionBox.vertices.add(anchor.x, anchor.y, tl.x, tl.y, maxZoom, placementZoom);
+                collisionBox.vertices.add(anchor.x, anchor.y, tr.x, tr.y, maxZoom, placementZoom);
+                collisionBox.vertices.add(anchor.x, anchor.y, tr.x, tr.y, maxZoom, placementZoom);
+                collisionBox.vertices.add(anchor.x, anchor.y, br.x, br.y, maxZoom, placementZoom);
+                collisionBox.vertices.add(anchor.x, anchor.y, br.x, br.y, maxZoom, placementZoom);
+                collisionBox.vertices.add(anchor.x, anchor.y, bl.x, bl.y, maxZoom, placementZoom);
+                collisionBox.vertices.add(anchor.x, anchor.y, bl.x, bl.y, maxZoom, placementZoom);
+                collisionBox.vertices.add(anchor.x, anchor.y, tl.x, tl.y, maxZoom, placementZoom);
+
+                auto &group= *collisionBox.groups.back();
+                group.vertex_length += 8;
+            }
+        }
+    }
+}
+
 void SymbolBucket::drawGlyphs(SDFShader &shader) {
     char *vertex_index = BUFFER_OFFSET(0);
     char *elements_index = BUFFER_OFFSET(0);
@@ -412,6 +467,14 @@ void SymbolBucket::drawIcons(IconShader &shader) {
         MBGL_CHECK_ERROR(glDrawElements(GL_TRIANGLES, group->elements_length * 3, GL_UNSIGNED_SHORT, elements_index));
         vertex_index += group->vertex_length * icon.vertices.itemSize;
         elements_index += group->elements_length * icon.triangles.itemSize;
+    }
+}
+
+void SymbolBucket::drawCollisionBoxes(CollisionBoxShader &shader) {
+    char *vertex_index = BUFFER_OFFSET(0);
+    for (auto &group : collisionBox.groups) {
+        group->array[0].bind(shader, collisionBox.vertices, vertex_index);
+        MBGL_CHECK_ERROR(glDrawArrays(GL_LINES, 0, group->vertex_length));
     }
 }
 }

@@ -17,7 +17,7 @@ CollisionFeature::CollisionFeature(const std::vector<Coordinate> &line, const An
 
         bboxifyLabel(line, anchor, length, height);
     } else {
-        boxes.emplace_back(anchor, x1, y2, x2, y2, std::numeric_limits<float>::infinity());
+        boxes.emplace_back(anchor, x1, y1, x2, y2, std::numeric_limits<float>::infinity());
     }
 }
 

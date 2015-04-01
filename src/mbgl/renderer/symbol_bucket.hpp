@@ -7,6 +7,7 @@
 #include <mbgl/geometry/elements_buffer.hpp>
 #include <mbgl/geometry/text_buffer.hpp>
 #include <mbgl/geometry/icon_buffer.hpp>
+#include <mbgl/geometry/collision_box_buffer.hpp>
 #include <mbgl/text/types.hpp>
 #include <mbgl/text/glyph.hpp>
 #include <mbgl/text/collision_feature.hpp>
@@ -24,6 +25,7 @@ class Style;
 class StyleLayoutSymbol;
 class SDFShader;
 class IconShader;
+class CollisionBoxShader;
 class DotShader;
 class Collision;
 class SpriteAtlas;
@@ -60,6 +62,7 @@ class SymbolInstance {
 class SymbolBucket : public Bucket {
     typedef ElementGroup<1> TextElementGroup;
     typedef ElementGroup<2> IconElementGroup;
+    typedef ElementGroup<1> CollisionBoxElementGroup;
 
 public:
     SymbolBucket(std::unique_ptr<const StyleLayoutSymbol> styleLayout, Collision &collision);
@@ -70,6 +73,7 @@ public:
     bool hasData() const override;
     bool hasTextData() const;
     bool hasIconData() const;
+    bool hasCollisionBoxData() const;
 
     void addFeatures(const GeometryTileLayer&,
                      const FilterExpression&,
@@ -82,6 +86,7 @@ public:
     void drawGlyphs(SDFShader& shader);
     void drawIcons(SDFShader& shader);
     void drawIcons(IconShader& shader);
+    void drawCollisionBoxes(CollisionBoxShader& shader);
 
 private:
     std::vector<SymbolFeature> processFeatures(const GeometryTileLayer&,
@@ -93,6 +98,7 @@ private:
             const GlyphPositions &face);
 
     void placeFeatures();
+    void addToDebugBuffers();
 
     // Adds placed items to the buffer.
     template <typename Buffer, typename GroupType>
@@ -117,6 +123,11 @@ private:
         TriangleElementsBuffer triangles;
         std::vector<std::unique_ptr<IconElementGroup>> groups;
     } icon;
+
+    struct CollisionBoxBuffer {
+        CollisionBoxVertexBuffer vertices;
+        std::vector<std::unique_ptr<CollisionBoxElementGroup>> groups;
+    } collisionBox;
 
 };
 }

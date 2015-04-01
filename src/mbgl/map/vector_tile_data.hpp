@@ -8,6 +8,7 @@
 #include <mbgl/geometry/icon_buffer.hpp>
 #include <mbgl/geometry/line_buffer.hpp>
 #include <mbgl/geometry/text_buffer.hpp>
+#include <mbgl/geometry/collision_box_buffer.hpp>
 
 #include <iosfwd>
 #include <memory>
@@ -50,6 +51,7 @@ protected:
     LineVertexBuffer lineVertexBuffer;
     IconVertexBuffer iconVertexBuffer;
     TextVertexBuffer textVertexBuffer;
+    CollisionBoxVertexBuffer collisionBoxVertexBuffer;
 
     TriangleElementsBuffer triangleElementsBuffer;
     LineElementsBuffer lineElementsBuffer;

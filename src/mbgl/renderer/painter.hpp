@@ -21,6 +21,7 @@
 #include <mbgl/shader/sdf_shader.hpp>
 #include <mbgl/shader/dot_shader.hpp>
 #include <mbgl/shader/gaussian_shader.hpp>
+#include <mbgl/shader/box_shader.hpp>
 
 #include <mbgl/map/transform_state.hpp>
 #include <mbgl/util/ptr.hpp>
@@ -212,6 +213,7 @@ public:
     std::unique_ptr<SDFIconShader> sdfIconShader;
     std::unique_ptr<DotShader> dotShader;
     std::unique_ptr<GaussianShader> gaussianShader;
+    std::unique_ptr<CollisionBoxShader> collisionBoxShader;
 
     StaticVertexBuffer backgroundBuffer = {
         { -1, -1 }, { 1, -1 },

@@ -106,6 +106,7 @@ void Painter::setupShaders() {
     if (!sdfIconShader) sdfIconShader = util::make_unique<SDFIconShader>();
     if (!dotShader) dotShader = util::make_unique<DotShader>();
     if (!gaussianShader) gaussianShader = util::make_unique<GaussianShader>();
+    if (!collisionBoxShader) collisionBoxShader = util::make_unique<CollisionBoxShader>();
 }
 
 void Painter::deleteShaders() {
