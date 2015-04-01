@@ -16,6 +16,7 @@
 
 #import "MGLTypes.h"
 #import "NSString+MGLAdditions.h"
+#import "NSProcessInfo+MGLAdditions.h"
 #import "MGLAnnotation.h"
 #import "MGLUserLocationAnnotationView.h"
 #import "MGLUserLocation_Private.h"
@@ -46,6 +47,7 @@ static dispatch_once_t loadGLExtensions;
 NSString *const MGLDefaultStyleName = @"Emerald";
 NSString *const MGLStyleVersion = @"7";
 NSString *const MGLDefaultStyleMarkerSymbolName = @"default_marker";
+NSString *const MGLMapboxAccessTokenManagerURLDisplayString = @"mapbox.com/account/apps";
 
 const NSTimeInterval MGLAnimationDuration = 0.3;
 const CGSize MGLAnnotationUpdateViewportOutset = {150, 150};
@@ -88,7 +90,9 @@ static NSURL *MGLURLForBundledStyleNamed(NSString *styleName)
 
 @end
 
-@implementation MGLMapView
+@implementation MGLMapView {
+    BOOL _isTargetingInterfaceBuilder;
+}
 
 #pragma mark - Setup & Teardown -
 
@@ -106,24 +110,22 @@ MBGLView *mbglView = nullptr;
 mbgl::SQLiteCache *mbglFileCache = nullptr;
 mbgl::DefaultFileSource *mbglFileSource = nullptr;
 
-- (instancetype)initWithFrame:(CGRect)frame accessToken:(NSString *)accessToken
+- (instancetype)initWithFrame:(CGRect)frame
 {
     self = [super initWithFrame:frame];
 
     if (self && [self commonInit])
     {
-        [self setAccessToken:accessToken];
-
-        if (accessToken)
-        {
-            // If style is set directly, pass it on. If not, if we have an access
-            // token, we can pass nil and use the default style.
-            //
-            self.styleURL = nil;
-        }
+        self.styleURL = nil;
+        return self;
     }
 
-    return self;
+    return nil;
+}
+
+- (instancetype)initWithFrame:(CGRect)frame accessToken:(NSString *)accessToken
+{
+    return [self initWithFrame:frame accessToken:accessToken styleURL:nil];
 }
 
 - (instancetype)initWithFrame:(CGRect)frame accessToken:(NSString *)accessToken styleURL:(NSURL *)styleURL
@@ -175,6 +177,11 @@ mbgl::DefaultFileSource *mbglFileSource = nullptr;
 
 - (void)setStyleURL:(NSURL *)styleURL
 {
+    if ( _isTargetingInterfaceBuilder )
+    {
+        return;
+    }
+    
     if ( ! styleURL)
     {
         styleURL = MGLURLForBundledStyleNamed([NSString stringWithFormat:@"%@-v%@",
@@ -193,6 +200,8 @@ mbgl::DefaultFileSource *mbglFileSource = nullptr;
 
 - (BOOL)commonInit
 {
+    _isTargetingInterfaceBuilder = NSProcessInfo.processInfo.mgl_isInterfaceBuilderDesignablesAgent;
+    
     // create context
     //
     _context = [[EAGLContext alloc] initWithAPI:kEAGLRenderingAPIOpenGLES2];
@@ -362,8 +371,11 @@ mbgl::DefaultFileSource *mbglFileSource = nullptr;
     _regionChangeDelegateQueue = [NSOperationQueue new];
     _regionChangeDelegateQueue.maxConcurrentOperationCount = 1;
 
-    // start the main loop
-    mbglMap->start();
+    // start the main loop, but not on the IB canvas
+    if ( ! _isTargetingInterfaceBuilder)
+    {
+        mbglMap->start();
+    }
 
     // metrics: map load event
     const mbgl::LatLng latLng = mbglMap->getLatLng();
@@ -550,7 +562,11 @@ mbgl::DefaultFileSource *mbglFileSource = nullptr;
 - (void)layoutSubviews
 {
     [super layoutSubviews];
-    mbglMap->triggerUpdate();
+    
+    if ( ! _isTargetingInterfaceBuilder)
+    {
+        mbglMap->triggerUpdate();
+    }
 }
 
 #pragma mark - Life Cycle -
@@ -2184,6 +2200,135 @@ CLLocationCoordinate2D latLngToCoordinate(mbgl::LatLng latLng)
     [self.glView setNeedsDisplay];
 
     [self notifyMapChange:@(mbgl::MapChangeRegionIsChanging)];
+}
+
+- (void)prepareForInterfaceBuilder
+{
+    [super prepareForInterfaceBuilder];
+    
+    self.layer.borderColor = [UIColor colorWithWhite:184/255. alpha:1].CGColor;
+    self.layer.borderWidth = 1;
+    
+    if (self.accessToken)
+    {
+        self.layer.backgroundColor = [UIColor colorWithRed:59/255.
+                                                     green:178/255.
+                                                      blue:208/255.
+                                                     alpha:0.8].CGColor;
+        
+        UIImage *image = [[self class] resourceImageNamed:@"mapbox.png"];
+        UIImageView *previewView = [[UIImageView alloc] initWithImage:image];
+        previewView.translatesAutoresizingMaskIntoConstraints = NO;
+        [self addSubview:previewView];
+        [self addConstraint:
+         [NSLayoutConstraint constraintWithItem:previewView
+                                      attribute:NSLayoutAttributeCenterXWithinMargins
+                                      relatedBy:NSLayoutRelationEqual
+                                         toItem:self
+                                      attribute:NSLayoutAttributeCenterXWithinMargins
+                                     multiplier:1
+                                       constant:0]];
+        [self addConstraint:
+         [NSLayoutConstraint constraintWithItem:previewView
+                                      attribute:NSLayoutAttributeCenterYWithinMargins
+                                      relatedBy:NSLayoutRelationEqual
+                                         toItem:self
+                                      attribute:NSLayoutAttributeCenterYWithinMargins
+                                     multiplier:1
+                                       constant:0]];
+    }
+    else
+    {
+        UIView *diagnosticView = [[UIView alloc] init];
+        diagnosticView.translatesAutoresizingMaskIntoConstraints = NO;
+        [self addSubview:diagnosticView];
+        
+        // Headline
+        UILabel *headlineLabel = [[UILabel alloc] init];
+        headlineLabel.text = @"No Access Token";
+        headlineLabel.font = [UIFont preferredFontForTextStyle:UIFontTextStyleHeadline];
+        headlineLabel.textAlignment = NSTextAlignmentCenter;
+        headlineLabel.numberOfLines = 1;
+        headlineLabel.translatesAutoresizingMaskIntoConstraints = NO;
+        [headlineLabel setContentCompressionResistancePriority:UILayoutPriorityDefaultLow
+                                                       forAxis:UILayoutConstraintAxisHorizontal];
+        [diagnosticView addSubview:headlineLabel];
+        
+        // Explanation
+        UILabel *explanationLabel = [[UILabel alloc] init];
+        explanationLabel.text = @"To display a map here, you must provide a Mapbox access token. Get an access token from:";
+        explanationLabel.font = [UIFont preferredFontForTextStyle:UIFontTextStyleBody];
+        explanationLabel.numberOfLines = 0;
+        explanationLabel.translatesAutoresizingMaskIntoConstraints = NO;
+        [explanationLabel setContentCompressionResistancePriority:UILayoutPriorityDefaultLow
+                                                          forAxis:UILayoutConstraintAxisHorizontal];
+        [diagnosticView addSubview:explanationLabel];
+        
+        // Link
+        UIButton *linkButton = [UIButton buttonWithType:UIButtonTypeSystem];
+        [linkButton setTitle:MGLMapboxAccessTokenManagerURLDisplayString forState:UIControlStateNormal];
+        linkButton.translatesAutoresizingMaskIntoConstraints = NO;
+        [linkButton setContentCompressionResistancePriority:UILayoutPriorityDefaultLow
+                                                    forAxis:UILayoutConstraintAxisHorizontal];
+        [diagnosticView addSubview:linkButton];
+        
+        // More explanation
+        UILabel *explanationLabel2 = [[UILabel alloc] init];
+        explanationLabel2.text = @"and enter it into the Access Token field in the Attributes inspector.";
+        explanationLabel2.font = [UIFont preferredFontForTextStyle:UIFontTextStyleBody];
+        explanationLabel2.numberOfLines = 0;
+        explanationLabel2.translatesAutoresizingMaskIntoConstraints = NO;
+        [explanationLabel2 setContentCompressionResistancePriority:UILayoutPriorityDefaultLow
+                                                           forAxis:UILayoutConstraintAxisHorizontal];
+        [diagnosticView addSubview:explanationLabel2];
+        
+        // Constraints
+        NSDictionary *views = @{
+            @"container": diagnosticView,
+            @"headline": headlineLabel,
+            @"explanation": explanationLabel,
+            @"link": linkButton,
+            @"explanation2": explanationLabel2,
+        };
+        [self addConstraint:
+         [NSLayoutConstraint constraintWithItem:diagnosticView
+                                      attribute:NSLayoutAttributeCenterYWithinMargins
+                                      relatedBy:NSLayoutRelationEqual
+                                         toItem:self
+                                      attribute:NSLayoutAttributeCenterYWithinMargins
+                                     multiplier:1
+                                       constant:0]];
+        [self addConstraints:
+         [NSLayoutConstraint constraintsWithVisualFormat:@"H:|-[container(20@20)]-|"
+                                                 options:NSLayoutFormatAlignAllCenterY
+                                                 metrics:nil
+                                                   views:views]];
+        [self addConstraints:
+         [NSLayoutConstraint constraintsWithVisualFormat:@"V:|[headline]-[explanation]-[link]-[explanation2]|"
+                                                 options:0
+                                                 metrics:nil
+                                                   views:views]];
+        [self addConstraints:
+         [NSLayoutConstraint constraintsWithVisualFormat:@"H:|[headline]|"
+                                                 options:0
+                                                 metrics:nil
+                                                   views:views]];
+        [self addConstraints:
+         [NSLayoutConstraint constraintsWithVisualFormat:@"H:|[explanation]|"
+                                                 options:0
+                                                 metrics:nil
+                                                   views:views]];
+        [self addConstraints:
+         [NSLayoutConstraint constraintsWithVisualFormat:@"H:|[link]|"
+                                                 options:0
+                                                 metrics:nil
+                                                   views:views]];
+        [self addConstraints:
+         [NSLayoutConstraint constraintsWithVisualFormat:@"H:|[explanation2]|"
+                                                 options:0
+                                                 metrics:nil
+                                                   views:views]];
+    }
 }
 
 class MBGLView : public mbgl::View

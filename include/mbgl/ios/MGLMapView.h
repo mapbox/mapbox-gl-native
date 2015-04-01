@@ -13,20 +13,21 @@
 *   Use of MGLMapView requires a Mapbox API access token. Obtain an access token on the [Mapbox account page](https://www.mapbox.com/account/apps/). If you instantiate an MGLMapView from Interface Builder, rendering of the map won't begin until the accessToken property has been set.
 *
 *   @warning Please note that you are responsible for getting permission to use the map data, and for ensuring your use adheres to the relevant terms of use. */
+IB_DESIGNABLE
 @interface MGLMapView : UIView
 
 #pragma mark - Initializing a Map View
 
 /** @name Initializing a Map View */
 
-/** Initialize a map view with a given frame, style URL, and access token.
+/** Initialize a map view with a given frame, access token, and style URL.
 *   @param frame The frame with which to initialize the map view.
 *   @param accessToken A Mapbox API access token.
 *   @param styleURL The map style URL to use. Can be either an HTTP/HTTPS URL or a Mapbox map ID style URL (`mapbox://<user.style>`).
 *   @return An initialized map view, or `nil` if the map view was unable to be initialized. */
 - (instancetype)initWithFrame:(CGRect)frame accessToken:(NSString *)accessToken styleURL:(NSURL *)styleURL;
 
-/** Initialize a map view with a given frame, the default style, and an access token.
+/** Initialize a map view with the default style given a frame and access token.
 *   @param frame The frame with which to initialize the map view.
 *   @param accessToken A Mapbox API access token.
 *   @return An initialized map view, or `nil` if the map view was unable to be initialized. */
@@ -49,7 +50,7 @@
 /** A view controller whose top and bottom layout guides to use for proper setup of constraints in the map view internals.
 *
 *   Certain components of the map view, such as the heading compass and the data attribution button, need to be aware of the view controller layout in order to avoid positioning content under a top navigation bar or a bottom toolbar. */
-@property (nonatomic, weak) UIViewController *viewControllerForLayoutGuides;
+@property (nonatomic, weak) IBOutlet UIViewController *viewControllerForLayoutGuides;
 
 #pragma mark - Accessing Map Properties
 
@@ -81,7 +82,7 @@
 /** @name Accessing the Delegate */
 
 // TODO
-@property(nonatomic, weak) id<MGLMapViewDelegate> delegate;
+@property(nonatomic, weak) IBOutlet id<MGLMapViewDelegate> delegate;
 
 #pragma mark - Manipulating the Visible Portion of the Map
 
@@ -134,7 +135,7 @@
 - (void)setDirection:(CLLocationDirection)direction animated:(BOOL)animated;
 
 /** Resets the map rotation to a northern heading. */
-- (void)resetNorth;
+- (IBAction)resetNorth;
 
 #pragma mark - Converting Map Coordinates
 

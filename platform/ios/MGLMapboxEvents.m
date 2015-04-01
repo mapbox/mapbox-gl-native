@@ -6,6 +6,7 @@
 #import <CoreTelephony/CTCarrier.h>
 
 #import "MGLMetricsLocationManager.h"
+#import "NSProcessInfo+MGLAdditions.h"
 
 #include <sys/sysctl.h>
 
@@ -176,17 +177,20 @@ NSString *const MGLEventGestureRotateStart = @"Rotation";
     static dispatch_once_t onceToken;
     static MGLMapboxEvents *_sharedManager;
     dispatch_once(&onceToken, ^{
-        void (^setupBlock)() = ^{
-            _sharedManager = [[self alloc] init];
-            // setup dedicated location manager on first use
-            [MGLMetricsLocationManager sharedManager];
-        };
-        if ( ! [[NSThread currentThread] isMainThread]) {
-            dispatch_sync(dispatch_get_main_queue(), ^{
+        if ( ! NSProcessInfo.processInfo.mgl_isInterfaceBuilderDesignablesAgent) {
+            void (^setupBlock)() = ^{
+                _sharedManager = [[self alloc] init];
+                // setup dedicated location manager on first use
+                [MGLMetricsLocationManager sharedManager];
+            };
+            if ( ! [[NSThread currentThread] isMainThread]) {
+                dispatch_sync(dispatch_get_main_queue(), ^{
+                    setupBlock();
+                });
+            }
+            else {
                 setupBlock();
-            });
-        } else {
-            setupBlock();
+            }
         }
     });
     return _sharedManager;
