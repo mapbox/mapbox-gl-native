@@ -9,6 +9,7 @@
 #include <mbgl/geometry/icon_buffer.hpp>
 #include <mbgl/text/types.hpp>
 #include <mbgl/text/glyph.hpp>
+#include <mbgl/text/collision_feature.hpp>
 #include <mbgl/text/shaping.hpp>
 #include <mbgl/style/style_bucket.hpp>
 #include <mbgl/util/ptr.hpp>
@@ -52,8 +53,8 @@ class SymbolInstance {
         const bool hasIcon;
         const PlacedGlyphs glyphQuads;
         const PlacedGlyphs iconQuads;
-        // text collision feature
-        // icon collision feature
+        const CollisionFeature textCollisionFeature;
+        const CollisionFeature iconCollisionFeature;
 };
 
 class SymbolBucket : public Bucket {

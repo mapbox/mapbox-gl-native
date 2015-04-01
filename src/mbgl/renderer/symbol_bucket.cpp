@@ -25,16 +25,19 @@ namespace mbgl {
 SymbolInstance::SymbolInstance(Anchor &anchor, const std::vector<Coordinate> &line,
         const Shaping &shapedText, const PositionedIcon &shapedIcon, 
         const StyleLayoutSymbol &layout, const bool inside,
-        const float textBoxScale, const float /*textPadding*/, const float textAlongLine,
-        const float /*iconBoxScale*/, const float /*iconPadding*/, const float iconAlongLine,
+        const float textBoxScale, const float textPadding, const float textAlongLine,
+        const float iconBoxScale, const float iconPadding, const float iconAlongLine,
         const GlyphPositions &face) :
-    hasText(shapedText), hasIcon(shapedIcon),
+    hasText(shapedText),
+    hasIcon(shapedIcon),
     glyphQuads(inside && shapedText ?
             getGlyphQuads(anchor, shapedText, textBoxScale, line, layout, textAlongLine, face) :
             PlacedGlyphs()),
     iconQuads(inside && shapedIcon ?
             getIconQuads(anchor, shapedIcon, line, layout, iconAlongLine) :
-            PlacedGlyphs()) {};
+            PlacedGlyphs()),
+    textCollisionFeature(line, anchor, shapedText, textBoxScale, textPadding, textAlongLine),
+    iconCollisionFeature(line, anchor, shapedIcon, iconBoxScale, iconPadding, iconAlongLine) {};
 
 SymbolBucket::SymbolBucket(std::unique_ptr<const StyleLayoutSymbol> styleLayout_, Collision &collision_)
     : styleLayout(std::move(styleLayout_)), collision(collision_) {
