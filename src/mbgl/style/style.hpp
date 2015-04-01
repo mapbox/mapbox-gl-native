@@ -20,7 +20,6 @@ namespace mbgl {
 
 class Sprite;
 class StyleLayer;
-class StyleLayerGroup;
 
 class Style : public util::noncopyable {
 public:
@@ -41,7 +40,7 @@ public:
 
     const std::string &getSpriteURL() const;
 
-    util::ptr<StyleLayerGroup> layers;
+    std::vector<util::ptr<StyleLayer>> layers;
     std::vector<std::string> appliedClasses;
     std::string glyph_url;
     std::string base;

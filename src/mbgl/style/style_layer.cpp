@@ -1,6 +1,5 @@
 #include <mbgl/style/style_layer.hpp>
 #include <mbgl/style/style_bucket.hpp>
-#include <mbgl/style/style_layer_group.hpp>
 #include <mbgl/style/property_fallback.hpp>
 
 #include <mbgl/util/interpolate.hpp>

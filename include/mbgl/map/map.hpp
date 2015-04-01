@@ -29,7 +29,6 @@ class LayerDescription;
 class Sprite;
 class Style;
 class StyleLayer;
-class StyleLayerGroup;
 class StyleSource;
 class TexturePool;
 class FileSource;
@@ -188,7 +187,6 @@ private:
 
     void updateTiles();
     void updateSources();
-    void updateSources(const util::ptr<StyleLayerGroup> &group);
 
     // Triggered by triggerUpdate();
     void update();

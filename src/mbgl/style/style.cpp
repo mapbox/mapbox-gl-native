@@ -1,6 +1,6 @@
 #include <mbgl/style/style.hpp>
 #include <mbgl/map/sprite.hpp>
-#include <mbgl/style/style_layer_group.hpp>
+#include <mbgl/style/style_layer.hpp>
 #include <mbgl/style/style_parser.hpp>
 #include <mbgl/style/style_bucket.hpp>
 #include <mbgl/util/constants.hpp>
@@ -30,8 +30,8 @@ void Style::updateProperties(float z, std::chrono::steady_clock::time_point now)
 
     zoomHistory.update(z, now);
 
-    if (layers) {
-        layers->updateProperties(z, now, zoomHistory);
+    for (const auto& layer : layers) {
+        layer->updateProperties(z, now, zoomHistory);
     }
 
     // Apply transitions after the first time.
@@ -50,20 +50,20 @@ void Style::setDefaultTransitionDuration(std::chrono::steady_clock::duration dur
 }
 
 void Style::cascadeClasses(const std::vector<std::string>& classes) {
-    if (layers) {
-        layers->setClasses(classes, std::chrono::steady_clock::now(), defaultTransition);
+    std::chrono::steady_clock::time_point now = std::chrono::steady_clock::now();
+    for (const auto& layer : layers) {
+        layer->setClasses(classes, now, defaultTransition);
     }
 }
 
 bool Style::hasTransitions() const {
-    if (layers) {
-        if (layers->hasTransitions()) {
+    for (const auto& layer : layers) {
+        if (layer->hasTransitions()) {
             return true;
         }
     }
     return false;
 }
-
 
 void Style::loadJSON(const uint8_t *const data) {
     uv::writelock lock(mtx);

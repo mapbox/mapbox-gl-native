@@ -43,7 +43,6 @@ class GlyphAtlas;
 class LineAtlas;
 class Source;
 class StyleSource;
-class StyleLayerGroup;
 
 class FillBucket;
 class LineBucket;
@@ -81,7 +80,6 @@ public:
                 TransformState state,
                 std::chrono::steady_clock::time_point time);
 
-    void renderLayers(const StyleLayerGroup &group);
     void renderLayer(const StyleLayer &layer_desc, const Tile::ID* id = nullptr, const mat4* matrix = nullptr);
 
     // Renders a particular layer from a tile.

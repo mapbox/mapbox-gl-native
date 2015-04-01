@@ -18,7 +18,6 @@
 namespace mbgl {
 
 class StyleBucket;
-class StyleLayerGroup;
 
 class StyleLayer {
 public:

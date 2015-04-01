@@ -18,7 +18,6 @@
 #include <mbgl/text/glyph_store.hpp>
 #include <mbgl/geometry/glyph_atlas.hpp>
 #include <mbgl/style/style_layer.hpp>
-#include <mbgl/style/style_layer_group.hpp>
 #include <mbgl/style/style_bucket.hpp>
 #include <mbgl/util/texture_pool.hpp>
 #include <mbgl/geometry/sprite_atlas.hpp>
@@ -723,7 +722,11 @@ void Map::updateSources() {
 
     // Then, reenable all of those that we actually use when drawing this layer.
     if (style) {
-        updateSources(style->layers);
+        for (const auto& layer : style->layers) {
+            if (layer->bucket && layer->bucket->style_source) {
+                (*activeSources.emplace(layer->bucket->style_source).first)->enabled = true;
+            }
+        }
     }
 
     // Then, construct or destroy the actual source object, depending on enabled state.
@@ -742,20 +745,6 @@ void Map::updateSources() {
     util::erase_if(activeSources, [](util::ptr<StyleSource> source){
         return !source->enabled;
     });
-}
-
-void Map::updateSources(const util::ptr<StyleLayerGroup> &group) {
-    assert(Environment::currentlyOn(ThreadType::Map));
-    if (!group) {
-        return;
-    }
-    for (const auto& layer : group->layers) {
-        if (!layer) continue;
-        if (layer->bucket && layer->bucket->style_source) {
-            (*activeSources.emplace(layer->bucket->style_source).first)->enabled = true;
-        }
-
-    }
 }
 
 void Map::updateTiles() {
