@@ -1,3 +1,7 @@
+# 1.0.2
+
+- Initialize shared display connection at module load time to avoid race condition when display connection is initialized on-demand.
+
 # 1.0.1
 
 - Adapts NodeFileSource around mbgl::Environment additions.
