@@ -18,17 +18,13 @@
 
 namespace mbgl {
 
-class Style;
-class StyleLayoutSymbol;
 class SDFShader;
 class IconShader;
-class DotShader;
 class Collision;
 class SpriteAtlas;
 class Sprite;
 class GlyphAtlas;
 class GlyphStore;
-class FontStack;
 
 class SymbolFeature {
 public:

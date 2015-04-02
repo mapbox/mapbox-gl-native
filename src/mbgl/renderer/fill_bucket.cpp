@@ -102,11 +102,11 @@ void FillBucket::tessellate() {
 
     if (!lineGroups.size() || (lineGroups.back()->vertex_length + total_vertex_count > 65535)) {
         // Move to a new group because the old one can't hold the geometry.
-        lineGroups.emplace_back(util::make_unique<line_group_type>());
+        lineGroups.emplace_back(util::make_unique<LineGroup>());
     }
 
     assert(lineGroups.back());
-    line_group_type& lineGroup = *lineGroups.back();
+    LineGroup& lineGroup = *lineGroups.back();
     uint32_t lineIndex = lineGroup.vertex_length;
 
     for (const auto& polygon : polygons) {
@@ -149,13 +149,13 @@ void FillBucket::tessellate() {
 
         if (!triangleGroups.size() || (triangleGroups.back()->vertex_length + total_vertex_count > 65535)) {
             // Move to a new group because the old one can't hold the geometry.
-            triangleGroups.emplace_back(util::make_unique<triangle_group_type>());
+            triangleGroups.emplace_back(util::make_unique<TriangleGroup>());
         }
 
         // We're generating triangle fans, so we always start with the first
         // coordinate in this polygon.
         assert(triangleGroups.back());
-        triangle_group_type& triangleGroup = *triangleGroups.back();
+        TriangleGroup& triangleGroup = *triangleGroups.back();
         uint32_t triangleIndex = triangleGroup.vertex_length;
 
         for (int i = 0; i < triangle_count; ++i) {
