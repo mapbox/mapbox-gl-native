@@ -44,7 +44,6 @@
         'miscellaneous/functions.cpp',
         'miscellaneous/mapbox.cpp',
         'miscellaneous/merge_lines.cpp',
-        'miscellaneous/rotation_range.cpp',
         'miscellaneous/style_parser.cpp',
         'miscellaneous/text_conversions.cpp',
         'miscellaneous/tile.cpp',
