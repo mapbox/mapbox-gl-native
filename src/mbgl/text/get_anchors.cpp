@@ -1,4 +1,5 @@
 #include <mbgl/text/get_anchors.hpp>
+#include <mbgl/text/check_max_angle.hpp>
 
 #include <mbgl/util/interpolate.hpp>
 
@@ -33,10 +34,9 @@ Anchors resample(const std::vector<Coordinate> &line, const float offset, const 
             if (x >= 0 && x < 4096 && y >= 0 && y < 4096) {
                 Anchor anchor(x, y, angle, 0.5f, i);
 
-                if (!angleWindowSize || true) {
+                if (!angleWindowSize || checkMaxAngle(line, anchor, labelLength, angleWindowSize, maxAngle)) {
                     anchors.push_back(anchor);
                 }
-                //if (!angleWindowSize || checkMaxAngle(line, anchor, labelLength, angleWindowSize, maxAngle)) {
             }
         }
 
@@ -63,8 +63,8 @@ Anchors getAnchors(const std::vector<Coordinate> &line, float spacing,
     // potential label passes text-max-angle check and has enough froom to fit
     // on the line.
 
-    const float angleWindowSize = left - right != 0.0f ?
-        3 / 5 * glyphSize * boxScale :
+    const float angleWindowSize = (left - right) != 0.0f ?
+        3.0f / 5.0f * glyphSize * boxScale :
         0;
 
     // Offset the first anchor by half the label length (or half the spacing distance for icons).
