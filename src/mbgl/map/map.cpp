@@ -18,7 +18,6 @@
 #include <mbgl/text/glyph_store.hpp>
 #include <mbgl/geometry/glyph_atlas.hpp>
 #include <mbgl/style/style_layer.hpp>
-#include <mbgl/style/style_layer_group.hpp>
 #include <mbgl/style/style_bucket.hpp>
 #include <mbgl/util/texture_pool.hpp>
 #include <mbgl/geometry/sprite_atlas.hpp>
@@ -129,19 +128,31 @@ void Map::start(bool startPaused) {
 
         // Remove all of these to make sure they are destructed in the correct thread.
         style.reset();
+
+        // Since we don't have a stylesheet anymore, this will disable all Sources and cancel
+        // their associated requests.
+        updateSources();
+        assert(activeSources.empty());
+
+        // It's now safe to destroy/join the workers since there won't be any more callbacks that
+        // could dispatch to the worker pool.
         workers.reset();
-        activeSources.clear();
 
         terminating = true;
 
         // Closes all open handles on the loop. This means that the loop will automatically terminate.
         asyncRender.reset();
         asyncUpdate.reset();
+        asyncInvoke.reset();
         asyncTerminate.reset();
     });
 
     asyncUpdate = util::make_unique<uv::async>(env->loop, [this] {
         update();
+    });
+
+    asyncInvoke = util::make_unique<uv::async>(env->loop, [this] {
+        processTasks();
     });
 
     asyncRender = util::make_unique<uv::async>(env->loop, [this] {
@@ -315,6 +326,42 @@ void Map::triggerRender() {
     asyncRender->send();
 }
 
+// Runs the function in the map thread.
+void Map::invokeTask(std::function<void()>&& fn) {
+    {
+        std::lock_guard<std::mutex> lock(mutexTask);
+        tasks.emplace(::std::forward<std::function<void()>>(fn));
+    }
+
+    // TODO: Once we have aligned static and continuous rendering, this should always dispatch
+    // to the async queue.
+    if (asyncInvoke) {
+        asyncInvoke->send();
+    } else {
+        processTasks();
+    }
+}
+
+template <typename Fn> auto Map::invokeSyncTask(const Fn& fn) -> decltype(fn()) {
+    std::promise<decltype(fn())> promise;
+    invokeTask([&fn, &promise] { promise.set_value(fn()); });
+    return promise.get_future().get();
+}
+
+// Processes the functions that should be run in the map thread.
+void Map::processTasks() {
+    std::queue<std::function<void()>> queue;
+    {
+        std::lock_guard<std::mutex> lock(mutexTask);
+        queue.swap(tasks);
+    }
+
+    while (!queue.empty()) {
+        queue.front()();
+        queue.pop();
+    }
+}
+
 void Map::checkForPause() {
     std::unique_lock<std::mutex> lockRun (mutexRun);
     while (pausing) {
@@ -352,13 +399,15 @@ void Map::setup() {
 void Map::setStyleURL(const std::string &url) {
     assert(Environment::currentlyOn(ThreadType::Main));
 
-    const size_t pos = url.rfind('/');
+    const std::string styleURL = mbgl::util::mapbox::normalizeStyleURL(url, getAccessToken());
+
+    const size_t pos = styleURL.rfind('/');
     std::string base = "";
     if (pos != std::string::npos) {
-        base = url.substr(0, pos + 1);
+        base = styleURL.substr(0, pos + 1);
     }
 
-    data->setStyleInfo({ url, base, "" });
+    data->setStyleInfo({ styleURL, base, "" });
     triggerUpdate(Update::StyleInfo);
 }
 
@@ -542,21 +591,31 @@ std::string Map::getAccessToken() const {
 
 void Map::setDefaultPointAnnotationSymbol(const std::string& symbol) {
     assert(Environment::currentlyOn(ThreadType::Main));
-    annotationManager->setDefaultPointAnnotationSymbol(symbol);
+    invokeTask([=] {
+        annotationManager->setDefaultPointAnnotationSymbol(symbol);
+    });
+}
+
+double Map::getTopOffsetPixelsForAnnotationSymbol(const std::string& symbol) {
+    assert(Environment::currentlyOn(ThreadType::Main));
+    return invokeSyncTask([&] {
+        assert(sprite);
+        const SpritePosition pos = sprite->getSpritePosition(symbol);
+        return -pos.height / pos.pixelRatio / 2;
+    });
 }
 
 uint32_t Map::addPointAnnotation(const LatLng& point, const std::string& symbol) {
-    assert(Environment::currentlyOn(ThreadType::Main));
-    std::vector<LatLng> points({ point });
-    std::vector<std::string> symbols({ symbol });
-    return addPointAnnotations(points, symbols)[0];
+    return addPointAnnotations({ point }, { symbol }).front();
 }
 
 std::vector<uint32_t> Map::addPointAnnotations(const std::vector<LatLng>& points, const std::vector<std::string>& symbols) {
     assert(Environment::currentlyOn(ThreadType::Main));
-    auto result = annotationManager->addPointAnnotations(points, symbols, *this);
-    updateAnnotationTiles(result.first);
-    return result.second;
+    return invokeSyncTask([&] {
+        auto result = annotationManager->addPointAnnotations(points, symbols, *this);
+        updateAnnotationTiles(result.first);
+        return result.second;
+    });
 }
 
 void Map::removeAnnotation(uint32_t annotation) {
@@ -566,22 +625,28 @@ void Map::removeAnnotation(uint32_t annotation) {
 
 void Map::removeAnnotations(const std::vector<uint32_t>& annotations) {
     assert(Environment::currentlyOn(ThreadType::Main));
-    auto result = annotationManager->removeAnnotations(annotations, *this);
-    updateAnnotationTiles(result);
+    invokeTask([=] {
+        auto result = annotationManager->removeAnnotations(annotations, *this);
+        updateAnnotationTiles(result);
+    });
 }
 
-std::vector<uint32_t> Map::getAnnotationsInBounds(const LatLngBounds& bounds) const {
+std::vector<uint32_t> Map::getAnnotationsInBounds(const LatLngBounds& bounds) {
     assert(Environment::currentlyOn(ThreadType::Main));
-    return annotationManager->getAnnotationsInBounds(bounds, *this);
+    return invokeSyncTask([&] {
+        return annotationManager->getAnnotationsInBounds(bounds, *this);
+    });
 }
 
-LatLngBounds Map::getBoundsForAnnotations(const std::vector<uint32_t>& annotations) const {
+LatLngBounds Map::getBoundsForAnnotations(const std::vector<uint32_t>& annotations) {
     assert(Environment::currentlyOn(ThreadType::Main));
-    return annotationManager->getBoundsForAnnotations(annotations);
+    return invokeSyncTask([&] {
+        return annotationManager->getBoundsForAnnotations(annotations);
+    });
 }
 
 void Map::updateAnnotationTiles(const std::vector<Tile::ID>& ids) {
-    assert(Environment::currentlyOn(ThreadType::Main));
+    assert(Environment::currentlyOn(ThreadType::Map));
     for (const auto &source : activeSources) {
         if (source->info.type == SourceType::Annotations) {
             source->source->invalidateTiles(*this, ids);
@@ -657,7 +722,11 @@ void Map::updateSources() {
 
     // Then, reenable all of those that we actually use when drawing this layer.
     if (style) {
-        updateSources(style->layers);
+        for (const auto& layer : style->layers) {
+            if (layer->bucket && layer->bucket->style_source) {
+                (*activeSources.emplace(layer->bucket->style_source).first)->enabled = true;
+            }
+        }
     }
 
     // Then, construct or destroy the actual source object, depending on enabled state.
@@ -678,23 +747,9 @@ void Map::updateSources() {
     });
 }
 
-void Map::updateSources(const util::ptr<StyleLayerGroup> &group) {
-    assert(Environment::currentlyOn(ThreadType::Map));
-    if (!group) {
-        return;
-    }
-    for (const util::ptr<StyleLayer> &layer : group->layers) {
-        if (!layer) continue;
-        if (layer->bucket && layer->bucket->style_source) {
-            (*activeSources.emplace(layer->bucket->style_source).first)->enabled = true;
-        }
-
-    }
-}
-
 void Map::updateTiles() {
     assert(Environment::currentlyOn(ThreadType::Map));
-    for (const auto &source : activeSources) {
+    for (const auto& source : activeSources) {
         source->source->update(*this, getWorker(), style, *glyphAtlas, *glyphStore,
                                *spriteAtlas, getSprite(), *texturePool, [this]() {
             assert(Environment::currentlyOn(ThreadType::Map));
@@ -741,7 +796,7 @@ void Map::loadStyleJSON(const std::string& json, const std::string& base) {
     style = std::make_shared<Style>();
     style->base = base;
     style->loadJSON((const uint8_t *)json.c_str());
-    style->cascadeClasses(data->getClasses());
+    style->cascade(data->getClasses());
     style->setDefaultTransitionDuration(data->getDefaultTransitionDuration());
 
     const std::string glyphURL = util::mapbox::normalizeGlyphsURL(style->glyph_url, getAccessToken());
@@ -754,7 +809,7 @@ void Map::prepare() {
     assert(Environment::currentlyOn(ThreadType::Map));
 
     const auto u = updated.exchange(static_cast<UpdateType>(Update::Nothing));
-    if (u & static_cast<UpdateType>(Update::StyleInfo)) {
+    if ((u & static_cast<UpdateType>(Update::StyleInfo)) || !style) {
         reloadStyle();
     }
     if (u & static_cast<UpdateType>(Update::Debug)) {
@@ -768,7 +823,7 @@ void Map::prepare() {
     }
     if (u & static_cast<UpdateType>(Update::Classes)) {
         if (style) {
-            style->cascadeClasses(data->getClasses());
+            style->cascade(data->getClasses());
         }
     }
 
@@ -784,7 +839,7 @@ void Map::prepare() {
 
     if (style) {
         updateSources();
-        style->updateProperties(state.getNormalizedZoom(), animationTime);
+        style->recalculate(state.getNormalizedZoom(), animationTime);
 
         // Allow the sprite atlas to potentially pull new sprite images if needed.
         spriteAtlas->resize(state.getPixelRatio());
@@ -804,6 +859,7 @@ void Map::render() {
     // Cleanup OpenGL objects that we abandoned since the last render call.
     env->performCleanup();
 
+    assert(style);
     assert(painter);
     painter->render(*style, activeSources,
                     state, data->getAnimationTime());

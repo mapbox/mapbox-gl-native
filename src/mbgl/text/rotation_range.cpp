@@ -17,7 +17,7 @@ CollisionRange mergeCollisions(const CollisionList &collisions,
     float min = 2.0f * M_PI;
     float max = 0.0f;
 
-    for (CollisionRange collision : collisions) {
+    for (const auto& collision : collisions) {
         bool entryOutside =
             ignoreRange[0] <= collision[0] && collision[0] <= ignoreRange[1];
         bool exitOutside =

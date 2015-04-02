@@ -5,8 +5,6 @@
 
 #include <cassert>
 
-struct geometry_too_long_exception : std::exception {};
-
 using namespace mbgl;
 
 DebugBucket::DebugBucket(DebugFontBuffer& fontBuffer_)

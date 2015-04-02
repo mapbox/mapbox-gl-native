@@ -78,7 +78,7 @@ void Source::updateClipIDs(const std::map<Tile::ID, ClipID> &mapping) {
 }
 
 void Source::updateMatrices(const mat4 &projMatrix, const TransformState &transform) {
-    for (std::pair<const Tile::ID, std::unique_ptr<Tile>> &pair : tiles) {
+    for (const auto& pair : tiles) {
         Tile &tile = *pair.second;
         transform.matrixFor(tile.matrix, tile.id);
         matrix::multiply(tile.matrix, projMatrix, tile.matrix);
@@ -90,7 +90,7 @@ size_t Source::getTileCount() const {
 }
 
 void Source::drawClippingMasks(Painter &painter) {
-    for (std::pair<const Tile::ID, std::unique_ptr<Tile>> &pair : tiles) {
+    for (const auto& pair : tiles) {
         Tile &tile = *pair.second;
         gl::group group(std::string { "mask: " } + std::string(tile.id));
         painter.drawClippingMask(tile.matrix, tile.clip);
@@ -99,7 +99,7 @@ void Source::drawClippingMasks(Painter &painter) {
 
 void Source::render(Painter &painter, const StyleLayer &layer_desc) {
     gl::group group(std::string { "layer: " } + layer_desc.id);
-    for (const std::pair<const Tile::ID, std::unique_ptr<Tile>> &pair : tiles) {
+    for (const auto& pair : tiles) {
         Tile &tile = *pair.second;
         if (tile.data && tile.data->state == TileData::State::parsed) {
             painter.renderTileLayer(tile, layer_desc, tile.matrix);
@@ -115,7 +115,7 @@ void Source::render(Painter &painter, const StyleLayer &layer_desc, const Tile::
 }
 
 void Source::finishRender(Painter &painter) {
-    for (std::pair<const Tile::ID, std::unique_ptr<Tile>> &pair : tiles) {
+    for (const auto& pair : tiles) {
         Tile &tile = *pair.second;
         painter.renderTileDebug(tile);
     }
@@ -252,7 +252,7 @@ bool Source::findLoadedChildren(const Tile::ID& id, int32_t maxCoveringZoom, std
     bool complete = true;
     int32_t z = id.z;
     auto ids = id.children(z + 1);
-    for (const Tile::ID& child_id : ids) {
+    for (const auto& child_id : ids) {
         const TileData::State state = hasTile(child_id);
         if (state == TileData::State::parsed) {
             retain.emplace_front(child_id);
@@ -301,8 +301,6 @@ void Source::update(Map &map,
         return;
     }
 
-    bool changed = false;
-
     int32_t zoom = std::floor(getZoom(map.getState()));
     std::forward_list<Tile::ID> required = coveringTiles(map.getState());
 
@@ -316,7 +314,7 @@ void Source::update(Map &map,
     std::forward_list<Tile::ID> retain(required);
 
     // Add existing child/parent tiles if the actual tile is not yet loaded
-    for (const Tile::ID& id : required) {
+    for (const auto& id : required) {
         const TileData::State state = addTile(map, worker, style, glyphAtlas, glyphStore,
                                               spriteAtlas, sprite, texturePool, id, callback);
 
@@ -334,21 +332,15 @@ void Source::update(Map &map,
                 findLoadedParent(id, minCoveringZoom, retain);
             }
         }
-
-        if (state == TileData::State::initial) {
-            changed = true;
-        }
     }
 
     // Remove tiles that we definitely don't need, i.e. tiles that are not on
     // the required list.
     std::set<Tile::ID> retain_data;
-    util::erase_if(tiles, [&retain, &retain_data, &changed](std::pair<const Tile::ID, std::unique_ptr<Tile>> &pair) {
+    util::erase_if(tiles, [&retain, &retain_data](std::pair<const Tile::ID, std::unique_ptr<Tile>> &pair) {
         Tile &tile = *pair.second;
         bool obsolete = std::find(retain.begin(), retain.end(), tile.id) == retain.end();
-        if (obsolete) {
-            changed = true;
-        } else {
+        if (!obsolete) {
             retain_data.insert(tile.data->id);
         }
         return obsolete;

@@ -22,7 +22,7 @@ Pod::Spec.new do |m|
 
   m.resource_bundle = { 'MapboxGL' => 'MapboxGL.bundle/*' }
 
-  m.frameworks = 'CoreLocation', 'GLKit', 'ImageIO', 'MobileCoreServices', 'SystemConfiguration'
+  m.frameworks = 'CoreLocation', 'CoreTelephony', 'GLKit', 'ImageIO', 'MobileCoreServices', 'QuartzCore', 'SystemConfiguration'
 
   m.libraries = 'c++', 'sqlite3', 'z'
 

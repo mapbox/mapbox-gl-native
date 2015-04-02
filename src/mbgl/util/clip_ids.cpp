@@ -18,7 +18,7 @@ ClipIDGenerator::Leaf::Leaf(Tile &tile_) : tile(tile_) {}
 void ClipIDGenerator::Leaf::add(const Tile::ID &p) {
     if (p.isChildOf(tile.id)) {
         // Ensure that no already present child is a parent of the new p.
-        for (const Tile::ID &child : children) {
+        for (const auto& child : children) {
             if (p.isChildOf(child))
                 return;
         }
@@ -31,7 +31,7 @@ bool ClipIDGenerator::Leaf::operator==(const Leaf &other) const {
 }
 
 bool ClipIDGenerator::reuseExisting(Leaf &leaf) {
-    for (const std::vector<Leaf> &pool : pools) {
+    for (const auto& pool : pools) {
         auto existing = std::find(pool.begin(), pool.end(), leaf);
         if (existing != pool.end()) {
             leaf.tile.clip = existing->tile.clip;
@@ -80,7 +80,7 @@ void ClipIDGenerator::update(std::forward_list<Tile *> tiles) {
         // We are starting our count with 1 since we need at least 1 bit set to distinguish between
         // areas without any tiles whatsoever and the current area.
         uint8_t count = 1;
-        for (Leaf &leaf : pool) {
+        for (auto& leaf : pool) {
             leaf.tile.clip.mask = mask;
             leaf.tile.clip.reference = count++ << bit_offset;
         }

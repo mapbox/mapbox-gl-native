@@ -7,6 +7,7 @@
 #include <mbgl/geometry/elements_buffer.hpp>
 #include <mbgl/geometry/line_buffer.hpp>
 #include <mbgl/style/style_bucket.hpp>
+#include <mbgl/style/style_layout.hpp>
 #include <mbgl/util/vec.hpp>
 
 #include <vector>
@@ -14,7 +15,6 @@
 namespace mbgl {
 
 class Style;
-class StyleLayoutLine;
 class LineVertexBuffer;
 class TriangleElementsBuffer;
 class LineShader;
@@ -27,8 +27,7 @@ class LineBucket : public Bucket {
     typedef ElementGroup<1> point_group_type;
 
 public:
-    LineBucket(std::unique_ptr<const StyleLayoutLine> styleLayout,
-               LineVertexBuffer &vertexBuffer,
+    LineBucket(LineVertexBuffer &vertexBuffer,
                TriangleElementsBuffer &triangleElementsBuffer,
                PointElementsBuffer &pointElementsBuffer);
     ~LineBucket() override;
@@ -48,7 +47,7 @@ public:
     void drawPoints(LinejoinShader& shader);
 
 public:
-    const std::unique_ptr<const StyleLayoutLine> styleLayout;
+    StyleLayoutLine layout;
 
 private:
     LineVertexBuffer& vertexBuffer;

@@ -26,7 +26,6 @@
           '<@(uv_static_libs)',
         ],
         'ldflags': [
-          '-framework Foundation',
           '-framework ImageIO',
           '-framework CoreServices',
           '-framework OpenGL',
@@ -42,6 +41,7 @@
       'xcode_settings': {
         'OTHER_CPLUSPLUSFLAGS': [ '<@(cflags_cc)' ],
         'CLANG_ENABLE_OBJC_ARC': 'YES',
+        'CLANG_ENABLE_MODULES': 'YES',
       },
 
       'link_settings': {

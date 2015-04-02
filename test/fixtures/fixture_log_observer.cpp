@@ -28,7 +28,7 @@ bool FixtureLogObserver::onRecord(EventSeverity severity, Event event, int64_t c
 
 size_t FixtureLogObserver::count(const LogMessage &message) const {
     size_t message_count = 0;
-    for (const LogMessage &msg : messages) {
+    for (const auto& msg : messages) {
         if (msg == message) {
             message_count++;
             msg.checked = true;
@@ -39,7 +39,7 @@ size_t FixtureLogObserver::count(const LogMessage &message) const {
 
 std::vector<FixtureLogObserver::LogMessage> FixtureLogObserver::unchecked() const {
     std::vector<LogMessage> unchecked_messages;
-    for (const LogMessage &msg : messages) {
+    for (const auto& msg : messages) {
         if (!msg.checked) {
             unchecked_messages.push_back(msg);
             msg.checked = true;
@@ -50,7 +50,7 @@ std::vector<FixtureLogObserver::LogMessage> FixtureLogObserver::unchecked() cons
 
 ::std::ostream &operator<<(::std::ostream &os,
                            const std::vector<FixtureLogObserver::LogMessage> &messages) {
-    for (const FixtureLogObserver::LogMessage &message : messages) {
+    for (const auto& message : messages) {
         os << "- " << message;
     }
     return os;

@@ -73,7 +73,7 @@ Rect<SpriteAtlas::dimension> SpriteAtlas::allocateImage(const size_t pixel_width
     // This is so we can scale down the texture coordinates and pack them
     // into 2 bytes rather than 4 bytes.
     const uint16_t pack_width = (pixel_width + 1) + (4 - (pixel_width + 1) % 4);
-    const uint16_t pack_height = (pixel_height + 1) + (4 - (pixel_width + 1) % 4);
+    const uint16_t pack_height = (pixel_height + 1) + (4 - (pixel_height + 1) % 4);
 
     // We have to allocate a new area in the bin, and store an empty image in it.
     // Add a 1px border around every image.
@@ -165,37 +165,37 @@ void SpriteAtlas::copy(const Rect<dimension>& dst, const SpritePosition& src, co
                                   static_cast<uint32_t>(dst.originalW * pixelRatio),
                                   static_cast<uint32_t>(dst.originalH * pixelRatio) };
 
-    util::bilinearScale(srcData, srcSize, srcPos, dstData, dstSize, dstPos);
+    util::bilinearScale(srcData, srcSize, srcPos, dstData, dstSize, dstPos, wrap);
 
     // Add borders around the copied image if required.
     if (wrap) {
         // We're copying from the same image so we don't have to scale again.
         const uint32_t border = 1;
+        const uint32_t borderX = dstPos.x != 0 ? border : 0;
+        const uint32_t borderY = dstPos.y != 0 ? border : 0;
+
         // Left border
-        if (dstPos.x >= border) {
-            util::nearestNeighborScale(
-                dstData, dstSize, { dstPos.x + dstPos.w - border - 1, dstPos.y, border, dstPos.h },
-                dstData, dstSize, { dstPos.x - border, dstPos.y, border, dstPos.h });
-        }
+        util::nearestNeighborScale(
+            dstData, dstSize, { dstPos.x + dstPos.w - borderX, dstPos.y, borderX, dstPos.h },
+            dstData, dstSize, { dstPos.x - borderX, dstPos.y, borderX, dstPos.h });
+
         // Right border
         util::nearestNeighborScale(dstData, dstSize, { dstPos.x, dstPos.y, border, dstPos.h },
                                    dstData, dstSize,
                                    { dstPos.x + dstPos.w, dstPos.y, border, dstPos.h });
 
         // Top border
-        if (dstPos.y >= border) {
-            util::nearestNeighborScale(
-                dstData, dstSize, { dstPos.x - border, dstPos.y + dstPos.h - border - 1,
-                                    dstPos.w + 2 * border, border },
-                dstData, dstSize,
-                { dstPos.x - border, dstPos.y - border, dstPos.w + 2 * border, border });
-        }
+        util::nearestNeighborScale(
+            dstData, dstSize, { dstPos.x - borderX, dstPos.y + dstPos.h - borderY,
+                                dstPos.w + border + borderX, borderY },
+            dstData, dstSize,
+            { dstPos.x - borderX, dstPos.y - borderY, dstPos.w + 2 * borderX, borderY });
 
         // Bottom border
         util::nearestNeighborScale(
-            dstData, dstSize, { dstPos.x - border, dstPos.y, dstPos.w + 2 * border, border },
+            dstData, dstSize, { dstPos.x - borderX, dstPos.y, dstPos.w + 2 * borderX, border },
             dstData, dstSize,
-            { dstPos.x - border, dstPos.y + dstPos.h, dstPos.w + 2 * border, border });
+            { dstPos.x - borderX, dstPos.y + dstPos.h, dstPos.w + border + borderX, border });
     }
 
     dirty = true;

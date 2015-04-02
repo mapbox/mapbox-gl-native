@@ -12,22 +12,17 @@
 
 #include <cassert>
 
-struct geometry_too_long_exception : std::exception {};
-
 using namespace mbgl;
 
-LineBucket::LineBucket(std::unique_ptr<const StyleLayoutLine> styleLayout_,
-                       LineVertexBuffer &vertexBuffer_,
+LineBucket::LineBucket(LineVertexBuffer &vertexBuffer_,
                        TriangleElementsBuffer &triangleElementsBuffer_,
                        PointElementsBuffer &pointElementsBuffer_)
-    : styleLayout(std::move(styleLayout_)),
-      vertexBuffer(vertexBuffer_),
+    : vertexBuffer(vertexBuffer_),
       triangleElementsBuffer(triangleElementsBuffer_),
       pointElementsBuffer(pointElementsBuffer_),
       vertex_start(vertexBuffer_.index()),
       triangle_elements_start(triangleElementsBuffer_.index()),
       point_elements_start(pointElementsBuffer_.index()) {
-    assert(styleLayout);
 }
 
 LineBucket::~LineBucket() {
@@ -48,7 +43,6 @@ void LineBucket::addGeometry(const GeometryCollection& geometryCollection) {
 }
 
 void LineBucket::addGeometry(const std::vector<Coordinate>& vertices) {
-    auto &layout = *styleLayout;
     // TODO: use roundLimit
     // const float roundLimit = geometry.round_limit;
 
@@ -302,7 +296,7 @@ void LineBucket::addGeometry(const std::vector<Coordinate>& vertices) {
 
         assert(triangleGroups.back());
         triangle_group_type& group = *triangleGroups.back();
-        for (const TriangleElement& triangle : triangle_store) {
+        for (const auto& triangle : triangle_store) {
             triangleElementsBuffer.add(
                 group.vertex_length + triangle.a,
                 group.vertex_length + triangle.b,
@@ -323,7 +317,7 @@ void LineBucket::addGeometry(const std::vector<Coordinate>& vertices) {
 
         assert(pointGroups.back());
         point_group_type& group = *pointGroups.back();
-        for (PointElement point : point_store) {
+        for (const auto point : point_store) {
             pointElementsBuffer.add(group.vertex_length + point);
         }
 

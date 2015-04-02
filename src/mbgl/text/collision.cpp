@@ -91,7 +91,7 @@ GlyphBox getMergedGlyphs(const GlyphBoxes &boxes, const CollisionAnchor &anchor)
     mergedGlyphs.anchor = anchor;
 
     CollisionRect &box = mergedGlyphs.box;
-    for (const GlyphBox &glyph : boxes) {
+    for (const auto& glyph : boxes) {
         const CollisionRect &gbox = glyph.box;
         box.tl.x = util::min(box.tl.x, gbox.tl.x);
         box.tl.y = util::min(box.tl.y, gbox.tl.y);
@@ -105,7 +105,7 @@ GlyphBox getMergedGlyphs(const GlyphBoxes &boxes, const CollisionAnchor &anchor)
 
 float Collision::getPlacementScale(const GlyphBoxes &glyphs, float minPlacementScale, bool avoidEdges) {
 
-    for (const GlyphBox &glyph : glyphs) {
+    for (const auto& glyph : glyphs) {
         const CollisionRect &box = glyph.box;
         const CollisionRect &bbox = glyph.hBox ? glyph.hBox.get() : glyph.box;
         const CollisionAnchor &anchor = glyph.anchor;
@@ -141,7 +141,7 @@ float Collision::getPlacementScale(const GlyphBoxes &glyphs, float minPlacementS
             const CollisionAnchor &na = anchor; // new anchor
             const CollisionRect &nb = box;      // new box
 
-            for (const PlacementValue &value : blocking) {
+            for (const auto& value : blocking) {
                 const PlacementBox &placement = std::get<1>(value);
                 const CollisionAnchor &oa = placement.anchor; // old anchor
                 const CollisionRect &ob = placement.box;      // old box
@@ -198,7 +198,7 @@ PlacementRange Collision::getPlacementRange(const GlyphBoxes &glyphs, float plac
                                             bool horizontal) {
     PlacementRange placementRange = {{2.0f * M_PI, 0}};
 
-    for (const GlyphBox &glyph : glyphs) {
+    for (const auto& glyph : glyphs) {
         const CollisionRect &bbox = glyph.hBox ? glyph.hBox.get() : glyph.box;
         const CollisionAnchor &anchor = glyph.anchor;
 
@@ -216,7 +216,7 @@ PlacementRange Collision::getPlacementRange(const GlyphBoxes &glyphs, float plac
             cTree.query(bgi::intersects(query_box), std::back_inserter(blocking));
         }
 
-        for (const PlacementValue &value : blocking) {
+        for (const auto& value : blocking) {
             const Box &s = std::get<0>(value);
             const PlacementBox &b = std::get<1>(value);
             const CollisionRect &bbox2 = b.hBox ? b.hBox.get() : b.box;
@@ -265,7 +265,7 @@ void Collision::insert(const GlyphBoxes &glyphs, const CollisionAnchor &anchor,
     std::vector<PlacementValue> allBounds;
     allBounds.reserve(glyphs.size());
 
-    for (const GlyphBox &glyph : glyphs) {
+    for (const auto& glyph : glyphs) {
         const CollisionRect &box = glyph.box;
         const CollisionRect &bbox = glyph.hBox ? glyph.hBox.get() : glyph.box;
 

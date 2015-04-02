@@ -12,7 +12,7 @@ namespace util {
 
 void bilinearScale(const uint32_t* srcData, const vec2<uint32_t>& srcSize,
                    const Rect<uint32_t>& srcPos, uint32_t* dstData, const vec2<uint32_t>& dstSize,
-                   const Rect<uint32_t>& dstPos);
+                   const Rect<uint32_t>& dstPos, bool wrap);
 
 void nearestNeighborScale(const uint32_t* srcData, const vec2<uint32_t>& srcSize,
                           const Rect<uint32_t>& srcPos, uint32_t* dstData,

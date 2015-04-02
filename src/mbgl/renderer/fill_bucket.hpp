@@ -6,6 +6,7 @@
 #include <mbgl/geometry/elements_buffer.hpp>
 #include <mbgl/geometry/fill_buffer.hpp>
 #include <mbgl/style/style_bucket.hpp>
+#include <mbgl/style/style_layout.hpp>
 
 #include <clipper/clipper.hpp>
 #include <libtess2/tesselator.h>
@@ -39,8 +40,7 @@ class FillBucket : public Bucket {
     typedef ElementGroup<1> line_group_type;
 
 public:
-    FillBucket(std::unique_ptr<const StyleLayoutFill> styleLayout,
-               FillVertexBuffer &vertexBuffer,
+    FillBucket(FillVertexBuffer &vertexBuffer,
                TriangleElementsBuffer &triangleElementsBuffer,
                LineElementsBuffer &lineElementsBuffer);
     ~FillBucket() override;
@@ -57,7 +57,7 @@ public:
     void drawVertices(OutlineShader& shader);
 
 public:
-    const std::unique_ptr<const StyleLayoutFill> styleLayout;
+    StyleLayoutFill layout;
 
 private:
     TESSalloc *allocator;

@@ -25,10 +25,13 @@ config/%.gypi: configure
 styles/styles:
 	git submodule update --init styles
 
+SMCalloutView:
+	git submodule update --init platform/ios/vendor/SMCalloutView
+
 #### Library builds ############################################################
 
 .PRECIOUS: Makefile/mbgl
-Makefile/mbgl: config/$(HOST).gypi styles/styles
+Makefile/mbgl: config/$(HOST).gypi styles/styles SMCalloutView
 	deps/run_gyp mbgl.gyp $(CONFIG_$(HOST)) $(LIBS_$(HOST)) --generator-output=./build/$(HOST) -f make
 
 mbgl: Makefile/mbgl
@@ -41,13 +44,13 @@ install: Makefile/mbgl
 	LINK=`pwd`/gyp/link.py $(MAKE) -C build/$(HOST) BUILDTYPE=$(BUILDTYPE) install
 
 .PRECIOUS: Xcode/mbgl
-Xcode/mbgl: config/$(HOST).gypi styles/styles
+Xcode/mbgl: config/$(HOST).gypi styles/styles SMCalloutView
 	deps/run_gyp mbgl.gyp $(CONFIG_$(HOST)) $(LIBS_$(HOST)) --generator-output=./build/$(HOST) -f xcode
 
 ##### Test builds ##############################################################
 
 .PRECIOUS: Makefile/test
-Makefile/test: test/test.gyp config/$(HOST).gypi styles/styles
+Makefile/test: test/test.gyp config/$(HOST).gypi styles/styles SMCalloutView
 	deps/run_gyp test/test.gyp $(CONFIG_$(HOST)) $(LIBS_$(HOST)) --generator-output=./build/$(HOST) -f make
 
 test: Makefile/test
@@ -58,7 +61,7 @@ test-%: test
 
 
 .PRECIOUS: Xcode/test
-Xcode/test: test/test.gyp config/osx.gypi styles/styles
+Xcode/test: test/test.gyp config/osx.gypi styles/styles SMCalloutView
 	deps/run_gyp test/test.gyp $(CONFIG_osx) $(LIBS_osx) --generator-output=./build/osx -f xcode
 
 .PHONY: lproj lbuild run-xlinux
@@ -108,7 +111,7 @@ xproj: xosx-proj
 #### iOS application builds ####################################################
 
 .PRECIOUS: Xcode/ios
-Xcode/ios: ios/app/mapboxgl-app.gyp config/ios.gypi styles/styles
+Xcode/ios: ios/app/mapboxgl-app.gyp config/ios.gypi styles/styles SMCalloutView
 	deps/run_gyp ios/app/mapboxgl-app.gyp $(CONFIG_ios) $(LIBS_ios) --generator-output=./build/ios -f xcode
 
 .PHONY: ios-proj ios run-ios

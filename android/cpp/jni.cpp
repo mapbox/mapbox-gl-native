@@ -160,7 +160,7 @@ jobject std_vector_string_to_jobject(JNIEnv *env, std::vector<std::string> vecto
         return nullptr;
     }
 
-    for (std::string str : vector) {
+    for (const auto& str : vector) {
         env->CallBooleanMethod(jlist, arrayListAddId, std_string_to_jstring(env, str));
         if (env->ExceptionCheck()) {
             env->ExceptionDescribe();

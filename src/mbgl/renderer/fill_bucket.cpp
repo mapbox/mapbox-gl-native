@@ -28,12 +28,10 @@ void FillBucket::free(void *, void *ptr) {
     ::free(ptr);
 }
 
-FillBucket::FillBucket(std::unique_ptr<const StyleLayoutFill> styleLayout_,
-                       FillVertexBuffer &vertexBuffer_,
+FillBucket::FillBucket(FillVertexBuffer &vertexBuffer_,
                        TriangleElementsBuffer &triangleElementsBuffer_,
                        LineElementsBuffer &lineElementsBuffer_)
-    : styleLayout(std::move(styleLayout_)),
-      allocator(new TESSalloc{
+    : allocator(new TESSalloc{
           &alloc,
           &realloc,
           &free,
@@ -53,7 +51,6 @@ FillBucket::FillBucket(std::unique_ptr<const StyleLayoutFill> styleLayout_,
       triangle_elements_start(triangleElementsBuffer_.index()),
       line_elements_start(lineElementsBuffer.index()) {
     assert(tesselator);
-    assert(styleLayout);
 }
 
 FillBucket::~FillBucket() {
@@ -95,7 +92,7 @@ void FillBucket::tessellate() {
     }
 
     size_t total_vertex_count = 0;
-    for (const std::vector<ClipperLib::IntPoint>& polygon : polygons) {
+    for (const auto& polygon : polygons) {
         total_vertex_count += polygon.size();
     }
 
@@ -112,12 +109,12 @@ void FillBucket::tessellate() {
     line_group_type& lineGroup = *lineGroups.back();
     uint32_t lineIndex = lineGroup.vertex_length;
 
-    for (const std::vector<ClipperLib::IntPoint>& polygon : polygons) {
+    for (const auto& polygon : polygons) {
         const size_t group_count = polygon.size();
         assert(group_count >= 3);
 
         std::vector<TESSreal> clipped_line;
-        for (const ClipperLib::IntPoint& pt : polygon) {
+        for (const auto& pt : polygon) {
             clipped_line.push_back(pt.X);
             clipped_line.push_back(pt.Y);
             vertexBuffer.add(pt.X, pt.Y);
