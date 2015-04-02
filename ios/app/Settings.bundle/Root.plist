@@ -9,23 +9,9 @@
 			<string>Privacy Settings</string>
 			<key>Type</key>
 			<string>PSGroupSpecifier</string>
+			<key>FooterText</key>
+			<string>This setting allows the application to share anonymized location and usage data with Mapbox.</string>
 		</dict>
-<!--
-        <dict>
-            <key>DefaultValue</key>
-            <true/>
-            <key>Key</key>
-            <string>mapbox_metrics_disabled</string>
-            <key>Title</key>
-            <string>Mapbox Metrics Are Disabled</string>
-            <key>Type</key>
-            <string>PSTitleValueSpecifier</string>
-            <key>TrueValue</key>
-            <true/>
-            <key>FalseValue</key>
-            <false/>
-        </dict>
- -->
 		<dict>
 			<key>DefaultValue</key>
 			<true/>
