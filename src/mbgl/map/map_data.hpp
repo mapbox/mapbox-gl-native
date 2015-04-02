@@ -1,10 +1,11 @@
 #ifndef MBGL_MAP_MAP_DATA
 #define MBGL_MAP_MAP_DATA
 
+#include <mbgl/util/chrono.hpp>
+
 #include <string>
 #include <mutex>
 #include <atomic>
-#include <chrono>
 #include <vector>
 
 namespace mbgl {
@@ -20,8 +21,8 @@ class MapData {
 
 public:
     inline MapData() {
-        setAnimationTime(std::chrono::steady_clock::time_point::min());
-        setDefaultTransitionDuration(std::chrono::steady_clock::duration::zero());
+        setAnimationTime(TimePoint::min());
+        setDefaultTransitionDuration(Duration::zero());
     }
 
     inline StyleInfo getStyleInfo() const {
@@ -70,19 +71,19 @@ public:
         debug = value;
     }
 
-    inline std::chrono::steady_clock::time_point getAnimationTime() const {
-        // We're casting the time_point to and from a duration because libstdc++
-        // has a bug that doesn't allow time_points to be atomic.
-        return std::chrono::steady_clock::time_point(animationTime);
+    inline TimePoint getAnimationTime() const {
+        // We're casting the TimePoint to and from a Duration because libstdc++
+        // has a bug that doesn't allow TimePoints to be atomic.
+        return TimePoint(animationTime);
     }
-    inline void setAnimationTime(std::chrono::steady_clock::time_point timePoint) {
+    inline void setAnimationTime(TimePoint timePoint) {
         animationTime = timePoint.time_since_epoch();
     };
 
-    inline std::chrono::steady_clock::duration getDefaultTransitionDuration() const {
+    inline Duration getDefaultTransitionDuration() const {
         return defaultTransitionDuration;
     }
-    inline void setDefaultTransitionDuration(std::chrono::steady_clock::duration duration) {
+    inline void setDefaultTransitionDuration(Duration duration) {
         defaultTransitionDuration = duration;
     };
 
@@ -93,8 +94,8 @@ private:
     std::string accessToken;
     std::vector<std::string> classes;
     std::atomic<uint8_t> debug { false };
-    std::atomic<std::chrono::steady_clock::time_point::duration> animationTime;
-    std::atomic<std::chrono::steady_clock::duration> defaultTransitionDuration;
+    std::atomic<Duration> animationTime;
+    std::atomic<Duration> defaultTransitionDuration;
 };
 
 }

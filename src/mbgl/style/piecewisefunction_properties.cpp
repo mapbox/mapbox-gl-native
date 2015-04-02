@@ -20,7 +20,7 @@ T PiecewiseConstantFunction<T>::evaluate(float z, const ZoomHistory &zh) const {
     T result;
 
     float fraction = std::fmod(z, 1.0f);
-    float t = std::min((std::chrono::steady_clock::now() - zh.lastIntegerZoomTime) / duration, 1.0f);
+    float t = std::min((Clock::now() - zh.lastIntegerZoomTime) / duration, 1.0f);
     float fromScale = 1.0f;
     float toScale = 1.0f;
     size_t from, to;

@@ -1,6 +1,7 @@
 #include <mbgl/storage/default/http_request.hpp>
 #include <mbgl/storage/default/http_context.hpp>
 #include <mbgl/storage/response.hpp>
+#include <mbgl/util/chrono.hpp>
 #include <mbgl/platform/log.hpp>
 
 #include <mbgl/util/time.hpp>
@@ -551,7 +552,7 @@ int64_t parseCacheControl(const char *value) {
         // http://www.w3.org/Protocols/rfc2616/rfc2616-sec14.html#sec14.9
         if (std::sscanf(value, "max-age=%llu", &seconds) == 1) {
             return std::chrono::duration_cast<std::chrono::seconds>(
-                       std::chrono::system_clock::now().time_since_epoch()).count() +
+                       SystemClock::now().time_since_epoch()).count() +
                    seconds;
         }
     }

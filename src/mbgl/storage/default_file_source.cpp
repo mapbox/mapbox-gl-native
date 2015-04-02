@@ -10,6 +10,7 @@
 #include <mbgl/util/util.hpp>
 
 #include <mbgl/util/variant.hpp>
+#include <mbgl/util/chrono.hpp>
 #include <mbgl/platform/log.hpp>
 
 #pragma GCC diagnostic push
@@ -200,7 +201,7 @@ void DefaultFileSource::process(ResultAction &action) {
         if (action.response) {
             // This entry was stored in the cache. Now determine if we need to revalidate.
             const int64_t now = std::chrono::duration_cast<std::chrono::seconds>(
-                                    std::chrono::system_clock::now().time_since_epoch()).count();
+                                    SystemClock::now().time_since_epoch()).count();
             if (action.response->expires > now) {
                 // The response is fresh. We're good to notify the caller.
                 sharedRequest->notify(std::move(action.response), FileCache::Hint::No);
