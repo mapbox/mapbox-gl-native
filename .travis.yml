@@ -39,3 +39,5 @@ after_success:
 
 git:
   submodules: true
+
+sudo: required

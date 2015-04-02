@@ -5,7 +5,7 @@
 #include <mbgl/map/still_image.hpp>
 #include <mbgl/util/exception.hpp>
 
- #include <unistd.h>
+#include <unistd.h>
 
 namespace node_mbgl {
 
@@ -25,6 +25,11 @@ struct NodeMap::RenderOptions {
 
 v8::Persistent<v8::FunctionTemplate> NodeMap::constructorTemplate;
 
+static std::shared_ptr<mbgl::HeadlessDisplay> sharedDisplay() {
+    static auto display = std::make_shared<mbgl::HeadlessDisplay>();
+    return display;
+}
+
 void NodeMap::Init(v8::Handle<v8::Object> target) {
     NanScope();
 
@@ -40,6 +45,9 @@ void NodeMap::Init(v8::Handle<v8::Object> target) {
     NanAssignPersistent(constructorTemplate, t);
 
     target->Set(NanNew("Map"), t->GetFunction());
+
+    // Initialize display connection on module load.
+    sharedDisplay();
 }
 
 NAN_METHOD(NodeMap::New) {
@@ -63,8 +71,13 @@ NAN_METHOD(NodeMap::New) {
         return NanThrowError("FileSource must have a cancel member function");
     }
 
-    auto map = new NodeMap(args[0]->ToObject());
-    map->Wrap(args.This());
+
+    try {
+        auto map = new NodeMap(source);
+        map->Wrap(args.This());
+    } catch(std::exception &ex) {
+        return NanThrowError(ex.what());
+    }
 
     NanReturnValue(args.This());
 }
@@ -273,17 +286,13 @@ void NodeMap::renderFinished() {
 ////////////////////////////////////////////////////////////////////////////////////////////////
 // Instance
 
-std::shared_ptr<mbgl::HeadlessDisplay> sharedDisplay() {
-    static auto display = std::make_shared<mbgl::HeadlessDisplay>();
-    return display;
-}
-
 NodeMap::NodeMap(v8::Handle<v8::Object> source_) :
+    source(source_),
     view(sharedDisplay()),
     fs(*ObjectWrap::Unwrap<NodeFileSource>(source_)),
     map(view, fs, mbgl::Map::RenderMode::Still),
     async(new uv_async_t) {
-    source = v8::Persistent<v8::Object>::New(source_);
+
     async->data = this;
     uv_async_init(uv_default_loop(), async, [](uv_async_t *as, int) {
         reinterpret_cast<NodeMap *>(as->data)->renderFinished();
