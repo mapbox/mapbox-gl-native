@@ -50,7 +50,7 @@ class CollisionTile {
 
     private:
 
-    Box getTreeBox(const Anchor &anchor, const CollisionBox &box);
+    Box getTreeBox(const vec2<float> &anchor, const CollisionBox &box);
 
     Tree tree;
     std::array<float, 4> rotationMatrix;

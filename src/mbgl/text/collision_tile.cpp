@@ -25,14 +25,14 @@ float CollisionTile::placeFeature(const CollisionFeature &feature) {
     float minPlacementScale = minScale;
 
     for (auto& box : feature.boxes) {
-        const Anchor anchor = box.anchor.matMul(rotationMatrix);
+        const auto anchor = box.anchor.matMul(rotationMatrix);
 
         std::vector<CollisionTreeBox> blockingBoxes;
         tree.query(bgi::intersects(getTreeBox(anchor, box)), std::back_inserter(blockingBoxes));
 
         for (auto& blockingTreeBox : blockingBoxes) {
             const auto& blocking = std::get<1>(blockingTreeBox);
-            Anchor blockingAnchor = blocking.anchor.matMul(rotationMatrix);
+            auto blockingAnchor = blocking.anchor.matMul(rotationMatrix);
 
             // Find the lowest scale at which the two boxes can fit side by side without overlapping.
             // Original algorithm:
@@ -89,7 +89,7 @@ void CollisionTile::insertFeature(CollisionFeature &feature, const float minPlac
 
 }
 
-Box CollisionTile::getTreeBox(const Anchor &anchor, const CollisionBox &box) {
+Box CollisionTile::getTreeBox(const vec2<float> &anchor, const CollisionBox &box) {
     return Box{
         Point{
             anchor.x + box.x1,

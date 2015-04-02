@@ -9,11 +9,11 @@
 namespace mbgl {
     class CollisionBox {
         public:
-            explicit CollisionBox(const Anchor &_anchor, float _x1, float _y1, float _x2, float _y2, float _maxScale) :
+            explicit CollisionBox(const vec2<float> &_anchor, float _x1, float _y1, float _x2, float _y2, float _maxScale) :
                 anchor(_anchor), x1(_x1), y1(_y1), x2(_x2), y2(_y2), maxScale(_maxScale) {}
 
             // the box is centered around the anchor point
-            const Anchor anchor;
+            const vec2<float> anchor;
 
             // distances to the edges from the anchor
             const float x1;
