@@ -251,20 +251,21 @@
 
 #pragma mark - Displaying the User's Location
 
+/** @name Displaying the User's Location */
+
 /** A Boolean value indicating whether the map may display the user location.
- 
-    This property does not indicate whether the user’s position is actually visible on the map, only whether the map view is allowed to display it. To determine whether the user’s position is visible, use the userLocationVisible property. The default value of this property is `NO`.
-
-    Setting this property to `YES` causes the map view to use the Core Location framework to find the current location. As long as this property is `YES`, the map view continues to track the user’s location and update it periodically.
-
-    On iOS 8 and above, your app must specify a value for `NSLocationWhenInUseUsageDescription` in its `Info.plist` to satisfy the requirements of the underlying Core Location framework when enabling this property.
- */
+*
+*   This property does not indicate whether the user’s position is actually visible on the map, only whether the map view is allowed to display it. To determine whether the user’s position is visible, use the userLocationVisible property. The default value of this property is `NO`.
+*
+*   Setting this property to `YES` causes the map view to use the Core Location framework to find the current location. As long as this property is `YES`, the map view continues to track the user’s location and update it periodically.
+*
+*   On iOS 8 and above, your app must specify a value for `NSLocationWhenInUseUsageDescription` or `NSLocationAlwaysUsageDescription` in its `Info.plist` to satisfy the requirements of the underlying Core Location framework when enabling this property. */
 @property (nonatomic, assign) BOOL showsUserLocation;
 
-/// Returns a Boolean value indicating whether the user currently sees the user location annotation.
+/** A Boolean value indicating whether the device’s current location is visible in the map view. (read-only) */
 @property (nonatomic, assign, readonly, getter=isUserLocationVisible) BOOL userLocationVisible;
 
-/// Returns the annotation object indicating the user’s current location.
+/** Returns the annotation object indicating the user’s current location. */
 @property (nonatomic, readonly) MGLUserLocation *userLocation;
 
 /** The mode used to track the user location. */
@@ -374,23 +375,42 @@
 
 #pragma mark - Tracking the User Location
 
-/// Tells the delegate that the map view will begin tracking the user’s location.
+/** Tells the delegate that the map view will begin tracking the user’s location.
+*
+*   This method is called when the value of the showsUserLocation property changes to `YES`.
+*
+*   @param mapView The map view that is tracking the user’s location. */
 - (void)mapViewWillStartLocatingUser:(MGLMapView *)mapView;
 
-/// Tells the delegate that the map view has stopped tracking the user’s location.
+/** Tells the delegate that the map view has stopped tracking the user’s location.
+*
+*   This method is called when the value of the showsUserLocation property changes to `NO`.
+*
+*   @param mapView The map view that is tracking the user’s location. */
 - (void)mapViewDidStopLocatingUser:(MGLMapView *)mapView;
 
-/// Tells the delegate that the map view has updated the user’s location to the given location.
+/** Tells the delegate that the location of the user was updated.
+*
+*   While the showsUserLocation property is set to `YES`, this method is called whenever a new location update is received by the map view. This method is also called if the map view’s user tracking mode is set to MGLUserTrackingModeFollowWithHeading and the heading changes.
+*
+*   This method is not called if the application is currently running in the background. If you want to receive location updates while running in the background, you must use the Core Location framework.
+*
+*   @param mapView The map view that is tracking the user’s location.
+*   @param userLocation The location object representing the user’s latest location. This property may be `nil`. */
 - (void)mapView:(MGLMapView *)mapView didUpdateUserLocation:(MGLUserLocation *)userLocation;
 
-/// Tells the delegate that the map view has failed to locate the user.
+/** Tells the delegate that an attempt to locate the user’s position failed.
+*   @param mapView The map view that is tracking the user’s location.
+*   @param error An error object containing the reason why location tracking failed. */
 - (void)mapView:(MGLMapView *)mapView didFailToLocateUserWithError:(NSError *)error;
 
-/**
-    Tells the delegate that the map view’s user tracking mode has changed.
- 
-    This method is called after the map view asynchronously changes to reflect the new user tracking mode, for example by beginning to zoom or rotate.
- */
+/** Tells the delegate that the map view’s user tracking mode has changed.
+*
+*   This method is called after the map view asynchronously changes to reflect the new user tracking mode, for example by beginning to zoom or rotate.
+*
+*   @param mapView The map view that changed its tracking mode.
+*   @param mode The new tracking mode.
+*   @param animated Whether the change caused an animated effect on the map. */
 - (void)mapView:(MGLMapView *)mapView didChangeUserTrackingMode:(MGLUserTrackingMode)mode animated:(BOOL)animated;
 
 #pragma mark - Managing Annotations

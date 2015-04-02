@@ -1,9 +1,12 @@
 #import <Foundation/Foundation.h>
 
-/// The degree to which the map view tracks the user’s location.
+/** The mode used to track the user location on the map. */
 typedef NS_ENUM(NSUInteger, MGLUserTrackingMode)
 {
-    MGLUserTrackingModeNone              = 0,   ///< does not track the user’s location or heading
-    MGLUserTrackingModeFollow            = 1,   ///< tracks the user’s location
-    MGLUserTrackingModeFollowWithHeading = 2,   ///< tracks the user’s location and heading
+    /** The map does not follow the user location. */
+    MGLUserTrackingModeNone              = 0,
+    /** The map follows the user location. */
+    MGLUserTrackingModeFollow,
+    /** The map follows the user location and rotates when the heading changes. */
+    MGLUserTrackingModeFollowWithHeading
 };

@@ -26,6 +26,7 @@ const CGFloat MGLTrackingDotRingWidth = 24.0;
     if (self = [super init])
     {
         self.annotation = [[MGLUserLocation alloc] init];
+        self.annotation.mapView = mapView;
         _mapView = mapView;
         [self setupLayers];
     }
