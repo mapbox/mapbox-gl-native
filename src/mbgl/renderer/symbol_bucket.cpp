@@ -18,6 +18,7 @@
 #include <mbgl/util/token.hpp>
 #include <mbgl/util/math.hpp>
 #include <mbgl/util/merge_lines.hpp>
+#include <mbgl/util/clip_lines.hpp>
 #include <mbgl/util/std.hpp>
 
 namespace mbgl {
@@ -269,9 +270,11 @@ void SymbolBucket::addFeature(const std::vector<std::vector<Coordinate>> &lines,
         layout.icon.rotation_alignment == RotationAlignmentType::Map &&
         layout.placement == PlacementType::Line;
 
-    // TODO clip lines here
+    auto& clippedLines = layout.placement == PlacementType::Line ?
+        util::clipLines(lines, 0, 0, 4096, 4096) :
+        lines;
 
-    for (const std::vector<Coordinate> &line : lines) {
+    for (const std::vector<Coordinate> &line : clippedLines) {
         if (!line.size()) continue;
 
         // Calculate the anchor points around which you want to place labels
