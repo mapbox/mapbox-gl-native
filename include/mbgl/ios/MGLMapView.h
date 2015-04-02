@@ -20,18 +20,18 @@ IB_DESIGNABLE
 
 /** @name Initializing a Map View */
 
-/** Initialize a map view with a given frame, access token, and style URL.
-*   @param frame The frame with which to initialize the map view.
-*   @param accessToken A Mapbox API access token.
-*   @param styleURL The map style URL to use. Can be either an HTTP/HTTPS URL or a Mapbox map ID style URL (`mapbox://<user.style>`).
-*   @return An initialized map view, or `nil` if the map view was unable to be initialized. */
-- (instancetype)initWithFrame:(CGRect)frame accessToken:(NSString *)accessToken styleURL:(NSURL *)styleURL;
-
-/** Initialize a map view with the default style given a frame and access token.
+/** Initialize a map view with the default style and a given frame and access token.
 *   @param frame The frame with which to initialize the map view.
 *   @param accessToken A Mapbox API access token.
 *   @return An initialized map view, or `nil` if the map view was unable to be initialized. */
 - (instancetype)initWithFrame:(CGRect)frame accessToken:(NSString *)accessToken;
+
+/** Initialize a map view with a given frame, access token, and style URL.
+ *   @param frame The frame with which to initialize the map view.
+ *   @param accessToken A Mapbox API access token.
+ *   @param styleURL The map style URL to use. Can be either an HTTP/HTTPS URL or a Mapbox map ID style URL (`mapbox://<user.style>`).
+ *   @return An initialized map view, or `nil` if the map view was unable to be initialized. */
+- (instancetype)initWithFrame:(CGRect)frame accessToken:(NSString *)accessToken styleURL:(NSURL *)styleURL;
 
 - (instancetype)initWithFrame:(CGRect)frame __attribute__((unavailable("Instantiating an MGLMapView requires setting a style and/or an access token.")));
 
@@ -166,7 +166,7 @@ IB_DESIGNABLE
 
 /** Mapbox map ID of the style currently displayed in the receiver, or `nil` if the style does not have a map ID.
 *
-*   The style may lack a map ID if it is located at an HTTP, HTTPS, or local file URL. Use `styleURL` to get the URL in these cases. 
+*   The style may lack a map ID if it is located at an HTTP, HTTPS, or local file URL. Use `styleURL` to get the URL in these cases.
 *
 *   To display the default style, set this property to `nil`. */
 @property (nonatomic) NSString *mapID;
@@ -175,9 +175,8 @@ IB_DESIGNABLE
 - (NSArray *)bundledStyleURLs;
 
 /** URL of the style currently displayed in the receiver.
-    
-    The URL may be a full HTTP or HTTPS URL or a Mapbox URL indicating the style’s map ID (`mapbox://<user.style>`). To display the default style, set this property to `nil`.
- */
+*
+*   The URL may be a full HTTP or HTTPS URL or a Mapbox URL indicating the style’s map ID (`mapbox://<user.style>`). To display the default style, set this property to `nil`. */
 @property (nonatomic) NSURL *styleURL;
 
 #pragma mark - Annotating the Map

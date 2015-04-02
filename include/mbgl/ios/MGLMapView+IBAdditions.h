@@ -17,13 +17,8 @@
 // must use the type double because Interface Builder is unaware that
 // CLLocationDegrees is a typedef for double.
 
-/// Initial latitude at which the receiver is centered.
 @property (nonatomic) IBInspectable double latitude;
-
-/// Initial longitude at which the receiver is centered.
 @property (nonatomic) IBInspectable double longitude;
-
-/// Initial zoom level of the receiver.
 @property (nonatomic) IBInspectable double zoomLevel;
 
 @end

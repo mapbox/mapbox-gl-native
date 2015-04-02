@@ -91,7 +91,8 @@ static NSURL *MGLURLForBundledStyleNamed(NSString *styleName)
 
 @end
 
-@implementation MGLMapView {
+@implementation MGLMapView
+{
     BOOL _isTargetingInterfaceBuilder;
     CLLocationDegrees _pendingLatitude;
     CLLocationDegrees _pendingLongitude;
@@ -168,7 +169,8 @@ mbgl::DefaultFileSource *mbglFileSource = nullptr;
     [MGLMapboxEvents setToken:accessToken.mgl_stringOrNilIfEmpty];
 }
 
-+ (NSSet *)keyPathsForValuesAffectingStyleURL {
++ (NSSet *)keyPathsForValuesAffectingStyleURL
+{
     return [NSSet setWithObjects:@"mapID", @"accessToken", nil];
 }
 
@@ -180,10 +182,7 @@ mbgl::DefaultFileSource *mbglFileSource = nullptr;
 
 - (void)setStyleURL:(NSURL *)styleURL
 {
-    if ( _isTargetingInterfaceBuilder )
-    {
-        return;
-    }
+    if (_isTargetingInterfaceBuilder) return;
     
     if ( ! styleURL)
     {
@@ -245,7 +244,8 @@ mbgl::DefaultFileSource *mbglFileSource = nullptr;
 
     // load extensions
     //
-    dispatch_once(&loadGLExtensions, ^{
+    dispatch_once(&loadGLExtensions, ^
+    {
         const std::string extensions = (char *)glGetString(GL_EXTENSIONS);
 
         using namespace mbgl;
@@ -1319,16 +1319,19 @@ CLLocationCoordinate2D latLngToCoordinate(mbgl::LatLng latLng)
     return [NSArray arrayWithArray:_bundledStyleURLs];
 }
 
-+ (NSSet *)keyPathsForValuesAffectingMapID {
++ (NSSet *)keyPathsForValuesAffectingMapID
+{
     return [NSSet setWithObjects:@"styleURL", @"accessToken", nil];
 }
 
-- (NSString *)mapID {
+- (NSString *)mapID
+{
     NSURL *styleURL = self.styleURL;
     return [styleURL.scheme isEqualToString:@"mapbox"] ? styleURL.host.mgl_stringOrNilIfEmpty : nil;
 }
 
-- (void)setMapID:(NSString *)mapID {
+- (void)setMapID:(NSString *)mapID
+{
     self.styleURL = [NSURL URLWithString:[NSString stringWithFormat:@"mapbox://%@", mapID]];
 }
 
