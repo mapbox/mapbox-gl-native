@@ -9,7 +9,6 @@
 #include <mbgl/text/get_anchors.hpp>
 #include <mbgl/renderer/painter.hpp>
 #include <mbgl/text/glyph_store.hpp>
-#include <mbgl/text/quads.hpp>
 #include <mbgl/platform/log.hpp>
 #include <mbgl/text/collision_tile.hpp>
 #include <mbgl/map/sprite.hpp>
@@ -35,12 +34,12 @@ SymbolInstance::SymbolInstance(Anchor &anchor, const std::vector<Coordinate> &li
     // Create the quads used for rendering the glyphs.
     glyphQuads(inside && shapedText ?
             getGlyphQuads(anchor, shapedText, textBoxScale, line, layout, textAlongLine, face) :
-            PlacedGlyphs()),
+            SymbolQuads()),
 
     // Create the quad used for rendering the icon.
     iconQuads(inside && shapedIcon ?
             getIconQuads(anchor, shapedIcon, line, layout, iconAlongLine) :
-            PlacedGlyphs()),
+            SymbolQuads()),
 
     // Create the collision features that will be used to check whether this symbol instance can be placed
     textCollisionFeature(line, anchor, shapedText, textBoxScale, textPadding, textAlongLine),
@@ -365,12 +364,12 @@ void SymbolBucket::placeFeatures() {
 }
 
 template <typename Buffer, typename GroupType>
-void SymbolBucket::addSymbols(Buffer &buffer, const PlacedGlyphs &symbols, float scale, const bool keepUpright, const bool alongLine) {
+void SymbolBucket::addSymbols(Buffer &buffer, const SymbolQuads &symbols, float scale, const bool keepUpright, const bool alongLine) {
     const float zoom = collision.zoom;
 
     const float placementZoom = std::log(scale) / std::log(2) + zoom;
 
-    for (const PlacedGlyph &symbol : symbols) {
+    for (const SymbolQuad &symbol : symbols) {
         const auto &tl = symbol.tl;
         const auto &tr = symbol.tr;
         const auto &bl = symbol.bl;

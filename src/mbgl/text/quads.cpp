@@ -9,7 +9,7 @@ namespace mbgl {
 
 const float globalMinScale = 0.5f; // underscale by 1 zoom level
 
-PlacedGlyphs getIconQuads(Anchor &anchor, const PositionedIcon &shapedIcon,
+SymbolQuads getIconQuads(Anchor &anchor, const PositionedIcon &shapedIcon,
         const std::vector<Coordinate> &line, const StyleLayoutSymbol &layout,
         const bool alongLine) {
 
@@ -39,7 +39,7 @@ PlacedGlyphs getIconQuads(Anchor &anchor, const PositionedIcon &shapedIcon,
         br = br.matMul(matrix);
     }
 
-    PlacedGlyphs quads;
+    SymbolQuads quads;
     quads.emplace_back(tl, tr, bl, br, shapedIcon.image, 0, anchor, globalMinScale, std::numeric_limits<float>::infinity());
     return quads;
 }
@@ -115,14 +115,14 @@ void getSegmentGlyphs(std::back_insert_iterator<GlyphInstances> glyphs, Anchor &
     }
 }
 
-PlacedGlyphs getGlyphQuads(Anchor &anchor, const Shaping &shapedText, 
+SymbolQuads getGlyphQuads(Anchor &anchor, const Shaping &shapedText, 
         const float boxScale, const std::vector<Coordinate> &line, const StyleLayoutSymbol &layout,
         const bool alongLine, const GlyphPositions &face) {
 
     const float textRotate = layout.text.rotate * M_PI / 180;
     const bool keepUpright = layout.text.keep_upright;
 
-    PlacedGlyphs quads;
+    SymbolQuads quads;
 
     for (const PositionedGlyph &positionedGlyph: shapedText.positionedGlyphs) {
         auto face_it = face.find(positionedGlyph.glyph);

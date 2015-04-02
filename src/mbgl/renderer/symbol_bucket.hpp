@@ -8,10 +8,10 @@
 #include <mbgl/geometry/text_buffer.hpp>
 #include <mbgl/geometry/icon_buffer.hpp>
 #include <mbgl/geometry/collision_box_buffer.hpp>
-#include <mbgl/text/types.hpp>
 #include <mbgl/text/glyph.hpp>
 #include <mbgl/text/collision_feature.hpp>
 #include <mbgl/text/shaping.hpp>
+#include <mbgl/text/quads.hpp>
 #include <mbgl/style/style_bucket.hpp>
 #include <mbgl/util/ptr.hpp>
 
@@ -53,8 +53,8 @@ class SymbolInstance {
                 const GlyphPositions &face);
         const bool hasText;
         const bool hasIcon;
-        const PlacedGlyphs glyphQuads;
-        const PlacedGlyphs iconQuads;
+        const SymbolQuads glyphQuads;
+        const SymbolQuads iconQuads;
         CollisionFeature textCollisionFeature;
         CollisionFeature iconCollisionFeature;
 };
@@ -102,7 +102,7 @@ private:
 
     // Adds placed items to the buffer.
     template <typename Buffer, typename GroupType>
-    void addSymbols(Buffer &buffer, const PlacedGlyphs &symbols, float scale, const bool keepUpright, const bool alongLine);
+    void addSymbols(Buffer &buffer, const SymbolQuads &symbols, float scale, const bool keepUpright, const bool alongLine);
 
 public:
     const std::unique_ptr<const StyleLayoutSymbol> styleLayout;

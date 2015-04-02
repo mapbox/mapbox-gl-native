@@ -1,7 +1,6 @@
 #ifndef MBGL_TEXT_SHAPING
 #define MBGL_TEXT_SHAPING
 
-#include <mbgl/text/types.hpp>
 #include <mbgl/text/glyph.hpp>
 
 #include <mbgl/util/vec.hpp>
