@@ -40,7 +40,7 @@ const Shaping FontStack::getShaping(const std::u32string &string, const float ma
                                     const float spacing, const vec2<float> &translate) const {
     std::lock_guard<std::mutex> lock(mtx);
 
-    Shaping shaping(translate.x, translate.y);
+    Shaping shaping(translate.x * 24, translate.y * 24);
 
     // the y offset *should* be part of the font metadata
     const int32_t yOffset = -17;

@@ -6,7 +6,7 @@
 #include <mbgl/geometry/glyph_atlas.hpp>
 #include <mbgl/geometry/sprite_atlas.hpp>
 #include <mbgl/geometry/anchor.hpp>
-#include <mbgl/geometry/resample.hpp>
+#include <mbgl/text/get_anchors.hpp>
 #include <mbgl/renderer/painter.hpp>
 #include <mbgl/text/glyph_store.hpp>
 #include <mbgl/text/quads.hpp>
@@ -257,11 +257,11 @@ void SymbolBucket::addFeature(const std::vector<std::vector<Coordinate>> &lines,
     const float fontScale = layout.text.max_size / glyphSize;
     const float textBoxScale = collision.tilePixelRatio * fontScale;
     const float iconBoxScale = collision.tilePixelRatio * layout.icon.max_size;
-    //const float symbolSpacing = collision.tilePixelRatio * layout.min_distance;
+    const float symbolSpacing = collision.tilePixelRatio * layout.min_distance;
     const bool avoidEdges = layout.avoid_edges && layout.placement != PlacementType::Line;
     const float textPadding = layout.text.padding * collision.tilePixelRatio;
     const float iconPadding = layout.icon.padding * collision.tilePixelRatio;
-    //const float textMaxAngle = layout.text.max_angle * M_PI / 180;
+    const float textMaxAngle = layout.text.max_angle * M_PI / 180;
     const bool textAlongLine =
         layout.text.rotation_alignment == RotationAlignmentType::Map &&
         layout.placement == PlacementType::Line;
@@ -276,7 +276,7 @@ void SymbolBucket::addFeature(const std::vector<std::vector<Coordinate>> &lines,
 
         // Calculate the anchor points around which you want to place labels
         Anchors anchors = layout.placement == PlacementType::Line ?
-            resample(line, layout.min_distance, minScale, 2.0f, collision.tilePixelRatio, 0.0f) :
+            getAnchors(line, symbolSpacing, textMaxAngle, shapedText.left, shapedText.right, glyphSize, textBoxScale, 1.0f) :
             Anchors({ Anchor(float(line[0].x), float(line[0].y), 0, minScale) });
 
 
