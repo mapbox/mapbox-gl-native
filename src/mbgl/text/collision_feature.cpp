@@ -15,8 +15,12 @@ CollisionFeature::CollisionFeature(const std::vector<Coordinate> &line, const An
     const float x2 = right * boxScale + padding;
 
     if (alongLine) {
-        const float height = y2 - y1;
+        float height = y2 - y1;
         const float length = x2 - x1;
+
+        if (height <= 0.0f) return;
+
+        height = std::max(10.0f * boxScale, height);
 
         bboxifyLabel(line, anchor, length, height);
     } else {
