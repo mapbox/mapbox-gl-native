@@ -1332,7 +1332,14 @@ CLLocationCoordinate2D latLngToCoordinate(mbgl::LatLng latLng)
 
 - (void)setMapID:(NSString *)mapID
 {
-    self.styleURL = [NSURL URLWithString:[NSString stringWithFormat:@"mapbox://%@", mapID]];
+    if (mapID)
+    {
+        self.styleURL = [NSURL URLWithString:[NSString stringWithFormat:@"mapbox://%@", mapID]];
+    }
+    else
+    {
+        self.styleURL = nil;
+    }
 }
 
 - (NSArray *)getAppliedStyleClasses

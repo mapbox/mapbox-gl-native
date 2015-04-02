@@ -176,7 +176,9 @@ IB_DESIGNABLE
 
 /** URL of the style currently displayed in the receiver.
 *
-*   The URL may be a full HTTP or HTTPS URL or a Mapbox URL indicating the style’s map ID (`mapbox://<user.style>`). To display the default style, set this property to `nil`. */
+*   The URL may be a full HTTP or HTTPS URL or a Mapbox URL indicating the style’s map ID (`mapbox://<user.style>`).
+*
+*   To display the default style, set this property to `nil`. */
 @property (nonatomic) NSURL *styleURL;
 
 #pragma mark - Annotating the Map
