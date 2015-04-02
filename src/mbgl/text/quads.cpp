@@ -21,7 +21,7 @@ SymbolQuads getIconQuads(Anchor &anchor, const PositionedIcon &shapedIcon,
 
     float angle = layout.icon.rotate * M_PI / 180.0f;
     if (alongLine) {
-        assert(anchor.segment < line.size());
+        assert(static_cast<unsigned int>(anchor.segment) < line.size());
         const Coordinate &next = line[anchor.segment];
         angle += -std::atan2(next.x - anchor.x, next.y - anchor.y) + M_PI / 2;
     }

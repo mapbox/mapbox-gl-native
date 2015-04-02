@@ -13,17 +13,17 @@ namespace mbgl {
                 anchor(_anchor), x1(_x1), y1(_y1), x2(_x2), y2(_y2), maxScale(_maxScale) {}
 
             // the box is centered around the anchor point
-            const vec2<float> anchor;
+            vec2<float> anchor;
 
             // distances to the edges from the anchor
-            const float x1;
-            const float y1;
-            const float x2;
-            const float y2;
+            float x1;
+            float y1;
+            float x2;
+            float y2;
 
             // the box is only valid for scales < maxScale.
             // The box does not block other boxes at scales >= maxScale;
-            const float maxScale;
+            float maxScale;
 
             // the scale at which the label can first be shown
             float placementScale = 0.0f;
