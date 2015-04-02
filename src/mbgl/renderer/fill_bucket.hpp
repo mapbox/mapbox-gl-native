@@ -4,9 +4,6 @@
 #include <mbgl/renderer/bucket.hpp>
 #include <mbgl/map/geometry_tile.hpp>
 #include <mbgl/geometry/elements_buffer.hpp>
-#include <mbgl/geometry/fill_buffer.hpp>
-#include <mbgl/style/style_bucket.hpp>
-#include <mbgl/style/style_layout.hpp>
 
 #include <clipper/clipper.hpp>
 #include <libtess2/tesselator.h>
@@ -20,12 +17,7 @@
 
 namespace mbgl {
 
-class Style;
-class StyleLayoutFill;
 class FillVertexBuffer;
-class TriangleElementsBuffer;
-class LineElementsBuffer;
-class BucketDescription;
 class OutlineShader;
 class PlainShader;
 class PatternShader;
@@ -36,8 +28,8 @@ class FillBucket : public Bucket {
     static void *realloc(void *data, void *ptr, unsigned int size);
     static void free(void *userData, void *ptr);
 
-    typedef ElementGroup<2> triangle_group_type;
-    typedef ElementGroup<1> line_group_type;
+    typedef ElementGroup<2> TriangleGroup;
+    typedef ElementGroup<1> LineGroup;
 
 public:
     FillBucket(FillVertexBuffer &vertexBuffer,
@@ -56,9 +48,6 @@ public:
     void drawElements(PatternShader& shader);
     void drawVertices(OutlineShader& shader);
 
-public:
-    StyleLayoutFill layout;
-
 private:
     TESSalloc *allocator;
     TESStesselator *tesselator;
@@ -72,10 +61,9 @@ private:
     const size_t vertex_start;
     const size_t triangle_elements_start;
     const size_t line_elements_start;
-    VertexArrayObject array;
 
-    std::vector<std::unique_ptr<triangle_group_type>> triangleGroups;
-    std::vector<std::unique_ptr<line_group_type>> lineGroups;
+    std::vector<std::unique_ptr<TriangleGroup>> triangleGroups;
+    std::vector<std::unique_ptr<LineGroup>> lineGroups;
 
     std::vector<ClipperLib::IntPoint> line;
     bool hasVertices = false;
