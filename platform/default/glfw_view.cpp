@@ -212,7 +212,6 @@ void GLFWView::onScroll(GLFWwindow *window, double /*xOffset*/, double yOffset) 
         scale = 1.0 / scale;
     }
 
-    view->map->startScaling();
     view->map->scaleBy(scale, view->lastX, view->lastY);
 }
 
@@ -231,14 +230,12 @@ void GLFWView::onMouseClick(GLFWwindow *window, int button, int action, int modi
     if (button == GLFW_MOUSE_BUTTON_RIGHT ||
         (button == GLFW_MOUSE_BUTTON_LEFT && modifiers & GLFW_MOD_CONTROL)) {
         view->rotating = action == GLFW_PRESS;
-        if (!view->rotating) {
-            view->map->stopRotating();
-        }
+        view->map->setGestureInProgress(view->rotating);
     } else if (button == GLFW_MOUSE_BUTTON_LEFT) {
         view->tracking = action == GLFW_PRESS;
+        view->map->setGestureInProgress(view->tracking);
 
         if (action == GLFW_RELEASE) {
-            view->map->stopPanning();
             double now = glfwGetTime();
             if (now - view->lastClick < 0.4 /* ms */) {
                 if (modifiers & GLFW_MOD_SHIFT) {
@@ -258,11 +255,9 @@ void GLFWView::onMouseMove(GLFWwindow *window, double x, double y) {
         double dx = x - view->lastX;
         double dy = y - view->lastY;
         if (dx || dy) {
-            view->map->startPanning();
             view->map->moveBy(dx, dy);
         }
     } else if (view->rotating) {
-        view->map->startRotating();
         view->map->rotateBy(view->lastX, view->lastY, x, y);
     }
     view->lastX = x;

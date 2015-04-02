@@ -1,7 +1,6 @@
 #ifndef MBGL_UTIL_RASTER
 #define MBGL_UTIL_RASTER
 
-#include <mbgl/util/transition.hpp>
 #include <mbgl/util/texture_pool.hpp>
 #include <mbgl/util/image.hpp>
 #include <mbgl/util/ptr.hpp>
@@ -32,11 +31,6 @@ public:
     // loaded status
     bool isLoaded() const;
 
-    // transitions
-    void beginFadeInTransition();
-    bool needsTransition() const;
-    void updateTransitions(TimePoint now);
-
 public:
     // loaded image dimensions
     uint32_t width = 0, height = 0;
@@ -64,9 +58,6 @@ private:
 
     // the raw pixels
     std::unique_ptr<util::Image> img;
-
-    // fade in transition
-    util::ptr<util::transition> fade_transition = nullptr;
 };
 
 }

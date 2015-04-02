@@ -615,6 +615,8 @@ mbgl::DefaultFileSource *mbglFileSource = nullptr;
     {
         [self trackGestureEvent:MGLEventGesturePanStart forRecognizer:pan];
 
+        mbglMap->setGestureInProgress(true);
+
         self.centerPoint = CGPointMake(0, 0);
 
         self.userTrackingMode = MGLUserTrackingModeNone;
@@ -650,6 +652,8 @@ mbgl::DefaultFileSource *mbglFileSource = nullptr;
         CGPoint offset = CGPointMake(velocity.x * duration / 2, velocity.y * duration / 2);
 
         mbglMap->moveBy(offset.x, offset.y, secondsAsDuration(duration));
+
+        mbglMap->setGestureInProgress(false);
 
         if (duration)
         {
@@ -694,7 +698,7 @@ mbgl::DefaultFileSource *mbglFileSource = nullptr;
     {
         [self trackGestureEvent:MGLEventGesturePinchStart forRecognizer:pinch];
 
-        mbglMap->startScaling();
+        mbglMap->setGestureInProgress(true);
 
         self.scale = mbglMap->getScale();
 
@@ -712,7 +716,7 @@ mbgl::DefaultFileSource *mbglFileSource = nullptr;
     }
     else if (pinch.state == UIGestureRecognizerStateEnded || pinch.state == UIGestureRecognizerStateCancelled)
     {
-        mbglMap->stopScaling();
+        mbglMap->setGestureInProgress(false);
 
         [self unrotateIfNeededAnimated:YES];
 
@@ -730,7 +734,7 @@ mbgl::DefaultFileSource *mbglFileSource = nullptr;
     {
         [self trackGestureEvent:MGLEventGestureRotateStart forRecognizer:rotate];
 
-        mbglMap->startRotating();
+        mbglMap->setGestureInProgress(true);
 
         self.angle = [MGLMapView degreesToRadians:mbglMap->getBearing()] * -1;
 
@@ -754,7 +758,7 @@ mbgl::DefaultFileSource *mbglFileSource = nullptr;
     }
     else if (rotate.state == UIGestureRecognizerStateEnded || rotate.state == UIGestureRecognizerStateCancelled)
     {
-        mbglMap->stopRotating();
+        mbglMap->setGestureInProgress(false);
 
         [self unrotateIfNeededAnimated:YES];
 
