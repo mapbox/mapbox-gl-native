@@ -149,8 +149,11 @@ SymbolQuads getGlyphQuads(Anchor &anchor, const Shaping &shapedText,
             glyphInstances.emplace_back(GlyphInstance{anchor});
         }
 
-        const float x1 = positionedGlyph.x + glyph.metrics.left;
-        const float y1 = positionedGlyph.y - glyph.metrics.top;
+        // The rects have an addditional buffer that is not included in their size;
+        const float rectBuffer = 3.0f;
+
+        const float x1 = positionedGlyph.x + glyph.metrics.left - rectBuffer;
+        const float y1 = positionedGlyph.y - glyph.metrics.top - rectBuffer;
         const float x2 = x1 + rect.w;
         const float y2 = y1 + rect.h;
 
