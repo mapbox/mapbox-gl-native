@@ -15,7 +15,7 @@ static NSString *const MGLMapboxEventsAPIBase = @"https://api.tiles.mapbox.com";
 NSString *const MGLEventTypeMapLoad = @"map.load";
 NSString *const MGLEventTypeMapTap = @"map.click";
 NSString *const MGLEventTypeMapDragEnd = @"map.dragend";
-NSString *const MGLEventTypeLocation = @"Location";
+NSString *const MGLEventTypeLocation = @"location";
 
 NSString *const MGLEventKeyLatitude = @"lat";
 NSString *const MGLEventKeyLongitude = @"lng";
