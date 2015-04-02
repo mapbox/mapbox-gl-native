@@ -20,6 +20,7 @@
         '../include/mbgl/ios/MGLMapboxEvents.h',
         '../platform/ios/MGLMapboxEvents.m',
         '../include/mbgl/ios/MGLMapView.h',
+        '../include/mbgl/ios/MGLMapView+IBAdditions.h',
         '../platform/ios/MGLMapView.mm',
         '../include/mbgl/ios/MGLAnnotation.h',
         '../include/mbgl/ios/MGLUserLocation.h',

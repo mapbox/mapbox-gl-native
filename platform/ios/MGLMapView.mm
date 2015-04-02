@@ -1,4 +1,5 @@
 #import "MGLMapView.h"
+#import "MGLMapView+IBAdditions.h"
 
 #import <mbgl/platform/log.hpp>
 #import <mbgl/platform/gl.hpp>
@@ -92,6 +93,8 @@ static NSURL *MGLURLForBundledStyleNamed(NSString *styleName)
 
 @implementation MGLMapView {
     BOOL _isTargetingInterfaceBuilder;
+    CLLocationDegrees _pendingLatitude;
+    CLLocationDegrees _pendingLongitude;
 }
 
 #pragma mark - Setup & Teardown -
@@ -365,6 +368,8 @@ mbgl::DefaultFileSource *mbglFileSource = nullptr;
     // set initial position
     //
     mbglMap->setLatLngZoom(mbgl::LatLng(0, 0), mbglMap->getMinZoom());
+    _pendingLatitude = NAN;
+    _pendingLongitude = NAN;
 
     // setup change delegate queue
     //
@@ -1125,6 +1130,11 @@ mbgl::DefaultFileSource *mbglFileSource = nullptr;
 }
 
 #pragma mark - Geography -
+
++ (NSSet *)keyPathsForValuesAffectingCenterCoordinate
+{
+    return [NSSet setWithObjects:@"latitude", @"longitude", nil];
+}
 
 - (void)setCenterCoordinate:(CLLocationCoordinate2D)coordinate animated:(BOOL)animated preservingTracking:(BOOL)tracking
 {
@@ -2386,5 +2396,61 @@ class MBGLView : public mbgl::View
     private:
         __weak MGLMapView *nativeView = nullptr;
 };
+
+@end
+
+@implementation MGLMapView (IBAdditions)
+
++ (NSSet *)keyPathsForValuesAffectingLatitude
+{
+    return [NSSet setWithObject:@"centerCoordinate"];
+}
+
+- (double)latitude
+{
+    return self.centerCoordinate.latitude;
+}
+
+- (void)setLatitude:(double)latitude
+{
+    if ( ! isnan(_pendingLongitude))
+    {
+        self.centerCoordinate = CLLocationCoordinate2DMake(latitude, _pendingLongitude);
+        _pendingLatitude = NAN;
+        _pendingLongitude = NAN;
+    }
+    else
+    {
+        // Not enough info to make a valid center coordinate yet. Stash this
+        // latitude away until the longitude is set too.
+        _pendingLatitude = latitude;
+    }
+}
+
++ (NSSet *)keyPathsForValuesAffectingLongitude
+{
+    return [NSSet setWithObject:@"centerCoordinate"];
+}
+
+- (double)longitude
+{
+    return self.centerCoordinate.longitude;
+}
+
+- (void)setLongitude:(double)longitude
+{
+    if ( ! isnan(_pendingLatitude))
+    {
+        self.centerCoordinate = CLLocationCoordinate2DMake(_pendingLatitude, longitude);
+        _pendingLatitude = NAN;
+        _pendingLongitude = NAN;
+    }
+    else
+    {
+        // Not enough info to make a valid center coordinate yet. Stash this
+        // longitude away until the latitude is set too.
+        _pendingLongitude = longitude;
+    }
+}
 
 @end

@@ -39,9 +39,8 @@ IB_DESIGNABLE
 
 /** @name Authorizing Access */
 
-/** Sets a Mapbox API access token for the map view. 
-*   @param accessToken A Mapbox API token. */
-@property (nonatomic) IBInspectable NSString *accessToken;
+/** Mapbox API access token for the map view. */
+@property (nonatomic) NSString *accessToken;
 
 #pragma mark - Managing Constraints
 
@@ -166,10 +165,11 @@ IB_DESIGNABLE
 /** @name Styling the Map */
 
 /** Mapbox map ID of the style currently displayed in the receiver, or `nil` if the style does not have a map ID.
- 
-    The style may lack a map ID if it is located at an HTTP, HTTPS, or asset: URL. Use -styleURL to get the URL in these cases.
- */
-@property (nonatomic) IBInspectable NSString *mapID;
+*
+*   The style may lack a map ID if it is located at an HTTP, HTTPS, or local file URL. Use `styleURL` to get the URL in these cases. 
+*
+*   To display the default style, set this property to `nil`. */
+@property (nonatomic) NSString *mapID;
 
 /** Returns the URLs to the styles bundled with the library. */
 - (NSArray *)bundledStyleURLs;
