@@ -86,6 +86,7 @@ private:
     AssetRequest *request = nullptr;
     const std::string root;
     const std::string path;
+    std::string data;
     std::unique_ptr<Response> response;
     uv_buf_t buffer;
 
@@ -190,8 +191,8 @@ void AssetRequestImpl::fileStated(uv_zip_t *zip) {
         response = util::make_unique<Response>();
 
         // Allocate the space for reading the data.
-        response->data.resize(zip->stat->size);
-        buffer = uv_buf_init(const_cast<char *>(response->data.data()), zip->stat->size);
+        data.resize(zip->stat->size);
+        buffer = uv_buf_init(const_cast<char *>(data.data()), zip->stat->size);
 
         // Get the modification time in case we have one.
         if (zip->stat->valid & ZIP_STAT_MTIME) {
@@ -229,6 +230,7 @@ void AssetRequestImpl::fileRead(uv_zip_t *zip) {
         notifyError(zip->message);
     } else if (request) {
         response->status = Response::Successful;
+        response->data = std::make_shared<const std::string>(std::move(data));
         request->notify(std::move(response), FileCache::Hint::No);
         delete request;
         assert(request == nullptr);
@@ -261,6 +263,7 @@ void AssetRequestImpl::notifyError(const char *message) {
         response = util::make_unique<Response>();
         response->status = Response::Error;
         response->message = message;
+        response->data = std::make_shared<const std::string>(std::move(data));
         request->notify(std::move(response), FileCache::Hint::No);
         delete request;
         assert(request == nullptr);
@@ -288,7 +291,7 @@ AssetRequest::~AssetRequest() {
     }
 }
 
-void AssetRequest::start(uv_loop_t *loop, std::unique_ptr<Response> response) {
+void AssetRequest::start(uv_loop_t *loop, std::shared_ptr<const Response> response) {
     MBGL_VERIFY_THREAD(tid);
 
     // We're ignoring the existing response if any.

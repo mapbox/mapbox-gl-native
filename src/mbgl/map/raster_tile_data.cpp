@@ -17,7 +17,10 @@ void RasterTileData::parse() {
         return;
     }
 
-    if (bucket.setImage(data)) {
+    // Make sure we actually got data.
+    assert(data);
+
+    if (bucket.setImage(*data)) {
         state = State::parsed;
     } else {
         state = State::invalid;

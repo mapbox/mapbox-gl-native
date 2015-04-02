@@ -20,7 +20,8 @@ TEST_F(Storage, AssetReadDirectory) {
     fs.request({ Resource::Unknown, "asset://TEST_DATA/fixtures/storage" }, uv_default_loop(),
                env, [&](const Response &res) {
         EXPECT_EQ(Response::Error, res.status);
-        EXPECT_EQ(0ul, res.data.size());
+        ASSERT_TRUE(!!res.data);
+        EXPECT_EQ(0ul, res.data->size());
         EXPECT_EQ(0, res.expires);
         EXPECT_EQ(0, res.modified);
         EXPECT_EQ("", res.etag);

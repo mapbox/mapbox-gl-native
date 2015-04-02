@@ -70,25 +70,41 @@ void Sprite::load(Environment &env) {
     util::ptr<Sprite> sprite = shared_from_this();
 
     env.request({ Resource::Kind::JSON, jsonURL }, [sprite](const Response &res) {
-        if (res.status == Response::Successful) {
-            sprite->body = res.data;
-            sprite->parseJSON();
-        } else {
+        switch (res.status) {
+        case Response::Error: {
             Log::Warning(Event::Sprite, "Failed to load sprite info: %s", res.message.c_str());
+            sprite->loadedJSON = true;
+            sprite->complete();
+            break;
         }
-        sprite->loadedJSON = true;
-        sprite->complete();
+        case Response::Successful: {
+            assert(res.data);
+            sprite->body = *res.data;
+            sprite->parseJSON();
+            sprite->loadedJSON = true;
+            sprite->complete();
+            break;
+        }
+        }
     });
 
     env.request({ Resource::Kind::Image, spriteURL }, [sprite](const Response &res) {
-        if (res.status == Response::Successful) {
-            sprite->image = res.data;
-            sprite->parseImage();
-        } else {
+        switch (res.status) {
+        case Response::Error: {
             Log::Warning(Event::Sprite, "Failed to load sprite image: %s", res.message.c_str());
+            sprite->loadedImage = true;
+            sprite->complete();
+            break;
         }
-        sprite->loadedImage = true;
-        sprite->complete();
+        case Response::Successful: {
+            assert(res.data);
+            sprite->image = *res.data;
+            sprite->parseImage();
+            sprite->loadedImage = true;
+            sprite->complete();
+            break;
+        }
+        }
     });
 }
 

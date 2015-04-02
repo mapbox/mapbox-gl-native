@@ -27,7 +27,8 @@ TEST_F(Storage, HTTPCancelEnvironment) {
         // This environment gets aborted below. This means the request is marked as failing and
         // will return an error here.
         EXPECT_EQ(Response::Error, res.status);
-        EXPECT_EQ("", res.data);
+        ASSERT_TRUE(!!res.data);
+        EXPECT_EQ("", *res.data);
         EXPECT_EQ(0, res.expires);
         EXPECT_EQ(0, res.modified);
         EXPECT_EQ("", res.etag);
@@ -40,7 +41,8 @@ TEST_F(Storage, HTTPCancelEnvironment) {
         // The same request as above, but in a different environment which doesn't get aborted. This
         // means the request should succeed.
         EXPECT_EQ(Response::Successful, res.status);
-        EXPECT_EQ("Response", res.data);
+        ASSERT_TRUE(!!res.data);
+        EXPECT_EQ("Response", *res.data);
         EXPECT_EQ(0, res.expires);
         EXPECT_EQ(0, res.modified);
         EXPECT_EQ("", res.etag);

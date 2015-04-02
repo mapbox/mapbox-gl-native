@@ -26,7 +26,8 @@ TEST_F(Storage, HTTPNoLoop) {
                [&](const Response &res) {
         EXPECT_NE(uv_thread_self(), mainThread) << "Response was called in the same thread";
         EXPECT_EQ(Response::Successful, res.status);
-        EXPECT_EQ("Hello World!", res.data);
+        ASSERT_TRUE(!!res.data);
+        EXPECT_EQ("Hello World!", *res.data);
         EXPECT_EQ(0, res.expires);
         EXPECT_EQ(0, res.modified);
         EXPECT_EQ("", res.etag);

@@ -44,24 +44,30 @@ void Source::load(Map &map, Environment &env) {
     util::ptr<Source> source = shared_from_this();
 
     const std::string url = util::mapbox::normalizeSourceURL(info.url, map.getAccessToken());
-    env.request({ Resource::Kind::JSON, url }, [source, &map](const Response &res) {
-        if (res.status != Response::Successful) {
+    env.request({ Resource::Kind::JSON, url }, [source, &map](const Response& res) {
+        switch (res.status) {
+        case Response::Error: {
             Log::Warning(Event::General, "Failed to load source TileJSON: %s", res.message.c_str());
             return;
         }
+        case Response::Successful: {
+            rapidjson::Document d;
+            assert(res.data);
+            d.Parse<0>(res.data->c_str());
 
-        rapidjson::Document d;
-        d.Parse<0>(res.data.c_str());
+            if (d.HasParseError()) {
+                Log::Warning(Event::General, "Invalid source TileJSON; Parse Error at %d: %s",
+                             d.GetErrorOffset(), d.GetParseError());
+                return;
+            }
 
-        if (d.HasParseError()) {
-            Log::Warning(Event::General, "Invalid source TileJSON; Parse Error at %d: %s", d.GetErrorOffset(), d.GetParseError());
-            return;
+            source->info.parseTileJSONProperties(d);
+            source->loaded = true;
+
+            map.triggerUpdate();
+            break;
         }
-
-        source->info.parseTileJSONProperties(d);
-        source->loaded = true;
-
-        map.triggerUpdate();
+        }
     });
 }
 

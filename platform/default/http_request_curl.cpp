@@ -95,7 +95,7 @@ class HTTPRequestImpl {
     MBGL_STORE_THREAD(tid)
 
 public:
-    HTTPRequestImpl(HTTPRequest *request, uv_loop_t *loop, std::unique_ptr<Response> response);
+    HTTPRequestImpl(HTTPRequest *request, uv_loop_t *loop, std::shared_ptr<const Response> response);
     ~HTTPRequestImpl();
 
     void handleResult(CURLcode code);
@@ -119,11 +119,14 @@ private:
     HTTPCURLContext *context = nullptr;
     HTTPRequest *request = nullptr;
 
+    // Stores the data as we receive it.
+    std::string data;
+
     // Will store the current response.
     std::unique_ptr<Response> response;
 
     // In case of revalidation requests, this will store the old response.
-    std::unique_ptr<Response> existingResponse;
+    std::shared_ptr<const Response> existingResponse;
 
     CURL *handle = nullptr;
     curl_slist *headers = nullptr;
@@ -425,10 +428,10 @@ static CURLcode sslctx_function(CURL * /* curl */, void *sslctx, void * /* parm 
 }
 #endif
 
-HTTPRequestImpl::HTTPRequestImpl(HTTPRequest *request_, uv_loop_t *loop, std::unique_ptr<Response> response_)
+HTTPRequestImpl::HTTPRequestImpl(HTTPRequest *request_, uv_loop_t *loop, std::shared_ptr<const Response> response_)
     : context(HTTPCURLContext::Get(loop)),
       request(request_),
-      existingResponse(std::move(response_)),
+      existingResponse(response_),
       handle(context->getHandle()) {
     assert(request);
     context->addRequest(request);
@@ -525,7 +528,7 @@ size_t HTTPRequestImpl::writeCallback(void *const contents, const size_t size, c
         impl->response = util::make_unique<Response>();
     }
 
-    impl->response->data.append((char *)contents, size * nmemb);
+    impl->data.append((char *)contents, size * nmemb);
     return size * nmemb;
 }
 
@@ -665,6 +668,9 @@ void HTTPRequestImpl::handleResult(CURLcode code) {
         response = util::make_unique<Response>();
     }
 
+    // Convert the data we collected from the incremental callbacks to a shared pointer.
+    response->data = std::make_shared<const std::string>(std::move(data));
+
     // Add human-readable error code
     if (code != CURLE_OK) {
         response->status = Response::Error;
@@ -688,12 +694,11 @@ void HTTPRequestImpl::handleResult(CURLcode code) {
 
         if (responseCode == 304) {
             if (existingResponse) {
-                // We're going to reuse the old response object, but need to copy over the new
-                // expires value (if possible).
-                std::swap(response, existingResponse);
-                if (existingResponse->expires) {
-                    response->expires = existingResponse->expires;
-                }
+                // We're going to reuse the old response data.
+                response->status = Response::Successful;
+                response->data = existingResponse->data;
+                response->modified = existingResponse->modified;
+                response->etag = existingResponse->etag;
                 return finish(ResponseStatus::NotModified);
             } else {
                 // This is an unsolicited 304 response and should only happen on malfunctioning
@@ -734,11 +739,11 @@ HTTPRequest::~HTTPRequest() {
     }
 }
 
-void HTTPRequest::start(uv_loop_t *loop, std::unique_ptr<Response> response) {
+void HTTPRequest::start(uv_loop_t *loop, std::shared_ptr<const Response> response) {
     MBGL_VERIFY_THREAD(tid);
 
     assert(!ptr);
-    ptr = new HTTPRequestImpl(this, loop, std::move(response));
+    ptr = new HTTPRequestImpl(this, loop, response);
 }
 
 void HTTPRequest::retryImmediately() {

@@ -20,7 +20,8 @@ TEST_F(Storage, CacheRevalidate) {
     const Resource revalidateSame { Resource::Unknown, "http://127.0.0.1:3000/revalidate-same" };
     fs.request(revalidateSame, uv_default_loop(), env, [&](const Response &res) {
         EXPECT_EQ(Response::Successful, res.status);
-        EXPECT_EQ("Response", res.data);
+        ASSERT_TRUE(!!res.data);
+        EXPECT_EQ("Response", *res.data);
         EXPECT_EQ(0, res.expires);
         EXPECT_EQ(0, res.modified);
         EXPECT_EQ("snowfall", res.etag);
@@ -28,7 +29,8 @@ TEST_F(Storage, CacheRevalidate) {
 
         fs.request(revalidateSame, uv_default_loop(), env, [&, res](const Response &res2) {
             EXPECT_EQ(Response::Successful, res2.status);
-            EXPECT_EQ("Response", res2.data);
+            EXPECT_TRUE(!!res2.data);
+            EXPECT_EQ("Response", *res2.data);
             // We use this to indicate that a 304 reply came back.
             EXPECT_LT(0, res2.expires);
             EXPECT_EQ(0, res2.modified);
@@ -44,7 +46,8 @@ TEST_F(Storage, CacheRevalidate) {
                                        "http://127.0.0.1:3000/revalidate-modified" };
     fs.request(revalidateModified, uv_default_loop(), env, [&](const Response &res) {
         EXPECT_EQ(Response::Successful, res.status);
-        EXPECT_EQ("Response", res.data);
+        ASSERT_TRUE(!!res.data);
+        EXPECT_EQ("Response", *res.data);
         EXPECT_EQ(0, res.expires);
         EXPECT_EQ(1420070400, res.modified);
         EXPECT_EQ("", res.etag);
@@ -52,7 +55,8 @@ TEST_F(Storage, CacheRevalidate) {
 
         fs.request(revalidateModified, uv_default_loop(), env, [&, res](const Response &res2) {
             EXPECT_EQ(Response::Successful, res2.status);
-            EXPECT_EQ("Response", res2.data);
+            EXPECT_TRUE(!!res2.data);
+            EXPECT_EQ("Response", *res2.data);
             // We use this to indicate that a 304 reply came back.
             EXPECT_LT(0, res2.expires);
             EXPECT_EQ(1420070400, res2.modified);
@@ -66,7 +70,8 @@ TEST_F(Storage, CacheRevalidate) {
     const Resource revalidateEtag { Resource::Unknown, "http://127.0.0.1:3000/revalidate-etag" };
     fs.request(revalidateEtag, uv_default_loop(), env, [&](const Response &res) {
         EXPECT_EQ(Response::Successful, res.status);
-        EXPECT_EQ("Response 1", res.data);
+        ASSERT_TRUE(!!res.data);
+        EXPECT_EQ("Response 1", *res.data);
         EXPECT_EQ(0, res.expires);
         EXPECT_EQ(0, res.modified);
         EXPECT_EQ("response-1", res.etag);
@@ -74,7 +79,8 @@ TEST_F(Storage, CacheRevalidate) {
 
         fs.request(revalidateEtag, uv_default_loop(), env, [&, res](const Response &res2) {
             EXPECT_EQ(Response::Successful, res2.status);
-            EXPECT_EQ("Response 2", res2.data);
+            EXPECT_TRUE(!!res2.data);
+            EXPECT_EQ("Response 2", *res2.data);
             EXPECT_EQ(0, res2.expires);
             EXPECT_EQ(0, res2.modified);
             EXPECT_EQ("response-2", res2.etag);

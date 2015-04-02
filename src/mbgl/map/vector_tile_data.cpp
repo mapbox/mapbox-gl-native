@@ -41,10 +41,13 @@ void VectorTileData::parse() {
             throw std::runtime_error("style isn't present in VectorTileData object anymore");
         }
 
+        // Make sure we actually got data.
+        assert(data);
+
         // Parsing creates state that is encapsulated in TileParser. While parsing,
         // the TileParser object writes results into this objects. All other state
         // is going to be discarded afterwards.
-        VectorTile vectorTile(pbf((const uint8_t *)data.data(), data.size()));
+        VectorTile vectorTile(pbf((const uint8_t *)data->data(), data->size()));
         const VectorTile* vt = &vectorTile;
         TileParser parser(*vt, *this, style, glyphAtlas, glyphStore, spriteAtlas, sprite);
 

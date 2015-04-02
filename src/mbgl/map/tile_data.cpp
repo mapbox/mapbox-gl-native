@@ -67,15 +67,19 @@ void TileData::request(uv::worker &worker, float pixelRatio, std::function<void(
         // Clear the request object.
         tile->req = nullptr;
 
-        if (res.status == Response::Successful) {
+        switch (res.status) {
+        case Response::Error: {
+            Log::Error(Event::HttpRequest, "[%s] tile loading failed: %s", url.c_str(), res.message.c_str());
+            break;
+        }
+        case Response::Successful: {
             tile->state = State::loaded;
-
             tile->data = res.data;
 
             // Schedule tile parsing in another thread
             tile->reparse(worker, callback);
-        } else {
-            Log::Error(Event::HttpRequest, "[%s] tile loading failed: %s", url.c_str(), res.message.c_str());
+            break;
+        }
         }
     });
 }

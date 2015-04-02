@@ -20,7 +20,8 @@ TEST_F(Storage, HTTPReading) {
                [&](const Response &res) {
         EXPECT_EQ(uv_thread_self(), mainThread);
         EXPECT_EQ(Response::Successful, res.status);
-        EXPECT_EQ("Hello World!", res.data);
+        ASSERT_TRUE(!!res.data);
+        EXPECT_EQ("Hello World!", *res.data);
         EXPECT_EQ(0, res.expires);
         EXPECT_EQ(0, res.modified);
         EXPECT_EQ("", res.etag);
