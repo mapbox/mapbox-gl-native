@@ -396,6 +396,10 @@ void Map::setup() {
     painter->setup();
 }
 
+std::string Map::getStyleURL() const {
+    return data->getStyleInfo().url;
+}
+
 void Map::setStyleURL(const std::string &url) {
     assert(Environment::currentlyOn(ThreadType::Main));
 
@@ -756,7 +760,7 @@ void Map::reloadStyle() {
                 Log::Error(Event::Setup, "loading style failed: %s", res.message.c_str());
             }
         });
-    } else {
+    } else if (!styleInfo.json.empty()) {
         // We got JSON data directly.
         loadStyleJSON(styleInfo.json, styleInfo.base);
     }

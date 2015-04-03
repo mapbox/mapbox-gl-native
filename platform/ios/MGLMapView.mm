@@ -1,4 +1,5 @@
 #import "MGLMapView.h"
+#import "MGLMapView+IBAdditions.h"
 
 #import <mbgl/platform/log.hpp>
 #import <mbgl/platform/gl.hpp>
@@ -15,6 +16,8 @@
 #include <mbgl/util/geo.hpp>
 
 #import "MGLTypes.h"
+#import "NSString+MGLAdditions.h"
+#import "NSProcessInfo+MGLAdditions.h"
 #import "MGLAnnotation.h"
 #import "MGLUserLocationAnnotationView.h"
 #import "MGLUserLocation_Private.h"
@@ -43,14 +46,20 @@ const std::string &defaultCacheDatabase() {
 static dispatch_once_t loadGLExtensions;
 
 NSString *const MGLDefaultStyleName = @"Emerald";
-NSString *const MGLStyleVersion = @"v7";
+NSString *const MGLStyleVersion = @"7";
 NSString *const MGLDefaultStyleMarkerSymbolName = @"default_marker";
+NSString *const MGLMapboxAccessTokenManagerURLDisplayString = @"mapbox.com/account/apps";
 
 const NSTimeInterval MGLAnimationDuration = 0.3;
 const CGSize MGLAnnotationUpdateViewportOutset = {150, 150};
 const CGFloat MGLMinimumZoom = 3;
 
 NSString *const MGLAnnotationIDKey = @"MGLAnnotationIDKey";
+
+static NSURL *MGLURLForBundledStyleNamed(NSString *styleName)
+{
+    return [NSURL URLWithString:[NSString stringWithFormat:@"asset://styles/%@.json", styleName]];
+}
 
 #pragma mark - Private -
 
@@ -66,7 +75,7 @@ NSString *const MGLAnnotationIDKey = @"MGLAnnotationIDKey";
 @property (nonatomic) UIPinchGestureRecognizer *pinch;
 @property (nonatomic) UIRotationGestureRecognizer *rotate;
 @property (nonatomic) UILongPressGestureRecognizer *quickZoom;
-@property (nonatomic) NSMutableArray *bundledStyleNames;
+@property (nonatomic) NSMutableArray *bundledStyleURLs;
 @property (nonatomic) NSMapTable *annotationIDsByAnnotation;
 @property (nonatomic) std::vector<uint32_t> annotationsNearbyLastTap;
 @property (nonatomic, weak) id <MGLAnnotation> selectedAnnotation;
@@ -83,6 +92,11 @@ NSString *const MGLAnnotationIDKey = @"MGLAnnotationIDKey";
 @end
 
 @implementation MGLMapView
+{
+    BOOL _isTargetingInterfaceBuilder;
+    CLLocationDegrees _pendingLatitude;
+    CLLocationDegrees _pendingLongitude;
+}
 
 #pragma mark - Setup & Teardown -
 
@@ -100,37 +114,22 @@ MBGLView *mbglView = nullptr;
 mbgl::SQLiteCache *mbglFileCache = nullptr;
 mbgl::DefaultFileSource *mbglFileSource = nullptr;
 
-- (instancetype)initWithFrame:(CGRect)frame accessToken:(NSString *)accessToken styleJSON:(NSString *)styleJSON
+- (instancetype)initWithFrame:(CGRect)frame
 {
     self = [super initWithFrame:frame];
 
     if (self && [self commonInit])
     {
-        if (accessToken) [self setAccessToken:accessToken];
-
-        if (styleJSON || accessToken)
-        {
-            // If style is set directly, pass it on. If not, if we have an access
-            // token, we can pass nil and use the default style.
-            //
-            [self setStyleJSON:styleJSON];
-        }
+        self.styleURL = nil;
+        return self;
     }
 
-    return self;
+    return nil;
 }
 
-- (instancetype)initWithFrame:(CGRect)frame accessToken:(NSString *)accessToken bundledStyleNamed:(NSString *)styleName
+- (instancetype)initWithFrame:(CGRect)frame accessToken:(NSString *)accessToken
 {
-    self = [super initWithFrame:frame];
-    
-    if (self && [self commonInit])
-    {
-        if (accessToken) [self setAccessToken:accessToken];
-        if (styleName) [self useBundledStyleNamed:styleName];
-    }
-    
-    return self;
+    return [self initWithFrame:frame accessToken:accessToken styleURL:nil];
 }
 
 - (instancetype)initWithFrame:(CGRect)frame accessToken:(NSString *)accessToken styleURL:(NSURL *)styleURL
@@ -139,16 +138,11 @@ mbgl::DefaultFileSource *mbglFileSource = nullptr;
 
     if (self && [self commonInit])
     {
-        if (accessToken) [self setAccessToken:accessToken];
-        if (styleURL) [self setStyleURL:styleURL];
+        self.accessToken = accessToken;
+        self.styleURL = styleURL;
     }
 
     return self;
-}
-
-- (instancetype)initWithFrame:(CGRect)frame accessToken:(NSString *)accessToken
-{
-    return [self initWithFrame:frame accessToken:accessToken styleJSON:nil];
 }
 
 - (instancetype)initWithCoder:(NSCoder *)decoder
@@ -157,51 +151,59 @@ mbgl::DefaultFileSource *mbglFileSource = nullptr;
 
     if (self && [self commonInit])
     {
+        self.styleURL = nil;
         return self;
     }
 
     return nil;
 }
 
-- (void)setAccessToken:(NSString *)accessToken
+- (NSString *)accessToken
 {
-    if (accessToken)
-    {
-        mbglMap->setAccessToken((std::string)[accessToken UTF8String]);
-        [MGLMapboxEvents setToken:accessToken];
-    }
+    return @(mbglMap->getAccessToken().c_str()).mgl_stringOrNilIfEmpty;
 }
 
-- (void)setStyleJSON:(NSString *)styleJSON
+- (void)setAccessToken:(NSString *)accessToken
 {
-    if ( ! styleJSON)
-    {
-        [self useBundledStyleNamed:[[[MGLDefaultStyleName lowercaseString]
-                                        stringByAppendingString:@"-"]
-                                        stringByAppendingString:MGLStyleVersion]];
-    }
-    else
-    {
-        mbglMap->setStyleJSON((std::string)[styleJSON UTF8String]);
-    }
+    mbglMap->setAccessToken((std::string)[accessToken UTF8String]);
+    [MGLMapboxEvents setToken:accessToken.mgl_stringOrNilIfEmpty];
+}
+
++ (NSSet *)keyPathsForValuesAffectingStyleURL
+{
+    return [NSSet setWithObjects:@"mapID", @"accessToken", nil];
+}
+
+- (NSURL *)styleURL
+{
+    NSString *styleURLString = @(mbglMap->getStyleURL().c_str()).mgl_stringOrNilIfEmpty;
+    return styleURLString ? [NSURL URLWithString:styleURLString] : nil;
 }
 
 - (void)setStyleURL:(NSURL *)styleURL
 {
-    std::string styleURLString([[styleURL absoluteString] UTF8String]);
-
+    if (_isTargetingInterfaceBuilder) return;
+    
+    if ( ! styleURL)
+    {
+        styleURL = MGLURLForBundledStyleNamed([NSString stringWithFormat:@"%@-v%@",
+                                               MGLDefaultStyleName.lowercaseString,
+                                               MGLStyleVersion]);
+    }
+    
     if ( ! [styleURL scheme])
     {
-        mbglMap->setStyleURL(std::string("asset://") + styleURLString);
+        // Assume a relative path into the developer’s bundle.
+        styleURL = [[NSBundle mainBundle] URLForResource:styleURL.path withExtension:nil];
     }
-    else
-    {
-        mbglMap->setStyleURL(styleURLString);
-    }
+    
+    mbglMap->setStyleURL([[styleURL absoluteString] UTF8String]);
 }
 
 - (BOOL)commonInit
 {
+    _isTargetingInterfaceBuilder = NSProcessInfo.processInfo.mgl_isInterfaceBuilderDesignablesAgent;
+    
     // create context
     //
     _context = [[EAGLContext alloc] initWithAPI:kEAGLRenderingAPIOpenGLES2];
@@ -242,7 +244,8 @@ mbgl::DefaultFileSource *mbglFileSource = nullptr;
 
     // load extensions
     //
-    dispatch_once(&loadGLExtensions, ^{
+    dispatch_once(&loadGLExtensions, ^
+    {
         const std::string extensions = (char *)glGetString(GL_EXTENSIONS);
 
         using namespace mbgl;
@@ -365,14 +368,19 @@ mbgl::DefaultFileSource *mbglFileSource = nullptr;
     // set initial position
     //
     mbglMap->setLatLngZoom(mbgl::LatLng(0, 0), mbglMap->getMinZoom());
+    _pendingLatitude = NAN;
+    _pendingLongitude = NAN;
 
     // setup change delegate queue
     //
     _regionChangeDelegateQueue = [NSOperationQueue new];
     _regionChangeDelegateQueue.maxConcurrentOperationCount = 1;
 
-    // start the main loop
-    mbglMap->start();
+    // start the main loop, but not on the IB canvas
+    if ( ! _isTargetingInterfaceBuilder)
+    {
+        mbglMap->start();
+    }
 
     // metrics: map load event
     const mbgl::LatLng latLng = mbglMap->getLatLng();
@@ -559,7 +567,11 @@ mbgl::DefaultFileSource *mbglFileSource = nullptr;
 - (void)layoutSubviews
 {
     [super layoutSubviews];
-    mbglMap->triggerUpdate();
+    
+    if ( ! _isTargetingInterfaceBuilder)
+    {
+        mbglMap->triggerUpdate();
+    }
 }
 
 #pragma mark - Life Cycle -
@@ -1052,6 +1064,21 @@ mbgl::DefaultFileSource *mbglFileSource = nullptr;
 
 #pragma mark - Properties -
 
++ (NSSet *)keyPathsForValuesAffectingZoomEnabled
+{
+    return [NSSet setWithObject:@"allowsZooming"];
+}
+
++ (NSSet *)keyPathsForValuesAffectingScrollEnabled
+{
+    return [NSSet setWithObject:@"allowsScrolling"];
+}
+
++ (NSSet *)keyPathsForValuesAffectingRotateEnabled
+{
+    return [NSSet setWithObject:@"allowsRotating"];
+}
+
 #pragma clang diagnostic push
 #pragma clang diagnostic ignored "-Wunused-parameter"
 
@@ -1118,6 +1145,11 @@ mbgl::DefaultFileSource *mbglFileSource = nullptr;
 }
 
 #pragma mark - Geography -
+
++ (NSSet *)keyPathsForValuesAffectingCenterCoordinate
+{
+    return [NSSet setWithObjects:@"latitude", @"longitude", nil];
+}
 
 - (void)setCenterCoordinate:(CLLocationCoordinate2D)coordinate animated:(BOOL)animated preservingTracking:(BOOL)tracking
 {
@@ -1284,54 +1316,44 @@ CLLocationCoordinate2D latLngToCoordinate(mbgl::LatLng latLng)
 
 #pragma mark - Styling -
 
-- (NSDictionary *)getRawStyle
+- (NSArray *)bundledStyleURLs
 {
-    const std::string styleJSON = mbglMap->getStyleJSON();
+    if ( ! _bundledStyleURLs)
+    {
+        NSString *stylesPath = [[MGLMapView resourceBundlePath] stringByAppendingPathComponent:@"styles"];
 
-    return [NSJSONSerialization JSONObjectWithData:[@(styleJSON.c_str()) dataUsingEncoding:NSUTF8StringEncoding] options:0 error:nil];
-}
-
-- (void)setRawStyle:(NSDictionary *)style
-{
-    NSData *data = [NSJSONSerialization dataWithJSONObject:style options:0 error:nil];
-
-    [self setStyleJSON:[[NSString alloc] initWithData:data encoding:NSUTF8StringEncoding]];
-}
-
-- (NSArray *)bundledStyleNames
-{
-    if (!_bundledStyleNames) {
-        NSString *stylesPath = [[MGLMapView resourceBundlePath] stringByAppendingString:@"/styles"];
-
-        _bundledStyleNames = [NSMutableArray array];
+        _bundledStyleURLs = [NSMutableArray array];
 
         NSArray *bundledStyleNamesWithExtensions = [[NSFileManager defaultManager] contentsOfDirectoryAtPath:stylesPath error:nil];
-        NSString *hybridStylePrefix = @"hybrid-";
-        NSString *satelliteStylePrefix = @"satellite-";
-        for (NSString *fileName in bundledStyleNamesWithExtensions) {
-            NSString *styleName = [fileName stringByDeletingPathExtension];
-            [_bundledStyleNames addObject:styleName];
-
-            // Add satellite raster & "hybrid" (satellite raster + vector contours & labels)
-            if ([styleName hasPrefix:satelliteStylePrefix]) {
-                [_bundledStyleNames addObject:[hybridStylePrefix stringByAppendingString:[styleName substringFromIndex:[satelliteStylePrefix length]]]];
-            }
+        for (NSString *fileName in bundledStyleNamesWithExtensions)
+        {
+            [_bundledStyleURLs addObject:MGLURLForBundledStyleNamed([fileName stringByDeletingPathExtension])];
         }
     }
 
-    return [NSArray arrayWithArray:_bundledStyleNames];
+    return [NSArray arrayWithArray:_bundledStyleURLs];
 }
 
-- (void)useBundledStyleNamed:(NSString *)styleName
++ (NSSet *)keyPathsForValuesAffectingMapID
 {
-    NSString *hybridStylePrefix = @"hybrid-";
-    BOOL isHybrid = [styleName hasPrefix:hybridStylePrefix];
-    if (isHybrid) {
-        styleName = [@"satellite-" stringByAppendingString:[styleName substringFromIndex:[hybridStylePrefix length]]];
+    return [NSSet setWithObjects:@"styleURL", @"accessToken", nil];
+}
+
+- (NSString *)mapID
+{
+    NSURL *styleURL = self.styleURL;
+    return [styleURL.scheme isEqualToString:@"mapbox"] ? styleURL.host.mgl_stringOrNilIfEmpty : nil;
+}
+
+- (void)setMapID:(NSString *)mapID
+{
+    if (mapID)
+    {
+        self.styleURL = [NSURL URLWithString:[NSString stringWithFormat:@"mapbox://%@", mapID]];
     }
-    [self setStyleURL:[NSURL URLWithString:[NSString stringWithFormat:@"styles/%@.json", styleName]]];
-    if (isHybrid) {
-        [self setStyleClasses:@[@"contours", @"labels"]];
+    else
+    {
+        self.styleURL = nil;
     }
 }
 
@@ -2215,6 +2237,135 @@ CLLocationCoordinate2D latLngToCoordinate(mbgl::LatLng latLng)
     [self notifyMapChange:@(mbgl::MapChangeRegionIsChanging)];
 }
 
+- (void)prepareForInterfaceBuilder
+{
+    [super prepareForInterfaceBuilder];
+    
+    self.layer.borderColor = [UIColor colorWithWhite:184/255. alpha:1].CGColor;
+    self.layer.borderWidth = 1;
+    
+    if (self.accessToken)
+    {
+        self.layer.backgroundColor = [UIColor colorWithRed:59/255.
+                                                     green:178/255.
+                                                      blue:208/255.
+                                                     alpha:0.8].CGColor;
+        
+        UIImage *image = [[self class] resourceImageNamed:@"mapbox.png"];
+        UIImageView *previewView = [[UIImageView alloc] initWithImage:image];
+        previewView.translatesAutoresizingMaskIntoConstraints = NO;
+        [self addSubview:previewView];
+        [self addConstraint:
+         [NSLayoutConstraint constraintWithItem:previewView
+                                      attribute:NSLayoutAttributeCenterXWithinMargins
+                                      relatedBy:NSLayoutRelationEqual
+                                         toItem:self
+                                      attribute:NSLayoutAttributeCenterXWithinMargins
+                                     multiplier:1
+                                       constant:0]];
+        [self addConstraint:
+         [NSLayoutConstraint constraintWithItem:previewView
+                                      attribute:NSLayoutAttributeCenterYWithinMargins
+                                      relatedBy:NSLayoutRelationEqual
+                                         toItem:self
+                                      attribute:NSLayoutAttributeCenterYWithinMargins
+                                     multiplier:1
+                                       constant:0]];
+    }
+    else
+    {
+        UIView *diagnosticView = [[UIView alloc] init];
+        diagnosticView.translatesAutoresizingMaskIntoConstraints = NO;
+        [self addSubview:diagnosticView];
+        
+        // Headline
+        UILabel *headlineLabel = [[UILabel alloc] init];
+        headlineLabel.text = @"No Access Token";
+        headlineLabel.font = [UIFont preferredFontForTextStyle:UIFontTextStyleHeadline];
+        headlineLabel.textAlignment = NSTextAlignmentCenter;
+        headlineLabel.numberOfLines = 1;
+        headlineLabel.translatesAutoresizingMaskIntoConstraints = NO;
+        [headlineLabel setContentCompressionResistancePriority:UILayoutPriorityDefaultLow
+                                                       forAxis:UILayoutConstraintAxisHorizontal];
+        [diagnosticView addSubview:headlineLabel];
+        
+        // Explanation
+        UILabel *explanationLabel = [[UILabel alloc] init];
+        explanationLabel.text = @"To display a map here, you must provide a Mapbox access token. Get an access token from:";
+        explanationLabel.font = [UIFont preferredFontForTextStyle:UIFontTextStyleBody];
+        explanationLabel.numberOfLines = 0;
+        explanationLabel.translatesAutoresizingMaskIntoConstraints = NO;
+        [explanationLabel setContentCompressionResistancePriority:UILayoutPriorityDefaultLow
+                                                          forAxis:UILayoutConstraintAxisHorizontal];
+        [diagnosticView addSubview:explanationLabel];
+        
+        // Link
+        UIButton *linkButton = [UIButton buttonWithType:UIButtonTypeSystem];
+        [linkButton setTitle:MGLMapboxAccessTokenManagerURLDisplayString forState:UIControlStateNormal];
+        linkButton.translatesAutoresizingMaskIntoConstraints = NO;
+        [linkButton setContentCompressionResistancePriority:UILayoutPriorityDefaultLow
+                                                    forAxis:UILayoutConstraintAxisHorizontal];
+        [diagnosticView addSubview:linkButton];
+        
+        // More explanation
+        UILabel *explanationLabel2 = [[UILabel alloc] init];
+        explanationLabel2.text = @"and enter it into the Access Token field in the Attributes inspector.";
+        explanationLabel2.font = [UIFont preferredFontForTextStyle:UIFontTextStyleBody];
+        explanationLabel2.numberOfLines = 0;
+        explanationLabel2.translatesAutoresizingMaskIntoConstraints = NO;
+        [explanationLabel2 setContentCompressionResistancePriority:UILayoutPriorityDefaultLow
+                                                           forAxis:UILayoutConstraintAxisHorizontal];
+        [diagnosticView addSubview:explanationLabel2];
+        
+        // Constraints
+        NSDictionary *views = @{
+            @"container": diagnosticView,
+            @"headline": headlineLabel,
+            @"explanation": explanationLabel,
+            @"link": linkButton,
+            @"explanation2": explanationLabel2,
+        };
+        [self addConstraint:
+         [NSLayoutConstraint constraintWithItem:diagnosticView
+                                      attribute:NSLayoutAttributeCenterYWithinMargins
+                                      relatedBy:NSLayoutRelationEqual
+                                         toItem:self
+                                      attribute:NSLayoutAttributeCenterYWithinMargins
+                                     multiplier:1
+                                       constant:0]];
+        [self addConstraints:
+         [NSLayoutConstraint constraintsWithVisualFormat:@"H:|-[container(20@20)]-|"
+                                                 options:NSLayoutFormatAlignAllCenterY
+                                                 metrics:nil
+                                                   views:views]];
+        [self addConstraints:
+         [NSLayoutConstraint constraintsWithVisualFormat:@"V:|[headline]-[explanation]-[link]-[explanation2]|"
+                                                 options:0
+                                                 metrics:nil
+                                                   views:views]];
+        [self addConstraints:
+         [NSLayoutConstraint constraintsWithVisualFormat:@"H:|[headline]|"
+                                                 options:0
+                                                 metrics:nil
+                                                   views:views]];
+        [self addConstraints:
+         [NSLayoutConstraint constraintsWithVisualFormat:@"H:|[explanation]|"
+                                                 options:0
+                                                 metrics:nil
+                                                   views:views]];
+        [self addConstraints:
+         [NSLayoutConstraint constraintsWithVisualFormat:@"H:|[link]|"
+                                                 options:0
+                                                 metrics:nil
+                                                   views:views]];
+        [self addConstraints:
+         [NSLayoutConstraint constraintsWithVisualFormat:@"H:|[explanation2]|"
+                                                 options:0
+                                                 metrics:nil
+                                                   views:views]];
+    }
+}
+
 class MBGLView : public mbgl::View
 {
     public:
@@ -2270,5 +2421,106 @@ class MBGLView : public mbgl::View
     private:
         __weak MGLMapView *nativeView = nullptr;
 };
+
+@end
+
+@implementation MGLMapView (IBAdditions)
+
++ (NSSet *)keyPathsForValuesAffectingLatitude
+{
+    return [NSSet setWithObject:@"centerCoordinate"];
+}
+
+- (double)latitude
+{
+    return self.centerCoordinate.latitude;
+}
+
+- (void)setLatitude:(double)latitude
+{
+    if ( ! isnan(_pendingLongitude))
+    {
+        self.centerCoordinate = CLLocationCoordinate2DMake(latitude, _pendingLongitude);
+        _pendingLatitude = NAN;
+        _pendingLongitude = NAN;
+    }
+    else
+    {
+        // Not enough info to make a valid center coordinate yet. Stash this
+        // latitude away until the longitude is set too.
+        _pendingLatitude = latitude;
+    }
+}
+
++ (NSSet *)keyPathsForValuesAffectingLongitude
+{
+    return [NSSet setWithObject:@"centerCoordinate"];
+}
+
+- (double)longitude
+{
+    return self.centerCoordinate.longitude;
+}
+
+- (void)setLongitude:(double)longitude
+{
+    if ( ! isnan(_pendingLatitude))
+    {
+        self.centerCoordinate = CLLocationCoordinate2DMake(_pendingLatitude, longitude);
+        _pendingLatitude = NAN;
+        _pendingLongitude = NAN;
+    }
+    else
+    {
+        // Not enough info to make a valid center coordinate yet. Stash this
+        // longitude away until the latitude is set too.
+        _pendingLongitude = longitude;
+    }
+}
+
++ (NSSet *)keyPathsForValuesAffectingAllowsZooming
+{
+    return [NSSet setWithObject:@"zoomEnabled"];
+}
+
+- (BOOL)allowsZooming
+{
+    return self.zoomEnabled;
+}
+
+- (void)setAllowsZooming:(BOOL)allowsZooming
+{
+    self.zoomEnabled = allowsZooming;
+}
+
++ (NSSet *)keyPathsForValuesAffectingAllowsScrolling
+{
+    return [NSSet setWithObject:@"scrollEnabled"];
+}
+
+- (BOOL)allowsScrolling
+{
+    return self.scrollEnabled;
+}
+
+- (void)setAllowsScrolling:(BOOL)allowsScrolling
+{
+    self.scrollEnabled = allowsScrolling;
+}
+
++ (NSSet *)keyPathsForValuesAffectingAllowsRotating
+{
+    return [NSSet setWithObject:@"rotateEnabled"];
+}
+
+- (BOOL)allowsRotating
+{
+    return self.rotateEnabled;
+}
+
+- (void)setAllowsRotating:(BOOL)allowsRotating
+{
+    self.rotateEnabled = allowsRotating;
+}
 
 @end

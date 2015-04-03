@@ -16,10 +16,9 @@ static NSArray *const kStyleNames = @[
     @"Basic",
     @"Outdoors",
     @"Satellite",
-    @"Hybrid",
 ];
 
-static NSString *const kStyleVersion = @"v7";
+static NSString *const kStyleVersion = @"7";
 
 @interface MBXViewController () <UIActionSheetDelegate, MGLMapViewDelegate>
 
@@ -246,10 +245,7 @@ mbgl::Settings_NSUserDefaults *settings = nullptr;
         styleName = [kStyleNames objectAtIndex:index];
     }
 
-    [self.mapView useBundledStyleNamed:
-        [[[styleName lowercaseString]
-        stringByAppendingString:@"-"]
-        stringByAppendingString:kStyleVersion]];
+    self.mapView.styleURL = [NSURL URLWithString:[NSString stringWithFormat:@"asset://styles/%@-v%@.json", styleName.lowercaseString, kStyleVersion]];
 
     [titleButton setTitle:styleName forState:UIControlStateNormal];
 }
