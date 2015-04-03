@@ -470,7 +470,7 @@ void Map::setLatLng(LatLng latLng, Duration duration) {
 }
 
 LatLng Map::getLatLng() const {
-    return state.getLatLng();
+    return transform.getLatLng();
 }
 
 void Map::resetPosition() {

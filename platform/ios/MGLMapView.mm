@@ -46,8 +46,9 @@ NSString *const MGLDefaultStyleName = @"Emerald";
 NSString *const MGLStyleVersion = @"v7";
 NSString *const MGLDefaultStyleMarkerSymbolName = @"default_marker";
 
-NSTimeInterval const MGLAnimationDuration = 0.3;
+const NSTimeInterval MGLAnimationDuration = 0.3;
 const CGSize MGLAnnotationUpdateViewportOutset = {150, 150};
+const CGFloat MGLMinZoom = 3;
 
 NSString *const MGLAnnotationIDKey = @"MGLAnnotationIDKey";
 
@@ -1129,7 +1130,9 @@ mbgl::DefaultFileSource *mbglFileSource = nullptr;
 {
     CGFloat duration = (animated ? MGLAnimationDuration : 0);
 
-    mbglMap->setLatLng(coordinateToLatLng(coordinate), secondsAsDuration(duration));
+    mbglMap->setLatLngZoom(coordinateToLatLng(coordinate),
+                           fmaxf(mbglMap->getZoom(), MGLMinZoom),
+                           secondsAsDuration(duration));
 
     [self notifyMapChange:@(animated ? mbgl::MapChangeRegionDidChangeAnimated : mbgl::MapChangeRegionDidChange)];
 }
@@ -1168,7 +1171,9 @@ mbgl::DefaultFileSource *mbglFileSource = nullptr;
 
     CGFloat duration = (animated ? MGLAnimationDuration : 0);
 
-    mbglMap->setZoom(zoomLevel, secondsAsDuration(duration));
+    mbglMap->setLatLngZoom(mbglMap->getLatLng(),
+                           fmaxf(zoomLevel, MGLMinZoom),
+                           secondsAsDuration(duration));
 
     [self unrotateIfNeededAnimated:animated];
 
@@ -1738,7 +1743,7 @@ CLLocationCoordinate2D latLngToCoordinate(mbgl::LatLng latLng)
         {
             self.showsUserLocation = YES;
 
-            if (self.zoomLevel < 3) [self setZoomLevel:3 animated:YES];
+            if (self.zoomLevel < MGLMinZoom) [self setZoomLevel:MGLMinZoom animated:YES];
 
             if (self.userLocationAnnotationView)
             {
@@ -1949,7 +1954,7 @@ CLLocationCoordinate2D latLngToCoordinate(mbgl::LatLng latLng)
 
 - (BOOL)isRotationAllowed
 {
-    return (self.zoomLevel > 3);
+    return (self.zoomLevel > MGLMinZoom);
 }
 
 // correct rotations to north as needed
