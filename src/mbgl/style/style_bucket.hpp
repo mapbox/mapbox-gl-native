@@ -10,7 +10,7 @@
 
 namespace mbgl {
 
-class StyleSource;
+class Source;
 
 class StyleBucket : public util::noncopyable {
 public:
@@ -20,7 +20,7 @@ public:
 
     const StyleLayerType type;
     std::string name;
-    util::ptr<StyleSource> style_source;
+    util::ptr<Source> source;
     std::string source_layer;
     FilterExpression filter;
     ClassProperties layout;

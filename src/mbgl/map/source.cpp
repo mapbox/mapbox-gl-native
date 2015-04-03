@@ -27,8 +27,7 @@
 
 namespace mbgl {
 
-Source::Source(SourceInfo& info_)
-    : info(info_)
+Source::Source()
 {
 }
 

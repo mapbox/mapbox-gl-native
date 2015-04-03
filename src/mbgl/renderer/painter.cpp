@@ -215,19 +215,25 @@ void Painter::prepareTile(const Tile& tile) {
     MBGL_CHECK_ERROR(glStencilFunc(GL_EQUAL, ref, mask));
 }
 
-void Painter::render(const Style& style, const std::set<util::ptr<StyleSource>>& sources,
-                     TransformState state_, TimePoint time) {
+void Painter::render(const Style& style, TransformState state_, TimePoint time) {
     state = state_;
 
     clear();
     resize();
     changeMatrix();
 
+    std::set<Source*> sources;
+    for (const auto& source : style.sources) {
+        if (source->enabled) {
+            sources.insert(source.get());
+        }
+    }
+
     // Update all clipping IDs.
     ClipIDGenerator generator;
     for (const auto& source : sources) {
-        generator.update(source->source->getLoadedTiles());
-        source->source->updateMatrices(projMatrix, state);
+        generator.update(source->getLoadedTiles());
+        source->updateMatrices(projMatrix, state);
     }
 
     drawClippingMasks(sources);
@@ -280,7 +286,7 @@ void Painter::render(const Style& style, const std::set<util::ptr<StyleSource>>&
     // When only rendering layers via the stylesheet, it's possible that we don't
     // ever visit a tile during rendering.
     for (const auto& source : sources) {
-        source->source->finishRender(*this);
+        source->finishRender(*this);
     }
 }
 
@@ -302,15 +308,8 @@ void Painter::renderLayer(const StyleLayer &layer_desc) {
             return;
         }
 
-        if (!layer_desc.bucket->style_source) {
+        if (!layer_desc.bucket->source) {
             Log::Warning(Event::Render, "can't find source for layer '%s'", layer_desc.id.c_str());
-            return;
-        }
-
-        StyleSource const& style_source = *layer_desc.bucket->style_source;
-
-        // Skip this layer if there is no data.
-        if (!style_source.source) {
             return;
         }
 
@@ -350,7 +349,7 @@ void Painter::renderLayer(const StyleLayer &layer_desc) {
                     StyleLayerTypeClass(layer_desc.type).c_str());
         }
 
-        style_source.source->render(*this, layer_desc);
+        layer_desc.bucket->source->render(*this, layer_desc);
     }
 }
 

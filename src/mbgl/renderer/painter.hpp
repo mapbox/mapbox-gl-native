@@ -42,7 +42,6 @@ class SpriteAtlas;
 class GlyphAtlas;
 class LineAtlas;
 class Source;
-class StyleSource;
 
 class FillBucket;
 class LineBucket;
@@ -76,7 +75,6 @@ public:
     void changeMatrix();
 
     void render(const Style& style,
-                const std::set<util::ptr<StyleSource>>& sources,
                 TransformState state,
                 TimePoint time);
 
@@ -121,7 +119,7 @@ public:
     // Configures the painter strata that is used for early z-culling of fragments.
     void setStrata(float strata);
 
-    void drawClippingMasks(const std::set<util::ptr<StyleSource>> &sources);
+    void drawClippingMasks(const std::set<Source*>&);
     void drawClippingMask(const mat4& matrix, const ClipID& clip);
 
     void resetFramebuffer();

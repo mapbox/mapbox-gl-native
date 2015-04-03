@@ -2,7 +2,6 @@
 #define MBGL_STYLE_STYLE_SOURCE
 
 #include <mbgl/style/types.hpp>
-#include <mbgl/util/ptr.hpp>
 #include <mbgl/util/noncopyable.hpp>
 #include <rapidjson/document.h>
 
@@ -10,8 +9,6 @@
 #include <string>
 
 namespace mbgl {
-
-class Source;
 
 class SourceInfo : private util::noncopyable {
 public:
@@ -26,14 +23,6 @@ public:
     std::array<float, 4> bounds = {{-180, -90, 180, 90}};
 
     void parseTileJSONProperties(const rapidjson::Value&);
-};
-
-
-class StyleSource : private util::noncopyable {
-public:
-    SourceInfo info;
-    bool enabled = false;
-    util::ptr<Source> source;
 };
 
 }

@@ -32,7 +32,7 @@ struct box;
 
 class Source : public std::enable_shared_from_this<Source>, private util::noncopyable {
 public:
-    Source(SourceInfo&);
+    Source();
 
     void load(Map &, Environment &);
     void update(Map &, uv::worker &, util::ptr<Style>, GlyphAtlas &, GlyphStore &,
@@ -49,6 +49,9 @@ public:
     std::forward_list<Tile *> getLoadedTiles() const;
     void updateClipIDs(const std::map<Tile::ID, ClipID> &mapping);
 
+    SourceInfo info;
+    bool enabled;
+
 private:
     bool findLoadedChildren(const Tile::ID& id, int32_t maxCoveringZoom, std::forward_list<Tile::ID>& retain);
     bool findLoadedParent(const Tile::ID& id, int32_t minCoveringZoom, std::forward_list<Tile::ID>& retain);
@@ -63,7 +66,6 @@ private:
 
     double getZoom(const TransformState &state) const;
 
-    SourceInfo& info;
     bool loaded = false;
 
     // Stores the time when this source was most recently updated.
