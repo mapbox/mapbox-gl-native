@@ -2,6 +2,12 @@
 
 #import "MGLMapView.h"
 
+@interface MGLUserLocation ()
+
+@property (nonatomic, weak) MGLMapView *mapView;
+
+@end
+
 @implementation MGLUserLocation
 
 - (instancetype)init
