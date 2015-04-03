@@ -1064,6 +1064,21 @@ mbgl::DefaultFileSource *mbglFileSource = nullptr;
 
 #pragma mark - Properties -
 
++ (NSSet *)keyPathsForValuesAffectingZoomEnabled
+{
+    return [NSSet setWithObject:@"allowsZooming"];
+}
+
++ (NSSet *)keyPathsForValuesAffectingScrollEnabled
+{
+    return [NSSet setWithObject:@"allowsScrolling"];
+}
+
++ (NSSet *)keyPathsForValuesAffectingRotateEnabled
+{
+    return [NSSet setWithObject:@"allowsRotating"];
+}
+
 #pragma clang diagnostic push
 #pragma clang diagnostic ignored "-Wunused-parameter"
 
@@ -2461,6 +2476,51 @@ class MBGLView : public mbgl::View
         // longitude away until the latitude is set too.
         _pendingLongitude = longitude;
     }
+}
+
++ (NSSet *)keyPathsForValuesAffectingAllowsZooming
+{
+    return [NSSet setWithObject:@"zoomEnabled"];
+}
+
+- (BOOL)allowsZooming
+{
+    return self.zoomEnabled;
+}
+
+- (void)setAllowsZooming:(BOOL)allowsZooming
+{
+    self.zoomEnabled = allowsZooming;
+}
+
++ (NSSet *)keyPathsForValuesAffectingAllowsScrolling
+{
+    return [NSSet setWithObject:@"scrollEnabled"];
+}
+
+- (BOOL)allowsScrolling
+{
+    return self.scrollEnabled;
+}
+
+- (void)setAllowsScrolling:(BOOL)allowsScrolling
+{
+    self.scrollEnabled = allowsScrolling;
+}
+
++ (NSSet *)keyPathsForValuesAffectingAllowsRotating
+{
+    return [NSSet setWithObject:@"rotateEnabled"];
+}
+
+- (BOOL)allowsRotating
+{
+    return self.rotateEnabled;
+}
+
+- (void)setAllowsRotating:(BOOL)allowsRotating
+{
+    self.rotateEnabled = allowsRotating;
 }
 
 @end

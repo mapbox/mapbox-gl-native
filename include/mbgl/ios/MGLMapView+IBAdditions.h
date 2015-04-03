@@ -11,7 +11,7 @@
 @property (nonatomic) IBInspectable NSString *accessToken;
 @property (nonatomic) IBInspectable NSString *mapID;
 
-// Some convenience properties related to the initial viewport. These properties
+// Convenience properties related to the initial viewport. These properties
 // are not meant to be used outside of Interface Builder. latitude and longitude
 // are backed by properties of type CLLocationDegrees, but these declarations
 // must use the type double because Interface Builder is unaware that
@@ -20,5 +20,14 @@
 @property (nonatomic) IBInspectable double latitude;
 @property (nonatomic) IBInspectable double longitude;
 @property (nonatomic) IBInspectable double zoomLevel;
+
+// Renamed properties. Interface Builder derives the display name of each
+// inspectable from the runtime name, but runtime names don’t always make sense
+// in UI.
+
+@property (nonatomic) IBInspectable BOOL allowsZooming;
+@property (nonatomic) IBInspectable BOOL allowsScrolling;
+@property (nonatomic) IBInspectable BOOL allowsRotating;
+@property (nonatomic) IBInspectable BOOL showsUserLocation;
 
 @end
