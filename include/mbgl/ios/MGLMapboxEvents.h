@@ -8,6 +8,8 @@ extern NSString *const MGLEventTypeLocation;
 extern NSString *const MGLEventKeyLatitude;
 extern NSString *const MGLEventKeyLongitude;
 extern NSString *const MGLEventKeyZoomLevel;
+extern NSString *const MGLEventKeySpeed;
+extern NSString *const MGLEventKeyCourse;
 extern NSString *const MGLEventKeyPushEnabled;
 extern NSString *const MGLEventKeyEmailEnabled;
 extern NSString *const MGLEventKeyGestureID;

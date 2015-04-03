@@ -45,7 +45,9 @@
     for (CLLocation *loc in locations) {
         [MGLMapboxEvents pushEvent:MGLEventTypeLocation withAttributes:@{
             MGLEventKeyLatitude: @(loc.coordinate.latitude),
-            MGLEventKeyLongitude: @(loc.coordinate.longitude)
+            MGLEventKeyLongitude: @(loc.coordinate.longitude),
+            MGLEventKeySpeed: @(loc.speed),
+            MGLEventKeyCourse: @(loc.course)
         }];
     }
 }
