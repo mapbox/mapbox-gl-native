@@ -1,5 +1,6 @@
 #import "MGLUserLocationAnnotationView.h"
 
+#import "MGLUserLocation.h"
 #import "MGLUserLocation_Private.h"
 #import "MGLAnnotation.h"
 #import "MGLMapView.h"
