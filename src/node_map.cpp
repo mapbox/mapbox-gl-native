@@ -287,11 +287,12 @@ void NodeMap::renderFinished() {
 // Instance
 
 NodeMap::NodeMap(v8::Handle<v8::Object> source_) :
-    source(source_),
     view(sharedDisplay()),
     fs(*ObjectWrap::Unwrap<NodeFileSource>(source_)),
     map(view, fs, mbgl::Map::RenderMode::Still),
     async(new uv_async_t) {
+
+    NanAssignPersistent(source, source_);
 
     async->data = this;
     uv_async_init(uv_default_loop(), async, [](uv_async_t *as, int) {
