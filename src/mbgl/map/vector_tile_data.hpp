@@ -48,8 +48,6 @@ protected:
     // Holds the actual geometries in this tile.
     FillVertexBuffer fillVertexBuffer;
     LineVertexBuffer lineVertexBuffer;
-    IconVertexBuffer iconVertexBuffer;
-    TextVertexBuffer textVertexBuffer;
 
     TriangleElementsBuffer triangleElementsBuffer;
     LineElementsBuffer lineElementsBuffer;
