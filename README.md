@@ -66,7 +66,7 @@ If you merely want to install the library for iOS and try it out as an Objective
    - `libz.dylib`
 4. Add `-ObjC` to your target's "Other Linker Flags" build setting (`OTHER_LDFLAGS`).
 5. [Set the Mapbox API access token](#mapbox-api-access-tokens).
-6. `#import "MGLMapView.h"`
+6. `#import "MapboxGL.h"`
 
 If you want to build from source and/or contribute to development of the project, run `make iproj`, which will create and open an Xcode project which can build the entire library from source as well as an Objective-C test app.
 
