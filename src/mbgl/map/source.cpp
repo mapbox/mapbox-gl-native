@@ -107,13 +107,6 @@ void Source::render(Painter &painter, const StyleLayer &layer_desc) {
     }
 }
 
-void Source::render(Painter &painter, const StyleLayer &layer_desc, const Tile::ID &id, const mat4 &matrix) {
-    auto it = tiles.find(id);
-    if (it != tiles.end() && it->second->data && it->second->data->state == TileData::State::parsed) {
-        painter.renderTileLayer(*it->second, layer_desc, matrix);
-    }
-}
-
 void Source::finishRender(Painter &painter) {
     for (const auto& pair : tiles) {
         Tile &tile = *pair.second;

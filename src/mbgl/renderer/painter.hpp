@@ -80,7 +80,7 @@ public:
                 TransformState state,
                 TimePoint time);
 
-    void renderLayer(const StyleLayer &layer_desc, const Tile::ID* id = nullptr, const mat4* matrix = nullptr);
+    void renderLayer(const StyleLayer&);
 
     // Renders a particular layer from a tile.
     void renderTileLayer(const Tile& tile, const StyleLayer &layer_desc, const mat4 &matrix);

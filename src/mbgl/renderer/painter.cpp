@@ -284,7 +284,7 @@ void Painter::render(const Style& style, const std::set<util::ptr<StyleSource>>&
     }
 }
 
-void Painter::renderLayer(const StyleLayer &layer_desc, const Tile::ID* id, const mat4* matrix) {
+void Painter::renderLayer(const StyleLayer &layer_desc) {
     if (layer_desc.bucket->visibility == VisibilityType::None) return;
     if (layer_desc.type == StyleLayerType::Background) {
         // This layer defines a background color/image.
@@ -349,11 +349,8 @@ void Painter::renderLayer(const StyleLayer &layer_desc, const Tile::ID* id, cons
             Log::Info(Event::Render, "%*s- %s (%s)", indent * 4, "", layer_desc.id.c_str(),
                     StyleLayerTypeClass(layer_desc.type).c_str());
         }
-        if (!id) {
-            style_source.source->render(*this, layer_desc);
-        } else {
-            style_source.source->render(*this, layer_desc, *id, *matrix);
-        }
+
+        style_source.source->render(*this, layer_desc);
     }
 }
 
