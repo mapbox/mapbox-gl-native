@@ -18,4 +18,12 @@
 * This property is `nil` if the user location tracking mode is not `MGLUserTrackingModeFollowWithHeading`. */
 @property (nonatomic, readonly) CLHeading *heading;
 
+/** @name Accessing the User Annotation Text */
+
+/** The title to display for the user location annotation. */
+@property (nonatomic, copy) NSString *title;
+
+/** The subtitle to display for the user location annotation. */
+@property (nonatomic, copy) NSString *subtitle;
+
 @end

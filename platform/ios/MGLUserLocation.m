@@ -2,13 +2,6 @@
 
 #import "MGLMapView.h"
 
-@interface MGLUserLocation ()
-
-@property (nonatomic, copy) NSString *title;
-@property (nonatomic, copy) NSString *subtitle;
-
-@end
-
 @implementation MGLUserLocation
 
 - (instancetype)init
