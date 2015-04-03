@@ -3,7 +3,7 @@
 #include <mbgl/util/std.hpp>
 #include <mbgl/style/style_layer.hpp>
 #include <mbgl/style/style_bucket.hpp>
-#include <mbgl/style/style_source.hpp>
+#include <mbgl/map/source.hpp>
 #include <mbgl/geometry/glyph_atlas.hpp>
 #include <mbgl/platform/log.hpp>
 #include <mbgl/util/pbf.hpp>

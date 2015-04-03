@@ -3,12 +3,14 @@
 
 #include <mbgl/map/tile.hpp>
 #include <mbgl/map/tile_data.hpp>
-#include <mbgl/style/style_source.hpp>
+#include <mbgl/style/types.hpp>
 
 #include <mbgl/util/noncopyable.hpp>
 #include <mbgl/util/mat4.hpp>
 #include <mbgl/util/ptr.hpp>
 #include <mbgl/util/chrono.hpp>
+
+#include <rapidjson/document.h>
 
 #include <cstdint>
 #include <forward_list>
@@ -29,6 +31,21 @@ class Painter;
 class StyleLayer;
 class TransformState;
 struct box;
+
+class SourceInfo : private util::noncopyable {
+public:
+    SourceType type = SourceType::Vector;
+    std::string url;
+    std::vector<std::string> tiles;
+    uint16_t tile_size = 512;
+    uint16_t min_zoom = 0;
+    uint16_t max_zoom = 22;
+    std::string attribution;
+    std::array<float, 3> center = {{0, 0, 0}};
+    std::array<float, 4> bounds = {{-180, -90, 180, 90}};
+
+    void parseTileJSONProperties(const rapidjson::Value&);
+};
 
 class Source : public std::enable_shared_from_this<Source>, private util::noncopyable {
 public:

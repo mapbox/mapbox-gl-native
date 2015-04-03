@@ -2,7 +2,7 @@
 #include <mbgl/map/live_tile_data.hpp>
 #include <mbgl/map/live_tile.hpp>
 #include <mbgl/map/tile_parser.hpp>
-#include <mbgl/style/style_source.hpp>
+#include <mbgl/map/source.hpp>
 #include <mbgl/map/vector_tile.hpp>
 #include <mbgl/platform/log.hpp>
 

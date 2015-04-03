@@ -3,7 +3,7 @@
 
 #include <rapidjson/document.h>
 #include <mbgl/style/style.hpp>
-#include <mbgl/style/style_source.hpp>
+#include <mbgl/map/source.hpp>
 #include <mbgl/style/filter_expression.hpp>
 #include <mbgl/style/class_properties.hpp>
 #include <mbgl/style/style_bucket.hpp>
