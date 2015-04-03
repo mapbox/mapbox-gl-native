@@ -13,7 +13,7 @@ void View::resize(uint16_t width, uint16_t height, float ratio, uint16_t fbWidth
     map->resize(width, height, ratio, fbWidth, fbHeight);
 }
 
-void View::notifyMapChange(MapChange, std::chrono::steady_clock::duration) {
+void View::notifyMapChange(MapChange, Duration) {
     // no-op
 }
 

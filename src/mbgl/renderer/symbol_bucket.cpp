@@ -46,9 +46,8 @@ SymbolInstance::SymbolInstance(Anchor &anchor, const std::vector<Coordinate> &li
     iconCollisionFeature(line, anchor, shapedIcon, iconBoxScale, iconPadding, iconAlongLine) {};
 
 
-SymbolBucket::SymbolBucket(std::unique_ptr<const StyleLayoutSymbol> styleLayout_, CollisionTile &collision_)
-    : styleLayout(std::move(styleLayout_)), collision(collision_) {
-    assert(styleLayout);
+SymbolBucket::SymbolBucket(CollisionTile &collision_)
+    : collision(collision_) {
 }
 
 SymbolBucket::~SymbolBucket() {
@@ -72,7 +71,6 @@ std::vector<SymbolFeature> SymbolBucket::processFeatures(const GeometryTileLayer
                                                          const FilterExpression& filter,
                                                          GlyphStore &glyphStore,
                                                          const Sprite &sprite) {
-    auto &layout = *styleLayout;
     const bool has_text = layout.text.field.size();
     const bool has_icon = layout.icon.image.size();
 
@@ -155,7 +153,6 @@ void SymbolBucket::addFeatures(const GeometryTileLayer& layer,
                                Sprite& sprite,
                                GlyphAtlas& glyphAtlas,
                                GlyphStore& glyphStore) {
-    auto &layout = *styleLayout;
     const std::vector<SymbolFeature> features = processFeatures(layer, filter, glyphStore, sprite);
 
     float horizontalAlign = 0.5;
@@ -201,7 +198,7 @@ void SymbolBucket::addFeatures(const GeometryTileLayer& layer,
 
     const auto &fontStack = glyphStore.getFontStack(layout.text.font);
 
-    for (const SymbolFeature &feature : features) {
+    for (const auto& feature : features) {
         if (!feature.geometry.size()) continue;
 
         Shaping shapedText;
@@ -248,8 +245,7 @@ void SymbolBucket::addFeatures(const GeometryTileLayer& layer,
 
 
 void SymbolBucket::addFeature(const std::vector<std::vector<Coordinate>> &lines,
-                    const Shaping &shapedText, const PositionedIcon &shapedIcon, const GlyphPositions &face) {
-    auto &layout = *styleLayout;
+        const Shaping &shapedText, const PositionedIcon &shapedIcon, const GlyphPositions &face) {
 
     const float minScale = 0.5f;
     const float glyphSize = 24.0f;
@@ -273,7 +269,7 @@ void SymbolBucket::addFeature(const std::vector<std::vector<Coordinate>> &lines,
         util::clipLines(lines, 0, 0, 4096, 4096) :
         lines;
 
-    for (const std::vector<Coordinate> &line : clippedLines) {
+    for (const auto& line : clippedLines) {
         if (!line.size()) continue;
 
         // Calculate the anchor points around which you want to place labels
@@ -301,8 +297,6 @@ void SymbolBucket::placeFeatures() {
 
     // Calculate which labels can be shown and when they can be shown and
     // create the bufers used for rendering.
-
-    auto &layout = *styleLayout;
 
     const bool textAlongLine =
         layout.text.rotation_alignment == RotationAlignmentType::Map &&
@@ -369,7 +363,7 @@ void SymbolBucket::addSymbols(Buffer &buffer, const SymbolQuads &symbols, float 
 
     const float placementZoom = std::log(scale) / std::log(2) + zoom;
 
-    for (const SymbolQuad &symbol : symbols) {
+    for (const auto& symbol : symbols) {
         const auto &tl = symbol.tl;
         const auto &tr = symbol.tr;
         const auto &bl = symbol.bl;

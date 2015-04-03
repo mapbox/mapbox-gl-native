@@ -18,6 +18,11 @@ TEST(Mapbox, GlyphsURL) {
     EXPECT_EQ(mbgl::util::mapbox::normalizeGlyphsURL("http://path", "key"), "http://path");
 }
 
+TEST(Mapbox, StyleURL) {
+    EXPECT_EQ(mbgl::util::mapbox::normalizeStyleURL("mapbox://user.style", "key"), "https://api.tiles.mapbox.com/styles/v1/user/user.style?access_token=key");
+    EXPECT_EQ(mbgl::util::mapbox::normalizeStyleURL("http://path", "key"), "http://path");
+}
+
 TEST(Mapbox, TileURL) {
     try {
         EXPECT_EQ(mbgl::util::mapbox::normalizeTileURL("http://path.png/tile.png", "mapbox://user.map", SourceType::Raster), "http://path.png/tile{ratio}.png");

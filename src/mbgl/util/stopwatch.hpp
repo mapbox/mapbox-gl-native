@@ -2,9 +2,9 @@
 #define MBGL_UTIL_STOPWATCH
 
 #include <mbgl/platform/event.hpp>
+#include <mbgl/util/chrono.hpp>
 
 #include <string>
-#include <chrono>
 
 namespace mbgl {
 namespace util {
@@ -23,7 +23,7 @@ private:
     const std::string name;
     EventSeverity severity = EventSeverity::Debug;
     Event event = Event::General;
-    std::chrono::steady_clock::time_point start;
+    TimePoint start;
 };
 #else
 class stopwatch {

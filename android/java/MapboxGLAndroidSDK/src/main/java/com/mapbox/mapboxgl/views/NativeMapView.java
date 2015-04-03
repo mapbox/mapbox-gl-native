@@ -213,14 +213,6 @@ class NativeMapView {
         return nativeGetLatLng(mNativeMapViewPtr);
     }
 
-    public void startPanning() {
-        nativeStartPanning(mNativeMapViewPtr);
-    }
-
-    public void stopPanning() {
-        nativeStopPanning(mNativeMapViewPtr);
-    }
-
     public void resetPosition() {
         nativeResetPosition(mNativeMapViewPtr);
     }
@@ -281,14 +273,6 @@ class NativeMapView {
         nativeResetZoom(mNativeMapViewPtr);
     }
 
-    public void startScaling() {
-        nativeStartScaling(mNativeMapViewPtr);
-    }
-
-    public void stopScaling() {
-        nativeStopScaling(mNativeMapViewPtr);
-    }
-
     public double getMinZoom() {
         return nativeGetMinZoom(mNativeMapViewPtr);
     }
@@ -324,14 +308,6 @@ class NativeMapView {
 
     public void resetNorth() {
         nativeResetNorth(mNativeMapViewPtr);
-    }
-
-    public void startRotating() {
-        nativeStartRotating(mNativeMapViewPtr);
-    }
-
-    public void stopRotating() {
-        nativeStopRotating(mNativeMapViewPtr);
     }
 
     public void setDebug(boolean debug) {
@@ -468,10 +444,6 @@ class NativeMapView {
 
     private native LatLng nativeGetLatLng(long nativeMapViewPtr);
 
-    private native void nativeStartPanning(long nativeMapViewPtr);
-
-    private native void nativeStopPanning(long nativeMapViewPtr);
-
     private native void nativeResetPosition(long nativeMapViewPtr);
 
     private native void nativeScaleBy(long nativeMapViewPtr, double ds,
@@ -494,10 +466,6 @@ class NativeMapView {
 
     private native void nativeResetZoom(long nativeMapViewPtr);
 
-    private native void nativeStartScaling(long nativeMapViewPtr);
-
-    private native void nativeStopScaling(long nativeMapViewPtr);
-
     private native double nativeGetMinZoom(long nativeMapViewPtr);
 
     private native double nativeGetMaxZoom(long nativeMapViewPtr);
@@ -514,10 +482,6 @@ class NativeMapView {
     private native double nativeGetBearing(long nativeMapViewPtr);
 
     private native void nativeResetNorth(long nativeMapViewPtr);
-
-    private native void nativeStartRotating(long nativeMapViewPtr);
-
-    private native void nativeStopRotating(long nativeMapViewPtr);
 
     private native void nativeSetDebug(long nativeMapViewPtr, boolean debug);
 

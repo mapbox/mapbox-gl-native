@@ -1,6 +1,5 @@
 #include <mbgl/style/style_layer.hpp>
 #include <mbgl/style/style_bucket.hpp>
-#include <mbgl/style/style_layer_group.hpp>
 #include <mbgl/style/property_fallback.hpp>
 
 #include <mbgl/util/interpolate.hpp>
@@ -14,7 +13,7 @@ bool StyleLayer::isBackground() const {
     return type == StyleLayerType::Background;
 }
 
-void StyleLayer::setClasses(const std::vector<std::string> &class_names, const std::chrono::steady_clock::time_point now,
+void StyleLayer::setClasses(const std::vector<std::string> &class_names, const TimePoint now,
                             const PropertyTransition &defaultTransition) {
     // Stores all keys that we have already added transitions for.
     std::set<PropertyKey> already_applied;
@@ -32,7 +31,7 @@ void StyleLayer::setClasses(const std::vector<std::string> &class_names, const s
 
     // Make sure that we also transition to the fallback value for keys that aren't changed by
     // any applied classes.
-    for (std::pair<const PropertyKey, AppliedClassProperties> &property_pair : appliedStyle) {
+    for (auto& property_pair : appliedStyle) {
         const PropertyKey key = property_pair.first;
         if (already_applied.find(key) != already_applied.end()) {
             // This property has already been set by a previous class, so we don't need to
@@ -45,8 +44,8 @@ void StyleLayer::setClasses(const std::vector<std::string> &class_names, const s
         if (appliedProperties.mostRecent() != ClassID::Fallback) {
             // This property key hasn't been set by a previous class, so we need to add a transition
             // to the fallback value for that key.
-            const std::chrono::steady_clock::time_point begin = now + defaultTransition.delay;
-            const std::chrono::steady_clock::time_point end = begin + defaultTransition.duration;
+            const TimePoint begin = now + defaultTransition.delay;
+            const TimePoint end = begin + defaultTransition.duration;
             const PropertyValue &value = PropertyFallbackValue::Get(key);
             appliedProperties.add(ClassID::Fallback, begin, end, value);
         }
@@ -55,7 +54,7 @@ void StyleLayer::setClasses(const std::vector<std::string> &class_names, const s
 
 // Helper function for applying all properties of a a single class that haven't been applied yet.
 void StyleLayer::applyClassProperties(const ClassID class_id,
-                                      std::set<PropertyKey> &already_applied, std::chrono::steady_clock::time_point now,
+                                      std::set<PropertyKey> &already_applied, TimePoint now,
                                       const PropertyTransition &defaultTransition) {
     auto style_it = styles.find(class_id);
     if (style_it == styles.end()) {
@@ -66,7 +65,7 @@ void StyleLayer::applyClassProperties(const ClassID class_id,
     // Loop through all the properties in this style, and add transitions to them, if they're
     // not already the most recent transition.
     const ClassProperties &class_properties = style_it->second;
-    for (const std::pair<PropertyKey, PropertyValue> &property_pair : class_properties)  {
+    for (const auto& property_pair : class_properties) {
         PropertyKey key = property_pair.first;
         if (already_applied.find(key) != already_applied.end()) {
             // This property has already been set by a previous class.
@@ -83,8 +82,8 @@ void StyleLayer::applyClassProperties(const ClassID class_id,
         if (appliedProperties.mostRecent() != class_id) {
             const PropertyTransition &transition =
                 class_properties.getTransition(key, defaultTransition);
-            const std::chrono::steady_clock::time_point begin = now + transition.delay;
-            const std::chrono::steady_clock::time_point end = begin + transition.duration;
+            const TimePoint begin = now + transition.delay;
+            const TimePoint end = begin + transition.duration;
             const PropertyValue &value = property_pair.second;
             appliedProperties.add(class_id, begin, end, value);
         }
@@ -120,13 +119,13 @@ private:
 };
 
 template <typename T>
-void StyleLayer::applyStyleProperty(PropertyKey key, T &target, const float z, const std::chrono::steady_clock::time_point now, const ZoomHistory &zoomHistory) {
+void StyleLayer::applyStyleProperty(PropertyKey key, T &target, const float z, const TimePoint now, const ZoomHistory &zoomHistory) {
     auto it = appliedStyle.find(key);
     if (it != appliedStyle.end()) {
         AppliedClassProperties &applied = it->second;
         // Iterate through all properties that we need to apply in order.
         const PropertyEvaluator<T> evaluator(z, zoomHistory);
-        for (AppliedClassProperty &property : applied.properties) {
+        for (auto& property : applied.properties) {
             if (now >= property.begin) {
                 // We overwrite the current property with the new value.
                 target = mapbox::util::apply_visitor(evaluator, property.value);
@@ -138,13 +137,13 @@ void StyleLayer::applyStyleProperty(PropertyKey key, T &target, const float z, c
 }
 
 template <typename T>
-void StyleLayer::applyTransitionedStyleProperty(PropertyKey key, T &target, const float z, const std::chrono::steady_clock::time_point now, const ZoomHistory &zoomHistory) {
+void StyleLayer::applyTransitionedStyleProperty(PropertyKey key, T &target, const float z, const TimePoint now, const ZoomHistory &zoomHistory) {
     auto it = appliedStyle.find(key);
     if (it != appliedStyle.end()) {
         AppliedClassProperties &applied = it->second;
         // Iterate through all properties that we need to apply in order.
         const PropertyEvaluator<T> evaluator(z, zoomHistory);
-        for (AppliedClassProperty &property : applied.properties) {
+        for (auto& property : applied.properties) {
             if (now >= property.end) {
                 // We overwrite the current property with the new value.
                 target = mapbox::util::apply_visitor(evaluator, property.value);
@@ -160,7 +159,7 @@ void StyleLayer::applyTransitionedStyleProperty(PropertyKey key, T &target, cons
 }
 
 template <>
-void StyleLayer::applyStyleProperties<FillProperties>(const float z, const std::chrono::steady_clock::time_point now, const ZoomHistory &zoomHistory) {
+void StyleLayer::applyStyleProperties<FillProperties>(const float z, const TimePoint now, const ZoomHistory &zoomHistory) {
     properties.set<FillProperties>();
     FillProperties &fill = properties.get<FillProperties>();
     applyStyleProperty(PropertyKey::FillAntialias, fill.antialias, z, now, zoomHistory);
@@ -173,7 +172,7 @@ void StyleLayer::applyStyleProperties<FillProperties>(const float z, const std::
 }
 
 template <>
-void StyleLayer::applyStyleProperties<LineProperties>(const float z, const std::chrono::steady_clock::time_point now, const ZoomHistory &zoomHistory) {
+void StyleLayer::applyStyleProperties<LineProperties>(const float z, const TimePoint now, const ZoomHistory &zoomHistory) {
     properties.set<LineProperties>();
     LineProperties &line = properties.get<LineProperties>();
     applyTransitionedStyleProperty(PropertyKey::LineOpacity, line.opacity, z, now, zoomHistory);
@@ -187,11 +186,11 @@ void StyleLayer::applyStyleProperties<LineProperties>(const float z, const std::
     applyStyleProperty(PropertyKey::LineImage, line.image, z, now, zoomHistory);
 
     // for scaling dasharrays
-    applyStyleProperty(PropertyKey::LineWidth, line.dash_line_width, std::floor(z), std::chrono::steady_clock::time_point::max(), zoomHistory);
+    applyStyleProperty(PropertyKey::LineWidth, line.dash_line_width, std::floor(z), TimePoint::max(), zoomHistory);
 }
 
 template <>
-void StyleLayer::applyStyleProperties<SymbolProperties>(const float z, const std::chrono::steady_clock::time_point now, const ZoomHistory &zoomHistory) {
+void StyleLayer::applyStyleProperties<SymbolProperties>(const float z, const TimePoint now, const ZoomHistory &zoomHistory) {
     properties.set<SymbolProperties>();
     SymbolProperties &symbol = properties.get<SymbolProperties>();
     applyTransitionedStyleProperty(PropertyKey::IconOpacity, symbol.icon.opacity, z, now, zoomHistory);
@@ -215,7 +214,7 @@ void StyleLayer::applyStyleProperties<SymbolProperties>(const float z, const std
 }
 
 template <>
-void StyleLayer::applyStyleProperties<RasterProperties>(const float z, const std::chrono::steady_clock::time_point now, const ZoomHistory &zoomHistory) {
+void StyleLayer::applyStyleProperties<RasterProperties>(const float z, const TimePoint now, const ZoomHistory &zoomHistory) {
     properties.set<RasterProperties>();
     RasterProperties &raster = properties.get<RasterProperties>();
     applyTransitionedStyleProperty(PropertyKey::RasterOpacity, raster.opacity, z, now, zoomHistory);
@@ -228,7 +227,7 @@ void StyleLayer::applyStyleProperties<RasterProperties>(const float z, const std
 }
 
 template <>
-void StyleLayer::applyStyleProperties<BackgroundProperties>(const float z, const std::chrono::steady_clock::time_point now, const ZoomHistory &zoomHistory) {
+void StyleLayer::applyStyleProperties<BackgroundProperties>(const float z, const TimePoint now, const ZoomHistory &zoomHistory) {
     properties.set<BackgroundProperties>();
     BackgroundProperties &background = properties.get<BackgroundProperties>();
     applyTransitionedStyleProperty(PropertyKey::BackgroundOpacity, background.opacity, z, now, zoomHistory);
@@ -236,7 +235,7 @@ void StyleLayer::applyStyleProperties<BackgroundProperties>(const float z, const
     applyStyleProperty(PropertyKey::BackgroundImage, background.image, z, now, zoomHistory);
 }
 
-void StyleLayer::updateProperties(float z, const std::chrono::steady_clock::time_point now, ZoomHistory &zoomHistory) {
+void StyleLayer::updateProperties(float z, const TimePoint now, ZoomHistory &zoomHistory) {
     cleanupAppliedStyleProperties(now);
 
     switch (type) {
@@ -250,7 +249,7 @@ void StyleLayer::updateProperties(float z, const std::chrono::steady_clock::time
 }
 
 bool StyleLayer::hasTransitions() const {
-    for (const std::pair<PropertyKey, AppliedClassProperties> &pair : appliedStyle) {
+    for (const auto& pair : appliedStyle) {
         if (pair.second.hasTransitions()) {
             return true;
         }
@@ -259,7 +258,7 @@ bool StyleLayer::hasTransitions() const {
 }
 
 
-void StyleLayer::cleanupAppliedStyleProperties(std::chrono::steady_clock::time_point now) {
+void StyleLayer::cleanupAppliedStyleProperties(TimePoint now) {
     auto it = appliedStyle.begin();
     const auto end = appliedStyle.end();
     while (it != end) {

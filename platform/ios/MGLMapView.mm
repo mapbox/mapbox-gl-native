@@ -46,8 +46,9 @@ NSString *const MGLDefaultStyleName = @"Emerald";
 NSString *const MGLStyleVersion = @"v7";
 NSString *const MGLDefaultStyleMarkerSymbolName = @"default_marker";
 
-NSTimeInterval const MGLAnimationDuration = 0.3;
+const NSTimeInterval MGLAnimationDuration = 0.3;
 const CGSize MGLAnnotationUpdateViewportOutset = {150, 150};
+const CGFloat MGLMinimumZoom = 3;
 
 NSString *const MGLAnnotationIDKey = @"MGLAnnotationIDKey";
 
@@ -132,6 +133,19 @@ mbgl::DefaultFileSource *mbglFileSource = nullptr;
     return self;
 }
 
+- (instancetype)initWithFrame:(CGRect)frame accessToken:(NSString *)accessToken styleURL:(NSURL *)styleURL
+{
+    self = [super initWithFrame:frame];
+
+    if (self && [self commonInit])
+    {
+        if (accessToken) [self setAccessToken:accessToken];
+        if (styleURL) [self setStyleURL:styleURL];
+    }
+
+    return self;
+}
+
 - (instancetype)initWithFrame:(CGRect)frame accessToken:(NSString *)accessToken
 {
     return [self initWithFrame:frame accessToken:accessToken styleJSON:nil];
@@ -172,17 +186,17 @@ mbgl::DefaultFileSource *mbglFileSource = nullptr;
     }
 }
 
-- (void)setStyleURL:(NSString *)styleURLString
+- (void)setStyleURL:(NSURL *)styleURL
 {
-    std::string styleURL([styleURLString UTF8String]);
+    std::string styleURLString([[styleURL absoluteString] UTF8String]);
 
-    if ( ! [[NSURL URLWithString:styleURLString] scheme])
+    if ( ! [styleURL scheme])
     {
-        mbglMap->setStyleURL(std::string("asset://") + styleURL);
+        mbglMap->setStyleURL(std::string("asset://") + styleURLString);
     }
     else
     {
-        mbglMap->setStyleURL(styleURL);
+        mbglMap->setStyleURL(styleURLString);
     }
 }
 
@@ -602,6 +616,8 @@ mbgl::DefaultFileSource *mbglFileSource = nullptr;
     {
         [self trackGestureEvent:MGLEventGesturePanStart forRecognizer:pan];
 
+        mbglMap->setGestureInProgress(true);
+
         self.centerPoint = CGPointMake(0, 0);
 
         self.userTrackingMode = MGLUserTrackingModeNone;
@@ -637,6 +653,8 @@ mbgl::DefaultFileSource *mbglFileSource = nullptr;
         CGPoint offset = CGPointMake(velocity.x * duration / 2, velocity.y * duration / 2);
 
         mbglMap->moveBy(offset.x, offset.y, secondsAsDuration(duration));
+
+        mbglMap->setGestureInProgress(false);
 
         if (duration)
         {
@@ -681,7 +699,7 @@ mbgl::DefaultFileSource *mbglFileSource = nullptr;
     {
         [self trackGestureEvent:MGLEventGesturePinchStart forRecognizer:pinch];
 
-        mbglMap->startScaling();
+        mbglMap->setGestureInProgress(true);
 
         self.scale = mbglMap->getScale();
 
@@ -699,7 +717,7 @@ mbgl::DefaultFileSource *mbglFileSource = nullptr;
     }
     else if (pinch.state == UIGestureRecognizerStateEnded || pinch.state == UIGestureRecognizerStateCancelled)
     {
-        mbglMap->stopScaling();
+        mbglMap->setGestureInProgress(false);
 
         [self unrotateIfNeededAnimated:YES];
 
@@ -717,7 +735,7 @@ mbgl::DefaultFileSource *mbglFileSource = nullptr;
     {
         [self trackGestureEvent:MGLEventGestureRotateStart forRecognizer:rotate];
 
-        mbglMap->startRotating();
+        mbglMap->setGestureInProgress(true);
 
         self.angle = [MGLMapView degreesToRadians:mbglMap->getBearing()] * -1;
 
@@ -741,7 +759,7 @@ mbgl::DefaultFileSource *mbglFileSource = nullptr;
     }
     else if (rotate.state == UIGestureRecognizerStateEnded || rotate.state == UIGestureRecognizerStateCancelled)
     {
-        mbglMap->stopRotating();
+        mbglMap->setGestureInProgress(false);
 
         [self unrotateIfNeededAnimated:YES];
 
@@ -1112,7 +1130,9 @@ mbgl::DefaultFileSource *mbglFileSource = nullptr;
 {
     CGFloat duration = (animated ? MGLAnimationDuration : 0);
 
-    mbglMap->setLatLng(coordinateToLatLng(coordinate), secondsAsDuration(duration));
+    mbglMap->setLatLngZoom(coordinateToLatLng(coordinate),
+                           fmaxf(mbglMap->getZoom(), self.currentMinimumZoom),
+                           secondsAsDuration(duration));
 
     [self notifyMapChange:@(animated ? mbgl::MapChangeRegionDidChangeAnimated : mbgl::MapChangeRegionDidChange)];
 }
@@ -1151,7 +1171,9 @@ mbgl::DefaultFileSource *mbglFileSource = nullptr;
 
     CGFloat duration = (animated ? MGLAnimationDuration : 0);
 
-    mbglMap->setZoom(zoomLevel, secondsAsDuration(duration));
+    mbglMap->setLatLngZoom(mbglMap->getLatLng(),
+                           fmaxf(zoomLevel, self.currentMinimumZoom),
+                           secondsAsDuration(duration));
 
     [self unrotateIfNeededAnimated:animated];
 
@@ -1307,7 +1329,7 @@ CLLocationCoordinate2D latLngToCoordinate(mbgl::LatLng latLng)
     if (isHybrid) {
         styleName = [@"satellite-" stringByAppendingString:[styleName substringFromIndex:[hybridStylePrefix length]]];
     }
-    [self setStyleURL:[NSString stringWithFormat:@"styles/%@.json", styleName]];
+    [self setStyleURL:[NSURL URLWithString:[NSString stringWithFormat:@"styles/%@.json", styleName]]];
     if (isHybrid) {
         [self setStyleClasses:@[@"contours", @"labels"]];
     }
@@ -1721,7 +1743,7 @@ CLLocationCoordinate2D latLngToCoordinate(mbgl::LatLng latLng)
         {
             self.showsUserLocation = YES;
 
-            if (self.zoomLevel < 3) [self setZoomLevel:3 animated:YES];
+            if (self.zoomLevel < self.currentMinimumZoom) [self setZoomLevel:self.currentMinimumZoom animated:YES];
 
             if (self.userLocationAnnotationView)
             {
@@ -1930,9 +1952,14 @@ CLLocationCoordinate2D latLngToCoordinate(mbgl::LatLng latLng)
     dispatch_after(dispatch_time(DISPATCH_TIME_NOW, (int64_t)(delay * NSEC_PER_SEC)), dispatch_get_main_queue(), animations);
 }
 
+- (CGFloat)currentMinimumZoom
+{
+    return fmaxf(mbglMap->getMinZoom(), MGLMinimumZoom);
+}
+
 - (BOOL)isRotationAllowed
 {
-    return (self.zoomLevel > 3);
+    return (self.zoomLevel >= self.currentMinimumZoom);
 }
 
 // correct rotations to north as needed

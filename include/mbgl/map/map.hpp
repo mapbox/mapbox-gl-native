@@ -2,6 +2,8 @@
 #define MBGL_MAP_MAP
 
 #include <mbgl/map/transform.hpp>
+#include <mbgl/util/chrono.hpp>
+#include <mbgl/map/update.hpp>
 #include <mbgl/util/geo.hpp>
 #include <mbgl/util/projection.hpp>
 #include <mbgl/util/noncopyable.hpp>
@@ -19,7 +21,6 @@
 #include <mutex>
 #include <condition_variable>
 #include <functional>
-#include <chrono>
 
 namespace mbgl {
 
@@ -29,7 +30,6 @@ class LayerDescription;
 class Sprite;
 class Style;
 class StyleLayer;
-class StyleLayerGroup;
 class StyleSource;
 class TexturePool;
 class FileSource;
@@ -77,14 +77,6 @@ public:
     void render();
 
     // Notifies the Map thread that the state has changed and an update might be necessary.
-    using UpdateType = uint32_t;
-    enum class Update : UpdateType {
-        Nothing                   = 0,
-        StyleInfo                 = 1 << 0,
-        Debug                     = 1 << 1,
-        DefaultTransitionDuration = 1 << 2,
-        Classes                   = 1 << 3,
-    };
     void triggerUpdate(Update = Update::Nothing);
 
     // Triggers a render. Can be called from any thread.
@@ -100,44 +92,39 @@ public:
     void setClasses(const std::vector<std::string>&);
     std::vector<std::string> getClasses() const;
 
-    void setDefaultTransitionDuration(std::chrono::steady_clock::duration duration = std::chrono::steady_clock::duration::zero());
-    std::chrono::steady_clock::duration getDefaultTransitionDuration();
+    void setDefaultTransitionDuration(Duration = Duration::zero());
+    Duration getDefaultTransitionDuration();
     void setStyleURL(const std::string& url);
     void setStyleJSON(const std::string& json, const std::string& base = "");
     std::string getStyleJSON() const;
 
     // Transition
     void cancelTransitions();
+    void setGestureInProgress(bool);
 
     // Position
-    void moveBy(double dx, double dy, std::chrono::steady_clock::duration duration = std::chrono::steady_clock::duration::zero());
-    void setLatLng(LatLng latLng, std::chrono::steady_clock::duration duration = std::chrono::steady_clock::duration::zero());
+    void moveBy(double dx, double dy, Duration = Duration::zero());
+    void setLatLng(LatLng latLng, Duration = Duration::zero());
     LatLng getLatLng() const;
-    void startPanning();
-    void stopPanning();
     void resetPosition();
 
     // Scale
-    void scaleBy(double ds, double cx = -1, double cy = -1, std::chrono::steady_clock::duration duration = std::chrono::steady_clock::duration::zero());
-    void setScale(double scale, double cx = -1, double cy = -1, std::chrono::steady_clock::duration duration = std::chrono::steady_clock::duration::zero());
+    void scaleBy(double ds, double cx = -1, double cy = -1, Duration = Duration::zero());
+    void setScale(double scale, double cx = -1, double cy = -1, Duration = Duration::zero());
     double getScale() const;
-    void setZoom(double zoom, std::chrono::steady_clock::duration duration = std::chrono::steady_clock::duration::zero());
+    void setZoom(double zoom, Duration = Duration::zero());
     double getZoom() const;
-    void setLatLngZoom(LatLng latLng, double zoom, std::chrono::steady_clock::duration duration = std::chrono::steady_clock::duration::zero());
+    void setLatLngZoom(LatLng latLng, double zoom, Duration = Duration::zero());
     void resetZoom();
-    void startScaling();
-    void stopScaling();
     double getMinZoom() const;
     double getMaxZoom() const;
 
     // Rotation
-    void rotateBy(double sx, double sy, double ex, double ey, std::chrono::steady_clock::duration duration = std::chrono::steady_clock::duration::zero());
-    void setBearing(double degrees, std::chrono::steady_clock::duration duration = std::chrono::steady_clock::duration::zero());
+    void rotateBy(double sx, double sy, double ex, double ey, Duration = Duration::zero());
+    void setBearing(double degrees, Duration = Duration::zero());
     void setBearing(double degrees, double cx, double cy);
     double getBearing() const;
     void resetNorth();
-    void startRotating();
-    void stopRotating();
 
     // API
     void setAccessToken(const std::string &token);
@@ -169,7 +156,7 @@ public:
     bool getDebug() const;
 
     inline const TransformState &getState() const { return state; }
-    std::chrono::steady_clock::time_point getTime() const;
+    TimePoint getTime() const;
     inline AnnotationManager& getAnnotationManager() const { return *annotationManager; }
 
 private:
@@ -188,7 +175,6 @@ private:
 
     void updateTiles();
     void updateSources();
-    void updateSources(const util::ptr<StyleLayerGroup> &group);
 
     // Triggered by triggerUpdate();
     void update();

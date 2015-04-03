@@ -13,7 +13,7 @@
 #include <mbgl/text/shaping.hpp>
 #include <mbgl/text/quads.hpp>
 #include <mbgl/style/style_bucket.hpp>
-#include <mbgl/util/ptr.hpp>
+#include <mbgl/style/style_layout.hpp>
 
 #include <memory>
 #include <map>
@@ -21,8 +21,6 @@
 
 namespace mbgl {
 
-class Style;
-class StyleLayoutSymbol;
 class SDFShader;
 class IconShader;
 class CollisionBoxShader;
@@ -32,7 +30,6 @@ class SpriteAtlas;
 class Sprite;
 class GlyphAtlas;
 class GlyphStore;
-class FontStack;
 
 class SymbolFeature {
 public:
@@ -65,7 +62,7 @@ class SymbolBucket : public Bucket {
     typedef ElementGroup<1> CollisionBoxElementGroup;
 
 public:
-    SymbolBucket(std::unique_ptr<const StyleLayoutSymbol> styleLayout, CollisionTile &collision);
+    SymbolBucket(CollisionTile &collision);
     ~SymbolBucket() override;
 
     void render(Painter &painter, const StyleLayer &layer_desc, const Tile::ID &id,
@@ -105,7 +102,7 @@ private:
     void addSymbols(Buffer &buffer, const SymbolQuads &symbols, float scale, const bool keepUpright, const bool alongLine);
 
 public:
-    const std::unique_ptr<const StyleLayoutSymbol> styleLayout;
+    StyleLayoutSymbol layout;
     bool sdfIcons = false;
 
 private:

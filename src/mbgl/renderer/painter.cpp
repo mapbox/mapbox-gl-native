@@ -2,7 +2,6 @@
 #include <mbgl/platform/log.hpp>
 #include <mbgl/style/style.hpp>
 #include <mbgl/style/style_layer.hpp>
-#include <mbgl/style/style_layer_group.hpp>
 #include <mbgl/style/style_bucket.hpp>
 #include <mbgl/util/std.hpp>
 #include <mbgl/util/string.hpp>
@@ -218,7 +217,7 @@ void Painter::prepareTile(const Tile& tile) {
 }
 
 void Painter::render(const Style& style, const std::set<util::ptr<StyleSource>>& sources,
-                     TransformState state_, std::chrono::steady_clock::time_point time) {
+                     TransformState state_, TimePoint time) {
     state = state_;
 
     clear();
@@ -227,7 +226,7 @@ void Painter::render(const Style& style, const std::set<util::ptr<StyleSource>>&
 
     // Update all clipping IDs.
     ClipIDGenerator generator;
-    for (const util::ptr<StyleSource> &source : sources) {
+    for (const auto& source : sources) {
         generator.update(source->source->getLoadedTiles());
         source->source->updateMatrices(projMatrix, state);
     }
@@ -238,23 +237,9 @@ void Painter::render(const Style& style, const std::set<util::ptr<StyleSource>>&
 
     // Actually render the layers
     if (debug::renderTree) { Log::Info(Event::Render, "{"); indent++; }
-    if (style.layers) {
-        renderLayers(*style.layers);
-    }
-    if (debug::renderTree) { Log::Info(Event::Render, "}"); indent--; }
 
-    // Finalize the rendering, e.g. by calling debug render calls per tile.
-    // This guarantees that we have at least one function per tile called.
-    // When only rendering layers via the stylesheet, it's possible that we don't
-    // ever visit a tile during rendering.
-    for (const util::ptr<StyleSource> &source : sources) {
-        source->source->finishRender(*this);
-    }
-}
-
-void Painter::renderLayers(const StyleLayerGroup &group) {
     // TODO: Correctly compute the number of layers recursively beforehand.
-    float strata_thickness = 1.0f / (group.layers.size() + 1);
+    float strata_thickness = 1.0f / (style.layers.size() + 1);
 
     // - FIRST PASS ------------------------------------------------------------
     // Render everything top-to-bottom by using reverse iterators. Render opaque
@@ -264,7 +249,7 @@ void Painter::renderLayers(const StyleLayerGroup &group) {
         Log::Info(Event::Render, "%*s%s", indent++ * 4, "", "OPAQUE {");
     }
     int i = 0;
-    for (auto it = group.layers.rbegin(), end = group.layers.rend(); it != end; ++it, ++i) {
+    for (auto it = style.layers.rbegin(), end = style.layers.rend(); it != end; ++it, ++i) {
         setOpaque();
         setStrata(i * strata_thickness);
         renderLayer(**it);
@@ -280,13 +265,23 @@ void Painter::renderLayers(const StyleLayerGroup &group) {
         Log::Info(Event::Render, "%*s%s", indent++ * 4, "", "TRANSLUCENT {");
     }
     --i;
-    for (auto it = group.layers.begin(), end = group.layers.end(); it != end; ++it, --i) {
+    for (auto it = style.layers.begin(), end = style.layers.end(); it != end; ++it, --i) {
         setTranslucent();
         setStrata(i * strata_thickness);
         renderLayer(**it);
     }
     if (debug::renderTree) {
         Log::Info(Event::Render, "%*s%s", --indent * 4, "", "}");
+    }
+
+    if (debug::renderTree) { Log::Info(Event::Render, "}"); indent--; }
+
+    // Finalize the rendering, e.g. by calling debug render calls per tile.
+    // This guarantees that we have at least one function per tile called.
+    // When only rendering layers via the stylesheet, it's possible that we don't
+    // ever visit a tile during rendering.
+    for (const auto& source : sources) {
+        source->source->finishRender(*this);
     }
 }
 

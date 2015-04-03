@@ -33,7 +33,7 @@ private:
     std::atomic<bool> dirty;
     uint32_t texture = 0;
     int nextRow = 0;
-    std::map<std::string, LinePatternPos> positions;
+    std::map<size_t, LinePatternPos> positions;
 };
 
 };

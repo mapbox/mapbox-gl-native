@@ -1,6 +1,6 @@
 #include <mbgl/style/style_source.hpp>
 #include <mbgl/style/style_parser.hpp>
-#include <mbgl/style/style_layer_group.hpp>
+#include <mbgl/style/style_layer.hpp>
 #include <mbgl/map/annotation.hpp>
 #include <mbgl/util/constants.hpp>
 #include <mbgl/util/std.hpp>
@@ -35,8 +35,7 @@ void StyleParser::parse(JSVal document) {
     }
 
     if (document.HasMember("layers")) {
-        root = createLayers(document["layers"]);
-        parseLayers();
+        parseLayers(document["layers"]);
 
         // create point annotations layer
         //
@@ -45,8 +44,8 @@ void StyleParser::parse(JSVal document) {
         std::map<ClassID, ClassProperties> paints;
         util::ptr<StyleLayer> annotations = std::make_shared<StyleLayer>(id, std::move(paints));
         annotations->type = StyleLayerType::Symbol;
-        layers.emplace(id, std::pair<JSVal, util::ptr<StyleLayer>> { JSVal(id), annotations });
-        root->layers.emplace_back(annotations);
+        layersMap.emplace(id, std::pair<JSVal, util::ptr<StyleLayer>> { JSVal(id), annotations });
+        layers.emplace_back(annotations);
 
         util::ptr<StyleBucket> pointBucket = std::make_shared<StyleBucket>(annotations->type);
         pointBucket->name = annotations->id;
@@ -386,7 +385,7 @@ std::tuple<bool, Function<T>> StyleParser::parseFunction(JSVal value, const char
 }
 
 template <typename T>
-std::tuple<bool, PiecewiseConstantFunction<T>> StyleParser::parsePiecewiseConstantFunction(JSVal value, std::chrono::steady_clock::duration duration) {
+std::tuple<bool, PiecewiseConstantFunction<T>> StyleParser::parsePiecewiseConstantFunction(JSVal value, Duration duration) {
     if (!value.HasMember("stops")) {
         Log::Warning(Event::ParseStyle, "function must specify a function type");
         return std::tuple<bool, PiecewiseConstantFunction<T>> { false, {} };
@@ -578,7 +577,7 @@ template<> std::tuple<bool, PropertyTransition> StyleParser::parseProperty(JSVal
         }
     }
 
-    if (transition.duration == std::chrono::steady_clock::duration::zero() && transition.delay == std::chrono::steady_clock::duration::zero()) {
+    if (transition.duration == Duration::zero() && transition.delay == Duration::zero()) {
         return std::tuple<bool, PropertyTransition> { false, std::move(transition) };
     }
 
@@ -643,7 +642,7 @@ template<> std::tuple<bool, Function<Color>> StyleParser::parseProperty(JSVal va
 }
 
 template<> std::tuple<bool, PiecewiseConstantFunction<Faded<std::vector<float>>>> StyleParser::parseProperty(JSVal value, const char *property_name, JSVal transition) {
-    std::chrono::steady_clock::duration duration = std::chrono::milliseconds(300);
+    Duration duration = std::chrono::milliseconds(300);
     if (transition.HasMember("duration")) {
         duration = std::chrono::milliseconds(transition["duration"].GetUint());
     }
@@ -663,7 +662,7 @@ template<> std::tuple<bool, PiecewiseConstantFunction<Faded<std::vector<float>>>
 
 template<> std::tuple<bool, PiecewiseConstantFunction<Faded<std::string>>> StyleParser::parseProperty(JSVal value, const char *property_name, JSVal transition) {
 
-    std::chrono::steady_clock::duration duration = std::chrono::milliseconds(300);
+    Duration duration = std::chrono::milliseconds(300);
     if (transition.HasMember("duration")) {
         duration = std::chrono::milliseconds(transition["duration"].GetUint());
     }
@@ -682,61 +681,48 @@ template<> std::tuple<bool, PiecewiseConstantFunction<Faded<std::string>>> Style
 
 #pragma mark - Parse Layers
 
-std::unique_ptr<StyleLayerGroup> StyleParser::createLayers(JSVal value) {
-    if (value.IsArray()) {
-        std::unique_ptr<StyleLayerGroup> group = util::make_unique<StyleLayerGroup>();
-        for (rapidjson::SizeType i = 0; i < value.Size(); ++i) {
-            util::ptr<StyleLayer> layer = createLayer(value[i]);
-            if (layer) {
-                group->layers.emplace_back(layer);
-            }
-        }
-        return group;
-    } else {
+void StyleParser::parseLayers(JSVal value) {
+    if (!value.IsArray()) {
         Log::Warning(Event::ParseStyle, "layers must be an array");
-        return nullptr;
+        return;
     }
-}
 
-util::ptr<StyleLayer> StyleParser::createLayer(JSVal value) {
-    if (value.IsObject()) {
-        if (!value.HasMember("id")) {
-            Log::Warning(Event::ParseStyle, "layer must have an id");
-            return nullptr;
+    for (rapidjson::SizeType i = 0; i < value.Size(); ++i) {
+        JSVal layerValue = value[i];
+
+        if (!layerValue.IsObject()) {
+            Log::Warning(Event::ParseStyle, "layer must be an object");
+            continue;
         }
 
-        JSVal id = value["id"];
+        if (!layerValue.HasMember("id")) {
+            Log::Warning(Event::ParseStyle, "layer must have an id");
+            continue;
+        }
+
+        JSVal id = layerValue["id"];
         if (!id.IsString()) {
             Log::Warning(Event::ParseStyle, "layer id must be a string");
-            return nullptr;
+            continue;
         }
 
-        const std::string layer_id = { id.GetString(), id.GetStringLength() };
-
-        if (layers.find(layer_id) != layers.end()) {
-            Log::Warning(Event::ParseStyle, "duplicate layer id %s", layer_id.c_str());
-            return nullptr;
+        const std::string layerID = { id.GetString(), id.GetStringLength() };
+        if (layersMap.find(layerID) != layersMap.end()) {
+            Log::Warning(Event::ParseStyle, "duplicate layer id %s", layerID.c_str());
+            continue;
         }
 
         // Parse paints already, as they can't be inherited anyway.
         std::map<ClassID, ClassProperties> paints;
-        parsePaints(value, paints);
+        parsePaints(layerValue, paints);
 
-        util::ptr<StyleLayer> layer = std::make_shared<StyleLayer>(
-            layer_id, std::move(paints));
+        util::ptr<StyleLayer> layer = std::make_shared<StyleLayer>(layerID, std::move(paints));
 
-        // Store the layer ID so we can reference it later.
-        layers.emplace(layer_id, std::pair<JSVal, util::ptr<StyleLayer>> { value, layer });
-
-        return layer;
-    } else {
-        Log::Warning(Event::ParseStyle, "layer must be an object");
-        return nullptr;
+        layers.emplace_back(layer);
+        layersMap.emplace(layerID, std::pair<JSVal, util::ptr<StyleLayer>> { layerValue, layer });
     }
-}
 
-void StyleParser::parseLayers() {
-    for (std::pair<const std::string, std::pair<JSVal, util::ptr<StyleLayer>>> &pair : layers) {
+    for (auto& pair : layersMap) {
         parseLayer(pair.second);
     }
 }
@@ -924,8 +910,8 @@ void StyleParser::parseReference(JSVal value, util::ptr<StyleLayer> &layer) {
         return;
     }
     const std::string ref { value.GetString(), value.GetStringLength() };
-    auto it = layers.find(ref);
-    if (it == layers.end()) {
+    auto it = layersMap.find(ref);
+    if (it == layersMap.end()) {
         Log::Warning(Event::ParseStyle, "layer '%s' references unknown layer %s", layer->id.c_str(), ref.c_str());
         // We cannot parse this layer further.
         return;

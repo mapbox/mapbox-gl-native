@@ -15,11 +15,13 @@ static NSString *const MGLMapboxEventsAPIBase = @"https://api.tiles.mapbox.com";
 NSString *const MGLEventTypeMapLoad = @"map.load";
 NSString *const MGLEventTypeMapTap = @"map.click";
 NSString *const MGLEventTypeMapDragEnd = @"map.dragend";
-NSString *const MGLEventTypeLocation = @"Location";
+NSString *const MGLEventTypeLocation = @"location";
 
 NSString *const MGLEventKeyLatitude = @"lat";
 NSString *const MGLEventKeyLongitude = @"lng";
 NSString *const MGLEventKeyZoomLevel = @"zoom";
+NSString *const MGLEventKeySpeed = @"speed";
+NSString *const MGLEventKeyCourse = @"course";
 NSString *const MGLEventKeyPushEnabled = @"enabled.push";
 NSString *const MGLEventKeyEmailEnabled = @"enabled.email";
 NSString *const MGLEventKeyGestureID = @"gesture";
@@ -59,6 +61,7 @@ NSString *const MGLEventGestureRotateStart = @"Rotation";
 @property (atomic) NSString *instanceID;
 @property (atomic) NSString *advertiserId;
 @property (atomic) NSString *vendorId;
+@property (atomic) NSString *appBundleId;
 @property (atomic) NSString *userAgent;
 @property (atomic) NSString *model;
 @property (atomic) NSString *iOSVersion;
@@ -115,9 +118,9 @@ NSString *const MGLEventGestureRotateStart = @"Rotation";
             
             [[NSUserDefaults standardUserDefaults] registerDefaults:defaultsToRegister];
         }
-        NSString *bundleID = [[NSBundle mainBundle] bundleIdentifier];
+        _appBundleId = [[NSBundle mainBundle] bundleIdentifier];
         NSString *uniqueID = [[NSProcessInfo processInfo] globallyUniqueString];
-        _serialQueue = dispatch_queue_create([[NSString stringWithFormat:@"%@.%@.events.serial", bundleID, uniqueID] UTF8String], DISPATCH_QUEUE_SERIAL);
+        _serialQueue = dispatch_queue_create([[NSString stringWithFormat:@"%@.%@.events.serial", _appBundleId, uniqueID] UTF8String], DISPATCH_QUEUE_SERIAL);
 
         // Configure Events Infrastructure
         _eventQueue = [[NSMutableArray alloc] init];
@@ -248,6 +251,7 @@ NSString *const MGLEventGestureRotateStart = @"Rotation";
         [evt setObject:weakSelf.instanceID forKey:@"instance"];
         [evt setObject:weakSelf.advertiserId forKey:@"advertiserId"];
         [evt setObject:weakSelf.vendorId forKey:@"vendorId"];
+        [evt setObject:weakSelf.appBundleId forKeyedSubscript:@"appBundleId"];
         
         // mapbox-events-ios stock attributes
         [evt setValue:[weakSelf.rfc3339DateFormatter stringFromDate:[NSDate date]] forKey:@"created"];

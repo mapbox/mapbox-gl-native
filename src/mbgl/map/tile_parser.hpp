@@ -28,7 +28,6 @@ class StyleLayoutFill;
 class StyleLayoutRaster;
 class StyleLayoutLine;
 class StyleLayoutSymbol;
-class StyleLayerGroup;
 class VectorTileData;
 class CollisionTile;
 
@@ -48,7 +47,6 @@ public:
 
 private:
     bool obsolete() const;
-    void parseStyleLayers(util::ptr<const StyleLayerGroup> group);
 
     std::unique_ptr<Bucket> createBucket(const StyleBucket&);
     std::unique_ptr<Bucket> createFillBucket(const GeometryTileLayer&, const StyleBucket&);
@@ -58,7 +56,6 @@ private:
     template <class Bucket>
     void addBucketGeometries(Bucket&, const GeometryTileLayer&, const FilterExpression&);
 
-private:
     const GeometryTile& geometryTile;
     VectorTileData& tile;
 

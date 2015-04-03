@@ -1,14 +1,13 @@
 #ifndef MBGL_UTIL_RASTER
 #define MBGL_UTIL_RASTER
 
-#include <mbgl/util/transition.hpp>
 #include <mbgl/util/texture_pool.hpp>
 #include <mbgl/util/image.hpp>
 #include <mbgl/util/ptr.hpp>
+#include <mbgl/util/chrono.hpp>
 
 #include <string>
 #include <mutex>
-#include <chrono>
 
 typedef struct uv_loop_s uv_loop_t;
 
@@ -31,11 +30,6 @@ public:
 
     // loaded status
     bool isLoaded() const;
-
-    // transitions
-    void beginFadeInTransition();
-    bool needsTransition() const;
-    void updateTransitions(std::chrono::steady_clock::time_point now);
 
 public:
     // loaded image dimensions
@@ -64,9 +58,6 @@ private:
 
     // the raw pixels
     std::unique_ptr<util::Image> img;
-
-    // fade in transition
-    util::ptr<util::transition> fade_transition = nullptr;
 };
 
 }

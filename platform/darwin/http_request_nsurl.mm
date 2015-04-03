@@ -141,8 +141,19 @@ void HTTPRequestImpl::start() {
     attempts++;
 
     @autoreleasepool {
+        
+        NSMutableString *url = [[NSMutableString alloc] initWithString:@(request->resource.url.c_str())];
+        if ([[NSUserDefaults standardUserDefaults] objectForKey:@"mapbox_metrics_disabled"] == nil) {
+            if ([url rangeOfString:@"?"].location == NSNotFound) {
+                [url appendString:@"?"];
+            } else {
+                [url appendString:@"&"];
+            }
+            [url appendString:@"events=true"];
+        }
+
         NSMutableURLRequest *req = [[NSMutableURLRequest alloc]
-            initWithURL:[NSURL URLWithString:@(request->resource.url.c_str())]];
+            initWithURL:[NSURL URLWithString:url]];
         if (existingResponse) {
             if (!existingResponse->etag.empty()) {
                 [req addValue:@(existingResponse->etag.c_str()) forHTTPHeaderField:@"If-None-Match"];

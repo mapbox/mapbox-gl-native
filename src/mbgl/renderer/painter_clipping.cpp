@@ -17,7 +17,7 @@ void Painter::drawClippingMasks(const std::set<util::ptr<StyleSource>> &sources)
 
     coveringPlainArray.bind(*plainShader, tileStencilBuffer, BUFFER_OFFSET(0));
 
-    for (const util::ptr<StyleSource> &source : sources) {
+    for (const auto& source : sources) {
         source->source->drawClippingMasks(*this);
     }
 

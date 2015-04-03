@@ -1,13 +1,16 @@
 #include "merge_lines.hpp"
-#include <sstream>
+
+#include <boost/functional/hash.hpp>
 
 namespace mbgl {
 namespace util {
 
+using Index = std::map<size_t, unsigned int>;
+
 unsigned int mergeFromRight(std::vector<SymbolFeature> &features,
-                            std::map<std::string, unsigned int> &rightIndex,
-                            std::map<std::string, unsigned int>::iterator left,
-                            std::string &rightKey,
+                            Index &rightIndex,
+                            Index::iterator left,
+                            size_t rightKey,
                             std::vector<std::vector<Coordinate>> &geom) {
 
     unsigned int index = left->second;
@@ -21,9 +24,9 @@ unsigned int mergeFromRight(std::vector<SymbolFeature> &features,
 }
 
 unsigned int mergeFromLeft(std::vector<SymbolFeature> &features,
-                           std::map<std::string, unsigned int> &leftIndex,
-                           std::string &leftKey,
-                           std::map<std::string, unsigned int>::iterator right,
+                           Index &leftIndex,
+                           size_t leftKey,
+                           Index::iterator right,
                            std::vector<std::vector<Coordinate>> &geom) {
 
     unsigned int index = right->second;
@@ -37,21 +40,20 @@ unsigned int mergeFromLeft(std::vector<SymbolFeature> &features,
     return index;
 }
 
-std::string
-getKey(const std::u32string &text, const std::vector<std::vector<Coordinate>> &geom, bool onRight) {
-    const Coordinate &coord = onRight ? geom[0].back() : geom[0].front();
-    std::ostringstream key;
-    for (const char32_t &c : text) {
-        key << (char)c;
-    }
-    key << ":" << coord.x << ":" << coord.y;
-    return key.str();
+size_t
+getKey(const std::u32string& text, const std::vector<std::vector<Coordinate>>& geom, bool onRight) {
+    const Coordinate& coord = onRight ? geom[0].back() : geom[0].front();
+
+    auto hash = std::hash<std::u32string>()(text);
+    boost::hash_combine(hash, coord.x);
+    boost::hash_combine(hash, coord.y);
+    return hash;
 }
 
 void mergeLines(std::vector<SymbolFeature> &features) {
 
-    std::map<std::string, unsigned int> leftIndex;
-    std::map<std::string, unsigned int> rightIndex;
+    Index leftIndex;
+    Index rightIndex;
 
     for (unsigned int k = 0; k < features.size(); k++) {
         SymbolFeature &feature = features[k];
@@ -61,11 +63,11 @@ void mergeLines(std::vector<SymbolFeature> &features) {
             continue;
         }
 
-        std::string leftKey = getKey(feature.label, geometry, false);
-        std::string rightKey = getKey(feature.label, geometry, true);
+        const auto leftKey = getKey(feature.label, geometry, false);
+        const auto rightKey = getKey(feature.label, geometry, true);
 
-        auto left = rightIndex.find(leftKey);
-        auto right = leftIndex.find(rightKey);
+        const auto left = rightIndex.find(leftKey);
+        const auto right = leftIndex.find(rightKey);
 
         if ((left != rightIndex.end()) && (right != leftIndex.end()) &&
             (left->second != right->second)) {

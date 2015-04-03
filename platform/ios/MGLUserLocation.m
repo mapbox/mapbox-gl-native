@@ -1,17 +1,20 @@
 #import "MGLUserLocation_Private.h"
 
-@implementation MGLUserLocation
-{
-    CLLocationCoordinate2D _coordinate;
-}
+#import "MGLMapView.h"
 
-@synthesize coordinate = _coordinate;
+@interface MGLUserLocation ()
+
+@property (nonatomic, weak) MGLMapView *mapView;
+
+@end
+
+@implementation MGLUserLocation
 
 - (instancetype)init
 {
     if (self = [super init])
     {
-        _coordinate = CLLocationCoordinate2DMake(MAXFLOAT, MAXFLOAT);
+        _location = [[CLLocation alloc] initWithLatitude:MAXFLOAT longitude:MAXFLOAT];
     }
 
     return self;
@@ -34,9 +37,13 @@
     {
         [self willChangeValueForKey:@"location"];
         _location = newLocation;
-        _coordinate = _location.coordinate;
         [self didChangeValueForKey:@"location"];
     }
+}
+
+- (BOOL)isUpdating
+{
+    return self.mapView.userTrackingMode != MGLUserTrackingModeNone;
 }
 
 - (void)setHeading:(CLHeading *)newHeading
@@ -49,9 +56,14 @@
     }
 }
 
+- (CLLocationCoordinate2D)coordinate
+{
+    return self.location.coordinate;
+}
+
 - (NSString *)title
 {
-    if ( ! _title) return @"Current Location";
+    return (_title ? _title : @"Current Location");
 }
 
 @end

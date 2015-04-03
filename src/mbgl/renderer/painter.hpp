@@ -25,11 +25,11 @@
 
 #include <mbgl/map/transform_state.hpp>
 #include <mbgl/util/ptr.hpp>
+#include <mbgl/util/chrono.hpp>
 
 #include <map>
 #include <unordered_map>
 #include <set>
-#include <chrono>
 
 namespace mbgl {
 
@@ -44,7 +44,6 @@ class GlyphAtlas;
 class LineAtlas;
 class Source;
 class StyleSource;
-class StyleLayerGroup;
 
 class FillBucket;
 class LineBucket;
@@ -80,9 +79,8 @@ public:
     void render(const Style& style,
                 const std::set<util::ptr<StyleSource>>& sources,
                 TransformState state,
-                std::chrono::steady_clock::time_point time);
+                TimePoint time);
 
-    void renderLayers(const StyleLayerGroup &group);
     void renderLayer(const StyleLayer &layer_desc, const Tile::ID* id = nullptr, const mat4* matrix = nullptr);
 
     // Renders a particular layer from a tile.

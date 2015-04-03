@@ -114,7 +114,7 @@ void Painter::renderSymbol(SymbolBucket &bucket, const StyleLayer &layer_desc, c
     }
 
     const auto &properties = layer_desc.getProperties<SymbolProperties>();
-    const auto &layout = *bucket.styleLayout;
+    const auto &layout = bucket.layout;
 
     MBGL_CHECK_ERROR(glDisable(GL_STENCIL_TEST));
     depthMask(false);

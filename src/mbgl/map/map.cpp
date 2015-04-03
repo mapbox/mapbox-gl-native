@@ -7,7 +7,6 @@
 #include <mbgl/renderer/painter.hpp>
 #include <mbgl/map/annotation.hpp>
 #include <mbgl/map/sprite.hpp>
-#include <mbgl/util/transition.hpp>
 #include <mbgl/util/math.hpp>
 #include <mbgl/util/clip_ids.hpp>
 #include <mbgl/util/string.hpp>
@@ -18,7 +17,6 @@
 #include <mbgl/text/glyph_store.hpp>
 #include <mbgl/geometry/glyph_atlas.hpp>
 #include <mbgl/style/style_layer.hpp>
-#include <mbgl/style/style_layer_group.hpp>
 #include <mbgl/style/style_bucket.hpp>
 #include <mbgl/util/texture_pool.hpp>
 #include <mbgl/geometry/sprite_atlas.hpp>
@@ -73,7 +71,8 @@ Map::Map(View& view_, FileSource& fileSource_)
       texturePool(std::make_shared<TexturePool>()),
       painter(util::make_unique<Painter>(*spriteAtlas, *glyphAtlas, *lineAtlas)),
       annotationManager(util::make_unique<AnnotationManager>()),
-      data(util::make_unique<MapData>())
+      data(util::make_unique<MapData>()),
+      updated(static_cast<UpdateType>(Update::Nothing))
 {
     view.initialize(this);
 }
@@ -450,87 +449,70 @@ void Map::resize(uint16_t width, uint16_t height, float ratio, uint16_t fbWidth,
 
 void Map::cancelTransitions() {
     transform.cancelTransitions();
-
     triggerUpdate();
 }
 
+void Map::setGestureInProgress(bool inProgress) {
+    transform.setGestureInProgress(inProgress);
+    triggerUpdate();
+}
 
 #pragma mark - Position
 
-void Map::moveBy(double dx, double dy, std::chrono::steady_clock::duration duration) {
+void Map::moveBy(double dx, double dy, Duration duration) {
     transform.moveBy(dx, dy, duration);
     triggerUpdate();
 }
 
-void Map::setLatLng(LatLng latLng, std::chrono::steady_clock::duration duration) {
+void Map::setLatLng(LatLng latLng, Duration duration) {
     transform.setLatLng(latLng, duration);
     triggerUpdate();
 }
 
 LatLng Map::getLatLng() const {
-    return state.getLatLng();
-}
-
-void Map::startPanning() {
-    transform.startPanning();
-    triggerUpdate();
-}
-
-void Map::stopPanning() {
-    transform.stopPanning();
-    triggerUpdate();
+    return transform.getLatLng();
 }
 
 void Map::resetPosition() {
     transform.setAngle(0);
     transform.setLatLng(LatLng(0, 0));
     transform.setZoom(0);
-    triggerUpdate();
+    triggerUpdate(Update::Zoom);
 }
 
 
 #pragma mark - Scale
 
-void Map::scaleBy(double ds, double cx, double cy, std::chrono::steady_clock::duration duration) {
+void Map::scaleBy(double ds, double cx, double cy, Duration duration) {
     transform.scaleBy(ds, cx, cy, duration);
-    triggerUpdate();
+    triggerUpdate(Update::Zoom);
 }
 
-void Map::setScale(double scale, double cx, double cy, std::chrono::steady_clock::duration duration) {
+void Map::setScale(double scale, double cx, double cy, Duration duration) {
     transform.setScale(scale, cx, cy, duration);
-    triggerUpdate();
+    triggerUpdate(Update::Zoom);
 }
 
 double Map::getScale() const {
     return transform.getScale();
 }
 
-void Map::setZoom(double zoom, std::chrono::steady_clock::duration duration) {
+void Map::setZoom(double zoom, Duration duration) {
     transform.setZoom(zoom, duration);
-    triggerUpdate();
+    triggerUpdate(Update::Zoom);
 }
 
 double Map::getZoom() const {
     return transform.getZoom();
 }
 
-void Map::setLatLngZoom(LatLng latLng, double zoom, std::chrono::steady_clock::duration duration) {
+void Map::setLatLngZoom(LatLng latLng, double zoom, Duration duration) {
     transform.setLatLngZoom(latLng, zoom, duration);
-    triggerUpdate();
+    triggerUpdate(Update::Zoom);
 }
 
 void Map::resetZoom() {
     setZoom(0);
-}
-
-void Map::startScaling() {
-    transform.startScaling();
-    triggerUpdate();
-}
-
-void Map::stopScaling() {
-    transform.stopScaling();
-    triggerUpdate();
 }
 
 double Map::getMinZoom() const {
@@ -544,12 +526,12 @@ double Map::getMaxZoom() const {
 
 #pragma mark - Rotation
 
-void Map::rotateBy(double sx, double sy, double ex, double ey, std::chrono::steady_clock::duration duration) {
+void Map::rotateBy(double sx, double sy, double ex, double ey, Duration duration) {
     transform.rotateBy(sx, sy, ex, ey, duration);
     triggerUpdate();
 }
 
-void Map::setBearing(double degrees, std::chrono::steady_clock::duration duration) {
+void Map::setBearing(double degrees, Duration duration) {
     transform.setAngle(-degrees * M_PI / 180, duration);
     triggerUpdate();
 }
@@ -565,16 +547,6 @@ double Map::getBearing() const {
 
 void Map::resetNorth() {
     transform.setAngle(0, std::chrono::milliseconds(500));
-    triggerUpdate();
-}
-
-void Map::startRotating() {
-    transform.startRotating();
-    triggerUpdate();
-}
-
-void Map::stopRotating() {
-    transform.stopRotating();
     triggerUpdate();
 }
 
@@ -672,7 +644,7 @@ bool Map::getDebug() const {
     return data->getDebug();
 }
 
-std::chrono::steady_clock::time_point Map::getTime() const {
+TimePoint Map::getTime() const {
     return data->getAnimationTime();
 }
 
@@ -701,14 +673,14 @@ std::vector<std::string> Map::getClasses() const {
     return data->getClasses();
 }
 
-void Map::setDefaultTransitionDuration(std::chrono::steady_clock::duration duration) {
+void Map::setDefaultTransitionDuration(Duration duration) {
     assert(Environment::currentlyOn(ThreadType::Main));
 
     data->setDefaultTransitionDuration(duration);
     triggerUpdate(Update::DefaultTransitionDuration);
 }
 
-std::chrono::steady_clock::duration Map::getDefaultTransitionDuration() {
+Duration Map::getDefaultTransitionDuration() {
     assert(Environment::currentlyOn(ThreadType::Main));
     return data->getDefaultTransitionDuration();
 }
@@ -723,7 +695,11 @@ void Map::updateSources() {
 
     // Then, reenable all of those that we actually use when drawing this layer.
     if (style) {
-        updateSources(style->layers);
+        for (const auto& layer : style->layers) {
+            if (layer->bucket && layer->bucket->style_source) {
+                (*activeSources.emplace(layer->bucket->style_source).first)->enabled = true;
+            }
+        }
     }
 
     // Then, construct or destroy the actual source object, depending on enabled state.
@@ -744,23 +720,9 @@ void Map::updateSources() {
     });
 }
 
-void Map::updateSources(const util::ptr<StyleLayerGroup> &group) {
-    assert(Environment::currentlyOn(ThreadType::Map));
-    if (!group) {
-        return;
-    }
-    for (const util::ptr<StyleLayer> &layer : group->layers) {
-        if (!layer) continue;
-        if (layer->bucket && layer->bucket->style_source) {
-            (*activeSources.emplace(layer->bucket->style_source).first)->enabled = true;
-        }
-
-    }
-}
-
 void Map::updateTiles() {
     assert(Environment::currentlyOn(ThreadType::Map));
-    for (const auto &source : activeSources) {
+    for (const auto& source : activeSources) {
         source->source->update(*this, getWorker(), style, *glyphAtlas, *glyphStore,
                                *spriteAtlas, getSprite(), *texturePool, [this]() {
             assert(Environment::currentlyOn(ThreadType::Map));
@@ -807,50 +769,55 @@ void Map::loadStyleJSON(const std::string& json, const std::string& base) {
     style = std::make_shared<Style>();
     style->base = base;
     style->loadJSON((const uint8_t *)json.c_str());
-    style->cascadeClasses(data->getClasses());
+    style->cascade(data->getClasses());
     style->setDefaultTransitionDuration(data->getDefaultTransitionDuration());
 
     const std::string glyphURL = util::mapbox::normalizeGlyphsURL(style->glyph_url, getAccessToken());
     glyphStore->setURL(glyphURL);
 
-    triggerUpdate();
+    triggerUpdate(Update::Zoom);
 }
 
 void Map::prepare() {
     assert(Environment::currentlyOn(ThreadType::Map));
 
-    const auto u = updated.exchange(static_cast<UpdateType>(Update::Nothing));
-    if ((u & static_cast<UpdateType>(Update::StyleInfo)) || !style) {
-        reloadStyle();
-    }
-    if (u & static_cast<UpdateType>(Update::Debug)) {
-        assert(painter);
-        painter->setDebug(data->getDebug());
-    }
-    if (u & static_cast<UpdateType>(Update::DefaultTransitionDuration)) {
-        if (style) {
-            style->setDefaultTransitionDuration(data->getDefaultTransitionDuration());
-        }
-    }
-    if (u & static_cast<UpdateType>(Update::Classes)) {
-        if (style) {
-            style->cascadeClasses(data->getClasses());
-        }
-    }
+    const auto now = Clock::now();
+    data->setAnimationTime(now);
 
-    // Update transform transitions.
+    auto u = updated.exchange(static_cast<UpdateType>(Update::Nothing)) |
+             transform.updateTransitions(now);
 
-    const auto animationTime = std::chrono::steady_clock::now();
-    data->setAnimationTime(animationTime);
-    if (transform.needsTransition()) {
-        transform.updateTransitions(animationTime);
+    if (!style) {
+        u |= static_cast<UpdateType>(Update::StyleInfo);
     }
 
     state = transform.currentState();
 
+    if (u & static_cast<UpdateType>(Update::StyleInfo)) {
+        reloadStyle();
+    }
+
+    if (u & static_cast<UpdateType>(Update::Debug)) {
+        assert(painter);
+        painter->setDebug(data->getDebug());
+    }
+
     if (style) {
+        if (u & static_cast<UpdateType>(Update::DefaultTransitionDuration)) {
+            style->setDefaultTransitionDuration(data->getDefaultTransitionDuration());
+        }
+
+        if (u & static_cast<UpdateType>(Update::Classes)) {
+            style->cascade(data->getClasses());
+        }
+
+        if (u & static_cast<UpdateType>(Update::StyleInfo) ||
+            u & static_cast<UpdateType>(Update::Classes) ||
+            u & static_cast<UpdateType>(Update::Zoom)) {
+            style->recalculate(state.getNormalizedZoom(), now);
+        }
+
         updateSources();
-        style->updateProperties(state.getNormalizedZoom(), animationTime);
 
         // Allow the sprite atlas to potentially pull new sprite images if needed.
         spriteAtlas->resize(state.getPixelRatio());
@@ -874,6 +841,7 @@ void Map::render() {
     assert(painter);
     painter->render(*style, activeSources,
                     state, data->getAnimationTime());
+
     // Schedule another rerender when we definitely need a next frame.
     if (transform.needsTransition() || style->hasTransitions()) {
         triggerUpdate();

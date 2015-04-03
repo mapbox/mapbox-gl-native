@@ -28,12 +28,10 @@ void FillBucket::free(void *, void *ptr) {
     ::free(ptr);
 }
 
-FillBucket::FillBucket(std::unique_ptr<const StyleLayoutFill> styleLayout_,
-                       FillVertexBuffer &vertexBuffer_,
+FillBucket::FillBucket(FillVertexBuffer &vertexBuffer_,
                        TriangleElementsBuffer &triangleElementsBuffer_,
                        LineElementsBuffer &lineElementsBuffer_)
-    : styleLayout(std::move(styleLayout_)),
-      allocator(new TESSalloc{
+    : allocator(new TESSalloc{
           &alloc,
           &realloc,
           &free,
@@ -53,7 +51,6 @@ FillBucket::FillBucket(std::unique_ptr<const StyleLayoutFill> styleLayout_,
       triangle_elements_start(triangleElementsBuffer_.index()),
       line_elements_start(lineElementsBuffer.index()) {
     assert(tesselator);
-    assert(styleLayout);
 }
 
 FillBucket::~FillBucket() {
@@ -95,7 +92,7 @@ void FillBucket::tessellate() {
     }
 
     size_t total_vertex_count = 0;
-    for (const std::vector<ClipperLib::IntPoint>& polygon : polygons) {
+    for (const auto& polygon : polygons) {
         total_vertex_count += polygon.size();
     }
 
@@ -105,19 +102,19 @@ void FillBucket::tessellate() {
 
     if (!lineGroups.size() || (lineGroups.back()->vertex_length + total_vertex_count > 65535)) {
         // Move to a new group because the old one can't hold the geometry.
-        lineGroups.emplace_back(util::make_unique<line_group_type>());
+        lineGroups.emplace_back(util::make_unique<LineGroup>());
     }
 
     assert(lineGroups.back());
-    line_group_type& lineGroup = *lineGroups.back();
+    LineGroup& lineGroup = *lineGroups.back();
     uint32_t lineIndex = lineGroup.vertex_length;
 
-    for (const std::vector<ClipperLib::IntPoint>& polygon : polygons) {
+    for (const auto& polygon : polygons) {
         const size_t group_count = polygon.size();
         assert(group_count >= 3);
 
         std::vector<TESSreal> clipped_line;
-        for (const ClipperLib::IntPoint& pt : polygon) {
+        for (const auto& pt : polygon) {
             clipped_line.push_back(pt.X);
             clipped_line.push_back(pt.Y);
             vertexBuffer.add(pt.X, pt.Y);
@@ -152,13 +149,13 @@ void FillBucket::tessellate() {
 
         if (!triangleGroups.size() || (triangleGroups.back()->vertex_length + total_vertex_count > 65535)) {
             // Move to a new group because the old one can't hold the geometry.
-            triangleGroups.emplace_back(util::make_unique<triangle_group_type>());
+            triangleGroups.emplace_back(util::make_unique<TriangleGroup>());
         }
 
         // We're generating triangle fans, so we always start with the first
         // coordinate in this polygon.
         assert(triangleGroups.back());
-        triangle_group_type& triangleGroup = *triangleGroups.back();
+        TriangleGroup& triangleGroup = *triangleGroups.back();
         uint32_t triangleIndex = triangleGroup.vertex_length;
 
         for (int i = 0; i < triangle_count; ++i) {
