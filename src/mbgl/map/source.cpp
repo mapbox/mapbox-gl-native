@@ -102,7 +102,9 @@ Source::Source()
 // Note: This is a separate function that must be called exactly once after creation
 // The reason this isn't part of the constructor is that calling shared_from_this() in
 // the constructor fails.
-void Source::load(Map &map, Environment &env) {
+void Source::load(const std::string& accessToken,
+                  Environment& env,
+                  std::function<void()> callback) {
     if (info.url.empty()) {
         loaded = true;
         return;
@@ -110,8 +112,8 @@ void Source::load(Map &map, Environment &env) {
 
     util::ptr<Source> source = shared_from_this();
 
-    const std::string url = util::mapbox::normalizeSourceURL(info.url, map.getAccessToken());
-    env.request({ Resource::Kind::JSON, url }, [source, &map](const Response &res) {
+    const std::string url = util::mapbox::normalizeSourceURL(info.url, accessToken);
+    env.request({ Resource::Kind::JSON, url }, [source, callback](const Response &res) {
         if (res.status != Response::Successful) {
             Log::Warning(Event::General, "Failed to load source TileJSON: %s", res.message.c_str());
             return;
@@ -128,7 +130,7 @@ void Source::load(Map &map, Environment &env) {
         source->info.parseTileJSONProperties(d);
         source->loaded = true;
 
-        map.triggerUpdate();
+        callback();
     });
 }
 

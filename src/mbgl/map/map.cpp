@@ -741,7 +741,10 @@ void Map::loadStyleJSON(const std::string& json, const std::string& base) {
     glyphStore->setURL(glyphURL);
 
     for (const auto& source : style->sources) {
-        source->load(*this, *env);
+        source->load(getAccessToken(), *env, [this]() {
+            assert(Environment::currentlyOn(ThreadType::Map));
+            triggerUpdate();
+        });
     }
 
     triggerUpdate(Update::Zoom);

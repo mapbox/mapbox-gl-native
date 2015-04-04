@@ -51,9 +51,13 @@ class Source : public std::enable_shared_from_this<Source>, private util::noncop
 public:
     Source();
 
-    void load(Map &, Environment &);
+    void load(const std::string& accessToken,
+              Environment&,
+              std::function<void()> callback);
+
     void update(Map &, uv::worker &, util::ptr<Style>, GlyphAtlas &, GlyphStore &,
                 SpriteAtlas &, util::ptr<Sprite>, TexturePool &, std::function<void()> callback);
+
     void invalidateTiles(Map&, const std::vector<Tile::ID>&);
 
     void updateMatrices(const mat4 &projMatrix, const TransformState &transform);
