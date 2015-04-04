@@ -102,7 +102,7 @@ const CGFloat MGLTrackingDotRingWidth = 24.0;
         //
         if ( ! _dotBorderLayer)
         {
-            CGRect rect = CGRectMake(0, 0, MGLTrackingDotRingWidth * 1.25, MGLTrackingDotRingWidth * 1.25);
+            CGRect rect = CGRectMake(0, 0, MGLTrackingDotRingWidth * 1.5, MGLTrackingDotRingWidth * 1.5);
             
             UIGraphicsBeginImageContextWithOptions(rect.size, NO, [[UIScreen mainScreen] scale]);
             CGContextRef context = UIGraphicsGetCurrentContext();
