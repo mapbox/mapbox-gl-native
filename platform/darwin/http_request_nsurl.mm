@@ -47,7 +47,7 @@ class HTTPNSURLContext;
 
 class HTTPRequestImpl {
 public:
-    HTTPRequestImpl(HTTPRequest *request, uv_loop_t *loop, std::unique_ptr<Response> response);
+    HTTPRequestImpl(HTTPRequest *request, uv_loop_t *loop, std::shared_ptr<const Response> response);
     ~HTTPRequestImpl();
 
     void cancel();
@@ -66,7 +66,7 @@ private:
     HTTPRequest *request = nullptr;
     NSURLSessionDataTask *task = nullptr;
     std::unique_ptr<Response> response;
-    std::unique_ptr<Response> existingResponse;
+    std::shared_ptr<const Response> existingResponse;
     ResponseStatus status = ResponseStatus::PermanentError;
     uv_async_t *async = nullptr;
     int attempts = 0;
@@ -118,10 +118,10 @@ HTTPNSURLContext::~HTTPNSURLContext() {
 // -------------------------------------------------------------------------------------------------
 
 HTTPRequestImpl::HTTPRequestImpl(HTTPRequest *request_, uv_loop_t *loop,
-                                 std::unique_ptr<Response> existingResponse_)
+                                 std::shared_ptr<const Response> existingResponse_)
     : context(HTTPNSURLContext::Get(loop)),
       request(request_),
-      existingResponse(std::move(existingResponse_)),
+      existingResponse(existingResponse_),
       async(new uv_async_t) {
     assert(request);
     context->addRequest(request);
@@ -271,6 +271,7 @@ void HTTPRequestImpl::handleResult(NSData *data, NSURLResponse *res, NSError *er
             response = util::make_unique<Response>();
             response->status = Response::Error;
             response->message = [[error localizedDescription] UTF8String];
+            response->data = std::make_shared<const std::string>();
 
             switch ([error code]) {
                 case NSURLErrorBadServerResponse: // 5xx errors
@@ -301,7 +302,7 @@ void HTTPRequestImpl::handleResult(NSData *data, NSURLResponse *res, NSError *er
         const long responseCode = [(NSHTTPURLResponse *)res statusCode];
 
         response = util::make_unique<Response>();
-        response->data = {(const char *)[data bytes], [data length]};
+        response->data = std::make_shared<const std::string>((const char *)[data bytes], [data length]);
 
         NSDictionary *headers = [(NSHTTPURLResponse *)res allHeaderFields];
         NSString *cache_control = [headers objectForKey:@"Cache-Control"];
@@ -326,12 +327,11 @@ void HTTPRequestImpl::handleResult(NSData *data, NSURLResponse *res, NSError *er
 
         if (responseCode == 304) {
             if (existingResponse) {
-                // We're going to reuse the old response object, but need to copy over the new
-                // expires value (if possible).
-                std::swap(response, existingResponse);
-                if (existingResponse->expires) {
-                    response->expires = existingResponse->expires;
-                }
+                // We're going to reuse the old response data.
+                response->status = Response::Successful;
+                response->data = existingResponse->data;
+                response->modified = existingResponse->modified;
+                response->etag = existingResponse->etag;
                 status = ResponseStatus::NotModified;
             } else {
                 // This is an unsolicited 304 response and should only happen on malfunctioning
@@ -409,11 +409,11 @@ HTTPRequest::~HTTPRequest() {
     }
 }
 
-void HTTPRequest::start(uv_loop_t *loop, std::unique_ptr<Response> response) {
+void HTTPRequest::start(uv_loop_t *loop, std::shared_ptr<const Response> response) {
     MBGL_VERIFY_THREAD(tid);
 
     assert(!ptr);
-    ptr = new HTTPRequestImpl(this, loop, std::move(response));
+    ptr = new HTTPRequestImpl(this, loop, response);
 }
 
 void HTTPRequest::retryImmediately() {

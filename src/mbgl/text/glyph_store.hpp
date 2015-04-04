@@ -66,7 +66,7 @@ public:
     std::shared_future<GlyphPBF &> getFuture();
 
 private:
-    std::string data;
+    std::shared_ptr<const std::string> data;
     std::promise<GlyphPBF &> promise;
     std::shared_future<GlyphPBF &> future;
     std::mutex mtx;

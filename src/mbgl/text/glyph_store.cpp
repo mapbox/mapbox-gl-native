@@ -152,17 +152,24 @@ GlyphPBF::GlyphPBF(const std::string &glyphURL,
 
     // The prepare call jumps back to the main thread.
     env.requestAsync({ Resource::Kind::Glyphs, url }, [&, url](const Response &res) {
-        if (res.status != Response::Successful) {
-            // Something went wrong with loading the glyph pbf. Pass on the error to the future listeners.
-            const std::string msg = std::string { "[ERROR] failed to load glyphs: " } + res.message;
+        switch (res.status) {
+        case Response::Error: {
+            // Something went wrong with loading the glyph pbf. Pass on the error to the future
+            // listeners.
+            const std::string msg = std::string{ "[ERROR] failed to load glyphs: " } + res.message;
             promise.set_exception(std::make_exception_ptr(std::runtime_error(msg)));
-        } else {
+            break;
+        }
+        case Response::Successful: {
             // Transfer the data to the GlyphSet and signal its availability.
             // Once it is available, the caller will need to call parse() to actually
             // parse the data we received. We are not doing this here since this callback is being
             // called from another (unknown) thread.
+            assert(res.data);
             data = res.data;
             promise.set_value(*this);
+            break;
+        }
         }
     });
 }
@@ -175,14 +182,14 @@ std::shared_future<GlyphPBF &> GlyphPBF::getFuture() {
 void GlyphPBF::parse(FontStack &stack) {
     std::lock_guard<std::mutex> lock(mtx);
 
-    if (!data.size()) {
+    if (!data || !data->size()) {
         // If there is no data, this means we either haven't received any data, or
         // we have already parsed the data.
         return;
     }
 
     // Parse the glyph PBF
-    pbf glyphs_pbf(reinterpret_cast<const uint8_t *>(data.data()), data.size());
+    pbf glyphs_pbf(reinterpret_cast<const uint8_t *>(data->data()), data->size());
 
     while (glyphs_pbf.next()) {
         if (glyphs_pbf.tag == 1) { // stacks
@@ -223,7 +230,7 @@ void GlyphPBF::parse(FontStack &stack) {
         }
     }
 
-    data.clear();
+    data.reset();
 }
 
 GlyphStore::GlyphStore(Environment& env_) : env(env_), mtx(util::make_unique<uv::mutex>()) {}

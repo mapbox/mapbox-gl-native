@@ -192,9 +192,9 @@ void SQLiteCache::process(GetAction &action) {
         response->modified = getStmt->get<int64_t>(1);
         response->etag = getStmt->get<std::string>(2);
         response->expires = getStmt->get<int64_t>(3);
-        response->data = getStmt->get<std::string>(4);
+        response->data = std::make_shared<const std::string>(getStmt->get<std::string>(4));
         if (getStmt->get<int>(5)) { // == compressed
-            response->data = util::decompress(response->data);
+            response->data = std::make_shared<const std::string>(util::decompress(*response->data));
         }
         action.callback(std::move(response));
     } else {
@@ -225,19 +225,21 @@ void SQLiteCache::process(PutAction &action) {
     putStmt->bind(5 /* etag */, action.response->etag.c_str());
     putStmt->bind(6 /* expires */, action.response->expires);
 
+    assert(action.response->data);
+
     std::string data;
     if (action.resource.kind != Resource::Image) {
         // Do not compress images, since they are typically compressed already.
-        data = util::compress(action.response->data);
+        data = util::compress(*action.response->data);
     }
 
-    if (!data.empty() && data.size() < action.response->data.size()) {
+    if (!data.empty() && data.size() < action.response->data->size()) {
         // Store the compressed data when it is smaller than the original
         // uncompressed data.
         putStmt->bind(7 /* data */, data, false); // do not retain the string internally.
         putStmt->bind(8 /* compressed */, true);
     } else {
-        putStmt->bind(7 /* data */, action.response->data, false); // do not retain the string internally.
+        putStmt->bind(7 /* data */, *action.response->data, false); // do not retain the string internally.
         putStmt->bind(8 /* compressed */, false);
     }
 

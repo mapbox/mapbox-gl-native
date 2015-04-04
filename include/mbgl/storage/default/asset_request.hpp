@@ -9,8 +9,8 @@ class AssetRequest : public SharedRequestBase {
 public:
     AssetRequest(DefaultFileSource *source, const Resource &resource);
 
-    void start(uv_loop_t *loop, std::unique_ptr<Response> response = nullptr);
-    void cancel();
+    void start(uv_loop_t *loop, std::shared_ptr<const Response> response = nullptr) override;
+    void cancel() override;
 
 private:
     ~AssetRequest();

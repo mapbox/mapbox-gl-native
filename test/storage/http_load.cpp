@@ -23,7 +23,8 @@ TEST_F(Storage, HTTPLoad) {
                      std::string("http://127.0.0.1:3000/load/") + std::to_string(current) },
                    uv_default_loop(), env, [&, current](const Response &res) {
             EXPECT_EQ(Response::Successful, res.status);
-            EXPECT_EQ(std::string("Request ") +  std::to_string(current), res.data);
+            ASSERT_TRUE(!!res.data);
+            EXPECT_EQ(std::string("Request ") +  std::to_string(current), *res.data);
             EXPECT_EQ(0, res.expires);
             EXPECT_EQ(0, res.modified);
             EXPECT_EQ("", res.etag);

@@ -204,12 +204,16 @@ void DefaultFileSource::process(ResultAction &action) {
                                     SystemClock::now().time_since_epoch()).count();
             if (action.response->expires > now) {
                 // The response is fresh. We're good to notify the caller.
-                sharedRequest->notify(std::move(action.response), FileCache::Hint::No);
+                auto sharedResponse = std::shared_ptr<const Response>(std::move(action.response));
+                sharedRequest->notify(sharedResponse, FileCache::Hint::No);
                 sharedRequest->cancel();
                 return;
             } else {
-                // The cached response is stale. Now run the real request.
-                sharedRequest->start(loop, std::move(action.response));
+                // The cached response is stale. Move it to a shared pointer.
+                auto sharedResponse = std::shared_ptr<const Response>(std::move(action.response));
+
+                // Now run a conditional request too so we know whether it actually changed.
+                sharedRequest->start(loop, sharedResponse);
             }
         } else {
             // There is no response. Now run the real request.
@@ -238,6 +242,7 @@ void DefaultFileSource::process(AbortAction &action) {
     auto res = util::make_unique<Response>();
     res->status = Response::Error;
     res->message = "Environment is terminating";
+    res->data = std::make_shared<const std::string>();
     std::shared_ptr<const Response> response = std::move(res);
 
     // Iterate through all pending requests and remove them in case they're abandoned.

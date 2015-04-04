@@ -18,7 +18,8 @@ TEST_F(Storage, CacheResponse) {
 
     fs.request(resource, uv_default_loop(), env, [&](const Response &res) {
         EXPECT_EQ(Response::Successful, res.status);
-        EXPECT_EQ("Response 1", res.data);
+        ASSERT_TRUE(!!res.data);
+        EXPECT_EQ("Response 1", *res.data);
         EXPECT_LT(0, res.expires);
         EXPECT_EQ(0, res.modified);
         EXPECT_EQ("", res.etag);
@@ -26,7 +27,7 @@ TEST_F(Storage, CacheResponse) {
 
         fs.request(resource, uv_default_loop(), env, [&, res](const Response &res2) {
             EXPECT_EQ(res.status, res2.status);
-            EXPECT_EQ(res.data, res2.data);
+            EXPECT_EQ(*res.data, *res2.data);
             EXPECT_EQ(res.expires, res2.expires);
             EXPECT_EQ(res.modified, res2.modified);
             EXPECT_EQ(res.etag, res2.etag);

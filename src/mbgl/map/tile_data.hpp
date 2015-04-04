@@ -64,7 +64,7 @@ protected:
     Environment& env;
 
     Request *req = nullptr;
-    std::string data;
+    std::shared_ptr<const std::string> data;
 
     // Contains the tile ID string for painting debug information.
     DebugFontBuffer debugFontBuffer;

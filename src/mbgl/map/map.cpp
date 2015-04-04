@@ -753,11 +753,17 @@ void Map::reloadStyle() {
     if (!styleInfo.url.empty()) {
         const auto base = styleInfo.base;
         // We have a style URL
-        env->request({ Resource::Kind::JSON, styleInfo.url }, [this, base](const Response &res) {
-            if (res.status == Response::Successful) {
-                loadStyleJSON(res.data, base);
-            } else {
+        env->request({ Resource::Kind::JSON, styleInfo.url }, [this, base](const Response& res) {
+            switch (res.status) {
+            case Response::Successful: {
+                assert(res.data);
+                loadStyleJSON(*res.data, base);
+                break;
+            }
+            case Response::Error: {
                 Log::Error(Event::Setup, "loading style failed: %s", res.message.c_str());
+                break;
+            }
             }
         });
     } else if (!styleInfo.json.empty()) {

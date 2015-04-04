@@ -41,6 +41,7 @@ public:
     uv_fs_t req;
     uv_file fd = -1;
     uv_buf_t buffer;
+    std::string data;
     std::unique_ptr<Response> response;
 };
 
@@ -122,6 +123,7 @@ void AssetRequestImpl::fileStated(uv_fs_t *req) {
             response->message = uv_strerror(UV_EFBIG);
 #endif
             assert(self->request);
+            self->response->data = std::make_shared<const std::string>(std::move(self->data));
             self->request->notify(std::move(response), FileCache::Hint::No);
             delete self->request;
 
@@ -136,8 +138,8 @@ void AssetRequestImpl::fileStated(uv_fs_t *req) {
 #endif
             self->response->etag = std::to_string(stat->st_ino);
             const auto size = (unsigned int)(stat->st_size);
-            self->response->data.resize(size);
-            self->buffer = uv_buf_init(const_cast<char *>(self->response->data.data()), size);
+            self->data.resize(size);
+            self->buffer = uv_buf_init(const_cast<char *>(self->data.data()), size);
             uv_fs_req_cleanup(req);
 #if UV_VERSION_MAJOR == 0 && UV_VERSION_MINOR <= 10
             uv_fs_read(req->loop, req, self->fd, self->buffer.base, self->buffer.len, -1, fileRead);
@@ -161,6 +163,7 @@ void AssetRequestImpl::fileRead(uv_fs_t *req) {
         // File was successfully read.
         self->response->status = Response::Successful;
         assert(self->request);
+        self->response->data = std::make_shared<const std::string>(std::move(self->data));
         self->request->notify(std::move(self->response), FileCache::Hint::No);
         delete self->request;
     }
@@ -191,6 +194,7 @@ void AssetRequestImpl::notifyError(uv_fs_t *req) {
         auto response = util::make_unique<Response>();
         response->status = Response::Error;
         response->message = uv::getFileRequestError(req);
+        response->data = std::make_shared<const std::string>();
         assert(self->request);
         self->request->notify(std::move(response), FileCache::Hint::No);
         delete self->request;
@@ -220,7 +224,7 @@ AssetRequest::~AssetRequest() {
     }
 }
 
-void AssetRequest::start(uv_loop_t *loop, std::unique_ptr<Response> response) {
+void AssetRequest::start(uv_loop_t *loop, std::shared_ptr<const Response> response) {
     MBGL_VERIFY_THREAD(tid);
 
     // We're ignoring the existing response if any.
