@@ -621,10 +621,10 @@ void Map::updateAnnotationTiles(const std::vector<Tile::ID>& ids) {
     if (!style) return;
     for (const auto &source : style->sources) {
         if (source->info.type == SourceType::Annotations) {
-            source->invalidateTiles(*this, ids);
-            return;
+            source->invalidateTiles(ids);
         }
     }
+    triggerUpdate();
 }
 
 #pragma mark - Toggles

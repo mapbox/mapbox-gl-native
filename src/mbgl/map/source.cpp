@@ -427,12 +427,11 @@ void Source::update(Map &map,
     updated = map.getTime();
 }
 
-void Source::invalidateTiles(Map& map, const std::vector<Tile::ID>& ids) {
+void Source::invalidateTiles(const std::vector<Tile::ID>& ids) {
     for (auto& id : ids) {
         tiles.erase(id);
         tile_data.erase(id);
     }
-    map.triggerUpdate();
 }
 
 }

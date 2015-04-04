@@ -58,7 +58,7 @@ public:
     void update(Map &, uv::worker &, util::ptr<Style>, GlyphAtlas &, GlyphStore &,
                 SpriteAtlas &, util::ptr<Sprite>, TexturePool &, std::function<void()> callback);
 
-    void invalidateTiles(Map&, const std::vector<Tile::ID>&);
+    void invalidateTiles(const std::vector<Tile::ID>&);
 
     void updateMatrices(const mat4 &projMatrix, const TransformState &transform);
     void drawClippingMasks(Painter &painter);
