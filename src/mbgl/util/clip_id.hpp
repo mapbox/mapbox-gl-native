@@ -3,6 +3,8 @@
 
 #include <mbgl/map/tile_id.hpp>
 
+#include <bitset>
+#include <string>
 #include <list>
 #include <set>
 #include <vector>
@@ -12,6 +14,19 @@
 namespace mbgl {
 
 class Tile;
+class TileID;
+
+struct ClipID {
+    inline ClipID() {}
+    inline ClipID(const std::string &mask_, const std::string &reference_) : mask(mask_), reference(reference_) {}
+
+    std::bitset<8> mask;
+    std::bitset<8> reference;
+
+    inline bool operator==(const ClipID &other) const {
+        return mask == other.mask && reference == other.reference;
+    }
+};
 
 class ClipIDGenerator {
 private:

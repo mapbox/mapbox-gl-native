@@ -3,7 +3,7 @@
 
 #include <algorithm>
 
-#include <mbgl/util/clip_ids.hpp>
+#include <mbgl/util/clip_id.hpp>
 #include <mbgl/map/tile.hpp>
 #include <mbgl/util/std.hpp>
 

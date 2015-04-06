@@ -8,7 +8,7 @@
 #include <mbgl/map/annotation.hpp>
 #include <mbgl/map/sprite.hpp>
 #include <mbgl/util/math.hpp>
-#include <mbgl/util/clip_ids.hpp>
+#include <mbgl/util/clip_id.hpp>
 #include <mbgl/util/string.hpp>
 #include <mbgl/util/constants.hpp>
 #include <mbgl/util/uv_detail.hpp>

@@ -1,4 +1,4 @@
-#include <mbgl/util/clip_ids.hpp>
+#include <mbgl/util/clip_id.hpp>
 
 #include <mbgl/platform/log.hpp>
 #include <mbgl/util/math.hpp>

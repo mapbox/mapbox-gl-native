@@ -5,7 +5,7 @@
 #include <mbgl/style/style_bucket.hpp>
 #include <mbgl/util/std.hpp>
 #include <mbgl/util/string.hpp>
-#include <mbgl/util/clip_ids.hpp>
+#include <mbgl/util/clip_id.hpp>
 #include <mbgl/util/constants.hpp>
 #include <mbgl/util/mat3.hpp>
 #include <mbgl/geometry/sprite_atlas.hpp>
