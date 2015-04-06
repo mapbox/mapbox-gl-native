@@ -158,28 +158,12 @@ void Source::load(const std::string& accessToken,
     });
 }
 
-void Source::updateClipIDs(const std::map<TileID, ClipID> &mapping) {
-    std::for_each(tiles.begin(), tiles.end(), [&mapping](std::pair<const TileID, std::unique_ptr<Tile>> &pair) {
-        Tile &tile = *pair.second;
-        auto it = mapping.find(tile.id);
-        if (it != mapping.end()) {
-            tile.clip = it->second;
-        } else {
-            tile.clip = ClipID {};
-        }
-    });
-}
-
 void Source::updateMatrices(const mat4 &projMatrix, const TransformState &transform) {
     for (const auto& pair : tiles) {
         Tile &tile = *pair.second;
         transform.matrixFor(tile.matrix, tile.id);
         matrix::multiply(tile.matrix, projMatrix, tile.matrix);
     }
-}
-
-size_t Source::getTileCount() const {
-    return tiles.size();
 }
 
 void Source::drawClippingMasks(Painter &painter) {
@@ -205,16 +189,6 @@ void Source::finishRender(Painter &painter) {
         Tile &tile = *pair.second;
         painter.renderTileDebug(tile);
     }
-}
-
-std::forward_list<TileID> Source::getIDs() const {
-    std::forward_list<TileID> ptrs;
-
-    std::transform(tiles.begin(), tiles.end(), std::front_inserter(ptrs), [](const std::pair<const TileID, std::unique_ptr<Tile>> &pair) {
-        Tile &tile = *pair.second;
-        return tile.id;
-    });
-    return ptrs;
 }
 
 std::forward_list<Tile *> Source::getLoadedTiles() const {

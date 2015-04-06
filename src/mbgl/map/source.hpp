@@ -66,13 +66,10 @@ public:
 
     void updateMatrices(const mat4 &projMatrix, const TransformState &transform);
     void drawClippingMasks(Painter &painter);
-    size_t getTileCount() const;
     void render(Painter &painter, const StyleLayer &layer_desc);
     void finishRender(Painter &painter);
 
-    std::forward_list<TileID> getIDs() const;
     std::forward_list<Tile *> getLoadedTiles() const;
-    void updateClipIDs(const std::map<TileID, ClipID> &mapping);
 
     SourceInfo info;
     bool enabled;
