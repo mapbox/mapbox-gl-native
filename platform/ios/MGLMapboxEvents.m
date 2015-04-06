@@ -165,6 +165,7 @@ NSString *const MGLEventGestureRotateStart = @"Rotation";
         
         [_rfc3339DateFormatter setLocale:enUSPOSIXLocale];
         [_rfc3339DateFormatter setDateFormat:@"yyyy'-'MM'-'dd'T'HH':'mm':'ss z Z"];
+        // Clear Any System TimeZone Cache
         [NSTimeZone resetSystemTimeZone];
         [_rfc3339DateFormatter setTimeZone:[NSTimeZone systemTimeZone]];
     }
