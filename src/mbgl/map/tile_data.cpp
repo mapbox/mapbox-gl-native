@@ -30,9 +30,6 @@ const std::string TileData::toString() const {
 }
 
 void TileData::request(uv::worker &worker, float pixelRatio, std::function<void()> callback) {
-    if (source.tiles.empty())
-        return;
-
     std::string url = source.tileURL(id, pixelRatio);
     state = State::loading;
 

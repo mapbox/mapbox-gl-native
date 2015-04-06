@@ -97,7 +97,7 @@ void SourceInfo::parseTileJSONProperties(const rapidjson::Value& value) {
 }
 
 std::string SourceInfo::tileURL(const Tile::ID& id, float pixelRatio) const {
-    std::string result = tiles[(id.x + id.y) % tiles.size()];
+    std::string result = tiles.at((id.x + id.y) % tiles.size());
     result = util::mapbox::normalizeTileURL(result, url, type);
     result = util::replaceTokens(result, [&](const std::string &token) -> std::string {
         if (token == "z") return util::toString(id.z);
