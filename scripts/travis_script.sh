@@ -1,8 +1,5 @@
 #!/usr/bin/env bash
 
-set -e
-set -o pipefail
-
 COMMIT_MESSAGE=$(git show -s --format=%B $1 | tr -d '\n')
 PUBLISH_TAG=$(echo "$COMMIT_MESSAGE" | grep -oE '\[publish [a-z0-9\.\-]+\]' | grep -oE '[a-z0-9\.\-]+' | tail -n1)
 PUBLISH_PLATFORM=$(echo "$PUBLISH_TAG" | awk -F '-' '{ print $1 }')
