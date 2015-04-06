@@ -165,7 +165,7 @@ mbgl::DefaultFileSource *mbglFileSource = nullptr;
 
 - (void)setAccessToken:(NSString *)accessToken
 {
-    mbglMap->setAccessToken((std::string)[accessToken UTF8String]);
+    mbglMap->setAccessToken(accessToken ? (std::string)[accessToken UTF8String] : "");
     [MGLMapboxEvents setToken:accessToken.mgl_stringOrNilIfEmpty];
 }
 
