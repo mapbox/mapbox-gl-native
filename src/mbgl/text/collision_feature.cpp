@@ -45,7 +45,7 @@ void CollisionFeature::bboxifyLabel(const std::vector<Coordinate> &line,
     float anchorDistance = firstBoxOffset;
 
     // move backwards along the line to the first segment the label appears on
-    while (anchorDistance > -labelLength / 2) {
+    do {
         index--;
 
         // there isn't enough room for the label after the beginning of the line
@@ -54,7 +54,7 @@ void CollisionFeature::bboxifyLabel(const std::vector<Coordinate> &line,
 
         anchorDistance -= util::dist<float>(line[index], p);
         p = line[index];
-    }
+    } while (anchorDistance > -labelLength / 2);
 
     float segmentLength = util::dist<float>(line[index], line[index + 1]);
 
