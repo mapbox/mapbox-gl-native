@@ -1357,7 +1357,7 @@ CLLocationCoordinate2D latLngToCoordinate(mbgl::LatLng latLng)
     }
 }
 
-- (NSArray *)getAppliedStyleClasses
+- (NSArray *)styleClasses
 {
     NSMutableArray *returnArray = [NSMutableArray array];
 
@@ -1387,6 +1387,27 @@ CLLocationCoordinate2D latLngToCoordinate(mbgl::LatLng latLng)
 
     mbglMap->setDefaultTransitionDuration(secondsAsDuration(transitionDuration));
     mbglMap->setClasses(newAppliedClasses);
+}
+
+- (BOOL)hasStyleClass:(NSString *)styleClass
+{
+    return styleClass && mbglMap->hasClass([styleClass UTF8String]);
+}
+
+- (void)addStyleClass:(NSString *)styleClass
+{
+    if (styleClass)
+    {
+        mbglMap->addClass([styleClass UTF8String]);
+    }
+}
+
+- (void)removeStyleClass:(NSString *)styleClass
+{
+    if (styleClass)
+    {
+        mbglMap->removeClass([styleClass UTF8String]);
+    }
 }
 
 #pragma mark - Annotations -

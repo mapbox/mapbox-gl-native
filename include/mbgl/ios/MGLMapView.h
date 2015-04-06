@@ -181,6 +181,18 @@ IB_DESIGNABLE
 *   To display the default style, set this property to `nil`. */
 @property (nonatomic) NSURL *styleURL;
 
+/** Currently active style classes, represented as an array of string identifiers. */
+@property (nonatomic) NSArray *styleClasses;
+
+/** Returns a Boolean value indicating whether the style class with the given identifier is currently active. */
+- (BOOL)hasStyleClass:(NSString *)styleClass;
+
+/** Activates the style class with the given identifier. */
+- (void)addStyleClass:(NSString *)styleClass;
+
+/** Deactivates the style class with the given identifier. */
+- (void)removeStyleClass:(NSString *)styleClass;
+
 #pragma mark - Annotating the Map
 
 /** @name Annotating the Map */
