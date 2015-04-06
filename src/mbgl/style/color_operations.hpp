@@ -26,18 +26,8 @@ namespace mbgl {
         double clamp(double);
 
     };
-    
-    class Darken : public ColorOperation {
-    public:
-        CSSColorParser::Color evaluate();
-    };
-    
+
     class Lighten : public ColorOperation {
-    public:
-        CSSColorParser::Color evaluate();
-    };
-    
-    class Desaturate : public ColorOperation {
     public:
         CSSColorParser::Color evaluate();
     };
@@ -46,13 +36,8 @@ namespace mbgl {
     public:
         CSSColorParser::Color evaluate();
     };
-    
-    class Fadeout : public ColorOperation {
-    public:
-        CSSColorParser::Color evaluate();
-    };
-    
-    class Fadein : public ColorOperation {
+
+    class Fade : public ColorOperation {
     public:
         CSSColorParser::Color evaluate();
     };

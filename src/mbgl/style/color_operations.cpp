@@ -32,24 +32,15 @@ namespace mbgl {
         ColorOperation opResult = ColorOperation::ColorOperation(degree, parseColorarr(value[2u], constants));
         CSSColorParser::Color result;
 
-        if (op == "darken") {
-            Darken * dark = static_cast<Darken*> (&opResult);
-            result = dark->evaluate();
-        } else if (op == "lighten") {
+        if (op == "lighten") {
             Lighten * light = static_cast<Lighten*> (&opResult);
             result = light->evaluate();
-        } else if (op == "desaturate") {
-            Desaturate * desaturate = static_cast<Desaturate*> (&opResult);
-            result = desaturate->evaluate();
         } else if (op == "saturate") {
             Saturate * saturate = static_cast<Saturate*> (&opResult);
             result = saturate->evaluate();
-        } else if (op == "fadeout") {
-            Fadeout * fadeout = static_cast<Fadeout*> (&opResult);
-            result = fadeout->evaluate();
-        } else if (op == "fadein") {
-            Fadein * fadein = static_cast<Fadein*> (&opResult);
-            result = fadein->evaluate();
+        } else if (op == "fade") {
+            Fade * fade = static_cast<Fade*> (&opResult);
+            result = fade->evaluate();
         } else if (op == "spin") {
             Spin * spin = static_cast<Spin*> (&opResult);
             result = spin->evaluate();
@@ -61,7 +52,7 @@ namespace mbgl {
             Mix mix = Mix::Mix(opResult, parseColorarr(value[3u], constants));
             result = mix.evaluate();
         } else {
-            Log::Warning(Event::ParseStyle, "color operator must be one of \"darken\", \"lighten\", \"desaturate\", \"saturate\", \"fadeout\", \"fadein\", \"spin\", \"mix\"");
+            Log::Warning(Event::ParseStyle, "color operator must be one of \"lighten\", \"saturate\", \"fade\", \"spin\", \"mix\"");
         }
         return result;
 
@@ -132,27 +123,11 @@ namespace mbgl {
         return CSSColorParser::parse(str);
     }
 
-    CSSColorParser::Color Darken::evaluate() {
-        std::array<double, 4> hsl = this->toHSL();
-        
-        hsl[2] -= this->degree_ / 100.0;
-        hsl[2] = clamp(hsl[2]);
-        return toColor(hsl);
-    }
-
     CSSColorParser::Color Lighten::evaluate() {
         std::array<double, 4> hsl = this->toHSL();
         
         hsl[2] += this->degree_ / 100.0;
         hsl[2] = clamp(hsl[2]);
-        return toColor(hsl);
-    }
-
-    CSSColorParser::Color Desaturate::evaluate() {
-        std::array<double, 4> hsl = this->toHSL();
-        
-        hsl[1] -= this->degree_ / 100.0;
-        hsl[1] = clamp(hsl[1]);
         return toColor(hsl);
     }
 
@@ -164,18 +139,10 @@ namespace mbgl {
         return toColor(hsl);
     }
 
-    CSSColorParser::Color Fadeout::evaluate() {
+    CSSColorParser::Color Fade::evaluate() {
         std::array<double, 4> hsl = this->toHSL();
 
         hsl[3] -= this->degree_ / 100.0;
-        hsl[3] = clamp(hsl[3]);
-        return toColor(hsl);
-    }
-
-    CSSColorParser::Color Fadein::evaluate() {
-        std::array<double, 4> hsl = this->toHSL();
-        
-        hsl[3] += this->degree_ / 100.0;
         hsl[3] = clamp(hsl[3]);
         return toColor(hsl);
     }
