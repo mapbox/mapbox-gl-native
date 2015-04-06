@@ -28,9 +28,8 @@ struct ClipID {
 
 class Tile : private util::noncopyable {
 public:
-    static std::forward_list<TileID> cover(int8_t z, const box& bounds);
-
-    explicit Tile(const TileID&);
+    explicit Tile(const TileID& id_)
+        : id(id_) {}
 
     const TileID id;
     ClipID clip;

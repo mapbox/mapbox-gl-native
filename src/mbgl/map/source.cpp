@@ -20,6 +20,7 @@
 #include <mbgl/platform/log.hpp>
 #include <mbgl/util/uv_detail.hpp>
 #include <mbgl/util/token.hpp>
+#include <mbgl/util/tile_cover.hpp>
 
 #include <mbgl/map/vector_tile_data.hpp>
 #include <mbgl/map/raster_tile_data.hpp>
@@ -313,7 +314,7 @@ std::forward_list<TileID> Source::coveringTiles(const TransformState& state) con
     box points = state.cornersToBox(z);
     const vec2<double>& center = points.center;
 
-    std::forward_list<TileID> covering_tiles = Tile::cover(z, points);
+    std::forward_list<TileID> covering_tiles = tileCover(z, points);
 
     covering_tiles.sort([&center](const TileID& a, const TileID& b) {
         // Sorts by distance from the box center
