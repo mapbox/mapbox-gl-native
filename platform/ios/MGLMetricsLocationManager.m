@@ -14,9 +14,7 @@
 - (instancetype) init {
     if (self = [super init]) {
         _locationManager = [[CLLocationManager alloc] init];
-        _locationManager.distanceFilter = 2;
-        _locationManager.desiredAccuracy = kCLLocationAccuracyBest;
-        _locationManager.pausesLocationUpdatesAutomatically = YES;
+        _locationManager.distanceFilter = 10;
         [_locationManager setDelegate:self];
     }
     return self;
