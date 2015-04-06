@@ -192,7 +192,7 @@ private:
 
     void processTasks();
 
-    void updateAnnotationTiles(const std::vector<Tile::ID>&);
+    void updateAnnotationTiles(const std::vector<TileID>&);
 
     enum class Mode : uint8_t {
         None, // we're not doing any processing

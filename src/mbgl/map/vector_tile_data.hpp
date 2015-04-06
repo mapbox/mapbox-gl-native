@@ -1,7 +1,6 @@
 #ifndef MBGL_MAP_VECTOR_TILE_DATA
 #define MBGL_MAP_VECTOR_TILE_DATA
 
-#include <mbgl/map/tile.hpp>
 #include <mbgl/map/tile_data.hpp>
 #include <mbgl/geometry/elements_buffer.hpp>
 #include <mbgl/geometry/fill_buffer.hpp>
@@ -30,7 +29,7 @@ class VectorTileData : public TileData {
     friend class TileParser;
 
 public:
-    VectorTileData(Tile::ID const&,
+    VectorTileData(const TileID&,
                    float mapMaxZoom,
                    util::ptr<Style>,
                    GlyphAtlas&,

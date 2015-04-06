@@ -9,7 +9,7 @@ class AnnotationManager;
 
 class LiveTileData : public VectorTileData {
 public:
-    LiveTileData(Tile::ID const&,
+    LiveTileData(const TileID&,
                  AnnotationManager&,
                  float mapMaxZoom,
                  util::ptr<Style>,

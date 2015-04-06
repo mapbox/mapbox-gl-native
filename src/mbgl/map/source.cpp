@@ -2,6 +2,7 @@
 #include <mbgl/map/map.hpp>
 #include <mbgl/map/environment.hpp>
 #include <mbgl/map/transform.hpp>
+#include <mbgl/map/tile.hpp>
 #include <mbgl/renderer/painter.hpp>
 #include <mbgl/util/constants.hpp>
 #include <mbgl/util/raster.hpp>
@@ -96,7 +97,7 @@ void SourceInfo::parseTileJSONProperties(const rapidjson::Value& value) {
     parse(value, bounds, "bounds");
 }
 
-std::string SourceInfo::tileURL(const Tile::ID& id, float pixelRatio) const {
+std::string SourceInfo::tileURL(const TileID& id, float pixelRatio) const {
     std::string result = tiles.at((id.x + id.y) % tiles.size());
     result = util::mapbox::normalizeTileURL(result, url, type);
     result = util::replaceTokens(result, [&](const std::string &token) -> std::string {
@@ -118,6 +119,8 @@ std::string SourceInfo::tileURL(const Tile::ID& id, float pixelRatio) const {
 Source::Source()
 {
 }
+
+Source::~Source() {}
 
 // Note: This is a separate function that must be called exactly once after creation
 // The reason this isn't part of the constructor is that calling shared_from_this() in
@@ -154,8 +157,8 @@ void Source::load(const std::string& accessToken,
     });
 }
 
-void Source::updateClipIDs(const std::map<Tile::ID, ClipID> &mapping) {
-    std::for_each(tiles.begin(), tiles.end(), [&mapping](std::pair<const Tile::ID, std::unique_ptr<Tile>> &pair) {
+void Source::updateClipIDs(const std::map<TileID, ClipID> &mapping) {
+    std::for_each(tiles.begin(), tiles.end(), [&mapping](std::pair<const TileID, std::unique_ptr<Tile>> &pair) {
         Tile &tile = *pair.second;
         auto it = mapping.find(tile.id);
         if (it != mapping.end()) {
@@ -203,10 +206,10 @@ void Source::finishRender(Painter &painter) {
     }
 }
 
-std::forward_list<Tile::ID> Source::getIDs() const {
-    std::forward_list<Tile::ID> ptrs;
+std::forward_list<TileID> Source::getIDs() const {
+    std::forward_list<TileID> ptrs;
 
-    std::transform(tiles.begin(), tiles.end(), std::front_inserter(ptrs), [](const std::pair<const Tile::ID, std::unique_ptr<Tile>> &pair) {
+    std::transform(tiles.begin(), tiles.end(), std::front_inserter(ptrs), [](const std::pair<const TileID, std::unique_ptr<Tile>> &pair) {
         Tile &tile = *pair.second;
         return tile.id;
     });
@@ -225,7 +228,7 @@ std::forward_list<Tile *> Source::getLoadedTiles() const {
 }
 
 
-TileData::State Source::hasTile(const Tile::ID& id) {
+TileData::State Source::hasTile(const TileID& id) {
     auto it = tiles.find(id);
     if (it != tiles.end()) {
         Tile &tile = *it->second;
@@ -241,7 +244,7 @@ TileData::State Source::addTile(Map &map, uv::worker &worker,
                                 util::ptr<Style> style, GlyphAtlas &glyphAtlas,
                                 GlyphStore &glyphStore, SpriteAtlas &spriteAtlas,
                                 util::ptr<Sprite> sprite, TexturePool &texturePool,
-                                const Tile::ID &id, std::function<void()> callback) {
+                                const TileID &id, std::function<void()> callback) {
     const TileData::State state = hasTile(id);
 
     if (state != TileData::State::invalid) {
@@ -253,7 +256,7 @@ TileData::State Source::addTile(Map &map, uv::worker &worker,
 
     // We couldn't find the tile in the list. Create a new one.
     // Try to find the associated TileData object.
-    const Tile::ID normalized_id = id.normalized();
+    const TileID normalized_id = id.normalized();
 
     auto it = tile_data.find(normalized_id);
     if (it != tile_data.end()) {
@@ -300,7 +303,7 @@ int32_t Source::coveringZoomLevel(const TransformState& state) const {
     return std::floor(getZoom(state));
 }
 
-std::forward_list<Tile::ID> Source::coveringTiles(const TransformState& state) const {
+std::forward_list<TileID> Source::coveringTiles(const TransformState& state) const {
     int32_t z = coveringZoomLevel(state);
 
     if (z < info.min_zoom) return {{}};
@@ -310,9 +313,9 @@ std::forward_list<Tile::ID> Source::coveringTiles(const TransformState& state) c
     box points = state.cornersToBox(z);
     const vec2<double>& center = points.center;
 
-    std::forward_list<Tile::ID> covering_tiles = Tile::cover(z, points);
+    std::forward_list<TileID> covering_tiles = Tile::cover(z, points);
 
-    covering_tiles.sort([&center](const Tile::ID& a, const Tile::ID& b) {
+    covering_tiles.sort([&center](const TileID& a, const TileID& b) {
         // Sorts by distance from the box center
         return std::fabs(a.x - center.x) + std::fabs(a.y - center.y) <
                std::fabs(b.x - center.x) + std::fabs(b.y - center.y);
@@ -330,7 +333,7 @@ std::forward_list<Tile::ID> Source::coveringTiles(const TransformState& state) c
  *
  * @return boolean Whether the children found completely cover the tile.
  */
-bool Source::findLoadedChildren(const Tile::ID& id, int32_t maxCoveringZoom, std::forward_list<Tile::ID>& retain) {
+bool Source::findLoadedChildren(const TileID& id, int32_t maxCoveringZoom, std::forward_list<TileID>& retain) {
     bool complete = true;
     int32_t z = id.z;
     auto ids = id.children(z + 1);
@@ -358,9 +361,9 @@ bool Source::findLoadedChildren(const Tile::ID& id, int32_t maxCoveringZoom, std
  *
  * @return boolean Whether a parent was found.
  */
-bool Source::findLoadedParent(const Tile::ID& id, int32_t minCoveringZoom, std::forward_list<Tile::ID>& retain) {
+bool Source::findLoadedParent(const TileID& id, int32_t minCoveringZoom, std::forward_list<TileID>& retain) {
     for (int32_t z = id.z - 1; z >= minCoveringZoom; --z) {
-        const Tile::ID parent_id = id.parent(z);
+        const TileID parent_id = id.parent(z);
         const TileData::State state = hasTile(parent_id);
         if (state == TileData::State::parsed) {
             retain.emplace_front(parent_id);
@@ -384,7 +387,7 @@ void Source::update(Map &map,
     }
 
     int32_t zoom = std::floor(getZoom(map.getState()));
-    std::forward_list<Tile::ID> required = coveringTiles(map.getState());
+    std::forward_list<TileID> required = coveringTiles(map.getState());
 
     // Determine the overzooming/underzooming amounts.
     int32_t minCoveringZoom = util::clamp<int32_t>(zoom - 10, info.min_zoom, info.max_zoom);
@@ -393,7 +396,7 @@ void Source::update(Map &map,
     // Retain is a list of tiles that we shouldn't delete, even if they are not
     // the most ideal tile for the current viewport. This may include tiles like
     // parent or child tiles that are *already* loaded.
-    std::forward_list<Tile::ID> retain(required);
+    std::forward_list<TileID> retain(required);
 
     // Add existing child/parent tiles if the actual tile is not yet loaded
     for (const auto& id : required) {
@@ -418,8 +421,8 @@ void Source::update(Map &map,
 
     // Remove tiles that we definitely don't need, i.e. tiles that are not on
     // the required list.
-    std::set<Tile::ID> retain_data;
-    util::erase_if(tiles, [&retain, &retain_data](std::pair<const Tile::ID, std::unique_ptr<Tile>> &pair) {
+    std::set<TileID> retain_data;
+    util::erase_if(tiles, [&retain, &retain_data](std::pair<const TileID, std::unique_ptr<Tile>> &pair) {
         Tile &tile = *pair.second;
         bool obsolete = std::find(retain.begin(), retain.end(), tile.id) == retain.end();
         if (!obsolete) {
@@ -429,7 +432,7 @@ void Source::update(Map &map,
     });
 
     // Remove all the expired pointers from the set.
-    util::erase_if(tile_data, [&retain_data](std::pair<const Tile::ID, std::weak_ptr<TileData>> &pair) {
+    util::erase_if(tile_data, [&retain_data](std::pair<const TileID, std::weak_ptr<TileData>> &pair) {
         const util::ptr<TileData> tile = pair.second.lock();
         if (!tile) {
             return true;
@@ -447,7 +450,7 @@ void Source::update(Map &map,
     updated = map.getTime();
 }
 
-void Source::invalidateTiles(const std::vector<Tile::ID>& ids) {
+void Source::invalidateTiles(const std::vector<TileID>& ids) {
     for (auto& id : ids) {
         tiles.erase(id);
         tile_data.erase(id);

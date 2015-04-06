@@ -1,7 +1,7 @@
 #ifndef MBGL_MAP_ANNOTATIONS
 #define MBGL_MAP_ANNOTATIONS
 
-#include <mbgl/map/tile.hpp>
+#include <mbgl/map/tile_id.hpp>
 #include <mbgl/util/geo.hpp>
 #include <mbgl/util/noncopyable.hpp>
 #include <mbgl/util/std.hpp>
@@ -28,13 +28,13 @@ public:
     ~AnnotationManager();
 
     void setDefaultPointAnnotationSymbol(const std::string& symbol);
-    std::pair<std::vector<Tile::ID>, AnnotationIDs> addPointAnnotations(
+    std::pair<std::vector<TileID>, AnnotationIDs> addPointAnnotations(
         const std::vector<LatLng>&, const std::vector<std::string>& symbols, const Map&);
-    std::vector<Tile::ID> removeAnnotations(const AnnotationIDs&, const Map&);
+    std::vector<TileID> removeAnnotations(const AnnotationIDs&, const Map&);
     AnnotationIDs getAnnotationsInBounds(const LatLngBounds&, const Map&) const;
     LatLngBounds getBoundsForAnnotations(const AnnotationIDs&) const;
 
-    const LiveTile* getTile(Tile::ID const& id);
+    const LiveTile* getTile(const TileID& id);
 
     static const std::string layerID;
 
@@ -46,7 +46,7 @@ private:
     mutable std::mutex mtx;
     std::string defaultPointAnnotationSymbol;
     std::unordered_map<uint32_t, std::unique_ptr<Annotation>> annotations;
-    std::unordered_map<Tile::ID, std::pair<std::unordered_set<uint32_t>, std::unique_ptr<LiveTile>>, Tile::ID::Hash> tiles;
+    std::unordered_map<TileID, std::pair<std::unordered_set<uint32_t>, std::unique_ptr<LiveTile>>, TileID::Hash> tiles;
     uint32_t nextID_ = 0;
 };
 

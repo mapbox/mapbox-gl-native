@@ -8,7 +8,7 @@ RasterBucket::RasterBucket(TexturePool& texturePool, const StyleLayoutRaster& la
   raster(texturePool) {
 }
 
-void RasterBucket::render(Painter &painter, const StyleLayer &layer_desc, const Tile::ID &id,
+void RasterBucket::render(Painter &painter, const StyleLayer &layer_desc, const TileID &id,
                           const mat4 &matrix) {
     painter.renderRaster(*this, layer_desc, id, matrix);
 }

@@ -10,6 +10,7 @@
 #include <mbgl/util/mat3.hpp>
 #include <mbgl/geometry/sprite_atlas.hpp>
 #include <mbgl/map/source.hpp>
+#include <mbgl/map/tile.hpp>
 
 #if defined(DEBUG)
 #include <mbgl/util/stopwatch.hpp>
@@ -442,7 +443,7 @@ void Painter::renderBackground(const StyleLayer &layer_desc) {
     MBGL_CHECK_ERROR(glEnable(GL_STENCIL_TEST));
 }
 
-mat4 Painter::translatedMatrix(const mat4& matrix, const std::array<float, 2> &translation, const Tile::ID &id, TranslateAnchorType anchor) {
+mat4 Painter::translatedMatrix(const mat4& matrix, const std::array<float, 2> &translation, const TileID &id, TranslateAnchorType anchor) {
     if (translation[0] == 0 && translation[1] == 0) {
         return matrix;
     } else {

@@ -616,7 +616,7 @@ LatLngBounds Map::getBoundsForAnnotations(const std::vector<uint32_t>& annotatio
     });
 }
 
-void Map::updateAnnotationTiles(const std::vector<Tile::ID>& ids) {
+void Map::updateAnnotationTiles(const std::vector<TileID>& ids) {
     assert(Environment::currentlyOn(ThreadType::Map));
     if (!style) return;
     for (const auto &source : style->sources) {

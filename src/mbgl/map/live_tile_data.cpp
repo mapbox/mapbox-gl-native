@@ -8,7 +8,7 @@
 
 using namespace mbgl;
 
-LiveTileData::LiveTileData(Tile::ID const& id_,
+LiveTileData::LiveTileData(const TileID& id_,
                            AnnotationManager& annotationManager_,
                            float mapMaxZoom,
                            util::ptr<Style> style_,

@@ -1,8 +1,8 @@
 #include <mbgl/util/clip_ids.hpp>
-#include <mbgl/map/tile.hpp>
 
 #include <mbgl/platform/log.hpp>
 #include <mbgl/util/math.hpp>
+#include <mbgl/map/tile.hpp>
 
 #include <list>
 #include <vector>
@@ -15,7 +15,7 @@ namespace mbgl {
 
 ClipIDGenerator::Leaf::Leaf(Tile &tile_) : tile(tile_) {}
 
-void ClipIDGenerator::Leaf::add(const Tile::ID &p) {
+void ClipIDGenerator::Leaf::add(const TileID &p) {
     if (p.isChildOf(tile.id)) {
         // Ensure that no already present child is a parent of the new p.
         for (const auto& child : children) {

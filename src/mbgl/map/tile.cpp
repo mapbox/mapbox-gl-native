@@ -1,64 +1,14 @@
 #include <mbgl/map/tile.hpp>
 #include <mbgl/util/vec.hpp>
-#include <mbgl/util/string.hpp>
 #include <mbgl/util/box.hpp>
-
-
-#include <cassert>
 
 using namespace mbgl;
 
 #include <iostream>
 
-Tile::Tile(const ID& id_)
+Tile::Tile(const TileID& id_)
     : id(id_) {
 }
-
-Tile::ID Tile::ID::parent(int8_t parent_z) const {
-    assert(parent_z < z);
-    int32_t dim = std::pow(2, z - parent_z);
-    return Tile::ID{
-        parent_z,
-        (x >= 0 ? x : x - dim + 1) / dim,
-        y / dim
-    };
-}
-
-std::forward_list<Tile::ID> Tile::ID::children(int32_t child_z) const {
-    assert(child_z > z);
-    int32_t factor = std::pow(2, child_z - z);
-
-    std::forward_list<ID> child_ids;
-    for (int32_t ty = y * factor, y_max = (y + 1) * factor; ty < y_max; ++ty) {
-        for (int32_t tx = x * factor, x_max = (x + 1) * factor; tx < x_max; ++tx) {
-            child_ids.emplace_front(child_z, tx, ty);
-        }
-    }
-    return child_ids;
-}
-
-Tile::ID Tile::ID::normalized() const {
-    int32_t dim = std::pow(2, z);
-    int32_t nx = x, ny = y;
-    while (nx < 0) nx += dim;
-    while (nx >= dim) nx -= dim;
-    return ID { z, nx, ny };
-}
-
-bool Tile::ID::isChildOf(const Tile::ID &parent_id) const {
-    if (parent_id.z >= z || parent_id.w != w) {
-        return false;
-    }
-    int32_t scale = std::pow(2, z - parent_id.z);
-    return parent_id.x == ((x < 0 ? x - scale + 1 : x) / scale) &&
-           parent_id.y == y / scale;
-}
-
-
-Tile::ID::operator std::string() const {
-    return util::toString(z) + "/" + util::toString(x) + "/" + util::toString(y);
-}
-
 
 // Taken from polymaps src/Layer.js
 // https://github.com/simplegeo/polymaps/blob/master/src/Layer.js#L333-L383
@@ -121,9 +71,9 @@ static void scanTriangle(const mbgl::vec2<double> a, const mbgl::vec2<double> b,
     if (bc.dy) scanSpans(ca, bc, ymin, ymax, scanLine);
 }
 
-std::forward_list<Tile::ID> Tile::cover(int8_t z, const mbgl::box &bounds) {
+std::forward_list<TileID> Tile::cover(int8_t z, const mbgl::box &bounds) {
     int32_t tiles = 1 << z;
-    std::forward_list<mbgl::Tile::ID> t;
+    std::forward_list<mbgl::TileID> t;
 
     auto scanLine = [&](int32_t x0, int32_t x1, int32_t y) {
         int32_t x;

@@ -1,4 +1,5 @@
 #include <mbgl/map/transform_state.hpp>
+#include <mbgl/map/tile_id.hpp>
 #include <mbgl/util/projection.hpp>
 #include <mbgl/util/constants.hpp>
 #include <mbgl/util/box.hpp>
@@ -7,7 +8,7 @@ using namespace mbgl;
 
 #pragma mark - Matrix
 
-void TransformState::matrixFor(mat4& matrix, const Tile::ID& id) const {
+void TransformState::matrixFor(mat4& matrix, const TileID& id) const {
     const double tile_scale = std::pow(2, id.z);
     const double tile_size = scale * util::tileSize / tile_scale;
 

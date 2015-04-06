@@ -37,7 +37,7 @@ public:
                LineElementsBuffer &lineElementsBuffer);
     ~FillBucket() override;
 
-    void render(Painter &painter, const StyleLayer &layer_desc, const Tile::ID &id,
+    void render(Painter &painter, const StyleLayer &layer_desc, const TileID &id,
                 const mat4 &matrix) override;
     bool hasData() const override;
 

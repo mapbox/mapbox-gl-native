@@ -1,8 +1,6 @@
 #ifndef MBGL_MAP_TRANSFORM_STATE
 #define MBGL_MAP_TRANSFORM_STATE
 
-#include <mbgl/map/tile.hpp>
-
 #include <mbgl/util/mat4.hpp>
 #include <mbgl/util/geo.hpp>
 #include <mbgl/util/vec.hpp>
@@ -13,12 +11,15 @@
 
 namespace mbgl {
 
+class TileID;
+struct box;
+
 class TransformState {
     friend class Transform;
 
 public:
     // Matrix
-    void matrixFor(mat4& matrix, const Tile::ID& id) const;
+    void matrixFor(mat4& matrix, const TileID& id) const;
     box cornersToBox(uint32_t z) const;
 
     // Dimensions

@@ -10,7 +10,7 @@
 
 using namespace mbgl;
 
-VectorTileData::VectorTileData(Tile::ID const& id_,
+VectorTileData::VectorTileData(const TileID& id_,
                                float mapMaxZoom,
                                util::ptr<Style> style_,
                                GlyphAtlas& glyphAtlas_,

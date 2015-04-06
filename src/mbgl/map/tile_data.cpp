@@ -8,7 +8,7 @@
 
 using namespace mbgl;
 
-TileData::TileData(Tile::ID const& id_, const SourceInfo& source_)
+TileData::TileData(const TileID& id_, const SourceInfo& source_)
     : id(id_),
       name(id),
       state(State::initial),
