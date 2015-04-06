@@ -45,6 +45,7 @@ public:
     std::array<float, 4> bounds = {{-180, -90, 180, 90}};
 
     void parseTileJSONProperties(const rapidjson::Value&);
+    std::string tileURL(const Tile::ID& id, float pixelRatio) const;
 };
 
 class Source : public std::enable_shared_from_this<Source>, private util::noncopyable {

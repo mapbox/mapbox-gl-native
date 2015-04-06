@@ -18,6 +18,7 @@
 #include <mbgl/style/style_layer.hpp>
 #include <mbgl/platform/log.hpp>
 #include <mbgl/util/uv_detail.hpp>
+#include <mbgl/util/token.hpp>
 
 #include <mbgl/map/vector_tile_data.hpp>
 #include <mbgl/map/raster_tile_data.hpp>
@@ -93,6 +94,25 @@ void SourceInfo::parseTileJSONProperties(const rapidjson::Value& value) {
     parse(value, attribution, "attribution");
     parse(value, center, "center");
     parse(value, bounds, "bounds");
+}
+
+std::string SourceInfo::tileURL(const Tile::ID& id, float pixelRatio) const {
+    std::string result = tiles[(id.x + id.y) % tiles.size()];
+    result = util::mapbox::normalizeTileURL(result, url, type);
+    result = util::replaceTokens(result, [&](const std::string &token) -> std::string {
+        if (token == "z") return util::toString(id.z);
+        if (token == "x") return util::toString(id.x);
+        if (token == "y") return util::toString(id.y);
+        if (token == "prefix") {
+            std::string prefix { 2 };
+            prefix[0] = "0123456789abcdef"[id.x % 16];
+            prefix[1] = "0123456789abcdef"[id.y % 16];
+            return prefix;
+        }
+        if (token == "ratio") return pixelRatio > 1.0 ? "@2x" : "";
+        return "";
+    });
+    return result;
 }
 
 Source::Source()

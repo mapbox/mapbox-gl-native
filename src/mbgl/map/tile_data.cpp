@@ -1,11 +1,7 @@
 #include <mbgl/map/tile_data.hpp>
-#include <mbgl/map/map.hpp>
 #include <mbgl/map/environment.hpp>
 #include <mbgl/map/source.hpp>
 
-#include <mbgl/util/token.hpp>
-#include <mbgl/util/string.hpp>
-#include <mbgl/util/mapbox.hpp>
 #include <mbgl/storage/file_source.hpp>
 #include <mbgl/util/uv_detail.hpp>
 #include <mbgl/platform/log.hpp>
@@ -37,22 +33,7 @@ void TileData::request(uv::worker &worker, float pixelRatio, std::function<void(
     if (source.tiles.empty())
         return;
 
-    std::string url = source.tiles[(id.x + id.y) % source.tiles.size()];
-    url = util::mapbox::normalizeTileURL(url, source.url, source.type);
-    url = util::replaceTokens(url, [&](const std::string &token) -> std::string {
-        if (token == "z") return util::toString(id.z);
-        if (token == "x") return util::toString(id.x);
-        if (token == "y") return util::toString(id.y);
-        if (token == "prefix") {
-            std::string prefix { 2 };
-            prefix[0] = "0123456789abcdef"[id.x % 16];
-            prefix[1] = "0123456789abcdef"[id.y % 16];
-            return prefix;
-        }
-        if (token == "ratio") return pixelRatio > 1.0 ? "@2x" : "";
-        return "";
-    });
-
+    std::string url = source.tileURL(id, pixelRatio);
     state = State::loading;
 
     std::weak_ptr<TileData> weak_tile = shared_from_this();
