@@ -1,7 +1,7 @@
 #ifndef MBGL_MAP_TILE_DATA
 #define MBGL_MAP_TILE_DATA
 
-#include <mbgl/map/tile.hpp>
+#include <mbgl/map/tile_id.hpp>
 #include <mbgl/renderer/debug_bucket.hpp>
 #include <mbgl/geometry/debug_font_buffer.hpp>
 
@@ -38,7 +38,7 @@ public:
         obsolete
     };
 
-    TileData(Tile::ID const &id, const SourceInfo &);
+    TileData(const TileID&, const SourceInfo&);
     ~TileData();
 
     void request(uv::worker&, float pixelRatio, std::function<void ()> callback);
@@ -55,7 +55,7 @@ public:
     virtual void render(Painter &painter, const StyleLayer &layer_desc, const mat4 &matrix) = 0;
     virtual bool hasData(StyleLayer const &layer_desc) const = 0;
 
-    const Tile::ID id;
+    const TileID id;
     const std::string name;
     std::atomic<State> state;
 

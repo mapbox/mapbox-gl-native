@@ -1,7 +1,8 @@
 #ifndef MBGL_UTIL_CLIP_IDS
 #define MBGL_UTIL_CLIP_IDS
 
-#include <mbgl/map/tile.hpp>
+#include <mbgl/map/tile_id.hpp>
+
 #include <list>
 #include <set>
 #include <vector>
@@ -10,15 +11,17 @@
 
 namespace mbgl {
 
+class Tile;
+
 class ClipIDGenerator {
 private:
     struct Leaf {
         Leaf(Tile &tile);
-        void add(const Tile::ID &p);
+        void add(const TileID &p);
         bool operator==(const Leaf &other) const;
 
         Tile &tile;
-        std::forward_list<Tile::ID> children;
+        std::forward_list<TileID> children;
     };
 
     typedef std::vector<Leaf> Pool;

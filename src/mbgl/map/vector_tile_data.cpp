@@ -3,14 +3,14 @@
 #include <mbgl/util/std.hpp>
 #include <mbgl/style/style_layer.hpp>
 #include <mbgl/style/style_bucket.hpp>
-#include <mbgl/style/style_source.hpp>
+#include <mbgl/map/source.hpp>
 #include <mbgl/geometry/glyph_atlas.hpp>
 #include <mbgl/platform/log.hpp>
 #include <mbgl/util/pbf.hpp>
 
 using namespace mbgl;
 
-VectorTileData::VectorTileData(Tile::ID const& id_,
+VectorTileData::VectorTileData(const TileID& id_,
                                float mapMaxZoom,
                                util::ptr<Style> style_,
                                GlyphAtlas& glyphAtlas_,

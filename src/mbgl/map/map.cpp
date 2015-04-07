@@ -90,7 +90,6 @@ Map::~Map() {
         "MapandMain");
 
     // Explicitly reset all pointers.
-    activeSources.clear();
     sprite.reset();
     glyphStore.reset();
     style.reset();
@@ -128,11 +127,6 @@ void Map::start(bool startPaused) {
 
         // Remove all of these to make sure they are destructed in the correct thread.
         style.reset();
-
-        // Since we don't have a stylesheet anymore, this will disable all Sources and cancel
-        // their associated requests.
-        updateSources();
-        assert(activeSources.empty());
 
         // It's now safe to destroy/join the workers since there won't be any more callbacks that
         // could dispatch to the worker pool.
@@ -622,14 +616,15 @@ LatLngBounds Map::getBoundsForAnnotations(const std::vector<uint32_t>& annotatio
     });
 }
 
-void Map::updateAnnotationTiles(const std::vector<Tile::ID>& ids) {
+void Map::updateAnnotationTiles(const std::vector<TileID>& ids) {
     assert(Environment::currentlyOn(ThreadType::Map));
-    for (const auto &source : activeSources) {
+    if (!style) return;
+    for (const auto &source : style->sources) {
         if (source->info.type == SourceType::Annotations) {
-            source->source->invalidateTiles(*this, ids);
-            return;
+            source->invalidateTiles(ids);
         }
     }
+    triggerUpdate();
 }
 
 #pragma mark - Toggles
@@ -689,45 +684,11 @@ Duration Map::getDefaultTransitionDuration() {
     return data->getDefaultTransitionDuration();
 }
 
-void Map::updateSources() {
-    assert(Environment::currentlyOn(ThreadType::Map));
-
-    // First, disable all existing sources.
-    for (const auto& source : activeSources) {
-        source->enabled = false;
-    }
-
-    // Then, reenable all of those that we actually use when drawing this layer.
-    if (style) {
-        for (const auto& layer : style->layers) {
-            if (layer->bucket && layer->bucket->style_source) {
-                (*activeSources.emplace(layer->bucket->style_source).first)->enabled = true;
-            }
-        }
-    }
-
-    // Then, construct or destroy the actual source object, depending on enabled state.
-    for (const auto& source : activeSources) {
-        if (source->enabled) {
-            if (!source->source) {
-                source->source = std::make_shared<Source>(source->info);
-                source->source->load(*this, *env);
-            }
-        } else {
-            source->source.reset();
-        }
-    }
-
-    // Finally, remove all sources that are disabled.
-    util::erase_if(activeSources, [](util::ptr<StyleSource> source){
-        return !source->enabled;
-    });
-}
-
 void Map::updateTiles() {
     assert(Environment::currentlyOn(ThreadType::Map));
-    for (const auto& source : activeSources) {
-        source->source->update(*this, getWorker(), style, *glyphAtlas, *glyphStore,
+    if (!style) return;
+    for (const auto& source : style->sources) {
+        source->update(*this, getWorker(), style, *glyphAtlas, *glyphStore,
                                *spriteAtlas, getSprite(), *texturePool, [this]() {
             assert(Environment::currentlyOn(ThreadType::Map));
             triggerUpdate();
@@ -779,6 +740,13 @@ void Map::loadStyleJSON(const std::string& json, const std::string& base) {
     const std::string glyphURL = util::mapbox::normalizeGlyphsURL(style->glyph_url, getAccessToken());
     glyphStore->setURL(glyphURL);
 
+    for (const auto& source : style->sources) {
+        source->load(getAccessToken(), *env, [this]() {
+            assert(Environment::currentlyOn(ThreadType::Map));
+            triggerUpdate();
+        });
+    }
+
     triggerUpdate(Update::Zoom);
 }
 
@@ -821,8 +789,6 @@ void Map::prepare() {
             style->recalculate(state.getNormalizedZoom(), now);
         }
 
-        updateSources();
-
         // Allow the sprite atlas to potentially pull new sprite images if needed.
         spriteAtlas->resize(state.getPixelRatio());
         spriteAtlas->setSprite(getSprite());
@@ -843,8 +809,8 @@ void Map::render() {
 
     assert(style);
     assert(painter);
-    painter->render(*style, activeSources,
-                    state, data->getAnimationTime());
+
+    painter->render(*style, state, data->getAnimationTime());
 
     // Schedule another rerender when we definitely need a next frame.
     if (transform.needsTransition() || style->hasTransitions()) {

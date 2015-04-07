@@ -30,7 +30,6 @@ class LayerDescription;
 class Sprite;
 class Style;
 class StyleLayer;
-class StyleSource;
 class TexturePool;
 class FileSource;
 class View;
@@ -175,7 +174,6 @@ private:
     void setup();
 
     void updateTiles();
-    void updateSources();
 
     // Triggered by triggerUpdate();
     void update();
@@ -194,7 +192,7 @@ private:
 
     void processTasks();
 
-    void updateAnnotationTiles(const std::vector<Tile::ID>&);
+    void updateAnnotationTiles(const std::vector<TileID>&);
 
     enum class Mode : uint8_t {
         None, // we're not doing any processing
@@ -248,8 +246,6 @@ private:
     std::unique_ptr<AnnotationManager> annotationManager;
 
     const std::unique_ptr<MapData> data;
-
-    std::set<util::ptr<StyleSource>> activeSources;
 
     std::atomic<UpdateType> updated;
 
