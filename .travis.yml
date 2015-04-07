@@ -38,7 +38,7 @@ matrix:
       env: BUILDTYPE=Debug JOBS=8 MASON_PLATFORM=osx
       compiler: clang
     - os: osx
-      env: BUILDTYPE=Release JOBS=8 MASON_PLATFORM=ios
+      env: BUILDTYPE=Debug JOBS=8 MASON_PLATFORM=ios
       compiler: clang
 
 env:
