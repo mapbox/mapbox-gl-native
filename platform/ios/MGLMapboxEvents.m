@@ -230,6 +230,9 @@ NSString *const MGLEventGestureRotateStart = @"Rotation";
 //
 + (void) pauseMetricsCollection {
     assert([[NSThread currentThread] isMainThread]);
+    if ([MGLMapboxEvents sharedManager].isPaused) {
+        return;
+    }
     [MGLMapboxEvents sharedManager].isPaused = YES;
     [MGLMetricsLocationManager stopUpdatingLocation];
 }
@@ -238,6 +241,9 @@ NSString *const MGLEventGestureRotateStart = @"Rotation";
 //
 + (void) resumeMetricsCollection {
     assert([[NSThread currentThread] isMainThread]);
+    if (![MGLMapboxEvents sharedManager].isPaused) {
+        return;
+    }
     [MGLMapboxEvents sharedManager].isPaused = NO;
     [MGLMetricsLocationManager startUpdatingLocation];
 }

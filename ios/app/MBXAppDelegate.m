@@ -1,5 +1,6 @@
 #import "MBXAppDelegate.h"
 #import "MBXViewController.h"
+#import <mbgl/ios/MGLMapboxEvents.h>
 
 @implementation MBXAppDelegate
 
@@ -11,5 +12,16 @@
 
     return YES;
 }
+
+- (void)applicationWillEnterForeground:(UIApplication *)application
+{
+    [MGLMapboxEvents resumeMetricsCollection];
+}
+
+- (void)applicationDidEnterBackground:(UIApplication *)application
+{
+    [MGLMapboxEvents pauseMetricsCollection];
+}
+
 
 @end
