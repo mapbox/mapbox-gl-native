@@ -231,6 +231,7 @@ NSString *const MGLEventGestureRotateStart = @"Rotation";
 + (void) pauseMetricsCollection {
     assert([[NSThread currentThread] isMainThread]);
     [MGLMapboxEvents sharedManager].isPaused = YES;
+    [MGLMetricsLocationManager stopUpdatingLocation];
 }
 
 // Must be called from the main thread.
@@ -238,6 +239,7 @@ NSString *const MGLEventGestureRotateStart = @"Rotation";
 + (void) resumeMetricsCollection {
     assert([[NSThread currentThread] isMainThread]);
     [MGLMapboxEvents sharedManager].isPaused = NO;
+    [MGLMetricsLocationManager startUpdatingLocation];
 }
 
 // Can be called from any thread. Can be called rapidly from
@@ -265,6 +267,11 @@ NSString *const MGLEventGestureRotateStart = @"Rotation";
         // Add Metrics Disabled App Wide Check
         if ([[NSUserDefaults standardUserDefaults] objectForKey:@"mapbox_metrics_disabled"] != nil) {
             [_eventQueue removeAllObjects];
+            return;
+        }
+        
+        // Metrics Collection Has Been Paused
+        if (_isPaused) {
             return;
         }
         

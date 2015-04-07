@@ -2,8 +2,10 @@
 
 @interface MGLMetricsLocationManager : NSObject
 
-// This method can be called from any thread.
+// These methods can be called from any thread.
 //
 + (instancetype)sharedManager;
++ (void) startUpdatingLocation;
++ (void) stopUpdatingLocation;
 
 @end
