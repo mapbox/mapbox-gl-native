@@ -71,6 +71,11 @@ NSString *const MGLEventGestureRotateStart = @"Rotation";
 @property (atomic) NSDateFormatter *rfc3339DateFormatter;
 @property (atomic) CGFloat scale;
 
+
+// The isPaused state tracker is only ever accessed from the main thread.
+//
+@property (nonatomic) BOOL isPaused;
+
 // The timer is only ever accessed from the main thread.
 //
 @property (nonatomic) NSTimer *timer;
@@ -168,6 +173,8 @@ NSString *const MGLEventGestureRotateStart = @"Rotation";
         // Clear Any System TimeZone Cache
         [NSTimeZone resetSystemTimeZone];
         [_rfc3339DateFormatter setTimeZone:[NSTimeZone systemTimeZone]];
+        
+        _isPaused = NO;
     }
     return self;
 }
@@ -217,6 +224,20 @@ NSString *const MGLEventGestureRotateStart = @"Rotation";
 + (void) setAppVersion:(NSString *)appVersion {
     assert([[NSThread currentThread] isMainThread]);
     [MGLMapboxEvents sharedManager].appVersion = appVersion;
+}
+
+// Must be called from the main thread.
+//
++ (void) pauseMetricsCollection {
+    assert([[NSThread currentThread] isMainThread]);
+    [MGLMapboxEvents sharedManager].isPaused = YES;
+}
+
+// Must be called from the main thread.
+//
++ (void) resumeMetricsCollection {
+    assert([[NSThread currentThread] isMainThread]);
+    [MGLMapboxEvents sharedManager].isPaused = NO;
 }
 
 // Can be called from any thread. Can be called rapidly from
