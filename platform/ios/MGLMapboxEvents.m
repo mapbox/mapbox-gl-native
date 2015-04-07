@@ -164,8 +164,10 @@ NSString *const MGLEventGestureRotateStart = @"Rotation";
         NSLocale *enUSPOSIXLocale = [[NSLocale alloc] initWithLocaleIdentifier:@"en_US_POSIX"];
         
         [_rfc3339DateFormatter setLocale:enUSPOSIXLocale];
-        [_rfc3339DateFormatter setDateFormat:@"yyyy'-'MM'-'dd'T'HH':'mm':'ss'Z'"];
-        [_rfc3339DateFormatter setTimeZone:[NSTimeZone timeZoneForSecondsFromGMT:0]];
+        [_rfc3339DateFormatter setDateFormat:@"yyyy'-'MM'-'dd'T'HH':'mm':'ssZ"];
+        // Clear Any System TimeZone Cache
+        [NSTimeZone resetSystemTimeZone];
+        [_rfc3339DateFormatter setTimeZone:[NSTimeZone systemTimeZone]];
     }
     return self;
 }
@@ -265,8 +267,21 @@ NSString *const MGLEventGestureRotateStart = @"Rotation";
         [evt setValue:@(100 * [UIDevice currentDevice].batteryLevel) forKey:@"batteryLevel"];
         [evt setValue:@(weakSelf.scale) forKey:@"resolution"];
         [evt setValue:weakSelf.carrier forKey:@"carrier"];
-        [evt setValue:[weakSelf getCurrentCellularNetworkConnectionType] forKey:@"cellularNetworkType"];
-        [evt setValue:[weakSelf getWifiNetworkName] forKey:@"wifi"];
+        
+        NSString *cell = [weakSelf getCurrentCellularNetworkConnectionType];
+        if (cell) {
+            [evt setValue:cell forKey:@"cellularNetworkType"];
+        } else {
+            [evt setObject:[NSNull null] forKey:@"cellularNetworkType"];
+        }
+        
+        NSString *wifi = [weakSelf getWifiNetworkName];
+        if (wifi) {
+            [evt setValue:wifi forKey:@"wifi"];
+        } else {
+            [evt setObject:[NSNull null] forKey:@"wifi"];
+        }
+        
         [evt setValue:@([weakSelf getContentSizeScale]) forKey:@"accessibilityFontScale"];
 
         // Make Immutable Version
@@ -505,17 +520,13 @@ NSString *const MGLEventGestureRotateStart = @"Rotation";
 //
 - (NSString *) getWifiNetworkName {
     
-    NSString *ssid = @"";
+    NSString *ssid = nil;
     CFArrayRef interfaces = CNCopySupportedInterfaces();
     if (interfaces) {
         NSDictionary *info = (__bridge NSDictionary *)CNCopyCurrentNetworkInfo(CFArrayGetValueAtIndex(interfaces, 0));
         if (info) {
             ssid = info[@"SSID"];
-        } else {
-            ssid = @"NONE";
         }
-    } else {
-        ssid = @"NONE";
     }
     
     return ssid;
@@ -528,7 +539,7 @@ NSString *const MGLEventGestureRotateStart = @"Rotation";
     NSString *radioTech = telephonyInfo.currentRadioAccessTechnology;
     
     if (radioTech == nil) {
-        return @"NONE";
+        return nil;
     } else if ([radioTech isEqualToString:CTRadioAccessTechnologyGPRS]) {
         return @"GPRS";
     } else if ([radioTech isEqualToString:CTRadioAccessTechnologyEdge]) {
