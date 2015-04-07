@@ -13,6 +13,7 @@
     return YES;
 }
 
+/**
 - (void)applicationWillEnterForeground:(UIApplication *)application
 {
     // Example of how to resume Metrics Collection
@@ -32,6 +33,6 @@
     // via any CLLocationManager instance it may have.
     [MGLMapboxEvents pauseMetricsCollection];
 }
-
+*/
 
 @end
