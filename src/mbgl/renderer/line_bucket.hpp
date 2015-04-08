@@ -29,10 +29,11 @@ class LineBucket : public Bucket {
 public:
     LineBucket(LineVertexBuffer &vertexBuffer,
                TriangleElementsBuffer &triangleElementsBuffer,
-               PointElementsBuffer &pointElementsBuffer);
+               PointElementsBuffer &pointElementsBuffer,
+               const float overscaling);
     ~LineBucket() override;
 
-    void render(Painter &painter, const StyleLayer &layer_desc, const TileID &id,
+    void render(Painter &painter, const StyleLayer &layer_desc, const Tile &tile,
                 const mat4 &matrix) override;
     bool hasData() const override;
 
@@ -57,6 +58,7 @@ private:
     const size_t vertex_start;
     const size_t triangle_elements_start;
     const size_t point_elements_start;
+    const float overscaling;
 
     std::vector<std::unique_ptr<triangle_group_type>> triangleGroups;
     std::vector<std::unique_ptr<point_group_type>> pointGroups;

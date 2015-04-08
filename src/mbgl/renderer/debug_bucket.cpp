@@ -12,7 +12,7 @@ DebugBucket::DebugBucket(DebugFontBuffer& fontBuffer_)
 }
 
 void DebugBucket::render(Painter &painter, const StyleLayer & /*layer_desc*/,
-                         const TileID & /*id*/, const mat4 &matrix) {
+                         const Tile & /*id*/, const mat4 &matrix) {
     painter.renderDebugText(*this, matrix);
 }
 

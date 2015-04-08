@@ -30,9 +30,9 @@ SymbolBucket::~SymbolBucket() {
     // Do not remove. header file only contains forward definitions to unique pointers.
 }
 
-void SymbolBucket::render(Painter &painter, const StyleLayer &layer_desc, const TileID &id,
+void SymbolBucket::render(Painter &painter, const StyleLayer &layer_desc, const Tile &tile,
                           const mat4 &matrix) {
-    painter.renderSymbol(*this, layer_desc, id, matrix);
+    painter.renderSymbol(*this, layer_desc, tile, matrix);
 }
 
 bool SymbolBucket::hasData() const { return hasTextData() || hasIconData(); }

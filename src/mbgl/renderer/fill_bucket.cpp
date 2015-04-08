@@ -195,9 +195,9 @@ void FillBucket::tessellate() {
     lineGroup.vertex_length += total_vertex_count;
 }
 
-void FillBucket::render(Painter &painter, const StyleLayer &layer_desc, const TileID &id,
+void FillBucket::render(Painter &painter, const StyleLayer &layer_desc, const Tile &tile,
                         const mat4 &matrix) {
-    painter.renderFill(*this, layer_desc, id, matrix);
+    painter.renderFill(*this, layer_desc, tile, matrix);
 }
 
 bool FillBucket::hasData() const {

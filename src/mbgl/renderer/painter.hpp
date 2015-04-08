@@ -92,10 +92,10 @@ public:
 
     void renderDebugText(DebugBucket& bucket, const mat4 &matrix);
     void renderDebugText(const std::vector<std::string> &strings);
-    void renderFill(FillBucket& bucket, const StyleLayer &layer_desc, const TileID& id, const mat4 &matrix);
-    void renderLine(LineBucket& bucket, const StyleLayer &layer_desc, const TileID& id, const mat4 &matrix);
-    void renderSymbol(SymbolBucket& bucket, const StyleLayer &layer_desc, const TileID& id, const mat4 &matrix);
-    void renderRaster(RasterBucket& bucket, const StyleLayer &layer_desc, const TileID& id, const mat4 &matrix);
+    void renderFill(FillBucket& bucket, const StyleLayer &layer_desc, const Tile& tile, const mat4 &matrix);
+    void renderLine(LineBucket& bucket, const StyleLayer &layer_desc, const Tile& tile, const mat4 &matrix);
+    void renderSymbol(SymbolBucket& bucket, const StyleLayer &layer_desc, const Tile& tile, const mat4 &matrix);
+    void renderRaster(RasterBucket& bucket, const StyleLayer &layer_desc, const Tile& tile, const mat4 &matrix);
     void renderBackground(const StyleLayer &layer_desc);
 
     float saturationFactor(float saturation);
@@ -134,13 +134,13 @@ public:
 private:
     void setupShaders();
     void deleteShaders();
-    mat4 translatedMatrix(const mat4& matrix, const std::array<float, 2> &translation, const TileID &id, TranslateAnchorType anchor);
+    mat4 translatedMatrix(const mat4& matrix, const std::array<float, 2> &translation, const Tile &tile, TranslateAnchorType anchor);
 
     void prepareTile(const Tile& tile);
 
     template <typename BucketProperties, typename StyleProperties>
     void renderSDF(SymbolBucket &bucket,
-                   const TileID &id,
+                   const Tile &tile,
                    const mat4 &matrixSymbol,
                    const BucketProperties& bucketProperties,
                    const StyleProperties& styleProperties,

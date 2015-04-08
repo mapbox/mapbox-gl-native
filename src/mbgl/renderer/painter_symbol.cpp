@@ -13,7 +13,7 @@ using namespace mbgl;
 
 template <typename BucketProperties, typename StyleProperties>
 void Painter::renderSDF(SymbolBucket &bucket,
-                        const TileID &id,
+                        const Tile &tile,
                         const mat4 &matrix,
                         const BucketProperties& bucketProperties,
                         const StyleProperties& styleProperties,
@@ -22,7 +22,7 @@ void Painter::renderSDF(SymbolBucket &bucket,
                         SDFShader& sdfShader,
                         void (SymbolBucket::*drawSDF)(SDFShader&))
 {
-    mat4 vtxMatrix = translatedMatrix(matrix, styleProperties.translate, id, styleProperties.translate_anchor);
+    mat4 vtxMatrix = translatedMatrix(matrix, styleProperties.translate, tile, styleProperties.translate_anchor);
 
     mat4 exMatrix;
     matrix::copy(exMatrix, projMatrix);
@@ -112,7 +112,7 @@ void Painter::renderSDF(SymbolBucket &bucket,
     }
 }
 
-void Painter::renderSymbol(SymbolBucket &bucket, const StyleLayer &layer_desc, const TileID &id, const mat4 &matrix) {
+void Painter::renderSymbol(SymbolBucket &bucket, const StyleLayer &layer_desc, const Tile &tile, const mat4 &matrix) {
     // Abort early.
     if (pass == RenderPass::Opaque) {
         return;
@@ -140,7 +140,7 @@ void Painter::renderSymbol(SymbolBucket &bucket, const StyleLayer &layer_desc, c
 
         if (sdf) {
             renderSDF(bucket,
-                      id,
+                      tile,
                       matrix,
                       layout.icon,
                       properties.icon,
@@ -149,7 +149,7 @@ void Painter::renderSymbol(SymbolBucket &bucket, const StyleLayer &layer_desc, c
                       *sdfIconShader,
                       &SymbolBucket::drawIcons);
         } else {
-            mat4 vtxMatrix = translatedMatrix(matrix, properties.icon.translate, id, properties.icon.translate_anchor);
+            mat4 vtxMatrix = translatedMatrix(matrix, properties.icon.translate, tile, properties.icon.translate_anchor);
 
             mat4 exMatrix;
             matrix::copy(exMatrix, projMatrix);
@@ -193,7 +193,7 @@ void Painter::renderSymbol(SymbolBucket &bucket, const StyleLayer &layer_desc, c
         glyphAtlas.bind();
 
         renderSDF(bucket,
-                  id,
+                  tile,
                   matrix,
                   layout.text,
                   properties.text,

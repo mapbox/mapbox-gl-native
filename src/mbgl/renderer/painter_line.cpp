@@ -10,7 +10,7 @@
 
 using namespace mbgl;
 
-void Painter::renderLine(LineBucket& bucket, const StyleLayer &layer_desc, const TileID& id, const mat4 &matrix) {
+void Painter::renderLine(LineBucket& bucket, const StyleLayer &layer_desc, const Tile& tile, const mat4 &matrix) {
     // Abort early.
     if (pass == RenderPass::Opaque) return;
     if (!bucket.hasData()) return;
@@ -47,7 +47,7 @@ void Painter::renderLine(LineBucket& bucket, const StyleLayer &layer_desc, const
     color[3] *= properties.opacity;
 
     float ratio = state.getPixelRatio();
-    mat4 vtxMatrix = translatedMatrix(matrix, properties.translate, id, properties.translateAnchor);
+    mat4 vtxMatrix = translatedMatrix(matrix, properties.translate, tile, properties.translateAnchor);
 
     depthRange(strata, 1.0f);
 
@@ -89,7 +89,7 @@ void Painter::renderLine(LineBucket& bucket, const StyleLayer &layer_desc, const
         LinePatternPos posB = lineAtlas.getDashPosition(properties.dash_array.to, layout.cap == CapType::Round);
         lineAtlas.bind();
 
-        float patternratio = std::pow(2.0, std::floor(std::log2(state.getScale())) - id.z) / 8.0;
+        float patternratio = std::pow(2.0, std::floor(std::log2(state.getScale())) - tile.id.z) / 8.0;
         float scaleXA = patternratio / posA.width / properties.dash_line_width / properties.dash_array.fromScale;
         float scaleYA = -posA.height / 2.0;
         float scaleXB = patternratio / posB.width / properties.dash_line_width / properties.dash_array.toScale;
@@ -109,7 +109,7 @@ void Painter::renderLine(LineBucket& bucket, const StyleLayer &layer_desc, const
         SpriteAtlasPosition imagePosA = spriteAtlas.getPosition(properties.image.from, true);
         SpriteAtlasPosition imagePosB = spriteAtlas.getPosition(properties.image.to, true);
 
-        float factor = 8.0 / std::pow(2, state.getIntegerZoom() - id.z);
+        float factor = 8.0 / std::pow(2, state.getIntegerZoom() - tile.id.z);
 
         useProgram(linepatternShader->program);
 

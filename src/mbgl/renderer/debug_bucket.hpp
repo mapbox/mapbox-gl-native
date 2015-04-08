@@ -19,7 +19,7 @@ class DebugBucket : public Bucket {
 public:
     DebugBucket(DebugFontBuffer& fontBuffer);
 
-    void render(Painter &painter, const StyleLayer &layer_desc, const TileID &id,
+    void render(Painter &painter, const StyleLayer &layer_desc, const Tile &tile,
                 const mat4 &matrix) override;
     bool hasData() const override;
 

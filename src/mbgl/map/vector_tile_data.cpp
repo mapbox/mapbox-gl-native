@@ -17,14 +17,16 @@ VectorTileData::VectorTileData(const TileID& id_,
                                GlyphStore& glyphStore_,
                                SpriteAtlas& spriteAtlas_,
                                util::ptr<Sprite> sprite_,
-                               const SourceInfo& source_)
+                               const SourceInfo& source_,
+                               const float overscaling_)
     : TileData(id_, source_),
       glyphAtlas(glyphAtlas_),
       glyphStore(glyphStore_),
       spriteAtlas(spriteAtlas_),
       sprite(sprite_),
       style(style_),
-      depth(id.z >= source.max_zoom ? mapMaxZoom - id.z : 1) {
+      depth(id.z >= source.max_zoom ? mapMaxZoom - id.z : 1),
+      overscaling(overscaling_) {
 }
 
 VectorTileData::~VectorTileData() {
@@ -63,12 +65,12 @@ void VectorTileData::parse() {
     }
 }
 
-void VectorTileData::render(Painter &painter, const StyleLayer &layer_desc, const mat4 &matrix) {
+void VectorTileData::render(Painter &painter, const StyleLayer &layer_desc, const mat4 &matrix, const Tile& tile) {
     if (state == State::parsed && layer_desc.bucket) {
         auto databucket_it = buckets.find(layer_desc.bucket->name);
         if (databucket_it != buckets.end()) {
             assert(databucket_it->second);
-            databucket_it->second->render(painter, layer_desc, id, matrix);
+            databucket_it->second->render(painter, layer_desc, tile, matrix);
         }
     }
 }

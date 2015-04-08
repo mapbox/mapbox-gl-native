@@ -11,12 +11,12 @@
 
 using namespace mbgl;
 
-void Painter::renderFill(FillBucket& bucket, const StyleLayer &layer_desc, const TileID& id, const mat4 &matrix) {
+void Painter::renderFill(FillBucket& bucket, const StyleLayer &layer_desc, const Tile& tile, const mat4 &matrix) {
     // Abort early.
     if (!bucket.hasData()) return;
 
     const FillProperties &properties = layer_desc.getProperties<FillProperties>();
-    mat4 vtxMatrix = translatedMatrix(matrix, properties.translate, id, properties.translateAnchor);
+    mat4 vtxMatrix = translatedMatrix(matrix, properties.translate, tile, properties.translateAnchor);
 
     Color fill_color = properties.fill_color;
     fill_color[0] *= properties.opacity;
@@ -63,7 +63,7 @@ void Painter::renderFill(FillBucket& bucket, const StyleLayer &layer_desc, const
 
             const SpriteAtlasPosition posA = spriteAtlas.getPosition(properties.image.from, true);
             const SpriteAtlasPosition posB = spriteAtlas.getPosition(properties.image.to, true);
-            float factor = 8.0 / std::pow(2, state.getIntegerZoom() - id.z);
+            float factor = (4096 / tile.tileSize) / std::pow(2, state.getIntegerZoom() - tile.id.z);
 
             mat3 patternMatrixA;
             matrix::identity(patternMatrixA);

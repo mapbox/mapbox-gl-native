@@ -28,10 +28,11 @@ struct ClipID {
 
 class Tile : private util::noncopyable {
 public:
-    explicit Tile(const TileID& id_)
-        : id(id_) {}
+    explicit Tile(const TileID& id_, const float tileSize_)
+        : id(id_), tileSize(tileSize_) {}
 
     const TileID id;
+    const float tileSize;
     ClipID clip;
     mat4 matrix;
     util::ptr<TileData> data;

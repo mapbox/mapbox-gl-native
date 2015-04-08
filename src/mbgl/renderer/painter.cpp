@@ -359,7 +359,7 @@ void Painter::renderTileLayer(const Tile& tile, const StyleLayer &layer_desc, co
     if (tile.data->hasData(layer_desc) || layer_desc.type == StyleLayerType::Raster) {
         gl::group group(std::string { "render " } + tile.data->name);
         prepareTile(tile);
-        tile.data->render(*this, layer_desc, matrix);
+        tile.data->render(*this, layer_desc, matrix, tile);
     }
 }
 
@@ -443,12 +443,12 @@ void Painter::renderBackground(const StyleLayer &layer_desc) {
     MBGL_CHECK_ERROR(glEnable(GL_STENCIL_TEST));
 }
 
-mat4 Painter::translatedMatrix(const mat4& matrix, const std::array<float, 2> &translation, const TileID &id, TranslateAnchorType anchor) {
+mat4 Painter::translatedMatrix(const mat4& matrix, const std::array<float, 2> &translation, const Tile &tile, TranslateAnchorType anchor) {
     if (translation[0] == 0 && translation[1] == 0) {
         return matrix;
     } else {
         // TODO: Get rid of the 8 (scaling from 4096 to tile size)
-        const double factor = ((double)(1 << id.z)) / state.getScale() * (4096.0 / util::tileSize);
+        const double factor = ((double)(1 << tile.id.z)) / state.getScale() * (4096.0 / tile.tileSize);
 
         mat4 vtxMatrix;
         if (anchor == TranslateAnchorType::Viewport) {
