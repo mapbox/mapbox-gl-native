@@ -19,6 +19,7 @@ const CGFloat MGLUserLocationAnnotationHaloSize = 110.0;
 @implementation MGLUserLocationAnnotationView
 {
     CALayer *_accuracyRingLayer;
+    CALayer *_headingIndicatorLayer;
     CALayer *_dotBorderLayer;
     CALayer *_dotLayer;
     
@@ -105,6 +106,28 @@ const CGFloat MGLUserLocationAnnotationHaloSize = 110.0;
             _accuracyRingLayer.allowsGroupOpacity = NO;
             
             [self.layer addSublayer:_accuracyRingLayer];
+        }
+        
+        // tinted heading indicator
+        //
+        if ( ! _headingIndicatorLayer && self.annotation.heading)
+        {
+            NSLog(@"_headingIndicatorLayer: %@", self.annotation.heading);
+            
+            CGFloat headingIndicatorSize = MGLUserLocationAnnotationHaloSize;
+            
+            _headingIndicatorLayer = [CALayer layer];
+            _headingIndicatorLayer.bounds = CGRectMake(0, 0, headingIndicatorSize, headingIndicatorSize);
+            _headingIndicatorLayer.position = CGPointMake(super.bounds.size.width / 2.0, super.bounds.size.height / 2.0);
+            _headingIndicatorLayer.shouldRasterize = YES;
+            _headingIndicatorLayer.rasterizationScale = [UIScreen mainScreen].scale;
+            _headingIndicatorLayer.drawsAsynchronously = YES;
+            
+            _headingIndicatorLayer.contents = [UIImage imageNamed:@"HeadingAngleMaskSmall"];
+            
+            _headingIndicatorLayer.opacity = 0.8;
+            
+            [self.layer addSublayer:_headingIndicatorLayer];
         }
         
         // expanding, fading, tinted outer layer
