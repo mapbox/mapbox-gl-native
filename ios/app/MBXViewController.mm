@@ -12,6 +12,8 @@ static UIColor *const kTintColor = [UIColor colorWithRed:0.120 green:0.550 blue:
 
 static NSArray *const kStyleNames = @[
     @"Emerald",
+    @"Mapbox Streets",
+    @"Light",
     @"Bright",
     @"Basic",
     @"Outdoors",
@@ -79,7 +81,7 @@ mbgl::Settings_NSUserDefaults *settings = nullptr;
                                                                             action:@selector(showSettings)];
 
     UIButton *titleButton = [UIButton buttonWithType:UIButtonTypeCustom];
-    [titleButton setFrame:CGRectMake(0, 0, 120, 40)];
+    [titleButton setFrame:CGRectMake(0, 0, 150, 40)];
     [titleButton setTitle:[kStyleNames firstObject] forState:UIControlStateNormal];
     [titleButton setTitleColor:kTintColor forState:UIControlStateNormal];
     [titleButton addTarget:self action:@selector(cycleStyles) forControlEvents:UIControlEventTouchUpInside];
@@ -245,7 +247,10 @@ mbgl::Settings_NSUserDefaults *settings = nullptr;
         styleName = [kStyleNames objectAtIndex:index];
     }
 
-    self.mapView.styleURL = [NSURL URLWithString:[NSString stringWithFormat:@"asset://styles/%@-v%@.json", styleName.lowercaseString, kStyleVersion]];
+    self.mapView.styleURL = [NSURL URLWithString:
+        [NSString stringWithFormat:@"asset://styles/%@-v%@.json",
+            [[styleName lowercaseString] stringByReplacingOccurrencesOfString:@" " withString:@"-"],
+            kStyleVersion]];
 
     [titleButton setTitle:styleName forState:UIControlStateNormal];
 }
