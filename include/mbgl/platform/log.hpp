@@ -4,6 +4,7 @@
 #include <mbgl/platform/event.hpp>
 
 #include <mbgl/util/std.hpp>
+#include <mbgl/util/noncopyable.hpp>
 
 #include <memory>
 #include <string>
@@ -12,7 +13,7 @@ namespace mbgl {
 
 class Log {
 public:
-    class Observer {
+    class Observer : private util::noncopyable {
     public:
         virtual ~Observer() = default;
 
@@ -22,6 +23,7 @@ public:
     };
 
     static void setObserver(std::unique_ptr<Observer> Observer);
+    static std::unique_ptr<Observer> removeObserver();
 
 private:
     template <typename T, size_t N>

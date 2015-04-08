@@ -38,6 +38,7 @@ private:
     void process(StopAction &action);
 
     void createDatabase();
+    void createSchema();
 
     const std::string path;
     uv_loop_t *loop = nullptr;
@@ -45,6 +46,7 @@ private:
     std::thread thread;
     std::unique_ptr<::mapbox::sqlite::Database> db;
     std::unique_ptr<::mapbox::sqlite::Statement> getStmt, putStmt, refreshStmt;
+    bool schema = false;
 };
 
 }

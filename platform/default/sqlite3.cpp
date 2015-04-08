@@ -76,10 +76,15 @@ Statement::Statement(sqlite3 *db, const char *sql) {
     }
 }
 
-#define CHECK_SQLITE_OK(err) \
+#define CHECK_SQLITE_OK_STMT(err, stmt) \
     if (err != SQLITE_OK) { \
         throw Exception { err, sqlite3_errmsg(sqlite3_db_handle(stmt)) }; \
     }
+
+#define CHECK_SQLITE_OK(err) \
+   if (err != SQLITE_OK) { \
+       throw Exception { err, sqlite3_errstr(err) }; \
+   }
 
 Statement::Statement(Statement &&other) {
     *this = std::move(other);
@@ -92,8 +97,7 @@ Statement &Statement::operator=(Statement &&other) {
 
 Statement::~Statement() {
     if (stmt) {
-        const int err = sqlite3_finalize(stmt);
-        CHECK_SQLITE_OK(err)
+        sqlite3_finalize(stmt);
     }
 }
 
@@ -101,38 +105,38 @@ Statement::operator bool() const {
     return stmt != nullptr;
 }
 
-#define BIND_3(type, value) \
+#define BIND_3(type, value, stmt) \
     assert(stmt); \
     const int err = sqlite3_bind_##type(stmt, offset, value); \
-    CHECK_SQLITE_OK(err)
+    CHECK_SQLITE_OK_STMT(err, stmt)
 
-#define BIND_5(type, value, length, param) \
+#define BIND_5(type, value, length, param, stmt) \
     assert(stmt); \
     const int err = sqlite3_bind_##type(stmt, offset, value, length, param); \
-    CHECK_SQLITE_OK(err)
+    CHECK_SQLITE_OK_STMT(err, stmt)
 
 template <> void Statement::bind(int offset, int value) {
-    BIND_3(int, value)
+    BIND_3(int, value, stmt)
 }
 
 template <> void Statement::bind(int offset, int64_t value) {
-    BIND_3(int64, value)
+    BIND_3(int64, value, stmt)
 }
 
 template <> void Statement::bind(int offset, double value) {
-    BIND_3(double, value)
+    BIND_3(double, value, stmt)
 }
 
 template <> void Statement::bind(int offset, bool value) {
-    BIND_3(int, value)
+    BIND_3(int, value, stmt)
 }
 
 template <> void Statement::bind(int offset, const char *value) {
-    BIND_5(text, value, -1, nullptr)
+    BIND_5(text, value, -1, nullptr, stmt)
 }
 
 void Statement::bind(int offset, const std::string &value, bool retain) {
-    BIND_5(blob, value.data(), int(value.size()), retain ? SQLITE_TRANSIENT : SQLITE_STATIC)
+    BIND_5(blob, value.data(), int(value.size()), retain ? SQLITE_TRANSIENT : SQLITE_STATIC, stmt)
 }
 
 bool Statement::run() {
@@ -143,7 +147,8 @@ bool Statement::run() {
     } else if (err == SQLITE_ROW) {
         return true;
     } else {
-        throw std::runtime_error("failed to run statement");
+        CHECK_SQLITE_OK_STMT(err, stmt)
+        return false;
     }
 }
 

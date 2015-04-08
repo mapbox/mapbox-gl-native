@@ -2,7 +2,6 @@
 #define MBGL_TEST_FIXTURE_LOG_OBSERVER
 
 #include <mbgl/platform/log.hpp>
-#include <mbgl/util/noncopyable.hpp>
 #include <mbgl/util/optional.hpp>
 
 #include <vector>
@@ -11,10 +10,11 @@
 
 namespace mbgl {
 
-class FixtureLogObserver : public Log::Observer, private util::noncopyable {
+class FixtureLogObserver : public Log::Observer {
 public:
     struct LogMessage {
         LogMessage(EventSeverity severity_, Event event_, int64_t code_, const std::string &msg_);
+        LogMessage();
 
         bool operator==(const LogMessage &rhs) const;
 
