@@ -8,7 +8,7 @@
 #include <mbgl/storage/response.hpp>
 #include <mbgl/util/io.hpp>
 
-#include <sys/file.h>
+#include <sqlite3.h>
 
 class ScopedTest {
 public:
@@ -96,31 +96,40 @@ TEST_F(Storage, DatabaseCreate) {
 class FileLock {
 public:
     FileLock(const std::string& path) {
-        fd = open(path.c_str(), O_RDONLY | O_NOCTTY | O_CREAT, 0666);
-        if (fd <= 0) {
-            throw std::runtime_error("Could not open file");
+        const int err = sqlite3_open_v2(path.c_str(), &db, SQLITE_OPEN_CREATE | SQLITE_OPEN_READWRITE, nullptr);
+        if (err != SQLITE_OK) {
+            throw std::runtime_error("Could not open db");
         }
         lock();
     }
 
     void lock() {
-        if (0 != flock(fd, LOCK_EX)) {
-            throw std::runtime_error("Could not lock file");
+        assert(!locked);
+        const int err = sqlite3_exec(db, "begin exclusive transaction", nullptr, nullptr, nullptr);
+        if (err != SQLITE_OK) {
+            throw std::runtime_error("Could not lock db");
         }
+        locked = true;
     }
 
     void unlock() {
-        if (0 != flock(fd, LOCK_UN)) {
-            throw std::runtime_error("Could not unlock file");
+        assert(locked);
+        const int err = sqlite3_exec(db, "commit", nullptr, nullptr, nullptr);
+        if (err != SQLITE_OK) {
+            throw std::runtime_error("Could not unlock db");
         }
+        locked = false;
     }
 
     ~FileLock() {
-        unlock();
+        if (locked) {
+            unlock();
+        }
     }
 
 private:
-    int fd;
+    sqlite3* db;
+    bool locked = false;
 };
 
 TEST_F(Storage, DatabaseLockedRead) {
