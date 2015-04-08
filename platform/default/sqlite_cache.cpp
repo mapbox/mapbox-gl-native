@@ -6,6 +6,7 @@
 #include <mbgl/util/async_queue.hpp>
 #include <mbgl/util/variant.hpp>
 #include <mbgl/util/compression.hpp>
+#include <mbgl/util/io.hpp>
 #include <mbgl/platform/log.hpp>
 
 #include "sqlite3.hpp"
@@ -169,8 +170,20 @@ void SQLiteCache::createSchema() {
     try {
         db->exec(sql);
         schema = true;
-    } catch(mapbox::sqlite::Exception &ex) {
-        Log::Error(Event::Database, ex.code, ex.what());
+    } catch (mapbox::sqlite::Exception &ex) {
+
+        if (ex.code == SQLITE_NOTADB) {
+            Log::Warning(Event::Database, "Trashing invalid database");
+            db.reset();
+            try {
+                util::deleteFile(path);
+            } catch (util::IOException& ioEx) {
+                Log::Error(Event::Database, ex.code, ex.what());
+            }
+            db = util::make_unique<Database>(path.c_str(), ReadWrite | Create);
+        } else {
+            Log::Error(Event::Database, ex.code, ex.what());
+        }
 
         // Creating the database table + index failed. That means there may already be one, likely
         // with different columsn. Drop it and try to create a new one.
@@ -269,7 +282,7 @@ void SQLiteCache::process(PutAction &action) {
         putStmt->run();
     } catch (mapbox::sqlite::Exception& ex) {
         Log::Error(Event::Database, ex.code, ex.what());
-    }
+        }
 }
 
 void SQLiteCache::process(RefreshAction &action) {

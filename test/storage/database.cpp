@@ -6,8 +6,9 @@
 #include <mbgl/storage/default/sqlite_cache.hpp>
 #include <mbgl/storage/resource.hpp>
 #include <mbgl/storage/response.hpp>
+#include <mbgl/util/io.hpp>
 
-#include <fcntl.h>
+#include <sys/file.h>
 
 class ScopedTest {
 public:
@@ -65,6 +66,12 @@ void deleteFile(const char* name) {
         ASSERT_EQ(0, ret);
     }
 }
+
+
+void writeFile(const char* name, const std::string& data) {
+    mbgl::util::write_file(name, data);
+}
+
 
 TEST_F(Storage, DatabaseCreate) {
     using namespace mbgl;
@@ -331,6 +338,43 @@ TEST_F(Storage, DatabaseDeleted) {
         auto observer = Log::removeObserver();
         auto flo = dynamic_cast<FixtureLogObserver*>(observer.get());
         EXPECT_EQ(1ul, flo->count({ EventSeverity::Error, Event::Database, 8, "attempt to write a readonly database" }));
+    }
+
+    // Explicitly delete the Cache now.
+    cache.reset();
+}
+
+
+
+TEST_F(Storage, DatabaseInvalid) {
+    using namespace mbgl;
+
+    // Create a locked file.
+    createDir("test/fixtures/database");
+    deleteFile("test/fixtures/database/invalid.db");
+    writeFile("test/fixtures/database/invalid.db", "this is an invalid file");
+
+    auto cache = util::make_unique<SQLiteCache>("test/fixtures/database/invalid.db");
+
+    std::promise<void> promise;
+
+    {
+        // Adds a file.
+        Log::setObserver(util::make_unique<FixtureLogObserver>());
+        promise = {};
+        auto response = std::make_shared<Response>();
+        response->data = "Demo";
+        cache->put({ Resource::Unknown, "mapbox://test" }, response, FileCache::Hint::Full);
+        cache->get({ Resource::Unknown, "mapbox://test" }, [&] (std::unique_ptr<Response> res) {
+            EXPECT_NE(nullptr, res.get());
+            EXPECT_EQ("Demo", res->data);
+            promise.set_value();
+        });
+        promise.get_future().get();
+
+        auto observer = Log::removeObserver();
+        auto flo = dynamic_cast<FixtureLogObserver*>(observer.get());
+        EXPECT_EQ(1ul, flo->count({ EventSeverity::Warning, Event::Database, -1, "Trashing invalid database" }));
     }
 
     // Explicitly delete the Cache now.
