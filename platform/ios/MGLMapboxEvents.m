@@ -71,6 +71,11 @@ NSString *const MGLEventGestureRotateStart = @"Rotation";
 @property (atomic) NSDateFormatter *rfc3339DateFormatter;
 @property (atomic) CGFloat scale;
 
+
+// The isPaused state tracker is only ever accessed from the main thread.
+//
+@property (nonatomic) BOOL isPaused;
+
 // The timer is only ever accessed from the main thread.
 //
 @property (nonatomic) NSTimer *timer;
@@ -168,6 +173,8 @@ NSString *const MGLEventGestureRotateStart = @"Rotation";
         // Clear Any System TimeZone Cache
         [NSTimeZone resetSystemTimeZone];
         [_rfc3339DateFormatter setTimeZone:[NSTimeZone systemTimeZone]];
+        
+        _isPaused = NO;
     }
     return self;
 }
@@ -219,6 +226,28 @@ NSString *const MGLEventGestureRotateStart = @"Rotation";
     [MGLMapboxEvents sharedManager].appVersion = appVersion;
 }
 
+// Must be called from the main thread.
+//
++ (void) pauseMetricsCollection {
+    assert([[NSThread currentThread] isMainThread]);
+    if ([MGLMapboxEvents sharedManager].isPaused) {
+        return;
+    }
+    [MGLMapboxEvents sharedManager].isPaused = YES;
+    [MGLMetricsLocationManager stopUpdatingLocation];
+}
+
+// Must be called from the main thread.
+//
++ (void) resumeMetricsCollection {
+    assert([[NSThread currentThread] isMainThread]);
+    if (![MGLMapboxEvents sharedManager].isPaused) {
+        return;
+    }
+    [MGLMapboxEvents sharedManager].isPaused = NO;
+    [MGLMetricsLocationManager startUpdatingLocation];
+}
+
 // Can be called from any thread. Can be called rapidly from
 // the UI thread, so performance is paramount.
 //
@@ -244,6 +273,11 @@ NSString *const MGLEventGestureRotateStart = @"Rotation";
         // Add Metrics Disabled App Wide Check
         if ([[NSUserDefaults standardUserDefaults] objectForKey:@"mapbox_metrics_disabled"] != nil) {
             [_eventQueue removeAllObjects];
+            return;
+        }
+        
+        // Metrics Collection Has Been Paused
+        if (_isPaused) {
             return;
         }
         
