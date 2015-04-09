@@ -11,7 +11,6 @@ class LiveTileData : public VectorTileData {
 public:
     LiveTileData(const TileID&,
                  AnnotationManager&,
-                 float mapMaxZoom,
                  util::ptr<Style>,
                  GlyphAtlas&,
                  GlyphStore&,

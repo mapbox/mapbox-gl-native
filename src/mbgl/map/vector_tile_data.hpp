@@ -31,7 +31,6 @@ class VectorTileData : public TileData {
 
 public:
     VectorTileData(const TileID&,
-                   float mapMaxZoom,
                    util::ptr<Style>,
                    GlyphAtlas&,
                    GlyphStore&,
@@ -65,7 +64,6 @@ protected:
     util::ptr<Style> style;
 
 public:
-    const float depth;
     const float overscaling;
 };
 

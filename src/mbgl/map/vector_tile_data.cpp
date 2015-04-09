@@ -11,7 +11,6 @@
 using namespace mbgl;
 
 VectorTileData::VectorTileData(const TileID& id_,
-                               float mapMaxZoom,
                                util::ptr<Style> style_,
                                GlyphAtlas& glyphAtlas_,
                                GlyphStore& glyphStore_,
@@ -25,7 +24,6 @@ VectorTileData::VectorTileData(const TileID& id_,
       spriteAtlas(spriteAtlas_),
       sprite(sprite_),
       style(style_),
-      depth(id.z >= source.max_zoom ? mapMaxZoom - id.z : 1),
       overscaling(overscaling_) {
 }
 

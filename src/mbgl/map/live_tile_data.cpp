@@ -10,7 +10,6 @@ using namespace mbgl;
 
 LiveTileData::LiveTileData(const TileID& id_,
                            AnnotationManager& annotationManager_,
-                           float mapMaxZoom,
                            util::ptr<Style> style_,
                            GlyphAtlas& glyphAtlas_,
                            GlyphStore& glyphStore_,
@@ -18,7 +17,7 @@ LiveTileData::LiveTileData(const TileID& id_,
                            util::ptr<Sprite> sprite_,
                            const SourceInfo& source_,
                            const float overscaling_)
-    : VectorTileData::VectorTileData(id_, mapMaxZoom, style_, glyphAtlas_, glyphStore_,
+    : VectorTileData::VectorTileData(id_, style_, glyphAtlas_, glyphStore_,
                                      spriteAtlas_, sprite_, source_, overscaling_),
       annotationManager(annotationManager_) {
     // live features are always ready

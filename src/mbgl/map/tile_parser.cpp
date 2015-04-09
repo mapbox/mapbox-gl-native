@@ -42,7 +42,7 @@ TileParser::TileParser(const GeometryTile& geometryTile_,
       glyphStore(glyphStore_),
       spriteAtlas(spriteAtlas_),
       sprite(sprite_),
-      collision(util::make_unique<Collision>(tile.id.z, 4096, tile.source.tile_size, tile.depth)) {
+      collision(util::make_unique<Collision>(tile.id.z, 4096, tile.source.tile_size, 1)) {
     assert(style);
     assert(sprite);
     assert(collision);

@@ -249,7 +249,7 @@ TileData::State Source::addTile(Map &map, uv::worker &worker,
         // If we don't find working tile data, we're just going to load it.
         if (info.type == SourceType::Vector) {
             new_tile.data =
-                std::make_shared<VectorTileData>(normalized_id, map.getMaxZoom(), style, glyphAtlas,
+                std::make_shared<VectorTileData>(normalized_id, style, glyphAtlas,
                                                  glyphStore, spriteAtlas, sprite, info, overscaling);
             new_tile.data->request(worker, map.getState().getPixelRatio(), callback);
         } else if (info.type == SourceType::Raster) {
@@ -258,7 +258,7 @@ TileData::State Source::addTile(Map &map, uv::worker &worker,
         } else if (info.type == SourceType::Annotations) {
             AnnotationManager& annotationManager = map.getAnnotationManager();
             new_tile.data = std::make_shared<LiveTileData>(normalized_id, annotationManager,
-                                                           map.getMaxZoom(), style, glyphAtlas,
+                                                           style, glyphAtlas,
                                                            glyphStore, spriteAtlas, sprite, info, overscaling);
             new_tile.data->reparse(worker, callback);
         } else {
