@@ -6,7 +6,7 @@
 #import "MGLMapView.h"
 
 const CGFloat MGLUserLocationAnnotationDotSize = 24.0;
-const CGFloat MGLUserLocationAnnotationHaloSize = 110.0;
+const CGFloat MGLUserLocationAnnotationHaloSize = 115.0;
 
 @interface MGLUserLocationAnnotationView ()
 
@@ -23,6 +23,7 @@ const CGFloat MGLUserLocationAnnotationHaloSize = 110.0;
     CALayer *_dotBorderLayer;
     CALayer *_dotLayer;
     
+    double oldHeadingAccuracy;
     CLLocationAccuracy oldHorizontalAccuracy;
     double oldZoom;
 }
@@ -66,13 +67,48 @@ const CGFloat MGLUserLocationAnnotationHaloSize = 110.0;
 {
     if (CLLocationCoordinate2DIsValid(self.annotation.coordinate))
     {
+        if (_headingIndicatorLayer)
+        {
+            // TODO: Investigate alternative ways to determine this
+            _headingIndicatorLayer.hidden = (_mapView.userTrackingMode == MGLUserTrackingModeFollowWithHeading) ? NO : YES;
+            
+            if (oldHeadingAccuracy != self.annotation.heading.headingAccuracy)
+            {
+                //_headingIndicatorLayer.contents = (id)[self headingIndicatorImageForAccuracy].CGImage;
+                oldHeadingAccuracy = self.annotation.heading.headingAccuracy;
+            }
+        }
+        
+        // tinted heading indicator
+        //
+        if ( ! _headingIndicatorLayer && self.annotation.heading)
+        {
+            CGFloat headingIndicatorSize = MGLUserLocationAnnotationHaloSize;
+            
+            _headingIndicatorLayer = [CALayer layer];
+            _headingIndicatorLayer.bounds = CGRectMake(0, 0, headingIndicatorSize, headingIndicatorSize);
+            _headingIndicatorLayer.position = CGPointMake(super.bounds.size.width / 2.0, super.bounds.size.height / 2.0);
+            //_headingIndicatorLayer.contents = (id)[self headingIndicatorImageForAccuracy].CGImage;
+            _headingIndicatorLayer.contents = (id)[self headingIndicatorImage].CGImage;
+            _headingIndicatorLayer.contentsGravity = kCAGravityBottom;
+            _headingIndicatorLayer.contentsScale = [UIScreen mainScreen].scale;
+            _headingIndicatorLayer.opacity = 0.4;
+            
+            _headingIndicatorLayer.shouldRasterize = YES;
+            _headingIndicatorLayer.rasterizationScale = [UIScreen mainScreen].scale;
+            _headingIndicatorLayer.drawsAsynchronously = YES;
+            
+            [self.layer insertSublayer:_headingIndicatorLayer below:_dotBorderLayer];
+        }
+        
         // update accuracy ring
         //
         if (_accuracyRingLayer)
         {
+            // FIX: This stops EVERYTHING... and that isn't necessarily necessary, now is it?
             if (oldZoom == self.mapView.zoomLevel && oldHorizontalAccuracy == self.annotation.location.horizontalAccuracy)
                 return;
-
+            
             CGFloat accuracyRingSize = [self calculateAccuracyRingSize];
             
             // only show the accuracy ring if it won't be obscured by the location dot
@@ -117,28 +153,6 @@ const CGFloat MGLUserLocationAnnotationHaloSize = 110.0;
             _accuracyRingLayer.allowsGroupOpacity = NO;
             
             [self.layer addSublayer:_accuracyRingLayer];
-        }
-        
-        // tinted heading indicator
-        //
-        if ( ! _headingIndicatorLayer && self.annotation.heading)
-        {
-            NSLog(@"_headingIndicatorLayer: %@", self.annotation.heading);
-            
-            CGFloat headingIndicatorSize = MGLUserLocationAnnotationHaloSize;
-            
-            _headingIndicatorLayer = [CALayer layer];
-            _headingIndicatorLayer.bounds = CGRectMake(0, 0, headingIndicatorSize, headingIndicatorSize);
-            _headingIndicatorLayer.position = CGPointMake(super.bounds.size.width / 2.0, super.bounds.size.height / 2.0);
-            _headingIndicatorLayer.shouldRasterize = YES;
-            _headingIndicatorLayer.rasterizationScale = [UIScreen mainScreen].scale;
-            _headingIndicatorLayer.drawsAsynchronously = YES;
-            
-            _headingIndicatorLayer.contents = [UIImage imageNamed:@"HeadingAngleMaskSmall"];
-            
-            _headingIndicatorLayer.opacity = 0.8;
-            
-            [self.layer addSublayer:_headingIndicatorLayer];
         }
         
         // expanding, fading, tinted outer layer
@@ -250,6 +264,96 @@ const CGFloat MGLUserLocationAnnotationHaloSize = 110.0;
     CGFloat pixelRadius = self.annotation.location.horizontalAccuracy / cos(latRadians) / [self.mapView metersPerPixelAtLatitude:self.annotation.coordinate.latitude];
     
     return pixelRadius * 2;
+}
+
+/*- (UIImage *)headingIndicatorImageForAccuracy
+{
+    NSString *fileName = @"HeadingAngleMask";
+    
+    double accuracy = self.annotation.heading.headingAccuracy;
+    
+    if (accuracy <=  10)
+    {
+        fileName = [fileName stringByAppendingString:@"Small"];
+    }
+    else if (accuracy <= 20)
+    {
+        fileName = [fileName stringByAppendingString:@"Medium"];
+    }
+    else
+    {
+        fileName = [fileName stringByAppendingString:@"Large"];
+    }
+    
+    NSLog(@"headingIndicatorImageForAccuracy: %f %@", accuracy, fileName);
+    
+    NSString *resourceBundlePath = [[NSBundle bundleForClass:[MGLMapView class]] pathForResource:@"MapboxGL" ofType:@"bundle"];
+    if ( ! resourceBundlePath) resourceBundlePath = [[NSBundle mainBundle] bundlePath];
+
+    NSString *path = [[NSBundle bundleWithPath:resourceBundlePath] pathForResource:fileName ofType:@"png" inDirectory:@""];
+        
+    NSAssert(path, @"%@ not found in application", fileName);
+        
+    return [UIImage imageWithContentsOfFile:path];
+}*/
+
+- (UIImage *)headingIndicatorImage
+{
+    UIImage *image;
+
+    CGFloat halfHalo = MGLUserLocationAnnotationHaloSize / 2.0;
+    
+    UIGraphicsBeginImageContextWithOptions(CGSizeMake(MGLUserLocationAnnotationHaloSize, halfHalo), NO, 0);
+    
+    CGColorSpaceRef colorSpace = CGColorSpaceCreateDeviceRGB();
+    CGContextRef context = UIGraphicsGetCurrentContext();
+    
+    // TODO: Hook this up to our actual accuracy
+    UIBezierPath *ovalPath = [self headingIndicatorClippingMaskForAccuracy:10.0];
+    
+    // gradient from the tint color to no-alpha tint color
+    //
+    CGFloat gradientLocations[] = {0.0, 1.0};
+    CGGradientRef gradient = CGGradientCreateWithColors(
+      colorSpace, (__bridge CFArrayRef)@[(id)[_mapView.tintColor CGColor],
+                                         (id)[[_mapView.tintColor colorWithAlphaComponent:0] CGColor]], gradientLocations);
+    
+    CGContextDrawRadialGradient(context, gradient,
+                                CGPointMake(halfHalo, halfHalo), 0.0,
+                                CGPointMake(halfHalo, halfHalo), halfHalo,
+                                kCGGradientDrawsBeforeStartLocation | kCGGradientDrawsAfterEndLocation);
+
+    // export and cleanup
+    //
+    image = UIGraphicsGetImageFromCurrentImageContext();
+    UIGraphicsEndImageContext();
+
+    CGGradientRelease(gradient);
+    CGColorSpaceRelease(colorSpace);
+    
+    return image;
+}
+
+- (UIBezierPath *)headingIndicatorClippingMaskForAccuracy:(CGFloat)accuracy
+{
+    CGFloat clippingDegrees = 60.0 - accuracy;
+    
+    CGRect ovalRect = CGRectMake(0, 0, MGLUserLocationAnnotationHaloSize, MGLUserLocationAnnotationHaloSize);
+    UIBezierPath *ovalPath = UIBezierPath.bezierPath;
+    
+    // clip the oval to ± incoming accuracy degrees, from the top
+    //
+    [ovalPath addArcWithCenter:CGPointMake(CGRectGetMidX(ovalRect), CGRectGetMidY(ovalRect))
+                        radius:CGRectGetWidth(ovalRect) / 2.0
+                    startAngle:(-180 + clippingDegrees) * M_PI / 180
+                      endAngle:-clippingDegrees * M_PI / 180
+                     clockwise:YES];
+    [ovalPath addLineToPoint:CGPointMake(CGRectGetMidX(ovalRect), CGRectGetMidY(ovalRect))];
+    [ovalPath closePath];
+    
+    [ovalPath addClip];
+    
+    return ovalPath;
 }
 
 @end
