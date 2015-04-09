@@ -146,8 +146,8 @@ Placement Placement::getIcon(Anchor &anchor, const Rect<uint16_t> &image, float 
 
     float angle = layout.icon.rotate * M_PI / 180.0f;
     if (anchor.segment >= 0 && layout.icon.rotation_alignment != RotationAlignmentType::Viewport) {
-        const Coordinate &next = line[anchor.segment];
-        angle += -std::atan2(next.x - anchor.x, next.y - anchor.y) + M_PI / 2;
+        const Coordinate &prev = line[anchor.segment];
+        angle += std::atan2(anchor.y - prev.y, anchor.x - prev.x);
     }
 
     if (angle) {
