@@ -20,9 +20,7 @@ TileData::TileData(const TileID& id_, const SourceInfo& source_)
 }
 
 TileData::~TileData() {
-    if (req) {
-        env.cancelRequest(req);
-    }
+    cancel();
 }
 
 const std::string TileData::toString() const {
@@ -33,28 +31,19 @@ void TileData::request(uv::worker &worker, float pixelRatio, std::function<void(
     std::string url = source.tileURL(id, pixelRatio);
     state = State::loading;
 
-    std::weak_ptr<TileData> weak_tile = shared_from_this();
-    req = env.request({ Resource::Kind::Tile, url }, [weak_tile, url, callback, &worker](const Response &res) {
-        util::ptr<TileData> tile = weak_tile.lock();
-        if (!tile || tile->state == State::obsolete) {
-            // noop. Tile is obsolete and we're now just waiting for the refcount
-            // to drop to zero for destruction.
+    req = env.request({ Resource::Kind::Tile, url }, [url, callback, &worker, this](const Response &res) {
+        req = nullptr;
+
+        if (res.status != Response::Successful) {
+            Log::Error(Event::HttpRequest, "[%s] tile loading failed: %s", url.c_str(), res.message.c_str());
             return;
         }
 
-        // Clear the request object.
-        tile->req = nullptr;
+        state = State::loaded;
+        data = res.data;
 
-        if (res.status == Response::Successful) {
-            tile->state = State::loaded;
-
-            tile->data = res.data;
-
-            // Schedule tile parsing in another thread
-            tile->reparse(worker, callback);
-        } else {
-            Log::Error(Event::HttpRequest, "[%s] tile loading failed: %s", url.c_str(), res.message.c_str());
-        }
+        // Schedule tile parsing in another thread
+        reparse(worker, callback);
     });
 }
 
