@@ -51,7 +51,7 @@ const CGFloat MGLUserLocationAnnotationHaloSize = 115.0;
     _haloLayer.backgroundColor = [tintColor CGColor];
     _dotLayer.backgroundColor = [tintColor CGColor];
     
-    // TODO: Add heading indicatory tint updating
+    // TODO: Add heading indicator tint updating
 }
 
 - (void)setupLayers
@@ -65,7 +65,7 @@ const CGFloat MGLUserLocationAnnotationHaloSize = 115.0;
             
             if (oldHeadingAccuracy != self.annotation.heading.headingAccuracy)
             {
-                // TODO: add add accuracy updating
+                // TODO: add accuracy updating
                 oldHeadingAccuracy = self.annotation.heading.headingAccuracy;
             }
         }
