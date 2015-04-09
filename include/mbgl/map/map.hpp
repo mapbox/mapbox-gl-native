@@ -7,7 +7,6 @@
 #include <mbgl/util/geo.hpp>
 #include <mbgl/util/projection.hpp>
 #include <mbgl/util/noncopyable.hpp>
-#include <mbgl/util/uv.hpp>
 #include <mbgl/util/ptr.hpp>
 #include <mbgl/util/vec.hpp>
 
@@ -21,6 +20,8 @@
 #include <mutex>
 #include <condition_variable>
 #include <functional>
+
+namespace uv { class async; }
 
 namespace mbgl {
 
