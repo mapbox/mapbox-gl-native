@@ -6,9 +6,11 @@
 #include <mbgl/util/async_queue.hpp>
 #include <mbgl/util/variant.hpp>
 #include <mbgl/util/compression.hpp>
+#include <mbgl/util/io.hpp>
 #include <mbgl/platform/log.hpp>
 
 #include "sqlite3.hpp"
+#include <sqlite3.h>
 
 #include <uv.h>
 
@@ -88,10 +90,10 @@ struct SQLiteCache::ActionDispatcher {
     template <typename T> void operator()(T &t) { cache.process(t); }
 };
 
-SQLiteCache::SQLiteCache(const std::string &path_)
+SQLiteCache::SQLiteCache(const std::string& path_)
     : path(path_),
       loop(uv_loop_new()),
-      queue(new Queue(loop, [this](Action &action) {
+      queue(new Queue(loop, [this](Action& action) {
           mapbox::util::apply_visitor(ActionDispatcher{ *this }, action);
       })),
       thread([this]() {
@@ -99,8 +101,16 @@ SQLiteCache::SQLiteCache(const std::string &path_)
           pthread_setname_np("SQLite Cache");
 #endif
           uv_run(loop, UV_RUN_DEFAULT);
-      })
-{
+
+          try {
+              getStmt.reset();
+              putStmt.reset();
+              refreshStmt.reset();
+              db.reset();
+          } catch (mapbox::sqlite::Exception& ex) {
+              Log::Error(Event::Database, ex.code, ex.what());
+          }
+      }) {
 }
 
 SQLiteCache::~SQLiteCache() {
@@ -140,6 +150,10 @@ void SQLiteCache::put(const Resource &resource, std::shared_ptr<const Response> 
 void SQLiteCache::createDatabase() {
     db = util::make_unique<Database>(path.c_str(), ReadWrite | Create);
 
+    createSchema();
+}
+
+void SQLiteCache::createSchema() {
     constexpr const char *const sql = ""
         "CREATE TABLE IF NOT EXISTS `http_cache` ("
         "    `url` TEXT PRIMARY KEY NOT NULL,"
@@ -155,111 +169,146 @@ void SQLiteCache::createDatabase() {
 
     try {
         db->exec(sql);
-    } catch(mapbox::sqlite::Exception &) {
+        schema = true;
+    } catch (mapbox::sqlite::Exception &ex) {
+
+        if (ex.code == SQLITE_NOTADB) {
+            Log::Warning(Event::Database, "Trashing invalid database");
+            db.reset();
+            try {
+                util::deleteFile(path);
+            } catch (util::IOException& ioEx) {
+                Log::Error(Event::Database, ex.code, ex.what());
+            }
+            db = util::make_unique<Database>(path.c_str(), ReadWrite | Create);
+        } else {
+            Log::Error(Event::Database, ex.code, ex.what());
+        }
+
         // Creating the database table + index failed. That means there may already be one, likely
         // with different columsn. Drop it and try to create a new one.
-        try {
-            db->exec("DROP TABLE IF EXISTS `http_cache`");
-            db->exec(sql);
-        } catch (mapbox::sqlite::Exception &ex) {
-            Log::Error(Event::Database, "Failed to create database: %s", ex.what());
-            db.reset();
-        }
+        db->exec("DROP TABLE IF EXISTS `http_cache`");
+        db->exec(sql);
     }
 }
 
 void SQLiteCache::process(GetAction &action) {
-    // This is called in the SQLite event loop.
-    if (!db) {
-        createDatabase();
-    }
-
-    if (!getStmt) {
-        // Initialize the statement                                   0         1
-        getStmt = util::make_unique<Statement>(db->prepare("SELECT `status`, `modified`, "
-        //     2         3        4          5                                       1
-            "`etag`, `expires`, `data`, `compressed` FROM `http_cache` WHERE `url` = ?"));
-    } else {
-        getStmt->reset();
-    }
-
-    const std::string unifiedURL = unifyMapboxURLs(action.resource.url);
-    getStmt->bind(1, unifiedURL.c_str());
-    if (getStmt->run()) {
-        // There is data.
-        auto response = util::make_unique<Response>();
-        response->status = Response::Status(getStmt->get<int>(0));
-        response->modified = getStmt->get<int64_t>(1);
-        response->etag = getStmt->get<std::string>(2);
-        response->expires = getStmt->get<int64_t>(3);
-        response->data = getStmt->get<std::string>(4);
-        if (getStmt->get<int>(5)) { // == compressed
-            response->data = util::decompress(response->data);
+    try {
+        // This is called in the SQLite event loop.
+        if (!db) {
+            createDatabase();
         }
-        action.callback(std::move(response));
-    } else {
-        // There is no data.
+
+        if (!schema) {
+            createSchema();
+        }
+
+        if (!getStmt) {
+            // Initialize the statement                                   0         1
+            getStmt = util::make_unique<Statement>(db->prepare("SELECT `status`, `modified`, "
+            //     2         3        4          5                                       1
+                "`etag`, `expires`, `data`, `compressed` FROM `http_cache` WHERE `url` = ?"));
+        } else {
+            getStmt->reset();
+        }
+
+        const std::string unifiedURL = unifyMapboxURLs(action.resource.url);
+        getStmt->bind(1, unifiedURL.c_str());
+        if (getStmt->run()) {
+            // There is data.
+            auto response = util::make_unique<Response>();
+            response->status = Response::Status(getStmt->get<int>(0));
+            response->modified = getStmt->get<int64_t>(1);
+            response->etag = getStmt->get<std::string>(2);
+            response->expires = getStmt->get<int64_t>(3);
+            response->data = getStmt->get<std::string>(4);
+            if (getStmt->get<int>(5)) { // == compressed
+                response->data = util::decompress(response->data);
+            }
+            action.callback(std::move(response));
+        } else {
+            // There is no data.
+            action.callback(nullptr);
+        }
+    } catch (mapbox::sqlite::Exception& ex) {
+        Log::Error(Event::Database, ex.code, ex.what());
         action.callback(nullptr);
     }
 }
 
 void SQLiteCache::process(PutAction &action) {
-    if (!db) {
-        createDatabase();
-    }
+    try {
+        if (!db) {
+            createDatabase();
+        }
 
-    if (!putStmt) {
-        putStmt = util::make_unique<Statement>(db->prepare("REPLACE INTO `http_cache` ("
-        //     1       2       3         4         5         6        7          8
-            "`url`, `status`, `kind`, `modified`, `etag`, `expires`, `data`, `compressed`"
-            ") VALUES(?, ?, ?, ?, ?, ?, ?, ?)"));
-    } else {
-        putStmt->reset();
-    }
+        if (!schema) {
+            createSchema();
+        }
 
-    const std::string unifiedURL = unifyMapboxURLs(action.resource.url);
-    putStmt->bind(1 /* url */, unifiedURL.c_str());
-    putStmt->bind(2 /* status */, int(action.response->status));
-    putStmt->bind(3 /* kind */, int(action.resource.kind));
-    putStmt->bind(4 /* modified */, action.response->modified);
-    putStmt->bind(5 /* etag */, action.response->etag.c_str());
-    putStmt->bind(6 /* expires */, action.response->expires);
+        if (!putStmt) {
+            putStmt = util::make_unique<Statement>(db->prepare("REPLACE INTO `http_cache` ("
+            //     1       2       3         4         5         6        7          8
+                "`url`, `status`, `kind`, `modified`, `etag`, `expires`, `data`, `compressed`"
+                ") VALUES(?, ?, ?, ?, ?, ?, ?, ?)"));
+        } else {
+            putStmt->reset();
+        }
 
-    std::string data;
-    if (action.resource.kind != Resource::Image) {
-        // Do not compress images, since they are typically compressed already.
-        data = util::compress(action.response->data);
-    }
+        const std::string unifiedURL = unifyMapboxURLs(action.resource.url);
+        putStmt->bind(1 /* url */, unifiedURL.c_str());
+        putStmt->bind(2 /* status */, int(action.response->status));
+        putStmt->bind(3 /* kind */, int(action.resource.kind));
+        putStmt->bind(4 /* modified */, action.response->modified);
+        putStmt->bind(5 /* etag */, action.response->etag.c_str());
+        putStmt->bind(6 /* expires */, action.response->expires);
 
-    if (!data.empty() && data.size() < action.response->data.size()) {
-        // Store the compressed data when it is smaller than the original
-        // uncompressed data.
-        putStmt->bind(7 /* data */, data, false); // do not retain the string internally.
-        putStmt->bind(8 /* compressed */, true);
-    } else {
-        putStmt->bind(7 /* data */, action.response->data, false); // do not retain the string internally.
-        putStmt->bind(8 /* compressed */, false);
-    }
+        std::string data;
+        if (action.resource.kind != Resource::Image) {
+            // Do not compress images, since they are typically compressed already.
+            data = util::compress(action.response->data);
+        }
 
-    putStmt->run();
+        if (!data.empty() && data.size() < action.response->data.size()) {
+            // Store the compressed data when it is smaller than the original
+            // uncompressed data.
+            putStmt->bind(7 /* data */, data, false); // do not retain the string internally.
+            putStmt->bind(8 /* compressed */, true);
+        } else {
+            putStmt->bind(7 /* data */, action.response->data, false); // do not retain the string internally.
+            putStmt->bind(8 /* compressed */, false);
+        }
+
+        putStmt->run();
+    } catch (mapbox::sqlite::Exception& ex) {
+        Log::Error(Event::Database, ex.code, ex.what());
+        }
 }
 
 void SQLiteCache::process(RefreshAction &action) {
-    if (!db) {
-        createDatabase();
-    }
+    try {
+        if (!db) {
+            createDatabase();
+        }
 
-    if (!refreshStmt) {
-        refreshStmt = util::make_unique<Statement>( //       1               2
-            db->prepare("UPDATE `http_cache` SET `expires` = ? WHERE `url` = ?"));
-    } else {
-        refreshStmt->reset();
-    }
+        if (!schema) {
+            createSchema();
+        }
 
-    const std::string unifiedURL = unifyMapboxURLs(action.resource.url);
-    refreshStmt->bind(1, int64_t(action.expires));
-    refreshStmt->bind(2, unifiedURL.c_str());
-    refreshStmt->run();
+        if (!refreshStmt) {
+            refreshStmt = util::make_unique<Statement>( //       1               2
+                db->prepare("UPDATE `http_cache` SET `expires` = ? WHERE `url` = ?"));
+        } else {
+            refreshStmt->reset();
+        }
+
+        const std::string unifiedURL = unifyMapboxURLs(action.resource.url);
+        refreshStmt->bind(1, int64_t(action.expires));
+        refreshStmt->bind(2, unifiedURL.c_str());
+        refreshStmt->run();
+    } catch (mapbox::sqlite::Exception& ex) {
+        Log::Error(Event::Database, ex.code, ex.what());
+    }
 }
 
 void SQLiteCache::process(StopAction &) {

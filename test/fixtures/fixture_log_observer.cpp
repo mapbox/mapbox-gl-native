@@ -8,6 +8,9 @@ FixtureLogObserver::LogMessage::LogMessage(EventSeverity severity_, Event event_
     : severity(severity_), event(event_), code(code_), msg(msg_) {
 }
 
+FixtureLogObserver::LogMessage::LogMessage() : severity(), event(), code(), msg() {
+}
+
 bool FixtureLogObserver::LogMessage::operator==(const LogMessage &rhs) const {
     return (!severity || !rhs.severity || severity.get() == rhs.severity.get()) &&
            (!event || !rhs.event || event.get() == rhs.event.get()) &&

@@ -54,6 +54,7 @@
         'storage/storage.cpp',
         'storage/cache_response.cpp',
         'storage/cache_revalidate.cpp',
+        'storage/database.cpp',
         'storage/directory_reading.cpp',
         'storage/file_reading.cpp',
         'storage/http_cancel.cpp',

@@ -114,7 +114,7 @@ xproj: xosx-proj
 Xcode/ios: ios/app/mapboxgl-app.gyp config/ios.gypi styles/styles SMCalloutView
 	deps/run_gyp ios/app/mapboxgl-app.gyp $(CONFIG_ios) $(LIBS_ios) --generator-output=./build/ios -f xcode
 
-.PHONY: ios-proj ios run-ios
+.PHONY: ios-proj ios isim ipackage
 ios-proj: Xcode/ios
 	open ./build/ios/ios/app/mapboxgl-app.xcodeproj
 
@@ -123,6 +123,9 @@ ios: Xcode/ios
 
 isim: Xcode/ios
 	xcodebuild -sdk iphonesimulator ARCHS="x86_64 i386" -project ./build/ios/ios/app/mapboxgl-app.xcodeproj -configuration Debug -target iosapp -jobs $(JOBS)
+
+ipackage: clean Xcode/ios
+	./scripts/package_ios.sh
 
 # Legacy name
 iproj: ios-proj

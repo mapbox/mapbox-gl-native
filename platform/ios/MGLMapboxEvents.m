@@ -71,6 +71,11 @@ NSString *const MGLEventGestureRotateStart = @"Rotation";
 @property (atomic) NSDateFormatter *rfc3339DateFormatter;
 @property (atomic) CGFloat scale;
 
+
+// The isPaused state tracker is only ever accessed from the main thread.
+//
+@property (nonatomic) BOOL isPaused;
+
 // The timer is only ever accessed from the main thread.
 //
 @property (nonatomic) NSTimer *timer;
@@ -164,8 +169,12 @@ NSString *const MGLEventGestureRotateStart = @"Rotation";
         NSLocale *enUSPOSIXLocale = [[NSLocale alloc] initWithLocaleIdentifier:@"en_US_POSIX"];
         
         [_rfc3339DateFormatter setLocale:enUSPOSIXLocale];
-        [_rfc3339DateFormatter setDateFormat:@"yyyy'-'MM'-'dd'T'HH':'mm':'ss'Z'"];
-        [_rfc3339DateFormatter setTimeZone:[NSTimeZone timeZoneForSecondsFromGMT:0]];
+        [_rfc3339DateFormatter setDateFormat:@"yyyy'-'MM'-'dd'T'HH':'mm':'ssZ"];
+        // Clear Any System TimeZone Cache
+        [NSTimeZone resetSystemTimeZone];
+        [_rfc3339DateFormatter setTimeZone:[NSTimeZone systemTimeZone]];
+        
+        _isPaused = NO;
     }
     return self;
 }
@@ -217,6 +226,28 @@ NSString *const MGLEventGestureRotateStart = @"Rotation";
     [MGLMapboxEvents sharedManager].appVersion = appVersion;
 }
 
+// Must be called from the main thread.
+//
++ (void) pauseMetricsCollection {
+    assert([[NSThread currentThread] isMainThread]);
+    if ([MGLMapboxEvents sharedManager].isPaused) {
+        return;
+    }
+    [MGLMapboxEvents sharedManager].isPaused = YES;
+    [MGLMetricsLocationManager stopUpdatingLocation];
+}
+
+// Must be called from the main thread.
+//
++ (void) resumeMetricsCollection {
+    assert([[NSThread currentThread] isMainThread]);
+    if (![MGLMapboxEvents sharedManager].isPaused) {
+        return;
+    }
+    [MGLMapboxEvents sharedManager].isPaused = NO;
+    [MGLMetricsLocationManager startUpdatingLocation];
+}
+
 // Can be called from any thread. Can be called rapidly from
 // the UI thread, so performance is paramount.
 //
@@ -245,6 +276,11 @@ NSString *const MGLEventGestureRotateStart = @"Rotation";
             return;
         }
         
+        // Metrics Collection Has Been Paused
+        if (_isPaused) {
+            return;
+        }
+        
         if (!event) return;
 
         NSMutableDictionary *evt = [[NSMutableDictionary alloc] initWithDictionary:attributeDictionary];
@@ -265,8 +301,21 @@ NSString *const MGLEventGestureRotateStart = @"Rotation";
         [evt setValue:@(100 * [UIDevice currentDevice].batteryLevel) forKey:@"batteryLevel"];
         [evt setValue:@(weakSelf.scale) forKey:@"resolution"];
         [evt setValue:weakSelf.carrier forKey:@"carrier"];
-        [evt setValue:[weakSelf getCurrentCellularNetworkConnectionType] forKey:@"cellularNetworkType"];
-        [evt setValue:[weakSelf getWifiNetworkName] forKey:@"wifi"];
+        
+        NSString *cell = [weakSelf getCurrentCellularNetworkConnectionType];
+        if (cell) {
+            [evt setValue:cell forKey:@"cellularNetworkType"];
+        } else {
+            [evt setObject:[NSNull null] forKey:@"cellularNetworkType"];
+        }
+        
+        NSString *wifi = [weakSelf getWifiNetworkName];
+        if (wifi) {
+            [evt setValue:wifi forKey:@"wifi"];
+        } else {
+            [evt setObject:[NSNull null] forKey:@"wifi"];
+        }
+        
         [evt setValue:@([weakSelf getContentSizeScale]) forKey:@"accessibilityFontScale"];
 
         // Make Immutable Version
@@ -505,17 +554,13 @@ NSString *const MGLEventGestureRotateStart = @"Rotation";
 //
 - (NSString *) getWifiNetworkName {
     
-    NSString *ssid = @"";
+    NSString *ssid = nil;
     CFArrayRef interfaces = CNCopySupportedInterfaces();
     if (interfaces) {
         NSDictionary *info = (__bridge NSDictionary *)CNCopyCurrentNetworkInfo(CFArrayGetValueAtIndex(interfaces, 0));
         if (info) {
             ssid = info[@"SSID"];
-        } else {
-            ssid = @"NONE";
         }
-    } else {
-        ssid = @"NONE";
     }
     
     return ssid;
@@ -528,7 +573,7 @@ NSString *const MGLEventGestureRotateStart = @"Rotation";
     NSString *radioTech = telephonyInfo.currentRadioAccessTechnology;
     
     if (radioTech == nil) {
-        return @"NONE";
+        return nil;
     } else if ([radioTech isEqualToString:CTRadioAccessTechnologyGPRS]) {
         return @"GPRS";
     } else if ([radioTech isEqualToString:CTRadioAccessTechnologyEdge]) {

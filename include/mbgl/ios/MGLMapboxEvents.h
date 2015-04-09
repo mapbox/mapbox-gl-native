@@ -29,6 +29,8 @@ extern NSString *const MGLEventGestureRotateStart;
 + (void) setToken:(NSString *)token;
 + (void) setAppName:(NSString *)appName;
 + (void) setAppVersion:(NSString *)appVersion;
++ (void) pauseMetricsCollection;
++ (void) resumeMetricsCollection;
 
 // You can call this method from any thread. Significant work will
 // be dispatched to a low-priority background queue and all

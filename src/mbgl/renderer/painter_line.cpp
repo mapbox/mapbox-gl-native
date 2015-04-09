@@ -10,7 +10,7 @@
 
 using namespace mbgl;
 
-void Painter::renderLine(LineBucket& bucket, const StyleLayer &layer_desc, const Tile::ID& id, const mat4 &matrix) {
+void Painter::renderLine(LineBucket& bucket, const StyleLayer &layer_desc, const TileID& id, const mat4 &matrix) {
     // Abort early.
     if (pass == RenderPass::Opaque) return;
     if (!bucket.hasData()) return;

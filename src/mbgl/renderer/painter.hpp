@@ -42,7 +42,6 @@ class SpriteAtlas;
 class GlyphAtlas;
 class LineAtlas;
 class Source;
-class StyleSource;
 
 class FillBucket;
 class LineBucket;
@@ -55,6 +54,7 @@ struct RasterProperties;
 
 class LayerDescription;
 class RasterTileData;
+struct ClipID;
 
 class Painter : private util::noncopyable {
 public:
@@ -76,7 +76,6 @@ public:
     void changeMatrix();
 
     void render(const Style& style,
-                const std::set<util::ptr<StyleSource>>& sources,
                 TransformState state,
                 TimePoint time);
 
@@ -93,10 +92,10 @@ public:
 
     void renderDebugText(DebugBucket& bucket, const mat4 &matrix);
     void renderDebugText(const std::vector<std::string> &strings);
-    void renderFill(FillBucket& bucket, const StyleLayer &layer_desc, const Tile::ID& id, const mat4 &matrix);
-    void renderLine(LineBucket& bucket, const StyleLayer &layer_desc, const Tile::ID& id, const mat4 &matrix);
-    void renderSymbol(SymbolBucket& bucket, const StyleLayer &layer_desc, const Tile::ID& id, const mat4 &matrix);
-    void renderRaster(RasterBucket& bucket, const StyleLayer &layer_desc, const Tile::ID& id, const mat4 &matrix);
+    void renderFill(FillBucket& bucket, const StyleLayer &layer_desc, const TileID& id, const mat4 &matrix);
+    void renderLine(LineBucket& bucket, const StyleLayer &layer_desc, const TileID& id, const mat4 &matrix);
+    void renderSymbol(SymbolBucket& bucket, const StyleLayer &layer_desc, const TileID& id, const mat4 &matrix);
+    void renderRaster(RasterBucket& bucket, const StyleLayer &layer_desc, const TileID& id, const mat4 &matrix);
     void renderBackground(const StyleLayer &layer_desc);
 
     float saturationFactor(float saturation);
@@ -107,7 +106,7 @@ public:
 
     void renderPrerenderedTexture(RasterBucket &bucket, const mat4 &matrix, const RasterProperties& properties);
 
-    void createPrerendered(RasterBucket& bucket, const StyleLayer &layer_desc, const Tile::ID& id);
+    void createPrerendered(RasterBucket& bucket, const StyleLayer &layer_desc, const TileID& id);
 
     void resize();
 
@@ -121,7 +120,7 @@ public:
     // Configures the painter strata that is used for early z-culling of fragments.
     void setStrata(float strata);
 
-    void drawClippingMasks(const std::set<util::ptr<StyleSource>> &sources);
+    void drawClippingMasks(const std::set<Source*>&);
     void drawClippingMask(const mat4& matrix, const ClipID& clip);
 
     void resetFramebuffer();
@@ -135,13 +134,13 @@ public:
 private:
     void setupShaders();
     void deleteShaders();
-    mat4 translatedMatrix(const mat4& matrix, const std::array<float, 2> &translation, const Tile::ID &id, TranslateAnchorType anchor);
+    mat4 translatedMatrix(const mat4& matrix, const std::array<float, 2> &translation, const TileID &id, TranslateAnchorType anchor);
 
     void prepareTile(const Tile& tile);
 
     template <typename BucketProperties, typename StyleProperties>
     void renderSDF(SymbolBucket &bucket,
-                   const Tile::ID &id,
+                   const TileID &id,
                    const mat4 &matrixSymbol,
                    const BucketProperties& bucketProperties,
                    const StyleProperties& styleProperties,
