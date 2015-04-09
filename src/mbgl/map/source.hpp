@@ -21,6 +21,7 @@ namespace mbgl {
 
 class Map;
 class Environment;
+class Worker;
 class GlyphAtlas;
 class GlyphStore;
 class SpriteAtlas;
@@ -59,7 +60,7 @@ public:
               Environment&,
               std::function<void()> callback);
 
-    void update(Map &, uv::worker &, util::ptr<Style>, GlyphAtlas &, GlyphStore &,
+    void update(Map &, Worker &, util::ptr<Style>, GlyphAtlas &, GlyphStore &,
                 SpriteAtlas &, util::ptr<Sprite>, TexturePool &, std::function<void()> callback);
 
     void invalidateTiles(const std::vector<TileID>&);
@@ -80,7 +81,7 @@ private:
     int32_t coveringZoomLevel(const TransformState&) const;
     std::forward_list<TileID> coveringTiles(const TransformState&) const;
 
-    TileData::State addTile(Map &, uv::worker &, util::ptr<Style>, GlyphAtlas &,
+    TileData::State addTile(Map &, Worker &, util::ptr<Style>, GlyphAtlas &,
                             GlyphStore &, SpriteAtlas &, util::ptr<Sprite>, TexturePool &,
                             const TileID &, std::function<void()> callback);
 

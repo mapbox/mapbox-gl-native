@@ -3,7 +3,7 @@
 #include <mbgl/map/source.hpp>
 
 #include <mbgl/storage/file_source.hpp>
-#include <mbgl/util/uv_detail.hpp>
+#include <mbgl/util/worker.hpp>
 #include <mbgl/platform/log.hpp>
 
 using namespace mbgl;
@@ -27,7 +27,7 @@ const std::string TileData::toString() const {
     return std::string { "[tile " } + name + "]";
 }
 
-void TileData::request(uv::worker &worker, float pixelRatio, std::function<void()> callback) {
+void TileData::request(Worker& worker, float pixelRatio, std::function<void()> callback) {
     std::string url = source.tileURL(id, pixelRatio);
     state = State::loading;
 
@@ -57,18 +57,12 @@ void TileData::cancel() {
     }
 }
 
-void TileData::reparse(uv::worker& worker, std::function<void()> callback)
-{
-    // We're creating a new work request. The work request deletes itself after it executed
-    // the after work handler
-    new uv::work<util::ptr<TileData>>(
-        worker,
-        [this](util::ptr<TileData>& tile) {
-            EnvironmentScope scope(env, ThreadType::TileWorker, "TileWorker_" + tile->name);
+void TileData::reparse(Worker& worker, std::function<void()> callback) {
+    util::ptr<TileData> tile = shared_from_this();
+    worker.send(
+        [tile]() {
+            EnvironmentScope scope(tile->env, ThreadType::TileWorker, "TileWorker_" + tile->name);
             tile->parse();
         },
-        [callback](util::ptr<TileData>&) {
-            callback();
-        },
-        shared_from_this());
+        callback);
 }
