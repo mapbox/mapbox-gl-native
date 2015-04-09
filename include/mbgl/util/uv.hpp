@@ -17,7 +17,6 @@ std::string cwd();
 class rwlock;
 class loop;
 class async;
-class worker;
 class mutex;
 class cond;
 
