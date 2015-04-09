@@ -10,6 +10,8 @@ extern NSString *const MGLEventKeyLongitude;
 extern NSString *const MGLEventKeyZoomLevel;
 extern NSString *const MGLEventKeySpeed;
 extern NSString *const MGLEventKeyCourse;
+extern NSString *const MGLEventKeyAltitude;
+extern NSString *const MGLEventKeyVerticalAccuracy;
 extern NSString *const MGLEventKeyPushEnabled;
 extern NSString *const MGLEventKeyEmailEnabled;
 extern NSString *const MGLEventKeyGestureID;

@@ -45,7 +45,9 @@
             MGLEventKeyLatitude: @(loc.coordinate.latitude),
             MGLEventKeyLongitude: @(loc.coordinate.longitude),
             MGLEventKeySpeed: @(loc.speed),
-            MGLEventKeyCourse: @(loc.course)
+            MGLEventKeyCourse: @(loc.course),
+            MGLEventKeyAltitude: @(loc.altitude),
+            MGLEventKeyVerticalAccuracy: @(loc.verticalAccuracy)
         }];
     }
 }
