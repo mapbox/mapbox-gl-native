@@ -22,8 +22,8 @@ SymbolQuads getIconQuads(Anchor &anchor, const PositionedIcon &shapedIcon,
     float angle = layout.icon.rotate * M_PI / 180.0f;
     if (alongLine) {
         assert(static_cast<unsigned int>(anchor.segment) < line.size());
-        const Coordinate &next = line[anchor.segment];
-        angle += -std::atan2(next.x - anchor.x, next.y - anchor.y) + M_PI / 2;
+        const Coordinate &prev= line[anchor.segment];
+        angle += std::atan2(anchor.y - prev.y, anchor.x - prev.x);
     }
 
 
@@ -82,7 +82,9 @@ void getSegmentGlyphs(std::back_insert_iterator<GlyphInstances> glyphs, Anchor &
     while (true) {
         const float dist = util::dist<float>(newAnchor, end);
         const float scale = offset / dist;
-        float angle = -std::atan2(end.x - newAnchor.x, end.y - newAnchor.y) + direction * M_PI / 2.0f;
+        float angle = std::atan2(end.y - newAnchor.y, end.x - newAnchor.x);
+        if (direction < 0)
+            angle += M_PI;
         if (upsideDown)
             angle += M_PI;
 
