@@ -91,7 +91,7 @@ mbgl::Settings_NSUserDefaults *settings = nullptr;
     [titleButton addTarget:self action:@selector(cycleStyles) forControlEvents:UIControlEventTouchUpInside];
     self.navigationItem.titleView = titleButton;
 
-    self.navigationItem.rightBarButtonItem = [[UIBarButtonItem alloc] initWithImage:[UIImage imageNamed:@"locateUser.png"]
+    self.navigationItem.rightBarButtonItem = [[UIBarButtonItem alloc] initWithImage:[UIImage imageNamed:@"TrackingLocationOffMask.png"]
                                                                               style:UIBarButtonItemStylePlain
                                                                              target:self
                                                                              action:@selector(locateUser)];
@@ -302,6 +302,29 @@ mbgl::Settings_NSUserDefaults *settings = nullptr;
 - (BOOL)mapView:(MGLMapView *)mapView annotationCanShowCallout:(id <MGLAnnotation>)annotation
 {
     return YES;
+}
+
+- (void)mapView:(MGLMapView *)mapView didChangeUserTrackingMode:(MGLUserTrackingMode)mode animated:(BOOL)animated
+{
+    UIImage *newButtonImage;
+    
+    switch (mode) {
+        case MGLUserTrackingModeNone:
+            newButtonImage = [UIImage imageNamed:@"TrackingLocationOffMask.png"];
+            break;
+            
+        case MGLUserTrackingModeFollow:
+            newButtonImage = [UIImage imageNamed:@"TrackingLocationMask.png"];
+            break;
+            
+        case MGLUserTrackingModeFollowWithHeading:
+            newButtonImage = [UIImage imageNamed:@"TrackingHeadingMask.png"];
+            break;
+    }
+    
+    [UIView animateWithDuration:0.25 animations:^{
+        self.navigationItem.rightBarButtonItem.image = newButtonImage;
+    }];
 }
 
 #pragma clang diagnostic pop
