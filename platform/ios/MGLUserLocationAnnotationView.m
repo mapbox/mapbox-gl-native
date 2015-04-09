@@ -50,6 +50,8 @@ const CGFloat MGLUserLocationAnnotationHaloSize = 115.0;
     
     _haloLayer.backgroundColor = [tintColor CGColor];
     _dotLayer.backgroundColor = [tintColor CGColor];
+    
+    // TODO: Add heading indicatory tint updating
 }
 
 - (void)setupLayers
@@ -63,7 +65,7 @@ const CGFloat MGLUserLocationAnnotationHaloSize = 115.0;
             
             if (oldHeadingAccuracy != self.annotation.heading.headingAccuracy)
             {
-                //_headingIndicatorLayer.contents = (id)[self headingIndicatorImageForAccuracy].CGImage;
+                // TODO: add add accuracy updating
                 oldHeadingAccuracy = self.annotation.heading.headingAccuracy;
             }
         }
@@ -77,7 +79,6 @@ const CGFloat MGLUserLocationAnnotationHaloSize = 115.0;
             _headingIndicatorLayer = [CALayer layer];
             _headingIndicatorLayer.bounds = CGRectMake(0, 0, headingIndicatorSize, headingIndicatorSize);
             _headingIndicatorLayer.position = CGPointMake(super.bounds.size.width / 2.0, super.bounds.size.height / 2.0);
-            //_headingIndicatorLayer.contents = (id)[self headingIndicatorImageForAccuracy].CGImage;
             _headingIndicatorLayer.contents = (id)[self headingIndicatorImage].CGImage;
             _headingIndicatorLayer.contentsGravity = kCAGravityBottom;
             _headingIndicatorLayer.contentsScale = [UIScreen mainScreen].scale;
@@ -255,49 +256,19 @@ const CGFloat MGLUserLocationAnnotationHaloSize = 115.0;
     return pixelRadius * 2;
 }
 
-/*- (UIImage *)headingIndicatorImageForAccuracy
-{
-    NSString *fileName = @"HeadingAngleMask";
-    
-    double accuracy = self.annotation.heading.headingAccuracy;
-    
-    if (accuracy <=  10)
-    {
-        fileName = [fileName stringByAppendingString:@"Small"];
-    }
-    else if (accuracy <= 20)
-    {
-        fileName = [fileName stringByAppendingString:@"Medium"];
-    }
-    else
-    {
-        fileName = [fileName stringByAppendingString:@"Large"];
-    }
-    
-    NSLog(@"headingIndicatorImageForAccuracy: %f %@", accuracy, fileName);
-    
-    NSString *resourceBundlePath = [[NSBundle bundleForClass:[MGLMapView class]] pathForResource:@"MapboxGL" ofType:@"bundle"];
-    if ( ! resourceBundlePath) resourceBundlePath = [[NSBundle mainBundle] bundlePath];
-
-    NSString *path = [[NSBundle bundleWithPath:resourceBundlePath] pathForResource:fileName ofType:@"png" inDirectory:@""];
-        
-    NSAssert(path, @"%@ not found in application", fileName);
-        
-    return [UIImage imageWithContentsOfFile:path];
-}*/
-
 - (UIImage *)headingIndicatorImage
 {
     UIImage *image;
 
-    CGFloat halfHalo = MGLUserLocationAnnotationHaloSize / 2.0;
+    CGFloat haloRadius = MGLUserLocationAnnotationHaloSize / 2.0;
     
-    UIGraphicsBeginImageContextWithOptions(CGSizeMake(MGLUserLocationAnnotationHaloSize, halfHalo), NO, 0);
+    UIGraphicsBeginImageContextWithOptions(CGSizeMake(MGLUserLocationAnnotationHaloSize, haloRadius), NO, 0);
     
     CGColorSpaceRef colorSpace = CGColorSpaceCreateDeviceRGB();
     CGContextRef context = UIGraphicsGetCurrentContext();
     
     // TODO: Hook this up to our actual accuracy
+    // ... also, this is a little too magical and doesn't *appear* to do anything
     UIBezierPath *ovalPath = [self headingIndicatorClippingMaskForAccuracy:10.0];
     
     // gradient from the tint color to no-alpha tint color
@@ -307,10 +278,13 @@ const CGFloat MGLUserLocationAnnotationHaloSize = 115.0;
       colorSpace, (__bridge CFArrayRef)@[(id)[_mapView.tintColor CGColor],
                                          (id)[[_mapView.tintColor colorWithAlphaComponent:0] CGColor]], gradientLocations);
     
+    // draw the gradient from the center point to the edge (full halo radius)
+    //
+    CGPoint centerPoint = CGPointMake(haloRadius, haloRadius);
     CGContextDrawRadialGradient(context, gradient,
-                                CGPointMake(halfHalo, halfHalo), 0.0,
-                                CGPointMake(halfHalo, halfHalo), halfHalo,
-                                kCGGradientDrawsBeforeStartLocation | kCGGradientDrawsAfterEndLocation);
+                                centerPoint, 0.0,
+                                centerPoint, haloRadius,
+                                nil);
 
     // export and cleanup
     //
