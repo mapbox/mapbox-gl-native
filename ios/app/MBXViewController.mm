@@ -308,7 +308,9 @@ mbgl::Settings_NSUserDefaults *settings = nullptr;
             break;
     }
     
-    self.navigationItem.rightBarButtonItem.image = newButtonImage;
+    [UIView animateWithDuration:0.25 animations:^{
+        self.navigationItem.rightBarButtonItem.image = newButtonImage;
+    }];
 }
 
 #pragma clang diagnostic pop
