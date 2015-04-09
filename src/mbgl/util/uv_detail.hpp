@@ -2,7 +2,6 @@
 #define MBGL_UTIL_UV_DETAIL
 
 #include <mbgl/util/uv.hpp>
-#include <mbgl/util/uv-worker.h>
 #include <mbgl/util/noncopyable.hpp>
 
 #include <uv.h>
@@ -115,56 +114,6 @@ public:
 
 private:
     uv_rwlock_t mtx;
-};
-
-class worker : public mbgl::util::noncopyable {
-public:
-    inline worker(uv_loop_t *loop, unsigned int count, const char *name = nullptr) : w(new uv_worker_t) {
-        uv_worker_init(w, loop, count, name);
-    }
-    inline ~worker() {
-        uv_worker_close(w, [](uv_worker_t *worker_) {
-            delete worker_;
-        });
-    }
-    inline void add(void *data, uv_worker_cb work_cb, uv_worker_after_cb after_work_cb) {
-        uv_worker_send(w, data, work_cb, after_work_cb);
-    }
-
-private:
-    uv_worker_t *w;
-};
-
-template <typename T>
-class work : public mbgl::util::noncopyable {
-public:
-    typedef std::function<void (T&)> work_callback;
-    typedef std::function<void (T&)> after_work_callback;
-
-    template<typename... Args>
-    work(worker &worker, work_callback work_cb_, after_work_callback after_work_cb_, Args&&... args)
-        : data(std::forward<Args>(args)...),
-          work_cb(work_cb_),
-          after_work_cb(after_work_cb_) {
-        worker.add(this, do_work, after_work);
-    }
-
-private:
-    static void do_work(void *data) {
-        work<T> *w = reinterpret_cast<work<T> *>(data);
-        w->work_cb(w->data);
-    }
-
-    static void after_work(void *data) {
-        work<T> *w = reinterpret_cast<work<T> *>(data);
-        w->after_work_cb(w->data);
-        delete w;
-    }
-
-private:
-    T data;
-    work_callback work_cb;
-    after_work_callback after_work_cb;
 };
 
 }

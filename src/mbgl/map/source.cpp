@@ -215,7 +215,7 @@ TileData::State Source::hasTile(const TileID& id) {
     return TileData::State::invalid;
 }
 
-TileData::State Source::addTile(Map &map, uv::worker &worker,
+TileData::State Source::addTile(Map &map, Worker &worker,
                                 util::ptr<Style> style, GlyphAtlas &glyphAtlas,
                                 GlyphStore &glyphStore, SpriteAtlas &spriteAtlas,
                                 util::ptr<Sprite> sprite, TexturePool &texturePool,
@@ -349,7 +349,7 @@ bool Source::findLoadedParent(const TileID& id, int32_t minCoveringZoom, std::fo
 }
 
 void Source::update(Map &map,
-                    uv::worker &worker,
+                    Worker &worker,
                     util::ptr<Style> style,
                     GlyphAtlas &glyphAtlas,
                     GlyphStore &glyphStore,

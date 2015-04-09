@@ -12,12 +12,6 @@
 #include <string>
 #include <functional>
 
-namespace uv {
-class worker;
-}
-
-typedef struct uv_loop_s uv_loop_t;
-
 namespace mbgl {
 
 class Environment;
@@ -25,6 +19,7 @@ class Painter;
 class SourceInfo;
 class StyleLayer;
 class Request;
+class Worker;
 
 class TileData : public std::enable_shared_from_this<TileData>,
              private util::noncopyable {
@@ -41,8 +36,8 @@ public:
     TileData(const TileID&, const SourceInfo&);
     ~TileData();
 
-    void request(uv::worker&, float pixelRatio, std::function<void ()> callback);
-    void reparse(uv::worker&, std::function<void ()> callback);
+    void request(Worker&, float pixelRatio, std::function<void ()> callback);
+    void reparse(Worker&, std::function<void ()> callback);
     void cancel();
     const std::string toString() const;
 

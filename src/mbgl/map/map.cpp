@@ -27,6 +27,7 @@
 #include <mbgl/util/uv.hpp>
 #include <mbgl/util/mapbox.hpp>
 #include <mbgl/util/exception.hpp>
+#include <mbgl/util/worker.hpp>
 
 #include <algorithm>
 #include <iostream>
@@ -105,7 +106,7 @@ Map::~Map() {
     env->performCleanup();
 }
 
-uv::worker &Map::getWorker() {
+Worker& Map::getWorker() {
     assert(workers);
     return *workers;
 }
@@ -266,7 +267,7 @@ void Map::run() {
 
     view.activate();
 
-    workers = util::make_unique<uv::worker>(env->loop, 4, "Tile Worker");
+    workers = util::make_unique<Worker>(env->loop, 4);
 
     setup();
     prepare();
