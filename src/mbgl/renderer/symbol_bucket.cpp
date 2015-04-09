@@ -45,8 +45,8 @@ std::vector<SymbolFeature> SymbolBucket::processFeatures(const GeometryTileLayer
                                                          const FilterExpression& filter,
                                                          GlyphStore &glyphStore,
                                                          const Sprite &sprite) {
-    const bool has_text = layout.text.field.size();
-    const bool has_icon = layout.icon.image.size();
+    const bool has_text = !layout.text.field.empty() && !layout.text.font.empty();
+    const bool has_icon = !layout.icon.image.empty();
 
     std::vector<SymbolFeature> features;
 
