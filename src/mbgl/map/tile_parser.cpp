@@ -173,7 +173,8 @@ std::unique_ptr<Bucket> TileParser::createLineBucket(const GeometryTileLayer& la
                                                      const StyleBucket& bucket_desc) {
     auto bucket = util::make_unique<LineBucket>(tile.lineVertexBuffer,
                                                 tile.triangleElementsBuffer,
-                                                tile.pointElementsBuffer);
+                                                tile.pointElementsBuffer,
+                                                tile.overscaling);
 
     const float z = tile.id.z;
     auto& layout = bucket->layout;

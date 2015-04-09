@@ -5,26 +5,42 @@
 
 namespace mbgl {
 
-TileID TileID::parent(int8_t parent_z) const {
+TileID TileID::parent(int8_t parent_z, int8_t sourceMaxZoom) const {
     assert(parent_z < z);
-    int32_t dim = std::pow(2, z - parent_z);
-    return TileID{
-        parent_z,
-        (x >= 0 ? x : x - dim + 1) / dim,
-        y / dim
-    };
-}
 
-std::forward_list<TileID> TileID::children(int32_t child_z) const {
-    assert(child_z > z);
-    int32_t factor = std::pow(2, child_z - z);
-
-    std::forward_list<TileID> child_ids;
-    for (int32_t ty = y * factor, y_max = (y + 1) * factor; ty < y_max; ++ty) {
-        for (int32_t tx = x * factor, x_max = (x + 1) * factor; tx < x_max; ++tx) {
-            child_ids.emplace_front(child_z, tx, ty);
+    auto newX = x;
+    auto newY = y;
+    for (auto newZ = z; newZ > parent_z; newZ--) {
+        if (newZ > sourceMaxZoom) {
+            // the id represents an overscaled tile, return the same coordinates with a lower z
+            // do nothing
+        } else {
+            newX = newX / 2;
+            newY = newY / 2;
         }
     }
+
+    return TileID{parent_z, newX, newY};
+}
+
+std::forward_list<TileID> TileID::children(int8_t sourceMaxZoom) const {
+
+    auto childZ = z + 1;
+
+    std::forward_list<TileID> child_ids;
+    if (z >= sourceMaxZoom) {
+        // return a single tile id representing a an overscaled tile
+        child_ids.emplace_front(childZ, x, y);
+
+    } else {
+        auto childX = x * 2;
+        auto childY = y * 2;
+        child_ids.emplace_front(childZ, childX, childY);
+        child_ids.emplace_front(childZ, childX + 1, childY);
+        child_ids.emplace_front(childZ, childX, childY + 1);
+        child_ids.emplace_front(childZ, childX + 1, childY + 1);
+    }
+
     return child_ids;
 }
 

@@ -16,13 +16,15 @@ using namespace mbgl;
 
 LineBucket::LineBucket(LineVertexBuffer &vertexBuffer_,
                        TriangleElementsBuffer &triangleElementsBuffer_,
-                       PointElementsBuffer &pointElementsBuffer_)
+                       PointElementsBuffer &pointElementsBuffer_,
+                       const float overscaling_)
     : vertexBuffer(vertexBuffer_),
       triangleElementsBuffer(triangleElementsBuffer_),
       pointElementsBuffer(pointElementsBuffer_),
       vertex_start(vertexBuffer_.index()),
       triangle_elements_start(triangleElementsBuffer_.index()),
-      point_elements_start(pointElementsBuffer_.index()) {
+      point_elements_start(pointElementsBuffer_.index()),
+      overscaling(overscaling_) {
 }
 
 LineBucket::~LineBucket() {
@@ -93,7 +95,7 @@ void LineBucket::addGeometry(const std::vector<Coordinate>& vertices) {
         currentVertex = vertices[i];
         currentJoin = layout.join;
 
-        if (prevVertex) distance += util::dist<double>(currentVertex, prevVertex);
+        if (prevVertex) distance += util::dist<double>(currentVertex, prevVertex) * overscaling;
 
         // Find the next vertex.
         if (i + 1 < vertices.size()) {
@@ -326,9 +328,9 @@ void LineBucket::addGeometry(const std::vector<Coordinate>& vertices) {
     }
 }
 
-void LineBucket::render(Painter &painter, const StyleLayer &layer_desc, const TileID &id,
+void LineBucket::render(Painter &painter, const StyleLayer &layer_desc, const Tile &tile,
                         const mat4 &matrix) {
-    painter.renderLine(*this, layer_desc, id, matrix);
+    painter.renderLine(*this, layer_desc, tile, matrix);
 }
 
 bool LineBucket::hasData() const {

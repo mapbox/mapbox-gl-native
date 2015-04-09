@@ -2,6 +2,7 @@
 #define MBGL_MAP_VECTOR_TILE_DATA
 
 #include <mbgl/map/tile_data.hpp>
+#include <mbgl/map/tile.hpp>
 #include <mbgl/geometry/elements_buffer.hpp>
 #include <mbgl/geometry/fill_buffer.hpp>
 #include <mbgl/geometry/icon_buffer.hpp>
@@ -36,11 +37,12 @@ public:
                    GlyphStore&,
                    SpriteAtlas&,
                    util::ptr<Sprite>,
-                   const SourceInfo&);
+                   const SourceInfo&,
+                   const float overscaling_);
     ~VectorTileData();
 
     void parse() override;
-    void render(Painter &painter, const StyleLayer &layer_desc, const mat4 &matrix) override;
+    void render(Painter &painter, const StyleLayer &layer_desc, const mat4 &matrix, const Tile& tile) override;
     bool hasData(StyleLayer const& layer_desc) const override;
 
 protected:
@@ -64,6 +66,7 @@ protected:
 
 public:
     const float depth;
+    const float overscaling;
 };
 
 }

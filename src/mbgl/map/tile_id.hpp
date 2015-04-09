@@ -43,9 +43,9 @@ public:
         return y < rhs.y;
     }
 
-    TileID parent(int8_t z) const;
+    TileID parent(int8_t z, int8_t sourceMaxZoom) const;
     TileID normalized() const;
-    std::forward_list<TileID> children(int32_t z) const;
+    std::forward_list<TileID> children(int8_t sourceMaxZoom) const;
     bool isChildOf(const TileID&) const;
     operator std::string() const;
 };

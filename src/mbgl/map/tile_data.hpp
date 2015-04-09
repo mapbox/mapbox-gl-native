@@ -25,6 +25,7 @@ class Painter;
 class SourceInfo;
 class StyleLayer;
 class Request;
+class Tile;
 
 class TileData : public std::enable_shared_from_this<TileData>,
              private util::noncopyable {
@@ -52,7 +53,7 @@ public:
 
     // Override this in the child class.
     virtual void parse() = 0;
-    virtual void render(Painter &painter, const StyleLayer &layer_desc, const mat4 &matrix) = 0;
+    virtual void render(Painter &painter, const StyleLayer &layer_desc, const mat4 &matrix, const Tile& tile) = 0;
     virtual bool hasData(StyleLayer const &layer_desc) const = 0;
 
     const TileID id;
