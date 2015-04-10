@@ -67,6 +67,8 @@ static NSURL *MGLURLForBundledStyleNamed(NSString *styleName)
 
 @property (nonatomic) EAGLContext *context;
 @property (nonatomic) GLKView *glView;
+/** A static view to impersonate `glView` when the app is in the background. */
+@property (nonatomic) UIImageView *glImpersonatingView;
 @property (nonatomic) NSOperationQueue *regionChangeDelegateQueue;
 @property (nonatomic) UIImageView *compass;
 @property (nonatomic) UIImageView *logoBug;
@@ -240,6 +242,13 @@ mbgl::DefaultFileSource *mbglFileSource = nullptr;
     [self insertSubview:_glView atIndex:0];
 
     _glView.contentMode = UIViewContentModeCenter;
+    
+    // create GL impersonating view
+    //
+    _glImpersonatingView = [[UIImageView alloc] initWithFrame:_glView.frame];
+    _glImpersonatingView.autoresizingMask = _glView.autoresizingMask;
+    [self insertSubview:_glImpersonatingView belowSubview:_glView];
+    
     [self setBackgroundColor:[UIColor clearColor]];
 
     // load extensions
@@ -583,6 +592,10 @@ mbgl::DefaultFileSource *mbglFileSource = nullptr;
 {
     [MGLMapboxEvents flush];
     
+    UIImage *snapshot = [self.glView snapshot];
+    self.glImpersonatingView.image = snapshot;
+    [self.glView removeFromSuperview];
+    
     mbglMap->stop();
 
     [self.glView deleteDrawable];
@@ -593,6 +606,8 @@ mbgl::DefaultFileSource *mbglFileSource = nullptr;
     [self.glView bindDrawable];
 
     mbglMap->start();
+    
+    [self insertSubview:self.glView aboveSubview:self.glImpersonatingView];
 }
 
 - (void)tintColorDidChange
