@@ -7,6 +7,14 @@
 namespace mbgl {
 namespace util {
 
+// Manages a thread with Object.
+
+// Upon creation of this object, it launches a thread, creates an object of type Object in that
+// thread, and then calls .start(); on that object. When the Thread<> object is destructed, the
+// Object's .stop() function is called, and the destructor waits for thread termination. The
+// Thread<> constructor blocks until the thread and the Object are fully created, so after the
+// object creation, it's safe to obtain the Object stored in this thread.
+
 template <class Object>
 class Thread {
 public:
@@ -23,6 +31,7 @@ public:
 
 private:
     std::thread thread;
+    std::promise<void> joinable;
     Object& object;
 };
 
@@ -35,6 +44,7 @@ Thread<Object>::Thread(Args&&... args)
               Object context(::std::forward<Args>(args)...);
               promise.set_value(context);
               context.start();
+              joinable.get_future().get();
           });
           return promise.get_future().get();
       }()) {
@@ -43,6 +53,7 @@ Thread<Object>::Thread(Args&&... args)
 template <class Object>
 Thread<Object>::~Thread() {
     object.stop();
+    joinable.set_value();
     thread.join();
 }
 
