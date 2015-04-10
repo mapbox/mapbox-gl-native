@@ -14,6 +14,7 @@
 #include <mbgl/storage/default/sqlite_cache.hpp>
 #include <mbgl/storage/network_status.hpp>
 #include <mbgl/util/geo.hpp>
+#include <mbgl/util/thread.hpp>
 
 #import "MGLTypes.h"
 #import "NSString+MGLAdditions.h"
@@ -111,7 +112,7 @@ std::chrono::steady_clock::duration secondsAsDuration(float duration)
 
 mbgl::Map *mbglMap = nullptr;
 MBGLView *mbglView = nullptr;
-mbgl::SQLiteCache *mbglFileCache = nullptr;
+mbgl::util::Thread<mbgl::SQLiteCache> *mbglFileCache = nullptr;
 mbgl::DefaultFileSource *mbglFileSource = nullptr;
 
 - (instancetype)initWithFrame:(CGRect)frame
@@ -269,8 +270,8 @@ mbgl::DefaultFileSource *mbglFileSource = nullptr;
     // setup mbgl map
     //
     mbglView = new MBGLView(self);
-    mbglFileCache  = new mbgl::SQLiteCache(defaultCacheDatabase());
-    mbglFileSource = new mbgl::DefaultFileSource(mbglFileCache);
+    mbglFileCache  = new mbgl::util::Thread<mbgl::SQLiteCache>(defaultCacheDatabase());
+    mbglFileSource = new mbgl::DefaultFileSource(*mbglFileCache);
     mbglMap = new mbgl::Map(*mbglView, *mbglFileSource);
     mbglView->resize(self.bounds.size.width, self.bounds.size.height, _glView.contentScaleFactor, _glView.drawableWidth, _glView.drawableHeight);
 

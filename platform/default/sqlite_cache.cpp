@@ -2,19 +2,12 @@
 #include <mbgl/storage/default/request.hpp>
 #include <mbgl/storage/response.hpp>
 
-#include <mbgl/util/util.hpp>
-#include <mbgl/util/async_queue.hpp>
-#include <mbgl/util/variant.hpp>
 #include <mbgl/util/compression.hpp>
 #include <mbgl/util/io.hpp>
 #include <mbgl/platform/log.hpp>
 
 #include "sqlite3.hpp"
 #include <sqlite3.h>
-
-#include <uv.h>
-
-#include <cassert>
 
 namespace mbgl {
 
@@ -67,90 +60,28 @@ std::string unifyMapboxURLs(const std::string &url) {
 
 using namespace mapbox::sqlite;
 
-struct SQLiteCache::GetAction {
-    const Resource resource;
-    const std::function<void(std::unique_ptr<Response>)> callback;
-};
-
-struct SQLiteCache::PutAction {
-    const Resource resource;
-    const std::shared_ptr<const Response> response;
-};
-
-struct SQLiteCache::RefreshAction {
-    const Resource resource;
-    const int64_t expires;
-};
-
-struct SQLiteCache::StopAction {
-};
-
-struct SQLiteCache::ActionDispatcher {
-    SQLiteCache &cache;
-    template <typename T> void operator()(T &t) { cache.process(t); }
-};
-
 SQLiteCache::SQLiteCache(const std::string& path_)
-    : path(path_),
-      loop(uv_loop_new()),
-      queue(new Queue(loop, [this](Action& action) {
-          mapbox::util::apply_visitor(ActionDispatcher{ *this }, action);
-      })),
-      thread([this]() {
+    : path(path_) {
 #ifdef __APPLE__
-          pthread_setname_np("SQLite Cache");
+    pthread_setname_np("SQLite Cache");
 #endif
-          uv_run(loop, UV_RUN_DEFAULT);
-
-          try {
-              getStmt.reset();
-              putStmt.reset();
-              refreshStmt.reset();
-              db.reset();
-          } catch (mapbox::sqlite::Exception& ex) {
-              Log::Error(Event::Database, ex.code, ex.what());
-          }
-      }) {
 }
 
 SQLiteCache::~SQLiteCache() {
-    if (thread.joinable()) {
-        if (queue) {
-            queue->send(StopAction{ });
-        }
-        thread.join();
-        uv_loop_delete(loop);
-    }
-}
-
-
-void SQLiteCache::get(const Resource &resource, std::function<void(std::unique_ptr<Response>)> callback) {
-    // Can be called from any thread, but most likely from the file source thread.
-    // Will try to load the URL from the SQLite database and call the callback when done.
-    // Note that the callback is probably going to invoked from another thread, so the caller
-    // must make sure that it can run in that thread.
-    assert(queue);
-    queue->send(GetAction{ resource, callback });
-}
-
-void SQLiteCache::put(const Resource &resource, std::shared_ptr<const Response> response, Hint hint) {
-    // Can be called from any thread, but most likely from the file source thread. We are either
-    // storing a new response or updating the currently stored response, potentially setting a new
-    // expiry date.
-    assert(queue);
-    assert(response);
-
-    if (hint == Hint::Full) {
-        queue->send(PutAction{ resource, response });
-    } else if (hint == Hint::Refresh) {
-        queue->send(RefreshAction{ resource, response->expires });
+    // Deleting these SQLite objects may result in exceptions, but we're in a destructor, so we
+    // can't throw anything.
+    try {
+        getStmt.reset();
+        putStmt.reset();
+        refreshStmt.reset();
+        db.reset();
+    } catch (mapbox::sqlite::Exception& ex) {
+        Log::Error(Event::Database, ex.code, ex.what());
     }
 }
 
 void SQLiteCache::createDatabase() {
     db = util::make_unique<Database>(path.c_str(), ReadWrite | Create);
-
-    createSchema();
 }
 
 void SQLiteCache::createSchema() {
@@ -171,7 +102,6 @@ void SQLiteCache::createSchema() {
         db->exec(sql);
         schema = true;
     } catch (mapbox::sqlite::Exception &ex) {
-
         if (ex.code == SQLITE_NOTADB) {
             Log::Warning(Event::Database, "Trashing invalid database");
             db.reset();
@@ -192,7 +122,15 @@ void SQLiteCache::createSchema() {
     }
 }
 
-void SQLiteCache::process(GetAction &action) {
+void SQLiteCache::get(const Resource &resource, Callback callback) {
+    // Can be called from any thread, but most likely from the file source thread.
+    // Will try to load the URL from the SQLite database and call the callback when done.
+    // Note that the callback is probably going to invoked from another thread, so the caller
+    // must make sure that it can run in that thread.
+    invoke(std::bind(&SQLiteCache::processGet, this, resource, callback));
+}
+
+void SQLiteCache::processGet(const Resource &resource, Callback callback) {
     try {
         // This is called in the SQLite event loop.
         if (!db) {
@@ -212,7 +150,7 @@ void SQLiteCache::process(GetAction &action) {
             getStmt->reset();
         }
 
-        const std::string unifiedURL = unifyMapboxURLs(action.resource.url);
+        const std::string unifiedURL = unifyMapboxURLs(resource.url);
         getStmt->bind(1, unifiedURL.c_str());
         if (getStmt->run()) {
             // There is data.
@@ -225,18 +163,29 @@ void SQLiteCache::process(GetAction &action) {
             if (getStmt->get<int>(5)) { // == compressed
                 response->data = util::decompress(response->data);
             }
-            action.callback(std::move(response));
+            callback(std::move(response));
         } else {
             // There is no data.
-            action.callback(nullptr);
+            callback(nullptr);
         }
     } catch (mapbox::sqlite::Exception& ex) {
         Log::Error(Event::Database, ex.code, ex.what());
-        action.callback(nullptr);
+        callback(nullptr);
     }
 }
 
-void SQLiteCache::process(PutAction &action) {
+void SQLiteCache::put(const Resource &resource, std::shared_ptr<const Response> response, Hint hint) {
+    // Can be called from any thread, but most likely from the file source thread. We are either
+    // storing a new response or updating the currently stored response, potentially setting a new
+    // expiry date.
+    if (hint == Hint::Full) {
+        invoke(std::bind(&SQLiteCache::processPut, this, resource, response));
+    } else if (hint == Hint::Refresh) {
+        invoke(std::bind(&SQLiteCache::processRefresh, this, resource, response->expires));
+    }
+}
+
+void SQLiteCache::processPut(const Resource& resource, std::shared_ptr<const Response> response) {
     try {
         if (!db) {
             createDatabase();
@@ -255,37 +204,37 @@ void SQLiteCache::process(PutAction &action) {
             putStmt->reset();
         }
 
-        const std::string unifiedURL = unifyMapboxURLs(action.resource.url);
+        const std::string unifiedURL = unifyMapboxURLs(resource.url);
         putStmt->bind(1 /* url */, unifiedURL.c_str());
-        putStmt->bind(2 /* status */, int(action.response->status));
-        putStmt->bind(3 /* kind */, int(action.resource.kind));
-        putStmt->bind(4 /* modified */, action.response->modified);
-        putStmt->bind(5 /* etag */, action.response->etag.c_str());
-        putStmt->bind(6 /* expires */, action.response->expires);
+        putStmt->bind(2 /* status */, int(response->status));
+        putStmt->bind(3 /* kind */, int(resource.kind));
+        putStmt->bind(4 /* modified */, response->modified);
+        putStmt->bind(5 /* etag */, response->etag.c_str());
+        putStmt->bind(6 /* expires */, response->expires);
 
         std::string data;
-        if (action.resource.kind != Resource::Image) {
+        if (resource.kind != Resource::Image) {
             // Do not compress images, since they are typically compressed already.
-            data = util::compress(action.response->data);
+            data = util::compress(response->data);
         }
 
-        if (!data.empty() && data.size() < action.response->data.size()) {
+        if (!data.empty() && data.size() < response->data.size()) {
             // Store the compressed data when it is smaller than the original
             // uncompressed data.
             putStmt->bind(7 /* data */, data, false); // do not retain the string internally.
             putStmt->bind(8 /* compressed */, true);
         } else {
-            putStmt->bind(7 /* data */, action.response->data, false); // do not retain the string internally.
+            putStmt->bind(7 /* data */, response->data, false); // do not retain the string internally.
             putStmt->bind(8 /* compressed */, false);
         }
 
         putStmt->run();
     } catch (mapbox::sqlite::Exception& ex) {
         Log::Error(Event::Database, ex.code, ex.what());
-        }
+    }
 }
 
-void SQLiteCache::process(RefreshAction &action) {
+void SQLiteCache::processRefresh(const Resource& resource, int64_t expires) {
     try {
         if (!db) {
             createDatabase();
@@ -302,19 +251,13 @@ void SQLiteCache::process(RefreshAction &action) {
             refreshStmt->reset();
         }
 
-        const std::string unifiedURL = unifyMapboxURLs(action.resource.url);
-        refreshStmt->bind(1, int64_t(action.expires));
+        const std::string unifiedURL = unifyMapboxURLs(resource.url);
+        refreshStmt->bind(1, int64_t(expires));
         refreshStmt->bind(2, unifiedURL.c_str());
         refreshStmt->run();
     } catch (mapbox::sqlite::Exception& ex) {
         Log::Error(Event::Database, ex.code, ex.what());
     }
-}
-
-void SQLiteCache::process(StopAction &) {
-    assert(queue);
-    queue->stop();
-    queue = nullptr;
 }
 
 }

@@ -7,6 +7,7 @@
 #include <mbgl/platform/default/glfw_view.hpp>
 #include <mbgl/storage/default_file_source.hpp>
 #include <mbgl/storage/default/sqlite_cache.hpp>
+#include <mbgl/util/thread.hpp>
 
 #include <signal.h>
 #include <getopt.h>
@@ -65,8 +66,8 @@ int main(int argc, char *argv[]) {
 
     view = mbgl::util::make_unique<GLFWView>();
 
-    mbgl::SQLiteCache cache("/tmp/mbgl-cache.db");
-    mbgl::DefaultFileSource fileSource(&cache);
+    mbgl::util::Thread<mbgl::SQLiteCache> cache("/tmp/mbgl-cache.db");
+    mbgl::DefaultFileSource fileSource(cache);
     mbgl::Map map(*view, fileSource);
 
     // Load settings

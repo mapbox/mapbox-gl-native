@@ -2,6 +2,7 @@
 #include <mbgl/util/image.hpp>
 #include <mbgl/util/std.hpp>
 #include <mbgl/util/io.hpp>
+#include <mbgl/util/thread.hpp>
 
 #include <mbgl/platform/default/headless_view.hpp>
 #include <mbgl/platform/default/headless_display.hpp>
@@ -66,8 +67,8 @@ int main(int argc, char *argv[]) {
 
     using namespace mbgl;
 
-    mbgl::SQLiteCache cache(cache_file);
-    mbgl::DefaultFileSource fileSource(&cache);
+    mbgl::util::Thread<mbgl::SQLiteCache> cache(cache_file);
+    mbgl::DefaultFileSource fileSource(cache);
 
     // Try to load the token from the environment.
     if (!token.size()) {

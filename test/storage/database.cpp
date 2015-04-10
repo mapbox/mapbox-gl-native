@@ -7,6 +7,7 @@
 #include <mbgl/storage/resource.hpp>
 #include <mbgl/storage/response.hpp>
 #include <mbgl/util/io.hpp>
+#include <mbgl/util/thread.hpp>
 
 #include <sqlite3.h>
 
@@ -41,9 +42,9 @@ TEST_F(Storage, DatabaseDoesNotExist) {
         EXPECT_EQ(1ul, dynamic_cast<FixtureLogObserver*>(observer.get())->count({ EventSeverity::Error, Event::Database, 14, "unable to open database file" }));
     });
 
-    SQLiteCache cache("test/fixtures/404/cache.db");
+    util::Thread<SQLiteCache> cache("test/fixtures/404/cache.db");
 
-    cache.get({ Resource::Unknown, "mapbox://test" }, [&] (std::unique_ptr<Response> res) {
+    cache->get({ Resource::Unknown, "mapbox://test" }, [&] (std::unique_ptr<Response> res) {
         EXPECT_EQ(nullptr, res.get());
         test.finish();
     });
@@ -85,9 +86,9 @@ TEST_F(Storage, DatabaseCreate) {
         Log::removeObserver();
     });
 
-    SQLiteCache cache("test/fixtures/database/cache.db");
+    util::Thread<SQLiteCache> cache("test/fixtures/database/cache.db");
 
-    cache.get({ Resource::Unknown, "mapbox://test" }, [&] (std::unique_ptr<Response> res) {
+    cache->get({ Resource::Unknown, "mapbox://test" }, [&] (std::unique_ptr<Response> res) {
         EXPECT_EQ(nullptr, res.get());
         test.finish();
     });
@@ -140,7 +141,8 @@ TEST_F(Storage, DatabaseLockedRead) {
     deleteFile("test/fixtures/database/locked.db");
     FileLock guard("test/fixtures/database/locked.db");
 
-    auto cache = util::make_unique<SQLiteCache>("test/fixtures/database/locked.db");
+
+    util::Thread<SQLiteCache> cache("test/fixtures/database/locked.db");
 
     std::promise<void> promise;
 
@@ -177,9 +179,6 @@ TEST_F(Storage, DatabaseLockedRead) {
         // Make sure that we got a no errors
         Log::removeObserver();
     }
-
-    // Explicitly delete the Cache now.
-    cache.reset();
 }
 
 
@@ -192,7 +191,7 @@ TEST_F(Storage, DatabaseLockedWrite) {
     deleteFile("test/fixtures/database/locked.db");
     FileLock guard("test/fixtures/database/locked.db");
 
-    auto cache = util::make_unique<SQLiteCache>("test/fixtures/database/locked.db");
+    util::Thread<SQLiteCache> cache("test/fixtures/database/locked.db");
 
     std::promise<void> promise;
 
@@ -234,9 +233,6 @@ TEST_F(Storage, DatabaseLockedWrite) {
         // Make sure that we got a no errors
         Log::removeObserver();
     }
-
-    // Explicitly delete the Cache now.
-    cache.reset();
 }
 
 
@@ -249,7 +245,7 @@ TEST_F(Storage, DatabaseLockedRefresh) {
     createDir("test/fixtures/database");
     deleteFile("test/fixtures/database/locked.db");
 
-    auto cache = util::make_unique<SQLiteCache>("test/fixtures/database/locked.db");
+    util::Thread<SQLiteCache> cache("test/fixtures/database/locked.db");
 
     // Then, lock the file and try again.
     FileLock guard("test/fixtures/database/locked.db");
@@ -293,9 +289,6 @@ TEST_F(Storage, DatabaseLockedRefresh) {
         auto flo = dynamic_cast<FixtureLogObserver*>(observer.get());
         EXPECT_EQ(4ul, flo->count({ EventSeverity::Error, Event::Database, 5, "database is locked" }));
     }
-
-    // Explicitly delete the Cache now.
-    cache.reset();
 }
 
 
@@ -307,7 +300,7 @@ TEST_F(Storage, DatabaseDeleted) {
     createDir("test/fixtures/database");
     deleteFile("test/fixtures/database/locked.db");
 
-    auto cache = util::make_unique<SQLiteCache>("test/fixtures/database/locked.db");
+    util::Thread<SQLiteCache> cache("test/fixtures/database/locked.db");
 
     std::promise<void> promise;
 
@@ -348,9 +341,6 @@ TEST_F(Storage, DatabaseDeleted) {
         auto flo = dynamic_cast<FixtureLogObserver*>(observer.get());
         EXPECT_EQ(1ul, flo->count({ EventSeverity::Error, Event::Database, 8, "attempt to write a readonly database" }));
     }
-
-    // Explicitly delete the Cache now.
-    cache.reset();
 }
 
 
@@ -363,7 +353,7 @@ TEST_F(Storage, DatabaseInvalid) {
     deleteFile("test/fixtures/database/invalid.db");
     writeFile("test/fixtures/database/invalid.db", "this is an invalid file");
 
-    auto cache = util::make_unique<SQLiteCache>("test/fixtures/database/invalid.db");
+    util::Thread<SQLiteCache> cache("test/fixtures/database/invalid.db");
 
     std::promise<void> promise;
 
@@ -385,7 +375,4 @@ TEST_F(Storage, DatabaseInvalid) {
         auto flo = dynamic_cast<FixtureLogObserver*>(observer.get());
         EXPECT_EQ(1ul, flo->count({ EventSeverity::Warning, Event::Database, -1, "Trashing invalid database" }));
     }
-
-    // Explicitly delete the Cache now.
-    cache.reset();
 }

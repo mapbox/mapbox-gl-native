@@ -41,10 +41,19 @@ public:
         uv_loop_close(l);
         delete l;
 #endif
-
     }
 
-    inline uv_loop_t *operator*() { return l; }
+    inline void run() {
+        uv_run(l, UV_RUN_DEFAULT);
+    }
+
+    inline uv_loop_t* operator*() {
+        return l;
+    }
+
+    inline uv_loop_t* get() {
+        return l;
+    }
 
 private:
     uv_loop_t *l = nullptr;
@@ -70,6 +79,14 @@ public:
         if (uv_async_send(a.get()) != 0) {
             throw std::runtime_error("failed to async send");
         }
+    }
+
+    inline void ref() {
+        uv_ref(reinterpret_cast<uv_handle_t*>(a.get()));
+    }
+
+    inline void unref() {
+        uv_unref(reinterpret_cast<uv_handle_t*>(a.get()));
     }
 
 private:

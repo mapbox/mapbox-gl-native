@@ -4,14 +4,15 @@
 
 #include <mbgl/storage/default_file_source.hpp>
 #include <mbgl/storage/default/sqlite_cache.hpp>
+#include <mbgl/util/thread.hpp>
 
 TEST_F(Storage, CacheResponse) {
     SCOPED_TEST(CacheResponse);
 
     using namespace mbgl;
 
-    SQLiteCache cache(":memory:");
-    DefaultFileSource fs(&cache, uv_default_loop());
+    util::Thread<SQLiteCache> cache(":memory:");
+    DefaultFileSource fs(cache, uv_default_loop());
 
     const Resource resource { Resource::Unknown, "http://127.0.0.1:3000/cache" };
     auto &env = *static_cast<const Environment *>(nullptr);

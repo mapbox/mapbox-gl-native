@@ -4,6 +4,7 @@
 
 #include <mbgl/storage/default_file_source.hpp>
 #include <mbgl/storage/default/sqlite_cache.hpp>
+#include <mbgl/util/thread.hpp>
 
 TEST_F(Storage, CacheRevalidate) {
     SCOPED_TEST(CacheRevalidateSame)
@@ -12,8 +13,8 @@ TEST_F(Storage, CacheRevalidate) {
 
     using namespace mbgl;
 
-    SQLiteCache cache(":memory:");
-    DefaultFileSource fs(&cache);
+    util::Thread<SQLiteCache> cache(":memory:");
+    DefaultFileSource fs(cache);
 
     auto &env = *static_cast<const Environment *>(nullptr);
 

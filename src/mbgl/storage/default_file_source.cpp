@@ -122,11 +122,7 @@ Request *DefaultFileSource::request(const Resource &resource, uv_loop_t *l, cons
 
 void DefaultFileSource::request(const Resource &resource, const Environment &env,
                                 Callback callback) {
-    auto req = new Request(resource, nullptr, env, std::move(callback));
-
-    // This function can be called from any thread. Make sure we're executing the actual call in the
-    // file source loop by sending it over the queue. It will be processed in processAction().
-    queue->send(AddRequestAction{ req });
+    request(resource, nullptr, env, std::move(callback));
 }
 
 void DefaultFileSource::cancel(Request *req) {

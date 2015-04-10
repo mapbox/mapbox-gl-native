@@ -58,7 +58,7 @@ void log_gl_string(GLenum name, const char *label) {
 NativeMapView::NativeMapView(JNIEnv *env, jobject obj_)
     : mbgl::View(*this),
       fileCache(mbgl::android::cachePath + "/mbgl-cache.db"),
-      fileSource(&fileCache),
+      fileSource(fileCache),
       map(*this, fileSource) {
     mbgl::Log::Debug(mbgl::Event::Android, "NativeMapView::NativeMapView");
 

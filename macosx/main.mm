@@ -6,6 +6,7 @@
 #include <mbgl/storage/default_file_source.hpp>
 #include <mbgl/storage/default/sqlite_cache.hpp>
 #include <mbgl/storage/network_status.hpp>
+#include <mbgl/util/thread.hpp>
 
 #include <mbgl/util/geo.hpp>
 
@@ -103,8 +104,8 @@ const std::string &defaultCacheDatabase() {
 int main() {
     GLFWView view;
 
-    mbgl::SQLiteCache cache(defaultCacheDatabase());
-    mbgl::DefaultFileSource fileSource(&cache);
+    mbgl::util::Thread<mbgl::SQLiteCache> cache(defaultCacheDatabase());
+    mbgl::DefaultFileSource fileSource(cache);
     mbgl::Map map(view, fileSource);
 
     URLHandler *handler = [[URLHandler alloc] init];
