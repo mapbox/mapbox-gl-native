@@ -45,7 +45,7 @@ const std::string &defaultCacheDatabase() {
 
 static dispatch_once_t loadGLExtensions;
 
-NSString *const MGLDefaultStyleName = @"Emerald";
+NSString *const MGLDefaultStyleName = @"mapbox-streets";
 NSString *const MGLStyleVersion = @"7";
 NSString *const MGLDefaultStyleMarkerSymbolName = @"default_marker";
 NSString *const MGLMapboxAccessTokenManagerURLDisplayString = @"mapbox.com/account/apps";

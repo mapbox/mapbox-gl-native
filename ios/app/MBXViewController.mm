@@ -11,8 +11,8 @@
 static UIColor *const kTintColor = [UIColor colorWithRed:0.120 green:0.550 blue:0.670 alpha:1.000];
 
 static NSArray *const kStyleNames = @[
-    @"Emerald",
     @"Mapbox Streets",
+    @"Emerald",
     @"Light",
     @"Dark",
     @"Bright",
