@@ -44,9 +44,9 @@ void RunLoop::process() {
     }
 }
 
-void RunLoop::invoke(std::function<void()> fn) {
+void RunLoop::invoke(std::function<void()>&& fn) {
     if (fn) {
-        critical_section(runloopMutex, [this, &fn] { runloopQueue.push(fn); });
+        critical_section(runloopMutex, [this, &fn] { runloopQueue.emplace(std::move(fn)); });
         runloopAsync->send();
     }
 }

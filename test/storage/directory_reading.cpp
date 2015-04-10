@@ -3,6 +3,7 @@
 #include <uv.h>
 
 #include <mbgl/storage/default_file_source.hpp>
+#include <mbgl/util/thread.hpp>
 
 TEST_F(Storage, AssetReadDirectory) {
     SCOPED_TEST(ReadDirectory)
@@ -10,14 +11,14 @@ TEST_F(Storage, AssetReadDirectory) {
     using namespace mbgl;
 
 #ifdef MBGL_ASSET_ZIP
-    DefaultFileSource fs(nullptr, uv_default_loop(), "test/fixtures/storage/assets.zip");
+    util::Thread<DefaultFileSource> fs(nullptr, "test/fixtures/storage/assets.zip");
 #else
-    DefaultFileSource fs(nullptr, uv_default_loop());
+    util::Thread<DefaultFileSource> fs(nullptr);
 #endif
 
     auto &env = *static_cast<const Environment *>(nullptr);
 
-    fs.request({ Resource::Unknown, "asset://TEST_DATA/fixtures/storage" }, uv_default_loop(),
+    fs->request({ Resource::Unknown, "asset://TEST_DATA/fixtures/storage" }, uv_default_loop(),
                env, [&](const Response &res) {
         EXPECT_EQ(Response::Error, res.status);
         EXPECT_EQ(0ul, res.data.size());

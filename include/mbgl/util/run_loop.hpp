@@ -1,6 +1,7 @@
 #ifndef MBGL_UTIL_RUN_LOOP
 #define MBGL_UTIL_RUN_LOOP
 
+#include <memory>
 #include <mutex>
 #include <functional>
 #include <queue>
@@ -31,13 +32,16 @@ protected:
     // Called by the Thread<> wrapper to terminate this loop.
     void stop();
 
+    // Obtain the underlying loop object in case you want to attach additional listeners.
+    uv::loop& loop() { return *runloop; };
+
 private:
     // Invokes function in the run loop.
     void process();
 
 public:
     // Schedules a function to be executed as part of this run loop.
-    void invoke(std::function<void()> fn);
+    void invoke(std::function<void()>&& fn);
 
 private:
     const std::unique_ptr<uv::loop> runloop;

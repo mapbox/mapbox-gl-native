@@ -67,8 +67,8 @@ int main(int argc, char *argv[]) {
     view = mbgl::util::make_unique<GLFWView>();
 
     mbgl::util::Thread<mbgl::SQLiteCache> cache("/tmp/mbgl-cache.db");
-    mbgl::DefaultFileSource fileSource(cache);
-    mbgl::Map map(*view, fileSource);
+    mbgl::util::Thread<mbgl::DefaultFileSource> fileSource(cache);
+    mbgl::Map map(*view, *fileSource);
 
     // Load settings
     mbgl::Settings_JSON settings;

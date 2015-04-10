@@ -12,12 +12,12 @@ TEST_F(Storage, CacheResponse) {
     using namespace mbgl;
 
     util::Thread<SQLiteCache> cache(":memory:");
-    DefaultFileSource fs(cache, uv_default_loop());
+    util::Thread<DefaultFileSource> fs(cache);
 
     const Resource resource { Resource::Unknown, "http://127.0.0.1:3000/cache" };
     auto &env = *static_cast<const Environment *>(nullptr);
 
-    fs.request(resource, uv_default_loop(), env, [&](const Response &res) {
+    fs->request(resource, uv_default_loop(), env, [&](const Response &res) {
         EXPECT_EQ(Response::Successful, res.status);
         EXPECT_EQ("Response 1", res.data);
         EXPECT_LT(0, res.expires);
@@ -25,7 +25,7 @@ TEST_F(Storage, CacheResponse) {
         EXPECT_EQ("", res.etag);
         EXPECT_EQ("", res.message);
 
-        fs.request(resource, uv_default_loop(), env, [&, res](const Response &res2) {
+        fs->request(resource, uv_default_loop(), env, [&, res](const Response &res2) {
             EXPECT_EQ(res.status, res2.status);
             EXPECT_EQ(res.data, res2.data);
             EXPECT_EQ(res.expires, res2.expires);

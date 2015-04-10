@@ -3,25 +3,25 @@
 
 #include <mbgl/storage/file_source.hpp>
 #include <mbgl/storage/file_cache.hpp>
+#include <mbgl/util/run_loop.hpp>
 
 #include <set>
 #include <unordered_map>
-#include <thread>
-
-namespace mapbox { namespace util { template<typename... Types> class variant; } }
 
 namespace mbgl {
 
-namespace util { template <typename T> class AsyncQueue; }
-
 class SharedRequestBase;
 
-class DefaultFileSource : public FileSource {
-public:
+class DefaultFileSource : public FileSource, protected util::RunLoop {
+    friend class util::Thread<DefaultFileSource>;
+    friend class SharedRequestBase;
+
+private:
     DefaultFileSource(FileCache *cache, const std::string &root = "");
-    DefaultFileSource(FileCache *cache, uv_loop_t *loop, const std::string &root = "");
     ~DefaultFileSource() override;
 
+public:
+    // FileSource API
     Request *request(const Resource &resource, uv_loop_t *loop, const Environment &env,
                      Callback callback) override;
     void cancel(Request *request) override;
@@ -29,37 +29,22 @@ public:
 
     void abort(const Environment &env) override;
 
+private:
     void notify(SharedRequestBase *sharedRequest, const std::set<Request *> &observers,
                 std::shared_ptr<const Response> response, FileCache::Hint hint);
+    SharedRequestBase *find(const Resource &resource);
+
+    void processAdd(Request* request);
+    void processCancel(Request* request);
+    void processResult(const Resource& resource, std::shared_ptr<const Response> response);
+    void processAbort(const Environment& env);
 
 public:
     const std::string assetRoot;
 
 private:
-    struct ActionDispatcher;
-    struct AddRequestAction;
-    struct RemoveRequestAction;
-    struct ResultAction;
-    struct StopAction;
-    struct AbortAction;
-    using Action = mapbox::util::variant<AddRequestAction, RemoveRequestAction, ResultAction,
-                                         StopAction, AbortAction>;
-    using Queue = util::AsyncQueue<Action>;
-
-    void process(AddRequestAction &action);
-    void process(RemoveRequestAction &action);
-    void process(ResultAction &action);
-    void process(StopAction &action);
-    void process(AbortAction &action);
-
-    SharedRequestBase *find(const Resource &resource);
-
     std::unordered_map<Resource, SharedRequestBase *, Resource::Hash> pending;
-
-    uv_loop_t *loop = nullptr;
     FileCache *cache = nullptr;
-    Queue *queue = nullptr;
-    std::thread thread;
 };
 
 }

@@ -3,6 +3,7 @@
 #include <uv.h>
 
 #include <mbgl/storage/default_file_source.hpp>
+#include <mbgl/util/thread.hpp>
 
 TEST_F(Storage, HTTPCoalescing) {
     SCOPED_TEST(HTTPCoalescing)
@@ -12,7 +13,7 @@ TEST_F(Storage, HTTPCoalescing) {
 
     using namespace mbgl;
 
-    DefaultFileSource fs(nullptr, uv_default_loop());
+    util::Thread<DefaultFileSource> fs(nullptr);
 
     auto &env = *static_cast<const Environment *>(nullptr);
 
@@ -43,7 +44,7 @@ TEST_F(Storage, HTTPCoalescing) {
     const Resource resource { Resource::Unknown, "http://127.0.0.1:3000/test" };
 
     for (int i = 0; i < total; i++) {
-        fs.request(resource, uv_default_loop(), env, complete);
+        fs->request(resource, uv_default_loop(), env, complete);
     }
 
     uv_run(uv_default_loop(), UV_RUN_DEFAULT);

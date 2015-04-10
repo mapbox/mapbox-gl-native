@@ -288,7 +288,7 @@ AssetRequest::~AssetRequest() {
     }
 }
 
-void AssetRequest::start(uv_loop_t *loop, std::unique_ptr<Response> response) {
+void AssetRequest::start(uv_loop_t *loop, std::shared_ptr<const Response> response) {
     MBGL_VERIFY_THREAD(tid);
 
     // We're ignoring the existing response if any.

@@ -105,8 +105,8 @@ int main() {
     GLFWView view;
 
     mbgl::util::Thread<mbgl::SQLiteCache> cache(defaultCacheDatabase());
-    mbgl::DefaultFileSource fileSource(cache);
-    mbgl::Map map(view, fileSource);
+    mbgl::util::Thread<mbgl::DefaultFileSource> fileSource(cache);
+    mbgl::Map map(view, *fileSource);
 
     URLHandler *handler = [[URLHandler alloc] init];
     [handler setMap:&map];

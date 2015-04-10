@@ -3,6 +3,7 @@
 #include <uv.h>
 
 #include <mbgl/storage/default_file_source.hpp>
+#include <mbgl/util/thread.hpp>
 
 TEST_F(Storage, HTTPReading) {
     SCOPED_TEST(HTTPTest)
@@ -10,13 +11,13 @@ TEST_F(Storage, HTTPReading) {
 
     using namespace mbgl;
 
-    DefaultFileSource fs(nullptr, uv_default_loop());
+    util::Thread<DefaultFileSource> fs(nullptr);
 
     auto &env = *static_cast<const Environment *>(nullptr);
 
     const auto mainThread = uv_thread_self();
 
-    fs.request({ Resource::Unknown, "http://127.0.0.1:3000/test" }, uv_default_loop(), env,
+    fs->request({ Resource::Unknown, "http://127.0.0.1:3000/test" }, uv_default_loop(), env,
                [&](const Response &res) {
         EXPECT_EQ(uv_thread_self(), mainThread);
         EXPECT_EQ(Response::Successful, res.status);
@@ -28,7 +29,7 @@ TEST_F(Storage, HTTPReading) {
         HTTPTest.finish();
     });
 
-    fs.request({ Resource::Unknown, "http://127.0.0.1:3000/doesnotexist" }, uv_default_loop(),
+    fs->request({ Resource::Unknown, "http://127.0.0.1:3000/doesnotexist" }, uv_default_loop(),
                env, [&](const Response &res) {
         EXPECT_EQ(uv_thread_self(), mainThread);
         EXPECT_EQ(Response::Error, res.status);
@@ -47,11 +48,11 @@ TEST_F(Storage, HTTPNoCallback) {
 
     using namespace mbgl;
 
-    DefaultFileSource fs(nullptr, uv_default_loop());
+    util::Thread<DefaultFileSource> fs(nullptr);
 
     auto &env = *static_cast<const Environment *>(nullptr);
 
-    fs.request({ Resource::Unknown, "http://127.0.0.1:3000/test" }, uv_default_loop(), env,
+    fs->request({ Resource::Unknown, "http://127.0.0.1:3000/test" }, uv_default_loop(), env,
                nullptr);
 
     uv_run(uv_default_loop(), UV_RUN_DEFAULT);
@@ -64,11 +65,11 @@ TEST_F(Storage, HTTPNoCallbackNoLoop) {
 
     using namespace mbgl;
 
-    DefaultFileSource fs(nullptr, uv_default_loop());
+    util::Thread<DefaultFileSource> fs(nullptr);
 
     auto &env = *static_cast<const Environment *>(nullptr);
 
-    fs.request({ Resource::Unknown, "http://127.0.0.1:3000/test" }, env, nullptr);
+    fs->request({ Resource::Unknown, "http://127.0.0.1:3000/test" }, env, nullptr);
 
     uv_run(uv_default_loop(), UV_RUN_DEFAULT);
 

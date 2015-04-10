@@ -29,15 +29,14 @@ public:
     SharedRequestBase(DefaultFileSource *source_, const Resource &resource_)
         : resource(resource_), source(source_) {}
 
-    virtual void start(uv_loop_t *loop, std::unique_ptr<Response> response = nullptr) = 0;
+    virtual void start(uv_loop_t *loop, std::shared_ptr<const Response> response = nullptr) = 0;
     virtual void cancel() = 0;
 
-    void notify(std::unique_ptr<Response> response, FileCache::Hint hint) {
+    void notify(std::shared_ptr<const Response> response, FileCache::Hint hint) {
         MBGL_VERIFY_THREAD(tid);
 
         if (source) {
-            source->notify(this, observers, std::shared_ptr<const Response>(std::move(response)),
-                           hint);
+            source->notify(this, observers, response, hint);
         }
     }
 

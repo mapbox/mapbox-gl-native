@@ -63,7 +63,7 @@ private:
     ANativeWindow *window = nullptr;
 
     mbgl::util::Thread<mbgl::SQLiteCache> fileCache;
-    mbgl::DefaultFileSource fileSource;
+    mbgl::util::Thread<mbgl::DefaultFileSource> fileSource;
     mbgl::Map map;
 
     EGLDisplay display = EGL_NO_DISPLAY;
