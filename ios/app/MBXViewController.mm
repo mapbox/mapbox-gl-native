@@ -21,10 +21,6 @@ static NSArray *const kStyleNames = @[
     @"Satellite",
 ];
 
-static NSDictionary *const kStyleFileNames = @{
-    @"Mapbox Streets": @"mapbox-streets",
-};
-
 static NSString *const kStyleVersion = @"7";
 
 @interface MBXViewController () <UIActionSheetDelegate, MGLMapViewDelegate>
@@ -251,16 +247,11 @@ mbgl::Settings_NSUserDefaults *settings = nullptr;
         if (index == [kStyleNames count]) index = 0;
         styleName = [kStyleNames objectAtIndex:index];
     }
-    
-    NSString *styleFileName = kStyleFileNames[styleName];
-    if (!styleFileName) {
-        styleFileName = [NSString stringWithFormat:@"%@-v%@",
-                         [styleName.lowercaseString stringByReplacingOccurrencesOfString:@" " withString:@"-"],
-                         kStyleVersion];
-    }
 
     self.mapView.styleURL = [NSURL URLWithString:
-        [NSString stringWithFormat:@"asset://styles/%@.json", styleFileName]];
+        [NSString stringWithFormat:@"asset://styles/%@-v%@.json",
+            [[styleName lowercaseString] stringByReplacingOccurrencesOfString:@" " withString:@"-"],
+            kStyleVersion]];
 
     [titleButton setTitle:styleName forState:UIControlStateNormal];
 }
