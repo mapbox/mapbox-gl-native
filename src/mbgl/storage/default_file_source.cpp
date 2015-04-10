@@ -79,8 +79,8 @@ void DefaultFileSource::abort(const Environment &env) {
     invoke([this, &env] { processAbort(env); });
 }
 
-void DefaultFileSource::processAdd(Request* request) {
-    const Resource &resource = request->resource;
+void DefaultFileSource::processAdd(Request* req) {
+    const Resource &resource = req->resource;
 
     // We're adding a new Request.
     SharedRequestBase *sharedRequest = find(resource);
@@ -108,16 +108,16 @@ void DefaultFileSource::processAdd(Request* request) {
             });
         }
     }
-    sharedRequest->subscribe(request);
+    sharedRequest->subscribe(req);
 }
 
-void DefaultFileSource::processCancel(Request* request) {
-    SharedRequestBase *sharedRequest = find(request->resource);
+void DefaultFileSource::processCancel(Request* req) {
+    SharedRequestBase *sharedRequest = find(req->resource);
     if (sharedRequest) {
         // If the number of dependent requests of the SharedRequestBase drops to zero, the
         // unsubscribe callback triggers the removal of the SharedRequestBase pointer from the list
         // of pending requests and initiates cancelation.
-        sharedRequest->unsubscribe(request);
+        sharedRequest->unsubscribe(req);
     } else {
         // There is no request for this URL anymore. Likely, the request already completed
         // before we got around to process the cancelation request.
@@ -125,7 +125,7 @@ void DefaultFileSource::processCancel(Request* request) {
 
     // Send a message back to the requesting thread and notify it that this request has been
     // canceled and is now safe to be deleted.
-    request->destruct();
+    req->destruct();
 }
 
 void DefaultFileSource::processResult(const Resource& resource, std::shared_ptr<const Response> response) {
