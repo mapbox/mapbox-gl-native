@@ -289,14 +289,13 @@ NSString *const MGLEventGestureRotateStart = @"Rotation";
         // mapbox-events stock attributes
         [evt setObject:event forKey:@"event"];
         [evt setObject:@(1) forKey:@"version"];
-        [evt setObject:[weakSelf formatDate:[NSDate date]] forKey:@"created"];
+        [evt setObject:[weakSelf.rfc3339DateFormatter stringFromDate:[NSDate date]] forKey:@"created"];
         [evt setObject:weakSelf.instanceID forKey:@"instance"];
         [evt setObject:weakSelf.advertiserId forKey:@"advertiserId"];
         [evt setObject:weakSelf.vendorId forKey:@"vendorId"];
         [evt setObject:weakSelf.appBundleId forKeyedSubscript:@"appBundleId"];
         
         // mapbox-events-ios stock attributes
-        [evt setValue:[weakSelf.rfc3339DateFormatter stringFromDate:[NSDate date]] forKey:@"created"];
         [evt setValue:weakSelf.model forKey:@"model"];
         [evt setValue:weakSelf.iOSVersion forKey:@"operatingSystem"];
         [evt setValue:[weakSelf getDeviceOrientation] forKey:@"orientation"];
