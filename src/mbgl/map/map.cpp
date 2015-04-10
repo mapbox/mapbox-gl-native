@@ -818,3 +818,13 @@ void Map::render() {
         triggerUpdate();
     }
 }
+
+void Map::onLowMemory() {
+    invokeTask([=] {
+        if (!style) return;
+        for (const auto &source : style->sources) {
+            source->onLowMemory();
+        }
+        env->performCleanup();
+    });
+};

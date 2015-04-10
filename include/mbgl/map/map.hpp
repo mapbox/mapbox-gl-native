@@ -152,6 +152,9 @@ public:
     std::vector<uint32_t> getAnnotationsInBounds(const LatLngBounds&);
     LatLngBounds getBoundsForAnnotations(const std::vector<uint32_t>&);
 
+    // Reduce memory usage
+    void onLowMemory();
+
     // Debug
     void setDebug(bool value);
     void toggleDebug();

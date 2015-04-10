@@ -3,6 +3,7 @@
 
 #include <mbgl/map/tile_id.hpp>
 #include <mbgl/map/tile_data.hpp>
+#include <mbgl/map/tile_cache.hpp>
 #include <mbgl/style/types.hpp>
 
 #include <mbgl/util/noncopyable.hpp>
@@ -72,6 +73,8 @@ public:
 
     std::forward_list<Tile *> getLoadedTiles() const;
 
+    void onLowMemory();
+
     SourceInfo info;
     bool enabled;
 
@@ -96,6 +99,7 @@ private:
 
     std::map<TileID, std::unique_ptr<Tile>> tiles;
     std::map<TileID, std::weak_ptr<TileData>> tile_data;
+    TileCache cache;
 };
 
 }
