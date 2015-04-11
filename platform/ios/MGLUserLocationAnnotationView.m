@@ -18,8 +18,9 @@ const CGFloat MGLUserLocationAnnotationHaloSize = 115.0;
 
 @implementation MGLUserLocationAnnotationView
 {
-    CALayer *_accuracyRingLayer;
     CALayer *_headingIndicatorLayer;
+    CAShapeLayer *_headingIndicatorMaskLayer;
+    CALayer *_accuracyRingLayer;
     CALayer *_dotBorderLayer;
     CALayer *_dotLayer;
     
@@ -62,44 +63,62 @@ const CGFloat MGLUserLocationAnnotationHaloSize = 115.0;
     _haloLayer.backgroundColor = [tintColor CGColor];
     _dotLayer.backgroundColor = [tintColor CGColor];
     
-    // TODO: Add heading indicator tint updating
+    _headingIndicatorLayer.contents = (__bridge id)[[self headingIndicatorTintedGradientImage] CGImage];
 }
 
 - (void)setupLayers
 {
     if (CLLocationCoordinate2DIsValid(self.annotation.coordinate))
     {
+        // update heading indicator
+        //
         if (_headingIndicatorLayer)
         {
-            // TODO: Investigate alternative ways to determine this
             _headingIndicatorLayer.hidden = (_mapView.userTrackingMode == MGLUserTrackingModeFollowWithHeading) ? NO : YES;
             
             if (oldHeadingAccuracy != self.annotation.heading.headingAccuracy)
             {
-                // TODO: add accuracy updating
+                // recalculate the clipping mask based on updated accuracy
+                //
+                _headingIndicatorMaskLayer.path = [[self headingIndicatorClippingMask] CGPath];
+
                 oldHeadingAccuracy = self.annotation.heading.headingAccuracy;
             }
         }
         
         // tinted heading indicator
         //
-        if ( ! _headingIndicatorLayer && self.annotation.heading)
+        if ( ! _headingIndicatorLayer && self.annotation.heading.headingAccuracy)
         {
             CGFloat headingIndicatorSize = MGLUserLocationAnnotationHaloSize;
             
             _headingIndicatorLayer = [CALayer layer];
             _headingIndicatorLayer.bounds = CGRectMake(0, 0, headingIndicatorSize, headingIndicatorSize);
             _headingIndicatorLayer.position = CGPointMake(super.bounds.size.width / 2.0, super.bounds.size.height / 2.0);
-            _headingIndicatorLayer.contents = (id)[self headingIndicatorImage].CGImage;
+            _headingIndicatorLayer.contents = (__bridge id)[[self headingIndicatorTintedGradientImage] CGImage];
             _headingIndicatorLayer.contentsGravity = kCAGravityBottom;
             _headingIndicatorLayer.contentsScale = [UIScreen mainScreen].scale;
             _headingIndicatorLayer.opacity = 0.4;
-            
             _headingIndicatorLayer.shouldRasterize = YES;
             _headingIndicatorLayer.rasterizationScale = [UIScreen mainScreen].scale;
             _headingIndicatorLayer.drawsAsynchronously = YES;
             
             [self.layer insertSublayer:_headingIndicatorLayer below:_dotBorderLayer];
+        }
+        
+        // heading indicator accuracy mask
+        //
+        if ( ! _headingIndicatorMaskLayer && self.annotation.heading.headingAccuracy)
+        {
+            _headingIndicatorMaskLayer = [CAShapeLayer layer];
+            _headingIndicatorMaskLayer.frame = _headingIndicatorLayer.bounds;
+            _headingIndicatorMaskLayer.path = [[self headingIndicatorClippingMask] CGPath];
+
+            // apply the mask to the halo-radius-sized gradient layer
+            //
+            _headingIndicatorLayer.mask = _headingIndicatorMaskLayer;
+            
+            oldHeadingAccuracy = self.annotation.heading.headingAccuracy;
         }
         
         // update accuracy ring
@@ -166,14 +185,14 @@ const CGFloat MGLUserLocationAnnotationHaloSize = 115.0;
             
             // set defaults for the animations
             //
-            CAAnimationGroup *animationGroup = [self animationGroupWithDuration:3.0];
+            CAAnimationGroup *animationGroup = [self loopingAnimationGroupWithDuration:3.0];
             
             // scale out radially with initial acceleration
             //
             CAKeyframeAnimation *boundsAnimation = [CAKeyframeAnimation animationWithKeyPath:@"transform.scale.xy"];
             boundsAnimation.values = @[@0, @0.35, @1];
             boundsAnimation.keyTimes = @[@0, @0.2, @1];
-
+            
             // go transparent as scaled out, start semi-opaque
             //
             CAKeyframeAnimation *opacityAnimation = [CAKeyframeAnimation animationWithKeyPath:@"opacity"];
@@ -200,17 +219,18 @@ const CGFloat MGLUserLocationAnnotationHaloSize = 115.0;
             
             [self.layer addSublayer:_dotBorderLayer];
         }
-
+        
         // pulsing, tinted inner dot sublayer
         //
         if ( ! _dotLayer)
         {
             _dotLayer = [self circleLayerWithSize:MGLUserLocationAnnotationDotSize * 0.75];
             _dotLayer.backgroundColor = [_mapView.tintColor CGColor];
+            _dotLayer.shouldRasterize = NO;
             
             // set defaults for the animations
             //
-            CAAnimationGroup *animationGroup = [self animationGroupWithDuration:1.5];
+            CAAnimationGroup *animationGroup = [self loopingAnimationGroupWithDuration:1.5];
             animationGroup.autoreverses = YES;
             animationGroup.fillMode = kCAFillModeBoth;
             
@@ -248,7 +268,7 @@ const CGFloat MGLUserLocationAnnotationHaloSize = 115.0;
     return circleLayer;
 }
 
-- (CAAnimationGroup *)animationGroupWithDuration:(CGFloat)animationDuration
+- (CAAnimationGroup *)loopingAnimationGroupWithDuration:(CGFloat)animationDuration
 {
     CAAnimationGroup *animationGroup = [CAAnimationGroup animation];
     animationGroup.duration = animationDuration;
@@ -267,20 +287,16 @@ const CGFloat MGLUserLocationAnnotationHaloSize = 115.0;
     return pixelRadius * 2;
 }
 
-- (UIImage *)headingIndicatorImage
+- (UIImage *)headingIndicatorTintedGradientImage
 {
     UIImage *image;
-
+    
     CGFloat haloRadius = MGLUserLocationAnnotationHaloSize / 2.0;
     
     UIGraphicsBeginImageContextWithOptions(CGSizeMake(MGLUserLocationAnnotationHaloSize, haloRadius), NO, 0);
     
     CGColorSpaceRef colorSpace = CGColorSpaceCreateDeviceRGB();
     CGContextRef context = UIGraphicsGetCurrentContext();
-    
-    // TODO: Hook this up to our actual accuracy
-    // ... also, this is a little too magical and doesn't *appear* to do anything
-    UIBezierPath *ovalPath = [self headingIndicatorClippingMaskForAccuracy:10.0];
     
     // gradient from the tint color to no-alpha tint color
     //
@@ -296,36 +312,39 @@ const CGFloat MGLUserLocationAnnotationHaloSize = 115.0;
                                 centerPoint, 0.0,
                                 centerPoint, haloRadius,
                                 nil);
-
-    // export and cleanup
-    //
+    
     image = UIGraphicsGetImageFromCurrentImageContext();
     UIGraphicsEndImageContext();
-
+    
     CGGradientRelease(gradient);
     CGColorSpaceRelease(colorSpace);
     
     return image;
 }
 
-- (UIBezierPath *)headingIndicatorClippingMaskForAccuracy:(CGFloat)accuracy
+- (UIBezierPath *)headingIndicatorClippingMask
 {
-    CGFloat clippingDegrees = 60.0 - accuracy;
+    CGFloat accuracy = self.annotation.heading.headingAccuracy;
+    
+    // size the mask using exagerated accuracy, but keep within a good display range
+    //
+    CGFloat clippingDegrees = 90 - (accuracy * 1.5);
+    clippingDegrees = fmin(clippingDegrees, 55);
+    clippingDegrees = fmax(clippingDegrees, 10);
     
     CGRect ovalRect = CGRectMake(0, 0, MGLUserLocationAnnotationHaloSize, MGLUserLocationAnnotationHaloSize);
     UIBezierPath *ovalPath = UIBezierPath.bezierPath;
     
-    // clip the oval to ± incoming accuracy degrees, from the top
+    // clip the oval to ± incoming accuracy degrees (converted to radians), from the top
     //
     [ovalPath addArcWithCenter:CGPointMake(CGRectGetMidX(ovalRect), CGRectGetMidY(ovalRect))
                         radius:CGRectGetWidth(ovalRect) / 2.0
                     startAngle:(-180 + clippingDegrees) * M_PI / 180
                       endAngle:-clippingDegrees * M_PI / 180
                      clockwise:YES];
+    
     [ovalPath addLineToPoint:CGPointMake(CGRectGetMidX(ovalRect), CGRectGetMidY(ovalRect))];
     [ovalPath closePath];
-    
-    [ovalPath addClip];
     
     return ovalPath;
 }
