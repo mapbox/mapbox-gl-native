@@ -20,6 +20,9 @@ matrix:
       env: CONFIG=release MASON_PLATFORM=android MASON_ANDROID_ABI=x86 TESTMUNK=no
       compiler: clang
     - os: linux
+      env: CONFIG=release MASON_PLATFORM=android MASON_ANDROID_ABI=x86-64 TESTMUNK=no
+      compiler: clang
+    - os: linux
       env: CONFIG=release MASON_PLATFORM=android MASON_ANDROID_ABI=mips TESTMUNK=no
       compiler: clang
     - os: linux
