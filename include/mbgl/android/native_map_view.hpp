@@ -4,7 +4,7 @@
 #include <mbgl/map/map.hpp>
 #include <mbgl/map/view.hpp>
 #include <mbgl/util/noncopyable.hpp>
-#include <mbgl/storage/default/sqlite_cache.hpp>
+#include <mbgl/storage/sqlite_cache.hpp>
 #include <mbgl/storage/default_file_source.hpp>
 
 #include <string>

@@ -1,7 +1,7 @@
 #include <mbgl/storage/default_file_source_impl.hpp>
-#include <mbgl/storage/default/request.hpp>
-#include <mbgl/storage/default/asset_request.hpp>
-#include <mbgl/storage/default/http_request.hpp>
+#include <mbgl/storage/request.hpp>
+#include <mbgl/storage/asset_request.hpp>
+#include <mbgl/storage/http_request.hpp>
 
 #include <mbgl/storage/response.hpp>
 #include <mbgl/platform/platform.hpp>
@@ -9,7 +9,6 @@
 #include <mbgl/util/uv_detail.hpp>
 #include <mbgl/util/chrono.hpp>
 #include <mbgl/util/thread.hpp>
-#include <mbgl/util/run_loop.hpp>
 #include <mbgl/platform/log.hpp>
 
 #pragma GCC diagnostic push

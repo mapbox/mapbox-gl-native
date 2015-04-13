@@ -1,5 +1,5 @@
-#include <mbgl/storage/default/asset_request.hpp>
-#include <mbgl/storage/default/thread_context.hpp>
+#include <mbgl/storage/asset_request.hpp>
+#include <mbgl/storage/thread_context.hpp>
 #include <mbgl/android/jni.hpp>
 #include <mbgl/storage/response.hpp>
 #include <mbgl/platform/log.hpp>

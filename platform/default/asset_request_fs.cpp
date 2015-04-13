@@ -1,4 +1,4 @@
-#include <mbgl/storage/default/asset_request.hpp>
+#include <mbgl/storage/asset_request.hpp>
 #include <mbgl/storage/response.hpp>
 #include <mbgl/util/std.hpp>
 #include <mbgl/util/util.hpp>

@@ -3,7 +3,7 @@
 #include <uv.h>
 
 #include <mbgl/storage/default_file_source.hpp>
-#include <mbgl/storage/default/sqlite_cache.hpp>
+#include <mbgl/storage/sqlite_cache.hpp>
 
 TEST_F(Storage, CacheResponse) {
     SCOPED_TEST(CacheResponse);

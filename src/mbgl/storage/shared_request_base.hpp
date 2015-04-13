@@ -4,7 +4,7 @@
 #include <mbgl/storage/resource.hpp>
 #include <mbgl/storage/file_cache.hpp>
 #include <mbgl/storage/default_file_source_impl.hpp>
-#include <mbgl/storage/default/request.hpp>
+#include <mbgl/storage/request.hpp>
 #include <mbgl/util/util.hpp>
 #include <mbgl/util/noncopyable.hpp>
 

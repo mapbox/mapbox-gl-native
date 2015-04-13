@@ -1,5 +1,5 @@
-#include <mbgl/storage/default/http_request.hpp>
-#include <mbgl/storage/default/http_context.hpp>
+#include <mbgl/storage/http_request.hpp>
+#include <mbgl/storage/http_context.hpp>
 #include <mbgl/storage/response.hpp>
 #include <mbgl/util/chrono.hpp>
 #include <mbgl/platform/log.hpp>

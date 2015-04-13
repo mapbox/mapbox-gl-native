@@ -12,6 +12,7 @@
 
       'include_dirs': [
         '../include',
+        '../src',
       ],
 
       'variables': {

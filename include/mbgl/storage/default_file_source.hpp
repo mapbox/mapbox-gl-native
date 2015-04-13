@@ -3,9 +3,12 @@
 
 #include <mbgl/storage/file_source.hpp>
 #include <mbgl/storage/file_cache.hpp>
-#include <mbgl/util/run_loop.hpp>
 
 namespace mbgl {
+
+namespace util {
+template <typename T> class Thread;
+}
 
 class DefaultFileSource : public FileSource {
 public:

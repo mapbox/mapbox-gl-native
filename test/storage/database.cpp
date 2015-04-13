@@ -3,7 +3,7 @@
 
 #include <future>
 
-#include <mbgl/storage/default/sqlite_cache.hpp>
+#include <mbgl/storage/sqlite_cache.hpp>
 #include <mbgl/storage/resource.hpp>
 #include <mbgl/storage/response.hpp>
 #include <mbgl/util/io.hpp>
