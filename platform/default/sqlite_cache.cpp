@@ -1,4 +1,4 @@
-#include <mbgl/storage/sqlite_cache.hpp>
+#include "sqlite_cache_impl.hpp"
 #include <mbgl/storage/request.hpp>
 #include <mbgl/storage/response.hpp>
 
@@ -12,33 +12,6 @@
 #include <sqlite3.h>
 
 namespace mbgl {
-
-class SQLiteCache::Impl : public util::RunLoop {
-    friend class util::Thread<SQLiteCache::Impl>;
-
-public:
-    Impl(const std::string &path = ":memory:");
-    ~Impl();
-
-public:
-    void processGet(const Resource& resource, Callback callback);
-    void processPut(const Resource& resource, std::shared_ptr<const Response> response);
-    void processRefresh(const Resource& resource, int64_t expires);
-
-private:
-    void createDatabase();
-    void createSchema();
-
-private:
-    const std::string path;
-    std::unique_ptr<::mapbox::sqlite::Database> db;
-    std::unique_ptr<::mapbox::sqlite::Statement> getStmt;
-    std::unique_ptr<::mapbox::sqlite::Statement> putStmt;
-    std::unique_ptr<::mapbox::sqlite::Statement> refreshStmt;
-    bool schema = false;
-};
-
-
 
 std::string removeAccessTokenFromURL(const std::string &url) {
     const size_t token_start = url.find("access_token=");
