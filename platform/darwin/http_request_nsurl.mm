@@ -397,7 +397,7 @@ void HTTPRequestImpl::restart(uv_timer_t *timer, int) {
 
 // -------------------------------------------------------------------------------------------------
 
-HTTPRequest::HTTPRequest(DefaultFileSource::Impl *source, const Resource &resource)
+HTTPRequest::HTTPRequest(DefaultFileSource::Impl &source, const Resource &resource)
     : SharedRequestBase(source, resource) {
 }
 

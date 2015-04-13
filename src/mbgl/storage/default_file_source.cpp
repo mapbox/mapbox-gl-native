@@ -89,9 +89,9 @@ void DefaultFileSource::Impl::add(Request* req, uv_loop_t* loop) {
     if (!sharedRequest) {
         // There is no request for this URL yet. Create a new one and start it.
         if (algo::starts_with(resource.url, "asset://")) {
-            sharedRequest = new AssetRequest(this, resource);
+            sharedRequest = new AssetRequest(*this, resource);
         } else {
-            sharedRequest = new HTTPRequest(this, resource);
+            sharedRequest = new HTTPRequest(*this, resource);
         }
 
         const bool inserted = pending.emplace(resource, sharedRequest).second;

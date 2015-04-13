@@ -114,7 +114,7 @@ AssetRequestImpl::~AssetRequestImpl() {
 AssetRequestImpl::AssetRequestImpl(AssetRequest *request_, uv_loop_t *loop)
     : context(*AssetZipContext::Get(loop)),
       request(request_),
-      root(request->source->assetRoot),
+      root(request->source.assetRoot),
       path(std::string { "assets/" } + request->resource.url.substr(8)) {
     auto zip = context.getHandle(root);
     if (zip) {
@@ -129,7 +129,6 @@ void AssetRequestImpl::openZipArchive() {
     req->data = this;
 
     assert(request);
-    assert(request->source);
 
     // We're using uv_fs_open first to obtain a file descriptor. Then, uv_zip_fdopen will operate
     // on a read-only file.
@@ -275,7 +274,7 @@ void AssetRequestImpl::cancel() {
 
 // -------------------------------------------------------------------------------------------------
 
-AssetRequest::AssetRequest(DefaultFileSource::Impl *source_, const Resource &resource_)
+AssetRequest::AssetRequest(DefaultFileSource::Impl &source_, const Resource &resource_)
     : SharedRequestBase(source_, resource_) {
     assert(algo::starts_with(resource.url, "asset://"));
 }

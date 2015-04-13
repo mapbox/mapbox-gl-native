@@ -722,7 +722,7 @@ void HTTPRequestImpl::handleResult(CURLcode code) {
 
 // -------------------------------------------------------------------------------------------------
 
-HTTPRequest::HTTPRequest(DefaultFileSource::Impl *source_, const Resource &resource_)
+HTTPRequest::HTTPRequest(DefaultFileSource::Impl &source_, const Resource &resource_)
     : SharedRequestBase(source_, resource_) {
 }
 

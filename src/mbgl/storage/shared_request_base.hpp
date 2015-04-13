@@ -26,7 +26,7 @@ protected:
     MBGL_STORE_THREAD(tid)
 
 public:
-    SharedRequestBase(DefaultFileSource::Impl *source_, const Resource &resource_)
+    SharedRequestBase(DefaultFileSource::Impl &source_, const Resource &resource_)
         : resource(resource_), source(source_) {}
 
     virtual void start(uv_loop_t *loop, std::shared_ptr<const Response> response = nullptr) = 0;
@@ -35,9 +35,7 @@ public:
     void notify(std::shared_ptr<const Response> response, FileCache::Hint hint) {
         MBGL_VERIFY_THREAD(tid);
 
-        if (source) {
-            source->notify(this, observers, response, hint);
-        }
+        source.notify(this, observers, response, hint);
     }
 
     void subscribe(Request *request) {
@@ -53,10 +51,8 @@ public:
 
         if (abandoned()) {
             // There are no observers anymore. We are initiating cancelation.
-            if (source) {
-                // First, remove this SharedRequestBase from the source.
-                source->notify(this, observers, nullptr, FileCache::Hint::No);
-            }
+            // First, remove this SharedRequestBase from the source.
+            source.notify(this, observers, nullptr, FileCache::Hint::No);
 
             // Then, initiate cancelation of this request
             cancel();
@@ -95,7 +91,7 @@ public:
     const Resource resource;
 
 protected:
-    DefaultFileSource::Impl *source = nullptr;
+    DefaultFileSource::Impl &source;
 
 private:
     std::set<Request *> observers;
