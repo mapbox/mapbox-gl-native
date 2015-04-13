@@ -13,12 +13,12 @@
 
 namespace mbgl {
 
-class SQLiteCache::Thread : public util::RunLoop {
-    friend class util::Thread<SQLiteCache::Thread>;
+class SQLiteCache::Impl : public util::RunLoop {
+    friend class util::Thread<SQLiteCache::Impl>;
 
 public:
-    Thread(const std::string &path = ":memory:");
-    ~Thread();
+    Impl(const std::string &path = ":memory:");
+    ~Impl();
 
 public:
     void processGet(const Resource& resource, Callback callback);
@@ -89,19 +89,19 @@ std::string unifyMapboxURLs(const std::string &url) {
 
 using namespace mapbox::sqlite;
 
-SQLiteCache::SQLiteCache(const std::string& path_) : thread(util::make_unique<util::Thread<Thread>>(path_)) {
+SQLiteCache::SQLiteCache(const std::string& path_) : thread(util::make_unique<util::Thread<Impl>>(path_)) {
 }
 
 SQLiteCache::~SQLiteCache() = default;
 
-SQLiteCache::Thread::Thread(const std::string& path_)
+SQLiteCache::Impl::Impl(const std::string& path_)
     : path(path_) {
 #ifdef __APPLE__
     pthread_setname_np("SQLite Cache");
 #endif
 }
 
-SQLiteCache::Thread::~Thread() {
+SQLiteCache::Impl::~Impl() {
     // Deleting these SQLite objects may result in exceptions, but we're in a destructor, so we
     // can't throw anything.
     try {
@@ -114,11 +114,11 @@ SQLiteCache::Thread::~Thread() {
     }
 }
 
-void SQLiteCache::Thread::createDatabase() {
+void SQLiteCache::Impl::createDatabase() {
     db = util::make_unique<Database>(path.c_str(), ReadWrite | Create);
 }
 
-void SQLiteCache::Thread::createSchema() {
+void SQLiteCache::Impl::createSchema() {
     constexpr const char *const sql = ""
         "CREATE TABLE IF NOT EXISTS `http_cache` ("
         "    `url` TEXT PRIMARY KEY NOT NULL,"
@@ -164,7 +164,7 @@ void SQLiteCache::get(const Resource &resource, Callback callback) {
     (*thread)->invoke([=] { (*thread)->processGet(resource, callback); });
 }
 
-void SQLiteCache::Thread::processGet(const Resource &resource, Callback callback) {
+void SQLiteCache::Impl::processGet(const Resource &resource, Callback callback) {
     try {
         // This is called in the SQLite event loop.
         if (!db) {
@@ -219,7 +219,7 @@ void SQLiteCache::put(const Resource &resource, std::shared_ptr<const Response> 
     }
 }
 
-void SQLiteCache::Thread::processPut(const Resource& resource, std::shared_ptr<const Response> response) {
+void SQLiteCache::Impl::processPut(const Resource& resource, std::shared_ptr<const Response> response) {
     try {
         if (!db) {
             createDatabase();
@@ -268,7 +268,7 @@ void SQLiteCache::Thread::processPut(const Resource& resource, std::shared_ptr<c
     }
 }
 
-void SQLiteCache::Thread::processRefresh(const Resource& resource, int64_t expires) {
+void SQLiteCache::Impl::processRefresh(const Resource& resource, int64_t expires) {
     try {
         if (!db) {
             createDatabase();

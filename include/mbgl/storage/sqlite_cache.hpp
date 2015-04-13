@@ -21,8 +21,8 @@ public:
     void put(const Resource &resource, std::shared_ptr<const Response> response, Hint hint) override;
 
 private:
-    class Thread;
-    const std::unique_ptr<util::Thread<Thread>> thread;
+    class Impl;
+    const std::unique_ptr<util::Thread<Impl>> thread;
 };
 
 }
