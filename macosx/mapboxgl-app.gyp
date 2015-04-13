@@ -54,7 +54,6 @@
         'OTHER_LDFLAGS': [ '<@(ldflags)' ],
         'SDKROOT': 'macosx',
         'INFOPLIST_FILE': 'Info.plist',
-        'MACOSX_DEPLOYMENT_TARGET': '10.9',
         'CLANG_ENABLE_OBJC_ARC': 'YES'
       },
     }
