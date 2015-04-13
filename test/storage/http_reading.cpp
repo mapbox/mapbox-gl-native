@@ -3,7 +3,8 @@
 #include <uv.h>
 
 #include <mbgl/storage/default_file_source.hpp>
-#include <mbgl/util/thread.hpp>
+
+#include <future>
 
 TEST_F(Storage, HTTPReading) {
     SCOPED_TEST(HTTPTest)
@@ -11,13 +12,13 @@ TEST_F(Storage, HTTPReading) {
 
     using namespace mbgl;
 
-    util::Thread<DefaultFileSource> fs(nullptr);
+    DefaultFileSource fs(nullptr);
 
     auto &env = *static_cast<const Environment *>(nullptr);
 
     const auto mainThread = uv_thread_self();
 
-    fs->request({ Resource::Unknown, "http://127.0.0.1:3000/test" }, uv_default_loop(), env,
+    fs.request({ Resource::Unknown, "http://127.0.0.1:3000/test" }, uv_default_loop(), env,
                [&](const Response &res) {
         EXPECT_EQ(uv_thread_self(), mainThread);
         EXPECT_EQ(Response::Successful, res.status);
@@ -29,7 +30,7 @@ TEST_F(Storage, HTTPReading) {
         HTTPTest.finish();
     });
 
-    fs->request({ Resource::Unknown, "http://127.0.0.1:3000/doesnotexist" }, uv_default_loop(),
+    fs.request({ Resource::Unknown, "http://127.0.0.1:3000/doesnotexist" }, uv_default_loop(),
                env, [&](const Response &res) {
         EXPECT_EQ(uv_thread_self(), mainThread);
         EXPECT_EQ(Response::Error, res.status);
@@ -48,11 +49,11 @@ TEST_F(Storage, HTTPNoCallback) {
 
     using namespace mbgl;
 
-    util::Thread<DefaultFileSource> fs(nullptr);
+    DefaultFileSource fs(nullptr);
 
     auto &env = *static_cast<const Environment *>(nullptr);
 
-    fs->request({ Resource::Unknown, "http://127.0.0.1:3000/test" }, uv_default_loop(), env,
+    fs.request({ Resource::Unknown, "http://127.0.0.1:3000/test" }, uv_default_loop(), env,
                nullptr);
 
     uv_run(uv_default_loop(), UV_RUN_DEFAULT);
@@ -60,18 +61,21 @@ TEST_F(Storage, HTTPNoCallback) {
     HTTPTest.finish();
 }
 
-TEST_F(Storage, HTTPNoCallbackNoLoop) {
-    SCOPED_TEST(HTTPTest)
-
+TEST_F(Storage, HTTPCallbackNotOnLoop) {
     using namespace mbgl;
 
-    util::Thread<DefaultFileSource> fs(nullptr);
+    DefaultFileSource fs(nullptr);
+
+    SCOPED_TEST(HTTPTest)
 
     auto &env = *static_cast<const Environment *>(nullptr);
 
-    fs->request({ Resource::Unknown, "http://127.0.0.1:3000/test" }, env, nullptr);
+    std::promise<void> promise;
+    fs.request({ Resource::Unknown, "http://127.0.0.1:3000/test" }, env, [&] (const Response &) {
+        promise.set_value();
+    });
 
-    uv_run(uv_default_loop(), UV_RUN_DEFAULT);
+    promise.get_future().get();
 
     HTTPTest.finish();
 }

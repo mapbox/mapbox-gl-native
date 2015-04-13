@@ -4,14 +4,13 @@
 
 #include <mbgl/storage/default_file_source.hpp>
 #include <mbgl/util/uv.hpp>
-#include <mbgl/util/thread.hpp>
 
 TEST_F(Storage, HTTPNoLoop) {
     SCOPED_TEST(HTTPNoLoop)
 
     using namespace mbgl;
 
-    util::Thread<DefaultFileSource> fs(nullptr);
+    DefaultFileSource fs(nullptr);
 
     auto &env = *static_cast<const Environment *>(nullptr);
 
@@ -23,7 +22,7 @@ TEST_F(Storage, HTTPNoLoop) {
         uv::close(as);
     });
 
-    fs->request({ Resource::Unknown, "http://127.0.0.1:3000/temporary-error" }, nullptr, env,
+    fs.request({ Resource::Unknown, "http://127.0.0.1:3000/temporary-error" }, nullptr, env,
                [&](const Response &res) {
         EXPECT_NE(uv_thread_self(), mainThread) << "Response was called in the same thread";
         EXPECT_EQ(Response::Successful, res.status);

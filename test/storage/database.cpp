@@ -7,7 +7,6 @@
 #include <mbgl/storage/resource.hpp>
 #include <mbgl/storage/response.hpp>
 #include <mbgl/util/io.hpp>
-#include <mbgl/util/thread.hpp>
 
 #include <sqlite3.h>
 
@@ -37,14 +36,14 @@ TEST_F(Storage, DatabaseDoesNotExist) {
 
     Log::setObserver(util::make_unique<FixtureLogObserver>());
 
+    SQLiteCache cache("test/fixtures/404/cache.db");
+
     ScopedTest test([&] {
         auto observer = Log::removeObserver();
         EXPECT_EQ(1ul, dynamic_cast<FixtureLogObserver*>(observer.get())->count({ EventSeverity::Error, Event::Database, 14, "unable to open database file" }));
     });
 
-    util::Thread<SQLiteCache> cache("test/fixtures/404/cache.db");
-
-    cache->get({ Resource::Unknown, "mapbox://test" }, [&] (std::unique_ptr<Response> res) {
+    cache.get({ Resource::Unknown, "mapbox://test" }, [&] (std::unique_ptr<Response> res) {
         EXPECT_EQ(nullptr, res.get());
         test.finish();
     });
@@ -82,13 +81,13 @@ TEST_F(Storage, DatabaseCreate) {
 
     Log::setObserver(util::make_unique<FixtureLogObserver>());
 
+    SQLiteCache cache("test/fixtures/database/cache.db");
+
     ScopedTest test([&] {
         Log::removeObserver();
     });
 
-    util::Thread<SQLiteCache> cache("test/fixtures/database/cache.db");
-
-    cache->get({ Resource::Unknown, "mapbox://test" }, [&] (std::unique_ptr<Response> res) {
+    cache.get({ Resource::Unknown, "mapbox://test" }, [&] (std::unique_ptr<Response> res) {
         EXPECT_EQ(nullptr, res.get());
         test.finish();
     });
@@ -142,7 +141,7 @@ TEST_F(Storage, DatabaseLockedRead) {
     FileLock guard("test/fixtures/database/locked.db");
 
 
-    util::Thread<SQLiteCache> cache("test/fixtures/database/locked.db");
+    SQLiteCache cache("test/fixtures/database/locked.db");
 
     std::promise<void> promise;
 
@@ -150,7 +149,7 @@ TEST_F(Storage, DatabaseLockedRead) {
         // First request should fail.
         Log::setObserver(util::make_unique<FixtureLogObserver>());
         promise = {};
-        cache->get({ Resource::Unknown, "mapbox://test" }, [&] (std::unique_ptr<Response> res) {
+        cache.get({ Resource::Unknown, "mapbox://test" }, [&] (std::unique_ptr<Response> res) {
             EXPECT_EQ(nullptr, res.get());
             promise.set_value();
         });
@@ -170,7 +169,7 @@ TEST_F(Storage, DatabaseLockedRead) {
         Log::setObserver(util::make_unique<FixtureLogObserver>());
         promise = {};
 
-        cache->get({ Resource::Unknown, "mapbox://test" }, [&] (std::unique_ptr<Response> res) {
+        cache.get({ Resource::Unknown, "mapbox://test" }, [&] (std::unique_ptr<Response> res) {
             EXPECT_EQ(nullptr, res.get());
             promise.set_value();
         });
@@ -191,7 +190,7 @@ TEST_F(Storage, DatabaseLockedWrite) {
     deleteFile("test/fixtures/database/locked.db");
     FileLock guard("test/fixtures/database/locked.db");
 
-    util::Thread<SQLiteCache> cache("test/fixtures/database/locked.db");
+    SQLiteCache cache("test/fixtures/database/locked.db");
 
     std::promise<void> promise;
 
@@ -200,8 +199,8 @@ TEST_F(Storage, DatabaseLockedWrite) {
         Log::setObserver(util::make_unique<FixtureLogObserver>());
         promise = {};
         auto response = std::make_shared<Response>();
-        cache->put({ Resource::Unknown, "mapbox://test" }, response, FileCache::Hint::Full);
-        cache->get({ Resource::Unknown, "mapbox://test" }, [&] (std::unique_ptr<Response> res) {
+        cache.put({ Resource::Unknown, "mapbox://test" }, response, FileCache::Hint::Full);
+        cache.get({ Resource::Unknown, "mapbox://test" }, [&] (std::unique_ptr<Response> res) {
             EXPECT_EQ(nullptr, res.get());
             promise.set_value();
         });
@@ -222,8 +221,8 @@ TEST_F(Storage, DatabaseLockedWrite) {
 
         auto response = std::make_shared<Response>();
         response->data = "Demo";
-        cache->put({ Resource::Unknown, "mapbox://test" }, response, FileCache::Hint::Full);
-        cache->get({ Resource::Unknown, "mapbox://test" }, [&] (std::unique_ptr<Response> res) {
+        cache.put({ Resource::Unknown, "mapbox://test" }, response, FileCache::Hint::Full);
+        cache.get({ Resource::Unknown, "mapbox://test" }, [&] (std::unique_ptr<Response> res) {
             EXPECT_NE(nullptr, res.get());
             EXPECT_EQ("Demo", res->data);
             promise.set_value();
@@ -245,7 +244,7 @@ TEST_F(Storage, DatabaseLockedRefresh) {
     createDir("test/fixtures/database");
     deleteFile("test/fixtures/database/locked.db");
 
-    util::Thread<SQLiteCache> cache("test/fixtures/database/locked.db");
+    SQLiteCache cache("test/fixtures/database/locked.db");
 
     // Then, lock the file and try again.
     FileLock guard("test/fixtures/database/locked.db");
@@ -258,8 +257,8 @@ TEST_F(Storage, DatabaseLockedRefresh) {
         promise = {};
         auto response = std::make_shared<Response>();
         response->data = "Demo";
-        cache->put({ Resource::Unknown, "mapbox://test" }, response, FileCache::Hint::Full);
-        cache->get({ Resource::Unknown, "mapbox://test" }, [&] (std::unique_ptr<Response> res) {
+        cache.put({ Resource::Unknown, "mapbox://test" }, response, FileCache::Hint::Full);
+        cache.get({ Resource::Unknown, "mapbox://test" }, [&] (std::unique_ptr<Response> res) {
             EXPECT_EQ(nullptr, res.get());
             promise.set_value();
         });
@@ -277,8 +276,8 @@ TEST_F(Storage, DatabaseLockedRefresh) {
 
         auto response = std::make_shared<Response>();
         response->data = "Demo";
-        cache->put({ Resource::Unknown, "mapbox://test" }, response, FileCache::Hint::Refresh);
-        cache->get({ Resource::Unknown, "mapbox://test" }, [&] (std::unique_ptr<Response> res) {
+        cache.put({ Resource::Unknown, "mapbox://test" }, response, FileCache::Hint::Refresh);
+        cache.get({ Resource::Unknown, "mapbox://test" }, [&] (std::unique_ptr<Response> res) {
             EXPECT_EQ(nullptr, res.get());
             promise.set_value();
         });
@@ -300,7 +299,7 @@ TEST_F(Storage, DatabaseDeleted) {
     createDir("test/fixtures/database");
     deleteFile("test/fixtures/database/locked.db");
 
-    util::Thread<SQLiteCache> cache("test/fixtures/database/locked.db");
+    SQLiteCache cache("test/fixtures/database/locked.db");
 
     std::promise<void> promise;
 
@@ -310,8 +309,8 @@ TEST_F(Storage, DatabaseDeleted) {
         promise = {};
         auto response = std::make_shared<Response>();
         response->data = "Demo";
-        cache->put({ Resource::Unknown, "mapbox://test" }, response, FileCache::Hint::Full);
-        cache->get({ Resource::Unknown, "mapbox://test" }, [&] (std::unique_ptr<Response> res) {
+        cache.put({ Resource::Unknown, "mapbox://test" }, response, FileCache::Hint::Full);
+        cache.get({ Resource::Unknown, "mapbox://test" }, [&] (std::unique_ptr<Response> res) {
             EXPECT_NE(nullptr, res.get());
             EXPECT_EQ("Demo", res->data);
             promise.set_value();
@@ -329,8 +328,8 @@ TEST_F(Storage, DatabaseDeleted) {
         promise = {};
         auto response = std::make_shared<Response>();
         response->data = "Demo";
-        cache->put({ Resource::Unknown, "mapbox://test" }, response, FileCache::Hint::Full);
-        cache->get({ Resource::Unknown, "mapbox://test" }, [&] (std::unique_ptr<Response> res) {
+        cache.put({ Resource::Unknown, "mapbox://test" }, response, FileCache::Hint::Full);
+        cache.get({ Resource::Unknown, "mapbox://test" }, [&] (std::unique_ptr<Response> res) {
             EXPECT_NE(nullptr, res.get());
             EXPECT_EQ("Demo", res->data);
             promise.set_value();
@@ -353,7 +352,7 @@ TEST_F(Storage, DatabaseInvalid) {
     deleteFile("test/fixtures/database/invalid.db");
     writeFile("test/fixtures/database/invalid.db", "this is an invalid file");
 
-    util::Thread<SQLiteCache> cache("test/fixtures/database/invalid.db");
+    SQLiteCache cache("test/fixtures/database/invalid.db");
 
     std::promise<void> promise;
 
@@ -363,8 +362,8 @@ TEST_F(Storage, DatabaseInvalid) {
         promise = {};
         auto response = std::make_shared<Response>();
         response->data = "Demo";
-        cache->put({ Resource::Unknown, "mapbox://test" }, response, FileCache::Hint::Full);
-        cache->get({ Resource::Unknown, "mapbox://test" }, [&] (std::unique_ptr<Response> res) {
+        cache.put({ Resource::Unknown, "mapbox://test" }, response, FileCache::Hint::Full);
+        cache.get({ Resource::Unknown, "mapbox://test" }, [&] (std::unique_ptr<Response> res) {
             EXPECT_NE(nullptr, res.get());
             EXPECT_EQ("Demo", res->data);
             promise.set_value();

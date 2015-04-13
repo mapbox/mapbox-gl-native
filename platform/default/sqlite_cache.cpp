@@ -4,12 +4,41 @@
 
 #include <mbgl/util/compression.hpp>
 #include <mbgl/util/io.hpp>
+#include <mbgl/util/thread.hpp>
+#include <mbgl/util/run_loop.hpp>
 #include <mbgl/platform/log.hpp>
 
 #include "sqlite3.hpp"
 #include <sqlite3.h>
 
 namespace mbgl {
+
+class SQLiteCache::Thread : public util::RunLoop {
+    friend class util::Thread<SQLiteCache::Thread>;
+
+public:
+    Thread(const std::string &path = ":memory:");
+    ~Thread();
+
+public:
+    void processGet(const Resource& resource, Callback callback);
+    void processPut(const Resource& resource, std::shared_ptr<const Response> response);
+    void processRefresh(const Resource& resource, int64_t expires);
+
+private:
+    void createDatabase();
+    void createSchema();
+
+private:
+    const std::string path;
+    std::unique_ptr<::mapbox::sqlite::Database> db;
+    std::unique_ptr<::mapbox::sqlite::Statement> getStmt;
+    std::unique_ptr<::mapbox::sqlite::Statement> putStmt;
+    std::unique_ptr<::mapbox::sqlite::Statement> refreshStmt;
+    bool schema = false;
+};
+
+
 
 std::string removeAccessTokenFromURL(const std::string &url) {
     const size_t token_start = url.find("access_token=");
@@ -60,14 +89,19 @@ std::string unifyMapboxURLs(const std::string &url) {
 
 using namespace mapbox::sqlite;
 
-SQLiteCache::SQLiteCache(const std::string& path_)
+SQLiteCache::SQLiteCache(const std::string& path_) : thread(util::make_unique<util::Thread<Thread>>(path_)) {
+}
+
+SQLiteCache::~SQLiteCache() = default;
+
+SQLiteCache::Thread::Thread(const std::string& path_)
     : path(path_) {
 #ifdef __APPLE__
     pthread_setname_np("SQLite Cache");
 #endif
 }
 
-SQLiteCache::~SQLiteCache() {
+SQLiteCache::Thread::~Thread() {
     // Deleting these SQLite objects may result in exceptions, but we're in a destructor, so we
     // can't throw anything.
     try {
@@ -80,11 +114,11 @@ SQLiteCache::~SQLiteCache() {
     }
 }
 
-void SQLiteCache::createDatabase() {
+void SQLiteCache::Thread::createDatabase() {
     db = util::make_unique<Database>(path.c_str(), ReadWrite | Create);
 }
 
-void SQLiteCache::createSchema() {
+void SQLiteCache::Thread::createSchema() {
     constexpr const char *const sql = ""
         "CREATE TABLE IF NOT EXISTS `http_cache` ("
         "    `url` TEXT PRIMARY KEY NOT NULL,"
@@ -127,10 +161,10 @@ void SQLiteCache::get(const Resource &resource, Callback callback) {
     // Will try to load the URL from the SQLite database and call the callback when done.
     // Note that the callback is probably going to invoked from another thread, so the caller
     // must make sure that it can run in that thread.
-    invoke(std::bind(&SQLiteCache::processGet, this, resource, callback));
+    (*thread)->invoke([=] { (*thread)->processGet(resource, callback); });
 }
 
-void SQLiteCache::processGet(const Resource &resource, Callback callback) {
+void SQLiteCache::Thread::processGet(const Resource &resource, Callback callback) {
     try {
         // This is called in the SQLite event loop.
         if (!db) {
@@ -179,13 +213,13 @@ void SQLiteCache::put(const Resource &resource, std::shared_ptr<const Response> 
     // storing a new response or updating the currently stored response, potentially setting a new
     // expiry date.
     if (hint == Hint::Full) {
-        invoke(std::bind(&SQLiteCache::processPut, this, resource, response));
+        (*thread)->invoke([=] { (*thread)->processPut(resource, response); });
     } else if (hint == Hint::Refresh) {
-        invoke(std::bind(&SQLiteCache::processRefresh, this, resource, response->expires));
+        (*thread)->invoke([=] { (*thread)->processRefresh(resource, response->expires); });
     }
 }
 
-void SQLiteCache::processPut(const Resource& resource, std::shared_ptr<const Response> response) {
+void SQLiteCache::Thread::processPut(const Resource& resource, std::shared_ptr<const Response> response) {
     try {
         if (!db) {
             createDatabase();
@@ -234,7 +268,7 @@ void SQLiteCache::processPut(const Resource& resource, std::shared_ptr<const Res
     }
 }
 
-void SQLiteCache::processRefresh(const Resource& resource, int64_t expires) {
+void SQLiteCache::Thread::processRefresh(const Resource& resource, int64_t expires) {
     try {
         if (!db) {
             createDatabase();

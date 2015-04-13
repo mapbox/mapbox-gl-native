@@ -4,7 +4,6 @@
 
 #include <mbgl/storage/default_file_source.hpp>
 #include <mbgl/storage/network_status.hpp>
-#include <mbgl/util/thread.hpp>
 
 #include <cmath>
 
@@ -13,15 +12,15 @@ TEST_F(Storage, HTTPCancel) {
 
     using namespace mbgl;
 
-    util::Thread<DefaultFileSource> fs(nullptr);
+    DefaultFileSource fs(nullptr);
 
     auto &env = *static_cast<const Environment *>(nullptr);
 
     auto req =
-        fs->request({ Resource::Unknown, "http://127.0.0.1:3000/test" }, uv_default_loop(), env,
+        fs.request({ Resource::Unknown, "http://127.0.0.1:3000/test" }, uv_default_loop(), env,
                    [&](const Response &) { ADD_FAILURE() << "Callback should not be called"; });
 
-    fs->cancel(req);
+    fs.cancel(req);
     HTTPCancel.finish();
 
     uv_run(uv_default_loop(), UV_RUN_DEFAULT);
@@ -32,15 +31,15 @@ TEST_F(Storage, HTTPCancelMultiple) {
 
     using namespace mbgl;
 
-    util::Thread<DefaultFileSource> fs(nullptr);
+    DefaultFileSource fs(nullptr);
 
     auto &env = *static_cast<const Environment *>(nullptr);
     const Resource resource { Resource::Unknown, "http://127.0.0.1:3000/test" };
 
-    auto req2 = fs->request(resource, uv_default_loop(), env, [&](const Response &) {
+    auto req2 = fs.request(resource, uv_default_loop(), env, [&](const Response &) {
         ADD_FAILURE() << "Callback should not be called";
     });
-    fs->request(resource, uv_default_loop(), env, [&](const Response &res) {
+    fs.request(resource, uv_default_loop(), env, [&](const Response &res) {
         EXPECT_EQ(Response::Successful, res.status);
         EXPECT_EQ("Hello World!", res.data);
         EXPECT_EQ(0, res.expires);
@@ -49,7 +48,7 @@ TEST_F(Storage, HTTPCancelMultiple) {
         EXPECT_EQ("", res.message);
         HTTPCancelMultiple.finish();
     });
-    fs->cancel(req2);
+    fs.cancel(req2);
 
     uv_run(uv_default_loop(), UV_RUN_DEFAULT);
 }

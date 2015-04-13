@@ -4,7 +4,6 @@
 
 #include <mbgl/storage/default_file_source.hpp>
 #include <mbgl/storage/network_status.hpp>
-#include <mbgl/util/thread.hpp>
 
 #include <cmath>
 
@@ -14,7 +13,7 @@ TEST_F(Storage, HTTPCancelEnvironment) {
 
     using namespace mbgl;
 
-    util::Thread<DefaultFileSource> fs(nullptr);
+    DefaultFileSource fs(nullptr);
 
     // Create two fake environment pointers. The FileSource implementation treats these as opaque
     // pointers and doesn't reach into them.
@@ -24,7 +23,7 @@ TEST_F(Storage, HTTPCancelEnvironment) {
     const Resource resource { Resource::Unknown, "http://127.0.0.1:3000/delayed" };
 
     // Environment 1
-    fs->request(resource, uv_default_loop(), env1, [&](const Response &res) {
+    fs.request(resource, uv_default_loop(), env1, [&](const Response &res) {
         // This environment gets aborted below. This means the request is marked as failing and
         // will return an error here.
         EXPECT_EQ(Response::Error, res.status);
@@ -37,7 +36,7 @@ TEST_F(Storage, HTTPCancelEnvironment) {
     });
 
     // Environment 2
-    fs->request(resource, uv_default_loop(), env2, [&](const Response &res) {
+    fs.request(resource, uv_default_loop(), env2, [&](const Response &res) {
         // The same request as above, but in a different environment which doesn't get aborted. This
         // means the request should succeed.
         EXPECT_EQ(Response::Successful, res.status);
@@ -49,7 +48,7 @@ TEST_F(Storage, HTTPCancelEnvironment) {
         HTTPRetainedEnvironment.finish();
     });
 
-    fs->abort(env1);
+    fs.abort(env1);
 
     uv_run(uv_default_loop(), UV_RUN_DEFAULT);
 }

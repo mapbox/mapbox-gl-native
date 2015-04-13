@@ -4,7 +4,6 @@
 #include <mbgl/map/map.hpp>
 #include <mbgl/map/view.hpp>
 #include <mbgl/util/noncopyable.hpp>
-#include <mbgl/util/thread.hpp>
 #include <mbgl/storage/default/sqlite_cache.hpp>
 #include <mbgl/storage/default_file_source.hpp>
 
@@ -62,8 +61,8 @@ private:
 
     ANativeWindow *window = nullptr;
 
-    mbgl::util::Thread<mbgl::SQLiteCache> fileCache;
-    mbgl::util::Thread<mbgl::DefaultFileSource> fileSource;
+    mbgl::SQLiteCache fileCache;
+    mbgl::DefaultFileSource fileSource;
     mbgl::Map map;
 
     EGLDisplay display = EGL_NO_DISPLAY;

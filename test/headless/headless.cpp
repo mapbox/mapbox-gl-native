@@ -4,7 +4,6 @@
 #include <mbgl/map/map.hpp>
 #include <mbgl/util/image.hpp>
 #include <mbgl/util/std.hpp>
-#include <mbgl/util/thread.hpp>
 
 #include <mbgl/util/io.hpp>
 #include <rapidjson/document.h>
@@ -140,8 +139,8 @@ TEST_P(HeadlessTest, render) {
         }
 
         HeadlessView view(display);
-        util::Thread<DefaultFileSource> fileSource(nullptr);
-        Map map(view, *fileSource);
+        DefaultFileSource fileSource(nullptr);
+        Map map(view, fileSource);
 
         map.setClasses(classes);
         map.setStyleJSON(style, "test/suite");

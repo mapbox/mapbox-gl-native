@@ -275,7 +275,7 @@ void AssetRequestImpl::cancel() {
 
 // -------------------------------------------------------------------------------------------------
 
-AssetRequest::AssetRequest(DefaultFileSource *source_, const Resource &resource_)
+AssetRequest::AssetRequest(DefaultFileSource::Impl *source_, const Resource &resource_)
     : SharedRequestBase(source_, resource_) {
     assert(algo::starts_with(resource.url, "asset://"));
 }

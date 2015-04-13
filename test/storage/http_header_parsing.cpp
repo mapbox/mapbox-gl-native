@@ -4,7 +4,6 @@
 
 #include <mbgl/storage/default_file_source.hpp>
 #include <mbgl/util/chrono.hpp>
-#include <mbgl/util/thread.hpp>
 
 #include <cmath>
 
@@ -14,11 +13,11 @@ TEST_F(Storage, HTTPHeaderParsing) {
 
     using namespace mbgl;
 
-    util::Thread<DefaultFileSource> fs(nullptr);
+    DefaultFileSource fs(nullptr);
 
     auto &env = *static_cast<const Environment *>(nullptr);
 
-    fs->request({ Resource::Unknown,
+    fs.request({ Resource::Unknown,
                  "http://127.0.0.1:3000/test?modified=1420794326&expires=1420797926&etag=foo" },
                uv_default_loop(), env, [&](const Response &res) {
         EXPECT_EQ(Response::Successful, res.status);
@@ -33,7 +32,7 @@ TEST_F(Storage, HTTPHeaderParsing) {
     int64_t now = std::chrono::duration_cast<std::chrono::seconds>(
                        SystemClock::now().time_since_epoch()).count();
 
-    fs->request({ Resource::Unknown, "http://127.0.0.1:3000/test?cachecontrol=max-age=120" },
+    fs.request({ Resource::Unknown, "http://127.0.0.1:3000/test?cachecontrol=max-age=120" },
                uv_default_loop(), env, [&](const Response &res) {
         EXPECT_EQ(Response::Successful, res.status);
         EXPECT_EQ("Hello World!", res.data);

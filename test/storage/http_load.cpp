@@ -3,14 +3,13 @@
 #include <uv.h>
 
 #include <mbgl/storage/default_file_source.hpp>
-#include <mbgl/util/thread.hpp>
 
 TEST_F(Storage, HTTPLoad) {
     SCOPED_TEST(HTTPLoad)
 
     using namespace mbgl;
 
-    util::Thread<DefaultFileSource> fs(nullptr);
+    DefaultFileSource fs(nullptr);
 
     auto &env = *static_cast<const Environment *>(nullptr);
 
@@ -20,7 +19,7 @@ TEST_F(Storage, HTTPLoad) {
 
     std::function<void()> req = [&]() {
         const auto current = number++;
-        fs->request({ Resource::Unknown,
+        fs.request({ Resource::Unknown,
                      std::string("http://127.0.0.1:3000/load/") + std::to_string(current) },
                    uv_default_loop(), env, [&, current](const Response &res) {
             EXPECT_EQ(Response::Successful, res.status);

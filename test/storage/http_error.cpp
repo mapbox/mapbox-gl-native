@@ -4,7 +4,6 @@
 
 #include <mbgl/storage/default_file_source.hpp>
 #include <mbgl/storage/network_status.hpp>
-#include <mbgl/util/thread.hpp>
 
 #include <cmath>
 
@@ -21,13 +20,13 @@ TEST_F(Storage, HTTPError) {
     }, 500, 500);
     uv_unref((uv_handle_t *)&statusChange);
 
-    util::Thread<DefaultFileSource> fs(nullptr);
+    DefaultFileSource fs(nullptr);
 
     auto &env = *static_cast<const Environment *>(nullptr);
 
     auto start = uv_hrtime();
 
-    fs->request({ Resource::Unknown, "http://127.0.0.1:3000/temporary-error" }, uv_default_loop(),
+    fs.request({ Resource::Unknown, "http://127.0.0.1:3000/temporary-error" }, uv_default_loop(),
                env, [&](const Response &res) {
         const auto duration = double(uv_hrtime() - start) / 1e9;
         EXPECT_LT(1, duration) << "Backoff timer didn't wait 1 second";
@@ -42,7 +41,7 @@ TEST_F(Storage, HTTPError) {
         HTTPTemporaryError.finish();
     });
 
-    fs->request({ Resource::Unknown, "http://127.0.0.1:3001/" }, uv_default_loop(), env,
+    fs.request({ Resource::Unknown, "http://127.0.0.1:3001/" }, uv_default_loop(), env,
                [&](const Response &res) {
         const auto duration = double(uv_hrtime() - start) / 1e9;
         // 1.5 seconds == 4 retries, with a 500ms timeout (see above).

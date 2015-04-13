@@ -4,7 +4,6 @@
 
 #include <mbgl/storage/default_file_source.hpp>
 #include <mbgl/platform/platform.hpp>
-#include <mbgl/util/thread.hpp>
 
 TEST_F(Storage, AssetEmptyFile) {
     SCOPED_TEST(EmptyFile)
@@ -12,14 +11,14 @@ TEST_F(Storage, AssetEmptyFile) {
     using namespace mbgl;
 
 #ifdef MBGL_ASSET_ZIP
-    util::Thread<DefaultFileSource> fs(nullptr, "test/fixtures/storage/assets.zip");
+    DefaultFileSource fs(nullptr, "test/fixtures/storage/assets.zip");
 #else
-    util::Thread<DefaultFileSource> fs(nullptr);
+    DefaultFileSource fs(nullptr);
 #endif
 
     auto &env = *static_cast<const Environment *>(nullptr);
 
-    fs->request({ Resource::Unknown, "asset://TEST_DATA/fixtures/storage/empty" }, uv_default_loop(),
+    fs.request({ Resource::Unknown, "asset://TEST_DATA/fixtures/storage/empty" }, uv_default_loop(),
                env, [&](const Response &res) {
         EXPECT_EQ(Response::Successful, res.status);
         EXPECT_EQ(0ul, res.data.size());
@@ -39,14 +38,14 @@ TEST_F(Storage, AssetNonEmptyFile) {
     using namespace mbgl;
 
 #ifdef MBGL_ASSET_ZIP
-    util::Thread<DefaultFileSource> fs(nullptr, "test/fixtures/storage/assets.zip");
+    DefaultFileSource fs(nullptr, "test/fixtures/storage/assets.zip");
 #else
-    util::Thread<DefaultFileSource> fs(nullptr);
+    DefaultFileSource fs(nullptr);
 #endif
 
     auto &env = *static_cast<const Environment *>(nullptr);
 
-    fs->request({ Resource::Unknown, "asset://TEST_DATA/fixtures/storage/nonempty" },
+    fs.request({ Resource::Unknown, "asset://TEST_DATA/fixtures/storage/nonempty" },
                uv_default_loop(), env, [&](const Response &res) {
         EXPECT_EQ(Response::Successful, res.status);
         EXPECT_EQ(16ul, res.data.size());
@@ -67,14 +66,14 @@ TEST_F(Storage, AssetNonExistentFile) {
     using namespace mbgl;
 
 #ifdef MBGL_ASSET_ZIP
-    util::Thread<DefaultFileSource> fs(nullptr, "test/fixtures/storage/assets.zip");
+    DefaultFileSource fs(nullptr, "test/fixtures/storage/assets.zip");
 #else
-    util::Thread<DefaultFileSource> fs(nullptr);
+    DefaultFileSource fs(nullptr);
 #endif
 
     auto &env = *static_cast<const Environment *>(nullptr);
 
-    fs->request({ Resource::Unknown, "asset://TEST_DATA/fixtures/storage/does_not_exist" },
+    fs.request({ Resource::Unknown, "asset://TEST_DATA/fixtures/storage/does_not_exist" },
                uv_default_loop(), env, [&](const Response &res) {
         EXPECT_EQ(Response::Error, res.status);
         EXPECT_EQ(0ul, res.data.size());

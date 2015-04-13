@@ -1,4 +1,4 @@
-#include <mbgl/storage/default_file_source.hpp>
+#include <mbgl/storage/default_file_source_impl.hpp>
 #include <mbgl/storage/default/request.hpp>
 #include <mbgl/storage/default/asset_request.hpp>
 #include <mbgl/storage/default/http_request.hpp>
@@ -8,6 +8,8 @@
 
 #include <mbgl/util/uv_detail.hpp>
 #include <mbgl/util/chrono.hpp>
+#include <mbgl/util/thread.hpp>
+#include <mbgl/util/run_loop.hpp>
 #include <mbgl/platform/log.hpp>
 
 #pragma GCC diagnostic push
@@ -18,7 +20,6 @@
 #include <boost/algorithm/string.hpp>
 #pragma GCC diagnostic pop
 
-#include <thread>
 #include <algorithm>
 #include <cassert>
 
@@ -27,18 +28,22 @@ namespace algo = boost::algorithm;
 
 namespace mbgl {
 
-DefaultFileSource::DefaultFileSource(FileCache* cache_, const std::string& root)
+DefaultFileSource::Impl::Impl(FileCache* cache_, const std::string& root)
     : assetRoot(root.empty() ? platform::assetRoot() : root), cache(cache_) {
 #ifdef __APPLE__
     pthread_setname_np("FileSource");
 #endif
 }
 
+DefaultFileSource::DefaultFileSource(FileCache* cache, const std::string& root)
+    : thread(util::make_unique<util::Thread<Impl>>(cache, root)) {
+}
+
 DefaultFileSource::~DefaultFileSource() {
     MBGL_VERIFY_THREAD(tid);
 }
 
-SharedRequestBase *DefaultFileSource::find(const Resource &resource) {
+SharedRequestBase *DefaultFileSource::Impl::find(const Resource &resource) {
     // We're using a set of pointers here instead of a map between url and SharedRequestBase because
     // we need to find the requests both by pointer and by URL. Given that the number of requests
     // is generally very small (typically < 10 at a time), hashing by URL incurs too much overhead
@@ -58,7 +63,7 @@ Request* DefaultFileSource::request(const Resource& resource,
 
     // This function can be called from any thread. Make sure we're executing the actual call in the
     // file source loop by sending it over the queue.
-    invoke([this, req] { processAdd(req); });
+    (*thread)->invoke([=] { (*thread)->processAdd(req); });
 
     return req;
 }
@@ -72,14 +77,14 @@ void DefaultFileSource::cancel(Request *req) {
 
     // This function can be called from any thread. Make sure we're executing the actual call in the
     // file source loop by sending it over the queue.
-    invoke([this, req] { processCancel(req); });
+    (*thread)->invoke([=] { (*thread)->processCancel(req); });
 }
 
 void DefaultFileSource::abort(const Environment &env) {
-    invoke([this, &env] { processAbort(env); });
+    (*thread)->invoke([=, &env] { (*thread)->processAbort(env); });
 }
 
-void DefaultFileSource::processAdd(Request* req) {
+void DefaultFileSource::Impl::processAdd(Request* req) {
     const Resource &resource = req->resource;
 
     // We're adding a new Request.
@@ -111,7 +116,7 @@ void DefaultFileSource::processAdd(Request* req) {
     sharedRequest->subscribe(req);
 }
 
-void DefaultFileSource::processCancel(Request* req) {
+void DefaultFileSource::Impl::processCancel(Request* req) {
     SharedRequestBase *sharedRequest = find(req->resource);
     if (sharedRequest) {
         // If the number of dependent requests of the SharedRequestBase drops to zero, the
@@ -128,7 +133,7 @@ void DefaultFileSource::processCancel(Request* req) {
     req->destruct();
 }
 
-void DefaultFileSource::processResult(const Resource& resource, std::shared_ptr<const Response> response) {
+void DefaultFileSource::Impl::processResult(const Resource& resource, std::shared_ptr<const Response> response) {
     SharedRequestBase *sharedRequest = find(resource);
     if (sharedRequest) {
         if (response) {
@@ -155,7 +160,7 @@ void DefaultFileSource::processResult(const Resource& resource, std::shared_ptr<
 }
 
 // Aborts all requests that are part of the current environment.
-void DefaultFileSource::processAbort(const Environment& env) {
+void DefaultFileSource::Impl::processAbort(const Environment& env) {
     // Construct a cancellation response.
     auto res = util::make_unique<Response>();
     res->status = Response::Error;
@@ -182,7 +187,7 @@ void DefaultFileSource::processAbort(const Environment& env) {
     });
 }
 
-void DefaultFileSource::notify(SharedRequestBase *sharedRequest,
+void DefaultFileSource::Impl::notify(SharedRequestBase *sharedRequest,
                                const std::set<Request *> &observers,
                                std::shared_ptr<const Response> response, FileCache::Hint hint) {
     // First, remove the request, since it might be destructed at any point now.
