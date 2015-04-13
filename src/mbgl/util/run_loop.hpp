@@ -1,53 +1,97 @@
 #ifndef MBGL_UTIL_RUN_LOOP
 #define MBGL_UTIL_RUN_LOOP
 
-#include <memory>
-#include <mutex>
+#include <mbgl/util/uv_detail.hpp>
+
 #include <functional>
 #include <queue>
-
-namespace uv {
-class async;
-class loop;
-}
+#include <mutex>
 
 namespace mbgl {
 namespace util {
 
-template <typename T> class Thread;
-
 class RunLoop {
-    friend Thread<RunLoop>;
-
-protected:
-    // These are called by the Thread<> wrapper.
+public:
     RunLoop();
-    ~RunLoop();
 
-    // Called by the Thread<> wrapper to start the loop. When you implement this
-    // method in a child class, you *must* call this function as the last action.
-    void start();
-
-protected:
-    // Called by the Thread<> wrapper to terminate this loop.
+    void run();
     void stop();
 
-    // Obtain the underlying loop object in case you want to attach additional listeners.
-    uv::loop& loop() { return *runloop; };
+    // Invoke fn() in the runloop thread.
+    template <class Fn>
+    void invoke(Fn&& fn) {
+        withMutex([&] { queue.push(Message(std::move(fn))); });
+        async.send();
+    }
+
+    // Invoke fn() in the runloop thread, then invoke callback(result) in the current thread.
+    template <class Fn, class R>
+    void invokeWithResult(Fn&& fn, std::function<void (R)> callback) {
+        RunLoop* outer = current.get();
+        assert(outer);
+
+        invoke([fn, callback, outer] {
+            /*
+                With C++14, we could write:
+
+                outer->invoke([callback, result = std::move(fn())] () mutable {
+                    callback(std::move(result));
+                });
+
+                Instead we're using a workaround with std::bind
+                to obtain move-capturing semantics with C++11:
+                  http://stackoverflow.com/a/12744730/52207
+            */
+            outer->invoke(std::bind([callback] (R& result) {
+                callback(std::move(result));
+            }, std::move(fn())));
+        });
+    }
+
+    uv_loop_t* get() { return *loop; }
 
 private:
-    // Invokes function in the run loop.
+    struct Message {
+        struct Base {
+            virtual void operator()() = 0;
+            virtual ~Base() = default;
+        };
+
+        template <class F>
+        struct Invoker : Base {
+            Invoker(F&& f) : func(std::move(f)) {}
+            void operator()() override { func(); }
+            F func;
+        }; 
+
+        Message() = default;
+        Message(Message&&) = default;
+        ~Message() = default;
+        Message& operator=(Message&&) = default;
+
+        // copy members implicitly deleted
+
+        template <class Fn>
+        Message(Fn fn)
+            : p_fn(new Invoker<Fn>(std::move(fn))) {
+        }
+
+        void operator()() const { (*p_fn)(); }
+        std::unique_ptr<Base> p_fn;
+    };
+
+    using Queue = std::queue<Message>;
+
+    static uv::tls<RunLoop> current;
+
+    void withMutex(std::function<void()>&&);
     void process();
 
-public:
-    // Schedules a function to be executed as part of this run loop.
-    void invoke(std::function<void()>&& fn);
+    Queue queue;
+    std::mutex mutex;
 
-private:
-    const std::unique_ptr<uv::loop> runloop;
-    const std::unique_ptr<uv::async> runloopAsync;
-    std::mutex runloopMutex;
-    std::queue<std::function<void()>> runloopQueue;
+    uv::loop loop;
+    uv::async async;
 };
 
 }

@@ -5,7 +5,6 @@
 #include <mbgl/util/compression.hpp>
 #include <mbgl/util/io.hpp>
 #include <mbgl/util/thread.hpp>
-#include <mbgl/util/run_loop.hpp>
 #include <mbgl/platform/log.hpp>
 
 #include "sqlite3.hpp"
@@ -62,16 +61,14 @@ std::string unifyMapboxURLs(const std::string &url) {
 
 using namespace mapbox::sqlite;
 
-SQLiteCache::SQLiteCache(const std::string& path_) : thread(util::make_unique<util::Thread<Impl>>(path_)) {
+SQLiteCache::SQLiteCache(const std::string& path_)
+    : thread(util::make_unique<util::Thread<Impl>>("SQLite Cache", path_)) {
 }
 
 SQLiteCache::~SQLiteCache() = default;
 
 SQLiteCache::Impl::Impl(const std::string& path_)
     : path(path_) {
-#ifdef __APPLE__
-    pthread_setname_np("SQLite Cache");
-#endif
 }
 
 SQLiteCache::Impl::~Impl() {
@@ -134,10 +131,10 @@ void SQLiteCache::get(const Resource &resource, Callback callback) {
     // Will try to load the URL from the SQLite database and call the callback when done.
     // Note that the callback is probably going to invoked from another thread, so the caller
     // must make sure that it can run in that thread.
-    (*thread)->invoke([=] { (*thread)->processGet(resource, callback); });
+    thread->invokeWithResult(&Impl::processGet, callback, resource);
 }
 
-void SQLiteCache::Impl::processGet(const Resource &resource, Callback callback) {
+std::unique_ptr<Response> SQLiteCache::Impl::processGet(const Resource &resource) {
     try {
         // This is called in the SQLite event loop.
         if (!db) {
@@ -170,14 +167,14 @@ void SQLiteCache::Impl::processGet(const Resource &resource, Callback callback) 
             if (getStmt->get<int>(5)) { // == compressed
                 response->data = util::decompress(response->data);
             }
-            callback(std::move(response));
+            return std::move(response);
         } else {
             // There is no data.
-            callback(nullptr);
+            return nullptr;
         }
     } catch (mapbox::sqlite::Exception& ex) {
         Log::Error(Event::Database, ex.code, ex.what());
-        callback(nullptr);
+        return nullptr;
     }
 }
 
@@ -186,9 +183,9 @@ void SQLiteCache::put(const Resource &resource, std::shared_ptr<const Response> 
     // storing a new response or updating the currently stored response, potentially setting a new
     // expiry date.
     if (hint == Hint::Full) {
-        (*thread)->invoke([=] { (*thread)->processPut(resource, response); });
+        thread->invoke(&Impl::processPut, resource, std::move(response));
     } else if (hint == Hint::Refresh) {
-        (*thread)->invoke([=] { (*thread)->processRefresh(resource, response->expires); });
+        thread->invoke(&Impl::processRefresh, resource, int64_t(response->expires));
     }
 }
 

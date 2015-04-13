@@ -3,6 +3,9 @@
 
 #include <future>
 #include <thread>
+#include <functional>
+
+#include <mbgl/util/run_loop.hpp>
 
 namespace {
 
@@ -34,49 +37,80 @@ template <class Object>
 class Thread {
 public:
     template <class... Args>
-    Thread(Args&&... args);
+    Thread(const std::string& name, Args&&... args);
+    ~Thread();
+
+    // Invoke object->fn(args...) in the runloop thread.
+    template <typename Fn, class... Args>
+    void invoke(Fn fn, Args&&... args) {
+        loop->invoke(std::bind(fn, object, args...));
+    }
+
+    // Invoke object->fn(args...) in the runloop thread, then invoke callback(result) in the current thread.
+    template <typename Fn, class R, class... Args>
+    void invokeWithResult(Fn fn, std::function<void (R)> callback, Args&&... args) {
+        loop->invokeWithResult(std::bind(fn, object, args...), callback);
+    }
+
+    uv_loop_t* get() { return loop->get(); }
+
+private:
     Thread(const Thread&) = delete;
     Thread(Thread&&) = delete;
     Thread& operator=(const Thread&) = delete;
     Thread& operator=(Thread&&) = delete;
-    ~Thread();
 
-    inline Object* operator->() const { return &object; }
-    inline operator Object*() const { return &object; }
-
-private:
     template <typename P, std::size_t... I>
-    void run(std::promise<Object&>& promise, P&& params, index_sequence<I...>) {
-        Object context(std::get<I>(std::forward<P>(params))...);
-        promise.set_value(context);
-        context.start();
-        joinable.get_future().get();
-    }
+    void run(P&& params, index_sequence<I...>);
 
-private:
-    std::thread thread;
+    std::promise<void> running;
     std::promise<void> joinable;
-    Object& object;
+
+    std::thread thread;
+
+    Object* object;
+    RunLoop* loop;
 };
 
 template <class Object>
 template <class... Args>
-Thread<Object>::Thread(Args&&... args)
-    : object([&](std::tuple<Args...>&& params) -> Object& {
-          // Note: We're using std::tuple<> to store the arguments because GCC 4.9 has a bug
-          // when expanding parameters packs captured in lambdas.
-          std::promise<Object&> promise;
-          constexpr auto seq = typename integer_sequence<sizeof...(Args)>::type();
-          thread = std::thread([&] {
-              run(promise, std::move(params), seq);
-          });
-          return promise.get_future().get();
-      }(std::move(std::forward_as_tuple(::std::forward<Args>(args)...)))) {
+Thread<Object>::Thread(const std::string& name, Args&&... args) {
+    // Note: We're using std::tuple<> to store the arguments because GCC 4.9 has a bug
+    // when expanding parameters packs captured in lambdas.
+    std::tuple<Args...> params = std::forward_as_tuple(::std::forward<Args>(args)...);
+
+    thread = std::thread([&] {
+        #ifdef __APPLE__
+        pthread_setname_np(name.c_str());
+        #else
+        (void(name));
+        #endif
+
+        constexpr auto seq = typename integer_sequence<sizeof...(Args)>::type();
+        run(std::move(params), seq);
+    });
+
+    running.get_future().get();
+}
+
+template <class Object>
+template <typename P, std::size_t... I>
+void Thread<Object>::run(P&& params, index_sequence<I...>) {
+    Object object_(std::get<I>(std::forward<P>(params))...);
+    object = &object_;
+
+    RunLoop loop_;
+    loop = &loop_;
+
+    running.set_value();
+    loop_.run();
+
+    joinable.get_future().get();
 }
 
 template <class Object>
 Thread<Object>::~Thread() {
-    object.stop();
+    loop->stop();
     joinable.set_value();
     thread.join();
 }

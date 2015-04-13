@@ -11,6 +11,21 @@
 #include <memory>
 #include <string>
 
+#if UV_VERSION_MAJOR == 0 && UV_VERSION_MINOR <= 10
+
+// Add thread local storage to libuv API:
+// https://github.com/joyent/libuv/commit/5d2434bf71e47802841bad218d521fa254d1ca2d
+
+typedef pthread_key_t uv_key_t;
+
+UV_EXTERN int uv_key_create(uv_key_t* key);
+UV_EXTERN void uv_key_delete(uv_key_t* key);
+UV_EXTERN void* uv_key_get(uv_key_t* key);
+UV_EXTERN void uv_key_set(uv_key_t* key, void* value);
+
+#endif
+
+
 namespace uv {
 
 template <class T>
@@ -131,6 +146,22 @@ public:
 
 private:
     uv_rwlock_t mtx;
+};
+
+template <class T>
+class tls : public mbgl::util::noncopyable {
+public:
+    inline tls() {
+        if (uv_key_create(&key) != 0) {
+            throw std::runtime_error("failed to initialize thread local storage key");
+        }
+    }
+    inline ~tls() { uv_key_delete(&key); }
+    inline T* get() { return reinterpret_cast<T*>(uv_key_get(&key)); }
+    inline void set(T* val) { uv_key_set(&key, val); }
+
+private:
+    uv_key_t key;
 };
 
 }

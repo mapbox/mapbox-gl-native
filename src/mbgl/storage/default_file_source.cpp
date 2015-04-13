@@ -10,6 +10,7 @@
 #include <mbgl/util/chrono.hpp>
 #include <mbgl/util/thread.hpp>
 #include <mbgl/platform/log.hpp>
+#include <mbgl/map/environment.hpp>
 
 #pragma GCC diagnostic push
 #ifndef __clang__
@@ -29,13 +30,10 @@ namespace mbgl {
 
 DefaultFileSource::Impl::Impl(FileCache* cache_, const std::string& root)
     : assetRoot(root.empty() ? platform::assetRoot() : root), cache(cache_) {
-#ifdef __APPLE__
-    pthread_setname_np("FileSource");
-#endif
 }
 
 DefaultFileSource::DefaultFileSource(FileCache* cache, const std::string& root)
-    : thread(util::make_unique<util::Thread<Impl>>(cache, root)) {
+    : thread(util::make_unique<util::Thread<Impl>>("FileSource", cache, root)) {
 }
 
 DefaultFileSource::~DefaultFileSource() {
@@ -62,7 +60,7 @@ Request* DefaultFileSource::request(const Resource& resource,
 
     // This function can be called from any thread. Make sure we're executing the actual call in the
     // file source loop by sending it over the queue.
-    (*thread)->invoke([=] { (*thread)->processAdd(req); });
+    thread->invoke(&Impl::processAdd, std::move(req), thread->get());
 
     return req;
 }
@@ -76,14 +74,14 @@ void DefaultFileSource::cancel(Request *req) {
 
     // This function can be called from any thread. Make sure we're executing the actual call in the
     // file source loop by sending it over the queue.
-    (*thread)->invoke([=] { (*thread)->processCancel(req); });
+    thread->invoke(&Impl::processCancel, std::move(req));
 }
 
 void DefaultFileSource::abort(const Environment &env) {
-    (*thread)->invoke([=, &env] { (*thread)->processAbort(env); });
+    thread->invoke(&Impl::processAbort, std::ref(env));
 }
 
-void DefaultFileSource::Impl::processAdd(Request* req) {
+void DefaultFileSource::Impl::processAdd(Request* req, uv_loop_t* loop) {
     const Resource &resource = req->resource;
 
     // We're adding a new Request.
@@ -102,13 +100,12 @@ void DefaultFileSource::Impl::processAdd(Request* req) {
 
         // But first, we're going to start querying the database if it exists.
         if (!cache) {
-            sharedRequest->start(loop().get());
+            sharedRequest->start(loop);
         } else {
             // Otherwise, first check the cache for existing data so that we can potentially
             // revalidate the information without having to redownload everything.
-            cache->get(resource, [this, resource](std::unique_ptr<Response> response) {
-                std::shared_ptr<const Response> sharedResponse = std::move(response);
-                invoke([this, resource, sharedResponse] { processResult(resource, sharedResponse); });
+            cache->get(resource, [this, resource, loop](std::unique_ptr<Response> response) {
+                processResult(resource, std::move(response), loop);
             });
         }
     }
@@ -132,7 +129,7 @@ void DefaultFileSource::Impl::processCancel(Request* req) {
     req->destruct();
 }
 
-void DefaultFileSource::Impl::processResult(const Resource& resource, std::shared_ptr<const Response> response) {
+void DefaultFileSource::Impl::processResult(const Resource& resource, std::shared_ptr<const Response> response, uv_loop_t* loop) {
     SharedRequestBase *sharedRequest = find(resource);
     if (sharedRequest) {
         if (response) {
@@ -146,11 +143,11 @@ void DefaultFileSource::Impl::processResult(const Resource& resource, std::share
                 return;
             } else {
                 // The cached response is stale. Now run the real request.
-                sharedRequest->start(loop().get(), response);
+                sharedRequest->start(loop, response);
             }
         } else {
             // There is no response. Now run the real request.
-            sharedRequest->start(loop().get());
+            sharedRequest->start(loop);
         }
     } else {
         // There is no request for this URL anymore. Likely, the request was canceled
