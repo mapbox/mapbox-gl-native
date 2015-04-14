@@ -24,6 +24,7 @@ NSString *const MGLEventKeyZoomLevel = @"zoom";
 NSString *const MGLEventKeySpeed = @"speed";
 NSString *const MGLEventKeyCourse = @"course";
 NSString *const MGLEventKeyAltitude = @"altitude";
+NSString *const MGLEventKeyHorizontalAccuracy = @"horizontalAccuracy";
 NSString *const MGLEventKeyVerticalAccuracy = @"verticalAccuracy";
 NSString *const MGLEventKeyPushEnabled = @"enabled.push";
 NSString *const MGLEventKeyEmailEnabled = @"enabled.email";
