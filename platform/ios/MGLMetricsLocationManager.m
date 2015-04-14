@@ -47,6 +47,7 @@
             MGLEventKeySpeed: @(loc.speed),
             MGLEventKeyCourse: @(loc.course),
             MGLEventKeyAltitude: @(loc.altitude),
+            MGLEventKeyHorizontalAccuracy: @(loc.horizontalAccuracy),
             MGLEventKeyVerticalAccuracy: @(loc.verticalAccuracy)
         }];
     }
