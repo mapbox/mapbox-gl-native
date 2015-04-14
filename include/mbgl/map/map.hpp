@@ -152,7 +152,9 @@ public:
     std::vector<uint32_t> getAnnotationsInBounds(const LatLngBounds&);
     LatLngBounds getBoundsForAnnotations(const std::vector<uint32_t>&);
 
-    // Reduce memory usage
+    // Memory
+    void setSourceTileCacheSize(size_t);
+    size_t getSourceTileCacheSize() const { return sourceCacheSize; }
     void onLowMemory();
 
     // Debug
@@ -198,6 +200,8 @@ private:
     void processTasks();
 
     void updateAnnotationTiles(const std::vector<TileID>&);
+
+    size_t sourceCacheSize;
 
     enum class Mode : uint8_t {
         None, // we're not doing any processing

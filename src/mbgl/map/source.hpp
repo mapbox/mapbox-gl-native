@@ -73,6 +73,7 @@ public:
 
     std::forward_list<Tile *> getLoadedTiles() const;
 
+    void setCacheSize(size_t);
     void onLowMemory();
 
     SourceInfo info;

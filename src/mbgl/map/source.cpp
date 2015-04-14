@@ -398,6 +398,14 @@ void Source::update(Map &map,
         }
     }
 
+    if (cache.getSize() == 0) {
+        size_t conservativeCacheSize = ((float)map.getState().getWidth()  / util::tileSize) *
+                                       ((float)map.getState().getHeight() / util::tileSize) *
+                                       (map.getMaxZoom() - map.getMinZoom() + 1) *
+                                       0.5;
+        cache.setSize(conservativeCacheSize);
+    }
+
     auto& tileCache = cache;
 
     // Remove tiles that we definitely don't need, i.e. tiles that are not on
@@ -413,7 +421,6 @@ void Source::update(Map &map,
         }
         return obsolete;
     });
-
 
     // Remove all the expired pointers from the set.
     util::erase_if(tile_data, [&retain_data, &tileCache](std::pair<const TileID, std::weak_ptr<TileData>> &pair) {
@@ -442,6 +449,10 @@ void Source::invalidateTiles(const std::vector<TileID>& ids) {
         tiles.erase(id);
         tile_data.erase(id);
     }
+}
+
+void Source::setCacheSize(size_t size) {
+    cache.setSize(size);
 }
 
 void Source::onLowMemory() {

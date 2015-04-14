@@ -12,6 +12,8 @@ class TileCache {
 public:
     TileCache(size_t size_ = 0) : size(size_) {}
 
+    void setSize(size_t);
+    size_t getSize() const { return size; };
     void add(uint64_t key, std::shared_ptr<TileData> data);
     std::shared_ptr<TileData> get(uint64_t key);
     bool has(uint64_t key);

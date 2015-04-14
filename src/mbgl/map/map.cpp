@@ -819,6 +819,19 @@ void Map::render() {
     }
 }
 
+void Map::setSourceTileCacheSize(size_t size) {
+    if (size != getSourceTileCacheSize()) {
+        invokeTask([=] {
+            sourceCacheSize = size;
+            if (!style) return;
+            for (const auto &source : style->sources) {
+                source->setCacheSize(sourceCacheSize);
+            }
+            env->performCleanup();
+        });
+    }
+}
+
 void Map::onLowMemory() {
     invokeTask([=] {
         if (!style) return;
