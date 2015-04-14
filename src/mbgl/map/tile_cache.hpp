@@ -9,18 +9,18 @@
 namespace mbgl {
 
 class TileCache {
-    public:
-        TileCache() : size(20) {}
+public:
+    TileCache(size_t size_ = 0) : size(size_) {}
 
-        void add(uint64_t key, std::shared_ptr<TileData> data);
-        std::shared_ptr<TileData> get(uint64_t key);
-        bool has(uint64_t key);
-        void clear();
-    private:
-        std::unordered_map<uint64_t, std::shared_ptr<TileData>> tiles;
-        std::list<uint64_t> orderedKeys;
+    void add(uint64_t key, std::shared_ptr<TileData> data);
+    std::shared_ptr<TileData> get(uint64_t key);
+    bool has(uint64_t key);
+    void clear();
+private:
+    std::unordered_map<uint64_t, std::shared_ptr<TileData>> tiles;
+    std::list<uint64_t> orderedKeys;
 
-        const size_t size;
+    size_t size;
 };
 
 };
