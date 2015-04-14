@@ -10,23 +10,20 @@ namespace mbgl { namespace util { template <typename T> class AsyncQueue; } }
 
 namespace node_mbgl {
 
-class NodeLogBackend : public mbgl::LogBackend {
+class NodeLogObserver : public mbgl::Log::Observer {
 public:
-    NodeLogBackend(v8::Handle<v8::Object> target);
-    ~NodeLogBackend();
+    NodeLogObserver(v8::Handle<v8::Object> target);
+    ~NodeLogObserver();
 
-    void record(mbgl::EventSeverity severity, mbgl::Event event, const std::string &msg);
-    void record(mbgl::EventSeverity severity, mbgl::Event event, const char* format, ...);
-    void record(mbgl::EventSeverity severity, mbgl::Event event, int64_t code);
-    void record(mbgl::EventSeverity severity, mbgl::Event event, int64_t code, const std::string &msg);
+    // Log::Observer implementation
+    virtual bool onRecord(mbgl::EventSeverity severity, mbgl::Event event, int64_t code, const std::string &msg) override;
 
 private:
     v8::Persistent<v8::Object> module;
 
-    struct Message;
-    using Queue = mbgl::util::AsyncQueue<Message>;
+    struct LogMessage;
+    using Queue = mbgl::util::AsyncQueue<LogMessage>;
     Queue *queue = nullptr;
 };
-
 
 }

@@ -31,7 +31,7 @@ void RegisterModule(v8::Handle<v8::Object> exports) {
     auto EventEmitter = process->Get(NanNew("EventEmitter"))->ToObject();
     exports->SetPrototype(EventEmitter->Get(NanNew("prototype")));
 
-    mbgl::Log::Set<node_mbgl::NodeLogBackend>(exports);
+    mbgl::Log::setObserver(mbgl::util::make_unique<node_mbgl::NodeLogObserver>(exports));
 }
 
 NODE_MODULE(mapbox_gl_native, RegisterModule)
