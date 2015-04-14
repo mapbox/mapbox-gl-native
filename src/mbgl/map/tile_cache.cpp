@@ -2,7 +2,7 @@
 
 #include <cassert>
 
-namespace mbgl{
+namespace mbgl {
 
 void TileCache::add(uint64_t key, std::shared_ptr<TileData> data) {
 

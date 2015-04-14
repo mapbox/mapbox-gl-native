@@ -1,14 +1,12 @@
 #ifndef MBGL_MAP_TILE_CACHE
 #define MBGL_MAP_TILE_CACHE
 
-#include <mbgl/map/tile_id.hpp>
 #include <mbgl/map/tile_data.hpp>
 
 #include <list>
 #include <unordered_map>
 
-namespace mbgl{
-
+namespace mbgl {
 
 class TileCache {
     public:
@@ -26,4 +24,5 @@ class TileCache {
 };
 
 };
+
 #endif
