@@ -561,6 +561,17 @@ mbgl::DefaultFileSource *mbglFileSource = nullptr;
 - (void)glkView:(GLKView *)view drawInRect:(CGRect)rect
 {
     mbglView->resize(rect.size.width, rect.size.height, view.contentScaleFactor, view.drawableWidth, view.drawableHeight);
+
+    CGFloat zoomFactor   = mbglMap->getMaxZoom() - mbglMap->getMinZoom() + 1;
+    CGFloat cpuFactor    = (CGFloat)[[NSProcessInfo processInfo] processorCount];
+    CGFloat memoryFactor = (CGFloat)[[NSProcessInfo processInfo] physicalMemory] / 1000 / 1000 / 1000;
+    CGFloat sizeFactor   = ((CGFloat)mbglMap->getState().getWidth()  / mbgl::util::tileSize) *
+                           ((CGFloat)mbglMap->getState().getHeight() / mbgl::util::tileSize);
+
+    NSUInteger cacheSize = zoomFactor * cpuFactor * memoryFactor * sizeFactor * 0.5;
+
+    mbglMap->setSourceTileCacheSize(cacheSize);
+
     mbglMap->renderSync();
 }
 
