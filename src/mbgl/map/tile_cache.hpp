@@ -20,7 +20,7 @@ class TileCache {
         std::unordered_map<uint64_t, std::shared_ptr<TileData>> tiles;
         std::list<uint64_t> orderedKeys;
 
-        const unsigned int size;
+        const size_t size;
 };
 
 };
