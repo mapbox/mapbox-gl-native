@@ -571,7 +571,7 @@ NSString *const MGLEventGestureRotateStart = @"Rotation";
 // Can be called from any thread.
 //
 - (NSString *) getCurrentCellularNetworkConnectionType {
-    CTTelephonyNetworkInfo *telephonyInfo = [CTTelephonyNetworkInfo new];
+    CTTelephonyNetworkInfo *telephonyInfo = [[CTTelephonyNetworkInfo alloc] init];
     NSString *radioTech = telephonyInfo.currentRadioAccessTechnology;
     
     if (radioTech == nil) {
