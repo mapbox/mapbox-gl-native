@@ -1156,6 +1156,11 @@ mbgl::DefaultFileSource *mbglFileSource = nullptr;
     mbglMap->toggleDebug();
 }
 
+- (void)emptyMemoryCache
+{
+    mbglMap->onLowMemory();
+}
+
 #pragma mark - Geography -
 
 + (NSSet *)keyPathsForValuesAffectingCenterCoordinate
