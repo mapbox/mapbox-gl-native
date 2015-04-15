@@ -1,12 +1,11 @@
 #ifndef MBGL_MAP_MAP_CONTEXT
 #define MBGL_MAP_MAP_CONTEXT
 
-#include <mbgl/map/tile.hpp>
+#include <mbgl/map/tile_id.hpp>
 #include <mbgl/map/update.hpp>
 #include <mbgl/util/ptr.hpp>
 #include <mbgl/util/signal.hpp>
 
-#include <set>
 #include <vector>
 #include <queue>
 #include <future>

@@ -5,23 +5,17 @@
 #include <mbgl/map/update.hpp>
 #include <mbgl/map/mode.hpp>
 #include <mbgl/util/geo.hpp>
-#include <mbgl/util/projection.hpp>
 #include <mbgl/util/noncopyable.hpp>
-#include <mbgl/util/ptr.hpp>
 #include <mbgl/util/vec.hpp>
 
 #include <cstdint>
-#include <atomic>
-#include <thread>
-#include <iosfwd>
-#include <set>
+#include <string>
+#include <functional>
 #include <vector>
-#include <queue>
+#include <thread>
 #include <mutex>
 #include <condition_variable>
-#include <functional>
-
-namespace uv { class async; }
+#include <memory>
 
 namespace mbgl {
 
@@ -30,10 +24,8 @@ class View;
 class Environment;
 class EnvironmentScope;
 class MapData;
-class Worker;
-class StillImage;
-class TileID;
 class MapContext;
+class StillImage;
 
 class Map : private util::noncopyable {
     friend class View;

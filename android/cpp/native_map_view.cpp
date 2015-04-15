@@ -1,5 +1,6 @@
 #include <cstdlib>
 #include <ctime>
+#include <cassert>
 #include <memory>
 #include <list>
 #include <tuple>

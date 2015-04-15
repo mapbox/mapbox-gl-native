@@ -2,6 +2,8 @@
 #include <mbgl/platform/gl.hpp>
 #include <mbgl/platform/log.hpp>
 
+#include <cassert>
+
 pthread_once_t loadGLExtensions = PTHREAD_ONCE_INIT;
 
 GLFWView::GLFWView(bool fullscreen_) : fullscreen(fullscreen_) {

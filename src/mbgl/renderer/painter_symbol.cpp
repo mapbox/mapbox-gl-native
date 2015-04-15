@@ -4,6 +4,8 @@
 #include <mbgl/style/style_layout.hpp>
 #include <mbgl/geometry/glyph_atlas.hpp>
 #include <mbgl/geometry/sprite_atlas.hpp>
+#include <mbgl/shader/sdf_shader.hpp>
+#include <mbgl/shader/icon_shader.hpp>
 #include <mbgl/util/math.hpp>
 
 #include <cmath>

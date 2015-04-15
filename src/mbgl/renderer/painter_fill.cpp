@@ -4,7 +4,11 @@
 #include <mbgl/style/style_layer.hpp>
 #include <mbgl/style/style_layout.hpp>
 #include <mbgl/map/sprite.hpp>
+#include <mbgl/map/tile_id.hpp>
 #include <mbgl/geometry/sprite_atlas.hpp>
+#include <mbgl/shader/outline_shader.hpp>
+#include <mbgl/shader/pattern_shader.hpp>
+#include <mbgl/shader/plain_shader.hpp>
 #include <mbgl/util/std.hpp>
 #include <mbgl/util/mat3.hpp>
 

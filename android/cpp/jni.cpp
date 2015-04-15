@@ -1,5 +1,6 @@
 #include <cstdint>
 #include <cinttypes>
+#include <cassert>
 
 #include <string>
 #include <locale>

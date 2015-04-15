@@ -1,33 +1,26 @@
 #include <mbgl/map/map.hpp>
-#include <mbgl/map/update.hpp>
 #include <mbgl/map/environment.hpp>
 #include <mbgl/map/map_context.hpp>
 #include <mbgl/map/view.hpp>
 #include <mbgl/map/map_data.hpp>
 #include <mbgl/map/still_image.hpp>
-#include <mbgl/platform/platform.hpp>
-#include <mbgl/map/source.hpp>
-#include <mbgl/renderer/painter.hpp>
-#include <mbgl/map/annotation.hpp>
 #include <mbgl/map/sprite.hpp>
-#include <mbgl/util/math.hpp>
-#include <mbgl/util/clip_id.hpp>
-#include <mbgl/util/string.hpp>
-#include <mbgl/util/constants.hpp>
-#include <mbgl/util/uv_detail.hpp>
-#include <mbgl/util/std.hpp>
+#include <mbgl/map/source.hpp>
+
 #include <mbgl/style/style.hpp>
+
+#include <mbgl/renderer/painter.hpp>
+
 #include <mbgl/text/glyph_store.hpp>
+
 #include <mbgl/geometry/glyph_atlas.hpp>
-#include <mbgl/style/style_layer.hpp>
-#include <mbgl/style/style_bucket.hpp>
-#include <mbgl/util/texture_pool.hpp>
 #include <mbgl/geometry/sprite_atlas.hpp>
 #include <mbgl/geometry/line_atlas.hpp>
-#include <mbgl/storage/file_source.hpp>
-#include <mbgl/platform/log.hpp>
-#include <mbgl/util/string.hpp>
-#include <mbgl/util/uv.hpp>
+
+#include <mbgl/util/std.hpp>
+#include <mbgl/util/projection.hpp>
+#include <mbgl/util/texture_pool.hpp>
+#include <mbgl/util/uv_detail.hpp>
 #include <mbgl/util/mapbox.hpp>
 #include <mbgl/util/exception.hpp>
 #include <mbgl/util/worker.hpp>
@@ -37,8 +30,6 @@
 
 #define _USE_MATH_DEFINES
 #include <cmath>
-
-#include <uv.h>
 
 namespace mbgl {
 

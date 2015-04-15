@@ -1,16 +1,32 @@
 #include <mbgl/renderer/painter.hpp>
+
+#include <mbgl/map/source.hpp>
+#include <mbgl/map/tile.hpp>
+
 #include <mbgl/platform/log.hpp>
+
 #include <mbgl/style/style.hpp>
 #include <mbgl/style/style_layer.hpp>
 #include <mbgl/style/style_bucket.hpp>
+
+#include <mbgl/geometry/sprite_atlas.hpp>
+
+#include <mbgl/shader/pattern_shader.hpp>
+#include <mbgl/shader/plain_shader.hpp>
+#include <mbgl/shader/outline_shader.hpp>
+#include <mbgl/shader/line_shader.hpp>
+#include <mbgl/shader/linesdf_shader.hpp>
+#include <mbgl/shader/linepattern_shader.hpp>
+#include <mbgl/shader/icon_shader.hpp>
+#include <mbgl/shader/raster_shader.hpp>
+#include <mbgl/shader/sdf_shader.hpp>
+#include <mbgl/shader/dot_shader.hpp>
+#include <mbgl/shader/gaussian_shader.hpp>
+
+
 #include <mbgl/util/std.hpp>
-#include <mbgl/util/string.hpp>
-#include <mbgl/util/clip_id.hpp>
 #include <mbgl/util/constants.hpp>
 #include <mbgl/util/mat3.hpp>
-#include <mbgl/geometry/sprite_atlas.hpp>
-#include <mbgl/map/source.hpp>
-#include <mbgl/map/tile.hpp>
 
 #if defined(DEBUG)
 #include <mbgl/util/stopwatch.hpp>

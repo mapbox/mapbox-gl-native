@@ -2,6 +2,8 @@
 #include <mbgl/map/map.hpp>
 #include <mbgl/map/still_image.hpp>
 
+#include <cassert>
+
 namespace mbgl {
 
 void View::initialize(Map *map_) {

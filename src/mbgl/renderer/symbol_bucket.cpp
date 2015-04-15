@@ -12,6 +12,8 @@
 #include <mbgl/text/placement.hpp>
 #include <mbgl/platform/log.hpp>
 #include <mbgl/text/collision.hpp>
+#include <mbgl/shader/sdf_shader.hpp>
+#include <mbgl/shader/icon_shader.hpp>
 #include <mbgl/map/sprite.hpp>
 
 #include <mbgl/util/utf.hpp>
@@ -19,6 +21,10 @@
 #include <mbgl/util/math.hpp>
 #include <mbgl/util/merge_lines.hpp>
 #include <mbgl/util/std.hpp>
+
+#ifndef BUFFER_OFFSET
+#define BUFFER_OFFSET(i) ((char *)nullptr + (i))
+#endif
 
 namespace mbgl {
 
