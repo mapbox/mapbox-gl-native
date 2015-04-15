@@ -9,8 +9,22 @@ struct NodeLogObserver::LogMessage {
     mbgl::Event event;
     int64_t code;
     std::string text;
-    int environment;
-    std::string threadName;
+    int environment = -1;
+    std::string threadName = "";
+
+    LogMessage(mbgl::EventSeverity severity_, mbgl::Event event_, int64_t code_, std::string text_, int environment_, std::string threadName_)
+        : severity(severity_),
+        event(event_),
+        code(code_),
+        text(text_),
+        environment(environment_),
+        threadName(threadName_) {};
+
+    LogMessage(mbgl::EventSeverity severity_, mbgl::Event event_, int64_t code_, std::string text_)
+        : severity(severity_),
+        event(event_),
+        code(code_),
+        text(text_) {}
 };
 
 NodeLogObserver::NodeLogObserver(v8::Handle<v8::Object> target)
@@ -54,7 +68,7 @@ bool NodeLogObserver::onRecord(mbgl::EventSeverity severity, mbgl::Event event, 
         std::string threadName = mbgl::Environment::threadName();
         queue->send({ severity, event, code, text, env, threadName });
     } else {
-        queue->send({ severity, event, code, text, -1, "" });
+        queue->send({ severity, event, code, text });
     }
     return true;
 }
