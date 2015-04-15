@@ -398,7 +398,7 @@ void Source::update(Map &map,
         }
     }
 
-    if (cache.getSize() == 0) {
+    if (info.type != SourceType::Raster && cache.getSize() == 0) {
         size_t conservativeCacheSize = ((float)map.getState().getWidth()  / util::tileSize) *
                                        ((float)map.getState().getHeight() / util::tileSize) *
                                        (map.getMaxZoom() - map.getMinZoom() + 1) *
@@ -407,16 +407,17 @@ void Source::update(Map &map,
     }
 
     auto& tileCache = cache;
+    auto& type = info.type;
 
     // Remove tiles that we definitely don't need, i.e. tiles that are not on
     // the required list.
     std::set<TileID> retain_data;
-    util::erase_if(tiles, [&retain, &retain_data, &tileCache](std::pair<const TileID, std::unique_ptr<Tile>> &pair) {
+    util::erase_if(tiles, [&retain, &retain_data, &tileCache, &type](std::pair<const TileID, std::unique_ptr<Tile>> &pair) {
         Tile &tile = *pair.second;
         bool obsolete = std::find(retain.begin(), retain.end(), tile.id) == retain.end();
         if (!obsolete) {
             retain_data.insert(tile.data->id);
-        } else if (tile.data->ready()) {
+        } else if (type != SourceType::Raster && tile.data->ready()) {
             tileCache.add(tile.id.to_uint64(), tile.data);
         }
         return obsolete;
