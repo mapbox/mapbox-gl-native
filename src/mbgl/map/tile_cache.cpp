@@ -13,7 +13,7 @@ void TileCache::setSize(size_t size_) {
         tiles.erase(key);
     }
 
-    assert(orderedKeys.size <= size);
+    assert(orderedKeys.size() <= size);
 
     tiles.reserve(size);
     orderedKeys.resize(size);
