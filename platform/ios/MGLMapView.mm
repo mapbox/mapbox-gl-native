@@ -67,6 +67,8 @@ static NSURL *MGLURLForBundledStyleNamed(NSString *styleName)
 
 @property (nonatomic) EAGLContext *context;
 @property (nonatomic) GLKView *glView;
+/** A static view to simulate and obscure `glView` when the app is in the background. */
+@property (nonatomic) UIView *glSnapshotView;
 @property (nonatomic) NSOperationQueue *regionChangeDelegateQueue;
 @property (nonatomic) UIImageView *compass;
 @property (nonatomic) UIImageView *logoBug;
@@ -240,6 +242,7 @@ mbgl::DefaultFileSource *mbglFileSource = nullptr;
     [self insertSubview:_glView atIndex:0];
 
     _glView.contentMode = UIViewContentModeCenter;
+    
     [self setBackgroundColor:[UIColor clearColor]];
 
     // load extensions
@@ -559,8 +562,20 @@ mbgl::DefaultFileSource *mbglFileSource = nullptr;
 // This is the delegate of the GLKView object's display call.
 - (void)glkView:(GLKView *)view drawInRect:(CGRect)rect
 {
-    mbglView->resize(rect.size.width, rect.size.height, view.contentScaleFactor, view.drawableWidth, view.drawableHeight);
-    mbglMap->renderSync();
+    if (self.glSnapshotView)
+    {
+        NSUInteger snapshotIdx = [self.subviews indexOfObject:self.glSnapshotView];
+        NSUInteger glIdx = [self.subviews indexOfObject:self.glView];
+        NSAssert(snapshotIdx > glIdx,
+                 @"The snapshot view is the %luth subview, behind the GL view, which is the %luth. "
+                 @"The snapshot view should obscure the GL view to prevent crashing while the app is in the background.",
+                 (unsigned long)snapshotIdx, (unsigned long)glIdx);
+    }
+    else
+    {
+        mbglView->resize(rect.size.width, rect.size.height, view.contentScaleFactor, view.drawableWidth, view.drawableHeight);
+        mbglMap->renderSync();
+    }
 }
 
 // This gets called when the view dimension changes, e.g. because the device is being rotated.
@@ -583,6 +598,10 @@ mbgl::DefaultFileSource *mbglFileSource = nullptr;
 {
     [MGLMapboxEvents flush];
     
+    self.glSnapshotView = [self.glView snapshotViewAfterScreenUpdates:YES];
+    self.glSnapshotView.autoresizingMask = self.glView.autoresizingMask;
+    [self insertSubview:self.glSnapshotView aboveSubview:self.glView];
+    
     mbglMap->stop();
 
     [self.glView deleteDrawable];
@@ -593,6 +612,9 @@ mbgl::DefaultFileSource *mbglFileSource = nullptr;
     [self.glView bindDrawable];
 
     mbglMap->start();
+    
+    [self.glSnapshotView removeFromSuperview];
+    self.glSnapshotView = nil;
 }
 
 - (void)tintColorDidChange
