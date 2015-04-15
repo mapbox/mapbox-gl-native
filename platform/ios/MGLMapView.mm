@@ -562,7 +562,16 @@ mbgl::DefaultFileSource *mbglFileSource = nullptr;
 // This is the delegate of the GLKView object's display call.
 - (void)glkView:(GLKView *)view drawInRect:(CGRect)rect
 {
-    if (!self.glSnapshotView)
+    if (self.glSnapshotView)
+    {
+        NSUInteger snapshotIdx = [self.subviews indexOfObject:self.glSnapshotView];
+        NSUInteger glIdx = [self.subviews indexOfObject:self.glView];
+        NSAssert(snapshotIdx > glIdx,
+                 @"The snapshot view is the %luth subview, behind the GL view, which is the %luth. "
+                 @"The snapshot view should obscure the GL view to prevent crashing while the app is in the background.",
+                 (unsigned long)snapshotIdx, (unsigned long)glIdx);
+    }
+    else
     {
         mbglView->resize(rect.size.width, rect.size.height, view.contentScaleFactor, view.drawableWidth, view.drawableHeight);
         mbglMap->renderSync();
