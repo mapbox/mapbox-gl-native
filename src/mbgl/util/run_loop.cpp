@@ -19,7 +19,7 @@ void RunLoop::process() {
     withMutex([&] { queue_.swap(queue); });
 
     while (!queue_.empty()) {
-        (queue_.front())();
+        (*(queue_.front()))();
         queue_.pop();
     }
 }
