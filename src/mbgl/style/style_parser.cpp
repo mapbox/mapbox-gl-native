@@ -10,6 +10,7 @@
 #include <csscolorparser/csscolorparser.hpp>
 
 #pragma GCC diagnostic push
+#pragma GCC diagnostic ignored "-Wshadow"
 #ifndef __clang__
 #pragma GCC diagnostic ignored "-Wunused-local-typedefs"
 #endif
