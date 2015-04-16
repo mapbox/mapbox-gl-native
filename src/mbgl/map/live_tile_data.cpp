@@ -54,7 +54,9 @@ void LiveTileData::parse() {
             return;
         }
     } else {
+        // Clear the style so that we don't have a cycle in the shared_ptr references.
         style.reset();
+
         state = State::obsolete;
     }
 
