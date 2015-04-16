@@ -17,9 +17,9 @@ public:
     Impl(const std::string &path = ":memory:");
     ~Impl();
 
-    std::unique_ptr<Response> processGet(const Resource&);
-    void processPut(const Resource& resource, std::shared_ptr<const Response> response);
-    void processRefresh(const Resource& resource, int64_t expires);
+    std::unique_ptr<Response> get(const Resource&);
+    void put(const Resource& resource, std::shared_ptr<const Response> response);
+    void refresh(const Resource& resource, int64_t expires);
 
 private:
     void createDatabase();

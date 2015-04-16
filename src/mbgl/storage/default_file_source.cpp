@@ -60,7 +60,7 @@ Request* DefaultFileSource::request(const Resource& resource,
 
     // This function can be called from any thread. Make sure we're executing the actual call in the
     // file source loop by sending it over the queue.
-    thread->invoke(&Impl::processAdd, std::move(req), thread->get());
+    thread->invoke(&Impl::add, std::move(req), thread->get());
 
     return req;
 }
@@ -74,14 +74,14 @@ void DefaultFileSource::cancel(Request *req) {
 
     // This function can be called from any thread. Make sure we're executing the actual call in the
     // file source loop by sending it over the queue.
-    thread->invoke(&Impl::processCancel, std::move(req));
+    thread->invoke(&Impl::cancel, std::move(req));
 }
 
 void DefaultFileSource::abort(const Environment &env) {
-    thread->invoke(&Impl::processAbort, std::ref(env));
+    thread->invoke(&Impl::abort, std::ref(env));
 }
 
-void DefaultFileSource::Impl::processAdd(Request* req, uv_loop_t* loop) {
+void DefaultFileSource::Impl::add(Request* req, uv_loop_t* loop) {
     const Resource &resource = req->resource;
 
     // We're adding a new Request.
@@ -112,7 +112,7 @@ void DefaultFileSource::Impl::processAdd(Request* req, uv_loop_t* loop) {
     sharedRequest->subscribe(req);
 }
 
-void DefaultFileSource::Impl::processCancel(Request* req) {
+void DefaultFileSource::Impl::cancel(Request* req) {
     SharedRequestBase *sharedRequest = find(req->resource);
     if (sharedRequest) {
         // If the number of dependent requests of the SharedRequestBase drops to zero, the
@@ -156,7 +156,7 @@ void DefaultFileSource::Impl::processResult(const Resource& resource, std::share
 }
 
 // Aborts all requests that are part of the current environment.
-void DefaultFileSource::Impl::processAbort(const Environment& env) {
+void DefaultFileSource::Impl::abort(const Environment& env) {
     // Construct a cancellation response.
     auto res = util::make_unique<Response>();
     res->status = Response::Error;

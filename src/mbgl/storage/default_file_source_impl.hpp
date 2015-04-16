@@ -18,9 +18,9 @@ public:
                 std::shared_ptr<const Response> response, FileCache::Hint hint);
     SharedRequestBase *find(const Resource &resource);
 
-    void processAdd(Request* request, uv_loop_t* loop);
-    void processCancel(Request* request);
-    void processAbort(const Environment& env);
+    void add(Request* request, uv_loop_t* loop);
+    void cancel(Request* request);
+    void abort(const Environment& env);
 
     const std::string assetRoot;
 

@@ -131,10 +131,10 @@ void SQLiteCache::get(const Resource &resource, Callback callback) {
     // Will try to load the URL from the SQLite database and call the callback when done.
     // Note that the callback is probably going to invoked from another thread, so the caller
     // must make sure that it can run in that thread.
-    thread->invokeWithResult(&Impl::processGet, callback, resource);
+    thread->invokeWithResult(&Impl::get, callback, resource);
 }
 
-std::unique_ptr<Response> SQLiteCache::Impl::processGet(const Resource &resource) {
+std::unique_ptr<Response> SQLiteCache::Impl::get(const Resource &resource) {
     try {
         // This is called in the SQLite event loop.
         if (!db) {
@@ -183,13 +183,13 @@ void SQLiteCache::put(const Resource &resource, std::shared_ptr<const Response> 
     // storing a new response or updating the currently stored response, potentially setting a new
     // expiry date.
     if (hint == Hint::Full) {
-        thread->invoke(&Impl::processPut, resource, std::move(response));
+        thread->invoke(&Impl::put, resource, std::move(response));
     } else if (hint == Hint::Refresh) {
-        thread->invoke(&Impl::processRefresh, resource, int64_t(response->expires));
+        thread->invoke(&Impl::refresh, resource, int64_t(response->expires));
     }
 }
 
-void SQLiteCache::Impl::processPut(const Resource& resource, std::shared_ptr<const Response> response) {
+void SQLiteCache::Impl::put(const Resource& resource, std::shared_ptr<const Response> response) {
     try {
         if (!db) {
             createDatabase();
@@ -238,7 +238,7 @@ void SQLiteCache::Impl::processPut(const Resource& resource, std::shared_ptr<con
     }
 }
 
-void SQLiteCache::Impl::processRefresh(const Resource& resource, int64_t expires) {
+void SQLiteCache::Impl::refresh(const Resource& resource, int64_t expires) {
     try {
         if (!db) {
             createDatabase();
