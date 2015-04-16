@@ -60,7 +60,7 @@ Request* DefaultFileSource::request(const Resource& resource,
 
     // This function can be called from any thread. Make sure we're executing the actual call in the
     // file source loop by sending it over the queue.
-    thread->invoke(&Impl::add, std::move(req), thread->get());
+    thread->invoke(&Impl::add, req, thread->get());
 
     return req;
 }
@@ -74,7 +74,7 @@ void DefaultFileSource::cancel(Request *req) {
 
     // This function can be called from any thread. Make sure we're executing the actual call in the
     // file source loop by sending it over the queue.
-    thread->invoke(&Impl::cancel, std::move(req));
+    thread->invoke(&Impl::cancel, req);
 }
 
 void DefaultFileSource::abort(const Environment &env) {
