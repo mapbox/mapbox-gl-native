@@ -29,6 +29,10 @@ VectorTileData::VectorTileData(const TileID& id_,
 
 VectorTileData::~VectorTileData() {
     glyphAtlas.removeGlyphs(reinterpret_cast<uintptr_t>(this));
+
+    // Clear the style (if not already during parse) to
+    // avoid cyclical shared_ptr references.
+    style.reset();
 }
 
 void VectorTileData::parse() {
