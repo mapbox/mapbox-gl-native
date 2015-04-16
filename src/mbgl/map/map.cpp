@@ -804,6 +804,9 @@ void Map::prepare() {
     }
 
     if (u & static_cast<UpdateType>(Update::RenderStill)) {
+        // Triggers a view resize.
+        view.discard();
+
         // Whenever we trigger an image render, we are unrefing all async handles so the loop will
         // eventually terminate. However, it'll stay alive as long as there are pending requests
         // (like work requests or HTTP requests).
