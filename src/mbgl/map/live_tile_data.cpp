@@ -31,13 +31,14 @@ void LiveTileData::parse() {
         return;
     }
 
-    try {
-        if (!style) {
-            throw std::runtime_error("style isn't present in LiveTileData object anymore");
-        }
+    const LiveTile* tile = annotationManager.getTile(id);
 
-        const LiveTile* tile = annotationManager.getTile(id);
-        if (tile) {
+    if (tile) {
+        try {
+            if (!style) {
+                throw std::runtime_error("style isn't present in LiveTileData object anymore");
+            }
+
             // Parsing creates state that is encapsulated in TileParser. While parsing,
             // the TileParser object writes results into this objects. All other state
             // is going to be discarded afterwards.
@@ -47,13 +48,14 @@ void LiveTileData::parse() {
             style.reset();
 
             parser.parse();
-        } else {
+        } catch (const std::exception& ex) {
+            Log::Error(Event::ParseTile, "Live-parsing [%d/%d/%d] failed: %s", id.z, id.x, id.y, ex.what());
             state = State::obsolete;
+            return;
         }
-    } catch (const std::exception& ex) {
-        Log::Error(Event::ParseTile, "Live-parsing [%d/%d/%d] failed: %s", id.z, id.x, id.y, ex.what());
+    } else {
+        style.reset();
         state = State::obsolete;
-        return;
     }
 
     if (state != State::obsolete) {
