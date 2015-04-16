@@ -562,7 +562,7 @@ mbgl::DefaultFileSource *mbglFileSource = nullptr;
 // This is the delegate of the GLKView object's display call.
 - (void)glkView:(GLKView *)view drawInRect:(CGRect)rect
 {
-    if ( ! self.glSnapshotView || self.glSnapshotView.isHidden)
+    if ( ! self.glSnapshotView || self.glSnapshotView.hidden)
     {
         mbglView->resize(rect.size.width, rect.size.height, view.contentScaleFactor, view.drawableWidth, view.drawableHeight);
 
