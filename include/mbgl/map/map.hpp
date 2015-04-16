@@ -42,16 +42,24 @@ class EnvironmentScope;
 class AnnotationManager;
 class MapData;
 class Worker;
+class StillImage;
 
 class Map : private util::noncopyable {
     friend class View;
 
 public:
+    enum class Mode : uint8_t {
+        None, // we're not doing any processing
+        Continuous, // continually updating map
+        Static, // a once-off static image.
+    };
+
     explicit Map(View&, FileSource&);
     ~Map();
 
     // Start the map render thread. It is asynchronous.
-    void start(bool startPaused = false);
+    void start(bool startPaused = false, Mode mode = Mode::Continuous);
+    inline void start(Mode renderMode) { start(false, renderMode); }
 
     // Stop the map render thread. This call will block until the map rendering thread stopped.
     // The optional callback function will be invoked repeatedly until the map thread is stopped.
@@ -65,10 +73,8 @@ public:
     // Resumes a paused render thread
     void resume();
 
-    // Runs the map event loop. ONLY run this function when you want to get render a single frame
-    // with this map object. It will *not* spawn a separate thread and instead block until the
-    // frame is completely rendered.
-    void run();
+    using StillImageCallback = std::function<void(std::unique_ptr<const StillImage>)>;
+    void renderStill(StillImageCallback callback);
 
     // Triggers a synchronous or asynchronous render.
     void renderSync();
@@ -167,6 +173,11 @@ public:
     inline AnnotationManager& getAnnotationManager() const { return *annotationManager; }
 
 private:
+    // Runs the map event loop. ONLY run this function when you want to get render a single frame
+    // with this map object. It will *not* spawn a separate thread and instead block until the
+    // frame is completely rendered.
+    void run();
+
     // This may only be called by the View object.
     void resize(uint16_t width, uint16_t height, float ratio = 1);
     void resize(uint16_t width, uint16_t height, float ratio, uint16_t fbWidth, uint16_t fbHeight);
@@ -202,12 +213,6 @@ private:
     void updateAnnotationTiles(const std::vector<TileID>&);
 
     size_t sourceCacheSize;
-
-    enum class Mode : uint8_t {
-        None, // we're not doing any processing
-        Continuous, // continually updating map
-        Static, // a once-off static image.
-    };
 
     Mode mode = Mode::None;
 
@@ -260,6 +265,7 @@ private:
 
     std::mutex mutexTask;
     std::queue<std::function<void()>> tasks;
+    StillImageCallback callback;
 };
 
 }
