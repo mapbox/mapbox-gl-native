@@ -1,6 +1,8 @@
 #ifndef MBGL_UTIL_RUN_LOOP
 #define MBGL_UTIL_RUN_LOOP
 
+#include <mbgl/util/noncopyable.hpp>
+#include <mbgl/util/std.hpp>
 #include <mbgl/util/uv_detail.hpp>
 
 #include <functional>
@@ -10,7 +12,7 @@
 namespace mbgl {
 namespace util {
 
-class RunLoop {
+class RunLoop : private util::noncopyable {
 public:
     RunLoop();
 
@@ -20,7 +22,8 @@ public:
     // Invoke fn() in the runloop thread.
     template <class Fn>
     void invoke(Fn&& fn) {
-        withMutex([&] { queue.push(Message(std::move(fn))); });
+        auto invokable = util::make_unique<Invoker<Fn>>(std::move(fn));
+        withMutex([&] { queue.push(std::move(invokable)); });
         async.send();
     }
 
@@ -51,36 +54,22 @@ public:
     uv_loop_t* get() { return *loop; }
 
 private:
+    // A movable type-erasing invokable entity wrapper. This allows to store arbitrary invokable
+    // things (like std::function<>, or the result of a movable-only std::bind()) in the queue.
+    // Source: http://stackoverflow.com/a/29642072/331379
     struct Message {
-        struct Base {
-            virtual void operator()() = 0;
-            virtual ~Base() = default;
-        };
-
-        template <class F>
-        struct Invoker : Base {
-            Invoker(F&& f) : func(std::move(f)) {}
-            void operator()() override { func(); }
-            F func;
-        }; 
-
-        Message() = default;
-        Message(Message&&) = default;
-        ~Message() = default;
-        Message& operator=(Message&&) = default;
-
-        // copy members implicitly deleted
-
-        template <class Fn>
-        Message(Fn fn)
-            : p_fn(new Invoker<Fn>(std::move(fn))) {
-        }
-
-        void operator()() const { (*p_fn)(); }
-        std::unique_ptr<Base> p_fn;
+        virtual void operator()() = 0;
+        virtual ~Message() = default;
     };
 
-    using Queue = std::queue<Message>;
+    template <class F>
+    struct Invoker : Message {
+        Invoker(F&& f) : func(std::move(f)) {}
+        void operator()() override { func(); }
+        F func;
+    };
+
+    using Queue = std::queue<std::unique_ptr<Message>>;
 
     static uv::tls<RunLoop> current;
 
