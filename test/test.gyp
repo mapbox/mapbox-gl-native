@@ -35,6 +35,8 @@
         'fixtures/fixture_log_observer.hpp',
         'fixtures/fixture_log_observer.cpp',
 
+        'api/set_style.cpp',
+
         'headless/headless.cpp',
 
         'miscellaneous/clip_ids.cpp',
