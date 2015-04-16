@@ -26,6 +26,7 @@
           '<@(uv_static_libs)',
         ],
         'ldflags': [
+          '-framework Foundation',
           '-framework ImageIO',
           '-framework CoreServices',
           '-framework OpenGL',

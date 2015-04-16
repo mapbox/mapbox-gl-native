@@ -139,7 +139,7 @@ TEST_P(HeadlessTest, render) {
         }
 
         HeadlessView view(display);
-        mbgl::DefaultFileSource fileSource(nullptr);
+        DefaultFileSource fileSource(nullptr);
         Map map(view, fileSource);
 
         map.setClasses(classes);

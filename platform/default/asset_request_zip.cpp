@@ -1,5 +1,5 @@
-#include <mbgl/storage/default/asset_request.hpp>
-#include <mbgl/storage/default/thread_context.hpp>
+#include <mbgl/storage/asset_request.hpp>
+#include <mbgl/storage/thread_context.hpp>
 #include <mbgl/android/jni.hpp>
 #include <mbgl/storage/response.hpp>
 #include <mbgl/platform/log.hpp>
@@ -275,7 +275,7 @@ void AssetRequestImpl::cancel() {
 
 // -------------------------------------------------------------------------------------------------
 
-AssetRequest::AssetRequest(DefaultFileSource *source_, const Resource &resource_)
+AssetRequest::AssetRequest(DefaultFileSource::Impl *source_, const Resource &resource_)
     : SharedRequestBase(source_, resource_) {
     assert(algo::starts_with(resource.url, "asset://"));
 }
@@ -288,7 +288,7 @@ AssetRequest::~AssetRequest() {
     }
 }
 
-void AssetRequest::start(uv_loop_t *loop, std::unique_ptr<Response> response) {
+void AssetRequest::start(uv_loop_t *loop, std::shared_ptr<const Response> response) {
     MBGL_VERIFY_THREAD(tid);
 
     // We're ignoring the existing response if any.

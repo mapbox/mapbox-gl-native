@@ -7,7 +7,7 @@
 #include <mbgl/platform/default/headless_display.hpp>
 #include <mbgl/platform/log.hpp>
 #include <mbgl/storage/default_file_source.hpp>
-#include <mbgl/storage/default/sqlite_cache.hpp>
+#include <mbgl/storage/sqlite_cache.hpp>
 
 #pragma GCC diagnostic push
 #ifndef __clang__

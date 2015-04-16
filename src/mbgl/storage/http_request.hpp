@@ -7,9 +7,9 @@ namespace mbgl {
 
 class HTTPRequest : public SharedRequestBase {
 public:
-    HTTPRequest(DefaultFileSource *source, const Resource &resource);
+    HTTPRequest(DefaultFileSource::Impl *source, const Resource &resource);
 
-    void start(uv_loop_t *loop, std::unique_ptr<Response> response = nullptr);
+    void start(uv_loop_t *loop, std::shared_ptr<const Response> response = nullptr);
     void cancel();
 
     void retryImmediately();

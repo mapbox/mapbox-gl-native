@@ -16,9 +16,9 @@ public:
     virtual ~FileCache() = default;
 
     enum class Hint : uint8_t { Full, Refresh, No };
+    using Callback = std::function<void(std::unique_ptr<Response>)>;
 
-    virtual void get(const Resource &resource,
-                     std::function<void(std::unique_ptr<Response>)> callback) = 0;
+    virtual void get(const Resource &resource, Callback callback) = 0;
     virtual void put(const Resource &resource, std::shared_ptr<const Response> response, Hint hint) = 0;
 };
 

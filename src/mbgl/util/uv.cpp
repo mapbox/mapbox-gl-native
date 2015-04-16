@@ -3,6 +3,28 @@
 
 #include <uv.h>
 
+#if UV_VERSION_MAJOR == 0 && UV_VERSION_MINOR <= 10
+
+int uv_key_create(uv_key_t* key) {
+  return -pthread_key_create(key, NULL);
+}
+
+void uv_key_delete(uv_key_t* key) {
+  if (pthread_key_delete(*key))
+    abort();
+}
+
+void* uv_key_get(uv_key_t* key) {
+  return pthread_getspecific(*key);
+}
+
+void uv_key_set(uv_key_t* key, void* value) {
+  if (pthread_setspecific(*key, value))
+    abort();
+}
+
+#endif
+
 namespace uv {
 
 std::string cwd() {

@@ -1,17 +1,16 @@
-#include <mbgl/storage/default_file_source.hpp>
-#include <mbgl/storage/default/request.hpp>
-#include <mbgl/storage/default/asset_request.hpp>
-#include <mbgl/storage/default/http_request.hpp>
+#include <mbgl/storage/default_file_source_impl.hpp>
+#include <mbgl/storage/request.hpp>
+#include <mbgl/storage/asset_request.hpp>
+#include <mbgl/storage/http_request.hpp>
 
 #include <mbgl/storage/response.hpp>
 #include <mbgl/platform/platform.hpp>
 
-#include <mbgl/util/async_queue.hpp>
-#include <mbgl/util/util.hpp>
-
-#include <mbgl/util/variant.hpp>
+#include <mbgl/util/uv_detail.hpp>
 #include <mbgl/util/chrono.hpp>
+#include <mbgl/util/thread.hpp>
 #include <mbgl/platform/log.hpp>
+#include <mbgl/map/environment.hpp>
 
 #pragma GCC diagnostic push
 #ifndef __clang__
@@ -21,7 +20,6 @@
 #include <boost/algorithm/string.hpp>
 #pragma GCC diagnostic pop
 
-#include <thread>
 #include <algorithm>
 #include <cassert>
 
@@ -30,75 +28,19 @@ namespace algo = boost::algorithm;
 
 namespace mbgl {
 
-struct DefaultFileSource::ActionDispatcher {
-    DefaultFileSource &fileSource;
-    template <typename T> void operator()(T &t) { fileSource.process(t); }
-};
-
-struct DefaultFileSource::AddRequestAction {
-    Request *const request;
-};
-
-struct DefaultFileSource::RemoveRequestAction {
-    Request *const request;
-};
-
-struct DefaultFileSource::ResultAction {
-    const Resource resource;
-    std::unique_ptr<Response> response;
-};
-
-struct DefaultFileSource::StopAction {
-};
-
-struct DefaultFileSource::AbortAction {
-    const Environment &env;
-};
-
-
-DefaultFileSource::DefaultFileSource(FileCache *cache_, const std::string &root)
-    : assetRoot(root.empty() ? platform::assetRoot() : root),
-      loop(uv_loop_new()),
-      cache(cache_),
-      queue(new Queue(loop, [this](Action &action) {
-          mapbox::util::apply_visitor(ActionDispatcher{*this}, action);
-      })),
-      thread([this]() {
-#ifdef __APPLE__
-          pthread_setname_np("FileSource");
-#endif
-          uv_run(loop, UV_RUN_DEFAULT);
-      }) {
+DefaultFileSource::Impl::Impl(FileCache* cache_, const std::string& root)
+    : assetRoot(root.empty() ? platform::assetRoot() : root), cache(cache_) {
 }
 
-DefaultFileSource::DefaultFileSource(FileCache *cache_, uv_loop_t *loop_, const std::string &root)
-    : assetRoot(root.empty() ? platform::assetRoot() : root),
-      loop(loop_),
-      cache(cache_),
-      queue(new Queue(loop, [this](Action &action) {
-          mapbox::util::apply_visitor(ActionDispatcher{*this}, action);
-      })) {
-    // Make sure that the queue doesn't block the loop from exiting.
-    queue->unref();
+DefaultFileSource::DefaultFileSource(FileCache* cache, const std::string& root)
+    : thread(util::make_unique<util::Thread<Impl>>("FileSource", cache, root)) {
 }
 
 DefaultFileSource::~DefaultFileSource() {
     MBGL_VERIFY_THREAD(tid);
-
-    if (thread.joinable()) {
-        if (queue) {
-            queue->send(StopAction{ });
-        }
-        thread.join();
-        uv_loop_delete(loop);
-    } else {
-        // Assume that the loop we received is running in the current thread.
-        StopAction action {};
-        process(action);
-    }
 }
 
-SharedRequestBase *DefaultFileSource::find(const Resource &resource) {
+SharedRequestBase *DefaultFileSource::Impl::find(const Resource &resource) {
     // We're using a set of pointers here instead of a map between url and SharedRequestBase because
     // we need to find the requests both by pointer and by URL. Given that the number of requests
     // is generally very small (typically < 10 at a time), hashing by URL incurs too much overhead
@@ -110,40 +52,37 @@ SharedRequestBase *DefaultFileSource::find(const Resource &resource) {
     return nullptr;
 }
 
-Request *DefaultFileSource::request(const Resource &resource, uv_loop_t *l, const Environment &env,
+Request* DefaultFileSource::request(const Resource& resource,
+                                    uv_loop_t* l,
+                                    const Environment& env,
                                     Callback callback) {
     auto req = new Request(resource, l, env, std::move(callback));
 
     // This function can be called from any thread. Make sure we're executing the actual call in the
-    // file source loop by sending it over the queue. It will be processed in processAction().
-    queue->send(AddRequestAction{ req });
+    // file source loop by sending it over the queue.
+    thread->invoke(&Impl::add, std::move(req), thread->get());
+
     return req;
 }
 
-void DefaultFileSource::request(const Resource &resource, const Environment &env,
-                                Callback callback) {
-    auto req = new Request(resource, nullptr, env, std::move(callback));
-
-    // This function can be called from any thread. Make sure we're executing the actual call in the
-    // file source loop by sending it over the queue. It will be processed in processAction().
-    queue->send(AddRequestAction{ req });
+void DefaultFileSource::request(const Resource& resource, const Environment& env, Callback callback) {
+    request(resource, nullptr, env, std::move(callback));
 }
 
 void DefaultFileSource::cancel(Request *req) {
     req->cancel();
 
     // This function can be called from any thread. Make sure we're executing the actual call in the
-    // file source loop by sending it over the queue. It will be processed in processAction().
-    queue->send(RemoveRequestAction{ req });
+    // file source loop by sending it over the queue.
+    thread->invoke(&Impl::cancel, std::move(req));
 }
 
 void DefaultFileSource::abort(const Environment &env) {
-    queue->send(AbortAction{ env });
+    thread->invoke(&Impl::abort, std::ref(env));
 }
 
-
-void DefaultFileSource::process(AddRequestAction &action) {
-    const Resource &resource = action.request->resource;
+void DefaultFileSource::Impl::add(Request* req, uv_loop_t* loop) {
+    const Resource &resource = req->resource;
 
     // We're adding a new Request.
     SharedRequestBase *sharedRequest = find(resource);
@@ -153,11 +92,6 @@ void DefaultFileSource::process(AddRequestAction &action) {
             sharedRequest = new AssetRequest(this, resource);
         } else {
             sharedRequest = new HTTPRequest(this, resource);
-        }
-
-        // Make sure the loop stays alive when we're not running the file source in it's own thread.
-        if (!thread.joinable() && pending.empty()) {
-            queue->ref();
         }
 
         const bool inserted = pending.emplace(resource, sharedRequest).second;
@@ -170,21 +104,21 @@ void DefaultFileSource::process(AddRequestAction &action) {
         } else {
             // Otherwise, first check the cache for existing data so that we can potentially
             // revalidate the information without having to redownload everything.
-            cache->get(resource, [this, resource](std::unique_ptr<Response> response) {
-                queue->send(ResultAction { resource, std::move(response) });
+            cache->get(resource, [this, resource, loop](std::unique_ptr<Response> response) {
+                processResult(resource, std::move(response), loop);
             });
         }
     }
-    sharedRequest->subscribe(action.request);
+    sharedRequest->subscribe(req);
 }
 
-void DefaultFileSource::process(RemoveRequestAction &action) {
-    SharedRequestBase *sharedRequest = find(action.request->resource);
+void DefaultFileSource::Impl::cancel(Request* req) {
+    SharedRequestBase *sharedRequest = find(req->resource);
     if (sharedRequest) {
         // If the number of dependent requests of the SharedRequestBase drops to zero, the
         // unsubscribe callback triggers the removal of the SharedRequestBase pointer from the list
         // of pending requests and initiates cancelation.
-        sharedRequest->unsubscribe(action.request);
+        sharedRequest->unsubscribe(req);
     } else {
         // There is no request for this URL anymore. Likely, the request already completed
         // before we got around to process the cancelation request.
@@ -192,24 +126,24 @@ void DefaultFileSource::process(RemoveRequestAction &action) {
 
     // Send a message back to the requesting thread and notify it that this request has been
     // canceled and is now safe to be deleted.
-    action.request->destruct();
+    req->destruct();
 }
 
-void DefaultFileSource::process(ResultAction &action) {
-    SharedRequestBase *sharedRequest = find(action.resource);
+void DefaultFileSource::Impl::processResult(const Resource& resource, std::shared_ptr<const Response> response, uv_loop_t* loop) {
+    SharedRequestBase *sharedRequest = find(resource);
     if (sharedRequest) {
-        if (action.response) {
+        if (response) {
             // This entry was stored in the cache. Now determine if we need to revalidate.
             const int64_t now = std::chrono::duration_cast<std::chrono::seconds>(
                                     SystemClock::now().time_since_epoch()).count();
-            if (action.response->expires > now) {
+            if (response->expires > now) {
                 // The response is fresh. We're good to notify the caller.
-                sharedRequest->notify(std::move(action.response), FileCache::Hint::No);
+                sharedRequest->notify(response, FileCache::Hint::No);
                 sharedRequest->cancel();
                 return;
             } else {
                 // The cached response is stale. Now run the real request.
-                sharedRequest->start(loop, std::move(action.response));
+                sharedRequest->start(loop, response);
             }
         } else {
             // There is no response. Now run the real request.
@@ -221,19 +155,8 @@ void DefaultFileSource::process(ResultAction &action) {
     }
 }
 
-// A stop action means the file source is about to be destructed. We need to cancel all requests
-// for all environments.
-void DefaultFileSource::process(StopAction &) {
-    // There may not be any pending requests in this file source anymore. You must terminate all
-    // Map objects before deleting the FileSource.
-    assert(pending.empty());
-    assert(queue);
-    queue->stop();
-    queue = nullptr;
-}
-
 // Aborts all requests that are part of the current environment.
-void DefaultFileSource::process(AbortAction &action) {
+void DefaultFileSource::Impl::abort(const Environment& env) {
     // Construct a cancellation response.
     auto res = util::make_unique<Response>();
     res->status = Response::Error;
@@ -243,7 +166,7 @@ void DefaultFileSource::process(AbortAction &action) {
     // Iterate through all pending requests and remove them in case they're abandoned.
     util::erase_if(pending, [&](const std::pair<Resource, SharedRequestBase *> &it) -> bool {
         // Obtain all pending requests that are in the current environment.
-        const auto aborted = it.second->removeAllInEnvironment(action.env);
+        const auto aborted = it.second->removeAllInEnvironment(env);
 
         // Notify all observers.
         for (auto req : aborted) {
@@ -260,7 +183,7 @@ void DefaultFileSource::process(AbortAction &action) {
     });
 }
 
-void DefaultFileSource::notify(SharedRequestBase *sharedRequest,
+void DefaultFileSource::Impl::notify(SharedRequestBase *sharedRequest,
                                const std::set<Request *> &observers,
                                std::shared_ptr<const Response> response, FileCache::Hint hint) {
     // First, remove the request, since it might be destructed at any point now.
@@ -277,11 +200,6 @@ void DefaultFileSource::notify(SharedRequestBase *sharedRequest,
         for (auto req : observers) {
             req->notify(response);
         }
-    }
-
-    if (!thread.joinable() && pending.empty()) {
-        // When there are no pending requests, we're going to allow the queue to stop.
-        queue->unref();
     }
 }
 

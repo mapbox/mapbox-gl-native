@@ -53,6 +53,7 @@ Xcode/mbgl: config/$(HOST).gypi styles/styles SMCalloutView
 Makefile/test: test/test.gyp config/$(HOST).gypi styles/styles SMCalloutView
 	deps/run_gyp test/test.gyp $(CONFIG_$(HOST)) $(LIBS_$(HOST)) --generator-output=./build/$(HOST) -f make
 
+.PHONY: test
 test: Makefile/test
 	$(MAKE) -C build/$(HOST) BUILDTYPE=$(BUILDTYPE) test
 

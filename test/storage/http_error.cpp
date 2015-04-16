@@ -20,7 +20,7 @@ TEST_F(Storage, HTTPError) {
     }, 500, 500);
     uv_unref((uv_handle_t *)&statusChange);
 
-    DefaultFileSource fs(nullptr, uv_default_loop());
+    DefaultFileSource fs(nullptr);
 
     auto &env = *static_cast<const Environment *>(nullptr);
 
