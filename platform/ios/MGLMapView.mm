@@ -367,6 +367,7 @@ mbgl::DefaultFileSource *mbglFileSource = nullptr;
     //
     [[NSNotificationCenter defaultCenter] addObserver:self selector:@selector(appDidBackground:) name:UIApplicationDidEnterBackgroundNotification object:nil];
     [[NSNotificationCenter defaultCenter] addObserver:self selector:@selector(appWillForeground:) name:UIApplicationWillEnterForegroundNotification object:nil];
+    [[NSNotificationCenter defaultCenter] addObserver:self selector:@selector(didReceiveMemoryWarning) name:UIApplicationDidReceiveMemoryWarningNotification object:nil];
 
     // set initial position
     //
@@ -574,6 +575,17 @@ mbgl::DefaultFileSource *mbglFileSource = nullptr;
     else
     {
         mbglView->resize(rect.size.width, rect.size.height, view.contentScaleFactor, view.drawableWidth, view.drawableHeight);
+
+        CGFloat zoomFactor   = mbglMap->getMaxZoom() - mbglMap->getMinZoom() + 1;
+        CGFloat cpuFactor    = (CGFloat)[[NSProcessInfo processInfo] processorCount];
+        CGFloat memoryFactor = (CGFloat)[[NSProcessInfo processInfo] physicalMemory] / 1000 / 1000 / 1000;
+        CGFloat sizeFactor   = ((CGFloat)mbglMap->getState().getWidth()  / mbgl::util::tileSize) *
+                               ((CGFloat)mbglMap->getState().getHeight() / mbgl::util::tileSize);
+
+        NSUInteger cacheSize = zoomFactor * cpuFactor * memoryFactor * sizeFactor * 0.5;
+
+        mbglMap->setSourceTileCacheSize(cacheSize);
+
         mbglMap->renderSync();
     }
 }
@@ -1164,6 +1176,11 @@ mbgl::DefaultFileSource *mbglFileSource = nullptr;
 - (void)toggleDebug
 {
     mbglMap->toggleDebug();
+}
+
+- (void)emptyMemoryCache
+{
+    mbglMap->onLowMemory();
 }
 
 #pragma mark - Geography -
@@ -2450,7 +2467,8 @@ class MBGLView : public mbgl::View
         [EAGLContext setCurrentContext:nil];
     }
 
-    void resize(uint16_t width, uint16_t height, float ratio, uint16_t fbWidth, uint16_t fbHeight) {
+    void resize(uint16_t width, uint16_t height, float ratio, uint16_t fbWidth, uint16_t fbHeight)
+    {
         View::resize(width, height, ratio, fbWidth, fbHeight);
     }
 
@@ -2564,6 +2582,11 @@ class MBGLView : public mbgl::View
 - (void)setAllowsRotating:(BOOL)allowsRotating
 {
     self.rotateEnabled = allowsRotating;
+}
+
+- (void)didReceiveMemoryWarning
+{
+    mbglMap->onLowMemory();
 }
 
 @end

@@ -279,6 +279,9 @@ IB_DESIGNABLE
 /** Toggle the current value of debugActive. */
 - (void)toggleDebug;
 
+/** Empties the in-memory tile cache. */
+- (void)emptyMemoryCache;
+
 /** Resets the map to the minimum zoom level, a center coordinate of (0, 0), and a northern heading. */
 - (void)resetPosition;
 
