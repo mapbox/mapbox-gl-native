@@ -6,6 +6,7 @@
 #include <mbgl/util/uv_detail.hpp>
 
 #include <functional>
+#include <utility>
 #include <queue>
 #include <mutex>
 
@@ -19,37 +20,38 @@ public:
 
     void stop();
 
-    // Invoke fn() in the runloop thread.
-    template <class Fn>
-    void invoke(Fn&& fn) {
-        auto invokable = util::make_unique<Invoker<Fn>>(std::move(fn));
+    // Invoke fn(args...) on this RunLoop.
+    template <class Fn, class... Args>
+    void invoke(Fn&& fn, Args&&... args) {
+        auto tuple = std::make_tuple(std::move(args)...);
+        auto invokable = util::make_unique<Invoker<Fn, decltype(tuple), Args...>>(std::move(fn), std::move(tuple));
         withMutex([&] { queue.push(std::move(invokable)); });
         async.send();
     }
 
-    // Invoke fn() in the runloop thread, then invoke callback(result) in the current thread.
-    template <class Fn, class R>
-    void invokeWithResult(Fn&& fn, std::function<void (R)>&& callback) {
-        RunLoop* outer = current.get();
-        assert(outer);
-
-        invoke([fn = std::move(fn), callback = std::move(callback), outer] () mutable {
-            outer->invoke([callback = std::move(callback), result = std::move(fn())] () mutable {
-                callback(std::move(result));
-            });
-        });
+    // Return a function that invokes the given function on this RunLoop.
+    template <class... Args>
+    auto bind(std::function<void (Args...)> fn) {
+        return [this, fn = std::move(fn)] (Args&&... args) {
+            invoke(std::move(fn), std::move(args)...);
+        };
     }
 
-    // Invoke fn() in the runloop thread, then invoke callback() in the current thread.
-    template <class Fn>
-    void invokeWithResult(Fn&& fn, std::function<void ()>&& callback) {
-        RunLoop* outer = current.get();
-        assert(outer);
+    // Invoke fn(args...) on this RunLoop, then invoke callback(result) on the current RunLoop.
+    template <class R, class Fn, class... Args>
+    void invokeWithResult(Fn&& fn, std::function<void (R)> callback, Args&&... args) {
+        invoke([fn = std::move(fn), callback = current.get()->bind(callback)] (Args&&... a) mutable {
+            callback(fn(std::forward<Args>(a)...));
+        }, std::forward<Args>(args)...);
+    }
 
-        invoke([fn = std::move(fn), callback = std::move(callback), outer] () mutable {
-            fn();
-            outer->invoke(std::move(callback));
-        });
+    // Invoke fn(args...) on this RunLoop, then invoke callback() on the current RunLoop.
+    template <class Fn, class... Args>
+    void invokeWithResult(Fn&& fn, std::function<void ()> callback, Args&&... args) {
+        invoke([fn = std::move(fn), callback = current.get()->bind(callback)] (Args&&... a) mutable {
+            fn(std::forward<Args>(a)...);
+            callback();
+        }, std::forward<Args>(args)...);
     }
 
     uv_loop_t* get() { return async.get()->loop; }
@@ -65,11 +67,24 @@ private:
         virtual ~Message() = default;
     };
 
-    template <class F>
+    template <class F, class P, class... Args>
     struct Invoker : Message {
-        Invoker(F&& f) : func(std::move(f)) {}
-        void operator()() override { func(); }
+        Invoker(F&& f, P&& p)
+          : func(std::move(f)),
+            params(std::move(p)) {
+        }
+
+        void operator()() override {
+            invoke(std::index_sequence_for<Args...>{});
+        }
+
+        template <std::size_t... I>
+        void invoke(std::index_sequence<I...>) {
+             func(std::forward<Args>(std::get<I>(params))...);
+        }
+
         F func;
+        P params;
     };
 
     using Queue = std::queue<std::unique_ptr<Message>>;

@@ -4,25 +4,11 @@
 #include <future>
 #include <thread>
 #include <atomic>
+#include <utility>
 #include <functional>
 
 #include <mbgl/util/run_loop.hpp>
 #include <mbgl/platform/platform.hpp>
-
-namespace {
-
-template <::std::size_t...>
-struct index_sequence {};
-
-template <::std::size_t N, ::std::size_t... I>
-struct integer_sequence : integer_sequence<N - 1, N - 1, I...> {};
-
-template <::std::size_t... I>
-struct integer_sequence<0, I...> {
-    using type = index_sequence<I...>;
-};
-
-}
 
 namespace mbgl {
 namespace util {
@@ -50,19 +36,19 @@ public:
     // Invoke object->fn(args...) in the runloop thread.
     template <typename Fn, class... Args>
     void invoke(Fn fn, Args&&... args) {
-        loop->invoke(std::bind(fn, object, args...));
+        loop->invoke(bind<Fn, Args...>(fn), std::forward<Args>(args)...);
     }
 
     // Invoke object->fn(args...) in the runloop thread, then invoke callback(result) in the current thread.
-    template <typename Fn, class R, class... Args>
-    void invokeWithResult(Fn fn, std::function<void (R)>&& callback, Args&&... args) {
-        loop->invokeWithResult(std::bind(fn, object, std::move(args)...), std::move(callback));
+    template <class R, typename Fn, class... Args>
+    void invokeWithResult(Fn fn, std::function<void (R)> callback, Args&&... args) {
+        loop->invokeWithResult(bind<Fn, Args...>(fn), callback, std::forward<Args>(args)...);
     }
 
     // Invoke object->fn(args...) in the runloop thread, then invoke callback() in the current thread.
     template <typename Fn, class... Args>
-    void invokeWithResult(Fn fn, std::function<void ()>&& callback, Args&&... args) {
-        loop->invokeWithResult(std::bind(fn, object, std::move(args)...), std::move(callback));
+    void invokeWithResult(Fn fn, std::function<void ()> callback, Args&&... args) {
+        loop->invokeWithResult(bind<Fn, Args...>(fn), callback, std::forward<Args>(args)...);
     }
 
     // Invoke object->fn(args...) in the runloop thread, and wait for the result.
@@ -89,8 +75,13 @@ private:
     Thread& operator=(const Thread&) = delete;
     Thread& operator=(Thread&&) = delete;
 
+    template <typename Fn, class... Args>
+    auto bind(Fn fn) {
+        return [fn, this] (Args&&... a) { return (object->*fn)(std::forward<Args>(a)...); };
+    }
+
     template <typename P, std::size_t... I>
-    void run(P&& params, index_sequence<I...>);
+    void run(P&& params, std::index_sequence<I...>);
 
     std::promise<void> running;
     std::promise<void> joinable;
@@ -119,8 +110,7 @@ Thread<Object>::Thread(const std::string& name, ThreadPriority priority, Args&&.
             platform::makeThreadLowPriority();
         }
 
-        constexpr auto seq = typename integer_sequence<sizeof...(Args)>::type();
-        run(std::move(params), seq);
+        run(std::move(params), std::index_sequence_for<Args...>{});
     });
 
     running.get_future().get();
@@ -128,7 +118,7 @@ Thread<Object>::Thread(const std::string& name, ThreadPriority priority, Args&&.
 
 template <class Object>
 template <typename P, std::size_t... I>
-void Thread<Object>::run(P&& params, index_sequence<I...>) {
+void Thread<Object>::run(P&& params, std::index_sequence<I...>) {
     uv::loop l;
 
     {
