@@ -94,10 +94,6 @@ NAN_METHOD(NodeMap::SetAccessToken) {
 
     auto nodeMap = node::ObjectWrap::Unwrap<NodeMap>(args.Holder());
 
-    if (nodeMap->map.isRendering()) {
-        return NanThrowError("Map object is currently in use");
-    }
-
     try {
         nodeMap->map.setAccessToken(std::string { *token, size_t(token.length()) });
     } catch (const std::exception &ex) {
@@ -136,10 +132,6 @@ NAN_METHOD(NodeMap::Load) {
     }
 
     auto nodeMap = node::ObjectWrap::Unwrap<NodeMap>(args.Holder());
-
-    if (nodeMap->map.isRendering()) {
-        return NanThrowError("Map object is currently in use");
-    }
 
     try {
         nodeMap->map.setStyleJSON(style, ".");
@@ -192,10 +184,6 @@ NAN_METHOD(NodeMap::Render) {
     auto options = ParseOptions(args[0]->ToObject());
 
     auto nodeMap = node::ObjectWrap::Unwrap<NodeMap>(args.Holder());
-
-    if (nodeMap->map.isRendering()) {
-        return NanThrowError("Map object is currently in use");
-    }
 
     assert(!nodeMap->callback);
     assert(!nodeMap->image);
@@ -289,8 +277,10 @@ void NodeMap::renderFinished() {
 NodeMap::NodeMap(v8::Handle<v8::Object> source_) :
     view(sharedDisplay()),
     fs(*ObjectWrap::Unwrap<NodeFileSource>(source_)),
-    map(view, fs, mbgl::Map::RenderMode::Still),
+    map(view, fs),
     async(new uv_async_t) {
+
+    map.start(mbgl::Map::Mode::Static);
 
     NanAssignPersistent(source, source_);
 
@@ -304,6 +294,8 @@ NodeMap::NodeMap(v8::Handle<v8::Object> source_) :
 }
 
 NodeMap::~NodeMap() {
+    map.stop();
+
     source.Dispose();
 
     uv_close(reinterpret_cast<uv_handle_t *>(async), [] (uv_handle_t *handle) {
