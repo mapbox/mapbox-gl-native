@@ -64,5 +64,9 @@ void TileData::reparse(Worker& worker, std::function<void()> callback) {
             EnvironmentScope scope(tile->env, ThreadType::TileWorker, "TileWorker_" + tile->name);
             tile->parse();
         },
-        callback);
+        [tile, callback]() {
+             // `tile` is bound in this lambda to ensure that if it's the last owning pointer,
+             // destruction happens on the map thread, not the worker thread.
+            callback();
+        });
 }
