@@ -16,7 +16,6 @@ void TileCache::setSize(size_t size_) {
     assert(orderedKeys.size() <= size);
 
     tiles.reserve(size);
-    orderedKeys.resize(size);
 }
 
 void TileCache::add(uint64_t key, std::shared_ptr<TileData> data) {
