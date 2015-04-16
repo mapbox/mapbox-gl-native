@@ -24,7 +24,11 @@ LiveTileData::LiveTileData(const TileID& id_,
     state = State::loaded;
 }
 
-LiveTileData::~LiveTileData() {}
+LiveTileData::~LiveTileData() {
+    // Clear the style (if not already during parse) to
+    // avoid cyclical shared_ptr references.
+    style.reset();
+}
 
 void LiveTileData::parse() {
     if (state != State::loaded) {

@@ -145,6 +145,7 @@ mbgl::Settings_NSUserDefaults *settings = nullptr;
                                               otherButtonTitles:@"Reset North",
                                                                 @"Reset Position",
                                                                 @"Toggle Debug",
+                                                                @"Empty Memory",
                                                                 @"Add 100 Points",
                                                                 @"Add 1,000 Points",
                                                                 @"Add 10,000 Points",
@@ -170,17 +171,21 @@ mbgl::Settings_NSUserDefaults *settings = nullptr;
     }
     else if (buttonIndex == actionSheet.firstOtherButtonIndex + 3)
     {
-        [self parseFeaturesAddingCount:100];
+        [self.mapView emptyMemoryCache];
     }
     else if (buttonIndex == actionSheet.firstOtherButtonIndex + 4)
     {
-        [self parseFeaturesAddingCount:1000];
+        [self parseFeaturesAddingCount:100];
     }
     else if (buttonIndex == actionSheet.firstOtherButtonIndex + 5)
     {
-        [self parseFeaturesAddingCount:10000];
+        [self parseFeaturesAddingCount:1000];
     }
     else if (buttonIndex == actionSheet.firstOtherButtonIndex + 6)
+    {
+        [self parseFeaturesAddingCount:10000];
+    }
+    else if (buttonIndex == actionSheet.firstOtherButtonIndex + 7)
     {
         [self.mapView removeAnnotations:self.mapView.annotations];
     }

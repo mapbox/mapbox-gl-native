@@ -245,6 +245,10 @@ TileData::State Source::addTile(Map &map, Worker &worker,
     }
 
     if (!new_tile.data) {
+        new_tile.data = cache.get(id.to_uint64());
+    }
+
+    if (!new_tile.data) {
         // If we don't find working tile data, we're just going to load it.
         if (info.type == SourceType::Vector) {
             new_tile.data =
@@ -394,20 +398,33 @@ void Source::update(Map &map,
         }
     }
 
+    if (info.type != SourceType::Raster && cache.getSize() == 0) {
+        size_t conservativeCacheSize = ((float)map.getState().getWidth()  / util::tileSize) *
+                                       ((float)map.getState().getHeight() / util::tileSize) *
+                                       (map.getMaxZoom() - map.getMinZoom() + 1) *
+                                       0.5;
+        cache.setSize(conservativeCacheSize);
+    }
+
+    auto& tileCache = cache;
+    auto& type = info.type;
+
     // Remove tiles that we definitely don't need, i.e. tiles that are not on
     // the required list.
     std::set<TileID> retain_data;
-    util::erase_if(tiles, [&retain, &retain_data](std::pair<const TileID, std::unique_ptr<Tile>> &pair) {
+    util::erase_if(tiles, [&retain, &retain_data, &tileCache, &type](std::pair<const TileID, std::unique_ptr<Tile>> &pair) {
         Tile &tile = *pair.second;
         bool obsolete = std::find(retain.begin(), retain.end(), tile.id) == retain.end();
         if (!obsolete) {
             retain_data.insert(tile.data->id);
+        } else if (type != SourceType::Raster && tile.data->ready()) {
+            tileCache.add(tile.id.to_uint64(), tile.data);
         }
         return obsolete;
     });
 
     // Remove all the expired pointers from the set.
-    util::erase_if(tile_data, [&retain_data](std::pair<const TileID, std::weak_ptr<TileData>> &pair) {
+    util::erase_if(tile_data, [&retain_data, &tileCache](std::pair<const TileID, std::weak_ptr<TileData>> &pair) {
         const util::ptr<TileData> tile = pair.second.lock();
         if (!tile) {
             return true;
@@ -415,7 +432,9 @@ void Source::update(Map &map,
 
         bool obsolete = retain_data.find(tile->id) == retain_data.end();
         if (obsolete) {
-            tile->cancel();
+            if (!tileCache.has(tile->id.to_uint64())) {
+                tile->cancel();
+            }
             return true;
         } else {
             return false;
@@ -426,10 +445,19 @@ void Source::update(Map &map,
 }
 
 void Source::invalidateTiles(const std::vector<TileID>& ids) {
+    cache.clear();
     for (auto& id : ids) {
         tiles.erase(id);
         tile_data.erase(id);
     }
+}
+
+void Source::setCacheSize(size_t size) {
+    cache.setSize(size);
+}
+
+void Source::onLowMemory() {
+    cache.clear();
 }
 
 }
