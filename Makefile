@@ -19,6 +19,11 @@ JOBS = $(shell nproc)
 endif
 endif
 
+NODE_PRE_GYP = $(shell which node-pre-gyp)
+ifeq ($(NODE_PRE_GYP),)
+NODE_PRE_GYP = $(shell npm bin)/node-pre-gyp
+endif
+
 # Explicitly disable the default FileSource implementation
 ASSET = none
 HTTP = none
@@ -30,20 +35,28 @@ global: build
 
 .PHONY: build
 build: build/Makefile
-	@node-pre-gyp build $(DEBUG_FLAG) --clang -- -j$(JOBS)
+	@$(NODE_PRE_GYP) build $(DEBUG_FLAG) --clang -- -j$(JOBS)
 
 vendor/mbgl:
 	git submodule update --init
 
+GYP_SETTINGS = -Dmbgl=$(MBGL) \
+	-Dhost=$(HOST) \
+	-I$(MBGL)/config/$(HOST).gypi \
+	$(LIBS_$(HOST)) \
+	-Duv_static_libs= -Duv_ldflags=
+
 .PHONY: build/Makefile
 build/Makefile: $(MBGL)/config/$(HOST).gypi
-	@node-pre-gyp configure --clang -- \
-		-Dmbgl=$(MBGL) \
-		-Dhost=$(HOST) \
-		-I$(MBGL)/config/$(HOST).gypi \
-		$(LIBS_$(HOST)) \
-		-Duv_static_libs= -Duv_ldflags= \
-		-Goutput_dir=.
+	@$(NODE_PRE_GYP) configure --clang -- $(GYP_SETTINGS) -f make
+
+.PHONY: build/binding.xcodeproj
+build/binding.xcodeproj: $(MBGL)/config/$(HOST).gypi
+	@$(NODE_PRE_GYP) configure --clang -- $(GYP_SETTINGS) -f xcode
+
+.PHONY: xproj
+xproj: build/binding.xcodeproj
+	open build/binding.xcodeproj
 
 $(MBGL)/config/%.gypi: $(MBGL) $(MBGL)/configure
 	make -C $(MBGL) config/$*.gypi

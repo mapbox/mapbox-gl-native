@@ -35,7 +35,7 @@
             "CLANG_CXX_LIBRARY": "libc++",
             "CLANG_CXX_LANGUAGE_STANDARD":"c++11",
             "GCC_VERSION": "com.apple.compilers.llvm.clang.1_0",
-            'MACOSX_DEPLOYMENT_TARGET': '10.7',
+            'MACOSX_DEPLOYMENT_TARGET': '10.9',
             'OTHER_CPLUSPLUSFLAGS': [ '<@(cflags_cc)' ],
             'GCC_ENABLE_CPP_EXCEPTIONS': 'YES',
           }

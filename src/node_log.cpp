@@ -1,28 +1,50 @@
 #include "node_log.hpp"
 
-#include <cstdarg>
+#include <mbgl/map/environment.hpp>
 
 namespace node_mbgl {
 
-struct NodeLogBackend::Message {
+struct NodeLogObserver::LogMessage {
     mbgl::EventSeverity severity;
     mbgl::Event event;
     int64_t code;
     std::string text;
+    int environment = -1;
+    std::string threadName = "";
+
+    LogMessage(mbgl::EventSeverity severity_, mbgl::Event event_, int64_t code_, std::string text_, int environment_, std::string threadName_)
+        : severity(severity_),
+        event(event_),
+        code(code_),
+        text(text_),
+        environment(environment_),
+        threadName(threadName_) {};
+
+    LogMessage(mbgl::EventSeverity severity_, mbgl::Event event_, int64_t code_, std::string text_)
+        : severity(severity_),
+        event(event_),
+        code(code_),
+        text(text_) {}
 };
 
-NodeLogBackend::NodeLogBackend(v8::Handle<v8::Object> target)
-    : queue(new Queue(uv_default_loop(), [this](Message &message) {
+NodeLogObserver::NodeLogObserver(v8::Handle<v8::Object> target)
+    : queue(new Queue(uv_default_loop(), [this](LogMessage &message) {
           NanScope();
 
           auto msg = v8::Object::New();
           msg->Set(NanNew("class"), NanNew(mbgl::EventClass(message.event).c_str()));
           msg->Set(NanNew("severity"), NanNew(mbgl::EventSeverityClass(message.severity).c_str()));
+          if (message.code != -1) {
+              msg->Set(NanNew("code"), NanNew<v8::Number>(message.code));
+          }
           if (!message.text.empty()) {
               msg->Set(NanNew("text"), NanNew(message.text));
           }
-          if (message.code != 0) {
-              msg->Set(NanNew("code"), NanNew(double(message.code)));
+          if (message.environment != -1) {
+              msg->Set(NanNew("environment"), NanNew<v8::Number>(message.environment));
+          }
+          if (!message.threadName.empty()) {
+              msg->Set(NanNew("threadName"), NanNew(message.threadName));
           }
 
           v8::Local<v8::Value> argv[] = { NanNew("message"), msg };
@@ -36,29 +58,19 @@ NodeLogBackend::NodeLogBackend(v8::Handle<v8::Object> target)
     queue->unref();
 }
 
-NodeLogBackend::~NodeLogBackend() {
+NodeLogObserver::~NodeLogObserver() {
     queue->stop();
 }
 
-void NodeLogBackend::record(mbgl::EventSeverity severity, mbgl::Event event, const std::string &msg) {
-    queue->send({ severity, event, 0, msg });
-}
-
-void NodeLogBackend::record(mbgl::EventSeverity severity, mbgl::Event event, const char* format, ...) {
-    char msg[512];
-    va_list args;
-    va_start(args, format);
-    vsnprintf(msg, 512, format, args);
-    va_end(args);
-    queue->send({ severity, event, 0, msg });
-}
-
-void NodeLogBackend::record(mbgl::EventSeverity severity, mbgl::Event event, int64_t code) {
-    queue->send({ severity, event, code, "" });
-}
-
-void NodeLogBackend::record(mbgl::EventSeverity severity, mbgl::Event event, int64_t code, const std::string &msg) {
-    queue->send({ severity, event, code, msg });
+bool NodeLogObserver::onRecord(mbgl::EventSeverity severity, mbgl::Event event, int64_t code, const std::string &text) {
+    if (mbgl::Environment::inScope()) {
+        int env = static_cast<int>(mbgl::Environment::Get().getID());
+        std::string threadName = mbgl::Environment::threadName();
+        queue->send({ severity, event, code, text, env, threadName });
+    } else {
+        queue->send({ severity, event, code, text });
+    }
+    return true;
 }
 
 }
