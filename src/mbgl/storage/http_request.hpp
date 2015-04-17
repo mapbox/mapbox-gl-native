@@ -3,23 +3,23 @@
 
 #include "request_base.hpp"
 
+typedef struct uv_loop_s uv_loop_t;
+
 namespace mbgl {
 
-struct Resource;
+class HTTPRequestImpl;
 
 class HTTPRequest : public RequestBase {
 public:
-    HTTPRequest(const Resource&, Callback);
+    HTTPRequest(const Resource&, Callback, uv_loop_t*, std::shared_ptr<const Response> = nullptr);
 
-    void start(uv_loop_t *loop, std::shared_ptr<const Response> response = nullptr);
-    void cancel();
-
+    void cancel() override;
     void retryImmediately();
 
 private:
     ~HTTPRequest();
-    void *ptr = nullptr;
 
+    HTTPRequestImpl* impl;
     friend class HTTPRequestImpl;
 };
 

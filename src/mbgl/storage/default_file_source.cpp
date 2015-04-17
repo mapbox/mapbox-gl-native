@@ -134,12 +134,10 @@ void DefaultFileSource::Impl::startRealRequest(const Resource& resource, std::sh
     };
 
     if (algo::starts_with(resource.url, "asset://")) {
-        request->request = new AssetRequest(resource, callback, assetRoot);
+        request->request = new AssetRequest(resource, callback, request->loop, assetRoot);
     } else {
-        request->request = new HTTPRequest(resource, callback);
+        request->request = new HTTPRequest(resource, callback, request->loop, response);
     }
-
-    request->request->start(request->loop, response);
 }
 
 void DefaultFileSource::Impl::cancel(Request* req) {

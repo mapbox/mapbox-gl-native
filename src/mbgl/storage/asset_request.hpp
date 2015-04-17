@@ -3,20 +3,22 @@
 
 #include "request_base.hpp"
 
+typedef struct uv_loop_s uv_loop_t;
+
 namespace mbgl {
+
+class AssetRequestImpl;
 
 class AssetRequest : public RequestBase {
 public:
-    AssetRequest(const Resource&, Callback, const std::string& assetRoot);
+    AssetRequest(const Resource&, Callback, uv_loop_t*, const std::string& assetRoot);
 
-    void start(uv_loop_t *loop, std::shared_ptr<const Response> response = nullptr);
-    void cancel();
+    void cancel() override;
 
 private:
     ~AssetRequest();
-    void *ptr = nullptr;
-    const std::string& assetRoot;
 
+    AssetRequestImpl* impl;
     friend class AssetRequestImpl;
 };
 

@@ -77,7 +77,7 @@ class AssetRequestImpl {
     MBGL_STORE_THREAD(tid)
 
 public:
-    AssetRequestImpl(AssetRequest *request, uv_loop_t *loop);
+    AssetRequestImpl(AssetRequest*, uv_loop_t*, const std::string& assetRoot);
     ~AssetRequestImpl();
 
     void cancel();
@@ -112,10 +112,10 @@ AssetRequestImpl::~AssetRequestImpl() {
     }
 }
 
-AssetRequestImpl::AssetRequestImpl(AssetRequest *request_, uv_loop_t *loop)
+AssetRequestImpl::AssetRequestImpl(AssetRequest* request_, uv_loop_t* loop, const std::string& assetRoot_)
     : context(*AssetZipContext::Get(loop)),
       request(request_),
-      root(request->assetRoot),
+      root(assetRoot_),
       path(std::string { "assets/" } + request->resource.url.substr(8)) {
     auto zip = context.getHandle(root);
     if (zip) {
@@ -275,30 +275,22 @@ void AssetRequestImpl::cancel() {
 
 // -------------------------------------------------------------------------------------------------
 
-AssetRequest::AssetRequest(const Resource& resource_, Callback callback_, const std::string& assetRoot_)
+AssetRequest::AssetRequest(const Resource& resource_, Callback callback_,
+                           uv_loop_t* loop, const std::string& assetRoot)
     : RequestBase(resource_, callback_)
-    , assetRoot(assetRoot_) {
+    , impl(new AssetRequestImpl(this, loop, assetRoot)) {
     assert(algo::starts_with(resource.url, "asset://"));
 }
 
 AssetRequest::~AssetRequest() {
-    if (ptr) {
-        reinterpret_cast<AssetRequestImpl *>(ptr)->cancel();
+    if (impl) {
+        impl->cancel();
     }
 }
 
-void AssetRequest::start(uv_loop_t *loop, std::shared_ptr<const Response> response) {
-    // We're ignoring the existing response if any.
-    (void(response));
-
-    assert(!ptr);
-    ptr = new AssetRequestImpl(this, loop);
-    // Note: the AssetRequestImpl deletes itself.
-}
-
 void AssetRequest::cancel() {
-    if (ptr) {
-        reinterpret_cast<AssetRequestImpl *>(ptr)->cancel();
+    if (impl) {
+        impl->cancel();
     }
 
     delete this;

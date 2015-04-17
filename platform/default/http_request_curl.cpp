@@ -495,7 +495,7 @@ HTTPRequestImpl::~HTTPRequestImpl() {
 
     if (request) {
         context->removeRequest(request);
-        request->ptr = nullptr;
+        request->impl = nullptr;
     }
 
     handleError(curl_multi_remove_handle(context->multi, handle));
@@ -723,33 +723,27 @@ void HTTPRequestImpl::handleResult(CURLcode code) {
 
 // -------------------------------------------------------------------------------------------------
 
-HTTPRequest::HTTPRequest(const Resource& resource_, Callback callback_)
-    : RequestBase(resource_, callback_) {
+HTTPRequest::HTTPRequest(const Resource& resource_, Callback callback_,
+                         uv_loop_t* loop, std::shared_ptr<const Response> response)
+    : RequestBase(resource_, callback_)
+    , impl(new HTTPRequestImpl(this, loop, response)) {
 }
 
 HTTPRequest::~HTTPRequest() {
-    if (ptr) {
-        reinterpret_cast<HTTPRequestImpl *>(ptr)->abandon();
+    if (impl) {
+        impl->abandon();
     }
 }
 
-void HTTPRequest::start(uv_loop_t *loop, std::shared_ptr<const Response> response) {
-    assert(!ptr);
-    ptr = new HTTPRequestImpl(this, loop, response);
-}
-
 void HTTPRequest::retryImmediately() {
-    if (ptr) {
-        reinterpret_cast<HTTPRequestImpl *>(ptr)->retryImmediately();
+    if (impl) {
+        impl->retryImmediately();
     }
 }
 
 void HTTPRequest::cancel() {
-    if (ptr) {
-        delete reinterpret_cast<HTTPRequestImpl *>(ptr);
-        ptr = nullptr;
-    }
-
+    delete impl;
+    impl = nullptr;
     delete this;
 }
 

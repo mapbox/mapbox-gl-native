@@ -200,7 +200,7 @@ void HTTPRequestImpl::handleResponse() {
         }
 
         context->removeRequest(request);
-        request->ptr = nullptr;
+        request->impl = nullptr;
         delete request;
         request = nullptr;
     }
@@ -243,7 +243,7 @@ HTTPRequestImpl::~HTTPRequestImpl() {
 
     if (request) {
         context->removeRequest(request);
-        request->ptr = nullptr;
+        request->impl = nullptr;
     }
 }
 
@@ -398,24 +398,21 @@ void HTTPRequestImpl::restart(uv_timer_t *timer, int) {
 
 // -------------------------------------------------------------------------------------------------
 
-HTTPRequest::HTTPRequest(const Resource& resource, Callback callback)
-    : RequestBase(resource, callback) {
+HTTPRequest::HTTPRequest(const Resource& resource, Callback callback,
+                         uv_loop_t* loop, std::shared_ptr<const Response> response)
+    : RequestBase(resource, callback)
+    , impl(new HTTPRequestImpl(this, loop, response)) {
 }
 
 HTTPRequest::~HTTPRequest() {
-    if (ptr) {
-        reinterpret_cast<HTTPRequestImpl *>(ptr)->cancel();
+    if (impl) {
+        impl->cancel();
     }
 }
 
-void HTTPRequest::start(uv_loop_t *loop, std::shared_ptr<const Response> response) {
-    assert(!ptr);
-    ptr = new HTTPRequestImpl(this, loop, response);
-}
-
 void HTTPRequest::retryImmediately() {
-    if (ptr) {
-        reinterpret_cast<HTTPRequestImpl *>(ptr)->retryImmediately();
+    if (impl) {
+        impl->retryImmediately();
     }
 }
 
