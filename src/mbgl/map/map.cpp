@@ -2,6 +2,7 @@
 #include <mbgl/map/environment.hpp>
 #include <mbgl/map/view.hpp>
 #include <mbgl/map/map_data.hpp>
+#include <mbgl/map/still_image.hpp>
 #include <mbgl/platform/platform.hpp>
 #include <mbgl/map/source.hpp>
 #include <mbgl/renderer/painter.hpp>
@@ -79,7 +80,7 @@ Map::Map(View& view_, FileSource& fileSource_)
 }
 
 Map::~Map() {
-    if (mode == Mode::Continuous) {
+    if (mode != Mode::None) {
         stop();
     }
 
@@ -111,13 +112,13 @@ Worker& Map::getWorker() {
     return *workers;
 }
 
-void Map::start(bool startPaused) {
+void Map::start(bool startPaused, Mode renderMode) {
     assert(Environment::currentlyOn(ThreadType::Main));
     assert(mode == Mode::None);
 
     // When starting map rendering in another thread, we perform async/continuously
     // updated rendering. Only in these cases, we attach the async handlers.
-    mode = Mode::Continuous;
+    mode = renderMode;
 
     // Reset the flag.
     isStopped = false;
@@ -143,6 +144,10 @@ void Map::start(bool startPaused) {
     });
 
     asyncUpdate = util::make_unique<uv::async>(env->loop, [this] {
+        // Whenever we call triggerUpdate(), we ref() the asyncUpdate handle to make sure that all
+        // of the calls actually get triggered.
+        asyncUpdate->unref();
+
         update();
     });
 
@@ -184,15 +189,15 @@ void Map::start(bool startPaused) {
     triggerUpdate();
 }
 
-void Map::stop(std::function<void ()> callback) {
+void Map::stop(std::function<void ()> cb) {
     assert(Environment::currentlyOn(ThreadType::Main));
-    assert(mode == Mode::Continuous);
+    assert(mode != Mode::None);
 
     asyncTerminate->send();
 
     resume();
 
-    if (callback) {
+    if (cb) {
         // Wait until the render thread stopped. We are using this construct instead of plainly
         // relying on the thread_join because the system might need to run things in the current
         // thread that is required for the render thread to terminate correctly. This is for example
@@ -200,7 +205,7 @@ void Map::stop(std::function<void ()> callback) {
         // thread (== main thread) is blocked. The callback function should use an efficient waiting
         // function to avoid a busy waiting loop.
         while (!isStopped) {
-            callback();
+            cb();
         }
     }
 
@@ -231,7 +236,7 @@ void Map::pause(bool waitForPause) {
 
 void Map::resume() {
     assert(Environment::currentlyOn(ThreadType::Main));
-    assert(mode == Mode::Continuous);
+    assert(mode != Mode::None);
 
     mutexRun.lock();
     pausing = false;
@@ -239,21 +244,28 @@ void Map::resume() {
     mutexRun.unlock();
 }
 
-void Map::run() {
-    ThreadType threadType = ThreadType::Map;
-    std::string threadName("Map");
+void Map::renderStill(StillImageCallback fn) {
+    assert(Environment::currentlyOn(ThreadType::Main));
 
-    if (mode == Mode::None) {
-        mode = Mode::Static;
-
-        // FIXME: Threads should have only one purpose. When running on Static mode,
-        // we are currently not spawning a Map thread and running the code on the
-        // Main thread, thus, the Main thread in this case is both Main and Map thread.
-        threadType = static_cast<ThreadType>(static_cast<uint8_t>(threadType) | static_cast<uint8_t>(ThreadType::Main));
-        threadName += "andMain";
+    if (mode != Mode::Static) {
+        throw util::Exception("Map is not in static render mode");
     }
 
-    EnvironmentScope mapScope(*env, threadType, threadName);
+    if (callback) {
+        throw util::Exception("Map is currently rendering an image");
+    }
+
+    assert(mode == Mode::Static);
+
+    callback = std::move(fn);
+
+    triggerUpdate(Update::RenderStill);
+}
+
+void Map::run() {
+    EnvironmentScope mapScope(*env, ThreadType::Map, "Map");
+    assert(Environment::currentlyOn(ThreadType::Map));
+    assert(mode != Mode::None);
 
     if (mode == Mode::Continuous) {
         checkForPause();
@@ -261,11 +273,8 @@ void Map::run() {
 
     auto styleInfo = data->getStyleInfo();
 
-    if (mode == Mode::Static && !style && (styleInfo.url.empty() && styleInfo.json.empty())) {
-        throw util::Exception("Style is not set");
-    }
-
     view.activate();
+    view.discard();
 
     workers = util::make_unique<Worker>(env->loop, 4);
 
@@ -274,23 +283,46 @@ void Map::run() {
 
     if (mode == Mode::Continuous) {
         terminating = false;
-        while(!terminating) {
+        while (!terminating) {
             uv_run(env->loop, UV_RUN_DEFAULT);
             checkForPause();
         }
+    } else if (mode == Mode::Static) {
+        terminating = false;
+        while (!terminating) {
+            uv_run(env->loop, UV_RUN_DEFAULT);
+
+            // After the loop terminated, these async handles may have been deleted if the terminate()
+            // callback was fired. In this case, we are exiting the loop.
+            if (asyncTerminate && asyncUpdate) {
+                 // Otherwise, loop termination means that we have acquired and parsed all resources
+                // required for this map image and we can now proceed to rendering.
+                render();
+                auto image = view.readStillImage();
+
+                // We are moving the callback out of the way and empty it in case the callback function
+                // starts the next map image render.
+                assert(callback);
+                StillImageCallback cb;
+                std::swap(cb, callback);
+
+                // Now we can finally invoke the callback function with the map image we rendered.
+                cb(std::move(image));
+
+                // To prepare for the next event loop run, we have to make sure the async handles keep
+                // the loop alive.
+                asyncTerminate->ref();
+                asyncUpdate->ref();
+                asyncInvoke->ref();
+                asyncRender->ref();
+            }
+        }
     } else {
-        uv_run(env->loop, UV_RUN_DEFAULT);
+        abort();
     }
 
     // Run the event loop once more to make sure our async delete handlers are called.
     uv_run(env->loop, UV_RUN_ONCE);
-
-    // If the map rendering wasn't started asynchronously, we perform one render
-    // *after* all events have been processed.
-    if (mode == Mode::Static) {
-        render();
-        mode = Mode::None;
-    }
 
     view.deactivate();
 }
@@ -309,14 +341,14 @@ void Map::renderSync() {
 void Map::triggerUpdate(const Update u) {
     updated |= static_cast<UpdateType>(u);
 
-    if (mode == Mode::Static) {
-        prepare();
-    } else if (asyncUpdate) {
+    if (asyncUpdate) {
+        asyncUpdate->ref();
         asyncUpdate->send();
     }
 }
 
 void Map::triggerRender() {
+    assert(mode == Mode::Continuous);
     assert(asyncRender);
     asyncRender->send();
 }
@@ -328,12 +360,8 @@ void Map::invokeTask(std::function<void()>&& fn) {
         tasks.emplace(::std::forward<std::function<void()>>(fn));
     }
 
-    // TODO: Once we have aligned static and continuous rendering, this should always dispatch
-    // to the async queue.
     if (asyncInvoke) {
         asyncInvoke->send();
-    } else {
-        processTasks();
     }
 }
 
@@ -775,6 +803,19 @@ void Map::prepare() {
         painter->setDebug(data->getDebug());
     }
 
+    if (u & static_cast<UpdateType>(Update::RenderStill)) {
+        // Triggers a view resize.
+        view.discard();
+
+        // Whenever we trigger an image render, we are unrefing all async handles so the loop will
+        // eventually terminate. However, it'll stay alive as long as there are pending requests
+        // (like work requests or HTTP requests).
+        asyncTerminate->unref();
+        asyncUpdate->unref();
+        asyncInvoke->unref();
+        asyncRender->unref();
+    }
+
     if (style) {
         if (u & static_cast<UpdateType>(Update::DefaultTransitionDuration)) {
             style->setDefaultTransitionDuration(data->getDefaultTransitionDuration());
@@ -804,6 +845,8 @@ void Map::prepare() {
 
 void Map::render() {
     assert(Environment::currentlyOn(ThreadType::Map));
+
+    view.discard();
 
     // Cleanup OpenGL objects that we abandoned since the last render call.
     env->performCleanup();

@@ -3,9 +3,12 @@
 
 #include <mbgl/util/chrono.hpp>
 
+#include <memory>
+
 namespace mbgl {
 
 class Map;
+class StillImage;
 
 enum MapChange : uint8_t {
     MapChangeRegionWillChange = 0,
@@ -39,6 +42,14 @@ public:
     // Called from the render thread. The implementation must trigger a rerender.
     // (i.e. map->renderSync() or map->renderAsync() must be called as a result of this)
     virtual void invalidate() = 0;
+
+    // Called from the render (=GL) thread. Signals that the contents of the contents
+    // may be discarded. The default is a no-op.
+    virtual void discard();
+
+    // Reads the pixel data from the current framebuffer. If your View implementation
+    // doesn't support reading from the framebuffer, return a null pointer.
+    virtual std::unique_ptr<StillImage> readStillImage();
 
     // Notifies a watcher of map x/y/scale/rotation changes.
     // Must only be called from the same thread that caused the change.
