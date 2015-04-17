@@ -34,14 +34,13 @@ public:
 
     void notify(std::shared_ptr<const Response> response, FileCache::Hint hint) {
         MBGL_VERIFY_THREAD(tid);
+        assert(response);
 
         source.notify(this, response, hint);
 
-        if (response) {
-            // Notify all observers.
-            for (auto req : observers) {
-                req->notify(response);
-            }
+        // Notify all observers.
+        for (auto req : observers) {
+            req->notify(response);
         }
     }
 
