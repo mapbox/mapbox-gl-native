@@ -184,22 +184,14 @@ void DefaultFileSource::Impl::abort(const Environment& env) {
 }
 
 void DefaultFileSource::Impl::notify(SharedRequestBase *sharedRequest,
-                               const std::set<Request *> &observers,
                                std::shared_ptr<const Response> response, FileCache::Hint hint) {
     // First, remove the request, since it might be destructed at any point now.
     assert(find(sharedRequest->resource) == sharedRequest);
     pending.erase(sharedRequest->resource);
 
-    if (response) {
-        if (cache) {
-            // Store response in database
-            cache->put(sharedRequest->resource, response, hint);
-        }
-
-        // Notify all observers.
-        for (auto req : observers) {
-            req->notify(response);
-        }
+    if (response && cache) {
+        // Store response in database
+        cache->put(sharedRequest->resource, response, hint);
     }
 }
 

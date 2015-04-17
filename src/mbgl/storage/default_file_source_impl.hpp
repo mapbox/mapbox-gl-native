@@ -14,7 +14,7 @@ class DefaultFileSource::Impl {
 public:
     Impl(FileCache *cache, const std::string &root = "");
 
-    void notify(SharedRequestBase *sharedRequest, const std::set<Request *> &observers,
+    void notify(SharedRequestBase *sharedRequest,
                 std::shared_ptr<const Response> response, FileCache::Hint hint);
     SharedRequestBase *find(const Resource &resource);
 

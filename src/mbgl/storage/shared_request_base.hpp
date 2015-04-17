@@ -35,7 +35,14 @@ public:
     void notify(std::shared_ptr<const Response> response, FileCache::Hint hint) {
         MBGL_VERIFY_THREAD(tid);
 
-        source.notify(this, observers, response, hint);
+        source.notify(this, response, hint);
+
+        if (response) {
+            // Notify all observers.
+            for (auto req : observers) {
+                req->notify(response);
+            }
+        }
     }
 
     void subscribe(Request *request) {
@@ -52,7 +59,7 @@ public:
         if (abandoned()) {
             // There are no observers anymore. We are initiating cancelation.
             // First, remove this SharedRequestBase from the source.
-            source.notify(this, observers, nullptr, FileCache::Hint::No);
+            source.notify(this, nullptr, FileCache::Hint::No);
 
             // Then, initiate cancelation of this request
             cancel();
