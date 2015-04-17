@@ -247,15 +247,15 @@ void Map::resume() {
 void Map::renderStill(StillImageCallback fn) {
     assert(Environment::currentlyOn(ThreadType::Main));
 
-    if (mode != Mode::Static) {
-        throw util::Exception("Map is not in static render mode");
+    if (mode != Mode::Still) {
+        throw util::Exception("Map is not in still image render mode");
     }
 
     if (callback) {
         throw util::Exception("Map is currently rendering an image");
     }
 
-    assert(mode == Mode::Static);
+    assert(mode == Mode::Still);
 
     callback = std::move(fn);
 
@@ -287,7 +287,7 @@ void Map::run() {
             uv_run(env->loop, UV_RUN_DEFAULT);
             checkForPause();
         }
-    } else if (mode == Mode::Static) {
+    } else if (mode == Mode::Still) {
         terminating = false;
         while (!terminating) {
             uv_run(env->loop, UV_RUN_DEFAULT);
