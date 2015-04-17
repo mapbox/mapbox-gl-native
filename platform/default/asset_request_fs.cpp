@@ -62,7 +62,7 @@ AssetRequestImpl::AssetRequestImpl(AssetRequest *request_, uv_loop_t *loop) : re
         path = url.substr(8);
     } else {
         // This is a relative path. Prefix with the application root.
-        path = request->source.assetRoot + "/" + url.substr(8);
+        path = request->assetRoot + "/" + url.substr(8);
     }
 
     uv_fs_open(loop, &req, path.c_str(), O_RDONLY, S_IRUSR, fileOpened);
@@ -207,8 +207,9 @@ void AssetRequestImpl::cleanup(uv_fs_t *req) {
 
 // -------------------------------------------------------------------------------------------------
 
-AssetRequest::AssetRequest(DefaultFileSource::Impl &source_, const Resource &resource_)
-    : SharedRequestBase(source_, resource_) {
+AssetRequest::AssetRequest(DefaultFileSource::Impl &source_, const Resource &resource_, const std::string& assetRoot_)
+    : SharedRequestBase(source_, resource_)
+    , assetRoot(assetRoot_) {
     assert(algo::starts_with(resource.url, "asset://"));
 }
 

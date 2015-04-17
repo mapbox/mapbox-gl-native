@@ -85,10 +85,8 @@ protected:
 public:
     const Resource resource;
 
-protected:
-    DefaultFileSource::Impl &source;
-
 private:
+    DefaultFileSource::Impl& source;
     std::set<Request *> observers;
 };
 

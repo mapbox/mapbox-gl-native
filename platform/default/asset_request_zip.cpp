@@ -114,7 +114,7 @@ AssetRequestImpl::~AssetRequestImpl() {
 AssetRequestImpl::AssetRequestImpl(AssetRequest *request_, uv_loop_t *loop)
     : context(*AssetZipContext::Get(loop)),
       request(request_),
-      root(request->source.assetRoot),
+      root(request->assetRoot),
       path(std::string { "assets/" } + request->resource.url.substr(8)) {
     auto zip = context.getHandle(root);
     if (zip) {
@@ -274,8 +274,9 @@ void AssetRequestImpl::cancel() {
 
 // -------------------------------------------------------------------------------------------------
 
-AssetRequest::AssetRequest(DefaultFileSource::Impl &source_, const Resource &resource_)
-    : SharedRequestBase(source_, resource_) {
+AssetRequest::AssetRequest(DefaultFileSource::Impl &source_, const Resource &resource_, const std::string& assetRoot_)
+    : SharedRequestBase(source_, resource_)
+    , assetRoot(assetRoot_) {
     assert(algo::starts_with(resource.url, "asset://"));
 }
 

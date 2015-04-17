@@ -7,7 +7,7 @@ namespace mbgl {
 
 class AssetRequest : public SharedRequestBase {
 public:
-    AssetRequest(DefaultFileSource::Impl &source, const Resource &resource);
+    AssetRequest(DefaultFileSource::Impl&, const Resource&, const std::string& assetRoot);
 
     void start(uv_loop_t *loop, std::shared_ptr<const Response> response = nullptr);
     void cancel();
@@ -15,6 +15,7 @@ public:
 private:
     ~AssetRequest();
     void *ptr = nullptr;
+    const std::string& assetRoot;
 
     friend class AssetRequestImpl;
 };
