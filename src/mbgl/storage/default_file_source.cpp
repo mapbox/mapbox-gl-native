@@ -119,6 +119,15 @@ void DefaultFileSource::Impl::cancel(Request* req) {
         // unsubscribe callback triggers the removal of the SharedRequestBase pointer from the list
         // of pending requests and initiates cancelation.
         sharedRequest->unsubscribe(req);
+
+        if (sharedRequest->abandoned()) {
+            // There are no observers anymore. We are initiating cancelation.
+            // First, remove this SharedRequestBase from the source.
+            pending.erase(sharedRequest->resource);
+
+            // Then, initiate cancelation of this request
+            sharedRequest->cancel();
+        }
     } else {
         // There is no request for this URL anymore. Likely, the request already completed
         // before we got around to process the cancelation request.
@@ -189,7 +198,7 @@ void DefaultFileSource::Impl::notify(SharedRequestBase *sharedRequest,
     assert(find(sharedRequest->resource) == sharedRequest);
     pending.erase(sharedRequest->resource);
 
-    if (response && cache) {
+    if (cache) {
         // Store response in database
         cache->put(sharedRequest->resource, response, hint);
     }

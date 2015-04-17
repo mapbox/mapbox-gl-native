@@ -46,23 +46,12 @@ public:
 
     void subscribe(Request *request) {
         MBGL_VERIFY_THREAD(tid);
-
         observers.insert(request);
     }
 
     void unsubscribe(Request *request) {
         MBGL_VERIFY_THREAD(tid);
-
         observers.erase(request);
-
-        if (abandoned()) {
-            // There are no observers anymore. We are initiating cancelation.
-            // First, remove this SharedRequestBase from the source.
-            source.notify(this, nullptr, FileCache::Hint::No);
-
-            // Then, initiate cancelation of this request
-            cancel();
-        }
     }
 
     bool abandoned() const {
