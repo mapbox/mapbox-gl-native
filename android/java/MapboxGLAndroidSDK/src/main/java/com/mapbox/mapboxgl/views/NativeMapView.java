@@ -89,10 +89,6 @@ class NativeMapView {
         nativeResume(mNativeMapViewPtr);
     }
 
-    public void run() {
-        nativeRun(mNativeMapViewPtr);
-    }
-
     public void update() {
         nativeUpdate(mNativeMapViewPtr);
     }
@@ -397,8 +393,6 @@ class NativeMapView {
     private native void nativePause(long nativeMapViewPtr);
 
     private native void nativeResume(long nativeMapViewPtr);
-
-    private native void nativeRun(long nativeMapViewPtr);
 
     private native void nativeUpdate(long nativeMapViewPtr);
 

@@ -5,7 +5,6 @@
 #include <mbgl/style/style_parser.hpp>
 #include <mbgl/style/style_bucket.hpp>
 #include <mbgl/util/constants.hpp>
-#include <mbgl/util/error.hpp>
 #include <mbgl/util/std.hpp>
 #include <mbgl/util/uv_detail.hpp>
 #include <mbgl/platform/log.hpp>
@@ -75,7 +74,7 @@ void Style::loadJSON(const uint8_t *const data) {
     doc.Parse<0>((const char *const)data);
     if (doc.HasParseError()) {
         Log::Error(Event::ParseStyle, "Error parsing style JSON at %i: %s", doc.GetErrorOffset(), doc.GetParseError());
-        throw error::style_parse(doc.GetErrorOffset(), doc.GetParseError());
+        return;
     }
 
     StyleParser parser;

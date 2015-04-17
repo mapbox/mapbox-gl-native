@@ -2,6 +2,7 @@
 #include "../fixtures/fixture_log_observer.hpp"
 
 #include <mbgl/map/map.hpp>
+#include <mbgl/map/still_image.hpp>
 #include <mbgl/util/image.hpp>
 #include <mbgl/util/std.hpp>
 
@@ -14,6 +15,8 @@
 #include <mbgl/platform/default/headless_view.hpp>
 #include <mbgl/platform/default/headless_display.hpp>
 #include <mbgl/storage/default_file_source.hpp>
+
+#include <uv.h>
 
 #include <dirent.h>
 
@@ -142,6 +145,8 @@ TEST_P(HeadlessTest, render) {
         DefaultFileSource fileSource(nullptr);
         Map map(view, fileSource);
 
+        map.start(Map::Mode::Static);
+
         map.setClasses(classes);
         map.setStyleJSON(style, "test/suite");
 
@@ -149,16 +154,34 @@ TEST_P(HeadlessTest, render) {
         map.setLatLngZoom(mbgl::LatLng(latitude, longitude), zoom);
         map.setBearing(bearing);
 
-        // Run the loop. It will terminate when we don't have any further listeners.
-        map.run();
+        struct Data {
+            std::string path;
+            std::unique_ptr<const StillImage> image;
+        };
 
-        const unsigned int w = width * pixelRatio;
-        const unsigned int h = height * pixelRatio;
+        uv_async_t *async = new uv_async_t;
+        async->data = new Data { "test/suite/tests/" + base + "/" + name +  "/actual.png", nullptr };
+        uv_async_init(uv_default_loop(), async, [](uv_async_t *as, int) {
+            auto data = std::unique_ptr<Data>(reinterpret_cast<Data *>(as->data));
+            as->data = nullptr;
+            uv_close(reinterpret_cast<uv_handle_t *>(as), [](uv_handle_t *handle) {
+                delete reinterpret_cast<uv_async_t *>(handle);
+            });
 
-        auto pixels = view.readPixels();
+            assert(data);
+            const std::string png = util::compress_png(data->image->width, data->image->height, data->image->pixels.get());
+            util::write_file(data->path, png);
+        });
 
-        const std::string image = util::compress_png(w, h, pixels.get());
-        util::write_file(actual_image, image);
+        map.renderStill([async](std::unique_ptr<const StillImage> image) {
+            reinterpret_cast<Data *>(async->data)->image = std::move(image);
+            uv_async_send(async);
+        });
+
+        // This loop will terminate once the async was fired.
+        uv_run(uv_default_loop(), UV_RUN_DEFAULT);
+
+        map.stop();
     }
 }
 
