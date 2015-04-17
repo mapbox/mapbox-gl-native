@@ -1,4 +1,5 @@
 #include <mbgl/storage/asset_request.hpp>
+#include <mbgl/storage/resource.hpp>
 #include <mbgl/storage/response.hpp>
 #include <mbgl/util/std.hpp>
 #include <mbgl/util/util.hpp>
@@ -207,23 +208,19 @@ void AssetRequestImpl::cleanup(uv_fs_t *req) {
 
 // -------------------------------------------------------------------------------------------------
 
-AssetRequest::AssetRequest(DefaultFileSource::Impl &source_, const Resource &resource_, const std::string& assetRoot_)
-    : SharedRequestBase(source_, resource_)
+AssetRequest::AssetRequest(const Resource& resource_, Callback callback_, const std::string& assetRoot_)
+    : RequestBase(resource_, callback_)
     , assetRoot(assetRoot_) {
     assert(algo::starts_with(resource.url, "asset://"));
 }
 
 AssetRequest::~AssetRequest() {
-    MBGL_VERIFY_THREAD(tid);
-
     if (ptr) {
         reinterpret_cast<AssetRequestImpl *>(ptr)->request = nullptr;
     }
 }
 
 void AssetRequest::start(uv_loop_t *loop, std::shared_ptr<const Response> response) {
-    MBGL_VERIFY_THREAD(tid);
-
     // We're ignoring the existing response if any.
     (void(response));
 
@@ -233,8 +230,6 @@ void AssetRequest::start(uv_loop_t *loop, std::shared_ptr<const Response> respon
 }
 
 void AssetRequest::cancel() {
-    MBGL_VERIFY_THREAD(tid);
-
     if (ptr) {
         reinterpret_cast<AssetRequestImpl *>(ptr)->canceled = true;
 

@@ -8,27 +8,36 @@
 
 namespace mbgl {
 
-class SharedRequestBase;
+class RequestBase;
+
+struct DefaultFileRequest {
+    const Resource resource;
+    uv_loop_t* loop;
+    std::set<Request*> observers;
+    RequestBase* request = nullptr;
+
+    DefaultFileRequest(const Resource& resource_, uv_loop_t* loop_)
+        : resource(resource_), loop(loop_) {}
+};
 
 class DefaultFileSource::Impl {
 public:
-    Impl(FileCache *cache, const std::string &root = "");
+    Impl(FileCache*, const std::string& = "");
 
-    void notify(SharedRequestBase *sharedRequest,
-                std::shared_ptr<const Response> response, FileCache::Hint hint);
-    SharedRequestBase *find(const Resource &resource);
-
-    void add(Request* request, uv_loop_t* loop);
-    void cancel(Request* request);
-    void abort(const Environment& env);
-
-    const std::string assetRoot;
+    void add(Request*, uv_loop_t*);
+    void cancel(Request*);
+    void abort(const Environment&);
 
 private:
-    void processResult(const Resource& resource, std::shared_ptr<const Response> response, uv_loop_t* loop);
+    DefaultFileRequest* find(const Resource&);
 
-    std::unordered_map<Resource, SharedRequestBase *, Resource::Hash> pending;
-    FileCache *cache = nullptr;
+    void startCacheRequest(const Resource&);
+    void startRealRequest(const Resource&, std::shared_ptr<const Response> = nullptr);
+    void notify(DefaultFileRequest*, std::shared_ptr<const Response>, FileCache::Hint);
+
+    std::unordered_map<Resource, DefaultFileRequest, Resource::Hash> pending;
+    FileCache* cache = nullptr;
+    const std::string assetRoot;
 };
 
 }

@@ -1,6 +1,7 @@
 #include <mbgl/storage/asset_request.hpp>
 #include <mbgl/storage/thread_context.hpp>
 #include <mbgl/android/jni.hpp>
+#include <mbgl/storage/resource.hpp>
 #include <mbgl/storage/response.hpp>
 #include <mbgl/platform/log.hpp>
 #include <mbgl/util/std.hpp>
@@ -107,7 +108,7 @@ AssetRequestImpl::~AssetRequestImpl() {
     MBGL_VERIFY_THREAD(tid);
 
     if (request) {
-        request->ptr = nullptr;
+        request->impl = nullptr;
     }
 }
 
@@ -274,23 +275,19 @@ void AssetRequestImpl::cancel() {
 
 // -------------------------------------------------------------------------------------------------
 
-AssetRequest::AssetRequest(DefaultFileSource::Impl &source_, const Resource &resource_, const std::string& assetRoot_)
-    : SharedRequestBase(source_, resource_)
+AssetRequest::AssetRequest(const Resource& resource_, Callback callback_, const std::string& assetRoot_)
+    : RequestBase(resource_, callback_)
     , assetRoot(assetRoot_) {
     assert(algo::starts_with(resource.url, "asset://"));
 }
 
 AssetRequest::~AssetRequest() {
-    MBGL_VERIFY_THREAD(tid);
-
     if (ptr) {
         reinterpret_cast<AssetRequestImpl *>(ptr)->cancel();
     }
 }
 
 void AssetRequest::start(uv_loop_t *loop, std::shared_ptr<const Response> response) {
-    MBGL_VERIFY_THREAD(tid);
-
     // We're ignoring the existing response if any.
     (void(response));
 
@@ -300,8 +297,6 @@ void AssetRequest::start(uv_loop_t *loop, std::shared_ptr<const Response> respon
 }
 
 void AssetRequest::cancel() {
-    MBGL_VERIFY_THREAD(tid);
-
     if (ptr) {
         reinterpret_cast<AssetRequestImpl *>(ptr)->cancel();
     }
