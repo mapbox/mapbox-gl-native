@@ -677,13 +677,22 @@ mbgl::DefaultFileSource *mbglFileSource = nullptr;
     else if (pan.state == UIGestureRecognizerStateEnded || pan.state == UIGestureRecognizerStateCancelled)
     {
         CGPoint velocity = [pan velocityInView:pan.view];
+        if (sqrtf(velocity.x * velocity.x + velocity.y * velocity.y) < 100)
+        {
+            // Not enough velocity to overcome friction
+            velocity = CGPointZero;
+        }
+        
         CGFloat duration = UIScrollViewDecelerationRateNormal;
-        CGPoint offset = CGPointMake(velocity.x * duration / 4, velocity.y * duration / 4);
-        mbglMap->moveBy(offset.x, offset.y, secondsAsDuration(duration));
+        if ( ! CGPointEqualToPoint(velocity, CGPointZero))
+        {
+            CGPoint offset = CGPointMake(velocity.x * duration / 4, velocity.y * duration / 4);
+            mbglMap->moveBy(offset.x, offset.y, secondsAsDuration(duration));
+        }
 
         mbglMap->setGestureInProgress(false);
 
-        if (duration)
+        if ( ! CGPointEqualToPoint(velocity, CGPointZero))
         {
             self.animatingGesture = YES;
 
