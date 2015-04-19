@@ -267,6 +267,9 @@ NSString *const MGLEventGestureRotateStart = @"Rotation";
     __weak MGLMapboxEvents *weakSelf = self;
 
     dispatch_async(_serialQueue, ^{
+        MGLMapboxEvents *strongSelf = weakSelf;
+        if ( ! strongSelf) return;
+        
         // Opt Out Checking When Built
         if (![[NSUserDefaults standardUserDefaults] boolForKey:@"mapbox_metrics_enabled_preference"]) {
             [_eventQueue removeAllObjects];
@@ -350,6 +353,9 @@ NSString *const MGLEventGestureRotateStart = @"Rotation";
     __weak MGLMapboxEvents *weakSelf = self;
 
     dispatch_async(_serialQueue, ^{
+        MGLMapboxEvents *strongSelf = weakSelf;
+        if ( ! strongSelf) return;
+        
         __block NSArray *events;
 
         NSUInteger upper = weakSelf.flushAt;
@@ -379,6 +385,9 @@ NSString *const MGLEventGestureRotateStart = @"Rotation";
     __weak MGLMapboxEvents *weakSelf = self;
 
     dispatch_async(dispatch_get_global_queue(DISPATCH_QUEUE_PRIORITY_BACKGROUND, 0), ^{
+        MGLMapboxEvents *strongSelf = weakSelf;
+        if ( ! strongSelf) return;
+        
         // Setup URL Request
         NSString *url = [NSString stringWithFormat:@"%@/events/v1?access_token=%@", MGLMapboxEventsAPIBase, weakSelf.token];
         NSMutableURLRequest *request = [[NSMutableURLRequest alloc] initWithURL:[NSURL URLWithString:url]];
