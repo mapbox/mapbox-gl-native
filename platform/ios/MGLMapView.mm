@@ -327,6 +327,7 @@ mbgl::DefaultFileSource *mbglFileSource = nullptr;
     //
     _pan = [[UIPanGestureRecognizer alloc] initWithTarget:self action:@selector(handlePanGesture:)];
     _pan.delegate = self;
+    _pan.maximumNumberOfTouches = 1;
     [self addGestureRecognizer:_pan];
     _scrollEnabled = YES;
 
@@ -747,17 +748,60 @@ mbgl::DefaultFileSource *mbglFileSource = nullptr;
 
         if (log2(newScale) < mbglMap->getMinZoom()) return;
 
-        double scale = mbglMap->getScale();
-
-        mbglMap->scaleBy(newScale / scale, [pinch locationInView:pinch.view].x, [pinch locationInView:pinch.view].y);
+        mbglMap->setScale(newScale, [pinch locationInView:pinch.view].x, [pinch locationInView:pinch.view].y);
     }
     else if (pinch.state == UIGestureRecognizerStateEnded || pinch.state == UIGestureRecognizerStateCancelled)
     {
+        CGFloat velocity = pinch.velocity;
+        if (velocity > -0.5 && velocity < 3)
+        {
+            velocity = 0;
+        }
+        CGFloat duration = velocity > 0 ? 1 : 0.25;
+        
+        CGFloat scale = self.scale * pinch.scale;
+        CGFloat newScale = scale;
+        if (velocity >= 0)
+        {
+            newScale += scale * velocity * duration * 0.1;
+        }
+        else
+        {
+            newScale += scale / (velocity * duration) * 0.1;
+        }
+        
+        if (newScale <= 0 || log2(newScale) < mbglMap->getMinZoom())
+        {
+            velocity = 0;
+        }
+        
+        if (velocity)
+        {
+            CGPoint pinchCenter = [pinch locationInView:pinch.view];
+            mbglMap->setScale(newScale, pinchCenter.x, pinchCenter.y, secondsAsDuration(duration));
+        }
+        
         mbglMap->setGestureInProgress(false);
-
+        
         [self unrotateIfNeededAnimated:YES];
+        
+        if (velocity)
+        {
+            self.animatingGesture = YES;
 
-        [self notifyMapChange:@(mbgl::MapChangeRegionDidChange)];
+            __weak MGLMapView *weakSelf = self;
+
+            [self animateWithDelay:duration animations:^
+            {
+                weakSelf.animatingGesture = NO;
+
+                [weakSelf notifyMapChange:@(mbgl::MapChangeRegionDidChangeAnimated)];
+            }];
+        }
+        else
+        {
+            [self notifyMapChange:@(mbgl::MapChangeRegionDidChange)];
+        }
     }
 }
 
