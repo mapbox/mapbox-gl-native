@@ -839,11 +839,40 @@ mbgl::DefaultFileSource *mbglFileSource = nullptr;
     }
     else if (rotate.state == UIGestureRecognizerStateEnded || rotate.state == UIGestureRecognizerStateCancelled)
     {
-        mbglMap->setGestureInProgress(false);
-
-        [self unrotateIfNeededAnimated:YES];
-
-        [self notifyMapChange:@(mbgl::MapChangeRegionDidChange)];
+        CGFloat velocity = rotate.velocity;
+        
+        if (fabs(velocity) > 5)
+        {
+            CGFloat radians = self.angle + rotate.rotation;
+            CGFloat duration = UIScrollViewDecelerationRateNormal;
+            CGFloat newRadians = radians + velocity * duration * 0.1;
+            CGFloat newDegrees = fmodf([MGLMapView radiansToDegrees:newRadians], 360) * -1;
+            
+            mbglMap->setBearing(newDegrees, secondsAsDuration(duration));
+            
+            mbglMap->setGestureInProgress(false);
+            
+            self.animatingGesture = YES;
+            
+            __weak MGLMapView *weakSelf = self;
+            
+            [self animateWithDelay:duration animations:^
+             {
+                 weakSelf.animatingGesture = NO;
+                 
+                 [weakSelf unrotateIfNeededAnimated:YES];
+                 
+                 [weakSelf notifyMapChange:@(mbgl::MapChangeRegionDidChangeAnimated)];
+             }];
+        }
+        else
+        {
+            mbglMap->setGestureInProgress(false);
+            
+            [self unrotateIfNeededAnimated:YES];
+            
+            [self notifyMapChange:@(mbgl::MapChangeRegionDidChange)];
+        }
     }
 }
 
