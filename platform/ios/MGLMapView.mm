@@ -846,7 +846,7 @@ mbgl::DefaultFileSource *mbglFileSource = nullptr;
             CGFloat radians = self.angle + rotate.rotation;
             CGFloat duration = UIScrollViewDecelerationRateNormal;
             CGFloat newRadians = radians + velocity * duration * 0.1;
-            CGFloat newDegrees = fmodf([MGLMapView radiansToDegrees:newRadians], 360) * -1;
+            CGFloat newDegrees = [MGLMapView radiansToDegrees:newRadians] * -1;
             
             mbglMap->setBearing(newDegrees, secondsAsDuration(duration));
             
