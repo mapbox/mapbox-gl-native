@@ -5,6 +5,7 @@ ANDROID_ABI ?= arm-v7
 
 ifeq ($(shell uname -s), Darwin)
 HOST ?= osx
+HEADLESS ?= cgl
 JOBS ?= $(shell sysctl -n hw.ncpu)
 endif
 HOST ?= linux
