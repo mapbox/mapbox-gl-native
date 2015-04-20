@@ -11,8 +11,8 @@
 
 namespace mbgl {
     
-    CSSColorParser::Color parseColorOp(const rapidjson::Value&, std::unordered_map<std::string, const rapidjson::Value *>);
-    CSSColorParser::Color parseColorarr(const rapidjson::Value&,  std::unordered_map<std::string, const rapidjson::Value *> constants);
+    CSSColorParser::Color parseColorOp(const rapidjson::Value&, const std::unordered_map<std::string, const rapidjson::Value *>&);
+    CSSColorParser::Color parseColorarr(const rapidjson::Value&, const std::unordered_map<std::string, const rapidjson::Value *>& constants);
     
     class ColorOperation {
     protected:

@@ -9,7 +9,7 @@
 
 namespace mbgl {
 
-    CSSColorParser::Color parseColorOp(const rapidjson::Value& value, std::unordered_map<std::string, const rapidjson::Value *> constants) {
+    CSSColorParser::Color parseColorOp(const rapidjson::Value& value, const std::unordered_map<std::string, const rapidjson::Value *>& constants) {
         CSSColorParser::Color empty;
         
         if (value.Size() < 3) {
@@ -58,10 +58,10 @@ namespace mbgl {
 
     }
 
-    CSSColorParser::Color parseColorarr(const rapidjson::Value& color,  std::unordered_map<std::string, const rapidjson::Value *> constants) {
+    CSSColorParser::Color parseColorarr(const rapidjson::Value& color, const std::unordered_map<std::string, const rapidjson::Value *>& constants) {
         CSSColorParser::Color css_color;
         if (color.IsArray()) {
-            css_color = parseColorarr(color, constants);
+            css_color = parseColorOp(color, constants);
         } else if (color.IsString()) {
             std::string strcolor { color.GetString(), color.GetStringLength() };
             if (strcolor.length() && strcolor[0] == '@') {
