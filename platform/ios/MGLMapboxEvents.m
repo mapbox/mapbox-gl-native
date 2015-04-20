@@ -177,6 +177,9 @@ NSString *const MGLEventGestureRotateStart = @"Rotation";
         [NSTimeZone resetSystemTimeZone];
         [_rfc3339DateFormatter setTimeZone:[NSTimeZone systemTimeZone]];
         
+        // Enable Battery Monitoring
+        [UIDevice currentDevice].batteryMonitoringEnabled = YES;
+        
         _isPaused = NO;
     }
     return self;
@@ -300,7 +303,7 @@ NSString *const MGLEventGestureRotateStart = @"Rotation";
         [evt setValue:weakSelf.model forKey:@"model"];
         [evt setValue:weakSelf.iOSVersion forKey:@"operatingSystem"];
         [evt setValue:[weakSelf getDeviceOrientation] forKey:@"orientation"];
-        [evt setValue:@(100 * [UIDevice currentDevice].batteryLevel) forKey:@"batteryLevel"];
+        [evt setValue:@((int)(100 * [UIDevice currentDevice].batteryLevel)) forKey:@"batteryLevel"];
         [evt setValue:@(weakSelf.scale) forKey:@"resolution"];
         [evt setValue:weakSelf.carrier forKey:@"carrier"];
         
