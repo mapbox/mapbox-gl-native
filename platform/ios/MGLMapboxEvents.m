@@ -398,8 +398,9 @@ NSString *const MGLEventGestureRotateStart = @"Rotation";
             [request setHTTPBody:jsonData];
 
             // Send non blocking HTTP Request to server
-            NSURLConnection *conn = [NSURLConnection connectionWithRequest:request delegate:strongSelf];
-            [conn start];
+            NSURLConnection *connection = [[NSURLConnection alloc] initWithRequest:request delegate:strongSelf startImmediately:NO];
+            [connection scheduleInRunLoop:[NSRunLoop mainRunLoop] forMode:NSRunLoopCommonModes];
+            [connection start];
 
 //            [NSURLConnection sendAsynchronousRequest:request
 //                                               queue:nil
