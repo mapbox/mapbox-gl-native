@@ -99,6 +99,12 @@ T clamp(T value, T min, T max) {
 }
 
 template <typename T>
+T wrap(T value, T min, T max) {
+    T d = max - min;
+    return value == max ? value : std::fmod((std::fmod((value - min), d) + d), d) + min;
+}
+
+template <typename T>
 T smoothstep(T edge0, T edge1, T x) {
     T t = clamp((x - edge0) / (edge1 - edge0), T(0), T(1));
     return t * t * (T(3) - T(2) * t);
