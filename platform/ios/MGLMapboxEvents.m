@@ -382,10 +382,13 @@ NSString *const MGLEventGestureRotateStart = @"Rotation";
     __weak MGLMapboxEvents *weakSelf = self;
 
     dispatch_async(dispatch_get_global_queue(DISPATCH_QUEUE_PRIORITY_BACKGROUND, 0), ^{
+        MGLMapboxEvents *strongSelf = weakSelf;
+        if (!strongSelf) return;
+
         // Setup URL Request
-        NSString *url = [NSString stringWithFormat:@"%@/events/v1?access_token=%@", MGLMapboxEventsAPIBase, weakSelf.token];
+        NSString *url = [NSString stringWithFormat:@"%@/events/v1?access_token=%@", MGLMapboxEventsAPIBase, strongSelf.token];
         NSMutableURLRequest *request = [[NSMutableURLRequest alloc] initWithURL:[NSURL URLWithString:url]];
-        [request setValue:[weakSelf getUserAgent] forHTTPHeaderField:@"User-Agent"];
+        [request setValue:[strongSelf getUserAgent] forHTTPHeaderField:@"User-Agent"];
         [request setValue:@"application/json" forHTTPHeaderField:@"Content-Type"];
         [request setHTTPMethod:@"POST"];
         
@@ -395,7 +398,7 @@ NSString *const MGLEventGestureRotateStart = @"Rotation";
             [request setHTTPBody:jsonData];
 
             // Send non blocking HTTP Request to server
-            NSURLConnection *conn = [NSURLConnection connectionWithRequest:request delegate:weakSelf];
+            NSURLConnection *conn = [NSURLConnection connectionWithRequest:request delegate:strongSelf];
             [conn start];
 
 //            [NSURLConnection sendAsynchronousRequest:request
