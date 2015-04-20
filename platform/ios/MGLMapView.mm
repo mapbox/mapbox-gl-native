@@ -841,7 +841,7 @@ mbgl::DefaultFileSource *mbglFileSource = nullptr;
     {
         CGFloat velocity = rotate.velocity;
         
-        if (fabs(velocity) > 5)
+        if (fabs(velocity) > 3)
         {
             CGFloat radians = self.angle + rotate.rotation;
             CGFloat duration = UIScrollViewDecelerationRateNormal;
