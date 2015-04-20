@@ -63,7 +63,15 @@ namespace mbgl {
         if (color.IsArray()) {
             css_color = parseColorarr(color, constants);
         } else if (color.IsString()) {
-            css_color = CSSColorParser::parse( {color.GetString(), color.GetStringLength()});
+            std::string strcolor { color.GetString(), color.GetStringLength() };
+            if (strcolor.length() && strcolor[0] == '@') {
+                auto it = constants.find(strcolor);
+                if (it != constants.end()) {
+                    const rapidjson::Value& replaced = *it->second;
+                    strcolor.replace(strcolor.begin(), strcolor.end(), { replaced.GetString(), replaced.GetStringLength()});
+                }
+            }
+            css_color = CSSColorParser::parse(strcolor);
         } else {
             Log::Warning(Event::ParseStyle, "color must be a string or array");
             return css_color;
