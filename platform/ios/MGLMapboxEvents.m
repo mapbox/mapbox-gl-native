@@ -395,9 +395,12 @@ NSString *const MGLEventGestureRotateStart = @"Rotation";
             [request setHTTPBody:jsonData];
 
             // Send non blocking HTTP Request to server
-            [NSURLConnection sendAsynchronousRequest:request
-                                               queue:nil
-                                   completionHandler:nil];
+            NSURLConnection *conn = [NSURLConnection connectionWithRequest:request delegate:weakSelf];
+            [conn start];
+
+//            [NSURLConnection sendAsynchronousRequest:request
+//                                               queue:nil
+//                                   completionHandler:nil];
         }
     });
 }
@@ -636,6 +639,53 @@ NSString *const MGLEventGestureRotateStart = @"Rotation";
     }
 
     return result;
+}
+
+#pragma mark NSURLConnectionDelegate
+- (void)connection:(NSURLConnection *)connection willSendRequestForAuthenticationChallenge:(NSURLAuthenticationChallenge *)challenge {
+
+    // Load Local Copy of Server's Public Key
+    //    NSString *cerPath = [[NSBundle mainBundle] pathForResource:@"b.ssl.fastly.net" ofType:@"der"];
+    NSString *cerPath = [[NSBundle mainBundle] pathForResource:@"api_mapbox_com" ofType:@"der"];
+    NSData *localCertData = [NSData dataWithContentsOfFile:cerPath];
+
+    // Get Server's Public Key
+    SecTrustRef serverTrust = challenge.protectionSpace.serverTrust;
+
+    SecTrustResultType trustResult;
+    SecTrustEvaluate(serverTrust, &trustResult);
+    switch (trustResult) {
+        case kSecTrustResultProceed:
+            break;
+        case kSecTrustResultConfirm:
+            break;
+        case kSecTrustResultUnspecified:
+            break;
+        default:
+            [[challenge sender] cancelAuthenticationChallenge:challenge];
+            return;
+    }
+
+    long numKeys = SecTrustGetCertificateCount(serverTrust);
+    NSLog(@"Number of certificaties presented: %ld", numKeys);
+
+    BOOL found = false;
+    for (int lc = 0; lc < numKeys; lc++) {
+        SecCertificateRef certificate = SecTrustGetCertificateAtIndex(serverTrust, lc);
+        NSData *remoteCertificateData = CFBridgingRelease(SecCertificateCopyData(certificate));
+
+        // Compare Remote Key With Local Version
+        if ([remoteCertificateData isEqualToData:localCertData]) {
+            NSURLCredential *credential = [NSURLCredential credentialForTrust:serverTrust];
+            [[challenge sender] useCredential:credential forAuthenticationChallenge:challenge];
+            found = true;
+            break;
+        }
+    }
+
+    if (!found) {
+        [[challenge sender] cancelAuthenticationChallenge:challenge];
+    }
 }
 
 @end
