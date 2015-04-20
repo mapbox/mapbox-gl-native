@@ -145,7 +145,7 @@ TEST_P(HeadlessTest, render) {
         DefaultFileSource fileSource(nullptr);
         Map map(view, fileSource);
 
-        map.start(Map::Mode::Still);
+        map.start(MapMode::Still);
 
         map.setClasses(classes);
         map.setStyleJSON(style, "test/suite");

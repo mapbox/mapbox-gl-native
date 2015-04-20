@@ -18,7 +18,7 @@ TEST(API, SetStyle) {
 
     Map map(view, fileSource);
 
-    map.start(Map::Mode::Still);
+    map.start(MapMode::Still);
 
     map.setStyleJSON("invalid", "test/suite");
 

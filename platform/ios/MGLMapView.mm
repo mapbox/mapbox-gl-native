@@ -14,6 +14,7 @@
 #include <mbgl/storage/sqlite_cache.hpp>
 #include <mbgl/storage/network_status.hpp>
 #include <mbgl/util/geo.hpp>
+#include <mbgl/util/constants.hpp>
 
 #import "MGLTypes.h"
 #import "NSString+MGLAdditions.h"
@@ -627,8 +628,8 @@ mbgl::DefaultFileSource *mbglFileSource = nullptr;
         CGFloat zoomFactor   = mbglMap->getMaxZoom() - mbglMap->getMinZoom() + 1;
         CGFloat cpuFactor    = (CGFloat)[[NSProcessInfo processInfo] processorCount];
         CGFloat memoryFactor = (CGFloat)[[NSProcessInfo processInfo] physicalMemory] / 1000 / 1000 / 1000;
-        CGFloat sizeFactor   = ((CGFloat)mbglMap->getState().getWidth()  / mbgl::util::tileSize) *
-                               ((CGFloat)mbglMap->getState().getHeight() / mbgl::util::tileSize);
+        CGFloat sizeFactor   = ((CGFloat)mbglMap->getWidth()  / mbgl::util::tileSize) *
+                               ((CGFloat)mbglMap->getHeight() / mbgl::util::tileSize);
 
         NSUInteger cacheSize = zoomFactor * cpuFactor * memoryFactor * sizeFactor * 0.5;
 

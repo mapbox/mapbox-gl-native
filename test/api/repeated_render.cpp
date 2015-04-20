@@ -24,7 +24,7 @@ TEST(API, RepeatedRender) {
 
     Map map(view, fileSource);
 
-    map.start(Map::Mode::Still);
+    map.start(MapMode::Still);
 
     {
         view.resize(128, 512, 1);
