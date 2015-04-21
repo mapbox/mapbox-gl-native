@@ -165,11 +165,9 @@ void MapContext::loadStyleJSON(const std::string& json, const std::string& base)
 
 void MapContext::updateTiles() {
     assert(Environment::currentlyOn(ThreadType::Map));
-    if (!style) return;
-    for (const auto& source : style->sources) {
-        source->update(data, transformState, *style, *glyphAtlas, *glyphStore, *spriteAtlas,
-                       getSprite(), *texturePool);
-    }
+
+    resourceLoader->update(data, transformState, *glyphAtlas, *glyphStore,
+                           *spriteAtlas, getSprite(), *texturePool);
 }
 
 void MapContext::updateAnnotationTiles(const std::vector<TileID>& ids) {
