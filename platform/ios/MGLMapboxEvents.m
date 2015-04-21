@@ -420,17 +420,8 @@ NSString *const MGLEventGestureRotateStart = @"Rotation";
             [request setHTTPBody:jsonData];
 
             // Send non blocking HTTP Request to server
-            NSURLSessionDataTask *task = [_session dataTaskWithRequest:request
-                                                     completionHandler: ^(NSData *data, NSURLResponse *response, NSError *error) {
-
-                                                         NSHTTPURLResponse *httpResponse = (NSHTTPURLResponse *)response;
-                                                         NSLog(@"Response Code =  %ld", (long)httpResponse.statusCode);
-                                                     }];
+            NSURLSessionDataTask *task = [_session dataTaskWithRequest:request completionHandler: nil];
             [task resume];
-
-//            NSURLConnection *connection = [[NSURLConnection alloc] initWithRequest:request delegate:strongSelf startImmediately:NO];
-//            [connection scheduleInRunLoop:[NSRunLoop mainRunLoop] forMode:NSRunLoopCommonModes];
-//            [connection start];
         }
     });
 }
@@ -671,52 +662,6 @@ NSString *const MGLEventGestureRotateStart = @"Rotation";
     return result;
 }
 
-/*
-#pragma mark NSURLConnectionDelegate
-- (void)connection:(NSURLConnection *)connection willSendRequestForAuthenticationChallenge:(NSURLAuthenticationChallenge *)challenge {
-
-    if (_geoTrustCert == nil) {
-        [[challenge sender] cancelAuthenticationChallenge:challenge];
-        return;
-    }
-
-    // Get Server's Public Key
-    SecTrustRef serverTrust = challenge.protectionSpace.serverTrust;
-
-    SecTrustResultType trustResult;
-    SecTrustEvaluate(serverTrust, &trustResult);
-    switch (trustResult) {
-        case kSecTrustResultProceed:
-            break;
-        case kSecTrustResultUnspecified:
-            break;
-        default:
-            [[challenge sender] cancelAuthenticationChallenge:challenge];
-            return;
-    }
-
-    long numKeys = SecTrustGetCertificateCount(serverTrust);
-
-    BOOL found = false;
-    for (int lc = 0; lc < numKeys; lc++) {
-        SecCertificateRef certificate = SecTrustGetCertificateAtIndex(serverTrust, lc);
-        NSData *remoteCertificateData = CFBridgingRelease(SecCertificateCopyData(certificate));
-
-        // Compare Remote Key With Local Version
-        if ([remoteCertificateData isEqualToData:_geoTrustCert]) {
-            NSURLCredential *credential = [NSURLCredential credentialForTrust:serverTrust];
-            [[challenge sender] useCredential:credential forAuthenticationChallenge:challenge];
-            found = true;
-            break;
-        }
-    }
-
-    if (!found) {
-        [[challenge sender] cancelAuthenticationChallenge:challenge];
-    }
-}
-*/
-
 #pragma mark NSURLSessionDelegate
 - (void)URLSession:(NSURLSession *)session didReceiveChallenge:(NSURLAuthenticationChallenge *)challenge completionHandler:(void (^) (NSURLSessionAuthChallengeDisposition disposition, NSURLCredential *credential))completionHandler {
 
@@ -752,13 +697,11 @@ NSString *const MGLEventGestureRotateStart = @"Rotation";
                 // The certificate wasn't found in the certificate chain; cancel the connection
                 completionHandler(NSURLSessionAuthChallengeCancelAuthenticationChallenge, [NSURLCredential credentialForTrust:challenge.protectionSpace.serverTrust]);
             }
-            NSLog(@"challenge result = %hhd", found);
         }
         else
         {
             // Certificate chain validation failed; cancel the connection
             completionHandler(NSURLSessionAuthChallengeCancelAuthenticationChallenge, [NSURLCredential credentialForTrust:challenge.protectionSpace.serverTrust]);
-            NSLog(@"challenge chain validation failed");
         }
     }
     
