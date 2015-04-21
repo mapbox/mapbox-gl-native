@@ -35,7 +35,6 @@ public:
     void deactivate() override;
     void notify() override;
     void invalidate(std::function<void()> render) override;
-    void discard() override;
     std::unique_ptr<StillImage> readStillImage() override;
 
 private:
@@ -57,12 +56,7 @@ private:
         float pixelRatio = 0;
     };
 
-    // These are the values that represent the state of the current framebuffer.
-    Dimensions current;
-
-    // These are the values that will be used after the next discard() event.
-    std::mutex prospectiveMutex;
-    Dimensions prospective;
+    Dimensions dimensions;
 
 #if MBGL_USE_CGL
     CGLContextObj glContext = nullptr;

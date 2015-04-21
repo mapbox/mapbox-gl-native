@@ -223,7 +223,7 @@ void GLFWView::onResize(GLFWwindow *window, int width, int height ) {
     int fbWidth, fbHeight;
     glfwGetFramebufferSize(window, &fbWidth, &fbHeight);
 
-    view->resize(width, height, static_cast<float>(fbWidth) / static_cast<float>(width), fbWidth, fbHeight);
+    view->map->resize(width, height, static_cast<float>(fbWidth) / static_cast<float>(width));
 }
 
 void GLFWView::onMouseClick(GLFWwindow *window, int button, int action, int modifiers) {

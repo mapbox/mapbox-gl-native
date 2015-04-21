@@ -200,11 +200,6 @@ void MapContext::update() {
         painter->setDebug(data.getDebug());
     }
 
-    if (u & static_cast<UpdateType>(Update::RenderStill)) {
-        // Triggers a view resize.
-        view.discard();
-    }
-
     if (style) {
         if (u & static_cast<UpdateType>(Update::DefaultTransitionDuration)) {
             style->setDefaultTransitionDuration(data.getDefaultTransitionDuration());
@@ -232,8 +227,6 @@ void MapContext::update() {
 
 void MapContext::render() {
     assert(Environment::currentlyOn(ThreadType::Map));
-
-    view.discard();
 
     // Cleanup OpenGL objects that we abandoned since the last render call.
     env.performCleanup();

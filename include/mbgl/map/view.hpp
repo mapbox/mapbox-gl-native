@@ -45,10 +45,6 @@ public:
     // or map->renderSync() from the main thread must be called as a result of this)
     virtual void invalidate(std::function<void()> render) = 0;
 
-    // Called from the render (=GL) thread. Signals that the contents of the contents
-    // may be discarded. The default is a no-op.
-    virtual void discard();
-
     // Reads the pixel data from the current framebuffer. If your View implementation
     // doesn't support reading from the framebuffer, return a null pointer.
     virtual std::unique_ptr<StillImage> readStillImage();
@@ -59,10 +55,6 @@ public:
     virtual void notifyMapChange(
         MapChange change,
         Duration delay = Duration::zero());
-
-protected:
-    // Resizes the view
-    void resize(uint16_t width, uint16_t height, float ratio, uint16_t fbWidth, uint16_t fbHeight);
 
 protected:
     mbgl::Map *map = nullptr;

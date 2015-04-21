@@ -141,16 +141,15 @@ TEST_P(HeadlessTest, render) {
             }
         }
 
-        HeadlessView view(display);
+        HeadlessView view(display, width, height, pixelRatio);
         DefaultFileSource fileSource(nullptr);
         Map map(view, fileSource);
 
+        map.resize(width, height, pixelRatio);
         map.start(MapMode::Still);
 
         map.setClasses(classes);
         map.setStyleJSON(style, "test/suite");
-
-        view.resize(width, height, pixelRatio);
         map.setLatLngZoom(mbgl::LatLng(latitude, longitude), zoom);
         map.setBearing(bearing);
 

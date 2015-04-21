@@ -107,6 +107,7 @@ public:
     void resetNorth();
 
     // Size
+    void resize(uint16_t width, uint16_t height, float ratio = 1);
     uint16_t getWidth() const;
     uint16_t getHeight() const;
 
@@ -145,10 +146,6 @@ public:
 
 private:
     void triggerUpdate(Update update = Update::Nothing);
-
-    // This may only be called by the View object.
-    void resize(uint16_t width, uint16_t height, float ratio = 1);
-    void resize(uint16_t width, uint16_t height, float ratio, uint16_t fbWidth, uint16_t fbHeight);
 
     const std::unique_ptr<Environment> env;
     std::unique_ptr<EnvironmentScope> scope;
