@@ -39,6 +39,7 @@
         'api/repeated_render.cpp',
 
         'miscellaneous/clip_ids.cpp',
+        'miscellaneous/color_operations.cpp',
         'miscellaneous/bilinear.cpp',
         'miscellaneous/comparisons.cpp',
         'miscellaneous/enums.cpp',
