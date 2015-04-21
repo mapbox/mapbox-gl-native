@@ -676,8 +676,6 @@ NSString *const MGLEventGestureRotateStart = @"Rotation";
     switch (trustResult) {
         case kSecTrustResultProceed:
             break;
-        case kSecTrustResultConfirm:
-            break;
         case kSecTrustResultUnspecified:
             break;
         default:
