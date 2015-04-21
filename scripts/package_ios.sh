@@ -31,7 +31,7 @@ step "Creating build files..."
 export MASON_PLATFORM=ios
 export BUILDTYPE=${BUILDTYPE:-Release}
 export HOST=ios
-make Xcode/mbgl
+make Xcode/ios
 
 step "Building iOS device targets..."
 xcodebuild -sdk iphoneos${IOS_SDK_VERSION} \
