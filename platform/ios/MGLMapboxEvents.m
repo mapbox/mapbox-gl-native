@@ -401,10 +401,6 @@ NSString *const MGLEventGestureRotateStart = @"Rotation";
             NSURLConnection *connection = [[NSURLConnection alloc] initWithRequest:request delegate:strongSelf startImmediately:NO];
             [connection scheduleInRunLoop:[NSRunLoop mainRunLoop] forMode:NSRunLoopCommonModes];
             [connection start];
-
-//            [NSURLConnection sendAsynchronousRequest:request
-//                                               queue:nil
-//                                   completionHandler:nil];
         }
     });
 }
@@ -653,7 +649,7 @@ NSString *const MGLEventGestureRotateStart = @"Rotation";
     NSArray *bundles = [NSBundle allFrameworks];
     for (int lc = 0; lc < bundles.count; lc++) {
         NSBundle *b = [bundles objectAtIndex:lc];
-        cerPath = [[NSBundle mainBundle] pathForResource:@"api_mapbox_com" ofType:@"der"];
+        cerPath = [[NSBundle mainBundle] pathForResource:@"api_mapbox_com-geotrust" ofType:@"der"];
         if (cerPath != nil) {
             break;
         }
@@ -663,7 +659,6 @@ NSString *const MGLEventGestureRotateStart = @"Rotation";
         return;
     }
 
-//    NSString *cerPath = [[NSBundle mainBundle] pathForResource:@"api_mapbox_com" ofType:@"der"];
     NSData *localCertData = [NSData dataWithContentsOfFile:cerPath];
 
     // Get Server's Public Key
