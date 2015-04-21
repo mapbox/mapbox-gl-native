@@ -73,6 +73,7 @@ NSString *const MGLEventGestureRotateStart = @"Rotation";
 @property (atomic) NSUInteger flushAt;
 @property (atomic) NSDateFormatter *rfc3339DateFormatter;
 @property (atomic) CGFloat scale;
+@property (atomic) NSData *geoTrustCert;
 
 
 // The isPaused state tracker is only ever accessed from the main thread.
@@ -132,11 +133,29 @@ NSString *const MGLEventGestureRotateStart = @"Rotation";
         _serialQueue = dispatch_queue_create([[NSString stringWithFormat:@"%@.%@.events.serial", _appBundleId, uniqueID] UTF8String], DISPATCH_QUEUE_SERIAL);
 
         // Configure Events Infrastructure
+        // ===============================
+
+        // Load Local Copy of Server's Public Key
+        NSString *cerPath = nil;
+        NSArray *bundles = [NSBundle allFrameworks];
+        for (int lc = 0; lc < bundles.count; lc++) {
+            NSBundle *b = [bundles objectAtIndex:lc];
+            cerPath = [[NSBundle mainBundle] pathForResource:@"api_mapbox_com-geotrust" ofType:@"der"];
+            if (cerPath != nil) {
+                break;
+            }
+        }
+        if (cerPath != nil) {
+            _geoTrustCert = [NSData dataWithContentsOfFile:cerPath];
+        }
+
+        // Events Control
         _eventQueue = [[NSMutableArray alloc] init];
         _flushAt = 20;
         _flushAfter = 60;
         _token = nil;
         _instanceID = [[NSUUID UUID] UUIDString];
+
         // Dynamic detection of ASIdentifierManager from Mixpanel
         // https://github.com/mixpanel/mixpanel-iphone/blob/master/LICENSE
         _advertiserId = @"";
@@ -644,22 +663,10 @@ NSString *const MGLEventGestureRotateStart = @"Rotation";
 #pragma mark NSURLConnectionDelegate
 - (void)connection:(NSURLConnection *)connection willSendRequestForAuthenticationChallenge:(NSURLAuthenticationChallenge *)challenge {
 
-    // Load Local Copy of Server's Public Key
-    NSString *cerPath = nil;
-    NSArray *bundles = [NSBundle allFrameworks];
-    for (int lc = 0; lc < bundles.count; lc++) {
-        NSBundle *b = [bundles objectAtIndex:lc];
-        cerPath = [[NSBundle mainBundle] pathForResource:@"api_mapbox_com-geotrust" ofType:@"der"];
-        if (cerPath != nil) {
-            break;
-        }
-    }
-    if (cerPath == nil) {
-        NSLog(@"cerPath not found.");
+    if (_geoTrustCert == nil) {
+        [[challenge sender] cancelAuthenticationChallenge:challenge];
         return;
     }
-
-    NSData *localCertData = [NSData dataWithContentsOfFile:cerPath];
 
     // Get Server's Public Key
     SecTrustRef serverTrust = challenge.protectionSpace.serverTrust;
@@ -686,7 +693,7 @@ NSString *const MGLEventGestureRotateStart = @"Rotation";
         NSData *remoteCertificateData = CFBridgingRelease(SecCertificateCopyData(certificate));
 
         // Compare Remote Key With Local Version
-        if ([remoteCertificateData isEqualToData:localCertData]) {
+        if ([remoteCertificateData isEqualToData:_geoTrustCert]) {
             NSURLCredential *credential = [NSURLCredential credentialForTrust:serverTrust];
             [[challenge sender] useCredential:credential forAuthenticationChallenge:challenge];
             found = true;
