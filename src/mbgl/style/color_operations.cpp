@@ -29,7 +29,7 @@ CSSColorParser::Color parseColorOp(const rapidjson::Value& value, const std::uno
     std::string op = { value[0u].GetString(), value[0u].GetStringLength() };
     double degree = value[1u].GetDouble();
 
-    ColorOperation opResult = ColorOperation::ColorOperation(degree, parseColorarr(value[2u], constants));
+    ColorOperation opResult = ColorOperation(degree, parseColorarr(value[2u], constants));
     CSSColorParser::Color result;
 
     if (op == "lighten") {
@@ -49,7 +49,7 @@ CSSColorParser::Color parseColorOp(const rapidjson::Value& value, const std::uno
             Log::Warning(Event::ParseStyle, "Mix must have a valid second color");
             return empty;
         }
-        Mix mix = Mix::Mix(opResult, parseColorarr(value[3u], constants));
+        Mix mix = Mix(opResult, parseColorarr(value[3u], constants));
         result = mix.evaluate();
     } else {
         Log::Warning(Event::ParseStyle, "color operator must be one of \"lighten\", \"saturate\", \"fade\", \"spin\", \"mix\"");
