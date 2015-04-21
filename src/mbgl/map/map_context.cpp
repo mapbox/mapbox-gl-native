@@ -42,6 +42,11 @@ MapContext::MapContext(Environment& env_, View& view_, MapData& data_)
       painter(util::make_unique<Painter>(*spriteAtlas, *glyphAtlas, *lineAtlas)) {
 }
 
+MapContext::~MapContext() {
+    // TODO: does this need to happen first for some reason?
+    style.reset();
+}
+
 void MapContext::start() {
     // Setup async notifications
     assert(!asyncTerminate);
@@ -85,7 +90,7 @@ void MapContext::start() {
         render();
 
         // Finally, notify all listeners that we have finished rendering this frame.
-        rendered.notify();
+        data.rendered.notify();
     });
 
     data.thread = std::thread([this]() {
@@ -408,6 +413,34 @@ void MapContext::processTasks() {
         queue.front()();
         queue.pop();
     }
+}
+
+double MapContext::getTopOffsetPixelsForAnnotationSymbol(const std::string& symbol) {
+    assert(Environment::currentlyOn(ThreadType::Map));
+    assert(sprite);
+    const SpritePosition pos = sprite->getSpritePosition(symbol);
+    return -pos.height / pos.pixelRatio / 2;
+}
+
+void MapContext::setSourceTileCacheSize(size_t size) {
+    assert(Environment::currentlyOn(ThreadType::Map));
+    if (size != sourceCacheSize) {
+        sourceCacheSize = size;
+        if (!style) return;
+        for (const auto &source : style->sources) {
+            source->setCacheSize(sourceCacheSize);
+        }
+        env.performCleanup();
+    }
+}
+
+void MapContext::onLowMemory() {
+    assert(Environment::currentlyOn(ThreadType::Map));
+    if (!style) return;
+    for (const auto &source : style->sources) {
+        source->onLowMemory();
+    }
+    env.performCleanup();
 }
 
 }

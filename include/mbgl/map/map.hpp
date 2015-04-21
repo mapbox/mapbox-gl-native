@@ -131,7 +131,6 @@ public:
 
     // Memory
     void setSourceTileCacheSize(size_t);
-    size_t getSourceTileCacheSize() const { return sourceCacheSize; }
     void onLowMemory();
 
     // Debug
@@ -149,7 +148,6 @@ private:
     void resize(uint16_t width, uint16_t height, float ratio = 1);
     void resize(uint16_t width, uint16_t height, float ratio, uint16_t fbWidth, uint16_t fbHeight);
 
-    size_t sourceCacheSize;
     const std::unique_ptr<Environment> env;
     std::unique_ptr<EnvironmentScope> scope;
     View &view;

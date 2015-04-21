@@ -54,8 +54,6 @@ Map::~Map() {
                                       static_cast<uint8_t>(ThreadType::Map)),
         "MapandMain");
 
-    // Explicitly reset all pointers.
-    context->style.reset();
     context.reset();
 
     uv_run(env->loop, UV_RUN_DEFAULT);
@@ -162,7 +160,7 @@ void Map::renderSync() {
 
     context->triggerRender();
 
-    context->rendered.wait();
+    data->rendered.wait();
 }
 
 void Map::update() {
@@ -383,9 +381,7 @@ void Map::setDefaultPointAnnotationSymbol(const std::string& symbol) {
 double Map::getTopOffsetPixelsForAnnotationSymbol(const std::string& symbol) {
     assert(Environment::currentlyOn(ThreadType::Main));
     return context->invokeSyncTask([&] {
-        assert(context->sprite);
-        const SpritePosition pos = context->sprite->getSpritePosition(symbol);
-        return -pos.height / pos.pixelRatio / 2;
+        return context->getTopOffsetPixelsForAnnotationSymbol(symbol);
     });
 }
 
@@ -487,25 +483,14 @@ Duration Map::getDefaultTransitionDuration() {
 
 
 void Map::setSourceTileCacheSize(size_t size) {
-    if (size != getSourceTileCacheSize()) {
-        context->invokeTask([=] {
-            sourceCacheSize = size;
-            if (!context->style) return;
-            for (const auto &source : context->style->sources) {
-                source->setCacheSize(sourceCacheSize);
-            }
-            env->performCleanup();
-        });
-    }
+    context->invokeTask([=] {
+        context->setSourceTileCacheSize(size);
+    });
 }
 
 void Map::onLowMemory() {
     context->invokeTask([=] {
-        if (!context->style) return;
-        for (const auto &source : context->style->sources) {
-            source->onLowMemory();
-        }
-        env->performCleanup();
+        context->onLowMemory();
     });
 }
 

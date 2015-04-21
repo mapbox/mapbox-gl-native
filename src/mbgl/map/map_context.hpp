@@ -4,7 +4,6 @@
 #include <mbgl/map/tile_id.hpp>
 #include <mbgl/map/update.hpp>
 #include <mbgl/util/ptr.hpp>
-#include <mbgl/util/signal.hpp>
 
 #include <vector>
 #include <queue>
@@ -33,6 +32,7 @@ class Worker;
 class MapContext {
 public:
     MapContext(Environment&, View&, MapData&);
+    ~MapContext();
 
     // Starts the map thread.
     void start();
@@ -57,6 +57,13 @@ public:
         return promise.get_future().get();
     }
 
+    double getTopOffsetPixelsForAnnotationSymbol(const std::string& symbol);
+    void setSourceTileCacheSize(size_t size);
+    void onLowMemory();
+
+    // TODO: Make this private
+    public: void updateAnnotationTiles(const std::vector<TileID>& ids);
+
     // These can only be called from the Map thread.
 private:
     // Checks if render thread needs to pause
@@ -66,58 +73,52 @@ private:
     util::ptr<Sprite> getSprite();
     void updateTiles();
 
-    // TODO: Make these private
-    public: void updateAnnotationTiles(const std::vector<TileID>& ids);
-
     // Triggered by triggerUpdate();
-    private: void update();
+    void update();
 
     // Prepares a map render by updating the tiles we need for the current view, as well as updating
     // the stylesheet.
-    public: void prepare();
+    void prepare();
 
     // Unconditionally performs a render with the current map state.
-    public: void render();
+    void render();
 
     // Runs the enqueued tasks.
-    private: void processTasks();
+    void processTasks();
 
-private:
     // Loads the style set in the data object. Called by Update::StyleInfo
-    private: void reloadStyle();
+    void reloadStyle();
 
     // Loads the actual JSON object an creates a new Style object.
-    private: void loadStyleJSON(const std::string& json, const std::string& base);
+    void loadStyleJSON(const std::string& json, const std::string& base);
 
-    // TODO: Make all of these private
-public:
-    private: Environment& env;
-    private: View& view;
-    private: MapData& data;
+    Environment& env;
+    View& view;
+    MapData& data;
 
-    private: std::atomic<UpdateType> updated { static_cast<UpdateType>(Update::Nothing) };
+    std::atomic<UpdateType> updated { static_cast<UpdateType>(Update::Nothing) };
 
-    private: std::mutex mutexTask;
-    private: std::queue<std::function<void()>> tasks;
+    std::mutex mutexTask;
+    std::queue<std::function<void()>> tasks;
 
 
-    public: std::unique_ptr<uv::async> asyncUpdate;
-    public: std::unique_ptr<uv::async> asyncRender;
-    public: std::unique_ptr<uv::async> asyncInvoke;
-    public: std::unique_ptr<uv::async> asyncTerminate;
+    std::unique_ptr<uv::async> asyncUpdate;
+    std::unique_ptr<uv::async> asyncRender;
+    std::unique_ptr<uv::async> asyncInvoke;
+    std::unique_ptr<uv::async> asyncTerminate;
 
-    public: std::unique_ptr<Worker> workers;
-    private: const std::unique_ptr<GlyphStore> glyphStore;
-    private: const std::unique_ptr<GlyphAtlas> glyphAtlas;
-    private: const std::unique_ptr<SpriteAtlas> spriteAtlas;
-    private: const std::unique_ptr<LineAtlas> lineAtlas;
-    private: const std::unique_ptr<TexturePool> texturePool;
-    public: const std::unique_ptr<Painter> painter;
-    public: util::ptr<Sprite> sprite;
-    public: util::ptr<Style> style;
+    std::unique_ptr<Worker> workers;
+    const std::unique_ptr<GlyphStore> glyphStore;
+    const std::unique_ptr<GlyphAtlas> glyphAtlas;
+    const std::unique_ptr<SpriteAtlas> spriteAtlas;
+    const std::unique_ptr<LineAtlas> lineAtlas;
+    const std::unique_ptr<TexturePool> texturePool;
+    const std::unique_ptr<Painter> painter;
 
-    // Used to signal that rendering completed.
-    public: util::Signal rendered;
+    util::ptr<Sprite> sprite;
+    util::ptr<Style> style;
+
+    size_t sourceCacheSize;
 };
 
 }

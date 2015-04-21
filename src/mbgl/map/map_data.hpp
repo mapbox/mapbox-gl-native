@@ -2,6 +2,7 @@
 #define MBGL_MAP_MAP_DATA
 
 #include <mbgl/util/chrono.hpp>
+#include <mbgl/util/signal.hpp>
 
 #include <string>
 #include <mutex>
@@ -122,8 +123,12 @@ private:
     std::atomic<Duration> animationTime;
     std::atomic<Duration> defaultTransitionDuration;
 
+// TODO: make private
 public:
-    // TODO: make private
+    // Used to signal that rendering completed.
+    public: util::Signal rendered;
+
+    // TODO: document
     bool terminating = false;
 
     std::thread thread;
