@@ -23,20 +23,16 @@ SpritePosition::SpritePosition(uint16_t x_, uint16_t y_, uint16_t width_, uint16
       sdf(sdf_) {
 }
 
-Sprite::Sprite(const std::string& baseUrl, float pixelRatio_, Environment& env_, std::function<void ()> callback_)
+Sprite::Sprite(const std::string& baseUrl, float pixelRatio_)
     : pixelRatio(pixelRatio_ > 1 ? 2 : 1),
       raster(),
       loadedImage(false),
       loadedJSON(false),
-      future(promise.get_future()),
-      callback(callback_),
-      env(env_) {
-
+      env(Environment::Get()) {
     if (baseUrl.empty()) {
         // Treat a non-existent sprite as a successfully loaded empty sprite.
         loadedImage = true;
         loadedJSON = true;
-        promise.set_value();
         return;
     }
 
@@ -52,7 +48,7 @@ Sprite::Sprite(const std::string& baseUrl, float pixelRatio_, Environment& env_,
             Log::Warning(Event::Sprite, "Failed to load sprite info: %s", res.message.c_str());
         }
         loadedJSON = true;
-        complete();
+        emitSpriteLoadedIfComplete();
     });
 
     spriteRequest = env.request({ Resource::Kind::Image, spriteURL }, [this](const Response &res) {
@@ -64,7 +60,7 @@ Sprite::Sprite(const std::string& baseUrl, float pixelRatio_, Environment& env_,
             Log::Warning(Event::Sprite, "Failed to load sprite image: %s", res.message.c_str());
         }
         loadedImage = true;
-        complete();
+        emitSpriteLoadedIfComplete();
     });
 }
 
@@ -78,19 +74,14 @@ Sprite::~Sprite() {
     }
 }
 
-void Sprite::complete() {
-    if (loadedImage && loadedJSON) {
-        promise.set_value();
-        callback();
+void Sprite::emitSpriteLoadedIfComplete() {
+    if (isLoaded() && observer) {
+        observer->onSpriteLoaded();
     }
 }
 
 bool Sprite::isLoaded() const {
     return loadedImage && loadedJSON;
-}
-
-void Sprite::waitUntilLoaded() const {
-    future.wait();
 }
 
 bool Sprite::hasPixelRatio(float ratio) const {
@@ -143,4 +134,8 @@ const SpritePosition &Sprite::getSpritePosition(const std::string& name) const {
     if (!isLoaded()) return empty;
     auto it = pos.find(name);
     return it == pos.end() ? empty : it->second;
+}
+
+void Sprite::setObserver(Observer* observer_) {
+    observer = observer_;
 }

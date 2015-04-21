@@ -90,8 +90,6 @@ private:
     std::unique_ptr<Style> style;
     std::unique_ptr<ResourceLoader> resourceLoader;
 
-    util::ptr<Sprite> sprite;
-
     std::string styleURL;
     std::string styleJSON;
 

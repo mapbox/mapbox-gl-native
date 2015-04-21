@@ -1,7 +1,10 @@
 #include <mbgl/map/resource_loader.hpp>
 
+#include <mbgl/geometry/sprite_atlas.hpp>
 #include <mbgl/map/environment.hpp>
 #include <mbgl/map/source.hpp>
+#include <mbgl/map/sprite.hpp>
+#include <mbgl/map/transform.hpp>
 #include <mbgl/style/style.hpp>
 
 #include <cassert>
@@ -18,6 +21,8 @@ ResourceLoader::~ResourceLoader() {
     for (const auto& source : style_->sources) {
         source->setObserver(nullptr);
     }
+
+    sprite_->setObserver(nullptr);
 }
 
 void ResourceLoader::setObserver(Observer* observer) {
@@ -28,6 +33,8 @@ void ResourceLoader::setObserver(Observer* observer) {
 }
 
 void ResourceLoader::setStyle(Style* style) {
+    assert(style);
+
     style_ = style;
 
     Environment& env = Environment::Get();
@@ -46,15 +53,23 @@ void ResourceLoader::update(MapData& data,
                             GlyphAtlas& glyphAtlas,
                             GlyphStore& glyphStore,
                             SpriteAtlas& spriteAtlas,
-                            util::ptr<Sprite> sprite,
                             TexturePool& texturePool) {
     if (!style_) {
         return;
     }
 
+    const float pixelRatio = transform.getPixelRatio();
+    if (!sprite_ || !sprite_->hasPixelRatio(pixelRatio)) {
+        sprite_ = util::make_unique<Sprite>(style_->getSpriteURL(), pixelRatio);
+        sprite_->setObserver(this);
+
+        spriteAtlas.resize(pixelRatio);
+        spriteAtlas.setSprite(sprite_);
+    }
+
     for (const auto& source : style_->sources) {
         source->update(
-            data, transform, *style_, glyphAtlas, glyphStore, spriteAtlas, sprite, texturePool);
+            data, transform, *style_, glyphAtlas, glyphStore, spriteAtlas, sprite_, texturePool);
     }
 }
 
@@ -63,6 +78,10 @@ void ResourceLoader::onSourceLoaded() {
 }
 
 void ResourceLoader::onTileLoaded() {
+    emitTileDataChanged();
+}
+
+void ResourceLoader::onSpriteLoaded() {
     emitTileDataChanged();
 }
 

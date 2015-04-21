@@ -3,6 +3,7 @@
 #include <mbgl/platform/log.hpp>
 #include <mbgl/style/style_layer.hpp>
 #include <mbgl/map/source.hpp>
+#include <mbgl/map/sprite.hpp>
 #include <mbgl/renderer/fill_bucket.hpp>
 #include <mbgl/renderer/line_bucket.hpp>
 #include <mbgl/renderer/symbol_bucket.hpp>
@@ -117,7 +118,11 @@ std::unique_ptr<Bucket> TileParser::createBucket(const StyleBucket &bucketDesc) 
         } else if (bucketDesc.type == StyleLayerType::Line) {
             return createLineBucket(*layer, bucketDesc);
         } else if (bucketDesc.type == StyleLayerType::Symbol) {
-            return createSymbolBucket(*layer, bucketDesc);
+            if (sprite->isLoaded()) {
+                return createSymbolBucket(*layer, bucketDesc);
+            } else {
+                return nullptr;
+            }
         } else if (bucketDesc.type == StyleLayerType::Raster) {
             return nullptr;
         } else {

@@ -76,8 +76,7 @@ public:
 private:
     std::vector<SymbolFeature> processFeatures(const GeometryTileLayer&,
                                                const FilterExpression&,
-                                               GlyphStore&,
-                                               const Sprite&);
+                                               GlyphStore&);
 
     void addFeature(const std::vector<Coordinate> &line, const Shaping &shaping, const GlyphPositions &face, const Rect<uint16_t> &image);
 
