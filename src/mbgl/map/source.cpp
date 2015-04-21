@@ -136,9 +136,7 @@ bool Source::isLoaded() const {
 // Note: This is a separate function that must be called exactly once after creation
 // The reason this isn't part of the constructor is that calling shared_from_this() in
 // the constructor fails.
-void Source::load(const std::string& accessToken,
-                  Environment& env,
-                  std::function<void()> callback) {
+void Source::load(const std::string& accessToken, Environment& env) {
     if (info.url.empty()) {
         loaded = true;
         return;
@@ -147,7 +145,7 @@ void Source::load(const std::string& accessToken,
     util::ptr<Source> source = shared_from_this();
 
     const std::string url = util::mapbox::normalizeSourceURL(info.url, accessToken);
-    env.request({ Resource::Kind::JSON, url }, [source, callback](const Response &res) {
+    env.request({ Resource::Kind::JSON, url }, [source](const Response &res) {
         if (res.status != Response::Successful) {
             Log::Warning(Event::General, "Failed to load source TileJSON: %s", res.message.c_str());
             return;
@@ -164,7 +162,7 @@ void Source::load(const std::string& accessToken,
         source->info.parseTileJSONProperties(d);
         source->loaded = true;
 
-        callback();
+        source->emitSourceLoaded();
     });
 }
 
@@ -226,8 +224,7 @@ TileData::State Source::addTile(MapData& data,
                                 SpriteAtlas& spriteAtlas,
                                 util::ptr<Sprite> sprite,
                                 TexturePool& texturePool,
-                                const TileID& id,
-                                std::function<void()> callback) {
+                                const TileID& id) {
     const TileData::State state = hasTile(id);
 
     if (state != TileData::State::invalid) {
@@ -255,6 +252,8 @@ TileData::State Source::addTile(MapData& data,
     if (!new_tile.data) {
         new_tile.data = cache.get(normalized_id.to_uint64());
     }
+
+    auto callback = std::bind(&Source::emitTileLoaded, this);
 
     if (!new_tile.data) {
         // If we don't find working tile data, we're just going to load it.
@@ -366,8 +365,7 @@ void Source::update(MapData& data,
                     GlyphStore& glyphStore,
                     SpriteAtlas& spriteAtlas,
                     util::ptr<Sprite> sprite,
-                    TexturePool& texturePool,
-                    std::function<void()> callback) {
+                    TexturePool& texturePool) {
     if (!loaded || data.getAnimationTime() <= updated) {
         return;
     }
@@ -387,7 +385,7 @@ void Source::update(MapData& data,
     // Add existing child/parent tiles if the actual tile is not yet loaded
     for (const auto& id : required) {
         const TileData::State state = addTile(data, transformState, style, glyphAtlas, glyphStore,
-                                              spriteAtlas, sprite, texturePool, id, callback);
+                                              spriteAtlas, sprite, texturePool, id);
 
         if (state != TileData::State::parsed) {
             // The tile we require is not yet loaded. Try to find a parent or
@@ -475,6 +473,22 @@ void Source::setCacheSize(size_t size) {
 
 void Source::onLowMemory() {
     cache.clear();
+}
+
+void Source::setObserver(Observer* observer) {
+    observer_ = observer;
+}
+
+void Source::emitSourceLoaded() {
+    if (observer_) {
+        observer_->onSourceLoaded();
+    }
+}
+
+void Source::emitTileLoaded() {
+    if (observer_) {
+        observer_->onTileLoaded();
+    }
 }
 
 }

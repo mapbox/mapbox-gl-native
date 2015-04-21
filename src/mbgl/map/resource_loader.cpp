@@ -5,7 +5,6 @@
 #include <mbgl/style/style.hpp>
 
 #include <cassert>
-#include <functional>
 
 namespace mbgl {
 
@@ -15,6 +14,10 @@ ResourceLoader::ResourceLoader() {
 
 ResourceLoader::~ResourceLoader() {
     assert(Environment::currentlyOn(ThreadType::Map));
+
+    for (const auto& source : style_->sources) {
+        source->setObserver(nullptr);
+    }
 }
 
 void ResourceLoader::setObserver(Observer* observer) {
@@ -29,12 +32,21 @@ void ResourceLoader::setStyle(Style* style) {
 
     Environment& env = Environment::Get();
     for (const auto& source : style->sources) {
-        source->load(accessToken_, env, std::bind(&ResourceLoader::emitTileDataChanged, this));
+        source->setObserver(this);
+        source->load(accessToken_, env);
     }
 }
 
 void ResourceLoader::setAccessToken(const std::string& accessToken) {
     accessToken_ = accessToken;
+}
+
+void ResourceLoader::onSourceLoaded() {
+    emitTileDataChanged();
+}
+
+void ResourceLoader::onTileLoaded() {
+    emitTileDataChanged();
 }
 
 void ResourceLoader::emitTileDataChanged() {

@@ -168,10 +168,7 @@ void MapContext::updateTiles() {
     if (!style) return;
     for (const auto& source : style->sources) {
         source->update(data, transformState, *style, *glyphAtlas, *glyphStore, *spriteAtlas,
-                       getSprite(), *texturePool, [this]() {
-            assert(Environment::currentlyOn(ThreadType::Map));
-            triggerUpdate();
-        });
+                       getSprite(), *texturePool);
     }
 }
 
