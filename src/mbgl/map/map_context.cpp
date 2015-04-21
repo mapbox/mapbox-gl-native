@@ -298,7 +298,7 @@ void MapContext::updateTiles() {
 }
 
 void MapContext::updateAnnotationTiles(const std::vector<TileID>& ids) {
-    assert(Environment::currentlyOn(ThreadType::Main));
+    assert(Environment::currentlyOn(ThreadType::Map));
     if (!style) return;
     for (const auto &source : style->sources) {
         if (source->info.type == SourceType::Annotations) {

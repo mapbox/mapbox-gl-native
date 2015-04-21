@@ -57,12 +57,10 @@ public:
         return promise.get_future().get();
     }
 
+    void updateAnnotationTiles(const std::vector<TileID>& ids);
     double getTopOffsetPixelsForAnnotationSymbol(const std::string& symbol);
     void setSourceTileCacheSize(size_t size);
     void onLowMemory();
-
-    // TODO: Make this private
-    public: void updateAnnotationTiles(const std::vector<TileID>& ids);
 
     // These can only be called from the Map thread.
 private:
