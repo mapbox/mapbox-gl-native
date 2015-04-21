@@ -12,7 +12,6 @@
 #include <string>
 #include <functional>
 #include <vector>
-#include <thread>
 #include <mutex>
 #include <condition_variable>
 #include <memory>
@@ -150,33 +149,12 @@ private:
     void resize(uint16_t width, uint16_t height, float ratio = 1);
     void resize(uint16_t width, uint16_t height, float ratio, uint16_t fbWidth, uint16_t fbHeight);
 
-    // Checks if render thread needs to pause
-    void checkForPause();
-
-    // Setup
-    void setup();
-
     size_t sourceCacheSize;
     const std::unique_ptr<Environment> env;
     std::unique_ptr<EnvironmentScope> scope;
     View &view;
     const std::unique_ptr<MapData> data;
     std::unique_ptr<MapContext> context;
-
-private:
-    std::thread thread;
-
-    bool pausing = false;
-    bool isPaused = false;
-    std::mutex mutexRun;
-    std::condition_variable condRun;
-    std::mutex mutexPause;
-    std::condition_variable condPause;
-
-    // Stores whether the map thread has been stopped already.
-    std::atomic_bool isStopped;
-
-    StillImageCallback callback;
 };
 
 }

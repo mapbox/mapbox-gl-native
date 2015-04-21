@@ -17,6 +17,8 @@
 
 namespace mbgl {
 
+class StillImage;
+
 struct StyleInfo {
     std::string url;
     std::string base;
@@ -119,6 +121,24 @@ private:
     std::atomic<uint8_t> debug { false };
     std::atomic<Duration> animationTime;
     std::atomic<Duration> defaultTransitionDuration;
+
+public:
+    // TODO: make private
+    bool terminating = false;
+
+    std::thread thread;
+    bool pausing = false;
+    bool isPaused = false;
+    std::mutex mutexRun;
+    std::condition_variable condRun;
+    std::mutex mutexPause;
+    std::condition_variable condPause;
+
+    // Stores whether the map thread has been stopped already.
+    std::atomic_bool isStopped;
+
+    using StillImageCallback = std::function<void(std::unique_ptr<const StillImage>)>;
+    StillImageCallback callback;
 };
 
 }

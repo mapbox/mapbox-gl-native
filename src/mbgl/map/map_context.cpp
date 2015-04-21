@@ -4,6 +4,7 @@
 #include <mbgl/map/environment.hpp>
 #include <mbgl/map/source.hpp>
 #include <mbgl/map/sprite.hpp>
+#include <mbgl/map/still_image.hpp>
 
 #include <mbgl/platform/log.hpp>
 
@@ -54,7 +55,7 @@ void MapContext::start() {
         // could dispatch to the worker pool.
         workers.reset();
 
-        terminating = true;
+        data.terminating = true;
 
         // Closes all open handles on the loop. This means that the loop will automatically terminate.
         asyncRender.reset();
@@ -86,8 +87,100 @@ void MapContext::start() {
         // Finally, notify all listeners that we have finished rendering this frame.
         rendered.notify();
     });
+
+    data.thread = std::thread([this]() {
+#ifdef __APPLE__
+        pthread_setname_np("Map");
+#endif
+
+        EnvironmentScope mapScope(env, ThreadType::Map, "Map");
+        assert(Environment::currentlyOn(ThreadType::Map));
+        assert(data.mode != MapMode::None);
+
+        if (data.mode == MapMode::Continuous) {
+            checkForPause();
+        }
+
+        view.activate();
+        view.discard();
+
+        workers = util::make_unique<Worker>(env.loop, 4);
+
+        assert(painter);
+        painter->setup();
+
+        prepare();
+
+        if (data.mode == MapMode::Continuous) {
+            data.terminating = false;
+            while (!data.terminating) {
+                uv_run(env.loop, UV_RUN_DEFAULT);
+                checkForPause();
+            }
+        } else if (data.mode == MapMode::Still) {
+            data.terminating = false;
+            while (!data.terminating) {
+                uv_run(env.loop, UV_RUN_DEFAULT);
+
+                // After the loop terminated, these async handles may have been deleted if the terminate()
+                // callback was fired. In this case, we are exiting the loop.
+                if (asyncTerminate && asyncUpdate) {
+                     // Otherwise, loop termination means that we have acquired and parsed all resources
+                    // required for this map image and we can now proceed to rendering.
+                    render();
+                    auto image = view.readStillImage();
+
+                    // We are moving the callback out of the way and empty it in case the callback function
+                    // starts the next map image render.
+                    assert(data.callback);
+                    MapData::StillImageCallback cb;
+                    std::swap(cb, data.callback);
+
+                    // Now we can finally invoke the callback function with the map image we rendered.
+                    cb(std::move(image));
+
+                    // To prepare for the next event loop run, we have to make sure the async handles keep
+                    // the loop alive.
+                    asyncTerminate->ref();
+                    asyncUpdate->ref();
+                    asyncInvoke->ref();
+                    asyncRender->ref();
+                }
+            }
+        } else {
+            abort();
+        }
+
+        // Run the event loop once more to make sure our async delete handlers are called.
+        uv_run(env.loop, UV_RUN_ONCE);
+
+        view.deactivate();
+
+        // Make sure that the stop() function knows when to stop invoking the callback function.
+        data.isStopped = true;
+        view.notify();
+    });
 }
 
+void MapContext::checkForPause() {
+    std::unique_lock<std::mutex> lockRun (data.mutexRun);
+    while (data.pausing) {
+        view.deactivate();
+
+        data.mutexPause.lock();
+        data.isPaused = true;
+        data.condPause.notify_all();
+        data.mutexPause.unlock();
+
+        data.condRun.wait(lockRun);
+
+        view.activate();
+    }
+
+    data.mutexPause.lock();
+    data.isPaused = false;
+    data.mutexPause.unlock();
+}
 
 void MapContext::terminate() {
     assert(asyncTerminate);

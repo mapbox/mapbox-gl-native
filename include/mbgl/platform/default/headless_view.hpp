@@ -17,6 +17,7 @@ typedef XID GLXPbuffer;
 #include <mbgl/platform/gl.hpp>
 
 #include <memory>
+#include <thread>
 
 namespace mbgl {
 

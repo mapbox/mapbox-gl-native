@@ -3,7 +3,6 @@
 #include <mbgl/map/map_context.hpp>
 #include <mbgl/map/view.hpp>
 #include <mbgl/map/map_data.hpp>
-#include <mbgl/map/still_image.hpp>
 #include <mbgl/map/sprite.hpp>
 #include <mbgl/map/source.hpp>
 
@@ -73,27 +72,14 @@ void Map::start(bool startPaused, MapMode renderMode) {
     data->mode = renderMode;
 
     // Reset the flag.
-    isStopped = false;
-
-    context->start();
+    data->isStopped = false;
 
     // Do we need to pause first?
     if (startPaused) {
         pause();
     }
 
-    thread = std::thread([this]() {
-#ifdef __APPLE__
-        pthread_setname_np("Map");
-#endif
-
-        run();
-
-        // Make sure that the stop() function knows when to stop invoking the callback function.
-        isStopped = true;
-        view.notify();
-    });
-
+    context->start();
     context->triggerUpdate();
 }
 
@@ -112,14 +98,14 @@ void Map::stop(std::function<void ()> cb) {
         // the case with Cocoa's NSURLRequest. Otherwise, we will eventually deadlock because this
         // thread (== main thread) is blocked. The callback function should use an efficient waiting
         // function to avoid a busy waiting loop.
-        while (!isStopped) {
+        while (!data->isStopped) {
             cb();
         }
     }
 
     // If a callback function was provided, this should return immediately because the thread has
     // already finished executing.
-    thread.join();
+    data->thread.join();
 
     data->mode = MapMode::None;
 }
@@ -127,17 +113,17 @@ void Map::stop(std::function<void ()> cb) {
 void Map::pause(bool waitForPause) {
     assert(Environment::currentlyOn(ThreadType::Main));
     assert(data->mode == MapMode::Continuous);
-    mutexRun.lock();
-    pausing = true;
-    mutexRun.unlock();
+    data->mutexRun.lock();
+    data->pausing = true;
+    data->mutexRun.unlock();
 
     uv_stop(env->loop);
     context->triggerUpdate(); // Needed to ensure uv_stop is seen and uv_run exits, otherwise we deadlock on wait_for_pause
 
     if (waitForPause) {
-        std::unique_lock<std::mutex> lockPause (mutexPause);
-        while (!isPaused) {
-            condPause.wait(lockPause);
+        std::unique_lock<std::mutex> lockPause (data->mutexPause);
+        while (!data->isPaused) {
+            data->condPause.wait(lockPause);
         }
     }
 }
@@ -146,10 +132,10 @@ void Map::resume() {
     assert(Environment::currentlyOn(ThreadType::Main));
     assert(data->mode != MapMode::None);
 
-    mutexRun.lock();
-    pausing = false;
-    condRun.notify_all();
-    mutexRun.unlock();
+    data->mutexRun.lock();
+    data->pausing = false;
+    data->condRun.notify_all();
+    data->mutexRun.unlock();
 }
 
 void Map::renderStill(StillImageCallback fn) {
@@ -159,78 +145,15 @@ void Map::renderStill(StillImageCallback fn) {
         throw util::Exception("Map is not in still image render mode");
     }
 
-    if (callback) {
+    if (data->callback) {
         throw util::Exception("Map is currently rendering an image");
     }
 
     assert(data->mode == MapMode::Still);
 
-    callback = std::move(fn);
+    data->callback = std::move(fn);
 
     context->triggerUpdate(Update::RenderStill);
-}
-
-void Map::run() {
-    EnvironmentScope mapScope(*env, ThreadType::Map, "Map");
-    assert(Environment::currentlyOn(ThreadType::Map));
-    assert(data->mode != MapMode::None);
-
-    if (data->mode == MapMode::Continuous) {
-        checkForPause();
-    }
-
-    view.activate();
-    view.discard();
-
-    context->workers = util::make_unique<Worker>(env->loop, 4);
-
-    setup();
-    context->prepare();
-
-    if (data->mode == MapMode::Continuous) {
-        context->terminating = false;
-        while (!context->terminating) {
-            uv_run(env->loop, UV_RUN_DEFAULT);
-            checkForPause();
-        }
-    } else if (data->mode == MapMode::Still) {
-        context->terminating = false;
-        while (!context->terminating) {
-            uv_run(env->loop, UV_RUN_DEFAULT);
-
-            // After the loop terminated, these async handles may have been deleted if the terminate()
-            // callback was fired. In this case, we are exiting the loop.
-            if (context->asyncTerminate && context->asyncUpdate) {
-                 // Otherwise, loop termination means that we have acquired and parsed all resources
-                // required for this map image and we can now proceed to rendering.
-                context->render();
-                auto image = view.readStillImage();
-
-                // We are moving the callback out of the way and empty it in case the callback function
-                // starts the next map image render.
-                assert(callback);
-                StillImageCallback cb;
-                std::swap(cb, callback);
-
-                // Now we can finally invoke the callback function with the map image we rendered.
-                cb(std::move(image));
-
-                // To prepare for the next event loop run, we have to make sure the async handles keep
-                // the loop alive.
-                context->asyncTerminate->ref();
-                context->asyncUpdate->ref();
-                context->asyncInvoke->ref();
-                context->asyncRender->ref();
-            }
-        }
-    } else {
-        abort();
-    }
-
-    // Run the event loop once more to make sure our async delete handlers are called.
-    uv_run(env->loop, UV_RUN_ONCE);
-
-    view.deactivate();
 }
 
 void Map::renderSync() {
@@ -242,37 +165,11 @@ void Map::renderSync() {
     context->rendered.wait();
 }
 
-void Map::checkForPause() {
-    std::unique_lock<std::mutex> lockRun (mutexRun);
-    while (pausing) {
-        view.deactivate();
-
-        mutexPause.lock();
-        isPaused = true;
-        condPause.notify_all();
-        mutexPause.unlock();
-
-        condRun.wait(lockRun);
-
-        view.activate();
-    }
-
-    mutexPause.lock();
-    isPaused = false;
-    mutexPause.unlock();
-}
-
 void Map::update() {
     context->triggerUpdate();
 }
 
 #pragma mark - Setup
-
-void Map::setup() {
-    assert(Environment::currentlyOn(ThreadType::Map));
-    assert(context->painter);
-    context->painter->setup();
-}
 
 std::string Map::getStyleURL() const {
     return data->getStyleInfo().url;

@@ -9,6 +9,7 @@
 #include <vector>
 #include <queue>
 #include <future>
+#include <thread>
 
 namespace uv {
 class async;
@@ -33,7 +34,7 @@ class MapContext {
 public:
     MapContext(Environment&, View&, MapData&);
 
-    // Starts the async handles.
+    // Starts the map thread.
     void start();
 
     // Terminates the map thread
@@ -58,6 +59,9 @@ public:
 
     // These can only be called from the Map thread.
 private:
+    // Checks if render thread needs to pause
+    void checkForPause();
+
     Worker& getWorker();
     util::ptr<Sprite> getSprite();
     void updateTiles();
@@ -114,9 +118,6 @@ public:
 
     // Used to signal that rendering completed.
     public: util::Signal rendered;
-
-    // TODO: document this
-    public: bool terminating = false;
 };
 
 }
