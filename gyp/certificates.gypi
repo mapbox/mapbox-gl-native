@@ -4,7 +4,7 @@
       'type': 'none',
       'hard_dependency': 1,
       'copies': [{
-        'files': [ '../common/api_mapbox_com.der', '../common/ca-bundle.crt' ],
+        'files': [ '../common/ca-bundle.crt' ],
         'destination': '<(PRODUCT_DIR)'
       }],
     },

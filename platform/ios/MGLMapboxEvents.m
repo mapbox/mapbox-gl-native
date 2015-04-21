@@ -649,8 +649,21 @@ NSString *const MGLEventGestureRotateStart = @"Rotation";
 - (void)connection:(NSURLConnection *)connection willSendRequestForAuthenticationChallenge:(NSURLAuthenticationChallenge *)challenge {
 
     // Load Local Copy of Server's Public Key
-    //    NSString *cerPath = [[NSBundle mainBundle] pathForResource:@"b.ssl.fastly.net" ofType:@"der"];
-    NSString *cerPath = [[NSBundle mainBundle] pathForResource:@"api_mapbox_com" ofType:@"der"];
+    NSString *cerPath = nil;
+    NSArray *bundles = [NSBundle allFrameworks];
+    for (int lc = 0; lc < bundles.count; lc++) {
+        NSBundle *b = [bundles objectAtIndex:lc];
+        cerPath = [[NSBundle mainBundle] pathForResource:@"api_mapbox_com" ofType:@"der"];
+        if (cerPath != nil) {
+            break;
+        }
+    }
+    if (cerPath == nil) {
+        NSLog(@"cerPath not found.");
+        return;
+    }
+
+//    NSString *cerPath = [[NSBundle mainBundle] pathForResource:@"api_mapbox_com" ofType:@"der"];
     NSData *localCertData = [NSData dataWithContentsOfFile:cerPath];
 
     // Get Server's Public Key
@@ -671,7 +684,6 @@ NSString *const MGLEventGestureRotateStart = @"Rotation";
     }
 
     long numKeys = SecTrustGetCertificateCount(serverTrust);
-    NSLog(@"Number of certificaties presented: %ld", numKeys);
 
     BOOL found = false;
     for (int lc = 0; lc < numKeys; lc++) {
