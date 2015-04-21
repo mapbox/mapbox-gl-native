@@ -28,6 +28,8 @@ class Painter;
 class Sprite;
 class Style;
 class Worker;
+struct LatLng;
+struct LatLngBounds;
 
 class MapContext {
 public:
@@ -57,8 +59,13 @@ public:
         return promise.get_future().get();
     }
 
-    void updateAnnotationTiles(const std::vector<TileID>& ids);
+    void setDefaultPointAnnotationSymbol(const std::string& symbol);
     double getTopOffsetPixelsForAnnotationSymbol(const std::string& symbol);
+    std::vector<uint32_t> addPointAnnotations(const std::vector<LatLng>& points, const std::vector<std::string>& symbols);
+    void removeAnnotations(const std::vector<uint32_t>& annotations);
+    std::vector<uint32_t> getAnnotationsInBounds(const LatLngBounds&);
+    LatLngBounds getBoundsForAnnotations(const std::vector<uint32_t>&);
+
     void setSourceTileCacheSize(size_t size);
     void onLowMemory();
 
@@ -66,6 +73,7 @@ public:
 private:
     // Checks if render thread needs to pause
     void checkForPause();
+    void updateAnnotationTiles(const std::vector<TileID>& ids);
 
     Worker& getWorker();
     util::ptr<Sprite> getSprite();

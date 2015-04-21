@@ -374,7 +374,7 @@ const LatLng Map::latLngForPixel(const vec2<double> pixel) const {
 void Map::setDefaultPointAnnotationSymbol(const std::string& symbol) {
     assert(Environment::currentlyOn(ThreadType::Main));
     context->invokeTask([=] {
-        data->annotationManager.setDefaultPointAnnotationSymbol(symbol);
+        context->setDefaultPointAnnotationSymbol(symbol);
     });
 }
 
@@ -392,9 +392,7 @@ uint32_t Map::addPointAnnotation(const LatLng& point, const std::string& symbol)
 std::vector<uint32_t> Map::addPointAnnotations(const std::vector<LatLng>& points, const std::vector<std::string>& symbols) {
     assert(Environment::currentlyOn(ThreadType::Main));
     return context->invokeSyncTask([&] {
-        auto result = data->annotationManager.addPointAnnotations(points, symbols, *data);
-        context->updateAnnotationTiles(result.first);
-        return result.second;
+        return context->addPointAnnotations(points, symbols);
     });
 }
 
@@ -406,22 +404,21 @@ void Map::removeAnnotation(uint32_t annotation) {
 void Map::removeAnnotations(const std::vector<uint32_t>& annotations) {
     assert(Environment::currentlyOn(ThreadType::Main));
     context->invokeTask([=] {
-        auto result = data->annotationManager.removeAnnotations(annotations, *data);
-        context->updateAnnotationTiles(result);
+        context->removeAnnotations(annotations);
     });
 }
 
 std::vector<uint32_t> Map::getAnnotationsInBounds(const LatLngBounds& bounds) {
     assert(Environment::currentlyOn(ThreadType::Main));
     return context->invokeSyncTask([&] {
-        return data->annotationManager.getAnnotationsInBounds(bounds, *data);
+        return context->getAnnotationsInBounds(bounds);
     });
 }
 
 LatLngBounds Map::getBoundsForAnnotations(const std::vector<uint32_t>& annotations) {
     assert(Environment::currentlyOn(ThreadType::Main));
     return context->invokeSyncTask([&] {
-        return data->annotationManager.getBoundsForAnnotations(annotations);
+        return context->getBoundsForAnnotations(annotations);
     });
 }
 

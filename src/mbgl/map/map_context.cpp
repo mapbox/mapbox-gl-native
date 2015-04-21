@@ -415,11 +415,34 @@ void MapContext::processTasks() {
     }
 }
 
+void MapContext::setDefaultPointAnnotationSymbol(const std::string& symbol) {
+    data.annotationManager.setDefaultPointAnnotationSymbol(symbol);
+}
+
 double MapContext::getTopOffsetPixelsForAnnotationSymbol(const std::string& symbol) {
     assert(Environment::currentlyOn(ThreadType::Map));
     assert(sprite);
     const SpritePosition pos = sprite->getSpritePosition(symbol);
     return -pos.height / pos.pixelRatio / 2;
+}
+
+std::vector<uint32_t> MapContext::addPointAnnotations(const std::vector<LatLng>& points, const std::vector<std::string>& symbols) {
+    auto result = data.annotationManager.addPointAnnotations(points, symbols, data);
+    updateAnnotationTiles(result.first);
+    return result.second;
+}
+
+void MapContext::removeAnnotations(const std::vector<uint32_t>& annotations) {
+    auto result = data.annotationManager.removeAnnotations(annotations, data);
+    updateAnnotationTiles(result);
+}
+
+std::vector<uint32_t> MapContext::getAnnotationsInBounds(const LatLngBounds& bounds) {
+    return data.annotationManager.getAnnotationsInBounds(bounds, data);
+}
+
+LatLngBounds MapContext::getBoundsForAnnotations(const std::vector<uint32_t>& annotations) {
+    return data.annotationManager.getBoundsForAnnotations(annotations);
 }
 
 void MapContext::setSourceTileCacheSize(size_t size) {
