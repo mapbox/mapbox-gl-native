@@ -61,7 +61,7 @@ void DefaultFileSource::cancel(Request *req) {
 
 // ----- Impl -----
 
-DefaultFileSource::Impl::Impl(FileCache* cache_, const std::string& root)
+DefaultFileSource::Impl::Impl(uv_loop_t*, FileCache* cache_, const std::string& root)
     : cache(cache_), assetRoot(root.empty() ? platform::assetRoot() : root) {
 }
 

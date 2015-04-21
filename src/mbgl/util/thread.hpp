@@ -96,11 +96,11 @@ Thread<Object>::Thread(const std::string& name, Args&&... args) {
 template <class Object>
 template <typename P, std::size_t... I>
 void Thread<Object>::run(P&& params, index_sequence<I...>) {
-    Object object_(std::get<I>(std::forward<P>(params))...);
-    object = &object_;
-
     RunLoop loop_;
     loop = &loop_;
+
+    Object object_(loop_.get(), std::get<I>(std::forward<P>(params))...);
+    object = &object_;
 
     running.set_value();
     loop_.run();
