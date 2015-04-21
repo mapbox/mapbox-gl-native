@@ -2,13 +2,13 @@
 #define MBGL_MAP_MAP_DATA
 
 #include <mbgl/util/chrono.hpp>
-#include <mbgl/util/signal.hpp>
 
 #include <string>
 #include <mutex>
 #include <atomic>
 #include <vector>
 #include <cassert>
+#include <condition_variable>
 
 #include <mbgl/map/mode.hpp>
 #include <mbgl/map/environment.hpp>
@@ -125,22 +125,9 @@ private:
 
 // TODO: make private
 public:
-    // Used to signal that rendering completed.
-    public: util::Signal rendered;
-
-    // TODO: document
-    bool terminating = false;
-
-    std::thread thread;
-    bool pausing = false;
-    bool isPaused = false;
-    std::mutex mutexRun;
-    std::condition_variable condRun;
     std::mutex mutexPause;
-    std::condition_variable condPause;
-
-    // Stores whether the map thread has been stopped already.
-    std::atomic_bool isStopped;
+    std::condition_variable condPaused;
+    std::condition_variable condResume;
 
     using StillImageCallback = std::function<void(std::unique_ptr<const StillImage>)>;
     StillImageCallback callback;

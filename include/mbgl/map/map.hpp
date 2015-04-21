@@ -27,6 +27,10 @@ class MapData;
 class MapContext;
 class StillImage;
 
+namespace util {
+template <class T> class Thread;
+}
+
 class Map : private util::noncopyable {
     friend class View;
 
@@ -55,6 +59,7 @@ public:
 
     // Triggers a synchronous or asynchronous render.
     void renderSync();
+    void renderAsync();
 
     // Notifies the Map thread that the state has changed and an update might be necessary.
     void update();
@@ -139,10 +144,7 @@ public:
     bool getDebug() const;
 
 private:
-    // Runs the map event loop. ONLY run this function when you want to get render a single frame
-    // with this map object. It will *not* spawn a separate thread and instead block until the
-    // frame is completely rendered.
-    void run();
+    void triggerUpdate(Update update = Update::Nothing);
 
     // This may only be called by the View object.
     void resize(uint16_t width, uint16_t height, float ratio = 1);
@@ -152,7 +154,7 @@ private:
     std::unique_ptr<EnvironmentScope> scope;
     View &view;
     const std::unique_ptr<MapData> data;
-    std::unique_ptr<MapContext> context;
+    std::unique_ptr<util::Thread<MapContext>> context;
 };
 
 }

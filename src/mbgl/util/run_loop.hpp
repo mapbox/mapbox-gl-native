@@ -53,6 +53,8 @@ public:
 
     uv_loop_t* get() { return *loop; }
 
+    static uv::tls<RunLoop> current;
+
 private:
     // A movable type-erasing invokable entity wrapper. This allows to store arbitrary invokable
     // things (like std::function<>, or the result of a movable-only std::bind()) in the queue.
@@ -70,8 +72,6 @@ private:
     };
 
     using Queue = std::queue<std::unique_ptr<Message>>;
-
-    static uv::tls<RunLoop> current;
 
     void withMutex(std::function<void()>&&);
     void process();

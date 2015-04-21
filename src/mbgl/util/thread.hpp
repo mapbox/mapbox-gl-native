@@ -3,6 +3,7 @@
 
 #include <future>
 #include <thread>
+#include <atomic>
 #include <functional>
 
 #include <mbgl/util/run_loop.hpp>
@@ -52,6 +53,29 @@ public:
         loop->invokeWithResult(std::bind(fn, object, args...), callback);
     }
 
+    // Invoke object->fn(args...) in the runloop thread, and wait for the result.
+    template <class R, typename Fn, class... Args>
+    R invokeSync(Fn fn, Args&&... args) {
+        std::promise<R> promise;
+        auto bound = std::bind(fn, object, args...);
+        loop->invoke([&] { promise.set_value(bound()); } );
+        return promise.get_future().get();
+    }
+
+    // Invoke object->fn(args...) in the runloop thread, and wait for it to complete.
+    template <typename Fn, class... Args>
+    void invokeSync(Fn fn, Args&&... args) {
+        std::promise<void> promise;
+        auto bound = std::bind(fn, object, args...);
+        loop->invoke([&] { bound(); promise.set_value(); } );
+        promise.get_future().get();
+    }
+
+    // Join the thread, but call the given function repeatedly in the current thread
+    // while waiting for the join to finish. This should be immediately followed by
+    // destroying the Thread.
+    void pumpingStop(std::function<void ()>);
+
     uv_loop_t* get() { return loop->get(); }
 
 private:
@@ -67,6 +91,7 @@ private:
     std::promise<void> joinable;
 
     std::thread thread;
+    std::atomic_bool joined;
 
     Object* object;
     RunLoop* loop;
@@ -74,7 +99,8 @@ private:
 
 template <class Object>
 template <class... Args>
-Thread<Object>::Thread(const std::string& name, Args&&... args) {
+Thread<Object>::Thread(const std::string& name, Args&&... args)
+    : joined(false) {
     // Note: We're using std::tuple<> to store the arguments because GCC 4.9 has a bug
     // when expanding parameters packs captured in lambdas.
     std::tuple<Args...> params = std::forward_as_tuple(::std::forward<Args>(args)...);
@@ -99,13 +125,21 @@ void Thread<Object>::run(P&& params, index_sequence<I...>) {
     RunLoop loop_;
     loop = &loop_;
 
-    Object object_(loop_.get(), std::get<I>(std::forward<P>(params))...);
-    object = &object_;
+    {
+        Object object_(loop_.get(), std::get<I>(std::forward<P>(params))...);
+        object = &object_;
 
-    running.set_value();
+        running.set_value();
+        loop_.run();
+
+        object = nullptr;
+    }
+
+    // Run the loop again to ensure that async close callbacks have been called.
     loop_.run();
 
     joinable.get_future().get();
+    joined = true;
 }
 
 template <class Object>
@@ -113,6 +147,15 @@ Thread<Object>::~Thread() {
     loop->stop();
     joinable.set_value();
     thread.join();
+}
+
+template <class Object>
+void Thread<Object>::pumpingStop(std::function<void ()> cb) {
+    loop->stop();
+    joinable.set_value();
+    while (!joined) {
+        cb();
+    }
 }
 
 }

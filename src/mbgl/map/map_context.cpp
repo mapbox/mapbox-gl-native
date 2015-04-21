@@ -29,198 +29,66 @@
 
 namespace mbgl {
 
-MapContext::MapContext(Environment& env_, View& view_, MapData& data_)
+MapContext::MapContext(uv_loop_t* loop, Environment& env_, View& view_, MapData& data_, bool startPaused)
     : env(env_),
       view(view_),
       data(data_),
+      mapScope(env, ThreadType::Map, "Map"),
       updated(static_cast<UpdateType>(Update::Nothing)),
+      asyncUpdate(util::make_unique<uv::async>(loop, [this] { update(); })),
+      workers(util::make_unique<Worker>(loop, 4)),
       glyphStore(util::make_unique<GlyphStore>(env)),
       glyphAtlas(util::make_unique<GlyphAtlas>(1024, 1024)),
       spriteAtlas(util::make_unique<SpriteAtlas>(512, 512)),
       lineAtlas(util::make_unique<LineAtlas>(512, 512)),
       texturePool(util::make_unique<TexturePool>()),
-      painter(util::make_unique<Painter>(*spriteAtlas, *glyphAtlas, *lineAtlas)) {
+      painter(util::make_unique<Painter>(*spriteAtlas, *glyphAtlas, *lineAtlas))
+{
+    assert(Environment::currentlyOn(ThreadType::Map));
+    assert(data.mode != MapMode::None);
+
+    asyncUpdate->unref();
+
+    view.activate();
+
+    if (startPaused) {
+        pause();
+    }
+
+    painter->setup();
 }
 
 MapContext::~MapContext() {
-    // TODO: does this need to happen first for some reason?
+    view.deactivate();
+    view.notify();
+
+    // Explicit resets currently necessary because these abandon resources that need to be
+    // cleaned up by env.performCleanup();
     style.reset();
+    sprite.reset();
+    painter.reset();
+    texturePool.reset();
+    lineAtlas.reset();
+    spriteAtlas.reset();
+    glyphAtlas.reset();
+    glyphStore.reset();
+
+    env.performCleanup();
 }
 
-void MapContext::start() {
-    // Setup async notifications
-    assert(!asyncTerminate);
-    asyncTerminate = util::make_unique<uv::async>(env.loop, [this]() {
-        assert(Environment::currentlyOn(ThreadType::Map));
+void MapContext::pause() {
+    view.deactivate();
 
-        // Remove all of these to make sure they are destructed in the correct thread.
-        style.reset();
+    std::unique_lock<std::mutex> lockPause(data.mutexPause);
+    data.condPaused.notify_all();
+    data.condResume.wait(lockPause);
 
-        // It's now safe to destroy/join the workers since there won't be any more callbacks that
-        // could dispatch to the worker pool.
-        workers.reset();
-
-        data.terminating = true;
-
-        // Closes all open handles on the loop. This means that the loop will automatically terminate.
-        asyncRender.reset();
-        asyncUpdate.reset();
-        asyncInvoke.reset();
-        asyncTerminate.reset();
-    });
-
-    assert(!asyncUpdate);
-    asyncUpdate = util::make_unique<uv::async>(env.loop, [this] {
-        // of the calls actually get triggered.
-        asyncUpdate->unref();
-
-        update();
-    });
-
-    assert(!asyncInvoke);
-    asyncInvoke = util::make_unique<uv::async>(env.loop, [this] {
-        processTasks();
-    });
-
-    assert(!asyncRender);
-    asyncRender = util::make_unique<uv::async>(env.loop, [this] {
-        // Must be called in Map thread.
-        assert(Environment::currentlyOn(ThreadType::Map));
-
-        render();
-
-        // Finally, notify all listeners that we have finished rendering this frame.
-        data.rendered.notify();
-    });
-
-    data.thread = std::thread([this]() {
-#ifdef __APPLE__
-        pthread_setname_np("Map");
-#endif
-
-        EnvironmentScope mapScope(env, ThreadType::Map, "Map");
-        assert(Environment::currentlyOn(ThreadType::Map));
-        assert(data.mode != MapMode::None);
-
-        if (data.mode == MapMode::Continuous) {
-            checkForPause();
-        }
-
-        view.activate();
-        view.discard();
-
-        workers = util::make_unique<Worker>(env.loop, 4);
-
-        assert(painter);
-        painter->setup();
-
-        prepare();
-
-        if (data.mode == MapMode::Continuous) {
-            data.terminating = false;
-            while (!data.terminating) {
-                uv_run(env.loop, UV_RUN_DEFAULT);
-                checkForPause();
-            }
-        } else if (data.mode == MapMode::Still) {
-            data.terminating = false;
-            while (!data.terminating) {
-                uv_run(env.loop, UV_RUN_DEFAULT);
-
-                // After the loop terminated, these async handles may have been deleted if the terminate()
-                // callback was fired. In this case, we are exiting the loop.
-                if (asyncTerminate && asyncUpdate) {
-                     // Otherwise, loop termination means that we have acquired and parsed all resources
-                    // required for this map image and we can now proceed to rendering.
-                    render();
-                    auto image = view.readStillImage();
-
-                    // We are moving the callback out of the way and empty it in case the callback function
-                    // starts the next map image render.
-                    assert(data.callback);
-                    MapData::StillImageCallback cb;
-                    std::swap(cb, data.callback);
-
-                    // Now we can finally invoke the callback function with the map image we rendered.
-                    cb(std::move(image));
-
-                    // To prepare for the next event loop run, we have to make sure the async handles keep
-                    // the loop alive.
-                    asyncTerminate->ref();
-                    asyncUpdate->ref();
-                    asyncInvoke->ref();
-                    asyncRender->ref();
-                }
-            }
-        } else {
-            abort();
-        }
-
-        // Run the event loop once more to make sure our async delete handlers are called.
-        uv_run(env.loop, UV_RUN_ONCE);
-
-        view.deactivate();
-
-        // Make sure that the stop() function knows when to stop invoking the callback function.
-        data.isStopped = true;
-        view.notify();
-    });
-}
-
-void MapContext::checkForPause() {
-    std::unique_lock<std::mutex> lockRun (data.mutexRun);
-    while (data.pausing) {
-        view.deactivate();
-
-        data.mutexPause.lock();
-        data.isPaused = true;
-        data.condPause.notify_all();
-        data.mutexPause.unlock();
-
-        data.condRun.wait(lockRun);
-
-        view.activate();
-    }
-
-    data.mutexPause.lock();
-    data.isPaused = false;
-    data.mutexPause.unlock();
-}
-
-void MapContext::terminate() {
-    assert(asyncTerminate);
-    asyncTerminate->send();
-}
-
-void MapContext::triggerRender() {
-    assert(data.mode == MapMode::Continuous);
-    assert(asyncRender);
-    asyncRender->send();
+    view.activate();
 }
 
 void MapContext::triggerUpdate(const Update u) {
     updated |= static_cast<UpdateType>(u);
-
-    if (asyncUpdate) {
-        asyncUpdate->ref();
-        asyncUpdate->send();
-    }
-}
-
-// Runs the function in the map thread.
-void MapContext::invokeTask(std::function<void()>&& fn) {
-    {
-        std::lock_guard<std::mutex> lock(mutexTask);
-        tasks.emplace(::std::forward<std::function<void()>>(fn));
-    }
-
-    // TODO: Once we have aligned static and continuous rendering, this should always dispatch
-    // to the async queue.
-    if (asyncInvoke) {
-        asyncInvoke->send();
-    } else {
-        processTasks();
-    }
+    asyncUpdate->send();
 }
 
 Worker& MapContext::getWorker() {
@@ -311,15 +179,6 @@ void MapContext::updateAnnotationTiles(const std::vector<TileID>& ids) {
 void MapContext::update() {
     assert(Environment::currentlyOn(ThreadType::Map));
 
-    if (data.getTransformState().hasSize()) {
-        prepare();
-    }
-}
-
-
-void MapContext::prepare() {
-    assert(Environment::currentlyOn(ThreadType::Map));
-
     const auto now = Clock::now();
     data.setAnimationTime(now);
 
@@ -344,14 +203,6 @@ void MapContext::prepare() {
     if (u & static_cast<UpdateType>(Update::RenderStill)) {
         // Triggers a view resize.
         view.discard();
-
-        // Whenever we trigger an image render, we are unrefing all async handles so the loop will
-        // eventually terminate. However, it'll stay alive as long as there are pending requests
-        // (like work requests or HTTP requests).
-        asyncTerminate->unref();
-        asyncUpdate->unref();
-        asyncInvoke->unref();
-        asyncRender->unref();
     }
 
     if (style) {
@@ -374,9 +225,7 @@ void MapContext::prepare() {
         spriteAtlas->setSprite(getSprite());
 
         updateTiles();
-    }
 
-    if (data.mode == MapMode::Continuous) {
         view.invalidate([this] { render(); });
     }
 }
@@ -394,29 +243,22 @@ void MapContext::render() {
 
     painter->render(*style, data.getTransformState(), data.getAnimationTime());
 
+    if (data.mode == MapMode::Still && data.callback /* && loaded() */) {
+        auto image = view.readStillImage();
+
+        // We are moving the callback out of the way and empty it in case the callback function
+        // starts the next map image render.
+        MapData::StillImageCallback cb;
+        std::swap(cb, data.callback);
+
+        // Now we can finally invoke the callback function with the map image we rendered.
+        cb(std::move(image));
+    }
+
     // Schedule another rerender when we definitely need a next frame.
     if (data.transform.needsTransition() || style->hasTransitions()) {
         triggerUpdate();
     }
-}
-
-
-// Processes the functions that should be run in the map thread.
-void MapContext::processTasks() {
-    std::queue<std::function<void()>> queue;
-    {
-        std::lock_guard<std::mutex> lock(mutexTask);
-        queue.swap(tasks);
-    }
-
-    while (!queue.empty()) {
-        queue.front()();
-        queue.pop();
-    }
-}
-
-void MapContext::setDefaultPointAnnotationSymbol(const std::string& symbol) {
-    data.annotationManager.setDefaultPointAnnotationSymbol(symbol);
 }
 
 double MapContext::getTopOffsetPixelsForAnnotationSymbol(const std::string& symbol) {
@@ -424,25 +266,6 @@ double MapContext::getTopOffsetPixelsForAnnotationSymbol(const std::string& symb
     assert(sprite);
     const SpritePosition pos = sprite->getSpritePosition(symbol);
     return -pos.height / pos.pixelRatio / 2;
-}
-
-std::vector<uint32_t> MapContext::addPointAnnotations(const std::vector<LatLng>& points, const std::vector<std::string>& symbols) {
-    auto result = data.annotationManager.addPointAnnotations(points, symbols, data);
-    updateAnnotationTiles(result.first);
-    return result.second;
-}
-
-void MapContext::removeAnnotations(const std::vector<uint32_t>& annotations) {
-    auto result = data.annotationManager.removeAnnotations(annotations, data);
-    updateAnnotationTiles(result);
-}
-
-std::vector<uint32_t> MapContext::getAnnotationsInBounds(const LatLngBounds& bounds) {
-    return data.annotationManager.getAnnotationsInBounds(bounds, data);
-}
-
-LatLngBounds MapContext::getBoundsForAnnotations(const std::vector<uint32_t>& annotations) {
-    return data.annotationManager.getBoundsForAnnotations(annotations);
 }
 
 void MapContext::setSourceTileCacheSize(size_t size) {
