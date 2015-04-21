@@ -13,7 +13,7 @@ using namespace mbgl;
 void ParsedValid(const rapidjson::Value& op, rapidjson::SizeType size)
 {
     ASSERT_TRUE(op.IsArray());
-    EXPECT_EQ(false, op.IsNull());
+    ASSERT_FALSE(op.IsNull());
     EXPECT_EQ(size, op.Size());
 }
 
@@ -40,6 +40,8 @@ TEST(StyleColorOperation, Evaluate) {
     const rapidjson::Value& complex = document["complex"];
     const rapidjson::Value& spin_constant = document["spin_constant"];
     const rapidjson::Value& mix_constant = document["mix_constant"];
+    const rapidjson::Value& empty = document["empty"];
+    const rapidjson::Value& lacks_op = document["lacks_op"];
     std::unordered_map<std::string, const rapidjson::Value *> constants;
     constants.emplace(std::string("@white"), &document["@white"]);
     constants.emplace(std::string("@white"), &document["@black"]);
@@ -53,6 +55,8 @@ TEST(StyleColorOperation, Evaluate) {
     ParsedValid(complex[2u][3u], rapidjson::SizeType(3));
     ParsedValid(spin_constant, rapidjson::SizeType(3));
     ParsedValid(mix_constant, rapidjson::SizeType(4));
+    ParsedValid(empty, rapidjson::SizeType(0));
+    ParsedValid(lacks_op, rapidjson::SizeType(3));
 
     // test color operations
     CSSColorParser::Color parsedLight = mbgl::parseColorOp(light, constants);
@@ -66,4 +70,10 @@ TEST(StyleColorOperation, Evaluate) {
 
     CSSColorParser::Color parsedMixConst = mbgl::parseColorOp(mix_constant, constants);
     TestColor(parsedMixConst, 119, 20, 111, 1);
+
+    CSSColorParser::Color parsedEmpty = mbgl::parseColorOp(empty, constants);
+    TestColor(parsedEmpty, 0, 0, 0, 1);
+
+    CSSColorParser::Color parsedLacksOp = mbgl::parseColorOp(lacks_op, constants);
+    TestColor(parsedLacksOp, 0, 0, 0, 1);
 }
