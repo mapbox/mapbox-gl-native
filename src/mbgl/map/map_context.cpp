@@ -62,6 +62,7 @@ MapContext::~MapContext() {
 
     // Explicit resets currently necessary because these abandon resources that need to be
     // cleaned up by env.performCleanup();
+    resourceLoader.reset();
     style.reset();
     sprite.reset();
     painter.reset();
@@ -141,6 +142,7 @@ util::ptr<Sprite> MapContext::getSprite() {
 void MapContext::loadStyleJSON(const std::string& json, const std::string& base) {
     assert(Environment::currentlyOn(ThreadType::Map));
 
+    resourceLoader.reset();
     sprite.reset();
     style.reset();
 
@@ -153,12 +155,10 @@ void MapContext::loadStyleJSON(const std::string& json, const std::string& base)
     const std::string glyphURL = util::mapbox::normalizeGlyphsURL(style->glyph_url, data.getAccessToken());
     glyphStore->setURL(glyphURL);
 
-    for (const auto& source : style->sources) {
-        source->load(data.getAccessToken(), env, [this]() {
-            assert(Environment::currentlyOn(ThreadType::Map));
-            triggerUpdate();
-        });
-    }
+    resourceLoader = util::make_unique<ResourceLoader>();
+    resourceLoader->setAccessToken(data.getAccessToken());
+    resourceLoader->setObserver(this);
+    resourceLoader->setStyle(style.get());
 
     triggerUpdate(Update::Zoom);
 }
@@ -297,6 +297,11 @@ void MapContext::onLowMemory() {
         source->onLowMemory();
     }
     view.invalidate([this] { render(); });
+}
+
+void MapContext::onTileDataChanged() {
+    assert(Environment::currentlyOn(ThreadType::Map));
+    triggerUpdate();
 }
 
 }
