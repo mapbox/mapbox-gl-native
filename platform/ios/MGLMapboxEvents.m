@@ -73,6 +73,7 @@ NSString *const MGLEventGestureRotateStart = @"Rotation";
 @property (atomic) NSUInteger flushAt;
 @property (atomic) NSDateFormatter *rfc3339DateFormatter;
 @property (atomic) CGFloat scale;
+@property (atomic) NSData *geoTrustCert;
 
 
 // The isPaused state tracker is only ever accessed from the main thread.
@@ -132,11 +133,29 @@ NSString *const MGLEventGestureRotateStart = @"Rotation";
         _serialQueue = dispatch_queue_create([[NSString stringWithFormat:@"%@.%@.events.serial", _appBundleId, uniqueID] UTF8String], DISPATCH_QUEUE_SERIAL);
 
         // Configure Events Infrastructure
+        // ===============================
+
+        // Load Local Copy of Server's Public Key
+        NSString *cerPath = nil;
+        NSArray *bundles = [NSBundle allFrameworks];
+        for (int lc = 0; lc < bundles.count; lc++) {
+            NSBundle *b = [bundles objectAtIndex:lc];
+            cerPath = [[NSBundle mainBundle] pathForResource:@"api_mapbox_com-geotrust" ofType:@"der"];
+            if (cerPath != nil) {
+                break;
+            }
+        }
+        if (cerPath != nil) {
+            _geoTrustCert = [NSData dataWithContentsOfFile:cerPath];
+        }
+
+        // Events Control
         _eventQueue = [[NSMutableArray alloc] init];
         _flushAt = 20;
         _flushAfter = 60;
         _token = nil;
         _instanceID = [[NSUUID UUID] UUIDString];
+
         // Dynamic detection of ASIdentifierManager from Mixpanel
         // https://github.com/mixpanel/mixpanel-iphone/blob/master/LICENSE
         _advertiserId = @"";
@@ -382,10 +401,13 @@ NSString *const MGLEventGestureRotateStart = @"Rotation";
     __weak MGLMapboxEvents *weakSelf = self;
 
     dispatch_async(dispatch_get_global_queue(DISPATCH_QUEUE_PRIORITY_BACKGROUND, 0), ^{
+        MGLMapboxEvents *strongSelf = weakSelf;
+        if (!strongSelf) return;
+
         // Setup URL Request
-        NSString *url = [NSString stringWithFormat:@"%@/events/v1?access_token=%@", MGLMapboxEventsAPIBase, weakSelf.token];
+        NSString *url = [NSString stringWithFormat:@"%@/events/v1?access_token=%@", MGLMapboxEventsAPIBase, strongSelf.token];
         NSMutableURLRequest *request = [[NSMutableURLRequest alloc] initWithURL:[NSURL URLWithString:url]];
-        [request setValue:[weakSelf getUserAgent] forHTTPHeaderField:@"User-Agent"];
+        [request setValue:[strongSelf getUserAgent] forHTTPHeaderField:@"User-Agent"];
         [request setValue:@"application/json" forHTTPHeaderField:@"Content-Type"];
         [request setHTTPMethod:@"POST"];
         
@@ -395,9 +417,9 @@ NSString *const MGLEventGestureRotateStart = @"Rotation";
             [request setHTTPBody:jsonData];
 
             // Send non blocking HTTP Request to server
-            [NSURLConnection sendAsynchronousRequest:request
-                                               queue:nil
-                                   completionHandler:nil];
+            NSURLConnection *connection = [[NSURLConnection alloc] initWithRequest:request delegate:strongSelf startImmediately:NO];
+            [connection scheduleInRunLoop:[NSRunLoop mainRunLoop] forMode:NSRunLoopCommonModes];
+            [connection start];
         }
     });
 }
@@ -636,6 +658,50 @@ NSString *const MGLEventGestureRotateStart = @"Rotation";
     }
 
     return result;
+}
+
+#pragma mark NSURLConnectionDelegate
+- (void)connection:(NSURLConnection *)connection willSendRequestForAuthenticationChallenge:(NSURLAuthenticationChallenge *)challenge {
+
+    if (_geoTrustCert == nil) {
+        [[challenge sender] cancelAuthenticationChallenge:challenge];
+        return;
+    }
+
+    // Get Server's Public Key
+    SecTrustRef serverTrust = challenge.protectionSpace.serverTrust;
+
+    SecTrustResultType trustResult;
+    SecTrustEvaluate(serverTrust, &trustResult);
+    switch (trustResult) {
+        case kSecTrustResultProceed:
+            break;
+        case kSecTrustResultUnspecified:
+            break;
+        default:
+            [[challenge sender] cancelAuthenticationChallenge:challenge];
+            return;
+    }
+
+    long numKeys = SecTrustGetCertificateCount(serverTrust);
+
+    BOOL found = false;
+    for (int lc = 0; lc < numKeys; lc++) {
+        SecCertificateRef certificate = SecTrustGetCertificateAtIndex(serverTrust, lc);
+        NSData *remoteCertificateData = CFBridgingRelease(SecCertificateCopyData(certificate));
+
+        // Compare Remote Key With Local Version
+        if ([remoteCertificateData isEqualToData:_geoTrustCert]) {
+            NSURLCredential *credential = [NSURLCredential credentialForTrust:serverTrust];
+            [[challenge sender] useCredential:credential forAuthenticationChallenge:challenge];
+            found = true;
+            break;
+        }
+    }
+
+    if (!found) {
+        [[challenge sender] cancelAuthenticationChallenge:challenge];
+    }
 }
 
 @end

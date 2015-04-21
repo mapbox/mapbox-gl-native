@@ -25,7 +25,7 @@ extern NSString *const MGLEventGesturePanStart;
 extern NSString *const MGLEventGesturePinchStart;
 extern NSString *const MGLEventGestureRotateStart;
 
-@interface MGLMapboxEvents : NSObject
+@interface MGLMapboxEvents : NSObject <NSURLConnectionDelegate>
 
 // You must call these methods from the main thread.
 //
