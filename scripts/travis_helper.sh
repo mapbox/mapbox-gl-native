@@ -1,19 +1,13 @@
 #!/usr/bin/env bash
 
-case `uname -s` in
-    'Darwin') JOBS=$((`sysctl -n hw.ncpu` + 2)) ;;
-    'Linux')  JOBS=$((`nproc` + 2)) ;;
-    *)        JOBS=2 ;;
-esac
-
 function mapbox_time_start {
     local name=$1
     mapbox_timer_name=$name
 
-    mapbox_fold start $name
+    travis_fold start $name
 
     mapbox_timer_id=$(printf %08x $(( RANDOM * RANDOM )))
-    eval "mapbox_start_time_$mapbox_timer_id=$(mapbox_nanoseconds)"
+    eval "mapbox_start_time_$mapbox_timer_id=$(travis_nanoseconds)"
     echo -en "travis_time:start:$mapbox_timer_id\n"
 }
 
@@ -22,11 +16,11 @@ function mapbox_time_finish {
     local timer_id=${2:-$mapbox_timer_id}
     local timer_start="mapbox_start_time_$timer_id"
     eval local start_time=\${$timer_start}
-    local end_time=$(mapbox_nanoseconds)
+    local end_time=$(travis_nanoseconds)
     local duration=$(($end_time-$start_time))
     echo -en "travis_time:end:$timer_id:start=$start_time,finish=$end_time,duration=$duration\n"
 
-    mapbox_fold end $name
+    travis_fold end $name
 }
 
 function mapbox_time {
@@ -38,13 +32,13 @@ function mapbox_time {
     mapbox_time_finish $name $timer_id
 }
 
-function mapbox_fold {
+if [[ "${TRAVIS_COMMIT:-false}" == false ]]; then
+function travis_fold {
   local action=$1
   local name=$2
   echo -en "travis_fold:${action}:${name}\r${ANSI_CLEAR}"
 }
-
-function mapbox_nanoseconds {
+function travis_nanoseconds {
   local cmd="date"
   local format="+%s%N"
   local os=$(uname)
@@ -57,11 +51,11 @@ function mapbox_nanoseconds {
 
   $cmd -u $format
 }
+fi
 
-export JOBS
 export ANSI_CLEAR
-export -f mapbox_fold
-export -f mapbox_nanoseconds
+export -f travis_fold
+export -f travis_nanoseconds
 export -f mapbox_time
 export -f mapbox_time_start
 export -f mapbox_time_finish

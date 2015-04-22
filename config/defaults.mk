@@ -31,32 +31,32 @@ LIBS_linux += -Dcache_lib=$(word 1,$(CACHE) sqlite)
 LIBS_linux += --depth=. -Goutput_dir=.
 
 ANDROID_ABIS += android-lib-arm-v8
-ENV_android-arm-v8 = $(shell MASON_ANDROID_ABI=arm-v8 ./scripts/android/toolchain.sh)
+ENV_android-arm-v8 = $(shell MASON_ANDROID_ABI=arm-v8 ./scripts/android_env.sh)
 CONFIG_android-arm-v8 = -Dhost=android -Iconfig/android-arm-v8.gypi
 
 ANDROID_ABIS += android-lib-arm-v7
-ENV_android-arm-v7 = $(shell MASON_ANDROID_ABI=arm-v7 ./scripts/android/toolchain.sh)
+ENV_android-arm-v7 = $(shell MASON_ANDROID_ABI=arm-v7 ./scripts/android_env.sh)
 CONFIG_android-arm-v7 = -Dhost=android -Iconfig/android-arm-v7.gypi
 
 ANDROID_ABIS += android-lib-arm-v5
-ENV_android-arm-v5 = $(shell MASON_ANDROID_ABI=arm-v5 ./scripts/android/toolchain.sh)
+ENV_android-arm-v5 = $(shell MASON_ANDROID_ABI=arm-v5 ./scripts/android_env.sh)
 CONFIG_android-arm-v5 = -Dhost=android -Iconfig/android-arm-v5.gypi
 
 ANDROID_ABIS += android-lib-x86
-ENV_android-x86 = $(shell MASON_ANDROID_ABI=x86 ./scripts/android/toolchain.sh)
+ENV_android-x86 = $(shell MASON_ANDROID_ABI=x86 ./scripts/android_env.sh)
 CONFIG_android-x86 = -Dhost=android -Iconfig/android-x86.gypi
 
 # OpenSSL build is incomplete.
 # ANDROID_ABIS += android-lib-x86-64
-# ENV_android-x86-64 = $(shell MASON_ANDROID_ABI=x86-64 ./scripts/android/toolchain.sh)
+# ENV_android-x86-64 = $(shell MASON_ANDROID_ABI=x86-64 ./scripts/android_env.sh)
 # CONFIG_android-x86-64 = -Dhost=android -Iconfig/android-x86-64.gypi
 
 ANDROID_ABIS += android-lib-mips
-ENV_android-mips = $(shell MASON_ANDROID_ABI=mips ./scripts/android/toolchain.sh)
+ENV_android-mips = $(shell MASON_ANDROID_ABI=mips ./scripts/android_env.sh)
 CONFIG_android-mips = -Dhost=android -Iconfig/android-mips.gypi
 
 ANDROID_ABIS += android-lib-mips-64
-ENV_android-mips-64 = $(shell MASON_ANDROID_ABI=mips-64 ./scripts/android/toolchain.sh)
+ENV_android-mips-64 = $(shell MASON_ANDROID_ABI=mips-64 ./scripts/android_env.sh)
 CONFIG_android-mips-64 = -Dhost=android -Iconfig/android-mips-64.gypi
 
 LIBS_android  = -Dheadless_lib=none
