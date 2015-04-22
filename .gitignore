@@ -9,6 +9,7 @@
 /mason_packages
 /config/*.gypi
 /build
+/node
 /macosx/build
 /linux/build
 /ios/build

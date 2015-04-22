@@ -10,6 +10,8 @@ matrix:
       env: FLAVOR=linux CXX=clang++ BUILDTYPE=Debug
     - os: linux
       env: FLAVOR=linux CXX=clang++ BUILDTYPE=Release
+    - os: linux
+      env: FLAVOR=node CXX=clang++ BUILDTYPE=Release
     - os: osx
       env: FLAVOR=osx BUILDTYPE=Debug
     - os: osx
