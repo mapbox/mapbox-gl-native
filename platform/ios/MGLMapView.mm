@@ -491,70 +491,122 @@ mbgl::DefaultFileSource *mbglFileSource = nullptr;
     // views so they don't underlap navigation or tool bars. If we don't have a reference, apply
     // constraints against ourself to maintain (albeit less ideal) placement of the subviews.
     //
-    NSString *topGuideFormatString    = (self.viewControllerForLayoutGuides ? @"[topLayoutGuide]"    : @"|");
-    NSString *bottomGuideFormatString = (self.viewControllerForLayoutGuides ? @"[bottomLayoutGuide]" : @"|");
-
-    id topGuideViewsObject            = (self.viewControllerForLayoutGuides ? (id)self.viewControllerForLayoutGuides.topLayoutGuide    : (id)@"");
-    id bottomGuideViewsObject         = (self.viewControllerForLayoutGuides ? (id)self.viewControllerForLayoutGuides.bottomLayoutGuide : (id)@"");
-
-    UIView *constraintParentView = (self.viewControllerForLayoutGuides.view ? self.viewControllerForLayoutGuides.view : self);
+    UIView *constraintParentView = (self.viewControllerForLayoutGuides.view ?
+                                    self.viewControllerForLayoutGuides.view :
+                                    self);
 
     // compass
     //
     UIView *compassContainer = self.compass.superview;
 
-    [constraintParentView addConstraints:[NSLayoutConstraint constraintsWithVisualFormat:[NSString stringWithFormat:@"V:%@-topSpacing-[container]", topGuideFormatString]
-                                                                                 options:0
-                                                                                 metrics:@{ @"topSpacing"     : @(5) }
-                                                                                   views:@{ @"topLayoutGuide" : topGuideViewsObject,
-                                                                                            @"container"      : compassContainer }]];
+    if (self.viewControllerForLayoutGuides)
+    {
+        [constraintParentView addConstraint:
+         [NSLayoutConstraint constraintWithItem:compassContainer
+                                      attribute:NSLayoutAttributeTop
+                                      relatedBy:NSLayoutRelationGreaterThanOrEqual
+                                         toItem:self.viewControllerForLayoutGuides.topLayoutGuide
+                                      attribute:NSLayoutAttributeBottom
+                                     multiplier:1
+                                       constant:5]];
+    }
+    [constraintParentView addConstraint:
+     [NSLayoutConstraint constraintWithItem:compassContainer
+                                  attribute:NSLayoutAttributeTop
+                                  relatedBy:NSLayoutRelationGreaterThanOrEqual
+                                     toItem:self
+                                  attribute:NSLayoutAttributeTop
+                                 multiplier:1
+                                   constant:5]];
 
-    [constraintParentView addConstraints:[NSLayoutConstraint constraintsWithVisualFormat:@"H:[container]-rightSpacing-|"
-                                                                                 options:0
-                                                                                 metrics:@{ @"rightSpacing" : @(5) }
-                                                                                   views:@{ @"container"    : compassContainer }]];
+    [constraintParentView addConstraint:
+     [NSLayoutConstraint constraintWithItem:self
+                                  attribute:NSLayoutAttributeRight
+                                  relatedBy:NSLayoutRelationEqual
+                                     toItem:compassContainer
+                                  attribute:NSLayoutAttributeRight
+                                 multiplier:1
+                                   constant:5]];
 
-    [compassContainer addConstraint:[NSLayoutConstraint constraintWithItem:compassContainer
-                                                                 attribute:NSLayoutAttributeWidth
-                                                                 relatedBy:NSLayoutRelationEqual
-                                                                    toItem:nil
-                                                                 attribute:NSLayoutAttributeNotAnAttribute
-                                                                multiplier:1
-                                                                  constant:self.compass.image.size.width]];
+    [compassContainer addConstraint:
+     [NSLayoutConstraint constraintWithItem:compassContainer
+                                  attribute:NSLayoutAttributeWidth
+                                  relatedBy:NSLayoutRelationEqual
+                                     toItem:nil
+                                  attribute:NSLayoutAttributeNotAnAttribute
+                                 multiplier:1
+                                   constant:self.compass.image.size.width]];
 
-    [compassContainer addConstraint:[NSLayoutConstraint constraintWithItem:compassContainer
-                                                                 attribute:NSLayoutAttributeHeight
-                                                                 relatedBy:NSLayoutRelationEqual
-                                                                    toItem:nil
-                                                                 attribute:NSLayoutAttributeNotAnAttribute
-                                                                multiplier:1
-                                                                  constant:self.compass.image.size.height]];
+    [compassContainer addConstraint:
+     [NSLayoutConstraint constraintWithItem:compassContainer
+                                  attribute:NSLayoutAttributeHeight
+                                  relatedBy:NSLayoutRelationEqual
+                                     toItem:nil
+                                  attribute:NSLayoutAttributeNotAnAttribute
+                                 multiplier:1
+                                   constant:self.compass.image.size.height]];
 
     // logo bug
     //
-    [constraintParentView addConstraints:[NSLayoutConstraint constraintsWithVisualFormat:[NSString stringWithFormat:@"V:[logoBug]-bottomSpacing-%@", bottomGuideFormatString]
-                                                                                 options:0
-                                                                                 metrics:@{ @"bottomSpacing"     : @(4) }
-                                                                                   views:@{ @"logoBug"           : self.logoBug,
-                                                                                            @"bottomLayoutGuide" : bottomGuideViewsObject }]];
+    if (self.viewControllerForLayoutGuides)
+    {
+        [constraintParentView addConstraint:
+         [NSLayoutConstraint constraintWithItem:self.viewControllerForLayoutGuides.bottomLayoutGuide
+                                      attribute:NSLayoutAttributeTop
+                                      relatedBy:NSLayoutRelationGreaterThanOrEqual
+                                         toItem:self.logoBug
+                                      attribute:NSLayoutAttributeBaseline
+                                     multiplier:1
+                                       constant:4]];
+    }
+    [constraintParentView addConstraint:
+     [NSLayoutConstraint constraintWithItem:self
+                                  attribute:NSLayoutAttributeBottom
+                                  relatedBy:NSLayoutRelationGreaterThanOrEqual
+                                     toItem:self.logoBug
+                                  attribute:NSLayoutAttributeBaseline
+                                 multiplier:1
+                                   constant:4]];
 
-    [constraintParentView addConstraints:[NSLayoutConstraint constraintsWithVisualFormat:@"H:|-leftSpacing-[logoBug]"
-                                                                                 options:0
-                                                                                 metrics:@{ @"leftSpacing"       : @(8) }
-                                                                                   views:@{ @"logoBug"           : self.logoBug }]];
+    [constraintParentView addConstraint:
+     [NSLayoutConstraint constraintWithItem:self.logoBug
+                                  attribute:NSLayoutAttributeLeft
+                                  relatedBy:NSLayoutRelationEqual
+                                     toItem:self
+                                  attribute:NSLayoutAttributeLeft
+                                 multiplier:1
+                                   constant:8]];
 
     // attribution button
     //
-    [constraintParentView addConstraints:[NSLayoutConstraint constraintsWithVisualFormat:[NSString stringWithFormat:@"V:[attributionButton]-bottomSpacing-%@", bottomGuideFormatString]
-                                                                                 options:0
-                                                                                 metrics:@{ @"bottomSpacing"     : @(8) }
-                                                                                   views:@{ @"attributionButton" : self.attributionButton,
-                                                                                            @"bottomLayoutGuide" : bottomGuideViewsObject }]];
+    if (self.viewControllerForLayoutGuides)
+    {
+        [constraintParentView addConstraint:
+         [NSLayoutConstraint constraintWithItem:self.viewControllerForLayoutGuides.bottomLayoutGuide
+                                      attribute:NSLayoutAttributeTop
+                                      relatedBy:NSLayoutRelationGreaterThanOrEqual
+                                         toItem:self.attributionButton
+                                      attribute:NSLayoutAttributeBaseline
+                                     multiplier:1
+                                       constant:8]];
+    }
+    [constraintParentView addConstraint:
+     [NSLayoutConstraint constraintWithItem:self
+                                  attribute:NSLayoutAttributeBottom
+                                  relatedBy:NSLayoutRelationGreaterThanOrEqual
+                                     toItem:self.attributionButton
+                                  attribute:NSLayoutAttributeBaseline
+                                 multiplier:1
+                                   constant:8]];
 
-    [constraintParentView addConstraints:[NSLayoutConstraint constraintsWithVisualFormat:@"H:[attributionButton]-rightSpacing-|"
-                                                                                 options:0
-                                                                                 metrics:@{ @"rightSpacing"      : @(8) }
-                                                                                   views:@{ @"attributionButton" : self.attributionButton }]];
+    [constraintParentView addConstraint:
+     [NSLayoutConstraint constraintWithItem:self
+                                  attribute:NSLayoutAttributeRight
+                                  relatedBy:NSLayoutRelationEqual
+                                     toItem:self.attributionButton
+                                  attribute:NSLayoutAttributeRight
+                                 multiplier:1
+                                   constant:8]];
 
     [super updateConstraints];
 }
