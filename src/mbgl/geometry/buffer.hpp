@@ -2,6 +2,7 @@
 #define MBGL_GEOMETRY_BUFFER
 
 #include <mbgl/platform/gl.hpp>
+#include <mbgl/platform/log.hpp>
 #include <mbgl/util/noncopyable.hpp>
 #include <mbgl/map/environment.hpp>
 
@@ -38,17 +39,16 @@ public:
     }
 
     // Transfers this buffer to the GPU and binds the buffer to the GL context.
-    void bind(bool force = false) {
-        if (buffer == 0) {
+    void bind() {
+        if (buffer) {
+            MBGL_CHECK_ERROR(glBindBuffer(bufferType, buffer));
+        } else {
             MBGL_CHECK_ERROR(glGenBuffers(1, &buffer));
-            force = true;
-        }
-        MBGL_CHECK_ERROR(glBindBuffer(bufferType, buffer));
-        if (force) {
+            MBGL_CHECK_ERROR(glBindBuffer(bufferType, buffer));
             if (array == nullptr) {
-                throw std::runtime_error("Buffer was already deleted or doesn't contain elements");
+                Log::Debug(Event::OpenGL, "Buffer doesn't contain elements");
+                pos = 0;
             }
-
             MBGL_CHECK_ERROR(glBufferData(bufferType, pos, array, GL_STATIC_DRAW));
             if (!retainAfterUpload) {
                 cleanup();
@@ -65,6 +65,12 @@ public:
 
     inline GLuint getID() const {
         return buffer;
+    }
+
+    inline void upload() {
+        if (!buffer) {
+            bind();
+        }
     }
 
 protected:

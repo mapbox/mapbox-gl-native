@@ -29,13 +29,6 @@ void RasterBucket::drawRaster(RasterShader& shader, StaticVertexBuffer &vertices
     MBGL_CHECK_ERROR(glDrawArrays(GL_TRIANGLES, 0, (GLsizei)vertices.index()));
 }
 
-void RasterBucket::drawRaster(RasterShader& shader, StaticVertexBuffer &vertices, VertexArrayObject &array, GLuint texture_) {
-    raster.bind(texture_);
-    shader.u_image = 0;
-    array.bind(shader, vertices, BUFFER_OFFSET(0));
-    MBGL_CHECK_ERROR(glDrawArrays(GL_TRIANGLES, 0, (GLsizei)vertices.index()));
-}
-
 bool RasterBucket::hasData() const {
     return raster.isLoaded();
 }

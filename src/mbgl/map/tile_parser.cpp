@@ -157,7 +157,7 @@ std::unique_ptr<Bucket> TileParser::createFillBucket(const GeometryTileLayer& la
                                                 tile.triangleElementsBuffer,
                                                 tile.lineElementsBuffer);
     addBucketGeometries(bucket, layer, bucket_desc.filter);
-    return std::move(bucket);
+    return bucket->hasData() ? std::move(bucket) : nullptr;
 }
 
 std::unique_ptr<Bucket> TileParser::createLineBucket(const GeometryTileLayer& layer,
@@ -174,7 +174,7 @@ std::unique_ptr<Bucket> TileParser::createLineBucket(const GeometryTileLayer& la
     applyLayoutProperty(PropertyKey::LineRoundLimit, bucket_desc.layout, layout.round_limit, z);
 
     addBucketGeometries(bucket, layer, bucket_desc.filter);
-    return std::move(bucket);
+    return bucket->hasData() ? std::move(bucket) : nullptr;
 }
 
 std::unique_ptr<Bucket> TileParser::createSymbolBucket(const GeometryTileLayer& layer,
@@ -224,6 +224,6 @@ std::unique_ptr<Bucket> TileParser::createSymbolBucket(const GeometryTileLayer& 
 
     bucket->addFeatures(
         layer, bucket_desc.filter, reinterpret_cast<uintptr_t>(&tile), spriteAtlas, *sprite, glyphAtlas, glyphStore);
-    return std::move(bucket);
+    return bucket->hasData() ? std::move(bucket) : nullptr;
 }
 }
