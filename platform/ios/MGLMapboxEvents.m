@@ -73,6 +73,7 @@ NSString *const MGLEventGestureRotateStart = @"Rotation";
 @property (atomic) NSUInteger flushAt;
 @property (atomic) NSDateFormatter *rfc3339DateFormatter;
 @property (atomic) CGFloat scale;
+@property (atomic) NSURLSession *session;
 @property (atomic) NSData *geoTrustCert;
 
 
@@ -134,6 +135,8 @@ NSString *const MGLEventGestureRotateStart = @"Rotation";
 
         // Configure Events Infrastructure
         // ===============================
+
+         _session = [NSURLSession sessionWithConfiguration:[NSURLSessionConfiguration defaultSessionConfiguration] delegate:self delegateQueue:nil];
 
         // Load Local Copy of Server's Public Key
         NSString *cerPath = nil;
@@ -417,9 +420,8 @@ NSString *const MGLEventGestureRotateStart = @"Rotation";
             [request setHTTPBody:jsonData];
 
             // Send non blocking HTTP Request to server
-            NSURLConnection *connection = [[NSURLConnection alloc] initWithRequest:request delegate:strongSelf startImmediately:NO];
-            [connection scheduleInRunLoop:[NSRunLoop mainRunLoop] forMode:NSRunLoopCommonModes];
-            [connection start];
+            NSURLSessionDataTask *task = [_session dataTaskWithRequest:request completionHandler: nil];
+            [task resume];
         }
     });
 }
@@ -660,48 +662,49 @@ NSString *const MGLEventGestureRotateStart = @"Rotation";
     return result;
 }
 
-#pragma mark NSURLConnectionDelegate
-- (void)connection:(NSURLConnection *)connection willSendRequestForAuthenticationChallenge:(NSURLAuthenticationChallenge *)challenge {
+#pragma mark NSURLSessionDelegate
+- (void)URLSession:(NSURLSession *)session didReceiveChallenge:(NSURLAuthenticationChallenge *)challenge completionHandler:(void (^) (NSURLSessionAuthChallengeDisposition disposition, NSURLCredential *credential))completionHandler {
 
-    if (_geoTrustCert == nil) {
-        [[challenge sender] cancelAuthenticationChallenge:challenge];
-        return;
-    }
+    if([challenge.protectionSpace.authenticationMethod isEqualToString:NSURLAuthenticationMethodServerTrust]) {
 
-    // Get Server's Public Key
-    SecTrustRef serverTrust = challenge.protectionSpace.serverTrust;
+        SecTrustRef serverTrust = [[challenge protectionSpace] serverTrust];
+        NSString *domain = [[challenge protectionSpace] host];
+        SecTrustResultType trustResult;
 
-    SecTrustResultType trustResult;
-    SecTrustEvaluate(serverTrust, &trustResult);
-    switch (trustResult) {
-        case kSecTrustResultProceed:
-            break;
-        case kSecTrustResultUnspecified:
-            break;
-        default:
-            [[challenge sender] cancelAuthenticationChallenge:challenge];
-            return;
-    }
+        // Validate the certificate chain with the device's trust store anyway
+        // This *might* give use revocation checking
+        SecTrustEvaluate(serverTrust, &trustResult);
+        if (trustResult == kSecTrustResultUnspecified)
+        {
+            // Look for a pinned certificate in the server's certificate chain
+            long numKeys = SecTrustGetCertificateCount(serverTrust);
 
-    long numKeys = SecTrustGetCertificateCount(serverTrust);
+            BOOL found = false;
+            for (int lc = 0; lc < numKeys; lc++) {
+                SecCertificateRef certificate = SecTrustGetCertificateAtIndex(serverTrust, lc);
+                NSData *remoteCertificateData = CFBridgingRelease(SecCertificateCopyData(certificate));
 
-    BOOL found = false;
-    for (int lc = 0; lc < numKeys; lc++) {
-        SecCertificateRef certificate = SecTrustGetCertificateAtIndex(serverTrust, lc);
-        NSData *remoteCertificateData = CFBridgingRelease(SecCertificateCopyData(certificate));
+                // Compare Remote Key With Local Version
+                if ([remoteCertificateData isEqualToData:_geoTrustCert]) {
+                    // Found the certificate; continue connecting
+                    completionHandler(NSURLSessionAuthChallengeUseCredential, [NSURLCredential credentialForTrust:challenge.protectionSpace.serverTrust]);
+                    found = true;
+                    break;
+                }
+            }
 
-        // Compare Remote Key With Local Version
-        if ([remoteCertificateData isEqualToData:_geoTrustCert]) {
-            NSURLCredential *credential = [NSURLCredential credentialForTrust:serverTrust];
-            [[challenge sender] useCredential:credential forAuthenticationChallenge:challenge];
-            found = true;
-            break;
+            if (!found) {
+                // The certificate wasn't found in the certificate chain; cancel the connection
+                completionHandler(NSURLSessionAuthChallengeCancelAuthenticationChallenge, [NSURLCredential credentialForTrust:challenge.protectionSpace.serverTrust]);
+            }
+        }
+        else
+        {
+            // Certificate chain validation failed; cancel the connection
+            completionHandler(NSURLSessionAuthChallengeCancelAuthenticationChallenge, [NSURLCredential credentialForTrust:challenge.protectionSpace.serverTrust]);
         }
     }
-
-    if (!found) {
-        [[challenge sender] cancelAuthenticationChallenge:challenge];
-    }
+    
 }
 
 @end
