@@ -35,7 +35,8 @@ TileParser::TileParser(const GeometryTile& geometryTile_,
       glyphStore(glyphStore_),
       spriteAtlas(spriteAtlas_),
       sprite(sprite_),
-      collision(util::make_unique<Collision>(tile.id.z, 4096, tile.source.tile_size, tile.depth)) {
+      collision(util::make_unique<Collision>(tile.id.z, 4096, tile.source.tile_size, tile.depth)),
+      partialParse(false) {
     assert(sprite);
     assert(collision);
 }
@@ -57,15 +58,15 @@ void TileParser::parse() {
         if (layer_desc->bucket) {
             // This is a singular layer. Check if this bucket already exists. If not,
             // parse this bucket.
-            auto bucket_it = tile.buckets.find(layer_desc->bucket->name);
-            if (bucket_it == tile.buckets.end()) {
-                // We need to create this bucket since it doesn't exist yet.
-                std::unique_ptr<Bucket> bucket = createBucket(*layer_desc->bucket);
-                if (bucket) {
-                    // Bucket creation might fail because the data tile may not
-                    // contain any data that falls into this bucket.
-                    tile.buckets[layer_desc->bucket->name] = std::move(bucket);
-                }
+            if (tile.getBucket(*layer_desc)) {
+                continue;
+            }
+
+            std::unique_ptr<Bucket> bucket = createBucket(*layer_desc->bucket);
+            if (bucket) {
+                // Bucket creation might fail because the data tile may not
+                // contain any data that falls into this bucket.
+                tile.setBucket(*layer_desc, std::move(bucket));
             }
         } else {
             Log::Warning(Event::ParseTile, "layer '%s' does not have buckets", layer_desc->id.c_str());
@@ -121,6 +122,7 @@ std::unique_ptr<Bucket> TileParser::createBucket(const StyleBucket &bucketDesc) 
             if (sprite->isLoaded()) {
                 return createSymbolBucket(*layer, bucketDesc);
             } else {
+                partialParse = true;
                 return nullptr;
             }
         } else if (bucketDesc.type == StyleLayerType::Raster) {

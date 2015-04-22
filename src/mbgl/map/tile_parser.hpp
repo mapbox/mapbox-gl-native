@@ -44,6 +44,9 @@ public:
 
 public:
     void parse();
+    inline bool isPartialParse() const {
+        return partialParse;
+    }
 
 private:
     bool obsolete() const;
@@ -67,6 +70,7 @@ private:
     util::ptr<Sprite> sprite;
 
     std::unique_ptr<Collision> collision;
+    bool partialParse;
 };
 
 }
