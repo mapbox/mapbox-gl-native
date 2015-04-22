@@ -4,6 +4,7 @@
 #include <mbgl/map/transform_state.hpp>
 
 #include <mbgl/renderer/frame_history.hpp>
+#include <mbgl/renderer/bucket.hpp>
 
 #include <mbgl/geometry/vao.hpp>
 #include <mbgl/geometry/static_vertex_buffer.hpp>
@@ -20,8 +21,6 @@
 #include <set>
 
 namespace mbgl {
-
-enum class RenderPass : bool { Opaque, Translucent };
 
 class Style;
 class StyleLayer;

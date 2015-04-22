@@ -16,8 +16,10 @@ DebugBucket::DebugBucket(DebugFontBuffer& fontBuffer_)
     : fontBuffer(fontBuffer_) {
 }
 
-void DebugBucket::render(Painter &painter, const StyleLayer & /*layer_desc*/,
-                         const TileID & /*id*/, const mat4 &matrix) {
+void DebugBucket::prepare() {
+}
+
+void DebugBucket::render(Painter& painter, const StyleLayer&, const TileID&, const mat4& matrix) {
     painter.renderDebugText(*this, matrix);
 }
 

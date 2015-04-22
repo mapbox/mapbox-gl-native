@@ -342,6 +342,9 @@ void LineBucket::addCurrentVertex(const Coordinate& currentVertex,
     e2 = e3;
 }
 
+void LineBucket::prepare() {
+}
+
 void LineBucket::render(Painter& painter,
                         const StyleLayer& layer_desc,
                         const TileID& id,
