@@ -4,6 +4,7 @@
 #include <mbgl/map/tile_id.hpp>
 #include <mbgl/map/update.hpp>
 #include <mbgl/map/environment.hpp>
+#include <mbgl/map/transform_state.hpp>
 #include <mbgl/util/ptr.hpp>
 
 #include <vector>
@@ -86,6 +87,7 @@ private:
     util::ptr<Style> style;
 
     size_t sourceCacheSize;
+    TransformState transformState;
 };
 
 }

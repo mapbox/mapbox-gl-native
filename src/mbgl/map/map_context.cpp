@@ -98,7 +98,7 @@ Worker& MapContext::getWorker() {
 
 util::ptr<Sprite> MapContext::getSprite() {
     assert(Environment::currentlyOn(ThreadType::Map));
-    const float pixelRatio = data.getTransformState().getPixelRatio();
+    const float pixelRatio = transformState.getPixelRatio();
     const std::string &sprite_url = style->getSpriteURL();
     if (!sprite || !sprite->hasPixelRatio(pixelRatio)) {
         sprite = std::make_shared<Sprite>(sprite_url, pixelRatio, env, [this] {
@@ -160,7 +160,7 @@ void MapContext::updateTiles() {
     assert(Environment::currentlyOn(ThreadType::Map));
     if (!style) return;
     for (const auto& source : style->sources) {
-        source->update(data, getWorker(), style, *glyphAtlas, *glyphStore, *spriteAtlas,
+        source->update(data, transformState, getWorker(), style, *glyphAtlas, *glyphStore, *spriteAtlas,
                        getSprite(), *texturePool, [this]() {
             assert(Environment::currentlyOn(ThreadType::Map));
             triggerUpdate();
@@ -192,7 +192,7 @@ void MapContext::update() {
         u |= static_cast<UpdateType>(Update::StyleInfo);
     }
 
-    data.setTransformState(data.transform.currentState());
+    transformState = data.transform.currentState();
 
     if (u & static_cast<UpdateType>(Update::StyleInfo)) {
         reloadStyle();
@@ -215,11 +215,11 @@ void MapContext::update() {
         if (u & static_cast<UpdateType>(Update::StyleInfo) ||
             u & static_cast<UpdateType>(Update::Classes) ||
             u & static_cast<UpdateType>(Update::Zoom)) {
-            style->recalculate(data.getTransformState().getNormalizedZoom(), now);
+            style->recalculate(transformState.getNormalizedZoom(), now);
         }
 
         // Allow the sprite atlas to potentially pull new sprite images if needed.
-        spriteAtlas->resize(data.getTransformState().getPixelRatio());
+        spriteAtlas->resize(transformState.getPixelRatio());
         spriteAtlas->setSprite(getSprite());
 
         updateTiles();
@@ -237,7 +237,7 @@ void MapContext::render() {
     assert(style);
     assert(painter);
 
-    painter->render(*style, data.getTransformState(), data.getAnimationTime());
+    painter->render(*style, transformState, data.getAnimationTime());
 
     if (data.mode == MapMode::Still && data.callback && style->isLoaded() && getSprite()->isLoaded()) {
         auto image = view.readStillImage();

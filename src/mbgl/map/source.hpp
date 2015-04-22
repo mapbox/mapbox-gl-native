@@ -64,6 +64,7 @@ public:
 
     void load(MapData&, Environment&, std::function<void()> callback);
     void update(MapData&,
+                const TransformState&,
                 Worker&,
                 util::ptr<Style>,
                 GlyphAtlas&,
@@ -95,6 +96,7 @@ private:
     std::forward_list<TileID> coveringTiles(const TransformState&) const;
 
     TileData::State addTile(MapData&,
+                            const TransformState&,
                             Worker&,
                             util::ptr<Style>,
                             GlyphAtlas&,

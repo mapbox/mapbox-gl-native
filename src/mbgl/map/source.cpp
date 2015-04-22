@@ -225,6 +225,7 @@ TileData::State Source::hasTile(const TileID& id) {
 }
 
 TileData::State Source::addTile(MapData& data,
+                                const TransformState& transformState,
                                 Worker& worker,
                                 util::ptr<Style> style,
                                 GlyphAtlas& glyphAtlas,
@@ -268,10 +269,10 @@ TileData::State Source::addTile(MapData& data,
             new_tile.data =
                 std::make_shared<VectorTileData>(normalized_id, data.transform.getMaxZoom(), style, glyphAtlas,
                                                  glyphStore, spriteAtlas, sprite, info);
-            new_tile.data->request(worker, data.getTransformState().getPixelRatio(), callback);
+            new_tile.data->request(worker, transformState.getPixelRatio(), callback);
         } else if (info.type == SourceType::Raster) {
             new_tile.data = std::make_shared<RasterTileData>(normalized_id, texturePool, info);
-            new_tile.data->request(worker, data.getTransformState().getPixelRatio(), callback);
+            new_tile.data->request(worker, transformState.getPixelRatio(), callback);
         } else if (info.type == SourceType::Annotations) {
             new_tile.data = std::make_shared<LiveTileData>(normalized_id, data.annotationManager,
                                                            data.transform.getMaxZoom(), style, glyphAtlas,
@@ -366,6 +367,7 @@ bool Source::findLoadedParent(const TileID& id, int32_t minCoveringZoom, std::fo
 }
 
 void Source::update(MapData& data,
+                    const TransformState& transformState,
                     Worker& worker,
                     util::ptr<Style> style,
                     GlyphAtlas& glyphAtlas,
@@ -378,8 +380,8 @@ void Source::update(MapData& data,
         return;
     }
 
-    int32_t zoom = std::floor(getZoom(data.getTransformState()));
-    std::forward_list<TileID> required = coveringTiles(data.getTransformState());
+    int32_t zoom = std::floor(getZoom(transformState));
+    std::forward_list<TileID> required = coveringTiles(transformState);
 
     // Determine the overzooming/underzooming amounts.
     int32_t minCoveringZoom = util::clamp<int32_t>(zoom - 10, info.min_zoom, info.max_zoom);
@@ -392,7 +394,7 @@ void Source::update(MapData& data,
 
     // Add existing child/parent tiles if the actual tile is not yet loaded
     for (const auto& id : required) {
-        const TileData::State state = addTile(data, worker, style, glyphAtlas, glyphStore,
+        const TileData::State state = addTile(data, transformState, worker, style, glyphAtlas, glyphStore,
                                               spriteAtlas, sprite, texturePool, id, callback);
 
         if (state != TileData::State::parsed) {
@@ -412,8 +414,8 @@ void Source::update(MapData& data,
     }
 
     if (info.type != SourceType::Raster && cache.getSize() == 0) {
-        size_t conservativeCacheSize = ((float)data.getTransformState().getWidth()  / util::tileSize) *
-                                       ((float)data.getTransformState().getHeight() / util::tileSize) *
+        size_t conservativeCacheSize = ((float)transformState.getWidth()  / util::tileSize) *
+                                       ((float)transformState.getHeight() / util::tileSize) *
                                        (data.transform.getMaxZoom() - data.transform.getMinZoom() + 1) *
                                        0.5;
         cache.setSize(conservativeCacheSize);

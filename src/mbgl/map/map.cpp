@@ -261,11 +261,11 @@ double Map::getMaxZoom() const {
 #pragma mark - Size
 
 uint16_t Map::getWidth() const {
-    return data->getTransformState().getWidth();
+    return data->transform.currentState().getWidth();
 }
 
 uint16_t Map::getHeight() const {
-    return data->getTransformState().getHeight();
+    return data->transform.currentState().getHeight();
 }
 
 
