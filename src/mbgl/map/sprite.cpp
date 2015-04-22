@@ -23,42 +23,15 @@ SpritePosition::SpritePosition(uint16_t x_, uint16_t y_, uint16_t width_, uint16
       sdf(sdf_) {
 }
 
-util::ptr<Sprite> Sprite::Create(const std::string &base_url, float pixelRatio, Environment &env) {
-    util::ptr<Sprite> sprite(std::make_shared<Sprite>(Key(), base_url, pixelRatio));
-    sprite->load(env);
-    return sprite;
-}
-
-Sprite::Sprite(const Key &, const std::string& base_url, float pixelRatio_)
-    : valid(base_url.length() > 0),
-      pixelRatio(pixelRatio_ > 1 ? 2 : 1),
-      spriteURL(base_url + (pixelRatio_ > 1 ? "@2x" : "") + ".png"),
-      jsonURL(base_url + (pixelRatio_ > 1 ? "@2x" : "") + ".json"),
+Sprite::Sprite(const std::string& baseUrl, float pixelRatio_, Environment& env, std::function<void ()> callback_)
+    : pixelRatio(pixelRatio_ > 1 ? 2 : 1),
       raster(),
       loadedImage(false),
       loadedJSON(false),
-      future(promise.get_future()) {
-}
+      future(promise.get_future()),
+      callback(callback_) {
 
-bool Sprite::hasPixelRatio(float ratio) const {
-    return pixelRatio == (ratio > 1 ? 2 : 1);
-}
-
-
-void Sprite::waitUntilLoaded() const {
-    future.wait();
-}
-
-Sprite::operator bool() const {
-    return valid && isLoaded() && !pos.empty();
-}
-
-
-// Note: This is a separate function that must be called exactly once after creation
-// The reason this isn't part of the constructor is that calling shared_from_this() in
-// the constructor fails.
-void Sprite::load(Environment &env) {
-    if (!valid) {
+    if (baseUrl.empty()) {
         // Treat a non-existent sprite as a successfully loaded empty sprite.
         loadedImage = true;
         loadedJSON = true;
@@ -66,39 +39,61 @@ void Sprite::load(Environment &env) {
         return;
     }
 
-    util::ptr<Sprite> sprite = shared_from_this();
+    std::string spriteURL(baseUrl + (pixelRatio_ > 1 ? "@2x" : "") + ".png");
+    std::string jsonURL(baseUrl + (pixelRatio_ > 1 ? "@2x" : "") + ".json");
 
-    env.request({ Resource::Kind::JSON, jsonURL }, [sprite](const Response &res) {
+    jsonRequest = env.request({ Resource::Kind::JSON, jsonURL }, [this](const Response &res) {
+        jsonRequest = nullptr;
         if (res.status == Response::Successful) {
-            sprite->body = res.data;
-            sprite->parseJSON();
+            body = res.data;
+            parseJSON();
         } else {
             Log::Warning(Event::Sprite, "Failed to load sprite info: %s", res.message.c_str());
         }
-        sprite->loadedJSON = true;
-        sprite->complete();
+        loadedJSON = true;
+        complete();
     });
 
-    env.request({ Resource::Kind::Image, spriteURL }, [sprite](const Response &res) {
+    spriteRequest = env.request({ Resource::Kind::Image, spriteURL }, [this](const Response &res) {
+        spriteRequest = nullptr;
         if (res.status == Response::Successful) {
-            sprite->image = res.data;
-            sprite->parseImage();
+            image = res.data;
+            parseImage();
         } else {
             Log::Warning(Event::Sprite, "Failed to load sprite image: %s", res.message.c_str());
         }
-        sprite->loadedImage = true;
-        sprite->complete();
+        loadedImage = true;
+        complete();
     });
+}
+
+Sprite::~Sprite() {
+    if (jsonRequest) {
+        jsonRequest->cancel();
+    }
+
+    if (spriteRequest) {
+        spriteRequest->cancel();
+    }
 }
 
 void Sprite::complete() {
     if (loadedImage && loadedJSON) {
         promise.set_value();
+        callback();
     }
 }
 
 bool Sprite::isLoaded() const {
     return loadedImage && loadedJSON;
+}
+
+void Sprite::waitUntilLoaded() const {
+    future.wait();
+}
+
+bool Sprite::hasPixelRatio(float ratio) const {
+    return pixelRatio == (ratio > 1 ? 2 : 1);
 }
 
 void Sprite::parseImage() {

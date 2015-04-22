@@ -4,6 +4,7 @@
 #include <mbgl/util/image.hpp>
 #include <mbgl/util/noncopyable.hpp>
 #include <mbgl/util/ptr.hpp>
+#include <mbgl/storage/request.hpp>
 
 #include <cstdint>
 #include <atomic>
@@ -15,6 +16,7 @@
 namespace mbgl {
 
 class Environment;
+class Request;
 
 class SpritePosition {
 public:
@@ -31,15 +33,10 @@ public:
     bool sdf = false;
 };
 
-class Sprite : public std::enable_shared_from_this<Sprite>, private util::noncopyable {
-private:
-    struct Key {};
-    void load(Environment &env);
-
+class Sprite : private util::noncopyable {
 public:
-    Sprite(const Key &, const std::string& base_url, float pixelRatio);
-    static util::ptr<Sprite>
-    Create(const std::string &base_url, float pixelRatio, Environment &env);
+    Sprite(const std::string& baseUrl, float pixelRatio, Environment&, std::function<void()> callback);
+    ~Sprite();
 
     const SpritePosition &getSpritePosition(const std::string& name) const;
 
@@ -48,15 +45,7 @@ public:
     void waitUntilLoaded() const;
     bool isLoaded() const;
 
-    operator bool() const;
-
-private:
-    const bool valid;
-
-public:
     const float pixelRatio;
-    const std::string spriteURL;
-    const std::string jsonURL;
     std::unique_ptr<util::Image> raster;
 
 private:
@@ -64,7 +53,6 @@ private:
     void parseImage();
     void complete();
 
-private:
     std::string body;
     std::string image;
     std::atomic<bool> loadedImage;
@@ -74,7 +62,10 @@ private:
 
     std::promise<void> promise;
     std::future<void> future;
+    std::function<void ()> callback;
 
+    Request* jsonRequest = nullptr;
+    Request* spriteRequest = nullptr;
 };
 
 }

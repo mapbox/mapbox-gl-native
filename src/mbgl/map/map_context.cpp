@@ -101,7 +101,10 @@ util::ptr<Sprite> MapContext::getSprite() {
     const float pixelRatio = data.getTransformState().getPixelRatio();
     const std::string &sprite_url = style->getSpriteURL();
     if (!sprite || !sprite->hasPixelRatio(pixelRatio)) {
-        sprite = Sprite::Create(sprite_url, pixelRatio, env);
+        sprite = std::make_shared<Sprite>(sprite_url, pixelRatio, env, [this] {
+            assert(Environment::currentlyOn(ThreadType::Map));
+            triggerUpdate();
+        });
     }
 
     return sprite;
