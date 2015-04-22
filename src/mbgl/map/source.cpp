@@ -156,7 +156,7 @@ void Source::load(const std::string& accessToken,
         d.Parse<0>(res.data.c_str());
 
         if (d.HasParseError()) {
-            Log::Warning(Event::General, "Invalid source TileJSON; Parse Error at %d: %s", d.GetErrorOffset(), d.GetParseError());
+            Log::Error(Event::General, "Invalid source TileJSON; Parse Error at %d: %s", d.GetErrorOffset(), d.GetParseError());
             return;
         }
 
