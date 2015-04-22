@@ -17,6 +17,7 @@
         '../platform/darwin/image.mm',
         '../platform/darwin/reachability.m',
         '../include/mbgl/ios/MapboxGL.h',
+        '../platform/ios/MapboxGL.m',
         '../include/mbgl/ios/MGLMapboxEvents.h',
         '../platform/ios/MGLMapboxEvents.m',
         '../include/mbgl/ios/MGLMapView.h',
