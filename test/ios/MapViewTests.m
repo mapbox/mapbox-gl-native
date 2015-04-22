@@ -76,9 +76,8 @@
                    0,
                    @"compass should not be visible when map is unrotated");
 
-    XCTAssertEqualObjects([NSValue valueWithCGAffineTransform:tester.compass.transform],
-                          [NSValue valueWithCGAffineTransform:CGAffineTransformIdentity],
-                          @"compass rotation should indicate map rotation");
+    XCTAssert(CGAffineTransformEqualToTransform(tester.compass.transform, CGAffineTransformIdentity),
+              @"compass rotation should indicate map rotation");
 }
 
 - (void)testDirectionReset {
@@ -100,9 +99,8 @@
                    0,
                    @"compass should not be visible when map is unrotated");
 
-    XCTAssertEqualObjects([NSValue valueWithCGAffineTransform:tester.compass.transform],
-                          [NSValue valueWithCGAffineTransform:CGAffineTransformIdentity],
-                          @"compass rotation should indicate map rotation");
+    XCTAssert(CGAffineTransformEqualToTransform(tester.compass.transform, CGAffineTransformIdentity),
+              @"compass rotation should indicate map rotation");
 }
 
 - (void)testZoom {

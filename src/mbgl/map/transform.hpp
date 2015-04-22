@@ -31,7 +31,7 @@ public:
     void moveBy(double dx, double dy, Duration = Duration::zero());
     void setLatLng(LatLng latLng, Duration = Duration::zero());
     void setLatLngZoom(LatLng latLng, double zoom, Duration = Duration::zero());
-    inline const LatLng getLatLng() const { return current.getLatLng(); }
+    inline const LatLng getLatLng() const { return state.getLatLng(); }
 
     // Zoom
     void scaleBy(double ds, double cx = -1, double cy = -1, Duration = Duration::zero());
@@ -58,7 +58,6 @@ public:
 
     // Transform state
     const TransformState currentState() const;
-    const TransformState finalState() const;
 
 private:
     // Functions prefixed with underscores will *not* perform any locks. It is the caller's
@@ -74,13 +73,7 @@ private:
 
     mutable std::recursive_mutex mtx;
 
-    // This reflects the current state of the transform, representing the actual position of the
-    // map. After calling a transform function with a timer, this will likely remain the same until
-    // you render a new frame.
-    TransformState current;
-
-    // This reflects the final position of the transform, after all possible transition took place.
-    TransformState final;
+    TransformState state;
 
     // Limit the amount of zooming possible on the map.
     const double min_scale = std::pow(2, 0);
