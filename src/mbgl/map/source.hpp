@@ -78,6 +78,7 @@ public:
     void finishRender(Painter &painter);
 
     std::forward_list<Tile *> getLoadedTiles() const;
+    const std::vector<Tile*>& getTiles() const;
 
     void setCacheSize(size_t);
     void onLowMemory();
@@ -103,6 +104,7 @@ private:
                             std::function<void()> callback);
 
     TileData::State hasTile(const TileID& id);
+    void updateTilePtrs();
 
     double getZoom(const TransformState &state) const;
 
@@ -112,6 +114,7 @@ private:
     TimePoint updated = TimePoint::min();
 
     std::map<TileID, std::unique_ptr<Tile>> tiles;
+    std::vector<Tile*> tilePtrs;
     std::map<TileID, std::weak_ptr<TileData>> tile_data;
     TileCache cache;
 };
