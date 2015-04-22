@@ -13,9 +13,9 @@ else:
     if sys.argv[2] == sys.argv[3]:
         tag = [0, 0, 0]
     else:
-	ver = re.sub("[^0-9.]", "", sys.argv[2])
+        ver = re.sub("[^0-9.]", "", sys.argv[2])
         tag = map(int, ver.split('.'))
-    rev = sys.argv[3][0:8]
+        rev = sys.argv[3][0:8]
 
 
 def mkdir_p(path):
