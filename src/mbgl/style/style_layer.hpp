@@ -35,6 +35,9 @@ public:
     // Determines whether this layer is the background layer.
     bool isBackground() const;
 
+    // Checks whether the layer is currently visible at all.
+    bool isVisible() const;
+
     // Updates the StyleProperties information in this layer by evaluating all
     // pending transitions and applied classes in order.
     void updateProperties(float z, TimePoint now, ZoomHistory &zoomHistory);

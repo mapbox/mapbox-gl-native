@@ -29,7 +29,6 @@ class Sprite;
 class TexturePool;
 class Style;
 class Painter;
-class StyleLayer;
 class TransformState;
 class Tile;
 struct ClipID;
@@ -76,7 +75,6 @@ public:
 
     void updateMatrices(const mat4 &projMatrix, const TransformState &transform);
     void drawClippingMasks(Painter &painter);
-    void render(Painter &painter, const StyleLayer &layer_desc);
     void finishRender(Painter &painter);
 
     std::forward_list<Tile *> getLoadedTiles() const;

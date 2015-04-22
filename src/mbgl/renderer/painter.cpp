@@ -235,8 +235,11 @@ void Painter::render(const Style& style, TransformState state_, TimePoint time) 
     // Actually render the layers
     if (debug::renderTree) { Log::Info(Event::Render, "{"); indent++; }
 
+    // Figure out what buckets we have to draw and what order we have to draw them in.
+    const auto order = determineRenderOrder(style);
+
     // TODO: Correctly compute the number of layers recursively beforehand.
-    float strata_thickness = 1.0f / (style.layers.size() + 1);
+    const float strata_thickness = 1.0f / (order.size() + 1);
 
     // - FIRST PASS ------------------------------------------------------------
     // Render everything top-to-bottom by using reverse iterators. Render opaque
@@ -246,10 +249,16 @@ void Painter::render(const Style& style, TransformState state_, TimePoint time) 
         Log::Info(Event::Render, "%*s%s", indent++ * 4, "", "OPAQUE {");
     }
     int i = 0;
-    for (auto it = style.layers.rbegin(), end = style.layers.rend(); it != end; ++it, ++i) {
-        setOpaque();
-        setStrata(i * strata_thickness);
-        renderLayer(**it);
+    setOpaque();
+    for (auto it = order.rbegin(), end = order.rend(); it != end; ++it, ++i) {
+        const auto& item = *it;
+        if (item.bucket && item.tile) {
+            setStrata(i * strata_thickness);
+            prepareTile(*item.tile);
+            item.bucket->render(*this, item.layer, item.tile->id, item.tile->matrix);
+        } else {
+            renderBackground(item.layer);
+        }
     }
     if (debug::renderTree) {
         Log::Info(Event::Render, "%*s%s", --indent * 4, "", "}");
@@ -262,10 +271,14 @@ void Painter::render(const Style& style, TransformState state_, TimePoint time) 
         Log::Info(Event::Render, "%*s%s", indent++ * 4, "", "TRANSLUCENT {");
     }
     --i;
-    for (auto it = style.layers.begin(), end = style.layers.end(); it != end; ++it, --i) {
-        setTranslucent();
-        setStrata(i * strata_thickness);
-        renderLayer(**it);
+    setTranslucent();
+    for (auto it = order.begin(), end = order.end(); it != end; ++it, --i) {
+        const auto& item = *it;
+        if (item.bucket && item.tile) {
+            setStrata(i * strata_thickness);
+            prepareTile(*item.tile);
+            item.bucket->render(*this, item.layer, item.tile->id, item.tile->matrix);
+        }
     }
     if (debug::renderTree) {
         Log::Info(Event::Render, "%*s%s", --indent * 4, "", "}");
@@ -282,76 +295,58 @@ void Painter::render(const Style& style, TransformState state_, TimePoint time) 
     }
 }
 
-void Painter::renderLayer(const StyleLayer &layer_desc) {
-    if (layer_desc.bucket->visibility == VisibilityType::None) return;
-    if (layer_desc.type == StyleLayerType::Background) {
-        // This layer defines a background color/image.
+std::vector<RenderItem> Painter::determineRenderOrder(const Style& style) {
+    std::vector<RenderItem> order;
 
-        if (debug::renderTree) {
-            Log::Info(Event::Render, "%*s- %s (%s)", indent * 4, "", layer_desc.id.c_str(),
-                    StyleLayerTypeClass(layer_desc.type).c_str());
+    for (const auto& layerPtr : style.layers) {
+        const auto& layer = *layerPtr;
+        if (layer.bucket->visibility == VisibilityType::None) continue;
+        if (layer.type == StyleLayerType::Background) {
+            // This layer defines a background color/image.
+            order.emplace_back(layer);
+            continue;
         }
 
-        renderBackground(layer_desc);
-    } else {
         // This is a singular layer.
-        if (!layer_desc.bucket) {
-            Log::Warning(Event::Render, "layer '%s' is missing bucket", layer_desc.id.c_str());
-            return;
+        if (!layer.bucket) {
+            Log::Warning(Event::Render, "layer '%s' is missing bucket", layer.id.c_str());
+            continue;
         }
 
-        if (!layer_desc.bucket->source) {
-            Log::Warning(Event::Render, "can't find source for layer '%s'", layer_desc.id.c_str());
-            return;
+        if (!layer.bucket->source) {
+            Log::Warning(Event::Render, "can't find source for layer '%s'", layer.id.c_str());
+            continue;
         }
 
         // Skip this layer if it's outside the range of min/maxzoom.
         // This may occur when there /is/ a bucket created for this layer, but the min/max-zoom
         // is set to a fractional value, or value that is larger than the source maxzoom.
         const double zoom = state.getZoom();
-        if (layer_desc.bucket->min_zoom > zoom ||
-            layer_desc.bucket->max_zoom <= zoom) {
-            return;
+        if (layer.bucket->min_zoom > zoom ||
+            layer.bucket->max_zoom <= zoom) {
+            continue;
         }
 
-        // Abort early if we can already deduce from the bucket type that
-        // we're not going to render anything anyway during this pass.
-        switch (layer_desc.type) {
-            case StyleLayerType::Fill:
-                if (!layer_desc.getProperties<FillProperties>().isVisible()) return;
-                break;
-            case StyleLayerType::Line:
-                if (pass == RenderPass::Opaque) return;
-                if (!layer_desc.getProperties<LineProperties>().isVisible()) return;
-                break;
-            case StyleLayerType::Symbol:
-                if (pass == RenderPass::Opaque) return;
-                if (!layer_desc.getProperties<SymbolProperties>().isVisible()) return;
-                break;
-            case StyleLayerType::Raster:
-                if (pass == RenderPass::Opaque) return;
-                if (!layer_desc.getProperties<RasterProperties>().isVisible()) return;
-                break;
-            default:
-                break;
+        // Don't include invisible layers.
+        if (!layer.isVisible()) {
+            continue;
         }
 
-        if (debug::renderTree) {
-            Log::Info(Event::Render, "%*s- %s (%s)", indent * 4, "", layer_desc.id.c_str(),
-                    StyleLayerTypeClass(layer_desc.type).c_str());
-        }
+        auto tiles = layer.bucket->source->getLoadedTiles();
+        for (auto tile : tiles) {
+            assert(tile);
+            if (!tile->data) {
+                continue;
+            }
 
-        layer_desc.bucket->source->render(*this, layer_desc);
+            auto bucket = tile->data->getBucket(layer);
+            if (bucket) {
+                order.emplace_back(layer, tile, bucket);
+            }
+        }
     }
-}
 
-void Painter::renderTileLayer(const Tile& tile, const StyleLayer &layer_desc, const mat4 &matrix) {
-    assert(tile.data);
-    if (tile.data->hasData(layer_desc) || layer_desc.type == StyleLayerType::Raster) {
-        gl::group group(std::string { "render " } + tile.data->name);
-        prepareTile(tile);
-        tile.data->render(*this, layer_desc, matrix);
-    }
+    return order;
 }
 
 void Painter::renderBackground(const StyleLayer &layer_desc) {

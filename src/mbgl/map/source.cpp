@@ -184,16 +184,6 @@ void Source::drawClippingMasks(Painter &painter) {
     }
 }
 
-void Source::render(Painter &painter, const StyleLayer &layer_desc) {
-    gl::group group(std::string { "layer: " } + layer_desc.id);
-    for (const auto& pair : tiles) {
-        Tile &tile = *pair.second;
-        if (tile.data && tile.data->state == TileData::State::parsed) {
-            painter.renderTileLayer(tile, layer_desc, tile.matrix);
-        }
-    }
-}
-
 void Source::finishRender(Painter &painter) {
     for (const auto& pair : tiles) {
         Tile &tile = *pair.second;

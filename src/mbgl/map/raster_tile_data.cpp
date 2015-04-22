@@ -23,10 +23,10 @@ void RasterTileData::parse() {
     }
 }
 
-void RasterTileData::render(Painter &painter, const StyleLayer &layer_desc, const mat4 &matrix) {
-    bucket.render(painter, layer_desc, id, matrix);
-}
-
-bool RasterTileData::hasData(StyleLayer const& /*layer_desc*/) const {
-    return bucket.hasData();
+Bucket* RasterTileData::getBucket(StyleLayer const&) {
+    if (bucket.hasData()) {
+        return &bucket;
+    } else {
+        return nullptr;
+    }
 }
