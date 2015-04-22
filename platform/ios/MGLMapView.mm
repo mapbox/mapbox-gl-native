@@ -242,7 +242,8 @@ mbgl::DefaultFileSource *mbglFileSource = nullptr;
 
     _glView.contentMode = UIViewContentModeCenter;
     
-    [self setBackgroundColor:[UIColor clearColor]];
+    self.backgroundColor = [UIColor clearColor];
+    self.clipsToBounds = YES;
 
     // load extensions
     //
