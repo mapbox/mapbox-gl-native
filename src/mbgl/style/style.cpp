@@ -86,4 +86,24 @@ void Style::loadJSON(const uint8_t *const data) {
     glyph_url = parser.getGlyphURL();
 }
 
+bool Style::isLoaded() const {
+    // TODO: move loading into Style
+//    if (!loaded) {
+//        return false;
+//    }
+
+    for (const auto& source : sources) {
+        if (!source->isLoaded()) {
+            return false;
+        }
+    }
+
+    // TODO: move sprite into Style
+//    if (sprite && !sprite.isLoaded()) {
+//        return false;
+//    }
+
+    return true;
+}
+
 }

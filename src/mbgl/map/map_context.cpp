@@ -236,7 +236,7 @@ void MapContext::render() {
 
     painter->render(*style, data.getTransformState(), data.getAnimationTime());
 
-    if (data.mode == MapMode::Still && data.callback /* && loaded() */) {
+    if (data.mode == MapMode::Still && data.callback && style->isLoaded() && getSprite()->isLoaded()) {
         auto image = view.readStillImage();
 
         // We are moving the callback out of the way and empty it in case the callback function

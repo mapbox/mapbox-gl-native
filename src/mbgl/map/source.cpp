@@ -118,6 +118,20 @@ Source::Source()
 
 Source::~Source() {}
 
+bool Source::isLoaded() const {
+    if (!loaded) {
+        return false;
+    }
+
+    for (const auto& tile : tiles) {
+        if (tile.second->data->state != TileData::State::parsed) {
+            return false;
+        }
+    }
+
+    return true;
+}
+
 // Note: This is a separate function that must be called exactly once after creation
 // The reason this isn't part of the constructor is that calling shared_from_this() in
 // the constructor fails.

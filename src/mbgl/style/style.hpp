@@ -24,6 +24,7 @@ public:
     ~Style();
 
     void loadJSON(const uint8_t *const data);
+    bool isLoaded() const;
 
     void cascade(const std::vector<std::string>&);
     void recalculate(float z, TimePoint now);

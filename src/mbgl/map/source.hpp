@@ -60,6 +60,7 @@ public:
     void load(const std::string& accessToken,
               Environment&,
               std::function<void()> callback);
+    bool isLoaded() const;
 
     void load(MapData&, Environment&, std::function<void()> callback);
     void update(MapData&,
