@@ -83,7 +83,7 @@ int main(int argc, char *argv[]) {
     HeadlessView view;
     Map map(view, fileSource);
 
-    map.start(Map::Mode::Static);
+    map.start(Map::Mode::Still);
 
     // Set access token if present
     if (token.size()) {

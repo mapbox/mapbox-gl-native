@@ -73,6 +73,8 @@ NSString *const MGLEventGestureRotateStart = @"Rotation";
 @property (atomic) NSUInteger flushAt;
 @property (atomic) NSDateFormatter *rfc3339DateFormatter;
 @property (atomic) CGFloat scale;
+@property (atomic) NSURLSession *session;
+@property (atomic) NSData *geoTrustCert;
 
 
 // The isPaused state tracker is only ever accessed from the main thread.
@@ -132,11 +134,31 @@ NSString *const MGLEventGestureRotateStart = @"Rotation";
         _serialQueue = dispatch_queue_create([[NSString stringWithFormat:@"%@.%@.events.serial", _appBundleId, uniqueID] UTF8String], DISPATCH_QUEUE_SERIAL);
 
         // Configure Events Infrastructure
+        // ===============================
+
+         _session = [NSURLSession sessionWithConfiguration:[NSURLSessionConfiguration defaultSessionConfiguration] delegate:self delegateQueue:nil];
+
+        // Load Local Copy of Server's Public Key
+        NSString *cerPath = nil;
+        NSArray *bundles = [NSBundle allFrameworks];
+        for (int lc = 0; lc < bundles.count; lc++) {
+            NSBundle *b = [bundles objectAtIndex:lc];
+            cerPath = [[NSBundle mainBundle] pathForResource:@"api_mapbox_com-geotrust" ofType:@"der"];
+            if (cerPath != nil) {
+                break;
+            }
+        }
+        if (cerPath != nil) {
+            _geoTrustCert = [NSData dataWithContentsOfFile:cerPath];
+        }
+
+        // Events Control
         _eventQueue = [[NSMutableArray alloc] init];
         _flushAt = 20;
         _flushAfter = 60;
         _token = nil;
         _instanceID = [[NSUUID UUID] UUIDString];
+
         // Dynamic detection of ASIdentifierManager from Mixpanel
         // https://github.com/mixpanel/mixpanel-iphone/blob/master/LICENSE
         _advertiserId = @"";
@@ -176,6 +198,9 @@ NSString *const MGLEventGestureRotateStart = @"Rotation";
         // Clear Any System TimeZone Cache
         [NSTimeZone resetSystemTimeZone];
         [_rfc3339DateFormatter setTimeZone:[NSTimeZone systemTimeZone]];
+        
+        // Enable Battery Monitoring
+        [UIDevice currentDevice].batteryMonitoringEnabled = YES;
         
         _isPaused = NO;
     }
@@ -303,7 +328,7 @@ NSString *const MGLEventGestureRotateStart = @"Rotation";
         [evt setValue:strongSelf.model forKey:@"model"];
         [evt setValue:strongSelf.iOSVersion forKey:@"operatingSystem"];
         [evt setValue:[strongSelf getDeviceOrientation] forKey:@"orientation"];
-        [evt setValue:@(100 * [UIDevice currentDevice].batteryLevel) forKey:@"batteryLevel"];
+        [evt setValue:@((int)(100 * [UIDevice currentDevice].batteryLevel)) forKey:@"batteryLevel"];
         [evt setValue:@(strongSelf.scale) forKey:@"resolution"];
         [evt setValue:strongSelf.carrier forKey:@"carrier"];
         
@@ -386,8 +411,8 @@ NSString *const MGLEventGestureRotateStart = @"Rotation";
 
     dispatch_async(dispatch_get_global_queue(DISPATCH_QUEUE_PRIORITY_BACKGROUND, 0), ^{
         MGLMapboxEvents *strongSelf = weakSelf;
-        if ( ! strongSelf) return;
-        
+        if (!strongSelf) return;
+
         // Setup URL Request
         NSString *url = [NSString stringWithFormat:@"%@/events/v1?access_token=%@", MGLMapboxEventsAPIBase, strongSelf.token];
         NSMutableURLRequest *request = [[NSMutableURLRequest alloc] initWithURL:[NSURL URLWithString:url]];
@@ -401,9 +426,8 @@ NSString *const MGLEventGestureRotateStart = @"Rotation";
             [request setHTTPBody:jsonData];
 
             // Send non blocking HTTP Request to server
-            [NSURLConnection sendAsynchronousRequest:request
-                                               queue:nil
-                                   completionHandler:nil];
+            NSURLSessionDataTask *task = [_session dataTaskWithRequest:request completionHandler: nil];
+            [task resume];
         }
     });
 }
@@ -642,6 +666,51 @@ NSString *const MGLEventGestureRotateStart = @"Rotation";
     }
 
     return result;
+}
+
+#pragma mark NSURLSessionDelegate
+- (void)URLSession:(NSURLSession *)session didReceiveChallenge:(NSURLAuthenticationChallenge *)challenge completionHandler:(void (^) (NSURLSessionAuthChallengeDisposition disposition, NSURLCredential *credential))completionHandler {
+
+    if([challenge.protectionSpace.authenticationMethod isEqualToString:NSURLAuthenticationMethodServerTrust]) {
+
+        SecTrustRef serverTrust = [[challenge protectionSpace] serverTrust];
+        NSString *domain = [[challenge protectionSpace] host];
+        SecTrustResultType trustResult;
+
+        // Validate the certificate chain with the device's trust store anyway
+        // This *might* give use revocation checking
+        SecTrustEvaluate(serverTrust, &trustResult);
+        if (trustResult == kSecTrustResultUnspecified)
+        {
+            // Look for a pinned certificate in the server's certificate chain
+            long numKeys = SecTrustGetCertificateCount(serverTrust);
+
+            BOOL found = false;
+            for (int lc = 0; lc < numKeys; lc++) {
+                SecCertificateRef certificate = SecTrustGetCertificateAtIndex(serverTrust, lc);
+                NSData *remoteCertificateData = CFBridgingRelease(SecCertificateCopyData(certificate));
+
+                // Compare Remote Key With Local Version
+                if ([remoteCertificateData isEqualToData:_geoTrustCert]) {
+                    // Found the certificate; continue connecting
+                    completionHandler(NSURLSessionAuthChallengeUseCredential, [NSURLCredential credentialForTrust:challenge.protectionSpace.serverTrust]);
+                    found = true;
+                    break;
+                }
+            }
+
+            if (!found) {
+                // The certificate wasn't found in the certificate chain; cancel the connection
+                completionHandler(NSURLSessionAuthChallengeCancelAuthenticationChallenge, [NSURLCredential credentialForTrust:challenge.protectionSpace.serverTrust]);
+            }
+        }
+        else
+        {
+            // Certificate chain validation failed; cancel the connection
+            completionHandler(NSURLSessionAuthChallengeCancelAuthenticationChallenge, [NSURLCredential credentialForTrust:challenge.protectionSpace.serverTrust]);
+        }
+    }
+    
 }
 
 @end
