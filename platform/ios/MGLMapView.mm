@@ -1701,6 +1701,8 @@ CLLocationCoordinate2D latLngToCoordinate(mbgl::LatLng latLng)
         }
         
         self.userLocationAnnotationView = [[MGLUserLocationAnnotationView alloc] initInMapView:self];
+        self.userLocationAnnotationView.autoresizingMask = (UIViewAutoresizingFlexibleLeftMargin | UIViewAutoresizingFlexibleRightMargin |
+                                                            UIViewAutoresizingFlexibleTopMargin | UIViewAutoresizingFlexibleBottomMargin);
         
         self.locationManager = [CLLocationManager new];
         

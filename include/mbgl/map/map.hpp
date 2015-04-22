@@ -51,7 +51,7 @@ public:
     enum class Mode : uint8_t {
         None, // we're not doing any processing
         Continuous, // continually updating map
-        Static, // a once-off static image.
+        Still, // a once-off still image.
     };
 
     explicit Map(View&, FileSource&);
