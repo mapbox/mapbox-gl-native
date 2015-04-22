@@ -55,10 +55,6 @@ bool Painter::needsAnimation() const {
 }
 
 void Painter::setup() {
-#if defined(DEBUG)
-    util::stopwatch stopwatch("painter setup");
-#endif
-
     // Enable GL debugging
     if ((gl::DebugMessageControl != nullptr) && (gl::DebugMessageCallback != nullptr)) {
         // This will enable all messages including performance hints
