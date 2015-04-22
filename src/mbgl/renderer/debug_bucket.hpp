@@ -17,7 +17,6 @@ public:
 
     void render(Painter &painter, const StyleLayer &layer_desc, const TileID &id,
                 const mat4 &matrix) override;
-    bool hasData() const override;
 
     void drawLines(PlainShader& shader);
     void drawPoints(PlainShader& shader);

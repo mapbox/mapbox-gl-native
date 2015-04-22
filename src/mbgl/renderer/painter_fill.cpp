@@ -15,9 +15,6 @@
 using namespace mbgl;
 
 void Painter::renderFill(FillBucket& bucket, const StyleLayer &layer_desc, const TileID& id, const mat4 &matrix) {
-    // Abort early.
-    if (!bucket.hasData()) return;
-
     const FillProperties &properties = layer_desc.getProperties<FillProperties>();
     mat4 vtxMatrix = translatedMatrix(matrix, properties.translate, id, properties.translateAnchor);
 

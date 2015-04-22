@@ -57,7 +57,7 @@ public:
 
     void render(Painter &painter, const StyleLayer &layer_desc, const TileID &id,
                 const mat4 &matrix) override;
-    bool hasData() const override;
+    bool hasData() const;
     bool hasTextData() const;
     bool hasIconData() const;
 

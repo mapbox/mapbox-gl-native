@@ -60,9 +60,7 @@ Bucket* VectorTileData::getBucket(StyleLayer const& layer) {
         const auto it = buckets.find(layer.bucket->name);
         if (it != buckets.end()) {
             assert(it->second);
-            if (it->second->hasData()) {
-                return it->second.get();
-            }
+            return it->second.get();
         }
     }
     return nullptr;
