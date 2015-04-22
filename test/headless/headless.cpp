@@ -86,7 +86,7 @@ TEST_P(HeadlessTest, render) {
                 }
             }
 
-            if (source->value.HasMember("url")) {
+            if (source->value.HasMember("url") && source->value["url"].IsString()) {
                 rewriteLocalScheme(source->value["url"], styleDoc.GetAllocator());
             }
         }
