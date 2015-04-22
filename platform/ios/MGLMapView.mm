@@ -294,9 +294,9 @@ mbgl::DefaultFileSource *mbglFileSource = nullptr;
 
     // setup logo bug
     //
-    _logoBug = [[UIImageView alloc] initWithImage:[MGLMapView resourceImageNamed:@"mapbox.png"]];
+    UIImage *logo = [[MGLMapView resourceImageNamed:@"mapbox.png"] imageWithAlignmentRectInsets:UIEdgeInsetsMake(1.5, 4, 3.5, 2)];
+    _logoBug = [[UIImageView alloc] initWithImage:logo];
     _logoBug.accessibilityLabel = @"Mapbox logo";
-    _logoBug.frame = CGRectMake(8, self.bounds.size.height - _logoBug.bounds.size.height - 4, _logoBug.bounds.size.width, _logoBug.bounds.size.height);
     _logoBug.translatesAutoresizingMaskIntoConstraints = NO;
     [self addSubview:_logoBug];
 
@@ -305,7 +305,6 @@ mbgl::DefaultFileSource *mbglFileSource = nullptr;
     _attributionButton = [UIButton buttonWithType:UIButtonTypeInfoLight];
     _attributionButton.accessibilityLabel = @"Attribution info";
     [_attributionButton addTarget:self action:@selector(showAttribution:) forControlEvents:UIControlEventTouchUpInside];
-    _attributionButton.frame = CGRectMake(self.bounds.size.width - _attributionButton.bounds.size.width - 8, self.bounds.size.height - _attributionButton.bounds.size.height - 8, _attributionButton.bounds.size.width, _attributionButton.bounds.size.height);
     _attributionButton.translatesAutoresizingMaskIntoConstraints = NO;
     [self addSubview:_attributionButton];
 
@@ -316,7 +315,7 @@ mbgl::DefaultFileSource *mbglFileSource = nullptr;
     UIImage *compassImage = [MGLMapView resourceImageNamed:@"Compass.png"];
     _compass.frame = CGRectMake(0, 0, compassImage.size.width, compassImage.size.height);
     _compass.alpha = 0;
-    UIView *container = [[UIView alloc] initWithFrame:CGRectMake(self.bounds.size.width - compassImage.size.width - 5, 5, compassImage.size.width, compassImage.size.height)];
+    UIView *container = [[UIView alloc] initWithFrame:CGRectZero];
     [container addSubview:_compass];
     container.translatesAutoresizingMaskIntoConstraints = NO;
     [container addGestureRecognizer:[[UITapGestureRecognizer alloc] initWithTarget:self action:@selector(handleCompassTapGesture:)]];
@@ -558,7 +557,7 @@ mbgl::DefaultFileSource *mbglFileSource = nullptr;
                                          toItem:self.logoBug
                                       attribute:NSLayoutAttributeBaseline
                                      multiplier:1
-                                       constant:4]];
+                                       constant:8]];
     }
     [constraintParentView addConstraint:
      [NSLayoutConstraint constraintWithItem:self
@@ -567,7 +566,7 @@ mbgl::DefaultFileSource *mbglFileSource = nullptr;
                                      toItem:self.logoBug
                                   attribute:NSLayoutAttributeBaseline
                                  multiplier:1
-                                   constant:4]];
+                                   constant:8]];
 
     [constraintParentView addConstraint:
      [NSLayoutConstraint constraintWithItem:self.logoBug
