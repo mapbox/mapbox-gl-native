@@ -67,6 +67,7 @@ public:
         return buffer;
     }
 
+    // Uploads the buffer to the GPU to be available when we need it.
     inline void upload() {
         if (!buffer) {
             bind();

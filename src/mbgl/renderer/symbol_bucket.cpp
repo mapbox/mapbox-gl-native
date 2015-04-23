@@ -37,6 +37,17 @@ SymbolBucket::~SymbolBucket() {
 }
 
 void SymbolBucket::prepare() {
+    if (hasTextData()) {
+        text.vertices.upload();
+        text.triangles.upload();
+    }
+    if (hasIconData()) {
+        icon.vertices.upload();
+        icon.triangles.upload();
+    }
+
+    // From now on, we're going to render during the opaque and translucent pass.
+    renderPass = RenderPass::Translucent;
 }
 
 void SymbolBucket::render(Painter& painter,

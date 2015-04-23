@@ -14,6 +14,9 @@ RasterBucket::RasterBucket(TexturePool& texturePool, const StyleLayoutRaster& la
 }
 
 void RasterBucket::prepare() {
+    if (hasData()) {
+        raster.upload();
+    }
 }
 
 void RasterBucket::render(Painter& painter,

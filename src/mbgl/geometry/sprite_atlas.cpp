@@ -230,6 +230,12 @@ void SpriteAtlas::setSprite(util::ptr<Sprite> sprite_) {
     });
 }
 
+void SpriteAtlas::upload() {
+    if (dirty) {
+        bind();
+    }
+}
+
 void SpriteAtlas::bind(bool linear) {
     bool first = false;
     if (!texture) {

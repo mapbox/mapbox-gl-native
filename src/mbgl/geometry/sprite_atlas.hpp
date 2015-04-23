@@ -50,9 +50,12 @@ public:
 
     SpriteAtlasPosition getPosition(const std::string& name, bool repeating = false);
 
-    // Binds the image buffer of this sprite atlas to the GPU, and uploads data if it is out
-    // of date.
+    // Binds the atlas texture to the GPU, and uploads data if it is out of date.
     void bind(bool linear = false);
+
+    // Uploads the texture to the GPU to be available when we need it. This is a lazy operation;
+    // the texture is only bound when the data is out of date (=dirty).
+    void upload();
 
     inline float getWidth() const { return width; }
     inline float getHeight() const { return height; }

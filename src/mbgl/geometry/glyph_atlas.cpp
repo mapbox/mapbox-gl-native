@@ -140,6 +140,12 @@ void GlyphAtlas::removeGlyphs(uintptr_t tileUID) {
     }
 }
 
+void GlyphAtlas::upload() {
+    if (dirty) {
+        bind();
+    }
+}
+
 void GlyphAtlas::bind() {
     if (!texture) {
         MBGL_CHECK_ERROR(glGenTextures(1, &texture));

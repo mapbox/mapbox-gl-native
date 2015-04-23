@@ -129,6 +129,12 @@ LinePatternPos LineAtlas::addDash(const std::vector<float> &dasharray, bool roun
     return position;
 };
 
+void LineAtlas::upload() {
+    if (dirty) {
+        bind();
+    }
+}
+
 void LineAtlas::bind() {
     std::lock_guard<std::recursive_mutex> lock(mtx);
 
