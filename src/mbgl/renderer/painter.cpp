@@ -218,7 +218,7 @@ void Painter::render(const Style& style, TransformState state_, TimePoint time) 
         }
     }
 
-    // - PREPARATION PASS --------------------------------------------------------------------------
+    // - UPLOAD PASS -------------------------------------------------------------------------------
     // Uploads all required buffers and images before we do any actual rendering.
 
     // Figure out what buckets we have to draw and what order we have to draw them in.
@@ -231,8 +231,8 @@ void Painter::render(const Style& style, TransformState state_, TimePoint time) 
     glyphAtlas.upload();
 
     for (const auto& item : order) {
-        if (item.bucket && item.bucket->hasRenderPass(RenderPass::Prepare)) {
-            item.bucket->prepare();
+        if (item.bucket && item.bucket->needsUpload()) {
+            item.bucket->upload();
         }
     }
 
@@ -272,7 +272,7 @@ void Painter::render(const Style& style, TransformState state_, TimePoint time) 
     for (auto it = order.rbegin(), end = order.rend(); it != end; ++it, ++i) {
         const auto& item = *it;
         if (item.bucket && item.tile) {
-            if (item.bucket->hasRenderPass(RenderPass::Opaque)) {
+            if (item.hasRenderPass(RenderPass::Opaque)) {
                 setStrata(i * strata_thickness);
                 prepareTile(*item.tile);
                 item.bucket->render(*this, item.layer, item.tile->id, item.tile->matrix);
@@ -296,7 +296,7 @@ void Painter::render(const Style& style, TransformState state_, TimePoint time) 
     for (auto it = order.begin(), end = order.end(); it != end; ++it, --i) {
         const auto& item = *it;
         if (item.bucket && item.tile) {
-            if (item.bucket->hasRenderPass(RenderPass::Translucent)) {
+            if (item.hasRenderPass(RenderPass::Translucent)) {
                 setStrata(i * strata_thickness);
                 prepareTile(*item.tile);
                 item.bucket->render(*this, item.layer, item.tile->id, item.tile->matrix);
@@ -360,6 +360,9 @@ std::vector<RenderItem> Painter::determineRenderOrder(const Style& style) {
             continue;
         }
 
+        // Determine what render passes we need for this layer.
+        const RenderPass passes = determineRenderPasses(layer);
+
         const auto& tiles = layer.bucket->source->getTiles();
         for (auto tile : tiles) {
             assert(tile);
@@ -369,12 +372,34 @@ std::vector<RenderItem> Painter::determineRenderOrder(const Style& style) {
 
             auto bucket = tile->data->getBucket(layer);
             if (bucket) {
-                order.emplace_back(layer, tile, bucket);
+                order.emplace_back(layer, tile, bucket, passes);
             }
         }
     }
 
     return order;
+}
+
+RenderPass Painter::determineRenderPasses(const StyleLayer& layer) {
+    RenderPass passes = RenderPass::None;
+
+    if (layer.properties.is<FillProperties>()) {
+        const FillProperties &properties = layer.properties.get<FillProperties>();
+        const float alpha = properties.fill_color[3] * properties.opacity;
+
+        if (properties.antialias) {
+            passes |= RenderPass::Translucent;
+        }
+        if (properties.image.from.size() || alpha < 1.0f) {
+            passes |= RenderPass::Translucent;
+        } else {
+            passes |= RenderPass::Opaque;
+        }
+    } else {
+        passes |= RenderPass::Translucent;
+    }
+
+    return passes;
 }
 
 void Painter::renderBackground(const StyleLayer &layer_desc) {

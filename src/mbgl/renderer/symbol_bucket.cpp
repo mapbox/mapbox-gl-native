@@ -36,7 +36,7 @@ SymbolBucket::~SymbolBucket() {
     // Do not remove. header file only contains forward definitions to unique pointers.
 }
 
-void SymbolBucket::prepare() {
+void SymbolBucket::upload() {
     if (hasTextData()) {
         text.vertices.upload();
         text.triangles.upload();
@@ -46,8 +46,7 @@ void SymbolBucket::prepare() {
         icon.triangles.upload();
     }
 
-    // From now on, we're going to render during the opaque and translucent pass.
-    renderPass = RenderPass::Translucent;
+    uploaded = true;
 }
 
 void SymbolBucket::render(Painter& painter,

@@ -342,12 +342,12 @@ void LineBucket::addCurrentVertex(const Coordinate& currentVertex,
     e2 = e3;
 }
 
-void LineBucket::prepare() {
+void LineBucket::upload() {
     vertexBuffer.upload();
     triangleElementsBuffer.upload();
 
     // From now on, we're only going to render during the translucent pass.
-    renderPass = RenderPass::Translucent;
+    uploaded = true;
 }
 
 void LineBucket::render(Painter& painter,

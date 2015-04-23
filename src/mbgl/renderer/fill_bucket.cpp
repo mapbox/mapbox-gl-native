@@ -200,15 +200,13 @@ void FillBucket::tessellate() {
     lineGroup.vertex_length += total_vertex_count;
 }
 
-void FillBucket::prepare() {
+void FillBucket::upload() {
     vertexBuffer.upload();
     triangleElementsBuffer.upload();
     lineElementsBuffer.upload();
 
     // From now on, we're going to render during the opaque and translucent pass.
-    renderPass = static_cast<RenderPass>(
-        static_cast<std::underlying_type<RenderPass>::type>(RenderPass::Opaque) |
-        static_cast<std::underlying_type<RenderPass>::type>(RenderPass::Translucent));
+    uploaded = true;
 }
 
 void FillBucket::render(Painter& painter,
