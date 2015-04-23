@@ -30,11 +30,11 @@
 
 namespace mbgl {
 
-MapContext::MapContext(uv_loop_t* loop, Environment& env_, View& view_, MapData& data_, bool startPaused)
-    : env(env_),
-      view(view_),
+MapContext::MapContext(uv_loop_t* loop, View& view_, FileSource& fileSource, MapData& data_, bool startPaused)
+    : view(view_),
       data(data_),
-      mapScope(env, ThreadType::Map, "Map"),
+      env(fileSource),
+      envScope(env, ThreadType::Map, "Map"),
       updated(static_cast<UpdateType>(Update::Nothing)),
       asyncUpdate(util::make_unique<uv::async>(loop, [this] { update(); })),
       workers(util::make_unique<Worker>(loop, 4)),

@@ -8,9 +8,6 @@
 #include <mbgl/util/ptr.hpp>
 
 #include <vector>
-#include <queue>
-#include <future>
-#include <thread>
 
 typedef struct uv_loop_s uv_loop_t;
 
@@ -20,7 +17,6 @@ class async;
 
 namespace mbgl {
 
-class Environment;
 class View;
 class MapData;
 class GlyphStore;
@@ -38,7 +34,7 @@ struct LatLngBounds;
 
 class MapContext {
 public:
-    MapContext(uv_loop_t*, Environment&, View&, MapData&, bool startPaused);
+    MapContext(uv_loop_t*, View&, FileSource&, MapData&, bool startPaused);
     ~MapContext();
 
     void pause();
@@ -72,11 +68,11 @@ private:
     // Loads the actual JSON object an creates a new Style object.
     void loadStyleJSON(const std::string& json, const std::string& base);
 
-    Environment& env;
     View& view;
     MapData& data;
 
-    EnvironmentScope mapScope;
+    Environment env;
+    EnvironmentScope envScope;
 
     std::atomic<UpdateType> updated { static_cast<UpdateType>(Update::Nothing) };
     std::unique_ptr<uv::async> asyncUpdate;

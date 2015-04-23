@@ -1,5 +1,4 @@
 #include <mbgl/map/map.hpp>
-#include <mbgl/map/environment.hpp>
 #include <mbgl/map/map_context.hpp>
 #include <mbgl/map/view.hpp>
 #include <mbgl/map/map_data.hpp>
@@ -11,10 +10,8 @@
 namespace mbgl {
 
 Map::Map(View& view, FileSource& fileSource, MapMode mode, bool startPaused)
-    : env(util::make_unique<Environment>(fileSource)),
-      scope(util::make_unique<EnvironmentScope>(*env, ThreadType::Main, "Main")),
-      data(util::make_unique<MapData>(view, mode)),
-      context(util::make_unique<util::Thread<MapContext>>("Map", *env, view, *data, startPaused))
+    : data(util::make_unique<MapData>(view, mode)),
+      context(util::make_unique<util::Thread<MapContext>>("Map", view, fileSource, *data, startPaused))
 {
     view.initialize(this);
 }
@@ -24,7 +21,6 @@ Map::~Map() {
 }
 
 void Map::pause(bool waitForPause) {
-    assert(Environment::currentlyOn(ThreadType::Main));
     assert(data->mode == MapMode::Continuous);
 
     std::unique_lock<std::mutex> lockPause(data->mutexPause);
@@ -36,8 +32,6 @@ void Map::pause(bool waitForPause) {
 }
 
 void Map::resume() {
-    assert(Environment::currentlyOn(ThreadType::Main));
-
     data->condResume.notify_all();
 }
 
@@ -46,14 +40,10 @@ void Map::renderStill(StillImageCallback callback) {
 }
 
 void Map::renderSync() {
-    assert(Environment::currentlyOn(ThreadType::Main));
-
     context->invokeSync(&MapContext::render);
 }
 
 void Map::renderAsync() {
-    assert(Environment::currentlyOn(ThreadType::Main));
-
     context->invoke(&MapContext::render);
 }
 
@@ -248,12 +238,10 @@ const LatLng Map::latLngForPixel(const vec2<double> pixel) const {
 #pragma mark - Annotations
 
 void Map::setDefaultPointAnnotationSymbol(const std::string& symbol) {
-    assert(Environment::currentlyOn(ThreadType::Main));
     data->annotationManager.setDefaultPointAnnotationSymbol(symbol);
 }
 
 double Map::getTopOffsetPixelsForAnnotationSymbol(const std::string& symbol) {
-    assert(Environment::currentlyOn(ThreadType::Main));
     return context->invokeSync<double>(&MapContext::getTopOffsetPixelsForAnnotationSymbol, symbol);
 }
 
@@ -262,30 +250,25 @@ uint32_t Map::addPointAnnotation(const LatLng& point, const std::string& symbol)
 }
 
 std::vector<uint32_t> Map::addPointAnnotations(const std::vector<LatLng>& points, const std::vector<std::string>& symbols) {
-    assert(Environment::currentlyOn(ThreadType::Main));
     auto result = data->annotationManager.addPointAnnotations(points, symbols, *data);
     context->invoke(&MapContext::updateAnnotationTiles, result.first);
     return result.second;
 }
 
 void Map::removeAnnotation(uint32_t annotation) {
-    assert(Environment::currentlyOn(ThreadType::Main));
     removeAnnotations({ annotation });
 }
 
 void Map::removeAnnotations(const std::vector<uint32_t>& annotations) {
-    assert(Environment::currentlyOn(ThreadType::Main));
     auto result = data->annotationManager.removeAnnotations(annotations, *data);
     context->invoke(&MapContext::updateAnnotationTiles, result);
 }
 
 std::vector<uint32_t> Map::getAnnotationsInBounds(const LatLngBounds& bounds) {
-    assert(Environment::currentlyOn(ThreadType::Main));
     return data->annotationManager.getAnnotationsInBounds(bounds, *data);
 }
 
 LatLngBounds Map::getBoundsForAnnotations(const std::vector<uint32_t>& annotations) {
-    assert(Environment::currentlyOn(ThreadType::Main));
     return data->annotationManager.getBoundsForAnnotations(annotations);
 }
 
@@ -332,14 +315,11 @@ std::vector<std::string> Map::getClasses() const {
 }
 
 void Map::setDefaultTransitionDuration(Duration duration) {
-    assert(Environment::currentlyOn(ThreadType::Main));
-
     data->setDefaultTransitionDuration(duration);
     update(Update::DefaultTransitionDuration);
 }
 
 Duration Map::getDefaultTransitionDuration() {
-    assert(Environment::currentlyOn(ThreadType::Main));
     return data->getDefaultTransitionDuration();
 }
 

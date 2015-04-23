@@ -18,8 +18,6 @@ namespace mbgl {
 
 class FileSource;
 class View;
-class Environment;
-class EnvironmentScope;
 class MapData;
 class MapContext;
 class StillImage;
@@ -136,10 +134,8 @@ public:
     bool getDebug() const;
 
 private:
-    const std::unique_ptr<Environment> env;
-    std::unique_ptr<EnvironmentScope> scope;
     const std::unique_ptr<MapData> data;
-    std::unique_ptr<util::Thread<MapContext>> context;
+    const std::unique_ptr<util::Thread<MapContext>> context;
 };
 
 }
