@@ -58,6 +58,7 @@ bool SpriteAtlas::resize(const float newRatio) {
 
         ::operator delete(old_data);
         dirty = true;
+        fullUploadRequired = true;
 
         // Mark all sprite images as in need of update
         for (const auto &pair : images) {
@@ -237,7 +238,6 @@ void SpriteAtlas::upload() {
 }
 
 void SpriteAtlas::bind(bool linear) {
-    bool first = false;
     if (!texture) {
         MBGL_CHECK_ERROR(glGenTextures(1, &texture));
         MBGL_CHECK_ERROR(glBindTexture(GL_TEXTURE_2D, texture));
@@ -248,7 +248,7 @@ void SpriteAtlas::bind(bool linear) {
         // We use those when the pixelRatio isn't a power of two, e.g. on iPhone 6 Plus.
         MBGL_CHECK_ERROR(glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_WRAP_S, GL_CLAMP_TO_EDGE));
         MBGL_CHECK_ERROR(glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_WRAP_T, GL_CLAMP_TO_EDGE));
-        first = true;
+        fullUploadRequired = true;
     } else {
         MBGL_CHECK_ERROR(glBindTexture(GL_TEXTURE_2D, texture));
     }
@@ -264,7 +264,7 @@ void SpriteAtlas::bind(bool linear) {
         std::lock_guard<std::recursive_mutex> lock(mtx);
         allocate();
 
-        if (first) {
+        if (fullUploadRequired) {
             MBGL_CHECK_ERROR(glTexImage2D(
                 GL_TEXTURE_2D, // GLenum target
                 0, // GLint level
@@ -276,6 +276,7 @@ void SpriteAtlas::bind(bool linear) {
                 GL_UNSIGNED_BYTE, // GLenum type
                 data // const GLvoid * data
             ));
+            fullUploadRequired = false;
         } else {
             MBGL_CHECK_ERROR(glTexSubImage2D(
                 GL_TEXTURE_2D, // GLenum target

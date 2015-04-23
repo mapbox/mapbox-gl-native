@@ -79,6 +79,7 @@ private:
     std::set<std::string> uninitialized;
     uint32_t *data = nullptr;
     std::atomic<bool> dirty;
+    bool fullUploadRequired = true;
     uint32_t texture = 0;
     uint32_t filter = 0;
     static const int buffer = 1;
