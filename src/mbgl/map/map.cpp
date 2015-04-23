@@ -3,33 +3,10 @@
 #include <mbgl/map/map_context.hpp>
 #include <mbgl/map/view.hpp>
 #include <mbgl/map/map_data.hpp>
-#include <mbgl/map/sprite.hpp>
-#include <mbgl/map/source.hpp>
-
-#include <mbgl/style/style.hpp>
-
-#include <mbgl/renderer/painter.hpp>
-
-#include <mbgl/text/glyph_store.hpp>
-
-#include <mbgl/geometry/glyph_atlas.hpp>
-#include <mbgl/geometry/sprite_atlas.hpp>
-#include <mbgl/geometry/line_atlas.hpp>
 
 #include <mbgl/util/std.hpp>
 #include <mbgl/util/projection.hpp>
-#include <mbgl/util/texture_pool.hpp>
-#include <mbgl/util/uv_detail.hpp>
-#include <mbgl/util/mapbox.hpp>
-#include <mbgl/util/exception.hpp>
-#include <mbgl/util/worker.hpp>
 #include <mbgl/util/thread.hpp>
-
-#include <algorithm>
-#include <iostream>
-
-#define _USE_MATH_DEFINES
-#include <cmath>
 
 namespace mbgl {
 

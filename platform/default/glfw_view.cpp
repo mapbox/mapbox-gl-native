@@ -3,6 +3,7 @@
 #include <mbgl/platform/log.hpp>
 
 #include <cassert>
+#include <pthread.h>
 
 pthread_once_t loadGLExtensions = PTHREAD_ONCE_INIT;
 

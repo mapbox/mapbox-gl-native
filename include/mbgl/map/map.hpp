@@ -12,10 +12,7 @@
 #include <string>
 #include <functional>
 #include <vector>
-#include <mutex>
-#include <condition_variable>
 #include <memory>
-#include <atomic>
 
 namespace mbgl {
 

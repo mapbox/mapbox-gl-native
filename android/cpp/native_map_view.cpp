@@ -17,6 +17,7 @@
 #include <mbgl/platform/gl.hpp>
 #include <mbgl/util/std.hpp>
 
+#include <pthread.h>
 
 pthread_once_t loadGLExtensions = PTHREAD_ONCE_INIT;
 
