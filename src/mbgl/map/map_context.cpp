@@ -113,8 +113,6 @@ util::ptr<Sprite> MapContext::getSprite() {
 void MapContext::reloadStyle() {
     assert(Environment::currentlyOn(ThreadType::Map));
 
-    style = std::make_shared<Style>();
-
     const auto styleInfo = data.getStyleInfo();
 
     if (!styleInfo.url.empty()) {
