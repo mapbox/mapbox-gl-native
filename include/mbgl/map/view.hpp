@@ -40,6 +40,9 @@ public:
 
     virtual void notify() = 0;
 
+    // Called from the render thread. The implementation should resize the framebuffer.
+    virtual void resize(uint16_t width, uint16_t height, float pixelRatio);
+
     // Called from the render thread. The implementation must trigger a rerender.
     // (i.e. either the passed render() function for rendering immediately on the map thread,
     // or map->renderSync() from the main thread must be called as a result of this)

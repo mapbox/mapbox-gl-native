@@ -45,8 +45,6 @@ public:
     void enableFps(bool enable);
     void updateFps();
 
-    void resize(uint16_t width, uint16_t height, float ratio, uint16_t fbWidth, uint16_t fbHeight);
-
 private:
     EGLConfig chooseConfig(const EGLConfig configs[], EGLint numConfigs);
 

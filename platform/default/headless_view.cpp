@@ -41,7 +41,9 @@ namespace mbgl {
 
 HeadlessView::HeadlessView(uint16_t width, uint16_t height, float pixelRatio)
     : display(std::make_shared<HeadlessDisplay>()) {
+    activate();
     resize(width, height, pixelRatio);
+    deactivate();
 }
 
 HeadlessView::HeadlessView(std::shared_ptr<HeadlessDisplay> display_,
@@ -49,7 +51,9 @@ HeadlessView::HeadlessView(std::shared_ptr<HeadlessDisplay> display_,
                            uint16_t height,
                            float pixelRatio)
     : display(display_) {
+    activate();
     resize(width, height, pixelRatio);
+    deactivate();
 }
 
 void HeadlessView::loadExtensions() {
@@ -155,8 +159,6 @@ HeadlessView::Dimensions::Dimensions(uint16_t width_, uint16_t height_, float pi
 }
 
 void HeadlessView::resize(const uint16_t width, const uint16_t height, const float pixelRatio) {
-    activate();
-
     dimensions = { width, height, pixelRatio };
 
     clearBuffers();
@@ -197,8 +199,6 @@ void HeadlessView::resize(const uint16_t width, const uint16_t height, const flo
         }
         throw std::runtime_error(error.str());
     }
-
-    deactivate();
 }
 
 std::unique_ptr<StillImage> HeadlessView::readStillImage() {

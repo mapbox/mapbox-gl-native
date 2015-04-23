@@ -85,6 +85,11 @@ void MapContext::pause() {
     view.activate();
 }
 
+void MapContext::resize(uint16_t width, uint16_t height, float ratio) {
+    view.resize(width, height, ratio);
+    triggerUpdate();
+}
+
 void MapContext::triggerUpdate(const Update u) {
     updated |= static_cast<UpdateType>(u);
     asyncUpdate->send();

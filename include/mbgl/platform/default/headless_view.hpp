@@ -29,11 +29,10 @@ public:
     HeadlessView(std::shared_ptr<HeadlessDisplay> display, uint16_t width = 256, uint16_t height = 256, float pixelRatio = 1);
     ~HeadlessView();
 
-    void resize(uint16_t width, uint16_t height, float pixelRatio);
-
     void activate() override;
     void deactivate() override;
     void notify() override;
+    void resize(uint16_t width, uint16_t height, float pixelRatio) override;
     void invalidate(std::function<void()> render) override;
     std::unique_ptr<StillImage> readStillImage() override;
 

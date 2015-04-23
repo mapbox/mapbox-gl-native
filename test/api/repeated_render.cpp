@@ -25,7 +25,7 @@ TEST(API, RepeatedRender) {
     Map map(view, fileSource, MapMode::Still);
 
     {
-        view.resize(128, 512, 1);
+        map.resize(128, 512, 1);
         map.setStyleJSON(style, "test/suite");
         std::promise<std::unique_ptr<const StillImage>> promise;
         map.renderStill([&promise](std::unique_ptr<const StillImage> image) {
@@ -39,7 +39,7 @@ TEST(API, RepeatedRender) {
     }
 
     {
-        view.resize(512, 512, 2);
+        map.resize(512, 512, 2);
         map.setStyleJSON(style, "TEST_DATA/suite");
         std::promise<std::unique_ptr<const StillImage>> promise;
         map.renderStill([&promise](std::unique_ptr<const StillImage> image) {

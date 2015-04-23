@@ -43,6 +43,8 @@ public:
     void pause();
     void render();
 
+    void resize(uint16_t width, uint16_t height, float ratio);
+
     // Notifies the Map thread that the state has changed and an update might be necessary.
     void triggerUpdate(Update = Update::Nothing);
 

@@ -131,7 +131,7 @@ std::string Map::getStyleJSON() const {
 
 void Map::resize(uint16_t width, uint16_t height, float ratio) {
     if (data->transform.resize(width, height, ratio, width * ratio, height * ratio)) {
-        triggerUpdate();
+        context->invoke(&MapContext::resize, width, height, ratio);
     }
 }
 
