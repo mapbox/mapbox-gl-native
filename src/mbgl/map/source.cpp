@@ -245,7 +245,7 @@ TileData::State Source::addTile(Map &map, Worker &worker,
     }
 
     if (!new_tile.data) {
-        new_tile.data = cache.get(id.to_uint64());
+        new_tile.data = cache.get(normalized_id.to_uint64());
     }
 
     if (!new_tile.data) {
@@ -418,7 +418,7 @@ void Source::update(Map &map,
         if (!obsolete) {
             retain_data.insert(tile.data->id);
         } else if (type != SourceType::Raster && tile.data->ready()) {
-            tileCache.add(tile.id.to_uint64(), tile.data);
+            tileCache.add(tile.id.normalized().to_uint64(), tile.data);
         }
         return obsolete;
     });
@@ -432,7 +432,7 @@ void Source::update(Map &map,
 
         bool obsolete = retain_data.find(tile->id) == retain_data.end();
         if (obsolete) {
-            if (!tileCache.has(tile->id.to_uint64())) {
+            if (!tileCache.has(tile->id.normalized().to_uint64())) {
                 tile->cancel();
             }
             return true;

@@ -15,8 +15,7 @@ function finish {
 trap finish EXIT
 
 # Install mason
-git submodule update --init .mason
-export PATH="`pwd`/.mason:${PATH}" MASON_DIR="`pwd`/.mason"
+. ./scripts/local_mason.sh
 
 case ${MASON_PLATFORM} in
     'ios')
