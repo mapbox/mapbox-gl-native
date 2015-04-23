@@ -5,6 +5,7 @@
 
 @interface MapboxGL : NSObject
 
-+ (void) sharedInstanceWithAccessToken:(NSString *)token;
++ (id) sharedInstanceWithAccessToken:(NSString *)token;
++ (NSString *) getAccessToken;
 
 @end

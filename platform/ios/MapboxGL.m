@@ -1,22 +1,24 @@
 #import <Foundation/Foundation.h>
 
 #import "MapboxGL.h"
+#import "NSProcessInfo+MGLAdditions.h"
 
 @interface MapboxGL()
 
+@property (atomic) NSString *accessToken;
+
 @end
 
-@property (atomic) NSString *accessToken;
 
 @implementation MapboxGL
 
+static MapboxGL *_sharedManager;
 
 // Can be called from any thread. Called implicitly from any
 // public class convenience methods.
 //
-+ (instancetype) sharedInstanceWithAccessToken:(NSString *)token {
++ (id) sharedInstanceWithAccessToken:(NSString *)token {
     static dispatch_once_t onceToken;
-    static MapboxGL *_sharedManager;
     dispatch_once(&onceToken, ^{
         if ( ! NSProcessInfo.processInfo.mgl_isInterfaceBuilderDesignablesAgent) {
             void (^setupBlock)() = ^{
@@ -34,6 +36,13 @@
         }
     });
     return _sharedManager;
+}
+
++ (NSString *) getAccessToken {
+    if (_sharedManager) {
+        return _sharedManager.accessToken;
+    }
+    return nil;
 }
 
 @end

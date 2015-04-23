@@ -25,6 +25,7 @@
 #import "SMCalloutView.h"
 
 #import "MGLMapboxEvents.h"
+#import "MapboxGL.h"
 
 #import <algorithm>
 
@@ -122,6 +123,7 @@ mbgl::DefaultFileSource *mbglFileSource = nullptr;
     if (self && [self commonInit])
     {
         self.styleURL = nil;
+        self.accessToken = [MapboxGL getAccessToken];
         return self;
     }
 

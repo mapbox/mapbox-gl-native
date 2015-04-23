@@ -20,6 +20,11 @@ IB_DESIGNABLE
 
 /** @name Initializing a Map View */
 
+/** Initialize a map view with the default style, given frame, and access token set in MapboxGL singleton.
+*   @param frame The frame with which to initialize the map view.
+*   @return An initialized map view, or `nil` if the map view was unable to be initialized. */
+- (instancetype)initWithFrame:(CGRect)frame;
+
 /** Initialize a map view with the default style and a given frame and access token.
 *   @param frame The frame with which to initialize the map view.
 *   @param accessToken A Mapbox API access token.
