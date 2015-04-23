@@ -74,7 +74,7 @@ private:
     Environment env;
     EnvironmentScope envScope;
 
-    std::atomic<UpdateType> updated { static_cast<UpdateType>(Update::Nothing) };
+    UpdateType updated { static_cast<UpdateType>(Update::Nothing) };
     std::unique_ptr<uv::async> asyncUpdate;
 
     std::unique_ptr<Worker> workers;

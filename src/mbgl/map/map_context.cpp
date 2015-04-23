@@ -188,27 +188,25 @@ void MapContext::update() {
     const auto now = Clock::now();
     data.setAnimationTime(now);
 
-    auto u = updated.exchange(static_cast<UpdateType>(Update::Nothing)) |
-             data.transform.updateTransitions(now);
-
+    updated |= data.transform.updateTransitions(now);
     transformState = data.transform.currentState();
 
-    if (u & static_cast<UpdateType>(Update::Debug)) {
+    if (updated & static_cast<UpdateType>(Update::Debug)) {
         assert(painter);
         painter->setDebug(data.getDebug());
     }
 
     if (style) {
-        if (u & static_cast<UpdateType>(Update::DefaultTransitionDuration)) {
+        if (updated & static_cast<UpdateType>(Update::DefaultTransitionDuration)) {
             style->setDefaultTransitionDuration(data.getDefaultTransitionDuration());
         }
 
-        if (u & static_cast<UpdateType>(Update::Classes)) {
+        if (updated & static_cast<UpdateType>(Update::Classes)) {
             style->cascade(data.getClasses());
         }
 
-        if (u & static_cast<UpdateType>(Update::Classes) ||
-            u & static_cast<UpdateType>(Update::Zoom)) {
+        if (updated & static_cast<UpdateType>(Update::Classes) ||
+            updated & static_cast<UpdateType>(Update::Zoom)) {
             style->recalculate(transformState.getNormalizedZoom(), now);
         }
 
@@ -220,6 +218,8 @@ void MapContext::update() {
 
         view.invalidate([this] { render(); });
     }
+
+    updated = static_cast<UpdateType>(Update::Nothing);
 }
 
 void MapContext::renderStill(StillImageCallback fn) {
