@@ -14,19 +14,18 @@ class RequestBase;
 
 struct DefaultFileRequest {
     const Resource resource;
-    uv_loop_t* loop;
     std::set<Request*> observers;
     RequestBase* request = nullptr;
 
-    DefaultFileRequest(const Resource& resource_, uv_loop_t* loop_)
-        : resource(resource_), loop(loop_) {}
+    DefaultFileRequest(const Resource& resource_)
+        : resource(resource_) {}
 };
 
 class DefaultFileSource::Impl {
 public:
     Impl(uv_loop_t*, FileCache*, const std::string& = "");
 
-    void add(Request*, uv_loop_t*);
+    void add(Request*);
     void cancel(Request*);
 
 private:
@@ -37,6 +36,7 @@ private:
     void notify(DefaultFileRequest*, std::shared_ptr<const Response>, FileCache::Hint);
 
     std::unordered_map<Resource, DefaultFileRequest, Resource::Hash> pending;
+    uv_loop_t* loop = nullptr;
     FileCache* cache = nullptr;
     const std::string assetRoot;
 };

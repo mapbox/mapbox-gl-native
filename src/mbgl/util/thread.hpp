@@ -76,8 +76,6 @@ public:
     // destroying the Thread.
     void pumpingStop(std::function<void ()>);
 
-    uv_loop_t* get() { return loop->get(); }
-
 private:
     Thread(const Thread&) = delete;
     Thread(Thread&&) = delete;

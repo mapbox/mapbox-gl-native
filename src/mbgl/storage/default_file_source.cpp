@@ -42,7 +42,7 @@ Request* DefaultFileSource::request(const Resource& resource,
 
     // This function can be called from any thread. Make sure we're executing the actual call in the
     // file source loop by sending it over the queue.
-    thread->invoke(&Impl::add, req, thread->get());
+    thread->invoke(&Impl::add, req);
 
     return req;
 }
@@ -61,8 +61,10 @@ void DefaultFileSource::cancel(Request *req) {
 
 // ----- Impl -----
 
-DefaultFileSource::Impl::Impl(uv_loop_t*, FileCache* cache_, const std::string& root)
-    : cache(cache_), assetRoot(root.empty() ? platform::assetRoot() : root) {
+DefaultFileSource::Impl::Impl(uv_loop_t* loop_, FileCache* cache_, const std::string& root)
+    : loop(loop_),
+      cache(cache_),
+      assetRoot(root.empty() ? platform::assetRoot() : root) {
 }
 
 DefaultFileRequest* DefaultFileSource::Impl::find(const Resource& resource) {
@@ -73,7 +75,7 @@ DefaultFileRequest* DefaultFileSource::Impl::find(const Resource& resource) {
     return nullptr;
 }
 
-void DefaultFileSource::Impl::add(Request* req, uv_loop_t* loop) {
+void DefaultFileSource::Impl::add(Request* req) {
     const Resource& resource = req->resource;
     DefaultFileRequest* request = find(resource);
 
@@ -82,7 +84,7 @@ void DefaultFileSource::Impl::add(Request* req, uv_loop_t* loop) {
         return;
     }
 
-    request = &pending.emplace(resource, DefaultFileRequest(resource, loop)).first->second;
+    request = &pending.emplace(resource, DefaultFileRequest(resource)).first->second;
     request->observers.insert(req);
 
     if (cache) {
@@ -128,9 +130,9 @@ void DefaultFileSource::Impl::startRealRequest(const Resource& resource, std::sh
     };
 
     if (algo::starts_with(resource.url, "asset://")) {
-        request->request = new AssetRequest(resource, callback, request->loop, assetRoot);
+        request->request = new AssetRequest(resource, callback, loop, assetRoot);
     } else {
-        request->request = new HTTPRequest(resource, callback, request->loop, response);
+        request->request = new HTTPRequest(resource, callback, loop, response);
     }
 }
 
