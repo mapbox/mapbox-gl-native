@@ -26,6 +26,7 @@
 #include <mbgl/util/worker.hpp>
 #include <mbgl/util/texture_pool.hpp>
 #include <mbgl/util/mapbox.hpp>
+#include <mbgl/util/exception.hpp>
 
 namespace mbgl {
 
@@ -226,6 +227,19 @@ void MapContext::update() {
     }
 }
 
+void MapContext::renderStill(StillImageCallback fn) {
+    if (data.mode != MapMode::Still) {
+        throw util::Exception("Map is not in still image render mode");
+    }
+
+    if (callback) {
+        throw util::Exception("Map is currently rendering an image");
+    }
+
+    callback = fn;
+    triggerUpdate(Update::RenderStill);
+}
+
 void MapContext::render() {
     assert(Environment::currentlyOn(ThreadType::Map));
 
@@ -237,16 +251,9 @@ void MapContext::render() {
 
     painter->render(*style, transformState, data.getAnimationTime());
 
-    if (data.mode == MapMode::Still && data.callback && style->isLoaded() && getSprite()->isLoaded()) {
-        auto image = view.readStillImage();
-
-        // We are moving the callback out of the way and empty it in case the callback function
-        // starts the next map image render.
-        MapData::StillImageCallback cb;
-        std::swap(cb, data.callback);
-
-        // Now we can finally invoke the callback function with the map image we rendered.
-        cb(std::move(image));
+    if (data.mode == MapMode::Still && callback && style->isLoaded() && getSprite()->isLoaded()) {
+        callback(view.readStillImage());
+        callback = nullptr;
     }
 
     // Schedule another rerender when we definitely need a next frame.

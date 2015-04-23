@@ -64,19 +64,8 @@ void Map::resume() {
     data->condResume.notify_all();
 }
 
-void Map::renderStill(StillImageCallback fn) {
-    assert(Environment::currentlyOn(ThreadType::Main));
-
-    if (data->mode != MapMode::Still) {
-        throw util::Exception("Map is not in still image render mode");
-    }
-
-    if (data->callback) {
-        throw util::Exception("Map is currently rendering an image");
-    }
-
-    data->callback = std::move(fn);
-    update(Update::RenderStill);
+void Map::renderStill(StillImageCallback callback) {
+    context->invoke(&MapContext::renderStill, callback);
 }
 
 void Map::renderSync() {

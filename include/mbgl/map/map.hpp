@@ -46,6 +46,8 @@ public:
     // Resumes a paused render thread
     void resume();
 
+    // Register a callback that will get called (on the render thread) when all resources have
+    // been loaded and a complete render occurs.
     using StillImageCallback = std::function<void(std::unique_ptr<const StillImage>)>;
     void renderStill(StillImageCallback callback);
 

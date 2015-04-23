@@ -32,6 +32,7 @@ class Painter;
 class Sprite;
 class Style;
 class Worker;
+class StillImage;
 struct LatLng;
 struct LatLngBounds;
 
@@ -45,7 +46,9 @@ public:
 
     void resize(uint16_t width, uint16_t height, float ratio);
 
-    // Notifies the Map thread that the state has changed and an update might be necessary.
+    using StillImageCallback = std::function<void(std::unique_ptr<const StillImage>)>;
+    void renderStill(StillImageCallback callback);
+
     void triggerUpdate(Update = Update::Nothing);
 
     void setStyleURL(const std::string&);
@@ -93,6 +96,7 @@ private:
     std::string styleURL;
     std::string styleJSON;
 
+    StillImageCallback callback;
     size_t sourceCacheSize;
     TransformState transformState;
 };

@@ -18,8 +18,6 @@
 
 namespace mbgl {
 
-class StillImage;
-
 class MapData {
     using Lock = std::lock_guard<std::mutex>;
 
@@ -101,9 +99,6 @@ public:
     std::mutex mutexPause;
     std::condition_variable condPaused;
     std::condition_variable condResume;
-
-    using StillImageCallback = std::function<void(std::unique_ptr<const StillImage>)>;
-    StillImageCallback callback;
 };
 
 }
