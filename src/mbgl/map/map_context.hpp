@@ -63,7 +63,6 @@ public:
     void onLowMemory();
 
 private:
-    Worker& getWorker();
     util::ptr<Sprite> getSprite();
     void updateTiles();
 

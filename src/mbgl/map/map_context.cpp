@@ -122,11 +122,6 @@ void MapContext::setStyleJSON(const std::string& json, const std::string& base) 
     loadStyleJSON(json, base);
 }
 
-Worker& MapContext::getWorker() {
-    assert(workers);
-    return *workers;
-}
-
 util::ptr<Sprite> MapContext::getSprite() {
     assert(Environment::currentlyOn(ThreadType::Map));
     const float pixelRatio = transformState.getPixelRatio();
@@ -168,7 +163,7 @@ void MapContext::updateTiles() {
     assert(Environment::currentlyOn(ThreadType::Map));
     if (!style) return;
     for (const auto& source : style->sources) {
-        source->update(data, transformState, getWorker(), style, *glyphAtlas, *glyphStore, *spriteAtlas,
+        source->update(data, transformState, *workers, style, *glyphAtlas, *glyphStore, *spriteAtlas,
                        getSprite(), *texturePool, [this]() {
             assert(Environment::currentlyOn(ThreadType::Map));
             triggerUpdate();
