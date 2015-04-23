@@ -51,6 +51,18 @@ public:
         });
     }
 
+    // Invoke fn() in the runloop thread, then invoke callback() in the current thread.
+    template <class Fn>
+    void invokeWithResult(Fn&& fn, std::function<void ()> callback) {
+        RunLoop* outer = current.get();
+        assert(outer);
+
+        invoke([fn, callback, outer] {
+            fn();
+            outer->invoke(std::move(callback));
+        });
+    }
+
     uv_loop_t* get() { return *loop; }
 
     static uv::tls<RunLoop> current;
