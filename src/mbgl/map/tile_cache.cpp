@@ -20,11 +20,16 @@ void TileCache::setSize(size_t size_) {
 
 void TileCache::add(uint64_t key, std::shared_ptr<TileData> data) {
 
-    assert(tiles.find(key) == tiles.end());
+    // insert new or query existing data
+    if (tiles.emplace(key, data).second) {
+        // remove existing data key
+        orderedKeys.remove(key);
+    }
 
-    tiles.emplace(key, data);
+    // (re-)insert data key as newest
     orderedKeys.push_back(key);
 
+    // purge oldest key/data if necessary
     if (orderedKeys.size() > size) {
         get(orderedKeys.front());
     }
