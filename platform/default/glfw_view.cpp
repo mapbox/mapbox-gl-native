@@ -6,24 +6,15 @@
 
 pthread_once_t loadGLExtensions = PTHREAD_ONCE_INIT;
 
-GLFWView::GLFWView(bool fullscreen_) : fullscreen(fullscreen_) {
-#ifdef NVIDIA
-    glDiscardFramebufferEXT = reinterpret_cast<PFNGLDISCARDFRAMEBUFFEREXTPROC>(glfwGetProcAddress("glDiscardFramebufferEXT"));
-#endif
-}
-
-GLFWView::~GLFWView() {
-    glfwDestroyWindow(window);
-    glfwTerminate();
-}
-
 void glfwError(int error, const char *description) {
     mbgl::Log::Error(mbgl::Event::OpenGL, "GLFW error (%i): %s", error, description);
     assert(false);
 }
 
-void GLFWView::initialize(mbgl::Map *map_) {
-    View::initialize(map_);
+GLFWView::GLFWView(bool fullscreen_) : fullscreen(fullscreen_) {
+#ifdef NVIDIA
+    glDiscardFramebufferEXT = reinterpret_cast<PFNGLDISCARDFRAMEBUFFEREXTPROC>(glfwGetProcAddress("glDiscardFramebufferEXT"));
+#endif
 
     glfwSetErrorCallback(glfwError);
 
@@ -64,10 +55,6 @@ void GLFWView::initialize(mbgl::Map *map_) {
     glfwSetWindowUserPointer(window, this);
     glfwMakeContextCurrent(window);
     glfwSwapInterval(1);
-
-    int width, height;
-    glfwGetWindowSize(window, &width, &height);
-    onResize(window, width, height);
 
     glfwSetCursorPosCallback(window, onMouseMove);
     glfwSetMouseButtonCallback(window, onMouseClick);
@@ -160,6 +147,19 @@ void GLFWView::initialize(mbgl::Map *map_) {
     });
 
     glfwMakeContextCurrent(nullptr);
+}
+
+GLFWView::~GLFWView() {
+    glfwDestroyWindow(window);
+    glfwTerminate();
+}
+
+void GLFWView::initialize(mbgl::Map *map_) {
+    View::initialize(map_);
+
+    int width, height;
+    glfwGetWindowSize(window, &width, &height);
+    onResize(window, width, height);
 }
 
 void GLFWView::onKey(GLFWwindow *window, int key, int /*scancode*/, int action, int mods) {
@@ -266,18 +266,10 @@ void GLFWView::onMouseMove(GLFWwindow *window, double x, double y) {
     view->lastY = y;
 }
 
-int GLFWView::run() {
-    map->start();
-
+void GLFWView::run() {
     while (!glfwWindowShouldClose(window)) {
         glfwWaitEvents();
     }
-
-    map->stop([]() {
-        glfwWaitEvents();
-    });
-
-    return 0;
 }
 
 void GLFWView::activate() {

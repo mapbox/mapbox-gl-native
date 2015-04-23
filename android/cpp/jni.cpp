@@ -256,20 +256,6 @@ void JNICALL nativeDestroySurface(JNIEnv *env, jobject obj, jlong nativeMapViewP
     nativeMapView->destroySurface();
 }
 
-void JNICALL nativeStart(JNIEnv *env, jobject obj, jlong nativeMapViewPtr) {
-    mbgl::Log::Debug(mbgl::Event::JNI, "nativeStart");
-    assert(nativeMapViewPtr != 0);
-    NativeMapView *nativeMapView = reinterpret_cast<NativeMapView *>(nativeMapViewPtr);
-    nativeMapView->start();
-}
-
-void JNICALL nativeStop(JNIEnv *env, jobject obj, jlong nativeMapViewPtr) {
-    mbgl::Log::Debug(mbgl::Event::JNI, "nativeStop");
-    assert(nativeMapViewPtr != 0);
-    NativeMapView *nativeMapView = reinterpret_cast<NativeMapView *>(nativeMapViewPtr);
-    nativeMapView->stop();
-}
-
 void JNICALL nativePause(JNIEnv *env, jobject obj, jlong nativeMapViewPtr) {
     mbgl::Log::Debug(mbgl::Event::JNI, "nativePause");
     assert(nativeMapViewPtr != 0);
@@ -932,8 +918,6 @@ extern "C" JNIEXPORT jint JNICALL JNI_OnLoad(JavaVM *vm, void *reserved) {
         {"nativeCreateSurface", "(JLandroid/view/Surface;)V",
          reinterpret_cast<void *>(&nativeCreateSurface)},
         {"nativeDestroySurface", "(J)V", reinterpret_cast<void *>(&nativeDestroySurface)},
-        {"nativeStart", "(J)V", reinterpret_cast<void *>(&nativeStart)},
-        {"nativeStop", "(J)V", reinterpret_cast<void *>(&nativeStop)},
         {"nativePause", "(J)V", reinterpret_cast<void *>(&nativePause)},
         {"nativeResume", "(J)V", reinterpret_cast<void *>(&nativeResume)},
         {"nativeUpdate", "(J)V", reinterpret_cast<void *>(&nativeUpdate)},

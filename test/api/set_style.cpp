@@ -16,13 +16,10 @@ TEST(API, SetStyle) {
 
     Log::setObserver(util::make_unique<FixtureLogObserver>());
 
-    Map map(view, fileSource);
-
-    map.start(MapMode::Still);
-
-    map.setStyleJSON("invalid", "test/suite");
-
-    map.stop();
+    {
+        Map map(view, fileSource, MapMode::Still);
+        map.setStyleJSON("invalid", "test/suite");
+    }
 
     auto observer = Log::removeObserver();
     auto flo = dynamic_cast<FixtureLogObserver*>(observer.get());

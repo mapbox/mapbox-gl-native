@@ -73,14 +73,6 @@ class NativeMapView {
         nativeDestroySurface(mNativeMapViewPtr);
     }
 
-    public void start() {
-        nativeStart(mNativeMapViewPtr);
-    }
-
-    public void stop() {
-        nativeStop(mNativeMapViewPtr);
-    }
-
     public void pause() {
         nativePause(mNativeMapViewPtr);
     }
@@ -385,10 +377,6 @@ class NativeMapView {
             Surface surface);
 
     private native void nativeDestroySurface(long nativeMapViewPtr);
-
-    private native void nativeStart(long nativeMapViewPtr);
-
-    private native void nativeStop(long nativeMapViewPtr);
 
     private native void nativePause(long nativeMapViewPtr);
 

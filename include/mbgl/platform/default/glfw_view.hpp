@@ -25,7 +25,7 @@ public:
     static void onMouseClick(GLFWwindow *window, int button, int action, int modifiers);
     static void onMouseMove(GLFWwindow *window, double x, double y);
 
-    int run();
+    void run();
     void fps();
 
 public:

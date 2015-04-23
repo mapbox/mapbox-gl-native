@@ -45,7 +45,6 @@ MapContext::MapContext(uv_loop_t* loop, Environment& env_, View& view_, MapData&
       painter(util::make_unique<Painter>(*spriteAtlas, *glyphAtlas, *lineAtlas))
 {
     assert(Environment::currentlyOn(ThreadType::Map));
-    assert(data.mode != MapMode::None);
 
     asyncUpdate->unref();
 

@@ -39,9 +39,6 @@ public:
     void createSurface(ANativeWindow *window);
     void destroySurface();
 
-    void start();
-    void stop();
-
     void resume();
     void pause(bool waitForPause = false);
 

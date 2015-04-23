@@ -30,7 +30,7 @@ class MapData {
     using Lock = std::lock_guard<std::mutex>;
 
 public:
-    inline MapData(View& view) : transform(view) {
+    inline MapData(View& view, MapMode mode_) : transform(view), mode(mode_) {
         setAnimationTime(TimePoint::min());
         setDefaultTransitionDuration(Duration::zero());
     }
@@ -100,7 +100,7 @@ public:
 public:
     Transform transform;
     AnnotationManager annotationManager;
-    MapMode mode = MapMode::None;
+    const MapMode mode;
 
 private:
     mutable std::mutex mtx;

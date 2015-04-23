@@ -35,18 +35,10 @@ class Map : private util::noncopyable {
     friend class View;
 
 public:
-    explicit Map(View&, FileSource&);
+    explicit Map(View&, FileSource&,
+                 MapMode mode = MapMode::Continuous,
+                 bool startPaused = false);
     ~Map();
-
-    // Start the map render thread. It is asynchronous.
-    void start(bool startPaused = false, MapMode mode = MapMode::Continuous);
-    inline void start(MapMode renderMode) { start(false, renderMode); }
-
-    // Stop the map render thread. This call will block until the map rendering thread stopped.
-    // The optional callback function will be invoked repeatedly until the map thread is stopped.
-    // The callback function should wait until it is woken up again by view.notify(), otherwise
-    // this will be a busy waiting loop.
-    void stop(std::function<void ()> callback = std::function<void ()>());
 
     // Pauses the render thread. The render thread will stop running but will not be terminated and will not lose state until resumed.
     void pause(bool waitForPause = false);
@@ -149,7 +141,6 @@ private:
 
     const std::unique_ptr<Environment> env;
     std::unique_ptr<EnvironmentScope> scope;
-    View &view;
     const std::unique_ptr<MapData> data;
     std::unique_ptr<util::Thread<MapContext>> context;
 };

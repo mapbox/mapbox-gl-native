@@ -144,11 +144,9 @@ TEST_P(HeadlessTest, render) {
 
         HeadlessView view(display, width, height, pixelRatio);
         DefaultFileSource fileSource(nullptr);
-        Map map(view, fileSource);
+        Map map(view, fileSource, MapMode::Still);
 
         map.resize(width, height, pixelRatio);
-        map.start(MapMode::Still);
-
         map.setClasses(classes);
         map.setStyleJSON(style, "test/suite");
         map.setLatLngZoom(mbgl::LatLng(latitude, longitude), zoom);
@@ -163,8 +161,6 @@ TEST_P(HeadlessTest, render) {
         });
 
         promise.get_future().get();
-
-        map.stop();
     }
 }
 

@@ -277,7 +277,9 @@ mbgl::DefaultFileSource *mbglFileSource = nullptr;
     mbglView = new MBGLView(self);
     mbglFileCache  = new mbgl::SQLiteCache(defaultCacheDatabase());
     mbglFileSource = new mbgl::DefaultFileSource(mbglFileCache);
-    mbglMap = new mbgl::Map(*mbglView, *mbglFileSource);
+
+    // Start paused on the IB canvas
+    mbglMap = new mbgl::Map(*mbglView, *mbglFileSource, mbgl::MapMode::Continuous, _isTargetingInterfaceBuilder);
     mbglMap->resize(self.bounds.size.width, self.bounds.size.height, _glView.contentScaleFactor);
 
     // Notify map object when network reachability status changes.
@@ -379,12 +381,6 @@ mbgl::DefaultFileSource *mbglFileSource = nullptr;
     //
     _regionChangeDelegateQueue = [NSOperationQueue new];
     _regionChangeDelegateQueue.maxConcurrentOperationCount = 1;
-
-    // start the main loop, but not on the IB canvas
-    if ( ! _isTargetingInterfaceBuilder)
-    {
-        mbglMap->start();
-    }
 
     // metrics: map load event
     const mbgl::LatLng latLng = mbglMap->getLatLng();
@@ -669,7 +665,7 @@ mbgl::DefaultFileSource *mbglFileSource = nullptr;
     self.glSnapshotView.image = self.glView.snapshot;
     self.glSnapshotView.hidden = NO;
 
-    mbglMap->stop();
+    mbglMap->pause();
 
     [self.glView deleteDrawable];
 }
@@ -680,7 +676,7 @@ mbgl::DefaultFileSource *mbglFileSource = nullptr;
 
     [self.glView bindDrawable];
 
-    mbglMap->start();
+    mbglMap->resume();
 }
 
 - (void)tintColorDidChange

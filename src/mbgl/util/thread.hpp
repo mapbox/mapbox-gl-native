@@ -89,7 +89,6 @@ private:
     std::promise<void> joinable;
 
     std::thread thread;
-    std::atomic_bool joined;
 
     Object* object;
     RunLoop* loop;
@@ -97,8 +96,7 @@ private:
 
 template <class Object>
 template <class... Args>
-Thread<Object>::Thread(const std::string& name, Args&&... args)
-    : joined(false) {
+Thread<Object>::Thread(const std::string& name, Args&&... args) {
     // Note: We're using std::tuple<> to store the arguments because GCC 4.9 has a bug
     // when expanding parameters packs captured in lambdas.
     std::tuple<Args...> params = std::forward_as_tuple(::std::forward<Args>(args)...);
@@ -137,7 +135,6 @@ void Thread<Object>::run(P&& params, index_sequence<I...>) {
     loop_.run();
 
     joinable.get_future().get();
-    joined = true;
 }
 
 template <class Object>
@@ -145,15 +142,6 @@ Thread<Object>::~Thread() {
     loop->stop();
     joinable.set_value();
     thread.join();
-}
-
-template <class Object>
-void Thread<Object>::pumpingStop(std::function<void ()> cb) {
-    loop->stop();
-    joinable.set_value();
-    while (!joined) {
-        cb();
-    }
 }
 
 }

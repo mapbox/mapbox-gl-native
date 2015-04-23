@@ -33,60 +33,22 @@
 
 namespace mbgl {
 
-Map::Map(View& view_, FileSource& fileSource_)
-    : env(util::make_unique<Environment>(fileSource_)),
+Map::Map(View& view, FileSource& fileSource, MapMode mode, bool startPaused)
+    : env(util::make_unique<Environment>(fileSource)),
       scope(util::make_unique<EnvironmentScope>(*env, ThreadType::Main, "Main")),
-      view(view_),
-      data(util::make_unique<MapData>(view_))
+      data(util::make_unique<MapData>(view, mode)),
+      context(util::make_unique<util::Thread<MapContext>>("Map", *env, view, *data, startPaused))
 {
     view.initialize(this);
 }
 
 Map::~Map() {
-    if (data->mode != MapMode::None) {
-        stop();
-    }
-}
-
-void Map::start(bool startPaused, MapMode renderMode) {
-    assert(Environment::currentlyOn(ThreadType::Main));
-    assert(data->mode == MapMode::None);
-
-    // When starting map rendering in another thread, we perform async/continuously
-    // updated rendering. Only in these cases, we attach the async handlers.
-    data->mode = renderMode;
-
-    context = util::make_unique<util::Thread<MapContext>>("Map", *env, view, *data, startPaused);
-    triggerUpdate();
-}
-
-void Map::stop(std::function<void ()> cb) {
-    assert(Environment::currentlyOn(ThreadType::Main));
-    assert(data->mode != MapMode::None);
-
     resume();
-
-    if (cb) {
-        // Wait until the render thread stopped. We are using this construct instead of plainly
-        // relying on the thread_join because the system might need to run things in the current
-        // thread that is required for the render thread to terminate correctly. This is for example
-        // the case with Cocoa's NSURLRequest. Otherwise, we will eventually deadlock because this
-        // thread (== main thread) is blocked. The callback function should use an efficient waiting
-        // function to avoid a busy waiting loop.
-        context->pumpingStop(cb);
-    }
-
-    // If a callback function was provided, this should return immediately because the thread has
-    // already finished executing.
-    context.reset();
-
-    data->mode = MapMode::None;
 }
 
 void Map::pause(bool waitForPause) {
     assert(Environment::currentlyOn(ThreadType::Main));
     assert(data->mode == MapMode::Continuous);
-    assert(context);
 
     std::unique_lock<std::mutex> lockPause(data->mutexPause);
     context->invoke(&MapContext::pause);
@@ -98,15 +60,12 @@ void Map::pause(bool waitForPause) {
 
 void Map::resume() {
     assert(Environment::currentlyOn(ThreadType::Main));
-    assert(data->mode != MapMode::None);
-    assert(context);
 
     data->condResume.notify_all();
 }
 
 void Map::renderStill(StillImageCallback fn) {
     assert(Environment::currentlyOn(ThreadType::Main));
-    assert(context);
 
     if (data->mode != MapMode::Still) {
         throw util::Exception("Map is not in still image render mode");
@@ -122,20 +81,17 @@ void Map::renderStill(StillImageCallback fn) {
 
 void Map::renderSync() {
     assert(Environment::currentlyOn(ThreadType::Main));
-    assert(context);
 
     context->invokeSync(&MapContext::render);
 }
 
 void Map::renderAsync() {
     assert(Environment::currentlyOn(ThreadType::Main));
-    assert(context);
 
     context->invoke(&MapContext::render);
 }
 
 void Map::update() {
-    assert(context);
     triggerUpdate();
 }
 
@@ -346,7 +302,6 @@ void Map::setDefaultPointAnnotationSymbol(const std::string& symbol) {
 
 double Map::getTopOffsetPixelsForAnnotationSymbol(const std::string& symbol) {
     assert(Environment::currentlyOn(ThreadType::Main));
-    assert(context);
     return context->invokeSync<double>(&MapContext::getTopOffsetPixelsForAnnotationSymbol, symbol);
 }
 
@@ -357,9 +312,7 @@ uint32_t Map::addPointAnnotation(const LatLng& point, const std::string& symbol)
 std::vector<uint32_t> Map::addPointAnnotations(const std::vector<LatLng>& points, const std::vector<std::string>& symbols) {
     assert(Environment::currentlyOn(ThreadType::Main));
     auto result = data->annotationManager.addPointAnnotations(points, symbols, *data);
-    if (context) {
-        context->invoke(&MapContext::updateAnnotationTiles, result.first);
-    }
+    context->invoke(&MapContext::updateAnnotationTiles, result.first);
     return result.second;
 }
 
@@ -371,9 +324,7 @@ void Map::removeAnnotation(uint32_t annotation) {
 void Map::removeAnnotations(const std::vector<uint32_t>& annotations) {
     assert(Environment::currentlyOn(ThreadType::Main));
     auto result = data->annotationManager.removeAnnotations(annotations, *data);
-    if (context) {
-        context->invoke(&MapContext::updateAnnotationTiles, result);
-    }
+    context->invoke(&MapContext::updateAnnotationTiles, result);
 }
 
 std::vector<uint32_t> Map::getAnnotationsInBounds(const LatLngBounds& bounds) {
@@ -441,22 +392,17 @@ Duration Map::getDefaultTransitionDuration() {
 }
 
 void Map::setSourceTileCacheSize(size_t size) {
-    assert(context);
     context->invoke(&MapContext::setSourceTileCacheSize, size);
 }
 
 void Map::onLowMemory() {
-    if (context) {
-        context->invoke(&MapContext::onLowMemory);
-    }
+    context->invoke(&MapContext::onLowMemory);
 }
 
 #pragma mark - Private
 
 void Map::triggerUpdate(Update update_) {
-    if (context) {
-        context->invoke(&MapContext::triggerUpdate, update_);
-    }
+    context->invoke(&MapContext::triggerUpdate, update_);
 }
 
 }

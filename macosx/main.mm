@@ -133,7 +133,7 @@ int main() {
     // Load style
     map.setStyleURL("asset://styles/bright-v7.json");
 
-    int ret = view.run();
+    view.run();
 
     [reachability stopNotifier];
 
@@ -146,5 +146,5 @@ int main() {
     settings.debug = map.getDebug();
     settings.save();
 
-    return ret;
+    return 0;
 }
