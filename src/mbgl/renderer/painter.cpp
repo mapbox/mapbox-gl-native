@@ -218,109 +218,137 @@ void Painter::render(const Style& style, TransformState state_, TimePoint time) 
         }
     }
 
-    // - UPLOAD PASS -------------------------------------------------------------------------------
-    // Uploads all required buffers and images before we do any actual rendering.
-
     // Figure out what buckets we have to draw and what order we have to draw them in.
     const auto order = determineRenderOrder(style);
 
-    tileStencilBuffer.upload();
-    tileBorderBuffer.upload();
-    spriteAtlas.upload();
-    lineAtlas.upload();
-    glyphAtlas.upload();
+    // - UPLOAD PASS -------------------------------------------------------------------------------
+    // Uploads all required buffers and images before we do any actual rendering.
+    {
+        const gl::group upload("upload");
 
-    for (const auto& item : order) {
-        if (item.bucket && item.bucket->needsUpload()) {
-            item.bucket->upload();
+        tileStencilBuffer.upload();
+        tileBorderBuffer.upload();
+        spriteAtlas.upload();
+        lineAtlas.upload();
+        glyphAtlas.upload();
+
+        for (const auto& item : order) {
+            if (item.bucket && item.bucket->needsUpload()) {
+                item.bucket->upload();
+            }
         }
     }
 
+
     // - CLIPPING MASKS ----------------------------------------------------------------------------
     // Draws the clipping masks to the stencil buffer.
+    {
+        const gl::group clip("clip");
 
-    // Update all clipping IDs.
-    ClipIDGenerator generator;
-    for (const auto& source : sources) {
-        generator.update(source->getLoadedTiles());
-        source->updateMatrices(projMatrix, state);
+        // Update all clipping IDs.
+        ClipIDGenerator generator;
+        for (const auto& source : sources) {
+            generator.update(source->getLoadedTiles());
+            source->updateMatrices(projMatrix, state);
+        }
+
+        clear();
+        resize();
+        changeMatrix();
+
+        drawClippingMasks(sources);
     }
-
-    clear();
-    resize();
-    changeMatrix();
-
-    drawClippingMasks(sources);
 
     frameHistory.record(time, state.getNormalizedZoom());
 
     // Actually render the layers
     if (debug::renderTree) { Log::Info(Event::Render, "{"); indent++; }
 
-
     // TODO: Correctly compute the number of layers recursively beforehand.
     const float strata_thickness = 1.0f / (order.size() + 1);
 
+    // Layer index
+    int i = 0;
+
     // - OPAQUE PASS -------------------------------------------------------------------------------
     // Render everything top-to-bottom by using reverse iterators. Render opaque objects first.
+    {
+        const gl::group _("opaque");
 
-    if (debug::renderTree) {
-        Log::Info(Event::Render, "%*s%s", indent++ * 4, "", "OPAQUE {");
-    }
-    int i = 0;
-    setOpaque();
-    for (auto it = order.rbegin(), end = order.rend(); it != end; ++it, ++i) {
-        const auto& item = *it;
-        if (item.bucket && item.tile) {
-            if (item.hasRenderPass(RenderPass::Opaque)) {
-                setStrata(i * strata_thickness);
-                prepareTile(*item.tile);
-                item.bucket->render(*this, item.layer, item.tile->id, item.tile->matrix);
-            }
-        } else {
-            renderBackground(item.layer);
+        if (debug::renderTree) {
+            Log::Info(Event::Render, "%*s%s", indent++ * 4, "", "OPAQUE {");
         }
-    }
-    if (debug::renderTree) {
-        Log::Info(Event::Render, "%*s%s", --indent * 4, "", "}");
+        i = 0;
+        setOpaque();
+        for (auto it = order.rbegin(), end = order.rend(); it != end; ++it, ++i) {
+            const auto& item = *it;
+            if (item.bucket && item.tile) {
+                if (item.hasRenderPass(RenderPass::Opaque)) {
+                    const gl::group group(item.layer.id + " - " + std::string(item.tile->id));
+                    setStrata(i * strata_thickness);
+                    prepareTile(*item.tile);
+                    item.bucket->render(*this, item.layer, item.tile->id, item.tile->matrix);
+                }
+            } else {
+                const gl::group group("background");
+                renderBackground(item.layer);
+            }
+        }
+        if (debug::renderTree) {
+            Log::Info(Event::Render, "%*s%s", --indent * 4, "", "}");
+        }
     }
 
     // - TRANSLUCENT PASS --------------------------------------------------------------------------
     // Make a second pass, rendering translucent objects. This time, we render bottom-to-top.
+    {
+        const gl::group _("translucent");
 
-    if (debug::renderTree) {
-        Log::Info(Event::Render, "%*s%s", indent++ * 4, "", "TRANSLUCENT {");
-    }
-    --i;
-    setTranslucent();
-    for (auto it = order.begin(), end = order.end(); it != end; ++it, --i) {
-        const auto& item = *it;
-        if (item.bucket && item.tile) {
-            if (item.hasRenderPass(RenderPass::Translucent)) {
-                setStrata(i * strata_thickness);
-                prepareTile(*item.tile);
-                item.bucket->render(*this, item.layer, item.tile->id, item.tile->matrix);
+        if (debug::renderTree) {
+            Log::Info(Event::Render, "%*s%s", indent++ * 4, "", "TRANSLUCENT {");
+        }
+        --i; // After the last iteration, this is incremented, so we have to decrement it again.
+        setTranslucent();
+        for (auto it = order.begin(), end = order.end(); it != end; ++it, --i) {
+            const auto& item = *it;
+            if (item.bucket && item.tile) {
+                if (item.hasRenderPass(RenderPass::Translucent)) {
+                    const gl::group group(item.layer.id + " - " + std::string(item.tile->id));
+                    setStrata(i * strata_thickness);
+                    prepareTile(*item.tile);
+                    item.bucket->render(*this, item.layer, item.tile->id, item.tile->matrix);
+                }
             }
         }
-    }
-    if (debug::renderTree) {
-        Log::Info(Event::Render, "%*s%s", --indent * 4, "", "}");
+        if (debug::renderTree) {
+            Log::Info(Event::Render, "%*s%s", --indent * 4, "", "}");
+        }
     }
 
     if (debug::renderTree) { Log::Info(Event::Render, "}"); indent--; }
 
-    // Finalize the rendering, e.g. by calling debug render calls per tile.
-    // This guarantees that we have at least one function per tile called.
-    // When only rendering layers via the stylesheet, it's possible that we don't
-    // ever visit a tile during rendering.
-    for (const auto& source : sources) {
-        source->finishRender(*this);
+    // - DEBUG PASS --------------------------------------------------------------------------------
+    // Renders debug overlays.
+    {
+        const gl::group _("debug");
+
+        // Finalize the rendering, e.g. by calling debug render calls per tile.
+        // This guarantees that we have at least one function per tile called.
+        // When only rendering layers via the stylesheet, it's possible that we don't
+        // ever visit a tile during rendering.
+        for (const auto& source : sources) {
+            source->finishRender(*this);
+        }
     }
 
     // TODO: Find a better way to unbind VAOs after we're done with them without introducing
     // unnecessary bind(0)/bind(N) sequences.
-    MBGL_CHECK_ERROR(glBindTexture(GL_TEXTURE_2D, 0));
-    MBGL_CHECK_ERROR(gl::BindVertexArray(0));
+    {
+        const gl::group _("cleanup");
+
+        MBGL_CHECK_ERROR(glBindTexture(GL_TEXTURE_2D, 0));
+        MBGL_CHECK_ERROR(gl::BindVertexArray(0));
+    }
 }
 
 std::vector<RenderItem> Painter::determineRenderOrder(const Style& style) {
