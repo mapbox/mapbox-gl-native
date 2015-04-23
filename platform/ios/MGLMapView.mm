@@ -521,10 +521,10 @@ mbgl::DefaultFileSource *mbglFileSource = nullptr;
 
     [constraintParentView addConstraint:
      [NSLayoutConstraint constraintWithItem:self
-                                  attribute:NSLayoutAttributeRight
+                                  attribute:NSLayoutAttributeTrailing
                                   relatedBy:NSLayoutRelationEqual
                                      toItem:compassContainer
-                                  attribute:NSLayoutAttributeRight
+                                  attribute:NSLayoutAttributeTrailing
                                  multiplier:1
                                    constant:5]];
 
@@ -570,10 +570,10 @@ mbgl::DefaultFileSource *mbglFileSource = nullptr;
 
     [constraintParentView addConstraint:
      [NSLayoutConstraint constraintWithItem:self.logoBug
-                                  attribute:NSLayoutAttributeLeft
+                                  attribute:NSLayoutAttributeLeading
                                   relatedBy:NSLayoutRelationEqual
                                      toItem:self
-                                  attribute:NSLayoutAttributeLeft
+                                  attribute:NSLayoutAttributeLeading
                                  multiplier:1
                                    constant:8]];
 
@@ -601,10 +601,10 @@ mbgl::DefaultFileSource *mbglFileSource = nullptr;
 
     [constraintParentView addConstraint:
      [NSLayoutConstraint constraintWithItem:self
-                                  attribute:NSLayoutAttributeRight
+                                  attribute:NSLayoutAttributeTrailing
                                   relatedBy:NSLayoutRelationEqual
                                      toItem:self.attributionButton
-                                  attribute:NSLayoutAttributeRight
+                                  attribute:NSLayoutAttributeTrailing
                                  multiplier:1
                                    constant:8]];
 
