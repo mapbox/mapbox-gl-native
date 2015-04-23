@@ -23,13 +23,14 @@ SpritePosition::SpritePosition(uint16_t x_, uint16_t y_, uint16_t width_, uint16
       sdf(sdf_) {
 }
 
-Sprite::Sprite(const std::string& baseUrl, float pixelRatio_, Environment& env, std::function<void ()> callback_)
+Sprite::Sprite(const std::string& baseUrl, float pixelRatio_, Environment& env_, std::function<void ()> callback_)
     : pixelRatio(pixelRatio_ > 1 ? 2 : 1),
       raster(),
       loadedImage(false),
       loadedJSON(false),
       future(promise.get_future()),
-      callback(callback_) {
+      callback(callback_),
+      env(env_) {
 
     if (baseUrl.empty()) {
         // Treat a non-existent sprite as a successfully loaded empty sprite.
@@ -69,11 +70,11 @@ Sprite::Sprite(const std::string& baseUrl, float pixelRatio_, Environment& env, 
 
 Sprite::~Sprite() {
     if (jsonRequest) {
-        jsonRequest->cancel();
+        env.cancelRequest(jsonRequest);
     }
 
     if (spriteRequest) {
-        spriteRequest->cancel();
+        env.cancelRequest(spriteRequest);
     }
 }
 

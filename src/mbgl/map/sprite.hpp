@@ -64,6 +64,7 @@ private:
     std::future<void> future;
     std::function<void ()> callback;
 
+    Environment& env;
     Request* jsonRequest = nullptr;
     Request* spriteRequest = nullptr;
 };
