@@ -95,6 +95,32 @@ void MapContext::triggerUpdate(const Update u) {
     asyncUpdate->send();
 }
 
+void MapContext::setStyleURL(const std::string& url) {
+    styleURL = mbgl::util::mapbox::normalizeStyleURL(url, data.getAccessToken());
+    styleJSON.clear();
+
+    const size_t pos = styleURL.rfind('/');
+    std::string base = "";
+    if (pos != std::string::npos) {
+        base = styleURL.substr(0, pos + 1);
+    }
+
+    env.request({ Resource::Kind::JSON, styleURL }, [this, base](const Response &res) {
+        if (res.status == Response::Successful) {
+            loadStyleJSON(res.data, base);
+        } else {
+            Log::Error(Event::Setup, "loading style failed: %s", res.message.c_str());
+        }
+    });
+}
+
+void MapContext::setStyleJSON(const std::string& json, const std::string& base) {
+    styleURL.clear();
+    styleJSON = json;
+
+    loadStyleJSON(json, base);
+}
+
 Worker& MapContext::getWorker() {
     assert(workers);
     return *workers;
@@ -112,27 +138,6 @@ util::ptr<Sprite> MapContext::getSprite() {
     }
 
     return sprite;
-}
-
-void MapContext::reloadStyle() {
-    assert(Environment::currentlyOn(ThreadType::Map));
-
-    const auto styleInfo = data.getStyleInfo();
-
-    if (!styleInfo.url.empty()) {
-        const auto base = styleInfo.base;
-        // We have a style URL
-        env.request({ Resource::Kind::JSON, styleInfo.url }, [this, base](const Response &res) {
-            if (res.status == Response::Successful) {
-                loadStyleJSON(res.data, base);
-            } else {
-                Log::Error(Event::Setup, "loading style failed: %s", res.message.c_str());
-            }
-        });
-    } else if (!styleInfo.json.empty()) {
-        // We got JSON data directly.
-        loadStyleJSON(styleInfo.json, styleInfo.base);
-    }
 }
 
 void MapContext::loadStyleJSON(const std::string& json, const std::string& base) {
@@ -190,15 +195,7 @@ void MapContext::update() {
     auto u = updated.exchange(static_cast<UpdateType>(Update::Nothing)) |
              data.transform.updateTransitions(now);
 
-    if (!style) {
-        u |= static_cast<UpdateType>(Update::StyleInfo);
-    }
-
     transformState = data.transform.currentState();
-
-    if (u & static_cast<UpdateType>(Update::StyleInfo)) {
-        reloadStyle();
-    }
 
     if (u & static_cast<UpdateType>(Update::Debug)) {
         assert(painter);
@@ -214,8 +211,7 @@ void MapContext::update() {
             style->cascade(data.getClasses());
         }
 
-        if (u & static_cast<UpdateType>(Update::StyleInfo) ||
-            u & static_cast<UpdateType>(Update::Classes) ||
+        if (u & static_cast<UpdateType>(Update::Classes) ||
             u & static_cast<UpdateType>(Update::Zoom)) {
             style->recalculate(transformState.getNormalizedZoom(), now);
         }

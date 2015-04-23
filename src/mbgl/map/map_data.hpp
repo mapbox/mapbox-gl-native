@@ -20,12 +20,6 @@ namespace mbgl {
 
 class StillImage;
 
-struct StyleInfo {
-    std::string url;
-    std::string base;
-    std::string json;
-};
-
 class MapData {
     using Lock = std::lock_guard<std::mutex>;
 
@@ -33,15 +27,6 @@ public:
     inline MapData(View& view, MapMode mode_) : transform(view), mode(mode_) {
         setAnimationTime(TimePoint::min());
         setDefaultTransitionDuration(Duration::zero());
-    }
-
-    inline StyleInfo getStyleInfo() const {
-        Lock lock(mtx);
-        return styleInfo;
-    }
-    inline void setStyleInfo(StyleInfo&& info) {
-        Lock lock(mtx);
-        styleInfo = info;
     }
 
     inline std::string getAccessToken() const {
@@ -105,7 +90,6 @@ public:
 private:
     mutable std::mutex mtx;
 
-    StyleInfo styleInfo;
     std::string accessToken;
     std::vector<std::string> classes;
     std::atomic<uint8_t> debug { false };

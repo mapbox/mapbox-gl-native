@@ -48,6 +48,11 @@ public:
     // Notifies the Map thread that the state has changed and an update might be necessary.
     void triggerUpdate(Update = Update::Nothing);
 
+    void setStyleURL(const std::string&);
+    void setStyleJSON(const std::string& json, const std::string& base);
+    std::string getStyleURL() const { return styleURL; }
+    std::string getStyleJSON() const { return styleJSON; }
+
     double getTopOffsetPixelsForAnnotationSymbol(const std::string& symbol);
     void updateAnnotationTiles(const std::vector<TileID>&);
 
@@ -61,9 +66,6 @@ private:
 
     // Update the state indicated by the accumulated Update flags, then render.
     void update();
-
-    // Loads the style set in the data object. Called by Update::StyleInfo
-    void reloadStyle();
 
     // Loads the actual JSON object an creates a new Style object.
     void loadStyleJSON(const std::string& json, const std::string& base);
@@ -87,6 +89,9 @@ private:
 
     util::ptr<Sprite> sprite;
     util::ptr<Style> style;
+
+    std::string styleURL;
+    std::string styleJSON;
 
     size_t sourceCacheSize;
     TransformState transformState;

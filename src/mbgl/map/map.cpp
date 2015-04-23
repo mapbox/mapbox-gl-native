@@ -95,36 +95,22 @@ void Map::update(Update update_) {
     context->invoke(&MapContext::triggerUpdate, update_);
 }
 
-#pragma mark - Setup
-
-std::string Map::getStyleURL() const {
-    return data->getStyleInfo().url;
-}
+#pragma mark - Style
 
 void Map::setStyleURL(const std::string &url) {
-    assert(Environment::currentlyOn(ThreadType::Main));
-
-    const std::string styleURL = mbgl::util::mapbox::normalizeStyleURL(url, getAccessToken());
-
-    const size_t pos = styleURL.rfind('/');
-    std::string base = "";
-    if (pos != std::string::npos) {
-        base = styleURL.substr(0, pos + 1);
-    }
-
-    data->setStyleInfo({ styleURL, base, "" });
-    update(Update::StyleInfo);
+    context->invoke(&MapContext::setStyleURL, url);
 }
 
 void Map::setStyleJSON(const std::string& json, const std::string& base) {
-    assert(Environment::currentlyOn(ThreadType::Main));
+    context->invoke(&MapContext::setStyleJSON, json, base);
+}
 
-    data->setStyleInfo({ "", base, json });
-    update(Update::StyleInfo);
+std::string Map::getStyleURL() const {
+    return context->invokeSync<std::string>(&MapContext::getStyleURL);
 }
 
 std::string Map::getStyleJSON() const {
-    return data->getStyleInfo().json;
+    return context->invokeSync<std::string>(&MapContext::getStyleJSON);
 }
 
 #pragma mark - Size
