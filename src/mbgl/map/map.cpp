@@ -76,7 +76,7 @@ void Map::renderStill(StillImageCallback fn) {
     }
 
     data->callback = std::move(fn);
-    triggerUpdate(Update::RenderStill);
+    update(Update::RenderStill);
 }
 
 void Map::renderSync() {
@@ -91,8 +91,8 @@ void Map::renderAsync() {
     context->invoke(&MapContext::render);
 }
 
-void Map::update() {
-    triggerUpdate();
+void Map::update(Update update_) {
+    context->invoke(&MapContext::triggerUpdate, update_);
 }
 
 #pragma mark - Setup
@@ -113,14 +113,14 @@ void Map::setStyleURL(const std::string &url) {
     }
 
     data->setStyleInfo({ styleURL, base, "" });
-    triggerUpdate(Update::StyleInfo);
+    update(Update::StyleInfo);
 }
 
 void Map::setStyleJSON(const std::string& json, const std::string& base) {
     assert(Environment::currentlyOn(ThreadType::Main));
 
     data->setStyleInfo({ "", base, json });
-    triggerUpdate(Update::StyleInfo);
+    update(Update::StyleInfo);
 }
 
 std::string Map::getStyleJSON() const {
@@ -139,24 +139,24 @@ void Map::resize(uint16_t width, uint16_t height, float ratio) {
 
 void Map::cancelTransitions() {
     data->transform.cancelTransitions();
-    triggerUpdate();
+    update();
 }
 
 void Map::setGestureInProgress(bool inProgress) {
     data->transform.setGestureInProgress(inProgress);
-    triggerUpdate();
+    update();
 }
 
 #pragma mark - Position
 
 void Map::moveBy(double dx, double dy, Duration duration) {
     data->transform.moveBy(dx, dy, duration);
-    triggerUpdate();
+    update();
 }
 
 void Map::setLatLng(LatLng latLng, Duration duration) {
     data->transform.setLatLng(latLng, duration);
-    triggerUpdate();
+    update();
 }
 
 LatLng Map::getLatLng() const {
@@ -167,7 +167,7 @@ void Map::resetPosition() {
     data->transform.setAngle(0);
     data->transform.setLatLng(LatLng(0, 0));
     data->transform.setZoom(0);
-    triggerUpdate(Update::Zoom);
+    update(Update::Zoom);
 }
 
 
@@ -175,12 +175,12 @@ void Map::resetPosition() {
 
 void Map::scaleBy(double ds, double cx, double cy, Duration duration) {
     data->transform.scaleBy(ds, cx, cy, duration);
-    triggerUpdate(Update::Zoom);
+    update(Update::Zoom);
 }
 
 void Map::setScale(double scale, double cx, double cy, Duration duration) {
     data->transform.setScale(scale, cx, cy, duration);
-    triggerUpdate(Update::Zoom);
+    update(Update::Zoom);
 }
 
 double Map::getScale() const {
@@ -189,7 +189,7 @@ double Map::getScale() const {
 
 void Map::setZoom(double zoom, Duration duration) {
     data->transform.setZoom(zoom, duration);
-    triggerUpdate(Update::Zoom);
+    update(Update::Zoom);
 }
 
 double Map::getZoom() const {
@@ -198,7 +198,7 @@ double Map::getZoom() const {
 
 void Map::setLatLngZoom(LatLng latLng, double zoom, Duration duration) {
     data->transform.setLatLngZoom(latLng, zoom, duration);
-    triggerUpdate(Update::Zoom);
+    update(Update::Zoom);
 }
 
 void Map::resetZoom() {
@@ -229,17 +229,17 @@ uint16_t Map::getHeight() const {
 
 void Map::rotateBy(double sx, double sy, double ex, double ey, Duration duration) {
     data->transform.rotateBy(sx, sy, ex, ey, duration);
-    triggerUpdate();
+    update();
 }
 
 void Map::setBearing(double degrees, Duration duration) {
     data->transform.setAngle(-degrees * M_PI / 180, duration);
-    triggerUpdate();
+    update();
 }
 
 void Map::setBearing(double degrees, double cx, double cy) {
     data->transform.setAngle(-degrees * M_PI / 180, cx, cy);
-    triggerUpdate();
+    update();
 }
 
 double Map::getBearing() const {
@@ -248,7 +248,7 @@ double Map::getBearing() const {
 
 void Map::resetNorth() {
     data->transform.setAngle(0, std::chrono::milliseconds(500));
-    triggerUpdate();
+    update();
 }
 
 
@@ -342,12 +342,12 @@ LatLngBounds Map::getBoundsForAnnotations(const std::vector<uint32_t>& annotatio
 
 void Map::setDebug(bool value) {
     data->setDebug(value);
-    triggerUpdate(Update::Debug);
+    update(Update::Debug);
 }
 
 void Map::toggleDebug() {
     data->toggleDebug();
-    triggerUpdate(Update::Debug);
+    update(Update::Debug);
 }
 
 bool Map::getDebug() const {
@@ -356,19 +356,19 @@ bool Map::getDebug() const {
 
 void Map::addClass(const std::string& klass) {
     if (data->addClass(klass)) {
-        triggerUpdate(Update::Classes);
+        update(Update::Classes);
     }
 }
 
 void Map::removeClass(const std::string& klass) {
     if (data->removeClass(klass)) {
-        triggerUpdate(Update::Classes);
+        update(Update::Classes);
     }
 }
 
 void Map::setClasses(const std::vector<std::string>& classes) {
     data->setClasses(classes);
-    triggerUpdate(Update::Classes);
+    update(Update::Classes);
 }
 
 bool Map::hasClass(const std::string& klass) const {
@@ -383,7 +383,7 @@ void Map::setDefaultTransitionDuration(Duration duration) {
     assert(Environment::currentlyOn(ThreadType::Main));
 
     data->setDefaultTransitionDuration(duration);
-    triggerUpdate(Update::DefaultTransitionDuration);
+    update(Update::DefaultTransitionDuration);
 }
 
 Duration Map::getDefaultTransitionDuration() {
@@ -397,12 +397,6 @@ void Map::setSourceTileCacheSize(size_t size) {
 
 void Map::onLowMemory() {
     context->invoke(&MapContext::onLowMemory);
-}
-
-#pragma mark - Private
-
-void Map::triggerUpdate(Update update_) {
-    context->invoke(&MapContext::triggerUpdate, update_);
 }
 
 }

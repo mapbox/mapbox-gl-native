@@ -54,7 +54,7 @@ public:
     void renderAsync();
 
     // Notifies the Map thread that the state has changed and an update might be necessary.
-    void update();
+    void update(Update update = Update::Nothing);
 
     // Styling
     void addClass(const std::string&);
@@ -137,8 +137,6 @@ public:
     bool getDebug() const;
 
 private:
-    void triggerUpdate(Update update = Update::Nothing);
-
     const std::unique_ptr<Environment> env;
     std::unique_ptr<EnvironmentScope> scope;
     const std::unique_ptr<MapData> data;
