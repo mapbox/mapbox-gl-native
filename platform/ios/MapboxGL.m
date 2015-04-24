@@ -17,7 +17,7 @@ static MapboxGL *_sharedManager;
 // Can be called from any thread. Called implicitly from any
 // public class convenience methods.
 //
-+ (id) sharedInstanceWithAccessToken:(NSString *)token {
++ (instancetype) sharedInstanceWithAccessToken:(NSString *)token {
     static dispatch_once_t onceToken;
     dispatch_once(&onceToken, ^{
         if ( ! NSProcessInfo.processInfo.mgl_isInterfaceBuilderDesignablesAgent) {
