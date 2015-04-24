@@ -46,6 +46,15 @@ public:
     void drawLinePatterns(LinepatternShader& shader);
     void drawPoints(LinejoinShader& shader);
 
+private:
+    struct TriangleElement {
+        TriangleElement(uint16_t a_, uint16_t b_, uint16_t c_) : a(a_), b(b_), c(c_) {}
+        uint16_t a, b, c;
+    };
+    void addCurrentVertex(const Coordinate& currentVertex, float flip, double distance,
+            const vec2<double>& normal, float endLeft, float endRight, bool round,
+            int32_t startVertex, std::vector<LineBucket::TriangleElement>& triangleStore);
+
 public:
     StyleLayoutLine layout;
 
@@ -57,6 +66,10 @@ private:
     const size_t vertex_start;
     const size_t triangle_elements_start;
     const size_t point_elements_start;
+
+    int32_t e1;
+    int32_t e2;
+    int32_t e3;
 
     std::vector<std::unique_ptr<triangle_group_type>> triangleGroups;
     std::vector<std::unique_ptr<point_group_type>> pointGroups;
