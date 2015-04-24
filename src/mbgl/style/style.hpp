@@ -8,6 +8,7 @@
 #include <mbgl/util/ptr.hpp>
 #include <mbgl/util/noncopyable.hpp>
 #include <mbgl/util/chrono.hpp>
+#include <mbgl/util/worker.hpp>
 
 #include <cstdint>
 #include <string>
@@ -44,6 +45,9 @@ private:
     PropertyTransition defaultTransition;
     std::unique_ptr<uv::rwlock> mtx;
     ZoomHistory zoomHistory;
+
+public:
+    Worker workers;
 };
 
 }

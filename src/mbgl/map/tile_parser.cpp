@@ -1,7 +1,6 @@
 #include <mbgl/map/tile_parser.hpp>
 #include <mbgl/map/vector_tile_data.hpp>
 #include <mbgl/platform/log.hpp>
-#include <mbgl/style/style.hpp>
 #include <mbgl/style/style_layer.hpp>
 #include <mbgl/map/source.hpp>
 #include <mbgl/renderer/fill_bucket.hpp>
@@ -10,6 +9,7 @@
 #include <mbgl/util/constants.hpp>
 #include <mbgl/text/collision.hpp>
 #include <mbgl/util/std.hpp>
+#include <mbgl/style/style.hpp>
 
 #include <locale>
 

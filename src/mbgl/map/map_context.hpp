@@ -77,7 +77,6 @@ private:
     UpdateType updated { static_cast<UpdateType>(Update::Nothing) };
     std::unique_ptr<uv::async> asyncUpdate;
 
-    std::unique_ptr<Worker> workers;
     std::unique_ptr<GlyphStore> glyphStore;
     std::unique_ptr<GlyphAtlas> glyphAtlas;
     std::unique_ptr<SpriteAtlas> spriteAtlas;

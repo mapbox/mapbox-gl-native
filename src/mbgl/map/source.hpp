@@ -22,7 +22,6 @@ namespace mbgl {
 
 class MapData;
 class Environment;
-class Worker;
 class GlyphAtlas;
 class GlyphStore;
 class SpriteAtlas;
@@ -65,7 +64,6 @@ public:
     void load(MapData&, Environment&, std::function<void()> callback);
     void update(MapData&,
                 const TransformState&,
-                Worker&,
                 util::ptr<Style>,
                 GlyphAtlas&,
                 GlyphStore&,
@@ -97,7 +95,6 @@ private:
 
     TileData::State addTile(MapData&,
                             const TransformState&,
-                            Worker&,
                             util::ptr<Style>,
                             GlyphAtlas&,
                             GlyphStore&,

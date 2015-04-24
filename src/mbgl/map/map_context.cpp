@@ -37,7 +37,6 @@ MapContext::MapContext(uv_loop_t* loop, View& view_, FileSource& fileSource, Map
       envScope(env, ThreadType::Map, "Map"),
       updated(static_cast<UpdateType>(Update::Nothing)),
       asyncUpdate(util::make_unique<uv::async>(loop, [this] { update(); })),
-      workers(util::make_unique<Worker>(4)),
       glyphStore(util::make_unique<GlyphStore>(env)),
       glyphAtlas(util::make_unique<GlyphAtlas>(1024, 1024)),
       spriteAtlas(util::make_unique<SpriteAtlas>(512, 512)),
@@ -163,7 +162,7 @@ void MapContext::updateTiles() {
     assert(Environment::currentlyOn(ThreadType::Map));
     if (!style) return;
     for (const auto& source : style->sources) {
-        source->update(data, transformState, *workers, style, *glyphAtlas, *glyphStore, *spriteAtlas,
+        source->update(data, transformState, style, *glyphAtlas, *glyphStore, *spriteAtlas,
                        getSprite(), *texturePool, [this]() {
             assert(Environment::currentlyOn(ThreadType::Map));
             triggerUpdate();

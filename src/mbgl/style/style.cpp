@@ -17,7 +17,8 @@
 namespace mbgl {
 
 Style::Style()
-    : mtx(util::make_unique<uv::rwlock>()) {
+    : mtx(util::make_unique<uv::rwlock>()),
+      workers(4) {
 }
 
 // Note: This constructor is seemingly empty, but we need to declare it anyway

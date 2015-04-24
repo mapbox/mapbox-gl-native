@@ -20,6 +20,7 @@
 #include <mbgl/map/vector_tile_data.hpp>
 #include <mbgl/map/raster_tile_data.hpp>
 #include <mbgl/map/live_tile_data.hpp>
+#include <mbgl/style/style.hpp>
 
 #include <algorithm>
 
@@ -226,7 +227,6 @@ TileData::State Source::hasTile(const TileID& id) {
 
 TileData::State Source::addTile(MapData& data,
                                 const TransformState& transformState,
-                                Worker& worker,
                                 util::ptr<Style> style,
                                 GlyphAtlas& glyphAtlas,
                                 GlyphStore& glyphStore,
@@ -269,15 +269,15 @@ TileData::State Source::addTile(MapData& data,
             new_tile.data =
                 std::make_shared<VectorTileData>(normalized_id, data.transform.getMaxZoom(), style, glyphAtlas,
                                                  glyphStore, spriteAtlas, sprite, info);
-            new_tile.data->request(worker, transformState.getPixelRatio(), callback);
+            new_tile.data->request(style->workers, transformState.getPixelRatio(), callback);
         } else if (info.type == SourceType::Raster) {
             new_tile.data = std::make_shared<RasterTileData>(normalized_id, texturePool, info);
-            new_tile.data->request(worker, transformState.getPixelRatio(), callback);
+            new_tile.data->request(style->workers, transformState.getPixelRatio(), callback);
         } else if (info.type == SourceType::Annotations) {
             new_tile.data = std::make_shared<LiveTileData>(normalized_id, data.annotationManager,
                                                            data.transform.getMaxZoom(), style, glyphAtlas,
                                                            glyphStore, spriteAtlas, sprite, info);
-            new_tile.data->reparse(worker, callback);
+            new_tile.data->reparse(style->workers, callback);
         } else {
             throw std::runtime_error("source type not implemented");
         }
@@ -368,7 +368,6 @@ bool Source::findLoadedParent(const TileID& id, int32_t minCoveringZoom, std::fo
 
 void Source::update(MapData& data,
                     const TransformState& transformState,
-                    Worker& worker,
                     util::ptr<Style> style,
                     GlyphAtlas& glyphAtlas,
                     GlyphStore& glyphStore,
@@ -394,7 +393,7 @@ void Source::update(MapData& data,
 
     // Add existing child/parent tiles if the actual tile is not yet loaded
     for (const auto& id : required) {
-        const TileData::State state = addTile(data, transformState, worker, style, glyphAtlas, glyphStore,
+        const TileData::State state = addTile(data, transformState, style, glyphAtlas, glyphStore,
                                               spriteAtlas, sprite, texturePool, id, callback);
 
         if (state != TileData::State::parsed) {
