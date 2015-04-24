@@ -23,4 +23,9 @@
     _mapView.frame = CGRectInset(_mapView.frame, 50, 50);
 }
 
+- (void)resetMapView
+{
+    _mapView.frame = self.view.bounds;
+}
+
 @end

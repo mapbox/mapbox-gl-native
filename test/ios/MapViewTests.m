@@ -14,6 +14,7 @@
 
 - (void)beforeEach {
     [system simulateDeviceRotationToOrientation:UIDeviceOrientationPortrait];
+    [tester.viewController resetMapView];
 
     tester.mapView.centerCoordinate = CLLocationCoordinate2DMake(38.913175, -77.032458);
     tester.mapView.zoomLevel = 14;
