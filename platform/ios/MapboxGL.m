@@ -2,6 +2,7 @@
 
 #import "MapboxGL.h"
 #import "NSProcessInfo+MGLAdditions.h"
+#import "MGLMapboxEvents.h"
 
 @interface MapboxGL()
 
@@ -24,6 +25,7 @@ static MapboxGL *_sharedManager;
             void (^setupBlock)() = ^{
                 _sharedManager = [[self alloc] init];
                 _sharedManager.accessToken = token;
+                [MGLMapboxEvents setToken:token];
             };
             if ( ! [[NSThread currentThread] isMainThread]) {
                 dispatch_sync(dispatch_get_main_queue(), ^{
