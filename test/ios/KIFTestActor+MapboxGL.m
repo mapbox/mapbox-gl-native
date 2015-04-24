@@ -10,8 +10,8 @@
     return [[UIApplication sharedApplication] statusBarWindow];
 }
 
-- (UIViewController *)viewController {
-    return (UIViewController *)[[tester.mapView nextResponder] nextResponder];
+- (MGLTViewController *)viewController {
+    return (MGLTViewController *)[[tester.mapView nextResponder] nextResponder];
 }
 
 - (MGLMapView *)mapView {
