@@ -62,7 +62,6 @@ void Painter::setup() {
     assert(plainShader);
     assert(outlineShader);
     assert(lineShader);
-    assert(linejoinShader);
     assert(linepatternShader);
     assert(patternShader);
     assert(rasterShader);
@@ -96,7 +95,6 @@ void Painter::setupShaders() {
     if (!plainShader) plainShader = util::make_unique<PlainShader>();
     if (!outlineShader) outlineShader = util::make_unique<OutlineShader>();
     if (!lineShader) lineShader = util::make_unique<LineShader>();
-    if (!linejoinShader) linejoinShader = util::make_unique<LinejoinShader>();
     if (!linesdfShader) linesdfShader = util::make_unique<LineSDFShader>();
     if (!linepatternShader) linepatternShader = util::make_unique<LinepatternShader>();
     if (!patternShader) patternShader = util::make_unique<PatternShader>();
@@ -112,7 +110,6 @@ void Painter::deleteShaders() {
     plainShader = nullptr;
     outlineShader = nullptr;
     lineShader = nullptr;
-    linejoinShader = nullptr;
     linepatternShader = nullptr;
     patternShader = nullptr;
     iconShader = nullptr;

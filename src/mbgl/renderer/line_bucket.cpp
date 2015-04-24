@@ -16,22 +16,17 @@ using namespace mbgl;
 
 
 LineBucket::LineBucket(LineVertexBuffer &vertexBuffer_,
-                       TriangleElementsBuffer &triangleElementsBuffer_,
-                       PointElementsBuffer &pointElementsBuffer_)
+                       TriangleElementsBuffer &triangleElementsBuffer_)
     : vertexBuffer(vertexBuffer_),
       triangleElementsBuffer(triangleElementsBuffer_),
-      pointElementsBuffer(pointElementsBuffer_),
       vertex_start(vertexBuffer_.index()),
-      triangle_elements_start(triangleElementsBuffer_.index()),
-      point_elements_start(pointElementsBuffer_.index()) {
-}
+      triangle_elements_start(triangleElementsBuffer_.index()) {
+};
 
 LineBucket::~LineBucket() {
     // Do not remove. header file only contains forward definitions to unique pointers.
 }
 
-
-typedef uint16_t PointElement;
 
 void LineBucket::addGeometry(const GeometryCollection& geometryCollection) {
     for (auto& line : geometryCollection) {
@@ -282,25 +277,6 @@ void LineBucket::addGeometry(const std::vector<Coordinate>& vertices) {
         group.vertex_length += vertex_count;
         group.elements_length += triangleStore.size();
     }
-    /*
-
-    // Store the line join/cap groups.
-    {
-        if (!pointGroups.size() || (pointGroups.back()->vertex_length + vertex_count > 65535)) {
-            // Move to a new group because the old one can't hold the geometry.
-            pointGroups.emplace_back(util::make_unique<point_group_type>());
-        }
-
-        assert(pointGroups.back());
-        point_group_type& group = *pointGroups.back();
-        for (const auto point : point_store) {
-            pointElementsBuffer.add(group.vertex_length + point);
-        }
-
-        group.vertex_length += vertex_count;
-        group.elements_length += point_store.size();
-    }
-    */
 }
 
 void LineBucket::addCurrentVertex(const Coordinate& currentVertex, float flip, double distance,
@@ -335,19 +311,7 @@ void LineBucket::render(Painter &painter, const StyleLayer &layer_desc, const Ti
 }
 
 bool LineBucket::hasData() const {
-    return !triangleGroups.empty() || !pointGroups.empty();
-}
-
-bool LineBucket::hasPoints() const {
-    if (!pointGroups.empty()) {
-        for (const auto& group : pointGroups) {
-            assert(group);
-            if (group->elements_length) {
-                return true;
-            }
-        }
-    }
-    return false;
+    return !triangleGroups.empty();
 }
 
 void LineBucket::drawLines(LineShader& shader) {
@@ -392,20 +356,5 @@ void LineBucket::drawLinePatterns(LinepatternShader& shader) {
         MBGL_CHECK_ERROR(glDrawElements(GL_TRIANGLES, group->elements_length * 3, GL_UNSIGNED_SHORT, elements_index));
         vertex_index += group->vertex_length * vertexBuffer.itemSize;
         elements_index += group->elements_length * triangleElementsBuffer.itemSize;
-    }
-}
-
-void LineBucket::drawPoints(LinejoinShader& shader) {
-    char *vertex_index = BUFFER_OFFSET(vertex_start * vertexBuffer.itemSize);
-    char *elements_index = BUFFER_OFFSET(point_elements_start * pointElementsBuffer.itemSize);
-    for (auto& group : pointGroups) {
-        assert(group);
-        if (!group->elements_length) {
-            continue;
-        }
-        group->array[0].bind(shader, vertexBuffer, pointElementsBuffer, vertex_index);
-        MBGL_CHECK_ERROR(glDrawElements(GL_POINTS, group->elements_length, GL_UNSIGNED_SHORT, elements_index));
-        vertex_index += group->vertex_length * vertexBuffer.itemSize;
-        elements_index += group->elements_length * pointElementsBuffer.itemSize;
     }
 }
