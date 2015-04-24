@@ -4,6 +4,7 @@
 #import "KIFTestActor+MapboxGL.h"
 
 #import "MapboxGL.h"
+#import "MGLTViewController.h"
 
 @interface MapViewTests : KIFTestCase <MGLMapViewDelegate>
 
@@ -295,6 +296,28 @@
     attributionButtonFrame = [attributionButton.superview convertRect:attributionButton.frame toView:nil];
     XCTAssertFalse(CGRectIntersectsRect(attributionButtonFrame, toolbarFrame),
                    @"rotated device should not have attribution button under toolbar");
+}
+
+- (void)testInsetMapView {
+    [tester.viewController insetMapView];
+    [tester waitForAnimationsToFinish];
+    
+    UIView *logoBug = (UIView *)[tester waitForViewWithAccessibilityLabel:@"Mapbox logo"];
+    UIView *attributionButton = (UIView *)[tester waitForViewWithAccessibilityLabel:@"Attribution info"];
+    
+    CGRect mapViewFrame = [tester.mapView.superview convertRect:tester.mapView.frame toView:nil];
+    
+    CGRect logoBugFrame = [logoBug.superview convertRect:logoBug.frame toView:nil];
+    XCTAssertTrue(CGRectIntersectsRect(logoBugFrame, mapViewFrame),
+                  @"logo bug should lie inside shrunken map view");
+    
+    CGRect attributionButtonFrame = [attributionButton.superview convertRect:attributionButton.frame toView:nil];
+    XCTAssertTrue(CGRectIntersectsRect(attributionButtonFrame, mapViewFrame),
+                  @"attribution button should lie inside shrunken map view");
+    
+    CGRect compassFrame = [tester.compass.superview convertRect:tester.compass.frame toView:nil];
+    XCTAssertTrue(CGRectIntersectsRect(compassFrame, mapViewFrame),
+                  @"compass should lie inside shrunken map view");
 }
 
 - (void)testDelegateRegionWillChange {

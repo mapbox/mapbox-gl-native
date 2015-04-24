@@ -2,4 +2,6 @@
 
 @interface MGLTViewController : UIViewController
 
+- (void)insetMapView;
+
 @end
