@@ -183,7 +183,8 @@ void SymbolBucket::addFeatures(const GeometryTileLayer& layer,
         if (feature.label.length()) {
             shaping = fontStack->getShaping(
                 /* string */ feature.label,
-                /* maxWidth: ems */ layout.text.max_width * 24,
+                /* maxWidth: ems */ layout.placement != PlacementType::Line ?
+                    layout.text.max_width * 24 : 0,
                 /* lineHeight: ems */ layout.text.line_height * 24,
                 /* horizontalAlign */ horizontalAlign,
                 /* verticalAlign */ verticalAlign,
