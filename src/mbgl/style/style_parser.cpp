@@ -811,7 +811,6 @@ void StyleParser::parsePaint(JSVal value, ClassProperties &klass) {
 
     parseOptionalProperty<Function<float>>("icon-opacity", Key::IconOpacity, klass, value);
     parseOptionalProperty<PropertyTransition>("icon-opacity-transition", Key::IconOpacity, klass, value);
-    parseOptionalProperty<Function<float>>("icon-rotate", Key::IconRotate, klass, value);
     parseOptionalProperty<Function<float>>("icon-size", Key::IconSize, klass, value);
     parseOptionalProperty<PropertyTransition>("icon-size-transition", Key::IconSize, klass, value);
     parseOptionalProperty<Function<Color>>("icon-color", Key::IconColor, klass, value);
