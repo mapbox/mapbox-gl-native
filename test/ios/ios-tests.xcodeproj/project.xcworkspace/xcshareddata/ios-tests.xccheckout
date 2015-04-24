@@ -14,26 +14,22 @@
 		<string>https://github.com/mapbox/KIF.git</string>
 		<key>7E68CB584078A487C0535CC191D3B7551EEE2095</key>
 		<string>github.com:mapbox/mapbox-gl-native.git</string>
-		<key>FC967DACF69B3B67E6F2E9FBE56B64B73B118AFF</key>
-		<string>github.com:mapbox/mapbox-gl-cocoa.git</string>
 	</dict>
 	<key>IDESourceControlProjectPath</key>
-	<string>test/ios-tests.xcodeproj</string>
+	<string>test/ios/ios-tests.xcodeproj</string>
 	<key>IDESourceControlProjectRelativeInstallPathDictionary</key>
 	<dict>
 		<key>10265E242415D473A6A613214DB7AC3EE3D43F93</key>
-		<string>../../..test/KIF/</string>
+		<string>../../../..test/ios/KIF</string>
 		<key>7E68CB584078A487C0535CC191D3B7551EEE2095</key>
-		<string>../../../../..</string>
-		<key>FC967DACF69B3B67E6F2E9FBE56B64B73B118AFF</key>
-		<string>../../..</string>
+		<string>../../../..</string>
 	</dict>
 	<key>IDESourceControlProjectURL</key>
-	<string>github.com:mapbox/mapbox-gl-cocoa.git</string>
+	<string>github.com:mapbox/mapbox-gl-native.git</string>
 	<key>IDESourceControlProjectVersion</key>
 	<integer>111</integer>
 	<key>IDESourceControlProjectWCCIdentifier</key>
-	<string>FC967DACF69B3B67E6F2E9FBE56B64B73B118AFF</string>
+	<string>7E68CB584078A487C0535CC191D3B7551EEE2095</string>
 	<key>IDESourceControlProjectWCConfigurations</key>
 	<array>
 		<dict>
@@ -42,7 +38,7 @@
 			<key>IDESourceControlWCCIdentifierKey</key>
 			<string>7E68CB584078A487C0535CC191D3B7551EEE2095</string>
 			<key>IDESourceControlWCCName</key>
-			<string>..</string>
+			<string>gl-native</string>
 		</dict>
 		<dict>
 			<key>IDESourceControlRepositoryExtensionIdentifierKey</key>
@@ -51,14 +47,6 @@
 			<string>10265E242415D473A6A613214DB7AC3EE3D43F93</string>
 			<key>IDESourceControlWCCName</key>
 			<string>KIF</string>
-		</dict>
-		<dict>
-			<key>IDESourceControlRepositoryExtensionIdentifierKey</key>
-			<string>public.vcs.git</string>
-			<key>IDESourceControlWCCIdentifierKey</key>
-			<string>FC967DACF69B3B67E6F2E9FBE56B64B73B118AFF</string>
-			<key>IDESourceControlWCCName</key>
-			<string>mapbox-gl-cocoa</string>
 		</dict>
 	</array>
 </dict>

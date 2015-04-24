@@ -57,6 +57,7 @@ env:
    - IOS_PROFILE_NAME="ios-in-house"
    - secure: "nQqSM8rd7OHtV4MqmNqVnkrVHqxKqQsaWRYk4/nPdhbeVWtTtkk0df711LrF1TUtbEPEewHxYUvTZ/UXmwJNeoKdzTHavI8hnatRkgjyxGERPn1il1Otelht9I+LQQHf+plrpRjVWBrNIW0Zox1B3cqn6d3NglpbXrEQ2EjYGNA="
    # end iOS code signing
+   - KIF_SCREENSHOTS="${TRAVIS_BUILD_DIR}/screenshots"
 
 before_install:
 - if [[ ${TRAVIS_OS_NAME} == "linux" ]]; then sudo service mysql stop; fi
@@ -68,6 +69,7 @@ before_install:
 - ./scripts/travis_before_install.sh
 - if [[ ${TRAVIS_OS_NAME} == "linux" && ${MASON_PLATFORM} != "android" ]]; then export LD_LIBRARY_PATH=`mason prefix mesa 10.4.3`/lib; fi
 - if [[ ${TRAVIS_OS_NAME} == "linux" && ${MASON_PLATFORM} != "android" ]]; then glxinfo; fi
+- if [[ ${TRAVIS_OS_NAME} == "osx" && ${TEST_OS} == "ios" ]]; then mkdir -p ${KIF_SCREENSHOTS}; fi
 
 install:
 - ulimit -c
@@ -87,6 +89,9 @@ script:
 
 after_script:
 - ./scripts/ios_travis/remove-key.sh
+
+after_failure:
+- if [[ ${TRAVIS_OS_NAME} == "osx" && ${TEST_OS} == "ios" ]]; then ./scripts/ios_travis/upload_screenshots.sh; fi
 
 notifications:
   slack:

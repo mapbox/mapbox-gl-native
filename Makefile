@@ -29,6 +29,9 @@ styles/styles:
 SMCalloutView:
 	git submodule update --init platform/ios/vendor/SMCalloutView
 
+KIF:
+	git submodule update --init test/ios/KIF
+
 #### Library builds ############################################################
 
 .PRECIOUS: Makefile/mbgl
@@ -128,6 +131,9 @@ isim: Xcode/ios
 
 ipackage: clean Xcode/ios
 	./scripts/package_ios.sh
+
+itest: ipackage KIF
+	./scripts/test_ios.sh
 
 # Legacy name
 iproj: ios-proj

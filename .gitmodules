@@ -12,7 +12,7 @@
 
 [submodule "test/ios/KIF"]
 	path = test/ios/KIF
-	url = https://github.com/mapbox/KIF.git
+	url = https://github.com/kif-framework/KIF.git
 
 [submodule "platform/ios/vendor/SMCalloutView"]
 	path = platform/ios/vendor/SMCalloutView

@@ -1,7 +1,8 @@
 #import "KIFTestActor+MapboxGL.h"
+
+#import "MapboxGL.h"
+
 #import <KIF/UIApplication-KIFAdditions.h>
-#import <KIF/UIAccessibilityElement-KIFAdditions.h>
-#import "MGLMapView.h"
 
 @implementation KIFTestActor (MapboxGL)
 
