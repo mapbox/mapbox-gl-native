@@ -38,8 +38,6 @@ IB_DESIGNABLE
  *   @return An initialized map view, or `nil` if the map view was unable to be initialized. */
 - (instancetype)initWithFrame:(CGRect)frame accessToken:(NSString *)accessToken styleURL:(NSURL *)styleURL;
 
-- (instancetype)initWithFrame:(CGRect)frame __attribute__((unavailable("Instantiating an MGLMapView requires setting a style and/or an access token.")));
-
 #pragma mark - Authorizing Access
 
 /** @name Authorizing Access */
