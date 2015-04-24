@@ -35,7 +35,7 @@ void Painter::renderSDF(SymbolBucket &bucket,
     }
 
     // If layerStyle.size > bucket.info.fontSize then labels may collide
-    float fontSize = std::fmin(styleProperties.size, bucketProperties.max_size);
+    float fontSize = styleProperties.size;
     float fontScale = fontSize / sdfFontSize;
     matrix::scale(exMatrix, exMatrix, fontScale, fontScale, 1.0f);
 
