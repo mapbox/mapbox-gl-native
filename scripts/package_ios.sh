@@ -33,9 +33,10 @@ export BUILDTYPE=${BUILDTYPE:-Release}
 export HOST=ios
 make Xcode/mbgl
 
-step "Building iOS targets..."
+step "Building iOS device targets..."
 xcodebuild -sdk iphoneos${IOS_SDK_VERSION} \
     ARCHS="arm64 armv7 armv7s" \
+    ONLY_ACTIVE_ARCH=NO \
     -project ./build/ios/mbgl.xcodeproj \
     -configuration ${BUILDTYPE} \
     -target everything \
@@ -45,6 +46,7 @@ xcodebuild -sdk iphoneos${IOS_SDK_VERSION} \
 step "Building iOS Simulator targets..."
 xcodebuild -sdk iphonesimulator${IOS_SDK_VERSION} \
     ARCHS="x86_64 i386" \
+    ONLY_ACTIVE_ARCH=NO \
     -project ./build/ios/mbgl.xcodeproj \
     -configuration ${BUILDTYPE} \
     -target everything \

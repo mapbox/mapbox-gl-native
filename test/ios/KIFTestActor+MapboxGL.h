@@ -1,3 +1,4 @@
+#import <UIKit/UIKit.h>
 #import <KIF/KIF.h>
 
 @class MGLMapView;
