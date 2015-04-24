@@ -31,7 +31,7 @@ class VectorTileData : public TileData {
 public:
     VectorTileData(const TileID&,
                    float mapMaxZoom,
-                   util::ptr<Style>,
+                   Style&,
                    GlyphAtlas&,
                    GlyphStore&,
                    SpriteAtlas&,
@@ -59,7 +59,7 @@ protected:
     GlyphStore& glyphStore;
     SpriteAtlas& spriteAtlas;
     util::ptr<Sprite> sprite;
-    util::ptr<Style> style;
+    Style& style;
 
 public:
     const float depth;

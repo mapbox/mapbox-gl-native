@@ -83,9 +83,9 @@ private:
     std::unique_ptr<LineAtlas> lineAtlas;
     std::unique_ptr<TexturePool> texturePool;
     std::unique_ptr<Painter> painter;
+    std::unique_ptr<Style> style;
 
     util::ptr<Sprite> sprite;
-    util::ptr<Style> style;
 
     std::string styleURL;
     std::string styleJSON;

@@ -227,7 +227,7 @@ TileData::State Source::hasTile(const TileID& id) {
 
 TileData::State Source::addTile(MapData& data,
                                 const TransformState& transformState,
-                                util::ptr<Style> style,
+                                Style& style,
                                 GlyphAtlas& glyphAtlas,
                                 GlyphStore& glyphStore,
                                 SpriteAtlas& spriteAtlas,
@@ -269,15 +269,15 @@ TileData::State Source::addTile(MapData& data,
             new_tile.data =
                 std::make_shared<VectorTileData>(normalized_id, data.transform.getMaxZoom(), style, glyphAtlas,
                                                  glyphStore, spriteAtlas, sprite, info);
-            new_tile.data->request(style->workers, transformState.getPixelRatio(), callback);
+            new_tile.data->request(style.workers, transformState.getPixelRatio(), callback);
         } else if (info.type == SourceType::Raster) {
             new_tile.data = std::make_shared<RasterTileData>(normalized_id, texturePool, info);
-            new_tile.data->request(style->workers, transformState.getPixelRatio(), callback);
+            new_tile.data->request(style.workers, transformState.getPixelRatio(), callback);
         } else if (info.type == SourceType::Annotations) {
             new_tile.data = std::make_shared<LiveTileData>(normalized_id, data.annotationManager,
                                                            data.transform.getMaxZoom(), style, glyphAtlas,
                                                            glyphStore, spriteAtlas, sprite, info);
-            new_tile.data->reparse(style->workers, callback);
+            new_tile.data->reparse(style.workers, callback);
         } else {
             throw std::runtime_error("source type not implemented");
         }
@@ -368,7 +368,7 @@ bool Source::findLoadedParent(const TileID& id, int32_t minCoveringZoom, std::fo
 
 void Source::update(MapData& data,
                     const TransformState& transformState,
-                    util::ptr<Style> style,
+                    Style& style,
                     GlyphAtlas& glyphAtlas,
                     GlyphStore& glyphStore,
                     SpriteAtlas& spriteAtlas,

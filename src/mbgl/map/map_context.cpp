@@ -139,7 +139,7 @@ void MapContext::loadStyleJSON(const std::string& json, const std::string& base)
     assert(Environment::currentlyOn(ThreadType::Map));
 
     sprite.reset();
-    style = std::make_shared<Style>();
+    style = util::make_unique<Style>();
     style->base = base;
     style->loadJSON((const uint8_t *)json.c_str());
     style->cascade(data.getClasses());
@@ -162,7 +162,7 @@ void MapContext::updateTiles() {
     assert(Environment::currentlyOn(ThreadType::Map));
     if (!style) return;
     for (const auto& source : style->sources) {
-        source->update(data, transformState, style, *glyphAtlas, *glyphStore, *spriteAtlas,
+        source->update(data, transformState, *style, *glyphAtlas, *glyphStore, *spriteAtlas,
                        getSprite(), *texturePool, [this]() {
             assert(Environment::currentlyOn(ThreadType::Map));
             triggerUpdate();

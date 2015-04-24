@@ -64,7 +64,7 @@ public:
     void load(MapData&, Environment&, std::function<void()> callback);
     void update(MapData&,
                 const TransformState&,
-                util::ptr<Style>,
+                Style&,
                 GlyphAtlas&,
                 GlyphStore&,
                 SpriteAtlas&,
@@ -95,7 +95,7 @@ private:
 
     TileData::State addTile(MapData&,
                             const TransformState&,
-                            util::ptr<Style>,
+                            Style&,
                             GlyphAtlas&,
                             GlyphStore&,
                             SpriteAtlas&,

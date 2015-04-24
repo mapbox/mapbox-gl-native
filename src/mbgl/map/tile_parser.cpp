@@ -22,7 +22,7 @@ TileParser::~TileParser() = default;
 
 TileParser::TileParser(const GeometryTile& geometryTile_,
                        VectorTileData& tile_,
-                       const util::ptr<const Style>& style_,
+                       const Style& style_,
                        GlyphAtlas& glyphAtlas_,
                        GlyphStore& glyphStore_,
                        SpriteAtlas& spriteAtlas_,
@@ -35,7 +35,6 @@ TileParser::TileParser(const GeometryTile& geometryTile_,
       spriteAtlas(spriteAtlas_),
       sprite(sprite_),
       collision(util::make_unique<Collision>(tile.id.z, 4096, tile.source.tile_size, tile.depth)) {
-    assert(style);
     assert(sprite);
     assert(collision);
 }
@@ -43,7 +42,7 @@ TileParser::TileParser(const GeometryTile& geometryTile_,
 bool TileParser::obsolete() const { return tile.state == TileData::State::obsolete; }
 
 void TileParser::parse() {
-    for (const auto& layer_desc : style->layers) {
+    for (const auto& layer_desc : style.layers) {
         // Cancel early when parsing.
         if (obsolete()) {
             return;
