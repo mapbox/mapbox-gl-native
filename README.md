@@ -70,6 +70,8 @@ If you merely want to install the library for iOS and try it out as an Objective
 
 If you want to build from source and/or contribute to development of the project, run `make iproj`, which will create and open an Xcode project which can build the entire library from source as well as an Objective-C test app.
 
+You can also run `make itest` to run the included tests. Requires `brew install xcpretty`. 
+
 Target devices: iPhone 4S and above (5, 5c, 5s, 6, 6 Plus) and iPad 2 and above (3, 4, Mini, Air, Mini 2, Air 2).
 
 Target iOS: 7.0 through 8.1

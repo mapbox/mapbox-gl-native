@@ -48,15 +48,24 @@ elif [[ ${TRAVIS_OS_NAME} == "osx" && ${MASON_PLATFORM} == "osx" ]]; then
 
 elif [[ ${TRAVIS_OS_NAME} == "osx" && ${MASON_PLATFORM} == "ios" ]]; then
     #
-    # build & package iOS
-    #
-    mapbox_time "package_ios"
-    make ipackage
-    #
-    # conditionally deploy iOS build
+    # conditionally publish or test
     #
     if [[ -n "$PUBLISH_TAG" ]]; then
+        #
+        # build & package iOS
+        #
+        mapbox_time "package_ios"
+        make ipackage
+        #
+        # publish iOS build
+        #
         mapbox_time "deploy_ios"
         ./scripts/publish_ios.sh "$PUBLISH_VERSION"
+    else
+        #
+        # build & test iOS
+        #
+        mapbox_time "run_ios_tests"
+        make itest
     fi
 fi

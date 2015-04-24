@@ -9,7 +9,7 @@
       'actions': [
         {
           'action_name': 'Symlink Fixture Directory',
-          'inputs': ['<!@(pwd)'],
+          'inputs': ['<!@(pwd)/../test'],
           'outputs': ['<(PRODUCT_DIR)/TEST_DATA'], # symlinks the test dir into TEST_DATA
           'action': ['ln', '-s', '-f', '-n', '<@(_inputs)', '<@(_outputs)' ],
         }

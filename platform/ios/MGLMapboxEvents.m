@@ -50,7 +50,7 @@ NSString *const MGLEventGestureRotateStart = @"Rotation";
 // from within a single thread use underscore syntax.
 //
 // All captures of `self` from within asynchronous
-// dispatches will use a `weakSelf` to avoid cyclical
+// dispatches will use a `strongSelf` to avoid cyclical
 // strong references.
 //
 
@@ -292,6 +292,9 @@ NSString *const MGLEventGestureRotateStart = @"Rotation";
     __weak MGLMapboxEvents *weakSelf = self;
 
     dispatch_async(_serialQueue, ^{
+        MGLMapboxEvents *strongSelf = weakSelf;
+        if ( ! strongSelf) return;
+        
         // Opt Out Checking When Built
         if (![[NSUserDefaults standardUserDefaults] boolForKey:@"mapbox_metrics_enabled_preference"]) {
             [_eventQueue removeAllObjects];
@@ -315,35 +318,35 @@ NSString *const MGLEventGestureRotateStart = @"Rotation";
         // mapbox-events stock attributes
         [evt setObject:event forKey:@"event"];
         [evt setObject:@(1) forKey:@"version"];
-        [evt setObject:[weakSelf.rfc3339DateFormatter stringFromDate:[NSDate date]] forKey:@"created"];
-        [evt setObject:weakSelf.instanceID forKey:@"instance"];
-        [evt setObject:weakSelf.advertiserId forKey:@"advertiserId"];
-        [evt setObject:weakSelf.vendorId forKey:@"vendorId"];
-        [evt setObject:weakSelf.appBundleId forKeyedSubscript:@"appBundleId"];
+        [evt setObject:[strongSelf.rfc3339DateFormatter stringFromDate:[NSDate date]] forKey:@"created"];
+        [evt setObject:strongSelf.instanceID forKey:@"instance"];
+        [evt setObject:strongSelf.advertiserId forKey:@"advertiserId"];
+        [evt setObject:strongSelf.vendorId forKey:@"vendorId"];
+        [evt setObject:strongSelf.appBundleId forKeyedSubscript:@"appBundleId"];
         
         // mapbox-events-ios stock attributes
-        [evt setValue:weakSelf.model forKey:@"model"];
-        [evt setValue:weakSelf.iOSVersion forKey:@"operatingSystem"];
-        [evt setValue:[weakSelf getDeviceOrientation] forKey:@"orientation"];
+        [evt setValue:strongSelf.model forKey:@"model"];
+        [evt setValue:strongSelf.iOSVersion forKey:@"operatingSystem"];
+        [evt setValue:[strongSelf getDeviceOrientation] forKey:@"orientation"];
         [evt setValue:@((int)(100 * [UIDevice currentDevice].batteryLevel)) forKey:@"batteryLevel"];
-        [evt setValue:@(weakSelf.scale) forKey:@"resolution"];
-        [evt setValue:weakSelf.carrier forKey:@"carrier"];
+        [evt setValue:@(strongSelf.scale) forKey:@"resolution"];
+        [evt setValue:strongSelf.carrier forKey:@"carrier"];
         
-        NSString *cell = [weakSelf getCurrentCellularNetworkConnectionType];
+        NSString *cell = [strongSelf getCurrentCellularNetworkConnectionType];
         if (cell) {
             [evt setValue:cell forKey:@"cellularNetworkType"];
         } else {
             [evt setObject:[NSNull null] forKey:@"cellularNetworkType"];
         }
         
-        NSString *wifi = [weakSelf getWifiNetworkName];
+        NSString *wifi = [strongSelf getWifiNetworkName];
         if (wifi) {
             [evt setValue:wifi forKey:@"wifi"];
         } else {
             [evt setObject:[NSNull null] forKey:@"wifi"];
         }
         
-        [evt setValue:@([weakSelf getContentSizeScale]) forKey:@"accessibilityFontScale"];
+        [evt setValue:@([strongSelf getContentSizeScale]) forKey:@"accessibilityFontScale"];
 
         // Make Immutable Version
         NSDictionary *finalEvent = [NSDictionary dictionaryWithDictionary:evt];
@@ -352,12 +355,12 @@ NSString *const MGLEventGestureRotateStart = @"Rotation";
         [_eventQueue addObject:finalEvent];
         
         // Has Flush Limit Been Reached?
-        if (_eventQueue.count >= weakSelf.flushAt) {
-            [weakSelf flush];
+        if (_eventQueue.count >= strongSelf.flushAt) {
+            [strongSelf flush];
         }
         
         // Reset Timer (Initial Starting of Timer after first event is pushed)
-        [weakSelf startTimer];
+        [strongSelf startTimer];
     });
 }
 
@@ -375,10 +378,13 @@ NSString *const MGLEventGestureRotateStart = @"Rotation";
     __weak MGLMapboxEvents *weakSelf = self;
 
     dispatch_async(_serialQueue, ^{
+        MGLMapboxEvents *strongSelf = weakSelf;
+        if ( ! strongSelf) return;
+        
         __block NSArray *events;
 
-        NSUInteger upper = weakSelf.flushAt;
-        if (weakSelf.flushAt > [_eventQueue count]) {
+        NSUInteger upper = strongSelf.flushAt;
+        if (strongSelf.flushAt > [_eventQueue count]) {
             if ([_eventQueue count] == 0) {
                 return;
             }
@@ -393,7 +399,7 @@ NSString *const MGLEventGestureRotateStart = @"Rotation";
         [_eventQueue removeObjectsInRange:theRange];
 
         // Send Array of Events to Server
-        [weakSelf postEvents:events];
+        [strongSelf postEvents:events];
     });
 }
 

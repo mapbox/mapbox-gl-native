@@ -1203,12 +1203,6 @@ mbgl::DefaultFileSource *mbglFileSource = nullptr;
                          if (finished)
                          {
                              [self notifyMapChange:@(animated ? mbgl::MapChangeRegionDidChangeAnimated : mbgl::MapChangeRegionDidChange)];
-
-                             [UIView animateWithDuration:MGLAnimationDuration
-                                              animations:^
-                                              {
-                                                  self.compass.alpha = 0;
-                                              }];
                          }
                      }];
 }
@@ -2304,6 +2298,17 @@ CLLocationCoordinate2D latLngToCoordinate(mbgl::LatLng latLng)
                          animations:^
                          {
                              self.compass.alpha = 1;
+                         }
+                         completion:nil];
+    }
+    else if (mbglMap->getBearing() == 0 && self.compass.alpha > 0)
+    {
+        [UIView animateWithDuration:MGLAnimationDuration
+                              delay:0
+                            options:UIViewAnimationOptionBeginFromCurrentState
+                         animations:^
+                         {
+                             self.compass.alpha = 0;
                          }
                          completion:nil];
     }
