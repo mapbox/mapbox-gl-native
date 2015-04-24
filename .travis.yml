@@ -16,8 +16,6 @@ addons:
     - libxxf86vm-dev
     - x11proto-xf86vidmode-dev
     - mesa-utils # for glxinfo
-    - libboost-dev
-    - libboost-program-options-dev
     - lib32stdc++6 # for Gradle's aapt
     - lib32z1 # for Gradle's aapt
 
