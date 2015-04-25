@@ -111,13 +111,13 @@ NSString *const MGLEventGestureRotateStart = @"Rotation";
     if (self) {
         
         // Put Settings bundle into memory
-        NSString *settingsBundle = [[NSBundle mainBundle] pathForResource:@"Settings" ofType:@"bundle"];
-        if(!settingsBundle) {
+        NSString *appSettingsBundle = [[NSBundle mainBundle] pathForResource:@"Settings" ofType:@"bundle"];
+        if(!appSettingsBundle) {
             NSLog(@"Could not find Settings.bundle");
         } else {
             // Dynamic Settings.bundle loading based on:
             // http://stackoverflow.com/questions/510216/can-you-make-the-settings-in-settings-bundle-default-even-if-you-dont-open-the
-            NSDictionary *settings = [NSDictionary dictionaryWithContentsOfFile:[settingsBundle stringByAppendingPathComponent:@"Root.plist"]];
+            NSDictionary *settings = [NSDictionary dictionaryWithContentsOfFile:[appSettingsBundle stringByAppendingPathComponent:@"Root.plist"]];
             NSArray *preferences = [settings objectForKey:@"PreferenceSpecifiers"];
             NSMutableDictionary *defaultsToRegister = [[NSMutableDictionary alloc] initWithCapacity:[preferences count]];
             for(NSDictionary *prefSpecification in preferences) {
@@ -143,7 +143,7 @@ NSString *const MGLEventGestureRotateStart = @"Rotation";
         NSArray *bundles = [NSBundle allFrameworks];
         for (int lc = 0; lc < bundles.count; lc++) {
             NSBundle *b = [bundles objectAtIndex:lc];
-            cerPath = [[NSBundle mainBundle] pathForResource:@"api_mapbox_com-geotrust" ofType:@"der"];
+            cerPath = [[NSBundle bundleForClass:[MGLMapboxEvents class]] pathForResource:@"api_mapbox_com-geotrust" ofType:@"der"];
             if (cerPath != nil) {
                 break;
             }
