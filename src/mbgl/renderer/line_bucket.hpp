@@ -22,7 +22,7 @@ class LineSDFShader;
 class LinepatternShader;
 
 class LineBucket : public Bucket {
-    typedef ElementGroup<3> triangle_group_type;
+    using TriangleGroup = ElementGroup<3>;
 
 public:
     LineBucket(LineVertexBuffer &vertexBuffer, TriangleElementsBuffer &triangleElementsBuffer);
@@ -62,7 +62,7 @@ private:
     int32_t e2;
     int32_t e3;
 
-    std::vector<std::unique_ptr<triangle_group_type>> triangleGroups;
+    std::vector<std::unique_ptr<TriangleGroup>> triangleGroups;
 };
 
 }

@@ -8,25 +8,24 @@
 #include <mbgl/util/std.hpp>
 #include <mbgl/platform/gl.hpp>
 
-#define BUFFER_OFFSET(i) ((char *)nullptr + (i))
+#ifndef BUFFER_OFFSET
+#define BUFFER_OFFSET(i) ((char*)nullptr + (i))
+#endif
 
 #include <cassert>
 
 using namespace mbgl;
 
-
-LineBucket::LineBucket(LineVertexBuffer &vertexBuffer_,
-                       TriangleElementsBuffer &triangleElementsBuffer_)
+LineBucket::LineBucket(LineVertexBuffer& vertexBuffer_,
+                       TriangleElementsBuffer& triangleElementsBuffer_)
     : vertexBuffer(vertexBuffer_),
       triangleElementsBuffer(triangleElementsBuffer_),
       vertex_start(vertexBuffer_.index()),
-      triangle_elements_start(triangleElementsBuffer_.index()) {
-};
+      triangle_elements_start(triangleElementsBuffer_.index()){};
 
 LineBucket::~LineBucket() {
     // Do not remove. header file only contains forward definitions to unique pointers.
 }
-
 
 void LineBucket::addGeometry(const GeometryCollection& geometryCollection) {
     for (auto& line : geometryCollection) {
@@ -35,12 +34,14 @@ void LineBucket::addGeometry(const GeometryCollection& geometryCollection) {
 }
 
 void LineBucket::addGeometry(const std::vector<Coordinate>& vertices) {
-
-    auto len = vertices.size();
-    // If the line has duplicate vertices at the end, adjust length to remove them.
-    while (len > 2 && vertices[len - 1] == vertices[len - 2]) {
-        len--;
-    }
+    const auto len = [&vertices] {
+        auto l = vertices.size();
+        // If the line has duplicate vertices at the end, adjust length to remove them.
+        while (l > 2 && vertices[l - 1] == vertices[l - 2]) {
+            l--;
+        }
+        return l;
+    }();
 
     if (len < 2) {
         // fprintf(stderr, "a line must have at least two vertices\n");
@@ -49,25 +50,24 @@ void LineBucket::addGeometry(const std::vector<Coordinate>& vertices) {
 
     const float miterLimit = layout.join == JoinType::Bevel ? 1.05f : layout.miter_limit;
 
-    Coordinate firstVertex = vertices.front();
-    Coordinate lastVertex = vertices[len - 1];
-    bool closed = firstVertex == lastVertex;
+    const Coordinate firstVertex = vertices.front();
+    const Coordinate lastVertex = vertices[len - 1];
+    const bool closed = firstVertex == lastVertex;
 
     if (len == 2 && closed) {
         // fprintf(stderr, "a line may not have coincident points\n");
         return;
     }
 
-    CapType beginCap = layout.cap;
-    CapType endCap = closed ? CapType::Butt : layout.cap;
+    const CapType beginCap = layout.cap;
+    const CapType endCap = closed ? CapType::Butt : layout.cap;
+
     int8_t flip = 1;
     double distance = 0;
     bool startOfLine = true;
-    Coordinate currentVertex = Coordinate::null(),
-               prevVertex = Coordinate::null(),
+    Coordinate currentVertex = Coordinate::null(), prevVertex = Coordinate::null(),
                nextVertex = Coordinate::null();
-    vec2<double> prevNormal = vec2<double>::null(),
-                 nextNormal = vec2<double>::null();
+    vec2<double> prevNormal = vec2<double>::null(), nextNormal = vec2<double>::null();
 
     // the last three vertices added
     e1 = e2 = e3 = -1;
@@ -77,11 +77,10 @@ void LineBucket::addGeometry(const std::vector<Coordinate>& vertices) {
         nextNormal = util::perp(util::unit(vec2<double>(firstVertex - currentVertex)));
     }
 
-    int32_t startVertex = (int32_t)vertexBuffer.index();
-    std::vector<LineBucket::TriangleElement> triangleStore;
+    const int32_t startVertex = (int32_t)vertexBuffer.index();
+    std::vector<TriangleElement> triangleStore;
 
     for (size_t i = 0; i < len; ++i) {
-
         if (closed && i == len - 1) {
             // if the line is closed, we treat the last vertex like the first
             nextVertex = vertices[i];
@@ -94,29 +93,38 @@ void LineBucket::addGeometry(const std::vector<Coordinate>& vertices) {
         }
 
         // if two consecutive vertices exist, skip the current one
-        if (nextVertex && vertices[i] == nextVertex) continue;
+        if (nextVertex && vertices[i] == nextVertex) {
+            continue;
+        }
 
-        if (nextNormal) prevNormal = nextNormal;
-        if (currentVertex) prevVertex = currentVertex;
+        if (nextNormal) {
+            prevNormal = nextNormal;
+        }
+        if (currentVertex) {
+            prevVertex = currentVertex;
+        }
 
         currentVertex = vertices[i];
 
         // Calculate how far along the line the currentVertex is
-        if (prevVertex) distance += util::dist<double>(currentVertex, prevVertex);
+        if (prevVertex)
+            distance += util::dist<double>(currentVertex, prevVertex);
 
         // Calculate the normal towards the next vertex in this line. In case
         // there is no next vertex, pretend that the line is continuing straight,
         // meaning that we are just using the previous normal.
-        nextNormal = nextVertex ? util::perp(util::unit(vec2<double>(nextVertex - currentVertex))) : prevNormal;
+        nextNormal = nextVertex ? util::perp(util::unit(vec2<double>(nextVertex - currentVertex)))
+                                : prevNormal;
 
         // If we still don't have a previous normal, this is the beginning of a
         // non-closed line, so we're doing a straight "join".
-        if (!prevNormal) prevNormal = nextNormal;
+        if (!prevNormal) {
+            prevNormal = nextNormal;
+        }
 
         // Determine the normal of the join extrusion. It is the angle bisector
         // of the segments between the previous line and the next line.
         vec2<double> joinNormal = util::unit(prevNormal + nextNormal);
-
 
         /*  joinNormal     prevNormal
          *             ↖      ↑
@@ -137,7 +145,7 @@ void LineBucket::addGeometry(const std::vector<Coordinate>& vertices) {
         // The join if a middle vertex, otherwise the cap
         const bool middleVertex = prevVertex && nextVertex;
         JoinType currentJoin = layout.join;
-        CapType currentCap = nextVertex ? beginCap : endCap;
+        const CapType currentCap = nextVertex ? beginCap : endCap;
 
         if (middleVertex) {
             if (currentJoin == JoinType::Round && miterLength < layout.round_limit) {
@@ -151,17 +159,22 @@ void LineBucket::addGeometry(const std::vector<Coordinate>& vertices) {
             if (currentJoin == JoinType::Bevel) {
                 // The maximum extrude length is 128 / 63 = 2 times the width of the line
                 // so if miterLength >= 2 we need to draw a different type of bevel where.
-                if (miterLength > 2) currentJoin = JoinType::FlipBevel;
+                if (miterLength > 2) {
+                    currentJoin = JoinType::FlipBevel;
+                }
 
                 // If the miterLength is really small and the line bevel wouldn't be visible,
                 // just draw a miter join to save a triangle.
-                if (miterLength < miterLimit) currentJoin = JoinType::Miter;
+                if (miterLength < miterLimit) {
+                    currentJoin = JoinType::Miter;
+                }
             }
         }
 
         if (middleVertex && currentJoin == JoinType::Miter) {
             joinNormal = joinNormal * miterLength;
-            addCurrentVertex(currentVertex, flip, distance, joinNormal, 0, 0, false, startVertex, triangleStore);
+            addCurrentVertex(currentVertex, flip, distance, joinNormal, 0, 0, false, startVertex,
+                             triangleStore);
 
         } else if (middleVertex && currentJoin == JoinType::FlipBevel) {
             // miter is too big, flip the direction to make a beveled join
@@ -170,11 +183,13 @@ void LineBucket::addGeometry(const std::vector<Coordinate>& vertices) {
                 // Almost parallel lines
                 joinNormal = nextNormal;
             } else {
-                const float bevelLength = miterLength * util::mag(prevNormal + nextNormal) / util::mag(prevNormal - nextNormal);
+                const float bevelLength = miterLength * util::mag(prevNormal + nextNormal) /
+                                          util::mag(prevNormal - nextNormal);
                 joinNormal = util::perp(joinNormal) * bevelLength;
             }
 
-            addCurrentVertex(currentVertex, flip, distance, joinNormal, 0, 0, false, startVertex, triangleStore);
+            addCurrentVertex(currentVertex, flip, distance, joinNormal, 0, 0, false, startVertex,
+                             triangleStore);
             flip = -flip;
 
         } else if (middleVertex && currentJoin == JoinType::Bevel) {
@@ -193,29 +208,34 @@ void LineBucket::addGeometry(const std::vector<Coordinate>& vertices) {
 
             // Close previous segement with bevel
             if (!startOfLine) {
-                addCurrentVertex(currentVertex, flip, distance, prevNormal, offsetA, offsetB, false, startVertex, triangleStore);
+                addCurrentVertex(currentVertex, flip, distance, prevNormal, offsetA, offsetB, false,
+                                 startVertex, triangleStore);
             }
 
             // Start next segment
             if (nextVertex) {
-                addCurrentVertex(currentVertex, flip, distance, nextNormal, -offsetA, -offsetB, false, startVertex, triangleStore);
+                addCurrentVertex(currentVertex, flip, distance, nextNormal, -offsetA, -offsetB,
+                                 false, startVertex, triangleStore);
             }
 
         } else if (!middleVertex && currentCap == CapType::Butt) {
             if (!startOfLine) {
                 // Close previous segment with a butt
-                addCurrentVertex(currentVertex, flip, distance, prevNormal, 0, 0, false, startVertex, triangleStore);
+                addCurrentVertex(currentVertex, flip, distance, prevNormal, 0, 0, false,
+                                 startVertex, triangleStore);
             }
 
             // Start next segment with a butt
             if (nextVertex) {
-                addCurrentVertex(currentVertex, flip, distance, nextNormal, 0, 0, false, startVertex, triangleStore);
+                addCurrentVertex(currentVertex, flip, distance, nextNormal, 0, 0, false,
+                                 startVertex, triangleStore);
             }
 
         } else if (!middleVertex && currentCap == CapType::Square) {
             if (!startOfLine) {
                 // Close previous segment with a square cap
-                addCurrentVertex(currentVertex, flip, distance, prevNormal, 1, 1, false, startVertex, triangleStore);
+                addCurrentVertex(currentVertex, flip, distance, prevNormal, 1, 1, false,
+                                 startVertex, triangleStore);
 
                 // The segment is done. Unset vertices to disconnect segments.
                 e1 = e2 = -1;
@@ -224,16 +244,19 @@ void LineBucket::addGeometry(const std::vector<Coordinate>& vertices) {
 
             // Start next segment
             if (nextVertex) {
-                addCurrentVertex(currentVertex, flip, distance, nextNormal, -1, -1, false, startVertex, triangleStore);
+                addCurrentVertex(currentVertex, flip, distance, nextNormal, -1, -1, false,
+                                 startVertex, triangleStore);
             }
 
         } else if (middleVertex ? currentJoin == JoinType::Round : currentCap == CapType::Round) {
             if (!startOfLine) {
                 // Close previous segment with a butt
-                addCurrentVertex(currentVertex, flip, distance, prevNormal, 0, 0, false, startVertex, triangleStore);
+                addCurrentVertex(currentVertex, flip, distance, prevNormal, 0, 0, false,
+                                 startVertex, triangleStore);
 
                 // Add round cap or linejoin at end of segment
-                addCurrentVertex(currentVertex, flip, distance, prevNormal, 1, 1, true , startVertex, triangleStore);
+                addCurrentVertex(currentVertex, flip, distance, prevNormal, 1, 1, true, startVertex,
+                                 triangleStore);
 
                 // The segment is done. Unset vertices to disconnect segments.
                 e1 = e2 = -1;
@@ -241,53 +264,61 @@ void LineBucket::addGeometry(const std::vector<Coordinate>& vertices) {
 
             } else if (beginCap == CapType::Round) {
                 // Add round cap before first segment
-                addCurrentVertex(currentVertex, flip, distance, nextNormal, -1, -1, true, startVertex, triangleStore);
+                addCurrentVertex(currentVertex, flip, distance, nextNormal, -1, -1, true,
+                                 startVertex, triangleStore);
             }
-
 
             // Start next segment with a butt
             if (nextVertex) {
-                addCurrentVertex(currentVertex, flip, distance, nextNormal, 0, 0, false, startVertex, triangleStore);
+                addCurrentVertex(currentVertex, flip, distance, nextNormal, 0, 0, false,
+                                 startVertex, triangleStore);
             }
         }
 
         startOfLine = false;
     }
 
-    size_t end_vertex = vertexBuffer.index();
-    size_t vertex_count = end_vertex - startVertex;
+    const size_t endVertex = vertexBuffer.index();
+    const size_t vertexCount = endVertex - startVertex;
 
     // Store the triangle/line groups.
     {
-        if (!triangleGroups.size() || (triangleGroups.back()->vertex_length + vertex_count > 65535)) {
+        if (!triangleGroups.size() ||
+            (triangleGroups.back()->vertex_length + vertexCount > 65535)) {
             // Move to a new group because the old one can't hold the geometry.
-            triangleGroups.emplace_back(util::make_unique<triangle_group_type>());
+            triangleGroups.emplace_back(util::make_unique<TriangleGroup>());
         }
 
         assert(triangleGroups.back());
-        triangle_group_type& group = *triangleGroups.back();
+        auto& group = *triangleGroups.back();
         for (const auto& triangle : triangleStore) {
-            triangleElementsBuffer.add(
-                group.vertex_length + triangle.a,
-                group.vertex_length + triangle.b,
-                group.vertex_length + triangle.c
-            );
+            triangleElementsBuffer.add(group.vertex_length + triangle.a,
+                                       group.vertex_length + triangle.b,
+                                       group.vertex_length + triangle.c);
         }
 
-        group.vertex_length += vertex_count;
+        group.vertex_length += vertexCount;
         group.elements_length += triangleStore.size();
     }
 }
 
-void LineBucket::addCurrentVertex(const Coordinate& currentVertex, float flip, double distance,
-                    const vec2<double>& normal, float endLeft, float endRight, bool round,
-                    int32_t startVertex, std::vector<LineBucket::TriangleElement>& triangleStore) {
+void LineBucket::addCurrentVertex(const Coordinate& currentVertex,
+                                  float flip,
+                                  double distance,
+                                  const vec2<double>& normal,
+                                  float endLeft,
+                                  float endRight,
+                                  bool round,
+                                  int32_t startVertex,
+                                  std::vector<TriangleElement>& triangleStore) {
     int8_t tx = round ? 1 : 0;
 
     vec2<double> extrude = normal * flip;
-    if (endLeft) extrude = extrude - (util::perp(normal) * endLeft);
-    e3 = (int32_t)vertexBuffer.add(currentVertex.x, currentVertex.y,
-                    extrude.x, extrude.y, tx, 0, distance) - startVertex;
+    if (endLeft)
+        extrude = extrude - (util::perp(normal) * endLeft);
+    e3 = (int32_t)vertexBuffer.add(currentVertex.x, currentVertex.y, extrude.x, extrude.y, tx, 0,
+                                   distance) -
+         startVertex;
     if (e1 >= 0 && e2 >= 0) {
         triangleStore.emplace_back(e1, e2, e3);
     }
@@ -295,9 +326,11 @@ void LineBucket::addCurrentVertex(const Coordinate& currentVertex, float flip, d
     e2 = e3;
 
     extrude = normal * (-flip);
-    if (endRight) extrude = extrude - (util::perp(normal) * endRight);
-    e3 = (int32_t)vertexBuffer.add(currentVertex.x, currentVertex.y,
-                    extrude.x, extrude.y, tx, 1, distance) - startVertex;
+    if (endRight)
+        extrude = extrude - (util::perp(normal) * endRight);
+    e3 = (int32_t)vertexBuffer.add(currentVertex.x, currentVertex.y, extrude.x, extrude.y, tx, 1,
+                                   distance) -
+         startVertex;
     if (e1 >= 0 && e2 >= 0) {
         triangleStore.emplace_back(e1, e2, e3);
     }
@@ -305,8 +338,10 @@ void LineBucket::addCurrentVertex(const Coordinate& currentVertex, float flip, d
     e2 = e3;
 }
 
-void LineBucket::render(Painter &painter, const StyleLayer &layer_desc, const TileID &id,
-                        const mat4 &matrix) {
+void LineBucket::render(Painter& painter,
+                        const StyleLayer& layer_desc,
+                        const TileID& id,
+                        const mat4& matrix) {
     painter.renderLine(*this, layer_desc, id, matrix);
 }
 
@@ -315,45 +350,48 @@ bool LineBucket::hasData() const {
 }
 
 void LineBucket::drawLines(LineShader& shader) {
-    char *vertex_index = BUFFER_OFFSET(vertex_start * vertexBuffer.itemSize);
-    char *elements_index = BUFFER_OFFSET(triangle_elements_start * triangleElementsBuffer.itemSize);
+    char* vertex_index = BUFFER_OFFSET(vertex_start * vertexBuffer.itemSize);
+    char* elements_index = BUFFER_OFFSET(triangle_elements_start * triangleElementsBuffer.itemSize);
     for (auto& group : triangleGroups) {
         assert(group);
         if (!group->elements_length) {
             continue;
         }
         group->array[0].bind(shader, vertexBuffer, triangleElementsBuffer, vertex_index);
-        MBGL_CHECK_ERROR(glDrawElements(GL_TRIANGLES, group->elements_length * 3, GL_UNSIGNED_SHORT, elements_index));
+        MBGL_CHECK_ERROR(glDrawElements(GL_TRIANGLES, group->elements_length * 3, GL_UNSIGNED_SHORT,
+                                        elements_index));
         vertex_index += group->vertex_length * vertexBuffer.itemSize;
         elements_index += group->elements_length * triangleElementsBuffer.itemSize;
     }
 }
 
 void LineBucket::drawLineSDF(LineSDFShader& shader) {
-    char *vertex_index = BUFFER_OFFSET(vertex_start * vertexBuffer.itemSize);
-    char *elements_index = BUFFER_OFFSET(triangle_elements_start * triangleElementsBuffer.itemSize);
+    char* vertex_index = BUFFER_OFFSET(vertex_start * vertexBuffer.itemSize);
+    char* elements_index = BUFFER_OFFSET(triangle_elements_start * triangleElementsBuffer.itemSize);
     for (auto& group : triangleGroups) {
         assert(group);
         if (!group->elements_length) {
             continue;
         }
         group->array[2].bind(shader, vertexBuffer, triangleElementsBuffer, vertex_index);
-        MBGL_CHECK_ERROR(glDrawElements(GL_TRIANGLES, group->elements_length * 3, GL_UNSIGNED_SHORT, elements_index));
+        MBGL_CHECK_ERROR(glDrawElements(GL_TRIANGLES, group->elements_length * 3, GL_UNSIGNED_SHORT,
+                                        elements_index));
         vertex_index += group->vertex_length * vertexBuffer.itemSize;
         elements_index += group->elements_length * triangleElementsBuffer.itemSize;
     }
 }
 
 void LineBucket::drawLinePatterns(LinepatternShader& shader) {
-    char *vertex_index = BUFFER_OFFSET(vertex_start * vertexBuffer.itemSize);
-    char *elements_index = BUFFER_OFFSET(triangle_elements_start * triangleElementsBuffer.itemSize);
+    char* vertex_index = BUFFER_OFFSET(vertex_start * vertexBuffer.itemSize);
+    char* elements_index = BUFFER_OFFSET(triangle_elements_start * triangleElementsBuffer.itemSize);
     for (auto& group : triangleGroups) {
         assert(group);
         if (!group->elements_length) {
             continue;
         }
         group->array[1].bind(shader, vertexBuffer, triangleElementsBuffer, vertex_index);
-        MBGL_CHECK_ERROR(glDrawElements(GL_TRIANGLES, group->elements_length * 3, GL_UNSIGNED_SHORT, elements_index));
+        MBGL_CHECK_ERROR(glDrawElements(GL_TRIANGLES, group->elements_length * 3, GL_UNSIGNED_SHORT,
+                                        elements_index));
         vertex_index += group->vertex_length * vertexBuffer.itemSize;
         elements_index += group->elements_length * triangleElementsBuffer.itemSize;
     }
