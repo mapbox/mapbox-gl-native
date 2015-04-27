@@ -75,6 +75,7 @@ NSString *const MGLEventGestureRotateStart = @"Rotation";
 @property (atomic) NSDateFormatter *rfc3339DateFormatter;
 @property (atomic) CGFloat scale;
 @property (atomic) NSURLSession *session;
+@property (atomic) NSData *digicertCert;
 @property (atomic) NSData *geoTrustCert;
 
 
@@ -144,6 +145,12 @@ NSString *const MGLEventGestureRotateStart = @"Rotation";
         cerPath = [[NSBundle bundleForClass:[MGLMapboxEvents class]] pathForResource:@"api_mapbox_com-geotrust" ofType:@"der"];
         if (cerPath != nil) {
             _geoTrustCert = [NSData dataWithContentsOfFile:cerPath];
+        }
+
+        cerPath = nil;
+        cerPath = [[NSBundle bundleForClass:[MGLMapboxEvents class]] pathForResource:@"api_mapbox_com-digicert" ofType:@"der"];
+        if (cerPath != nil) {
+            _digicertCert = [NSData dataWithContentsOfFile:cerPath];
         }
 
         // Events Control
@@ -687,12 +694,27 @@ NSString *const MGLEventGestureRotateStart = @"Rotation";
             long numKeys = SecTrustGetCertificateCount(serverTrust);
 
             BOOL found = false;
+            // Try GeoTrust Cert First
             for (int lc = 0; lc < numKeys; lc++) {
                 SecCertificateRef certificate = SecTrustGetCertificateAtIndex(serverTrust, lc);
                 NSData *remoteCertificateData = CFBridgingRelease(SecCertificateCopyData(certificate));
 
                 // Compare Remote Key With Local Version
                 if ([remoteCertificateData isEqualToData:_geoTrustCert]) {
+                    // Found the certificate; continue connecting
+                    completionHandler(NSURLSessionAuthChallengeUseCredential, [NSURLCredential credentialForTrust:challenge.protectionSpace.serverTrust]);
+                    found = true;
+                    break;
+                }
+            }
+
+            // Fallback to Digicert Cert
+            for (int lc = 0; lc < numKeys; lc++) {
+                SecCertificateRef certificate = SecTrustGetCertificateAtIndex(serverTrust, lc);
+                NSData *remoteCertificateData = CFBridgingRelease(SecCertificateCopyData(certificate));
+
+                // Compare Remote Key With Local Version
+                if ([remoteCertificateData isEqualToData:_digicertCert]) {
                     // Found the certificate; continue connecting
                     completionHandler(NSURLSessionAuthChallengeUseCredential, [NSURLCredential credentialForTrust:challenge.protectionSpace.serverTrust]);
                     found = true;
