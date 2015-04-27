@@ -34,6 +34,15 @@
         '../../platform/darwin/settings_nsuserdefaults.mm',
       ],
 
+      'actions': [
+        {
+          'action_name': 'Icon Burning',
+          'inputs': [ './icon_burn.sh' ],
+          'outputs': [],
+          'action': ['<@(_inputs)'],
+        },
+      ],
+
       'xcode_settings': {
         'SDKROOT': 'iphoneos',
         'SUPPORTED_PLATFORMS': 'iphonesimulator iphoneos',
