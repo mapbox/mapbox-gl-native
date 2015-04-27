@@ -88,16 +88,15 @@ void Painter::setup() {
     // We are blending new pixels on top of old pixels. Since we have depth testing
     // and are drawing opaque fragments first front-to-back, then translucent
     // fragments back-to-front, this shades the fewest fragments possible.
-    MBGL_CHECK_ERROR(glEnable(GL_BLEND));
+    config.blend = true;
     MBGL_CHECK_ERROR(glBlendFunc(GL_ONE, GL_ONE_MINUS_SRC_ALPHA));
 
     // Set clear values
-    MBGL_CHECK_ERROR(glClearColor(0.0f, 0.0f, 0.0f, 0.0f));
-    MBGL_CHECK_ERROR(glClearDepth(1.0f));
-    MBGL_CHECK_ERROR(glClearStencil(0x0));
+    config.clearColor = { 0.0f, 0.0f, 0.0f, 0.0f };
+    config.clearDepth = 1.0f;
+    config.clearStencil = 0x0;
 
     // Stencil test
-    MBGL_CHECK_ERROR(glEnable(GL_STENCIL_TEST));
     MBGL_CHECK_ERROR(glStencilOp(GL_KEEP, GL_KEEP, GL_REPLACE));
 
     // Depth test
@@ -145,21 +144,6 @@ void Painter::lineWidth(float line_width) {
     }
 }
 
-void Painter::depthMask(bool value) {
-    if (gl_depthMask != value) {
-        MBGL_CHECK_ERROR(glDepthMask(value ? GL_TRUE : GL_FALSE));
-        gl_depthMask = value;
-    }
-}
-
-void Painter::depthRange(const float near, const float far) {
-    if (gl_depthRange[0] != near || gl_depthRange[1] != far) {
-        MBGL_CHECK_ERROR(glDepthRange(near, far));
-        gl_depthRange = {{ near, far }};
-    }
-}
-
-
 void Painter::changeMatrix() {
     // Initialize projection matrix
     matrix::ortho(projMatrix, 0, state.getWidth(), state.getHeight(), 0, 0, 1);
@@ -177,24 +161,25 @@ void Painter::changeMatrix() {
 
 void Painter::clear() {
     gl::group group("clear");
-    MBGL_CHECK_ERROR(glStencilMask(0xFF));
-    depthMask(true);
-
-    MBGL_CHECK_ERROR(glClearColor(0, 0, 0, 0));
+    config.stencilTest = true;
+    config.stencilMask = 0xFF;
+    config.depthTest = false;
+    config.depthMask = GL_TRUE;
+    config.clearColor = { 0.0f, 0.0f, 0.0f, 0.0f };
     MBGL_CHECK_ERROR(glClear(GL_COLOR_BUFFER_BIT | GL_STENCIL_BUFFER_BIT | GL_DEPTH_BUFFER_BIT));
 }
 
 void Painter::setOpaque() {
     if (pass != RenderPass::Opaque) {
         pass = RenderPass::Opaque;
-        MBGL_CHECK_ERROR(glDisable(GL_BLEND));
+        config.blend = false;
     }
 }
 
 void Painter::setTranslucent() {
     if (pass != RenderPass::Translucent) {
         pass = RenderPass::Translucent;
-        MBGL_CHECK_ERROR(glEnable(GL_BLEND));
+        config.blend = true;
     }
 }
 
@@ -205,7 +190,7 @@ void Painter::setStrata(float value) {
 void Painter::prepareTile(const Tile& tile) {
     const GLint ref = (GLint)tile.clip.reference.to_ulong();
     const GLuint mask = (GLuint)tile.clip.mask.to_ulong();
-    MBGL_CHECK_ERROR(glStencilFunc(GL_EQUAL, ref, mask));
+    config.stencilFunc = { GL_EQUAL, ref, mask };
 }
 
 void Painter::render(const Style& style, TransformState state_, TimePoint time) {
@@ -504,10 +489,10 @@ void Painter::renderBackground(const StyleLayer &layer_desc) {
         backgroundArray.bind(*plainShader, backgroundBuffer, BUFFER_OFFSET(0));
     }
 
-    MBGL_CHECK_ERROR(glDisable(GL_STENCIL_TEST));
-    depthRange(strata + strata_epsilon, 1.0f);
+    config.stencilTest = false;
+    config.depthTest = true;
+    config.depthRange = { strata + strata_epsilon, 1.0f };
     MBGL_CHECK_ERROR(glDrawArrays(GL_TRIANGLE_STRIP, 0, 4));
-    MBGL_CHECK_ERROR(glEnable(GL_STENCIL_TEST));
 }
 
 mat4 Painter::translatedMatrix(const mat4& matrix, const std::array<float, 2> &translation, const TileID &id, TranslateAnchorType anchor) {

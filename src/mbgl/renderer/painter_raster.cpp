@@ -23,8 +23,9 @@ void Painter::renderRaster(RasterBucket& bucket, const StyleLayer &layer_desc, c
         rasterShader->u_contrast_factor = contrastFactor(properties.contrast);
         rasterShader->u_spin_weights = spinWeights(properties.hue_rotate);
 
-        depthRange(strata + strata_epsilon, 1.0f);
-
+        config.stencilTest = true;
+        config.depthTest = true;
+        config.depthRange = { strata + strata_epsilon, 1.0f };
         bucket.drawRaster(*rasterShader, tileStencilBuffer, coveringRasterArray);
     }
 }
