@@ -53,7 +53,7 @@
         'OTHER_CPLUSPLUSFLAGS': [ '<@(cflags_cc)' ],
         'OTHER_LDFLAGS': [ '<@(ldflags)' ],
         'SDKROOT': 'macosx',
-        'INFOPLIST_FILE': 'Info.plist',
+        'INFOPLIST_FILE': '../macosx/Info.plist',
         'CLANG_ENABLE_OBJC_ARC': 'YES'
       },
     }

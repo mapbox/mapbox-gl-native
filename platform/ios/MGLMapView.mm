@@ -223,8 +223,10 @@ mbgl::DefaultFileSource *mbglFileSource = nullptr;
     // metrics: initial setup
     NSString *appName = [[NSBundle mainBundle] objectForInfoDictionaryKey:@"CFBundleName"];
     NSString *appVersion = [[NSBundle mainBundle] objectForInfoDictionaryKey:@"CFBundleShortVersionString"];
+    NSString *appBuildNumber = [[NSBundle mainBundle] objectForInfoDictionaryKey:@"CFBundleVersion"];
     if (appName != nil) [MGLMapboxEvents setAppName:appName];
     if (appVersion != nil) [MGLMapboxEvents setAppVersion:appVersion];
+    if (appBuildNumber != nil) [MGLMapboxEvents setAppBuildNumber:appBuildNumber];
 
     // create GL view
     //
@@ -242,7 +244,8 @@ mbgl::DefaultFileSource *mbglFileSource = nullptr;
 
     _glView.contentMode = UIViewContentModeCenter;
     
-    [self setBackgroundColor:[UIColor clearColor]];
+    self.backgroundColor = [UIColor clearColor];
+    self.clipsToBounds = YES;
 
     // load extensions
     //
@@ -293,9 +296,9 @@ mbgl::DefaultFileSource *mbglFileSource = nullptr;
 
     // setup logo bug
     //
-    _logoBug = [[UIImageView alloc] initWithImage:[MGLMapView resourceImageNamed:@"mapbox.png"]];
+    UIImage *logo = [[MGLMapView resourceImageNamed:@"mapbox.png"] imageWithAlignmentRectInsets:UIEdgeInsetsMake(1.5, 4, 3.5, 2)];
+    _logoBug = [[UIImageView alloc] initWithImage:logo];
     _logoBug.accessibilityLabel = @"Mapbox logo";
-    _logoBug.frame = CGRectMake(8, self.bounds.size.height - _logoBug.bounds.size.height - 4, _logoBug.bounds.size.width, _logoBug.bounds.size.height);
     _logoBug.translatesAutoresizingMaskIntoConstraints = NO;
     [self addSubview:_logoBug];
 
@@ -304,7 +307,6 @@ mbgl::DefaultFileSource *mbglFileSource = nullptr;
     _attributionButton = [UIButton buttonWithType:UIButtonTypeInfoLight];
     _attributionButton.accessibilityLabel = @"Attribution info";
     [_attributionButton addTarget:self action:@selector(showAttribution:) forControlEvents:UIControlEventTouchUpInside];
-    _attributionButton.frame = CGRectMake(self.bounds.size.width - _attributionButton.bounds.size.width - 8, self.bounds.size.height - _attributionButton.bounds.size.height - 8, _attributionButton.bounds.size.width, _attributionButton.bounds.size.height);
     _attributionButton.translatesAutoresizingMaskIntoConstraints = NO;
     [self addSubview:_attributionButton];
 
@@ -315,7 +317,7 @@ mbgl::DefaultFileSource *mbglFileSource = nullptr;
     UIImage *compassImage = [MGLMapView resourceImageNamed:@"Compass.png"];
     _compass.frame = CGRectMake(0, 0, compassImage.size.width, compassImage.size.height);
     _compass.alpha = 0;
-    UIView *container = [[UIView alloc] initWithFrame:CGRectMake(self.bounds.size.width - compassImage.size.width - 5, 5, compassImage.size.width, compassImage.size.height)];
+    UIView *container = [[UIView alloc] initWithFrame:CGRectZero];
     [container addSubview:_compass];
     container.translatesAutoresizingMaskIntoConstraints = NO;
     [container addGestureRecognizer:[[UITapGestureRecognizer alloc] initWithTarget:self action:@selector(handleCompassTapGesture:)]];
@@ -491,70 +493,122 @@ mbgl::DefaultFileSource *mbglFileSource = nullptr;
     // views so they don't underlap navigation or tool bars. If we don't have a reference, apply
     // constraints against ourself to maintain (albeit less ideal) placement of the subviews.
     //
-    NSString *topGuideFormatString    = (self.viewControllerForLayoutGuides ? @"[topLayoutGuide]"    : @"|");
-    NSString *bottomGuideFormatString = (self.viewControllerForLayoutGuides ? @"[bottomLayoutGuide]" : @"|");
-
-    id topGuideViewsObject            = (self.viewControllerForLayoutGuides ? (id)self.viewControllerForLayoutGuides.topLayoutGuide    : (id)@"");
-    id bottomGuideViewsObject         = (self.viewControllerForLayoutGuides ? (id)self.viewControllerForLayoutGuides.bottomLayoutGuide : (id)@"");
-
-    UIView *constraintParentView = (self.viewControllerForLayoutGuides.view ? self.viewControllerForLayoutGuides.view : self);
+    UIView *constraintParentView = (self.viewControllerForLayoutGuides.view ?
+                                    self.viewControllerForLayoutGuides.view :
+                                    self);
 
     // compass
     //
     UIView *compassContainer = self.compass.superview;
 
-    [constraintParentView addConstraints:[NSLayoutConstraint constraintsWithVisualFormat:[NSString stringWithFormat:@"V:%@-topSpacing-[container]", topGuideFormatString]
-                                                                                 options:0
-                                                                                 metrics:@{ @"topSpacing"     : @(5) }
-                                                                                   views:@{ @"topLayoutGuide" : topGuideViewsObject,
-                                                                                            @"container"      : compassContainer }]];
+    if (self.viewControllerForLayoutGuides)
+    {
+        [constraintParentView addConstraint:
+         [NSLayoutConstraint constraintWithItem:compassContainer
+                                      attribute:NSLayoutAttributeTop
+                                      relatedBy:NSLayoutRelationGreaterThanOrEqual
+                                         toItem:self.viewControllerForLayoutGuides.topLayoutGuide
+                                      attribute:NSLayoutAttributeBottom
+                                     multiplier:1
+                                       constant:5]];
+    }
+    [constraintParentView addConstraint:
+     [NSLayoutConstraint constraintWithItem:compassContainer
+                                  attribute:NSLayoutAttributeTop
+                                  relatedBy:NSLayoutRelationGreaterThanOrEqual
+                                     toItem:self
+                                  attribute:NSLayoutAttributeTop
+                                 multiplier:1
+                                   constant:5]];
 
-    [constraintParentView addConstraints:[NSLayoutConstraint constraintsWithVisualFormat:@"H:[container]-rightSpacing-|"
-                                                                                 options:0
-                                                                                 metrics:@{ @"rightSpacing" : @(5) }
-                                                                                   views:@{ @"container"    : compassContainer }]];
+    [constraintParentView addConstraint:
+     [NSLayoutConstraint constraintWithItem:self
+                                  attribute:NSLayoutAttributeTrailing
+                                  relatedBy:NSLayoutRelationEqual
+                                     toItem:compassContainer
+                                  attribute:NSLayoutAttributeTrailing
+                                 multiplier:1
+                                   constant:5]];
 
-    [compassContainer addConstraint:[NSLayoutConstraint constraintWithItem:compassContainer
-                                                                 attribute:NSLayoutAttributeWidth
-                                                                 relatedBy:NSLayoutRelationEqual
-                                                                    toItem:nil
-                                                                 attribute:NSLayoutAttributeNotAnAttribute
-                                                                multiplier:1
-                                                                  constant:self.compass.image.size.width]];
+    [compassContainer addConstraint:
+     [NSLayoutConstraint constraintWithItem:compassContainer
+                                  attribute:NSLayoutAttributeWidth
+                                  relatedBy:NSLayoutRelationEqual
+                                     toItem:nil
+                                  attribute:NSLayoutAttributeNotAnAttribute
+                                 multiplier:1
+                                   constant:self.compass.image.size.width]];
 
-    [compassContainer addConstraint:[NSLayoutConstraint constraintWithItem:compassContainer
-                                                                 attribute:NSLayoutAttributeHeight
-                                                                 relatedBy:NSLayoutRelationEqual
-                                                                    toItem:nil
-                                                                 attribute:NSLayoutAttributeNotAnAttribute
-                                                                multiplier:1
-                                                                  constant:self.compass.image.size.height]];
+    [compassContainer addConstraint:
+     [NSLayoutConstraint constraintWithItem:compassContainer
+                                  attribute:NSLayoutAttributeHeight
+                                  relatedBy:NSLayoutRelationEqual
+                                     toItem:nil
+                                  attribute:NSLayoutAttributeNotAnAttribute
+                                 multiplier:1
+                                   constant:self.compass.image.size.height]];
 
     // logo bug
     //
-    [constraintParentView addConstraints:[NSLayoutConstraint constraintsWithVisualFormat:[NSString stringWithFormat:@"V:[logoBug]-bottomSpacing-%@", bottomGuideFormatString]
-                                                                                 options:0
-                                                                                 metrics:@{ @"bottomSpacing"     : @(4) }
-                                                                                   views:@{ @"logoBug"           : self.logoBug,
-                                                                                            @"bottomLayoutGuide" : bottomGuideViewsObject }]];
+    if (self.viewControllerForLayoutGuides)
+    {
+        [constraintParentView addConstraint:
+         [NSLayoutConstraint constraintWithItem:self.viewControllerForLayoutGuides.bottomLayoutGuide
+                                      attribute:NSLayoutAttributeTop
+                                      relatedBy:NSLayoutRelationGreaterThanOrEqual
+                                         toItem:self.logoBug
+                                      attribute:NSLayoutAttributeBaseline
+                                     multiplier:1
+                                       constant:8]];
+    }
+    [constraintParentView addConstraint:
+     [NSLayoutConstraint constraintWithItem:self
+                                  attribute:NSLayoutAttributeBottom
+                                  relatedBy:NSLayoutRelationGreaterThanOrEqual
+                                     toItem:self.logoBug
+                                  attribute:NSLayoutAttributeBaseline
+                                 multiplier:1
+                                   constant:8]];
 
-    [constraintParentView addConstraints:[NSLayoutConstraint constraintsWithVisualFormat:@"H:|-leftSpacing-[logoBug]"
-                                                                                 options:0
-                                                                                 metrics:@{ @"leftSpacing"       : @(8) }
-                                                                                   views:@{ @"logoBug"           : self.logoBug }]];
+    [constraintParentView addConstraint:
+     [NSLayoutConstraint constraintWithItem:self.logoBug
+                                  attribute:NSLayoutAttributeLeading
+                                  relatedBy:NSLayoutRelationEqual
+                                     toItem:self
+                                  attribute:NSLayoutAttributeLeading
+                                 multiplier:1
+                                   constant:8]];
 
     // attribution button
     //
-    [constraintParentView addConstraints:[NSLayoutConstraint constraintsWithVisualFormat:[NSString stringWithFormat:@"V:[attributionButton]-bottomSpacing-%@", bottomGuideFormatString]
-                                                                                 options:0
-                                                                                 metrics:@{ @"bottomSpacing"     : @(8) }
-                                                                                   views:@{ @"attributionButton" : self.attributionButton,
-                                                                                            @"bottomLayoutGuide" : bottomGuideViewsObject }]];
+    if (self.viewControllerForLayoutGuides)
+    {
+        [constraintParentView addConstraint:
+         [NSLayoutConstraint constraintWithItem:self.viewControllerForLayoutGuides.bottomLayoutGuide
+                                      attribute:NSLayoutAttributeTop
+                                      relatedBy:NSLayoutRelationGreaterThanOrEqual
+                                         toItem:self.attributionButton
+                                      attribute:NSLayoutAttributeBaseline
+                                     multiplier:1
+                                       constant:8]];
+    }
+    [constraintParentView addConstraint:
+     [NSLayoutConstraint constraintWithItem:self
+                                  attribute:NSLayoutAttributeBottom
+                                  relatedBy:NSLayoutRelationGreaterThanOrEqual
+                                     toItem:self.attributionButton
+                                  attribute:NSLayoutAttributeBaseline
+                                 multiplier:1
+                                   constant:8]];
 
-    [constraintParentView addConstraints:[NSLayoutConstraint constraintsWithVisualFormat:@"H:[attributionButton]-rightSpacing-|"
-                                                                                 options:0
-                                                                                 metrics:@{ @"rightSpacing"      : @(8) }
-                                                                                   views:@{ @"attributionButton" : self.attributionButton }]];
+    [constraintParentView addConstraint:
+     [NSLayoutConstraint constraintWithItem:self
+                                  attribute:NSLayoutAttributeTrailing
+                                  relatedBy:NSLayoutRelationEqual
+                                     toItem:self.attributionButton
+                                  attribute:NSLayoutAttributeTrailing
+                                 multiplier:1
+                                   constant:8]];
 
     [super updateConstraints];
 }
@@ -1151,12 +1205,6 @@ mbgl::DefaultFileSource *mbglFileSource = nullptr;
                          if (finished)
                          {
                              [self notifyMapChange:@(animated ? mbgl::MapChangeRegionDidChangeAnimated : mbgl::MapChangeRegionDidChange)];
-
-                             [UIView animateWithDuration:MGLAnimationDuration
-                                              animations:^
-                                              {
-                                                  self.compass.alpha = 0;
-                                              }];
                          }
                      }];
 }
@@ -2252,6 +2300,17 @@ CLLocationCoordinate2D latLngToCoordinate(mbgl::LatLng latLng)
                          animations:^
                          {
                              self.compass.alpha = 1;
+                         }
+                         completion:nil];
+    }
+    else if (mbglMap->getBearing() == 0 && self.compass.alpha > 0)
+    {
+        [UIView animateWithDuration:MGLAnimationDuration
+                              delay:0
+                            options:UIViewAnimationOptionBeginFromCurrentState
+                         animations:^
+                         {
+                             self.compass.alpha = 0;
                          }
                          completion:nil];
     }

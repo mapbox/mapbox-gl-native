@@ -22,7 +22,6 @@ const std::map<PropertyKey, PropertyValue> PropertyFallbackValue::properties = {
     { PropertyKey::LineBlur, defaultStyleProperties<LineProperties>().blur },
 
     { PropertyKey::IconOpacity, defaultStyleProperties<SymbolProperties>().icon.opacity },
-    { PropertyKey::IconRotate, defaultStyleProperties<SymbolProperties>().icon.rotate },
     { PropertyKey::IconSize, defaultStyleProperties<SymbolProperties>().icon.size },
     { PropertyKey::IconColor, defaultStyleProperties<SymbolProperties>().icon.color },
     { PropertyKey::IconHaloColor, defaultStyleProperties<SymbolProperties>().icon.halo_color },

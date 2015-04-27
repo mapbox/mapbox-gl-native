@@ -50,7 +50,7 @@ NSString *const MGLEventGestureRotateStart = @"Rotation";
 // from within a single thread use underscore syntax.
 //
 // All captures of `self` from within asynchronous
-// dispatches will use a `weakSelf` to avoid cyclical
+// dispatches will use a `strongSelf` to avoid cyclical
 // strong references.
 //
 
@@ -62,6 +62,7 @@ NSString *const MGLEventGestureRotateStart = @"Rotation";
 @property (atomic) NSString *token;
 @property (atomic) NSString *appName;
 @property (atomic) NSString *appVersion;
+@property (atomic) NSString *appBuildNumber;
 @property (atomic) NSString *instanceID;
 @property (atomic) NSString *advertiserId;
 @property (atomic) NSString *vendorId;
@@ -74,6 +75,7 @@ NSString *const MGLEventGestureRotateStart = @"Rotation";
 @property (atomic) NSDateFormatter *rfc3339DateFormatter;
 @property (atomic) CGFloat scale;
 @property (atomic) NSURLSession *session;
+@property (atomic) NSData *digicertCert;
 @property (atomic) NSData *geoTrustCert;
 
 
@@ -111,13 +113,13 @@ NSString *const MGLEventGestureRotateStart = @"Rotation";
     if (self) {
         
         // Put Settings bundle into memory
-        NSString *settingsBundle = [[NSBundle mainBundle] pathForResource:@"Settings" ofType:@"bundle"];
-        if(!settingsBundle) {
+        NSString *appSettingsBundle = [[NSBundle mainBundle] pathForResource:@"Settings" ofType:@"bundle"];
+        if(!appSettingsBundle) {
             NSLog(@"Could not find Settings.bundle");
         } else {
             // Dynamic Settings.bundle loading based on:
             // http://stackoverflow.com/questions/510216/can-you-make-the-settings-in-settings-bundle-default-even-if-you-dont-open-the
-            NSDictionary *settings = [NSDictionary dictionaryWithContentsOfFile:[settingsBundle stringByAppendingPathComponent:@"Root.plist"]];
+            NSDictionary *settings = [NSDictionary dictionaryWithContentsOfFile:[appSettingsBundle stringByAppendingPathComponent:@"Root.plist"]];
             NSArray *preferences = [settings objectForKey:@"PreferenceSpecifiers"];
             NSMutableDictionary *defaultsToRegister = [[NSMutableDictionary alloc] initWithCapacity:[preferences count]];
             for(NSDictionary *prefSpecification in preferences) {
@@ -140,16 +142,15 @@ NSString *const MGLEventGestureRotateStart = @"Rotation";
 
         // Load Local Copy of Server's Public Key
         NSString *cerPath = nil;
-        NSArray *bundles = [NSBundle allFrameworks];
-        for (int lc = 0; lc < bundles.count; lc++) {
-            NSBundle *b = [bundles objectAtIndex:lc];
-            cerPath = [[NSBundle mainBundle] pathForResource:@"api_mapbox_com-geotrust" ofType:@"der"];
-            if (cerPath != nil) {
-                break;
-            }
-        }
+        cerPath = [[NSBundle bundleForClass:[MGLMapboxEvents class]] pathForResource:@"api_mapbox_com-geotrust" ofType:@"der"];
         if (cerPath != nil) {
             _geoTrustCert = [NSData dataWithContentsOfFile:cerPath];
+        }
+
+        cerPath = nil;
+        cerPath = [[NSBundle bundleForClass:[MGLMapboxEvents class]] pathForResource:@"api_mapbox_com-digicert" ofType:@"der"];
+        if (cerPath != nil) {
+            _digicertCert = [NSData dataWithContentsOfFile:cerPath];
         }
 
         // Events Control
@@ -256,6 +257,13 @@ NSString *const MGLEventGestureRotateStart = @"Rotation";
 
 // Must be called from the main thread.
 //
++ (void) setAppBuildNumber:(NSString *)appBuildNumber {
+    assert([[NSThread currentThread] isMainThread]);
+    [MGLMapboxEvents sharedManager].appBuildNumber = appBuildNumber;
+}
+
+// Must be called from the main thread.
+//
 + (void) pauseMetricsCollection {
     assert([[NSThread currentThread] isMainThread]);
     if ([MGLMapboxEvents sharedManager].isPaused) {
@@ -292,6 +300,9 @@ NSString *const MGLEventGestureRotateStart = @"Rotation";
     __weak MGLMapboxEvents *weakSelf = self;
 
     dispatch_async(_serialQueue, ^{
+        MGLMapboxEvents *strongSelf = weakSelf;
+        if ( ! strongSelf) return;
+        
         // Opt Out Checking When Built
         if (![[NSUserDefaults standardUserDefaults] boolForKey:@"mapbox_metrics_enabled_preference"]) {
             [_eventQueue removeAllObjects];
@@ -315,35 +326,35 @@ NSString *const MGLEventGestureRotateStart = @"Rotation";
         // mapbox-events stock attributes
         [evt setObject:event forKey:@"event"];
         [evt setObject:@(1) forKey:@"version"];
-        [evt setObject:[weakSelf.rfc3339DateFormatter stringFromDate:[NSDate date]] forKey:@"created"];
-        [evt setObject:weakSelf.instanceID forKey:@"instance"];
-        [evt setObject:weakSelf.advertiserId forKey:@"advertiserId"];
-        [evt setObject:weakSelf.vendorId forKey:@"vendorId"];
-        [evt setObject:weakSelf.appBundleId forKeyedSubscript:@"appBundleId"];
+        [evt setObject:[strongSelf.rfc3339DateFormatter stringFromDate:[NSDate date]] forKey:@"created"];
+        [evt setObject:strongSelf.instanceID forKey:@"instance"];
+        [evt setObject:strongSelf.advertiserId forKey:@"advertiserId"];
+        [evt setObject:strongSelf.vendorId forKey:@"vendorId"];
+        [evt setObject:strongSelf.appBundleId forKeyedSubscript:@"appBundleId"];
         
         // mapbox-events-ios stock attributes
-        [evt setValue:weakSelf.model forKey:@"model"];
-        [evt setValue:weakSelf.iOSVersion forKey:@"operatingSystem"];
-        [evt setValue:[weakSelf getDeviceOrientation] forKey:@"orientation"];
+        [evt setValue:strongSelf.model forKey:@"model"];
+        [evt setValue:strongSelf.iOSVersion forKey:@"operatingSystem"];
+        [evt setValue:[strongSelf getDeviceOrientation] forKey:@"orientation"];
         [evt setValue:@((int)(100 * [UIDevice currentDevice].batteryLevel)) forKey:@"batteryLevel"];
-        [evt setValue:@(weakSelf.scale) forKey:@"resolution"];
-        [evt setValue:weakSelf.carrier forKey:@"carrier"];
+        [evt setValue:@(strongSelf.scale) forKey:@"resolution"];
+        [evt setValue:strongSelf.carrier forKey:@"carrier"];
         
-        NSString *cell = [weakSelf getCurrentCellularNetworkConnectionType];
+        NSString *cell = [strongSelf getCurrentCellularNetworkConnectionType];
         if (cell) {
             [evt setValue:cell forKey:@"cellularNetworkType"];
         } else {
             [evt setObject:[NSNull null] forKey:@"cellularNetworkType"];
         }
         
-        NSString *wifi = [weakSelf getWifiNetworkName];
+        NSString *wifi = [strongSelf getWifiNetworkName];
         if (wifi) {
             [evt setValue:wifi forKey:@"wifi"];
         } else {
             [evt setObject:[NSNull null] forKey:@"wifi"];
         }
         
-        [evt setValue:@([weakSelf getContentSizeScale]) forKey:@"accessibilityFontScale"];
+        [evt setValue:@([strongSelf getContentSizeScale]) forKey:@"accessibilityFontScale"];
 
         // Make Immutable Version
         NSDictionary *finalEvent = [NSDictionary dictionaryWithDictionary:evt];
@@ -352,12 +363,12 @@ NSString *const MGLEventGestureRotateStart = @"Rotation";
         [_eventQueue addObject:finalEvent];
         
         // Has Flush Limit Been Reached?
-        if (_eventQueue.count >= weakSelf.flushAt) {
-            [weakSelf flush];
+        if (_eventQueue.count >= strongSelf.flushAt) {
+            [strongSelf flush];
         }
         
         // Reset Timer (Initial Starting of Timer after first event is pushed)
-        [weakSelf startTimer];
+        [strongSelf startTimer];
     });
 }
 
@@ -375,10 +386,13 @@ NSString *const MGLEventGestureRotateStart = @"Rotation";
     __weak MGLMapboxEvents *weakSelf = self;
 
     dispatch_async(_serialQueue, ^{
+        MGLMapboxEvents *strongSelf = weakSelf;
+        if ( ! strongSelf) return;
+        
         __block NSArray *events;
 
-        NSUInteger upper = weakSelf.flushAt;
-        if (weakSelf.flushAt > [_eventQueue count]) {
+        NSUInteger upper = strongSelf.flushAt;
+        if (strongSelf.flushAt > [_eventQueue count]) {
             if ([_eventQueue count] == 0) {
                 return;
             }
@@ -393,7 +407,7 @@ NSString *const MGLEventGestureRotateStart = @"Rotation";
         [_eventQueue removeObjectsInRange:theRange];
 
         // Send Array of Events to Server
-        [weakSelf postEvents:events];
+        [strongSelf postEvents:events];
     });
 }
 
@@ -456,8 +470,8 @@ NSString *const MGLEventGestureRotateStart = @"Rotation";
 // Can be called from any thread.
 //
 - (NSString *) getUserAgent {
-    if (self.appName != nil && self.appVersion != nil && ([self.userAgent rangeOfString:self.appName].location == NSNotFound)) {
-        self.userAgent = [NSString stringWithFormat:@"%@/%@ %@", self.appName, self.appVersion, self.userAgent];
+    if (self.appName != nil && self.appVersion != nil && self.appBuildNumber != nil && ([self.userAgent rangeOfString:self.appName].location == NSNotFound)) {
+        self.userAgent = [NSString stringWithFormat:@"%@/%@-%@ %@", self.appName, self.appVersion, self.appBuildNumber, self.userAgent];
     }
     return self.userAgent;
 }
@@ -680,6 +694,7 @@ NSString *const MGLEventGestureRotateStart = @"Rotation";
             long numKeys = SecTrustGetCertificateCount(serverTrust);
 
             BOOL found = false;
+            // Try GeoTrust Cert First
             for (int lc = 0; lc < numKeys; lc++) {
                 SecCertificateRef certificate = SecTrustGetCertificateAtIndex(serverTrust, lc);
                 NSData *remoteCertificateData = CFBridgingRelease(SecCertificateCopyData(certificate));
@@ -694,8 +709,24 @@ NSString *const MGLEventGestureRotateStart = @"Rotation";
             }
 
             if (!found) {
-                // The certificate wasn't found in the certificate chain; cancel the connection
-                completionHandler(NSURLSessionAuthChallengeCancelAuthenticationChallenge, [NSURLCredential credentialForTrust:challenge.protectionSpace.serverTrust]);
+                // Fallback to Digicert Cert
+                for (int lc = 0; lc < numKeys; lc++) {
+                    SecCertificateRef certificate = SecTrustGetCertificateAtIndex(serverTrust, lc);
+                    NSData *remoteCertificateData = CFBridgingRelease(SecCertificateCopyData(certificate));
+
+                    // Compare Remote Key With Local Version
+                    if ([remoteCertificateData isEqualToData:_digicertCert]) {
+                        // Found the certificate; continue connecting
+                        completionHandler(NSURLSessionAuthChallengeUseCredential, [NSURLCredential credentialForTrust:challenge.protectionSpace.serverTrust]);
+                        found = true;
+                        break;
+                    }
+                }
+
+                if (!found) {
+                    // The certificate wasn't found in GeoTrust nor Digicert. Cancel the connection.
+                    completionHandler(NSURLSessionAuthChallengeCancelAuthenticationChallenge, [NSURLCredential credentialForTrust:challenge.protectionSpace.serverTrust]);
+                }
             }
         }
         else

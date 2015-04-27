@@ -13,7 +13,6 @@
 #include <mbgl/shader/outline_shader.hpp>
 #include <mbgl/shader/pattern_shader.hpp>
 #include <mbgl/shader/line_shader.hpp>
-#include <mbgl/shader/linejoin_shader.hpp>
 #include <mbgl/shader/linesdf_shader.hpp>
 #include <mbgl/shader/linepattern_shader.hpp>
 #include <mbgl/shader/icon_shader.hpp>
@@ -199,7 +198,6 @@ public:
     std::unique_ptr<PlainShader> plainShader;
     std::unique_ptr<OutlineShader> outlineShader;
     std::unique_ptr<LineShader> lineShader;
-    std::unique_ptr<LinejoinShader> linejoinShader;
     std::unique_ptr<LineSDFShader> linesdfShader;
     std::unique_ptr<LinepatternShader> linepatternShader;
     std::unique_ptr<PatternShader> patternShader;
