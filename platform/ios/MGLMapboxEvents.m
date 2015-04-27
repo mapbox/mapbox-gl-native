@@ -708,23 +708,25 @@ NSString *const MGLEventGestureRotateStart = @"Rotation";
                 }
             }
 
-            // Fallback to Digicert Cert
-            for (int lc = 0; lc < numKeys; lc++) {
-                SecCertificateRef certificate = SecTrustGetCertificateAtIndex(serverTrust, lc);
-                NSData *remoteCertificateData = CFBridgingRelease(SecCertificateCopyData(certificate));
-
-                // Compare Remote Key With Local Version
-                if ([remoteCertificateData isEqualToData:_digicertCert]) {
-                    // Found the certificate; continue connecting
-                    completionHandler(NSURLSessionAuthChallengeUseCredential, [NSURLCredential credentialForTrust:challenge.protectionSpace.serverTrust]);
-                    found = true;
-                    break;
-                }
-            }
-
             if (!found) {
-                // The certificate wasn't found in the certificate chain; cancel the connection
-                completionHandler(NSURLSessionAuthChallengeCancelAuthenticationChallenge, [NSURLCredential credentialForTrust:challenge.protectionSpace.serverTrust]);
+                // Fallback to Digicert Cert
+                for (int lc = 0; lc < numKeys; lc++) {
+                    SecCertificateRef certificate = SecTrustGetCertificateAtIndex(serverTrust, lc);
+                    NSData *remoteCertificateData = CFBridgingRelease(SecCertificateCopyData(certificate));
+
+                    // Compare Remote Key With Local Version
+                    if ([remoteCertificateData isEqualToData:_digicertCert]) {
+                        // Found the certificate; continue connecting
+                        completionHandler(NSURLSessionAuthChallengeUseCredential, [NSURLCredential credentialForTrust:challenge.protectionSpace.serverTrust]);
+                        found = true;
+                        break;
+                    }
+                }
+
+                if (!found) {
+                    // The certificate wasn't found in GeoTrust nor Digicert. Cancel the connection.
+                    completionHandler(NSURLSessionAuthChallengeCancelAuthenticationChallenge, [NSURLCredential credentialForTrust:challenge.protectionSpace.serverTrust]);
+                }
             }
         }
         else
