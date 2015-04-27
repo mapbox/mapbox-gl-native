@@ -842,7 +842,7 @@ void StyleParser::parsePaint(JSVal value, ClassProperties &klass) {
 
     parseOptionalProperty<Function<float>>("background-opacity", Key::BackgroundOpacity, klass, value);
     parseOptionalProperty<Function<Color>>("background-color", Key::BackgroundColor, klass, value);
-    parseOptionalProperty<PiecewiseConstantFunction<Faded<std::string>>>("background-image", Key::BackgroundImage, klass, value, "background-image-transition");
+    parseOptionalProperty<PiecewiseConstantFunction<Faded<std::string>>>("background-pattern", Key::BackgroundImage, klass, value, "background-pattern-transition");
 }
 
 void StyleParser::parseLayout(JSVal value, util::ptr<StyleBucket> &bucket) {
