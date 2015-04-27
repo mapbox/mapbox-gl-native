@@ -80,8 +80,8 @@
         MGLEventKeyLatitude: @(visit.coordinate.latitude),
         MGLEventKeyLongitude: @(visit.coordinate.longitude),
         MGLEventKeyHorizontalAccuracy: @(visit.horizontalAccuracy),
-        MGLEventKeyArrivalDate: [_rfc3339DateFormatter stringFromDate:visit.arrivalDate],
-        MGLEventKeyDepartureDate: [_rfc3339DateFormatter stringFromDate:visit.departureDate],
+        MGLEventKeyArrivalDate: [[NSDate distantPast] isEqualToDate:visit.arrivalDate] ? [NSNull null] : [_rfc3339DateFormatter stringFromDate:visit.arrivalDate],
+        MGLEventKeyDepartureDate: [[NSDate distantFuture] isEqualToDate:visit.departureDate] ? [NSNull null] : [_rfc3339DateFormatter stringFromDate:visit.departureDate]
     }];
 }
 
