@@ -61,7 +61,13 @@ struct vec2 {
     template <typename O>
     inline typename std::enable_if<!std::is_arithmetic<O>::value, vec2>::type
     operator-(const O &o) const {
-        return {x - o.x, y - o.y};
+        return vec2<T>(x - o.x, y - o.y);
+    }
+
+    template <typename O>
+    inline typename std::enable_if<!std::is_arithmetic<O>::value, vec2>::type
+    operator+(const O &o) const {
+        return vec2<T>(x + o.x, y + o.y);
     }
 
     template <typename M>
