@@ -15,10 +15,8 @@ TEST_F(Storage, AssetReadDirectory) {
     DefaultFileSource fs(nullptr);
 #endif
 
-    auto &env = *static_cast<const Environment *>(nullptr);
-
     fs.request({ Resource::Unknown, "asset://TEST_DATA/fixtures/storage" }, uv_default_loop(),
-               env, [&](const Response &res) {
+               [&](const Response &res) {
         EXPECT_EQ(Response::Error, res.status);
         EXPECT_EQ(0ul, res.data.size());
         EXPECT_EQ(0, res.expires);
@@ -27,7 +25,7 @@ TEST_F(Storage, AssetReadDirectory) {
 #ifdef MBGL_ASSET_ZIP
         EXPECT_EQ("No such file", res.message);
 #elif MBGL_ASSET_FS
-                            EXPECT_EQ("illegal operation on a directory", res.message);
+        EXPECT_EQ("illegal operation on a directory", res.message);
 #endif
         ReadDirectory.finish();
     });

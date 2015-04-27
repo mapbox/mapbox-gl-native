@@ -10,7 +10,6 @@
 #include <mbgl/util/chrono.hpp>
 #include <mbgl/util/thread.hpp>
 #include <mbgl/platform/log.hpp>
-#include <mbgl/map/environment.hpp>
 
 #pragma GCC diagnostic push
 #pragma GCC diagnostic ignored "-Wshadow"
@@ -38,9 +37,8 @@ DefaultFileSource::~DefaultFileSource() {
 
 Request* DefaultFileSource::request(const Resource& resource,
                                     uv_loop_t* l,
-                                    const Environment& env,
                                     Callback callback) {
-    auto req = new Request(resource, l, env, std::move(callback));
+    auto req = new Request(resource, l, std::move(callback));
 
     // This function can be called from any thread. Make sure we're executing the actual call in the
     // file source loop by sending it over the queue.
@@ -49,8 +47,8 @@ Request* DefaultFileSource::request(const Resource& resource,
     return req;
 }
 
-void DefaultFileSource::request(const Resource& resource, const Environment& env, Callback callback) {
-    request(resource, nullptr, env, std::move(callback));
+void DefaultFileSource::request(const Resource& resource, Callback callback) {
+    request(resource, nullptr, std::move(callback));
 }
 
 void DefaultFileSource::cancel(Request *req) {
@@ -59,10 +57,6 @@ void DefaultFileSource::cancel(Request *req) {
     // This function can be called from any thread. Make sure we're executing the actual call in the
     // file source loop by sending it over the queue.
     thread->invoke(&Impl::cancel, req);
-}
-
-void DefaultFileSource::abort(const Environment &env) {
-    thread->invoke(&Impl::abort, std::ref(env));
 }
 
 // ----- Impl -----
@@ -161,35 +155,6 @@ void DefaultFileSource::Impl::cancel(Request* req) {
     // Send a message back to the requesting thread and notify it that this request has been
     // canceled and is now safe to be deleted.
     req->destruct();
-}
-
-// Aborts all requests that are part of the current environment.
-void DefaultFileSource::Impl::abort(const Environment& env) {
-    // Construct a cancellation response.
-    auto response = std::make_shared<Response>();
-    response->status = Response::Error;
-    response->message = "Environment is terminating";
-
-    // Iterate through all pending requests and remove them in case they're abandoned.
-    util::erase_if(pending, [&](std::pair<const Resource, DefaultFileRequest>& it) -> bool {
-        // Notify all pending requests that are in the current environment.
-        util::erase_if(it.second.observers, [&](Request* req) -> bool {
-            if (&req->env == &env) {
-                req->notify(response);
-                return true;
-            } else {
-                return false;
-            }
-        });
-
-        bool abandoned = it.second.observers.empty();
-
-        if (abandoned && it.second.request) {
-            it.second.request->cancel();
-        }
-
-        return abandoned;
-    });
 }
 
 void DefaultFileSource::Impl::notify(DefaultFileRequest* request, std::shared_ptr<const Response> response, FileCache::Hint hint) {

@@ -26,7 +26,6 @@ public:
 
     void add(Request*, uv_loop_t*);
     void cancel(Request*);
-    void abort(const Environment&);
 
 private:
     DefaultFileRequest* find(const Resource&);

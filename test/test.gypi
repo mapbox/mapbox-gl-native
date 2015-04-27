@@ -62,7 +62,6 @@
         'storage/file_reading.cpp',
         'storage/http_cancel.cpp',
         'storage/http_coalescing.cpp',
-        'storage/http_environment.cpp',
         'storage/http_error.cpp',
         'storage/http_header_parsing.cpp',
         'storage/http_load.cpp',

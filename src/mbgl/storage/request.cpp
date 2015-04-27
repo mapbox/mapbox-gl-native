@@ -16,8 +16,8 @@ namespace mbgl {
 struct Request::Canceled { std::mutex mutex; bool confirmed = false; };
 
 // Note: This requires that loop is running in the current thread (or not yet running).
-Request::Request(const Resource &resource_, uv_loop_t *loop, const Environment &env_, Callback callback_)
-    : callback(callback_), resource(resource_), env(env_) {
+Request::Request(const Resource &resource_, uv_loop_t *loop, Callback callback_)
+    : callback(callback_), resource(resource_) {
     // When there is no loop supplied (== nullptr), the callback will be fired in an arbitrary
     // thread (the thread notify() is called from) rather than kicking back to the calling thread.
     if (loop) {
