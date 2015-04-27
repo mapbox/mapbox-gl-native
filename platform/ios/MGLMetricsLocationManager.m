@@ -6,6 +6,7 @@
 @interface MGLMetricsLocationManager() <CLLocationManagerDelegate>
 
 @property (nonatomic) CLLocationManager *locationManager;
+@property (atomic) NSDateFormatter *rfc3339DateFormatter;
 
 @end
 
@@ -16,6 +17,15 @@
         _locationManager = [[CLLocationManager alloc] init];
         _locationManager.distanceFilter = 10;
         [_locationManager setDelegate:self];
+
+        _rfc3339DateFormatter = [[NSDateFormatter alloc] init];
+        NSLocale *enUSPOSIXLocale = [[NSLocale alloc] initWithLocaleIdentifier:@"en_US_POSIX"];
+
+        [_rfc3339DateFormatter setLocale:enUSPOSIXLocale];
+        [_rfc3339DateFormatter setDateFormat:@"yyyy'-'MM'-'dd'T'HH':'mm':'ssZ"];
+        // Clear Any System TimeZone Cache
+        [NSTimeZone resetSystemTimeZone];
+        [_rfc3339DateFormatter setTimeZone:[NSTimeZone systemTimeZone]];
     }
     return self;
 }
@@ -63,6 +73,16 @@
             MGLEventKeyVerticalAccuracy: @(loc.verticalAccuracy)
         }];
     }
+}
+
+- (void)locationManager:(CLLocationManager *)manager didVisit:(CLVisit *)visit {
+    [MGLMapboxEvents pushEvent:MGLEventTypeVisit withAttributes:@{
+        MGLEventKeyLatitude: @(visit.coordinate.latitude),
+        MGLEventKeyLongitude: @(visit.coordinate.longitude),
+        MGLEventKeyHorizontalAccuracy: @(visit.horizontalAccuracy),
+        MGLEventKeyArrivalDate: [_rfc3339DateFormatter stringFromDate:visit.arrivalDate],
+        MGLEventKeyDepartureDate: [_rfc3339DateFormatter stringFromDate:visit.departureDate],
+    }];
 }
 
 - (void)locationManager:(CLLocationManager *)manager didChangeAuthorizationStatus:(CLAuthorizationStatus)status {

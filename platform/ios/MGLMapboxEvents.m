@@ -17,6 +17,7 @@ NSString *const MGLEventTypeMapLoad = @"map.load";
 NSString *const MGLEventTypeMapTap = @"map.click";
 NSString *const MGLEventTypeMapDragEnd = @"map.dragend";
 NSString *const MGLEventTypeLocation = @"location";
+NSString *const MGLEventTypeVisit = @"visit";
 
 NSString *const MGLEventKeyLatitude = @"lat";
 NSString *const MGLEventKeyLongitude = @"lng";
@@ -29,6 +30,8 @@ NSString *const MGLEventKeyVerticalAccuracy = @"verticalAccuracy";
 NSString *const MGLEventKeyPushEnabled = @"enabled.push";
 NSString *const MGLEventKeyEmailEnabled = @"enabled.email";
 NSString *const MGLEventKeyGestureID = @"gesture";
+NSString *const MGLEventKeyArrivalDate = @"arrivalDate";
+NSString *const MGLEventKeyDepartureDate = @"departureDate";
 
 NSString *const MGLEventGestureSingleTap = @"SingleTap";
 NSString *const MGLEventGestureDoubleTap = @"DoubleTap";
