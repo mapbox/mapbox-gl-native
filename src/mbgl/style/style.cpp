@@ -1,10 +1,10 @@
 #include <mbgl/style/style.hpp>
 #include <mbgl/map/sprite.hpp>
+#include <mbgl/map/source.hpp>
 #include <mbgl/style/style_layer.hpp>
 #include <mbgl/style/style_parser.hpp>
 #include <mbgl/style/style_bucket.hpp>
 #include <mbgl/util/constants.hpp>
-#include <mbgl/util/error.hpp>
 #include <mbgl/util/std.hpp>
 #include <mbgl/util/uv_detail.hpp>
 #include <mbgl/platform/log.hpp>
@@ -36,10 +36,17 @@ void Style::cascade(const std::vector<std::string>& classes) {
 void Style::recalculate(float z, TimePoint now) {
     uv::writelock lock(mtx);
 
+    for (const auto& source : sources) {
+        source->enabled = false;
+    }
+
     zoomHistory.update(z, now);
 
     for (const auto& layer : layers) {
         layer->updateProperties(z, now, zoomHistory);
+        if (layer->bucket && layer->bucket->source) {
+            layer->bucket->source->enabled = true;
+        }
     }
 }
 
@@ -67,12 +74,13 @@ void Style::loadJSON(const uint8_t *const data) {
     doc.Parse<0>((const char *const)data);
     if (doc.HasParseError()) {
         Log::Error(Event::ParseStyle, "Error parsing style JSON at %i: %s", doc.GetErrorOffset(), doc.GetParseError());
-        throw error::style_parse(doc.GetErrorOffset(), doc.GetParseError());
+        return;
     }
 
     StyleParser parser;
     parser.parse(doc);
 
+    sources = parser.getSources();
     layers = parser.getLayers();
     sprite_url = parser.getSprite();
     glyph_url = parser.getGlyphURL();

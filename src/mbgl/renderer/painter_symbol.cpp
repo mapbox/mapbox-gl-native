@@ -13,7 +13,7 @@ using namespace mbgl;
 
 template <typename BucketProperties, typename StyleProperties>
 void Painter::renderSDF(SymbolBucket &bucket,
-                        const Tile::ID &id,
+                        const TileID &id,
                         const mat4 &matrix,
                         const BucketProperties& bucketProperties,
                         const StyleProperties& styleProperties,
@@ -35,7 +35,7 @@ void Painter::renderSDF(SymbolBucket &bucket,
     }
 
     // If layerStyle.size > bucket.info.fontSize then labels may collide
-    float fontSize = std::fmin(styleProperties.size, bucketProperties.max_size);
+    float fontSize = styleProperties.size;
     float fontScale = fontSize / sdfFontSize;
     matrix::scale(exMatrix, exMatrix, fontScale, fontScale, 1.0f);
 
@@ -107,7 +107,7 @@ void Painter::renderSDF(SymbolBucket &bucket,
     }
 }
 
-void Painter::renderSymbol(SymbolBucket &bucket, const StyleLayer &layer_desc, const Tile::ID &id, const mat4 &matrix) {
+void Painter::renderSymbol(SymbolBucket &bucket, const StyleLayer &layer_desc, const TileID &id, const mat4 &matrix) {
     // Abort early.
     if (pass == RenderPass::Opaque) {
         return;

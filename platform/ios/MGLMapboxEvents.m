@@ -6,6 +6,7 @@
 #import <CoreTelephony/CTCarrier.h>
 
 #import "MGLMetricsLocationManager.h"
+#import "NSProcessInfo+MGLAdditions.h"
 
 #include <sys/sysctl.h>
 
@@ -22,6 +23,9 @@ NSString *const MGLEventKeyLongitude = @"lng";
 NSString *const MGLEventKeyZoomLevel = @"zoom";
 NSString *const MGLEventKeySpeed = @"speed";
 NSString *const MGLEventKeyCourse = @"course";
+NSString *const MGLEventKeyAltitude = @"altitude";
+NSString *const MGLEventKeyHorizontalAccuracy = @"horizontalAccuracy";
+NSString *const MGLEventKeyVerticalAccuracy = @"verticalAccuracy";
 NSString *const MGLEventKeyPushEnabled = @"enabled.push";
 NSString *const MGLEventKeyEmailEnabled = @"enabled.email";
 NSString *const MGLEventKeyGestureID = @"gesture";
@@ -46,7 +50,7 @@ NSString *const MGLEventGestureRotateStart = @"Rotation";
 // from within a single thread use underscore syntax.
 //
 // All captures of `self` from within asynchronous
-// dispatches will use a `weakSelf` to avoid cyclical
+// dispatches will use a `strongSelf` to avoid cyclical
 // strong references.
 //
 
@@ -69,6 +73,13 @@ NSString *const MGLEventGestureRotateStart = @"Rotation";
 @property (atomic) NSUInteger flushAt;
 @property (atomic) NSDateFormatter *rfc3339DateFormatter;
 @property (atomic) CGFloat scale;
+@property (atomic) NSURLSession *session;
+@property (atomic) NSData *geoTrustCert;
+
+
+// The isPaused state tracker is only ever accessed from the main thread.
+//
+@property (nonatomic) BOOL isPaused;
 
 // The timer is only ever accessed from the main thread.
 //
@@ -123,11 +134,31 @@ NSString *const MGLEventGestureRotateStart = @"Rotation";
         _serialQueue = dispatch_queue_create([[NSString stringWithFormat:@"%@.%@.events.serial", _appBundleId, uniqueID] UTF8String], DISPATCH_QUEUE_SERIAL);
 
         // Configure Events Infrastructure
+        // ===============================
+
+         _session = [NSURLSession sessionWithConfiguration:[NSURLSessionConfiguration defaultSessionConfiguration] delegate:self delegateQueue:nil];
+
+        // Load Local Copy of Server's Public Key
+        NSString *cerPath = nil;
+        NSArray *bundles = [NSBundle allFrameworks];
+        for (int lc = 0; lc < bundles.count; lc++) {
+            NSBundle *b = [bundles objectAtIndex:lc];
+            cerPath = [[NSBundle mainBundle] pathForResource:@"api_mapbox_com-geotrust" ofType:@"der"];
+            if (cerPath != nil) {
+                break;
+            }
+        }
+        if (cerPath != nil) {
+            _geoTrustCert = [NSData dataWithContentsOfFile:cerPath];
+        }
+
+        // Events Control
         _eventQueue = [[NSMutableArray alloc] init];
         _flushAt = 20;
         _flushAfter = 60;
         _token = nil;
         _instanceID = [[NSUUID UUID] UUIDString];
+
         // Dynamic detection of ASIdentifierManager from Mixpanel
         // https://github.com/mixpanel/mixpanel-iphone/blob/master/LICENSE
         _advertiserId = @"";
@@ -163,8 +194,15 @@ NSString *const MGLEventGestureRotateStart = @"Rotation";
         NSLocale *enUSPOSIXLocale = [[NSLocale alloc] initWithLocaleIdentifier:@"en_US_POSIX"];
         
         [_rfc3339DateFormatter setLocale:enUSPOSIXLocale];
-        [_rfc3339DateFormatter setDateFormat:@"yyyy'-'MM'-'dd'T'HH':'mm':'ss'Z'"];
-        [_rfc3339DateFormatter setTimeZone:[NSTimeZone timeZoneForSecondsFromGMT:0]];
+        [_rfc3339DateFormatter setDateFormat:@"yyyy'-'MM'-'dd'T'HH':'mm':'ssZ"];
+        // Clear Any System TimeZone Cache
+        [NSTimeZone resetSystemTimeZone];
+        [_rfc3339DateFormatter setTimeZone:[NSTimeZone systemTimeZone]];
+        
+        // Enable Battery Monitoring
+        [UIDevice currentDevice].batteryMonitoringEnabled = YES;
+        
+        _isPaused = NO;
     }
     return self;
 }
@@ -176,17 +214,20 @@ NSString *const MGLEventGestureRotateStart = @"Rotation";
     static dispatch_once_t onceToken;
     static MGLMapboxEvents *_sharedManager;
     dispatch_once(&onceToken, ^{
-        void (^setupBlock)() = ^{
-            _sharedManager = [[self alloc] init];
-            // setup dedicated location manager on first use
-            [MGLMetricsLocationManager sharedManager];
-        };
-        if ( ! [[NSThread currentThread] isMainThread]) {
-            dispatch_sync(dispatch_get_main_queue(), ^{
+        if ( ! NSProcessInfo.processInfo.mgl_isInterfaceBuilderDesignablesAgent) {
+            void (^setupBlock)() = ^{
+                _sharedManager = [[self alloc] init];
+                // setup dedicated location manager on first use
+                [MGLMetricsLocationManager sharedManager];
+            };
+            if ( ! [[NSThread currentThread] isMainThread]) {
+                dispatch_sync(dispatch_get_main_queue(), ^{
+                    setupBlock();
+                });
+            }
+            else {
                 setupBlock();
-            });
-        } else {
-            setupBlock();
+            }
         }
     });
     return _sharedManager;
@@ -213,6 +254,28 @@ NSString *const MGLEventGestureRotateStart = @"Rotation";
     [MGLMapboxEvents sharedManager].appVersion = appVersion;
 }
 
+// Must be called from the main thread.
+//
++ (void) pauseMetricsCollection {
+    assert([[NSThread currentThread] isMainThread]);
+    if ([MGLMapboxEvents sharedManager].isPaused) {
+        return;
+    }
+    [MGLMapboxEvents sharedManager].isPaused = YES;
+    [MGLMetricsLocationManager stopUpdatingLocation];
+}
+
+// Must be called from the main thread.
+//
++ (void) resumeMetricsCollection {
+    assert([[NSThread currentThread] isMainThread]);
+    if (![MGLMapboxEvents sharedManager].isPaused) {
+        return;
+    }
+    [MGLMapboxEvents sharedManager].isPaused = NO;
+    [MGLMetricsLocationManager startUpdatingLocation];
+}
+
 // Can be called from any thread. Can be called rapidly from
 // the UI thread, so performance is paramount.
 //
@@ -229,6 +292,9 @@ NSString *const MGLEventGestureRotateStart = @"Rotation";
     __weak MGLMapboxEvents *weakSelf = self;
 
     dispatch_async(_serialQueue, ^{
+        MGLMapboxEvents *strongSelf = weakSelf;
+        if ( ! strongSelf) return;
+        
         // Opt Out Checking When Built
         if (![[NSUserDefaults standardUserDefaults] boolForKey:@"mapbox_metrics_enabled_preference"]) {
             [_eventQueue removeAllObjects];
@@ -241,29 +307,46 @@ NSString *const MGLEventGestureRotateStart = @"Rotation";
             return;
         }
         
+        // Metrics Collection Has Been Paused
+        if (_isPaused) {
+            return;
+        }
+        
         if (!event) return;
 
         NSMutableDictionary *evt = [[NSMutableDictionary alloc] initWithDictionary:attributeDictionary];
         // mapbox-events stock attributes
         [evt setObject:event forKey:@"event"];
         [evt setObject:@(1) forKey:@"version"];
-        [evt setObject:[weakSelf formatDate:[NSDate date]] forKey:@"created"];
-        [evt setObject:weakSelf.instanceID forKey:@"instance"];
-        [evt setObject:weakSelf.advertiserId forKey:@"advertiserId"];
-        [evt setObject:weakSelf.vendorId forKey:@"vendorId"];
-        [evt setObject:weakSelf.appBundleId forKeyedSubscript:@"appBundleId"];
+        [evt setObject:[strongSelf.rfc3339DateFormatter stringFromDate:[NSDate date]] forKey:@"created"];
+        [evt setObject:strongSelf.instanceID forKey:@"instance"];
+        [evt setObject:strongSelf.advertiserId forKey:@"advertiserId"];
+        [evt setObject:strongSelf.vendorId forKey:@"vendorId"];
+        [evt setObject:strongSelf.appBundleId forKeyedSubscript:@"appBundleId"];
         
         // mapbox-events-ios stock attributes
-        [evt setValue:[weakSelf.rfc3339DateFormatter stringFromDate:[NSDate date]] forKey:@"created"];
-        [evt setValue:weakSelf.model forKey:@"model"];
-        [evt setValue:weakSelf.iOSVersion forKey:@"operatingSystem"];
-        [evt setValue:[weakSelf getDeviceOrientation] forKey:@"orientation"];
-        [evt setValue:@(100 * [UIDevice currentDevice].batteryLevel) forKey:@"batteryLevel"];
-        [evt setValue:@(weakSelf.scale) forKey:@"resolution"];
-        [evt setValue:weakSelf.carrier forKey:@"carrier"];
-        [evt setValue:[weakSelf getCurrentCellularNetworkConnectionType] forKey:@"cellularNetworkType"];
-        [evt setValue:[weakSelf getWifiNetworkName] forKey:@"wifi"];
-        [evt setValue:@([weakSelf getContentSizeScale]) forKey:@"accessibilityFontScale"];
+        [evt setValue:strongSelf.model forKey:@"model"];
+        [evt setValue:strongSelf.iOSVersion forKey:@"operatingSystem"];
+        [evt setValue:[strongSelf getDeviceOrientation] forKey:@"orientation"];
+        [evt setValue:@((int)(100 * [UIDevice currentDevice].batteryLevel)) forKey:@"batteryLevel"];
+        [evt setValue:@(strongSelf.scale) forKey:@"resolution"];
+        [evt setValue:strongSelf.carrier forKey:@"carrier"];
+        
+        NSString *cell = [strongSelf getCurrentCellularNetworkConnectionType];
+        if (cell) {
+            [evt setValue:cell forKey:@"cellularNetworkType"];
+        } else {
+            [evt setObject:[NSNull null] forKey:@"cellularNetworkType"];
+        }
+        
+        NSString *wifi = [strongSelf getWifiNetworkName];
+        if (wifi) {
+            [evt setValue:wifi forKey:@"wifi"];
+        } else {
+            [evt setObject:[NSNull null] forKey:@"wifi"];
+        }
+        
+        [evt setValue:@([strongSelf getContentSizeScale]) forKey:@"accessibilityFontScale"];
 
         // Make Immutable Version
         NSDictionary *finalEvent = [NSDictionary dictionaryWithDictionary:evt];
@@ -272,12 +355,12 @@ NSString *const MGLEventGestureRotateStart = @"Rotation";
         [_eventQueue addObject:finalEvent];
         
         // Has Flush Limit Been Reached?
-        if (_eventQueue.count >= weakSelf.flushAt) {
-            [weakSelf flush];
+        if (_eventQueue.count >= strongSelf.flushAt) {
+            [strongSelf flush];
         }
         
         // Reset Timer (Initial Starting of Timer after first event is pushed)
-        [weakSelf startTimer];
+        [strongSelf startTimer];
     });
 }
 
@@ -295,10 +378,13 @@ NSString *const MGLEventGestureRotateStart = @"Rotation";
     __weak MGLMapboxEvents *weakSelf = self;
 
     dispatch_async(_serialQueue, ^{
+        MGLMapboxEvents *strongSelf = weakSelf;
+        if ( ! strongSelf) return;
+        
         __block NSArray *events;
 
-        NSUInteger upper = weakSelf.flushAt;
-        if (weakSelf.flushAt > [_eventQueue count]) {
+        NSUInteger upper = strongSelf.flushAt;
+        if (strongSelf.flushAt > [_eventQueue count]) {
             if ([_eventQueue count] == 0) {
                 return;
             }
@@ -313,7 +399,7 @@ NSString *const MGLEventGestureRotateStart = @"Rotation";
         [_eventQueue removeObjectsInRange:theRange];
 
         // Send Array of Events to Server
-        [weakSelf postEvents:events];
+        [strongSelf postEvents:events];
     });
 }
 
@@ -324,10 +410,13 @@ NSString *const MGLEventGestureRotateStart = @"Rotation";
     __weak MGLMapboxEvents *weakSelf = self;
 
     dispatch_async(dispatch_get_global_queue(DISPATCH_QUEUE_PRIORITY_BACKGROUND, 0), ^{
+        MGLMapboxEvents *strongSelf = weakSelf;
+        if (!strongSelf) return;
+
         // Setup URL Request
-        NSString *url = [NSString stringWithFormat:@"%@/events/v1?access_token=%@", MGLMapboxEventsAPIBase, weakSelf.token];
+        NSString *url = [NSString stringWithFormat:@"%@/events/v1?access_token=%@", MGLMapboxEventsAPIBase, strongSelf.token];
         NSMutableURLRequest *request = [[NSMutableURLRequest alloc] initWithURL:[NSURL URLWithString:url]];
-        [request setValue:[weakSelf getUserAgent] forHTTPHeaderField:@"User-Agent"];
+        [request setValue:[strongSelf getUserAgent] forHTTPHeaderField:@"User-Agent"];
         [request setValue:@"application/json" forHTTPHeaderField:@"Content-Type"];
         [request setHTTPMethod:@"POST"];
         
@@ -337,9 +426,8 @@ NSString *const MGLEventGestureRotateStart = @"Rotation";
             [request setHTTPBody:jsonData];
 
             // Send non blocking HTTP Request to server
-            [NSURLConnection sendAsynchronousRequest:request
-                                               queue:nil
-                                   completionHandler:nil];
+            NSURLSessionDataTask *task = [_session dataTaskWithRequest:request completionHandler: nil];
+            [task resume];
         }
     });
 }
@@ -501,17 +589,13 @@ NSString *const MGLEventGestureRotateStart = @"Rotation";
 //
 - (NSString *) getWifiNetworkName {
     
-    NSString *ssid = @"";
+    NSString *ssid = nil;
     CFArrayRef interfaces = CNCopySupportedInterfaces();
     if (interfaces) {
         NSDictionary *info = (__bridge NSDictionary *)CNCopyCurrentNetworkInfo(CFArrayGetValueAtIndex(interfaces, 0));
         if (info) {
             ssid = info[@"SSID"];
-        } else {
-            ssid = @"NONE";
         }
-    } else {
-        ssid = @"NONE";
     }
     
     return ssid;
@@ -520,11 +604,11 @@ NSString *const MGLEventGestureRotateStart = @"Rotation";
 // Can be called from any thread.
 //
 - (NSString *) getCurrentCellularNetworkConnectionType {
-    CTTelephonyNetworkInfo *telephonyInfo = [CTTelephonyNetworkInfo new];
+    CTTelephonyNetworkInfo *telephonyInfo = [[CTTelephonyNetworkInfo alloc] init];
     NSString *radioTech = telephonyInfo.currentRadioAccessTechnology;
     
     if (radioTech == nil) {
-        return @"NONE";
+        return nil;
     } else if ([radioTech isEqualToString:CTRadioAccessTechnologyGPRS]) {
         return @"GPRS";
     } else if ([radioTech isEqualToString:CTRadioAccessTechnologyEdge]) {
@@ -582,6 +666,51 @@ NSString *const MGLEventGestureRotateStart = @"Rotation";
     }
 
     return result;
+}
+
+#pragma mark NSURLSessionDelegate
+- (void)URLSession:(NSURLSession *)session didReceiveChallenge:(NSURLAuthenticationChallenge *)challenge completionHandler:(void (^) (NSURLSessionAuthChallengeDisposition disposition, NSURLCredential *credential))completionHandler {
+
+    if([challenge.protectionSpace.authenticationMethod isEqualToString:NSURLAuthenticationMethodServerTrust]) {
+
+        SecTrustRef serverTrust = [[challenge protectionSpace] serverTrust];
+        NSString *domain = [[challenge protectionSpace] host];
+        SecTrustResultType trustResult;
+
+        // Validate the certificate chain with the device's trust store anyway
+        // This *might* give use revocation checking
+        SecTrustEvaluate(serverTrust, &trustResult);
+        if (trustResult == kSecTrustResultUnspecified)
+        {
+            // Look for a pinned certificate in the server's certificate chain
+            long numKeys = SecTrustGetCertificateCount(serverTrust);
+
+            BOOL found = false;
+            for (int lc = 0; lc < numKeys; lc++) {
+                SecCertificateRef certificate = SecTrustGetCertificateAtIndex(serverTrust, lc);
+                NSData *remoteCertificateData = CFBridgingRelease(SecCertificateCopyData(certificate));
+
+                // Compare Remote Key With Local Version
+                if ([remoteCertificateData isEqualToData:_geoTrustCert]) {
+                    // Found the certificate; continue connecting
+                    completionHandler(NSURLSessionAuthChallengeUseCredential, [NSURLCredential credentialForTrust:challenge.protectionSpace.serverTrust]);
+                    found = true;
+                    break;
+                }
+            }
+
+            if (!found) {
+                // The certificate wasn't found in the certificate chain; cancel the connection
+                completionHandler(NSURLSessionAuthChallengeCancelAuthenticationChallenge, [NSURLCredential credentialForTrust:challenge.protectionSpace.serverTrust]);
+            }
+        }
+        else
+        {
+            // Certificate chain validation failed; cancel the connection
+            completionHandler(NSURLSessionAuthChallengeCancelAuthenticationChallenge, [NSURLCredential credentialForTrust:challenge.protectionSpace.serverTrust]);
+        }
+    }
+    
 }
 
 @end

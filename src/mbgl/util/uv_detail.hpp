@@ -2,7 +2,6 @@
 #define MBGL_UTIL_UV_DETAIL
 
 #include <mbgl/util/uv.hpp>
-#include <mbgl/util/uv-worker.h>
 #include <mbgl/util/noncopyable.hpp>
 
 #include <uv.h>
@@ -11,6 +10,21 @@
 #include <cassert>
 #include <memory>
 #include <string>
+
+#if UV_VERSION_MAJOR == 0 && UV_VERSION_MINOR <= 10
+
+// Add thread local storage to libuv API:
+// https://github.com/joyent/libuv/commit/5d2434bf71e47802841bad218d521fa254d1ca2d
+
+typedef pthread_key_t uv_key_t;
+
+UV_EXTERN int uv_key_create(uv_key_t* key);
+UV_EXTERN void uv_key_delete(uv_key_t* key);
+UV_EXTERN void* uv_key_get(uv_key_t* key);
+UV_EXTERN void uv_key_set(uv_key_t* key, void* value);
+
+#endif
+
 
 namespace uv {
 
@@ -42,10 +56,19 @@ public:
         uv_loop_close(l);
         delete l;
 #endif
-
     }
 
-    inline uv_loop_t *operator*() { return l; }
+    inline void run() {
+        uv_run(l, UV_RUN_DEFAULT);
+    }
+
+    inline uv_loop_t* operator*() {
+        return l;
+    }
+
+    inline uv_loop_t* get() {
+        return l;
+    }
 
 private:
     uv_loop_t *l = nullptr;
@@ -71,6 +94,14 @@ public:
         if (uv_async_send(a.get()) != 0) {
             throw std::runtime_error("failed to async send");
         }
+    }
+
+    inline void ref() {
+        uv_ref(reinterpret_cast<uv_handle_t*>(a.get()));
+    }
+
+    inline void unref() {
+        uv_unref(reinterpret_cast<uv_handle_t*>(a.get()));
     }
 
 private:
@@ -117,54 +148,20 @@ private:
     uv_rwlock_t mtx;
 };
 
-class worker : public mbgl::util::noncopyable {
+template <class T>
+class tls : public mbgl::util::noncopyable {
 public:
-    inline worker(uv_loop_t *loop, unsigned int count, const char *name = nullptr) : w(new uv_worker_t) {
-        uv_worker_init(w, loop, count, name);
+    inline tls() {
+        if (uv_key_create(&key) != 0) {
+            throw std::runtime_error("failed to initialize thread local storage key");
+        }
     }
-    inline ~worker() {
-        uv_worker_close(w, [](uv_worker_t *worker_) {
-            delete worker_;
-        });
-    }
-    inline void add(void *data, uv_worker_cb work_cb, uv_worker_after_cb after_work_cb) {
-        uv_worker_send(w, data, work_cb, after_work_cb);
-    }
+    inline ~tls() { uv_key_delete(&key); }
+    inline T* get() { return reinterpret_cast<T*>(uv_key_get(&key)); }
+    inline void set(T* val) { uv_key_set(&key, val); }
 
 private:
-    uv_worker_t *w;
-};
-
-template <typename T>
-class work : public mbgl::util::noncopyable {
-public:
-    typedef std::function<void (T&)> work_callback;
-    typedef std::function<void (T&)> after_work_callback;
-
-    template<typename... Args>
-    work(worker &worker, work_callback work_cb_, after_work_callback after_work_cb_, Args&&... args)
-        : data(std::forward<Args>(args)...),
-          work_cb(work_cb_),
-          after_work_cb(after_work_cb_) {
-        worker.add(this, do_work, after_work);
-    }
-
-private:
-    static void do_work(void *data) {
-        work<T> *w = reinterpret_cast<work<T> *>(data);
-        w->work_cb(w->data);
-    }
-
-    static void after_work(void *data) {
-        work<T> *w = reinterpret_cast<work<T> *>(data);
-        w->after_work_cb(w->data);
-        delete w;
-    }
-
-private:
-    T data;
-    work_callback work_cb;
-    after_work_callback after_work_cb;
+    uv_key_t key;
 };
 
 }

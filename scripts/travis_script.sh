@@ -1,5 +1,10 @@
 #!/usr/bin/env bash
 
+COMMIT_MESSAGE=$(git show -s --format=%B $1 | tr -d '\n')
+PUBLISH_TAG=$(echo "$COMMIT_MESSAGE" | grep -oE '\[publish [a-z0-9\.\-]+\]' | grep -oE '[a-z0-9\.\-]+' | tail -n1)
+PUBLISH_PLATFORM=$(echo "$PUBLISH_TAG" | awk -F '-v' '{ print $1 }')
+PUBLISH_VERSION=$(echo "$PUBLISH_TAG" | awk -F '-v' '{ print $2 }')
+
 set -e
 set -o pipefail
 
@@ -34,18 +39,33 @@ elif [[ ${TRAVIS_OS_NAME} == "linux" ]]; then
         mapbox_time_finish
     fi
 
-elif [[ ${TRAVIS_OS_NAME} == "osx" ]]; then
+elif [[ ${TRAVIS_OS_NAME} == "osx" && ${MASON_PLATFORM} == "osx" ]]; then
     #
     # build OS X
     #
-    mapbox_time "build_osx_project" \
+    mapbox_time "build_osx" \
     make xosx -j$JOBS
 
+elif [[ ${TRAVIS_OS_NAME} == "osx" && ${MASON_PLATFORM} == "ios" ]]; then
     #
-    # build iOS
+    # conditionally publish or test
     #
-    mapbox_time "build_ios_project_device_release" \
-    make ios -j$JOBS
-    mapbox_time "build_ios_project_simulator_debug" \
-    make isim -j$JOBS
+    if [[ -n "$PUBLISH_TAG" ]]; then
+        #
+        # build & package iOS
+        #
+        mapbox_time "package_ios"
+        make ipackage
+        #
+        # publish iOS build
+        #
+        mapbox_time "deploy_ios"
+        ./scripts/publish_ios.sh "$PUBLISH_VERSION"
+    else
+        #
+        # build & test iOS
+        #
+        mapbox_time "run_ios_tests"
+        make itest
+    fi
 fi

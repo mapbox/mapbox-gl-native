@@ -11,15 +11,17 @@
 static UIColor *const kTintColor = [UIColor colorWithRed:0.120 green:0.550 blue:0.670 alpha:1.000];
 
 static NSArray *const kStyleNames = @[
+    @"Mapbox Streets",
     @"Emerald",
+    @"Light",
+    @"Dark",
     @"Bright",
     @"Basic",
     @"Outdoors",
     @"Satellite",
-    @"Hybrid",
 ];
 
-static NSString *const kStyleVersion = @"v7";
+static NSString *const kStyleVersion = @"7";
 
 @interface MBXViewController () <UIActionSheetDelegate, MGLMapViewDelegate>
 
@@ -80,13 +82,13 @@ mbgl::Settings_NSUserDefaults *settings = nullptr;
                                                                             action:@selector(showSettings)];
 
     UIButton *titleButton = [UIButton buttonWithType:UIButtonTypeCustom];
-    [titleButton setFrame:CGRectMake(0, 0, 120, 40)];
+    [titleButton setFrame:CGRectMake(0, 0, 150, 40)];
     [titleButton setTitle:[kStyleNames firstObject] forState:UIControlStateNormal];
     [titleButton setTitleColor:kTintColor forState:UIControlStateNormal];
     [titleButton addTarget:self action:@selector(cycleStyles) forControlEvents:UIControlEventTouchUpInside];
     self.navigationItem.titleView = titleButton;
 
-    self.navigationItem.rightBarButtonItem = [[UIBarButtonItem alloc] initWithImage:[UIImage imageNamed:@"locateUser.png"]
+    self.navigationItem.rightBarButtonItem = [[UIBarButtonItem alloc] initWithImage:[UIImage imageNamed:@"TrackingLocationOffMask.png"]
                                                                               style:UIBarButtonItemStylePlain
                                                                              target:self
                                                                              action:@selector(locateUser)];
@@ -143,6 +145,7 @@ mbgl::Settings_NSUserDefaults *settings = nullptr;
                                               otherButtonTitles:@"Reset North",
                                                                 @"Reset Position",
                                                                 @"Toggle Debug",
+                                                                @"Empty Memory",
                                                                 @"Add 100 Points",
                                                                 @"Add 1,000 Points",
                                                                 @"Add 10,000 Points",
@@ -168,17 +171,21 @@ mbgl::Settings_NSUserDefaults *settings = nullptr;
     }
     else if (buttonIndex == actionSheet.firstOtherButtonIndex + 3)
     {
-        [self parseFeaturesAddingCount:100];
+        [self.mapView emptyMemoryCache];
     }
     else if (buttonIndex == actionSheet.firstOtherButtonIndex + 4)
     {
-        [self parseFeaturesAddingCount:1000];
+        [self parseFeaturesAddingCount:100];
     }
     else if (buttonIndex == actionSheet.firstOtherButtonIndex + 5)
     {
-        [self parseFeaturesAddingCount:10000];
+        [self parseFeaturesAddingCount:1000];
     }
     else if (buttonIndex == actionSheet.firstOtherButtonIndex + 6)
+    {
+        [self parseFeaturesAddingCount:10000];
+    }
+    else if (buttonIndex == actionSheet.firstOtherButtonIndex + 7)
     {
         [self.mapView removeAnnotations:self.mapView.annotations];
     }
@@ -246,10 +253,10 @@ mbgl::Settings_NSUserDefaults *settings = nullptr;
         styleName = [kStyleNames objectAtIndex:index];
     }
 
-    [self.mapView useBundledStyleNamed:
-        [[[styleName lowercaseString]
-        stringByAppendingString:@"-"]
-        stringByAppendingString:kStyleVersion]];
+    self.mapView.styleURL = [NSURL URLWithString:
+        [NSString stringWithFormat:@"asset://styles/%@-v%@.json",
+            [[styleName lowercaseString] stringByReplacingOccurrencesOfString:@" " withString:@"-"],
+            kStyleVersion]];
 
     [titleButton setTitle:styleName forState:UIControlStateNormal];
 }
@@ -292,6 +299,29 @@ mbgl::Settings_NSUserDefaults *settings = nullptr;
 - (BOOL)mapView:(MGLMapView *)mapView annotationCanShowCallout:(id <MGLAnnotation>)annotation
 {
     return YES;
+}
+
+- (void)mapView:(MGLMapView *)mapView didChangeUserTrackingMode:(MGLUserTrackingMode)mode animated:(BOOL)animated
+{
+    UIImage *newButtonImage;
+    
+    switch (mode) {
+        case MGLUserTrackingModeNone:
+            newButtonImage = [UIImage imageNamed:@"TrackingLocationOffMask.png"];
+            break;
+            
+        case MGLUserTrackingModeFollow:
+            newButtonImage = [UIImage imageNamed:@"TrackingLocationMask.png"];
+            break;
+            
+        case MGLUserTrackingModeFollowWithHeading:
+            newButtonImage = [UIImage imageNamed:@"TrackingHeadingMask.png"];
+            break;
+    }
+    
+    [UIView animateWithDuration:0.25 animations:^{
+        self.navigationItem.rightBarButtonItem.image = newButtonImage;
+    }];
 }
 
 #pragma clang diagnostic pop

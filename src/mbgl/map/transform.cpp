@@ -12,6 +12,21 @@
 
 using namespace mbgl;
 
+/** Converts the given angle (in radians) to be numerically close to the anchor angle, allowing it to be interpolated properly without sudden jumps. */
+static double _normalizeAngle(double angle, double anchorAngle)
+{
+    angle = util::wrap(angle, -M_PI, M_PI);
+    double diff = std::abs(angle - anchorAngle);
+    if (std::abs(angle - util::M2PI - anchorAngle) < diff) {
+        angle -= util::M2PI;
+    }
+    if (std::abs(angle + util::M2PI - anchorAngle) < diff) {
+        angle += util::M2PI;
+    }
+    
+    return angle;
+}
+
 Transform::Transform(View &view_)
     : view(view_)
 {
@@ -330,12 +345,7 @@ void Transform::_setAngle(double new_angle, const Duration duration) {
                            MapChangeRegionWillChangeAnimated :
                            MapChangeRegionWillChange);
 
-    while (new_angle > M_PI)
-        new_angle -= util::M2PI;
-    while (new_angle <= -M_PI)
-        new_angle += util::M2PI;
-
-    final.angle = new_angle;
+    final.angle = _normalizeAngle(new_angle, current.angle);
 
     if (duration == Duration::zero()) {
         current.angle = final.angle;

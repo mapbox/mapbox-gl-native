@@ -6,7 +6,7 @@ set -u
 
 NAME=MapboxGL
 OUTPUT=build/ios/pkg
-IOS_SDK_VERSION=8.1
+IOS_SDK_VERSION=`xcrun --sdk iphoneos --show-sdk-version`
 LIBUV_VERSION=0.10.28
 
 function step { >&2 echo -e "\033[1m\033[36m* $@\033[0m"; }
@@ -31,11 +31,12 @@ step "Creating build files..."
 export MASON_PLATFORM=ios
 export BUILDTYPE=${BUILDTYPE:-Release}
 export HOST=ios
-make Xcode/mbgl
+make Xcode/ios
 
-step "Building iOS targets..."
+step "Building iOS device targets..."
 xcodebuild -sdk iphoneos${IOS_SDK_VERSION} \
     ARCHS="arm64 armv7 armv7s" \
+    ONLY_ACTIVE_ARCH=NO \
     -project ./build/ios/mbgl.xcodeproj \
     -configuration ${BUILDTYPE} \
     -target everything \
@@ -45,6 +46,7 @@ xcodebuild -sdk iphoneos${IOS_SDK_VERSION} \
 step "Building iOS Simulator targets..."
 xcodebuild -sdk iphonesimulator${IOS_SDK_VERSION} \
     ARCHS="x86_64 i386" \
+    ONLY_ACTIVE_ARCH=NO \
     -project ./build/ios/mbgl.xcodeproj \
     -configuration ${BUILDTYPE} \
     -target everything \

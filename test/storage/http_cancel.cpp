@@ -12,7 +12,7 @@ TEST_F(Storage, HTTPCancel) {
 
     using namespace mbgl;
 
-    DefaultFileSource fs(nullptr, uv_default_loop());
+    DefaultFileSource fs(nullptr);
 
     auto &env = *static_cast<const Environment *>(nullptr);
 
@@ -31,7 +31,7 @@ TEST_F(Storage, HTTPCancelMultiple) {
 
     using namespace mbgl;
 
-    DefaultFileSource fs(nullptr, uv_default_loop());
+    DefaultFileSource fs(nullptr);
 
     auto &env = *static_cast<const Environment *>(nullptr);
     const Resource resource { Resource::Unknown, "http://127.0.0.1:3000/test" };

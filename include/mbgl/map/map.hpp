@@ -7,7 +7,6 @@
 #include <mbgl/util/geo.hpp>
 #include <mbgl/util/projection.hpp>
 #include <mbgl/util/noncopyable.hpp>
-#include <mbgl/util/uv.hpp>
 #include <mbgl/util/ptr.hpp>
 #include <mbgl/util/vec.hpp>
 
@@ -22,6 +21,8 @@
 #include <condition_variable>
 #include <functional>
 
+namespace uv { class async; }
+
 namespace mbgl {
 
 class Painter;
@@ -30,7 +31,6 @@ class LayerDescription;
 class Sprite;
 class Style;
 class StyleLayer;
-class StyleSource;
 class TexturePool;
 class FileSource;
 class View;
@@ -41,16 +41,25 @@ class Environment;
 class EnvironmentScope;
 class AnnotationManager;
 class MapData;
+class Worker;
+class StillImage;
 
 class Map : private util::noncopyable {
     friend class View;
 
 public:
+    enum class Mode : uint8_t {
+        None, // we're not doing any processing
+        Continuous, // continually updating map
+        Still, // a once-off still image.
+    };
+
     explicit Map(View&, FileSource&);
     ~Map();
 
     // Start the map render thread. It is asynchronous.
-    void start(bool startPaused = false);
+    void start(bool startPaused = false, Mode mode = Mode::Continuous);
+    inline void start(Mode renderMode) { start(false, renderMode); }
 
     // Stop the map render thread. This call will block until the map rendering thread stopped.
     // The optional callback function will be invoked repeatedly until the map thread is stopped.
@@ -64,10 +73,8 @@ public:
     // Resumes a paused render thread
     void resume();
 
-    // Runs the map event loop. ONLY run this function when you want to get render a single frame
-    // with this map object. It will *not* spawn a separate thread and instead block until the
-    // frame is completely rendered.
-    void run();
+    using StillImageCallback = std::function<void(std::unique_ptr<const StillImage>)>;
+    void renderStill(StillImageCallback callback);
 
     // Triggers a synchronous or asynchronous render.
     void renderSync();
@@ -96,6 +103,7 @@ public:
     Duration getDefaultTransitionDuration();
     void setStyleURL(const std::string& url);
     void setStyleJSON(const std::string& json, const std::string& base = "");
+    std::string getStyleURL() const;
     std::string getStyleJSON() const;
 
     // Transition
@@ -150,6 +158,11 @@ public:
     std::vector<uint32_t> getAnnotationsInBounds(const LatLngBounds&);
     LatLngBounds getBoundsForAnnotations(const std::vector<uint32_t>&);
 
+    // Memory
+    void setSourceTileCacheSize(size_t);
+    size_t getSourceTileCacheSize() const { return sourceCacheSize; }
+    void onLowMemory();
+
     // Debug
     void setDebug(bool value);
     void toggleDebug();
@@ -160,12 +173,17 @@ public:
     inline AnnotationManager& getAnnotationManager() const { return *annotationManager; }
 
 private:
+    // Runs the map event loop. ONLY run this function when you want to get render a single frame
+    // with this map object. It will *not* spawn a separate thread and instead block until the
+    // frame is completely rendered.
+    void run();
+
     // This may only be called by the View object.
     void resize(uint16_t width, uint16_t height, float ratio = 1);
     void resize(uint16_t width, uint16_t height, float ratio, uint16_t fbWidth, uint16_t fbHeight);
 
     util::ptr<Sprite> getSprite();
-    uv::worker& getWorker();
+    Worker& getWorker();
 
     // Checks if render thread needs to pause
     void checkForPause();
@@ -174,7 +192,6 @@ private:
     void setup();
 
     void updateTiles();
-    void updateSources();
 
     // Triggered by triggerUpdate();
     void update();
@@ -193,13 +210,9 @@ private:
 
     void processTasks();
 
-    void updateAnnotationTiles(const std::vector<Tile::ID>&);
+    void updateAnnotationTiles(const std::vector<TileID>&);
 
-    enum class Mode : uint8_t {
-        None, // we're not doing any processing
-        Continuous, // continually updating map
-        Static, // a once-off static image.
-    };
+    size_t sourceCacheSize;
 
     Mode mode = Mode::None;
 
@@ -208,7 +221,7 @@ private:
     View &view;
 
 private:
-    std::unique_ptr<uv::worker> workers;
+    std::unique_ptr<Worker> workers;
     std::thread thread;
     std::unique_ptr<uv::async> asyncTerminate;
     std::unique_ptr<uv::async> asyncUpdate;
@@ -248,12 +261,11 @@ private:
 
     const std::unique_ptr<MapData> data;
 
-    std::set<util::ptr<StyleSource>> activeSources;
-
     std::atomic<UpdateType> updated;
 
     std::mutex mutexTask;
     std::queue<std::function<void()>> tasks;
+    StillImageCallback callback;
 };
 
 }

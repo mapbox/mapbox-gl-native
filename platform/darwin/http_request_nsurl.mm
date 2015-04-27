@@ -1,5 +1,5 @@
-#include <mbgl/storage/default/http_request.hpp>
-#include <mbgl/storage/default/http_context.hpp>
+#include <mbgl/storage/http_request.hpp>
+#include <mbgl/storage/http_context.hpp>
 #include <mbgl/storage/response.hpp>
 #include <mbgl/util/uv.hpp>
 
@@ -47,7 +47,7 @@ class HTTPNSURLContext;
 
 class HTTPRequestImpl {
 public:
-    HTTPRequestImpl(HTTPRequest *request, uv_loop_t *loop, std::unique_ptr<Response> response);
+    HTTPRequestImpl(HTTPRequest *request, uv_loop_t *loop, std::shared_ptr<const Response> response);
     ~HTTPRequestImpl();
 
     void cancel();
@@ -66,7 +66,7 @@ private:
     HTTPRequest *request = nullptr;
     NSURLSessionDataTask *task = nullptr;
     std::unique_ptr<Response> response;
-    std::unique_ptr<Response> existingResponse;
+    const std::shared_ptr<const Response> existingResponse;
     ResponseStatus status = ResponseStatus::PermanentError;
     uv_async_t *async = nullptr;
     int attempts = 0;
@@ -118,10 +118,10 @@ HTTPNSURLContext::~HTTPNSURLContext() {
 // -------------------------------------------------------------------------------------------------
 
 HTTPRequestImpl::HTTPRequestImpl(HTTPRequest *request_, uv_loop_t *loop,
-                                 std::unique_ptr<Response> existingResponse_)
+                                 std::shared_ptr<const Response> existingResponse_)
     : context(HTTPNSURLContext::Get(loop)),
       request(request_),
-      existingResponse(std::move(existingResponse_)),
+      existingResponse(existingResponse_),
       async(new uv_async_t) {
     assert(request);
     context->addRequest(request);
@@ -326,12 +326,12 @@ void HTTPRequestImpl::handleResult(NSData *data, NSURLResponse *res, NSError *er
 
         if (responseCode == 304) {
             if (existingResponse) {
-                // We're going to reuse the old response object, but need to copy over the new
-                // expires value (if possible).
-                std::swap(response, existingResponse);
-                if (existingResponse->expires) {
-                    response->expires = existingResponse->expires;
-                }
+                // We're going to copy over the existing response's data.
+                response->status = existingResponse->status;
+                response->message = existingResponse->message;
+                response->modified = existingResponse->modified;
+                response->etag = existingResponse->etag;
+                response->data = existingResponse->data;
                 status = ResponseStatus::NotModified;
             } else {
                 // This is an unsolicited 304 response and should only happen on malfunctioning
@@ -397,7 +397,7 @@ void HTTPRequestImpl::restart(uv_timer_t *timer, int) {
 
 // -------------------------------------------------------------------------------------------------
 
-HTTPRequest::HTTPRequest(DefaultFileSource *source, const Resource &resource)
+HTTPRequest::HTTPRequest(DefaultFileSource::Impl *source, const Resource &resource)
     : SharedRequestBase(source, resource) {
 }
 
@@ -409,11 +409,11 @@ HTTPRequest::~HTTPRequest() {
     }
 }
 
-void HTTPRequest::start(uv_loop_t *loop, std::unique_ptr<Response> response) {
+void HTTPRequest::start(uv_loop_t *loop, std::shared_ptr<const Response> response) {
     MBGL_VERIFY_THREAD(tid);
 
     assert(!ptr);
-    ptr = new HTTPRequestImpl(this, loop, std::move(response));
+    ptr = new HTTPRequestImpl(this, loop, response);
 }
 
 void HTTPRequest::retryImmediately() {

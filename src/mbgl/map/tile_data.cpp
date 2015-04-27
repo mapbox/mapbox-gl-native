@@ -1,18 +1,14 @@
 #include <mbgl/map/tile_data.hpp>
-#include <mbgl/map/map.hpp>
 #include <mbgl/map/environment.hpp>
-#include <mbgl/style/style_source.hpp>
+#include <mbgl/map/source.hpp>
 
-#include <mbgl/util/token.hpp>
-#include <mbgl/util/string.hpp>
-#include <mbgl/util/mapbox.hpp>
 #include <mbgl/storage/file_source.hpp>
-#include <mbgl/util/uv_detail.hpp>
+#include <mbgl/util/worker.hpp>
 #include <mbgl/platform/log.hpp>
 
 using namespace mbgl;
 
-TileData::TileData(Tile::ID const& id_, const SourceInfo& source_)
+TileData::TileData(const TileID& id_, const SourceInfo& source_)
     : id(id_),
       name(id),
       state(State::initial),
@@ -24,59 +20,30 @@ TileData::TileData(Tile::ID const& id_, const SourceInfo& source_)
 }
 
 TileData::~TileData() {
-    if (req) {
-        env.cancelRequest(req);
-    }
+    cancel();
 }
 
 const std::string TileData::toString() const {
     return std::string { "[tile " } + name + "]";
 }
 
-void TileData::request(uv::worker &worker, float pixelRatio, std::function<void()> callback) {
-    if (source.tiles.empty())
-        return;
-
-    std::string url = source.tiles[(id.x + id.y) % source.tiles.size()];
-    url = util::mapbox::normalizeTileURL(url, source.url, source.type);
-    url = util::replaceTokens(url, [&](const std::string &token) -> std::string {
-        if (token == "z") return util::toString(id.z);
-        if (token == "x") return util::toString(id.x);
-        if (token == "y") return util::toString(id.y);
-        if (token == "prefix") {
-            std::string prefix { 2 };
-            prefix[0] = "0123456789abcdef"[id.x % 16];
-            prefix[1] = "0123456789abcdef"[id.y % 16];
-            return prefix;
-        }
-        if (token == "ratio") return pixelRatio > 1.0 ? "@2x" : "";
-        return "";
-    });
-
+void TileData::request(Worker& worker, float pixelRatio, std::function<void()> callback) {
+    std::string url = source.tileURL(id, pixelRatio);
     state = State::loading;
 
-    std::weak_ptr<TileData> weak_tile = shared_from_this();
-    req = env.request({ Resource::Kind::Tile, url }, [weak_tile, url, callback, &worker](const Response &res) {
-        util::ptr<TileData> tile = weak_tile.lock();
-        if (!tile || tile->state == State::obsolete) {
-            // noop. Tile is obsolete and we're now just waiting for the refcount
-            // to drop to zero for destruction.
+    req = env.request({ Resource::Kind::Tile, url }, [url, callback, &worker, this](const Response &res) {
+        req = nullptr;
+
+        if (res.status != Response::Successful) {
+            Log::Error(Event::HttpRequest, "[%s] tile loading failed: %s", url.c_str(), res.message.c_str());
             return;
         }
 
-        // Clear the request object.
-        tile->req = nullptr;
+        state = State::loaded;
+        data = res.data;
 
-        if (res.status == Response::Successful) {
-            tile->state = State::loaded;
-
-            tile->data = res.data;
-
-            // Schedule tile parsing in another thread
-            tile->reparse(worker, callback);
-        } else {
-            Log::Error(Event::HttpRequest, "[%s] tile loading failed: %s", url.c_str(), res.message.c_str());
-        }
+        // Schedule tile parsing in another thread
+        reparse(worker, callback);
     });
 }
 
@@ -90,18 +57,16 @@ void TileData::cancel() {
     }
 }
 
-void TileData::reparse(uv::worker& worker, std::function<void()> callback)
-{
-    // We're creating a new work request. The work request deletes itself after it executed
-    // the after work handler
-    new uv::work<util::ptr<TileData>>(
-        worker,
-        [this](util::ptr<TileData>& tile) {
-            EnvironmentScope scope(env, ThreadType::TileWorker, "TileWorker_" + tile->name);
+void TileData::reparse(Worker& worker, std::function<void()> callback) {
+    util::ptr<TileData> tile = shared_from_this();
+    worker.send(
+        [tile]() {
+            EnvironmentScope scope(tile->env, ThreadType::TileWorker, "TileWorker_" + tile->name);
             tile->parse();
         },
-        [callback](util::ptr<TileData>&) {
+        [tile, callback]() {
+             // `tile` is bound in this lambda to ensure that if it's the last owning pointer,
+             // destruction happens on the map thread, not the worker thread.
             callback();
-        },
-        shared_from_this());
+        });
 }

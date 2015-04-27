@@ -11,7 +11,7 @@
 
 using namespace mbgl;
 
-void Painter::renderFill(FillBucket& bucket, const StyleLayer &layer_desc, const Tile::ID& id, const mat4 &matrix) {
+void Painter::renderFill(FillBucket& bucket, const StyleLayer &layer_desc, const TileID& id, const mat4 &matrix) {
     // Abort early.
     if (!bucket.hasData()) return;
 

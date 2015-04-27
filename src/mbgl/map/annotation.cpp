@@ -1,5 +1,6 @@
 #include <mbgl/map/annotation.hpp>
 #include <mbgl/map/map.hpp>
+#include <mbgl/map/tile_id.hpp>
 #include <mbgl/map/live_tile.hpp>
 #include <mbgl/util/ptr.hpp>
 #include <mbgl/util/std.hpp>
@@ -29,7 +30,7 @@ private:
 private:
     const AnnotationType type = AnnotationType::Point;
     const AnnotationSegments geometry;
-    std::unordered_map<Tile::ID, std::weak_ptr<const LiveTileFeature>, Tile::ID::Hash> tileFeatures;
+    std::unordered_map<TileID, std::weak_ptr<const LiveTileFeature>, TileID::Hash> tileFeatures;
     const LatLngBounds bounds;
 };
 
@@ -82,7 +83,7 @@ vec2<double> AnnotationManager::projectPoint(const LatLng& point) {
     return { x, y };
 }
 
-std::pair<std::vector<Tile::ID>, AnnotationIDs> AnnotationManager::addPointAnnotations(
+std::pair<std::vector<TileID>, AnnotationIDs> AnnotationManager::addPointAnnotations(
     const std::vector<LatLng>& points, const std::vector<std::string>& symbols, const Map& map) {
     std::lock_guard<std::mutex> lock(mtx);
 
@@ -97,7 +98,7 @@ std::pair<std::vector<Tile::ID>, AnnotationIDs> AnnotationManager::addPointAnnot
     std::vector<uint32_t> annotationIDs;
     annotationIDs.reserve(points.size());
 
-    std::vector<Tile::ID> affectedTiles;
+    std::vector<TileID> affectedTiles;
 
     for (size_t i = 0; i < points.size(); ++i) {
         const uint32_t annotationID = nextID();
@@ -121,7 +122,7 @@ std::pair<std::vector<Tile::ID>, AnnotationIDs> AnnotationManager::addPointAnnot
 
         for (int8_t z = maxZoom; z >= 0; z--) {
             affectedTiles.emplace_back(z, x, y);
-            Tile::ID tileID = affectedTiles.back();
+            TileID tileID = affectedTiles.back();
 
             // calculate tile coordinate
             const Coordinate coordinate(extent * (p.x * z2 - x), extent * (p.y * z2 - y));
@@ -180,10 +181,10 @@ std::pair<std::vector<Tile::ID>, AnnotationIDs> AnnotationManager::addPointAnnot
     return std::make_pair(affectedTiles, annotationIDs);
 }
 
-std::vector<Tile::ID> AnnotationManager::removeAnnotations(const AnnotationIDs& ids, const Map& map) {
+std::vector<TileID> AnnotationManager::removeAnnotations(const AnnotationIDs& ids, const Map& map) {
     std::lock_guard<std::mutex> lock(mtx);
 
-    std::vector<Tile::ID> affectedTiles;
+    std::vector<TileID> affectedTiles;
 
     std::vector<uint32_t> z2s;
     uint8_t zoomCount = map.getMaxZoom() + 1;
@@ -208,7 +209,7 @@ std::vector<Tile::ID> AnnotationManager::removeAnnotations(const AnnotationIDs& 
                 p = projectPoint(latLng);
                 x = z2s[z] * p.x;
                 y = z2s[z] * p.y;
-                Tile::ID tid(z, x, y);
+                TileID tid(z, x, y);
                 // erase annotation from tile's list
                 auto& tileAnnotations = tiles[tid].first;
                 tileAnnotations.erase(annotationID);
@@ -225,7 +226,7 @@ std::vector<Tile::ID> AnnotationManager::removeAnnotations(const AnnotationIDs& 
         }
     }
 
-    // Tile::IDs for tiles that need refreshed.
+    // TileIDs for tiles that need refreshed.
     return affectedTiles;
 }
 
@@ -239,13 +240,13 @@ std::vector<uint32_t> AnnotationManager::getAnnotationsInBounds(const LatLngBoun
     const vec2<double> nePoint = projectPoint(queryBounds.ne);
 
     // tiles number y from top down
-    const Tile::ID nwTile(z, swPoint.x * z2, nePoint.y * z2);
-    const Tile::ID seTile(z, nePoint.x * z2, swPoint.y * z2);
+    const TileID nwTile(z, swPoint.x * z2, nePoint.y * z2);
+    const TileID seTile(z, nePoint.x * z2, swPoint.y * z2);
 
     std::vector<uint32_t> matchingAnnotations;
 
     for (auto& tile : tiles) {
-        Tile::ID id = tile.first;
+        TileID id = tile.first;
         if (id.z == z) {
             if (id.x >= nwTile.x && id.x <= seTile.x && id.y >= nwTile.y && id.y <= seTile.y) {
                 if (id.x > nwTile.x && id.x < seTile.x && id.y > nwTile.y && id.y < seTile.y) {
@@ -292,7 +293,7 @@ LatLngBounds AnnotationManager::getBoundsForAnnotations(const AnnotationIDs& ids
     return bounds;
 }
 
-const LiveTile* AnnotationManager::getTile(Tile::ID const& id) {
+const LiveTile* AnnotationManager::getTile(const TileID& id) {
     std::lock_guard<std::mutex> lock(mtx);
 
     const auto tile_it = tiles.find(id);

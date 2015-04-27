@@ -17,6 +17,12 @@ void Log::setObserver(std::unique_ptr<Observer> observer) {
     currentObserver = std::move(observer);
 }
 
+std::unique_ptr<Log::Observer> Log::removeObserver() {
+    std::unique_ptr<Observer> observer;
+    std::swap(observer, currentObserver);
+    return observer;
+}
+
 void Log::record(EventSeverity severity, Event event, const std::string &msg) {
     record(severity, event, -1, msg);
 }
@@ -36,7 +42,8 @@ void Log::record(EventSeverity severity, Event event, int64_t code) {
 }
 
 void Log::record(EventSeverity severity, Event event, int64_t code, const std::string &msg) {
-    if (currentObserver && currentObserver->onRecord(severity, event, code, msg)) {
+    if (currentObserver && severity != EventSeverity::Debug &&
+        currentObserver->onRecord(severity, event, code, msg)) {
         return;
     }
 

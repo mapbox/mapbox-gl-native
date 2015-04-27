@@ -2,6 +2,7 @@
 #include "../fixtures/fixture_log_observer.hpp"
 
 #include <mbgl/map/map.hpp>
+#include <mbgl/map/still_image.hpp>
 #include <mbgl/util/image.hpp>
 #include <mbgl/util/std.hpp>
 
@@ -16,6 +17,8 @@
 #include <mbgl/storage/default_file_source.hpp>
 
 #include <dirent.h>
+
+#include <future>
 
 void rewriteLocalScheme(rapidjson::Value &value, rapidjson::Document::AllocatorType &allocator) {
     ASSERT_TRUE(value.IsString());
@@ -139,8 +142,10 @@ TEST_P(HeadlessTest, render) {
         }
 
         HeadlessView view(display);
-        mbgl::DefaultFileSource fileSource(nullptr);
+        DefaultFileSource fileSource(nullptr);
         Map map(view, fileSource);
+
+        map.start(Map::Mode::Still);
 
         map.setClasses(classes);
         map.setStyleJSON(style, "test/suite");
@@ -149,16 +154,17 @@ TEST_P(HeadlessTest, render) {
         map.setLatLngZoom(mbgl::LatLng(latitude, longitude), zoom);
         map.setBearing(bearing);
 
-        // Run the loop. It will terminate when we don't have any further listeners.
-        map.run();
+        std::promise<void> promise;
 
-        const unsigned int w = width * pixelRatio;
-        const unsigned int h = height * pixelRatio;
+        map.renderStill([&](std::unique_ptr<const StillImage> image) {
+            const std::string png = util::compress_png(image->width, image->height, image->pixels.get());
+            util::write_file("test/suite/tests/" + base + "/" + name +  "/actual.png", png);
+            promise.set_value();
+        });
 
-        auto pixels = view.readPixels();
+        promise.get_future().get();
 
-        const std::string image = util::compress_png(w, h, pixels.get());
-        util::write_file(actual_image, image);
+        map.stop();
     }
 }
 

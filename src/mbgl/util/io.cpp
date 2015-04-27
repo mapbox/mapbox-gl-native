@@ -4,7 +4,8 @@
 #include <iostream>
 #include <sstream>
 #include <fstream>
-#include <stdexcept>
+
+#include <unistd.h>
 
 namespace mbgl {
 namespace util {
@@ -27,6 +28,13 @@ std::string read_file(const std::string &filename) {
         return data.str();
     } else {
         throw std::runtime_error(std::string("Cannot read file ") + filename);
+    }
+}
+
+void deleteFile(const std::string& filename) {
+    const int ret = unlink(filename.c_str());
+    if (ret == -1) {
+        throw IOException(errno, "failed to unlink file");
     }
 }
 

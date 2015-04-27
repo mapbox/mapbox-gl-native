@@ -1,8 +1,6 @@
 #ifndef MBGL_PLATFORM_PLATFORM
 #define MBGL_PLATFORM_PLATFORM
 
-#include <mbgl/util/uv.hpp>
-
 #include <memory>
 #include <string>
 

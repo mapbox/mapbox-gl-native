@@ -11,9 +11,9 @@ TEST_F(Storage, AssetEmptyFile) {
     using namespace mbgl;
 
 #ifdef MBGL_ASSET_ZIP
-    DefaultFileSource fs(nullptr, uv_default_loop(), "test/fixtures/storage/assets.zip");
+    DefaultFileSource fs(nullptr, "test/fixtures/storage/assets.zip");
 #else
-    DefaultFileSource fs(nullptr, uv_default_loop());
+    DefaultFileSource fs(nullptr);
 #endif
 
     auto &env = *static_cast<const Environment *>(nullptr);
@@ -38,9 +38,9 @@ TEST_F(Storage, AssetNonEmptyFile) {
     using namespace mbgl;
 
 #ifdef MBGL_ASSET_ZIP
-    DefaultFileSource fs(nullptr, uv_default_loop(), "test/fixtures/storage/assets.zip");
+    DefaultFileSource fs(nullptr, "test/fixtures/storage/assets.zip");
 #else
-    DefaultFileSource fs(nullptr, uv_default_loop());
+    DefaultFileSource fs(nullptr);
 #endif
 
     auto &env = *static_cast<const Environment *>(nullptr);
@@ -66,9 +66,9 @@ TEST_F(Storage, AssetNonExistentFile) {
     using namespace mbgl;
 
 #ifdef MBGL_ASSET_ZIP
-    DefaultFileSource fs(nullptr, uv_default_loop(), "test/fixtures/storage/assets.zip");
+    DefaultFileSource fs(nullptr, "test/fixtures/storage/assets.zip");
 #else
-    DefaultFileSource fs(nullptr, uv_default_loop());
+    DefaultFileSource fs(nullptr);
 #endif
 
     auto &env = *static_cast<const Environment *>(nullptr);

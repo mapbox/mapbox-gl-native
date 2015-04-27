@@ -18,33 +18,35 @@ class Style;
 class LineVertexBuffer;
 class TriangleElementsBuffer;
 class LineShader;
-class LinejoinShader;
 class LineSDFShader;
 class LinepatternShader;
 
 class LineBucket : public Bucket {
-    typedef ElementGroup<3> triangle_group_type;
-    typedef ElementGroup<1> point_group_type;
+    using TriangleGroup = ElementGroup<3>;
 
 public:
-    LineBucket(LineVertexBuffer &vertexBuffer,
-               TriangleElementsBuffer &triangleElementsBuffer,
-               PointElementsBuffer &pointElementsBuffer);
+    LineBucket(LineVertexBuffer &vertexBuffer, TriangleElementsBuffer &triangleElementsBuffer);
     ~LineBucket() override;
 
-    void render(Painter &painter, const StyleLayer &layer_desc, const Tile::ID &id,
+    void render(Painter &painter, const StyleLayer &layer_desc, const TileID &id,
                 const mat4 &matrix) override;
     bool hasData() const override;
 
     void addGeometry(const GeometryCollection&);
     void addGeometry(const std::vector<Coordinate>& line);
 
-    bool hasPoints() const;
-
     void drawLines(LineShader& shader);
     void drawLineSDF(LineSDFShader& shader);
     void drawLinePatterns(LinepatternShader& shader);
-    void drawPoints(LinejoinShader& shader);
+
+private:
+    struct TriangleElement {
+        TriangleElement(uint16_t a_, uint16_t b_, uint16_t c_) : a(a_), b(b_), c(c_) {}
+        uint16_t a, b, c;
+    };
+    void addCurrentVertex(const Coordinate& currentVertex, float flip, double distance,
+            const vec2<double>& normal, float endLeft, float endRight, bool round,
+            int32_t startVertex, std::vector<LineBucket::TriangleElement>& triangleStore);
 
 public:
     StyleLayoutLine layout;
@@ -52,14 +54,15 @@ public:
 private:
     LineVertexBuffer& vertexBuffer;
     TriangleElementsBuffer& triangleElementsBuffer;
-    PointElementsBuffer& pointElementsBuffer;
 
     const size_t vertex_start;
     const size_t triangle_elements_start;
-    const size_t point_elements_start;
 
-    std::vector<std::unique_ptr<triangle_group_type>> triangleGroups;
-    std::vector<std::unique_ptr<point_group_type>> pointGroups;
+    int32_t e1;
+    int32_t e2;
+    int32_t e3;
+
+    std::vector<std::unique_ptr<TriangleGroup>> triangleGroups;
 };
 
 }

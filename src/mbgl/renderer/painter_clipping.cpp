@@ -1,12 +1,13 @@
 #include <mbgl/renderer/painter.hpp>
 #include <mbgl/renderer/fill_bucket.hpp>
 #include <mbgl/map/map.hpp>
+#include <mbgl/map/tile.hpp>
 #include <mbgl/map/source.hpp>
-#include <mbgl/util/clip_ids.hpp>
+#include <mbgl/util/clip_id.hpp>
 
 using namespace mbgl;
 
-void Painter::drawClippingMasks(const std::set<util::ptr<StyleSource>> &sources) {
+void Painter::drawClippingMasks(const std::set<Source*>& sources) {
     gl::group group("clipping masks");
 
     useProgram(plainShader->program);
@@ -18,7 +19,7 @@ void Painter::drawClippingMasks(const std::set<util::ptr<StyleSource>> &sources)
     coveringPlainArray.bind(*plainShader, tileStencilBuffer, BUFFER_OFFSET(0));
 
     for (const auto& source : sources) {
-        source->source->drawClippingMasks(*this);
+        source->drawClippingMasks(*this);
     }
 
     MBGL_CHECK_ERROR(glEnable(GL_DEPTH_TEST));

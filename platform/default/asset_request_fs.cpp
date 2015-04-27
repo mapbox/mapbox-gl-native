@@ -1,4 +1,4 @@
-#include <mbgl/storage/default/asset_request.hpp>
+#include <mbgl/storage/asset_request.hpp>
 #include <mbgl/storage/response.hpp>
 #include <mbgl/util/std.hpp>
 #include <mbgl/util/util.hpp>
@@ -207,7 +207,7 @@ void AssetRequestImpl::cleanup(uv_fs_t *req) {
 
 // -------------------------------------------------------------------------------------------------
 
-AssetRequest::AssetRequest(DefaultFileSource *source_, const Resource &resource_)
+AssetRequest::AssetRequest(DefaultFileSource::Impl *source_, const Resource &resource_)
     : SharedRequestBase(source_, resource_) {
     assert(algo::starts_with(resource.url, "asset://"));
 }
@@ -220,7 +220,7 @@ AssetRequest::~AssetRequest() {
     }
 }
 
-void AssetRequest::start(uv_loop_t *loop, std::unique_ptr<Response> response) {
+void AssetRequest::start(uv_loop_t *loop, std::shared_ptr<const Response> response) {
     MBGL_VERIFY_THREAD(tid);
 
     // We're ignoring the existing response if any.

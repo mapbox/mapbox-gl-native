@@ -1,7 +1,6 @@
 #ifndef MBGL_MAP_RASTER_TILE_DATA
 #define MBGL_MAP_RASTER_TILE_DATA
 
-#include <mbgl/map/tile.hpp>
 #include <mbgl/map/tile_data.hpp>
 #include <mbgl/style/style_layout.hpp>
 #include <mbgl/renderer/raster_bucket.hpp>
@@ -17,7 +16,7 @@ class RasterTileData : public TileData {
     friend class TileParser;
 
 public:
-    RasterTileData(Tile::ID const &id, TexturePool &, const SourceInfo &);
+    RasterTileData(const TileID&, TexturePool&, const SourceInfo&);
     ~RasterTileData();
 
     void parse() override;

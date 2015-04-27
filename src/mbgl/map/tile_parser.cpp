@@ -3,7 +3,7 @@
 #include <mbgl/platform/log.hpp>
 #include <mbgl/style/style.hpp>
 #include <mbgl/style/style_layer.hpp>
-#include <mbgl/style/style_source.hpp>
+#include <mbgl/map/source.hpp>
 #include <mbgl/renderer/fill_bucket.hpp>
 #include <mbgl/renderer/line_bucket.hpp>
 #include <mbgl/renderer/symbol_bucket.hpp>
@@ -172,8 +172,7 @@ std::unique_ptr<Bucket> TileParser::createFillBucket(const GeometryTileLayer& la
 std::unique_ptr<Bucket> TileParser::createLineBucket(const GeometryTileLayer& layer,
                                                      const StyleBucket& bucket_desc) {
     auto bucket = util::make_unique<LineBucket>(tile.lineVertexBuffer,
-                                                tile.triangleElementsBuffer,
-                                                tile.pointElementsBuffer);
+                                                tile.triangleElementsBuffer);
 
     const float z = tile.id.z;
     auto& layout = bucket->layout;

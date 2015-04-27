@@ -10,6 +10,9 @@ extern NSString *const MGLEventKeyLongitude;
 extern NSString *const MGLEventKeyZoomLevel;
 extern NSString *const MGLEventKeySpeed;
 extern NSString *const MGLEventKeyCourse;
+extern NSString *const MGLEventKeyAltitude;
+extern NSString *const MGLEventKeyHorizontalAccuracy;
+extern NSString *const MGLEventKeyVerticalAccuracy;
 extern NSString *const MGLEventKeyPushEnabled;
 extern NSString *const MGLEventKeyEmailEnabled;
 extern NSString *const MGLEventKeyGestureID;
@@ -22,13 +25,15 @@ extern NSString *const MGLEventGesturePanStart;
 extern NSString *const MGLEventGesturePinchStart;
 extern NSString *const MGLEventGestureRotateStart;
 
-@interface MGLMapboxEvents : NSObject
+@interface MGLMapboxEvents : NSObject <NSURLSessionDelegate>
 
 // You must call these methods from the main thread.
 //
 + (void) setToken:(NSString *)token;
 + (void) setAppName:(NSString *)appName;
 + (void) setAppVersion:(NSString *)appVersion;
++ (void) pauseMetricsCollection;
++ (void) resumeMetricsCollection;
 
 // You can call this method from any thread. Significant work will
 // be dispatched to a low-priority background queue and all

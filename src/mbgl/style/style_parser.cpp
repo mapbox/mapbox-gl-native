@@ -1,5 +1,5 @@
-#include <mbgl/style/style_source.hpp>
 #include <mbgl/style/style_parser.hpp>
+#include <mbgl/map/source.hpp>
 #include <mbgl/style/style_layer.hpp>
 #include <mbgl/map/annotation.hpp>
 #include <mbgl/util/constants.hpp>
@@ -59,11 +59,11 @@ void StyleParser::parse(JSVal document) {
         iconOverlap.AddMember("icon-allow-overlap", true, d.GetAllocator());
         parseLayout(iconOverlap, pointBucket);
 
-        SourceInfo& info = sources.emplace(id, std::make_shared<StyleSource>()).first->second->info;
-        info.type = SourceType::Annotations;
-
-        auto source_it = sources.find(id);
-        pointBucket->style_source = source_it->second;
+        util::ptr<Source> source = std::make_shared<Source>();
+        sourcesMap.emplace(id, source);
+        sources.emplace_back(source);
+        source->info.type = SourceType::Annotations;
+        pointBucket->source = source;
         annotations->bucket = pointBucket;
         //
         // end point annotations
@@ -218,12 +218,13 @@ void StyleParser::parseSources(JSVal value) {
         rapidjson::Value::ConstMemberIterator itr = value.MemberBegin();
         for (; itr != value.MemberEnd(); ++itr) {
             std::string name { itr->name.GetString(), itr->name.GetStringLength() };
-            SourceInfo& info = sources.emplace(name, std::make_shared<StyleSource>()).first->second->info;
-
-            parseRenderProperty<SourceTypeClass>(itr->value, info.type, "type");
-            parseRenderProperty(itr->value, info.url, "url");
-            parseRenderProperty(itr->value, info.tile_size, "tileSize");
-            info.parseTileJSONProperties(itr->value);
+            util::ptr<Source> source = std::make_shared<Source>();
+            parseRenderProperty<SourceTypeClass>(itr->value, source->info.type, "type");
+            parseRenderProperty(itr->value, source->info.url, "url");
+            parseRenderProperty(itr->value, source->info.tile_size, "tileSize");
+            source->info.parseTileJSONProperties(itr->value);
+            sources.emplace_back(source);
+            sourcesMap.emplace(name, source);
         }
     } else {
         Log::Warning(Event::ParseStyle, "sources must be an object");
@@ -810,7 +811,6 @@ void StyleParser::parsePaint(JSVal value, ClassProperties &klass) {
 
     parseOptionalProperty<Function<float>>("icon-opacity", Key::IconOpacity, klass, value);
     parseOptionalProperty<PropertyTransition>("icon-opacity-transition", Key::IconOpacity, klass, value);
-    parseOptionalProperty<Function<float>>("icon-rotate", Key::IconRotate, klass, value);
     parseOptionalProperty<Function<float>>("icon-size", Key::IconSize, klass, value);
     parseOptionalProperty<PropertyTransition>("icon-size-transition", Key::IconSize, klass, value);
     parseOptionalProperty<Function<Color>>("icon-color", Key::IconColor, klass, value);
@@ -939,9 +939,9 @@ void StyleParser::parseBucket(JSVal value, util::ptr<StyleLayer> &layer) {
         JSVal value_source = replaceConstant(value["source"]);
         if (value_source.IsString()) {
             const std::string source_name = { value_source.GetString(), value_source.GetStringLength() };
-            auto source_it = sources.find(source_name);
-            if (source_it != sources.end()) {
-                bucket->style_source = source_it->second;
+            auto source_it = sourcesMap.find(source_name);
+            if (source_it != sourcesMap.end()) {
+                bucket->source = source_it->second;
             } else {
                 Log::Warning(Event::ParseStyle, "can't find source '%s' required for layer '%s'", source_name.c_str(), layer->id.c_str());
             }

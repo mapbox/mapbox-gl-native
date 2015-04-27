@@ -4,10 +4,16 @@ PREFIX ?= /usr/local
 ANDROID_ABI ?= arm-v7
 
 ifeq ($(shell uname -s), Darwin)
-HOST ?= osx
+HOST = osx
+HEADLESS = cgl
 JOBS ?= $(shell sysctl -n hw.ncpu)
 endif
-HOST ?= linux
+
+ifeq ($(shell uname -s), Linux)
+HOST = linux
+JOBS ?= $(shell sysctl -n hw.ncpu)
+endif
+
 JOBS ?= 1
 
 all: mbgl
@@ -28,48 +34,45 @@ styles/styles:
 SMCalloutView:
 	git submodule update --init platform/ios/vendor/SMCalloutView
 
+KIF:
+	git submodule update --init test/ios/KIF
+
+
+#### Build files ###############################################################
+
+.PRECIOUS: Makefile/project
+Makefile/project: config/$(HOST).gypi styles/styles SMCalloutView
+	deps/run_gyp gyp/project.gyp $(CONFIG_$(HOST)) $(LIBS_$(HOST)) --generator-output=./build/$(HOST) -f make
+
+.PRECIOUS: Xcode/project
+Xcode/project: config/$(HOST).gypi styles/styles SMCalloutView
+	deps/run_gyp gyp/project.gyp $(CONFIG_$(HOST)) $(LIBS_$(HOST)) --generator-output=./build/$(HOST) -f xcode
+
+
 #### Library builds ############################################################
 
-.PRECIOUS: Makefile/mbgl
-Makefile/mbgl: config/$(HOST).gypi styles/styles SMCalloutView
-	deps/run_gyp mbgl.gyp $(CONFIG_$(HOST)) $(LIBS_$(HOST)) --generator-output=./build/$(HOST) -f make
-
-mbgl: Makefile/mbgl
+mbgl: Makefile/project
 	$(MAKE) -C build/$(HOST) BUILDTYPE=$(BUILDTYPE) everything
 
-standalone: Makefile/mbgl
+standalone: Makefile/project
 	LINK=`pwd`/gyp/link.py $(MAKE) -C build/$(HOST) BUILDTYPE=$(BUILDTYPE) standalone
 
-install: Makefile/mbgl
+install: Makefile/project
 	LINK=`pwd`/gyp/link.py $(MAKE) -C build/$(HOST) BUILDTYPE=$(BUILDTYPE) install
 
-.PRECIOUS: Xcode/mbgl
-Xcode/mbgl: config/$(HOST).gypi styles/styles SMCalloutView
-	deps/run_gyp mbgl.gyp $(CONFIG_$(HOST)) $(LIBS_$(HOST)) --generator-output=./build/$(HOST) -f xcode
 
 ##### Test builds ##############################################################
 
-.PRECIOUS: Makefile/test
-Makefile/test: test/test.gyp config/$(HOST).gypi styles/styles SMCalloutView
-	deps/run_gyp test/test.gyp $(CONFIG_$(HOST)) $(LIBS_$(HOST)) --generator-output=./build/$(HOST) -f make
-
-test: Makefile/test
+.PHONY: test
+test: Makefile/project
 	$(MAKE) -C build/$(HOST) BUILDTYPE=$(BUILDTYPE) test
 
 test-%: test
 	./scripts/run_tests.sh "build/$(HOST)/$(BUILDTYPE)/test" --gtest_filter=$*
 
-
-.PRECIOUS: Xcode/test
-Xcode/test: test/test.gyp config/osx.gypi styles/styles SMCalloutView
-	deps/run_gyp test/test.gyp $(CONFIG_osx) $(LIBS_osx) --generator-output=./build/osx -f xcode
-
-.PHONY: lproj lbuild run-xlinux
-xtest-proj: Xcode/test
-	open ./build/osx/test/test.xcodeproj
-
-xtest: Xcode/test
-	xcodebuild -project ./build/osx/test/test.xcodeproj -configuration $(BUILDTYPE) -target test -jobs $(JOBS)
+.PHONY: xtest
+xtest: Xcode/project
+	xcodebuild -project ./build/osx/gyp/project.xcodeproj -configuration $(BUILDTYPE) -target test -jobs $(JOBS)
 
 xtest-%: xtest
 	./scripts/run_tests.sh "build/osx/Build/Products/$(BUILDTYPE)/test" --gtest_filter=$*
@@ -77,31 +80,22 @@ xtest-%: xtest
 
 #### Mac OS X application builds ###############################################
 
-.PRECIOUS: Makefile/osx
-Makefile/osx: macosx/mapboxgl-app.gyp config/osx.gypi styles/styles
-	deps/run_gyp macosx/mapboxgl-app.gyp $(CONFIG_osx) $(LIBS_osx) --generator-output=./build/osx -f make
-
 .PHONY: osx run-osx
-osx: Makefile/osx
+osx: Makefile/project
 	$(MAKE) -C build/osx BUILDTYPE=$(BUILDTYPE) osxapp
 
 run-osx: osx
 	"build/osx/$(BUILDTYPE)/Mapbox GL.app/Contents/MacOS/Mapbox GL"
 
-
-.PRECIOUS: Xcode/osx
-Xcode/osx: macosx/mapboxgl-app.gyp config/osx.gypi styles/styles
-	deps/run_gyp macosx/mapboxgl-app.gyp $(CONFIG_osx) $(LIBS_osx) --generator-output=./build/osx -f xcode
-
 .PHONY: xosx-proj xosx run-xosx
-xosx-proj: Xcode/osx
-	open ./build/osx/macosx/mapboxgl-app.xcodeproj
+xosx-proj: Xcode/project
+	open ./build/osx/gyp/project.xcodeproj
 
-xosx: Xcode/osx
-	xcodebuild -project ./build/osx/macosx/mapboxgl-app.xcodeproj -configuration $(BUILDTYPE) -target osxapp -jobs $(JOBS)
+xosx: Xcode/project
+	xcodebuild -project ./build/osx/gyp/project.xcodeproj -configuration $(BUILDTYPE) -target osxapp -jobs $(JOBS)
 
 run-xosx: xosx
-	"build/osx/Build/Products/$(BUILDTYPE)/Mapbox GL.app/Contents/MacOS/Mapbox GL"
+	"gyp/build/$(BUILDTYPE)/Mapbox GL.app/Contents/MacOS/Mapbox GL"
 
 # Legacy name
 xproj: xosx-proj
@@ -114,7 +108,7 @@ xproj: xosx-proj
 Xcode/ios: ios/app/mapboxgl-app.gyp config/ios.gypi styles/styles SMCalloutView
 	deps/run_gyp ios/app/mapboxgl-app.gyp $(CONFIG_ios) $(LIBS_ios) --generator-output=./build/ios -f xcode
 
-.PHONY: ios-proj ios run-ios
+.PHONY: ios-proj ios isim ipackage
 ios-proj: Xcode/ios
 	open ./build/ios/ios/app/mapboxgl-app.xcodeproj
 
@@ -124,40 +118,31 @@ ios: Xcode/ios
 isim: Xcode/ios
 	xcodebuild -sdk iphonesimulator ARCHS="x86_64 i386" -project ./build/ios/ios/app/mapboxgl-app.xcodeproj -configuration Debug -target iosapp -jobs $(JOBS)
 
+ipackage: clean Xcode/ios
+	./scripts/package_ios.sh
+
+itest: ipackage KIF
+	./scripts/test_ios.sh
+
 # Legacy name
 iproj: ios-proj
 
 
 #### Linux application builds ##################################################
 
-.PRECIOUS: Makefile/linux
-Makefile/linux: linux/mapboxgl-app.gyp config/$(HOST).gypi styles/styles
-	deps/run_gyp linux/mapboxgl-app.gyp $(CONFIG_$(HOST)) $(LIBS_linux) --generator-output=./build/$(HOST) -f make
-
 .PHONY: linux run-linux
-linux: Makefile/linux
+linux: Makefile/project
 	$(MAKE) -C build/$(HOST) BUILDTYPE=$(BUILDTYPE) linuxapp
 
 run-linux: linux
 	(cd build/$(HOST)/$(BUILDTYPE) && ./mapbox-gl)
 
-
-.PRECIOUS: Xcode/linux
-Xcode/linux: linux/mapboxgl-app.gyp config/osx.gypi styles/styles
-	deps/run_gyp linux/mapboxgl-app.gyp $(CONFIG_osx) $(LIBS_linux) --generator-output=./build/osx -f xcode
-
-.PHONY: lproj lbuild run-xlinux
-xlinux-proj: Xcode/linux
-	open ./build/osx/linux/mapboxgl-app.xcodeproj
-
-xlinux: Xcode/linux
-	xcodebuild -project ./build/osx/linux/mapboxgl-app.xcodeproj -configuration $(BUILDTYPE) -target linuxapp
+.PHONY: xlinux run-xlinux
+xlinux: Xcode/project
+	xcodebuild -project ./build/osx/gyp/project.xcodeproj -configuration $(BUILDTYPE) -target linuxapp -jobs $(JOBS)
 
 run-xlinux: xlinux
-	"build/osx/Build/Products/$(BUILDTYPE)/mapbox-gl"
-
-# Legacy name
-lproj: xlinux-proj
+	"gyp/build/$(BUILDTYPE)/mapbox-gl"
 
 
 #### Android libaries #########################################################
@@ -189,22 +174,15 @@ android-deploy: $(ANDROID_ABIS)
 
 android-project: android-lib
 
+
 ##### Render builds ############################################################
 
-.PRECIOUS: Makefile/render
-Makefile/render: bin/render.gyp config/$(HOST).gypi
-	deps/run_gyp bin/render.gyp $(CONFIG_$(HOST)) $(LIBS_$(HOST)) --generator-output=./build/$(HOST) -f make
-
-render: Makefile/render
+render: Makefile/project
 	$(MAKE) -C build/$(HOST) BUILDTYPE=$(BUILDTYPE) mbgl-render
 
-.PRECIOUS: Xcode/render
-Xcode/render: bin/render.gyp config/osx.gypi styles/styles
-	deps/run_gyp bin/render.gyp $(CONFIG_osx) $(LIBS_osx) --generator-output=./build/osx -f xcode
-
-.PHONY: xrender-proj
-xrender-proj: Xcode/render
-	open ./build/osx/bin/render.xcodeproj
+.PHONY: xrender run-xrender
+xrender: Xcode/project
+	xcodebuild -project ./build/osx/gyp/project.xcodeproj -configuration $(BUILDTYPE) -target mbgl-render -jobs $(JOBS)
 
 
 ##### Maintenace operations ####################################################

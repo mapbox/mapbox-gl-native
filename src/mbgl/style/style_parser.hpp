@@ -3,7 +3,7 @@
 
 #include <rapidjson/document.h>
 #include <mbgl/style/style.hpp>
-#include <mbgl/style/style_source.hpp>
+#include <mbgl/map/source.hpp>
 #include <mbgl/style/filter_expression.hpp>
 #include <mbgl/style/class_properties.hpp>
 #include <mbgl/style/style_bucket.hpp>
@@ -17,6 +17,7 @@ namespace mbgl {
 enum class ClassID : uint32_t;
 
 class StyleLayer;
+class Source;
 
 class StyleParser {
 public:
@@ -25,6 +26,10 @@ public:
     StyleParser();
 
     void parse(JSVal document);
+
+    std::vector<util::ptr<Source>> getSources() {
+        return sources;
+    }
 
     std::vector<util::ptr<StyleLayer>> getLayers() {
         return layers;
@@ -90,12 +95,10 @@ private:
 private:
     std::unordered_map<std::string, const rapidjson::Value *> constants;
 
-    std::unordered_map<std::string, const util::ptr<StyleSource>> sources;
-
-    // This stores the root layer.
+    std::vector<util::ptr<Source>> sources;
     std::vector<util::ptr<StyleLayer>> layers;
 
-    // This maps ids to Layer objects, with all items being at the root level.
+    std::unordered_map<std::string, const util::ptr<Source>> sourcesMap;
     std::unordered_map<std::string, std::pair<JSVal, util::ptr<StyleLayer>>> layersMap;
 
     // Store a stack of layers we're parsing right now. This is to prevent reference cycles.

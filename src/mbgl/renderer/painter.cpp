@@ -5,11 +5,12 @@
 #include <mbgl/style/style_bucket.hpp>
 #include <mbgl/util/std.hpp>
 #include <mbgl/util/string.hpp>
-#include <mbgl/util/clip_ids.hpp>
+#include <mbgl/util/clip_id.hpp>
 #include <mbgl/util/constants.hpp>
 #include <mbgl/util/mat3.hpp>
 #include <mbgl/geometry/sprite_atlas.hpp>
 #include <mbgl/map/source.hpp>
+#include <mbgl/map/tile.hpp>
 
 #if defined(DEBUG)
 #include <mbgl/util/stopwatch.hpp>
@@ -61,7 +62,6 @@ void Painter::setup() {
     assert(plainShader);
     assert(outlineShader);
     assert(lineShader);
-    assert(linejoinShader);
     assert(linepatternShader);
     assert(patternShader);
     assert(rasterShader);
@@ -95,7 +95,6 @@ void Painter::setupShaders() {
     if (!plainShader) plainShader = util::make_unique<PlainShader>();
     if (!outlineShader) outlineShader = util::make_unique<OutlineShader>();
     if (!lineShader) lineShader = util::make_unique<LineShader>();
-    if (!linejoinShader) linejoinShader = util::make_unique<LinejoinShader>();
     if (!linesdfShader) linesdfShader = util::make_unique<LineSDFShader>();
     if (!linepatternShader) linepatternShader = util::make_unique<LinepatternShader>();
     if (!patternShader) patternShader = util::make_unique<PatternShader>();
@@ -112,7 +111,6 @@ void Painter::deleteShaders() {
     plainShader = nullptr;
     outlineShader = nullptr;
     lineShader = nullptr;
-    linejoinShader = nullptr;
     linepatternShader = nullptr;
     patternShader = nullptr;
     iconShader = nullptr;
@@ -216,19 +214,25 @@ void Painter::prepareTile(const Tile& tile) {
     MBGL_CHECK_ERROR(glStencilFunc(GL_EQUAL, ref, mask));
 }
 
-void Painter::render(const Style& style, const std::set<util::ptr<StyleSource>>& sources,
-                     TransformState state_, TimePoint time) {
+void Painter::render(const Style& style, TransformState state_, TimePoint time) {
     state = state_;
 
     clear();
     resize();
     changeMatrix();
 
+    std::set<Source*> sources;
+    for (const auto& source : style.sources) {
+        if (source->enabled) {
+            sources.insert(source.get());
+        }
+    }
+
     // Update all clipping IDs.
     ClipIDGenerator generator;
     for (const auto& source : sources) {
-        generator.update(source->source->getLoadedTiles());
-        source->source->updateMatrices(projMatrix, state);
+        generator.update(source->getLoadedTiles());
+        source->updateMatrices(projMatrix, state);
     }
 
     drawClippingMasks(sources);
@@ -281,11 +285,11 @@ void Painter::render(const Style& style, const std::set<util::ptr<StyleSource>>&
     // When only rendering layers via the stylesheet, it's possible that we don't
     // ever visit a tile during rendering.
     for (const auto& source : sources) {
-        source->source->finishRender(*this);
+        source->finishRender(*this);
     }
 }
 
-void Painter::renderLayer(const StyleLayer &layer_desc, const Tile::ID* id, const mat4* matrix) {
+void Painter::renderLayer(const StyleLayer &layer_desc) {
     if (layer_desc.bucket->visibility == VisibilityType::None) return;
     if (layer_desc.type == StyleLayerType::Background) {
         // This layer defines a background color/image.
@@ -303,15 +307,8 @@ void Painter::renderLayer(const StyleLayer &layer_desc, const Tile::ID* id, cons
             return;
         }
 
-        if (!layer_desc.bucket->style_source) {
+        if (!layer_desc.bucket->source) {
             Log::Warning(Event::Render, "can't find source for layer '%s'", layer_desc.id.c_str());
-            return;
-        }
-
-        StyleSource const& style_source = *layer_desc.bucket->style_source;
-
-        // Skip this layer if there is no data.
-        if (!style_source.source) {
             return;
         }
 
@@ -350,11 +347,8 @@ void Painter::renderLayer(const StyleLayer &layer_desc, const Tile::ID* id, cons
             Log::Info(Event::Render, "%*s- %s (%s)", indent * 4, "", layer_desc.id.c_str(),
                     StyleLayerTypeClass(layer_desc.type).c_str());
         }
-        if (!id) {
-            style_source.source->render(*this, layer_desc);
-        } else {
-            style_source.source->render(*this, layer_desc, *id, *matrix);
-        }
+
+        layer_desc.bucket->source->render(*this, layer_desc);
     }
 }
 
@@ -447,7 +441,7 @@ void Painter::renderBackground(const StyleLayer &layer_desc) {
     MBGL_CHECK_ERROR(glEnable(GL_STENCIL_TEST));
 }
 
-mat4 Painter::translatedMatrix(const mat4& matrix, const std::array<float, 2> &translation, const Tile::ID &id, TranslateAnchorType anchor) {
+mat4 Painter::translatedMatrix(const mat4& matrix, const std::array<float, 2> &translation, const TileID &id, TranslateAnchorType anchor) {
     if (translation[0] == 0 && translation[1] == 0) {
         return matrix;
     } else {

@@ -54,7 +54,7 @@ SymbolBucket::~SymbolBucket() {
     // Do not remove. header file only contains forward definitions to unique pointers.
 }
 
-void SymbolBucket::render(Painter &painter, const StyleLayer &layer_desc, const Tile::ID &id,
+void SymbolBucket::render(Painter &painter, const StyleLayer &layer_desc, const TileID &id,
                           const mat4 &matrix) {
     painter.renderSymbol(*this, layer_desc, id, matrix);
 }
@@ -71,8 +71,8 @@ std::vector<SymbolFeature> SymbolBucket::processFeatures(const GeometryTileLayer
                                                          const FilterExpression& filter,
                                                          GlyphStore &glyphStore,
                                                          const Sprite &sprite) {
-    const bool has_text = layout.text.field.size();
-    const bool has_icon = layout.icon.image.size();
+    const bool has_text = !layout.text.field.empty() && !layout.text.font.empty();
+    const bool has_icon = !layout.icon.image.empty();
 
     std::vector<SymbolFeature> features;
 
@@ -209,7 +209,8 @@ void SymbolBucket::addFeatures(const GeometryTileLayer& layer,
         if (feature.label.length()) {
             shapedText = fontStack->getShaping(
                 /* string */ feature.label,
-                /* maxWidth: ems */ layout.text.max_width * 24,
+                /* maxWidth: ems */ layout.placement != PlacementType::Line ?
+                    layout.text.max_width * 24 : 0,
                 /* lineHeight: ems */ layout.text.line_height * 24,
                 /* horizontalAlign */ horizontalAlign,
                 /* verticalAlign */ verticalAlign,

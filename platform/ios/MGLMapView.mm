@@ -1,4 +1,5 @@
 #import "MGLMapView.h"
+#import "MGLMapView+IBAdditions.h"
 
 #import <mbgl/platform/log.hpp>
 #import <mbgl/platform/gl.hpp>
@@ -10,11 +11,13 @@
 #include <mbgl/platform/platform.hpp>
 #include <mbgl/platform/darwin/reachability.h>
 #include <mbgl/storage/default_file_source.hpp>
-#include <mbgl/storage/default/sqlite_cache.hpp>
+#include <mbgl/storage/sqlite_cache.hpp>
 #include <mbgl/storage/network_status.hpp>
 #include <mbgl/util/geo.hpp>
 
 #import "MGLTypes.h"
+#import "NSString+MGLAdditions.h"
+#import "NSProcessInfo+MGLAdditions.h"
 #import "MGLAnnotation.h"
 #import "MGLUserLocationAnnotationView.h"
 #import "MGLUserLocation_Private.h"
@@ -42,9 +45,10 @@ const std::string &defaultCacheDatabase() {
 
 static dispatch_once_t loadGLExtensions;
 
-NSString *const MGLDefaultStyleName = @"Emerald";
-NSString *const MGLStyleVersion = @"v7";
+NSString *const MGLDefaultStyleName = @"mapbox-streets";
+NSString *const MGLStyleVersion = @"7";
 NSString *const MGLDefaultStyleMarkerSymbolName = @"default_marker";
+NSString *const MGLMapboxAccessTokenManagerURLDisplayString = @"mapbox.com/account/apps";
 
 const NSTimeInterval MGLAnimationDuration = 0.3;
 const CGSize MGLAnnotationUpdateViewportOutset = {150, 150};
@@ -52,12 +56,18 @@ const CGFloat MGLMinimumZoom = 3;
 
 NSString *const MGLAnnotationIDKey = @"MGLAnnotationIDKey";
 
+static NSURL *MGLURLForBundledStyleNamed(NSString *styleName)
+{
+    return [NSURL URLWithString:[NSString stringWithFormat:@"asset://styles/%@.json", styleName]];
+}
+
 #pragma mark - Private -
 
 @interface MGLMapView () <UIGestureRecognizerDelegate, GLKViewDelegate, CLLocationManagerDelegate>
 
 @property (nonatomic) EAGLContext *context;
 @property (nonatomic) GLKView *glView;
+@property (nonatomic) UIImageView *glSnapshotView;
 @property (nonatomic) NSOperationQueue *regionChangeDelegateQueue;
 @property (nonatomic) UIImageView *compass;
 @property (nonatomic) UIImageView *logoBug;
@@ -66,7 +76,7 @@ NSString *const MGLAnnotationIDKey = @"MGLAnnotationIDKey";
 @property (nonatomic) UIPinchGestureRecognizer *pinch;
 @property (nonatomic) UIRotationGestureRecognizer *rotate;
 @property (nonatomic) UILongPressGestureRecognizer *quickZoom;
-@property (nonatomic) NSMutableArray *bundledStyleNames;
+@property (nonatomic) NSMutableArray *bundledStyleURLs;
 @property (nonatomic) NSMapTable *annotationIDsByAnnotation;
 @property (nonatomic) std::vector<uint32_t> annotationsNearbyLastTap;
 @property (nonatomic, weak) id <MGLAnnotation> selectedAnnotation;
@@ -83,6 +93,11 @@ NSString *const MGLAnnotationIDKey = @"MGLAnnotationIDKey";
 @end
 
 @implementation MGLMapView
+{
+    BOOL _isTargetingInterfaceBuilder;
+    CLLocationDegrees _pendingLatitude;
+    CLLocationDegrees _pendingLongitude;
+}
 
 #pragma mark - Setup & Teardown -
 
@@ -100,37 +115,22 @@ MBGLView *mbglView = nullptr;
 mbgl::SQLiteCache *mbglFileCache = nullptr;
 mbgl::DefaultFileSource *mbglFileSource = nullptr;
 
-- (instancetype)initWithFrame:(CGRect)frame accessToken:(NSString *)accessToken styleJSON:(NSString *)styleJSON
+- (instancetype)initWithFrame:(CGRect)frame
 {
     self = [super initWithFrame:frame];
 
     if (self && [self commonInit])
     {
-        if (accessToken) [self setAccessToken:accessToken];
-
-        if (styleJSON || accessToken)
-        {
-            // If style is set directly, pass it on. If not, if we have an access
-            // token, we can pass nil and use the default style.
-            //
-            [self setStyleJSON:styleJSON];
-        }
+        self.styleURL = nil;
+        return self;
     }
 
-    return self;
+    return nil;
 }
 
-- (instancetype)initWithFrame:(CGRect)frame accessToken:(NSString *)accessToken bundledStyleNamed:(NSString *)styleName
+- (instancetype)initWithFrame:(CGRect)frame accessToken:(NSString *)accessToken
 {
-    self = [super initWithFrame:frame];
-    
-    if (self && [self commonInit])
-    {
-        if (accessToken) [self setAccessToken:accessToken];
-        if (styleName) [self useBundledStyleNamed:styleName];
-    }
-    
-    return self;
+    return [self initWithFrame:frame accessToken:accessToken styleURL:nil];
 }
 
 - (instancetype)initWithFrame:(CGRect)frame accessToken:(NSString *)accessToken styleURL:(NSURL *)styleURL
@@ -139,16 +139,11 @@ mbgl::DefaultFileSource *mbglFileSource = nullptr;
 
     if (self && [self commonInit])
     {
-        if (accessToken) [self setAccessToken:accessToken];
-        if (styleURL) [self setStyleURL:styleURL];
+        self.accessToken = accessToken;
+        self.styleURL = styleURL;
     }
 
     return self;
-}
-
-- (instancetype)initWithFrame:(CGRect)frame accessToken:(NSString *)accessToken
-{
-    return [self initWithFrame:frame accessToken:accessToken styleJSON:nil];
 }
 
 - (instancetype)initWithCoder:(NSCoder *)decoder
@@ -157,51 +152,59 @@ mbgl::DefaultFileSource *mbglFileSource = nullptr;
 
     if (self && [self commonInit])
     {
+        self.styleURL = nil;
         return self;
     }
 
     return nil;
 }
 
-- (void)setAccessToken:(NSString *)accessToken
+- (NSString *)accessToken
 {
-    if (accessToken)
-    {
-        mbglMap->setAccessToken((std::string)[accessToken UTF8String]);
-        [MGLMapboxEvents setToken:accessToken];
-    }
+    return @(mbglMap->getAccessToken().c_str()).mgl_stringOrNilIfEmpty;
 }
 
-- (void)setStyleJSON:(NSString *)styleJSON
+- (void)setAccessToken:(NSString *)accessToken
 {
-    if ( ! styleJSON)
-    {
-        [self useBundledStyleNamed:[[[MGLDefaultStyleName lowercaseString]
-                                        stringByAppendingString:@"-"]
-                                        stringByAppendingString:MGLStyleVersion]];
-    }
-    else
-    {
-        mbglMap->setStyleJSON((std::string)[styleJSON UTF8String]);
-    }
+    mbglMap->setAccessToken(accessToken ? (std::string)[accessToken UTF8String] : "");
+    [MGLMapboxEvents setToken:accessToken.mgl_stringOrNilIfEmpty];
+}
+
++ (NSSet *)keyPathsForValuesAffectingStyleURL
+{
+    return [NSSet setWithObjects:@"mapID", @"accessToken", nil];
+}
+
+- (NSURL *)styleURL
+{
+    NSString *styleURLString = @(mbglMap->getStyleURL().c_str()).mgl_stringOrNilIfEmpty;
+    return styleURLString ? [NSURL URLWithString:styleURLString] : nil;
 }
 
 - (void)setStyleURL:(NSURL *)styleURL
 {
-    std::string styleURLString([[styleURL absoluteString] UTF8String]);
-
+    if (_isTargetingInterfaceBuilder) return;
+    
+    if ( ! styleURL)
+    {
+        styleURL = MGLURLForBundledStyleNamed([NSString stringWithFormat:@"%@-v%@",
+                                               MGLDefaultStyleName.lowercaseString,
+                                               MGLStyleVersion]);
+    }
+    
     if ( ! [styleURL scheme])
     {
-        mbglMap->setStyleURL(std::string("asset://") + styleURLString);
+        // Assume a relative path into the developer’s bundle.
+        styleURL = [[NSBundle mainBundle] URLForResource:styleURL.path withExtension:nil];
     }
-    else
-    {
-        mbglMap->setStyleURL(styleURLString);
-    }
+    
+    mbglMap->setStyleURL([[styleURL absoluteString] UTF8String]);
 }
 
 - (BOOL)commonInit
 {
+    _isTargetingInterfaceBuilder = NSProcessInfo.processInfo.mgl_isInterfaceBuilderDesignablesAgent;
+    
     // create context
     //
     _context = [[EAGLContext alloc] initWithAPI:kEAGLRenderingAPIOpenGLES2];
@@ -238,11 +241,14 @@ mbgl::DefaultFileSource *mbglFileSource = nullptr;
     [self insertSubview:_glView atIndex:0];
 
     _glView.contentMode = UIViewContentModeCenter;
-    [self setBackgroundColor:[UIColor clearColor]];
+    
+    self.backgroundColor = [UIColor clearColor];
+    self.clipsToBounds = YES;
 
     // load extensions
     //
-    dispatch_once(&loadGLExtensions, ^{
+    dispatch_once(&loadGLExtensions, ^
+    {
         const std::string extensions = (char *)glGetString(GL_EXTENSIONS);
 
         using namespace mbgl;
@@ -288,9 +294,9 @@ mbgl::DefaultFileSource *mbglFileSource = nullptr;
 
     // setup logo bug
     //
-    _logoBug = [[UIImageView alloc] initWithImage:[MGLMapView resourceImageNamed:@"mapbox.png"]];
+    UIImage *logo = [[MGLMapView resourceImageNamed:@"mapbox.png"] imageWithAlignmentRectInsets:UIEdgeInsetsMake(1.5, 4, 3.5, 2)];
+    _logoBug = [[UIImageView alloc] initWithImage:logo];
     _logoBug.accessibilityLabel = @"Mapbox logo";
-    _logoBug.frame = CGRectMake(8, self.bounds.size.height - _logoBug.bounds.size.height - 4, _logoBug.bounds.size.width, _logoBug.bounds.size.height);
     _logoBug.translatesAutoresizingMaskIntoConstraints = NO;
     [self addSubview:_logoBug];
 
@@ -299,7 +305,6 @@ mbgl::DefaultFileSource *mbglFileSource = nullptr;
     _attributionButton = [UIButton buttonWithType:UIButtonTypeInfoLight];
     _attributionButton.accessibilityLabel = @"Attribution info";
     [_attributionButton addTarget:self action:@selector(showAttribution:) forControlEvents:UIControlEventTouchUpInside];
-    _attributionButton.frame = CGRectMake(self.bounds.size.width - _attributionButton.bounds.size.width - 8, self.bounds.size.height - _attributionButton.bounds.size.height - 8, _attributionButton.bounds.size.width, _attributionButton.bounds.size.height);
     _attributionButton.translatesAutoresizingMaskIntoConstraints = NO;
     [self addSubview:_attributionButton];
 
@@ -310,7 +315,7 @@ mbgl::DefaultFileSource *mbglFileSource = nullptr;
     UIImage *compassImage = [MGLMapView resourceImageNamed:@"Compass.png"];
     _compass.frame = CGRectMake(0, 0, compassImage.size.width, compassImage.size.height);
     _compass.alpha = 0;
-    UIView *container = [[UIView alloc] initWithFrame:CGRectMake(self.bounds.size.width - compassImage.size.width - 5, 5, compassImage.size.width, compassImage.size.height)];
+    UIView *container = [[UIView alloc] initWithFrame:CGRectZero];
     [container addSubview:_compass];
     container.translatesAutoresizingMaskIntoConstraints = NO;
     [container addGestureRecognizer:[[UITapGestureRecognizer alloc] initWithTarget:self action:@selector(handleCompassTapGesture:)]];
@@ -361,18 +366,24 @@ mbgl::DefaultFileSource *mbglFileSource = nullptr;
     //
     [[NSNotificationCenter defaultCenter] addObserver:self selector:@selector(appDidBackground:) name:UIApplicationDidEnterBackgroundNotification object:nil];
     [[NSNotificationCenter defaultCenter] addObserver:self selector:@selector(appWillForeground:) name:UIApplicationWillEnterForegroundNotification object:nil];
+    [[NSNotificationCenter defaultCenter] addObserver:self selector:@selector(didReceiveMemoryWarning) name:UIApplicationDidReceiveMemoryWarningNotification object:nil];
 
     // set initial position
     //
     mbglMap->setLatLngZoom(mbgl::LatLng(0, 0), mbglMap->getMinZoom());
+    _pendingLatitude = NAN;
+    _pendingLongitude = NAN;
 
     // setup change delegate queue
     //
     _regionChangeDelegateQueue = [NSOperationQueue new];
     _regionChangeDelegateQueue.maxConcurrentOperationCount = 1;
 
-    // start the main loop
-    mbglMap->start();
+    // start the main loop, but not on the IB canvas
+    if ( ! _isTargetingInterfaceBuilder)
+    {
+        mbglMap->start();
+    }
 
     // metrics: map load event
     const mbgl::LatLng latLng = mbglMap->getLatLng();
@@ -480,70 +491,122 @@ mbgl::DefaultFileSource *mbglFileSource = nullptr;
     // views so they don't underlap navigation or tool bars. If we don't have a reference, apply
     // constraints against ourself to maintain (albeit less ideal) placement of the subviews.
     //
-    NSString *topGuideFormatString    = (self.viewControllerForLayoutGuides ? @"[topLayoutGuide]"    : @"|");
-    NSString *bottomGuideFormatString = (self.viewControllerForLayoutGuides ? @"[bottomLayoutGuide]" : @"|");
-
-    id topGuideViewsObject            = (self.viewControllerForLayoutGuides ? (id)self.viewControllerForLayoutGuides.topLayoutGuide    : (id)@"");
-    id bottomGuideViewsObject         = (self.viewControllerForLayoutGuides ? (id)self.viewControllerForLayoutGuides.bottomLayoutGuide : (id)@"");
-
-    UIView *constraintParentView = (self.viewControllerForLayoutGuides.view ? self.viewControllerForLayoutGuides.view : self);
+    UIView *constraintParentView = (self.viewControllerForLayoutGuides.view ?
+                                    self.viewControllerForLayoutGuides.view :
+                                    self);
 
     // compass
     //
     UIView *compassContainer = self.compass.superview;
 
-    [constraintParentView addConstraints:[NSLayoutConstraint constraintsWithVisualFormat:[NSString stringWithFormat:@"V:%@-topSpacing-[container]", topGuideFormatString]
-                                                                                 options:0
-                                                                                 metrics:@{ @"topSpacing"     : @(5) }
-                                                                                   views:@{ @"topLayoutGuide" : topGuideViewsObject,
-                                                                                            @"container"      : compassContainer }]];
+    if (self.viewControllerForLayoutGuides)
+    {
+        [constraintParentView addConstraint:
+         [NSLayoutConstraint constraintWithItem:compassContainer
+                                      attribute:NSLayoutAttributeTop
+                                      relatedBy:NSLayoutRelationGreaterThanOrEqual
+                                         toItem:self.viewControllerForLayoutGuides.topLayoutGuide
+                                      attribute:NSLayoutAttributeBottom
+                                     multiplier:1
+                                       constant:5]];
+    }
+    [constraintParentView addConstraint:
+     [NSLayoutConstraint constraintWithItem:compassContainer
+                                  attribute:NSLayoutAttributeTop
+                                  relatedBy:NSLayoutRelationGreaterThanOrEqual
+                                     toItem:self
+                                  attribute:NSLayoutAttributeTop
+                                 multiplier:1
+                                   constant:5]];
 
-    [constraintParentView addConstraints:[NSLayoutConstraint constraintsWithVisualFormat:@"H:[container]-rightSpacing-|"
-                                                                                 options:0
-                                                                                 metrics:@{ @"rightSpacing" : @(5) }
-                                                                                   views:@{ @"container"    : compassContainer }]];
+    [constraintParentView addConstraint:
+     [NSLayoutConstraint constraintWithItem:self
+                                  attribute:NSLayoutAttributeTrailing
+                                  relatedBy:NSLayoutRelationEqual
+                                     toItem:compassContainer
+                                  attribute:NSLayoutAttributeTrailing
+                                 multiplier:1
+                                   constant:5]];
 
-    [compassContainer addConstraint:[NSLayoutConstraint constraintWithItem:compassContainer
-                                                                 attribute:NSLayoutAttributeWidth
-                                                                 relatedBy:NSLayoutRelationEqual
-                                                                    toItem:nil
-                                                                 attribute:NSLayoutAttributeNotAnAttribute
-                                                                multiplier:1
-                                                                  constant:self.compass.image.size.width]];
+    [compassContainer addConstraint:
+     [NSLayoutConstraint constraintWithItem:compassContainer
+                                  attribute:NSLayoutAttributeWidth
+                                  relatedBy:NSLayoutRelationEqual
+                                     toItem:nil
+                                  attribute:NSLayoutAttributeNotAnAttribute
+                                 multiplier:1
+                                   constant:self.compass.image.size.width]];
 
-    [compassContainer addConstraint:[NSLayoutConstraint constraintWithItem:compassContainer
-                                                                 attribute:NSLayoutAttributeHeight
-                                                                 relatedBy:NSLayoutRelationEqual
-                                                                    toItem:nil
-                                                                 attribute:NSLayoutAttributeNotAnAttribute
-                                                                multiplier:1
-                                                                  constant:self.compass.image.size.height]];
+    [compassContainer addConstraint:
+     [NSLayoutConstraint constraintWithItem:compassContainer
+                                  attribute:NSLayoutAttributeHeight
+                                  relatedBy:NSLayoutRelationEqual
+                                     toItem:nil
+                                  attribute:NSLayoutAttributeNotAnAttribute
+                                 multiplier:1
+                                   constant:self.compass.image.size.height]];
 
     // logo bug
     //
-    [constraintParentView addConstraints:[NSLayoutConstraint constraintsWithVisualFormat:[NSString stringWithFormat:@"V:[logoBug]-bottomSpacing-%@", bottomGuideFormatString]
-                                                                                 options:0
-                                                                                 metrics:@{ @"bottomSpacing"     : @(4) }
-                                                                                   views:@{ @"logoBug"           : self.logoBug,
-                                                                                            @"bottomLayoutGuide" : bottomGuideViewsObject }]];
+    if (self.viewControllerForLayoutGuides)
+    {
+        [constraintParentView addConstraint:
+         [NSLayoutConstraint constraintWithItem:self.viewControllerForLayoutGuides.bottomLayoutGuide
+                                      attribute:NSLayoutAttributeTop
+                                      relatedBy:NSLayoutRelationGreaterThanOrEqual
+                                         toItem:self.logoBug
+                                      attribute:NSLayoutAttributeBaseline
+                                     multiplier:1
+                                       constant:8]];
+    }
+    [constraintParentView addConstraint:
+     [NSLayoutConstraint constraintWithItem:self
+                                  attribute:NSLayoutAttributeBottom
+                                  relatedBy:NSLayoutRelationGreaterThanOrEqual
+                                     toItem:self.logoBug
+                                  attribute:NSLayoutAttributeBaseline
+                                 multiplier:1
+                                   constant:8]];
 
-    [constraintParentView addConstraints:[NSLayoutConstraint constraintsWithVisualFormat:@"H:|-leftSpacing-[logoBug]"
-                                                                                 options:0
-                                                                                 metrics:@{ @"leftSpacing"       : @(8) }
-                                                                                   views:@{ @"logoBug"           : self.logoBug }]];
+    [constraintParentView addConstraint:
+     [NSLayoutConstraint constraintWithItem:self.logoBug
+                                  attribute:NSLayoutAttributeLeading
+                                  relatedBy:NSLayoutRelationEqual
+                                     toItem:self
+                                  attribute:NSLayoutAttributeLeading
+                                 multiplier:1
+                                   constant:8]];
 
     // attribution button
     //
-    [constraintParentView addConstraints:[NSLayoutConstraint constraintsWithVisualFormat:[NSString stringWithFormat:@"V:[attributionButton]-bottomSpacing-%@", bottomGuideFormatString]
-                                                                                 options:0
-                                                                                 metrics:@{ @"bottomSpacing"     : @(8) }
-                                                                                   views:@{ @"attributionButton" : self.attributionButton,
-                                                                                            @"bottomLayoutGuide" : bottomGuideViewsObject }]];
+    if (self.viewControllerForLayoutGuides)
+    {
+        [constraintParentView addConstraint:
+         [NSLayoutConstraint constraintWithItem:self.viewControllerForLayoutGuides.bottomLayoutGuide
+                                      attribute:NSLayoutAttributeTop
+                                      relatedBy:NSLayoutRelationGreaterThanOrEqual
+                                         toItem:self.attributionButton
+                                      attribute:NSLayoutAttributeBaseline
+                                     multiplier:1
+                                       constant:8]];
+    }
+    [constraintParentView addConstraint:
+     [NSLayoutConstraint constraintWithItem:self
+                                  attribute:NSLayoutAttributeBottom
+                                  relatedBy:NSLayoutRelationGreaterThanOrEqual
+                                     toItem:self.attributionButton
+                                  attribute:NSLayoutAttributeBaseline
+                                 multiplier:1
+                                   constant:8]];
 
-    [constraintParentView addConstraints:[NSLayoutConstraint constraintsWithVisualFormat:@"H:[attributionButton]-rightSpacing-|"
-                                                                                 options:0
-                                                                                 metrics:@{ @"rightSpacing"      : @(8) }
-                                                                                   views:@{ @"attributionButton" : self.attributionButton }]];
+    [constraintParentView addConstraint:
+     [NSLayoutConstraint constraintWithItem:self
+                                  attribute:NSLayoutAttributeTrailing
+                                  relatedBy:NSLayoutRelationEqual
+                                     toItem:self.attributionButton
+                                  attribute:NSLayoutAttributeTrailing
+                                 multiplier:1
+                                   constant:8]];
 
     [super updateConstraints];
 }
@@ -551,15 +614,33 @@ mbgl::DefaultFileSource *mbglFileSource = nullptr;
 // This is the delegate of the GLKView object's display call.
 - (void)glkView:(GLKView *)view drawInRect:(CGRect)rect
 {
-    mbglView->resize(rect.size.width, rect.size.height, view.contentScaleFactor, view.drawableWidth, view.drawableHeight);
-    mbglMap->renderSync();
+    if ( ! self.glSnapshotView || self.glSnapshotView.hidden)
+    {
+        mbglView->resize(rect.size.width, rect.size.height, view.contentScaleFactor, view.drawableWidth, view.drawableHeight);
+
+        CGFloat zoomFactor   = mbglMap->getMaxZoom() - mbglMap->getMinZoom() + 1;
+        CGFloat cpuFactor    = (CGFloat)[[NSProcessInfo processInfo] processorCount];
+        CGFloat memoryFactor = (CGFloat)[[NSProcessInfo processInfo] physicalMemory] / 1000 / 1000 / 1000;
+        CGFloat sizeFactor   = ((CGFloat)mbglMap->getState().getWidth()  / mbgl::util::tileSize) *
+                               ((CGFloat)mbglMap->getState().getHeight() / mbgl::util::tileSize);
+
+        NSUInteger cacheSize = zoomFactor * cpuFactor * memoryFactor * sizeFactor * 0.5;
+
+        mbglMap->setSourceTileCacheSize(cacheSize);
+
+        mbglMap->renderSync();
+    }
 }
 
 // This gets called when the view dimension changes, e.g. because the device is being rotated.
 - (void)layoutSubviews
 {
     [super layoutSubviews];
-    mbglMap->triggerUpdate();
+    
+    if ( ! _isTargetingInterfaceBuilder)
+    {
+        mbglMap->triggerUpdate();
+    }
 }
 
 #pragma mark - Life Cycle -
@@ -570,7 +651,17 @@ mbgl::DefaultFileSource *mbglFileSource = nullptr;
 - (void)appDidBackground:(NSNotification *)notification
 {
     [MGLMapboxEvents flush];
-    
+
+    if ( ! self.glSnapshotView)
+    {
+        self.glSnapshotView = [[UIImageView alloc] initWithFrame:self.glView.frame];
+        self.glSnapshotView.autoresizingMask = self.glView.autoresizingMask;
+        [self insertSubview:self.glSnapshotView aboveSubview:self.glView];
+    }
+
+    self.glSnapshotView.image = self.glView.snapshot;
+    self.glSnapshotView.hidden = NO;
+
     mbglMap->stop();
 
     [self.glView deleteDrawable];
@@ -578,6 +669,8 @@ mbgl::DefaultFileSource *mbglFileSource = nullptr;
 
 - (void)appWillForeground:(NSNotification *)notification
 {
+    self.glSnapshotView.hidden = YES;
+
     [self.glView bindDrawable];
 
     mbglMap->start();
@@ -1052,6 +1145,21 @@ mbgl::DefaultFileSource *mbglFileSource = nullptr;
 
 #pragma mark - Properties -
 
++ (NSSet *)keyPathsForValuesAffectingZoomEnabled
+{
+    return [NSSet setWithObject:@"allowsZooming"];
+}
+
++ (NSSet *)keyPathsForValuesAffectingScrollEnabled
+{
+    return [NSSet setWithObject:@"allowsScrolling"];
+}
+
++ (NSSet *)keyPathsForValuesAffectingRotateEnabled
+{
+    return [NSSet setWithObject:@"allowsRotating"];
+}
+
 #pragma clang diagnostic push
 #pragma clang diagnostic ignored "-Wunused-parameter"
 
@@ -1095,12 +1203,6 @@ mbgl::DefaultFileSource *mbglFileSource = nullptr;
                          if (finished)
                          {
                              [self notifyMapChange:@(animated ? mbgl::MapChangeRegionDidChangeAnimated : mbgl::MapChangeRegionDidChange)];
-
-                             [UIView animateWithDuration:MGLAnimationDuration
-                                              animations:^
-                                              {
-                                                  self.compass.alpha = 0;
-                                              }];
                          }
                      }];
 }
@@ -1117,7 +1219,17 @@ mbgl::DefaultFileSource *mbglFileSource = nullptr;
     mbglMap->toggleDebug();
 }
 
+- (void)emptyMemoryCache
+{
+    mbglMap->onLowMemory();
+}
+
 #pragma mark - Geography -
+
++ (NSSet *)keyPathsForValuesAffectingCenterCoordinate
+{
+    return [NSSet setWithObjects:@"latitude", @"longitude", nil];
+}
 
 - (void)setCenterCoordinate:(CLLocationCoordinate2D)coordinate animated:(BOOL)animated preservingTracking:(BOOL)tracking
 {
@@ -1284,58 +1396,48 @@ CLLocationCoordinate2D latLngToCoordinate(mbgl::LatLng latLng)
 
 #pragma mark - Styling -
 
-- (NSDictionary *)getRawStyle
+- (NSArray *)bundledStyleURLs
 {
-    const std::string styleJSON = mbglMap->getStyleJSON();
+    if ( ! _bundledStyleURLs)
+    {
+        NSString *stylesPath = [[MGLMapView resourceBundlePath] stringByAppendingPathComponent:@"styles"];
 
-    return [NSJSONSerialization JSONObjectWithData:[@(styleJSON.c_str()) dataUsingEncoding:NSUTF8StringEncoding] options:0 error:nil];
-}
-
-- (void)setRawStyle:(NSDictionary *)style
-{
-    NSData *data = [NSJSONSerialization dataWithJSONObject:style options:0 error:nil];
-
-    [self setStyleJSON:[[NSString alloc] initWithData:data encoding:NSUTF8StringEncoding]];
-}
-
-- (NSArray *)bundledStyleNames
-{
-    if (!_bundledStyleNames) {
-        NSString *stylesPath = [[MGLMapView resourceBundlePath] stringByAppendingString:@"/styles"];
-
-        _bundledStyleNames = [NSMutableArray array];
+        _bundledStyleURLs = [NSMutableArray array];
 
         NSArray *bundledStyleNamesWithExtensions = [[NSFileManager defaultManager] contentsOfDirectoryAtPath:stylesPath error:nil];
-        NSString *hybridStylePrefix = @"hybrid-";
-        NSString *satelliteStylePrefix = @"satellite-";
-        for (NSString *fileName in bundledStyleNamesWithExtensions) {
-            NSString *styleName = [fileName stringByDeletingPathExtension];
-            [_bundledStyleNames addObject:styleName];
-
-            // Add satellite raster & "hybrid" (satellite raster + vector contours & labels)
-            if ([styleName hasPrefix:satelliteStylePrefix]) {
-                [_bundledStyleNames addObject:[hybridStylePrefix stringByAppendingString:[styleName substringFromIndex:[satelliteStylePrefix length]]]];
-            }
+        for (NSString *fileName in bundledStyleNamesWithExtensions)
+        {
+            [_bundledStyleURLs addObject:MGLURLForBundledStyleNamed([fileName stringByDeletingPathExtension])];
         }
     }
 
-    return [NSArray arrayWithArray:_bundledStyleNames];
+    return [NSArray arrayWithArray:_bundledStyleURLs];
 }
 
-- (void)useBundledStyleNamed:(NSString *)styleName
++ (NSSet *)keyPathsForValuesAffectingMapID
 {
-    NSString *hybridStylePrefix = @"hybrid-";
-    BOOL isHybrid = [styleName hasPrefix:hybridStylePrefix];
-    if (isHybrid) {
-        styleName = [@"satellite-" stringByAppendingString:[styleName substringFromIndex:[hybridStylePrefix length]]];
+    return [NSSet setWithObjects:@"styleURL", @"accessToken", nil];
+}
+
+- (NSString *)mapID
+{
+    NSURL *styleURL = self.styleURL;
+    return [styleURL.scheme isEqualToString:@"mapbox"] ? styleURL.host.mgl_stringOrNilIfEmpty : nil;
+}
+
+- (void)setMapID:(NSString *)mapID
+{
+    if (mapID)
+    {
+        self.styleURL = [NSURL URLWithString:[NSString stringWithFormat:@"mapbox://%@", mapID]];
     }
-    [self setStyleURL:[NSURL URLWithString:[NSString stringWithFormat:@"styles/%@.json", styleName]]];
-    if (isHybrid) {
-        [self setStyleClasses:@[@"contours", @"labels"]];
+    else
+    {
+        self.styleURL = nil;
     }
 }
 
-- (NSArray *)getAppliedStyleClasses
+- (NSArray *)styleClasses
 {
     NSMutableArray *returnArray = [NSMutableArray array];
 
@@ -1365,6 +1467,27 @@ CLLocationCoordinate2D latLngToCoordinate(mbgl::LatLng latLng)
 
     mbglMap->setDefaultTransitionDuration(secondsAsDuration(transitionDuration));
     mbglMap->setClasses(newAppliedClasses);
+}
+
+- (BOOL)hasStyleClass:(NSString *)styleClass
+{
+    return styleClass && mbglMap->hasClass([styleClass UTF8String]);
+}
+
+- (void)addStyleClass:(NSString *)styleClass
+{
+    if (styleClass)
+    {
+        mbglMap->addClass([styleClass UTF8String]);
+    }
+}
+
+- (void)removeStyleClass:(NSString *)styleClass
+{
+    if (styleClass)
+    {
+        mbglMap->removeClass([styleClass UTF8String]);
+    }
 }
 
 #pragma mark - Annotations -
@@ -1624,6 +1747,8 @@ CLLocationCoordinate2D latLngToCoordinate(mbgl::LatLng latLng)
         }
         
         self.userLocationAnnotationView = [[MGLUserLocationAnnotationView alloc] initInMapView:self];
+        self.userLocationAnnotationView.autoresizingMask = (UIViewAutoresizingFlexibleLeftMargin | UIViewAutoresizingFlexibleRightMargin |
+                                                            UIViewAutoresizingFlexibleTopMargin | UIViewAutoresizingFlexibleBottomMargin);
         
         self.locationManager = [CLLocationManager new];
         
@@ -2176,6 +2301,17 @@ CLLocationCoordinate2D latLngToCoordinate(mbgl::LatLng latLng)
                          }
                          completion:nil];
     }
+    else if (mbglMap->getBearing() == 0 && self.compass.alpha > 0)
+    {
+        [UIView animateWithDuration:MGLAnimationDuration
+                              delay:0
+                            options:UIViewAnimationOptionBeginFromCurrentState
+                         animations:^
+                         {
+                             self.compass.alpha = 0;
+                         }
+                         completion:nil];
+    }
 }
 
 + (UIImage *)resourceImageNamed:(NSString *)imageName
@@ -2213,6 +2349,135 @@ CLLocationCoordinate2D latLngToCoordinate(mbgl::LatLng latLng)
     [self.glView setNeedsDisplay];
 
     [self notifyMapChange:@(mbgl::MapChangeRegionIsChanging)];
+}
+
+- (void)prepareForInterfaceBuilder
+{
+    [super prepareForInterfaceBuilder];
+    
+    self.layer.borderColor = [UIColor colorWithWhite:184/255. alpha:1].CGColor;
+    self.layer.borderWidth = 1;
+    
+    if (self.accessToken)
+    {
+        self.layer.backgroundColor = [UIColor colorWithRed:59/255.
+                                                     green:178/255.
+                                                      blue:208/255.
+                                                     alpha:0.8].CGColor;
+        
+        UIImage *image = [[self class] resourceImageNamed:@"mapbox.png"];
+        UIImageView *previewView = [[UIImageView alloc] initWithImage:image];
+        previewView.translatesAutoresizingMaskIntoConstraints = NO;
+        [self addSubview:previewView];
+        [self addConstraint:
+         [NSLayoutConstraint constraintWithItem:previewView
+                                      attribute:NSLayoutAttributeCenterXWithinMargins
+                                      relatedBy:NSLayoutRelationEqual
+                                         toItem:self
+                                      attribute:NSLayoutAttributeCenterXWithinMargins
+                                     multiplier:1
+                                       constant:0]];
+        [self addConstraint:
+         [NSLayoutConstraint constraintWithItem:previewView
+                                      attribute:NSLayoutAttributeCenterYWithinMargins
+                                      relatedBy:NSLayoutRelationEqual
+                                         toItem:self
+                                      attribute:NSLayoutAttributeCenterYWithinMargins
+                                     multiplier:1
+                                       constant:0]];
+    }
+    else
+    {
+        UIView *diagnosticView = [[UIView alloc] init];
+        diagnosticView.translatesAutoresizingMaskIntoConstraints = NO;
+        [self addSubview:diagnosticView];
+        
+        // Headline
+        UILabel *headlineLabel = [[UILabel alloc] init];
+        headlineLabel.text = @"No Access Token";
+        headlineLabel.font = [UIFont preferredFontForTextStyle:UIFontTextStyleHeadline];
+        headlineLabel.textAlignment = NSTextAlignmentCenter;
+        headlineLabel.numberOfLines = 1;
+        headlineLabel.translatesAutoresizingMaskIntoConstraints = NO;
+        [headlineLabel setContentCompressionResistancePriority:UILayoutPriorityDefaultLow
+                                                       forAxis:UILayoutConstraintAxisHorizontal];
+        [diagnosticView addSubview:headlineLabel];
+        
+        // Explanation
+        UILabel *explanationLabel = [[UILabel alloc] init];
+        explanationLabel.text = @"To display a map here, you must provide a Mapbox access token. Get an access token from:";
+        explanationLabel.font = [UIFont preferredFontForTextStyle:UIFontTextStyleBody];
+        explanationLabel.numberOfLines = 0;
+        explanationLabel.translatesAutoresizingMaskIntoConstraints = NO;
+        [explanationLabel setContentCompressionResistancePriority:UILayoutPriorityDefaultLow
+                                                          forAxis:UILayoutConstraintAxisHorizontal];
+        [diagnosticView addSubview:explanationLabel];
+        
+        // Link
+        UIButton *linkButton = [UIButton buttonWithType:UIButtonTypeSystem];
+        [linkButton setTitle:MGLMapboxAccessTokenManagerURLDisplayString forState:UIControlStateNormal];
+        linkButton.translatesAutoresizingMaskIntoConstraints = NO;
+        [linkButton setContentCompressionResistancePriority:UILayoutPriorityDefaultLow
+                                                    forAxis:UILayoutConstraintAxisHorizontal];
+        [diagnosticView addSubview:linkButton];
+        
+        // More explanation
+        UILabel *explanationLabel2 = [[UILabel alloc] init];
+        explanationLabel2.text = @"and enter it into the Access Token field in the Attributes inspector.";
+        explanationLabel2.font = [UIFont preferredFontForTextStyle:UIFontTextStyleBody];
+        explanationLabel2.numberOfLines = 0;
+        explanationLabel2.translatesAutoresizingMaskIntoConstraints = NO;
+        [explanationLabel2 setContentCompressionResistancePriority:UILayoutPriorityDefaultLow
+                                                           forAxis:UILayoutConstraintAxisHorizontal];
+        [diagnosticView addSubview:explanationLabel2];
+        
+        // Constraints
+        NSDictionary *views = @{
+            @"container": diagnosticView,
+            @"headline": headlineLabel,
+            @"explanation": explanationLabel,
+            @"link": linkButton,
+            @"explanation2": explanationLabel2,
+        };
+        [self addConstraint:
+         [NSLayoutConstraint constraintWithItem:diagnosticView
+                                      attribute:NSLayoutAttributeCenterYWithinMargins
+                                      relatedBy:NSLayoutRelationEqual
+                                         toItem:self
+                                      attribute:NSLayoutAttributeCenterYWithinMargins
+                                     multiplier:1
+                                       constant:0]];
+        [self addConstraints:
+         [NSLayoutConstraint constraintsWithVisualFormat:@"H:|-[container(20@20)]-|"
+                                                 options:NSLayoutFormatAlignAllCenterY
+                                                 metrics:nil
+                                                   views:views]];
+        [self addConstraints:
+         [NSLayoutConstraint constraintsWithVisualFormat:@"V:|[headline]-[explanation]-[link]-[explanation2]|"
+                                                 options:0
+                                                 metrics:nil
+                                                   views:views]];
+        [self addConstraints:
+         [NSLayoutConstraint constraintsWithVisualFormat:@"H:|[headline]|"
+                                                 options:0
+                                                 metrics:nil
+                                                   views:views]];
+        [self addConstraints:
+         [NSLayoutConstraint constraintsWithVisualFormat:@"H:|[explanation]|"
+                                                 options:0
+                                                 metrics:nil
+                                                   views:views]];
+        [self addConstraints:
+         [NSLayoutConstraint constraintsWithVisualFormat:@"H:|[link]|"
+                                                 options:0
+                                                 metrics:nil
+                                                   views:views]];
+        [self addConstraints:
+         [NSLayoutConstraint constraintsWithVisualFormat:@"H:|[explanation2]|"
+                                                 options:0
+                                                 metrics:nil
+                                                   views:views]];
+    }
 }
 
 class MBGLView : public mbgl::View
@@ -2256,7 +2521,8 @@ class MBGLView : public mbgl::View
         [EAGLContext setCurrentContext:nil];
     }
 
-    void resize(uint16_t width, uint16_t height, float ratio, uint16_t fbWidth, uint16_t fbHeight) {
+    void resize(uint16_t width, uint16_t height, float ratio, uint16_t fbWidth, uint16_t fbHeight)
+    {
         View::resize(width, height, ratio, fbWidth, fbHeight);
     }
 
@@ -2270,5 +2536,111 @@ class MBGLView : public mbgl::View
     private:
         __weak MGLMapView *nativeView = nullptr;
 };
+
+@end
+
+@implementation MGLMapView (IBAdditions)
+
++ (NSSet *)keyPathsForValuesAffectingLatitude
+{
+    return [NSSet setWithObject:@"centerCoordinate"];
+}
+
+- (double)latitude
+{
+    return self.centerCoordinate.latitude;
+}
+
+- (void)setLatitude:(double)latitude
+{
+    if ( ! isnan(_pendingLongitude))
+    {
+        self.centerCoordinate = CLLocationCoordinate2DMake(latitude, _pendingLongitude);
+        _pendingLatitude = NAN;
+        _pendingLongitude = NAN;
+    }
+    else
+    {
+        // Not enough info to make a valid center coordinate yet. Stash this
+        // latitude away until the longitude is set too.
+        _pendingLatitude = latitude;
+    }
+}
+
++ (NSSet *)keyPathsForValuesAffectingLongitude
+{
+    return [NSSet setWithObject:@"centerCoordinate"];
+}
+
+- (double)longitude
+{
+    return self.centerCoordinate.longitude;
+}
+
+- (void)setLongitude:(double)longitude
+{
+    if ( ! isnan(_pendingLatitude))
+    {
+        self.centerCoordinate = CLLocationCoordinate2DMake(_pendingLatitude, longitude);
+        _pendingLatitude = NAN;
+        _pendingLongitude = NAN;
+    }
+    else
+    {
+        // Not enough info to make a valid center coordinate yet. Stash this
+        // longitude away until the latitude is set too.
+        _pendingLongitude = longitude;
+    }
+}
+
++ (NSSet *)keyPathsForValuesAffectingAllowsZooming
+{
+    return [NSSet setWithObject:@"zoomEnabled"];
+}
+
+- (BOOL)allowsZooming
+{
+    return self.zoomEnabled;
+}
+
+- (void)setAllowsZooming:(BOOL)allowsZooming
+{
+    self.zoomEnabled = allowsZooming;
+}
+
++ (NSSet *)keyPathsForValuesAffectingAllowsScrolling
+{
+    return [NSSet setWithObject:@"scrollEnabled"];
+}
+
+- (BOOL)allowsScrolling
+{
+    return self.scrollEnabled;
+}
+
+- (void)setAllowsScrolling:(BOOL)allowsScrolling
+{
+    self.scrollEnabled = allowsScrolling;
+}
+
++ (NSSet *)keyPathsForValuesAffectingAllowsRotating
+{
+    return [NSSet setWithObject:@"rotateEnabled"];
+}
+
+- (BOOL)allowsRotating
+{
+    return self.rotateEnabled;
+}
+
+- (void)setAllowsRotating:(BOOL)allowsRotating
+{
+    self.rotateEnabled = allowsRotating;
+}
+
+- (void)didReceiveMemoryWarning
+{
+    mbglMap->onLowMemory();
+}
 
 @end

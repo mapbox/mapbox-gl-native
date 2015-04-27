@@ -13,7 +13,7 @@ TEST_F(Storage, HTTPCancelEnvironment) {
 
     using namespace mbgl;
 
-    DefaultFileSource fs(nullptr, uv_default_loop());
+    DefaultFileSource fs(nullptr);
 
     // Create two fake environment pointers. The FileSource implementation treats these as opaque
     // pointers and doesn't reach into them.
