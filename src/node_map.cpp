@@ -199,7 +199,7 @@ NAN_METHOD(NodeMap::Render) {
 }
 
 void NodeMap::startRender(std::unique_ptr<NodeMap::RenderOptions> options) {
-    view.resize(options->width, options->height, options->ratio);
+    map.resize(options->width, options->height, options->ratio);
     map.setClasses(options->classes);
     map.setLatLngZoom(mbgl::LatLng(options->latitude, options->longitude), options->zoom);
     map.setBearing(options->bearing);
