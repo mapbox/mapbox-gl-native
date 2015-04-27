@@ -37,6 +37,18 @@
     [[MGLMetricsLocationManager sharedManager].locationManager stopUpdatingLocation];
 }
 
++ (void) startMonitoringVisits {
+    if ([[MGLMetricsLocationManager sharedManager].locationManager respondsToSelector:@selector(startMonitoringVisits)]) {
+        [[MGLMetricsLocationManager sharedManager].locationManager startMonitoringVisits];
+    }
+}
+
++ (void) stopMonitoringVisits {
+    if ([[MGLMetricsLocationManager sharedManager].locationManager respondsToSelector:@selector(stopMonitoringVisits)]) {
+        [[MGLMetricsLocationManager sharedManager].locationManager stopMonitoringVisits];
+    }
+}
+
 #pragma mark CLLocationManagerDelegate
 - (void)locationManager:(CLLocationManager *)manager didUpdateLocations:(NSArray *)locations {
     //  Iterate through locations to pass all data
@@ -65,10 +77,12 @@
         case kCLAuthorizationStatusDenied:
             newStatus = @"User Explcitly Denied";
             [MGLMetricsLocationManager stopUpdatingLocation];
+            [MGLMetricsLocationManager stopMonitoringVisits];
             break;
         case kCLAuthorizationStatusAuthorized:
             newStatus = @"User Has Authorized / Authorized Always";
             [MGLMetricsLocationManager startUpdatingLocation];
+            [MGLMetricsLocationManager startMonitoringVisits];
             break;
             //        case kCLAuthorizationStatusAuthorizedAlways:
             //            newStatus = @"Not Determined";
@@ -76,6 +90,7 @@
         case kCLAuthorizationStatusAuthorizedWhenInUse:
             newStatus = @"User Has Authorized When In Use Only";
             [MGLMetricsLocationManager startUpdatingLocation];
+            [MGLMetricsLocationManager startMonitoringVisits];
             break;
         default:
             newStatus = @"Unknown";

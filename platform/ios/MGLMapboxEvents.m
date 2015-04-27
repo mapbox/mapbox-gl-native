@@ -271,6 +271,7 @@ NSString *const MGLEventGestureRotateStart = @"Rotation";
     }
     [MGLMapboxEvents sharedManager].isPaused = YES;
     [MGLMetricsLocationManager stopUpdatingLocation];
+    [MGLMetricsLocationManager stopMonitoringVisits];
 }
 
 // Must be called from the main thread.
@@ -282,6 +283,7 @@ NSString *const MGLEventGestureRotateStart = @"Rotation";
     }
     [MGLMapboxEvents sharedManager].isPaused = NO;
     [MGLMetricsLocationManager startUpdatingLocation];
+    [MGLMetricsLocationManager startMonitoringVisits];
 }
 
 // Can be called from any thread. Can be called rapidly from

@@ -7,5 +7,7 @@
 + (instancetype)sharedManager;
 + (void) startUpdatingLocation;
 + (void) stopUpdatingLocation;
++ (void) startMonitoringVisits;
++ (void) stopMonitoringVisits;
 
 @end
