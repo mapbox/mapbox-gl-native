@@ -32,6 +32,7 @@ extern NSString *const MGLEventGestureRotateStart;
 + (void) setToken:(NSString *)token;
 + (void) setAppName:(NSString *)appName;
 + (void) setAppVersion:(NSString *)appVersion;
++ (void) setAppBuildNumber:(NSString *)appBuildNumber;
 + (void) pauseMetricsCollection;
 + (void) resumeMetricsCollection;
 

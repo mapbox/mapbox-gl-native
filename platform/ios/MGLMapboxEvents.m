@@ -62,6 +62,7 @@ NSString *const MGLEventGestureRotateStart = @"Rotation";
 @property (atomic) NSString *token;
 @property (atomic) NSString *appName;
 @property (atomic) NSString *appVersion;
+@property (atomic) NSString *appBuildNumber;
 @property (atomic) NSString *instanceID;
 @property (atomic) NSString *advertiserId;
 @property (atomic) NSString *vendorId;
@@ -245,6 +246,13 @@ NSString *const MGLEventGestureRotateStart = @"Rotation";
 + (void) setAppVersion:(NSString *)appVersion {
     assert([[NSThread currentThread] isMainThread]);
     [MGLMapboxEvents sharedManager].appVersion = appVersion;
+}
+
+// Must be called from the main thread.
+//
++ (void) setAppBuildNumber:(NSString *)appBuildNumber {
+    assert([[NSThread currentThread] isMainThread]);
+    [MGLMapboxEvents sharedManager].appBuildNumber = appBuildNumber;
 }
 
 // Must be called from the main thread.
@@ -455,8 +463,8 @@ NSString *const MGLEventGestureRotateStart = @"Rotation";
 // Can be called from any thread.
 //
 - (NSString *) getUserAgent {
-    if (self.appName != nil && self.appVersion != nil && ([self.userAgent rangeOfString:self.appName].location == NSNotFound)) {
-        self.userAgent = [NSString stringWithFormat:@"%@/%@ %@", self.appName, self.appVersion, self.userAgent];
+    if (self.appName != nil && self.appVersion != nil && self.appBuildNumber != nil && ([self.userAgent rangeOfString:self.appName].location == NSNotFound)) {
+        self.userAgent = [NSString stringWithFormat:@"%@/%@-%@ %@", self.appName, self.appVersion, self.appBuildNumber, self.userAgent];
     }
     return self.userAgent;
 }
