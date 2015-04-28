@@ -7,6 +7,7 @@
 
 #import "MGLMetricsLocationManager.h"
 #import "NSProcessInfo+MGLAdditions.h"
+#import "NSBundle+MGLAdditions.h"
 
 #include <sys/sysctl.h>
 
@@ -142,16 +143,17 @@ NSString *const MGLEventGestureRotateStart = @"Rotation";
         // ===============================
 
          _session = [NSURLSession sessionWithConfiguration:[NSURLSessionConfiguration defaultSessionConfiguration] delegate:self delegateQueue:nil];
+        NSBundle *resourceBundle = [NSBundle bundleWithPath:[NSBundle mgl_resourceBundlePath]];
 
         // Load Local Copy of Server's Public Key
         NSString *cerPath = nil;
-        cerPath = [[NSBundle bundleForClass:[MGLMapboxEvents class]] pathForResource:@"api_mapbox_com-geotrust" ofType:@"der"];
+        cerPath = [resourceBundle pathForResource:@"api_mapbox_com-geotrust" ofType:@"der"];
         if (cerPath != nil) {
             _geoTrustCert = [NSData dataWithContentsOfFile:cerPath];
         }
 
         cerPath = nil;
-        cerPath = [[NSBundle bundleForClass:[MGLMapboxEvents class]] pathForResource:@"api_mapbox_com-digicert" ofType:@"der"];
+        cerPath = [resourceBundle pathForResource:@"api_mapbox_com-digicert" ofType:@"der"];
         if (cerPath != nil) {
             _digicertCert = [NSData dataWithContentsOfFile:cerPath];
         }

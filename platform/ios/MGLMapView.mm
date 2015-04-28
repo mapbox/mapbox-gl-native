@@ -16,6 +16,7 @@
 #include <mbgl/util/geo.hpp>
 
 #import "MGLTypes.h"
+#import "NSBundle+MGLAdditions.h"
 #import "NSString+MGLAdditions.h"
 #import "NSProcessInfo+MGLAdditions.h"
 #import "MGLAnnotation.h"
@@ -1406,7 +1407,7 @@ CLLocationCoordinate2D latLngToCoordinate(mbgl::LatLng latLng)
 {
     if ( ! _bundledStyleURLs)
     {
-        NSString *stylesPath = [[MGLMapView resourceBundlePath] stringByAppendingPathComponent:@"styles"];
+        NSString *stylesPath = [[NSBundle mgl_resourceBundlePath] stringByAppendingPathComponent:@"styles"];
 
         _bundledStyleURLs = [NSMutableArray array];
 
@@ -2332,20 +2333,11 @@ CLLocationCoordinate2D latLngToCoordinate(mbgl::LatLng latLng)
 
 + (NSString *)pathForBundleResourceNamed:(NSString *)name ofType:(NSString *)extension inDirectory:(NSString *)directory
 {
-    NSString *path = [[NSBundle bundleWithPath:[MGLMapView resourceBundlePath]] pathForResource:name ofType:extension inDirectory:directory];
+    NSString *path = [[NSBundle bundleWithPath:[NSBundle mgl_resourceBundlePath]] pathForResource:name ofType:extension inDirectory:directory];
 
     NSAssert(path, @"Resource not found in application.");
 
     return path;
-}
-
-+ (NSString *)resourceBundlePath
-{
-    NSString *resourceBundlePath = [[NSBundle bundleForClass:[MGLMapView class]] pathForResource:@"MapboxGL" ofType:@"bundle"];
-
-    if ( ! resourceBundlePath) resourceBundlePath = [[NSBundle mainBundle] bundlePath];
-
-    return resourceBundlePath;
 }
 
 - (void)invalidate
