@@ -24,7 +24,7 @@ public:
     virtual ~Bucket() {}
 
     inline bool needsUpload() const {
-        return uploaded;
+        return !uploaded;
     }
 
 protected:
