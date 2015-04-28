@@ -153,7 +153,7 @@ void LineAtlas::bind() {
 
     if (dirty) {
         if (first) {
-            glTexImage2D(
+            MBGL_CHECK_ERROR(glTexImage2D(
                 GL_TEXTURE_2D, // GLenum target
                 0, // GLint level
                 GL_ALPHA, // GLint internalformat
@@ -163,9 +163,9 @@ void LineAtlas::bind() {
                 GL_ALPHA, // GLenum format
                 GL_UNSIGNED_BYTE, // GLenum type
                 data // const GLvoid * data
-            );
+            ));
         } else {
-            glTexSubImage2D(
+            MBGL_CHECK_ERROR(glTexSubImage2D(
                 GL_TEXTURE_2D, // GLenum target
                 0, // GLint level
                 0, // GLint xoffset
@@ -175,7 +175,7 @@ void LineAtlas::bind() {
                 GL_ALPHA, // GLenum format
                 GL_UNSIGNED_BYTE, // GLenum type
                 data // const GLvoid *pixels
-            );
+            ));
         }
 
 
