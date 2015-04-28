@@ -27,7 +27,7 @@ if [[ ${PUBLISH_PLATFORM} = 'ios' ]]; then
 
     # publish iOS build
     mapbox_time "deploy_ios" \
-    ./scripts/publish_ios.sh "${PUBLISH_VERSION}"
+    ./scripts/ios/publish.sh "${PUBLISH_VERSION}"
 else
     # build & test iOS
     mapbox_time "run_ios_tests" \
