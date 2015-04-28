@@ -323,8 +323,6 @@ mbgl::DefaultFileSource *mbglFileSource = nullptr;
     [container addGestureRecognizer:[[UITapGestureRecognizer alloc] initWithTarget:self action:@selector(handleCompassTapGesture:)]];
     [self addSubview:container];
 
-    self.viewControllerForLayoutGuides = nil;
-
     // setup interaction
     //
     _pan = [[UIPanGestureRecognizer alloc] initWithTarget:self action:@selector(handlePanGesture:)];
@@ -476,15 +474,22 @@ mbgl::DefaultFileSource *mbglFileSource = nullptr;
     [self setNeedsUpdateConstraints];
 }
 
-- (void)setViewControllerForLayoutGuides:(UIViewController *)viewController
+- (UIViewController *)viewControllerForLayoutGuides
 {
-    _viewControllerForLayoutGuides = viewController;
-
-    [self.compass.superview removeConstraints:self.compass.superview.constraints];
-    [self.logoBug removeConstraints:self.logoBug.constraints];
-    [self.attributionButton removeConstraints:self.attributionButton.constraints];
-
-    [self setNeedsUpdateConstraints];
+    // Per -[UIResponder nextResponder] documentation, a UIView’s next responder
+    // is its managing UIViewController if applicable, or otherwise its
+    // superview. UIWindow’s next responder is UIApplication, which has no next
+    // responder.
+    UIResponder *laterResponder = self;
+    while ([laterResponder isKindOfClass:[UIView class]])
+    {
+        laterResponder = laterResponder.nextResponder;
+    }
+    if ([laterResponder isKindOfClass:[UIViewController class]])
+    {
+        return (UIViewController *)laterResponder;
+    }
+    return nil;
 }
 
 - (void)updateConstraints
@@ -493,21 +498,20 @@ mbgl::DefaultFileSource *mbglFileSource = nullptr;
     // views so they don't underlap navigation or tool bars. If we don't have a reference, apply
     // constraints against ourself to maintain (albeit less ideal) placement of the subviews.
     //
-    UIView *constraintParentView = (self.viewControllerForLayoutGuides.view ?
-                                    self.viewControllerForLayoutGuides.view :
-                                    self);
+    UIViewController *viewController = self.viewControllerForLayoutGuides;
+    UIView *constraintParentView = (viewController.view ? viewController.view : self);
 
     // compass
     //
     UIView *compassContainer = self.compass.superview;
 
-    if (self.viewControllerForLayoutGuides)
+    if (viewController)
     {
         [constraintParentView addConstraint:
          [NSLayoutConstraint constraintWithItem:compassContainer
                                       attribute:NSLayoutAttributeTop
                                       relatedBy:NSLayoutRelationGreaterThanOrEqual
-                                         toItem:self.viewControllerForLayoutGuides.topLayoutGuide
+                                         toItem:viewController.topLayoutGuide
                                       attribute:NSLayoutAttributeBottom
                                      multiplier:1
                                        constant:5]];
@@ -550,10 +554,10 @@ mbgl::DefaultFileSource *mbglFileSource = nullptr;
 
     // logo bug
     //
-    if (self.viewControllerForLayoutGuides)
+    if (viewController)
     {
         [constraintParentView addConstraint:
-         [NSLayoutConstraint constraintWithItem:self.viewControllerForLayoutGuides.bottomLayoutGuide
+         [NSLayoutConstraint constraintWithItem:viewController.bottomLayoutGuide
                                       attribute:NSLayoutAttributeTop
                                       relatedBy:NSLayoutRelationGreaterThanOrEqual
                                          toItem:self.logoBug
@@ -581,10 +585,10 @@ mbgl::DefaultFileSource *mbglFileSource = nullptr;
 
     // attribution button
     //
-    if (self.viewControllerForLayoutGuides)
+    if (viewController)
     {
         [constraintParentView addConstraint:
-         [NSLayoutConstraint constraintWithItem:self.viewControllerForLayoutGuides.bottomLayoutGuide
+         [NSLayoutConstraint constraintWithItem:viewController.bottomLayoutGuide
                                       attribute:NSLayoutAttributeTop
                                       relatedBy:NSLayoutRelationGreaterThanOrEqual
                                          toItem:self.attributionButton

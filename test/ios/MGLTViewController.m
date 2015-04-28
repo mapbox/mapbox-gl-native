@@ -12,7 +12,6 @@
 
     _mapView = [[MGLMapView alloc] initWithFrame:self.view.bounds
                                                 accessToken:@"pk.eyJ1IjoianVzdGluIiwiYSI6Ik9RX3RRQzAifQ.dmOg_BAp1ywuDZMM7YsXRg"];
-    _mapView.viewControllerForLayoutGuides = self;
     _mapView.autoresizingMask = UIViewAutoresizingFlexibleWidth | UIViewAutoresizingFlexibleHeight;
 
     [self.view addSubview:_mapView];
