@@ -75,7 +75,15 @@ private:
 // Manages Glyphrange PBF loading.
 class GlyphStore {
 public:
+    class Observer {
+    public:
+        virtual ~Observer() = default;
+
+        virtual void onGlyphRangeLoaded() = 0;
+    };
+
     GlyphStore(Environment &);
+    ~GlyphStore();
 
     // Block until all specified GlyphRanges of the specified font stack are loaded.
     void waitForGlyphRanges(const std::string &fontStack, const std::set<GlyphRange> &glyphRanges);
@@ -84,7 +92,11 @@ public:
 
     void setURL(const std::string &url);
 
+    void setObserver(Observer* observer);
+
 private:
+    void emitGlyphRangeLoaded();
+
     // Loads an individual glyph range from the font stack and adds it to rangeSets
     std::shared_future<GlyphPBF &> loadGlyphRange(const std::string &fontStack, std::map<GlyphRange, std::unique_ptr<GlyphPBF>> &rangeSets, GlyphRange range);
 
@@ -95,6 +107,8 @@ private:
     std::unordered_map<std::string, std::map<GlyphRange, std::unique_ptr<GlyphPBF>>> ranges;
     std::unordered_map<std::string, std::unique_ptr<FontStack>> stacks;
     std::unique_ptr<uv::mutex> mtx;
+
+    Observer* observer;
 };
 
 

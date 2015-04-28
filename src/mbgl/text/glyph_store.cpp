@@ -226,7 +226,13 @@ void GlyphPBF::parse(FontStack &stack) {
     data.clear();
 }
 
-GlyphStore::GlyphStore(Environment& env_) : env(env_), mtx(util::make_unique<uv::mutex>()) {}
+GlyphStore::GlyphStore(Environment& env_)
+    : env(env_), mtx(util::make_unique<uv::mutex>()), observer(nullptr) {
+}
+
+GlyphStore::~GlyphStore() {
+    observer = nullptr;
+}
 
 void GlyphStore::setURL(const std::string &url) {
     glyphURL = url;
@@ -289,5 +295,14 @@ uv::exclusive<FontStack> GlyphStore::getFontStack(const std::string &fontStack) 
     return stack;
 }
 
+void GlyphStore::setObserver(Observer* observer_) {
+    observer = observer_;
+}
+
+void GlyphStore::emitGlyphRangeLoaded() {
+    if (observer) {
+        observer->onGlyphRangeLoaded();
+    }
+}
 
 }

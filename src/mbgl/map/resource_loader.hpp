@@ -3,6 +3,7 @@
 
 #include <mbgl/map/source.hpp>
 #include <mbgl/map/sprite.hpp>
+#include <mbgl/text/glyph_store.hpp>
 #include <mbgl/util/noncopyable.hpp>
 
 #include <string>
@@ -21,7 +22,10 @@ class TransformState;
 // by the Style. The Source object currently owns all the tiles, thus this
 // class will notify its observers of any change on these tiles which will
 // ultimately cause a new rendering to be triggered.
-class ResourceLoader : public Source::Observer, public Sprite::Observer, private util::noncopyable {
+class ResourceLoader : public GlyphStore::Observer,
+                       public Source::Observer,
+                       public Sprite::Observer,
+                       private util::noncopyable {
 public:
     class Observer {
     public:
@@ -51,6 +55,9 @@ public:
     inline util::ptr<Sprite> getSprite() const {
         return sprite_;
     }
+
+    // GlyphStore::Observer implementation.
+    void onGlyphRangeLoaded() override;
 
     // Source::Observer implementation.
     void onSourceLoaded() override;

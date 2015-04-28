@@ -73,6 +73,10 @@ void ResourceLoader::update(MapData& data,
     }
 }
 
+void ResourceLoader::onGlyphRangeLoaded() {
+    emitTileDataChanged();
+}
+
 void ResourceLoader::onSourceLoaded() {
     emitTileDataChanged();
 }
