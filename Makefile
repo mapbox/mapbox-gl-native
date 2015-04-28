@@ -31,8 +31,12 @@ config/%.gypi: configure
 styles/styles:
 	git submodule update --init styles
 
+ifeq ($(shell uname -s), Darwin)
 SMCalloutView:
 	git submodule update --init platform/ios/vendor/SMCalloutView
+else
+SMCalloutView:
+endif
 
 KIF:
 	git submodule update --init test/ios/KIF
@@ -71,8 +75,9 @@ test-%: test
 	./scripts/run_tests.sh "build/$(HOST)/$(BUILDTYPE)/test" --gtest_filter=$*
 
 .PHONY: xtest
+xtest: XCPRETTY := $(shell ./scripts/xcpretty.sh)
 xtest: Xcode/project
-	xcodebuild -project ./build/osx/gyp/project.xcodeproj -configuration $(BUILDTYPE) -target test -jobs $(JOBS)
+	xcodebuild -project ./build/osx/gyp/project.xcodeproj -configuration $(BUILDTYPE) -target test -jobs $(JOBS) $(XCPRETTY)
 
 xtest-%: xtest
 	./scripts/run_tests.sh "build/osx/Build/Products/$(BUILDTYPE)/test" --gtest_filter=$*
@@ -91,8 +96,9 @@ run-osx: osx
 xosx-proj: Xcode/project
 	open ./build/osx/gyp/project.xcodeproj
 
+xosx: XCPRETTY := $(shell ./scripts/xcpretty.sh)
 xosx: Xcode/project
-	xcodebuild -project ./build/osx/gyp/project.xcodeproj -configuration $(BUILDTYPE) -target osxapp -jobs $(JOBS)
+	xcodebuild -project ./build/osx/gyp/project.xcodeproj -configuration $(BUILDTYPE) -target osxapp -jobs $(JOBS) $(XCPRETTY)
 
 run-xosx: xosx
 	"gyp/build/$(BUILDTYPE)/Mapbox GL.app/Contents/MacOS/Mapbox GL"
@@ -112,17 +118,19 @@ Xcode/ios: ios/app/mapboxgl-app.gyp config/ios.gypi styles/styles SMCalloutView
 ios-proj: Xcode/ios
 	open ./build/ios/ios/app/mapboxgl-app.xcodeproj
 
+ios: XCPRETTY := $(shell ./scripts/xcpretty.sh)
 ios: Xcode/ios
-	xcodebuild -sdk iphoneos ARCHS="arm64 armv7 armv7s" PROVISIONING_PROFILE="2b532944-bf3d-4bf4-aa6c-a81676984ae8" -project ./build/ios/ios/app/mapboxgl-app.xcodeproj -configuration Release -target iosapp -jobs $(JOBS)
+	xcodebuild -sdk iphoneos ARCHS="arm64 armv7 armv7s" PROVISIONING_PROFILE="2b532944-bf3d-4bf4-aa6c-a81676984ae8" -project ./build/ios/ios/app/mapboxgl-app.xcodeproj -configuration Release -target iosapp -jobs $(JOBS) $(XCPRETTY)
 
+isim: XCPRETTY := $(shell ./scripts/xcpretty.sh)
 isim: Xcode/ios
-	xcodebuild -sdk iphonesimulator ARCHS="x86_64 i386" -project ./build/ios/ios/app/mapboxgl-app.xcodeproj -configuration Debug -target iosapp -jobs $(JOBS)
+	xcodebuild -sdk iphonesimulator ARCHS="x86_64 i386" -project ./build/ios/ios/app/mapboxgl-app.xcodeproj -configuration Debug -target iosapp -jobs $(JOBS) $(XCPRETTY)
 
 ipackage: clean Xcode/ios
-	./scripts/package_ios.sh
+	./scripts/ios/package.sh
 
 itest: ipackage KIF
-	./scripts/test_ios.sh
+	./scripts/ios/test.sh
 
 # Legacy name
 iproj: ios-proj
@@ -138,8 +146,9 @@ run-linux: linux
 	(cd build/$(HOST)/$(BUILDTYPE) && ./mapbox-gl)
 
 .PHONY: xlinux run-xlinux
+xlinux: XCPRETTY := $(shell ./scripts/xcpretty.sh)
 xlinux: Xcode/project
-	xcodebuild -project ./build/osx/gyp/project.xcodeproj -configuration $(BUILDTYPE) -target linuxapp -jobs $(JOBS)
+	xcodebuild -project ./build/osx/gyp/project.xcodeproj -configuration $(BUILDTYPE) -target linuxapp -jobs $(JOBS) $(XCPRETTY)
 
 run-xlinux: xlinux
 	"gyp/build/$(BUILDTYPE)/mapbox-gl"

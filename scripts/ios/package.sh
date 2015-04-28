@@ -4,6 +4,8 @@ set -e
 set -o pipefail
 set -u
 
+source ./scripts/travis_helper.sh
+
 NAME=MapboxGL
 OUTPUT=build/ios/pkg
 IOS_SDK_VERSION=`xcrun --sdk iphoneos --show-sdk-version`
@@ -40,7 +42,7 @@ xcodebuild -sdk iphoneos${IOS_SDK_VERSION} \
     -project ./build/ios/mbgl.xcodeproj \
     -configuration ${BUILDTYPE} \
     -target everything \
-    -jobs `sysctl -n hw.ncpu` | xcpretty -c
+    -jobs ${JOBS} | xcpretty -c
 
 
 step "Building iOS Simulator targets..."
@@ -50,7 +52,7 @@ xcodebuild -sdk iphonesimulator${IOS_SDK_VERSION} \
     -project ./build/ios/mbgl.xcodeproj \
     -configuration ${BUILDTYPE} \
     -target everything \
-    -jobs `sysctl -n hw.ncpu` | xcpretty -c
+    -jobs ${JOBS} | xcpretty -c
 
 
 step "Building static library..."

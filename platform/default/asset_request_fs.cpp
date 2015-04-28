@@ -7,9 +7,9 @@
 #include <uv.h>
 
 #pragma GCC diagnostic push
+#pragma GCC diagnostic ignored "-Wshadow"
 #ifndef __clang__
 #pragma GCC diagnostic ignored "-Wunused-local-typedefs"
-#pragma GCC diagnostic ignored "-Wshadow"
 #endif
 #include <boost/algorithm/string.hpp>
 #pragma GCC diagnostic pop
