@@ -113,11 +113,13 @@ std::string SourceInfo::tileURL(const TileID& id, float pixelRatio) const {
     return result;
 }
 
-Source::Source()
-{
-}
+Source::Source() {}
 
-Source::~Source() {}
+Source::~Source() {
+    if (req) {
+        Environment::Get().cancelRequest(req);
+    }
+}
 
 bool Source::isLoaded() const {
     if (!loaded) {
@@ -136,7 +138,7 @@ bool Source::isLoaded() const {
 // Note: This is a separate function that must be called exactly once after creation
 // The reason this isn't part of the constructor is that calling shared_from_this() in
 // the constructor fails.
-void Source::load(const std::string& accessToken, Environment& env) {
+void Source::load(const std::string& accessToken) {
     if (info.url.empty()) {
         loaded = true;
         return;
@@ -145,7 +147,9 @@ void Source::load(const std::string& accessToken, Environment& env) {
     util::ptr<Source> source = shared_from_this();
 
     const std::string url = util::mapbox::normalizeSourceURL(info.url, accessToken);
-    env.request({ Resource::Kind::JSON, url }, [source](const Response &res) {
+    req = Environment::Get().request({ Resource::Kind::JSON, url }, [source](const Response &res) {
+        source->clearRequest();
+
         if (res.status != Response::Successful) {
             Log::Warning(Event::General, "Failed to load source TileJSON: %s", res.message.c_str());
             return;
@@ -503,6 +507,10 @@ void Source::setCacheSize(size_t size) {
 
 void Source::onLowMemory() {
     cache.clear();
+}
+
+void Source::clearRequest() {
+    req = nullptr;
 }
 
 void Source::setObserver(Observer* observer) {

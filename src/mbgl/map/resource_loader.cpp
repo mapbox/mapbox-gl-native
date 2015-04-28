@@ -37,10 +37,9 @@ void ResourceLoader::setStyle(Style* style) {
 
     style_ = style;
 
-    Environment& env = Environment::Get();
     for (const auto& source : style->sources) {
         source->setObserver(this);
-        source->load(accessToken_, env);
+        source->load(accessToken_);
     }
 }
 

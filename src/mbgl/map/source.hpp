@@ -29,6 +29,7 @@ class Sprite;
 class TexturePool;
 class Style;
 class Painter;
+class Request;
 class TransformState;
 class Tile;
 struct ClipID;
@@ -63,7 +64,7 @@ public:
     Source();
     ~Source();
 
-    void load(const std::string& accessToken, Environment&);
+    void load(const std::string& accessToken);
     bool isLoaded() const;
 
     void load(MapData&, Environment&, std::function<void()> callback);
@@ -87,6 +88,7 @@ public:
 
     void setCacheSize(size_t);
     void onLowMemory();
+    void clearRequest();
 
     void setObserver(Observer* observer);
 
@@ -128,7 +130,7 @@ private:
     std::map<TileID, std::weak_ptr<TileData>> tile_data;
     TileCache cache;
 
-
+    Request* req = nullptr;
     Observer* observer_ = nullptr;
 };
 

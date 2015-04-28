@@ -142,9 +142,9 @@ void FontStack::lineWrap(Shaping &shaping, const float lineHeight, const float m
 GlyphPBF::GlyphPBF(const std::string& glyphURL,
                    const std::string& fontStack,
                    GlyphRange glyphRange,
-                   Environment& env,
+                   Environment& env_,
                    const GlyphLoadedCallback& callback)
-    : parsed(false) {
+    : parsed(false), env(env_) {
     // Load the glyph set URL
     std::string url = util::replaceTokens(glyphURL, [&](const std::string &name) -> std::string {
         if (name == "fontstack") return util::percentEncode(fontStack);
@@ -153,7 +153,9 @@ GlyphPBF::GlyphPBF(const std::string& glyphURL,
     });
 
     // The prepare call jumps back to the main thread.
-    env.requestAsync({ Resource::Kind::Glyphs, url }, [&, url, callback](const Response &res) {
+    req = env.request({ Resource::Kind::Glyphs, url }, [&, url, callback](const Response &res) {
+        req = nullptr;
+
         if (res.status != Response::Successful) {
             // Something went wrong with loading the glyph pbf.
             const std::string msg = std::string { "[ERROR] failed to load glyphs: " } + url + " message: " + res.message;
@@ -168,6 +170,12 @@ GlyphPBF::GlyphPBF(const std::string& glyphURL,
             callback(this);
         }
     });
+}
+
+GlyphPBF::~GlyphPBF() {
+    if (req) {
+        env.cancelRequest(req);
+    }
 }
 
 void GlyphPBF::parse(FontStack &stack) {

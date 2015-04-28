@@ -17,6 +17,7 @@ namespace mbgl {
 
 class FileSource;
 class Environment;
+class Request;
 
 class SDFGlyph {
 public:
@@ -56,6 +57,7 @@ public:
              GlyphRange glyphRange,
              Environment &env,
              const GlyphLoadedCallback& callback);
+    ~GlyphPBF();
 
     void parse(FontStack &stack);
     bool isParsed() const;
@@ -68,6 +70,10 @@ private:
 
     std::string data;
     std::atomic_bool parsed;
+
+    Environment& env;
+    Request* req = nullptr;
+
     mutable std::mutex mtx;
 };
 
