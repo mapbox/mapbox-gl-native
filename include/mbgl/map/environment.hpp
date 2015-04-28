@@ -54,11 +54,6 @@ public:
     // Only call this while the OpenGL context is exclusive to this thread.
     void performCleanup();
 
-    // #############################################################################################
-
-    // Request to terminate the environment.
-    void terminate();
-
 private:
     unsigned id;
     FileSource& fileSource;

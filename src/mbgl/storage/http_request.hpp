@@ -1,23 +1,25 @@
 #ifndef MBGL_STORAGE_DEFAULT_HTTP_REQUEST
 #define MBGL_STORAGE_DEFAULT_HTTP_REQUEST
 
-#include "shared_request_base.hpp"
+#include "request_base.hpp"
+
+typedef struct uv_loop_s uv_loop_t;
 
 namespace mbgl {
 
-class HTTPRequest : public SharedRequestBase {
+class HTTPRequestImpl;
+
+class HTTPRequest : public RequestBase {
 public:
-    HTTPRequest(DefaultFileSource::Impl *source, const Resource &resource);
+    HTTPRequest(const Resource&, Callback, uv_loop_t*, std::shared_ptr<const Response> = nullptr);
 
-    void start(uv_loop_t *loop, std::shared_ptr<const Response> response = nullptr);
-    void cancel();
-
+    void cancel() override;
     void retryImmediately();
 
 private:
     ~HTTPRequest();
-    void *ptr = nullptr;
 
+    HTTPRequestImpl* impl;
     friend class HTTPRequestImpl;
 };
 

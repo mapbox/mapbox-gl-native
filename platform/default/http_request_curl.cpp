@@ -1,5 +1,6 @@
 #include <mbgl/storage/http_request.hpp>
 #include <mbgl/storage/http_context.hpp>
+#include <mbgl/storage/resource.hpp>
 #include <mbgl/storage/response.hpp>
 #include <mbgl/util/chrono.hpp>
 #include <mbgl/platform/log.hpp>
@@ -494,7 +495,7 @@ HTTPRequestImpl::~HTTPRequestImpl() {
 
     if (request) {
         context->removeRequest(request);
-        request->ptr = nullptr;
+        request->impl = nullptr;
     }
 
     handleError(curl_multi_remove_handle(context->multi, handle));
@@ -722,41 +723,27 @@ void HTTPRequestImpl::handleResult(CURLcode code) {
 
 // -------------------------------------------------------------------------------------------------
 
-HTTPRequest::HTTPRequest(DefaultFileSource::Impl *source_, const Resource &resource_)
-    : SharedRequestBase(source_, resource_) {
+HTTPRequest::HTTPRequest(const Resource& resource_, Callback callback_,
+                         uv_loop_t* loop, std::shared_ptr<const Response> response)
+    : RequestBase(resource_, callback_)
+    , impl(new HTTPRequestImpl(this, loop, response)) {
 }
 
 HTTPRequest::~HTTPRequest() {
-    MBGL_VERIFY_THREAD(tid);
-
-    if (ptr) {
-        reinterpret_cast<HTTPRequestImpl *>(ptr)->abandon();
+    if (impl) {
+        impl->abandon();
     }
 }
 
-void HTTPRequest::start(uv_loop_t *loop, std::shared_ptr<const Response> response) {
-    MBGL_VERIFY_THREAD(tid);
-
-    assert(!ptr);
-    ptr = new HTTPRequestImpl(this, loop, response);
-}
-
 void HTTPRequest::retryImmediately() {
-    MBGL_VERIFY_THREAD(tid);
-
-    if (ptr) {
-        reinterpret_cast<HTTPRequestImpl *>(ptr)->retryImmediately();
+    if (impl) {
+        impl->retryImmediately();
     }
 }
 
 void HTTPRequest::cancel() {
-    MBGL_VERIFY_THREAD(tid);
-
-    if (ptr) {
-        delete reinterpret_cast<HTTPRequestImpl *>(ptr);
-        ptr = nullptr;
-    }
-
+    delete impl;
+    impl = nullptr;
     delete this;
 }
 

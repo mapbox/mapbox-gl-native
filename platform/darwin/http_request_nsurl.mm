@@ -1,5 +1,6 @@
 #include <mbgl/storage/http_request.hpp>
 #include <mbgl/storage/http_context.hpp>
+#include <mbgl/storage/resource.hpp>
 #include <mbgl/storage/response.hpp>
 #include <mbgl/util/uv.hpp>
 
@@ -199,7 +200,7 @@ void HTTPRequestImpl::handleResponse() {
         }
 
         context->removeRequest(request);
-        request->ptr = nullptr;
+        request->impl = nullptr;
         delete request;
         request = nullptr;
     }
@@ -242,7 +243,7 @@ HTTPRequestImpl::~HTTPRequestImpl() {
 
     if (request) {
         context->removeRequest(request);
-        request->ptr = nullptr;
+        request->impl = nullptr;
     }
 }
 
@@ -397,36 +398,25 @@ void HTTPRequestImpl::restart(uv_timer_t *timer, int) {
 
 // -------------------------------------------------------------------------------------------------
 
-HTTPRequest::HTTPRequest(DefaultFileSource::Impl *source, const Resource &resource)
-    : SharedRequestBase(source, resource) {
+HTTPRequest::HTTPRequest(const Resource& resource, Callback callback,
+                         uv_loop_t* loop, std::shared_ptr<const Response> response)
+    : RequestBase(resource, callback)
+    , impl(new HTTPRequestImpl(this, loop, response)) {
 }
 
 HTTPRequest::~HTTPRequest() {
-    MBGL_VERIFY_THREAD(tid);
-
-    if (ptr) {
-        reinterpret_cast<HTTPRequestImpl *>(ptr)->cancel();
+    if (impl) {
+        impl->cancel();
     }
 }
 
-void HTTPRequest::start(uv_loop_t *loop, std::shared_ptr<const Response> response) {
-    MBGL_VERIFY_THREAD(tid);
-
-    assert(!ptr);
-    ptr = new HTTPRequestImpl(this, loop, response);
-}
-
 void HTTPRequest::retryImmediately() {
-    MBGL_VERIFY_THREAD(tid);
-
-    if (ptr) {
-        reinterpret_cast<HTTPRequestImpl *>(ptr)->retryImmediately();
+    if (impl) {
+        impl->retryImmediately();
     }
 }
 
 void HTTPRequest::cancel() {
-    MBGL_VERIFY_THREAD(tid);
-
     delete this;
 }
 

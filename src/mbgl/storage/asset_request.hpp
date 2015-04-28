@@ -1,21 +1,24 @@
 #ifndef MBGL_STORAGE_DEFAULT_ASSET_REQUEST
 #define MBGL_STORAGE_DEFAULT_ASSET_REQUEST
 
-#include "shared_request_base.hpp"
+#include "request_base.hpp"
+
+typedef struct uv_loop_s uv_loop_t;
 
 namespace mbgl {
 
-class AssetRequest : public SharedRequestBase {
-public:
-    AssetRequest(DefaultFileSource::Impl *source, const Resource &resource);
+class AssetRequestImpl;
 
-    void start(uv_loop_t *loop, std::shared_ptr<const Response> response = nullptr);
-    void cancel();
+class AssetRequest : public RequestBase {
+public:
+    AssetRequest(const Resource&, Callback, uv_loop_t*, const std::string& assetRoot);
+
+    void cancel() override;
 
 private:
     ~AssetRequest();
-    void *ptr = nullptr;
 
+    AssetRequestImpl* impl;
     friend class AssetRequestImpl;
 };
 

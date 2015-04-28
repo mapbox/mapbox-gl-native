@@ -1,4 +1,5 @@
 #include <mbgl/storage/asset_request.hpp>
+#include <mbgl/storage/resource.hpp>
 #include <mbgl/storage/response.hpp>
 #include <mbgl/util/std.hpp>
 #include <mbgl/util/util.hpp>
@@ -25,7 +26,7 @@ class AssetRequestImpl {
     MBGL_STORE_THREAD(tid)
 
 public:
-    AssetRequestImpl(AssetRequest *request, uv_loop_t *loop);
+    AssetRequestImpl(AssetRequest*, uv_loop_t*, const std::string& assetRoot);
     ~AssetRequestImpl();
 
     static void fileOpened(uv_fs_t *req);
@@ -35,8 +36,8 @@ public:
     static void notifyError(uv_fs_t *req);
     static void cleanup(uv_fs_t *req);
 
-
     AssetRequest *request = nullptr;
+    std::string assetRoot;
     bool canceled = false;
     uv_fs_t req;
     uv_file fd = -1;
@@ -48,11 +49,13 @@ AssetRequestImpl::~AssetRequestImpl() {
     MBGL_VERIFY_THREAD(tid);
 
     if (request) {
-        request->ptr = nullptr;
+        request->impl = nullptr;
     }
 }
 
-AssetRequestImpl::AssetRequestImpl(AssetRequest *request_, uv_loop_t *loop) : request(request_) {
+AssetRequestImpl::AssetRequestImpl(AssetRequest* request_, uv_loop_t* loop, const std::string& assetRoot_)
+    : request(request_)
+    , assetRoot(assetRoot_) {
     req.data = this;
 
     const auto &url = request->resource.url;
@@ -62,7 +65,7 @@ AssetRequestImpl::AssetRequestImpl(AssetRequest *request_, uv_loop_t *loop) : re
         path = url.substr(8);
     } else {
         // This is a relative path. Prefix with the application root.
-        path = request->source->assetRoot + "/" + url.substr(8);
+        path = assetRoot + "/" + url.substr(8);
     }
 
     uv_fs_open(loop, &req, path.c_str(), O_RDONLY, S_IRUSR, fileOpened);
@@ -207,45 +210,26 @@ void AssetRequestImpl::cleanup(uv_fs_t *req) {
 
 // -------------------------------------------------------------------------------------------------
 
-AssetRequest::AssetRequest(DefaultFileSource::Impl *source_, const Resource &resource_)
-    : SharedRequestBase(source_, resource_) {
+AssetRequest::AssetRequest(const Resource& resource_, Callback callback_,
+                           uv_loop_t* loop, const std::string& assetRoot)
+    : RequestBase(resource_, callback_)
+    , impl(new AssetRequestImpl(this, loop, assetRoot)) {
     assert(algo::starts_with(resource.url, "asset://"));
-}
-
-AssetRequest::~AssetRequest() {
-    MBGL_VERIFY_THREAD(tid);
-
-    if (ptr) {
-        reinterpret_cast<AssetRequestImpl *>(ptr)->request = nullptr;
-    }
-}
-
-void AssetRequest::start(uv_loop_t *loop, std::shared_ptr<const Response> response) {
-    MBGL_VERIFY_THREAD(tid);
-
-    // We're ignoring the existing response if any.
-    (void(response));
-
-    assert(!ptr);
-    ptr = new AssetRequestImpl(this, loop);
     // Note: the AssetRequestImpl deletes itself.
 }
 
-void AssetRequest::cancel() {
-    MBGL_VERIFY_THREAD(tid);
-
-    if (ptr) {
-        reinterpret_cast<AssetRequestImpl *>(ptr)->canceled = true;
-
-        // uv_cancel fails frequently when the request has already been started.
-        // In that case, we have to let it complete and check the canceled bool
-        // instead. The cancelation callback will delete the AssetRequest object.
-        uv_cancel((uv_req_t *)&reinterpret_cast<AssetRequestImpl *>(ptr)->req);
-    } else {
-        // This request is canceled before we called start. We're safe to delete
-        // ourselves now.
-        delete this;
+AssetRequest::~AssetRequest() {
+    if (impl) {
+        impl->request = nullptr;
     }
+}
+
+void AssetRequest::cancel() {
+    impl->canceled = true;
+    // uv_cancel fails frequently when the request has already been started.
+    // In that case, we have to let it complete and check the canceled bool
+    // instead. The cancelation callback will delete the AssetRequest object.
+    uv_cancel((uv_req_t *)&impl->req);
 }
 
 }
