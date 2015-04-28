@@ -49,7 +49,7 @@ Target OS X: 10.9+
 If you merely want to install the library for iOS and try it out as an Objective-C consumer:
 
 0. Use [Homebrew](http://brew.sh/) to install Boost headers: `brew install boost`.
-1. Run `./scripts/ios/package.sh`. The packaging script will produce the statically-linked `libMapboxGL.a`, `MapboxGL.bundle` for resources, and a `Headers` folder.
+1. Run `make ipackage`. The packaging script will produce the statically-linked `libMapboxGL.a`, `MapboxGL.bundle` for resources, and a `Headers` folder.
 2. Copy the contents of `build/ios/pkg/static` into your project. It should happen automatically, but ensure that:
    - `Headers` is in your *Header Search Paths* (`HEADER_SEARCH_PATHS`) build setting.
    - `MapboxGL.bundle` is in your target's *Copy Bundle Resources* build phase.

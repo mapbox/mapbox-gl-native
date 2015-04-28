@@ -35,15 +35,16 @@ export BUILDTYPE=${BUILDTYPE:-Release}
 export HOST=ios
 make Xcode/ios
 
-step "Building iOS device targets..."
-xcodebuild -sdk iphoneos${IOS_SDK_VERSION} \
-    ARCHS="arm64 armv7 armv7s" \
-    ONLY_ACTIVE_ARCH=NO \
-    -project ./build/ios/mbgl.xcodeproj \
-    -configuration ${BUILDTYPE} \
-    -target everything \
-    -jobs ${JOBS} | xcpretty -c
-
+if [[ ${#} -eq 0 ]]; then # no args
+    step "Building iOS device targets..."
+    xcodebuild -sdk iphoneos${IOS_SDK_VERSION} \
+        ARCHS="arm64 armv7 armv7s" \
+        ONLY_ACTIVE_ARCH=NO \
+        -project ./build/ios/mbgl.xcodeproj \
+        -configuration ${BUILDTYPE} \
+        -target everything \
+        -jobs ${JOBS} | xcpretty -c
+fi
 
 step "Building iOS Simulator targets..."
 xcodebuild -sdk iphonesimulator${IOS_SDK_VERSION} \
