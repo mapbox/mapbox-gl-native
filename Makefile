@@ -130,7 +130,7 @@ ipackage: clean Xcode/ios
 	./scripts/ios/package.sh
 
 itest: ipackage KIF
-	./scripts/test_ios.sh
+	./scripts/ios/test.sh
 
 # Legacy name
 iproj: ios-proj
