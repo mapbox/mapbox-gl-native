@@ -9,18 +9,18 @@
       'product_extension': 'app',
       'mac_bundle': 1,
       'mac_bundle_resources': [
-        '<!@(find ./img -type f)',
+        '<!@(find ../ios/app/img -type f)',
         './features.geojson',
         './Settings.bundle/'
       ],
 
       'dependencies': [
-        '../../mbgl.gyp:bundle_styles',
-        '../../mbgl.gyp:core',
-        '../../mbgl.gyp:platform-<(platform_lib)',
-        '../../mbgl.gyp:http-<(http_lib)',
-        '../../mbgl.gyp:asset-<(asset_lib)',
-        '../../mbgl.gyp:cache-<(cache_lib)',
+        '../mbgl.gyp:bundle_styles',
+        '../mbgl.gyp:core',
+        '../mbgl.gyp:platform-<(platform_lib)',
+        '../mbgl.gyp:http-<(http_lib)',
+        '../mbgl.gyp:asset-<(asset_lib)',
+        '../mbgl.gyp:cache-<(cache_lib)',
       ],
 
       'sources': [
@@ -38,7 +38,7 @@
         'SDKROOT': 'iphoneos',
         'SUPPORTED_PLATFORMS': 'iphonesimulator iphoneos',
         'IPHONEOS_DEPLOYMENT_TARGET': '7.0',
-        'INFOPLIST_FILE': 'app-info.plist',
+        'INFOPLIST_FILE': '../ios/app/app-info.plist',
         'TARGETED_DEVICE_FAMILY': '1,2',
         'COMBINE_HIDPI_IMAGES': 'NO', # don't merge @2x.png images into .tiff files
         'CLANG_ENABLE_OBJC_ARC': 'YES',
