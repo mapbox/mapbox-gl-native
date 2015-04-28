@@ -7,6 +7,7 @@
 #include <functional>
 
 #include <mbgl/util/run_loop.hpp>
+#include <mbgl/platform/platform.hpp>
 
 namespace {
 
@@ -34,11 +35,16 @@ namespace util {
 // Thread<> constructor blocks until the thread and the Object are fully created, so after the
 // object creation, it's safe to obtain the Object stored in this thread.
 
+enum class ThreadPriority : bool {
+    Regular,
+    Low,
+};
+
 template <class Object>
 class Thread {
 public:
     template <class... Args>
-    Thread(const std::string& name, Args&&... args);
+    Thread(const std::string& name, ThreadPriority priority, Args&&... args);
     ~Thread();
 
     // Invoke object->fn(args...) in the runloop thread.
@@ -97,7 +103,7 @@ private:
 
 template <class Object>
 template <class... Args>
-Thread<Object>::Thread(const std::string& name, Args&&... args) {
+Thread<Object>::Thread(const std::string& name, ThreadPriority priority, Args&&... args) {
     // Note: We're using std::tuple<> to store the arguments because GCC 4.9 has a bug
     // when expanding parameters packs captured in lambdas.
     std::tuple<Args...> params = std::forward_as_tuple(::std::forward<Args>(args)...);
@@ -108,6 +114,10 @@ Thread<Object>::Thread(const std::string& name, Args&&... args) {
         #else
         (void(name));
         #endif
+
+        if (priority == ThreadPriority::Low) {
+            platform::makeThreadLowPriority();
+        }
 
         constexpr auto seq = typename integer_sequence<sizeof...(Args)>::type();
         run(std::move(params), seq);

@@ -21,6 +21,9 @@ const std::string &applicationRoot();
 // Returns the path to the asset location.
 const std::string &assetRoot();
 
+// Makes the current thread low priority.
+void makeThreadLowPriority();
+
 // Shows an alpha image with the specified dimensions in a named window.
 void showDebugImage(std::string name, const char *data, size_t width, size_t height);
 

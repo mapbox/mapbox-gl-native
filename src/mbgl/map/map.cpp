@@ -11,7 +11,7 @@ namespace mbgl {
 
 Map::Map(View& view, FileSource& fileSource, MapMode mode, bool startPaused)
     : data(util::make_unique<MapData>(view, mode)),
-      context(util::make_unique<util::Thread<MapContext>>("Map", view, fileSource, *data, startPaused))
+      context(util::make_unique<util::Thread<MapContext>>("Map", util::ThreadPriority::Regular, view, fileSource, *data, startPaused))
 {
     view.initialize(this);
 }
