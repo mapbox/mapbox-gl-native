@@ -69,6 +69,8 @@ public:
                      GlyphAtlas&,
                      GlyphStore&);
 
+    inline bool needsGlyphs() const { return needsGlyphs_; }
+
     void drawGlyphs(SDFShader& shader);
     void drawIcons(SDFShader& shader);
     void drawIcons(IconShader& shader);
@@ -103,6 +105,7 @@ private:
         std::vector<std::unique_ptr<IconElementGroup>> groups;
     } icon;
 
+    bool needsGlyphs_;
 };
 }
 

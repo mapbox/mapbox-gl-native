@@ -29,7 +29,7 @@
 namespace mbgl {
 
 SymbolBucket::SymbolBucket(Collision &collision_)
-    : collision(collision_) {
+    : collision(collision_), needsGlyphs_(false) {
 }
 
 SymbolBucket::~SymbolBucket() {
@@ -134,7 +134,10 @@ std::vector<SymbolFeature> SymbolBucket::processFeatures(const GeometryTileLayer
         util::mergeLines(features);
     }
 
-    glyphStore.waitForGlyphRanges(layout.text.font, ranges);
+    if (glyphStore.requestGlyphRangesIfNeeded(layout.text.font, ranges)) {
+        needsGlyphs_ = true;
+        return {};
+    }
 
     return features;
 }
@@ -147,6 +150,12 @@ void SymbolBucket::addFeatures(const GeometryTileLayer& layer,
                                GlyphAtlas& glyphAtlas,
                                GlyphStore& glyphStore) {
     const std::vector<SymbolFeature> features = processFeatures(layer, filter, glyphStore);
+
+    // Stop if we still need glyphs because the
+    // bucket will be discarded.
+    if (needsGlyphs()) {
+        return;
+    }
 
     float horizontalAlign = 0.5;
     float verticalAlign = 0.5;
@@ -189,7 +198,7 @@ void SymbolBucket::addFeatures(const GeometryTileLayer& layer,
     if (layout.text.justify == TextJustifyType::Right) justify = 1;
     else if (layout.text.justify == TextJustifyType::Left) justify = 0;
 
-    const auto &fontStack = glyphStore.getFontStack(layout.text.font);
+    auto* fontStack = glyphStore.getFontStack(layout.text.font);
 
     for (const auto& feature : features) {
         if (!feature.geometry.size()) continue;
@@ -213,7 +222,7 @@ void SymbolBucket::addFeatures(const GeometryTileLayer& layer,
 
             // Add the glyphs we need for this label to the glyph atlas.
             if (shaping.size()) {
-                glyphAtlas.addGlyphs(tileUID, feature.label, layout.text.font, fontStack, face);
+                glyphAtlas.addGlyphs(tileUID, feature.label, layout.text.font, *fontStack, face);
             }
         }
 

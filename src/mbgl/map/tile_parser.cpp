@@ -119,11 +119,13 @@ std::unique_ptr<Bucket> TileParser::createBucket(const StyleBucket &bucketDesc) 
         } else if (bucketDesc.type == StyleLayerType::Line) {
             return createLineBucket(*layer, bucketDesc);
         } else if (bucketDesc.type == StyleLayerType::Symbol) {
-            if (sprite->isLoaded()) {
-                return createSymbolBucket(*layer, bucketDesc);
-            } else {
+            bool needsResources = false;
+            auto symbolBucket = createSymbolBucket(*layer, bucketDesc, needsResources);
+            if (needsResources) {
                 partialParse = true;
                 return nullptr;
+            } else {
+                return std::move(symbolBucket);
             }
         } else if (bucketDesc.type == StyleLayerType::Raster) {
             return nullptr;
@@ -185,7 +187,13 @@ std::unique_ptr<Bucket> TileParser::createLineBucket(const GeometryTileLayer& la
 }
 
 std::unique_ptr<Bucket> TileParser::createSymbolBucket(const GeometryTileLayer& layer,
-                                                       const StyleBucket& bucket_desc) {
+                                                       const StyleBucket& bucket_desc,
+                                                       bool& needsResources) {
+    if (!sprite->isLoaded()) {
+        needsResources = true;
+        return nullptr;
+    }
+
     auto bucket = util::make_unique<SymbolBucket>(*collision);
 
     const float z = tile.id.z;
@@ -231,6 +239,13 @@ std::unique_ptr<Bucket> TileParser::createSymbolBucket(const GeometryTileLayer& 
 
     bucket->addFeatures(
         layer, bucket_desc.filter, reinterpret_cast<uintptr_t>(&tile), spriteAtlas, *sprite, glyphAtlas, glyphStore);
+
+    if (bucket->needsGlyphs()) {
+        needsResources = true;
+        return nullptr;
+    }
+
     return bucket->hasData() ? std::move(bucket) : nullptr;
 }
+
 }
