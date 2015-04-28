@@ -471,7 +471,7 @@ NSString *const MGLEventGestureRotateStart = @"Rotation";
 //
 - (NSString *) getUserAgent {
     if (self.appName != nil && self.appVersion != nil && self.appBuildNumber != nil && ([self.userAgent rangeOfString:self.appName].location == NSNotFound)) {
-        self.userAgent = [NSString stringWithFormat:@"%@/%@-%@ %@", self.appName, self.appVersion, self.appBuildNumber, self.userAgent];
+        self.userAgent = [NSString stringWithFormat:@"%@/%@/%@ %@", self.appName, self.appVersion, self.appBuildNumber, self.userAgent];
     }
     return self.userAgent;
 }
