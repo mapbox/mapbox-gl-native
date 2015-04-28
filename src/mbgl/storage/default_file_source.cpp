@@ -1,7 +1,7 @@
 #include <mbgl/storage/default_file_source_impl.hpp>
 #include <mbgl/storage/request.hpp>
-#include <mbgl/storage/asset_request.hpp>
-#include <mbgl/storage/http_request.hpp>
+#include <mbgl/storage/asset_context.hpp>
+#include <mbgl/storage/http_context.hpp>
 
 #include <mbgl/storage/response.hpp>
 #include <mbgl/platform/platform.hpp>
@@ -64,7 +64,9 @@ void DefaultFileSource::cancel(Request *req) {
 DefaultFileSource::Impl::Impl(uv_loop_t* loop_, FileCache* cache_, const std::string& root)
     : loop(loop_),
       cache(cache_),
-      assetRoot(root.empty() ? platform::assetRoot() : root) {
+      assetRoot(root.empty() ? platform::assetRoot() : root),
+      assetContext(AssetContext::createContext(loop_)),
+      httpContext(HTTPContext::createContext(loop_)) {
 }
 
 DefaultFileRequest* DefaultFileSource::Impl::find(const Resource& resource) {
@@ -130,9 +132,9 @@ void DefaultFileSource::Impl::startRealRequest(const Resource& resource, std::sh
     };
 
     if (algo::starts_with(resource.url, "asset://")) {
-        request->request = new AssetRequest(resource, callback, loop, assetRoot);
+        request->request = assetContext->createRequest(resource, callback, loop, assetRoot);
     } else {
-        request->request = new HTTPRequest(resource, callback, loop, response);
+        request->request = httpContext->createRequest(resource, callback, loop, response);
     }
 }
 
