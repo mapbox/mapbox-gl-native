@@ -129,7 +129,10 @@ isim: Xcode/ios
 ipackage: clean Xcode/ios
 	./scripts/ios/package.sh
 
-itest: ipackage KIF
+ipackage-sim: clean Xcode/ios
+	./scripts/ios/package.sh sim
+
+itest: ipackage-sim KIF
 	./scripts/ios/test.sh
 
 # Legacy name
