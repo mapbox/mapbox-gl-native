@@ -58,7 +58,6 @@ MapContext::MapContext(uv_loop_t* loop, View& view_, FileSource& fileSource, Map
 }
 
 MapContext::~MapContext() {
-    view.deactivate();
     view.notify();
 
     // Explicit resets currently necessary because these abandon resources that need to be
@@ -73,6 +72,8 @@ MapContext::~MapContext() {
     glyphStore.reset();
 
     env.performCleanup();
+
+    view.deactivate();
 }
 
 void MapContext::pause() {
