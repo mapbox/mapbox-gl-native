@@ -84,7 +84,7 @@ void FillBucket::tessellate() {
     hasVertices = false;
 
     std::vector<std::vector<ClipperLib::IntPoint>> polygons;
-    clipper.Execute(ClipperLib::ctUnion, polygons, ClipperLib::pftPositive);
+    clipper.Execute(ClipperLib::ctUnion, polygons, ClipperLib::pftEvenOdd, ClipperLib::pftEvenOdd);
     clipper.Clear();
 
     if (polygons.size() == 0) {
@@ -132,7 +132,7 @@ void FillBucket::tessellate() {
 
     lineGroup.elements_length += total_vertex_count;
 
-    if (tessTesselate(tesselator, TESS_WINDING_POSITIVE, TESS_POLYGONS, vertices_per_group, vertexSize, 0)) {
+    if (tessTesselate(tesselator, TESS_WINDING_ODD, TESS_POLYGONS, vertices_per_group, vertexSize, 0)) {
         const TESSreal *vertices = tessGetVertices(tesselator);
         const size_t vertex_count = tessGetVertexCount(tesselator);
         TESSindex *vertex_indices = const_cast<TESSindex *>(tessGetVertexIndices(tesselator));
