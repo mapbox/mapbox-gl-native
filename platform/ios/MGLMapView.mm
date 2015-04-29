@@ -706,6 +706,15 @@ mbgl::DefaultFileSource *mbglFileSource = nullptr;
 
 #pragma clang diagnostic pop
 
+- (void)touchesBegan:(NSSet *)touches withEvent:(UIEvent *)event
+{
+    (void)touches;
+    (void)event;
+    mbglMap->cancelTransitions();
+    mbglMap->setGestureInProgress(false);
+    self.animatingGesture = NO;
+}
+
 - (void)handlePanGesture:(UIPanGestureRecognizer *)pan
 {
     if ( ! self.isScrollEnabled) return;
