@@ -11,7 +11,7 @@ endif
 
 ifeq ($(shell uname -s), Linux)
 HOST = linux
-JOBS ?= $(shell sysctl -n hw.ncpu)
+JOBS ?= $(shell grep --count processor /proc/cpuinfo)
 endif
 
 JOBS ?= 1
