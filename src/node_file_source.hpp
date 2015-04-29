@@ -26,11 +26,10 @@ public:
     NodeFileSource();
     ~NodeFileSource();
 
-    mbgl::Request *request(const mbgl::Resource &resource, uv_loop_t *loop, const mbgl::Environment &env, Callback callback);
-    void request(const mbgl::Resource &resource, const mbgl::Environment &env, Callback callback);
+    mbgl::Request* request(const mbgl::Resource&, uv_loop_t*, Callback);
     void cancel(mbgl::Request *request);
-    void abort(const mbgl::Environment &env);
 
+    void request(const mbgl::Resource&, Callback);
 
     // visiblity?
     void notify(mbgl::Request *request, const std::shared_ptr<const mbgl::Response> &response);

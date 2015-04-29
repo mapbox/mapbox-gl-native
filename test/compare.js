@@ -12,7 +12,7 @@ module.exports = function compare(actual, expected, diff, t, callback) {
         t.error(err);
     });
 
-    compare.on('exit', function (code) {
+    compare.on('exit', function(code) {
         // The compare program returns 2 on error otherwise 0 if the images are similar or 1 if they are dissimilar.
         if (code === 2) {
             callback(error.trim(), Infinity);

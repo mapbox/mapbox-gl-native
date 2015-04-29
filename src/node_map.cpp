@@ -280,7 +280,7 @@ NodeMap::NodeMap(v8::Handle<v8::Object> source_) :
     map(view, fs),
     async(new uv_async_t) {
 
-    map.start(mbgl::Map::Mode::Static);
+    map.start(mbgl::Map::Mode::Still);
 
     NanAssignPersistent(source, source_);
 

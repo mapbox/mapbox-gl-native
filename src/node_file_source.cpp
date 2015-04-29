@@ -63,8 +63,8 @@ NodeFileSource::~NodeFileSource() {
     queue = nullptr;
 }
 
-mbgl::Request *NodeFileSource::request(const mbgl::Resource &resource, uv_loop_t *loop, const mbgl::Environment &env, Callback callback) {
-    auto request = new mbgl::Request(resource, loop, env, std::move(callback));
+mbgl::Request* NodeFileSource::request(const mbgl::Resource& resource, uv_loop_t* loop, Callback callback) {
+    auto request = new mbgl::Request(resource, loop, std::move(callback));
 
     // This function can be called from any thread. Make sure we're executing the actual call in the
     // file source loop by sending it over the queue. It will be processed in processAction().
@@ -72,16 +72,7 @@ mbgl::Request *NodeFileSource::request(const mbgl::Resource &resource, uv_loop_t
     return request;
 }
 
-void NodeFileSource::request(const mbgl::Resource &resource, const mbgl::Environment &env, Callback callback) {
-    auto request = new mbgl::Request(resource, nullptr, env, std::move(callback));
-
-    // This function can be called from any thread. Make sure we're executing the actual call in the
-    // file source loop by sending it over the queue. It will be processed in processAction().
-    queue->send(Action{ Action::Add, request });
-}
-
-
-void NodeFileSource::cancel(mbgl::Request *request) {
+void NodeFileSource::cancel(mbgl::Request* request) {
     request->cancel();
 
     // This function can be called from any thread. Make sure we're executing the actual call in the
@@ -89,8 +80,12 @@ void NodeFileSource::cancel(mbgl::Request *request) {
     queue->send(Action{ Action::Cancel, request });
 }
 
-void NodeFileSource::abort(const mbgl::Environment &env) {
-    // no-op
+void NodeFileSource::request(const mbgl::Resource& resource, Callback callback) {
+    auto request = new mbgl::Request(resource, nullptr, std::move(callback));
+
+    // This function can be called from any thread. Make sure we're executing the actual call in the
+    // file source loop by sending it over the queue. It will be processed in processAction().
+    queue->send(Action{ Action::Add, request });
 }
 
 void NodeFileSource::processAdd(mbgl::Request *request) {
