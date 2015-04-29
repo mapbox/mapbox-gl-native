@@ -7,6 +7,7 @@
 #include <mbgl/util/uv_detail.hpp>
 #include <mbgl/platform/log.hpp>
 #include <csscolorparser/csscolorparser.hpp>
+#include <mbgl/style/color_operations.hpp>
 
 #include <algorithm>
 
@@ -29,6 +30,37 @@ void StyleParser::parse(JSVal document) {
     if (document.HasMember("layers")) {
         root = createLayers(document["layers"]);
         parseLayers();
+
+        // create point annotations layer
+        //
+        std::string id = util::ANNOTATIONS_POINTS_LAYER_ID;
+
+        std::map<ClassID, ClassProperties> paints;
+        util::ptr<StyleLayer> annotations = std::make_shared<StyleLayer>(id, std::move(paints));
+        annotations->type = StyleLayerType::Symbol;
+        layers.emplace(id, std::pair<JSVal, util::ptr<StyleLayer>> { JSVal(id), annotations });
+        root->layers.emplace_back(annotations);
+
+        util::ptr<StyleBucket> pointBucket = std::make_shared<StyleBucket>(annotations->type);
+        pointBucket->name = annotations->id;
+        pointBucket->source_layer = annotations->id;
+
+        rapidjson::Document d;
+        rapidjson::Value iconImage(rapidjson::kObjectType);
+        iconImage.AddMember("icon-image", "{sprite}", d.GetAllocator());
+        parseLayout(iconImage, pointBucket);
+        rapidjson::Value iconOverlap(rapidjson::kObjectType);
+        iconOverlap.AddMember("icon-allow-overlap", true, d.GetAllocator());
+        parseLayout(iconOverlap, pointBucket);
+
+        SourceInfo& info = sources.emplace(id, std::make_shared<StyleSource>()).first->second->info;
+        info.type = SourceType::Annotations;
+
+        auto source_it = sources.find(id);
+        pointBucket->style_source = source_it->second;
+        annotations->bucket = pointBucket;
+        //
+        // end point annotations
     }
 
     if (document.HasMember("sprite")) {
@@ -75,7 +107,7 @@ template<> bool StyleParser::parseRenderProperty(JSVal value, bool &target, cons
             target = property.GetBool();
             return true;
         } else {
-            fprintf(stderr, "[WARNING] '%s' must be a boolean\n", name);
+            Log::Warning(Event::ParseStyle, "'%s' must be a boolean", name);
         }
     }
     return false;
@@ -194,13 +226,17 @@ void StyleParser::parseSources(JSVal value) {
 
 #pragma mark - Parse Style Properties
 
-Color parseColor(JSVal value) {
-    if (!value.IsString()) {
-        Log::Warning(Event::ParseStyle, "color value must be a string");
+Color parseColor(JSVal value, std::unordered_map<std::string, const rapidjson::Value *> constants) {
+    if (!value.IsString() && !value.IsArray()) {
+        Log::Warning(Event::ParseStyle, "color value must be a string or an array");
         return Color{{ 0, 0, 0, 0 }};
     }
-
-    CSSColorParser::Color css_color = CSSColorParser::parse({ value.GetString(), value.GetStringLength() });
+    CSSColorParser::Color css_color;
+    if (value.IsArray()) {
+        css_color = parseColorOp(value, constants);
+    } else {
+        css_color = CSSColorParser::parse({ value.GetString(), value.GetStringLength()});
+    }
 
     // Premultiply the color.
     const float factor = css_color.a / 255;
@@ -208,7 +244,7 @@ Color parseColor(JSVal value) {
     return Color{{(float)css_color.r * factor,
                   (float)css_color.g * factor,
                   (float)css_color.b * factor,
-                  css_color.a}};
+                   css_color.a}};
 }
 
 std::tuple<bool,std::vector<float>> StyleParser::parseFloatArray(JSVal value) {
@@ -258,7 +294,7 @@ std::tuple<bool, float> StyleParser::parseProperty(JSVal value, const char* prop
 template <>
 std::tuple<bool, Color> StyleParser::parseProperty(JSVal value, const char*) {
     JSVal rvalue = replaceConstant(value);
-    return std::tuple<bool, Color> { true, parseColor(rvalue) };
+    return std::tuple<bool, Color> { true, parseColor(rvalue, constants) };
 }
 
 template <>

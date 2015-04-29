@@ -13,6 +13,12 @@
       'include_dirs': [
         '../include',
       ],
+
+      'cflags_cc': [ '<@(opengl_cflags)' ],
+
+      'link_settings': {
+        'libraries': [ '<@(opengl_ldflags)' ],
+      },
     },
   ],
 }

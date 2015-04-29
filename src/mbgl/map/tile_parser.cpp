@@ -1,5 +1,6 @@
 #include <mbgl/map/tile_parser.hpp>
 #include <mbgl/map/vector_tile_data.hpp>
+#include <mbgl/platform/log.hpp>
 #include <mbgl/style/style.hpp>
 #include <mbgl/style/style_layer.hpp>
 #include <mbgl/style/style_layer_group.hpp>
@@ -16,7 +17,6 @@
 #include <mbgl/text/collision.hpp>
 #include <mbgl/text/glyph.hpp>
 #include <mbgl/map/map.hpp>
-
 #include <mbgl/util/std.hpp>
 #include <mbgl/util/utf.hpp>
 
@@ -29,14 +29,14 @@ namespace mbgl {
 // its header file.
 TileParser::~TileParser() = default;
 
-TileParser::TileParser(const std::string& rawData_,
+TileParser::TileParser(const GeometryTile& geometryTile_,
                        VectorTileData& tile_,
                        const util::ptr<const Style>& style_,
                        GlyphAtlas& glyphAtlas_,
                        GlyphStore& glyphStore_,
                        SpriteAtlas& spriteAtlas_,
                        const util::ptr<Sprite>& sprite_)
-    : vectorTile(pbf((const uint8_t *)rawData_.data(), rawData_.size())),
+    : geometryTile(geometryTile_),
       tile(tile_),
       style(style_),
       glyphAtlas(glyphAtlas_),
@@ -85,7 +85,7 @@ void TileParser::parseStyleLayers(util::ptr<const StyleLayerGroup> group) {
                 }
             }
         } else {
-            fprintf(stderr, "[WARNING] layer '%s' does not have buckets\n", layer_desc->id.c_str());
+            Log::Warning(Event::ParseTile, "layer '%s' does not have buckets", layer_desc->id.c_str());
         }
     }
 }
@@ -187,7 +187,7 @@ std::unique_ptr<Bucket> TileParser::createBucket(const StyleBucket &bucketDesc) 
     if (tile.id.z >= std::ceil(bucketDesc.max_zoom)) return nullptr;
     if (bucketDesc.visibility == mbgl::VisibilityType::None) return nullptr;
 
-    auto layer = vectorTile.getLayer(bucketDesc.source_layer);
+    auto layer = geometryTile.getLayer(bucketDesc.source_layer);
     if (layer) {
         if (bucketDesc.type == StyleLayerType::Fill) {
             return createFillBucket(*layer, bucketDesc);
@@ -198,12 +198,13 @@ std::unique_ptr<Bucket> TileParser::createBucket(const StyleBucket &bucketDesc) 
         } else if (bucketDesc.type == StyleLayerType::Raster) {
             return nullptr;
         } else {
-            fprintf(stderr, "[WARNING] unknown bucket render type for layer '%s' (source layer '%s')\n", bucketDesc.name.c_str(), bucketDesc.source_layer.c_str());
+            Log::Warning(Event::ParseTile, "unknown bucket render type for layer '%s' (source layer '%s')",
+                    bucketDesc.name.c_str(), bucketDesc.source_layer.c_str());
         }
     } else {
         // The layer specified in the bucket does not exist. Do nothing.
         if (debug::tileParseWarnings) {
-            fprintf(stderr, "[WARNING] layer '%s' does not exist in tile %d/%d/%d\n",
+            Log::Warning(Event::ParseTile, "layer '%s' does not exist in tile %d/%d/%d",
                     bucketDesc.source_layer.c_str(), tile.id.z, tile.id.x, tile.id.y);
         }
     }
@@ -214,7 +215,7 @@ std::unique_ptr<Bucket> TileParser::createBucket(const StyleBucket &bucketDesc) 
 template <class Bucket>
 void TileParser::addBucketGeometries(Bucket& bucket, const GeometryTileLayer& layer, const FilterExpression &filter) {
     for (std::size_t i = 0; i < layer.featureCount(); i++) {
-        auto feature = layer.feature(i);
+        auto feature = layer.getFeature(i);
 
         if (obsolete())
             return;
@@ -254,7 +255,7 @@ std::unique_ptr<Bucket> TileParser::createSymbolBucket(const GeometryTileLayer& 
     auto symbol = parseStyleLayoutSymbol(bucket_desc, tile.id.z);
     auto bucket = util::make_unique<SymbolBucket>(std::move(symbol), *collision);
     bucket->addFeatures(
-        layer, bucket_desc.filter, tile.id, spriteAtlas, *sprite, glyphAtlas, glyphStore);
+        layer, bucket_desc.filter, reinterpret_cast<uintptr_t>(&tile), spriteAtlas, *sprite, glyphAtlas, glyphStore);
     return obsolete() ? nullptr : std::move(bucket);
 }
 }

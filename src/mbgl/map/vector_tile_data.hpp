@@ -30,8 +30,14 @@ class VectorTileData : public TileData {
     friend class TileParser;
 
 public:
-    VectorTileData(Tile::ID const &, float mapMaxZoom, util::ptr<Style>, GlyphAtlas &, GlyphStore &,
-                   SpriteAtlas &, util::ptr<Sprite>, const SourceInfo &, Environment &);
+    VectorTileData(Tile::ID const&,
+                   float mapMaxZoom,
+                   util::ptr<Style>,
+                   GlyphAtlas&,
+                   GlyphStore&,
+                   SpriteAtlas&,
+                   util::ptr<Sprite>,
+                   const SourceInfo&);
     ~VectorTileData();
 
     void parse() override;

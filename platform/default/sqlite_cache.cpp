@@ -5,10 +5,10 @@
 #include <mbgl/util/util.hpp>
 #include <mbgl/util/async_queue.hpp>
 #include <mbgl/util/variant.hpp>
+#include <mbgl/util/compression.hpp>
 #include <mbgl/platform/log.hpp>
 
 #include "sqlite3.hpp"
-#include "compression.hpp"
 
 #include <uv.h>
 

@@ -1,21 +1,24 @@
 #include <mbgl/map/vector_tile_data.hpp>
 #include <mbgl/map/tile_parser.hpp>
 #include <mbgl/util/std.hpp>
-#include <mbgl/map/map.hpp>
 #include <mbgl/style/style_layer.hpp>
 #include <mbgl/style/style_bucket.hpp>
 #include <mbgl/style/style_source.hpp>
 #include <mbgl/geometry/glyph_atlas.hpp>
 #include <mbgl/platform/log.hpp>
+#include <mbgl/util/pbf.hpp>
 
 using namespace mbgl;
 
 VectorTileData::VectorTileData(Tile::ID const& id_,
-                               float mapMaxZoom, util::ptr<Style> style_,
-                               GlyphAtlas& glyphAtlas_, GlyphStore& glyphStore_,
-                               SpriteAtlas& spriteAtlas_, util::ptr<Sprite> sprite_,
-                               const SourceInfo& source_, Environment &env_)
-    : TileData(id_, source_, env_),
+                               float mapMaxZoom,
+                               util::ptr<Style> style_,
+                               GlyphAtlas& glyphAtlas_,
+                               GlyphStore& glyphStore_,
+                               SpriteAtlas& spriteAtlas_,
+                               util::ptr<Sprite> sprite_,
+                               const SourceInfo& source_)
+    : TileData(id_, source_),
       glyphAtlas(glyphAtlas_),
       glyphStore(glyphStore_),
       spriteAtlas(spriteAtlas_),
@@ -25,9 +28,8 @@ VectorTileData::VectorTileData(Tile::ID const& id_,
 }
 
 VectorTileData::~VectorTileData() {
-    glyphAtlas.removeGlyphs(id.to_uint64());
+    glyphAtlas.removeGlyphs(reinterpret_cast<uintptr_t>(this));
 }
-
 
 void VectorTileData::parse() {
     if (state != State::loaded) {
@@ -42,9 +44,10 @@ void VectorTileData::parse() {
         // Parsing creates state that is encapsulated in TileParser. While parsing,
         // the TileParser object writes results into this objects. All other state
         // is going to be discarded afterwards.
-        TileParser parser(data, *this, style,
-                          glyphAtlas, glyphStore,
-                          spriteAtlas, sprite);
+        VectorTile vectorTile(pbf((const uint8_t *)data.data(), data.size()));
+        const VectorTile* vt = &vectorTile;
+        TileParser parser(*vt, *this, style, glyphAtlas, glyphStore, spriteAtlas, sprite);
+
         // Clear the style so that we don't have a cycle in the shared_ptr references.
         style.reset();
 

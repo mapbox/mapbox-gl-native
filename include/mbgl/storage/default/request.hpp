@@ -6,6 +6,8 @@
 #include <mbgl/util/util.hpp>
 #include <mbgl/util/noncopyable.hpp>
 
+#include <mutex>
+#include <thread>
 #include <functional>
 #include <memory>
 
@@ -35,12 +37,12 @@ public:
 private:
     ~Request();
     void invoke();
-    static void notifyCallback(uv_async_t *async);
-    static void cancelCallback(uv_async_t *async);
+    void notifyCallback();
 
 private:
-    uv_async_t *notifyAsync = nullptr;
-    uv_async_t *destructAsync = nullptr;
+    uv_async_t *async = nullptr;
+    struct Canceled;
+    std::unique_ptr<Canceled> canceled;
     Callback callback;
     std::shared_ptr<const Response> response;
 

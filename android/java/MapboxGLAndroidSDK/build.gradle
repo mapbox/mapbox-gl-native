@@ -3,8 +3,8 @@ buildscript {
         mavenCentral()
     }
     dependencies {
-        classpath 'com.android.tools.build:gradle:1.1.0'
-        classpath 'com.jakewharton.sdkmanager:gradle-plugin:0.10.1'
+        classpath 'com.android.tools.build:gradle:1.1.3'
+        classpath 'com.jakewharton.sdkmanager:gradle-plugin:0.12.0'
     }
 }
 
@@ -29,8 +29,8 @@ repositories {
 
 dependencies {
     compile 'commons-validator:commons-validator:1.4.1'
-    compile 'com.android.support:support-annotations:21.0.3'
-    compile 'com.android.support:support-v4:21.0.3'
+    compile 'com.android.support:support-annotations:22.0.0'
+    compile 'com.android.support:support-v4:22.0.0'
     compile 'com.squareup.okhttp:okhttp:2.2.0'
 }
 

@@ -1,4 +1,5 @@
 #include <mbgl/renderer/painter.hpp>
+#include <mbgl/platform/log.hpp>
 #include <mbgl/style/style.hpp>
 #include <mbgl/style/style_layer.hpp>
 #include <mbgl/style/style_layer_group.hpp>
@@ -234,11 +235,11 @@ void Painter::render(const Style& style, const std::set<util::ptr<StyleSource>>&
     frameHistory.record(time, state.getNormalizedZoom());
 
     // Actually render the layers
-    if (debug::renderTree) { std::cout << "{" << std::endl; indent++; }
+    if (debug::renderTree) { Log::Info(Event::Render, "{"); indent++; }
     if (style.layers) {
         renderLayers(*style.layers);
     }
-    if (debug::renderTree) { std::cout << "}" << std::endl; indent--; }
+    if (debug::renderTree) { Log::Info(Event::Render, "}"); indent--; }
 
     // Finalize the rendering, e.g. by calling debug render calls per tile.
     // This guarantees that we have at least one function per tile called.
@@ -258,7 +259,7 @@ void Painter::renderLayers(const StyleLayerGroup &group) {
     // objects first.
 
     if (debug::renderTree) {
-        std::cout << std::string(indent++ * 4, ' ') << "OPAQUE {" << std::endl;
+        Log::Info(Event::Render, "%*s%s", indent++ * 4, "", "OPAQUE {");
     }
     int i = 0;
     for (auto it = group.layers.rbegin(), end = group.layers.rend(); it != end; ++it, ++i) {
@@ -267,14 +268,14 @@ void Painter::renderLayers(const StyleLayerGroup &group) {
         renderLayer(**it);
     }
     if (debug::renderTree) {
-        std::cout << std::string(--indent * 4, ' ') << "}" << std::endl;
+        Log::Info(Event::Render, "%*s%s", --indent * 4, "", "}");
     }
 
     // - SECOND PASS -----------------------------------------------------------
     // Make a second pass, rendering translucent objects. This time, we render
     // bottom-to-top.
     if (debug::renderTree) {
-        std::cout << std::string(indent++ * 4, ' ') << "TRANSLUCENT {" << std::endl;
+        Log::Info(Event::Render, "%*s%s", indent++ * 4, "", "TRANSLUCENT {");
     }
     --i;
     for (auto it = group.layers.begin(), end = group.layers.end(); it != end; ++it, --i) {
@@ -283,7 +284,7 @@ void Painter::renderLayers(const StyleLayerGroup &group) {
         renderLayer(**it);
     }
     if (debug::renderTree) {
-        std::cout << std::string(--indent * 4, ' ') << "}" << std::endl;
+        Log::Info(Event::Render, "%*s%s", --indent * 4, "", "}");
     }
 }
 
@@ -293,20 +294,20 @@ void Painter::renderLayer(const StyleLayer &layer_desc, const Tile::ID* id, cons
         // This layer defines a background color/image.
 
         if (debug::renderTree) {
-            std::cout << std::string(indent * 4, ' ') << "- " << layer_desc.id << " ("
-                      << layer_desc.type << ")" << std::endl;
+            Log::Info(Event::Render, "%*s- %s (%s)", indent * 4, "", layer_desc.id.c_str(),
+                    StyleLayerTypeClass(layer_desc.type).c_str());
         }
 
         renderBackground(layer_desc);
     } else {
         // This is a singular layer.
         if (!layer_desc.bucket) {
-            fprintf(stderr, "[WARNING] layer '%s' is missing bucket\n", layer_desc.id.c_str());
+            Log::Warning(Event::Render, "layer '%s' is missing bucket", layer_desc.id.c_str());
             return;
         }
 
         if (!layer_desc.bucket->style_source) {
-            fprintf(stderr, "[WARNING] can't find source for layer '%s'\n", layer_desc.id.c_str());
+            Log::Warning(Event::Render, "can't find source for layer '%s'", layer_desc.id.c_str());
             return;
         }
 
@@ -349,8 +350,8 @@ void Painter::renderLayer(const StyleLayer &layer_desc, const Tile::ID* id, cons
         }
 
         if (debug::renderTree) {
-            std::cout << std::string(indent * 4, ' ') << "- " << layer_desc.id << " ("
-                      << layer_desc.type << ")" << std::endl;
+            Log::Info(Event::Render, "%*s- %s (%s)", indent * 4, "", layer_desc.id.c_str(),
+                    StyleLayerTypeClass(layer_desc.type).c_str());
         }
         if (!id) {
             style_source.source->render(*this, layer_desc);

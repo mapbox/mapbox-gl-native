@@ -1,6 +1,9 @@
 #include <mbgl/platform/log.hpp>
 
+#include <mbgl/map/environment.hpp>
+
 #include <cstdarg>
+#include <sstream>
 
 namespace mbgl {
 
@@ -37,7 +40,28 @@ void Log::record(EventSeverity severity, Event event, int64_t code, const std::s
         return;
     }
 
-    platformRecord(severity, event, code, msg);
+    std::stringstream logStream;
+
+    if (Environment::inScope()) {
+        logStream << "{" << Environment::Get().getID() << "}";
+    }
+
+    const std::string threadName = Environment::threadName();
+    if (!threadName.empty()) {
+        logStream << "{" << threadName << "}";
+    }
+
+    logStream << "[" << event << "]";
+
+    if (code >= 0) {
+        logStream << "(" << code << ")";
+    }
+
+    if (!msg.empty()) {
+        logStream << ": " << msg;
+    }
+
+    platformRecord(severity, logStream.str());
 }
 
 }

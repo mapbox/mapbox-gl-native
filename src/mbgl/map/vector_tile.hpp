@@ -31,7 +31,7 @@ public:
     VectorTileLayer(pbf);
 
     std::size_t featureCount() const override { return features.size(); }
-    util::ptr<const GeometryTileFeature> feature(std::size_t) const override;
+    util::ptr<const GeometryTileFeature> getFeature(std::size_t) const override;
 
 private:
     friend class VectorTile;
@@ -48,10 +48,10 @@ class VectorTile : public GeometryTile {
 public:
     VectorTile(pbf);
 
-    util::ptr<const GeometryTileLayer> getLayer(const std::string&) const override;
+    util::ptr<GeometryTileLayer> getLayer(const std::string&) const override;
 
 private:
-    std::unordered_map<std::string, util::ptr<const GeometryTileLayer>> layers;
+    std::unordered_map<std::string, util::ptr<GeometryTileLayer>> layers;
 };
 
 }

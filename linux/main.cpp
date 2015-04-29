@@ -17,7 +17,7 @@ GLFWView *view = nullptr;
 
 void quit_handler(int) {
     if (view) {
-        fprintf(stderr, "waiting for quit...\n");
+        mbgl::Log::Info(mbgl::Event::Setup, "waiting for quit...");
         glfwSetWindowShouldClose(view->window, true);
         glfwPostEmptyEvent();
     } else {

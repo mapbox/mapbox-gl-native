@@ -1,6 +1,7 @@
 #include <mbgl/geometry/glyph_atlas.hpp>
 
 #include <mbgl/platform/gl.hpp>
+#include <mbgl/platform/log.hpp>
 #include <mbgl/platform/platform.hpp>
 
 #include <cassert>
@@ -17,26 +18,43 @@ GlyphAtlas::GlyphAtlas(uint16_t width_, uint16_t height_)
       dirty(true) {
 }
 
-Rect<uint16_t> GlyphAtlas::addGlyph(uint64_t tile_id, const std::string& face_name,
-                                    const SDFGlyph& glyph)
+void GlyphAtlas::addGlyphs(uintptr_t tileUID,
+                           const std::u32string& text,
+                           const std::string& stackName,
+                           const FontStack& fontStack,
+                           GlyphPositions& face)
 {
     std::lock_guard<std::mutex> lock(mtx);
-    return addGlyph_impl(tile_id, face_name, glyph);
+
+    const std::map<uint32_t, SDFGlyph>& sdfs = fontStack.getSDFs();
+
+    for (uint32_t chr : text)
+    {
+        auto sdf_it = sdfs.find(chr);
+        if (sdf_it == sdfs.end()) {
+            continue;
+        }
+
+        const SDFGlyph& sdf = sdf_it->second;
+        Rect<uint16_t> rect = addGlyph(tileUID, stackName, sdf);
+        face.emplace(chr, Glyph{rect, sdf.metrics});
+    }
 }
 
-Rect<uint16_t> GlyphAtlas::addGlyph_impl(uint64_t tile_id, const std::string& face_name,
+Rect<uint16_t> GlyphAtlas::addGlyph(uintptr_t tileUID,
+                                    const std::string& stackName,
                                     const SDFGlyph& glyph)
 {
     // Use constant value for now.
     const uint8_t buffer = 3;
 
-    std::map<uint32_t, GlyphValue>& face = index[face_name];
+    std::map<uint32_t, GlyphValue>& face = index[stackName];
     std::map<uint32_t, GlyphValue>::iterator it = face.find(glyph.id);
 
     // The glyph is already in this texture.
     if (it != face.end()) {
         GlyphValue& value = it->second;
-        value.ids.insert(tile_id);
+        value.ids.insert(tileUID);
         return value.rect;
     }
 
@@ -60,14 +78,14 @@ Rect<uint16_t> GlyphAtlas::addGlyph_impl(uint64_t tile_id, const std::string& fa
 
     Rect<uint16_t> rect = bin.allocate(pack_width, pack_height);
     if (rect.w == 0) {
-        fprintf(stderr, "glyph bitmap overflow");
+        Log::Error(Event::OpenGL, "glyph bitmap overflow");
         return rect;
     }
 
     assert(rect.x + rect.w <= width);
     assert(rect.y + rect.h <= height);
 
-    face.emplace(glyph.id, GlyphValue { rect, tile_id });
+    face.emplace(glyph.id, GlyphValue { rect, tileUID });
 
     // Copy the bitmap
     char *target = data.get();
@@ -85,31 +103,14 @@ Rect<uint16_t> GlyphAtlas::addGlyph_impl(uint64_t tile_id, const std::string& fa
     return rect;
 }
 
-void GlyphAtlas::addGlyphs(uint64_t tileid, std::u32string const& text, std::string const& stackname, FontStack const& fontStack, GlyphPositions & face)
-{
-    std::lock_guard<std::mutex> lock(mtx);
-
-    std::map<uint32_t, SDFGlyph> const& sdfs = fontStack.getSDFs();
-    for (uint32_t chr : text)
-    {
-        auto sdf_it = sdfs.find(chr);
-        if (sdf_it != sdfs.end())
-        {
-            SDFGlyph const& sdf = sdf_it->second;
-            Rect<uint16_t> rect = addGlyph_impl(tileid, stackname, sdf);
-            face.emplace(chr, Glyph{rect, sdf.metrics});
-        }
-    }
-}
-
-void GlyphAtlas::removeGlyphs(uint64_t tile_id) {
+void GlyphAtlas::removeGlyphs(uintptr_t tileUID) {
     std::lock_guard<std::mutex> lock(mtx);
 
     for (auto& faces : index) {
         std::map<uint32_t, GlyphValue>& face = faces.second;
         for (auto it = face.begin(); it != face.end(); /* we advance in the body */) {
             GlyphValue& value = it->second;
-            value.ids.erase(tile_id);
+            value.ids.erase(tileUID);
 
             if (!value.ids.size()) {
                 const Rect<uint16_t>& rect = value.rect;

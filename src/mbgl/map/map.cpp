@@ -4,6 +4,7 @@
 #include <mbgl/platform/platform.hpp>
 #include <mbgl/map/source.hpp>
 #include <mbgl/renderer/painter.hpp>
+#include <mbgl/map/annotation.hpp>
 #include <mbgl/map/sprite.hpp>
 #include <mbgl/util/transition.hpp>
 #include <mbgl/util/math.hpp>
@@ -61,8 +62,6 @@ using namespace mbgl;
 Map::Map(View& view_, FileSource& fileSource_)
     : env(util::make_unique<Environment>(fileSource_)),
       view(view_),
-      mainThread(std::this_thread::get_id()),
-      mapThread(mainThread),
       transform(view_),
       fileSource(fileSource_),
       glyphAtlas(util::make_unique<GlyphAtlas>(1024, 1024)),
@@ -70,7 +69,8 @@ Map::Map(View& view_, FileSource& fileSource_)
       spriteAtlas(util::make_unique<SpriteAtlas>(512, 512)),
       lineAtlas(util::make_unique<LineAtlas>(512, 512)),
       texturePool(std::make_shared<TexturePool>()),
-      painter(util::make_unique<Painter>(*spriteAtlas, *glyphAtlas, *lineAtlas))
+      painter(util::make_unique<Painter>(*spriteAtlas, *glyphAtlas, *lineAtlas)),
+      annotationManager(util::make_unique<AnnotationManager>())
 {
     view.initialize(this);
 }
@@ -97,7 +97,7 @@ uv::worker &Map::getWorker() {
 }
 
 void Map::start(bool startPaused) {
-    assert(std::this_thread::get_id() == mainThread);
+    assert(Environment::currentlyOn(ThreadType::Main));
     assert(mode == Mode::None);
 
     // When starting map rendering in another thread, we perform async/continuously
@@ -109,7 +109,7 @@ void Map::start(bool startPaused) {
 
     // Setup async notifications
     asyncTerminate = util::make_unique<uv::async>(env->loop, [this]() {
-        assert(std::this_thread::get_id() == mapThread);
+        assert(Environment::currentlyOn(ThreadType::Map));
 
         // Remove all of these to make sure they are destructed in the correct thread.
         style.reset();
@@ -125,7 +125,7 @@ void Map::start(bool startPaused) {
     });
 
     asyncUpdate = util::make_unique<uv::async>(env->loop, [this] {
-        assert(std::this_thread::get_id() == mapThread);
+        assert(Environment::currentlyOn(ThreadType::Map));
 
         if (state.hasSize()) {
             prepare();
@@ -134,7 +134,7 @@ void Map::start(bool startPaused) {
 
     asyncRender = util::make_unique<uv::async>(env->loop, [this] {
         // Must be called in Map thread.
-        assert(std::this_thread::get_id() == mapThread);
+        assert(Environment::currentlyOn(ThreadType::Map));
 
         render();
 
@@ -152,19 +152,11 @@ void Map::start(bool startPaused) {
     }
 
     thread = std::thread([this]() {
-#ifdef DEBUG
-        mapThread = std::this_thread::get_id();
-#endif
-
 #ifdef __APPLE__
         pthread_setname_np("Map");
 #endif
 
         run();
-
-#ifdef DEBUG
-        mapThread = std::thread::id();
-#endif
 
         // Make sure that the stop() function knows when to stop invoking the callback function.
         isStopped = true;
@@ -173,8 +165,7 @@ void Map::start(bool startPaused) {
 }
 
 void Map::stop(std::function<void ()> callback) {
-    assert(std::this_thread::get_id() == mainThread);
-    assert(mainThread != mapThread);
+    assert(Environment::currentlyOn(ThreadType::Main));
     assert(mode == Mode::Continuous);
 
     asyncTerminate->send();
@@ -201,7 +192,7 @@ void Map::stop(std::function<void ()> callback) {
 }
 
 void Map::pause(bool waitForPause) {
-    assert(std::this_thread::get_id() == mainThread);
+    assert(Environment::currentlyOn(ThreadType::Main));
     assert(mode == Mode::Continuous);
     mutexRun.lock();
     pausing = true;
@@ -219,7 +210,7 @@ void Map::pause(bool waitForPause) {
 }
 
 void Map::resume() {
-    assert(std::this_thread::get_id() == mainThread);
+    assert(Environment::currentlyOn(ThreadType::Main));
     assert(mode == Mode::Continuous);
 
     mutexRun.lock();
@@ -229,13 +220,20 @@ void Map::resume() {
 }
 
 void Map::run() {
+    ThreadType threadType = ThreadType::Map;
+    std::string threadName("Map");
+
     if (mode == Mode::None) {
-#ifdef DEBUG
-        mapThread = mainThread;
-#endif
         mode = Mode::Static;
+
+        // FIXME: Threads should have only one purpose. When running on Static mode,
+        // we are currently not spawning a Map thread and running the code on the
+        // Main thread, thus, the Main thread in this case is both Main and Map thread.
+        threadType = static_cast<ThreadType>(static_cast<uint8_t>(threadType) | static_cast<uint8_t>(ThreadType::Main));
+        threadName += "andMain";
     }
-    assert(std::this_thread::get_id() == mapThread);
+
+    Environment::Scope scope(*env, threadType, threadName);
 
     if (mode == Mode::Continuous) {
         checkForPause();
@@ -248,8 +246,6 @@ void Map::run() {
     view.activate();
 
     workers = util::make_unique<uv::worker>(env->loop, 4, "Tile Worker");
-
-    env->setup();
 
     setup();
     prepare();
@@ -271,9 +267,6 @@ void Map::run() {
     // *after* all events have been processed.
     if (mode == Mode::Static) {
         render();
-#ifdef DEBUG
-        mapThread = std::thread::id();
-#endif
         mode = Mode::None;
     }
 
@@ -282,7 +275,7 @@ void Map::run() {
 
 void Map::renderSync() {
     // Must be called in UI thread.
-    assert(std::this_thread::get_id() == mainThread);
+    assert(Environment::currentlyOn(ThreadType::Main));
 
     triggerRender();
 
@@ -333,7 +326,7 @@ void Map::terminate() {
 #pragma mark - Setup
 
 void Map::setup() {
-    assert(std::this_thread::get_id() == mapThread);
+    assert(Environment::currentlyOn(ThreadType::Map));
     assert(painter);
     painter->setup();
 }
@@ -374,7 +367,7 @@ std::string Map::getStyleJSON() const {
 util::ptr<Sprite> Map::getSprite() {
     const float pixelRatio = state.getPixelRatio();
     const std::string &sprite_url = style->getSpriteURL();
-    if (!sprite || sprite->pixelRatio != pixelRatio) {
+    if (!sprite || !sprite->hasPixelRatio(pixelRatio)) {
         sprite = Sprite::Create(sprite_url, pixelRatio, *env);
     }
 
@@ -536,6 +529,57 @@ const std::string &Map::getAccessToken() const {
     return accessToken;
 }
 
+#pragma mark - Annotations
+
+void Map::setDefaultPointAnnotationSymbol(std::string& symbol) {
+    assert(Environment::currentlyOn(ThreadType::Main));
+    annotationManager->setDefaultPointAnnotationSymbol(symbol);
+}
+
+uint32_t Map::addPointAnnotation(LatLng point, std::string& symbol) {
+    assert(Environment::currentlyOn(ThreadType::Main));
+    std::vector<LatLng> points({ point });
+    std::vector<std::string> symbols({ symbol });
+    return addPointAnnotations(points, symbols)[0];
+}
+
+std::vector<uint32_t> Map::addPointAnnotations(std::vector<LatLng> points, std::vector<std::string>& symbols) {
+    assert(Environment::currentlyOn(ThreadType::Main));
+    auto result = annotationManager->addPointAnnotations(points, symbols, *this);
+    updateAnnotationTiles(result.first);
+    return result.second;
+}
+
+void Map::removeAnnotation(uint32_t annotation) {
+    assert(Environment::currentlyOn(ThreadType::Main));
+    removeAnnotations({ annotation });
+}
+
+void Map::removeAnnotations(std::vector<uint32_t> annotations) {
+    assert(Environment::currentlyOn(ThreadType::Main));
+    auto result = annotationManager->removeAnnotations(annotations);
+    updateAnnotationTiles(result);
+}
+
+std::vector<uint32_t> Map::getAnnotationsInBounds(LatLngBounds bounds) const {
+    assert(Environment::currentlyOn(ThreadType::Main));
+    return annotationManager->getAnnotationsInBounds(bounds, *this);
+}
+
+LatLngBounds Map::getBoundsForAnnotations(std::vector<uint32_t> annotations) const {
+    assert(Environment::currentlyOn(ThreadType::Main));
+    return annotationManager->getBoundsForAnnotations(annotations);
+}
+
+void Map::updateAnnotationTiles(std::vector<Tile::ID>& ids) {
+    for (const auto &source : activeSources) {
+        if (source->info.type == SourceType::Annotations) {
+            source->source->invalidateTiles(*this, ids);
+            return;
+        }
+    }
+}
+
 #pragma mark - Toggles
 
 void Map::setDebug(bool value) {
@@ -605,7 +649,7 @@ std::chrono::steady_clock::duration Map::getDefaultTransitionDuration() {
 }
 
 void Map::updateSources() {
-    assert(std::this_thread::get_id() == mapThread);
+    assert(Environment::currentlyOn(ThreadType::Map));
 
     // First, disable all existing sources.
     for (const auto& source : activeSources) {
@@ -634,7 +678,7 @@ void Map::updateSources() {
 }
 
 void Map::updateSources(const util::ptr<StyleLayerGroup> &group) {
-    assert(std::this_thread::get_id() == mapThread);
+    assert(Environment::currentlyOn(ThreadType::Map));
     if (!group) {
         return;
     }
@@ -643,22 +687,23 @@ void Map::updateSources(const util::ptr<StyleLayerGroup> &group) {
         if (layer->bucket && layer->bucket->style_source) {
             (*activeSources.emplace(layer->bucket->style_source).first)->enabled = true;
         }
+
     }
 }
 
 void Map::updateTiles() {
-    assert(std::this_thread::get_id() == mapThread);
+    assert(Environment::currentlyOn(ThreadType::Map));
     for (const auto &source : activeSources) {
-        source->source->update(*this, *env, getWorker(), style, *glyphAtlas, *glyphStore,
+        source->source->update(*this, getWorker(), style, *glyphAtlas, *glyphStore,
                                *spriteAtlas, getSprite(), *texturePool, [this]() {
-            assert(std::this_thread::get_id() == mapThread);
+            assert(Environment::currentlyOn(ThreadType::Map));
             triggerUpdate();
         });
     }
 }
 
 void Map::prepare() {
-    assert(std::this_thread::get_id() == mapThread);
+    assert(Environment::currentlyOn(ThreadType::Map));
 
     if (!style) {
         style = std::make_shared<Style>();
@@ -703,7 +748,7 @@ void Map::prepare() {
 }
 
 void Map::render() {
-    assert(std::this_thread::get_id() == mapThread);
+    assert(Environment::currentlyOn(ThreadType::Map));
     assert(painter);
     painter->render(*style, activeSources,
                     state, animationTime);

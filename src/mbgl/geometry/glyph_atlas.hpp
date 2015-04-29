@@ -15,32 +15,32 @@ namespace mbgl {
 
 class GlyphAtlas : public util::noncopyable {
 public:
-
-private:
-    struct GlyphValue {
-        GlyphValue(const Rect<uint16_t>& rect_, uint64_t id)
-            : rect(rect_), ids({ id }) {}
-        Rect<uint16_t> rect;
-        std::set<uint64_t> ids;
-    };
-
-    Rect<uint16_t> addGlyph_impl(uint64_t tile_id, const std::string& face_name,
-                                 const SDFGlyph& glyph);
-public:
     GlyphAtlas(uint16_t width, uint16_t height);
 
-    Rect<uint16_t> addGlyph(uint64_t tile_id, const std::string& face_name,
-                            const SDFGlyph& glyph);
-    void addGlyphs(uint64_t tileid, std::u32string const& text, std::string const& stackname,
-                   FontStack const& fontStack, GlyphPositions & face);
-    void removeGlyphs(uint64_t tile_id);
+    void addGlyphs(uintptr_t tileUID,
+                   const std::u32string& text,
+                   const std::string& stackName,
+                   const FontStack&,
+                   GlyphPositions&);
+    void removeGlyphs(uintptr_t tileUID);
+
     void bind();
 
-public:
     const uint16_t width = 0;
     const uint16_t height = 0;
 
 private:
+    struct GlyphValue {
+        GlyphValue(const Rect<uint16_t>& rect_, uintptr_t id)
+            : rect(rect_), ids({ id }) {}
+        Rect<uint16_t> rect;
+        std::set<uintptr_t> ids;
+    };
+
+    Rect<uint16_t> addGlyph(uintptr_t tileID,
+                            const std::string& stackName,
+                            const SDFGlyph&);
+
     std::mutex mtx;
     BinPack<uint16_t> bin;
     std::map<std::string, std::map<uint32_t, GlyphValue>> index;

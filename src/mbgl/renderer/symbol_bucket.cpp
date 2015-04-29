@@ -42,12 +42,6 @@ bool SymbolBucket::hasTextData() const { return !text.groups.empty(); }
 
 bool SymbolBucket::hasIconData() const { return !icon.groups.empty(); }
 
-void SymbolBucket::addGlyphsToAtlas(uint64_t tileid, const std::string stackname,
-                                    const std::u32string &text, const FontStack &fontStack,
-                                    GlyphAtlas &glyphAtlas, GlyphPositions &face) {
-    glyphAtlas.addGlyphs(tileid, text, stackname, fontStack,face);
-}
-
 std::vector<SymbolFeature> SymbolBucket::processFeatures(const GeometryTileLayer& layer,
                                                          const FilterExpression& filter,
                                                          GlyphStore &glyphStore,
@@ -66,7 +60,7 @@ std::vector<SymbolFeature> SymbolBucket::processFeatures(const GeometryTileLayer
     std::set<GlyphRange> ranges;
 
     for (std::size_t i = 0; i < layer.featureCount(); i++) {
-        auto feature = layer.feature(i);
+        auto feature = layer.getFeature(i);
 
         GeometryTileFeatureExtractor extractor(*feature);
         if (!evaluate(filter, extractor))
@@ -130,8 +124,11 @@ std::vector<SymbolFeature> SymbolBucket::processFeatures(const GeometryTileLayer
 
 void SymbolBucket::addFeatures(const GeometryTileLayer& layer,
                                const FilterExpression& filter,
-                               const Tile::ID &id, SpriteAtlas &spriteAtlas, Sprite &sprite,
-                               GlyphAtlas & glyphAtlas, GlyphStore &glyphStore) {
+                               uintptr_t tileUID,
+                               SpriteAtlas& spriteAtlas,
+                               Sprite& sprite,
+                               GlyphAtlas& glyphAtlas,
+                               GlyphStore& glyphStore) {
     auto &layout = *styleLayout;
     const std::vector<SymbolFeature> features = processFeatures(layer, filter, glyphStore, sprite);
 
@@ -199,8 +196,7 @@ void SymbolBucket::addFeatures(const GeometryTileLayer& layer,
 
             // Add the glyphs we need for this label to the glyph atlas.
             if (shaping.size()) {
-                SymbolBucket::addGlyphsToAtlas(id.to_uint64(), layout.text.font, feature.label, fontStack,
-                                               glyphAtlas, face);
+                glyphAtlas.addGlyphs(tileUID, feature.label, layout.text.font, fontStack, face);
             }
         }
 
