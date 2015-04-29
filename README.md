@@ -68,7 +68,7 @@ If you merely want to install the library for iOS and try it out as an Objective
 5. [Set the Mapbox API access token](#mapbox-api-access-tokens).
 6. `#import "MapboxGL.h"`
 
-If you want to build from source and/or contribute to development of the project, run `make iproj`, which will create and open an Xcode project which can build the entire library from source as well as an Objective-C test app.
+If you want to build from source and/or contribute to development of the project, run `make iproj`, which will create and open an Xcode project which can build the entire library from source as well as an Objective-C test app. If you don't have an Apple Developer account, change the destination from "My Mac" to a simulator such as "iPhone 6" before you run and build the app.
 
 You can also run `make itest` to run the included tests. Requires `brew install xcpretty`. 
 
