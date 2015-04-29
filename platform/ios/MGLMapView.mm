@@ -1194,8 +1194,6 @@ mbgl::DefaultFileSource *mbglFileSource = nullptr;
 
 - (void)resetNorthAnimated:(BOOL)animated
 {
-    self.userTrackingMode = MGLUserTrackingModeNone;
-
     CGFloat duration = (animated ? MGLAnimationDuration : 0);
 
     mbglMap->setBearing(0, secondsAsDuration(duration));
@@ -1266,17 +1264,22 @@ mbgl::DefaultFileSource *mbglFileSource = nullptr;
     return latLngToCoordinate(mbglMap->getLatLng());
 }
 
+- (void)setCenterCoordinate:(CLLocationCoordinate2D)centerCoordinate zoomLevel:(double)zoomLevel animated:(BOOL)animated preservingTracking:(BOOL)tracking
+{
+    self.userTrackingMode = (tracking ? self.userTrackingMode : MGLUserTrackingModeNone);
+    
+    CGFloat duration = (animated ? MGLAnimationDuration : 0);
+    
+    mbglMap->setLatLngZoom(coordinateToLatLng(centerCoordinate), zoomLevel, secondsAsDuration(duration));
+    
+    [self unrotateIfNeededAnimated:animated];
+    
+    [self notifyMapChange:@(animated ? mbgl::MapChangeRegionDidChangeAnimated : mbgl::MapChangeRegionDidChange)];
+}
+
 - (void)setCenterCoordinate:(CLLocationCoordinate2D)centerCoordinate zoomLevel:(double)zoomLevel animated:(BOOL)animated
 {
-    self.userTrackingMode = MGLUserTrackingModeNone;
-
-    CGFloat duration = (animated ? MGLAnimationDuration : 0);
-
-    mbglMap->setLatLngZoom(coordinateToLatLng(centerCoordinate), zoomLevel, secondsAsDuration(duration));
-
-    [self unrotateIfNeededAnimated:animated];
-
-    [self notifyMapChange:@(animated ? mbgl::MapChangeRegionDidChangeAnimated : mbgl::MapChangeRegionDidChange)];
+    [self setCenterCoordinate:centerCoordinate zoomLevel:zoomLevel animated:animated preservingTracking:NO];
 }
 
 - (double)zoomLevel
@@ -1306,8 +1309,6 @@ mbgl::DefaultFileSource *mbglFileSource = nullptr;
 
 - (void)zoomToSouthWestCoordinate:(CLLocationCoordinate2D)southWestCoordinate northEastCoordinate:(CLLocationCoordinate2D)northEastCoordinate animated:(BOOL)animated
 {
-    // NOTE: does not disrupt tracking mode
-
     CLLocationCoordinate2D center = CLLocationCoordinate2DMake((northEastCoordinate.latitude + southWestCoordinate.latitude) / 2, (northEastCoordinate.longitude + southWestCoordinate.longitude) / 2);
     
     CGFloat scale = mbglMap->getScale();
@@ -1317,7 +1318,7 @@ mbgl::DefaultFileSource *mbglFileSource = nullptr;
     CGFloat maxZoom = mbglMap->getMaxZoom();
     CGFloat zoomLevel = MAX(MIN(log(scale * MIN(scaleX, scaleY)) / log(2), maxZoom), minZoom);
     
-    [self setCenterCoordinate:center zoomLevel:zoomLevel animated:animated];
+    [self setCenterCoordinate:center zoomLevel:zoomLevel animated:animated preservingTracking:YES];
 }
 
 - (CLLocationDirection)direction
