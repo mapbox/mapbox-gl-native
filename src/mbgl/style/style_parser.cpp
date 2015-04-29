@@ -86,7 +86,16 @@ void StyleParser::parseConstants(JSVal value) {
             std::string name { itr->name.GetString(), itr->name.GetStringLength() };
             // Discard constants that don't start with an @ sign.
             if (name.length() && name[0] == '@') {
-                constants.emplace(std::move(name), &itr->value);
+                JSVal constant = itr->value;
+                if (!constant.IsObject()) {
+                    Log::Warning(Event::ParseStyle, "constant '%s' must be an object with keys 'type', 'value'", name.c_str());
+                } else {
+                    if (!constant.HasMember("type") || !constant.HasMember("value")) {
+                        Log::Warning(Event::ParseStyle, "constant '%s' must have a type and value", name.c_str());
+                    } else {
+                        constants.emplace(std::move(name), &constant["value"]);
+                    }
+                }
             }
         }
     } else {
