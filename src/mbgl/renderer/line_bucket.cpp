@@ -183,8 +183,9 @@ void LineBucket::addGeometry(const std::vector<Coordinate>& vertices) {
                 // Almost parallel lines
                 joinNormal = nextNormal;
             } else {
+                const float direction = prevNormal.x * nextNormal.y - prevNormal.y * nextNormal.x > 0 ? -1 : 1;
                 const float bevelLength = miterLength * util::mag(prevNormal + nextNormal) /
-                                          util::mag(prevNormal - nextNormal);
+                                          util::mag(prevNormal - nextNormal * direction);
                 joinNormal = util::perp(joinNormal) * bevelLength;
             }
 
