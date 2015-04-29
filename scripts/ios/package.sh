@@ -11,6 +11,12 @@ OUTPUT=build/ios/pkg
 IOS_SDK_VERSION=`xcrun --sdk iphoneos --show-sdk-version`
 LIBUV_VERSION=0.10.28
 
+if [[ ${#} -eq 0 ]]; then
+    BUILD_FOR_DEVICE=true
+else
+    BUILD_FOR_DEVICE=false
+fi
+
 function step { >&2 echo -e "\033[1m\033[36m* $@\033[0m"; }
 function finish { >&2 echo -en "\033[0m"; }
 trap finish EXIT
@@ -35,7 +41,7 @@ export BUILDTYPE=${BUILDTYPE:-Release}
 export HOST=ios
 make Xcode/ios
 
-if [[ ${#} -eq 0 ]]; then # no args
+if [[ "${BUILD_FOR_DEVICE}" == true ]]; then
     step "Building iOS device targets..."
     xcodebuild -sdk iphoneos${IOS_SDK_VERSION} \
         ARCHS="arm64 armv7 armv7s" \
@@ -58,11 +64,18 @@ xcodebuild -sdk iphonesimulator${IOS_SDK_VERSION} \
 
 step "Building static library..."
 LIBS=(core.a platform-ios.a asset-fs.a cache-sqlite.a http-nsurl.a)
-libtool -static -no_warning_for_no_symbols \
-    -o ${OUTPUT}/static/lib${NAME}.a \
-    ${LIBS[@]/#/build/${BUILDTYPE}-iphoneos/libmbgl-} \
-    ${LIBS[@]/#/build/${BUILDTYPE}-iphonesimulator/libmbgl-} \
-    `find mason_packages/ios-${IOS_SDK_VERSION} -type f -name libuv.a`
+if [[ "${BUILD_FOR_DEVICE}" == true ]]; then
+    libtool -static -no_warning_for_no_symbols \
+        -o ${OUTPUT}/static/lib${NAME}.a \
+        ${LIBS[@]/#/build/${BUILDTYPE}-iphoneos/libmbgl-} \
+        ${LIBS[@]/#/build/${BUILDTYPE}-iphonesimulator/libmbgl-} \
+        `find mason_packages/ios-${IOS_SDK_VERSION} -type f -name libuv.a`
+else
+    libtool -static -no_warning_for_no_symbols \
+        -o ${OUTPUT}/static/lib${NAME}.a \
+        ${LIBS[@]/#/build/${BUILDTYPE}-iphonesimulator/libmbgl-} \
+        `find mason_packages/ios-${IOS_SDK_VERSION} -type f -name libuv.a`
+fi
 echo "Created ${OUTPUT}/static/lib${NAME}.a"
 
 
