@@ -2419,6 +2419,11 @@ CLLocationCoordinate2D latLngToCoordinate(mbgl::LatLng latLng)
     [self notifyMapChange:@(mbgl::MapChangeRegionIsChanging)];
 }
 
+- (BOOL)isFullyLoaded
+{
+    return _mbglMap->isFullyLoaded();
+}
+
 - (void)prepareForInterfaceBuilder
 {
     [super prepareForInterfaceBuilder];

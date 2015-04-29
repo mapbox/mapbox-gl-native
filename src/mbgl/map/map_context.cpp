@@ -220,6 +220,16 @@ void MapContext::update() {
 
         updateTiles();
 
+        if (sprite->isLoaded() && style->isLoaded()) {
+            if (!data.getFullyLoaded()) {
+                data.setFullyLoaded(true);
+            }
+        } else {
+            if (data.getFullyLoaded()) {
+                data.setFullyLoaded(false);
+            }
+        }
+
         view.invalidate([this] { render(); });
     }
 

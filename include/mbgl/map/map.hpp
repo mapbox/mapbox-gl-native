@@ -132,6 +132,7 @@ public:
     void setDebug(bool value);
     void toggleDebug();
     bool getDebug() const;
+    bool isFullyLoaded() const;
 
 private:
     const std::unique_ptr<MapData> data;

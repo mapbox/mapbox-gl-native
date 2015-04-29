@@ -286,6 +286,10 @@ bool Map::getDebug() const {
     return data->getDebug();
 }
 
+bool Map::isFullyLoaded() const {
+    return data->getFullyLoaded();
+}
+
 void Map::addClass(const std::string& klass) {
     if (data->addClass(klass)) {
         update(Update::Classes);
