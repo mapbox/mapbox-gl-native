@@ -11,7 +11,6 @@
 #include <mbgl/platform/platform.hpp>
 #include <mbgl/platform/darwin/reachability.h>
 #include <mbgl/storage/default_file_source.hpp>
-#include <mbgl/storage/sqlite_cache.hpp>
 #include <mbgl/storage/network_status.hpp>
 #include <mbgl/util/geo.hpp>
 #include <mbgl/util/constants.hpp>
@@ -24,6 +23,7 @@
 #import "MGLAnnotation.h"
 #import "MGLUserLocationAnnotationView.h"
 #import "MGLUserLocation_Private.h"
+#import "MGLFileCache.h"
 
 #import "SMCalloutView.h"
 
@@ -32,21 +32,6 @@
 #import <algorithm>
 
 class MBGLView;
-
-// Returns the path to the default cache database on this system.
-const std::string &defaultCacheDatabase() {
-    static const std::string path = []() -> std::string {
-        NSArray *paths = NSSearchPathForDirectoriesInDomains(NSCachesDirectory, NSUserDomainMask, YES);
-        if ([paths count] == 0) {
-            // Disable the cache if we don't have a location to write.
-            return "";
-        }
-
-        NSString *libraryDirectory = [paths objectAtIndex:0];
-        return [[libraryDirectory stringByAppendingPathComponent:@"cache.db"] UTF8String];
-    }();
-    return path;
-}
 
 static dispatch_once_t loadGLExtensions;
 
@@ -101,7 +86,6 @@ static NSURL *MGLURLForBundledStyleNamed(NSString *styleName)
 {
     mbgl::Map *_mbglMap;
     MBGLView *_mbglView;
-    mbgl::SQLiteCache *_mbglFileCache;
     mbgl::DefaultFileSource *_mbglFileSource;
 
     BOOL _isTargetingInterfaceBuilder;
@@ -277,8 +261,7 @@ std::chrono::steady_clock::duration secondsAsDuration(float duration)
     // setup mbgl map
     //
     _mbglView = new MBGLView(self);
-    _mbglFileCache  = new mbgl::SQLiteCache(defaultCacheDatabase());
-    _mbglFileSource = new mbgl::DefaultFileSource(_mbglFileCache);
+    _mbglFileSource = new mbgl::DefaultFileSource([MGLFileCache obtainSharedCacheWithObject:self]);
 
     // Start paused on the IB canvas
     _mbglMap = new mbgl::Map(*_mbglView, *_mbglFileSource, mbgl::MapMode::Continuous, _isTargetingInterfaceBuilder);
@@ -423,6 +406,8 @@ std::chrono::steady_clock::duration secondsAsDuration(float duration)
         delete _mbglFileSource;
         _mbglFileSource = nullptr;
     }
+
+    [MGLFileCache releaseSharedCacheForObject:self];
 
     if (_mbglView)
     {
