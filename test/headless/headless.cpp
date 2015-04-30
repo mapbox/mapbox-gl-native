@@ -142,6 +142,8 @@ TEST_P(HeadlessTest, render) {
             }
         }
 
+        std::promise<void> promise;
+
         HeadlessView view(display, width, height, pixelRatio);
         DefaultFileSource fileSource(nullptr);
         Map map(view, fileSource, MapMode::Still);
@@ -151,8 +153,6 @@ TEST_P(HeadlessTest, render) {
         map.setStyleJSON(style, "test/suite");
         map.setLatLngZoom(mbgl::LatLng(latitude, longitude), zoom);
         map.setBearing(bearing);
-
-        std::promise<void> promise;
 
         map.renderStill([&](std::unique_ptr<const StillImage> image) {
             const std::string png = util::compress_png(image->width, image->height, image->pixels.get());
