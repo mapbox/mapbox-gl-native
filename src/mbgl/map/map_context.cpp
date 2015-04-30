@@ -286,7 +286,7 @@ void MapContext::setSourceTileCacheSize(size_t size) {
         for (const auto &source : style->sources) {
             source->setCacheSize(sourceCacheSize);
         }
-        env.performCleanup();
+        view.invalidate([this] { render(); });
     }
 }
 
@@ -296,7 +296,7 @@ void MapContext::onLowMemory() {
     for (const auto &source : style->sources) {
         source->onLowMemory();
     }
-    env.performCleanup();
+    view.invalidate([this] { render(); });
 }
 
 }
