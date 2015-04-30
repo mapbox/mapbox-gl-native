@@ -143,7 +143,8 @@ NSString *const MGLEventGestureRotateStart = @"Rotation";
         // Configure Events Infrastructure
         // ===============================
 
-         _session = [NSURLSession sessionWithConfiguration:[NSURLSessionConfiguration defaultSessionConfiguration] delegate:self delegateQueue:nil];
+        _paused = YES;
+        [self resumeMetricsCollection];
         NSBundle *resourceBundle = [NSBundle bundleWithPath:[NSBundle mgl_resourceBundlePath]];
 
         // Load Local Copy of Server's Public Key
@@ -222,8 +223,6 @@ NSString *const MGLEventGestureRotateStart = @"Rotation";
         if ( ! NSProcessInfo.processInfo.mgl_isInterfaceBuilderDesignablesAgent) {
             void (^setupBlock)() = ^{
                 _sharedManager = [[self alloc] init];
-                // setup dedicated location manager on first use
-                [MGLMetricsLocationManager sharedManager];
             };
             if ( ! [[NSThread currentThread] isMainThread]) {
                 dispatch_sync(dispatch_get_main_queue(), ^{
@@ -278,6 +277,8 @@ NSString *const MGLEventGestureRotateStart = @"Rotation";
         return;
     }
     self.paused = YES;
+    [_session invalidateAndCancel];
+    _session = nil;
     MGLMetricsLocationManager *sharedLocationManager = [MGLMetricsLocationManager sharedManager];
     [sharedLocationManager stopUpdatingLocation];
     [sharedLocationManager stopMonitoringVisits];
@@ -295,6 +296,7 @@ NSString *const MGLEventGestureRotateStart = @"Rotation";
         return;
     }
     self.paused = NO;
+    _session = [NSURLSession sessionWithConfiguration:[NSURLSessionConfiguration defaultSessionConfiguration] delegate:self delegateQueue:nil];
     MGLMetricsLocationManager *sharedLocationManager = [MGLMetricsLocationManager sharedManager];
     [sharedLocationManager startUpdatingLocation];
     [sharedLocationManager startMonitoringVisits];
