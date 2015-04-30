@@ -72,7 +72,7 @@ private:
     std::unique_ptr<Response> response;
     const std::shared_ptr<const Response> existingResponse;
     ResponseStatus status = ResponseStatus::PermanentError;
-    uv_async_t *async = nullptr;
+    uv::async async;
     int attempts = 0;
     uv_timer_t *timer = nullptr;
     enum : bool { PreemptImmediately, ExponentialBackoff } strategy = PreemptImmediately;
@@ -134,26 +134,16 @@ HTTPRequest::HTTPRequest(HTTPNSURLContext* context_, const Resource& resource_, 
     : RequestBase(resource_, callback_),
       context(context_),
       existingResponse(existingResponse_),
-      async(new uv_async_t) {
+      async(loop, [this] { handleResponse(); }) {
     context->addRequest(this);
-
-    async->data = this;
-    uv_async_init(loop, async, [](uv_async_t *as, int) {
-        auto impl = reinterpret_cast<HTTPRequest *>(as->data);
-        impl->handleResponse();
-    });
-
     start();
 }
 
 HTTPRequest::~HTTPRequest() {
     assert(!task);
-    assert(async);
 
     // Stop the backoff timer to avoid re-triggering this request.
     cancelTimer();
-
-    uv::close(async);
 
     context->removeRequest(this);
 }
@@ -364,7 +354,7 @@ void HTTPRequest::handleResult(NSData *data, NSURLResponse *res, NSError *error)
         response->message = "response class is not NSHTTPURLResponse";
     }
 
-    uv_async_send(async);
+    async.send();
 }
 
 void HTTPRequest::retry(uint64_t timeout) {
@@ -373,7 +363,7 @@ void HTTPRequest::retry(uint64_t timeout) {
     assert(!timer);
     timer = new uv_timer_t;
     timer->data = this;
-    uv_timer_init(async->loop, timer);
+    uv_timer_init(async.get()->loop, timer);
     uv_timer_start(timer, restart, timeout, 0);
 }
 
