@@ -27,6 +27,13 @@ StyleParser::StyleParser(MapData& data_)
 }
 
 void StyleParser::parse(JSVal document) {
+    if (document.HasMember("version")) {
+        version = document["version"].GetInt();
+        if (version != 8) {
+            Log::Warning(Event::ParseStyle, "current renderer implementation only supports style spec version 8; using an outdated style will cause rendering errors");
+        }
+    }
+
     if (document.HasMember("constants")) {
         parseConstants(document["constants"]);
     }
