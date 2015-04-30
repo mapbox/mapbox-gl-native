@@ -5,9 +5,9 @@
 // These methods can be called from any thread.
 //
 + (instancetype)sharedManager;
-+ (void) startUpdatingLocation;
-+ (void) stopUpdatingLocation;
-+ (void) startMonitoringVisits;
-+ (void) stopMonitoringVisits;
+- (void) startUpdatingLocation;
+- (void) stopUpdatingLocation;
+- (void) startMonitoringVisits;
+- (void) stopMonitoringVisits;
 
 @end

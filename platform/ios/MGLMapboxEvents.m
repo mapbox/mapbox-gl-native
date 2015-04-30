@@ -266,28 +266,38 @@ NSString *const MGLEventGestureRotateStart = @"Rotation";
     [MGLMapboxEvents sharedManager].appBuildNumber = appBuildNumber;
 }
 
-// Must be called from the main thread.
-//
-+ (void) pauseMetricsCollection {
-    MGLAssertIsMainThread();
-    if ([MGLMapboxEvents sharedManager].paused) {
-        return;
-    }
-    [MGLMapboxEvents sharedManager].paused = YES;
-    [MGLMetricsLocationManager stopUpdatingLocation];
-    [MGLMetricsLocationManager stopMonitoringVisits];
++ (void)pauseMetricsCollection {
+    [[MGLMapboxEvents sharedManager] pauseMetricsCollection];
 }
 
 // Must be called from the main thread.
 //
-+ (void) resumeMetricsCollection {
+- (void)pauseMetricsCollection {
     MGLAssertIsMainThread();
-    if (![MGLMapboxEvents sharedManager].paused) {
+    if (self.paused) {
         return;
     }
-    [MGLMapboxEvents sharedManager].paused = NO;
-    [MGLMetricsLocationManager startUpdatingLocation];
-    [MGLMetricsLocationManager startMonitoringVisits];
+    self.paused = YES;
+    MGLMetricsLocationManager *sharedLocationManager = [MGLMetricsLocationManager sharedManager];
+    [sharedLocationManager stopUpdatingLocation];
+    [sharedLocationManager stopMonitoringVisits];
+}
+
++ (void)resumeMetricsCollection {
+    [[MGLMapboxEvents sharedManager] resumeMetricsCollection];
+}
+
+// Must be called from the main thread.
+//
+- (void)resumeMetricsCollection {
+    MGLAssertIsMainThread();
+    if (!self.isPaused) {
+        return;
+    }
+    self.paused = NO;
+    MGLMetricsLocationManager *sharedLocationManager = [MGLMetricsLocationManager sharedManager];
+    [sharedLocationManager startUpdatingLocation];
+    [sharedLocationManager startMonitoringVisits];
 }
 
 // Can be called from any thread. Can be called rapidly from
