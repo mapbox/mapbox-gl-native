@@ -8,6 +8,7 @@
 #import "MGLMetricsLocationManager.h"
 #import "NSProcessInfo+MGLAdditions.h"
 #import "NSBundle+MGLAdditions.h"
+#import "NSException+MGLAdditions.h"
 
 #include <sys/sysctl.h>
 
@@ -83,9 +84,9 @@ NSString *const MGLEventGestureRotateStart = @"Rotation";
 @property (atomic) NSData *geoTrustCert;
 
 
-// The isPaused state tracker is only ever accessed from the main thread.
+// The paused state tracker is only ever accessed from the main thread.
 //
-@property (nonatomic) BOOL isPaused;
+@property (nonatomic, getter=isPaused) BOOL paused;
 
 // The timer is only ever accessed from the main thread.
 //
@@ -111,7 +112,7 @@ NSString *const MGLEventGestureRotateStart = @"Rotation";
 // Must be called from the main thread. Only called internally.
 //
 - (instancetype) init {
-    assert([[NSThread currentThread] isMainThread]);
+    MGLAssertIsMainThread();
 
     self = [super init];
     if (self) {
@@ -207,8 +208,6 @@ NSString *const MGLEventGestureRotateStart = @"Rotation";
         
         // Enable Battery Monitoring
         [UIDevice currentDevice].batteryMonitoringEnabled = YES;
-        
-        _isPaused = NO;
     }
     return self;
 }
@@ -242,39 +241,39 @@ NSString *const MGLEventGestureRotateStart = @"Rotation";
 // Must be called from the main thread.
 //
 + (void) setToken:(NSString *)token {
-    assert([[NSThread currentThread] isMainThread]);
+    MGLAssertIsMainThread();
     [MGLMapboxEvents sharedManager].token = token;
 }
 
 // Must be called from the main thread.
 //
 + (void) setAppName:(NSString *)appName {
-    assert([[NSThread currentThread] isMainThread]);
+    MGLAssertIsMainThread();
     [MGLMapboxEvents sharedManager].appName = appName;
 }
 
 // Must be called from the main thread.
 //
 + (void) setAppVersion:(NSString *)appVersion {
-    assert([[NSThread currentThread] isMainThread]);
+    MGLAssertIsMainThread();
     [MGLMapboxEvents sharedManager].appVersion = appVersion;
 }
 
 // Must be called from the main thread.
 //
 + (void) setAppBuildNumber:(NSString *)appBuildNumber {
-    assert([[NSThread currentThread] isMainThread]);
+    MGLAssertIsMainThread();
     [MGLMapboxEvents sharedManager].appBuildNumber = appBuildNumber;
 }
 
 // Must be called from the main thread.
 //
 + (void) pauseMetricsCollection {
-    assert([[NSThread currentThread] isMainThread]);
-    if ([MGLMapboxEvents sharedManager].isPaused) {
+    MGLAssertIsMainThread();
+    if ([MGLMapboxEvents sharedManager].paused) {
         return;
     }
-    [MGLMapboxEvents sharedManager].isPaused = YES;
+    [MGLMapboxEvents sharedManager].paused = YES;
     [MGLMetricsLocationManager stopUpdatingLocation];
     [MGLMetricsLocationManager stopMonitoringVisits];
 }
@@ -282,11 +281,11 @@ NSString *const MGLEventGestureRotateStart = @"Rotation";
 // Must be called from the main thread.
 //
 + (void) resumeMetricsCollection {
-    assert([[NSThread currentThread] isMainThread]);
-    if (![MGLMapboxEvents sharedManager].isPaused) {
+    MGLAssertIsMainThread();
+    if (![MGLMapboxEvents sharedManager].paused) {
         return;
     }
-    [MGLMapboxEvents sharedManager].isPaused = NO;
+    [MGLMapboxEvents sharedManager].paused = NO;
     [MGLMetricsLocationManager startUpdatingLocation];
     [MGLMetricsLocationManager startMonitoringVisits];
 }
@@ -323,7 +322,7 @@ NSString *const MGLEventGestureRotateStart = @"Rotation";
         }
         
         // Metrics Collection Has Been Paused
-        if (_isPaused) {
+        if (_paused) {
             return;
         }
         

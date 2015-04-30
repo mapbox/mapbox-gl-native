@@ -20,6 +20,7 @@
 #import "NSBundle+MGLAdditions.h"
 #import "NSString+MGLAdditions.h"
 #import "NSProcessInfo+MGLAdditions.h"
+#import "NSException+MGLAdditions.h"
 #import "MGLAnnotation.h"
 #import "MGLUserLocationAnnotationView.h"
 #import "MGLUserLocation_Private.h"
@@ -2348,7 +2349,7 @@ CLLocationCoordinate2D latLngToCoordinate(mbgl::LatLng latLng)
 
 - (void)invalidate
 {
-    assert([[NSThread currentThread] isMainThread]);
+    MGLAssertIsMainThread();
 
     [self.glView setNeedsDisplay];
 
