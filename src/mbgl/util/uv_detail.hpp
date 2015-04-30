@@ -121,6 +121,60 @@ private:
     std::function<void ()> fn;
 };
 
+class timer : public mbgl::util::noncopyable {
+public:
+    inline timer(uv_loop_t* loop)
+        : t(new uv_timer_t)
+    {
+        t->data = this;
+        if (uv_timer_init(loop, t.get()) != 0) {
+            throw std::runtime_error("failed to initialize timer");
+        }
+    }
+
+    inline timer() {
+        close(std::move(t));
+    }
+
+    inline void start(uint64_t timeout, uint64_t repeat, std::function<void ()> fn_) {
+        fn = fn_;
+        if (uv_timer_start(t.get(), timer_cb, timeout, repeat) != 0) {
+            throw std::runtime_error("failed to start timer");
+        }
+    }
+
+    inline void stop() {
+        fn = nullptr;
+        if (uv_timer_stop(t.get()) != 0) {
+            throw std::runtime_error("failed to stop timer");
+        }
+    }
+
+    inline void ref() {
+        uv_ref(reinterpret_cast<uv_handle_t*>(t.get()));
+    }
+
+    inline void unref() {
+        uv_unref(reinterpret_cast<uv_handle_t*>(t.get()));
+    }
+
+    inline uv_timer_t* get() {
+        return t.get();
+    }
+
+private:
+#if UV_VERSION_MAJOR == 0 && UV_VERSION_MINOR <= 10
+    static void timer_cb(uv_timer_t* t, int) {
+#else
+    static void timer_cb(uv_timer_t* t) {
+#endif
+        reinterpret_cast<timer*>(t->data)->fn();
+    }
+
+    std::unique_ptr<uv_timer_t> t;
+    std::function<void ()> fn;
+};
+
 class mutex : public mbgl::util::noncopyable {
 public:
     inline mutex() {
