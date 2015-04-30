@@ -237,6 +237,10 @@ NSString *const MGLEventGestureRotateStart = @"Rotation";
     return _sharedManager;
 }
 
+- (void)dealloc {
+    [self pauseMetricsCollection];
+}
+
 // Must be called from the main thread.
 //
 + (void) setToken:(NSString *)token {
