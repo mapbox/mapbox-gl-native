@@ -4,9 +4,12 @@
 #include <mbgl/style/style_layer.hpp>
 #include <mbgl/style/style_layout.hpp>
 #include <mbgl/map/sprite.hpp>
+#include <mbgl/map/tile_id.hpp>
+#include <mbgl/shader/line_shader.hpp>
+#include <mbgl/shader/linesdf_shader.hpp>
+#include <mbgl/shader/linepattern_shader.hpp>
 #include <mbgl/geometry/sprite_atlas.hpp>
 #include <mbgl/geometry/line_atlas.hpp>
-#include <mbgl/map/map.hpp>
 
 using namespace mbgl;
 

@@ -2,9 +2,13 @@
 #define MBGL_STORAGE_DEFAULT_DEFAULT_FILE_SOURCE_IMPL
 
 #include <mbgl/storage/default_file_source.hpp>
+#include <mbgl/storage/asset_context.hpp>
+#include <mbgl/storage/http_context.hpp>
 
 #include <set>
 #include <unordered_map>
+
+typedef struct uv_loop_s uv_loop_t;
 
 namespace mbgl {
 
@@ -12,19 +16,18 @@ class RequestBase;
 
 struct DefaultFileRequest {
     const Resource resource;
-    uv_loop_t* loop;
     std::set<Request*> observers;
     RequestBase* request = nullptr;
 
-    DefaultFileRequest(const Resource& resource_, uv_loop_t* loop_)
-        : resource(resource_), loop(loop_) {}
+    DefaultFileRequest(const Resource& resource_)
+        : resource(resource_) {}
 };
 
 class DefaultFileSource::Impl {
 public:
-    Impl(FileCache*, const std::string& = "");
+    Impl(uv_loop_t*, FileCache*, const std::string& = "");
 
-    void add(Request*, uv_loop_t*);
+    void add(Request*);
     void cancel(Request*);
 
 private:
@@ -35,8 +38,11 @@ private:
     void notify(DefaultFileRequest*, std::shared_ptr<const Response>, FileCache::Hint);
 
     std::unordered_map<Resource, DefaultFileRequest, Resource::Hash> pending;
+    uv_loop_t* loop = nullptr;
     FileCache* cache = nullptr;
     const std::string assetRoot;
+    std::unique_ptr<AssetContext> assetContext;
+    std::unique_ptr<HTTPContext> httpContext;
 };
 
 }

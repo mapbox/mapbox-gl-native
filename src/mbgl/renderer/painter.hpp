@@ -1,58 +1,60 @@
 #ifndef MBGL_RENDERER_PAINTER
 #define MBGL_RENDERER_PAINTER
 
-#include <mbgl/map/tile_data.hpp>
+#include <mbgl/map/transform_state.hpp>
+
+#include <mbgl/renderer/frame_history.hpp>
+
 #include <mbgl/geometry/vao.hpp>
 #include <mbgl/geometry/static_vertex_buffer.hpp>
-#include <mbgl/util/mat4.hpp>
-#include <mbgl/util/noncopyable.hpp>
-#include <mbgl/renderer/frame_history.hpp>
+
 #include <mbgl/style/types.hpp>
 
-#include <mbgl/shader/plain_shader.hpp>
-#include <mbgl/shader/outline_shader.hpp>
-#include <mbgl/shader/pattern_shader.hpp>
-#include <mbgl/shader/line_shader.hpp>
-#include <mbgl/shader/linesdf_shader.hpp>
-#include <mbgl/shader/linepattern_shader.hpp>
-#include <mbgl/shader/icon_shader.hpp>
-#include <mbgl/shader/raster_shader.hpp>
-#include <mbgl/shader/sdf_shader.hpp>
-#include <mbgl/shader/dot_shader.hpp>
-#include <mbgl/shader/gaussian_shader.hpp>
+#include <mbgl/platform/gl.hpp>
 
-#include <mbgl/map/transform_state.hpp>
-#include <mbgl/util/ptr.hpp>
+#include <mbgl/util/noncopyable.hpp>
 #include <mbgl/util/chrono.hpp>
 
-#include <map>
-#include <unordered_map>
+#include <array>
+#include <vector>
 #include <set>
 
 namespace mbgl {
 
 enum class RenderPass : bool { Opaque, Translucent };
 
-class Transform;
 class Style;
+class StyleLayer;
 class Tile;
-class Sprite;
 class SpriteAtlas;
 class GlyphAtlas;
 class LineAtlas;
 class Source;
 
+
+class DebugBucket;
 class FillBucket;
 class LineBucket;
 class SymbolBucket;
 class RasterBucket;
-class PrerenderedTexture;
 
-struct FillProperties;
 struct RasterProperties;
 
-class LayerDescription;
-class RasterTileData;
+class SDFShader;
+class PlainShader;
+class OutlineShader;
+class LineShader;
+class LinejoinShader;
+class LineSDFShader;
+class LinepatternShader;
+class PatternShader;
+class IconShader;
+class RasterShader;
+class SDFGlyphShader;
+class SDFIconShader;
+class DotShader;
+class GaussianShader;
+
 struct ClipID;
 
 class Painter : private util::noncopyable {
@@ -61,11 +63,6 @@ public:
     ~Painter();
 
     void setup();
-
-    // Perform cleanup tasks that prepare shutting down the app. This doesn't mean that the
-    // app will be shut down. That means all operations must be automatically be reversed (e.g. through
-    // lazy initialization) in case rendering continues.
-    void terminate();
 
     // Renders the backdrop of the OpenGL view. This also paints in areas where we don't have any
     // tiles whatsoever.
@@ -132,7 +129,6 @@ public:
 
 private:
     void setupShaders();
-    void deleteShaders();
     mat4 translatedMatrix(const mat4& matrix, const std::array<float, 2> &translation, const TileID &id, TranslateAnchorType anchor);
 
     void prepareTile(const Tile& tile);

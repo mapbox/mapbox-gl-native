@@ -1,5 +1,10 @@
 #include <mbgl/renderer/raster_bucket.hpp>
+#include <mbgl/shader/raster_shader.hpp>
 #include <mbgl/renderer/painter.hpp>
+
+#ifndef BUFFER_OFFSET
+#define BUFFER_OFFSET(i) ((char *)nullptr + (i))
+#endif
 
 using namespace mbgl;
 

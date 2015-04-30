@@ -1,9 +1,14 @@
 #include <mbgl/renderer/debug_bucket.hpp>
 #include <mbgl/renderer/painter.hpp>
+#include <mbgl/shader/plain_shader.hpp>
 
 #include <mbgl/platform/gl.hpp>
 
 #include <cassert>
+
+#ifndef BUFFER_OFFSET
+#define BUFFER_OFFSET(i) ((char *)nullptr + (i))
+#endif
 
 using namespace mbgl;
 

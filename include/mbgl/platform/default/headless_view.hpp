@@ -17,6 +17,7 @@ typedef XID GLXPbuffer;
 #include <mbgl/platform/gl.hpp>
 
 #include <memory>
+#include <thread>
 
 namespace mbgl {
 
@@ -28,13 +29,11 @@ public:
     HeadlessView(std::shared_ptr<HeadlessDisplay> display, uint16_t width = 256, uint16_t height = 256, float pixelRatio = 1);
     ~HeadlessView();
 
-    void resize(uint16_t width, uint16_t height, float pixelRatio);
-
     void activate() override;
     void deactivate() override;
     void notify() override;
-    void invalidate() override;
-    void discard() override;
+    void resize(uint16_t width, uint16_t height, float pixelRatio) override;
+    void invalidate(std::function<void()> render) override;
     std::unique_ptr<StillImage> readStillImage() override;
 
 private:
@@ -56,12 +55,7 @@ private:
         float pixelRatio = 0;
     };
 
-    // These are the values that represent the state of the current framebuffer.
-    Dimensions current;
-
-    // These are the values that will be used after the next discard() event.
-    std::mutex prospectiveMutex;
-    Dimensions prospective;
+    Dimensions dimensions;
 
 #if MBGL_USE_CGL
     CGLContextObj glContext = nullptr;

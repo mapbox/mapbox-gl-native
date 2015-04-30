@@ -1,46 +1,40 @@
-#include <mbgl/storage/asset_request.hpp>
-#include <mbgl/storage/thread_context.hpp>
+#include <mbgl/storage/asset_context.hpp>
 #include <mbgl/android/jni.hpp>
 #include <mbgl/storage/resource.hpp>
 #include <mbgl/storage/response.hpp>
 #include <mbgl/platform/log.hpp>
 #include <mbgl/util/std.hpp>
+#include <mbgl/util/util.hpp>
+#include <mbgl/util/uv.hpp>
 
+#include <uv.h>
 #include "uv_zip.h"
 
-#pragma GCC diagnostic push
-#pragma GCC diagnostic ignored "-Wshadow"
-#ifndef __clang__
-#pragma GCC diagnostic ignored "-Wunused-local-typedefs"
-#endif
-#include <boost/algorithm/string.hpp>
-#pragma GCC diagnostic pop
-
+#include <map>
+#include <cassert>
 #include <forward_list>
-
-namespace algo = boost::algorithm;
 
 namespace mbgl {
 
-class AssetZipContext : public ThreadContext<AssetZipContext> {
+class AssetZipContext : public AssetContext {
 public:
     AssetZipContext(uv_loop_t *loop);
     ~AssetZipContext();
 
+    RequestBase* createRequest(const Resource& resource,
+                               RequestBase::Callback callback,
+                               uv_loop_t* loop,
+                               const std::string& assetRoot) override;
+
     uv_zip_t *getHandle(const std::string &path);
     void returnHandle(const std::string &path, uv_zip_t *zip);
 
-private:
     // A list of resuable uv_zip handles to avoid creating and destroying them all the time.
     std::map<std::string, std::forward_list<uv_zip_t *>> handles;
+    uv_loop_t *loop;
 };
 
-// -------------------------------------------------------------------------------------------------
-
-template<> pthread_key_t ThreadContext<AssetZipContext>::key{};
-template<> pthread_once_t ThreadContext<AssetZipContext>::once = PTHREAD_ONCE_INIT;
-
-AssetZipContext::AssetZipContext(uv_loop_t *loop_) : ThreadContext(loop_) {
+AssetZipContext::AssetZipContext(uv_loop_t *loop_) : loop(loop_) {
 }
 
 uv_zip_t *AssetZipContext::getHandle(const std::string &path) {
@@ -71,20 +65,18 @@ AssetZipContext::~AssetZipContext() {
     handles.clear();
 }
 
-// -------------------------------------------------------------------------------------------------
-
-class AssetRequestImpl {
+class AssetRequest : public RequestBase {
     MBGL_STORE_THREAD(tid)
 
 public:
-    AssetRequestImpl(AssetRequest*, uv_loop_t*, const std::string& assetRoot);
-    ~AssetRequestImpl();
+    AssetRequest(AssetZipContext&, const Resource&, Callback, const std::string& assetRoot);
+    ~AssetRequest();
 
-    void cancel();
+    void cancel() override;
 
 private:
     AssetZipContext &context;
-    AssetRequest *request = nullptr;
+    bool cancelled = false;
     const std::string root;
     const std::string path;
     std::unique_ptr<Response> response;
@@ -102,21 +94,18 @@ private:
     void notifyError(const char *message);
 };
 
-// -------------------------------------------------------------------------------------------------
-
-AssetRequestImpl::~AssetRequestImpl() {
-    MBGL_VERIFY_THREAD(tid);
-
-    if (request) {
-        request->impl = nullptr;
-    }
+RequestBase* AssetZipContext::createRequest(const Resource& resource,
+                                            RequestBase::Callback callback,
+                                            uv_loop_t*,
+                                            const std::string& assetRoot) {
+    return new AssetRequest(*this, resource, callback, assetRoot);
 }
 
-AssetRequestImpl::AssetRequestImpl(AssetRequest* request_, uv_loop_t* loop, const std::string& assetRoot_)
-    : context(*AssetZipContext::Get(loop)),
-      request(request_),
+AssetRequest::AssetRequest(AssetZipContext& context_, const Resource& resource_, Callback callback_, const std::string& assetRoot_)
+    : RequestBase(resource_, callback_),
+      context(context_),
       root(assetRoot_),
-      path(std::string { "assets/" } + request->resource.url.substr(8)) {
+      path(std::string { "assets/" } + resource.url.substr(8)) {
     auto zip = context.getHandle(root);
     if (zip) {
         archiveOpened(zip);
@@ -125,17 +114,19 @@ AssetRequestImpl::AssetRequestImpl(AssetRequest* request_, uv_loop_t* loop, cons
     }
 }
 
-void AssetRequestImpl::openZipArchive() {
+AssetRequest::~AssetRequest() {
+    MBGL_VERIFY_THREAD(tid);
+}
+
+void AssetRequest::openZipArchive() {
     uv_fs_t *req = new uv_fs_t();
     req->data = this;
-
-    assert(request);
 
     // We're using uv_fs_open first to obtain a file descriptor. Then, uv_zip_fdopen will operate
     // on a read-only file.
     uv_fs_open(context.loop, req, root.c_str(), O_RDONLY, S_IRUSR, [](uv_fs_t *fsReq) {
         if (fsReq->result < 0) {
-            auto impl = reinterpret_cast<AssetRequestImpl *>(fsReq->data);
+            auto impl = reinterpret_cast<AssetRequest *>(fsReq->data);
             impl->notifyError(uv::getFileRequestError(fsReq));
             delete impl;
         } else {
@@ -143,7 +134,7 @@ void AssetRequestImpl::openZipArchive() {
             uv_zip_init(zip);
             zip->data = fsReq->data;
             uv_zip_fdopen(fsReq->loop, zip, uv_file(fsReq->result), 0, [](uv_zip_t *openZip) {
-                auto impl = reinterpret_cast<AssetRequestImpl *>(openZip->data);
+                auto impl = reinterpret_cast<AssetRequest *>(openZip->data);
                 if (openZip->result < 0) {
                     impl->notifyError(openZip->message);
                     delete openZip;
@@ -163,20 +154,20 @@ void AssetRequestImpl::openZipArchive() {
 #define INVOKE_MEMBER(name) \
     [](uv_zip_t *zip_) { \
         assert(zip_->data); \
-        reinterpret_cast<AssetRequestImpl *>(zip_->data)->name(zip_); \
+        reinterpret_cast<AssetRequest *>(zip_->data)->name(zip_); \
     }
 
-void AssetRequestImpl::archiveOpened(uv_zip_t *zip) {
+void AssetRequest::archiveOpened(uv_zip_t *zip) {
     MBGL_VERIFY_THREAD(tid);
 
     zip->data = this;
     uv_zip_stat(context.loop, zip, path.c_str(), 0, INVOKE_MEMBER(fileStated));
 }
 
-void AssetRequestImpl::fileStated(uv_zip_t *zip) {
+void AssetRequest::fileStated(uv_zip_t *zip) {
     MBGL_VERIFY_THREAD(tid);
 
-    if (!request || zip->result < 0) {
+    if (cancelled || zip->result < 0) {
         // Stat failed, probably because the file doesn't exist.
         if (zip->result < 0) {
             notifyError(zip->message);
@@ -206,14 +197,14 @@ void AssetRequestImpl::fileStated(uv_zip_t *zip) {
     }
 }
 
-void AssetRequestImpl::fileOpened(uv_zip_t *zip) {
+void AssetRequest::fileOpened(uv_zip_t *zip) {
     MBGL_VERIFY_THREAD(tid);
 
     if (zip->result < 0) {
         // Opening failed.
         notifyError(zip->message);
         cleanup(zip);
-    } else if (!request) {
+    } else if (cancelled) {
         // The request was canceled. Close the file again.
         uv_zip_fclose(context.loop, zip, zip->file, INVOKE_MEMBER(fileClosed));
     } else {
@@ -221,23 +212,21 @@ void AssetRequestImpl::fileOpened(uv_zip_t *zip) {
     }
 }
 
-void AssetRequestImpl::fileRead(uv_zip_t *zip) {
+void AssetRequest::fileRead(uv_zip_t *zip) {
     MBGL_VERIFY_THREAD(tid);
 
     if (zip->result < 0) {
         // Reading failed. We still have an open file handle though.
         notifyError(zip->message);
-    } else if (request) {
+    } else if (!cancelled) {
         response->status = Response::Successful;
-        request->notify(std::move(response), FileCache::Hint::No);
-        delete request;
-        assert(request == nullptr);
+        notify(std::move(response), FileCache::Hint::No);
     }
 
     uv_zip_fclose(context.loop, zip, zip->file, INVOKE_MEMBER(fileClosed));
 }
 
-void AssetRequestImpl::fileClosed(uv_zip_t *zip) {
+void AssetRequest::fileClosed(uv_zip_t *zip) {
     MBGL_VERIFY_THREAD(tid);
 
     if (zip->result < 0) {
@@ -247,53 +236,32 @@ void AssetRequestImpl::fileClosed(uv_zip_t *zip) {
     cleanup(zip);
 }
 
-void AssetRequestImpl::cleanup(uv_zip_t *zip) {
+void AssetRequest::cleanup(uv_zip_t *zip) {
     MBGL_VERIFY_THREAD(tid);
 
     context.returnHandle(root, zip);
     delete this;
 }
 
-void AssetRequestImpl::notifyError(const char *message) {
+void AssetRequest::notifyError(const char *message) {
     MBGL_VERIFY_THREAD(tid);
 
-    if (request) {
+    if (!cancelled) {
         response = util::make_unique<Response>();
         response->status = Response::Error;
         response->message = message;
-        request->notify(std::move(response), FileCache::Hint::No);
-        delete request;
-        assert(request == nullptr);
+        notify(std::move(response), FileCache::Hint::No);
     } else {
         // The request was already canceled and deleted.
     }
 }
 
-void AssetRequestImpl::cancel() {
-    request = nullptr;
-}
-
-// -------------------------------------------------------------------------------------------------
-
-AssetRequest::AssetRequest(const Resource& resource_, Callback callback_,
-                           uv_loop_t* loop, const std::string& assetRoot)
-    : RequestBase(resource_, callback_)
-    , impl(new AssetRequestImpl(this, loop, assetRoot)) {
-    assert(algo::starts_with(resource.url, "asset://"));
-}
-
-AssetRequest::~AssetRequest() {
-    if (impl) {
-        impl->cancel();
-    }
-}
-
 void AssetRequest::cancel() {
-    if (impl) {
-        impl->cancel();
-    }
+    cancelled = true;
+}
 
-    delete this;
+std::unique_ptr<AssetContext> AssetContext::createContext(uv_loop_t* loop) {
+    return util::make_unique<AssetZipContext>(loop);
 }
 
 }

@@ -14,6 +14,7 @@
 #include <mbgl/storage/sqlite_cache.hpp>
 #include <mbgl/storage/network_status.hpp>
 #include <mbgl/util/geo.hpp>
+#include <mbgl/util/constants.hpp>
 
 #import "MGLTypes.h"
 #import "NSBundle+MGLAdditions.h"
@@ -277,8 +278,10 @@ mbgl::DefaultFileSource *mbglFileSource = nullptr;
     mbglView = new MBGLView(self);
     mbglFileCache  = new mbgl::SQLiteCache(defaultCacheDatabase());
     mbglFileSource = new mbgl::DefaultFileSource(mbglFileCache);
-    mbglMap = new mbgl::Map(*mbglView, *mbglFileSource);
-    mbglView->resize(self.bounds.size.width, self.bounds.size.height, _glView.contentScaleFactor, _glView.drawableWidth, _glView.drawableHeight);
+
+    // Start paused on the IB canvas
+    mbglMap = new mbgl::Map(*mbglView, *mbglFileSource, mbgl::MapMode::Continuous, _isTargetingInterfaceBuilder);
+    mbglMap->resize(self.bounds.size.width, self.bounds.size.height, _glView.contentScaleFactor);
 
     // Notify map object when network reachability status changes.
     [[NSNotificationCenter defaultCenter] addObserver:self
@@ -379,12 +382,6 @@ mbgl::DefaultFileSource *mbglFileSource = nullptr;
     //
     _regionChangeDelegateQueue = [NSOperationQueue new];
     _regionChangeDelegateQueue.maxConcurrentOperationCount = 1;
-
-    // start the main loop, but not on the IB canvas
-    if ( ! _isTargetingInterfaceBuilder)
-    {
-        mbglMap->start();
-    }
 
     // metrics: map load event
     const mbgl::LatLng latLng = mbglMap->getLatLng();
@@ -623,13 +620,13 @@ mbgl::DefaultFileSource *mbglFileSource = nullptr;
 {
     if ( ! self.glSnapshotView || self.glSnapshotView.hidden)
     {
-        mbglView->resize(rect.size.width, rect.size.height, view.contentScaleFactor, view.drawableWidth, view.drawableHeight);
+        mbglMap->resize(rect.size.width, rect.size.height, view.contentScaleFactor);
 
         CGFloat zoomFactor   = mbglMap->getMaxZoom() - mbglMap->getMinZoom() + 1;
         CGFloat cpuFactor    = (CGFloat)[[NSProcessInfo processInfo] processorCount];
         CGFloat memoryFactor = (CGFloat)[[NSProcessInfo processInfo] physicalMemory] / 1000 / 1000 / 1000;
-        CGFloat sizeFactor   = ((CGFloat)mbglMap->getState().getWidth()  / mbgl::util::tileSize) *
-                               ((CGFloat)mbglMap->getState().getHeight() / mbgl::util::tileSize);
+        CGFloat sizeFactor   = ((CGFloat)mbglMap->getWidth()  / mbgl::util::tileSize) *
+                               ((CGFloat)mbglMap->getHeight() / mbgl::util::tileSize);
 
         NSUInteger cacheSize = zoomFactor * cpuFactor * memoryFactor * sizeFactor * 0.5;
 
@@ -646,7 +643,7 @@ mbgl::DefaultFileSource *mbglFileSource = nullptr;
     
     if ( ! _isTargetingInterfaceBuilder)
     {
-        mbglMap->triggerUpdate();
+        mbglMap->update();
     }
 }
 
@@ -669,7 +666,7 @@ mbgl::DefaultFileSource *mbglFileSource = nullptr;
     self.glSnapshotView.image = self.glView.snapshot;
     self.glSnapshotView.hidden = NO;
 
-    mbglMap->stop();
+    mbglMap->pause();
 
     [self.glView deleteDrawable];
 }
@@ -680,7 +677,7 @@ mbgl::DefaultFileSource *mbglFileSource = nullptr;
 
     [self.glView bindDrawable];
 
-    mbglMap->start();
+    mbglMap->resume();
 }
 
 - (void)tintColorDidChange
@@ -1320,8 +1317,8 @@ mbgl::DefaultFileSource *mbglFileSource = nullptr;
     CLLocationCoordinate2D center = CLLocationCoordinate2DMake((northEastCoordinate.latitude + southWestCoordinate.latitude) / 2, (northEastCoordinate.longitude + southWestCoordinate.longitude) / 2);
     
     CGFloat scale = mbglMap->getScale();
-    CGFloat scaleX = mbglMap->getState().getWidth() / (northEastCoordinate.longitude - southWestCoordinate.longitude);
-    CGFloat scaleY = mbglMap->getState().getHeight() / (northEastCoordinate.latitude - southWestCoordinate.latitude);
+    CGFloat scaleX = mbglMap->getWidth() / (northEastCoordinate.longitude - southWestCoordinate.longitude);
+    CGFloat scaleY = mbglMap->getHeight() / (northEastCoordinate.latitude - southWestCoordinate.latitude);
     CGFloat minZoom = mbglMap->getMinZoom();
     CGFloat maxZoom = mbglMap->getMaxZoom();
     CGFloat zoomLevel = MAX(MIN(log(scale * MIN(scaleX, scaleY)) / log(2), maxZoom), minZoom);
@@ -2528,12 +2525,7 @@ class MBGLView : public mbgl::View
         [EAGLContext setCurrentContext:nil];
     }
 
-    void resize(uint16_t width, uint16_t height, float ratio, uint16_t fbWidth, uint16_t fbHeight)
-    {
-        View::resize(width, height, ratio, fbWidth, fbHeight);
-    }
-
-    void invalidate() override
+    void invalidate(std::function<void()>) override
     {
         [nativeView performSelectorOnMainThread:@selector(invalidate)
                                      withObject:nil

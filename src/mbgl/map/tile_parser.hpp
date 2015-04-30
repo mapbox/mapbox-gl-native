@@ -35,7 +35,7 @@ class TileParser : private util::noncopyable {
 public:
     TileParser(const GeometryTile& geometryTile,
                VectorTileData& tile,
-               const util::ptr<const Style>& style,
+               const Style& style,
                GlyphAtlas& glyphAtlas,
                GlyphStore& glyphStore,
                SpriteAtlas& spriteAtlas,
@@ -60,7 +60,7 @@ private:
     VectorTileData& tile;
 
     // Cross-thread shared data.
-    util::ptr<const Style> style;
+    const Style& style;
     GlyphAtlas& glyphAtlas;
     GlyphStore& glyphStore;
     SpriteAtlas& spriteAtlas;

@@ -4,17 +4,22 @@
 #include <mbgl/renderer/painter.hpp>
 #include <mbgl/style/style.hpp>
 #include <mbgl/style/style_layout.hpp>
+#include <mbgl/shader/plain_shader.hpp>
+#include <mbgl/shader/pattern_shader.hpp>
+#include <mbgl/shader/outline_shader.hpp>
 #include <mbgl/util/std.hpp>
 #include <mbgl/platform/gl.hpp>
 #include <mbgl/platform/log.hpp>
 
 #include <cassert>
 
+#ifndef BUFFER_OFFSET
+#define BUFFER_OFFSET(i) ((char *)nullptr + (i))
+#endif
+
 struct geometry_too_long_exception : std::exception {};
 
 using namespace mbgl;
-
-
 
 void *FillBucket::alloc(void *, unsigned int size) {
     return ::malloc(size);

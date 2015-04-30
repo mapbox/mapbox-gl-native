@@ -23,6 +23,7 @@ public:
 
     virtual ~RequestBase() = default;
     virtual void cancel() = 0;
+    virtual void retry() {};
 
 protected:
     const Resource& resource;

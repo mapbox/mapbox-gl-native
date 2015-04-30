@@ -1,4 +1,4 @@
-#include <mbgl/storage/asset_request.hpp>
+#include <mbgl/storage/asset_context.hpp>
 #include <mbgl/storage/resource.hpp>
 #include <mbgl/storage/response.hpp>
 #include <mbgl/util/std.hpp>
@@ -7,27 +7,19 @@
 
 #include <uv.h>
 
-#pragma GCC diagnostic push
-#pragma GCC diagnostic ignored "-Wshadow"
-#ifndef __clang__
-#pragma GCC diagnostic ignored "-Wunused-local-typedefs"
-#endif
-#include <boost/algorithm/string.hpp>
-#pragma GCC diagnostic pop
-
 #include <cassert>
-
-
-namespace algo = boost::algorithm;
+#include <limits>
 
 namespace mbgl {
 
-class AssetRequestImpl {
+class AssetRequest : public RequestBase {
     MBGL_STORE_THREAD(tid)
 
 public:
-    AssetRequestImpl(AssetRequest*, uv_loop_t*, const std::string& assetRoot);
-    ~AssetRequestImpl();
+    AssetRequest(const Resource&, Callback, uv_loop_t*, const std::string& assetRoot);
+    ~AssetRequest();
+
+    void cancel() override;
 
     static void fileOpened(uv_fs_t *req);
     static void fileStated(uv_fs_t *req);
@@ -36,7 +28,6 @@ public:
     static void notifyError(uv_fs_t *req);
     static void cleanup(uv_fs_t *req);
 
-    AssetRequest *request = nullptr;
     std::string assetRoot;
     bool canceled = false;
     uv_fs_t req;
@@ -45,20 +36,25 @@ public:
     std::unique_ptr<Response> response;
 };
 
-AssetRequestImpl::~AssetRequestImpl() {
-    MBGL_VERIFY_THREAD(tid);
-
-    if (request) {
-        request->impl = nullptr;
+class AssetFSContext : public AssetContext {
+    RequestBase* createRequest(const Resource& resource,
+                               RequestBase::Callback callback,
+                               uv_loop_t* loop,
+                               const std::string& assetRoot) override {
+        return new AssetRequest(resource, callback, loop, assetRoot);
     }
+};
+
+AssetRequest::~AssetRequest() {
+    MBGL_VERIFY_THREAD(tid);
 }
 
-AssetRequestImpl::AssetRequestImpl(AssetRequest* request_, uv_loop_t* loop, const std::string& assetRoot_)
-    : request(request_)
-    , assetRoot(assetRoot_) {
+AssetRequest::AssetRequest(const Resource& resource_, Callback callback_, uv_loop_t* loop, const std::string& assetRoot_)
+    : RequestBase(resource_, callback_),
+      assetRoot(assetRoot_) {
     req.data = this;
 
-    const auto &url = request->resource.url;
+    const auto &url = resource.url;
     std::string path;
     if (url.size() <= 8 || url[8] == '/') {
         // This is an empty or absolute path.
@@ -71,9 +67,9 @@ AssetRequestImpl::AssetRequestImpl(AssetRequest* request_, uv_loop_t* loop, cons
     uv_fs_open(loop, &req, path.c_str(), O_RDONLY, S_IRUSR, fileOpened);
 }
 
-void AssetRequestImpl::fileOpened(uv_fs_t *req) {
+void AssetRequest::fileOpened(uv_fs_t *req) {
     assert(req->data);
-    auto self = reinterpret_cast<AssetRequestImpl *>(req->data);
+    auto self = reinterpret_cast<AssetRequest *>(req->data);
     MBGL_VERIFY_THREAD(self->tid);
 
     if (req->result < 0) {
@@ -96,9 +92,9 @@ void AssetRequestImpl::fileOpened(uv_fs_t *req) {
     }
 }
 
-void AssetRequestImpl::fileStated(uv_fs_t *req) {
+void AssetRequest::fileStated(uv_fs_t *req) {
     assert(req->data);
-    auto self = reinterpret_cast<AssetRequestImpl *>(req->data);
+    auto self = reinterpret_cast<AssetRequest *>(req->data);
     MBGL_VERIFY_THREAD(self->tid);
 
     if (req->result != 0 || self->canceled) {
@@ -124,9 +120,7 @@ void AssetRequestImpl::fileStated(uv_fs_t *req) {
 #else
             response->message = uv_strerror(UV_EFBIG);
 #endif
-            assert(self->request);
-            self->request->notify(std::move(response), FileCache::Hint::No);
-            delete self->request;
+            self->notify(std::move(response), FileCache::Hint::No);
 
             uv_fs_req_cleanup(req);
             uv_fs_close(req->loop, req, self->fd, fileClosed);
@@ -151,9 +145,9 @@ void AssetRequestImpl::fileStated(uv_fs_t *req) {
     }
 }
 
-void AssetRequestImpl::fileRead(uv_fs_t *req) {
+void AssetRequest::fileRead(uv_fs_t *req) {
     assert(req->data);
-    auto self = reinterpret_cast<AssetRequestImpl *>(req->data);
+    auto self = reinterpret_cast<AssetRequest *>(req->data);
     MBGL_VERIFY_THREAD(self->tid);
 
     if (req->result < 0 || self->canceled) {
@@ -163,18 +157,16 @@ void AssetRequestImpl::fileRead(uv_fs_t *req) {
     } else {
         // File was successfully read.
         self->response->status = Response::Successful;
-        assert(self->request);
-        self->request->notify(std::move(self->response), FileCache::Hint::No);
-        delete self->request;
+        self->notify(std::move(self->response), FileCache::Hint::No);
     }
 
     uv_fs_req_cleanup(req);
     uv_fs_close(req->loop, req, self->fd, fileClosed);
 }
 
-void AssetRequestImpl::fileClosed(uv_fs_t *req) {
+void AssetRequest::fileClosed(uv_fs_t *req) {
     assert(req->data);
-    auto self = reinterpret_cast<AssetRequestImpl *>(req->data);
+    auto self = reinterpret_cast<AssetRequest *>(req->data);
     MBGL_VERIFY_THREAD(self->tid);
     (void(self)); // Silence unused variable error in Release mode
 
@@ -185,51 +177,37 @@ void AssetRequestImpl::fileClosed(uv_fs_t *req) {
     cleanup(req);
 }
 
-void AssetRequestImpl::notifyError(uv_fs_t *req) {
+void AssetRequest::notifyError(uv_fs_t *req) {
     assert(req->data);
-    auto self = reinterpret_cast<AssetRequestImpl *>(req->data);
+    auto self = reinterpret_cast<AssetRequest *>(req->data);
     MBGL_VERIFY_THREAD(self->tid);
 
     if (req->result < 0 && !self->canceled && req->result != UV_ECANCELED) {
         auto response = util::make_unique<Response>();
         response->status = Response::Error;
         response->message = uv::getFileRequestError(req);
-        assert(self->request);
-        self->request->notify(std::move(response), FileCache::Hint::No);
-        delete self->request;
+        self->notify(std::move(response), FileCache::Hint::No);
     }
 }
 
-void AssetRequestImpl::cleanup(uv_fs_t *req) {
+void AssetRequest::cleanup(uv_fs_t *req) {
     assert(req->data);
-    auto self = reinterpret_cast<AssetRequestImpl *>(req->data);
+    auto self = reinterpret_cast<AssetRequest *>(req->data);
     MBGL_VERIFY_THREAD(self->tid);
     uv_fs_req_cleanup(req);
     delete self;
 }
 
-// -------------------------------------------------------------------------------------------------
-
-AssetRequest::AssetRequest(const Resource& resource_, Callback callback_,
-                           uv_loop_t* loop, const std::string& assetRoot)
-    : RequestBase(resource_, callback_)
-    , impl(new AssetRequestImpl(this, loop, assetRoot)) {
-    assert(algo::starts_with(resource.url, "asset://"));
-    // Note: the AssetRequestImpl deletes itself.
-}
-
-AssetRequest::~AssetRequest() {
-    if (impl) {
-        impl->request = nullptr;
-    }
-}
-
 void AssetRequest::cancel() {
-    impl->canceled = true;
+    canceled = true;
     // uv_cancel fails frequently when the request has already been started.
     // In that case, we have to let it complete and check the canceled bool
     // instead. The cancelation callback will delete the AssetRequest object.
-    uv_cancel((uv_req_t *)&impl->req);
+    uv_cancel((uv_req_t *)&req);
+}
+
+std::unique_ptr<AssetContext> AssetContext::createContext(uv_loop_t*) {
+    return util::make_unique<AssetFSContext>();
 }
 
 }

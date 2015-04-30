@@ -1,30 +1,26 @@
 #include <mbgl/map/source.hpp>
-#include <mbgl/map/map.hpp>
+#include <mbgl/map/map_data.hpp>
 #include <mbgl/map/environment.hpp>
 #include <mbgl/map/transform.hpp>
 #include <mbgl/map/tile.hpp>
 #include <mbgl/renderer/painter.hpp>
 #include <mbgl/util/constants.hpp>
-#include <mbgl/util/raster.hpp>
-#include <mbgl/util/string.hpp>
-#include <mbgl/util/texture_pool.hpp>
 #include <mbgl/storage/resource.hpp>
 #include <mbgl/storage/response.hpp>
-#include <mbgl/util/vec.hpp>
 #include <mbgl/util/math.hpp>
-#include <mbgl/util/std.hpp>
 #include <mbgl/util/box.hpp>
 #include <mbgl/util/mapbox.hpp>
-#include <mbgl/geometry/glyph_atlas.hpp>
 #include <mbgl/style/style_layer.hpp>
 #include <mbgl/platform/log.hpp>
 #include <mbgl/util/uv_detail.hpp>
 #include <mbgl/util/token.hpp>
+#include <mbgl/util/string.hpp>
 #include <mbgl/util/tile_cover.hpp>
 
 #include <mbgl/map/vector_tile_data.hpp>
 #include <mbgl/map/raster_tile_data.hpp>
 #include <mbgl/map/live_tile_data.hpp>
+#include <mbgl/style/style.hpp>
 
 #include <algorithm>
 
@@ -123,6 +119,20 @@ Source::Source()
 
 Source::~Source() {}
 
+bool Source::isLoaded() const {
+    if (!loaded) {
+        return false;
+    }
+
+    for (const auto& tile : tiles) {
+        if (tile.second->data->state != TileData::State::parsed) {
+            return false;
+        }
+    }
+
+    return true;
+}
+
 // Note: This is a separate function that must be called exactly once after creation
 // The reason this isn't part of the constructor is that calling shared_from_this() in
 // the constructor fails.
@@ -147,7 +157,7 @@ void Source::load(const std::string& accessToken,
         d.Parse<0>(res.data.c_str());
 
         if (d.HasParseError()) {
-            Log::Warning(Event::General, "Invalid source TileJSON; Parse Error at %d: %s", d.GetErrorOffset(), d.GetParseError());
+            Log::Error(Event::General, "Invalid source TileJSON; Parse Error at %d: %s", d.GetErrorOffset(), d.GetParseError());
             return;
         }
 
@@ -215,11 +225,16 @@ TileData::State Source::hasTile(const TileID& id) {
     return TileData::State::invalid;
 }
 
-TileData::State Source::addTile(Map &map, Worker &worker,
-                                util::ptr<Style> style, GlyphAtlas &glyphAtlas,
-                                GlyphStore &glyphStore, SpriteAtlas &spriteAtlas,
-                                util::ptr<Sprite> sprite, TexturePool &texturePool,
-                                const TileID &id, std::function<void()> callback) {
+TileData::State Source::addTile(MapData& data,
+                                const TransformState& transformState,
+                                Style& style,
+                                GlyphAtlas& glyphAtlas,
+                                GlyphStore& glyphStore,
+                                SpriteAtlas& spriteAtlas,
+                                util::ptr<Sprite> sprite,
+                                TexturePool& texturePool,
+                                const TileID& id,
+                                std::function<void()> callback) {
     const TileData::State state = hasTile(id);
 
     if (state != TileData::State::invalid) {
@@ -252,18 +267,17 @@ TileData::State Source::addTile(Map &map, Worker &worker,
         // If we don't find working tile data, we're just going to load it.
         if (info.type == SourceType::Vector) {
             new_tile.data =
-                std::make_shared<VectorTileData>(normalized_id, map.getMaxZoom(), style, glyphAtlas,
+                std::make_shared<VectorTileData>(normalized_id, data.transform.getMaxZoom(), style, glyphAtlas,
                                                  glyphStore, spriteAtlas, sprite, info);
-            new_tile.data->request(worker, map.getState().getPixelRatio(), callback);
+            new_tile.data->request(style.workers, transformState.getPixelRatio(), callback);
         } else if (info.type == SourceType::Raster) {
             new_tile.data = std::make_shared<RasterTileData>(normalized_id, texturePool, info);
-            new_tile.data->request(worker, map.getState().getPixelRatio(), callback);
+            new_tile.data->request(style.workers, transformState.getPixelRatio(), callback);
         } else if (info.type == SourceType::Annotations) {
-            AnnotationManager& annotationManager = map.getAnnotationManager();
-            new_tile.data = std::make_shared<LiveTileData>(normalized_id, annotationManager,
-                                                           map.getMaxZoom(), style, glyphAtlas,
+            new_tile.data = std::make_shared<LiveTileData>(normalized_id, data.annotationManager,
+                                                           data.transform.getMaxZoom(), style, glyphAtlas,
                                                            glyphStore, spriteAtlas, sprite, info);
-            new_tile.data->reparse(worker, callback);
+            new_tile.data->reparse(style.workers, callback);
         } else {
             throw std::runtime_error("source type not implemented");
         }
@@ -352,21 +366,21 @@ bool Source::findLoadedParent(const TileID& id, int32_t minCoveringZoom, std::fo
     return false;
 }
 
-void Source::update(Map &map,
-                    Worker &worker,
-                    util::ptr<Style> style,
-                    GlyphAtlas &glyphAtlas,
-                    GlyphStore &glyphStore,
-                    SpriteAtlas &spriteAtlas,
+void Source::update(MapData& data,
+                    const TransformState& transformState,
+                    Style& style,
+                    GlyphAtlas& glyphAtlas,
+                    GlyphStore& glyphStore,
+                    SpriteAtlas& spriteAtlas,
                     util::ptr<Sprite> sprite,
-                    TexturePool &texturePool,
+                    TexturePool& texturePool,
                     std::function<void()> callback) {
-    if (!loaded || map.getTime() <= updated) {
+    if (!loaded || data.getAnimationTime() <= updated) {
         return;
     }
 
-    int32_t zoom = std::floor(getZoom(map.getState()));
-    std::forward_list<TileID> required = coveringTiles(map.getState());
+    int32_t zoom = std::floor(getZoom(transformState));
+    std::forward_list<TileID> required = coveringTiles(transformState);
 
     // Determine the overzooming/underzooming amounts.
     int32_t minCoveringZoom = util::clamp<int32_t>(zoom - 10, info.min_zoom, info.max_zoom);
@@ -379,7 +393,7 @@ void Source::update(Map &map,
 
     // Add existing child/parent tiles if the actual tile is not yet loaded
     for (const auto& id : required) {
-        const TileData::State state = addTile(map, worker, style, glyphAtlas, glyphStore,
+        const TileData::State state = addTile(data, transformState, style, glyphAtlas, glyphStore,
                                               spriteAtlas, sprite, texturePool, id, callback);
 
         if (state != TileData::State::parsed) {
@@ -399,9 +413,9 @@ void Source::update(Map &map,
     }
 
     if (info.type != SourceType::Raster && cache.getSize() == 0) {
-        size_t conservativeCacheSize = ((float)map.getState().getWidth()  / util::tileSize) *
-                                       ((float)map.getState().getHeight() / util::tileSize) *
-                                       (map.getMaxZoom() - map.getMinZoom() + 1) *
+        size_t conservativeCacheSize = ((float)transformState.getWidth()  / util::tileSize) *
+                                       ((float)transformState.getHeight() / util::tileSize) *
+                                       (data.transform.getMaxZoom() - data.transform.getMinZoom() + 1) *
                                        0.5;
         cache.setSize(conservativeCacheSize);
     }
@@ -441,7 +455,7 @@ void Source::update(Map &map,
         }
     });
 
-    updated = map.getTime();
+    updated = data.getAnimationTime();
 }
 
 void Source::invalidateTiles(const std::vector<TileID>& ids) {

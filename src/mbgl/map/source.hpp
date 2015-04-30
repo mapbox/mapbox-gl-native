@@ -20,9 +20,8 @@
 
 namespace mbgl {
 
-class Map;
+class MapData;
 class Environment;
-class Worker;
 class GlyphAtlas;
 class GlyphStore;
 class SpriteAtlas;
@@ -60,9 +59,18 @@ public:
     void load(const std::string& accessToken,
               Environment&,
               std::function<void()> callback);
+    bool isLoaded() const;
 
-    void update(Map &, Worker &, util::ptr<Style>, GlyphAtlas &, GlyphStore &,
-                SpriteAtlas &, util::ptr<Sprite>, TexturePool &, std::function<void()> callback);
+    void load(MapData&, Environment&, std::function<void()> callback);
+    void update(MapData&,
+                const TransformState&,
+                Style&,
+                GlyphAtlas&,
+                GlyphStore&,
+                SpriteAtlas&,
+                util::ptr<Sprite>,
+                TexturePool&,
+                std::function<void()> callback);
 
     void invalidateTiles(const std::vector<TileID>&);
 
@@ -85,9 +93,16 @@ private:
     int32_t coveringZoomLevel(const TransformState&) const;
     std::forward_list<TileID> coveringTiles(const TransformState&) const;
 
-    TileData::State addTile(Map &, Worker &, util::ptr<Style>, GlyphAtlas &,
-                            GlyphStore &, SpriteAtlas &, util::ptr<Sprite>, TexturePool &,
-                            const TileID &, std::function<void()> callback);
+    TileData::State addTile(MapData&,
+                            const TransformState&,
+                            Style&,
+                            GlyphAtlas&,
+                            GlyphStore&,
+                            SpriteAtlas&,
+                            util::ptr<Sprite>,
+                            TexturePool&,
+                            const TileID&,
+                            std::function<void()> callback);
 
     TileData::State hasTile(const TileID& id);
 

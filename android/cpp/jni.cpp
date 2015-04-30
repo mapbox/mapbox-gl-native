@@ -1,5 +1,6 @@
 #include <cstdint>
 #include <cinttypes>
+#include <cassert>
 
 #include <string>
 #include <locale>
@@ -255,20 +256,6 @@ void JNICALL nativeDestroySurface(JNIEnv *env, jobject obj, jlong nativeMapViewP
     nativeMapView->destroySurface();
 }
 
-void JNICALL nativeStart(JNIEnv *env, jobject obj, jlong nativeMapViewPtr) {
-    mbgl::Log::Debug(mbgl::Event::JNI, "nativeStart");
-    assert(nativeMapViewPtr != 0);
-    NativeMapView *nativeMapView = reinterpret_cast<NativeMapView *>(nativeMapViewPtr);
-    nativeMapView->start();
-}
-
-void JNICALL nativeStop(JNIEnv *env, jobject obj, jlong nativeMapViewPtr) {
-    mbgl::Log::Debug(mbgl::Event::JNI, "nativeStop");
-    assert(nativeMapViewPtr != 0);
-    NativeMapView *nativeMapView = reinterpret_cast<NativeMapView *>(nativeMapViewPtr);
-    nativeMapView->stop();
-}
-
 void JNICALL nativePause(JNIEnv *env, jobject obj, jlong nativeMapViewPtr) {
     mbgl::Log::Debug(mbgl::Event::JNI, "nativePause");
     assert(nativeMapViewPtr != 0);
@@ -287,14 +274,7 @@ void JNICALL nativeUpdate(JNIEnv *env, jobject obj, jlong nativeMapViewPtr) {
     mbgl::Log::Debug(mbgl::Event::JNI, "nativeUpdate");
     assert(nativeMapViewPtr != 0);
     NativeMapView *nativeMapView = reinterpret_cast<NativeMapView *>(nativeMapViewPtr);
-    nativeMapView->getMap().triggerUpdate();
-}
-
-void JNICALL nativeTerminate(JNIEnv *env, jobject obj, jlong nativeMapViewPtr) {
-    mbgl::Log::Debug(mbgl::Event::JNI, "nativeTerminate");
-    assert(nativeMapViewPtr != 0);
-    NativeMapView *nativeMapView = reinterpret_cast<NativeMapView *>(nativeMapViewPtr);
-    nativeMapView->getMap().terminate();
+    nativeMapView->getMap().update();
 }
 
 void JNICALL nativeResize(JNIEnv *env, jobject obj, jlong nativeMapViewPtr, jint width, jint height,
@@ -310,7 +290,7 @@ void JNICALL nativeResize(JNIEnv *env, jobject obj, jlong nativeMapViewPtr, jint
     assert(fbWidth <= UINT16_MAX);
     assert(fbHeight <= UINT16_MAX);
     NativeMapView *nativeMapView = reinterpret_cast<NativeMapView *>(nativeMapViewPtr);
-    nativeMapView->resize(width, height, ratio, fbWidth, fbHeight);
+    nativeMapView->getMap().resize(width, height, ratio);
 }
 
 void JNICALL nativeRemoveClass(JNIEnv *env, jobject obj, jlong nativeMapViewPtr, jstring clazz) {
@@ -938,12 +918,9 @@ extern "C" JNIEXPORT jint JNICALL JNI_OnLoad(JavaVM *vm, void *reserved) {
         {"nativeCreateSurface", "(JLandroid/view/Surface;)V",
          reinterpret_cast<void *>(&nativeCreateSurface)},
         {"nativeDestroySurface", "(J)V", reinterpret_cast<void *>(&nativeDestroySurface)},
-        {"nativeStart", "(J)V", reinterpret_cast<void *>(&nativeStart)},
-        {"nativeStop", "(J)V", reinterpret_cast<void *>(&nativeStop)},
         {"nativePause", "(J)V", reinterpret_cast<void *>(&nativePause)},
         {"nativeResume", "(J)V", reinterpret_cast<void *>(&nativeResume)},
         {"nativeUpdate", "(J)V", reinterpret_cast<void *>(&nativeUpdate)},
-        {"nativeTerminate", "(J)V", reinterpret_cast<void *>(&nativeTerminate)},
         {"nativeResize", "(JIIFII)V",
          reinterpret_cast<void *>(static_cast<void JNICALL (
              *)(JNIEnv *, jobject, jlong, jint, jint, jfloat, jint, jint)>(&nativeResize))},

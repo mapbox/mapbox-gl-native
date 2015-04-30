@@ -41,7 +41,9 @@ namespace mbgl {
 
 HeadlessView::HeadlessView(uint16_t width, uint16_t height, float pixelRatio)
     : display(std::make_shared<HeadlessDisplay>()) {
+    activate();
     resize(width, height, pixelRatio);
+    deactivate();
 }
 
 HeadlessView::HeadlessView(std::shared_ptr<HeadlessDisplay> display_,
@@ -49,7 +51,9 @@ HeadlessView::HeadlessView(std::shared_ptr<HeadlessDisplay> display_,
                            uint16_t height,
                            float pixelRatio)
     : display(display_) {
+    activate();
     resize(width, height, pixelRatio);
+    deactivate();
 }
 
 void HeadlessView::loadExtensions() {
@@ -150,30 +154,17 @@ bool HeadlessView::isActive() {
     return std::this_thread::get_id() == thread;
 }
 
-void HeadlessView::resize(const uint16_t width, const uint16_t height, const float pixelRatio) {
-    std::lock_guard<std::mutex> lock(prospectiveMutex);
-    prospective = { width, height, pixelRatio };
-}
-
 HeadlessView::Dimensions::Dimensions(uint16_t width_, uint16_t height_, float pixelRatio_)
     : width(width_), height(height_), pixelRatio(pixelRatio_) {
 }
 
-void HeadlessView::discard() {
-    assert(isActive());
-
-    { // Obtain the new values.
-        std::lock_guard<std::mutex> lock(prospectiveMutex);
-        if (current.pixelWidth() == prospective.pixelWidth() && current.pixelHeight() == prospective.pixelHeight()) {
-            return;
-        }
-        current = prospective;
-    }
+void HeadlessView::resize(const uint16_t width, const uint16_t height, const float pixelRatio) {
+    dimensions = { width, height, pixelRatio };
 
     clearBuffers();
 
-    const unsigned int w = current.width * current.pixelRatio;
-    const unsigned int h = current.height * current.pixelRatio;
+    const unsigned int w = dimensions.width * dimensions.pixelRatio;
+    const unsigned int h = dimensions.height * dimensions.pixelRatio;
 
     // Create depth/stencil buffer
     MBGL_CHECK_ERROR(glGenRenderbuffersEXT(1, &fboDepthStencil));
@@ -208,15 +199,13 @@ void HeadlessView::discard() {
         }
         throw std::runtime_error(error.str());
     }
-
-    View::resize(current.width, current.height, current.pixelRatio, w, h);
 }
 
 std::unique_ptr<StillImage> HeadlessView::readStillImage() {
     assert(isActive());
 
-    const unsigned int w = current.pixelWidth();
-    const unsigned int h = current.pixelHeight();
+    const unsigned int w = dimensions.pixelWidth();
+    const unsigned int h = dimensions.pixelHeight();
 
     auto image = util::make_unique<StillImage>();
     image->width = w;
@@ -305,7 +294,6 @@ void HeadlessView::activate() {
 #endif
 
     loadExtensions();
-    discard();
 }
 
 void HeadlessView::deactivate() {
@@ -328,9 +316,8 @@ void HeadlessView::deactivate() {
 #endif
 }
 
-void HeadlessView::invalidate() {
-    assert(map);
-    map->render();
+void HeadlessView::invalidate(std::function<void()> render) {
+    render();
 }
 
 }

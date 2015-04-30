@@ -1,6 +1,7 @@
 #include <mbgl/map/environment.hpp>
 #include <mbgl/storage/file_source.hpp>
 #include <mbgl/platform/gl.hpp>
+#include <mbgl/util/run_loop.hpp>
 
 #include <uv.h>
 
@@ -88,7 +89,7 @@ EnvironmentScope::~EnvironmentScope() {
 }
 
 Environment::Environment(FileSource& fs)
-    : id(makeEnvironmentID()), fileSource(fs), loop(uv_loop_new()) {
+    : id(makeEnvironmentID()), fileSource(fs) {
 }
 
 Environment::~Environment() {
@@ -128,7 +129,7 @@ void Environment::requestAsync(const Resource& resource,
 Request* Environment::request(const Resource& resource,
                               std::function<void(const Response&)> callback) {
     assert(currentlyOn(ThreadType::Map));
-    return fileSource.request(resource, loop, std::move(callback));
+    return fileSource.request(resource, util::RunLoop::current.get()->get(), std::move(callback));
 }
 
 void Environment::cancelRequest(Request* req) {

@@ -104,6 +104,10 @@ public:
         uv_unref(reinterpret_cast<uv_handle_t*>(a.get()));
     }
 
+    inline uv_async_t* get() {
+        return a.get();
+    }
+
 private:
 #if UV_VERSION_MAJOR == 0 && UV_VERSION_MINOR <= 10
     static void async_cb(uv_async_t* a, int) {

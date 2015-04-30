@@ -51,7 +51,21 @@ public:
         });
     }
 
+    // Invoke fn() in the runloop thread, then invoke callback() in the current thread.
+    template <class Fn>
+    void invokeWithResult(Fn&& fn, std::function<void ()> callback) {
+        RunLoop* outer = current.get();
+        assert(outer);
+
+        invoke([fn, callback, outer] {
+            fn();
+            outer->invoke(std::move(callback));
+        });
+    }
+
     uv_loop_t* get() { return *loop; }
+
+    static uv::tls<RunLoop> current;
 
 private:
     // A movable type-erasing invokable entity wrapper. This allows to store arbitrary invokable
@@ -70,8 +84,6 @@ private:
     };
 
     using Queue = std::queue<std::unique_ptr<Message>>;
-
-    static uv::tls<RunLoop> current;
 
     void withMutex(std::function<void()>&&);
     void process();

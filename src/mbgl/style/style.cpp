@@ -17,7 +17,8 @@
 namespace mbgl {
 
 Style::Style()
-    : mtx(util::make_unique<uv::rwlock>()) {
+    : mtx(util::make_unique<uv::rwlock>()),
+      workers(4) {
 }
 
 // Note: This constructor is seemingly empty, but we need to declare it anyway
@@ -84,6 +85,26 @@ void Style::loadJSON(const uint8_t *const data) {
     layers = parser.getLayers();
     sprite_url = parser.getSprite();
     glyph_url = parser.getGlyphURL();
+}
+
+bool Style::isLoaded() const {
+    // TODO: move loading into Style
+//    if (!loaded) {
+//        return false;
+//    }
+
+    for (const auto& source : sources) {
+        if (!source->isLoaded()) {
+            return false;
+        }
+    }
+
+    // TODO: move sprite into Style
+//    if (sprite && !sprite.isLoaded()) {
+//        return false;
+//    }
+
+    return true;
 }
 
 }
