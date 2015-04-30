@@ -28,13 +28,6 @@ UV_EXTERN void uv_key_set(uv_key_t* key, void* value);
 
 namespace uv {
 
-template <class T>
-void close(std::unique_ptr<T> ptr) {
-    uv_close(reinterpret_cast<uv_handle_t*>(ptr.release()), [](uv_handle_t* handle) {
-        delete reinterpret_cast<T*>(handle);
-    });
-}
-
 class loop : public mbgl::util::noncopyable {
 public:
     inline loop() {
@@ -74,38 +67,48 @@ private:
     uv_loop_t *l = nullptr;
 };
 
-class async : public mbgl::util::noncopyable {
+template <class T>
+class handle : public mbgl::util::noncopyable {
+public:
+    inline handle() : t(reinterpret_cast<uv_handle_t*>(new T)) {
+        t->data = this;
+    }
+
+    inline ~handle() {
+        uv_close(t.release(), [](uv_handle_t* handle) {
+            delete reinterpret_cast<T*>(handle);
+        });
+    }
+
+    inline void ref() {
+        uv_ref(t.get());
+    }
+
+    inline void unref() {
+        uv_unref(t.get());
+    }
+
+    inline T* get() {
+        return reinterpret_cast<T*>(t.get());
+    }
+
+private:
+    std::unique_ptr<uv_handle_t> t;
+};
+
+class async : public handle<uv_async_t> {
 public:
     inline async(uv_loop_t* loop, std::function<void ()> fn_)
-        : a(new uv_async_t)
-        , fn(fn_)
-    {
-        a->data = this;
-        if (uv_async_init(loop, a.get(), async_cb) != 0) {
+        : fn(fn_) {
+        if (uv_async_init(loop, get(), async_cb) != 0) {
             throw std::runtime_error("failed to initialize async");
         }
     }
 
-    inline ~async() {
-        close(std::move(a));
-    }
-
     inline void send() {
-        if (uv_async_send(a.get()) != 0) {
+        if (uv_async_send(get()) != 0) {
             throw std::runtime_error("failed to async send");
         }
-    }
-
-    inline void ref() {
-        uv_ref(reinterpret_cast<uv_handle_t*>(a.get()));
-    }
-
-    inline void unref() {
-        uv_unref(reinterpret_cast<uv_handle_t*>(a.get()));
-    }
-
-    inline uv_async_t* get() {
-        return a.get();
     }
 
 private:
@@ -117,7 +120,40 @@ private:
         reinterpret_cast<async*>(a->data)->fn();
     }
 
-    std::unique_ptr<uv_async_t> a;
+    std::function<void ()> fn;
+};
+
+class timer : public handle<uv_timer_t> {
+public:
+    inline timer(uv_loop_t* loop) {
+        if (uv_timer_init(loop, get()) != 0) {
+            throw std::runtime_error("failed to initialize timer");
+        }
+    }
+
+    inline void start(uint64_t timeout, uint64_t repeat, std::function<void ()> fn_) {
+        fn = fn_;
+        if (uv_timer_start(get(), timer_cb, timeout, repeat) != 0) {
+            throw std::runtime_error("failed to start timer");
+        }
+    }
+
+    inline void stop() {
+        fn = nullptr;
+        if (uv_timer_stop(get()) != 0) {
+            throw std::runtime_error("failed to stop timer");
+        }
+    }
+
+private:
+#if UV_VERSION_MAJOR == 0 && UV_VERSION_MINOR <= 10
+    static void timer_cb(uv_timer_t* t, int) {
+#else
+    static void timer_cb(uv_timer_t* t) {
+#endif
+        reinterpret_cast<timer*>(t->data)->fn();
+    }
+
     std::function<void ()> fn;
 };
 

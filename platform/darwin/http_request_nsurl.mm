@@ -58,13 +58,10 @@ public:
     void retry() override;
 
 private:
-    void cancelTimer();
     void start();
     void handleResult(NSData *data, NSURLResponse *res, NSError *error);
     void handleResponse();
     void retry(uint64_t timeout);
-
-    static void restart(uv_timer_t *timer, int);
 
     HTTPNSURLContext *context = nullptr;
     bool cancelled = false;
@@ -72,9 +69,9 @@ private:
     std::unique_ptr<Response> response;
     const std::shared_ptr<const Response> existingResponse;
     ResponseStatus status = ResponseStatus::PermanentError;
-    uv_async_t *async = nullptr;
+    uv::async async;
+    uv::timer timer;
     int attempts = 0;
-    uv_timer_t *timer = nullptr;
     enum : bool { PreemptImmediately, ExponentialBackoff } strategy = PreemptImmediately;
 
     static const int maxAttempts = 4;
@@ -134,26 +131,17 @@ HTTPRequest::HTTPRequest(HTTPNSURLContext* context_, const Resource& resource_, 
     : RequestBase(resource_, callback_),
       context(context_),
       existingResponse(existingResponse_),
-      async(new uv_async_t) {
+      async(loop, [this] { handleResponse(); }),
+      timer(loop) {
     context->addRequest(this);
-
-    async->data = this;
-    uv_async_init(loop, async, [](uv_async_t *as, int) {
-        auto impl = reinterpret_cast<HTTPRequest *>(as->data);
-        impl->handleResponse();
-    });
-
     start();
 }
 
 HTTPRequest::~HTTPRequest() {
     assert(!task);
-    assert(async);
 
     // Stop the backoff timer to avoid re-triggering this request.
-    cancelTimer();
-
-    uv::close(async);
+    timer.stop();
 
     context->removeRequest(this);
 }
@@ -230,7 +218,7 @@ void HTTPRequest::cancel() {
     cancelled = true;
 
     // Stop the backoff timer to avoid re-triggering this request.
-    cancelTimer();
+    timer.stop();
 
     if (task) {
         [task cancel];
@@ -238,14 +226,6 @@ void HTTPRequest::cancel() {
         task = nullptr;
     } else {
         delete this;
-    }
-}
-
-void HTTPRequest::cancelTimer() {
-    if (timer) {
-        uv_timer_stop(timer);
-        uv::close(timer);
-        timer = nullptr;
     }
 }
 
@@ -364,38 +344,24 @@ void HTTPRequest::handleResult(NSData *data, NSURLResponse *res, NSError *error)
         response->message = "response class is not NSHTTPURLResponse";
     }
 
-    uv_async_send(async);
+    async.send();
 }
 
 void HTTPRequest::retry(uint64_t timeout) {
     response.reset();
 
-    assert(!timer);
-    timer = new uv_timer_t;
-    timer->data = this;
-    uv_timer_init(async->loop, timer);
-    uv_timer_start(timer, restart, timeout, 0);
+    timer.stop();
+    timer.start(timeout, 0, [this] { start(); });
 }
 
 void HTTPRequest::retry() {
     // All batons get notified when the network status changed, but some of them
     // might not actually wait for the network to become available again.
-    if (timer && strategy == PreemptImmediately) {
+    if (strategy == PreemptImmediately) {
         // Triggers the timer upon the next event loop iteration.
-        uv_timer_stop(timer);
-        uv_timer_start(timer, restart, 0, 0);
+        timer.stop();
+        timer.start(0, 0, [this] { start(); });
     }
-}
-
-void HTTPRequest::restart(uv_timer_t *timer, int) {
-    // Restart the request.
-    auto impl = reinterpret_cast<HTTPRequest *>(timer->data);
-
-    // Get rid of the timer.
-    impl->timer = nullptr;
-    uv::close(timer);
-
-    impl->start();
 }
 
 std::unique_ptr<HTTPContext> HTTPContext::createContext(uv_loop_t* loop) {

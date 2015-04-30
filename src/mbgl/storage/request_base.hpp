@@ -3,13 +3,13 @@
 
 #include <mbgl/util/noncopyable.hpp>
 #include <mbgl/storage/file_cache.hpp>
+#include <mbgl/storage/resource.hpp>
 
 #include <memory>
 #include <functional>
 
 namespace mbgl {
 
-struct Resource;
 class Response;
 
 class RequestBase : private util::noncopyable {
@@ -26,7 +26,7 @@ public:
     virtual void retry() {};
 
 protected:
-    const Resource& resource;
+    Resource resource;
     Callback notify;
 };
 
