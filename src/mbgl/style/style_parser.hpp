@@ -103,6 +103,8 @@ private:
 private:
     std::unordered_map<std::string, const rapidjson::Value *> constants;
 
+    std::uint8_t version;
+
     std::vector<std::unique_ptr<Source>> sources;
     std::vector<util::ptr<StyleLayer>> layers;
 
