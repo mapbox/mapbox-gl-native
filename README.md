@@ -86,6 +86,7 @@ Install GCC 4.8+ if you are running Ubuntu 13.10 or older. Alternatively, you ca
     sudo add-apt-repository --yes ppa:ubuntu-toolchain-r/test
     sudo apt-get update
     sudo apt-get install gcc-4.8 g++-4.8
+    export CXX=g++-4.8
 
 Ensure you have git and other build essentials:
 
@@ -109,10 +110,6 @@ Finally, install Boost. If you're running Ubuntu 12.04 or older, you need to ins
 Otherwise, you can just install
 
     sudo apt-get install libboost-dev libboost-program-options-dev
-
-Once you're done installing the build dependencies, you can get started by running
-
-    ./configure
 
 Then, you can then proceed to build the library:
 
