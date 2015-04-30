@@ -111,10 +111,6 @@ Otherwise, you can just install
 
     sudo apt-get install libboost-dev libboost-program-options-dev
 
-Once you're done installing the build dependencies, you can get started by running
-
-    ./configure
-
 Then, you can then proceed to build the library:
 
 	git submodule update --init
