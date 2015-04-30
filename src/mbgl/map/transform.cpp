@@ -238,6 +238,9 @@ void Transform::_setScaleXY(const double new_scale, const double xn, const doubl
         current.scale = final.scale;
         current.x = final.x;
         current.y = final.y;
+        const double s = current.scale * util::tileSize;
+        current.Bc = s / 360;
+        current.Cc = s / util::M2PI;
     } else {
         const double startS = current.scale;
         const double startX = current.x;
@@ -250,6 +253,9 @@ void Transform::_setScaleXY(const double new_scale, const double xn, const doubl
                 current.scale = util::interpolate(startS, final.scale, t);
                 current.x = util::interpolate(startX, final.x, t);
                 current.y = util::interpolate(startY, final.y, t);
+                const double s = current.scale * util::tileSize;
+                current.Bc = s / 360;
+                current.Cc = s / util::M2PI;
                 return Update::Zoom;
             },
             [=] {
@@ -257,10 +263,6 @@ void Transform::_setScaleXY(const double new_scale, const double xn, const doubl
                 current.scaling = false;
             }, duration);
     }
-
-    const double s = final.scale * util::tileSize;
-    current.Bc = s / 360;
-    current.Cc = s / util::M2PI;
 
     view.notifyMapChange(duration != Duration::zero() ?
                            MapChangeRegionDidChangeAnimated :
