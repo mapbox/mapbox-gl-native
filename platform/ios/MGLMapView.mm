@@ -31,6 +31,8 @@
 
 #import <algorithm>
 
+class MBGLView;
+
 // Returns the path to the default cache database on this system.
 const std::string &defaultCacheDatabase() {
     static const std::string path = []() -> std::string {
@@ -97,6 +99,11 @@ static NSURL *MGLURLForBundledStyleNamed(NSString *styleName)
 
 @implementation MGLMapView
 {
+    mbgl::Map *_mbglMap;
+    MBGLView *_mbglView;
+    mbgl::SQLiteCache *_mbglFileCache;
+    mbgl::DefaultFileSource *_mbglFileSource;
+
     BOOL _isTargetingInterfaceBuilder;
     CLLocationDegrees _pendingLatitude;
     CLLocationDegrees _pendingLongitude;
@@ -106,17 +113,10 @@ static NSURL *MGLURLForBundledStyleNamed(NSString *styleName)
 
 @dynamic debugActive;
 
-class MBGLView;
-
 std::chrono::steady_clock::duration secondsAsDuration(float duration)
 {
     return std::chrono::duration_cast<std::chrono::steady_clock::duration>(std::chrono::duration<float, std::chrono::seconds::period>(duration));
 }
-
-mbgl::Map *mbglMap = nullptr;
-MBGLView *mbglView = nullptr;
-mbgl::SQLiteCache *mbglFileCache = nullptr;
-mbgl::DefaultFileSource *mbglFileSource = nullptr;
 
 - (instancetype)initWithFrame:(CGRect)frame
 {
@@ -164,12 +164,12 @@ mbgl::DefaultFileSource *mbglFileSource = nullptr;
 
 - (NSString *)accessToken
 {
-    return @(mbglMap->getAccessToken().c_str()).mgl_stringOrNilIfEmpty;
+    return @(_mbglMap->getAccessToken().c_str()).mgl_stringOrNilIfEmpty;
 }
 
 - (void)setAccessToken:(NSString *)accessToken
 {
-    mbglMap->setAccessToken(accessToken ? (std::string)[accessToken UTF8String] : "");
+    _mbglMap->setAccessToken(accessToken ? (std::string)[accessToken UTF8String] : "");
     [MGLMapboxEvents setToken:accessToken.mgl_stringOrNilIfEmpty];
 }
 
@@ -180,7 +180,7 @@ mbgl::DefaultFileSource *mbglFileSource = nullptr;
 
 - (NSURL *)styleURL
 {
-    NSString *styleURLString = @(mbglMap->getStyleURL().c_str()).mgl_stringOrNilIfEmpty;
+    NSString *styleURLString = @(_mbglMap->getStyleURL().c_str()).mgl_stringOrNilIfEmpty;
     return styleURLString ? [NSURL URLWithString:styleURLString] : nil;
 }
 
@@ -201,7 +201,7 @@ mbgl::DefaultFileSource *mbglFileSource = nullptr;
         styleURL = [[NSBundle mainBundle] URLForResource:styleURL.path withExtension:nil];
     }
     
-    mbglMap->setStyleURL([[styleURL absoluteString] UTF8String]);
+    _mbglMap->setStyleURL([[styleURL absoluteString] UTF8String]);
 }
 
 - (BOOL)commonInit
@@ -276,13 +276,13 @@ mbgl::DefaultFileSource *mbglFileSource = nullptr;
 
     // setup mbgl map
     //
-    mbglView = new MBGLView(self);
-    mbglFileCache  = new mbgl::SQLiteCache(defaultCacheDatabase());
-    mbglFileSource = new mbgl::DefaultFileSource(mbglFileCache);
+    _mbglView = new MBGLView(self);
+    _mbglFileCache  = new mbgl::SQLiteCache(defaultCacheDatabase());
+    _mbglFileSource = new mbgl::DefaultFileSource(_mbglFileCache);
 
     // Start paused on the IB canvas
-    mbglMap = new mbgl::Map(*mbglView, *mbglFileSource, mbgl::MapMode::Continuous, _isTargetingInterfaceBuilder);
-    mbglMap->resize(self.bounds.size.width, self.bounds.size.height, _glView.contentScaleFactor);
+    _mbglMap = new mbgl::Map(*_mbglView, *_mbglFileSource, mbgl::MapMode::Continuous, _isTargetingInterfaceBuilder);
+    _mbglMap->resize(self.bounds.size.width, self.bounds.size.height, _glView.contentScaleFactor);
 
     // Notify map object when network reachability status changes.
     [[NSNotificationCenter defaultCenter] addObserver:self
@@ -297,7 +297,7 @@ mbgl::DefaultFileSource *mbglFileSource = nullptr;
     //
     _annotationIDsByAnnotation = [NSMapTable mapTableWithKeyOptions:NSMapTableStrongMemory valueOptions:NSMapTableStrongMemory];
     std::string defaultSymbolName([MGLDefaultStyleMarkerSymbolName UTF8String]);
-    mbglMap->setDefaultPointAnnotationSymbol(defaultSymbolName);
+    _mbglMap->setDefaultPointAnnotationSymbol(defaultSymbolName);
 
     // setup logo bug
     //
@@ -375,7 +375,7 @@ mbgl::DefaultFileSource *mbglFileSource = nullptr;
 
     // set initial position
     //
-    mbglMap->setLatLngZoom(mbgl::LatLng(0, 0), mbglMap->getMinZoom());
+    _mbglMap->setLatLngZoom(mbgl::LatLng(0, 0), _mbglMap->getMinZoom());
     _pendingLatitude = NAN;
     _pendingLongitude = NAN;
 
@@ -385,8 +385,8 @@ mbgl::DefaultFileSource *mbglFileSource = nullptr;
     _regionChangeDelegateQueue.maxConcurrentOperationCount = 1;
 
     // metrics: map load event
-    const mbgl::LatLng latLng = mbglMap->getLatLng();
-    const double zoom = mbglMap->getZoom();
+    const mbgl::LatLng latLng = _mbglMap->getLatLng();
+    const double zoom = _mbglMap->getZoom();
 
     [MGLMapboxEvents pushEvent:MGLEventTypeMapLoad withAttributes:@{
         MGLEventKeyLatitude: @(latLng.latitude),
@@ -412,22 +412,22 @@ mbgl::DefaultFileSource *mbglFileSource = nullptr;
 
     [[NSNotificationCenter defaultCenter] removeObserver:self];
 
-    if (mbglMap)
+    if (_mbglMap)
     {
-        delete mbglMap;
-        mbglMap = nullptr;
+        delete _mbglMap;
+        _mbglMap = nullptr;
     }
 
-    if (mbglFileSource)
+    if (_mbglFileSource)
     {
-        delete mbglFileSource;
-        mbglFileSource = nullptr;
+        delete _mbglFileSource;
+        _mbglFileSource = nullptr;
     }
 
-    if (mbglView)
+    if (_mbglView)
     {
-        delete mbglView;
-        mbglView = nullptr;
+        delete _mbglView;
+        _mbglView = nullptr;
     }
 
     if ([[EAGLContext currentContext] isEqual:_context])
@@ -621,19 +621,19 @@ mbgl::DefaultFileSource *mbglFileSource = nullptr;
 {
     if ( ! self.glSnapshotView || self.glSnapshotView.hidden)
     {
-        mbglMap->resize(rect.size.width, rect.size.height, view.contentScaleFactor);
+        _mbglMap->resize(rect.size.width, rect.size.height, view.contentScaleFactor);
 
-        CGFloat zoomFactor   = mbglMap->getMaxZoom() - mbglMap->getMinZoom() + 1;
+        CGFloat zoomFactor   = _mbglMap->getMaxZoom() - _mbglMap->getMinZoom() + 1;
         CGFloat cpuFactor    = (CGFloat)[[NSProcessInfo processInfo] processorCount];
         CGFloat memoryFactor = (CGFloat)[[NSProcessInfo processInfo] physicalMemory] / 1000 / 1000 / 1000;
-        CGFloat sizeFactor   = ((CGFloat)mbglMap->getWidth()  / mbgl::util::tileSize) *
-                               ((CGFloat)mbglMap->getHeight() / mbgl::util::tileSize);
+        CGFloat sizeFactor   = ((CGFloat)_mbglMap->getWidth()  / mbgl::util::tileSize) *
+                               ((CGFloat)_mbglMap->getHeight() / mbgl::util::tileSize);
 
         NSUInteger cacheSize = zoomFactor * cpuFactor * memoryFactor * sizeFactor * 0.5;
 
-        mbglMap->setSourceTileCacheSize(cacheSize);
+        _mbglMap->setSourceTileCacheSize(cacheSize);
 
-        mbglMap->renderSync();
+        _mbglMap->renderSync();
     }
 }
 
@@ -644,7 +644,7 @@ mbgl::DefaultFileSource *mbglFileSource = nullptr;
     
     if ( ! _isTargetingInterfaceBuilder)
     {
-        mbglMap->update();
+        _mbglMap->update();
     }
 }
 
@@ -667,7 +667,7 @@ mbgl::DefaultFileSource *mbglFileSource = nullptr;
     self.glSnapshotView.image = self.glView.snapshot;
     self.glSnapshotView.hidden = NO;
 
-    mbglMap->pause();
+    _mbglMap->pause();
 
     [self.glView deleteDrawable];
 }
@@ -678,7 +678,7 @@ mbgl::DefaultFileSource *mbglFileSource = nullptr;
 
     [self.glView bindDrawable];
 
-    mbglMap->resume();
+    _mbglMap->resume();
 }
 
 - (void)tintColorDidChange
@@ -708,8 +708,8 @@ mbgl::DefaultFileSource *mbglFileSource = nullptr;
 {
     (void)touches;
     (void)event;
-    mbglMap->cancelTransitions();
-    mbglMap->setGestureInProgress(false);
+    _mbglMap->cancelTransitions();
+    _mbglMap->setGestureInProgress(false);
     self.animatingGesture = NO;
 }
 
@@ -717,13 +717,13 @@ mbgl::DefaultFileSource *mbglFileSource = nullptr;
 {
     if ( ! self.isScrollEnabled) return;
 
-    mbglMap->cancelTransitions();
+    _mbglMap->cancelTransitions();
 
     if (pan.state == UIGestureRecognizerStateBegan)
     {
         [self trackGestureEvent:MGLEventGesturePanStart forRecognizer:pan];
 
-        mbglMap->setGestureInProgress(true);
+        _mbglMap->setGestureInProgress(true);
 
         self.centerPoint = CGPointMake(0, 0);
 
@@ -734,7 +734,7 @@ mbgl::DefaultFileSource *mbglFileSource = nullptr;
         CGPoint delta = CGPointMake([pan translationInView:pan.view].x - self.centerPoint.x,
                                     [pan translationInView:pan.view].y - self.centerPoint.y);
 
-        mbglMap->moveBy(delta.x, delta.y);
+        _mbglMap->moveBy(delta.x, delta.y);
 
         self.centerPoint = CGPointMake(self.centerPoint.x + delta.x, self.centerPoint.y + delta.y);
         
@@ -759,9 +759,9 @@ mbgl::DefaultFileSource *mbglFileSource = nullptr;
 
         CGPoint offset = CGPointMake(velocity.x * duration / 2, velocity.y * duration / 2);
 
-        mbglMap->moveBy(offset.x, offset.y, secondsAsDuration(duration));
+        _mbglMap->moveBy(offset.x, offset.y, secondsAsDuration(duration));
 
-        mbglMap->setGestureInProgress(false);
+        _mbglMap->setGestureInProgress(false);
 
         if (duration)
         {
@@ -798,17 +798,17 @@ mbgl::DefaultFileSource *mbglFileSource = nullptr;
 {
     if ( ! self.isZoomEnabled) return;
 
-    if (mbglMap->getZoom() <= mbglMap->getMinZoom() && pinch.scale < 1) return;
+    if (_mbglMap->getZoom() <= _mbglMap->getMinZoom() && pinch.scale < 1) return;
 
-    mbglMap->cancelTransitions();
+    _mbglMap->cancelTransitions();
 
     if (pinch.state == UIGestureRecognizerStateBegan)
     {
         [self trackGestureEvent:MGLEventGesturePinchStart forRecognizer:pinch];
 
-        mbglMap->setGestureInProgress(true);
+        _mbglMap->setGestureInProgress(true);
 
-        self.scale = mbglMap->getScale();
+        self.scale = _mbglMap->getScale();
 
         self.userTrackingMode = MGLUserTrackingModeNone;
     }
@@ -816,15 +816,15 @@ mbgl::DefaultFileSource *mbglFileSource = nullptr;
     {
         CGFloat newScale = self.scale * pinch.scale;
 
-        if (log2(newScale) < mbglMap->getMinZoom()) return;
+        if (log2(newScale) < _mbglMap->getMinZoom()) return;
 
-        double scale = mbglMap->getScale();
+        double scale = _mbglMap->getScale();
 
-        mbglMap->scaleBy(newScale / scale, [pinch locationInView:pinch.view].x, [pinch locationInView:pinch.view].y);
+        _mbglMap->scaleBy(newScale / scale, [pinch locationInView:pinch.view].x, [pinch locationInView:pinch.view].y);
     }
     else if (pinch.state == UIGestureRecognizerStateEnded || pinch.state == UIGestureRecognizerStateCancelled)
     {
-        mbglMap->setGestureInProgress(false);
+        _mbglMap->setGestureInProgress(false);
 
         [self unrotateIfNeededAnimated:YES];
 
@@ -836,15 +836,15 @@ mbgl::DefaultFileSource *mbglFileSource = nullptr;
 {
     if ( ! self.isRotateEnabled) return;
 
-    mbglMap->cancelTransitions();
+    _mbglMap->cancelTransitions();
 
     if (rotate.state == UIGestureRecognizerStateBegan)
     {
         [self trackGestureEvent:MGLEventGestureRotateStart forRecognizer:rotate];
 
-        mbglMap->setGestureInProgress(true);
+        _mbglMap->setGestureInProgress(true);
 
-        self.angle = [MGLMapView degreesToRadians:mbglMap->getBearing()] * -1;
+        self.angle = [MGLMapView degreesToRadians:_mbglMap->getBearing()] * -1;
 
         self.userTrackingMode = MGLUserTrackingModeNone;
     }
@@ -860,13 +860,13 @@ mbgl::DefaultFileSource *mbglFileSource = nullptr;
             newDegrees = fmaxf(newDegrees, -30);
         }
 
-        mbglMap->setBearing(newDegrees,
+        _mbglMap->setBearing(newDegrees,
                             [rotate locationInView:rotate.view].x,
                             [rotate locationInView:rotate.view].y);
     }
     else if (rotate.state == UIGestureRecognizerStateEnded || rotate.state == UIGestureRecognizerStateCancelled)
     {
-        mbglMap->setGestureInProgress(false);
+        _mbglMap->setGestureInProgress(false);
 
         [self unrotateIfNeededAnimated:YES];
 
@@ -921,7 +921,7 @@ mbgl::DefaultFileSource *mbglFileSource = nullptr;
         tapBounds.extend(coordinateToLatLng(coordinate));
 
         // query for nearby annotations
-        std::vector<uint32_t> nearbyAnnotations = mbglMap->getAnnotationsInBounds(tapBounds);
+        std::vector<uint32_t> nearbyAnnotations = _mbglMap->getAnnotationsInBounds(tapBounds);
 
         int32_t newSelectedAnnotationID = -1;
 
@@ -1004,7 +1004,7 @@ mbgl::DefaultFileSource *mbglFileSource = nullptr;
 {
     if ( ! self.isZoomEnabled) return;
 
-    mbglMap->cancelTransitions();
+    _mbglMap->cancelTransitions();
 
     if (doubleTap.state == UIGestureRecognizerStateBegan)
     {
@@ -1032,7 +1032,7 @@ mbgl::DefaultFileSource *mbglFileSource = nullptr;
             zoomInPoint = doubleTapPoint;
         }
 
-        mbglMap->scaleBy(2, zoomInPoint.x, zoomInPoint.y, secondsAsDuration(MGLAnimationDuration));
+        _mbglMap->scaleBy(2, zoomInPoint.x, zoomInPoint.y, secondsAsDuration(MGLAnimationDuration));
 
         self.animatingGesture = YES;
 
@@ -1053,9 +1053,9 @@ mbgl::DefaultFileSource *mbglFileSource = nullptr;
 {
     if ( ! self.isZoomEnabled) return;
 
-    if (mbglMap->getZoom() == mbglMap->getMinZoom()) return;
+    if (_mbglMap->getZoom() == _mbglMap->getMinZoom()) return;
 
-    mbglMap->cancelTransitions();
+    _mbglMap->cancelTransitions();
 
     if (twoFingerTap.state == UIGestureRecognizerStateBegan)
     {
@@ -1076,7 +1076,7 @@ mbgl::DefaultFileSource *mbglFileSource = nullptr;
             zoomOutPoint = CGPointMake([twoFingerTap locationInView:twoFingerTap.view].x, [twoFingerTap locationInView:twoFingerTap.view].y);
         }
 
-        mbglMap->scaleBy(0.5, zoomOutPoint.x, zoomOutPoint.y, secondsAsDuration(MGLAnimationDuration));
+        _mbglMap->scaleBy(0.5, zoomOutPoint.x, zoomOutPoint.y, secondsAsDuration(MGLAnimationDuration));
 
         self.animatingGesture = YES;
 
@@ -1097,13 +1097,13 @@ mbgl::DefaultFileSource *mbglFileSource = nullptr;
 {
     if ( ! self.isZoomEnabled) return;
 
-    mbglMap->cancelTransitions();
+    _mbglMap->cancelTransitions();
 
     if (quickZoom.state == UIGestureRecognizerStateBegan)
     {
         [self trackGestureEvent:MGLEventGestureQuickZoom forRecognizer:quickZoom];
 
-        self.scale = mbglMap->getScale();
+        self.scale = _mbglMap->getScale();
 
         self.quickZoomStart = [quickZoom locationInView:quickZoom.view].y;
 
@@ -1115,9 +1115,9 @@ mbgl::DefaultFileSource *mbglFileSource = nullptr;
 
         CGFloat newZoom = log2f(self.scale) + (distance / 100);
 
-        if (newZoom < mbglMap->getMinZoom()) return;
+        if (newZoom < _mbglMap->getMinZoom()) return;
 
-        mbglMap->scaleBy(powf(2, newZoom) / mbglMap->getScale(), self.bounds.size.width / 2, self.bounds.size.height / 2);
+        _mbglMap->scaleBy(powf(2, newZoom) / _mbglMap->getScale(), self.bounds.size.width / 2, self.bounds.size.height / 2);
     }
     else if (quickZoom.state == UIGestureRecognizerStateEnded || quickZoom.state == UIGestureRecognizerStateCancelled)
     {
@@ -1186,12 +1186,12 @@ mbgl::DefaultFileSource *mbglFileSource = nullptr;
 
 - (void)setDebugActive:(BOOL)debugActive
 {
-    mbglMap->setDebug(debugActive);
+    _mbglMap->setDebug(debugActive);
 }
 
 - (BOOL)isDebugActive
 {
-    return mbglMap->getDebug();
+    return _mbglMap->getDebug();
 }
 
 - (void)resetNorth
@@ -1205,7 +1205,7 @@ mbgl::DefaultFileSource *mbglFileSource = nullptr;
 
     CGFloat duration = (animated ? MGLAnimationDuration : 0);
 
-    mbglMap->setBearing(0, secondsAsDuration(duration));
+    _mbglMap->setBearing(0, secondsAsDuration(duration));
 
     [UIView animateWithDuration:duration
                      animations:^
@@ -1223,19 +1223,19 @@ mbgl::DefaultFileSource *mbglFileSource = nullptr;
 
 - (void)resetPosition
 {
-    mbglMap->resetPosition();
+    _mbglMap->resetPosition();
 
     [self notifyMapChange:@(mbgl::MapChangeRegionDidChange)];
 }
 
 - (void)toggleDebug
 {
-    mbglMap->toggleDebug();
+    _mbglMap->toggleDebug();
 }
 
 - (void)emptyMemoryCache
 {
-    mbglMap->onLowMemory();
+    _mbglMap->onLowMemory();
 }
 
 #pragma mark - Geography -
@@ -1256,9 +1256,9 @@ mbgl::DefaultFileSource *mbglFileSource = nullptr;
 {
     CGFloat duration = (animated ? MGLAnimationDuration : 0);
 
-    mbglMap->setLatLngZoom(coordinateToLatLng(coordinate),
-                           fmaxf(mbglMap->getZoom(), self.currentMinimumZoom),
-                           secondsAsDuration(duration));
+    _mbglMap->setLatLngZoom(coordinateToLatLng(coordinate),
+                            fmaxf(_mbglMap->getZoom(), self.currentMinimumZoom),
+                            secondsAsDuration(duration));
 
     [self notifyMapChange:@(animated ? mbgl::MapChangeRegionDidChangeAnimated : mbgl::MapChangeRegionDidChange)];
 }
@@ -1270,7 +1270,7 @@ mbgl::DefaultFileSource *mbglFileSource = nullptr;
 
 - (CLLocationCoordinate2D)centerCoordinate
 {
-    return latLngToCoordinate(mbglMap->getLatLng());
+    return latLngToCoordinate(_mbglMap->getLatLng());
 }
 
 - (void)setCenterCoordinate:(CLLocationCoordinate2D)centerCoordinate zoomLevel:(double)zoomLevel animated:(BOOL)animated
@@ -1279,7 +1279,7 @@ mbgl::DefaultFileSource *mbglFileSource = nullptr;
 
     CGFloat duration = (animated ? MGLAnimationDuration : 0);
 
-    mbglMap->setLatLngZoom(coordinateToLatLng(centerCoordinate), zoomLevel, secondsAsDuration(duration));
+    _mbglMap->setLatLngZoom(coordinateToLatLng(centerCoordinate), zoomLevel, secondsAsDuration(duration));
 
     [self unrotateIfNeededAnimated:animated];
 
@@ -1288,7 +1288,7 @@ mbgl::DefaultFileSource *mbglFileSource = nullptr;
 
 - (double)zoomLevel
 {
-    return mbglMap->getZoom();
+    return _mbglMap->getZoom();
 }
 
 - (void)setZoomLevel:(double)zoomLevel animated:(BOOL)animated
@@ -1297,7 +1297,7 @@ mbgl::DefaultFileSource *mbglFileSource = nullptr;
 
     CGFloat duration = (animated ? MGLAnimationDuration : 0);
 
-    mbglMap->setLatLngZoom(mbglMap->getLatLng(),
+    _mbglMap->setLatLngZoom(_mbglMap->getLatLng(),
                            fmaxf(zoomLevel, self.currentMinimumZoom),
                            secondsAsDuration(duration));
 
@@ -1317,11 +1317,11 @@ mbgl::DefaultFileSource *mbglFileSource = nullptr;
 
     CLLocationCoordinate2D center = CLLocationCoordinate2DMake((northEastCoordinate.latitude + southWestCoordinate.latitude) / 2, (northEastCoordinate.longitude + southWestCoordinate.longitude) / 2);
     
-    CGFloat scale = mbglMap->getScale();
-    CGFloat scaleX = mbglMap->getWidth() / (northEastCoordinate.longitude - southWestCoordinate.longitude);
-    CGFloat scaleY = mbglMap->getHeight() / (northEastCoordinate.latitude - southWestCoordinate.latitude);
-    CGFloat minZoom = mbglMap->getMinZoom();
-    CGFloat maxZoom = mbglMap->getMaxZoom();
+    CGFloat scale = _mbglMap->getScale();
+    CGFloat scaleX = _mbglMap->getWidth() / (northEastCoordinate.longitude - southWestCoordinate.longitude);
+    CGFloat scaleY = _mbglMap->getHeight() / (northEastCoordinate.latitude - southWestCoordinate.latitude);
+    CGFloat minZoom = _mbglMap->getMinZoom();
+    CGFloat maxZoom = _mbglMap->getMaxZoom();
     CGFloat zoomLevel = MAX(MIN(log(scale * MIN(scaleX, scaleY)) / log(2), maxZoom), minZoom);
     
     [self setCenterCoordinate:center zoomLevel:zoomLevel animated:animated];
@@ -1329,7 +1329,7 @@ mbgl::DefaultFileSource *mbglFileSource = nullptr;
 
 - (CLLocationDirection)direction
 {
-    double direction = mbglMap->getBearing() * -1;
+    double direction = _mbglMap->getBearing() * -1;
 
     while (direction > 360) direction -= 360;
     while (direction < 0) direction += 360;
@@ -1345,7 +1345,7 @@ mbgl::DefaultFileSource *mbglFileSource = nullptr;
 
     CGFloat duration = (animated ? MGLAnimationDuration : 0);
 
-    mbglMap->setBearing(direction * -1, secondsAsDuration(duration));
+    _mbglMap->setBearing(direction * -1, secondsAsDuration(duration));
 
     [self notifyMapChange:@(animated ? mbgl::MapChangeRegionDidChangeAnimated : mbgl::MapChangeRegionDidChange)];
 }
@@ -1363,12 +1363,12 @@ mbgl::DefaultFileSource *mbglFileSource = nullptr;
     //
     convertedPoint.y = self.bounds.size.height - convertedPoint.y;
 
-    return latLngToCoordinate(mbglMap->latLngForPixel(mbgl::vec2<double>(convertedPoint.x, convertedPoint.y)));
+    return latLngToCoordinate(_mbglMap->latLngForPixel(mbgl::vec2<double>(convertedPoint.x, convertedPoint.y)));
 }
 
 - (CGPoint)convertCoordinate:(CLLocationCoordinate2D)coordinate toPointToView:(UIView *)view
 {
-    mbgl::vec2<double> pixel = mbglMap->pixelForLatLng(coordinateToLatLng(coordinate));
+    mbgl::vec2<double> pixel = _mbglMap->pixelForLatLng(coordinateToLatLng(coordinate));
 
     // flip y coordinate for iOS view origin in top left
     //
@@ -1379,7 +1379,7 @@ mbgl::DefaultFileSource *mbglFileSource = nullptr;
 
 - (CLLocationDistance)metersPerPixelAtLatitude:(CLLocationDegrees)latitude
 {
-    return mbglMap->getMetersPerPixelAtLatitude(latitude, self.zoomLevel);
+    return _mbglMap->getMetersPerPixelAtLatitude(latitude, self.zoomLevel);
 }
 
 mbgl::LatLng coordinateToLatLng(CLLocationCoordinate2D coordinate)
@@ -1455,7 +1455,7 @@ CLLocationCoordinate2D latLngToCoordinate(mbgl::LatLng latLng)
 {
     NSMutableArray *returnArray = [NSMutableArray array];
 
-    const std::vector<std::string> &appliedClasses = mbglMap->getClasses();
+    const std::vector<std::string> &appliedClasses = _mbglMap->getClasses();
 
     for (auto class_it = appliedClasses.begin(); class_it != appliedClasses.end(); class_it++)
     {
@@ -1479,20 +1479,20 @@ CLLocationCoordinate2D latLngToCoordinate(mbgl::LatLng latLng)
         newAppliedClasses.insert(newAppliedClasses.end(), [appliedClass UTF8String]);
     }
 
-    mbglMap->setDefaultTransitionDuration(secondsAsDuration(transitionDuration));
-    mbglMap->setClasses(newAppliedClasses);
+    _mbglMap->setDefaultTransitionDuration(secondsAsDuration(transitionDuration));
+    _mbglMap->setClasses(newAppliedClasses);
 }
 
 - (BOOL)hasStyleClass:(NSString *)styleClass
 {
-    return styleClass && mbglMap->hasClass([styleClass UTF8String]);
+    return styleClass && _mbglMap->hasClass([styleClass UTF8String]);
 }
 
 - (void)addStyleClass:(NSString *)styleClass
 {
     if (styleClass)
     {
-        mbglMap->addClass([styleClass UTF8String]);
+        _mbglMap->addClass([styleClass UTF8String]);
     }
 }
 
@@ -1500,7 +1500,7 @@ CLLocationCoordinate2D latLngToCoordinate(mbgl::LatLng latLng)
 {
     if (styleClass)
     {
-        mbglMap->removeClass([styleClass UTF8String]);
+        _mbglMap->removeClass([styleClass UTF8String]);
     }
 }
 
@@ -1564,7 +1564,7 @@ CLLocationCoordinate2D latLngToCoordinate(mbgl::LatLng latLng)
         symbols.push_back((symbolName ? [symbolName UTF8String] : ""));
     }
 
-    std::vector<uint32_t> annotationIDs = mbglMap->addPointAnnotations(latLngs, symbols);
+    std::vector<uint32_t> annotationIDs = _mbglMap->addPointAnnotations(latLngs, symbols);
 
     for (size_t i = 0; i < annotationIDs.size(); ++i)
     {
@@ -1605,7 +1605,7 @@ CLLocationCoordinate2D latLngToCoordinate(mbgl::LatLng latLng)
         }
     }
 
-    mbglMap->removeAnnotations(annotationIDsToRemove);
+    _mbglMap->removeAnnotations(annotationIDsToRemove);
 }
 
 - (NSArray *)selectedAnnotations
@@ -1665,7 +1665,7 @@ CLLocationCoordinate2D latLngToCoordinate(mbgl::LatLng latLng)
 
             // determine anchor point based on symbol
             CGPoint calloutAnchorPoint = [self convertCoordinate:annotation.coordinate toPointToView:self];
-            double y = mbglMap->getTopOffsetPixelsForAnnotationSymbol(symbolName);
+            double y = _mbglMap->getTopOffsetPixelsForAnnotationSymbol(symbolName);
             calloutBounds = CGRectMake(calloutAnchorPoint.x - 1, calloutAnchorPoint.y + y, 0, 0);
         }
 
@@ -2010,7 +2010,7 @@ CLLocationCoordinate2D latLngToCoordinate(mbgl::LatLng latLng)
 
     if (headingDirection > 0 && self.userTrackingMode == MGLUserTrackingModeFollowWithHeading)
     {
-        mbglMap->setBearing(headingDirection, secondsAsDuration(MGLAnimationDuration));
+        _mbglMap->setBearing(headingDirection, secondsAsDuration(MGLAnimationDuration));
     }
 }
 
@@ -2093,7 +2093,7 @@ CLLocationCoordinate2D latLngToCoordinate(mbgl::LatLng latLng)
 
 - (CGFloat)currentMinimumZoom
 {
-    return fmaxf(mbglMap->getMinZoom(), MGLMinimumZoom);
+    return fmaxf(_mbglMap->getMinZoom(), MGLMinimumZoom);
 }
 
 - (BOOL)isRotationAllowed
@@ -2298,13 +2298,13 @@ CLLocationCoordinate2D latLngToCoordinate(mbgl::LatLng latLng)
 
 - (void)updateCompass
 {
-    double degrees = mbglMap->getBearing() * -1;
+    double degrees = _mbglMap->getBearing() * -1;
     while (degrees >= 360) degrees -= 360;
     while (degrees < 0) degrees += 360;
 
     self.compass.transform = CGAffineTransformMakeRotation([MGLMapView degreesToRadians:degrees]);
 
-    if (mbglMap->getBearing() && self.compass.alpha < 1)
+    if (_mbglMap->getBearing() && self.compass.alpha < 1)
     {
         [UIView animateWithDuration:MGLAnimationDuration
                               delay:0
@@ -2315,7 +2315,7 @@ CLLocationCoordinate2D latLngToCoordinate(mbgl::LatLng latLng)
                          }
                          completion:nil];
     }
-    else if (mbglMap->getBearing() == 0 && self.compass.alpha > 0)
+    else if (_mbglMap->getBearing() == 0 && self.compass.alpha > 0)
     {
         [UIView animateWithDuration:MGLAnimationDuration
                               delay:0
@@ -2640,7 +2640,7 @@ class MBGLView : public mbgl::View
 
 - (void)didReceiveMemoryWarning
 {
-    mbglMap->onLowMemory();
+    _mbglMap->onLowMemory();
 }
 
 @end
