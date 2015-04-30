@@ -49,11 +49,17 @@
 }
 
 - (void)startMonitoringVisits {
-    [self.locationManager startMonitoringVisits];
+    // -[CLLocationManager startMonitoringVisits] is only available in iOS 8+.
+    if ([self.locationManager respondsToSelector:@selector(startMonitoringVisits)]) {
+        [self.locationManager startMonitoringVisits];
+    }
 }
 
 - (void)stopMonitoringVisits {
-    [self.locationManager stopMonitoringVisits];
+    // -[CLLocationManager stopMonitoringVisits] is only available in iOS 8+.
+    if ([self.locationManager respondsToSelector:@selector(stopMonitoringVisits)]) {
+        [self.locationManager stopMonitoringVisits];
+    }
 }
 
 #pragma mark CLLocationManagerDelegate
