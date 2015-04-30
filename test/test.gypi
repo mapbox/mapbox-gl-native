@@ -38,6 +38,8 @@
         'api/set_style.cpp',
         'api/repeated_render.cpp',
 
+        'headless/headless.cpp',
+
         'miscellaneous/clip_ids.cpp',
         'miscellaneous/bilinear.cpp',
         'miscellaneous/comparisons.cpp',
