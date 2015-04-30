@@ -40,24 +40,20 @@
     return sharedManager;
 }
 
-+ (void) startUpdatingLocation {
-    [[MGLMetricsLocationManager sharedManager].locationManager startUpdatingLocation];
+- (void)startUpdatingLocation {
+    [self.locationManager startUpdatingLocation];
 }
 
-+ (void) stopUpdatingLocation {
-    [[MGLMetricsLocationManager sharedManager].locationManager stopUpdatingLocation];
+- (void)stopUpdatingLocation {
+    [self.locationManager stopUpdatingLocation];
 }
 
-+ (void) startMonitoringVisits {
-    if ([[MGLMetricsLocationManager sharedManager].locationManager respondsToSelector:@selector(startMonitoringVisits)]) {
-        [[MGLMetricsLocationManager sharedManager].locationManager startMonitoringVisits];
-    }
+- (void)startMonitoringVisits {
+    [self.locationManager startMonitoringVisits];
 }
 
-+ (void) stopMonitoringVisits {
-    if ([[MGLMetricsLocationManager sharedManager].locationManager respondsToSelector:@selector(stopMonitoringVisits)]) {
-        [[MGLMetricsLocationManager sharedManager].locationManager stopMonitoringVisits];
-    }
+- (void)stopMonitoringVisits {
+    [self.locationManager stopMonitoringVisits];
 }
 
 #pragma mark CLLocationManagerDelegate
@@ -97,21 +93,21 @@
             break;
         case kCLAuthorizationStatusDenied:
             newStatus = @"User Explcitly Denied";
-            [MGLMetricsLocationManager stopUpdatingLocation];
-            [MGLMetricsLocationManager stopMonitoringVisits];
+            [self stopUpdatingLocation];
+            [self stopMonitoringVisits];
             break;
         case kCLAuthorizationStatusAuthorized:
             newStatus = @"User Has Authorized / Authorized Always";
-            [MGLMetricsLocationManager startUpdatingLocation];
-            [MGLMetricsLocationManager startMonitoringVisits];
+            [self startUpdatingLocation];
+            [self startMonitoringVisits];
             break;
-            //        case kCLAuthorizationStatusAuthorizedAlways:
-            //            newStatus = @"Not Determined";
-            //            break;
+//        case kCLAuthorizationStatusAuthorizedAlways:
+//            newStatus = @"Not Determined";
+//            break;
         case kCLAuthorizationStatusAuthorizedWhenInUse:
             newStatus = @"User Has Authorized When In Use Only";
-            [MGLMetricsLocationManager startUpdatingLocation];
-            [MGLMetricsLocationManager startMonitoringVisits];
+            [self startUpdatingLocation];
+            [self startMonitoringVisits];
             break;
         default:
             newStatus = @"Unknown";

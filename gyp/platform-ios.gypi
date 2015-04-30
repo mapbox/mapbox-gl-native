@@ -33,6 +33,7 @@
         '../include/mbgl/ios/MGLTypes.h',
         '../platform/ios/NSBundle+MGLAdditions.h',
         '../platform/ios/NSBundle+MGLAdditions.m',
+        '../platform/ios/NSException+MGLAdditions.h',
         '../platform/ios/NSProcessInfo+MGLAdditions.h',
         '../platform/ios/NSProcessInfo+MGLAdditions.m',
         '../platform/ios/NSString+MGLAdditions.h',
