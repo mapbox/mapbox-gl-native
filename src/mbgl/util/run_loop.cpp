@@ -5,8 +5,13 @@ namespace util {
 
 uv::tls<RunLoop> RunLoop::current;
 
-RunLoop::RunLoop()
-    : async(*loop, std::bind(&RunLoop::process, this)) {
+RunLoop::RunLoop(uv_loop_t* loop)
+    : async(loop, std::bind(&RunLoop::process, this)) {
+    current.set(this);
+}
+
+RunLoop::~RunLoop() {
+    current.set(nullptr);
 }
 
 void RunLoop::withMutex(std::function<void()>&& fn) {
@@ -22,13 +27,6 @@ void RunLoop::process() {
         (*(queue_.front()))();
         queue_.pop();
     }
-}
-
-void RunLoop::run() {
-    assert(!current.get());
-    current.set(this);
-    loop.run();
-    current.set(nullptr);
 }
 
 void RunLoop::stop() {

@@ -17,7 +17,7 @@
     },
     { 'target_name': 'test',
       'type': 'executable',
-      'include_dirs': [ '../include', '../src' ],
+      'include_dirs': [ '../include', '../src', '../platform/default' ],
       'dependencies': [
         'symlink_TEST_DATA',
         '../mbgl.gyp:core',
