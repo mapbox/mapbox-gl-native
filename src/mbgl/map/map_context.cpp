@@ -140,6 +140,8 @@ void MapContext::loadStyleJSON(const std::string& json, const std::string& base)
     assert(Environment::currentlyOn(ThreadType::Map));
 
     sprite.reset();
+    style.reset();
+
     style = util::make_unique<Style>();
     style->base = base;
     style->loadJSON((const uint8_t *)json.c_str());
