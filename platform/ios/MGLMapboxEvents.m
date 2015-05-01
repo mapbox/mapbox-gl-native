@@ -214,13 +214,14 @@ NSString *const MGLEventGestureRotateStart = @"Rotation";
 }
 
 // Can be called from any thread. Called implicitly from any
-// public class convenience methods.
+// public class convenience methods. May return nil if this feature is disabled.
 //
 + (instancetype)sharedManager {
     static dispatch_once_t onceToken;
     static MGLMapboxEvents *_sharedManager;
     dispatch_once(&onceToken, ^{
-        if ( ! NSProcessInfo.processInfo.mgl_isInterfaceBuilderDesignablesAgent) {
+        if ( ! NSProcessInfo.processInfo.mgl_isInterfaceBuilderDesignablesAgent &&
+            [[NSUserDefaults standardUserDefaults] objectForKey:@"mapbox_metrics_disabled"] == nil) {
             void (^setupBlock)() = ^{
                 _sharedManager = [[self alloc] init];
             };
@@ -331,12 +332,6 @@ NSString *const MGLEventGestureRotateStart = @"Rotation";
             return;
         }
 
-        // Add Metrics Disabled App Wide Check
-        if ([[NSUserDefaults standardUserDefaults] objectForKey:@"mapbox_metrics_disabled"] != nil) {
-            [_eventQueue removeAllObjects];
-            return;
-        }
-        
         // Metrics Collection Has Been Paused
         if (_paused) {
             return;
