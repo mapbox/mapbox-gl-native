@@ -315,6 +315,7 @@ std::chrono::steady_clock::duration secondsAsDuration(float duration)
     //
     _pan = [[UIPanGestureRecognizer alloc] initWithTarget:self action:@selector(handlePanGesture:)];
     _pan.delegate = self;
+    _pan.maximumNumberOfTouches = 1;
     [self addGestureRecognizer:_pan];
     _scrollEnabled = YES;
 
@@ -728,27 +729,22 @@ std::chrono::steady_clock::duration secondsAsDuration(float duration)
     else if (pan.state == UIGestureRecognizerStateEnded || pan.state == UIGestureRecognizerStateCancelled)
     {
         CGPoint velocity = [pan velocityInView:pan.view];
-        CGFloat duration = 0;
-
+        if (sqrtf(velocity.x * velocity.x + velocity.y * velocity.y) < 100)
+        {
+            // Not enough velocity to overcome friction
+            velocity = CGPointZero;
+        }
+        
+        CGFloat duration = UIScrollViewDecelerationRateNormal;
         if ( ! CGPointEqualToPoint(velocity, CGPointZero))
         {
-            CGFloat ease = 0.25;
-
-            velocity.x = velocity.x * ease;
-            velocity.y = velocity.y * ease;
-
-            CGFloat speed = sqrt(velocity.x * velocity.x + velocity.y * velocity.y);
-            CGFloat deceleration = 2500;
-            duration = speed / (deceleration * ease);
+            CGPoint offset = CGPointMake(velocity.x * duration / 4, velocity.y * duration / 4);
+            _mbglMap->moveBy(offset.x, offset.y, secondsAsDuration(duration));
         }
-
-        CGPoint offset = CGPointMake(velocity.x * duration / 2, velocity.y * duration / 2);
-
-        _mbglMap->moveBy(offset.x, offset.y, secondsAsDuration(duration));
 
         _mbglMap->setGestureInProgress(false);
 
-        if (duration)
+        if ( ! CGPointEqualToPoint(velocity, CGPointZero))
         {
             self.animatingGesture = YES;
 
@@ -803,17 +799,60 @@ std::chrono::steady_clock::duration secondsAsDuration(float duration)
 
         if (log2(newScale) < _mbglMap->getMinZoom()) return;
 
-        double scale = _mbglMap->getScale();
-
-        _mbglMap->scaleBy(newScale / scale, [pinch locationInView:pinch.view].x, [pinch locationInView:pinch.view].y);
+        _mbglMap->setScale(newScale, [pinch locationInView:pinch.view].x, [pinch locationInView:pinch.view].y);
     }
     else if (pinch.state == UIGestureRecognizerStateEnded || pinch.state == UIGestureRecognizerStateCancelled)
     {
+        CGFloat velocity = pinch.velocity;
+        if (velocity > -0.5 && velocity < 3)
+        {
+            velocity = 0;
+        }
+        CGFloat duration = velocity > 0 ? 1 : 0.25;
+        
+        CGFloat scale = self.scale * pinch.scale;
+        CGFloat newScale = scale;
+        if (velocity >= 0)
+        {
+            newScale += scale * velocity * duration * 0.1;
+        }
+        else
+        {
+            newScale += scale / (velocity * duration) * 0.1;
+        }
+        
+        if (newScale <= 0 || log2(newScale) < _mbglMap->getMinZoom())
+        {
+            velocity = 0;
+        }
+        
+        if (velocity)
+        {
+            CGPoint pinchCenter = [pinch locationInView:pinch.view];
+            _mbglMap->setScale(newScale, pinchCenter.x, pinchCenter.y, secondsAsDuration(duration));
+        }
+        
         _mbglMap->setGestureInProgress(false);
-
+        
         [self unrotateIfNeededAnimated:YES];
+        
+        if (velocity)
+        {
+            self.animatingGesture = YES;
 
-        [self notifyMapChange:@(mbgl::MapChangeRegionDidChange)];
+            __weak MGLMapView *weakSelf = self;
+
+            [self animateWithDelay:duration animations:^
+            {
+                weakSelf.animatingGesture = NO;
+
+                [weakSelf notifyMapChange:@(mbgl::MapChangeRegionDidChangeAnimated)];
+            }];
+        }
+        else
+        {
+            [self notifyMapChange:@(mbgl::MapChangeRegionDidChange)];
+        }
     }
 }
 
@@ -851,11 +890,40 @@ std::chrono::steady_clock::duration secondsAsDuration(float duration)
     }
     else if (rotate.state == UIGestureRecognizerStateEnded || rotate.state == UIGestureRecognizerStateCancelled)
     {
-        _mbglMap->setGestureInProgress(false);
-
-        [self unrotateIfNeededAnimated:YES];
-
-        [self notifyMapChange:@(mbgl::MapChangeRegionDidChange)];
+        CGFloat velocity = rotate.velocity;
+        
+        if (fabs(velocity) > 3)
+        {
+            CGFloat radians = self.angle + rotate.rotation;
+            CGFloat duration = UIScrollViewDecelerationRateNormal;
+            CGFloat newRadians = radians + velocity * duration * 0.1;
+            CGFloat newDegrees = [MGLMapView radiansToDegrees:newRadians] * -1;
+            
+            _mbglMap->setBearing(newDegrees, secondsAsDuration(duration));
+            
+            _mbglMap->setGestureInProgress(false);
+            
+            self.animatingGesture = YES;
+            
+            __weak MGLMapView *weakSelf = self;
+            
+            [self animateWithDelay:duration animations:^
+             {
+                 weakSelf.animatingGesture = NO;
+                 
+                 [weakSelf unrotateIfNeededAnimated:YES];
+                 
+                 [weakSelf notifyMapChange:@(mbgl::MapChangeRegionDidChangeAnimated)];
+             }];
+        }
+        else
+        {
+            _mbglMap->setGestureInProgress(false);
+            
+            [self unrotateIfNeededAnimated:YES];
+            
+            [self notifyMapChange:@(mbgl::MapChangeRegionDidChange)];
+        }
     }
 }
 
