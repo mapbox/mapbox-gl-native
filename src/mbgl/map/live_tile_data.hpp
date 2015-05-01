@@ -12,7 +12,7 @@ public:
     LiveTileData(const TileID&,
                  AnnotationManager&,
                  float mapMaxZoom,
-                 util::ptr<Style>,
+                 Style&,
                  GlyphAtlas&,
                  GlyphStore&,
                  SpriteAtlas&,

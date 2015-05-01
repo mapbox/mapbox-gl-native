@@ -1,16 +1,32 @@
 #include <mbgl/renderer/painter.hpp>
+
+#include <mbgl/map/source.hpp>
+#include <mbgl/map/tile.hpp>
+
 #include <mbgl/platform/log.hpp>
+
 #include <mbgl/style/style.hpp>
 #include <mbgl/style/style_layer.hpp>
 #include <mbgl/style/style_bucket.hpp>
+
+#include <mbgl/geometry/sprite_atlas.hpp>
+
+#include <mbgl/shader/pattern_shader.hpp>
+#include <mbgl/shader/plain_shader.hpp>
+#include <mbgl/shader/outline_shader.hpp>
+#include <mbgl/shader/line_shader.hpp>
+#include <mbgl/shader/linesdf_shader.hpp>
+#include <mbgl/shader/linepattern_shader.hpp>
+#include <mbgl/shader/icon_shader.hpp>
+#include <mbgl/shader/raster_shader.hpp>
+#include <mbgl/shader/sdf_shader.hpp>
+#include <mbgl/shader/dot_shader.hpp>
+#include <mbgl/shader/gaussian_shader.hpp>
+
+
 #include <mbgl/util/std.hpp>
-#include <mbgl/util/string.hpp>
-#include <mbgl/util/clip_id.hpp>
 #include <mbgl/util/constants.hpp>
 #include <mbgl/util/mat3.hpp>
-#include <mbgl/geometry/sprite_atlas.hpp>
-#include <mbgl/map/source.hpp>
-#include <mbgl/map/tile.hpp>
 
 #if defined(DEBUG)
 #include <mbgl/util/stopwatch.hpp>
@@ -39,10 +55,6 @@ bool Painter::needsAnimation() const {
 }
 
 void Painter::setup() {
-#if defined(DEBUG)
-    util::stopwatch stopwatch("painter setup");
-#endif
-
     // Enable GL debugging
     if ((gl::DebugMessageControl != nullptr) && (gl::DebugMessageCallback != nullptr)) {
         // This will enable all messages including performance hints
@@ -62,7 +74,6 @@ void Painter::setup() {
     assert(plainShader);
     assert(outlineShader);
     assert(lineShader);
-    assert(linejoinShader);
     assert(linepatternShader);
     assert(patternShader);
     assert(rasterShader);
@@ -96,7 +107,6 @@ void Painter::setupShaders() {
     if (!plainShader) plainShader = util::make_unique<PlainShader>();
     if (!outlineShader) outlineShader = util::make_unique<OutlineShader>();
     if (!lineShader) lineShader = util::make_unique<LineShader>();
-    if (!linejoinShader) linejoinShader = util::make_unique<LinejoinShader>();
     if (!linesdfShader) linesdfShader = util::make_unique<LineSDFShader>();
     if (!linepatternShader) linepatternShader = util::make_unique<LinepatternShader>();
     if (!patternShader) patternShader = util::make_unique<PatternShader>();
@@ -106,25 +116,6 @@ void Painter::setupShaders() {
     if (!sdfIconShader) sdfIconShader = util::make_unique<SDFIconShader>();
     if (!dotShader) dotShader = util::make_unique<DotShader>();
     if (!gaussianShader) gaussianShader = util::make_unique<GaussianShader>();
-}
-
-void Painter::deleteShaders() {
-    plainShader = nullptr;
-    outlineShader = nullptr;
-    lineShader = nullptr;
-    linejoinShader = nullptr;
-    linepatternShader = nullptr;
-    patternShader = nullptr;
-    iconShader = nullptr;
-    rasterShader = nullptr;
-    sdfGlyphShader = nullptr;
-    sdfIconShader = nullptr;
-    dotShader = nullptr;
-    gaussianShader = nullptr;
-}
-
-void Painter::terminate() {
-    deleteShaders();
 }
 
 void Painter::resize() {

@@ -2,26 +2,20 @@
 #include <mbgl/platform/gl.hpp>
 #include <mbgl/platform/log.hpp>
 
+#include <cassert>
+#include <pthread.h>
+
 pthread_once_t loadGLExtensions = PTHREAD_ONCE_INIT;
-
-GLFWView::GLFWView(bool fullscreen_) : fullscreen(fullscreen_) {
-#ifdef NVIDIA
-    glDiscardFramebufferEXT = reinterpret_cast<PFNGLDISCARDFRAMEBUFFEREXTPROC>(glfwGetProcAddress("glDiscardFramebufferEXT"));
-#endif
-}
-
-GLFWView::~GLFWView() {
-    glfwDestroyWindow(window);
-    glfwTerminate();
-}
 
 void glfwError(int error, const char *description) {
     mbgl::Log::Error(mbgl::Event::OpenGL, "GLFW error (%i): %s", error, description);
     assert(false);
 }
 
-void GLFWView::initialize(mbgl::Map *map_) {
-    View::initialize(map_);
+GLFWView::GLFWView(bool fullscreen_) : fullscreen(fullscreen_) {
+#ifdef NVIDIA
+    glDiscardFramebufferEXT = reinterpret_cast<PFNGLDISCARDFRAMEBUFFEREXTPROC>(glfwGetProcAddress("glDiscardFramebufferEXT"));
+#endif
 
     glfwSetErrorCallback(glfwError);
 
@@ -62,10 +56,6 @@ void GLFWView::initialize(mbgl::Map *map_) {
     glfwSetWindowUserPointer(window, this);
     glfwMakeContextCurrent(window);
     glfwSwapInterval(1);
-
-    int width, height;
-    glfwGetWindowSize(window, &width, &height);
-    onResize(window, width, height);
 
     glfwSetCursorPosCallback(window, onMouseMove);
     glfwSetMouseButtonCallback(window, onMouseClick);
@@ -160,6 +150,19 @@ void GLFWView::initialize(mbgl::Map *map_) {
     glfwMakeContextCurrent(nullptr);
 }
 
+GLFWView::~GLFWView() {
+    glfwDestroyWindow(window);
+    glfwTerminate();
+}
+
+void GLFWView::initialize(mbgl::Map *map_) {
+    View::initialize(map_);
+
+    int width, height;
+    glfwGetWindowSize(window, &width, &height);
+    onResize(window, width, height);
+}
+
 void GLFWView::onKey(GLFWwindow *window, int key, int /*scancode*/, int action, int mods) {
     GLFWView *view = reinterpret_cast<GLFWView *>(glfwGetWindowUserPointer(window));
 
@@ -221,7 +224,7 @@ void GLFWView::onResize(GLFWwindow *window, int width, int height ) {
     int fbWidth, fbHeight;
     glfwGetFramebufferSize(window, &fbWidth, &fbHeight);
 
-    view->resize(width, height, static_cast<float>(fbWidth) / static_cast<float>(width), fbWidth, fbHeight);
+    view->map->resize(width, height, static_cast<float>(fbWidth) / static_cast<float>(width));
 }
 
 void GLFWView::onMouseClick(GLFWwindow *window, int button, int action, int modifiers) {
@@ -264,21 +267,10 @@ void GLFWView::onMouseMove(GLFWwindow *window, double x, double y) {
     view->lastY = y;
 }
 
-int GLFWView::run() {
-    map->start();
-
+void GLFWView::run() {
     while (!glfwWindowShouldClose(window)) {
         glfwWaitEvents();
     }
-
-    map->stop([]() {
-        glfwWaitEvents();
-    });
-
-    // Terminate here to save binary shaders
-    map->terminate();
-
-    return 0;
 }
 
 void GLFWView::activate() {
@@ -293,9 +285,8 @@ void GLFWView::notify() {
     glfwPostEmptyEvent();
 }
 
-void GLFWView::invalidate() {
-    assert(map);
-    map->render();
+void GLFWView::invalidate(std::function<void()> render) {
+    render();
     glfwSwapBuffers(window);
     fps();
 }

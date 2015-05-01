@@ -12,6 +12,21 @@
 
 using namespace mbgl;
 
+/** Converts the given angle (in radians) to be numerically close to the anchor angle, allowing it to be interpolated properly without sudden jumps. */
+static double _normalizeAngle(double angle, double anchorAngle)
+{
+    angle = util::wrap(angle, -M_PI, M_PI);
+    double diff = std::abs(angle - anchorAngle);
+    if (std::abs(angle - util::M2PI - anchorAngle) < diff) {
+        angle -= util::M2PI;
+    }
+    if (std::abs(angle + util::M2PI - anchorAngle) < diff) {
+        angle += util::M2PI;
+    }
+    
+    return angle;
+}
+
 Transform::Transform(View &view_)
     : view(view_)
 {
@@ -223,6 +238,9 @@ void Transform::_setScaleXY(const double new_scale, const double xn, const doubl
         current.scale = final.scale;
         current.x = final.x;
         current.y = final.y;
+        const double s = current.scale * util::tileSize;
+        current.Bc = s / 360;
+        current.Cc = s / util::M2PI;
     } else {
         const double startS = current.scale;
         const double startX = current.x;
@@ -235,6 +253,9 @@ void Transform::_setScaleXY(const double new_scale, const double xn, const doubl
                 current.scale = util::interpolate(startS, final.scale, t);
                 current.x = util::interpolate(startX, final.x, t);
                 current.y = util::interpolate(startY, final.y, t);
+                const double s = current.scale * util::tileSize;
+                current.Bc = s / 360;
+                current.Cc = s / util::M2PI;
                 return Update::Zoom;
             },
             [=] {
@@ -242,10 +263,6 @@ void Transform::_setScaleXY(const double new_scale, const double xn, const doubl
                 current.scaling = false;
             }, duration);
     }
-
-    const double s = final.scale * util::tileSize;
-    current.Bc = s / 360;
-    current.Cc = s / util::M2PI;
 
     view.notifyMapChange(duration != Duration::zero() ?
                            MapChangeRegionDidChangeAnimated :
@@ -330,12 +347,7 @@ void Transform::_setAngle(double new_angle, const Duration duration) {
                            MapChangeRegionWillChangeAnimated :
                            MapChangeRegionWillChange);
 
-    while (new_angle > M_PI)
-        new_angle -= util::M2PI;
-    while (new_angle <= -M_PI)
-        new_angle += util::M2PI;
-
-    final.angle = new_angle;
+    final.angle = _normalizeAngle(new_angle, current.angle);
 
     if (duration == Duration::zero()) {
         current.angle = final.angle;

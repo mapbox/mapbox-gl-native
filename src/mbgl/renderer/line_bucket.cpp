@@ -4,37 +4,31 @@
 #include <mbgl/renderer/painter.hpp>
 #include <mbgl/style/style.hpp>
 #include <mbgl/style/style_layout.hpp>
+#include <mbgl/shader/line_shader.hpp>
+#include <mbgl/shader/linesdf_shader.hpp>
+#include <mbgl/shader/linepattern_shader.hpp>
 #include <mbgl/util/math.hpp>
 #include <mbgl/util/std.hpp>
 #include <mbgl/platform/gl.hpp>
 
-#define BUFFER_OFFSET(i) ((char *)nullptr + (i))
+#ifndef BUFFER_OFFSET
+#define BUFFER_OFFSET(i) ((char*)nullptr + (i))
+#endif
 
 #include <cassert>
 
 using namespace mbgl;
 
-LineBucket::LineBucket(LineVertexBuffer &vertexBuffer_,
-                       TriangleElementsBuffer &triangleElementsBuffer_,
-                       PointElementsBuffer &pointElementsBuffer_)
+LineBucket::LineBucket(LineVertexBuffer& vertexBuffer_,
+                       TriangleElementsBuffer& triangleElementsBuffer_)
     : vertexBuffer(vertexBuffer_),
       triangleElementsBuffer(triangleElementsBuffer_),
-      pointElementsBuffer(pointElementsBuffer_),
       vertex_start(vertexBuffer_.index()),
-      triangle_elements_start(triangleElementsBuffer_.index()),
-      point_elements_start(pointElementsBuffer_.index()) {
-}
+      triangle_elements_start(triangleElementsBuffer_.index()){};
 
 LineBucket::~LineBucket() {
     // Do not remove. header file only contains forward definitions to unique pointers.
 }
-
-struct TriangleElement {
-    TriangleElement(uint16_t a_, uint16_t b_, uint16_t c_) : a(a_), b(b_), c(c_) {}
-    uint16_t a, b, c;
-};
-
-typedef uint16_t PointElement;
 
 void LineBucket::addGeometry(const GeometryCollection& geometryCollection) {
     for (auto& line : geometryCollection) {
@@ -43,366 +37,366 @@ void LineBucket::addGeometry(const GeometryCollection& geometryCollection) {
 }
 
 void LineBucket::addGeometry(const std::vector<Coordinate>& vertices) {
-    // TODO: use roundLimit
-    // const float roundLimit = geometry.round_limit;
+    const auto len = [&vertices] {
+        auto l = vertices.size();
+        // If the line has duplicate vertices at the end, adjust length to remove them.
+        while (l > 2 && vertices[l - 1] == vertices[l - 2]) {
+            l--;
+        }
+        return l;
+    }();
 
-    if (vertices.size() < 2) {
+    if (len < 2) {
         // fprintf(stderr, "a line must have at least two vertices\n");
         return;
     }
 
-    Coordinate firstVertex = vertices.front();
-    Coordinate lastVertex = vertices.back();
-    bool closed = firstVertex.x == lastVertex.x && firstVertex.y == lastVertex.y;
+    const float miterLimit = layout.join == JoinType::Bevel ? 1.05f : layout.miter_limit;
 
-    if (vertices.size() == 2 && closed) {
+    const Coordinate firstVertex = vertices.front();
+    const Coordinate lastVertex = vertices[len - 1];
+    const bool closed = firstVertex == lastVertex;
+
+    if (len == 2 && closed) {
         // fprintf(stderr, "a line may not have coincident points\n");
         return;
     }
 
-    CapType beginCap = layout.cap;
-    CapType endCap = closed ? CapType::Butt : layout.cap;
-
-    JoinType currentJoin = JoinType::Miter;
-
-    Coordinate currentVertex = Coordinate::null(),
-               prevVertex = Coordinate::null(),
-               nextVertex = Coordinate::null();
-    vec2<double> prevNormal = vec2<double>::null(),
-                 nextNormal = vec2<double>::null();
-
-    int32_t e1 = -1, e2 = -1, e3 = -1;
+    const CapType beginCap = layout.cap;
+    const CapType endCap = closed ? CapType::Butt : layout.cap;
 
     int8_t flip = 1;
     double distance = 0;
+    bool startOfLine = true;
+    Coordinate currentVertex = Coordinate::null(), prevVertex = Coordinate::null(),
+               nextVertex = Coordinate::null();
+    vec2<double> prevNormal = vec2<double>::null(), nextNormal = vec2<double>::null();
+
+    // the last three vertices added
+    e1 = e2 = e3 = -1;
 
     if (closed) {
-        currentVertex = vertices[vertices.size() - 2];
-        nextNormal = util::normal<double>(currentVertex, lastVertex);
+        currentVertex = vertices[len - 2];
+        nextNormal = util::perp(util::unit(vec2<double>(firstVertex - currentVertex)));
     }
 
-    int32_t start_vertex = (int32_t)vertexBuffer.index();
+    const int32_t startVertex = (int32_t)vertexBuffer.index();
+    std::vector<TriangleElement> triangleStore;
 
-    std::vector<TriangleElement> triangle_store;
-    std::vector<PointElement> point_store;
-
-    for (size_t i = 0; i < vertices.size(); ++i) {
-        if (nextNormal) prevNormal = { -nextNormal.x, -nextNormal.y };
-        if (currentVertex) prevVertex = currentVertex;
-
-        currentVertex = vertices[i];
-        currentJoin = layout.join;
-
-        if (prevVertex) distance += util::dist<double>(currentVertex, prevVertex);
-
-        // Find the next vertex.
-        if (i + 1 < vertices.size()) {
+    for (size_t i = 0; i < len; ++i) {
+        if (closed && i == len - 1) {
+            // if the line is closed, we treat the last vertex like the first
+            nextVertex = vertices[i];
+        } else if (i + 1 < len) {
+            // just the next vertex
             nextVertex = vertices[i + 1];
         } else {
+            // there is no next vertex
             nextVertex = Coordinate::null();
         }
 
-        // If the line is closed, we treat the last vertex like the first vertex.
-        if (!nextVertex && closed) {
-            nextVertex = vertices[1];
+        // if two consecutive vertices exist, skip the current one
+        if (nextVertex && vertices[i] == nextVertex) {
+            continue;
         }
 
-        if (nextVertex) {
-            // if two consecutive vertices exist, skip one
-            if (currentVertex.x == nextVertex.x && currentVertex.y == nextVertex.y) continue;
+        if (nextNormal) {
+            prevNormal = nextNormal;
         }
+        if (currentVertex) {
+            prevVertex = currentVertex;
+        }
+
+        currentVertex = vertices[i];
+
+        // Calculate how far along the line the currentVertex is
+        if (prevVertex)
+            distance += util::dist<double>(currentVertex, prevVertex);
 
         // Calculate the normal towards the next vertex in this line. In case
         // there is no next vertex, pretend that the line is continuing straight,
-        // meaning that we are just reversing the previous normal
-        if (nextVertex) {
-            nextNormal = util::normal<double>(currentVertex, nextVertex);
-        } else {
-            nextNormal = { -prevNormal.x, -prevNormal.y };
-        }
+        // meaning that we are just using the previous normal.
+        nextNormal = nextVertex ? util::perp(util::unit(vec2<double>(nextVertex - currentVertex)))
+                                : prevNormal;
 
         // If we still don't have a previous normal, this is the beginning of a
         // non-closed line, so we're doing a straight "join".
         if (!prevNormal) {
-            prevNormal = { -nextNormal.x, -nextNormal.y };
+            prevNormal = nextNormal;
         }
 
         // Determine the normal of the join extrusion. It is the angle bisector
         // of the segments between the previous line and the next line.
-        vec2<double> joinNormal = {
-            prevNormal.x + nextNormal.x,
-            prevNormal.y + nextNormal.y
-        };
+        vec2<double> joinNormal = util::unit(prevNormal + nextNormal);
 
-        // Cross product yields 0..1 depending on whether they are parallel
-        // or perpendicular.
-        double joinAngularity = nextNormal.x * joinNormal.y - nextNormal.y * joinNormal.x;
-        joinNormal.x /= joinAngularity;
-        joinNormal.y /= joinAngularity;
-        double roundness = std::fmax(std::abs(joinNormal.x), std::abs(joinNormal.y));
+        /*  joinNormal     prevNormal
+         *             ↖      ↑
+         *                .________. prevVertex
+         *                |
+         * nextNormal  ←  |  currentVertex
+         *                |
+         *     nextVertex !
+         *
+         */
 
+        // Calculate the length of the miter (the ratio of the miter to the width).
+        // Find the cosine of the angle between the next and join normals
+        // using dot product. The inverse of that is the miter length.
+        const float cosHalfAngle = joinNormal.x * nextNormal.x + joinNormal.y * nextNormal.y;
+        const float miterLength = 1 / cosHalfAngle;
 
-        // Switch to miter joins if the angle is very low.
-        if (currentJoin != JoinType::Miter) {
-            if (std::fabs(joinAngularity) < 0.5 && roundness < layout.miter_limit) {
+        // The join if a middle vertex, otherwise the cap
+        const bool middleVertex = prevVertex && nextVertex;
+        JoinType currentJoin = layout.join;
+        const CapType currentCap = nextVertex ? beginCap : endCap;
+
+        if (middleVertex) {
+            if (currentJoin == JoinType::Round && miterLength < layout.round_limit) {
                 currentJoin = JoinType::Miter;
             }
-        }
 
-        // Add offset square begin cap.
-        if (!prevVertex && beginCap == CapType::Square) {
-            // Add first vertex
-            e3 = (int32_t)vertexBuffer.add(currentVertex.x, currentVertex.y, // vertex pos
-                                   flip * (prevNormal.x + prevNormal.y), flip * (-prevNormal.x + prevNormal.y), // extrude normal
-                                   0, 0, distance) - start_vertex; // texture normal
-
-            if (e1 >= 0 && e2 >= 0 && e3 >= 0) triangle_store.emplace_back(e1, e2, e3);
-            e1 = e2; e2 = e3;
-
-            // Add second vertex
-            e3 = (int32_t)vertexBuffer.add(currentVertex.x, currentVertex.y, // vertex pos
-                                   flip * (prevNormal.x - prevNormal.y), flip * (prevNormal.x + prevNormal.y), // extrude normal
-                                   0, 1, distance) - start_vertex; // texture normal
-
-            if (e1 >= 0 && e2 >= 0 && e3 >= 0) triangle_store.emplace_back(e1, e2, e3);
-            e1 = e2; e2 = e3;
-        }
-
-        // Add offset square end cap.
-        else if (!nextVertex && endCap == CapType::Square) {
-            // Add first vertex
-            e3 = (int32_t)vertexBuffer.add(currentVertex.x, currentVertex.y, // vertex pos
-                                   nextNormal.x - flip * nextNormal.y, flip * nextNormal.x + nextNormal.y, // extrude normal
-                                   0, 0, distance) - start_vertex; // texture normal
-
-            if (e1 >= 0 && e2 >= 0 && e3 >= 0) triangle_store.emplace_back(e1, e2, e3);
-            e1 = e2; e2 = e3;
-
-            // Add second vertex
-            e3 = (int32_t)vertexBuffer.add(currentVertex.x, currentVertex.y, // vertex pos
-                                   nextNormal.x + flip * nextNormal.y, -flip * nextNormal.x + nextNormal.y, // extrude normal
-                                   0, 1, distance) - start_vertex; // texture normal
-
-            if (e1 >= 0 && e2 >= 0 && e3 >= 0) triangle_store.emplace_back(e1, e2, e3);
-            e1 = e2; e2 = e3;
-        }
-
-        else if (currentJoin == JoinType::Miter) {
-            // MITER JOIN
-            if (std::fabs(joinAngularity) < 0.01) {
-                // The two normals are almost parallel.
-                joinNormal.x = -nextNormal.y;
-                joinNormal.y = nextNormal.x;
-            } else if (roundness > layout.miter_limit) {
-                // If the miter grows too large, flip the direction to make a
-                // bevel join.
-                joinNormal.x = (prevNormal.x - nextNormal.x) / joinAngularity;
-                joinNormal.y = (prevNormal.y - nextNormal.y) / joinAngularity;
+            if (currentJoin == JoinType::Miter && miterLength > miterLimit) {
+                currentJoin = JoinType::Bevel;
             }
 
-            if (roundness > layout.miter_limit) {
-                flip = -flip;
-            }
-
-            // Add first vertex
-            e3 = (int32_t)vertexBuffer.add(currentVertex.x, currentVertex.y, // vertex pos
-                                   flip * joinNormal.x, flip * joinNormal.y, // extrude normal
-                                   0, 0, distance) - start_vertex; // texture normal
-
-            if (e1 >= 0 && e2 >= 0 && e3 >= 0) triangle_store.emplace_back(e1, e2, e3);
-            e1 = e2; e2 = e3;
-
-            // Add second vertex
-            e3 = (int32_t)vertexBuffer.add(currentVertex.x, currentVertex.y, // vertex pos
-                                   -flip * joinNormal.x, -flip * joinNormal.y, // extrude normal
-                                   0, 1, distance) - start_vertex; // texture normal
-
-            if (e1 >= 0 && e2 >= 0 && e3 >= 0) triangle_store.emplace_back(e1, e2, e3);
-            e1 = e2; e2 = e3;
-
-            if ((!prevVertex && beginCap == CapType::Round) ||
-                    (!nextVertex && endCap == CapType::Round)) {
-                point_store.emplace_back(e1);
-            }
-        }
-
-        else {
-            // Close up the previous line
-            // Add first vertex
-            e3 = (int32_t)vertexBuffer.add(currentVertex.x, currentVertex.y, // vertex pos
-                                   flip * prevNormal.y, -flip * prevNormal.x, // extrude normal
-                                   0, 0, distance) - start_vertex; // texture normal
-
-            if (e1 >= 0 && e2 >= 0 && e3 >= 0) triangle_store.emplace_back(e1, e2, e3);
-            e1 = e2; e2 = e3;
-
-            // Add second vertex.
-            e3 = (int32_t)vertexBuffer.add(currentVertex.x, currentVertex.y, // vertex pos
-                                   -flip * prevNormal.y, flip * prevNormal.x, // extrude normal
-                                   0, 1, distance) - start_vertex; // texture normal
-
-            if (e1 >= 0 && e2 >= 0 && e3 >= 0) triangle_store.emplace_back(e1, e2, e3);
-            e1 = e2; e2 = e3;
-
-            prevNormal = { -nextNormal.x, -nextNormal.y };
-            flip = 1;
-
-
-            // begin/end caps
-            if ((!prevVertex && beginCap == CapType::Round) ||
-                    (!nextVertex && endCap == CapType::Round)) {
-                point_store.emplace_back(e1);
-            }
-
-
-            if (currentJoin == JoinType::Round) {
-                if (prevVertex && nextVertex && (!closed || i > 0)) {
-                    point_store.emplace_back(e1);
+            if (currentJoin == JoinType::Bevel) {
+                // The maximum extrude length is 128 / 63 = 2 times the width of the line
+                // so if miterLength >= 2 we need to draw a different type of bevel where.
+                if (miterLength > 2) {
+                    currentJoin = JoinType::FlipBevel;
                 }
 
-                // Reset the previous vertices so that we don't accidentally create
-                // any triangles.
-                e1 = -1; e2 = -1; e3 = -1;
+                // If the miterLength is really small and the line bevel wouldn't be visible,
+                // just draw a miter join to save a triangle.
+                if (miterLength < miterLimit) {
+                    currentJoin = JoinType::Miter;
+                }
+            }
+        }
+
+        if (middleVertex && currentJoin == JoinType::Miter) {
+            joinNormal = joinNormal * miterLength;
+            addCurrentVertex(currentVertex, flip, distance, joinNormal, 0, 0, false, startVertex,
+                             triangleStore);
+
+        } else if (middleVertex && currentJoin == JoinType::FlipBevel) {
+            // miter is too big, flip the direction to make a beveled join
+
+            if (miterLength > 100) {
+                // Almost parallel lines
+                joinNormal = nextNormal;
+            } else {
+                const float direction = prevNormal.x * nextNormal.y - prevNormal.y * nextNormal.x > 0 ? -1 : 1;
+                const float bevelLength = miterLength * util::mag(prevNormal + nextNormal) /
+                                          util::mag(prevNormal - nextNormal * direction);
+                joinNormal = util::perp(joinNormal) * bevelLength;
             }
 
-            // Start the new quad.
-            // Add first vertex
-            e3 = (int32_t)vertexBuffer.add(currentVertex.x, currentVertex.y, // vertex pos
-                                   -flip * nextNormal.y, flip * nextNormal.x, // extrude normal
-                                   0, 0, distance) - start_vertex; // texture normal
+            addCurrentVertex(currentVertex, flip, distance, joinNormal, 0, 0, false, startVertex,
+                             triangleStore);
+            flip = -flip;
 
-            if (e1 >= 0 && e2 >= 0 && e3 >= 0) triangle_store.emplace_back(e1, e2, e3);
-            e1 = e2; e2 = e3;
+        } else if (middleVertex && currentJoin == JoinType::Bevel) {
+            const float dir = prevNormal.x * nextNormal.y - prevNormal.y * nextNormal.x;
+            const float offset = -std::sqrt(miterLength * miterLength - 1);
+            float offsetA;
+            float offsetB;
 
-            // Add second vertex
-            e3 = (int32_t)vertexBuffer.add(currentVertex.x, currentVertex.y, // vertex pos
-                                   flip * nextNormal.y, -flip * nextNormal.x, // extrude normal
-                                   0, 1, distance) - start_vertex; // texture normal
+            if (flip * dir > 0) {
+                offsetB = 0;
+                offsetA = offset;
+            } else {
+                offsetA = 0;
+                offsetB = offset;
+            }
 
-            if (e1 >= 0 && e2 >= 0 && e3 >= 0) triangle_store.emplace_back(e1, e2, e3);
-            e1 = e2; e2 = e3;
+            // Close previous segement with bevel
+            if (!startOfLine) {
+                addCurrentVertex(currentVertex, flip, distance, prevNormal, offsetA, offsetB, false,
+                                 startVertex, triangleStore);
+            }
+
+            // Start next segment
+            if (nextVertex) {
+                addCurrentVertex(currentVertex, flip, distance, nextNormal, -offsetA, -offsetB,
+                                 false, startVertex, triangleStore);
+            }
+
+        } else if (!middleVertex && currentCap == CapType::Butt) {
+            if (!startOfLine) {
+                // Close previous segment with a butt
+                addCurrentVertex(currentVertex, flip, distance, prevNormal, 0, 0, false,
+                                 startVertex, triangleStore);
+            }
+
+            // Start next segment with a butt
+            if (nextVertex) {
+                addCurrentVertex(currentVertex, flip, distance, nextNormal, 0, 0, false,
+                                 startVertex, triangleStore);
+            }
+
+        } else if (!middleVertex && currentCap == CapType::Square) {
+            if (!startOfLine) {
+                // Close previous segment with a square cap
+                addCurrentVertex(currentVertex, flip, distance, prevNormal, 1, 1, false,
+                                 startVertex, triangleStore);
+
+                // The segment is done. Unset vertices to disconnect segments.
+                e1 = e2 = -1;
+                flip = 1;
+            }
+
+            // Start next segment
+            if (nextVertex) {
+                addCurrentVertex(currentVertex, flip, distance, nextNormal, -1, -1, false,
+                                 startVertex, triangleStore);
+            }
+
+        } else if (middleVertex ? currentJoin == JoinType::Round : currentCap == CapType::Round) {
+            if (!startOfLine) {
+                // Close previous segment with a butt
+                addCurrentVertex(currentVertex, flip, distance, prevNormal, 0, 0, false,
+                                 startVertex, triangleStore);
+
+                // Add round cap or linejoin at end of segment
+                addCurrentVertex(currentVertex, flip, distance, prevNormal, 1, 1, true, startVertex,
+                                 triangleStore);
+
+                // The segment is done. Unset vertices to disconnect segments.
+                e1 = e2 = -1;
+                flip = 1;
+
+            } else if (beginCap == CapType::Round) {
+                // Add round cap before first segment
+                addCurrentVertex(currentVertex, flip, distance, nextNormal, -1, -1, true,
+                                 startVertex, triangleStore);
+            }
+
+            // Start next segment with a butt
+            if (nextVertex) {
+                addCurrentVertex(currentVertex, flip, distance, nextNormal, 0, 0, false,
+                                 startVertex, triangleStore);
+            }
         }
+
+        startOfLine = false;
     }
 
-    size_t end_vertex = vertexBuffer.index();
-    size_t vertex_count = end_vertex - start_vertex;
+    const size_t endVertex = vertexBuffer.index();
+    const size_t vertexCount = endVertex - startVertex;
 
     // Store the triangle/line groups.
     {
-        if (!triangleGroups.size() || (triangleGroups.back()->vertex_length + vertex_count > 65535)) {
+        if (!triangleGroups.size() ||
+            (triangleGroups.back()->vertex_length + vertexCount > 65535)) {
             // Move to a new group because the old one can't hold the geometry.
-            triangleGroups.emplace_back(util::make_unique<triangle_group_type>());
+            triangleGroups.emplace_back(util::make_unique<TriangleGroup>());
         }
 
         assert(triangleGroups.back());
-        triangle_group_type& group = *triangleGroups.back();
-        for (const auto& triangle : triangle_store) {
-            triangleElementsBuffer.add(
-                group.vertex_length + triangle.a,
-                group.vertex_length + triangle.b,
-                group.vertex_length + triangle.c
-            );
+        auto& group = *triangleGroups.back();
+        for (const auto& triangle : triangleStore) {
+            triangleElementsBuffer.add(group.vertex_length + triangle.a,
+                                       group.vertex_length + triangle.b,
+                                       group.vertex_length + triangle.c);
         }
 
-        group.vertex_length += vertex_count;
-        group.elements_length += triangle_store.size();
-    }
-
-    // Store the line join/cap groups.
-    {
-        if (!pointGroups.size() || (pointGroups.back()->vertex_length + vertex_count > 65535)) {
-            // Move to a new group because the old one can't hold the geometry.
-            pointGroups.emplace_back(util::make_unique<point_group_type>());
-        }
-
-        assert(pointGroups.back());
-        point_group_type& group = *pointGroups.back();
-        for (const auto point : point_store) {
-            pointElementsBuffer.add(group.vertex_length + point);
-        }
-
-        group.vertex_length += vertex_count;
-        group.elements_length += point_store.size();
+        group.vertex_length += vertexCount;
+        group.elements_length += triangleStore.size();
     }
 }
 
-void LineBucket::render(Painter &painter, const StyleLayer &layer_desc, const TileID &id,
-                        const mat4 &matrix) {
+void LineBucket::addCurrentVertex(const Coordinate& currentVertex,
+                                  float flip,
+                                  double distance,
+                                  const vec2<double>& normal,
+                                  float endLeft,
+                                  float endRight,
+                                  bool round,
+                                  int32_t startVertex,
+                                  std::vector<TriangleElement>& triangleStore) {
+    int8_t tx = round ? 1 : 0;
+
+    vec2<double> extrude = normal * flip;
+    if (endLeft)
+        extrude = extrude - (util::perp(normal) * endLeft);
+    e3 = (int32_t)vertexBuffer.add(currentVertex.x, currentVertex.y, extrude.x, extrude.y, tx, 0,
+                                   distance) -
+         startVertex;
+    if (e1 >= 0 && e2 >= 0) {
+        triangleStore.emplace_back(e1, e2, e3);
+    }
+    e1 = e2;
+    e2 = e3;
+
+    extrude = normal * (-flip);
+    if (endRight)
+        extrude = extrude - (util::perp(normal) * endRight);
+    e3 = (int32_t)vertexBuffer.add(currentVertex.x, currentVertex.y, extrude.x, extrude.y, tx, 1,
+                                   distance) -
+         startVertex;
+    if (e1 >= 0 && e2 >= 0) {
+        triangleStore.emplace_back(e1, e2, e3);
+    }
+    e1 = e2;
+    e2 = e3;
+}
+
+void LineBucket::render(Painter& painter,
+                        const StyleLayer& layer_desc,
+                        const TileID& id,
+                        const mat4& matrix) {
     painter.renderLine(*this, layer_desc, id, matrix);
 }
 
 bool LineBucket::hasData() const {
-    return !triangleGroups.empty() || !pointGroups.empty();
-}
-
-bool LineBucket::hasPoints() const {
-    if (!pointGroups.empty()) {
-        for (const auto& group : pointGroups) {
-            assert(group);
-            if (group->elements_length) {
-                return true;
-            }
-        }
-    }
-    return false;
+    return !triangleGroups.empty();
 }
 
 void LineBucket::drawLines(LineShader& shader) {
-    char *vertex_index = BUFFER_OFFSET(vertex_start * vertexBuffer.itemSize);
-    char *elements_index = BUFFER_OFFSET(triangle_elements_start * triangleElementsBuffer.itemSize);
+    char* vertex_index = BUFFER_OFFSET(vertex_start * vertexBuffer.itemSize);
+    char* elements_index = BUFFER_OFFSET(triangle_elements_start * triangleElementsBuffer.itemSize);
     for (auto& group : triangleGroups) {
         assert(group);
         if (!group->elements_length) {
             continue;
         }
         group->array[0].bind(shader, vertexBuffer, triangleElementsBuffer, vertex_index);
-        MBGL_CHECK_ERROR(glDrawElements(GL_TRIANGLES, group->elements_length * 3, GL_UNSIGNED_SHORT, elements_index));
+        MBGL_CHECK_ERROR(glDrawElements(GL_TRIANGLES, group->elements_length * 3, GL_UNSIGNED_SHORT,
+                                        elements_index));
         vertex_index += group->vertex_length * vertexBuffer.itemSize;
         elements_index += group->elements_length * triangleElementsBuffer.itemSize;
     }
 }
 
 void LineBucket::drawLineSDF(LineSDFShader& shader) {
-    char *vertex_index = BUFFER_OFFSET(vertex_start * vertexBuffer.itemSize);
-    char *elements_index = BUFFER_OFFSET(triangle_elements_start * triangleElementsBuffer.itemSize);
+    char* vertex_index = BUFFER_OFFSET(vertex_start * vertexBuffer.itemSize);
+    char* elements_index = BUFFER_OFFSET(triangle_elements_start * triangleElementsBuffer.itemSize);
     for (auto& group : triangleGroups) {
         assert(group);
         if (!group->elements_length) {
             continue;
         }
         group->array[2].bind(shader, vertexBuffer, triangleElementsBuffer, vertex_index);
-        MBGL_CHECK_ERROR(glDrawElements(GL_TRIANGLES, group->elements_length * 3, GL_UNSIGNED_SHORT, elements_index));
+        MBGL_CHECK_ERROR(glDrawElements(GL_TRIANGLES, group->elements_length * 3, GL_UNSIGNED_SHORT,
+                                        elements_index));
         vertex_index += group->vertex_length * vertexBuffer.itemSize;
         elements_index += group->elements_length * triangleElementsBuffer.itemSize;
     }
 }
 
 void LineBucket::drawLinePatterns(LinepatternShader& shader) {
-    char *vertex_index = BUFFER_OFFSET(vertex_start * vertexBuffer.itemSize);
-    char *elements_index = BUFFER_OFFSET(triangle_elements_start * triangleElementsBuffer.itemSize);
+    char* vertex_index = BUFFER_OFFSET(vertex_start * vertexBuffer.itemSize);
+    char* elements_index = BUFFER_OFFSET(triangle_elements_start * triangleElementsBuffer.itemSize);
     for (auto& group : triangleGroups) {
         assert(group);
         if (!group->elements_length) {
             continue;
         }
         group->array[1].bind(shader, vertexBuffer, triangleElementsBuffer, vertex_index);
-        MBGL_CHECK_ERROR(glDrawElements(GL_TRIANGLES, group->elements_length * 3, GL_UNSIGNED_SHORT, elements_index));
+        MBGL_CHECK_ERROR(glDrawElements(GL_TRIANGLES, group->elements_length * 3, GL_UNSIGNED_SHORT,
+                                        elements_index));
         vertex_index += group->vertex_length * vertexBuffer.itemSize;
         elements_index += group->elements_length * triangleElementsBuffer.itemSize;
-    }
-}
-
-void LineBucket::drawPoints(LinejoinShader& shader) {
-    char *vertex_index = BUFFER_OFFSET(vertex_start * vertexBuffer.itemSize);
-    char *elements_index = BUFFER_OFFSET(point_elements_start * pointElementsBuffer.itemSize);
-    for (auto& group : pointGroups) {
-        assert(group);
-        if (!group->elements_length) {
-            continue;
-        }
-        group->array[0].bind(shader, vertexBuffer, pointElementsBuffer, vertex_index);
-        MBGL_CHECK_ERROR(glDrawElements(GL_POINTS, group->elements_length, GL_UNSIGNED_SHORT, elements_index));
-        vertex_index += group->vertex_length * vertexBuffer.itemSize;
-        elements_index += group->elements_length * pointElementsBuffer.itemSize;
     }
 }

@@ -74,6 +74,11 @@ inline vec2<T> normal(const S1& a, const S2& b) {
     return { dx / c, dy / c };
 }
 
+template <typename T>
+inline T perp(const T& a) {
+    return T(-a.y, a.x);
+}
+
 template <typename T, typename S1, typename S2>
 inline T dist(const S1& a, const S2& b) {
     T dx = b.x - a.x;
@@ -93,9 +98,20 @@ inline T mag(const S& a) {
     return std::sqrt(a.x * a.x + a.y * a.y);
 }
 
+template <typename S>
+inline S unit(const S& a) {
+    return a * (1 / mag(a));
+}
+
 template <typename T>
 T clamp(T value, T min, T max) {
     return value < min ? min : (value > max ? max : value);
+}
+
+template <typename T>
+T wrap(T value, T min, T max) {
+    T d = max - min;
+    return value == max ? value : std::fmod((std::fmod((value - min), d) + d), d) + min;
 }
 
 template <typename T>

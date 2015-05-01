@@ -194,7 +194,6 @@ void StyleLayer::applyStyleProperties<SymbolProperties>(const float z, const Tim
     properties.set<SymbolProperties>();
     SymbolProperties &symbol = properties.get<SymbolProperties>();
     applyTransitionedStyleProperty(PropertyKey::IconOpacity, symbol.icon.opacity, z, now, zoomHistory);
-    applyTransitionedStyleProperty(PropertyKey::IconRotate, symbol.icon.rotate, z, now, zoomHistory);
     applyTransitionedStyleProperty(PropertyKey::IconSize, symbol.icon.size, z, now, zoomHistory);
     applyTransitionedStyleProperty(PropertyKey::IconColor, symbol.icon.color, z, now, zoomHistory);
     applyTransitionedStyleProperty(PropertyKey::IconHaloColor, symbol.icon.halo_color, z, now, zoomHistory);

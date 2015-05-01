@@ -67,7 +67,7 @@ SQLiteCache::SQLiteCache(const std::string& path_)
 
 SQLiteCache::~SQLiteCache() = default;
 
-SQLiteCache::Impl::Impl(const std::string& path_)
+SQLiteCache::Impl::Impl(uv_loop_t*, const std::string& path_)
     : path(path_) {
 }
 
@@ -183,9 +183,9 @@ void SQLiteCache::put(const Resource &resource, std::shared_ptr<const Response> 
     // storing a new response or updating the currently stored response, potentially setting a new
     // expiry date.
     if (hint == Hint::Full) {
-        thread->invoke(&Impl::put, resource, std::move(response));
+        thread->invoke(&Impl::put, resource, response);
     } else if (hint == Hint::Refresh) {
-        thread->invoke(&Impl::refresh, resource, int64_t(response->expires));
+        thread->invoke(&Impl::refresh, resource, response->expires);
     }
 }
 

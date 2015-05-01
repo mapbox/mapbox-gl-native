@@ -1,9 +1,11 @@
 #include <mbgl/renderer/painter.hpp>
-#include <mbgl/renderer/fill_bucket.hpp>
-#include <mbgl/map/map.hpp>
-#include <mbgl/map/tile.hpp>
 #include <mbgl/map/source.hpp>
+#include <mbgl/shader/plain_shader.hpp>
 #include <mbgl/util/clip_id.hpp>
+
+#ifndef BUFFER_OFFSET
+#define BUFFER_OFFSET(i) ((char *)nullptr + (i))
+#endif
 
 using namespace mbgl;
 

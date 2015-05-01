@@ -6,6 +6,7 @@
 @interface MGLMetricsLocationManager() <CLLocationManagerDelegate>
 
 @property (nonatomic) CLLocationManager *locationManager;
+@property (atomic) NSDateFormatter *rfc3339DateFormatter;
 
 @end
 
@@ -14,8 +15,18 @@
 - (instancetype) init {
     if (self = [super init]) {
         _locationManager = [[CLLocationManager alloc] init];
+        _locationManager.desiredAccuracy = kCLLocationAccuracyThreeKilometers;
         _locationManager.distanceFilter = 10;
         [_locationManager setDelegate:self];
+
+        _rfc3339DateFormatter = [[NSDateFormatter alloc] init];
+        NSLocale *enUSPOSIXLocale = [[NSLocale alloc] initWithLocaleIdentifier:@"en_US_POSIX"];
+
+        [_rfc3339DateFormatter setLocale:enUSPOSIXLocale];
+        [_rfc3339DateFormatter setDateFormat:@"yyyy'-'MM'-'dd'T'HH':'mm':'ssZ"];
+        // Clear Any System TimeZone Cache
+        [NSTimeZone resetSystemTimeZone];
+        [_rfc3339DateFormatter setTimeZone:[NSTimeZone systemTimeZone]];
     }
     return self;
 }
@@ -29,12 +40,26 @@
     return sharedManager;
 }
 
-+ (void) startUpdatingLocation {
-    [[MGLMetricsLocationManager sharedManager].locationManager startUpdatingLocation];
+- (void)startUpdatingLocation {
+    [self.locationManager startUpdatingLocation];
 }
 
-+ (void) stopUpdatingLocation {
-    [[MGLMetricsLocationManager sharedManager].locationManager stopUpdatingLocation];
+- (void)stopUpdatingLocation {
+    [self.locationManager stopUpdatingLocation];
+}
+
+- (void)startMonitoringVisits {
+    // -[CLLocationManager startMonitoringVisits] is only available in iOS 8+.
+    if ([self.locationManager respondsToSelector:@selector(startMonitoringVisits)]) {
+        [self.locationManager startMonitoringVisits];
+    }
+}
+
+- (void)stopMonitoringVisits {
+    // -[CLLocationManager stopMonitoringVisits] is only available in iOS 8+.
+    if ([self.locationManager respondsToSelector:@selector(stopMonitoringVisits)]) {
+        [self.locationManager stopMonitoringVisits];
+    }
 }
 
 #pragma mark CLLocationManagerDelegate
@@ -53,6 +78,16 @@
     }
 }
 
+- (void)locationManager:(CLLocationManager *)manager didVisit:(CLVisit *)visit {
+    [MGLMapboxEvents pushEvent:MGLEventTypeVisit withAttributes:@{
+        MGLEventKeyLatitude: @(visit.coordinate.latitude),
+        MGLEventKeyLongitude: @(visit.coordinate.longitude),
+        MGLEventKeyHorizontalAccuracy: @(visit.horizontalAccuracy),
+        MGLEventKeyArrivalDate: [[NSDate distantPast] isEqualToDate:visit.arrivalDate] ? [NSNull null] : [_rfc3339DateFormatter stringFromDate:visit.arrivalDate],
+        MGLEventKeyDepartureDate: [[NSDate distantFuture] isEqualToDate:visit.departureDate] ? [NSNull null] : [_rfc3339DateFormatter stringFromDate:visit.departureDate]
+    }];
+}
+
 - (void)locationManager:(CLLocationManager *)manager didChangeAuthorizationStatus:(CLAuthorizationStatus)status {
     NSString *newStatus = nil;
     switch (status) {
@@ -64,18 +99,21 @@
             break;
         case kCLAuthorizationStatusDenied:
             newStatus = @"User Explcitly Denied";
-            [MGLMetricsLocationManager stopUpdatingLocation];
+            [self stopUpdatingLocation];
+            [self stopMonitoringVisits];
             break;
         case kCLAuthorizationStatusAuthorized:
             newStatus = @"User Has Authorized / Authorized Always";
-            [MGLMetricsLocationManager startUpdatingLocation];
+            [self startUpdatingLocation];
+            [self startMonitoringVisits];
             break;
-            //        case kCLAuthorizationStatusAuthorizedAlways:
-            //            newStatus = @"Not Determined";
-            //            break;
+//        case kCLAuthorizationStatusAuthorizedAlways:
+//            newStatus = @"Not Determined";
+//            break;
         case kCLAuthorizationStatusAuthorizedWhenInUse:
             newStatus = @"User Has Authorized When In Use Only";
-            [MGLMetricsLocationManager startUpdatingLocation];
+            [self startUpdatingLocation];
+            [self startMonitoringVisits];
             break;
         default:
             newStatus = @"Unknown";

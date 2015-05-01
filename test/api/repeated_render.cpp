@@ -22,12 +22,10 @@ TEST(API, RepeatedRender) {
 
     Log::setObserver(util::make_unique<FixtureLogObserver>());
 
-    Map map(view, fileSource);
-
-    map.start(Map::Mode::Static);
+    Map map(view, fileSource, MapMode::Still);
 
     {
-        view.resize(128, 512, 1);
+        map.resize(128, 512, 1);
         map.setStyleJSON(style, "test/suite");
         std::promise<std::unique_ptr<const StillImage>> promise;
         map.renderStill([&promise](std::unique_ptr<const StillImage> image) {
@@ -41,7 +39,7 @@ TEST(API, RepeatedRender) {
     }
 
     {
-        view.resize(512, 512, 2);
+        map.resize(512, 512, 2);
         map.setStyleJSON(style, "TEST_DATA/suite");
         std::promise<std::unique_ptr<const StillImage>> promise;
         map.renderStill([&promise](std::unique_ptr<const StillImage> image) {
@@ -53,8 +51,6 @@ TEST(API, RepeatedRender) {
         const std::string png = util::compress_png(result->width, result->height, result->pixels.get());
         util::write_file("test/fixtures/api/2.png", png);
     }
-
-    map.stop();
 
     auto observer = Log::removeObserver();
     auto flo = dynamic_cast<FixtureLogObserver*>(observer.get());

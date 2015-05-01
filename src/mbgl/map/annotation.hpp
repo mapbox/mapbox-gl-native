@@ -19,6 +19,7 @@ namespace mbgl {
 class Annotation;
 class Map;
 class LiveTile;
+class MapData;
 
 using AnnotationIDs = std::vector<uint32_t>;
 
@@ -29,9 +30,9 @@ public:
 
     void setDefaultPointAnnotationSymbol(const std::string& symbol);
     std::pair<std::vector<TileID>, AnnotationIDs> addPointAnnotations(
-        const std::vector<LatLng>&, const std::vector<std::string>& symbols, const Map&);
-    std::vector<TileID> removeAnnotations(const AnnotationIDs&, const Map&);
-    AnnotationIDs getAnnotationsInBounds(const LatLngBounds&, const Map&) const;
+        const std::vector<LatLng>&, const std::vector<std::string>& symbols, const MapData&);
+    std::vector<TileID> removeAnnotations(const AnnotationIDs&, const MapData&);
+    AnnotationIDs getAnnotationsInBounds(const LatLngBounds&, const MapData&) const;
     LatLngBounds getBoundsForAnnotations(const AnnotationIDs&) const;
 
     const LiveTile* getTile(const TileID& id);

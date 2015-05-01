@@ -1,4 +1,3 @@
-#include <mbgl/map/map.hpp>
 #include <mbgl/map/raster_tile_data.hpp>
 #include <mbgl/style/style.hpp>
 

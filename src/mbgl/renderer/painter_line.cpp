@@ -4,9 +4,12 @@
 #include <mbgl/style/style_layer.hpp>
 #include <mbgl/style/style_layout.hpp>
 #include <mbgl/map/sprite.hpp>
+#include <mbgl/map/tile_id.hpp>
+#include <mbgl/shader/line_shader.hpp>
+#include <mbgl/shader/linesdf_shader.hpp>
+#include <mbgl/shader/linepattern_shader.hpp>
 #include <mbgl/geometry/sprite_atlas.hpp>
 #include <mbgl/geometry/line_atlas.hpp>
-#include <mbgl/map/map.hpp>
 
 using namespace mbgl;
 
@@ -50,29 +53,6 @@ void Painter::renderLine(LineBucket& bucket, const StyleLayer &layer_desc, const
     mat4 vtxMatrix = translatedMatrix(matrix, properties.translate, id, properties.translateAnchor);
 
     depthRange(strata, 1.0f);
-
-    // We're only drawing end caps + round line joins if the line is > 2px. Otherwise, they aren't visible anyway.
-    if (bucket.hasPoints() && outset > 1.0f) {
-        useProgram(linejoinShader->program);
-        linejoinShader->u_matrix = vtxMatrix;
-        linejoinShader->u_color = color;
-        linejoinShader->u_world = {{
-            state.getFramebufferWidth() * 0.5f,
-            state.getFramebufferHeight() * 0.5f
-        }};
-        linejoinShader->u_linewidth = {{
-            ((outset - 0.25f) * state.getPixelRatio()),
-            ((inset - 0.25f) * state.getPixelRatio())
-        }};
-
-        float pointSize = std::ceil(state.getPixelRatio() * outset * 2.0);
-#if defined(GL_ES_VERSION_2_0)
-        linejoinShader->u_size = pointSize;
-#else
-        MBGL_CHECK_ERROR(glPointSize(pointSize));
-#endif
-        bucket.drawPoints(*linejoinShader);
-    }
 
     if (properties.dash_array.from.size()) {
 

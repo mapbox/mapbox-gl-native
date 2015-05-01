@@ -16,9 +16,9 @@
 #include <mbgl/platform/default/headless_display.hpp>
 #include <mbgl/storage/default_file_source.hpp>
 
-#include <uv.h>
-
 #include <dirent.h>
+
+#include <future>
 
 void rewriteLocalScheme(rapidjson::Value &value, rapidjson::Document::AllocatorType &allocator) {
     ASSERT_TRUE(value.IsString());
@@ -86,7 +86,7 @@ TEST_P(HeadlessTest, render) {
                 }
             }
 
-            if (source->value.HasMember("url")) {
+            if (source->value.HasMember("url") && source->value["url"].IsString()) {
                 rewriteLocalScheme(source->value["url"], styleDoc.GetAllocator());
             }
         }
@@ -106,12 +106,13 @@ TEST_P(HeadlessTest, render) {
 
     Log::setObserver(util::make_unique<FixtureLogObserver>());
 
-    Log::Info(Event::General, "test fixture %s", base.c_str());
-
     for (auto it = infoDoc.MemberBegin(), end = infoDoc.MemberEnd(); it != end; it++) {
         const std::string name {
             it->name.GetString(), it->name.GetStringLength()
         };
+
+        Log::Info(Event::General, "test fixture %s %s", base.c_str(), name.c_str());
+
         const rapidjson::Value& value = it->value;
         ASSERT_TRUE(value.IsObject());
 
@@ -141,47 +142,25 @@ TEST_P(HeadlessTest, render) {
             }
         }
 
-        HeadlessView view(display);
+        HeadlessView view(display, width, height, pixelRatio);
         DefaultFileSource fileSource(nullptr);
-        Map map(view, fileSource);
+        Map map(view, fileSource, MapMode::Still);
 
-        map.start(Map::Mode::Static);
-
+        map.resize(width, height, pixelRatio);
         map.setClasses(classes);
         map.setStyleJSON(style, "test/suite");
-
-        view.resize(width, height, pixelRatio);
         map.setLatLngZoom(mbgl::LatLng(latitude, longitude), zoom);
         map.setBearing(bearing);
 
-        struct Data {
-            std::string path;
-            std::unique_ptr<const StillImage> image;
-        };
+        std::promise<void> promise;
 
-        uv_async_t *async = new uv_async_t;
-        async->data = new Data { "test/suite/tests/" + base + "/" + name +  "/actual.png", nullptr };
-        uv_async_init(uv_default_loop(), async, [](uv_async_t *as, int) {
-            auto data = std::unique_ptr<Data>(reinterpret_cast<Data *>(as->data));
-            as->data = nullptr;
-            uv_close(reinterpret_cast<uv_handle_t *>(as), [](uv_handle_t *handle) {
-                delete reinterpret_cast<uv_async_t *>(handle);
-            });
-
-            assert(data);
-            const std::string png = util::compress_png(data->image->width, data->image->height, data->image->pixels.get());
-            util::write_file(data->path, png);
+        map.renderStill([&](std::unique_ptr<const StillImage> image) {
+            const std::string png = util::compress_png(image->width, image->height, image->pixels.get());
+            util::write_file("test/suite/tests/" + base + "/" + name +  "/actual.png", png);
+            promise.set_value();
         });
 
-        map.renderStill([async](std::unique_ptr<const StillImage> image) {
-            reinterpret_cast<Data *>(async->data)->image = std::move(image);
-            uv_async_send(async);
-        });
-
-        // This loop will terminate once the async was fired.
-        uv_run(uv_default_loop(), UV_RUN_DEFAULT);
-
-        map.stop();
+        promise.get_future().get();
     }
 }
 

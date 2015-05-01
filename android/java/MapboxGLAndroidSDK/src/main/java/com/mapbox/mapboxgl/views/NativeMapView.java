@@ -73,14 +73,6 @@ class NativeMapView {
         nativeDestroySurface(mNativeMapViewPtr);
     }
 
-    public void start() {
-        nativeStart(mNativeMapViewPtr);
-    }
-
-    public void stop() {
-        nativeStop(mNativeMapViewPtr);
-    }
-
     public void pause() {
         nativePause(mNativeMapViewPtr);
     }
@@ -386,17 +378,11 @@ class NativeMapView {
 
     private native void nativeDestroySurface(long nativeMapViewPtr);
 
-    private native void nativeStart(long nativeMapViewPtr);
-
-    private native void nativeStop(long nativeMapViewPtr);
-
     private native void nativePause(long nativeMapViewPtr);
 
     private native void nativeResume(long nativeMapViewPtr);
 
     private native void nativeUpdate(long nativeMapViewPtr);
-
-    private native void nativeTerminate(long nativeMapViewPtr);
 
     private native void nativeResize(long nativeMapViewPtr, int width,
             int height, float ratio, int fbWidth, int fbHeight);
