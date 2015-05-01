@@ -207,6 +207,11 @@ HTTPCURLContext::HTTPCURLContext(uv_loop_t *loop_)
 }
 
 HTTPCURLContext::~HTTPCURLContext() {
+    while (!handles.empty()) {
+        curl_easy_cleanup(handles.front());
+        handles.pop();
+    }
+
     curl_multi_cleanup(multi);
     multi = nullptr;
 
