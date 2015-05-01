@@ -62,19 +62,19 @@ public:
     // Invoke object->fn(args...) in the runloop thread, and wait for the result.
     template <class R, typename Fn, class... Args>
     R invokeSync(Fn fn, Args&&... args) {
-        std::promise<R> promise;
-        auto bound = std::bind(fn, object, args...);
-        loop->invoke([&] { promise.set_value(bound()); } );
-        return promise.get_future().get();
+        std::packaged_task<R ()> task(std::bind(fn, object, args...));
+        std::future<R> future = task.get_future();
+        loop->invoke(std::move(task));
+        return future.get();
     }
 
     // Invoke object->fn(args...) in the runloop thread, and wait for it to complete.
     template <typename Fn, class... Args>
     void invokeSync(Fn fn, Args&&... args) {
-        std::promise<void> promise;
-        auto bound = std::bind(fn, object, args...);
-        loop->invoke([&] { bound(); promise.set_value(); } );
-        promise.get_future().get();
+        std::packaged_task<void ()> task(std::bind(fn, object, args...));
+        std::future<void> future = task.get_future();
+        loop->invoke(std::move(task));
+        return future.get();
     }
 
     // Join the thread, but call the given function repeatedly in the current thread
