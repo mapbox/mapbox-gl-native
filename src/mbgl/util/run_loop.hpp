@@ -29,7 +29,7 @@ public:
 
     // Invoke fn() in the runloop thread, then invoke callback(result) in the current thread.
     template <class Fn, class R>
-    void invokeWithResult(Fn&& fn, std::function<void (R)> callback) {
+    void invokeWithResult(Fn&& fn, std::function<void (R)>&& callback) {
         RunLoop* outer = current.get();
         assert(outer);
 
@@ -37,23 +37,23 @@ public:
             /*
                 With C++14, we could write:
 
-                outer->invoke([callback, result = std::move(fn())] () mutable {
-                    callback(std::move(result));
+                outer->invoke([cb = std::move(callback), result = std::move(fn())] () mutable {
+                    cb(std::move(result));
                 });
 
                 Instead we're using a workaround with std::bind
                 to obtain move-capturing semantics with C++11:
                   http://stackoverflow.com/a/12744730/52207
             */
-            outer->invoke(std::bind([callback] (R& result) {
-                callback(std::move(result));
-            }, std::move(fn())));
+            outer->invoke(std::bind([] (std::function<void (R)>& cb, R& result) {
+                cb(std::move(result));
+            }, std::move(callback), std::move(fn())));
         });
     }
 
     // Invoke fn() in the runloop thread, then invoke callback() in the current thread.
     template <class Fn>
-    void invokeWithResult(Fn&& fn, std::function<void ()> callback) {
+    void invokeWithResult(Fn&& fn, std::function<void ()>&& callback) {
         RunLoop* outer = current.get();
         assert(outer);
 

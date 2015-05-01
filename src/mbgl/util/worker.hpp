@@ -15,7 +15,7 @@ public:
     Worker(std::size_t count);
     ~Worker();
 
-    void send(Fn work, Fn after);
+    void send(Fn&& work, Fn&& after);
 
 private:
     class Impl;

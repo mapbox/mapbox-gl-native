@@ -21,8 +21,8 @@ Worker::Worker(std::size_t count) {
 
 Worker::~Worker() = default;
 
-void Worker::send(Fn work, Fn after) {
-    threads[current]->invokeWithResult(&Worker::Impl::doWork, after, work);
+void Worker::send(Fn&& work, Fn&& after) {
+    threads[current]->invokeWithResult(&Worker::Impl::doWork, std::move(after), std::move(work));
     current = (current + 1) % threads.size();
 }
 

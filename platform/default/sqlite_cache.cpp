@@ -131,7 +131,7 @@ void SQLiteCache::get(const Resource &resource, Callback callback) {
     // Will try to load the URL from the SQLite database and call the callback when done.
     // Note that the callback is probably going to invoked from another thread, so the caller
     // must make sure that it can run in that thread.
-    thread->invokeWithResult(&Impl::get, callback, resource);
+    thread->invokeWithResult(&Impl::get, std::move(callback), resource);
 }
 
 std::unique_ptr<Response> SQLiteCache::Impl::get(const Resource &resource) {
