@@ -739,7 +739,7 @@ std::chrono::steady_clock::duration secondsAsDuration(float duration)
         if ( ! CGPointEqualToPoint(velocity, CGPointZero))
         {
             CGPoint offset = CGPointMake(velocity.x * duration / 4, velocity.y * duration / 4);
-            mbglMap->moveBy(offset.x, offset.y, secondsAsDuration(duration));
+            _mbglMap->moveBy(offset.x, offset.y, secondsAsDuration(duration));
         }
 
         _mbglMap->setGestureInProgress(false);
@@ -821,7 +821,7 @@ std::chrono::steady_clock::duration secondsAsDuration(float duration)
             newScale += scale / (velocity * duration) * 0.1;
         }
         
-        if (newScale <= 0 || log2(newScale) < mbglMap->getMinZoom())
+        if (newScale <= 0 || log2(newScale) < _mbglMap->getMinZoom())
         {
             velocity = 0;
         }
