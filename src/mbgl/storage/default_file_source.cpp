@@ -13,9 +13,8 @@
 
 #pragma GCC diagnostic push
 #pragma GCC diagnostic ignored "-Wshadow"
-#ifndef __clang__
+#pragma GCC diagnostic ignored "-Wunknown-pragmas"
 #pragma GCC diagnostic ignored "-Wunused-local-typedefs"
-#endif
 #include <boost/algorithm/string.hpp>
 #pragma GCC diagnostic pop
 
