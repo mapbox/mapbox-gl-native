@@ -77,11 +77,6 @@ public:
         return future.get();
     }
 
-    // Join the thread, but call the given function repeatedly in the current thread
-    // while waiting for the join to finish. This should be immediately followed by
-    // destroying the Thread.
-    void pumpingStop(std::function<void ()>);
-
 private:
     Thread(const Thread&) = delete;
     Thread(Thread&&) = delete;
@@ -124,21 +119,24 @@ Thread<Object>::Thread(const std::string& name, Args&&... args) {
 template <class Object>
 template <typename P, std::size_t... I>
 void Thread<Object>::run(P&& params, index_sequence<I...>) {
-    RunLoop loop_;
-    loop = &loop_;
+    uv::loop l;
 
     {
-        Object object_(loop_.get(), std::get<I>(std::forward<P>(params))...);
+        Object object_(l.get(), std::get<I>(std::forward<P>(params))...);
         object = &object_;
 
-        running.set_value();
-        loop_.run();
+        RunLoop loop_(l.get());
+        loop = &loop_;
 
+        running.set_value();
+        l.run();
+
+        loop = nullptr;
         object = nullptr;
     }
 
     // Run the loop again to ensure that async close callbacks have been called.
-    loop_.run();
+    l.run();
 
     joinable.get_future().get();
 }

@@ -14,9 +14,9 @@ namespace util {
 
 class RunLoop : private util::noncopyable {
 public:
-    RunLoop();
+    RunLoop(uv_loop_t*);
+    ~RunLoop();
 
-    void run();
     void stop();
 
     // Invoke fn() in the runloop thread.
@@ -63,7 +63,7 @@ public:
         });
     }
 
-    uv_loop_t* get() { return *loop; }
+    uv_loop_t* get() { return async.get()->loop; }
 
     static uv::tls<RunLoop> current;
 
@@ -90,8 +90,6 @@ private:
 
     Queue queue;
     std::mutex mutex;
-
-    uv::loop loop;
     uv::async async;
 };
 
