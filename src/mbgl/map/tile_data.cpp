@@ -55,21 +55,11 @@ void TileData::cancel() {
         env.cancelRequest(req);
         req = nullptr;
     }
+    if (workRequest) {
+        workRequest.join();
+    }
 }
 
 void TileData::reparse(Worker& worker, std::function<void()> callback) {
-    util::ptr<TileData> tile = shared_from_this();
-    worker.send(
-        [this]() {
-            EnvironmentScope scope(env, ThreadType::TileWorker, "TileWorker_" + name);
-            parse();
-        },
-        [tile, callback]() {
-             // `tile` is bound in this lambda to ensure that if it's the last owning pointer,
-             // destruction happens on the map thread, not the worker thread. It is _not_ bound
-             // in the above lambda, because we do not want the possibility to arise that the
-             // after callback could execute and release the penultimate reference before the
-             // work callback has been destructed.
-            callback();
-        });
+    workRequest = worker.send([this] { parse(); }, callback);
 }

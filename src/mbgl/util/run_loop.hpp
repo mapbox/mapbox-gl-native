@@ -33,21 +33,10 @@ public:
         RunLoop* outer = current.get();
         assert(outer);
 
-        invoke([fn, callback, outer] {
-            /*
-                With C++14, we could write:
-
-                outer->invoke([cb = std::move(callback), result = std::move(fn())] () mutable {
-                    cb(std::move(result));
-                });
-
-                Instead we're using a workaround with std::bind
-                to obtain move-capturing semantics with C++11:
-                  http://stackoverflow.com/a/12744730/52207
-            */
-            outer->invoke(std::bind([] (std::function<void (R)>& cb, R& result) {
-                cb(std::move(result));
-            }, std::move(callback), std::move(fn())));
+        invoke([fn = std::move(fn), callback = std::move(callback), outer] () mutable {
+            outer->invoke([callback = std::move(callback), result = std::move(fn())] () mutable {
+                callback(std::move(result));
+            });
         });
     }
 
@@ -57,7 +46,7 @@ public:
         RunLoop* outer = current.get();
         assert(outer);
 
-        invoke([fn, callback, outer] {
+        invoke([fn = std::move(fn), callback = std::move(callback), outer] () mutable {
             fn();
             outer->invoke(std::move(callback));
         });
