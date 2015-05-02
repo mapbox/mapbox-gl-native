@@ -122,11 +122,11 @@ void Thread<Object>::run(P&& params, index_sequence<I...>) {
     uv::loop l;
 
     {
-        Object object_(l.get(), std::get<I>(std::forward<P>(params))...);
-        object = &object_;
-
         RunLoop loop_(l.get());
         loop = &loop_;
+
+        Object object_(l.get(), std::get<I>(std::forward<P>(params))...);
+        object = &object_;
 
         running.set_value();
         l.run();
