@@ -33,6 +33,7 @@ extern NSString *const MGLEventGestureRotateStart;
 // You must call these methods from the main thread.
 //
 + (void) setToken:(NSString *)token;
++ (void) setAlternateDataServerURL:(NSString *)alternateDataServerURL;
 + (void) setAppName:(NSString *)appName;
 + (void) setAppVersion:(NSString *)appVersion;
 + (void) setAppBuildNumber:(NSString *)appBuildNumber;
