@@ -5,7 +5,7 @@ implemented in C++11, currently targeting iOS, OS X, Android, and Ubuntu Linux.
 
 # Depends
 
- - Modern C++ compiler that supports `-std=c++11` (On OS X clang++, on Linux g++-4.8 or g++-4.9)
+ - Modern C++ compiler that supports `-std=c++14` (On OS X clang++, on Linux g++-4.9)
  - [Boost headers](http://boost.org/)
  - [`zlib`](http://www.zlib.net/)
  - [`libpng`](http://www.libpng.org/pub/png/libpng.html)
@@ -85,8 +85,8 @@ Install GCC 4.8+ if you are running Ubuntu 13.10 or older. Alternatively, you ca
 
     sudo add-apt-repository --yes ppa:ubuntu-toolchain-r/test
     sudo apt-get update
-    sudo apt-get install gcc-4.8 g++-4.8
-    export CXX=g++-4.8
+    sudo apt-get install gcc-4.9 g++-4.9
+    export CXX=g++-4.9
 
 Ensure you have git and other build essentials:
 

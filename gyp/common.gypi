@@ -34,7 +34,6 @@
           '-Wshadow',
           '-Wno-variadic-macros',
           '-Wno-error=unused-parameter',
-          '-Wno-unknown-warning-option',
           '-frtti',
           '-fexceptions',
         ],

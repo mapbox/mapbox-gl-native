@@ -7,23 +7,23 @@ matrix:
     - os: linux
   include:
     - os: linux
-      env: FLAVOR=linux CXX=g++-4.8 BUILDTYPE=Release
+      env: FLAVOR=linux CXX=g++-4.9 BUILDTYPE=Release
       addons:
         apt:
           sources: [ 'ubuntu-toolchain-r-test' ]
-          packages: [ 'gdb', 'g++-4.8', 'gcc-4.8', 'libllvm3.4', 'xutils-dev', 'libxxf86vm-dev', 'x11proto-xf86vidmode-dev', 'mesa-utils' ]
+          packages: [ 'gdb', 'g++-4.9', 'gcc-4.9', 'libllvm3.4', 'xutils-dev', 'libxxf86vm-dev', 'x11proto-xf86vidmode-dev', 'mesa-utils' ]
     - os: linux
       env: FLAVOR=linux CXX=clang++ BUILDTYPE=Debug
       addons:
         apt:
           sources: [ 'ubuntu-toolchain-r-test' ]
-          packages: [ 'gdb', 'libgcc-4.8-dev', 'libstdc++-4.8-dev', 'libstdc++6', 'libllvm3.4', 'xutils-dev', 'libxxf86vm-dev', 'x11proto-xf86vidmode-dev', 'mesa-utils' ]
+          packages: [ 'gdb', 'libstdc++-4.9-dev', 'libstdc++6', 'libllvm3.4', 'xutils-dev', 'libxxf86vm-dev', 'x11proto-xf86vidmode-dev', 'mesa-utils' ]
     - os: linux
       env: FLAVOR=linux CXX=clang++ BUILDTYPE=Release
       addons:
         apt:
           sources: [ 'ubuntu-toolchain-r-test' ]
-          packages: [ 'gdb', 'libgcc-4.8-dev', 'libstdc++-4.8-dev', 'libstdc++6', 'libllvm3.4', 'xutils-dev', 'libxxf86vm-dev', 'x11proto-xf86vidmode-dev', 'mesa-utils' ]
+          packages: [ 'gdb', 'libstdc++-4.9-dev', 'libstdc++6', 'libllvm3.4', 'xutils-dev', 'libxxf86vm-dev', 'x11proto-xf86vidmode-dev', 'mesa-utils' ]
     - os: osx
       env: FLAVOR=osx BUILDTYPE=Debug
     - os: osx
