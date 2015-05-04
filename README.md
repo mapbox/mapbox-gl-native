@@ -1,11 +1,10 @@
 [![Travis](https://api.travis-ci.org/mapbox/mapbox-gl-native.svg?branch=master)](https://travis-ci.org/mapbox/mapbox-gl-native/builds)
 
-An OpenGL renderer for [Mapbox Vector Tiles](https://www.mapbox.com/blog/vector-tiles),
-implemented in C++11, currently targeting iOS, OS X, Android, and Ubuntu Linux.
+An OpenGL renderer for [Mapbox Vector Tiles](https://www.mapbox.com/blog/vector-tiles), consisting of a C++ library for OS X and Linux and SDK bindings for iOS and Android.
 
 # Depends
 
- - Modern C++ compiler that supports `-std=c++14` (On OS X clang++, on Linux g++-4.9)
+ - Modern C++ compiler that supports `-std=c++14` (clang++ 3.5 or later or g++-4.9 or later)
  - [Boost headers](http://boost.org/)
  - [`zlib`](http://www.zlib.net/)
  - [`libpng`](http://www.libpng.org/pub/png/libpng.html)
@@ -81,7 +80,7 @@ Target iOS: 7.0 through latest 8.x.
 
 We are using Ubuntu for development. While the software should work on other distributions as well, we are not providing explicit build instructions here.
 
-Install GCC 4.8+ if you are running Ubuntu 13.10 or older. Alternatively, you can also use Clang 3.4+.
+Install GCC 4.9+ if you are running Ubuntu 13.10 or older. Alternatively, you can also use Clang 3.5+.
 
     sudo add-apt-repository --yes ppa:ubuntu-toolchain-r/test
     sudo apt-get update
