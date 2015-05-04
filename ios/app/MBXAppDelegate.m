@@ -1,6 +1,7 @@
 #import "MBXAppDelegate.h"
 #import "MBXViewController.h"
 #import <mbgl/ios/MapboxGL.h>
+#import <mbgl/ios/MGLAccountManager.h>
 #import <mbgl/ios/MGLMapboxEvents.h>
 
 @implementation MBXAppDelegate
@@ -20,7 +21,7 @@
     }
     if ( ! accessToken) NSLog(@"No access token set. Mapbox vector tiles won't work.");
 
-    [MapboxGL sharedInstanceWithAccessToken:accessToken];
+    [MGLAccountManager sharedInstanceWithAccessToken:accessToken];
 
     self.window = [[UIWindow alloc] initWithFrame:[[UIScreen mainScreen] bounds]];
     self.window.rootViewController = [[UINavigationController alloc] initWithRootViewController:[MBXViewController new]];

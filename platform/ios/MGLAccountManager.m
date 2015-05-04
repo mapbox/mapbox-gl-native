@@ -1,19 +1,19 @@
 #import <Foundation/Foundation.h>
 
-#import "MapboxGL.h"
+#import "MGLAccountManager.h"
 #import "NSProcessInfo+MGLAdditions.h"
 #import "MGLMapboxEvents.h"
 
-@interface MapboxGL()
+@interface MGLAccountManager()
 
 @property (atomic) NSString *accessToken;
 
 @end
 
 
-@implementation MapboxGL
+@implementation MGLAccountManager
 
-static MapboxGL *_sharedManager;
+static MGLAccountManager *_sharedManager;
 
 // Can be called from any thread. Called implicitly from any
 // public class convenience methods.

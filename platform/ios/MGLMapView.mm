@@ -123,7 +123,7 @@ mbgl::DefaultFileSource *mbglFileSource = nullptr;
     if (self && [self commonInit])
     {
         self.styleURL = nil;
-        self.accessToken = [MapboxGL getAccessToken];
+        self.accessToken = [MGLAccountManager getAccessToken];
         return self;
     }
 
