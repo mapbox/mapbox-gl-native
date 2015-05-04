@@ -12,4 +12,7 @@ export PATH="`pwd`/.mason:${PATH}" MASON_DIR="`pwd`/.mason"
 mapbox_time "install_xcpretty" \
 gem install xcpretty --no-rdoc --no-ri --no-document --quiet
 
+mapbox_time "install_recent_git" \
+brew install git
+
 mkdir -p ${KIF_SCREENSHOTS}
