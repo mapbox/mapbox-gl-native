@@ -74,7 +74,7 @@ You can run `make itest` to run the included integration tests. Requires `gem in
 
 Target devices: iPhone 4S and above (5, 5c, 5s, 6, 6 Plus) and iPad 2 and above (3, 4, Mini, Air, Mini 2, Air 2).
 
-Target iOS: 7.0 through 8.1
+Target iOS: 7.0 through latest 8.x. 
 
 
 ## Linux
