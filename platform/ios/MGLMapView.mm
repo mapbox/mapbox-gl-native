@@ -123,7 +123,7 @@ mbgl::DefaultFileSource *mbglFileSource = nullptr;
     if (self && [self commonInit])
     {
         self.styleURL = nil;
-        self.accessToken = [MGLAccountManager getAccessToken];
+        self.accessToken = [MGLAccountManager sharedAccessToken];
         return self;
     }
 

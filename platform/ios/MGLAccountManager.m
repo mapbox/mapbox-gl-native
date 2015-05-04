@@ -40,7 +40,7 @@ static MGLAccountManager *_sharedManager;
     return _sharedManager;
 }
 
-+ (NSString *) getAccessToken {
++ (NSString *) sharedAccessToken {
     if (_sharedManager) {
         return _sharedManager.accessToken;
     }
