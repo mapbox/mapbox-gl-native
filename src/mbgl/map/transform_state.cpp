@@ -31,8 +31,8 @@ box TransformState::cornersToBox(uint32_t z) const {
     const double angle_sin = std::sin(-angle);
     const double angle_cos = std::cos(-angle);
 
-    const double w_2 = width / 2;
-    const double h_2 = height / 2;
+    const double w_2 = static_cast<double>(width) / 2.0;
+    const double h_2 = static_cast<double>(height) / 2.0;
     const double ss_0 = scale * util::tileSize;
     const double ss_1 = ref_scale / ss_0;
     const double ss_2 = ss_0 / 2.0;
@@ -166,8 +166,8 @@ const vec2<double> TransformState::pixelForLatLng(const LatLng latLng) const {
     LatLng ll = getLatLng();
     double zoom = getZoom();
 
-    const double centerX = width  / 2;
-    const double centerY = height / 2;
+    const double centerX = static_cast<double>(width) / 2.0;
+    const double centerY = static_cast<double>(height) / 2.0;
 
     const double m = Projection::getMetersPerPixelAtLatitude(0, zoom);
 
