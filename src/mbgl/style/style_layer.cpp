@@ -13,6 +13,21 @@ bool StyleLayer::isBackground() const {
     return type == StyleLayerType::Background;
 }
 
+bool StyleLayer::isVisible() const {
+    switch (type) {
+        case StyleLayerType::Fill:
+            return getProperties<FillProperties>().isVisible();
+        case StyleLayerType::Line:
+            return getProperties<LineProperties>().isVisible();
+        case StyleLayerType::Symbol:
+            return getProperties<SymbolProperties>().isVisible();
+        case StyleLayerType::Raster:
+            return getProperties<RasterProperties>().isVisible();
+        default:
+            return false;
+    }
+}
+
 void StyleLayer::setClasses(const std::vector<std::string> &class_names, const TimePoint now,
                             const PropertyTransition &defaultTransition) {
     // Stores all keys that we have already added transitions for.

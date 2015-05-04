@@ -249,6 +249,12 @@ std::chrono::steady_clock::duration secondsAsDuration(float duration)
             gl::IsVertexArray = glIsVertexArrayOES;
         }
 
+        if (extensions.find("GL_EXT_debug_marker") != std::string::npos) {
+            gl::InsertEventMarkerEXT = glInsertEventMarkerEXT;
+            gl::PushGroupMarkerEXT = glPushGroupMarkerEXT;
+            gl::PopGroupMarkerEXT = glPopGroupMarkerEXT;
+        }
+
         if (extensions.find("GL_OES_packed_depth_stencil") != std::string::npos) {
             gl::isPackedDepthStencilSupported = YES;
         }

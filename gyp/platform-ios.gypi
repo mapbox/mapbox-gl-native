@@ -15,6 +15,7 @@
         '../platform/darwin/application_root.mm',
         '../platform/darwin/asset_root.mm',
         '../platform/darwin/image.mm',
+        '../platform/darwin/nsthread.mm',
         '../platform/darwin/reachability.m',
         '../include/mbgl/ios/MapboxGL.h',
         '../include/mbgl/ios/MGLMapboxEvents.h',

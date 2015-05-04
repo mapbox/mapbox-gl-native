@@ -25,8 +25,8 @@ public:
     // bind current texture
     void bind(bool linear = false);
 
-    // bind prerendered texture
-    void bind(const GLuint texture);
+    // uploads the texture if it hasn't been uploaded yet.
+    void upload();
 
     // loaded status
     bool isLoaded() const;

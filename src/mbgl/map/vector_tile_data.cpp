@@ -55,23 +55,13 @@ void VectorTileData::parse() {
     }
 }
 
-void VectorTileData::render(Painter &painter, const StyleLayer &layer_desc, const mat4 &matrix) {
-    if (state == State::parsed && layer_desc.bucket) {
-        auto databucket_it = buckets.find(layer_desc.bucket->name);
-        if (databucket_it != buckets.end()) {
-            assert(databucket_it->second);
-            databucket_it->second->render(painter, layer_desc, id, matrix);
+Bucket* VectorTileData::getBucket(StyleLayer const& layer) {
+    if (state == State::parsed && layer.bucket) {
+        const auto it = buckets.find(layer.bucket->name);
+        if (it != buckets.end()) {
+            assert(it->second);
+            return it->second.get();
         }
     }
-}
-
-bool VectorTileData::hasData(const StyleLayer &layer_desc) const {
-    if (state == State::parsed && layer_desc.bucket) {
-        auto databucket_it = buckets.find(layer_desc.bucket->name);
-        if (databucket_it != buckets.end()) {
-            assert(databucket_it->second);
-            return databucket_it->second->hasData();
-        }
-    }
-    return false;
+    return nullptr;
 }

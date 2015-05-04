@@ -1,4 +1,5 @@
 #include <mbgl/util/worker.hpp>
+#include <mbgl/platform/platform.hpp>
 
 #include <cassert>
 
@@ -15,7 +16,7 @@ public:
 
 Worker::Worker(std::size_t count) {
     for (std::size_t i = 0; i < count; i++) {
-        threads.emplace_back(util::make_unique<util::Thread<Impl>>("Worker"));
+        threads.emplace_back(util::make_unique<util::Thread<Impl>>("Worker", util::ThreadPriority::Low));
     }
 }
 

@@ -184,16 +184,6 @@ void Source::drawClippingMasks(Painter &painter) {
     }
 }
 
-void Source::render(Painter &painter, const StyleLayer &layer_desc) {
-    gl::group group(std::string { "layer: " } + layer_desc.id);
-    for (const auto& pair : tiles) {
-        Tile &tile = *pair.second;
-        if (tile.data && tile.data->state == TileData::State::parsed) {
-            painter.renderTileLayer(tile, layer_desc, tile.matrix);
-        }
-    }
-}
-
 void Source::finishRender(Painter &painter) {
     for (const auto& pair : tiles) {
         Tile &tile = *pair.second;
@@ -212,6 +202,9 @@ std::forward_list<Tile *> Source::getLoadedTiles() const {
     return ptrs;
 }
 
+const std::vector<Tile*>& Source::getTiles() const {
+    return tilePtrs;
+}
 
 TileData::State Source::hasTile(const TileID& id) {
     auto it = tiles.find(id);
@@ -455,6 +448,8 @@ void Source::update(MapData& data,
         }
     });
 
+    updateTilePtrs();
+
     updated = data.getAnimationTime();
 }
 
@@ -463,6 +458,14 @@ void Source::invalidateTiles(const std::vector<TileID>& ids) {
     for (auto& id : ids) {
         tiles.erase(id);
         tile_data.erase(id);
+    }
+    updateTilePtrs();
+}
+
+void Source::updateTilePtrs() {
+    tilePtrs.clear();
+    for (const auto& pair : tiles) {
+        tilePtrs.push_back(pair.second.get());
     }
 }
 

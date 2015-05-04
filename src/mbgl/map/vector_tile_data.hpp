@@ -40,8 +40,7 @@ public:
     ~VectorTileData();
 
     void parse() override;
-    void render(Painter &painter, const StyleLayer &layer_desc, const mat4 &matrix) override;
-    bool hasData(StyleLayer const& layer_desc) const override;
+    virtual Bucket* getBucket(StyleLayer const &layer_desc) override;
 
 protected:
     // Holds the actual geometries in this tile.

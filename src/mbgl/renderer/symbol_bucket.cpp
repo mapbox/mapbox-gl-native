@@ -36,8 +36,23 @@ SymbolBucket::~SymbolBucket() {
     // Do not remove. header file only contains forward definitions to unique pointers.
 }
 
-void SymbolBucket::render(Painter &painter, const StyleLayer &layer_desc, const TileID &id,
-                          const mat4 &matrix) {
+void SymbolBucket::upload() {
+    if (hasTextData()) {
+        text.vertices.upload();
+        text.triangles.upload();
+    }
+    if (hasIconData()) {
+        icon.vertices.upload();
+        icon.triangles.upload();
+    }
+
+    uploaded = true;
+}
+
+void SymbolBucket::render(Painter& painter,
+                          const StyleLayer& layer_desc,
+                          const TileID& id,
+                          const mat4& matrix) {
     painter.renderSymbol(*this, layer_desc, id, matrix);
 }
 
