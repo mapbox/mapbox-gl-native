@@ -54,7 +54,6 @@ mbgl::Settings_NSUserDefaults *settings = nullptr;
 
     self.mapView = [[MGLMapView alloc] initWithFrame:self.view.bounds];
     self.mapView.autoresizingMask = UIViewAutoresizingFlexibleWidth | UIViewAutoresizingFlexibleHeight;
-    self.mapView.viewControllerForLayoutGuides = self;
     self.mapView.showsUserLocation = YES;
     self.mapView.delegate = self;
     [self.view addSubview:self.mapView];

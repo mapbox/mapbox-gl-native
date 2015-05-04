@@ -51,7 +51,6 @@ struct SymbolProperties {
 
     struct {
         float opacity = 1.0f;
-        float rotate = 0.0f;
         float size = 1.0f;
         Color color = {{ 0, 0, 0, 1 }};
         Color halo_color = {{ 0, 0, 0, 0 }};

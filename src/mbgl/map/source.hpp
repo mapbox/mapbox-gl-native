@@ -20,9 +20,8 @@
 
 namespace mbgl {
 
-class Map;
+class MapData;
 class Environment;
-class Worker;
 class GlyphAtlas;
 class GlyphStore;
 class SpriteAtlas;
@@ -30,7 +29,6 @@ class Sprite;
 class TexturePool;
 class Style;
 class Painter;
-class StyleLayer;
 class TransformState;
 class Tile;
 struct ClipID;
@@ -60,18 +58,27 @@ public:
     void load(const std::string& accessToken,
               Environment&,
               std::function<void()> callback);
+    bool isLoaded() const;
 
-    void update(Map &, Worker &, util::ptr<Style>, GlyphAtlas &, GlyphStore &,
-                SpriteAtlas &, util::ptr<Sprite>, TexturePool &, std::function<void()> callback);
+    void load(MapData&, Environment&, std::function<void()> callback);
+    void update(MapData&,
+                const TransformState&,
+                Style&,
+                GlyphAtlas&,
+                GlyphStore&,
+                SpriteAtlas&,
+                util::ptr<Sprite>,
+                TexturePool&,
+                std::function<void()> callback);
 
     void invalidateTiles(const std::vector<TileID>&);
 
     void updateMatrices(const mat4 &projMatrix, const TransformState &transform);
     void drawClippingMasks(Painter &painter);
-    void render(Painter &painter, const StyleLayer &layer_desc);
     void finishRender(Painter &painter);
 
     std::forward_list<Tile *> getLoadedTiles() const;
+    const std::vector<Tile*>& getTiles() const;
 
     void setCacheSize(size_t);
     void onLowMemory();
@@ -85,11 +92,19 @@ private:
     int32_t coveringZoomLevel(const TransformState&) const;
     std::forward_list<TileID> coveringTiles(const TransformState&) const;
 
-    TileData::State addTile(Map &, Worker &, util::ptr<Style>, GlyphAtlas &,
-                            GlyphStore &, SpriteAtlas &, util::ptr<Sprite>, TexturePool &,
-                            const TileID &, std::function<void()> callback);
+    TileData::State addTile(MapData&,
+                            const TransformState&,
+                            Style&,
+                            GlyphAtlas&,
+                            GlyphStore&,
+                            SpriteAtlas&,
+                            util::ptr<Sprite>,
+                            TexturePool&,
+                            const TileID&,
+                            std::function<void()> callback);
 
     TileData::State hasTile(const TileID& id);
+    void updateTilePtrs();
 
     double getZoom(const TransformState &state) const;
 
@@ -99,6 +114,7 @@ private:
     TimePoint updated = TimePoint::min();
 
     std::map<TileID, std::unique_ptr<Tile>> tiles;
+    std::vector<Tile*> tilePtrs;
     std::map<TileID, std::weak_ptr<TileData>> tile_data;
     TileCache cache;
 };

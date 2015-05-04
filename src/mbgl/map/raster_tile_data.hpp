@@ -20,8 +20,7 @@ public:
     ~RasterTileData();
 
     void parse() override;
-    void render(Painter &painter, const StyleLayer &layer_desc, const mat4 &matrix) override;
-    bool hasData(StyleLayer const &layer_desc) const override;
+    Bucket* getBucket(StyleLayer const &layer_desc) override;
 
 protected:
     StyleLayoutRaster layout;

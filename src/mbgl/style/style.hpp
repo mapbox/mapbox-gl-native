@@ -8,6 +8,7 @@
 #include <mbgl/util/ptr.hpp>
 #include <mbgl/util/noncopyable.hpp>
 #include <mbgl/util/chrono.hpp>
+#include <mbgl/util/worker.hpp>
 
 #include <cstdint>
 #include <string>
@@ -24,6 +25,7 @@ public:
     ~Style();
 
     void loadJSON(const uint8_t *const data);
+    bool isLoaded() const;
 
     void cascade(const std::vector<std::string>&);
     void recalculate(float z, TimePoint now);
@@ -43,6 +45,9 @@ private:
     PropertyTransition defaultTransition;
     std::unique_ptr<uv::rwlock> mtx;
     ZoomHistory zoomHistory;
+
+public:
+    Worker workers;
 };
 
 }

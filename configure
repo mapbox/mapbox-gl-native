@@ -15,7 +15,8 @@ function finish {
 trap finish EXIT
 
 # Install mason
-. ./scripts/local_mason.sh
+git submodule update --init .mason
+export PATH="`pwd`/.mason:${PATH}" MASON_DIR="`pwd`/.mason"
 
 case ${MASON_PLATFORM} in
     'ios')
@@ -44,7 +45,7 @@ case ${MASON_PLATFORM} in
         LIBCURL_VERSION=system
         LIBUV_VERSION=0.10.28
         ZLIB_VERSION=system
-        BOOST_VERSION=system
+        BOOST_VERSION=1.57.0
         NUNICODE_VERSION=1.5.1
         LIBZIP_VERSION=0.11.2
         ;;

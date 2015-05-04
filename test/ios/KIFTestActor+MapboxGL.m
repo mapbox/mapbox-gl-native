@@ -1,7 +1,8 @@
 #import "KIFTestActor+MapboxGL.h"
+
+#import "MapboxGL.h"
+
 #import <KIF/UIApplication-KIFAdditions.h>
-#import <KIF/UIAccessibilityElement-KIFAdditions.h>
-#import "MGLMapView.h"
 
 @implementation KIFTestActor (MapboxGL)
 
@@ -9,8 +10,8 @@
     return [[UIApplication sharedApplication] statusBarWindow];
 }
 
-- (UIViewController *)viewController {
-    return (UIViewController *)[[tester.mapView nextResponder] nextResponder];
+- (MGLTViewController *)viewController {
+    return (MGLTViewController *)[[tester.mapView nextResponder] nextResponder];
 }
 
 - (MGLMapView *)mapView {

@@ -13,6 +13,21 @@ bool StyleLayer::isBackground() const {
     return type == StyleLayerType::Background;
 }
 
+bool StyleLayer::isVisible() const {
+    switch (type) {
+        case StyleLayerType::Fill:
+            return getProperties<FillProperties>().isVisible();
+        case StyleLayerType::Line:
+            return getProperties<LineProperties>().isVisible();
+        case StyleLayerType::Symbol:
+            return getProperties<SymbolProperties>().isVisible();
+        case StyleLayerType::Raster:
+            return getProperties<RasterProperties>().isVisible();
+        default:
+            return false;
+    }
+}
+
 void StyleLayer::setClasses(const std::vector<std::string> &class_names, const TimePoint now,
                             const PropertyTransition &defaultTransition) {
     // Stores all keys that we have already added transitions for.
@@ -194,7 +209,6 @@ void StyleLayer::applyStyleProperties<SymbolProperties>(const float z, const Tim
     properties.set<SymbolProperties>();
     SymbolProperties &symbol = properties.get<SymbolProperties>();
     applyTransitionedStyleProperty(PropertyKey::IconOpacity, symbol.icon.opacity, z, now, zoomHistory);
-    applyTransitionedStyleProperty(PropertyKey::IconRotate, symbol.icon.rotate, z, now, zoomHistory);
     applyTransitionedStyleProperty(PropertyKey::IconSize, symbol.icon.size, z, now, zoomHistory);
     applyTransitionedStyleProperty(PropertyKey::IconColor, symbol.icon.color, z, now, zoomHistory);
     applyTransitionedStyleProperty(PropertyKey::IconHaloColor, symbol.icon.halo_color, z, now, zoomHistory);

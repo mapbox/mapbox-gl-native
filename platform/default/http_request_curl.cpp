@@ -1,10 +1,11 @@
-#include <mbgl/storage/http_request.hpp>
 #include <mbgl/storage/http_context.hpp>
+#include <mbgl/storage/resource.hpp>
 #include <mbgl/storage/response.hpp>
 #include <mbgl/util/chrono.hpp>
 #include <mbgl/platform/log.hpp>
 
 #include <mbgl/util/time.hpp>
+#include <mbgl/util/util.hpp>
 
 #include <curl/curl.h>
 
@@ -53,13 +54,19 @@ enum class ResponseStatus : int8_t {
     NotModified,
 };
 
-class HTTPRequestImpl;
+class HTTPRequest;
 
-class HTTPCURLContext : public HTTPContext<HTTPCURLContext> {
+class HTTPCURLContext : public HTTPContext {
+    MBGL_STORE_THREAD(tid)
 
 public:
     HTTPCURLContext(uv_loop_t *loop);
     ~HTTPCURLContext();
+
+    RequestBase* createRequest(const Resource&,
+                               RequestBase::Callback,
+                               uv_loop_t*,
+                               std::shared_ptr<const Response>) override;
 
     static int handleSocket(CURL *handle, curl_socket_t s, int action, void *userp, void *socketp);
     static void perform(uv_poll_t *req, int status, int events);
@@ -74,7 +81,8 @@ public:
     void returnHandle(CURL *handle);
     void checkMultiInfo();
 
-public:
+    uv_loop_t *loop = nullptr;
+
     // Used as the CURL timer function to periodically check for socket updates.
     uv_timer_t *timeout = nullptr;
 
@@ -90,17 +98,21 @@ public:
     std::queue<CURL *> handles;
 };
 
-
-class HTTPRequestImpl {
+class HTTPRequest : public RequestBase {
     MBGL_STORE_THREAD(tid)
 
 public:
-    HTTPRequestImpl(HTTPRequest *request, uv_loop_t *loop, std::shared_ptr<const Response> response);
-    ~HTTPRequestImpl();
+    HTTPRequest(HTTPCURLContext*,
+                const Resource&,
+                Callback,
+                uv_loop_t*,
+                std::shared_ptr<const Response>);
+    ~HTTPRequest();
+
+    void cancel() override;
+    void retry() override;
 
     void handleResult(CURLcode code);
-    void abandon();
-    void retryImmediately();
 
 private:
     static size_t headerCallback(char *const buffer, const size_t size, const size_t nmemb, void *userp);
@@ -115,9 +127,8 @@ private:
     void finish(ResponseStatus status);
     void start();
 
-private:
     HTTPCURLContext *context = nullptr;
-    HTTPRequest *request = nullptr;
+    bool cancelled = false;
 
     // Will store the current response.
     std::unique_ptr<Response> response;
@@ -175,10 +186,9 @@ private:
 
 // -------------------------------------------------------------------------------------------------
 
-template<> pthread_key_t ThreadContext<HTTPCURLContext>::key{};
-template<> pthread_once_t ThreadContext<HTTPCURLContext>::once = PTHREAD_ONCE_INIT;
-
-HTTPCURLContext::HTTPCURLContext(uv_loop_t *loop_) : HTTPContext(loop_) {
+HTTPCURLContext::HTTPCURLContext(uv_loop_t *loop_)
+    : HTTPContext(loop_),
+      loop(loop_) {
     if (curl_global_init(CURL_GLOBAL_ALL)) {
         throw std::runtime_error("Could not init cURL");
     }
@@ -197,6 +207,11 @@ HTTPCURLContext::HTTPCURLContext(uv_loop_t *loop_) : HTTPContext(loop_) {
 }
 
 HTTPCURLContext::~HTTPCURLContext() {
+    while (!handles.empty()) {
+        curl_easy_cleanup(handles.front());
+        handles.pop();
+    }
+
     curl_multi_cleanup(multi);
     multi = nullptr;
 
@@ -205,6 +220,13 @@ HTTPCURLContext::~HTTPCURLContext() {
 
     uv_timer_stop(timeout);
     uv::close(timeout);
+}
+
+RequestBase* HTTPCURLContext::createRequest(const Resource& resource,
+                                            RequestBase::Callback callback,
+                                            uv_loop_t* loop_,
+                                            std::shared_ptr<const Response> response) {
+    return new HTTPRequest(this, resource, callback, loop_, response);
 }
 
 CURL *HTTPCURLContext::getHandle() {
@@ -230,7 +252,7 @@ void HTTPCURLContext::checkMultiInfo() {
     while ((message = curl_multi_info_read(multi, &pending))) {
         switch (message->msg) {
         case CURLMSG_DONE: {
-            HTTPRequestImpl *baton = nullptr;
+            HTTPRequest *baton = nullptr;
             curl_easy_getinfo(message->easy_handle, CURLINFO_PRIVATE, (char *)&baton);
             assert(baton);
             baton->handleResult(message->data.result);
@@ -425,13 +447,12 @@ static CURLcode sslctx_function(CURL * /* curl */, void *sslctx, void * /* parm 
 }
 #endif
 
-HTTPRequestImpl::HTTPRequestImpl(HTTPRequest *request_, uv_loop_t *loop, std::shared_ptr<const Response> response_)
-    : context(HTTPCURLContext::Get(loop)),
-      request(request_),
+HTTPRequest::HTTPRequest(HTTPCURLContext* context_, const Resource& resource_, Callback callback_, uv_loop_t*, std::shared_ptr<const Response> response_)
+    : RequestBase(resource_, callback_),
+      context(context_),
       existingResponse(response_),
       handle(context->getHandle()) {
-    assert(request);
-    context->addRequest(request);
+    context->addRequest(this);
 
     // Zero out the error buffer.
     memset(error, 0, sizeof(error));
@@ -462,7 +483,7 @@ HTTPRequestImpl::HTTPRequestImpl(HTTPRequest *request_, uv_loop_t *loop, std::sh
     handleError(curl_easy_setopt(handle, CURLOPT_CAINFO, "ca-bundle.crt"));
 #endif
     handleError(curl_easy_setopt(handle, CURLOPT_FOLLOWLOCATION, 1));
-    handleError(curl_easy_setopt(handle, CURLOPT_URL, request->resource.url.c_str()));
+    handleError(curl_easy_setopt(handle, CURLOPT_URL, resource.url.c_str()));
     handleError(curl_easy_setopt(handle, CURLOPT_WRITEFUNCTION, writeCallback));
     handleError(curl_easy_setopt(handle, CURLOPT_WRITEDATA, this));
     handleError(curl_easy_setopt(handle, CURLOPT_HEADERFUNCTION, headerCallback));
@@ -474,28 +495,10 @@ HTTPRequestImpl::HTTPRequestImpl(HTTPRequest *request_, uv_loop_t *loop, std::sh
     start();
 }
 
-void HTTPRequestImpl::abandon() {
-    if (request) {
-        context->removeRequest(request);
-        request = nullptr;
-    }
-}
-
-void HTTPRequestImpl::start() {
-    // Count up the attempts.
-    attempts++;
-
-    // Start requesting the information.
-    handleError(curl_multi_add_handle(context->multi, handle));
-}
-
-HTTPRequestImpl::~HTTPRequestImpl() {
+HTTPRequest::~HTTPRequest() {
     MBGL_VERIFY_THREAD(tid);
 
-    if (request) {
-        context->removeRequest(request);
-        request->ptr = nullptr;
-    }
+    context->removeRequest(this);
 
     handleError(curl_multi_remove_handle(context->multi, handle));
     context->returnHandle(handle);
@@ -514,11 +517,23 @@ HTTPRequestImpl::~HTTPRequestImpl() {
     }
 }
 
+void HTTPRequest::cancel() {
+   delete this;
+}
+
+void HTTPRequest::start() {
+    // Count up the attempts.
+    attempts++;
+
+    // Start requesting the information.
+    handleError(curl_multi_add_handle(context->multi, handle));
+}
+
 // This function is called when we have new data for a request. We just append it to the string
 // containing the previous data.
-size_t HTTPRequestImpl::writeCallback(void *const contents, const size_t size, const size_t nmemb, void *userp) {
+size_t HTTPRequest::writeCallback(void *const contents, const size_t size, const size_t nmemb, void *userp) {
     assert(userp);
-    auto impl = reinterpret_cast<HTTPRequestImpl *>(userp);
+    auto impl = reinterpret_cast<HTTPRequest *>(userp);
     MBGL_VERIFY_THREAD(impl->tid);
 
     if (!impl->response) {
@@ -560,9 +575,9 @@ int64_t parseCacheControl(const char *value) {
     return 0;
 }
 
-size_t HTTPRequestImpl::headerCallback(char *const buffer, const size_t size, const size_t nmemb, void *userp) {
+size_t HTTPRequest::headerCallback(char *const buffer, const size_t size, const size_t nmemb, void *userp) {
     assert(userp);
-    auto baton = reinterpret_cast<HTTPRequestImpl *>(userp);
+    auto baton = reinterpret_cast<HTTPRequest *>(userp);
     MBGL_VERIFY_THREAD(baton->tid);
 
     if (!baton->response) {
@@ -589,8 +604,7 @@ size_t HTTPRequestImpl::headerCallback(char *const buffer, const size_t size, co
     return length;
 }
 
-
-void HTTPRequestImpl::retry(uint64_t timeout) {
+void HTTPRequest::retry(uint64_t timeout) {
     handleError(curl_multi_remove_handle(context->multi, handle));
 
     response.reset();
@@ -602,7 +616,7 @@ void HTTPRequestImpl::retry(uint64_t timeout) {
     uv_timer_start(timer, restart, timeout, 0);
 }
 
-void HTTPRequestImpl::retryImmediately() {
+void HTTPRequest::retry() {
     // All batons get notified when the network status changed, but some of them
     // might not actually wait for the network to become available again.
     if (timer && strategy == PreemptImmediately) {
@@ -613,12 +627,12 @@ void HTTPRequestImpl::retryImmediately() {
 }
 
 #if UV_VERSION_MAJOR == 0 && UV_VERSION_MINOR <= 10
-void HTTPRequestImpl::restart(uv_timer_t *timer, int) {
+void HTTPRequest::restart(uv_timer_t *timer, int) {
 #else
-void HTTPRequestImpl::restart(uv_timer_t *timer) {
+void HTTPRequest::restart(uv_timer_t *timer) {
 #endif
     // Restart the request.
-    auto baton = reinterpret_cast<HTTPRequestImpl *>(timer->data);
+    auto baton = reinterpret_cast<HTTPRequest *>(timer->data);
 
     // Get rid of the timer.
     baton->timer = nullptr;
@@ -627,7 +641,7 @@ void HTTPRequestImpl::restart(uv_timer_t *timer) {
     baton->start();
 }
 
-void HTTPRequestImpl::finish(ResponseStatus status) {
+void HTTPRequest::finish(ResponseStatus status) {
     if (status == ResponseStatus::TemporaryError && attempts < maxAttempts) {
         strategy = ExponentialBackoff;
         return retry((1 << (attempts - 1)) * 1000);
@@ -640,19 +654,18 @@ void HTTPRequestImpl::finish(ResponseStatus status) {
 
     // Actually return the response.
     if (status == ResponseStatus::NotModified) {
-        request->notify(std::move(response), FileCache::Hint::Refresh);
+        notify(std::move(response), FileCache::Hint::Refresh);
     } else {
-        request->notify(std::move(response), FileCache::Hint::Full);
+        notify(std::move(response), FileCache::Hint::Full);
     }
 
-    delete request;
     delete this;
 }
 
-void HTTPRequestImpl::handleResult(CURLcode code) {
+void HTTPRequest::handleResult(CURLcode code) {
     MBGL_VERIFY_THREAD(tid);
 
-    if (!request) {
+    if (cancelled) {
         // In this case, it doesn't make sense to even process the response even further since
         // the request was canceled anyway.
         delete this;
@@ -720,44 +733,8 @@ void HTTPRequestImpl::handleResult(CURLcode code) {
     throw std::runtime_error("Response hasn't been handled");
 }
 
-// -------------------------------------------------------------------------------------------------
-
-HTTPRequest::HTTPRequest(DefaultFileSource::Impl *source_, const Resource &resource_)
-    : SharedRequestBase(source_, resource_) {
-}
-
-HTTPRequest::~HTTPRequest() {
-    MBGL_VERIFY_THREAD(tid);
-
-    if (ptr) {
-        reinterpret_cast<HTTPRequestImpl *>(ptr)->abandon();
-    }
-}
-
-void HTTPRequest::start(uv_loop_t *loop, std::shared_ptr<const Response> response) {
-    MBGL_VERIFY_THREAD(tid);
-
-    assert(!ptr);
-    ptr = new HTTPRequestImpl(this, loop, response);
-}
-
-void HTTPRequest::retryImmediately() {
-    MBGL_VERIFY_THREAD(tid);
-
-    if (ptr) {
-        reinterpret_cast<HTTPRequestImpl *>(ptr)->retryImmediately();
-    }
-}
-
-void HTTPRequest::cancel() {
-    MBGL_VERIFY_THREAD(tid);
-
-    if (ptr) {
-        delete reinterpret_cast<HTTPRequestImpl *>(ptr);
-        ptr = nullptr;
-    }
-
-    delete this;
+std::unique_ptr<HTTPContext> HTTPContext::createContext(uv_loop_t* loop) {
+    return util::make_unique<HTTPCURLContext>(loop);
 }
 
 }

@@ -31,7 +31,7 @@ class VectorTileData : public TileData {
 public:
     VectorTileData(const TileID&,
                    float mapMaxZoom,
-                   util::ptr<Style>,
+                   Style&,
                    GlyphAtlas&,
                    GlyphStore&,
                    SpriteAtlas&,
@@ -40,8 +40,7 @@ public:
     ~VectorTileData();
 
     void parse() override;
-    void render(Painter &painter, const StyleLayer &layer_desc, const mat4 &matrix) override;
-    bool hasData(StyleLayer const& layer_desc) const override;
+    virtual Bucket* getBucket(StyleLayer const &layer_desc) override;
 
 protected:
     // Holds the actual geometries in this tile.
@@ -50,7 +49,6 @@ protected:
 
     TriangleElementsBuffer triangleElementsBuffer;
     LineElementsBuffer lineElementsBuffer;
-    PointElementsBuffer pointElementsBuffer;
 
     // Holds the buckets of this tile.
     // They contain the location offsets in the buffers stored above
@@ -60,7 +58,7 @@ protected:
     GlyphStore& glyphStore;
     SpriteAtlas& spriteAtlas;
     util::ptr<Sprite> sprite;
-    util::ptr<Style> style;
+    Style& style;
 
 public:
     const float depth;

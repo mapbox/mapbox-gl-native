@@ -1,4 +1,3 @@
-#include <mbgl/map/map.hpp>
 #include <mbgl/map/raster_tile_data.hpp>
 #include <mbgl/style/style.hpp>
 
@@ -24,10 +23,6 @@ void RasterTileData::parse() {
     }
 }
 
-void RasterTileData::render(Painter &painter, const StyleLayer &layer_desc, const mat4 &matrix) {
-    bucket.render(painter, layer_desc, id, matrix);
-}
-
-bool RasterTileData::hasData(StyleLayer const& /*layer_desc*/) const {
-    return bucket.hasData();
+Bucket* RasterTileData::getBucket(StyleLayer const&) {
+    return &bucket;
 }

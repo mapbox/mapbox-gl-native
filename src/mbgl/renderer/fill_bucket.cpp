@@ -4,17 +4,22 @@
 #include <mbgl/renderer/painter.hpp>
 #include <mbgl/style/style.hpp>
 #include <mbgl/style/style_layout.hpp>
+#include <mbgl/shader/plain_shader.hpp>
+#include <mbgl/shader/pattern_shader.hpp>
+#include <mbgl/shader/outline_shader.hpp>
 #include <mbgl/util/std.hpp>
 #include <mbgl/platform/gl.hpp>
 #include <mbgl/platform/log.hpp>
 
 #include <cassert>
 
+#ifndef BUFFER_OFFSET
+#define BUFFER_OFFSET(i) ((char *)nullptr + (i))
+#endif
+
 struct geometry_too_long_exception : std::exception {};
 
 using namespace mbgl;
-
-
 
 void *FillBucket::alloc(void *, unsigned int size) {
     return ::malloc(size);
@@ -84,7 +89,7 @@ void FillBucket::tessellate() {
     hasVertices = false;
 
     std::vector<std::vector<ClipperLib::IntPoint>> polygons;
-    clipper.Execute(ClipperLib::ctUnion, polygons, ClipperLib::pftPositive);
+    clipper.Execute(ClipperLib::ctUnion, polygons, ClipperLib::pftEvenOdd, ClipperLib::pftEvenOdd);
     clipper.Clear();
 
     if (polygons.size() == 0) {
@@ -132,7 +137,7 @@ void FillBucket::tessellate() {
 
     lineGroup.elements_length += total_vertex_count;
 
-    if (tessTesselate(tesselator, TESS_WINDING_POSITIVE, TESS_POLYGONS, vertices_per_group, vertexSize, 0)) {
+    if (tessTesselate(tesselator, TESS_WINDING_ODD, TESS_POLYGONS, vertices_per_group, vertexSize, 0)) {
         const TESSreal *vertices = tessGetVertices(tesselator);
         const size_t vertex_count = tessGetVertexCount(tesselator);
         TESSindex *vertex_indices = const_cast<TESSindex *>(tessGetVertexIndices(tesselator));
@@ -195,8 +200,19 @@ void FillBucket::tessellate() {
     lineGroup.vertex_length += total_vertex_count;
 }
 
-void FillBucket::render(Painter &painter, const StyleLayer &layer_desc, const TileID &id,
-                        const mat4 &matrix) {
+void FillBucket::upload() {
+    vertexBuffer.upload();
+    triangleElementsBuffer.upload();
+    lineElementsBuffer.upload();
+
+    // From now on, we're going to render during the opaque and translucent pass.
+    uploaded = true;
+}
+
+void FillBucket::render(Painter& painter,
+                        const StyleLayer& layer_desc,
+                        const TileID& id,
+                        const mat4& matrix) {
     painter.renderFill(*this, layer_desc, id, matrix);
 }
 

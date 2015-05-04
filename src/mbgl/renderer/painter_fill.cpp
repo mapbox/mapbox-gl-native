@@ -3,18 +3,18 @@
 #include <mbgl/style/style.hpp>
 #include <mbgl/style/style_layer.hpp>
 #include <mbgl/style/style_layout.hpp>
-#include <mbgl/map/map.hpp>
 #include <mbgl/map/sprite.hpp>
+#include <mbgl/map/tile_id.hpp>
 #include <mbgl/geometry/sprite_atlas.hpp>
+#include <mbgl/shader/outline_shader.hpp>
+#include <mbgl/shader/pattern_shader.hpp>
+#include <mbgl/shader/plain_shader.hpp>
 #include <mbgl/util/std.hpp>
 #include <mbgl/util/mat3.hpp>
 
 using namespace mbgl;
 
 void Painter::renderFill(FillBucket& bucket, const StyleLayer &layer_desc, const TileID& id, const mat4 &matrix) {
-    // Abort early.
-    if (!bucket.hasData()) return;
-
     const FillProperties &properties = layer_desc.getProperties<FillProperties>();
     mat4 vtxMatrix = translatedMatrix(matrix, properties.translate, id, properties.translateAnchor);
 
@@ -39,6 +39,9 @@ void Painter::renderFill(FillBucket& bucket, const StyleLayer &layer_desc, const
     bool outline = properties.antialias && !pattern && stroke_color != fill_color;
     bool fringeline = properties.antialias && !pattern && stroke_color == fill_color;
 
+    config.stencilTest = true;
+    config.depthTest = true;
+
     // Because we're drawing top-to-bottom, and we update the stencil mask
     // befrom, we have to draw the outline first (!)
     if (outline && pass == RenderPass::Translucent) {
@@ -53,7 +56,7 @@ void Painter::renderFill(FillBucket& bucket, const StyleLayer &layer_desc, const
             static_cast<float>(state.getFramebufferWidth()),
             static_cast<float>(state.getFramebufferHeight())
         }};
-        depthRange(strata, 1.0f);
+        config.depthRange = { strata, 1.0f };
         bucket.drawVertices(*outlineShader);
     }
 
@@ -92,8 +95,8 @@ void Painter::renderFill(FillBucket& bucket, const StyleLayer &layer_desc, const
             spriteAtlas.bind(true);
 
             // Draw the actual triangles into the color & stencil buffer.
-            depthMask(true);
-            depthRange(strata, 1.0f);
+            config.depthMask = GL_TRUE;
+            config.depthRange = { strata, 1.0f };
             bucket.drawElements(*patternShader);
         }
     }
@@ -109,8 +112,8 @@ void Painter::renderFill(FillBucket& bucket, const StyleLayer &layer_desc, const
             plainShader->u_color = fill_color;
 
             // Draw the actual triangles into the color & stencil buffer.
-            depthMask(true);
-            depthRange(strata + strata_epsilon, 1.0f);
+            config.depthMask = GL_TRUE;
+            config.depthRange = { strata + strata_epsilon, 1.0f };
             bucket.drawElements(*plainShader);
         }
     }
@@ -130,7 +133,7 @@ void Painter::renderFill(FillBucket& bucket, const StyleLayer &layer_desc, const
             static_cast<float>(state.getFramebufferHeight())
         }};
 
-        depthRange(strata + strata_epsilon + strata_epsilon, 1.0f);
+        config.depthRange = { strata + strata_epsilon + strata_epsilon, 1.0f };
         bucket.drawVertices(*outlineShader);
     }
 }

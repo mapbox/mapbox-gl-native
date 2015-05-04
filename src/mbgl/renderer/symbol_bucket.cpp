@@ -12,6 +12,8 @@
 #include <mbgl/text/placement.hpp>
 #include <mbgl/platform/log.hpp>
 #include <mbgl/text/collision.hpp>
+#include <mbgl/shader/sdf_shader.hpp>
+#include <mbgl/shader/icon_shader.hpp>
 #include <mbgl/map/sprite.hpp>
 
 #include <mbgl/util/utf.hpp>
@@ -19,6 +21,10 @@
 #include <mbgl/util/math.hpp>
 #include <mbgl/util/merge_lines.hpp>
 #include <mbgl/util/std.hpp>
+
+#ifndef BUFFER_OFFSET
+#define BUFFER_OFFSET(i) ((char *)nullptr + (i))
+#endif
 
 namespace mbgl {
 
@@ -30,8 +36,23 @@ SymbolBucket::~SymbolBucket() {
     // Do not remove. header file only contains forward definitions to unique pointers.
 }
 
-void SymbolBucket::render(Painter &painter, const StyleLayer &layer_desc, const TileID &id,
-                          const mat4 &matrix) {
+void SymbolBucket::upload() {
+    if (hasTextData()) {
+        text.vertices.upload();
+        text.triangles.upload();
+    }
+    if (hasIconData()) {
+        icon.vertices.upload();
+        icon.triangles.upload();
+    }
+
+    uploaded = true;
+}
+
+void SymbolBucket::render(Painter& painter,
+                          const StyleLayer& layer_desc,
+                          const TileID& id,
+                          const mat4& matrix) {
     painter.renderSymbol(*this, layer_desc, id, matrix);
 }
 
@@ -183,7 +204,8 @@ void SymbolBucket::addFeatures(const GeometryTileLayer& layer,
         if (feature.label.length()) {
             shaping = fontStack->getShaping(
                 /* string */ feature.label,
-                /* maxWidth: ems */ layout.text.max_width * 24,
+                /* maxWidth: ems */ layout.placement != PlacementType::Line ?
+                    layout.text.max_width * 24 : 0,
                 /* lineHeight: ems */ layout.text.line_height * 24,
                 /* horizontalAlign */ horizontalAlign,
                 /* verticalAlign */ verticalAlign,

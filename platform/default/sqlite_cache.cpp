@@ -62,12 +62,12 @@ std::string unifyMapboxURLs(const std::string &url) {
 using namespace mapbox::sqlite;
 
 SQLiteCache::SQLiteCache(const std::string& path_)
-    : thread(util::make_unique<util::Thread<Impl>>("SQLite Cache", path_)) {
+    : thread(util::make_unique<util::Thread<Impl>>("SQLite Cache", util::ThreadPriority::Low, path_)) {
 }
 
 SQLiteCache::~SQLiteCache() = default;
 
-SQLiteCache::Impl::Impl(const std::string& path_)
+SQLiteCache::Impl::Impl(uv_loop_t*, const std::string& path_)
     : path(path_) {
 }
 
@@ -131,7 +131,7 @@ void SQLiteCache::get(const Resource &resource, Callback callback) {
     // Will try to load the URL from the SQLite database and call the callback when done.
     // Note that the callback is probably going to invoked from another thread, so the caller
     // must make sure that it can run in that thread.
-    thread->invokeWithResult(&Impl::get, callback, resource);
+    thread->invokeWithResult(&Impl::get, std::move(callback), resource);
 }
 
 std::unique_ptr<Response> SQLiteCache::Impl::get(const Resource &resource) {
@@ -183,9 +183,9 @@ void SQLiteCache::put(const Resource &resource, std::shared_ptr<const Response> 
     // storing a new response or updating the currently stored response, potentially setting a new
     // expiry date.
     if (hint == Hint::Full) {
-        thread->invoke(&Impl::put, resource, std::move(response));
+        thread->invoke(&Impl::put, resource, response);
     } else if (hint == Hint::Refresh) {
-        thread->invoke(&Impl::refresh, resource, int64_t(response->expires));
+        thread->invoke(&Impl::refresh, resource, response->expires);
     }
 }
 

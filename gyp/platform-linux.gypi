@@ -14,6 +14,7 @@
         '../platform/default/string_stdlib.cpp',
         '../platform/default/application_root.cpp',
         '../platform/default/asset_root.cpp',
+        '../platform/default/thread.cpp',
         '../platform/default/image.cpp',
         '../platform/default/image_reader.cpp',
         '../platform/default/png_reader.cpp',

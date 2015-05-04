@@ -2,6 +2,8 @@
 #include <mbgl/map/map.hpp>
 #include <mbgl/map/tile_id.hpp>
 #include <mbgl/map/live_tile.hpp>
+#include <mbgl/map/map_data.hpp>
+#include <mbgl/util/constants.hpp>
 #include <mbgl/util/ptr.hpp>
 #include <mbgl/util/std.hpp>
 
@@ -83,8 +85,10 @@ vec2<double> AnnotationManager::projectPoint(const LatLng& point) {
     return { x, y };
 }
 
-std::pair<std::vector<TileID>, AnnotationIDs> AnnotationManager::addPointAnnotations(
-    const std::vector<LatLng>& points, const std::vector<std::string>& symbols, const Map& map) {
+std::pair<std::vector<TileID>, AnnotationIDs>
+AnnotationManager::addPointAnnotations(const std::vector<LatLng>& points,
+                                       const std::vector<std::string>& symbols,
+                                       const MapData& data) {
     std::lock_guard<std::mutex> lock(mtx);
 
     // We pre-generate tiles to contain each annotation up to the map's max zoom.
@@ -109,7 +113,7 @@ std::pair<std::vector<TileID>, AnnotationIDs> AnnotationManager::addPointAnnotat
             util::make_unique<Annotation>(AnnotationType::Point,
                                           AnnotationSegments({ { points[i] } })));
 
-        const uint8_t maxZoom = map.getMaxZoom();
+        const uint8_t maxZoom = data.transform.getMaxZoom();
 
         // side length of map at this zoom
         uint32_t z2 = 1 << maxZoom;
@@ -181,13 +185,14 @@ std::pair<std::vector<TileID>, AnnotationIDs> AnnotationManager::addPointAnnotat
     return std::make_pair(affectedTiles, annotationIDs);
 }
 
-std::vector<TileID> AnnotationManager::removeAnnotations(const AnnotationIDs& ids, const Map& map) {
+std::vector<TileID> AnnotationManager::removeAnnotations(const AnnotationIDs& ids,
+                                                         const MapData& data) {
     std::lock_guard<std::mutex> lock(mtx);
 
     std::vector<TileID> affectedTiles;
 
     std::vector<uint32_t> z2s;
-    uint8_t zoomCount = map.getMaxZoom() + 1;
+    const uint8_t zoomCount = data.transform.getMaxZoom() + 1;
     z2s.reserve(zoomCount);
     for (uint8_t z = 0; z < zoomCount; ++z) {
         z2s.emplace_back(1<< z);
@@ -231,10 +236,10 @@ std::vector<TileID> AnnotationManager::removeAnnotations(const AnnotationIDs& id
 }
 
 std::vector<uint32_t> AnnotationManager::getAnnotationsInBounds(const LatLngBounds& queryBounds,
-                                                                const Map& map) const {
+                                                                const MapData& data) const {
     std::lock_guard<std::mutex> lock(mtx);
 
-    const uint8_t z = map.getMaxZoom();
+    const uint8_t z = data.transform.getMaxZoom();
     const uint32_t z2 = 1 << z;
     const vec2<double> swPoint = projectPoint(queryBounds.sw);
     const vec2<double> nePoint = projectPoint(queryBounds.ne);

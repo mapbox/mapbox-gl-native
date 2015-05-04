@@ -4,6 +4,7 @@ extern NSString *const MGLEventTypeMapLoad;
 extern NSString *const MGLEventTypeMapTap;
 extern NSString *const MGLEventTypeMapDragEnd;
 extern NSString *const MGLEventTypeLocation;
+extern NSString *const MGLEventTypeVisit;
 
 extern NSString *const MGLEventKeyLatitude;
 extern NSString *const MGLEventKeyLongitude;
@@ -16,6 +17,8 @@ extern NSString *const MGLEventKeyVerticalAccuracy;
 extern NSString *const MGLEventKeyPushEnabled;
 extern NSString *const MGLEventKeyEmailEnabled;
 extern NSString *const MGLEventKeyGestureID;
+extern NSString *const MGLEventKeyArrivalDate;
+extern NSString *const MGLEventKeyDepartureDate;
 
 extern NSString *const MGLEventGestureSingleTap;
 extern NSString *const MGLEventGestureDoubleTap;
@@ -32,6 +35,7 @@ extern NSString *const MGLEventGestureRotateStart;
 + (void) setToken:(NSString *)token;
 + (void) setAppName:(NSString *)appName;
 + (void) setAppVersion:(NSString *)appVersion;
++ (void) setAppBuildNumber:(NSString *)appBuildNumber;
 + (void) pauseMetricsCollection;
 + (void) resumeMetricsCollection;
 

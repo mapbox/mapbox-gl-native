@@ -91,13 +91,15 @@ MBGL_DEFINE_ENUM_CLASS(CapTypeClass, CapType, {
 enum class JoinType : uint8_t {
     Miter,
     Bevel,
-    Round
+    Round,
+    FlipBevel
 };
 
 MBGL_DEFINE_ENUM_CLASS(JoinTypeClass, JoinType, {
     { JoinType::Miter, "miter" },
     { JoinType::Bevel, "bevel" },
     { JoinType::Round, "round" },
+    { JoinType::FlipBevel, "flipbevel" },
 });
 
 // -------------------------------------------------------------------------------------------------

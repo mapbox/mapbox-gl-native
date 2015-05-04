@@ -49,11 +49,6 @@ IB_DESIGNABLE
 
 /** @name Managing Constraints */
 
-/** A view controller whose top and bottom layout guides to use for proper setup of constraints in the map view internals.
-*
-*   Certain components of the map view, such as the heading compass and the data attribution button, need to be aware of the view controller layout in order to avoid positioning content under a top navigation bar or a bottom toolbar. */
-@property (nonatomic, weak) IBOutlet UIViewController *viewControllerForLayoutGuides;
-
 #pragma mark - Accessing Map Properties
 
 /** @name Accessing Map Properties */
