@@ -9,6 +9,9 @@ RasterTileData::RasterTileData(const TileID& id_, TexturePool &texturePool,
 }
 
 RasterTileData::~RasterTileData() {
+    // Cancel in most derived class destructor so that worker tasks are joined before
+    // any member data goes away.
+    cancel();
 }
 
 void RasterTileData::parse() {

@@ -28,6 +28,9 @@ VectorTileData::VectorTileData(const TileID& id_,
 }
 
 VectorTileData::~VectorTileData() {
+    // Cancel in most derived class destructor so that worker tasks are joined before
+    // any member data goes away.
+    cancel();
     glyphAtlas.removeGlyphs(reinterpret_cast<uintptr_t>(this));
 }
 

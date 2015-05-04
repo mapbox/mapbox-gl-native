@@ -24,7 +24,11 @@ LiveTileData::LiveTileData(const TileID& id_,
     state = State::loaded;
 }
 
-LiveTileData::~LiveTileData() {}
+LiveTileData::~LiveTileData() {
+    // Cancel in most derived class destructor so that worker tasks are joined before
+    // any member data goes away.
+    cancel();
+}
 
 void LiveTileData::parse() {
     if (state != State::loaded) {

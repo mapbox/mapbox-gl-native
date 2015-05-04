@@ -56,13 +56,13 @@ public:
     // Invoke object->fn(args...) in the runloop thread, then invoke callback(result) in the current thread.
     template <typename Fn, class R, class... Args>
     void invokeWithResult(Fn fn, std::function<void (R)>&& callback, Args&&... args) {
-        loop->invokeWithResult(std::bind(fn, object, args...), std::move(callback));
+        loop->invokeWithResult(std::bind(fn, object, std::move(args)...), std::move(callback));
     }
 
     // Invoke object->fn(args...) in the runloop thread, then invoke callback() in the current thread.
     template <typename Fn, class... Args>
     void invokeWithResult(Fn fn, std::function<void ()>&& callback, Args&&... args) {
-        loop->invokeWithResult(std::bind(fn, object, args...), std::move(callback));
+        loop->invokeWithResult(std::bind(fn, object, std::move(args)...), std::move(callback));
     }
 
     // Invoke object->fn(args...) in the runloop thread, and wait for the result.
