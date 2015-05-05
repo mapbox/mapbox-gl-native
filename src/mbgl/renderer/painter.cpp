@@ -203,6 +203,9 @@ void Painter::render(const Style& style, TransformState state_, TimePoint time) 
         }
     }
 
+    resize();
+    changeMatrix();
+
     // Figure out what buckets we have to draw and what order we have to draw them in.
     const auto order = determineRenderOrder(style);
 
@@ -238,8 +241,6 @@ void Painter::render(const Style& style, TransformState state_, TimePoint time) 
         }
 
         clear();
-        resize();
-        changeMatrix();
 
         drawClippingMasks(sources);
     }
