@@ -109,6 +109,3 @@ appledoc \
     --no-install-docset \
     --company-id com.mapbox \
     include/mbgl/ios
-cd ${DOCS_OUTPUT}
-ln -s html/index.html
-cd ${OLDPWD}
