@@ -1389,6 +1389,23 @@ std::chrono::steady_clock::duration secondsAsDuration(float duration)
     CGFloat maxZoom = _mbglMap->getMaxZoom();
     CGFloat zoomLevel = MAX(MIN(log(scale * MIN(scaleX, scaleY)) / log(2), maxZoom), minZoom);
     
+    NSLog(@"z%.2f   scale: %.2f     output-zoom: %.2f", _mbglMap->getZoom(), _mbglMap->getScale(), zoomLevel);
+    
+    [self setCenterCoordinate:center zoomLevel:zoomLevel animated:animated];
+}
+
+- (void)fitBoundsToSouthWestCoordinate:(CLLocationCoordinate2D)southWestCoordinate northEastCoordinate:(CLLocationCoordinate2D)northEastCoordinate animated:(BOOL)animated
+{
+    CLLocationCoordinate2D center = CLLocationCoordinate2DMake((northEastCoordinate.latitude + southWestCoordinate.latitude) / 2, (northEastCoordinate.longitude + southWestCoordinate.longitude) / 2);
+    
+    CGFloat scaleX = _mbglMap->getWidth() / (northEastCoordinate.longitude - southWestCoordinate.longitude);
+    CGFloat scaleY = _mbglMap->getHeight() / (northEastCoordinate.latitude - southWestCoordinate.latitude);
+    CGFloat minZoom = _mbglMap->getMinZoom();
+    CGFloat maxZoom = _mbglMap->getMaxZoom();
+    CGFloat hack = ([[UIApplication sharedApplication] statusBarOrientation] == UIInterfaceOrientationPortrait) ? 0.5f : 1.f;
+    CGFloat zoomLevel = log(MIN(scaleX, scaleY)) / log(2) - hack;
+    zoomLevel = MAX(MIN(zoomLevel, maxZoom), minZoom);
+    
     [self setCenterCoordinate:center zoomLevel:zoomLevel animated:animated];
 }
 

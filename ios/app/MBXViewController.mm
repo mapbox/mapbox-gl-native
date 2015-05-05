@@ -8,6 +8,15 @@
 
 #import "MBXAnnotation.h"
 
+// hook up private API, in absence of public bounds-setting
+@interface MGLMapView ()
+
+- (void)zoomToSouthWestCoordinate:(CLLocationCoordinate2D)southWestCoordinate northEastCoordinate:(CLLocationCoordinate2D)northEastCoordinate animated:(BOOL)animated;
+
+- (void)fitBoundsToSouthWestCoordinate:(CLLocationCoordinate2D)southWestCoordinate northEastCoordinate:(CLLocationCoordinate2D)northEastCoordinate animated:(BOOL)animated;
+
+@end
+
 static UIColor *const kTintColor = [UIColor colorWithRed:0.120 green:0.550 blue:0.670 alpha:1.000];
 
 static NSArray *const kStyleNames = @[
@@ -136,6 +145,7 @@ mbgl::Settings_NSUserDefaults *settings = nullptr;
                                                                 @"Add 1,000 Points",
                                                                 @"Add 10,000 Points",
                                                                 @"Remove Points",
+                                                                @"Zoom to Oregon",
                                                                 nil];
 
     [sheet showFromBarButtonItem:self.navigationItem.leftBarButtonItem animated:YES];
@@ -174,6 +184,32 @@ mbgl::Settings_NSUserDefaults *settings = nullptr;
     else if (buttonIndex == actionSheet.firstOtherButtonIndex + 7)
     {
         [self.mapView removeAnnotations:self.mapView.annotations];
+    }
+    else if (buttonIndex == actionSheet.firstOtherButtonIndex + 8)
+    {
+        // state of oregon
+        CLLocationCoordinate2D southWest = CLLocationCoordinate2DMake(41.997856, -124.852431);
+        CLLocationCoordinate2D northEast = CLLocationCoordinate2DMake(46.327812, -116.482880);
+        
+        // several blocks in NW Portland
+        //CLLocationCoordinate2D southWest = CLLocationCoordinate2DMake(45.522964, -122.685109);
+        //CLLocationCoordinate2D northEast = CLLocationCoordinate2DMake(45.526561, -122.679230);
+
+        if(!self.mapView.annotations.count)
+        {
+            NSMutableArray *annotations = [NSMutableArray array];
+            
+            MBXAnnotation *sw = [MBXAnnotation annotationWithLocation:southWest title:@"Southwest" subtitle:nil];
+            MBXAnnotation *ne = [MBXAnnotation annotationWithLocation:northEast title:@"Northeast" subtitle:nil];
+            
+            [annotations addObject:sw];
+            [annotations addObject:ne];
+
+            [self.mapView addAnnotations:annotations];
+        }
+        
+        [self.mapView zoomToSouthWestCoordinate:southWest northEastCoordinate:northEast animated:YES];
+        //[self.mapView fitBoundsToSouthWestCoordinate:southWest northEastCoordinate:northEast animated:YES];
     }
 }
 
