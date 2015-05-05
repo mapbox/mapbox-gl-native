@@ -827,7 +827,7 @@ void StyleParser::parsePaint(JSVal value, ClassProperties &klass) {
     parseOptionalProperty<Function<std::array<float, 2>>>("fill-translate", Key::FillTranslate, klass, value);
     parseOptionalProperty<PropertyTransition>("fill-translate-transition", Key::FillTranslate, klass, value);
     parseOptionalProperty<Function<TranslateAnchorType>>("fill-translate-anchor", Key::FillTranslateAnchor, klass, value);
-    parseOptionalProperty<PiecewiseConstantFunction<Faded<std::string>>>("fill-image", Key::FillImage, klass, value, "fill-image-transition");
+    parseOptionalProperty<PiecewiseConstantFunction<Faded<std::string>>>("fill-pattern", Key::FillImage, klass, value, "fill-pattern-transition");
 
     parseOptionalProperty<Function<float>>("line-opacity", Key::LineOpacity, klass, value);
     parseOptionalProperty<PropertyTransition>("line-opacity-transition", Key::LineOpacity, klass, value);
