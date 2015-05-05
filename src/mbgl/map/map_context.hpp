@@ -4,6 +4,7 @@
 #include <mbgl/map/tile_id.hpp>
 #include <mbgl/map/update.hpp>
 #include <mbgl/map/environment.hpp>
+#include <mbgl/map/resource_loader.hpp>
 #include <mbgl/map/transform_state.hpp>
 #include <mbgl/util/ptr.hpp>
 
@@ -32,7 +33,7 @@ class StillImage;
 struct LatLng;
 struct LatLngBounds;
 
-class MapContext {
+class MapContext : public ResourceLoader::Observer {
 public:
     MapContext(uv_loop_t*, View&, FileSource&, MapData&, bool startPaused);
     ~MapContext();
@@ -57,6 +58,9 @@ public:
 
     void setSourceTileCacheSize(size_t size);
     void onLowMemory();
+
+    // ResourceLoader::Observer implementation.
+    void onTileDataChanged() override;
 
 private:
     util::ptr<Sprite> getSprite();
@@ -84,8 +88,7 @@ private:
     std::unique_ptr<TexturePool> texturePool;
     std::unique_ptr<Painter> painter;
     std::unique_ptr<Style> style;
-
-    util::ptr<Sprite> sprite;
+    std::unique_ptr<ResourceLoader> resourceLoader;
 
     std::string styleURL;
     std::string styleJSON;

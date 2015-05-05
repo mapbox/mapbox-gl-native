@@ -3,7 +3,6 @@
 #include <mbgl/map/view.hpp>
 #include <mbgl/map/environment.hpp>
 #include <mbgl/map/source.hpp>
-#include <mbgl/map/sprite.hpp>
 #include <mbgl/map/still_image.hpp>
 
 #include <mbgl/platform/log.hpp>
@@ -62,8 +61,8 @@ MapContext::~MapContext() {
 
     // Explicit resets currently necessary because these abandon resources that need to be
     // cleaned up by env.performCleanup();
+    resourceLoader.reset();
     style.reset();
-    sprite.reset();
     painter.reset();
     texturePool.reset();
     lineAtlas.reset();
@@ -124,24 +123,10 @@ void MapContext::setStyleJSON(const std::string& json, const std::string& base) 
     loadStyleJSON(json, base);
 }
 
-util::ptr<Sprite> MapContext::getSprite() {
-    assert(Environment::currentlyOn(ThreadType::Map));
-    const float pixelRatio = transformState.getPixelRatio();
-    const std::string &sprite_url = style->getSpriteURL();
-    if (!sprite || !sprite->hasPixelRatio(pixelRatio)) {
-        sprite = std::make_shared<Sprite>(sprite_url, pixelRatio, env, [this] {
-            assert(Environment::currentlyOn(ThreadType::Map));
-            triggerUpdate();
-        });
-    }
-
-    return sprite;
-}
-
 void MapContext::loadStyleJSON(const std::string& json, const std::string& base) {
     assert(Environment::currentlyOn(ThreadType::Map));
 
-    sprite.reset();
+    resourceLoader.reset();
     style.reset();
 
     style = util::make_unique<Style>();
@@ -153,26 +138,19 @@ void MapContext::loadStyleJSON(const std::string& json, const std::string& base)
     const std::string glyphURL = util::mapbox::normalizeGlyphsURL(style->glyph_url, data.getAccessToken());
     glyphStore->setURL(glyphURL);
 
-    for (const auto& source : style->sources) {
-        source->load(data.getAccessToken(), env, [this]() {
-            assert(Environment::currentlyOn(ThreadType::Map));
-            triggerUpdate();
-        });
-    }
+    resourceLoader = util::make_unique<ResourceLoader>();
+    resourceLoader->setAccessToken(data.getAccessToken());
+    resourceLoader->setObserver(this);
+    resourceLoader->setStyle(style.get());
 
     triggerUpdate(Update::Zoom);
 }
 
 void MapContext::updateTiles() {
     assert(Environment::currentlyOn(ThreadType::Map));
-    if (!style) return;
-    for (const auto& source : style->sources) {
-        source->update(data, transformState, *style, *glyphAtlas, *glyphStore, *spriteAtlas,
-                       getSprite(), *texturePool, [this]() {
-            assert(Environment::currentlyOn(ThreadType::Map));
-            triggerUpdate();
-        });
-    }
+
+    resourceLoader->update(data, transformState, *glyphAtlas, *glyphStore,
+                           *spriteAtlas, *texturePool);
 }
 
 void MapContext::updateAnnotationTiles(const std::vector<TileID>& ids) {
@@ -214,13 +192,9 @@ void MapContext::update() {
             style->recalculate(transformState.getNormalizedZoom(), now);
         }
 
-        // Allow the sprite atlas to potentially pull new sprite images if needed.
-        spriteAtlas->resize(transformState.getPixelRatio());
-        spriteAtlas->setSprite(getSprite());
-
         updateTiles();
 
-        if (sprite->isLoaded() && style->isLoaded()) {
+        if (style->isLoaded()) {
             if (!data.getFullyLoaded()) {
                 data.setFullyLoaded(true);
             }
@@ -260,7 +234,7 @@ void MapContext::render() {
 
     painter->render(*style, transformState, data.getAnimationTime());
 
-    if (data.mode == MapMode::Still && callback && style->isLoaded() && getSprite()->isLoaded()) {
+    if (data.mode == MapMode::Still && callback && style->isLoaded() && resourceLoader->getSprite()->isLoaded()) {
         callback(view.readStillImage());
         callback = nullptr;
     }
@@ -273,8 +247,7 @@ void MapContext::render() {
 
 double MapContext::getTopOffsetPixelsForAnnotationSymbol(const std::string& symbol) {
     assert(Environment::currentlyOn(ThreadType::Map));
-    assert(sprite);
-    const SpritePosition pos = sprite->getSpritePosition(symbol);
+    const SpritePosition pos = resourceLoader->getSprite()->getSpritePosition(symbol);
     return -pos.height / pos.pixelRatio / 2;
 }
 
@@ -297,6 +270,11 @@ void MapContext::onLowMemory() {
         source->onLowMemory();
     }
     view.invalidate([this] { render(); });
+}
+
+void MapContext::onTileDataChanged() {
+    assert(Environment::currentlyOn(ThreadType::Map));
+    triggerUpdate();
 }
 
 }

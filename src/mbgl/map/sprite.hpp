@@ -11,7 +11,6 @@
 #include <iosfwd>
 #include <string>
 #include <unordered_map>
-#include <future>
 
 namespace mbgl {
 
@@ -35,23 +34,31 @@ public:
 
 class Sprite : private util::noncopyable {
 public:
-    Sprite(const std::string& baseUrl, float pixelRatio, Environment&, std::function<void()> callback);
+    class Observer {
+    public:
+        virtual ~Observer() = default;
+
+        virtual void onSpriteLoaded() = 0;
+    };
+
+    Sprite(const std::string& baseUrl, float pixelRatio);
     ~Sprite();
 
     const SpritePosition &getSpritePosition(const std::string& name) const;
 
     bool hasPixelRatio(float ratio) const;
 
-    void waitUntilLoaded() const;
     bool isLoaded() const;
 
     const float pixelRatio;
     std::unique_ptr<util::Image> raster;
 
+    void setObserver(Observer* observer);
 private:
+    void emitSpriteLoadedIfComplete();
+
     void parseJSON();
     void parseImage();
-    void complete();
 
     std::string body;
     std::string image;
@@ -60,13 +67,10 @@ private:
     std::unordered_map<std::string, SpritePosition> pos;
     const SpritePosition empty;
 
-    std::promise<void> promise;
-    std::future<void> future;
-    std::function<void ()> callback;
-
     Environment& env;
     Request* jsonRequest = nullptr;
     Request* spriteRequest = nullptr;
+    Observer* observer = nullptr;
 };
 
 }

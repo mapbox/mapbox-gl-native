@@ -29,9 +29,17 @@ public:
         initial,
         loading,
         loaded,
+        partial,
         parsed,
         obsolete
     };
+
+    // Tile data considered "Ready" can be used for rendering. Data in
+    // partial state is still waiting for network resources but can also
+    // be rendered, although layers will be missing.
+    inline static bool isReadyState(const State& state) {
+        return state == State::partial || state == State::parsed;
+    }
 
     TileData(const TileID&, const SourceInfo&);
     ~TileData();
@@ -42,8 +50,10 @@ public:
     const std::string toString() const;
 
     inline bool ready() const {
-        return state == State::parsed;
+        return isReadyState(state);
     }
+
+    void endParsing();
 
     // Override this in the child class.
     virtual void parse() = 0;
@@ -52,8 +62,17 @@ public:
     const TileID id;
     const std::string name;
     std::atomic<State> state;
+    std::atomic_flag parsing;
 
 protected:
+    // Set the internal parsing state to true so we prevent
+    // multiple workers to parse the same tile in parallel,
+    // which can happen if the tile is in the "partial" state.
+    // It will return true if is possible to start pasing the
+    // tile or false if not (so some other worker is already
+    // parsing the tile).
+    bool mayStartParsing();
+
     const SourceInfo& source;
     Environment& env;
 

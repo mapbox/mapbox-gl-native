@@ -35,7 +35,7 @@ VectorTileData::~VectorTileData() {
 }
 
 void VectorTileData::parse() {
-    if (state != State::loaded) {
+    if (state != State::loaded && state != State::partial) {
         return;
     }
 
@@ -47,24 +47,47 @@ void VectorTileData::parse() {
         const VectorTile* vt = &vectorTile;
         TileParser parser(*vt, *this, style, glyphAtlas, glyphStore, spriteAtlas, sprite);
         parser.parse();
+
+        if (state == State::obsolete) {
+            return;
+        }
+
+        if (parser.isPartialParse()) {
+            state = State::partial;
+        } else {
+            state = State::parsed;
+        }
     } catch (const std::exception& ex) {
         Log::Error(Event::ParseTile, "Parsing [%d/%d/%d] failed: %s", id.z, id.x, id.y, ex.what());
         state = State::obsolete;
         return;
     }
-
-    if (state != State::obsolete) {
-        state = State::parsed;
-    }
 }
 
 Bucket* VectorTileData::getBucket(StyleLayer const& layer) {
-    if (state == State::parsed && layer.bucket) {
-        const auto it = buckets.find(layer.bucket->name);
-        if (it != buckets.end()) {
-            assert(it->second);
-            return it->second.get();
-        }
+    if (!ready() || !layer.bucket) {
+        return nullptr;
     }
-    return nullptr;
+
+    std::lock_guard<std::mutex> lock(bucketsMutex);
+
+    const auto it = buckets.find(layer.bucket->name);
+    if (it == buckets.end()) {
+        return nullptr;
+    }
+
+    assert(it->second);
+    return it->second.get();
+}
+
+void VectorTileData::setBucket(StyleLayer const& layer, std::unique_ptr<Bucket> bucket) {
+    assert(layer.bucket);
+
+    std::lock_guard<std::mutex> lock(bucketsMutex);
+
+    if (buckets.find(layer.bucket->name) != buckets.end()) {
+        return;
+    }
+
+    buckets[layer.bucket->name] = std::move(bucket);
 }

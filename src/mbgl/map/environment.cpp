@@ -128,7 +128,6 @@ void Environment::requestAsync(const Resource& resource,
 
 Request* Environment::request(const Resource& resource,
                               std::function<void(const Response&)> callback) {
-    assert(currentlyOn(ThreadType::Map));
     return fileSource.request(resource, util::RunLoop::current.get()->get(), std::move(callback));
 }
 
