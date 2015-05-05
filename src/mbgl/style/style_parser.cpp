@@ -476,16 +476,8 @@ bool StyleParser::parseOptionalProperty(const char *property_name, PropertyKey k
     }
 }
 
-std::string normalizeFontStack(const std::string &name) {
-    namespace algo = boost::algorithm;
-    std::vector<std::string> parts;
-    algo::split(parts, name, algo::is_any_of(","), algo::token_compress_on);
-    std::for_each(parts.begin(), parts.end(), [](std::string& str) { algo::trim(str); });
-    return algo::join(parts, ", ");
-}
-
 template<> std::tuple<bool, std::string> StyleParser::parseProperty(JSVal value, const char *property_name) {
-    if (strncmp(property_name, "text-font", 9) == 0) {
+    if (std::string { "text-font" } == property_name) {
         if (!value.IsArray()) {
             Log::Warning(Event::ParseStyle, "value of '%s' must be an array of strings", property_name);
             return std::tuple<bool, std::string> { false, std::string() };
@@ -495,15 +487,15 @@ template<> std::tuple<bool, std::string> StyleParser::parseProperty(JSVal value,
                 JSVal stop = value[i];
                 if (stop.IsString()) {
                     result += stop.GetString();
-                    if (i < value.Size()) {
-                        result += ",";
+                    if (i < value.Size()-1) {
+                        result += ", ";
                     }
                 } else {
                     Log::Warning(Event::ParseStyle, "text-font members must be strings");
                     return std::tuple<bool, std::string> { false, {}};
                 }
             }
-            return std::tuple<bool, std::string> { true, { result, result.length() } };
+            return std::tuple<bool, std::string> { true, result };
         }
     } else if (!value.IsString()) {
         Log::Warning(Event::ParseStyle, "value of '%s' must be a string", property_name);
