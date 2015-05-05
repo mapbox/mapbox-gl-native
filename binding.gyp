@@ -21,32 +21,49 @@
         'src/node_map.cpp',
         'src/node_request.hpp',
         'src/node_request.cpp',
+        'src/util/async_queue.hpp',
       ],
 
-      'variables': {
-        'cflags_cc': [
-          '-Wno-unused-parameter',
-        ],
-      },
-
       'conditions': [
-        ['OS == "mac"', {
+        ['OS=="mac"', {
           'xcode_settings': {
-            "CLANG_CXX_LIBRARY": "libc++",
-            "CLANG_CXX_LANGUAGE_STANDARD":"c++11",
-            "GCC_VERSION": "com.apple.compilers.llvm.clang.1_0",
-            'MACOSX_DEPLOYMENT_TARGET': '10.9',
-            'OTHER_CPLUSPLUSFLAGS': [ '<@(cflags_cc)' ],
+            'CLANG_CXX_LIBRARY': 'libc++',
+            'CLANG_CXX_LANGUAGE_STANDARD': 'c++14',
+            'GCC_VERSION': 'com.apple.compilers.llvm.clang.1_0',
             'GCC_ENABLE_CPP_EXCEPTIONS': 'YES',
-          }
+            'GCC_ENABLE_CPP_RTTI': 'YES',
+            'OTHER_CPLUSPLUSFLAGS': [
+              '-Werror',
+              '-Wall',
+              '-Wextra',
+              '-Wshadow',
+              '-Wno-variadic-macros',
+              '-Wno-error=unused-parameter',
+              '-frtti',
+              '-fexceptions',
+            ],
+            'GCC_WARN_PEDANTIC': 'YES',
+            'GCC_WARN_UNINITIALIZED_AUTOS': 'YES_AGGRESSIVE',
+            'MACOSX_DEPLOYMENT_TARGET': '10.9',
+          },
         }, {
           'cflags_cc': [
-            '-std=c++11',
+            '-std=c++14',
+            '-Werror',
+            '-Wall',
+            '-Wextra',
+            '-Wno-variadic-macros',
+            '-Wno-error=unused-parameter',
+            '-frtti',
             '-fexceptions',
-            '<@(cflags_cc)',
           ],
           'libraries': [ '<@(glfw3_ldflags)' ],
-        }]
+        }],
+        ['OS=="linux"', {
+          'cflags_cc': [
+            '-Wno-unknown-pragmas', # We are using '#pragma mark', but it is only available on Darwin.
+          ],
+        }],
       ],
     },
 

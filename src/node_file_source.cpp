@@ -1,8 +1,8 @@
 #include "node_file_source.hpp"
 #include "node_request.hpp"
+#include "util/async_queue.hpp"
 
 #include <mbgl/storage/request.hpp>
-#include <mbgl/util/async_queue.hpp>
 
 namespace node_mbgl {
 

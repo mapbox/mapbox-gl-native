@@ -7,9 +7,9 @@
 
 #include <map>
 
-namespace mbgl { namespace util { template <typename T> class AsyncQueue; } }
-
 namespace node_mbgl {
+
+namespace util { template <typename T> class AsyncQueue; }
 
 class NodeFileSource : public node::ObjectWrap, public mbgl::FileSource {
     ////////////////////////////////////////////////////////////////////////////////////////////////
@@ -27,22 +27,22 @@ public:
     ~NodeFileSource();
 
     mbgl::Request* request(const mbgl::Resource&, uv_loop_t*, Callback);
-    void cancel(mbgl::Request *request);
+    void cancel(mbgl::Request*);
 
     void request(const mbgl::Resource&, Callback);
 
     // visiblity?
-    void notify(mbgl::Request *request, const std::shared_ptr<const mbgl::Response> &response);
+    void notify(mbgl::Request*, const std::shared_ptr<const mbgl::Response>&);
 
 private:
     struct Action;
-    using Queue = mbgl::util::AsyncQueue<Action>;
+    using Queue = util::AsyncQueue<Action>;
 
-    void processAdd(mbgl::Request *request);
-    void processCancel(mbgl::Request *request);
+    void processAdd(mbgl::Request*);
+    void processCancel(mbgl::Request*);
 
 private:
-    std::map<mbgl::Request *, v8::Persistent<v8::Object>> pending;
+    std::map<mbgl::Request*, v8::Persistent<v8::Object>> pending;
     Queue *queue = nullptr;
 };
 
