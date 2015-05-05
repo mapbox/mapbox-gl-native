@@ -30,6 +30,9 @@ StyleParser::StyleParser() {
 void StyleParser::parse(JSVal document) {
     if (document.HasMember("version")) {
         version = document["version"].GetInt();
+        if (version != 8) {
+            Log::Warning(Event::ParseStyle, "current renderer implementation only supports style spec version 8; using an outdated style will cause rendering errors");
+        }
     }
 
     if (document.HasMember("constants")) {
@@ -92,10 +95,7 @@ void StyleParser::parseConstants(JSVal value) {
             // Discard constants that don't start with an @ sign.
             if (name.length() && name[0] == '@') {
                 JSVal constant = itr->value;
-                if (version < 8) {
-                    constants.emplace(std::move(name), &constant);
-                }
-                else if (!constant.IsObject()) {
+                if (!constant.IsObject()) {
                     Log::Warning(Event::ParseStyle, "constant '%s' must be an object with keys 'type', 'value'", name.c_str());
                 } else {
                     if (!constant.HasMember("type") || !constant.HasMember("value")) {
