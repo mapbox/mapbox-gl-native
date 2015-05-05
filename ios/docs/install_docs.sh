@@ -5,13 +5,15 @@ if [ -z `which appledoc` ]; then
     exit 1
 fi
 
-VERSION=$( git tag | grep ^[0-9] | sort -r | sed -n '1p' )
+OUTPUT="/tmp/`uuidgen`"
+
+VERSION=$( git tag -l ios\* --sort -v:refname | sed -n '1p' | sed 's/ios-v//' )
 echo "Creating new docs for $VERSION..."
 echo
 
 appledoc \
-    --output /tmp/`uuidgen` \
-    --project-name "Mapbox GL $VERSION" \
+    --output $OUTPUT \
+    --project-name "Mapbox GL for iOS $VERSION" \
     --project-company Mapbox \
     --create-docset \
     --company-id com.mapbox \

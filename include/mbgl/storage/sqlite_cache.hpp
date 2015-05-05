@@ -20,8 +20,9 @@ public:
     void get(const Resource &resource, Callback callback) override;
     void put(const Resource &resource, std::shared_ptr<const Response> response, Hint hint) override;
 
-private:
     class Impl;
+
+private:
     const std::unique_ptr<util::Thread<Impl>> thread;
 };
 

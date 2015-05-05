@@ -90,7 +90,7 @@ int main(int argc, char *argv[]) {
 
     map.setStyleURL(style);
 
-    int ret = view->run();
+    view->run();
 
     // Save settings
     mbgl::LatLng latLng = map.getLatLng();
@@ -101,5 +101,5 @@ int main(int argc, char *argv[]) {
     settings.debug = map.getDebug();
     settings.save();
 
-    return ret;
+    return 0;
 }

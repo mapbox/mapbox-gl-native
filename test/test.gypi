@@ -17,7 +17,7 @@
     },
     { 'target_name': 'test',
       'type': 'executable',
-      'include_dirs': [ '../include', '../src' ],
+      'include_dirs': [ '../include', '../src', '../platform/default' ],
       'dependencies': [
         'symlink_TEST_DATA',
         '../mbgl.gyp:core',
@@ -38,13 +38,12 @@
         'api/set_style.cpp',
         'api/repeated_render.cpp',
 
-        'headless/headless.cpp',
-
         'miscellaneous/clip_ids.cpp',
         'miscellaneous/bilinear.cpp',
         'miscellaneous/comparisons.cpp',
         'miscellaneous/enums.cpp',
         'miscellaneous/functions.cpp',
+        'miscellaneous/map.cpp',
         'miscellaneous/mapbox.cpp',
         'miscellaneous/merge_lines.cpp',
         'miscellaneous/rotation_range.cpp',
@@ -62,7 +61,6 @@
         'storage/file_reading.cpp',
         'storage/http_cancel.cpp',
         'storage/http_coalescing.cpp',
-        'storage/http_environment.cpp',
         'storage/http_error.cpp',
         'storage/http_header_parsing.cpp',
         'storage/http_load.cpp',
@@ -72,15 +70,18 @@
       ],
       'libraries': [
         '<@(uv_static_libs)',
+        '<@(sqlite3_static_libs)',
       ],
       'variables': {
         'cflags_cc': [
           '<@(uv_cflags)',
           '<@(opengl_cflags)',
           '<@(boost_cflags)',
+          '<@(sqlite3_cflags)',
         ],
         'ldflags': [
           '<@(uv_ldflags)',
+          '<@(sqlite3_ldflags)',
         ],
       },
       'conditions': [

@@ -16,12 +16,9 @@ public:
     ~DefaultFileSource() override;
 
     // FileSource API
-    Request *request(const Resource &resource, uv_loop_t *loop, const Environment &env,
-                     Callback callback) override;
-    void cancel(Request *request) override;
-    void request(const Resource &resource, const Environment &env, Callback callback) override;
-
-    void abort(const Environment &env) override;
+    Request* request(const Resource&, uv_loop_t*, Callback) override;
+    void cancel(Request*) override;
+    void request(const Resource&, Callback) override;
 
 public:
     class Impl;

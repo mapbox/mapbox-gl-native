@@ -7,31 +7,24 @@
 #include <mutex>
 #include <atomic>
 #include <vector>
+#include <cassert>
+#include <condition_variable>
+
+#include <mbgl/map/mode.hpp>
+#include <mbgl/map/environment.hpp>
+#include <mbgl/map/transform.hpp>
+#include <mbgl/map/transform_state.hpp>
+#include <mbgl/map/annotation.hpp>
 
 namespace mbgl {
-
-struct StyleInfo {
-    std::string url;
-    std::string base;
-    std::string json;
-};
 
 class MapData {
     using Lock = std::lock_guard<std::mutex>;
 
 public:
-    inline MapData() {
+    inline MapData(View& view, MapMode mode_) : transform(view), mode(mode_) {
         setAnimationTime(TimePoint::min());
         setDefaultTransitionDuration(Duration::zero());
-    }
-
-    inline StyleInfo getStyleInfo() const {
-        Lock lock(mtx);
-        return styleInfo;
-    }
-    inline void setStyleInfo(StyleInfo&& info) {
-        Lock lock(mtx);
-        styleInfo = info;
     }
 
     inline std::string getAccessToken() const {
@@ -71,6 +64,13 @@ public:
         debug = value;
     }
 
+    inline bool getFullyLoaded() const {
+        return loaded;
+    }
+    inline void setFullyLoaded(bool value) {
+        loaded = value;
+    }
+
     inline TimePoint getAnimationTime() const {
         // We're casting the TimePoint to and from a Duration because libstdc++
         // has a bug that doesn't allow TimePoints to be atomic.
@@ -87,15 +87,26 @@ public:
         defaultTransitionDuration = duration;
     };
 
+public:
+    Transform transform;
+    AnnotationManager annotationManager;
+    const MapMode mode;
+
 private:
     mutable std::mutex mtx;
 
-    StyleInfo styleInfo;
     std::string accessToken;
     std::vector<std::string> classes;
     std::atomic<uint8_t> debug { false };
+    std::atomic<bool> loaded { false };
     std::atomic<Duration> animationTime;
     std::atomic<Duration> defaultTransitionDuration;
+
+// TODO: make private
+public:
+    std::mutex mutexPause;
+    std::condition_variable condPaused;
+    std::condition_variable condResume;
 };
 
 }

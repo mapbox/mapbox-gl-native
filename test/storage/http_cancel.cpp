@@ -14,10 +14,8 @@ TEST_F(Storage, HTTPCancel) {
 
     DefaultFileSource fs(nullptr);
 
-    auto &env = *static_cast<const Environment *>(nullptr);
-
     auto req =
-        fs.request({ Resource::Unknown, "http://127.0.0.1:3000/test" }, uv_default_loop(), env,
+        fs.request({ Resource::Unknown, "http://127.0.0.1:3000/test" }, uv_default_loop(),
                    [&](const Response &) { ADD_FAILURE() << "Callback should not be called"; });
 
     fs.cancel(req);
@@ -33,13 +31,12 @@ TEST_F(Storage, HTTPCancelMultiple) {
 
     DefaultFileSource fs(nullptr);
 
-    auto &env = *static_cast<const Environment *>(nullptr);
     const Resource resource { Resource::Unknown, "http://127.0.0.1:3000/test" };
 
-    auto req2 = fs.request(resource, uv_default_loop(), env, [&](const Response &) {
+    auto req2 = fs.request(resource, uv_default_loop(), [&](const Response &) {
         ADD_FAILURE() << "Callback should not be called";
     });
-    fs.request(resource, uv_default_loop(), env, [&](const Response &res) {
+    fs.request(resource, uv_default_loop(), [&](const Response &res) {
         EXPECT_EQ(Response::Successful, res.status);
         EXPECT_EQ("Hello World!", res.data);
         EXPECT_EQ(0, res.expires);

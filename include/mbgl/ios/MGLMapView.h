@@ -20,6 +20,11 @@ IB_DESIGNABLE
 
 /** @name Initializing a Map View */
 
+/** Initialize a map view with the default style, given frame, and access token set in MapboxGL singleton.
+*   @param frame The frame with which to initialize the map view.
+*   @return An initialized map view, or `nil` if the map view was unable to be initialized. */
+- (instancetype)initWithFrame:(CGRect)frame;
+
 /** Initialize a map view with the default style and a given frame and access token.
 *   @param frame The frame with which to initialize the map view.
 *   @param accessToken A Mapbox API access token.
@@ -33,8 +38,6 @@ IB_DESIGNABLE
  *   @return An initialized map view, or `nil` if the map view was unable to be initialized. */
 - (instancetype)initWithFrame:(CGRect)frame accessToken:(NSString *)accessToken styleURL:(NSURL *)styleURL;
 
-- (instancetype)initWithFrame:(CGRect)frame __attribute__((unavailable("Instantiating an MGLMapView requires setting a style and/or an access token.")));
-
 #pragma mark - Authorizing Access
 
 /** @name Authorizing Access */
@@ -45,11 +48,6 @@ IB_DESIGNABLE
 #pragma mark - Managing Constraints
 
 /** @name Managing Constraints */
-
-/** A view controller whose top and bottom layout guides to use for proper setup of constraints in the map view internals.
-*
-*   Certain components of the map view, such as the heading compass and the data attribution button, need to be aware of the view controller layout in order to avoid positioning content under a top navigation bar or a bottom toolbar. */
-@property (nonatomic, weak) IBOutlet UIViewController *viewControllerForLayoutGuides;
 
 #pragma mark - Accessing Map Properties
 
@@ -184,13 +182,17 @@ IB_DESIGNABLE
 /** Currently active style classes, represented as an array of string identifiers. */
 @property (nonatomic) NSArray *styleClasses;
 
-/** Returns a Boolean value indicating whether the style class with the given identifier is currently active. */
+/** Returns a Boolean value indicating whether the style class with the given identifier is currently active.
+    @param styleClass The style class to query for.
+    @return Whether the style class is currently active. */
 - (BOOL)hasStyleClass:(NSString *)styleClass;
 
-/** Activates the style class with the given identifier. */
+/** Activates the style class with the given identifier.
+    @param styleClass The style class to activate. */
 - (void)addStyleClass:(NSString *)styleClass;
 
-/** Deactivates the style class with the given identifier. */
+/** Deactivates the style class with the given identifier. 
+    @param styleClass The style class to deactivate. */
 - (void)removeStyleClass:(NSString *)styleClass;
 
 #pragma mark - Annotating the Map

@@ -12,6 +12,8 @@
 #include <mbgl/text/placement.hpp>
 #include <mbgl/platform/log.hpp>
 #include <mbgl/text/collision.hpp>
+#include <mbgl/shader/sdf_shader.hpp>
+#include <mbgl/shader/icon_shader.hpp>
 #include <mbgl/map/sprite.hpp>
 
 #include <mbgl/util/utf.hpp>
@@ -20,18 +22,37 @@
 #include <mbgl/util/merge_lines.hpp>
 #include <mbgl/util/std.hpp>
 
+#ifndef BUFFER_OFFSET
+#define BUFFER_OFFSET(i) ((char *)nullptr + (i))
+#endif
+
 namespace mbgl {
 
 SymbolBucket::SymbolBucket(Collision &collision_)
-    : collision(collision_) {
+    : collision(collision_), needsGlyphs_(false) {
 }
 
 SymbolBucket::~SymbolBucket() {
     // Do not remove. header file only contains forward definitions to unique pointers.
 }
 
-void SymbolBucket::render(Painter &painter, const StyleLayer &layer_desc, const TileID &id,
-                          const mat4 &matrix) {
+void SymbolBucket::upload() {
+    if (hasTextData()) {
+        text.vertices.upload();
+        text.triangles.upload();
+    }
+    if (hasIconData()) {
+        icon.vertices.upload();
+        icon.triangles.upload();
+    }
+
+    uploaded = true;
+}
+
+void SymbolBucket::render(Painter& painter,
+                          const StyleLayer& layer_desc,
+                          const TileID& id,
+                          const mat4& matrix) {
     painter.renderSymbol(*this, layer_desc, id, matrix);
 }
 
@@ -43,8 +64,7 @@ bool SymbolBucket::hasIconData() const { return !icon.groups.empty(); }
 
 std::vector<SymbolFeature> SymbolBucket::processFeatures(const GeometryTileLayer& layer,
                                                          const FilterExpression& filter,
-                                                         GlyphStore &glyphStore,
-                                                         const Sprite &sprite) {
+                                                         GlyphStore &glyphStore) {
     const bool has_text = !layout.text.field.empty() && !layout.text.font.empty();
     const bool has_icon = !layout.icon.image.empty();
 
@@ -114,8 +134,10 @@ std::vector<SymbolFeature> SymbolBucket::processFeatures(const GeometryTileLayer
         util::mergeLines(features);
     }
 
-    glyphStore.waitForGlyphRanges(layout.text.font, ranges);
-    sprite.waitUntilLoaded();
+    if (glyphStore.requestGlyphRangesIfNeeded(layout.text.font, ranges)) {
+        needsGlyphs_ = true;
+        return {};
+    }
 
     return features;
 }
@@ -127,7 +149,13 @@ void SymbolBucket::addFeatures(const GeometryTileLayer& layer,
                                Sprite& sprite,
                                GlyphAtlas& glyphAtlas,
                                GlyphStore& glyphStore) {
-    const std::vector<SymbolFeature> features = processFeatures(layer, filter, glyphStore, sprite);
+    const std::vector<SymbolFeature> features = processFeatures(layer, filter, glyphStore);
+
+    // Stop if we still need glyphs because the
+    // bucket will be discarded.
+    if (needsGlyphs()) {
+        return;
+    }
 
     float horizontalAlign = 0.5;
     float verticalAlign = 0.5;
@@ -170,7 +198,7 @@ void SymbolBucket::addFeatures(const GeometryTileLayer& layer,
     if (layout.text.justify == TextJustifyType::Right) justify = 1;
     else if (layout.text.justify == TextJustifyType::Left) justify = 0;
 
-    const auto &fontStack = glyphStore.getFontStack(layout.text.font);
+    auto* fontStack = glyphStore.getFontStack(layout.text.font);
 
     for (const auto& feature : features) {
         if (!feature.geometry.size()) continue;
@@ -194,13 +222,12 @@ void SymbolBucket::addFeatures(const GeometryTileLayer& layer,
 
             // Add the glyphs we need for this label to the glyph atlas.
             if (shaping.size()) {
-                glyphAtlas.addGlyphs(tileUID, feature.label, layout.text.font, fontStack, face);
+                glyphAtlas.addGlyphs(tileUID, feature.label, layout.text.font, *fontStack, face);
             }
         }
 
         // if feature has icon, get sprite atlas position
         if (feature.sprite.length()) {
-            sprite.waitUntilLoaded();
             image = spriteAtlas.getImage(feature.sprite, false);
 
             if (sprite.getSpritePosition(feature.sprite).sdf) {

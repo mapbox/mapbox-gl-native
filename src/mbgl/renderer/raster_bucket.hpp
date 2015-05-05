@@ -5,8 +5,6 @@
 #include <mbgl/util/raster.hpp>
 #include <mbgl/style/style_bucket.hpp>
 
-
-
 namespace mbgl {
 
 class StyleLayoutRaster;
@@ -18,17 +16,15 @@ class RasterBucket : public Bucket {
 public:
     RasterBucket(TexturePool&, const StyleLayoutRaster&);
 
-    void render(Painter &painter, const StyleLayer &layer_desc, const TileID &id,
-                const mat4 &matrix) override;
-    bool hasData() const override;
+    void upload() override;
+    void render(Painter&, const StyleLayer&, const TileID&, const mat4&) override;
+    bool hasData() const;
 
     bool setImage(const std::string &data);
 
     const StyleLayoutRaster &layout;
 
     void drawRaster(RasterShader& shader, StaticVertexBuffer &vertices, VertexArrayObject &array);
-
-    void drawRaster(RasterShader& shader, StaticVertexBuffer &vertices, VertexArrayObject &array, GLuint texture);
 
     Raster raster;
 };

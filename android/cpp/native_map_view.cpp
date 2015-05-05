@@ -1,5 +1,6 @@
 #include <cstdlib>
 #include <ctime>
+#include <cassert>
 #include <memory>
 #include <list>
 #include <tuple>
@@ -16,6 +17,7 @@
 #include <mbgl/platform/gl.hpp>
 #include <mbgl/util/std.hpp>
 
+#include <pthread.h>
 
 pthread_once_t loadGLExtensions = PTHREAD_ONCE_INIT;
 
@@ -59,7 +61,7 @@ NativeMapView::NativeMapView(JNIEnv *env, jobject obj_)
     : mbgl::View(*this),
       fileCache(mbgl::android::cachePath + "/mbgl-cache.db"),
       fileSource(&fileCache),
-      map(*this, fileSource) {
+      map(*this, fileSource, MapMode::Continuous, true) {
     mbgl::Log::Debug(mbgl::Event::Android, "NativeMapView::NativeMapView");
 
     assert(env != nullptr);
@@ -121,11 +123,11 @@ void NativeMapView::deactivate() {
     }
 }
 
-void NativeMapView::invalidate() {
+void NativeMapView::invalidate(std::function<void()> render) {
     mbgl::Log::Debug(mbgl::Event::Android, "NativeMapView::invalidate");
 
     if ((display != EGL_NO_DISPLAY) && (surface != EGL_NO_SURFACE)) {
-        map.render();
+        render();
 
         if (!eglSwapBuffers(display, surface)) {
             mbgl::Log::Error(mbgl::Event::OpenGL, "eglSwapBuffers() returned error %d",
@@ -358,7 +360,7 @@ void NativeMapView::createSurface(ANativeWindow *window_) {
 void NativeMapView::destroySurface() {
     mbgl::Log::Debug(mbgl::Event::Android, "NativeMapView::destroySurface");
 
-    pause(true);
+    pause();
 
     if (surface != EGL_NO_SURFACE) {
         if (!eglDestroySurface(display, surface)) {
@@ -576,23 +578,6 @@ EGLConfig NativeMapView::chooseConfig(const EGLConfig configs[], EGLint numConfi
     return configId;
 }
 
-void NativeMapView::start() {
-    mbgl::Log::Debug(mbgl::Event::Android, "NativeMapView::start");
-
-    if (display == EGL_NO_DISPLAY) {
-        initializeDisplay();
-    }
-
-    if (context == EGL_NO_CONTEXT) {
-        initializeContext();
-    }
-
-    assert(display != EGL_NO_DISPLAY);
-    assert(context != EGL_NO_CONTEXT);
-
-    map.start(true);
-}
-
 void loadExtensions() {
     const GLubyte *str = glGetString(GL_EXTENSIONS);
     if (str == nullptr) {
@@ -689,20 +674,11 @@ void loadExtensions() {
     }
 }
 
-void NativeMapView::stop() {
-    mbgl::Log::Debug(mbgl::Event::Android, "NativeMapView::stop");
+void NativeMapView::pause() {
+    mbgl::Log::Debug(mbgl::Event::Android, "NativeMapView::pause");
 
     if ((display != EGL_NO_DISPLAY) && (context != EGL_NO_CONTEXT)) {
-        map.stop();
-    }
-}
-
-void NativeMapView::pause(bool waitForPause) {
-    mbgl::Log::Debug(mbgl::Event::Android, "NativeMapView::pause %s",
-                     (waitForPause) ? "true" : "false");
-
-    if ((display != EGL_NO_DISPLAY) && (context != EGL_NO_CONTEXT)) {
-        map.pause(waitForPause);
+        map.pause();
     }
 }
 
@@ -822,10 +798,6 @@ void NativeMapView::updateFps() {
         }
     }
     env = nullptr;
-}
-
-void NativeMapView::resize(uint16_t width, uint16_t height, float ratio, uint16_t fbWidth, uint16_t fbHeight) {
-    View::resize(width, height, ratio, fbWidth, fbHeight);
 }
 
 }

@@ -55,9 +55,9 @@ public:
     SymbolBucket(Collision &collision);
     ~SymbolBucket() override;
 
-    void render(Painter &painter, const StyleLayer &layer_desc, const TileID &id,
-                const mat4 &matrix) override;
-    bool hasData() const override;
+    void upload() override;
+    void render(Painter&, const StyleLayer&, const TileID&, const mat4&) override;
+    bool hasData() const;
     bool hasTextData() const;
     bool hasIconData() const;
 
@@ -69,6 +69,8 @@ public:
                      GlyphAtlas&,
                      GlyphStore&);
 
+    inline bool needsGlyphs() const { return needsGlyphs_; }
+
     void drawGlyphs(SDFShader& shader);
     void drawIcons(SDFShader& shader);
     void drawIcons(IconShader& shader);
@@ -76,8 +78,7 @@ public:
 private:
     std::vector<SymbolFeature> processFeatures(const GeometryTileLayer&,
                                                const FilterExpression&,
-                                               GlyphStore&,
-                                               const Sprite&);
+                                               GlyphStore&);
 
     void addFeature(const std::vector<Coordinate> &line, const Shaping &shaping, const GlyphPositions &face, const Rect<uint16_t> &image);
 
@@ -104,6 +105,7 @@ private:
         std::vector<std::unique_ptr<IconElementGroup>> groups;
     } icon;
 
+    bool needsGlyphs_;
 };
 }
 

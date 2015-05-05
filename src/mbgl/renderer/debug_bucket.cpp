@@ -1,9 +1,14 @@
 #include <mbgl/renderer/debug_bucket.hpp>
 #include <mbgl/renderer/painter.hpp>
+#include <mbgl/shader/plain_shader.hpp>
 
 #include <mbgl/platform/gl.hpp>
 
 #include <cassert>
+
+#ifndef BUFFER_OFFSET
+#define BUFFER_OFFSET(i) ((char *)nullptr + (i))
+#endif
 
 using namespace mbgl;
 
@@ -11,13 +16,14 @@ DebugBucket::DebugBucket(DebugFontBuffer& fontBuffer_)
     : fontBuffer(fontBuffer_) {
 }
 
-void DebugBucket::render(Painter &painter, const StyleLayer & /*layer_desc*/,
-                         const TileID & /*id*/, const mat4 &matrix) {
-    painter.renderDebugText(*this, matrix);
+void DebugBucket::upload() {
+    fontBuffer.upload();
+
+    uploaded = true;
 }
 
-bool DebugBucket::hasData() const {
-    return fontBuffer.index() > 0;
+void DebugBucket::render(Painter& painter, const StyleLayer&, const TileID&, const mat4& matrix) {
+    painter.renderDebugText(*this, matrix);
 }
 
 void DebugBucket::drawLines(PlainShader& shader) {

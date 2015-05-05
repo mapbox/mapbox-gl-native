@@ -4,6 +4,9 @@
 #include <mbgl/renderer/painter.hpp>
 #include <mbgl/style/style.hpp>
 #include <mbgl/style/style_layout.hpp>
+#include <mbgl/shader/line_shader.hpp>
+#include <mbgl/shader/linesdf_shader.hpp>
+#include <mbgl/shader/linepattern_shader.hpp>
 #include <mbgl/util/math.hpp>
 #include <mbgl/util/std.hpp>
 #include <mbgl/platform/gl.hpp>
@@ -183,8 +186,9 @@ void LineBucket::addGeometry(const std::vector<Coordinate>& vertices) {
                 // Almost parallel lines
                 joinNormal = nextNormal;
             } else {
+                const float direction = prevNormal.x * nextNormal.y - prevNormal.y * nextNormal.x > 0 ? -1 : 1;
                 const float bevelLength = miterLength * util::mag(prevNormal + nextNormal) /
-                                          util::mag(prevNormal - nextNormal);
+                                          util::mag(prevNormal - nextNormal * direction);
                 joinNormal = util::perp(joinNormal) * bevelLength;
             }
 
@@ -336,6 +340,14 @@ void LineBucket::addCurrentVertex(const Coordinate& currentVertex,
     }
     e1 = e2;
     e2 = e3;
+}
+
+void LineBucket::upload() {
+    vertexBuffer.upload();
+    triangleElementsBuffer.upload();
+
+    // From now on, we're only going to render during the translucent pass.
+    uploaded = true;
 }
 
 void LineBucket::render(Painter& painter,

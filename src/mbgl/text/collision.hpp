@@ -9,12 +9,13 @@
 #pragma GCC diagnostic ignored "-Wunused-variable"
 #pragma GCC diagnostic ignored "-Wshadow"
 #ifdef __clang__
+#pragma GCC diagnostic ignored "-Wunknown-pragmas"
+#endif
+#pragma GCC diagnostic ignored "-Wpragmas"
 #pragma GCC diagnostic ignored "-Wdeprecated-register"
 #pragma GCC diagnostic ignored "-Wshorten-64-to-32"
-#else
 #pragma GCC diagnostic ignored "-Wunused-local-typedefs"
 #pragma GCC diagnostic ignored "-Wmaybe-uninitialized"
-#endif
 #include <boost/geometry.hpp>
 #include <boost/geometry/geometries/point.hpp>
 #include <boost/geometry/geometries/box.hpp>

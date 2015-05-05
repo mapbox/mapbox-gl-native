@@ -1,11 +1,10 @@
 [![Travis](https://api.travis-ci.org/mapbox/mapbox-gl-native.svg?branch=master)](https://travis-ci.org/mapbox/mapbox-gl-native/builds)
 
-An OpenGL renderer for [Mapbox Vector Tiles](https://www.mapbox.com/blog/vector-tiles),
-implemented in C++11, currently targeting iOS, OS X, Android, and Ubuntu Linux.
+An OpenGL renderer for [Mapbox Vector Tiles](https://www.mapbox.com/blog/vector-tiles), consisting of a C++ library for OS X and Linux and SDK bindings for iOS and Android.
 
 # Depends
 
- - Modern C++ compiler that supports `-std=c++11` (On OS X clang++, on Linux g++-4.8 or g++-4.9)
+ - Modern C++ compiler that supports `-std=c++14` (clang++ 3.5 or later or g++-4.9 or later)
  - [Boost headers](http://boost.org/)
  - [`zlib`](http://www.zlib.net/)
  - [`libpng`](http://www.libpng.org/pub/png/libpng.html)
@@ -48,8 +47,8 @@ Target OS X: 10.9+
 
 If you merely want to install the library for iOS and try it out as an Objective-C consumer:
 
-0. Use [Homebrew](http://brew.sh/) to install Boost headers: `brew install boost`.
-1. Run `./scripts/package_ios.sh`. The packaging script will produce the statically-linked `libMapboxGL.a`, `MapboxGL.bundle` for resources, and a `Headers` folder.
+0. Use [Homebrew](http://brew.sh/) to install Boost headers and [appledoc](http://gentlebytes.com/appledoc/): `brew install boost appledoc`.
+1. Run `make ipackage`. The packaging script will produce the statically-linked `libMapboxGL.a`, `MapboxGL.bundle` for resources, a `Headers` folder, and a `Docs` folder with HTML API documentation.
 2. Copy the contents of `build/ios/pkg/static` into your project. It should happen automatically, but ensure that:
    - `Headers` is in your *Header Search Paths* (`HEADER_SEARCH_PATHS`) build setting.
    - `MapboxGL.bundle` is in your target's *Copy Bundle Resources* build phase.
@@ -68,24 +67,25 @@ If you merely want to install the library for iOS and try it out as an Objective
 5. [Set the Mapbox API access token](#mapbox-api-access-tokens).
 6. `#import "MapboxGL.h"`
 
-If you want to build from source and/or contribute to development of the project, run `make iproj`, which will create and open an Xcode project which can build the entire library from source as well as an Objective-C test app.
+If you want to build from source and/or contribute to development of the project, run `make iproj`, which will create and open an Xcode project which can build the entire library from source as well as an Objective-C test app. If you don't have an Apple Developer account, change the destination from "My Mac" to a simulator such as "iPhone 6" before you run and build the app.
 
-You can also run `make itest` to run the included tests. Requires `brew install xcpretty`. 
+You can run `make itest` to run the included integration tests. Requires `gem install xcpretty`. If you want to run the tests in Xcode instead, first `make ipackage` to create a local static library version, then open `test/ios/ios-tests.xcodeproj`, and lastly `Command + U` on the `Mapbox GL Tests` application target. 
 
 Target devices: iPhone 4S and above (5, 5c, 5s, 6, 6 Plus) and iPad 2 and above (3, 4, Mini, Air, Mini 2, Air 2).
 
-Target iOS: 7.0 through 8.1
+Target iOS: 7.0 through latest 8.x. 
 
 
 ## Linux
 
 We are using Ubuntu for development. While the software should work on other distributions as well, we are not providing explicit build instructions here.
 
-Install GCC 4.8+ if you are running Ubuntu 13.10 or older. Alternatively, you can also use Clang 3.4+.
+Install GCC 4.9+ if you are running Ubuntu 13.10 or older. Alternatively, you can also use Clang 3.5+.
 
     sudo add-apt-repository --yes ppa:ubuntu-toolchain-r/test
     sudo apt-get update
-    sudo apt-get install gcc-4.8 g++-4.8
+    sudo apt-get install gcc-4.9 g++-4.9
+    export CXX=g++-4.9
 
 Ensure you have git and other build essentials:
 
@@ -109,10 +109,6 @@ Finally, install Boost. If you're running Ubuntu 12.04 or older, you need to ins
 Otherwise, you can just install
 
     sudo apt-get install libboost-dev libboost-program-options-dev
-
-Once you're done installing the build dependencies, you can get started by running
-
-    ./configure
 
 Then, you can then proceed to build the library:
 

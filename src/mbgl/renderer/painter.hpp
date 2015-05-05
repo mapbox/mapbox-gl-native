@@ -1,59 +1,80 @@
 #ifndef MBGL_RENDERER_PAINTER
 #define MBGL_RENDERER_PAINTER
 
-#include <mbgl/map/tile_data.hpp>
+#include <mbgl/map/transform_state.hpp>
+
+#include <mbgl/renderer/frame_history.hpp>
+#include <mbgl/renderer/bucket.hpp>
+
 #include <mbgl/geometry/vao.hpp>
 #include <mbgl/geometry/static_vertex_buffer.hpp>
-#include <mbgl/util/mat4.hpp>
-#include <mbgl/util/noncopyable.hpp>
-#include <mbgl/renderer/frame_history.hpp>
+
+#include <mbgl/renderer/gl_config.hpp>
+
 #include <mbgl/style/types.hpp>
 
-#include <mbgl/shader/plain_shader.hpp>
-#include <mbgl/shader/outline_shader.hpp>
-#include <mbgl/shader/pattern_shader.hpp>
-#include <mbgl/shader/line_shader.hpp>
-#include <mbgl/shader/linesdf_shader.hpp>
-#include <mbgl/shader/linepattern_shader.hpp>
-#include <mbgl/shader/icon_shader.hpp>
-#include <mbgl/shader/raster_shader.hpp>
-#include <mbgl/shader/sdf_shader.hpp>
-#include <mbgl/shader/dot_shader.hpp>
-#include <mbgl/shader/gaussian_shader.hpp>
+#include <mbgl/platform/gl.hpp>
 
-#include <mbgl/map/transform_state.hpp>
-#include <mbgl/util/ptr.hpp>
+#include <mbgl/util/noncopyable.hpp>
 #include <mbgl/util/chrono.hpp>
 
-#include <map>
-#include <unordered_map>
+#include <array>
+#include <vector>
 #include <set>
 
 namespace mbgl {
 
-enum class RenderPass : bool { Opaque, Translucent };
-
-class Transform;
 class Style;
+class StyleLayer;
 class Tile;
-class Sprite;
 class SpriteAtlas;
 class GlyphAtlas;
 class LineAtlas;
 class Source;
 
+
+class DebugBucket;
 class FillBucket;
 class LineBucket;
 class SymbolBucket;
 class RasterBucket;
-class PrerenderedTexture;
 
-struct FillProperties;
 struct RasterProperties;
 
-class LayerDescription;
-class RasterTileData;
+class SDFShader;
+class PlainShader;
+class OutlineShader;
+class LineShader;
+class LinejoinShader;
+class LineSDFShader;
+class LinepatternShader;
+class PatternShader;
+class IconShader;
+class RasterShader;
+class SDFGlyphShader;
+class SDFIconShader;
+class DotShader;
+class GaussianShader;
+
 struct ClipID;
+
+struct RenderItem {
+    inline RenderItem(const StyleLayer& layer_,
+                      const Tile* tile_ = nullptr,
+                      Bucket* bucket_ = nullptr,
+                      RenderPass passes_ = RenderPass::Opaque)
+        : tile(tile_), bucket(bucket_), layer(layer_), passes(passes_) {
+    }
+
+    const Tile* const tile;
+    Bucket* const bucket;
+    const StyleLayer& layer;
+    const RenderPass passes;
+
+    inline bool hasRenderPass(RenderPass pass) const {
+        return bool(passes & pass);
+    }
+};
 
 class Painter : private util::noncopyable {
 public:
@@ -61,11 +82,6 @@ public:
     ~Painter();
 
     void setup();
-
-    // Perform cleanup tasks that prepare shutting down the app. This doesn't mean that the
-    // app will be shut down. That means all operations must be automatically be reversed (e.g. through
-    // lazy initialization) in case rendering continues.
-    void terminate();
 
     // Renders the backdrop of the OpenGL view. This also paints in areas where we don't have any
     // tiles whatsoever.
@@ -77,11 +93,6 @@ public:
     void render(const Style& style,
                 TransformState state,
                 TimePoint time);
-
-    void renderLayer(const StyleLayer&);
-
-    // Renders a particular layer from a tile.
-    void renderTileLayer(const Tile& tile, const StyleLayer &layer_desc, const mat4 &matrix);
 
     // Renders debug information for a tile.
     void renderTileDebug(const Tile& tile);
@@ -132,8 +143,10 @@ public:
 
 private:
     void setupShaders();
-    void deleteShaders();
     mat4 translatedMatrix(const mat4& matrix, const std::array<float, 2> &translation, const TileID &id, TranslateAnchorType anchor);
+
+    std::vector<RenderItem> determineRenderOrder(const Style& style);
+    static RenderPass determineRenderPasses(const StyleLayer&);
 
     void prepareTile(const Tile& tile);
 
@@ -151,8 +164,6 @@ private:
 public:
     void useProgram(uint32_t program);
     void lineWidth(float lineWidth);
-    void depthMask(bool value);
-    void depthRange(float near, float far);
 
 public:
     mat4 projMatrix;
@@ -179,11 +190,11 @@ private:
     bool debug = false;
     int indent = 0;
 
+    gl::Config config;
+
     uint32_t gl_program = 0;
     float gl_lineWidth = 0;
-    bool gl_depthMask = true;
     std::array<uint16_t, 2> gl_viewport = {{ 0, 0 }};
-    std::array<float, 2> gl_depthRange = {{ 0, 1 }};
     float strata = 0;
     RenderPass pass = RenderPass::Opaque;
     const float strata_epsilon = 1.0f / (1 << 16);

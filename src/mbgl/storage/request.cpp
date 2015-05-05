@@ -1,5 +1,6 @@
 #include <mbgl/storage/request.hpp>
 
+#include <mbgl/map/environment.hpp>
 #include <mbgl/storage/response.hpp>
 
 #include <mbgl/util/util.hpp>
@@ -16,8 +17,8 @@ namespace mbgl {
 struct Request::Canceled { std::mutex mutex; bool confirmed = false; };
 
 // Note: This requires that loop is running in the current thread (or not yet running).
-Request::Request(const Resource &resource_, uv_loop_t *loop, const Environment &env_, Callback callback_)
-    : callback(callback_), resource(resource_), env(env_) {
+Request::Request(const Resource &resource_, uv_loop_t *loop, Callback callback_)
+    : callback(callback_), resource(resource_) {
     // When there is no loop supplied (== nullptr), the callback will be fired in an arbitrary
     // thread (the thread notify() is called from) rather than kicking back to the calling thread.
     if (loop) {
@@ -33,7 +34,6 @@ Request::Request(const Resource &resource_, uv_loop_t *loop, const Environment &
 
 // Called in the originating thread.
 void Request::notifyCallback() {
-    MBGL_VERIFY_THREAD(tid)
     if (!canceled) {
         invoke();
     } else {
@@ -84,7 +84,6 @@ void Request::notify(const std::shared_ptr<const Response> &response_) {
 
 // Called in the originating thread.
 void Request::cancel() {
-    MBGL_VERIFY_THREAD(tid)
     assert(async);
     assert(!canceled);
     canceled = util::make_unique<Canceled>();

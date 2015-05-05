@@ -14,9 +14,9 @@ namespace util {
 
 class RunLoop : private util::noncopyable {
 public:
-    RunLoop();
+    RunLoop(uv_loop_t*);
+    ~RunLoop();
 
-    void run();
     void stop();
 
     // Invoke fn() in the runloop thread.
@@ -29,29 +29,32 @@ public:
 
     // Invoke fn() in the runloop thread, then invoke callback(result) in the current thread.
     template <class Fn, class R>
-    void invokeWithResult(Fn&& fn, std::function<void (R)> callback) {
+    void invokeWithResult(Fn&& fn, std::function<void (R)>&& callback) {
         RunLoop* outer = current.get();
         assert(outer);
 
-        invoke([fn, callback, outer] {
-            /*
-                With C++14, we could write:
-
-                outer->invoke([callback, result = std::move(fn())] () mutable {
-                    callback(std::move(result));
-                });
-
-                Instead we're using a workaround with std::bind
-                to obtain move-capturing semantics with C++11:
-                  http://stackoverflow.com/a/12744730/52207
-            */
-            outer->invoke(std::bind([callback] (R& result) {
+        invoke([fn = std::move(fn), callback = std::move(callback), outer] () mutable {
+            outer->invoke([callback = std::move(callback), result = std::move(fn())] () mutable {
                 callback(std::move(result));
-            }, std::move(fn())));
+            });
         });
     }
 
-    uv_loop_t* get() { return *loop; }
+    // Invoke fn() in the runloop thread, then invoke callback() in the current thread.
+    template <class Fn>
+    void invokeWithResult(Fn&& fn, std::function<void ()>&& callback) {
+        RunLoop* outer = current.get();
+        assert(outer);
+
+        invoke([fn = std::move(fn), callback = std::move(callback), outer] () mutable {
+            fn();
+            outer->invoke(std::move(callback));
+        });
+    }
+
+    uv_loop_t* get() { return async.get()->loop; }
+
+    static uv::tls<RunLoop> current;
 
 private:
     // A movable type-erasing invokable entity wrapper. This allows to store arbitrary invokable
@@ -71,15 +74,11 @@ private:
 
     using Queue = std::queue<std::unique_ptr<Message>>;
 
-    static uv::tls<RunLoop> current;
-
     void withMutex(std::function<void()>&&);
     void process();
 
     Queue queue;
     std::mutex mutex;
-
-    uv::loop loop;
     uv::async async;
 };
 

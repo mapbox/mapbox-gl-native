@@ -124,8 +124,6 @@ void GlyphAtlas::removeGlyphs(uintptr_t tileUID) {
                     }
                 }
 
-                dirty = true;
-
                 bin.release(rect);
 
                 // Make sure to post-increment the iterator: This will return the
@@ -137,6 +135,47 @@ void GlyphAtlas::removeGlyphs(uintptr_t tileUID) {
                 ++it;
             }
         }
+    }
+}
+
+void GlyphAtlas::upload() {
+    if (dirty) {
+        const bool first = !texture;
+        bind();
+
+        std::lock_guard<std::mutex> lock(mtx);
+
+        if (first) {
+            MBGL_CHECK_ERROR(glTexImage2D(
+                GL_TEXTURE_2D, // GLenum target
+                0, // GLint level
+                GL_ALPHA, // GLint internalformat
+                width, // GLsizei width
+                height, // GLsizei height
+                0, // GLint border
+                GL_ALPHA, // GLenum format
+                GL_UNSIGNED_BYTE, // GLenum type
+                data.get() // const GLvoid* data
+            ));
+        } else {
+            MBGL_CHECK_ERROR(glTexSubImage2D(
+                GL_TEXTURE_2D, // GLenum target
+                0, // GLint level
+                0, // GLint xoffset
+                0, // GLint yoffset
+                width, // GLsizei width
+                height, // GLsizei height
+                GL_ALPHA, // GLenum format
+                GL_UNSIGNED_BYTE, // GLenum type
+                data.get() // const GLvoid* data
+            ));
+        }
+
+        dirty = false;
+
+#if defined(DEBUG)
+        // platform::showDebugImage("Glyph Atlas", data.get(), width, height);
+#endif
     }
 }
 
@@ -153,15 +192,5 @@ void GlyphAtlas::bind() {
         MBGL_CHECK_ERROR(glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_WRAP_T, GL_CLAMP_TO_EDGE));
     } else {
         MBGL_CHECK_ERROR(glBindTexture(GL_TEXTURE_2D, texture));
-    }
-
-    if (dirty) {
-        std::lock_guard<std::mutex> lock(mtx);
-        MBGL_CHECK_ERROR(glTexImage2D(GL_TEXTURE_2D, 0, GL_ALPHA, width, height, 0, GL_ALPHA, GL_UNSIGNED_BYTE, data.get()));
-        dirty = false;
-
-#if defined(DEBUG)
-        // platform::showDebugImage("Glyph Atlas", data, width, height);
-#endif
     }
 };

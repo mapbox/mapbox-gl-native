@@ -12,6 +12,7 @@ TileData::TileData(const TileID& id_, const SourceInfo& source_)
     : id(id_),
       name(id),
       state(State::initial),
+      parsing(ATOMIC_FLAG_INIT),
       source(source_),
       env(Environment::Get()),
       debugBucket(debugFontBuffer) {
@@ -55,18 +56,23 @@ void TileData::cancel() {
         env.cancelRequest(req);
         req = nullptr;
     }
+    if (workRequest) {
+        workRequest.join();
+    }
+}
+
+bool TileData::mayStartParsing() {
+    return !parsing.test_and_set(std::memory_order_acquire);
+}
+
+void TileData::endParsing() {
+    parsing.clear(std::memory_order_release);
 }
 
 void TileData::reparse(Worker& worker, std::function<void()> callback) {
-    util::ptr<TileData> tile = shared_from_this();
-    worker.send(
-        [tile]() {
-            EnvironmentScope scope(tile->env, ThreadType::TileWorker, "TileWorker_" + tile->name);
-            tile->parse();
-        },
-        [tile, callback]() {
-             // `tile` is bound in this lambda to ensure that if it's the last owning pointer,
-             // destruction happens on the map thread, not the worker thread.
-            callback();
-        });
+    if (!mayStartParsing()) {
+        return;
+    }
+
+    workRequest = worker.send([this] { parse(); endParsing(); }, callback);
 }

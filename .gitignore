@@ -16,8 +16,13 @@
 /test/build
 /test/node_modules
 /test/fixtures/*/*_actual.*
+/test/fixtures/database/*.db
 /include/mbgl/shader/shaders.hpp
 /src/shader/shaders_gl.cpp
 /src/shader/shaders_gles2.cpp
 /bin/style.bin.js
 *~
+
+/ios/benchmark/assets/tiles/mapbox.mapbox-streets-v6/
+/ios/benchmark/assets/tiles/mapbox.mapbox-terrain-v2/
+/ios/benchmark/assets/glyphs/DIN Offc Pro*/

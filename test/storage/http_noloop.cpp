@@ -12,8 +12,6 @@ TEST_F(Storage, HTTPNoLoop) {
 
     DefaultFileSource fs(nullptr);
 
-    auto &env = *static_cast<const Environment *>(nullptr);
-
     const auto mainThread = uv_thread_self();
 
     // Async handle that keeps the main loop alive until the thread finished
@@ -22,7 +20,7 @@ TEST_F(Storage, HTTPNoLoop) {
         uv::close(as);
     });
 
-    fs.request({ Resource::Unknown, "http://127.0.0.1:3000/temporary-error" }, nullptr, env,
+    fs.request({ Resource::Unknown, "http://127.0.0.1:3000/temporary-error" }, nullptr,
                [&](const Response &res) {
         EXPECT_NE(uv_thread_self(), mainThread) << "Response was called in the same thread";
         EXPECT_EQ(Response::Successful, res.status);

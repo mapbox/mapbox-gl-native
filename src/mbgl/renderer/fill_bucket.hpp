@@ -11,10 +11,6 @@
 #include <vector>
 #include <memory>
 
-#ifndef BUFFER_OFFSET
-#define BUFFER_OFFSET(i) ((char *)nullptr + (i))
-#endif
-
 namespace mbgl {
 
 class FillVertexBuffer;
@@ -37,9 +33,9 @@ public:
                LineElementsBuffer &lineElementsBuffer);
     ~FillBucket() override;
 
-    void render(Painter &painter, const StyleLayer &layer_desc, const TileID &id,
-                const mat4 &matrix) override;
-    bool hasData() const override;
+    void upload() override;
+    void render(Painter&, const StyleLayer&, const TileID&, const mat4&) override;
+    bool hasData() const;
 
     void addGeometry(const GeometryCollection&);
     void tessellate();

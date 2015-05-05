@@ -86,7 +86,7 @@ TEST_P(HeadlessTest, render) {
                 }
             }
 
-            if (source->value.HasMember("url")) {
+            if (source->value.HasMember("url") && source->value["url"].IsString()) {
                 rewriteLocalScheme(source->value["url"], styleDoc.GetAllocator());
             }
         }
@@ -106,12 +106,13 @@ TEST_P(HeadlessTest, render) {
 
     Log::setObserver(util::make_unique<FixtureLogObserver>());
 
-    Log::Info(Event::General, "test fixture %s", base.c_str());
-
     for (auto it = infoDoc.MemberBegin(), end = infoDoc.MemberEnd(); it != end; it++) {
         const std::string name {
             it->name.GetString(), it->name.GetStringLength()
         };
+
+        Log::Info(Event::General, "test fixture %s %s", base.c_str(), name.c_str());
+
         const rapidjson::Value& value = it->value;
         ASSERT_TRUE(value.IsObject());
 
@@ -141,20 +142,17 @@ TEST_P(HeadlessTest, render) {
             }
         }
 
-        HeadlessView view(display);
+        std::promise<void> promise;
+
+        HeadlessView view(display, width, height, pixelRatio);
         DefaultFileSource fileSource(nullptr);
-        Map map(view, fileSource);
+        Map map(view, fileSource, MapMode::Still);
 
-        map.start(Map::Mode::Still);
-
+        map.resize(width, height, pixelRatio);
         map.setClasses(classes);
         map.setStyleJSON(style, "test/suite");
-
-        view.resize(width, height, pixelRatio);
         map.setLatLngZoom(mbgl::LatLng(latitude, longitude), zoom);
         map.setBearing(bearing);
-
-        std::promise<void> promise;
 
         map.renderStill([&](std::unique_ptr<const StillImage> image) {
             const std::string png = util::compress_png(image->width, image->height, image->pixels.get());
@@ -163,8 +161,6 @@ TEST_P(HeadlessTest, render) {
         });
 
         promise.get_future().get();
-
-        map.stop();
     }
 }
 
