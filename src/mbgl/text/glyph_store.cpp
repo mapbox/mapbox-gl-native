@@ -154,7 +154,7 @@ GlyphPBF::GlyphPBF(const std::string &glyphURL,
     env.requestAsync({ Resource::Kind::Glyphs, url }, [&, url](const Response &res) {
         if (res.status != Response::Successful) {
             // Something went wrong with loading the glyph pbf. Pass on the error to the future listeners.
-            const std::string msg = std::string { "[ERROR] failed to load glyphs: " } + res.message;
+            const std::string msg = std::string { "[ERROR] failed to load glyphs: " } + url + " message: " + res.message;
             promise.set_exception(std::make_exception_ptr(std::runtime_error(msg)));
         } else {
             // Transfer the data to the GlyphSet and signal its availability.

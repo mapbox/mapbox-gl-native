@@ -85,13 +85,14 @@ void Style::loadJSON(const uint8_t *const data) {
     layers = parser.getLayers();
     sprite_url = parser.getSprite();
     glyph_url = parser.getGlyphURL();
+    loaded = true;
 }
 
 bool Style::isLoaded() const {
     // TODO: move loading into Style
-//    if (!loaded) {
-//        return false;
-//    }
+    if (!loaded) {
+        return false;
+    }
 
     for (const auto& source : sources) {
         if (!source->isLoaded()) {

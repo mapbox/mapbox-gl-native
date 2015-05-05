@@ -220,6 +220,16 @@ void MapContext::update() {
 
         updateTiles();
 
+        if (sprite->isLoaded() && style->isLoaded()) {
+            if (!data.getFullyLoaded()) {
+                data.setFullyLoaded(true);
+            }
+        } else {
+            if (data.getFullyLoaded()) {
+                data.setFullyLoaded(false);
+            }
+        }
+
         view.invalidate([this] { render(); });
     }
 
@@ -276,7 +286,7 @@ void MapContext::setSourceTileCacheSize(size_t size) {
         for (const auto &source : style->sources) {
             source->setCacheSize(sourceCacheSize);
         }
-        env.performCleanup();
+        view.invalidate([this] { render(); });
     }
 }
 
@@ -286,7 +296,7 @@ void MapContext::onLowMemory() {
     for (const auto &source : style->sources) {
         source->onLowMemory();
     }
-    env.performCleanup();
+    view.invalidate([this] { render(); });
 }
 
 }
