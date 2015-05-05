@@ -360,7 +360,7 @@ void NativeMapView::createSurface(ANativeWindow *window_) {
 void NativeMapView::destroySurface() {
     mbgl::Log::Debug(mbgl::Event::Android, "NativeMapView::destroySurface");
 
-    pause(true);
+    pause();
 
     if (surface != EGL_NO_SURFACE) {
         if (!eglDestroySurface(display, surface)) {
@@ -674,12 +674,11 @@ void loadExtensions() {
     }
 }
 
-void NativeMapView::pause(bool waitForPause) {
-    mbgl::Log::Debug(mbgl::Event::Android, "NativeMapView::pause %s",
-                     (waitForPause) ? "true" : "false");
+void NativeMapView::pause() {
+    mbgl::Log::Debug(mbgl::Event::Android, "NativeMapView::pause");
 
     if ((display != EGL_NO_DISPLAY) && (context != EGL_NO_CONTEXT)) {
-        map.pause(waitForPause);
+        map.pause();
     }
 }
 
