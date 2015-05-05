@@ -9,8 +9,6 @@ export HOST=android
 export MASON_PLATFORM=android
 export MASON_ANDROID_ABI=${ANDROID_ABI:-arm-v7}
 
-source ./scripts/travis_helper.sh
-
 # Add Mason to PATH
 export PATH="`pwd`/.mason:${PATH}" MASON_DIR="`pwd`/.mason"
 

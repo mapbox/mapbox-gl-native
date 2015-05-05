@@ -5,14 +5,6 @@ set -o pipefail
 
 BUILDTYPE=${BUILDTYPE:-Release}
 
-source ./scripts/travis_helper.sh
-
-# Add Mason to PATH
-export PATH="`pwd`/.mason:${PATH}" MASON_DIR="`pwd`/.mason"
-
-# Set the core file limit to unlimited so a core file is generated upon crash
-ulimit -c unlimited -S
-
 ################################################################################
 # Build
 ################################################################################
