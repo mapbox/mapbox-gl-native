@@ -794,7 +794,6 @@ void tessMeshCheckMesh( TESSmesh *mesh )
 	TESSvertex *v, *vPrev;
 	TESShalfEdge *e, *ePrev;
 
-	fPrev = fHead;
 	for( fPrev = fHead ; (f = fPrev->next) != fHead; fPrev = f) {
 		assert( f->prev == fPrev );
 		e = f->anEdge;
@@ -809,7 +808,6 @@ void tessMeshCheckMesh( TESSmesh *mesh )
 	}
 	assert( f->prev == fPrev && f->anEdge == NULL );
 
-	vPrev = vHead;
 	for( vPrev = vHead ; (v = vPrev->next) != vHead; vPrev = v) {
 		assert( v->prev == vPrev );
 		e = v->anEdge;
@@ -824,7 +822,6 @@ void tessMeshCheckMesh( TESSmesh *mesh )
 	}
 	assert( v->prev == vPrev && v->anEdge == NULL );
 
-	ePrev = eHead;
 	for( ePrev = eHead ; (e = ePrev->next) != eHead; ePrev = e) {
 		assert( e->Sym->next == ePrev->Sym );
 		assert( e->Sym != e );

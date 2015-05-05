@@ -699,7 +699,6 @@ NSString *const MGLEventGestureRotateStart = @"Rotation";
     if([challenge.protectionSpace.authenticationMethod isEqualToString:NSURLAuthenticationMethodServerTrust]) {
 
         SecTrustRef serverTrust = [[challenge protectionSpace] serverTrust];
-        NSString *domain = [[challenge protectionSpace] host];
         SecTrustResultType trustResult;
 
         // Validate the certificate chain with the device's trust store anyway
