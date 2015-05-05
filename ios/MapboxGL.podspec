@@ -1,7 +1,7 @@
 Pod::Spec.new do |m|
 
   m.name    = 'MapboxGL'
-  m.version = '0.2.19'
+  m.version = '0.2.20'
 
   m.summary          = 'Open source vector map solution for iOS with full styling capabilities.'
   m.description      = 'Open source OpenGL-based vector map solution for iOS with full styling capabilities and Cocoa bindings.'
