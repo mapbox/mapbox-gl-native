@@ -17,4 +17,5 @@ appledoc \
     --project-company Mapbox \
     --create-docset \
     --company-id com.mapbox \
+    --ignore ../../include/mbgl/ios/private \
     ../../include/mbgl/ios
