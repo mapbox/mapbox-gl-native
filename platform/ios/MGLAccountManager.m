@@ -15,17 +15,14 @@
 
 static MGLAccountManager *_sharedManager;
 
-// Can be called from any thread. Called implicitly from any
-// public class convenience methods.
+// Can be called from any thread.
 //
-+ (instancetype) sharedInstanceWithAccessToken:(NSString *)token {
++ (instancetype) sharedInstance {
     static dispatch_once_t onceToken;
     dispatch_once(&onceToken, ^{
         if ( ! NSProcessInfo.processInfo.mgl_isInterfaceBuilderDesignablesAgent) {
             void (^setupBlock)() = ^{
                 _sharedManager = [[self alloc] init];
-                _sharedManager.accessToken = token;
-                [MGLMapboxEvents setToken:token];
             };
             if ( ! [[NSThread currentThread] isMainThread]) {
                 dispatch_sync(dispatch_get_main_queue(), ^{
@@ -40,11 +37,17 @@ static MGLAccountManager *_sharedManager;
     return _sharedManager;
 }
 
-+ (NSString *) sharedAccessToken {
-    if (_sharedManager) {
-        return _sharedManager.accessToken;
-    }
-    return nil;
++ (void) setAccessToken:(NSString *) accessToken {
+    [[MGLAccountManager sharedInstance] setAccessToken:accessToken];
+
+    // Update MGLMapboxEvents
+    // NOTE: This is (likely) the initial setup of MGLMapboxEvents
+    [MGLMapboxEvents setToken:accessToken];
 }
+
++ (NSString *) accessToken {
+    return [MGLAccountManager sharedInstance].accessToken;
+}
+
 
 @end

@@ -1,6 +1,6 @@
 @interface MGLAccountManager : NSObject
 
-+ (instancetype) sharedInstanceWithAccessToken:(NSString *)token;
-+ (NSString *) sharedAccessToken;
++ (void) setAccessToken:(NSString *) accessToken;
++ (NSString *) accessToken;
 
 @end
