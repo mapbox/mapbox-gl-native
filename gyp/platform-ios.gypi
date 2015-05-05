@@ -25,6 +25,8 @@
         '../platform/ios/MGLMapView.mm',
         '../platform/ios/MGLFileCache.h',
         '../platform/ios/MGLFileCache.mm',
+        '../include/mbgl/ios/MGLAccountManager.h',
+        '../platform/ios/MGLAccountManager.m',
         '../include/mbgl/ios/MGLAnnotation.h',
         '../include/mbgl/ios/MGLUserLocation.h',
         '../platform/ios/MGLUserLocation_Private.h',
