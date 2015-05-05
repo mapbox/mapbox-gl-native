@@ -77,6 +77,8 @@ MapContext::~MapContext() {
 }
 
 void MapContext::pause() {
+    MBGL_CHECK_ERROR(glFinish());
+
     view.deactivate();
 
     std::unique_lock<std::mutex> lockPause(data.mutexPause);

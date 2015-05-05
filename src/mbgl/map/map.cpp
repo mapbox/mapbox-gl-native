@@ -20,15 +20,12 @@ Map::~Map() {
     resume();
 }
 
-void Map::pause(bool waitForPause) {
+void Map::pause() {
     assert(data->mode == MapMode::Continuous);
 
     std::unique_lock<std::mutex> lockPause(data->mutexPause);
     context->invoke(&MapContext::pause);
-
-    if (waitForPause) {
-        data->condPaused.wait(lockPause);
-    }
+    data->condPaused.wait(lockPause);
 }
 
 void Map::resume() {
