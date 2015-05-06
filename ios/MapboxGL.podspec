@@ -22,7 +22,7 @@ Pod::Spec.new do |m|
   m.requires_arc = true
 
   m.preserve_paths = '**'
-  m.source_files = 'Headers/*.h'
+  m.source_files = 'Headers/*.h', 'MGLDummy.m'
   m.resource_bundle = { 'MapboxGL' => 'MapboxGL.bundle/*' }
   m.vendored_library = 'libMapboxGL.a'
 
