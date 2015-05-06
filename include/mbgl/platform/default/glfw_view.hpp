@@ -29,22 +29,23 @@ public:
     // The expected action is to set a new style, different to the current one.
     void setChangeStyleCallback(std::function<void()> callback);
 
+    void setShouldClose();
+
     void run();
     void fps();
 
-    GLFWwindow *window = nullptr;
-
 private:
     bool fullscreen = false;
+    bool tracking = false;
+    bool rotating = false;
 
     double lastX = 0, lastY = 0;
-    bool tracking = false;
-
-    bool rotating = false;
 
     double lastClick = -1;
 
     std::function<void()> changeStyleCallback;
+
+    GLFWwindow *window = nullptr;
 };
 
 #endif

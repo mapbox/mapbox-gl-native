@@ -23,8 +23,7 @@ std::unique_ptr<GLFWView> view;
 void quit_handler(int) {
     if (view) {
         mbgl::Log::Info(mbgl::Event::Setup, "waiting for quit...");
-        glfwSetWindowShouldClose(view->window, true);
-        glfwPostEmptyEvent();
+        view->setShouldClose();
     } else {
         exit(0);
     }

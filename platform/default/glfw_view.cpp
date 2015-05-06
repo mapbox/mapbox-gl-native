@@ -314,6 +314,11 @@ void GLFWView::setChangeStyleCallback(std::function<void()> callback) {
     changeStyleCallback = callback;
 }
 
+void GLFWView::setShouldClose() {
+    glfwSetWindowShouldClose(window, true);
+    glfwPostEmptyEvent();
+}
+
 namespace mbgl {
 namespace platform {
 
