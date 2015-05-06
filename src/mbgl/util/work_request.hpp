@@ -10,9 +10,10 @@ namespace mbgl {
 class WorkRequest : public util::noncopyable {
 public:
     using Future = std::future<void>;
+    using JoinedFlag = std::shared_ptr<std::atomic<bool>>;
 
     WorkRequest();
-    WorkRequest(Future&&);
+    WorkRequest(Future&&, JoinedFlag);
     WorkRequest(WorkRequest&&);
     ~WorkRequest();
 
@@ -24,6 +25,7 @@ public:
 
 private:
     Future complete;
+    JoinedFlag joinedFlag;
 };
 
 }
