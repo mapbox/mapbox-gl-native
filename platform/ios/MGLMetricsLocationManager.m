@@ -89,34 +89,17 @@
 }
 
 - (void)locationManager:(CLLocationManager *)manager didChangeAuthorizationStatus:(CLAuthorizationStatus)status {
-    NSString *newStatus = nil;
     switch (status) {
-        case kCLAuthorizationStatusNotDetermined:
-            newStatus = @"User Hasn't Determined Yet";
-            break;
-        case kCLAuthorizationStatusRestricted:
-            newStatus = @"Restricted and Can't Be Changed By User";
-            break;
         case kCLAuthorizationStatusDenied:
-            newStatus = @"User Explcitly Denied";
             [self stopUpdatingLocation];
             [self stopMonitoringVisits];
             break;
         case kCLAuthorizationStatusAuthorized:
-            newStatus = @"User Has Authorized / Authorized Always";
-            [self startUpdatingLocation];
-            [self startMonitoringVisits];
-            break;
-//        case kCLAuthorizationStatusAuthorizedAlways:
-//            newStatus = @"Not Determined";
-//            break;
         case kCLAuthorizationStatusAuthorizedWhenInUse:
-            newStatus = @"User Has Authorized When In Use Only";
             [self startUpdatingLocation];
             [self startMonitoringVisits];
             break;
         default:
-            newStatus = @"Unknown";
             break;
     }
 }

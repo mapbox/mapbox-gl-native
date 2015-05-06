@@ -617,10 +617,11 @@ NSString *const MGLEventGestureRotateStart = @"Rotation";
     NSString *ssid = nil;
     CFArrayRef interfaces = CNCopySupportedInterfaces();
     if (interfaces) {
-        NSDictionary *info = (__bridge NSDictionary *)CNCopyCurrentNetworkInfo(CFArrayGetValueAtIndex(interfaces, 0));
+        NSDictionary *info = CFBridgingRelease(CNCopyCurrentNetworkInfo(CFArrayGetValueAtIndex(interfaces, 0)));
         if (info) {
             ssid = info[@"SSID"];
         }
+        CFRelease(interfaces);
     }
     
     return ssid;
@@ -699,7 +700,6 @@ NSString *const MGLEventGestureRotateStart = @"Rotation";
     if([challenge.protectionSpace.authenticationMethod isEqualToString:NSURLAuthenticationMethodServerTrust]) {
 
         SecTrustRef serverTrust = [[challenge protectionSpace] serverTrust];
-        NSString *domain = [[challenge protectionSpace] host];
         SecTrustResultType trustResult;
 
         // Validate the certificate chain with the device's trust store anyway

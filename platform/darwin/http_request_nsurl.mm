@@ -153,7 +153,7 @@ void HTTPRequest::start() {
 
     @autoreleasepool {
         
-        NSMutableString *url = [[NSMutableString alloc] initWithString:@(resource.url.c_str())];
+        NSMutableString *url = [NSMutableString stringWithString:@(resource.url.c_str())];
         if ([[NSUserDefaults standardUserDefaults] objectForKey:@"mapbox_metrics_disabled"] == nil) {
             if ([url rangeOfString:@"?"].location == NSNotFound) {
                 [url appendString:@"?"];
@@ -163,8 +163,7 @@ void HTTPRequest::start() {
             [url appendString:@"events=true"];
         }
 
-        NSMutableURLRequest *req = [[NSMutableURLRequest alloc]
-            initWithURL:[NSURL URLWithString:url]];
+        NSMutableURLRequest *req = [NSMutableURLRequest requestWithURL:[NSURL URLWithString:url]];
         if (existingResponse) {
             if (!existingResponse->etag.empty()) {
                 [req addValue:@(existingResponse->etag.c_str()) forHTTPHeaderField:@"If-None-Match"];
@@ -179,7 +178,6 @@ void HTTPRequest::start() {
         task = [context->session dataTaskWithRequest:req
                           completionHandler:^(NSData *data, NSURLResponse *res,
                                               NSError *error) { handleResult(data, res, error); }];
-        [req release];
         [task retain];
         [task resume];
     }

@@ -1079,22 +1079,19 @@ std::chrono::steady_clock::duration secondsAsDuration(float duration)
     {
         CGPoint doubleTapPoint = [doubleTap locationInView:doubleTap.view];
 
-        CGPoint zoomInPoint;
-
+        CGPoint zoomInPoint = doubleTapPoint;
+        CGPoint userPoint = [self convertCoordinate:self.userLocation.coordinate toPointToView:self];
         if (self.userTrackingMode != MGLUserTrackingModeNone)
         {
-            CGPoint userPoint = [self convertCoordinate:self.userLocation.coordinate toPointToView:self];
             CGRect userLocationRect = CGRectMake(userPoint.x - 40, userPoint.y - 40, 80, 80);
             if (CGRectContainsPoint(userLocationRect, doubleTapPoint))
             {
                 zoomInPoint = userPoint;
             }
         }
-        else
+        if ( ! CGPointEqualToPoint(zoomInPoint, userPoint))
         {
             self.userTrackingMode = MGLUserTrackingModeNone;
-
-            zoomInPoint = doubleTapPoint;
         }
 
         _mbglMap->scaleBy(2, zoomInPoint.x, zoomInPoint.y, secondsAsDuration(MGLAnimationDuration));
