@@ -1394,7 +1394,7 @@ std::chrono::steady_clock::duration secondsAsDuration(float duration)
     [self setCenterCoordinate:center zoomLevel:zoomLevel animated:animated];
 }
 
-- (void)fitBoundsToSouthWestCoordinate:(CLLocationCoordinate2D)southWestCoordinate northEastCoordinate:(CLLocationCoordinate2D)northEastCoordinate animated:(BOOL)animated
+- (void)fitBoundsToSouthWestCoordinate:(CLLocationCoordinate2D)southWestCoordinate northEastCoordinate:(CLLocationCoordinate2D)northEastCoordinate padding:(CGFloat)padding animated:(BOOL)animated
 {
     CLLocationCoordinate2D center = CLLocationCoordinate2DMake((northEastCoordinate.latitude + southWestCoordinate.latitude) / 2, (northEastCoordinate.longitude + southWestCoordinate.longitude) / 2);
     
@@ -1403,7 +1403,7 @@ std::chrono::steady_clock::duration secondsAsDuration(float duration)
     CGFloat minZoom = _mbglMap->getMinZoom();
     CGFloat maxZoom = _mbglMap->getMaxZoom();
     CGFloat hack = ([[UIApplication sharedApplication] statusBarOrientation] == UIInterfaceOrientationPortrait) ? 0.5f : 1.f;
-    CGFloat zoomLevel = log(MIN(scaleX, scaleY)) / log(2) - hack;
+    CGFloat zoomLevel = log(MIN(scaleX, scaleY)) / log(2) - (hack + padding);
     zoomLevel = MAX(MIN(zoomLevel, maxZoom), minZoom);
     
     [self setCenterCoordinate:center zoomLevel:zoomLevel animated:animated];

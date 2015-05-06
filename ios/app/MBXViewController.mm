@@ -13,7 +13,7 @@
 
 - (void)zoomToSouthWestCoordinate:(CLLocationCoordinate2D)southWestCoordinate northEastCoordinate:(CLLocationCoordinate2D)northEastCoordinate animated:(BOOL)animated;
 
-- (void)fitBoundsToSouthWestCoordinate:(CLLocationCoordinate2D)southWestCoordinate northEastCoordinate:(CLLocationCoordinate2D)northEastCoordinate animated:(BOOL)animated;
+- (void)fitBoundsToSouthWestCoordinate:(CLLocationCoordinate2D)southWestCoordinate northEastCoordinate:(CLLocationCoordinate2D)northEastCoordinate padding:(CGFloat)padding animated:(BOOL)animated;
 
 @end
 
@@ -208,8 +208,8 @@ mbgl::Settings_NSUserDefaults *settings = nullptr;
             [self.mapView addAnnotations:annotations];
         }
         
-        [self.mapView zoomToSouthWestCoordinate:southWest northEastCoordinate:northEast animated:YES];
-        //[self.mapView fitBoundsToSouthWestCoordinate:southWest northEastCoordinate:northEast animated:YES];
+        //[self.mapView zoomToSouthWestCoordinate:southWest northEastCoordinate:northEast animated:YES];
+        [self.mapView fitBoundsToSouthWestCoordinate:southWest northEastCoordinate:northEast padding:0 animated:YES];
     }
 }
 
