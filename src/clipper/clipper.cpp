@@ -4136,6 +4136,7 @@ void ClipperOffset::DoOffset(double delta)
       }
       else
       {
+        k = 1;
         m_sinA = 0;
         if (node.m_endtype == etOpenSquare)
           DoSquare(0, 1);
