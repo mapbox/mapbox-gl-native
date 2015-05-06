@@ -78,6 +78,7 @@ static NSURL *MGLURLForBundledStyleNamed(NSString *styleName)
 @property (nonatomic) CGFloat scale;
 @property (nonatomic) CGFloat angle;
 @property (nonatomic) CGFloat quickZoomStart;
+@property (nonatomic, getter=isDormant) BOOL dormant;
 @property (nonatomic, getter=isAnimatingGesture) BOOL animatingGesture;
 @property (nonatomic, readonly, getter=isRotationAllowed) BOOL rotationAllowed;
 
@@ -361,8 +362,10 @@ std::chrono::steady_clock::duration secondsAsDuration(float duration)
 
     // observe app activity
     //
-    [[NSNotificationCenter defaultCenter] addObserver:self selector:@selector(appDidBackground:) name:UIApplicationDidEnterBackgroundNotification object:nil];
-    [[NSNotificationCenter defaultCenter] addObserver:self selector:@selector(appWillForeground:) name:UIApplicationWillEnterForegroundNotification object:nil];
+    [[NSNotificationCenter defaultCenter] addObserver:self selector:@selector(sleepGL:) name:UIApplicationWillResignActiveNotification object:nil];
+    [[NSNotificationCenter defaultCenter] addObserver:self selector:@selector(sleepGL:) name:UIApplicationDidEnterBackgroundNotification object:nil];
+    [[NSNotificationCenter defaultCenter] addObserver:self selector:@selector(wakeGL:) name:UIApplicationWillEnterForegroundNotification object:nil];
+    [[NSNotificationCenter defaultCenter] addObserver:self selector:@selector(wakeGL:) name:UIApplicationDidBecomeActiveNotification object:nil];
     [[NSNotificationCenter defaultCenter] addObserver:self selector:@selector(didReceiveMemoryWarning) name:UIApplicationDidReceiveMemoryWarningNotification object:nil];
 
     // set initial position
@@ -613,7 +616,7 @@ std::chrono::steady_clock::duration secondsAsDuration(float duration)
 // This is the delegate of the GLKView object's display call.
 - (void)glkView:(GLKView *)view drawInRect:(CGRect)rect
 {
-    if ( ! self.glSnapshotView || self.glSnapshotView.hidden)
+    if ( ! self.isDormant)
     {
         [self notifyMapChange:@(mbgl::MapChangeWillStartRenderingMap)];
 
@@ -651,32 +654,56 @@ std::chrono::steady_clock::duration secondsAsDuration(float duration)
 #pragma clang diagnostic push
 #pragma clang diagnostic ignored "-Wunused-parameter"
 
-- (void)appDidBackground:(NSNotification *)notification
+- (void)sleepGL:(NSNotification *)notification
 {
-    [MGLMapboxEvents flush];
+    MGLAssertIsMainThread();
 
-    if ( ! self.glSnapshotView)
+    if ( ! self.isDormant)
     {
-        self.glSnapshotView = [[UIImageView alloc] initWithFrame:self.glView.frame];
-        self.glSnapshotView.autoresizingMask = self.glView.autoresizingMask;
-        [self insertSubview:self.glSnapshotView aboveSubview:self.glView];
+        self.dormant = YES;
+
+        [MGLMapboxEvents flush];
+
+        if ( ! self.glSnapshotView)
+        {
+            self.glSnapshotView = [[UIImageView alloc] initWithFrame:self.glView.frame];
+            self.glSnapshotView.autoresizingMask = self.glView.autoresizingMask;
+            [self insertSubview:self.glSnapshotView aboveSubview:self.glView];
+        }
+
+        self.glSnapshotView.image = self.glView.snapshot;
+        self.glSnapshotView.hidden = NO;
+
+        if (_mbglMap->getDebug() && [self.glSnapshotView.subviews count] == 0)
+        {
+            UIView *snapshotTint = [[UIView alloc] initWithFrame:self.glSnapshotView.bounds];
+            snapshotTint.autoresizingMask = self.glSnapshotView.autoresizingMask;
+            snapshotTint.backgroundColor = [[UIColor redColor] colorWithAlphaComponent:0.25];
+            [self.glSnapshotView addSubview:snapshotTint];
+        }
+
+        _mbglMap->pause();
+
+        [self.glView deleteDrawable];
     }
-
-    self.glSnapshotView.image = self.glView.snapshot;
-    self.glSnapshotView.hidden = NO;
-
-    _mbglMap->pause();
-
-    [self.glView deleteDrawable];
 }
 
-- (void)appWillForeground:(NSNotification *)notification
+- (void)wakeGL:(NSNotification *)notification
 {
-    self.glSnapshotView.hidden = YES;
+    MGLAssertIsMainThread();
 
-    [self.glView bindDrawable];
+    if (self.isDormant)
+    {
+        self.dormant = NO;
 
-    _mbglMap->resume();
+        self.glSnapshotView.hidden = YES;
+
+        [self.glSnapshotView.subviews makeObjectsPerformSelector:@selector(removeFromSuperview)];
+
+        [self.glView bindDrawable];
+
+        _mbglMap->resume();
+    }
 }
 
 - (void)tintColorDidChange
