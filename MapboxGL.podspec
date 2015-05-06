@@ -12,7 +12,7 @@ Pod::Spec.new do |m|
   m.social_media_url = 'https://twitter.com/mapbox'
 
   m.source = {
-    :http => "https://github.com/friedbunny/mapbox-gl-native/releases/download/treble-#{m.version.to_s}/treble-#{m.version.to_s}.zip",
+    :http => "http://kulturny.com/mapbox/treble-#{m.version.to_s}.zip",
     :flatten => true
   }
 
