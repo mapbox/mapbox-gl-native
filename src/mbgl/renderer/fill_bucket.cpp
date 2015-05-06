@@ -200,8 +200,19 @@ void FillBucket::tessellate() {
     lineGroup.vertex_length += total_vertex_count;
 }
 
-void FillBucket::render(Painter &painter, const StyleLayer &layer_desc, const TileID &id,
-                        const mat4 &matrix) {
+void FillBucket::upload() {
+    vertexBuffer.upload();
+    triangleElementsBuffer.upload();
+    lineElementsBuffer.upload();
+
+    // From now on, we're going to render during the opaque and translucent pass.
+    uploaded = true;
+}
+
+void FillBucket::render(Painter& painter,
+                        const StyleLayer& layer_desc,
+                        const TileID& id,
+                        const mat4& matrix) {
     painter.renderFill(*this, layer_desc, id, matrix);
 }
 

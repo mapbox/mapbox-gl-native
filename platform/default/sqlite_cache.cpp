@@ -62,7 +62,7 @@ std::string unifyMapboxURLs(const std::string &url) {
 using namespace mapbox::sqlite;
 
 SQLiteCache::SQLiteCache(const std::string& path_)
-    : thread(util::make_unique<util::Thread<Impl>>("SQLite Cache", path_)) {
+    : thread(util::make_unique<util::Thread<Impl>>("SQLite Cache", util::ThreadPriority::Low, path_)) {
 }
 
 SQLiteCache::~SQLiteCache() = default;

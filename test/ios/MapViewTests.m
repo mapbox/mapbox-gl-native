@@ -13,6 +13,8 @@
 @implementation MapViewTests
 
 - (void)beforeEach {
+    [tester acknowledgeSystemAlert];
+
     [system simulateDeviceRotationToOrientation:UIDeviceOrientationPortrait];
     [tester.viewController resetMapView];
 

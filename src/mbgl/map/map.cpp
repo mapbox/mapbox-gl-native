@@ -11,7 +11,7 @@ namespace mbgl {
 
 Map::Map(View& view, FileSource& fileSource, MapMode mode, bool startPaused)
     : data(util::make_unique<MapData>(view, mode)),
-      context(util::make_unique<util::Thread<MapContext>>("Map", view, fileSource, *data, startPaused))
+      context(util::make_unique<util::Thread<MapContext>>("Map", util::ThreadPriority::Regular, view, fileSource, *data, startPaused))
 {
     view.initialize(this);
 }
@@ -20,15 +20,12 @@ Map::~Map() {
     resume();
 }
 
-void Map::pause(bool waitForPause) {
+void Map::pause() {
     assert(data->mode == MapMode::Continuous);
 
     std::unique_lock<std::mutex> lockPause(data->mutexPause);
     context->invoke(&MapContext::pause);
-
-    if (waitForPause) {
-        data->condPaused.wait(lockPause);
-    }
+    data->condPaused.wait(lockPause);
 }
 
 void Map::resume() {
@@ -287,6 +284,10 @@ void Map::toggleDebug() {
 
 bool Map::getDebug() const {
     return data->getDebug();
+}
+
+bool Map::isFullyLoaded() const {
+    return data->getFullyLoaded();
 }
 
 void Map::addClass(const std::string& klass) {

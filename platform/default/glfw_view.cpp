@@ -1,6 +1,7 @@
 #include <mbgl/platform/default/glfw_view.hpp>
 #include <mbgl/platform/gl.hpp>
 #include <mbgl/platform/log.hpp>
+#include <mbgl/util/gl_helper.hpp>
 
 #include <cassert>
 #include <pthread.h>
@@ -333,14 +334,19 @@ void showDebugImage(std::string name, const char *data, size_t width, size_t hei
     glfwGetFramebufferSize(debugWindow, &fbWidth, &fbHeight);
     float scale = static_cast<float>(fbWidth) / static_cast<float>(width);
 
-    MBGL_CHECK_ERROR(glPixelZoom(scale, -scale));
-    MBGL_CHECK_ERROR(glRasterPos2f(-1.0f, 1.0f));
-    MBGL_CHECK_ERROR(glDrawPixels(width, height, GL_LUMINANCE, GL_UNSIGNED_BYTE, data));
+    {
+        gl::PreservePixelZoom pixelZoom;
+        gl::PreserveRasterPos rasterPos;
+
+        MBGL_CHECK_ERROR(glPixelZoom(scale, -scale));
+        MBGL_CHECK_ERROR(glRasterPos2f(-1.0f, 1.0f));
+        MBGL_CHECK_ERROR(glDrawPixels(width, height, GL_LUMINANCE, GL_UNSIGNED_BYTE, data));
+    }
+
     glfwSwapBuffers(debugWindow);
 
     glfwMakeContextCurrent(currentWindow);
 }
-
 
 void showColorDebugImage(std::string name, const char *data, size_t logicalWidth, size_t logicalHeight, size_t width, size_t height) {
     glfwInit();
@@ -365,14 +371,22 @@ void showColorDebugImage(std::string name, const char *data, size_t logicalWidth
     float xScale = static_cast<float>(fbWidth) / static_cast<float>(width);
     float yScale = static_cast<float>(fbHeight) / static_cast<float>(height);
 
-    MBGL_CHECK_ERROR(glClearColor(0.8, 0.8, 0.8, 1));
-    MBGL_CHECK_ERROR(glClear(GL_COLOR_BUFFER_BIT));
-    MBGL_CHECK_ERROR(glEnable(GL_BLEND));
-    MBGL_CHECK_ERROR(glBlendFunc(GL_SRC_ALPHA, GL_ONE_MINUS_SRC_ALPHA));
+    {
+        gl::PreserveClearColor clearColor;
+        gl::PreserveBlend blend;
+        gl::PreserveBlendFunc blendFunc;
+        gl::PreservePixelZoom pixelZoom;
+        gl::PreserveRasterPos rasterPos;
 
-    MBGL_CHECK_ERROR(glPixelZoom(xScale, -yScale));
-    MBGL_CHECK_ERROR(glRasterPos2f(-1.0f, 1.0f));
-    MBGL_CHECK_ERROR(glDrawPixels(width, height, GL_RGBA, GL_UNSIGNED_INT_8_8_8_8_REV, data));
+        MBGL_CHECK_ERROR(glClearColor(0.8, 0.8, 0.8, 1));
+        MBGL_CHECK_ERROR(glClear(GL_COLOR_BUFFER_BIT));
+        MBGL_CHECK_ERROR(glEnable(GL_BLEND));
+        MBGL_CHECK_ERROR(glBlendFunc(GL_SRC_ALPHA, GL_ONE_MINUS_SRC_ALPHA));
+        MBGL_CHECK_ERROR(glPixelZoom(xScale, -yScale));
+        MBGL_CHECK_ERROR(glRasterPos2f(-1.0f, 1.0f));
+        MBGL_CHECK_ERROR(glDrawPixels(width, height, GL_RGBA, GL_UNSIGNED_INT_8_8_8_8_REV, data));
+    }
+
     glfwSwapBuffers(debugWindow);
 
     glfwMakeContextCurrent(currentWindow);

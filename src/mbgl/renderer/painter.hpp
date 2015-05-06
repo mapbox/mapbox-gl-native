@@ -4,9 +4,12 @@
 #include <mbgl/map/transform_state.hpp>
 
 #include <mbgl/renderer/frame_history.hpp>
+#include <mbgl/renderer/bucket.hpp>
 
 #include <mbgl/geometry/vao.hpp>
 #include <mbgl/geometry/static_vertex_buffer.hpp>
+
+#include <mbgl/renderer/gl_config.hpp>
 
 #include <mbgl/style/types.hpp>
 
@@ -20,8 +23,6 @@
 #include <set>
 
 namespace mbgl {
-
-enum class RenderPass : bool { Opaque, Translucent };
 
 class Style;
 class StyleLayer;
@@ -57,6 +58,24 @@ class GaussianShader;
 
 struct ClipID;
 
+struct RenderItem {
+    inline RenderItem(const StyleLayer& layer_,
+                      const Tile* tile_ = nullptr,
+                      Bucket* bucket_ = nullptr,
+                      RenderPass passes_ = RenderPass::Opaque)
+        : tile(tile_), bucket(bucket_), layer(layer_), passes(passes_) {
+    }
+
+    const Tile* const tile;
+    Bucket* const bucket;
+    const StyleLayer& layer;
+    const RenderPass passes;
+
+    inline bool hasRenderPass(RenderPass pass) const {
+        return bool(passes & pass);
+    }
+};
+
 class Painter : private util::noncopyable {
 public:
     Painter(SpriteAtlas&, GlyphAtlas&, LineAtlas&);
@@ -74,11 +93,6 @@ public:
     void render(const Style& style,
                 TransformState state,
                 TimePoint time);
-
-    void renderLayer(const StyleLayer&);
-
-    // Renders a particular layer from a tile.
-    void renderTileLayer(const Tile& tile, const StyleLayer &layer_desc, const mat4 &matrix);
 
     // Renders debug information for a tile.
     void renderTileDebug(const Tile& tile);
@@ -131,6 +145,9 @@ private:
     void setupShaders();
     mat4 translatedMatrix(const mat4& matrix, const std::array<float, 2> &translation, const TileID &id, TranslateAnchorType anchor);
 
+    std::vector<RenderItem> determineRenderOrder(const Style& style);
+    static RenderPass determineRenderPasses(const StyleLayer&);
+
     void prepareTile(const Tile& tile);
 
     template <typename BucketProperties, typename StyleProperties>
@@ -147,8 +164,6 @@ private:
 public:
     void useProgram(uint32_t program);
     void lineWidth(float lineWidth);
-    void depthMask(bool value);
-    void depthRange(float near, float far);
 
 public:
     mat4 projMatrix;
@@ -175,11 +190,11 @@ private:
     bool debug = false;
     int indent = 0;
 
+    gl::Config config;
+
     uint32_t gl_program = 0;
     float gl_lineWidth = 0;
-    bool gl_depthMask = true;
     std::array<uint16_t, 2> gl_viewport = {{ 0, 0 }};
-    std::array<float, 2> gl_depthRange = {{ 0, 1 }};
     float strata = 0;
     RenderPass pass = RenderPass::Opaque;
     const float strata_epsilon = 1.0f / (1 << 16);

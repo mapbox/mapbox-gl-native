@@ -75,8 +75,8 @@ public:
     }
 
     inline ~handle() {
-        uv_close(t.release(), [](uv_handle_t* handle) {
-            delete reinterpret_cast<T*>(handle);
+        uv_close(t.release(), [](uv_handle_t* h) {
+            delete reinterpret_cast<T*>(h);
         });
     }
 

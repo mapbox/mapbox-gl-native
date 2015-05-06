@@ -40,7 +40,7 @@ public:
     void destroySurface();
 
     void resume();
-    void pause(bool waitForPause = false);
+    void pause();
 
     void enableFps(bool enable);
     void updateFps();

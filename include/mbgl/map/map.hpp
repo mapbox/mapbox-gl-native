@@ -36,7 +36,7 @@ public:
     ~Map();
 
     // Pauses the render thread. The render thread will stop running but will not be terminated and will not lose state until resumed.
-    void pause(bool waitForPause = false);
+    void pause();
 
     // Resumes a paused render thread
     void resume();
@@ -132,6 +132,7 @@ public:
     void setDebug(bool value);
     void toggleDebug();
     bool getDebug() const;
+    bool isFullyLoaded() const;
 
 private:
     const std::unique_ptr<MapData> data;

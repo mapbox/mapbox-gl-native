@@ -44,6 +44,9 @@ public:
 
 public:
     void parse();
+    inline bool isPartialParse() const {
+        return partialParse;
+    }
 
 private:
     bool obsolete() const;
@@ -51,7 +54,7 @@ private:
     std::unique_ptr<Bucket> createBucket(const StyleBucket&);
     std::unique_ptr<Bucket> createFillBucket(const GeometryTileLayer&, const StyleBucket&);
     std::unique_ptr<Bucket> createLineBucket(const GeometryTileLayer&, const StyleBucket&);
-    std::unique_ptr<Bucket> createSymbolBucket(const GeometryTileLayer&, const StyleBucket&);
+    std::unique_ptr<Bucket> createSymbolBucket(const GeometryTileLayer&, const StyleBucket&, bool& needsResources);
 
     template <class Bucket>
     void addBucketGeometries(Bucket&, const GeometryTileLayer&, const FilterExpression&);
@@ -67,6 +70,7 @@ private:
     util::ptr<Sprite> sprite;
 
     std::unique_ptr<Collision> collision;
+    bool partialParse;
 };
 
 }

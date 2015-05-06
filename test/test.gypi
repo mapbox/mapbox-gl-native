@@ -38,11 +38,14 @@
         'api/set_style.cpp',
         'api/repeated_render.cpp',
 
+        'headless/headless.cpp',
+
         'miscellaneous/clip_ids.cpp',
         'miscellaneous/bilinear.cpp',
         'miscellaneous/comparisons.cpp',
         'miscellaneous/enums.cpp',
         'miscellaneous/functions.cpp',
+        'miscellaneous/map.cpp',
         'miscellaneous/mapbox.cpp',
         'miscellaneous/merge_lines.cpp',
         'miscellaneous/rotation_range.cpp',

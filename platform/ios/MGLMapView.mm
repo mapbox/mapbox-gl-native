@@ -28,6 +28,7 @@
 #import "SMCalloutView.h"
 
 #import "MGLMapboxEvents.h"
+#import "MapboxGL.h"
 
 #import <algorithm>
 
@@ -109,6 +110,7 @@ std::chrono::steady_clock::duration secondsAsDuration(float duration)
     if (self && [self commonInit])
     {
         self.styleURL = nil;
+        self.accessToken = [MGLAccountManager accessToken];
         return self;
     }
 
@@ -247,6 +249,12 @@ std::chrono::steady_clock::duration secondsAsDuration(float duration)
             gl::DeleteVertexArrays = glDeleteVertexArraysOES;
             gl::GenVertexArrays = glGenVertexArraysOES;
             gl::IsVertexArray = glIsVertexArrayOES;
+        }
+
+        if (extensions.find("GL_EXT_debug_marker") != std::string::npos) {
+            gl::InsertEventMarkerEXT = glInsertEventMarkerEXT;
+            gl::PushGroupMarkerEXT = glPushGroupMarkerEXT;
+            gl::PopGroupMarkerEXT = glPopGroupMarkerEXT;
         }
 
         if (extensions.find("GL_OES_packed_depth_stencil") != std::string::npos) {
@@ -607,6 +615,8 @@ std::chrono::steady_clock::duration secondsAsDuration(float duration)
 {
     if ( ! self.glSnapshotView || self.glSnapshotView.hidden)
     {
+        [self notifyMapChange:@(mbgl::MapChangeWillStartRenderingMap)];
+
         _mbglMap->resize(rect.size.width, rect.size.height, view.contentScaleFactor);
 
         CGFloat zoomFactor   = _mbglMap->getMaxZoom() - _mbglMap->getMinZoom() + 1;
@@ -620,6 +630,8 @@ std::chrono::steady_clock::duration secondsAsDuration(float duration)
         _mbglMap->setSourceTileCacheSize(cacheSize);
 
         _mbglMap->renderSync();
+
+        [self notifyMapChange:@(mbgl::MapChangeDidFinishRenderingMap)];
     }
 }
 
@@ -2407,6 +2419,11 @@ CLLocationCoordinate2D latLngToCoordinate(mbgl::LatLng latLng)
     [self.glView setNeedsDisplay];
 
     [self notifyMapChange:@(mbgl::MapChangeRegionIsChanging)];
+}
+
+- (BOOL)isFullyLoaded
+{
+    return _mbglMap->isFullyLoaded();
 }
 
 - (void)prepareForInterfaceBuilder

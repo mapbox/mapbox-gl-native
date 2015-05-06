@@ -24,7 +24,7 @@ void Painter::renderTileDebug(const Tile& tile) {
 void Painter::renderDebugText(DebugBucket& bucket, const mat4 &matrix) {
     gl::group group("debug text");
 
-    MBGL_CHECK_ERROR(glDisable(GL_DEPTH_TEST));
+    config.depthTest = false;
 
     useProgram(plainShader->program);
     plainShader->u_matrix = matrix;
@@ -45,7 +45,7 @@ void Painter::renderDebugText(DebugBucket& bucket, const mat4 &matrix) {
     lineWidth(2.0f * state.getPixelRatio());
     bucket.drawLines(*plainShader);
 
-    MBGL_CHECK_ERROR(glEnable(GL_DEPTH_TEST));
+    config.depthTest = true;
 }
 
 void Painter::renderDebugFrame(const mat4 &matrix) {
@@ -54,7 +54,8 @@ void Painter::renderDebugFrame(const mat4 &matrix) {
     // Disable depth test and don't count this towards the depth buffer,
     // but *don't* disable stencil test, as we want to clip the red tile border
     // to the tile viewport.
-    MBGL_CHECK_ERROR(glDisable(GL_DEPTH_TEST));
+    config.depthTest = false;
+    config.stencilTest = true;
 
     useProgram(plainShader->program);
     plainShader->u_matrix = matrix;
@@ -64,8 +65,6 @@ void Painter::renderDebugFrame(const mat4 &matrix) {
     plainShader->u_color = {{ 1.0f, 0.0f, 0.0f, 1.0f }};
     lineWidth(4.0f * state.getPixelRatio());
     MBGL_CHECK_ERROR(glDrawArrays(GL_LINE_STRIP, 0, (GLsizei)tileBorderBuffer.index()));
-
-    MBGL_CHECK_ERROR(glEnable(GL_DEPTH_TEST));
 }
 
 void Painter::renderDebugText(const std::vector<std::string> &strings) {
@@ -75,8 +74,9 @@ void Painter::renderDebugText(const std::vector<std::string> &strings) {
 
     gl::group group("debug text");
 
-    MBGL_CHECK_ERROR(glDisable(GL_DEPTH_TEST));
-    MBGL_CHECK_ERROR(glStencilFunc(GL_ALWAYS, 0xFF, 0xFF));
+    config.depthTest = false;
+    config.stencilTest = true;
+    config.stencilFunc = { GL_ALWAYS, 0xFF, 0xFF };
 
     useProgram(plainShader->program);
     plainShader->u_matrix = nativeMatrix;
@@ -103,6 +103,4 @@ void Painter::renderDebugText(const std::vector<std::string> &strings) {
         lineWidth(2.0f * state.getPixelRatio());
         MBGL_CHECK_ERROR(glDrawArrays(GL_LINES, 0, (GLsizei)debugFontBuffer.index()));
     }
-
-    MBGL_CHECK_ERROR(glEnable(GL_DEPTH_TEST));
 }

@@ -16,9 +16,10 @@ using namespace mbgl;
 void Painter::renderLine(LineBucket& bucket, const StyleLayer &layer_desc, const TileID& id, const mat4 &matrix) {
     // Abort early.
     if (pass == RenderPass::Opaque) return;
-    if (!bucket.hasData()) return;
 
-    depthMask(false);
+    config.stencilTest = true;
+    config.depthTest = true;
+    config.depthMask = GL_FALSE;
 
     const auto &properties = layer_desc.getProperties<LineProperties>();
     const auto &layout = bucket.layout;
@@ -52,7 +53,7 @@ void Painter::renderLine(LineBucket& bucket, const StyleLayer &layer_desc, const
     float ratio = state.getPixelRatio();
     mat4 vtxMatrix = translatedMatrix(matrix, properties.translate, id, properties.translateAnchor);
 
-    depthRange(strata, 1.0f);
+    config.depthRange = { strata, 1.0f };
 
     if (properties.dash_array.from.size()) {
 
@@ -110,7 +111,7 @@ void Painter::renderLine(LineBucket& bucket, const StyleLayer &layer_desc, const
 
         MBGL_CHECK_ERROR(glActiveTexture(GL_TEXTURE0));
         spriteAtlas.bind(true);
-        MBGL_CHECK_ERROR(glDepthRange(strata + strata_epsilon, 1.0f));  // may or may not matter
+        config.depthRange = { strata + strata_epsilon, 1.0f };  // may or may not matter
 
         bucket.drawLinePatterns(*linepatternShader);
 

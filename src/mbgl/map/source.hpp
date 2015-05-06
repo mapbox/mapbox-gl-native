@@ -29,7 +29,7 @@ class Sprite;
 class TexturePool;
 class Style;
 class Painter;
-class StyleLayer;
+class Request;
 class TransformState;
 class Tile;
 struct ClipID;
@@ -53,12 +53,18 @@ public:
 
 class Source : public std::enable_shared_from_this<Source>, private util::noncopyable {
 public:
+    class Observer {
+    public:
+        virtual ~Observer() = default;
+
+        virtual void onSourceLoaded() = 0;
+        virtual void onTileLoaded() = 0;
+    };
+
     Source();
     ~Source();
 
-    void load(const std::string& accessToken,
-              Environment&,
-              std::function<void()> callback);
+    void load(const std::string& accessToken);
     bool isLoaded() const;
 
     void load(MapData&, Environment&, std::function<void()> callback);
@@ -69,25 +75,31 @@ public:
                 GlyphStore&,
                 SpriteAtlas&,
                 util::ptr<Sprite>,
-                TexturePool&,
-                std::function<void()> callback);
+                TexturePool&);
 
     void invalidateTiles(const std::vector<TileID>&);
 
     void updateMatrices(const mat4 &projMatrix, const TransformState &transform);
     void drawClippingMasks(Painter &painter);
-    void render(Painter &painter, const StyleLayer &layer_desc);
     void finishRender(Painter &painter);
 
     std::forward_list<Tile *> getLoadedTiles() const;
+    const std::vector<Tile*>& getTiles() const;
 
     void setCacheSize(size_t);
     void onLowMemory();
+    void clearRequest();
+
+    void setObserver(Observer* observer);
 
     SourceInfo info;
     bool enabled;
 
 private:
+    void emitSourceLoaded();
+    void emitTileLoaded();
+
+    void handlePartialTile(const TileID &id, Worker &worker);
     bool findLoadedChildren(const TileID& id, int32_t maxCoveringZoom, std::forward_list<TileID>& retain);
     bool findLoadedParent(const TileID& id, int32_t minCoveringZoom, std::forward_list<TileID>& retain);
     int32_t coveringZoomLevel(const TransformState&) const;
@@ -101,10 +113,10 @@ private:
                             SpriteAtlas&,
                             util::ptr<Sprite>,
                             TexturePool&,
-                            const TileID&,
-                            std::function<void()> callback);
+                            const TileID&);
 
     TileData::State hasTile(const TileID& id);
+    void updateTilePtrs();
 
     double getZoom(const TransformState &state) const;
 
@@ -114,8 +126,12 @@ private:
     TimePoint updated = TimePoint::min();
 
     std::map<TileID, std::unique_ptr<Tile>> tiles;
+    std::vector<Tile*> tilePtrs;
     std::map<TileID, std::weak_ptr<TileData>> tile_data;
     TileCache cache;
+
+    Request* req = nullptr;
+    Observer* observer_ = nullptr;
 };
 
 }

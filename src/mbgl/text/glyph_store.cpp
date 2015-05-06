@@ -10,6 +10,7 @@
 #include <mbgl/util/token.hpp>
 #include <mbgl/util/math.hpp>
 #include <mbgl/storage/file_source.hpp>
+#include <mbgl/platform/log.hpp>
 #include <mbgl/platform/platform.hpp>
 #include <mbgl/util/uv_detail.hpp>
 #include <algorithm>
@@ -138,11 +139,12 @@ void FontStack::lineWrap(Shaping &shaping, const float lineHeight, const float m
     align(shaping, justify, horizontalAlign, verticalAlign, maxLineLength, lineHeight, line);
 }
 
-GlyphPBF::GlyphPBF(const std::string &glyphURL,
-                   const std::string &fontStack,
+GlyphPBF::GlyphPBF(const std::string& glyphURL,
+                   const std::string& fontStack,
                    GlyphRange glyphRange,
-                   Environment &env)
-    : future(promise.get_future().share()) {
+                   Environment& env_,
+                   const GlyphLoadedCallback& callback)
+    : parsed(false), env(env_) {
     // Load the glyph set URL
     std::string url = util::replaceTokens(glyphURL, [&](const std::string &name) -> std::string {
         if (name == "fontstack") return util::percentEncode(fontStack);
@@ -151,25 +153,29 @@ GlyphPBF::GlyphPBF(const std::string &glyphURL,
     });
 
     // The prepare call jumps back to the main thread.
-    env.requestAsync({ Resource::Kind::Glyphs, url }, [&, url](const Response &res) {
+    req = env.request({ Resource::Kind::Glyphs, url }, [&, url, callback](const Response &res) {
+        req = nullptr;
+
         if (res.status != Response::Successful) {
-            // Something went wrong with loading the glyph pbf. Pass on the error to the future listeners.
-            const std::string msg = std::string { "[ERROR] failed to load glyphs: " } + res.message;
-            promise.set_exception(std::make_exception_ptr(std::runtime_error(msg)));
+            // Something went wrong with loading the glyph pbf.
+            const std::string msg = std::string { "[ERROR] failed to load glyphs: " } + url + " message: " + res.message;
+            Log::Error(Event::HttpRequest, msg);
         } else {
             // Transfer the data to the GlyphSet and signal its availability.
             // Once it is available, the caller will need to call parse() to actually
             // parse the data we received. We are not doing this here since this callback is being
             // called from another (unknown) thread.
             data = res.data;
-            promise.set_value(*this);
+            parsed = true;
+            callback(this);
         }
     });
 }
 
-
-std::shared_future<GlyphPBF &> GlyphPBF::getFuture() {
-    return future;
+GlyphPBF::~GlyphPBF() {
+    if (req) {
+        env.cancelRequest(req);
+    }
 }
 
 void GlyphPBF::parse(FontStack &stack) {
@@ -226,68 +232,85 @@ void GlyphPBF::parse(FontStack &stack) {
     data.clear();
 }
 
-GlyphStore::GlyphStore(Environment& env_) : env(env_), mtx(util::make_unique<uv::mutex>()) {}
+bool GlyphPBF::isParsed() const {
+    return parsed;
+}
+
+GlyphStore::GlyphStore(Environment& env_)
+    : env(env_), observer(nullptr) {
+}
+
+GlyphStore::~GlyphStore() {
+    observer = nullptr;
+}
 
 void GlyphStore::setURL(const std::string &url) {
     glyphURL = url;
 }
 
+bool GlyphStore::requestGlyphRangesIfNeeded(const std::string& fontStack,
+                                            const std::set<GlyphRange>& glyphRanges) {
+    bool requestIsNeeded = false;
 
-void GlyphStore::waitForGlyphRanges(const std::string &fontStack, const std::set<GlyphRange> &glyphRanges) {
-    // We are implementing a blocking wait with futures: Every GlyphSet has a future that we are
-    // waiting for until it is loaded.
     if (glyphRanges.empty()) {
-        return;
+        return requestIsNeeded;
     }
 
-    uv::exclusive<FontStack> stack(mtx);
+    auto callback = [this, fontStack](GlyphPBF* glyph) {
+        glyph->parse(*createFontStack(fontStack));
+        emitGlyphRangeLoaded();
+    };
 
-    std::vector<std::shared_future<GlyphPBF &>> futures;
-    futures.reserve(glyphRanges.size());
-    {
-        auto &rangeSets = ranges[fontStack];
+    std::lock_guard<std::mutex> lock(rangesMutex);
+    auto& rangeSets = ranges[fontStack];
 
-        stack << createFontStack(fontStack);
+    for (const auto& range : glyphRanges) {
+        const auto& rangeSets_it = rangeSets.find(range);
+        if (rangeSets_it == rangeSets.end()) {
+            auto glyph = util::make_unique<GlyphPBF>(glyphURL, fontStack, range, env, callback);
+            rangeSets.emplace(range, std::move(glyph));
+            requestIsNeeded = true;
+            continue;
+        }
 
-        // Attempt to load the glyph range. If the GlyphSet already exists, we are getting back
-        // the same shared_future.
-        for (const auto range : glyphRanges) {
-            futures.emplace_back(loadGlyphRange(fontStack, rangeSets, range));
+        if (!rangeSets_it->second->isParsed()) {
+            requestIsNeeded = true;
         }
     }
 
-    // Now that we potentially created all GlyphSets, we are waiting for the results, one by one.
-    // When we get a result (or the GlyphSet is aready loaded), we are attempting to parse the
-    // GlyphSet.
-    for (const auto& future : futures) {
-        future.get().parse(stack);
-    }
+    return requestIsNeeded;
 }
 
-std::shared_future<GlyphPBF &> GlyphStore::loadGlyphRange(const std::string &fontStack, std::map<GlyphRange, std::unique_ptr<GlyphPBF>> &rangeSets, const GlyphRange range) {
-    auto range_it = rangeSets.find(range);
-    if (range_it == rangeSets.end()) {
-        // We don't have this glyph set yet for this font stack.
-        range_it = rangeSets.emplace(range, util::make_unique<GlyphPBF>(glyphURL, fontStack, range, env)).first;
-    }
+FontStack* GlyphStore::createFontStack(const std::string &fontStack) {
+    std::lock_guard<std::mutex> lock(stacksMutex);
 
-    return range_it->second->getFuture();
-}
-
-FontStack &GlyphStore::createFontStack(const std::string &fontStack) {
     auto stack_it = stacks.find(fontStack);
     if (stack_it == stacks.end()) {
         stack_it = stacks.emplace(fontStack, util::make_unique<FontStack>()).first;
     }
 
-    return *stack_it->second.get();
+    return stack_it->second.get();
 }
 
-uv::exclusive<FontStack> GlyphStore::getFontStack(const std::string &fontStack) {
-    uv::exclusive<FontStack> stack(mtx);
-    stack << createFontStack(fontStack);
-    return stack;
+FontStack* GlyphStore::getFontStack(const std::string &fontStack) {
+    std::lock_guard<std::mutex> lock(stacksMutex);
+
+    const auto& stack_it = stacks.find(fontStack);
+    if (stack_it == stacks.end()) {
+        return nullptr;
+    }
+
+    return stack_it->second.get();
 }
 
+void GlyphStore::setObserver(Observer* observer_) {
+    observer = observer_;
+}
+
+void GlyphStore::emitGlyphRangeLoaded() {
+    if (observer) {
+        observer->onGlyphRangeLoaded();
+    }
+}
 
 }

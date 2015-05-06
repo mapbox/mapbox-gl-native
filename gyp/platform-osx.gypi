@@ -15,6 +15,7 @@
         '../platform/darwin/application_root.mm',
         '../platform/darwin/asset_root.mm',
         '../platform/darwin/image.mm',
+        '../platform/darwin/nsthread.mm',
       ],
 
       'variables': {

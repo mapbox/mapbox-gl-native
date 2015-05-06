@@ -20,6 +20,11 @@ IB_DESIGNABLE
 
 /** @name Initializing a Map View */
 
+/** Initialize a map view with the default style, given frame, and access token set in MapboxGL singleton.
+*   @param frame The frame with which to initialize the map view.
+*   @return An initialized map view, or `nil` if the map view was unable to be initialized. */
+- (instancetype)initWithFrame:(CGRect)frame;
+
 /** Initialize a map view with the default style and a given frame and access token.
 *   @param frame The frame with which to initialize the map view.
 *   @param accessToken A Mapbox API access token.
@@ -32,8 +37,6 @@ IB_DESIGNABLE
  *   @param styleURL The map style URL to use. Can be either an HTTP/HTTPS URL or a Mapbox map ID style URL (`mapbox://<user.style>`).
  *   @return An initialized map view, or `nil` if the map view was unable to be initialized. */
 - (instancetype)initWithFrame:(CGRect)frame accessToken:(NSString *)accessToken styleURL:(NSURL *)styleURL;
-
-- (instancetype)initWithFrame:(CGRect)frame __attribute__((unavailable("Instantiating an MGLMapView requires setting a style and/or an access token.")));
 
 #pragma mark - Authorizing Access
 
@@ -179,13 +182,17 @@ IB_DESIGNABLE
 /** Currently active style classes, represented as an array of string identifiers. */
 @property (nonatomic) NSArray *styleClasses;
 
-/** Returns a Boolean value indicating whether the style class with the given identifier is currently active. */
+/** Returns a Boolean value indicating whether the style class with the given identifier is currently active.
+    @param styleClass The style class to query for.
+    @return Whether the style class is currently active. */
 - (BOOL)hasStyleClass:(NSString *)styleClass;
 
-/** Activates the style class with the given identifier. */
+/** Activates the style class with the given identifier.
+    @param styleClass The style class to activate. */
 - (void)addStyleClass:(NSString *)styleClass;
 
-/** Deactivates the style class with the given identifier. */
+/** Deactivates the style class with the given identifier. 
+    @param styleClass The style class to deactivate. */
 - (void)removeStyleClass:(NSString *)styleClass;
 
 #pragma mark - Annotating the Map

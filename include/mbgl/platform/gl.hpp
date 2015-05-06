@@ -159,7 +159,7 @@ inline void start_group(const std::string &str) {
     if (gl::PushDebugGroup != nullptr) {
         MBGL_CHECK_ERROR(gl::PushDebugGroup(GL_DEBUG_SOURCE_APPLICATION, 0, GLsizei(str.size()), str.c_str()));
     } else if (gl::PushGroupMarkerEXT != nullptr) {
-        MBGL_CHECK_ERROR(gl::PushGroupMarkerEXT(GLsizei(str.size()), str.c_str()));
+        MBGL_CHECK_ERROR(gl::PushGroupMarkerEXT(GLsizei(str.size() + 1), str.c_str()));
     }
     // fprintf(stderr, "%s%s\n", std::string(indent * 4, ' ').c_str(), str.c_str());
     // indent++;

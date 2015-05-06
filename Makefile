@@ -120,7 +120,11 @@ ios-proj: Xcode/ios
 
 ios: XCPRETTY := $(shell ./scripts/xcpretty.sh)
 ios: Xcode/ios
-	xcodebuild -sdk iphoneos ARCHS="arm64 armv7 armv7s" PROVISIONING_PROFILE="2b532944-bf3d-4bf4-aa6c-a81676984ae8" -project ./build/ios/gyp/ios.xcodeproj -configuration Release -target iosapp -jobs $(JOBS) $(XCPRETTY)
+	xcodebuild -sdk iphoneos ARCHS="arm64 armv7 armv7s" PROVISIONING_PROFILE="19324a54-7455-4f0b-8e1c-e6957c718ebc" -project ./build/ios/gyp/ios.xcodeproj -configuration Release -target iosapp -jobs $(JOBS) $(XCPRETTY)
+
+ibench: XCPRETTY := $(shell ./scripts/xcpretty.sh)
+ibench: Xcode/ios
+	xcodebuild -sdk iphoneos ARCHS="arm64" PROVISIONING_PROFILE="19324a54-7455-4f0b-8e1c-e6957c718ebc" -project ./build/ios/gyp/ios.xcodeproj -configuration Release -target ios-bench -jobs $(JOBS) $(XCPRETTY)
 
 isim: XCPRETTY := $(shell ./scripts/xcpretty.sh)
 isim: Xcode/ios
