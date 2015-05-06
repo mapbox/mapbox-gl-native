@@ -4,19 +4,20 @@
 #include <mbgl/text/glyph.hpp>
 #include <mbgl/util/vec.hpp>
 #include <mbgl/util/ptr.hpp>
-#include <mbgl/util/uv.hpp>
 
 #include <cstdint>
 #include <vector>
 #include <future>
 #include <map>
 #include <set>
+#include <string>
 #include <unordered_map>
 
 namespace mbgl {
 
 class FileSource;
 class Environment;
+class Request;
 
 class SDFGlyph {
 public:
@@ -49,10 +50,17 @@ private:
 
 class GlyphPBF {
 public:
+    using GlyphLoadedCallback = std::function<void(GlyphPBF*)>;
+
     GlyphPBF(const std::string &glyphURL,
              const std::string &fontStack,
              GlyphRange glyphRange,
-             Environment &env);
+             Environment &env,
+             const GlyphLoadedCallback& callback);
+    ~GlyphPBF();
+
+    void parse(FontStack &stack);
+    bool isParsed() const;
 
 private:
     GlyphPBF(const GlyphPBF &) = delete;
@@ -60,43 +68,56 @@ private:
     GlyphPBF &operator=(const GlyphPBF &) = delete;
     GlyphPBF &operator=(GlyphPBF &&) = delete;
 
-public:
-    void parse(FontStack &stack);
-
-    std::shared_future<GlyphPBF &> getFuture();
-
-private:
     std::string data;
-    std::promise<GlyphPBF &> promise;
-    std::shared_future<GlyphPBF &> future;
-    std::mutex mtx;
+    std::atomic_bool parsed;
+
+    Environment& env;
+    Request* req = nullptr;
+
+    mutable std::mutex mtx;
 };
 
 // Manages Glyphrange PBF loading.
 class GlyphStore {
 public:
+    class Observer {
+    public:
+        virtual ~Observer() = default;
+
+        virtual void onGlyphRangeLoaded() = 0;
+    };
+
     GlyphStore(Environment &);
+    ~GlyphStore();
 
-    // Block until all specified GlyphRanges of the specified font stack are loaded.
-    void waitForGlyphRanges(const std::string &fontStack, const std::set<GlyphRange> &glyphRanges);
+    // Asynchronously request for GlyphRanges and when it gets loaded, notifies the
+    // observer subscribed to this object. Successive requests for the same range are
+    // going to be discarded. Returns true if a request was made or false if all the
+    // GlyphRanges are already available, and thus, no request is performed.
+    bool requestGlyphRangesIfNeeded(const std::string &fontStack, const std::set<GlyphRange> &glyphRanges);
 
-    uv::exclusive<FontStack> getFontStack(const std::string &fontStack);
+    FontStack* getFontStack(const std::string &fontStack);
 
     void setURL(const std::string &url);
 
-private:
-    // Loads an individual glyph range from the font stack and adds it to rangeSets
-    std::shared_future<GlyphPBF &> loadGlyphRange(const std::string &fontStack, std::map<GlyphRange, std::unique_ptr<GlyphPBF>> &rangeSets, GlyphRange range);
+    void setObserver(Observer* observer);
 
-    FontStack &createFontStack(const std::string &fontStack);
+private:
+    void emitGlyphRangeLoaded();
+
+    FontStack* createFontStack(const std::string &fontStack);
 
     std::string glyphURL;
     Environment &env;
-    std::unordered_map<std::string, std::map<GlyphRange, std::unique_ptr<GlyphPBF>>> ranges;
-    std::unordered_map<std::string, std::unique_ptr<FontStack>> stacks;
-    std::unique_ptr<uv::mutex> mtx;
-};
 
+    std::unordered_map<std::string, std::map<GlyphRange, std::unique_ptr<GlyphPBF>>> ranges;
+    std::mutex rangesMutex;
+
+    std::unordered_map<std::string, std::unique_ptr<FontStack>> stacks;
+    std::mutex stacksMutex;
+
+    Observer* observer;
+};
 
 }
 

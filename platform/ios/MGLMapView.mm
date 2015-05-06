@@ -28,6 +28,7 @@
 #import "SMCalloutView.h"
 
 #import "MGLMapboxEvents.h"
+#import "MapboxGL.h"
 
 #import <algorithm>
 
@@ -109,6 +110,7 @@ std::chrono::steady_clock::duration secondsAsDuration(float duration)
     if (self && [self commonInit])
     {
         self.styleURL = nil;
+        self.accessToken = [MGLAccountManager accessToken];
         return self;
     }
 

@@ -81,7 +81,9 @@ echo "Created ${OUTPUT}/static/lib${NAME}.a"
 
 step "Copying Headers..."
 mkdir -p "${OUTPUT}/static/Headers"
-cp -pv include/mbgl/ios/* "${OUTPUT}/static/Headers"
+for i in `ls -R include/mbgl/ios | grep -vi private`; do
+    cp -pv include/mbgl/ios/$i "${OUTPUT}/static/Headers"
+done
 
 
 # Manually create resource bundle. We don't use a GYP target here because of
@@ -109,6 +111,3 @@ appledoc \
     --no-install-docset \
     --company-id com.mapbox \
     include/mbgl/ios
-cd ${DOCS_OUTPUT}
-ln -s html/index.html
-cd ${OLDPWD}

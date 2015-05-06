@@ -12,6 +12,7 @@ TileData::TileData(const TileID& id_, const SourceInfo& source_)
     : id(id_),
       name(id),
       state(State::initial),
+      parsing(ATOMIC_FLAG_INIT),
       source(source_),
       env(Environment::Get()),
       debugBucket(debugFontBuffer) {
@@ -60,6 +61,18 @@ void TileData::cancel() {
     }
 }
 
+bool TileData::mayStartParsing() {
+    return !parsing.test_and_set(std::memory_order_acquire);
+}
+
+void TileData::endParsing() {
+    parsing.clear(std::memory_order_release);
+}
+
 void TileData::reparse(Worker& worker, std::function<void()> callback) {
-    workRequest = worker.send([this] { parse(); }, callback);
+    if (!mayStartParsing()) {
+        return;
+    }
+
+    workRequest = worker.send([this] { parse(); endParsing(); }, callback);
 }

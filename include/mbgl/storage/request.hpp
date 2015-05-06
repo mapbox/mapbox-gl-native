@@ -19,8 +19,6 @@ namespace mbgl {
 class Response;
 
 class Request : private util::noncopyable {
-    MBGL_STORE_THREAD(tid)
-
 public:
     using Callback = std::function<void(const Response &)>;
     Request(const Resource &resource, uv_loop_t *loop, Callback callback);
