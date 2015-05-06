@@ -26,7 +26,6 @@ Pod::Spec.new do |m|
   m.resource_bundle = { 'MapboxGL' => 'MapboxGL.bundle/*' }
   m.vendored_library = 'libMapboxGL.a'
 
-
   m.frameworks = 'CoreLocation', 'CoreTelephony', 'GLKit', 'ImageIO', 'MobileCoreServices', 'QuartzCore', 'SystemConfiguration'
   m.libraries = 'c++', 'sqlite3', 'z'
   m.xcconfig = { 'OTHER_CPLUSPLUSFLAGS' => '-std=gnu++11 -stdlib=libc++' }

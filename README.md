@@ -47,6 +47,19 @@ Target OS X: 10.9+
 
 If you merely want to install the library for iOS and try it out as an Objective-C consumer:
 
+### CocoaPods
+
+CocoaPods is preferred. As of yet, Mapbox GL isn't in the global specs repo, but you can use it like so in your `Podfile`: 
+
+```ruby
+use_frameworks!
+pod 'MapboxGL', :podspec => 'https://raw.githubusercontent.com/mapbox/mapbox-gl-native/master/ios/MapboxGL.podspec'
+```
+
+Once the library stabilizes, a mere `pod 'MapboxGL'` will work. 
+
+### Manually
+
 0. Use [Homebrew](http://brew.sh/) to install Boost headers and [appledoc](http://gentlebytes.com/appledoc/): `brew install boost appledoc`.
 1. Run `make ipackage`. The packaging script will produce the statically-linked `libMapboxGL.a`, `MapboxGL.bundle` for resources, a `Headers` folder, and a `Docs` folder with HTML API documentation.
 2. Copy the contents of `build/ios/pkg/static` into your project. It should happen automatically, but ensure that:
