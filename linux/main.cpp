@@ -1,4 +1,5 @@
 #include <mbgl/mbgl.hpp>
+#include "../platform/default/default_styles.hpp"
 #include <mbgl/util/std.hpp>
 #include <mbgl/util/uv.hpp>
 #include <mbgl/platform/log.hpp>
@@ -13,8 +14,11 @@
 #include <fstream>
 #include <sstream>
 
+namespace {
 
 std::unique_ptr<GLFWView> view;
+
+}
 
 void quit_handler(int) {
     if (view) {
@@ -75,6 +79,19 @@ int main(int argc, char *argv[]) {
     map.setBearing(settings.bearing);
     map.setDebug(settings.debug);
 
+    view->setChangeStyleCallback([&map] () {
+        static uint8_t currentStyleIndex;
+
+        if (++currentStyleIndex == mbgl::util::defaultStyles.size()) {
+            currentStyleIndex = 0;
+        }
+
+        const auto& newStyle = mbgl::util::defaultStyles[currentStyleIndex];
+        map.setStyleURL(newStyle.first);
+
+        mbgl::Log::Info(mbgl::Event::Setup, std::string("Changed style to: ") + newStyle.first);
+    });
+
     // Set access token if present
     const char *token = getenv("MAPBOX_ACCESS_TOKEN");
     if (token == nullptr) {
@@ -85,7 +102,7 @@ int main(int argc, char *argv[]) {
 
     // Load style
     if (style.empty()) {
-        style = std::string("asset://") + std::string("styles/bright-v7.json");
+        style = mbgl::util::defaultStyles.front().first;
     }
 
     map.setStyleURL(style);

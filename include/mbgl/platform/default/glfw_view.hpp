@@ -25,10 +25,16 @@ public:
     static void onMouseClick(GLFWwindow *window, int button, int action, int modifiers);
     static void onMouseMove(GLFWwindow *window, double x, double y);
 
+    // Callback called when the user presses the key mapped to style change.
+    // The expected action is to set a new style, different to the current one.
+    void setChangeStyleCallback(std::function<void()> callback);
+
     void run();
     void fps();
 
-public:
+    GLFWwindow *window = nullptr;
+
+private:
     bool fullscreen = false;
 
     double lastX = 0, lastY = 0;
@@ -38,7 +44,7 @@ public:
 
     double lastClick = -1;
 
-    GLFWwindow *window = nullptr;
+    std::function<void()> changeStyleCallback;
 };
 
 #endif
