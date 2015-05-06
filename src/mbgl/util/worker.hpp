@@ -21,9 +21,11 @@ public:
     // work is complete.
     //
     // The return value represents the request to perform the work asynchronously.
-    // Its destructor guarantees that the work is either cancelled and will never
-    // execute, or has finished executing. In other words, the WorkRequest is
-    // guaranteed to outlive any references held by the work function.
+    // Its destructor guarantees that the work function has finished executing, and
+    // that the after function has either finished executing or will not execute.
+    // Together, this means that an object may make a work request with lambdas which
+    // bind references to itself, and if and when those lambdas execute, the references
+    // will still be valid.
     WorkRequest send(Fn work, Fn after);
 
 private:
