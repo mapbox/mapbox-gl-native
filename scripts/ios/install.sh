@@ -15,4 +15,7 @@ gem install xcpretty --no-rdoc --no-ri --no-document --quiet
 mapbox_time "install_recent_git" \
 brew install git
 
+mapbox_time "install_awscli" \
+brew install awscli
+
 mkdir -p ${KIF_SCREENSHOTS}

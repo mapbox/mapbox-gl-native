@@ -22,7 +22,9 @@ ResourceLoader::~ResourceLoader() {
         source->setObserver(nullptr);
     }
 
-    sprite_->setObserver(nullptr);
+    if (sprite_) {
+        sprite_->setObserver(nullptr);
+    }
 }
 
 void ResourceLoader::setObserver(Observer* observer) {

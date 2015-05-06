@@ -1,7 +1,7 @@
 Pod::Spec.new do |m|
 
   m.name    = 'MapboxGL'
-  m.version = '0.2.20'
+  m.version = '0.2.21'
 
   m.summary          = 'Open source vector map solution for iOS with full styling capabilities.'
   m.description      = 'Open source OpenGL-based vector map solution for iOS with full styling capabilities and Cocoa bindings.'
@@ -22,10 +22,9 @@ Pod::Spec.new do |m|
   m.requires_arc = true
 
   m.preserve_paths = '**'
-  m.source_files = 'Headers/*.h'
+  m.source_files = 'Headers/*.h', 'MGLDummy.m'
   m.resource_bundle = { 'MapboxGL' => 'MapboxGL.bundle/*' }
   m.vendored_library = 'libMapboxGL.a'
-
 
   m.frameworks = 'CoreLocation', 'CoreTelephony', 'GLKit', 'ImageIO', 'MobileCoreServices', 'QuartzCore', 'SystemConfiguration'
   m.libraries = 'c++', 'sqlite3', 'z'

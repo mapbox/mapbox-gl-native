@@ -1,7 +1,7 @@
 #import "MBXBenchViewController.h"
 
 #import <mbgl/ios/MGLMapView.h>
-#import <mbgl/ios/MGLMapView_Private.h>
+#import <mbgl/ios/private/MGLMapView_Private.h>
 
 #include "locations.hpp"
 
