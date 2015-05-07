@@ -36,7 +36,7 @@ MapContext::MapContext(uv_loop_t* loop, View& view_, FileSource& fileSource, Map
       envScope(env, ThreadType::Map, "Map"),
       updated(static_cast<UpdateType>(Update::Nothing)),
       asyncUpdate(util::make_unique<uv::async>(loop, [this] { update(); })),
-      glyphStore(util::make_unique<GlyphStore>(env)),
+      glyphStore(util::make_unique<GlyphStore>(loop, env)),
       glyphAtlas(util::make_unique<GlyphAtlas>(1024, 1024)),
       spriteAtlas(util::make_unique<SpriteAtlas>(512, 512)),
       lineAtlas(util::make_unique<LineAtlas>(512, 512)),

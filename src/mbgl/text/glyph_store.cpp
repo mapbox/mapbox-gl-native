@@ -9,6 +9,7 @@
 #include <mbgl/util/constants.hpp>
 #include <mbgl/util/token.hpp>
 #include <mbgl/util/math.hpp>
+#include <mbgl/util/uv_detail.hpp>
 #include <mbgl/storage/file_source.hpp>
 #include <mbgl/platform/log.hpp>
 #include <mbgl/platform/platform.hpp>
@@ -236,8 +237,11 @@ bool GlyphPBF::isParsed() const {
     return parsed;
 }
 
-GlyphStore::GlyphStore(Environment& env_)
-    : env(env_), observer(nullptr) {
+GlyphStore::GlyphStore(uv_loop_t* loop, Environment& env_)
+    : env(env_),
+      asyncEmitGlyphRangeLoaded(util::make_unique<uv::async>(loop, [this] { emitGlyphRangeLoaded(); })),
+      observer(nullptr) {
+    asyncEmitGlyphRangeLoaded->unref();
 }
 
 GlyphStore::~GlyphStore() {
@@ -258,7 +262,7 @@ bool GlyphStore::requestGlyphRangesIfNeeded(const std::string& fontStack,
 
     auto callback = [this, fontStack](GlyphPBF* glyph) {
         glyph->parse(*createFontStack(fontStack));
-        emitGlyphRangeLoaded();
+        asyncEmitGlyphRangeLoaded->send();
     };
 
     std::lock_guard<std::mutex> lock(rangesMutex);
