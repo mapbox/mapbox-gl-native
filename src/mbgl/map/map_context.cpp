@@ -134,6 +134,7 @@ void MapContext::loadStyleJSON(const std::string& json, const std::string& base)
     resourceLoader->setAccessToken(data.getAccessToken());
     resourceLoader->setObserver(this);
     resourceLoader->setStyle(style.get());
+    resourceLoader->setGlyphStore(glyphStore.get());
 
     triggerUpdate(Update::Zoom);
 }
@@ -141,8 +142,7 @@ void MapContext::loadStyleJSON(const std::string& json, const std::string& base)
 void MapContext::updateTiles() {
     assert(Environment::currentlyOn(ThreadType::Map));
 
-    resourceLoader->update(data, transformState, *glyphAtlas, *glyphStore,
-                           *spriteAtlas, *texturePool);
+    resourceLoader->update(data, transformState, *glyphAtlas, *spriteAtlas, *texturePool);
 }
 
 void MapContext::updateAnnotationTiles(const std::vector<TileID>& ids) {
