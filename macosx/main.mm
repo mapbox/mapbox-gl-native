@@ -126,7 +126,7 @@ int main() {
     map.setBearing(settings.bearing);
     map.setDebug(settings.debug);
 
-    view.setChangeStyleCallback([&map] () {
+    view.setChangeStyleCallback([&map, &view] () {
         static uint8_t currentStyleIndex;
 
         if (++currentStyleIndex == mbgl::util::defaultStyles.size()) {
@@ -135,6 +135,7 @@ int main() {
 
         const auto& newStyle = mbgl::util::defaultStyles[currentStyleIndex];
         map.setStyleURL(newStyle.first);
+        view.setWindowTitle(newStyle.second);
 
         mbgl::Log::Info(mbgl::Event::Setup, std::string("Changed style to: ") + newStyle.first);
     });
@@ -147,6 +148,7 @@ int main() {
     // Load style
     const auto& newStyle = mbgl::util::defaultStyles.front();
     map.setStyleURL(newStyle.first);
+    view.setWindowTitle(newStyle.second);
 
     view.run();
 

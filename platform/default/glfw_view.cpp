@@ -319,6 +319,10 @@ void GLFWView::setShouldClose() {
     glfwPostEmptyEvent();
 }
 
+void GLFWView::setWindowTitle(const std::string& title) {
+    glfwSetWindowTitle(window, (std::string { "Mapbox GL: " } + title).c_str());
+}
+
 namespace mbgl {
 namespace platform {
 

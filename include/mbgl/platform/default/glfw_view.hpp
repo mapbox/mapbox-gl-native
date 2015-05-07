@@ -31,6 +31,8 @@ public:
 
     void setShouldClose();
 
+    void setWindowTitle(const std::string&);
+
     void run();
     void fps();
 

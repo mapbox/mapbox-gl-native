@@ -87,6 +87,7 @@ int main(int argc, char *argv[]) {
 
         const auto& newStyle = mbgl::util::defaultStyles[currentStyleIndex];
         map.setStyleURL(newStyle.first);
+        view->setWindowTitle(newStyle.second);
 
         mbgl::Log::Info(mbgl::Event::Setup, std::string("Changed style to: ") + newStyle.first);
     });
@@ -101,7 +102,9 @@ int main(int argc, char *argv[]) {
 
     // Load style
     if (style.empty()) {
-        style = mbgl::util::defaultStyles.front().first;
+        const auto& newStyle = mbgl::util::defaultStyles.front();
+        style = newStyle.first;
+        view->setWindowTitle(newStyle.second);
     }
 
     map.setStyleURL(style);
