@@ -85,11 +85,15 @@ void ResourceLoader::update(MapData& data,
 
     for (const auto& source : style_->sources) {
         source->update(data, transform, *style_, glyphAtlas, *glyphStore_,
-                       spriteAtlas, sprite_, texturePool);
+                       spriteAtlas, sprite_, texturePool, hasNewResources_);
     }
+
+    hasNewResources_ = false;
 }
 
 void ResourceLoader::onGlyphRangeLoaded() {
+    hasNewResources_ = true;
+
     emitTileDataChanged();
 }
 
@@ -102,6 +106,8 @@ void ResourceLoader::onTileLoaded() {
 }
 
 void ResourceLoader::onSpriteLoaded() {
+    hasNewResources_ = true;
+
     emitTileDataChanged();
 }
 

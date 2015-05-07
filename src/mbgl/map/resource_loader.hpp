@@ -73,6 +73,8 @@ public:
 private:
     void emitTileDataChanged();
 
+    bool hasNewResources_ = false;
+
     std::string accessToken_;
     util::ptr<Sprite> sprite_;
 

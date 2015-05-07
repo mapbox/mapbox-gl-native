@@ -75,7 +75,8 @@ public:
                 GlyphStore&,
                 SpriteAtlas&,
                 util::ptr<Sprite>,
-                TexturePool&);
+                TexturePool&,
+                bool hasNewResources);
 
     void invalidateTiles(const std::vector<TileID>&);
 
