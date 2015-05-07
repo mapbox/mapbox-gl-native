@@ -53,6 +53,7 @@
         'miscellaneous/text_conversions.cpp',
         'miscellaneous/tile.cpp',
         'miscellaneous/variant.cpp',
+        'miscellaneous/worker.cpp',
 
         'storage/storage.hpp',
         'storage/storage.cpp',

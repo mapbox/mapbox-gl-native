@@ -27,10 +27,17 @@ WorkRequest Worker::send(Fn work, Fn after) {
     std::packaged_task<void ()> task(work);
     std::future<void> future = task.get_future();
 
-    threads[current]->invokeWithResult(&Worker::Impl::doWork, std::move(after), task);
+    std::shared_ptr<std::atomic<bool>> joined = std::make_shared<std::atomic<bool>>();
+    *joined = false;
+
+    threads[current]->invokeWithResult(&Worker::Impl::doWork, [joined, after] {
+        if (!*joined) {
+            after();
+        }
+    }, task);
 
     current = (current + 1) % threads.size();
-    return WorkRequest(std::move(future));
+    return WorkRequest(std::move(future), joined);
 }
 
 }

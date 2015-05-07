@@ -31,5 +31,5 @@ if [[ ${PUBLISH_PLATFORM} = 'ios' ]]; then
 else
     # build & test iOS
     mapbox_time "run_ios_tests" \
-    make itest
+    make ipackage-sim
 fi
