@@ -85,11 +85,15 @@ void ResourceLoader::update(MapData& data,
 
     for (const auto& source : style_->sources) {
         source->update(data, transform, *style_, glyphAtlas, *glyphStore_,
-                       spriteAtlas, sprite_, texturePool);
+                       spriteAtlas, sprite_, texturePool, shouldReparsePartialTiles_);
     }
+
+    shouldReparsePartialTiles_ = false;
 }
 
 void ResourceLoader::onGlyphRangeLoaded() {
+    shouldReparsePartialTiles_ = true;
+
     emitTileDataChanged();
 }
 
@@ -102,6 +106,8 @@ void ResourceLoader::onTileLoaded() {
 }
 
 void ResourceLoader::onSpriteLoaded() {
+    shouldReparsePartialTiles_ = true;
+
     emitTileDataChanged();
 }
 

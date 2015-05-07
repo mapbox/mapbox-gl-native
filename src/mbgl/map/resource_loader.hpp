@@ -73,6 +73,8 @@ public:
 private:
     void emitTileDataChanged();
 
+    bool shouldReparsePartialTiles_ = false;
+
     std::string accessToken_;
     util::ptr<Sprite> sprite_;
 

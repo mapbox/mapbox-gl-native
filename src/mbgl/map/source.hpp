@@ -75,7 +75,8 @@ public:
                 GlyphStore&,
                 SpriteAtlas&,
                 util::ptr<Sprite>,
-                TexturePool&);
+                TexturePool&,
+                bool shouldReparsePartialTiles);
 
     void invalidateTiles(const std::vector<TileID>&);
 
