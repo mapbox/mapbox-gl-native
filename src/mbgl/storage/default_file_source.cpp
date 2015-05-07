@@ -71,7 +71,7 @@ DefaultFileSource::Impl::Impl(uv_loop_t* loop_, FileCache* cache_, const std::st
 DefaultFileRequest* DefaultFileSource::Impl::find(const Resource& resource) {
     const auto it = pending.find(resource);
     if (it != pending.end()) {
-        return &it->second;
+        return it->second.get();
     }
     return nullptr;
 }
@@ -85,7 +85,8 @@ void DefaultFileSource::Impl::add(Request* req) {
         return;
     }
 
-    request = &pending.emplace(resource, DefaultFileRequest(resource)).first->second;
+    request = pending.emplace(resource, util::make_unique<DefaultFileRequest>(resource))
+                  .first->second.get();
     request->observers.insert(req);
 
     if (cache) {

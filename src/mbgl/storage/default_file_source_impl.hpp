@@ -14,12 +14,12 @@ namespace mbgl {
 
 class RequestBase;
 
-struct DefaultFileRequest {
+struct DefaultFileRequest : private util::noncopyable {
     const Resource resource;
     std::set<Request*> observers;
     RequestBase* request = nullptr;
 
-    DefaultFileRequest(const Resource& resource_)
+    inline DefaultFileRequest(const Resource& resource_)
         : resource(resource_) {}
 };
 
@@ -37,7 +37,7 @@ private:
     void startRealRequest(const Resource&, std::shared_ptr<const Response> = nullptr);
     void notify(DefaultFileRequest*, std::shared_ptr<const Response>, FileCache::Hint);
 
-    std::unordered_map<Resource, DefaultFileRequest, Resource::Hash> pending;
+    std::unordered_map<Resource, std::unique_ptr<DefaultFileRequest>, Resource::Hash> pending;
     uv_loop_t* loop = nullptr;
     FileCache* cache = nullptr;
     const std::string assetRoot;
