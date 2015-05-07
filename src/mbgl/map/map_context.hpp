@@ -63,7 +63,6 @@ public:
     void onTileDataChanged() override;
 
 private:
-    util::ptr<Sprite> getSprite();
     void updateTiles();
 
     // Update the state indicated by the accumulated Update flags, then render.
