@@ -13,7 +13,7 @@
         '../mbgl.gyp:http-<(http_lib)',
         '../mbgl.gyp:asset-<(asset_lib)',
         '../mbgl.gyp:cache-<(cache_lib)',
-        '../mbgl.gyp:bundle_styles',
+        '../mbgl.gyp:copy_styles',
         '../mbgl.gyp:copy_certificate_bundle',
       ],
 
