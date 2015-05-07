@@ -348,6 +348,7 @@ void Transform::_setAngle(double new_angle, const Duration duration) {
                            MapChangeRegionWillChange);
 
     final.angle = _normalizeAngle(new_angle, current.angle);
+    current.angle = _normalizeAngle(current.angle, final.angle);
 
     if (duration == Duration::zero()) {
         current.angle = final.angle;
