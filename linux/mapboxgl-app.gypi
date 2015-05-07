@@ -13,15 +13,18 @@
         '../mbgl.gyp:http-<(http_lib)',
         '../mbgl.gyp:asset-<(asset_lib)',
         '../mbgl.gyp:cache-<(cache_lib)',
-        '../mbgl.gyp:bundle_styles',
+        '../mbgl.gyp:copy_styles',
         '../mbgl.gyp:copy_certificate_bundle',
       ],
 
       'sources': [
         'main.cpp',
         '../platform/default/settings_json.cpp',
+        '../platform/default/glfw_view.hpp',
         '../platform/default/glfw_view.cpp',
         '../platform/default/log_stderr.cpp',
+        '../platform/default/default_styles.hpp',
+        '../platform/default/default_styles.cpp',
       ],
 
       'variables' : {
