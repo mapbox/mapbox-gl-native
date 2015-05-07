@@ -1403,8 +1403,9 @@ std::chrono::steady_clock::duration secondsAsDuration(float duration)
 
 - (void)zoomToSouthWestCoordinate:(CLLocationCoordinate2D)southWestCoordinate northEastCoordinate:(CLLocationCoordinate2D)northEastCoordinate animated:(BOOL)animated
 {
-    // NOTE: does not disrupt tracking mode
+    [self fitBoundsToSouthWestCoordinate:southWestCoordinate northEastCoordinate:northEastCoordinate padding:0 animated:animated];
 
+    /*
     CLLocationCoordinate2D center = CLLocationCoordinate2DMake((northEastCoordinate.latitude + southWestCoordinate.latitude) / 2, (northEastCoordinate.longitude + southWestCoordinate.longitude) / 2);
     
     CGFloat scale = _mbglMap->getScale();
@@ -1417,6 +1418,7 @@ std::chrono::steady_clock::duration secondsAsDuration(float duration)
     NSLog(@"z%.2f   scale: %.2f     output-zoom: %.2f", _mbglMap->getZoom(), _mbglMap->getScale(), zoomLevel);
     
     [self setCenterCoordinate:center zoomLevel:zoomLevel animated:animated];
+     */
 }
 
 - (void)fitBoundsToSouthWestCoordinate:(CLLocationCoordinate2D)southWestCoordinate northEastCoordinate:(CLLocationCoordinate2D)northEastCoordinate padding:(CGFloat)padding animated:(BOOL)animated
