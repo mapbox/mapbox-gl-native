@@ -12,6 +12,7 @@ endif
 ifeq ($(shell uname -s), Linux)
 HOST = linux
 JOBS ?= $(shell grep --count processor /proc/cpuinfo)
+BUILD_ROOT = $(shell pwd)
 endif
 
 JOBS ?= 1
@@ -92,6 +93,9 @@ osx: Makefile/project
 run-osx: osx
 	"build/osx/$(BUILDTYPE)/Mapbox GL.app/Contents/MacOS/Mapbox GL"
 
+run-valgrind-osx: osx
+	(valgrind --leak-check=full --suppressions=scripts/valgrind.sup build/osx/$(BUILDTYPE)/Mapbox\ GL.app/Contents/MacOS/Mapbox\ GL)
+
 .PHONY: xosx-proj xosx run-xosx
 xosx-proj: Xcode/project
 	open ./build/osx/gyp/osx.xcodeproj
@@ -151,6 +155,9 @@ linux: Makefile/project
 
 run-linux: linux
 	(cd build/$(HOST)/$(BUILDTYPE) && ./mapbox-gl)
+
+run-valgrind-linux: linux
+	(cd build/$(HOST)/$(BUILDTYPE) && valgrind --leak-check=full --suppressions=$(BUILD_ROOT)/scripts/valgrind.sup ./mapbox-gl)
 
 .PHONY: xlinux run-xlinux
 xlinux: XCPRETTY := $(shell ./scripts/xcpretty.sh)
