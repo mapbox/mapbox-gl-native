@@ -1,4 +1,5 @@
 #include <mbgl/platform/log.hpp>
+#include "../platform/default/default_styles.hpp"
 #include <mbgl/platform/platform.hpp>
 #include <mbgl/platform/darwin/settings_nsuserdefaults.hpp>
 #include <mbgl/platform/darwin/Reachability.h>
@@ -125,13 +126,27 @@ int main() {
     map.setBearing(settings.bearing);
     map.setDebug(settings.debug);
 
+    view.setChangeStyleCallback([&map] () {
+        static uint8_t currentStyleIndex;
+
+        if (++currentStyleIndex == mbgl::util::defaultStyles.size()) {
+            currentStyleIndex = 0;
+        }
+
+        const auto& newStyle = mbgl::util::defaultStyles[currentStyleIndex];
+        map.setStyleURL(newStyle.first);
+
+        mbgl::Log::Info(mbgl::Event::Setup, std::string("Changed style to: ") + newStyle.first);
+    });
+
     // Set access token if present
     NSString *accessToken = [[NSProcessInfo processInfo] environment][@"MAPBOX_ACCESS_TOKEN"];
     if (!accessToken) mbgl::Log::Warning(mbgl::Event::Setup, "No access token set. Mapbox vector tiles won't work.");
     if (accessToken) map.setAccessToken([accessToken cStringUsingEncoding:[NSString defaultCStringEncoding]]);
 
     // Load style
-    map.setStyleURL("asset://styles/bright-v7.json");
+    const auto& newStyle = mbgl::util::defaultStyles.front();
+    map.setStyleURL(newStyle.first);
 
     view.run();
 
