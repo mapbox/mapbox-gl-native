@@ -101,7 +101,11 @@ void ResourceLoader::onSourceLoaded() {
     emitTileDataChanged();
 }
 
-void ResourceLoader::onTileLoaded() {
+void ResourceLoader::onTileLoaded(bool isNewTile) {
+    if (isNewTile) {
+        shouldReparsePartialTiles_ = true;
+    }
+
     emitTileDataChanged();
 }
 

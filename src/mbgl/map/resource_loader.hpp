@@ -65,7 +65,7 @@ public:
 
     // Source::Observer implementation.
     void onSourceLoaded() override;
-    void onTileLoaded() override;
+    void onTileLoaded(bool isNewTile) override;
 
     // Sprite::Observer implementation.
     void onSpriteLoaded() override;

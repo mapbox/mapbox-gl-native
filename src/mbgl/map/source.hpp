@@ -58,7 +58,7 @@ public:
         virtual ~Observer() = default;
 
         virtual void onSourceLoaded() = 0;
-        virtual void onTileLoaded() = 0;
+        virtual void onTileLoaded(bool isNewTile) = 0;
     };
 
     Source();
@@ -97,7 +97,7 @@ public:
 
 private:
     void emitSourceLoaded();
-    void emitTileLoaded();
+    void emitTileLoaded(bool isNewTile);
 
     void handlePartialTile(const TileID &id, Worker &worker);
     bool findLoadedChildren(const TileID& id, int32_t maxCoveringZoom, std::forward_list<TileID>& retain);
