@@ -101,9 +101,11 @@ void DefaultFileSource::Impl::startCacheRequest(const Resource& resource) {
     cache->get(resource, [this, resource](std::unique_ptr<Response> response) {
         DefaultFileRequest* request = find(resource);
 
-        if (!request) {
+        if (!request || request->request) {
             // There is no request for this URL anymore. Likely, the request was canceled
             // before we got around to process the cache result.
+            // The second possibility is that a request has already been started by another cache
+            // request. In this case, we don't have to do anything either.
             return;
         }
 

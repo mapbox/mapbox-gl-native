@@ -66,6 +66,7 @@
         'storage/http_coalescing.cpp',
         'storage/http_error.cpp',
         'storage/http_header_parsing.cpp',
+        'storage/http_issue_1369.cpp',
         'storage/http_load.cpp',
         'storage/http_noloop.cpp',
         'storage/http_other_loop.cpp',
