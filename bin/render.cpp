@@ -79,11 +79,8 @@ int main(int argc, char *argv[]) {
         }
     }
 
-
     HeadlessView view;
-    Map map(view, fileSource);
-
-    map.start(Map::Mode::Still);
+    Map map(view, fileSource, MapMode::Still);
 
     // Set access token if present
     if (token.size()) {
@@ -93,7 +90,7 @@ int main(int argc, char *argv[]) {
     map.setStyleJSON(style, ".");
     map.setClasses(classes);
 
-    view.resize(width, height, pixelRatio);
+    map.resize(width, height, pixelRatio);
     map.setLatLngZoom({ lat, lon }, zoom);
     map.setBearing(bearing);
 
@@ -115,6 +112,4 @@ int main(int argc, char *argv[]) {
 
     // This loop will terminate once the async was fired.
     uv_run(uv_default_loop(), UV_RUN_DEFAULT);
-
-    map.stop();
 }
