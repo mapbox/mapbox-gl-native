@@ -13,6 +13,7 @@ TileData::TileData(const TileID& id_, const SourceInfo& source_)
       name(id),
       state(State::initial),
 #pragma GCC diagnostic push
+#pragma GCC diagnostic ignored "-Wunknown-pragmas"
 #pragma GCC diagnostic ignored "-Wbraced-scalar-init"
       parsing(ATOMIC_FLAG_INIT),
 #pragma GCC diagnostic pop
