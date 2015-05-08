@@ -18,7 +18,6 @@ public:
     // FileSource API
     Request* request(const Resource&, uv_loop_t*, Callback) override;
     void cancel(Request*) override;
-    void request(const Resource&, Callback) override;
 
 public:
     class Impl;

@@ -121,11 +121,6 @@ unsigned Environment::getID() const {
     return id;
 }
 
-void Environment::requestAsync(const Resource& resource,
-                               std::function<void(const Response&)> callback) {
-    fileSource.request(resource, std::move(callback));
-}
-
 Request* Environment::request(const Resource& resource,
                               std::function<void(const Response&)> callback) {
     return fileSource.request(resource, util::RunLoop::current.get()->get(), std::move(callback));

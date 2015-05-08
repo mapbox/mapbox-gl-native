@@ -37,24 +37,14 @@ DefaultFileSource::~DefaultFileSource() {
 Request* DefaultFileSource::request(const Resource& resource,
                                     uv_loop_t* l,
                                     Callback callback) {
+    assert(l);
     auto req = new Request(resource, l, std::move(callback));
-
-    // This function can be called from any thread. Make sure we're executing the actual call in the
-    // file source loop by sending it over the queue.
     thread->invoke(&Impl::add, req);
-
     return req;
-}
-
-void DefaultFileSource::request(const Resource& resource, Callback callback) {
-    request(resource, nullptr, std::move(callback));
 }
 
 void DefaultFileSource::cancel(Request *req) {
     req->cancel();
-
-    // This function can be called from any thread. Make sure we're executing the actual call in the
-    // file source loop by sending it over the queue.
     thread->invoke(&Impl::cancel, req);
 }
 
