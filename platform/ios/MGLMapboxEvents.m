@@ -429,6 +429,13 @@ NSString *const MGLEventGestureRotateStart = @"Rotation";
 
         // Send Array of Events to Server
         [strongSelf postEvents:events];
+
+        // Cancel Any Timer That May Running
+        if (strongSelf.timer) {
+            NSLog(@"timer still exists after flush, need to clean it up.");
+            [strongSelf.timer invalidate];
+            strongSelf.timer = nil;
+        }
     });
 }
 
