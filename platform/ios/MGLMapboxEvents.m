@@ -189,7 +189,7 @@ NSString *const MGLEventGestureRotateStart = @"Rotation";
         }
         _vendorId = [[[UIDevice currentDevice] identifierForVendor] UUIDString];
         
-        _model = [self getSysInfoByName:"hw.machine"];
+        _model = [self sysInfoByName:"hw.machine"];
         _iOSVersion = [NSString stringWithFormat:@"%@ %@", [UIDevice currentDevice].systemName, [UIDevice currentDevice].systemVersion];
         if ([UIScreen instancesRespondToSelector:@selector(nativeScale)]) {
             _scale = [UIScreen mainScreen].nativeScale;
@@ -351,26 +351,26 @@ NSString *const MGLEventGestureRotateStart = @"Rotation";
         // mapbox-events-ios stock attributes
         [evt setValue:strongSelf.model forKey:@"model"];
         [evt setValue:strongSelf.iOSVersion forKey:@"operatingSystem"];
-        [evt setValue:[strongSelf getDeviceOrientation] forKey:@"orientation"];
+        [evt setValue:[strongSelf deviceOrientation] forKey:@"orientation"];
         [evt setValue:@((int)(100 * [UIDevice currentDevice].batteryLevel)) forKey:@"batteryLevel"];
         [evt setValue:@(strongSelf.scale) forKey:@"resolution"];
         [evt setValue:strongSelf.carrier forKey:@"carrier"];
         
-        NSString *cell = [strongSelf getCurrentCellularNetworkConnectionType];
+        NSString *cell = [strongSelf currentCellularNetworkConnectionType];
         if (cell) {
             [evt setValue:cell forKey:@"cellularNetworkType"];
         } else {
             [evt setObject:[NSNull null] forKey:@"cellularNetworkType"];
         }
         
-        NSString *wifi = [strongSelf getWifiNetworkName];
+        NSString *wifi = [strongSelf wifiNetworkName];
         if (wifi) {
             [evt setValue:wifi forKey:@"wifi"];
         } else {
             [evt setObject:[NSNull null] forKey:@"wifi"];
         }
         
-        [evt setValue:@([strongSelf getContentSizeScale]) forKey:@"accessibilityFontScale"];
+        [evt setValue:@([strongSelf contentSizeScale]) forKey:@"accessibilityFontScale"];
 
         // Make Immutable Version
         NSDictionary *finalEvent = [NSDictionary dictionaryWithDictionary:evt];
@@ -437,7 +437,7 @@ NSString *const MGLEventGestureRotateStart = @"Rotation";
         // Setup URL Request
         NSString *url = [NSString stringWithFormat:@"%@/events/v1?access_token=%@", MGLMapboxEventsAPIBase, strongSelf.token];
         NSMutableURLRequest *request = [[NSMutableURLRequest alloc] initWithURL:[NSURL URLWithString:url]];
-        [request setValue:[strongSelf getUserAgent] forHTTPHeaderField:@"User-Agent"];
+        [request setValue:strongSelf.userAgent forHTTPHeaderField:@"User-Agent"];
         [request setValue:@"application/json" forHTTPHeaderField:@"Content-Type"];
         [request setHTTPMethod:@"POST"];
         
@@ -482,11 +482,11 @@ NSString *const MGLEventGestureRotateStart = @"Rotation";
 
 // Can be called from any thread.
 //
-- (NSString *) getUserAgent {
-    if (self.appName != nil && self.appVersion != nil && self.appBuildNumber != nil && ([self.userAgent rangeOfString:self.appName].location == NSNotFound)) {
-        self.userAgent = [NSString stringWithFormat:@"%@/%@/%@ %@", self.appName, self.appVersion, self.appBuildNumber, self.userAgent];
+- (NSString *) userAgent {
+    if (self.appName != nil && self.appVersion != nil && self.appBuildNumber != nil && ([_userAgent rangeOfString:self.appName].location == NSNotFound)) {
+        _userAgent = [NSString stringWithFormat:@"%@/%@/%@ %@", self.appName, self.appVersion, self.appBuildNumber, _userAgent];
     }
-    return self.userAgent;
+    return _userAgent;
 }
 
 // Can be called from any thread.
@@ -497,7 +497,7 @@ NSString *const MGLEventGestureRotateStart = @"Rotation";
 
 // Can be called from any thread.
 //
-- (NSString *) getDeviceOrientation {
+- (NSString *) deviceOrientation {
     __block NSString *result;
 
     NSString *(^deviceOrientationBlock)(void) = ^{
@@ -544,7 +544,7 @@ NSString *const MGLEventGestureRotateStart = @"Rotation";
 
 // Can be called from any thread.
 //
-- (NSInteger) getContentSizeScale {
+- (NSInteger) contentSizeScale {
     __block NSInteger result = -9999;
 
     NSInteger (^contentSizeScaleBlock)(void) = ^{
@@ -592,7 +592,7 @@ NSString *const MGLEventGestureRotateStart = @"Rotation";
 
 // Can be called from any thread.
 //
-- (NSString *)getSysInfoByName:(char *)typeSpecifier
+- (NSString *)sysInfoByName:(char *)typeSpecifier
 {
     size_t size;
     sysctlbyname(typeSpecifier, NULL, &size, NULL, 0);
@@ -608,7 +608,7 @@ NSString *const MGLEventGestureRotateStart = @"Rotation";
 
 // Can be called from any thread.
 //
-- (NSString *) getWifiNetworkName {
+- (NSString *) wifiNetworkName {
     
     NSString *ssid = nil;
     CFArrayRef interfaces = CNCopySupportedInterfaces();
@@ -625,7 +625,7 @@ NSString *const MGLEventGestureRotateStart = @"Rotation";
 
 // Can be called from any thread.
 //
-- (NSString *) getCurrentCellularNetworkConnectionType {
+- (NSString *) currentCellularNetworkConnectionType {
     CTTelephonyNetworkInfo *telephonyInfo = [[CTTelephonyNetworkInfo alloc] init];
     NSString *radioTech = telephonyInfo.currentRadioAccessTechnology;
     
