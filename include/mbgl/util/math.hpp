@@ -100,7 +100,11 @@ inline T mag(const S& a) {
 
 template <typename S>
 inline S unit(const S& a) {
-    return a * (1 / mag(a));
+    auto magnitude = mag(a);
+    if (magnitude == 0) {
+        return a;
+    }
+    return a * (1 / magnitude);
 }
 
 template <typename T>
