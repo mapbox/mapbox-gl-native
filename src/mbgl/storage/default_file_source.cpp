@@ -85,7 +85,7 @@ void DefaultFileSource::Impl::add(Request* req) {
         return;
     }
 
-    request = &pending.emplace(resource, DefaultFileRequest(resource)).first->second;
+    request = &pending.emplace(resource, resource).first->second;
     request->observers.insert(req);
 
     if (cache) {
