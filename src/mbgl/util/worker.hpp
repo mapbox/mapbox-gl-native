@@ -2,12 +2,14 @@
 #define MBGL_UTIL_WORKER
 
 #include <mbgl/util/noncopyable.hpp>
-#include <mbgl/util/work_request.hpp>
 #include <mbgl/util/thread.hpp>
 
 #include <functional>
+#include <memory>
 
 namespace mbgl {
+
+class WorkRequest;
 
 class Worker : public mbgl::util::noncopyable {
 public:
@@ -26,7 +28,7 @@ public:
     // Together, this means that an object may make a work request with lambdas which
     // bind references to itself, and if and when those lambdas execute, the references
     // will still be valid.
-    WorkRequest send(Fn work, Fn after);
+    std::unique_ptr<WorkRequest> send(Fn work, Fn after);
 
 private:
     class Impl;

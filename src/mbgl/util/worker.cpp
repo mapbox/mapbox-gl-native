@@ -1,4 +1,6 @@
 #include <mbgl/util/worker.hpp>
+#include <mbgl/util/work_task.hpp>
+#include <mbgl/util/work_request.hpp>
 #include <mbgl/platform/platform.hpp>
 
 #include <cassert>
@@ -10,8 +12,8 @@ class Worker::Impl {
 public:
     Impl(uv_loop_t*) {}
 
-    void doWork(std::packaged_task<void ()>& task) {
-        task();
+    void doWork(std::shared_ptr<WorkTask>& task) {
+        task->runTask();
     }
 };
 
@@ -23,21 +25,16 @@ Worker::Worker(std::size_t count) {
 
 Worker::~Worker() = default;
 
-WorkRequest Worker::send(Fn work, Fn after) {
-    std::packaged_task<void ()> task(work);
-    std::future<void> future = task.get_future();
+std::unique_ptr<WorkRequest> Worker::send(Fn work, Fn after) {
+    auto task = std::make_shared<WorkTask>(work, after);
+    auto request = util::make_unique<WorkRequest>(task);
 
-    std::shared_ptr<std::atomic<bool>> joined = std::make_shared<std::atomic<bool>>();
-    *joined = false;
-
-    threads[current]->invokeWithResult(&Worker::Impl::doWork, [joined, after] {
-        if (!*joined) {
-            after();
-        }
+    threads[current]->invokeWithResult(&Worker::Impl::doWork, [task] {
+        task->runAfter();
     }, task);
 
     current = (current + 1) % threads.size();
-    return WorkRequest(std::move(future), joined);
+    return request;
 }
 
-}
+} // end namespace mbgl

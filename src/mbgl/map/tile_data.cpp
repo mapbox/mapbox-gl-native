@@ -4,6 +4,7 @@
 
 #include <mbgl/storage/file_source.hpp>
 #include <mbgl/util/worker.hpp>
+#include <mbgl/util/work_request.hpp>
 #include <mbgl/platform/log.hpp>
 
 using namespace mbgl;
@@ -56,9 +57,7 @@ void TileData::cancel() {
         env.cancelRequest(req);
         req = nullptr;
     }
-    if (workRequest) {
-        workRequest.join();
-    }
+    workRequest.reset();
 }
 
 bool TileData::mayStartParsing() {
