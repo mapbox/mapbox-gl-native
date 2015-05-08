@@ -19,6 +19,7 @@
         '../platform/darwin/reachability.m',
         '../include/mbgl/ios/MapboxGL.h',
         '../include/mbgl/ios/MGLMapboxEvents.h',
+        '../platform/ios/MGLMapboxEvents_Private.h',
         '../platform/ios/MGLMapboxEvents.m',
         '../include/mbgl/ios/MGLMapView.h',
         '../include/mbgl/ios/MGLMapView+IBAdditions.h',

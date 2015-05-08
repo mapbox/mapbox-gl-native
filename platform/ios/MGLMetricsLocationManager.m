@@ -27,17 +27,16 @@
         // Clear Any System TimeZone Cache
         [NSTimeZone resetSystemTimeZone];
         [_rfc3339DateFormatter setTimeZone:[NSTimeZone systemTimeZone]];
+        
+        [self startUpdatingLocation];
+        [self startMonitoringVisits];
     }
     return self;
 }
 
-+ (instancetype)sharedManager {
-    static dispatch_once_t onceToken;
-    static MGLMetricsLocationManager *sharedManager;
-    dispatch_once(&onceToken, ^{
-        sharedManager = [[self alloc] init];
-    });
-    return sharedManager;
+- (void)dealloc {
+    [self stopUpdatingLocation];
+    [self stopMonitoringVisits];
 }
 
 - (void)startUpdatingLocation {

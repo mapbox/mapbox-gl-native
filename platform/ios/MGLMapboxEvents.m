@@ -1,10 +1,11 @@
-#import "MGLMapboxEvents.h"
+#import "MGLMapboxEvents_Private.h"
 
 #import <UIKit/UIKit.h>
 #import <SystemConfiguration/CaptiveNetwork.h>
 #import <CoreTelephony/CTTelephonyNetworkInfo.h>
 #import <CoreTelephony/CTCarrier.h>
 
+#import "MGLAccountManager.h"
 #import "MGLMetricsLocationManager.h"
 #import "NSProcessInfo+MGLAdditions.h"
 #import "NSBundle+MGLAdditions.h"
@@ -43,6 +44,76 @@ NSString *const MGLEventGesturePanStart = @"Pan";
 NSString *const MGLEventGesturePinchStart = @"Pinch";
 NSString *const MGLEventGestureRotateStart = @"Rotation";
 
+@interface MGLMapboxEventsData : NSObject
+
+// All of the following properties are written to only from
+// the main thread, but can be read on any thread.
+//
+@property (atomic) NSString *instanceID;
+@property (atomic) NSString *advertiserId;
+@property (atomic) NSString *vendorId;
+@property (atomic) NSString *model;
+@property (atomic) NSString *iOSVersion;
+@property (atomic) NSString *carrier;
+@property (atomic) CGFloat scale;
+
+@end
+
+@implementation MGLMapboxEventsData
+
+- (instancetype)init {
+    if (self = [super init]) {
+        _instanceID = [[NSUUID UUID] UUIDString];
+        
+        // Dynamic detection of ASIdentifierManager from Mixpanel
+        // https://github.com/mixpanel/mixpanel-iphone/blob/master/LICENSE
+        _advertiserId = @"";
+        Class ASIdentifierManagerClass = NSClassFromString(@"ASIdentifierManager");
+        if (ASIdentifierManagerClass) {
+            SEL sharedManagerSelector = NSSelectorFromString(@"sharedManager");
+            id sharedManager = ((id (*)(id, SEL))[ASIdentifierManagerClass methodForSelector:sharedManagerSelector])(ASIdentifierManagerClass, sharedManagerSelector);
+            // Add check here
+            SEL isAdvertisingTrackingEnabledSelector = NSSelectorFromString(@"isAdvertisingTrackingEnabled");
+            BOOL trackingEnabled = ((BOOL (*)(id, SEL))[sharedManager methodForSelector:isAdvertisingTrackingEnabledSelector])(sharedManager, isAdvertisingTrackingEnabledSelector);
+            if (trackingEnabled) {
+                SEL advertisingIdentifierSelector = NSSelectorFromString(@"advertisingIdentifier");
+                NSUUID *uuid = ((NSUUID* (*)(id, SEL))[sharedManager methodForSelector:advertisingIdentifierSelector])(sharedManager, advertisingIdentifierSelector);
+                _advertiserId = [uuid UUIDString];
+            }
+        }
+        _vendorId = [[[UIDevice currentDevice] identifierForVendor] UUIDString];
+        
+        _model = [self sysInfoByName:"hw.machine"];
+        _iOSVersion = [NSString stringWithFormat:@"%@ %@", [UIDevice currentDevice].systemName, [UIDevice currentDevice].systemVersion];
+        if ([UIScreen instancesRespondToSelector:@selector(nativeScale)]) {
+            _scale = [UIScreen mainScreen].nativeScale;
+        } else {
+            _scale = [UIScreen mainScreen].scale;
+        }
+        CTCarrier *carrierVendor = [[[CTTelephonyNetworkInfo alloc] init] subscriberCellularProvider];
+        _carrier = [carrierVendor carrierName];
+    }
+    return self;
+}
+
+// Can be called from any thread.
+//
+- (NSString *)sysInfoByName:(char *)typeSpecifier
+{
+    size_t size;
+    sysctlbyname(typeSpecifier, NULL, &size, NULL, 0);
+    
+    char *answer = malloc(size);
+    sysctlbyname(typeSpecifier, answer, &size, NULL, 0);
+    
+    NSString *results = [NSString stringWithCString:answer encoding: NSUTF8StringEncoding];
+    
+    free(answer);
+    return results;
+}
+
+@end
+
 //
 // Threadsafety conventions:
 //
@@ -64,25 +135,17 @@ NSString *const MGLEventGestureRotateStart = @"Rotation";
 // All of the following properties are written to only from
 // the main thread, but can be read on any thread.
 //
-@property (atomic) NSString *token;
+@property (atomic) MGLMapboxEventsData *data;
+@property (atomic) NSString *appBundleId;
 @property (atomic) NSString *appName;
 @property (atomic) NSString *appVersion;
 @property (atomic) NSString *appBuildNumber;
-@property (atomic) NSString *instanceID;
-@property (atomic) NSString *advertiserId;
-@property (atomic) NSString *vendorId;
-@property (atomic) NSString *appBundleId;
-@property (atomic) NSString *userAgent;
-@property (atomic) NSString *model;
-@property (atomic) NSString *iOSVersion;
-@property (atomic) NSString *carrier;
+@property (atomic) MGLMetricsLocationManager *locationManager;
 @property (atomic) NSUInteger flushAt;
 @property (atomic) NSDateFormatter *rfc3339DateFormatter;
-@property (atomic) CGFloat scale;
 @property (atomic) NSURLSession *session;
 @property (atomic) NSData *digicertCert;
 @property (atomic) NSData *geoTrustCert;
-
 
 // The paused state tracker is only ever accessed from the main thread.
 //
@@ -133,6 +196,12 @@ NSString *const MGLEventGestureRotateStart = @"Rotation";
     }
 }
 
++ (BOOL)isEnabled {
+    return ( ! NSProcessInfo.processInfo.mgl_isInterfaceBuilderDesignablesAgent &&
+            [[NSUserDefaults standardUserDefaults] boolForKey:@"MGLMapboxMetricsEnabled"] &&
+            [[NSUserDefaults standardUserDefaults] integerForKey:@"MGLMapboxAccountType"] == 0);
+}
+
 // Must be called from the main thread. Only called internally.
 //
 - (instancetype) init {
@@ -141,6 +210,10 @@ NSString *const MGLEventGestureRotateStart = @"Rotation";
     self = [super init];
     if (self) {
         _appBundleId = [[NSBundle mainBundle] bundleIdentifier];
+        _appName = [[NSBundle mainBundle] objectForInfoDictionaryKey:@"CFBundleName"];
+        _appVersion = [[NSBundle mainBundle] objectForInfoDictionaryKey:@"CFBundleShortVersionString"];
+        _appBuildNumber = [[NSBundle mainBundle] objectForInfoDictionaryKey:@"CFBundleVersion"];
+        
         NSString *uniqueID = [[NSProcessInfo processInfo] globallyUniqueString];
         _serialQueue = dispatch_queue_create([[NSString stringWithFormat:@"%@.%@.events.serial", _appBundleId, uniqueID] UTF8String], DISPATCH_QUEUE_SERIAL);
 
@@ -168,38 +241,6 @@ NSString *const MGLEventGestureRotateStart = @"Rotation";
         _eventQueue = [[NSMutableArray alloc] init];
         _flushAt = 20;
         _flushAfter = 60;
-        _token = nil;
-        _instanceID = [[NSUUID UUID] UUIDString];
-
-        // Dynamic detection of ASIdentifierManager from Mixpanel
-        // https://github.com/mixpanel/mixpanel-iphone/blob/master/LICENSE
-        _advertiserId = @"";
-        Class ASIdentifierManagerClass = NSClassFromString(@"ASIdentifierManager");
-        if (ASIdentifierManagerClass) {
-            SEL sharedManagerSelector = NSSelectorFromString(@"sharedManager");
-            id sharedManager = ((id (*)(id, SEL))[ASIdentifierManagerClass methodForSelector:sharedManagerSelector])(ASIdentifierManagerClass, sharedManagerSelector);
-            // Add check here
-            SEL isAdvertisingTrackingEnabledSelector = NSSelectorFromString(@"isAdvertisingTrackingEnabled");
-            BOOL trackingEnabled = ((BOOL (*)(id, SEL))[sharedManager methodForSelector:isAdvertisingTrackingEnabledSelector])(sharedManager, isAdvertisingTrackingEnabledSelector);
-            if (trackingEnabled) {
-                SEL advertisingIdentifierSelector = NSSelectorFromString(@"advertisingIdentifier");
-                NSUUID *uuid = ((NSUUID* (*)(id, SEL))[sharedManager methodForSelector:advertisingIdentifierSelector])(sharedManager, advertisingIdentifierSelector);
-                _advertiserId = [uuid UUIDString];
-            }
-        }
-        _vendorId = [[[UIDevice currentDevice] identifierForVendor] UUIDString];
-        
-        _model = [self sysInfoByName:"hw.machine"];
-        _iOSVersion = [NSString stringWithFormat:@"%@ %@", [UIDevice currentDevice].systemName, [UIDevice currentDevice].systemVersion];
-        if ([UIScreen instancesRespondToSelector:@selector(nativeScale)]) {
-            _scale = [UIScreen mainScreen].nativeScale;
-        } else {
-            _scale = [UIScreen mainScreen].scale;
-        }
-        CTCarrier *carrierVendor = [[[CTTelephonyNetworkInfo alloc] init] subscriberCellularProvider];
-        _carrier = [carrierVendor carrierName];
-        
-        _userAgent = MGLMapboxEventsUserAgent;
         
         // Setup Date Format
         _rfc3339DateFormatter = [[NSDateFormatter alloc] init];
@@ -224,20 +265,16 @@ NSString *const MGLEventGestureRotateStart = @"Rotation";
     static dispatch_once_t onceToken;
     static MGLMapboxEvents *_sharedManager;
     dispatch_once(&onceToken, ^{
-        if ( ! NSProcessInfo.processInfo.mgl_isInterfaceBuilderDesignablesAgent &&
-            [[NSUserDefaults standardUserDefaults] boolForKey:@"MGLMapboxMetricsEnabled"] &&
-            [[NSUserDefaults standardUserDefaults] integerForKey:@"MGLMapboxAccountType"] == 0) {
-            void (^setupBlock)() = ^{
-                _sharedManager = [[self alloc] init];
-            };
-            if ( ! [[NSThread currentThread] isMainThread]) {
-                dispatch_sync(dispatch_get_main_queue(), ^{
-                    setupBlock();
-                });
-            }
-            else {
+        void (^setupBlock)() = ^{
+            _sharedManager = [[self alloc] init];
+        };
+        if ( ! [[NSThread currentThread] isMainThread]) {
+            dispatch_sync(dispatch_get_main_queue(), ^{
                 setupBlock();
-            }
+            });
+        }
+        else {
+            setupBlock();
         }
     });
     return _sharedManager;
@@ -245,34 +282,6 @@ NSString *const MGLEventGestureRotateStart = @"Rotation";
 
 - (void)dealloc {
     [self pauseMetricsCollection];
-}
-
-// Must be called from the main thread.
-//
-+ (void) setToken:(NSString *)token {
-    MGLAssertIsMainThread();
-    [MGLMapboxEvents sharedManager].token = token;
-}
-
-// Must be called from the main thread.
-//
-+ (void) setAppName:(NSString *)appName {
-    MGLAssertIsMainThread();
-    [MGLMapboxEvents sharedManager].appName = appName;
-}
-
-// Must be called from the main thread.
-//
-+ (void) setAppVersion:(NSString *)appVersion {
-    MGLAssertIsMainThread();
-    [MGLMapboxEvents sharedManager].appVersion = appVersion;
-}
-
-// Must be called from the main thread.
-//
-+ (void) setAppBuildNumber:(NSString *)appBuildNumber {
-    MGLAssertIsMainThread();
-    [MGLMapboxEvents sharedManager].appBuildNumber = appBuildNumber;
 }
 
 + (void)pauseMetricsCollection {
@@ -287,11 +296,10 @@ NSString *const MGLEventGestureRotateStart = @"Rotation";
         return;
     }
     self.paused = YES;
+    _data = nil;
     [_session invalidateAndCancel];
     _session = nil;
-    MGLMetricsLocationManager *sharedLocationManager = [MGLMetricsLocationManager sharedManager];
-    [sharedLocationManager stopUpdatingLocation];
-    [sharedLocationManager stopMonitoringVisits];
+    _locationManager = nil;
 }
 
 + (void)resumeMetricsCollection {
@@ -302,14 +310,13 @@ NSString *const MGLEventGestureRotateStart = @"Rotation";
 //
 - (void)resumeMetricsCollection {
     MGLAssertIsMainThread();
-    if (!self.isPaused) {
+    if (!self.isPaused || [[self class] isEnabled]) {
         return;
     }
     self.paused = NO;
+    _data = [[MGLMapboxEventsData alloc] init];
     _session = [NSURLSession sessionWithConfiguration:[NSURLSessionConfiguration defaultSessionConfiguration] delegate:self delegateQueue:nil];
-    MGLMetricsLocationManager *sharedLocationManager = [MGLMetricsLocationManager sharedManager];
-    [sharedLocationManager startUpdatingLocation];
-    [sharedLocationManager startMonitoringVisits];
+    _locationManager = [[MGLMetricsLocationManager alloc] init];
 }
 
 // Can be called from any thread. Can be called rapidly from
@@ -343,18 +350,18 @@ NSString *const MGLEventGestureRotateStart = @"Rotation";
         [evt setObject:event forKey:@"event"];
         [evt setObject:@(1) forKey:@"version"];
         [evt setObject:[strongSelf.rfc3339DateFormatter stringFromDate:[NSDate date]] forKey:@"created"];
-        [evt setObject:strongSelf.instanceID forKey:@"instance"];
-        [evt setObject:strongSelf.advertiserId forKey:@"advertiserId"];
-        [evt setObject:strongSelf.vendorId forKey:@"vendorId"];
+        [evt setObject:strongSelf.data.instanceID forKey:@"instance"];
+        [evt setObject:strongSelf.data.advertiserId forKey:@"advertiserId"];
+        [evt setObject:strongSelf.data.vendorId forKey:@"vendorId"];
         [evt setObject:strongSelf.appBundleId forKeyedSubscript:@"appBundleId"];
         
         // mapbox-events-ios stock attributes
-        [evt setValue:strongSelf.model forKey:@"model"];
-        [evt setValue:strongSelf.iOSVersion forKey:@"operatingSystem"];
+        [evt setValue:strongSelf.data.model forKey:@"model"];
+        [evt setValue:strongSelf.data.iOSVersion forKey:@"operatingSystem"];
         [evt setValue:[strongSelf deviceOrientation] forKey:@"orientation"];
         [evt setValue:@((int)(100 * [UIDevice currentDevice].batteryLevel)) forKey:@"batteryLevel"];
-        [evt setValue:@(strongSelf.scale) forKey:@"resolution"];
-        [evt setValue:strongSelf.carrier forKey:@"carrier"];
+        [evt setValue:@(strongSelf.data.scale) forKey:@"resolution"];
+        [evt setValue:strongSelf.data.carrier forKey:@"carrier"];
         
         NSString *cell = [strongSelf currentCellularNetworkConnectionType];
         if (cell) {
@@ -397,7 +404,7 @@ NSString *const MGLEventGestureRotateStart = @"Rotation";
 // Can be called from any thread.
 //
 - (void) flush {
-    if (self.token == nil) return;
+    if ([MGLAccountManager accessToken] == nil) return;
 
     __weak MGLMapboxEvents *weakSelf = self;
 
@@ -435,7 +442,7 @@ NSString *const MGLEventGestureRotateStart = @"Rotation";
         if (!strongSelf) return;
 
         // Setup URL Request
-        NSString *url = [NSString stringWithFormat:@"%@/events/v1?access_token=%@", MGLMapboxEventsAPIBase, strongSelf.token];
+        NSString *url = [NSString stringWithFormat:@"%@/events/v1?access_token=%@", MGLMapboxEventsAPIBase, [MGLAccountManager accessToken]];
         NSMutableURLRequest *request = [[NSMutableURLRequest alloc] initWithURL:[NSURL URLWithString:url]];
         [request setValue:strongSelf.userAgent forHTTPHeaderField:@"User-Agent"];
         [request setValue:@"application/json" forHTTPHeaderField:@"Content-Type"];
@@ -483,10 +490,7 @@ NSString *const MGLEventGestureRotateStart = @"Rotation";
 // Can be called from any thread.
 //
 - (NSString *) userAgent {
-    if (self.appName != nil && self.appVersion != nil && self.appBuildNumber != nil && ([_userAgent rangeOfString:self.appName].location == NSNotFound)) {
-        _userAgent = [NSString stringWithFormat:@"%@/%@/%@ %@", self.appName, self.appVersion, self.appBuildNumber, _userAgent];
-    }
-    return _userAgent;
+    return [NSString stringWithFormat:@"%@/%@/%@ %@", self.appName, self.appVersion, self.appBuildNumber, MGLMapboxEventsUserAgent];
 }
 
 // Can be called from any thread.
@@ -588,22 +592,6 @@ NSString *const MGLEventGestureRotateStart = @"Rotation";
     }
 
     return result;
-}
-
-// Can be called from any thread.
-//
-- (NSString *)sysInfoByName:(char *)typeSpecifier
-{
-    size_t size;
-    sysctlbyname(typeSpecifier, NULL, &size, NULL, 0);
-    
-    char *answer = malloc(size);
-    sysctlbyname(typeSpecifier, answer, &size, NULL, 0);
-    
-    NSString *results = [NSString stringWithCString:answer encoding: NSUTF8StringEncoding];
-    
-    free(answer);
-    return results;
 }
 
 // Can be called from any thread.

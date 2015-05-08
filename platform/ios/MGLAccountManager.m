@@ -1,8 +1,8 @@
 #import <Foundation/Foundation.h>
 
 #import "MGLAccountManager.h"
+#import "MGLMapboxEvents_Private.h"
 #import "NSProcessInfo+MGLAdditions.h"
-#import "MGLMapboxEvents.h"
 
 @interface MGLAccountManager()
 
@@ -17,7 +17,7 @@ static MGLAccountManager *_sharedManager;
 
 // Can be called from any thread.
 //
-+ (instancetype) sharedInstance {
++ (instancetype) sharedManager {
     static dispatch_once_t onceToken;
     dispatch_once(&onceToken, ^{
         if ( ! NSProcessInfo.processInfo.mgl_isInterfaceBuilderDesignablesAgent) {
@@ -38,15 +38,15 @@ static MGLAccountManager *_sharedManager;
 }
 
 + (void) setAccessToken:(NSString *) accessToken {
-    [[MGLAccountManager sharedInstance] setAccessToken:accessToken];
+    [[MGLAccountManager sharedManager] setAccessToken:accessToken];
 
     // Update MGLMapboxEvents
     // NOTE: This is (likely) the initial setup of MGLMapboxEvents
-    [MGLMapboxEvents setToken:accessToken];
+    [MGLMapboxEvents sharedManager];
 }
 
 + (NSString *) accessToken {
-    return [MGLAccountManager sharedInstance].accessToken;
+    return [MGLAccountManager sharedManager].accessToken;
 }
 
 
