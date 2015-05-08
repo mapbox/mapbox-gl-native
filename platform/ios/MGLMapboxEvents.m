@@ -225,6 +225,7 @@ NSString *const MGLEventGestureRotateStart = @"Rotation";
     static MGLMapboxEvents *_sharedManager;
     dispatch_once(&onceToken, ^{
         if ( ! NSProcessInfo.processInfo.mgl_isInterfaceBuilderDesignablesAgent &&
+            [[NSUserDefaults standardUserDefaults] boolForKey:@"MGLMapboxMetricsEnabled"] &&
             [[NSUserDefaults standardUserDefaults] integerForKey:@"MGLMapboxAccountType"] == 0) {
             void (^setupBlock)() = ^{
                 _sharedManager = [[self alloc] init];
@@ -330,12 +331,6 @@ NSString *const MGLEventGestureRotateStart = @"Rotation";
         MGLMapboxEvents *strongSelf = weakSelf;
         if ( ! strongSelf) return;
         
-        // User has opted out
-        if (![[NSUserDefaults standardUserDefaults] boolForKey:@"MGLMapboxMetricsEnabled"]) {
-            [_eventQueue removeAllObjects];
-            return;
-        }
-
         // Metrics Collection Has Been Paused
         if (_paused) {
             return;
