@@ -109,15 +109,9 @@ NSString *const MGLEventGestureRotateStart = @"Rotation";
 
 @implementation MGLMapboxEvents
 
-// Must be called from the main thread. Only called internally.
-//
-- (instancetype) init {
-    MGLAssertIsMainThread();
-
-    self = [super init];
-    if (self) {
-        
-        // Put Settings bundle into memory
++ (void)initialize {
+    if (self == [MGLMapboxEvents class]) {
+        // Register defaults from DefaultValue entries in Settings.bundle plist.
         NSString *appSettingsBundle = [[NSBundle mainBundle] pathForResource:@"Settings" ofType:@"bundle"];
         if(!appSettingsBundle) {
             NSLog(@"Could not find Settings.bundle");
@@ -136,6 +130,16 @@ NSString *const MGLEventGestureRotateStart = @"Rotation";
             
             [[NSUserDefaults standardUserDefaults] registerDefaults:defaultsToRegister];
         }
+    }
+}
+
+// Must be called from the main thread. Only called internally.
+//
+- (instancetype) init {
+    MGLAssertIsMainThread();
+
+    self = [super init];
+    if (self) {
         _appBundleId = [[NSBundle mainBundle] bundleIdentifier];
         NSString *uniqueID = [[NSProcessInfo processInfo] globallyUniqueString];
         _serialQueue = dispatch_queue_create([[NSString stringWithFormat:@"%@.%@.events.serial", _appBundleId, uniqueID] UTF8String], DISPATCH_QUEUE_SERIAL);
