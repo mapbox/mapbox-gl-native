@@ -382,10 +382,10 @@ NSString *const MGLEventGestureRotateStart = @"Rotation";
         // Has Flush Limit Been Reached?
         if (_eventQueue.count >= strongSelf.flushAt) {
             [strongSelf flush];
+        } else if (_eventQueue.count ==  1) {
+            // If this is first new event on queue start timer,
+            [strongSelf startTimer];
         }
-        
-        // Reset Timer (Initial Starting of Timer after first event is pushed)
-        [strongSelf startTimer];
     });
 }
 
@@ -425,6 +425,12 @@ NSString *const MGLEventGestureRotateStart = @"Rotation";
 
         // Send Array of Events to Server
         [strongSelf postEvents:events];
+
+        // Cancel Any Timer That May Running
+        if (strongSelf.timer) {
+            [strongSelf.timer invalidate];
+            strongSelf.timer = nil;
+        }
     });
 }
 
