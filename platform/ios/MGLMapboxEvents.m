@@ -221,7 +221,7 @@ NSString *const MGLEventGestureRotateStart = @"Rotation";
     static MGLMapboxEvents *_sharedManager;
     dispatch_once(&onceToken, ^{
         if ( ! NSProcessInfo.processInfo.mgl_isInterfaceBuilderDesignablesAgent &&
-            [[NSUserDefaults standardUserDefaults] objectForKey:@"mapbox_metrics_disabled"] == nil) {
+            [[NSUserDefaults standardUserDefaults] integerForKey:@"MGLMapboxAccountType"] == 0) {
             void (^setupBlock)() = ^{
                 _sharedManager = [[self alloc] init];
             };
@@ -326,8 +326,8 @@ NSString *const MGLEventGestureRotateStart = @"Rotation";
         MGLMapboxEvents *strongSelf = weakSelf;
         if ( ! strongSelf) return;
         
-        // Opt Out Checking When Built
-        if (![[NSUserDefaults standardUserDefaults] boolForKey:@"mapbox_metrics_enabled_preference"]) {
+        // User has opted out
+        if (![[NSUserDefaults standardUserDefaults] boolForKey:@"MGLMapboxMetricsEnabled"]) {
             [_eventQueue removeAllObjects];
             return;
         }
