@@ -843,6 +843,11 @@ std::chrono::steady_clock::duration secondsAsDuration(float duration)
     else if (pinch.state == UIGestureRecognizerStateEnded || pinch.state == UIGestureRecognizerStateCancelled)
     {
         CGFloat velocity = pinch.velocity;
+        if (isnan(velocity))
+        {
+            // UIPinchGestureRecognizer sometimes returns NaN for the velocity
+            velocity = 0;
+        }
         if (velocity > -0.5 && velocity < 3)
         {
             velocity = 0;
