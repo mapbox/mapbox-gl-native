@@ -408,21 +408,11 @@ NSString *const MGLEventGestureRotateStart = @"Rotation";
         
         __block NSArray *events;
 
-        NSUInteger upper = [_eventQueue count];
-//        if (strongSelf.flushAt > [_eventQueue count]) {
-//            if ([_eventQueue count] == 0) {
-//                return;
-//            }
-//            upper = [_eventQueue count];
-//        }
-        NSLog(@"upper = %d", upper);
-
-        // Create Array of Events to push to the Server
-        NSRange theRange = NSMakeRange(0, upper);
-        events = [_eventQueue subarrayWithRange:theRange];
+        // Make an immutable copy
+        events = [_eventQueue copy];
     
         // Update Queue to remove events sent to server
-        [_eventQueue removeObjectsInRange:theRange];
+        [_eventQueue removeAllObjects];
 
         // Send Array of Events to Server
         [strongSelf postEvents:events];
