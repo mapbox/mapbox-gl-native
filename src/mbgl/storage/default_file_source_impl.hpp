@@ -19,8 +19,14 @@ struct DefaultFileRequest {
     std::set<Request*> observers;
     RequestBase* request = nullptr;
 
-    DefaultFileRequest(const Resource& resource_)
+    inline DefaultFileRequest(const Resource& resource_)
         : resource(resource_) {}
+
+    // Make it movable-only
+    DefaultFileRequest(const DefaultFileRequest&) = delete;
+    inline DefaultFileRequest(DefaultFileRequest&&) = default;
+    DefaultFileRequest& operator=(const DefaultFileRequest&) = delete;
+    inline DefaultFileRequest& operator=(DefaultFileRequest&&) = default;
 };
 
 class DefaultFileSource::Impl {
