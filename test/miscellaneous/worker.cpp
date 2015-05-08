@@ -68,3 +68,30 @@ TEST(Worker, WorkRequestJoinCancelsAfter) {
     uv_run(uv_default_loop(), UV_RUN_DEFAULT);
     EXPECT_FALSE(didAfter);
 }
+
+TEST(Worker, WorkRequestCancelsImmediately) {
+    RunLoop loop(uv_default_loop());
+
+    Worker worker(1);
+
+    loop.invoke([&] {
+        std::promise<void> started;
+        // First worker item.
+        WorkRequest request1 = worker.send([&] {
+            usleep(10000);
+            started.set_value();
+        }, [&] {});
+
+        WorkRequest request2 = worker.send([&] {
+            ADD_FAILURE() << "Second work item should not be invoked";
+        }, [&] {});
+        request2.join();
+
+        started.get_future().get();
+        request1.join();
+
+        loop.stop();
+    });
+
+    uv_run(uv_default_loop(), UV_RUN_DEFAULT);
+}
