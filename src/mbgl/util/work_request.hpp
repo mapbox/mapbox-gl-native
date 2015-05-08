@@ -3,29 +3,20 @@
 
 #include <mbgl/util/noncopyable.hpp>
 
-#include <future>
+#include <memory>
 
 namespace mbgl {
 
+class WorkTask;
+
 class WorkRequest : public util::noncopyable {
 public:
-    using Future = std::future<void>;
-    using JoinedFlag = std::shared_ptr<std::atomic<bool>>;
-
-    WorkRequest();
-    WorkRequest(Future&&, JoinedFlag);
-    WorkRequest(WorkRequest&&);
+    using Task = std::shared_ptr<WorkTask>;
+    WorkRequest(Task);
     ~WorkRequest();
 
-    WorkRequest& operator=(WorkRequest&&);
-    operator bool() const;
-
-    // Wait for the worker task to complete.
-    void join();
-
 private:
-    Future complete;
-    JoinedFlag joinedFlag;
+    std::shared_ptr<WorkTask> task;
 };
 
 }

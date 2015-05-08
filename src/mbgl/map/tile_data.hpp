@@ -7,7 +7,6 @@
 
 #include <mbgl/util/noncopyable.hpp>
 #include <mbgl/util/ptr.hpp>
-#include <mbgl/util/work_request.hpp>
 
 #include <atomic>
 #include <string>
@@ -21,6 +20,7 @@ class SourceInfo;
 class StyleLayer;
 class Request;
 class Worker;
+class WorkRequest;
 
 class TileData : private util::noncopyable {
 public:
@@ -79,7 +79,7 @@ protected:
     Request *req = nullptr;
     std::string data;
 
-    WorkRequest workRequest;
+    std::unique_ptr<WorkRequest> workRequest;
 
     // Contains the tile ID string for painting debug information.
     DebugFontBuffer debugFontBuffer;
