@@ -409,8 +409,8 @@ NSString *const MGLEventGestureRotateStart = @"Rotation";
         __block NSArray *events;
 
         // Make an immutable copy
-        events = [_eventQueue copy];
-    
+        events = [NSArray arrayWithArray:_eventQueue];
+
         // Update Queue to remove events sent to server
         [_eventQueue removeAllObjects];
 
