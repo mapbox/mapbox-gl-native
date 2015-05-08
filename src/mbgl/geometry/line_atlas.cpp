@@ -14,7 +14,7 @@ using namespace mbgl;
 LineAtlas::LineAtlas(uint16_t w, uint16_t h)
     : width(w),
       height(h),
-      data(new char[w * h]),
+      data(new uint8_t[w * h]),
       dirty(true) {
 }
 
