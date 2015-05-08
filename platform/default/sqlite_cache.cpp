@@ -126,12 +126,23 @@ void SQLiteCache::Impl::createSchema() {
     }
 }
 
-void SQLiteCache::get(const Resource &resource, Callback callback) {
+CacheRequest SQLiteCache::get(const Resource &resource, Callback callback) {
     // Can be called from any thread, but most likely from the file source thread.
     // Will try to load the URL from the SQLite database and call the callback when done.
     // Note that the callback is probably going to invoked from another thread, so the caller
     // must make sure that it can run in that thread.
-    thread->invokeWithResult(&Impl::get, std::move(callback), resource);
+    std::shared_ptr<bool> cancelled = std::make_shared<bool>();
+    *cancelled = false;
+
+    std::function<void (std::unique_ptr<Response>)> wrapped = [cancelled, callback] (std::unique_ptr<Response> response) {
+        if (!*cancelled) {
+            callback(std::move(response));
+        }
+    };
+
+    thread->invokeWithResult(&Impl::get, std::move(wrapped), resource);
+
+    return CacheRequest(cancelled);
 }
 
 std::unique_ptr<Response> SQLiteCache::Impl::get(const Resource &resource) {

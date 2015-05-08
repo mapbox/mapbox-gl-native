@@ -71,7 +71,7 @@ DefaultFileSource::Impl::Impl(uv_loop_t* loop_, FileCache* cache_, const std::st
 DefaultFileRequest* DefaultFileSource::Impl::find(const Resource& resource) {
     const auto it = pending.find(resource);
     if (it != pending.end()) {
-        return &it->second;
+        return it->second.get();
     }
     return nullptr;
 }
@@ -85,28 +85,21 @@ void DefaultFileSource::Impl::add(Request* req) {
         return;
     }
 
-    request = &pending.emplace(resource, DefaultFileRequest(resource)).first->second;
+    request = pending.emplace(resource, util::make_unique<DefaultFileRequest>(resource))
+                  .first->second.get();
     request->observers.insert(req);
 
     if (cache) {
-        startCacheRequest(resource);
+        startCacheRequest(request);
     } else {
-        startRealRequest(resource);
+        startRealRequest(request);
     }
 }
 
-void DefaultFileSource::Impl::startCacheRequest(const Resource& resource) {
+void DefaultFileSource::Impl::startCacheRequest(DefaultFileRequest* request) {
     // Check the cache for existing data so that we can potentially
     // revalidate the information without having to redownload everything.
-    cache->get(resource, [this, resource](std::unique_ptr<Response> response) {
-        DefaultFileRequest* request = find(resource);
-
-        if (!request) {
-            // There is no request for this URL anymore. Likely, the request was canceled
-            // before we got around to process the cache result.
-            return;
-        }
-
+    request->cacheRequest = cache->get(request->resource, [this, request](std::unique_ptr<Response> response) {
         auto expired = [&response] {
             const int64_t now = std::chrono::duration_cast<std::chrono::seconds>(
                                     SystemClock::now().time_since_epoch()).count();
@@ -115,7 +108,7 @@ void DefaultFileSource::Impl::startCacheRequest(const Resource& resource) {
 
         if (!response || expired()) {
             // No response or stale cache. Run the real request.
-            startRealRequest(resource, std::move(response));
+            startRealRequest(request, std::move(response));
         } else {
             // The response is fresh. We're good to notify the caller.
             notify(request, std::move(response), FileCache::Hint::No);
@@ -123,17 +116,15 @@ void DefaultFileSource::Impl::startCacheRequest(const Resource& resource) {
     });
 }
 
-void DefaultFileSource::Impl::startRealRequest(const Resource& resource, std::shared_ptr<const Response> response) {
-    DefaultFileRequest* request = find(resource);
-
+void DefaultFileSource::Impl::startRealRequest(DefaultFileRequest* request, std::shared_ptr<const Response> response) {
     auto callback = [request, this] (std::shared_ptr<const Response> res, FileCache::Hint hint) {
         notify(request, res, hint);
     };
 
-    if (algo::starts_with(resource.url, "asset://")) {
-        request->request = assetContext->createRequest(resource, callback, loop, assetRoot);
+    if (algo::starts_with(request->resource.url, "asset://")) {
+        request->realRequest = assetContext->createRequest(request->resource, callback, loop, assetRoot);
     } else {
-        request->request = httpContext->createRequest(resource, callback, loop, response);
+        request->realRequest = httpContext->createRequest(request->resource, callback, loop, response);
     }
 }
 
@@ -145,8 +136,11 @@ void DefaultFileSource::Impl::cancel(Request* req) {
         // cancel the request and remove it from the pending list.
         request->observers.erase(req);
         if (request->observers.empty()) {
-            if (request->request) {
-                request->request->cancel();
+            if (request->cacheRequest) {
+                request->cacheRequest.cancel();
+            }
+            if (request->realRequest) {
+                request->realRequest->cancel();
             }
             pending.erase(request->resource);
         }
