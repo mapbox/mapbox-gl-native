@@ -163,7 +163,7 @@ NSString *const MGLEventGestureRotateStart = @"Rotation";
         // Events Control
         _eventQueue = [[NSMutableArray alloc] init];
         _flushAt = 20;
-        _flushAfter = 15;
+        _flushAfter = 60;
         _token = nil;
         _instanceID = [[NSUUID UUID] UUIDString];
 
@@ -384,10 +384,7 @@ NSString *const MGLEventGestureRotateStart = @"Rotation";
             [strongSelf flush];
         } else if (_eventQueue.count ==  1) {
             // If this is first new event on queue start timer,
-            NSLog(@"event queue is 1, start timer.");
             [strongSelf startTimer];
-        } else {
-            NSLog(@"event queue is != 1, don't adjust timer.");
         }
     });
 }
@@ -395,7 +392,6 @@ NSString *const MGLEventGestureRotateStart = @"Rotation";
 // Can be called from any thread.
 //
 + (void) flush {
-    NSLog(@"+flush called (likely timer)");
     [[MGLMapboxEvents sharedManager] flush];
 }
 
@@ -432,7 +428,6 @@ NSString *const MGLEventGestureRotateStart = @"Rotation";
 
         // Cancel Any Timer That May Running
         if (strongSelf.timer) {
-            NSLog(@"timer still exists after flush, need to clean it up.");
             [strongSelf.timer invalidate];
             strongSelf.timer = nil;
         }
