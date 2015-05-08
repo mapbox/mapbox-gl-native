@@ -59,7 +59,11 @@ FilterExpression parseSetFilter(const rapidjson::Value& value) {
     Expression expression;
     expression.key = { value[1u].GetString(), value[1u].GetStringLength() };
     for (rapidjson::SizeType i = 2; i < value.Size(); ++i) {
-        expression.values.push_back(parseValue(value[i]));
+        Value parsedValue = parseValue(value[i]);
+        if (expression.key == "$type") {
+            parsedValue = parseFeatureType(parsedValue);
+        }
+        expression.values.push_back(parsedValue);
     }
     return expression;
 }
