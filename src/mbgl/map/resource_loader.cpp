@@ -25,10 +25,6 @@ ResourceLoader::~ResourceLoader() {
     if (sprite_) {
         sprite_->setObserver(nullptr);
     }
-
-    if (glyphStore_) {
-        glyphStore_->setObserver(nullptr);
-    }
 }
 
 void ResourceLoader::setObserver(Observer* observer) {
@@ -49,18 +45,6 @@ void ResourceLoader::setStyle(Style* style) {
     }
 }
 
-void ResourceLoader::setGlyphStore(GlyphStore* glyphStore) {
-    assert(glyphStore);
-
-    if (glyphStore_) {
-        glyphStore_->setObserver(nullptr);
-    }
-
-    glyphStore_ = glyphStore;
-    glyphStore_->setObserver(this);
-}
-
-
 void ResourceLoader::setAccessToken(const std::string& accessToken) {
     accessToken_ = accessToken;
 }
@@ -68,6 +52,7 @@ void ResourceLoader::setAccessToken(const std::string& accessToken) {
 void ResourceLoader::update(MapData& data,
                             const TransformState& transform,
                             GlyphAtlas& glyphAtlas,
+                            GlyphStore& glyphStore,
                             SpriteAtlas& spriteAtlas,
                             TexturePool& texturePool) {
     if (!style_) {
@@ -84,16 +69,12 @@ void ResourceLoader::update(MapData& data,
     }
 
     for (const auto& source : style_->sources) {
-        source->update(data, transform, *style_, glyphAtlas, *glyphStore_,
-                       spriteAtlas, sprite_, texturePool, hasNewResources_);
+        source->update(
+            data, transform, *style_, glyphAtlas, glyphStore, spriteAtlas, sprite_, texturePool);
     }
-
-    hasNewResources_ = false;
 }
 
 void ResourceLoader::onGlyphRangeLoaded() {
-    hasNewResources_ = true;
-
     emitTileDataChanged();
 }
 
@@ -106,8 +87,6 @@ void ResourceLoader::onTileLoaded() {
 }
 
 void ResourceLoader::onSpriteLoaded() {
-    hasNewResources_ = true;
-
     emitTileDataChanged();
 }
 

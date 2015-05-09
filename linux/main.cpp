@@ -1,5 +1,4 @@
 #include <mbgl/mbgl.hpp>
-#include "../platform/default/default_styles.hpp"
 #include <mbgl/util/std.hpp>
 #include <mbgl/util/uv.hpp>
 #include <mbgl/platform/log.hpp>
@@ -14,16 +13,14 @@
 #include <fstream>
 #include <sstream>
 
-namespace {
 
 std::unique_ptr<GLFWView> view;
-
-}
 
 void quit_handler(int) {
     if (view) {
         mbgl::Log::Info(mbgl::Event::Setup, "waiting for quit...");
-        view->setShouldClose();
+        glfwSetWindowShouldClose(view->window, true);
+        glfwPostEmptyEvent();
     } else {
         exit(0);
     }
@@ -78,20 +75,6 @@ int main(int argc, char *argv[]) {
     map.setBearing(settings.bearing);
     map.setDebug(settings.debug);
 
-    view->setChangeStyleCallback([&map] () {
-        static uint8_t currentStyleIndex;
-
-        if (++currentStyleIndex == mbgl::util::defaultStyles.size()) {
-            currentStyleIndex = 0;
-        }
-
-        const auto& newStyle = mbgl::util::defaultStyles[currentStyleIndex];
-        map.setStyleURL(newStyle.first);
-        view->setWindowTitle(newStyle.second);
-
-        mbgl::Log::Info(mbgl::Event::Setup, std::string("Changed style to: ") + newStyle.first);
-    });
-
     // Set access token if present
     const char *token = getenv("MAPBOX_ACCESS_TOKEN");
     if (token == nullptr) {
@@ -102,9 +85,7 @@ int main(int argc, char *argv[]) {
 
     // Load style
     if (style.empty()) {
-        const auto& newStyle = mbgl::util::defaultStyles.front();
-        style = newStyle.first;
-        view->setWindowTitle(newStyle.second);
+        style = std::string("asset://") + std::string("styles/bright-v7.json");
     }
 
     map.setStyleURL(style);

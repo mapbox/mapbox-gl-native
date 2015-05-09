@@ -179,10 +179,6 @@ void GLFWView::onKey(GLFWwindow *window, int key, int /*scancode*/, int action, 
             if (!mods)
                 view->map->resetPosition();
             break;
-        case GLFW_KEY_S:
-            if (view->changeStyleCallback)
-                view->changeStyleCallback();
-            break;
         case GLFW_KEY_R:
             if (!mods) {
                 view->map->setDefaultTransitionDuration(std::chrono::milliseconds(300));
@@ -308,19 +304,6 @@ void GLFWView::fps() {
         timeElapsed = currentTime;
         frames = 0;
     }
-}
-
-void GLFWView::setChangeStyleCallback(std::function<void()> callback) {
-    changeStyleCallback = callback;
-}
-
-void GLFWView::setShouldClose() {
-    glfwSetWindowShouldClose(window, true);
-    glfwPostEmptyEvent();
-}
-
-void GLFWView::setWindowTitle(const std::string& title) {
-    glfwSetWindowTitle(window, (std::string { "Mapbox GL: " } + title).c_str());
 }
 
 namespace mbgl {

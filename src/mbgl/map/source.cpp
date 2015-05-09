@@ -385,8 +385,7 @@ void Source::update(MapData& data,
                     GlyphStore& glyphStore,
                     SpriteAtlas& spriteAtlas,
                     util::ptr<Sprite> sprite,
-                    TexturePool& texturePool,
-                    bool hasNewResources) {
+                    TexturePool& texturePool) {
     if (!loaded || data.getAnimationTime() <= updated) {
         return;
     }
@@ -409,8 +408,7 @@ void Source::update(MapData& data,
 
         switch (state) {
         case TileData::State::partial:
-            if (hasNewResources)
-                handlePartialTile(id, style.workers);
+            handlePartialTile(id, style.workers);
             break;
         case TileData::State::invalid:
             state = addTile(data, transformState, style, glyphAtlas, glyphStore,
