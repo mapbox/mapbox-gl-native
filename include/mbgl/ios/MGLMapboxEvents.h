@@ -54,4 +54,7 @@ extern NSString *const MGLEventGestureRotateStart;
 //
 + (void) flush;
 
+// Main thread only
++ (void)validate;
+
 @end

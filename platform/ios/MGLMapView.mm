@@ -707,6 +707,8 @@ std::chrono::steady_clock::duration secondsAsDuration(float duration)
     if (self.isDormant)
     {
         self.dormant = NO;
+        
+        [MGLMapboxEvents validate];
 
         self.glSnapshotView.hidden = YES;
 

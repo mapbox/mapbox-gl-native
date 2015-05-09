@@ -260,12 +260,7 @@ const NSTimeInterval MGLFlushInterval = 60;
                                                                               usingBlock:
          ^(NSNotification *notification) {
              MGLMapboxEvents *strongSelf = weakSelf;
-             BOOL enabledInSettings = [[strongSelf class] isEnabled];
-             if (strongSelf.paused && enabledInSettings) {
-                 [strongSelf resumeMetricsCollection];
-             } else if (!strongSelf.paused && !enabledInSettings) {
-                 [strongSelf pauseMetricsCollection];
-             }
+             [strongSelf validate];
          }];
     }
     return self;
@@ -302,6 +297,38 @@ const NSTimeInterval MGLFlushInterval = 60;
     [self pauseMetricsCollection];
 }
 
++ (void)validate {
+    [[MGLMapboxEvents sharedManager] validate];
+}
+
+- (void)validate {
+    MGLAssertIsMainThread();
+    BOOL enabledInSettings = [[self class] isEnabled];
+    if (self.paused && enabledInSettings) {
+        [self resumeMetricsCollection];
+    } else if (!self.paused && !enabledInSettings) {
+        [self pauseMetricsCollection];
+    }
+    
+    [self validateUpdatingLocation];
+}
+
+- (void)validateUpdatingLocation {
+    MGLAssertIsMainThread();
+    if (self.paused) {
+        [self stopUpdatingLocation];
+    } else {
+        CLAuthorizationStatus authStatus = [CLLocationManager authorizationStatus];
+        if (authStatus == kCLAuthorizationStatusDenied ||
+            authStatus == kCLAuthorizationStatusRestricted) {
+            [self stopUpdatingLocation];
+        } else if (authStatus == kCLAuthorizationStatusAuthorized ||
+                   authStatus == kCLAuthorizationStatusAuthorizedWhenInUse) {
+            [self startUpdatingLocation];
+        }
+    }
+}
+
 + (void)pauseMetricsCollection {
     [[MGLMapboxEvents sharedManager] pauseMetricsCollection];
 }
@@ -321,7 +348,7 @@ const NSTimeInterval MGLFlushInterval = 60;
     [_session invalidateAndCancel];
     _session = nil;
     
-    [self stopUpdatingLocation];
+    [self validateUpdatingLocation];
 }
 
 - (void)stopUpdatingLocation {
@@ -343,17 +370,23 @@ const NSTimeInterval MGLFlushInterval = 60;
 //
 - (void)resumeMetricsCollection {
     MGLAssertIsMainThread();
-    if (!self.isPaused || ![[self class] isEnabled]) {
+    if (!self.paused || ![[self class] isEnabled]) {
         return;
     }
     self.paused = NO;
     _data = [[MGLMapboxEventsData alloc] init];
     _session = [NSURLSession sessionWithConfiguration:[NSURLSessionConfiguration defaultSessionConfiguration] delegate:self delegateQueue:nil];
     
-    [self startUpdatingLocation];
+    [self validateUpdatingLocation];
 }
 
 - (void)startUpdatingLocation {
+    MGLAssertIsMainThread();
+    if (_locationManager || _paused) {
+        NSAssert(!(_locationManager && _paused),
+                 @"MGLMapboxEvents should not have a CLLocationManager while paused.");
+        return;
+    }
     _locationManager = [[CLLocationManager alloc] init];
     _locationManager.desiredAccuracy = kCLLocationAccuracyKilometer;
     _locationManager.distanceFilter = 10;
@@ -742,17 +775,7 @@ const NSTimeInterval MGLFlushInterval = 60;
 }
 
 - (void)locationManager:(CLLocationManager *)manager didChangeAuthorizationStatus:(CLAuthorizationStatus)status {
-    switch (status) {
-        case kCLAuthorizationStatusDenied:
-            [self stopUpdatingLocation];
-            break;
-        case kCLAuthorizationStatusAuthorized:
-        case kCLAuthorizationStatusAuthorizedWhenInUse:
-            [self startUpdatingLocation];
-            break;
-        default:
-            break;
-    }
+    [self validateUpdatingLocation];
 }
 
 #pragma mark NSURLSessionDelegate
