@@ -34,8 +34,6 @@
         '../platform/ios/MGLUserLocation.m',
         '../platform/ios/MGLUserLocationAnnotationView.h',
         '../platform/ios/MGLUserLocationAnnotationView.m',
-        '../include/mbgl/ios/MGLMetricsLocationManager.h',
-        '../platform/ios/MGLMetricsLocationManager.m',
         '../include/mbgl/ios/MGLTypes.h',
         '../platform/ios/NSBundle+MGLAdditions.h',
         '../platform/ios/NSBundle+MGLAdditions.m',

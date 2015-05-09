@@ -4,9 +4,9 @@
 #import <SystemConfiguration/CaptiveNetwork.h>
 #import <CoreTelephony/CTTelephonyNetworkInfo.h>
 #import <CoreTelephony/CTCarrier.h>
+#import <CoreLocation/CoreLocation.h>
 
 #import "MGLAccountManager.h"
-#import "MGLMetricsLocationManager.h"
 #import "NSProcessInfo+MGLAdditions.h"
 #import "NSBundle+MGLAdditions.h"
 #import "NSException+MGLAdditions.h"
@@ -130,7 +130,7 @@ NSString *const MGLEventGestureRotateStart = @"Rotation";
 // strong references.
 //
 
-@interface MGLMapboxEvents()
+@interface MGLMapboxEvents () <CLLocationManagerDelegate>
 
 // All of the following properties are written to only from
 // the main thread, but can be read on any thread.
@@ -140,12 +140,14 @@ NSString *const MGLEventGestureRotateStart = @"Rotation";
 @property (atomic) NSString *appName;
 @property (atomic) NSString *appVersion;
 @property (atomic) NSString *appBuildNumber;
-@property (atomic) MGLMetricsLocationManager *locationManager;
 @property (atomic) NSUInteger flushAt;
 @property (atomic) NSDateFormatter *rfc3339DateFormatter;
 @property (atomic) NSURLSession *session;
 @property (atomic) NSData *digicertCert;
 @property (atomic) NSData *geoTrustCert;
+
+// Main thread only
+@property (nonatomic) CLLocationManager *locationManager;
 
 // The paused state tracker is only ever accessed from the main thread.
 //
@@ -299,6 +301,18 @@ NSString *const MGLEventGestureRotateStart = @"Rotation";
     _data = nil;
     [_session invalidateAndCancel];
     _session = nil;
+    
+    [self stopUpdatingLocation];
+}
+
+- (void)stopUpdatingLocation {
+    [_locationManager stopUpdatingLocation];
+    
+    // -[CLLocationManager stopMonitoringVisits] is only available in iOS 8+.
+    if ([_locationManager respondsToSelector:@selector(stopMonitoringVisits)]) {
+        [_locationManager stopMonitoringVisits];
+    }
+    
     _locationManager = nil;
 }
 
@@ -316,7 +330,22 @@ NSString *const MGLEventGestureRotateStart = @"Rotation";
     self.paused = NO;
     _data = [[MGLMapboxEventsData alloc] init];
     _session = [NSURLSession sessionWithConfiguration:[NSURLSessionConfiguration defaultSessionConfiguration] delegate:self delegateQueue:nil];
-    _locationManager = [[MGLMetricsLocationManager alloc] init];
+    
+    [self startUpdatingLocation];
+}
+
+- (void)startUpdatingLocation {
+    _locationManager = [[CLLocationManager alloc] init];
+    _locationManager.desiredAccuracy = kCLLocationAccuracyKilometer;
+    _locationManager.distanceFilter = 10;
+    _locationManager.delegate = self;
+    
+    [_locationManager startUpdatingLocation];
+    
+    // -[CLLocationManager startMonitoringVisits] is only available in iOS 8+.
+    if ([_locationManager respondsToSelector:@selector(startMonitoringVisits)]) {
+        [_locationManager startMonitoringVisits];
+    }
 }
 
 // Can be called from any thread. Can be called rapidly from
@@ -491,12 +520,6 @@ NSString *const MGLEventGestureRotateStart = @"Rotation";
 //
 - (NSString *) userAgent {
     return [NSString stringWithFormat:@"%@/%@/%@ %@", self.appName, self.appVersion, self.appBuildNumber, MGLMapboxEventsUserAgent];
-}
-
-// Can be called from any thread.
-//
-- (NSString *) formatDate:(NSDate *)date {
-    return [self.rfc3339DateFormatter stringFromDate:date];
 }
 
 // Can be called from any thread.
@@ -676,6 +699,46 @@ NSString *const MGLEventGestureRotateStart = @"Rotation";
     }
 
     return result;
+}
+
+#pragma mark CLLocationManagerDelegate
+- (void)locationManager:(CLLocationManager *)manager didUpdateLocations:(NSArray *)locations {
+    //  Iterate through locations to pass all data
+    for (CLLocation *loc in locations) {
+        [MGLMapboxEvents pushEvent:MGLEventTypeLocation withAttributes:@{
+            MGLEventKeyLatitude: @(loc.coordinate.latitude),
+            MGLEventKeyLongitude: @(loc.coordinate.longitude),
+            MGLEventKeySpeed: @(loc.speed),
+            MGLEventKeyCourse: @(loc.course),
+            MGLEventKeyAltitude: @(loc.altitude),
+            MGLEventKeyHorizontalAccuracy: @(loc.horizontalAccuracy),
+            MGLEventKeyVerticalAccuracy: @(loc.verticalAccuracy)
+        }];
+    }
+}
+
+- (void)locationManager:(CLLocationManager *)manager didVisit:(CLVisit *)visit {
+    [MGLMapboxEvents pushEvent:MGLEventTypeVisit withAttributes:@{
+        MGLEventKeyLatitude: @(visit.coordinate.latitude),
+        MGLEventKeyLongitude: @(visit.coordinate.longitude),
+        MGLEventKeyHorizontalAccuracy: @(visit.horizontalAccuracy),
+        MGLEventKeyArrivalDate: [[NSDate distantPast] isEqualToDate:visit.arrivalDate] ? [NSNull null] : [_rfc3339DateFormatter stringFromDate:visit.arrivalDate],
+        MGLEventKeyDepartureDate: [[NSDate distantFuture] isEqualToDate:visit.departureDate] ? [NSNull null] : [_rfc3339DateFormatter stringFromDate:visit.departureDate]
+    }];
+}
+
+- (void)locationManager:(CLLocationManager *)manager didChangeAuthorizationStatus:(CLAuthorizationStatus)status {
+    switch (status) {
+        case kCLAuthorizationStatusDenied:
+            [self stopUpdatingLocation];
+            break;
+        case kCLAuthorizationStatusAuthorized:
+        case kCLAuthorizationStatusAuthorizedWhenInUse:
+            [self startUpdatingLocation];
+            break;
+        default:
+            break;
+    }
 }
 
 #pragma mark NSURLSessionDelegate
