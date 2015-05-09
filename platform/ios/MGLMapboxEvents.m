@@ -310,7 +310,7 @@ NSString *const MGLEventGestureRotateStart = @"Rotation";
 //
 - (void)resumeMetricsCollection {
     MGLAssertIsMainThread();
-    if (!self.isPaused || [[self class] isEnabled]) {
+    if (!self.isPaused || ![[self class] isEnabled]) {
         return;
     }
     self.paused = NO;
