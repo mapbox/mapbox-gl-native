@@ -170,7 +170,9 @@ const NSTimeInterval MGLFlushInterval = 60;
 
 @end
 
-@implementation MGLMapboxEvents
+@implementation MGLMapboxEvents {
+    id _userDefaultsObserver;
+}
 
 + (void)initialize {
     if (self == [MGLMapboxEvents class]) {
@@ -197,8 +199,7 @@ const NSTimeInterval MGLFlushInterval = 60;
 }
 
 + (BOOL)isEnabled {
-    return ( ! NSProcessInfo.processInfo.mgl_isInterfaceBuilderDesignablesAgent &&
-            [[NSUserDefaults standardUserDefaults] boolForKey:@"MGLMapboxMetricsEnabled"] &&
+    return ([[NSUserDefaults standardUserDefaults] boolForKey:@"MGLMapboxMetricsEnabled"] &&
             [[NSUserDefaults standardUserDefaults] integerForKey:@"MGLMapboxAccountType"] == 0);
 }
 
@@ -231,7 +232,6 @@ const NSTimeInterval MGLFlushInterval = 60;
             _geoTrustCert = [NSData dataWithContentsOfFile:cerPath];
         }
 
-        cerPath = nil;
         cerPath = [resourceBundle pathForResource:@"api_mapbox_com-digicert" ofType:@"der"];
         if (cerPath != nil) {
             _digicertCert = [NSData dataWithContentsOfFile:cerPath];
@@ -252,6 +252,21 @@ const NSTimeInterval MGLFlushInterval = 60;
         
         // Enable Battery Monitoring
         [UIDevice currentDevice].batteryMonitoringEnabled = YES;
+        
+        __weak MGLMapboxEvents *weakSelf = self;
+        _userDefaultsObserver = [[NSNotificationCenter defaultCenter] addObserverForName:NSUserDefaultsDidChangeNotification
+                                                                                  object:nil
+                                                                                   queue:[NSOperationQueue mainQueue]
+                                                                              usingBlock:
+         ^(NSNotification *notification) {
+             MGLMapboxEvents *strongSelf = weakSelf;
+             BOOL enabledInSettings = [[strongSelf class] isEnabled];
+             if (strongSelf.paused && enabledInSettings) {
+                 [strongSelf resumeMetricsCollection];
+             } else if (!strongSelf.paused && !enabledInSettings) {
+                 [strongSelf pauseMetricsCollection];
+             }
+         }];
     }
     return self;
 }
@@ -263,6 +278,10 @@ const NSTimeInterval MGLFlushInterval = 60;
     static dispatch_once_t onceToken;
     static MGLMapboxEvents *_sharedManager;
     dispatch_once(&onceToken, ^{
+        if (NSProcessInfo.processInfo.mgl_isInterfaceBuilderDesignablesAgent) {
+            return;
+        }
+        
         void (^setupBlock)() = ^{
             _sharedManager = [[self alloc] init];
         };
@@ -279,6 +298,7 @@ const NSTimeInterval MGLFlushInterval = 60;
 }
 
 - (void)dealloc {
+    [[NSNotificationCenter defaultCenter] removeObserver:_userDefaultsObserver];
     [self pauseMetricsCollection];
 }
 
