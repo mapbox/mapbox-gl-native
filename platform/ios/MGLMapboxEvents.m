@@ -221,7 +221,7 @@ NSString *const MGLEventGestureRotateStart = @"Rotation";
     static MGLMapboxEvents *_sharedManager;
     dispatch_once(&onceToken, ^{
         if ( ! NSProcessInfo.processInfo.mgl_isInterfaceBuilderDesignablesAgent &&
-            [[NSUserDefaults standardUserDefaults] objectForKey:@"mapbox_metrics_disabled"] == nil) {
+            [[NSUserDefaults standardUserDefaults] integerForKey:@"MGLMapboxAccountType"] == 0) {
             void (^setupBlock)() = ^{
                 _sharedManager = [[self alloc] init];
             };
@@ -326,8 +326,8 @@ NSString *const MGLEventGestureRotateStart = @"Rotation";
         MGLMapboxEvents *strongSelf = weakSelf;
         if ( ! strongSelf) return;
         
-        // Opt Out Checking When Built
-        if (![[NSUserDefaults standardUserDefaults] boolForKey:@"mapbox_metrics_enabled_preference"]) {
+        // User has opted out
+        if (![[NSUserDefaults standardUserDefaults] boolForKey:@"MGLMapboxMetricsEnabled"]) {
             [_eventQueue removeAllObjects];
             return;
         }
@@ -382,10 +382,10 @@ NSString *const MGLEventGestureRotateStart = @"Rotation";
         // Has Flush Limit Been Reached?
         if (_eventQueue.count >= strongSelf.flushAt) {
             [strongSelf flush];
+        } else if (_eventQueue.count ==  1) {
+            // If this is first new event on queue start timer,
+            [strongSelf startTimer];
         }
-        
-        // Reset Timer (Initial Starting of Timer after first event is pushed)
-        [strongSelf startTimer];
     });
 }
 
@@ -408,23 +408,20 @@ NSString *const MGLEventGestureRotateStart = @"Rotation";
         
         __block NSArray *events;
 
-        NSUInteger upper = strongSelf.flushAt;
-        if (strongSelf.flushAt > [_eventQueue count]) {
-            if ([_eventQueue count] == 0) {
-                return;
-            }
-            upper = [_eventQueue count];
-        }
-    
-        // Create Array of Events to push to the Server
-        NSRange theRange = NSMakeRange(0, upper);
-        events = [_eventQueue subarrayWithRange:theRange];
-    
+        // Make an immutable copy
+        events = [NSArray arrayWithArray:_eventQueue];
+
         // Update Queue to remove events sent to server
-        [_eventQueue removeObjectsInRange:theRange];
+        [_eventQueue removeAllObjects];
 
         // Send Array of Events to Server
         [strongSelf postEvents:events];
+
+        // Cancel Any Timer That May Running
+        if (strongSelf.timer) {
+            [strongSelf.timer invalidate];
+            strongSelf.timer = nil;
+        }
     });
 }
 

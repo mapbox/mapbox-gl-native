@@ -3,6 +3,7 @@
 
 #include <mbgl/util/mat4.hpp>
 #include <mbgl/util/geo.hpp>
+#include <mbgl/util/constants.hpp>
 #include <mbgl/util/vec.hpp>
 
 #include <cstdint>
@@ -71,9 +72,6 @@ private:
     // map scale factor
     float pixelRatio = 0;
 
-    // cache values for spherical mercator math
-    double Bc, Cc;
-
     // animation state
     bool rotating = false;
     bool scaling = false;
@@ -84,6 +82,10 @@ private:
     double x = 0, y = 0;
     double angle = 0;
     double scale = 1;
+
+    // cache values for spherical mercator math
+    double Bc = (scale * util::tileSize) / 360;
+    double Cc = (scale * util::tileSize) / util::M2PI;
 };
 
 }

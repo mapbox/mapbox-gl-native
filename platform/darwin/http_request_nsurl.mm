@@ -154,7 +154,7 @@ void HTTPRequest::start() {
     @autoreleasepool {
         
         NSMutableString *url = [NSMutableString stringWithString:@(resource.url.c_str())];
-        if ([[NSUserDefaults standardUserDefaults] objectForKey:@"mapbox_metrics_disabled"] == nil) {
+        if ([[NSUserDefaults standardUserDefaults] integerForKey:@"MGLMapboxAccountType"] == 0) {
             if ([url rangeOfString:@"?"].location == NSNotFound) {
                 [url appendString:@"?"];
             } else {

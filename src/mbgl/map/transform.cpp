@@ -23,7 +23,7 @@ static double _normalizeAngle(double angle, double anchorAngle)
     if (std::abs(angle + util::M2PI - anchorAngle) < diff) {
         angle += util::M2PI;
     }
-    
+
     return angle;
 }
 
@@ -61,6 +61,10 @@ bool Transform::resize(const uint16_t w, const uint16_t h, const float ratio,
 #pragma mark - Position
 
 void Transform::moveBy(const double dx, const double dy, const Duration duration) {
+    if (std::isnan(dx) || std::isnan(dy)) {
+        return;
+    }
+
     std::lock_guard<std::recursive_mutex> lock(mtx);
 
     _moveBy(dx, dy, duration);
@@ -104,6 +108,10 @@ void Transform::_moveBy(const double dx, const double dy, const Duration duratio
 }
 
 void Transform::setLatLng(const LatLng latLng, const Duration duration) {
+    if (std::isnan(latLng.latitude) || std::isnan(latLng.longitude)) {
+        return;
+    }
+
     std::lock_guard<std::recursive_mutex> lock(mtx);
 
     const double m = 1 - 1e-15;
@@ -116,6 +124,10 @@ void Transform::setLatLng(const LatLng latLng, const Duration duration) {
 }
 
 void Transform::setLatLngZoom(const LatLng latLng, const double zoom, const Duration duration) {
+    if (std::isnan(latLng.latitude) || std::isnan(latLng.longitude) || std::isnan(zoom)) {
+        return;
+    }
+
     std::lock_guard<std::recursive_mutex> lock(mtx);
 
     double new_scale = std::pow(2.0, zoom);
@@ -137,6 +149,10 @@ void Transform::setLatLngZoom(const LatLng latLng, const double zoom, const Dura
 #pragma mark - Zoom
 
 void Transform::scaleBy(const double ds, const double cx, const double cy, const Duration duration) {
+    if (std::isnan(ds) || std::isnan(cx) || std::isnan(cy)) {
+        return;
+    }
+
     std::lock_guard<std::recursive_mutex> lock(mtx);
 
     // clamp scale to min/max values
@@ -152,12 +168,20 @@ void Transform::scaleBy(const double ds, const double cx, const double cy, const
 
 void Transform::setScale(const double scale, const double cx, const double cy,
                          const Duration duration) {
+    if (std::isnan(scale) || std::isnan(cx) || std::isnan(cy)) {
+        return;
+    }
+
     std::lock_guard<std::recursive_mutex> lock(mtx);
 
     _setScale(scale, cx, cy, duration);
 }
 
 void Transform::setZoom(const double zoom, const Duration duration) {
+    if (std::isnan(zoom)) {
+        return;
+    }
+
     std::lock_guard<std::recursive_mutex> lock(mtx);
 
     _setScale(std::pow(2.0, zoom), -1, -1, duration);
@@ -287,6 +311,10 @@ void Transform::constrain(double& scale, double& y) const {
 
 void Transform::rotateBy(const double start_x, const double start_y, const double end_x,
                          const double end_y, const Duration duration) {
+    if (std::isnan(start_x) || std::isnan(start_y) || std::isnan(end_x) || std::isnan(end_y)) {
+        return;
+    }
+
     std::lock_guard<std::recursive_mutex> lock(mtx);
 
     double center_x = static_cast<double>(current.width) / 2.0, center_y = static_cast<double>(current.height) / 2.0;
@@ -317,12 +345,20 @@ void Transform::rotateBy(const double start_x, const double start_y, const doubl
 }
 
 void Transform::setAngle(const double new_angle, const Duration duration) {
+    if (std::isnan(new_angle)) {
+        return;
+    }
+
     std::lock_guard<std::recursive_mutex> lock(mtx);
 
     _setAngle(new_angle, duration);
 }
 
 void Transform::setAngle(const double new_angle, const double cx, const double cy) {
+    if (std::isnan(new_angle) || std::isnan(cx) || std::isnan(cy)) {
+        return;
+    }
+
     std::lock_guard<std::recursive_mutex> lock(mtx);
 
     double dx = 0, dy = 0;
