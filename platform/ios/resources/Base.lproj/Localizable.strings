@@ -7,6 +7,9 @@
 /* No comment provided by engineer. */
 "CANCEL" = "Cancel";
 
+/* Accessibility hint */
+"COMPASS_A11Y_HINT" = "Rotates the map to face due north";
+
 /* Accessibility label */
 "COMPASS_A11Y_LABEL" = "Compass";
 
@@ -25,8 +28,11 @@
 /* Setup documentation URL display string; keep as short as possible */
 "FIRST_STEPS_URL" = "mapbox.com/help/first-steps-ios-sdk";
 
+/* Accessibility hint */
+"INFO_A11Y_HINT" = "Access credits, a feedback form, and more";
+
 /* Accessibility label */
-"INFO_A11Y_LABEL" = "Attribution info";
+"INFO_A11Y_LABEL" = "About this map";
 
 /* Accessibility label */
 "LOGO_A11Y_LABEL" = "Mapbox logo";
@@ -66,9 +72,6 @@
 
 /* Telemetry prompt title */
 "TELEMETRY_TITLE" = "Make Mapbox Maps Better";
-
-/* Accessibility label */
-"USER_DOT_A11Y_LABEL" = "User location";
 
 /* Default user location annotation title */
 "USER_DOT_TITLE" = "You Are Here";

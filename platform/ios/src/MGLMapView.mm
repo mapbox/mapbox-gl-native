@@ -218,7 +218,7 @@ public:
     BOOL _delegateHasFillColorsForShapeAnnotations;
     BOOL _delegateHasLineWidthsForShapeAnnotations;
     
-    MGLCoordinateFormatter *_accessibilityCoordinateFormatter;
+    MGLCompassDirectionFormatter *_accessibilityCompassFormatter;
 }
 
 #pragma mark - Setup & Teardown -
@@ -307,11 +307,11 @@ mbgl::Duration MGLDurationInSeconds(NSTimeInterval duration)
 
     // setup accessibility
     //
-    self.isAccessibilityElement = YES;
+//    self.isAccessibilityElement = YES;
     self.accessibilityLabel = NSLocalizedStringWithDefaultValue(@"MAP_A11Y_LABEL", nil, nil, @"Map", @"Accessibility label");
     self.accessibilityTraits = UIAccessibilityTraitAllowsDirectInteraction;
-    _accessibilityCoordinateFormatter = [[MGLCoordinateFormatter alloc] init];
-    _accessibilityCoordinateFormatter.unitStyle = NSFormattingUnitStyleLong;
+    _accessibilityCompassFormatter = [[MGLCompassDirectionFormatter alloc] init];
+    _accessibilityCompassFormatter.unitStyle = NSFormattingUnitStyleLong;
     
     self.backgroundColor = [UIColor clearColor];
     self.clipsToBounds = YES;
@@ -365,7 +365,8 @@ mbgl::Duration MGLDurationInSeconds(NSTimeInterval duration)
     // setup attribution
     //
     _attributionButton = [UIButton buttonWithType:UIButtonTypeInfoLight];
-    _attributionButton.accessibilityLabel = NSLocalizedStringWithDefaultValue(@"INFO_A11Y_LABEL", nil, nil, @"Attribution info", @"Accessibility label");
+    _attributionButton.accessibilityLabel = NSLocalizedStringWithDefaultValue(@"INFO_A11Y_LABEL", nil, nil, @"About this map", @"Accessibility label");
+    _attributionButton.accessibilityHint = NSLocalizedStringWithDefaultValue(@"INFO_A11Y_HINT", nil, nil, @"Access credits, a feedback form, and more", @"Accessibility hint");
     [_attributionButton addTarget:self action:@selector(showAttribution) forControlEvents:UIControlEventTouchUpInside];
     _attributionButton.translatesAutoresizingMaskIntoConstraints = NO;
     [self addSubview:_attributionButton];
@@ -375,11 +376,14 @@ mbgl::Duration MGLDurationInSeconds(NSTimeInterval duration)
     // setup compass
     //
     _compassView = [[UIImageView alloc] initWithImage:self.compassImage];
-    _compassView.accessibilityLabel = NSLocalizedStringWithDefaultValue(@"COMPASS_A11Y_LABEL", nil, nil, @"Compass", @"Accessibility label");
-    _compassView.frame = CGRectMake(0, 0, _compassView.image.size.width, _compassView.image.size.height);
+    _compassView.frame = { CGPointZero, _compassView.image.size };
     _compassView.alpha = 0;
     _compassView.userInteractionEnabled = YES;
     [_compassView addGestureRecognizer:[[UITapGestureRecognizer alloc] initWithTarget:self action:@selector(handleCompassTapGesture:)]];
+    _compassView.isAccessibilityElement = YES;
+    _compassView.accessibilityTraits = UIAccessibilityTraitButton;
+    _compassView.accessibilityLabel = NSLocalizedStringWithDefaultValue(@"COMPASS_A11Y_LABEL", nil, nil, @"Compass", @"Accessibility label");
+    _compassView.accessibilityHint = NSLocalizedStringWithDefaultValue(@"COMPASS_A11Y_HINT", nil, nil, @"Rotates the map to face due north", @"Accessibility hint");
     UIView *container = [[UIView alloc] initWithFrame:CGRectZero];
     [container addSubview:_compassView];
     container.translatesAutoresizingMaskIntoConstraints = NO;
@@ -663,6 +667,7 @@ mbgl::Duration MGLDurationInSeconds(NSTimeInterval duration)
                                  multiplier:1
                                    constant:5]];
 
+    UIImage *compassImage = self.compassView.image;
     [compassContainerConstraints addObject:
      [NSLayoutConstraint constraintWithItem:compassContainer
                                   attribute:NSLayoutAttributeWidth
@@ -670,7 +675,7 @@ mbgl::Duration MGLDurationInSeconds(NSTimeInterval duration)
                                      toItem:nil
                                   attribute:NSLayoutAttributeNotAnAttribute
                                  multiplier:1
-                                   constant:self.compassView.image.size.width]];
+                                   constant:compassImage.size.width]];
 
     [compassContainerConstraints addObject:
      [NSLayoutConstraint constraintWithItem:compassContainer
@@ -679,7 +684,7 @@ mbgl::Duration MGLDurationInSeconds(NSTimeInterval duration)
                                      toItem:nil
                                   attribute:NSLayoutAttributeNotAnAttribute
                                  multiplier:1
-                                   constant:self.compassView.image.size.height]];
+                                   constant:compassImage.size.height]];
     [constraintParentView addConstraints:compassContainerConstraints];
 
     // logo bug
@@ -1782,17 +1787,6 @@ mbgl::Duration MGLDurationInSeconds(NSTimeInterval duration)
         frame.size.height = bottomInset - frame.origin.y;
     }
     return frame;
-}
-
-- (NSString *)accessibilityValue
-{
-    // Each arcminute of longitude is at most about 1 nmi, too small for low zoom levels.
-    // Each arcsecond of longitude is at most about 30 m, too small for all but the very highest of zoom levels.
-    _accessibilityCoordinateFormatter.allowsMinutes = self.zoomLevel > 8;
-    _accessibilityCoordinateFormatter.allowsSeconds = self.zoomLevel > 20;
-    
-    return [NSString stringWithFormat:@"Centered on %@",
-            [_accessibilityCoordinateFormatter stringFromCoordinate:self.centerCoordinate]];
 }
 
 #pragma mark - Geography -
@@ -3004,6 +2998,7 @@ mbgl::Duration MGLDurationInSeconds(NSTimeInterval duration)
                                                                inView:self.glView
                                                     constrainedToView:self.glView
                                                              animated:animated];
+        UIAccessibilityPostNotification(UIAccessibilityLayoutChangedNotification, nil);
     }
 
     // notify delegate
@@ -3085,6 +3080,8 @@ mbgl::Duration MGLDurationInSeconds(NSTimeInterval duration)
         self.calloutViewForSelectedAnnotation = nil;
         self.selectedAnnotation = nil;
 
+        UIAccessibilityPostNotification(UIAccessibilityLayoutChangedNotification, nil);
+        
         // notify delegate
         if ([self.delegate respondsToSelector:@selector(mapView:didDeselectAnnotation:)])
         {
@@ -3274,6 +3271,7 @@ mbgl::Duration MGLDurationInSeconds(NSTimeInterval duration)
         self.userLocationAnnotationView = [[MGLUserLocationAnnotationView alloc] initInMapView:self];
         self.userLocationAnnotationView.autoresizingMask = (UIViewAutoresizingFlexibleLeftMargin | UIViewAutoresizingFlexibleRightMargin |
                                                             UIViewAutoresizingFlexibleTopMargin | UIViewAutoresizingFlexibleBottomMargin);
+        self.userLocationAnnotationView.isAccessibilityElement = YES;
 
         [self validateLocationServices];
     }
@@ -3855,6 +3853,7 @@ mbgl::Duration MGLDurationInSeconds(NSTimeInterval duration)
 
             if ( ! [self isSuppressingChangeDelimiters] && [self.delegate respondsToSelector:@selector(mapView:regionDidChangeAnimated:)])
             {
+                UIAccessibilityPostNotification(UIAccessibilityLayoutChangedNotification, nil);
                 BOOL animated = change == mbgl::MapChangeRegionDidChangeAnimated;
                 [self.delegate mapView:self regionDidChangeAnimated:animated];
             }
@@ -4034,8 +4033,9 @@ mbgl::Duration MGLDurationInSeconds(NSTimeInterval duration)
 - (void)updateCompass
 {
     CLLocationDirection degrees = mbgl::util::wrap(-self.direction, 0., 360.);
-
     self.compassView.transform = CGAffineTransformMakeRotation(MGLRadiansFromDegrees(degrees));
+    
+    self.compassView.accessibilityValue = [_accessibilityCompassFormatter stringFromDirection:self.direction];
 
     if (_mbglMap->getBearing() && self.compassView.alpha < 1)
     {
