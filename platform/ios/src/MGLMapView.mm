@@ -217,6 +217,8 @@ public:
     BOOL _delegateHasStrokeColorsForShapeAnnotations;
     BOOL _delegateHasFillColorsForShapeAnnotations;
     BOOL _delegateHasLineWidthsForShapeAnnotations;
+    
+    MGLCoordinateFormatter *_accessibilityCoordinateFormatter;
 }
 
 #pragma mark - Setup & Teardown -
@@ -303,7 +305,14 @@ mbgl::Duration MGLDurationInSeconds(NSTimeInterval duration)
         [self createGLView];
     }
 
+    // setup accessibility
+    //
+    self.isAccessibilityElement = YES;
     self.accessibilityLabel = NSLocalizedStringWithDefaultValue(@"MAP_A11Y_LABEL", nil, nil, @"Map", @"Accessibility label");
+    self.accessibilityTraits = UIAccessibilityTraitAllowsDirectInteraction;
+    _accessibilityCoordinateFormatter = [[MGLCoordinateFormatter alloc] init];
+    _accessibilityCoordinateFormatter.unitStyle = NSFormattingUnitStyleLong;
+    
     self.backgroundColor = [UIColor clearColor];
     self.clipsToBounds = YES;
 
@@ -1754,6 +1763,36 @@ mbgl::Duration MGLDurationInSeconds(NSTimeInterval duration)
 - (void)emptyMemoryCache
 {
     _mbglMap->onLowMemory();
+}
+
+#pragma mark - Accessibility -
+
+- (CGRect)accessibilityFrame
+{
+    CGRect frame = [super accessibilityFrame];
+    UIViewController *viewController = self.viewControllerForLayoutGuides;
+    if (viewController)
+    {
+        UIView *compassContainer = self.compassView.superview;
+        CGFloat topInset = compassContainer.frame.origin.y + compassContainer.frame.size.height + 5;
+        frame.origin.y += topInset;
+        frame.size.height -= topInset;
+        
+        CGFloat bottomInset = MIN(self.logoView.frame.origin.y, self.attributionButton.frame.origin.y) - 8;
+        frame.size.height = bottomInset - frame.origin.y;
+    }
+    return frame;
+}
+
+- (NSString *)accessibilityValue
+{
+    // Each arcminute of longitude is at most about 1 nmi, too small for low zoom levels.
+    // Each arcsecond of longitude is at most about 30 m, too small for all but the very highest of zoom levels.
+    _accessibilityCoordinateFormatter.allowsMinutes = self.zoomLevel > 8;
+    _accessibilityCoordinateFormatter.allowsSeconds = self.zoomLevel > 20;
+    
+    return [NSString stringWithFormat:@"Centered on %@",
+            [_accessibilityCoordinateFormatter stringFromCoordinate:self.centerCoordinate]];
 }
 
 #pragma mark - Geography -
