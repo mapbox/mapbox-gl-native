@@ -1255,12 +1255,13 @@ std::chrono::steady_clock::duration secondsAsDuration(float duration)
 
 - (void)showAttribution
 {
-    UIActionSheet *sheet = [[UIActionSheet alloc] initWithTitle:@"© Mapbox © OpenStreetMap"
+    UIActionSheet *sheet = [[UIActionSheet alloc] initWithTitle:@"Mapbox GL for iOS"
                                                        delegate:self
                                               cancelButtonTitle:@"Cancel"
                                          destructiveButtonTitle:nil
                                               otherButtonTitles:
-                            @"About This Map",
+                            @"© Mapbox",
+                            @"© OpenStreetMap",
                             @"Improve This Map",
                             nil];
     [sheet showFromRect:self.attributionButton.frame inView:self animated:YES];
@@ -1274,6 +1275,11 @@ std::chrono::steady_clock::duration secondsAsDuration(float duration)
          [NSURL URLWithString:@"https://www.mapbox.com/about/maps/"]];
     }
     else if (buttonIndex == actionSheet.firstOtherButtonIndex + 1)
+    {
+        [[UIApplication sharedApplication] openURL:
+         [NSURL URLWithString:@"http://www.openstreetmap.org/about/"]];
+    }
+    else if (buttonIndex == actionSheet.firstOtherButtonIndex + 2)
     {
         [[UIApplication sharedApplication] openURL:
          [NSURL URLWithString:@"https://www.mapbox.com/map-feedback/"]];
