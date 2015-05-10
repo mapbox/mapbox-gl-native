@@ -54,7 +54,7 @@ static NSURL *MGLURLForBundledStyleNamed(NSString *styleName)
 
 #pragma mark - Private -
 
-@interface MGLMapView () <UIGestureRecognizerDelegate, GLKViewDelegate, CLLocationManagerDelegate>
+@interface MGLMapView () <UIGestureRecognizerDelegate, GLKViewDelegate, CLLocationManagerDelegate, UIActionSheetDelegate>
 
 @property (nonatomic) EAGLContext *context;
 @property (nonatomic) GLKView *glView;
@@ -303,7 +303,7 @@ std::chrono::steady_clock::duration secondsAsDuration(float duration)
     //
     _attributionButton = [UIButton buttonWithType:UIButtonTypeInfoLight];
     _attributionButton.accessibilityLabel = @"Attribution info";
-    [_attributionButton addTarget:self action:@selector(showAttribution:) forControlEvents:UIControlEventTouchUpInside];
+    [_attributionButton addTarget:self action:@selector(showAttribution) forControlEvents:UIControlEventTouchUpInside];
     _attributionButton.translatesAutoresizingMaskIntoConstraints = NO;
     [self addSubview:_attributionButton];
 
@@ -1251,6 +1251,35 @@ std::chrono::steady_clock::duration secondsAsDuration(float duration)
     }];
 }
 
+#pragma mark - Attribution -
+
+- (void)showAttribution
+{
+    UIActionSheet *sheet = [[UIActionSheet alloc] initWithTitle:@"© Mapbox © OpenStreetMap"
+                                                       delegate:self
+                                              cancelButtonTitle:@"Cancel"
+                                         destructiveButtonTitle:nil
+                                              otherButtonTitles:
+                            @"About This Map",
+                            @"Improve This Map",
+                            nil];
+    [sheet showFromRect:self.attributionButton.frame inView:self animated:YES];
+}
+
+- (void)actionSheet:(UIActionSheet *)actionSheet didDismissWithButtonIndex:(NSInteger)buttonIndex
+{
+    if (buttonIndex == actionSheet.firstOtherButtonIndex)
+    {
+        [[UIApplication sharedApplication] openURL:
+         [NSURL URLWithString:@"https://www.mapbox.com/about/maps/"]];
+    }
+    else if (buttonIndex == actionSheet.firstOtherButtonIndex + 1)
+    {
+        [[UIApplication sharedApplication] openURL:
+         [NSURL URLWithString:@"https://www.mapbox.com/map-feedback/"]];
+    }
+}
+
 #pragma mark - Properties -
 
 + (NSSet *)keyPathsForValuesAffectingZoomEnabled
@@ -1267,16 +1296,6 @@ std::chrono::steady_clock::duration secondsAsDuration(float duration)
 {
     return [NSSet setWithObject:@"allowsRotating"];
 }
-
-#pragma clang diagnostic push
-#pragma clang diagnostic ignored "-Wunused-parameter"
-
-- (void)showAttribution:(id)sender
-{
-    [[UIApplication sharedApplication] openURL:[NSURL URLWithString:@"https://www.mapbox.com/about/maps/"]];
-}
-
-#pragma clang diagnostic pop
 
 - (void)setDebugActive:(BOOL)debugActive
 {
