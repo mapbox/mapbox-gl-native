@@ -88,11 +88,8 @@ static const int benchmarkDuration = 200; // frames
     }
 }
 
-- (void)mapViewDidFinishRenderingMap:(MGLMapView *)mapView fullyRendered:(BOOL)fullyRendered
+- (void)mapViewDidFinishRenderingMap:(MGLMapView *)mapView fullyRendered:(__unused BOOL)fullyRendered
 {
-    (void)mapView;
-    (void)fullyRendered;
-
     if (state == State::Benchmarking)
     {
         frames++;
