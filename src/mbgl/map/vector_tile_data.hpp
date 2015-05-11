@@ -44,6 +44,7 @@ public:
     void parse() override;
     virtual Bucket* getBucket(StyleLayer const &layer_desc) override;
 
+    size_t countBuckets() const;
     void setBucket(StyleLayer const &layer_desc, std::unique_ptr<Bucket> bucket);
 
     void setState(const State& state) override;

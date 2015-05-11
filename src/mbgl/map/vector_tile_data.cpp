@@ -82,6 +82,12 @@ Bucket* VectorTileData::getBucket(StyleLayer const& layer) {
     return it->second.get();
 }
 
+size_t VectorTileData::countBuckets() const {
+    std::lock_guard<std::mutex> lock(bucketsMutex);
+
+    return buckets.size();
+}
+
 void VectorTileData::setBucket(StyleLayer const& layer, std::unique_ptr<Bucket> bucket) {
     assert(layer.bucket);
 

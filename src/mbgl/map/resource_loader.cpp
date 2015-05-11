@@ -83,12 +83,19 @@ void ResourceLoader::update(MapData& data,
         spriteAtlas.setSprite(sprite_);
     }
 
+    bool allTilesUpdated = true;
     for (const auto& source : style_->sources) {
-        source->update(data, transform, *style_, glyphAtlas, *glyphStore_,
-                       spriteAtlas, sprite_, texturePool, shouldReparsePartialTiles_);
+        if (!source->update(data, transform, *style_, glyphAtlas, *glyphStore_,
+                       spriteAtlas, sprite_, texturePool, shouldReparsePartialTiles_)) {
+            allTilesUpdated = false;
+        }
     }
 
-    shouldReparsePartialTiles_ = false;
+    // We can only stop updating "partial" tiles when all of them
+    // were notified of the arrival of the new resources.
+    if (allTilesUpdated) {
+        shouldReparsePartialTiles_ = false;
+    }
 }
 
 void ResourceLoader::onGlyphRangeLoaded() {

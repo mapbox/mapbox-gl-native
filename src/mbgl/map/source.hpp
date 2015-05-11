@@ -68,7 +68,12 @@ public:
     bool isLoaded() const;
 
     void load(MapData&, Environment&, std::function<void()> callback);
-    void update(MapData&,
+
+    // Request or parse all the tiles relevant for the "TransformState". This method
+    // will return true if all the tiles were scheduled for updating of false if
+    // they were not. shouldReparsePartialTiles must be set to "true" if there is
+    // new data available that a tile in the "partial" state might be interested at.
+    bool update(MapData&,
                 const TransformState&,
                 Style&,
                 GlyphAtlas&,
@@ -99,7 +104,7 @@ private:
     void emitSourceLoaded();
     void emitTileLoaded(bool isNewTile);
 
-    void handlePartialTile(const TileID &id, Worker &worker);
+    bool handlePartialTile(const TileID &id, Worker &worker);
     bool findLoadedChildren(const TileID& id, int32_t maxCoveringZoom, std::forward_list<TileID>& retain);
     bool findLoadedParent(const TileID& id, int32_t minCoveringZoom, std::forward_list<TileID>& retain);
     int32_t coveringZoomLevel(const TransformState&) const;

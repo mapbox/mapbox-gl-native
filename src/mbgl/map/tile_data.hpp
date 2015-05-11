@@ -45,7 +45,13 @@ public:
     ~TileData();
 
     void request(Worker&, float pixelRatio, std::function<void ()> callback);
-    void reparse(Worker&, std::function<void ()> callback);
+
+    // Schedule a tile reparse on a worker thread and call the callback on
+    // completion. It will return true if the work was schedule or false it was
+    // not, which can occur if the tile is already being parsed by another
+    // worker (see "mayStartParsing()").
+    bool reparse(Worker&, std::function<void ()> callback);
+
     void cancel();
     const std::string toString() const;
 
