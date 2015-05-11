@@ -4,6 +4,8 @@
 #include <mbgl/platform/log.hpp>
 #include <mbgl/platform/platform.hpp>
 
+#include <mbgl/util/std.hpp>
+
 #include <cassert>
 #include <algorithm>
 
@@ -14,7 +16,7 @@ GlyphAtlas::GlyphAtlas(uint16_t width_, uint16_t height_)
     : width(width_),
       height(height_),
       bin(width_, height_),
-      data(new char[width_ *height_]),
+      data(util::make_unique<uint8_t[]>(width_ * height_)),
       dirty(true) {
 }
 
@@ -88,13 +90,12 @@ Rect<uint16_t> GlyphAtlas::addGlyph(uintptr_t tileUID,
     face.emplace(glyph.id, GlyphValue { rect, tileUID });
 
     // Copy the bitmap
-    char *target = data.get();
-    const char *source = glyph.bitmap.data();
+    const uint8_t* source = reinterpret_cast<const uint8_t*>(glyph.bitmap.data());
     for (uint32_t y = 0; y < buffered_height; y++) {
         uint32_t y1 = width * (rect.y + y) + rect.x;
         uint32_t y2 = buffered_width * y;
         for (uint32_t x = 0; x < buffered_width; x++) {
-            target[y1 + x] = source[y2 + x];
+            data[y1 + x] = source[y2 + x];
         }
     }
 
@@ -116,7 +117,7 @@ void GlyphAtlas::removeGlyphs(uintptr_t tileUID) {
                 const Rect<uint16_t>& rect = value.rect;
 
                 // Clear out the bitmap.
-                char *target = data.get();
+                uint8_t *target = data.get();
                 for (uint32_t y = 0; y < rect.h; y++) {
                     uint32_t y1 = width * (rect.y + y) + rect.x;
                     for (uint32_t x = 0; x < rect.w; x++) {
