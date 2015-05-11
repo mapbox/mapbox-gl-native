@@ -129,12 +129,23 @@ mbgl::Color MGLColorObjectFromUIColor(UIColor *color)
     return {{ (float)r, (float)g, (float)b, (float)a }};
 }
 
+@interface MGLAnnotationAccessibilityElement : UIAccessibilityElement
+
+@property (nonatomic) MGLAnnotationTag tag;
+
+@end
+
+@implementation MGLAnnotationAccessibilityElement
+
+@end
+
 /// Lightweight container for metadata about an annotation, including the annotation itself.
 class MGLAnnotationContext {
 public:
     id <MGLAnnotation> annotation;
     /// The annotation’s image’s reuse identifier.
     NSString *imageReuseIdentifier;
+    MGLAnnotationAccessibilityElement *accessibilityElement;
 };
 
 #pragma mark - Private -
@@ -1789,6 +1800,105 @@ mbgl::Duration MGLDurationInSeconds(NSTimeInterval duration)
     return frame;
 }
 
+- (NSInteger)accessibilityElementCount
+{
+    std::vector<MGLAnnotationTag> visibleAnnotations = [self annotationTagsInRect:self.bounds];
+    return visibleAnnotations.size() + 2 /* compass, attributionButton */;
+}
+
+- (id)accessibilityElementAtIndex:(NSInteger)index
+{
+    std::vector<MGLAnnotationTag> visibleAnnotations = [self annotationTagsInRect:self.bounds];
+    
+    // Ornaments
+    if (index == 0)
+    {
+        return self.compassView;
+    }
+    if (index > 0 && (NSUInteger)index == visibleAnnotations.size() + 1 /* compass */)
+    {
+        return self.attributionButton;
+    }
+    
+    std::sort(visibleAnnotations.begin(), visibleAnnotations.end());
+    CGPoint centerPoint = self.contentCenter;
+    if (self.userTrackingMode != MGLUserTrackingModeNone)
+    {
+        centerPoint = self.userLocationAnnotationViewCenter;
+    }
+    CLLocationCoordinate2D currentCoordinate = [self convertPoint:centerPoint toCoordinateFromView:self];
+    std::sort(visibleAnnotations.begin(), visibleAnnotations.end(), [&](const MGLAnnotationTag tagA, const MGLAnnotationTag tagB) {
+        CLLocationCoordinate2D coordinateA = [[self annotationWithTag:tagA] coordinate];
+        CLLocationCoordinate2D coordinateB = [[self annotationWithTag:tagB] coordinate];
+        CLLocationDegrees deltaA = hypot(coordinateA.latitude - currentCoordinate.latitude,
+                                         coordinateA.longitude - currentCoordinate.longitude);
+        CLLocationDegrees deltaB = hypot(coordinateB.latitude - currentCoordinate.latitude,
+                                         coordinateB.longitude - currentCoordinate.longitude);
+        return deltaA < deltaB;
+    });
+    
+    NSUInteger annotationIndex = MGLAnnotationTagNotFound;
+    if (index >= 0 && (NSUInteger)index < visibleAnnotations.size())
+    {
+        annotationIndex = index - 1 /* compass */;
+    }
+    MGLAnnotationTag annotationTag = visibleAnnotations[annotationIndex];
+    NSAssert(annotationTag != MGLAnnotationTagNotFound, @"Can’t get accessibility element for nonexistent or invisible annotation at index %li.", index);
+    NSAssert(_annotationContextsByAnnotationTag.count(annotationTag), @"Missing annotation for tag %u.", annotationTag);
+    MGLAnnotationContext &annotationContext = _annotationContextsByAnnotationTag.at(annotationTag);
+    id <MGLAnnotation> annotation = annotationContext.annotation;
+    MGLAnnotationAccessibilityElement *element = annotationContext.accessibilityElement;
+    
+    // Lazily create an accessibility element for the found annotation.
+    if ( ! element)
+    {
+        element = [[MGLAnnotationAccessibilityElement alloc] initWithAccessibilityContainer:self];
+        element.tag = annotationTag;
+        element.accessibilityTraits = UIAccessibilityTraitButton;
+        if ([annotation respondsToSelector:@selector(title)])
+        {
+            element.accessibilityLabel = annotation.title;
+        }
+        if ([annotation respondsToSelector:@selector(subtitle)])
+        {
+            element.accessibilityValue = annotation.subtitle;
+        }
+        annotationContext.accessibilityElement = element;
+    }
+    
+    // Update the accessibility element’s frame.
+    MGLAnnotationImage *annotationImage = [self imageOfAnnotationWithTag:annotationTag];
+    CGRect annotationFrame = [self frameOfImage:annotationImage.image centeredAtCoordinate:annotation.coordinate];
+    CGRect screenRect = UIAccessibilityConvertFrameToScreenCoordinates(annotationFrame, self);
+    element.accessibilityFrame = screenRect;
+    
+    return element;
+}
+
+- (NSInteger)indexOfAccessibilityElement:(id)element
+{
+    if (element == self.compassView)
+    {
+        return 0;
+    }
+    if ( ! [element isKindOfClass:[MGLAnnotationAccessibilityElement class]] &&
+        element != self.attributionButton)
+    {
+        return NSNotFound;
+    }
+    
+    std::vector<MGLAnnotationTag> visibleAnnotations = [self annotationTagsInRect:self.bounds];
+    if (element == self.attributionButton)
+    {
+        return visibleAnnotations.size();
+    }
+    std::sort(visibleAnnotations.begin(), visibleAnnotations.end());
+    auto foundElement = std::find(visibleAnnotations.begin(), visibleAnnotations.end(),
+                                  ((MGLAnnotationAccessibilityElement *)element).tag);
+    if (foundElement == visibleAnnotations.end()) return NSNotFound;
+    else return std::distance(visibleAnnotations.begin(), foundElement) + 1;
+}
+
 #pragma mark - Geography -
 
 + (NS_SET_OF(NSString *) *)keyPathsForValuesAffectingCenterCoordinate
@@ -2551,6 +2661,7 @@ mbgl::Duration MGLDurationInSeconds(NSTimeInterval duration)
     }
     
     [self didChangeValueForKey:@"annotations"];
+    UIAccessibilityPostNotification(UIAccessibilityLayoutChangedNotification, nil);
 }
 
 /// Initialize and return a default annotation image that depicts a round pin
@@ -2685,6 +2796,7 @@ mbgl::Duration MGLDurationInSeconds(NSTimeInterval duration)
         [self willChangeValueForKey:@"annotations"];
         _mbglMap->removeAnnotations(annotationTagsToRemove);
         [self didChangeValueForKey:@"annotations"];
+        UIAccessibilityPostNotification(UIAccessibilityLayoutChangedNotification, nil);
     }
 }
 
