@@ -157,14 +157,24 @@ float Collision::getPlacementScale(const GlyphBoxes &glyphs, float minPlacementS
                 float padding = std::fmax(pad, placement.padding) * 8.0f;
 
                 // Original algorithm:
-                float s1 = (ob.tl.x - nb.br.x - padding) /
-                           (na.x - oa.x); // scale at which new box is to the left of old box
-                float s2 = (ob.br.x - nb.tl.x + padding) /
-                           (na.x - oa.x); // scale at which new box is to the right of old box
-                float s3 = (ob.tl.y - nb.br.y - padding) /
-                           (na.y - oa.y); // scale at which new box is to the top of old box
-                float s4 = (ob.br.y - nb.tl.y + padding) /
-                           (na.y - oa.y); // scale at which new box is to the bottom of old box
+                float sx = (na.x - oa.x);
+                float s1 = 1;
+                float s2 = 1;
+                if (sx != 0) {
+                   s1 = (ob.tl.x - nb.br.x - padding) /
+                           sx; // scale at which new box is to the left of old box
+                   s2 = (ob.br.x - nb.tl.x + padding) /
+                           sx; // scale at which new box is to the right of old box
+                }
+                float sy = (na.y - oa.y);
+                float s3 = 1;
+                float s4 = 1;
+                if (sy != 0) {
+                    s3 = (ob.tl.y - nb.br.y - padding) /
+                           sy; // scale at which new box is to the top of old box
+                    s4 = (ob.br.y - nb.tl.y + padding) /
+                           sy; // scale at which new box is to the bottom of old box
+                }
 
                 if (std::isnan(s1) || std::isnan(s2)) {
                     s1 = s2 = 1;

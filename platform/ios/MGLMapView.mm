@@ -54,7 +54,7 @@ static NSURL *MGLURLForBundledStyleNamed(NSString *styleName)
 
 #pragma mark - Private -
 
-@interface MGLMapView () <UIGestureRecognizerDelegate, GLKViewDelegate, CLLocationManagerDelegate>
+@interface MGLMapView () <UIGestureRecognizerDelegate, GLKViewDelegate, CLLocationManagerDelegate, UIActionSheetDelegate>
 
 @property (nonatomic) EAGLContext *context;
 @property (nonatomic) GLKView *glView;
@@ -63,6 +63,7 @@ static NSURL *MGLURLForBundledStyleNamed(NSString *styleName)
 @property (nonatomic) UIImageView *compass;
 @property (nonatomic) UIImageView *logoBug;
 @property (nonatomic) UIButton *attributionButton;
+@property (nonatomic) UIActionSheet *attributionSheet;
 @property (nonatomic) UIPanGestureRecognizer *pan;
 @property (nonatomic) UIPinchGestureRecognizer *pinch;
 @property (nonatomic) UIRotationGestureRecognizer *rotate;
@@ -175,27 +176,27 @@ std::chrono::steady_clock::duration secondsAsDuration(float duration)
 - (void)setStyleURL:(NSURL *)styleURL
 {
     if (_isTargetingInterfaceBuilder) return;
-    
+
     if ( ! styleURL)
     {
         styleURL = MGLURLForBundledStyleNamed([NSString stringWithFormat:@"%@-v%@",
                                                MGLDefaultStyleName.lowercaseString,
                                                MGLStyleVersion]);
     }
-    
+
     if ( ! [styleURL scheme])
     {
         // Assume a relative path into the developer’s bundle.
         styleURL = [[NSBundle mainBundle] URLForResource:styleURL.path withExtension:nil];
     }
-    
+
     _mbglMap->setStyleURL([[styleURL absoluteString] UTF8String]);
 }
 
 - (BOOL)commonInit
 {
     _isTargetingInterfaceBuilder = NSProcessInfo.processInfo.mgl_isInterfaceBuilderDesignablesAgent;
-    
+
     // create context
     //
     _context = [[EAGLContext alloc] initWithAPI:kEAGLRenderingAPIOpenGLES2];
@@ -210,7 +211,7 @@ std::chrono::steady_clock::duration secondsAsDuration(float duration)
     // setup accessibility
     //
     self.accessibilityLabel = @"Map";
-    
+
     // metrics: initial setup
     NSString *appName = [[NSBundle mainBundle] objectForInfoDictionaryKey:@"CFBundleName"];
     NSString *appVersion = [[NSBundle mainBundle] objectForInfoDictionaryKey:@"CFBundleShortVersionString"];
@@ -234,7 +235,7 @@ std::chrono::steady_clock::duration secondsAsDuration(float duration)
     [self insertSubview:_glView atIndex:0];
 
     _glView.contentMode = UIViewContentModeCenter;
-    
+
     self.backgroundColor = [UIColor clearColor];
     self.clipsToBounds = YES;
 
@@ -274,7 +275,10 @@ std::chrono::steady_clock::duration secondsAsDuration(float duration)
     _mbglFileSource = new mbgl::DefaultFileSource([MGLFileCache obtainSharedCacheWithObject:self]);
 
     // Start paused on the IB canvas
-    _mbglMap = new mbgl::Map(*_mbglView, *_mbglFileSource, mbgl::MapMode::Continuous, _isTargetingInterfaceBuilder);
+    _mbglMap = new mbgl::Map(*_mbglView, *_mbglFileSource, mbgl::MapMode::Continuous);
+    if (_isTargetingInterfaceBuilder) {
+        _mbglMap->pause();
+    }
     _mbglMap->resize(self.bounds.size.width, self.bounds.size.height, _glView.contentScaleFactor);
 
     // Notify map object when network reachability status changes.
@@ -304,9 +308,19 @@ std::chrono::steady_clock::duration secondsAsDuration(float duration)
     //
     _attributionButton = [UIButton buttonWithType:UIButtonTypeInfoLight];
     _attributionButton.accessibilityLabel = @"Attribution info";
-    [_attributionButton addTarget:self action:@selector(showAttribution:) forControlEvents:UIControlEventTouchUpInside];
+    [_attributionButton addTarget:self action:@selector(showAttribution) forControlEvents:UIControlEventTouchUpInside];
     _attributionButton.translatesAutoresizingMaskIntoConstraints = NO;
     [self addSubview:_attributionButton];
+    
+    _attributionSheet = [[UIActionSheet alloc] initWithTitle:@"Mapbox GL for iOS"
+                                                    delegate:self
+                                           cancelButtonTitle:@"Cancel"
+                                      destructiveButtonTitle:nil
+                                           otherButtonTitles:
+                         @"© Mapbox",
+                         @"© OpenStreetMap",
+                         @"Improve This Map",
+                         nil];
 
     // setup compass
     //
@@ -437,7 +451,7 @@ std::chrono::steady_clock::duration secondsAsDuration(float duration)
 - (void)setDelegate:(id<MGLMapViewDelegate>)delegate
 {
     if (_delegate == delegate) return;
-    
+
     _delegate = delegate;
 }
 
@@ -643,10 +657,15 @@ std::chrono::steady_clock::duration secondsAsDuration(float duration)
 - (void)layoutSubviews
 {
     [super layoutSubviews];
-    
+
     if ( ! _isTargetingInterfaceBuilder)
     {
         _mbglMap->update();
+    }
+    
+    if (self.attributionSheet.visible)
+    {
+        [self.attributionSheet dismissWithClickedButtonIndex:self.attributionSheet.cancelButtonIndex animated:YES];
     }
 }
 
@@ -763,7 +782,7 @@ std::chrono::steady_clock::duration secondsAsDuration(float duration)
         _mbglMap->moveBy(delta.x, delta.y);
 
         self.centerPoint = CGPointMake(self.centerPoint.x + delta.x, self.centerPoint.y + delta.y);
-        
+
         [self notifyMapChange:@(mbgl::MapChangeRegionDidChangeAnimated)];
     }
     else if (pan.state == UIGestureRecognizerStateEnded || pan.state == UIGestureRecognizerStateCancelled)
@@ -774,7 +793,7 @@ std::chrono::steady_clock::duration secondsAsDuration(float duration)
             // Not enough velocity to overcome friction
             velocity = CGPointZero;
         }
-        
+
         CGFloat duration = UIScrollViewDecelerationRateNormal;
         if ( ! CGPointEqualToPoint(velocity, CGPointZero))
         {
@@ -854,7 +873,7 @@ std::chrono::steady_clock::duration secondsAsDuration(float duration)
             velocity = 0;
         }
         CGFloat duration = velocity > 0 ? 1 : 0.25;
-        
+
         CGFloat scale = self.scale * pinch.scale;
         CGFloat newScale = scale;
         if (velocity >= 0)
@@ -865,22 +884,22 @@ std::chrono::steady_clock::duration secondsAsDuration(float duration)
         {
             newScale += scale / (velocity * duration) * 0.1;
         }
-        
+
         if (newScale <= 0 || log2(newScale) < _mbglMap->getMinZoom())
         {
             velocity = 0;
         }
-        
+
         if (velocity)
         {
             CGPoint pinchCenter = [pinch locationInView:pinch.view];
             _mbglMap->setScale(newScale, pinchCenter.x, pinchCenter.y, secondsAsDuration(duration));
         }
-        
+
         _mbglMap->setGestureInProgress(false);
-        
+
         [self unrotateIfNeededAnimated:YES];
-        
+
         if (velocity)
         {
             self.animatingGesture = YES;
@@ -936,37 +955,37 @@ std::chrono::steady_clock::duration secondsAsDuration(float duration)
     else if (rotate.state == UIGestureRecognizerStateEnded || rotate.state == UIGestureRecognizerStateCancelled)
     {
         CGFloat velocity = rotate.velocity;
-        
+
         if (fabs(velocity) > 3)
         {
             CGFloat radians = self.angle + rotate.rotation;
             CGFloat duration = UIScrollViewDecelerationRateNormal;
             CGFloat newRadians = radians + velocity * duration * 0.1;
             CGFloat newDegrees = [MGLMapView radiansToDegrees:newRadians] * -1;
-            
+
             _mbglMap->setBearing(newDegrees, secondsAsDuration(duration));
-            
+
             _mbglMap->setGestureInProgress(false);
-            
+
             self.animatingGesture = YES;
-            
+
             __weak MGLMapView *weakSelf = self;
-            
+
             [self animateWithDelay:duration animations:^
              {
                  weakSelf.animatingGesture = NO;
-                 
+
                  [weakSelf unrotateIfNeededAnimated:YES];
-                 
+
                  [weakSelf notifyMapChange:@(mbgl::MapChangeRegionDidChangeAnimated)];
              }];
         }
         else
         {
             _mbglMap->setGestureInProgress(false);
-            
+
             [self unrotateIfNeededAnimated:YES];
-            
+
             [self notifyMapChange:@(mbgl::MapChangeRegionDidChange)];
         }
     }
@@ -1252,6 +1271,34 @@ std::chrono::steady_clock::duration secondsAsDuration(float duration)
     }];
 }
 
+#pragma mark - Attribution -
+
+- (void)showAttribution
+{
+    [self.attributionSheet showFromRect:self.attributionButton.frame inView:self animated:YES];
+}
+
+- (void)actionSheet:(UIActionSheet *)actionSheet didDismissWithButtonIndex:(NSInteger)buttonIndex
+{
+    if (buttonIndex == actionSheet.firstOtherButtonIndex)
+    {
+        [[UIApplication sharedApplication] openURL:
+         [NSURL URLWithString:@"https://www.mapbox.com/about/maps/"]];
+    }
+    else if (buttonIndex == actionSheet.firstOtherButtonIndex + 1)
+    {
+        [[UIApplication sharedApplication] openURL:
+         [NSURL URLWithString:@"http://www.openstreetmap.org/about/"]];
+    }
+    else if (buttonIndex == actionSheet.firstOtherButtonIndex + 2)
+    {
+        NSString *feedbackURL = [NSString stringWithFormat:@"https://www.mapbox.com/map-feedback/#/%.5f/%.5f/%i",
+                                 self.longitude, self.latitude, (int)round(self.zoomLevel)];
+        [[UIApplication sharedApplication] openURL:
+         [NSURL URLWithString:feedbackURL]];
+    }
+}
+
 #pragma mark - Properties -
 
 + (NSSet *)keyPathsForValuesAffectingZoomEnabled
@@ -1268,16 +1315,6 @@ std::chrono::steady_clock::duration secondsAsDuration(float duration)
 {
     return [NSSet setWithObject:@"allowsRotating"];
 }
-
-#pragma clang diagnostic push
-#pragma clang diagnostic ignored "-Wunused-parameter"
-
-- (void)showAttribution:(id)sender
-{
-    [[UIApplication sharedApplication] openURL:[NSURL URLWithString:@"https://www.mapbox.com/about/maps/"]];
-}
-
-#pragma clang diagnostic pop
 
 - (void)setDebugActive:(BOOL)debugActive
 {
@@ -1412,7 +1449,7 @@ std::chrono::steady_clock::duration secondsAsDuration(float duration)
 
     /*
     CLLocationCoordinate2D center = CLLocationCoordinate2DMake((northEastCoordinate.latitude + southWestCoordinate.latitude) / 2, (northEastCoordinate.longitude + southWestCoordinate.longitude) / 2);
-    
+
     CGFloat scale = _mbglMap->getScale();
     CGFloat scaleX = _mbglMap->getWidth() / (northEastCoordinate.longitude - southWestCoordinate.longitude);
     CGFloat scaleY = _mbglMap->getHeight() / (northEastCoordinate.latitude - southWestCoordinate.latitude);
@@ -1437,7 +1474,7 @@ std::chrono::steady_clock::duration secondsAsDuration(float duration)
     CGFloat hack = ([[UIApplication sharedApplication] statusBarOrientation] == UIInterfaceOrientationPortrait) ? 0.5f : 1.f;
     CGFloat zoomLevel = log(MIN(scaleX, scaleY)) / log(2) - (hack + padding);
     zoomLevel = MAX(MIN(zoomLevel, maxZoom), minZoom);
-    
+
     [self setCenterCoordinate:center zoomLevel:zoomLevel animated:animated];
 }
 
@@ -1709,7 +1746,7 @@ CLLocationCoordinate2D latLngToCoordinate(mbgl::LatLng latLng)
     {
         assert([annotation conformsToProtocol:@protocol(MGLAnnotation)]);
 
-        annotationIDsToRemove.push_back([[[self.annotationIDsByAnnotation objectForKey:annotation] 
+        annotationIDsToRemove.push_back([[[self.annotationIDsByAnnotation objectForKey:annotation]
             objectForKey:MGLAnnotationIDKey] unsignedIntValue]);
         [self.annotationIDsByAnnotation removeObjectForKey:annotation];
 
@@ -1745,7 +1782,7 @@ CLLocationCoordinate2D latLngToCoordinate(mbgl::LatLng latLng)
     if ( ! annotation) return;
 
     if ( ! [self viewportBounds].contains(coordinateToLatLng(annotation.coordinate))) return;
-    
+
     if (annotation == self.selectedAnnotation) return;
 
     self.userTrackingMode = MGLUserTrackingModeNone;
@@ -1864,22 +1901,22 @@ CLLocationCoordinate2D latLngToCoordinate(mbgl::LatLng latLng)
 - (void)setShowsUserLocation:(BOOL)showsUserLocation
 {
     if (showsUserLocation == _showsUserLocation) return;
-    
+
     _showsUserLocation = showsUserLocation;
-    
+
     if (showsUserLocation)
     {
         if ([self.delegate respondsToSelector:@selector(mapViewWillStartLocatingUser:)])
         {
             [self.delegate mapViewWillStartLocatingUser:self];
         }
-        
+
         self.userLocationAnnotationView = [[MGLUserLocationAnnotationView alloc] initInMapView:self];
         self.userLocationAnnotationView.autoresizingMask = (UIViewAutoresizingFlexibleLeftMargin | UIViewAutoresizingFlexibleRightMargin |
                                                             UIViewAutoresizingFlexibleTopMargin | UIViewAutoresizingFlexibleBottomMargin);
-        
+
         self.locationManager = [CLLocationManager new];
-        
+
 #if __IPHONE_OS_VERSION_MAX_ALLOWED >= 80000
         // enable iOS 8+ location authorization API
         //
@@ -1892,7 +1929,7 @@ CLLocationCoordinate2D latLngToCoordinate(mbgl::LatLng latLng)
             [self.locationManager requestWhenInUseAuthorization];
         }
 #endif
-        
+
         self.locationManager.headingFilter = 5.0;
         self.locationManager.delegate = self;
         [self.locationManager startUpdatingLocation];
@@ -1910,7 +1947,7 @@ CLLocationCoordinate2D latLngToCoordinate(mbgl::LatLng latLng)
         }
 
         [self setUserTrackingMode:MGLUserTrackingModeNone animated:YES];
-        
+
         [self.userLocationAnnotationView removeFromSuperview];
         self.userLocationAnnotationView = nil;
     }
@@ -2075,7 +2112,7 @@ CLLocationCoordinate2D latLngToCoordinate(mbgl::LatLng latLng)
                 CLLocationCoordinate2D actualNorthEast = [self convertPoint:CGPointMake(userLocationPoint.x + pixelRadius,
                                                                                         userLocationPoint.y + pixelRadius)
                                                        toCoordinateFromView:self];
-                
+
                 if (desiredNorthEast.latitude  != actualNorthEast.latitude  ||
                     desiredNorthEast.longitude != actualNorthEast.longitude ||
                     desiredSouthWest.latitude  != actualSouthWest.latitude  ||
@@ -2478,17 +2515,17 @@ CLLocationCoordinate2D latLngToCoordinate(mbgl::LatLng latLng)
 - (void)prepareForInterfaceBuilder
 {
     [super prepareForInterfaceBuilder];
-    
+
     self.layer.borderColor = [UIColor colorWithWhite:184/255. alpha:1].CGColor;
     self.layer.borderWidth = 1;
-    
+
     if (self.accessToken)
     {
         self.layer.backgroundColor = [UIColor colorWithRed:59/255.
                                                      green:178/255.
                                                       blue:208/255.
                                                      alpha:0.8].CGColor;
-        
+
         UIImage *image = [[self class] resourceImageNamed:@"mapbox.png"];
         UIImageView *previewView = [[UIImageView alloc] initWithImage:image];
         previewView.translatesAutoresizingMaskIntoConstraints = NO;
@@ -2515,7 +2552,7 @@ CLLocationCoordinate2D latLngToCoordinate(mbgl::LatLng latLng)
         UIView *diagnosticView = [[UIView alloc] init];
         diagnosticView.translatesAutoresizingMaskIntoConstraints = NO;
         [self addSubview:diagnosticView];
-        
+
         // Headline
         UILabel *headlineLabel = [[UILabel alloc] init];
         headlineLabel.text = @"No Access Token";
@@ -2526,7 +2563,7 @@ CLLocationCoordinate2D latLngToCoordinate(mbgl::LatLng latLng)
         [headlineLabel setContentCompressionResistancePriority:UILayoutPriorityDefaultLow
                                                        forAxis:UILayoutConstraintAxisHorizontal];
         [diagnosticView addSubview:headlineLabel];
-        
+
         // Explanation
         UILabel *explanationLabel = [[UILabel alloc] init];
         explanationLabel.text = @"To display a map here, you must provide a Mapbox access token. Get an access token from:";
@@ -2536,7 +2573,7 @@ CLLocationCoordinate2D latLngToCoordinate(mbgl::LatLng latLng)
         [explanationLabel setContentCompressionResistancePriority:UILayoutPriorityDefaultLow
                                                           forAxis:UILayoutConstraintAxisHorizontal];
         [diagnosticView addSubview:explanationLabel];
-        
+
         // Link
         UIButton *linkButton = [UIButton buttonWithType:UIButtonTypeSystem];
         [linkButton setTitle:MGLMapboxAccessTokenManagerURLDisplayString forState:UIControlStateNormal];
@@ -2544,7 +2581,7 @@ CLLocationCoordinate2D latLngToCoordinate(mbgl::LatLng latLng)
         [linkButton setContentCompressionResistancePriority:UILayoutPriorityDefaultLow
                                                     forAxis:UILayoutConstraintAxisHorizontal];
         [diagnosticView addSubview:linkButton];
-        
+
         // More explanation
         UILabel *explanationLabel2 = [[UILabel alloc] init];
         explanationLabel2.text = @"and enter it into the Access Token field in the Attributes inspector.";
@@ -2554,7 +2591,7 @@ CLLocationCoordinate2D latLngToCoordinate(mbgl::LatLng latLng)
         [explanationLabel2 setContentCompressionResistancePriority:UILayoutPriorityDefaultLow
                                                            forAxis:UILayoutConstraintAxisHorizontal];
         [diagnosticView addSubview:explanationLabel2];
-        
+
         // Constraints
         NSDictionary *views = @{
             @"container": diagnosticView,

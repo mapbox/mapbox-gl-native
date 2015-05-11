@@ -60,13 +60,14 @@ Once the library stabilizes, a mere `pod 'MapboxGL'` will work.
 
 #### Manually
 
-0. Use [Homebrew](http://brew.sh/) to install Boost headers and [appledoc](http://gentlebytes.com/appledoc/): `brew install boost appledoc`.
+1. Use [Homebrew](http://brew.sh/) to install Boost headers: `brew install boost`.
+1. Install [appledoc](http://appledoc.gentlebytes.com/appledoc/) for API docs generation. We recommend [`2.2v963`](https://github.com/tomaz/appledoc/releases/tag/v2.2-963), which currently isn't available in Homebrew. 
 1. Run `make ipackage`. The packaging script will produce the statically-linked `libMapboxGL.a`, `MapboxGL.bundle` for resources, a `Headers` folder, and a `Docs` folder with HTML API documentation.
-2. Copy the contents of `build/ios/pkg/static` into your project. It should happen automatically, but ensure that:
+1. Copy the contents of `build/ios/pkg/static` into your project. It should happen automatically, but ensure that:
    - `Headers` is in your *Header Search Paths* (`HEADER_SEARCH_PATHS`) build setting.
    - `MapboxGL.bundle` is in your target's *Copy Bundle Resources* build phase.
    - `libMapboxGL.a` is in your target's *Link Binary With Libraries* build phase.
-3. Add the following Cocoa framework dependencies to your target's *Link Binary With Libraries* build phase:
+1. Add the following Cocoa framework dependencies to your target's *Link Binary With Libraries* build phase:
    - `CoreTelephony.framework`
    - `GLKit.framework`
    - `ImageIO.framework`
@@ -76,9 +77,9 @@ Once the library stabilizes, a mere `pod 'MapboxGL'` will work.
    - `libc++.dylib`
    - `libsqlite3.dylib`
    - `libz.dylib`
-4. Add `-ObjC` to your target's "Other Linker Flags" build setting (`OTHER_LDFLAGS`).
-5. [Set the Mapbox API access token](#mapbox-api-access-tokens).
-6. `#import "MapboxGL.h"`
+1. Add `-ObjC` to your target's "Other Linker Flags" build setting (`OTHER_LDFLAGS`).
+1. [Set the Mapbox API access token](#mapbox-api-access-tokens).
+1. `#import "MapboxGL.h"`
 
 ### Development 
 

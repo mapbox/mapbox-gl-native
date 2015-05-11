@@ -9,9 +9,9 @@
 
 namespace mbgl {
 
-Map::Map(View& view, FileSource& fileSource, MapMode mode, bool startPaused)
+Map::Map(View& view, FileSource& fileSource, MapMode mode)
     : data(util::make_unique<MapData>(view, mode)),
-      context(util::make_unique<util::Thread<MapContext>>("Map", util::ThreadPriority::Regular, view, fileSource, *data, startPaused))
+      context(util::make_unique<util::Thread<MapContext>>("Map", util::ThreadPriority::Regular, view, fileSource, *data))
 {
     view.initialize(this);
 }
@@ -23,13 +23,17 @@ Map::~Map() {
 void Map::pause() {
     assert(data->mode == MapMode::Continuous);
 
-    std::unique_lock<std::mutex> lockPause(data->mutexPause);
-    context->invoke(&MapContext::pause);
-    data->condPaused.wait(lockPause);
+    if (!paused) {
+        std::unique_lock<std::mutex> lockPause(data->mutexPause);
+        context->invoke(&MapContext::pause);
+        data->condPaused.wait(lockPause);
+        paused = true;
+    }
 }
 
 void Map::resume() {
     data->condResume.notify_all();
+    paused = false;
 }
 
 void Map::renderStill(StillImageCallback callback) {
@@ -274,12 +278,12 @@ LatLngBounds Map::getBoundsForAnnotations(const std::vector<uint32_t>& annotatio
 
 void Map::setDebug(bool value) {
     data->setDebug(value);
-    update(Update::Debug);
+    update();
 }
 
 void Map::toggleDebug() {
     data->toggleDebug();
-    update(Update::Debug);
+    update();
 }
 
 bool Map::getDebug() const {

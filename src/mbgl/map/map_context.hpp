@@ -35,7 +35,7 @@ struct LatLngBounds;
 
 class MapContext : public ResourceLoader::Observer {
 public:
-    MapContext(uv_loop_t*, View&, FileSource&, MapData&, bool startPaused);
+    MapContext(uv_loop_t*, View&, FileSource&, MapData&);
     ~MapContext();
 
     void pause();

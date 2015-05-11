@@ -4,8 +4,6 @@ set -e
 set -o pipefail
 set -u
 
-source ./scripts/travis_helper.sh
-
 NAME=MapboxGL
 OUTPUT=build/ios/pkg
 IOS_SDK_VERSION=`xcrun --sdk iphoneos --show-sdk-version`
@@ -105,6 +103,11 @@ if [ -z `which appledoc` ]; then
 fi
 DOCS_OUTPUT="${OUTPUT}/static/Docs"
 DOCS_VERSION=$( git tag -l ios\* --sort -v:refname | sed -n '1p' | sed 's/ios-v//' )
+README="/tmp/GL-README.md"
+cat ios/README.md > ${README}
+echo >> ${README}
+echo -n "#" >> ${README}
+cat CHANGELOG.md >> ${README}
 appledoc \
     --output ${DOCS_OUTPUT} \
     --project-name "Mapbox GL for iOS ${DOCS_VERSION}" \
@@ -113,4 +116,6 @@ appledoc \
     --no-create-docset \
     --no-install-docset \
     --company-id com.mapbox \
+    --ignore include/mbgl/ios/private \
+    --index-desc ${README} \
     include/mbgl/ios
