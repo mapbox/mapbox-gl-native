@@ -13,7 +13,6 @@ TileData::TileData(const TileID& id_, const SourceInfo& source_)
     : id(id_),
       name(id),
       state(State::initial),
-      parsing(ATOMIC_FLAG_INIT),
       source(source_),
       env(Environment::Get()),
       debugBucket(debugFontBuffer) {
