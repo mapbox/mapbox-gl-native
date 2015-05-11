@@ -1288,8 +1288,8 @@ std::chrono::steady_clock::duration secondsAsDuration(float duration)
     }
     else if (buttonIndex == actionSheet.firstOtherButtonIndex + 2)
     {
-        NSString *feedbackURL = [NSString stringWithFormat:@"https://www.mapbox.com/map-feedback/#/%.5f/%.5f/%.1f",
-                                 self.longitude, self.latitude, self.zoomLevel];
+        NSString *feedbackURL = [NSString stringWithFormat:@"https://www.mapbox.com/map-feedback/#/%.5f/%.5f/%i",
+                                 self.longitude, self.latitude, (int)round(self.zoomLevel)];
         [[UIApplication sharedApplication] openURL:
          [NSURL URLWithString:feedbackURL]];
     }
