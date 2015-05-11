@@ -63,6 +63,7 @@ static NSURL *MGLURLForBundledStyleNamed(NSString *styleName)
 @property (nonatomic) UIImageView *compass;
 @property (nonatomic) UIImageView *logoBug;
 @property (nonatomic) UIButton *attributionButton;
+@property (nonatomic) UIActionSheet *attributionSheet;
 @property (nonatomic) UIPanGestureRecognizer *pan;
 @property (nonatomic) UIPinchGestureRecognizer *pinch;
 @property (nonatomic) UIRotationGestureRecognizer *rotate;
@@ -306,6 +307,16 @@ std::chrono::steady_clock::duration secondsAsDuration(float duration)
     [_attributionButton addTarget:self action:@selector(showAttribution) forControlEvents:UIControlEventTouchUpInside];
     _attributionButton.translatesAutoresizingMaskIntoConstraints = NO;
     [self addSubview:_attributionButton];
+    
+    _attributionSheet = [[UIActionSheet alloc] initWithTitle:@"Mapbox GL for iOS"
+                                                    delegate:self
+                                           cancelButtonTitle:@"Cancel"
+                                      destructiveButtonTitle:nil
+                                           otherButtonTitles:
+                         @"© Mapbox",
+                         @"© OpenStreetMap",
+                         @"Improve This Map",
+                         nil];
 
     // setup compass
     //
@@ -646,6 +657,11 @@ std::chrono::steady_clock::duration secondsAsDuration(float duration)
     if ( ! _isTargetingInterfaceBuilder)
     {
         _mbglMap->update();
+    }
+    
+    if (self.attributionSheet.visible)
+    {
+        [self.attributionSheet dismissWithClickedButtonIndex:self.attributionSheet.cancelButtonIndex animated:YES];
     }
 }
 
@@ -1255,16 +1271,7 @@ std::chrono::steady_clock::duration secondsAsDuration(float duration)
 
 - (void)showAttribution
 {
-    UIActionSheet *sheet = [[UIActionSheet alloc] initWithTitle:@"Mapbox GL for iOS"
-                                                       delegate:self
-                                              cancelButtonTitle:@"Cancel"
-                                         destructiveButtonTitle:nil
-                                              otherButtonTitles:
-                            @"© Mapbox",
-                            @"© OpenStreetMap",
-                            @"Improve This Map",
-                            nil];
-    [sheet showFromRect:self.attributionButton.frame inView:self animated:YES];
+    [self.attributionSheet showFromRect:self.attributionButton.frame inView:self animated:YES];
 }
 
 - (void)actionSheet:(UIActionSheet *)actionSheet didDismissWithButtonIndex:(NSInteger)buttonIndex
