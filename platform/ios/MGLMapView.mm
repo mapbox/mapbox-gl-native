@@ -54,7 +54,7 @@ static NSURL *MGLURLForBundledStyleNamed(NSString *styleName)
 
 #pragma mark - Private -
 
-@interface MGLMapView () <UIGestureRecognizerDelegate, GLKViewDelegate, CLLocationManagerDelegate>
+@interface MGLMapView () <UIGestureRecognizerDelegate, GLKViewDelegate, CLLocationManagerDelegate, UIActionSheetDelegate>
 
 @property (nonatomic) EAGLContext *context;
 @property (nonatomic) GLKView *glView;
@@ -63,6 +63,7 @@ static NSURL *MGLURLForBundledStyleNamed(NSString *styleName)
 @property (nonatomic) UIImageView *compass;
 @property (nonatomic) UIImageView *logoBug;
 @property (nonatomic) UIButton *attributionButton;
+@property (nonatomic) UIActionSheet *attributionSheet;
 @property (nonatomic) UIPanGestureRecognizer *pan;
 @property (nonatomic) UIPinchGestureRecognizer *pinch;
 @property (nonatomic) UIRotationGestureRecognizer *rotate;
@@ -303,9 +304,19 @@ std::chrono::steady_clock::duration secondsAsDuration(float duration)
     //
     _attributionButton = [UIButton buttonWithType:UIButtonTypeInfoLight];
     _attributionButton.accessibilityLabel = @"Attribution info";
-    [_attributionButton addTarget:self action:@selector(showAttribution:) forControlEvents:UIControlEventTouchUpInside];
+    [_attributionButton addTarget:self action:@selector(showAttribution) forControlEvents:UIControlEventTouchUpInside];
     _attributionButton.translatesAutoresizingMaskIntoConstraints = NO;
     [self addSubview:_attributionButton];
+    
+    _attributionSheet = [[UIActionSheet alloc] initWithTitle:@"Mapbox GL for iOS"
+                                                    delegate:self
+                                           cancelButtonTitle:@"Cancel"
+                                      destructiveButtonTitle:nil
+                                           otherButtonTitles:
+                         @"© Mapbox",
+                         @"© OpenStreetMap",
+                         @"Improve This Map",
+                         nil];
 
     // setup compass
     //
@@ -646,6 +657,11 @@ std::chrono::steady_clock::duration secondsAsDuration(float duration)
     if ( ! _isTargetingInterfaceBuilder)
     {
         _mbglMap->update();
+    }
+    
+    if (self.attributionSheet.visible)
+    {
+        [self.attributionSheet dismissWithClickedButtonIndex:self.attributionSheet.cancelButtonIndex animated:YES];
     }
 }
 
@@ -1251,6 +1267,34 @@ std::chrono::steady_clock::duration secondsAsDuration(float duration)
     }];
 }
 
+#pragma mark - Attribution -
+
+- (void)showAttribution
+{
+    [self.attributionSheet showFromRect:self.attributionButton.frame inView:self animated:YES];
+}
+
+- (void)actionSheet:(UIActionSheet *)actionSheet didDismissWithButtonIndex:(NSInteger)buttonIndex
+{
+    if (buttonIndex == actionSheet.firstOtherButtonIndex)
+    {
+        [[UIApplication sharedApplication] openURL:
+         [NSURL URLWithString:@"https://www.mapbox.com/about/maps/"]];
+    }
+    else if (buttonIndex == actionSheet.firstOtherButtonIndex + 1)
+    {
+        [[UIApplication sharedApplication] openURL:
+         [NSURL URLWithString:@"http://www.openstreetmap.org/about/"]];
+    }
+    else if (buttonIndex == actionSheet.firstOtherButtonIndex + 2)
+    {
+        NSString *feedbackURL = [NSString stringWithFormat:@"https://www.mapbox.com/map-feedback/#/%.5f/%.5f/%i",
+                                 self.longitude, self.latitude, (int)round(self.zoomLevel)];
+        [[UIApplication sharedApplication] openURL:
+         [NSURL URLWithString:feedbackURL]];
+    }
+}
+
 #pragma mark - Properties -
 
 + (NSSet *)keyPathsForValuesAffectingZoomEnabled
@@ -1267,16 +1311,6 @@ std::chrono::steady_clock::duration secondsAsDuration(float duration)
 {
     return [NSSet setWithObject:@"allowsRotating"];
 }
-
-#pragma clang diagnostic push
-#pragma clang diagnostic ignored "-Wunused-parameter"
-
-- (void)showAttribution:(id)sender
-{
-    [[UIApplication sharedApplication] openURL:[NSURL URLWithString:@"https://www.mapbox.com/about/maps/"]];
-}
-
-#pragma clang diagnostic pop
 
 - (void)setDebugActive:(BOOL)debugActive
 {
