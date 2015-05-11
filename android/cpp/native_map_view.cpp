@@ -61,8 +61,10 @@ NativeMapView::NativeMapView(JNIEnv *env, jobject obj_)
     : mbgl::View(*this),
       fileCache(mbgl::android::cachePath + "/mbgl-cache.db"),
       fileSource(&fileCache),
-      map(*this, fileSource, MapMode::Continuous, true) {
+      map(*this, fileSource, MapMode::Continuous) {
     mbgl::Log::Debug(mbgl::Event::Android, "NativeMapView::NativeMapView");
+
+    map.pause();
 
     assert(env != nullptr);
     assert(obj_ != nullptr);
@@ -116,10 +118,14 @@ void NativeMapView::activate() {
 
 void NativeMapView::deactivate() {
     mbgl::Log::Debug(mbgl::Event::Android, "NativeMapView::deactivate");
-    if (!eglMakeCurrent(display, EGL_NO_SURFACE, EGL_NO_SURFACE, EGL_NO_CONTEXT)) {
-        mbgl::Log::Error(mbgl::Event::OpenGL, "eglMakeCurrent(EGL_NO_CONTEXT) returned error %d",
-                         eglGetError());
-        throw new std::runtime_error("eglMakeCurrent() failed");
+    if (display != EGL_NO_DISPLAY) {
+        if (!eglMakeCurrent(display, EGL_NO_SURFACE, EGL_NO_SURFACE, EGL_NO_CONTEXT)) {
+            mbgl::Log::Error(mbgl::Event::OpenGL, "eglMakeCurrent(EGL_NO_CONTEXT) returned error %d",
+                             eglGetError());
+            throw new std::runtime_error("eglMakeCurrent() failed");
+        }
+    } else {
+        mbgl::Log::Info(mbgl::Event::Android, "Not deactivating as we are not ready");
     }
 }
 

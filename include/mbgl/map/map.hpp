@@ -31,8 +31,7 @@ class Map : private util::noncopyable {
 
 public:
     explicit Map(View&, FileSource&,
-                 MapMode mode = MapMode::Continuous,
-                 bool startPaused = false);
+                 MapMode mode = MapMode::Continuous);
     ~Map();
 
     // Pauses the render thread. The render thread will stop running but will not be terminated and will not lose state until resumed.
@@ -137,6 +136,7 @@ public:
 private:
     const std::unique_ptr<MapData> data;
     const std::unique_ptr<util::Thread<MapContext>> context;
+    bool paused = false;
 };
 
 }

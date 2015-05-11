@@ -55,11 +55,6 @@ private:
     jobject obj = nullptr;
 
     ANativeWindow *window = nullptr;
-
-    mbgl::SQLiteCache fileCache;
-    mbgl::DefaultFileSource fileSource;
-    mbgl::Map map;
-
     EGLDisplay display = EGL_NO_DISPLAY;
     EGLSurface surface = EGL_NO_SURFACE;
     EGLContext context = EGL_NO_CONTEXT;
@@ -74,6 +69,12 @@ private:
 
     bool fpsEnabled = false;
     double fps = 0.0;
+
+    // Ensure these are initialised last
+    mbgl::SQLiteCache fileCache;
+    mbgl::DefaultFileSource fileSource;
+    mbgl::Map map;
+
 };
 }
 }

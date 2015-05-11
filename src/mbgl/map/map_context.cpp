@@ -29,7 +29,7 @@
 
 namespace mbgl {
 
-MapContext::MapContext(uv_loop_t* loop, View& view_, FileSource& fileSource, MapData& data_, bool startPaused)
+MapContext::MapContext(uv_loop_t* loop, View& view_, FileSource& fileSource, MapData& data_)
     : view(view_),
       data(data_),
       env(fileSource),
@@ -40,20 +40,12 @@ MapContext::MapContext(uv_loop_t* loop, View& view_, FileSource& fileSource, Map
       glyphAtlas(util::make_unique<GlyphAtlas>(1024, 1024)),
       spriteAtlas(util::make_unique<SpriteAtlas>(512, 512)),
       lineAtlas(util::make_unique<LineAtlas>(512, 512)),
-      texturePool(util::make_unique<TexturePool>()),
-      painter(util::make_unique<Painter>(*spriteAtlas, *glyphAtlas, *lineAtlas))
-{
+      texturePool(util::make_unique<TexturePool>()) {
     assert(Environment::currentlyOn(ThreadType::Map));
 
     asyncUpdate->unref();
 
     view.activate();
-
-    if (startPaused) {
-        pause();
-    }
-
-    painter->setup();
 }
 
 MapContext::~MapContext() {
@@ -173,11 +165,6 @@ void MapContext::update() {
     updated |= data.transform.updateTransitions(now);
     transformState = data.transform.currentState();
 
-    if (updated & static_cast<UpdateType>(Update::Debug)) {
-        assert(painter);
-        painter->setDebug(data.getDebug());
-    }
-
     if (style) {
         if (updated & static_cast<UpdateType>(Update::DefaultTransitionDuration)) {
             style->setDefaultTransitionDuration(data.getDefaultTransitionDuration());
@@ -230,8 +217,13 @@ void MapContext::render() {
     env.performCleanup();
 
     assert(style);
-    assert(painter);
 
+    if (!painter) {
+        painter = util::make_unique<Painter>(*spriteAtlas, *glyphAtlas, *lineAtlas);
+        painter->setup();
+    }
+
+    painter->setDebug(data.getDebug());
     painter->render(*style, transformState, data.getAnimationTime());
 
     if (data.mode == MapMode::Still && callback && style->isLoaded() && resourceLoader->getSprite()->isLoaded()) {
