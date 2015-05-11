@@ -53,6 +53,9 @@ void getSegmentGlyphs(std::back_insert_iterator<GlyphInstances> glyphs, Anchor &
 
     while (true) {
         const float dist = util::dist<float>(newAnchor, end);
+        if (dist == 0) {
+            break;
+        }
         const float scale = offset / dist;
         float angle =
             -std::atan2(end.x - newAnchor.x, end.y - newAnchor.y) + direction * M_PI / 2.0f;

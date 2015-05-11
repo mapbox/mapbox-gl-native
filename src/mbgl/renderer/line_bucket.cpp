@@ -143,7 +143,7 @@ void LineBucket::addGeometry(const std::vector<Coordinate>& vertices) {
         // Find the cosine of the angle between the next and join normals
         // using dot product. The inverse of that is the miter length.
         const float cosHalfAngle = joinNormal.x * nextNormal.x + joinNormal.y * nextNormal.y;
-        const float miterLength = 1 / cosHalfAngle;
+        const float miterLength = cosHalfAngle != 0 ? 1 / cosHalfAngle: 1;
 
         // The join if a middle vertex, otherwise the cap
         const bool middleVertex = prevVertex && nextVertex;
