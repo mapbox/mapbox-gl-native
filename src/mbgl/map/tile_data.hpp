@@ -62,7 +62,7 @@ public:
     const TileID id;
     const std::string name;
     std::atomic<State> state;
-    std::atomic_flag parsing;
+    std::atomic_flag parsing = ATOMIC_FLAG_INIT;
 
 protected:
     // Set the internal parsing state to true so we prevent
