@@ -1,0 +1,12 @@
+{
+  "light": ["lighten", -50, "#FFF"],
+  "complex": ["lighten", -30, ["mix", 20, "#551A8B", ["saturate", 10, "#FF0000"]]],
+  "spin_constant": ["spin", 10, "@red"],
+  "mix_constant": ["mix", 20, "rgba(255, 0, 0, 1)", "@purple"],
+  "empty": [],
+  "lacks_op": ["", 30, "#fff"],
+  "@white": "#ffffff",
+  "@black": "#000",
+  "@red": "rgba(255, 0, 0, 0)",
+  "@purple": "rgba(85, 26, 139, 1)"
+}

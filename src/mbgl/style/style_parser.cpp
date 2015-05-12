@@ -8,6 +8,7 @@
 #include <mbgl/util/uv_detail.hpp>
 #include <mbgl/platform/log.hpp>
 #include <csscolorparser/csscolorparser.hpp>
+#include <mbgl/style/color_operations.hpp>
 
 #pragma GCC diagnostic push
 #pragma GCC diagnostic ignored "-Wshadow"
@@ -26,6 +27,13 @@ StyleParser::StyleParser() {
 }
 
 void StyleParser::parse(JSVal document) {
+    if (document.HasMember("version")) {
+        version = document["version"].GetInt();
+        if (version != 8) {
+            Log::Warning(Event::ParseStyle, "current renderer implementation only supports style spec version 8; using an outdated style will cause rendering errors");
+        }
+    }
+
     if (document.HasMember("constants")) {
         parseConstants(document["constants"]);
     }
@@ -85,7 +93,16 @@ void StyleParser::parseConstants(JSVal value) {
             std::string name { itr->name.GetString(), itr->name.GetStringLength() };
             // Discard constants that don't start with an @ sign.
             if (name.length() && name[0] == '@') {
-                constants.emplace(std::move(name), &itr->value);
+                JSVal constant = itr->value;
+                if (!constant.IsObject()) {
+                    Log::Warning(Event::ParseStyle, "constant '%s' must be an object with keys 'type', 'value'", name.c_str());
+                } else {
+                    if (!constant.HasMember("type") || !constant.HasMember("value")) {
+                        Log::Warning(Event::ParseStyle, "constant '%s' must have a type and value", name.c_str());
+                    } else {
+                        constants.emplace(std::move(name), &constant["value"]);
+                    }
+                }
             }
         }
     } else {
@@ -233,13 +250,17 @@ void StyleParser::parseSources(JSVal value) {
 
 #pragma mark - Parse Style Properties
 
-Color parseColor(JSVal value) {
-    if (!value.IsString()) {
-        Log::Warning(Event::ParseStyle, "color value must be a string");
+Color parseColor(JSVal value, std::unordered_map<std::string, const rapidjson::Value *> constants) {
+    if (!value.IsString() && !value.IsArray()) {
+        Log::Warning(Event::ParseStyle, "color value must be a string or an array");
         return Color{{ 0, 0, 0, 0 }};
     }
-
-    CSSColorParser::Color css_color = CSSColorParser::parse({ value.GetString(), value.GetStringLength() });
+    CSSColorParser::Color css_color;
+    if (value.IsArray()) {
+        css_color = parseColorOp(value, constants);
+    } else {
+        css_color = CSSColorParser::parse({ value.GetString(), value.GetStringLength()});
+    }
 
     // Premultiply the color.
     const float factor = css_color.a / 255;
@@ -247,7 +268,7 @@ Color parseColor(JSVal value) {
     return Color{{(float)css_color.r * factor,
                   (float)css_color.g * factor,
                   (float)css_color.b * factor,
-                  css_color.a}};
+                   css_color.a}};
 }
 
 std::tuple<bool,std::vector<float>> StyleParser::parseFloatArray(JSVal value) {
@@ -297,7 +318,7 @@ std::tuple<bool, float> StyleParser::parseProperty(JSVal value, const char* prop
 template <>
 std::tuple<bool, Color> StyleParser::parseProperty(JSVal value, const char*) {
     JSVal rvalue = replaceConstant(value);
-    return std::tuple<bool, Color> { true, parseColor(rvalue) };
+    return std::tuple<bool, Color> { true, parseColor(rvalue, constants) };
 }
 
 template <>
@@ -454,24 +475,30 @@ bool StyleParser::parseOptionalProperty(const char *property_name, PropertyKey k
     }
 }
 
-std::string normalizeFontStack(const std::string &name) {
-    namespace algo = boost::algorithm;
-    std::vector<std::string> parts;
-    algo::split(parts, name, algo::is_any_of(","), algo::token_compress_on);
-    std::for_each(parts.begin(), parts.end(), [](std::string& str) { algo::trim(str); });
-    return algo::join(parts, ", ");
-}
-
 template<> std::tuple<bool, std::string> StyleParser::parseProperty(JSVal value, const char *property_name) {
-    if (!value.IsString()) {
+    if (std::string { "text-font" } == property_name) {
+        if (!value.IsArray()) {
+            Log::Warning(Event::ParseStyle, "value of '%s' must be an array of strings", property_name);
+            return std::tuple<bool, std::string> { false, std::string() };
+        } else {
+            std::string result = "";
+            for (rapidjson::SizeType i = 0; i < value.Size(); ++i) {
+                JSVal stop = value[i];
+                if (stop.IsString()) {
+                    result += stop.GetString();
+                    if (i < value.Size()-1) {
+                        result += ", ";
+                    }
+                } else {
+                    Log::Warning(Event::ParseStyle, "text-font members must be strings");
+                    return std::tuple<bool, std::string> { false, {}};
+                }
+            }
+            return std::tuple<bool, std::string> { true, result };
+        }
+    } else if (!value.IsString()) {
         Log::Warning(Event::ParseStyle, "value of '%s' must be a string", property_name);
         return std::tuple<bool, std::string> { false, std::string() };
-    }
-
-    if (std::string { "text-font" } == property_name) {
-        return std::tuple<bool, std::string> {
-            true, normalizeFontStack({ value.GetString(), value.GetStringLength() })
-        };
     } else {
         return std::tuple<bool, std::string> { true, { value.GetString(), value.GetStringLength() } };
     }
@@ -791,7 +818,7 @@ void StyleParser::parsePaint(JSVal value, ClassProperties &klass) {
     parseOptionalProperty<Function<std::array<float, 2>>>("fill-translate", Key::FillTranslate, klass, value);
     parseOptionalProperty<PropertyTransition>("fill-translate-transition", Key::FillTranslate, klass, value);
     parseOptionalProperty<Function<TranslateAnchorType>>("fill-translate-anchor", Key::FillTranslateAnchor, klass, value);
-    parseOptionalProperty<PiecewiseConstantFunction<Faded<std::string>>>("fill-image", Key::FillImage, klass, value, "fill-image-transition");
+    parseOptionalProperty<PiecewiseConstantFunction<Faded<std::string>>>("fill-pattern", Key::FillImage, klass, value, "fill-pattern-transition");
 
     parseOptionalProperty<Function<float>>("line-opacity", Key::LineOpacity, klass, value);
     parseOptionalProperty<PropertyTransition>("line-opacity-transition", Key::LineOpacity, klass, value);
@@ -807,7 +834,7 @@ void StyleParser::parsePaint(JSVal value, ClassProperties &klass) {
     parseOptionalProperty<Function<float>>("line-blur", Key::LineBlur, klass, value);
     parseOptionalProperty<PropertyTransition>("line-blur-transition", Key::LineBlur, klass, value);
     parseOptionalProperty<PiecewiseConstantFunction<Faded<std::vector<float>>>>("line-dasharray", Key::LineDashArray, klass, value, "line-dasharray-transition");
-    parseOptionalProperty<PiecewiseConstantFunction<Faded<std::string>>>("line-image", Key::LineImage, klass, value, "line-image-transition");
+    parseOptionalProperty<PiecewiseConstantFunction<Faded<std::string>>>("line-pattern", Key::LineImage, klass, value, "line-pattern-transition");
 
     parseOptionalProperty<Function<float>>("icon-opacity", Key::IconOpacity, klass, value);
     parseOptionalProperty<PropertyTransition>("icon-opacity-transition", Key::IconOpacity, klass, value);
@@ -857,7 +884,7 @@ void StyleParser::parsePaint(JSVal value, ClassProperties &klass) {
 
     parseOptionalProperty<Function<float>>("background-opacity", Key::BackgroundOpacity, klass, value);
     parseOptionalProperty<Function<Color>>("background-color", Key::BackgroundColor, klass, value);
-    parseOptionalProperty<PiecewiseConstantFunction<Faded<std::string>>>("background-image", Key::BackgroundImage, klass, value, "background-image-transition");
+    parseOptionalProperty<PiecewiseConstantFunction<Faded<std::string>>>("background-pattern", Key::BackgroundImage, klass, value, "background-pattern-transition");
 }
 
 void StyleParser::parseLayout(JSVal value, util::ptr<StyleBucket> &bucket) {
@@ -871,7 +898,7 @@ void StyleParser::parseLayout(JSVal value, util::ptr<StyleBucket> &bucket) {
     parseOptionalProperty<Function<float>>("line-round-limit", Key::LineRoundLimit, bucket->layout, value);
 
     parseOptionalProperty<Function<PlacementType>>("symbol-placement", Key::SymbolPlacement, bucket->layout, value);
-    parseOptionalProperty<Function<float>>("symbol-min-distance", Key::SymbolMinDistance, bucket->layout, value);
+    parseOptionalProperty<Function<float>>("symbol-spacing", Key::SymbolSpacing, bucket->layout, value);
     parseOptionalProperty<Function<bool>>("symbol-avoid-edges", Key::SymbolAvoidEdges, bucket->layout, value);
     parseOptionalProperty<Function<bool>>("icon-allow-overlap", Key::IconAllowOverlap, bucket->layout, value);
     parseOptionalProperty<Function<bool>>("icon-ignore-placement", Key::IconIgnorePlacement, bucket->layout, value);

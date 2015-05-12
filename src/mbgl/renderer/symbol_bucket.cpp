@@ -285,7 +285,7 @@ void SymbolBucket::addFeature(const std::vector<Coordinate> &line, const Shaping
         }
 
         // Line labels
-        anchors = resample(line, layout.min_distance, minScale, collision.maxPlacementScale,
+        anchors = resample(line, layout.spacing, minScale, collision.maxPlacementScale,
                            collision.tilePixelRatio, resampleOffset);
 
         // Sort anchors by segment so that we can start placement with the

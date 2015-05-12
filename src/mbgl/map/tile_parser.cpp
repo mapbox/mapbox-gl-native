@@ -204,7 +204,7 @@ std::unique_ptr<Bucket> TileParser::createSymbolBucket(const GeometryTileLayer& 
         layout.icon.rotation_alignment = RotationAlignmentType::Map;
         layout.text.rotation_alignment = RotationAlignmentType::Map;
     };
-    applyLayoutProperty(PropertyKey::SymbolMinDistance, bucket_desc.layout, layout.min_distance, z);
+    applyLayoutProperty(PropertyKey::SymbolSpacing, bucket_desc.layout, layout.spacing, z);
     applyLayoutProperty(PropertyKey::SymbolAvoidEdges, bucket_desc.layout, layout.avoid_edges, z);
 
     applyLayoutProperty(PropertyKey::IconAllowOverlap, bucket_desc.layout, layout.icon.allow_overlap, z);
