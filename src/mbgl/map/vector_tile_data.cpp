@@ -6,6 +6,7 @@
 #include <mbgl/map/source.hpp>
 #include <mbgl/geometry/glyph_atlas.hpp>
 #include <mbgl/platform/log.hpp>
+#include <mbgl/text/collision.hpp>
 #include <mbgl/util/pbf.hpp>
 
 using namespace mbgl;
@@ -19,12 +20,13 @@ VectorTileData::VectorTileData(const TileID& id_,
                                util::ptr<Sprite> sprite_,
                                const SourceInfo& source_)
     : TileData(id_, source_),
+      depth(id_.z >= source_.max_zoom ? mapMaxZoom - id_.z : 1),
       glyphAtlas(glyphAtlas_),
       glyphStore(glyphStore_),
       spriteAtlas(spriteAtlas_),
       sprite(sprite_),
       style(style_),
-      depth(id.z >= source.max_zoom ? mapMaxZoom - id.z : 1) {
+      collision(util::make_unique<Collision>(id_.z, 4096, source_.tile_size, depth)) {
 }
 
 VectorTileData::~VectorTileData() {
@@ -90,4 +92,12 @@ void VectorTileData::setBucket(StyleLayer const& layer, std::unique_ptr<Bucket> 
     }
 
     buckets[layer.bucket->name] = std::move(bucket);
+}
+
+void VectorTileData::setState(const State& state_) {
+    TileData::setState(state_);
+
+    if (isImmutable()) {
+        collision.reset();
+    }
 }

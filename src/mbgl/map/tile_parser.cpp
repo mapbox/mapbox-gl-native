@@ -8,7 +8,6 @@
 #include <mbgl/renderer/line_bucket.hpp>
 #include <mbgl/renderer/symbol_bucket.hpp>
 #include <mbgl/util/constants.hpp>
-#include <mbgl/text/collision.hpp>
 #include <mbgl/util/std.hpp>
 #include <mbgl/style/style.hpp>
 
@@ -35,10 +34,8 @@ TileParser::TileParser(const GeometryTile& geometryTile_,
       glyphStore(glyphStore_),
       spriteAtlas(spriteAtlas_),
       sprite(sprite_),
-      collision(util::make_unique<Collision>(tile.id.z, 4096, tile.source.tile_size, tile.depth)),
       partialParse(false) {
     assert(sprite);
-    assert(collision);
 }
 
 bool TileParser::obsolete() const {
@@ -196,7 +193,7 @@ std::unique_ptr<Bucket> TileParser::createSymbolBucket(const GeometryTileLayer& 
         return nullptr;
     }
 
-    auto bucket = util::make_unique<SymbolBucket>(*collision);
+    auto bucket = util::make_unique<SymbolBucket>(*tile.getCollision());
 
     const float z = tile.id.z;
     auto& layout = bucket->layout;

@@ -29,7 +29,6 @@ class StyleLayoutRaster;
 class StyleLayoutLine;
 class StyleLayoutSymbol;
 class VectorTileData;
-class Collision;
 
 class TileParser : private util::noncopyable {
 public:
@@ -69,7 +68,6 @@ private:
     SpriteAtlas& spriteAtlas;
     util::ptr<Sprite> sprite;
 
-    std::unique_ptr<Collision> collision;
     bool partialParse;
 };
 
