@@ -49,7 +49,7 @@ private:
     std::mutex mtx;
     BinPack<uint16_t> bin;
     std::map<std::string, std::map<uint32_t, GlyphValue>> index;
-    std::unique_ptr<char[]> data;
+    const std::unique_ptr<uint8_t[]> data;
     std::atomic<bool> dirty;
     uint32_t texture = 0;
 };

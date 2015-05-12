@@ -77,7 +77,7 @@ private:
     util::ptr<Sprite> sprite;
     std::map<std::string, Rect<dimension>> images;
     std::set<std::string> uninitialized;
-    uint32_t *data = nullptr;
+    std::unique_ptr<uint32_t[]> data;
     std::atomic<bool> dirty;
     bool fullUploadRequired = true;
     uint32_t texture = 0;
