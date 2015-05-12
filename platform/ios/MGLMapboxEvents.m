@@ -83,6 +83,7 @@ NSString *const MGLEventGestureRotateStart = @"Rotation";
 @property (atomic) NSURLSession *session;
 @property (atomic) NSData *digicertCert;
 @property (atomic) NSData *geoTrustCert;
+@property (atomic) NSString *alternateDataServerURL;
 
 
 // The paused state tracker is only ever accessed from the main thread.
@@ -252,6 +253,14 @@ NSString *const MGLEventGestureRotateStart = @"Rotation";
     MGLAssertIsMainThread();
     [MGLMapboxEvents sharedManager].token = token;
 }
+
+// Must be called from the main thread.
+//
++ (void) setAlternateDataServerURL:(NSString *)alternateDataServerURL {
+    MGLAssertIsMainThread();
+    [MGLMapboxEvents sharedManager].alternateDataServerURL = alternateDataServerURL;
+}
+
 
 // Must be called from the main thread.
 //
