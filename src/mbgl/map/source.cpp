@@ -21,6 +21,7 @@
 #include <mbgl/map/raster_tile_data.hpp>
 #include <mbgl/map/live_tile_data.hpp>
 #include <mbgl/style/style.hpp>
+#include <mbgl/gl/debugging.hpp>
 
 #include <algorithm>
 
@@ -179,7 +180,7 @@ void Source::updateMatrices(const mat4 &projMatrix, const TransformState &transf
 void Source::drawClippingMasks(Painter &painter) {
     for (const auto& pair : tiles) {
         Tile &tile = *pair.second;
-        gl::group group(std::string { "mask: " } + std::string(tile.id));
+        gl::debugging::group group(std::string { "mask: " } + std::string(tile.id));
         painter.drawClippingMask(tile.matrix, tile.clip);
     }
 }

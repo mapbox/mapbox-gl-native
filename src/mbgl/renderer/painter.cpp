@@ -4,6 +4,7 @@
 #include <mbgl/map/tile.hpp>
 
 #include <mbgl/platform/log.hpp>
+#include <mbgl/gl/debugging.hpp>
 
 #include <mbgl/style/style.hpp>
 #include <mbgl/style/style_layer.hpp>
@@ -56,18 +57,7 @@ bool Painter::needsAnimation() const {
 }
 
 void Painter::setup() {
-    // Enable GL debugging
-    if ((gl::DebugMessageControl != nullptr) && (gl::DebugMessageCallback != nullptr)) {
-        // This will enable all messages including performance hints
-        //MBGL_CHECK_ERROR(gl::DebugMessageControl(GL_DONT_CARE, GL_DONT_CARE, GL_DONT_CARE, 0, nullptr, GL_TRUE));
-
-        // This will only enable high and medium severity messages
-        MBGL_CHECK_ERROR(gl::DebugMessageControl(GL_DONT_CARE, GL_DONT_CARE, GL_DEBUG_SEVERITY_HIGH, 0, nullptr, GL_TRUE));
-        MBGL_CHECK_ERROR(gl::DebugMessageControl(GL_DONT_CARE, GL_DONT_CARE, GL_DEBUG_SEVERITY_MEDIUM, 0, nullptr, GL_TRUE));
-        MBGL_CHECK_ERROR(gl::DebugMessageControl(GL_DONT_CARE, GL_DONT_CARE, GL_DEBUG_SEVERITY_NOTIFICATION, 0, nullptr, GL_FALSE));
-
-        MBGL_CHECK_ERROR(gl::DebugMessageCallback(gl::debug_callback, nullptr));
-    }
+    gl::debugging::enable();
 
     setupShaders();
 
@@ -160,7 +150,7 @@ void Painter::changeMatrix() {
 }
 
 void Painter::clear() {
-    gl::group group("clear");
+    gl::debugging::group group("clear");
     config.stencilTest = true;
     config.stencilMask = 0xFF;
     config.depthTest = false;
@@ -212,7 +202,7 @@ void Painter::render(const Style& style, TransformState state_, TimePoint time) 
     // - UPLOAD PASS -------------------------------------------------------------------------------
     // Uploads all required buffers and images before we do any actual rendering.
     {
-        const gl::group upload("upload");
+        const gl::debugging::group upload("upload");
 
         tileStencilBuffer.upload();
         tileBorderBuffer.upload();
@@ -231,7 +221,7 @@ void Painter::render(const Style& style, TransformState state_, TimePoint time) 
     // - CLIPPING MASKS ----------------------------------------------------------------------------
     // Draws the clipping masks to the stencil buffer.
     {
-        const gl::group clip("clip");
+        const gl::debugging::group clip("clip");
 
         // Update all clipping IDs.
         ClipIDGenerator generator;
@@ -259,7 +249,7 @@ void Painter::render(const Style& style, TransformState state_, TimePoint time) 
     // - OPAQUE PASS -------------------------------------------------------------------------------
     // Render everything top-to-bottom by using reverse iterators. Render opaque objects first.
     {
-        const gl::group _("opaque");
+        const gl::debugging::group _("opaque");
 
         if (debug::renderTree) {
             Log::Info(Event::Render, "%*s%s", indent++ * 4, "", "OPAQUE {");
@@ -270,13 +260,13 @@ void Painter::render(const Style& style, TransformState state_, TimePoint time) 
             const auto& item = *it;
             if (item.bucket && item.tile) {
                 if (item.hasRenderPass(RenderPass::Opaque)) {
-                    const gl::group group(item.layer.id + " - " + std::string(item.tile->id));
+                    const gl::debugging::group group(item.layer.id + " - " + std::string(item.tile->id));
                     setStrata(i * strata_thickness);
                     prepareTile(*item.tile);
                     item.bucket->render(*this, item.layer, item.tile->id, item.tile->matrix);
                 }
             } else {
-                const gl::group group("background");
+                const gl::debugging::group group("background");
                 setStrata(i * strata_thickness);
                 renderBackground(item.layer);
             }
@@ -289,7 +279,7 @@ void Painter::render(const Style& style, TransformState state_, TimePoint time) 
     // - TRANSLUCENT PASS --------------------------------------------------------------------------
     // Make a second pass, rendering translucent objects. This time, we render bottom-to-top.
     {
-        const gl::group _("translucent");
+        const gl::debugging::group _("translucent");
 
         if (debug::renderTree) {
             Log::Info(Event::Render, "%*s%s", indent++ * 4, "", "TRANSLUCENT {");
@@ -300,7 +290,7 @@ void Painter::render(const Style& style, TransformState state_, TimePoint time) 
             const auto& item = *it;
             if (item.bucket && item.tile) {
                 if (item.hasRenderPass(RenderPass::Translucent)) {
-                    const gl::group group(item.layer.id + " - " + std::string(item.tile->id));
+                    const gl::debugging::group group(item.layer.id + " - " + std::string(item.tile->id));
                     setStrata(i * strata_thickness);
                     prepareTile(*item.tile);
                     item.bucket->render(*this, item.layer, item.tile->id, item.tile->matrix);
@@ -317,7 +307,7 @@ void Painter::render(const Style& style, TransformState state_, TimePoint time) 
     // - DEBUG PASS --------------------------------------------------------------------------------
     // Renders debug overlays.
     {
-        const gl::group _("debug");
+        const gl::debugging::group _("debug");
 
         // Finalize the rendering, e.g. by calling debug render calls per tile.
         // This guarantees that we have at least one function per tile called.
@@ -331,10 +321,10 @@ void Painter::render(const Style& style, TransformState state_, TimePoint time) 
     // TODO: Find a better way to unbind VAOs after we're done with them without introducing
     // unnecessary bind(0)/bind(N) sequences.
     {
-        const gl::group _("cleanup");
+        const gl::debugging::group _("cleanup");
 
         MBGL_CHECK_ERROR(glBindTexture(GL_TEXTURE_2D, 0));
-        MBGL_CHECK_ERROR(gl::BindVertexArray(0));
+        MBGL_CHECK_ERROR(VertexArrayObject::Bind(0));
     }
 }
 

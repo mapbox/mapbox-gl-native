@@ -17,22 +17,6 @@ pthread_once_t loadGLExtensions = PTHREAD_ONCE_INIT;
 
 #ifdef MBGL_USE_CGL
 #include <CoreFoundation/CoreFoundation.h>
-
-typedef void (* CGLProc)(void);
-CGLProc CGLGetProcAddress(const char *proc) {
-    static CFBundleRef framework = nullptr;
-    if (!framework) {
-        framework = CFBundleGetBundleWithIdentifier(CFSTR("com.apple.opengl"));
-        if (!framework) {
-            throw std::runtime_error("Failed to load OpenGL framework.");
-        }
-    }
-
-    CFStringRef name = CFStringCreateWithCString(kCFAllocatorDefault, proc, kCFStringEncodingASCII);
-    CGLProc symbol = reinterpret_cast<CGLProc>(CFBundleGetFunctionPointerForName(framework, name));
-    CFRelease(name);
-    return symbol;
-}
 #elif MBGL_USE_GLX
 #include <GL/glx.h>
 #endif
@@ -62,36 +46,25 @@ void HeadlessView::loadExtensions() {
     }
 
     pthread_once(&loadGLExtensions, [] {
-        const char *extensionPtr = reinterpret_cast<const char *>(MBGL_CHECK_ERROR(glGetString(GL_EXTENSIONS)));
-
-        if (!extensionPtr) {
-            return;
-        }
-        const std::string extensions = extensionPtr;
-
 #ifdef MBGL_USE_CGL
-        if (extensions.find("GL_APPLE_vertex_array_object") != std::string::npos) {
-            gl::BindVertexArray = reinterpret_cast<gl::PFNGLBINDVERTEXARRAYPROC>(CGLGetProcAddress("glBindVertexArrayAPPLE"));
-            gl::DeleteVertexArrays = reinterpret_cast<gl::PFNGLDELETEVERTEXARRAYSPROC>(CGLGetProcAddress("glDeleteVertexArraysAPPLE"));
-            gl::GenVertexArrays = reinterpret_cast<gl::PFNGLGENVERTEXARRAYSPROC>(CGLGetProcAddress("glGenVertexArraysAPPLE"));
-            gl::IsVertexArray = reinterpret_cast<gl::PFNGLISVERTEXARRAYPROC>(CGLGetProcAddress("glIsVertexArrayAPPLE"));
-            assert(gl::BindVertexArray != nullptr);
-            assert(gl::DeleteVertexArrays != nullptr);
-            assert(gl::GenVertexArrays != nullptr);
-            assert(gl::IsVertexArray != nullptr);
-        }
+        gl::InitializeExtensions([](const char * name) {
+            static CFBundleRef framework = CFBundleGetBundleWithIdentifier(CFSTR("com.apple.opengl"));
+            if (!framework) {
+                throw std::runtime_error("Failed to load OpenGL framework.");
+            }
+
+            CFStringRef str = CFStringCreateWithCString(kCFAllocatorDefault, name, kCFStringEncodingASCII);
+            void* symbol = CFBundleGetFunctionPointerForName(framework, str);
+            CFRelease(str);
+
+            return reinterpret_cast<gl::glProc>(symbol);
+        });
 #endif
+
 #ifdef MBGL_USE_GLX
-        if (extensions.find("GL_ARB_vertex_array_object") != std::string::npos) {
-            gl::BindVertexArray = reinterpret_cast<gl::PFNGLBINDVERTEXARRAYPROC>(glXGetProcAddress((const GLubyte *)"glBindVertexArray"));
-            gl::DeleteVertexArrays = reinterpret_cast<gl::PFNGLDELETEVERTEXARRAYSPROC>(glXGetProcAddress((const GLubyte *)"glDeleteVertexArrays"));
-            gl::GenVertexArrays = reinterpret_cast<gl::PFNGLGENVERTEXARRAYSPROC>(glXGetProcAddress((const GLubyte *)"glGenVertexArrays"));
-            gl::IsVertexArray = reinterpret_cast<gl::PFNGLISVERTEXARRAYPROC>(glXGetProcAddress((const GLubyte *)"glIsVertexArray"));
-            assert(gl::BindVertexArray != nullptr);
-            assert(gl::DeleteVertexArrays != nullptr);
-            assert(gl::GenVertexArrays != nullptr);
-            assert(gl::IsVertexArray != nullptr);
-        }
+        gl::InitializeExtensions([](const char * name) {
+            return glXGetProcAddress(reinterpret_cast<const GLubyte *>(name));
+        });
 #endif
     });
 

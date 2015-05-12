@@ -14,10 +14,6 @@ void glfwError(int error, const char *description) {
 }
 
 GLFWView::GLFWView(bool fullscreen_) : fullscreen(fullscreen_) {
-#ifdef NVIDIA
-    glDiscardFramebufferEXT = reinterpret_cast<PFNGLDISCARDFRAMEBUFFEREXTPROC>(glfwGetProcAddress("glDiscardFramebufferEXT"));
-#endif
-
     glfwSetErrorCallback(glfwError);
 
     if (!glfwInit()) {
@@ -66,82 +62,7 @@ GLFWView::GLFWView(bool fullscreen_) : fullscreen(fullscreen_) {
     glfwSetKeyCallback(window, onKey);
 
     pthread_once(&loadGLExtensions, [] {
-        const std::string extensions = reinterpret_cast<const char *>(MBGL_CHECK_ERROR(glGetString(GL_EXTENSIONS)));
-        using namespace mbgl;
-
-        if (extensions.find("GL_KHR_debug") != std::string::npos) {
-            gl::DebugMessageControl = reinterpret_cast<gl::PFNGLDEBUGMESSAGECONTROLPROC>(glfwGetProcAddress("glDebugMessageControl"));
-            gl::DebugMessageInsert = reinterpret_cast<gl::PFNGLDEBUGMESSAGEINSERTPROC>(glfwGetProcAddress("glDebugMessageInsert"));
-            gl::DebugMessageCallback = reinterpret_cast<gl::PFNGLDEBUGMESSAGECALLBACKPROC>(glfwGetProcAddress("glDebugMessageCallback"));
-            gl::GetDebugMessageLog = reinterpret_cast<gl::PFNGLGETDEBUGMESSAGELOGPROC>(glfwGetProcAddress("glGetDebugMessageLog"));
-            gl::GetPointerv = reinterpret_cast<gl::PFNGLGETPOINTERVPROC>(glfwGetProcAddress("glGetPointerv"));
-            gl::PushDebugGroup = reinterpret_cast<gl::PFNGLPUSHDEBUGGROUPPROC>(glfwGetProcAddress("glPushDebugGroup"));
-            gl::PopDebugGroup = reinterpret_cast<gl::PFNGLPOPDEBUGGROUPPROC>(glfwGetProcAddress("glPopDebugGroup"));
-            gl::ObjectLabel = reinterpret_cast<gl::PFNGLOBJECTLABELPROC>(glfwGetProcAddress("glObjectLabel"));
-            gl::GetObjectLabel = reinterpret_cast<gl::PFNGLGETOBJECTLABELPROC>(glfwGetProcAddress("glGetObjectLabel"));
-            gl::ObjectPtrLabel = reinterpret_cast<gl::PFNGLOBJECTPTRLABELPROC>(glfwGetProcAddress("glObjectPtrLabel"));
-            gl::GetObjectPtrLabel = reinterpret_cast<gl::PFNGLGETOBJECTPTRLABELPROC>(glfwGetProcAddress("glGetObjectPtrLabel"));
-            assert(gl::DebugMessageControl != nullptr);
-            assert(gl::DebugMessageInsert != nullptr);
-            assert(gl::DebugMessageCallback != nullptr);
-            assert(gl::GetDebugMessageLog != nullptr);
-            assert(gl::GetPointerv != nullptr);
-            assert(gl::PushDebugGroup != nullptr);
-            assert(gl::PopDebugGroup != nullptr);
-            assert(gl::ObjectLabel != nullptr);
-            assert(gl::GetObjectLabel != nullptr);
-            assert(gl::ObjectPtrLabel != nullptr);
-            assert(gl::GetObjectPtrLabel != nullptr);
-        } else {
-            if (extensions.find("GL_ARB_debug_output") != std::string::npos) {
-                gl::DebugMessageControl = reinterpret_cast<gl::PFNGLDEBUGMESSAGECONTROLPROC>(glfwGetProcAddress("glDebugMessageControlARB"));
-                gl::DebugMessageInsert = reinterpret_cast<gl::PFNGLDEBUGMESSAGEINSERTPROC>(glfwGetProcAddress("glDebugMessageInsertARB"));
-                gl::DebugMessageCallback = reinterpret_cast<gl::PFNGLDEBUGMESSAGECALLBACKPROC>(glfwGetProcAddress("glDebugMessageCallbackARB"));
-                gl::GetDebugMessageLog = reinterpret_cast<gl::PFNGLGETDEBUGMESSAGELOGPROC>(glfwGetProcAddress("glGetDebugMessageLogARB"));
-                gl::GetPointerv = reinterpret_cast<gl::PFNGLGETPOINTERVPROC>(glfwGetProcAddress("glGetPointerv"));
-                assert(gl::DebugMessageControl != nullptr);
-                assert(gl::DebugMessageInsert != nullptr);
-                assert(gl::DebugMessageCallback != nullptr);
-                assert(gl::GetDebugMessageLog != nullptr);
-                assert(gl::GetPointerv != nullptr);
-            }
-
-            if (extensions.find("GL_EXT_debug_marker") != std::string::npos) {
-                gl::InsertEventMarkerEXT = reinterpret_cast<gl::PFNGLINSERTEVENTMARKEREXTPROC>(glfwGetProcAddress("glInsertEventMarkerEXT"));
-                gl::PushGroupMarkerEXT = reinterpret_cast<gl::PFNGLPUSHGROUPMARKEREXTPROC>(glfwGetProcAddress("glPushGroupMarkerEXT"));
-                gl::PopGroupMarkerEXT = reinterpret_cast<gl::PFNGLPOPGROUPMARKEREXTPROC>(glfwGetProcAddress("glPopGroupMarkerEXT"));
-                assert(gl::InsertEventMarkerEXT != nullptr);
-                assert(gl::PushGroupMarkerEXT != nullptr);
-                assert(gl::PopGroupMarkerEXT != nullptr);
-            }
-
-            if (extensions.find("GL_EXT_debug_label") != std::string::npos) {
-                gl::LabelObjectEXT = reinterpret_cast<gl::PFNGLLABELOBJECTEXTPROC>(glfwGetProcAddress("glLabelObjectEXT"));
-                gl::GetObjectLabelEXT = reinterpret_cast<gl::PFNGLGETOBJECTLABELEXTPROC>(glfwGetProcAddress("glGetObjectLabelEXT"));
-                assert(gl::LabelObjectEXT != nullptr);
-                assert(gl::GetObjectLabelEXT != nullptr);
-            }
-        }
-
-        if (extensions.find("GL_ARB_vertex_array_object") != std::string::npos) {
-            gl::BindVertexArray = reinterpret_cast<gl::PFNGLBINDVERTEXARRAYPROC>(glfwGetProcAddress("glBindVertexArray"));
-            gl::DeleteVertexArrays = reinterpret_cast<gl::PFNGLDELETEVERTEXARRAYSPROC>(glfwGetProcAddress("glDeleteVertexArrays"));
-            gl::GenVertexArrays = reinterpret_cast<gl::PFNGLGENVERTEXARRAYSPROC>(glfwGetProcAddress("glGenVertexArrays"));
-            gl::IsVertexArray = reinterpret_cast<gl::PFNGLISVERTEXARRAYPROC>(glfwGetProcAddress("glIsVertexArray"));
-            assert(gl::BindVertexArray != nullptr);
-            assert(gl::DeleteVertexArrays != nullptr);
-            assert(gl::GenVertexArrays != nullptr);
-            assert(gl::IsVertexArray != nullptr);
-        } else if (extensions.find("GL_APPLE_vertex_array_object") != std::string::npos) {
-            gl::BindVertexArray = reinterpret_cast<gl::PFNGLBINDVERTEXARRAYPROC>(glfwGetProcAddress("glBindVertexArrayAPPLE"));
-            gl::DeleteVertexArrays = reinterpret_cast<gl::PFNGLDELETEVERTEXARRAYSPROC>(glfwGetProcAddress("glDeleteVertexArraysAPPLE"));
-            gl::GenVertexArrays = reinterpret_cast<gl::PFNGLGENVERTEXARRAYSPROC>(glfwGetProcAddress("glGenVertexArraysAPPLE"));
-            gl::IsVertexArray = reinterpret_cast<gl::PFNGLISVERTEXARRAYPROC>(glfwGetProcAddress("glIsVertexArrayAPPLE"));
-            assert(gl::BindVertexArray != nullptr);
-            assert(gl::DeleteVertexArrays != nullptr);
-            assert(gl::GenVertexArrays != nullptr);
-            assert(gl::IsVertexArray != nullptr);
-        }
+        mbgl::gl::InitializeExtensions(glfwGetProcAddress);
     });
 
     glfwMakeContextCurrent(nullptr);

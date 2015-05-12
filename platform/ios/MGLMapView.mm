@@ -235,22 +235,18 @@ std::chrono::steady_clock::duration secondsAsDuration(float duration)
     //
     dispatch_once(&loadGLExtensions, ^
     {
-        const std::string extensions = (char *)glGetString(GL_EXTENSIONS);
+        mbgl::gl::InitializeExtensions([](const char * name) {
+            static CFBundleRef framework = CFBundleGetBundleWithIdentifier(CFSTR("com.apple.opengles"));
+            if (!framework) {
+                throw std::runtime_error("Failed to load OpenGL framework.");
+            }
 
-        using namespace mbgl;
+            CFStringRef str = CFStringCreateWithCString(kCFAllocatorDefault, name, kCFStringEncodingASCII);
+            void* symbol = CFBundleGetFunctionPointerForName(framework, str);
+            CFRelease(str);
 
-        if (extensions.find("GL_OES_vertex_array_object") != std::string::npos) {
-            gl::BindVertexArray = glBindVertexArrayOES;
-            gl::DeleteVertexArrays = glDeleteVertexArraysOES;
-            gl::GenVertexArrays = glGenVertexArraysOES;
-            gl::IsVertexArray = glIsVertexArrayOES;
-        }
-
-        if (extensions.find("GL_EXT_debug_marker") != std::string::npos) {
-            gl::InsertEventMarkerEXT = glInsertEventMarkerEXT;
-            gl::PushGroupMarkerEXT = glPushGroupMarkerEXT;
-            gl::PopGroupMarkerEXT = glPopGroupMarkerEXT;
-        }
+            return reinterpret_cast<mbgl::gl::glProc>(symbol);
+        });
     });
 
     // setup mbgl map
