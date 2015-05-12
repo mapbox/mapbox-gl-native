@@ -118,12 +118,12 @@ NSString *const MGLEventGestureRotateStart = @"Rotation";
     self = [super init];
     if (self) {
         
-        if (! [MGLAccountManager sharedInstance].showsOptOutInApp) {
+        if (! [MGLAccountManager mapboxMetricsEnabledSettingShownInApp]) {
             // Opt Out is not configured in UI, so check for Settings.bundle
             // Put Settings bundle into memory
             NSString *appSettingsBundle = [[NSBundle mainBundle] pathForResource:@"Settings" ofType:@"bundle"];
 
-            NSAssert(appSettingsBundle, @"End Users must be able to opt out of Metrics in your app either via the Settings.bundle or in the app itself which must be noted via setting [MGLAccountManager setShowsOptOutInApp:YES]");
+            NSAssert(appSettingsBundle, @"End users must be able to opt out of Metrics in your app, either via the Settings.bundle or in the app itself which must be noted via setting +[MGLAccountManager setShowsOptOutInApp:YES]");
 
             // Dynamic Settings.bundle loading based on:
             // http://stackoverflow.com/questions/510216/can-you-make-the-settings-in-settings-bundle-default-even-if-you-dont-open-the
@@ -244,10 +244,6 @@ NSString *const MGLEventGestureRotateStart = @"Rotation";
 
 - (void)dealloc {
     [self pauseMetricsCollection];
-}
-
-+ (void) setShowsOptOutInApp:(BOOL)showsOptOut {
-
 }
 
 // Must be called from the main thread.

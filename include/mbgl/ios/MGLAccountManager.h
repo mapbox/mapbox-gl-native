@@ -1,6 +1,6 @@
 @interface MGLAccountManager : NSObject
 
-+ (void) setShowsOptOutInApp:(BOOL)showsOptOut;
++ (void) setMapboxMetricsEnabledSettingShownInApp:(BOOL)showsOptOut;
 + (void) setAccessToken:(NSString *) accessToken;
 + (NSString *) accessToken;
 

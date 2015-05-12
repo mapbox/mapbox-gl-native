@@ -39,11 +39,11 @@ static MGLAccountManager *_sharedManager;
     return _sharedManager;
 }
 
-+ (void) setShowsOptOutInApp:(BOOL)showsOptOut {
-    [[MGLAccountManager sharedInstance] setShowsOptOutInApp:showsOptOut];
++ (void) setMapboxMetricsEnabledSettingShownInApp:(BOOL)showsOptOut {
+    [MGLAccountManager sharedInstance].showsOptOutInApp = showsOptOut;
 }
 
-+ (BOOL) showsOptOutInApp {
++ (BOOL) mapboxMetricsEnabledSettingShownInApp {
     return [MGLAccountManager sharedInstance].showsOptOutInApp;
 }
 
