@@ -22,7 +22,7 @@
     if ( ! accessToken) NSLog(@"No access token set. Mapbox vector tiles won't work.");
 
     // Signal To SDK That Opt Out Is In App UI
-//    [MGLAccountManager setShowsOptOutInApp:YES];
+//    [MGLAccountManager setMapboxMetricsEnabledSettingShownInApp:YES];
 
     // Start Mapbox GL SDK
     [MGLAccountManager setAccessToken:accessToken];
