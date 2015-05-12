@@ -7,11 +7,7 @@ const std::vector<std::pair<std::string, std::string>> defaultStyles = {
     { "asset://styles/mapbox-streets-v7.json", "Mapbox Streets" },
     { "asset://styles/emerald-v7.json", "Emerald" },
     { "asset://styles/light-v7.json", "Light" },
-    { "asset://styles/dark-v7.json", "Dark" },
-    { "asset://styles/bright-v7.json", "Bright" },
-    { "asset://styles/basic-v7.json", "Basic" },
-    { "asset://styles/outdoors-v7.json", "Outdoors" },
-    { "asset://styles/satellite-v7.json", "Satellite" },
+    { "asset://styles/dark-v7.json", "Dark" }
 };
 
 } // end namespace util
