@@ -1,3 +1,5 @@
+#import <Foundation/Foundation.h>
+
 @interface MGLAccountManager : NSObject
 
 + (void) setMapboxMetricsEnabledSettingShownInApp:(BOOL)showsOptOut;
