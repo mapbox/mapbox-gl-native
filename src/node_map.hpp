@@ -3,8 +3,12 @@
 #include <mbgl/map/map.hpp>
 #include <mbgl/platform/default/headless_view.hpp>
 
+#pragma GCC diagnostic push
+#pragma GCC diagnostic ignored "-Wunused-parameter"
+#pragma GCC diagnostic ignored "-Wshadow"
 #include <node.h>
 #include <nan.h>
+#pragma GCC diagnostic pop
 
 #include <queue>
 

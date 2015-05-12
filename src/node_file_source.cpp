@@ -64,31 +64,31 @@ NodeFileSource::~NodeFileSource() {
 }
 
 mbgl::Request* NodeFileSource::request(const mbgl::Resource& resource, uv_loop_t* loop, Callback callback) {
-    auto request = new mbgl::Request(resource, loop, std::move(callback));
+    auto req = new mbgl::Request(resource, loop, std::move(callback));
 
     // This function can be called from any thread. Make sure we're executing the actual call in the
     // file source loop by sending it over the queue. It will be processed in processAction().
-    queue->send(Action{ Action::Add, request });
-    return request;
+    queue->send(Action{ Action::Add, req });
+    return req;
 }
 
-void NodeFileSource::cancel(mbgl::Request* request) {
-    request->cancel();
+void NodeFileSource::cancel(mbgl::Request* req) {
+    req->cancel();
 
     // This function can be called from any thread. Make sure we're executing the actual call in the
     // file source loop by sending it over the queue. It will be processed in processAction().
-    queue->send(Action{ Action::Cancel, request });
+    queue->send(Action{ Action::Cancel, req });
 }
 
 void NodeFileSource::request(const mbgl::Resource& resource, Callback callback) {
-    auto request = new mbgl::Request(resource, nullptr, std::move(callback));
+    auto req = new mbgl::Request(resource, nullptr, std::move(callback));
 
     // This function can be called from any thread. Make sure we're executing the actual call in the
     // file source loop by sending it over the queue. It will be processed in processAction().
-    queue->send(Action{ Action::Add, request });
+    queue->send(Action{ Action::Add, req });
 }
 
-void NodeFileSource::processAdd(mbgl::Request *request) {
+void NodeFileSource::processAdd(mbgl::Request *req) {
     NanScope();
 
     // Make sure the loop stays alive as long as request is pending.
@@ -96,17 +96,17 @@ void NodeFileSource::processAdd(mbgl::Request *request) {
         queue->ref();
     }
 
-    auto requestHandle = v8::Local<v8::Object>::New(NodeRequest::Create(handle_, request));
-    pending.emplace(request, std::move(v8::Persistent<v8::Object>::New(requestHandle)));
+    auto requestHandle = v8::Local<v8::Object>::New(NodeRequest::Create(handle_, req));
+    pending.emplace(req, std::move(v8::Persistent<v8::Object>::New(requestHandle)));
 
     v8::Local<v8::Value> argv[] = { requestHandle };
     NanMakeCallback(handle_, NanNew("request"), 1, argv);
 }
 
-void NodeFileSource::processCancel(mbgl::Request *request) {
+void NodeFileSource::processCancel(mbgl::Request *req) {
     NanScope();
 
-    auto it = pending.find(request);
+    auto it = pending.find(req);
     if (it == pending.end()) {
         // The response callback was already fired. There is no point in calling the cancelation
         // callback because the request is already completed.
@@ -132,12 +132,12 @@ void NodeFileSource::processCancel(mbgl::Request *request) {
     }
 
     // Finally, destruct the request object
-    request->destruct();
+    req->destruct();
 }
 
-void NodeFileSource::notify(mbgl::Request *request, const std::shared_ptr<const mbgl::Response>& response) {
+void NodeFileSource::notify(mbgl::Request *req, const std::shared_ptr<const mbgl::Response>& response) {
     // First, remove the request, since it might be destructed at any point now.
-    auto it = pending.find(request);
+    auto it = pending.find(req);
     if (it != pending.end()) {
         it->second.Dispose();
         pending.erase(it);
@@ -148,7 +148,7 @@ void NodeFileSource::notify(mbgl::Request *request, const std::shared_ptr<const 
         }
     }
 
-    request->notify(response);
+    req->notify(response);
 }
 
 }

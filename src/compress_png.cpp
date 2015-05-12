@@ -1,15 +1,13 @@
-#include <node.h>
-#include <nan.h>
-
+#include "compress_png.hpp"
 #include <mbgl/util/image.hpp>
 
 namespace node_mbgl {
 
 class CompressPNGWorker : public NanAsyncWorker {
 public:
-    CompressPNGWorker(NanCallback *callback, v8::Local<v8::Object> buffer_, uint32_t width_,
+    CompressPNGWorker(NanCallback *callback_, v8::Local<v8::Object> buffer_, uint32_t width_,
                       uint32_t height_)
-        : NanAsyncWorker(callback),
+        : NanAsyncWorker(callback_),
           buffer(v8::Persistent<v8::Object>::New(buffer_)),
           data(node::Buffer::Data(buffer_)),
           width(width_),
