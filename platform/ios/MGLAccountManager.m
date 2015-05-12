@@ -6,6 +6,7 @@
 
 @interface MGLAccountManager()
 
+@property (atomic) BOOL showsOptOutInApp;
 @property (atomic) NSString *accessToken;
 
 @end
@@ -23,6 +24,7 @@ static MGLAccountManager *_sharedManager;
         if ( ! NSProcessInfo.processInfo.mgl_isInterfaceBuilderDesignablesAgent) {
             void (^setupBlock)() = ^{
                 _sharedManager = [[self alloc] init];
+                _sharedManager.showsOptOutInApp = NO;
             };
             if ( ! [[NSThread currentThread] isMainThread]) {
                 dispatch_sync(dispatch_get_main_queue(), ^{
@@ -35,6 +37,14 @@ static MGLAccountManager *_sharedManager;
         }
     });
     return _sharedManager;
+}
+
++ (void) setShowsOptOutInApp:(BOOL)showsOptOut {
+    [[MGLAccountManager sharedInstance] setShowsOptOutInApp:showsOptOut];
+}
+
++ (BOOL) showsOptOutInApp {
+    return [MGLAccountManager sharedInstance].showsOptOutInApp;
 }
 
 + (void) setAccessToken:(NSString *) accessToken {
