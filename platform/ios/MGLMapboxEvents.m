@@ -119,23 +119,22 @@ NSString *const MGLEventGestureRotateStart = @"Rotation";
         
         // Put Settings bundle into memory
         NSString *appSettingsBundle = [[NSBundle mainBundle] pathForResource:@"Settings" ofType:@"bundle"];
+        NSMutableDictionary *defaultsToRegister = [NSMutableDictionary dictionaryWithObject:@YES forKey:@"MGLMapboxMetricsEnabled"];
         if(!appSettingsBundle) {
-            NSLog(@"Could not find Settings.bundle");
+            NSLog(@"End users must be able to opt out of Metrics in your app, either inside Settings (via Settings.bundle) or inside this app.");
         } else {
             // Dynamic Settings.bundle loading based on:
             // http://stackoverflow.com/questions/510216/can-you-make-the-settings-in-settings-bundle-default-even-if-you-dont-open-the
             NSDictionary *settings = [NSDictionary dictionaryWithContentsOfFile:[appSettingsBundle stringByAppendingPathComponent:@"Root.plist"]];
             NSArray *preferences = [settings objectForKey:@"PreferenceSpecifiers"];
-            NSMutableDictionary *defaultsToRegister = [[NSMutableDictionary alloc] initWithCapacity:[preferences count]];
             for(NSDictionary *prefSpecification in preferences) {
                 NSString *key = [prefSpecification objectForKey:@"Key"];
-                if(key && [[prefSpecification allKeys] containsObject:@"DefaultValue"]) {
+                if([key isEqualToString:@"MGLMapboxMetricsEnabled"] && [[prefSpecification allKeys] containsObject:@"DefaultValue"]) {
                     [defaultsToRegister setObject:[prefSpecification objectForKey:@"DefaultValue"] forKey:key];
                 }
             }
-            
-            [[NSUserDefaults standardUserDefaults] registerDefaults:defaultsToRegister];
         }
+        [[NSUserDefaults standardUserDefaults] registerDefaults:defaultsToRegister];
         _appBundleId = [[NSBundle mainBundle] bundleIdentifier];
         NSString *uniqueID = [[NSProcessInfo processInfo] globallyUniqueString];
         _serialQueue = dispatch_queue_create([[NSString stringWithFormat:@"%@.%@.events.serial", _appBundleId, uniqueID] UTF8String], DISPATCH_QUEUE_SERIAL);
