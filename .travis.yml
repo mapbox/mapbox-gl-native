@@ -82,8 +82,14 @@ env:
     - secure: "nQqSM8rd7OHtV4MqmNqVnkrVHqxKqQsaWRYk4/nPdhbeVWtTtkk0df711LrF1TUtbEPEewHxYUvTZ/UXmwJNeoKdzTHavI8hnatRkgjyxGERPn1il1Otelht9I+LQQHf+plrpRjVWBrNIW0Zox1B3cqn6d3NglpbXrEQ2EjYGNA="
     - KIF_SCREENSHOTS="${TRAVIS_BUILD_DIR}/screenshots"
 
+before_install:
+- source ./scripts/travis_helper.sh
+
 install:
 - ./scripts/${FLAVOR}/install.sh
+
+before_script:
+- if [ -f ./scripts/${FLAVOR}/setup.sh ]; then source ./scripts/${FLAVOR}/setup.sh; fi
 
 script:
 - ./scripts/${FLAVOR}/run.sh

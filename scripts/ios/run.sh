@@ -6,8 +6,6 @@ set -u
 
 BUILDTYPE=${BUILDTYPE:-Release}
 
-source ./scripts/travis_helper.sh
-
 # Add Mason to PATH
 export PATH="`pwd`/.mason:${PATH}" MASON_DIR="`pwd`/.mason"
 
