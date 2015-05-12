@@ -294,6 +294,12 @@ std::chrono::steady_clock::duration secondsAsDuration(float duration)
                          @"Improve This Map",
                          nil];
 
+    // iOS 8+: add action that opens app's Settings.app panel, if applicable
+    if (&UIApplicationOpenSettingsURLString != NULL && ! [MGLAccountManager mapboxMetricsEnabledSettingShownInApp])
+    {
+        [_attributionSheet addButtonWithTitle:@"Adjust Privacy Settings"];
+    }
+
     // setup compass
     //
     _compass = [[UIImageView alloc] initWithImage:[MGLMapView resourceImageNamed:@"Compass.png"]];
@@ -1269,6 +1275,11 @@ std::chrono::steady_clock::duration secondsAsDuration(float duration)
                                  self.longitude, self.latitude, (int)round(self.zoomLevel)];
         [[UIApplication sharedApplication] openURL:
          [NSURL URLWithString:feedbackURL]];
+    }
+    // skips to 4 because button is conditionally added after cancel (index 3)
+    else if (buttonIndex == actionSheet.firstOtherButtonIndex + 4)
+    {
+        [[UIApplication sharedApplication] openURL:[NSURL URLWithString:UIApplicationOpenSettingsURLString]];
     }
 }
 
