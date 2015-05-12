@@ -142,10 +142,6 @@ GLFWView::GLFWView(bool fullscreen_) : fullscreen(fullscreen_) {
             assert(gl::GenVertexArrays != nullptr);
             assert(gl::IsVertexArray != nullptr);
         }
-
-        // Require packed depth stencil
-        gl::isPackedDepthStencilSupported = true;
-        gl::isDepth24Supported = true;
     });
 
     glfwMakeContextCurrent(nullptr);

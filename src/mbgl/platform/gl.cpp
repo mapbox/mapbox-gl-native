@@ -70,10 +70,6 @@ PFNGLDELETEVERTEXARRAYSPROC DeleteVertexArrays = nullptr;
 PFNGLGENVERTEXARRAYSPROC GenVertexArrays = nullptr;
 PFNGLISVERTEXARRAYPROC IsVertexArray = nullptr;
 
-bool isPackedDepthStencilSupported = false;
-
-bool isDepth24Supported = false;
-
 void checkError(const char *cmd, const char *file, int line) {
     const GLenum err = glGetError();
     if (err != GL_NO_ERROR) {

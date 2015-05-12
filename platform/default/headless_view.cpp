@@ -95,10 +95,6 @@ void HeadlessView::loadExtensions() {
 #endif
     });
 
-    // HeadlessView requires packed depth stencil
-    gl::isPackedDepthStencilSupported = true;
-    gl::isDepth24Supported = true;
-
     extensionsLoaded = true;
 }
 

@@ -610,15 +610,6 @@ void loadExtensions() {
         assert(gl::IsVertexArray != nullptr);
     }
 
-    if (extensions.find("GL_OES_packed_depth_stencil") != std::string::npos) {
-        mbgl::Log::Info(mbgl::Event::OpenGL, "Using GL_OES_packed_depth_stencil.");
-        gl::isPackedDepthStencilSupported = true;
-    }
-
-    if (extensions.find("GL_OES_depth24") != std::string::npos) {
-        gl::isDepth24Supported = true;
-    }
-
     if (extensions.find("GL_KHR_debug") != std::string::npos) {
         mbgl::Log::Info(mbgl::Event::OpenGL, "Using GL_KHR_debug.");
         gl::DebugMessageControl = reinterpret_cast<gl::PFNGLDEBUGMESSAGECONTROLPROC>(
