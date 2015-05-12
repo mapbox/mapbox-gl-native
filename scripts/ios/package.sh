@@ -4,6 +4,8 @@ set -e
 set -o pipefail
 set -u
 
+source ./scripts/travis_helper.sh
+
 NAME=MapboxGL
 OUTPUT=build/ios/pkg
 IOS_SDK_VERSION=`xcrun --sdk iphoneos --show-sdk-version`

@@ -3,6 +3,8 @@
 set -e
 set -o pipefail
 
+source ./scripts/travis_helper.sh
+
 mapbox_time "checkout_mason" \
 git submodule update --init .mason
 
