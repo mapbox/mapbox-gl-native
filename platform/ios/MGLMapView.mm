@@ -82,6 +82,7 @@ static NSURL *MGLURLForBundledStyleNamed(NSString *styleName)
 @property (nonatomic, getter=isDormant) BOOL dormant;
 @property (nonatomic, getter=isAnimatingGesture) BOOL animatingGesture;
 @property (nonatomic, readonly, getter=isRotationAllowed) BOOL rotationAllowed;
+@property (nonatomic, readonly, getter=hasSettingsBundleMetricsOptOut) BOOL settingsBundleMetricsOptOut;
 
 @end
 
@@ -320,6 +321,12 @@ std::chrono::steady_clock::duration secondsAsDuration(float duration)
                          @"© OpenStreetMap",
                          @"Improve This Map",
                          nil];
+
+    // iOS 8+: add action that opens app's Settings.app panel, if applicable
+    if (&UIApplicationOpenSettingsURLString != NULL && self.hasSettingsBundleMetricsOptOut)
+    {
+        [_attributionSheet addButtonWithTitle:@"Adjust Privacy Settings"];
+    }
 
     // setup compass
     //
@@ -1295,6 +1302,11 @@ std::chrono::steady_clock::duration secondsAsDuration(float duration)
                                  self.longitude, self.latitude, (int)round(self.zoomLevel)];
         [[UIApplication sharedApplication] openURL:
          [NSURL URLWithString:feedbackURL]];
+    }
+    // skips to 4 because button is conditionally added after cancel (index 3)
+    else if (buttonIndex == actionSheet.firstOtherButtonIndex + 4)
+    {
+        [[UIApplication sharedApplication] openURL:[NSURL URLWithString:UIApplicationOpenSettingsURLString]];
     }
 }
 
@@ -2476,6 +2488,33 @@ CLLocationCoordinate2D latLngToCoordinate(mbgl::LatLng latLng)
     NSAssert(path, @"Resource not found in application.");
 
     return path;
+}
+
+- (BOOL)hasSettingsBundleMetricsOptOut
+{
+    NSString *appSettingsBundle = [[NSBundle mainBundle] pathForResource:@"Settings" ofType:@"bundle"];
+
+    if ( ! appSettingsBundle)
+    {
+        return NO;
+    }
+    else
+    {
+        NSDictionary *settings = [NSDictionary dictionaryWithContentsOfFile:[appSettingsBundle stringByAppendingPathComponent:@"Root.plist"]];
+        NSArray *preferences = [settings objectForKey:@"PreferenceSpecifiers"];
+
+        for (NSDictionary *preference in preferences)
+        {
+            NSString *key = [preference objectForKey:@"Key"];
+
+            if ([key isEqualToString:@"MGLMapboxMetricsEnabled"])
+            {
+                return YES;
+            }
+        }
+    }
+
+    return NO;
 }
 
 - (void)invalidate
