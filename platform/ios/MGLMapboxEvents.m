@@ -123,7 +123,7 @@ NSString *const MGLEventGestureRotateStart = @"Rotation";
             // Put Settings bundle into memory
             NSString *appSettingsBundle = [[NSBundle mainBundle] pathForResource:@"Settings" ofType:@"bundle"];
 
-            NSAssert(appSettingsBundle, @"End users must be able to opt out of Metrics in your app, either via the Settings.bundle or in the app itself which must be noted via setting +[MGLAccountManager setShowsOptOutInApp:YES]");
+            NSAssert(appSettingsBundle, @"End users must be able to opt out of Metrics in your app, either inside Settings (via Settings.bundle) or inside this app. If you implement the opt-out control inside this app, disable this assertion by setting [MGLAccountManager setMapboxMetricsEnabledSettingShownInApp:YES] before initializing any MGLMapView.");
 
             // Dynamic Settings.bundle loading based on:
             // http://stackoverflow.com/questions/510216/can-you-make-the-settings-in-settings-bundle-default-even-if-you-dont-open-the
