@@ -6,7 +6,7 @@
 
 @interface MGLAccountManager()
 
-@property (atomic) BOOL showsOptOutInApp;
+@property (atomic) BOOL mapboxMetricsEnabledSettingShownInApp;
 @property (atomic) NSString *accessToken;
 
 @end
@@ -24,7 +24,7 @@ static MGLAccountManager *_sharedManager;
         if ( ! NSProcessInfo.processInfo.mgl_isInterfaceBuilderDesignablesAgent) {
             void (^setupBlock)() = ^{
                 _sharedManager = [[self alloc] init];
-                _sharedManager.showsOptOutInApp = NO;
+                _sharedManager.mapboxMetricsEnabledSettingShownInApp = NO;
             };
             if ( ! [[NSThread currentThread] isMainThread]) {
                 dispatch_sync(dispatch_get_main_queue(), ^{
@@ -39,12 +39,12 @@ static MGLAccountManager *_sharedManager;
     return _sharedManager;
 }
 
-+ (void) setMapboxMetricsEnabledSettingShownInApp:(BOOL)showsOptOut {
-    [MGLAccountManager sharedManager].showsOptOutInApp = showsOptOut;
++ (void) setMapboxMetricsEnabledSettingShownInApp:(BOOL)shown {
+    [MGLAccountManager sharedManager].mapboxMetricsEnabledSettingShownInApp = shown;
 }
 
 + (BOOL) mapboxMetricsEnabledSettingShownInApp {
-    return [MGLAccountManager sharedManager].showsOptOutInApp;
+    return [MGLAccountManager sharedManager].mapboxMetricsEnabledSettingShownInApp;
 }
 
 + (void) setAccessToken:(NSString *) accessToken {
