@@ -177,27 +177,10 @@ const NSTimeInterval MGLFlushInterval = 60;
 
 + (void)initialize {
     if (self == [MGLMapboxEvents class]) {
-        if (! [MGLAccountManager mapboxMetricsEnabledSettingShownInApp]) {
-            // Opt Out is not configured in UI, so check for Settings.bundle
-            // Put Settings bundle into memory
-            NSString *appSettingsBundle = [[NSBundle mainBundle] pathForResource:@"Settings" ofType:@"bundle"];
-
-            NSAssert(appSettingsBundle, @"End users must be able to opt out of Metrics in your app, either inside Settings (via Settings.bundle) or inside this app. If you implement the opt-out control inside this app, disable this assertion by setting [MGLAccountManager setMapboxMetricsEnabledSettingShownInApp:YES] before the app initializes any Mapbox GL classes.");
-
-            // Dynamic Settings.bundle loading based on:
-            // http://stackoverflow.com/questions/510216/can-you-make-the-settings-in-settings-bundle-default-even-if-you-dont-open-the
-            NSDictionary *settings = [NSDictionary dictionaryWithContentsOfFile:[appSettingsBundle stringByAppendingPathComponent:@"Root.plist"]];
-            NSArray *preferences = [settings objectForKey:@"PreferenceSpecifiers"];
-            NSMutableDictionary *defaultsToRegister = [[NSMutableDictionary alloc] initWithCapacity:[preferences count]];
-            for(NSDictionary *prefSpecification in preferences) {
-                NSString *key = [prefSpecification objectForKey:@"Key"];
-                if(key && [[prefSpecification allKeys] containsObject:@"DefaultValue"]) {
-                    [defaultsToRegister setObject:[prefSpecification objectForKey:@"DefaultValue"] forKey:key];
-                }
-            }
-
-            [[NSUserDefaults standardUserDefaults] registerDefaults:defaultsToRegister];
-        }
+        [[NSUserDefaults standardUserDefaults] registerDefaults:@{
+             @"MGLMapboxAccountType": @0,
+             @"MGLMapboxMetricsEnabled": @YES,
+         }];
     }
 }
 
@@ -213,6 +196,30 @@ const NSTimeInterval MGLFlushInterval = 60;
 
     self = [super init];
     if (self) {
+        if (! [MGLAccountManager mapboxMetricsEnabledSettingShownInApp]) {
+            // Opt Out is not configured in UI, so check for Settings.bundle
+            // Put Settings bundle into memory
+            id defaultEnabledValue;
+            NSString *appSettingsBundle = [[NSBundle mainBundle] pathForResource:@"Settings" ofType:@"bundle"];
+
+            if (appSettingsBundle) {
+                // Dynamic Settings.bundle loading based on:
+                // http://stackoverflow.com/questions/510216/can-you-make-the-settings-in-settings-bundle-default-even-if-you-dont-open-the
+                NSDictionary *settings = [NSDictionary dictionaryWithContentsOfFile:[appSettingsBundle stringByAppendingPathComponent:@"Root.plist"]];
+                NSArray *preferences = settings[@"PreferenceSpecifiers"];
+                for (NSDictionary *prefSpecification in preferences) {
+                    if ([prefSpecification[@"Key"] isEqualToString:@"MGLMapboxMetricsEnabled"]) {
+                        defaultEnabledValue = prefSpecification[@"DefaultValue"];
+                    }
+                }
+            }
+
+            NSAssert(defaultEnabledValue, @"End users must be able to opt out of Metrics in your app, either inside Settings (via Settings.bundle) or inside this app. If you implement the opt-out control inside this app, disable this assertion by setting [MGLAccountManager setMapboxMetricsEnabledSettingShownInApp:YES] before the app initializes any Mapbox GL classes.");
+            [[NSUserDefaults standardUserDefaults] registerDefaults:@{
+                 @"MGLMapboxMetricsEnabled": defaultEnabledValue,
+             }];
+        }
+
         _appBundleId = [[NSBundle mainBundle] bundleIdentifier];
         _appName = [[NSBundle mainBundle] objectForInfoDictionaryKey:@"CFBundleName"];
         _appVersion = [[NSBundle mainBundle] objectForInfoDictionaryKey:@"CFBundleShortVersionString"];
