@@ -9,6 +9,7 @@
 #import "NSProcessInfo+MGLAdditions.h"
 #import "NSBundle+MGLAdditions.h"
 #import "NSException+MGLAdditions.h"
+#import "MGLAccountManager.m"
 
 #include <sys/sysctl.h>
 
@@ -117,11 +118,13 @@ NSString *const MGLEventGestureRotateStart = @"Rotation";
     self = [super init];
     if (self) {
         
-        // Put Settings bundle into memory
-        NSString *appSettingsBundle = [[NSBundle mainBundle] pathForResource:@"Settings" ofType:@"bundle"];
-        if(!appSettingsBundle) {
-            NSLog(@"Could not find Settings.bundle");
-        } else {
+        if (! [MGLAccountManager mapboxMetricsEnabledSettingShownInApp]) {
+            // Opt Out is not configured in UI, so check for Settings.bundle
+            // Put Settings bundle into memory
+            NSString *appSettingsBundle = [[NSBundle mainBundle] pathForResource:@"Settings" ofType:@"bundle"];
+
+            NSAssert(appSettingsBundle, @"End users must be able to opt out of Metrics in your app, either via the Settings.bundle or in the app itself which must be noted via setting +[MGLAccountManager setShowsOptOutInApp:YES]");
+
             // Dynamic Settings.bundle loading based on:
             // http://stackoverflow.com/questions/510216/can-you-make-the-settings-in-settings-bundle-default-even-if-you-dont-open-the
             NSDictionary *settings = [NSDictionary dictionaryWithContentsOfFile:[appSettingsBundle stringByAppendingPathComponent:@"Root.plist"]];
@@ -133,9 +136,10 @@ NSString *const MGLEventGestureRotateStart = @"Rotation";
                     [defaultsToRegister setObject:[prefSpecification objectForKey:@"DefaultValue"] forKey:key];
                 }
             }
-            
+
             [[NSUserDefaults standardUserDefaults] registerDefaults:defaultsToRegister];
         }
+
         _appBundleId = [[NSBundle mainBundle] bundleIdentifier];
         NSString *uniqueID = [[NSProcessInfo processInfo] globallyUniqueString];
         _serialQueue = dispatch_queue_create([[NSString stringWithFormat:@"%@.%@.events.serial", _appBundleId, uniqueID] UTF8String], DISPATCH_QUEUE_SERIAL);
