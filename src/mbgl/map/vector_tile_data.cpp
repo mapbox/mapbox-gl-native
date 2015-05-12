@@ -35,7 +35,7 @@ VectorTileData::~VectorTileData() {
 }
 
 void VectorTileData::parse() {
-    if (state != State::loaded && state != State::partial) {
+    if (getState() != State::loaded && getState() != State::partial) {
         return;
     }
 
@@ -48,24 +48,24 @@ void VectorTileData::parse() {
         TileParser parser(*vt, *this, style, glyphAtlas, glyphStore, spriteAtlas, sprite);
         parser.parse();
 
-        if (state == State::obsolete) {
+        if (getState() == State::obsolete) {
             return;
         }
 
         if (parser.isPartialParse()) {
-            state = State::partial;
+            setState(State::partial);
         } else {
-            state = State::parsed;
+            setState(State::parsed);
         }
     } catch (const std::exception& ex) {
         Log::Error(Event::ParseTile, "Parsing [%d/%d/%d] failed: %s", id.z, id.x, id.y, ex.what());
-        state = State::obsolete;
+        setState(State::obsolete);
         return;
     }
 }
 
 Bucket* VectorTileData::getBucket(StyleLayer const& layer) {
-    if (!ready() || !layer.bucket) {
+    if (!isReady() || !layer.bucket) {
         return nullptr;
     }
 

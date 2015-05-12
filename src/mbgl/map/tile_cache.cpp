@@ -46,7 +46,7 @@ std::shared_ptr<TileData> TileCache::get(uint64_t key) {
         data = it->second;
         tiles.erase(it);
         orderedKeys.remove(key);
-        assert(data->ready());
+        assert(data->isReady());
     }
 
     return data;

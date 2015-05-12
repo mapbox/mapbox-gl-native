@@ -41,7 +41,9 @@ TileParser::TileParser(const GeometryTile& geometryTile_,
     assert(collision);
 }
 
-bool TileParser::obsolete() const { return tile.state == TileData::State::obsolete; }
+bool TileParser::obsolete() const {
+    return tile.getState() == TileData::State::obsolete;
+}
 
 void TileParser::parse() {
     for (const auto& layer_desc : style.layers) {

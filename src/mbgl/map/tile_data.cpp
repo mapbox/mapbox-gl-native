@@ -12,9 +12,9 @@ using namespace mbgl;
 TileData::TileData(const TileID& id_, const SourceInfo& source_)
     : id(id_),
       name(id),
-      state(State::initial),
       source(source_),
       env(Environment::Get()),
+      state(State::initial),
       debugBucket(debugFontBuffer) {
     // Initialize tile debug coordinates
     debugFontBuffer.addText(name.c_str(), 50, 200, 5);
@@ -26,6 +26,12 @@ TileData::~TileData() {
 
 const std::string TileData::toString() const {
     return std::string { "[tile " } + name + "]";
+}
+
+void TileData::setState(const State& state_) {
+    assert(!isImmutable());
+
+    state = state_;
 }
 
 void TileData::request(Worker& worker, float pixelRatio, std::function<void()> callback) {

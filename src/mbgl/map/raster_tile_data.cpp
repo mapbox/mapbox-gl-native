@@ -15,14 +15,14 @@ RasterTileData::~RasterTileData() {
 }
 
 void RasterTileData::parse() {
-    if (state != State::loaded) {
+    if (getState() != State::loaded) {
         return;
     }
 
     if (bucket.setImage(data)) {
-        state = State::parsed;
+        setState(State::parsed);
     } else {
-        state = State::invalid;
+        setState(State::invalid);
     }
 }
 
