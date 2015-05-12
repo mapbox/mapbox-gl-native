@@ -277,6 +277,7 @@ void Painter::render(const Style& style, TransformState state_, TimePoint time) 
                 }
             } else {
                 const gl::group group("background");
+                setStrata(i * strata_thickness);
                 renderBackground(item.layer);
             }
         }
