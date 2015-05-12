@@ -17,10 +17,6 @@
 #include <mbgl/platform/gl.hpp>
 #include <mbgl/util/std.hpp>
 
-#include <pthread.h>
-
-pthread_once_t loadGLExtensions = PTHREAD_ONCE_INIT;
-
 namespace mbgl {
 namespace android {
 
@@ -308,8 +304,6 @@ void NativeMapView::terminateContext() {
     context = EGL_NO_CONTEXT;
 }
 
-void loadExtensions();
-
 void NativeMapView::createSurface(ANativeWindow *window_) {
     mbgl::Log::Debug(mbgl::Event::Android, "NativeMapView::createSurface");
 
@@ -349,9 +343,11 @@ void NativeMapView::createSurface(ANativeWindow *window_) {
                         "SL Version"); // In the emulator this returns NULL with error code 0?
                                         // https://code.google.com/p/android/issues/detail?id=78977
         }
-        log_gl_string(GL_EXTENSIONS, "Extensions");
 
-        pthread_once(&loadGLExtensions, loadExtensions);
+        log_gl_string(GL_EXTENSIONS, "Extensions");
+        mbgl::gl::InitializeExtensions([] (const char * name) {
+             return reinterpret_cast<mbgl::gl::glProc>(eglGetProcAddress(name));
+        });
 
         if (!eglMakeCurrent(display, EGL_NO_SURFACE, EGL_NO_SURFACE, EGL_NO_CONTEXT)) {
             mbgl::Log::Error(mbgl::Event::OpenGL,
@@ -582,12 +578,6 @@ EGLConfig NativeMapView::chooseConfig(const EGLConfig configs[], EGLint numConfi
     }
 
     return configId;
-}
-
-void loadExtensions() {
-    mbgl::gl::InitializeExtensions([] (const char * name) {
-         return reinterpret_cast<mbgl::gl::glProc>(eglGetProcAddress(name));
-    });
 }
 
 void NativeMapView::pause() {

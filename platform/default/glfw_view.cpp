@@ -4,9 +4,6 @@
 #include <mbgl/util/gl_helper.hpp>
 
 #include <cassert>
-#include <pthread.h>
-
-pthread_once_t loadGLExtensions = PTHREAD_ONCE_INIT;
 
 void glfwError(int error, const char *description) {
     mbgl::Log::Error(mbgl::Event::OpenGL, "GLFW error (%i): %s", error, description);
@@ -61,9 +58,7 @@ GLFWView::GLFWView(bool fullscreen_) : fullscreen(fullscreen_) {
     glfwSetScrollCallback(window, onScroll);
     glfwSetKeyCallback(window, onKey);
 
-    pthread_once(&loadGLExtensions, [] {
-        mbgl::gl::InitializeExtensions(glfwGetProcAddress);
-    });
+    mbgl::gl::InitializeExtensions(glfwGetProcAddress);
 
     glfwMakeContextCurrent(nullptr);
 }

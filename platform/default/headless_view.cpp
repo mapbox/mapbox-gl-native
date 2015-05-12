@@ -13,8 +13,6 @@
 #include <cstring>
 #include <cassert>
 
-pthread_once_t loadGLExtensions = PTHREAD_ONCE_INIT;
-
 #ifdef MBGL_USE_CGL
 #include <CoreFoundation/CoreFoundation.h>
 #elif MBGL_USE_GLX
@@ -45,28 +43,26 @@ void HeadlessView::loadExtensions() {
         return;
     }
 
-    pthread_once(&loadGLExtensions, [] {
 #ifdef MBGL_USE_CGL
-        gl::InitializeExtensions([](const char * name) {
-            static CFBundleRef framework = CFBundleGetBundleWithIdentifier(CFSTR("com.apple.opengl"));
-            if (!framework) {
-                throw std::runtime_error("Failed to load OpenGL framework.");
-            }
+    gl::InitializeExtensions([](const char * name) {
+        static CFBundleRef framework = CFBundleGetBundleWithIdentifier(CFSTR("com.apple.opengl"));
+        if (!framework) {
+            throw std::runtime_error("Failed to load OpenGL framework.");
+        }
 
-            CFStringRef str = CFStringCreateWithCString(kCFAllocatorDefault, name, kCFStringEncodingASCII);
-            void* symbol = CFBundleGetFunctionPointerForName(framework, str);
-            CFRelease(str);
+        CFStringRef str = CFStringCreateWithCString(kCFAllocatorDefault, name, kCFStringEncodingASCII);
+        void* symbol = CFBundleGetFunctionPointerForName(framework, str);
+        CFRelease(str);
 
-            return reinterpret_cast<gl::glProc>(symbol);
-        });
+        return reinterpret_cast<gl::glProc>(symbol);
+    });
 #endif
 
 #ifdef MBGL_USE_GLX
-        gl::InitializeExtensions([](const char * name) {
-            return glXGetProcAddress(reinterpret_cast<const GLubyte *>(name));
-        });
-#endif
+    gl::InitializeExtensions([](const char * name) {
+        return glXGetProcAddress(reinterpret_cast<const GLubyte *>(name));
     });
+#endif
 
     extensionsLoaded = true;
 }

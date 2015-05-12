@@ -35,8 +35,6 @@
 
 class MBGLView;
 
-static dispatch_once_t loadGLExtensions;
-
 NSString *const MGLDefaultStyleName = @"mapbox-streets";
 NSString *const MGLStyleVersion = @"7";
 NSString *const MGLDefaultStyleMarkerSymbolName = @"default_marker";
@@ -233,20 +231,17 @@ std::chrono::steady_clock::duration secondsAsDuration(float duration)
 
     // load extensions
     //
-    dispatch_once(&loadGLExtensions, ^
-    {
-        mbgl::gl::InitializeExtensions([](const char * name) {
-            static CFBundleRef framework = CFBundleGetBundleWithIdentifier(CFSTR("com.apple.opengles"));
-            if (!framework) {
-                throw std::runtime_error("Failed to load OpenGL framework.");
-            }
+    mbgl::gl::InitializeExtensions([](const char * name) {
+        static CFBundleRef framework = CFBundleGetBundleWithIdentifier(CFSTR("com.apple.opengles"));
+        if (!framework) {
+            throw std::runtime_error("Failed to load OpenGL framework.");
+        }
 
-            CFStringRef str = CFStringCreateWithCString(kCFAllocatorDefault, name, kCFStringEncodingASCII);
-            void* symbol = CFBundleGetFunctionPointerForName(framework, str);
-            CFRelease(str);
+        CFStringRef str = CFStringCreateWithCString(kCFAllocatorDefault, name, kCFStringEncodingASCII);
+        void* symbol = CFBundleGetFunctionPointerForName(framework, str);
+        CFRelease(str);
 
-            return reinterpret_cast<mbgl::gl::glProc>(symbol);
-        });
+        return reinterpret_cast<mbgl::gl::glProc>(symbol);
     });
 
     // setup mbgl map

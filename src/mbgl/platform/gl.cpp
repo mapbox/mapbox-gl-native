@@ -1,5 +1,7 @@
 #include <mbgl/platform/gl.hpp>
 
+#include <mutex>
+
 namespace mbgl {
 namespace gl {
 
@@ -8,22 +10,26 @@ std::vector<ExtensionFunctionBase*>& ExtensionFunctionBase::functions() {
     return functions;
 }
 
+static std::once_flag initializeExtensionsOnce;
+
 void InitializeExtensions(glProc (*getProcAddress)(const char *)) {
-    const char * extensionsPtr = reinterpret_cast<const char *>(
-        MBGL_CHECK_ERROR(glGetString(GL_EXTENSIONS)));
+    std::call_once(initializeExtensionsOnce, [getProcAddress] {
+        const char * extensionsPtr = reinterpret_cast<const char *>(
+            MBGL_CHECK_ERROR(glGetString(GL_EXTENSIONS)));
 
-    if (!extensionsPtr)
-        return;
+        if (!extensionsPtr)
+            return;
 
-    const std::string extensions = extensionsPtr;
-    for (auto fn : ExtensionFunctionBase::functions()) {
-        for (auto probe : fn->probes) {
-            if (extensions.find(probe.first) != std::string::npos) {
-                fn->ptr = getProcAddress(probe.second);
-                break;
+        const std::string extensions = extensionsPtr;
+        for (auto fn : ExtensionFunctionBase::functions()) {
+            for (auto probe : fn->probes) {
+                if (extensions.find(probe.first) != std::string::npos) {
+                    fn->ptr = getProcAddress(probe.second);
+                    break;
+                }
             }
         }
-    }
+    });
 }
 
 void checkError(const char *cmd, const char *file, int line) {
