@@ -34,7 +34,7 @@ public:
 
 private:
     std::recursive_mutex mtx;
-    char *const data = nullptr;
+    const std::unique_ptr<uint8_t[]> data;
     std::atomic<bool> dirty;
     uint32_t texture = 0;
     int nextRow = 0;

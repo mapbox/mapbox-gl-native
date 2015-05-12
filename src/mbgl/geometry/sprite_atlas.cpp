@@ -33,9 +33,7 @@ bool SpriteAtlas::resize(const float newRatio) {
     pixelRatio = newRatio;
 
     if (data) {
-        uint32_t *old_data = data;
-
-        data = nullptr;
+        const auto oldData = std::move(data);
         allocate();
 
         const int old_w = width * oldRatio;
@@ -44,19 +42,15 @@ bool SpriteAtlas::resize(const float newRatio) {
         const int new_h = height * newRatio;
 
         // Basic image scaling. TODO: Replace this with better image scaling.
-        uint32_t *img_new = reinterpret_cast<uint32_t *>(data);
-        const uint32_t *img_old = reinterpret_cast<const uint32_t *>(old_data);
-
         for (int y = 0; y < new_h; y++) {
             const int old_yoffset = ((y * old_h) / new_h) * old_w;
             const int new_yoffset = y * new_w;
             for (int x = 0; x < new_w; x++) {
                 const int old_x = (x * old_w) / new_w;
-                img_new[new_yoffset + x] = img_old[old_yoffset + old_x];
+                data[new_yoffset + x] = oldData[old_yoffset + old_x];
             }
         }
 
-        ::operator delete(old_data);
         dirty = true;
         fullUploadRequired = true;
 
@@ -144,8 +138,8 @@ void SpriteAtlas::allocate() {
     if (!data) {
         dimension w = static_cast<dimension>(width * pixelRatio);
         dimension h = static_cast<dimension>(height * pixelRatio);
-        data = static_cast<uint32_t*>(::operator new(w * h * sizeof(uint32_t)));
-        std::fill(data, data + w * h, 0);
+        data = util::make_unique<uint32_t[]>(w * h);
+        std::fill(data.get(), data.get() + w * h, 0);
     }
 }
 
@@ -158,7 +152,7 @@ void SpriteAtlas::copy(const Rect<dimension>& dst, const SpritePosition& src, co
     const Rect<uint32_t> srcPos { src.x, src.y, src.width, src.height };
 
     allocate();
-    uint32_t *dstData = reinterpret_cast<uint32_t *>(data);
+    uint32_t *const dstData = data.get();
     const vec2<uint32_t> dstSize { static_cast<unsigned int>(width * pixelRatio),
                                    static_cast<unsigned int>(height * pixelRatio) };
     const Rect<uint32_t> dstPos { static_cast<uint32_t>(dst.x * pixelRatio),
@@ -274,7 +268,7 @@ void SpriteAtlas::bind(bool linear) {
                 0, // GLint border
                 GL_RGBA, // GLenum format
                 GL_UNSIGNED_BYTE, // GLenum type
-                data // const GLvoid * data
+                data.get() // const GLvoid * data
             ));
             fullUploadRequired = false;
         } else {
@@ -287,7 +281,7 @@ void SpriteAtlas::bind(bool linear) {
                 height * pixelRatio, // GLsizei height
                 GL_RGBA, // GLenum format
                 GL_UNSIGNED_BYTE, // GLenum type
-                data // const GLvoid *pixels
+                data.get() // const GLvoid *pixels
             ));
         }
 
@@ -303,5 +297,4 @@ SpriteAtlas::~SpriteAtlas() {
     std::lock_guard<std::recursive_mutex> lock(mtx);
     Environment::Get().abandonTexture(texture);
     texture = 0;
-    ::operator delete(data), data = nullptr;
 }
