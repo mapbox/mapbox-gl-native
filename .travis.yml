@@ -89,7 +89,7 @@ script:
 - ./scripts/${FLAVOR}/run.sh
 
 after_failure:
-- "[ -f scripts/${FLAVOR}/run.sh ] && scripts/${FLAVOR}/run.sh"
+- "[ -f ./scripts/${FLAVOR}/after_failure.sh ] && ./scripts/${FLAVOR}/after_failure.sh"
 
 notifications:
   slack:
