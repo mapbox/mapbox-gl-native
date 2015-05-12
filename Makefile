@@ -203,9 +203,10 @@ android-project: android-lib
 render: Makefile/project
 	$(MAKE) -C build/$(HOST) BUILDTYPE=$(BUILDTYPE) mbgl-render
 
-.PHONY: xrender run-xrender
+.PHONY: xrender
+xrender: XCPRETTY := $(shell ./scripts/xcpretty.sh)
 xrender: Xcode/project
-	xcodebuild -project ./build/osx/gyp/osx.xcodeproj -configuration $(BUILDTYPE) -target mbgl-render -jobs $(JOBS)
+	xcodebuild -project ./build/osx/gyp/osx.xcodeproj -configuration $(BUILDTYPE) -target mbgl-render -jobs $(JOBS) $(XCPRETTY)
 
 
 ##### Maintenace operations ####################################################

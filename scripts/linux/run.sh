@@ -43,6 +43,9 @@ git submodule update --init styles
 mapbox_time "compile_program" \
 make linux -j${JOBS} BUILDTYPE=${BUILDTYPE}
 
+mapbox_time "compile_render_binary" \
+make render -j${JOBS} BUILDTYPE=${BUILDTYPE}
+
 mapbox_time "compile_tests" \
 make test -j${JOBS} BUILDTYPE=${BUILDTYPE}
 
