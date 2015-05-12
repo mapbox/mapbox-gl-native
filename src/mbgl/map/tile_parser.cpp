@@ -118,6 +118,10 @@ std::unique_ptr<Bucket> TileParser::createBucket(const StyleBucket &bucketDesc) 
         } else if (bucketDesc.type == StyleLayerType::Line) {
             return createLineBucket(*layer, bucketDesc);
         } else if (bucketDesc.type == StyleLayerType::Symbol) {
+            if (partialParse) {
+                return nullptr;
+            }
+
             bool needsResources = false;
             auto symbolBucket = createSymbolBucket(*layer, bucketDesc, needsResources);
             if (needsResources) {
