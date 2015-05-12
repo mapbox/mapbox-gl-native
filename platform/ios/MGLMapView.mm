@@ -82,7 +82,7 @@ static NSURL *MGLURLForBundledStyleNamed(NSString *styleName)
 @property (nonatomic, getter=isDormant) BOOL dormant;
 @property (nonatomic, getter=isAnimatingGesture) BOOL animatingGesture;
 @property (nonatomic, readonly, getter=isRotationAllowed) BOOL rotationAllowed;
-@property (nonatomic, readonly, getter=hasSettingsBundleMetricsOptOut) BOOL settingsBundleMetricsOptOut;
+@property (nonatomic, readonly) BOOL hasSettingsBundleMetricsOptOut;
 
 @end
 
