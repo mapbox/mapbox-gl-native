@@ -199,7 +199,7 @@ NAN_METHOD(NodeMap::Render) {
 }
 
 void NodeMap::startRender(std::unique_ptr<NodeMap::RenderOptions> options) {
-    view.resize(options->width, options->height, options->ratio);
+    map.resize(options->width, options->height, options->ratio);
     map.setClasses(options->classes);
     map.setLatLngZoom(mbgl::LatLng(options->latitude, options->longitude), options->zoom);
     map.setBearing(options->bearing);
@@ -277,10 +277,8 @@ void NodeMap::renderFinished() {
 NodeMap::NodeMap(v8::Handle<v8::Object> source_) :
     view(sharedDisplay()),
     fs(*ObjectWrap::Unwrap<NodeFileSource>(source_)),
-    map(view, fs),
+    map(view, fs, mbgl::MapMode::Still),
     async(new uv_async_t) {
-
-    map.start(mbgl::Map::Mode::Still);
 
     NanAssignPersistent(source, source_);
 
@@ -294,8 +292,6 @@ NodeMap::NodeMap(v8::Handle<v8::Object> source_) :
 }
 
 NodeMap::~NodeMap() {
-    map.stop();
-
     source.Dispose();
 
     uv_close(reinterpret_cast<uv_handle_t *>(async), [] (uv_handle_t *handle) {

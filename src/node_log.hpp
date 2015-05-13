@@ -1,14 +1,17 @@
 #pragma once
 
 #include <mbgl/platform/log.hpp>
-#include <mbgl/util/async_queue.hpp>
 
+#pragma GCC diagnostic push
+#pragma GCC diagnostic ignored "-Wunused-parameter"
+#pragma GCC diagnostic ignored "-Wshadow"
 #include <node.h>
 #include <nan.h>
-
-namespace mbgl { namespace util { template <typename T> class AsyncQueue; } }
+#pragma GCC diagnostic pop
 
 namespace node_mbgl {
+
+namespace util { template <typename T> class AsyncQueue; }
 
 class NodeLogObserver : public mbgl::Log::Observer {
 public:
@@ -22,7 +25,7 @@ private:
     v8::Persistent<v8::Object> module;
 
     struct LogMessage;
-    using Queue = mbgl::util::AsyncQueue<LogMessage>;
+    using Queue = util::AsyncQueue<LogMessage>;
     Queue *queue = nullptr;
 };
 
