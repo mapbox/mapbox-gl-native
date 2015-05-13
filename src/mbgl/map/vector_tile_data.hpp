@@ -16,6 +16,7 @@
 namespace mbgl {
 
 class Bucket;
+class Collision;
 class Painter;
 class SourceInfo;
 class StyleLayer;
@@ -45,6 +46,14 @@ public:
 
     void setBucket(StyleLayer const &layer_desc, std::unique_ptr<Bucket> bucket);
 
+    void setState(const State& state) override;
+
+    inline Collision* getCollision() const {
+        return collision.get();
+    }
+
+    const float depth;
+
 protected:
     // Holds the actual geometries in this tile.
     FillVertexBuffer fillVertexBuffer;
@@ -69,8 +78,7 @@ private:
     std::unordered_map<std::string, std::unique_ptr<Bucket>> buckets;
     mutable std::mutex bucketsMutex;
 
-public:
-    const float depth;
+    std::unique_ptr<Collision> collision;
 };
 
 }

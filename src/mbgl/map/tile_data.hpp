@@ -49,8 +49,22 @@ public:
     void cancel();
     const std::string toString() const;
 
-    inline bool ready() const {
+    inline bool isReady() const {
         return isReadyState(state);
+    }
+
+    // Returns true if the TileData is in a final state and we cannot
+    // make changes to it anymore.
+    inline bool isImmutable() const {
+        return state == State::parsed || state == State::obsolete;
+    }
+
+    // We let subclasses override setState() so they
+    // can intercept the state change and react accordingly.
+    virtual void setState(const State& state);
+
+    inline State getState() const {
+        return state;
     }
 
     void endParsing();
@@ -61,8 +75,7 @@ public:
 
     const TileID id;
     const std::string name;
-    std::atomic<State> state;
-    std::atomic_flag parsing;
+    std::atomic_flag parsing = ATOMIC_FLAG_INIT;
 
 protected:
     // Set the internal parsing state to true so we prevent
@@ -81,6 +94,10 @@ protected:
 
     std::unique_ptr<WorkRequest> workRequest;
 
+private:
+    std::atomic<State> state;
+
+protected:
     // Contains the tile ID string for painting debug information.
     DebugFontBuffer debugFontBuffer;
 

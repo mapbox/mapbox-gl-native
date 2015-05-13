@@ -127,7 +127,7 @@ bool Source::isLoaded() const {
     }
 
     for (const auto& tile : tiles) {
-        if (tile.second->data->state != TileData::State::parsed) {
+        if (tile.second->data->getState() != TileData::State::parsed) {
             return false;
         }
     }
@@ -193,11 +193,11 @@ void Source::finishRender(Painter &painter) {
     }
 }
 
-std::forward_list<Tile *> Source::getLoadedTiles() const {
-    std::forward_list<Tile *> ptrs;
+std::forward_list<Tile*> Source::getLoadedTiles() const {
+    std::forward_list<Tile*> ptrs;
     auto it = ptrs.before_begin();
-    for (const auto &pair : tiles) {
-        if (pair.second->data->ready()) {
+    for (const auto& pair : tiles) {
+        if (pair.second->data->isReady()) {
             it = ptrs.insert_after(it, pair.second.get());
         }
     }
@@ -211,16 +211,16 @@ const std::vector<Tile*>& Source::getTiles() const {
 TileData::State Source::hasTile(const TileID& id) {
     auto it = tiles.find(id);
     if (it != tiles.end()) {
-        Tile &tile = *it->second;
+        Tile& tile = *it->second;
         if (tile.id == id && tile.data) {
-            return tile.data->state;
+            return tile.data->getState();
         }
     }
 
     return TileData::State::invalid;
 }
 
-void Source::handlePartialTile(const TileID &id, Worker &worker) {
+void Source::handlePartialTile(const TileID& id, Worker& worker) {
     const TileID normalized_id = id.normalized();
 
     auto it = tile_data.find(normalized_id);
@@ -265,7 +265,7 @@ TileData::State Source::addTile(MapData& data,
         new_tile.data = it->second.lock();
     }
 
-    if (new_tile.data && new_tile.data->state == TileData::State::obsolete) {
+    if (new_tile.data && new_tile.data->getState() == TileData::State::obsolete) {
         // Do not consider the tile if it's already obsolete.
         new_tile.data.reset();
     }
@@ -296,7 +296,7 @@ TileData::State Source::addTile(MapData& data,
         tile_data.emplace(new_tile.data->id, new_tile.data);
     }
 
-    return new_tile.data->state;
+    return new_tile.data->getState();
 }
 
 double Source::getZoom(const TransformState& state) const {
@@ -453,7 +453,7 @@ void Source::update(MapData& data,
         bool obsolete = std::find(retain.begin(), retain.end(), tile.id) == retain.end();
         if (!obsolete) {
             retain_data.insert(tile.data->id);
-        } else if (type != SourceType::Raster && tile.data->state == TileData::State::parsed) {
+        } else if (type != SourceType::Raster && tile.data->getState() == TileData::State::parsed) {
             // Partially parsed tiles are never added to the cache because otherwise
             // they never get updated if the go out from the viewport and the pending
             // resources arrive.

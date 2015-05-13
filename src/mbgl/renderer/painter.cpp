@@ -381,7 +381,7 @@ std::vector<RenderItem> Painter::determineRenderOrder(const Style& style) {
         const auto& tiles = layer.bucket->source->getTiles();
         for (auto tile : tiles) {
             assert(tile);
-            if (!tile->data && !tile->data->ready()) {
+            if (!tile->data && !tile->data->isReady()) {
                 continue;
             }
 
