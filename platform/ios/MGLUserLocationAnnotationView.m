@@ -5,7 +5,7 @@
 #import "MGLAnnotation.h"
 #import "MGLMapView.h"
 
-const CGFloat MGLUserLocationAnnotationDotSize = 24.0;
+const CGFloat MGLUserLocationAnnotationDotSize = 22.0;
 const CGFloat MGLUserLocationAnnotationHaloSize = 115.0;
 
 @interface MGLUserLocationAnnotationView ()
@@ -68,14 +68,13 @@ const CGFloat MGLUserLocationAnnotationHaloSize = 115.0;
             if (oldHeadingAccuracy != self.annotation.heading.headingAccuracy)
             {
                 // recalculate the clipping mask based on updated accuracy
-                //
                 _headingIndicatorMaskLayer.path = [[self headingIndicatorClippingMask] CGPath];
 
                 oldHeadingAccuracy = self.annotation.heading.headingAccuracy;
             }
         }
         
-        // tinted heading indicator
+        // heading indicator (tinted, semi-circle)
         //
         if ( ! _headingIndicatorLayer && self.annotation.heading.headingAccuracy)
         {
@@ -95,7 +94,7 @@ const CGFloat MGLUserLocationAnnotationHaloSize = 115.0;
             [self.layer insertSublayer:_headingIndicatorLayer below:_dotBorderLayer];
         }
         
-        // heading indicator accuracy mask
+        // heading indicator accuracy mask (fan-shaped)
         //
         if ( ! _headingIndicatorMaskLayer && self.annotation.heading.headingAccuracy)
         {
@@ -104,7 +103,6 @@ const CGFloat MGLUserLocationAnnotationHaloSize = 115.0;
             _headingIndicatorMaskLayer.path = [[self headingIndicatorClippingMask] CGPath];
 
             // apply the mask to the halo-radius-sized gradient layer
-            //
             _headingIndicatorLayer.mask = _headingIndicatorMaskLayer;
             
             oldHeadingAccuracy = self.annotation.heading.headingAccuracy;
@@ -121,7 +119,6 @@ const CGFloat MGLUserLocationAnnotationHaloSize = 115.0;
             CGFloat accuracyRingSize = [self calculateAccuracyRingSize];
             
             // only show the accuracy ring if it won't be obscured by the location dot
-            //
             if (accuracyRingSize > MGLUserLocationAnnotationDotSize + 15)
             {
                 _accuracyRingLayer.hidden = NO;
@@ -129,7 +126,6 @@ const CGFloat MGLUserLocationAnnotationHaloSize = 115.0;
                 _accuracyRingLayer.cornerRadius = accuracyRingSize / 2;
                 
                 // match the halo to the accuracy ring
-                //
                 _haloLayer.bounds = _accuracyRingLayer.bounds;
                 _haloLayer.cornerRadius = _accuracyRingLayer.cornerRadius;
                 _haloLayer.shouldRasterize = NO;
@@ -145,12 +141,11 @@ const CGFloat MGLUserLocationAnnotationHaloSize = 115.0;
             }
             
             // store accuracy and zoom so we're not redrawing unchanged location updates
-            //
             oldHorizontalAccuracy = self.annotation.location.horizontalAccuracy;
             oldZoom = self.mapView.zoomLevel;
         }
         
-        // tinted, mostly-transparent accuracy ring
+        // accuracy ring (circular, tinted, mostly-transparent)
         //
         if ( ! _accuracyRingLayer && self.annotation.location.horizontalAccuracy)
         {
@@ -164,7 +159,7 @@ const CGFloat MGLUserLocationAnnotationHaloSize = 115.0;
             [self.layer addSublayer:_accuracyRingLayer];
         }
         
-        // expanding, fading, tinted outer layer
+        // expanding sonar-like pulse (circular, tinted, fades out)
         //
         if ( ! _haloLayer)
         {
@@ -173,17 +168,14 @@ const CGFloat MGLUserLocationAnnotationHaloSize = 115.0;
             _haloLayer.allowsGroupOpacity = NO;
             
             // set defaults for the animations
-            //
             CAAnimationGroup *animationGroup = [self loopingAnimationGroupWithDuration:3.0];
             
             // scale out radially with initial acceleration
-            //
             CAKeyframeAnimation *boundsAnimation = [CAKeyframeAnimation animationWithKeyPath:@"transform.scale.xy"];
             boundsAnimation.values = @[@0, @0.35, @1];
             boundsAnimation.keyTimes = @[@0, @0.2, @1];
             
             // go transparent as scaled out, start semi-opaque
-            //
             CAKeyframeAnimation *opacityAnimation = [CAKeyframeAnimation animationWithKeyPath:@"opacity"];
             opacityAnimation.values = @[@0.4, @0.4, @0];
             opacityAnimation.keyTimes = @[@0, @0.2, @1];
@@ -195,7 +187,7 @@ const CGFloat MGLUserLocationAnnotationHaloSize = 115.0;
             [self.layer addSublayer:_haloLayer];
         }
         
-        // white dot background with shadow
+        // background dot (white with black shadow)
         //
         if ( ! _dotBorderLayer)
         {
@@ -209,7 +201,7 @@ const CGFloat MGLUserLocationAnnotationHaloSize = 115.0;
             [self.layer addSublayer:_dotBorderLayer];
         }
         
-        // pulsing, tinted inner dot sublayer
+        // inner dot (pulsing, tinted)
         //
         if ( ! _dotLayer)
         {
@@ -218,19 +210,16 @@ const CGFloat MGLUserLocationAnnotationHaloSize = 115.0;
             _dotLayer.shouldRasterize = NO;
             
             // set defaults for the animations
-            //
             CAAnimationGroup *animationGroup = [self loopingAnimationGroupWithDuration:1.5];
             animationGroup.autoreverses = YES;
             animationGroup.fillMode = kCAFillModeBoth;
             
             // scale the dot up and down
-            //
             CABasicAnimation *pulseAnimation = [CABasicAnimation animationWithKeyPath:@"transform.scale.xy"];
             pulseAnimation.fromValue = @0.8;
             pulseAnimation.toValue = @1;
             
             // fade opacity in and out, subtly
-            //
             CABasicAnimation *opacityAnimation = [CABasicAnimation animationWithKeyPath:@"opacity"];
             opacityAnimation.fromValue = @0.8;
             opacityAnimation.toValue = @1;
@@ -288,14 +277,12 @@ const CGFloat MGLUserLocationAnnotationHaloSize = 115.0;
     CGContextRef context = UIGraphicsGetCurrentContext();
     
     // gradient from the tint color to no-alpha tint color
-    //
     CGFloat gradientLocations[] = {0.0, 1.0};
     CGGradientRef gradient = CGGradientCreateWithColors(
       colorSpace, (__bridge CFArrayRef)@[(id)[_mapView.tintColor CGColor],
                                          (id)[[_mapView.tintColor colorWithAlphaComponent:0] CGColor]], gradientLocations);
     
     // draw the gradient from the center point to the edge (full halo radius)
-    //
     CGPoint centerPoint = CGPointMake(haloRadius, haloRadius);
     CGContextDrawRadialGradient(context, gradient,
                                 centerPoint, 0.0,
@@ -316,7 +303,6 @@ const CGFloat MGLUserLocationAnnotationHaloSize = 115.0;
     CGFloat accuracy = self.annotation.heading.headingAccuracy;
     
     // size the mask using exagerated accuracy, but keep within a good display range
-    //
     CGFloat clippingDegrees = 90 - (accuracy * 1.5);
     clippingDegrees = fmin(clippingDegrees, 55);
     clippingDegrees = fmax(clippingDegrees, 10);
@@ -325,7 +311,6 @@ const CGFloat MGLUserLocationAnnotationHaloSize = 115.0;
     UIBezierPath *ovalPath = UIBezierPath.bezierPath;
     
     // clip the oval to ± incoming accuracy degrees (converted to radians), from the top
-    //
     [ovalPath addArcWithCenter:CGPointMake(CGRectGetMidX(ovalRect), CGRectGetMidY(ovalRect))
                         radius:CGRectGetWidth(ovalRect) / 2.0
                     startAngle:(-180 + clippingDegrees) * M_PI / 180
