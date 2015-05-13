@@ -153,7 +153,8 @@ std::chrono::steady_clock::duration secondsAsDuration(float duration)
 
 - (NSString *)accessToken
 {
-    return @(_mbglMap->getAccessToken().c_str()).mgl_stringOrNilIfEmpty;
+    NSString *accessToken = @(_mbglMap->getAccessToken().c_str()).mgl_stringOrNilIfEmpty;
+    return accessToken ? accessToken : [MGLAccountManager accessToken];
 }
 
 - (void)setAccessToken:(NSString *)accessToken
@@ -2559,7 +2560,7 @@ CLLocationCoordinate2D latLngToCoordinate(mbgl::LatLng latLng)
 
         // More explanation
         UILabel *explanationLabel2 = [[UILabel alloc] init];
-        explanationLabel2.text = @"and enter it into the Access Token field in the Attributes inspector.";
+        explanationLabel2.text = @"and enter it into the Access Token field in the Attributes inspector or in an MGLMapboxAccessToken entry in the Info.plist file.";
         explanationLabel2.font = [UIFont preferredFontForTextStyle:UIFontTextStyleBody];
         explanationLabel2.numberOfLines = 0;
         explanationLabel2.translatesAutoresizingMaskIntoConstraints = NO;
