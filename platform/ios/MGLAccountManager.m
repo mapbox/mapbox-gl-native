@@ -16,15 +16,13 @@
 
 @implementation MGLAccountManager
 
-+ (void)initialize {
-    if (self == [MGLAccountManager class]) {
-        // Read initial configuration from Info.plist.
-        NSBundle *bundle = [NSBundle bundleForClass:self];
-        self.accessToken = [bundle objectForInfoDictionaryKey:@"MGLMapboxAccessToken"];
-        NSNumber *shownInAppNumber = [bundle objectForInfoDictionaryKey:@"MGLMapboxMetricsEnabledSettingShownInApp"];
-        if (shownInAppNumber) {
-            [MGLAccountManager sharedManager].mapboxMetricsEnabledSettingShownInApp = [shownInAppNumber boolValue];
-        }
++ (void)load {
+    // Read initial configuration from Info.plist.
+    NSBundle *bundle = [NSBundle bundleForClass:self];
+    self.accessToken = [bundle objectForInfoDictionaryKey:@"MGLMapboxAccessToken"];
+    NSNumber *shownInAppNumber = [bundle objectForInfoDictionaryKey:@"MGLMapboxMetricsEnabledSettingShownInApp"];
+    if (shownInAppNumber) {
+        [MGLAccountManager sharedManager].mapboxMetricsEnabledSettingShownInApp = [shownInAppNumber boolValue];
     }
 }
 
@@ -63,7 +61,7 @@
 + (void) setAccessToken:(NSString *) accessToken {
     if ( ! [accessToken length]) return;
     
-    [[MGLAccountManager sharedManager] setAccessToken:accessToken];
+    [MGLAccountManager sharedManager].accessToken = accessToken;
 
     // Update MGLMapboxEvents
     // NOTE: This is (likely) the initial setup of MGLMapboxEvents
