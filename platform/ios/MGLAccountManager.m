@@ -1,12 +1,12 @@
 #import <Foundation/Foundation.h>
 
 #import "MGLAccountManager.h"
+#import "MGLMapboxEvents_Private.h"
 #import "NSProcessInfo+MGLAdditions.h"
-#import "MGLMapboxEvents.h"
 
 @interface MGLAccountManager()
 
-@property (atomic) BOOL showsOptOutInApp;
+@property (atomic) BOOL mapboxMetricsEnabledSettingShownInApp;
 @property (atomic) NSString *accessToken;
 
 @end
@@ -14,49 +14,49 @@
 
 @implementation MGLAccountManager
 
-static MGLAccountManager *_sharedManager;
-
 // Can be called from any thread.
 //
-+ (instancetype) sharedInstance {
++ (instancetype) sharedManager {
+    if (NSProcessInfo.processInfo.mgl_isInterfaceBuilderDesignablesAgent) {
+        return;
+    }
     static dispatch_once_t onceToken;
-    dispatch_once(&onceToken, ^{
-        if ( ! NSProcessInfo.processInfo.mgl_isInterfaceBuilderDesignablesAgent) {
-            void (^setupBlock)() = ^{
-                _sharedManager = [[self alloc] init];
-                _sharedManager.showsOptOutInApp = NO;
-            };
-            if ( ! [[NSThread currentThread] isMainThread]) {
-                dispatch_sync(dispatch_get_main_queue(), ^{
-                    setupBlock();
-                });
-            }
-            else {
-                setupBlock();
-            }
-        }
-    });
+    static MGLAccountManager *_sharedManager;
+    void (^setupBlock)() = ^{
+        dispatch_once(&onceToken, ^{
+            _sharedManager = [[self alloc] init];
+            _sharedManager.mapboxMetricsEnabledSettingShownInApp = NO;
+        });
+    };
+    if ( ! [[NSThread currentThread] isMainThread]) {
+        dispatch_sync(dispatch_get_main_queue(), ^{
+            setupBlock();
+        });
+    }
+    else {
+        setupBlock();
+    }
     return _sharedManager;
 }
 
-+ (void) setMapboxMetricsEnabledSettingShownInApp:(BOOL)showsOptOut {
-    [MGLAccountManager sharedInstance].showsOptOutInApp = showsOptOut;
++ (void) setMapboxMetricsEnabledSettingShownInApp:(BOOL)shown {
+    [MGLAccountManager sharedManager].mapboxMetricsEnabledSettingShownInApp = shown;
 }
 
 + (BOOL) mapboxMetricsEnabledSettingShownInApp {
-    return [MGLAccountManager sharedInstance].showsOptOutInApp;
+    return [MGLAccountManager sharedManager].mapboxMetricsEnabledSettingShownInApp;
 }
 
 + (void) setAccessToken:(NSString *) accessToken {
-    [[MGLAccountManager sharedInstance] setAccessToken:accessToken];
+    [[MGLAccountManager sharedManager] setAccessToken:accessToken];
 
     // Update MGLMapboxEvents
     // NOTE: This is (likely) the initial setup of MGLMapboxEvents
-    [MGLMapboxEvents setToken:accessToken];
+    [MGLMapboxEvents sharedManager];
 }
 
 + (NSString *) accessToken {
-    return [MGLAccountManager sharedInstance].accessToken;
+    return [MGLAccountManager sharedManager].accessToken;
 }
 
 

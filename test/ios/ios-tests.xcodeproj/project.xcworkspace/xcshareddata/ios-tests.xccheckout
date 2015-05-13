@@ -12,6 +12,8 @@
 	<dict>
 		<key>10265E242415D473A6A613214DB7AC3EE3D43F93</key>
 		<string>https://github.com/mapbox/KIF.git</string>
+		<key>38C2A0D4F62B675E8C16C8BC1437C7753846C8AC</key>
+		<string>https://github.com/AliSoftware/OHHTTPStubs.git</string>
 		<key>7E68CB584078A487C0535CC191D3B7551EEE2095</key>
 		<string>github.com:mapbox/mapbox-gl-native.git</string>
 	</dict>
@@ -21,6 +23,8 @@
 	<dict>
 		<key>10265E242415D473A6A613214DB7AC3EE3D43F93</key>
 		<string>../../../..test/ios/KIF</string>
+		<key>38C2A0D4F62B675E8C16C8BC1437C7753846C8AC</key>
+		<string>../../../../test/ios/OHHTTPStubs/</string>
 		<key>7E68CB584078A487C0535CC191D3B7551EEE2095</key>
 		<string>../../../..</string>
 	</dict>
@@ -47,6 +51,14 @@
 			<string>10265E242415D473A6A613214DB7AC3EE3D43F93</string>
 			<key>IDESourceControlWCCName</key>
 			<string>KIF</string>
+		</dict>
+		<dict>
+			<key>IDESourceControlRepositoryExtensionIdentifierKey</key>
+			<string>public.vcs.git</string>
+			<key>IDESourceControlWCCIdentifierKey</key>
+			<string>38C2A0D4F62B675E8C16C8BC1437C7753846C8AC</string>
+			<key>IDESourceControlWCCName</key>
+			<string>OHHTTPStubs</string>
 		</dict>
 	</array>
 </dict>
