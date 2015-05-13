@@ -1,4 +1,5 @@
 #include "node_log.hpp"
+#include "util/async_queue.hpp"
 
 #include <mbgl/map/environment.hpp>
 
