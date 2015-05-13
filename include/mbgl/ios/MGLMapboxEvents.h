@@ -32,10 +32,6 @@ extern NSString *const MGLEventGestureRotateStart;
 
 // You must call these methods from the main thread.
 //
-+ (void) setToken:(NSString *)token;
-+ (void) setAppName:(NSString *)appName;
-+ (void) setAppVersion:(NSString *)appVersion;
-+ (void) setAppBuildNumber:(NSString *)appBuildNumber;
 + (void) pauseMetricsCollection;
 + (void) resumeMetricsCollection;
 
@@ -57,5 +53,8 @@ extern NSString *const MGLEventGestureRotateStart;
 // You can call this method from any thread.
 //
 + (void) flush;
+
+// Main thread only
++ (void)validate;
 
 @end
