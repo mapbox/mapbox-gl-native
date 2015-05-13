@@ -176,8 +176,10 @@ const NSTimeInterval MGLFlushInterval = 60;
 
 + (void)initialize {
     if (self == [MGLMapboxEvents class]) {
+        NSBundle *bundle = [NSBundle bundleForClass:self];
+        NSNumber *accountTypeNumber = [bundle objectForInfoDictionaryKey:@"MGLMapboxAccountType"];
         [[NSUserDefaults standardUserDefaults] registerDefaults:@{
-             @"MGLMapboxAccountType": @0,
+             @"MGLMapboxAccountType": accountTypeNumber ? accountTypeNumber : @0,
              @"MGLMapboxMetricsEnabled": @YES,
          }];
     }

@@ -9,10 +9,24 @@
 @property (atomic) BOOL mapboxMetricsEnabledSettingShownInApp;
 @property (atomic) NSString *accessToken;
 
++ (void)setMapboxMetricsEnabledSettingShownInApp:(BOOL)showsOptOut;
+
 @end
 
 
 @implementation MGLAccountManager
+
++ (void)initialize {
+    if (self == [MGLAccountManager class]) {
+        // Read initial configuration from Info.plist.
+        NSBundle *bundle = [NSBundle bundleForClass:self];
+        self.accessToken = [bundle objectForInfoDictionaryKey:@"MGLMapboxAccessToken"];
+        NSNumber *shownInAppNumber = [bundle objectForInfoDictionaryKey:@"MGLMapboxMetricsEnabledSettingShownInApp"];
+        if (shownInAppNumber) {
+            [MGLAccountManager sharedManager].mapboxMetricsEnabledSettingShownInApp = [shownInAppNumber boolValue];
+        }
+    }
+}
 
 // Can be called from any thread.
 //
@@ -25,7 +39,6 @@
     void (^setupBlock)() = ^{
         dispatch_once(&onceToken, ^{
             _sharedManager = [[self alloc] init];
-            _sharedManager.mapboxMetricsEnabledSettingShownInApp = NO;
         });
     };
     if ( ! [[NSThread currentThread] isMainThread]) {
@@ -48,6 +61,8 @@
 }
 
 + (void) setAccessToken:(NSString *) accessToken {
+    if ( ! [accessToken length]) return;
+    
     [[MGLAccountManager sharedManager] setAccessToken:accessToken];
 
     // Update MGLMapboxEvents
