@@ -144,11 +144,9 @@ void Source::load(const std::string& accessToken) {
         return;
     }
 
-    util::ptr<Source> source = shared_from_this();
-
     const std::string url = util::mapbox::normalizeSourceURL(info.url, accessToken);
-    req = Environment::Get().request({ Resource::Kind::JSON, url }, [source](const Response &res) {
-        source->clearRequest();
+    req = Environment::Get().request({ Resource::Kind::JSON, url }, [this](const Response &res) {
+        req = nullptr;
 
         if (res.status != Response::Successful) {
             Log::Warning(Event::General, "Failed to load source TileJSON: %s", res.message.c_str());
@@ -163,10 +161,10 @@ void Source::load(const std::string& accessToken) {
             return;
         }
 
-        source->info.parseTileJSONProperties(d);
-        source->loaded = true;
+        info.parseTileJSONProperties(d);
+        loaded = true;
 
-        source->emitSourceLoaded();
+        emitSourceLoaded();
     });
 }
 
@@ -507,10 +505,6 @@ void Source::setCacheSize(size_t size) {
 
 void Source::onLowMemory() {
     cache.clear();
-}
-
-void Source::clearRequest() {
-    req = nullptr;
 }
 
 void Source::setObserver(Observer* observer) {
