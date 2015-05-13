@@ -3,6 +3,8 @@
 set -e
 set -o pipefail
 
+source ./scripts/linux/setup.sh
+
 BUILDTYPE=${BUILDTYPE:-Release}
 
 ################################################################################

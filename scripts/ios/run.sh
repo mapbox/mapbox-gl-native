@@ -4,10 +4,9 @@ set -e
 set -o pipefail
 set -u
 
-BUILDTYPE=${BUILDTYPE:-Release}
+source ./scripts/ios/setup.sh
 
-# Add Mason to PATH
-export PATH="`pwd`/.mason:${PATH}" MASON_DIR="`pwd`/.mason"
+BUILDTYPE=${BUILDTYPE:-Release}
 
 PUBLISH_TAG=($(git show -s --format=%B | sed -n 's/.*\[publish \([a-z]\{1,\}\)-v\([0-9.]\{1,\}\)\].*/\1 \2/p'))
 PUBLISH_PLATFORM=${PUBLISH_TAG[0],-}
