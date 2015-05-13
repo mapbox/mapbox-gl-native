@@ -224,7 +224,7 @@ Placement Placement::getGlyphs(Anchor &anchor, const vec2<float> &origin, const 
         if (!glyph)
             continue;
 
-        if (!rect)
+        if (!rect.hasArea())
             continue;
 
         const float x = (origin.x + shape.x + glyph.metrics.left - buffer + rect.w / 2) * boxScale;

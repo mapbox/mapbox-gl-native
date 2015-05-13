@@ -34,12 +34,11 @@
         'ldflags': [
           '<@(glfw3_ldflags)',
           '<@(uv_ldflags)',
-          '<@(boost_ldflags)',
-          '-lboost_program_options'
         ],
         'libraries': [
           '<@(glfw3_static_libs)',
           '<@(uv_static_libs)',
+          '<@(boost_program_options_static_libs)'
         ],
       },
 

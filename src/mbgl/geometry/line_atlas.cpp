@@ -3,6 +3,7 @@
 #include <mbgl/platform/gl.hpp>
 #include <mbgl/platform/log.hpp>
 #include <mbgl/platform/platform.hpp>
+#include <mbgl/util/std.hpp>
 
 #include <boost/functional/hash.hpp>
 
@@ -14,7 +15,7 @@ using namespace mbgl;
 LineAtlas::LineAtlas(uint16_t w, uint16_t h)
     : width(w),
       height(h),
-      data(new char[w * h]),
+      data(util::make_unique<uint8_t[]>(w * h)),
       dirty(true) {
 }
 
@@ -23,8 +24,6 @@ LineAtlas::~LineAtlas() {
 
     Environment::Get().abandonTexture(texture);
     texture = 0;
-
-    delete[] data;
 }
 
 LinePatternPos LineAtlas::getDashPosition(const std::vector<float> &dasharray, bool round) {
@@ -162,7 +161,7 @@ void LineAtlas::bind() {
                 0, // GLint border
                 GL_ALPHA, // GLenum format
                 GL_UNSIGNED_BYTE, // GLenum type
-                data // const GLvoid * data
+                data.get() // const GLvoid * data
             ));
         } else {
             MBGL_CHECK_ERROR(glTexSubImage2D(
@@ -174,7 +173,7 @@ void LineAtlas::bind() {
                 height, // GLsizei height
                 GL_ALPHA, // GLenum format
                 GL_UNSIGNED_BYTE, // GLenum type
-                data // const GLvoid *pixels
+                data.get() // const GLvoid *pixels
             ));
         }
 

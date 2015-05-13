@@ -236,7 +236,7 @@ void SymbolBucket::addFeatures(const GeometryTileLayer& layer,
         }
 
         // if either shaping or icon position is present, add the feature
-        if (shaping.size() || image) {
+        if (shaping.size() || image.hasArea()) {
             for (const auto& line : feature.geometry) {
                 if (line.size()) {
                     addFeature(line, shaping, face, image);
@@ -265,7 +265,7 @@ void SymbolBucket::addFeature(const std::vector<Coordinate> &line, const Shaping
     const float textBoxScale = collision.tilePixelRatio * fontScale;
     const float iconBoxScale = collision.tilePixelRatio * layout.icon.max_size;
     const bool iconWithoutText = layout.text.optional || !shaping.size();
-    const bool textWithoutIcon = layout.icon.optional || !image;
+    const bool textWithoutIcon = layout.icon.optional || !image.hasArea();
     const bool avoidEdges = layout.avoid_edges && layout.placement != PlacementType::Line;
 
     Anchors anchors;
@@ -322,7 +322,7 @@ void SymbolBucket::addFeature(const std::vector<Coordinate> &line, const Shaping
                 continue;
         }
 
-        if (image) {
+        if (image.hasArea()) {
             iconPlacement = Placement::getIcon(anchor, image, iconBoxScale, line, layout);
             iconScale =
                 layout.icon.allow_overlap

@@ -23,7 +23,11 @@ public:
             if (width <= ref.w && height <= ref.h) {
                 if (smallest == free.end() || (ref.y <= rect.y && ref.x <= rect.x)) {
                     smallest = it;
+                } else {
+                    // Our current "smallest" rect is already closer to 0/0.
                 }
+            } else {
+                // The rect in the free list is not big enough.
             }
         }
 
