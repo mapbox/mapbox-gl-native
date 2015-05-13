@@ -18,7 +18,7 @@
 //
 + (instancetype) sharedManager {
     if (NSProcessInfo.processInfo.mgl_isInterfaceBuilderDesignablesAgent) {
-        return;
+        return nil;
     }
     static dispatch_once_t onceToken;
     static MGLAccountManager *_sharedManager;

@@ -280,7 +280,7 @@ const NSTimeInterval MGLFlushInterval = 60;
 //
 + (instancetype)sharedManager {
     if (NSProcessInfo.processInfo.mgl_isInterfaceBuilderDesignablesAgent) {
-        return;
+        return nil;
     }
     static dispatch_once_t onceToken;
     static MGLMapboxEvents *_sharedManager;
