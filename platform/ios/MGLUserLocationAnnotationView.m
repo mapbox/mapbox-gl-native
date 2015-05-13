@@ -24,9 +24,9 @@ const CGFloat MGLUserLocationAnnotationHaloSize = 115.0;
     CALayer *_dotBorderLayer;
     CALayer *_dotLayer;
     
-    double oldHeadingAccuracy;
-    CLLocationAccuracy oldHorizontalAccuracy;
-    double oldZoom;
+    double _oldHeadingAccuracy;
+    CLLocationAccuracy _oldHorizontalAccuracy;
+    double _oldZoom;
 }
 
 - (instancetype)initWithFrame:(CGRect)frame
@@ -76,12 +76,12 @@ const CGFloat MGLUserLocationAnnotationHaloSize = 115.0;
         {
             _headingIndicatorLayer.hidden = (_mapView.userTrackingMode == MGLUserTrackingModeFollowWithHeading) ? NO : YES;
             
-            if (oldHeadingAccuracy != self.annotation.heading.headingAccuracy)
+            if (_oldHeadingAccuracy != self.annotation.heading.headingAccuracy)
             {
                 // recalculate the clipping mask based on updated accuracy
                 _headingIndicatorMaskLayer.path = [[self headingIndicatorClippingMask] CGPath];
 
-                oldHeadingAccuracy = self.annotation.heading.headingAccuracy;
+                _oldHeadingAccuracy = self.annotation.heading.headingAccuracy;
             }
         }
         
@@ -116,7 +116,7 @@ const CGFloat MGLUserLocationAnnotationHaloSize = 115.0;
             // apply the mask to the halo-radius-sized gradient layer
             _headingIndicatorLayer.mask = _headingIndicatorMaskLayer;
             
-            oldHeadingAccuracy = self.annotation.heading.headingAccuracy;
+            _oldHeadingAccuracy = self.annotation.heading.headingAccuracy;
         }
         
         // update accuracy ring
@@ -124,8 +124,10 @@ const CGFloat MGLUserLocationAnnotationHaloSize = 115.0;
         if (_accuracyRingLayer)
         {
             // FIX: This stops EVERYTHING... and that isn't necessarily necessary, now is it?
-            if (oldZoom == self.mapView.zoomLevel && oldHorizontalAccuracy == self.annotation.location.horizontalAccuracy)
+            if (_oldZoom == self.mapView.zoomLevel && _oldHorizontalAccuracy == self.annotation.location.horizontalAccuracy)
+            {
                 return;
+            }
             
             CGFloat accuracyRingSize = [self calculateAccuracyRingSize];
             
@@ -152,8 +154,8 @@ const CGFloat MGLUserLocationAnnotationHaloSize = 115.0;
             }
             
             // store accuracy and zoom so we're not redrawing unchanged location updates
-            oldHorizontalAccuracy = self.annotation.location.horizontalAccuracy;
-            oldZoom = self.mapView.zoomLevel;
+            _oldHorizontalAccuracy = self.annotation.location.horizontalAccuracy;
+            _oldZoom = self.mapView.zoomLevel;
         }
         
         // accuracy ring (circular, tinted, mostly-transparent)
