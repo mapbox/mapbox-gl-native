@@ -279,25 +279,24 @@ const NSTimeInterval MGLFlushInterval = 60;
 // public class convenience methods. May return nil if this feature is disabled.
 //
 + (instancetype)sharedManager {
+    if (NSProcessInfo.processInfo.mgl_isInterfaceBuilderDesignablesAgent) {
+        return;
+    }
     static dispatch_once_t onceToken;
     static MGLMapboxEvents *_sharedManager;
-    dispatch_once(&onceToken, ^{
-        if (NSProcessInfo.processInfo.mgl_isInterfaceBuilderDesignablesAgent) {
-            return;
-        }
-        
-        void (^setupBlock)() = ^{
+    void (^setupBlock)() = ^{
+        dispatch_once(&onceToken, ^{
             _sharedManager = [[self alloc] init];
-        };
-        if ( ! [[NSThread currentThread] isMainThread]) {
-            dispatch_sync(dispatch_get_main_queue(), ^{
-                setupBlock();
-            });
-        }
-        else {
+        });
+    };
+    if ( ! [[NSThread currentThread] isMainThread]) {
+        dispatch_sync(dispatch_get_main_queue(), ^{
             setupBlock();
-        }
-    });
+        });
+    }
+    else {
+        setupBlock();
+    }
     return _sharedManager;
 }
 

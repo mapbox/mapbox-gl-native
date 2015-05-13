@@ -14,28 +14,28 @@
 
 @implementation MGLAccountManager
 
-static MGLAccountManager *_sharedManager;
-
 // Can be called from any thread.
 //
 + (instancetype) sharedManager {
+    if (NSProcessInfo.processInfo.mgl_isInterfaceBuilderDesignablesAgent) {
+        return;
+    }
     static dispatch_once_t onceToken;
-    dispatch_once(&onceToken, ^{
-        if ( ! NSProcessInfo.processInfo.mgl_isInterfaceBuilderDesignablesAgent) {
-            void (^setupBlock)() = ^{
-                _sharedManager = [[self alloc] init];
-                _sharedManager.mapboxMetricsEnabledSettingShownInApp = NO;
-            };
-            if ( ! [[NSThread currentThread] isMainThread]) {
-                dispatch_sync(dispatch_get_main_queue(), ^{
-                    setupBlock();
-                });
-            }
-            else {
-                setupBlock();
-            }
-        }
-    });
+    static MGLAccountManager *_sharedManager;
+    void (^setupBlock)() = ^{
+        dispatch_once(&onceToken, ^{
+            _sharedManager = [[self alloc] init];
+            _sharedManager.mapboxMetricsEnabledSettingShownInApp = NO;
+        });
+    };
+    if ( ! [[NSThread currentThread] isMainThread]) {
+        dispatch_sync(dispatch_get_main_queue(), ^{
+            setupBlock();
+        });
+    }
+    else {
+        setupBlock();
+    }
     return _sharedManager;
 }
 
