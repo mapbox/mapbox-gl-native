@@ -631,6 +631,7 @@
 					/Applications/Xcode.app/Contents/Developer/Toolchains/XcodeDefault.xctoolchain/usr/include,
 					"../../build/ios/pkg/static/**",
 					OCMock,
+					OHHTTPStubs/OHHTTPStubs/Sources,
 				);
 				INFOPLIST_FILE = "Bundle-Info.plist";
 				LIBRARY_SEARCH_PATHS = (
@@ -665,6 +666,7 @@
 					/Applications/Xcode.app/Contents/Developer/Toolchains/XcodeDefault.xctoolchain/usr/include,
 					"../../build/ios/pkg/static/**",
 					OCMock,
+					OHHTTPStubs/OHHTTPStubs/Sources,
 				);
 				INFOPLIST_FILE = "Bundle-Info.plist";
 				LIBRARY_SEARCH_PATHS = (
