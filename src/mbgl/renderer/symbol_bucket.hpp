@@ -61,25 +61,22 @@ public:
     bool hasTextData() const;
     bool hasIconData() const;
 
-    void addFeatures(const GeometryTileLayer&,
-                     const FilterExpression&,
-                     uintptr_t tileUID,
+    void addFeatures(uintptr_t tileUID,
                      SpriteAtlas&,
                      Sprite&,
                      GlyphAtlas&,
                      GlyphStore&);
 
-    inline bool needsGlyphs() const { return needsGlyphs_; }
-
     void drawGlyphs(SDFShader& shader);
     void drawIcons(SDFShader& shader);
     void drawIcons(IconShader& shader);
 
-private:
-    std::vector<SymbolFeature> processFeatures(const GeometryTileLayer&,
-                                               const FilterExpression&,
-                                               GlyphStore&);
+    bool needsDependencies(const GeometryTileLayer&,
+                           const FilterExpression&,
+                           GlyphStore&,
+                           Sprite&);
 
+private:
     void addFeature(const std::vector<Coordinate> &line, const Shaping &shaping, const GlyphPositions &face, const Rect<uint16_t> &image);
 
     // Adds placed items to the buffer.
@@ -92,6 +89,7 @@ public:
 
 private:
     Collision &collision;
+    std::vector<SymbolFeature> features;
 
     struct TextBuffer {
         TextVertexBuffer vertices;
@@ -104,9 +102,8 @@ private:
         TriangleElementsBuffer triangles;
         std::vector<std::unique_ptr<IconElementGroup>> groups;
     } icon;
-
-    bool needsGlyphs_;
 };
+
 }
 
 #endif
