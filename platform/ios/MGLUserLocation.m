@@ -63,7 +63,7 @@
 
 - (NSString *)title
 {
-    return (_title ? _title : @"Current Location");
+    return (_title ? _title : @"You Are Here");
 }
 
 @end
