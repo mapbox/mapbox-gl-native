@@ -11,7 +11,7 @@ matrix:
     - FLAVOR: linux
     - CXX: clang++-3.5
     - NODE_EXE: "iojs"
-    - NODE_VERSION: 1.2.0
+    - NODE_VERSION: 2.0.1
     addons:
       apt:
         sources: [ 'ubuntu-toolchain-r-test', 'llvm-toolchain-precise-3.5' ]
@@ -44,7 +44,7 @@ matrix:
     - FLAVOR: linux
     - CXX: g++-4.9
     - NODE_EXE: "iojs"
-    - NODE_VERSION: 1.2.0
+    - NODE_VERSION: 2.0.1
     addons:
       apt:
         sources: [ 'ubuntu-toolchain-r-test' ]
@@ -76,7 +76,7 @@ matrix:
     env:
     - FLAVOR: osx
     - NODE_EXE: "iojs"
-    - NODE_VERSION: 1.2.0
+    - NODE_VERSION: 2.0.1
   - os: osx
     compiler: clang
     env:
