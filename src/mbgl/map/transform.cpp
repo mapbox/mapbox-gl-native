@@ -24,6 +24,11 @@ static double _normalizeAngle(double angle, double anchorAngle)
         angle += util::M2PI;
     }
 
+    // 360 degrees should be normalized as 0
+    if (std::abs(angle) == util::M2PI) {
+        angle = 0;
+    }
+
     return angle;
 }
 
