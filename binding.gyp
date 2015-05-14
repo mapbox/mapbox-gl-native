@@ -52,7 +52,6 @@
             '-Werror',
             '-Wall',
             '-Wextra',
-            '-Wshadow',
             '-Wno-variadic-macros',
             '-Wno-error=unused-parameter',
             '-frtti',
