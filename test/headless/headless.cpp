@@ -104,14 +104,12 @@ TEST_P(HeadlessTest, render) {
     ASSERT_FALSE(infoDoc.HasParseError());
     ASSERT_TRUE(infoDoc.IsObject());
 
-    Log::setObserver(util::make_unique<FixtureLogObserver>());
-
     for (auto it = infoDoc.MemberBegin(), end = infoDoc.MemberEnd(); it != end; it++) {
         const std::string name {
             it->name.GetString(), it->name.GetStringLength()
         };
 
-        Log::Info(Event::General, "test fixture %s %s", base.c_str(), name.c_str());
+        Log::Info(Event::General, "%s %s", base.c_str(), name.c_str());
 
         const rapidjson::Value& value = it->value;
         ASSERT_TRUE(value.IsObject());
