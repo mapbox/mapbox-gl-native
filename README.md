@@ -9,7 +9,7 @@ Renders map tiles with [Mapbox GL](https://github.com/mapbox/mapbox-gl-native).
 By default, installs binaries. On these platforms no external dependencies are needed.
 
 - 64 bit OS X or 64 bit Linux
-- Node v0.10.x
+- Node.js v0.10.x, Node.js v0.12.x, io.js v2.x
 
 Just run:
 
@@ -17,7 +17,7 @@ Just run:
 npm install mapbox-gl-native
 ```
 
-However, other platforms will fall back to a source compile with `make build`. To compile this module, make sure all submodules are initialized.
+However, other platforms will fall back to a source compile with `npm run build`. To compile this module, make sure all submodules are initialized with `git submodule update --init`.
 
 ## Rendering a map tile
 
@@ -45,6 +45,8 @@ The first argument passed to `map.render` is an options object, all keys are opt
 ```
 
 _More about classes: https://github.com/mapbox/mapbox-gl-js/blob/master/API.md#working-with-style-classes_
+
+When you are finished using a map object, you can call `map.release()` to dispose the internal map resources manually. This is not necessary, but can be helpful to optimize resource usage (memory, file sockets) on a more granualar level than v8's garbage collector.
 
 ## Testing
 
@@ -83,10 +85,12 @@ The `kind` is an enum and defined in `mbgl.Resource`:
 ```json
 {
     "Unknown": 0,
-    "Tile": 1,
-    "Glyphs": 2,
-    "Image": 3,
-    "JSON": 4
+    "Style": 1,
+    "Source": 2,
+    "Tile": 3,
+    "Glyphs": 4,
+    "JSON": 5,
+    "Image": 6
 }
 ```
 
@@ -110,7 +114,7 @@ This is a very barebones implementation and you'll probably want a better implem
     modified: new Date(),
     expires: new Date(),
     etag: "string",
-    data: new Buffer(),
+    data: new Buffer()
 };
 ```
 
@@ -156,12 +160,45 @@ Note that in reality, Mapbox GL uses two types of protocols: `asset://` for file
 
 ## Mapbox API Access tokens
 
-To use styles that rely on Mapbox vector tiles, you must register a [API access token](https://www.mapbox.com/developers/api/#access-tokens) on the map. Use the `setAccessToken` method before load:
+To use styles that rely on Mapbox vector tiles, you must pass an [API access token](https://www.mapbox.com/developers/api/#access-tokens) in your `FileSource` implementation with requests to `mapbox://` protocols.
 
 ```js
+var mbgl = require('mapbox-gl-native');
+var request = require('request');
+var url = require('url');
+
+var fileSource = new mbgl.FileSource();
+fileSource.request = function(req) {
+    var opts = {
+        url: req.url,
+        encoding: null,
+        gzip: true
+    };
+
+    if (url.parse(req.url).protocol === 'mapbox:') {
+        opts.qs = { access_token: process.env.MAPBOX_ACCESS_TOKEN};
+    }
+
+    request(opts, function (err, res, body) {
+        if (err) {
+            req.respond(err);
+        } else if (res.statusCode == 200) {
+            var response = {};
+
+            if (res.headers.modified) { response.modified = new Date(res.headers.modified); }
+            if (res.headers.expires) { response.expires = new Date(res.headers.expires); }
+            if (res.headers.etag) { response.etag = res.headers.etag; }
+            response.data = body;
+            req.respond(null, response);
+        } else {
+            req.respond(new Error(JSON.parse(body).message));
+        }
+    });
+}
+
 var map = mbgl.Map(fileSource);
 var style = mapboxStyle; // includes a datasource with a reference to something like `mapbox://mapbox.mapbox-streets-v6`
-map.setAccessToken(process.env.MAPBOX_ACCESS_TOKEN);
+
 map.load(style);
 map.render({}, function(err, image) {
     if (err) throw err;
