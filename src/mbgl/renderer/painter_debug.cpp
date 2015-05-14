@@ -4,6 +4,7 @@
 #include <mbgl/map/tile_data.hpp>
 #include <mbgl/shader/plain_shader.hpp>
 #include <mbgl/util/string.hpp>
+#include <mbgl/gl/debugging.hpp>
 
 #ifndef BUFFER_OFFSET
 #define BUFFER_OFFSET(i) ((char *)nullptr + (i))
@@ -12,7 +13,7 @@
 using namespace mbgl;
 
 void Painter::renderTileDebug(const Tile& tile) {
-    gl::group group(std::string { "debug " } + std::string(tile.id));
+    gl::debugging::group group(std::string { "debug " } + std::string(tile.id));
     assert(tile.data);
     if (debug) {
         prepareTile(tile);
@@ -22,7 +23,7 @@ void Painter::renderTileDebug(const Tile& tile) {
 }
 
 void Painter::renderDebugText(DebugBucket& bucket, const mat4 &matrix) {
-    gl::group group("debug text");
+    gl::debugging::group group("debug text");
 
     config.depthTest = false;
 
@@ -49,7 +50,7 @@ void Painter::renderDebugText(DebugBucket& bucket, const mat4 &matrix) {
 }
 
 void Painter::renderDebugFrame(const mat4 &matrix) {
-    gl::group group("debug frame");
+    gl::debugging::group group("debug frame");
 
     // Disable depth test and don't count this towards the depth buffer,
     // but *don't* disable stencil test, as we want to clip the red tile border
@@ -72,7 +73,7 @@ void Painter::renderDebugText(const std::vector<std::string> &strings) {
         return;
     }
 
-    gl::group group("debug text");
+    gl::debugging::group group("debug text");
 
     config.depthTest = false;
     config.stencilTest = true;

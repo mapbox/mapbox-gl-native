@@ -51,7 +51,7 @@ public:
     std::string tileURL(const TileID& id, float pixelRatio) const;
 };
 
-class Source : public std::enable_shared_from_this<Source>, private util::noncopyable {
+class Source : private util::noncopyable {
 public:
     class Observer {
     public:
@@ -88,7 +88,6 @@ public:
 
     void setCacheSize(size_t);
     void onLowMemory();
-    void clearRequest();
 
     void setObserver(Observer* observer);
 

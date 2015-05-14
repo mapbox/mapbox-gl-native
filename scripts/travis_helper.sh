@@ -1,5 +1,9 @@
 #!/usr/bin/env bash
 
+# This script is sourced, so do not set -e or -o pipefail here. Doing so would
+# bleed into Travis' wrapper script, which messes with their workflow, e.g.
+# preventing after_failure scripts to be triggered.
+
 case `uname -s` in
     'Darwin') JOBS=$((`sysctl -n hw.ncpu` + 2)) ;;
     'Linux')  JOBS=$((`nproc` + 2)) ;;

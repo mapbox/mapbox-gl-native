@@ -216,6 +216,11 @@ void MapContext::render() {
     // Cleanup OpenGL objects that we abandoned since the last render call.
     env.performCleanup();
 
+    if (data.mode == MapMode::Still && (!callback || !data.getFullyLoaded())) {
+        // We are either not waiting for a map to be rendered, or we don't have all resources yet.
+        return;
+    }
+
     assert(style);
 
     if (!painter) {
@@ -226,7 +231,7 @@ void MapContext::render() {
     painter->setDebug(data.getDebug());
     painter->render(*style, transformState, data.getAnimationTime());
 
-    if (data.mode == MapMode::Still && callback && style->isLoaded() && resourceLoader->getSprite()->isLoaded()) {
+    if (data.mode == MapMode::Still) {
         callback(view.readStillImage());
         callback = nullptr;
     }

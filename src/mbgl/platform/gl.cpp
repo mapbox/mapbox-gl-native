@@ -1,78 +1,36 @@
 #include <mbgl/platform/gl.hpp>
-#include <mbgl/platform/log.hpp>
 
-#include <iostream>
-
+#include <mutex>
 
 namespace mbgl {
 namespace gl {
 
-PFNGLDEBUGMESSAGECONTROLPROC DebugMessageControl = nullptr;
-PFNGLDEBUGMESSAGEINSERTPROC DebugMessageInsert = nullptr;
-PFNGLDEBUGMESSAGECALLBACKPROC DebugMessageCallback = nullptr;
-PFNGLGETDEBUGMESSAGELOGPROC GetDebugMessageLog = nullptr;
-PFNGLGETPOINTERVPROC GetPointerv = nullptr;
-PFNGLPUSHDEBUGGROUPPROC PushDebugGroup = nullptr;
-PFNGLPOPDEBUGGROUPPROC PopDebugGroup = nullptr;
-PFNGLOBJECTLABELPROC ObjectLabel = nullptr;
-PFNGLGETOBJECTLABELPROC GetObjectLabel = nullptr;
-PFNGLOBJECTPTRLABELPROC ObjectPtrLabel = nullptr;
-PFNGLGETOBJECTPTRLABELPROC GetObjectPtrLabel = nullptr;
-
-void debug_callback(GLenum source, GLenum type, GLuint id, GLenum severity, GLsizei, const GLchar *message, const void *) {
-    std::string strSource;
-    switch (source) {
-        case GL_DEBUG_SOURCE_API: strSource = "DEBUG_SOURCE_API"; break;
-        case GL_DEBUG_SOURCE_WINDOW_SYSTEM: strSource = "DEBUG_SOURCE_WINDOW_SYSTEM"; break;
-        case GL_DEBUG_SOURCE_SHADER_COMPILER: strSource = "DEBUG_SOURCE_SHADER_COMPILER"; break;
-        case GL_DEBUG_SOURCE_THIRD_PARTY: strSource = "DEBUG_SOURCE_THIRD_PARTY"; break;
-        case GL_DEBUG_SOURCE_APPLICATION: strSource = "DEBUG_SOURCE_APPLICATION"; break;
-        case GL_DEBUG_SOURCE_OTHER: strSource = "DEBUG_SOURCE_OTHER"; break;
-        default: strSource = "(unknown)"; break;
-    }
-
-    std::string strType;
-    switch (type) {
-        case GL_DEBUG_TYPE_ERROR: strType = "DEBUG_TYPE_ERROR"; break;
-        case GL_DEBUG_TYPE_DEPRECATED_BEHAVIOR: strType = "DEBUG_TYPE_DEPRECATED_BEHAVIOR"; break;
-        case GL_DEBUG_TYPE_UNDEFINED_BEHAVIOR: strType = "DEBUG_TYPE_UNDEFINED_BEHAVIOR"; break;
-        case GL_DEBUG_TYPE_PERFORMANCE: strType = "DEBUG_TYPE_PERFORMANCE"; break;
-        case GL_DEBUG_TYPE_PORTABILITY: strType = "DEBUG_TYPE_PORTABILITY"; break;
-        case GL_DEBUG_TYPE_OTHER: strType = "DEBUG_TYPE_OTHER"; break;
-        case GL_DEBUG_TYPE_MARKER: strType = "DEBUG_TYPE_MARKER"; break;
-        case GL_DEBUG_TYPE_PUSH_GROUP: strType = "DEBUG_TYPE_OTHER"; break;
-        case GL_DEBUG_TYPE_POP_GROUP: strType = "DEBUG_TYPE_POP_GROUP"; break;
-        default: strSource = "(unknown)"; break;
-    }
-
-    std::string strSeverity;
-    mbgl::EventSeverity evtSeverity;
-    switch (severity) {
-        case GL_DEBUG_SEVERITY_HIGH: strSeverity = "DEBUG_SEVERITY_HIGH"; evtSeverity = mbgl::EventSeverity::Error; break;
-        case GL_DEBUG_SEVERITY_MEDIUM: strSeverity = "DEBUG_SEVERITY_MEDIUM"; evtSeverity = mbgl::EventSeverity::Warning; break;
-        case GL_DEBUG_SEVERITY_LOW: strSeverity = "DEBUG_SEVERITY_LOW"; evtSeverity = mbgl::EventSeverity::Info; break;
-        case GL_DEBUG_SEVERITY_NOTIFICATION: strSeverity = "DEBUG_SEVERITY_NOTIFICATION"; evtSeverity = mbgl::EventSeverity::Debug; break;
-        default: strSource = "(unknown)"; evtSeverity = mbgl::EventSeverity::Debug; break;
-    }
-
-    mbgl::Log::Record(evtSeverity, mbgl::Event::OpenGL, "GL_%s GL_%s %u GL_%s - %s", strSource.c_str(), strType.c_str(), id, strSeverity.c_str(), message);
+std::vector<ExtensionFunctionBase*>& ExtensionFunctionBase::functions() {
+    static std::vector<ExtensionFunctionBase*> functions;
+    return functions;
 }
 
-PFNGLINSERTEVENTMARKEREXTPROC InsertEventMarkerEXT = nullptr;
-PFNGLPUSHGROUPMARKEREXTPROC PushGroupMarkerEXT = nullptr;
-PFNGLPOPGROUPMARKEREXTPROC PopGroupMarkerEXT = nullptr;
+static std::once_flag initializeExtensionsOnce;
 
-PFNGLLABELOBJECTEXTPROC LabelObjectEXT = nullptr;
-PFNGLGETOBJECTLABELEXTPROC GetObjectLabelEXT = nullptr;
+void InitializeExtensions(glProc (*getProcAddress)(const char *)) {
+    std::call_once(initializeExtensionsOnce, [getProcAddress] {
+        const char * extensionsPtr = reinterpret_cast<const char *>(
+            MBGL_CHECK_ERROR(glGetString(GL_EXTENSIONS)));
 
-PFNGLBINDVERTEXARRAYPROC BindVertexArray = nullptr;
-PFNGLDELETEVERTEXARRAYSPROC DeleteVertexArrays = nullptr;
-PFNGLGENVERTEXARRAYSPROC GenVertexArrays = nullptr;
-PFNGLISVERTEXARRAYPROC IsVertexArray = nullptr;
+        if (!extensionsPtr)
+            return;
 
-bool isPackedDepthStencilSupported = false;
-
-bool isDepth24Supported = false;
+        const std::string extensions = extensionsPtr;
+        for (auto fn : ExtensionFunctionBase::functions()) {
+            for (auto probe : fn->probes) {
+                if (extensions.find(probe.first) != std::string::npos) {
+                    fn->ptr = getProcAddress(probe.second);
+                    break;
+                }
+            }
+        }
+    });
+}
 
 void checkError(const char *cmd, const char *file, int line) {
     const GLenum err = glGetError();

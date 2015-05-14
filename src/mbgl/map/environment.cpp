@@ -2,6 +2,7 @@
 #include <mbgl/storage/file_source.hpp>
 #include <mbgl/platform/gl.hpp>
 #include <mbgl/util/run_loop.hpp>
+#include <mbgl/geometry/vao.hpp>
 
 #include <uv.h>
 
@@ -121,11 +122,6 @@ unsigned Environment::getID() const {
     return id;
 }
 
-void Environment::requestAsync(const Resource& resource,
-                               std::function<void(const Response&)> callback) {
-    fileSource.request(resource, std::move(callback));
-}
-
 Request* Environment::request(const Resource& resource,
                               std::function<void(const Response&)> callback) {
     return fileSource.request(resource, util::RunLoop::current.get()->get(), std::move(callback));
@@ -160,8 +156,8 @@ void Environment::performCleanup() {
     assert(currentlyOn(ThreadType::Map));
 
     if (!abandonedVAOs.empty()) {
-        MBGL_CHECK_ERROR(gl::DeleteVertexArrays(static_cast<GLsizei>(abandonedVAOs.size()),
-                                                abandonedVAOs.data()));
+        MBGL_CHECK_ERROR(VertexArrayObject::Delete(static_cast<GLsizei>(abandonedVAOs.size()),
+                                                   abandonedVAOs.data()));
         abandonedVAOs.clear();
     }
 

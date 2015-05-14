@@ -21,7 +21,7 @@ LiveTileData::LiveTileData(const TileID& id_,
                                      spriteAtlas_, sprite_, source_),
       annotationManager(annotationManager_) {
     // live features are always ready
-    state = State::loaded;
+    setState(State::loaded);
 }
 
 LiveTileData::~LiveTileData() {
@@ -31,7 +31,7 @@ LiveTileData::~LiveTileData() {
 }
 
 void LiveTileData::parse() {
-    if (state != State::loaded) {
+    if (getState() != State::loaded) {
         return;
     }
 
@@ -46,12 +46,12 @@ void LiveTileData::parse() {
             parser.parse();
         } catch (const std::exception& ex) {
             Log::Error(Event::ParseTile, "Live-parsing [%d/%d/%d] failed: %s", id.z, id.x, id.y, ex.what());
-            state = State::obsolete;
+            setState(State::obsolete);
             return;
         }
     }
 
-    if (state != State::obsolete) {
-        state = State::parsed;
+    if (getState() != State::obsolete) {
+        setState(State::parsed);
     }
 }

@@ -3,6 +3,8 @@
 set -e
 set -o pipefail
 
+source ./scripts/osx/setup.sh
+
 BUILDTYPE=${BUILDTYPE:-Release}
 
 ################################################################################

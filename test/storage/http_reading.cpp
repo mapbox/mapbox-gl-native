@@ -56,20 +56,3 @@ TEST_F(Storage, HTTPNoCallback) {
 
     HTTPTest.finish();
 }
-
-TEST_F(Storage, HTTPCallbackNotOnLoop) {
-    using namespace mbgl;
-
-    DefaultFileSource fs(nullptr);
-
-    SCOPED_TEST(HTTPTest)
-
-    std::promise<void> promise;
-    fs.request({ Resource::Unknown, "http://127.0.0.1:3000/test" }, [&] (const Response &) {
-        promise.set_value();
-    });
-
-    promise.get_future().get();
-
-    HTTPTest.finish();
-}

@@ -11,8 +11,8 @@
 #include <functional>
 #include <memory>
 
-typedef struct uv_async_s uv_async_t;
 typedef struct uv_loop_s uv_loop_t;
+namespace uv { class async; }
 
 namespace mbgl {
 
@@ -37,7 +37,7 @@ private:
     void notifyCallback();
 
 private:
-    uv_async_t *async = nullptr;
+    std::unique_ptr<uv::async> async;
     struct Canceled;
     std::unique_ptr<Canceled> canceled;
     Callback callback;

@@ -29,10 +29,6 @@ public:
     // You can only cancel a request from the same thread it was created in.
     virtual Request* request(const Resource&, uv_loop_t*, Callback) = 0;
     virtual void cancel(Request*) = 0;
-
-    // These can be called from any thread. The callback will be invoked in an arbitrary other thread.
-    // You cannot cancel these requests.
-    virtual void request(const Resource&, Callback) = 0;
 };
 
 }

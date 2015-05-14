@@ -39,7 +39,6 @@ public:
     // #############################################################################################
 
     // File request APIs
-    void requestAsync(const Resource&, std::function<void(const Response&)>);
     Request* request(const Resource&, std::function<void(const Response&)>);
     void cancelRequest(Request*);
 

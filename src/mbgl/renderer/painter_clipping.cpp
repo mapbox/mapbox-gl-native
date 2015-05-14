@@ -2,6 +2,7 @@
 #include <mbgl/map/source.hpp>
 #include <mbgl/shader/plain_shader.hpp>
 #include <mbgl/util/clip_id.hpp>
+#include <mbgl/gl/debugging.hpp>
 
 #ifndef BUFFER_OFFSET
 #define BUFFER_OFFSET(i) ((char *)nullptr + (i))
@@ -10,7 +11,7 @@
 using namespace mbgl;
 
 void Painter::drawClippingMasks(const std::set<Source*>& sources) {
-    gl::group group("clipping masks");
+    gl::debugging::group group("clipping masks");
 
     useProgram(plainShader->program);
     config.stencilTest = true;
