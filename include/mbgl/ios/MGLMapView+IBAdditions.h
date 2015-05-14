@@ -9,7 +9,7 @@
 // MGLMapView+IBAdditions.h, due to ASCII sort order.
 
 @property (nonatomic) IBInspectable NSString *accessToken;
-@property (nonatomic) IBInspectable NSString *mapID;
+@property (nonatomic) IBInspectable NSString *styleID;
 
 // Convenience properties related to the initial viewport. These properties
 // are not meant to be used outside of Interface Builder. latitude and longitude
