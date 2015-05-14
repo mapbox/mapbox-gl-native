@@ -31,5 +31,6 @@ else
     make ipackage-sim
 
     # run the static analyzer
+    mapbox_time "analyze_ios" \
     make ianalyze
 fi
