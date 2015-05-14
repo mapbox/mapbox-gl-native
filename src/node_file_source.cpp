@@ -125,9 +125,7 @@ void NodeFileSource::processCancel(mbgl::Request *req) {
 #endif
 
         // Dispose and remove the persistent handle
-#if (NODE_MODULE_VERSION > NODE_0_10_MODULE_VERSION)
-        // it->second.Reset();
-#else
+#if (NODE_MODULE_VERSION <= NODE_0_10_MODULE_VERSION)
         NanDisposePersistent(it->second);
 #endif
         pending.erase(it);
@@ -155,9 +153,7 @@ void NodeFileSource::notify(mbgl::Request *req, const std::shared_ptr<const mbgl
     // First, remove the request, since it might be destructed at any point now.
     auto it = pending.find(req);
     if (it != pending.end()) {
-#if (NODE_MODULE_VERSION > NODE_0_10_MODULE_VERSION)
-        // it->second.Dispose();
-#else
+#if (NODE_MODULE_VERSION <= NODE_0_10_MODULE_VERSION)
         NanDisposePersistent(it->second);
 #endif
         pending.erase(it);
