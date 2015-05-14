@@ -642,6 +642,12 @@ std::chrono::steady_clock::duration secondsAsDuration(float duration)
     {
         [self.attributionSheet dismissWithClickedButtonIndex:self.attributionSheet.cancelButtonIndex animated:YES];
     }
+
+    if (self.compass.alpha)
+    {
+        [self updateHeadingForDeviceOrientation];
+        [self updateCompass];
+    }
 }
 
 #pragma mark - Life Cycle -
