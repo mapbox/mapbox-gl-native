@@ -50,14 +50,12 @@ Target OS X: 10.9+
 
 #### CocoaPods
 
-CocoaPods is preferred. As of yet, Mapbox GL isn't in the global specs repo, but you can use it like so in your `Podfile`: 
+[CocoaPods](https://cocoapods.org) is preferred. Put the following in your `Podfile`: 
 
 ```ruby
 use_frameworks!
-pod 'MapboxGL', :podspec => 'https://raw.githubusercontent.com/mapbox/mapbox-gl-native/master/ios/MapboxGL.podspec'
+pod 'MapboxGL'
 ```
-
-Once the library stabilizes, a mere `pod 'MapboxGL'` will work. 
 
 #### Manually
 
