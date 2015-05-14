@@ -8,7 +8,6 @@ matrix:
   - os: linux
     compiler: clang
     env:
-    - FLAVOR: linux
     - CXX: clang++-3.5
     - NODE_EXE: "iojs"
     - NODE_VERSION: 2.0.1
@@ -19,7 +18,6 @@ matrix:
   - os: linux
     compiler: clang
     env:
-    - FLAVOR: linux
     - CXX: clang++-3.5
     - NODE_EXE: "node"
     - NODE_VERSION: 0.12.0
@@ -30,7 +28,6 @@ matrix:
   - os: linux
     compiler: clang
     env:
-    - FLAVOR: linux
     - CXX: clang++-3.5
     - NODE_EXE: "node"
     - NODE_VERSION: 0.10.36
@@ -41,7 +38,6 @@ matrix:
   - os: linux
     compiler: gcc
     env:
-    - FLAVOR: linux
     - CXX: g++-4.9
     - NODE_EXE: "iojs"
     - NODE_VERSION: 2.0.1
@@ -52,7 +48,6 @@ matrix:
   - os: linux
     compiler: gcc
     env:
-    - FLAVOR: linux
     - CXX: g++-4.9
     - NODE_EXE: "node"
     - NODE_VERSION: 0.12.0
@@ -63,7 +58,6 @@ matrix:
   - os: linux
     compiler: gcc
     env:
-    - FLAVOR: linux
     - CXX: g++-4.9
     - NODE_EXE: "node"
     - NODE_VERSION: 0.10.36
@@ -74,19 +68,16 @@ matrix:
   - os: osx
     compiler: clang
     env:
-    - FLAVOR: osx
     - NODE_EXE: "iojs"
     - NODE_VERSION: 2.0.1
   - os: osx
     compiler: clang
     env:
-    - FLAVOR: osx
     - NODE_EXE: "node"
     - NODE_VERSION: 0.12.0
   - os: osx
     compiler: clang
     env:
-    - FLAVOR: osx
     - NODE_EXE: "node"
     - NODE_VERSION: 0.10.36
 
