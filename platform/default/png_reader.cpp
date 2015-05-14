@@ -157,7 +157,7 @@ void PngReader<T>::read(unsigned x0, unsigned y0, unsigned w, unsigned h, char *
     double gamma;
     if (png_get_gAMA(png_ptr, info_ptr, &gamma))
         png_set_gamma(png_ptr, 2.2, gamma);
-    png_set_alpha_mode(png_ptr, PNG_ALPHA_PREMULTIPLIED, 2.2);
+    png_set_alpha_mode(png_ptr, PNG_ALPHA_PREMULTIPLIED, PNG_GAMMA_LINEAR);
 
     if (x0 == 0 && y0 == 0 && w >= width_ && h >= height_)
     {
