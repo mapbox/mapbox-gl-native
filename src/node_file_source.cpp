@@ -97,14 +97,14 @@ void NodeFileSource::processAdd(mbgl::Request *req) {
     }
 
     auto handle = NanObjectWrapHandle(this);
-    auto requestHandle = NanNew<v8::Object>(NodeRequest::Create(handle, request));
-#if UV_VERSION_MAJOR == 0 && UV_VERSION_MINOR <= 10
+    auto requestHandle = NanNew<v8::Object>(NodeRequest::Create(handle, req));
+#if (NODE_MODULE_VERSION > NODE_0_10_MODULE_VERSION)
+    const v8::UniquePersistent<v8::Object> requestPersistent(v8::Isolate::GetCurrent(), requestHandle);
+#else
     v8::Persistent<v8::Object> requestPersistent;
     NanAssignPersistent(requestPersistent, requestHandle);
-#else
-    const v8::UniquePersistent<v8::Object> requestPersistent(v8::Isolate::GetCurrent(), requestHandle);
 #endif
-    pending.emplace(request, std::move(requestPersistent));
+    pending.emplace(req, std::move(requestPersistent));
 
     v8::Local<v8::Value> argv[] = { requestHandle };
     NanMakeCallback(handle, NanNew("request"), 1, argv);
@@ -118,17 +118,17 @@ void NodeFileSource::processCancel(mbgl::Request *req) {
         // The response callback was already fired. There is no point in calling the cancelation
         // callback because the request is already completed.
     } else {
-#if UV_VERSION_MAJOR == 0 && UV_VERSION_MINOR <= 10
-        auto requestHandle = NanNew<v8::Object>(it->second);
-#else
+#if (NODE_MODULE_VERSION > NODE_0_10_MODULE_VERSION)
         auto requestHandle = v8::Local<v8::Object>::New(v8::Isolate::GetCurrent(), it->second);
+#else
+        auto requestHandle = NanNew<v8::Object>(it->second);
 #endif
 
         // Dispose and remove the persistent handle
-#if UV_VERSION_MAJOR == 0 && UV_VERSION_MINOR <= 10
-        NanDisposePersistent(it->second);
-#else
+#if (NODE_MODULE_VERSION > NODE_0_10_MODULE_VERSION)
         // it->second.Reset();
+#else
+        NanDisposePersistent(it->second);
 #endif
         pending.erase(it);
 
@@ -155,10 +155,10 @@ void NodeFileSource::notify(mbgl::Request *req, const std::shared_ptr<const mbgl
     // First, remove the request, since it might be destructed at any point now.
     auto it = pending.find(req);
     if (it != pending.end()) {
-#if UV_VERSION_MAJOR == 0 && UV_VERSION_MINOR <= 10
-        NanDisposePersistent(it->second);
-#else
+#if (NODE_MODULE_VERSION > NODE_0_10_MODULE_VERSION)
         // it->second.Dispose();
+#else
+        NanDisposePersistent(it->second);
 #endif
         pending.erase(it);
 
