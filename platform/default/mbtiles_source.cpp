@@ -33,7 +33,7 @@ namespace mbgl {
   }
 
   void MBTilesSource::Impl::openDatabase() {
-    Log::Info(Event::Database, "Opening sqlite: %s", path.c_str());
+    Log::Debug(Event::Database, "Opening mbtiles: %s", path.c_str());
     db = util::make_unique<Database>(path.c_str(), ReadOnly);
   }
 
@@ -64,15 +64,12 @@ namespace mbgl {
           getStmt->reset();
         }
         int32_t y = (1 << resource.z) - resource.y - 1; // flip y for mbtiles
-
         getStmt->bind(1, (int)resource.z);
         getStmt->bind(2, resource.x);
         getStmt->bind(3, y);
-        Log::Info(Event::Database, "Finding tile (%d, %d, %d [%d])", resource.z, resource.x, resource.y, y);
         if (getStmt->run()) {
-          Log::Info(Event::Database, "==> tile (%d, %d, %d [%d])", resource.z, resource.x, resource.y, y);
           response->data = util::decompress(getStmt->get<std::string>(0));
-          Log::Info(Event::Database, "Data: %d", response->data.length());
+          Log::Debug(Event::Database, "mbtiles (%d, %d, %d [%d]) => %d", resource.z, resource.x, resource.y, y, response->data.length());
         }
       }  catch (mapbox::sqlite::Exception& ex) {
         Log::Error(Event::Database, ex.code, ex.what());
