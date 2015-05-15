@@ -13,7 +13,6 @@
 *   Use of MGLMapView requires a Mapbox API access token. Obtain an access token on the [Mapbox account page](https://www.mapbox.com/account/apps/). If you instantiate an MGLMapView from Interface Builder, rendering of the map won't begin until the accessToken property has been set.
 *
 *   @warning Please note that you are responsible for getting permission to use the map data, and for ensuring your use adheres to the relevant terms of use. */
-IB_DESIGNABLE
 @interface MGLMapView : UIView
 
 #pragma mark - Initializing a Map View
