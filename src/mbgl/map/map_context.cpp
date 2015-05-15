@@ -181,7 +181,7 @@ void MapContext::update() {
 
         updateTiles();
 
-        if (style->isLoaded()) {
+        if (style->isLoaded() && resourceLoader->getSprite()->isLoaded()) {
             if (!data.getFullyLoaded()) {
                 data.setFullyLoaded(true);
             }
