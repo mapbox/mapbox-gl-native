@@ -5,6 +5,7 @@
 #include <mbgl/platform/darwin/Reachability.h>
 #include <mbgl/platform/default/glfw_view.hpp>
 #include <mbgl/storage/default_file_source.hpp>
+#include <mbgl/storage/mbtiles_source.hpp>
 #include <mbgl/storage/sqlite_cache.hpp>
 #include <mbgl/storage/network_status.hpp>
 
@@ -77,8 +78,8 @@
 @end
 
 // Returns the path to the default cache database on this system.
-const std::string &defaultCacheDatabase() {
-    static const std::string path = []() -> std::string {
+const std::string &fileInApplicationSupport(NSString *filename) {
+    static const std::string path = [filename]() -> std::string {
         NSArray *paths = NSSearchPathForDirectoriesInDomains(
             NSApplicationSupportDirectory, NSUserDomainMask, YES);
         if ([paths count] == 0) {
@@ -96,7 +97,7 @@ const std::string &defaultCacheDatabase() {
             return "";
         }
 
-        return [[p stringByAppendingPathComponent:@"cache.db"] UTF8String];
+        return [[p stringByAppendingPathComponent:filename] UTF8String];
     }();
     return path;
 }
@@ -104,7 +105,7 @@ const std::string &defaultCacheDatabase() {
 int main() {
     GLFWView view;
 
-    mbgl::SQLiteCache cache(defaultCacheDatabase());
+    mbgl::MBTilesSource cache(fileInApplicationSupport(@"map_19.db"));
     mbgl::DefaultFileSource fileSource(&cache);
     mbgl::Map map(view, fileSource);
 
