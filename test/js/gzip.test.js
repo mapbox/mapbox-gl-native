@@ -11,6 +11,7 @@ var http = require('http');
 var request = require('request');
 var st = require('st');
 var style = require('../../test/fixtures/style.json');
+var PNG = require('pngjs').PNG;
 var compare = require('../compare.js');
 
 var dirPath = path.join(path.dirname(require.resolve('../../package.json')), 'test');
@@ -65,28 +66,35 @@ test('gzip', function(t) {
 
         setup(getFileSource(true, t), function(map) {
             map.load(style);
-            map.render({}, function(err, image) {
+            map.render({}, function(err, data) {
+                t.error(err);
+
                 mbgl.removeAllListeners('message');
-                mbgl.compressPNG(image, function(err, image) {
-                    t.error(err);
 
-                    var filename = filePath('success.png');
+                var filename = filePath('success.png');
 
-                    if (process.env.UPDATE) {
-                        fs.writeFile(filename.expected, image, function(err) {
-                            t.error(err);
-                            t.end();
-                        });
-                    } else {
-                        fs.writeFile(filename.actual, image, function(err) {
-                            t.error(err);
-                            compare(filename.actual, filename.expected, filename.diff, t, function(error, difference) {
-                                t.ok(difference <= 0.01, 'actual matches expected');
+                var png = new PNG({
+                    width: data.width,
+                    height: data.height
+                });
+
+                png.data = data.pixels;
+
+                if (process.env.UPDATE) {
+                    png.pack()
+                        .pipe(fs.createWriteStream(filename.expected))
+                        .on('finish', t.end);
+                } else {
+                    png.pack()
+                        .pipe(fs.createWriteStream(filename.actual))
+                        .on('finish', function() {
+                            compare(filename.actual, filename.expected, filename.diff, t, function(err, diff) {
+                                t.error(err);
+                                t.ok(diff <= 0.01, 'actual matches expected');
                                 t.end();
                             });
                         });
-                    }
-                });
+                }
             });
         });
     });
@@ -108,29 +116,35 @@ test('gzip', function(t) {
 
         setup(getFileSource(false, t), function(map) {
             map.load(style);
-            map.render({}, function(err, image) {
+            map.render({}, function(err, data) {
                 if (!errorEmitted) t.fail('no error emitted');
+
                 mbgl.removeAllListeners('message');
-                mbgl.compressPNG(image, function(err, image) {
-                    t.error(err);
 
-                    var filename = filePath('unhandled.png');
+                var filename = filePath('unhandled.png');
 
-                    if (process.env.UPDATE) {
-                        fs.writeFile(filename.expected, image, function(err) {
-                            t.error(err);
-                            t.end();
-                        });
-                    } else {
-                        fs.writeFile(filename.actual, image, function(err) {
-                            t.error(err);
-                            compare(filename.actual, filename.expected, filename.diff, t, function(error, difference) {
-                                t.ok(difference <= 0.001, 'actual matches expected');
+                var png = new PNG({
+                    width: data.width,
+                    height: data.height
+                });
+
+                png.data = data.pixels;
+
+                if (process.env.UPDATE) {
+                    png.pack()
+                        .pipe(fs.createWriteStream(filename.expected))
+                        .on('finish', t.end);
+                } else {
+                    png.pack()
+                        .pipe(fs.createWriteStream(filename.actual))
+                        .on('finish', function() {
+                            compare(filename.actual, filename.expected, filename.diff, t, function(err, diff) {
+                                t.error(err);
+                                t.ok(diff <= 0.01, 'actual matches expected');
                                 t.end();
                             });
                         });
-                    }
-                });
+                }
             });
         });
     });

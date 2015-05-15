@@ -8,6 +8,7 @@ var fs = require('fs');
 var path = require('path');
 var mkdirp = require('mkdirp');
 var style = require('../fixtures/style.json');
+var PNG = require('pngjs').PNG;
 var compare = require('../compare.js');
 
 function filePath(name) {
@@ -201,28 +202,33 @@ test('Map', function(t) {
         t.test('returns an image', function(t) {
             setup(fileSource, function(map) {
                 map.load(style);
-                map.render({}, function(err, image) {
+                map.render({}, function(err, data) {
                     t.error(err);
-                    mbgl.compressPNG(image, function(err, image) {
-                        t.error(err);
 
-                        var filename = filePath('image.png');
+                    var filename = filePath('image.png');
 
-                        if (process.env.UPDATE) {
-                            fs.writeFile(filename.expected, image, function(err) {
-                                t.error(err);
-                                t.end();
-                            });
-                        } else {
-                            fs.writeFile(filename.actual, image, function(err) {
-                                t.error(err);
-                                compare(filename.actual, filename.expected, filename.diff, t, function(error, difference) {
-                                    t.ok(difference <= 0.01, 'actual matches expected');
+                    var png = new PNG({
+                        width: data.width,
+                        height: data.height
+                    });
+
+                    png.data = data.pixels;
+
+                    if (process.env.UPDATE) {
+                        png.pack()
+                            .pipe(fs.createWriteStream(filename.expected))
+                            .on('finish', t.end);
+                    } else {
+                        png.pack()
+                            .pipe(fs.createWriteStream(filename.actual))
+                            .on('finish', function() {
+                                compare(filename.actual, filename.expected, filename.diff, t, function(err, diff) {
+                                    t.error(err);
+                                    t.ok(diff <= 0.01, 'actual matches expected');
                                     t.end();
                                 });
                             });
-                        }
-                    });
+                    }
                 });
             });
         });
