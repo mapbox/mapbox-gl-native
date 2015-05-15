@@ -15,4 +15,4 @@ xcodebuild \
     -project ./build/ios/gyp/ios.xcodeproj \
     -configuration Debug \
     -target All \
-    analyze | xcpretty | grep -q 'The following commands produced analyzer issues'
+    analyze | xcpretty -c | grep -qF 'The following commands produced analyzer issues'
