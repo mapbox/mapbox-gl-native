@@ -15,10 +15,8 @@ TEST(MapContext, DoubleStyleLoad) {
     DefaultFileSource fileSource(nullptr);
     MapData data(view, MapMode::Continuous);
 
-    std::unique_ptr<util::Thread<MapContext>> context(
-        util::make_unique<util::Thread<MapContext>>(
-            "Map", util::ThreadPriority::Regular, view, fileSource, data));
+    util::Thread<MapContext> context("Map", util::ThreadPriority::Regular, view, fileSource, data);
 
-    context->invokeSync(&MapContext::setStyleJSON, "", "");
-    context->invokeSync(&MapContext::setStyleJSON, "", "");
+    context.invokeSync(&MapContext::setStyleJSON, "", "");
+    context.invokeSync(&MapContext::setStyleJSON, "", "");
 }
