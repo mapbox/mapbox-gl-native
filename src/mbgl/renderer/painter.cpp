@@ -159,20 +159,6 @@ void Painter::clear() {
     MBGL_CHECK_ERROR(glClear(GL_COLOR_BUFFER_BIT | GL_STENCIL_BUFFER_BIT | GL_DEPTH_BUFFER_BIT));
 }
 
-void Painter::setOpaque() {
-    if (pass != RenderPass::Opaque) {
-        pass = RenderPass::Opaque;
-        config.blend = false;
-    }
-}
-
-void Painter::setTranslucent() {
-    if (pass != RenderPass::Translucent) {
-        pass = RenderPass::Translucent;
-        config.blend = true;
-    }
-}
-
 void Painter::setStrata(float value) {
     strata = value;
 }
@@ -241,66 +227,19 @@ void Painter::render(const Style& style, TransformState state_, TimePoint time) 
     if (debug::renderTree) { Log::Info(Event::Render, "{"); indent++; }
 
     // TODO: Correctly compute the number of layers recursively beforehand.
-    const float strata_thickness = 1.0f / (order.size() + 1);
-
-    // Layer index
-    int i = 0;
+    const float strataThickness = 1.0f / (order.size() + 1);
 
     // - OPAQUE PASS -------------------------------------------------------------------------------
     // Render everything top-to-bottom by using reverse iterators. Render opaque objects first.
-    {
-        const gl::debugging::group _("opaque");
-
-        if (debug::renderTree) {
-            Log::Info(Event::Render, "%*s%s", indent++ * 4, "", "OPAQUE {");
-        }
-        i = 0;
-        setOpaque();
-        for (auto it = order.rbegin(), end = order.rend(); it != end; ++it, ++i) {
-            const auto& item = *it;
-            if (item.bucket && item.tile) {
-                if (item.hasRenderPass(RenderPass::Opaque)) {
-                    const gl::debugging::group group(item.layer.id + " - " + std::string(item.tile->id));
-                    setStrata(i * strata_thickness);
-                    prepareTile(*item.tile);
-                    item.bucket->render(*this, item.layer, item.tile->id, item.tile->matrix);
-                }
-            } else {
-                const gl::debugging::group group("background");
-                setStrata(i * strata_thickness);
-                renderBackground(item.layer);
-            }
-        }
-        if (debug::renderTree) {
-            Log::Info(Event::Render, "%*s%s", --indent * 4, "", "}");
-        }
-    }
+    renderPass(RenderPass::Opaque,
+               order.rbegin(), order.rend(),
+               0, 1, strataThickness);
 
     // - TRANSLUCENT PASS --------------------------------------------------------------------------
     // Make a second pass, rendering translucent objects. This time, we render bottom-to-top.
-    {
-        const gl::debugging::group _("translucent");
-
-        if (debug::renderTree) {
-            Log::Info(Event::Render, "%*s%s", indent++ * 4, "", "TRANSLUCENT {");
-        }
-        --i; // After the last iteration, this is incremented, so we have to decrement it again.
-        setTranslucent();
-        for (auto it = order.begin(), end = order.end(); it != end; ++it, --i) {
-            const auto& item = *it;
-            if (item.bucket && item.tile) {
-                if (item.hasRenderPass(RenderPass::Translucent)) {
-                    const gl::debugging::group group(item.layer.id + " - " + std::string(item.tile->id));
-                    setStrata(i * strata_thickness);
-                    prepareTile(*item.tile);
-                    item.bucket->render(*this, item.layer, item.tile->id, item.tile->matrix);
-                }
-            }
-        }
-        if (debug::renderTree) {
-            Log::Info(Event::Render, "%*s%s", --indent * 4, "", "}");
-        }
-    }
+    renderPass(RenderPass::Translucent,
+               order.begin(), order.end(),
+               order.size() - 1, -1, strataThickness);
 
     if (debug::renderTree) { Log::Info(Event::Render, "}"); indent--; }
 
@@ -325,6 +264,43 @@ void Painter::render(const Style& style, TransformState state_, TimePoint time) 
 
         MBGL_CHECK_ERROR(glBindTexture(GL_TEXTURE_2D, 0));
         MBGL_CHECK_ERROR(VertexArrayObject::Bind(0));
+    }
+}
+
+template <class Iterator>
+void Painter::renderPass(RenderPass pass_,
+                         Iterator it, Iterator end,
+                         std::size_t i, int8_t increment,
+                         const float strataThickness) {
+    pass = pass_;
+
+    const char * passName = pass == RenderPass::Opaque ? "opaque" : "translucent";
+    const gl::debugging::group _(passName);
+
+    if (debug::renderTree) {
+        Log::Info(Event::Render, "%*s%s {", indent++ * 4, "", passName);
+    }
+
+    config.blend = pass == RenderPass::Translucent;
+
+    for (; it != end; ++it, i += increment) {
+        const auto& item = *it;
+        if (item.bucket && item.tile) {
+            if (item.hasRenderPass(pass)) {
+                const gl::debugging::group group(item.layer.id + " - " + std::string(item.tile->id));
+                setStrata(i * strataThickness);
+                prepareTile(*item.tile);
+                item.bucket->render(*this, item.layer, item.tile->id, item.tile->matrix);
+            }
+        } else {
+            const gl::debugging::group group("background");
+            setStrata(i * strataThickness);
+            renderBackground(item.layer);
+        }
+    }
+
+    if (debug::renderTree) {
+        Log::Info(Event::Render, "%*s%s", --indent * 4, "", "}");
     }
 }
 
