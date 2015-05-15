@@ -67,6 +67,10 @@ std::string decompress(const std::string &raw) {
         throw std::runtime_error("failed to initialize inflate");
     }
 
+    if (inflateInit2(&inflate_stream, 32 + MAX_WBITS) != Z_OK) {
+      throw std::runtime_error("failed to initialize inflate gzip");
+    }
+
     inflate_stream.next_in = (Bytef *)raw.data();
     inflate_stream.avail_in = uInt(raw.size());
 

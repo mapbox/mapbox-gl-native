@@ -4,7 +4,7 @@
 #include <mbgl/storage/resource.hpp>
 #include <mbgl/storage/response.hpp>
 #include <mbgl/util/chrono.hpp>
-#include <mbgl/util/gzip.hpp>
+#include <mbgl/util/compression.hpp>
 
 #include "sqlite3.hpp"
 #include <sqlite3.h>
@@ -71,7 +71,7 @@ namespace mbgl {
         Log::Info(Event::Database, "Finding tile (%d, %d, %d [%d])", resource.z, resource.x, resource.y, y);
         if (getStmt->run()) {
           Log::Info(Event::Database, "==> tile (%d, %d, %d [%d])", resource.z, resource.x, resource.y, y);
-          response->data = Gzip::decompress(getStmt->get<std::string>(0));
+          response->data = util::decompress(getStmt->get<std::string>(0));
           Log::Info(Event::Database, "Data: %d", response->data.length());
         }
       }  catch (mapbox::sqlite::Exception& ex) {

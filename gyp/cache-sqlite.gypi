@@ -22,19 +22,16 @@
         'cflags_cc': [
           '<@(uv_cflags)',
           '<@(sqlite3_cflags)',
-          '<@(boost_cflags)',
         ],
         'ldflags': [
           '<@(uv_ldflags)',
           '<@(sqlite3_ldflags)',
           '<@(zlib_ldflags)',
-          '-lboost_iostreams-mt',
         ],
         'libraries': [
           '<@(uv_static_libs)',
           '<@(sqlite3_static_libs)',
           '<@(zlib_static_libs)',
-          '/opt/local/lib/_',
         ],
       },
 
