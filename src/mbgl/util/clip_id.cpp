@@ -75,14 +75,14 @@ void ClipIDGenerator::update(std::forward_list<Tile *> tiles) {
 
     if (pool.size()) {
         const uint32_t bit_count = util::ceil_log2(pool.size() + 1);
-        const std::bitset<8> mask = uint64_t(((1 << bit_count) - 1) << bit_offset);
+        const std::bitset<8> mask = uint64_t(((1ul << bit_count) - 1) << bit_offset);
 
         // We are starting our count with 1 since we need at least 1 bit set to distinguish between
         // areas without any tiles whatsoever and the current area.
         uint8_t count = 1;
         for (auto& leaf : pool) {
             leaf.tile.clip.mask = mask;
-            leaf.tile.clip.reference = count++ << bit_offset;
+            leaf.tile.clip.reference = uint32_t(count++) << bit_offset;
         }
 
         bit_offset += bit_count;
