@@ -7,6 +7,7 @@
       'hard_dependency': 1,
 
       'sources': [
+        '../platform/default/mbtiles_source.cpp',
         '../platform/default/sqlite_cache.cpp',
         '../platform/default/sqlite3.hpp',
         '../platform/default/sqlite3.cpp',
@@ -21,6 +22,7 @@
         'cflags_cc': [
           '<@(uv_cflags)',
           '<@(sqlite3_cflags)',
+          '<@(boost_cflags)',
         ],
         'ldflags': [
           '<@(uv_ldflags)',

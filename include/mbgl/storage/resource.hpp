@@ -18,6 +18,9 @@ struct Resource {
     const Kind kind;
     const std::string url;
 
+    const int8_t z = 0;
+    const int32_t x = 0, y = 0;
+
     inline bool operator==(const Resource &res) const {
         return kind == res.kind && url == res.url;
     }

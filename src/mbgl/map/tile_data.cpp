@@ -38,7 +38,7 @@ void TileData::request(Worker& worker, float pixelRatio, std::function<void()> c
     std::string url = source.tileURL(id, pixelRatio);
     state = State::loading;
 
-    req = env.request({ Resource::Kind::Tile, url }, [url, callback, &worker, this](const Response &res) {
+    req = env.request({ Resource::Kind::Tile, url, id.z, id.x, id.y }, [url, callback, &worker, this](const Response &res) {
         req = nullptr;
 
         if (res.status != Response::Successful) {
