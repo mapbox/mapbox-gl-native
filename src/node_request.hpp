@@ -27,7 +27,7 @@ public:
     ////////////////////////////////////////////////////////////////////////////////////////////////
     // Instance
 public:
-    NodeRequest(v8::Persistent<v8::Object> source, mbgl::Request *request);
+    NodeRequest(v8::Local<v8::Object> source, mbgl::Request *request);
     ~NodeRequest();
 
     void cancel();

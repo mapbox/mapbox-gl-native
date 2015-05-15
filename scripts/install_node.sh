@@ -4,10 +4,10 @@ set -e
 set -o pipefail
 
 # Mason exists on PATH from sourcing mbgl install script
-mapbox_time "node" \
-mason install node $NODE_VERSION
+mapbox_time $NODE_EXE \
+mason install $NODE_EXE $NODE_VERSION
 
-export PATH="`mason prefix node $NODE_VERSION`/bin":"$PATH"
+export PATH="`mason prefix $NODE_EXE $NODE_VERSION`/bin":"$PATH"
 
-node --version
+$NODE_EXE --version
 npm --version

@@ -35,34 +35,35 @@ NAN_METHOD(NodeRequest::New) {
         return NanThrowTypeError("Cannot create Request objects explicitly");
     }
 
-    auto source = v8::Persistent<v8::Object>::New(args[0]->ToObject());
+    v8::Persistent<v8::Object> source;
+    NanAssignPersistent(source, args[0]->ToObject());
+
     auto request = reinterpret_cast<mbgl::Request *>(args[1].As<v8::External>()->Value());
-    auto req = new NodeRequest(source, request);
+    auto req = new NodeRequest(NanNew<v8::Object>(std::move(source)), request);
     req->Wrap(args.This());
 
     NanReturnValue(args.This());
 }
 
 v8::Handle<v8::Object> NodeRequest::Create(v8::Handle<v8::Object> source, mbgl::Request *request) {
-    NanScope();
-    v8::Local<v8::Value> argv[] = { v8::Local<v8::Object>::New(source), NanNew<v8::External>(request) };
-    auto instance = constructorTemplate->GetFunction()->NewInstance(2, argv);
+    NanEscapableScope();
 
-    instance->Set(NanNew("url"), NanNew(request->resource.url), v8::ReadOnly);
-    instance->Set(NanNew("kind"), NanNew<v8::Integer>(int(request->resource.kind)), v8::ReadOnly);
+    v8::Local<v8::Value> argv[] = { NanNew<v8::Object>(source), NanNew<v8::External>(request) };
+    auto instance = NanNew<v8::FunctionTemplate>(constructorTemplate)->GetFunction()->NewInstance(2, argv);
 
-    NanReturnValue(instance);
+    instance->ForceSet(NanNew("url"), NanNew(request->resource.url), v8::ReadOnly);
+    instance->ForceSet(NanNew("kind"), NanNew<v8::Integer>(int(request->resource.kind)), v8::ReadOnly);
+
+    return NanEscapeScope(instance);
 }
 
 NAN_METHOD(NodeRequest::Respond) {
-    NanScope();
-
     auto nodeRequest = ObjectWrap::Unwrap<NodeRequest>(args.Holder());
     if (!nodeRequest->request) {
         return NanThrowError("Request has already been responded to, or was canceled.");
     }
 
-    auto source = ObjectWrap::Unwrap<NodeFileSource>(nodeRequest->source);
+    auto source = ObjectWrap::Unwrap<NodeFileSource>(NanNew<v8::Object>(nodeRequest->source));
 
     auto request = nodeRequest->request;
     nodeRequest->request = nullptr;
@@ -131,12 +132,13 @@ NAN_METHOD(NodeRequest::Respond) {
 ////////////////////////////////////////////////////////////////////////////////////////////////
 // Instance
 
-NodeRequest::NodeRequest(v8::Persistent<v8::Object> source_, mbgl::Request *request_)
-    : source(source_), request(request_) {
+NodeRequest::NodeRequest(v8::Local<v8::Object> source_, mbgl::Request *request_)
+    : request(request_) {
+    NanAssignPersistent(source, source_);
 }
 
 NodeRequest::~NodeRequest() {
-    source.Dispose();
+    NanDisposePersistent(source);
 }
 
 void NodeRequest::cancel() {

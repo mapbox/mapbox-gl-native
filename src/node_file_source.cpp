@@ -96,11 +96,18 @@ void NodeFileSource::processAdd(mbgl::Request *req) {
         queue->ref();
     }
 
-    auto requestHandle = v8::Local<v8::Object>::New(NodeRequest::Create(handle_, req));
-    pending.emplace(req, std::move(v8::Persistent<v8::Object>::New(requestHandle)));
+    auto handle = NanObjectWrapHandle(this);
+    auto requestHandle = NanNew<v8::Object>(NodeRequest::Create(handle, req));
+#if (NODE_MODULE_VERSION > NODE_0_10_MODULE_VERSION)
+    const v8::UniquePersistent<v8::Object> requestPersistent(v8::Isolate::GetCurrent(), requestHandle);
+#else
+    v8::Persistent<v8::Object> requestPersistent;
+    NanAssignPersistent(requestPersistent, requestHandle);
+#endif
+    pending.emplace(req, std::move(requestPersistent));
 
     v8::Local<v8::Value> argv[] = { requestHandle };
-    NanMakeCallback(handle_, NanNew("request"), 1, argv);
+    NanMakeCallback(handle, NanNew("request"), 1, argv);
 }
 
 void NodeFileSource::processCancel(mbgl::Request *req) {
@@ -111,10 +118,16 @@ void NodeFileSource::processCancel(mbgl::Request *req) {
         // The response callback was already fired. There is no point in calling the cancelation
         // callback because the request is already completed.
     } else {
-        auto requestHandle = v8::Local<v8::Object>::New(it->second);
+#if (NODE_MODULE_VERSION > NODE_0_10_MODULE_VERSION)
+        auto requestHandle = v8::Local<v8::Object>::New(v8::Isolate::GetCurrent(), it->second);
+#else
+        auto requestHandle = NanNew<v8::Object>(it->second);
+#endif
 
         // Dispose and remove the persistent handle
-        it->second.Dispose();
+#if (NODE_MODULE_VERSION <= NODE_0_10_MODULE_VERSION)
+        NanDisposePersistent(it->second);
+#endif
         pending.erase(it);
 
         // Make sure the the loop can exit when there are no pending requests.
@@ -122,9 +135,10 @@ void NodeFileSource::processCancel(mbgl::Request *req) {
             queue->unref();
         }
 
-        if (handle_->Has(NanNew("cancel"))) {
+        auto handle = NanObjectWrapHandle(this);
+        if (handle->Has(NanNew("cancel"))) {
             v8::Local<v8::Value> argv[] = { requestHandle };
-            NanMakeCallback(handle_, NanNew("cancel"), 1, argv);
+            NanMakeCallback(handle, NanNew("cancel"), 1, argv);
         }
 
         // Set the request handle in the request wrapper handle to null
@@ -139,7 +153,9 @@ void NodeFileSource::notify(mbgl::Request *req, const std::shared_ptr<const mbgl
     // First, remove the request, since it might be destructed at any point now.
     auto it = pending.find(req);
     if (it != pending.end()) {
-        it->second.Dispose();
+#if (NODE_MODULE_VERSION <= NODE_0_10_MODULE_VERSION)
+        NanDisposePersistent(it->second);
+#endif
         pending.erase(it);
 
         // Make sure the the loop can exit when there are no pending requests.

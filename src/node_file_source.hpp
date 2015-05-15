@@ -6,6 +6,7 @@
 #pragma GCC diagnostic ignored "-Wunused-parameter"
 #pragma GCC diagnostic ignored "-Wshadow"
 #include <node.h>
+#include <node_version.h>
 #include <nan.h>
 #pragma GCC diagnostic pop
 
@@ -46,7 +47,11 @@ private:
     void processCancel(mbgl::Request*);
 
 private:
+#if (NODE_MODULE_VERSION > NODE_0_10_MODULE_VERSION)
+    std::map<mbgl::Request*, const v8::UniquePersistent<v8::Object> &> pending;
+#else
     std::map<mbgl::Request*, v8::Persistent<v8::Object>> pending;
+#endif
     Queue *queue = nullptr;
 };
 
