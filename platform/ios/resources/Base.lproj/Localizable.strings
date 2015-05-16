@@ -1,3 +1,6 @@
+/* Accessibility hint */
+"ANNOTATION_A11Y_HINT" = "Shows more info";
+
 /* No comment provided by engineer. */
 "API_CLIENT_400_DESC" = "The session data task failed. Original request was: %@";
 
@@ -29,7 +32,7 @@
 "FIRST_STEPS_URL" = "mapbox.com/help/first-steps-ios-sdk";
 
 /* Accessibility hint */
-"INFO_A11Y_HINT" = "Access credits, a feedback form, and more";
+"INFO_A11Y_HINT" = "Shows credits, a feedback form, and more";
 
 /* Accessibility label */
 "INFO_A11Y_LABEL" = "About this map";

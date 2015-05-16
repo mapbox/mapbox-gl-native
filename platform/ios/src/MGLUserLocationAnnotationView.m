@@ -57,8 +57,7 @@ const CGFloat MGLUserLocationAnnotationArrowSize = MGLUserLocationAnnotationPuck
         self.annotation = [[MGLUserLocation alloc] initWithMapView:mapView];
         _mapView = mapView;
         [self setupLayers];
-        self.isAccessibilityElement = YES;
-        self.accessibilityTraits = UIAccessibilityTraitButton;
+        self.accessibilityTraits = UIAccessibilityTraitButton | UIAccessibilityTraitAdjustable;
         
         _accessibilityCoordinateFormatter = [[MGLCoordinateFormatter alloc] init];
         _accessibilityCoordinateFormatter.unitStyle = NSFormattingUnitStyleLong;
@@ -106,6 +105,16 @@ const CGFloat MGLUserLocationAnnotationArrowSize = MGLUserLocationAnnotationPuck
 - (UIBezierPath *)accessibilityPath
 {
     return [UIBezierPath bezierPathWithOvalInRect:self.frame];
+}
+
+- (void)accessibilityIncrement
+{
+    [self.mapView accessibilityIncrement];
+}
+
+- (void)accessibilityDecrement
+{
+    [self.mapView accessibilityDecrement];
 }
 
 - (void)setTintColor:(UIColor *)tintColor

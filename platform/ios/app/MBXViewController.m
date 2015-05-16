@@ -518,24 +518,30 @@ static const CLLocationCoordinate2D WorldTourDestinations[] = {
     [titleButton setTitle:styleNames[self.styleIndex] forState:UIControlStateNormal];
 }
 
-- (IBAction)locateUser:(__unused id)sender
+- (IBAction)locateUser:(id)sender
 {
     MGLUserTrackingMode nextMode;
+    NSString *nextAccessibilityValue;
     switch (self.mapView.userTrackingMode) {
         case MGLUserTrackingModeNone:
             nextMode = MGLUserTrackingModeFollow;
+            nextAccessibilityValue = @"Follow location";
             break;
         case MGLUserTrackingModeFollow:
             nextMode = MGLUserTrackingModeFollowWithHeading;
+            nextAccessibilityValue = @"Follow location and heading";
             break;
         case MGLUserTrackingModeFollowWithHeading:
             nextMode = MGLUserTrackingModeFollowWithCourse;
+            nextAccessibilityValue = @"Follow course";
             break;
         case MGLUserTrackingModeFollowWithCourse:
             nextMode = MGLUserTrackingModeNone;
+            nextAccessibilityValue = @"Off";
             break;
     }
     self.mapView.userTrackingMode = nextMode;
+    [sender setAccessibilityValue:nextAccessibilityValue];
 }
 
 - (IBAction)startWorldTour:(__unused id)sender

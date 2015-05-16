@@ -38,7 +38,10 @@
                     </view>
                     <navigationItem key="navigationItem" id="p8W-eP-el5">
                         <nil key="title"/>
-                        <barButtonItem key="leftBarButtonItem" image="settings.png" id="Jw8-JP-CaZ">
+                        <barButtonItem key="leftBarButtonItem" image="settings.png" id="Jw8-JP-CaZ" userLabel="Map Settings">
+                            <userDefinedRuntimeAttributes>
+                                <userDefinedRuntimeAttribute type="string" keyPath="accessibilityLabel" value="Map settings"/>
+                            </userDefinedRuntimeAttributes>
                             <connections>
                                 <action selector="showSettings:" destination="WaX-pd-UZQ" id="X2C-Ee-Qvt"/>
                             </connections>
@@ -53,12 +56,18 @@
                             </connections>
                         </button>
                         <rightBarButtonItems>
-                            <barButtonItem image="TrackingLocationOffMask.png" id="CQ1-GP-M6x">
+                            <barButtonItem image="TrackingLocationOffMask.png" id="CQ1-GP-M6x" userLabel="User Tracking Mode">
+                                <userDefinedRuntimeAttributes>
+                                    <userDefinedRuntimeAttribute type="string" keyPath="accessibilityLabel" value="User tracking mode"/>
+                                </userDefinedRuntimeAttributes>
                                 <connections>
                                     <action selector="locateUser:" destination="WaX-pd-UZQ" id="XgF-DB-z3f"/>
                                 </connections>
                             </barButtonItem>
-                            <barButtonItem systemItem="organize" id="5IK-vz-jKQ">
+                            <barButtonItem systemItem="organize" id="5IK-vz-jKQ" userLabel="Offline Packs">
+                                <userDefinedRuntimeAttributes>
+                                    <userDefinedRuntimeAttribute type="string" keyPath="accessibilityLabel" value="Offline packs"/>
+                                </userDefinedRuntimeAttributes>
                                 <connections>
                                     <segue destination="7q0-lI-zqb" kind="show" identifier="ShowOfflinePacks" id="xjx-0t-0LD"/>
                                 </connections>

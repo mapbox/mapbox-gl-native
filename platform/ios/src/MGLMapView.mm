@@ -133,9 +133,31 @@ mbgl::Color MGLColorObjectFromUIColor(UIColor *color)
 
 @property (nonatomic) MGLAnnotationTag tag;
 
+- (instancetype)initWithAccessibilityContainer:(id)container tag:(MGLAnnotationTag)identifier NS_DESIGNATED_INITIALIZER;
+
 @end
 
 @implementation MGLAnnotationAccessibilityElement
+
+- (instancetype)initWithAccessibilityContainer:(id)container tag:(MGLAnnotationTag)tag
+{
+    if (self = [super initWithAccessibilityContainer:container])
+    {
+        _tag = tag;
+        self.accessibilityTraits = UIAccessibilityTraitButton | UIAccessibilityTraitAdjustable;
+    }
+    return self;
+}
+
+- (void)accessibilityIncrement
+{
+    [self.accessibilityContainer accessibilityIncrement];
+}
+
+- (void)accessibilityDecrement
+{
+    [self.accessibilityContainer accessibilityDecrement];
+}
 
 @end
 
@@ -160,7 +182,7 @@ public:
     if (self = [super initWithAccessibilityContainer:container])
     {
         self.accessibilityTraits = UIAccessibilityTraitButton;
-        self.accessibilityLabel = self.accessibilityLabel;
+        self.accessibilityLabel = [self.accessibilityContainer accessibilityLabel];
         self.accessibilityHint = @"Returns to the map";
     }
     return self;
@@ -207,7 +229,7 @@ public:
 @property (nonatomic) CGFloat quickZoomStart;
 @property (nonatomic, getter=isDormant) BOOL dormant;
 @property (nonatomic, readonly, getter=isRotationAllowed) BOOL rotationAllowed;
-@property (nonatomic) UIAccessibilityElement *mapViewProxyAccessibilityElement;
+@property (nonatomic) MGLMapViewProxyAccessibilityElement *mapViewProxyAccessibilityElement;
 
 @end
 
@@ -341,7 +363,7 @@ mbgl::Duration MGLDurationInSeconds(NSTimeInterval duration)
     //
 //    self.isAccessibilityElement = YES;
     self.accessibilityLabel = NSLocalizedStringWithDefaultValue(@"MAP_A11Y_LABEL", nil, nil, @"Map", @"Accessibility label");
-    self.accessibilityTraits = UIAccessibilityTraitAllowsDirectInteraction;
+    self.accessibilityTraits = UIAccessibilityTraitAllowsDirectInteraction | UIAccessibilityTraitAdjustable;
     _accessibilityCompassFormatter = [[MGLCompassDirectionFormatter alloc] init];
     _accessibilityCompassFormatter.unitStyle = NSFormattingUnitStyleLong;
     
@@ -398,7 +420,7 @@ mbgl::Duration MGLDurationInSeconds(NSTimeInterval duration)
     //
     _attributionButton = [UIButton buttonWithType:UIButtonTypeInfoLight];
     _attributionButton.accessibilityLabel = NSLocalizedStringWithDefaultValue(@"INFO_A11Y_LABEL", nil, nil, @"About this map", @"Accessibility label");
-    _attributionButton.accessibilityHint = NSLocalizedStringWithDefaultValue(@"INFO_A11Y_HINT", nil, nil, @"Access credits, a feedback form, and more", @"Accessibility hint");
+    _attributionButton.accessibilityHint = NSLocalizedStringWithDefaultValue(@"INFO_A11Y_HINT", nil, nil, @"Shows credits, a feedback form, and more", @"Accessibility hint");
     [_attributionButton addTarget:self action:@selector(showAttribution) forControlEvents:UIControlEventTouchUpInside];
     _attributionButton.translatesAutoresizingMaskIntoConstraints = NO;
     [self addSubview:_attributionButton];
@@ -1922,32 +1944,30 @@ mbgl::Duration MGLDurationInSeconds(NSTimeInterval duration)
     NSAssert(_annotationContextsByAnnotationTag.count(annotationTag), @"Missing annotation for tag %u.", annotationTag);
     MGLAnnotationContext &annotationContext = _annotationContextsByAnnotationTag.at(annotationTag);
     id <MGLAnnotation> annotation = annotationContext.annotation;
-    MGLAnnotationAccessibilityElement *element = annotationContext.accessibilityElement;
     
     // Lazily create an accessibility element for the found annotation.
-    if ( ! element)
+    if ( ! annotationContext.accessibilityElement)
     {
-        element = [[MGLAnnotationAccessibilityElement alloc] initWithAccessibilityContainer:self];
-        element.tag = annotationTag;
-        element.accessibilityTraits = UIAccessibilityTraitButton;
-        if ([annotation respondsToSelector:@selector(title)])
-        {
-            element.accessibilityLabel = annotation.title;
-        }
-        if ([annotation respondsToSelector:@selector(subtitle)])
-        {
-            element.accessibilityValue = annotation.subtitle;
-        }
-        annotationContext.accessibilityElement = element;
+        annotationContext.accessibilityElement = [[MGLAnnotationAccessibilityElement alloc] initWithAccessibilityContainer:self tag:annotationTag];
     }
     
-    // Update the accessibility element’s frame.
+    // Update the accessibility element.
     MGLAnnotationImage *annotationImage = [self imageOfAnnotationWithTag:annotationTag];
     CGRect annotationFrame = [self frameOfImage:annotationImage.image centeredAtCoordinate:annotation.coordinate];
     CGRect screenRect = UIAccessibilityConvertFrameToScreenCoordinates(annotationFrame, self);
-    element.accessibilityFrame = screenRect;
+    annotationContext.accessibilityElement.accessibilityFrame = screenRect;
+    annotationContext.accessibilityElement.accessibilityHint = NSLocalizedStringWithDefaultValue(@"ANNOTATION_A11Y_HINT", nil, nil, @"Shows more info", @"Accessibility hint");
     
-    return element;
+    if ([annotation respondsToSelector:@selector(title)])
+    {
+        annotationContext.accessibilityElement.accessibilityLabel = annotation.title;
+    }
+    if ([annotation respondsToSelector:@selector(subtitle)])
+    {
+        annotationContext.accessibilityElement.accessibilityValue = annotation.subtitle;
+    }
+    
+    return annotationContext.accessibilityElement;
 }
 
 - (NSInteger)indexOfAccessibilityElement:(id)element
@@ -1983,13 +2003,36 @@ mbgl::Duration MGLDurationInSeconds(NSTimeInterval duration)
     else return std::distance(visibleAnnotations.begin(), foundElement) + 2 /* compass, userLocationAnnotationView */;
 }
 
-- (UIAccessibilityElement *)mapViewProxyAccessibilityElement
+- (MGLMapViewProxyAccessibilityElement *)mapViewProxyAccessibilityElement
 {
     if ( ! _mapViewProxyAccessibilityElement)
     {
-        _mapViewProxyAccessibilityElement = [[MGLAnnotationAccessibilityElement alloc] initWithAccessibilityContainer:self];
+        _mapViewProxyAccessibilityElement = [[MGLMapViewProxyAccessibilityElement alloc] initWithAccessibilityContainer:self];
     }
     return _mapViewProxyAccessibilityElement;
+}
+
+- (void)accessibilityIncrement
+{
+    // Swipe up to zoom out.
+    [self accessibilityScaleBy:0.5];
+}
+
+- (void)accessibilityDecrement
+{
+    // Swipe down to zoom in.
+    [self accessibilityScaleBy:2];
+}
+
+- (void)accessibilityScaleBy:(double)scaleFactor
+{
+    CGPoint centerPoint = self.contentCenter;
+    if (self.userTrackingMode != MGLUserTrackingModeNone)
+    {
+        centerPoint = self.userLocationAnnotationViewCenter;
+    }
+    _mbglMap->scaleBy(scaleFactor, mbgl::ScreenCoordinate { centerPoint.x, centerPoint.y });
+    [self unrotateIfNeededForGesture];
 }
 
 #pragma mark - Geography -
