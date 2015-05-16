@@ -148,6 +148,26 @@ public:
     MGLAnnotationAccessibilityElement *accessibilityElement;
 };
 
+/** An accessibility element representing the MGLMapView at large. */
+@interface MGLMapViewProxyAccessibilityElement : UIAccessibilityElement
+
+@end
+
+@implementation MGLMapViewProxyAccessibilityElement
+
+- (instancetype)initWithAccessibilityContainer:(id)container
+{
+    if (self = [super initWithAccessibilityContainer:container])
+    {
+        self.accessibilityTraits = UIAccessibilityTraitButton;
+        self.accessibilityLabel = self.accessibilityLabel;
+        self.accessibilityHint = @"Returns to the map";
+    }
+    return self;
+}
+
+@end
+
 #pragma mark - Private -
 
 @interface MGLMapView () <UIGestureRecognizerDelegate,
@@ -187,6 +207,7 @@ public:
 @property (nonatomic) CGFloat quickZoomStart;
 @property (nonatomic, getter=isDormant) BOOL dormant;
 @property (nonatomic, readonly, getter=isRotationAllowed) BOOL rotationAllowed;
+@property (nonatomic) UIAccessibilityElement *mapViewProxyAccessibilityElement;
 
 @end
 
@@ -1316,6 +1337,22 @@ mbgl::Duration MGLDurationInSeconds(NSTimeInterval duration)
         return;
     }
     [self trackGestureEvent:MGLEventGestureSingleTap forRecognizer:singleTap];
+    
+    if (self.mapViewProxyAccessibilityElement.accessibilityElementIsFocused)
+    {
+        id nextElement;
+        if (_userLocationAnnotationIsSelected)
+        {
+            nextElement = self.userLocationAnnotationView;
+        }
+        else
+        {
+            nextElement = _annotationContextsByAnnotationTag[_selectedAnnotationTag].accessibilityElement;
+        }
+        [self deselectAnnotation:self.selectedAnnotation animated:YES];
+        UIAccessibilityPostNotification(UIAccessibilityScreenChangedNotification, nextElement);
+        return;
+    }
 
     CGPoint tapPoint = [singleTap locationInView:self];
 
@@ -1532,6 +1569,12 @@ mbgl::Duration MGLDurationInSeconds(NSTimeInterval duration)
     {
         [self.delegate mapView:self tapOnCalloutForAnnotation:self.selectedAnnotation];
     }
+}
+
+- (void)calloutViewDidAppear:(UIView<MGLCalloutView> *)calloutView
+{
+    UIAccessibilityPostNotification(UIAccessibilityScreenChangedNotification, nil);
+    UIAccessibilityPostNotification(UIAccessibilityLayoutChangedNotification, calloutView);
 }
 
 - (BOOL)gestureRecognizer:(UIGestureRecognizer *)gestureRecognizer shouldRecognizeSimultaneouslyWithGestureRecognizer:(UIGestureRecognizer *)otherGestureRecognizer
@@ -1789,25 +1832,53 @@ mbgl::Duration MGLDurationInSeconds(NSTimeInterval duration)
     UIViewController *viewController = self.viewControllerForLayoutGuides;
     if (viewController)
     {
-        UIView *compassContainer = self.compassView.superview;
-        CGFloat topInset = compassContainer.frame.origin.y + compassContainer.frame.size.height + 5;
+        CGFloat topInset = viewController.topLayoutGuide.length;
         frame.origin.y += topInset;
-        frame.size.height -= topInset;
-        
-        CGFloat bottomInset = MIN(self.logoView.frame.origin.y, self.attributionButton.frame.origin.y) - 8;
-        frame.size.height = bottomInset - frame.origin.y;
+        frame.size.height -= topInset + viewController.bottomLayoutGuide.length;
     }
     return frame;
 }
 
+- (UIBezierPath *)accessibilityPath
+{
+    UIBezierPath *path = [UIBezierPath bezierPathWithRect:self.accessibilityFrame];
+    
+    // Exclude any visible annotation callout view.
+    if (self.calloutViewForSelectedAnnotation)
+    {
+        UIBezierPath *calloutViewPath = [UIBezierPath bezierPathWithRect:self.calloutViewForSelectedAnnotation.frame];
+        [path appendPath:calloutViewPath];
+    }
+    
+    return path;
+}
+
 - (NSInteger)accessibilityElementCount
 {
+    if (self.calloutViewForSelectedAnnotation)
+    {
+        return 2 /* selectedAnnotationCalloutView, mapViewProxyAccessibilityElement */;
+    }
     std::vector<MGLAnnotationTag> visibleAnnotations = [self annotationTagsInRect:self.bounds];
     return visibleAnnotations.size() + 3 /* compass, userLocationAnnotationView, attributionButton */;
 }
 
 - (id)accessibilityElementAtIndex:(NSInteger)index
 {
+    if (self.calloutViewForSelectedAnnotation)
+    {
+        if (index == 0)
+        {
+            return self.calloutViewForSelectedAnnotation;
+        }
+        if (index == 1)
+        {
+            self.mapViewProxyAccessibilityElement.accessibilityFrame = self.accessibilityFrame;
+            self.mapViewProxyAccessibilityElement.accessibilityPath = self.accessibilityPath;
+            return self.mapViewProxyAccessibilityElement;
+        }
+        return nil;
+    }
     std::vector<MGLAnnotationTag> visibleAnnotations = [self annotationTagsInRect:self.bounds];
     
     // Ornaments
@@ -1881,6 +1952,11 @@ mbgl::Duration MGLDurationInSeconds(NSTimeInterval duration)
 
 - (NSInteger)indexOfAccessibilityElement:(id)element
 {
+    if (self.calloutViewForSelectedAnnotation)
+    {
+        return [@[self.calloutViewForSelectedAnnotation, self.mapViewProxyAccessibilityElement]
+                indexOfObject:element];
+    }
     if (element == self.compassView)
     {
         return 0;
@@ -1905,6 +1981,15 @@ mbgl::Duration MGLDurationInSeconds(NSTimeInterval duration)
                                   ((MGLAnnotationAccessibilityElement *)element).tag);
     if (foundElement == visibleAnnotations.end()) return NSNotFound;
     else return std::distance(visibleAnnotations.begin(), foundElement) + 2 /* compass, userLocationAnnotationView */;
+}
+
+- (UIAccessibilityElement *)mapViewProxyAccessibilityElement
+{
+    if ( ! _mapViewProxyAccessibilityElement)
+    {
+        _mapViewProxyAccessibilityElement = [[MGLAnnotationAccessibilityElement alloc] initWithAccessibilityContainer:self];
+    }
+    return _mapViewProxyAccessibilityElement;
 }
 
 #pragma mark - Geography -
@@ -3062,14 +3147,16 @@ mbgl::Duration MGLDurationInSeconds(NSTimeInterval duration)
         [self.delegate mapView:self annotationCanShowCallout:annotation])
     {
         // build the callout
+        UIView <MGLCalloutView> *calloutView;
         if ([self.delegate respondsToSelector:@selector(mapView:calloutViewForAnnotation:)])
         {
-            self.calloutViewForSelectedAnnotation = [self.delegate mapView:self calloutViewForAnnotation:annotation];
+            calloutView = [self.delegate mapView:self calloutViewForAnnotation:annotation];
         }
-        if (!self.calloutViewForSelectedAnnotation)
+        if (!calloutView)
         {
-            self.calloutViewForSelectedAnnotation = [self calloutViewForAnnotation:annotation];
+            calloutView = [self calloutViewForAnnotation:annotation];
         }
+        self.calloutViewForSelectedAnnotation = calloutView;
 
         if (_userLocationAnnotationIsSelected)
         {
@@ -3084,41 +3171,38 @@ mbgl::Duration MGLDurationInSeconds(NSTimeInterval duration)
         // consult delegate for left and/or right accessory views
         if ([self.delegate respondsToSelector:@selector(mapView:leftCalloutAccessoryViewForAnnotation:)])
         {
-            self.calloutViewForSelectedAnnotation.leftAccessoryView =
-                [self.delegate mapView:self leftCalloutAccessoryViewForAnnotation:annotation];
+            calloutView.leftAccessoryView = [self.delegate mapView:self leftCalloutAccessoryViewForAnnotation:annotation];
 
-            if ([self.calloutViewForSelectedAnnotation.leftAccessoryView isKindOfClass:[UIControl class]])
+            if ([calloutView.leftAccessoryView isKindOfClass:[UIControl class]])
             {
                 UITapGestureRecognizer *calloutAccessoryTap = [[UITapGestureRecognizer alloc] initWithTarget:self
                                                                   action:@selector(handleCalloutAccessoryTapGesture:)];
 
-                [self.calloutViewForSelectedAnnotation.leftAccessoryView addGestureRecognizer:calloutAccessoryTap];
+                [calloutView.leftAccessoryView addGestureRecognizer:calloutAccessoryTap];
             }
         }
 
         if ([self.delegate respondsToSelector:@selector(mapView:rightCalloutAccessoryViewForAnnotation:)])
         {
-            self.calloutViewForSelectedAnnotation.rightAccessoryView =
-                [self.delegate mapView:self rightCalloutAccessoryViewForAnnotation:annotation];
+            calloutView.rightAccessoryView = [self.delegate mapView:self rightCalloutAccessoryViewForAnnotation:annotation];
 
-            if ([self.calloutViewForSelectedAnnotation.rightAccessoryView isKindOfClass:[UIControl class]])
+            if ([calloutView.rightAccessoryView isKindOfClass:[UIControl class]])
             {
                 UITapGestureRecognizer *calloutAccessoryTap = [[UITapGestureRecognizer alloc] initWithTarget:self
                                                                   action:@selector(handleCalloutAccessoryTapGesture:)];
 
-                [self.calloutViewForSelectedAnnotation.rightAccessoryView addGestureRecognizer:calloutAccessoryTap];
+                [calloutView.rightAccessoryView addGestureRecognizer:calloutAccessoryTap];
             }
         }
 
         // set annotation delegate to handle taps on the callout view
-        self.calloutViewForSelectedAnnotation.delegate = self;
+        calloutView.delegate = self;
 
         // present popup
-        [self.calloutViewForSelectedAnnotation presentCalloutFromRect:positioningRect
-                                                               inView:self.glView
-                                                    constrainedToView:self.glView
-                                                             animated:animated];
-        UIAccessibilityPostNotification(UIAccessibilityLayoutChangedNotification, nil);
+        [calloutView presentCalloutFromRect:positioningRect
+                                     inView:self.glView
+                          constrainedToView:self.glView
+                                   animated:animated];
     }
 
     // notify delegate
@@ -3200,8 +3284,6 @@ mbgl::Duration MGLDurationInSeconds(NSTimeInterval duration)
         self.calloutViewForSelectedAnnotation = nil;
         self.selectedAnnotation = nil;
 
-        UIAccessibilityPostNotification(UIAccessibilityLayoutChangedNotification, nil);
-        
         // notify delegate
         if ([self.delegate respondsToSelector:@selector(mapView:didDeselectAnnotation:)])
         {
@@ -3391,7 +3473,6 @@ mbgl::Duration MGLDurationInSeconds(NSTimeInterval duration)
         self.userLocationAnnotationView = [[MGLUserLocationAnnotationView alloc] initInMapView:self];
         self.userLocationAnnotationView.autoresizingMask = (UIViewAutoresizingFlexibleLeftMargin | UIViewAutoresizingFlexibleRightMargin |
                                                             UIViewAutoresizingFlexibleTopMargin | UIViewAutoresizingFlexibleBottomMargin);
-        self.userLocationAnnotationView.isAccessibilityElement = YES;
 
         [self validateLocationServices];
     }

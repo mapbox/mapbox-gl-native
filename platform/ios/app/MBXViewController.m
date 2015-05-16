@@ -739,6 +739,24 @@ static const CLLocationCoordinate2D WorldTourDestinations[] = {
     return nil;
 }
 
+- (UIView *)mapView:(__unused MGLMapView *)mapView leftCalloutAccessoryViewForAnnotation:(__unused id<MGLAnnotation>)annotation
+{
+    UIButton *button = [UIButton buttonWithType:UIButtonTypeSystem];
+    button.frame = CGRectZero;
+    [button setTitle:@"Left" forState:UIControlStateNormal];
+    [button sizeToFit];
+    return button;
+}
+
+- (UIView *)mapView:(__unused MGLMapView *)mapView rightCalloutAccessoryViewForAnnotation:(__unused id<MGLAnnotation>)annotation
+{
+    UIButton *button = [UIButton buttonWithType:UIButtonTypeSystem];
+    button.frame = CGRectZero;
+    [button setTitle:@"Right" forState:UIControlStateNormal];
+    [button sizeToFit];
+    return button;
+}
+
 - (void)mapView:(MGLMapView *)mapView tapOnCalloutForAnnotation:(id <MGLAnnotation>)annotation
 {
     if ( ! [annotation isKindOfClass:[MGLPointAnnotation class]])

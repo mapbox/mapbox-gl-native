@@ -59,6 +59,11 @@ static CGFloat const tipWidth = 10.0;
     CGFloat frameOriginY = rect.origin.y - frameHeight;
     self.frame = CGRectMake(frameOriginX, frameOriginY,
                             frameWidth, frameHeight);
+    
+    if ([self.delegate respondsToSelector:@selector(calloutViewDidAppear:)])
+    {
+        [self.delegate performSelector:@selector(calloutViewDidAppear:) withObject:self];
+    }
 }
 
 - (void)dismissCalloutAnimated:(BOOL)animated

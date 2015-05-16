@@ -57,6 +57,7 @@ const CGFloat MGLUserLocationAnnotationArrowSize = MGLUserLocationAnnotationPuck
         self.annotation = [[MGLUserLocation alloc] initWithMapView:mapView];
         _mapView = mapView;
         [self setupLayers];
+        self.isAccessibilityElement = YES;
         self.accessibilityTraits = UIAccessibilityTraitButton;
         
         _accessibilityCoordinateFormatter = [[MGLCoordinateFormatter alloc] init];
@@ -95,6 +96,11 @@ const CGFloat MGLUserLocationAnnotationArrowSize = MGLUserLocationAnnotationPuck
     _accessibilityCoordinateFormatter.allowsSeconds = zoomLevel > 20;
     
     return [_accessibilityCoordinateFormatter stringFromCoordinate:self.mapView.centerCoordinate];
+}
+
+- (CGRect)accessibilityFrame
+{
+    return CGRectInset(self.frame, -15, -15);
 }
 
 - (UIBezierPath *)accessibilityPath
