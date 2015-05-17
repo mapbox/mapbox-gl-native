@@ -62,6 +62,11 @@ NS_ASSUME_NONNULL_BEGIN
  */
 - (void)calloutViewTapped:(UIView<MGLCalloutView> *)calloutView;
 
+/**
+ Called before the callout view appears on screen, or before the appearance animation will start.
+ */
+- (void)calloutViewWillAppear:(UIView<MGLCalloutView> *)calloutView;
+
 @end
 
 NS_ASSUME_NONNULL_END
