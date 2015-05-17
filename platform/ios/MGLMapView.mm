@@ -2352,9 +2352,10 @@ CLLocationCoordinate2D latLngToCoordinate(mbgl::LatLng latLng)
         }
         case mbgl::MapChangeDidFailLoadingMap:
         {
-            if ([self.delegate respondsToSelector:@selector(mapViewDidFailLoadingMap:withError::)])
+            if ([self.delegate respondsToSelector:@selector(mapViewDidFailLoadingMap:withError:)])
             {
-                [self.delegate mapViewDidFailLoadingMap:self withError:nil];
+                NSError *error = [NSError errorWithDomain:MGLErrorDomain code:0 userInfo:nil];
+                [self.delegate mapViewDidFailLoadingMap:self withError:error];
             }
             break;
         }

@@ -1,5 +1,7 @@
 #import <Foundation/Foundation.h>
 
+extern NSString * const MGLErrorDomain;
+
 /** The mode used to track the user location on the map. */
 typedef NS_ENUM(NSUInteger, MGLUserTrackingMode)
 {
