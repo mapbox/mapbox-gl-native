@@ -1,11 +1,22 @@
 #import "MBXBenchViewController.h"
 
 #import <mbgl/ios/MGLMapView.h>
-#import <mbgl/ios/private/MGLMapView_Private.h>
 
 #include "locations.hpp"
 
 #include <chrono>
+
+@interface MGLMapView (MBXBenchmarkAdditions)
+
+#pragma mark - Debugging
+
+/** Triggers another render pass even when it is not necessary. */
+- (void)invalidate;
+
+/** Returns whether the map view is currently loading or processing any assets required to render the map */
+- (BOOL)isFullyLoaded;
+
+@end
 
 @interface MBXBenchViewController () <MGLMapViewDelegate>
 
