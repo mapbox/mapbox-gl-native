@@ -2,7 +2,7 @@
 
 @implementation NSString (MGLAdditions)
 
-- (NSString *)mgl_stringOrNilIfEmpty
+- (nullable NSString *)mgl_stringOrNilIfEmpty
 {
     return self.length ? self : nil;
 }

@@ -1,4 +1,7 @@
 #import "MGLMapView.h"
+#import "MGLTypes.h"
+
+NS_ASSUME_NONNULL_BEGIN
 
 @interface MGLMapView (IBAdditions)
 
@@ -8,7 +11,7 @@
 // inspectables declared in MGLMapView.h are always sorted before those in
 // MGLMapView+IBAdditions.h, due to ASCII sort order.
 
-@property (nonatomic) IBInspectable NSString *styleID;
+@property (nonatomic, nullable) IBInspectable NSString *styleID;
 
 // Convenience properties related to the initial viewport. These properties
 // are not meant to be used outside of Interface Builder. latitude and longitude
@@ -30,3 +33,5 @@
 @property (nonatomic) IBInspectable BOOL showsUserLocation;
 
 @end
+
+NS_ASSUME_NONNULL_END
