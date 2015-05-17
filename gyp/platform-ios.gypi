@@ -35,6 +35,7 @@
         '../platform/ios/MGLUserLocationAnnotationView.h',
         '../platform/ios/MGLUserLocationAnnotationView.m',
         '../include/mbgl/ios/MGLTypes.h',
+        '../platform/ios/MGLTypes.m',
         '../platform/ios/NSBundle+MGLAdditions.h',
         '../platform/ios/NSBundle+MGLAdditions.m',
         '../platform/ios/NSException+MGLAdditions.h',
