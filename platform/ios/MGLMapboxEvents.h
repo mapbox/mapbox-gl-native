@@ -30,6 +30,8 @@ extern NSString *const MGLEventGestureRotateStart;
 
 @interface MGLMapboxEvents : NSObject <NSURLSessionDelegate>
 
++ (instancetype)sharedManager;
+
 // You must call these methods from the main thread.
 //
 + (void) pauseMetricsCollection;

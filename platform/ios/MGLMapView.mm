@@ -15,21 +15,18 @@
 #include <mbgl/util/geo.hpp>
 #include <mbgl/util/constants.hpp>
 
-#import "MGLTypes.h"
+#import "MapboxGL.h"
+
 #import "NSBundle+MGLAdditions.h"
 #import "NSString+MGLAdditions.h"
 #import "NSProcessInfo+MGLAdditions.h"
 #import "NSException+MGLAdditions.h"
-#import "MGLAccountManager.h"
-#import "MGLAnnotation.h"
 #import "MGLUserLocationAnnotationView.h"
 #import "MGLUserLocation_Private.h"
 #import "MGLFileCache.h"
+#import "MGLMapboxEvents.h"
 
 #import "SMCalloutView.h"
-
-#import "MGLMapboxEvents.h"
-#import "MapboxGL.h"
 
 #import <algorithm>
 

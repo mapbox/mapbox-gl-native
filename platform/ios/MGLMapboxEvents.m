@@ -1,4 +1,4 @@
-#import "MGLMapboxEvents_Private.h"
+#import "MGLMapboxEvents.h"
 
 #import <UIKit/UIKit.h>
 #import <SystemConfiguration/CaptiveNetwork.h>

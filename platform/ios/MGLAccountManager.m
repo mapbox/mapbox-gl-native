@@ -1,7 +1,7 @@
 #import <Foundation/Foundation.h>
 
 #import "MGLAccountManager.h"
-#import "MGLMapboxEvents_Private.h"
+#import "MGLMapboxEvents.h"
 #import "NSProcessInfo+MGLAdditions.h"
 
 @interface MGLAccountManager()
