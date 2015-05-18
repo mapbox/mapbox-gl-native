@@ -66,6 +66,7 @@ public:
 
     // Source::Observer implementation.
     void onSourceLoaded() override;
+    void onSourceLoadingFailed(std::exception_ptr error) override;
     void onTileLoaded(bool isNewTile) override;
 
     // Sprite::Observer implementation.

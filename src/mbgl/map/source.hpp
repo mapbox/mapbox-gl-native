@@ -58,6 +58,8 @@ public:
         virtual ~Observer() = default;
 
         virtual void onSourceLoaded() = 0;
+        virtual void onSourceLoadingFailed(std::exception_ptr error) = 0;
+
         virtual void onTileLoaded(bool isNewTile) = 0;
     };
 
@@ -102,6 +104,7 @@ public:
 
 private:
     void emitSourceLoaded();
+    void emitSourceLoadingFailed(const std::string& message);
     void emitTileLoaded(bool isNewTile);
 
     bool handlePartialTile(const TileID &id, Worker &worker);

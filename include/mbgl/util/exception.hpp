@@ -21,6 +21,11 @@ struct ShaderException : Exception {
     inline ShaderException(const std::string &msg) : Exception(msg) {}
 };
 
+struct SourceLoadingException : Exception {
+    inline SourceLoadingException(const char *msg) : Exception(msg) {}
+    inline SourceLoadingException(const std::string &msg) : Exception(msg) {}
+};
+
 }
 }
 

@@ -4,6 +4,7 @@
 #include <mbgl/map/transform.hpp>
 #include <mbgl/map/tile.hpp>
 #include <mbgl/renderer/painter.hpp>
+#include <mbgl/util/exception.hpp>
 #include <mbgl/util/constants.hpp>
 #include <mbgl/storage/resource.hpp>
 #include <mbgl/storage/response.hpp>
@@ -150,7 +151,9 @@ void Source::load(const std::string& accessToken) {
         req = nullptr;
 
         if (res.status != Response::Successful) {
-            Log::Warning(Event::General, "Failed to load source TileJSON: %s", res.message.c_str());
+            std::stringstream message;
+            message <<  "Failed to load [" << info.url << "]: " << res.message;
+            emitSourceLoadingFailed(message.str());
             return;
         }
 
@@ -158,7 +161,9 @@ void Source::load(const std::string& accessToken) {
         d.Parse<0>(res.data.c_str());
 
         if (d.HasParseError()) {
-            Log::Error(Event::General, "Invalid source TileJSON; Parse Error at %d: %s", d.GetErrorOffset(), d.GetParseError());
+            std::stringstream message;
+            message << "Failed to parse [" << info.url << "]: " << d.GetErrorOffset() << " - " << d.GetParseError();
+            emitSourceLoadingFailed(message.str());
             return;
         }
 
@@ -534,6 +539,15 @@ void Source::emitSourceLoaded() {
     if (observer_) {
         observer_->onSourceLoaded();
     }
+}
+
+void Source::emitSourceLoadingFailed(const std::string& message) {
+    if (!observer_) {
+        return;
+    }
+
+    auto error = std::make_exception_ptr(util::SourceLoadingException(message));
+    observer_->onSourceLoadingFailed(error);
 }
 
 void Source::emitTileLoaded(bool isNewTile) {
