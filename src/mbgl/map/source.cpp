@@ -287,22 +287,26 @@ TileData::State Source::addTile(MapData& data,
         new_tile.data = cache.get(normalized_id.to_uint64());
     }
 
-    auto callback = std::bind(&Source::emitTileLoaded, this, true);
+    auto successCallback = std::bind(&Source::emitTileLoaded, this, true);
+    auto failureCallback = std::bind(&Source::emitTileLoadingFailed, this, std::placeholders::_1);
+
     if (!new_tile.data) {
         // If we don't find working tile data, we're just going to load it.
         if (info.type == SourceType::Vector) {
             new_tile.data =
                 std::make_shared<VectorTileData>(normalized_id, data.transform.getMaxZoom(), style, glyphAtlas,
                                                  glyphStore, spriteAtlas, sprite, info);
-            new_tile.data->request(style.workers, transformState.getPixelRatio(), callback);
+            new_tile.data->request(
+                style.workers, transformState.getPixelRatio(), successCallback, failureCallback);
         } else if (info.type == SourceType::Raster) {
             new_tile.data = std::make_shared<RasterTileData>(normalized_id, texturePool, info);
-            new_tile.data->request(style.workers, transformState.getPixelRatio(), callback);
+            new_tile.data->request(
+                style.workers, transformState.getPixelRatio(), successCallback, failureCallback);
         } else if (info.type == SourceType::Annotations) {
             new_tile.data = std::make_shared<LiveTileData>(normalized_id, data.annotationManager,
                                                            data.transform.getMaxZoom(), style, glyphAtlas,
                                                            glyphStore, spriteAtlas, sprite, info);
-            new_tile.data->reparse(style.workers, callback);
+            new_tile.data->reparse(style.workers, successCallback);
         } else {
             throw std::runtime_error("source type not implemented");
         }
@@ -554,6 +558,15 @@ void Source::emitTileLoaded(bool isNewTile) {
     if (observer_) {
         observer_->onTileLoaded(isNewTile);
     }
+}
+
+void Source::emitTileLoadingFailed(const std::string& message) {
+    if (!observer_) {
+        return;
+    }
+
+    auto error = std::make_exception_ptr(util::TileLoadingException(message));
+    observer_->onTileLoadingFailed(error);
 }
 
 }

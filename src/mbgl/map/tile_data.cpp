@@ -1,11 +1,13 @@
 #include <mbgl/map/tile_data.hpp>
+
 #include <mbgl/map/environment.hpp>
 #include <mbgl/map/source.hpp>
-
-#include <mbgl/storage/file_source.hpp>
-#include <mbgl/util/worker.hpp>
-#include <mbgl/util/work_request.hpp>
 #include <mbgl/platform/log.hpp>
+#include <mbgl/storage/file_source.hpp>
+#include <mbgl/util/work_request.hpp>
+#include <mbgl/util/worker.hpp>
+
+#include <sstream>
 
 using namespace mbgl;
 
@@ -34,15 +36,20 @@ void TileData::setState(const State& state_) {
     state = state_;
 }
 
-void TileData::request(Worker& worker, float pixelRatio, std::function<void()> callback) {
+void TileData::request(Worker& worker,
+                       float pixelRatio,
+                       const std::function<void()>& successCallback,
+                       const std::function<void(const std::string& message)>& failureCallback) {
     std::string url = source.tileURL(id, pixelRatio);
     state = State::loading;
 
-    req = env.request({ Resource::Kind::Tile, url }, [url, callback, &worker, this](const Response &res) {
+    req = env.request({ Resource::Kind::Tile, url }, [url, successCallback, failureCallback, &worker, this](const Response &res) {
         req = nullptr;
 
         if (res.status != Response::Successful) {
-            Log::Error(Event::HttpRequest, "[%s] tile loading failed: %s", url.c_str(), res.message.c_str());
+            std::stringstream message;
+            message <<  "Failed to load [" << url << "]: " << res.message;
+            failureCallback(message.str());
             return;
         }
 
@@ -50,7 +57,7 @@ void TileData::request(Worker& worker, float pixelRatio, std::function<void()> c
         data = res.data;
 
         // Schedule tile parsing in another thread
-        reparse(worker, callback);
+        reparse(worker, successCallback);
     });
 }
 

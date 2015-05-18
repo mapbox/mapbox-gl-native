@@ -61,6 +61,7 @@ public:
         virtual void onSourceLoadingFailed(std::exception_ptr error) = 0;
 
         virtual void onTileLoaded(bool isNewTile) = 0;
+        virtual void onTileLoadingFailed(std::exception_ptr error) = 0;
     };
 
     Source();
@@ -106,6 +107,7 @@ private:
     void emitSourceLoaded();
     void emitSourceLoadingFailed(const std::string& message);
     void emitTileLoaded(bool isNewTile);
+    void emitTileLoadingFailed(const std::string& message);
 
     bool handlePartialTile(const TileID &id, Worker &worker);
     bool findLoadedChildren(const TileID& id, int32_t maxCoveringZoom, std::forward_list<TileID>& retain);

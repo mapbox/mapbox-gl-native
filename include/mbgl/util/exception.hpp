@@ -31,6 +31,11 @@ struct SpriteLoadingException : Exception {
     inline SpriteLoadingException(const std::string &msg) : Exception(msg) {}
 };
 
+struct TileLoadingException : Exception {
+    inline TileLoadingException(const char *msg) : Exception(msg) {}
+    inline TileLoadingException(const std::string &msg) : Exception(msg) {}
+};
+
 }
 }
 

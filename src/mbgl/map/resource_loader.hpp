@@ -68,6 +68,7 @@ public:
     void onSourceLoaded() override;
     void onSourceLoadingFailed(std::exception_ptr error) override;
     void onTileLoaded(bool isNewTile) override;
+    void onTileLoadingFailed(std::exception_ptr error) override;
 
     // Sprite::Observer implementation.
     void onSpriteLoaded() override;
