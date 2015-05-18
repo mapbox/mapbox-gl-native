@@ -11,8 +11,6 @@
 
       'sources': [
         'src/node_mapbox_gl_native.cpp',
-        'src/compress_png.hpp',
-        'src/compress_png.cpp',
         'src/node_log.hpp',
         'src/node_log.cpp',
         'src/node_file_source.hpp',

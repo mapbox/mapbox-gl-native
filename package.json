@@ -29,9 +29,9 @@
     "faucet": "0.0.1",
     "mapbox-gl-test-suite": "git://github.com/mapbox/mapbox-gl-test-suite#master",
     "mkdirp": "^0.5.1",
+    "pngjs": "^0.4.0",
     "request": "^2.55.0",
     "st": "^0.5.3",
-    "tap-spec": "^3.0.0",
     "tape": "^4.0.0"
   },
   "scripts": {

@@ -5,6 +5,7 @@
 var mbgl = require('..');
 var fs = require('fs');
 var path = require('path');
+var PNG = require('pngjs').PNG;
 
 var base = path.join(path.dirname(process.mainModule.filename), '../test');
 
@@ -20,10 +21,19 @@ fileSource.cancel = function(req) {
 
 var map = new mbgl.Map(fileSource);
 map.load(require('../test/fixtures/style.json'));
-map.render({}, function(err, image) {
+map.render({}, function(err, data) {
     if (err) throw err;
-    mbgl.compressPNG(image, function(err, png) {
-        fs.writeFileSync('image.png', png);
-        console.warn('Written image.png');
+
+    var png = new PNG({
+        width: data.width,
+        height: data.height
     });
+
+    png.data = data.pixels;
+
+    png.pack()
+        .pipe(fs.createWriteStream('image.png'))
+        .on('finish', function() {
+            console.warn('Written image.png');
+        });
 });
