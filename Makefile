@@ -143,7 +143,7 @@ ipackage-sim: clean Xcode/ios
 itest: ipackage-sim KIF
 	./scripts/ios/test.sh
 
-ianalyze: Xcode/ios
+ianalyze:
 	./scripts/ios/analyze.sh
 
 # Legacy name
