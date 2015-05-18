@@ -219,21 +219,30 @@ TileData::State Source::hasTile(const TileID& id) {
     return TileData::State::invalid;
 }
 
-void Source::handlePartialTile(const TileID& id, Worker& worker) {
+bool Source::handlePartialTile(const TileID& id, Worker& worker) {
     const TileID normalized_id = id.normalized();
 
     auto it = tile_data.find(normalized_id);
     if (it == tile_data.end()) {
-        return;
+        return true;
     }
 
     util::ptr<TileData> data = it->second.lock();
     if (!data) {
-        return;
+        return true;
     }
 
-    auto callback = std::bind(&Source::emitTileLoaded, this);
-    data->reparse(worker, callback);
+    // The signal is only emitted if there was an actual change on the tile. The
+    // tile can be in a "partial" state waiting for resources and get reparsed on
+    // the arrival of new resources that were needed by another tile.
+    size_t bucketCount = static_cast<VectorTileData*>(data.get())->countBuckets();
+    auto callback = [this, data, bucketCount]() {
+        if (static_cast<VectorTileData*>(data.get())->countBuckets() > bucketCount) {
+            emitTileLoaded(false);
+        }
+    };
+
+    return data->reparse(worker, callback);
 }
 
 TileData::State Source::addTile(MapData& data,
@@ -273,7 +282,7 @@ TileData::State Source::addTile(MapData& data,
         new_tile.data = cache.get(normalized_id.to_uint64());
     }
 
-    auto callback = std::bind(&Source::emitTileLoaded, this);
+    auto callback = std::bind(&Source::emitTileLoaded, this, true);
     if (!new_tile.data) {
         // If we don't find working tile data, we're just going to load it.
         if (info.type == SourceType::Vector) {
@@ -377,16 +386,19 @@ bool Source::findLoadedParent(const TileID& id, int32_t minCoveringZoom, std::fo
     return false;
 }
 
-void Source::update(MapData& data,
+bool Source::update(MapData& data,
                     const TransformState& transformState,
                     Style& style,
                     GlyphAtlas& glyphAtlas,
                     GlyphStore& glyphStore,
                     SpriteAtlas& spriteAtlas,
                     util::ptr<Sprite> sprite,
-                    TexturePool& texturePool) {
+                    TexturePool& texturePool,
+                    bool shouldReparsePartialTiles) {
+    bool allTilesUpdated = true;
+
     if (!loaded || data.getAnimationTime() <= updated) {
-        return;
+        return allTilesUpdated;
     }
 
     int32_t zoom = std::floor(getZoom(transformState));
@@ -407,7 +419,11 @@ void Source::update(MapData& data,
 
         switch (state) {
         case TileData::State::partial:
-            handlePartialTile(id, style.workers);
+            if (shouldReparsePartialTiles) {
+                if (!handlePartialTile(id, style.workers)) {
+                    allTilesUpdated = false;
+                }
+            }
             break;
         case TileData::State::invalid:
             state = addTile(data, transformState, style, glyphAtlas, glyphStore,
@@ -482,6 +498,8 @@ void Source::update(MapData& data,
     updateTilePtrs();
 
     updated = data.getAnimationTime();
+
+    return allTilesUpdated;
 }
 
 void Source::invalidateTiles(const std::vector<TileID>& ids) {
@@ -518,9 +536,9 @@ void Source::emitSourceLoaded() {
     }
 }
 
-void Source::emitTileLoaded() {
+void Source::emitTileLoaded(bool isNewTile) {
     if (observer_) {
-        observer_->onTileLoaded();
+        observer_->onTileLoaded(isNewTile);
     }
 }
 

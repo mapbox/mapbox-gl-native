@@ -13,6 +13,14 @@
 #include <string>
 #include <unordered_map>
 
+typedef struct uv_loop_s uv_loop_t;
+
+namespace uv {
+
+class async;
+
+}
+
 namespace mbgl {
 
 class FileSource;
@@ -87,7 +95,7 @@ public:
         virtual void onGlyphRangeLoaded() = 0;
     };
 
-    GlyphStore(Environment &);
+    GlyphStore(uv_loop_t* loop, Environment &);
     ~GlyphStore();
 
     // Asynchronously request for GlyphRanges and when it gets loaded, notifies the
@@ -115,6 +123,8 @@ private:
 
     std::unordered_map<std::string, std::unique_ptr<FontStack>> stacks;
     std::mutex stacksMutex;
+
+    std::unique_ptr<uv::async> asyncEmitGlyphRangeLoaded;
 
     Observer* observer;
 };

@@ -25,6 +25,10 @@ ResourceLoader::~ResourceLoader() {
     if (sprite_) {
         sprite_->setObserver(nullptr);
     }
+
+    if (glyphStore_) {
+        glyphStore_->setObserver(nullptr);
+    }
 }
 
 void ResourceLoader::setObserver(Observer* observer) {
@@ -45,6 +49,18 @@ void ResourceLoader::setStyle(Style* style) {
     }
 }
 
+void ResourceLoader::setGlyphStore(GlyphStore* glyphStore) {
+    assert(glyphStore);
+
+    if (glyphStore_) {
+        glyphStore_->setObserver(nullptr);
+    }
+
+    glyphStore_ = glyphStore;
+    glyphStore_->setObserver(this);
+}
+
+
 void ResourceLoader::setAccessToken(const std::string& accessToken) {
     accessToken_ = accessToken;
 }
@@ -52,7 +68,6 @@ void ResourceLoader::setAccessToken(const std::string& accessToken) {
 void ResourceLoader::update(MapData& data,
                             const TransformState& transform,
                             GlyphAtlas& glyphAtlas,
-                            GlyphStore& glyphStore,
                             SpriteAtlas& spriteAtlas,
                             TexturePool& texturePool) {
     if (!style_) {
@@ -68,13 +83,24 @@ void ResourceLoader::update(MapData& data,
         spriteAtlas.setSprite(sprite_);
     }
 
+    bool allTilesUpdated = true;
     for (const auto& source : style_->sources) {
-        source->update(
-            data, transform, *style_, glyphAtlas, glyphStore, spriteAtlas, sprite_, texturePool);
+        if (!source->update(data, transform, *style_, glyphAtlas, *glyphStore_,
+                       spriteAtlas, sprite_, texturePool, shouldReparsePartialTiles_)) {
+            allTilesUpdated = false;
+        }
+    }
+
+    // We can only stop updating "partial" tiles when all of them
+    // were notified of the arrival of the new resources.
+    if (allTilesUpdated) {
+        shouldReparsePartialTiles_ = false;
     }
 }
 
 void ResourceLoader::onGlyphRangeLoaded() {
+    shouldReparsePartialTiles_ = true;
+
     emitTileDataChanged();
 }
 
@@ -82,11 +108,17 @@ void ResourceLoader::onSourceLoaded() {
     emitTileDataChanged();
 }
 
-void ResourceLoader::onTileLoaded() {
+void ResourceLoader::onTileLoaded(bool isNewTile) {
+    if (isNewTile) {
+        shouldReparsePartialTiles_ = true;
+    }
+
     emitTileDataChanged();
 }
 
 void ResourceLoader::onSpriteLoaded() {
+    shouldReparsePartialTiles_ = true;
+
     emitTileDataChanged();
 }
 
