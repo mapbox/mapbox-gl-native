@@ -263,7 +263,7 @@ void Painter::render(const Style& style, TransformState state_, TimePoint time) 
         const gl::debugging::group _("cleanup");
 
         MBGL_CHECK_ERROR(glBindTexture(GL_TEXTURE_2D, 0));
-        MBGL_CHECK_ERROR(VertexArrayObject::Bind(0));
+        MBGL_CHECK_ERROR(VertexArrayObject::Unbind());
     }
 }
 

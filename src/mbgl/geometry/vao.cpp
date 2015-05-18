@@ -31,8 +31,9 @@ static gl::ExtensionFunction<
         {"GL_APPLE_vertex_array_object", "glGenVertexArraysAPPLE"}
     });
 
-void VertexArrayObject::Bind(GLuint array) {
-    MBGL_CHECK_ERROR(BindVertexArray(array));
+void VertexArrayObject::Unbind() {
+    if (!BindVertexArray) return;
+    MBGL_CHECK_ERROR(BindVertexArray(0));
 }
 
 void VertexArrayObject::Delete(GLsizei n, const GLuint* arrays) {
