@@ -59,6 +59,10 @@
         'miscellaneous/variant.cpp',
         'miscellaneous/worker.cpp',
 
+        'resources/mock_file_source.cpp',
+        'resources/mock_file_source.hpp',
+        'resources/mock_view.hpp',
+
         'storage/storage.hpp',
         'storage/storage.cpp',
         'storage/cache_response.cpp',
