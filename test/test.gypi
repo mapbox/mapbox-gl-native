@@ -62,6 +62,7 @@
         'resources/mock_file_source.cpp',
         'resources/mock_file_source.hpp',
         'resources/mock_view.hpp',
+        'resources/resource_loader.cpp',
 
         'storage/storage.hpp',
         'storage/storage.cpp',
