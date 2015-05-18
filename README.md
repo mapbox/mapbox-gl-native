@@ -196,14 +196,14 @@ You can then open `android/java` in Android Studio via "Import Non-Android Studi
 
 ### Setting up Android emulator
 
-If you want to run the test app in the simulator, we reccomend the x86 build because it will run a lot faster.
+If you want to run the test app in the emulator, we recommend the x86 build because it will run a lot faster.
 
-To create an x86 build in the terminal run:
+First ensure you have an `MAPBOX_ACCESS_TOKEN` environment variable set, as described below. Then, create an x86 build:
 
     ANDROID_ABI=x86 make android
 
-In Android studio create an x86 AVD (Android Virtual Device):
-- Open AVD Manager via the Tools menu -> Andorid -> AVD Manager
+In Android Studio, create an x86 AVD (Android Virtual Device):
+- Open AVD Manager via the Tools menu -> Android -> AVD Manager
 - Click "Create Virtual Device" at the bottom on AVD Manager window
 - Select one of the device profiles, for example the Nexus 4
 - Click "Next"
