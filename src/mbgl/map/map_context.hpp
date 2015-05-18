@@ -43,7 +43,7 @@ public:
 
     void resize(uint16_t width, uint16_t height, float ratio);
 
-    using StillImageCallback = std::function<void(std::unique_ptr<const StillImage>)>;
+    using StillImageCallback = std::function<void(std::exception_ptr, std::unique_ptr<const StillImage>)>;
     void renderStill(StillImageCallback callback);
 
     void triggerUpdate(Update = Update::Nothing);
@@ -61,6 +61,7 @@ public:
 
     // ResourceLoader::Observer implementation.
     void onTileDataChanged() override;
+    void onResourceLoadingFailed(std::exception_ptr error) override;
 
 private:
     void updateTiles();

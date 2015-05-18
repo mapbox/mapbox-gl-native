@@ -130,4 +130,20 @@ void ResourceLoader::emitTileDataChanged() {
     }
 }
 
+void ResourceLoader::emitResourceLoadingFailed(std::exception_ptr error) {
+    assert(Environment::currentlyOn(ThreadType::Map));
+
+    try {
+        if (error) {
+            std::rethrow_exception(error);
+        }
+    } catch(const std::exception& e) {
+        Log::Error(Event::ResourceLoader, e.what());
+    }
+
+    if (observer_) {
+        observer_->onResourceLoadingFailed(error);
+    }
+}
+
 }
