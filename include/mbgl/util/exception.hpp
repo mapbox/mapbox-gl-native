@@ -11,6 +11,11 @@ struct Exception : std::runtime_error {
     inline Exception(const std::string &msg) : std::runtime_error(msg) {}
 };
 
+struct GlyphRangeLoadingException : Exception {
+    inline GlyphRangeLoadingException(const char *msg) : Exception(msg) {}
+    inline GlyphRangeLoadingException(const std::string &msg) : Exception(msg) {}
+};
+
 struct MisuseException : Exception {
     inline MisuseException(const char *msg) : Exception(msg) {}
     inline MisuseException(const std::string &msg) : Exception(msg) {}

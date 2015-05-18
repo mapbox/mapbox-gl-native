@@ -104,6 +104,10 @@ void ResourceLoader::onGlyphRangeLoaded() {
     emitTileDataChanged();
 }
 
+void ResourceLoader::onGlyphRangeLoadingFailed(std::exception_ptr error) {
+    emitResourceLoadingFailed(error);
+}
+
 void ResourceLoader::onSourceLoaded() {
     emitTileDataChanged();
 }
