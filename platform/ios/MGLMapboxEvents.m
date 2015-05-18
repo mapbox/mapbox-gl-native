@@ -14,7 +14,7 @@
 #include <sys/sysctl.h>
 
 static NSString *const MGLMapboxEventsUserAgent = @"MapboxEventsiOS/1.0";
-static NSString *const MGLMapboxEventsAPIBase = @"https://api.tiles.mapbox.com";
+static NSString *MGLMapboxEventsAPIBase = @"https://api.tiles.mapbox.com";
 
 NSString *const MGLEventTypeMapLoad = @"map.load";
 NSString *const MGLEventTypeMapTap = @"map.click";
@@ -229,6 +229,12 @@ const NSTimeInterval MGLFlushInterval = 60;
 
         // Configure Events Infrastructure
         // ===============================
+
+        // Check for TEST Metrics URL
+        NSString *testURL = [[NSBundle mainBundle] objectForInfoDictionaryKey:@"MGLMetricsTestServerURL"];
+        if (testURL != nil) {
+            MGLMapboxEventsAPIBase = testURL;
+        }
 
         _paused = YES;
         [self resumeMetricsCollection];
