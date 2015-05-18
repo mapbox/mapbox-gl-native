@@ -71,6 +71,7 @@ public:
 
     // Sprite::Observer implementation.
     void onSpriteLoaded() override;
+    void onSpriteLoadingFailed(std::exception_ptr error) override;
 
 private:
     void emitTileDataChanged();

@@ -26,6 +26,11 @@ struct SourceLoadingException : Exception {
     inline SourceLoadingException(const std::string &msg) : Exception(msg) {}
 };
 
+struct SpriteLoadingException : Exception {
+    inline SpriteLoadingException(const char *msg) : Exception(msg) {}
+    inline SpriteLoadingException(const std::string &msg) : Exception(msg) {}
+};
+
 }
 }
 
