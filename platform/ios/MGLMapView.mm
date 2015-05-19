@@ -2120,6 +2120,11 @@ CLLocationCoordinate2D latLngToCoordinate(mbgl::LatLng latLng)
         self.userTrackingMode  = MGLUserTrackingModeNone;
         self.showsUserLocation = NO;
     }
+
+    if ([self.delegate respondsToSelector:@selector(mapView:didChangeLocationAuthorizationStatus:)])
+    {
+        [self.delegate mapView:self didChangeLocationAuthorizationStatus:status];
+    }
 }
 
 - (void)locationManager:(__unused CLLocationManager *)manager didFailWithError:(NSError *)error
