@@ -297,15 +297,15 @@ FontStack* GlyphStore::createFontStack(const std::string &fontStack) {
     return stack_it->second.get();
 }
 
-FontStack* GlyphStore::getFontStack(const std::string &fontStack) {
-    std::lock_guard<std::mutex> lock(stacksMutex);
+util::exclusive<FontStack> GlyphStore::getFontStack(const std::string &fontStack) {
+    auto lock = util::make_unique<std::lock_guard<std::mutex>>(stacksMutex);
 
     const auto& stack_it = stacks.find(fontStack);
     if (stack_it == stacks.end()) {
-        return nullptr;
+        return { nullptr, nullptr };
     }
 
-    return stack_it->second.get();
+    return { stack_it->second.get(), std::move(lock) };
 }
 
 void GlyphStore::setObserver(Observer* observer_) {

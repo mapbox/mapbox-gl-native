@@ -4,6 +4,7 @@
 #include <mbgl/text/glyph.hpp>
 #include <mbgl/util/vec.hpp>
 #include <mbgl/util/ptr.hpp>
+#include <mbgl/util/exclusive.hpp>
 
 #include <cstdint>
 #include <vector>
@@ -104,7 +105,7 @@ public:
     // GlyphRanges are already available, and thus, no request is performed.
     bool requestGlyphRangesIfNeeded(const std::string &fontStack, const std::set<GlyphRange> &glyphRanges);
 
-    FontStack* getFontStack(const std::string &fontStack);
+    util::exclusive<FontStack> getFontStack(const std::string &fontStack);
 
     void setURL(const std::string &url);
 

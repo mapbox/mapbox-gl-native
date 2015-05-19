@@ -190,7 +190,7 @@ void SymbolBucket::addFeatures(uintptr_t tileUID,
     if (layout.text.justify == TextJustifyType::Right) justify = 1;
     else if (layout.text.justify == TextJustifyType::Left) justify = 0;
 
-    auto* fontStack = glyphStore.getFontStack(layout.text.font);
+    auto fontStack = glyphStore.getFontStack(layout.text.font);
 
     for (const auto& feature : features) {
         if (!feature.geometry.size()) continue;
@@ -214,7 +214,7 @@ void SymbolBucket::addFeatures(uintptr_t tileUID,
 
             // Add the glyphs we need for this label to the glyph atlas.
             if (shaping.size()) {
-                glyphAtlas.addGlyphs(tileUID, feature.label, layout.text.font, *fontStack, face);
+                glyphAtlas.addGlyphs(tileUID, feature.label, layout.text.font, **fontStack, face);
             }
         }
 
