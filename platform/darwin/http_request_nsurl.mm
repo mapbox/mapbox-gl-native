@@ -153,19 +153,16 @@ void HTTPRequest::start() {
 
     @autoreleasepool {
         
-        NSMutableString *url = [NSMutableString stringWithString:@(resource.url.c_str())];
-        if ([url rangeOfString:@"mapbox.com"].location != NSNotFound) {
+        NSURL *url = [NSURL URLWithString:@(resource.url.c_str())];
+        if ([url.host isEqualToString:@"mapbox.com"] || [url.host hasSuffix:@".mapbox.com"]) {
             if ([[NSUserDefaults standardUserDefaults] integerForKey:@"MGLMapboxAccountType"] == 0) {
-                if ([url rangeOfString:@"?"].location == NSNotFound) {
-                    [url appendString:@"?"];
-                } else {
-                    [url appendString:@"&"];
-                }
-                [url appendString:@"events=true"];
+                NSString *absoluteString = [url.absoluteString stringByAppendingFormat:
+                                            (url.query ? @"&%@" : @"?%@"), @"events=true"];
+                url = [NSURL URLWithString:absoluteString];
             }
         }
 
-        NSMutableURLRequest *req = [NSMutableURLRequest requestWithURL:[NSURL URLWithString:url]];
+        NSMutableURLRequest *req = [NSMutableURLRequest requestWithURL:url];
         if (existingResponse) {
             if (!existingResponse->etag.empty()) {
                 [req addValue:@(existingResponse->etag.c_str()) forHTTPHeaderField:@"If-None-Match"];
