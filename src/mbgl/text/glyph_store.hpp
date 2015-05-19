@@ -54,7 +54,6 @@ private:
     std::map<uint32_t, std::string> bitmaps;
     std::map<uint32_t, GlyphMetrics> metrics;
     std::map<uint32_t, SDFGlyph> sdfs;
-    mutable std::mutex mtx;
 };
 
 class GlyphPBF {
@@ -82,8 +81,6 @@ private:
 
     Environment& env;
     Request* req = nullptr;
-
-    mutable std::mutex mtx;
 };
 
 // Manages Glyphrange PBF loading.
@@ -114,7 +111,7 @@ public:
 private:
     void emitGlyphRangeLoaded();
 
-    FontStack* createFontStack(const std::string &fontStack);
+    util::exclusive<FontStack> createFontStack(const std::string &fontStack);
 
     std::string glyphURL;
     Environment &env;

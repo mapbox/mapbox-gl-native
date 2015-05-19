@@ -20,19 +20,16 @@ namespace mbgl {
 
 
 void FontStack::insert(uint32_t id, const SDFGlyph &glyph) {
-    std::lock_guard<std::mutex> lock(mtx);
     metrics.emplace(id, glyph.metrics);
     bitmaps.emplace(id, glyph.bitmap);
     sdfs.emplace(id, glyph);
 }
 
 const std::map<uint32_t, GlyphMetrics> &FontStack::getMetrics() const {
-    std::lock_guard<std::mutex> lock(mtx);
     return metrics;
 }
 
 const std::map<uint32_t, SDFGlyph> &FontStack::getSDFs() const {
-    std::lock_guard<std::mutex> lock(mtx);
     return sdfs;
 }
 
@@ -40,8 +37,6 @@ const Shaping FontStack::getShaping(const std::u32string &string, const float ma
                                     const float lineHeight, const float horizontalAlign,
                                     const float verticalAlign, const float justify,
                                     const float spacing, const vec2<float> &translate) const {
-    std::lock_guard<std::mutex> lock(mtx);
-
     Shaping shaping;
 
     int32_t x = std::round(translate.x * 24); // one em
@@ -179,8 +174,6 @@ GlyphPBF::~GlyphPBF() {
 }
 
 void GlyphPBF::parse(FontStack &stack) {
-    std::lock_guard<std::mutex> lock(mtx);
-
     if (!data.size()) {
         // If there is no data, this means we either haven't received any data, or
         // we have already parsed the data.
@@ -253,7 +246,7 @@ void GlyphStore::setURL(const std::string &url) {
     glyphURL = url;
 }
 
-bool GlyphStore::requestGlyphRangesIfNeeded(const std::string& fontStack,
+bool GlyphStore::requestGlyphRangesIfNeeded(const std::string& fontStackName,
                                             const std::set<GlyphRange>& glyphRanges) {
     bool requestIsNeeded = false;
 
@@ -261,18 +254,19 @@ bool GlyphStore::requestGlyphRangesIfNeeded(const std::string& fontStack,
         return requestIsNeeded;
     }
 
-    auto callback = [this, fontStack](GlyphPBF* glyph) {
-        glyph->parse(*createFontStack(fontStack));
+    auto callback = [this, fontStackName](GlyphPBF* glyph) {
+        auto fontStack = createFontStack(fontStackName);
+        glyph->parse(**fontStack);
         asyncEmitGlyphRangeLoaded->send();
     };
 
     std::lock_guard<std::mutex> lock(rangesMutex);
-    auto& rangeSets = ranges[fontStack];
+    auto& rangeSets = ranges[fontStackName];
 
     for (const auto& range : glyphRanges) {
         const auto& rangeSets_it = rangeSets.find(range);
         if (rangeSets_it == rangeSets.end()) {
-            auto glyph = util::make_unique<GlyphPBF>(glyphURL, fontStack, range, env, callback);
+            auto glyph = util::make_unique<GlyphPBF>(glyphURL, fontStackName, range, env, callback);
             rangeSets.emplace(range, std::move(glyph));
             requestIsNeeded = true;
             continue;
@@ -286,15 +280,15 @@ bool GlyphStore::requestGlyphRangesIfNeeded(const std::string& fontStack,
     return requestIsNeeded;
 }
 
-FontStack* GlyphStore::createFontStack(const std::string &fontStack) {
-    std::lock_guard<std::mutex> lock(stacksMutex);
+util::exclusive<FontStack> GlyphStore::createFontStack(const std::string &fontStack) {
+    auto lock = util::make_unique<std::lock_guard<std::mutex>>(stacksMutex);
 
     auto stack_it = stacks.find(fontStack);
     if (stack_it == stacks.end()) {
         stack_it = stacks.emplace(fontStack, util::make_unique<FontStack>()).first;
     }
 
-    return stack_it->second.get();
+    return { stack_it->second.get(), std::move(lock) };
 }
 
 util::exclusive<FontStack> GlyphStore::getFontStack(const std::string &fontStack) {
