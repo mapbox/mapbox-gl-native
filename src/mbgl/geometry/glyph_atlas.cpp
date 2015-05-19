@@ -69,8 +69,9 @@ Rect<uint16_t> GlyphAtlas::addGlyph(uintptr_t tileUID,
     uint16_t buffered_height = glyph.metrics.height + buffer * 2;
 
     // Add a 1px border around every image.
-    uint16_t pack_width = buffered_width;
-    uint16_t pack_height = buffered_height;
+    const uint16_t padding = 1;
+    uint16_t pack_width = buffered_width + 2 * padding;
+    uint16_t pack_height = buffered_height + 2 * padding;
 
     // Increase to next number divisible by 4, but at least 1.
     // This is so we can scale down the texture coordinates and pack them
@@ -92,7 +93,7 @@ Rect<uint16_t> GlyphAtlas::addGlyph(uintptr_t tileUID,
     // Copy the bitmap
     const uint8_t* source = reinterpret_cast<const uint8_t*>(glyph.bitmap.data());
     for (uint32_t y = 0; y < buffered_height; y++) {
-        uint32_t y1 = width * (rect.y + y) + rect.x;
+        uint32_t y1 = width * (rect.y + y + padding) + rect.x + padding;
         uint32_t y2 = buffered_width * y;
         for (uint32_t x = 0; x < buffered_width; x++) {
             data[y1 + x] = source[y2 + x];
