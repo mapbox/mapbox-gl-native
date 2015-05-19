@@ -91,6 +91,7 @@ public:
 
     NSURLSession *session = nil;
     NSString *userAgent = nil;
+    NSInteger accountType = 0;
 };
 
 HTTPNSURLContext::HTTPNSURLContext(uv_loop_t *loop_) : HTTPContext(loop_) {
@@ -107,6 +108,8 @@ HTTPNSURLContext::HTTPNSURLContext(uv_loop_t *loop_) : HTTPContext(loop_) {
 
         // Write user agent string
         userAgent = @"MapboxGL";
+        
+        accountType = [[NSUserDefaults standardUserDefaults] integerForKey:@"MGLMapboxAccountType"];
     }
 }
 
@@ -155,7 +158,7 @@ void HTTPRequest::start() {
         
         NSURL *url = [NSURL URLWithString:@(resource.url.c_str())];
         if ([url.host isEqualToString:@"mapbox.com"] || [url.host hasSuffix:@".mapbox.com"]) {
-            if ([[NSUserDefaults standardUserDefaults] integerForKey:@"MGLMapboxAccountType"] == 0) {
+            if (context->accountType == 0) {
                 NSString *absoluteString = [url.absoluteString stringByAppendingFormat:
                                             (url.query ? @"&%@" : @"?%@"), @"events=true"];
                 url = [NSURL URLWithString:absoluteString];
