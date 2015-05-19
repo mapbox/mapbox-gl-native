@@ -2127,20 +2127,6 @@ CLLocationCoordinate2D latLngToCoordinate(mbgl::LatLng latLng)
     }
 }
 
-- (void)locationManager:(__unused CLLocationManager *)manager didFailWithError:(NSError *)error
-{
-    if ([error code] == kCLErrorDenied)
-    {
-        self.userTrackingMode  = MGLUserTrackingModeNone;
-        self.showsUserLocation = NO;
-
-        if ([self.delegate respondsToSelector:@selector(mapView:didFailToLocateUserWithError:)])
-        {
-            [self.delegate mapView:self didFailToLocateUserWithError:error];
-        }
-    }
-}
-
 - (void)updateHeadingForDeviceOrientation
 {
     if (self.locationManager)

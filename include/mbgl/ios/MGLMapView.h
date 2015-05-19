@@ -397,11 +397,6 @@ IB_DESIGNABLE
 *   @param userLocation The location object representing the user’s latest location. This property may be `nil`. */
 - (void)mapView:(MGLMapView *)mapView didUpdateUserLocation:(MGLUserLocation *)userLocation;
 
-/** Tells the delegate that an attempt to locate the user’s position failed.
-*   @param mapView The map view that is tracking the user’s location.
-*   @param error An error object containing the reason why location tracking failed. */
-- (void)mapView:(MGLMapView *)mapView didFailToLocateUserWithError:(NSError *)error;
-
 /** Tells the delegate that location authorization status has changed.
 *
 *   When the user allows or denies use of their location, this method is called with the appropriate status. When explicitly denied, status will be set to kCLAuthorizationStatusDenied.
