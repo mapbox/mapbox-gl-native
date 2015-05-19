@@ -53,6 +53,9 @@
     // Update MGLMapboxEvents
     // NOTE: This is (likely) the initial setup of MGLMapboxEvents
     [MGLMapboxEvents sharedManager];
+
+    // Count App Users
+    [MGLMapboxEvents pushEvent:MGLEventTypeAppUserCount withAttributes:nil];
 }
 
 + (NSString *) accessToken {

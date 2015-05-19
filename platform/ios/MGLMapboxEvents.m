@@ -16,6 +16,7 @@
 static NSString *const MGLMapboxEventsUserAgent = @"MapboxEventsiOS/1.0";
 static NSString *MGLMapboxEventsAPIBase = @"https://api.tiles.mapbox.com";
 
+NSString *const MGLEventTypeAppUserCount = @"appUserCount";
 NSString *const MGLEventTypeMapLoad = @"map.load";
 NSString *const MGLEventTypeMapTap = @"map.click";
 NSString *const MGLEventTypeMapDragEnd = @"map.dragend";
@@ -481,7 +482,7 @@ const NSTimeInterval MGLFlushInterval = 60;
         [_eventQueue addObject:finalEvent];
         
         // Has Flush Limit Been Reached?
-        if (_eventQueue.count >= MGLMaximumEventsPerFlush) {
+        if (_eventQueue.count >= MGLMaximumEventsPerFlush || [MGLEventTypeAppUserCount isEqualToString:event]) {
             [strongSelf flush];
         } else if (_eventQueue.count ==  1) {
             // If this is first new event on queue start timer,
