@@ -46,16 +46,7 @@ void Raster::bind(bool linear) {
     }
 
     if (img && !textured) {
-        texture = texturePool.getTextureID();
-        MBGL_CHECK_ERROR(glBindTexture(GL_TEXTURE_2D, texture));
-#ifndef GL_ES_VERSION_2_0
-        MBGL_CHECK_ERROR(glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MAX_LEVEL, 0));
-#endif
-        MBGL_CHECK_ERROR(glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_WRAP_S, GL_CLAMP_TO_EDGE));
-        MBGL_CHECK_ERROR(glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_WRAP_T, GL_CLAMP_TO_EDGE));
-        MBGL_CHECK_ERROR(glTexImage2D(GL_TEXTURE_2D, 0, GL_RGBA, width, height, 0, GL_RGBA, GL_UNSIGNED_BYTE, img->getData()));
-        img.reset();
-        textured = true;
+        upload();
     } else if (textured) {
         MBGL_CHECK_ERROR(glBindTexture(GL_TEXTURE_2D, texture));
     }
@@ -68,24 +59,17 @@ void Raster::bind(bool linear) {
     }
 }
 
-// overload ::bind for prerendered raster textures
-void Raster::bind(const GLuint custom_texture) {
+void Raster::upload() {
     if (img && !textured) {
-        MBGL_CHECK_ERROR(glBindTexture(GL_TEXTURE_2D, custom_texture));
+        texture = texturePool.getTextureID();
+        MBGL_CHECK_ERROR(glBindTexture(GL_TEXTURE_2D, texture));
+#ifndef GL_ES_VERSION_2_0
+        MBGL_CHECK_ERROR(glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MAX_LEVEL, 0));
+#endif
         MBGL_CHECK_ERROR(glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_WRAP_S, GL_CLAMP_TO_EDGE));
         MBGL_CHECK_ERROR(glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_WRAP_T, GL_CLAMP_TO_EDGE));
         MBGL_CHECK_ERROR(glTexImage2D(GL_TEXTURE_2D, 0, GL_RGBA, width, height, 0, GL_RGBA, GL_UNSIGNED_BYTE, img->getData()));
         img.reset();
         textured = true;
-    } else if (textured) {
-        MBGL_CHECK_ERROR(glBindTexture(GL_TEXTURE_2D, custom_texture));
     }
-
-    GLuint new_filter = GL_LINEAR;
-    if (new_filter != this->filter) {
-        MBGL_CHECK_ERROR(glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MIN_FILTER, new_filter));
-        MBGL_CHECK_ERROR(glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MAG_FILTER, new_filter));
-        filter = new_filter;
-    }
-
 }

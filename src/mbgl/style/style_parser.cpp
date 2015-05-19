@@ -10,9 +10,9 @@
 #include <csscolorparser/csscolorparser.hpp>
 
 #pragma GCC diagnostic push
-#ifndef __clang__
+#pragma GCC diagnostic ignored "-Wshadow"
+#pragma GCC diagnostic ignored "-Wunknown-pragmas"
 #pragma GCC diagnostic ignored "-Wunused-local-typedefs"
-#endif
 #include <boost/algorithm/string.hpp>
 #pragma GCC diagnostic pop
 

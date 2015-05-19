@@ -1,73 +1,40 @@
 #include <mbgl/util/worker.hpp>
+#include <mbgl/util/work_task.hpp>
+#include <mbgl/util/work_request.hpp>
+#include <mbgl/platform/platform.hpp>
 
 #include <cassert>
+#include <future>
 
 namespace mbgl {
 
-Worker::Worker(uv_loop_t* loop, std::size_t count)
-    : queue(new Queue(loop, [this](Fn after) { afterWork(after); }))
-{
-    queue->unref();
+class Worker::Impl {
+public:
+    Impl(uv_loop_t*) {}
 
+    void doWork(std::shared_ptr<WorkTask>& task) {
+        task->runTask();
+    }
+};
+
+Worker::Worker(std::size_t count) {
     for (std::size_t i = 0; i < count; i++) {
-        threads.emplace_back(&Worker::workLoop, this);
+        threads.emplace_back(util::make_unique<util::Thread<Impl>>("Worker", util::ThreadPriority::Low));
     }
 }
 
-Worker::~Worker() {
-    MBGL_VERIFY_THREAD(tid);
+Worker::~Worker() = default;
 
-    if (active++ == 0) {
-        queue->ref();
-    }
+std::unique_ptr<WorkRequest> Worker::send(Fn work, Fn after) {
+    auto task = std::make_shared<WorkTask>(work, after);
+    auto request = util::make_unique<WorkRequest>(task);
 
-    channel.send(Work());
+    threads[current]->invokeWithResult(&Worker::Impl::doWork, [task] {
+        task->runAfter();
+    }, task);
 
-    for (auto& thread : threads) {
-        thread.join();
-    }
-
-    queue->stop();
+    current = (current + 1) % threads.size();
+    return request;
 }
 
-void Worker::send(Fn work, Fn after) {
-    MBGL_VERIFY_THREAD(tid);
-    assert(work);
-
-    if (active++ == 0) {
-        queue->ref();
-    }
-
-    channel.send({work, after});
-}
-
-void Worker::workLoop() {
-#ifdef __APPLE__
-    pthread_setname_np("Worker");
-#endif
-
-    while (true) {
-        Work item = channel.receive();
-
-        if (!item.work)
-            break;
-
-        item.work();
-        queue->send(std::move(item.after));
-    }
-
-    // Make sure to close all other workers too.
-    channel.send(Work());
-}
-
-void Worker::afterWork(Fn after) {
-    if (after) {
-        after();
-    }
-
-    if (--active == 0) {
-        queue->unref();
-    }
-}
-
-}
+} // end namespace mbgl

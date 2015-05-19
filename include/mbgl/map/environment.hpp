@@ -39,7 +39,6 @@ public:
     // #############################################################################################
 
     // File request APIs
-    void requestAsync(const Resource&, std::function<void(const Response&)>);
     Request* request(const Resource&, std::function<void(const Response&)>);
     void cancelRequest(Request*);
 
@@ -54,11 +53,6 @@ public:
     // Only call this while the OpenGL context is exclusive to this thread.
     void performCleanup();
 
-    // #############################################################################################
-
-    // Request to terminate the environment.
-    void terminate();
-
 private:
     unsigned id;
     FileSource& fileSource;
@@ -67,9 +61,6 @@ private:
     std::vector<uint32_t> abandonedVAOs;
     std::vector<uint32_t> abandonedBuffers;
     std::vector<uint32_t> abandonedTextures;
-
-public:
-    uv_loop_t* const loop;
 };
 
 class EnvironmentScope final {

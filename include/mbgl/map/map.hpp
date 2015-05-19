@@ -1,96 +1,56 @@
 #ifndef MBGL_MAP_MAP
 #define MBGL_MAP_MAP
 
-#include <mbgl/map/transform.hpp>
 #include <mbgl/util/chrono.hpp>
 #include <mbgl/map/update.hpp>
+#include <mbgl/map/mode.hpp>
 #include <mbgl/util/geo.hpp>
-#include <mbgl/util/projection.hpp>
 #include <mbgl/util/noncopyable.hpp>
-#include <mbgl/util/ptr.hpp>
 #include <mbgl/util/vec.hpp>
 
 #include <cstdint>
-#include <atomic>
-#include <thread>
-#include <iosfwd>
-#include <set>
-#include <vector>
-#include <queue>
-#include <mutex>
-#include <condition_variable>
+#include <string>
 #include <functional>
-
-namespace uv { class async; }
+#include <vector>
+#include <memory>
 
 namespace mbgl {
 
-class Painter;
-class GlyphStore;
-class LayerDescription;
-class Sprite;
-class Style;
-class StyleLayer;
-class TexturePool;
 class FileSource;
 class View;
-class GlyphAtlas;
-class SpriteAtlas;
-class LineAtlas;
-class Environment;
-class EnvironmentScope;
-class AnnotationManager;
 class MapData;
-class Worker;
+class MapContext;
 class StillImage;
+
+namespace util {
+template <class T> class Thread;
+}
 
 class Map : private util::noncopyable {
     friend class View;
 
 public:
-    enum class Mode : uint8_t {
-        None, // we're not doing any processing
-        Continuous, // continually updating map
-        Still, // a once-off still image.
-    };
-
-    explicit Map(View&, FileSource&);
+    explicit Map(View&, FileSource&,
+                 MapMode mode = MapMode::Continuous);
     ~Map();
 
-    // Start the map render thread. It is asynchronous.
-    void start(bool startPaused = false, Mode mode = Mode::Continuous);
-    inline void start(Mode renderMode) { start(false, renderMode); }
-
-    // Stop the map render thread. This call will block until the map rendering thread stopped.
-    // The optional callback function will be invoked repeatedly until the map thread is stopped.
-    // The callback function should wait until it is woken up again by view.notify(), otherwise
-    // this will be a busy waiting loop.
-    void stop(std::function<void ()> callback = std::function<void ()>());
-
     // Pauses the render thread. The render thread will stop running but will not be terminated and will not lose state until resumed.
-    void pause(bool waitForPause = false);
+    void pause();
 
     // Resumes a paused render thread
     void resume();
 
+    // Register a callback that will get called (on the render thread) when all resources have
+    // been loaded and a complete render occurs.
     using StillImageCallback = std::function<void(std::unique_ptr<const StillImage>)>;
     void renderStill(StillImageCallback callback);
 
     // Triggers a synchronous or asynchronous render.
     void renderSync();
-
-    // Unconditionally performs a render with the current map state. May only be called from the Map
-    // thread.
-    void render();
+    void renderAsync();
 
     // Notifies the Map thread that the state has changed and an update might be necessary.
-    void triggerUpdate(Update = Update::Nothing);
-
-    // Triggers a render. Can be called from any thread.
-    void triggerRender();
-
-    // Releases resources immediately
-    void terminate();
+    void update(Update update = Update::Nothing);
 
     // Styling
     void addClass(const std::string&);
@@ -134,18 +94,23 @@ public:
     double getBearing() const;
     void resetNorth();
 
+    // Size
+    void resize(uint16_t width, uint16_t height, float ratio = 1);
+    uint16_t getWidth() const;
+    uint16_t getHeight() const;
+
     // API
     void setAccessToken(const std::string &token);
     std::string getAccessToken() const;
 
     // Projection
-    inline void getWorldBoundsMeters(ProjectedMeters &sw, ProjectedMeters &ne) const { Projection::getWorldBoundsMeters(sw, ne); }
-    inline void getWorldBoundsLatLng(LatLng &sw, LatLng &ne) const { Projection::getWorldBoundsLatLng(sw, ne); }
-    inline double getMetersPerPixelAtLatitude(const double lat, const double zoom) const { return Projection::getMetersPerPixelAtLatitude(lat, zoom); }
-    inline const ProjectedMeters projectedMetersForLatLng(const LatLng latLng) const { return Projection::projectedMetersForLatLng(latLng); }
-    inline const LatLng latLngForProjectedMeters(const ProjectedMeters projectedMeters) const { return Projection::latLngForProjectedMeters(projectedMeters); }
-    inline const vec2<double> pixelForLatLng(const LatLng latLng) const { return state.pixelForLatLng(latLng); }
-    inline const LatLng latLngForPixel(const vec2<double> pixel) const { return state.latLngForPixel(pixel); }
+    void getWorldBoundsMeters(ProjectedMeters &sw, ProjectedMeters &ne) const;
+    void getWorldBoundsLatLng(LatLng &sw, LatLng &ne) const;
+    double getMetersPerPixelAtLatitude(const double lat, const double zoom) const;
+    const ProjectedMeters projectedMetersForLatLng(const LatLng latLng) const;
+    const LatLng latLngForProjectedMeters(const ProjectedMeters projectedMeters) const;
+    const vec2<double> pixelForLatLng(const LatLng latLng) const;
+    const LatLng latLngForPixel(const vec2<double> pixel) const;
 
     // Annotations
     void setDefaultPointAnnotationSymbol(const std::string&);
@@ -160,112 +125,18 @@ public:
 
     // Memory
     void setSourceTileCacheSize(size_t);
-    size_t getSourceTileCacheSize() const { return sourceCacheSize; }
     void onLowMemory();
 
     // Debug
     void setDebug(bool value);
     void toggleDebug();
     bool getDebug() const;
-
-    inline const TransformState &getState() const { return state; }
-    TimePoint getTime() const;
-    inline AnnotationManager& getAnnotationManager() const { return *annotationManager; }
+    bool isFullyLoaded() const;
 
 private:
-    // Runs the map event loop. ONLY run this function when you want to get render a single frame
-    // with this map object. It will *not* spawn a separate thread and instead block until the
-    // frame is completely rendered.
-    void run();
-
-    // This may only be called by the View object.
-    void resize(uint16_t width, uint16_t height, float ratio = 1);
-    void resize(uint16_t width, uint16_t height, float ratio, uint16_t fbWidth, uint16_t fbHeight);
-
-    util::ptr<Sprite> getSprite();
-    Worker& getWorker();
-
-    // Checks if render thread needs to pause
-    void checkForPause();
-
-    // Setup
-    void setup();
-
-    void updateTiles();
-
-    // Triggered by triggerUpdate();
-    void update();
-
-    // Loads the style set in the data object. Called by Update::StyleInfo
-    void reloadStyle();
-    void loadStyleJSON(const std::string& json, const std::string& base);
-
-    // Prepares a map render by updating the tiles we need for the current view, as well as updating
-    // the stylesheet.
-    void prepare();
-
-    // Runs the function in the map thread.
-    void invokeTask(std::function<void()>&&);
-    template <typename Fn> auto invokeSyncTask(const Fn& fn) -> decltype(fn());
-
-    void processTasks();
-
-    void updateAnnotationTiles(const std::vector<TileID>&);
-
-    size_t sourceCacheSize;
-
-    Mode mode = Mode::None;
-
-    const std::unique_ptr<Environment> env;
-    std::unique_ptr<EnvironmentScope> scope;
-    View &view;
-
-private:
-    std::unique_ptr<Worker> workers;
-    std::thread thread;
-    std::unique_ptr<uv::async> asyncTerminate;
-    std::unique_ptr<uv::async> asyncUpdate;
-    std::unique_ptr<uv::async> asyncInvoke;
-    std::unique_ptr<uv::async> asyncRender;
-
-    bool terminating = false;
-    bool pausing = false;
-    bool isPaused = false;
-    std::mutex mutexRun;
-    std::condition_variable condRun;
-    std::mutex mutexPause;
-    std::condition_variable condPause;
-
-    // Used to signal that rendering completed.
-    bool rendered = false;
-    std::condition_variable condRendered;
-    std::mutex mutexRendered;
-
-    // Stores whether the map thread has been stopped already.
-    std::atomic_bool isStopped;
-
-    Transform transform;
-    TransformState state;
-
-    FileSource& fileSource;
-
-    util::ptr<Style> style;
-    std::unique_ptr<GlyphAtlas> glyphAtlas;
-    util::ptr<GlyphStore> glyphStore;
-    std::unique_ptr<SpriteAtlas> spriteAtlas;
-    util::ptr<Sprite> sprite;
-    std::unique_ptr<LineAtlas> lineAtlas;
-    util::ptr<TexturePool> texturePool;
-    std::unique_ptr<Painter> painter;
-    std::unique_ptr<AnnotationManager> annotationManager;
-
     const std::unique_ptr<MapData> data;
-
-    std::atomic<UpdateType> updated;
-
-    std::mutex mutexTask;
-    std::queue<std::function<void()>> tasks;
-    StillImageCallback callback;
+    const std::unique_ptr<util::Thread<MapContext>> context;
+    bool paused = false;
 };
 
 }

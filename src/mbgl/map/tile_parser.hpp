@@ -29,13 +29,12 @@ class StyleLayoutRaster;
 class StyleLayoutLine;
 class StyleLayoutSymbol;
 class VectorTileData;
-class CollisionTile;
 
 class TileParser : private util::noncopyable {
 public:
     TileParser(const GeometryTile& geometryTile,
                VectorTileData& tile,
-               const util::ptr<const Style>& style,
+               const Style& style,
                GlyphAtlas& glyphAtlas,
                GlyphStore& glyphStore,
                SpriteAtlas& spriteAtlas,
@@ -44,6 +43,9 @@ public:
 
 public:
     void parse();
+    inline bool isPartialParse() const {
+        return partialParse;
+    }
 
 private:
     bool obsolete() const;
@@ -60,13 +62,13 @@ private:
     VectorTileData& tile;
 
     // Cross-thread shared data.
-    util::ptr<const Style> style;
+    const Style& style;
     GlyphAtlas& glyphAtlas;
     GlyphStore& glyphStore;
     SpriteAtlas& spriteAtlas;
     util::ptr<Sprite> sprite;
 
-    std::unique_ptr<CollisionTile> collision;
+    bool partialParse;
 };
 
 }

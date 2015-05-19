@@ -65,16 +65,14 @@ public:
     SymbolBucket(CollisionTile &collision);
     ~SymbolBucket() override;
 
-    void render(Painter &painter, const StyleLayer &layer_desc, const TileID &id,
-                const mat4 &matrix) override;
-    bool hasData() const override;
+    void upload() override;
+    void render(Painter&, const StyleLayer&, const TileID&, const mat4&) override;
+    bool hasData() const;
     bool hasTextData() const;
     bool hasIconData() const;
     bool hasCollisionBoxData() const;
 
-    void addFeatures(const GeometryTileLayer&,
-                     const FilterExpression&,
-                     uintptr_t tileUID,
+    void addFeatures(uintptr_t tileUID,
                      SpriteAtlas&,
                      Sprite&,
                      GlyphAtlas&,
@@ -85,11 +83,12 @@ public:
     void drawIcons(IconShader& shader);
     void drawCollisionBoxes(CollisionBoxShader& shader);
 
+    bool needsDependencies(const GeometryTileLayer&,
+                           const FilterExpression&,
+                           GlyphStore&,
+                           Sprite&);
+
 private:
-    std::vector<SymbolFeature> processFeatures(const GeometryTileLayer&,
-                                               const FilterExpression&,
-                                               GlyphStore&,
-                                               const Sprite&);
     void addFeature(const std::vector<std::vector<Coordinate>> &lines,
             const Shaping &shapedText, const PositionedIcon &shapedIcon,
             const GlyphPositions &face);
@@ -108,6 +107,7 @@ public:
 private:
     CollisionTile &collision;
     std::vector<SymbolInstance> symbolInstances;
+    std::vector<SymbolFeature> features;
 
     struct TextBuffer {
         TextVertexBuffer vertices;
@@ -127,6 +127,7 @@ private:
     } collisionBox;
 
 };
+
 }
 
 #endif

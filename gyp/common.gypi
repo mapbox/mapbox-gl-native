@@ -8,11 +8,11 @@
       ['OS=="mac"', {
         'xcode_settings': {
           'CLANG_CXX_LIBRARY': 'libc++',
-          'CLANG_CXX_LANGUAGE_STANDARD': 'c++11',
           'GCC_VERSION': 'com.apple.compilers.llvm.clang.1_0',
           'GCC_ENABLE_CPP_EXCEPTIONS': 'YES',
           'GCC_ENABLE_CPP_RTTI': 'YES',
           'OTHER_CPLUSPLUSFLAGS': [
+            '-std=c++1y',
             '-Werror',
             '-Wall',
             '-Wextra',
@@ -27,14 +27,14 @@
         },
       }, {
         'cflags_cc': [
-          '-std=c++11',
+          '-std=c++14',
           '-Werror',
           '-Wall',
           '-Wextra',
           '-Wshadow',
           '-Wno-variadic-macros',
           '-Wno-error=unused-parameter',
-          '-Wno-unknown-warning-option',
+          '-Wno-c++1y-extensions',
           '-frtti',
           '-fexceptions',
         ],

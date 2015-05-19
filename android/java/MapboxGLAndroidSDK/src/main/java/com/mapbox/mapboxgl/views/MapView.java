@@ -419,7 +419,6 @@ public class MapView extends SurfaceView {
 
         mNativeMapView.initializeDisplay();
         mNativeMapView.initializeContext();
-        mNativeMapView.start();
     }
 
     // Called when we need to save instance state
@@ -441,7 +440,6 @@ public class MapView extends SurfaceView {
     // Called when we need to clean up
     // Must be called from Activity onDestroy
     public void onDestroy() {
-        mNativeMapView.stop();
         mNativeMapView.terminateContext();
         mNativeMapView.terminateDisplay();
     }

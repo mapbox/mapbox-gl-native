@@ -11,11 +11,13 @@
 
 #include <iosfwd>
 #include <memory>
+#include <mutex>
 #include <unordered_map>
 
 namespace mbgl {
 
 class Bucket;
+class CollisionTile;
 class Painter;
 class SourceInfo;
 class StyleLayer;
@@ -32,7 +34,7 @@ class VectorTileData : public TileData {
 public:
     VectorTileData(const TileID&,
                    float mapMaxZoom,
-                   util::ptr<Style>,
+                   Style&,
                    GlyphAtlas&,
                    GlyphStore&,
                    SpriteAtlas&,
@@ -41,8 +43,18 @@ public:
     ~VectorTileData();
 
     void parse() override;
-    void render(Painter &painter, const StyleLayer &layer_desc, const mat4 &matrix) override;
-    bool hasData(StyleLayer const& layer_desc) const override;
+    virtual Bucket* getBucket(StyleLayer const &layer_desc) override;
+
+    size_t countBuckets() const;
+    void setBucket(StyleLayer const &layer_desc, std::unique_ptr<Bucket> bucket);
+
+    void setState(const State& state) override;
+
+    inline CollisionTile* getCollision() const {
+        return collision.get();
+    }
+
+    const float depth;
 
 protected:
     // Holds the actual geometries in this tile.
@@ -52,18 +64,23 @@ protected:
     TriangleElementsBuffer triangleElementsBuffer;
     LineElementsBuffer lineElementsBuffer;
 
-    // Holds the buckets of this tile.
-    // They contain the location offsets in the buffers stored above
-    std::unordered_map<std::string, std::unique_ptr<Bucket>> buckets;
-
     GlyphAtlas& glyphAtlas;
     GlyphStore& glyphStore;
     SpriteAtlas& spriteAtlas;
     util::ptr<Sprite> sprite;
-    util::ptr<Style> style;
+    Style& style;
 
-public:
-    const float depth;
+private:
+    // Contains all the Bucket objects for the tile. Buckets are render
+    // objects and they get added to this std::map<> by the workers doing
+    // the actual tile parsing as they get processed. Tiles partially
+    // parsed can get new buckets at any moment but are also fit for
+    // rendering. That said, access to this list needs locking unless
+    // the tile is completely parsed.
+    std::unordered_map<std::string, std::unique_ptr<Bucket>> buckets;
+    mutable std::mutex bucketsMutex;
+
+    std::unique_ptr<CollisionTile> collision;
 };
 
 }

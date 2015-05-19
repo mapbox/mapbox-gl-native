@@ -1,11 +1,10 @@
 #include "storage.hpp"
 #include "../fixtures/fixture_log_observer.hpp"
 
-#include <mbgl/storage/sqlite_cache.hpp>
+#include "sqlite_cache_impl.hpp"
 #include <mbgl/storage/resource.hpp>
 #include <mbgl/storage/response.hpp>
 #include <mbgl/util/io.hpp>
-#include <mbgl/util/run_loop.hpp>
 
 #include <sqlite3.h>
 
@@ -14,18 +13,10 @@ TEST_F(Storage, DatabaseDoesNotExist) {
 
     Log::setObserver(util::make_unique<FixtureLogObserver>());
 
-    SQLiteCache cache("test/fixtures/404/cache.db");
+    SQLiteCache::Impl cache(nullptr, "test/fixtures/404/cache.db");
 
-    util::RunLoop loop;
-
-    loop.invoke([&] {
-        cache.get({ Resource::Unknown, "mapbox://test" }, [&] (std::unique_ptr<Response> res) {
-            EXPECT_EQ(nullptr, res.get());
-            loop.stop();
-        });
-    });
-
-    loop.run();
+    std::unique_ptr<Response> res = cache.get({ Resource::Unknown, "mapbox://test" });
+    EXPECT_EQ(nullptr, res.get());
 
     auto observer = Log::removeObserver();
     EXPECT_EQ(1ul, dynamic_cast<FixtureLogObserver*>(observer.get())->count({ EventSeverity::Error, Event::Database, 14, "unable to open database file" }));
@@ -63,18 +54,10 @@ TEST_F(Storage, DatabaseCreate) {
 
     Log::setObserver(util::make_unique<FixtureLogObserver>());
 
-    SQLiteCache cache("test/fixtures/database/cache.db");
+    SQLiteCache::Impl cache(nullptr, "test/fixtures/database/cache.db");
 
-    util::RunLoop loop;
-
-    loop.invoke([&] {
-        cache.get({ Resource::Unknown, "mapbox://test" }, [&] (std::unique_ptr<Response> res) {
-            EXPECT_EQ(nullptr, res.get());
-            loop.stop();
-        });
-    });
-
-    loop.run();
+    std::unique_ptr<Response> res = cache.get({ Resource::Unknown, "mapbox://test" });
+    EXPECT_EQ(nullptr, res.get());
 
     Log::removeObserver();
 }
@@ -126,23 +109,14 @@ TEST_F(Storage, DatabaseLockedRead) {
     deleteFile("test/fixtures/database/locked.db");
     FileLock guard("test/fixtures/database/locked.db");
 
-
-    SQLiteCache cache("test/fixtures/database/locked.db");
+    SQLiteCache::Impl cache(nullptr, "test/fixtures/database/locked.db");
 
     {
         // First request should fail.
         Log::setObserver(util::make_unique<FixtureLogObserver>());
 
-        util::RunLoop loop;
-
-        loop.invoke([&] {
-            cache.get({ Resource::Unknown, "mapbox://test" }, [&] (std::unique_ptr<Response> res) {
-                EXPECT_EQ(nullptr, res.get());
-                loop.stop();
-            });
-        });
-
-        loop.run();
+        std::unique_ptr<Response> res = cache.get({ Resource::Unknown, "mapbox://test" });
+        EXPECT_EQ(nullptr, res.get());
 
         // Make sure that we got a few "database locked" errors
         auto observer = Log::removeObserver();
@@ -157,16 +131,8 @@ TEST_F(Storage, DatabaseLockedRead) {
         // First, try getting a file (the cache value should not exist).
         Log::setObserver(util::make_unique<FixtureLogObserver>());
 
-        util::RunLoop loop;
-
-        loop.invoke([&] {
-            cache.get({ Resource::Unknown, "mapbox://test" }, [&] (std::unique_ptr<Response> res) {
-                EXPECT_EQ(nullptr, res.get());
-                loop.stop();
-            });
-        });
-
-        loop.run();
+        std::unique_ptr<Response> res = cache.get({ Resource::Unknown, "mapbox://test" });
+        EXPECT_EQ(nullptr, res.get());
 
         // Make sure that we got a no errors
         Log::removeObserver();
@@ -183,24 +149,16 @@ TEST_F(Storage, DatabaseLockedWrite) {
     deleteFile("test/fixtures/database/locked.db");
     FileLock guard("test/fixtures/database/locked.db");
 
-    SQLiteCache cache("test/fixtures/database/locked.db");
+    SQLiteCache::Impl cache(nullptr, "test/fixtures/database/locked.db");
 
     {
         // Adds a file (which should fail).
         Log::setObserver(util::make_unique<FixtureLogObserver>());
 
-        util::RunLoop loop;
-
-        loop.invoke([&] {
-            auto response = std::make_shared<Response>();
-            cache.put({ Resource::Unknown, "mapbox://test" }, response, FileCache::Hint::Full);
-            cache.get({ Resource::Unknown, "mapbox://test" }, [&] (std::unique_ptr<Response> res) {
-                EXPECT_EQ(nullptr, res.get());
-                loop.stop();
-            });
-        });
-
-        loop.run();
+        auto response = std::make_shared<Response>();
+        cache.put({ Resource::Unknown, "mapbox://test" }, response);
+        std::unique_ptr<Response> res = cache.get({ Resource::Unknown, "mapbox://test" });
+        EXPECT_EQ(nullptr, res.get());
 
         auto observer = Log::removeObserver();
         auto flo = dynamic_cast<FixtureLogObserver*>(observer.get());
@@ -214,20 +172,12 @@ TEST_F(Storage, DatabaseLockedWrite) {
         // Then, set a file and obtain it again.
         Log::setObserver(util::make_unique<FixtureLogObserver>());
 
-        util::RunLoop loop;
-
-        loop.invoke([&] {
-            auto response = std::make_shared<Response>();
-            response->data = "Demo";
-            cache.put({ Resource::Unknown, "mapbox://test" }, response, FileCache::Hint::Full);
-            cache.get({ Resource::Unknown, "mapbox://test" }, [&] (std::unique_ptr<Response> res) {
-                EXPECT_NE(nullptr, res.get());
-                EXPECT_EQ("Demo", res->data);
-                loop.stop();
-            });
-        });
-
-        loop.run();
+        auto response = std::make_shared<Response>();
+        response->data = "Demo";
+        cache.put({ Resource::Unknown, "mapbox://test" }, response);
+        std::unique_ptr<Response> res = cache.get({ Resource::Unknown, "mapbox://test" });
+        EXPECT_NE(nullptr, res.get());
+        EXPECT_EQ("Demo", res->data);
 
         // Make sure that we got a no errors
         Log::removeObserver();
@@ -244,7 +194,7 @@ TEST_F(Storage, DatabaseLockedRefresh) {
     createDir("test/fixtures/database");
     deleteFile("test/fixtures/database/locked.db");
 
-    SQLiteCache cache("test/fixtures/database/locked.db");
+    SQLiteCache::Impl cache(nullptr, "test/fixtures/database/locked.db");
 
     // Then, lock the file and try again.
     FileLock guard("test/fixtures/database/locked.db");
@@ -253,19 +203,11 @@ TEST_F(Storage, DatabaseLockedRefresh) {
         // Adds a file.
         Log::setObserver(util::make_unique<FixtureLogObserver>());
 
-        util::RunLoop loop;
-
-        loop.invoke([&] {
-            auto response = std::make_shared<Response>();
-            response->data = "Demo";
-            cache.put({ Resource::Unknown, "mapbox://test" }, response, FileCache::Hint::Full);
-            cache.get({ Resource::Unknown, "mapbox://test" }, [&] (std::unique_ptr<Response> res) {
-                EXPECT_EQ(nullptr, res.get());
-                loop.stop();
-            });
-        });
-
-        loop.run();
+        auto response = std::make_shared<Response>();
+        response->data = "Demo";
+        cache.put({ Resource::Unknown, "mapbox://test" }, response);
+        std::unique_ptr<Response> res = cache.get({ Resource::Unknown, "mapbox://test" });
+        EXPECT_EQ(nullptr, res.get());
 
         auto observer = Log::removeObserver();
         auto flo = dynamic_cast<FixtureLogObserver*>(observer.get());
@@ -276,19 +218,11 @@ TEST_F(Storage, DatabaseLockedRefresh) {
         // Then, try to refresh it.
         Log::setObserver(util::make_unique<FixtureLogObserver>());
 
-        util::RunLoop loop;
-
-        loop.invoke([&] {
-            auto response = std::make_shared<Response>();
-            response->data = "Demo";
-            cache.put({ Resource::Unknown, "mapbox://test" }, response, FileCache::Hint::Refresh);
-            cache.get({ Resource::Unknown, "mapbox://test" }, [&] (std::unique_ptr<Response> res) {
-                EXPECT_EQ(nullptr, res.get());
-                loop.stop();
-            });
-        });
-
-        loop.run();
+        auto response = std::make_shared<Response>();
+        response->data = "Demo";
+        cache.refresh({ Resource::Unknown, "mapbox://test" }, response->expires);
+        std::unique_ptr<Response> res = cache.get({ Resource::Unknown, "mapbox://test" });
+        EXPECT_EQ(nullptr, res.get());
 
         // Make sure that we got the right errors.
         auto observer = Log::removeObserver();
@@ -306,26 +240,18 @@ TEST_F(Storage, DatabaseDeleted) {
     createDir("test/fixtures/database");
     deleteFile("test/fixtures/database/locked.db");
 
-    SQLiteCache cache("test/fixtures/database/locked.db");
+    SQLiteCache::Impl cache(nullptr, "test/fixtures/database/locked.db");
 
     {
         // Adds a file.
         Log::setObserver(util::make_unique<FixtureLogObserver>());
 
-        util::RunLoop loop;
-
-        loop.invoke([&] {
-            auto response = std::make_shared<Response>();
-            response->data = "Demo";
-            cache.put({ Resource::Unknown, "mapbox://test" }, response, FileCache::Hint::Full);
-            cache.get({ Resource::Unknown, "mapbox://test" }, [&] (std::unique_ptr<Response> res) {
-                EXPECT_NE(nullptr, res.get());
-                EXPECT_EQ("Demo", res->data);
-                loop.stop();
-            });
-        });
-
-        loop.run();
+        auto response = std::make_shared<Response>();
+        response->data = "Demo";
+        cache.put({ Resource::Unknown, "mapbox://test" }, response);
+        std::unique_ptr<Response> res = cache.get({ Resource::Unknown, "mapbox://test" });
+        EXPECT_NE(nullptr, res.get());
+        EXPECT_EQ("Demo", res->data);
 
         Log::removeObserver();
     }
@@ -336,20 +262,12 @@ TEST_F(Storage, DatabaseDeleted) {
         // Adds a file.
         Log::setObserver(util::make_unique<FixtureLogObserver>());
 
-        util::RunLoop loop;
-
-        loop.invoke([&] {
-            auto response = std::make_shared<Response>();
-            response->data = "Demo";
-            cache.put({ Resource::Unknown, "mapbox://test" }, response, FileCache::Hint::Full);
-            cache.get({ Resource::Unknown, "mapbox://test" }, [&] (std::unique_ptr<Response> res) {
-                EXPECT_NE(nullptr, res.get());
-                EXPECT_EQ("Demo", res->data);
-                loop.stop();
-            });
-        });
-
-        loop.run();
+        auto response = std::make_shared<Response>();
+        response->data = "Demo";
+        cache.put({ Resource::Unknown, "mapbox://test" }, response);
+        std::unique_ptr<Response> res = cache.get({ Resource::Unknown, "mapbox://test" });
+        EXPECT_NE(nullptr, res.get());
+        EXPECT_EQ("Demo", res->data);
 
         auto observer = Log::removeObserver();
         auto flo = dynamic_cast<FixtureLogObserver*>(observer.get());
@@ -367,26 +285,18 @@ TEST_F(Storage, DatabaseInvalid) {
     deleteFile("test/fixtures/database/invalid.db");
     writeFile("test/fixtures/database/invalid.db", "this is an invalid file");
 
-    SQLiteCache cache("test/fixtures/database/invalid.db");
+    SQLiteCache::Impl cache(nullptr, "test/fixtures/database/invalid.db");
 
     {
         // Adds a file.
         Log::setObserver(util::make_unique<FixtureLogObserver>());
 
-        util::RunLoop loop;
-
-        loop.invoke([&] {
-            auto response = std::make_shared<Response>();
-            response->data = "Demo";
-            cache.put({ Resource::Unknown, "mapbox://test" }, response, FileCache::Hint::Full);
-            cache.get({ Resource::Unknown, "mapbox://test" }, [&] (std::unique_ptr<Response> res) {
-                EXPECT_NE(nullptr, res.get());
-                EXPECT_EQ("Demo", res->data);
-                loop.stop();
-            });
-        });
-
-        loop.run();
+        auto response = std::make_shared<Response>();
+        response->data = "Demo";
+        cache.put({ Resource::Unknown, "mapbox://test" }, response);
+        std::unique_ptr<Response> res = cache.get({ Resource::Unknown, "mapbox://test" });
+        EXPECT_NE(nullptr, res.get());
+        EXPECT_EQ("Demo", res->data);
 
         auto observer = Log::removeObserver();
         auto flo = dynamic_cast<FixtureLogObserver*>(observer.get());

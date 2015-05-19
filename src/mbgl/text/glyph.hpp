@@ -35,7 +35,7 @@ struct Glyph {
         : rect(rect_), metrics(metrics_) {}
 
     operator bool() const {
-        return metrics || rect;
+        return metrics || rect.hasArea();
     }
 
     const Rect<uint16_t> rect;

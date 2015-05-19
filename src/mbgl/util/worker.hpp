@@ -2,41 +2,38 @@
 #define MBGL_UTIL_WORKER
 
 #include <mbgl/util/noncopyable.hpp>
-#include <mbgl/util/async_queue.hpp>
-#include <mbgl/util/channel.hpp>
-#include <mbgl/util/util.hpp>
+#include <mbgl/util/thread.hpp>
 
-#include <thread>
 #include <functional>
+#include <memory>
 
 namespace mbgl {
+
+class WorkRequest;
 
 class Worker : public mbgl::util::noncopyable {
 public:
     using Fn = std::function<void ()>;
 
-    Worker(uv_loop_t* loop, std::size_t count);
+    Worker(std::size_t count);
     ~Worker();
 
-    void send(Fn work, Fn after);
+    // Request work be done on a thread pool. The optional after callback is
+    // executed on the invoking thread, which must have a run loop, after the
+    // work is complete.
+    //
+    // The return value represents the request to perform the work asynchronously.
+    // Its destructor guarantees that the work function has finished executing, and
+    // that the after function has either finished executing or will not execute.
+    // Together, this means that an object may make a work request with lambdas which
+    // bind references to itself, and if and when those lambdas execute, the references
+    // will still be valid.
+    std::unique_ptr<WorkRequest> send(Fn work, Fn after);
 
 private:
-    void workLoop();
-    void afterWork(Fn after);
-
-    struct Work {
-        Fn work;
-        Fn after;
-    };
-
-    using Queue = util::AsyncQueue<std::function<void ()>>;
-
-    std::size_t active = 0;
-    Queue* queue = nullptr;
-    Channel<Work> channel;
-    std::vector<std::thread> threads;
-
-    MBGL_STORE_THREAD(tid)
+    class Impl;
+    std::vector<std::unique_ptr<util::Thread<Impl>>> threads;
+    std::size_t current = 0;
 };
 
 }

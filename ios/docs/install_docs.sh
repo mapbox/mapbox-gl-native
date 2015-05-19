@@ -1,18 +1,28 @@
-#!/bin/sh
+#!/usr/bin/env bash
 
 if [ -z `which appledoc` ]; then
     echo "Unable to find appledoc. Consider installing it from source or Homebrew."
     exit 1
 fi
 
-VERSION=$( git tag | grep ^[0-9] | sort -r | sed -n '1p' )
-echo "Creating new docs for $VERSION..."
+OUTPUT="/tmp/`uuidgen`"
+
+VERSION=$( git tag -l ios\* --sort -v:refname | sed -n '1p' | sed 's/ios-v//' )
+echo "Creating new docs for ${VERSION}..."
 echo
 
+README="/tmp/GL-README.md"
+cat ../README.md > ${README}
+echo >> ${README}
+echo -n "#" >> ${README}
+cat ../../CHANGELOG.md >> ${README}
+
 appledoc \
-    --output /tmp/`uuidgen` \
-    --project-name "Mapbox GL $VERSION" \
+    --output ${OUTPUT} \
+    --project-name "Mapbox GL for iOS ${VERSION}" \
     --project-company Mapbox \
     --create-docset \
     --company-id com.mapbox \
+    --ignore ../../include/mbgl/ios/private \
+    --index-desc ${README} \
     ../../include/mbgl/ios

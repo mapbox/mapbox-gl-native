@@ -1,4 +1,3 @@
-#include <mbgl/map/map.hpp>
 #include <mbgl/map/raster_tile_data.hpp>
 #include <mbgl/style/style.hpp>
 
@@ -10,24 +9,23 @@ RasterTileData::RasterTileData(const TileID& id_, TexturePool &texturePool,
 }
 
 RasterTileData::~RasterTileData() {
+    // Cancel in most derived class destructor so that worker tasks are joined before
+    // any member data goes away.
+    cancel();
 }
 
 void RasterTileData::parse() {
-    if (state != State::loaded) {
+    if (getState() != State::loaded) {
         return;
     }
 
     if (bucket.setImage(data)) {
-        state = State::parsed;
+        setState(State::parsed);
     } else {
-        state = State::invalid;
+        setState(State::invalid);
     }
 }
 
-void RasterTileData::render(Painter &painter, const StyleLayer &layer_desc, const mat4 &matrix) {
-    bucket.render(painter, layer_desc, id, matrix);
-}
-
-bool RasterTileData::hasData(StyleLayer const& /*layer_desc*/) const {
-    return bucket.hasData();
+Bucket* RasterTileData::getBucket(StyleLayer const&) {
+    return &bucket;
 }

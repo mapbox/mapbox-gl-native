@@ -1,5 +1,6 @@
 #include <cstdlib>
 #include <ctime>
+#include <cassert>
 #include <memory>
 #include <list>
 #include <tuple>
@@ -15,9 +16,6 @@
 #include <mbgl/platform/log.hpp>
 #include <mbgl/platform/gl.hpp>
 #include <mbgl/util/std.hpp>
-
-
-pthread_once_t loadGLExtensions = PTHREAD_ONCE_INIT;
 
 namespace mbgl {
 namespace android {
@@ -59,8 +57,10 @@ NativeMapView::NativeMapView(JNIEnv *env, jobject obj_)
     : mbgl::View(*this),
       fileCache(mbgl::android::cachePath + "/mbgl-cache.db"),
       fileSource(&fileCache),
-      map(*this, fileSource) {
+      map(*this, fileSource, MapMode::Continuous) {
     mbgl::Log::Debug(mbgl::Event::Android, "NativeMapView::NativeMapView");
+
+    map.pause();
 
     assert(env != nullptr);
     assert(obj_ != nullptr);
@@ -114,18 +114,22 @@ void NativeMapView::activate() {
 
 void NativeMapView::deactivate() {
     mbgl::Log::Debug(mbgl::Event::Android, "NativeMapView::deactivate");
-    if (!eglMakeCurrent(display, EGL_NO_SURFACE, EGL_NO_SURFACE, EGL_NO_CONTEXT)) {
-        mbgl::Log::Error(mbgl::Event::OpenGL, "eglMakeCurrent(EGL_NO_CONTEXT) returned error %d",
-                         eglGetError());
-        throw new std::runtime_error("eglMakeCurrent() failed");
+    if (display != EGL_NO_DISPLAY) {
+        if (!eglMakeCurrent(display, EGL_NO_SURFACE, EGL_NO_SURFACE, EGL_NO_CONTEXT)) {
+            mbgl::Log::Error(mbgl::Event::OpenGL, "eglMakeCurrent(EGL_NO_CONTEXT) returned error %d",
+                             eglGetError());
+            throw new std::runtime_error("eglMakeCurrent() failed");
+        }
+    } else {
+        mbgl::Log::Info(mbgl::Event::Android, "Not deactivating as we are not ready");
     }
 }
 
-void NativeMapView::invalidate() {
+void NativeMapView::invalidate(std::function<void()> render) {
     mbgl::Log::Debug(mbgl::Event::Android, "NativeMapView::invalidate");
 
     if ((display != EGL_NO_DISPLAY) && (surface != EGL_NO_SURFACE)) {
-        map.render();
+        render();
 
         if (!eglSwapBuffers(display, surface)) {
             mbgl::Log::Error(mbgl::Event::OpenGL, "eglSwapBuffers() returned error %d",
@@ -300,8 +304,6 @@ void NativeMapView::terminateContext() {
     context = EGL_NO_CONTEXT;
 }
 
-void loadExtensions();
-
 void NativeMapView::createSurface(ANativeWindow *window_) {
     mbgl::Log::Debug(mbgl::Event::Android, "NativeMapView::createSurface");
 
@@ -341,9 +343,11 @@ void NativeMapView::createSurface(ANativeWindow *window_) {
                         "SL Version"); // In the emulator this returns NULL with error code 0?
                                         // https://code.google.com/p/android/issues/detail?id=78977
         }
-        log_gl_string(GL_EXTENSIONS, "Extensions");
 
-        pthread_once(&loadGLExtensions, loadExtensions);
+        log_gl_string(GL_EXTENSIONS, "Extensions");
+        mbgl::gl::InitializeExtensions([] (const char * name) {
+             return reinterpret_cast<mbgl::gl::glProc>(eglGetProcAddress(name));
+        });
 
         if (!eglMakeCurrent(display, EGL_NO_SURFACE, EGL_NO_SURFACE, EGL_NO_CONTEXT)) {
             mbgl::Log::Error(mbgl::Event::OpenGL,
@@ -358,7 +362,7 @@ void NativeMapView::createSurface(ANativeWindow *window_) {
 void NativeMapView::destroySurface() {
     mbgl::Log::Debug(mbgl::Event::Android, "NativeMapView::destroySurface");
 
-    pause(true);
+    pause();
 
     if (surface != EGL_NO_SURFACE) {
         if (!eglDestroySurface(display, surface)) {
@@ -576,133 +580,11 @@ EGLConfig NativeMapView::chooseConfig(const EGLConfig configs[], EGLint numConfi
     return configId;
 }
 
-void NativeMapView::start() {
-    mbgl::Log::Debug(mbgl::Event::Android, "NativeMapView::start");
-
-    if (display == EGL_NO_DISPLAY) {
-        initializeDisplay();
-    }
-
-    if (context == EGL_NO_CONTEXT) {
-        initializeContext();
-    }
-
-    assert(display != EGL_NO_DISPLAY);
-    assert(context != EGL_NO_CONTEXT);
-
-    map.start(true);
-}
-
-void loadExtensions() {
-    const GLubyte *str = glGetString(GL_EXTENSIONS);
-    if (str == nullptr) {
-        mbgl::Log::Error(mbgl::Event::OpenGL, "glGetString(GL_EXTENSIONS) returned error %d",
-                         glGetError());
-        return;
-    }
-
-    std::string extensions(reinterpret_cast<const char *>(str));
-
-    if (extensions.find("GL_OES_vertex_array_object") != std::string::npos) {
-        mbgl::Log::Info(mbgl::Event::OpenGL, "Using GL_OES_vertex_array_object.");
-        gl::BindVertexArray = reinterpret_cast<gl::PFNGLBINDVERTEXARRAYPROC>(
-            eglGetProcAddress("glBindVertexArrayOES"));
-        gl::DeleteVertexArrays = reinterpret_cast<gl::PFNGLDELETEVERTEXARRAYSPROC>(
-            eglGetProcAddress("glDeleteVertexArraysOES"));
-        gl::GenVertexArrays = reinterpret_cast<gl::PFNGLGENVERTEXARRAYSPROC>(
-            eglGetProcAddress("glGenVertexArraysOES"));
-        gl::IsVertexArray =
-            reinterpret_cast<gl::PFNGLISVERTEXARRAYPROC>(eglGetProcAddress("glIsVertexArrayOES"));
-        assert(gl::BindVertexArray != nullptr);
-        assert(gl::DeleteVertexArrays != nullptr);
-        assert(gl::GenVertexArrays != nullptr);
-        assert(gl::IsVertexArray != nullptr);
-    }
-
-    if (extensions.find("GL_OES_packed_depth_stencil") != std::string::npos) {
-        mbgl::Log::Info(mbgl::Event::OpenGL, "Using GL_OES_packed_depth_stencil.");
-        gl::isPackedDepthStencilSupported = true;
-    }
-
-    if (extensions.find("GL_OES_depth24") != std::string::npos) {
-        gl::isDepth24Supported = true;
-    }
-
-    if (extensions.find("GL_KHR_debug") != std::string::npos) {
-        mbgl::Log::Info(mbgl::Event::OpenGL, "Using GL_KHR_debug.");
-        gl::DebugMessageControl = reinterpret_cast<gl::PFNGLDEBUGMESSAGECONTROLPROC>(
-            eglGetProcAddress("glDebugMessageControl"));
-        gl::DebugMessageInsert = reinterpret_cast<gl::PFNGLDEBUGMESSAGEINSERTPROC>(
-            eglGetProcAddress("glDebugMessageInsert"));
-        gl::DebugMessageCallback = reinterpret_cast<gl::PFNGLDEBUGMESSAGECALLBACKPROC>(
-            eglGetProcAddress("glDebugMessageCallback"));
-        gl::GetDebugMessageLog = reinterpret_cast<gl::PFNGLGETDEBUGMESSAGELOGPROC>(
-            eglGetProcAddress("glGetDebugMessageLog"));
-        gl::GetPointerv =
-            reinterpret_cast<gl::PFNGLGETPOINTERVPROC>(eglGetProcAddress("glGetPointerv"));
-        gl::PushDebugGroup =
-            reinterpret_cast<gl::PFNGLPUSHDEBUGGROUPPROC>(eglGetProcAddress("glPushDebugGroup"));
-        gl::PopDebugGroup =
-            reinterpret_cast<gl::PFNGLPOPDEBUGGROUPPROC>(eglGetProcAddress("glPopDebugGroup"));
-        gl::ObjectLabel =
-            reinterpret_cast<gl::PFNGLOBJECTLABELPROC>(eglGetProcAddress("glObjectLabel"));
-        gl::GetObjectLabel =
-            reinterpret_cast<gl::PFNGLGETOBJECTLABELPROC>(eglGetProcAddress("glGetObjectLabel"));
-        gl::ObjectPtrLabel =
-            reinterpret_cast<gl::PFNGLOBJECTPTRLABELPROC>(eglGetProcAddress("glObjectPtrLabel"));
-        gl::GetObjectPtrLabel = reinterpret_cast<gl::PFNGLGETOBJECTPTRLABELPROC>(
-            eglGetProcAddress("glGetObjectPtrLabel"));
-        assert(gl::DebugMessageControl != nullptr);
-        assert(gl::DebugMessageInsert != nullptr);
-        assert(gl::DebugMessageCallback != nullptr);
-        assert(gl::GetDebugMessageLog != nullptr);
-        assert(gl::GetPointerv != nullptr);
-        assert(gl::PushDebugGroup != nullptr);
-        assert(gl::PopDebugGroup != nullptr);
-        assert(gl::ObjectLabel != nullptr);
-        assert(gl::GetObjectLabel != nullptr);
-        assert(gl::ObjectPtrLabel != nullptr);
-        assert(gl::GetObjectPtrLabel != nullptr);
-    } else {
-        if (extensions.find("GL_EXT_debug_marker") != std::string::npos) {
-            mbgl::Log::Info(mbgl::Event::OpenGL, "Using GL_EXT_debug_marker.");
-            gl::InsertEventMarkerEXT = reinterpret_cast<gl::PFNGLINSERTEVENTMARKEREXTPROC>(
-                eglGetProcAddress("glInsertEventMarkerEXT"));
-            gl::PushGroupMarkerEXT = reinterpret_cast<gl::PFNGLPUSHGROUPMARKEREXTPROC>(
-                eglGetProcAddress("glPushGroupMarkerEXT"));
-            gl::PopGroupMarkerEXT = reinterpret_cast<gl::PFNGLPOPGROUPMARKEREXTPROC>(
-                eglGetProcAddress("glPopGroupMarkerEXT"));
-            assert(gl::InsertEventMarkerEXT != nullptr);
-            assert(gl::PushGroupMarkerEXT != nullptr);
-            assert(gl::PopGroupMarkerEXT != nullptr);
-        }
-
-        if (extensions.find("GL_EXT_debug_label") != std::string::npos) {
-            mbgl::Log::Info(mbgl::Event::OpenGL, "Using GL_EXT_debug_label.");
-            gl::LabelObjectEXT = reinterpret_cast<gl::PFNGLLABELOBJECTEXTPROC>(
-                eglGetProcAddress("glLabelObjectEXT"));
-            gl::GetObjectLabelEXT = reinterpret_cast<gl::PFNGLGETOBJECTLABELEXTPROC>(
-                eglGetProcAddress("glGetObjectLabelEXT"));
-            assert(gl::LabelObjectEXT != nullptr);
-            assert(gl::GetObjectLabelEXT != nullptr);
-        }
-    }
-}
-
-void NativeMapView::stop() {
-    mbgl::Log::Debug(mbgl::Event::Android, "NativeMapView::stop");
+void NativeMapView::pause() {
+    mbgl::Log::Debug(mbgl::Event::Android, "NativeMapView::pause");
 
     if ((display != EGL_NO_DISPLAY) && (context != EGL_NO_CONTEXT)) {
-        map.stop();
-    }
-}
-
-void NativeMapView::pause(bool waitForPause) {
-    mbgl::Log::Debug(mbgl::Event::Android, "NativeMapView::pause %s",
-                     (waitForPause) ? "true" : "false");
-
-    if ((display != EGL_NO_DISPLAY) && (context != EGL_NO_CONTEXT)) {
-        map.pause(waitForPause);
+        map.pause();
     }
 }
 
@@ -822,10 +704,6 @@ void NativeMapView::updateFps() {
         }
     }
     env = nullptr;
-}
-
-void NativeMapView::resize(uint16_t width, uint16_t height, float ratio, uint16_t fbWidth, uint16_t fbHeight) {
-    View::resize(width, height, ratio, fbWidth, fbHeight);
 }
 
 }

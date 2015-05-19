@@ -2,6 +2,7 @@
 #define MBGL_MAP_VIEW
 
 #include <mbgl/util/chrono.hpp>
+#include <functional>
 
 #include <memory>
 
@@ -39,13 +40,13 @@ public:
 
     virtual void notify() = 0;
 
-    // Called from the render thread. The implementation must trigger a rerender.
-    // (i.e. map->renderSync() or map->renderAsync() must be called as a result of this)
-    virtual void invalidate() = 0;
+    // Called from the render thread. The implementation should resize the framebuffer.
+    virtual void resize(uint16_t width, uint16_t height, float pixelRatio);
 
-    // Called from the render (=GL) thread. Signals that the contents of the contents
-    // may be discarded. The default is a no-op.
-    virtual void discard();
+    // Called from the render thread. The implementation must trigger a rerender.
+    // (i.e. either the passed render() function for rendering immediately on the map thread,
+    // or map->renderSync() from the main thread must be called as a result of this)
+    virtual void invalidate(std::function<void()> render) = 0;
 
     // Reads the pixel data from the current framebuffer. If your View implementation
     // doesn't support reading from the framebuffer, return a null pointer.
@@ -57,10 +58,6 @@ public:
     virtual void notifyMapChange(
         MapChange change,
         Duration delay = Duration::zero());
-
-protected:
-    // Resizes the view
-    void resize(uint16_t width, uint16_t height, float ratio, uint16_t fbWidth, uint16_t fbHeight);
 
 protected:
     mbgl::Map *map = nullptr;

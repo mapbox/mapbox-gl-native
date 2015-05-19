@@ -13,26 +13,8 @@
 #include <cstring>
 #include <cassert>
 
-pthread_once_t loadGLExtensions = PTHREAD_ONCE_INIT;
-
 #ifdef MBGL_USE_CGL
 #include <CoreFoundation/CoreFoundation.h>
-
-typedef void (* CGLProc)(void);
-CGLProc CGLGetProcAddress(const char *proc) {
-    static CFBundleRef framework = nullptr;
-    if (!framework) {
-        framework = CFBundleGetBundleWithIdentifier(CFSTR("com.apple.opengl"));
-        if (!framework) {
-            throw std::runtime_error("Failed to load OpenGL framework.");
-        }
-    }
-
-    CFStringRef name = CFStringCreateWithCString(kCFAllocatorDefault, proc, kCFStringEncodingASCII);
-    CGLProc symbol = reinterpret_cast<CGLProc>(CFBundleGetFunctionPointerForName(framework, name));
-    CFRelease(name);
-    return symbol;
-}
 #elif MBGL_USE_GLX
 #include <GL/glx.h>
 #endif
@@ -41,7 +23,9 @@ namespace mbgl {
 
 HeadlessView::HeadlessView(uint16_t width, uint16_t height, float pixelRatio)
     : display(std::make_shared<HeadlessDisplay>()) {
+    activate();
     resize(width, height, pixelRatio);
+    deactivate();
 }
 
 HeadlessView::HeadlessView(std::shared_ptr<HeadlessDisplay> display_,
@@ -49,7 +33,9 @@ HeadlessView::HeadlessView(std::shared_ptr<HeadlessDisplay> display_,
                            uint16_t height,
                            float pixelRatio)
     : display(display_) {
+    activate();
     resize(width, height, pixelRatio);
+    deactivate();
 }
 
 void HeadlessView::loadExtensions() {
@@ -57,43 +43,26 @@ void HeadlessView::loadExtensions() {
         return;
     }
 
-    pthread_once(&loadGLExtensions, [] {
-        const char *extensionPtr = reinterpret_cast<const char *>(MBGL_CHECK_ERROR(glGetString(GL_EXTENSIONS)));
-
-        if (!extensionPtr) {
-            return;
-        }
-        const std::string extensions = extensionPtr;
-
 #ifdef MBGL_USE_CGL
-        if (extensions.find("GL_APPLE_vertex_array_object") != std::string::npos) {
-            gl::BindVertexArray = reinterpret_cast<gl::PFNGLBINDVERTEXARRAYPROC>(CGLGetProcAddress("glBindVertexArrayAPPLE"));
-            gl::DeleteVertexArrays = reinterpret_cast<gl::PFNGLDELETEVERTEXARRAYSPROC>(CGLGetProcAddress("glDeleteVertexArraysAPPLE"));
-            gl::GenVertexArrays = reinterpret_cast<gl::PFNGLGENVERTEXARRAYSPROC>(CGLGetProcAddress("glGenVertexArraysAPPLE"));
-            gl::IsVertexArray = reinterpret_cast<gl::PFNGLISVERTEXARRAYPROC>(CGLGetProcAddress("glIsVertexArrayAPPLE"));
-            assert(gl::BindVertexArray != nullptr);
-            assert(gl::DeleteVertexArrays != nullptr);
-            assert(gl::GenVertexArrays != nullptr);
-            assert(gl::IsVertexArray != nullptr);
+    gl::InitializeExtensions([](const char * name) {
+        static CFBundleRef framework = CFBundleGetBundleWithIdentifier(CFSTR("com.apple.opengl"));
+        if (!framework) {
+            throw std::runtime_error("Failed to load OpenGL framework.");
         }
-#endif
-#ifdef MBGL_USE_GLX
-        if (extensions.find("GL_ARB_vertex_array_object") != std::string::npos) {
-            gl::BindVertexArray = reinterpret_cast<gl::PFNGLBINDVERTEXARRAYPROC>(glXGetProcAddress((const GLubyte *)"glBindVertexArray"));
-            gl::DeleteVertexArrays = reinterpret_cast<gl::PFNGLDELETEVERTEXARRAYSPROC>(glXGetProcAddress((const GLubyte *)"glDeleteVertexArrays"));
-            gl::GenVertexArrays = reinterpret_cast<gl::PFNGLGENVERTEXARRAYSPROC>(glXGetProcAddress((const GLubyte *)"glGenVertexArrays"));
-            gl::IsVertexArray = reinterpret_cast<gl::PFNGLISVERTEXARRAYPROC>(glXGetProcAddress((const GLubyte *)"glIsVertexArray"));
-            assert(gl::BindVertexArray != nullptr);
-            assert(gl::DeleteVertexArrays != nullptr);
-            assert(gl::GenVertexArrays != nullptr);
-            assert(gl::IsVertexArray != nullptr);
-        }
-#endif
-    });
 
-    // HeadlessView requires packed depth stencil
-    gl::isPackedDepthStencilSupported = true;
-    gl::isDepth24Supported = true;
+        CFStringRef str = CFStringCreateWithCString(kCFAllocatorDefault, name, kCFStringEncodingASCII);
+        void* symbol = CFBundleGetFunctionPointerForName(framework, str);
+        CFRelease(str);
+
+        return reinterpret_cast<gl::glProc>(symbol);
+    });
+#endif
+
+#ifdef MBGL_USE_GLX
+    gl::InitializeExtensions([](const char * name) {
+        return glXGetProcAddress(reinterpret_cast<const GLubyte *>(name));
+    });
+#endif
 
     extensionsLoaded = true;
 }
@@ -150,30 +119,17 @@ bool HeadlessView::isActive() {
     return std::this_thread::get_id() == thread;
 }
 
-void HeadlessView::resize(const uint16_t width, const uint16_t height, const float pixelRatio) {
-    std::lock_guard<std::mutex> lock(prospectiveMutex);
-    prospective = { width, height, pixelRatio };
-}
-
 HeadlessView::Dimensions::Dimensions(uint16_t width_, uint16_t height_, float pixelRatio_)
     : width(width_), height(height_), pixelRatio(pixelRatio_) {
 }
 
-void HeadlessView::discard() {
-    assert(isActive());
-
-    { // Obtain the new values.
-        std::lock_guard<std::mutex> lock(prospectiveMutex);
-        if (current.pixelWidth() == prospective.pixelWidth() && current.pixelHeight() == prospective.pixelHeight()) {
-            return;
-        }
-        current = prospective;
-    }
+void HeadlessView::resize(const uint16_t width, const uint16_t height, const float pixelRatio) {
+    dimensions = { width, height, pixelRatio };
 
     clearBuffers();
 
-    const unsigned int w = current.width * current.pixelRatio;
-    const unsigned int h = current.height * current.pixelRatio;
+    const unsigned int w = dimensions.width * dimensions.pixelRatio;
+    const unsigned int h = dimensions.height * dimensions.pixelRatio;
 
     // Create depth/stencil buffer
     MBGL_CHECK_ERROR(glGenRenderbuffersEXT(1, &fboDepthStencil));
@@ -208,15 +164,13 @@ void HeadlessView::discard() {
         }
         throw std::runtime_error(error.str());
     }
-
-    View::resize(current.width, current.height, current.pixelRatio, w, h);
 }
 
 std::unique_ptr<StillImage> HeadlessView::readStillImage() {
     assert(isActive());
 
-    const unsigned int w = current.pixelWidth();
-    const unsigned int h = current.pixelHeight();
+    const unsigned int w = dimensions.pixelWidth();
+    const unsigned int h = dimensions.pixelHeight();
 
     auto image = util::make_unique<StillImage>();
     image->width = w;
@@ -305,7 +259,6 @@ void HeadlessView::activate() {
 #endif
 
     loadExtensions();
-    discard();
 }
 
 void HeadlessView::deactivate() {
@@ -328,9 +281,8 @@ void HeadlessView::deactivate() {
 #endif
 }
 
-void HeadlessView::invalidate() {
-    assert(map);
-    map->render();
+void HeadlessView::invalidate(std::function<void()> render) {
+    render();
 }
 
 }

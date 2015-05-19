@@ -20,9 +20,8 @@
 
 namespace mbgl {
 
-class Map;
+class MapData;
 class Environment;
-class Worker;
 class GlyphAtlas;
 class GlyphStore;
 class SpriteAtlas;
@@ -30,7 +29,7 @@ class Sprite;
 class TexturePool;
 class Style;
 class Painter;
-class StyleLayer;
+class Request;
 class TransformState;
 class Tile;
 struct ClipID;
@@ -52,44 +51,77 @@ public:
     std::string tileURL(const TileID& id, float pixelRatio) const;
 };
 
-class Source : public std::enable_shared_from_this<Source>, private util::noncopyable {
+class Source : private util::noncopyable {
 public:
+    class Observer {
+    public:
+        virtual ~Observer() = default;
+
+        virtual void onSourceLoaded() = 0;
+        virtual void onTileLoaded(bool isNewTile) = 0;
+    };
+
     Source();
     ~Source();
 
-    void load(const std::string& accessToken,
-              Environment&,
-              std::function<void()> callback);
+    void load(const std::string& accessToken);
+    bool isLoaded() const;
 
-    void update(Map &, Worker &, util::ptr<Style>, GlyphAtlas &, GlyphStore &,
-                SpriteAtlas &, util::ptr<Sprite>, TexturePool &, std::function<void()> callback);
+    void load(MapData&, Environment&, std::function<void()> callback);
+
+    // Request or parse all the tiles relevant for the "TransformState". This method
+    // will return true if all the tiles were scheduled for updating of false if
+    // they were not. shouldReparsePartialTiles must be set to "true" if there is
+    // new data available that a tile in the "partial" state might be interested at.
+    bool update(MapData&,
+                const TransformState&,
+                Style&,
+                GlyphAtlas&,
+                GlyphStore&,
+                SpriteAtlas&,
+                util::ptr<Sprite>,
+                TexturePool&,
+                bool shouldReparsePartialTiles);
 
     void invalidateTiles(const std::vector<TileID>&);
 
     void updateMatrices(const mat4 &projMatrix, const TransformState &transform);
     void drawClippingMasks(Painter &painter);
-    void render(Painter &painter, const StyleLayer &layer_desc);
     void finishRender(Painter &painter);
 
     std::forward_list<Tile *> getLoadedTiles() const;
+    const std::vector<Tile*>& getTiles() const;
 
     void setCacheSize(size_t);
     void onLowMemory();
+
+    void setObserver(Observer* observer);
 
     SourceInfo info;
     bool enabled;
 
 private:
+    void emitSourceLoaded();
+    void emitTileLoaded(bool isNewTile);
+
+    bool handlePartialTile(const TileID &id, Worker &worker);
     bool findLoadedChildren(const TileID& id, int32_t maxCoveringZoom, std::forward_list<TileID>& retain);
     bool findLoadedParent(const TileID& id, int32_t minCoveringZoom, std::forward_list<TileID>& retain);
     int32_t coveringZoomLevel(const TransformState&) const;
     std::forward_list<TileID> coveringTiles(const TransformState&) const;
 
-    TileData::State addTile(Map &, Worker &, util::ptr<Style>, GlyphAtlas &,
-                            GlyphStore &, SpriteAtlas &, util::ptr<Sprite>, TexturePool &,
-                            const TileID &, std::function<void()> callback);
+    TileData::State addTile(MapData&,
+                            const TransformState&,
+                            Style&,
+                            GlyphAtlas&,
+                            GlyphStore&,
+                            SpriteAtlas&,
+                            util::ptr<Sprite>,
+                            TexturePool&,
+                            const TileID&);
 
     TileData::State hasTile(const TileID& id);
+    void updateTilePtrs();
 
     double getZoom(const TransformState &state) const;
 
@@ -99,8 +131,12 @@ private:
     TimePoint updated = TimePoint::min();
 
     std::map<TileID, std::unique_ptr<Tile>> tiles;
+    std::vector<Tile*> tilePtrs;
     std::map<TileID, std::weak_ptr<TileData>> tile_data;
     TileCache cache;
+
+    Request* req = nullptr;
+    Observer* observer_ = nullptr;
 };
 
 }

@@ -136,7 +136,7 @@ SymbolQuads getGlyphQuads(Anchor &anchor, const Shaping &shapedText,
         if (!glyph)
             continue;
 
-        if (!rect)
+        if (!rect.hasArea())
             continue;
 
         const float centerX = (positionedGlyph.x + glyph.metrics.advance / 2.0f) * boxScale;

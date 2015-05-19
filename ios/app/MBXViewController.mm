@@ -52,22 +52,8 @@ mbgl::Settings_NSUserDefaults *settings = nullptr;
 {
     [super viewDidLoad];
 
-    NSString *accessToken = [[NSProcessInfo processInfo] environment][@"MAPBOX_ACCESS_TOKEN"];
-    if (accessToken) {
-        // Store to preferences so that we can launch the app later on without having to specify
-        // token.
-        [[NSUserDefaults standardUserDefaults] setObject:accessToken forKey:@"access_token"];
-    } else {
-        // Try to retrieve from preferences, maybe we've stored them there previously and can reuse
-        // the token.
-        accessToken = [[NSUserDefaults standardUserDefaults] objectForKey:@"access_token"];
-    }
-
-    if ( ! accessToken) NSLog(@"No access token set. Mapbox vector tiles won't work.");
-
-    self.mapView = [[MGLMapView alloc] initWithFrame:self.view.bounds accessToken:accessToken];
+    self.mapView = [[MGLMapView alloc] initWithFrame:self.view.bounds];
     self.mapView.autoresizingMask = UIViewAutoresizingFlexibleWidth | UIViewAutoresizingFlexibleHeight;
-    self.mapView.viewControllerForLayoutGuides = self;
     self.mapView.showsUserLocation = YES;
     self.mapView.delegate = self;
     [self.view addSubview:self.mapView];
@@ -97,10 +83,7 @@ mbgl::Settings_NSUserDefaults *settings = nullptr;
     [self restoreState:nil];
 }
 
-#pragma clang diagnostic push
-#pragma clang diagnostic ignored "-Wunused-parameter"
-
-- (void)saveState:(NSNotification *)notification
+- (void)saveState:(__unused NSNotification *)notification
 {
     if (self.mapView && settings)
     {
@@ -115,7 +98,7 @@ mbgl::Settings_NSUserDefaults *settings = nullptr;
     }
 }
 
-- (void)restoreState:(NSNotification *)notification
+- (void)restoreState:(__unused NSNotification *)notification
 {
     if (self.mapView && settings) {
         settings->load();
@@ -126,8 +109,6 @@ mbgl::Settings_NSUserDefaults *settings = nullptr;
         [self.mapView setDebugActive:settings->debug];
     }
 }
-
-#pragma clang diagnostic pop
 
 - (NSUInteger)supportedInterfaceOrientations
 {
@@ -291,17 +272,14 @@ mbgl::Settings_NSUserDefaults *settings = nullptr;
     }
 }
 
-#pragma clang diagnostic push
-#pragma clang diagnostic ignored "-Wunused-parameter"
-
 #pragma mark - MGLMapViewDelegate
 
-- (BOOL)mapView:(MGLMapView *)mapView annotationCanShowCallout:(id <MGLAnnotation>)annotation
+- (BOOL)mapView:(__unused MGLMapView *)mapView annotationCanShowCallout:(__unused id <MGLAnnotation>)annotation
 {
     return YES;
 }
 
-- (void)mapView:(MGLMapView *)mapView didChangeUserTrackingMode:(MGLUserTrackingMode)mode animated:(BOOL)animated
+- (void)mapView:(__unused MGLMapView *)mapView didChangeUserTrackingMode:(MGLUserTrackingMode)mode animated:(__unused BOOL)animated
 {
     UIImage *newButtonImage;
     
@@ -323,7 +301,5 @@ mbgl::Settings_NSUserDefaults *settings = nullptr;
         self.navigationItem.rightBarButtonItem.image = newButtonImage;
     }];
 }
-
-#pragma clang diagnostic pop
 
 @end

@@ -24,7 +24,12 @@ public:
                    GlyphPositions&);
     void removeGlyphs(uintptr_t tileUID);
 
+    // Binds the atlas texture to the GPU, and uploads data if it is out of date.
     void bind();
+
+    // Uploads the texture to the GPU to be available when we need it. This is a lazy operation;
+    // the texture is only bound when the data is out of date (=dirty).
+    void upload();
 
     const uint16_t width = 0;
     const uint16_t height = 0;
@@ -44,7 +49,7 @@ private:
     std::mutex mtx;
     BinPack<uint16_t> bin;
     std::map<std::string, std::map<uint32_t, GlyphValue>> index;
-    std::unique_ptr<char[]> data;
+    const std::unique_ptr<uint8_t[]> data;
     std::atomic<bool> dirty;
     uint32_t texture = 0;
 };

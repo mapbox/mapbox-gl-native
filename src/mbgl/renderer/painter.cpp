@@ -1,16 +1,35 @@
 #include <mbgl/renderer/painter.hpp>
+
+#include <mbgl/map/source.hpp>
+#include <mbgl/map/tile.hpp>
+
 #include <mbgl/platform/log.hpp>
+#include <mbgl/gl/debugging.hpp>
+
 #include <mbgl/style/style.hpp>
 #include <mbgl/style/style_layer.hpp>
 #include <mbgl/style/style_bucket.hpp>
+
+#include <mbgl/geometry/sprite_atlas.hpp>
+#include <mbgl/geometry/line_atlas.hpp>
+#include <mbgl/geometry/glyph_atlas.hpp>
+
+#include <mbgl/shader/pattern_shader.hpp>
+#include <mbgl/shader/plain_shader.hpp>
+#include <mbgl/shader/outline_shader.hpp>
+#include <mbgl/shader/line_shader.hpp>
+#include <mbgl/shader/linesdf_shader.hpp>
+#include <mbgl/shader/linepattern_shader.hpp>
+#include <mbgl/shader/icon_shader.hpp>
+#include <mbgl/shader/raster_shader.hpp>
+#include <mbgl/shader/sdf_shader.hpp>
+#include <mbgl/shader/dot_shader.hpp>
+#include <mbgl/shader/gaussian_shader.hpp>
+#include <mbgl/shader/box_shader.hpp>
+
 #include <mbgl/util/std.hpp>
-#include <mbgl/util/string.hpp>
-#include <mbgl/util/clip_id.hpp>
 #include <mbgl/util/constants.hpp>
 #include <mbgl/util/mat3.hpp>
-#include <mbgl/geometry/sprite_atlas.hpp>
-#include <mbgl/map/source.hpp>
-#include <mbgl/map/tile.hpp>
 
 #if defined(DEBUG)
 #include <mbgl/util/stopwatch.hpp>
@@ -39,22 +58,7 @@ bool Painter::needsAnimation() const {
 }
 
 void Painter::setup() {
-#if defined(DEBUG)
-    util::stopwatch stopwatch("painter setup");
-#endif
-
-    // Enable GL debugging
-    if ((gl::DebugMessageControl != nullptr) && (gl::DebugMessageCallback != nullptr)) {
-        // This will enable all messages including performance hints
-        //MBGL_CHECK_ERROR(gl::DebugMessageControl(GL_DONT_CARE, GL_DONT_CARE, GL_DONT_CARE, 0, nullptr, GL_TRUE));
-
-        // This will only enable high and medium severity messages
-        MBGL_CHECK_ERROR(gl::DebugMessageControl(GL_DONT_CARE, GL_DONT_CARE, GL_DEBUG_SEVERITY_HIGH, 0, nullptr, GL_TRUE));
-        MBGL_CHECK_ERROR(gl::DebugMessageControl(GL_DONT_CARE, GL_DONT_CARE, GL_DEBUG_SEVERITY_MEDIUM, 0, nullptr, GL_TRUE));
-        MBGL_CHECK_ERROR(gl::DebugMessageControl(GL_DONT_CARE, GL_DONT_CARE, GL_DEBUG_SEVERITY_NOTIFICATION, 0, nullptr, GL_FALSE));
-
-        MBGL_CHECK_ERROR(gl::DebugMessageCallback(gl::debug_callback, nullptr));
-    }
+    gl::debugging::enable();
 
     setupShaders();
 
@@ -75,16 +79,15 @@ void Painter::setup() {
     // We are blending new pixels on top of old pixels. Since we have depth testing
     // and are drawing opaque fragments first front-to-back, then translucent
     // fragments back-to-front, this shades the fewest fragments possible.
-    MBGL_CHECK_ERROR(glEnable(GL_BLEND));
+    config.blend = true;
     MBGL_CHECK_ERROR(glBlendFunc(GL_ONE, GL_ONE_MINUS_SRC_ALPHA));
 
     // Set clear values
-    MBGL_CHECK_ERROR(glClearColor(0.0f, 0.0f, 0.0f, 0.0f));
-    MBGL_CHECK_ERROR(glClearDepth(1.0f));
-    MBGL_CHECK_ERROR(glClearStencil(0x0));
+    config.clearColor = { 0.0f, 0.0f, 0.0f, 0.0f };
+    config.clearDepth = 1.0f;
+    config.clearStencil = 0x0;
 
     // Stencil test
-    MBGL_CHECK_ERROR(glEnable(GL_STENCIL_TEST));
     MBGL_CHECK_ERROR(glStencilOp(GL_KEEP, GL_KEEP, GL_REPLACE));
 
     // Depth test
@@ -105,24 +108,6 @@ void Painter::setupShaders() {
     if (!dotShader) dotShader = util::make_unique<DotShader>();
     if (!gaussianShader) gaussianShader = util::make_unique<GaussianShader>();
     if (!collisionBoxShader) collisionBoxShader = util::make_unique<CollisionBoxShader>();
-}
-
-void Painter::deleteShaders() {
-    plainShader = nullptr;
-    outlineShader = nullptr;
-    lineShader = nullptr;
-    linepatternShader = nullptr;
-    patternShader = nullptr;
-    iconShader = nullptr;
-    rasterShader = nullptr;
-    sdfGlyphShader = nullptr;
-    sdfIconShader = nullptr;
-    dotShader = nullptr;
-    gaussianShader = nullptr;
-}
-
-void Painter::terminate() {
-    deleteShaders();
 }
 
 void Painter::resize() {
@@ -151,21 +136,6 @@ void Painter::lineWidth(float line_width) {
     }
 }
 
-void Painter::depthMask(bool value) {
-    if (gl_depthMask != value) {
-        MBGL_CHECK_ERROR(glDepthMask(value ? GL_TRUE : GL_FALSE));
-        gl_depthMask = value;
-    }
-}
-
-void Painter::depthRange(const float near, const float far) {
-    if (gl_depthRange[0] != near || gl_depthRange[1] != far) {
-        MBGL_CHECK_ERROR(glDepthRange(near, far));
-        gl_depthRange = {{ near, far }};
-    }
-}
-
-
 void Painter::changeMatrix() {
     // Initialize projection matrix
     matrix::ortho(projMatrix, 0, state.getWidth(), state.getHeight(), 0, 0, 1);
@@ -182,26 +152,13 @@ void Painter::changeMatrix() {
 }
 
 void Painter::clear() {
-    gl::group group("clear");
-    MBGL_CHECK_ERROR(glStencilMask(0xFF));
-    depthMask(true);
-
-    MBGL_CHECK_ERROR(glClearColor(0, 0, 0, 0));
+    gl::debugging::group group("clear");
+    config.stencilTest = true;
+    config.stencilMask = 0xFF;
+    config.depthTest = false;
+    config.depthMask = GL_TRUE;
+    config.clearColor = { 0.0f, 0.0f, 0.0f, 0.0f };
     MBGL_CHECK_ERROR(glClear(GL_COLOR_BUFFER_BIT | GL_STENCIL_BUFFER_BIT | GL_DEPTH_BUFFER_BIT));
-}
-
-void Painter::setOpaque() {
-    if (pass != RenderPass::Opaque) {
-        pass = RenderPass::Opaque;
-        MBGL_CHECK_ERROR(glDisable(GL_BLEND));
-    }
-}
-
-void Painter::setTranslucent() {
-    if (pass != RenderPass::Translucent) {
-        pass = RenderPass::Translucent;
-        MBGL_CHECK_ERROR(glEnable(GL_BLEND));
-    }
 }
 
 void Painter::setStrata(float value) {
@@ -211,15 +168,11 @@ void Painter::setStrata(float value) {
 void Painter::prepareTile(const Tile& tile) {
     const GLint ref = (GLint)tile.clip.reference.to_ulong();
     const GLuint mask = (GLuint)tile.clip.mask.to_ulong();
-    MBGL_CHECK_ERROR(glStencilFunc(GL_EQUAL, ref, mask));
+    config.stencilFunc = { GL_EQUAL, ref, mask };
 }
 
 void Painter::render(const Style& style, TransformState state_, TimePoint time) {
     state = state_;
-
-    clear();
-    resize();
-    changeMatrix();
 
     std::set<Source*> sources;
     for (const auto& source : style.sources) {
@@ -228,14 +181,47 @@ void Painter::render(const Style& style, TransformState state_, TimePoint time) 
         }
     }
 
-    // Update all clipping IDs.
-    ClipIDGenerator generator;
-    for (const auto& source : sources) {
-        generator.update(source->getLoadedTiles());
-        source->updateMatrices(projMatrix, state);
+    resize();
+    changeMatrix();
+
+    // Figure out what buckets we have to draw and what order we have to draw them in.
+    const auto order = determineRenderOrder(style);
+
+    // - UPLOAD PASS -------------------------------------------------------------------------------
+    // Uploads all required buffers and images before we do any actual rendering.
+    {
+        const gl::debugging::group upload("upload");
+
+        tileStencilBuffer.upload();
+        tileBorderBuffer.upload();
+        spriteAtlas.upload();
+        lineAtlas.upload();
+        glyphAtlas.upload();
+
+        for (const auto& item : order) {
+            if (item.bucket && item.bucket->needsUpload()) {
+                item.bucket->upload();
+            }
+        }
     }
 
-    drawClippingMasks(sources);
+
+    // - CLIPPING MASKS ----------------------------------------------------------------------------
+    // Draws the clipping masks to the stencil buffer.
+    {
+        const gl::debugging::group clip("clip");
+
+        // Update all clipping IDs.
+        ClipIDGenerator generator;
+        for (const auto& source : sources) {
+            generator.update(source->getLoadedTiles());
+            source->updateMatrices(projMatrix, state);
+        }
+
+        clear();
+
+        drawClippingMasks(sources);
+    }
 
     frameHistory.record(time, state.getNormalizedZoom());
 
@@ -243,122 +229,160 @@ void Painter::render(const Style& style, TransformState state_, TimePoint time) 
     if (debug::renderTree) { Log::Info(Event::Render, "{"); indent++; }
 
     // TODO: Correctly compute the number of layers recursively beforehand.
-    float strata_thickness = 1.0f / (style.layers.size() + 1);
+    const float strataThickness = 1.0f / (order.size() + 1);
 
-    // - FIRST PASS ------------------------------------------------------------
-    // Render everything top-to-bottom by using reverse iterators. Render opaque
-    // objects first.
+    // - OPAQUE PASS -------------------------------------------------------------------------------
+    // Render everything top-to-bottom by using reverse iterators. Render opaque objects first.
+    renderPass(RenderPass::Opaque,
+               order.rbegin(), order.rend(),
+               0, 1, strataThickness);
 
-    if (debug::renderTree) {
-        Log::Info(Event::Render, "%*s%s", indent++ * 4, "", "OPAQUE {");
-    }
-    int i = 0;
-    for (auto it = style.layers.rbegin(), end = style.layers.rend(); it != end; ++it, ++i) {
-        setOpaque();
-        setStrata(i * strata_thickness);
-        renderLayer(**it);
-    }
-    if (debug::renderTree) {
-        Log::Info(Event::Render, "%*s%s", --indent * 4, "", "}");
-    }
-
-    // - SECOND PASS -----------------------------------------------------------
-    // Make a second pass, rendering translucent objects. This time, we render
-    // bottom-to-top.
-    if (debug::renderTree) {
-        Log::Info(Event::Render, "%*s%s", indent++ * 4, "", "TRANSLUCENT {");
-    }
-    --i;
-    for (auto it = style.layers.begin(), end = style.layers.end(); it != end; ++it, --i) {
-        setTranslucent();
-        setStrata(i * strata_thickness);
-        renderLayer(**it);
-    }
-    if (debug::renderTree) {
-        Log::Info(Event::Render, "%*s%s", --indent * 4, "", "}");
-    }
+    // - TRANSLUCENT PASS --------------------------------------------------------------------------
+    // Make a second pass, rendering translucent objects. This time, we render bottom-to-top.
+    renderPass(RenderPass::Translucent,
+               order.begin(), order.end(),
+               order.size() - 1, -1, strataThickness);
 
     if (debug::renderTree) { Log::Info(Event::Render, "}"); indent--; }
 
-    // Finalize the rendering, e.g. by calling debug render calls per tile.
-    // This guarantees that we have at least one function per tile called.
-    // When only rendering layers via the stylesheet, it's possible that we don't
-    // ever visit a tile during rendering.
-    for (const auto& source : sources) {
-        source->finishRender(*this);
+    // - DEBUG PASS --------------------------------------------------------------------------------
+    // Renders debug overlays.
+    {
+        const gl::debugging::group _("debug");
+
+        // Finalize the rendering, e.g. by calling debug render calls per tile.
+        // This guarantees that we have at least one function per tile called.
+        // When only rendering layers via the stylesheet, it's possible that we don't
+        // ever visit a tile during rendering.
+        for (const auto& source : sources) {
+            source->finishRender(*this);
+        }
+    }
+
+    // TODO: Find a better way to unbind VAOs after we're done with them without introducing
+    // unnecessary bind(0)/bind(N) sequences.
+    {
+        const gl::debugging::group _("cleanup");
+
+        MBGL_CHECK_ERROR(glBindTexture(GL_TEXTURE_2D, 0));
+        MBGL_CHECK_ERROR(VertexArrayObject::Unbind());
     }
 }
 
-void Painter::renderLayer(const StyleLayer &layer_desc) {
-    if (layer_desc.bucket->visibility == VisibilityType::None) return;
-    if (layer_desc.type == StyleLayerType::Background) {
-        // This layer defines a background color/image.
+template <class Iterator>
+void Painter::renderPass(RenderPass pass_,
+                         Iterator it, Iterator end,
+                         std::size_t i, int8_t increment,
+                         const float strataThickness) {
+    pass = pass_;
 
-        if (debug::renderTree) {
-            Log::Info(Event::Render, "%*s- %s (%s)", indent * 4, "", layer_desc.id.c_str(),
-                    StyleLayerTypeClass(layer_desc.type).c_str());
+    const char * passName = pass == RenderPass::Opaque ? "opaque" : "translucent";
+    const gl::debugging::group _(passName);
+
+    if (debug::renderTree) {
+        Log::Info(Event::Render, "%*s%s {", indent++ * 4, "", passName);
+    }
+
+    config.blend = pass == RenderPass::Translucent;
+
+    for (; it != end; ++it, i += increment) {
+        const auto& item = *it;
+        if (item.bucket && item.tile) {
+            if (item.hasRenderPass(pass)) {
+                const gl::debugging::group group(item.layer.id + " - " + std::string(item.tile->id));
+                setStrata(i * strataThickness);
+                prepareTile(*item.tile);
+                item.bucket->render(*this, item.layer, item.tile->id, item.tile->matrix);
+            }
+        } else {
+            const gl::debugging::group group("background");
+            setStrata(i * strataThickness);
+            renderBackground(item.layer);
+        }
+    }
+
+    if (debug::renderTree) {
+        Log::Info(Event::Render, "%*s%s", --indent * 4, "", "}");
+    }
+}
+
+std::vector<RenderItem> Painter::determineRenderOrder(const Style& style) {
+    std::vector<RenderItem> order;
+
+    for (const auto& layerPtr : style.layers) {
+        const auto& layer = *layerPtr;
+        if (layer.bucket->visibility == VisibilityType::None) continue;
+        if (layer.type == StyleLayerType::Background) {
+            // This layer defines a background color/image.
+            order.emplace_back(layer);
+            continue;
         }
 
-        renderBackground(layer_desc);
-    } else {
         // This is a singular layer.
-        if (!layer_desc.bucket) {
-            Log::Warning(Event::Render, "layer '%s' is missing bucket", layer_desc.id.c_str());
-            return;
+        if (!layer.bucket) {
+            Log::Warning(Event::Render, "layer '%s' is missing bucket", layer.id.c_str());
+            continue;
         }
 
-        if (!layer_desc.bucket->source) {
-            Log::Warning(Event::Render, "can't find source for layer '%s'", layer_desc.id.c_str());
-            return;
+        if (!layer.bucket->source) {
+            Log::Warning(Event::Render, "can't find source for layer '%s'", layer.id.c_str());
+            continue;
         }
 
         // Skip this layer if it's outside the range of min/maxzoom.
         // This may occur when there /is/ a bucket created for this layer, but the min/max-zoom
         // is set to a fractional value, or value that is larger than the source maxzoom.
         const double zoom = state.getZoom();
-        if (layer_desc.bucket->min_zoom > zoom ||
-            layer_desc.bucket->max_zoom <= zoom) {
-            return;
+        if (layer.bucket->min_zoom > zoom ||
+            layer.bucket->max_zoom <= zoom) {
+            continue;
         }
 
-        // Abort early if we can already deduce from the bucket type that
-        // we're not going to render anything anyway during this pass.
-        switch (layer_desc.type) {
-            case StyleLayerType::Fill:
-                if (!layer_desc.getProperties<FillProperties>().isVisible()) return;
-                break;
-            case StyleLayerType::Line:
-                if (pass == RenderPass::Opaque) return;
-                if (!layer_desc.getProperties<LineProperties>().isVisible()) return;
-                break;
-            case StyleLayerType::Symbol:
-                if (pass == RenderPass::Opaque) return;
-                if (!layer_desc.getProperties<SymbolProperties>().isVisible()) return;
-                break;
-            case StyleLayerType::Raster:
-                if (pass == RenderPass::Opaque) return;
-                if (!layer_desc.getProperties<RasterProperties>().isVisible()) return;
-                break;
-            default:
-                break;
+        // Don't include invisible layers.
+        if (!layer.isVisible()) {
+            continue;
         }
 
-        if (debug::renderTree) {
-            Log::Info(Event::Render, "%*s- %s (%s)", indent * 4, "", layer_desc.id.c_str(),
-                    StyleLayerTypeClass(layer_desc.type).c_str());
-        }
+        // Determine what render passes we need for this layer.
+        const RenderPass passes = determineRenderPasses(layer);
 
-        layer_desc.bucket->source->render(*this, layer_desc);
+        const auto& tiles = layer.bucket->source->getTiles();
+        for (auto tile : tiles) {
+            assert(tile);
+            if (!tile->data && !tile->data->isReady()) {
+                continue;
+            }
+
+            auto bucket = tile->data->getBucket(layer);
+            if (bucket) {
+                order.emplace_back(layer, tile, bucket, passes);
+            }
+        }
     }
+
+    return order;
 }
 
-void Painter::renderTileLayer(const Tile& tile, const StyleLayer &layer_desc, const mat4 &matrix) {
-    assert(tile.data);
-    if (tile.data->hasData(layer_desc) || layer_desc.type == StyleLayerType::Raster) {
-        gl::group group(std::string { "render " } + tile.data->name);
-        prepareTile(tile);
-        tile.data->render(*this, layer_desc, matrix);
+RenderPass Painter::determineRenderPasses(const StyleLayer& layer) {
+    RenderPass passes = RenderPass::None;
+
+    if (layer.properties.is<FillProperties>()) {
+        const FillProperties &properties = layer.properties.get<FillProperties>();
+        const float alpha = properties.fill_color[3] * properties.opacity;
+
+        if (properties.antialias) {
+            passes |= RenderPass::Translucent;
+        }
+        if (properties.image.from.size() || alpha < 1.0f) {
+            passes |= RenderPass::Translucent;
+        } else {
+            passes |= RenderPass::Opaque;
+        }
+    } else {
+        passes |= RenderPass::Translucent;
     }
+
+    return passes;
 }
 
 void Painter::renderBackground(const StyleLayer &layer_desc) {
@@ -435,10 +459,10 @@ void Painter::renderBackground(const StyleLayer &layer_desc) {
         backgroundArray.bind(*plainShader, backgroundBuffer, BUFFER_OFFSET(0));
     }
 
-    MBGL_CHECK_ERROR(glDisable(GL_STENCIL_TEST));
-    depthRange(strata + strata_epsilon, 1.0f);
+    config.stencilTest = false;
+    config.depthTest = true;
+    config.depthRange = { strata + strata_epsilon, 1.0f };
     MBGL_CHECK_ERROR(glDrawArrays(GL_TRIANGLE_STRIP, 0, 4));
-    MBGL_CHECK_ERROR(glEnable(GL_STENCIL_TEST));
 }
 
 mat4 Painter::translatedMatrix(const mat4& matrix, const std::array<float, 2> &translation, const TileID &id, TranslateAnchorType anchor) {

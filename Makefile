@@ -11,7 +11,8 @@ endif
 
 ifeq ($(shell uname -s), Linux)
 HOST = linux
-JOBS ?= $(shell sysctl -n hw.ncpu)
+JOBS ?= $(shell grep --count processor /proc/cpuinfo)
+BUILD_ROOT = $(shell pwd)
 endif
 
 JOBS ?= 1
@@ -31,8 +32,12 @@ config/%.gypi: configure
 styles/styles:
 	git submodule update --init styles
 
+ifeq ($(shell uname -s), Darwin)
 SMCalloutView:
 	git submodule update --init platform/ios/vendor/SMCalloutView
+else
+SMCalloutView:
+endif
 
 KIF:
 	git submodule update --init test/ios/KIF
@@ -42,11 +47,11 @@ KIF:
 
 .PRECIOUS: Makefile/project
 Makefile/project: config/$(HOST).gypi styles/styles SMCalloutView
-	deps/run_gyp gyp/project.gyp $(CONFIG_$(HOST)) $(LIBS_$(HOST)) --generator-output=./build/$(HOST) -f make
+	deps/run_gyp gyp/$(HOST).gyp $(CONFIG_$(HOST)) $(LIBS_$(HOST)) --generator-output=./build/$(HOST) -f make
 
 .PRECIOUS: Xcode/project
 Xcode/project: config/$(HOST).gypi styles/styles SMCalloutView
-	deps/run_gyp gyp/project.gyp $(CONFIG_$(HOST)) $(LIBS_$(HOST)) --generator-output=./build/$(HOST) -f xcode
+	deps/run_gyp gyp/$(HOST).gyp $(CONFIG_$(HOST)) $(LIBS_$(HOST)) --generator-output=./build/$(HOST) -f xcode
 
 
 #### Library builds ############################################################
@@ -71,8 +76,9 @@ test-%: test
 	./scripts/run_tests.sh "build/$(HOST)/$(BUILDTYPE)/test" --gtest_filter=$*
 
 .PHONY: xtest
+xtest: XCPRETTY := $(shell ./scripts/xcpretty.sh)
 xtest: Xcode/project
-	xcodebuild -project ./build/osx/gyp/project.xcodeproj -configuration $(BUILDTYPE) -target test -jobs $(JOBS)
+	xcodebuild -project ./build/osx/gyp/osx.xcodeproj -configuration $(BUILDTYPE) -target test -jobs $(JOBS) $(XCPRETTY)
 
 xtest-%: xtest
 	./scripts/run_tests.sh "build/osx/Build/Products/$(BUILDTYPE)/test" --gtest_filter=$*
@@ -87,12 +93,16 @@ osx: Makefile/project
 run-osx: osx
 	"build/osx/$(BUILDTYPE)/Mapbox GL.app/Contents/MacOS/Mapbox GL"
 
+run-valgrind-osx: osx
+	(valgrind --leak-check=full --suppressions=scripts/valgrind.sup build/osx/$(BUILDTYPE)/Mapbox\ GL.app/Contents/MacOS/Mapbox\ GL)
+
 .PHONY: xosx-proj xosx run-xosx
 xosx-proj: Xcode/project
-	open ./build/osx/gyp/project.xcodeproj
+	open ./build/osx/gyp/osx.xcodeproj
 
+xosx: XCPRETTY := $(shell ./scripts/xcpretty.sh)
 xosx: Xcode/project
-	xcodebuild -project ./build/osx/gyp/project.xcodeproj -configuration $(BUILDTYPE) -target osxapp -jobs $(JOBS)
+	xcodebuild -project ./build/osx/gyp/osx.xcodeproj -configuration $(BUILDTYPE) -target osxapp -jobs $(JOBS) $(XCPRETTY)
 
 run-xosx: xosx
 	"gyp/build/$(BUILDTYPE)/Mapbox GL.app/Contents/MacOS/Mapbox GL"
@@ -105,24 +115,33 @@ xproj: xosx-proj
 #### iOS application builds ####################################################
 
 .PRECIOUS: Xcode/ios
-Xcode/ios: ios/app/mapboxgl-app.gyp config/ios.gypi styles/styles SMCalloutView
-	deps/run_gyp ios/app/mapboxgl-app.gyp $(CONFIG_ios) $(LIBS_ios) --generator-output=./build/ios -f xcode
+Xcode/ios: gyp/ios.gyp config/ios.gypi styles/styles SMCalloutView
+	deps/run_gyp gyp/ios.gyp $(CONFIG_ios) $(LIBS_ios) --generator-output=./build/ios -f xcode
 
 .PHONY: ios-proj ios isim ipackage
 ios-proj: Xcode/ios
-	open ./build/ios/ios/app/mapboxgl-app.xcodeproj
+	open ./build/ios/gyp/ios.xcodeproj
 
+ios: XCPRETTY := $(shell ./scripts/xcpretty.sh)
 ios: Xcode/ios
-	xcodebuild -sdk iphoneos ARCHS="arm64 armv7 armv7s" PROVISIONING_PROFILE="2b532944-bf3d-4bf4-aa6c-a81676984ae8" -project ./build/ios/ios/app/mapboxgl-app.xcodeproj -configuration Release -target iosapp -jobs $(JOBS)
+	xcodebuild -sdk iphoneos ARCHS="arm64 armv7 armv7s" PROVISIONING_PROFILE="19324a54-7455-4f0b-8e1c-e6957c718ebc" -project ./build/ios/gyp/ios.xcodeproj -configuration Release -target iosapp -jobs $(JOBS) $(XCPRETTY)
 
+ibench: XCPRETTY := $(shell ./scripts/xcpretty.sh)
+ibench: Xcode/ios
+	xcodebuild -sdk iphoneos ARCHS="arm64" PROVISIONING_PROFILE="19324a54-7455-4f0b-8e1c-e6957c718ebc" -project ./build/ios/gyp/ios.xcodeproj -configuration Release -target ios-bench -jobs $(JOBS) $(XCPRETTY)
+
+isim: XCPRETTY := $(shell ./scripts/xcpretty.sh)
 isim: Xcode/ios
-	xcodebuild -sdk iphonesimulator ARCHS="x86_64 i386" -project ./build/ios/ios/app/mapboxgl-app.xcodeproj -configuration Debug -target iosapp -jobs $(JOBS)
+	xcodebuild -sdk iphonesimulator ARCHS="x86_64 i386" -project ./build/ios/gyp/ios.xcodeproj -configuration Debug -target iosapp -jobs $(JOBS) $(XCPRETTY)
 
-ipackage: clean Xcode/ios
-	./scripts/package_ios.sh
+ipackage: Xcode/ios
+	JOBS=$(JOBS) ./scripts/ios/package.sh
 
-itest: ipackage KIF
-	./scripts/test_ios.sh
+ipackage-sim: Xcode/ios
+	JOBS=$(JOBS) ./scripts/ios/package.sh sim
+
+itest: ipackage-sim KIF
+	./scripts/ios/test.sh
 
 # Legacy name
 iproj: ios-proj
@@ -137,9 +156,13 @@ linux: Makefile/project
 run-linux: linux
 	(cd build/$(HOST)/$(BUILDTYPE) && ./mapbox-gl)
 
+run-valgrind-linux: linux
+	(cd build/$(HOST)/$(BUILDTYPE) && valgrind --leak-check=full --suppressions=$(BUILD_ROOT)/scripts/valgrind.sup ./mapbox-gl)
+
 .PHONY: xlinux run-xlinux
+xlinux: XCPRETTY := $(shell ./scripts/xcpretty.sh)
 xlinux: Xcode/project
-	xcodebuild -project ./build/osx/gyp/project.xcodeproj -configuration $(BUILDTYPE) -target linuxapp -jobs $(JOBS)
+	xcodebuild -project ./build/osx/gyp/osx.xcodeproj -configuration $(BUILDTYPE) -target linuxapp -jobs $(JOBS) $(XCPRETTY)
 
 run-xlinux: xlinux
 	"gyp/build/$(BUILDTYPE)/mapbox-gl"
@@ -180,9 +203,10 @@ android-project: android-lib
 render: Makefile/project
 	$(MAKE) -C build/$(HOST) BUILDTYPE=$(BUILDTYPE) mbgl-render
 
-.PHONY: xrender run-xrender
+.PHONY: xrender
+xrender: XCPRETTY := $(shell ./scripts/xcpretty.sh)
 xrender: Xcode/project
-	xcodebuild -project ./build/osx/gyp/project.xcodeproj -configuration $(BUILDTYPE) -target mbgl-render -jobs $(JOBS)
+	xcodebuild -project ./build/osx/gyp/osx.xcodeproj -configuration $(BUILDTYPE) -target mbgl-render -jobs $(JOBS) $(XCPRETTY)
 
 
 ##### Maintenace operations ####################################################

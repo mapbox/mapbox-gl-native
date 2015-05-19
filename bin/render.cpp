@@ -39,6 +39,7 @@ int main(int argc, char *argv[]) {
     std::string cache_file = "cache.sqlite";
     std::vector<std::string> classes;
     std::string token;
+    bool debug = false;
 
     po::options_description desc("Allowed options");
     desc.add_options()
@@ -51,6 +52,7 @@ int main(int argc, char *argv[]) {
         ("height,h", po::value(&height)->value_name("pixels")->default_value(height), "Image height")
         ("class,c", po::value(&classes)->value_name("name"), "Class name")
         ("token,t", po::value(&token)->value_name("key")->default_value(token), "Mapbox access token")
+        ("debug", po::bool_switch(&debug)->default_value(debug), "Debug mode")
         ("output,o", po::value(&output)->value_name("file")->default_value(output), "Output file name")
         ("cache,d", po::value(&cache_file)->value_name("file")->default_value(cache_file), "Cache database file name")
     ;
@@ -79,11 +81,8 @@ int main(int argc, char *argv[]) {
         }
     }
 
-
     HeadlessView view;
-    Map map(view, fileSource);
-
-    map.start(Map::Mode::Still);
+    Map map(view, fileSource, MapMode::Still);
 
     // Set access token if present
     if (token.size()) {
@@ -93,9 +92,13 @@ int main(int argc, char *argv[]) {
     map.setStyleJSON(style, ".");
     map.setClasses(classes);
 
-    view.resize(width, height, pixelRatio);
+    map.resize(width, height, pixelRatio);
     map.setLatLngZoom({ lat, lon }, zoom);
     map.setBearing(bearing);
+
+    if (debug) {
+        map.setDebug(debug);
+    }
 
     uv_async_t *async = new uv_async_t;
     uv_async_init(uv_default_loop(), async, [](uv_async_t *as, int) {
@@ -115,6 +118,4 @@ int main(int argc, char *argv[]) {
 
     // This loop will terminate once the async was fired.
     uv_run(uv_default_loop(), UV_RUN_DEFAULT);
-
-    map.stop();
 }

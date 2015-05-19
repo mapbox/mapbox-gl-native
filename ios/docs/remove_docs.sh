@@ -1,4 +1,4 @@
-#!/bin/sh
+#!/usr/bin/env bash
 
 echo
 echo "Removing docs from ~/Library/Developer/Shared/Documentation/DocSets..."

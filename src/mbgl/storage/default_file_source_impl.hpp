@@ -2,33 +2,53 @@
 #define MBGL_STORAGE_DEFAULT_DEFAULT_FILE_SOURCE_IMPL
 
 #include <mbgl/storage/default_file_source.hpp>
+#include <mbgl/storage/asset_context.hpp>
+#include <mbgl/storage/http_context.hpp>
 
 #include <set>
 #include <unordered_map>
 
+typedef struct uv_loop_s uv_loop_t;
+
 namespace mbgl {
 
-class SharedRequestBase;
+class RequestBase;
+
+struct DefaultFileRequest {
+    const Resource resource;
+    std::set<Request*> observers;
+    RequestBase* request = nullptr;
+
+    inline DefaultFileRequest(const Resource& resource_)
+        : resource(resource_) {}
+
+    // Make it movable-only
+    DefaultFileRequest(const DefaultFileRequest&) = delete;
+    inline DefaultFileRequest(DefaultFileRequest&&) = default;
+    DefaultFileRequest& operator=(const DefaultFileRequest&) = delete;
+    inline DefaultFileRequest& operator=(DefaultFileRequest&&) = default;
+};
 
 class DefaultFileSource::Impl {
 public:
-    Impl(FileCache *cache, const std::string &root = "");
+    Impl(uv_loop_t*, FileCache*, const std::string& = "");
 
-    void notify(SharedRequestBase *sharedRequest, const std::set<Request *> &observers,
-                std::shared_ptr<const Response> response, FileCache::Hint hint);
-    SharedRequestBase *find(const Resource &resource);
-
-    void add(Request* request, uv_loop_t* loop);
-    void cancel(Request* request);
-    void abort(const Environment& env);
-
-    const std::string assetRoot;
+    void add(Request*);
+    void cancel(Request*);
 
 private:
-    void processResult(const Resource& resource, std::shared_ptr<const Response> response, uv_loop_t* loop);
+    DefaultFileRequest* find(const Resource&);
 
-    std::unordered_map<Resource, SharedRequestBase *, Resource::Hash> pending;
-    FileCache *cache = nullptr;
+    void startCacheRequest(const Resource&);
+    void startRealRequest(const Resource&, std::shared_ptr<const Response> = nullptr);
+    void notify(DefaultFileRequest*, std::shared_ptr<const Response>, FileCache::Hint);
+
+    std::unordered_map<Resource, DefaultFileRequest, Resource::Hash> pending;
+    uv_loop_t* loop = nullptr;
+    FileCache* cache = nullptr;
+    const std::string assetRoot;
+    std::unique_ptr<AssetContext> assetContext;
+    std::unique_ptr<HTTPContext> httpContext;
 };
 
 }

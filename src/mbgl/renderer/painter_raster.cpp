@@ -2,8 +2,8 @@
 #include <mbgl/platform/gl.hpp>
 #include <mbgl/renderer/raster_bucket.hpp>
 #include <mbgl/style/style_layer.hpp>
+#include <mbgl/shader/raster_shader.hpp>
 #include <mbgl/util/std.hpp>
-#include <mbgl/map/map.hpp>
 
 using namespace mbgl;
 
@@ -23,8 +23,9 @@ void Painter::renderRaster(RasterBucket& bucket, const StyleLayer &layer_desc, c
         rasterShader->u_contrast_factor = contrastFactor(properties.contrast);
         rasterShader->u_spin_weights = spinWeights(properties.hue_rotate);
 
-        depthRange(strata + strata_epsilon, 1.0f);
-
+        config.stencilTest = true;
+        config.depthTest = true;
+        config.depthRange = { strata + strata_epsilon, 1.0f };
         bucket.drawRaster(*rasterShader, tileStencilBuffer, coveringRasterArray);
     }
 }

@@ -21,7 +21,7 @@
 	<key>CFBundleSignature</key>
 	<string>MBGL</string>
 	<key>CFBundleVersion</key>
-	<string>0.0.2</string>
+	<string>0.0.3</string>
 	<key>LSRequiresIPhoneOS</key>
 	<true/>
 	<key>NSHumanReadableCopyright</key>
@@ -47,5 +47,7 @@
 		<string>UIInterfaceOrientationLandscapeLeft</string>
 		<string>UIInterfaceOrientationLandscapeRight</string>
 	</array>
+	<key>MGLMetricsTestServerURL</key>
+	<string>https://cloudfront-staging.tilestream.net</string>
 </dict>
 </plist>

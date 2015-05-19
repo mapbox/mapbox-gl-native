@@ -1,28 +1,16 @@
 #include <mbgl/platform/default/glfw_view.hpp>
 #include <mbgl/platform/gl.hpp>
 #include <mbgl/platform/log.hpp>
+#include <mbgl/util/gl_helper.hpp>
 
-pthread_once_t loadGLExtensions = PTHREAD_ONCE_INIT;
-
-GLFWView::GLFWView(bool fullscreen_) : fullscreen(fullscreen_) {
-#ifdef NVIDIA
-    glDiscardFramebufferEXT = reinterpret_cast<PFNGLDISCARDFRAMEBUFFEREXTPROC>(glfwGetProcAddress("glDiscardFramebufferEXT"));
-#endif
-}
-
-GLFWView::~GLFWView() {
-    glfwDestroyWindow(window);
-    glfwTerminate();
-}
+#include <cassert>
 
 void glfwError(int error, const char *description) {
     mbgl::Log::Error(mbgl::Event::OpenGL, "GLFW error (%i): %s", error, description);
     assert(false);
 }
 
-void GLFWView::initialize(mbgl::Map *map_) {
-    View::initialize(map_);
-
+GLFWView::GLFWView(bool fullscreen_) : fullscreen(fullscreen_) {
     glfwSetErrorCallback(glfwError);
 
     if (!glfwInit()) {
@@ -63,10 +51,6 @@ void GLFWView::initialize(mbgl::Map *map_) {
     glfwMakeContextCurrent(window);
     glfwSwapInterval(1);
 
-    int width, height;
-    glfwGetWindowSize(window, &width, &height);
-    onResize(window, width, height);
-
     glfwSetCursorPosCallback(window, onMouseMove);
     glfwSetMouseButtonCallback(window, onMouseClick);
     glfwSetWindowSizeCallback(window, onResize);
@@ -74,90 +58,22 @@ void GLFWView::initialize(mbgl::Map *map_) {
     glfwSetScrollCallback(window, onScroll);
     glfwSetKeyCallback(window, onKey);
 
-    pthread_once(&loadGLExtensions, [] {
-        const std::string extensions = reinterpret_cast<const char *>(MBGL_CHECK_ERROR(glGetString(GL_EXTENSIONS)));
-        using namespace mbgl;
-
-        if (extensions.find("GL_KHR_debug") != std::string::npos) {
-            gl::DebugMessageControl = reinterpret_cast<gl::PFNGLDEBUGMESSAGECONTROLPROC>(glfwGetProcAddress("glDebugMessageControl"));
-            gl::DebugMessageInsert = reinterpret_cast<gl::PFNGLDEBUGMESSAGEINSERTPROC>(glfwGetProcAddress("glDebugMessageInsert"));
-            gl::DebugMessageCallback = reinterpret_cast<gl::PFNGLDEBUGMESSAGECALLBACKPROC>(glfwGetProcAddress("glDebugMessageCallback"));
-            gl::GetDebugMessageLog = reinterpret_cast<gl::PFNGLGETDEBUGMESSAGELOGPROC>(glfwGetProcAddress("glGetDebugMessageLog"));
-            gl::GetPointerv = reinterpret_cast<gl::PFNGLGETPOINTERVPROC>(glfwGetProcAddress("glGetPointerv"));
-            gl::PushDebugGroup = reinterpret_cast<gl::PFNGLPUSHDEBUGGROUPPROC>(glfwGetProcAddress("glPushDebugGroup"));
-            gl::PopDebugGroup = reinterpret_cast<gl::PFNGLPOPDEBUGGROUPPROC>(glfwGetProcAddress("glPopDebugGroup"));
-            gl::ObjectLabel = reinterpret_cast<gl::PFNGLOBJECTLABELPROC>(glfwGetProcAddress("glObjectLabel"));
-            gl::GetObjectLabel = reinterpret_cast<gl::PFNGLGETOBJECTLABELPROC>(glfwGetProcAddress("glGetObjectLabel"));
-            gl::ObjectPtrLabel = reinterpret_cast<gl::PFNGLOBJECTPTRLABELPROC>(glfwGetProcAddress("glObjectPtrLabel"));
-            gl::GetObjectPtrLabel = reinterpret_cast<gl::PFNGLGETOBJECTPTRLABELPROC>(glfwGetProcAddress("glGetObjectPtrLabel"));
-            assert(gl::DebugMessageControl != nullptr);
-            assert(gl::DebugMessageInsert != nullptr);
-            assert(gl::DebugMessageCallback != nullptr);
-            assert(gl::GetDebugMessageLog != nullptr);
-            assert(gl::GetPointerv != nullptr);
-            assert(gl::PushDebugGroup != nullptr);
-            assert(gl::PopDebugGroup != nullptr);
-            assert(gl::ObjectLabel != nullptr);
-            assert(gl::GetObjectLabel != nullptr);
-            assert(gl::ObjectPtrLabel != nullptr);
-            assert(gl::GetObjectPtrLabel != nullptr);
-        } else {
-            if (extensions.find("GL_ARB_debug_output") != std::string::npos) {
-                gl::DebugMessageControl = reinterpret_cast<gl::PFNGLDEBUGMESSAGECONTROLPROC>(glfwGetProcAddress("glDebugMessageControlARB"));
-                gl::DebugMessageInsert = reinterpret_cast<gl::PFNGLDEBUGMESSAGEINSERTPROC>(glfwGetProcAddress("glDebugMessageInsertARB"));
-                gl::DebugMessageCallback = reinterpret_cast<gl::PFNGLDEBUGMESSAGECALLBACKPROC>(glfwGetProcAddress("glDebugMessageCallbackARB"));
-                gl::GetDebugMessageLog = reinterpret_cast<gl::PFNGLGETDEBUGMESSAGELOGPROC>(glfwGetProcAddress("glGetDebugMessageLogARB"));
-                gl::GetPointerv = reinterpret_cast<gl::PFNGLGETPOINTERVPROC>(glfwGetProcAddress("glGetPointerv"));
-                assert(gl::DebugMessageControl != nullptr);
-                assert(gl::DebugMessageInsert != nullptr);
-                assert(gl::DebugMessageCallback != nullptr);
-                assert(gl::GetDebugMessageLog != nullptr);
-                assert(gl::GetPointerv != nullptr);
-            }
-
-            if (extensions.find("GL_EXT_debug_marker") != std::string::npos) {
-                gl::InsertEventMarkerEXT = reinterpret_cast<gl::PFNGLINSERTEVENTMARKEREXTPROC>(glfwGetProcAddress("glInsertEventMarkerEXT"));
-                gl::PushGroupMarkerEXT = reinterpret_cast<gl::PFNGLPUSHGROUPMARKEREXTPROC>(glfwGetProcAddress("glPushGroupMarkerEXT"));
-                gl::PopGroupMarkerEXT = reinterpret_cast<gl::PFNGLPOPGROUPMARKEREXTPROC>(glfwGetProcAddress("glPopGroupMarkerEXT"));
-                assert(gl::InsertEventMarkerEXT != nullptr);
-                assert(gl::PushGroupMarkerEXT != nullptr);
-                assert(gl::PopGroupMarkerEXT != nullptr);
-            }
-
-            if (extensions.find("GL_EXT_debug_label") != std::string::npos) {
-                gl::LabelObjectEXT = reinterpret_cast<gl::PFNGLLABELOBJECTEXTPROC>(glfwGetProcAddress("glLabelObjectEXT"));
-                gl::GetObjectLabelEXT = reinterpret_cast<gl::PFNGLGETOBJECTLABELEXTPROC>(glfwGetProcAddress("glGetObjectLabelEXT"));
-                assert(gl::LabelObjectEXT != nullptr);
-                assert(gl::GetObjectLabelEXT != nullptr);
-            }
-        }
-
-        if (extensions.find("GL_ARB_vertex_array_object") != std::string::npos) {
-            gl::BindVertexArray = reinterpret_cast<gl::PFNGLBINDVERTEXARRAYPROC>(glfwGetProcAddress("glBindVertexArray"));
-            gl::DeleteVertexArrays = reinterpret_cast<gl::PFNGLDELETEVERTEXARRAYSPROC>(glfwGetProcAddress("glDeleteVertexArrays"));
-            gl::GenVertexArrays = reinterpret_cast<gl::PFNGLGENVERTEXARRAYSPROC>(glfwGetProcAddress("glGenVertexArrays"));
-            gl::IsVertexArray = reinterpret_cast<gl::PFNGLISVERTEXARRAYPROC>(glfwGetProcAddress("glIsVertexArray"));
-            assert(gl::BindVertexArray != nullptr);
-            assert(gl::DeleteVertexArrays != nullptr);
-            assert(gl::GenVertexArrays != nullptr);
-            assert(gl::IsVertexArray != nullptr);
-        } else if (extensions.find("GL_APPLE_vertex_array_object") != std::string::npos) {
-            gl::BindVertexArray = reinterpret_cast<gl::PFNGLBINDVERTEXARRAYPROC>(glfwGetProcAddress("glBindVertexArrayAPPLE"));
-            gl::DeleteVertexArrays = reinterpret_cast<gl::PFNGLDELETEVERTEXARRAYSPROC>(glfwGetProcAddress("glDeleteVertexArraysAPPLE"));
-            gl::GenVertexArrays = reinterpret_cast<gl::PFNGLGENVERTEXARRAYSPROC>(glfwGetProcAddress("glGenVertexArraysAPPLE"));
-            gl::IsVertexArray = reinterpret_cast<gl::PFNGLISVERTEXARRAYPROC>(glfwGetProcAddress("glIsVertexArrayAPPLE"));
-            assert(gl::BindVertexArray != nullptr);
-            assert(gl::DeleteVertexArrays != nullptr);
-            assert(gl::GenVertexArrays != nullptr);
-            assert(gl::IsVertexArray != nullptr);
-        }
-
-        // Require packed depth stencil
-        gl::isPackedDepthStencilSupported = true;
-        gl::isDepth24Supported = true;
-    });
+    mbgl::gl::InitializeExtensions(glfwGetProcAddress);
 
     glfwMakeContextCurrent(nullptr);
+}
+
+GLFWView::~GLFWView() {
+    glfwDestroyWindow(window);
+    glfwTerminate();
+}
+
+void GLFWView::initialize(mbgl::Map *map_) {
+    View::initialize(map_);
+
+    int width, height;
+    glfwGetWindowSize(window, &width, &height);
+    onResize(window, width, height);
 }
 
 void GLFWView::onKey(GLFWwindow *window, int key, int /*scancode*/, int action, int mods) {
@@ -174,6 +90,10 @@ void GLFWView::onKey(GLFWwindow *window, int key, int /*scancode*/, int action, 
         case GLFW_KEY_X:
             if (!mods)
                 view->map->resetPosition();
+            break;
+        case GLFW_KEY_S:
+            if (view->changeStyleCallback)
+                view->changeStyleCallback();
             break;
         case GLFW_KEY_R:
             if (!mods) {
@@ -221,7 +141,7 @@ void GLFWView::onResize(GLFWwindow *window, int width, int height ) {
     int fbWidth, fbHeight;
     glfwGetFramebufferSize(window, &fbWidth, &fbHeight);
 
-    view->resize(width, height, static_cast<float>(fbWidth) / static_cast<float>(width), fbWidth, fbHeight);
+    view->map->resize(width, height, static_cast<float>(fbWidth) / static_cast<float>(width));
 }
 
 void GLFWView::onMouseClick(GLFWwindow *window, int button, int action, int modifiers) {
@@ -264,21 +184,10 @@ void GLFWView::onMouseMove(GLFWwindow *window, double x, double y) {
     view->lastY = y;
 }
 
-int GLFWView::run() {
-    map->start();
-
+void GLFWView::run() {
     while (!glfwWindowShouldClose(window)) {
         glfwWaitEvents();
     }
-
-    map->stop([]() {
-        glfwWaitEvents();
-    });
-
-    // Terminate here to save binary shaders
-    map->terminate();
-
-    return 0;
 }
 
 void GLFWView::activate() {
@@ -293,9 +202,8 @@ void GLFWView::notify() {
     glfwPostEmptyEvent();
 }
 
-void GLFWView::invalidate() {
-    assert(map);
-    map->render();
+void GLFWView::invalidate(std::function<void()> render) {
+    render();
     glfwSwapBuffers(window);
     fps();
 }
@@ -312,6 +220,19 @@ void GLFWView::fps() {
         timeElapsed = currentTime;
         frames = 0;
     }
+}
+
+void GLFWView::setChangeStyleCallback(std::function<void()> callback) {
+    changeStyleCallback = callback;
+}
+
+void GLFWView::setShouldClose() {
+    glfwSetWindowShouldClose(window, true);
+    glfwPostEmptyEvent();
+}
+
+void GLFWView::setWindowTitle(const std::string& title) {
+    glfwSetWindowTitle(window, (std::string { "Mapbox GL: " } + title).c_str());
 }
 
 namespace mbgl {
@@ -342,14 +263,19 @@ void showDebugImage(std::string name, const char *data, size_t width, size_t hei
     glfwGetFramebufferSize(debugWindow, &fbWidth, &fbHeight);
     float scale = static_cast<float>(fbWidth) / static_cast<float>(width);
 
-    MBGL_CHECK_ERROR(glPixelZoom(scale, -scale));
-    MBGL_CHECK_ERROR(glRasterPos2f(-1.0f, 1.0f));
-    MBGL_CHECK_ERROR(glDrawPixels(width, height, GL_LUMINANCE, GL_UNSIGNED_BYTE, data));
+    {
+        gl::PreservePixelZoom pixelZoom;
+        gl::PreserveRasterPos rasterPos;
+
+        MBGL_CHECK_ERROR(glPixelZoom(scale, -scale));
+        MBGL_CHECK_ERROR(glRasterPos2f(-1.0f, 1.0f));
+        MBGL_CHECK_ERROR(glDrawPixels(width, height, GL_LUMINANCE, GL_UNSIGNED_BYTE, data));
+    }
+
     glfwSwapBuffers(debugWindow);
 
     glfwMakeContextCurrent(currentWindow);
 }
-
 
 void showColorDebugImage(std::string name, const char *data, size_t logicalWidth, size_t logicalHeight, size_t width, size_t height) {
     glfwInit();
@@ -374,14 +300,22 @@ void showColorDebugImage(std::string name, const char *data, size_t logicalWidth
     float xScale = static_cast<float>(fbWidth) / static_cast<float>(width);
     float yScale = static_cast<float>(fbHeight) / static_cast<float>(height);
 
-    MBGL_CHECK_ERROR(glClearColor(0.8, 0.8, 0.8, 1));
-    MBGL_CHECK_ERROR(glClear(GL_COLOR_BUFFER_BIT));
-    MBGL_CHECK_ERROR(glEnable(GL_BLEND));
-    MBGL_CHECK_ERROR(glBlendFunc(GL_SRC_ALPHA, GL_ONE_MINUS_SRC_ALPHA));
+    {
+        gl::PreserveClearColor clearColor;
+        gl::PreserveBlend blend;
+        gl::PreserveBlendFunc blendFunc;
+        gl::PreservePixelZoom pixelZoom;
+        gl::PreserveRasterPos rasterPos;
 
-    MBGL_CHECK_ERROR(glPixelZoom(xScale, -yScale));
-    MBGL_CHECK_ERROR(glRasterPos2f(-1.0f, 1.0f));
-    MBGL_CHECK_ERROR(glDrawPixels(width, height, GL_RGBA, GL_UNSIGNED_INT_8_8_8_8_REV, data));
+        MBGL_CHECK_ERROR(glClearColor(0.8, 0.8, 0.8, 1));
+        MBGL_CHECK_ERROR(glClear(GL_COLOR_BUFFER_BIT));
+        MBGL_CHECK_ERROR(glEnable(GL_BLEND));
+        MBGL_CHECK_ERROR(glBlendFunc(GL_SRC_ALPHA, GL_ONE_MINUS_SRC_ALPHA));
+        MBGL_CHECK_ERROR(glPixelZoom(xScale, -yScale));
+        MBGL_CHECK_ERROR(glRasterPos2f(-1.0f, 1.0f));
+        MBGL_CHECK_ERROR(glDrawPixels(width, height, GL_RGBA, GL_UNSIGNED_INT_8_8_8_8_REV, data));
+    }
+
     glfwSwapBuffers(debugWindow);
 
     glfwMakeContextCurrent(currentWindow);

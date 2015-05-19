@@ -23,7 +23,7 @@ public:
     void activate() override;
     void deactivate() override;
     void notify() override;
-    void invalidate() override;
+    void invalidate(std::function<void()> render) override;
 
     void notifyMapChange(mbgl::MapChange change, Duration delay = Duration::zero()) override;
 
@@ -39,16 +39,11 @@ public:
     void createSurface(ANativeWindow *window);
     void destroySurface();
 
-    void start();
-    void stop();
-
     void resume();
-    void pause(bool waitForPause = false);
+    void pause();
 
     void enableFps(bool enable);
     void updateFps();
-
-    void resize(uint16_t width, uint16_t height, float ratio, uint16_t fbWidth, uint16_t fbHeight);
 
 private:
     EGLConfig chooseConfig(const EGLConfig configs[], EGLint numConfigs);
@@ -60,11 +55,6 @@ private:
     jobject obj = nullptr;
 
     ANativeWindow *window = nullptr;
-
-    mbgl::SQLiteCache fileCache;
-    mbgl::DefaultFileSource fileSource;
-    mbgl::Map map;
-
     EGLDisplay display = EGL_NO_DISPLAY;
     EGLSurface surface = EGL_NO_SURFACE;
     EGLContext context = EGL_NO_CONTEXT;
@@ -79,6 +69,12 @@ private:
 
     bool fpsEnabled = false;
     double fps = 0.0;
+
+    // Ensure these are initialised last
+    mbgl::SQLiteCache fileCache;
+    mbgl::DefaultFileSource fileSource;
+    mbgl::Map map;
+
 };
 }
 }

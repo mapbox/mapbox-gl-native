@@ -23,7 +23,7 @@ static double _normalizeAngle(double angle, double anchorAngle)
     if (std::abs(angle + util::M2PI - anchorAngle) < diff) {
         angle += util::M2PI;
     }
-    
+
     return angle;
 }
 
@@ -61,6 +61,10 @@ bool Transform::resize(const uint16_t w, const uint16_t h, const float ratio,
 #pragma mark - Position
 
 void Transform::moveBy(const double dx, const double dy, const Duration duration) {
+    if (std::isnan(dx) || std::isnan(dy)) {
+        return;
+    }
+
     std::lock_guard<std::recursive_mutex> lock(mtx);
 
     _moveBy(dx, dy, duration);
@@ -104,6 +108,10 @@ void Transform::_moveBy(const double dx, const double dy, const Duration duratio
 }
 
 void Transform::setLatLng(const LatLng latLng, const Duration duration) {
+    if (std::isnan(latLng.latitude) || std::isnan(latLng.longitude)) {
+        return;
+    }
+
     std::lock_guard<std::recursive_mutex> lock(mtx);
 
     const double m = 1 - 1e-15;
@@ -116,6 +124,10 @@ void Transform::setLatLng(const LatLng latLng, const Duration duration) {
 }
 
 void Transform::setLatLngZoom(const LatLng latLng, const double zoom, const Duration duration) {
+    if (std::isnan(latLng.latitude) || std::isnan(latLng.longitude) || std::isnan(zoom)) {
+        return;
+    }
+
     std::lock_guard<std::recursive_mutex> lock(mtx);
 
     double new_scale = std::pow(2.0, zoom);
@@ -137,6 +149,10 @@ void Transform::setLatLngZoom(const LatLng latLng, const double zoom, const Dura
 #pragma mark - Zoom
 
 void Transform::scaleBy(const double ds, const double cx, const double cy, const Duration duration) {
+    if (std::isnan(ds) || std::isnan(cx) || std::isnan(cy)) {
+        return;
+    }
+
     std::lock_guard<std::recursive_mutex> lock(mtx);
 
     // clamp scale to min/max values
@@ -152,12 +168,20 @@ void Transform::scaleBy(const double ds, const double cx, const double cy, const
 
 void Transform::setScale(const double scale, const double cx, const double cy,
                          const Duration duration) {
+    if (std::isnan(scale) || std::isnan(cx) || std::isnan(cy)) {
+        return;
+    }
+
     std::lock_guard<std::recursive_mutex> lock(mtx);
 
     _setScale(scale, cx, cy, duration);
 }
 
 void Transform::setZoom(const double zoom, const Duration duration) {
+    if (std::isnan(zoom)) {
+        return;
+    }
+
     std::lock_guard<std::recursive_mutex> lock(mtx);
 
     _setScale(std::pow(2.0, zoom), -1, -1, duration);
@@ -199,14 +223,14 @@ void Transform::_setScale(double new_scale, double cx, double cy, const Duration
 
     // Zoom in on the center if we don't have click or gesture anchor coordinates.
     if (cx < 0 || cy < 0) {
-        cx = current.width / 2;
-        cy = current.height / 2;
+        cx = static_cast<double>(current.width) / 2.0;
+        cy = static_cast<double>(current.height) / 2.0;
     }
 
     // Account for the x/y offset from the center (= where the user clicked or pinched)
     const double factor = new_scale / current.scale;
-    const double dx = (cx - current.width / 2) * (1.0 - factor);
-    const double dy = (cy - current.height / 2) * (1.0 - factor);
+    const double dx = (cx - static_cast<double>(current.width) / 2.0) * (1.0 - factor);
+    const double dy = (cy - static_cast<double>(current.height) / 2.0) * (1.0 - factor);
 
     // Account for angle
     const double angle_sin = std::sin(-current.angle);
@@ -238,6 +262,9 @@ void Transform::_setScaleXY(const double new_scale, const double xn, const doubl
         current.scale = final.scale;
         current.x = final.x;
         current.y = final.y;
+        const double s = current.scale * util::tileSize;
+        current.Bc = s / 360;
+        current.Cc = s / util::M2PI;
     } else {
         const double startS = current.scale;
         const double startX = current.x;
@@ -250,6 +277,9 @@ void Transform::_setScaleXY(const double new_scale, const double xn, const doubl
                 current.scale = util::interpolate(startS, final.scale, t);
                 current.x = util::interpolate(startX, final.x, t);
                 current.y = util::interpolate(startY, final.y, t);
+                const double s = current.scale * util::tileSize;
+                current.Bc = s / 360;
+                current.Cc = s / util::M2PI;
                 return Update::Zoom;
             },
             [=] {
@@ -257,10 +287,6 @@ void Transform::_setScaleXY(const double new_scale, const double xn, const doubl
                 current.scaling = false;
             }, duration);
     }
-
-    const double s = final.scale * util::tileSize;
-    current.Bc = s / 360;
-    current.Cc = s / util::M2PI;
 
     view.notifyMapChange(duration != Duration::zero() ?
                            MapChangeRegionDidChangeAnimated :
@@ -285,9 +311,13 @@ void Transform::constrain(double& scale, double& y) const {
 
 void Transform::rotateBy(const double start_x, const double start_y, const double end_x,
                          const double end_y, const Duration duration) {
+    if (std::isnan(start_x) || std::isnan(start_y) || std::isnan(end_x) || std::isnan(end_y)) {
+        return;
+    }
+
     std::lock_guard<std::recursive_mutex> lock(mtx);
 
-    double center_x = current.width / 2, center_y = current.height / 2;
+    double center_x = static_cast<double>(current.width) / 2.0, center_y = static_cast<double>(current.height) / 2.0;
 
     const double begin_center_x = start_x - center_x;
     const double begin_center_y = start_y - center_y;
@@ -315,19 +345,27 @@ void Transform::rotateBy(const double start_x, const double start_y, const doubl
 }
 
 void Transform::setAngle(const double new_angle, const Duration duration) {
+    if (std::isnan(new_angle)) {
+        return;
+    }
+
     std::lock_guard<std::recursive_mutex> lock(mtx);
 
     _setAngle(new_angle, duration);
 }
 
 void Transform::setAngle(const double new_angle, const double cx, const double cy) {
+    if (std::isnan(new_angle) || std::isnan(cx) || std::isnan(cy)) {
+        return;
+    }
+
     std::lock_guard<std::recursive_mutex> lock(mtx);
 
     double dx = 0, dy = 0;
 
     if (cx >= 0 && cy >= 0) {
-        dx = (final.width / 2) - cx;
-        dy = (final.height / 2) - cy;
+        dx = (static_cast<double>(final.width) / 2.0) - cx;
+        dy = (static_cast<double>(final.height) / 2.0) - cy;
         _moveBy(dx, dy, Duration::zero());
     }
 

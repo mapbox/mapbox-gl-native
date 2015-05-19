@@ -72,6 +72,13 @@ TEST(FilterComparison, EqualsType) {
     ASSERT_TRUE(evaluate(f, {{}}, FeatureType::LineString));
 }
 
+TEST(FilterComparison, InType) {
+    FilterExpression f = parse("[\"in\", \"$type\", \"LineString\", \"Polygon\"]");
+    ASSERT_FALSE(evaluate(f, {{}}, FeatureType::Point));
+    ASSERT_TRUE(evaluate(f, {{}}, FeatureType::LineString));
+    ASSERT_TRUE(evaluate(f, {{}}, FeatureType::Polygon));
+}
+
 TEST(FilterComparison, Any) {
     ASSERT_FALSE(evaluate(parse("[\"any\"]"), {{}}));
     ASSERT_TRUE(evaluate(parse("[\"any\", [\"==\", \"foo\", 1]]"),

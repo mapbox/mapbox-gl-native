@@ -11,20 +11,17 @@
 #include <functional>
 #include <memory>
 
-typedef struct uv_async_s uv_async_t;
 typedef struct uv_loop_s uv_loop_t;
+namespace uv { class async; }
 
 namespace mbgl {
 
 class Response;
-class Environment;
 
 class Request : private util::noncopyable {
-    MBGL_STORE_THREAD(tid)
-
 public:
     using Callback = std::function<void(const Response &)>;
-    Request(const Resource &resource, uv_loop_t *loop, const Environment &env, Callback callback);
+    Request(const Resource &resource, uv_loop_t *loop, Callback callback);
 
 public:
     // May be called from any thread.
@@ -40,7 +37,7 @@ private:
     void notifyCallback();
 
 private:
-    uv_async_t *async = nullptr;
+    std::unique_ptr<uv::async> async;
     struct Canceled;
     std::unique_ptr<Canceled> canceled;
     Callback callback;
@@ -48,11 +45,6 @@ private:
 
 public:
     const Resource resource;
-
-    // The environment ref is used to associate requests with a particular environment. This allows
-    // us to only terminate requests associated with that environment, e.g. when the map the env
-    // belongs to is discarded.
-    const Environment &env;
 };
 
 }

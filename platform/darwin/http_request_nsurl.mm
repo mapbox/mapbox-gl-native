@@ -1,8 +1,8 @@
-#include <mbgl/storage/http_request.hpp>
 #include <mbgl/storage/http_context.hpp>
+#include <mbgl/storage/resource.hpp>
 #include <mbgl/storage/response.hpp>
-#include <mbgl/util/uv.hpp>
 
+#include <mbgl/util/std.hpp>
 #include <mbgl/util/time.hpp>
 #include <mbgl/util/parsedate.h>
 
@@ -45,32 +45,33 @@ enum class ResponseStatus : uint8_t {
 
 class HTTPNSURLContext;
 
-class HTTPRequestImpl {
+class HTTPRequest : public RequestBase {
 public:
-    HTTPRequestImpl(HTTPRequest *request, uv_loop_t *loop, std::shared_ptr<const Response> response);
-    ~HTTPRequestImpl();
+    HTTPRequest(HTTPNSURLContext*,
+                const Resource&,
+                Callback,
+                uv_loop_t*,
+                std::shared_ptr<const Response>);
+    ~HTTPRequest();
 
-    void cancel();
-    void cancelTimer();
+    void cancel() override;
+    void retry() override;
 
+private:
     void start();
     void handleResult(NSData *data, NSURLResponse *res, NSError *error);
     void handleResponse();
-
     void retry(uint64_t timeout);
-    void retryImmediately();
-    static void restart(uv_timer_t *timer, int);
 
-private:
     HTTPNSURLContext *context = nullptr;
-    HTTPRequest *request = nullptr;
+    bool cancelled = false;
     NSURLSessionDataTask *task = nullptr;
     std::unique_ptr<Response> response;
     const std::shared_ptr<const Response> existingResponse;
     ResponseStatus status = ResponseStatus::PermanentError;
-    uv_async_t *async = nullptr;
+    uv::async async;
+    uv::timer timer;
     int attempts = 0;
-    uv_timer_t *timer = nullptr;
     enum : bool { PreemptImmediately, ExponentialBackoff } strategy = PreemptImmediately;
 
     static const int maxAttempts = 4;
@@ -78,17 +79,19 @@ private:
 
 // -------------------------------------------------------------------------------------------------
 
-class HTTPNSURLContext : public HTTPContext<HTTPNSURLContext> {
+class HTTPNSURLContext : public HTTPContext {
 public:
     HTTPNSURLContext(uv_loop_t *loop);
     ~HTTPNSURLContext();
 
+    RequestBase* createRequest(const Resource&,
+                               RequestBase::Callback,
+                               uv_loop_t*,
+                               std::shared_ptr<const Response>) override;
+
     NSURLSession *session = nil;
     NSString *userAgent = nil;
 };
-
-template<> pthread_key_t ThreadContext<HTTPNSURLContext>::key{};
-template<> pthread_once_t ThreadContext<HTTPNSURLContext>::once = PTHREAD_ONCE_INIT;
 
 HTTPNSURLContext::HTTPNSURLContext(uv_loop_t *loop_) : HTTPContext(loop_) {
     @autoreleasepool {
@@ -115,35 +118,43 @@ HTTPNSURLContext::~HTTPNSURLContext() {
     userAgent = nullptr;
 }
 
+RequestBase* HTTPNSURLContext::createRequest(const Resource& resource,
+                                             RequestBase::Callback callback,
+                                             uv_loop_t* loop,
+                                             std::shared_ptr<const Response> response) {
+    return new HTTPRequest(this, resource, callback, loop, response);
+}
+
 // -------------------------------------------------------------------------------------------------
 
-HTTPRequestImpl::HTTPRequestImpl(HTTPRequest *request_, uv_loop_t *loop,
-                                 std::shared_ptr<const Response> existingResponse_)
-    : context(HTTPNSURLContext::Get(loop)),
-      request(request_),
+HTTPRequest::HTTPRequest(HTTPNSURLContext* context_, const Resource& resource_, Callback callback_, uv_loop_t *loop, std::shared_ptr<const Response> existingResponse_)
+    : RequestBase(resource_, callback_),
+      context(context_),
       existingResponse(existingResponse_),
-      async(new uv_async_t) {
-    assert(request);
-    context->addRequest(request);
-
-    async->data = this;
-    uv_async_init(loop, async, [](uv_async_t *as, int) {
-        auto impl = reinterpret_cast<HTTPRequestImpl *>(as->data);
-        impl->handleResponse();
-    });
-
+      async(loop, [this] { handleResponse(); }),
+      timer(loop) {
+    context->addRequest(this);
     start();
 }
 
-void HTTPRequestImpl::start() {
+HTTPRequest::~HTTPRequest() {
+    assert(!task);
+
+    // Stop the backoff timer to avoid re-triggering this request.
+    timer.stop();
+
+    context->removeRequest(this);
+}
+
+void HTTPRequest::start() {
     assert(!task);
 
     attempts++;
 
     @autoreleasepool {
         
-        NSMutableString *url = [[NSMutableString alloc] initWithString:@(request->resource.url.c_str())];
-        if ([[NSUserDefaults standardUserDefaults] objectForKey:@"mapbox_metrics_disabled"] == nil) {
+        NSMutableString *url = [NSMutableString stringWithString:@(resource.url.c_str())];
+        if ([[NSUserDefaults standardUserDefaults] integerForKey:@"MGLMapboxAccountType"] == 0) {
             if ([url rangeOfString:@"?"].location == NSNotFound) {
                 [url appendString:@"?"];
             } else {
@@ -152,8 +163,7 @@ void HTTPRequestImpl::start() {
             [url appendString:@"events=true"];
         }
 
-        NSMutableURLRequest *req = [[NSMutableURLRequest alloc]
-            initWithURL:[NSURL URLWithString:url]];
+        NSMutableURLRequest *req = [NSMutableURLRequest requestWithURL:[NSURL URLWithString:url]];
         if (existingResponse) {
             if (!existingResponse->etag.empty()) {
                 [req addValue:@(existingResponse->etag.c_str()) forHTTPHeaderField:@"If-None-Match"];
@@ -168,19 +178,18 @@ void HTTPRequestImpl::start() {
         task = [context->session dataTaskWithRequest:req
                           completionHandler:^(NSData *data, NSURLResponse *res,
                                               NSError *error) { handleResult(data, res, error); }];
-        [req release];
         [task retain];
         [task resume];
     }
 }
 
-void HTTPRequestImpl::handleResponse() {
+void HTTPRequest::handleResponse() {
     if (task) {
         [task release];
         task = nullptr;
     }
 
-    if (request) {
+    if (!cancelled) {
         if (status == ResponseStatus::TemporaryError && attempts < maxAttempts) {
             strategy = ExponentialBackoff;
             return retry((1 << (attempts - 1)) * 1000);
@@ -193,26 +202,21 @@ void HTTPRequestImpl::handleResponse() {
 
         // Actually return the response.
         if (status == ResponseStatus::NotModified) {
-            request->notify(std::move(response), FileCache::Hint::Refresh);
+            notify(std::move(response), FileCache::Hint::Refresh);
         } else {
-            request->notify(std::move(response), FileCache::Hint::Full);
+            notify(std::move(response), FileCache::Hint::Full);
         }
-
-        context->removeRequest(request);
-        request->ptr = nullptr;
-        delete request;
-        request = nullptr;
     }
 
     delete this;
 }
 
-void HTTPRequestImpl::cancel() {
-    context->removeRequest(request);
-    request = nullptr;
+void HTTPRequest::cancel() {
+    context->removeRequest(this);
+    cancelled = true;
 
     // Stop the backoff timer to avoid re-triggering this request.
-    cancelTimer();
+    timer.stop();
 
     if (task) {
         [task cancel];
@@ -220,29 +224,6 @@ void HTTPRequestImpl::cancel() {
         task = nullptr;
     } else {
         delete this;
-    }
-}
-
-void HTTPRequestImpl::cancelTimer() {
-    if (timer) {
-        uv_timer_stop(timer);
-        uv::close(timer);
-        timer = nullptr;
-    }
-}
-
-HTTPRequestImpl::~HTTPRequestImpl() {
-    assert(!task);
-    assert(async);
-
-    // Stop the backoff timer to avoid re-triggering this request.
-    cancelTimer();
-
-    uv::close(async);
-
-    if (request) {
-        context->removeRequest(request);
-        request->ptr = nullptr;
     }
 }
 
@@ -261,7 +242,7 @@ int64_t parseCacheControl(const char *value) {
     return 0;
 }
 
-void HTTPRequestImpl::handleResult(NSData *data, NSURLResponse *res, NSError *error) {
+void HTTPRequest::handleResult(NSData *data, NSURLResponse *res, NSError *error) {
     if (error) {
         if ([error code] == NSURLErrorCancelled) {
             status = ResponseStatus::Canceled;
@@ -361,73 +342,28 @@ void HTTPRequestImpl::handleResult(NSData *data, NSURLResponse *res, NSError *er
         response->message = "response class is not NSHTTPURLResponse";
     }
 
-    uv_async_send(async);
+    async.send();
 }
 
-void HTTPRequestImpl::retry(uint64_t timeout) {
+void HTTPRequest::retry(uint64_t timeout) {
     response.reset();
 
-    assert(!timer);
-    timer = new uv_timer_t;
-    timer->data = this;
-    uv_timer_init(async->loop, timer);
-    uv_timer_start(timer, restart, timeout, 0);
+    timer.stop();
+    timer.start(timeout, 0, [this] { start(); });
 }
 
-void HTTPRequestImpl::retryImmediately() {
+void HTTPRequest::retry() {
     // All batons get notified when the network status changed, but some of them
     // might not actually wait for the network to become available again.
-    if (timer && strategy == PreemptImmediately) {
+    if (strategy == PreemptImmediately) {
         // Triggers the timer upon the next event loop iteration.
-        uv_timer_stop(timer);
-        uv_timer_start(timer, restart, 0, 0);
+        timer.stop();
+        timer.start(0, 0, [this] { start(); });
     }
 }
 
-void HTTPRequestImpl::restart(uv_timer_t *timer, int) {
-    // Restart the request.
-    auto impl = reinterpret_cast<HTTPRequestImpl *>(timer->data);
-
-    // Get rid of the timer.
-    impl->timer = nullptr;
-    uv::close(timer);
-
-    impl->start();
-}
-
-// -------------------------------------------------------------------------------------------------
-
-HTTPRequest::HTTPRequest(DefaultFileSource::Impl *source, const Resource &resource)
-    : SharedRequestBase(source, resource) {
-}
-
-HTTPRequest::~HTTPRequest() {
-    MBGL_VERIFY_THREAD(tid);
-
-    if (ptr) {
-        reinterpret_cast<HTTPRequestImpl *>(ptr)->cancel();
-    }
-}
-
-void HTTPRequest::start(uv_loop_t *loop, std::shared_ptr<const Response> response) {
-    MBGL_VERIFY_THREAD(tid);
-
-    assert(!ptr);
-    ptr = new HTTPRequestImpl(this, loop, response);
-}
-
-void HTTPRequest::retryImmediately() {
-    MBGL_VERIFY_THREAD(tid);
-
-    if (ptr) {
-        reinterpret_cast<HTTPRequestImpl *>(ptr)->retryImmediately();
-    }
-}
-
-void HTTPRequest::cancel() {
-    MBGL_VERIFY_THREAD(tid);
-
-    delete this;
+std::unique_ptr<HTTPContext> HTTPContext::createContext(uv_loop_t* loop) {
+    return util::make_unique<HTTPNSURLContext>(loop);
 }
 
 }

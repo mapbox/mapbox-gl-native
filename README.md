@@ -1,11 +1,10 @@
 [![Travis](https://api.travis-ci.org/mapbox/mapbox-gl-native.svg?branch=master)](https://travis-ci.org/mapbox/mapbox-gl-native/builds)
 
-An OpenGL renderer for [Mapbox Vector Tiles](https://www.mapbox.com/blog/vector-tiles),
-implemented in C++11, currently targeting iOS, OS X, Android, and Ubuntu Linux.
+An OpenGL renderer for [Mapbox Vector Tiles](https://www.mapbox.com/blog/vector-tiles), consisting of a C++ library for OS X and Linux and SDK bindings for iOS and Android.
 
 # Depends
 
- - Modern C++ compiler that supports `-std=c++11` (On OS X clang++, on Linux g++-4.8 or g++-4.9)
+ - Modern C++ compiler that supports `-std=c++14` (clang++ 3.5 or later or g++-4.9 or later)
  - [Boost headers](http://boost.org/)
  - [`zlib`](http://www.zlib.net/)
  - [`libpng`](http://www.libpng.org/pub/png/libpng.html)
@@ -46,15 +45,27 @@ Target OS X: 10.9+
 
 ## iOS
 
-If you merely want to install the library for iOS and try it out as an Objective-C consumer:
+### Use
 
-0. Use [Homebrew](http://brew.sh/) to install Boost headers: `brew install boost`.
-1. Run `./scripts/package_ios.sh`. The packaging script will produce the statically-linked `libMapboxGL.a`, `MapboxGL.bundle` for resources, and a `Headers` folder.
-2. Copy the contents of `build/ios/pkg/static` into your project. It should happen automatically, but ensure that:
+#### CocoaPods
+
+[CocoaPods](https://cocoapods.org) is preferred. Put the following in your `Podfile`:
+
+```ruby
+use_frameworks!
+pod 'MapboxGL'
+```
+
+#### Manually
+
+1. Use [Homebrew](http://brew.sh/) to install Boost headers: `brew install boost`.
+1. Install [appledoc](http://appledoc.gentlebytes.com/appledoc/) for API docs generation. We recommend [`2.2v963`](https://github.com/tomaz/appledoc/releases/tag/v2.2-963), which currently isn't available in Homebrew.
+1. Run `make ipackage`. The packaging script will produce the statically-linked `libMapboxGL.a`, `MapboxGL.bundle` for resources, a `Headers` folder, and a `Docs` folder with HTML API documentation.
+1. Copy the contents of `build/ios/pkg/static` into your project. It should happen automatically, but ensure that:
    - `Headers` is in your *Header Search Paths* (`HEADER_SEARCH_PATHS`) build setting.
    - `MapboxGL.bundle` is in your target's *Copy Bundle Resources* build phase.
    - `libMapboxGL.a` is in your target's *Link Binary With Libraries* build phase.
-3. Add the following Cocoa framework dependencies to your target's *Link Binary With Libraries* build phase:
+1. Add the following Cocoa framework dependencies to your target's *Link Binary With Libraries* build phase:
    - `CoreTelephony.framework`
    - `GLKit.framework`
    - `ImageIO.framework`
@@ -64,28 +75,31 @@ If you merely want to install the library for iOS and try it out as an Objective
    - `libc++.dylib`
    - `libsqlite3.dylib`
    - `libz.dylib`
-4. Add `-ObjC` to your target's "Other Linker Flags" build setting (`OTHER_LDFLAGS`).
-5. [Set the Mapbox API access token](#mapbox-api-access-tokens).
-6. `#import "MapboxGL.h"`
+1. Add `-ObjC` to your target's "Other Linker Flags" build setting (`OTHER_LDFLAGS`).
+1. [Set the Mapbox API access token](#mapbox-api-access-tokens).
+1. `#import "MapboxGL.h"`
 
-If you want to build from source and/or contribute to development of the project, run `make iproj`, which will create and open an Xcode project which can build the entire library from source as well as an Objective-C test app.
+### Development
 
-You can also run `make itest` to run the included tests. Requires `brew install xcpretty`. 
+If you want to build from source and/or contribute to development of the project, run `make iproj`, which will create and open an Xcode project which can build the entire library from source as well as an Objective-C test app. If you don't have an Apple Developer account, change the destination from "My Mac" to a simulator such as "iPhone 6" before you run and build the app.
+
+You can run `make itest` to run the included integration tests. Requires `gem install xcpretty`. If you want to run the tests in Xcode instead, first `make ipackage` to create a local static library version, then open `test/ios/ios-tests.xcodeproj`, and lastly `Command + U` on the `Mapbox GL Tests` application target.
 
 Target devices: iPhone 4S and above (5, 5c, 5s, 6, 6 Plus) and iPad 2 and above (3, 4, Mini, Air, Mini 2, Air 2).
 
-Target iOS: 7.0 through 8.1
+Target iOS: 7.0 through latest 8.x.
 
 
 ## Linux
 
 We are using Ubuntu for development. While the software should work on other distributions as well, we are not providing explicit build instructions here.
 
-Install GCC 4.8+ if you are running Ubuntu 13.10 or older. Alternatively, you can also use Clang 3.4+.
+Install GCC 4.9+ if you are running Ubuntu 13.10 or older. Alternatively, you can also use Clang 3.5+.
 
     sudo add-apt-repository --yes ppa:ubuntu-toolchain-r/test
     sudo apt-get update
-    sudo apt-get install gcc-4.8 g++-4.8
+    sudo apt-get install gcc-4.9 g++-4.9
+    export CXX=g++-4.9
 
 Ensure you have git and other build essentials:
 
@@ -109,10 +123,6 @@ Finally, install Boost. If you're running Ubuntu 12.04 or older, you need to ins
 Otherwise, you can just install
 
     sudo apt-get install libboost-dev libboost-program-options-dev
-
-Once you're done installing the build dependencies, you can get started by running
-
-    ./configure
 
 Then, you can then proceed to build the library:
 
@@ -184,6 +194,35 @@ Run:
 
 You can then open `android/java` in Android Studio via "Import Non-Android Studio Project".
 
+### Setting up Android emulator
+
+If you want to run the test app in the emulator, we recommend the x86 build because it will run a lot faster.
+
+First ensure you have an `MAPBOX_ACCESS_TOKEN` environment variable set, as described below. Then, create an x86 build:
+
+    ANDROID_ABI=x86 make android
+
+In Android Studio, create an x86 AVD (Android Virtual Device):
+- Open AVD Manager via the Tools menu -> Android -> AVD Manager
+- Click "Create Virtual Device" at the bottom on AVD Manager window
+- Select one of the device profiles, for example the Nexus 4
+- Click "Next"
+- Select a Lollipop or Kitkat release with ABI of x86. If the line is greyed out click Download to download the OS files.
+- Click "Next"
+- Under "Emulated Performance" check "Host GPU" and uncheck "Store a snapshot for faster startup"
+- Click "Finish"
+- Close the AVD Manager
+
+Now when you run or debug the Android project you will see a window "Choose Device". Select your new AVD from drop down under "Launch emulator". If you select "Use same device for future launches" Android Studio will remember the selection and not ask again.
+
+### Running on a hardware device
+
+First read the [Google documentation](http://developer.android.com/tools/device.html) to set up your device and your OS to connect to the device.
+
+When you plug your device in and then run or debug the Android project you will see a window "Choose Device". Choose your device from the "Choose a running device" list.
+
+If your device does not show you have not set it up properly, double check the [Google documentation](http://developer.android.com/tools/device.html).
+
 # Troubleshooting
 
 To trigger a complete rebuild, run `make clean` and then start over generating the Xcode projects or Makefiles as described above.
@@ -204,7 +243,7 @@ For iOS and OS X use of the demo apps in Xcode, setup the access token by editin
 
 For Linux, set the environment variable `MAPBOX_ACCESS_TOKEN` to your token.
 
-For Android, gradle will take the value of `MAPBOX_ACCESS_TOKEN` and save it to `android/java/app/src/main/res/raw/token.txt` where the app will read it from.
+For Android, gradle will take the value of `MAPBOX_ACCESS_TOKEN` and save it to `android/java/MapboxGLAndroidSDKTestApp/src/main/res/raw/token.txt` where the app will read it from.
 
 # Style
 

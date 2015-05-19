@@ -4,7 +4,10 @@
 #include <mbgl/style/style_layout.hpp>
 #include <mbgl/geometry/glyph_atlas.hpp>
 #include <mbgl/geometry/sprite_atlas.hpp>
-#include <mbgl/map/map.hpp>
+#include <mbgl/shader/sdf_shader.hpp>
+#include <mbgl/shader/icon_shader.hpp>
+#include <mbgl/shader/box_shader.hpp>
+#include <mbgl/map/tile_id.hpp>
 #include <mbgl/util/math.hpp>
 
 #include <cmath>
@@ -81,7 +84,7 @@ void Painter::renderSDF(SymbolBucket &bucket,
 
         sdfShader.u_buffer = (haloOffset - styleProperties.halo_width / fontScale) / sdfPx;
 
-        depthRange(strata, 1.0f);
+        config.depthRange = { strata, 1.0f };
         (bucket.*drawSDF)(sdfShader);
     }
 
@@ -102,7 +105,7 @@ void Painter::renderSDF(SymbolBucket &bucket,
 
         sdfShader.u_buffer = (256.0f - 64.0f) / 256.0f;
 
-        depthRange(strata + strata_epsilon, 1.0f);
+        config.depthRange = { strata + strata_epsilon, 1.0f };
         (bucket.*drawSDF)(sdfShader);
     }
 }
@@ -116,8 +119,9 @@ void Painter::renderSymbol(SymbolBucket &bucket, const StyleLayer &layer_desc, c
     const auto &properties = layer_desc.getProperties<SymbolProperties>();
     const auto &layout = bucket.layout;
 
-    MBGL_CHECK_ERROR(glDisable(GL_STENCIL_TEST));
-    depthMask(false);
+    config.stencilTest = false;
+    config.depthTest = true;
+    config.depthMask = GL_FALSE;
 
     if (bucket.hasIconData()) {
         bool sdf = bucket.sdfIcons;
@@ -170,7 +174,7 @@ void Painter::renderSymbol(SymbolBucket &bucket, const StyleLayer &layer_desc, c
             iconShader->u_fadezoom = state.getNormalizedZoom() * 10;
             iconShader->u_opacity = properties.icon.opacity;
 
-            depthRange(strata, 1.0f);
+            config.depthRange = { strata, 1.0f };
             bucket.drawIcons(*iconShader);
         }
     }
@@ -190,7 +194,7 @@ void Painter::renderSymbol(SymbolBucket &bucket, const StyleLayer &layer_desc, c
     }
 
     if (bucket.hasCollisionBoxData()) {
-        MBGL_CHECK_ERROR(glEnable(GL_STENCIL_TEST));
+        config.stencilTest = true;
 
         useProgram(collisionBoxShader->program);
         collisionBoxShader->u_matrix = matrix;
@@ -199,10 +203,9 @@ void Painter::renderSymbol(SymbolBucket &bucket, const StyleLayer &layer_desc, c
         collisionBoxShader->u_maxzoom = (id.z + 1) * 10;
         lineWidth(3.0f);
 
-        depthRange(strata, 1.0f);
+        config.depthRange = { strata, 1.0f };
         bucket.drawCollisionBoxes(*collisionBoxShader);
 
     }
 
-    MBGL_CHECK_ERROR(glEnable(GL_STENCIL_TEST));
 }

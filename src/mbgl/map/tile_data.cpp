@@ -4,6 +4,7 @@
 
 #include <mbgl/storage/file_source.hpp>
 #include <mbgl/util/worker.hpp>
+#include <mbgl/util/work_request.hpp>
 #include <mbgl/platform/log.hpp>
 
 using namespace mbgl;
@@ -11,9 +12,9 @@ using namespace mbgl;
 TileData::TileData(const TileID& id_, const SourceInfo& source_)
     : id(id_),
       name(id),
-      state(State::initial),
       source(source_),
       env(Environment::Get()),
+      state(State::initial),
       debugBucket(debugFontBuffer) {
     // Initialize tile debug coordinates
     debugFontBuffer.addText(name.c_str(), 50, 200, 5);
@@ -25,6 +26,12 @@ TileData::~TileData() {
 
 const std::string TileData::toString() const {
     return std::string { "[tile " } + name + "]";
+}
+
+void TileData::setState(const State& state_) {
+    assert(!isImmutable());
+
+    state = state_;
 }
 
 void TileData::request(Worker& worker, float pixelRatio, std::function<void()> callback) {
@@ -55,18 +62,22 @@ void TileData::cancel() {
         env.cancelRequest(req);
         req = nullptr;
     }
+    workRequest.reset();
 }
 
-void TileData::reparse(Worker& worker, std::function<void()> callback) {
-    util::ptr<TileData> tile = shared_from_this();
-    worker.send(
-        [tile]() {
-            EnvironmentScope scope(tile->env, ThreadType::TileWorker, "TileWorker_" + tile->name);
-            tile->parse();
-        },
-        [tile, callback]() {
-             // `tile` is bound in this lambda to ensure that if it's the last owning pointer,
-             // destruction happens on the map thread, not the worker thread.
-            callback();
-        });
+bool TileData::mayStartParsing() {
+    return !parsing.test_and_set(std::memory_order_acquire);
+}
+
+void TileData::endParsing() {
+    parsing.clear(std::memory_order_release);
+}
+
+bool TileData::reparse(Worker& worker, std::function<void()> callback) {
+    if (!mayStartParsing()) {
+        return false;
+    }
+
+    workRequest = worker.send([this] { parse(); endParsing(); }, callback);
+    return true;
 }
