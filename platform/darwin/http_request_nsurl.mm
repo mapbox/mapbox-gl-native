@@ -91,6 +91,7 @@ public:
 
     NSURLSession *session = nil;
     NSString *userAgent = nil;
+    NSInteger accountType = 0;
 };
 
 HTTPNSURLContext::HTTPNSURLContext(uv_loop_t *loop_) : HTTPContext(loop_) {
@@ -107,6 +108,8 @@ HTTPNSURLContext::HTTPNSURLContext(uv_loop_t *loop_) : HTTPContext(loop_) {
 
         // Write user agent string
         userAgent = @"MapboxGL";
+        
+        accountType = [[NSUserDefaults standardUserDefaults] integerForKey:@"MGLMapboxAccountType"];
     }
 }
 
@@ -153,19 +156,15 @@ void HTTPRequest::start() {
 
     @autoreleasepool {
         
-        NSMutableString *url = [NSMutableString stringWithString:@(resource.url.c_str())];
-        if ([url rangeOfString:@"mapbox.com"].location != NSNotFound) {
-            if ([[NSUserDefaults standardUserDefaults] integerForKey:@"MGLMapboxAccountType"] == 0) {
-                if ([url rangeOfString:@"?"].location == NSNotFound) {
-                    [url appendString:@"?"];
-                } else {
-                    [url appendString:@"&"];
-                }
-                [url appendString:@"events=true"];
-            }
+        NSURL *url = [NSURL URLWithString:@(resource.url.c_str())];
+        if (context->accountType == 0 &&
+            ([url.host isEqualToString:@"mapbox.com"] || [url.host hasSuffix:@".mapbox.com"])) {
+            NSString *absoluteString = [url.absoluteString stringByAppendingFormat:
+                                        (url.query ? @"&%@" : @"?%@"), @"events=true"];
+            url = [NSURL URLWithString:absoluteString];
         }
 
-        NSMutableURLRequest *req = [NSMutableURLRequest requestWithURL:[NSURL URLWithString:url]];
+        NSMutableURLRequest *req = [NSMutableURLRequest requestWithURL:url];
         if (existingResponse) {
             if (!existingResponse->etag.empty()) {
                 [req addValue:@(existingResponse->etag.c_str()) forHTTPHeaderField:@"If-None-Match"];
