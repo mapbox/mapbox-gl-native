@@ -157,12 +157,11 @@ void HTTPRequest::start() {
     @autoreleasepool {
         
         NSURL *url = [NSURL URLWithString:@(resource.url.c_str())];
-        if ([url.host isEqualToString:@"mapbox.com"] || [url.host hasSuffix:@".mapbox.com"]) {
-            if (context->accountType == 0) {
-                NSString *absoluteString = [url.absoluteString stringByAppendingFormat:
-                                            (url.query ? @"&%@" : @"?%@"), @"events=true"];
-                url = [NSURL URLWithString:absoluteString];
-            }
+        if (context->accountType == 0 &&
+            ([url.host isEqualToString:@"mapbox.com"] || [url.host hasSuffix:@".mapbox.com"])) {
+            NSString *absoluteString = [url.absoluteString stringByAppendingFormat:
+                                        (url.query ? @"&%@" : @"?%@"), @"events=true"];
+            url = [NSURL URLWithString:absoluteString];
         }
 
         NSMutableURLRequest *req = [NSMutableURLRequest requestWithURL:url];
