@@ -167,7 +167,6 @@ GlyphPBF::GlyphPBF(const std::string& glyphURL,
             // parse the data we received. We are not doing this here since this callback is being
             // called from another (unknown) thread.
             data = res.data;
-            parsed = true;
             callback(this);
         }
     });
@@ -231,6 +230,8 @@ void GlyphPBF::parse(FontStack &stack) {
     }
 
     data.clear();
+
+    parsed = true;
 }
 
 bool GlyphPBF::isParsed() const {
