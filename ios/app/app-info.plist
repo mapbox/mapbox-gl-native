@@ -47,5 +47,7 @@
 		<string>UIInterfaceOrientationLandscapeLeft</string>
 		<string>UIInterfaceOrientationLandscapeRight</string>
 	</array>
+	<key>MGLMetricsTestServerURL</key>
+	<string>https://cloudfront-staging.tilestream.net</string>
 </dict>
 </plist>
