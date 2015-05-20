@@ -27,6 +27,9 @@ public:
         return !uploaded;
     }
 
+    virtual void placeFeatures() {}
+    virtual void swapRenderData() {}
+
 protected:
     bool uploaded = false;
 

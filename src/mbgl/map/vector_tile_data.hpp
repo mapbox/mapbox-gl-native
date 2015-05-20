@@ -43,6 +43,7 @@ public:
     ~VectorTileData();
 
     void parse() override;
+    void redoPlacement(float angle) override;
     virtual Bucket* getBucket(StyleLayer const &layer_desc) override;
 
     size_t countBuckets() const;
@@ -81,6 +82,13 @@ private:
     mutable std::mutex bucketsMutex;
 
     std::unique_ptr<CollisionTile> collision;
+
+    float lastAngle = 0;
+    float currentAngle = 0;
+    bool redoingPlacement = false;
+    bool redoWhenDone = false;
+    void endRedoPlacement();
+    void workerRedoPlacement(float angle);
 };
 
 }

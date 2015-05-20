@@ -497,6 +497,8 @@ bool Source::update(MapData& data,
 
     updateTilePtrs();
 
+    redoPlacement(transformState);
+
     updated = data.getAnimationTime();
 
     return allTilesUpdated;
@@ -515,6 +517,12 @@ void Source::updateTilePtrs() {
     tilePtrs.clear();
     for (const auto& pair : tiles) {
         tilePtrs.push_back(pair.second.get());
+    }
+}
+
+void Source::redoPlacement(const TransformState& transformState) {
+    for (auto& tilePtr : tilePtrs) {
+        tilePtr->data->redoPlacement(transformState.getAngle());
     }
 }
 

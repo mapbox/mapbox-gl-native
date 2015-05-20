@@ -8,6 +8,9 @@
 #include <mbgl/platform/log.hpp>
 #include <mbgl/text/collision_tile.hpp>
 #include <mbgl/util/pbf.hpp>
+#include <mbgl/util/worker.hpp>
+#include <mbgl/util/work_request.hpp>
+#include <mbgl/style/style.hpp>
 
 using namespace mbgl;
 
@@ -104,6 +107,48 @@ void VectorTileData::setState(const State& state_) {
     TileData::setState(state_);
 
     if (isImmutable()) {
-        collision.reset();
+        collision->reset(0, 0);
+    }
+}
+
+void VectorTileData::redoPlacement(float angle) {
+    if (angle != currentAngle) {
+        lastAngle = angle;
+
+        if (getState() != State::parsed || redoingPlacement) {
+            redoWhenDone = true;
+            return;
+        }
+
+        redoingPlacement = true;
+        currentAngle = angle;
+
+        auto callback = std::bind(&VectorTileData::endRedoPlacement, this);
+        workRequest = style.workers.send([this, angle] { workerRedoPlacement(angle); }, callback);
+
+    }
+}
+
+void VectorTileData::workerRedoPlacement(float angle) {
+    collision->reset(angle, 0);
+    for (const auto& layer_desc : style.layers) {
+        auto bucket = getBucket(*layer_desc);
+        if (bucket) {
+            bucket->placeFeatures();
+        }
+    }
+}
+
+void VectorTileData::endRedoPlacement() {
+    for (const auto& layer_desc : style.layers) {
+        auto bucket = getBucket(*layer_desc);
+        if (bucket) {
+            bucket->swapRenderData();
+        }
+    }
+    redoingPlacement = false;
+    if (redoWhenDone) {
+        redoPlacement(lastAngle);
+        redoWhenDone = false;
     }
 }

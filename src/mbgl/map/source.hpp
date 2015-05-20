@@ -101,6 +101,7 @@ public:
     bool enabled;
 
 private:
+    void redoPlacement(const TransformState& transformState);
     void emitSourceLoaded();
     void emitTileLoaded(bool isNewTile);
 

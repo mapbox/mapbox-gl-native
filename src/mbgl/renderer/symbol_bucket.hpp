@@ -87,14 +87,17 @@ public:
                            const FilterExpression&,
                            GlyphStore&,
                            Sprite&);
+    void placeFeatures();
 
 private:
     void addFeature(const std::vector<std::vector<Coordinate>> &lines,
             const Shaping &shapedText, const PositionedIcon &shapedIcon,
             const GlyphPositions &face);
 
-    void placeFeatures();
     void addToDebugBuffers();
+
+    void placeFeatures(bool swapImmediately);
+    void swapRenderData();
 
     // Adds placed items to the buffer.
     template <typename Buffer, typename GroupType>
@@ -109,23 +112,27 @@ private:
     std::vector<SymbolInstance> symbolInstances;
     std::vector<SymbolFeature> features;
 
-    struct TextBuffer {
-        TextVertexBuffer vertices;
-        TriangleElementsBuffer triangles;
-        std::vector<std::unique_ptr<TextElementGroup>> groups;
-    } text;
+    struct SymbolRenderData {
+        struct TextBuffer {
+            TextVertexBuffer vertices;
+            TriangleElementsBuffer triangles;
+            std::vector<std::unique_ptr<TextElementGroup>> groups;
+        } text;
 
-    struct IconBuffer {
-        IconVertexBuffer vertices;
-        TriangleElementsBuffer triangles;
-        std::vector<std::unique_ptr<IconElementGroup>> groups;
-    } icon;
+        struct IconBuffer {
+            IconVertexBuffer vertices;
+            TriangleElementsBuffer triangles;
+            std::vector<std::unique_ptr<IconElementGroup>> groups;
+        } icon;
 
-    struct CollisionBoxBuffer {
-        CollisionBoxVertexBuffer vertices;
-        std::vector<std::unique_ptr<CollisionBoxElementGroup>> groups;
-    } collisionBox;
+        struct CollisionBoxBuffer {
+            CollisionBoxVertexBuffer vertices;
+            std::vector<std::unique_ptr<CollisionBoxElementGroup>> groups;
+        } collisionBox;
+    };
 
+    std::unique_ptr<SymbolRenderData> renderData;
+    std::unique_ptr<SymbolRenderData> renderDataInProgress;
 };
 
 }

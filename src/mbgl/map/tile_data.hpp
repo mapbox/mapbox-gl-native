@@ -21,6 +21,7 @@ class StyleLayer;
 class Request;
 class Worker;
 class WorkRequest;
+class TransformState;
 
 class TileData : private util::noncopyable {
 public:
@@ -78,6 +79,8 @@ public:
     // Override this in the child class.
     virtual void parse() = 0;
     virtual Bucket* getBucket(StyleLayer const &layer_desc) = 0;
+
+    virtual void redoPlacement(float) {}
 
     const TileID id;
     const std::string name;

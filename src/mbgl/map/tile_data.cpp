@@ -1,6 +1,7 @@
 #include <mbgl/map/tile_data.hpp>
 #include <mbgl/map/environment.hpp>
 #include <mbgl/map/source.hpp>
+#include <mbgl/map/transform_state.hpp>
 
 #include <mbgl/storage/file_source.hpp>
 #include <mbgl/util/worker.hpp>
