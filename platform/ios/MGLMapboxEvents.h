@@ -1,6 +1,6 @@
 #import <Foundation/Foundation.h>
 
-extern NSString *const MGLEventTypeAppUserCount;
+extern NSString *const MGLEventTypeAppUserTurnstile;
 extern NSString *const MGLEventTypeMapLoad;
 extern NSString *const MGLEventTypeMapTap;
 extern NSString *const MGLEventTypeMapDragEnd;
