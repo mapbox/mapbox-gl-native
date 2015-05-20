@@ -442,7 +442,7 @@ const NSTimeInterval MGLFlushInterval = 60;
             [_eventQueue addObject:vevt];
 
             // Flush
-            [self flush];
+            [strongSelf flush];
     });
 }
 
