@@ -22,6 +22,14 @@ class LiveTile;
 class MapData;
 
 using AnnotationIDs = std::vector<uint32_t>;
+using AnnotationSegment = std::vector<LatLng>;
+using AnnotationSegments = std::vector<AnnotationSegment>;
+using AnnotationsProperties = std::unordered_map<std::string, std::vector<std::string>>;
+
+enum class AnnotationType : uint8_t {
+    Point,
+    Shape
+};
 
 class AnnotationManager : private util::noncopyable {
 public:
@@ -30,7 +38,13 @@ public:
 
     void setDefaultPointAnnotationSymbol(const std::string& symbol);
     std::pair<std::vector<TileID>, AnnotationIDs> addPointAnnotations(
-        const std::vector<LatLng>&, const std::vector<std::string>& symbols, const MapData&);
+        const AnnotationSegment& points,
+        const AnnotationsProperties& properties,
+        const MapData&);
+    std::pair<std::vector<TileID>, AnnotationIDs> addShapeAnnotations(
+        const std::vector<AnnotationSegments>& shapes,
+        const AnnotationsProperties& properties,
+        const MapData&);
     std::vector<TileID> removeAnnotations(const AnnotationIDs&, const MapData&);
     AnnotationIDs getAnnotationsInBounds(const LatLngBounds&, const MapData&) const;
     LatLngBounds getBoundsForAnnotations(const AnnotationIDs&) const;
@@ -42,6 +56,11 @@ public:
 private:
     inline uint32_t nextID();
     static vec2<double> projectPoint(const LatLng& point);
+    std::pair<std::vector<TileID>, AnnotationIDs> addAnnotations(
+        const AnnotationType,
+        const std::vector<AnnotationSegments>& segments,
+        const AnnotationsProperties& properties,
+        const MapData&);
 
 private:
     mutable std::mutex mtx;

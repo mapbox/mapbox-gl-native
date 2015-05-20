@@ -7,6 +7,8 @@
 #include <mbgl/util/projection.hpp>
 #include <mbgl/util/thread.hpp>
 
+#include <unordered_map>
+
 namespace mbgl {
 
 Map::Map(View& view, FileSource& fileSource, MapMode mode)
@@ -251,7 +253,8 @@ uint32_t Map::addPointAnnotation(const LatLng& point, const std::string& symbol)
 }
 
 std::vector<uint32_t> Map::addPointAnnotations(const std::vector<LatLng>& points, const std::vector<std::string>& symbols) {
-    auto result = data->annotationManager.addPointAnnotations(points, symbols, *data);
+    AnnotationsProperties properties = { { "symbols", symbols } };
+    auto result = data->annotationManager.addPointAnnotations(points, properties, *data);
     context->invoke(&MapContext::updateAnnotationTiles, result.first);
     return result.second;
 }

@@ -12,14 +12,6 @@
 
 namespace mbgl {
 
-enum class AnnotationType : uint8_t {
-    Point,
-    Shape
-};
-
-using AnnotationSegment = std::vector<LatLng>;
-using AnnotationSegments = std::vector<AnnotationSegment>;
-
 class Annotation : private util::noncopyable {
     friend class AnnotationManager;
 public:
@@ -86,9 +78,10 @@ vec2<double> AnnotationManager::projectPoint(const LatLng& point) {
 }
 
 std::pair<std::vector<TileID>, AnnotationIDs>
-AnnotationManager::addPointAnnotations(const std::vector<LatLng>& points,
-                                       const std::vector<std::string>& symbols,
-                                       const MapData& data) {
+AnnotationManager::addAnnotations(const AnnotationType type,
+                                  const std::vector<AnnotationSegments>& segments,
+                                  const AnnotationsProperties& properties,
+                                  const MapData& data) {
     std::lock_guard<std::mutex> lock(mtx);
 
     // We pre-generate tiles to contain each annotation up to the map's max zoom.
@@ -99,7 +92,9 @@ AnnotationManager::addPointAnnotations(const std::vector<LatLng>& points,
 
     const uint16_t extent = 4096;
 
-    std::vector<uint32_t> annotationIDs;
+    AnnotationSegment points = segments[0][0]; // FIXME
+
+    AnnotationIDs annotationIDs;
     annotationIDs.reserve(points.size());
 
     std::vector<TileID> affectedTiles;
@@ -133,13 +128,24 @@ AnnotationManager::addPointAnnotations(const std::vector<LatLng>& points,
 
             const GeometryCollection geometries({ { { { coordinate } } } });
 
-            // at render time we style the annotation according to its {sprite} field
-            const std::map<std::string, std::string> properties = {
-                { "sprite", (symbols[i].length() ? symbols[i] : defaultPointAnnotationSymbol) }
-            };
+            std::unordered_map<std::string, std::string> featureProperties;
+
+            if (type == AnnotationType::Point) {
+                // at render time we style the point according to its {sprite} field
+                const std::string& symbol = properties.at("symbols")[i];
+                if (symbol.length()) {
+                    featureProperties.emplace("sprite", symbol);
+                } else {
+                    featureProperties.emplace("sprite", defaultPointAnnotationSymbol);
+                }
+            } else {
+
+            }
 
             auto feature =
-                std::make_shared<const LiveTileFeature>(FeatureType::Point, geometries, properties);
+                std::make_shared<const LiveTileFeature>(FeatureType::Point,
+                                                        geometries,
+                                                        featureProperties);
 
             auto tile_it = tiles.find(tileID);
             if (tile_it != tiles.end()) {
@@ -183,6 +189,26 @@ AnnotationManager::addPointAnnotations(const std::vector<LatLng>& points,
 
     // Tile:IDs that need refreshed and the annotation identifiers held onto by the client.
     return std::make_pair(affectedTiles, annotationIDs);
+}
+
+std::pair<std::vector<TileID>, AnnotationIDs>
+AnnotationManager::addPointAnnotations(const AnnotationSegment& points,
+                                       const AnnotationsProperties& properties,
+                                       const MapData& data) {
+    return addAnnotations(AnnotationType::Point,
+                          { { points } },
+                          properties,
+                          data);
+}
+
+std::pair<std::vector<TileID>, AnnotationIDs>
+AnnotationManager::addShapeAnnotations(const std::vector<AnnotationSegments>& shapes,
+                                       const AnnotationsProperties& properties,
+                                       const MapData& data) {
+    return addAnnotations(AnnotationType::Shape,
+                          shapes,
+                          properties,
+                          data);
 }
 
 std::vector<TileID> AnnotationManager::removeAnnotations(const AnnotationIDs& ids,
@@ -235,8 +261,8 @@ std::vector<TileID> AnnotationManager::removeAnnotations(const AnnotationIDs& id
     return affectedTiles;
 }
 
-std::vector<uint32_t> AnnotationManager::getAnnotationsInBounds(const LatLngBounds& queryBounds,
-                                                                const MapData& data) const {
+AnnotationIDs AnnotationManager::getAnnotationsInBounds(const LatLngBounds& queryBounds,
+                                                        const MapData& data) const {
     std::lock_guard<std::mutex> lock(mtx);
 
     const uint8_t z = data.transform.getMaxZoom();
@@ -248,7 +274,7 @@ std::vector<uint32_t> AnnotationManager::getAnnotationsInBounds(const LatLngBoun
     const TileID nwTile(z, swPoint.x * z2, nePoint.y * z2);
     const TileID seTile(z, nePoint.x * z2, swPoint.y * z2);
 
-    std::vector<uint32_t> matchingAnnotations;
+    AnnotationIDs matchingAnnotations;
 
     for (auto& tile : tiles) {
         TileID id = tile.first;
