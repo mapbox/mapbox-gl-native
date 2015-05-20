@@ -118,6 +118,7 @@ public:
     uint32_t addPointAnnotation(const LatLng&, const std::string& symbol);
     std::vector<uint32_t> addPointAnnotations(const std::vector<LatLng>&,
                                               const std::vector<std::string>& symbols);
+    uint32_t addShapeAnnotation(const std::vector<LatLng>&);
     void removeAnnotation(uint32_t);
     void removeAnnotations(const std::vector<uint32_t>&);
     std::vector<uint32_t> getAnnotationsInBounds(const LatLngBounds&);

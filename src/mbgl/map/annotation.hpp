@@ -51,7 +51,8 @@ public:
 
     const LiveTile* getTile(const TileID& id);
 
-    static const std::string layerID;
+    static const std::string PointLayerID;
+    static const std::string ShapeLayerID;
 
 private:
     inline uint32_t nextID();

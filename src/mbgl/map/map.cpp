@@ -259,6 +259,12 @@ std::vector<uint32_t> Map::addPointAnnotations(const std::vector<LatLng>& points
     return result.second;
 }
 
+uint32_t Map::addShapeAnnotation(const std::vector<LatLng>& shape) {
+    auto result = data->annotationManager.addShapeAnnotations({{ shape }}, {{}}, *data);
+    context->invoke(&MapContext::updateAnnotationTiles, result.first);
+    return result.second[0];
+}
+
 void Map::removeAnnotation(uint32_t annotation) {
     removeAnnotations({ annotation });
 }

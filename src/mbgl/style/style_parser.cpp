@@ -37,14 +37,54 @@ void StyleParser::parse(JSVal document) {
     if (document.HasMember("layers")) {
         parseLayers(document["layers"]);
 
+
+
+
+
+
+
+        const std::string& shapeID = AnnotationManager::ShapeLayerID;
+
+        std::map<ClassID, ClassProperties> shapePaints;
+        rapidjson::Document d1;
+        rapidjson::Value lineWidth(rapidjson::kObjectType);
+        lineWidth.AddMember("line-width", 5, d1.GetAllocator());
+        parsePaint(lineWidth, shapePaints[ClassID::Default]);
+        rapidjson::Value lineColor(rapidjson::kObjectType);
+        lineColor.AddMember("line-color", "#ff0000", d1.GetAllocator());
+        parsePaint(lineColor, shapePaints[ClassID::Default]);
+        util::ptr<StyleLayer> shapeAnnotations = std::make_shared<StyleLayer>(shapeID, std::move(shapePaints));
+        shapeAnnotations->type = StyleLayerType::Line;
+        layersMap.emplace(shapeID, std::pair<JSVal, util::ptr<StyleLayer>> { JSVal(shapeID), shapeAnnotations });
+        layers.emplace_back(shapeAnnotations);
+
+        util::ptr<StyleBucket> lineBucket = std::make_shared<StyleBucket>(shapeAnnotations->type);
+        lineBucket->name = shapeAnnotations->id;
+        lineBucket->source_layer = shapeAnnotations->id;
+
+        // parse layout?
+
+        util::ptr<Source> source1 = std::make_shared<Source>();
+        sourcesMap.emplace(shapeID, source1);
+        sources.emplace_back(source1);
+        source1->info.type = SourceType::Annotations;
+        lineBucket->source = source1;
+        shapeAnnotations->bucket = lineBucket;
+
+
+
+
+
+
+
         // create point annotations layer
         //
-        const std::string& id = AnnotationManager::layerID;
+        const std::string& pointID = AnnotationManager::PointLayerID;
 
         std::map<ClassID, ClassProperties> paints;
-        util::ptr<StyleLayer> annotations = std::make_shared<StyleLayer>(id, std::move(paints));
+        util::ptr<StyleLayer> annotations = std::make_shared<StyleLayer>(pointID, std::move(paints));
         annotations->type = StyleLayerType::Symbol;
-        layersMap.emplace(id, std::pair<JSVal, util::ptr<StyleLayer>> { JSVal(id), annotations });
+        layersMap.emplace(pointID, std::pair<JSVal, util::ptr<StyleLayer>> { JSVal(pointID), annotations });
         layers.emplace_back(annotations);
 
         util::ptr<StyleBucket> pointBucket = std::make_shared<StyleBucket>(annotations->type);
@@ -60,7 +100,7 @@ void StyleParser::parse(JSVal document) {
         parseLayout(iconOverlap, pointBucket);
 
         util::ptr<Source> source = std::make_shared<Source>();
-        sourcesMap.emplace(id, source);
+        sourcesMap.emplace(pointID, source);
         sources.emplace_back(source);
         source->info.type = SourceType::Annotations;
         pointBucket->source = source;
