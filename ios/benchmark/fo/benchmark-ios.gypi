@@ -26,7 +26,6 @@
 
       'sources': [
         './main.m',
-        '../../include/mbgl/ios/MGLMapView_private.h',
         './MBXBenchAppDelegate.h',
         './MBXBenchAppDelegate.m',
         './MBXBenchViewController.h',

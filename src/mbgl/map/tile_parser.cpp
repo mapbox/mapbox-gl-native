@@ -118,18 +118,7 @@ std::unique_ptr<Bucket> TileParser::createBucket(const StyleBucket &bucketDesc) 
         } else if (bucketDesc.type == StyleLayerType::Line) {
             return createLineBucket(*layer, bucketDesc);
         } else if (bucketDesc.type == StyleLayerType::Symbol) {
-            if (partialParse) {
-                return nullptr;
-            }
-
-            bool needsResources = false;
-            auto symbolBucket = createSymbolBucket(*layer, bucketDesc, needsResources);
-            if (needsResources) {
-                partialParse = true;
-                return nullptr;
-            } else {
-                return std::move(symbolBucket);
-            }
+            return createSymbolBucket(*layer, bucketDesc);
         } else if (bucketDesc.type == StyleLayerType::Raster) {
             return nullptr;
         } else {
@@ -190,13 +179,7 @@ std::unique_ptr<Bucket> TileParser::createLineBucket(const GeometryTileLayer& la
 }
 
 std::unique_ptr<Bucket> TileParser::createSymbolBucket(const GeometryTileLayer& layer,
-                                                       const StyleBucket& bucket_desc,
-                                                       bool& needsResources) {
-    if (!sprite->isLoaded()) {
-        needsResources = true;
-        return nullptr;
-    }
-
+                                                       const StyleBucket& bucket_desc) {
     auto bucket = util::make_unique<SymbolBucket>(*tile.getCollision());
 
     const float z = tile.id.z;
@@ -240,13 +223,20 @@ std::unique_ptr<Bucket> TileParser::createSymbolBucket(const GeometryTileLayer& 
     applyLayoutProperty(PropertyKey::TextOffset, bucket_desc.layout, layout.text.offset, z);
     applyLayoutProperty(PropertyKey::TextAllowOverlap, bucket_desc.layout, layout.text.allow_overlap, z);
 
-    bucket->addFeatures(
-        layer, bucket_desc.filter, reinterpret_cast<uintptr_t>(&tile), spriteAtlas, *sprite, glyphAtlas, glyphStore);
+    if (bucket->needsDependencies(layer, bucket_desc.filter, glyphStore, *sprite)) {
+        partialParse = true;
+    }
 
-    if (bucket->needsGlyphs()) {
-        needsResources = true;
+    // We do not proceed if the parser is in a "partial" state because
+    // the layer ordering needs to be respected when calculating text
+    // collisions. Although, at this point, we requested all the resources
+    // needed by this tile.
+    if (partialParse) {
         return nullptr;
     }
+
+    bucket->addFeatures(
+        reinterpret_cast<uintptr_t>(&tile), spriteAtlas, *sprite, glyphAtlas, glyphStore);
 
     return bucket->hasData() ? std::move(bucket) : nullptr;
 }

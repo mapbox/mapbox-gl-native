@@ -135,11 +135,12 @@ GlyphBox getMergedBoxes(const GlyphBoxes &glyphs, const Anchor &anchor) {
 Placement Placement::getIcon(Anchor &anchor, const Rect<uint16_t> &image, float boxScale,
                              const std::vector<Coordinate> &line, const StyleLayoutSymbol &layout) {
 
+    const float padding = 1.0f;
     const float dx = layout.icon.offset[0];
     const float dy = layout.icon.offset[1];
-    float x1 = dx - image.originalW / 2.0f;
+    float x1 = dx - image.originalW / 2.0f - padding;
     float x2 = x1 + image.w;
-    float y1 = dy - image.originalH / 2.0f;
+    float y1 = dy - image.originalH / 2.0f - padding;
     float y2 = y1 + image.h;
 
     vec2<float> tl{x1, y1};
@@ -212,7 +213,8 @@ Placement Placement::getGlyphs(Anchor &anchor, const vec2<float> &origin, const 
 
     Placement placement;
 
-    const uint32_t buffer = 3;
+    const uint32_t glyphPadding = 1;
+    const uint32_t buffer = 3 + glyphPadding;
 
     for (const auto& shape : shaping) {
         auto face_it = face.find(shape.glyph);

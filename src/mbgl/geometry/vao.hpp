@@ -11,7 +11,7 @@ namespace mbgl {
 
 class VertexArrayObject : public util::noncopyable {
 public:
-    static void Bind(GLuint array);
+    static void Unbind();
     static void Delete(GLsizei n, const GLuint* arrays);
 
     VertexArrayObject();

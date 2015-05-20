@@ -15,21 +15,19 @@
 #include <mbgl/util/geo.hpp>
 #include <mbgl/util/constants.hpp>
 
-#import "MGLTypes.h"
+#import "MapboxGL.h"
+
 #import "NSBundle+MGLAdditions.h"
 #import "NSString+MGLAdditions.h"
 #import "NSProcessInfo+MGLAdditions.h"
 #import "NSException+MGLAdditions.h"
-#import "MGLAccountManager.h"
-#import "MGLAnnotation.h"
 #import "MGLUserLocationAnnotationView.h"
 #import "MGLUserLocation_Private.h"
 #import "MGLFileCache.h"
+#import "MGLAccountManager_Private.h"
+#import "MGLMapboxEvents.h"
 
 #import "SMCalloutView.h"
-
-#import "MGLMapboxEvents.h"
-#import "MapboxGL.h"
 
 #import <algorithm>
 
@@ -112,25 +110,18 @@ std::chrono::steady_clock::duration secondsAsDuration(float duration)
     if (self && [self commonInit])
     {
         self.styleURL = nil;
-        self.accessToken = [MGLAccountManager accessToken];
         return self;
     }
 
     return nil;
 }
 
-- (instancetype)initWithFrame:(CGRect)frame accessToken:(NSString *)accessToken
-{
-    return [self initWithFrame:frame accessToken:accessToken styleURL:nil];
-}
-
-- (instancetype)initWithFrame:(CGRect)frame accessToken:(NSString *)accessToken styleURL:(NSURL *)styleURL
+- (instancetype)initWithFrame:(CGRect)frame styleURL:(NSURL *)styleURL
 {
     self = [super initWithFrame:frame];
 
     if (self && [self commonInit])
     {
-        self.accessToken = accessToken;
         self.styleURL = styleURL;
     }
 
@@ -153,18 +144,18 @@ std::chrono::steady_clock::duration secondsAsDuration(float duration)
 
 - (NSString *)accessToken
 {
-    return @(_mbglMap->getAccessToken().c_str()).mgl_stringOrNilIfEmpty;
+    NSAssert(NO, @"-[MGLMapView accessToken] has been removed. Use +[MGLAccountManager accessToken] or get MGLMapboxAccessToken from the Info.plist.");
+    return nil;
 }
 
 - (void)setAccessToken:(NSString *)accessToken
 {
-    _mbglMap->setAccessToken(accessToken ? (std::string)[accessToken UTF8String] : "");
-    [MGLAccountManager setAccessToken:accessToken.mgl_stringOrNilIfEmpty];
+    NSAssert(NO, @"-[MGLMapView setAccessToken:] has been replaced by +[MGLAccountManager setAccessToken:].\n\nIf you previously set this access token in a storyboard inspectable, select the MGLMapView in Interface Builder and delete the “accessToken” entry from the User Defined Runtime Attributes section of the Identity inspector. Then go to the Info.plist file and set MGLMapboxAccessToken to “%@”.", accessToken);
 }
 
 + (NSSet *)keyPathsForValuesAffectingStyleURL
 {
-    return [NSSet setWithObjects:@"mapID", @"accessToken", nil];
+    return [NSSet setWithObjects:@"mapID", nil];
 }
 
 - (NSURL *)styleURL
@@ -257,6 +248,13 @@ std::chrono::steady_clock::duration secondsAsDuration(float duration)
         _mbglMap->pause();
     }
     _mbglMap->resize(self.bounds.size.width, self.bounds.size.height, _glView.contentScaleFactor);
+
+    // Observe for changes to the global access token (and find out the current one).
+    [[MGLAccountManager sharedManager] addObserver:self
+                                        forKeyPath:@"accessToken"
+                                           options:(NSKeyValueObservingOptionInitial |
+                                                    NSKeyValueObservingOptionNew)
+                                           context:NULL];
 
     // Notify map object when network reachability status changes.
     [[NSNotificationCenter defaultCenter] addObserver:self
@@ -404,6 +402,7 @@ std::chrono::steady_clock::duration secondsAsDuration(float duration)
     [_regionChangeDelegateQueue cancelAllOperations];
 
     [[NSNotificationCenter defaultCenter] removeObserver:self];
+    [[MGLAccountManager sharedManager] removeObserver:self forKeyPath:@"accessToken"];
 
     if (_mbglMap)
     {
@@ -660,10 +659,7 @@ std::chrono::steady_clock::duration secondsAsDuration(float duration)
 
 #pragma mark - Life Cycle -
 
-#pragma clang diagnostic push
-#pragma clang diagnostic ignored "-Wunused-parameter"
-
-- (void)sleepGL:(NSNotification *)notification
+- (void)sleepGL:(__unused NSNotification *)notification
 {
     MGLAssertIsMainThread();
 
@@ -697,7 +693,7 @@ std::chrono::steady_clock::duration secondsAsDuration(float duration)
     }
 }
 
-- (void)wakeGL:(NSNotification *)notification
+- (void)wakeGL:(__unused NSNotification *)notification
 {
     MGLAssertIsMainThread();
 
@@ -731,19 +727,15 @@ std::chrono::steady_clock::duration secondsAsDuration(float duration)
 
 #pragma mark - Gestures -
 
-- (void)handleCompassTapGesture:(id)sender
+- (void)handleCompassTapGesture:(__unused id)sender
 {
     [self resetNorthAnimated:YES];
 
     if (self.userTrackingMode == MGLUserTrackingModeFollowWithHeading) self.userTrackingMode = MGLUserTrackingModeFollow;
 }
 
-#pragma clang diagnostic pop
-
-- (void)touchesBegan:(NSSet *)touches withEvent:(UIEvent *)event
+- (void)touchesBegan:(__unused NSSet *)touches withEvent:(__unused UIEvent *)event
 {
-    (void)touches;
-    (void)event;
     _mbglMap->cancelTransitions();
     _mbglMap->setGestureInProgress(false);
     self.animatingGesture = NO;
@@ -1297,6 +1289,16 @@ std::chrono::steady_clock::duration secondsAsDuration(float duration)
 
 #pragma mark - Properties -
 
+- (void)observeValueForKeyPath:(NSString *)keyPath ofObject:(id)object change:(NSDictionary *)change context:(__unused void *)context
+{
+    // Synchronize mbgl::Map’s access token with the global one in MGLAccountManager.
+    if ([keyPath isEqualToString:@"accessToken"] && object == [MGLAccountManager sharedManager])
+    {
+        NSString *accessToken = change[NSKeyValueChangeNewKey];
+        _mbglMap->setAccessToken(accessToken ? (std::string)[accessToken UTF8String] : "");
+    }
+}
+
 + (NSSet *)keyPathsForValuesAffectingZoomEnabled
 {
     return [NSSet setWithObject:@"allowsZooming"];
@@ -1577,7 +1579,7 @@ CLLocationCoordinate2D latLngToCoordinate(mbgl::LatLng latLng)
 
 + (NSSet *)keyPathsForValuesAffectingMapID
 {
-    return [NSSet setWithObjects:@"styleURL", @"accessToken", nil];
+    return [NSSet setWithObjects:@"styleURL", nil];
 }
 
 - (NSString *)mapID
@@ -2053,10 +2055,8 @@ CLLocationCoordinate2D latLngToCoordinate(mbgl::LatLng latLng)
     }
 }
 
-- (void)locationManager:(CLLocationManager *)manager didUpdateToLocation:(CLLocation *)newLocation fromLocation:(CLLocation *)oldLocation
+- (void)locationManager:(__unused CLLocationManager *)manager didUpdateToLocation:(CLLocation *)newLocation fromLocation:(CLLocation *)oldLocation
 {
-    (void)manager;
-
     if ( ! _showsUserLocation || ! newLocation || ! CLLocationCoordinate2DIsValid(newLocation.coordinate)) return;
 
     if ([newLocation distanceFromLocation:oldLocation] || ! oldLocation)
@@ -2129,19 +2129,15 @@ CLLocationCoordinate2D latLngToCoordinate(mbgl::LatLng latLng)
 
 - (BOOL)locationManagerShouldDisplayHeadingCalibration:(CLLocationManager *)manager
 {
-    (void)manager;
-
-    if (self.displayHeadingCalibration) [self.locationManager performSelector:@selector(dismissHeadingCalibrationDisplay)
-                                                                   withObject:nil
-                                                                   afterDelay:10.0];
+    if (self.displayHeadingCalibration) [manager performSelector:@selector(dismissHeadingCalibrationDisplay)
+                                                      withObject:nil
+                                                      afterDelay:10.0];
 
     return self.displayHeadingCalibration;
 }
 
-- (void)locationManager:(CLLocationManager *)manager didUpdateHeading:(CLHeading *)newHeading
+- (void)locationManager:(__unused CLLocationManager *)manager didUpdateHeading:(CLHeading *)newHeading
 {
-    (void)manager;
-
     if ( ! _showsUserLocation || self.pan.state == UIGestureRecognizerStateBegan || newHeading.headingAccuracy < 0) return;
 
     self.userLocation.heading = newHeading;
@@ -2161,10 +2157,8 @@ CLLocationCoordinate2D latLngToCoordinate(mbgl::LatLng latLng)
     }
 }
 
-- (void)locationManager:(CLLocationManager *)manager didChangeAuthorizationStatus:(CLAuthorizationStatus)status
+- (void)locationManager:(__unused CLLocationManager *)manager didChangeAuthorizationStatus:(CLAuthorizationStatus)status
 {
-    (void)manager;
-
     if (status == kCLAuthorizationStatusDenied || status == kCLAuthorizationStatusRestricted)
     {
         self.userTrackingMode  = MGLUserTrackingModeNone;
@@ -2172,10 +2166,8 @@ CLLocationCoordinate2D latLngToCoordinate(mbgl::LatLng latLng)
     }
 }
 
-- (void)locationManager:(CLLocationManager *)manager didFailWithError:(NSError *)error
+- (void)locationManager:(__unused CLLocationManager *)manager didFailWithError:(NSError *)error
 {
-    (void)manager;
-
     if ([error code] == kCLErrorDenied)
     {
         self.userTrackingMode  = MGLUserTrackingModeNone;
@@ -2384,9 +2376,10 @@ CLLocationCoordinate2D latLngToCoordinate(mbgl::LatLng latLng)
         }
         case mbgl::MapChangeDidFailLoadingMap:
         {
-            if ([self.delegate respondsToSelector:@selector(mapViewDidFailLoadingMap:withError::)])
+            if ([self.delegate respondsToSelector:@selector(mapViewDidFailLoadingMap:withError:)])
             {
-                [self.delegate mapViewDidFailLoadingMap:self withError:nil];
+                NSError *error = [NSError errorWithDomain:MGLErrorDomain code:0 userInfo:nil];
+                [self.delegate mapViewDidFailLoadingMap:self withError:error];
             }
             break;
         }
@@ -2542,7 +2535,7 @@ CLLocationCoordinate2D latLngToCoordinate(mbgl::LatLng latLng)
     self.layer.borderColor = [UIColor colorWithWhite:184/255. alpha:1].CGColor;
     self.layer.borderWidth = 1;
 
-    if (self.accessToken)
+    if ([MGLAccountManager accessToken])
     {
         self.layer.backgroundColor = [UIColor colorWithRed:59/255.
                                                      green:178/255.
@@ -2607,7 +2600,7 @@ CLLocationCoordinate2D latLngToCoordinate(mbgl::LatLng latLng)
 
         // More explanation
         UILabel *explanationLabel2 = [[UILabel alloc] init];
-        explanationLabel2.text = @"and enter it into the Access Token field in the Attributes inspector.";
+        explanationLabel2.text = @"and set it as the value of MGLMapboxAccessToken in the Info.plist file.";
         explanationLabel2.font = [UIFont preferredFontForTextStyle:UIFontTextStyleBody];
         explanationLabel2.numberOfLines = 0;
         explanationLabel2.translatesAutoresizingMaskIntoConstraints = NO;

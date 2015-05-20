@@ -123,10 +123,6 @@ public:
     // Changes whether debug information is drawn onto the map
     void setDebug(bool enabled);
 
-    // Opaque/Translucent pass setting
-    void setOpaque();
-    void setTranslucent();
-
     // Configures the painter strata that is used for early z-culling of fragments.
     void setStrata(float strata);
 
@@ -147,6 +143,12 @@ private:
 
     std::vector<RenderItem> determineRenderOrder(const Style& style);
     static RenderPass determineRenderPasses(const StyleLayer&);
+
+    template <class Iterator>
+    void renderPass(RenderPass,
+                    Iterator it, Iterator end,
+                    std::size_t i, int8_t iIncrement,
+                    const float strataThickness);
 
     void prepareTile(const Tile& tile);
 

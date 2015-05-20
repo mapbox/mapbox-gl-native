@@ -1,5 +1,6 @@
 #import <Foundation/Foundation.h>
 
+extern NSString *const MGLEventTypeAppUserTurnstile;
 extern NSString *const MGLEventTypeMapLoad;
 extern NSString *const MGLEventTypeMapTap;
 extern NSString *const MGLEventTypeMapDragEnd;
@@ -29,6 +30,8 @@ extern NSString *const MGLEventGesturePinchStart;
 extern NSString *const MGLEventGestureRotateStart;
 
 @interface MGLMapboxEvents : NSObject <NSURLSessionDelegate>
+
++ (instancetype)sharedManager;
 
 // You must call these methods from the main thread.
 //

@@ -81,6 +81,7 @@
 /* End PBXContainerItemProxy section */
 
 /* Begin PBXFileReference section */
+		DACAD7111B08719F009119DC /* MGLMapboxEvents.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; name = MGLMapboxEvents.h; path = ../../platform/ios/MGLMapboxEvents.h; sourceTree = SOURCE_ROOT; };
 		DD043323196DB9BC00E6F39D /* Mapbox GL Tests.app */ = {isa = PBXFileReference; explicitFileType = wrapper.application; includeInIndex = 0; path = "Mapbox GL Tests.app"; sourceTree = BUILT_PRODUCTS_DIR; };
 		DD04335F196DBBD500E6F39D /* MGLTAppDelegate.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = MGLTAppDelegate.m; sourceTree = SOURCE_ROOT; };
 		DD043360196DBBD500E6F39D /* MGLTViewController.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = MGLTViewController.m; sourceTree = SOURCE_ROOT; };
@@ -270,6 +271,7 @@
 			isa = PBXGroup;
 			children = (
 				DD0581031ACB661200B112C9 /* Headers */,
+				DACAD7111B08719F009119DC /* MGLMapboxEvents.h */,
 				DD0581071ACB663200B112C9 /* libMapboxGL.a */,
 				DD0581051ACB661C00B112C9 /* MapboxGL.bundle */,
 			);

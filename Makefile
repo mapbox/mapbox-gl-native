@@ -134,10 +134,10 @@ isim: XCPRETTY := $(shell ./scripts/xcpretty.sh)
 isim: Xcode/ios
 	xcodebuild -sdk iphonesimulator ARCHS="x86_64 i386" -project ./build/ios/gyp/ios.xcodeproj -configuration Debug -target iosapp -jobs $(JOBS) $(XCPRETTY)
 
-ipackage: clean Xcode/ios
+ipackage: Xcode/ios
 	JOBS=$(JOBS) ./scripts/ios/package.sh
 
-ipackage-sim: clean Xcode/ios
+ipackage-sim: Xcode/ios
 	JOBS=$(JOBS) ./scripts/ios/package.sh sim
 
 itest: ipackage-sim KIF

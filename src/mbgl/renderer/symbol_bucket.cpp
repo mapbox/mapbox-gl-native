@@ -29,7 +29,7 @@
 namespace mbgl {
 
 SymbolBucket::SymbolBucket(Collision &collision_)
-    : collision(collision_), needsGlyphs_(false) {
+    : collision(collision_) {
 }
 
 SymbolBucket::~SymbolBucket() {
@@ -62,16 +62,15 @@ bool SymbolBucket::hasTextData() const { return !text.groups.empty(); }
 
 bool SymbolBucket::hasIconData() const { return !icon.groups.empty(); }
 
-std::vector<SymbolFeature> SymbolBucket::processFeatures(const GeometryTileLayer& layer,
-                                                         const FilterExpression& filter,
-                                                         GlyphStore &glyphStore) {
+bool SymbolBucket::needsDependencies(const GeometryTileLayer& layer,
+                                     const FilterExpression& filter,
+                                     GlyphStore& glyphStore,
+                                     Sprite& sprite) {
     const bool has_text = !layout.text.field.empty() && !layout.text.font.empty();
     const bool has_icon = !layout.icon.image.empty();
 
-    std::vector<SymbolFeature> features;
-
     if (!has_text && !has_icon) {
-        return features;
+        return false;
     }
 
     // Determine and load glyph ranges
@@ -135,28 +134,21 @@ std::vector<SymbolFeature> SymbolBucket::processFeatures(const GeometryTileLayer
     }
 
     if (glyphStore.requestGlyphRangesIfNeeded(layout.text.font, ranges)) {
-        needsGlyphs_ = true;
-        return {};
+        return true;
     }
 
-    return features;
+    if (!sprite.isLoaded()) {
+        return true;
+    }
+
+    return false;
 }
 
-void SymbolBucket::addFeatures(const GeometryTileLayer& layer,
-                               const FilterExpression& filter,
-                               uintptr_t tileUID,
+void SymbolBucket::addFeatures(uintptr_t tileUID,
                                SpriteAtlas& spriteAtlas,
                                Sprite& sprite,
                                GlyphAtlas& glyphAtlas,
                                GlyphStore& glyphStore) {
-    const std::vector<SymbolFeature> features = processFeatures(layer, filter, glyphStore);
-
-    // Stop if we still need glyphs because the
-    // bucket will be discarded.
-    if (needsGlyphs()) {
-        return;
-    }
-
     float horizontalAlign = 0.5;
     float verticalAlign = 0.5;
 
@@ -198,7 +190,7 @@ void SymbolBucket::addFeatures(const GeometryTileLayer& layer,
     if (layout.text.justify == TextJustifyType::Right) justify = 1;
     else if (layout.text.justify == TextJustifyType::Left) justify = 0;
 
-    auto* fontStack = glyphStore.getFontStack(layout.text.font);
+    auto fontStack = glyphStore.getFontStack(layout.text.font);
 
     for (const auto& feature : features) {
         if (!feature.geometry.size()) continue;
@@ -222,7 +214,7 @@ void SymbolBucket::addFeatures(const GeometryTileLayer& layer,
 
             // Add the glyphs we need for this label to the glyph atlas.
             if (shaping.size()) {
-                glyphAtlas.addGlyphs(tileUID, feature.label, layout.text.font, *fontStack, face);
+                glyphAtlas.addGlyphs(tileUID, feature.label, layout.text.font, **fontStack, face);
             }
         }
 
@@ -244,6 +236,8 @@ void SymbolBucket::addFeatures(const GeometryTileLayer& layer,
             }
         }
     }
+
+    features.clear();
 }
 
 bool byScale(const Anchor &a, const Anchor &b) { return a.scale < b.scale; }

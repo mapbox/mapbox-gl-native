@@ -92,10 +92,7 @@ mbgl::Settings_NSUserDefaults *settings = nullptr;
     [self restoreState:nil];
 }
 
-#pragma clang diagnostic push
-#pragma clang diagnostic ignored "-Wunused-parameter"
-
-- (void)saveState:(NSNotification *)notification
+- (void)saveState:(__unused NSNotification *)notification
 {
     if (self.mapView && settings)
     {
@@ -110,7 +107,7 @@ mbgl::Settings_NSUserDefaults *settings = nullptr;
     }
 }
 
-- (void)restoreState:(NSNotification *)notification
+- (void)restoreState:(__unused NSNotification *)notification
 {
     if (self.mapView && settings) {
         settings->load();
@@ -121,8 +118,6 @@ mbgl::Settings_NSUserDefaults *settings = nullptr;
         [self.mapView setDebugActive:settings->debug];
     }
 }
-
-#pragma clang diagnostic pop
 
 - (NSUInteger)supportedInterfaceOrientations
 {
@@ -313,17 +308,14 @@ mbgl::Settings_NSUserDefaults *settings = nullptr;
     }
 }
 
-#pragma clang diagnostic push
-#pragma clang diagnostic ignored "-Wunused-parameter"
-
 #pragma mark - MGLMapViewDelegate
 
-- (BOOL)mapView:(MGLMapView *)mapView annotationCanShowCallout:(id <MGLAnnotation>)annotation
+- (BOOL)mapView:(__unused MGLMapView *)mapView annotationCanShowCallout:(__unused id <MGLAnnotation>)annotation
 {
     return YES;
 }
 
-- (void)mapView:(MGLMapView *)mapView didChangeUserTrackingMode:(MGLUserTrackingMode)mode animated:(BOOL)animated
+- (void)mapView:(__unused MGLMapView *)mapView didChangeUserTrackingMode:(MGLUserTrackingMode)mode animated:(__unused BOOL)animated
 {
     UIImage *newButtonImage;
     
@@ -345,7 +337,5 @@ mbgl::Settings_NSUserDefaults *settings = nullptr;
         self.navigationItem.rightBarButtonItem.image = newButtonImage;
     }];
 }
-
-#pragma clang diagnostic pop
 
 @end

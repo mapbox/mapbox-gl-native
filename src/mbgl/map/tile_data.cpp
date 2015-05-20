@@ -73,10 +73,11 @@ void TileData::endParsing() {
     parsing.clear(std::memory_order_release);
 }
 
-void TileData::reparse(Worker& worker, std::function<void()> callback) {
+bool TileData::reparse(Worker& worker, std::function<void()> callback) {
     if (!mayStartParsing()) {
-        return;
+        return false;
     }
 
     workRequest = worker.send([this] { parse(); endParsing(); }, callback);
+    return true;
 }

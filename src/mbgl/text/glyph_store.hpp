@@ -4,6 +4,7 @@
 #include <mbgl/text/glyph.hpp>
 #include <mbgl/util/vec.hpp>
 #include <mbgl/util/ptr.hpp>
+#include <mbgl/util/exclusive.hpp>
 
 #include <cstdint>
 #include <vector>
@@ -12,6 +13,14 @@
 #include <set>
 #include <string>
 #include <unordered_map>
+
+typedef struct uv_loop_s uv_loop_t;
+
+namespace uv {
+
+class async;
+
+}
 
 namespace mbgl {
 
@@ -45,7 +54,6 @@ private:
     std::map<uint32_t, std::string> bitmaps;
     std::map<uint32_t, GlyphMetrics> metrics;
     std::map<uint32_t, SDFGlyph> sdfs;
-    mutable std::mutex mtx;
 };
 
 class GlyphPBF {
@@ -73,8 +81,6 @@ private:
 
     Environment& env;
     Request* req = nullptr;
-
-    mutable std::mutex mtx;
 };
 
 // Manages Glyphrange PBF loading.
@@ -87,7 +93,7 @@ public:
         virtual void onGlyphRangeLoaded() = 0;
     };
 
-    GlyphStore(Environment &);
+    GlyphStore(uv_loop_t* loop, Environment &);
     ~GlyphStore();
 
     // Asynchronously request for GlyphRanges and when it gets loaded, notifies the
@@ -96,7 +102,7 @@ public:
     // GlyphRanges are already available, and thus, no request is performed.
     bool requestGlyphRangesIfNeeded(const std::string &fontStack, const std::set<GlyphRange> &glyphRanges);
 
-    FontStack* getFontStack(const std::string &fontStack);
+    util::exclusive<FontStack> getFontStack(const std::string &fontStack);
 
     void setURL(const std::string &url);
 
@@ -105,7 +111,7 @@ public:
 private:
     void emitGlyphRangeLoaded();
 
-    FontStack* createFontStack(const std::string &fontStack);
+    util::exclusive<FontStack> createFontStack(const std::string &fontStack);
 
     std::string glyphURL;
     Environment &env;
@@ -115,6 +121,8 @@ private:
 
     std::unordered_map<std::string, std::unique_ptr<FontStack>> stacks;
     std::mutex stacksMutex;
+
+    std::unique_ptr<uv::async> asyncEmitGlyphRangeLoaded;
 
     Observer* observer;
 };

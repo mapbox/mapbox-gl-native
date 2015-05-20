@@ -16,6 +16,8 @@
 /test/build
 /test/node_modules
 /test/fixtures/*/*_actual.*
+/test/fixtures/api/1.png
+/test/fixtures/api/2.png
 /test/fixtures/database/*.db
 /include/mbgl/shader/shaders.hpp
 /src/shader/shaders_gl.cpp

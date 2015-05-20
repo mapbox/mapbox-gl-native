@@ -43,13 +43,17 @@ public:
     // a new style we will go through all of them and try to load.
     void setStyle(Style* style);
 
+    // TODO: Move GlyphStore to ResourceLoader. We cannot do it now
+    // because we reset the ResourceLoader every time we change the
+    // style.
+    void setGlyphStore(GlyphStore* glyphStore);
+
     // Set the access token to be used for loading the tile data.
     void setAccessToken(const std::string& accessToken);
 
     // Fetch the tiles needed by the current viewport and emit a signal when
     // a tile is ready so observers can render the tile.
-    void update(MapData&, const TransformState&, GlyphAtlas&, GlyphStore&,
-                SpriteAtlas&, TexturePool&);
+    void update(MapData&, const TransformState&, GlyphAtlas&, SpriteAtlas&, TexturePool&);
 
     // FIXME: There is probably a better place for this.
     inline util::ptr<Sprite> getSprite() const {
@@ -61,7 +65,7 @@ public:
 
     // Source::Observer implementation.
     void onSourceLoaded() override;
-    void onTileLoaded() override;
+    void onTileLoaded(bool isNewTile) override;
 
     // Sprite::Observer implementation.
     void onSpriteLoaded() override;
@@ -69,9 +73,14 @@ public:
 private:
     void emitTileDataChanged();
 
+    bool shouldReparsePartialTiles_ = false;
+
     std::string accessToken_;
     util::ptr<Sprite> sprite_;
+
+    GlyphStore* glyphStore_ = nullptr;
     Style* style_ = nullptr;
+
     Observer* observer_ = nullptr;
 };
 

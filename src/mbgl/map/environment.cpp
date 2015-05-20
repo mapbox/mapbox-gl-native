@@ -36,10 +36,7 @@ public:
     void registerThread(Environment* env, ThreadType type, const std::string& name) {
         std::lock_guard<std::mutex> lock(mtx);
 
-        // FIXME: We should never need to overwrite a thread here and we only allow
-        // this today because on the Static mode, the Map thread and the Main thread
-        // are same. Replace this with emplace() when this gets fixed.
-        threadSet[std::this_thread::get_id()] = ThreadInfo{ env, type, name };
+        threadSet.emplace(std::this_thread::get_id(), ThreadInfo{ env, type, name });
     }
 
     void unregisterThread() {

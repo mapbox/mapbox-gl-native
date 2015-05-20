@@ -20,30 +20,25 @@ IB_DESIGNABLE
 
 /** @name Initializing a Map View */
 
-/** Initialize a map view with the default style, given frame, and access token set in MapboxGL singleton.
-*   @param frame The frame with which to initialize the map view.
-*   @return An initialized map view, or `nil` if the map view was unable to be initialized. */
+/** Initializes and returns a newly allocated map view with the specified frame and the default style.
+*   @param frame The frame for the view, measured in points.
+*   @return An initialized map view or `nil` if the map view couldn’t be created. */
 - (instancetype)initWithFrame:(CGRect)frame;
+- (instancetype)initWithFrame:(CGRect)frame accessToken:(NSString *)accessToken __attribute__((unavailable("Use -initWithFrame:. Set MGLMapboxAccessToken in the Info.plist or call +[MGLAccountManager setAccessToken:].")));
 
-/** Initialize a map view with the default style and a given frame and access token.
-*   @param frame The frame with which to initialize the map view.
-*   @param accessToken A Mapbox API access token.
-*   @return An initialized map view, or `nil` if the map view was unable to be initialized. */
-- (instancetype)initWithFrame:(CGRect)frame accessToken:(NSString *)accessToken;
-
-/** Initialize a map view with a given frame, access token, and style URL.
- *   @param frame The frame with which to initialize the map view.
- *   @param accessToken A Mapbox API access token.
- *   @param styleURL The map style URL to use. Can be either an HTTP/HTTPS URL or a Mapbox map ID style URL (`mapbox://<user.style>`).
- *   @return An initialized map view, or `nil` if the map view was unable to be initialized. */
-- (instancetype)initWithFrame:(CGRect)frame accessToken:(NSString *)accessToken styleURL:(NSURL *)styleURL;
+/** Initializes and returns a newly allocated map view with the specified frame and style URL.
+*   @param frame The frame for the view, measured in points.
+*   @param styleURL The map style URL to use. Can be either an HTTP/HTTPS URL or a Mapbox map ID style URL (`mapbox://<user.style>`).
+*   @return An initialized map view or `nil` if the map view couldn’t be created. */
+- (instancetype)initWithFrame:(CGRect)frame styleURL:(NSURL *)styleURL;
+- (instancetype)initWithFrame:(CGRect)frame accessToken:(NSString *)accessToken styleURL:(NSURL *)styleURL __attribute__((unavailable("Use -initWithFrame:styleURL:. Set MGLMapboxAccessToken in the Info.plist or call +[MGLAccountManager setAccessToken:].")));
 
 #pragma mark - Authorizing Access
 
 /** @name Authorizing Access */
 
 /** Mapbox API access token for the map view. */
-@property (nonatomic) NSString *accessToken;
+@property (nonatomic) NSString *accessToken __attribute__((unavailable("Use +[MGLAccountManager accessToken] and +[MGLAccountManager setAccessToken:].")));
 
 #pragma mark - Managing Constraints
 

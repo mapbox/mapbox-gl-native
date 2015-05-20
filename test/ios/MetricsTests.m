@@ -10,7 +10,6 @@
 
 @interface MGLMapboxEvents (Testing)
 
-+ (instancetype)sharedManager;
 - (NSString *)appBundleId;
 - (NSString *)token;
 - (BOOL)isPaused;
