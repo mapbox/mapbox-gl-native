@@ -37,12 +37,8 @@ void StyleParser::parse(JSVal document) {
     if (document.HasMember("layers")) {
         parseLayers(document["layers"]);
 
-
-
-
-
-
-
+        // create single shape annotations layer (for now)
+        //
         const std::string& shapeID = AnnotationManager::ShapeLayerID;
 
         std::map<ClassID, ClassProperties> shapePaints;
@@ -51,7 +47,7 @@ void StyleParser::parse(JSVal document) {
         lineWidth.AddMember("line-width", 5, d1.GetAllocator());
         parsePaint(lineWidth, shapePaints[ClassID::Default]);
         rapidjson::Value lineColor(rapidjson::kObjectType);
-        lineColor.AddMember("line-color", "#ff0000", d1.GetAllocator());
+        lineColor.AddMember("line-color", "#0000ff", d1.GetAllocator());
         parsePaint(lineColor, shapePaints[ClassID::Default]);
         util::ptr<StyleLayer> shapeAnnotations = std::make_shared<StyleLayer>(shapeID, std::move(shapePaints));
         shapeAnnotations->type = StyleLayerType::Line;
@@ -70,12 +66,8 @@ void StyleParser::parse(JSVal document) {
         source1->info.type = SourceType::Annotations;
         lineBucket->source = source1;
         shapeAnnotations->bucket = lineBucket;
-
-
-
-
-
-
+        //
+        // end shape annotations
 
         // create point annotations layer
         //

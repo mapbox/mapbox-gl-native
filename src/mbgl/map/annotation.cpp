@@ -146,42 +146,37 @@ AnnotationManager::addAnnotations(const AnnotationType type,
 
                     }
 
+                    // create tile feature
                     auto feature =
                         std::make_shared<const LiveTileFeature>(
                             (type == AnnotationType::Point ? FeatureType::Point : FeatureType::LineString),
                             geometries,
                             featureProperties);
 
-                    auto tile_it = tiles.find(tileID);
-                    if (tile_it != tiles.end()) {
-                        //
-                        // We have this tile created already. Add this feature to it.
-                        //
-                        // get point layer & add feature
-                        auto layer =
-                            tile_it->second.second->getMutableLayer(
-                                (type == AnnotationType::Point ? PointLayerID : ShapeLayerID)
-                            );
-                        layer->addFeature(feature);
-                        // record annotation association with tile
-                        tile_it->second.first.insert(annotationID);
+                    // check for tile & create if necessary
+                    auto tile_pos = tiles.emplace(
+                        tileID,
+                        std::make_pair(
+                            std::unordered_set<uint32_t>({ annotationID }),
+                            util::make_unique<LiveTile>()
+                        )
+                    );
+
+                    // check for annotation layer & create if necessary
+                    util::ptr<LiveTileLayer> layer;
+                    auto& layerID = (type == AnnotationType::Point ? PointLayerID : ShapeLayerID);
+                    if (tile_pos.second || tile_pos.first->second.second->getMutableLayer(layerID) == nullptr) {
+                        layer = std::make_shared<LiveTileLayer>();
+                        tile_pos.first->second.second->addLayer(layerID, layer);
                     } else {
-                        //
-                        // We need to create a new tile for this feature.
-                        //
-                        // create point layer & add feature
-                        util::ptr<LiveTileLayer> layer = std::make_shared<LiveTileLayer>();
-                        layer->addFeature(feature);
-                        // create tile & record annotation association
-                        auto tile_pos = tiles.emplace(
-                            tileID, std::make_pair(std::unordered_set<uint32_t>({ annotationID }),
-                                                   util::make_unique<LiveTile>()));
-                        // add point layer to tile
-                        tile_pos.first->second.second->addLayer(
-                            (type == AnnotationType::Point ? PointLayerID : ShapeLayerID),
-                            layer
-                        );
+                        layer = tile_pos.first->second.second->getMutableLayer(layerID);
+
+                        // associate annotation with tile
+                        tile_pos.first->second.first.insert(annotationID);
                     }
+
+                    // add feature to layer
+                    layer->addFeature(feature);
 
                     // Record annotation association with tile and tile feature. This is used to determine stale tiles,
                     // as well as to remove the feature from the tile upon annotation deletion.
