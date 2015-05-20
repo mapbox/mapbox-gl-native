@@ -280,7 +280,9 @@ const NSTimeInterval MGLFlushInterval = 60;
          }];
 
         // Turn the Mapbox Turnstile to Count App Users
-        [self pushEvent:MGLEventTypeAppUserTurnstile withAttributes:nil];
+        dispatch_async(dispatch_get_global_queue(DISPATCH_QUEUE_PRIORITY_BACKGROUND, 0), ^{
+            [self pushTurnstileEvent];
+        });
     }
     return self;
 }
@@ -419,6 +421,31 @@ const NSTimeInterval MGLFlushInterval = 60;
     }
 }
 
+- (void) pushTurnstileEvent {
+
+    __weak MGLMapboxEvents *weakSelf = self;
+
+    dispatch_async(_serialQueue, ^{
+
+        MGLMapboxEvents *strongSelf = weakSelf;
+
+        if ( ! strongSelf) return;
+
+            // Build only IDFV event
+            NSString *vid = [[[UIDevice currentDevice] identifierForVendor] UUIDString];
+            NSDictionary *vevt = @{@"event" : MGLEventTypeAppUserTurnstile,
+                                   @"created" : [strongSelf.rfc3339DateFormatter stringFromDate:[NSDate date]],
+                                   @"appBundleId" : strongSelf.appBundleId,
+                                   @"vendorId": vid};
+
+            // Add to Queue
+            [_eventQueue addObject:vevt];
+
+            // Flush
+            [self flush];
+    });
+}
+
 // Can be called from any thread. Can be called rapidly from
 // the UI thread, so performance is paramount.
 //
@@ -439,20 +466,6 @@ const NSTimeInterval MGLFlushInterval = 60;
         MGLMapboxEvents *strongSelf = weakSelf;
 
         if ( ! strongSelf) return;
-
-        if ([MGLEventTypeAppUserTurnstile isEqualToString:event]) {
-            // Build only IDFV event
-            NSString *vid = [[[UIDevice currentDevice] identifierForVendor] UUIDString];
-            NSDictionary *vevt = @{@"vendorId": vid};
-
-            // Add to Queue
-            [_eventQueue addObject:vevt];
-
-            // Flush
-            [self flush];
-
-            return;
-        }
 
         // Metrics Collection Has Been Paused
         if (_paused) {
@@ -502,7 +515,7 @@ const NSTimeInterval MGLFlushInterval = 60;
         [_eventQueue addObject:finalEvent];
         
         // Has Flush Limit Been Reached?
-        if (_eventQueue.count >= MGLMaximumEventsPerFlush || [MGLEventTypeAppUserTurnstile isEqualToString:event]) {
+        if (_eventQueue.count >= MGLMaximumEventsPerFlush) {
             [strongSelf flush];
         } else if (_eventQueue.count ==  1) {
             // If this is first new event on queue start timer,
