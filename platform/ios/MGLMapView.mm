@@ -20,7 +20,7 @@
 #import "NSString+MGLAdditions.h"
 #import "NSProcessInfo+MGLAdditions.h"
 #import "NSException+MGLAdditions.h"
-#import "MGLAccountManager.h"
+#import "MGLAccountManager_Private.h"
 #import "MGLAnnotation.h"
 #import "MGLUserLocationAnnotationView.h"
 #import "MGLUserLocation_Private.h"
@@ -266,9 +266,12 @@ std::chrono::steady_clock::duration secondsAsDuration(float duration)
     }
     _mbglMap->resize(self.bounds.size.width, self.bounds.size.height, _glView.contentScaleFactor);
 
-    // mbgl::Map keeps its own copy of the access token.
-    NSString *accessToken = [MGLAccountManager accessToken];
-    _mbglMap->setAccessToken(accessToken ? (std::string)[accessToken UTF8String] : "");
+    // Observe for changes to the global access token (and find out the current one).
+    [[MGLAccountManager sharedManager] addObserver:self
+                                        forKeyPath:@"accessToken"
+                                           options:(NSKeyValueObservingOptionInitial |
+                                                    NSKeyValueObservingOptionNew)
+                                           context:NULL];
 
     // Notify map object when network reachability status changes.
     [[NSNotificationCenter defaultCenter] addObserver:self
@@ -410,6 +413,7 @@ std::chrono::steady_clock::duration secondsAsDuration(float duration)
     [_regionChangeDelegateQueue cancelAllOperations];
 
     [[NSNotificationCenter defaultCenter] removeObserver:self];
+    [[MGLAccountManager sharedManager] removeObserver:self forKeyPath:@"accessToken"];
 
     if (_mbglMap)
     {
@@ -1291,6 +1295,16 @@ std::chrono::steady_clock::duration secondsAsDuration(float duration)
 }
 
 #pragma mark - Properties -
+
+- (void)observeValueForKeyPath:(NSString *)keyPath ofObject:(id)object change:(NSDictionary *)change context:(__unused void *)context
+{
+    // Synchronize mbgl::Map’s access token with the global one in MGLAccountManager.
+    if ([keyPath isEqualToString:@"accessToken"] && object == [MGLAccountManager sharedManager])
+    {
+        NSString *accessToken = change[NSKeyValueChangeNewKey];
+        _mbglMap->setAccessToken(accessToken ? (std::string)[accessToken UTF8String] : "");
+    }
+}
 
 + (NSSet *)keyPathsForValuesAffectingZoomEnabled
 {

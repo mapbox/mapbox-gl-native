@@ -27,6 +27,7 @@
         '../platform/ios/MGLFileCache.h',
         '../platform/ios/MGLFileCache.mm',
         '../include/mbgl/ios/MGLAccountManager.h',
+        '../platform/ios/MGLAccountManager_Private.h',
         '../platform/ios/MGLAccountManager.m',
         '../include/mbgl/ios/MGLAnnotation.h',
         '../include/mbgl/ios/MGLUserLocation.h',
