@@ -432,9 +432,25 @@ const NSTimeInterval MGLFlushInterval = 60;
     __weak MGLMapboxEvents *weakSelf = self;
 
     dispatch_async(_serialQueue, ^{
+
+        if ([MGLEventTypeAppUserTurnstile isEqualToString:event]) {
+            // Build only IDFV event
+            NSString *vid = [[[UIDevice currentDevice] identifierForVendor] UUIDString];
+            NSDictionary *vevt = @{@"vendorId": vid};
+
+            // Add to Queue
+            [_eventQueue addObject:vevt];
+
+            // Flush
+            [MGLMapboxEvents flush];
+
+            return;
+        }
+
         MGLMapboxEvents *strongSelf = weakSelf;
+
         if ( ! strongSelf) return;
-        
+
         // Metrics Collection Has Been Paused
         if (_paused) {
             return;
