@@ -94,19 +94,25 @@ test('Map', function(t) {
                     t.throws(function() {
                         map.load();
                     }, /Requires a map style as first argument/);
+
+                    map.release();
+
                     t.end();
                 });
             });
 
             t.test('expect either an object or array at root', { timeout: 1000 }, function(t) {
-                mbgl.once('message', function(msg) {
-                    t.equal(msg.severity, 'ERROR');
-                    t.equal(msg.class, 'ParseStyle');
-                    t.ok(msg.text.match(/Expect either an object or array at root/));
-                    t.end();
-                });
-
                 setup(fileSource, function(map) {
+                    mbgl.once('message', function(msg) {
+                        t.equal(msg.severity, 'ERROR');
+                        t.equal(msg.class, 'ParseStyle');
+                        t.ok(msg.text.match(/Expect either an object or array at root/));
+
+                        map.release();
+
+                        t.end();
+                    });
+
                     map.load('invalid');
                 });
             });
@@ -119,6 +125,9 @@ test('Map', function(t) {
                 t.doesNotThrow(function() {
                     map.load('{}');
                 });
+
+                map.release();
+
                 t.end();
             });
         });
@@ -132,6 +141,9 @@ test('Map', function(t) {
                 t.doesNotThrow(function() {
                     map.load(style);
                 });
+
+                map.release();
+
                 t.end();
             });
         });
@@ -145,6 +157,9 @@ test('Map', function(t) {
                 t.doesNotThrow(function() {
                     map.load(JSON.stringify(style));
                 });
+
+                map.release();
+
                 t.end();
             });
         });
@@ -171,6 +186,8 @@ test('Map', function(t) {
                     map.render('invalid');
                 }, /First argument must be an options object/);
 
+                map.release();
+
                 t.end();
             });
         });
@@ -185,6 +202,8 @@ test('Map', function(t) {
                     map.render({}, 'invalid');
                 }, /Second argument must be a callback function/);
 
+                map.release();
+
                 t.end();
             });
         });
@@ -194,18 +213,38 @@ test('Map', function(t) {
                 t.throws(function() {
                     map.render({}, function() {});
                 }, /Style is not set/);
+
+                map.release();
+
                 t.end();
             });
         });
 
         t.test('returns an error', function(t) {
+            mbgl.once('message', function(msg) {
+                console.log(msg);
+            });
+
             setup(fileSource, function(map) {
                 map.load(style);
                 map.render({ zoom: 1 }, function(err, data) {
+                    map.release();
                     t.ok(err);
                     t.equal(err.message, 'Error rendering image');
                     t.end();
                 });
+            });
+        });
+
+        t.test('double release', function(t) {
+            setup(fileSource, function(map) {
+                map.release();
+
+                t.throws(function() {
+                    map.release();
+                }, /Map resources have already been released/);
+
+                t.end();
             });
         });
 
@@ -214,6 +253,8 @@ test('Map', function(t) {
                 map.load(style);
                 map.render({}, function(err, data) {
                     t.error(err);
+
+                    map.release();
 
                     var filename = filePath('image.png');
 

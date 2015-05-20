@@ -69,6 +69,8 @@ test('gzip', function(t) {
             map.render({}, function(err, data) {
                 t.error(err);
 
+                map.release();
+
                 mbgl.removeAllListeners('message');
 
                 var filename = filePath('success.png');
@@ -118,6 +120,8 @@ test('gzip', function(t) {
             map.load(style);
             map.render({}, function(err, data) {
                 if (!errorEmitted) t.fail('no error emitted');
+
+                map.release();
 
                 mbgl.removeAllListeners('message');
 

@@ -54,6 +54,8 @@ function renderTest(style, info, base, key) {
         map.render(info[key], function(err, data) {
             t.error(err);
 
+            map.release();
+
             var expected = path.join(dir, 'expected.png');
             var actual = path.join(dir, 'actual.png');
             var diff = path.join(dir, 'diff.png');
