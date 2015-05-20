@@ -9,8 +9,6 @@
 @property (atomic) BOOL mapboxMetricsEnabledSettingShownInApp;
 @property (atomic) NSString *accessToken;
 
-+ (void)setMapboxMetricsEnabledSettingShownInApp:(BOOL)showsOptOut;
-
 @end
 
 
