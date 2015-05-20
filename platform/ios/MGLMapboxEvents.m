@@ -177,8 +177,10 @@ const NSTimeInterval MGLFlushInterval = 60;
 
 + (void)initialize {
     if (self == [MGLMapboxEvents class]) {
+        NSBundle *bundle = [NSBundle bundleForClass:self];
+        NSNumber *accountTypeNumber = [bundle objectForInfoDictionaryKey:@"MGLMapboxAccountType"];
         [[NSUserDefaults standardUserDefaults] registerDefaults:@{
-             @"MGLMapboxAccountType": @0,
+             @"MGLMapboxAccountType": accountTypeNumber ? accountTypeNumber : @0,
              @"MGLMapboxMetricsEnabled": @YES,
          }];
     }
@@ -214,7 +216,7 @@ const NSTimeInterval MGLFlushInterval = 60;
                 }
             }
 
-            NSAssert(defaultEnabledValue, @"End users must be able to opt out of Metrics in your app, either inside Settings (via Settings.bundle) or inside this app. If you implement the opt-out control inside this app, disable this assertion by setting [MGLAccountManager setMapboxMetricsEnabledSettingShownInApp:YES] before the app initializes any Mapbox GL classes.");
+            NSAssert(defaultEnabledValue, @"End users must be able to opt out of Metrics in your app, either inside Settings (via Settings.bundle) or inside this app. If you implement the opt-out control inside this app, disable this assertion by setting MGLMapboxMetricsEnabledSettingShownInApp to YES in Info.plist.");
             [[NSUserDefaults standardUserDefaults] registerDefaults:@{
                  @"MGLMapboxMetricsEnabled": defaultEnabledValue,
              }];
