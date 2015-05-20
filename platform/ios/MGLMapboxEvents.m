@@ -16,6 +16,7 @@
 static NSString *const MGLMapboxEventsUserAgent = @"MapboxEventsiOS/1.0";
 static NSString *MGLMapboxEventsAPIBase = @"https://api.tiles.mapbox.com";
 
+NSString *const MGLEventTypeAppUserTurnstile = @"appUserTurnstile";
 NSString *const MGLEventTypeMapLoad = @"map.load";
 NSString *const MGLEventTypeMapTap = @"map.click";
 NSString *const MGLEventTypeMapDragEnd = @"map.dragend";
@@ -277,6 +278,11 @@ const NSTimeInterval MGLFlushInterval = 60;
              MGLMapboxEvents *strongSelf = weakSelf;
              [strongSelf validate];
          }];
+
+        // Turn the Mapbox Turnstile to Count App Users
+        dispatch_async(dispatch_get_global_queue(DISPATCH_QUEUE_PRIORITY_BACKGROUND, 0), ^{
+            [self pushTurnstileEvent];
+        });
     }
     return self;
 }
@@ -315,6 +321,7 @@ const NSTimeInterval MGLFlushInterval = 60;
     [[MGLMapboxEvents sharedManager] validate];
 }
 
+// Used to determine if Mapbox Metrics should be collected at any given point in time
 - (void)validate {
     MGLAssertIsMainThread();
     BOOL enabledInSettings = [[self class] isEnabled];
@@ -414,6 +421,31 @@ const NSTimeInterval MGLFlushInterval = 60;
     }
 }
 
+- (void) pushTurnstileEvent {
+
+    __weak MGLMapboxEvents *weakSelf = self;
+
+    dispatch_async(_serialQueue, ^{
+
+        MGLMapboxEvents *strongSelf = weakSelf;
+
+        if ( ! strongSelf) return;
+
+            // Build only IDFV event
+            NSString *vid = [[[UIDevice currentDevice] identifierForVendor] UUIDString];
+            NSDictionary *vevt = @{@"event" : MGLEventTypeAppUserTurnstile,
+                                   @"created" : [strongSelf.rfc3339DateFormatter stringFromDate:[NSDate date]],
+                                   @"appBundleId" : strongSelf.appBundleId,
+                                   @"vendorId": vid};
+
+            // Add to Queue
+            [_eventQueue addObject:vevt];
+
+            // Flush
+            [strongSelf flush];
+    });
+}
+
 // Can be called from any thread. Can be called rapidly from
 // the UI thread, so performance is paramount.
 //
@@ -430,9 +462,11 @@ const NSTimeInterval MGLFlushInterval = 60;
     __weak MGLMapboxEvents *weakSelf = self;
 
     dispatch_async(_serialQueue, ^{
+
         MGLMapboxEvents *strongSelf = weakSelf;
+
         if ( ! strongSelf) return;
-        
+
         // Metrics Collection Has Been Paused
         if (_paused) {
             return;
