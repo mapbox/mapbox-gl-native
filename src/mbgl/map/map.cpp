@@ -195,17 +195,6 @@ void Map::resetNorth() {
 }
 
 
-#pragma mark - Access Token
-
-void Map::setAccessToken(const std::string &token) {
-    data->setAccessToken(token);
-}
-
-std::string Map::getAccessToken() const {
-    return data->getAccessToken();
-}
-
-
 #pragma mark - Projection
 
 void Map::getWorldBoundsMeters(ProjectedMeters& sw, ProjectedMeters& ne) const {

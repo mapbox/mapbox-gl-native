@@ -67,7 +67,7 @@ public:
     Source();
     ~Source();
 
-    void load(const std::string& accessToken);
+    void load();
     bool isLoaded() const;
 
     void load(MapData&, Environment&, std::function<void()> callback);

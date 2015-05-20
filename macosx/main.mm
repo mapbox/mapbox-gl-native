@@ -106,6 +106,12 @@ int main() {
 
     mbgl::SQLiteCache cache(defaultCacheDatabase());
     mbgl::DefaultFileSource fileSource(&cache);
+
+    // Set access token if present
+    NSString *accessToken = [[NSProcessInfo processInfo] environment][@"MAPBOX_ACCESS_TOKEN"];
+    if (!accessToken) mbgl::Log::Warning(mbgl::Event::Setup, "No access token set. Mapbox vector tiles won't work.");
+    if (accessToken) fileSource.setAccessToken([accessToken cStringUsingEncoding:[NSString defaultCStringEncoding]]);
+
     mbgl::Map map(view, fileSource);
 
     URLHandler *handler = [[URLHandler alloc] init];
@@ -139,11 +145,6 @@ int main() {
 
         mbgl::Log::Info(mbgl::Event::Setup, std::string("Changed style to: ") + newStyle.first);
     });
-
-    // Set access token if present
-    NSString *accessToken = [[NSProcessInfo processInfo] environment][@"MAPBOX_ACCESS_TOKEN"];
-    if (!accessToken) mbgl::Log::Warning(mbgl::Event::Setup, "No access token set. Mapbox vector tiles won't work.");
-    if (accessToken) map.setAccessToken([accessToken cStringUsingEncoding:[NSString defaultCStringEncoding]]);
 
     // Load style
     const auto& newStyle = mbgl::util::defaultStyles.front();

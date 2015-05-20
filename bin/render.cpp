@@ -81,13 +81,13 @@ int main(int argc, char *argv[]) {
         }
     }
 
-    HeadlessView view;
-    Map map(view, fileSource, MapMode::Still);
-
     // Set access token if present
     if (token.size()) {
-        map.setAccessToken(std::string(token));
+        fileSource.setAccessToken(std::string(token));
     }
+
+    HeadlessView view;
+    Map map(view, fileSource, MapMode::Still);
 
     map.setStyleJSON(style, ".");
     map.setClasses(classes);

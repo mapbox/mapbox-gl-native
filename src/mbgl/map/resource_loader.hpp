@@ -49,9 +49,6 @@ public:
     // style.
     void setGlyphStore(GlyphStore* glyphStore);
 
-    // Set the access token to be used for loading the tile data.
-    void setAccessToken(const std::string& accessToken);
-
     // Fetch the tiles needed by the current viewport and emit a signal when
     // a tile is ready so observers can render the tile.
     void update(MapData&, const TransformState&, GlyphAtlas&, SpriteAtlas&, TexturePool&);
@@ -81,7 +78,6 @@ private:
 
     bool shouldReparsePartialTiles_ = false;
 
-    std::string accessToken_;
     util::ptr<Sprite> sprite_;
 
     GlyphStore* glyphStore_ = nullptr;

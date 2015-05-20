@@ -70,6 +70,15 @@ int main(int argc, char *argv[]) {
 
     mbgl::SQLiteCache cache("/tmp/mbgl-cache.db");
     mbgl::DefaultFileSource fileSource(&cache);
+
+    // Set access token if present
+    const char *token = getenv("MAPBOX_ACCESS_TOKEN");
+    if (token == nullptr) {
+        mbgl::Log::Warning(mbgl::Event::Setup, "no access token set. mapbox.com tiles won't work.");
+    } else {
+        fileSource.setAccessToken(std::string(token));
+    }
+
     mbgl::Map map(*view, fileSource);
 
     // Load settings
@@ -91,14 +100,6 @@ int main(int argc, char *argv[]) {
 
         mbgl::Log::Info(mbgl::Event::Setup, std::string("Changed style to: ") + newStyle.first);
     });
-
-    // Set access token if present
-    const char *token = getenv("MAPBOX_ACCESS_TOKEN");
-    if (token == nullptr) {
-        mbgl::Log::Warning(mbgl::Event::Setup, "no access token set. mapbox.com tiles won't work.");
-    } else {
-        map.setAccessToken(std::string(token));
-    }
 
     // Load style
     if (style.empty()) {

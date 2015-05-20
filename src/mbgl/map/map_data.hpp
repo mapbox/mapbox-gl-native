@@ -27,15 +27,6 @@ public:
         setDefaultTransitionDuration(Duration::zero());
     }
 
-    inline std::string getAccessToken() const {
-        Lock lock(mtx);
-        return accessToken;
-    }
-    inline void setAccessToken(const std::string &token) {
-        Lock lock(mtx);
-        accessToken = token;
-    }
-
     // Adds the class if it's not yet set. Returns true when it added the class, and false when it
     // was already present.
     bool addClass(const std::string& klass);
@@ -95,7 +86,6 @@ public:
 private:
     mutable std::mutex mtx;
 
-    std::string accessToken;
     std::vector<std::string> classes;
     std::atomic<uint8_t> debug { false };
     std::atomic<bool> loaded { false };

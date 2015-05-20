@@ -140,14 +140,13 @@ bool Source::isLoaded() const {
 // Note: This is a separate function that must be called exactly once after creation
 // The reason this isn't part of the constructor is that calling shared_from_this() in
 // the constructor fails.
-void Source::load(const std::string& accessToken) {
+void Source::load() {
     if (info.url.empty()) {
         loaded = true;
         return;
     }
 
-    const std::string url = util::mapbox::normalizeSourceURL(info.url, accessToken);
-    req = Environment::Get().request({ Resource::Kind::JSON, url }, [this](const Response &res) {
+    req = Environment::Get().request({ Resource::Kind::Source, info.url }, [this](const Response &res) {
         req = nullptr;
 
         if (res.status != Response::Successful) {

@@ -24,7 +24,6 @@
 #include <mbgl/util/uv_detail.hpp>
 #include <mbgl/util/worker.hpp>
 #include <mbgl/util/texture_pool.hpp>
-#include <mbgl/util/mapbox.hpp>
 #include <mbgl/util/exception.hpp>
 
 namespace mbgl {
@@ -90,7 +89,7 @@ void MapContext::triggerUpdate(const Update u) {
 }
 
 void MapContext::setStyleURL(const std::string& url) {
-    styleURL = mbgl::util::mapbox::normalizeStyleURL(url, data.getAccessToken());
+    styleURL = url;
     styleJSON.clear();
 
     const size_t pos = styleURL.rfind('/');
@@ -99,7 +98,7 @@ void MapContext::setStyleURL(const std::string& url) {
         base = styleURL.substr(0, pos + 1);
     }
 
-    env.request({ Resource::Kind::JSON, styleURL }, [this, base](const Response &res) {
+    env.request({ Resource::Kind::Style, styleURL }, [this, base](const Response &res) {
         if (res.status == Response::Successful) {
             loadStyleJSON(res.data, base);
         } else {
@@ -127,11 +126,9 @@ void MapContext::loadStyleJSON(const std::string& json, const std::string& base)
     style->cascade(data.getClasses());
     style->setDefaultTransitionDuration(data.getDefaultTransitionDuration());
 
-    const std::string glyphURL = util::mapbox::normalizeGlyphsURL(style->glyph_url, data.getAccessToken());
-    glyphStore->setURL(glyphURL);
+    glyphStore->setURL(style->glyph_url);
 
     resourceLoader = util::make_unique<ResourceLoader>();
-    resourceLoader->setAccessToken(data.getAccessToken());
     resourceLoader->setObserver(this);
     resourceLoader->setStyle(style.get());
     resourceLoader->setGlyphStore(glyphStore.get());

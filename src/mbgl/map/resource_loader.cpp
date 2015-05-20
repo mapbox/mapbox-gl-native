@@ -45,7 +45,7 @@ void ResourceLoader::setStyle(Style* style) {
 
     for (const auto& source : style->sources) {
         source->setObserver(this);
-        source->load(accessToken_);
+        source->load();
     }
 }
 
@@ -58,11 +58,6 @@ void ResourceLoader::setGlyphStore(GlyphStore* glyphStore) {
 
     glyphStore_ = glyphStore;
     glyphStore_->setObserver(this);
-}
-
-
-void ResourceLoader::setAccessToken(const std::string& accessToken) {
-    accessToken_ = accessToken;
 }
 
 void ResourceLoader::update(MapData& data,

@@ -99,10 +99,6 @@ public:
     uint16_t getWidth() const;
     uint16_t getHeight() const;
 
-    // API
-    void setAccessToken(const std::string &token);
-    std::string getAccessToken() const;
-
     // Projection
     void getWorldBoundsMeters(ProjectedMeters &sw, ProjectedMeters &ne) const;
     void getWorldBoundsLatLng(LatLng &sw, LatLng &ne) const;
