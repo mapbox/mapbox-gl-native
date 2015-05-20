@@ -2113,15 +2113,6 @@ CLLocationCoordinate2D latLngToCoordinate(mbgl::LatLng latLng)
     }
 }
 
-- (void)locationManager:(__unused CLLocationManager *)manager didChangeAuthorizationStatus:(CLAuthorizationStatus)status
-{
-    if (status == kCLAuthorizationStatusDenied || status == kCLAuthorizationStatusRestricted)
-    {
-        self.userTrackingMode  = MGLUserTrackingModeNone;
-        self.showsUserLocation = NO;
-    }
-}
-
 - (void)locationManager:(__unused CLLocationManager *)manager didFailWithError:(NSError *)error
 {
     if ([error code] == kCLErrorDenied)
