@@ -402,6 +402,16 @@ IB_DESIGNABLE
 *   @param error An error object containing the reason why location tracking failed. */
 - (void)mapView:(MGLMapView *)mapView didFailToLocateUserWithError:(NSError *)error;
 
+/** Tells the delegate that location authorization status has changed.
+*
+*   When the user allows or denies use of their location, this method is called with the appropriate status. When explicitly denied, status will be set to kCLAuthorizationStatusDenied.
+*
+*   See [Apple's CoreLocation Framework Reference](https://developer.apple.com/library/ios/documentation/CoreLocation/Reference/CLLocationManager_Class/index.html#//apple_ref/c/tdef/CLAuthorizationStatus) for other possible statuses.
+*
+*   @param mapView The map view that is tracking the user’s location.
+*   @param status A CLAuthorizationStatus constant indicating whether the app is authorized to use location services. */
+- (void)mapView:(MGLMapView *)mapView didChangeLocationAuthorizationStatus:(CLAuthorizationStatus)status;
+
 /** Tells the delegate that the map view’s user tracking mode has changed.
 *
 *   This method is called after the map view asynchronously changes to reflect the new user tracking mode, for example by beginning to zoom or rotate.
