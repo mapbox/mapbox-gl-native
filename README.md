@@ -253,6 +253,7 @@ Some styles in JSON format are included at `./styles`. See the [style spec](http
 
 ## Desktop
 
+- Press `S` to cycle through bundled styles
 - Press `X` to reset the transform
 - Press `N` to reset north
 - Press `Tab` to toggle debug information
