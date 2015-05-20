@@ -34,8 +34,8 @@ namespace mbgl {
 class CollisionTile {
 
     public:
-    inline explicit CollisionTile(float _zoom, float tileExtent, float tileSize) :
-        zoom(_zoom), tilePixelRatio(tileExtent / tileSize) { reset(0, 0); }
+    inline explicit CollisionTile(float _zoom, float tileExtent, float tileSize, float angle_) :
+        zoom(_zoom), tilePixelRatio(tileExtent / tileSize) { reset(angle_, 0); }
 
     void reset(const float angle, const float pitch);
     float placeFeature(const CollisionFeature &feature);

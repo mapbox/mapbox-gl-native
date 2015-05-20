@@ -39,7 +39,8 @@ public:
                    GlyphStore&,
                    SpriteAtlas&,
                    util::ptr<Sprite>,
-                   const SourceInfo&);
+                   const SourceInfo&,
+                   float);
     ~VectorTileData();
 
     void parse() override;
@@ -58,6 +59,8 @@ public:
     const float depth;
 
 protected:
+    void redoPlacement();
+
     // Holds the actual geometries in this tile.
     FillVertexBuffer fillVertexBuffer;
     LineVertexBuffer lineVertexBuffer;
@@ -84,9 +87,8 @@ private:
     std::unique_ptr<CollisionTile> collision;
 
     float lastAngle = 0;
-    float currentAngle = 0;
+    float currentAngle;
     bool redoingPlacement = false;
-    bool redoWhenDone = false;
     void endRedoPlacement();
     void workerRedoPlacement(float angle);
 };

@@ -16,9 +16,10 @@ LiveTileData::LiveTileData(const TileID& id_,
                            GlyphStore& glyphStore_,
                            SpriteAtlas& spriteAtlas_,
                            util::ptr<Sprite> sprite_,
-                           const SourceInfo& source_)
+                           const SourceInfo& source_,
+                           float angle_)
     : VectorTileData::VectorTileData(id_, mapMaxZoom, style_, glyphAtlas_, glyphStore_,
-                                     spriteAtlas_, sprite_, source_),
+                                     spriteAtlas_, sprite_, source_, angle_),
       annotationManager(annotationManager_) {
     // live features are always ready
     setState(State::loaded);
@@ -53,5 +54,6 @@ void LiveTileData::parse() {
 
     if (getState() != State::obsolete) {
         setState(State::parsed);
+        redoPlacement();
     }
 }

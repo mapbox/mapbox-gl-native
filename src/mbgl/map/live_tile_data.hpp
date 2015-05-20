@@ -17,7 +17,8 @@ public:
                  GlyphStore&,
                  SpriteAtlas&,
                  util::ptr<Sprite>,
-                 const SourceInfo&);
+                 const SourceInfo&,
+                 float);
     ~LiveTileData();
 
     void parse() override;

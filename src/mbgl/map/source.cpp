@@ -288,7 +288,7 @@ TileData::State Source::addTile(MapData& data,
         if (info.type == SourceType::Vector) {
             new_tile.data =
                 std::make_shared<VectorTileData>(normalized_id, data.transform.getMaxZoom(), style, glyphAtlas,
-                                                 glyphStore, spriteAtlas, sprite, info);
+                                                 glyphStore, spriteAtlas, sprite, info, transformState.getAngle());
             new_tile.data->request(style.workers, transformState.getPixelRatio(), callback);
         } else if (info.type == SourceType::Raster) {
             new_tile.data = std::make_shared<RasterTileData>(normalized_id, texturePool, info);
@@ -296,7 +296,7 @@ TileData::State Source::addTile(MapData& data,
         } else if (info.type == SourceType::Annotations) {
             new_tile.data = std::make_shared<LiveTileData>(normalized_id, data.annotationManager,
                                                            data.transform.getMaxZoom(), style, glyphAtlas,
-                                                           glyphStore, spriteAtlas, sprite, info);
+                                                           glyphStore, spriteAtlas, sprite, info, transformState.getAngle());
             new_tile.data->reparse(style.workers, callback);
         } else {
             throw std::runtime_error("source type not implemented");

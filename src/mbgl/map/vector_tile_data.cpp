@@ -21,7 +21,8 @@ VectorTileData::VectorTileData(const TileID& id_,
                                GlyphStore& glyphStore_,
                                SpriteAtlas& spriteAtlas_,
                                util::ptr<Sprite> sprite_,
-                               const SourceInfo& source_)
+                               const SourceInfo& source_,
+                               float angle)
     : TileData(id_, source_),
       depth(id_.z >= source_.max_zoom ? mapMaxZoom - id_.z : 1),
       glyphAtlas(glyphAtlas_),
@@ -29,7 +30,9 @@ VectorTileData::VectorTileData(const TileID& id_,
       spriteAtlas(spriteAtlas_),
       sprite(sprite_),
       style(style_),
-      collision(util::make_unique<CollisionTile>(id_.z, 4096, source_.tile_size)) {
+      collision(util::make_unique<CollisionTile>(id_.z, 4096, source_.tile_size, angle)),
+      lastAngle(angle),
+      currentAngle(angle) {
 }
 
 VectorTileData::~VectorTileData() {
@@ -61,6 +64,7 @@ void VectorTileData::parse() {
             setState(State::partial);
         } else {
             setState(State::parsed);
+            redoPlacement();
         }
     } catch (const std::exception& ex) {
         Log::Error(Event::ParseTile, "Parsing [%d/%d/%d] failed: %s", id.z, id.x, id.y, ex.what());
@@ -111,14 +115,15 @@ void VectorTileData::setState(const State& state_) {
     }
 }
 
+void VectorTileData::redoPlacement() {
+    redoPlacement(lastAngle);
+}
+
 void VectorTileData::redoPlacement(float angle) {
     if (angle != currentAngle) {
         lastAngle = angle;
 
-        if (getState() != State::parsed || redoingPlacement) {
-            redoWhenDone = true;
-            return;
-        }
+        if (getState() != State::parsed || redoingPlacement) return;
 
         redoingPlacement = true;
         currentAngle = angle;
@@ -147,8 +152,5 @@ void VectorTileData::endRedoPlacement() {
         }
     }
     redoingPlacement = false;
-    if (redoWhenDone) {
-        redoPlacement(lastAngle);
-        redoWhenDone = false;
-    }
+    redoPlacement();
 }
