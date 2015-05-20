@@ -204,10 +204,15 @@ void NodeMap::startRender(std::unique_ptr<NodeMap::RenderOptions> options) {
     map.setLatLngZoom(mbgl::LatLng(options->latitude, options->longitude), options->zoom);
     map.setBearing(options->bearing);
 
-    map.renderStill([this](std::unique_ptr<const mbgl::StillImage> result) {
-        assert(!image);
-        image = std::move(result);
-        uv_async_send(async);
+    map.renderStill([this](const std::exception_ptr eptr, std::unique_ptr<const mbgl::StillImage> result) {
+        if (eptr) {
+            error = std::move(eptr);
+            uv_async_send(async);
+        } else {
+            assert(!image);
+            image = std::move(result);
+            uv_async_send(async);
+        }
     });
 
     // Retain this object, otherwise it might get destructed before we are finished rendering the
@@ -238,7 +243,16 @@ void NodeMap::renderFinished() {
     assert(!callback);
     assert(!image);
 
-    if (img) {
+    if (error) {
+        // This must be empty to be prepared for the next render call.
+        error = nullptr;
+        assert(!error);
+
+        v8::Local<v8::Value> argv[] = {
+            NanError("Error rendering image")
+        };
+        cb->Call(1, argv);
+    } else if (img) {
         auto result = NanNew<v8::Object>();
         result->Set(NanNew("width"), NanNew(img->width));
         result->Set(NanNew("height"), NanNew(img->height));

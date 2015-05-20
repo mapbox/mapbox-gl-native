@@ -50,6 +50,7 @@ private:
     NodeFileSource &fs;
     mbgl::Map map;
 
+    std::exception_ptr error;
     std::unique_ptr<const mbgl::StillImage> image;
     std::unique_ptr<NanCallback> callback;
 

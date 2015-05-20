@@ -157,7 +157,6 @@ test('Map', function(t) {
         fileSource.request = function(req) {
             fs.readFile(path.join('test', req.url), function(err, data) {
                 req.respond(err, { data: data });
-                t.error(err);
             });
         };
         fileSource.cancel = function() {};
@@ -196,6 +195,17 @@ test('Map', function(t) {
                     map.render({}, function() {});
                 }, /Style is not set/);
                 t.end();
+            });
+        });
+
+        t.test('returns an error', function(t) {
+            setup(fileSource, function(map) {
+                map.load(style);
+                map.render({ zoom: 1 }, function(err, data) {
+                    t.ok(err);
+                    t.equal(err.message, 'Error rendering image');
+                    t.end();
+                });
             });
         });
 
