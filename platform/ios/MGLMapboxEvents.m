@@ -278,6 +278,9 @@ const NSTimeInterval MGLFlushInterval = 60;
              MGLMapboxEvents *strongSelf = weakSelf;
              [strongSelf validate];
          }];
+
+        // Turn the Mapbox Turnstile to Count App Users
+        [self pushEvent:MGLEventTypeAppUserTurnstile withAttributes:nil];
     }
     return self;
 }

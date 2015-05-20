@@ -51,9 +51,8 @@
     [[MGLAccountManager sharedManager] setAccessToken:accessToken];
 
     // Update MGLMapboxEvents
-    // NOTE: This is (likely) the initial setup of MGLMapboxEvents (via implicit call to +[MGLMapboxEvents sharedManager])
-    // Turn the Mapbox Turnstile to Count App Users
-    [MGLMapboxEvents pushEvent:MGLEventTypeAppUserTurnstile withAttributes:nil];
+    // NOTE: This is (likely) the initial setup of MGLMapboxEvents
+    [MGLMapboxEvents sharedManager];
 }
 
 + (NSString *) accessToken {
