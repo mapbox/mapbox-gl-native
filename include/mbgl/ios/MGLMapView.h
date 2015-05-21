@@ -73,8 +73,8 @@ IB_DESIGNABLE
 
 /** @name Accessing the Delegate */
 
-// TODO
-@property(nonatomic, weak) IBOutlet id<MGLMapViewDelegate> delegate;
+/** The receiver’s delegate. */
+@property (nonatomic, weak) IBOutlet id <MGLMapViewDelegate> delegate;
 
 #pragma mark - Manipulating the Visible Portion of the Map
 

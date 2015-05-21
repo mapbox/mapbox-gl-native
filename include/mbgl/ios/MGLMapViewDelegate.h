@@ -50,37 +50,41 @@
 
 #pragma mark - Responding to Map Position Changes
 
-// Responding to Map Position Changes
+/** @name Responding to Map Position Changes */
 
-// TODO
+/** Tells the delegate that the region displayed by the given map view is about to change. */
 - (void)mapView:(MGLMapView *)mapView regionWillChangeAnimated:(BOOL)animated;
 
-// TODO
+/** Tells the delegate that the region displayed by the given map view is changing. */
 - (void)mapViewRegionIsChanging:(MGLMapView *)mapView;
 
-// TODO
+/** Tells the delegate that the region displayed by the given map view did change. */
 - (void)mapView:(MGLMapView *)mapView regionDidChangeAnimated:(BOOL)animated;
 
 #pragma mark - Loading the Map Data
 
-// Loading the Map Data
+/** @name Loading the Map Data */
 
-// TODO
+/** Tells the delegate that the given map view is about to retrieve and render data. */
 - (void)mapViewWillStartLoadingMap:(MGLMapView *)mapView;
 
-// TODO
+/** Tells the delegate that the given map view finished retrieving and render data. */
 - (void)mapViewDidFinishLoadingMap:(MGLMapView *)mapView;
 
-// TODO
+/** Tells the delegate that the given map view was unable to retrieve or render data. */
 - (void)mapViewDidFailLoadingMap:(MGLMapView *)mapView withError:(NSError *)error;
 
-// TODO
+/** Tells the delegate that the given map view is about to start rendering one or more tiles. */
 - (void)mapViewWillStartRenderingMap:(MGLMapView *)mapView;
 
-// TODO
+/** Tells the delegate that the given map view finished rendering all the tiles in the current viewport.
+*
+*   @param fullyRendered `YES` if all the tiles in the current viewport were rendered successfully; `NO` otherwise. */
 - (void)mapViewDidFinishRenderingMap:(MGLMapView *)mapView fullyRendered:(BOOL)fullyRendered;
 
 #pragma mark - Tracking the User Location
+
+/** @name Tracking the User Location */
 
 /** Tells the delegate that the map view will begin tracking the user’s location.
 *
