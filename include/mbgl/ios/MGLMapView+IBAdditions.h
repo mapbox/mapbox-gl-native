@@ -8,7 +8,6 @@
 // inspectables declared in MGLMapView.h are always sorted before those in
 // MGLMapView+IBAdditions.h, due to ASCII sort order.
 
-@property (nonatomic) IBInspectable NSString *accessToken;
 @property (nonatomic) IBInspectable NSString *mapID;
 
 // Convenience properties related to the initial viewport. These properties
