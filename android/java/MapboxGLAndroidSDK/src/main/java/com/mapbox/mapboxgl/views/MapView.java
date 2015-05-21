@@ -149,9 +149,9 @@ public class MapView extends SurfaceView {
         // Load the attributes
         TypedArray typedArray = context.obtainStyledAttributes(attrs, R.styleable.MapView, 0, 0);
         try {
-            double centerLongitude = typedArray.getFloat(R.styleable.MapView_centerLongitude, 0.0f);
             double centerLatitude = typedArray.getFloat(R.styleable.MapView_centerLatitude, 0.0f);
-            LatLng centerCoordinate = new LatLng(centerLongitude, centerLatitude);
+            double centerLongitude = typedArray.getFloat(R.styleable.MapView_centerLongitude, 0.0f);
+            LatLng centerCoordinate = new LatLng(centerLatitude, centerLongitude);
             setCenterCoordinate(centerCoordinate);
             setZoomLevel(typedArray.getFloat(R.styleable.MapView_zoomLevel, 0.0f)); // need to set zoom level first because of limitation on rotating when zoomed out
             setDirection(typedArray.getFloat(R.styleable.MapView_direction, 0.0f));
