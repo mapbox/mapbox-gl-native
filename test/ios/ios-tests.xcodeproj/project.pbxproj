@@ -8,6 +8,7 @@
 
 /* Begin PBXBuildFile section */
 		96567A231B0E84CD00D78776 /* LaunchScreen.xib in Resources */ = {isa = PBXBuildFile; fileRef = 96567A221B0E84CD00D78776 /* LaunchScreen.xib */; };
+		96567A311B0E8BB900D78776 /* Images.xcassets in Resources */ = {isa = PBXBuildFile; fileRef = 96567A301B0E8BB900D78776 /* Images.xcassets */; };
 		DD043363196DBBD500E6F39D /* MGLTAppDelegate.m in Sources */ = {isa = PBXBuildFile; fileRef = DD04335F196DBBD500E6F39D /* MGLTAppDelegate.m */; };
 		DD043364196DBBD500E6F39D /* MGLTViewController.m in Sources */ = {isa = PBXBuildFile; fileRef = DD043360196DBBD500E6F39D /* MGLTViewController.m */; };
 		DD043366196DBBE000E6F39D /* main.m in Sources */ = {isa = PBXBuildFile; fileRef = DD043365196DBBE000E6F39D /* main.m */; };
@@ -83,6 +84,7 @@
 
 /* Begin PBXFileReference section */
 		96567A221B0E84CD00D78776 /* LaunchScreen.xib */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = file.xib; path = LaunchScreen.xib; sourceTree = SOURCE_ROOT; };
+		96567A301B0E8BB900D78776 /* Images.xcassets */ = {isa = PBXFileReference; lastKnownFileType = folder.assetcatalog; path = Images.xcassets; sourceTree = SOURCE_ROOT; };
 		DACAD7111B08719F009119DC /* MGLMapboxEvents.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; name = MGLMapboxEvents.h; path = ../../platform/ios/MGLMapboxEvents.h; sourceTree = SOURCE_ROOT; };
 		DD043323196DB9BC00E6F39D /* Mapbox GL Tests.app */ = {isa = PBXFileReference; explicitFileType = wrapper.application; includeInIndex = 0; path = "Mapbox GL Tests.app"; sourceTree = BUILT_PRODUCTS_DIR; };
 		DD04335F196DBBD500E6F39D /* MGLTAppDelegate.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = MGLTAppDelegate.m; sourceTree = SOURCE_ROOT; };
@@ -219,6 +221,7 @@
 		DD04332D196DB9BC00E6F39D /* Supporting Files */ = {
 			isa = PBXGroup;
 			children = (
+				96567A301B0E8BB900D78776 /* Images.xcassets */,
 				DD043367196DBCC200E6F39D /* App-Info.plist */,
 				DD043365196DBBE000E6F39D /* main.m */,
 				96567A221B0E84CD00D78776 /* LaunchScreen.xib */,
@@ -446,6 +449,7 @@
 			isa = PBXResourcesBuildPhase;
 			buildActionMask = 2147483647;
 			files = (
+				96567A311B0E8BB900D78776 /* Images.xcassets in Resources */,
 				DD0581041ACB661200B112C9 /* Headers in Resources */,
 				DD0581061ACB661C00B112C9 /* MapboxGL.bundle in Resources */,
 				96567A231B0E84CD00D78776 /* LaunchScreen.xib in Resources */,
