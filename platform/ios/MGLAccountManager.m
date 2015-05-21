@@ -50,10 +50,6 @@
     return _sharedManager;
 }
 
-+ (void) setMapboxMetricsEnabledSettingShownInApp:(BOOL)shown {
-    [MGLAccountManager sharedManager].mapboxMetricsEnabledSettingShownInApp = shown;
-}
-
 + (BOOL) mapboxMetricsEnabledSettingShownInApp {
     return [MGLAccountManager sharedManager].mapboxMetricsEnabledSettingShownInApp;
 }
