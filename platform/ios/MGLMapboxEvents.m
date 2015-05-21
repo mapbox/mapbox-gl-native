@@ -177,7 +177,7 @@ const NSTimeInterval MGLFlushInterval = 60;
 
 + (void)initialize {
     if (self == [MGLMapboxEvents class]) {
-        NSBundle *bundle = [NSBundle bundleForClass:self];
+        NSBundle *bundle = [NSBundle mainBundle];
         NSNumber *accountTypeNumber = [bundle objectForInfoDictionaryKey:@"MGLMapboxAccountType"];
         [[NSUserDefaults standardUserDefaults] registerDefaults:@{
              @"MGLMapboxAccountType": accountTypeNumber ? accountTypeNumber : @0,
@@ -198,7 +198,8 @@ const NSTimeInterval MGLFlushInterval = 60;
 
     self = [super init];
     if (self) {
-        if (! [MGLAccountManager mapboxMetricsEnabledSettingShownInApp]) {
+        if (! [MGLAccountManager mapboxMetricsEnabledSettingShownInApp] &&
+            [[NSUserDefaults standardUserDefaults] integerForKey:@"MGLMapboxAccountType"] == 0) {
             // Opt Out is not configured in UI, so check for Settings.bundle
             // Put Settings bundle into memory
             id defaultEnabledValue;
