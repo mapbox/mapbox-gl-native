@@ -153,7 +153,7 @@ std::chrono::steady_clock::duration secondsAsDuration(float duration)
 
 + (NSSet *)keyPathsForValuesAffectingStyleURL
 {
-    return [NSSet setWithObjects:@"mapID", nil];
+    return [NSSet setWithObject:@"styleID"];
 }
 
 - (NSURL *)styleURL
@@ -1556,27 +1556,31 @@ CLLocationCoordinate2D latLngToCoordinate(mbgl::LatLng latLng)
     return [NSArray arrayWithArray:_bundledStyleURLs];
 }
 
-+ (NSSet *)keyPathsForValuesAffectingMapID
++ (NSSet *)keyPathsForValuesAffectingStyleID
 {
-    return [NSSet setWithObjects:@"styleURL", nil];
+    return [NSSet setWithObject:@"styleURL"];
 }
 
-- (NSString *)mapID
+- (NSString *)styleID
 {
     NSURL *styleURL = self.styleURL;
     return [styleURL.scheme isEqualToString:@"mapbox"] ? styleURL.host.mgl_stringOrNilIfEmpty : nil;
 }
 
+- (void)setStyleID:(NSString *)styleID
+{
+    self.styleURL = styleID ? [NSURL URLWithString:[NSString stringWithFormat:@"mapbox://%@", styleID]] : nil;
+}
+
+- (NSString *)mapID
+{
+    NSAssert(NO, @"-[MGLMapView mapID] has been renamed -[MGLMapView styleID].");
+    return nil;
+}
+
 - (void)setMapID:(NSString *)mapID
 {
-    if (mapID)
-    {
-        self.styleURL = [NSURL URLWithString:[NSString stringWithFormat:@"mapbox://%@", mapID]];
-    }
-    else
-    {
-        self.styleURL = nil;
-    }
+    NSAssert(NO, @"-[MGLMapView setMapID:] has been renamed -[MGLMapView setStyleID:].\n\nIf you previously set this map ID in a storyboard inspectable, select the MGLMapView in Interface Builder and delete the “mapID” entry from the User Defined Runtime Attributes section of the Identity inspector. Then go to the Attributes inspector and enter “%@” into the “Style ID” field.", mapID);
 }
 
 - (NSArray *)styleClasses

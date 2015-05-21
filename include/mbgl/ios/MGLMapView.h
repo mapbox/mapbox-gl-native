@@ -157,12 +157,13 @@ IB_DESIGNABLE
 
 /** @name Styling the Map */
 
-/** Mapbox map ID of the style currently displayed in the receiver, or `nil` if the style does not have a map ID.
+/** Mapbox ID of the style currently displayed in the receiver, or `nil` if the style does not have an ID.
 *
-*   The style may lack a map ID if it is located at an HTTP, HTTPS, or local file URL. Use `styleURL` to get the URL in these cases.
+*   The style may lack an ID if it is located at an HTTP, HTTPS, or local file URL. Use `styleURL` to get the URL in these cases.
 *
 *   To display the default style, set this property to `nil`. */
-@property (nonatomic) NSString *mapID;
+@property (nonatomic) NSString *styleID;
+@property (nonatomic) NSString *mapID __attribute__((unavailable("Use styleID.")));
 
 /** Returns the URLs to the styles bundled with the library. */
 - (NSArray *)bundledStyleURLs;
