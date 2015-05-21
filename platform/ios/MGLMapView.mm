@@ -2523,7 +2523,7 @@ CLLocationCoordinate2D latLngToCoordinate(mbgl::LatLng latLng)
 
         // Explanation
         UILabel *explanationLabel = [[UILabel alloc] init];
-        explanationLabel.text = @"To display a map here, you must provide a Mapbox access token. Get an access token from:";
+        explanationLabel.text = @"To display a Mapbox-hosted map here, you must provide an access token. Get an access token from:";
         explanationLabel.font = [UIFont preferredFontForTextStyle:UIFontTextStyleBody];
         explanationLabel.numberOfLines = 0;
         explanationLabel.translatesAutoresizingMaskIntoConstraints = NO;
