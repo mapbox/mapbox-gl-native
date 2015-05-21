@@ -15,13 +15,15 @@
 @implementation MGLAccountManager
 
 + (void)load {
-    // Read initial configuration from Info.plist.
-    NSBundle *bundle = [NSBundle bundleForClass:self];
-    self.accessToken = [bundle objectForInfoDictionaryKey:@"MGLMapboxAccessToken"];
+    // Read the initial configuration from Info.plist. The shown-in-app setting
+    // preempts the Settings bundle check in -[MGLMapboxEvents init] triggered
+    // by setting the access token.
+    NSBundle *bundle = [NSBundle mainBundle];
     NSNumber *shownInAppNumber = [bundle objectForInfoDictionaryKey:@"MGLMapboxMetricsEnabledSettingShownInApp"];
     if (shownInAppNumber) {
         [MGLAccountManager sharedManager].mapboxMetricsEnabledSettingShownInApp = [shownInAppNumber boolValue];
     }
+    self.accessToken = [bundle objectForInfoDictionaryKey:@"MGLMapboxAccessToken"];
 }
 
 // Can be called from any thread.
@@ -46,10 +48,6 @@
         setupBlock();
     }
     return _sharedManager;
-}
-
-+ (void) setMapboxMetricsEnabledSettingShownInApp:(BOOL)shown {
-    [MGLAccountManager sharedManager].mapboxMetricsEnabledSettingShownInApp = shown;
 }
 
 + (BOOL) mapboxMetricsEnabledSettingShownInApp {
