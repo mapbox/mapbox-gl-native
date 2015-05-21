@@ -13,8 +13,6 @@
     wrapper.toolbarHidden = YES;
     [self.window makeKeyAndVisible];
 
-    [MGLAccountManager setMapboxMetricsEnabledSettingShownInApp:YES]; // a lie, but a convenient one
-
     return YES;
 }
 

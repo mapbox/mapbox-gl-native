@@ -60,12 +60,6 @@
     XCTAssertEqualObjects([[MGLMapboxEvents sharedManager] appBundleId], @"com.mapbox.Mapbox-GL-Tests");
 }
 
-- (void)testTokenSetViaMapView {
-    [tester.mapView setAccessToken:@"test_token"];
-
-    XCTAssertEqualObjects([[MGLMapboxEvents sharedManager] token], @"test_token");
-}
-
 - (void)testResumeMetricsCollection {
     [MGLMapboxEvents resumeMetricsCollection];
 
