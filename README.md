@@ -148,9 +148,9 @@ Install Oracle JDK 7 (requires license agreement) from http://www.oracle.com/tec
 
     export JAVA_HOME="/dir/to/jdk1.7.0_71"
 
-Install the [Android NDK Revision 10d](https://developer.android.com/tools/sdk/ndk/index.html).
+Install the [Android NDK Revision 10e](https://developer.android.com/tools/sdk/ndk/index.html).
 
-    export ANDROID_NDK_PATH="/dir/to/android-ndk-r10d"
+    export ANDROID_NDK_PATH="/dir/to/android-ndk-r10e"
 
 Install the Android SDK. We recommend doing this by way of [Android Studio](https://developer.android.com/sdk/installing/studio.html).
 
@@ -168,7 +168,7 @@ Install Oracle JDK 7+:
 
     brew cask install java
 
-Install the [Android NDK Revision 10d](https://developer.android.com/tools/sdk/ndk/index.html) for 64-bit OS X:
+Install the [Android NDK Revision 10e](https://developer.android.com/tools/sdk/ndk/index.html) for 64-bit OS X:
 
     brew install android-ndk
 
@@ -182,7 +182,7 @@ Install [Android Studio](https://developer.android.com/sdk/installing/studio.htm
 By default, the SDK will be installed to `/usr/local/opt/android-sdk`. If you open Android Studio at this point, you may get an error message telling you that it can't find a JVM, it's because you installed a custom Java VM from Oracle. Follow [these instructions](http://tools.android.com/recent/androidstudio1rc3_releasecandidate3released) to start Android Studio. You'll wind up setting these environment variables in your .bash_profile or similar:
 
     echo "export ANDROID_HOME=`brew --prefix android-sdk`" >> .bash_profile
-    echo "export ANDROID_NDK_PATH=`brew --cellar android-ndk`/r10d" >> .bash_profile
+    echo "export ANDROID_NDK_PATH=`brew --cellar android-ndk`/r10e" >> .bash_profile
     # Replace <path to JDK> with something like /Library/Java/JavaVirtualMachines/jdk1.8.0_31.jdk
     echo "export JAVA_HOME=<path to JDK>" >> .bash_profile
     echo "export STUDIO_JDK=$JAVA_HOME" >> .bash_profile
