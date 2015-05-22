@@ -54,7 +54,7 @@ public:
     std::string getStyleJSON() const { return styleJSON; }
 
     double getTopOffsetPixelsForAnnotationSymbol(const std::string& symbol);
-    void updateAnnotationTiles(const std::vector<TileID>&);
+    void updateAnnotationTiles(const std::unordered_set<TileID, TileID::Hash>&);
 
     void setSourceTileCacheSize(size_t size);
     void onLowMemory();

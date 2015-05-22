@@ -145,7 +145,7 @@ void MapContext::updateTiles() {
     resourceLoader->update(data, transformState, *glyphAtlas, *spriteAtlas, *texturePool);
 }
 
-void MapContext::updateAnnotationTiles(const std::vector<TileID>& ids) {
+void MapContext::updateAnnotationTiles(const std::unordered_set<TileID, TileID::Hash>& ids) {
     assert(Environment::currentlyOn(ThreadType::Map));
     if (!style) return;
     for (const auto &source : style->sources) {

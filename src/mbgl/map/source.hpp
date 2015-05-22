@@ -17,6 +17,7 @@
 #include <forward_list>
 #include <iosfwd>
 #include <map>
+#include <unordered_set>
 
 namespace mbgl {
 
@@ -83,7 +84,7 @@ public:
                 TexturePool&,
                 bool shouldReparsePartialTiles);
 
-    void invalidateTiles(const std::vector<TileID>&);
+    void invalidateTiles(const std::unordered_set<TileID, TileID::Hash>&);
 
     void updateMatrices(const mat4 &projMatrix, const TransformState &transform);
     void drawClippingMasks(Painter &painter);

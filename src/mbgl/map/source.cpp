@@ -502,7 +502,7 @@ bool Source::update(MapData& data,
     return allTilesUpdated;
 }
 
-void Source::invalidateTiles(const std::vector<TileID>& ids) {
+void Source::invalidateTiles(const std::unordered_set<TileID, TileID::Hash>& ids) {
     cache.clear();
     for (auto& id : ids) {
         tiles.erase(id);
