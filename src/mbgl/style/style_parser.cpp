@@ -43,20 +43,23 @@ void StyleParser::parse(JSVal document) {
 
         std::map<ClassID, ClassProperties> shapePaints;
         rapidjson::Document d1;
-        rapidjson::Value lineWidth(rapidjson::kObjectType);
-        lineWidth.AddMember("line-width", 2, d1.GetAllocator());
-        parsePaint(lineWidth, shapePaints[ClassID::Default]);
-        rapidjson::Value lineColor(rapidjson::kObjectType);
-        lineColor.AddMember("line-color", "#0000ff", d1.GetAllocator());
-        parsePaint(lineColor, shapePaints[ClassID::Default]);
+        rapidjson::Value fillOpacity(rapidjson::kObjectType);
+        fillOpacity.AddMember("fill-opacity", 0.25, d1.GetAllocator());
+        parsePaint(fillOpacity, shapePaints[ClassID::Default]);
+        rapidjson::Value fillColor(rapidjson::kObjectType);
+        fillColor.AddMember("fill-color", "#0000ff", d1.GetAllocator());
+        parsePaint(fillColor, shapePaints[ClassID::Default]);
+        rapidjson::Value fillOutlineColor(rapidjson::kObjectType);
+        fillOutlineColor.AddMember("fill-outline-color", "#ff0000", d1.GetAllocator());
+        parsePaint(fillOutlineColor, shapePaints[ClassID::Default]);
         util::ptr<StyleLayer> shapeAnnotations = std::make_shared<StyleLayer>(shapeID, std::move(shapePaints));
-        shapeAnnotations->type = StyleLayerType::Line;
+        shapeAnnotations->type = StyleLayerType::Fill;
         layersMap.emplace(shapeID, std::pair<JSVal, util::ptr<StyleLayer>> { JSVal(shapeID), shapeAnnotations });
         layers.emplace_back(shapeAnnotations);
 
-        util::ptr<StyleBucket> lineBucket = std::make_shared<StyleBucket>(shapeAnnotations->type);
-        lineBucket->name = shapeAnnotations->id;
-        lineBucket->source_layer = shapeAnnotations->id;
+        util::ptr<StyleBucket> fillBucket = std::make_shared<StyleBucket>(shapeAnnotations->type);
+        fillBucket->name = shapeAnnotations->id;
+        fillBucket->source_layer = shapeAnnotations->id;
 
         // parse layout?
 
@@ -64,8 +67,8 @@ void StyleParser::parse(JSVal document) {
         sourcesMap.emplace(shapeID, source1);
         sources.emplace_back(source1);
         source1->info.type = SourceType::Annotations;
-        lineBucket->source = source1;
-        shapeAnnotations->bucket = lineBucket;
+        fillBucket->source = source1;
+        shapeAnnotations->bucket = fillBucket;
         //
         // end shape annotations
 
