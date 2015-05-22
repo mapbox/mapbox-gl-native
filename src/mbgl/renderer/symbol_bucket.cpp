@@ -9,6 +9,7 @@
 #include <mbgl/geometry/resample.hpp>
 #include <mbgl/renderer/painter.hpp>
 #include <mbgl/text/glyph_store.hpp>
+#include <mbgl/text/font_stack.hpp>
 #include <mbgl/text/placement.hpp>
 #include <mbgl/platform/log.hpp>
 #include <mbgl/text/collision.hpp>

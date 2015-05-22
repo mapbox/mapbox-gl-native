@@ -1,5 +1,7 @@
 #include <mbgl/geometry/glyph_atlas.hpp>
 
+#include <mbgl/text/font_stack.hpp>
+
 #include <mbgl/platform/gl.hpp>
 #include <mbgl/platform/log.hpp>
 #include <mbgl/platform/platform.hpp>
