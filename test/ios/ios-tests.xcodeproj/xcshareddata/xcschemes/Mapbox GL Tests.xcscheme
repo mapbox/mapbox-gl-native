@@ -55,6 +55,15 @@
                <Test
                   Identifier = "MapViewTests/testDelegateRegionWillChange">
                </Test>
+               <Test
+                  Identifier = "MetricsTests/testFlushPostsEvents">
+               </Test>
+               <Test
+                  Identifier = "MetricsTests/testPostEventsNetworkRequest">
+               </Test>
+               <Test
+                  Identifier = "MetricsTests/testTimerFiresFlush">
+               </Test>
             </SkippedTests>
          </TestableReference>
       </Testables>

@@ -8,6 +8,9 @@
 #import "MapboxGL.h"
 #import "OHHTTPStubs.h"
 
+const NSUInteger MGLMaximumEventsPerFlush = 20;
+const NSTimeInterval MGLFlushInterval = 60;
+
 @interface MGLMapboxEvents (Testing)
 
 - (NSString *)appBundleId;
@@ -18,9 +21,6 @@
 - (NSMutableArray *)eventQueue;
 - (void)postEvents:(NSArray *)events;
 - (NSTimer *)timer;
-- (NSUInteger)flushAt;
-- (NSTimeInterval)flushAfter;
-- (void)setFlushAfter:(NSTimeInterval)newFlushAfter;
 - (void)flush;
 - (void)startTimer;
 
@@ -28,15 +28,12 @@
 
 @interface MetricsTests : KIFTestCase
 
-@property (nonatomic) NSTimeInterval defaultFlushAfter;
-
 @end
 
 @implementation MetricsTests
 
 - (void)beforeAll {
     [tester acknowledgeSystemAlert];
-    self.defaultFlushAfter = [[MGLMapboxEvents sharedManager] flushAfter];
 }
 
 - (void)beforeEach {
@@ -44,8 +41,6 @@
     [MGLMapboxEvents resumeMetricsCollection];
 
     [MGLAccountManager setAccessToken:@"pk.eyJ1IjoianVzdGluIiwiYSI6IlpDbUJLSUEifQ.4mG8vhelFMju6HpIY-Hi5A"];
-
-    [[MGLMapboxEvents sharedManager] setFlushAfter:self.defaultFlushAfter];
 }
 
 - (void)afterEach {
@@ -76,7 +71,6 @@
 
 - (void)testFlushAtThreshold {
     NSUInteger startCount = [[[MGLMapboxEvents sharedManager] eventQueue] count];
-    NSUInteger flushAt = [[MGLMapboxEvents sharedManager] flushAt];
 
     XCTestExpectation *queueItemsExpectation = [self expectationWithDescription:@"queue should contain events"];
 
@@ -89,7 +83,7 @@
         }
     });
 
-    for (NSUInteger i = 0; i < (flushAt - startCount - 1); i++) {
+    for (NSUInteger i = 0; i < (MGLMaximumEventsPerFlush - startCount - 1); i++) {
         [self pushFakeEvent];
     }
 
@@ -146,8 +140,6 @@
 
     [self waitForExpectationsWithTimeout:1.0 handler:nil];
 
-    [[MGLMapboxEvents sharedManager] setFlushAfter:5];
-
     id eventsMock = [OCMockObject partialMockForObject:[MGLMapboxEvents sharedManager]];
     [[[eventsMock expect] andForwardToRealObject] startTimer];
     [self pushFakeEvent];
@@ -155,7 +147,7 @@
 
     XCTAssertEqual([[[MGLMapboxEvents sharedManager] eventQueue] count], 1);
     XCTAssertNotNil([[MGLMapboxEvents sharedManager] timer]);
-    XCTAssertEqual([[MGLMapboxEvents sharedManager] flushAfter], [[[MGLMapboxEvents sharedManager] timer] timeInterval]);
+    XCTAssertEqual(MGLFlushInterval, [[[MGLMapboxEvents sharedManager] timer] timeInterval]);
 }
 
 - (void)testTimerFiresFlush {
@@ -174,11 +166,10 @@
 
     [self waitForExpectationsWithTimeout:1.0 handler:nil];
 
-    [[MGLMapboxEvents sharedManager] setFlushAfter:5];
     [self pushFakeEvent];
     id eventsMock = [OCMockObject partialMockForObject:[MGLMapboxEvents sharedManager]];
     [[eventsMock expect] flush];
-    [eventsMock verifyWithDelay:[[MGLMapboxEvents sharedManager] flushAfter]];
+    [eventsMock verifyWithDelay:MGLFlushInterval];
 }
 
 - (void)testFlushPostsEvents {
