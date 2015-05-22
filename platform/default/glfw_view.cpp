@@ -282,6 +282,10 @@ void GLFWView::onMouseMove(GLFWwindow *window, double x, double y) {
 void GLFWView::run() {
     while (!glfwWindowShouldClose(window)) {
         glfwWaitEvents();
+        const bool dirty = !clean.test_and_set();
+        if (dirty) {
+            map->renderSync();
+        }
     }
 }
 
@@ -297,8 +301,12 @@ void GLFWView::notify() {
     glfwPostEmptyEvent();
 }
 
-void GLFWView::invalidate(std::function<void()> render) {
-    render();
+void GLFWView::invalidate() {
+    clean.clear();
+    glfwPostEmptyEvent();
+}
+
+void GLFWView::swap() {
     glfwSwapBuffers(window);
     fps();
 }

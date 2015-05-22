@@ -33,7 +33,8 @@ public:
     void deactivate() override;
     void notify() override;
     void resize(uint16_t width, uint16_t height, float pixelRatio) override;
-    void invalidate(std::function<void()> render) override;
+    void invalidate() override;
+    void swap() override;
     std::unique_ptr<StillImage> readStillImage() override;
 
 private:

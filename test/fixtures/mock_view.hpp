@@ -1,5 +1,5 @@
-#ifndef TEST_RESOURCES_MOCK_VIEW
-#define TEST_RESOURCES_MOCK_VIEW
+#ifndef TEST_FIXTURES_MOCK_VIEW
+#define TEST_FIXTURES_MOCK_VIEW
 
 #include <mbgl/map/view.hpp>
 
@@ -13,7 +13,8 @@ public:
     void activate() override {};
     void deactivate() override {};
     void notify() override {};
-    void invalidate(std::function<void()>) override {};
+    void invalidate() override {}
+    void swap() override {}
 };
 
 }

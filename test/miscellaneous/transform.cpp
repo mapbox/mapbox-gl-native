@@ -1,4 +1,5 @@
 #include "../fixtures/util.hpp"
+#include "../fixtures/mock_view.hpp"
 
 #include <mbgl/util/run_loop.hpp>
 #include <mbgl/map/map_data.hpp>
@@ -10,18 +11,6 @@
 #include <cstdlib>
 
 using namespace mbgl;
-
-class MockView : public View {
-public:
-    void activate() override {
-    }
-    void deactivate() override {
-    }
-    void notify() override {
-    }
-    void invalidate(std::function<void()>) override {
-    }
-};
 
 TEST(Transform, InvalidScale) {
     MockView view;

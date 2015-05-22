@@ -1,7 +1,7 @@
 #include "../fixtures/fixture_log_observer.hpp"
 #include "../fixtures/util.hpp"
+#include "../fixtures/mock_view.hpp"
 #include "mock_file_source.hpp"
-#include "mock_view.hpp"
 
 #include <mbgl/map/map_data.hpp>
 #include <mbgl/map/transform_state.hpp>

@@ -44,9 +44,11 @@ public:
     virtual void resize(uint16_t width, uint16_t height, float pixelRatio);
 
     // Called from the render thread. The implementation must trigger a rerender.
-    // (i.e. either the passed render() function for rendering immediately on the map thread,
-    // or map->renderSync() from the main thread must be called as a result of this)
-    virtual void invalidate(std::function<void()> render) = 0;
+    // (map->renderSync() from the main thread must be called as a result of this)
+    virtual void invalidate() = 0;
+
+    // Called from the render thread after the render is complete.
+    virtual void swap() = 0;
 
     // Reads the pixel data from the current framebuffer. If your View implementation
     // doesn't support reading from the framebuffer, return a null pointer.

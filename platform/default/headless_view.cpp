@@ -280,8 +280,12 @@ void HeadlessView::deactivate() {
 #endif
 }
 
-void HeadlessView::invalidate(std::function<void()> render) {
-    render();
+void HeadlessView::invalidate() {
+    // no-op
+}
+
+void HeadlessView::swap() {
+    // no-op
 }
 
 }

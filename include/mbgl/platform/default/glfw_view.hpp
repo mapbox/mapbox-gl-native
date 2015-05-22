@@ -8,6 +8,8 @@
 #endif
 #include <GLFW/glfw3.h>
 
+#include <atomic>
+
 class GLFWView : public mbgl::View {
 public:
     GLFWView(bool fullscreen = false);
@@ -17,7 +19,8 @@ public:
     void activate() override;
     void deactivate() override;
     void notify() override;
-    void invalidate(std::function<void()> render) override;
+    void invalidate() override;
+    void swap() override;
 
     static void onKey(GLFWwindow *window, int key, int scancode, int action, int mods);
     static void onScroll(GLFWwindow *window, double xoffset, double yoffset);
@@ -62,6 +65,7 @@ private:
     std::function<void()> changeStyleCallback;
 
     GLFWwindow *window = nullptr;
+    std::atomic_flag clean = ATOMIC_FLAG_INIT;
 };
 
 #endif

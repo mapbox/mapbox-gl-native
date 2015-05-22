@@ -2755,11 +2755,16 @@ class MBGLView : public mbgl::View
         [EAGLContext setCurrentContext:nil];
     }
 
-    void invalidate(std::function<void()>) override
+    void invalidate() override
     {
         [nativeView performSelectorOnMainThread:@selector(invalidate)
                                      withObject:nil
                                   waitUntilDone:NO];
+    }
+
+    void swap() override
+    {
+        // no-op
     }
 
     private:

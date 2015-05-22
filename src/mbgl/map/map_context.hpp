@@ -34,12 +34,12 @@ public:
     ~MapContext();
 
     void pause();
-    void render();
 
     void resize(uint16_t width, uint16_t height, float ratio);
 
     using StillImageCallback = std::function<void(std::exception_ptr, std::unique_ptr<const StillImage>)>;
     void renderStill(StillImageCallback callback);
+    void renderSync();
 
     void triggerUpdate(Update = Update::Nothing);
 
@@ -62,6 +62,7 @@ public:
 
 private:
     void updateTiles();
+    void render();
 
     // Style-related updates.
     void cascadeClasses();
@@ -88,6 +89,7 @@ private:
     std::string styleURL;
     std::string styleJSON;
 
+    bool mayRender = false;
     StillImageCallback callback;
     size_t sourceCacheSize;
     TransformState transformState;

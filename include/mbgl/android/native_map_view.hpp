@@ -23,7 +23,8 @@ public:
     void activate() override;
     void deactivate() override;
     void notify() override;
-    void invalidate(std::function<void()> render) override;
+    void invalidate() override;
+    void swap() override;
 
     void notifyMapChange(mbgl::MapChange change, Duration delay = Duration::zero()) override;
 
