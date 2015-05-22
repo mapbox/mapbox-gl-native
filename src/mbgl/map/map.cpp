@@ -46,10 +46,6 @@ void Map::renderSync() {
     context->invokeSync(&MapContext::render);
 }
 
-void Map::renderAsync() {
-    context->invoke(&MapContext::render);
-}
-
 void Map::update(Update update_) {
     context->invoke(&MapContext::triggerUpdate, update_);
 }

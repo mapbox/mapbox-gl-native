@@ -63,7 +63,6 @@ public:
 
     // Triggers a synchronous or asynchronous render.
     void renderSync();
-    void renderAsync();
 
     // Notifies the Map thread that the state has changed and an update might be necessary.
     void update(Update update = Update::Nothing);
