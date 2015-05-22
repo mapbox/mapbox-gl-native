@@ -1,3 +1,4 @@
+#include "../fixtures/fixture_log_observer.hpp"
 #include "../fixtures/util.hpp"
 #include "mock_file_source.hpp"
 #include "mock_view.hpp"
@@ -121,6 +122,9 @@ TEST_P(ResourceLoaderTest, RequestFailure) {
     MockView view;
     MockFileSource fileSource(param);
 
+    FixtureLogObserver* log = new FixtureLogObserver();
+    Log::setObserver(std::unique_ptr<Log::Observer>(log));
+
     auto callback = [&loop, &param](std::exception_ptr error) {
         try {
             if (error) {
@@ -144,10 +148,33 @@ TEST_P(ResourceLoaderTest, RequestFailure) {
         loop.stop();
     };
 
-    util::Thread<MockMapContext> context(
-        "Map", util::ThreadPriority::Regular, view, fileSource, callback);
+    std::unique_ptr<util::Thread<MockMapContext>> context(
+        util::make_unique<util::Thread<MockMapContext>>(
+            "Map", util::ThreadPriority::Regular, view, fileSource, callback));
 
     uv_run(loop.get(), UV_RUN_DEFAULT);
+
+    // Needed because it will make the Map thread
+    // join and cease logging after this point.
+    context.reset();
+
+    std::stringstream message;
+    message << "Failed to load [test/fixtures/resources/" << param << "]: Failed by the test case";
+
+    const FixtureLogObserver::LogMessage logMessage {
+        EventSeverity::Error,
+        Event::ResourceLoader,
+        int64_t(-1),
+        message.str(),
+    };
+
+    if (param.empty()) {
+        EXPECT_EQ(log->count(logMessage), 0u);
+    } else {
+        EXPECT_GT(log->count(logMessage), 0u);
+    }
+
+    EXPECT_EQ(log->unchecked().size(), 0u);
 }
 
 INSTANTIATE_TEST_CASE_P(ResourceLoader, ResourceLoaderTest,
