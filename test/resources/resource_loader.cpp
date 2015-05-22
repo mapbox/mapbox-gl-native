@@ -59,8 +59,6 @@ public:
         spriteAtlas_.reset();
         glyphAtlas_.reset();
         glyphStore_.reset();
-
-        env_.performCleanup();
     }
 
     void update() {

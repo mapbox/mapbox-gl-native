@@ -299,6 +299,8 @@ void SpriteAtlas::bind(bool linear) {
 
 SpriteAtlas::~SpriteAtlas() {
     std::lock_guard<std::recursive_mutex> lock(mtx);
-    Environment::Get().abandonTexture(texture);
-    texture = 0;
+    if (texture) {
+        Environment::Get().abandonTexture(texture);
+        texture = 0;
+    }
 }
