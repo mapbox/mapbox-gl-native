@@ -1,16 +1,19 @@
 #include <mbgl/map/sprite.hpp>
-#include <mbgl/util/raster.hpp>
-#include <mbgl/platform/log.hpp>
 
-#include <string>
-#include <mbgl/platform/platform.hpp>
 #include <mbgl/map/environment.hpp>
+#include <mbgl/platform/log.hpp>
+#include <mbgl/platform/platform.hpp>
 #include <mbgl/storage/resource.hpp>
 #include <mbgl/storage/response.hpp>
-#include <mbgl/util/uv_detail.hpp>
+#include <mbgl/util/exception.hpp>
+#include <mbgl/util/raster.hpp>
 #include <mbgl/util/std.hpp>
+#include <mbgl/util/uv_detail.hpp>
 
 #include <rapidjson/document.h>
+
+#include <string>
+#include <sstream>
 
 using namespace mbgl;
 
@@ -39,25 +42,31 @@ Sprite::Sprite(const std::string& baseUrl, float pixelRatio_)
     std::string spriteURL(baseUrl + (pixelRatio_ > 1 ? "@2x" : "") + ".png");
     std::string jsonURL(baseUrl + (pixelRatio_ > 1 ? "@2x" : "") + ".json");
 
-    jsonRequest = env.request({ Resource::Kind::JSON, jsonURL }, [this](const Response &res) {
+    jsonRequest = env.request({ Resource::Kind::JSON, jsonURL }, [this, jsonURL](const Response &res) {
         jsonRequest = nullptr;
         if (res.status == Response::Successful) {
             body = res.data;
             parseJSON();
         } else {
-            Log::Warning(Event::Sprite, "Failed to load sprite info: %s", res.message.c_str());
+            std::stringstream message;
+            message <<  "Failed to load [" << jsonURL << "]: " << res.message;
+            emitSpriteLoadingFailed(message.str());
+            return;
         }
         loadedJSON = true;
         emitSpriteLoadedIfComplete();
     });
 
-    spriteRequest = env.request({ Resource::Kind::Image, spriteURL }, [this](const Response &res) {
+    spriteRequest = env.request({ Resource::Kind::Image, spriteURL }, [this, spriteURL](const Response &res) {
         spriteRequest = nullptr;
         if (res.status == Response::Successful) {
             image = res.data;
             parseImage();
         } else {
-            Log::Warning(Event::Sprite, "Failed to load sprite image: %s", res.message.c_str());
+            std::stringstream message;
+            message <<  "Failed to load [" << spriteURL << "]: " << res.message;
+            emitSpriteLoadingFailed(message.str());
+            return;
         }
         loadedImage = true;
         emitSpriteLoadedIfComplete();
@@ -78,6 +87,15 @@ void Sprite::emitSpriteLoadedIfComplete() {
     if (isLoaded() && observer) {
         observer->onSpriteLoaded();
     }
+}
+
+void Sprite::emitSpriteLoadingFailed(const std::string& message) {
+    if (!observer) {
+        return;
+    }
+
+    auto error = std::make_exception_ptr(util::SpriteLoadingException(message));
+    observer->onSpriteLoadingFailed(error);
 }
 
 bool Sprite::isLoaded() const {

@@ -232,7 +232,7 @@ void MapContext::render() {
     painter->render(*style, transformState, data.getAnimationTime());
 
     if (data.mode == MapMode::Still) {
-        callback(view.readStillImage());
+        callback(nullptr, view.readStillImage());
         callback = nullptr;
     }
 
@@ -272,6 +272,15 @@ void MapContext::onLowMemory() {
 void MapContext::onTileDataChanged() {
     assert(Environment::currentlyOn(ThreadType::Map));
     triggerUpdate();
+}
+
+void MapContext::onResourceLoadingFailed(std::exception_ptr error) {
+    assert(Environment::currentlyOn(ThreadType::Map));
+
+    if (data.mode == MapMode::Still && callback) {
+        callback(error, nullptr);
+        callback = nullptr;
+    }
 }
 
 }

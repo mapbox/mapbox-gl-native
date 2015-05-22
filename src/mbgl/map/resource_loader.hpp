@@ -32,6 +32,7 @@ public:
         virtual ~Observer() = default;
 
         virtual void onTileDataChanged() = 0;
+        virtual void onResourceLoadingFailed(std::exception_ptr error) = 0;
     };
 
     ResourceLoader();
@@ -62,16 +63,21 @@ public:
 
     // GlyphStore::Observer implementation.
     void onGlyphRangeLoaded() override;
+    void onGlyphRangeLoadingFailed(std::exception_ptr error) override;
 
     // Source::Observer implementation.
     void onSourceLoaded() override;
+    void onSourceLoadingFailed(std::exception_ptr error) override;
     void onTileLoaded(bool isNewTile) override;
+    void onTileLoadingFailed(std::exception_ptr error) override;
 
     // Sprite::Observer implementation.
     void onSpriteLoaded() override;
+    void onSpriteLoadingFailed(std::exception_ptr error) override;
 
 private:
     void emitTileDataChanged();
+    void emitResourceLoadingFailed(std::exception_ptr error);
 
     bool shouldReparsePartialTiles_ = false;
 

@@ -111,7 +111,16 @@ int main(int argc, char *argv[]) {
         util::write_file(output, png);
     });
 
-    map.renderStill([async](std::unique_ptr<const StillImage> image) {
+    map.renderStill([async](std::exception_ptr error, std::unique_ptr<const StillImage> image) {
+        try {
+            if (error) {
+                std::rethrow_exception(error);
+            }
+        } catch(std::exception& e) {
+            std::cout << "Error: " << e.what() << std::endl;
+            exit(1);
+        }
+
         async->data = const_cast<StillImage *>(image.release());
         uv_async_send(async);
     });

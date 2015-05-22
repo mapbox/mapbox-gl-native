@@ -104,8 +104,16 @@ void ResourceLoader::onGlyphRangeLoaded() {
     emitTileDataChanged();
 }
 
+void ResourceLoader::onGlyphRangeLoadingFailed(std::exception_ptr error) {
+    emitResourceLoadingFailed(error);
+}
+
 void ResourceLoader::onSourceLoaded() {
     emitTileDataChanged();
+}
+
+void ResourceLoader::onSourceLoadingFailed(std::exception_ptr error) {
+    emitResourceLoadingFailed(error);
 }
 
 void ResourceLoader::onTileLoaded(bool isNewTile) {
@@ -116,10 +124,18 @@ void ResourceLoader::onTileLoaded(bool isNewTile) {
     emitTileDataChanged();
 }
 
+void ResourceLoader::onTileLoadingFailed(std::exception_ptr error) {
+    emitResourceLoadingFailed(error);
+}
+
 void ResourceLoader::onSpriteLoaded() {
     shouldReparsePartialTiles_ = true;
 
     emitTileDataChanged();
+}
+
+void ResourceLoader::onSpriteLoadingFailed(std::exception_ptr error) {
+    emitResourceLoadingFailed(error);
 }
 
 void ResourceLoader::emitTileDataChanged() {
@@ -127,6 +143,22 @@ void ResourceLoader::emitTileDataChanged() {
 
     if (observer_) {
         observer_->onTileDataChanged();
+    }
+}
+
+void ResourceLoader::emitResourceLoadingFailed(std::exception_ptr error) {
+    assert(Environment::currentlyOn(ThreadType::Map));
+
+    try {
+        if (error) {
+            std::rethrow_exception(error);
+        }
+    } catch(const std::exception& e) {
+        Log::Error(Event::ResourceLoader, e.what());
+    }
+
+    if (observer_) {
+        observer_->onResourceLoadingFailed(error);
     }
 }
 

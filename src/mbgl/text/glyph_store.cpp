@@ -1,20 +1,23 @@
 #include <mbgl/text/glyph_store.hpp>
 
 #include <mbgl/map/environment.hpp>
-#include <mbgl/util/std.hpp>
-#include <mbgl/util/string.hpp>
-#include <mbgl/util/utf.hpp>
-#include <mbgl/util/pbf.hpp>
-#include <mbgl/util/url.hpp>
-#include <mbgl/util/constants.hpp>
-#include <mbgl/util/token.hpp>
-#include <mbgl/util/math.hpp>
-#include <mbgl/util/uv_detail.hpp>
-#include <mbgl/storage/file_source.hpp>
 #include <mbgl/platform/log.hpp>
 #include <mbgl/platform/platform.hpp>
+#include <mbgl/storage/file_source.hpp>
+#include <mbgl/util/constants.hpp>
+#include <mbgl/util/exception.hpp>
+#include <mbgl/util/math.hpp>
+#include <mbgl/util/pbf.hpp>
+#include <mbgl/util/std.hpp>
+#include <mbgl/util/string.hpp>
+#include <mbgl/util/token.hpp>
+#include <mbgl/util/url.hpp>
+#include <mbgl/util/utf.hpp>
 #include <mbgl/util/uv_detail.hpp>
+#include <mbgl/util/uv_detail.hpp>
+
 #include <algorithm>
+#include <sstream>
 
 namespace mbgl {
 
@@ -139,7 +142,8 @@ GlyphPBF::GlyphPBF(const std::string& glyphURL,
                    const std::string& fontStack,
                    GlyphRange glyphRange,
                    Environment& env_,
-                   const GlyphLoadedCallback& callback)
+                   const GlyphLoadedCallback& successCallback,
+                   const GlyphLoadingFailedCallback& failureCallback)
     : parsed(false), env(env_) {
     // Load the glyph set URL
     std::string url = util::replaceTokens(glyphURL, [&](const std::string &name) -> std::string {
@@ -149,20 +153,20 @@ GlyphPBF::GlyphPBF(const std::string& glyphURL,
     });
 
     // The prepare call jumps back to the main thread.
-    req = env.request({ Resource::Kind::Glyphs, url }, [&, url, callback](const Response &res) {
+    req = env.request({ Resource::Kind::Glyphs, url }, [&, url, successCallback, failureCallback](const Response &res) {
         req = nullptr;
 
         if (res.status != Response::Successful) {
-            // Something went wrong with loading the glyph pbf.
-            const std::string msg = std::string { "[ERROR] failed to load glyphs: " } + url + " message: " + res.message;
-            Log::Error(Event::HttpRequest, msg);
+            std::stringstream message;
+            message <<  "Failed to load [" << url << "]: " << res.message;
+            failureCallback(message.str());
         } else {
             // Transfer the data to the GlyphSet and signal its availability.
             // Once it is available, the caller will need to call parse() to actually
             // parse the data we received. We are not doing this here since this callback is being
             // called from another (unknown) thread.
             data = res.data;
-            callback(this);
+            successCallback(this);
         }
     });
 }
@@ -234,8 +238,10 @@ bool GlyphPBF::isParsed() const {
 GlyphStore::GlyphStore(uv_loop_t* loop, Environment& env_)
     : env(env_),
       asyncEmitGlyphRangeLoaded(util::make_unique<uv::async>(loop, [this] { emitGlyphRangeLoaded(); })),
+      asyncEmitGlyphRangeLoadedingFailed(util::make_unique<uv::async>(loop, [this] { emitGlyphRangeLoadingFailed(); })),
       observer(nullptr) {
     asyncEmitGlyphRangeLoaded->unref();
+    asyncEmitGlyphRangeLoadedingFailed->unref();
 }
 
 GlyphStore::~GlyphStore() {
@@ -254,10 +260,16 @@ bool GlyphStore::requestGlyphRangesIfNeeded(const std::string& fontStackName,
         return requestIsNeeded;
     }
 
-    auto callback = [this, fontStackName](GlyphPBF* glyph) {
+    auto successCallback = [this, fontStackName](GlyphPBF* glyph) {
         auto fontStack = createFontStack(fontStackName);
         glyph->parse(**fontStack);
         asyncEmitGlyphRangeLoaded->send();
+    };
+
+    auto failureCallback = [this](const std::string& message) {
+        std::lock_guard<std::mutex> lock(errorMessageMutex);
+        errorMessage = message;
+        asyncEmitGlyphRangeLoadedingFailed->send();
     };
 
     std::lock_guard<std::mutex> lock(rangesMutex);
@@ -266,7 +278,8 @@ bool GlyphStore::requestGlyphRangesIfNeeded(const std::string& fontStackName,
     for (const auto& range : glyphRanges) {
         const auto& rangeSets_it = rangeSets.find(range);
         if (rangeSets_it == rangeSets.end()) {
-            auto glyph = util::make_unique<GlyphPBF>(glyphURL, fontStackName, range, env, callback);
+            auto glyph = util::make_unique<GlyphPBF>(glyphURL, fontStackName, range, env,
+                successCallback, failureCallback);
             rangeSets.emplace(range, std::move(glyph));
             requestIsNeeded = true;
             continue;
@@ -310,6 +323,16 @@ void GlyphStore::emitGlyphRangeLoaded() {
     if (observer) {
         observer->onGlyphRangeLoaded();
     }
+}
+
+void GlyphStore::emitGlyphRangeLoadingFailed() {
+    if (!observer) {
+        return;
+    }
+
+    std::lock_guard<std::mutex> lock(errorMessageMutex);
+    auto error = std::make_exception_ptr(util::GlyphRangeLoadingException(errorMessage));
+    observer->onGlyphRangeLoadingFailed(error);
 }
 
 }

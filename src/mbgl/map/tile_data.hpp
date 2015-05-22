@@ -44,7 +44,10 @@ public:
     TileData(const TileID&, const SourceInfo&);
     ~TileData();
 
-    void request(Worker&, float pixelRatio, std::function<void ()> callback);
+    void request(Worker&,
+                 float pixelRatio,
+                 const std::function<void()>& successCallback,
+                 const std::function<void(const std::string& message)>& failureCallback);
 
     // Schedule a tile reparse on a worker thread and call the callback on
     // completion. It will return true if the work was schedule or false it was
