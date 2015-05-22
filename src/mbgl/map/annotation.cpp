@@ -103,20 +103,22 @@ AnnotationManager::addAnnotations(const AnnotationType type,
         auto& shape = segments[s];
 
         std::vector<std::vector<vec2<double>>> projectedShape;
+        projectedShape.reserve(shape.size());
 
         const uint32_t annotationID = nextID();
 
-        for (size_t l = 0; l < segments[s].size(); ++l) {
+        for (size_t l = 0; l < shape.size(); ++l) {
             auto& line = shape[l];
 
-            projectedShape.push_back({{}});
-            auto& projectedLine = projectedShape.back();
+            std::vector<vec2<double>> projectedLine;
+            projectedLine.reserve(line.size());
 
             for (size_t p = 0; p < line.size(); ++p) {
                 auto& point = line[p];
 
                 // projection conversion into unit space
-                const vec2<double> pp = projectPoint(point);
+                const auto pp = projectPoint(point);
+
                 projectedLine.push_back(pp);
             }
 
