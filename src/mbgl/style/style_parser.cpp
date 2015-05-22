@@ -44,7 +44,7 @@ void StyleParser::parse(JSVal document) {
         std::map<ClassID, ClassProperties> shapePaints;
         rapidjson::Document d1;
         rapidjson::Value lineWidth(rapidjson::kObjectType);
-        lineWidth.AddMember("line-width", 5, d1.GetAllocator());
+        lineWidth.AddMember("line-width", 2, d1.GetAllocator());
         parsePaint(lineWidth, shapePaints[ClassID::Default]);
         rapidjson::Value lineColor(rapidjson::kObjectType);
         lineColor.AddMember("line-color", "#0000ff", d1.GetAllocator());
