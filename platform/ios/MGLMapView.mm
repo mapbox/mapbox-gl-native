@@ -1574,7 +1574,14 @@ CLLocationCoordinate2D MGLLocationCoordinate2DFromLatLng(mbgl::LatLng latLng)
 - (NSString *)styleID
 {
     NSURL *styleURL = self.styleURL;
-    return [styleURL.scheme isEqualToString:@"mapbox"] ? styleURL.host.mgl_stringOrNilIfEmpty : nil;
+    if ([styleURL.host isEqualToString:@"api.tiles.mapbox.com"])
+    {
+        return styleURL.lastPathComponent.mgl_stringOrNilIfEmpty;
+    }
+    else
+    {
+        return nil;
+    }
 }
 
 - (void)setStyleID:(NSString *)styleID
