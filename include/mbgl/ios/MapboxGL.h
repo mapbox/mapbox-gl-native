@@ -1,5 +1,6 @@
 #import "MGLAccountManager.h"
 #import "MGLAnnotation.h"
 #import "MGLMapView.h"
+#import "MGLMapViewDelegate.h"
 #import "MGLTypes.h"
 #import "MGLUserLocation.h"

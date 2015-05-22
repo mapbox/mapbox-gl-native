@@ -22,6 +22,7 @@
         '../platform/ios/MGLMapboxEvents.m',
         '../include/mbgl/ios/MGLMapView.h',
         '../include/mbgl/ios/MGLMapView+IBAdditions.h',
+        '../include/mbgl/ios/MGLMapViewDelegate.h',
         '../platform/ios/MGLMapView.mm',
         '../platform/ios/MGLFileCache.h',
         '../platform/ios/MGLFileCache.mm',
