@@ -9,6 +9,7 @@
 #import <Foundation/Foundation.h>
 
 #include <map>
+#include <future>
 #include <cassert>
 
 namespace mbgl {
@@ -41,6 +42,30 @@ enum class ResponseStatus : uint8_t {
     NotModified,
 };
 
+ResponseStatus responseStatusFromNSError(NSError *error) {
+    switch ([error code]) {
+        case NSURLErrorBadServerResponse: // 5xx errors
+            return ResponseStatus::TemporaryError;
+
+        case NSURLErrorTimedOut:
+        case NSURLErrorUserCancelledAuthentication:
+            return ResponseStatus::SingularError; // retry immediately
+
+        case NSURLErrorNetworkConnectionLost:
+        case NSURLErrorCannotFindHost:
+        case NSURLErrorCannotConnectToHost:
+        case NSURLErrorDNSLookupFailed:
+        case NSURLErrorNotConnectedToInternet:
+        case NSURLErrorInternationalRoamingOff:
+        case NSURLErrorCallIsActive:
+        case NSURLErrorDataNotAllowed:
+            return ResponseStatus::ConnectionError;
+
+        default:
+            return ResponseStatus::PermanentError;
+    }
+}
+
 // -------------------------------------------------------------------------------------------------
 
 class HTTPNSURLContext;
@@ -58,17 +83,22 @@ public:
     void retry() override;
 
 private:
+    static std::tuple<ResponseStatus, std::unique_ptr<Response>>
+    completionHandler(NSData *data, NSURLResponse *res, NSError *error,
+                      const std::shared_ptr<const Response> existingResponse);
+
     void start();
-    void handleResult(NSData *data, NSURLResponse *res, NSError *error);
     void handleResponse();
     void retry(uint64_t timeout);
 
     HTTPNSURLContext *context = nullptr;
     bool cancelled = false;
     NSURLSessionDataTask *task = nullptr;
-    std::unique_ptr<Response> response;
     const std::shared_ptr<const Response> existingResponse;
-    ResponseStatus status = ResponseStatus::PermanentError;
+
+    using Promise = std::promise<std::tuple<ResponseStatus, std::unique_ptr<Response>>>;
+    Promise promise;
+
     uv::async async;
     uv::timer timer;
     int attempts = 0;
@@ -177,14 +207,22 @@ void HTTPRequest::start() {
         [req addValue:context->userAgent forHTTPHeaderField:@"User-Agent"];
 
         task = [context->session dataTaskWithRequest:req
-                          completionHandler:^(NSData *data, NSURLResponse *res,
-                                              NSError *error) { handleResult(data, res, error); }];
+                                completionHandler:^(NSData *data, NSURLResponse *res, NSError *error) {
+                                    promise.set_value(completionHandler(data, res, error, existingResponse));
+                                    async.send();
+                                }];
+
         [task retain];
         [task resume];
     }
 }
 
 void HTTPRequest::handleResponse() {
+    auto result = promise.get_future().get();
+    ResponseStatus status = std::get<0>(result);
+    std::unique_ptr<Response> response = std::move(std::get<1>(result));
+    promise = Promise();
+
     if (task) {
         [task release];
         task = nullptr;
@@ -243,112 +281,93 @@ int64_t parseCacheControl(const char *value) {
     return 0;
 }
 
-void HTTPRequest::handleResult(NSData *data, NSURLResponse *res, NSError *error) {
-    if (error) {
-        if ([error code] == NSURLErrorCancelled) {
-            status = ResponseStatus::Canceled;
-        } else {
-            // TODO: Use different codes for host not found, timeout, invalid URL etc.
-            // These can be categorized in temporary and permanent errors.
-            response = util::make_unique<Response>();
-            response->status = Response::Error;
-            response->message = [[error localizedDescription] UTF8String];
-
-            switch ([error code]) {
-                case NSURLErrorBadServerResponse: // 5xx errors
-                    status = ResponseStatus::TemporaryError;
-                    break;
-
-                case NSURLErrorTimedOut:
-                case NSURLErrorUserCancelledAuthentication:
-                    status = ResponseStatus::SingularError; // retry immediately
-                    break;
-
-                case NSURLErrorNetworkConnectionLost:
-                case NSURLErrorCannotFindHost:
-                case NSURLErrorCannotConnectToHost:
-                case NSURLErrorDNSLookupFailed:
-                case NSURLErrorNotConnectedToInternet:
-                case NSURLErrorInternationalRoamingOff:
-                case NSURLErrorCallIsActive:
-                case NSURLErrorDataNotAllowed:
-                    status = ResponseStatus::ConnectionError;
-                    break;
-
-                default:
-                    status = ResponseStatus::PermanentError;
-            }
-        }
-    } else if ([res isKindOfClass:[NSHTTPURLResponse class]]) {
-        const long responseCode = [(NSHTTPURLResponse *)res statusCode];
-
-        response = util::make_unique<Response>();
-        response->data = {(const char *)[data bytes], [data length]};
-
-        NSDictionary *headers = [(NSHTTPURLResponse *)res allHeaderFields];
-        NSString *cache_control = [headers objectForKey:@"Cache-Control"];
-        if (cache_control) {
-            response->expires = parseCacheControl([cache_control UTF8String]);
-        }
-
-        NSString *expires = [headers objectForKey:@"Expires"];
-        if (expires) {
-            response->expires = parse_date([expires UTF8String]);
-        }
-
-        NSString *last_modified = [headers objectForKey:@"Last-Modified"];
-        if (last_modified) {
-            response->modified = parse_date([last_modified UTF8String]);
-        }
-
-        NSString *etag = [headers objectForKey:@"ETag"];
-        if (etag) {
-            response->etag = [etag UTF8String];
-        }
-
-        if (responseCode == 304) {
-            if (existingResponse) {
-                // We're going to copy over the existing response's data.
-                response->status = existingResponse->status;
-                response->message = existingResponse->message;
-                response->modified = existingResponse->modified;
-                response->etag = existingResponse->etag;
-                response->data = existingResponse->data;
-                status = ResponseStatus::NotModified;
-            } else {
-                // This is an unsolicited 304 response and should only happen on malfunctioning
-                // HTTP servers. It likely doesn't include any data, but we don't have much options.
-                response->status = Response::Successful;
-                status = ResponseStatus::Successful;
-            }
-        } else if (responseCode == 200) {
-            response->status = Response::Successful;
-            status = ResponseStatus::Successful;
-        } else if (responseCode >= 500 && responseCode < 600) {
-            // Server errors may be temporary, so back off exponentially.
-            response->status = Response::Error;
-            response->message = "HTTP status code " + std::to_string(responseCode);
-            status = ResponseStatus::TemporaryError;
-        } else {
-            // We don't know how to handle any other errors, so declare them as permanently failing.
-            response->status = Response::Error;
-            response->message = "HTTP status code " + std::to_string(responseCode);
-            status = ResponseStatus::PermanentError;
-        }
-    } else {
-        // This should never happen.
-        status = ResponseStatus::PermanentError;
-        response = util::make_unique<Response>();
-        response->status = Response::Error;
-        response->message = "response class is not NSHTTPURLResponse";
+std::tuple<ResponseStatus, std::unique_ptr<Response>>
+HTTPRequest::completionHandler(NSData *data, NSURLResponse *res, NSError *error,
+                               const std::shared_ptr<const Response> existingResponse) {
+    if (error && [error code] == NSURLErrorCancelled) {
+        return { ResponseStatus::Canceled, nullptr };
     }
 
-    async.send();
+    if (error) {
+        // TODO: Use different codes for host not found, timeout, invalid URL etc.
+        // These can be categorized in temporary and permanent errors.
+        return {
+            responseStatusFromNSError(error),
+            std::make_unique<Response>(Response::Error, [[error localizedDescription] UTF8String])
+        };
+    }
+
+    if (![res isKindOfClass:[NSHTTPURLResponse class]]) {
+        // This should never happen.
+        std::unique_ptr<Response> response = std::make_unique<Response>();
+        response->status = Response::Error;
+        response->message = "response class is not NSHTTPURLResponse";
+        return { ResponseStatus::PermanentError, std::move(response) };
+    }
+
+    const long responseCode = [(NSHTTPURLResponse *)res statusCode];
+
+    std::unique_ptr<Response> response = std::make_unique<Response>();
+
+    response->data = {(const char *)[data bytes], [data length]};
+
+    NSDictionary *headers = [(NSHTTPURLResponse *)res allHeaderFields];
+    NSString *cache_control = [headers objectForKey:@"Cache-Control"];
+    if (cache_control) {
+        response->expires = parseCacheControl([cache_control UTF8String]);
+    }
+
+    NSString *expires = [headers objectForKey:@"Expires"];
+    if (expires) {
+        response->expires = parse_date([expires UTF8String]);
+    }
+
+    NSString *last_modified = [headers objectForKey:@"Last-Modified"];
+    if (last_modified) {
+        response->modified = parse_date([last_modified UTF8String]);
+    }
+
+    NSString *etag = [headers objectForKey:@"ETag"];
+    if (etag) {
+        response->etag = [etag UTF8String];
+    }
+
+    ResponseStatus status;
+
+    if (responseCode == 304) {
+        if (existingResponse) {
+            // We're going to copy over the existing response's data.
+            response->status = existingResponse->status;
+            response->message = existingResponse->message;
+            response->modified = existingResponse->modified;
+            response->etag = existingResponse->etag;
+            response->data = existingResponse->data;
+            status = ResponseStatus::NotModified;
+        } else {
+            // This is an unsolicited 304 response and should only happen on malfunctioning
+            // HTTP servers. It likely doesn't include any data, but we don't have much options.
+            response->status = Response::Successful;
+            status = ResponseStatus::Successful;
+        }
+    } else if (responseCode == 200) {
+        response->status = Response::Successful;
+        status = ResponseStatus::Successful;
+    } else if (responseCode >= 500 && responseCode < 600) {
+        // Server errors may be temporary, so back off exponentially.
+        response->status = Response::Error;
+        response->message = "HTTP status code " + std::to_string(responseCode);
+        status = ResponseStatus::TemporaryError;
+    } else {
+        // We don't know how to handle any other errors, so declare them as permanently failing.
+        response->status = Response::Error;
+        response->message = "HTTP status code " + std::to_string(responseCode);
+        status = ResponseStatus::PermanentError;
+    }
+
+    return { status, std::move(response) };
 }
 
 void HTTPRequest::retry(uint64_t timeout) {
-    response.reset();
-
     timer.stop();
     timer.start(timeout, 0, [this] { start(); });
 }
