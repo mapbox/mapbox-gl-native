@@ -49,6 +49,16 @@ static NSURL *MGLURLForBundledStyleNamed(NSString *styleName)
     return [NSURL URLWithString:[NSString stringWithFormat:@"asset://styles/%@.json", styleName]];
 }
 
+CGFloat MGLRadiansFromDegrees(CLLocationDegrees degrees)
+{
+    return degrees * M_PI / 180;
+}
+
+CLLocationDegrees MGLDegreesFromRadians(CGFloat radians)
+{
+    return radians * 180 / M_PI;
+}
+
 #pragma mark - Private -
 
 @interface MGLMapView () <UIGestureRecognizerDelegate, GLKViewDelegate, CLLocationManagerDelegate, UIActionSheetDelegate>
@@ -913,13 +923,13 @@ std::chrono::steady_clock::duration secondsAsDuration(float duration)
 
         _mbglMap->setGestureInProgress(true);
 
-        self.angle = [MGLMapView degreesToRadians:_mbglMap->getBearing()] * -1;
+        self.angle = MGLRadiansFromDegrees(_mbglMap->getBearing()) * -1;
 
         self.userTrackingMode = MGLUserTrackingModeNone;
     }
     else if (rotate.state == UIGestureRecognizerStateChanged)
     {
-        CGFloat newDegrees = [MGLMapView radiansToDegrees:(self.angle + rotate.rotation)] * -1;
+        CGFloat newDegrees = MGLDegreesFromRadians(self.angle + rotate.rotation) * -1;
 
         // constrain to +/-30 degrees when merely rotating like Apple does
         //
@@ -942,7 +952,7 @@ std::chrono::steady_clock::duration secondsAsDuration(float duration)
             CGFloat radians = self.angle + rotate.rotation;
             CGFloat duration = UIScrollViewDecelerationRateNormal;
             CGFloat newRadians = radians + velocity * duration * 0.1;
-            CGFloat newDegrees = [MGLMapView radiansToDegrees:newRadians] * -1;
+            CGFloat newDegrees = MGLDegreesFromRadians(newRadians) * -1;
 
             _mbglMap->setBearing(newDegrees, secondsAsDuration(duration));
 
@@ -1007,16 +1017,16 @@ std::chrono::steady_clock::duration secondsAsDuration(float duration)
         mbgl::LatLngBounds tapBounds;
 
         coordinate = [self convertPoint:tapRectLowerLeft  toCoordinateFromView:self];
-        tapBounds.extend(coordinateToLatLng(coordinate));
+        tapBounds.extend(MGLLatLngFromLocationCoordinate2D(coordinate));
 
         coordinate = [self convertPoint:tapRectUpperLeft  toCoordinateFromView:self];
-        tapBounds.extend(coordinateToLatLng(coordinate));
+        tapBounds.extend(MGLLatLngFromLocationCoordinate2D(coordinate));
 
         coordinate = [self convertPoint:tapRectUpperRight toCoordinateFromView:self];
-        tapBounds.extend(coordinateToLatLng(coordinate));
+        tapBounds.extend(MGLLatLngFromLocationCoordinate2D(coordinate));
 
         coordinate = [self convertPoint:tapRectLowerRight toCoordinateFromView:self];
-        tapBounds.extend(coordinateToLatLng(coordinate));
+        tapBounds.extend(MGLLatLngFromLocationCoordinate2D(coordinate));
 
         // query for nearby annotations
         std::vector<uint32_t> nearbyAnnotations = _mbglMap->getAnnotationsInBounds(tapBounds);
@@ -1384,7 +1394,7 @@ std::chrono::steady_clock::duration secondsAsDuration(float duration)
 {
     CGFloat duration = (animated ? MGLAnimationDuration : 0);
 
-    _mbglMap->setLatLngZoom(coordinateToLatLng(coordinate),
+    _mbglMap->setLatLngZoom(MGLLatLngFromLocationCoordinate2D(coordinate),
                             fmaxf(_mbglMap->getZoom(), self.currentMinimumZoom),
                             secondsAsDuration(duration));
 
@@ -1398,7 +1408,7 @@ std::chrono::steady_clock::duration secondsAsDuration(float duration)
 
 - (CLLocationCoordinate2D)centerCoordinate
 {
-    return latLngToCoordinate(_mbglMap->getLatLng());
+    return MGLLocationCoordinate2DFromLatLng(_mbglMap->getLatLng());
 }
 
 - (void)setCenterCoordinate:(CLLocationCoordinate2D)centerCoordinate zoomLevel:(double)zoomLevel animated:(BOOL)animated
@@ -1407,7 +1417,7 @@ std::chrono::steady_clock::duration secondsAsDuration(float duration)
 
     CGFloat duration = (animated ? MGLAnimationDuration : 0);
 
-    _mbglMap->setLatLngZoom(coordinateToLatLng(centerCoordinate), zoomLevel, secondsAsDuration(duration));
+    _mbglMap->setLatLngZoom(MGLLatLngFromLocationCoordinate2D(centerCoordinate), zoomLevel, secondsAsDuration(duration));
 
     [self unrotateIfNeededAnimated:animated];
 
@@ -1491,12 +1501,12 @@ std::chrono::steady_clock::duration secondsAsDuration(float duration)
     //
     convertedPoint.y = self.bounds.size.height - convertedPoint.y;
 
-    return latLngToCoordinate(_mbglMap->latLngForPixel(mbgl::vec2<double>(convertedPoint.x, convertedPoint.y)));
+    return MGLLocationCoordinate2DFromLatLng(_mbglMap->latLngForPixel(mbgl::vec2<double>(convertedPoint.x, convertedPoint.y)));
 }
 
 - (CGPoint)convertCoordinate:(CLLocationCoordinate2D)coordinate toPointToView:(UIView *)view
 {
-    mbgl::vec2<double> pixel = _mbglMap->pixelForLatLng(coordinateToLatLng(coordinate));
+    mbgl::vec2<double> pixel = _mbglMap->pixelForLatLng(MGLLatLngFromLocationCoordinate2D(coordinate));
 
     // flip y coordinate for iOS view origin in top left
     //
@@ -1510,12 +1520,12 @@ std::chrono::steady_clock::duration secondsAsDuration(float duration)
     return _mbglMap->getMetersPerPixelAtLatitude(latitude, self.zoomLevel);
 }
 
-mbgl::LatLng coordinateToLatLng(CLLocationCoordinate2D coordinate)
+mbgl::LatLng MGLLatLngFromLocationCoordinate2D(CLLocationCoordinate2D coordinate)
 {
     return mbgl::LatLng(coordinate.latitude, coordinate.longitude);
 }
 
-CLLocationCoordinate2D latLngToCoordinate(mbgl::LatLng latLng)
+CLLocationCoordinate2D MGLLocationCoordinate2DFromLatLng(mbgl::LatLng latLng)
 {
     return CLLocationCoordinate2DMake(latLng.latitude, latLng.longitude);
 }
@@ -1524,13 +1534,13 @@ CLLocationCoordinate2D latLngToCoordinate(mbgl::LatLng latLng)
 {
     mbgl::LatLngBounds bounds;
 
-    bounds.extend(coordinateToLatLng(
+    bounds.extend(MGLLatLngFromLocationCoordinate2D(
         [self convertPoint:CGPointMake(0, 0) toCoordinateFromView:self]));
-    bounds.extend(coordinateToLatLng(
+    bounds.extend(MGLLatLngFromLocationCoordinate2D(
         [self convertPoint:CGPointMake(self.bounds.size.width, 0) toCoordinateFromView:self]));
-    bounds.extend(coordinateToLatLng(
+    bounds.extend(MGLLatLngFromLocationCoordinate2D(
         [self convertPoint:CGPointMake(0, self.bounds.size.height) toCoordinateFromView:self]));
-    bounds.extend(coordinateToLatLng(
+    bounds.extend(MGLLatLngFromLocationCoordinate2D(
         [self convertPoint:CGPointMake(self.bounds.size.width, self.bounds.size.height) toCoordinateFromView:self]));
 
     return bounds;
@@ -1684,7 +1694,7 @@ CLLocationCoordinate2D latLngToCoordinate(mbgl::LatLng latLng)
     {
         assert([annotation conformsToProtocol:@protocol(MGLAnnotation)]);
 
-        latLngs.push_back(coordinateToLatLng(annotation.coordinate));
+        latLngs.push_back(MGLLatLngFromLocationCoordinate2D(annotation.coordinate));
 
         NSString *symbolName = nil;
 
@@ -1753,7 +1763,7 @@ CLLocationCoordinate2D latLngToCoordinate(mbgl::LatLng latLng)
 
     assert([firstAnnotation conformsToProtocol:@protocol(MGLAnnotation)]);
 
-    if ( ! [self viewportBounds].contains(coordinateToLatLng(firstAnnotation.coordinate))) return;
+    if ( ! [self viewportBounds].contains(MGLLatLngFromLocationCoordinate2D(firstAnnotation.coordinate))) return;
 
     [self selectAnnotation:firstAnnotation animated:NO];
 }
@@ -1762,7 +1772,7 @@ CLLocationCoordinate2D latLngToCoordinate(mbgl::LatLng latLng)
 {
     if ( ! annotation) return;
 
-    if ( ! [self viewportBounds].contains(coordinateToLatLng(annotation.coordinate))) return;
+    if ( ! [self viewportBounds].contains(MGLLatLngFromLocationCoordinate2D(annotation.coordinate))) return;
 
     if (annotation == self.selectedAnnotation) return;
 
@@ -2198,16 +2208,6 @@ CLLocationCoordinate2D latLngToCoordinate(mbgl::LatLng latLng)
 
 #pragma mark - Utility -
 
-+ (CGFloat)degreesToRadians:(CGFloat)degrees
-{
-    return degrees * M_PI / 180;
-}
-
-+ (CGFloat)radiansToDegrees:(CGFloat)radians
-{
-    return radians * 180 / M_PI;
-}
-
 - (void)animateWithDelay:(NSTimeInterval)delay animations:(void (^)(void))animations
 {
     dispatch_after(dispatch_time(DISPATCH_TIME_NOW, (int64_t)(delay * NSEC_PER_SEC)), dispatch_get_main_queue(), animations);
@@ -2425,7 +2425,7 @@ CLLocationCoordinate2D latLngToCoordinate(mbgl::LatLng latLng)
     while (degrees >= 360) degrees -= 360;
     while (degrees < 0) degrees += 360;
 
-    self.compass.transform = CGAffineTransformMakeRotation([MGLMapView degreesToRadians:degrees]);
+    self.compass.transform = CGAffineTransformMakeRotation(MGLRadiansFromDegrees(degrees));
 
     if (_mbglMap->getBearing() && self.compass.alpha < 1)
     {
@@ -2458,14 +2458,14 @@ CLLocationCoordinate2D latLngToCoordinate(mbgl::LatLng latLng)
         imageName = [imageName stringByAppendingString:@".png"];
     }
 
-    return [UIImage imageWithContentsOfFile:[MGLMapView pathForBundleResourceNamed:imageName ofType:nil inDirectory:@""]];
+    return [UIImage imageWithContentsOfFile:[self pathForBundleResourceNamed:imageName ofType:nil inDirectory:@""]];
 }
 
 + (NSString *)pathForBundleResourceNamed:(NSString *)name ofType:(NSString *)extension inDirectory:(NSString *)directory
 {
     NSString *path = [[NSBundle bundleWithPath:[NSBundle mgl_resourceBundlePath]] pathForResource:name ofType:extension inDirectory:directory];
 
-    NSAssert(path, @"Resource not found in application.");
+    NSAssert(path, @"Resource %@ not found in application.", name);
 
     return path;
 }
