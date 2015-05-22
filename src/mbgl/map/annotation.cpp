@@ -97,6 +97,8 @@ AnnotationManager::addAnnotations(const AnnotationType type,
 
     std::unordered_set<TileID, TileID::Hash> affectedTiles;
 
+    const uint8_t maxZoom = data.transform.getMaxZoom();
+
     for (size_t s = 0; s < segments.size(); ++s) {
         auto& shape = segments[s];
 
@@ -139,7 +141,7 @@ AnnotationManager::addAnnotations(const AnnotationType type,
             projectedShape,
             type,
             featureProperties,
-            data.transform.getMaxZoom()
+            maxZoom
         );
 
         std::copy(featureAffectedTiles.begin(), featureAffectedTiles.end(), std::inserter(affectedTiles, affectedTiles.begin()));
