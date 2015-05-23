@@ -24,7 +24,7 @@
 		<key>10265E242415D473A6A613214DB7AC3EE3D43F93</key>
 		<string>../../../..test/ios/KIF</string>
 		<key>38C2A0D4F62B675E8C16C8BC1437C7753846C8AC</key>
-		<string>../../../../test/ios/OHHTTPStubs/</string>
+		<string>../../../../test/ios/OHHTTPStubs</string>
 		<key>7E68CB584078A487C0535CC191D3B7551EEE2095</key>
 		<string>../../../..</string>
 	</dict>
