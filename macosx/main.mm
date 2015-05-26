@@ -2,7 +2,7 @@
 #include "../platform/default/default_styles.hpp"
 #include <mbgl/platform/platform.hpp>
 #include <mbgl/platform/darwin/settings_nsuserdefaults.hpp>
-#include <mbgl/platform/darwin/Reachability.h>
+#include <mbgl/platform/darwin/reachability.h>
 #include <mbgl/platform/default/glfw_view.hpp>
 #include <mbgl/storage/default_file_source.hpp>
 #include <mbgl/storage/sqlite_cache.hpp>
@@ -120,8 +120,8 @@ int main() {
     [appleEventManager setEventHandler:handler andSelector:@selector(handleGetURLEvent:withReplyEvent:) forEventClass:kInternetEventClass andEventID:kAEGetURL];
 
     // Notify map object when network reachability status changes.
-    Reachability* reachability = [Reachability reachabilityForInternetConnection];
-    reachability.reachableBlock = ^(Reachability *) {
+    MGLReachability* reachability = [MGLReachability reachabilityForInternetConnection];
+    reachability.reachableBlock = ^(MGLReachability *) {
         mbgl::NetworkStatus::Reachable();
     };
     [reachability startNotifier];
