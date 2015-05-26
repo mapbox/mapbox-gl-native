@@ -7,7 +7,6 @@
 #include <mbgl/storage/response.hpp>
 #include <mbgl/util/exception.hpp>
 #include <mbgl/util/raster.hpp>
-#include <mbgl/util/std.hpp>
 #include <mbgl/util/uv_detail.hpp>
 
 #include <rapidjson/document.h>
@@ -107,7 +106,7 @@ bool Sprite::hasPixelRatio(float ratio) const {
 }
 
 void Sprite::parseImage() {
-    raster = util::make_unique<util::Image>(image);
+    raster = std::make_unique<util::Image>(image);
     if (!*raster) {
         raster.reset();
     }

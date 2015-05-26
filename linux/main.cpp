@@ -1,6 +1,5 @@
 #include <mbgl/mbgl.hpp>
 #include "../platform/default/default_styles.hpp"
-#include <mbgl/util/std.hpp>
 #include <mbgl/util/uv.hpp>
 #include <mbgl/platform/log.hpp>
 #include <mbgl/platform/platform.hpp>
@@ -66,7 +65,7 @@ int main(int argc, char *argv[]) {
     sigIntHandler.sa_flags = 0;
     sigaction(SIGINT, &sigIntHandler, NULL);
 
-    view = mbgl::util::make_unique<GLFWView>();
+    view = std::make_unique<GLFWView>();
 
     mbgl::SQLiteCache cache("/tmp/mbgl-cache.db");
     mbgl::DefaultFileSource fileSource(&cache);

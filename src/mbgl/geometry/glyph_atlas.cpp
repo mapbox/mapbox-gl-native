@@ -6,8 +6,6 @@
 #include <mbgl/platform/log.hpp>
 #include <mbgl/platform/platform.hpp>
 
-#include <mbgl/util/std.hpp>
-
 #include <cassert>
 #include <algorithm>
 
@@ -18,7 +16,7 @@ GlyphAtlas::GlyphAtlas(uint16_t width_, uint16_t height_)
     : width(width_),
       height(height_),
       bin(width_, height_),
-      data(util::make_unique<uint8_t[]>(width_ * height_)),
+      data(std::make_unique<uint8_t[]>(width_ * height_)),
       dirty(true) {
 }
 

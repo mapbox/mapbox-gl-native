@@ -14,6 +14,7 @@
 #include <mbgl/style/style_layer.hpp>
 #include <mbgl/platform/log.hpp>
 #include <mbgl/util/uv_detail.hpp>
+#include <mbgl/util/std.hpp>
 #include <mbgl/util/token.hpp>
 #include <mbgl/util/string.hpp>
 #include <mbgl/util/tile_cover.hpp>
@@ -264,7 +265,7 @@ TileData::State Source::addTile(MapData& data,
         return state;
     }
 
-    auto pos = tiles.emplace(id, util::make_unique<Tile>(id));
+    auto pos = tiles.emplace(id, std::make_unique<Tile>(id));
     Tile& new_tile = *pos.first->second;
 
     // We couldn't find the tile in the list. Create a new one.

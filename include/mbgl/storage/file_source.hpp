@@ -5,7 +5,6 @@
 #include "resource.hpp"
 
 #include <mbgl/util/noncopyable.hpp>
-#include <mbgl/util/std.hpp>
 #include <mbgl/util/util.hpp>
 
 #include <functional>

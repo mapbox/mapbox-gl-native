@@ -21,7 +21,6 @@
 #include <mbgl/util/token.hpp>
 #include <mbgl/util/math.hpp>
 #include <mbgl/util/merge_lines.hpp>
-#include <mbgl/util/std.hpp>
 
 #ifndef BUFFER_OFFSET
 #define BUFFER_OFFSET(i) ((char *)nullptr + (i))
@@ -409,7 +408,7 @@ void SymbolBucket::addSymbols(Buffer &buffer, const PlacedGlyphs &symbols, float
         if (!buffer.groups.size() ||
             (buffer.groups.back()->vertex_length + glyph_vertex_length > 65535)) {
             // Move to a new group because the old one can't hold the geometry.
-            buffer.groups.emplace_back(util::make_unique<GroupType>());
+            buffer.groups.emplace_back(std::make_unique<GroupType>());
         }
 
         // We're generating triangle fans, so we always start with the first

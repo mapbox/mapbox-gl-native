@@ -1,6 +1,5 @@
 #include <mbgl/map/vector_tile_data.hpp>
 #include <mbgl/map/tile_parser.hpp>
-#include <mbgl/util/std.hpp>
 #include <mbgl/style/style_layer.hpp>
 #include <mbgl/style/style_bucket.hpp>
 #include <mbgl/map/source.hpp>
@@ -26,7 +25,7 @@ VectorTileData::VectorTileData(const TileID& id_,
       spriteAtlas(spriteAtlas_),
       sprite(sprite_),
       style(style_),
-      collision(util::make_unique<Collision>(id_.z, 4096, source_.tile_size, depth)) {
+      collision(std::make_unique<Collision>(id_.z, 4096, source_.tile_size, depth)) {
 }
 
 VectorTileData::~VectorTileData() {

@@ -30,13 +30,13 @@ public:
         : env_(fileSource),
           envScope_(env_, ThreadType::Map, "Map"),
           data_(view, MapMode::Still),
-          glyphStore_(util::make_unique<GlyphStore>(loop, env_)),
-          glyphAtlas_(util::make_unique<GlyphAtlas>(1024, 1024)),
-          spriteAtlas_(util::make_unique<SpriteAtlas>(512, 512)),
-          texturePool_(util::make_unique<TexturePool>()),
-          style_(util::make_unique<Style>()),
-          resourceLoader_(util::make_unique<ResourceLoader>()),
-          asyncUpdate(util::make_unique<uv::async>(loop, [this] { update(); })),
+          glyphStore_(std::make_unique<GlyphStore>(loop, env_)),
+          glyphAtlas_(std::make_unique<GlyphAtlas>(1024, 1024)),
+          spriteAtlas_(std::make_unique<SpriteAtlas>(512, 512)),
+          texturePool_(std::make_unique<TexturePool>()),
+          style_(std::make_unique<Style>()),
+          resourceLoader_(std::make_unique<ResourceLoader>()),
+          asyncUpdate(std::make_unique<uv::async>(loop, [this] { update(); })),
           callback_(callback) {
         asyncUpdate->unref();
 
@@ -147,7 +147,7 @@ TEST_P(ResourceLoaderTest, RequestFailure) {
     };
 
     std::unique_ptr<util::Thread<MockMapContext>> context(
-        util::make_unique<util::Thread<MockMapContext>>(
+        std::make_unique<util::Thread<MockMapContext>>(
             "Map", util::ThreadPriority::Regular, view, fileSource, callback));
 
     uv_run(loop.get(), UV_RUN_DEFAULT);

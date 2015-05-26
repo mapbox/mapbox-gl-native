@@ -140,7 +140,7 @@ void SpriteAtlas::allocate() {
     if (!data) {
         dimension w = static_cast<dimension>(width * pixelRatio);
         dimension h = static_cast<dimension>(height * pixelRatio);
-        data = util::make_unique<uint32_t[]>(w * h);
+        data = std::make_unique<uint32_t[]>(w * h);
         std::fill(data.get(), data.get() + w * h, 0);
     }
 }

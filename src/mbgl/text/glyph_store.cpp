@@ -3,15 +3,14 @@
 #include <mbgl/text/font_stack.hpp>
 
 #include <mbgl/util/exception.hpp>
-#include <mbgl/util/std.hpp>
 #include <mbgl/util/uv_detail.hpp>
 
 namespace mbgl {
 
 GlyphStore::GlyphStore(uv_loop_t* loop, Environment& env_)
     : env(env_),
-      asyncEmitGlyphRangeLoaded(util::make_unique<uv::async>(loop, [this] { emitGlyphRangeLoaded(); })),
-      asyncEmitGlyphRangeLoadedingFailed(util::make_unique<uv::async>(loop, [this] { emitGlyphRangeLoadingFailed(); })),
+      asyncEmitGlyphRangeLoaded(std::make_unique<uv::async>(loop, [this] { emitGlyphRangeLoaded(); })),
+      asyncEmitGlyphRangeLoadedingFailed(std::make_unique<uv::async>(loop, [this] { emitGlyphRangeLoadingFailed(); })),
       observer(nullptr) {
     asyncEmitGlyphRangeLoaded->unref();
     asyncEmitGlyphRangeLoadedingFailed->unref();
@@ -51,7 +50,7 @@ bool GlyphStore::requestGlyphRangesIfNeeded(const std::string& fontStackName,
     for (const auto& range : glyphRanges) {
         const auto& rangeSets_it = rangeSets.find(range);
         if (rangeSets_it == rangeSets.end()) {
-            auto glyph = util::make_unique<GlyphPBF>(glyphURL, fontStackName, range, env,
+            auto glyph = std::make_unique<GlyphPBF>(glyphURL, fontStackName, range, env,
                 successCallback, failureCallback);
             rangeSets.emplace(range, std::move(glyph));
             requestIsNeeded = true;
@@ -67,18 +66,18 @@ bool GlyphStore::requestGlyphRangesIfNeeded(const std::string& fontStackName,
 }
 
 util::exclusive<FontStack> GlyphStore::createFontStack(const std::string &fontStack) {
-    auto lock = util::make_unique<std::lock_guard<std::mutex>>(stacksMutex);
+    auto lock = std::make_unique<std::lock_guard<std::mutex>>(stacksMutex);
 
     auto stack_it = stacks.find(fontStack);
     if (stack_it == stacks.end()) {
-        stack_it = stacks.emplace(fontStack, util::make_unique<FontStack>()).first;
+        stack_it = stacks.emplace(fontStack, std::make_unique<FontStack>()).first;
     }
 
     return { stack_it->second.get(), std::move(lock) };
 }
 
 util::exclusive<FontStack> GlyphStore::getFontStack(const std::string &fontStack) {
-    auto lock = util::make_unique<std::lock_guard<std::mutex>>(stacksMutex);
+    auto lock = std::make_unique<std::lock_guard<std::mutex>>(stacksMutex);
 
     const auto& stack_it = stacks.find(fontStack);
     if (stack_it == stacks.end()) {

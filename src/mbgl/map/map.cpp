@@ -3,15 +3,14 @@
 #include <mbgl/map/view.hpp>
 #include <mbgl/map/map_data.hpp>
 
-#include <mbgl/util/std.hpp>
 #include <mbgl/util/projection.hpp>
 #include <mbgl/util/thread.hpp>
 
 namespace mbgl {
 
 Map::Map(View& view, FileSource& fileSource, MapMode mode)
-    : data(util::make_unique<MapData>(view, mode)),
-      context(util::make_unique<util::Thread<MapContext>>("Map", util::ThreadPriority::Regular, view, fileSource, *data))
+    : data(std::make_unique<MapData>(view, mode)),
+      context(std::make_unique<util::Thread<MapContext>>("Map", util::ThreadPriority::Regular, view, fileSource, *data))
 {
     view.initialize(this);
 }

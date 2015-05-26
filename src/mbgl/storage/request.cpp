@@ -4,7 +4,6 @@
 #include <mbgl/storage/response.hpp>
 
 #include <mbgl/util/util.hpp>
-#include <mbgl/util/std.hpp>
 #include <mbgl/util/uv_detail.hpp>
 
 #include <cassert>
@@ -16,7 +15,7 @@ struct Request::Canceled { std::mutex mutex; bool confirmed = false; };
 
 // Note: This requires that loop is running in the current thread (or not yet running).
 Request::Request(const Resource &resource_, uv_loop_t *loop, Callback callback_)
-    : async(util::make_unique<uv::async>(loop, [this] { notifyCallback(); })),
+    : async(std::make_unique<uv::async>(loop, [this] { notifyCallback(); })),
       callback(callback_),
       resource(resource_) {
 }
@@ -62,7 +61,7 @@ void Request::notify(const std::shared_ptr<const Response> &response_) {
 void Request::cancel() {
     assert(async);
     assert(!canceled);
-    canceled = util::make_unique<Canceled>();
+    canceled = std::make_unique<Canceled>();
 }
 
 

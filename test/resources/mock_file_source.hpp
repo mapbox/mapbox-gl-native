@@ -4,6 +4,7 @@
 #include <mbgl/storage/file_source.hpp>
 
 #include <string>
+#include <memory>
 
 namespace mbgl {
 

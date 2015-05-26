@@ -20,7 +20,6 @@
 
 #include <mbgl/style/style.hpp>
 
-#include <mbgl/util/std.hpp>
 #include <mbgl/util/uv_detail.hpp>
 #include <mbgl/util/worker.hpp>
 #include <mbgl/util/texture_pool.hpp>
@@ -34,12 +33,12 @@ MapContext::MapContext(uv_loop_t* loop, View& view_, FileSource& fileSource, Map
       env(fileSource),
       envScope(env, ThreadType::Map, "Map"),
       updated(static_cast<UpdateType>(Update::Nothing)),
-      asyncUpdate(util::make_unique<uv::async>(loop, [this] { update(); })),
-      glyphStore(util::make_unique<GlyphStore>(loop, env)),
-      glyphAtlas(util::make_unique<GlyphAtlas>(1024, 1024)),
-      spriteAtlas(util::make_unique<SpriteAtlas>(512, 512)),
-      lineAtlas(util::make_unique<LineAtlas>(512, 512)),
-      texturePool(util::make_unique<TexturePool>()) {
+      asyncUpdate(std::make_unique<uv::async>(loop, [this] { update(); })),
+      glyphStore(std::make_unique<GlyphStore>(loop, env)),
+      glyphAtlas(std::make_unique<GlyphAtlas>(1024, 1024)),
+      spriteAtlas(std::make_unique<SpriteAtlas>(512, 512)),
+      lineAtlas(std::make_unique<LineAtlas>(512, 512)),
+      texturePool(std::make_unique<TexturePool>()) {
     assert(Environment::currentlyOn(ThreadType::Map));
 
     asyncUpdate->unref();
@@ -120,7 +119,7 @@ void MapContext::loadStyleJSON(const std::string& json, const std::string& base)
     resourceLoader.reset();
     style.reset();
 
-    style = util::make_unique<Style>();
+    style = std::make_unique<Style>();
     style->base = base;
     style->loadJSON((const uint8_t *)json.c_str());
     style->cascade(data.getClasses());
@@ -128,7 +127,7 @@ void MapContext::loadStyleJSON(const std::string& json, const std::string& base)
 
     glyphStore->setURL(style->glyph_url);
 
-    resourceLoader = util::make_unique<ResourceLoader>();
+    resourceLoader = std::make_unique<ResourceLoader>();
     resourceLoader->setObserver(this);
     resourceLoader->setStyle(style.get());
     resourceLoader->setGlyphStore(glyphStore.get());
@@ -221,7 +220,7 @@ void MapContext::render() {
     assert(style);
 
     if (!painter) {
-        painter = util::make_unique<Painter>(*spriteAtlas, *glyphAtlas, *lineAtlas);
+        painter = std::make_unique<Painter>(*spriteAtlas, *glyphAtlas, *lineAtlas);
         painter->setup();
     }
 

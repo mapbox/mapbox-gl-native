@@ -2,7 +2,6 @@
 #include <mbgl/storage/resource.hpp>
 #include <mbgl/storage/response.hpp>
 
-#include <mbgl/util/std.hpp>
 #include <mbgl/util/time.hpp>
 #include <mbgl/util/parsedate.h>
 
@@ -250,7 +249,7 @@ void HTTPRequest::handleResult(NSData *data, NSURLResponse *res, NSError *error)
         } else {
             // TODO: Use different codes for host not found, timeout, invalid URL etc.
             // These can be categorized in temporary and permanent errors.
-            response = util::make_unique<Response>();
+            response = std::make_unique<Response>();
             response->status = Response::Error;
             response->message = [[error localizedDescription] UTF8String];
 
@@ -282,7 +281,7 @@ void HTTPRequest::handleResult(NSData *data, NSURLResponse *res, NSError *error)
     } else if ([res isKindOfClass:[NSHTTPURLResponse class]]) {
         const long responseCode = [(NSHTTPURLResponse *)res statusCode];
 
-        response = util::make_unique<Response>();
+        response = std::make_unique<Response>();
         response->data = {(const char *)[data bytes], [data length]};
 
         NSDictionary *headers = [(NSHTTPURLResponse *)res allHeaderFields];
@@ -338,7 +337,7 @@ void HTTPRequest::handleResult(NSData *data, NSURLResponse *res, NSError *error)
     } else {
         // This should never happen.
         status = ResponseStatus::PermanentError;
-        response = util::make_unique<Response>();
+        response = std::make_unique<Response>();
         response->status = Response::Error;
         response->message = "response class is not NSHTTPURLResponse";
     }
@@ -364,7 +363,7 @@ void HTTPRequest::retry() {
 }
 
 std::unique_ptr<HTTPContext> HTTPContext::createContext(uv_loop_t* loop) {
-    return util::make_unique<HTTPNSURLContext>(loop);
+    return std::make_unique<HTTPNSURLContext>(loop);
 }
 
 }

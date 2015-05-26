@@ -31,7 +31,7 @@ void MockFileSource::Impl::handleRequest(Request* req) const {
 }
 
 MockFileSource::MockFileSource(const std::string& matchFail)
-    : thread_(util::make_unique<util::Thread<Impl>>("FileSource", util::ThreadPriority::Low, matchFail)) {
+    : thread_(std::make_unique<util::Thread<Impl>>("FileSource", util::ThreadPriority::Low, matchFail)) {
 }
 
 Request* MockFileSource::request(const Resource& resource, uv_loop_t* loop, Callback callback) {

@@ -3,7 +3,6 @@
 #include <mbgl/storage/resource.hpp>
 #include <mbgl/storage/response.hpp>
 #include <mbgl/platform/log.hpp>
-#include <mbgl/util/std.hpp>
 #include <mbgl/util/util.hpp>
 #include <mbgl/util/uv.hpp>
 
@@ -178,7 +177,7 @@ void AssetRequest::fileStated(uv_zip_t *zip) {
         notifyError("Could not determine file size in zip file");
         cleanup(zip);
     } else {
-        response = util::make_unique<Response>();
+        response = std::make_unique<Response>();
 
         // Allocate the space for reading the data.
         response->data.resize(zip->stat->size);
@@ -247,7 +246,7 @@ void AssetRequest::notifyError(const char *message) {
     MBGL_VERIFY_THREAD(tid);
 
     if (!cancelled) {
-        response = util::make_unique<Response>();
+        response = std::make_unique<Response>();
         response->status = Response::Error;
         response->message = message;
         notify(std::move(response), FileCache::Hint::No);
@@ -261,7 +260,7 @@ void AssetRequest::cancel() {
 }
 
 std::unique_ptr<AssetContext> AssetContext::createContext(uv_loop_t* loop) {
-    return util::make_unique<AssetZipContext>(loop);
+    return std::make_unique<AssetZipContext>(loop);
 }
 
 }

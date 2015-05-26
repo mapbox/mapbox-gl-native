@@ -3,7 +3,6 @@
 
 #include <mbgl/platform/event.hpp>
 
-#include <mbgl/util/std.hpp>
 #include <mbgl/util/noncopyable.hpp>
 
 #include <memory>

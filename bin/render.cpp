@@ -1,7 +1,6 @@
 #include <mbgl/map/map.hpp>
 #include <mbgl/map/still_image.hpp>
 #include <mbgl/util/image.hpp>
-#include <mbgl/util/std.hpp>
 #include <mbgl/util/io.hpp>
 
 #include <mbgl/platform/default/headless_view.hpp>

@@ -4,7 +4,6 @@
 #include <mbgl/map/tile_id.hpp>
 #include <mbgl/util/geo.hpp>
 #include <mbgl/util/noncopyable.hpp>
-#include <mbgl/util/std.hpp>
 #include <mbgl/util/vec.hpp>
 
 #include <string>

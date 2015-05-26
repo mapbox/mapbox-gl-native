@@ -2,7 +2,6 @@
 #include <mbgl/map/view.hpp>
 #include <mbgl/util/constants.hpp>
 #include <mbgl/util/mat4.hpp>
-#include <mbgl/util/std.hpp>
 #include <mbgl/util/math.hpp>
 #include <mbgl/util/unitbezier.hpp>
 #include <mbgl/util/interpolate.hpp>

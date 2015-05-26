@@ -1,7 +1,6 @@
 #include <mbgl/storage/asset_context.hpp>
 #include <mbgl/storage/resource.hpp>
 #include <mbgl/storage/response.hpp>
-#include <mbgl/util/std.hpp>
 #include <mbgl/util/util.hpp>
 #include <mbgl/util/url.hpp>
 #include <mbgl/util/uv.hpp>
@@ -114,7 +113,7 @@ void AssetRequest::fileStated(uv_fs_t *req) {
         if (stat->st_size > std::numeric_limits<int>::max()) {
             // File is too large for us to open this way because uv_buf's only support unsigned
             // ints as maximum size.
-            auto response = util::make_unique<Response>();
+            auto response = std::make_unique<Response>();
             response->status = Response::Error;
 #if UV_VERSION_MAJOR == 0 && UV_VERSION_MINOR <= 10
             response->message = uv_strerror(uv_err_t {UV_EFBIG, 0});
@@ -126,7 +125,7 @@ void AssetRequest::fileStated(uv_fs_t *req) {
             uv_fs_req_cleanup(req);
             uv_fs_close(req->loop, req, self->fd, fileClosed);
         } else {
-            self->response = util::make_unique<Response>();
+            self->response = std::make_unique<Response>();
 #ifdef __APPLE__
             self->response->modified = stat->st_mtimespec.tv_sec;
 #else
@@ -184,7 +183,7 @@ void AssetRequest::notifyError(uv_fs_t *req) {
     MBGL_VERIFY_THREAD(self->tid);
 
     if (req->result < 0 && !self->canceled && req->result != UV_ECANCELED) {
-        auto response = util::make_unique<Response>();
+        auto response = std::make_unique<Response>();
         response->status = Response::Error;
         response->message = uv::getFileRequestError(req);
         self->notify(std::move(response), FileCache::Hint::No);
@@ -208,7 +207,7 @@ void AssetRequest::cancel() {
 }
 
 std::unique_ptr<AssetContext> AssetContext::createContext(uv_loop_t*) {
-    return util::make_unique<AssetFSContext>();
+    return std::make_unique<AssetFSContext>();
 }
 
 }

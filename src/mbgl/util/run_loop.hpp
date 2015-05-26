@@ -2,7 +2,6 @@
 #define MBGL_UTIL_RUN_LOOP
 
 #include <mbgl/util/noncopyable.hpp>
-#include <mbgl/util/std.hpp>
 #include <mbgl/util/uv_detail.hpp>
 
 #include <functional>
@@ -24,7 +23,7 @@ public:
     template <class Fn, class... Args>
     void invoke(Fn&& fn, Args&&... args) {
         auto tuple = std::make_tuple(std::move(args)...);
-        auto invokable = util::make_unique<Invoker<Fn, decltype(tuple), Args...>>(std::move(fn), std::move(tuple));
+        auto invokable = std::make_unique<Invoker<Fn, decltype(tuple), Args...>>(std::move(fn), std::move(tuple));
         withMutex([&] { queue.push(std::move(invokable)); });
         async.send();
     }

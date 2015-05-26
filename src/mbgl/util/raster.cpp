@@ -4,7 +4,6 @@
 
 #include <mbgl/util/raster.hpp>
 #include <mbgl/util/uv_detail.hpp>
-#include <mbgl/util/std.hpp>
 
 #include <cassert>
 #include <cstring>
@@ -27,7 +26,7 @@ bool Raster::isLoaded() const {
 }
 
 bool Raster::load(const std::string &data) {
-    img = util::make_unique<util::Image>(data);
+    img = std::make_unique<util::Image>(data);
     width = img->getWidth();
     height = img->getHeight();
 

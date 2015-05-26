@@ -71,7 +71,7 @@ void ResourceLoader::update(MapData& data,
 
     const float pixelRatio = transform.getPixelRatio();
     if (!sprite_ || !sprite_->hasPixelRatio(pixelRatio)) {
-        sprite_ = util::make_unique<Sprite>(style_->getSpriteURL(), pixelRatio);
+        sprite_ = std::make_unique<Sprite>(style_->getSpriteURL(), pixelRatio);
         sprite_->setObserver(this);
 
         spriteAtlas.resize(pixelRatio);

@@ -8,7 +8,6 @@
 #include <mbgl/renderer/line_bucket.hpp>
 #include <mbgl/renderer/symbol_bucket.hpp>
 #include <mbgl/util/constants.hpp>
-#include <mbgl/util/std.hpp>
 #include <mbgl/style/style.hpp>
 
 #include <locale>
@@ -154,7 +153,7 @@ void TileParser::addBucketGeometries(Bucket& bucket, const GeometryTileLayer& la
 
 std::unique_ptr<Bucket> TileParser::createFillBucket(const GeometryTileLayer& layer,
                                                      const StyleBucket& bucket_desc) {
-    auto bucket = util::make_unique<FillBucket>(tile.fillVertexBuffer,
+    auto bucket = std::make_unique<FillBucket>(tile.fillVertexBuffer,
                                                 tile.triangleElementsBuffer,
                                                 tile.lineElementsBuffer);
     addBucketGeometries(bucket, layer, bucket_desc.filter);
@@ -163,7 +162,7 @@ std::unique_ptr<Bucket> TileParser::createFillBucket(const GeometryTileLayer& la
 
 std::unique_ptr<Bucket> TileParser::createLineBucket(const GeometryTileLayer& layer,
                                                      const StyleBucket& bucket_desc) {
-    auto bucket = util::make_unique<LineBucket>(tile.lineVertexBuffer,
+    auto bucket = std::make_unique<LineBucket>(tile.lineVertexBuffer,
                                                 tile.triangleElementsBuffer);
 
     const float z = tile.id.z;
@@ -180,7 +179,7 @@ std::unique_ptr<Bucket> TileParser::createLineBucket(const GeometryTileLayer& la
 
 std::unique_ptr<Bucket> TileParser::createSymbolBucket(const GeometryTileLayer& layer,
                                                        const StyleBucket& bucket_desc) {
-    auto bucket = util::make_unique<SymbolBucket>(*tile.getCollision());
+    auto bucket = std::make_unique<SymbolBucket>(*tile.getCollision());
 
     const float z = tile.id.z;
     auto& layout = bucket->layout;

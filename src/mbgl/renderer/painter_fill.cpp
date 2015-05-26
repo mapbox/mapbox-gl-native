@@ -9,7 +9,6 @@
 #include <mbgl/shader/outline_shader.hpp>
 #include <mbgl/shader/pattern_shader.hpp>
 #include <mbgl/shader/plain_shader.hpp>
-#include <mbgl/util/std.hpp>
 #include <mbgl/util/mat3.hpp>
 
 using namespace mbgl;
