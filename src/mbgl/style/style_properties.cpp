@@ -1,4 +1,5 @@
 #include <mbgl/style/style_properties.hpp>
+#include <mbgl/style/piecewisefunction_properties.hpp>
 
 namespace mbgl {
 

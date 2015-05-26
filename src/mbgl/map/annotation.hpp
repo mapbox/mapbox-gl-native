@@ -3,6 +3,8 @@
 
 #include <mbgl/map/geometry_tile.hpp>
 #include <mbgl/map/tile_id.hpp>
+#include <mbgl/style/style_properties.hpp>
+#include <mbgl/style/types.hpp>
 #include <mbgl/util/geo.hpp>
 #include <mbgl/util/noncopyable.hpp>
 #include <mbgl/util/std.hpp>
@@ -40,12 +42,13 @@ public:
 
     void setDefaultPointAnnotationSymbol(const std::string& symbol);
     std::pair<std::unordered_set<TileID, TileID::Hash>, AnnotationIDs> addPointAnnotations(
-        const AnnotationSegment& points,
-        const AnnotationsProperties& properties,
+        const AnnotationSegment&,
+        const AnnotationsProperties&,
         const MapData&);
     std::pair<std::unordered_set<TileID, TileID::Hash>, AnnotationIDs> addShapeAnnotations(
-        const std::vector<AnnotationSegments>& shapes,
-        const AnnotationsProperties& properties,
+        const std::vector<AnnotationSegments>&,
+        const StyleProperties&,
+        const AnnotationsProperties&,
         const MapData&);
     std::unordered_set<TileID, TileID::Hash> removeAnnotations(const AnnotationIDs&, const MapData&);
     AnnotationIDs getAnnotationsInBounds(const LatLngBounds&, const MapData&) const;
@@ -61,15 +64,17 @@ private:
     static vec2<double> projectPoint(const LatLng& point);
     std::pair<std::unordered_set<TileID, TileID::Hash>, AnnotationIDs> addAnnotations(
         const AnnotationType,
-        const std::vector<AnnotationSegments>& segments,
-        const AnnotationsProperties& properties,
+        const std::vector<AnnotationSegments>&,
+        const StyleProperties&,
+        const AnnotationsProperties&,
         const MapData&);
     std::unordered_set<TileID, TileID::Hash> addTileFeature(
         const uint32_t annotationID,
         const AnnotationSegments&,
         const std::vector<std::vector<vec2<double>>>& projectedFeature,
         const AnnotationType&,
-        const std::unordered_map<std::string, std::string>& properties,
+        const StyleProperties&,
+        const std::unordered_map<std::string, std::string>& featureProperties,
         const uint8_t maxZoom);
 
 private:

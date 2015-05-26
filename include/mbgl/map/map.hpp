@@ -4,6 +4,7 @@
 #include <mbgl/util/chrono.hpp>
 #include <mbgl/map/update.hpp>
 #include <mbgl/map/mode.hpp>
+#include <mbgl/style/style_properties.hpp>
 #include <mbgl/util/geo.hpp>
 #include <mbgl/util/noncopyable.hpp>
 #include <mbgl/util/vec.hpp>
@@ -13,6 +14,7 @@
 #include <functional>
 #include <vector>
 #include <memory>
+#include <unordered_map>
 
 namespace mbgl {
 
@@ -118,7 +120,8 @@ public:
     uint32_t addPointAnnotation(const LatLng&, const std::string& symbol);
     std::vector<uint32_t> addPointAnnotations(const std::vector<LatLng>&,
                                               const std::vector<std::string>& symbols);
-    uint32_t addShapeAnnotation(const std::vector<LatLng>&);
+    uint32_t addShapeAnnotation(const std::vector<LatLng>&,
+                                const StyleProperties&);
     void removeAnnotation(uint32_t);
     void removeAnnotations(const std::vector<uint32_t>&);
     std::vector<uint32_t> getAnnotationsInBounds(const LatLngBounds&);

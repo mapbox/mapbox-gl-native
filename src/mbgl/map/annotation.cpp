@@ -15,7 +15,7 @@ namespace mbgl {
 class Annotation : private util::noncopyable {
     friend class AnnotationManager;
 public:
-    Annotation(AnnotationType, const AnnotationSegments&);
+    Annotation(AnnotationType, const AnnotationSegments&, const StyleProperties&);
 
 private:
     LatLng getPoint() const;
@@ -24,13 +24,17 @@ private:
 private:
     const AnnotationType type = AnnotationType::Point;
     const AnnotationSegments geometry;
+    const StyleProperties styleProperties;
     std::unordered_map<TileID, std::weak_ptr<const LiveTileFeature>, TileID::Hash> tileFeatures;
     const LatLngBounds bounds;
 };
 
-Annotation::Annotation(AnnotationType type_, const AnnotationSegments& geometry_)
+Annotation::Annotation(AnnotationType type_,
+                       const AnnotationSegments& geometry_,
+                       const StyleProperties& styleProperties_)
     : type(type_),
       geometry(geometry_),
+      styleProperties(styleProperties_),
       bounds([this] {
           LatLngBounds bounds_;
           if (type == AnnotationType::Point) {
@@ -80,7 +84,8 @@ vec2<double> AnnotationManager::projectPoint(const LatLng& point) {
 std::pair<std::unordered_set<TileID, TileID::Hash>, AnnotationIDs>
 AnnotationManager::addAnnotations(const AnnotationType type,
                                   const std::vector<AnnotationSegments>& segments,
-                                  const AnnotationsProperties& properties,
+                                  const StyleProperties& styleProperties,
+                                  const AnnotationsProperties& annotationsProperties,
                                   const MapData& data) {
     std::lock_guard<std::mutex> lock(mtx);
 
@@ -129,7 +134,7 @@ AnnotationManager::addAnnotations(const AnnotationType type,
 
         if (type == AnnotationType::Point) {
             // at render time we style the point according to its {sprite} field
-            const std::string& symbol = properties.at("symbols")[s];
+            const std::string& symbol = annotationsProperties.at("symbols")[s];
             if (symbol.length()) {
                 featureProperties.emplace("sprite", symbol);
             } else {
@@ -142,6 +147,7 @@ AnnotationManager::addAnnotations(const AnnotationType type,
             shape,
             projectedShape,
             type,
+            styleProperties,
             featureProperties,
             maxZoom
         );
@@ -160,11 +166,13 @@ AnnotationManager::addTileFeature(const uint32_t annotationID,
                                   const AnnotationSegments& segments,
                                   const std::vector<std::vector<vec2<double>>>& projectedFeature,
                                   const AnnotationType& type,
-                                  const std::unordered_map<std::string, std::string>& properties,
+                                  const StyleProperties& styleProperties,
+                                  const std::unordered_map<std::string, std::string>& featureProperties,
                                   const uint8_t maxZoom) {
 
     // track the annotation global ID and its original geometry
-    auto anno_it = annotations.emplace(annotationID, util::make_unique<Annotation>(type, segments));
+    auto anno_it = annotations.emplace(annotationID,
+        util::make_unique<Annotation>(type, segments, styleProperties));
 
     // side length of map at max zoom
     uint32_t z2 = 1 << maxZoom;
@@ -216,7 +224,7 @@ AnnotationManager::addTileFeature(const uint32_t annotationID,
         auto feature = std::make_shared<const LiveTileFeature>(
             (type == AnnotationType::Point ? FeatureType::Point : FeatureType::LineString),
             geometries,
-            properties
+            featureProperties
         );
 
         // check for tile & create if necessary
@@ -258,21 +266,24 @@ AnnotationManager::addTileFeature(const uint32_t annotationID,
 
 std::pair<std::unordered_set<TileID, TileID::Hash>, AnnotationIDs>
 AnnotationManager::addPointAnnotations(const AnnotationSegment& points,
-                                       const AnnotationsProperties& properties,
+                                       const AnnotationsProperties& annotationsProperties,
                                        const MapData& data) {
     return addAnnotations(AnnotationType::Point,
                           { { points } },
-                          properties,
+                          defaultStyleProperties<SymbolProperties>(),
+                          annotationsProperties,
                           data);
 }
 
 std::pair<std::unordered_set<TileID, TileID::Hash>, AnnotationIDs>
 AnnotationManager::addShapeAnnotations(const std::vector<AnnotationSegments>& shapes,
-                                       const AnnotationsProperties& properties,
+                                       const StyleProperties& styleProperties,
+                                       const AnnotationsProperties& annotationsProperties,
                                        const MapData& data) {
     return addAnnotations(AnnotationType::Shape,
                           shapes,
-                          properties,
+                          styleProperties,
+                          annotationsProperties,
                           data);
 }
 
