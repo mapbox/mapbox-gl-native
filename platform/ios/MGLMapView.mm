@@ -270,7 +270,7 @@ std::chrono::steady_clock::duration secondsAsDuration(float duration)
                                                  name:kReachabilityChangedNotification
                                                object:nil];
 
-    Reachability* reachability = [Reachability reachabilityForInternetConnection];
+    MGLReachability* reachability = [MGLReachability reachabilityForInternetConnection];
     [reachability startNotifier];
 
     // setup annotations
@@ -399,7 +399,7 @@ std::chrono::steady_clock::duration secondsAsDuration(float duration)
 
 -(void)reachabilityChanged:(NSNotification*)notification
 {
-    Reachability *reachability = [notification object];
+    MGLReachability *reachability = [notification object];
     if ([reachability isReachable]) {
         mbgl::NetworkStatus::Reachable();
     }
