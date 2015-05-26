@@ -53,7 +53,6 @@ const NSTimeInterval MGLFlushInterval = 60;
 // All of the following properties are written to only from
 // the main thread, but can be read on any thread.
 //
-@property (atomic) NSString *instanceID;
 @property (atomic) NSString *advertiserId;
 @property (atomic) NSString *vendorId;
 @property (atomic) NSString *model;
@@ -67,8 +66,7 @@ const NSTimeInterval MGLFlushInterval = 60;
 
 - (instancetype)init {
     if (self = [super init]) {
-        _instanceID = [[NSUUID UUID] UUIDString];
-        
+
         // Dynamic detection of ASIdentifierManager from Mixpanel
         // https://github.com/mixpanel/mixpanel-iphone/blob/master/LICENSE
         _advertiserId = @"";
@@ -144,6 +142,8 @@ const NSTimeInterval MGLFlushInterval = 60;
 @property (atomic) NSString *appName;
 @property (atomic) NSString *appVersion;
 @property (atomic) NSString *appBuildNumber;
+@property (atomic) NSNumber *version;
+@property (atomic) NSString *instanceID;
 @property (atomic) NSDateFormatter *rfc3339DateFormatter;
 @property (atomic) NSURLSession *session;
 @property (atomic) NSData *digicertCert;
@@ -227,7 +227,9 @@ const NSTimeInterval MGLFlushInterval = 60;
         _appName = [[NSBundle mainBundle] objectForInfoDictionaryKey:@"CFBundleName"];
         _appVersion = [[NSBundle mainBundle] objectForInfoDictionaryKey:@"CFBundleShortVersionString"];
         _appBuildNumber = [[NSBundle mainBundle] objectForInfoDictionaryKey:@"CFBundleVersion"];
-        
+        _version = [NSNumber numberWithInt:1];
+        _instanceID = [[NSUUID UUID] UUIDString];
+
         NSString *uniqueID = [[NSProcessInfo processInfo] globallyUniqueString];
         _serialQueue = dispatch_queue_create([[NSString stringWithFormat:@"%@.%@.events.serial", _appBundleId, uniqueID] UTF8String], DISPATCH_QUEUE_SERIAL);
 
@@ -439,7 +441,9 @@ const NSTimeInterval MGLFlushInterval = 60;
             NSDictionary *vevt = @{@"event" : MGLEventTypeAppUserTurnstile,
                                    @"created" : [strongSelf.rfc3339DateFormatter stringFromDate:[NSDate date]],
                                    @"appBundleId" : strongSelf.appBundleId,
-                                   @"vendorId": vid};
+                                   @"vendorId": vid,
+                                   @"version": strongSelf.version,
+                                   @"instance": strongSelf.instanceID};
 
             // Add to Queue
             [_eventQueue addObject:vevt];
@@ -480,9 +484,9 @@ const NSTimeInterval MGLFlushInterval = 60;
         NSMutableDictionary *evt = [[NSMutableDictionary alloc] initWithDictionary:attributeDictionary];
         // mapbox-events stock attributes
         [evt setObject:event forKey:@"event"];
-        [evt setObject:@(1) forKey:@"version"];
+        [evt setObject:strongSelf.version forKey:@"version"];
         [evt setObject:[strongSelf.rfc3339DateFormatter stringFromDate:[NSDate date]] forKey:@"created"];
-        [evt setObject:strongSelf.data.instanceID forKey:@"instance"];
+        [evt setObject:strongSelf.instanceID forKey:@"instance"];
         [evt setObject:strongSelf.data.advertiserId forKey:@"advertiserId"];
         [evt setObject:strongSelf.data.vendorId forKey:@"vendorId"];
         [evt setObject:strongSelf.appBundleId forKeyedSubscript:@"appBundleId"];
