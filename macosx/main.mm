@@ -150,6 +150,27 @@ int main() {
     map.setStyleURL(newStyle.first);
     view.setWindowTitle(newStyle.second);
 
+    map.addPointAnnotation(mbgl::LatLng(45, -120), "default_marker");
+
+    __block mbgl::Map& map_ = map;
+
+    dispatch_after(dispatch_time(DISPATCH_TIME_NOW, (int64_t)(2 * NSEC_PER_SEC)), dispatch_get_main_queue(), ^{
+        mbgl::FillProperties fillProperties;
+        fillProperties.fill_color = mbgl::Color({{ 1, 0, 0, 1 }});
+        fillProperties.stroke_color = mbgl::Color({{ 0, 0, 0, 1 }});
+        fillProperties.opacity = 0.25;
+
+        mbgl::StyleProperties shapeProperties;
+        shapeProperties.set<mbgl::FillProperties>(fillProperties);
+
+        map_.addShapeAnnotation({
+            mbgl::LatLng(44, -122),
+            mbgl::LatLng(46, -122),
+            mbgl::LatLng(46, -121),
+            mbgl::LatLng(44, -122)
+        }, shapeProperties);
+    });
+
     view.run();
 
     [reachability stopNotifier];
