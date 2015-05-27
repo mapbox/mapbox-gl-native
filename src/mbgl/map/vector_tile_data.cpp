@@ -59,9 +59,9 @@ void VectorTileData::parse() {
             setState(State::parsed);
         }
     } catch (const std::exception& ex) {
-        Log::Error(Event::ParseTile, "Parsing [%d/%d/%d] failed: %s", id.z, id.x, id.y, ex.what());
-        setState(State::obsolete);
-        return;
+        std::stringstream message;
+        message << "Failed to parse [" << int(id.z) << "/" << id.x << "/" << id.y << "]: " << ex.what();
+        setError(message.str());
     }
 }
 

@@ -44,10 +44,7 @@ public:
     TileData(const TileID&, const SourceInfo&);
     ~TileData();
 
-    void request(Worker&,
-                 float pixelRatio,
-                 const std::function<void()>& successCallback,
-                 const std::function<void(const std::string& message)>& failureCallback);
+    void request(Worker&, float pixelRatio, const std::function<void()>& callback);
 
     // Schedule a tile reparse on a worker thread and call the callback on
     // completion. It will return true if the work was schedule or false it was
@@ -71,12 +68,19 @@ public:
     // We let subclasses override setState() so they
     // can intercept the state change and react accordingly.
     virtual void setState(const State& state);
-
     inline State getState() const {
         return state;
     }
 
     void endParsing();
+
+    // Error message to be set in case of request
+    // and parsing errors.
+    void setError(const std::string& message);
+
+    std::string getError() const {
+        return error;
+    }
 
     // Override this in the child class.
     virtual void parse() = 0;
@@ -105,6 +109,8 @@ protected:
 
 private:
     std::atomic<State> state;
+
+    std::string error;
 
 protected:
     // Contains the tile ID string for painting debug information.

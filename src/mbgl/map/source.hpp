@@ -104,6 +104,8 @@ public:
     bool enabled;
 
 private:
+    void tileLoadingCompleteCallback(const TileID& normalized_id);
+
     void emitSourceLoaded();
     void emitSourceLoadingFailed(const std::string& message);
     void emitTileLoaded(bool isNewTile);
