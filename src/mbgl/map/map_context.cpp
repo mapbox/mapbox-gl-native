@@ -30,6 +30,8 @@
 #include <mbgl/util/mapbox.hpp>
 #include <mbgl/util/exception.hpp>
 
+#include <algorithm>
+
 namespace mbgl {
 
 MapContext::MapContext(uv_loop_t* loop, View& view_, FileSource& fileSource, MapData& data_)
