@@ -94,7 +94,7 @@ Target iOS: 7.0 through latest 8.x.
 
 We are using Ubuntu for development. While the software should work on other distributions as well, we are not providing explicit build instructions here.
 
-Install GCC 4.9+ if you are running Ubuntu 13.10 or older. Alternatively, you can also use Clang 3.5+.
+Install GCC 4.9+ if you are running Ubuntu 14.04 or older. Alternatively, you can also use Clang 3.5+.
 
     sudo add-apt-repository --yes ppa:ubuntu-toolchain-r/test
     sudo apt-get update
@@ -105,7 +105,8 @@ Ensure you have git and other build essentials:
 
     sudo apt-get install curl git build-essential zlib1g-dev automake \
                          libtool xutils-dev make cmake pkg-config python-pip \
-                         libcurl4-openssl-dev libpng-dev libsqlite3-dev
+                         libcurl4-openssl-dev libpng-dev libsqlite3-dev \
+                         libllvm3.4
 
 Install glfw3 dependencies:
 
@@ -122,7 +123,7 @@ Finally, install Boost. If you're running Ubuntu 12.04 or older, you need to ins
 
 Otherwise, you can just install
 
-    sudo apt-get install libboost-dev libboost-program-options-dev
+    sudo apt-get install libboost1.55-dev libboost-program-options1.55-dev
 
 Then, you can then proceed to build the library:
 
