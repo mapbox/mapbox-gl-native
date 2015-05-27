@@ -22,14 +22,14 @@ IB_DESIGNABLE
 
 /** Initializes and returns a newly allocated map view with the specified frame and the default style.
 *   @param frame The frame for the view, measured in points.
-*   @return An initialized map view or `nil` if the map view couldn’t be created. */
+*   @return An initialized map view. */
 - (instancetype)initWithFrame:(CGRect)frame;
 - (instancetype)initWithFrame:(CGRect)frame accessToken:(NSString *)accessToken __attribute__((unavailable("Use -initWithFrame:. Set MGLMapboxAccessToken in the Info.plist or call +[MGLAccountManager setAccessToken:].")));
 
 /** Initializes and returns a newly allocated map view with the specified frame and style URL.
 *   @param frame The frame for the view, measured in points.
 *   @param styleURL The map style URL to use. Can be either an HTTP/HTTPS URL or a Mapbox map ID style URL (`mapbox://<user.style>`).
-*   @return An initialized map view or `nil` if the map view couldn’t be created. */
+*   @return An initialized map view. */
 - (instancetype)initWithFrame:(CGRect)frame styleURL:(NSURL *)styleURL;
 - (instancetype)initWithFrame:(CGRect)frame accessToken:(NSString *)accessToken styleURL:(NSURL *)styleURL __attribute__((unavailable("Use -initWithFrame:styleURL:. Set MGLMapboxAccessToken in the Info.plist or call +[MGLAccountManager setAccessToken:].")));
 
