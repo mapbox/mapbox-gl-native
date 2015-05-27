@@ -132,9 +132,10 @@ std::chrono::steady_clock::duration secondsAsDuration(float duration)
     if (self && [self commonInit])
     {
         self.styleURL = styleURL;
+        return self;
     }
 
-    return self;
+    return nil;
 }
 
 - (instancetype)initWithCoder:(NSCoder *)decoder
