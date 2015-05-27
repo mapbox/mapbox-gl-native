@@ -67,11 +67,10 @@ test('gzip', function(t) {
         setup(getFileSource(true, t), function(map) {
             map.load(style);
             map.render({}, function(err, data) {
-                t.error(err);
-
+                mbgl.removeAllListeners('message');
                 map.release();
 
-                mbgl.removeAllListeners('message');
+                t.error(err);
 
                 var filename = filePath('success.png');
 
@@ -101,54 +100,25 @@ test('gzip', function(t) {
         });
     });
 
-    // skip this for now because map.render doesn't error properly on bad
-    // vector tiles
-    t.skip('unhandled', function(t) {
-        var errorEmitted = false;
-
-        mbgl.on('message', function(msg) {
+    t.test('unhandled', function(t) {
+        mbgl.once('message', function(msg) {
             if (msg.severity == 'ERROR') {
-                errorEmitted = true;
                 t.ok(msg, 'emits error');
-                t.equal(msg.class, 'ParseTile');
+                t.equal(msg.class, 'ResourceLoader');
                 t.equal(msg.severity, 'ERROR');
-                t.ok(msg.text.match(/failed: pbf unknown field type exception/), 'pbf unknown field type exception');
+                t.ok(msg.text.match(/pbf unknown field type exception/), 'error text matches');
             }
         });
 
         setup(getFileSource(false, t), function(map) {
             map.load(style);
             map.render({}, function(err, data) {
-                if (!errorEmitted) t.fail('no error emitted');
-
                 map.release();
 
-                mbgl.removeAllListeners('message');
+                t.ok(err, 'returns error');
+                t.equal(err.message, 'Error rendering image');
 
-                var filename = filePath('unhandled.png');
-
-                var png = new PNG({
-                    width: data.width,
-                    height: data.height
-                });
-
-                png.data = data.pixels;
-
-                if (process.env.UPDATE) {
-                    png.pack()
-                        .pipe(fs.createWriteStream(filename.expected))
-                        .on('finish', t.end);
-                } else {
-                    png.pack()
-                        .pipe(fs.createWriteStream(filename.actual))
-                        .on('finish', function() {
-                            compare(filename.actual, filename.expected, filename.diff, t, function(err, diff) {
-                                t.error(err);
-                                t.ok(diff <= 0.01, 'actual matches expected');
-                                t.end();
-                            });
-                        });
-                }
+                t.end();
             });
         });
     });

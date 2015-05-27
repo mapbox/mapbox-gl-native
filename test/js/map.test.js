@@ -221,16 +221,22 @@ test('Map', function(t) {
         });
 
         t.skip('returns an error', function(t) {
-            mbgl.once('message', function(msg) {
-                console.log(msg);
+            mbgl.on('message', function(msg) {
+                t.ok(msg, 'emits error');
+                t.equal(msg.class, 'ResourceLoader');
+                t.equal(msg.severity, 'ERROR');
+                t.ok(msg.text.match(/Failed to load/), 'error text matches');
             });
 
             setup(fileSource, function(map) {
                 map.load(style);
                 map.render({ zoom: 1 }, function(err, data) {
+                    mbgl.removeAllListeners('message');
                     map.release();
-                    t.ok(err);
+
+                    t.ok(err, 'returns error');
                     t.equal(err.message, 'Error rendering image');
+
                     t.end();
                 });
             });
