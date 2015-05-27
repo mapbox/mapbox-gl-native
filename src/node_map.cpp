@@ -145,7 +145,7 @@ NAN_METHOD(NodeMap::Load) {
 std::unique_ptr<NodeMap::RenderOptions> NodeMap::ParseOptions(v8::Local<v8::Object> obj) {
     NanScope();
 
-    auto options = mbgl::util::make_unique<RenderOptions>();
+    auto options = std::make_unique<RenderOptions>();
 
     if (obj->Has(NanNew("zoom"))) { options->zoom = obj->Get(NanNew("zoom"))->NumberValue(); }
     if (obj->Has(NanNew("bearing"))) { options->bearing = obj->Get(NanNew("bearing"))->NumberValue(); }
