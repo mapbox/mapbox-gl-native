@@ -34,8 +34,14 @@ bool GlyphStore::requestGlyphRangesIfNeeded(const std::string& fontStackName,
 
     auto successCallback = [this, fontStackName](GlyphPBF* glyph) {
         auto fontStack = createFontStack(fontStackName);
-        glyph->parse(**fontStack);
-        asyncEmitGlyphRangeLoaded->send();
+        try {
+            glyph->parse(**fontStack);
+            asyncEmitGlyphRangeLoaded->send();
+        } catch (const std::exception&) {
+            std::lock_guard<std::mutex> lock(errorMessageMutex);
+            errorMessage = "Failed to parse [" + glyph->getURL() + "]";
+            asyncEmitGlyphRangeLoadedingFailed->send();
+        }
     };
 
     auto failureCallback = [this](const std::string& message) {

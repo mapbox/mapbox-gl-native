@@ -29,6 +29,10 @@ public:
     void parse(FontStack &stack);
     bool isParsed() const;
 
+    std::string getURL() const {
+        return url;
+    }
+
 private:
     GlyphPBF(const GlyphPBF &) = delete;
     GlyphPBF(GlyphPBF &&) = delete;
@@ -36,6 +40,7 @@ private:
     GlyphPBF &operator=(GlyphPBF &&) = delete;
 
     std::string data;
+    std::string url;
     std::atomic<bool> parsed;
 
     Environment& env;
