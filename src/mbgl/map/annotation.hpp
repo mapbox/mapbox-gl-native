@@ -35,6 +35,25 @@ enum class AnnotationType : uint8_t {
     Shape
 };
 
+class Annotation : private util::noncopyable {
+    friend class AnnotationManager;
+public:
+    Annotation(AnnotationType, const AnnotationSegments&, const StyleProperties&);
+
+public:
+    const StyleProperties styleProperties;
+
+private:
+    LatLng getPoint() const;
+    LatLngBounds getBounds() const { return bounds; }
+
+private:
+    const AnnotationType type = AnnotationType::Point;
+    const AnnotationSegments geometry;
+    std::unordered_map<TileID, std::weak_ptr<const LiveTileFeature>, TileID::Hash> tileFeatures;
+    const LatLngBounds bounds;
+};
+
 class AnnotationManager : private util::noncopyable {
 public:
     AnnotationManager();
@@ -51,6 +70,8 @@ public:
         const AnnotationsProperties&,
         const MapData&);
     std::unordered_set<TileID, TileID::Hash> removeAnnotations(const AnnotationIDs&, const MapData&);
+    AnnotationIDs getOrderedShapeAnnotations() const { return orderedShapeAnnotations; }
+    const std::unique_ptr<Annotation>& getAnnotationWithID(uint32_t) const;
     AnnotationIDs getAnnotationsInBounds(const LatLngBounds&, const MapData&) const;
     LatLngBounds getBoundsForAnnotations(const AnnotationIDs&) const;
 
@@ -81,6 +102,7 @@ private:
     mutable std::mutex mtx;
     std::string defaultPointAnnotationSymbol;
     std::unordered_map<uint32_t, std::unique_ptr<Annotation>> annotations;
+    std::vector<uint32_t> orderedShapeAnnotations;
     std::unordered_map<TileID, std::pair<std::unordered_set<uint32_t>, std::unique_ptr<LiveTile>>, TileID::Hash> tiles;
     uint32_t nextID_ = 0;
 };

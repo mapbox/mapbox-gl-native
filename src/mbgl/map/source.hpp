@@ -47,6 +47,7 @@ public:
     std::string attribution;
     std::array<float, 3> center = {{0, 0, 0}};
     std::array<float, 4> bounds = {{-180, -90, 180, 90}};
+    std::string source_id = "";
 
     void parseTileJSONProperties(const rapidjson::Value&);
     std::string tileURL(const TileID& id, float pixelRatio) const;

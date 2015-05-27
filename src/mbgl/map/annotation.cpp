@@ -12,29 +12,12 @@
 
 namespace mbgl {
 
-class Annotation : private util::noncopyable {
-    friend class AnnotationManager;
-public:
-    Annotation(AnnotationType, const AnnotationSegments&, const StyleProperties&);
-
-private:
-    LatLng getPoint() const;
-    LatLngBounds getBounds() const { return bounds; }
-
-private:
-    const AnnotationType type = AnnotationType::Point;
-    const AnnotationSegments geometry;
-    const StyleProperties styleProperties;
-    std::unordered_map<TileID, std::weak_ptr<const LiveTileFeature>, TileID::Hash> tileFeatures;
-    const LatLngBounds bounds;
-};
-
 Annotation::Annotation(AnnotationType type_,
                        const AnnotationSegments& geometry_,
                        const StyleProperties& styleProperties_)
-    : type(type_),
+    : styleProperties(styleProperties_),
+      type(type_),
       geometry(geometry_),
-      styleProperties(styleProperties_),
       bounds([this] {
           LatLngBounds bounds_;
           if (type == AnnotationType::Point) {
@@ -174,6 +157,10 @@ AnnotationManager::addTileFeature(const uint32_t annotationID,
     auto anno_it = annotations.emplace(annotationID,
         util::make_unique<Annotation>(type, segments, styleProperties));
 
+    if (type == AnnotationType::Shape) {
+        orderedShapeAnnotations.push_back(annotationID);
+    }
+
     // side length of map at max zoom
     uint32_t z2 = 1 << maxZoom;
 
@@ -234,7 +221,12 @@ AnnotationManager::addTileFeature(const uint32_t annotationID,
 
         // check for annotation layer & create if necessary
         util::ptr<LiveTileLayer> layer;
-        auto& layerID = (type == AnnotationType::Point ? PointLayerID : ShapeLayerID);
+        std::string layerID = "";
+        if (type == AnnotationType::Point) {
+            layerID = PointLayerID;
+        } else {
+            layerID = ShapeLayerID + "." + std::to_string(annotationID);
+        }
         if (tile_pos.second || tile_pos.first->second.second->getMutableLayer(layerID) == nullptr) {
             layer = std::make_shared<LiveTileLayer>();
             tile_pos.first->second.second->addLayer(layerID, layer);
@@ -335,6 +327,15 @@ std::unordered_set<TileID, TileID::Hash> AnnotationManager::removeAnnotations(co
 
     // TileIDs for tiles that need refreshed.
     return affectedTiles;
+}
+
+const std::unique_ptr<Annotation>& AnnotationManager::getAnnotationWithID(uint32_t annotationID) const {
+    std::lock_guard<std::mutex> lock(mtx);
+
+    auto anno_it = annotations.find(annotationID);
+    assert(anno_it != annotations.end());
+
+    return anno_it->second;
 }
 
 AnnotationIDs AnnotationManager::getAnnotationsInBounds(const LatLngBounds& queryBounds,

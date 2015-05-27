@@ -37,58 +37,30 @@ void StyleParser::parse(JSVal document) {
     if (document.HasMember("layers")) {
         parseLayers(document["layers"]);
 
-        // create single shape annotations layer (for now)
-        //
+        // create shape annotations source
         const std::string& shapeID = AnnotationManager::ShapeLayerID;
 
-        std::map<ClassID, ClassProperties> shapePaints;
-        rapidjson::Document d1;
-        rapidjson::Value fillOpacity(rapidjson::kObjectType);
-        fillOpacity.AddMember("fill-opacity", 0.5, d1.GetAllocator());
-        parsePaint(fillOpacity, shapePaints[ClassID::Default]);
-        rapidjson::Value fillColor(rapidjson::kObjectType);
-        fillColor.AddMember("fill-color", "#fff", d1.GetAllocator());
-        parsePaint(fillColor, shapePaints[ClassID::Default]);
-        rapidjson::Value fillOutlineColor(rapidjson::kObjectType);
-        fillOutlineColor.AddMember("fill-outline-color", "#f00", d1.GetAllocator());
-        parsePaint(fillOutlineColor, shapePaints[ClassID::Default]);
-//        rapidjson::Value fillWidth(rapidjson::kObjectType);
-//        fillWidth.AddMember("line-width", 1, d1.GetAllocator());
-//        parsePaint(fillWidth, shapePaints[ClassID::Default]);
-        util::ptr<StyleLayer> shapeAnnotations = std::make_shared<StyleLayer>(shapeID, std::move(shapePaints));
-        shapeAnnotations->type = StyleLayerType::Fill;
-        layersMap.emplace(shapeID, std::pair<JSVal, util::ptr<StyleLayer>> { JSVal(shapeID), shapeAnnotations });
-        layers.emplace_back(shapeAnnotations);
-
-        util::ptr<StyleBucket> fillBucket = std::make_shared<StyleBucket>(shapeAnnotations->type);
-        fillBucket->name = shapeAnnotations->id;
-        fillBucket->source_layer = shapeAnnotations->id;
-
-        // parse layout?
-
-        util::ptr<Source> source1 = std::make_shared<Source>();
-        sourcesMap.emplace(shapeID, source1);
-        sources.emplace_back(source1);
-        source1->info.type = SourceType::Annotations;
-        fillBucket->source = source1;
-        shapeAnnotations->bucket = fillBucket;
-        //
-        // end shape annotations
+        util::ptr<Source> shapeAnnotationsSource = std::make_shared<Source>();
+        sourcesMap.emplace(shapeID, shapeAnnotationsSource);
+        sources.emplace_back(shapeAnnotationsSource);
+        shapeAnnotationsSource->info.type = SourceType::Annotations;
+        shapeAnnotationsSource->info.source_id = shapeID;
 
         // create point annotations layer
-        //
         const std::string& pointID = AnnotationManager::PointLayerID;
 
-        std::map<ClassID, ClassProperties> paints;
-        util::ptr<StyleLayer> annotations = std::make_shared<StyleLayer>(pointID, std::move(paints));
-        annotations->type = StyleLayerType::Symbol;
-        layersMap.emplace(pointID, std::pair<JSVal, util::ptr<StyleLayer>> { JSVal(pointID), annotations });
-        layers.emplace_back(annotations);
+        std::map<ClassID, ClassProperties> pointPaints;
+        util::ptr<StyleLayer> pointAnnotationsLayer = std::make_shared<StyleLayer>(pointID, std::move(pointPaints));
+        pointAnnotationsLayer->type = StyleLayerType::Symbol;
+        layersMap.emplace(pointID, std::pair<JSVal, util::ptr<StyleLayer>> { JSVal(pointID), pointAnnotationsLayer });
+        layers.emplace_back(pointAnnotationsLayer);
 
-        util::ptr<StyleBucket> pointBucket = std::make_shared<StyleBucket>(annotations->type);
-        pointBucket->name = annotations->id;
-        pointBucket->source_layer = annotations->id;
+        // create point annotations symbol bucket
+        util::ptr<StyleBucket> pointBucket = std::make_shared<StyleBucket>(pointAnnotationsLayer->type);
+        pointBucket->name = pointAnnotationsLayer->id;
+        pointBucket->source_layer = pointAnnotationsLayer->id;
 
+        // build up point annotations style
         rapidjson::Document d;
         rapidjson::Value iconImage(rapidjson::kObjectType);
         iconImage.AddMember("icon-image", "{sprite}", d.GetAllocator());
@@ -97,14 +69,14 @@ void StyleParser::parse(JSVal document) {
         iconOverlap.AddMember("icon-allow-overlap", true, d.GetAllocator());
         parseLayout(iconOverlap, pointBucket);
 
-        util::ptr<Source> source = std::make_shared<Source>();
-        sourcesMap.emplace(pointID, source);
-        sources.emplace_back(source);
-        source->info.type = SourceType::Annotations;
-        pointBucket->source = source;
-        annotations->bucket = pointBucket;
-        //
-        // end point annotations
+        // create point annotations source & connect to bucket & layer
+        util::ptr<Source> pointAnnotationsSource = std::make_shared<Source>();
+        sourcesMap.emplace(pointID, pointAnnotationsSource);
+        sources.emplace_back(pointAnnotationsSource);
+        pointAnnotationsSource->info.type = SourceType::Annotations;
+        pointAnnotationsSource->info.source_id = pointID;
+        pointBucket->source = pointAnnotationsSource;
+        pointAnnotationsLayer->bucket = pointBucket;
     }
 
     if (document.HasMember("sprite")) {
