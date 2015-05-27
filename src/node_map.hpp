@@ -25,7 +25,6 @@ class NodeMap : public node::ObjectWrap {
 public:
     static void Init(v8::Handle<v8::Object> target);
     static NAN_METHOD(New);
-    static NAN_METHOD(SetAccessToken);
     static NAN_METHOD(Load);
     static NAN_METHOD(Render);
 
