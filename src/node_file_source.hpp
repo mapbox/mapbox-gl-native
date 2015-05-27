@@ -11,6 +11,7 @@
 #pragma GCC diagnostic pop
 
 #include <map>
+#include <memory>
 
 namespace node_mbgl {
 
