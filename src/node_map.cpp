@@ -38,7 +38,6 @@ void NodeMap::Init(v8::Handle<v8::Object> target) {
     t->InstanceTemplate()->SetInternalFieldCount(1);
     t->SetClassName(NanNew("Map"));
 
-    NODE_SET_PROTOTYPE_METHOD(t, "setAccessToken", SetAccessToken);
     NODE_SET_PROTOTYPE_METHOD(t, "load", Load);
     NODE_SET_PROTOTYPE_METHOD(t, "render", Render);
 
@@ -83,27 +82,6 @@ NAN_METHOD(NodeMap::New) {
 }
 
 
-NAN_METHOD(NodeMap::SetAccessToken) {
-    NanScope();
-
-    if (args.Length() < 1) {
-        return NanThrowError("Requires a string as first argument");
-    }
-
-    NanUtf8String token(args[0]);
-
-    auto nodeMap = node::ObjectWrap::Unwrap<NodeMap>(args.Holder());
-
-    try {
-        nodeMap->map.setAccessToken(std::string { *token, size_t(token.length()) });
-    } catch (const std::exception &ex) {
-        return NanThrowError(ex.what());
-    }
-
-
-    NanReturnUndefined();
-}
-
 const std::string StringifyStyle(v8::Handle<v8::Value> styleHandle) {
     NanScope();
 
@@ -125,8 +103,7 @@ NAN_METHOD(NodeMap::Load) {
     if (args[0]->IsObject()) {
         style = StringifyStyle(args[0]);
     } else if (args[0]->IsString()) {
-        NanUtf8String string(args[0]);
-        style = { *string, size_t(string.length()) };
+        style = *NanUtf8String(args[0]);
     } else {
         return NanThrowTypeError("First argument must be a string or object");
     }
