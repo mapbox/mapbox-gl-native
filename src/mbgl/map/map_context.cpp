@@ -142,6 +142,11 @@ void MapContext::loadStyleJSON(const std::string& json, const std::string& base)
     resourceLoader->setGlyphStore(glyphStore.get());
 
     triggerUpdate(Update::Zoom);
+
+    auto staleTiles = data.annotationManager.resetStaleTiles();
+    if (staleTiles.size()) {
+        updateAnnotationTiles(staleTiles);
+    }
 }
 
 void MapContext::updateTiles() {
@@ -152,6 +157,9 @@ void MapContext::updateTiles() {
 
 void MapContext::updateAnnotationTiles(const std::unordered_set<TileID, TileID::Hash>& ids) {
     assert(Environment::currentlyOn(ThreadType::Map));
+
+    data.annotationManager.markStaleTiles(ids);
+
     if (!style) return;
 
     // grab existing, single shape annotations source
@@ -236,6 +244,8 @@ void MapContext::updateAnnotationTiles(const std::unordered_set<TileID, TileID::
     cascadeClasses();
 
     triggerUpdate(Update::Classes);
+
+    data.annotationManager.resetStaleTiles();
 }
 
 void MapContext::cascadeClasses() {

@@ -59,6 +59,9 @@ public:
     AnnotationManager();
     ~AnnotationManager();
 
+    void markStaleTiles(std::unordered_set<TileID, TileID::Hash>);
+    std::unordered_set<TileID, TileID::Hash> resetStaleTiles();
+
     void setDefaultPointAnnotationSymbol(const std::string& symbol);
     std::pair<std::unordered_set<TileID, TileID::Hash>, AnnotationIDs> addPointAnnotations(
         const AnnotationSegment&,
@@ -104,6 +107,7 @@ private:
     std::unordered_map<uint32_t, std::unique_ptr<Annotation>> annotations;
     std::vector<uint32_t> orderedShapeAnnotations;
     std::unordered_map<TileID, std::pair<std::unordered_set<uint32_t>, std::unique_ptr<LiveTile>>, TileID::Hash> tiles;
+    std::unordered_set<TileID, TileID::Hash> staleTiles;
     uint32_t nextID_ = 0;
 };
 

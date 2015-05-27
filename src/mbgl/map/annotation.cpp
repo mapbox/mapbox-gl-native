@@ -47,6 +47,16 @@ AnnotationManager::~AnnotationManager() {
     // Annotation so we can't destruct the object with just the header file.
 }
 
+void AnnotationManager::markStaleTiles(std::unordered_set<TileID, TileID::Hash> ids) {
+    std::lock_guard<std::mutex> lock(mtx);
+    std::copy(ids.begin(), ids.end(), std::inserter(staleTiles, staleTiles.begin()));
+}
+
+std::unordered_set<TileID, TileID::Hash> AnnotationManager::resetStaleTiles() {
+    std::lock_guard<std::mutex> lock(mtx);
+    return std::move(staleTiles);
+}
+
 void AnnotationManager::setDefaultPointAnnotationSymbol(const std::string& symbol) {
     std::lock_guard<std::mutex> lock(mtx);
     defaultPointAnnotationSymbol = symbol;
