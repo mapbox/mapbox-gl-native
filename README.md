@@ -28,7 +28,7 @@ Be sure to pull down all submodules first:
 
 ## OS X
 
-Prerequisites include the Boost headers (for routines provided therein) and ImageMagick (for tests). To install all prerequisites, use [Homebrew](http://brew.sh/) and type `brew install pkg-config boost imagemagick`.
+ImageMagick is required for tests. It's recommended to install it with [Homebrew](http://brew.sh/) via `brew install imagemagick`.
 
 To create projects, you can run:
 
@@ -58,7 +58,6 @@ pod 'MapboxGL'
 
 #### Manually
 
-1. Use [Homebrew](http://brew.sh/) to install Boost headers: `brew install boost`.
 1. Install [appledoc](http://appledoc.gentlebytes.com/appledoc/) for API docs generation. We recommend [`2.2v963`](https://github.com/tomaz/appledoc/releases/tag/v2.2-963), which currently isn't available in Homebrew.
 1. Run `make ipackage`. The packaging script will produce the statically-linked `libMapboxGL.a`, `MapboxGL.bundle` for resources, a `Headers` folder, and a `Docs` folder with HTML API documentation.
 1. Copy the contents of `build/ios/pkg/static` into your project. It should happen automatically, but ensure that:
@@ -114,16 +113,6 @@ Install glfw3 dependencies:
                          x11proto-xext-dev libxrandr-dev \
                          x11proto-xf86vidmode-dev libxxf86vm-dev \
                          libxcursor-dev libxinerama-dev
-
-Finally, install Boost. If you're running Ubuntu 12.04 or older, you need to install a backport PPA since the version provided by APT doesn't contain Boost Geometry:
-
-    sudo add-apt-repository --yes ppa:boost-latest/ppa
-    sudo apt-get update
-    sudo apt-get install libboost1.55-dev
-
-Otherwise, you can just install
-
-    sudo apt-get install libboost1.55-dev libboost-program-options1.55-dev
 
 Then, you can then proceed to build the library:
 
