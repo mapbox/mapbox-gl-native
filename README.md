@@ -94,7 +94,7 @@ Target iOS: 7.0 through latest 8.x.
 
 We are using Ubuntu for development. While the software should work on other distributions as well, we are not providing explicit build instructions here.
 
-Install GCC 4.9+ if you are running Ubuntu 14.04 or older. Alternatively, you can also use Clang 3.5+.
+Install GCC 4.9+ if you are running Ubuntu 14.04 or older. Alternatively, you can also use [Clang 3.5+](http://llvm.org/apt/).
 
     sudo add-apt-repository --yes ppa:ubuntu-toolchain-r/test
     sudo apt-get update
