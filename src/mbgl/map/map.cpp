@@ -252,23 +252,26 @@ uint32_t Map::addPointAnnotation(const LatLng& point, const std::string& symbol)
     return addPointAnnotations({ point }, { symbol }).front();
 }
 
-std::vector<uint32_t> Map::addPointAnnotations(const std::vector<LatLng>& points, const std::vector<std::string>& symbols) {
+AnnotationIDs Map::addPointAnnotations(const AnnotationSegment& points,
+                                       const std::vector<std::string>& symbols) {
     AnnotationsProperties properties = { { "symbols", symbols } };
     auto result = data->annotationManager.addPointAnnotations(points, properties, *data);
     context->invoke(&MapContext::updateAnnotationTiles, result.first);
     return result.second;
 }
 
-uint32_t Map::addShapeAnnotation(const std::vector<LatLng>& shape,
+// todo don't penalize adding point and shape anno's at the same time
+
+uint32_t Map::addShapeAnnotation(const AnnotationSegments& shape,
                                  const StyleProperties& styleProperties) {
-    auto result = data->annotationManager.addShapeAnnotations(
-        {{ shape }},
-        styleProperties,
-        {{}},
-        *data
-    );
+    return addShapeAnnotations({ shape }, { styleProperties }).front();
+}
+
+AnnotationIDs Map::addShapeAnnotations(const std::vector<AnnotationSegments>& shapes,
+                                       const std::vector<StyleProperties>& styleProperties) {
+    auto result = data->annotationManager.addShapeAnnotations(shapes, styleProperties, {{}}, *data);
     context->invoke(&MapContext::updateAnnotationTiles, result.first);
-    return result.second[0];
+    return result.second;
 }
 
 void Map::removeAnnotation(uint32_t annotation) {

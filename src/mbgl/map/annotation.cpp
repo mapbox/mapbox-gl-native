@@ -77,7 +77,7 @@ vec2<double> AnnotationManager::projectPoint(const LatLng& point) {
 std::pair<std::unordered_set<TileID, TileID::Hash>, AnnotationIDs>
 AnnotationManager::addAnnotations(const AnnotationType type,
                                   const std::vector<AnnotationSegments>& segments,
-                                  const StyleProperties& styleProperties,
+                                  const std::vector<StyleProperties>& styleProperties,
                                   const AnnotationsProperties& annotationsProperties,
                                   const MapData& data) {
     std::lock_guard<std::mutex> lock(mtx);
@@ -140,7 +140,7 @@ AnnotationManager::addAnnotations(const AnnotationType type,
             shape,
             projectedShape,
             type,
-            styleProperties,
+            styleProperties[s],
             featureProperties,
             maxZoom
         );
@@ -272,14 +272,14 @@ AnnotationManager::addPointAnnotations(const AnnotationSegment& points,
                                        const MapData& data) {
     return addAnnotations(AnnotationType::Point,
                           { { points } },
-                          defaultStyleProperties<SymbolProperties>(),
+                          { defaultStyleProperties<SymbolProperties>() },
                           annotationsProperties,
                           data);
 }
 
 std::pair<std::unordered_set<TileID, TileID::Hash>, AnnotationIDs>
 AnnotationManager::addShapeAnnotations(const std::vector<AnnotationSegments>& shapes,
-                                       const StyleProperties& styleProperties,
+                                       const std::vector<StyleProperties>& styleProperties,
                                        const AnnotationsProperties& annotationsProperties,
                                        const MapData& data) {
     return addAnnotations(AnnotationType::Shape,

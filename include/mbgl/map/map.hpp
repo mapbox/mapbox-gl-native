@@ -28,6 +28,10 @@ namespace util {
 template <class T> class Thread;
 }
 
+using AnnotationIDs = std::vector<uint32_t>;
+using AnnotationSegment = std::vector<LatLng>;
+using AnnotationSegments = std::vector<AnnotationSegment>;
+
 class Map : private util::noncopyable {
     friend class View;
 
@@ -118,14 +122,16 @@ public:
     void setDefaultPointAnnotationSymbol(const std::string&);
     double getTopOffsetPixelsForAnnotationSymbol(const std::string&);
     uint32_t addPointAnnotation(const LatLng&, const std::string& symbol);
-    std::vector<uint32_t> addPointAnnotations(const std::vector<LatLng>&,
-                                              const std::vector<std::string>& symbols);
-    uint32_t addShapeAnnotation(const std::vector<LatLng>&,
+    AnnotationIDs addPointAnnotations(const AnnotationSegment&,
+                                      const std::vector<std::string>& symbols);
+    uint32_t addShapeAnnotation(const AnnotationSegments&,
                                 const StyleProperties&);
+    AnnotationIDs addShapeAnnotations(const std::vector<AnnotationSegments>&,
+                                      const std::vector<StyleProperties>&);
     void removeAnnotation(uint32_t);
-    void removeAnnotations(const std::vector<uint32_t>&);
-    std::vector<uint32_t> getAnnotationsInBounds(const LatLngBounds&);
-    LatLngBounds getBoundsForAnnotations(const std::vector<uint32_t>&);
+    void removeAnnotations(const AnnotationIDs&);
+    AnnotationIDs getAnnotationsInBounds(const LatLngBounds&);
+    LatLngBounds getBoundsForAnnotations(const AnnotationIDs&);
 
     // Memory
     void setSourceTileCacheSize(size_t);

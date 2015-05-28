@@ -1,6 +1,7 @@
 #ifndef MBGL_MAP_ANNOTATIONS
 #define MBGL_MAP_ANNOTATIONS
 
+#include <mbgl/map/map.hpp>
 #include <mbgl/map/geometry_tile.hpp>
 #include <mbgl/map/tile_id.hpp>
 #include <mbgl/style/style_properties.hpp>
@@ -25,9 +26,6 @@ class LiveTile;
 class LiveTileFeature;
 class MapData;
 
-using AnnotationIDs = std::vector<uint32_t>;
-using AnnotationSegment = std::vector<LatLng>;
-using AnnotationSegments = std::vector<AnnotationSegment>;
 using AnnotationsProperties = std::unordered_map<std::string, std::vector<std::string>>;
 
 enum class AnnotationType : uint8_t {
@@ -69,7 +67,7 @@ public:
         const MapData&);
     std::pair<std::unordered_set<TileID, TileID::Hash>, AnnotationIDs> addShapeAnnotations(
         const std::vector<AnnotationSegments>&,
-        const StyleProperties&,
+        const std::vector<StyleProperties>&,
         const AnnotationsProperties&,
         const MapData&);
     std::unordered_set<TileID, TileID::Hash> removeAnnotations(const AnnotationIDs&, const MapData&);
@@ -89,7 +87,7 @@ private:
     std::pair<std::unordered_set<TileID, TileID::Hash>, AnnotationIDs> addAnnotations(
         const AnnotationType,
         const std::vector<AnnotationSegments>&,
-        const StyleProperties&,
+        const std::vector<StyleProperties>&,
         const AnnotationsProperties&,
         const MapData&);
     std::unordered_set<TileID, TileID::Hash> addTileFeature(
