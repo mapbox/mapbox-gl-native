@@ -31,8 +31,10 @@ function renderTest(style, info, dir, key) {
         function render() {
             map.render(info[key], function(err, image) {
                 t.error(err);
+
                 t.ok(true, 'render @ ' + ((+new Date) - start) + 'ms');
                 if (++completed === remaining) {
+                    map.release();
                     t.end();
                 } else {
                     render();

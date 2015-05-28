@@ -35,11 +35,8 @@ NAN_METHOD(NodeRequest::New) {
         return NanThrowTypeError("Cannot create Request objects explicitly");
     }
 
-    v8::Persistent<v8::Object> source;
-    NanAssignPersistent(source, args[0]->ToObject());
-
     auto request = reinterpret_cast<mbgl::Request *>(args[1].As<v8::External>()->Value());
-    auto req = new NodeRequest(NanNew<v8::Object>(std::move(source)), request);
+    auto req = new NodeRequest(args[0]->ToObject(), request);
     req->Wrap(args.This());
 
     NanReturnValue(args.This());

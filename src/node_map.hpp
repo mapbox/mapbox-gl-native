@@ -27,9 +27,13 @@ public:
     static NAN_METHOD(New);
     static NAN_METHOD(Load);
     static NAN_METHOD(Render);
+    static NAN_METHOD(Release);
 
     void startRender(std::unique_ptr<NodeMap::RenderOptions> options);
     void renderFinished();
+
+    void release();
+    inline bool isValid() { return valid; }
 
     static std::unique_ptr<NodeMap::RenderOptions> ParseOptions(v8::Local<v8::Object> obj);
 
@@ -47,7 +51,7 @@ private:
 
     mbgl::HeadlessView view;
     NodeFileSource &fs;
-    mbgl::Map map;
+    std::unique_ptr<mbgl::Map> map;
 
     std::exception_ptr error;
     std::unique_ptr<const mbgl::StillImage> image;
@@ -55,6 +59,8 @@ private:
 
     // Async for delivering the notifications of render completion.
     uv_async_t *async;
+
+    bool valid = true;
 };
 
 }

@@ -30,6 +30,10 @@ static std::shared_ptr<mbgl::HeadlessDisplay> sharedDisplay() {
     return display;
 }
 
+const static char* releasedMessage() {
+    return "Map resources have already been released";
+}
+
 void NodeMap::Init(v8::Handle<v8::Object> target) {
     NanScope();
 
@@ -40,6 +44,7 @@ void NodeMap::Init(v8::Handle<v8::Object> target) {
 
     NODE_SET_PROTOTYPE_METHOD(t, "load", Load);
     NODE_SET_PROTOTYPE_METHOD(t, "render", Render);
+    NODE_SET_PROTOTYPE_METHOD(t, "release", Release);
 
     NanAssignPersistent(constructorTemplate, t);
 
@@ -72,15 +77,14 @@ NAN_METHOD(NodeMap::New) {
 
 
     try {
-        auto map = new NodeMap(source);
-        map->Wrap(args.This());
+        auto nodeMap = new NodeMap(source);
+        nodeMap->Wrap(args.This());
     } catch(std::exception &ex) {
         return NanThrowError(ex.what());
     }
 
     NanReturnValue(args.This());
 }
-
 
 const std::string StringifyStyle(v8::Handle<v8::Value> styleHandle) {
     NanScope();
@@ -93,6 +97,10 @@ const std::string StringifyStyle(v8::Handle<v8::Value> styleHandle) {
 
 NAN_METHOD(NodeMap::Load) {
     NanScope();
+
+    auto nodeMap = node::ObjectWrap::Unwrap<NodeMap>(args.Holder());
+
+    if (!nodeMap->isValid()) return NanThrowError(releasedMessage());
 
     if (args.Length() < 1) {
         return NanThrowError("Requires a map style as first argument");
@@ -108,10 +116,8 @@ NAN_METHOD(NodeMap::Load) {
         return NanThrowTypeError("First argument must be a string or object");
     }
 
-    auto nodeMap = node::ObjectWrap::Unwrap<NodeMap>(args.Holder());
-
     try {
-        nodeMap->map.setStyleJSON(style, ".");
+        nodeMap->map->setStyleJSON(style, ".");
     } catch (const std::exception &ex) {
         return NanThrowError(ex.what());
     }
@@ -150,6 +156,10 @@ std::unique_ptr<NodeMap::RenderOptions> NodeMap::ParseOptions(v8::Local<v8::Obje
 NAN_METHOD(NodeMap::Render) {
     NanScope();
 
+    auto nodeMap = node::ObjectWrap::Unwrap<NodeMap>(args.Holder());
+
+    if (!nodeMap->isValid()) return NanThrowError(releasedMessage());
+
     if (args.Length() <= 0 || !args[0]->IsObject()) {
         return NanThrowTypeError("First argument must be an options object");
     }
@@ -159,8 +169,6 @@ NAN_METHOD(NodeMap::Render) {
     }
 
     auto options = ParseOptions(args[0]->ToObject());
-
-    auto nodeMap = node::ObjectWrap::Unwrap<NodeMap>(args.Holder());
 
     assert(!nodeMap->callback);
     assert(!nodeMap->image);
@@ -176,12 +184,12 @@ NAN_METHOD(NodeMap::Render) {
 }
 
 void NodeMap::startRender(std::unique_ptr<NodeMap::RenderOptions> options) {
-    map.resize(options->width, options->height, options->ratio);
-    map.setClasses(options->classes);
-    map.setLatLngZoom(mbgl::LatLng(options->latitude, options->longitude), options->zoom);
-    map.setBearing(options->bearing);
+    map->resize(options->width, options->height, options->ratio);
+    map->setClasses(options->classes);
+    map->setLatLngZoom(mbgl::LatLng(options->latitude, options->longitude), options->zoom);
+    map->setBearing(options->bearing);
 
-    map.renderStill([this](const std::exception_ptr eptr, std::unique_ptr<const mbgl::StillImage> result) {
+    map->renderStill([this](const std::exception_ptr eptr, std::unique_ptr<const mbgl::StillImage> result) {
         if (eptr) {
             error = std::move(eptr);
             uv_async_send(async);
@@ -261,6 +269,36 @@ void NodeMap::renderFinished() {
     }
 }
 
+NAN_METHOD(NodeMap::Release) {
+    NanScope();
+
+    auto nodeMap = node::ObjectWrap::Unwrap<NodeMap>(args.Holder());
+
+    if (!nodeMap->isValid()) return NanThrowError(releasedMessage());
+
+    try {
+        nodeMap->release();
+    } catch (const std::exception &ex) {
+        return NanThrowError(ex.what());
+    }
+
+    NanReturnUndefined();
+}
+
+void NodeMap::release() {
+    if (!isValid()) throw mbgl::util::Exception(releasedMessage());
+
+    valid = false;
+
+    NanDisposePersistent(source);
+
+    uv_close(reinterpret_cast<uv_handle_t *>(async), [] (uv_handle_t *handle) {
+        delete reinterpret_cast<uv_async_t *>(handle);
+    });
+
+    map.reset(nullptr);
+}
+
 
 ////////////////////////////////////////////////////////////////////////////////////////////////
 // Instance
@@ -268,7 +306,7 @@ void NodeMap::renderFinished() {
 NodeMap::NodeMap(v8::Handle<v8::Object> source_) :
     view(sharedDisplay()),
     fs(*ObjectWrap::Unwrap<NodeFileSource>(source_)),
-    map(view, fs, mbgl::MapMode::Still),
+    map(std::make_unique<mbgl::Map>(view, fs, mbgl::MapMode::Still)),
     async(new uv_async_t) {
 
     NanAssignPersistent(source, source_);
@@ -287,11 +325,7 @@ NodeMap::NodeMap(v8::Handle<v8::Object> source_) :
 }
 
 NodeMap::~NodeMap() {
-    NanDisposePersistent(source);
-
-    uv_close(reinterpret_cast<uv_handle_t *>(async), [] (uv_handle_t *handle) {
-        delete reinterpret_cast<uv_async_t *>(handle);
-    });
+    if (valid) release();
 }
 
 }
