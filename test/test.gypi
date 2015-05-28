@@ -77,6 +77,7 @@
         'style/mock_file_source.cpp',
         'style/mock_file_source.hpp',
         'style/mock_view.hpp',
+        'style/pending_resources.cpp',
         'style/resource_loading.cpp',
       ],
       'libraries': [
