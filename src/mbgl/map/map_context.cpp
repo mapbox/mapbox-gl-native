@@ -186,37 +186,37 @@ void MapContext::updateAnnotationTiles(const std::unordered_set<TileID, TileID::
             auto& annotation = data.annotationManager.getAnnotationWithID(shapeAnnotationID);
             auto& shapeStyle = annotation->styleProperties;
 
-            // apply shape style properties
-            ClassProperties classProperties;
+            // apply shape paint properties
+            ClassProperties paintProperties;
 
             if (shapeStyle.is<LineProperties>()) {
                 // opacity
                 PropertyValue lineOpacity = ConstantFunction<float>(shapeStyle.get<LineProperties>().opacity);
-                classProperties.set(PropertyKey::LineOpacity, lineOpacity);
+                paintProperties.set(PropertyKey::LineOpacity, lineOpacity);
 
                 // line width
                 PropertyValue lineWidth = ConstantFunction<float>(shapeStyle.get<LineProperties>().width);
-                classProperties.set(PropertyKey::LineWidth, lineWidth);
+                paintProperties.set(PropertyKey::LineWidth, lineWidth);
 
                 // stroke color
                 PropertyValue strokeColor = ConstantFunction<Color>(shapeStyle.get<LineProperties>().color);
-                classProperties.set(PropertyKey::LineColor, strokeColor);
+                paintProperties.set(PropertyKey::LineColor, strokeColor);
             } else if (shapeStyle.is<FillProperties>()) {
                 // opacity
                 PropertyValue fillOpacity = ConstantFunction<float>(shapeStyle.get<FillProperties>().opacity);
-                classProperties.set(PropertyKey::FillOpacity, fillOpacity);
+                paintProperties.set(PropertyKey::FillOpacity, fillOpacity);
 
                 // fill color
                 PropertyValue fillColor = ConstantFunction<Color>(shapeStyle.get<FillProperties>().fill_color);
-                classProperties.set(PropertyKey::FillColor, fillColor);
+                paintProperties.set(PropertyKey::FillColor, fillColor);
 
                 // stroke color
                 PropertyValue strokeColor = ConstantFunction<Color>(shapeStyle.get<FillProperties>().stroke_color);
-                classProperties.set(PropertyKey::FillOutlineColor, strokeColor);
+                paintProperties.set(PropertyKey::FillOutlineColor, strokeColor);
             }
 
             std::map<ClassID, ClassProperties> shapePaints;
-            shapePaints.emplace(ClassID::Default, std::move(classProperties));
+            shapePaints.emplace(ClassID::Default, std::move(paintProperties));
 
             // create shape layer
             util::ptr<StyleLayer> shapeLayer = std::make_shared<StyleLayer>(shapeLayerID, std::move(shapePaints));
@@ -228,6 +228,11 @@ void MapContext::updateAnnotationTiles(const std::unordered_set<TileID, TileID::
             shapeBucket->name = shapeLayer->id;
             shapeBucket->source_layer = shapeLayer->id;
             shapeBucket->source = *source_it;
+
+            // apply line layout properties to bucket
+            if (shapeStyle.is<LineProperties>()) {
+                shapeBucket->layout.set(PropertyKey::LineJoin, ConstantFunction<JoinType>(JoinType::Round));
+            }
 
             // connect layer to bucket
             shapeLayer->bucket = shapeBucket;
