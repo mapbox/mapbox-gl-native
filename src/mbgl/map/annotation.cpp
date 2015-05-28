@@ -125,7 +125,7 @@ AnnotationManager::addPointAnnotations(const std::vector<LatLng>& points,
         uint32_t y = p.y * z2;
 
         for (int8_t z = maxZoom; z >= 0; z--) {
-            affectedTiles.emplace_back(z, x, y);
+            affectedTiles.emplace_back(z, x, y, z);
             TileID tileID = affectedTiles.back();
 
             // calculate tile coordinate
@@ -214,7 +214,7 @@ std::vector<TileID> AnnotationManager::removeAnnotations(const AnnotationIDs& id
                 p = projectPoint(latLng);
                 x = z2s[z] * p.x;
                 y = z2s[z] * p.y;
-                TileID tid(z, x, y);
+                TileID tid(z, x, y, z);
                 // erase annotation from tile's list
                 auto& tileAnnotations = tiles[tid].first;
                 tileAnnotations.erase(annotationID);
@@ -245,8 +245,8 @@ std::vector<uint32_t> AnnotationManager::getAnnotationsInBounds(const LatLngBoun
     const vec2<double> nePoint = projectPoint(queryBounds.ne);
 
     // tiles number y from top down
-    const TileID nwTile(z, swPoint.x * z2, nePoint.y * z2);
-    const TileID seTile(z, nePoint.x * z2, swPoint.y * z2);
+    const TileID nwTile(z, swPoint.x * z2, nePoint.y * z2, z);
+    const TileID seTile(z, nePoint.x * z2, swPoint.y * z2, z);
 
     std::vector<uint32_t> matchingAnnotations;
 

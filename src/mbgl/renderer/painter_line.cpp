@@ -70,7 +70,7 @@ void Painter::renderLine(LineBucket& bucket, const StyleLayer &layer_desc, const
         LinePatternPos posB = lineAtlas.getDashPosition(properties.dash_array.to, layout.cap == CapType::Round);
         lineAtlas.bind();
 
-        float patternratio = std::pow(2.0, std::floor(std::log2(state.getScale())) - id.z) / 8.0;
+        float patternratio = std::pow(2.0, std::floor(std::log2(state.getScale())) - id.z) / 8.0 * id.overscaling;
         float scaleXA = patternratio / posA.width / properties.dash_line_width / properties.dash_array.fromScale;
         float scaleYA = -posA.height / 2.0;
         float scaleXB = patternratio / posB.width / properties.dash_line_width / properties.dash_array.toScale;
@@ -90,7 +90,7 @@ void Painter::renderLine(LineBucket& bucket, const StyleLayer &layer_desc, const
         SpriteAtlasPosition imagePosA = spriteAtlas.getPosition(properties.image.from, true);
         SpriteAtlasPosition imagePosB = spriteAtlas.getPosition(properties.image.to, true);
 
-        float factor = 8.0 / std::pow(2, state.getIntegerZoom() - id.z);
+        float factor = 8.0 / std::pow(2, state.getIntegerZoom() - id.z) * id.overscaling;
 
         useProgram(linepatternShader->program);
 

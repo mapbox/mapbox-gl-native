@@ -11,13 +11,13 @@ class LiveTileData : public VectorTileData {
 public:
     LiveTileData(const TileID&,
                  AnnotationManager&,
-                 float mapMaxZoom,
                  Style&,
                  GlyphAtlas&,
                  GlyphStore&,
                  SpriteAtlas&,
                  util::ptr<Sprite>,
                  const SourceInfo&,
+                 float,
                  float,
                  bool);
     ~LiveTileData();

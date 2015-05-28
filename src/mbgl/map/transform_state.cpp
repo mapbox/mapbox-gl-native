@@ -8,8 +8,8 @@ using namespace mbgl;
 
 #pragma mark - Matrix
 
-void TransformState::matrixFor(mat4& matrix, const TileID& id) const {
-    const double tile_scale = std::pow(2, id.z);
+void TransformState::matrixFor(mat4& matrix, const TileID& id, const int8_t z) const {
+    const double tile_scale = std::pow(2, z);
     const double tile_size = scale * util::tileSize / tile_scale;
 
     matrix::identity(matrix);

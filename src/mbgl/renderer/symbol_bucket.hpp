@@ -62,7 +62,7 @@ class SymbolBucket : public Bucket {
     typedef ElementGroup<1> CollisionBoxElementGroup;
 
 public:
-    SymbolBucket(CollisionTile &collision);
+    SymbolBucket(CollisionTile &collision, float overscaling);
     ~SymbolBucket() override;
 
     void upload() override;
@@ -109,6 +109,7 @@ public:
 
 private:
     CollisionTile &collision;
+    const float overscaling;
     std::vector<SymbolInstance> symbolInstances;
     std::vector<SymbolFeature> features;
 

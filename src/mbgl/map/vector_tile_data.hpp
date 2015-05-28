@@ -33,13 +33,13 @@ class VectorTileData : public TileData {
 
 public:
     VectorTileData(const TileID&,
-                   float mapMaxZoom,
                    Style&,
                    GlyphAtlas&,
                    GlyphStore&,
                    SpriteAtlas&,
                    util::ptr<Sprite>,
                    const SourceInfo&,
+                   float,
                    float,
                    bool);
     ~VectorTileData();
@@ -56,8 +56,6 @@ public:
     inline CollisionTile* getCollision() const {
         return collision.get();
     }
-
-    const float depth;
 
 protected:
     void redoPlacement();
@@ -85,6 +83,7 @@ private:
     std::unordered_map<std::string, std::unique_ptr<Bucket>> buckets;
     mutable std::mutex bucketsMutex;
 
+    const float overscaling;
     std::unique_ptr<CollisionTile> collision;
 
     float lastAngle = 0;

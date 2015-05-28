@@ -15,23 +15,23 @@
 using namespace mbgl;
 
 VectorTileData::VectorTileData(const TileID& id_,
-                               float mapMaxZoom,
                                Style& style_,
                                GlyphAtlas& glyphAtlas_,
                                GlyphStore& glyphStore_,
                                SpriteAtlas& spriteAtlas_,
                                util::ptr<Sprite> sprite_,
                                const SourceInfo& source_,
+                               float overscaling_,
                                float angle,
                                bool collisionDebug)
     : TileData(id_, source_),
-      depth(id_.z >= source_.max_zoom ? mapMaxZoom - id_.z : 1),
       glyphAtlas(glyphAtlas_),
       glyphStore(glyphStore_),
       spriteAtlas(spriteAtlas_),
       sprite(sprite_),
       style(style_),
-      collision(util::make_unique<CollisionTile>(id_.z, 4096, source_.tile_size, angle, collisionDebug)),
+      overscaling(overscaling_),
+      collision(util::make_unique<CollisionTile>(id_.z, 4096, source_.tile_size * id.overscaling, angle, collisionDebug)),
       lastAngle(angle),
       currentAngle(angle) {
 }

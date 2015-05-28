@@ -99,7 +99,7 @@ std::string SourceInfo::tileURL(const TileID& id, float pixelRatio) const {
     std::string result = tiles.at((id.x + id.y) % tiles.size());
     result = util::mapbox::normalizeTileURL(result, url, type);
     result = util::replaceTokens(result, [&](const std::string &token) -> std::string {
-        if (token == "z") return util::toString(id.z);
+        if (token == "z") return util::toString(std::min(id.z, static_cast<int8_t>(max_zoom)));
         if (token == "x") return util::toString(id.x);
         if (token == "y") return util::toString(id.y);
         if (token == "prefix") {
@@ -172,7 +172,7 @@ void Source::load(const std::string& accessToken) {
 void Source::updateMatrices(const mat4 &projMatrix, const TransformState &transform) {
     for (const auto& pair : tiles) {
         Tile &tile = *pair.second;
-        transform.matrixFor(tile.matrix, tile.id);
+        transform.matrixFor(tile.matrix, tile.id, std::min(static_cast<int8_t>(info.max_zoom), tile.id.z));
         matrix::multiply(tile.matrix, projMatrix, tile.matrix);
     }
 }
@@ -260,7 +260,8 @@ TileData::State Source::addTile(MapData& data,
         return state;
     }
 
-    auto pos = tiles.emplace(id, util::make_unique<Tile>(id));
+    const float overscaling = id.z > info.max_zoom ? std::pow(2.0f, id.z - info.max_zoom) : 1.0f;
+    auto pos = tiles.emplace(id, util::make_unique<Tile>(id));//, util::tileSize * overscaling));
     Tile& new_tile = *pos.first->second;
 
     // We couldn't find the tile in the list. Create a new one.
@@ -287,16 +288,18 @@ TileData::State Source::addTile(MapData& data,
         // If we don't find working tile data, we're just going to load it.
         if (info.type == SourceType::Vector) {
             new_tile.data =
-                std::make_shared<VectorTileData>(normalized_id, data.transform.getMaxZoom(), style, glyphAtlas,
-                                                 glyphStore, spriteAtlas, sprite, info, transformState.getAngle(), data.getCollisionDebug());
+                std::make_shared<VectorTileData>(normalized_id, style, glyphAtlas,
+                                                 glyphStore, spriteAtlas, sprite, info,
+                                                 overscaling, transformState.getAngle(), data.getCollisionDebug());
             new_tile.data->request(style.workers, transformState.getPixelRatio(), callback);
         } else if (info.type == SourceType::Raster) {
             new_tile.data = std::make_shared<RasterTileData>(normalized_id, texturePool, info);
             new_tile.data->request(style.workers, transformState.getPixelRatio(), callback);
         } else if (info.type == SourceType::Annotations) {
             new_tile.data = std::make_shared<LiveTileData>(normalized_id, data.annotationManager,
-                                                           data.transform.getMaxZoom(), style, glyphAtlas,
-                                                           glyphStore, spriteAtlas, sprite, info, transformState.getAngle(), data.getCollisionDebug());
+                                                           style, glyphAtlas,
+                                                           glyphStore, spriteAtlas, sprite, info,
+                                                           overscaling, transformState.getAngle(), data.getCollisionDebug());
             new_tile.data->reparse(style.workers, callback);
         } else {
             throw std::runtime_error("source type not implemented");
@@ -319,6 +322,11 @@ int32_t Source::coveringZoomLevel(const TransformState& state) const {
 std::forward_list<TileID> Source::coveringTiles(const TransformState& state) const {
     int32_t z = coveringZoomLevel(state);
 
+    auto actualZ = z;
+    const bool reparseOverscaled =
+        info.type == SourceType::Vector ||
+        info.type == SourceType::Annotations;
+
     if (z < info.min_zoom) return {{}};
     if (z > info.max_zoom) z = info.max_zoom;
 
@@ -326,7 +334,7 @@ std::forward_list<TileID> Source::coveringTiles(const TransformState& state) con
     box points = state.cornersToBox(z);
     const vec2<double>& center = points.center;
 
-    std::forward_list<TileID> covering_tiles = tileCover(z, points);
+    std::forward_list<TileID> covering_tiles = tileCover(z, points, reparseOverscaled ? actualZ : z);
 
     covering_tiles.sort([&center](const TileID& a, const TileID& b) {
         // Sorts by distance from the box center
@@ -349,7 +357,7 @@ std::forward_list<TileID> Source::coveringTiles(const TransformState& state) con
 bool Source::findLoadedChildren(const TileID& id, int32_t maxCoveringZoom, std::forward_list<TileID>& retain) {
     bool complete = true;
     int32_t z = id.z;
-    auto ids = id.children(z + 1);
+    auto ids = id.children(info.max_zoom);
     for (const auto& child_id : ids) {
         const TileData::State state = hasTile(child_id);
         if (TileData::isReadyState(state)) {
@@ -376,7 +384,7 @@ bool Source::findLoadedChildren(const TileID& id, int32_t maxCoveringZoom, std::
  */
 bool Source::findLoadedParent(const TileID& id, int32_t minCoveringZoom, std::forward_list<TileID>& retain) {
     for (int32_t z = id.z - 1; z >= minCoveringZoom; --z) {
-        const TileID parent_id = id.parent(z);
+        const TileID parent_id = id.parent(z, info.max_zoom);
         const TileData::State state = hasTile(parent_id);
         if (TileData::isReadyState(state)) {
             retain.emplace_front(parent_id);

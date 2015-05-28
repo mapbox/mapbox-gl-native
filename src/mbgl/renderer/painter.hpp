@@ -102,7 +102,6 @@ public:
     void renderDebugFrame(const mat4 &matrix);
 
     void renderDebugText(DebugBucket& bucket, const mat4 &matrix);
-    void renderDebugText(const std::vector<std::string> &strings);
     void renderFill(FillBucket& bucket, const StyleLayer &layer_desc, const TileID& id, const mat4 &matrix);
     void renderLine(LineBucket& bucket, const StyleLayer &layer_desc, const TileID& id, const mat4 &matrix);
     void renderSymbol(SymbolBucket& bucket, const StyleLayer &layer_desc, const TileID& id, const mat4 &matrix);

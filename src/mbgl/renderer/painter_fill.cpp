@@ -66,7 +66,7 @@ void Painter::renderFill(FillBucket& bucket, const StyleLayer &layer_desc, const
 
             const SpriteAtlasPosition posA = spriteAtlas.getPosition(properties.image.from, true);
             const SpriteAtlasPosition posB = spriteAtlas.getPosition(properties.image.to, true);
-            float factor = 8.0 / std::pow(2, state.getIntegerZoom() - id.z);
+            float factor = 8.0 / std::pow(2, state.getIntegerZoom() - id.z) / id.overscaling;
 
             mat3 patternMatrixA;
             matrix::identity(patternMatrixA);

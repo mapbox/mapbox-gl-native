@@ -53,8 +53,8 @@ SymbolInstance::SymbolInstance(Anchor &anchor, const std::vector<Coordinate> &li
     iconCollisionFeature(line, anchor, shapedIcon, iconBoxScale, iconPadding, iconAlongLine) {};
 
 
-SymbolBucket::SymbolBucket(CollisionTile &collision_)
-    : collision(collision_) {
+SymbolBucket::SymbolBucket(CollisionTile &collision_, float overscaling_)
+    : collision(collision_), overscaling(overscaling_) {
 }
 
 SymbolBucket::~SymbolBucket() {
@@ -297,7 +297,7 @@ void SymbolBucket::addFeature(const std::vector<std::vector<Coordinate>> &lines,
 
         // Calculate the anchor points around which you want to place labels
         Anchors anchors = layout.placement == PlacementType::Line ?
-            getAnchors(line, symbolSpacing, textMaxAngle, shapedText.left, shapedText.right, glyphSize, textBoxScale, 1.0f) :
+            getAnchors(line, symbolSpacing, textMaxAngle, shapedText.left, shapedText.right, glyphSize, textBoxScale, overscaling) :
             Anchors({ Anchor(float(line[0].x), float(line[0].y), 0, minScale) });
 
 

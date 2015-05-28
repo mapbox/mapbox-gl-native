@@ -30,11 +30,11 @@ template <typename T> void print(const T &sources) {
 TEST(ClipIDs, ParentAndFourChildren) {
     const std::vector<std::vector<std::shared_ptr<Tile>>> sources = {
         {
-            std::make_shared<Tile>(TileID { 1, 0, 0 }),
-            std::make_shared<Tile>(TileID { 1, 0, 1 }),
-            std::make_shared<Tile>(TileID { 1, 1, 0 }),
-            std::make_shared<Tile>(TileID { 1, 1, 1 }),
-            std::make_shared<Tile>(TileID { 0, 0, 0 }),
+            std::make_shared<Tile>(TileID { 1, 0, 0, 1 }),
+            std::make_shared<Tile>(TileID { 1, 0, 1, 1 }),
+            std::make_shared<Tile>(TileID { 1, 1, 0, 1 }),
+            std::make_shared<Tile>(TileID { 1, 1, 1, 1 }),
+            std::make_shared<Tile>(TileID { 0, 0, 0, 0 }),
         },
     };
 
@@ -51,11 +51,11 @@ TEST(ClipIDs, ParentAndFourChildren) {
 TEST(ClipIDs, ParentAndFourChildrenNegative) {
     const std::vector<std::vector<std::shared_ptr<Tile>>> sources = {
         {
-            std::make_shared<Tile>(TileID { 1, -2, 0 }),
-            std::make_shared<Tile>(TileID { 1, -2, 1 }),
-            std::make_shared<Tile>(TileID { 1, -1, 0 }),
-            std::make_shared<Tile>(TileID { 1, -1, 1 }),
-            std::make_shared<Tile>(TileID { 0, -1, 0 }),
+            std::make_shared<Tile>(TileID { 1, -2, 0, 1 }),
+            std::make_shared<Tile>(TileID { 1, -2, 1, 1 }),
+            std::make_shared<Tile>(TileID { 1, -1, 0, 1 }),
+            std::make_shared<Tile>(TileID { 1, -1, 1, 1 }),
+            std::make_shared<Tile>(TileID { 0, -1, 0, 0 }),
         },
     };
 
@@ -72,11 +72,11 @@ TEST(ClipIDs, ParentAndFourChildrenNegative) {
 TEST(ClipIDs, NegativeParentAndMissingLevel) {
     const std::vector<std::vector<std::shared_ptr<Tile>>> sources = {
         {
-            std::make_shared<Tile>(TileID { 1, -1, 0 }),
-            std::make_shared<Tile>(TileID { 2, -1, 0 }),
-            std::make_shared<Tile>(TileID { 2, -2, 1 }),
-            std::make_shared<Tile>(TileID { 2, -1, 1 }),
-            std::make_shared<Tile>(TileID { 2, -2, 0 }),
+            std::make_shared<Tile>(TileID { 1, -1, 0, 1 }),
+            std::make_shared<Tile>(TileID { 2, -1, 0, 2 }),
+            std::make_shared<Tile>(TileID { 2, -2, 1, 2 }),
+            std::make_shared<Tile>(TileID { 2, -1, 1, 2 }),
+            std::make_shared<Tile>(TileID { 2, -2, 0, 2 }),
         },
     };
 
@@ -94,13 +94,13 @@ TEST(ClipIDs, NegativeParentAndMissingLevel) {
 TEST(ClipIDs, SevenOnSameLevel) {
     const std::vector<std::vector<std::shared_ptr<Tile>>> sources = {
         {
-            std::make_shared<Tile>(TileID { 2, 0, 0 }),
-            std::make_shared<Tile>(TileID { 2, 0, 1 }),
-            std::make_shared<Tile>(TileID { 2, 0, 2 }),
-            std::make_shared<Tile>(TileID { 2, 1, 0 }),
-            std::make_shared<Tile>(TileID { 2, 1, 1 }),
-            std::make_shared<Tile>(TileID { 2, 1, 2 }),
-            std::make_shared<Tile>(TileID { 2, 2, 0 }),
+            std::make_shared<Tile>(TileID { 2, 0, 0, 2 }),
+            std::make_shared<Tile>(TileID { 2, 0, 1, 2 }),
+            std::make_shared<Tile>(TileID { 2, 0, 2, 2 }),
+            std::make_shared<Tile>(TileID { 2, 1, 0, 2 }),
+            std::make_shared<Tile>(TileID { 2, 1, 1, 2 }),
+            std::make_shared<Tile>(TileID { 2, 1, 2, 2 }),
+            std::make_shared<Tile>(TileID { 2, 2, 0, 2 }),
         },
     };
 
@@ -119,18 +119,18 @@ TEST(ClipIDs, SevenOnSameLevel) {
 TEST(ClipIDs, MultipleLevels) {
     const std::vector<std::vector<std::shared_ptr<Tile>>> sources = {
         {
-            std::make_shared<Tile>(TileID { 2, 0, 0 }),
-                std::make_shared<Tile>(TileID { 3, 0, 0 }),
-                std::make_shared<Tile>(TileID { 3, 0, 1 }),
-                    std::make_shared<Tile>(TileID { 4, 0, 2 }),
-                    std::make_shared<Tile>(TileID { 4, 1, 2 }),
-                    std::make_shared<Tile>(TileID { 4, 0, 3 }),
-                    std::make_shared<Tile>(TileID { 4, 1, 3 }),
-                std::make_shared<Tile>(TileID { 3, 1, 0 }),
-                std::make_shared<Tile>(TileID { 3, 1, 1 }),
-            std::make_shared<Tile>(TileID { 2, 1, 0 }),
-                std::make_shared<Tile>(TileID { 3, 2, 0 }),
-                std::make_shared<Tile>(TileID { 3, 2, 1 }),
+            std::make_shared<Tile>(TileID { 2, 0, 0, 2 }),
+                std::make_shared<Tile>(TileID { 3, 0, 0, 3 }),
+                std::make_shared<Tile>(TileID { 3, 0, 1, 3 }),
+                    std::make_shared<Tile>(TileID { 4, 0, 2, 4 }),
+                    std::make_shared<Tile>(TileID { 4, 1, 2, 4 }),
+                    std::make_shared<Tile>(TileID { 4, 0, 3, 4 }),
+                    std::make_shared<Tile>(TileID { 4, 1, 3, 4 }),
+                std::make_shared<Tile>(TileID { 3, 1, 0, 3 }),
+                std::make_shared<Tile>(TileID { 3, 1, 1, 3 }),
+            std::make_shared<Tile>(TileID { 2, 1, 0, 2 }),
+                std::make_shared<Tile>(TileID { 3, 2, 0, 3 }),
+                std::make_shared<Tile>(TileID { 3, 2, 1, 3 }),
         },
     };
 
@@ -155,17 +155,17 @@ TEST(ClipIDs, MultipleLevels) {
 TEST(ClipIDs, Bug206) {
     const std::vector<std::vector<std::shared_ptr<Tile>>> sources = {
         {
-            std::make_shared<Tile>(TileID { 10, 162, 395 }),
-            std::make_shared<Tile>(TileID { 10, 162, 396 }),
-            std::make_shared<Tile>(TileID { 10, 163, 395 }),
-                std::make_shared<Tile>(TileID { 11, 326, 791 }),
-                std::make_shared<Tile>(TileID { 12, 654, 1582 }),
-                std::make_shared<Tile>(TileID { 12, 654, 1583 }),
-                std::make_shared<Tile>(TileID { 12, 655, 1582 }),
-                std::make_shared<Tile>(TileID { 12, 655, 1583 }),
-            std::make_shared<Tile>(TileID { 10, 163, 396 }),
-            std::make_shared<Tile>(TileID { 10, 164, 395 }),
-            std::make_shared<Tile>(TileID { 10, 164, 396 }),
+            std::make_shared<Tile>(TileID { 10, 162, 395, 10 }),
+            std::make_shared<Tile>(TileID { 10, 162, 396, 10 }),
+            std::make_shared<Tile>(TileID { 10, 163, 395, 10 }),
+                std::make_shared<Tile>(TileID { 11, 326, 791, 10 }),
+                std::make_shared<Tile>(TileID { 12, 654, 1582, 10 }),
+                std::make_shared<Tile>(TileID { 12, 654, 1583, 10 }),
+                std::make_shared<Tile>(TileID { 12, 655, 1582, 10 }),
+                std::make_shared<Tile>(TileID { 12, 655, 1583, 10 }),
+            std::make_shared<Tile>(TileID { 10, 163, 396, 10 }),
+            std::make_shared<Tile>(TileID { 10, 164, 395, 10 }),
+            std::make_shared<Tile>(TileID { 10, 164, 396, 10 }),
         },
     };
 
@@ -189,23 +189,23 @@ TEST(ClipIDs, Bug206) {
 TEST(ClipIDs, MultipleSources) {
     const std::vector<std::vector<std::shared_ptr<Tile>>> sources = {
         {
-            std::make_shared<Tile>(TileID { 0, 0, 0 }),
-            std::make_shared<Tile>(TileID { 1, 1, 1 }),
-            std::make_shared<Tile>(TileID { 2, 2, 1 }),
-            std::make_shared<Tile>(TileID { 2, 2, 2 }),
+            std::make_shared<Tile>(TileID { 0, 0, 0, 0 }),
+            std::make_shared<Tile>(TileID { 1, 1, 1, 1 }),
+            std::make_shared<Tile>(TileID { 2, 2, 1, 2 }),
+            std::make_shared<Tile>(TileID { 2, 2, 2, 2 }),
         },
         {
-            std::make_shared<Tile>(TileID { 0, 0, 0 }),
-            std::make_shared<Tile>(TileID { 1, 1, 1 }),
-            std::make_shared<Tile>(TileID { 2, 1, 1 }),
-            std::make_shared<Tile>(TileID { 2, 2, 2 }),
+            std::make_shared<Tile>(TileID { 0, 0, 0, 0 }),
+            std::make_shared<Tile>(TileID { 1, 1, 1, 1 }),
+            std::make_shared<Tile>(TileID { 2, 1, 1, 2 }),
+            std::make_shared<Tile>(TileID { 2, 2, 2, 2 }),
         },
         {
-            std::make_shared<Tile>(TileID { 1, 0, 0 }),
-            std::make_shared<Tile>(TileID { 1, 0, 1 }),
-            std::make_shared<Tile>(TileID { 1, 1, 0 }),
-            std::make_shared<Tile>(TileID { 1, 1, 1 }),
-            std::make_shared<Tile>(TileID { 2, 1, 1 }),
+            std::make_shared<Tile>(TileID { 1, 0, 0, 1 }),
+            std::make_shared<Tile>(TileID { 1, 0, 1, 1 }),
+            std::make_shared<Tile>(TileID { 1, 1, 0, 1 }),
+            std::make_shared<Tile>(TileID { 1, 1, 1, 1 }),
+            std::make_shared<Tile>(TileID { 2, 1, 1, 2 }),
         },
     };
 
@@ -231,13 +231,13 @@ TEST(ClipIDs, MultipleSources) {
 TEST(ClipIDs, DuplicateIDs) {
         const std::vector<std::vector<std::shared_ptr<Tile>>> sources = {
         {
-            std::make_shared<Tile>(TileID { 2, 0, 0 }),
-            std::make_shared<Tile>(TileID { 2, 0, 1 }),
+            std::make_shared<Tile>(TileID { 2, 0, 0, 2 }),
+            std::make_shared<Tile>(TileID { 2, 0, 1, 2 }),
         },
         {
-            std::make_shared<Tile>(TileID { 2, 0, 0 }),
-            std::make_shared<Tile>(TileID { 2, 0, 1 }),
-            std::make_shared<Tile>(TileID { 2, 0, 1 }),
+            std::make_shared<Tile>(TileID { 2, 0, 0, 2 }),
+            std::make_shared<Tile>(TileID { 2, 0, 1, 2 }),
+            std::make_shared<Tile>(TileID { 2, 0, 1, 2 }),
         }
     };
 

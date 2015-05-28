@@ -10,17 +10,17 @@ using namespace mbgl;
 
 LiveTileData::LiveTileData(const TileID& id_,
                            AnnotationManager& annotationManager_,
-                           float mapMaxZoom,
                            Style& style_,
                            GlyphAtlas& glyphAtlas_,
                            GlyphStore& glyphStore_,
                            SpriteAtlas& spriteAtlas_,
                            util::ptr<Sprite> sprite_,
                            const SourceInfo& source_,
+                           float overscaling_,
                            float angle_,
                            bool collisionDebug_)
-    : VectorTileData::VectorTileData(id_, mapMaxZoom, style_, glyphAtlas_, glyphStore_,
-                                     spriteAtlas_, sprite_, source_, angle_, collisionDebug_),
+    : VectorTileData::VectorTileData(id_, style_, glyphAtlas_, glyphStore_,
+                                     spriteAtlas_, sprite_, source_, overscaling_, angle_, collisionDebug_),
       annotationManager(annotationManager_) {
     // live features are always ready
     setState(State::loaded);

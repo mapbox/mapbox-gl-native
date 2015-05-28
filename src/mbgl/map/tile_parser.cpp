@@ -180,7 +180,7 @@ std::unique_ptr<Bucket> TileParser::createLineBucket(const GeometryTileLayer& la
 
 std::unique_ptr<Bucket> TileParser::createSymbolBucket(const GeometryTileLayer& layer,
                                                        const StyleBucket& bucket_desc) {
-    auto bucket = util::make_unique<SymbolBucket>(*tile.getCollision());
+    auto bucket = util::make_unique<SymbolBucket>(*tile.getCollision(), tile.id.overscaling);
 
     const float z = tile.id.z;
     auto& layout = bucket->layout;
