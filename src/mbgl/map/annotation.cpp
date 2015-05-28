@@ -335,6 +335,12 @@ std::unordered_set<TileID, TileID::Hash> AnnotationManager::removeAnnotations(co
                     affectedTiles.insert(tid);
                 }
             }
+
+            if (annotation->type == AnnotationType::Shape) {
+                auto shape_it = std::find(orderedShapeAnnotations.begin(), orderedShapeAnnotations.end(), annotationID);
+                orderedShapeAnnotations.erase(shape_it);
+            }
+
             annotations.erase(annotationID);
         }
     }
