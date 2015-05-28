@@ -59,8 +59,8 @@ private:
     void emitSpriteLoadedIfComplete();
     void emitSpriteLoadingFailed(const std::string& message);
 
-    void parseJSON();
-    void parseImage();
+    void parseJSON(const std::string& jsonURL);
+    void parseImage(const std::string& spriteURL);
 
     std::string body;
     std::string image;

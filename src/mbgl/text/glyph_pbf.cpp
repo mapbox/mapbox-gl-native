@@ -23,14 +23,14 @@ GlyphPBF::GlyphPBF(const std::string& glyphURL,
                    const GlyphLoadingFailedCallback& failureCallback)
     : parsed(false), env(env_) {
     // Load the glyph set URL
-    std::string url = util::replaceTokens(glyphURL, [&](const std::string &name) -> std::string {
+    url = util::replaceTokens(glyphURL, [&](const std::string &name) -> std::string {
         if (name == "fontstack") return util::percentEncode(fontStack);
         if (name == "range") return util::toString(glyphRange.first) + "-" + util::toString(glyphRange.second);
         return "";
     });
 
     // The prepare call jumps back to the main thread.
-    req = env.request({ Resource::Kind::Glyphs, url }, [&, url, successCallback, failureCallback](const Response &res) {
+    req = env.request({ Resource::Kind::Glyphs, url }, [&, successCallback, failureCallback](const Response &res) {
         req = nullptr;
 
         if (res.status != Response::Successful) {

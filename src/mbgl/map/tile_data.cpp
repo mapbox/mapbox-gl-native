@@ -38,18 +38,18 @@ void TileData::setState(const State& state_) {
 
 void TileData::request(Worker& worker,
                        float pixelRatio,
-                       const std::function<void()>& successCallback,
-                       const std::function<void(const std::string& message)>& failureCallback) {
+                       const std::function<void()>& callback) {
     std::string url = source.tileURL(id, pixelRatio);
     state = State::loading;
 
-    req = env.request({ Resource::Kind::Tile, url }, [url, successCallback, failureCallback, &worker, this](const Response &res) {
+    req = env.request({ Resource::Kind::Tile, url }, [url, callback, &worker, this](const Response &res) {
         req = nullptr;
 
         if (res.status != Response::Successful) {
             std::stringstream message;
             message <<  "Failed to load [" << url << "]: " << res.message;
-            failureCallback(message.str());
+            setError(message.str());
+            callback();
             return;
         }
 
@@ -57,7 +57,7 @@ void TileData::request(Worker& worker,
         data = res.data;
 
         // Schedule tile parsing in another thread
-        reparse(worker, successCallback);
+        reparse(worker, callback);
     });
 }
 
@@ -87,4 +87,9 @@ bool TileData::reparse(Worker& worker, std::function<void()> callback) {
 
     workRequest = worker.send([this] { parse(); endParsing(); }, callback);
     return true;
+}
+
+void TileData::setError(const std::string& message) {
+    error = message;
+    setState(State::obsolete);
 }

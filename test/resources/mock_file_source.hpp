@@ -13,12 +13,18 @@ template <typename T> class Thread;
 }
 
 // This mock FileSource will read data from the disk and will fail
-// the request if the URL matches the 'matchFail' string.
+// the request if the URL matches a string.
 class MockFileSource : public FileSource {
 public:
+    enum Type {
+        Success,
+        RequestFail,
+        RequestWithCorruptedData
+    };
+
     class Impl;
 
-    MockFileSource(const std::string& matchFail);
+    MockFileSource(Type type, const std::string& match);
     ~MockFileSource() override = default;
 
     // FileSource implementation.

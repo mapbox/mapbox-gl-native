@@ -45,14 +45,13 @@ Sprite::Sprite(const std::string& baseUrl, float pixelRatio_)
         jsonRequest = nullptr;
         if (res.status == Response::Successful) {
             body = res.data;
-            parseJSON();
+            parseJSON(jsonURL);
         } else {
             std::stringstream message;
             message <<  "Failed to load [" << jsonURL << "]: " << res.message;
             emitSpriteLoadingFailed(message.str());
             return;
         }
-        loadedJSON = true;
         emitSpriteLoadedIfComplete();
     });
 
@@ -60,14 +59,13 @@ Sprite::Sprite(const std::string& baseUrl, float pixelRatio_)
         spriteRequest = nullptr;
         if (res.status == Response::Successful) {
             image = res.data;
-            parseImage();
+            parseImage(spriteURL);
         } else {
             std::stringstream message;
             message <<  "Failed to load [" << spriteURL << "]: " << res.message;
             emitSpriteLoadingFailed(message.str());
             return;
         }
-        loadedImage = true;
         emitSpriteLoadedIfComplete();
     });
 }
@@ -105,21 +103,29 @@ bool Sprite::hasPixelRatio(float ratio) const {
     return pixelRatio == (ratio > 1 ? 2 : 1);
 }
 
-void Sprite::parseImage() {
+void Sprite::parseImage(const std::string& spriteURL) {
     raster = std::make_unique<util::Image>(image);
     if (!*raster) {
         raster.reset();
+        std::stringstream message;
+        message <<  "Failed to parse [" << spriteURL << "]";
+        emitSpriteLoadingFailed(message.str());
+        return;
     }
+
     image.clear();
+    loadedImage = true;
 }
 
-void Sprite::parseJSON() {
+void Sprite::parseJSON(const std::string& jsonURL) {
     rapidjson::Document d;
     d.Parse<0>(body.c_str());
     body.clear();
 
     if (d.HasParseError()) {
-        Log::Warning(Event::Sprite, "sprite JSON is invalid");
+        std::stringstream message;
+        message <<  "Failed to parse [" << jsonURL << "]: " << d.GetErrorOffset() << " - " << d.GetParseError();
+        emitSpriteLoadingFailed(message.str());
     } else if (d.IsObject()) {
         for (rapidjson::Value::ConstMemberIterator itr = d.MemberBegin(); itr != d.MemberEnd(); ++itr) {
             const std::string& name = itr->name.GetString();
@@ -142,8 +148,11 @@ void Sprite::parseJSON() {
                 pos.emplace(name, SpritePosition { x, y, width, height, spritePixelRatio, sdf });
             }
         }
+        loadedJSON = true;
     } else {
-        Log::Warning(Event::Sprite, "sprite JSON root is not an object");
+        std::stringstream message;
+        message <<  "Failed to parse [" << jsonURL << "]: Root is not an object";
+        emitSpriteLoadingFailed(message.str());
     }
 }
 

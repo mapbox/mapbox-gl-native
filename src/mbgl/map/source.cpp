@@ -287,26 +287,25 @@ TileData::State Source::addTile(MapData& data,
         new_tile.data = cache.get(normalized_id.to_uint64());
     }
 
-    auto successCallback = std::bind(&Source::emitTileLoaded, this, true);
-    auto failureCallback = std::bind(&Source::emitTileLoadingFailed, this, std::placeholders::_1);
-
     if (!new_tile.data) {
+        auto callback = std::bind(&Source::tileLoadingCompleteCallback, this, normalized_id);
+
         // If we don't find working tile data, we're just going to load it.
         if (info.type == SourceType::Vector) {
             new_tile.data =
                 std::make_shared<VectorTileData>(normalized_id, data.transform.getMaxZoom(), style, glyphAtlas,
                                                  glyphStore, spriteAtlas, sprite, info);
             new_tile.data->request(
-                style.workers, transformState.getPixelRatio(), successCallback, failureCallback);
+                style.workers, transformState.getPixelRatio(), callback);
         } else if (info.type == SourceType::Raster) {
             new_tile.data = std::make_shared<RasterTileData>(normalized_id, texturePool, info);
             new_tile.data->request(
-                style.workers, transformState.getPixelRatio(), successCallback, failureCallback);
+                style.workers, transformState.getPixelRatio(), callback);
         } else if (info.type == SourceType::Annotations) {
             new_tile.data = std::make_shared<LiveTileData>(normalized_id, data.annotationManager,
                                                            data.transform.getMaxZoom(), style, glyphAtlas,
                                                            glyphStore, spriteAtlas, sprite, info);
-            new_tile.data->reparse(style.workers, successCallback);
+            new_tile.data->reparse(style.workers, callback);
         } else {
             throw std::runtime_error("source type not implemented");
         }
@@ -537,6 +536,25 @@ void Source::onLowMemory() {
 
 void Source::setObserver(Observer* observer) {
     observer_ = observer;
+}
+
+void Source::tileLoadingCompleteCallback(const TileID& normalized_id) {
+    auto it = tile_data.find(normalized_id);
+    if (it == tile_data.end()) {
+        return;
+    }
+
+    util::ptr<TileData> data = it->second.lock();
+    if (!data) {
+        return;
+    }
+
+    if (data->getState() == TileData::State::obsolete && !data->getError().empty()) {
+        emitTileLoadingFailed(data->getError());
+        return;
+    }
+
+    emitTileLoaded(true);
 }
 
 void Source::emitSourceLoaded() {

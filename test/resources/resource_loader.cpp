@@ -107,18 +107,13 @@ private:
     std::function<void(std::exception_ptr error)> callback_;
 };
 
-}
-
-class ResourceLoaderTest : public ::testing::TestWithParam<std::string> {
-};
-
-TEST_P(ResourceLoaderTest, RequestFailure) {
+void runTestCase(MockFileSource::Type type,
+                 const std::string& param,
+                 const std::string& message) {
     util::RunLoop loop(uv_default_loop());
 
-    const std::string param(GetParam());
-
     MockView view;
-    MockFileSource fileSource(param);
+    MockFileSource fileSource(type, param);
 
     FixtureLogObserver* log = new FixtureLogObserver();
     Log::setObserver(std::unique_ptr<Log::Observer>(log));
@@ -127,9 +122,6 @@ TEST_P(ResourceLoaderTest, RequestFailure) {
         try {
             if (error) {
                 std::rethrow_exception(error);
-            } else {
-                // Control test, should succeed.
-                EXPECT_TRUE(param.empty());
             }
         } catch (const util::GlyphRangeLoadingException&) {
             EXPECT_EQ(param, "glyphs.pbf");
@@ -156,24 +148,57 @@ TEST_P(ResourceLoaderTest, RequestFailure) {
     // join and cease logging after this point.
     context.reset();
 
-    std::stringstream message;
-    message << "Failed to load [test/fixtures/resources/" << param << "]: Failed by the test case";
-
     const FixtureLogObserver::LogMessage logMessage {
         EventSeverity::Error,
         Event::ResourceLoader,
         int64_t(-1),
-        message.str(),
+        message,
     };
 
-    if (param.empty()) {
+    if (type == MockFileSource::Success) {
         EXPECT_EQ(log->count(logMessage), 0u);
     } else {
         EXPECT_GT(log->count(logMessage), 0u);
     }
 
-    EXPECT_EQ(log->unchecked().size(), 0u);
+    // Clear the remaining error messages
+    log->unchecked().size();
+}
+
+}
+
+class ResourceLoaderTest : public ::testing::TestWithParam<std::string> {
+};
+
+TEST_P(ResourceLoaderTest, Success) {
+    runTestCase(MockFileSource::Success, GetParam(), std::string());
+}
+
+TEST_P(ResourceLoaderTest, RequestFail) {
+    std::stringstream message;
+    message << "Failed to load [test/fixtures/resources/" << GetParam() << "]: Failed by the test case";
+
+    runTestCase(MockFileSource::RequestFail, GetParam(), message.str());
+}
+
+TEST_P(ResourceLoaderTest, RequestWithCorruptedData) {
+    const std::string param(GetParam());
+
+    std::stringstream message;
+    message << "Failed to parse ";
+
+    if (param == "vector.pbf") {
+        message << "[15/16384/16384]: pbf unknown field type exception";
+    } else {
+        message << "[test/fixtures/resources/" << param << "]";
+    }
+
+    if (param.find("json") != std::string::npos) {
+        message << ": 0 - Expect either an object or array at root";
+    }
+
+    runTestCase(MockFileSource::RequestWithCorruptedData, GetParam(), message.str());
 }
 
 INSTANTIATE_TEST_CASE_P(ResourceLoader, ResourceLoaderTest,
-    ::testing::Values("", "source.json", "sprite.json", "sprite.png", "vector.pbf", "glyphs.pbf"));
+    ::testing::Values("source.json", "sprite.json", "sprite.png", "vector.pbf", "glyphs.pbf"));
