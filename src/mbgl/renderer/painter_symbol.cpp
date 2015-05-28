@@ -193,7 +193,9 @@ void Painter::renderSymbol(SymbolBucket &bucket, const StyleLayer &layer_desc, c
                   &SymbolBucket::drawGlyphs);
     }
 
-    if (bucket.hasCollisionBoxData()) {
+    if (bucket.hasCollisionBoxData() && (
+                (bucket.hasIconData() && properties.icon.opacity) ||
+                (bucket.hasTextData() && properties.text.opacity))) {
         config.stencilTest = true;
 
         useProgram(collisionBoxShader->program);

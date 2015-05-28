@@ -385,7 +385,7 @@ void SymbolBucket::placeFeatures(bool swapImmediately) {
         }
     }
 
-    addToDebugBuffers();
+    if (collision.getDebug()) addToDebugBuffers();
 
     if (swapImmediately) swapRenderData();
 }

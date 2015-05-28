@@ -18,7 +18,8 @@ public:
                  SpriteAtlas&,
                  util::ptr<Sprite>,
                  const SourceInfo&,
-                 float);
+                 float,
+                 bool);
     ~LiveTileData();
 
     void parse() override;

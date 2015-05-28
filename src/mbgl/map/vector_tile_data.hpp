@@ -40,11 +40,12 @@ public:
                    SpriteAtlas&,
                    util::ptr<Sprite>,
                    const SourceInfo&,
-                   float);
+                   float,
+                   bool);
     ~VectorTileData();
 
     void parse() override;
-    void redoPlacement(float angle) override;
+    void redoPlacement(float angle, bool collisionDebug) override;
     virtual Bucket* getBucket(StyleLayer const &layer_desc) override;
 
     size_t countBuckets() const;
@@ -88,9 +89,11 @@ private:
 
     float lastAngle = 0;
     float currentAngle;
+    bool lastCollisionDebug = 0;
+    bool currentCollisionDebug = 0;
     bool redoingPlacement = false;
     void endRedoPlacement();
-    void workerRedoPlacement(float angle);
+    void workerRedoPlacement(float angle, bool collisionDebug);
 };
 
 }

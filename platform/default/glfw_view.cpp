@@ -87,6 +87,9 @@ void GLFWView::onKey(GLFWwindow *window, int key, int /*scancode*/, int action, 
         case GLFW_KEY_TAB:
             view->map->toggleDebug();
             break;
+        case GLFW_KEY_C:
+            view->map->toggleCollisionDebug();
+            break;
         case GLFW_KEY_X:
             if (!mods)
                 view->map->resetPosition();

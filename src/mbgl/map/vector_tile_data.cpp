@@ -22,7 +22,8 @@ VectorTileData::VectorTileData(const TileID& id_,
                                SpriteAtlas& spriteAtlas_,
                                util::ptr<Sprite> sprite_,
                                const SourceInfo& source_,
-                               float angle)
+                               float angle,
+                               bool collisionDebug)
     : TileData(id_, source_),
       depth(id_.z >= source_.max_zoom ? mapMaxZoom - id_.z : 1),
       glyphAtlas(glyphAtlas_),
@@ -30,7 +31,7 @@ VectorTileData::VectorTileData(const TileID& id_,
       spriteAtlas(spriteAtlas_),
       sprite(sprite_),
       style(style_),
-      collision(util::make_unique<CollisionTile>(id_.z, 4096, source_.tile_size, angle)),
+      collision(util::make_unique<CollisionTile>(id_.z, 4096, source_.tile_size, angle, collisionDebug)),
       lastAngle(angle),
       currentAngle(angle) {
 }
@@ -116,26 +117,29 @@ void VectorTileData::setState(const State& state_) {
 }
 
 void VectorTileData::redoPlacement() {
-    redoPlacement(lastAngle);
+    redoPlacement(lastAngle, lastCollisionDebug);
 }
 
-void VectorTileData::redoPlacement(float angle) {
-    if (angle != currentAngle) {
+void VectorTileData::redoPlacement(float angle, bool collisionDebug) {
+    if (angle != currentAngle || collisionDebug != currentCollisionDebug) {
         lastAngle = angle;
+        lastCollisionDebug = collisionDebug;
 
         if (getState() != State::parsed || redoingPlacement) return;
 
         redoingPlacement = true;
         currentAngle = angle;
+        currentCollisionDebug = collisionDebug;
 
         auto callback = std::bind(&VectorTileData::endRedoPlacement, this);
-        workRequest = style.workers.send([this, angle] { workerRedoPlacement(angle); }, callback);
+        workRequest = style.workers.send([this, angle, collisionDebug] { workerRedoPlacement(angle, collisionDebug); }, callback);
 
     }
 }
 
-void VectorTileData::workerRedoPlacement(float angle) {
+void VectorTileData::workerRedoPlacement(float angle, bool collisionDebug) {
     collision->reset(angle, 0);
+    collision->setDebug(collisionDebug);
     for (const auto& layer_desc : style.layers) {
         auto bucket = getBucket(*layer_desc);
         if (bucket) {

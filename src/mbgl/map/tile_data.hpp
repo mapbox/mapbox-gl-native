@@ -80,7 +80,7 @@ public:
     virtual void parse() = 0;
     virtual Bucket* getBucket(StyleLayer const &layer_desc) = 0;
 
-    virtual void redoPlacement(float) {}
+    virtual void redoPlacement(float, bool) {}
 
     const TileID id;
     const std::string name;

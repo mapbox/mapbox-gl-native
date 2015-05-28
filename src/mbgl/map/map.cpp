@@ -290,6 +290,20 @@ bool Map::getDebug() const {
     return data->getDebug();
 }
 
+void Map::setCollisionDebug(bool value) {
+    data->setCollisionDebug(value);
+    update();
+}
+
+void Map::toggleCollisionDebug() {
+    data->toggleCollisionDebug();
+    update();
+}
+
+bool Map::getCollisionDebug() const {
+    return data->getCollisionDebug();
+}
+
 bool Map::isFullyLoaded() const {
     return data->getFullyLoaded();
 }

@@ -101,7 +101,7 @@ public:
     bool enabled;
 
 private:
-    void redoPlacement(const TransformState& transformState);
+    void redoPlacement(const TransformState& transformState, bool collisionDebug);
     void emitSourceLoaded();
     void emitTileLoaded(bool isNewTile);
 

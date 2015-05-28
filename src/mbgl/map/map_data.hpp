@@ -64,6 +64,16 @@ public:
         debug = value;
     }
 
+    inline bool getCollisionDebug() const {
+        return collisionDebug;
+    }
+    inline bool toggleCollisionDebug() {
+        return collisionDebug ^= 1u;
+    }
+    inline void setCollisionDebug(bool value) {
+        collisionDebug = value;
+    }
+
     inline bool getFullyLoaded() const {
         return loaded;
     }
@@ -98,6 +108,7 @@ private:
     std::string accessToken;
     std::vector<std::string> classes;
     std::atomic<uint8_t> debug { false };
+    std::atomic<uint8_t> collisionDebug { false };
     std::atomic<bool> loaded { false };
     std::atomic<Duration> animationTime;
     std::atomic<Duration> defaultTransitionDuration;
