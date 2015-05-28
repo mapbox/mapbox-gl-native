@@ -290,7 +290,7 @@ AnnotationManager::addShapeAnnotations(const std::vector<AnnotationSegments>& sh
 }
 
 std::unordered_set<TileID, TileID::Hash> AnnotationManager::removeAnnotations(const AnnotationIDs& ids,
-                                                         const MapData& data) {
+                                                                              const MapData& data) {
     std::lock_guard<std::mutex> lock(mtx);
 
     std::unordered_set<TileID, TileID::Hash> affectedTiles;
@@ -325,8 +325,12 @@ std::unordered_set<TileID, TileID::Hash> AnnotationManager::removeAnnotations(co
                 // remove annotation's features from tile
                 const auto& features_it = annotation->tileFeatures.find(tid);
                 if (features_it != annotation->tileFeatures.end()) {
-                    const auto& layer =
-                        tiles[tid].second->getMutableLayer(PointLayerID); //
+                    util::ptr<LiveTileLayer> layer;
+                    if (annotation->type == AnnotationType::Point) {
+                        layer = tiles[tid].second->getMutableLayer(PointLayerID);
+                    } else {
+                        layer = tiles[tid].second->getMutableLayer(ShapeLayerID + "." + std::to_string(annotationID));
+                    }
                     layer->removeFeature(features_it->second);
                     affectedTiles.insert(tid);
                 }
