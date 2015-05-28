@@ -4,6 +4,10 @@
 #include <mbgl/style/property_transition.hpp>
 #include <mbgl/style/zoom_history.hpp>
 
+#include <mbgl/map/source.hpp>
+#include <mbgl/map/sprite.hpp>
+#include <mbgl/text/glyph_store.hpp>
+
 #include <mbgl/util/uv.hpp>
 #include <mbgl/util/ptr.hpp>
 #include <mbgl/util/noncopyable.hpp>
@@ -16,16 +20,38 @@
 
 namespace mbgl {
 
-class Source;
+class Environment;
+class GlyphAtlas;
+class GlyphStore;
+class SpriteAtlas;
+class LineAtlas;
 class StyleLayer;
 
-class Style : public util::noncopyable {
+class Style : public GlyphStore::Observer,
+              public Source::Observer,
+              public Sprite::Observer,
+              public util::noncopyable {
 public:
-    Style();
+    Style(const std::string& data,
+          const std::string& base,
+          uv_loop_t*, Environment&);
     ~Style();
 
-    void loadJSON(const uint8_t *const data);
+    class Observer {
+    public:
+        virtual ~Observer() = default;
+
+        virtual void onTileDataChanged() = 0;
+        virtual void onResourceLoadingFailed(std::exception_ptr error) = 0;
+    };
+
+    void setObserver(Observer*);
+
     bool isLoaded() const;
+
+    // Fetch the tiles needed by the current viewport and emit a signal when
+    // a tile is ready so observers can render the tile.
+    void update(MapData&, const TransformState&, TexturePool&);
 
     void cascade(const std::vector<std::string>&);
     void recalculate(float z, TimePoint now);
@@ -33,16 +59,40 @@ public:
     void setDefaultTransitionDuration(Duration);
     bool hasTransitions() const;
 
-    const std::string &getSpriteURL() const;
+    std::unique_ptr<GlyphStore> glyphStore;
+    std::unique_ptr<GlyphAtlas> glyphAtlas;
+    util::ptr<Sprite> sprite;
+    std::unique_ptr<SpriteAtlas> spriteAtlas;
+    std::unique_ptr<LineAtlas> lineAtlas;
 
     std::vector<util::ptr<Source>> sources;
     std::vector<util::ptr<StyleLayer>> layers;
-    std::string glyph_url;
-    std::string base;
 
 private:
-    bool loaded = false;
+    // GlyphStore::Observer implementation.
+    void onGlyphRangeLoaded() override;
+    void onGlyphRangeLoadingFailed(std::exception_ptr error) override;
+
+    // Source::Observer implementation.
+    void onSourceLoaded() override;
+    void onSourceLoadingFailed(std::exception_ptr error) override;
+    void onTileLoaded(bool isNewTile) override;
+    void onTileLoadingFailed(std::exception_ptr error) override;
+
+    // Sprite::Observer implementation.
+    void onSpriteLoaded() override;
+    void onSpriteLoadingFailed(std::exception_ptr error) override;
+
+    void emitTileDataChanged();
+    void emitResourceLoadingFailed(std::exception_ptr error);
+
+    bool shouldReparsePartialTiles = false;
+
+    Observer* observer = nullptr;
+
+    std::string base;
     std::string sprite_url;
+    std::string glyph_url;
     PropertyTransition defaultTransition;
     std::unique_ptr<uv::rwlock> mtx;
     ZoomHistory zoomHistory;

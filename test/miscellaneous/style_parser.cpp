@@ -1,6 +1,6 @@
 #include "../fixtures/util.hpp"
 
-#include <mbgl/style/style.hpp>
+#include <mbgl/style/style_parser.hpp>
 #include <mbgl/util/io.hpp>
 
 #include <rapidjson/document.h>
@@ -22,27 +22,23 @@ class StyleParserTest : public ::testing::TestWithParam<std::string> {};
 TEST_P(StyleParserTest, ParseStyle) {
     const std::string &base = "test/fixtures/style_parser/" + GetParam();
 
-    const std::string style_path = base + ".style.json";
-    const std::string info = util::read_file(base + ".info.json");
+    rapidjson::Document infoDoc;
+    infoDoc.Parse<0>(util::read_file(base + ".info.json").c_str());
+    ASSERT_FALSE(infoDoc.HasParseError());
+    ASSERT_TRUE(infoDoc.IsObject());
 
-    // Parse settings.
-    rapidjson::Document doc;
-    doc.Parse<0>((const char *const)info.c_str());
-    ASSERT_FALSE(doc.HasParseError());
-    ASSERT_TRUE(doc.IsObject());
-
-    std::ifstream stylefile(style_path);
-    ASSERT_TRUE(stylefile.good());
-    std::stringstream stylejson;
-    stylejson << stylefile.rdbuf();
+    rapidjson::Document styleDoc;
+    styleDoc.Parse<0>(util::read_file(base + ".style.json").c_str());
+    ASSERT_FALSE(styleDoc.HasParseError());
+    ASSERT_TRUE(styleDoc.IsObject());
 
     FixtureLogObserver* observer = new FixtureLogObserver();
     Log::setObserver(std::unique_ptr<Log::Observer>(observer));
 
-    Style style;
-    style.loadJSON((const uint8_t *)stylejson.str().c_str());
+    StyleParser parser;
+    parser.parse(styleDoc);
 
-    for (auto it = doc.MemberBegin(), end = doc.MemberEnd(); it != end; it++) {
+    for (auto it = infoDoc.MemberBegin(), end = infoDoc.MemberEnd(); it != end; it++) {
         const std::string name { it->name.GetString(), it->name.GetStringLength() };
         const rapidjson::Value &value = it->value;
         ASSERT_EQ(true, value.IsObject());
