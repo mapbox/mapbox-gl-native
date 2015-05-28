@@ -16,6 +16,7 @@
 static const NSUInteger version = 1;
 static NSString *const MGLMapboxEventsUserAgent = @"MapboxEventsiOS/1.0";
 static NSString *MGLMapboxEventsAPIBase = @"https://api.tiles.mapbox.com";
+static BOOL usingTestServer = NO;
 
 NSString *const MGLEventTypeAppUserTurnstile = @"appUserTurnstile";
 NSString *const MGLEventTypeMapLoad = @"map.load";
@@ -148,6 +149,7 @@ const NSTimeInterval MGLFlushInterval = 60;
 @property (atomic) NSURLSession *session;
 @property (atomic) NSData *digicertCert;
 @property (atomic) NSData *geoTrustCert;
+@property (atomic) NSData *testServerCert;
 
 // Main thread only
 @property (nonatomic) CLLocationManager *locationManager;
@@ -239,6 +241,7 @@ const NSTimeInterval MGLFlushInterval = 60;
         NSString *testURL = [[NSBundle mainBundle] objectForInfoDictionaryKey:@"MGLMetricsTestServerURL"];
         if (testURL != nil) {
             MGLMapboxEventsAPIBase = testURL;
+            usingTestServer = YES;
         }
 
         _paused = YES;
@@ -255,6 +258,10 @@ const NSTimeInterval MGLFlushInterval = 60;
         cerPath = [resourceBundle pathForResource:@"api_mapbox_com-digicert" ofType:@"der"];
         if (cerPath != nil) {
             _digicertCert = [NSData dataWithContentsOfFile:cerPath];
+        }
+        cerPath = [resourceBundle pathForResource:@"star_tilestream_net" ofType:@"der"];
+        if (cerPath != nil) {
+            _testServerCert = [NSData dataWithContentsOfFile:cerPath];
         }
 
         // Events Control
@@ -875,6 +882,22 @@ const NSTimeInterval MGLFlushInterval = 60;
                         completionHandler(NSURLSessionAuthChallengeUseCredential, [NSURLCredential credentialForTrust:challenge.protectionSpace.serverTrust]);
                         found = true;
                         break;
+                    }
+                }
+
+                if (!found && usingTestServer) {
+                    // See if this is test server
+                    for (int lc = 0; lc < numKeys; lc++) {
+                        SecCertificateRef certificate = SecTrustGetCertificateAtIndex(serverTrust, lc);
+                        NSData *remoteCertificateData = CFBridgingRelease(SecCertificateCopyData(certificate));
+
+                        // Compare Remote Key With Local Version
+                        if ([remoteCertificateData isEqualToData:_testServerCert]) {
+                            // Found the certificate; continue connecting
+                            completionHandler(NSURLSessionAuthChallengeUseCredential, [NSURLCredential credentialForTrust:challenge.protectionSpace.serverTrust]);
+                            found = true;
+                            break;
+                        }
                     }
                 }
 
