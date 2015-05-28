@@ -13,10 +13,15 @@ SymbolQuads getIconQuads(Anchor &anchor, const PositionedIcon &shapedIcon,
         const std::vector<Coordinate> &line, const StyleLayoutSymbol &layout,
         const bool alongLine) {
 
-    vec2<float> tl{shapedIcon.left, shapedIcon.top};
-    vec2<float> tr{shapedIcon.right, shapedIcon.top};
-    vec2<float> br{shapedIcon.right, shapedIcon.bottom};
-    vec2<float> bl{shapedIcon.left, shapedIcon.bottom};
+    const float border = 1.0;
+    auto left = shapedIcon.left - border;
+    auto right = left + shapedIcon.image.w;
+    auto top = shapedIcon.top - border;
+    auto bottom = top + shapedIcon.image.h;
+    vec2<float> tl{left, top};
+    vec2<float> tr{right, top};
+    vec2<float> br{right, bottom};
+    vec2<float> bl{left, bottom};
 
 
     float angle = layout.icon.rotate * M_PI / 180.0f;
