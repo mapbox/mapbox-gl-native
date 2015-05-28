@@ -19,13 +19,12 @@
 
 namespace mbgl {
 
-Style::Style(const std::string& data, const std::string& base_,
+Style::Style(const std::string& data, const std::string&,
              uv_loop_t* loop, Environment& env)
     : glyphStore(std::make_unique<GlyphStore>(loop, env)),
       glyphAtlas(std::make_unique<GlyphAtlas>(1024, 1024)),
       spriteAtlas(std::make_unique<SpriteAtlas>(512, 512)),
       lineAtlas(std::make_unique<LineAtlas>(512, 512)),
-      base(base_),
       mtx(std::make_unique<uv::rwlock>()),
       workers(4) {
 
@@ -42,9 +41,8 @@ Style::Style(const std::string& data, const std::string& base_,
     sources = parser.getSources();
     layers = parser.getLayers();
 
-    sprite_url = parser.getSprite();
-    glyph_url = parser.getGlyphURL();
-    glyphStore->setURL(glyph_url);
+    spriteURL = parser.getSprite();
+    glyphStore->setURL(parser.getGlyphURL());
 
     for (const auto& source : sources) {
         source->setObserver(this);
@@ -71,7 +69,7 @@ void Style::update(MapData& data,
                    TexturePool& texturePool) {
     const float pixelRatio = transform.getPixelRatio();
     if (!sprite || !sprite->hasPixelRatio(pixelRatio)) {
-        sprite = std::make_unique<Sprite>(sprite_url, pixelRatio);
+        sprite = std::make_unique<Sprite>(spriteURL, pixelRatio);
         sprite->setObserver(this);
 
         spriteAtlas->resize(pixelRatio);

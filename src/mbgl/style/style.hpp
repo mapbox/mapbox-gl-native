@@ -90,9 +90,7 @@ private:
 
     Observer* observer = nullptr;
 
-    std::string base;
-    std::string sprite_url;
-    std::string glyph_url;
+    std::string spriteURL;
     PropertyTransition defaultTransition;
     std::unique_ptr<uv::rwlock> mtx;
     ZoomHistory zoomHistory;
