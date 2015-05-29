@@ -19,4 +19,5 @@ TEST(MapContext, DoubleStyleLoad) {
 
     context.invokeSync(&MapContext::setStyleJSON, "", "");
     context.invokeSync(&MapContext::setStyleJSON, "", "");
+    context.invokeSync(&MapContext::cleanup);
 }

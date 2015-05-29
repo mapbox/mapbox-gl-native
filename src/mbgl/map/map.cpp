@@ -17,6 +17,7 @@ Map::Map(View& view, FileSource& fileSource, MapMode mode)
 
 Map::~Map() {
     resume();
+    context->invoke(&MapContext::cleanup);
 }
 
 void Map::pause() {
