@@ -32,20 +32,22 @@ namespace mbgl {
 
 SymbolInstance::SymbolInstance(Anchor &anchor, const std::vector<Coordinate> &line,
         const Shaping &shapedText, const PositionedIcon &shapedIcon, 
-        const StyleLayoutSymbol &layout, const bool inside,
+        const StyleLayoutSymbol &layout, const bool addToBuffers,
         const float textBoxScale, const float textPadding, const float textAlongLine,
         const float iconBoxScale, const float iconPadding, const float iconAlongLine,
         const GlyphPositions &face) :
+    x(anchor.x),
+    y(anchor.y),
     hasText(shapedText),
     hasIcon(shapedIcon),
 
     // Create the quads used for rendering the glyphs.
-    glyphQuads(inside && shapedText ?
+    glyphQuads(addToBuffers && shapedText ?
             getGlyphQuads(anchor, shapedText, textBoxScale, line, layout, textAlongLine, face) :
             SymbolQuads()),
 
     // Create the quad used for rendering the icon.
-    iconQuads(inside && shapedIcon ?
+    iconQuads(addToBuffers && shapedIcon ?
             getIconQuads(anchor, shapedIcon, line, layout, iconAlongLine) :
             SymbolQuads()),
 
@@ -288,6 +290,8 @@ void SymbolBucket::addFeature(const std::vector<std::vector<Coordinate>> &lines,
     const bool iconAlongLine =
         layout.icon.rotation_alignment == RotationAlignmentType::Map &&
         layout.placement == PlacementType::Line;
+    const bool mayOverlap = layout.text.allow_overlap || layout.icon.allow_overlap ||
+        layout.text.ignore_placement || layout.icon.ignore_placement;
 
     auto& clippedLines = layout.placement == PlacementType::Line ?
         util::clipLines(lines, 0, 0, 4096, 4096) :
@@ -309,7 +313,20 @@ void SymbolBucket::addFeature(const std::vector<std::vector<Coordinate>> &lines,
 
             if (avoidEdges && !inside) continue;
 
-            symbolInstances.emplace_back(anchor, line, shapedText, shapedIcon, layout, inside,
+            // Normally symbol layers are drawn across tile boundaries. Only symbols
+            // with their anchors within the tile boundaries are added to the buffers
+            // to prevent symbols from being drawn twice.
+            //
+            // Symbols in layers with overlap are sorted in the y direction so that
+            // symbols lower on the canvas are drawn on top of symbols near the top.
+            // To preserve this order across tile boundaries these symbols can't
+            // be drawn across tile boundaries. Instead they need to be included in
+            // the buffers for both tiles and clipped to tile boundaries at draw time.
+            //
+            // TODO remove the `&& false` when is #1673 implemented
+            const bool addToBuffers = inside || (mayOverlap && false);
+
+            symbolInstances.emplace_back(anchor, line, shapedText, shapedIcon, layout, addToBuffers,
                     textBoxScale, textPadding, textAlongLine,
                     iconBoxScale, iconPadding, iconAlongLine,
                     face);
@@ -335,6 +352,24 @@ void SymbolBucket::placeFeatures(bool swapImmediately) {
         layout.icon.rotation_alignment == RotationAlignmentType::Map &&
         layout.placement == PlacementType::Line;
 
+    const bool mayOverlap = layout.text.allow_overlap || layout.icon.allow_overlap ||
+        layout.text.ignore_placement || layout.icon.ignore_placement;
+
+    // Sort symbols by their y position on the canvas so that they lower symbols
+    // are drawn on top of higher symbols.
+    // Don't sort symbols that won't overlap because it isn't necessary and
+    // because it causes more labels to pop in and out when rotating.
+    if (mayOverlap) {
+        float sin = std::sin(collision.angle);
+        float cos = std::cos(collision.angle);
+
+        std::sort(symbolInstances.begin(), symbolInstances.end(), [sin, cos](SymbolInstance &a, SymbolInstance &b) {
+            const float aRotated = sin * a.x + cos * a.y;
+            const float bRotated = sin * b.x + cos * b.y;
+            return aRotated < bRotated;
+        });
+    }
+
     for (SymbolInstance &symbolInstance : symbolInstances) {
 
         const bool hasText = symbolInstance.hasText;
@@ -342,7 +377,6 @@ void SymbolBucket::placeFeatures(bool swapImmediately) {
 
         const bool iconWithoutText = layout.text.optional || !hasText;
         const bool textWithoutIcon = layout.icon.optional || !hasIcon;
-
 
         // Calculate the scales at which the text and icon can be placed without collision.
 

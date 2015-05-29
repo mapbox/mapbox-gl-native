@@ -119,9 +119,35 @@ void Painter::renderSymbol(SymbolBucket &bucket, const StyleLayer &layer_desc, c
     const auto &properties = layer_desc.getProperties<SymbolProperties>();
     const auto &layout = bucket.layout;
 
-    config.stencilTest = false;
+    // TODO remove the `|| true` when #1673 is implemented
+    const bool drawAcrossEdges = !(layout.text.allow_overlap || layout.icon.allow_overlap ||
+          layout.text.ignore_placement || layout.icon.ignore_placement) || true;
+
+    // Disable the stencil test so that labels aren't clipped to tile boundaries.
+    //
+    // Layers with features that may be drawn overlapping aren't clipped. These
+    // layers are sorted in the y direction, and to draw the correct ordering near
+    // tile edges the icons are included in both tiles and clipped when drawing.
+    config.stencilTest = drawAcrossEdges ? false : true;
     config.depthTest = true;
     config.depthMask = GL_FALSE;
+
+    if (bucket.hasCollisionBoxData() && (
+                (bucket.hasIconData() && properties.icon.opacity) ||
+                (bucket.hasTextData() && properties.text.opacity))) {
+        config.stencilTest = true;
+
+        useProgram(collisionBoxShader->program);
+        collisionBoxShader->u_matrix = matrix;
+        collisionBoxShader->u_scale = std::pow(2, state.getNormalizedZoom() - id.z);
+        collisionBoxShader->u_zoom = state.getNormalizedZoom() * 10;
+        collisionBoxShader->u_maxzoom = (id.z + 1) * 10;
+        lineWidth(3.0f);
+
+        config.depthRange = { strata, 1.0f };
+        bucket.drawCollisionBoxes(*collisionBoxShader);
+
+    }
 
     if (bucket.hasIconData()) {
         bool sdf = bucket.sdfIcons;
@@ -191,23 +217,6 @@ void Painter::renderSymbol(SymbolBucket &bucket, const StyleLayer &layer_desc, c
                   {{ float(glyphAtlas.width) / 4, float(glyphAtlas.height) / 4 }},
                   *sdfGlyphShader,
                   &SymbolBucket::drawGlyphs);
-    }
-
-    if (bucket.hasCollisionBoxData() && (
-                (bucket.hasIconData() && properties.icon.opacity) ||
-                (bucket.hasTextData() && properties.text.opacity))) {
-        config.stencilTest = true;
-
-        useProgram(collisionBoxShader->program);
-        collisionBoxShader->u_matrix = matrix;
-        collisionBoxShader->u_scale = std::pow(2, state.getNormalizedZoom() - id.z);
-        collisionBoxShader->u_zoom = state.getNormalizedZoom() * 10;
-        collisionBoxShader->u_maxzoom = (id.z + 1) * 10;
-        lineWidth(3.0f);
-
-        config.depthRange = { strata, 1.0f };
-        bucket.drawCollisionBoxes(*collisionBoxShader);
-
     }
 
 }

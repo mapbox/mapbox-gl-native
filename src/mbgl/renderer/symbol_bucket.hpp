@@ -48,10 +48,12 @@ class SymbolInstance {
                 const float textBoxScale, const float textPadding, const float textAlongLine,
                 const float iconBoxScale, const float iconPadding, const float iconAlongLine,
                 const GlyphPositions &face);
-        const bool hasText;
-        const bool hasIcon;
-        const SymbolQuads glyphQuads;
-        const SymbolQuads iconQuads;
+        float x;
+        float y;
+        bool hasText;
+        bool hasIcon;
+        SymbolQuads glyphQuads;
+        SymbolQuads iconQuads;
         CollisionFeature textCollisionFeature;
         CollisionFeature iconCollisionFeature;
 };
