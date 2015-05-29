@@ -58,11 +58,15 @@ pod 'MapboxGL'
 
 #### Manually
 
-1. Install [appledoc](http://appledoc.gentlebytes.com/appledoc/) (2.2v963 or later) for API docs generation. This is installable via homebrew:
-  ```
-  brew install appledoc22
-  brew link --force appledoc22
-  ```
+1. Install [appledoc](http://appledoc.gentlebytes.com/appledoc/) 2.2v963 for API docs generation (only this exact version works).
+
+   ```
+   wget https://github.com/tomaz/appledoc/releases/download/v2.2-963/appledoc.zip
+   tar xvzf appledoc.zip
+   cp appledoc /usr/local/bin
+   cp -Rf Templates/ ~/.appledoc
+   ```
+     
 1. Run `make ipackage`. The packaging script will produce the statically-linked `libMapboxGL.a`, `MapboxGL.bundle` for resources, a `Headers` folder, and a `Docs` folder with HTML API documentation.
 1. Copy the contents of `build/ios/pkg/static` into your project. It should happen automatically, but ensure that:
    - `Headers` is in your *Header Search Paths* (`HEADER_SEARCH_PATHS`) build setting.
