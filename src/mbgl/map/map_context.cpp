@@ -176,6 +176,11 @@ void MapContext::renderStill(StillImageCallback fn) {
         throw util::Exception("Map is currently rendering an image");
     }
 
+    if (style->getLastError()) {
+        fn(style->getLastError(), nullptr);
+        return;
+    }
+
     callback = fn;
     triggerUpdate(Update::RenderStill);
 }

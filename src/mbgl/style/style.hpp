@@ -59,6 +59,10 @@ public:
     void setDefaultTransitionDuration(Duration);
     bool hasTransitions() const;
 
+    std::exception_ptr getLastError() const {
+        return lastError;
+    }
+
     std::unique_ptr<GlyphStore> glyphStore;
     std::unique_ptr<GlyphAtlas> glyphAtlas;
     util::ptr<Sprite> sprite;
@@ -89,6 +93,8 @@ private:
     bool shouldReparsePartialTiles = false;
 
     Observer* observer = nullptr;
+
+    std::exception_ptr lastError;
 
     std::string spriteURL;
     PropertyTransition defaultTransition;

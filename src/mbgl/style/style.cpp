@@ -203,6 +203,7 @@ void Style::emitResourceLoadingFailed(std::exception_ptr error) {
 
     try {
         if (error) {
+            lastError = error;
             std::rethrow_exception(error);
         }
     } catch(const std::exception& e) {
