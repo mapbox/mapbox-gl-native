@@ -15,4 +15,7 @@ brew install git
 mapbox_time "install_awscli" \
 brew install awscli
 
+mapbox_time "install_appledoc" \
+brew install appledoc22 && brew link --force appledoc22
+
 mkdir -p ${KIF_SCREENSHOTS}
