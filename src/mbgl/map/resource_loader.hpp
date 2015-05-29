@@ -32,6 +32,7 @@ public:
         virtual ~Observer() = default;
 
         virtual void onTileDataChanged() = 0;
+        virtual void onResourceLoadingFailed(std::exception_ptr error) = 0;
     };
 
     ResourceLoader();
@@ -48,9 +49,6 @@ public:
     // style.
     void setGlyphStore(GlyphStore* glyphStore);
 
-    // Set the access token to be used for loading the tile data.
-    void setAccessToken(const std::string& accessToken);
-
     // Fetch the tiles needed by the current viewport and emit a signal when
     // a tile is ready so observers can render the tile.
     void update(MapData&, const TransformState&, GlyphAtlas&, SpriteAtlas&, TexturePool&);
@@ -62,20 +60,24 @@ public:
 
     // GlyphStore::Observer implementation.
     void onGlyphRangeLoaded() override;
+    void onGlyphRangeLoadingFailed(std::exception_ptr error) override;
 
     // Source::Observer implementation.
     void onSourceLoaded() override;
+    void onSourceLoadingFailed(std::exception_ptr error) override;
     void onTileLoaded(bool isNewTile) override;
+    void onTileLoadingFailed(std::exception_ptr error) override;
 
     // Sprite::Observer implementation.
     void onSpriteLoaded() override;
+    void onSpriteLoadingFailed(std::exception_ptr error) override;
 
 private:
     void emitTileDataChanged();
+    void emitResourceLoadingFailed(std::exception_ptr error);
 
     bool shouldReparsePartialTiles_ = false;
 
-    std::string accessToken_;
     util::ptr<Sprite> sprite_;
 
     GlyphStore* glyphStore_ = nullptr;

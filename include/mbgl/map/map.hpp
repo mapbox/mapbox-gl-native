@@ -42,7 +42,7 @@ public:
 
     // Register a callback that will get called (on the render thread) when all resources have
     // been loaded and a complete render occurs.
-    using StillImageCallback = std::function<void(std::unique_ptr<const StillImage>)>;
+    using StillImageCallback = std::function<void(std::exception_ptr, std::unique_ptr<const StillImage>)>;
     void renderStill(StillImageCallback callback);
 
     // Triggers a synchronous or asynchronous render.
@@ -98,10 +98,6 @@ public:
     void resize(uint16_t width, uint16_t height, float ratio = 1);
     uint16_t getWidth() const;
     uint16_t getHeight() const;
-
-    // API
-    void setAccessToken(const std::string &token);
-    std::string getAccessToken() const;
 
     // Projection
     void getWorldBoundsMeters(ProjectedMeters &sw, ProjectedMeters &ne) const;

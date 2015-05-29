@@ -9,6 +9,7 @@
 #include <mbgl/text/get_anchors.hpp>
 #include <mbgl/renderer/painter.hpp>
 #include <mbgl/text/glyph_store.hpp>
+#include <mbgl/text/font_stack.hpp>
 #include <mbgl/platform/log.hpp>
 #include <mbgl/text/collision_tile.hpp>
 #include <mbgl/shader/sdf_shader.hpp>
@@ -217,7 +218,7 @@ void SymbolBucket::addFeatures(uintptr_t tileUID,
         layout.text.justify == TextJustifyType::Left ? 0 :
         0.5;
 
-    auto* fontStack = glyphStore.getFontStack(layout.text.font);
+    auto fontStack = glyphStore.getFontStack(layout.text.font);
 
     for (const auto& feature : features) {
         if (!feature.geometry.size()) continue;
@@ -241,7 +242,7 @@ void SymbolBucket::addFeatures(uintptr_t tileUID,
 
             // Add the glyphs we need for this label to the glyph atlas.
             if (shapedText) {
-                glyphAtlas.addGlyphs(tileUID, feature.label, layout.text.font, *fontStack, face);
+                glyphAtlas.addGlyphs(tileUID, feature.label, layout.text.font, **fontStack, face);
             }
         }
 
@@ -322,7 +323,7 @@ void SymbolBucket::placeFeatures() {
 
 void SymbolBucket::placeFeatures(bool swapImmediately) {
 
-    renderDataInProgress = util::make_unique<SymbolRenderData>();
+    renderDataInProgress = std::make_unique<SymbolRenderData>();
 
     // Calculate which labels can be shown and when they can be shown and
     // create the bufers used for rendering.
@@ -427,7 +428,7 @@ void SymbolBucket::addSymbols(Buffer &buffer, const SymbolQuads &symbols, float 
         if (!buffer.groups.size() ||
             (buffer.groups.back()->vertex_length + glyph_vertex_length > 65535)) {
             // Move to a new group because the old one can't hold the geometry.
-            buffer.groups.emplace_back(util::make_unique<GroupType>());
+            buffer.groups.emplace_back(std::make_unique<GroupType>());
         }
 
         // We're generating triangle fans, so we always start with the first
@@ -488,7 +489,7 @@ void SymbolBucket::addToDebugBuffers() {
                 auto& collisionBox = renderDataInProgress->collisionBox;
                 if (!collisionBox.groups.size()) {
                     // Move to a new group because the old one can't hold the geometry.
-                    collisionBox.groups.emplace_back(util::make_unique<CollisionBoxElementGroup>());
+                    collisionBox.groups.emplace_back(std::make_unique<CollisionBoxElementGroup>());
                 }
 
                 collisionBox.vertices.add(anchor.x, anchor.y, tl.x, tl.y, maxZoom, placementZoom);

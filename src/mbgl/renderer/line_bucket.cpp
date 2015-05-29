@@ -8,7 +8,6 @@
 #include <mbgl/shader/linesdf_shader.hpp>
 #include <mbgl/shader/linepattern_shader.hpp>
 #include <mbgl/util/math.hpp>
-#include <mbgl/util/std.hpp>
 #include <mbgl/platform/gl.hpp>
 
 #ifndef BUFFER_OFFSET
@@ -290,7 +289,7 @@ void LineBucket::addGeometry(const std::vector<Coordinate>& vertices) {
         if (!triangleGroups.size() ||
             (triangleGroups.back()->vertex_length + vertexCount > 65535)) {
             // Move to a new group because the old one can't hold the geometry.
-            triangleGroups.emplace_back(util::make_unique<TriangleGroup>());
+            triangleGroups.emplace_back(std::make_unique<TriangleGroup>());
         }
 
         assert(triangleGroups.back());

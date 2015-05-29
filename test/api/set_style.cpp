@@ -14,7 +14,7 @@ TEST(API, SetStyle) {
     HeadlessView view(display);
     DefaultFileSource fileSource(nullptr);
 
-    Log::setObserver(util::make_unique<FixtureLogObserver>());
+    Log::setObserver(std::make_unique<FixtureLogObserver>());
 
     {
         Map map(view, fileSource, MapMode::Still);

@@ -20,7 +20,7 @@ TEST(API, RepeatedRender) {
     HeadlessView view(display);
     DefaultFileSource fileSource(nullptr);
 
-    Log::setObserver(util::make_unique<FixtureLogObserver>());
+    Log::setObserver(std::make_unique<FixtureLogObserver>());
 
     Map map(view, fileSource, MapMode::Still);
 
@@ -28,7 +28,7 @@ TEST(API, RepeatedRender) {
         map.resize(128, 512, 1);
         map.setStyleJSON(style, "test/suite");
         std::promise<std::unique_ptr<const StillImage>> promise;
-        map.renderStill([&promise](std::unique_ptr<const StillImage> image) {
+        map.renderStill([&promise](std::exception_ptr, std::unique_ptr<const StillImage> image) {
             promise.set_value(std::move(image));
         });
         auto result = promise.get_future().get();
@@ -42,7 +42,7 @@ TEST(API, RepeatedRender) {
         map.resize(512, 512, 2);
         map.setStyleJSON(style, "TEST_DATA/suite");
         std::promise<std::unique_ptr<const StillImage>> promise;
-        map.renderStill([&promise](std::unique_ptr<const StillImage> image) {
+        map.renderStill([&promise](std::exception_ptr, std::unique_ptr<const StillImage> image) {
             promise.set_value(std::move(image));
         });
         auto result = promise.get_future().get();

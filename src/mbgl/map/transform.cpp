@@ -2,7 +2,6 @@
 #include <mbgl/map/view.hpp>
 #include <mbgl/util/constants.hpp>
 #include <mbgl/util/mat4.hpp>
-#include <mbgl/util/std.hpp>
 #include <mbgl/util/math.hpp>
 #include <mbgl/util/unitbezier.hpp>
 #include <mbgl/util/interpolate.hpp>
@@ -384,6 +383,7 @@ void Transform::_setAngle(double new_angle, const Duration duration) {
                            MapChangeRegionWillChange);
 
     final.angle = _normalizeAngle(new_angle, current.angle);
+    current.angle = _normalizeAngle(current.angle, final.angle);
 
     if (duration == Duration::zero()) {
         current.angle = final.angle;

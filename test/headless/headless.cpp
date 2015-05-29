@@ -4,7 +4,6 @@
 #include <mbgl/map/map.hpp>
 #include <mbgl/map/still_image.hpp>
 #include <mbgl/util/image.hpp>
-#include <mbgl/util/std.hpp>
 
 #include <mbgl/util/io.hpp>
 #include <rapidjson/document.h>
@@ -152,7 +151,7 @@ TEST_P(HeadlessTest, render) {
         map.setLatLngZoom(mbgl::LatLng(latitude, longitude), zoom);
         map.setBearing(bearing);
 
-        map.renderStill([&](std::unique_ptr<const StillImage> image) {
+        map.renderStill([&](std::exception_ptr, std::unique_ptr<const StillImage> image) {
             const std::string png = util::compress_png(image->width, image->height, image->pixels.get());
             util::write_file("test/suite/tests/" + base + "/" + name +  "/actual.png", png);
             promise.set_value();

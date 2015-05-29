@@ -15,7 +15,6 @@
 #include <mbgl/platform/event.hpp>
 #include <mbgl/platform/log.hpp>
 #include <mbgl/platform/gl.hpp>
-#include <mbgl/util/std.hpp>
 
 namespace mbgl {
 namespace android {
@@ -214,7 +213,7 @@ void NativeMapView::initializeDisplay() {
         throw new std::runtime_error("eglChooseConfig() failed");
     }
 
-    const std::unique_ptr<EGLConfig[]> configs = mbgl::util::make_unique<EGLConfig[]>(numConfigs);
+    const auto configs = std::make_unique<EGLConfig[]>(numConfigs);
     if (!eglChooseConfig(display, configAttribs, configs.get(), numConfigs, &numConfigs)) {
         mbgl::Log::Error(mbgl::Event::OpenGL, "eglChooseConfig() returned error %d", eglGetError());
         throw new std::runtime_error("eglChooseConfig() failed");

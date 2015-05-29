@@ -1,11 +1,11 @@
 #ifndef MBGL_UTIL_IMAGE_READER_HPP
 #define MBGL_UTIL_IMAGE_READER_HPP
 
-#include <mbgl/util/std.hpp>
 #include <mbgl/util/noncopyable.hpp>
 // stl
 #include <stdexcept>
 #include <string>
+#include <memory>
 
 namespace mbgl { namespace util {
 

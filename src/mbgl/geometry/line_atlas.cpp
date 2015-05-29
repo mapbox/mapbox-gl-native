@@ -3,7 +3,6 @@
 #include <mbgl/platform/gl.hpp>
 #include <mbgl/platform/log.hpp>
 #include <mbgl/platform/platform.hpp>
-#include <mbgl/util/std.hpp>
 
 #include <boost/functional/hash.hpp>
 
@@ -15,7 +14,7 @@ using namespace mbgl;
 LineAtlas::LineAtlas(uint16_t w, uint16_t h)
     : width(w),
       height(h),
-      data(util::make_unique<uint8_t[]>(w * h)),
+      data(std::make_unique<uint8_t[]>(w * h)),
       dirty(true) {
 }
 

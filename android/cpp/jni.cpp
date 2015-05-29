@@ -373,14 +373,14 @@ nativeSetAccessToken(JNIEnv *env, jobject obj, jlong nativeMapViewPtr, jstring a
     mbgl::Log::Debug(mbgl::Event::JNI, "nativeSetAccessToken");
     assert(nativeMapViewPtr != 0);
     NativeMapView *nativeMapView = reinterpret_cast<NativeMapView *>(nativeMapViewPtr);
-    nativeMapView->getMap().setAccessToken(std_string_from_jstring(env, accessToken));
+    nativeMapView->getFileSource().setAccessToken(std_string_from_jstring(env, accessToken));
 }
 
 jstring JNICALL nativeGetAccessToken(JNIEnv *env, jobject obj, jlong nativeMapViewPtr) {
     mbgl::Log::Debug(mbgl::Event::JNI, "nativeGetAccessToken");
     assert(nativeMapViewPtr != 0);
     NativeMapView *nativeMapView = reinterpret_cast<NativeMapView *>(nativeMapViewPtr);
-    return std_string_to_jstring(env, nativeMapView->getMap().getAccessToken());
+    return std_string_to_jstring(env, nativeMapView->getFileSource().getAccessToken());
 }
 
 void JNICALL nativeCancelTransitions(JNIEnv *env, jobject obj, jlong nativeMapViewPtr) {

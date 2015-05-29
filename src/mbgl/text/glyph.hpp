@@ -5,6 +5,7 @@
 
 #include <cstdint>
 #include <vector>
+#include <string>
 #include <map>
 
 namespace mbgl {
@@ -68,6 +69,17 @@ class Shaping {
     operator bool() const { return positionedGlyphs.size(); }
 };
 
-}
+class SDFGlyph {
+public:
+    uint32_t id = 0;
+
+    // A signed distance field of the glyph with a border of 3 pixels.
+    std::string bitmap;
+
+    // Glyph metrics
+    GlyphMetrics metrics;
+};
+
+} // end namespace mbgl
 
 #endif

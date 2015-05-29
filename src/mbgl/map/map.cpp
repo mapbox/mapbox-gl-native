@@ -3,15 +3,14 @@
 #include <mbgl/map/view.hpp>
 #include <mbgl/map/map_data.hpp>
 
-#include <mbgl/util/std.hpp>
 #include <mbgl/util/projection.hpp>
 #include <mbgl/util/thread.hpp>
 
 namespace mbgl {
 
 Map::Map(View& view, FileSource& fileSource, MapMode mode)
-    : data(util::make_unique<MapData>(view, mode)),
-      context(util::make_unique<util::Thread<MapContext>>("Map", util::ThreadPriority::Regular, view, fileSource, *data))
+    : data(std::make_unique<MapData>(view, mode)),
+      context(std::make_unique<util::Thread<MapContext>>("Map", util::ThreadPriority::Regular, view, fileSource, *data))
 {
     view.initialize(this);
 }
@@ -192,17 +191,6 @@ double Map::getBearing() const {
 void Map::resetNorth() {
     data->transform.setAngle(0, std::chrono::milliseconds(500));
     update();
-}
-
-
-#pragma mark - Access Token
-
-void Map::setAccessToken(const std::string &token) {
-    data->setAccessToken(token);
-}
-
-std::string Map::getAccessToken() const {
-    return data->getAccessToken();
 }
 
 

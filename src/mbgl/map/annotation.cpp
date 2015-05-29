@@ -5,7 +5,6 @@
 #include <mbgl/map/map_data.hpp>
 #include <mbgl/util/constants.hpp>
 #include <mbgl/util/ptr.hpp>
-#include <mbgl/util/std.hpp>
 
 #include <algorithm>
 #include <memory>
@@ -110,7 +109,7 @@ AnnotationManager::addPointAnnotations(const std::vector<LatLng>& points,
         // track the annotation global ID and its geometry
         auto anno_it = annotations.emplace(
             annotationID,
-            util::make_unique<Annotation>(AnnotationType::Point,
+            std::make_unique<Annotation>(AnnotationType::Point,
                                           AnnotationSegments({ { points[i] } })));
 
         const uint8_t maxZoom = data.transform.getMaxZoom();
@@ -162,7 +161,7 @@ AnnotationManager::addPointAnnotations(const std::vector<LatLng>& points,
                 // create tile & record annotation association
                 auto tile_pos = tiles.emplace(
                     tileID, std::make_pair(std::unordered_set<uint32_t>({ annotationID }),
-                                           util::make_unique<LiveTile>()));
+                                           std::make_unique<LiveTile>()));
                 // add point layer to tile
                 tile_pos.first->second.second->addLayer(layerID, layer);
             }

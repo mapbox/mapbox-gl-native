@@ -20,11 +20,9 @@
 
 #include <mbgl/style/style.hpp>
 
-#include <mbgl/util/std.hpp>
 #include <mbgl/util/uv_detail.hpp>
 #include <mbgl/util/worker.hpp>
 #include <mbgl/util/texture_pool.hpp>
-#include <mbgl/util/mapbox.hpp>
 #include <mbgl/util/exception.hpp>
 
 namespace mbgl {
@@ -35,12 +33,12 @@ MapContext::MapContext(uv_loop_t* loop, View& view_, FileSource& fileSource, Map
       env(fileSource),
       envScope(env, ThreadType::Map, "Map"),
       updated(static_cast<UpdateType>(Update::Nothing)),
-      asyncUpdate(util::make_unique<uv::async>(loop, [this] { update(); })),
-      glyphStore(util::make_unique<GlyphStore>(loop, env)),
-      glyphAtlas(util::make_unique<GlyphAtlas>(1024, 1024)),
-      spriteAtlas(util::make_unique<SpriteAtlas>(512, 512)),
-      lineAtlas(util::make_unique<LineAtlas>(512, 512)),
-      texturePool(util::make_unique<TexturePool>()) {
+      asyncUpdate(std::make_unique<uv::async>(loop, [this] { update(); })),
+      glyphStore(std::make_unique<GlyphStore>(loop, env)),
+      glyphAtlas(std::make_unique<GlyphAtlas>(1024, 1024)),
+      spriteAtlas(std::make_unique<SpriteAtlas>(512, 512)),
+      lineAtlas(std::make_unique<LineAtlas>(512, 512)),
+      texturePool(std::make_unique<TexturePool>()) {
     assert(Environment::currentlyOn(ThreadType::Map));
 
     asyncUpdate->unref();
@@ -90,7 +88,7 @@ void MapContext::triggerUpdate(const Update u) {
 }
 
 void MapContext::setStyleURL(const std::string& url) {
-    styleURL = mbgl::util::mapbox::normalizeStyleURL(url, data.getAccessToken());
+    styleURL = url;
     styleJSON.clear();
 
     const size_t pos = styleURL.rfind('/');
@@ -99,7 +97,7 @@ void MapContext::setStyleURL(const std::string& url) {
         base = styleURL.substr(0, pos + 1);
     }
 
-    env.request({ Resource::Kind::JSON, styleURL }, [this, base](const Response &res) {
+    env.request({ Resource::Kind::Style, styleURL }, [this, base](const Response &res) {
         if (res.status == Response::Successful) {
             loadStyleJSON(res.data, base);
         } else {
@@ -121,17 +119,15 @@ void MapContext::loadStyleJSON(const std::string& json, const std::string& base)
     resourceLoader.reset();
     style.reset();
 
-    style = util::make_unique<Style>();
+    style = std::make_unique<Style>();
     style->base = base;
     style->loadJSON((const uint8_t *)json.c_str());
     style->cascade(data.getClasses());
     style->setDefaultTransitionDuration(data.getDefaultTransitionDuration());
 
-    const std::string glyphURL = util::mapbox::normalizeGlyphsURL(style->glyph_url, data.getAccessToken());
-    glyphStore->setURL(glyphURL);
+    glyphStore->setURL(style->glyph_url);
 
-    resourceLoader = util::make_unique<ResourceLoader>();
-    resourceLoader->setAccessToken(data.getAccessToken());
+    resourceLoader = std::make_unique<ResourceLoader>();
     resourceLoader->setObserver(this);
     resourceLoader->setStyle(style.get());
     resourceLoader->setGlyphStore(glyphStore.get());
@@ -224,7 +220,7 @@ void MapContext::render() {
     assert(style);
 
     if (!painter) {
-        painter = util::make_unique<Painter>(*spriteAtlas, *glyphAtlas, *lineAtlas);
+        painter = std::make_unique<Painter>(*spriteAtlas, *glyphAtlas, *lineAtlas);
         painter->setup();
     }
 
@@ -232,7 +228,7 @@ void MapContext::render() {
     painter->render(*style, transformState, data.getAnimationTime());
 
     if (data.mode == MapMode::Still) {
-        callback(view.readStillImage());
+        callback(nullptr, view.readStillImage());
         callback = nullptr;
     }
 
@@ -272,6 +268,15 @@ void MapContext::onLowMemory() {
 void MapContext::onTileDataChanged() {
     assert(Environment::currentlyOn(ThreadType::Map));
     triggerUpdate();
+}
+
+void MapContext::onResourceLoadingFailed(std::exception_ptr error) {
+    assert(Environment::currentlyOn(ThreadType::Map));
+
+    if (data.mode == MapMode::Still && callback) {
+        callback(error, nullptr);
+        callback = nullptr;
+    }
 }
 
 }

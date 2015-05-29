@@ -9,10 +9,12 @@ namespace mbgl {
 struct Resource {
     enum Kind : uint8_t {
         Unknown = 0,
-        Tile = 1,
-        Glyphs = 2,
-        Image = 3,
-        JSON = 4,
+        Style,
+        Source,
+        Tile,
+        Glyphs,
+        JSON,
+        Image
     };
 
     const Kind kind;

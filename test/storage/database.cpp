@@ -11,7 +11,7 @@
 TEST_F(Storage, DatabaseDoesNotExist) {
     using namespace mbgl;
 
-    Log::setObserver(util::make_unique<FixtureLogObserver>());
+    Log::setObserver(std::make_unique<FixtureLogObserver>());
 
     SQLiteCache::Impl cache(nullptr, "test/fixtures/404/cache.db");
 
@@ -52,7 +52,7 @@ TEST_F(Storage, DatabaseCreate) {
     createDir("test/fixtures/database");
     deleteFile("test/fixtures/database/cache.db");
 
-    Log::setObserver(util::make_unique<FixtureLogObserver>());
+    Log::setObserver(std::make_unique<FixtureLogObserver>());
 
     SQLiteCache::Impl cache(nullptr, "test/fixtures/database/cache.db");
 
@@ -113,7 +113,7 @@ TEST_F(Storage, DatabaseLockedRead) {
 
     {
         // First request should fail.
-        Log::setObserver(util::make_unique<FixtureLogObserver>());
+        Log::setObserver(std::make_unique<FixtureLogObserver>());
 
         std::unique_ptr<Response> res = cache.get({ Resource::Unknown, "mapbox://test" });
         EXPECT_EQ(nullptr, res.get());
@@ -129,7 +129,7 @@ TEST_F(Storage, DatabaseLockedRead) {
 
     {
         // First, try getting a file (the cache value should not exist).
-        Log::setObserver(util::make_unique<FixtureLogObserver>());
+        Log::setObserver(std::make_unique<FixtureLogObserver>());
 
         std::unique_ptr<Response> res = cache.get({ Resource::Unknown, "mapbox://test" });
         EXPECT_EQ(nullptr, res.get());
@@ -153,7 +153,7 @@ TEST_F(Storage, DatabaseLockedWrite) {
 
     {
         // Adds a file (which should fail).
-        Log::setObserver(util::make_unique<FixtureLogObserver>());
+        Log::setObserver(std::make_unique<FixtureLogObserver>());
 
         auto response = std::make_shared<Response>();
         cache.put({ Resource::Unknown, "mapbox://test" }, response);
@@ -170,7 +170,7 @@ TEST_F(Storage, DatabaseLockedWrite) {
 
     {
         // Then, set a file and obtain it again.
-        Log::setObserver(util::make_unique<FixtureLogObserver>());
+        Log::setObserver(std::make_unique<FixtureLogObserver>());
 
         auto response = std::make_shared<Response>();
         response->data = "Demo";
@@ -201,7 +201,7 @@ TEST_F(Storage, DatabaseLockedRefresh) {
 
     {
         // Adds a file.
-        Log::setObserver(util::make_unique<FixtureLogObserver>());
+        Log::setObserver(std::make_unique<FixtureLogObserver>());
 
         auto response = std::make_shared<Response>();
         response->data = "Demo";
@@ -216,7 +216,7 @@ TEST_F(Storage, DatabaseLockedRefresh) {
 
     {
         // Then, try to refresh it.
-        Log::setObserver(util::make_unique<FixtureLogObserver>());
+        Log::setObserver(std::make_unique<FixtureLogObserver>());
 
         auto response = std::make_shared<Response>();
         response->data = "Demo";
@@ -244,7 +244,7 @@ TEST_F(Storage, DatabaseDeleted) {
 
     {
         // Adds a file.
-        Log::setObserver(util::make_unique<FixtureLogObserver>());
+        Log::setObserver(std::make_unique<FixtureLogObserver>());
 
         auto response = std::make_shared<Response>();
         response->data = "Demo";
@@ -260,7 +260,7 @@ TEST_F(Storage, DatabaseDeleted) {
 
     {
         // Adds a file.
-        Log::setObserver(util::make_unique<FixtureLogObserver>());
+        Log::setObserver(std::make_unique<FixtureLogObserver>());
 
         auto response = std::make_shared<Response>();
         response->data = "Demo";
@@ -289,7 +289,7 @@ TEST_F(Storage, DatabaseInvalid) {
 
     {
         // Adds a file.
-        Log::setObserver(util::make_unique<FixtureLogObserver>());
+        Log::setObserver(std::make_unique<FixtureLogObserver>());
 
         auto response = std::make_shared<Response>();
         response->data = "Demo";

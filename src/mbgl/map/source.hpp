@@ -58,13 +58,16 @@ public:
         virtual ~Observer() = default;
 
         virtual void onSourceLoaded() = 0;
+        virtual void onSourceLoadingFailed(std::exception_ptr error) = 0;
+
         virtual void onTileLoaded(bool isNewTile) = 0;
+        virtual void onTileLoadingFailed(std::exception_ptr error) = 0;
     };
 
     Source();
     ~Source();
 
-    void load(const std::string& accessToken);
+    void load();
     bool isLoaded() const;
 
     void load(MapData&, Environment&, std::function<void()> callback);
@@ -102,8 +105,12 @@ public:
 
 private:
     void redoPlacement(const TransformState& transformState, bool collisionDebug);
+    void tileLoadingCompleteCallback(const TileID& normalized_id);
+
     void emitSourceLoaded();
+    void emitSourceLoadingFailed(const std::string& message);
     void emitTileLoaded(bool isNewTile);
+    void emitTileLoadingFailed(const std::string& message);
 
     bool handlePartialTile(const TileID &id, Worker &worker);
     bool findLoadedChildren(const TileID& id, int32_t maxCoveringZoom, std::forward_list<TileID>& retain);

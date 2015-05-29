@@ -13,9 +13,11 @@
 
 #include <sys/sysctl.h>
 
+static const NSUInteger version = 1;
 static NSString *const MGLMapboxEventsUserAgent = @"MapboxEventsiOS/1.0";
 static NSString *MGLMapboxEventsAPIBase = @"https://api.tiles.mapbox.com";
 
+NSString *const MGLEventTypeAppUserTurnstile = @"appUserTurnstile";
 NSString *const MGLEventTypeMapLoad = @"map.load";
 NSString *const MGLEventTypeMapTap = @"map.click";
 NSString *const MGLEventTypeMapDragEnd = @"map.dragend";
@@ -52,7 +54,6 @@ const NSTimeInterval MGLFlushInterval = 60;
 // All of the following properties are written to only from
 // the main thread, but can be read on any thread.
 //
-@property (atomic) NSString *instanceID;
 @property (atomic) NSString *advertiserId;
 @property (atomic) NSString *vendorId;
 @property (atomic) NSString *model;
@@ -66,8 +67,7 @@ const NSTimeInterval MGLFlushInterval = 60;
 
 - (instancetype)init {
     if (self = [super init]) {
-        _instanceID = [[NSUUID UUID] UUIDString];
-        
+
         // Dynamic detection of ASIdentifierManager from Mixpanel
         // https://github.com/mixpanel/mixpanel-iphone/blob/master/LICENSE
         _advertiserId = @"";
@@ -143,6 +143,7 @@ const NSTimeInterval MGLFlushInterval = 60;
 @property (atomic) NSString *appName;
 @property (atomic) NSString *appVersion;
 @property (atomic) NSString *appBuildNumber;
+@property (atomic) NSString *instanceID;
 @property (atomic) NSDateFormatter *rfc3339DateFormatter;
 @property (atomic) NSURLSession *session;
 @property (atomic) NSData *digicertCert;
@@ -176,8 +177,10 @@ const NSTimeInterval MGLFlushInterval = 60;
 
 + (void)initialize {
     if (self == [MGLMapboxEvents class]) {
+        NSBundle *bundle = [NSBundle mainBundle];
+        NSNumber *accountTypeNumber = [bundle objectForInfoDictionaryKey:@"MGLMapboxAccountType"];
         [[NSUserDefaults standardUserDefaults] registerDefaults:@{
-             @"MGLMapboxAccountType": @0,
+             @"MGLMapboxAccountType": accountTypeNumber ? accountTypeNumber : @0,
              @"MGLMapboxMetricsEnabled": @YES,
          }];
     }
@@ -195,7 +198,8 @@ const NSTimeInterval MGLFlushInterval = 60;
 
     self = [super init];
     if (self) {
-        if (! [MGLAccountManager mapboxMetricsEnabledSettingShownInApp]) {
+        if (! [MGLAccountManager mapboxMetricsEnabledSettingShownInApp] &&
+            [[NSUserDefaults standardUserDefaults] integerForKey:@"MGLMapboxAccountType"] == 0) {
             // Opt Out is not configured in UI, so check for Settings.bundle
             // Put Settings bundle into memory
             id defaultEnabledValue;
@@ -213,7 +217,7 @@ const NSTimeInterval MGLFlushInterval = 60;
                 }
             }
 
-            NSAssert(defaultEnabledValue, @"End users must be able to opt out of Metrics in your app, either inside Settings (via Settings.bundle) or inside this app. If you implement the opt-out control inside this app, disable this assertion by setting [MGLAccountManager setMapboxMetricsEnabledSettingShownInApp:YES] before the app initializes any Mapbox GL classes.");
+            NSAssert(defaultEnabledValue, @"End users must be able to opt out of Metrics in your app, either inside Settings (via Settings.bundle) or inside this app. If you implement the opt-out control inside this app, disable this assertion by setting MGLMapboxMetricsEnabledSettingShownInApp to YES in Info.plist.");
             [[NSUserDefaults standardUserDefaults] registerDefaults:@{
                  @"MGLMapboxMetricsEnabled": defaultEnabledValue,
              }];
@@ -223,7 +227,8 @@ const NSTimeInterval MGLFlushInterval = 60;
         _appName = [[NSBundle mainBundle] objectForInfoDictionaryKey:@"CFBundleName"];
         _appVersion = [[NSBundle mainBundle] objectForInfoDictionaryKey:@"CFBundleShortVersionString"];
         _appBuildNumber = [[NSBundle mainBundle] objectForInfoDictionaryKey:@"CFBundleVersion"];
-        
+        _instanceID = [[NSUUID UUID] UUIDString];
+
         NSString *uniqueID = [[NSProcessInfo processInfo] globallyUniqueString];
         _serialQueue = dispatch_queue_create([[NSString stringWithFormat:@"%@.%@.events.serial", _appBundleId, uniqueID] UTF8String], DISPATCH_QUEUE_SERIAL);
 
@@ -277,6 +282,11 @@ const NSTimeInterval MGLFlushInterval = 60;
              MGLMapboxEvents *strongSelf = weakSelf;
              [strongSelf validate];
          }];
+
+        // Turn the Mapbox Turnstile to Count App Users
+        dispatch_async(dispatch_get_global_queue(DISPATCH_QUEUE_PRIORITY_BACKGROUND, 0), ^{
+            [self pushTurnstileEvent];
+        });
     }
     return self;
 }
@@ -315,6 +325,7 @@ const NSTimeInterval MGLFlushInterval = 60;
     [[MGLMapboxEvents sharedManager] validate];
 }
 
+// Used to determine if Mapbox Metrics should be collected at any given point in time
 - (void)validate {
     MGLAssertIsMainThread();
     BOOL enabledInSettings = [[self class] isEnabled];
@@ -414,6 +425,33 @@ const NSTimeInterval MGLFlushInterval = 60;
     }
 }
 
+- (void) pushTurnstileEvent {
+
+    __weak MGLMapboxEvents *weakSelf = self;
+
+    dispatch_async(_serialQueue, ^{
+
+        MGLMapboxEvents *strongSelf = weakSelf;
+
+        if ( ! strongSelf) return;
+
+            // Build only IDFV event
+            NSString *vid = [[[UIDevice currentDevice] identifierForVendor] UUIDString];
+            NSDictionary *vevt = @{@"event" : MGLEventTypeAppUserTurnstile,
+                                   @"created" : [strongSelf.rfc3339DateFormatter stringFromDate:[NSDate date]],
+                                   @"appBundleId" : strongSelf.appBundleId,
+                                   @"vendorId": vid,
+                                   @"version": @(version),
+                                   @"instance": strongSelf.instanceID};
+
+            // Add to Queue
+            [_eventQueue addObject:vevt];
+
+            // Flush
+            [strongSelf flush];
+    });
+}
+
 // Can be called from any thread. Can be called rapidly from
 // the UI thread, so performance is paramount.
 //
@@ -430,9 +468,11 @@ const NSTimeInterval MGLFlushInterval = 60;
     __weak MGLMapboxEvents *weakSelf = self;
 
     dispatch_async(_serialQueue, ^{
+
         MGLMapboxEvents *strongSelf = weakSelf;
+
         if ( ! strongSelf) return;
-        
+
         // Metrics Collection Has Been Paused
         if (_paused) {
             return;
@@ -443,9 +483,9 @@ const NSTimeInterval MGLFlushInterval = 60;
         NSMutableDictionary *evt = [[NSMutableDictionary alloc] initWithDictionary:attributeDictionary];
         // mapbox-events stock attributes
         [evt setObject:event forKey:@"event"];
-        [evt setObject:@(1) forKey:@"version"];
+        [evt setObject:@(version) forKey:@"version"];
         [evt setObject:[strongSelf.rfc3339DateFormatter stringFromDate:[NSDate date]] forKey:@"created"];
-        [evt setObject:strongSelf.data.instanceID forKey:@"instance"];
+        [evt setObject:strongSelf.instanceID forKey:@"instance"];
         [evt setObject:strongSelf.data.advertiserId forKey:@"advertiserId"];
         [evt setObject:strongSelf.data.vendorId forKey:@"vendorId"];
         [evt setObject:strongSelf.appBundleId forKeyedSubscript:@"appBundleId"];

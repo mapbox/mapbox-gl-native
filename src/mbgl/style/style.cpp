@@ -5,7 +5,6 @@
 #include <mbgl/style/style_parser.hpp>
 #include <mbgl/style/style_bucket.hpp>
 #include <mbgl/util/constants.hpp>
-#include <mbgl/util/std.hpp>
 #include <mbgl/util/uv_detail.hpp>
 #include <mbgl/platform/log.hpp>
 #include <csscolorparser/csscolorparser.hpp>
@@ -17,7 +16,7 @@
 namespace mbgl {
 
 Style::Style()
-    : mtx(util::make_unique<uv::rwlock>()),
+    : mtx(std::make_unique<uv::rwlock>()),
       workers(4) {
 }
 

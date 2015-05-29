@@ -3,7 +3,6 @@
 #include <mbgl/style/style_layer.hpp>
 #include <mbgl/map/annotation.hpp>
 #include <mbgl/util/constants.hpp>
-#include <mbgl/util/std.hpp>
 #include <mbgl/util/vec.hpp>
 #include <mbgl/util/uv_detail.hpp>
 #include <mbgl/platform/log.hpp>

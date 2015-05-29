@@ -127,10 +127,12 @@ SpriteAtlasPosition SpriteAtlas::getPosition(const std::string& name, bool repea
         rect.h = pos.height / pos.pixelRatio;
     }
 
+    const float padding = 1;
+
     return SpriteAtlasPosition {
         {{ float(rect.w), float(rect.h) }},
-        {{ float(rect.x)          / width, float(rect.y)          / height }},
-        {{ float(rect.x + rect.w) / width, float(rect.y + rect.h) / height }}
+        {{ float(rect.x + padding)          / width, float(rect.y + padding)          / height }},
+        {{ float(rect.x + padding + rect.w) / width, float(rect.y + padding + rect.h) / height }}
     };
 }
 
@@ -138,7 +140,7 @@ void SpriteAtlas::allocate() {
     if (!data) {
         dimension w = static_cast<dimension>(width * pixelRatio);
         dimension h = static_cast<dimension>(height * pixelRatio);
-        data = util::make_unique<uint32_t[]>(w * h);
+        data = std::make_unique<uint32_t[]>(w * h);
         std::fill(data.get(), data.get() + w * h, 0);
     }
 }
@@ -151,12 +153,14 @@ void SpriteAtlas::copy(const Rect<dimension>& dst, const SpritePosition& src, co
     const vec2<uint32_t> srcSize { sprite->raster->getWidth(), sprite->raster->getHeight() };
     const Rect<uint32_t> srcPos { src.x, src.y, src.width, src.height };
 
+    const int offset = 1;
+
     allocate();
     uint32_t *const dstData = data.get();
     const vec2<uint32_t> dstSize { static_cast<unsigned int>(width * pixelRatio),
                                    static_cast<unsigned int>(height * pixelRatio) };
-    const Rect<uint32_t> dstPos { static_cast<uint32_t>(dst.x * pixelRatio),
-                                  static_cast<uint32_t>(dst.y * pixelRatio),
+    const Rect<uint32_t> dstPos { static_cast<uint32_t>((offset + dst.x) * pixelRatio),
+                                  static_cast<uint32_t>((offset + dst.y) * pixelRatio),
                                   static_cast<uint32_t>(dst.originalW * pixelRatio),
                                   static_cast<uint32_t>(dst.originalH * pixelRatio) };
 
@@ -295,6 +299,8 @@ void SpriteAtlas::bind(bool linear) {
 
 SpriteAtlas::~SpriteAtlas() {
     std::lock_guard<std::recursive_mutex> lock(mtx);
-    Environment::Get().abandonTexture(texture);
-    texture = 0;
+    if (texture) {
+        Environment::Get().abandonTexture(texture);
+        texture = 0;
+    }
 }

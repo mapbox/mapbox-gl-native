@@ -94,7 +94,7 @@ script:
 after_failure:
 - "[ -f ./scripts/${FLAVOR}/after_failure.sh ] && ./scripts/${FLAVOR}/after_failure.sh"
 
-after_failure:
+after_script:
 - "[ -f ./scripts/${FLAVOR}/after_script.sh ] && ./scripts/${FLAVOR}/after_script.sh"
 
 notifications:

@@ -2,7 +2,6 @@
 #include <mbgl/storage/resource.hpp>
 #include <mbgl/storage/response.hpp>
 
-#include <mbgl/util/std.hpp>
 #include <mbgl/util/time.hpp>
 #include <mbgl/util/parsedate.h>
 
@@ -91,6 +90,7 @@ public:
 
     NSURLSession *session = nil;
     NSString *userAgent = nil;
+    NSInteger accountType = 0;
 };
 
 HTTPNSURLContext::HTTPNSURLContext(uv_loop_t *loop_) : HTTPContext(loop_) {
@@ -107,6 +107,8 @@ HTTPNSURLContext::HTTPNSURLContext(uv_loop_t *loop_) : HTTPContext(loop_) {
 
         // Write user agent string
         userAgent = @"MapboxGL";
+        
+        accountType = [[NSUserDefaults standardUserDefaults] integerForKey:@"MGLMapboxAccountType"];
     }
 }
 
@@ -153,17 +155,15 @@ void HTTPRequest::start() {
 
     @autoreleasepool {
         
-        NSMutableString *url = [NSMutableString stringWithString:@(resource.url.c_str())];
-        if ([[NSUserDefaults standardUserDefaults] integerForKey:@"MGLMapboxAccountType"] == 0) {
-            if ([url rangeOfString:@"?"].location == NSNotFound) {
-                [url appendString:@"?"];
-            } else {
-                [url appendString:@"&"];
-            }
-            [url appendString:@"events=true"];
+        NSURL *url = [NSURL URLWithString:@(resource.url.c_str())];
+        if (context->accountType == 0 &&
+            ([url.host isEqualToString:@"mapbox.com"] || [url.host hasSuffix:@".mapbox.com"])) {
+            NSString *absoluteString = [url.absoluteString stringByAppendingFormat:
+                                        (url.query ? @"&%@" : @"?%@"), @"events=true"];
+            url = [NSURL URLWithString:absoluteString];
         }
 
-        NSMutableURLRequest *req = [NSMutableURLRequest requestWithURL:[NSURL URLWithString:url]];
+        NSMutableURLRequest *req = [NSMutableURLRequest requestWithURL:url];
         if (existingResponse) {
             if (!existingResponse->etag.empty()) {
                 [req addValue:@(existingResponse->etag.c_str()) forHTTPHeaderField:@"If-None-Match"];
@@ -249,7 +249,7 @@ void HTTPRequest::handleResult(NSData *data, NSURLResponse *res, NSError *error)
         } else {
             // TODO: Use different codes for host not found, timeout, invalid URL etc.
             // These can be categorized in temporary and permanent errors.
-            response = util::make_unique<Response>();
+            response = std::make_unique<Response>();
             response->status = Response::Error;
             response->message = [[error localizedDescription] UTF8String];
 
@@ -281,7 +281,7 @@ void HTTPRequest::handleResult(NSData *data, NSURLResponse *res, NSError *error)
     } else if ([res isKindOfClass:[NSHTTPURLResponse class]]) {
         const long responseCode = [(NSHTTPURLResponse *)res statusCode];
 
-        response = util::make_unique<Response>();
+        response = std::make_unique<Response>();
         response->data = {(const char *)[data bytes], [data length]};
 
         NSDictionary *headers = [(NSHTTPURLResponse *)res allHeaderFields];
@@ -337,7 +337,7 @@ void HTTPRequest::handleResult(NSData *data, NSURLResponse *res, NSError *error)
     } else {
         // This should never happen.
         status = ResponseStatus::PermanentError;
-        response = util::make_unique<Response>();
+        response = std::make_unique<Response>();
         response->status = Response::Error;
         response->message = "response class is not NSHTTPURLResponse";
     }
@@ -363,7 +363,7 @@ void HTTPRequest::retry() {
 }
 
 std::unique_ptr<HTTPContext> HTTPContext::createContext(uv_loop_t* loop) {
-    return util::make_unique<HTTPNSURLContext>(loop);
+    return std::make_unique<HTTPNSURLContext>(loop);
 }
 
 }

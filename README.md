@@ -28,7 +28,7 @@ Be sure to pull down all submodules first:
 
 ## OS X
 
-Prerequisites include the Boost headers (for routines provided therein) and ImageMagick (for tests). To install all prerequisites, use [Homebrew](http://brew.sh/) and type `brew install pkg-config boost imagemagick`.
+ImageMagick is required for tests. It's recommended to install it with [Homebrew](http://brew.sh/) via `brew install imagemagick`.
 
 To create projects, you can run:
 
@@ -58,7 +58,6 @@ pod 'MapboxGL'
 
 #### Manually
 
-1. Use [Homebrew](http://brew.sh/) to install Boost headers: `brew install boost`.
 1. Install [appledoc](http://appledoc.gentlebytes.com/appledoc/) for API docs generation. We recommend [`2.2v963`](https://github.com/tomaz/appledoc/releases/tag/v2.2-963), which currently isn't available in Homebrew.
 1. Run `make ipackage`. The packaging script will produce the statically-linked `libMapboxGL.a`, `MapboxGL.bundle` for resources, a `Headers` folder, and a `Docs` folder with HTML API documentation.
 1. Copy the contents of `build/ios/pkg/static` into your project. It should happen automatically, but ensure that:
@@ -94,7 +93,7 @@ Target iOS: 7.0 through latest 8.x.
 
 We are using Ubuntu for development. While the software should work on other distributions as well, we are not providing explicit build instructions here.
 
-Install GCC 4.9+ if you are running Ubuntu 13.10 or older. Alternatively, you can also use Clang 3.5+.
+Install GCC 4.9+ if you are running Ubuntu 14.04 or older. Alternatively, you can also use [Clang 3.5+](http://llvm.org/apt/).
 
     sudo add-apt-repository --yes ppa:ubuntu-toolchain-r/test
     sudo apt-get update
@@ -105,7 +104,8 @@ Ensure you have git and other build essentials:
 
     sudo apt-get install curl git build-essential zlib1g-dev automake \
                          libtool xutils-dev make cmake pkg-config python-pip \
-                         libcurl4-openssl-dev libpng-dev libsqlite3-dev
+                         libcurl4-openssl-dev libpng-dev libsqlite3-dev \
+                         libllvm3.4
 
 Install glfw3 dependencies:
 
@@ -113,16 +113,6 @@ Install glfw3 dependencies:
                          x11proto-xext-dev libxrandr-dev \
                          x11proto-xf86vidmode-dev libxxf86vm-dev \
                          libxcursor-dev libxinerama-dev
-
-Finally, install Boost. If you're running Ubuntu 12.04 or older, you need to install a backport PPA since the version provided by APT doesn't contain Boost Geometry:
-
-    sudo add-apt-repository --yes ppa:boost-latest/ppa
-    sudo apt-get update
-    sudo apt-get install libboost1.55-dev
-
-Otherwise, you can just install
-
-    sudo apt-get install libboost-dev libboost-program-options-dev
 
 Then, you can then proceed to build the library:
 
@@ -148,9 +138,9 @@ Install Oracle JDK 7 (requires license agreement) from http://www.oracle.com/tec
 
     export JAVA_HOME="/dir/to/jdk1.7.0_71"
 
-Install the [Android NDK Revision 10d](https://developer.android.com/tools/sdk/ndk/index.html).
+Install the [Android NDK Revision 10e](https://developer.android.com/tools/sdk/ndk/index.html).
 
-    export ANDROID_NDK_PATH="/dir/to/android-ndk-r10d"
+    export ANDROID_NDK_PATH="/dir/to/android-ndk-r10e"
 
 Install the Android SDK. We recommend doing this by way of [Android Studio](https://developer.android.com/sdk/installing/studio.html).
 
@@ -168,7 +158,7 @@ Install Oracle JDK 7+:
 
     brew cask install java
 
-Install the [Android NDK Revision 10d](https://developer.android.com/tools/sdk/ndk/index.html) for 64-bit OS X:
+Install the [Android NDK Revision 10e](https://developer.android.com/tools/sdk/ndk/index.html) for 64-bit OS X:
 
     brew install android-ndk
 
@@ -182,7 +172,7 @@ Install [Android Studio](https://developer.android.com/sdk/installing/studio.htm
 By default, the SDK will be installed to `/usr/local/opt/android-sdk`. If you open Android Studio at this point, you may get an error message telling you that it can't find a JVM, it's because you installed a custom Java VM from Oracle. Follow [these instructions](http://tools.android.com/recent/androidstudio1rc3_releasecandidate3released) to start Android Studio. You'll wind up setting these environment variables in your .bash_profile or similar:
 
     echo "export ANDROID_HOME=`brew --prefix android-sdk`" >> .bash_profile
-    echo "export ANDROID_NDK_PATH=`brew --cellar android-ndk`/r10d" >> .bash_profile
+    echo "export ANDROID_NDK_PATH=`brew --cellar android-ndk`/r10e" >> .bash_profile
     # Replace <path to JDK> with something like /Library/Java/JavaVirtualMachines/jdk1.8.0_31.jdk
     echo "export JAVA_HOME=<path to JDK>" >> .bash_profile
     echo "export STUDIO_JDK=$JAVA_HOME" >> .bash_profile
@@ -253,6 +243,7 @@ Some styles in JSON format are included at `./styles`. See the [style spec](http
 
 ## Desktop
 
+- Press `S` to cycle through bundled styles
 - Press `X` to reset the transform
 - Press `N` to reset north
 - Press `Tab` to toggle debug information

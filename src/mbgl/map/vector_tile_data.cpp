@@ -1,6 +1,5 @@
 #include <mbgl/map/vector_tile_data.hpp>
 #include <mbgl/map/tile_parser.hpp>
-#include <mbgl/util/std.hpp>
 #include <mbgl/style/style_layer.hpp>
 #include <mbgl/style/style_bucket.hpp>
 #include <mbgl/map/source.hpp>
@@ -31,7 +30,7 @@ VectorTileData::VectorTileData(const TileID& id_,
       sprite(sprite_),
       style(style_),
       overscaling(overscaling_),
-      collision(util::make_unique<CollisionTile>(id_.z, 4096, source_.tile_size * id.overscaling, angle, collisionDebug)),
+      collision(std::make_unique<CollisionTile>(id_.z, 4096, source_.tile_size * id.overscaling, angle, collisionDebug)),
       lastAngle(angle),
       currentAngle(angle) {
 }
@@ -68,9 +67,9 @@ void VectorTileData::parse() {
             redoPlacement();
         }
     } catch (const std::exception& ex) {
-        Log::Error(Event::ParseTile, "Parsing [%d/%d/%d] failed: %s", id.z, id.x, id.y, ex.what());
-        setState(State::obsolete);
-        return;
+        std::stringstream message;
+        message << "Failed to parse [" << int(id.z) << "/" << id.x << "/" << id.y << "]: " << ex.what();
+        setError(message.str());
     }
 }
 

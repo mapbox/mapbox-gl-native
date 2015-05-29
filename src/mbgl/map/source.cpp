@@ -4,6 +4,7 @@
 #include <mbgl/map/transform.hpp>
 #include <mbgl/map/tile.hpp>
 #include <mbgl/renderer/painter.hpp>
+#include <mbgl/util/exception.hpp>
 #include <mbgl/util/constants.hpp>
 #include <mbgl/storage/resource.hpp>
 #include <mbgl/storage/response.hpp>
@@ -13,6 +14,7 @@
 #include <mbgl/style/style_layer.hpp>
 #include <mbgl/platform/log.hpp>
 #include <mbgl/util/uv_detail.hpp>
+#include <mbgl/util/std.hpp>
 #include <mbgl/util/token.hpp>
 #include <mbgl/util/string.hpp>
 #include <mbgl/util/tile_cover.hpp>
@@ -139,18 +141,19 @@ bool Source::isLoaded() const {
 // Note: This is a separate function that must be called exactly once after creation
 // The reason this isn't part of the constructor is that calling shared_from_this() in
 // the constructor fails.
-void Source::load(const std::string& accessToken) {
+void Source::load() {
     if (info.url.empty()) {
         loaded = true;
         return;
     }
 
-    const std::string url = util::mapbox::normalizeSourceURL(info.url, accessToken);
-    req = Environment::Get().request({ Resource::Kind::JSON, url }, [this](const Response &res) {
+    req = Environment::Get().request({ Resource::Kind::Source, info.url }, [this](const Response &res) {
         req = nullptr;
 
         if (res.status != Response::Successful) {
-            Log::Warning(Event::General, "Failed to load source TileJSON: %s", res.message.c_str());
+            std::stringstream message;
+            message <<  "Failed to load [" << info.url << "]: " << res.message;
+            emitSourceLoadingFailed(message.str());
             return;
         }
 
@@ -158,7 +161,9 @@ void Source::load(const std::string& accessToken) {
         d.Parse<0>(res.data.c_str());
 
         if (d.HasParseError()) {
-            Log::Error(Event::General, "Invalid source TileJSON; Parse Error at %d: %s", d.GetErrorOffset(), d.GetParseError());
+            std::stringstream message;
+            message << "Failed to parse [" << info.url << "]: " << d.GetErrorOffset() << " - " << d.GetParseError();
+            emitSourceLoadingFailed(message.str());
             return;
         }
 
@@ -261,7 +266,8 @@ TileData::State Source::addTile(MapData& data,
     }
 
     const float overscaling = id.z > info.max_zoom ? std::pow(2.0f, id.z - info.max_zoom) : 1.0f;
-    auto pos = tiles.emplace(id, util::make_unique<Tile>(id));//, util::tileSize * overscaling));
+    auto pos = tiles.emplace(id, std::make_unique<Tile>(id));
+
     Tile& new_tile = *pos.first->second;
 
     // We couldn't find the tile in the list. Create a new one.
@@ -283,8 +289,9 @@ TileData::State Source::addTile(MapData& data,
         new_tile.data = cache.get(normalized_id.to_uint64());
     }
 
-    auto callback = std::bind(&Source::emitTileLoaded, this, true);
     if (!new_tile.data) {
+        auto callback = std::bind(&Source::tileLoadingCompleteCallback, this, normalized_id);
+
         // If we don't find working tile data, we're just going to load it.
         if (info.type == SourceType::Vector) {
             new_tile.data =
@@ -294,7 +301,8 @@ TileData::State Source::addTile(MapData& data,
             new_tile.data->request(style.workers, transformState.getPixelRatio(), callback);
         } else if (info.type == SourceType::Raster) {
             new_tile.data = std::make_shared<RasterTileData>(normalized_id, texturePool, info);
-            new_tile.data->request(style.workers, transformState.getPixelRatio(), callback);
+            new_tile.data->request(
+                style.workers, transformState.getPixelRatio(), callback);
         } else if (info.type == SourceType::Annotations) {
             new_tile.data = std::make_shared<LiveTileData>(normalized_id, data.annotationManager,
                                                            style, glyphAtlas,
@@ -546,16 +554,53 @@ void Source::setObserver(Observer* observer) {
     observer_ = observer;
 }
 
+void Source::tileLoadingCompleteCallback(const TileID& normalized_id) {
+    auto it = tile_data.find(normalized_id);
+    if (it == tile_data.end()) {
+        return;
+    }
+
+    util::ptr<TileData> data = it->second.lock();
+    if (!data) {
+        return;
+    }
+
+    if (data->getState() == TileData::State::obsolete && !data->getError().empty()) {
+        emitTileLoadingFailed(data->getError());
+        return;
+    }
+
+    emitTileLoaded(true);
+}
+
 void Source::emitSourceLoaded() {
     if (observer_) {
         observer_->onSourceLoaded();
     }
 }
 
+void Source::emitSourceLoadingFailed(const std::string& message) {
+    if (!observer_) {
+        return;
+    }
+
+    auto error = std::make_exception_ptr(util::SourceLoadingException(message));
+    observer_->onSourceLoadingFailed(error);
+}
+
 void Source::emitTileLoaded(bool isNewTile) {
     if (observer_) {
         observer_->onTileLoaded(isNewTile);
     }
+}
+
+void Source::emitTileLoadingFailed(const std::string& message) {
+    if (!observer_) {
+        return;
+    }
+
+    auto error = std::make_exception_ptr(util::TileLoadingException(message));
+    observer_->onTileLoadingFailed(error);
 }
 
 }

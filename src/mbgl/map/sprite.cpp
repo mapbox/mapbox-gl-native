@@ -1,16 +1,18 @@
 #include <mbgl/map/sprite.hpp>
-#include <mbgl/util/raster.hpp>
-#include <mbgl/platform/log.hpp>
 
-#include <string>
-#include <mbgl/platform/platform.hpp>
 #include <mbgl/map/environment.hpp>
+#include <mbgl/platform/log.hpp>
+#include <mbgl/platform/platform.hpp>
 #include <mbgl/storage/resource.hpp>
 #include <mbgl/storage/response.hpp>
+#include <mbgl/util/exception.hpp>
+#include <mbgl/util/raster.hpp>
 #include <mbgl/util/uv_detail.hpp>
-#include <mbgl/util/std.hpp>
 
 #include <rapidjson/document.h>
+
+#include <string>
+#include <sstream>
 
 using namespace mbgl;
 
@@ -39,27 +41,31 @@ Sprite::Sprite(const std::string& baseUrl, float pixelRatio_)
     std::string spriteURL(baseUrl + (pixelRatio_ > 1 ? "@2x" : "") + ".png");
     std::string jsonURL(baseUrl + (pixelRatio_ > 1 ? "@2x" : "") + ".json");
 
-    jsonRequest = env.request({ Resource::Kind::JSON, jsonURL }, [this](const Response &res) {
+    jsonRequest = env.request({ Resource::Kind::JSON, jsonURL }, [this, jsonURL](const Response &res) {
         jsonRequest = nullptr;
         if (res.status == Response::Successful) {
             body = res.data;
-            parseJSON();
+            parseJSON(jsonURL);
         } else {
-            Log::Warning(Event::Sprite, "Failed to load sprite info: %s", res.message.c_str());
+            std::stringstream message;
+            message <<  "Failed to load [" << jsonURL << "]: " << res.message;
+            emitSpriteLoadingFailed(message.str());
+            return;
         }
-        loadedJSON = true;
         emitSpriteLoadedIfComplete();
     });
 
-    spriteRequest = env.request({ Resource::Kind::Image, spriteURL }, [this](const Response &res) {
+    spriteRequest = env.request({ Resource::Kind::Image, spriteURL }, [this, spriteURL](const Response &res) {
         spriteRequest = nullptr;
         if (res.status == Response::Successful) {
             image = res.data;
-            parseImage();
+            parseImage(spriteURL);
         } else {
-            Log::Warning(Event::Sprite, "Failed to load sprite image: %s", res.message.c_str());
+            std::stringstream message;
+            message <<  "Failed to load [" << spriteURL << "]: " << res.message;
+            emitSpriteLoadingFailed(message.str());
+            return;
         }
-        loadedImage = true;
         emitSpriteLoadedIfComplete();
     });
 }
@@ -80,6 +86,15 @@ void Sprite::emitSpriteLoadedIfComplete() {
     }
 }
 
+void Sprite::emitSpriteLoadingFailed(const std::string& message) {
+    if (!observer) {
+        return;
+    }
+
+    auto error = std::make_exception_ptr(util::SpriteLoadingException(message));
+    observer->onSpriteLoadingFailed(error);
+}
+
 bool Sprite::isLoaded() const {
     return loadedImage && loadedJSON;
 }
@@ -88,21 +103,29 @@ bool Sprite::hasPixelRatio(float ratio) const {
     return pixelRatio == (ratio > 1 ? 2 : 1);
 }
 
-void Sprite::parseImage() {
-    raster = util::make_unique<util::Image>(image);
+void Sprite::parseImage(const std::string& spriteURL) {
+    raster = std::make_unique<util::Image>(image);
     if (!*raster) {
         raster.reset();
+        std::stringstream message;
+        message <<  "Failed to parse [" << spriteURL << "]";
+        emitSpriteLoadingFailed(message.str());
+        return;
     }
+
     image.clear();
+    loadedImage = true;
 }
 
-void Sprite::parseJSON() {
+void Sprite::parseJSON(const std::string& jsonURL) {
     rapidjson::Document d;
     d.Parse<0>(body.c_str());
     body.clear();
 
     if (d.HasParseError()) {
-        Log::Warning(Event::Sprite, "sprite JSON is invalid");
+        std::stringstream message;
+        message <<  "Failed to parse [" << jsonURL << "]: " << d.GetErrorOffset() << " - " << d.GetParseError();
+        emitSpriteLoadingFailed(message.str());
     } else if (d.IsObject()) {
         for (rapidjson::Value::ConstMemberIterator itr = d.MemberBegin(); itr != d.MemberEnd(); ++itr) {
             const std::string& name = itr->name.GetString();
@@ -125,8 +148,11 @@ void Sprite::parseJSON() {
                 pos.emplace(name, SpritePosition { x, y, width, height, spritePixelRatio, sdf });
             }
         }
+        loadedJSON = true;
     } else {
-        Log::Warning(Event::Sprite, "sprite JSON root is not an object");
+        std::stringstream message;
+        message <<  "Failed to parse [" << jsonURL << "]: Root is not an object";
+        emitSpriteLoadingFailed(message.str());
     }
 }
 

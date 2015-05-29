@@ -24,6 +24,7 @@
 #import "MGLUserLocationAnnotationView.h"
 #import "MGLUserLocation_Private.h"
 #import "MGLFileCache.h"
+#import "MGLAccountManager_Private.h"
 #import "MGLMapboxEvents.h"
 
 #import "SMCalloutView.h"
@@ -35,7 +36,7 @@ class MBGLView;
 NSString *const MGLDefaultStyleName = @"mapbox-streets";
 NSString *const MGLStyleVersion = @"7";
 NSString *const MGLDefaultStyleMarkerSymbolName = @"default_marker";
-NSString *const MGLMapboxAccessTokenManagerURLDisplayString = @"mapbox.com/account/apps";
+NSString *const MGLMapboxSetupDocumentationURLDisplayString = @"mapbox.com/guides/first-steps-gl-ios";
 
 const NSTimeInterval MGLAnimationDuration = 0.3;
 const CGSize MGLAnnotationUpdateViewportOutset = {150, 150};
@@ -46,6 +47,16 @@ NSString *const MGLAnnotationIDKey = @"MGLAnnotationIDKey";
 static NSURL *MGLURLForBundledStyleNamed(NSString *styleName)
 {
     return [NSURL URLWithString:[NSString stringWithFormat:@"asset://styles/%@.json", styleName]];
+}
+
+CGFloat MGLRadiansFromDegrees(CLLocationDegrees degrees)
+{
+    return degrees * M_PI / 180;
+}
+
+CLLocationDegrees MGLDegreesFromRadians(CGFloat radians)
+{
+    return radians * 180 / M_PI;
 }
 
 #pragma mark - Private -
@@ -103,63 +114,48 @@ std::chrono::steady_clock::duration secondsAsDuration(float duration)
 
 - (instancetype)initWithFrame:(CGRect)frame
 {
-    self = [super initWithFrame:frame];
-
-    if (self && [self commonInit])
+    if (self = [super initWithFrame:frame])
     {
+        [self commonInit];
         self.styleURL = nil;
-        self.accessToken = [MGLAccountManager accessToken];
-        return self;
     }
-
-    return nil;
+    return self;
 }
 
-- (instancetype)initWithFrame:(CGRect)frame accessToken:(NSString *)accessToken
+- (instancetype)initWithFrame:(CGRect)frame styleURL:(NSURL *)styleURL
 {
-    return [self initWithFrame:frame accessToken:accessToken styleURL:nil];
-}
-
-- (instancetype)initWithFrame:(CGRect)frame accessToken:(NSString *)accessToken styleURL:(NSURL *)styleURL
-{
-    self = [super initWithFrame:frame];
-
-    if (self && [self commonInit])
+    if (self = [super initWithFrame:frame])
     {
-        self.accessToken = accessToken;
+        [self commonInit];
         self.styleURL = styleURL;
     }
-
     return self;
 }
 
 - (instancetype)initWithCoder:(NSCoder *)decoder
 {
-    self = [super initWithCoder:decoder];
-
-    if (self && [self commonInit])
+    if (self = [super initWithCoder:decoder])
     {
+        [self commonInit];
         self.styleURL = nil;
-        return self;
     }
-
-    return nil;
+    return self;
 }
 
 - (NSString *)accessToken
 {
-    return @(_mbglMap->getAccessToken().c_str()).mgl_stringOrNilIfEmpty;
+    NSAssert(NO, @"-[MGLMapView accessToken] has been removed. Use +[MGLAccountManager accessToken] or get MGLMapboxAccessToken from the Info.plist.");
+    return nil;
 }
 
 - (void)setAccessToken:(NSString *)accessToken
 {
-    _mbglMap->setAccessToken(accessToken ? (std::string)[accessToken UTF8String] : "");
-    [MGLAccountManager setAccessToken:accessToken.mgl_stringOrNilIfEmpty];
+    NSAssert(NO, @"-[MGLMapView setAccessToken:] has been replaced by +[MGLAccountManager setAccessToken:].\n\nIf you previously set this access token in a storyboard inspectable, select the MGLMapView in Interface Builder and delete the “accessToken” entry from the User Defined Runtime Attributes section of the Identity inspector. Then go to the Info.plist file and set MGLMapboxAccessToken to “%@”.", accessToken);
 }
 
 + (NSSet *)keyPathsForValuesAffectingStyleURL
 {
-    return [NSSet setWithObjects:@"mapID", @"accessToken", nil];
+    return [NSSet setWithObject:@"styleID"];
 }
 
 - (NSURL *)styleURL
@@ -188,20 +184,14 @@ std::chrono::steady_clock::duration secondsAsDuration(float duration)
     _mbglMap->setStyleURL([[styleURL absoluteString] UTF8String]);
 }
 
-- (BOOL)commonInit
+- (void)commonInit
 {
     _isTargetingInterfaceBuilder = NSProcessInfo.processInfo.mgl_isInterfaceBuilderDesignablesAgent;
 
     // create context
     //
     _context = [[EAGLContext alloc] initWithAPI:kEAGLRenderingAPIOpenGLES2];
-
-    if ( ! _context)
-    {
-        mbgl::Log::Error(mbgl::Event::Setup, "failed to create OpenGL ES context");
-
-        return NO;
-    }
+    NSAssert(_context, @"Failed to create OpenGL ES context.");
 
     // setup accessibility
     //
@@ -253,13 +243,20 @@ std::chrono::steady_clock::duration secondsAsDuration(float duration)
     }
     _mbglMap->resize(self.bounds.size.width, self.bounds.size.height, _glView.contentScaleFactor);
 
+    // Observe for changes to the global access token (and find out the current one).
+    [[MGLAccountManager sharedManager] addObserver:self
+                                        forKeyPath:@"accessToken"
+                                           options:(NSKeyValueObservingOptionInitial |
+                                                    NSKeyValueObservingOptionNew)
+                                           context:NULL];
+
     // Notify map object when network reachability status changes.
     [[NSNotificationCenter defaultCenter] addObserver:self
                                              selector:@selector(reachabilityChanged:)
                                                  name:kReachabilityChangedNotification
                                                object:nil];
 
-    Reachability* reachability = [Reachability reachabilityForInternetConnection];
+    MGLReachability* reachability = [MGLReachability reachabilityForInternetConnection];
     [reachability startNotifier];
 
     // setup annotations
@@ -293,6 +290,12 @@ std::chrono::steady_clock::duration secondsAsDuration(float duration)
                          @"© OpenStreetMap",
                          @"Improve This Map",
                          nil];
+
+    // iOS 8+: add action that opens app's Settings.app panel, if applicable
+    if (&UIApplicationOpenSettingsURLString != NULL && ! [MGLAccountManager mapboxMetricsEnabledSettingShownInApp])
+    {
+        [_attributionSheet addButtonWithTitle:@"Adjust Privacy Settings"];
+    }
 
     // setup compass
     //
@@ -376,13 +379,11 @@ std::chrono::steady_clock::duration secondsAsDuration(float duration)
         MGLEventKeyZoomLevel: @(zoom),
         MGLEventKeyPushEnabled: @([MGLMapboxEvents checkPushEnabled])
     }];
-
-    return YES;
 }
 
 -(void)reachabilityChanged:(NSNotification*)notification
 {
-    Reachability *reachability = [notification object];
+    MGLReachability *reachability = [notification object];
     if ([reachability isReachable]) {
         mbgl::NetworkStatus::Reachable();
     }
@@ -393,6 +394,7 @@ std::chrono::steady_clock::duration secondsAsDuration(float duration)
     [_regionChangeDelegateQueue cancelAllOperations];
 
     [[NSNotificationCenter defaultCenter] removeObserver:self];
+    [[MGLAccountManager sharedManager] removeObserver:self forKeyPath:@"accessToken"];
 
     if (_mbglMap)
     {
@@ -905,13 +907,13 @@ std::chrono::steady_clock::duration secondsAsDuration(float duration)
 
         _mbglMap->setGestureInProgress(true);
 
-        self.angle = [MGLMapView degreesToRadians:_mbglMap->getBearing()] * -1;
+        self.angle = MGLRadiansFromDegrees(_mbglMap->getBearing()) * -1;
 
         self.userTrackingMode = MGLUserTrackingModeNone;
     }
     else if (rotate.state == UIGestureRecognizerStateChanged)
     {
-        CGFloat newDegrees = [MGLMapView radiansToDegrees:(self.angle + rotate.rotation)] * -1;
+        CGFloat newDegrees = MGLDegreesFromRadians(self.angle + rotate.rotation) * -1;
 
         // constrain to +/-30 degrees when merely rotating like Apple does
         //
@@ -934,7 +936,7 @@ std::chrono::steady_clock::duration secondsAsDuration(float duration)
             CGFloat radians = self.angle + rotate.rotation;
             CGFloat duration = UIScrollViewDecelerationRateNormal;
             CGFloat newRadians = radians + velocity * duration * 0.1;
-            CGFloat newDegrees = [MGLMapView radiansToDegrees:newRadians] * -1;
+            CGFloat newDegrees = MGLDegreesFromRadians(newRadians) * -1;
 
             _mbglMap->setBearing(newDegrees, secondsAsDuration(duration));
 
@@ -999,16 +1001,16 @@ std::chrono::steady_clock::duration secondsAsDuration(float duration)
         mbgl::LatLngBounds tapBounds;
 
         coordinate = [self convertPoint:tapRectLowerLeft  toCoordinateFromView:self];
-        tapBounds.extend(coordinateToLatLng(coordinate));
+        tapBounds.extend(MGLLatLngFromLocationCoordinate2D(coordinate));
 
         coordinate = [self convertPoint:tapRectUpperLeft  toCoordinateFromView:self];
-        tapBounds.extend(coordinateToLatLng(coordinate));
+        tapBounds.extend(MGLLatLngFromLocationCoordinate2D(coordinate));
 
         coordinate = [self convertPoint:tapRectUpperRight toCoordinateFromView:self];
-        tapBounds.extend(coordinateToLatLng(coordinate));
+        tapBounds.extend(MGLLatLngFromLocationCoordinate2D(coordinate));
 
         coordinate = [self convertPoint:tapRectLowerRight toCoordinateFromView:self];
-        tapBounds.extend(coordinateToLatLng(coordinate));
+        tapBounds.extend(MGLLatLngFromLocationCoordinate2D(coordinate));
 
         // query for nearby annotations
         std::vector<uint32_t> nearbyAnnotations = _mbglMap->getAnnotationsInBounds(tapBounds);
@@ -1270,9 +1272,24 @@ std::chrono::steady_clock::duration secondsAsDuration(float duration)
         [[UIApplication sharedApplication] openURL:
          [NSURL URLWithString:feedbackURL]];
     }
+    // skips to 4 because button is conditionally added after cancel (index 3)
+    else if (buttonIndex == actionSheet.firstOtherButtonIndex + 4)
+    {
+        [[UIApplication sharedApplication] openURL:[NSURL URLWithString:UIApplicationOpenSettingsURLString]];
+    }
 }
 
 #pragma mark - Properties -
+
+- (void)observeValueForKeyPath:(NSString *)keyPath ofObject:(id)object change:(NSDictionary *)change context:(__unused void *)context
+{
+    // Synchronize mbgl::Map’s access token with the global one in MGLAccountManager.
+    if ([keyPath isEqualToString:@"accessToken"] && object == [MGLAccountManager sharedManager])
+    {
+        NSString *accessToken = change[NSKeyValueChangeNewKey];
+        _mbglFileSource->setAccessToken(accessToken ? (std::string)[accessToken UTF8String] : "");
+    }
+}
 
 + (NSSet *)keyPathsForValuesAffectingZoomEnabled
 {
@@ -1361,7 +1378,7 @@ std::chrono::steady_clock::duration secondsAsDuration(float duration)
 {
     CGFloat duration = (animated ? MGLAnimationDuration : 0);
 
-    _mbglMap->setLatLngZoom(coordinateToLatLng(coordinate),
+    _mbglMap->setLatLngZoom(MGLLatLngFromLocationCoordinate2D(coordinate),
                             fmaxf(_mbglMap->getZoom(), self.currentMinimumZoom),
                             secondsAsDuration(duration));
 
@@ -1375,7 +1392,7 @@ std::chrono::steady_clock::duration secondsAsDuration(float duration)
 
 - (CLLocationCoordinate2D)centerCoordinate
 {
-    return latLngToCoordinate(_mbglMap->getLatLng());
+    return MGLLocationCoordinate2DFromLatLng(_mbglMap->getLatLng());
 }
 
 - (void)setCenterCoordinate:(CLLocationCoordinate2D)centerCoordinate zoomLevel:(double)zoomLevel animated:(BOOL)animated
@@ -1384,7 +1401,7 @@ std::chrono::steady_clock::duration secondsAsDuration(float duration)
 
     CGFloat duration = (animated ? MGLAnimationDuration : 0);
 
-    _mbglMap->setLatLngZoom(coordinateToLatLng(centerCoordinate), zoomLevel, secondsAsDuration(duration));
+    _mbglMap->setLatLngZoom(MGLLatLngFromLocationCoordinate2D(centerCoordinate), zoomLevel, secondsAsDuration(duration));
 
     [self unrotateIfNeededAnimated:animated];
 
@@ -1468,12 +1485,12 @@ std::chrono::steady_clock::duration secondsAsDuration(float duration)
     //
     convertedPoint.y = self.bounds.size.height - convertedPoint.y;
 
-    return latLngToCoordinate(_mbglMap->latLngForPixel(mbgl::vec2<double>(convertedPoint.x, convertedPoint.y)));
+    return MGLLocationCoordinate2DFromLatLng(_mbglMap->latLngForPixel(mbgl::vec2<double>(convertedPoint.x, convertedPoint.y)));
 }
 
 - (CGPoint)convertCoordinate:(CLLocationCoordinate2D)coordinate toPointToView:(UIView *)view
 {
-    mbgl::vec2<double> pixel = _mbglMap->pixelForLatLng(coordinateToLatLng(coordinate));
+    mbgl::vec2<double> pixel = _mbglMap->pixelForLatLng(MGLLatLngFromLocationCoordinate2D(coordinate));
 
     // flip y coordinate for iOS view origin in top left
     //
@@ -1487,12 +1504,12 @@ std::chrono::steady_clock::duration secondsAsDuration(float duration)
     return _mbglMap->getMetersPerPixelAtLatitude(latitude, self.zoomLevel);
 }
 
-mbgl::LatLng coordinateToLatLng(CLLocationCoordinate2D coordinate)
+mbgl::LatLng MGLLatLngFromLocationCoordinate2D(CLLocationCoordinate2D coordinate)
 {
     return mbgl::LatLng(coordinate.latitude, coordinate.longitude);
 }
 
-CLLocationCoordinate2D latLngToCoordinate(mbgl::LatLng latLng)
+CLLocationCoordinate2D MGLLocationCoordinate2DFromLatLng(mbgl::LatLng latLng)
 {
     return CLLocationCoordinate2DMake(latLng.latitude, latLng.longitude);
 }
@@ -1501,13 +1518,13 @@ CLLocationCoordinate2D latLngToCoordinate(mbgl::LatLng latLng)
 {
     mbgl::LatLngBounds bounds;
 
-    bounds.extend(coordinateToLatLng(
+    bounds.extend(MGLLatLngFromLocationCoordinate2D(
         [self convertPoint:CGPointMake(0, 0) toCoordinateFromView:self]));
-    bounds.extend(coordinateToLatLng(
+    bounds.extend(MGLLatLngFromLocationCoordinate2D(
         [self convertPoint:CGPointMake(self.bounds.size.width, 0) toCoordinateFromView:self]));
-    bounds.extend(coordinateToLatLng(
+    bounds.extend(MGLLatLngFromLocationCoordinate2D(
         [self convertPoint:CGPointMake(0, self.bounds.size.height) toCoordinateFromView:self]));
-    bounds.extend(coordinateToLatLng(
+    bounds.extend(MGLLatLngFromLocationCoordinate2D(
         [self convertPoint:CGPointMake(self.bounds.size.width, self.bounds.size.height) toCoordinateFromView:self]));
 
     return bounds;
@@ -1533,27 +1550,31 @@ CLLocationCoordinate2D latLngToCoordinate(mbgl::LatLng latLng)
     return [NSArray arrayWithArray:_bundledStyleURLs];
 }
 
-+ (NSSet *)keyPathsForValuesAffectingMapID
++ (NSSet *)keyPathsForValuesAffectingStyleID
 {
-    return [NSSet setWithObjects:@"styleURL", @"accessToken", nil];
+    return [NSSet setWithObject:@"styleURL"];
 }
 
-- (NSString *)mapID
+- (NSString *)styleID
 {
     NSURL *styleURL = self.styleURL;
     return [styleURL.scheme isEqualToString:@"mapbox"] ? styleURL.host.mgl_stringOrNilIfEmpty : nil;
 }
 
+- (void)setStyleID:(NSString *)styleID
+{
+    self.styleURL = styleID ? [NSURL URLWithString:[NSString stringWithFormat:@"mapbox://%@", styleID]] : nil;
+}
+
+- (NSString *)mapID
+{
+    NSAssert(NO, @"-[MGLMapView mapID] has been renamed -[MGLMapView styleID].");
+    return nil;
+}
+
 - (void)setMapID:(NSString *)mapID
 {
-    if (mapID)
-    {
-        self.styleURL = [NSURL URLWithString:[NSString stringWithFormat:@"mapbox://%@", mapID]];
-    }
-    else
-    {
-        self.styleURL = nil;
-    }
+    NSAssert(NO, @"-[MGLMapView setMapID:] has been renamed -[MGLMapView setStyleID:].\n\nIf you previously set this map ID in a storyboard inspectable, select the MGLMapView in Interface Builder and delete the “mapID” entry from the User Defined Runtime Attributes section of the Identity inspector. Then go to the Attributes inspector and enter “%@” into the “Style ID” field.", mapID);
 }
 
 - (NSArray *)styleClasses
@@ -1657,7 +1678,7 @@ CLLocationCoordinate2D latLngToCoordinate(mbgl::LatLng latLng)
     {
         assert([annotation conformsToProtocol:@protocol(MGLAnnotation)]);
 
-        latLngs.push_back(coordinateToLatLng(annotation.coordinate));
+        latLngs.push_back(MGLLatLngFromLocationCoordinate2D(annotation.coordinate));
 
         NSString *symbolName = nil;
 
@@ -1726,7 +1747,7 @@ CLLocationCoordinate2D latLngToCoordinate(mbgl::LatLng latLng)
 
     assert([firstAnnotation conformsToProtocol:@protocol(MGLAnnotation)]);
 
-    if ( ! [self viewportBounds].contains(coordinateToLatLng(firstAnnotation.coordinate))) return;
+    if ( ! [self viewportBounds].contains(MGLLatLngFromLocationCoordinate2D(firstAnnotation.coordinate))) return;
 
     [self selectAnnotation:firstAnnotation animated:NO];
 }
@@ -1735,7 +1756,7 @@ CLLocationCoordinate2D latLngToCoordinate(mbgl::LatLng latLng)
 {
     if ( ! annotation) return;
 
-    if ( ! [self viewportBounds].contains(coordinateToLatLng(annotation.coordinate))) return;
+    if ( ! [self viewportBounds].contains(MGLLatLngFromLocationCoordinate2D(annotation.coordinate))) return;
 
     if (annotation == self.selectedAnnotation) return;
 
@@ -2171,16 +2192,6 @@ CLLocationCoordinate2D latLngToCoordinate(mbgl::LatLng latLng)
 
 #pragma mark - Utility -
 
-+ (CGFloat)degreesToRadians:(CGFloat)degrees
-{
-    return degrees * M_PI / 180;
-}
-
-+ (CGFloat)radiansToDegrees:(CGFloat)radians
-{
-    return radians * 180 / M_PI;
-}
-
 - (void)animateWithDelay:(NSTimeInterval)delay animations:(void (^)(void))animations
 {
     dispatch_after(dispatch_time(DISPATCH_TIME_NOW, (int64_t)(delay * NSEC_PER_SEC)), dispatch_get_main_queue(), animations);
@@ -2398,7 +2409,7 @@ CLLocationCoordinate2D latLngToCoordinate(mbgl::LatLng latLng)
     while (degrees >= 360) degrees -= 360;
     while (degrees < 0) degrees += 360;
 
-    self.compass.transform = CGAffineTransformMakeRotation([MGLMapView degreesToRadians:degrees]);
+    self.compass.transform = CGAffineTransformMakeRotation(MGLRadiansFromDegrees(degrees));
 
     if (_mbglMap->getBearing() && self.compass.alpha < 1)
     {
@@ -2431,14 +2442,14 @@ CLLocationCoordinate2D latLngToCoordinate(mbgl::LatLng latLng)
         imageName = [imageName stringByAppendingString:@".png"];
     }
 
-    return [UIImage imageWithContentsOfFile:[MGLMapView pathForBundleResourceNamed:imageName ofType:nil inDirectory:@""]];
+    return [UIImage imageWithContentsOfFile:[self pathForBundleResourceNamed:imageName ofType:nil inDirectory:@""]];
 }
 
 + (NSString *)pathForBundleResourceNamed:(NSString *)name ofType:(NSString *)extension inDirectory:(NSString *)directory
 {
     NSString *path = [[NSBundle bundleWithPath:[NSBundle mgl_resourceBundlePath]] pathForResource:name ofType:extension inDirectory:directory];
 
-    NSAssert(path, @"Resource not found in application.");
+    NSAssert(path, @"Resource %@ not found in application.", name);
 
     return path;
 }
@@ -2461,129 +2472,106 @@ CLLocationCoordinate2D latLngToCoordinate(mbgl::LatLng latLng)
 {
     [super prepareForInterfaceBuilder];
 
-    self.layer.borderColor = [UIColor colorWithWhite:184/255. alpha:1].CGColor;
-    self.layer.borderWidth = 1;
+    self.layer.borderColor = [UIColor colorWithRed:59/255.
+                                             green:178/255.
+                                              blue:208/255.
+                                             alpha:0.8].CGColor;
+    self.layer.borderWidth = 4;
+    self.layer.backgroundColor = [UIColor whiteColor].CGColor;
 
-    if (self.accessToken)
-    {
-        self.layer.backgroundColor = [UIColor colorWithRed:59/255.
-                                                     green:178/255.
-                                                      blue:208/255.
-                                                     alpha:0.8].CGColor;
+    UIView *diagnosticView = [[UIView alloc] init];
+    diagnosticView.translatesAutoresizingMaskIntoConstraints = NO;
+    [self addSubview:diagnosticView];
 
-        UIImage *image = [[self class] resourceImageNamed:@"mapbox.png"];
-        UIImageView *previewView = [[UIImageView alloc] initWithImage:image];
-        previewView.translatesAutoresizingMaskIntoConstraints = NO;
-        [self addSubview:previewView];
-        [self addConstraint:
-         [NSLayoutConstraint constraintWithItem:previewView
-                                      attribute:NSLayoutAttributeCenterXWithinMargins
-                                      relatedBy:NSLayoutRelationEqual
-                                         toItem:self
-                                      attribute:NSLayoutAttributeCenterXWithinMargins
-                                     multiplier:1
-                                       constant:0]];
-        [self addConstraint:
-         [NSLayoutConstraint constraintWithItem:previewView
-                                      attribute:NSLayoutAttributeCenterYWithinMargins
-                                      relatedBy:NSLayoutRelationEqual
-                                         toItem:self
-                                      attribute:NSLayoutAttributeCenterYWithinMargins
-                                     multiplier:1
-                                       constant:0]];
-    }
-    else
-    {
-        UIView *diagnosticView = [[UIView alloc] init];
-        diagnosticView.translatesAutoresizingMaskIntoConstraints = NO;
-        [self addSubview:diagnosticView];
+    // Headline
+    UILabel *headlineLabel = [[UILabel alloc] init];
+    headlineLabel.text = @"MGLMapView";
+    headlineLabel.font = [UIFont preferredFontForTextStyle:UIFontTextStyleHeadline];
+    headlineLabel.textAlignment = NSTextAlignmentCenter;
+    headlineLabel.numberOfLines = 1;
+    headlineLabel.translatesAutoresizingMaskIntoConstraints = NO;
+    [headlineLabel setContentCompressionResistancePriority:UILayoutPriorityDefaultLow
+                                                   forAxis:UILayoutConstraintAxisHorizontal];
+    [diagnosticView addSubview:headlineLabel];
 
-        // Headline
-        UILabel *headlineLabel = [[UILabel alloc] init];
-        headlineLabel.text = @"No Access Token";
-        headlineLabel.font = [UIFont preferredFontForTextStyle:UIFontTextStyleHeadline];
-        headlineLabel.textAlignment = NSTextAlignmentCenter;
-        headlineLabel.numberOfLines = 1;
-        headlineLabel.translatesAutoresizingMaskIntoConstraints = NO;
-        [headlineLabel setContentCompressionResistancePriority:UILayoutPriorityDefaultLow
-                                                       forAxis:UILayoutConstraintAxisHorizontal];
-        [diagnosticView addSubview:headlineLabel];
+    // Explanation
+    UILabel *explanationLabel = [[UILabel alloc] init];
+    explanationLabel.text = (@"To display a Mapbox-hosted map here:\n\n"
+                             @"1. Set MGLMapboxAccessToken to your access token in Info.plist\n"
+                             @"2. Add a Settings bundle that allows the user to turn Mapbox Metrics on and off\n\n"
+                             @"For detailed instructions, see:");
+    explanationLabel.font = [UIFont preferredFontForTextStyle:UIFontTextStyleBody];
+    explanationLabel.numberOfLines = 0;
+    explanationLabel.translatesAutoresizingMaskIntoConstraints = NO;
+    [explanationLabel setContentCompressionResistancePriority:UILayoutPriorityDefaultLow
+                                                      forAxis:UILayoutConstraintAxisHorizontal];
+    [diagnosticView addSubview:explanationLabel];
 
-        // Explanation
-        UILabel *explanationLabel = [[UILabel alloc] init];
-        explanationLabel.text = @"To display a map here, you must provide a Mapbox access token. Get an access token from:";
-        explanationLabel.font = [UIFont preferredFontForTextStyle:UIFontTextStyleBody];
-        explanationLabel.numberOfLines = 0;
-        explanationLabel.translatesAutoresizingMaskIntoConstraints = NO;
-        [explanationLabel setContentCompressionResistancePriority:UILayoutPriorityDefaultLow
-                                                          forAxis:UILayoutConstraintAxisHorizontal];
-        [diagnosticView addSubview:explanationLabel];
+    // Link
+    UIButton *linkButton = [UIButton buttonWithType:UIButtonTypeSystem];
+    [linkButton setTitle:MGLMapboxSetupDocumentationURLDisplayString forState:UIControlStateNormal];
+    linkButton.translatesAutoresizingMaskIntoConstraints = NO;
+    linkButton.titleLabel.numberOfLines = 0;
+    [linkButton setContentCompressionResistancePriority:UILayoutPriorityDefaultLow
+                                                forAxis:UILayoutConstraintAxisHorizontal];
+    [diagnosticView addSubview:linkButton];
 
-        // Link
-        UIButton *linkButton = [UIButton buttonWithType:UIButtonTypeSystem];
-        [linkButton setTitle:MGLMapboxAccessTokenManagerURLDisplayString forState:UIControlStateNormal];
-        linkButton.translatesAutoresizingMaskIntoConstraints = NO;
-        [linkButton setContentCompressionResistancePriority:UILayoutPriorityDefaultLow
-                                                    forAxis:UILayoutConstraintAxisHorizontal];
-        [diagnosticView addSubview:linkButton];
-
-        // More explanation
-        UILabel *explanationLabel2 = [[UILabel alloc] init];
-        explanationLabel2.text = @"and enter it into the Access Token field in the Attributes inspector.";
-        explanationLabel2.font = [UIFont preferredFontForTextStyle:UIFontTextStyleBody];
-        explanationLabel2.numberOfLines = 0;
-        explanationLabel2.translatesAutoresizingMaskIntoConstraints = NO;
-        [explanationLabel2 setContentCompressionResistancePriority:UILayoutPriorityDefaultLow
-                                                           forAxis:UILayoutConstraintAxisHorizontal];
-        [diagnosticView addSubview:explanationLabel2];
-
-        // Constraints
-        NSDictionary *views = @{
-            @"container": diagnosticView,
-            @"headline": headlineLabel,
-            @"explanation": explanationLabel,
-            @"link": linkButton,
-            @"explanation2": explanationLabel2,
-        };
-        [self addConstraint:
-         [NSLayoutConstraint constraintWithItem:diagnosticView
-                                      attribute:NSLayoutAttributeCenterYWithinMargins
-                                      relatedBy:NSLayoutRelationEqual
-                                         toItem:self
-                                      attribute:NSLayoutAttributeCenterYWithinMargins
-                                     multiplier:1
-                                       constant:0]];
-        [self addConstraints:
-         [NSLayoutConstraint constraintsWithVisualFormat:@"H:|-[container(20@20)]-|"
-                                                 options:NSLayoutFormatAlignAllCenterY
-                                                 metrics:nil
-                                                   views:views]];
-        [self addConstraints:
-         [NSLayoutConstraint constraintsWithVisualFormat:@"V:|[headline]-[explanation]-[link]-[explanation2]|"
-                                                 options:0
-                                                 metrics:nil
-                                                   views:views]];
-        [self addConstraints:
-         [NSLayoutConstraint constraintsWithVisualFormat:@"H:|[headline]|"
-                                                 options:0
-                                                 metrics:nil
-                                                   views:views]];
-        [self addConstraints:
-         [NSLayoutConstraint constraintsWithVisualFormat:@"H:|[explanation]|"
-                                                 options:0
-                                                 metrics:nil
-                                                   views:views]];
-        [self addConstraints:
-         [NSLayoutConstraint constraintsWithVisualFormat:@"H:|[link]|"
-                                                 options:0
-                                                 metrics:nil
-                                                   views:views]];
-        [self addConstraints:
-         [NSLayoutConstraint constraintsWithVisualFormat:@"H:|[explanation2]|"
-                                                 options:0
-                                                 metrics:nil
-                                                   views:views]];
-    }
+    // Constraints
+    NSDictionary *views = @{
+        @"container": diagnosticView,
+        @"headline": headlineLabel,
+        @"explanation": explanationLabel,
+        @"link": linkButton,
+    };
+    [self addConstraint:
+     [NSLayoutConstraint constraintWithItem:diagnosticView
+                                  attribute:NSLayoutAttributeCenterYWithinMargins
+                                  relatedBy:NSLayoutRelationEqual
+                                     toItem:self
+                                  attribute:NSLayoutAttributeCenterYWithinMargins
+                                 multiplier:1
+                                   constant:0]];
+    [self addConstraint:
+     [NSLayoutConstraint constraintWithItem:diagnosticView
+                                  attribute:NSLayoutAttributeTopMargin
+                                  relatedBy:NSLayoutRelationGreaterThanOrEqual
+                                     toItem:self
+                                  attribute:NSLayoutAttributeTopMargin
+                                 multiplier:1
+                                   constant:8]];
+    [self addConstraint:
+     [NSLayoutConstraint constraintWithItem:self
+                                  attribute:NSLayoutAttributeBottomMargin
+                                  relatedBy:NSLayoutRelationGreaterThanOrEqual
+                                     toItem:diagnosticView
+                                  attribute:NSLayoutAttributeBottomMargin
+                                 multiplier:1
+                                   constant:8]];
+    [self addConstraints:
+     [NSLayoutConstraint constraintsWithVisualFormat:@"H:|-[container(20@20)]-|"
+                                             options:NSLayoutFormatAlignAllCenterY
+                                             metrics:nil
+                                               views:views]];
+    [self addConstraints:
+     [NSLayoutConstraint constraintsWithVisualFormat:@"V:|[headline]-[explanation]-[link]|"
+                                             options:0
+                                             metrics:nil
+                                               views:views]];
+    [self addConstraints:
+     [NSLayoutConstraint constraintsWithVisualFormat:@"H:|[headline]|"
+                                             options:0
+                                             metrics:nil
+                                               views:views]];
+    [self addConstraints:
+     [NSLayoutConstraint constraintsWithVisualFormat:@"H:|[explanation]|"
+                                             options:0
+                                             metrics:nil
+                                               views:views]];
+    [self addConstraints:
+     [NSLayoutConstraint constraintsWithVisualFormat:@"H:|[link]|"
+                                             options:0
+                                             metrics:nil
+                                               views:views]];
 }
 
 class MBGLView : public mbgl::View

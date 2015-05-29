@@ -3,7 +3,6 @@
 #include <mbgl/util/scaling.hpp>
 #include <mbgl/util/image.hpp>
 #include <mbgl/util/io.hpp>
-#include <mbgl/util/std.hpp>
 
 #include <algorithm>
 #include <cstring>
@@ -24,7 +23,7 @@ TEST(Bilinear, Scaling) {
     const uint32_t *srcData = reinterpret_cast<const uint32_t *>(src + 8);
     const vec2<uint32_t> srcSize { width, height };
     const vec2<uint32_t> dstSize { 128, 128 };
-    auto dst = util::make_unique<uint32_t[]>(dstSize.x * dstSize.y);
+    auto dst = std::make_unique<uint32_t[]>(dstSize.x * dstSize.y);
     uint32_t *dstData = dst.get();
     std::fill(dstData, dstData + dstSize.x * dstSize.y, 0xFFFF00FF);
 
