@@ -183,7 +183,7 @@ AnnotationManager::addTileFeature(const uint32_t annotationID,
 
     for (int8_t z = maxZoom; z >= 0; z--) {
 
-        GeometryCollection geometries;
+        std::unordered_map<TileID, GeometryCollection, TileID::Hash> featureTiles;
 
         if (type == AnnotationType::Point) {
             auto& pp = projectedFeature[0][0];
@@ -193,7 +193,9 @@ AnnotationManager::addTileFeature(const uint32_t annotationID,
 
             const Coordinate coordinate(extent * (pp.x * z2 - x), extent * (pp.y * z2 - y));
 
-            geometries = {{ {{ coordinate }} }};
+            GeometryCollection geometries = {{ {{ coordinate }} }};
+
+            featureTiles.emplace(TileID(z, x, y), geometries);
         } else {
             for (size_t l = 0; l < projectedFeature.size(); ++l) {
 
@@ -208,54 +210,64 @@ AnnotationManager::addTileFeature(const uint32_t annotationID,
 
                     const Coordinate coordinate(extent * (pp.x * z2 - x), extent * (pp.y * z2 - y));
 
-                    line.push_back(coordinate);
-                }
+                    auto tile_it = featureTiles.find(TileID(z, x, y));
 
-                geometries.push_back(line);
+                    if (tile_it != featureTiles.end()) {
+                        GeometryCollection& geometries = featureTiles.find(TileID(z, x, y))->second;
+                        if (geometries.size()) {
+                            geometries.back().push_back(coordinate);
+                        } else {
+                            geometries.push_back({{ coordinate }});
+                        }
+                    } else {
+                        GeometryCollection geometries = {{ {{ coordinate }} }};
+                        featureTiles.emplace(TileID(z, x, y), geometries);
+                    }
+                }
             }
         }
 
-        auto tileID = TileID(z, x, y);
+        for (auto& featureTile : featureTiles) {
+            // create tile feature
+            auto feature = std::make_shared<const LiveTileFeature>(
+                (type == AnnotationType::Point ? FeatureType::Point : FeatureType::LineString),
+                featureTile.second,
+                featureProperties
+            );
 
-        // create tile feature
-        auto feature = std::make_shared<const LiveTileFeature>(
-            (type == AnnotationType::Point ? FeatureType::Point : FeatureType::LineString),
-            geometries,
-            featureProperties
-        );
+            // check for tile & create if necessary
+            auto tile_pos = tiles.emplace(featureTile.first,
+                                          std::make_pair(std::unordered_set<uint32_t>({ annotationID }),
+                                                         util::make_unique<LiveTile>()));
 
-        // check for tile & create if necessary
-        auto tile_pos = tiles.emplace(tileID,
-                                      std::make_pair(std::unordered_set<uint32_t>({ annotationID }),
-                                                     util::make_unique<LiveTile>()));
+            // check for annotation layer & create if necessary
+            util::ptr<LiveTileLayer> layer;
+            std::string layerID = "";
+            if (type == AnnotationType::Point) {
+                layerID = PointLayerID;
+            } else {
+                layerID = ShapeLayerID + "." + std::to_string(annotationID);
+            }
+            if (tile_pos.second || tile_pos.first->second.second->getMutableLayer(layerID) == nullptr) {
+                layer = std::make_shared<LiveTileLayer>();
+                tile_pos.first->second.second->addLayer(layerID, layer);
+            } else {
+                layer = tile_pos.first->second.second->getMutableLayer(layerID);
 
-        // check for annotation layer & create if necessary
-        util::ptr<LiveTileLayer> layer;
-        std::string layerID = "";
-        if (type == AnnotationType::Point) {
-            layerID = PointLayerID;
-        } else {
-            layerID = ShapeLayerID + "." + std::to_string(annotationID);
+                // associate annotation with tile
+                tile_pos.first->second.first.insert(annotationID);
+            }
+
+            // add feature to layer
+            layer->addFeature(feature);
+
+            // Record annotation association with tile and tile feature. This is used to determine stale tiles,
+            // as well as to remove the feature from the tile upon annotation deletion.
+            anno_it.first->second->tileFeatures.emplace(featureTile.first, std::weak_ptr<const LiveTileFeature>(feature));
+
+            // track affected tile
+            affectedTiles.insert(featureTile.first);
         }
-        if (tile_pos.second || tile_pos.first->second.second->getMutableLayer(layerID) == nullptr) {
-            layer = std::make_shared<LiveTileLayer>();
-            tile_pos.first->second.second->addLayer(layerID, layer);
-        } else {
-            layer = tile_pos.first->second.second->getMutableLayer(layerID);
-
-            // associate annotation with tile
-            tile_pos.first->second.first.insert(annotationID);
-        }
-
-        // add feature to layer
-        layer->addFeature(feature);
-
-        // Record annotation association with tile and tile feature. This is used to determine stale tiles,
-        // as well as to remove the feature from the tile upon annotation deletion.
-        anno_it.first->second->tileFeatures.emplace(tileID, std::weak_ptr<const LiveTileFeature>(feature));
-
-        // track affected tile
-        affectedTiles.insert(tileID);
 
         // get ready for the next-lower zoom number
         z2 /= 2;
