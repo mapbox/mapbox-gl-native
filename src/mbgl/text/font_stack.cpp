@@ -32,9 +32,9 @@ const Shaping FontStack::getShaping(const std::u32string &string, const float ma
 
     // Loop through all characters of this label and shape.
     for (uint32_t chr : string) {
-        shaping.positionedGlyphs.emplace_back(chr, x, y);
         auto metric = metrics.find(chr);
         if (metric != metrics.end()) {
+            shaping.positionedGlyphs.emplace_back(chr, x, y);
             x += metric->second.advance + spacing;
         }
     }
