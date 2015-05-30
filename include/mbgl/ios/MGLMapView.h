@@ -309,11 +309,10 @@ IB_DESIGNABLE
 *   @return The marker symbol to display for the specified annotation or `nil` if you want to display the default symbol. */
 - (NSString *)mapView:(MGLMapView *)mapView symbolNameForAnnotation:(id <MGLAnnotation>)annotation;
 
-- (CGFloat)alphaForShapeAnnotation:(MGLShape *)annotation;
-- (UIColor *)strokeColorForPolylineAnnotation:(MGLPolyline *)annotation;
-- (CGFloat)lineWidthForPolylineAnnotation:(MGLPolyline *)annotation;
-- (UIColor *)strokeColorForPolygonAnnotation:(MGLPolygon *)annotation;
-- (UIColor *)fillColorForPolygonAnnotation:(MGLPolygon *)annotation;
+- (CGFloat)mapView:(MGLMapView *)mapView alphaForShapeAnnotation:(MGLShape *)annotation;
+- (UIColor *)mapView:(MGLMapView *)mapView strokeColorForShapeAnnotation:(MGLShape *)annotation;
+- (UIColor *)mapView:(MGLMapView *)mapView fillColorForPolygonAnnotation:(MGLPolygon *)annotation;
+- (CGFloat)mapView:(MGLMapView *)mapView lineWidthForPolylineAnnotation:(MGLPolyline *)annotation;
 
 /** Returns a Boolean value indicating whether the annotation is able to display extra information in a callout bubble.
 *
