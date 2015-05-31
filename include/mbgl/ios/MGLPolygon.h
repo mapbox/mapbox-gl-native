@@ -3,7 +3,7 @@
 
 #import "MGLMultiPoint.h"
 
-@interface MGLPolygon: MGLMultiPoint
+@interface MGLPolygon : MGLMultiPoint
 
 + (instancetype)polygonWithCoordinates:(CLLocationCoordinate2D *)coords
                                  count:(NSUInteger)count;

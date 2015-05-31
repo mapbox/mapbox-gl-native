@@ -29,8 +29,6 @@
         './MBXAppDelegate.m',
         './MBXViewController.h',
         './MBXViewController.mm',
-        './MBXAnnotation.h',
-        './MBXAnnotation.m',
         '../../platform/darwin/settings_nsuserdefaults.mm',
       ],
 

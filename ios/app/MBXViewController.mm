@@ -6,8 +6,6 @@
 
 #import <CoreLocation/CoreLocation.h>
 
-#import "MBXAnnotation.h"
-
 static UIColor *const kTintColor = [UIColor colorWithRed:0.120 green:0.550 blue:0.670 alpha:1.000];
 
 static NSArray *const kStyleNames = @[
@@ -194,9 +192,9 @@ mbgl::Settings_NSUserDefaults *settings = nullptr;
                                                                                [feature[@"geometry"][@"coordinates"][0] doubleValue]);
                 NSString *title = feature[@"properties"][@"NAME"];
 
-                MBXAnnotation *annotation = [MBXAnnotation annotationWithLocation:coordinate
-                                                                            title:title
-                                                                         subtitle:nil];
+                MGLPointAnnotation *annotation = [MGLPointAnnotation new];
+                annotation.coordinate = coordinate;
+                annotation.title = title;
 
                 [annotations addObject:annotation];
 

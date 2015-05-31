@@ -3,7 +3,7 @@
 
 #import "MGLShape.h"
 
-@interface MGLMultiPoint: MGLShape
+@interface MGLMultiPoint : MGLShape
 
 - (void)getCoordinates:(CLLocationCoordinate2D *)coords range:(NSRange)range;
 

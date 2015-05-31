@@ -3,6 +3,7 @@
 #import "MGLMapView.h"
 #import "MGLMultiPoint.h"
 #import "MGLOverlay.h"
+#import "MGLPointAnnotation.h"
 #import "MGLPolygon.h"
 #import "MGLPolyline.h"
 #import "MGLShape.h"

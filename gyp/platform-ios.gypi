@@ -38,6 +38,8 @@
         '../include/mbgl/ios/MGLMultiPoint.h',
         '../platform/ios/MGLMultiPoint.m',
         '../include/mbgl/ios/MGLOverlay.h',
+        '../include/mbgl/ios/MGLPointAnnotation.h',
+        '../platform/ios/MGLPointAnnotation.m',
         '../include/mbgl/ios/MGLPolyline.h',
         '../platform/ios/MGLPolyline.m',
         '../include/mbgl/ios/MGLPolygon.h',
