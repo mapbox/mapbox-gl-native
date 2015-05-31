@@ -1645,36 +1645,131 @@ CLLocationCoordinate2D latLngToCoordinate(mbgl::LatLng latLng)
 {
     if ( ! annotations) return;
 
-    std::vector<mbgl::LatLng> latLngs;
-    latLngs.reserve(annotations.count);
-
+    std::vector<mbgl::LatLng> points;
     std::vector<std::string> symbols;
-    symbols.reserve(annotations.count);
+
+    std::vector<mbgl::AnnotationSegments> shapes;
+    std::vector<mbgl::StyleProperties> shapesProperties;
 
     BOOL delegateImplementsSymbolLookup = [self.delegate respondsToSelector:@selector(mapView:symbolNameForAnnotation:)];
+    BOOL delegateImplementsAlphaForShape = [self.delegate respondsToSelector:@selector(mapView:alphaForShapeAnnotation:)];
+    BOOL delegateImplementsStrokeColorForShape = [self.delegate respondsToSelector:@selector(mapView:strokeColorForShapeAnnotation:)];
+    BOOL delegateImplementsFillColorForPolygon = [self.delegate respondsToSelector:@selector(mapView:fillColorForPolygonAnnotation:)];
+    BOOL delegateImplementsLineWidthForPolyline = [self.delegate respondsToSelector:@selector(mapView:lineWidthForPolylineAnnotation:)];
 
     for (id <MGLAnnotation> annotation in annotations)
     {
         assert([annotation conformsToProtocol:@protocol(MGLAnnotation)]);
 
-        latLngs.push_back(coordinateToLatLng(annotation.coordinate));
-
-        NSString *symbolName = nil;
-
-        if (delegateImplementsSymbolLookup)
+        if ([annotation isKindOfClass:[MGLMultiPoint class]])
         {
-            symbolName = [self.delegate mapView:self symbolNameForAnnotation:annotation];
-        }
+            CGFloat alpha = (delegateImplementsAlphaForShape ?
+                                [self.delegate mapView:self alphaForShapeAnnotation:annotation] :
+                                1.0);
 
-        symbols.push_back((symbolName ? [symbolName UTF8String] : ""));
+            UIColor *strokeColor = (delegateImplementsStrokeColorForShape ?
+                                [self.delegate mapView:self strokeColorForShapeAnnotation:annotation] :
+                                [UIColor blackColor]);
+
+            assert(strokeColor);
+
+            CGFloat r,g,b,a;
+            [strokeColor getRed:&r green:&g blue:&b alpha:&a];
+            mbgl::Color strokeNativeColor({{ (float)r, (float)g, (float)b, (float)a }});
+
+            mbgl::StyleProperties shapeProperties;
+
+            if ([annotation isKindOfClass:[MGLPolyline class]])
+            {
+                CGFloat lineWidth = (delegateImplementsLineWidthForPolyline ?
+                                [self.delegate mapView:self lineWidthForPolylineAnnotation:annotation] :
+                                3.0);
+
+                mbgl::LineProperties lineProperties;
+                lineProperties.opacity = alpha;
+                lineProperties.color = strokeNativeColor;
+                lineProperties.width = lineWidth;
+                shapeProperties.set<mbgl::LineProperties>(lineProperties);
+
+            }
+            else if ([annotation isKindOfClass:[MGLPolygon class]])
+            {
+                UIColor *fillColor = (delegateImplementsFillColorForPolygon ?
+                                [self.delegate mapView:self fillColorForPolygonAnnotation:annotation] :
+                                [UIColor blueColor]);
+
+                assert(fillColor);
+
+                [fillColor getRed:&r green:&g blue:&b alpha:&a];
+                mbgl::Color fillNativeColor({{ (float)r, (float)g, (float)b, (float)a }});
+
+                mbgl::FillProperties fillProperties;
+                fillProperties.opacity = alpha;
+                fillProperties.stroke_color = strokeNativeColor;
+                fillProperties.fill_color = fillNativeColor;
+                shapeProperties.set<mbgl::FillProperties>(fillProperties);
+            }
+            else
+            {
+                [[NSException exceptionWithName:@"MGLUnknownShapeClassException"
+                                         reason:[NSString stringWithFormat:@"%@ is an unknown shape class", [annotation class]]
+                                       userInfo:nil] raise];
+            }
+
+            shapesProperties.push_back(shapeProperties);
+
+            NSUInteger count = [(MGLMultiPoint *)annotation pointCount];
+
+            CLLocationCoordinate2D *coordinates = (CLLocationCoordinate2D *)malloc(count * sizeof(CLLocationCoordinate2D));
+            [(MGLMultiPoint *)annotation getCoordinates:coordinates range:NSMakeRange(0, count)];
+
+            mbgl::AnnotationSegment shape;
+            shape.reserve(count);
+
+            for (NSUInteger i = 0; i < count; i++)
+            {
+                shape.push_back(mbgl::LatLng(coordinates[i].latitude, coordinates[i].longitude));
+            }
+
+            free(coordinates);
+
+            shapes.push_back({{ shape }});
+        }
+        else
+        {
+            points.push_back(coordinateToLatLng(annotation.coordinate));
+
+            NSString *symbolName = nil;
+
+            if (delegateImplementsSymbolLookup)
+            {
+                symbolName = [self.delegate mapView:self symbolNameForAnnotation:annotation];
+            }
+
+            symbols.push_back((symbolName ? [symbolName UTF8String] : ""));
+        }
     }
 
-    std::vector<uint32_t> annotationIDs = _mbglMap->addPointAnnotations(latLngs, symbols);
-
-    for (size_t i = 0; i < annotationIDs.size(); ++i)
+    if (points.size())
     {
-        [self.annotationIDsByAnnotation setObject:@{ MGLAnnotationIDKey : @(annotationIDs[i]) }
-                                           forKey:annotations[i]];
+        std::vector<uint32_t> pointAnnotationIDs = _mbglMap->addPointAnnotations(points, symbols);
+
+        for (size_t i = 0; i < pointAnnotationIDs.size(); ++i)
+        {
+            [self.annotationIDsByAnnotation setObject:@{ MGLAnnotationIDKey : @(pointAnnotationIDs[i]) }
+                                               forKey:annotations[i]];
+        }
+    }
+
+    if (shapes.size())
+    {
+        std::vector<uint32_t> shapeAnnotationIDs = _mbglMap->addShapeAnnotations(shapes, shapesProperties);
+
+        for (size_t i = 0; i < shapeAnnotationIDs.size(); ++i)
+        {
+            [self.annotationIDsByAnnotation setObject:@{ MGLAnnotationIDKey : @(shapeAnnotationIDs[i]) }
+                                               forKey:annotations[i]];
+        }
     }
 }
 

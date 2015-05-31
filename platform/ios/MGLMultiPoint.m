@@ -9,8 +9,6 @@
 - (instancetype)initWithCoordinates:(CLLocationCoordinate2D *)coords
                               count:(NSUInteger)count
 {
-    assert(sizeof(coords) == count * sizeof(CLLocationCoordinate2D));
-
     self = [super init];
 
     if (self)
@@ -68,7 +66,7 @@
     }
 
     assert(sizeof(coords) >= sizeof(range.length * sizeof(CLLocationCoordinate2D)));
-    assert(range.location + range.length < _count);
+    assert(range.location + range.length <= _count);
 
     NSUInteger index = 0;
 

@@ -10,7 +10,8 @@
       'mac_bundle': 1,
       'mac_bundle_resources': [
         '<!@(find ../ios/app/img -type f)',
-        './features.geojson',
+        './points.geojson',
+        './polyline.geojson',
         './Settings.bundle/'
       ],
 

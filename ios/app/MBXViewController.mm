@@ -128,7 +128,8 @@ mbgl::Settings_NSUserDefaults *settings = nullptr;
                                                                 @"Add 100 Points",
                                                                 @"Add 1,000 Points",
                                                                 @"Add 10,000 Points",
-                                                                @"Remove Points",
+                                                                @"Add Test Shapes",
+                                                                @"Remove Annotations",
                                                                 nil];
 
     [sheet showFromBarButtonItem:self.navigationItem.leftBarButtonItem animated:YES];
@@ -166,6 +167,42 @@ mbgl::Settings_NSUserDefaults *settings = nullptr;
     }
     else if (buttonIndex == actionSheet.firstOtherButtonIndex + 7)
     {
+        CLLocationCoordinate2D polygonCoordinates[4] =
+        {
+            CLLocationCoordinate2DMake(44, -122),
+            CLLocationCoordinate2DMake(46, -122),
+            CLLocationCoordinate2DMake(46, -121),
+            CLLocationCoordinate2DMake(44, -122)
+        };
+
+        MGLPolygon *polygon = [MGLPolygon polygonWithCoordinates:polygonCoordinates count:4];
+
+        [self.mapView addAnnotation:polygon];
+
+        NSDictionary *hike = [NSJSONSerialization JSONObjectWithData:
+                                 [NSData dataWithContentsOfFile:
+                                     [[NSBundle mainBundle] pathForResource:@"polyline" ofType:@"geojson"]]
+                                                             options:0
+                                                               error:nil];
+
+        NSArray *coordinatePairs = hike[@"features"][0][@"geometry"][@"coordinates"];
+
+        CLLocationCoordinate2D *polylineCoordinates = (CLLocationCoordinate2D *)malloc([coordinatePairs count] * sizeof(CLLocationCoordinate2D));
+
+        for (NSArray *coordinatePair in coordinatePairs)
+        {
+            polylineCoordinates[[coordinatePairs indexOfObject:coordinatePair]] = CLLocationCoordinate2DMake([coordinatePair[1] doubleValue], [coordinatePair[0] doubleValue]);
+        }
+
+        MGLPolyline *polyline = [MGLPolyline polylineWithCoordinates:polylineCoordinates
+                                                               count:[coordinatePairs count]];
+
+        [self.mapView addAnnotation:polyline];
+
+        free(polylineCoordinates);
+    }
+    else if (buttonIndex == actionSheet.firstOtherButtonIndex + 8)
+    {
         [self.mapView removeAnnotations:self.mapView.annotations];
     }
 }
@@ -176,7 +213,7 @@ mbgl::Settings_NSUserDefaults *settings = nullptr;
 
     dispatch_async(dispatch_get_global_queue(DISPATCH_QUEUE_PRIORITY_DEFAULT, 0), ^
     {
-        NSData *featuresData = [NSData dataWithContentsOfFile:[[NSBundle mainBundle] pathForResource:@"features" ofType:@"geojson"]];
+        NSData *featuresData = [NSData dataWithContentsOfFile:[[NSBundle mainBundle] pathForResource:@"points" ofType:@"geojson"]];
 
         id features = [NSJSONSerialization JSONObjectWithData:featuresData
                                                       options:0
@@ -275,6 +312,21 @@ mbgl::Settings_NSUserDefaults *settings = nullptr;
 - (BOOL)mapView:(__unused MGLMapView *)mapView annotationCanShowCallout:(__unused id <MGLAnnotation>)annotation
 {
     return YES;
+}
+
+- (CGFloat)mapView:(__unused MGLMapView *)mapView alphaForShapeAnnotation:(MGLShape *)annotation
+{
+    return ([annotation isKindOfClass:[MGLPolygon class]] ? 0.5 : 1.0);
+}
+
+- (UIColor *)mapView:(__unused MGLMapView *)mapView strokeColorForShapeAnnotation:(MGLShape *)annotation
+{
+    return ([annotation isKindOfClass:[MGLPolyline class]] ? [UIColor purpleColor] : [UIColor blackColor]);
+}
+
+- (UIColor *)mapView:(__unused MGLMapView *)mapView fillColorForPolygonAnnotation:(__unused MGLPolygon *)annotation
+{
+    return [UIColor redColor];
 }
 
 - (void)mapView:(__unused MGLMapView *)mapView didChangeUserTrackingMode:(MGLUserTrackingMode)mode animated:(__unused BOOL)animated
