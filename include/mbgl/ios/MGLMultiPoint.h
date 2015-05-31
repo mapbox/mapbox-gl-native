@@ -5,6 +5,8 @@
 
 @interface MGLMultiPoint : MGLShape
 
+@property (nonatomic, readonly) NSUInteger pointCount;
+
 - (void)getCoordinates:(CLLocationCoordinate2D *)coords range:(NSRange)range;
 
 @end
