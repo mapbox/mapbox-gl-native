@@ -106,8 +106,6 @@ AnnotationManager::addAnnotations(const AnnotationType type,
         std::vector<std::vector<vec2<double>>> projectedShape;
         projectedShape.reserve(shape.size());
 
-        const uint32_t annotationID = nextID();
-
         for (size_t l = 0; l < shape.size(); ++l) {
             auto& line = shape[l];
 
@@ -120,37 +118,59 @@ AnnotationManager::addAnnotations(const AnnotationType type,
                 // projection conversion into unit space
                 const auto pp = projectPoint(point);
 
-                projectedLine.push_back(pp);
+                if (type == AnnotationType::Point) {
+                    const uint32_t pointAnnotationID = nextID();
+
+                    // at render time we style the point according to its {sprite} field
+                    std::unordered_map<std::string, std::string> pointFeatureProperties;
+                    const std::string& symbol = annotationsProperties.at("symbols")[p];
+                    if (symbol.length()) {
+                        pointFeatureProperties.emplace("sprite", symbol);
+                    } else {
+                        pointFeatureProperties.emplace("sprite", defaultPointAnnotationSymbol);
+                    }
+
+                    // add individual point tile feature
+                    auto featureAffectedTiles = addTileFeature(
+                        pointAnnotationID,
+                        AnnotationSegments({{ point }}),
+                        std::vector<std::vector<vec2<double>>>({{ pp }}),
+                        AnnotationType::Point,
+                        {{ }},
+                        pointFeatureProperties,
+                        maxZoom
+                    );
+
+                    std::copy(featureAffectedTiles.begin(), featureAffectedTiles.end(), std::inserter(affectedTiles, affectedTiles.begin()));
+
+                    annotationIDs.push_back(pointAnnotationID);
+                } else {
+                    projectedLine.push_back(pp);
+                }
             }
 
-            projectedShape.push_back(projectedLine);
-        }
-
-        std::unordered_map<std::string, std::string> featureProperties;
-
-        if (type == AnnotationType::Point) {
-            // at render time we style the point according to its {sprite} field
-            const std::string& symbol = annotationsProperties.at("symbols")[s];
-            if (symbol.length()) {
-                featureProperties.emplace("sprite", symbol);
-            } else {
-                featureProperties.emplace("sprite", defaultPointAnnotationSymbol);
+            if (type == AnnotationType::Shape) {
+                projectedShape.push_back(projectedLine);
             }
         }
 
-        auto featureAffectedTiles = addTileFeature(
-            annotationID,
-            shape,
-            projectedShape,
-            type,
-            styleProperties[s],
-            featureProperties,
-            maxZoom
-        );
+        if (type == AnnotationType::Shape) {
+            const uint32_t shapeAnnotationID = nextID();
 
-        std::copy(featureAffectedTiles.begin(), featureAffectedTiles.end(), std::inserter(affectedTiles, affectedTiles.begin()));
+            auto featureAffectedTiles = addTileFeature(
+                shapeAnnotationID,
+                shape,
+                projectedShape,
+                AnnotationType::Shape,
+                styleProperties[s],
+                {{ }},
+                maxZoom
+            );
 
-        annotationIDs.push_back(annotationID);
+            std::copy(featureAffectedTiles.begin(), featureAffectedTiles.end(), std::inserter(affectedTiles, affectedTiles.begin()));
+
+            annotationIDs.push_back(shapeAnnotationID);
+        }
     }
 
     // Tile:IDs that need refreshed and the annotation identifiers held onto by the client.
@@ -286,8 +306,8 @@ AnnotationManager::addPointAnnotations(const AnnotationSegment& points,
                                        const AnnotationsProperties& annotationsProperties,
                                        const MapData& data) {
     return addAnnotations(AnnotationType::Point,
-                          { { points } },
-                          { defaultStyleProperties<SymbolProperties>() },
+                          {{ points }},
+                          {{ }},
                           annotationsProperties,
                           data);
 }
