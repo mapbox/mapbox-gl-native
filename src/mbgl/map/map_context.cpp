@@ -2,18 +2,11 @@
 #include <mbgl/map/map_data.hpp>
 #include <mbgl/map/view.hpp>
 #include <mbgl/map/environment.hpp>
-#include <mbgl/map/source.hpp>
 #include <mbgl/map/still_image.hpp>
 
 #include <mbgl/platform/log.hpp>
 
 #include <mbgl/renderer/painter.hpp>
-
-#include <mbgl/text/glyph_store.hpp>
-
-#include <mbgl/geometry/glyph_atlas.hpp>
-#include <mbgl/geometry/sprite_atlas.hpp>
-#include <mbgl/geometry/line_atlas.hpp>
 
 #include <mbgl/storage/resource.hpp>
 #include <mbgl/storage/response.hpp>
@@ -34,10 +27,6 @@ MapContext::MapContext(uv_loop_t* loop, View& view_, FileSource& fileSource, Map
       envScope(env, ThreadType::Map, "Map"),
       updated(static_cast<UpdateType>(Update::Nothing)),
       asyncUpdate(std::make_unique<uv::async>(loop, [this] { update(); })),
-      glyphStore(std::make_unique<GlyphStore>(loop, env)),
-      glyphAtlas(std::make_unique<GlyphAtlas>(1024, 1024)),
-      spriteAtlas(std::make_unique<SpriteAtlas>(512, 512)),
-      lineAtlas(std::make_unique<LineAtlas>(512, 512)),
       texturePool(std::make_unique<TexturePool>()) {
     assert(Environment::currentlyOn(ThreadType::Map));
 
@@ -51,14 +40,9 @@ MapContext::~MapContext() {
 
     // Explicit resets currently necessary because these abandon resources that need to be
     // cleaned up by env.performCleanup();
-    resourceLoader.reset();
     style.reset();
     painter.reset();
     texturePool.reset();
-    lineAtlas.reset();
-    spriteAtlas.reset();
-    glyphAtlas.reset();
-    glyphStore.reset();
 
     env.performCleanup();
 
@@ -116,21 +100,11 @@ void MapContext::setStyleJSON(const std::string& json, const std::string& base) 
 void MapContext::loadStyleJSON(const std::string& json, const std::string& base) {
     assert(Environment::currentlyOn(ThreadType::Map));
 
-    resourceLoader.reset();
     style.reset();
-
-    style = std::make_unique<Style>();
-    style->base = base;
-    style->loadJSON((const uint8_t *)json.c_str());
+    style = std::make_unique<Style>(json, base, asyncUpdate->get()->loop, env);
     style->cascade(data.getClasses());
     style->setDefaultTransitionDuration(data.getDefaultTransitionDuration());
-
-    glyphStore->setURL(style->glyph_url);
-
-    resourceLoader = std::make_unique<ResourceLoader>();
-    resourceLoader->setObserver(this);
-    resourceLoader->setStyle(style.get());
-    resourceLoader->setGlyphStore(glyphStore.get());
+    style->setObserver(this);
 
     triggerUpdate(Update::Zoom);
 }
@@ -138,7 +112,7 @@ void MapContext::loadStyleJSON(const std::string& json, const std::string& base)
 void MapContext::updateTiles() {
     assert(Environment::currentlyOn(ThreadType::Map));
 
-    resourceLoader->update(data, transformState, *glyphAtlas, *spriteAtlas, *texturePool);
+    style->update(data, transformState, *texturePool);
 }
 
 void MapContext::updateAnnotationTiles(const std::vector<TileID>& ids) {
@@ -177,7 +151,7 @@ void MapContext::update() {
 
         updateTiles();
 
-        if (style->isLoaded() && resourceLoader->getSprite()->isLoaded()) {
+        if (style->isLoaded()) {
             if (!data.getFullyLoaded()) {
                 data.setFullyLoaded(true);
             }
@@ -220,7 +194,7 @@ void MapContext::render() {
     assert(style);
 
     if (!painter) {
-        painter = std::make_unique<Painter>(*spriteAtlas, *glyphAtlas, *lineAtlas);
+        painter = std::make_unique<Painter>();
         painter->setup();
     }
 
@@ -240,7 +214,7 @@ void MapContext::render() {
 
 double MapContext::getTopOffsetPixelsForAnnotationSymbol(const std::string& symbol) {
     assert(Environment::currentlyOn(ThreadType::Map));
-    const SpritePosition pos = resourceLoader->getSprite()->getSpritePosition(symbol);
+    const SpritePosition pos = style->sprite->getSpritePosition(symbol);
     return -pos.height / pos.pixelRatio / 2;
 }
 

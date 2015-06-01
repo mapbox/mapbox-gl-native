@@ -138,7 +138,7 @@ void Painter::renderSymbol(SymbolBucket &bucket, const StyleLayer &layer_desc, c
         const float fontSize = properties.icon.size != 0 ? properties.icon.size : layout.icon.max_size;
         const float fontScale = fontSize / 1.0f;
 
-        spriteAtlas.bind(state.isChanging() || layout.placement == PlacementType::Line || angleOffset != 0 || fontScale != 1 || sdf);
+        spriteAtlas->bind(state.isChanging() || layout.placement == PlacementType::Line || angleOffset != 0 || fontScale != 1 || sdf);
 
         if (sdf) {
             renderSDF(bucket,
@@ -147,7 +147,7 @@ void Painter::renderSymbol(SymbolBucket &bucket, const StyleLayer &layer_desc, c
                       layout.icon,
                       properties.icon,
                       1.0f,
-                      {{ float(spriteAtlas.getWidth()) / 4.0f, float(spriteAtlas.getHeight()) / 4.0f }},
+                      {{ float(spriteAtlas->getWidth()) / 4.0f, float(spriteAtlas->getHeight()) / 4.0f }},
                       *sdfIconShader,
                       &SymbolBucket::drawIcons);
         } else {
@@ -165,7 +165,7 @@ void Painter::renderSymbol(SymbolBucket &bucket, const StyleLayer &layer_desc, c
             useProgram(iconShader->program);
             iconShader->u_matrix = vtxMatrix;
             iconShader->u_exmatrix = exMatrix;
-            iconShader->u_texsize = {{ float(spriteAtlas.getWidth()) / 4.0f, float(spriteAtlas.getHeight()) / 4.0f }};
+            iconShader->u_texsize = {{ float(spriteAtlas->getWidth()) / 4.0f, float(spriteAtlas->getHeight()) / 4.0f }};
 
             // Convert the -pi..pi to an int8 range.
             const float angle = std::round(state.getAngle() / M_PI * 128);
@@ -192,7 +192,7 @@ void Painter::renderSymbol(SymbolBucket &bucket, const StyleLayer &layer_desc, c
     }
 
     if (bucket.hasTextData()) {
-        glyphAtlas.bind();
+        glyphAtlas->bind();
 
         renderSDF(bucket,
                   id,
@@ -200,7 +200,7 @@ void Painter::renderSymbol(SymbolBucket &bucket, const StyleLayer &layer_desc, c
                   layout.text,
                   properties.text,
                   24.0f,
-                  {{ float(glyphAtlas.width) / 4, float(glyphAtlas.height) / 4 }},
+                  {{ float(glyphAtlas->width) / 4, float(glyphAtlas->height) / 4 }},
                   *sdfGlyphShader,
                   &SymbolBucket::drawGlyphs);
     }

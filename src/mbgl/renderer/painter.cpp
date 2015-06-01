@@ -41,11 +41,7 @@ using namespace mbgl;
 
 #define BUFFER_OFFSET(i) ((char *)nullptr + (i))
 
-Painter::Painter(SpriteAtlas& spriteAtlas_, GlyphAtlas& glyphAtlas_, LineAtlas& lineAtlas_)
-    : spriteAtlas(spriteAtlas_)
-    , glyphAtlas(glyphAtlas_)
-    , lineAtlas(lineAtlas_)
-{
+Painter::Painter() {
 }
 
 Painter::~Painter() {
@@ -171,6 +167,10 @@ void Painter::prepareTile(const Tile& tile) {
 void Painter::render(const Style& style, TransformState state_, TimePoint time) {
     state = state_;
 
+    glyphAtlas = style.glyphAtlas.get();
+    spriteAtlas = style.spriteAtlas.get();
+    lineAtlas = style.lineAtlas.get();
+
     std::set<Source*> sources;
     for (const auto& source : style.sources) {
         if (source->enabled) {
@@ -191,9 +191,9 @@ void Painter::render(const Style& style, TransformState state_, TimePoint time) 
 
         tileStencilBuffer.upload();
         tileBorderBuffer.upload();
-        spriteAtlas.upload();
-        lineAtlas.upload();
-        glyphAtlas.upload();
+        spriteAtlas->upload();
+        lineAtlas->upload();
+        glyphAtlas->upload();
 
         for (const auto& item : order) {
             if (item.bucket && item.bucket->needsUpload()) {
@@ -389,8 +389,8 @@ void Painter::renderBackground(const StyleLayer &layer_desc) {
         if ((properties.opacity >= 1.0f) != (pass == RenderPass::Opaque))
             return;
 
-        SpriteAtlasPosition imagePosA = spriteAtlas.getPosition(properties.image.from, true);
-        SpriteAtlasPosition imagePosB = spriteAtlas.getPosition(properties.image.to, true);
+        SpriteAtlasPosition imagePosA = spriteAtlas->getPosition(properties.image.from, true);
+        SpriteAtlasPosition imagePosB = spriteAtlas->getPosition(properties.image.to, true);
         float zoomFraction = state.getZoomFraction();
 
         useProgram(patternShader->program);
@@ -439,7 +439,7 @@ void Painter::renderBackground(const StyleLayer &layer_desc) {
 
         backgroundBuffer.bind();
         patternShader->bind(0);
-        spriteAtlas.bind(true);
+        spriteAtlas->bind(true);
     } else {
         Color color = properties.color;
         color[0] *= properties.opacity;

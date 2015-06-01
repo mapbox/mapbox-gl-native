@@ -4,8 +4,8 @@
 #include <mbgl/map/tile_id.hpp>
 #include <mbgl/map/update.hpp>
 #include <mbgl/map/environment.hpp>
-#include <mbgl/map/resource_loader.hpp>
 #include <mbgl/map/transform_state.hpp>
+#include <mbgl/style/style.hpp>
 #include <mbgl/util/ptr.hpp>
 
 #include <vector>
@@ -20,20 +20,15 @@ namespace mbgl {
 
 class View;
 class MapData;
-class GlyphStore;
-class GlyphAtlas;
-class SpriteAtlas;
-class LineAtlas;
 class TexturePool;
 class Painter;
 class Sprite;
-class Style;
 class Worker;
 class StillImage;
 struct LatLng;
 struct LatLngBounds;
 
-class MapContext : public ResourceLoader::Observer {
+class MapContext : public Style::Observer {
 public:
     MapContext(uv_loop_t*, View&, FileSource&, MapData&);
     ~MapContext();
@@ -81,14 +76,9 @@ private:
     UpdateType updated { static_cast<UpdateType>(Update::Nothing) };
     std::unique_ptr<uv::async> asyncUpdate;
 
-    std::unique_ptr<GlyphStore> glyphStore;
-    std::unique_ptr<GlyphAtlas> glyphAtlas;
-    std::unique_ptr<SpriteAtlas> spriteAtlas;
-    std::unique_ptr<LineAtlas> lineAtlas;
     std::unique_ptr<TexturePool> texturePool;
     std::unique_ptr<Painter> painter;
     std::unique_ptr<Style> style;
-    std::unique_ptr<ResourceLoader> resourceLoader;
 
     std::string styleURL;
     std::string styleJSON;

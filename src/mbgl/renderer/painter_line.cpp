@@ -66,9 +66,9 @@ void Painter::renderLine(LineBucket& bucket, const StyleLayer &layer_desc, const
         linesdfShader->u_blur = blur;
         linesdfShader->u_color = color;
 
-        LinePatternPos posA = lineAtlas.getDashPosition(properties.dash_array.from, layout.cap == CapType::Round);
-        LinePatternPos posB = lineAtlas.getDashPosition(properties.dash_array.to, layout.cap == CapType::Round);
-        lineAtlas.bind();
+        LinePatternPos posA = lineAtlas->getDashPosition(properties.dash_array.from, layout.cap == CapType::Round);
+        LinePatternPos posB = lineAtlas->getDashPosition(properties.dash_array.to, layout.cap == CapType::Round);
+        lineAtlas->bind();
 
         float patternratio = std::pow(2.0, std::floor(std::log2(state.getScale())) - id.z) / 8.0;
         float scaleXA = patternratio / posA.width / properties.dash_line_width / properties.dash_array.fromScale;
@@ -81,14 +81,14 @@ void Painter::renderLine(LineBucket& bucket, const StyleLayer &layer_desc, const
         linesdfShader->u_patternscale_b = {{ scaleXB, scaleYB }};
         linesdfShader->u_tex_y_b = posB.y;
         linesdfShader->u_image = 0;
-        linesdfShader->u_sdfgamma = lineAtlas.width / (properties.dash_line_width * std::min(posA.width, posB.width) * 256.0 * state.getPixelRatio()) / 2;
+        linesdfShader->u_sdfgamma = lineAtlas->width / (properties.dash_line_width * std::min(posA.width, posB.width) * 256.0 * state.getPixelRatio()) / 2;
         linesdfShader->u_mix = properties.dash_array.t;
 
         bucket.drawLineSDF(*linesdfShader);
 
     } else if (properties.image.from.size()) {
-        SpriteAtlasPosition imagePosA = spriteAtlas.getPosition(properties.image.from, true);
-        SpriteAtlasPosition imagePosB = spriteAtlas.getPosition(properties.image.to, true);
+        SpriteAtlasPosition imagePosA = spriteAtlas->getPosition(properties.image.from, true);
+        SpriteAtlasPosition imagePosB = spriteAtlas->getPosition(properties.image.to, true);
 
         float factor = 8.0 / std::pow(2, state.getIntegerZoom() - id.z);
 
@@ -110,7 +110,7 @@ void Painter::renderLine(LineBucket& bucket, const StyleLayer &layer_desc, const
         linepatternShader->u_opacity = properties.opacity;
 
         MBGL_CHECK_ERROR(glActiveTexture(GL_TEXTURE0));
-        spriteAtlas.bind(true);
+        spriteAtlas->bind(true);
         config.depthRange = { strata + strata_epsilon, 1.0f };  // may or may not matter
 
         bucket.drawLinePatterns(*linepatternShader);
