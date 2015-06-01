@@ -20,6 +20,7 @@ Annotation::Annotation(AnnotationType type_,
       geometry(geometry_),
       bounds([this] {
           LatLngBounds bounds_;
+          assert(type != AnnotationType::Any);
           if (type == AnnotationType::Point) {
               bounds_ = { getPoint(), getPoint() };
           } else {
@@ -84,6 +85,8 @@ AnnotationManager::addAnnotations(const AnnotationType type,
                                   const AnnotationsProperties& annotationsProperties,
                                   const MapData& data) {
     std::lock_guard<std::mutex> lock(mtx);
+
+    assert(type != AnnotationType::Any);
 
     // We pre-generate tiles to contain each annotation up to the map's max zoom.
     // We do this for fast rendering without projection conversions on the fly, as well as
@@ -185,6 +188,8 @@ AnnotationManager::addTileFeature(const uint32_t annotationID,
                                   const StyleProperties& styleProperties,
                                   const std::unordered_map<std::string, std::string>& featureProperties,
                                   const uint8_t maxZoom) {
+
+    assert(type != AnnotationType::Any);
 
     // track the annotation global ID and its original geometry
     auto anno_it = annotations.emplace(annotationID,
@@ -394,7 +399,8 @@ const std::unique_ptr<Annotation>& AnnotationManager::getAnnotationWithID(uint32
 }
 
 AnnotationIDs AnnotationManager::getAnnotationsInBounds(const LatLngBounds& queryBounds,
-                                                        const MapData& data) const {
+                                                        const MapData& data,
+                                                        const AnnotationType& type) const {
     std::lock_guard<std::mutex> lock(mtx);
 
     const uint8_t z = data.transform.getMaxZoom();
@@ -414,9 +420,22 @@ AnnotationIDs AnnotationManager::getAnnotationsInBounds(const LatLngBounds& quer
             if (id.x >= nwTile.x && id.x <= seTile.x && id.y >= nwTile.y && id.y <= seTile.y) {
                 if (id.x > nwTile.x && id.x < seTile.x && id.y > nwTile.y && id.y < seTile.y) {
                     // Trivial accept; this tile is completely inside the query bounds, so
-                    // we'll return all of its annotations.
-                    std::copy(tile.second.first.begin(), tile.second.first.end(),
-                              std::inserter(matchingAnnotations, matchingAnnotations.begin()));
+                    // we'll return all of its annotations that match type (if specified).
+                    if (type != AnnotationType::Any) {
+                        std::copy_if(tile.second.first.begin(), tile.second.first.end(),
+                                     std::inserter(matchingAnnotations, matchingAnnotations.begin()),
+                                     [&](const uint32_t annotationID) -> bool {
+                            const auto it = annotations.find(annotationID);
+                            if (it != annotations.end()) {
+                                return (it->second->type == type);
+                            } else {
+                                return false;
+                            }
+                        });
+                    } else {
+                        std::copy(tile.second.first.begin(), tile.second.first.end(),
+                                  std::inserter(matchingAnnotations, matchingAnnotations.begin()));
+                    }
                 } else {
                     // This tile is intersected by the query bounds. We need to check the
                     // tile's annotations' bounding boxes individually.
@@ -425,6 +444,12 @@ AnnotationIDs AnnotationManager::getAnnotationsInBounds(const LatLngBounds& quer
                                  [&](const uint32_t annotationID) -> bool {
                         const auto it = annotations.find(annotationID);
                         if (it != annotations.end()) {
+                            // check type
+                            if (type != AnnotationType::Any && it->second->type != type) {
+                                return false;
+                            }
+
+                            // check bounds
                             const LatLngBounds annoBounds = it->second->getBounds();
                             return (annoBounds.sw.latitude >= queryBounds.sw.latitude &&
                                     annoBounds.ne.latitude <= queryBounds.ne.latitude &&

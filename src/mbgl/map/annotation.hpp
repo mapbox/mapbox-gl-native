@@ -28,11 +28,6 @@ class MapData;
 
 using AnnotationsProperties = std::unordered_map<std::string, std::vector<std::string>>;
 
-enum class AnnotationType : uint8_t {
-    Point,
-    Shape
-};
-
 class Annotation : private util::noncopyable {
     friend class AnnotationManager;
 public:
@@ -73,7 +68,7 @@ public:
     std::unordered_set<TileID, TileID::Hash> removeAnnotations(const AnnotationIDs&, const MapData&);
     AnnotationIDs getOrderedShapeAnnotations() const { return orderedShapeAnnotations; }
     const std::unique_ptr<Annotation>& getAnnotationWithID(uint32_t) const;
-    AnnotationIDs getAnnotationsInBounds(const LatLngBounds&, const MapData&) const;
+    AnnotationIDs getAnnotationsInBounds(const LatLngBounds&, const MapData&, const AnnotationType& = AnnotationType::Any) const;
     LatLngBounds getBoundsForAnnotations(const AnnotationIDs&) const;
 
     const LiveTile* getTile(const TileID& id);

@@ -281,8 +281,8 @@ void Map::removeAnnotations(const std::vector<uint32_t>& annotations) {
     context->invoke(&MapContext::updateAnnotationTiles, result);
 }
 
-std::vector<uint32_t> Map::getAnnotationsInBounds(const LatLngBounds& bounds) {
-    return data->annotationManager.getAnnotationsInBounds(bounds, *data);
+std::vector<uint32_t> Map::getAnnotationsInBounds(const LatLngBounds& bounds, const AnnotationType& type) {
+    return data->annotationManager.getAnnotationsInBounds(bounds, *data, type);
 }
 
 LatLngBounds Map::getBoundsForAnnotations(const std::vector<uint32_t>& annotations) {

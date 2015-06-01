@@ -1011,7 +1011,7 @@ std::chrono::steady_clock::duration secondsAsDuration(float duration)
         tapBounds.extend(coordinateToLatLng(coordinate));
 
         // query for nearby annotations
-        std::vector<uint32_t> nearbyAnnotations = _mbglMap->getAnnotationsInBounds(tapBounds);
+        std::vector<uint32_t> nearbyAnnotations = _mbglMap->getAnnotationsInBounds(tapBounds, mbgl::AnnotationType::Point);
 
         int32_t newSelectedAnnotationID = -1;
 

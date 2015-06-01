@@ -28,6 +28,12 @@ namespace util {
 template <class T> class Thread;
 }
 
+enum class AnnotationType : uint8_t {
+    Any   = 0,
+    Point = 1 << 0,
+    Shape = 1 << 1,
+};
+
 using AnnotationIDs = std::vector<uint32_t>;
 using AnnotationSegment = std::vector<LatLng>;
 using AnnotationSegments = std::vector<AnnotationSegment>;
@@ -130,7 +136,7 @@ public:
                                       const std::vector<StyleProperties>&);
     void removeAnnotation(uint32_t);
     void removeAnnotations(const AnnotationIDs&);
-    AnnotationIDs getAnnotationsInBounds(const LatLngBounds&);
+    AnnotationIDs getAnnotationsInBounds(const LatLngBounds&, const AnnotationType& = AnnotationType::Any);
     LatLngBounds getBoundsForAnnotations(const AnnotationIDs&);
 
     // Memory
