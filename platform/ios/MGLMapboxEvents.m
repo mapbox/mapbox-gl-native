@@ -858,7 +858,7 @@ const NSTimeInterval MGLFlushInterval = 60;
             // Look for a pinned certificate in the server's certificate chain
             long numKeys = SecTrustGetCertificateCount(serverTrust);
 
-            BOOL found = false;
+            BOOL found = NO;
             // Try GeoTrust Cert First
             for (int lc = 0; lc < numKeys; lc++) {
                 SecCertificateRef certificate = SecTrustGetCertificateAtIndex(serverTrust, lc);
@@ -868,7 +868,7 @@ const NSTimeInterval MGLFlushInterval = 60;
                 if ([remoteCertificateData isEqualToData:_geoTrustCert]) {
                     // Found the certificate; continue connecting
                     completionHandler(NSURLSessionAuthChallengeUseCredential, [NSURLCredential credentialForTrust:challenge.protectionSpace.serverTrust]);
-                    found = true;
+                    found = YES;
                     break;
                 }
             }
@@ -883,7 +883,7 @@ const NSTimeInterval MGLFlushInterval = 60;
                     if ([remoteCertificateData isEqualToData:_digicertCert]) {
                         // Found the certificate; continue connecting
                         completionHandler(NSURLSessionAuthChallengeUseCredential, [NSURLCredential credentialForTrust:challenge.protectionSpace.serverTrust]);
-                        found = true;
+                        found = YES;
                         break;
                     }
                 }
@@ -898,7 +898,7 @@ const NSTimeInterval MGLFlushInterval = 60;
                         if ([remoteCertificateData isEqualToData:_testServerCert]) {
                             // Found the certificate; continue connecting
                             completionHandler(NSURLSessionAuthChallengeUseCredential, [NSURLCredential credentialForTrust:challenge.protectionSpace.serverTrust]);
-                            found = true;
+                            found = YES;
                             break;
                         }
                     }
