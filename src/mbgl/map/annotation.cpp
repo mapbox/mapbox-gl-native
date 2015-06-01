@@ -67,8 +67,11 @@ uint32_t AnnotationManager::nextID() {
 }
 
 vec2<double> AnnotationManager::projectPoint(const LatLng& point) {
+    // Clamp to the latitude limits of Mercator.
+    const double constrainedLatitude = std::fmin(std::fmax(point.latitude, -util::LATITUDE_MAX), util::LATITUDE_MAX);
+
     // Project a coordinate into unit space in a square map.
-    const double sine = std::sin(point.latitude * M_PI / 180.0);
+    const double sine = std::sin(constrainedLatitude * M_PI / 180.0);
     const double x = point.longitude / 360.0 + 0.5;
     const double y = 0.5 - 0.25 * std::log((1.0 + sine) / (1.0 - sine)) / M_PI;
     return { x, y };
