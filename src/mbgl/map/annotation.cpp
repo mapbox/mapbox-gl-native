@@ -386,7 +386,7 @@ AnnotationIDs AnnotationManager::getAnnotationsInBounds(const LatLngBounds& quer
     const TileID nwTile(z, swPoint.x * z2, nePoint.y * z2);
     const TileID seTile(z, nePoint.x * z2, swPoint.y * z2);
 
-    AnnotationIDs matchingAnnotations;
+    std::unordered_set<uint32_t> matchingAnnotations;
 
     for (auto& tile : tiles) {
         TileID id = tile.first;
@@ -396,12 +396,12 @@ AnnotationIDs AnnotationManager::getAnnotationsInBounds(const LatLngBounds& quer
                     // Trivial accept; this tile is completely inside the query bounds, so
                     // we'll return all of its annotations.
                     std::copy(tile.second.first.begin(), tile.second.first.end(),
-                              std::back_inserter(matchingAnnotations));
+                              std::inserter(matchingAnnotations, matchingAnnotations.begin()));
                 } else {
                     // This tile is intersected by the query bounds. We need to check the
                     // tile's annotations' bounding boxes individually.
                     std::copy_if(tile.second.first.begin(), tile.second.first.end(),
-                                 std::back_inserter(matchingAnnotations),
+                                 std::inserter(matchingAnnotations, matchingAnnotations.begin()),
                                  [&](const uint32_t annotationID) -> bool {
                         const auto it = annotations.find(annotationID);
                         if (it != annotations.end()) {
@@ -419,7 +419,7 @@ AnnotationIDs AnnotationManager::getAnnotationsInBounds(const LatLngBounds& quer
         }
     }
 
-    return matchingAnnotations;
+    return AnnotationIDs(matchingAnnotations.begin(), matchingAnnotations.end());
 }
 
 LatLngBounds AnnotationManager::getBoundsForAnnotations(const AnnotationIDs& ids) const {
