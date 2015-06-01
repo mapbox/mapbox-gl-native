@@ -16,7 +16,6 @@
 static const NSUInteger version = 1;
 static NSString *const MGLMapboxEventsUserAgent = @"MapboxEventsiOS/1.0";
 static NSString *MGLMapboxEventsAPIBase = @"https://api.tiles.mapbox.com";
-static BOOL usingTestServer = NO;
 
 NSString *const MGLEventTypeAppUserTurnstile = @"appUserTurnstile";
 NSString *const MGLEventTypeMapLoad = @"map.load";
@@ -150,6 +149,7 @@ const NSTimeInterval MGLFlushInterval = 60;
 @property (atomic) NSData *digicertCert;
 @property (atomic) NSData *geoTrustCert;
 @property (atomic) NSData *testServerCert;
+@property (atomic) BOOL usesTestServer;
 
 // Main thread only
 @property (nonatomic) CLLocationManager *locationManager;
@@ -241,7 +241,10 @@ const NSTimeInterval MGLFlushInterval = 60;
         NSString *testURL = [[NSBundle mainBundle] objectForInfoDictionaryKey:@"MGLMetricsTestServerURL"];
         if (testURL != nil) {
             MGLMapboxEventsAPIBase = testURL;
-            usingTestServer = YES;
+            _usesTestServer = YES;
+        } else {
+            // Explicitly Set For Clarity
+            _usesTestServer = NO;
         }
 
         _paused = YES;
@@ -885,7 +888,7 @@ const NSTimeInterval MGLFlushInterval = 60;
                     }
                 }
 
-                if (!found && usingTestServer) {
+                if (!found && _usesTestServer) {
                     // See if this is test server
                     for (int lc = 0; lc < numKeys; lc++) {
                         SecCertificateRef certificate = SecTrustGetCertificateAtIndex(serverTrust, lc);
