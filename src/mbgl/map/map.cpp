@@ -260,8 +260,6 @@ AnnotationIDs Map::addPointAnnotations(const AnnotationSegment& points,
     return result.second;
 }
 
-// todo don't penalize adding point and shape anno's at the same time
-
 uint32_t Map::addShapeAnnotation(const AnnotationSegments& shape,
                                  const StyleProperties& styleProperties) {
     return addShapeAnnotations({ shape }, { styleProperties }).front();
