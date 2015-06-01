@@ -450,14 +450,13 @@ AnnotationIDs AnnotationManager::getAnnotationsInBounds(const LatLngBounds& quer
                             }
 
                             // check bounds
-                            const LatLngBounds annoBounds = it->second->getBounds();
-                            return (annoBounds.sw.latitude >= queryBounds.sw.latitude &&
-                                    annoBounds.ne.latitude <= queryBounds.ne.latitude &&
-                                    annoBounds.sw.longitude >= queryBounds.sw.longitude &&
-                                    annoBounds.ne.longitude <= queryBounds.ne.longitude);
-                        } else {
-                            return false;
+                            if (it->second->type == AnnotationType::Point) {
+                                return queryBounds.contains(it->second->getPoint());
+                            } else if (it->second->type == AnnotationType::Shape) {
+                                return queryBounds.intersects(it->second->getBounds());
+                            }
                         }
+                        return false;
                     });
                 }
             }

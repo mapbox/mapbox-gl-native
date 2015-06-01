@@ -33,11 +33,18 @@ struct LatLngBounds {
         if (point.longitude > ne.longitude) ne.longitude = point.longitude;
     }
 
-    inline bool contains(const LatLng& point) {
+    inline bool contains(const LatLng& point) const {
         return (point.latitude  >= sw.latitude  &&
                 point.latitude  <= ne.latitude  &&
                 point.longitude >= sw.longitude &&
                 point.longitude <= ne.longitude);
+    }
+
+    inline bool intersects(const LatLngBounds area) const {
+        return (area.ne.latitude  > sw.latitude  &&
+                area.sw.latitude  < ne.latitude  &&
+                area.ne.longitude > sw.longitude &&
+                area.sw.longitude < ne.longitude);
     }
 };
 
