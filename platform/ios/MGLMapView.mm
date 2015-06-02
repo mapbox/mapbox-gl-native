@@ -1842,6 +1842,8 @@ CLLocationCoordinate2D MGLLocationCoordinate2DFromLatLng(mbgl::LatLng latLng)
 
     assert([firstAnnotation conformsToProtocol:@protocol(MGLAnnotation)]);
 
+    if ([firstAnnotation isKindOfClass:[MGLMultiPoint class]]) return;
+
     if ( ! [self viewportBounds].contains(MGLLatLngFromLocationCoordinate2D(firstAnnotation.coordinate))) return;
 
     [self selectAnnotation:firstAnnotation animated:NO];
@@ -1850,6 +1852,8 @@ CLLocationCoordinate2D MGLLocationCoordinate2DFromLatLng(mbgl::LatLng latLng)
 - (void)selectAnnotation:(id <MGLAnnotation>)annotation animated:(BOOL)animated
 {
     if ( ! annotation) return;
+
+    if ([annotation isKindOfClass:[MGLMultiPoint class]]) return;
 
     if ( ! [self viewportBounds].contains(MGLLatLngFromLocationCoordinate2D(annotation.coordinate))) return;
 
