@@ -1682,7 +1682,7 @@ CLLocationCoordinate2D latLngToCoordinate(mbgl::LatLng latLng)
             if ([annotation isKindOfClass:[MGLPolyline class]])
             {
                 CGFloat lineWidth = (delegateImplementsLineWidthForPolyline ?
-                                [self.delegate mapView:self lineWidthForPolylineAnnotation:annotation] :
+                                [self.delegate mapView:self lineWidthForPolylineAnnotation:(MGLPolyline *)annotation] :
                                 3.0);
 
                 mbgl::LineProperties lineProperties;
@@ -1695,7 +1695,7 @@ CLLocationCoordinate2D latLngToCoordinate(mbgl::LatLng latLng)
             else if ([annotation isKindOfClass:[MGLPolygon class]])
             {
                 UIColor *fillColor = (delegateImplementsFillColorForPolygon ?
-                                [self.delegate mapView:self fillColorForPolygonAnnotation:annotation] :
+                                [self.delegate mapView:self fillColorForPolygonAnnotation:(MGLPolygon *)annotation] :
                                 [UIColor blueColor]);
 
                 assert(fillColor);

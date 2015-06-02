@@ -1,9 +1,13 @@
 #import "MGLMultiPoint.h"
+#import "MGLTypes.h"
+
+#import <mbgl/util/geo.hpp>
 
 @implementation MGLMultiPoint
 {
     CLLocationCoordinate2D *_coords;
     size_t _count;
+    mbgl::LatLngBounds _bounds;
 }
 
 - (instancetype)initWithCoordinates:(CLLocationCoordinate2D *)coords
@@ -14,11 +18,12 @@
     if (self)
     {
         _count = count;
-        _coords = malloc(_count * sizeof(CLLocationCoordinate2D));
+        _coords = (CLLocationCoordinate2D*)malloc(_count * sizeof(CLLocationCoordinate2D));
 
         for (NSUInteger i = 0; i < _count; i++)
         {
             _coords[i] = coords[i];
+            _bounds.extend(mbgl::LatLng(coords[i].latitude, coords[i].longitude));
         }
     }
 
@@ -75,6 +80,24 @@
         coords[index] = _coords[i];
         index++;
     }
+}
+
+- (MGLMapBounds)overlayBounds
+{
+    return {
+        CLLocationCoordinate2DMake(_bounds.sw.latitude,  _bounds.sw.longitude),
+        CLLocationCoordinate2DMake(_bounds.ne.longitude, _bounds.ne.longitude)
+    };
+}
+
+- (BOOL)intersectsOverlayBounds:(MGLMapBounds)overlayBounds
+{
+    mbgl::LatLngBounds area(
+        mbgl::LatLng(overlayBounds.sw.latitude, overlayBounds.sw.longitude),
+        mbgl::LatLng(overlayBounds.ne.latitude, overlayBounds.ne.longitude)
+    );
+
+    return _bounds.intersects(area);
 }
 
 @end

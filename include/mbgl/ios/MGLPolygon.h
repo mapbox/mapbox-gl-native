@@ -2,8 +2,9 @@
 #import <CoreLocation/CoreLocation.h>
 
 #import "MGLMultiPoint.h"
+#import "MGLOverlay.h"
 
-@interface MGLPolygon : MGLMultiPoint
+@interface MGLPolygon : MGLMultiPoint <MGLOverlay>
 
 + (instancetype)polygonWithCoordinates:(CLLocationCoordinate2D *)coords
                                  count:(NSUInteger)count;
