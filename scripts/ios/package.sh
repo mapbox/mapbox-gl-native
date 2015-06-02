@@ -96,26 +96,26 @@ mkdir -p "${OUTPUT}/static/${NAME}.bundle"
 cp -pv platform/ios/resources/* "${OUTPUT}/static/${NAME}.bundle"
 cp -prv styles/styles "${OUTPUT}/static/${NAME}.bundle/styles"
 
-# step "Creating API Docs..."
-# if [ -z `which appledoc` ]; then
-#     echo "Unable to find appledoc. Consider installing it from source or Homebrew."
-#     exit 1
-# fi
-# DOCS_OUTPUT="${OUTPUT}/static/Docs"
-# DOCS_VERSION=$( git tag -l ios\* --sort -v:refname | sed -n '1p' | sed 's/ios-v//' )
-# README="/tmp/GL-README.md"
-# cat ios/README.md > ${README}
-# echo >> ${README}
-# echo -n "#" >> ${README}
-# cat CHANGELOG.md >> ${README}
-# appledoc \
-#     --output ${DOCS_OUTPUT} \
-#     --project-name "Mapbox GL for iOS ${DOCS_VERSION}" \
-#     --project-company Mapbox \
-#     --create-html \
-#     --no-create-docset \
-#     --no-install-docset \
-#     --company-id com.mapbox \
-#     --ignore include/mbgl/ios/private \
-#     --index-desc ${README} \
-#     include/mbgl/ios
+step "Creating API Docs..."
+if [ -z `which appledoc` ]; then
+    echo "Unable to find appledoc. Consider installing it from source or Homebrew."
+    exit 1
+fi
+DOCS_OUTPUT="${OUTPUT}/static/Docs"
+DOCS_VERSION=$( git tag -l ios\* --sort -v:refname | sed -n '1p' | sed 's/ios-v//' )
+README="/tmp/GL-README.md"
+cat ios/README.md > ${README}
+echo >> ${README}
+echo -n "#" >> ${README}
+cat CHANGELOG.md >> ${README}
+appledoc \
+    --output ${DOCS_OUTPUT} \
+    --project-name "Mapbox GL for iOS ${DOCS_VERSION}" \
+    --project-company Mapbox \
+    --create-html \
+    --no-create-docset \
+    --no-install-docset \
+    --company-id com.mapbox \
+    --ignore include/mbgl/ios/private \
+    --index-desc ${README} \
+    include/mbgl/ios
