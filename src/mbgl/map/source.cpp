@@ -290,7 +290,7 @@ TileData::State Source::addTile(MapData& data,
     }
 
     if (!new_tile.data) {
-        auto callback = std::bind(&Source::tileLoadingCompleteCallback, this, normalized_id);
+        auto callback = std::bind(&Source::tileLoadingCompleteCallback, this, normalized_id, transformState, data.getCollisionDebug());
 
         // If we don't find working tile data, we're just going to load it.
         if (info.type == SourceType::Vector) {
@@ -513,7 +513,9 @@ bool Source::update(MapData& data,
 
     updateTilePtrs();
 
-    redoPlacement(transformState, data.getCollisionDebug());
+    for (auto& tilePtr : tilePtrs) {
+        tilePtr->data->redoPlacement(transformState.getAngle(), data.getCollisionDebug());
+    }
 
     updated = data.getAnimationTime();
 
@@ -536,12 +538,6 @@ void Source::updateTilePtrs() {
     }
 }
 
-void Source::redoPlacement(const TransformState& transformState, bool collisionDebug) {
-    for (auto& tilePtr : tilePtrs) {
-        tilePtr->data->redoPlacement(transformState.getAngle(), collisionDebug);
-    }
-}
-
 void Source::setCacheSize(size_t size) {
     cache.setSize(size);
 }
@@ -554,7 +550,7 @@ void Source::setObserver(Observer* observer) {
     observer_ = observer;
 }
 
-void Source::tileLoadingCompleteCallback(const TileID& normalized_id) {
+void Source::tileLoadingCompleteCallback(const TileID& normalized_id, const TransformState& transformState, bool collisionDebug) {
     auto it = tile_data.find(normalized_id);
     if (it == tile_data.end()) {
         return;
@@ -571,6 +567,8 @@ void Source::tileLoadingCompleteCallback(const TileID& normalized_id) {
     }
 
     emitTileLoaded(true);
+    data->redoPlacement(transformState.getAngle(), collisionDebug);
+
 }
 
 void Source::emitSourceLoaded() {

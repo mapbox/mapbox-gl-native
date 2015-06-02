@@ -55,6 +55,5 @@ void LiveTileData::parse() {
 
     if (getState() != State::obsolete) {
         setState(State::parsed);
-        redoPlacement();
     }
 }

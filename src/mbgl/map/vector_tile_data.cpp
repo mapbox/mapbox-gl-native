@@ -64,7 +64,6 @@ void VectorTileData::parse() {
             setState(State::partial);
         } else {
             setState(State::parsed);
-            redoPlacement();
         }
     } catch (const std::exception& ex) {
         std::stringstream message;
