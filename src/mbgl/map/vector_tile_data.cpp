@@ -68,7 +68,7 @@ void VectorTileData::parse() {
         }
     } catch (const std::exception& ex) {
         std::stringstream message;
-        message << "Failed to parse [" << int(id.z) << "/" << id.x << "/" << id.y << "]: " << ex.what();
+        message << "Failed to parse [" << int(id.sourceZ) << "/" << id.x << "/" << id.y << "]: " << ex.what();
         setError(message.str());
     }
 }
