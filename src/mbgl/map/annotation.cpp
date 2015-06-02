@@ -255,9 +255,21 @@ AnnotationManager::addTileFeature(const uint32_t annotationID,
         }
 
         for (auto& featureTile : featureTiles) {
+            // determine feature type
+            FeatureType featureType;
+            if (type == AnnotationType::Point) {
+                featureType = FeatureType::Point;
+            } else if (styleProperties.is<LineProperties>()) {
+                featureType = FeatureType::LineString;
+            } else if (styleProperties.is<FillProperties>()) {
+                featureType = FeatureType::Polygon;
+            } else {
+                throw std::runtime_error("Invalid feature type");
+            }
+
             // create tile feature
             auto feature = std::make_shared<const LiveTileFeature>(
-                (type == AnnotationType::Point ? FeatureType::Point : FeatureType::LineString),
+                featureType,
                 featureTile.second,
                 featureProperties
             );
