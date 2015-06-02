@@ -160,12 +160,12 @@ int main() {
     mbgl::StyleProperties shapeProperties;
     shapeProperties.set<mbgl::FillProperties>(fillProperties);
 
-    map.addShapeAnnotation({
+    map.addShapeAnnotation({{
         mbgl::LatLng(44, -122),
         mbgl::LatLng(46, -122),
         mbgl::LatLng(46, -121),
         mbgl::LatLng(44, -122)
-    }, shapeProperties);
+    }}, shapeProperties);
 
     view.run();
 
