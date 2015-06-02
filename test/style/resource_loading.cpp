@@ -3,14 +3,10 @@
 #include "mock_file_source.hpp"
 #include "mock_view.hpp"
 
-#include <mbgl/geometry/glyph_atlas.hpp>
-#include <mbgl/geometry/sprite_atlas.hpp>
 #include <mbgl/map/environment.hpp>
 #include <mbgl/map/map_data.hpp>
-#include <mbgl/map/resource_loader.hpp>
 #include <mbgl/map/transform_state.hpp>
 #include <mbgl/style/style.hpp>
-#include <mbgl/text/glyph_store.hpp>
 #include <mbgl/util/exception.hpp>
 #include <mbgl/util/io.hpp>
 #include <mbgl/util/run_loop.hpp>
@@ -21,7 +17,7 @@ using namespace mbgl;
 
 namespace {
 
-class MockMapContext : public ResourceLoader::Observer {
+class MockMapContext : public Style::Observer {
 public:
     MockMapContext(uv_loop_t* loop,
                    View& view,
@@ -30,12 +26,6 @@ public:
         : env_(fileSource),
           envScope_(env_, ThreadType::Map, "Map"),
           data_(view, MapMode::Still),
-          glyphStore_(std::make_unique<GlyphStore>(loop, env_)),
-          glyphAtlas_(std::make_unique<GlyphAtlas>(1024, 1024)),
-          spriteAtlas_(std::make_unique<SpriteAtlas>(512, 512)),
-          texturePool_(std::make_unique<TexturePool>()),
-          style_(std::make_unique<Style>()),
-          resourceLoader_(std::make_unique<ResourceLoader>()),
           asyncUpdate(std::make_unique<uv::async>(loop, [this] { update(); })),
           callback_(callback) {
         asyncUpdate->unref();
@@ -44,22 +34,13 @@ public:
         data_.transform.setLatLngZoom({0, 0}, 16);
 
         const std::string style = util::read_file("test/fixtures/resources/style.json");
-        style_->loadJSON(reinterpret_cast<const uint8_t *>(style.c_str()));
-
-        glyphStore_->setURL(style_->glyph_url);
-
-        resourceLoader_->setGlyphStore(glyphStore_.get());
-        resourceLoader_->setObserver(this);
-        resourceLoader_->setStyle(style_.get());
+        style_ = std::make_unique<Style>(style, "", loop, env_),
+        style_->setObserver(this);
     }
 
     ~MockMapContext() {
-        resourceLoader_.reset();
         style_.reset();
-        texturePool_.reset();
-        spriteAtlas_.reset();
-        glyphAtlas_.reset();
-        glyphStore_.reset();
+        env_.performCleanup();
     }
 
     void update() {
@@ -69,15 +50,12 @@ public:
         data_.transform.updateTransitions(now);
 
         transformState_ = data_.transform.currentState();
-
-        resourceLoader_->update(
-            data_, transformState_, *glyphAtlas_, *spriteAtlas_, *texturePool_);
+        style_->update(data_, transformState_, texturePool_);
     }
 
-    // ResourceLoader::Observer implementation.
+    // Style::Observer implementation.
     void onTileDataChanged() override {
-        util::ptr<Sprite> sprite = resourceLoader_->getSprite();
-        if (sprite && sprite->isLoaded() && style_->isLoaded()) {
+        if (style_->isLoaded()) {
             callback_(nullptr);
         }
 
@@ -94,13 +72,9 @@ private:
 
     MapData data_;
     TransformState transformState_;
+    TexturePool texturePool_;
 
-    std::unique_ptr<GlyphStore> glyphStore_;
-    std::unique_ptr<GlyphAtlas> glyphAtlas_;
-    std::unique_ptr<SpriteAtlas> spriteAtlas_;
-    std::unique_ptr<TexturePool> texturePool_;
     std::unique_ptr<Style> style_;
-    std::unique_ptr<ResourceLoader> resourceLoader_;
 
     std::unique_ptr<uv::async> asyncUpdate;
 
@@ -118,7 +92,13 @@ void runTestCase(MockFileSource::Type type,
     FixtureLogObserver* log = new FixtureLogObserver();
     Log::setObserver(std::unique_ptr<Log::Observer>(log));
 
-    auto callback = [&loop, &param](std::exception_ptr error) {
+    auto callback = [type, &loop, &param](std::exception_ptr error) {
+        if (type == MockFileSource::Success) {
+            EXPECT_TRUE(error == nullptr);
+        } else {
+            EXPECT_TRUE(error != nullptr);
+        }
+
         try {
             if (error) {
                 std::rethrow_exception(error);
@@ -150,7 +130,7 @@ void runTestCase(MockFileSource::Type type,
 
     const FixtureLogObserver::LogMessage logMessage {
         EventSeverity::Error,
-        Event::ResourceLoader,
+        Event::Style,
         int64_t(-1),
         message,
     };
@@ -167,21 +147,21 @@ void runTestCase(MockFileSource::Type type,
 
 }
 
-class ResourceLoaderTest : public ::testing::TestWithParam<std::string> {
+class ResourceLoading : public ::testing::TestWithParam<std::string> {
 };
 
-TEST_P(ResourceLoaderTest, Success) {
+TEST_P(ResourceLoading, Success) {
     runTestCase(MockFileSource::Success, GetParam(), std::string());
 }
 
-TEST_P(ResourceLoaderTest, RequestFail) {
+TEST_P(ResourceLoading, RequestFail) {
     std::stringstream message;
     message << "Failed to load [test/fixtures/resources/" << GetParam() << "]: Failed by the test case";
 
     runTestCase(MockFileSource::RequestFail, GetParam(), message.str());
 }
 
-TEST_P(ResourceLoaderTest, RequestWithCorruptedData) {
+TEST_P(ResourceLoading, RequestWithCorruptedData) {
     const std::string param(GetParam());
 
     std::stringstream message;
@@ -200,5 +180,5 @@ TEST_P(ResourceLoaderTest, RequestWithCorruptedData) {
     runTestCase(MockFileSource::RequestWithCorruptedData, GetParam(), message.str());
 }
 
-INSTANTIATE_TEST_CASE_P(ResourceLoader, ResourceLoaderTest,
+INSTANTIATE_TEST_CASE_P(Style, ResourceLoading,
     ::testing::Values("source.json", "sprite.json", "sprite.png", "vector.pbf", "glyphs.pbf"));

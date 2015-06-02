@@ -59,10 +59,6 @@
         'miscellaneous/variant.cpp',
         'miscellaneous/worker.cpp',
 
-        'resources/mock_file_source.cpp',
-        'resources/mock_file_source.hpp',
-        'resources/mock_view.hpp',
-
         'storage/storage.hpp',
         'storage/storage.cpp',
         'storage/cache_response.cpp',
@@ -78,6 +74,11 @@
         'storage/http_load.cpp',
         'storage/http_other_loop.cpp',
         'storage/http_reading.cpp',
+
+        'style/mock_file_source.cpp',
+        'style/mock_file_source.hpp',
+        'style/mock_view.hpp',
+        'style/resource_loading.cpp',
       ],
       'libraries': [
         '<@(uv_static_libs)',
