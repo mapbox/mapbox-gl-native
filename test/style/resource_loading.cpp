@@ -26,9 +26,7 @@ public:
         : env_(fileSource),
           envScope_(env_, ThreadType::Map, "Map"),
           data_(view, MapMode::Still),
-          asyncUpdate(std::make_unique<uv::async>(loop, [this] { update(); })),
           callback_(callback) {
-        asyncUpdate->unref();
 
         data_.transform.resize(1000, 1000, 1.0, 1000, 1000);
         data_.transform.setLatLngZoom({0, 0}, 16);
@@ -55,11 +53,11 @@ public:
 
     // Style::Observer implementation.
     void onTileDataChanged() override {
+        update();
+
         if (style_->isLoaded()) {
             callback_(nullptr);
         }
-
-        asyncUpdate->send();
     };
 
     void onResourceLoadingFailed(std::exception_ptr error) override {
@@ -75,8 +73,6 @@ private:
     TexturePool texturePool_;
 
     std::unique_ptr<Style> style_;
-
-    std::unique_ptr<uv::async> asyncUpdate;
 
     std::function<void(std::exception_ptr error)> callback_;
 };
