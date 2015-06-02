@@ -1,6 +1,6 @@
 #import <Foundation/Foundation.h>
 
-#import "MGLAccountManager.h"
+#import "MGLAccountManager_Private.h"
 #import "MGLMapboxEvents.h"
 #import "NSProcessInfo+MGLAdditions.h"
 
@@ -14,6 +14,18 @@
 
 @implementation MGLAccountManager
 
++ (void)load {
+    // Read the initial configuration from Info.plist. The shown-in-app setting
+    // preempts the Settings bundle check in -[MGLMapboxEvents init] triggered
+    // by setting the access token.
+    NSBundle *bundle = [NSBundle mainBundle];
+    NSNumber *shownInAppNumber = [bundle objectForInfoDictionaryKey:@"MGLMapboxMetricsEnabledSettingShownInApp"];
+    if (shownInAppNumber) {
+        [MGLAccountManager sharedManager].mapboxMetricsEnabledSettingShownInApp = [shownInAppNumber boolValue];
+    }
+    self.accessToken = [bundle objectForInfoDictionaryKey:@"MGLMapboxAccessToken"];
+}
+
 // Can be called from any thread.
 //
 + (instancetype) sharedManager {
@@ -25,7 +37,6 @@
     void (^setupBlock)() = ^{
         dispatch_once(&onceToken, ^{
             _sharedManager = [[self alloc] init];
-            _sharedManager.mapboxMetricsEnabledSettingShownInApp = NO;
         });
     };
     if ( ! [[NSThread currentThread] isMainThread]) {
@@ -39,16 +50,14 @@
     return _sharedManager;
 }
 
-+ (void) setMapboxMetricsEnabledSettingShownInApp:(BOOL)shown {
-    [MGLAccountManager sharedManager].mapboxMetricsEnabledSettingShownInApp = shown;
-}
-
 + (BOOL) mapboxMetricsEnabledSettingShownInApp {
     return [MGLAccountManager sharedManager].mapboxMetricsEnabledSettingShownInApp;
 }
 
 + (void) setAccessToken:(NSString *) accessToken {
-    [[MGLAccountManager sharedManager] setAccessToken:accessToken];
+    if ( ! [accessToken length]) return;
+    
+    [MGLAccountManager sharedManager].accessToken = accessToken;
 
     // Update MGLMapboxEvents
     // NOTE: This is (likely) the initial setup of MGLMapboxEvents

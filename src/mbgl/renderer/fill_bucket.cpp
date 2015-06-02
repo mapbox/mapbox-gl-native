@@ -7,7 +7,6 @@
 #include <mbgl/shader/plain_shader.hpp>
 #include <mbgl/shader/pattern_shader.hpp>
 #include <mbgl/shader/outline_shader.hpp>
-#include <mbgl/util/std.hpp>
 #include <mbgl/platform/gl.hpp>
 #include <mbgl/platform/log.hpp>
 
@@ -107,7 +106,7 @@ void FillBucket::tessellate() {
 
     if (!lineGroups.size() || (lineGroups.back()->vertex_length + total_vertex_count > 65535)) {
         // Move to a new group because the old one can't hold the geometry.
-        lineGroups.emplace_back(util::make_unique<LineGroup>());
+        lineGroups.emplace_back(std::make_unique<LineGroup>());
     }
 
     assert(lineGroups.back());
@@ -154,7 +153,7 @@ void FillBucket::tessellate() {
 
         if (!triangleGroups.size() || (triangleGroups.back()->vertex_length + total_vertex_count > 65535)) {
             // Move to a new group because the old one can't hold the geometry.
-            triangleGroups.emplace_back(util::make_unique<TriangleGroup>());
+            triangleGroups.emplace_back(std::make_unique<TriangleGroup>());
         }
 
         // We're generating triangle fans, so we always start with the first

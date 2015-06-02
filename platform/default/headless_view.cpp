@@ -5,7 +5,6 @@
 
 #include <mbgl/map/still_image.hpp>
 
-#include <mbgl/util/std.hpp>
 
 #include <stdexcept>
 #include <sstream>
@@ -172,15 +171,15 @@ std::unique_ptr<StillImage> HeadlessView::readStillImage() {
     const unsigned int w = dimensions.pixelWidth();
     const unsigned int h = dimensions.pixelHeight();
 
-    auto image = util::make_unique<StillImage>();
+    auto image = std::make_unique<StillImage>();
     image->width = w;
     image->height = h;
-    image->pixels = util::make_unique<uint32_t[]>(w * h);
+    image->pixels = std::make_unique<uint32_t[]>(w * h);
 
     MBGL_CHECK_ERROR(glReadPixels(0, 0, w, h, GL_RGBA, GL_UNSIGNED_BYTE, image->pixels.get()));
 
     const int stride = w * 4;
-    auto tmp = util::make_unique<char[]>(stride);
+    auto tmp = std::make_unique<char[]>(stride);
     char *rgba = reinterpret_cast<char *>(image->pixels.get());
     for (int i = 0, j = h - 1; i < j; i++, j--) {
         std::memcpy(tmp.get(), rgba + i * stride, stride);

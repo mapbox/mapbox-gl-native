@@ -39,6 +39,7 @@ public:
         virtual ~Observer() = default;
 
         virtual void onSpriteLoaded() = 0;
+        virtual void onSpriteLoadingFailed(std::exception_ptr error) = 0;
     };
 
     Sprite(const std::string& baseUrl, float pixelRatio);
@@ -56,9 +57,10 @@ public:
     void setObserver(Observer* observer);
 private:
     void emitSpriteLoadedIfComplete();
+    void emitSpriteLoadingFailed(const std::string& message);
 
-    void parseJSON();
-    void parseImage();
+    void parseJSON(const std::string& jsonURL);
+    void parseImage(const std::string& spriteURL);
 
     std::string body;
     std::string image;

@@ -19,7 +19,7 @@ public:
 
 Worker::Worker(std::size_t count) {
     for (std::size_t i = 0; i < count; i++) {
-        threads.emplace_back(util::make_unique<util::Thread<Impl>>("Worker", util::ThreadPriority::Low));
+        threads.emplace_back(std::make_unique<util::Thread<Impl>>("Worker", util::ThreadPriority::Low));
     }
 }
 
@@ -27,7 +27,7 @@ Worker::~Worker() = default;
 
 std::unique_ptr<WorkRequest> Worker::send(Fn work, Fn after) {
     auto task = std::make_shared<WorkTask>(work, after);
-    auto request = util::make_unique<WorkRequest>(task);
+    auto request = std::make_unique<WorkRequest>(task);
 
     threads[current]->invokeWithResult(&Worker::Impl::doWork, [task] {
         task->runAfter();

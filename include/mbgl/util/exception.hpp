@@ -11,6 +11,11 @@ struct Exception : std::runtime_error {
     inline Exception(const std::string &msg) : std::runtime_error(msg) {}
 };
 
+struct GlyphRangeLoadingException : Exception {
+    inline GlyphRangeLoadingException(const char *msg) : Exception(msg) {}
+    inline GlyphRangeLoadingException(const std::string &msg) : Exception(msg) {}
+};
+
 struct MisuseException : Exception {
     inline MisuseException(const char *msg) : Exception(msg) {}
     inline MisuseException(const std::string &msg) : Exception(msg) {}
@@ -19,6 +24,21 @@ struct MisuseException : Exception {
 struct ShaderException : Exception {
     inline ShaderException(const char *msg) : Exception(msg) {}
     inline ShaderException(const std::string &msg) : Exception(msg) {}
+};
+
+struct SourceLoadingException : Exception {
+    inline SourceLoadingException(const char *msg) : Exception(msg) {}
+    inline SourceLoadingException(const std::string &msg) : Exception(msg) {}
+};
+
+struct SpriteLoadingException : Exception {
+    inline SpriteLoadingException(const char *msg) : Exception(msg) {}
+    inline SpriteLoadingException(const std::string &msg) : Exception(msg) {}
+};
+
+struct TileLoadingException : Exception {
+    inline TileLoadingException(const char *msg) : Exception(msg) {}
+    inline TileLoadingException(const std::string &msg) : Exception(msg) {}
 };
 
 }

@@ -5,7 +5,6 @@
 
 #include <mbgl/util/clip_id.hpp>
 #include <mbgl/map/tile.hpp>
-#include <mbgl/util/std.hpp>
 
 using namespace mbgl;
 

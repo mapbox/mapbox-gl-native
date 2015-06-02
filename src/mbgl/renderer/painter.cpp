@@ -26,7 +26,6 @@
 #include <mbgl/shader/dot_shader.hpp>
 #include <mbgl/shader/gaussian_shader.hpp>
 
-#include <mbgl/util/std.hpp>
 #include <mbgl/util/constants.hpp>
 #include <mbgl/util/mat3.hpp>
 
@@ -42,11 +41,7 @@ using namespace mbgl;
 
 #define BUFFER_OFFSET(i) ((char *)nullptr + (i))
 
-Painter::Painter(SpriteAtlas& spriteAtlas_, GlyphAtlas& glyphAtlas_, LineAtlas& lineAtlas_)
-    : spriteAtlas(spriteAtlas_)
-    , glyphAtlas(glyphAtlas_)
-    , lineAtlas(lineAtlas_)
-{
+Painter::Painter() {
 }
 
 Painter::~Painter() {
@@ -94,18 +89,18 @@ void Painter::setup() {
 }
 
 void Painter::setupShaders() {
-    if (!plainShader) plainShader = util::make_unique<PlainShader>();
-    if (!outlineShader) outlineShader = util::make_unique<OutlineShader>();
-    if (!lineShader) lineShader = util::make_unique<LineShader>();
-    if (!linesdfShader) linesdfShader = util::make_unique<LineSDFShader>();
-    if (!linepatternShader) linepatternShader = util::make_unique<LinepatternShader>();
-    if (!patternShader) patternShader = util::make_unique<PatternShader>();
-    if (!iconShader) iconShader = util::make_unique<IconShader>();
-    if (!rasterShader) rasterShader = util::make_unique<RasterShader>();
-    if (!sdfGlyphShader) sdfGlyphShader = util::make_unique<SDFGlyphShader>();
-    if (!sdfIconShader) sdfIconShader = util::make_unique<SDFIconShader>();
-    if (!dotShader) dotShader = util::make_unique<DotShader>();
-    if (!gaussianShader) gaussianShader = util::make_unique<GaussianShader>();
+    if (!plainShader) plainShader = std::make_unique<PlainShader>();
+    if (!outlineShader) outlineShader = std::make_unique<OutlineShader>();
+    if (!lineShader) lineShader = std::make_unique<LineShader>();
+    if (!linesdfShader) linesdfShader = std::make_unique<LineSDFShader>();
+    if (!linepatternShader) linepatternShader = std::make_unique<LinepatternShader>();
+    if (!patternShader) patternShader = std::make_unique<PatternShader>();
+    if (!iconShader) iconShader = std::make_unique<IconShader>();
+    if (!rasterShader) rasterShader = std::make_unique<RasterShader>();
+    if (!sdfGlyphShader) sdfGlyphShader = std::make_unique<SDFGlyphShader>();
+    if (!sdfIconShader) sdfIconShader = std::make_unique<SDFIconShader>();
+    if (!dotShader) dotShader = std::make_unique<DotShader>();
+    if (!gaussianShader) gaussianShader = std::make_unique<GaussianShader>();
 }
 
 void Painter::resize() {
@@ -172,6 +167,10 @@ void Painter::prepareTile(const Tile& tile) {
 void Painter::render(const Style& style, TransformState state_, TimePoint time) {
     state = state_;
 
+    glyphAtlas = style.glyphAtlas.get();
+    spriteAtlas = style.spriteAtlas.get();
+    lineAtlas = style.lineAtlas.get();
+
     std::set<Source*> sources;
     for (const auto& source : style.sources) {
         if (source->enabled) {
@@ -192,9 +191,9 @@ void Painter::render(const Style& style, TransformState state_, TimePoint time) 
 
         tileStencilBuffer.upload();
         tileBorderBuffer.upload();
-        spriteAtlas.upload();
-        lineAtlas.upload();
-        glyphAtlas.upload();
+        spriteAtlas->upload();
+        lineAtlas->upload();
+        glyphAtlas->upload();
 
         for (const auto& item : order) {
             if (item.bucket && item.bucket->needsUpload()) {
@@ -390,8 +389,8 @@ void Painter::renderBackground(const StyleLayer &layer_desc) {
         if ((properties.opacity >= 1.0f) != (pass == RenderPass::Opaque))
             return;
 
-        SpriteAtlasPosition imagePosA = spriteAtlas.getPosition(properties.image.from, true);
-        SpriteAtlasPosition imagePosB = spriteAtlas.getPosition(properties.image.to, true);
+        SpriteAtlasPosition imagePosA = spriteAtlas->getPosition(properties.image.from, true);
+        SpriteAtlasPosition imagePosB = spriteAtlas->getPosition(properties.image.to, true);
         float zoomFraction = state.getZoomFraction();
 
         useProgram(patternShader->program);
@@ -440,7 +439,7 @@ void Painter::renderBackground(const StyleLayer &layer_desc) {
 
         backgroundBuffer.bind();
         patternShader->bind(0);
-        spriteAtlas.bind(true);
+        spriteAtlas->bind(true);
     } else {
         Color color = properties.color;
         color[0] *= properties.opacity;

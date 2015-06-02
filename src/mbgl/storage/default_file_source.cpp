@@ -5,11 +5,12 @@
 
 #include <mbgl/storage/response.hpp>
 #include <mbgl/platform/platform.hpp>
+#include <mbgl/platform/log.hpp>
 
 #include <mbgl/util/uv_detail.hpp>
 #include <mbgl/util/chrono.hpp>
 #include <mbgl/util/thread.hpp>
-#include <mbgl/platform/log.hpp>
+#include <mbgl/util/mapbox.hpp>
 
 #pragma GCC diagnostic push
 #pragma GCC diagnostic ignored "-Wshadow"
@@ -27,7 +28,7 @@ namespace algo = boost::algorithm;
 namespace mbgl {
 
 DefaultFileSource::DefaultFileSource(FileCache* cache, const std::string& root)
-    : thread(util::make_unique<util::Thread<Impl>>("FileSource", util::ThreadPriority::Low, cache, root)) {
+    : thread(std::make_unique<util::Thread<Impl>>("FileSource", util::ThreadPriority::Low, cache, root)) {
 }
 
 DefaultFileSource::~DefaultFileSource() {
@@ -38,7 +39,27 @@ Request* DefaultFileSource::request(const Resource& resource,
                                     uv_loop_t* l,
                                     Callback callback) {
     assert(l);
-    auto req = new Request(resource, l, std::move(callback));
+
+    std::string url;
+
+    switch (resource.kind) {
+    case Resource::Kind::Style:
+        url = mbgl::util::mapbox::normalizeStyleURL(resource.url, accessToken);
+        break;
+
+    case Resource::Kind::Source:
+        url = util::mapbox::normalizeSourceURL(resource.url, accessToken);
+        break;
+
+    case Resource::Kind::Glyphs:
+        url = util::mapbox::normalizeGlyphsURL(resource.url, accessToken);
+        break;
+
+    default:
+        url = resource.url;
+    }
+
+    auto req = new Request({ resource.kind, url }, l, std::move(callback));
     thread->invoke(&Impl::add, req);
     return req;
 }

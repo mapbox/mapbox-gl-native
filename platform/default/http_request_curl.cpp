@@ -385,7 +385,7 @@ static CURLcode sslctx_function(CURL * /* curl */, void *sslctx, void * /* parm 
         return CURLE_SSL_CACERT_BADFILE;
     }
 
-    const auto pem = util::make_unique<char[]>(stat.size);
+    const auto pem = std::make_unique<char[]>(stat.size);
 
     if (static_cast<zip_uint64_t>(zip_fread(apkFile, reinterpret_cast<void *>(pem.get()), stat.size)) != stat.size) {
         zip_fclose(apkFile);
@@ -537,7 +537,7 @@ size_t HTTPRequest::writeCallback(void *const contents, const size_t size, const
     MBGL_VERIFY_THREAD(impl->tid);
 
     if (!impl->response) {
-        impl->response = util::make_unique<Response>();
+        impl->response = std::make_unique<Response>();
     }
 
     impl->response->data.append((char *)contents, size * nmemb);
@@ -581,7 +581,7 @@ size_t HTTPRequest::headerCallback(char *const buffer, const size_t size, const 
     MBGL_VERIFY_THREAD(baton->tid);
 
     if (!baton->response) {
-        baton->response = util::make_unique<Response>();
+        baton->response = std::make_unique<Response>();
     }
 
     const size_t length = size * nmemb;
@@ -675,7 +675,7 @@ void HTTPRequest::handleResult(CURLcode code) {
     // Make sure a response object exists in case we haven't got any headers
     // or content.
     if (!response) {
-        response = util::make_unique<Response>();
+        response = std::make_unique<Response>();
     }
 
     // Add human-readable error code
@@ -734,7 +734,7 @@ void HTTPRequest::handleResult(CURLcode code) {
 }
 
 std::unique_ptr<HTTPContext> HTTPContext::createContext(uv_loop_t* loop) {
-    return util::make_unique<HTTPCURLContext>(loop);
+    return std::make_unique<HTTPCURLContext>(loop);
 }
 
 }

@@ -1,6 +1,5 @@
 #include <mbgl/mbgl.hpp>
 #include "../platform/default/default_styles.hpp"
-#include <mbgl/util/std.hpp>
 #include <mbgl/util/uv.hpp>
 #include <mbgl/platform/log.hpp>
 #include <mbgl/platform/platform.hpp>
@@ -66,10 +65,19 @@ int main(int argc, char *argv[]) {
     sigIntHandler.sa_flags = 0;
     sigaction(SIGINT, &sigIntHandler, NULL);
 
-    view = mbgl::util::make_unique<GLFWView>();
+    view = std::make_unique<GLFWView>();
 
     mbgl::SQLiteCache cache("/tmp/mbgl-cache.db");
     mbgl::DefaultFileSource fileSource(&cache);
+
+    // Set access token if present
+    const char *token = getenv("MAPBOX_ACCESS_TOKEN");
+    if (token == nullptr) {
+        mbgl::Log::Warning(mbgl::Event::Setup, "no access token set. mapbox.com tiles won't work.");
+    } else {
+        fileSource.setAccessToken(std::string(token));
+    }
+
     mbgl::Map map(*view, fileSource);
 
     // Load settings
@@ -91,14 +99,6 @@ int main(int argc, char *argv[]) {
 
         mbgl::Log::Info(mbgl::Event::Setup, std::string("Changed style to: ") + newStyle.first);
     });
-
-    // Set access token if present
-    const char *token = getenv("MAPBOX_ACCESS_TOKEN");
-    if (token == nullptr) {
-        mbgl::Log::Warning(mbgl::Event::Setup, "no access token set. mapbox.com tiles won't work.");
-    } else {
-        map.setAccessToken(std::string(token));
-    }
 
     // Load style
     if (style.empty()) {

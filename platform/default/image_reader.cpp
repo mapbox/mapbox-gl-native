@@ -49,11 +49,11 @@ std::unique_ptr<ImageReader> getImageReader(char const* data, size_t size)
     {
         if (*type == "png")
         {
-            return util::make_unique<PngReader<boost::iostreams::array_source>>(data, size);
+            return std::make_unique<PngReader<boost::iostreams::array_source>>(data, size);
         }
         else if (*type == "jpeg")
         {
-            return util::make_unique<JpegReader<boost::iostreams::array_source>>(data, size);
+            return std::make_unique<JpegReader<boost::iostreams::array_source>>(data, size);
         }
     }
     throw ImageReaderException("ImageReader: can't determine type from input data");

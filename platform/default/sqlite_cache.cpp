@@ -62,7 +62,7 @@ std::string unifyMapboxURLs(const std::string &url) {
 using namespace mapbox::sqlite;
 
 SQLiteCache::SQLiteCache(const std::string& path_)
-    : thread(util::make_unique<util::Thread<Impl>>("SQLite Cache", util::ThreadPriority::Low, path_)) {
+    : thread(std::make_unique<util::Thread<Impl>>("SQLite Cache", util::ThreadPriority::Low, path_)) {
 }
 
 SQLiteCache::~SQLiteCache() = default;
@@ -85,7 +85,7 @@ SQLiteCache::Impl::~Impl() {
 }
 
 void SQLiteCache::Impl::createDatabase() {
-    db = util::make_unique<Database>(path.c_str(), ReadWrite | Create);
+    db = std::make_unique<Database>(path.c_str(), ReadWrite | Create);
 }
 
 void SQLiteCache::Impl::createSchema() {
@@ -114,7 +114,7 @@ void SQLiteCache::Impl::createSchema() {
             } catch (util::IOException& ioEx) {
                 Log::Error(Event::Database, ex.code, ex.what());
             }
-            db = util::make_unique<Database>(path.c_str(), ReadWrite | Create);
+            db = std::make_unique<Database>(path.c_str(), ReadWrite | Create);
         } else {
             Log::Error(Event::Database, ex.code, ex.what());
         }
@@ -146,8 +146,8 @@ std::unique_ptr<Response> SQLiteCache::Impl::get(const Resource &resource) {
         }
 
         if (!getStmt) {
-            // Initialize the statement                                   0         1
-            getStmt = util::make_unique<Statement>(db->prepare("SELECT `status`, `modified`, "
+            // Initialize the statement                                  0         1
+            getStmt = std::make_unique<Statement>(db->prepare("SELECT `status`, `modified`, "
             //     2         3        4          5                                       1
                 "`etag`, `expires`, `data`, `compressed` FROM `http_cache` WHERE `url` = ?"));
         } else {
@@ -158,7 +158,7 @@ std::unique_ptr<Response> SQLiteCache::Impl::get(const Resource &resource) {
         getStmt->bind(1, unifiedURL.c_str());
         if (getStmt->run()) {
             // There is data.
-            auto response = util::make_unique<Response>();
+            auto response = std::make_unique<Response>();
             response->status = Response::Status(getStmt->get<int>(0));
             response->modified = getStmt->get<int64_t>(1);
             response->etag = getStmt->get<std::string>(2);
@@ -200,7 +200,7 @@ void SQLiteCache::Impl::put(const Resource& resource, std::shared_ptr<const Resp
         }
 
         if (!putStmt) {
-            putStmt = util::make_unique<Statement>(db->prepare("REPLACE INTO `http_cache` ("
+            putStmt = std::make_unique<Statement>(db->prepare("REPLACE INTO `http_cache` ("
             //     1       2       3         4         5         6        7          8
                 "`url`, `status`, `kind`, `modified`, `etag`, `expires`, `data`, `compressed`"
                 ") VALUES(?, ?, ?, ?, ?, ?, ?, ?)"));
@@ -249,7 +249,7 @@ void SQLiteCache::Impl::refresh(const Resource& resource, int64_t expires) {
         }
 
         if (!refreshStmt) {
-            refreshStmt = util::make_unique<Statement>( //       1               2
+            refreshStmt = std::make_unique<Statement>( //        1               2
                 db->prepare("UPDATE `http_cache` SET `expires` = ? WHERE `url` = ?"));
         } else {
             refreshStmt->reset();

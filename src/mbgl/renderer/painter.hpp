@@ -78,7 +78,7 @@ struct RenderItem {
 
 class Painter : private util::noncopyable {
 public:
-    Painter(SpriteAtlas&, GlyphAtlas&, LineAtlas&);
+    Painter();
     ~Painter();
 
     void setup();
@@ -204,9 +204,9 @@ private:
 public:
     FrameHistory frameHistory;
 
-    SpriteAtlas& spriteAtlas;
-    GlyphAtlas& glyphAtlas;
-    LineAtlas& lineAtlas;
+    SpriteAtlas* spriteAtlas;
+    GlyphAtlas* glyphAtlas;
+    LineAtlas* lineAtlas;
 
     std::unique_ptr<PlainShader> plainShader;
     std::unique_ptr<OutlineShader> outlineShader;

@@ -5,7 +5,6 @@
 #include <mbgl/map/map_data.hpp>
 #include <mbgl/util/constants.hpp>
 #include <mbgl/util/ptr.hpp>
-#include <mbgl/util/std.hpp>
 
 #include <algorithm>
 #include <memory>
@@ -193,7 +192,7 @@ AnnotationManager::addTileFeature(const uint32_t annotationID,
 
     // track the annotation global ID and its original geometry
     auto anno_it = annotations.emplace(annotationID,
-        util::make_unique<Annotation>(type, segments, styleProperties));
+        std::make_unique<Annotation>(type, segments, styleProperties));
 
     if (type == AnnotationType::Shape) {
         orderedShapeAnnotations.push_back(annotationID);
@@ -266,7 +265,7 @@ AnnotationManager::addTileFeature(const uint32_t annotationID,
             // check for tile & create if necessary
             auto tile_pos = tiles.emplace(featureTile.first,
                                           std::make_pair(std::unordered_set<uint32_t>({ annotationID }),
-                                                         util::make_unique<LiveTile>()));
+                                                         std::make_unique<LiveTile>()));
 
             // check for annotation layer & create if necessary
             util::ptr<LiveTileLayer> layer;

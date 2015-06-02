@@ -53,10 +53,15 @@
         'miscellaneous/rotation_range.cpp',
         'miscellaneous/style_parser.cpp',
         'miscellaneous/text_conversions.cpp',
-        'miscellaneous/transform.cpp',
+        'miscellaneous/thread.cpp',
         'miscellaneous/tile.cpp',
+        'miscellaneous/transform.cpp',
         'miscellaneous/variant.cpp',
         'miscellaneous/worker.cpp',
+
+        'resources/mock_file_source.cpp',
+        'resources/mock_file_source.hpp',
+        'resources/mock_view.hpp',
 
         'storage/storage.hpp',
         'storage/storage.cpp',
