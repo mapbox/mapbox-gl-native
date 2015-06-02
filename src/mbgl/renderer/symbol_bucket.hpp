@@ -89,7 +89,7 @@ public:
                            const FilterExpression&,
                            GlyphStore&,
                            Sprite&);
-    void placeFeatures();
+    void placeFeatures() override;
 
 private:
     void addFeature(const std::vector<std::vector<Coordinate>> &lines,
@@ -99,7 +99,7 @@ private:
     void addToDebugBuffers();
 
     void placeFeatures(bool swapImmediately);
-    void swapRenderData();
+    void swapRenderData() override;
 
     // Adds placed items to the buffer.
     template <typename Buffer, typename GroupType>
