@@ -309,9 +309,28 @@ IB_DESIGNABLE
 *   @return The marker symbol to display for the specified annotation or `nil` if you want to display the default symbol. */
 - (NSString *)mapView:(MGLMapView *)mapView symbolNameForAnnotation:(id <MGLAnnotation>)annotation;
 
+/** Returns the alpha value to use when rendering a shape annotation. Defaults to `1.0`.
+*   @param mapView The map view rendering the shape annotation.
+*   @param annotation The annotation being rendered.
+*   @return An alpha value between `0` and `1.0`. */
 - (CGFloat)mapView:(MGLMapView *)mapView alphaForShapeAnnotation:(MGLShape *)annotation;
+
+/** Returns the stroke color to use when rendering a shape annotation. Defaults to black.
+*   @param mapView The map view rendering the shape annotation.
+*   @param annotation The annotation being rendered.
+*   @return A color to use for the shape outline. */
 - (UIColor *)mapView:(MGLMapView *)mapView strokeColorForShapeAnnotation:(MGLShape *)annotation;
+
+/** Returns the fill color to use when rendering a polygon annotation. Defaults to blue.
+*   @param mapView The map view rendering the polygon annotation.
+*   @param annotation The annotation being rendered.
+*   @return A color to use for the polygon interior. */
 - (UIColor *)mapView:(MGLMapView *)mapView fillColorForPolygonAnnotation:(MGLPolygon *)annotation;
+
+/** Returns the line width to use when rendering a polyline annotation. Defaults to `3.0`.
+*   @param mapView The map view rendering the polygon annotation.
+*   @param annotation The annotation being rendered.
+*   @return A line width for the polyline. */
 - (CGFloat)mapView:(MGLMapView *)mapView lineWidthForPolylineAnnotation:(MGLPolyline *)annotation;
 
 /** Returns a Boolean value indicating whether the annotation is able to display extra information in a callout bubble.
@@ -380,6 +399,8 @@ IB_DESIGNABLE
 - (void)mapViewDidFinishRenderingMap:(MGLMapView *)mapView fullyRendered:(BOOL)fullyRendered;
 
 #pragma mark - Tracking the User Location
+
+/** @name Tracking the User Location */
 
 /** Tells the delegate that the map view will begin tracking the user’s location.
 *
