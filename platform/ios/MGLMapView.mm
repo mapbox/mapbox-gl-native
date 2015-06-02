@@ -1957,12 +1957,12 @@ CLLocationCoordinate2D MGLLocationCoordinate2DFromLatLng(mbgl::LatLng latLng)
         // clean up
         self.selectedAnnotationCalloutView = nil;
         self.selectedAnnotation = nil;
-    }
 
-    // notify delegate
-    if ([self.delegate respondsToSelector:@selector(mapView:didDeselectAnnotation:)])
-    {
-        [self.delegate mapView:self didDeselectAnnotation:annotation];
+        // notify delegate
+        if ([self.delegate respondsToSelector:@selector(mapView:didDeselectAnnotation:)])
+        {
+            [self.delegate mapView:self didDeselectAnnotation:annotation];
+        }
     }
 }
 
