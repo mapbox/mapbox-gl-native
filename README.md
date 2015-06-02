@@ -61,7 +61,7 @@ pod 'MapboxGL'
 1. Install [appledoc](http://appledoc.gentlebytes.com/appledoc/) 2.2v963 for API docs generation (only this exact version works).
 
    ```
-   curl -o appledoc.zip https://github.com/tomaz/appledoc/releases/download/v2.2-963/appledoc.zip
+   curl -L -o appledoc.zip https://github.com/tomaz/appledoc/releases/download/v2.2-963/appledoc.zip
    tar xvzf appledoc.zip
    cp appledoc /usr/local/bin
    cp -Rf Templates/ ~/.appledoc
