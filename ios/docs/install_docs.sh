@@ -1,7 +1,7 @@
 #!/usr/bin/env bash
 
 if [ -z `which appledoc` ]; then
-    echo "Unable to find appledoc. https://github.com/mapbox/mapbox-gl-native#manually"
+    echo "Unable to find appledoc. See https://github.com/mapbox/mapbox-gl-native#manually"
     exit 1
 fi
 
