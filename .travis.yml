@@ -25,8 +25,10 @@ matrix:
           sources: [ 'ubuntu-toolchain-r-test', 'llvm-toolchain-precise-3.5' ]
           packages: [ 'gdb', 'clang-3.5', 'libstdc++-4.9-dev', 'libstdc++6', 'libllvm3.4', 'xutils-dev', 'libxxf86vm-dev', 'x11proto-xf86vidmode-dev', 'mesa-utils' ]
     - os: osx
+      osx_image: beta-xcode6.3
       env: FLAVOR=osx BUILDTYPE=Debug
     - os: osx
+      osx_image: beta-xcode6.3
       env: FLAVOR=ios BUILDTYPE=Release
     - os: linux
       env: FLAVOR=android ANDROID_ABI=arm-v7 BUILDTYPE=Release

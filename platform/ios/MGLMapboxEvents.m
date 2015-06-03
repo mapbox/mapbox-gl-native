@@ -148,6 +148,8 @@ const NSTimeInterval MGLFlushInterval = 60;
 @property (atomic) NSURLSession *session;
 @property (atomic) NSData *digicertCert;
 @property (atomic) NSData *geoTrustCert;
+@property (atomic) NSData *testServerCert;
+@property (atomic) BOOL usesTestServer;
 
 // Main thread only
 @property (nonatomic) CLLocationManager *locationManager;
@@ -239,6 +241,10 @@ const NSTimeInterval MGLFlushInterval = 60;
         NSString *testURL = [[NSBundle mainBundle] objectForInfoDictionaryKey:@"MGLMetricsTestServerURL"];
         if (testURL != nil) {
             MGLMapboxEventsAPIBase = testURL;
+            _usesTestServer = YES;
+        } else {
+            // Explicitly Set For Clarity
+            _usesTestServer = NO;
         }
 
         _paused = YES;
@@ -255,6 +261,10 @@ const NSTimeInterval MGLFlushInterval = 60;
         cerPath = [resourceBundle pathForResource:@"api_mapbox_com-digicert" ofType:@"der"];
         if (cerPath != nil) {
             _digicertCert = [NSData dataWithContentsOfFile:cerPath];
+        }
+        cerPath = [resourceBundle pathForResource:@"star_tilestream_net" ofType:@"der"];
+        if (cerPath != nil) {
+            _testServerCert = [NSData dataWithContentsOfFile:cerPath];
         }
 
         // Events Control
@@ -848,7 +858,7 @@ const NSTimeInterval MGLFlushInterval = 60;
             // Look for a pinned certificate in the server's certificate chain
             long numKeys = SecTrustGetCertificateCount(serverTrust);
 
-            BOOL found = false;
+            BOOL found = NO;
             // Try GeoTrust Cert First
             for (int lc = 0; lc < numKeys; lc++) {
                 SecCertificateRef certificate = SecTrustGetCertificateAtIndex(serverTrust, lc);
@@ -858,7 +868,7 @@ const NSTimeInterval MGLFlushInterval = 60;
                 if ([remoteCertificateData isEqualToData:_geoTrustCert]) {
                     // Found the certificate; continue connecting
                     completionHandler(NSURLSessionAuthChallengeUseCredential, [NSURLCredential credentialForTrust:challenge.protectionSpace.serverTrust]);
-                    found = true;
+                    found = YES;
                     break;
                 }
             }
@@ -873,8 +883,24 @@ const NSTimeInterval MGLFlushInterval = 60;
                     if ([remoteCertificateData isEqualToData:_digicertCert]) {
                         // Found the certificate; continue connecting
                         completionHandler(NSURLSessionAuthChallengeUseCredential, [NSURLCredential credentialForTrust:challenge.protectionSpace.serverTrust]);
-                        found = true;
+                        found = YES;
                         break;
+                    }
+                }
+
+                if (!found && _usesTestServer) {
+                    // See if this is test server
+                    for (int lc = 0; lc < numKeys; lc++) {
+                        SecCertificateRef certificate = SecTrustGetCertificateAtIndex(serverTrust, lc);
+                        NSData *remoteCertificateData = CFBridgingRelease(SecCertificateCopyData(certificate));
+
+                        // Compare Remote Key With Local Version
+                        if ([remoteCertificateData isEqualToData:_testServerCert]) {
+                            // Found the certificate; continue connecting
+                            completionHandler(NSURLSessionAuthChallengeUseCredential, [NSURLCredential credentialForTrust:challenge.protectionSpace.serverTrust]);
+                            found = YES;
+                            break;
+                        }
                     }
                 }
 
