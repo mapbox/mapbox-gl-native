@@ -220,10 +220,10 @@ test('Map', function(t) {
             });
         });
 
-        t.skip('returns an error', function(t) {
+        t.test('returns an error', function(t) {
             mbgl.on('message', function(msg) {
                 t.ok(msg, 'emits error');
-                t.equal(msg.class, 'ResourceLoader');
+                t.equal(msg.class, 'Style');
                 t.equal(msg.severity, 'ERROR');
                 t.ok(msg.text.match(/Failed to load/), 'error text matches');
             });

@@ -104,7 +104,7 @@ test('gzip', function(t) {
         mbgl.once('message', function(msg) {
             if (msg.severity == 'ERROR') {
                 t.ok(msg, 'emits error');
-                t.equal(msg.class, 'ResourceLoader');
+                t.equal(msg.class, 'Style');
                 t.equal(msg.severity, 'ERROR');
                 t.ok(msg.text.match(/pbf unknown field type exception/), 'error text matches');
             }
