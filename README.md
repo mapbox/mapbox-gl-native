@@ -247,6 +247,7 @@ Some styles in JSON format are included at `./styles`. See the [style spec](http
 - Press `X` to reset the transform
 - Press `N` to reset north
 - Press `Tab` to toggle debug information
+- Press 'C' to toggle symbol collision debug boxes
 - Press `Esc` to quit
 
 ## Mobile
