@@ -15,18 +15,10 @@ using namespace mbgl;
 
 VectorTileData::VectorTileData(const TileID& id_,
                                Style& style_,
-                               GlyphAtlas& glyphAtlas_,
-                               GlyphStore& glyphStore_,
-                               SpriteAtlas& spriteAtlas_,
-                               util::ptr<Sprite> sprite_,
                                const SourceInfo& source_,
                                float angle,
                                bool collisionDebug)
     : TileData(id_, source_),
-      glyphAtlas(glyphAtlas_),
-      glyphStore(glyphStore_),
-      spriteAtlas(spriteAtlas_),
-      sprite(sprite_),
       style(style_),
       collision(std::make_unique<CollisionTile>(id_.z, 4096, source_.tile_size * id.overscaling, angle, collisionDebug)),
       lastAngle(angle),
@@ -37,7 +29,7 @@ VectorTileData::~VectorTileData() {
     // Cancel in most derived class destructor so that worker tasks are joined before
     // any member data goes away.
     cancel();
-    glyphAtlas.removeGlyphs(reinterpret_cast<uintptr_t>(this));
+    style.glyphAtlas->removeGlyphs(reinterpret_cast<uintptr_t>(this));
 }
 
 void VectorTileData::parse() {
@@ -51,7 +43,7 @@ void VectorTileData::parse() {
         // is going to be discarded afterwards.
         VectorTile vectorTile(pbf((const uint8_t *)data.data(), data.size()));
         const VectorTile* vt = &vectorTile;
-        TileParser parser(*vt, *this, style, glyphAtlas, glyphStore, spriteAtlas, sprite);
+        TileParser parser(*vt, *this, style);
         parser.parse();
 
         if (getState() == State::obsolete) {

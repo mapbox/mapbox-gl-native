@@ -21,20 +21,12 @@ TileParser::~TileParser() = default;
 
 TileParser::TileParser(const GeometryTile& geometryTile_,
                        VectorTileData& tile_,
-                       const Style& style_,
-                       GlyphAtlas& glyphAtlas_,
-                       GlyphStore& glyphStore_,
-                       SpriteAtlas& spriteAtlas_,
-                       const util::ptr<Sprite>& sprite_)
+                       Style& style_)
     : geometryTile(geometryTile_),
       tile(tile_),
       style(style_),
-      glyphAtlas(glyphAtlas_),
-      glyphStore(glyphStore_),
-      spriteAtlas(spriteAtlas_),
-      sprite(sprite_),
       partialParse(false) {
-    assert(sprite);
+    assert(style.sprite);
 }
 
 bool TileParser::obsolete() const {
@@ -222,7 +214,7 @@ std::unique_ptr<Bucket> TileParser::createSymbolBucket(const GeometryTileLayer& 
     applyLayoutProperty(PropertyKey::TextOffset, bucket_desc.layout, layout.text.offset, z);
     applyLayoutProperty(PropertyKey::TextAllowOverlap, bucket_desc.layout, layout.text.allow_overlap, z);
 
-    if (bucket->needsDependencies(layer, bucket_desc.filter, glyphStore, *sprite)) {
+    if (bucket->needsDependencies(layer, bucket_desc.filter, *style.glyphStore, *style.sprite)) {
         partialParse = true;
     }
 
@@ -235,7 +227,7 @@ std::unique_ptr<Bucket> TileParser::createSymbolBucket(const GeometryTileLayer& 
     }
 
     bucket->addFeatures(
-        reinterpret_cast<uintptr_t>(&tile), spriteAtlas, *sprite, glyphAtlas, glyphStore);
+        reinterpret_cast<uintptr_t>(&tile), *style.spriteAtlas, *style.sprite, *style.glyphAtlas, *style.glyphStore);
 
     return bucket->hasData() ? std::move(bucket) : nullptr;
 }

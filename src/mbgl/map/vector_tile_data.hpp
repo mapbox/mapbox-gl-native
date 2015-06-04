@@ -22,10 +22,6 @@ class Painter;
 class SourceInfo;
 class StyleLayer;
 class TileParser;
-class GlyphAtlas;
-class GlyphStore;
-class SpriteAtlas;
-class Sprite;
 class Style;
 
 class VectorTileData : public TileData {
@@ -34,10 +30,6 @@ class VectorTileData : public TileData {
 public:
     VectorTileData(const TileID&,
                    Style&,
-                   GlyphAtlas&,
-                   GlyphStore&,
-                   SpriteAtlas&,
-                   util::ptr<Sprite>,
                    const SourceInfo&,
                    float angle_,
                    bool collisionDebug_);
@@ -66,10 +58,6 @@ protected:
     TriangleElementsBuffer triangleElementsBuffer;
     LineElementsBuffer lineElementsBuffer;
 
-    GlyphAtlas& glyphAtlas;
-    GlyphStore& glyphStore;
-    SpriteAtlas& spriteAtlas;
-    util::ptr<Sprite> sprite;
     Style& style;
 
 private:

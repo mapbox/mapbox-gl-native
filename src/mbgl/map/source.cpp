@@ -254,10 +254,6 @@ bool Source::handlePartialTile(const TileID& id, Worker& worker) {
 TileData::State Source::addTile(MapData& data,
                                 const TransformState& transformState,
                                 Style& style,
-                                GlyphAtlas& glyphAtlas,
-                                GlyphStore& glyphStore,
-                                SpriteAtlas& spriteAtlas,
-                                util::ptr<Sprite> sprite,
                                 TexturePool& texturePool,
                                 const TileID& id) {
     const TileData::State state = hasTile(id);
@@ -295,8 +291,7 @@ TileData::State Source::addTile(MapData& data,
         // If we don't find working tile data, we're just going to load it.
         if (info.type == SourceType::Vector) {
             new_tile.data =
-                std::make_shared<VectorTileData>(normalized_id, style, glyphAtlas,
-                                                 glyphStore, spriteAtlas, sprite, info,
+                std::make_shared<VectorTileData>(normalized_id, style, info,
                                                  transformState.getAngle(), data.getCollisionDebug());
             new_tile.data->request(style.workers, transformState.getPixelRatio(), callback);
         } else if (info.type == SourceType::Raster) {
@@ -305,8 +300,7 @@ TileData::State Source::addTile(MapData& data,
                 style.workers, transformState.getPixelRatio(), callback);
         } else if (info.type == SourceType::Annotations) {
             new_tile.data = std::make_shared<LiveTileData>(normalized_id, data.annotationManager,
-                                                           style, glyphAtlas,
-                                                           glyphStore, spriteAtlas, sprite, info,
+                                                           style, info,
                                                            transformState.getAngle(), data.getCollisionDebug());
             new_tile.data->reparse(style.workers, callback);
         } else {
@@ -405,10 +399,6 @@ bool Source::findLoadedParent(const TileID& id, int32_t minCoveringZoom, std::fo
 bool Source::update(MapData& data,
                     const TransformState& transformState,
                     Style& style,
-                    GlyphAtlas& glyphAtlas,
-                    GlyphStore& glyphStore,
-                    SpriteAtlas& spriteAtlas,
-                    util::ptr<Sprite> sprite,
                     TexturePool& texturePool,
                     bool shouldReparsePartialTiles) {
     bool allTilesUpdated = true;
@@ -442,8 +432,7 @@ bool Source::update(MapData& data,
             }
             break;
         case TileData::State::invalid:
-            state = addTile(data, transformState, style, glyphAtlas, glyphStore,
-                            spriteAtlas, sprite, texturePool, id);
+            state = addTile(data, transformState, style, texturePool, id);
             break;
         default:
             break;

@@ -18,10 +18,6 @@ namespace mbgl {
 
 class Bucket;
 class FontStack;
-class GlyphAtlas;
-class GlyphStore;
-class SpriteAtlas;
-class Sprite;
 class Style;
 class StyleBucket;
 class StyleLayoutFill;
@@ -32,13 +28,7 @@ class VectorTileData;
 
 class TileParser : private util::noncopyable {
 public:
-    TileParser(const GeometryTile& geometryTile,
-               VectorTileData& tile,
-               const Style& style,
-               GlyphAtlas& glyphAtlas,
-               GlyphStore& glyphStore,
-               SpriteAtlas& spriteAtlas,
-               const util::ptr<Sprite>& sprite);
+    TileParser(const GeometryTile&, VectorTileData&, Style&);
     ~TileParser();
 
 public:
@@ -62,11 +52,7 @@ private:
     VectorTileData& tile;
 
     // Cross-thread shared data.
-    const Style& style;
-    GlyphAtlas& glyphAtlas;
-    GlyphStore& glyphStore;
-    SpriteAtlas& spriteAtlas;
-    util::ptr<Sprite> sprite;
+    Style& style;
 
     bool partialParse;
 };

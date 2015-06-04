@@ -12,10 +12,6 @@ public:
     LiveTileData(const TileID&,
                  AnnotationManager&,
                  Style&,
-                 GlyphAtlas&,
-                 GlyphStore&,
-                 SpriteAtlas&,
-                 util::ptr<Sprite>,
                  const SourceInfo&,
                  float angle_,
                  bool collisionDebug_);

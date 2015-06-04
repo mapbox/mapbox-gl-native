@@ -78,8 +78,7 @@ void Style::update(MapData& data,
 
     bool allTilesUpdated = true;
     for (const auto& source : sources) {
-        if (!source->update(data, transform, *this, *glyphAtlas, *glyphStore,
-                       *spriteAtlas, sprite, texturePool, shouldReparsePartialTiles)) {
+        if (!source->update(data, transform, *this, texturePool, shouldReparsePartialTiles)) {
             allTilesUpdated = false;
         }
     }
