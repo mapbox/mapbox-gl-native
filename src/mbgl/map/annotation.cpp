@@ -431,8 +431,12 @@ std::unordered_set<TileID, TileID::Hash> AnnotationManager::removeAnnotations(co
             }
 
             if (annotation->type == AnnotationType::Shape) {
+                // clear shape from render order
                 auto shape_it = std::find(orderedShapeAnnotations.begin(), orderedShapeAnnotations.end(), annotationID);
                 orderedShapeAnnotations.erase(shape_it);
+
+                // clear shape tiler
+                shapeTilers.erase(annotationID);
             }
 
             annotations.erase(annotationID);
