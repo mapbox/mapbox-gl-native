@@ -218,14 +218,14 @@ AnnotationManager::addTileFeature(const uint32_t annotationID,
 
         ProjectedFeatureType featureType;
 
-        if (styleProperties.is<LineProperties>()) {
-            featureType = ProjectedFeatureType::LineString;
-        } else if (styleProperties.is<FillProperties>()) {
+        if (styleProperties.is<FillProperties>()) {
             featureType = ProjectedFeatureType::Polygon;
 
             if (points.front().lon != points.back().lon || points.front().lat != points.back().lat) {
                 points.push_back(LonLat(points.front().lon, points.front().lat));
             }
+        } else {
+            featureType = ProjectedFeatureType::LineString;
         }
 
         ProjectedGeometryContainer ring = Convert::project(points, tolerance);
