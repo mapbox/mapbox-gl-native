@@ -194,124 +194,171 @@ AnnotationManager::addTileFeature(const uint32_t annotationID,
     auto anno_it = annotations.emplace(annotationID,
         std::make_unique<Annotation>(type, segments, styleProperties));
 
-    if (type == AnnotationType::Shape) {
-        orderedShapeAnnotations.push_back(annotationID);
-    }
-
-    // side length of map at max zoom
-    uint32_t z2 = 1 << maxZoom;
-
-    const uint16_t extent = 4096;
-
-    uint32_t x = 0;
-    uint32_t y = 0;
-
     std::unordered_set<TileID, TileID::Hash> affectedTiles;
 
-    for (int8_t z = maxZoom; z >= 0; z--) {
+    if (type == AnnotationType::Shape) {
 
-        std::unordered_map<TileID, GeometryCollection, TileID::Hash> featureTiles;
+        orderedShapeAnnotations.push_back(annotationID);
 
-        if (type == AnnotationType::Point) {
-            auto& pp = projectedFeature[0][0];
+        using namespace mapbox::util::geojsonvt;
 
-            x = pp.x * z2;
-            y = pp.y * z2;
+        const uint32_t z2 = 1 << 14;
+        const double baseTolerance = 3;
+        const uint16_t extent = 4096;
 
-            const Coordinate coordinate(extent * (pp.x * z2 - x), extent * (pp.y * z2 - y));
+        const double tolerance = baseTolerance / (z2 * extent);
 
-            GeometryCollection geometries = {{ {{ coordinate }} }};
+        ProjectedGeometryContainer rings;
 
-            featureTiles.emplace(TileID(z, x, y), geometries);
-        } else {
-            for (size_t l = 0; l < projectedFeature.size(); ++l) {
+        std::vector<LonLat> points;
 
-                std::vector<Coordinate> line;
+        for (size_t i = 0; i < segments[0].size(); ++i) {
+            points.push_back(LonLat(segments[0][i].longitude, segments[0][i].latitude));
+        }
 
-                for (size_t p = 0; p < projectedFeature[l].size(); ++p) {
+        ProjectedFeatureType featureType;
 
-                    auto& pp = projectedFeature[l][p];
+        if (styleProperties.is<LineProperties>()) {
+            featureType = ProjectedFeatureType::LineString;
+        } else if (styleProperties.is<FillProperties>()) {
+            featureType = ProjectedFeatureType::Polygon;
 
-                    x = pp.x * z2;
-                    y = pp.y * z2;
+            if (points.front().lon != points.back().lon || points.front().lat != points.back().lat) {
+                points.push_back(LonLat(points.front().lon, points.front().lat));
+            }
+        }
 
-                    const Coordinate coordinate(extent * (pp.x * z2 - x), extent * (pp.y * z2 - y));
+        ProjectedGeometryContainer ring = Convert::project(points, tolerance);
 
-                    auto tile_it = featureTiles.find(TileID(z, x, y));
+        rings.members.push_back(ring);
 
-                    if (tile_it != featureTiles.end()) {
-                        GeometryCollection& geometries = featureTiles.find(TileID(z, x, y))->second;
-                        if (geometries.size()) {
-                            geometries.back().push_back(coordinate);
+        std::vector<ProjectedFeature> features;
+
+        features.push_back(Convert::create(Tags(),
+                                           (styleProperties.is<LineProperties>() ?
+                                            ProjectedFeatureType::LineString :
+                                            ProjectedFeatureType::Polygon),
+                                           rings));
+
+        shapeTilers.emplace(annotationID, mapbox::util::geojsonvt::GeoJSONVT(features));
+
+        // FIXME: need to expire tiles
+
+    } else {
+
+        // side length of map at max zoom
+        uint32_t z2 = 1 << maxZoom;
+
+        const uint16_t extent = 4096;
+
+        uint32_t x = 0;
+        uint32_t y = 0;
+
+        for (int8_t z = maxZoom; z >= 0; z--) {
+
+            std::unordered_map<TileID, GeometryCollection, TileID::Hash> featureTiles;
+
+            if (type == AnnotationType::Point) {
+                auto& pp = projectedFeature[0][0];
+
+                x = pp.x * z2;
+                y = pp.y * z2;
+
+                const Coordinate coordinate(extent * (pp.x * z2 - x), extent * (pp.y * z2 - y));
+
+                GeometryCollection geometries = {{ {{ coordinate }} }};
+
+                featureTiles.emplace(TileID(z, x, y), geometries);
+            } else {
+                for (size_t l = 0; l < projectedFeature.size(); ++l) {
+
+                    std::vector<Coordinate> line;
+
+                    for (size_t p = 0; p < projectedFeature[l].size(); ++p) {
+
+                        auto& pp = projectedFeature[l][p];
+
+                        x = pp.x * z2;
+                        y = pp.y * z2;
+
+                        const Coordinate coordinate(extent * (pp.x * z2 - x), extent * (pp.y * z2 - y));
+
+                        auto tile_it = featureTiles.find(TileID(z, x, y));
+
+                        if (tile_it != featureTiles.end()) {
+                            GeometryCollection& geometries = featureTiles.find(TileID(z, x, y))->second;
+                            if (geometries.size()) {
+                                geometries.back().push_back(coordinate);
+                            } else {
+                                geometries.push_back({{ coordinate }});
+                            }
                         } else {
-                            geometries.push_back({{ coordinate }});
+                            GeometryCollection geometries = {{ {{ coordinate }} }};
+                            featureTiles.emplace(TileID(z, x, y), geometries);
                         }
-                    } else {
-                        GeometryCollection geometries = {{ {{ coordinate }} }};
-                        featureTiles.emplace(TileID(z, x, y), geometries);
                     }
                 }
             }
+
+            for (auto& featureTile : featureTiles) {
+                // determine feature type
+                FeatureType featureType;
+                if (type == AnnotationType::Point) {
+                    featureType = FeatureType::Point;
+                } else if (styleProperties.is<LineProperties>()) {
+                    featureType = FeatureType::LineString;
+                } else if (styleProperties.is<FillProperties>()) {
+                    featureType = FeatureType::Polygon;
+                } else {
+                    throw std::runtime_error("Invalid feature type");
+                }
+
+                // create tile feature
+                auto feature = std::make_shared<const LiveTileFeature>(
+                    featureType,
+                    featureTile.second,
+                    featureProperties
+                );
+
+                // check for tile & create if necessary
+                auto tile_pos = tiles.emplace(featureTile.first,
+                                              std::make_pair(std::unordered_set<uint32_t>({ annotationID }),
+                                                             std::make_unique<LiveTile>()));
+
+                // check for annotation layer & create if necessary
+                util::ptr<LiveTileLayer> layer;
+                std::string layerID = "";
+                if (type == AnnotationType::Point) {
+                    layerID = PointLayerID;
+                } else {
+                    layerID = ShapeLayerID + "." + std::to_string(annotationID);
+                }
+                if (tile_pos.second || tile_pos.first->second.second->getMutableLayer(layerID) == nullptr) {
+                    layer = std::make_shared<LiveTileLayer>();
+                    tile_pos.first->second.second->addLayer(layerID, layer);
+                } else {
+                    layer = tile_pos.first->second.second->getMutableLayer(layerID);
+
+                    // associate annotation with tile
+                    tile_pos.first->second.first.insert(annotationID);
+                }
+
+                // add feature to layer
+                layer->addFeature(feature);
+
+                // Record annotation association with tile and tile feature. This is used to determine stale tiles,
+                // as well as to remove the feature from the tile upon annotation deletion.
+                anno_it.first->second->tileFeatures.emplace(featureTile.first, std::weak_ptr<const LiveTileFeature>(feature));
+
+                // track affected tile
+                affectedTiles.insert(featureTile.first);
+            }
+
+            // get ready for the next-lower zoom number
+            z2 /= 2;
+            x /= 2;
+            y /= 2;
         }
-
-        for (auto& featureTile : featureTiles) {
-            // determine feature type
-            FeatureType featureType;
-            if (type == AnnotationType::Point) {
-                featureType = FeatureType::Point;
-            } else if (styleProperties.is<LineProperties>()) {
-                featureType = FeatureType::LineString;
-            } else if (styleProperties.is<FillProperties>()) {
-                featureType = FeatureType::Polygon;
-            } else {
-                throw std::runtime_error("Invalid feature type");
-            }
-
-            // create tile feature
-            auto feature = std::make_shared<const LiveTileFeature>(
-                featureType,
-                featureTile.second,
-                featureProperties
-            );
-
-            // check for tile & create if necessary
-            auto tile_pos = tiles.emplace(featureTile.first,
-                                          std::make_pair(std::unordered_set<uint32_t>({ annotationID }),
-                                                         std::make_unique<LiveTile>()));
-
-            // check for annotation layer & create if necessary
-            util::ptr<LiveTileLayer> layer;
-            std::string layerID = "";
-            if (type == AnnotationType::Point) {
-                layerID = PointLayerID;
-            } else {
-                layerID = ShapeLayerID + "." + std::to_string(annotationID);
-            }
-            if (tile_pos.second || tile_pos.first->second.second->getMutableLayer(layerID) == nullptr) {
-                layer = std::make_shared<LiveTileLayer>();
-                tile_pos.first->second.second->addLayer(layerID, layer);
-            } else {
-                layer = tile_pos.first->second.second->getMutableLayer(layerID);
-
-                // associate annotation with tile
-                tile_pos.first->second.first.insert(annotationID);
-            }
-
-            // add feature to layer
-            layer->addFeature(feature);
-
-            // Record annotation association with tile and tile feature. This is used to determine stale tiles,
-            // as well as to remove the feature from the tile upon annotation deletion.
-            anno_it.first->second->tileFeatures.emplace(featureTile.first, std::weak_ptr<const LiveTileFeature>(feature));
-
-            // track affected tile
-            affectedTiles.insert(featureTile.first);
-        }
-
-        // get ready for the next-lower zoom number
-        z2 /= 2;
-        x /= 2;
-        y /= 2;
     }
 
     return affectedTiles;

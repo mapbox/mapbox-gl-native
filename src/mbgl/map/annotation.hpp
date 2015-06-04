@@ -7,6 +7,7 @@
 #include <mbgl/style/style_properties.hpp>
 #include <mbgl/style/types.hpp>
 #include <mbgl/util/geo.hpp>
+#include <mbgl/util/geojsonvt.hpp>
 #include <mbgl/util/noncopyable.hpp>
 #include <mbgl/util/vec.hpp>
 
@@ -26,6 +27,8 @@ class LiveTileFeature;
 class MapData;
 
 using AnnotationsProperties = std::unordered_map<std::string, std::vector<std::string>>;
+
+using GeoJSONVT = mapbox::util::geojsonvt::GeoJSONVT;
 
 class Annotation : private util::noncopyable {
     friend class AnnotationManager;
@@ -99,6 +102,7 @@ private:
     std::unordered_map<uint32_t, std::unique_ptr<Annotation>> annotations;
     std::vector<uint32_t> orderedShapeAnnotations;
     std::unordered_map<TileID, std::pair<std::unordered_set<uint32_t>, std::unique_ptr<LiveTile>>, TileID::Hash> tiles;
+    std::unordered_map<uint32_t, GeoJSONVT> shapeTilers;
     std::unordered_set<TileID, TileID::Hash> staleTiles;
     uint32_t nextID_ = 0;
 };
