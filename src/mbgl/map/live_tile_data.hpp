@@ -17,7 +17,7 @@ public:
                  bool collisionDebug_);
     ~LiveTileData();
 
-    void parse() override;
+    bool reparse(Worker&, std::function<void ()> callback) override;
 
 private:
     AnnotationManager& annotationManager;

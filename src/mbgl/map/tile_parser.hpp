@@ -24,11 +24,11 @@ class StyleLayoutFill;
 class StyleLayoutRaster;
 class StyleLayoutLine;
 class StyleLayoutSymbol;
-class VectorTileData;
+class TileWorker;
 
 class TileParser : private util::noncopyable {
 public:
-    TileParser(const GeometryTile&, VectorTileData&, Style&);
+    TileParser(const GeometryTile&, TileWorker&, Style&);
     ~TileParser();
 
 public:
@@ -49,7 +49,7 @@ private:
     void addBucketGeometries(Bucket&, const GeometryTileLayer&, const FilterExpression&);
 
     const GeometryTile& geometryTile;
-    VectorTileData& tile;
+    TileWorker& tile;
 
     // Cross-thread shared data.
     Style& style;

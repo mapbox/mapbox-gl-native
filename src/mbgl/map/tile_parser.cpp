@@ -20,7 +20,7 @@ namespace mbgl {
 TileParser::~TileParser() = default;
 
 TileParser::TileParser(const GeometryTile& geometryTile_,
-                       VectorTileData& tile_,
+                       TileWorker& tile_,
                        Style& style_)
     : geometryTile(geometryTile_),
       tile(tile_),
@@ -98,7 +98,7 @@ void applyLayoutProperty(PropertyKey key, const ClassProperties &classProperties
 
 std::unique_ptr<Bucket> TileParser::createBucket(const StyleBucket &bucketDesc) {
     // Skip this bucket if we are to not render this
-    if (tile.id.z < std::floor(bucketDesc.min_zoom) && std::floor(bucketDesc.min_zoom) < tile.source.max_zoom) return nullptr;
+    if (tile.id.z < std::floor(bucketDesc.min_zoom) && std::floor(bucketDesc.min_zoom) < tile.maxZoom) return nullptr;
     if (tile.id.z >= std::ceil(bucketDesc.max_zoom)) return nullptr;
     if (bucketDesc.visibility == mbgl::VisibilityType::None) return nullptr;
 
