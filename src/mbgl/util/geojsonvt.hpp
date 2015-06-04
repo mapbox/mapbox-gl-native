@@ -211,7 +211,7 @@ private:
     };
 
 private:
-    std::mutex mtx;
+//    std::mutex mtx;
     uint8_t baseZoom;
     uint8_t maxZoom;
     uint32_t maxPoints;

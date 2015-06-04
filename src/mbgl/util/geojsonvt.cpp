@@ -247,7 +247,7 @@ void GeoJSONVT::splitTile(std::vector<ProjectedFeature> features_, uint8_t z_, u
 
 Tile& GeoJSONVT::getTile(uint8_t z, uint32_t x, uint32_t y) {
 
-    std::lock_guard<std::mutex> lock(mtx);
+//    std::lock_guard<std::mutex> lock(mtx);
 
     const uint64_t id = toID(z, x, y);
     if (this->tiles.count(id)) {
