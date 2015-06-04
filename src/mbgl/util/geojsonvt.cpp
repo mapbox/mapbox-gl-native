@@ -79,7 +79,34 @@ TilePoint Tile::transformPoint(const ProjectedPoint &p, uint32_t z2, uint32_t tx
 
 #pragma mark - GeoJSONVT
 
-GeoJSONVT::GeoJSONVT(const std::string &data, uint8_t baseZoom_, uint8_t maxZoom_, uint32_t maxPoints_, double tolerance_, bool debug_)
+std::vector<ProjectedFeature> GeoJSONVT::convertFeatures(const std::string &data, uint8_t baseZoom, double tolerance, bool debug) {
+
+    if (debug) {
+        Time::time("preprocess data");
+    }
+
+    uint32_t z2 = 1 << baseZoom;
+
+    JSDocument deserializedData;
+    deserializedData.Parse<0>(data.c_str());
+
+    if (deserializedData.HasParseError()) {
+        printf("invalid GeoJSON\n");
+        return std::vector<ProjectedFeature>();
+    }
+
+    const uint16_t extent = 4096;
+
+    std::vector<ProjectedFeature> features = Convert::convert(deserializedData, tolerance / (z2 * extent));
+
+    if (debug) {
+        Time::timeEnd("preprocess data");
+    }
+
+    return features;
+}
+
+GeoJSONVT::GeoJSONVT(const std::vector<ProjectedFeature>& features_, uint8_t baseZoom_, uint8_t maxZoom_, uint32_t maxPoints_, double tolerance_, bool debug_)
     : baseZoom(baseZoom_),
       maxZoom(maxZoom_),
       maxPoints(maxPoints_),
@@ -87,27 +114,10 @@ GeoJSONVT::GeoJSONVT(const std::string &data, uint8_t baseZoom_, uint8_t maxZoom
       debug(debug_) {
 
     if (this->debug) {
-        Time::time("preprocess data");
-    }
-
-    uint32_t z2 = 1 << this->baseZoom;
-
-    JSDocument deserializedData;
-    deserializedData.Parse<0>(data.c_str());
-
-    if (deserializedData.HasParseError()) {
-        printf("invalid GeoJSON\n");
-        return;
-    }
-
-    std::vector<ProjectedFeature> features = Convert::convert(deserializedData, this->tolerance / (z2 * this->extent));
-
-    if (this->debug) {
-        Time::timeEnd("preprocess data");
         Time::time("generate tiles up to z" + std::to_string(maxZoom));
     }
 
-    splitTile(features, 0, 0, 0);
+    splitTile(features_, 0, 0, 0);
 
     if (this->debug) {
         printf("features: %i, points: %i\n", this->tiles[0].numFeatures, this->tiles[0].numPoints);

@@ -183,7 +183,9 @@ public:
 
 class GeoJSONVT {
 public:
-    GeoJSONVT(const std::string &data, uint8_t baseZoom = 14, uint8_t maxZoom = 4, uint32_t maxPoints = 100, double tolerance = 3, bool debug = true);
+    static std::vector<ProjectedFeature> convertFeatures(const std::string &data, uint8_t baseZoom = 14, double tolerance = 3, bool debug = true);
+
+    GeoJSONVT(const std::vector<ProjectedFeature>& features_, uint8_t baseZoom = 14, uint8_t maxZoom = 4, uint32_t maxPoints = 100, double tolerance = 3, bool debug = true);
 
     Tile& getTile(uint8_t z, uint32_t x, uint32_t y);
 
