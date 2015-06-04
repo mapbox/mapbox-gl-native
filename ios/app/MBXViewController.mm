@@ -167,39 +167,70 @@ mbgl::Settings_NSUserDefaults *settings = nullptr;
     }
     else if (buttonIndex == actionSheet.firstOtherButtonIndex + 7)
     {
-        CLLocationCoordinate2D polygonCoordinates[4] =
+        // PNW triangle
+        //
+        CLLocationCoordinate2D triangleCoordinates[3] =
         {
             CLLocationCoordinate2DMake(44, -122),
             CLLocationCoordinate2DMake(46, -122),
-            CLLocationCoordinate2DMake(46, -121),
-            CLLocationCoordinate2DMake(44, -122)
+            CLLocationCoordinate2DMake(46, -121)
         };
 
-        MGLPolygon *polygon = [MGLPolygon polygonWithCoordinates:polygonCoordinates count:4];
+        MGLPolygon *triangle = [MGLPolygon polygonWithCoordinates:triangleCoordinates count:3];
 
-        [self.mapView addAnnotation:polygon];
+        [self.mapView addAnnotation:triangle];
 
+        // Orcas Island hike
+        //
         NSDictionary *hike = [NSJSONSerialization JSONObjectWithData:
                                  [NSData dataWithContentsOfFile:
                                      [[NSBundle mainBundle] pathForResource:@"polyline" ofType:@"geojson"]]
                                                              options:0
                                                                error:nil];
 
-        NSArray *coordinatePairs = hike[@"features"][0][@"geometry"][@"coordinates"];
+        NSArray *hikeCoordinatePairs = hike[@"features"][0][@"geometry"][@"coordinates"];
 
-        CLLocationCoordinate2D *polylineCoordinates = (CLLocationCoordinate2D *)malloc([coordinatePairs count] * sizeof(CLLocationCoordinate2D));
+        CLLocationCoordinate2D *polylineCoordinates = (CLLocationCoordinate2D *)malloc([hikeCoordinatePairs count] * sizeof(CLLocationCoordinate2D));
 
-        for (NSArray *coordinatePair in coordinatePairs)
+        for (NSArray *coordinatePair in hikeCoordinatePairs)
         {
-            polylineCoordinates[[coordinatePairs indexOfObject:coordinatePair]] = CLLocationCoordinate2DMake([coordinatePair[1] doubleValue], [coordinatePair[0] doubleValue]);
+            polylineCoordinates[[hikeCoordinatePairs indexOfObject:coordinatePair]] = CLLocationCoordinate2DMake([coordinatePair[1] doubleValue], [coordinatePair[0] doubleValue]);
         }
 
         MGLPolyline *polyline = [MGLPolyline polylineWithCoordinates:polylineCoordinates
-                                                               count:[coordinatePairs count]];
+                                                               count:[hikeCoordinatePairs count]];
 
         [self.mapView addAnnotation:polyline];
 
         free(polylineCoordinates);
+
+        // PA/NJ/DE polys
+        //
+        NSDictionary *threestates = [NSJSONSerialization JSONObjectWithData:
+                              [NSData dataWithContentsOfFile:
+                               [[NSBundle mainBundle] pathForResource:@"threestates" ofType:@"geojson"]]
+                                                             options:0
+                                                               error:nil];
+
+        for (NSDictionary *feature in threestates[@"features"])
+        {
+            NSArray *stateCoordinatePairs = feature[@"geometry"][@"coordinates"];
+
+            while ([stateCoordinatePairs count] == 1) stateCoordinatePairs = stateCoordinatePairs[0];
+
+            CLLocationCoordinate2D *polygonCoordinates = (CLLocationCoordinate2D *)malloc([stateCoordinatePairs count] * sizeof(CLLocationCoordinate2D));
+
+            for (NSUInteger i = 0; i < [stateCoordinatePairs count]; i++)
+            {
+                polygonCoordinates[i] = CLLocationCoordinate2DMake([stateCoordinatePairs[i][1] doubleValue], [stateCoordinatePairs[i][0] doubleValue]);
+            }
+
+            MGLPolygon *polygon = [MGLPolygon polygonWithCoordinates:polygonCoordinates count:[stateCoordinatePairs count]];
+
+            [self.mapView addAnnotation:polygon];
+
+            free(polygonCoordinates);
+        }
     }
     else if (buttonIndex == actionSheet.firstOtherButtonIndex + 8)
     {

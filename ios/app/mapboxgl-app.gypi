@@ -12,6 +12,7 @@
         '<!@(find ../ios/app/img -type f)',
         './points.geojson',
         './polyline.geojson',
+        './threestates.geojson',
         './Settings.bundle/'
       ],
 
