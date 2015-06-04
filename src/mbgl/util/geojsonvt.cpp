@@ -202,8 +202,8 @@ void GeoJSONVT::splitTile(std::vector<ProjectedFeature> features_, uint8_t z_, u
 
         if (cz >= 0) {
             m = 1 << (cz - z);
-            goLeft = cx / m - x < 0.5;
-            goTop  = cy / m - y < 0.5;
+            goLeft = double(cx) / double(m) - double(x) < 0.5;
+            goTop  = double(cy) / double(m) - double(y) < 0.5;
         }
 
         if (cz < 0 || goLeft) {
