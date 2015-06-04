@@ -14,6 +14,8 @@
 + (instancetype)polygonWithCoordinates:(CLLocationCoordinate2D *)coords
                                  count:(NSUInteger)count
 {
+    // connect first & last if needed
+
     return [[self alloc] initWithCoordinates:coords count:count];
 }
 
