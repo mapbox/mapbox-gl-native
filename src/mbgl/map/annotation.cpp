@@ -531,7 +531,7 @@ LatLngBounds AnnotationManager::getBoundsForAnnotations(const AnnotationIDs& ids
     for (auto id : ids) {
         const auto annotation_it = annotations.find(id);
         if (annotation_it != annotations.end()) {
-            bounds.extend(annotation_it->second->getPoint());
+            bounds.extend(annotation_it->second->getBounds());
         }
     }
 

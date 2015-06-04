@@ -33,6 +33,11 @@ struct LatLngBounds {
         if (point.longitude > ne.longitude) ne.longitude = point.longitude;
     }
 
+    inline void extend(const LatLngBounds& bounds) {
+        extend(bounds.sw);
+        extend(bounds.ne);
+    }
+
     inline bool contains(const LatLng& point) const {
         return (point.latitude  >= sw.latitude  &&
                 point.latitude  <= ne.latitude  &&
