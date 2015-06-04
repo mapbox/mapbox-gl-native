@@ -541,11 +541,79 @@ LatLngBounds AnnotationManager::getBoundsForAnnotations(const AnnotationIDs& ids
 const LiveTile* AnnotationManager::getTile(const TileID& id) {
     std::lock_guard<std::mutex> lock(mtx);
 
-    const auto tile_it = tiles.find(id);
-    if (tile_it != tiles.end()) {
-        return tile_it->second.second.get();
+    // look up any existing annotation tile
+    LiveTile *renderTile = nullptr;
+    const auto tile_lookup_it = tiles.find(id);
+    if (tile_lookup_it != tiles.end()) {
+        // it exists and may have annotations already
+        renderTile = tile_lookup_it->second.second.get();
+    } else if (orderedShapeAnnotations.size()) {
+        // it needs created, but only for on-demand shapes
+        renderTile = tiles.emplace(id,
+            std::make_pair(std::unordered_set<uint32_t>(), std::make_unique<LiveTile>())
+        ).first->second.second.get();
     }
-    return nullptr;
+
+    if (renderTile != nullptr && orderedShapeAnnotations.size()) {
+
+        // create shape tile layers from GeoJSONVT queries
+        for (auto& tiler_it : shapeTilers) {
+            const auto annotationID = tiler_it.first;
+            const std::string layerID = ShapeLayerID + "." + std::to_string(annotationID);
+
+            // check for existing render layer
+            auto renderLayer = renderTile->getMutableLayer(layerID);
+
+            if (renderLayer == nullptr) {
+                // we might need to create a tile layer for this shape
+                const auto& shapeTile = tiler_it.second.getTile(id.z, id.x, id.y);
+
+                if (shapeTile) {
+
+                    // shape exists on this tile; let's make a layer
+                    renderLayer = std::make_shared<LiveTileLayer>();
+
+                    // convert the features and add to render layer
+                    for (auto& shapeFeature : shapeTile.features) {
+
+                        using namespace mapbox::util::geojsonvt;
+
+                        FeatureType renderType = FeatureType::Unknown;
+
+                        if (shapeFeature.type == TileFeatureType::LineString) {
+                            renderType = FeatureType::LineString;
+                        } else if (shapeFeature.type == TileFeatureType::Polygon) {
+                            renderType = FeatureType::Polygon;
+                        }
+
+                        assert(renderType != FeatureType::Unknown);
+
+                        std::vector<Coordinate> renderLine;
+                        auto& shapeLine = shapeFeature.geometry[0].get<TileRing>();
+                        for (auto& shapePoint : shapeLine.points) {
+                            renderLine.emplace_back(shapePoint.x, shapePoint.y);
+                        }
+
+                        GeometryCollection renderGeometry;
+                        renderGeometry.push_back(renderLine);
+                        auto renderFeature = std::make_shared<LiveTileFeature>(renderType, renderGeometry);
+
+                        renderLayer->addFeature(renderFeature);
+                    }
+
+                    // move the layer to the render tile
+                    renderTile->addLayer(layerID, renderLayer);
+
+                    // associate the annotation with the tile
+                    auto tile_update_it = tiles.find(id);
+                    assert(tile_update_it != tiles.end());
+                    tile_update_it->second.first.insert(annotationID);
+                }
+            }
+        }
+    }
+
+    return renderTile;
 }
 
 const std::string AnnotationManager::PointLayerID = "com.mapbox.annotations.points";
