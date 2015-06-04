@@ -234,11 +234,7 @@ AnnotationManager::addTileFeature(const uint32_t annotationID,
 
         std::vector<ProjectedFeature> features;
 
-        features.push_back(Convert::create(Tags(),
-                                           (styleProperties.is<LineProperties>() ?
-                                            ProjectedFeatureType::LineString :
-                                            ProjectedFeatureType::Polygon),
-                                           rings));
+        features.push_back(Convert::create(Tags(), featureType, rings));
 
         shapeTilers.emplace(annotationID, mapbox::util::geojsonvt::GeoJSONVT(features));
 
