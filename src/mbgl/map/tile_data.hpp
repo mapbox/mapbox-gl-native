@@ -77,13 +77,16 @@ public:
     TileData(const TileID&, const SourceInfo&);
     ~TileData();
 
-    void request(Worker&, float pixelRatio, const std::function<void()>& callback);
+    virtual void request(Worker&,
+                         float pixelRatio,
+                         const std::function<void()>& callback) = 0;
 
     // Schedule a tile reparse on a worker thread and call the callback on
     // completion. It will return true if the work was schedule or false it was
     // not, which can occur if the tile is already being parsed by another
     // worker (see "mayStartParsing()").
-    bool reparse(Worker&, std::function<void ()> callback);
+    virtual bool reparse(Worker&,
+                         std::function<void ()> callback) = 0;
 
     void cancel();
     const std::string toString() const;
@@ -116,7 +119,6 @@ public:
     }
 
     // Override this in the child class.
-    virtual void parse() = 0;
     virtual Bucket* getBucket(StyleLayer const &layer_desc) = 0;
 
     virtual void redoPlacement(float, bool) {}
@@ -141,9 +143,9 @@ protected:
 
     std::unique_ptr<WorkRequest> workRequest;
 
-private:
     std::atomic<State> state;
 
+private:
     std::string error;
 
 protected:

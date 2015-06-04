@@ -35,7 +35,7 @@ public:
                    bool collisionDebug_);
     ~VectorTileData();
 
-    void parse() override;
+    virtual void parse();
     void redoPlacement(float angle, bool collisionDebug) override;
     virtual Bucket* getBucket(StyleLayer const &layer_desc) override;
 
@@ -47,6 +47,12 @@ public:
     inline CollisionTile* getCollision() const {
         return collision.get();
     }
+
+    void request(Worker&,
+                 float pixelRatio,
+                 const std::function<void()>& callback) override;
+
+    bool reparse(Worker&, std::function<void ()> callback) override;
 
 protected:
     void redoPlacement();

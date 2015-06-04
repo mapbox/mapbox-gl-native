@@ -13,13 +13,17 @@ class StyleLayer;
 class TexturePool;
 
 class RasterTileData : public TileData {
-    friend class TileParser;
-
 public:
     RasterTileData(const TileID&, TexturePool&, const SourceInfo&);
     ~RasterTileData();
 
-    void parse() override;
+    void request(Worker&,
+                 float pixelRatio,
+                 const std::function<void()>& callback) override;
+
+    bool reparse(Worker&, std::function<void ()> callback) override;
+
+    void parse();
     Bucket* getBucket(StyleLayer const &layer_desc) override;
 
 protected:
