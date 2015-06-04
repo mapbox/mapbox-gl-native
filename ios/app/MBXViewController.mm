@@ -357,7 +357,7 @@ mbgl::Settings_NSUserDefaults *settings = nullptr;
 
 - (UIColor *)mapView:(__unused MGLMapView *)mapView fillColorForPolygonAnnotation:(__unused MGLPolygon *)annotation
 {
-    return [UIColor redColor];
+    return (annotation.pointCount > 3 ? [UIColor greenColor] : [UIColor redColor]);
 }
 
 - (void)mapView:(__unused MGLMapView *)mapView didChangeUserTrackingMode:(MGLUserTrackingMode)mode animated:(__unused BOOL)animated
