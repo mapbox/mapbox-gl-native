@@ -265,7 +265,6 @@ TileData::State Source::addTile(MapData& data,
         return state;
     }
 
-    const float overscaling = id.z > info.max_zoom ? std::pow(2.0f, id.z - info.max_zoom) : 1.0f;
     auto pos = tiles.emplace(id, std::make_unique<Tile>(id));
 
     Tile& new_tile = *pos.first->second;
@@ -297,7 +296,7 @@ TileData::State Source::addTile(MapData& data,
             new_tile.data =
                 std::make_shared<VectorTileData>(normalized_id, style, glyphAtlas,
                                                  glyphStore, spriteAtlas, sprite, info,
-                                                 overscaling, transformState.getAngle(), data.getCollisionDebug());
+                                                 transformState.getAngle(), data.getCollisionDebug());
             new_tile.data->request(style.workers, transformState.getPixelRatio(), callback);
         } else if (info.type == SourceType::Raster) {
             new_tile.data = std::make_shared<RasterTileData>(normalized_id, texturePool, info);
@@ -307,7 +306,7 @@ TileData::State Source::addTile(MapData& data,
             new_tile.data = std::make_shared<LiveTileData>(normalized_id, data.annotationManager,
                                                            style, glyphAtlas,
                                                            glyphStore, spriteAtlas, sprite, info,
-                                                           overscaling, transformState.getAngle(), data.getCollisionDebug());
+                                                           transformState.getAngle(), data.getCollisionDebug());
             new_tile.data->reparse(style.workers, callback);
         } else {
             throw std::runtime_error("source type not implemented");

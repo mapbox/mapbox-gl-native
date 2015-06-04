@@ -16,11 +16,10 @@ LiveTileData::LiveTileData(const TileID& id_,
                            SpriteAtlas& spriteAtlas_,
                            util::ptr<Sprite> sprite_,
                            const SourceInfo& source_,
-                           float overscaling_,
                            float angle_,
                            bool collisionDebug_)
     : VectorTileData::VectorTileData(id_, style_, glyphAtlas_, glyphStore_,
-                                     spriteAtlas_, sprite_, source_, overscaling_, angle_, collisionDebug_),
+                                     spriteAtlas_, sprite_, source_, angle_, collisionDebug_),
       annotationManager(annotationManager_) {
     // live features are always ready
     setState(State::loaded);

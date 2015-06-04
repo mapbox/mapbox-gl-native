@@ -39,7 +39,6 @@ public:
                    SpriteAtlas&,
                    util::ptr<Sprite>,
                    const SourceInfo&,
-                   float overscaling_,
                    float angle_,
                    bool collisionDebug_);
     ~VectorTileData();
@@ -83,7 +82,6 @@ private:
     std::unordered_map<std::string, std::unique_ptr<Bucket>> buckets;
     mutable std::mutex bucketsMutex;
 
-    const float overscaling;
     std::unique_ptr<CollisionTile> collision;
 
     float lastAngle = 0;

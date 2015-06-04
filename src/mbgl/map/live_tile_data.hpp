@@ -17,7 +17,6 @@ public:
                  SpriteAtlas&,
                  util::ptr<Sprite>,
                  const SourceInfo&,
-                 float overscaling_,
                  float angle_,
                  bool collisionDebug_);
     ~LiveTileData();
