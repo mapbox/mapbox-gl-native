@@ -230,12 +230,12 @@ class Convert {
 public:
     static std::vector<ProjectedFeature> convert(const JSDocument &data, double tolerance);
 
-private:
-    static void convertFeature(std::vector<ProjectedFeature> &features, const JSValue &feature, double tolerance);
-
     static ProjectedFeature create(Tags tags, ProjectedFeatureType type, ProjectedGeometry geometry);
 
     static ProjectedGeometryContainer project(const std::vector<LonLat> &lonlats, double tolerance = 0);
+
+private:
+    static void convertFeature(std::vector<ProjectedFeature> &features, const JSValue &feature, double tolerance);
 
     static ProjectedPoint projectPoint(const LonLat &p);
 
