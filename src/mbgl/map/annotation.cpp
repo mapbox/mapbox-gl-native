@@ -225,7 +225,7 @@ AnnotationManager::addTileFeature(const uint32_t annotationID,
 
         features.push_back(Convert::create(Tags(), featureType, rings));
 
-        shapeTilers.emplace(annotationID, std::make_unique<GeoJSONVT>(features));
+        shapeTilers.emplace(annotationID, std::make_unique<GeoJSONVT>(features, maxZoom));
 
     } else {
 
