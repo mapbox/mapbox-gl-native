@@ -159,7 +159,10 @@ AnnotationManager::addAnnotations(const AnnotationType type,
         if (type == AnnotationType::Shape) {
             const uint32_t shapeAnnotationID = nextID();
 
-            auto featureAffectedTiles = addTileFeature(
+            // current shape tiles are on-the-fly, so we don't get any "affected tiles"
+            // and just expire all annotation tiles for shape adds
+
+            addTileFeature(
                 shapeAnnotationID,
                 shape,
                 projectedShape,
@@ -168,8 +171,6 @@ AnnotationManager::addAnnotations(const AnnotationType type,
                 {{ }},
                 maxZoom
             );
-
-            std::copy(featureAffectedTiles.begin(), featureAffectedTiles.end(), std::inserter(affectedTiles, affectedTiles.begin()));
 
             annotationIDs.push_back(shapeAnnotationID);
         }
@@ -237,8 +238,6 @@ AnnotationManager::addTileFeature(const uint32_t annotationID,
         features.push_back(Convert::create(Tags(), featureType, rings));
 
         shapeTilers.emplace(annotationID, mapbox::util::geojsonvt::GeoJSONVT(features));
-
-        // FIXME: need to expire tiles
 
     } else {
 
@@ -344,7 +343,7 @@ AnnotationManager::addTileFeature(const uint32_t annotationID,
 
                 // Record annotation association with tile and tile feature. This is used to determine stale tiles,
                 // as well as to remove the feature from the tile upon annotation deletion.
-                anno_it.first->second->tileFeatures.emplace(featureTile.first, std::weak_ptr<const LiveTileFeature>(feature));
+                anno_it.first->second->tilePointFeatures.emplace(featureTile.first, std::weak_ptr<const LiveTileFeature>(feature));
 
                 // track affected tile
                 affectedTiles.insert(featureTile.first);
@@ -406,31 +405,36 @@ std::unordered_set<TileID, TileID::Hash> AnnotationManager::removeAnnotations(co
         const auto& annotation_it = annotations.find(annotationID);
         if (annotation_it != annotations.end()) {
             const auto& annotation = annotation_it->second;
-            // calculate annotation's affected tile for each zoom
-            for (uint8_t z = 0; z < zoomCount; ++z) {
-                latLng = annotation->getPoint();
-                p = projectPoint(latLng);
-                x = z2s[z] * p.x;
-                y = z2s[z] * p.y;
-                TileID tid(z, x, y);
-                // erase annotation from tile's list
-                auto& tileAnnotations = tiles[tid].first;
-                tileAnnotations.erase(annotationID);
-                // remove annotation's features from tile
-                const auto& features_it = annotation->tileFeatures.find(tid);
-                if (features_it != annotation->tileFeatures.end()) {
-                    util::ptr<LiveTileLayer> layer;
-                    if (annotation->type == AnnotationType::Point) {
-                        layer = tiles[tid].second->getMutableLayer(PointLayerID);
-                    } else {
-                        layer = tiles[tid].second->getMutableLayer(ShapeLayerID + "." + std::to_string(annotationID));
+            // remove feature(s) from relevant tiles
+            if (annotation->type == AnnotationType::Point) {
+                // calculate annotation's affected tile for each zoom
+                for (uint8_t z = 0; z < zoomCount; ++z) {
+                    latLng = annotation->getPoint();
+                    p = projectPoint(latLng);
+                    x = z2s[z] * p.x;
+                    y = z2s[z] * p.y;
+                    TileID tid(z, x, y);
+                    // erase annotation from tile's list
+                    auto& tileAnnotations = tiles[tid].first;
+                    tileAnnotations.erase(annotationID);
+                    // remove annotation's features from tile
+                    const auto& features_it = annotation->tilePointFeatures.find(tid);
+                    if (features_it != annotation->tilePointFeatures.end()) {
+                        // points share a layer; remove feature
+                        auto layer = tiles[tid].second->getMutableLayer(PointLayerID);
+                        layer->removeFeature(features_it->second);
+                        affectedTiles.insert(tid);
                     }
-                    layer->removeFeature(features_it->second);
-                    affectedTiles.insert(tid);
                 }
-            }
+            } else {
+                // remove shape layer from tiles if relevant
+                for (auto tile_it = tiles.begin(); tile_it != tiles.end(); ++tile_it) {
+                    if (tile_it->second.first.count(annotationID)) {
+                        tile_it->second.second->removeLayer(ShapeLayerID + "." + std::to_string(annotationID));
+                        affectedTiles.insert(tile_it->first);
+                    }
+                }
 
-            if (annotation->type == AnnotationType::Shape) {
                 // clear shape from render order
                 auto shape_it = std::find(orderedShapeAnnotations.begin(), orderedShapeAnnotations.end(), annotationID);
                 orderedShapeAnnotations.erase(shape_it);

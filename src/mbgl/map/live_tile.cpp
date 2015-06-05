@@ -42,6 +42,10 @@ void LiveTile::addLayer(const std::string& name, util::ptr<LiveTileLayer> layer)
     layers.emplace(name, std::move(layer));
 }
 
+void LiveTile::removeLayer(const std::string& name) {
+    layers.erase(name);
+}
+
 util::ptr<GeometryTileLayer> LiveTile::getLayer(const std::string& name) const {
     return getMutableLayer(name);
 }

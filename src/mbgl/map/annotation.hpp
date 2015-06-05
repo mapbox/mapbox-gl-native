@@ -45,7 +45,7 @@ private:
 private:
     const AnnotationType type = AnnotationType::Point;
     const AnnotationSegments geometry;
-    std::unordered_map<TileID, std::weak_ptr<const LiveTileFeature>, TileID::Hash> tileFeatures;
+    std::unordered_map<TileID, std::weak_ptr<const LiveTileFeature>, TileID::Hash> tilePointFeatures;
     const LatLngBounds bounds;
 };
 

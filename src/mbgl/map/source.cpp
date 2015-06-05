@@ -512,13 +512,15 @@ bool Source::update(MapData& data,
 
 void Source::invalidateTiles(const std::unordered_set<TileID, TileID::Hash>& ids) {
     cache.clear();
-//    for (auto& id : ids) {
-//        tiles.erase(id);
-//        tile_data.erase(id);
-//    }
-    (void)ids;
-    tiles.clear();
-    tile_data.clear();
+    if (ids.size()) {
+        for (auto& id : ids) {
+            tiles.erase(id);
+            tile_data.erase(id);
+        }
+    } else {
+        tiles.clear();
+        tile_data.clear();
+    }
     updateTilePtrs();
 }
 

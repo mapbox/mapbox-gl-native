@@ -42,6 +42,7 @@ public:
     LiveTile();
 
     void addLayer(const std::string&, util::ptr<LiveTileLayer>);
+    void removeLayer(const std::string&);
     util::ptr<GeometryTileLayer> getLayer(const std::string&) const override;
     util::ptr<LiveTileLayer> getMutableLayer(const std::string&) const;
 
