@@ -18,7 +18,7 @@
     if (self)
     {
         _count = count;
-        _coords = (CLLocationCoordinate2D*)malloc(_count * sizeof(CLLocationCoordinate2D));
+        _coords = (CLLocationCoordinate2D *)malloc(_count * sizeof(CLLocationCoordinate2D));
 
         for (NSUInteger i = 0; i < _count; i++)
         {
