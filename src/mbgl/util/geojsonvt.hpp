@@ -55,10 +55,8 @@ using ProjectedGeometry = mapbox::util::variant<geojsonvt::ProjectedPoint, geojs
 
 class ProjectedPoint {
 public:
-    ProjectedPoint(double x_, double y_, double z_)
+    ProjectedPoint(double x_ = -1, double y_ = -1, double z_ = -1)
         : x(x_), y(y_), z(z_) {}
-    ProjectedPoint()
-        : x(-1), y(-1), z(-1) {}
 
     inline bool isValid() const { return (x >= 0 && y >= 0 && z >= 0); }
     inline bool isEqualToPoint(const ProjectedPoint *p2) const { return (x == p2->x && y == p2->y && z == p2->z); }
