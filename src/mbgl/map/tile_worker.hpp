@@ -7,7 +7,9 @@
 #include <mbgl/geometry/fill_buffer.hpp>
 #include <mbgl/geometry/line_buffer.hpp>
 #include <mbgl/util/noncopyable.hpp>
+#include <mbgl/style/filter_expression.hpp>
 
+#include <string>
 #include <memory>
 #include <mutex>
 #include <unordered_map>
@@ -18,6 +20,8 @@ class CollisionTile;
 class GeometryTile;
 class Style;
 class Bucket;
+class StyleBucket;
+class GeometryTileLayer;
 
 using TileParseResult = mapbox::util::variant<
     TileData::State, // success
@@ -44,13 +48,31 @@ public:
         return collision.get();
     }
 
+    inline bool isPartialParse() const {
+        return partialParse;
+    }
+
     TileParseResult parse(const GeometryTile&);
     void redoPlacement(float angle, bool collisionDebug);
 
-    const TileID id;
     Style& style;
+
+private:
+    bool obsolete() const;
+
+    std::unique_ptr<Bucket> createBucket(const StyleBucket&, const GeometryTile&);
+    std::unique_ptr<Bucket> createFillBucket(const GeometryTileLayer&, const StyleBucket&);
+    std::unique_ptr<Bucket> createLineBucket(const GeometryTileLayer&, const StyleBucket&);
+    std::unique_ptr<Bucket> createSymbolBucket(const GeometryTileLayer&, const StyleBucket&);
+
+    template <class Bucket>
+    void addBucketGeometries(Bucket&, const GeometryTileLayer&, const FilterExpression&);
+
+    const TileID id;
     const uint16_t maxZoom;
     const std::atomic<TileData::State>& state;
+
+    bool partialParse = false;
 
     FillVertexBuffer fillVertexBuffer;
     LineVertexBuffer lineVertexBuffer;
