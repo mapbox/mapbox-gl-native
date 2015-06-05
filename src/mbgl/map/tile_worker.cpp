@@ -28,18 +28,6 @@ TileWorker::~TileWorker() {
     style.glyphAtlas->removeGlyphs(reinterpret_cast<uintptr_t>(this));
 }
 
-void TileWorker::setBucket(const StyleLayer& layer, std::unique_ptr<Bucket> bucket) {
-    assert(layer.bucket);
-
-    std::lock_guard<std::mutex> lock(bucketsMutex);
-
-    if (buckets.find(layer.bucket->name) != buckets.end()) {
-        return;
-    }
-
-    buckets[layer.bucket->name] = std::move(bucket);
-}
-
 Bucket* TileWorker::getBucket(const StyleLayer& layer) const {
     std::lock_guard<std::mutex> lock(bucketsMutex);
 
@@ -60,40 +48,11 @@ size_t TileWorker::countBuckets() const {
 TileParseResult TileWorker::parse(const GeometryTile& geometryTile) {
     partialParse = false;
 
-    for (const auto& layer_desc : style.layers) {
-        // Cancel early when parsing.
-        if (state == TileData::State::obsolete) {
-            return TileData::State::obsolete;
-        }
-
-        if (layer_desc->isBackground()) {
-            // background is a special, fake bucket
-            continue;
-        }
-
-        if (layer_desc->bucket) {
-            // This is a singular layer. Check if this bucket already exists. If not,
-            // parse this bucket.
-            if (getBucket(*layer_desc)) {
-                continue;
-            }
-
-            std::unique_ptr<Bucket> bucket = createBucket(*layer_desc->bucket, geometryTile);
-            if (bucket) {
-                // Bucket creation might fail because the data tile may not
-                // contain any data that falls into this bucket.
-                setBucket(*layer_desc, std::move(bucket));
-            }
-        } else {
-            Log::Warning(Event::ParseTile, "layer '%s' does not have buckets", layer_desc->id.c_str());
-        }
+    for (const auto& layer : style.layers) {
+        parseLayer(*layer, geometryTile);
     }
 
-    if (partialParse) {
-        return TileData::State::partial;
-    } else {
-        return TileData::State::parsed;
-    }
+    return partialParse ? TileData::State::partial : TileData::State::parsed;
 }
 
 void TileWorker::redoPlacement(float angle, bool collisionDebug) {
@@ -139,35 +98,66 @@ void applyLayoutProperty(PropertyKey key, const ClassProperties &classProperties
     }
 }
 
-std::unique_ptr<Bucket> TileWorker::createBucket(const StyleBucket& bucketDesc, const GeometryTile& geometryTile) {
-    // Skip this bucket if we are to not render this
-    if (id.z < std::floor(bucketDesc.min_zoom) && std::floor(bucketDesc.min_zoom) < maxZoom) return nullptr;
-    if (id.z >= std::ceil(bucketDesc.max_zoom)) return nullptr;
-    if (bucketDesc.visibility == mbgl::VisibilityType::None) return nullptr;
+void TileWorker::parseLayer(const StyleLayer& layer, const GeometryTile& geometryTile) {
+    // Cancel early when parsing.
+    if (state == TileData::State::obsolete)
+        return;
 
-    auto layer = geometryTile.getLayer(bucketDesc.source_layer);
-    if (layer) {
-        if (bucketDesc.type == StyleLayerType::Fill) {
-            return createFillBucket(*layer, bucketDesc);
-        } else if (bucketDesc.type == StyleLayerType::Line) {
-            return createLineBucket(*layer, bucketDesc);
-        } else if (bucketDesc.type == StyleLayerType::Symbol) {
-            return createSymbolBucket(*layer, bucketDesc);
-        } else if (bucketDesc.type == StyleLayerType::Raster) {
-            return nullptr;
-        } else {
-            Log::Warning(Event::ParseTile, "unknown bucket render type for layer '%s' (source layer '%s')",
-                    bucketDesc.name.c_str(), bucketDesc.source_layer.c_str());
-        }
-    } else {
+    // Background is a special case.
+    if (layer.isBackground())
+        return;
+
+    if (!layer.bucket) {
+        Log::Warning(Event::ParseTile, "layer '%s' does not have buckets", layer.id.c_str());
+        return;
+    }
+
+    // This is a singular layer. Check if this bucket already exists.
+    if (getBucket(layer))
+        return;
+
+    const StyleBucket& styleBucket = *layer.bucket;
+
+    // Skip this bucket if we are to not render this
+    if (id.z < std::floor(styleBucket.min_zoom) && std::floor(styleBucket.min_zoom) < maxZoom)
+        return;
+    if (id.z >= std::ceil(styleBucket.max_zoom))
+        return;
+    if (styleBucket.visibility == mbgl::VisibilityType::None)
+        return;
+
+    auto geometryLayer = geometryTile.getLayer(styleBucket.source_layer);
+    if (!geometryLayer) {
         // The layer specified in the bucket does not exist. Do nothing.
         if (debug::tileParseWarnings) {
             Log::Warning(Event::ParseTile, "layer '%s' does not exist in tile %d/%d/%d",
-                    bucketDesc.source_layer.c_str(), id.z, id.x, id.y);
+                    styleBucket.source_layer.c_str(), id.z, id.x, id.y);
         }
+        return;
     }
 
-    return nullptr;
+    std::unique_ptr<Bucket> bucket;
+
+    if (styleBucket.type == StyleLayerType::Fill) {
+        bucket = createFillBucket(*geometryLayer, styleBucket);
+    } else if (styleBucket.type == StyleLayerType::Line) {
+        bucket = createLineBucket(*geometryLayer, styleBucket);
+    } else if (styleBucket.type == StyleLayerType::Symbol) {
+        bucket = createSymbolBucket(*geometryLayer, styleBucket);
+    } else if (styleBucket.type == StyleLayerType::Raster) {
+        return;
+    } else {
+        Log::Warning(Event::ParseTile, "unknown bucket render type for layer '%s' (source layer '%s')",
+                styleBucket.name.c_str(), styleBucket.source_layer.c_str());
+    }
+
+    // Bucket creation might fail because the data tile may not
+    // contain any data that falls into this bucket.
+    if (!bucket)
+        return;
+
+    std::lock_guard<std::mutex> lock(bucketsMutex);
+    buckets[styleBucket.name] = std::move(bucket);
 }
 
 template <class Bucket>

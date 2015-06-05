@@ -36,7 +36,6 @@ public:
                std::unique_ptr<CollisionTile>);
     ~TileWorker();
 
-    void setBucket(const StyleLayer&, std::unique_ptr<Bucket>);
     Bucket* getBucket(const StyleLayer&) const;
     size_t countBuckets() const;
 
@@ -46,7 +45,8 @@ public:
     Style& style;
 
 private:
-    std::unique_ptr<Bucket> createBucket(const StyleBucket&, const GeometryTile&);
+    void parseLayer(const StyleLayer&, const GeometryTile&);
+
     std::unique_ptr<Bucket> createFillBucket(const GeometryTileLayer&, const StyleBucket&);
     std::unique_ptr<Bucket> createLineBucket(const GeometryTileLayer&, const StyleBucket&);
     std::unique_ptr<Bucket> createSymbolBucket(const GeometryTileLayer&, const StyleBucket&);
@@ -69,11 +69,10 @@ private:
     std::unique_ptr<CollisionTile> collision;
 
     // Contains all the Bucket objects for the tile. Buckets are render
-    // objects and they get added to this std::map<> by the workers doing
-    // the actual tile parsing as they get processed. Tiles partially
-    // parsed can get new buckets at any moment but are also fit for
-    // rendering. That said, access to this list needs locking unless
-    // the tile is completely parsed.
+    // objects and they get added to this map as they get processed.
+    // Tiles partially parsed can get new buckets at any moment but are
+    // also fit for rendering. That said, access to this list needs locking
+    // unless the tile is completely parsed.
     std::unordered_map<std::string, std::unique_ptr<Bucket>> buckets;
     mutable std::mutex bucketsMutex;
 };
