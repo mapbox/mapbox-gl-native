@@ -192,9 +192,9 @@ mbgl::Settings_NSUserDefaults *settings = nullptr;
 
         CLLocationCoordinate2D *polylineCoordinates = (CLLocationCoordinate2D *)malloc([hikeCoordinatePairs count] * sizeof(CLLocationCoordinate2D));
 
-        for (NSArray *coordinatePair in hikeCoordinatePairs)
+        for (NSUInteger i = 0; i < [hikeCoordinatePairs count]; i++)
         {
-            polylineCoordinates[[hikeCoordinatePairs indexOfObject:coordinatePair]] = CLLocationCoordinate2DMake([coordinatePair[1] doubleValue], [coordinatePair[0] doubleValue]);
+            polylineCoordinates[i] = CLLocationCoordinate2DMake([hikeCoordinatePairs[i][1] doubleValue], [hikeCoordinatePairs[i][0] doubleValue]);
         }
 
         MGLPolyline *polyline = [MGLPolyline polylineWithCoordinates:polylineCoordinates
