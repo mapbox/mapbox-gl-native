@@ -213,7 +213,7 @@ AnnotationManager::addTileFeature(const uint32_t annotationID,
 
         std::vector<LonLat> points;
 
-        for (size_t i = 0; i < segments[0].size(); ++i) {
+        for (size_t i = 0; i < segments[0].size(); ++i) { // first segment for now (no holes)
             const double constraintedLatitude = std::fmin(std::fmax(segments[0][i].latitude, -util::LATITUDE_MAX), util::LATITUDE_MAX);
             points.push_back(LonLat(segments[0][i].longitude, constraintedLatitude));
         }
