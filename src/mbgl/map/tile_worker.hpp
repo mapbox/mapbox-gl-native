@@ -40,26 +40,12 @@ public:
     Bucket* getBucket(const StyleLayer&) const;
     size_t countBuckets() const;
 
-    inline TileData::State getState() const {
-        return state;
-    }
-
-    inline CollisionTile* getCollision() const {
-        return collision.get();
-    }
-
-    inline bool isPartialParse() const {
-        return partialParse;
-    }
-
     TileParseResult parse(const GeometryTile&);
     void redoPlacement(float angle, bool collisionDebug);
 
     Style& style;
 
 private:
-    bool obsolete() const;
-
     std::unique_ptr<Bucket> createBucket(const StyleBucket&, const GeometryTile&);
     std::unique_ptr<Bucket> createFillBucket(const GeometryTileLayer&, const StyleBucket&);
     std::unique_ptr<Bucket> createLineBucket(const GeometryTileLayer&, const StyleBucket&);

@@ -62,7 +62,7 @@ TileParseResult TileWorker::parse(const GeometryTile& geometryTile) {
 
     for (const auto& layer_desc : style.layers) {
         // Cancel early when parsing.
-        if (obsolete()) {
+        if (state == TileData::State::obsolete) {
             return TileData::State::obsolete;
         }
 
@@ -89,7 +89,7 @@ TileParseResult TileWorker::parse(const GeometryTile& geometryTile) {
         }
     }
 
-    if (isPartialParse()) {
+    if (partialParse) {
         return TileData::State::partial;
     } else {
         return TileData::State::parsed;
@@ -105,10 +105,6 @@ void TileWorker::redoPlacement(float angle, bool collisionDebug) {
             bucket->placeFeatures();
         }
     }
-}
-
-bool TileWorker::obsolete() const {
-    return getState() == TileData::State::obsolete;
 }
 
 template <typename T>
@@ -179,7 +175,7 @@ void TileWorker::addBucketGeometries(Bucket& bucket, const GeometryTileLayer& la
     for (std::size_t i = 0; i < layer.featureCount(); i++) {
         auto feature = layer.getFeature(i);
 
-        if (obsolete())
+        if (state == TileData::State::obsolete)
             return;
 
         GeometryTileFeatureExtractor extractor(*feature);
@@ -218,7 +214,7 @@ std::unique_ptr<Bucket> TileWorker::createLineBucket(const GeometryTileLayer& la
 
 std::unique_ptr<Bucket> TileWorker::createSymbolBucket(const GeometryTileLayer& layer,
                                                        const StyleBucket& bucket_desc) {
-    auto bucket = std::make_unique<SymbolBucket>(*getCollision(), id.overscaling);
+    auto bucket = std::make_unique<SymbolBucket>(*collision, id.overscaling);
 
     const float z = id.z;
     auto& layout = bucket->layout;
