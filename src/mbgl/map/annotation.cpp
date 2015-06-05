@@ -237,7 +237,7 @@ AnnotationManager::addTileFeature(const uint32_t annotationID,
 
         features.push_back(Convert::create(Tags(), featureType, rings));
 
-        shapeTilers.emplace(annotationID, mapbox::util::geojsonvt::GeoJSONVT(features));
+        shapeTilers.emplace(annotationID, std::make_unique<GeoJSONVT>(features));
 
     } else {
 
@@ -570,7 +570,7 @@ const LiveTile* AnnotationManager::getTile(const TileID& id) {
 
             if (renderLayer == nullptr) {
                 // we might need to create a tile layer for this shape
-                const auto& shapeTile = tiler_it.second.getTile(id.z, id.x, id.y);
+                const auto& shapeTile = tiler_it.second->getTile(id.z, id.x, id.y);
 
                 if (shapeTile) {
 

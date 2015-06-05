@@ -102,7 +102,7 @@ private:
     std::unordered_map<uint32_t, std::unique_ptr<Annotation>> annotations;
     std::vector<uint32_t> orderedShapeAnnotations;
     std::unordered_map<TileID, std::pair<std::unordered_set<uint32_t>, std::unique_ptr<LiveTile>>, TileID::Hash> tiles;
-    std::unordered_map<uint32_t, GeoJSONVT> shapeTilers;
+    std::unordered_map<uint32_t, std::unique_ptr<GeoJSONVT>> shapeTilers;
     std::unordered_set<TileID, TileID::Hash> staleTiles;
     uint32_t nextID_ = 0;
 };
