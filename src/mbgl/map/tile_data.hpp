@@ -1,12 +1,10 @@
 #ifndef MBGL_MAP_TILE_DATA
 #define MBGL_MAP_TILE_DATA
 
+#include <mbgl/util/noncopyable.hpp>
 #include <mbgl/map/tile_id.hpp>
 #include <mbgl/renderer/debug_bucket.hpp>
 #include <mbgl/geometry/debug_font_buffer.hpp>
-
-#include <mbgl/util/noncopyable.hpp>
-#include <mbgl/util/ptr.hpp>
 
 #include <atomic>
 #include <string>
@@ -14,13 +12,8 @@
 
 namespace mbgl {
 
-class Painter;
-class SourceInfo;
 class StyleLayer;
-class Request;
 class Worker;
-class WorkRequest;
-class TransformState;
 
 class TileData : private util::noncopyable {
 public:
@@ -74,8 +67,8 @@ public:
         return state == State::partial || state == State::parsed;
     }
 
-    TileData(const TileID&, const SourceInfo&);
-    ~TileData();
+    TileData(const TileID&);
+    virtual ~TileData() = default;
 
     virtual void request(Worker&,
                          float pixelRatio,
@@ -88,72 +81,34 @@ public:
     virtual bool reparse(Worker&,
                          std::function<void ()> callback) = 0;
 
-    void cancel();
-    const std::string toString() const;
+    // Mark this tile as no longer needed and cancel any pending work.
+    virtual void cancel() = 0;
 
-    inline bool isReady() const {
+    virtual Bucket* getBucket(const StyleLayer&) = 0;
+
+    virtual void redoPlacement(float, bool) {}
+
+    bool isReady() const {
         return isReadyState(state);
     }
 
-    // Returns true if the TileData is in a final state and we cannot
-    // make changes to it anymore.
-    inline bool isImmutable() const {
-        return state == State::parsed || state == State::obsolete;
-    }
-
-    // We let subclasses override setState() so they
-    // can intercept the state change and react accordingly.
-    virtual void setState(const State& state);
-    inline State getState() const {
+    State getState() const {
         return state;
     }
-
-    void endParsing();
-
-    // Error message to be set in case of request
-    // and parsing errors.
-    void setError(const std::string& message);
 
     std::string getError() const {
         return error;
     }
 
-    // Override this in the child class.
-    virtual Bucket* getBucket(StyleLayer const &layer_desc) = 0;
-
-    virtual void redoPlacement(float, bool) {}
-
     const TileID id;
-    const std::string name;
-    std::atomic_flag parsing = ATOMIC_FLAG_INIT;
 
-protected:
-    // Set the internal parsing state to true so we prevent
-    // multiple workers to parse the same tile in parallel,
-    // which can happen if the tile is in the "partial" state.
-    // It will return true if is possible to start pasing the
-    // tile or false if not (so some other worker is already
-    // parsing the tile).
-    bool mayStartParsing();
-
-    const SourceInfo& source;
-
-    Request *req = nullptr;
-    std::string data;
-
-    std::unique_ptr<WorkRequest> workRequest;
-
-    std::atomic<State> state;
-
-private:
-    std::string error;
-
-protected:
     // Contains the tile ID string for painting debug information.
+    DebugBucket debugBucket;
     DebugFontBuffer debugFontBuffer;
 
-public:
-    DebugBucket debugBucket;
+protected:
+    std::atomic<State> state;
+    std::string error;
 };
 
 }
