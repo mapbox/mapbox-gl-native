@@ -103,24 +103,18 @@ AnnotationManager::addAnnotations(const AnnotationType type,
     const uint8_t maxZoom = data.transform.getMaxZoom();
 
     for (size_t s = 0; s < segments.size(); ++s) {
-        auto& shape = segments[s];
 
-        std::vector<std::vector<vec2<double>>> projectedShape;
-        projectedShape.reserve(shape.size());
+        if (type == AnnotationType::Point) {
 
-        for (size_t l = 0; l < shape.size(); ++l) {
-            auto& line = shape[l];
+            for (size_t l = 0; l < segments[s].size(); ++l) {
 
-            std::vector<vec2<double>> projectedLine;
-            projectedLine.reserve(line.size());
+                for (size_t p = 0; p < segments[s][l].size(); ++p) {
 
-            for (size_t p = 0; p < line.size(); ++p) {
-                auto& point = line[p];
+                    auto& point = segments[s][l][p];
 
-                // projection conversion into unit space
-                const auto pp = projectPoint(point);
+                    // projection conversion into unit space
+                    const auto pp = projectPoint(point);
 
-                if (type == AnnotationType::Point) {
                     const uint32_t pointAnnotationID = nextID();
 
                     // at render time we style the point according to its {sprite} field
@@ -146,17 +140,10 @@ AnnotationManager::addAnnotations(const AnnotationType type,
                     std::copy(featureAffectedTiles.begin(), featureAffectedTiles.end(), std::inserter(affectedTiles, affectedTiles.begin()));
 
                     annotationIDs.push_back(pointAnnotationID);
-                } else {
-                    projectedLine.push_back(pp);
                 }
             }
+        } else {
 
-            if (type == AnnotationType::Shape) {
-                projectedShape.push_back(projectedLine);
-            }
-        }
-
-        if (type == AnnotationType::Shape) {
             const uint32_t shapeAnnotationID = nextID();
 
             // current shape tiles are on-the-fly, so we don't get any "affected tiles"
@@ -164,8 +151,8 @@ AnnotationManager::addAnnotations(const AnnotationType type,
 
             addTileFeature(
                 shapeAnnotationID,
-                shape,
-                projectedShape,
+                segments[s],
+                {{ }},
                 AnnotationType::Shape,
                 styleProperties[s],
                 {{ }},
