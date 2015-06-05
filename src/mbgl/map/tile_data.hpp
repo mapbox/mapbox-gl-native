@@ -77,7 +77,7 @@ public:
     // Schedule a tile reparse on a worker thread and call the callback on
     // completion. It will return true if the work was schedule or false it was
     // not, which can occur if the tile is already being parsed by another
-    // worker (see "mayStartParsing()").
+    // worker.
     virtual bool reparse(Worker&,
                          std::function<void ()> callback) = 0;
 
