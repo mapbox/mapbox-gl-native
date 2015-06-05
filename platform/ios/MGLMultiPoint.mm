@@ -70,7 +70,6 @@
                                userInfo:nil] raise];
     }
 
-    assert(sizeof(coords) >= sizeof(range.length * sizeof(CLLocationCoordinate2D)));
     assert(range.location + range.length <= _count);
 
     NSUInteger index = 0;
