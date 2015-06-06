@@ -583,7 +583,7 @@ void Convert::calcSize(ProjectedGeometryContainer &geometryContainer) {
     ProjectedPoint a, b;
 
     for (size_t i = 0; i < geometryContainer.members.size() - 1; ++i) {
-        a = (b.isValid() ? b : geometryContainer.members[i].get<ProjectedPoint>());
+        a = (b ? b : geometryContainer.members[i].get<ProjectedPoint>());
         b = geometryContainer.members[i + 1].get<ProjectedPoint>();
 
         area += a.x * b.y - b.x * a.y;
@@ -719,7 +719,7 @@ std::vector<ProjectedFeature> Clip::clip(const std::vector<ProjectedFeature> fea
         double min = 0;
         double max = 0;
 
-        if (feature.minPoint.isValid()) {
+        if (feature.minPoint) {
             min = (axis == 0 ? feature.minPoint.x : feature.minPoint.y);
             max = (axis == 0 ? feature.maxPoint.x : feature.maxPoint.y);
 
@@ -781,7 +781,7 @@ ProjectedGeometryContainer Clip::clipGeometry(ProjectedGeometryContainer geometr
         ProjectedGeometryContainer slice;
 
         for (size_t j = 0; j < (len - 1); ++j) {
-            a = (b.isValid() ? b : points->members[j].get<ProjectedPoint>());
+            a = (b ? b : points->members[j].get<ProjectedPoint>());
             b = points->members[j + 1].get<ProjectedPoint>();
             ak = (bk ? bk : (axis == 0 ? a.x : a.y));
             bk = (axis == 0 ? b.x : b.y);
@@ -833,7 +833,7 @@ ProjectedGeometryContainer Clip::clipGeometry(ProjectedGeometryContainer geometr
         if (closed && slice.members.size()) {
             const ProjectedPoint *first = &(slice.members[0].get<ProjectedPoint>());
             const ProjectedPoint *last  = &(slice.members[slice.members.size() - 1].get<ProjectedPoint>());
-            if (!first->isEqualToPoint(last)) {
+            if (first != last) {
                 slice.members.push_back(ProjectedPoint(first->x, first->y, first->z));
             }
         }

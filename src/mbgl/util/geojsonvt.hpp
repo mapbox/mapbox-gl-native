@@ -58,8 +58,8 @@ public:
     ProjectedPoint(double x_ = -1, double y_ = -1, double z_ = -1)
         : x(x_), y(y_), z(z_) {}
 
-    inline bool isValid() const { return (x >= 0 && y >= 0 && z >= 0); }
-    inline bool isEqualToPoint(const ProjectedPoint *p2) const { return (x == p2->x && y == p2->y && z == p2->z); }
+    inline operator bool() const { return (x >= 0 && y >= 0 && z >= 0); }
+    inline bool operator!= (const ProjectedPoint& rhs) const { return (x != rhs.x || y != rhs.y || z != rhs.z); }
 
 public:
     double x = -1;
