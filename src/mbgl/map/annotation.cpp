@@ -580,14 +580,21 @@ const LiveTile* AnnotationManager::getTile(const TileID& id) {
 
                         assert(renderType != FeatureType::Unknown);
 
-                        std::vector<Coordinate> renderLine;
-                        auto& shapeLine = shapeFeature.geometry[0].get<TileRing>();
-                        for (auto& shapePoint : shapeLine.points) {
-                            renderLine.emplace_back(shapePoint.x, shapePoint.y);
+                        GeometryCollection renderGeometry;
+
+                        for (auto& shapeGeometry : shapeFeature.geometry) {
+
+                            std::vector<Coordinate> renderLine;
+
+                            auto& shapeRing = shapeGeometry.get<TileRing>();
+
+                            for (auto& shapePoint : shapeRing.points) {
+                                renderLine.emplace_back(shapePoint.x, shapePoint.y);
+                            }
+
+                            renderGeometry.push_back(renderLine);
                         }
 
-                        GeometryCollection renderGeometry;
-                        renderGeometry.push_back(renderLine);
                         auto renderFeature = std::make_shared<LiveTileFeature>(renderType, renderGeometry);
 
                         renderLayer->addFeature(renderFeature);
