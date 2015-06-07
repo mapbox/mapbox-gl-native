@@ -109,8 +109,8 @@ public:
     ProjectedGeometry geometry;
     ProjectedFeatureType type;
     Tags tags;
-    ProjectedPoint minPoint = ProjectedPoint(1, 1, 0);
-    ProjectedPoint maxPoint = ProjectedPoint(0, 0, 0);
+    ProjectedPoint minPoint = ProjectedPoint();
+    ProjectedPoint maxPoint = ProjectedPoint();
 };
 
 #pragma mark -
