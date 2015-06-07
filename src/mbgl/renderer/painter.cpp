@@ -25,6 +25,7 @@
 #include <mbgl/shader/sdf_shader.hpp>
 #include <mbgl/shader/dot_shader.hpp>
 #include <mbgl/shader/gaussian_shader.hpp>
+#include <mbgl/shader/box_shader.hpp>
 
 #include <mbgl/util/constants.hpp>
 #include <mbgl/util/mat3.hpp>
@@ -101,6 +102,7 @@ void Painter::setupShaders() {
     if (!sdfIconShader) sdfIconShader = std::make_unique<SDFIconShader>();
     if (!dotShader) dotShader = std::make_unique<DotShader>();
     if (!gaussianShader) gaussianShader = std::make_unique<GaussianShader>();
+    if (!collisionBoxShader) collisionBoxShader = std::make_unique<CollisionBoxShader>();
 }
 
 void Painter::resize() {
@@ -467,7 +469,7 @@ mat4 Painter::translatedMatrix(const mat4& matrix, const std::array<float, 2> &t
         return matrix;
     } else {
         // TODO: Get rid of the 8 (scaling from 4096 to tile size)
-        const double factor = ((double)(1 << id.z)) / state.getScale() * (4096.0 / util::tileSize);
+        const double factor = ((double)(1 << id.z)) / state.getScale() * (4096.0 / util::tileSize / id.overscaling);
 
         mat4 vtxMatrix;
         if (anchor == TranslateAnchorType::Viewport) {

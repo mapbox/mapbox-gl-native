@@ -65,7 +65,7 @@ static void scanTriangle(const mbgl::vec2<double> a, const mbgl::vec2<double> b,
     if (bc.dy) scanSpans(ca, bc, ymin, ymax, scanLine);
 }
 
-std::forward_list<TileID> tileCover(int8_t z, const mbgl::box &bounds) {
+std::forward_list<TileID> tileCover(int8_t z, const mbgl::box &bounds, int8_t actualZ) {
     int32_t tiles = 1 << z;
     std::forward_list<mbgl::TileID> t;
 
@@ -73,7 +73,7 @@ std::forward_list<TileID> tileCover(int8_t z, const mbgl::box &bounds) {
         int32_t x;
         if (y >= 0 && y <= tiles) {
             for (x = x0; x < x1; x++) {
-                t.emplace_front(z, x, y);
+                t.emplace_front(actualZ, x, y, z);
             }
         }
     };

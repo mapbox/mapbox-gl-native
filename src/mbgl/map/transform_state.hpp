@@ -20,7 +20,7 @@ class TransformState {
 
 public:
     // Matrix
-    void matrixFor(mat4& matrix, const TileID& id) const;
+    void matrixFor(mat4& matrix, const TileID& id, const int8_t z) const;
     box cornersToBox(uint32_t z) const;
 
     // Dimensions

@@ -54,7 +54,9 @@ public:
     void setSourceTileCacheSize(size_t size);
     void onLowMemory();
 
-    // ResourceLoader::Observer implementation.
+    void cleanup();
+
+    // Style::Observer implementation.
     void onTileDataChanged() override;
     void onResourceLoadingFailed(std::exception_ptr error) override;
 

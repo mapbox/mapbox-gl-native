@@ -251,7 +251,7 @@ AnnotationManager::addTileFeature(const uint32_t annotationID,
 
                 GeometryCollection geometries = {{ {{ coordinate }} }};
 
-                featureTiles.emplace(TileID(z, x, y), geometries);
+                featureTiles.emplace(TileID(z, x, y, z), geometries);
             } else {
                 for (size_t l = 0; l < projectedFeature.size(); ++l) {
 
@@ -266,10 +266,10 @@ AnnotationManager::addTileFeature(const uint32_t annotationID,
 
                         const Coordinate coordinate(extent * (pp.x * z2 - x), extent * (pp.y * z2 - y));
 
-                        auto tile_it = featureTiles.find(TileID(z, x, y));
+                        auto tile_it = featureTiles.find(TileID(z, x, y, z));
 
                         if (tile_it != featureTiles.end()) {
-                            GeometryCollection& geometries = featureTiles.find(TileID(z, x, y))->second;
+                            GeometryCollection& geometries = featureTiles.find(TileID(z, x, y, z))->second;
                             if (geometries.size()) {
                                 geometries.back().push_back(coordinate);
                             } else {
@@ -277,7 +277,7 @@ AnnotationManager::addTileFeature(const uint32_t annotationID,
                             }
                         } else {
                             GeometryCollection geometries = {{ {{ coordinate }} }};
-                            featureTiles.emplace(TileID(z, x, y), geometries);
+                            featureTiles.emplace(TileID(z, x, y, z), geometries);
                         }
                     }
                 }
@@ -401,7 +401,7 @@ std::unordered_set<TileID, TileID::Hash> AnnotationManager::removeAnnotations(co
                     p = projectPoint(latLng);
                     x = z2s[z] * p.x;
                     y = z2s[z] * p.y;
-                    TileID tid(z, x, y);
+                    TileID tid(z, x, y, z);
                     // erase annotation from tile's list
                     auto& tileAnnotations = tiles[tid].first;
                     tileAnnotations.erase(annotationID);
@@ -459,8 +459,8 @@ AnnotationIDs AnnotationManager::getAnnotationsInBounds(const LatLngBounds& quer
     const vec2<double> nePoint = projectPoint(queryBounds.ne);
 
     // tiles number y from top down
-    const TileID nwTile(z, swPoint.x * z2, nePoint.y * z2);
-    const TileID seTile(z, nePoint.x * z2, swPoint.y * z2);
+    const TileID nwTile(z, swPoint.x * z2, nePoint.y * z2, z);
+    const TileID seTile(z, nePoint.x * z2, swPoint.y * z2, z);
 
     std::unordered_set<uint32_t> matchingAnnotations;
 

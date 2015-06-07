@@ -55,6 +55,7 @@ class SDFGlyphShader;
 class SDFIconShader;
 class DotShader;
 class GaussianShader;
+class CollisionBoxShader;
 
 struct ClipID;
 
@@ -101,7 +102,6 @@ public:
     void renderDebugFrame(const mat4 &matrix);
 
     void renderDebugText(DebugBucket& bucket, const mat4 &matrix);
-    void renderDebugText(const std::vector<std::string> &strings);
     void renderFill(FillBucket& bucket, const StyleLayer &layer_desc, const TileID& id, const mat4 &matrix);
     void renderLine(LineBucket& bucket, const StyleLayer &layer_desc, const TileID& id, const mat4 &matrix);
     void renderSymbol(SymbolBucket& bucket, const StyleLayer &layer_desc, const TileID& id, const mat4 &matrix);
@@ -220,6 +220,7 @@ public:
     std::unique_ptr<SDFIconShader> sdfIconShader;
     std::unique_ptr<DotShader> dotShader;
     std::unique_ptr<GaussianShader> gaussianShader;
+    std::unique_ptr<CollisionBoxShader> collisionBoxShader;
 
     StaticVertexBuffer backgroundBuffer = {
         { -1, -1 }, { 1, -1 },

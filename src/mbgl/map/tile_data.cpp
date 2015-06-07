@@ -2,6 +2,7 @@
 
 #include <mbgl/map/environment.hpp>
 #include <mbgl/map/source.hpp>
+#include <mbgl/map/transform_state.hpp>
 #include <mbgl/platform/log.hpp>
 #include <mbgl/storage/file_source.hpp>
 #include <mbgl/util/work_request.hpp>

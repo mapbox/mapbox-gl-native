@@ -41,6 +41,11 @@ MapContext::MapContext(uv_loop_t* loop, View& view_, FileSource& fileSource, Map
 }
 
 MapContext::~MapContext() {
+    // Make sure we call cleanup() before deleting this object.
+    assert(!style);
+}
+
+void MapContext::cleanup() {
     view.notify();
 
     // Explicit resets currently necessary because these abandon resources that need to be
@@ -281,6 +286,11 @@ void MapContext::renderStill(StillImageCallback fn) {
 
     if (callback) {
         throw util::Exception("Map is currently rendering an image");
+    }
+
+    if (style->getLastError()) {
+        fn(style->getLastError(), nullptr);
+        return;
     }
 
     callback = fn;

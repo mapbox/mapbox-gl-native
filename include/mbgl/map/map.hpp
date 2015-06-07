@@ -143,6 +143,9 @@ public:
     void setDebug(bool value);
     void toggleDebug();
     bool getDebug() const;
+    void setCollisionDebug(bool value);
+    void toggleCollisionDebug();
+    bool getCollisionDebug() const;
     bool isFullyLoaded() const;
 
 private:

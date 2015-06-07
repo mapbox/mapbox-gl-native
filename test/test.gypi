@@ -50,7 +50,6 @@
         'miscellaneous/map_context.cpp',
         'miscellaneous/mapbox.cpp',
         'miscellaneous/merge_lines.cpp',
-        'miscellaneous/rotation_range.cpp',
         'miscellaneous/style_parser.cpp',
         'miscellaneous/text_conversions.cpp',
         'miscellaneous/thread.cpp',
@@ -58,10 +57,6 @@
         'miscellaneous/transform.cpp',
         'miscellaneous/variant.cpp',
         'miscellaneous/worker.cpp',
-
-        'resources/mock_file_source.cpp',
-        'resources/mock_file_source.hpp',
-        'resources/mock_view.hpp',
 
         'storage/storage.hpp',
         'storage/storage.cpp',
@@ -78,6 +73,12 @@
         'storage/http_load.cpp',
         'storage/http_other_loop.cpp',
         'storage/http_reading.cpp',
+
+        'style/mock_file_source.cpp',
+        'style/mock_file_source.hpp',
+        'style/mock_view.hpp',
+        'style/pending_resources.cpp',
+        'style/resource_loading.cpp',
       ],
       'libraries': [
         '<@(uv_static_libs)',

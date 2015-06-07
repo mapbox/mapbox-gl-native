@@ -98,7 +98,7 @@ cp -prv styles/styles "${OUTPUT}/static/${NAME}.bundle/styles"
 
 step "Creating API Docs..."
 if [ -z `which appledoc` ]; then
-    echo "Unable to find appledoc. Consider installing it from source or Homebrew."
+    echo "Unable to find appledoc. See https://github.com/mapbox/mapbox-gl-native#manually"
     exit 1
 fi
 DOCS_OUTPUT="${OUTPUT}/static/Docs"

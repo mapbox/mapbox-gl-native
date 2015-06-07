@@ -11,13 +11,14 @@ class LiveTileData : public VectorTileData {
 public:
     LiveTileData(const TileID&,
                  AnnotationManager&,
-                 float mapMaxZoom,
                  Style&,
                  GlyphAtlas&,
                  GlyphStore&,
                  SpriteAtlas&,
                  util::ptr<Sprite>,
-                 const SourceInfo&);
+                 const SourceInfo&,
+                 float angle_,
+                 bool collisionDebug_);
     ~LiveTileData();
 
     void parse() override;

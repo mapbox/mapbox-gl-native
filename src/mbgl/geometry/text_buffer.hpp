@@ -14,9 +14,7 @@ class TextVertexBuffer : public Buffer <
 public:
     typedef int16_t vertex_type;
 
-    static const double angleFactor;
-
-    size_t add(int16_t x, int16_t y, float ox, float oy, uint16_t tx, uint16_t ty, float angle, float minzoom, std::array<float, 2> range, float maxzoom, float labelminzoom);
+    size_t add(int16_t x, int16_t y, float ox, float oy, uint16_t tx, uint16_t ty, float minzoom, float maxzoom, float labelminzoom);
 };
 
 

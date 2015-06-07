@@ -7,6 +7,7 @@
 #include <mbgl/geometry/icon_buffer.hpp>
 #include <mbgl/geometry/line_buffer.hpp>
 #include <mbgl/geometry/text_buffer.hpp>
+#include <mbgl/geometry/collision_box_buffer.hpp>
 
 #include <iosfwd>
 #include <memory>
@@ -16,7 +17,7 @@
 namespace mbgl {
 
 class Bucket;
-class Collision;
+class CollisionTile;
 class Painter;
 class SourceInfo;
 class StyleLayer;
@@ -32,16 +33,18 @@ class VectorTileData : public TileData {
 
 public:
     VectorTileData(const TileID&,
-                   float mapMaxZoom,
                    Style&,
                    GlyphAtlas&,
                    GlyphStore&,
                    SpriteAtlas&,
                    util::ptr<Sprite>,
-                   const SourceInfo&);
+                   const SourceInfo&,
+                   float angle_,
+                   bool collisionDebug_);
     ~VectorTileData();
 
     void parse() override;
+    void redoPlacement(float angle, bool collisionDebug) override;
     virtual Bucket* getBucket(StyleLayer const &layer_desc) override;
 
     size_t countBuckets() const;
@@ -49,13 +52,13 @@ public:
 
     void setState(const State& state) override;
 
-    inline Collision* getCollision() const {
+    inline CollisionTile* getCollision() const {
         return collision.get();
     }
 
-    const float depth;
-
 protected:
+    void redoPlacement();
+
     // Holds the actual geometries in this tile.
     FillVertexBuffer fillVertexBuffer;
     LineVertexBuffer lineVertexBuffer;
@@ -79,7 +82,15 @@ private:
     std::unordered_map<std::string, std::unique_ptr<Bucket>> buckets;
     mutable std::mutex bucketsMutex;
 
-    std::unique_ptr<Collision> collision;
+    std::unique_ptr<CollisionTile> collision;
+
+    float lastAngle = 0;
+    float currentAngle;
+    bool lastCollisionDebug = 0;
+    bool currentCollisionDebug = 0;
+    bool redoingPlacement = false;
+    void endRedoPlacement();
+    void workerRedoPlacement(float angle, bool collisionDebug);
 };
 
 }

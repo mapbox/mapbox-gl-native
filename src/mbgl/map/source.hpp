@@ -106,7 +106,7 @@ public:
     bool enabled;
 
 private:
-    void tileLoadingCompleteCallback(const TileID& normalized_id);
+    void tileLoadingCompleteCallback(const TileID& normalized_id, const TransformState& transformState, bool collisionDebug);
 
     void emitSourceLoaded();
     void emitSourceLoadingFailed(const std::string& message);

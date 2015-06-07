@@ -203,10 +203,11 @@ void Style::emitResourceLoadingFailed(std::exception_ptr error) {
 
     try {
         if (error) {
+            lastError = error;
             std::rethrow_exception(error);
         }
     } catch(const std::exception& e) {
-        Log::Error(Event::ResourceLoader, e.what());
+        Log::Error(Event::Style, e.what());
     }
 
     if (observer) {
