@@ -124,12 +124,12 @@ using TileGeometry = mapbox::util::variant<geojsonvt::TilePoint, geojsonvt::Tile
 
 class TilePoint {
 public:
-    TilePoint(uint16_t x_, uint16_t y_)
+    TilePoint(int16_t x_, int16_t y_)
         : x(x_), y(y_) {}
 
 public:
-    const uint16_t x = 0;
-    const uint16_t y = 0;
+    const int16_t x = 0;
+    const int16_t y = 0;
 };
 
 #pragma mark -

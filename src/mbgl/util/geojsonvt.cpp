@@ -71,8 +71,8 @@ void Tile::addFeature(Tile &tile, ProjectedFeature &feature, uint32_t z2, uint32
 
 TilePoint Tile::transformPoint(const ProjectedPoint &p, uint32_t z2, uint32_t tx, uint32_t ty, uint16_t extent) {
 
-    uint16_t x = extent * (p.x * z2 - tx);
-    uint16_t y = extent * (p.y * z2 - ty);
+    int16_t x = extent * (p.x * z2 - tx);
+    int16_t y = extent * (p.y * z2 - ty);
 
     return TilePoint(x, y);
 }
