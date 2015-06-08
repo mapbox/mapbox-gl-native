@@ -151,23 +151,6 @@ int main() {
     map.setStyleURL(newStyle.first);
     view.setWindowTitle(newStyle.second);
 
-    map.addPointAnnotation(mbgl::LatLng(45, -120), "default_marker");
-
-    mbgl::FillProperties fillProperties;
-    fillProperties.fill_color = mbgl::Color({{ 1, 0, 0, 1 }});
-    fillProperties.stroke_color = mbgl::Color({{ 0, 0, 0, 1 }});
-    fillProperties.opacity = 0.25;
-
-    mbgl::StyleProperties shapeProperties;
-    shapeProperties.set<mbgl::FillProperties>(fillProperties);
-
-    map.addShapeAnnotation({{
-        mbgl::LatLng(44, -122),
-        mbgl::LatLng(46, -122),
-        mbgl::LatLng(46, -121),
-        mbgl::LatLng(44, -122)
-    }}, shapeProperties);
-
     view.run();
 
     [reachability stopNotifier];
