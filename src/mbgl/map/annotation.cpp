@@ -439,13 +439,13 @@ std::unordered_set<TileID, TileID::Hash> AnnotationManager::removeAnnotations(co
     return affectedTiles;
 }
 
-const std::unique_ptr<Annotation>& AnnotationManager::getAnnotationWithID(uint32_t annotationID) const {
+const StyleProperties AnnotationManager::getAnnotationStyleProperties(uint32_t annotationID) const {
     std::lock_guard<std::mutex> lock(mtx);
 
     auto anno_it = annotations.find(annotationID);
     assert(anno_it != annotations.end());
 
-    return anno_it->second;
+    return anno_it->second->styleProperties;
 }
 
 AnnotationIDs AnnotationManager::getAnnotationsInBounds(const LatLngBounds& queryBounds,

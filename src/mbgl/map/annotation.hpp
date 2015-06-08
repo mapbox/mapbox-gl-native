@@ -69,7 +69,7 @@ public:
         const MapData&);
     std::unordered_set<TileID, TileID::Hash> removeAnnotations(const AnnotationIDs&, const MapData&);
     AnnotationIDs getOrderedShapeAnnotations() const { return orderedShapeAnnotations; }
-    const std::unique_ptr<Annotation>& getAnnotationWithID(uint32_t) const;
+    const StyleProperties getAnnotationStyleProperties(uint32_t) const;
     AnnotationIDs getAnnotationsInBounds(const LatLngBounds&, const MapData&, const AnnotationType& = AnnotationType::Any) const;
     LatLngBounds getBoundsForAnnotations(const AnnotationIDs&) const;
 

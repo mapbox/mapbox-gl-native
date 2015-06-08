@@ -158,8 +158,7 @@ void MapContext::updateAnnotationTiles(const std::unordered_set<TileID, TileID::
 
         if (layer_it == style->layers.end()) {
             // query shape styling
-            auto& annotation = data.annotationManager.getAnnotationWithID(shapeAnnotationID);
-            auto& shapeStyle = annotation->styleProperties;
+            auto& shapeStyle = data.annotationManager.getAnnotationStyleProperties(shapeAnnotationID);
 
             // apply shape paint properties
             ClassProperties paintProperties;
