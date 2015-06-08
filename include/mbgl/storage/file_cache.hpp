@@ -10,6 +10,7 @@ namespace mbgl {
 
 struct Resource;
 class Response;
+class WorkRequest;
 
 class FileCache : private util::noncopyable {
 public:
@@ -18,7 +19,7 @@ public:
     enum class Hint : uint8_t { Full, Refresh, No };
     using Callback = std::function<void(std::unique_ptr<Response>)>;
 
-    virtual void get(const Resource &resource, Callback callback) = 0;
+    virtual std::unique_ptr<WorkRequest> get(const Resource &resource, Callback callback) = 0;
     virtual void put(const Resource &resource, std::shared_ptr<const Response> response, Hint hint) = 0;
 };
 

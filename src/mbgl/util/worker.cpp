@@ -10,41 +10,29 @@ namespace mbgl {
 
 class Worker::Impl {
 public:
-    Impl(uv_loop_t*) {}
+    Impl(uv_loop_t*, FileSource* fs) {
+        // FIXME: Workers should not access the FileSource but it
+        // is currently needed because of GlyphsPBF. See #1664.
+        util::ThreadContext::setFileSource(fs);
+    }
 
-    void doWork(std::shared_ptr<WorkTask>& task) {
-        task->runTask();
+    void doWork(Fn work) {
+        work();
     }
 };
 
 Worker::Worker(std::size_t count) {
     util::ThreadContext context = {"Worker", util::ThreadType::Worker, util::ThreadPriority::Low};
     for (std::size_t i = 0; i < count; i++) {
-        std::unique_ptr<util::Thread<Impl>> worker(new util::Thread<Impl>(context));
-
-        // FIXME: Workers should not access the FileSource but it
-        // is currently needed because of GlyphsPBF. See #1664.
-        auto task = std::make_shared<WorkTask>([fs = util::ThreadContext::getFileSource()]{
-            util::ThreadContext::setFileSource(fs);
-        }, []{});
-
-        worker->invoke(&Worker::Impl::doWork, task);
-        threads.emplace_back(std::move(worker));
+        threads.emplace_back(std::make_unique<util::Thread<Impl>>(context, util::ThreadContext::getFileSource()));
     }
 }
 
 Worker::~Worker() = default;
 
 std::unique_ptr<WorkRequest> Worker::send(Fn work, Fn after) {
-    auto task = std::make_shared<WorkTask>(work, after);
-    auto request = std::make_unique<WorkRequest>(task);
-
-    threads[current]->invokeWithResult(&Worker::Impl::doWork, [task] {
-        task->runAfter();
-    }, task);
-
     current = (current + 1) % threads.size();
-    return request;
+    return threads[current]->invokeWithResult(&Worker::Impl::doWork, after, work);
 }
 
 } // end namespace mbgl

@@ -3,25 +3,19 @@
 
 #include <mbgl/util/noncopyable.hpp>
 
-#include <functional>
-#include <mutex>
-
 namespace mbgl {
 
+// A movable type-erasing function wrapper. This allows to store arbitrary invokable
+// things (like std::function<>, or the result of a movable-only std::bind()) in the queue.
+// Source: http://stackoverflow.com/a/29642072/331379
 class WorkTask : private util::noncopyable {
 public:
-    WorkTask(std::function<void()> task, std::function<void()> after);
+    virtual ~WorkTask() = default;
 
-    void runTask();
-    void runAfter();
-    void cancel();
-
-private:
-    const std::function<void()> task;
-    std::function<void()> after;
-    std::mutex mutex;
+    virtual void operator()() = 0;
+    virtual void cancel() = 0;
 };
 
-} // end namespace mbgl
+}
 
 #endif
