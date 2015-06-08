@@ -81,7 +81,7 @@
     }
 }
 
-- (MGLMapBounds)overlayBounds
+- (MGLCoordinateBounds)overlayBounds
 {
     return {
         CLLocationCoordinate2DMake(_bounds.sw.latitude,  _bounds.sw.longitude),
@@ -89,7 +89,7 @@
     };
 }
 
-- (BOOL)intersectsOverlayBounds:(MGLMapBounds)overlayBounds
+- (BOOL)intersectsOverlayBounds:(MGLCoordinateBounds)overlayBounds
 {
     mbgl::LatLngBounds area(
         mbgl::LatLng(overlayBounds.sw.latitude, overlayBounds.sw.longitude),

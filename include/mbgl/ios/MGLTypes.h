@@ -16,4 +16,4 @@ typedef NS_ENUM(NSUInteger, MGLUserTrackingMode) {
 typedef struct {
     CLLocationCoordinate2D sw;
     CLLocationCoordinate2D ne;
-} MGLMapBounds;
+} MGLCoordinateBounds;

@@ -19,13 +19,13 @@
 /** The cooordinate rectangle that encompasses the overlay. (required) (read-only)
 *
 *   This property contains the smallest rectangle that completely encompasses the overlay. Implementers of this protocol must set this area when implementing their overlay class, and after setting it, you must not change it. */
-@property (nonatomic, readonly) MGLMapBounds overlayBounds;
+@property (nonatomic, readonly) MGLCoordinateBounds overlayBounds;
 
 /** Returns a Boolean indicating whether the specified rectangle intersects the receiver’s shape.
 *
 *   You can implement this method to provide more specific bounds checking for an overlay. If you do not implement it, the bounding rectangle is used to detect intersections.
 *   @param overlayBounds The rectangle to intersect with the receiver’s area.
 *   @return `YES` if any part of the map rectangle intersects the receiver’s shape or `NO` if it does not. */
-- (BOOL)intersectsOverlayBounds:(MGLMapBounds)overlayBounds;
+- (BOOL)intersectsOverlayBounds:(MGLCoordinateBounds)overlayBounds;
 
 @end

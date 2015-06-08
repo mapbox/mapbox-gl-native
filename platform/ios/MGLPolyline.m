@@ -3,7 +3,7 @@
 @interface MGLMultiPoint (MGLPolyline)
 
 - (instancetype)initWithCoordinates:(CLLocationCoordinate2D *)coords count:(NSUInteger)count;
-- (BOOL)intersectsOverlayBounds:(MGLMapBounds)overlayBounds;
+- (BOOL)intersectsOverlayBounds:(MGLCoordinateBounds)overlayBounds;
 
 @end
 
