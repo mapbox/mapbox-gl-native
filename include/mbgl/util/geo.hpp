@@ -3,12 +3,17 @@
 
 namespace mbgl {
 
+class TileID;
+
 struct LatLng {
     double latitude = 0;
     double longitude = 0;
 
     inline LatLng(double lat = 0, double lon = 0)
         : latitude(lat), longitude(lon) {}
+
+    // Constructs a LatLng object with the top left position of the specified tile.
+    LatLng(const TileID& id);
 };
 
 struct ProjectedMeters {
@@ -25,6 +30,9 @@ struct LatLngBounds {
 
     inline LatLngBounds(LatLng sw_ = {90, 180}, LatLng ne_ = {-90, -180})
         : sw(sw_), ne(ne_) {}
+
+    // Constructs a LatLngBounds object with the tile's exact boundaries.
+    LatLngBounds(const TileID& id);
 
     inline void extend(const LatLng& point) {
         if (point.latitude < sw.latitude) sw.latitude = point.latitude;
