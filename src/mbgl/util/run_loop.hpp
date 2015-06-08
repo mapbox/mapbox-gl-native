@@ -42,6 +42,17 @@ public:
             std::move(fn),
             std::move(tuple));
 
+        // `task` is a shared pointer with ownership in the following three places:
+        //   1. In the `queue` of pending invocations.
+        //   2. In the `WorkRequest` result.
+        //   3. In the lambda binding of the callback to be executed on the invoking
+        //      RunLoop. This last shared ownership is necessary in the case where
+        //      callback execution has been scheduled (queued on the invoking RunLoop),
+        //      but the other two places have released ownership -- i.e. the task was
+        //      cancelled after the work is completed, but before the callback is
+        //      executed. In this case, the lambda binding checks the cancellation flag
+        //      and does not execute the original callback.
+
         task->bind(callback);
 
         withMutex([&] { queue.push(task); });
