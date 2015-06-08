@@ -65,7 +65,7 @@ private:
 
     // Style-related updates.
     void cascadeClasses();
-    void recalculateClasses(TimePoint);
+    void recalculateStyle(TimePoint);
 
     // Update the state indicated by the accumulated Update flags, then render.
     void update();

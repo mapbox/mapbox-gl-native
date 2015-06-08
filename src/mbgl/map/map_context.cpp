@@ -234,7 +234,7 @@ void MapContext::cascadeClasses() {
     style->cascade(data.getClasses());
 }
 
-void MapContext::recalculateClasses(TimePoint now) {
+void MapContext::recalculateStyle(TimePoint now) {
     style->recalculate(transformState.getNormalizedZoom(), now);
 }
 
@@ -258,7 +258,7 @@ void MapContext::update() {
 
         if (updated & static_cast<UpdateType>(Update::Classes) ||
             updated & static_cast<UpdateType>(Update::Zoom)) {
-            recalculateClasses(now);
+            recalculateStyle(now);
         }
 
         updateTiles();
