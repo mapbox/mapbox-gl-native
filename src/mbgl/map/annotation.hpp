@@ -34,7 +34,7 @@ public:
     AnnotationIDs getAnnotationsInBounds(const LatLngBounds&, const MapData&) const;
     LatLngBounds getBoundsForAnnotations(const AnnotationIDs&) const;
 
-    const LiveTile* getTile(const TileID& id);
+    std::shared_ptr<const LiveTile> getTile(const TileID& id);
 
     static const std::string layerID;
 
@@ -46,7 +46,7 @@ private:
     mutable std::mutex mtx;
     std::string defaultPointAnnotationSymbol;
     std::unordered_map<uint32_t, std::unique_ptr<Annotation>> annotations;
-    std::unordered_map<TileID, std::pair<std::unordered_set<uint32_t>, std::unique_ptr<LiveTile>>, TileID::Hash> tiles;
+    std::unordered_map<TileID, std::pair<std::unordered_set<uint32_t>, std::shared_ptr<LiveTile>>, TileID::Hash> tiles;
     uint32_t nextID_ = 0;
 };
 

@@ -161,7 +161,7 @@ AnnotationManager::addPointAnnotations(const std::vector<LatLng>& points,
                 // create tile & record annotation association
                 auto tile_pos = tiles.emplace(
                     tileID, std::make_pair(std::unordered_set<uint32_t>({ annotationID }),
-                                           std::make_unique<LiveTile>()));
+                                           std::make_shared<LiveTile>()));
                 // add point layer to tile
                 tile_pos.first->second.second->addLayer(layerID, layer);
             }
@@ -297,12 +297,12 @@ LatLngBounds AnnotationManager::getBoundsForAnnotations(const AnnotationIDs& ids
     return bounds;
 }
 
-const LiveTile* AnnotationManager::getTile(const TileID& id) {
+std::shared_ptr<const LiveTile> AnnotationManager::getTile(const TileID& id) {
     std::lock_guard<std::mutex> lock(mtx);
 
     const auto tile_it = tiles.find(id);
     if (tile_it != tiles.end()) {
-        return tile_it->second.second.get();
+        return tile_it->second.second;
     }
     return nullptr;
 }

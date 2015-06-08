@@ -36,7 +36,7 @@ void LiveTileData::parse() {
         return;
     }
 
-    const LiveTile* tile = annotationManager.getTile(id);
+    const auto tile = annotationManager.getTile(id);
 
     if (tile) {
         try {
