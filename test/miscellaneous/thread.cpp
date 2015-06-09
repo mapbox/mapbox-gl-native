@@ -136,3 +136,86 @@ TEST(Thread, context) {
 
     uv_run(uv_default_loop(), UV_RUN_DEFAULT);
 }
+
+class TestWorker {
+public:
+    TestWorker(uv_loop_t*) {}
+    void send(std::function<void ()> fn) { fn(); }
+};
+
+TEST(Thread, ExecutesAfter) {
+    RunLoop loop(uv_default_loop());
+    Thread<TestWorker> thread({"Test", ThreadType::Map, ThreadPriority::Regular});
+
+    bool didWork = false;
+    bool didAfter = false;
+
+    auto request = thread.invokeWithResult(&TestWorker::send, [&] {
+        didAfter = true;
+        loop.stop();
+    }, [&] {
+        didWork = true;
+    });
+
+    uv_run(uv_default_loop(), UV_RUN_DEFAULT);
+
+    EXPECT_TRUE(didWork);
+    EXPECT_TRUE(didAfter);
+}
+
+TEST(Thread, WorkRequestDeletionWaitsForWorkToComplete) {
+    RunLoop loop(uv_default_loop());
+    Thread<TestWorker> thread({"Test", ThreadType::Map, ThreadPriority::Regular});
+
+    std::promise<void> started;
+    bool didWork = false;
+
+    auto request = thread.invokeWithResult(&TestWorker::send, [&] {}, [&] {
+        started.set_value();
+        usleep(10000);
+        didWork = true;
+    });
+
+    started.get_future().get();
+    request.reset();
+    EXPECT_TRUE(didWork);
+}
+
+TEST(Thread, WorkRequestDeletionCancelsAfter) {
+    RunLoop loop(uv_default_loop());
+    Thread<TestWorker> thread({"Test", ThreadType::Map, ThreadPriority::Regular});
+
+    std::promise<void> started;
+    bool didAfter = false;
+
+    auto request = thread.invokeWithResult(&TestWorker::send, [&] {
+        didAfter = true;
+    }, [&] {
+        started.set_value();
+    });
+
+    started.get_future().get();
+    request.reset();
+    uv_run(uv_default_loop(), UV_RUN_ONCE);
+    EXPECT_FALSE(didAfter);
+}
+
+TEST(Thread, WorkRequestDeletionCancelsImmediately) {
+    RunLoop loop(uv_default_loop());
+    Thread<TestWorker> thread({"Test", ThreadType::Map, ThreadPriority::Regular});
+
+    std::promise<void> started;
+
+    auto request1 = thread.invokeWithResult(&TestWorker::send, [&] {}, [&] {
+        usleep(10000);
+        started.set_value();
+    });
+
+    auto request2 = thread.invokeWithResult(&TestWorker::send, [&] {}, [&] {
+        ADD_FAILURE() << "Second work item should not be invoked";
+    });
+    request2.reset();
+
+    started.get_future().get();
+    request1.reset();
+}
