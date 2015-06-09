@@ -10,17 +10,38 @@
 #include <vector>
 #include <mutex>
 #include <memory>
-#include <unordered_map>
+#include <map>
 #include <unordered_set>
 
 namespace mbgl {
 
-class Annotation;
-class Map;
 class LiveTile;
 class MapData;
+class PointAnnotationLayer;
 
-using AnnotationIDs = std::vector<uint32_t>;
+using AnnotationID = uint32_t;
+using AnnotationIDs = std::vector<AnnotationID>;
+
+enum class AnnotationType : uint8_t {
+    Point,
+    Shape
+};
+
+class Annotation : private util::noncopyable {
+public:
+    Annotation(AnnotationID, AnnotationType, const std::string& symbol, const LatLng&);
+
+public:
+    inline AnnotationType getType() const { return type; }
+    inline const std::string& getSymbol() const { return symbol; }
+
+public:
+    const AnnotationID id;
+    const AnnotationType type = AnnotationType::Point;
+    const std::string symbol;
+    const LatLng point;
+};
+
 
 class AnnotationManager : private util::noncopyable {
 public:
@@ -34,6 +55,9 @@ public:
     AnnotationIDs getAnnotationsInBounds(const LatLngBounds&, const MapData&) const;
     LatLngBounds getBoundsForAnnotations(const AnnotationIDs&) const;
 
+    // Returns a list of all annotations for the given layer that are in the bounds of the tile.
+    std::vector<std::shared_ptr<const Annotation>> getAnnotations(const std::string& layer, const TileID& id) const;
+
     std::shared_ptr<const LiveTile> getTile(const TileID& id);
 
     static const std::string layerID;
@@ -45,8 +69,8 @@ private:
 private:
     mutable std::mutex mtx;
     std::string defaultPointAnnotationSymbol;
-    std::unordered_map<uint32_t, std::unique_ptr<Annotation>> annotations;
-    std::unordered_map<TileID, std::pair<std::unordered_set<uint32_t>, std::shared_ptr<LiveTile>>, TileID::Hash> tiles;
+    std::map<uint32_t, std::shared_ptr<const Annotation>> annotationIndex;
+    const std::unique_ptr<PointAnnotationLayer> annotations;
     uint32_t nextID_ = 0;
 };
 

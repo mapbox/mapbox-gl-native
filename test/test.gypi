@@ -35,6 +35,8 @@
         'fixtures/fixture_log_observer.hpp',
         'fixtures/fixture_log_observer.cpp',
 
+        'annotations/points.cpp',
+
         'api/set_style.cpp',
         'api/repeated_render.cpp',
 
