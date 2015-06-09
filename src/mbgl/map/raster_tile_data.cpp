@@ -12,9 +12,11 @@ using namespace mbgl;
 
 RasterTileData::RasterTileData(const TileID& id_,
                                TexturePool &texturePool,
-                               const SourceInfo &source_)
+                               const SourceInfo &source_,
+                               Worker& worker_)
     : TileData(id_),
       source(source_),
+      worker(worker_),
       bucket(texturePool, layout) {
 }
 
@@ -22,14 +24,13 @@ RasterTileData::~RasterTileData() {
     cancel();
 }
 
-void RasterTileData::request(Worker& worker,
-                       float pixelRatio,
-                       const std::function<void()>& callback) {
+void RasterTileData::request(float pixelRatio,
+                             const std::function<void()>& callback) {
     std::string url = source.tileURL(id, pixelRatio);
     state = State::loading;
 
     FileSource* fs = util::ThreadContext::getFileSource();
-    req = fs->request({ Resource::Kind::Tile, url }, util::RunLoop::current.get()->get(), [url, callback, &worker, this](const Response &res) {
+    req = fs->request({ Resource::Kind::Tile, url }, util::RunLoop::current.get()->get(), [url, callback, this](const Response &res) {
         req = nullptr;
 
         if (res.status != Response::Successful) {
@@ -59,7 +60,7 @@ void RasterTileData::request(Worker& worker,
     });
 }
 
-bool RasterTileData::reparse(Worker&, std::function<void()>) {
+bool RasterTileData::reparse(std::function<void()>) {
     assert(false);
     return false;
 }

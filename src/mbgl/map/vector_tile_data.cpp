@@ -18,6 +18,7 @@ VectorTileData::VectorTileData(const TileID& id_,
                                float angle,
                                bool collisionDebug)
     : TileData(id_),
+      worker(style_.workers),
       tileWorker(id_,
                  style_,
                  source_.max_zoom,
@@ -26,7 +27,6 @@ VectorTileData::VectorTileData(const TileID& id_,
                                     source_.tile_size * id.overscaling,
                                     angle, collisionDebug)),
       source(source_),
-      worker(style_.workers),
       lastAngle(angle),
       currentAngle(angle) {
 }
@@ -35,7 +35,7 @@ VectorTileData::~VectorTileData() {
     cancel();
 }
 
-void VectorTileData::request(Worker&, float pixelRatio, const std::function<void()>& callback) {
+void VectorTileData::request(float pixelRatio, const std::function<void()>& callback) {
     std::string url = source.tileURL(id, pixelRatio);
     state = State::loading;
 
@@ -55,11 +55,11 @@ void VectorTileData::request(Worker&, float pixelRatio, const std::function<void
         state = State::loaded;
         data = res.data;
 
-        reparse(worker, callback);
+        reparse(callback);
     });
 }
 
-bool VectorTileData::reparse(Worker&, std::function<void()> callback) {
+bool VectorTileData::reparse(std::function<void()> callback) {
     if (parsing || (state != State::loaded && state != State::partial)) {
         return false;
     }

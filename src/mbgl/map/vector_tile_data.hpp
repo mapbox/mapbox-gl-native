@@ -25,20 +25,20 @@ public:
                    bool collisionDebug_);
     ~VectorTileData();
 
-    void redoPlacement(float angle, bool collisionDebug) override;
-
     Bucket* getBucket(const StyleLayer&) override;
     size_t countBuckets() const;
 
-    void request(Worker&,
-                 float pixelRatio,
+    void request(float pixelRatio,
                  const std::function<void()>& callback) override;
 
-    bool reparse(Worker&, std::function<void ()> callback) override;
+    bool reparse(std::function<void ()> callback) override;
+
+    void redoPlacement(float angle, bool collisionDebug) override;
 
     void cancel() override;
 
 protected:
+    Worker& worker;
     TileWorker tileWorker;
     std::unique_ptr<WorkRequest> workRequest;
     bool parsing = false;
@@ -47,7 +47,6 @@ private:
     const SourceInfo& source;
     Request* req = nullptr;
     std::string data;
-    Worker& worker;
 
     float lastAngle = 0;
     float currentAngle;

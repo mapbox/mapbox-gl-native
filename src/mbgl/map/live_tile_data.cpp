@@ -24,7 +24,7 @@ LiveTileData::~LiveTileData() {
     cancel();
 }
 
-bool LiveTileData::reparse(Worker& worker, std::function<void()> callback) {
+bool LiveTileData::reparse(std::function<void()> callback) {
     if (parsing || (state != State::loaded && state != State::partial)) {
         return false;
     }

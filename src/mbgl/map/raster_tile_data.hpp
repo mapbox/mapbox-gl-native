@@ -15,14 +15,13 @@ class WorkRequest;
 
 class RasterTileData : public TileData {
 public:
-    RasterTileData(const TileID&, TexturePool&, const SourceInfo&);
+    RasterTileData(const TileID&, TexturePool&, const SourceInfo&, Worker&);
     ~RasterTileData();
 
-    void request(Worker&,
-                 float pixelRatio,
+    void request(float pixelRatio,
                  const std::function<void()>& callback) override;
 
-    bool reparse(Worker&, std::function<void ()> callback) override;
+    bool reparse(std::function<void ()> callback) override;
 
     void cancel() override;
 
@@ -30,6 +29,7 @@ public:
 
 private:
     const SourceInfo& source;
+    Worker& worker;
     Request* req = nullptr;
 
     StyleLayoutRaster layout;
