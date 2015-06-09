@@ -37,7 +37,7 @@ bool LiveTileData::reparse(Worker& worker, std::function<void()> callback) {
 
     parsing = true;
 
-    workRequest = worker.parseLiveTile(workerData, *tile, [this, callback] (TileParseResult result) {
+    workRequest = worker.parseLiveTile(tileWorker, *tile, [this, callback] (TileParseResult result) {
         parsing = false;
 
         if (state == State::obsolete) {

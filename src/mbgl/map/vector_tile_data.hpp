@@ -39,7 +39,7 @@ public:
     void cancel() override;
 
 protected:
-    TileWorker workerData;
+    TileWorker tileWorker;
     std::unique_ptr<WorkRequest> workRequest;
     bool parsing = false;
 
