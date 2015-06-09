@@ -2,9 +2,7 @@
 #include <mbgl/style/style_layer.hpp>
 #include <mbgl/style/style_bucket.hpp>
 #include <mbgl/map/source.hpp>
-#include <mbgl/map/vector_tile.hpp>
 #include <mbgl/text/collision_tile.hpp>
-#include <mbgl/util/pbf.hpp>
 #include <mbgl/storage/resource.hpp>
 #include <mbgl/storage/response.hpp>
 #include <mbgl/storage/file_source.hpp>
@@ -20,15 +18,15 @@ VectorTileData::VectorTileData(const TileID& id_,
                                float angle,
                                bool collisionDebug)
     : TileData(id_),
-      source(source_),
-      worker(style_.workers),
       workerData(id_,
                  style_,
-                 source.max_zoom,
+                 source_.max_zoom,
                  state,
                  std::make_unique<CollisionTile>(id_.z, 4096,
                                     source_.tile_size * id.overscaling,
                                     angle, collisionDebug)),
+      source(source_),
+      worker(style_.workers),
       lastAngle(angle),
       currentAngle(angle) {
 }
@@ -37,9 +35,7 @@ VectorTileData::~VectorTileData() {
     cancel();
 }
 
-void VectorTileData::request(Worker&,
-                       float pixelRatio,
-                       const std::function<void()>& callback) {
+void VectorTileData::request(Worker&, float pixelRatio, const std::function<void()>& callback) {
     std::string url = source.tileURL(id, pixelRatio);
     state = State::loading;
 
@@ -64,37 +60,28 @@ void VectorTileData::request(Worker&,
 }
 
 bool VectorTileData::reparse(Worker&, std::function<void()> callback) {
-    if (parsing.test_and_set(std::memory_order_acquire)) {
+    if (parsing || (state != State::loaded && state != State::partial)) {
         return false;
     }
 
-    workRequest = worker.send([this] {
-        if (getState() != TileData::State::loaded && getState() != TileData::State::partial) {
+    parsing = true;
+
+    workRequest = worker.parseVectorTile(workerData, data, [this, callback] (TileParseResult result) {
+        parsing = false;
+
+        if (state == State::obsolete) {
             return;
         }
 
-        TileParseResult result;
-
-        try {
-            VectorTile vectorTile(pbf((const uint8_t *)data.data(), data.size()));
-            result = workerData.parse(vectorTile);
-        } catch (const std::exception& ex) {
-            std::stringstream message;
-            message << "Failed to parse [" << int(id.sourceZ) << "/" << id.x << "/" << id.y << "]: " << ex.what();
-            result = message.str();
-        }
-
-        if (getState() == TileData::State::obsolete) {
-            return;
-        } else if (result.is<State>()) {
+        if (result.is<State>()) {
             state = result.get<State>();
         } else {
             error = result.get<std::string>();
             state = State::obsolete;
         }
 
-        parsing.clear(std::memory_order_release);
-    }, callback);
+        callback();
+    });
 
     return true;
 }
@@ -111,35 +98,30 @@ size_t VectorTileData::countBuckets() const {
     return workerData.countBuckets();
 }
 
-void VectorTileData::redoPlacement() {
-    redoPlacement(lastAngle, lastCollisionDebug);
-}
-
 void VectorTileData::redoPlacement(float angle, bool collisionDebug) {
-    if (angle != currentAngle || collisionDebug != currentCollisionDebug) {
-        lastAngle = angle;
-        lastCollisionDebug = collisionDebug;
+    if (angle == currentAngle && collisionDebug == currentCollisionDebug)
+        return;
 
-        if (getState() != State::parsed || redoingPlacement) return;
+    lastAngle = angle;
+    lastCollisionDebug = collisionDebug;
 
-        redoingPlacement = true;
-        currentAngle = angle;
-        currentCollisionDebug = collisionDebug;
+    if (state != State::parsed || redoingPlacement)
+        return;
 
-        auto callback = std::bind(&VectorTileData::endRedoPlacement, this);
-        workRequest = worker.send([this, angle, collisionDebug] { workerData.redoPlacement(angle, collisionDebug); }, callback);
-    }
-}
+    redoingPlacement = true;
+    currentAngle = angle;
+    currentCollisionDebug = collisionDebug;
 
-void VectorTileData::endRedoPlacement() {
-    for (const auto& layer_desc : workerData.style.layers) {
-        auto bucket = getBucket(*layer_desc);
-        if (bucket) {
-            bucket->swapRenderData();
+    workRequest = worker.redoPlacement(workerData, angle, collisionDebug, [this] {
+        for (const auto& layer : workerData.style.layers) {
+            auto bucket = getBucket(*layer);
+            if (bucket) {
+                bucket->swapRenderData();
+            }
         }
-    }
-    redoingPlacement = false;
-    redoPlacement();
+        redoingPlacement = false;
+        redoPlacement(lastAngle, lastCollisionDebug);
+    });
 }
 
 void VectorTileData::cancel() {

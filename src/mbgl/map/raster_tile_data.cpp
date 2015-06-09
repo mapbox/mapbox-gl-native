@@ -42,19 +42,20 @@ void RasterTileData::request(Worker& worker,
         }
 
         state = State::loaded;
-        data = res.data;
 
-        workRequest = worker.send([this] {
-            if (getState() != State::loaded) {
+        workRequest = worker.parseRasterTile(bucket, res.data, [this, callback] (bool result) {
+            if (state != State::loaded) {
                 return;
             }
 
-            if (bucket.setImage(data)) {
+            if (result) {
                 state = State::parsed;
             } else {
                 state = State::invalid;
             }
-        }, callback);
+
+            callback();
+        });
     });
 }
 

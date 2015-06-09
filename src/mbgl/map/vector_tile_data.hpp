@@ -39,23 +39,21 @@ public:
     void cancel() override;
 
 protected:
-    void redoPlacement();
-
-    const SourceInfo& source;
-    Request *req = nullptr;
-    std::string data;
-    Worker& worker;
     TileWorker workerData;
     std::unique_ptr<WorkRequest> workRequest;
-    std::atomic_flag parsing = ATOMIC_FLAG_INIT;
+    bool parsing = false;
 
 private:
+    const SourceInfo& source;
+    Request* req = nullptr;
+    std::string data;
+    Worker& worker;
+
     float lastAngle = 0;
     float currentAngle;
     bool lastCollisionDebug = 0;
     bool currentCollisionDebug = 0;
     bool redoingPlacement = false;
-    void endRedoPlacement();
 };
 
 }

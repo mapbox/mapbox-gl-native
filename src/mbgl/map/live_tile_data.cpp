@@ -24,44 +24,35 @@ LiveTileData::~LiveTileData() {
     cancel();
 }
 
-bool LiveTileData::reparse(Worker&, std::function<void()> callback) {
-    if (parsing.test_and_set(std::memory_order_acquire)) {
+bool LiveTileData::reparse(Worker& worker, std::function<void()> callback) {
+    if (parsing || (state != State::loaded && state != State::partial)) {
         return false;
     }
 
-    workRequest = worker.send([this] {
-        if (getState() != State::loaded) {
+    const LiveTile* tile = annotationManager.getTile(id);
+    if (!tile) {
+        state = State::parsed;
+        return true;
+    }
+
+    parsing = true;
+
+    workRequest = worker.parseLiveTile(workerData, *tile, [this, callback] (TileParseResult result) {
+        parsing = false;
+
+        if (state == State::obsolete) {
             return;
         }
 
-        const LiveTile* tile = annotationManager.getTile(id);
-
-        if (!tile) {
-            state = State::parsed;
-            return;
-        }
-
-        TileParseResult result;
-
-        try {
-            result = workerData.parse(*tile);
-        } catch (const std::exception& ex) {
-            std::stringstream message;
-            message << "Failed to parse [" << int(id.sourceZ) << "/" << id.x << "/" << id.y << "]: " << ex.what();
-            result = message.str();
-        }
-
-        if (getState() == TileData::State::obsolete) {
-            return;
-        } else if (result.is<State>()) {
+        if (result.is<State>()) {
             state = result.get<State>();
         } else {
             error = result.get<std::string>();
             state = State::obsolete;
         }
 
-        parsing.clear(std::memory_order_release);
-    }, callback);
+        callback();
+    });
 
     return true;
 }

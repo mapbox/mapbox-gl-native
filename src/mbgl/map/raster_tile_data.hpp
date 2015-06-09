@@ -30,9 +30,7 @@ public:
 
 private:
     const SourceInfo& source;
-
-    Request *req = nullptr;
-    std::string data;
+    Request* req = nullptr;
 
     StyleLayoutRaster layout;
     RasterBucket bucket;
