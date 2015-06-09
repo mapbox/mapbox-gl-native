@@ -35,8 +35,6 @@ public:
     mbgl::Request* request(const mbgl::Resource&, uv_loop_t*, Callback);
     void cancel(mbgl::Request*);
 
-    void request(const mbgl::Resource&, Callback);
-
     // visiblity?
     void notify(mbgl::Request*, const std::shared_ptr<const mbgl::Response>&);
 

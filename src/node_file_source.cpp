@@ -80,14 +80,6 @@ void NodeFileSource::cancel(mbgl::Request* req) {
     queue->send(Action{ Action::Cancel, req });
 }
 
-void NodeFileSource::request(const mbgl::Resource& resource, Callback callback) {
-    auto req = new mbgl::Request(resource, nullptr, std::move(callback));
-
-    // This function can be called from any thread. Make sure we're executing the actual call in the
-    // file source loop by sending it over the queue. It will be processed in processAction().
-    queue->send(Action{ Action::Add, req });
-}
-
 void NodeFileSource::processAdd(mbgl::Request *req) {
     NanScope();
 
