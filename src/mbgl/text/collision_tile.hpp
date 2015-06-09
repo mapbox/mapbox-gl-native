@@ -27,8 +27,8 @@ namespace mbgl {
     namespace bg = boost::geometry;
     namespace bgm = bg::model;
     namespace bgi = bg::index;
-    typedef bgm::point<float, 2, bg::cs::cartesian> Point;
-    typedef bgm::box<Point> Box;
+    typedef bgm::point<float, 2, bg::cs::cartesian> CollisionPoint;
+    typedef bgm::box<CollisionPoint> Box;
     typedef std::pair<Box, CollisionBox> CollisionTreeBox;
     typedef bgi::rtree<CollisionTreeBox, bgi::linear<16,4>> Tree;
 

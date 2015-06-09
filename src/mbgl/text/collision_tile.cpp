@@ -91,11 +91,11 @@ void CollisionTile::insertFeature(CollisionFeature &feature, const float minPlac
 
 Box CollisionTile::getTreeBox(const vec2<float> &anchor, const CollisionBox &box) {
     return Box{
-        Point{
+        CollisionPoint{
             anchor.x + box.x1,
             anchor.y + box.y1 * yStretch
         },
-        Point{
+        CollisionPoint{
             anchor.x + box.x2,
             anchor.y + box.y2 * yStretch
         }
