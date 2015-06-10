@@ -76,7 +76,9 @@ bool VectorTileData::reparse(Worker&, std::function<void()> callback) {
         if (result.is<State>()) {
             state = result.get<State>();
         } else {
-            error = result.get<std::string>();
+            std::stringstream message;
+            message <<  "Failed to parse [" << std::string(id) << "]: " << result.get<std::string>();
+            error = message.str();
             state = State::obsolete;
         }
 

@@ -159,7 +159,7 @@ TEST_P(ResourceLoading, RequestWithCorruptedData) {
     message << "Failed to parse ";
 
     if (param == "vector.pbf") {
-        message << "\\[15\\/1638(3|4)\\/1638(3|4)\\]\\: pbf unknown field type exception";
+        message << "\\[1(5|6)\\/1638(3|4)\\/1638(3|4)\\]\\: pbf unknown field type exception";
     } else {
         message << "\\[test\\/fixtures\\/resources\\/" << param << "\\]";
     }

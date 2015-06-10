@@ -25,8 +25,12 @@ public:
     }
 
     TileParseResult parseVectorTile(TileWorker* worker, std::string data) {
-        VectorTile vectorTile(pbf(reinterpret_cast<const unsigned char *>(data.data()), data.size()));
-        return worker->parse(vectorTile);
+        try {
+            pbf tilePBF(reinterpret_cast<const unsigned char *>(data.data()), data.size());
+            return worker->parse(VectorTile(tilePBF));
+        } catch (const std::exception& ex) {
+            return TileParseResult(ex.what());
+        }
     }
 
     TileParseResult parseLiveTile(TileWorker* worker, const LiveTile* tile) {
