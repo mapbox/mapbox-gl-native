@@ -58,6 +58,8 @@ size_t TileWorker::countBuckets() const {
 }
 
 TileParseResult TileWorker::parse(const GeometryTile& geometryTile) {
+    partialParse = false;
+
     for (const auto& layer_desc : style.layers) {
         // Cancel early when parsing.
         if (obsolete()) {
