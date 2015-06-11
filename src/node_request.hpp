@@ -7,8 +7,11 @@
 #include <nan.h>
 #pragma GCC diagnostic pop
 
+#include <mbgl/storage/resource.hpp>
+
+#include <memory>
+
 class NodeFileSource;
-namespace mbgl { class Request; }
 
 namespace node_mbgl {
 
@@ -20,21 +23,21 @@ public:
     static NAN_METHOD(New);
     static NAN_METHOD(Respond);
 
-    static v8::Handle<v8::Object> Create(v8::Handle<v8::Object> source, mbgl::Request *request);
+    static v8::Handle<v8::Object> Create(v8::Handle<v8::Object> source, const mbgl::Resource& resource);
 
     static v8::Persistent<v8::FunctionTemplate> constructorTemplate;
 
     ////////////////////////////////////////////////////////////////////////////////////////////////
     // Instance
 public:
-    NodeRequest(v8::Local<v8::Object> source, mbgl::Request *request);
+    NodeRequest(v8::Local<v8::Object> source, const mbgl::Resource& resource);
     ~NodeRequest();
 
     void cancel();
 
 private:
     v8::Persistent<v8::Object> source;
-    mbgl::Request *request = nullptr;
+    std::unique_ptr<mbgl::Resource> resource;
 };
 
 }
