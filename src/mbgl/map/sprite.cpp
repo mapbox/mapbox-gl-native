@@ -10,6 +10,7 @@
 #include <mbgl/util/uv_detail.hpp>
 
 #include <rapidjson/document.h>
+#include <rapidjson/error/en.h>
 
 #include <string>
 #include <sstream>
@@ -124,7 +125,7 @@ void Sprite::parseJSON(const std::string& jsonURL) {
 
     if (d.HasParseError()) {
         std::stringstream message;
-        message <<  "Failed to parse [" << jsonURL << "]: " << d.GetErrorOffset() << " - " << d.GetParseError();
+        message << "Failed to parse [" << jsonURL << "]: " << d.GetErrorOffset() << " - " << rapidjson::GetParseError_En(d.GetParseError());
         emitSpriteLoadingFailed(message.str());
     } else if (d.IsObject()) {
         for (rapidjson::Value::ConstMemberIterator itr = d.MemberBegin(); itr != d.MemberEnd(); ++itr) {

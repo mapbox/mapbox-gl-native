@@ -28,6 +28,8 @@
 
       'variables': {
         'cflags_cc': [
+          '<@(variant_cflags)',
+          '<@(rapidjson_cflags)',
           '<@(uv_cflags)',
           '<@(opengl_cflags)',
           '<@(boost_cflags)',

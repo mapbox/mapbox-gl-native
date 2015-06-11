@@ -2,7 +2,7 @@
 #define MBGL_TEST_FIXTURE_LOG_OBSERVER
 
 #include <mbgl/platform/log.hpp>
-#include <mbgl/util/optional.hpp>
+#include <mapbox/optional.hpp>
 
 #include <vector>
 #include <cstdarg>

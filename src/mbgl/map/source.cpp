@@ -27,6 +27,8 @@
 
 #include <algorithm>
 
+#include <rapidjson/error/en.h>
+
 namespace mbgl {
 
 void parse(const rapidjson::Value& value, std::vector<std::string>& target, const char *name) {
@@ -162,7 +164,7 @@ void Source::load() {
 
         if (d.HasParseError()) {
             std::stringstream message;
-            message << "Failed to parse [" << info.url << "]: " << d.GetErrorOffset() << " - " << d.GetParseError();
+            message << "Failed to parse [" << info.url << "]: " << d.GetErrorOffset() << " - " << rapidjson::GetParseError_En(d.GetParseError());
             emitSourceLoadingFailed(message.str());
             return;
         }

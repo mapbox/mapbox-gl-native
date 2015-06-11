@@ -14,6 +14,7 @@
 #include <csscolorparser/csscolorparser.hpp>
 
 #include <rapidjson/document.h>
+#include <rapidjson/error/en.h>
 
 #include <algorithm>
 
@@ -31,7 +32,7 @@ Style::Style(const std::string& data, const std::string&,
     rapidjson::Document doc;
     doc.Parse<0>((const char *const)data.c_str());
     if (doc.HasParseError()) {
-        Log::Error(Event::ParseStyle, "Error parsing style JSON at %i: %s", doc.GetErrorOffset(), doc.GetParseError());
+        Log::Error(Event::ParseStyle, "Error parsing style JSON at %i: %s", doc.GetErrorOffset(), rapidjson::GetParseError_En(doc.GetParseError()));
         return;
     }
 

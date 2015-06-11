@@ -26,7 +26,6 @@
         '../mbgl.gyp:asset-<(asset_lib)',
         '../mbgl.gyp:cache-<(cache_lib)',
         '../mbgl.gyp:headless-<(headless_lib)',
-        '../deps/gtest/gtest.gyp:gtest'
       ],
       'sources': [
         'fixtures/main.cpp',
@@ -82,17 +81,22 @@
         'style/resource_loading.cpp',
       ],
       'libraries': [
+        '<@(gtest_static_libs)',
         '<@(uv_static_libs)',
         '<@(sqlite3_static_libs)',
       ],
       'variables': {
         'cflags_cc': [
+          '<@(gtest_cflags)',
+          '<@(variant_cflags)',
+          '<@(rapidjson_cflags)',
           '<@(uv_cflags)',
           '<@(opengl_cflags)',
           '<@(boost_cflags)',
           '<@(sqlite3_cflags)',
         ],
         'ldflags': [
+          '<@(gtest_ldflags)',
           '<@(uv_ldflags)',
           '<@(sqlite3_ldflags)',
         ],
