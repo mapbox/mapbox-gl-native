@@ -10,22 +10,10 @@
 
 static UIColor *const kTintColor = [UIColor colorWithRed:0.120 green:0.550 blue:0.670 alpha:1.000];
 
-static NSArray *const kStyleNames = @[
-    @"Mapbox Streets",
-    @"Emerald",
-    @"Light",
-    @"Dark",
-    @"Bright",
-    @"Basic",
-    @"Outdoors",
-    @"Satellite",
-];
-
-static NSString *const kStyleVersion = @"7";
-
 @interface MBXViewController () <UIActionSheetDelegate, MGLMapViewDelegate>
 
 @property (nonatomic) MGLMapView *mapView;
+@property             NSUInteger selectedStyleIdx;
 
 @end
 
@@ -51,8 +39,10 @@ mbgl::Settings_NSUserDefaults *settings = nullptr;
 - (void)viewDidLoad
 {
     [super viewDidLoad];
-
+    
     self.mapView = [[MGLMapView alloc] initWithFrame:self.view.bounds];
+    //Map starts with Mapbox-Street so hardcode according index as start
+    self.selectedStyleIdx = 3;
     self.mapView.autoresizingMask = UIViewAutoresizingFlexibleWidth | UIViewAutoresizingFlexibleHeight;
     self.mapView.showsUserLocation = YES;
     self.mapView.delegate = self;
@@ -69,7 +59,7 @@ mbgl::Settings_NSUserDefaults *settings = nullptr;
 
     UIButton *titleButton = [UIButton buttonWithType:UIButtonTypeCustom];
     [titleButton setFrame:CGRectMake(0, 0, 150, 40)];
-    [titleButton setTitle:[kStyleNames firstObject] forState:UIControlStateNormal];
+    [titleButton setTitle:[@(self.selectedStyleIdx) stringValue] forState:UIControlStateNormal];
     [titleButton setTitleColor:kTintColor forState:UIControlStateNormal];
     [titleButton addTarget:self action:@selector(cycleStyles) forControlEvents:UIControlEventTouchUpInside];
     self.navigationItem.titleView = titleButton;
@@ -221,25 +211,17 @@ mbgl::Settings_NSUserDefaults *settings = nullptr;
 {
     UIButton *titleButton = (UIButton *)self.navigationItem.titleView;
 
-    NSString *styleName = [titleButton titleForState:UIControlStateNormal];
-
-    if ( ! styleName)
-    {
-        styleName = [kStyleNames firstObject];
+    if (self.selectedStyleIdx+1 == [self.mapView.bundledStyleURLs count]) {
+        self.selectedStyleIdx = 0;
     }
     else
     {
-        NSUInteger index = [kStyleNames indexOfObject:styleName] + 1;
-        if (index == [kStyleNames count]) index = 0;
-        styleName = [kStyleNames objectAtIndex:index];
+        self.selectedStyleIdx=self.selectedStyleIdx+1;
     }
 
-    self.mapView.styleURL = [NSURL URLWithString:
-        [NSString stringWithFormat:@"asset://styles/%@-v%@.json",
-            [[styleName lowercaseString] stringByReplacingOccurrencesOfString:@" " withString:@"-"],
-            kStyleVersion]];
+    self.mapView.styleURL = [self.mapView.bundledStyleURLs objectAtIndex:self.selectedStyleIdx];
 
-    [titleButton setTitle:styleName forState:UIControlStateNormal];
+    [titleButton setTitle:[@(self.selectedStyleIdx) stringValue] forState:UIControlStateNormal];
 }
 
 - (void)locateUser
