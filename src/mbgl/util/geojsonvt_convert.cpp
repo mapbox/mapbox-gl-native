@@ -157,8 +157,6 @@ void Convert::convertFeature(std::vector<ProjectedFeature> &features, const JSVa
         ProjectedGeometryContainer *geometry = &rings;
 
         features.push_back(create(tags, projectedType, *geometry));
-
-        printf("features now has %lu items\n", (unsigned long)features.size());
     }
 
     else if (type == "MultiPolygon") {
