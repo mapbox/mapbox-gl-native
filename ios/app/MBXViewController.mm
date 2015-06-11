@@ -15,7 +15,7 @@ static UIColor *const kTintColor = [UIColor colorWithRed:0.120 green:0.550 blue:
 @interface MBXViewController () <UIActionSheetDelegate, MGLMapViewDelegate>
 
 @property (nonatomic) MGLMapView *mapView;
-@property             NSUInteger selectedStyleIdx;
+@property (nonatomic) NSUInteger selectedStyleIdx;
 
 @end
 
