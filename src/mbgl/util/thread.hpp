@@ -32,21 +32,14 @@ public:
     // Invoke object->fn(args...) in the runloop thread.
     template <typename Fn, class... Args>
     void invoke(Fn fn, Args&&... args) {
-        loop->invoke(bind<Fn, Args...>(fn), std::forward<Args>(args)...);
+        loop->invoke(bind(fn), std::forward<Args>(args)...);
     }
 
     // Invoke object->fn(args...) in the runloop thread, then invoke callback(result) in the current thread.
-    template <typename Fn, class... Args>
+    template <typename Fn, class Cb, class... Args>
     std::unique_ptr<WorkRequest>
-    invokeWithResult(Fn fn, std::function<void ()> callback, Args&&... args) {
-        return loop->invokeWithResult(bind<Fn, Args...>(fn), callback, std::forward<Args>(args)...);
-    }
-
-    // Invoke object->fn(args...) in the runloop thread, then invoke callback(result) in the current thread.
-    template <class R, typename Fn, class... Args>
-    std::unique_ptr<WorkRequest>
-    invokeWithResult(Fn fn, std::function<void (R)> callback, Args&&... args) {
-        return loop->invokeWithResult(bind<Fn, Args...>(fn), callback, std::forward<Args>(args)...);
+    invokeWithCallback(Fn fn, Cb&& callback, Args&&... args) {
+        return loop->invokeWithCallback(bind(fn), callback, std::forward<Args>(args)...);
     }
 
     // Invoke object->fn(args...) in the runloop thread, and wait for the result.
@@ -73,9 +66,11 @@ private:
     Thread& operator=(const Thread&) = delete;
     Thread& operator=(Thread&&) = delete;
 
-    template <typename Fn, class... Args>
+    template <typename Fn>
     auto bind(Fn fn) {
-        return [fn, this] (Args&&... a) { return (object->*fn)(std::forward<Args>(a)...); };
+        return [fn, this] (auto &&... args) {
+            return (object->*fn)(std::forward<decltype(args)>(args)...);
+        };
     }
 
     template <typename P, std::size_t... I>

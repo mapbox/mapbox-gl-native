@@ -131,10 +131,10 @@ std::unique_ptr<WorkRequest> SQLiteCache::get(const Resource &resource, Callback
     // Will try to load the URL from the SQLite database and call the callback when done.
     // Note that the callback is probably going to invoked from another thread, so the caller
     // must make sure that it can run in that thread.
-    return thread->invokeWithResult(&Impl::get, std::move(callback), resource);
+    return thread->invokeWithCallback(&Impl::get, callback, resource);
 }
 
-std::unique_ptr<Response> SQLiteCache::Impl::get(const Resource &resource) {
+void SQLiteCache::Impl::get(const Resource &resource, Callback callback) {
     try {
         // This is called in the SQLite event loop.
         if (!db) {
@@ -167,14 +167,14 @@ std::unique_ptr<Response> SQLiteCache::Impl::get(const Resource &resource) {
             if (getStmt->get<int>(5)) { // == compressed
                 response->data = util::decompress(response->data);
             }
-            return std::move(response);
+            callback(std::move(response));
         } else {
             // There is no data.
-            return nullptr;
+            callback(nullptr);
         }
     } catch (mapbox::sqlite::Exception& ex) {
         Log::Error(Event::Database, ex.code, ex.what());
-        return nullptr;
+        callback(nullptr);
     }
 }
 

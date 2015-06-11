@@ -19,7 +19,7 @@ public:
     Impl(uv_loop_t*, const std::string &path = ":memory:");
     ~Impl();
 
-    std::unique_ptr<Response> get(const Resource&);
+    void get(const Resource&, Callback);
     void put(const Resource& resource, std::shared_ptr<const Response> response);
     void refresh(const Resource& resource, int64_t expires);
 

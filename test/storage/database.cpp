@@ -15,8 +15,9 @@ TEST_F(Storage, DatabaseDoesNotExist) {
 
     SQLiteCache::Impl cache(nullptr, "test/fixtures/404/cache.db");
 
-    std::unique_ptr<Response> res = cache.get({ Resource::Unknown, "mapbox://test" });
-    EXPECT_EQ(nullptr, res.get());
+    cache.get({ Resource::Unknown, "mapbox://test" }, [] (std::unique_ptr<Response> res) {
+        EXPECT_EQ(nullptr, res.get());
+    });
 
     auto observer = Log::removeObserver();
     EXPECT_EQ(1ul, dynamic_cast<FixtureLogObserver*>(observer.get())->count({ EventSeverity::Error, Event::Database, 14, "unable to open database file" }));
@@ -56,8 +57,9 @@ TEST_F(Storage, DatabaseCreate) {
 
     SQLiteCache::Impl cache(nullptr, "test/fixtures/database/cache.db");
 
-    std::unique_ptr<Response> res = cache.get({ Resource::Unknown, "mapbox://test" });
-    EXPECT_EQ(nullptr, res.get());
+    cache.get({ Resource::Unknown, "mapbox://test" }, [] (std::unique_ptr<Response> res) {
+        EXPECT_EQ(nullptr, res.get());
+    });
 
     Log::removeObserver();
 }
@@ -115,8 +117,9 @@ TEST_F(Storage, DatabaseLockedRead) {
         // First request should fail.
         Log::setObserver(std::make_unique<FixtureLogObserver>());
 
-        std::unique_ptr<Response> res = cache.get({ Resource::Unknown, "mapbox://test" });
-        EXPECT_EQ(nullptr, res.get());
+        cache.get({ Resource::Unknown, "mapbox://test" }, [] (std::unique_ptr<Response> res) {
+            EXPECT_EQ(nullptr, res.get());
+        });
 
         // Make sure that we got a few "database locked" errors
         auto observer = Log::removeObserver();
@@ -131,8 +134,9 @@ TEST_F(Storage, DatabaseLockedRead) {
         // First, try getting a file (the cache value should not exist).
         Log::setObserver(std::make_unique<FixtureLogObserver>());
 
-        std::unique_ptr<Response> res = cache.get({ Resource::Unknown, "mapbox://test" });
-        EXPECT_EQ(nullptr, res.get());
+        cache.get({ Resource::Unknown, "mapbox://test" }, [] (std::unique_ptr<Response> res) {
+            EXPECT_EQ(nullptr, res.get());
+        });
 
         // Make sure that we got a no errors
         Log::removeObserver();
@@ -157,8 +161,9 @@ TEST_F(Storage, DatabaseLockedWrite) {
 
         auto response = std::make_shared<Response>();
         cache.put({ Resource::Unknown, "mapbox://test" }, response);
-        std::unique_ptr<Response> res = cache.get({ Resource::Unknown, "mapbox://test" });
-        EXPECT_EQ(nullptr, res.get());
+        cache.get({ Resource::Unknown, "mapbox://test" }, [] (std::unique_ptr<Response> res) {
+            EXPECT_EQ(nullptr, res.get());
+        });
 
         auto observer = Log::removeObserver();
         auto flo = dynamic_cast<FixtureLogObserver*>(observer.get());
@@ -175,9 +180,10 @@ TEST_F(Storage, DatabaseLockedWrite) {
         auto response = std::make_shared<Response>();
         response->data = "Demo";
         cache.put({ Resource::Unknown, "mapbox://test" }, response);
-        std::unique_ptr<Response> res = cache.get({ Resource::Unknown, "mapbox://test" });
-        EXPECT_NE(nullptr, res.get());
-        EXPECT_EQ("Demo", res->data);
+        cache.get({ Resource::Unknown, "mapbox://test" }, [] (std::unique_ptr<Response> res) {
+            EXPECT_NE(nullptr, res.get());
+            EXPECT_EQ("Demo", res->data);
+        });
 
         // Make sure that we got a no errors
         Log::removeObserver();
@@ -206,8 +212,9 @@ TEST_F(Storage, DatabaseLockedRefresh) {
         auto response = std::make_shared<Response>();
         response->data = "Demo";
         cache.put({ Resource::Unknown, "mapbox://test" }, response);
-        std::unique_ptr<Response> res = cache.get({ Resource::Unknown, "mapbox://test" });
-        EXPECT_EQ(nullptr, res.get());
+        cache.get({ Resource::Unknown, "mapbox://test" }, [] (std::unique_ptr<Response> res) {
+            EXPECT_EQ(nullptr, res.get());
+        });
 
         auto observer = Log::removeObserver();
         auto flo = dynamic_cast<FixtureLogObserver*>(observer.get());
@@ -221,8 +228,9 @@ TEST_F(Storage, DatabaseLockedRefresh) {
         auto response = std::make_shared<Response>();
         response->data = "Demo";
         cache.refresh({ Resource::Unknown, "mapbox://test" }, response->expires);
-        std::unique_ptr<Response> res = cache.get({ Resource::Unknown, "mapbox://test" });
-        EXPECT_EQ(nullptr, res.get());
+        cache.get({ Resource::Unknown, "mapbox://test" }, [] (std::unique_ptr<Response> res) {
+            EXPECT_EQ(nullptr, res.get());
+        });
 
         // Make sure that we got the right errors.
         auto observer = Log::removeObserver();
@@ -249,9 +257,10 @@ TEST_F(Storage, DatabaseDeleted) {
         auto response = std::make_shared<Response>();
         response->data = "Demo";
         cache.put({ Resource::Unknown, "mapbox://test" }, response);
-        std::unique_ptr<Response> res = cache.get({ Resource::Unknown, "mapbox://test" });
-        EXPECT_NE(nullptr, res.get());
-        EXPECT_EQ("Demo", res->data);
+        cache.get({ Resource::Unknown, "mapbox://test" }, [] (std::unique_ptr<Response> res) {
+            EXPECT_NE(nullptr, res.get());
+            EXPECT_EQ("Demo", res->data);
+        });
 
         Log::removeObserver();
     }
@@ -265,9 +274,10 @@ TEST_F(Storage, DatabaseDeleted) {
         auto response = std::make_shared<Response>();
         response->data = "Demo";
         cache.put({ Resource::Unknown, "mapbox://test" }, response);
-        std::unique_ptr<Response> res = cache.get({ Resource::Unknown, "mapbox://test" });
-        EXPECT_NE(nullptr, res.get());
-        EXPECT_EQ("Demo", res->data);
+        cache.get({ Resource::Unknown, "mapbox://test" }, [] (std::unique_ptr<Response> res) {
+            EXPECT_NE(nullptr, res.get());
+            EXPECT_EQ("Demo", res->data);
+        });
 
         auto observer = Log::removeObserver();
         auto flo = dynamic_cast<FixtureLogObserver*>(observer.get());
@@ -294,9 +304,10 @@ TEST_F(Storage, DatabaseInvalid) {
         auto response = std::make_shared<Response>();
         response->data = "Demo";
         cache.put({ Resource::Unknown, "mapbox://test" }, response);
-        std::unique_ptr<Response> res = cache.get({ Resource::Unknown, "mapbox://test" });
-        EXPECT_NE(nullptr, res.get());
-        EXPECT_EQ("Demo", res->data);
+        cache.get({ Resource::Unknown, "mapbox://test" }, [] (std::unique_ptr<Response> res) {
+            EXPECT_NE(nullptr, res.get());
+            EXPECT_EQ("Demo", res->data);
+        });
 
         auto observer = Log::removeObserver();
         auto flo = dynamic_cast<FixtureLogObserver*>(observer.get());

@@ -233,7 +233,9 @@ bool Source::handlePartialTile(const TileID& id, Worker&) {
         return true;
     }
 
-    util::ptr<TileData> data = it->second.lock();
+    // Note: this uses a raw pointer; we don't want the callback binding to have a
+    // shared pointer.
+    VectorTileData* data = static_cast<VectorTileData*>(it->second.lock().get());
     if (!data) {
         return true;
     }
@@ -241,14 +243,12 @@ bool Source::handlePartialTile(const TileID& id, Worker&) {
     // The signal is only emitted if there was an actual change on the tile. The
     // tile can be in a "partial" state waiting for resources and get reparsed on
     // the arrival of new resources that were needed by another tile.
-    size_t bucketCount = static_cast<VectorTileData*>(data.get())->countBuckets();
-    auto callback = [this, data, bucketCount]() {
-        if (static_cast<VectorTileData*>(data.get())->countBuckets() > bucketCount) {
+    size_t bucketCount = data->countBuckets();
+    return data->reparse([this, data, bucketCount]() {
+        if (data->countBuckets() > bucketCount) {
             emitTileLoaded(false);
         }
-    };
-
-    return data->reparse(callback);
+    });
 }
 
 TileData::State Source::addTile(MapData& data,
