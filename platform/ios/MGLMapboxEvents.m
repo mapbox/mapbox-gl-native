@@ -165,7 +165,7 @@ const NSTimeInterval MGLFlushInterval = 60;
 // This is an array of events to push. All access to it will be
 // from our own serial queue.
 //
-@property (nonatomic) NSMutableArray *eventQueue;
+@property (nonatomic) NS_MUTABLE_ARRAY_OF(MGLMapboxEventAttributes *) *eventQueue;
 
 // This is a custom serial queue for accessing the event queue.
 //
@@ -447,12 +447,14 @@ const NSTimeInterval MGLFlushInterval = 60;
 
             // Build only IDFV event
             NSString *vid = [[[UIDevice currentDevice] identifierForVendor] UUIDString];
-            NSDictionary *vevt = @{@"event" : MGLEventTypeAppUserTurnstile,
-                                   @"created" : [strongSelf.rfc3339DateFormatter stringFromDate:[NSDate date]],
-                                   @"appBundleId" : strongSelf.appBundleId,
-                                   @"vendorId": vid,
-                                   @"version": @(version),
-                                   @"instance": strongSelf.instanceID};
+            NSDictionary *vevt = @{
+                @"event" : MGLEventTypeAppUserTurnstile,
+                @"created" : [strongSelf.rfc3339DateFormatter stringFromDate:[NSDate date]],
+                @"appBundleId" : strongSelf.appBundleId,
+                @"vendorId": vid,
+                @"version": @(version),
+                @"instance": strongSelf.instanceID
+            };
 
             // Add to Queue
             [_eventQueue addObject:vevt];
@@ -465,7 +467,7 @@ const NSTimeInterval MGLFlushInterval = 60;
 // Can be called from any thread. Can be called rapidly from
 // the UI thread, so performance is paramount.
 //
-+ (void) pushEvent:(NSString *)event withAttributes:(NSDictionary *)attributeDictionary {
++ (void) pushEvent:(NSString *)event withAttributes:(MGLMapboxEventAttributes *)attributeDictionary {
     dispatch_async(dispatch_get_global_queue(DISPATCH_QUEUE_PRIORITY_BACKGROUND, 0), ^{
         [[MGLMapboxEvents sharedManager] pushEvent:event withAttributes:attributeDictionary];
     });
@@ -474,7 +476,7 @@ const NSTimeInterval MGLFlushInterval = 60;
 // Can be called from any thread. Called implicitly from public
 // use of +pushEvent:withAttributes:.
 //
-- (void) pushEvent:(NSString *)event withAttributes:(NSDictionary *)attributeDictionary {
+- (void) pushEvent:(NSString *)event withAttributes:(MGLMapboxEventAttributes *)attributeDictionary {
     __weak MGLMapboxEvents *weakSelf = self;
 
     dispatch_async(_serialQueue, ^{
@@ -490,7 +492,7 @@ const NSTimeInterval MGLFlushInterval = 60;
         
         if (!event) return;
 
-        NSMutableDictionary *evt = [[NSMutableDictionary alloc] initWithDictionary:attributeDictionary];
+        MGLMutableMapboxEventAttributes *evt = [MGLMutableMapboxEventAttributes dictionaryWithDictionary:attributeDictionary];
         // mapbox-events stock attributes
         [evt setObject:event forKey:@"event"];
         [evt setObject:@(version) forKey:@"version"];
@@ -577,7 +579,7 @@ const NSTimeInterval MGLFlushInterval = 60;
 // Can be called from any thread. Called implicitly from public
 // use of +flush. Posts an async network request to upload metrics.
 //
-- (void) postEvents:(NSArray *)events {
+- (void) postEvents:(NS_ARRAY_OF(MGLMapboxEventAttributes *) *)events {
     __weak MGLMapboxEvents *weakSelf = self;
 
     dispatch_async(dispatch_get_global_queue(DISPATCH_QUEUE_PRIORITY_BACKGROUND, 0), ^{

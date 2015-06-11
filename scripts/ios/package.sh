@@ -110,11 +110,19 @@ if [ -z `which appledoc` ]; then
 fi
 DOCS_OUTPUT="${OUTPUT}/static/Docs"
 DOCS_VERSION=$( git tag -l ios\* --sort -v:refname | sed -n '1p' | sed 's/^v//' )
-README="/tmp/GL-README.md"
+rm -rf /tmp/mbgl
+mkdir -p /tmp/mbgl/
+README=/tmp/mbgl/GL-README.md
 cat ios/README.md > ${README}
 echo >> ${README}
 echo -n "#" >> ${README}
 cat CHANGELOG.md >> ${README}
+# Copy headers to a temporary location where we can substitute macros that appledoc doesn't understand.
+cp -r "${OUTPUT}/static/Headers" /tmp/mbgl
+perl \
+    -pi \
+    -e 's/NS_(?:(MUTABLE)_)?(ARRAY|SET|DICTIONARY)_OF\(\s*(.+?)\s*\)/NS\L\u$1\u$2\E <$3>/g' \
+    /tmp/mbgl/Headers/*.h
 appledoc \
     --output ${DOCS_OUTPUT} \
     --project-name "Mapbox GL for iOS ${DOCS_VERSION}" \
@@ -123,6 +131,5 @@ appledoc \
     --no-create-docset \
     --no-install-docset \
     --company-id com.mapbox \
-    --ignore include/mbgl/ios/private \
     --index-desc ${README} \
-    include/mbgl/ios
+    /tmp/mbgl/Headers

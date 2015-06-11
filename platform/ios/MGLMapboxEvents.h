@@ -31,6 +31,9 @@ extern NSString *const MGLEventGesturePanStart;
 extern NSString *const MGLEventGesturePinchStart;
 extern NSString *const MGLEventGestureRotateStart;
 
+typedef NS_DICTIONARY_OF(NSString *, id) MGLMapboxEventAttributes;
+typedef NS_MUTABLE_DICTIONARY_OF(NSString *, id) MGLMutableMapboxEventAttributes;
+
 @interface MGLMapboxEvents : NSObject <NSURLSessionDelegate>
 
 + (nullable instancetype)sharedManager;
@@ -49,7 +52,7 @@ extern NSString *const MGLEventGestureRotateStart;
 // Copy any values needed first or create dedicated methods in this
 // class for threadsafe access to UIKit classes.
 //
-+ (void) pushEvent:(NSString *)event withAttributes:(NSDictionary *)attributeDictionary;
++ (void) pushEvent:(NSString *)event withAttributes:(MGLMapboxEventAttributes *)attributeDictionary;
 
 // You can call these methods from any thread.
 //
