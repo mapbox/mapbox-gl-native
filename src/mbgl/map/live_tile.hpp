@@ -4,47 +4,21 @@
 #include <map>
 
 #include <mbgl/map/geometry_tile.hpp>
+#include <mbgl/map/tile_id.hpp>
 
 namespace mbgl {
 
-class LiveTileFeature : public GeometryTileFeature {
-public:
-    LiveTileFeature(FeatureType, GeometryCollection, std::map<std::string, std::string> properties = {{}});
-
-    FeatureType getType() const override { return type; }
-    mapbox::util::optional<Value> getValue(const std::string&) const override;
-    GeometryCollection getGeometries() const override { return geometries; }
-
-private:
-    FeatureType type = FeatureType::Unknown;
-    std::map<std::string, std::string> properties;
-    GeometryCollection geometries;
-};
-
-class LiveTileLayer : public GeometryTileLayer {
-public:
-    LiveTileLayer();
-
-    void prepareToAddFeatures(size_t count);
-    void addFeature(util::ptr<const LiveTileFeature>);
-    void removeFeature(util::ptr<const LiveTileFeature>);
-    std::size_t featureCount() const override { return features.size(); }
-    util::ptr<const GeometryTileFeature> getFeature(std::size_t i) const override { return features[i]; }
-
-private:
-    std::vector<util::ptr<const LiveTileFeature>> features;
-};
+class AnnotationManager;
 
 class LiveTile : public GeometryTile {
 public:
-    LiveTile();
+    LiveTile(const AnnotationManager&, const TileID& id);
 
-    void addLayer(const std::string&, util::ptr<LiveTileLayer>);
     util::ptr<GeometryTileLayer> getLayer(const std::string&) const override;
-    util::ptr<LiveTileLayer> getMutableLayer(const std::string&) const;
 
 private:
-    std::map<std::string, util::ptr<LiveTileLayer>> layers;
+    const AnnotationManager& manager;
+    const TileID id;
 };
 
 }

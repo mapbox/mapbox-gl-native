@@ -1,9 +1,23 @@
 #include <mbgl/map/tile_id.hpp>
+#include <mbgl/util/geo.hpp>
 #include <mbgl/util/string.hpp>
 
 #include <cassert>
+#include <cmath>
 
 namespace mbgl {
+
+TileID::TileID(const int8_t z_, const LatLng& point)
+    : z(z_),
+      x((point.longitude / 360.0 + 0.5) * (1 << z)),
+      y([&] {
+          const double sine = std::sin(point.latitude * M_PI / 180.0);
+          return (0.5 - 0.25 * std::log((1.0 + sine) / (1.0 - sine)) / M_PI) * (1 << z);
+      }()),
+      w((x < 0 ? x - (1 << z) + 1 : x) / (1 << z)),
+      sourceZ(z_),
+      overscaling(1) {
+}
 
 TileID TileID::parent(int8_t parent_z, int8_t sourceMaxZoom) const {
     assert(parent_z < z);
