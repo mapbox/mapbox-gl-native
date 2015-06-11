@@ -190,7 +190,7 @@ AnnotationManager::addTileFeature(const uint32_t annotationID,
 
         using namespace mapbox::util::geojsonvt;
 
-        const uint32_t z2 = 1 << 14;
+        const uint32_t z2 = 1 << maxZoom;
         const double baseTolerance = 3;
         const uint16_t extent = 4096;
 
