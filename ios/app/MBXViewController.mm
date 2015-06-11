@@ -6,6 +6,8 @@
 
 #import <CoreLocation/CoreLocation.h>
 
+#import <Foundation/NSPathUtilities.h>
+
 #import "MBXAnnotation.h"
 
 static UIColor *const kTintColor = [UIColor colorWithRed:0.120 green:0.550 blue:0.670 alpha:1.000];
@@ -59,7 +61,7 @@ mbgl::Settings_NSUserDefaults *settings = nullptr;
 
     UIButton *titleButton = [UIButton buttonWithType:UIButtonTypeCustom];
     [titleButton setFrame:CGRectMake(0, 0, 150, 40)];
-    [titleButton setTitle:[@(self.selectedStyleIdx) stringValue] forState:UIControlStateNormal];
+    [titleButton setTitle:[[[self.mapView.bundledStyleURLs objectAtIndex:self.selectedStyleIdx] lastPathComponent] stringByDeletingPathExtension] forState:UIControlStateNormal];
     [titleButton setTitleColor:kTintColor forState:UIControlStateNormal];
     [titleButton addTarget:self action:@selector(cycleStyles) forControlEvents:UIControlEventTouchUpInside];
     self.navigationItem.titleView = titleButton;
@@ -221,7 +223,7 @@ mbgl::Settings_NSUserDefaults *settings = nullptr;
 
     self.mapView.styleURL = [self.mapView.bundledStyleURLs objectAtIndex:self.selectedStyleIdx];
 
-    [titleButton setTitle:[@(self.selectedStyleIdx) stringValue] forState:UIControlStateNormal];
+    [titleButton setTitle:[[[self.mapView.bundledStyleURLs objectAtIndex:self.selectedStyleIdx] lastPathComponent] stringByDeletingPathExtension] forState:UIControlStateNormal];
 }
 
 - (void)locateUser
