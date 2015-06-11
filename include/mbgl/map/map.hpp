@@ -21,6 +21,7 @@ class View;
 class MapData;
 class MapContext;
 class StillImage;
+class PointAnnotation;
 
 namespace util {
 template <class T> class Thread;
@@ -111,9 +112,8 @@ public:
     // Annotations
     void setDefaultPointAnnotationSymbol(const std::string&);
     double getTopOffsetPixelsForAnnotationSymbol(const std::string&);
-    uint32_t addPointAnnotation(const LatLng&, const std::string& symbol);
-    std::vector<uint32_t> addPointAnnotations(const std::vector<LatLng>&,
-                                              const std::vector<std::string>& symbols);
+    uint32_t addPointAnnotation(const PointAnnotation&);
+    std::vector<uint32_t> addPointAnnotations(const std::vector<PointAnnotation>&);
     void removeAnnotation(uint32_t);
     void removeAnnotations(const std::vector<uint32_t>&);
     std::vector<uint32_t> getAnnotationsInBounds(const LatLngBounds&);

@@ -8,6 +8,7 @@
 #import <OpenGLES/EAGL.h>
 
 #include <mbgl/mbgl.hpp>
+#include <mbgl/annotation/point_annotation.hpp>
 #include <mbgl/platform/platform.hpp>
 #include <mbgl/platform/darwin/reachability.h>
 #include <mbgl/storage/default_file_source.hpp>
@@ -1669,19 +1670,14 @@ CLLocationCoordinate2D MGLLocationCoordinate2DFromLatLng(mbgl::LatLng latLng)
 {
     if ( ! annotations) return;
 
-    std::vector<mbgl::LatLng> latLngs;
-    latLngs.reserve(annotations.count);
-
-    std::vector<std::string> symbols;
-    symbols.reserve(annotations.count);
+    std::vector<mbgl::PointAnnotation> points;
+    points.reserve(annotations.count);
 
     BOOL delegateImplementsSymbolLookup = [self.delegate respondsToSelector:@selector(mapView:symbolNameForAnnotation:)];
 
     for (id <MGLAnnotation> annotation in annotations)
     {
         assert([annotation conformsToProtocol:@protocol(MGLAnnotation)]);
-
-        latLngs.push_back(MGLLatLngFromLocationCoordinate2D(annotation.coordinate));
 
         NSString *symbolName = nil;
 
@@ -1690,10 +1686,10 @@ CLLocationCoordinate2D MGLLocationCoordinate2DFromLatLng(mbgl::LatLng latLng)
             symbolName = [self.delegate mapView:self symbolNameForAnnotation:annotation];
         }
 
-        symbols.push_back((symbolName ? [symbolName UTF8String] : ""));
+        points.emplace_back(MGLLatLngFromLocationCoordinate2D(annotation.coordinate), (symbolName ? [symbolName UTF8String] : ""));
     }
 
-    std::vector<uint32_t> annotationIDs = _mbglMap->addPointAnnotations(latLngs, symbols);
+    std::vector<uint32_t> annotationIDs = _mbglMap->addPointAnnotations(points);
 
     for (size_t i = 0; i < annotationIDs.size(); ++i)
     {

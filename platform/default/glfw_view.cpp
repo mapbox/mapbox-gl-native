@@ -1,3 +1,4 @@
+#include <mbgl/annotation/point_annotation.hpp>
 #include <mbgl/platform/default/glfw_view.hpp>
 #include <mbgl/platform/gl.hpp>
 #include <mbgl/platform/log.hpp>
@@ -130,8 +131,7 @@ void GLFWView::onKey(GLFWwindow *window, int key, int /*scancode*/, int action, 
 }
 
 void GLFWView::addRandomPointAnnotations(int count) {
-    std::vector<mbgl::LatLng> points;
-    std::vector<std::string> markers;
+    std::vector<mbgl::PointAnnotation> points;
 
     const auto sw = map->latLngForPixel({ 0, 0 });
     const auto ne = map->latLngForPixel({ double(width), double(height) });
@@ -140,11 +140,10 @@ void GLFWView::addRandomPointAnnotations(int count) {
         const double lon = sw.longitude + (ne.longitude - sw.longitude) * (double(std::rand()) / RAND_MAX);
         const double lat = sw.latitude + (ne.latitude - sw.latitude) * (double(std::rand()) / RAND_MAX);
 
-        points.push_back({ lat, lon });
-        markers.push_back("default_marker");
+        points.emplace_back(mbgl::LatLng{ lat, lon }, "default_marker");
     }
 
-    map->addPointAnnotations(points, markers);
+    map->addPointAnnotations(points);
 }
 
 void GLFWView::onScroll(GLFWwindow *window, double /*xOffset*/, double yOffset) {
