@@ -37,6 +37,9 @@
 
         'miscellaneous/assert.cpp',
 
+        'annotations/sprite_image.cpp',
+        'annotations/sprite_store.cpp',
+
         'api/api_misuse.cpp',
         'api/repeated_render.cpp',
         'api/set_style.cpp',

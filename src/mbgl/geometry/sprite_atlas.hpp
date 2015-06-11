@@ -46,8 +46,10 @@ public:
     // This getter attempts to read the image from the sprite if it is already loaded.
     // In that case, it copies it into the sprite atlas and returns the dimensions.
     // Otherwise, it returns a 0/0/0/0 rect.
+    // This function is used during bucket creation.
     Rect<dimension> getImage(const std::string& name, const bool wrap);
 
+    // This function is used for getting the position during render time.
     SpriteAtlasPosition getPosition(const std::string& name, bool repeating = false);
 
     // Binds the atlas texture to the GPU, and uploads data if it is out of date.
