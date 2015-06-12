@@ -20,7 +20,6 @@ export PATH="`pwd`/.mason:${PATH}" MASON_DIR="`pwd`/.mason"
 
 RAPIDJSON_VERSION=1.0.2
 VARIANT_VERSION=1.0
-GTEST_VERSION=1.7.0
 ZLIB_VERSION=system
 
 case ${MASON_PLATFORM} in
@@ -41,6 +40,7 @@ case ${MASON_PLATFORM} in
         LIBZIP_VERSION=0.11.2
         ;;
     *)
+        GTEST_VERSION=1.7.0
         GLFW_VERSION=3.1
         SQLITE_VERSION=3.8.8.1
         LIBPNG_VERSION=1.6.16
