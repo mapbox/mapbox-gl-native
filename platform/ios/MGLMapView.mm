@@ -256,7 +256,7 @@ std::chrono::steady_clock::duration secondsAsDuration(float duration)
     // Notify map object when network reachability status changes.
     [[NSNotificationCenter defaultCenter] addObserver:self
                                              selector:@selector(reachabilityChanged:)
-                                                 name:kReachabilityChangedNotification
+                                                 name:kMGLReachabilityChangedNotification
                                                object:nil];
 
     MGLReachability* reachability = [MGLReachability reachabilityForInternetConnection];
