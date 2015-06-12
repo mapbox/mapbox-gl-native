@@ -2,27 +2,27 @@
 
 #include <mbgl/util/merge_lines.hpp>
 
-const std::u32string a = U"a";
-const std::u32string b = U"b";
+const std::u32string aaa = U"a";
+const std::u32string bbb = U"b";
 
 TEST(MergeLines, SameText) {
     // merges lines with the same text
     std::vector<mbgl::SymbolFeature> input1 = {
-        { {{{0, 0}, {1, 0}, {2, 0}}}, a, "" },
-        { {{{4, 0}, {5, 0}, {6, 0}}}, b, "" },
-        { {{{8, 0}, {9, 0}}}, a, "" },
-        { {{{2, 0}, {3, 0}, {4, 0}}}, a, "" },
-        { {{{6, 0}, {7, 0}, {8, 0}}}, a, "" },
-        { {{{5, 0}, {6, 0}}}, a, "" }
+        { {{{0, 0}, {1, 0}, {2, 0}}}, aaa, "" },
+        { {{{4, 0}, {5, 0}, {6, 0}}}, bbb, "" },
+        { {{{8, 0}, {9, 0}}}, aaa, "" },
+        { {{{2, 0}, {3, 0}, {4, 0}}}, aaa, "" },
+        { {{{6, 0}, {7, 0}, {8, 0}}}, aaa, "" },
+        { {{{5, 0}, {6, 0}}}, aaa, "" }
     };
 
     const std::vector<mbgl::SymbolFeature> expected1 = {
-        { {{{0, 0}, {1, 0}, {2, 0}, {3, 0}, {4, 0}}}, a, "" },
-        { {{{4, 0}, {5, 0}, {6, 0}}}, b, "" },
-        { {{{5, 0}, {6, 0}, {7, 0}, {8, 0}, {9, 0}}}, a, "" },
-        { {{}}, a, "" },
-        { {{}}, a, "" },
-        { {{}}, a, "" }
+        { {{{0, 0}, {1, 0}, {2, 0}, {3, 0}, {4, 0}}}, aaa, "" },
+        { {{{4, 0}, {5, 0}, {6, 0}}}, bbb, "" },
+        { {{{5, 0}, {6, 0}, {7, 0}, {8, 0}, {9, 0}}}, aaa, "" },
+        { {{}}, aaa, "" },
+        { {{}}, aaa, "" },
+        { {{}}, aaa, "" }
     };
 
     mbgl::util::mergeLines(input1);
@@ -35,15 +35,15 @@ TEST(MergeLines, SameText) {
 TEST(MergeLines, BothEnds) {
     // mergeLines handles merge from both ends
     std::vector<mbgl::SymbolFeature> input2 = {
-        { {{{0, 0}, {1, 0}, {2, 0}}}, a, "" },
-        { {{{4, 0}, {5, 0}, {6, 0}}}, a, "" },
-        { {{{2, 0}, {3, 0}, {4, 0}}}, a, "" }
+        { {{{0, 0}, {1, 0}, {2, 0}}}, aaa, "" },
+        { {{{4, 0}, {5, 0}, {6, 0}}}, aaa, "" },
+        { {{{2, 0}, {3, 0}, {4, 0}}}, aaa, "" }
     };
 
     const std::vector<mbgl::SymbolFeature> expected2 = {
-        { {{{0, 0}, {1, 0}, {2, 0}, {3, 0}, {4, 0}, {5, 0}, {6, 0}}}, a, "" },
-        { {{}}, a, "" },
-        { {{}}, a, "" }
+        { {{{0, 0}, {1, 0}, {2, 0}, {3, 0}, {4, 0}, {5, 0}, {6, 0}}}, aaa, "" },
+        { {{}}, aaa, "" },
+        { {{}}, aaa, "" }
     };
 
     mbgl::util::mergeLines(input2);
@@ -56,15 +56,15 @@ TEST(MergeLines, BothEnds) {
 TEST(MergeLines, CircularLines) {
     // mergeLines handles circular lines
     std::vector<mbgl::SymbolFeature> input3 = {
-        { {{{0, 0}, {1, 0}, {2, 0}}}, a, "" },
-        { {{{2, 0}, {3, 0}, {4, 0}}}, a, "" },
-        { {{{4, 0}, {0, 0}}}, a, "" }
+        { {{{0, 0}, {1, 0}, {2, 0}}}, aaa, "" },
+        { {{{2, 0}, {3, 0}, {4, 0}}}, aaa, "" },
+        { {{{4, 0}, {0, 0}}}, aaa, "" }
     };
 
     const std::vector<mbgl::SymbolFeature> expected3 = {
-        { {{{0, 0}, {1, 0}, {2, 0}, {3, 0}, {4, 0}, {0, 0}}}, a, "" },
-        { {{}}, a, "" },
-        { {{}}, a, "" }
+        { {{{0, 0}, {1, 0}, {2, 0}, {3, 0}, {4, 0}, {0, 0}}}, aaa, "" },
+        { {{}}, aaa, "" },
+        { {{}}, aaa, "" }
     };
 
     mbgl::util::mergeLines(input3);
