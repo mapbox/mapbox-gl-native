@@ -135,16 +135,19 @@ void Environment::cancelRequest(Request* req) {
 
 void Environment::abandonVAO(uint32_t vao) {
     assert(currentlyOn(ThreadType::Map));
+    assert(vao > 0);
     abandonedVAOs.emplace_back(vao);
 }
 
 void Environment::abandonBuffer(uint32_t buffer) {
     assert(currentlyOn(ThreadType::Map));
+    assert(buffer > 0);
     abandonedBuffers.emplace_back(buffer);
 }
 
 void Environment::abandonTexture(uint32_t texture) {
     assert(currentlyOn(ThreadType::Map));
+    assert(texture > 0);
     abandonedTextures.emplace_back(texture);
 }
 
