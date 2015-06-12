@@ -170,7 +170,7 @@ TEST_P(ResourceLoading, RequestWithCorruptedData) {
     }
 
     if (param.find("json") != std::string::npos) {
-        message << ": 0 - Expect either an object or array at root";
+        message << ": 0 - Invalid value.";
     }
 
     runTestCase(MockFileSource::RequestWithCorruptedData, GetParam(), message.str());
