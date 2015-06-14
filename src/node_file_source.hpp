@@ -49,7 +49,7 @@ private:
 
 private:
 #if (NODE_MODULE_VERSION > NODE_0_10_MODULE_VERSION)
-    std::unordered_map<mbgl::Resource, const v8::UniquePersistent<v8::Object> &, mbgl::Resource::Hash> pending;
+    std::unordered_map<mbgl::Resource, v8::Persistent<v8::Object, v8::CopyablePersistentTraits<v8::Object>>, mbgl::Resource::Hash> pending;
 #else
     std::unordered_map<mbgl::Resource, v8::Persistent<v8::Object>, mbgl::Resource::Hash> pending;
 #endif

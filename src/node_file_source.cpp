@@ -121,12 +121,9 @@ void NodeFileSource::processAdd(const mbgl::Resource& resource) {
 
     auto handle = NanObjectWrapHandle(this);
     auto requestHandle = NanNew<v8::Object>(NodeRequest::Create(handle, resource));
-#if (NODE_MODULE_VERSION > NODE_0_10_MODULE_VERSION)
-    const v8::UniquePersistent<v8::Object> requestPersistent(v8::Isolate::GetCurrent(), requestHandle);
-#else
+
     v8::Persistent<v8::Object> requestPersistent;
     NanAssignPersistent(requestPersistent, requestHandle);
-#endif
     pending.emplace(resource, std::move(requestPersistent));
 
     v8::Local<v8::Value> argv[] = { requestHandle };
@@ -143,12 +140,9 @@ void NodeFileSource::processCancel(const mbgl::Resource& resource) {
     } else {
 #if (NODE_MODULE_VERSION > NODE_0_10_MODULE_VERSION)
         auto requestHandle = v8::Local<v8::Object>::New(v8::Isolate::GetCurrent(), it->second);
+        it->second.Reset();
 #else
         auto requestHandle = NanNew<v8::Object>(it->second);
-#endif
-
-        // Dispose and remove the persistent handle
-#if (NODE_MODULE_VERSION <= NODE_0_10_MODULE_VERSION)
         NanDisposePersistent(it->second);
 #endif
         pending.erase(it);
@@ -173,7 +167,9 @@ void NodeFileSource::notify(const mbgl::Resource& resource, const std::shared_pt
     // First, remove the request, since it might be destructed at any point now.
     auto it = pending.find(resource);
     if (it != pending.end()) {
-#if (NODE_MODULE_VERSION <= NODE_0_10_MODULE_VERSION)
+#if (NODE_MODULE_VERSION > NODE_0_10_MODULE_VERSION)
+        it->second.Reset();
+#else
         NanDisposePersistent(it->second);
 #endif
         pending.erase(it);
