@@ -1,5 +1,13 @@
 #import <Foundation/Foundation.h>
 
+#if !__has_feature(nullability)
+    #define NS_ASSUME_NONNULL_BEGIN
+    #define NS_ASSUME_NONNULL_END
+    #define nullable
+    #define nonnull
+    #define null_resettable
+#endif
+
 NS_ASSUME_NONNULL_BEGIN
 
 extern NSString * const MGLErrorDomain;
