@@ -132,11 +132,7 @@ test('Map', function(t) {
             });
         });
 
-        t.skip('accepts a JSON stylesheet', { timeout: 1000 }, function(t) {
-            mbgl.once('message', function(msg) {
-                console.log(msg);
-            });
-
+        t.test('accepts a JSON stylesheet', { timeout: 1000 }, function(t) {
             setup(fileSource, function(map) {
                 t.doesNotThrow(function() {
                     map.load(style);
@@ -148,11 +144,7 @@ test('Map', function(t) {
             });
         });
 
-        t.skip('accepts a stringified stylesheet', { timeout: 1000 }, function(t) {
-            mbgl.once('message', function(msg) {
-                console.log(msg);
-            });
-
+        t.test('accepts a stringified stylesheet', { timeout: 1000 }, function(t) {
             setup(fileSource, function(map) {
                 t.doesNotThrow(function() {
                     map.load(JSON.stringify(style));
