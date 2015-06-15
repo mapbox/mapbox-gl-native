@@ -7,7 +7,7 @@
 #include <mbgl/style/style_properties.hpp>
 #include <mbgl/style/types.hpp>
 #include <mbgl/util/geo.hpp>
-#include <mbgl/util/geojsonvt.hpp>
+#include <mbgl/util/geojsonvt/geojsonvt.hpp>
 #include <mbgl/util/noncopyable.hpp>
 #include <mbgl/util/vec.hpp>
 
