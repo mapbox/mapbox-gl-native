@@ -10,8 +10,10 @@
 #include <nan.h>
 #pragma GCC diagnostic pop
 
-#include <map>
 #include <memory>
+#include <mutex>
+#include <unordered_map>
+#include <vector>
 
 namespace node_mbgl {
 
@@ -36,21 +38,32 @@ public:
     void cancel(mbgl::Request*);
 
     // visiblity?
-    void notify(mbgl::Request*, const std::shared_ptr<const mbgl::Response>&);
+    void notify(const mbgl::Resource&, const std::shared_ptr<const mbgl::Response>&);
 
 private:
     struct Action;
     using Queue = util::AsyncQueue<Action>;
 
-    void processAdd(mbgl::Request*);
-    void processCancel(mbgl::Request*);
+    void processAdd(const mbgl::Resource&);
+    void processCancel(const mbgl::Resource&);
 
 private:
 #if (NODE_MODULE_VERSION > NODE_0_10_MODULE_VERSION)
-    std::map<mbgl::Request*, const v8::UniquePersistent<v8::Object> &> pending;
+    std::unordered_map<mbgl::Resource, v8::Persistent<v8::Object, v8::CopyablePersistentTraits<v8::Object>>, mbgl::Resource::Hash> pending;
 #else
-    std::map<mbgl::Request*, v8::Persistent<v8::Object>> pending;
+    std::unordered_map<mbgl::Resource, v8::Persistent<v8::Object>, mbgl::Resource::Hash> pending;
 #endif
+
+    // The observers list will hold pointers to all the requests waiting
+    // for a particular resource. It is also used for coalescing requests,
+    // so we don't ask for the same resources twice. The access must be
+    // guarded by a mutex because the list is also accessed by a thread
+    // from the mbgl::Map object and from the main thread when notifying
+    // requests of completion. Concurrent access is specially needed when
+    // canceling a request to avoid a deadlock (see #129).
+    std::unordered_map<mbgl::Resource, std::vector<mbgl::Request*>, mbgl::Resource::Hash> observers;
+    std::mutex observersMutex;
+
     Queue *queue = nullptr;
 };
 

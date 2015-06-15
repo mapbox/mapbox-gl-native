@@ -132,11 +132,7 @@ test('Map', function(t) {
             });
         });
 
-        t.skip('accepts a JSON stylesheet', { timeout: 1000 }, function(t) {
-            mbgl.once('message', function(msg) {
-                console.log(msg);
-            });
-
+        t.test('accepts a JSON stylesheet', { timeout: 1000 }, function(t) {
             setup(fileSource, function(map) {
                 t.doesNotThrow(function() {
                     map.load(style);
@@ -148,11 +144,7 @@ test('Map', function(t) {
             });
         });
 
-        t.skip('accepts a stringified stylesheet', { timeout: 1000 }, function(t) {
-            mbgl.once('message', function(msg) {
-                console.log(msg);
-            });
-
+        t.test('accepts a stringified stylesheet', { timeout: 1000 }, function(t) {
             setup(fileSource, function(map) {
                 t.doesNotThrow(function() {
                     map.load(JSON.stringify(style));
@@ -162,6 +154,144 @@ test('Map', function(t) {
 
                 t.end();
             });
+        });
+
+        t.end();
+    });
+
+    t.test('request coalesting', function(t) {
+        var requestList = [];
+        var fileSourceDoNotReply = new mbgl.FileSource();
+
+        // This file source will never reply to any
+        // request other than "./fixtures/tiles.tilejson" which
+        // will force the cancellation of the pending requests.
+        fileSourceDoNotReply.request = function(req) {
+            if (req.url != "./fixtures/tiles.tilejson") {
+                requestList.push(req);
+                return;
+            }
+
+            fs.readFile(path.join('test', req.url), function(err, data) {
+                req.respond(err, { data: data });
+            });
+        };
+
+        fileSourceDoNotReply.cancel = function() {
+            requestList.pop();
+        };
+
+        t.test('merge requests/cancels for the same resource', function(t) {
+            var map1 = new mbgl.Map(fileSourceDoNotReply);
+            var map2 = new mbgl.Map(fileSourceDoNotReply);
+            var map3 = new mbgl.Map(fileSourceDoNotReply);
+            var map4 = new mbgl.Map(fileSourceDoNotReply);
+            var map5 = new mbgl.Map(fileSourceDoNotReply);
+
+            map1.load(style);
+            map2.load(style);
+            map3.load(style);
+            map4.load(style);
+            map5.load(style);
+
+            var renderCallback = function(err, data) {}
+
+            map1.render({}, renderCallback);
+            map2.render({}, renderCallback);
+            map3.render({}, renderCallback);
+            map4.render({}, renderCallback);
+            map5.render({}, renderCallback);
+
+            var checkCancel = function() {
+                t.equal(requestList.length, 0);
+                t.end();
+            };
+
+            var checkCoalescing = function() {
+                // Check if all the 5 vector tile
+                // requests are going to merge in
+                // a single request.
+                t.equal(requestList.length, 1);
+
+                // This should cause the pending
+                // resources to get canceled, but
+                // only one cancel is emitted, because
+                // all map objects requested the same
+                // resource.
+                map1.release();
+                map2.release();
+                map3.release();
+                map4.release();
+                map5.release();
+
+                setTimeout(checkCancel, 500);
+            };
+
+            setTimeout(checkCoalescing, 500);
+        });
+
+        var vectorTileRequestCount = 0;
+        var fileSourceDelay = new mbgl.FileSource();
+
+        // This file source will add a little delay before
+        // replying so we make sure that all the map objects
+        // request the same resource will get a reply from the
+        // same request.
+        fileSourceDelay.request = function(req) {
+            var timeout = 0;
+
+            if (req.url != "./fixtures/tiles.tilejson") {
+                timeout = 500;
+                t.ok(++vectorTileRequestCount == 1, "Should make only one request for tiles");
+            }
+
+            var readFile = function() {
+                fs.readFile(path.join('test', req.url), function(err, data) {
+                    req.respond(err, { data: data });
+                });
+            };
+
+            setTimeout(readFile, timeout);
+        };
+
+        fileSourceDelay.cancel = function() {
+            t.fail("Should never cancel");
+        };
+
+        t.test('one request for the same resource notifies multiple map objects', function(t) {
+            var map1 = new mbgl.Map(fileSourceDelay);
+            var map2 = new mbgl.Map(fileSourceDelay);
+            var map3 = new mbgl.Map(fileSourceDelay);
+            var map4 = new mbgl.Map(fileSourceDelay);
+            var map5 = new mbgl.Map(fileSourceDelay);
+
+            map1.load(style);
+            map2.load(style);
+            map3.load(style);
+            map4.load(style);
+            map5.load(style);
+
+            var renderFinishedCount = 0;
+            var renderCallback = function(err, data) {
+                // We make only one request for tiles, but that
+                // should be enough for all these map objects because
+                // they all want the same resource.
+                if (++renderFinishedCount == 5) {
+                    map1.release();
+                    map2.release();
+                    map3.release();
+                    map4.release();
+                    map5.release();
+
+                    t.end();
+                }
+            }
+
+            map1.render({}, renderCallback);
+            map2.render({}, renderCallback);
+            map3.render({}, renderCallback);
+            map4.render({}, renderCallback);
+            map5.render({}, renderCallback);
         });
 
         t.end();
@@ -220,10 +350,10 @@ test('Map', function(t) {
             });
         });
 
-        t.skip('returns an error', function(t) {
+        t.test('returns an error', function(t) {
             mbgl.on('message', function(msg) {
                 t.ok(msg, 'emits error');
-                t.equal(msg.class, 'ResourceLoader');
+                t.equal(msg.class, 'Style');
                 t.equal(msg.severity, 'ERROR');
                 t.ok(msg.text.match(/Failed to load/), 'error text matches');
             });
