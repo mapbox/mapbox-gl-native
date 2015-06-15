@@ -2,6 +2,9 @@
 
 Renders map tiles with [Mapbox GL](https://github.com/mapbox/mapbox-gl-native).
 
+
+[![NPM](https://nodei.co/npm/mapbox-gl-native.png)](https://npmjs.org/package/mapbox-gl-native)
+
 [![Build Status](https://travis-ci.org/mapbox/node-mapbox-gl-native.svg?branch=master)](https://travis-ci.org/mapbox/node-mapbox-gl-native)
 
 ## Installing
