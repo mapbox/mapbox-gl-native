@@ -68,16 +68,19 @@ matrix:
   - os: osx
     compiler: clang
     env:
+    - CXX: clang++
     - NODE_EXE: "iojs"
     - NODE_VERSION: 2.0.1
   - os: osx
     compiler: clang
     env:
+    - CXX: clang++
     - NODE_EXE: "node"
     - NODE_VERSION: 0.12.0
   - os: osx
     compiler: clang
     env:
+    - CXX: clang++
     - NODE_EXE: "node"
     - NODE_VERSION: 0.10.36
 
