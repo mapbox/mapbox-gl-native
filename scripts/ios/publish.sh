@@ -5,7 +5,7 @@ set -o pipefail
 set -u
 
 #
-# iOS release tag format is `ios-vX.Y.Z`; `X.Y.Z` gets passed in
+# iOS release tag format is `vX.Y.Z`; `X.Y.Z` gets passed in
 #
 PUBLISH_VERSION="$1"
 
