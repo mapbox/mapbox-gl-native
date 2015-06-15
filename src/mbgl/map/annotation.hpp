@@ -2,7 +2,6 @@
 #define MBGL_MAP_ANNOTATIONS
 
 #include <mbgl/map/tile_id.hpp>
-#include <mbgl/annotation/point_annotation.hpp>
 #include <mbgl/util/geo.hpp>
 #include <mbgl/util/noncopyable.hpp>
 #include <mbgl/util/vec.hpp>
@@ -30,7 +29,7 @@ public:
 
     void setDefaultPointAnnotationSymbol(const std::string& symbol);
     std::pair<std::vector<TileID>, AnnotationIDs> addPointAnnotations(
-        const std::vector<PointAnnotation>&, const MapData&);
+        const std::vector<LatLng>&, const std::vector<std::string>& symbols, const MapData&);
     std::vector<TileID> removeAnnotations(const AnnotationIDs&, const MapData&);
     AnnotationIDs getAnnotationsInBounds(const LatLngBounds&, const MapData&) const;
     LatLngBounds getBoundsForAnnotations(const AnnotationIDs&) const;

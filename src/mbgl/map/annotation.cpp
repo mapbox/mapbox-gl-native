@@ -85,7 +85,8 @@ vec2<double> AnnotationManager::projectPoint(const LatLng& point) {
 }
 
 std::pair<std::vector<TileID>, AnnotationIDs>
-AnnotationManager::addPointAnnotations(const std::vector<PointAnnotation>& points,
+AnnotationManager::addPointAnnotations(const std::vector<LatLng>& points,
+                                       const std::vector<std::string>& symbols,
                                        const MapData& data) {
     std::lock_guard<std::mutex> lock(mtx);
 
@@ -102,14 +103,14 @@ AnnotationManager::addPointAnnotations(const std::vector<PointAnnotation>& point
 
     std::vector<TileID> affectedTiles;
 
-    for (const PointAnnotation& point : points) {
+    for (size_t i = 0; i < points.size(); ++i) {
         const uint32_t annotationID = nextID();
 
         // track the annotation global ID and its geometry
         auto anno_it = annotations.emplace(
             annotationID,
             std::make_unique<Annotation>(AnnotationType::Point,
-                                          AnnotationSegments({ { point.position } })));
+                                          AnnotationSegments({ { points[i] } })));
 
         const uint8_t maxZoom = data.transform.getMaxZoom();
 
@@ -117,7 +118,7 @@ AnnotationManager::addPointAnnotations(const std::vector<PointAnnotation>& point
         uint32_t z2 = 1 << maxZoom;
 
         // projection conversion into unit space
-        const vec2<double> p = projectPoint(point.position);
+        const vec2<double> p = projectPoint(points[i]);
 
         uint32_t x = p.x * z2;
         uint32_t y = p.y * z2;
@@ -133,7 +134,7 @@ AnnotationManager::addPointAnnotations(const std::vector<PointAnnotation>& point
 
             // at render time we style the annotation according to its {sprite} field
             const std::map<std::string, std::string> properties = {
-                { "sprite", (point.icon.length() ? point.icon : defaultPointAnnotationSymbol) }
+                { "sprite", (symbols[i].length() ? symbols[i] : defaultPointAnnotationSymbol) }
             };
 
             auto feature =

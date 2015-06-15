@@ -235,12 +235,12 @@ double Map::getTopOffsetPixelsForAnnotationSymbol(const std::string& symbol) {
     return context->invokeSync<double>(&MapContext::getTopOffsetPixelsForAnnotationSymbol, symbol);
 }
 
-uint32_t Map::addPointAnnotation(const PointAnnotation& annotation) {
-    return addPointAnnotations({ annotation }).front();
+uint32_t Map::addPointAnnotation(const LatLng& point, const std::string& symbol) {
+    return addPointAnnotations({ point }, { symbol }).front();
 }
 
-std::vector<uint32_t> Map::addPointAnnotations(const std::vector<PointAnnotation>& annotations) {
-    auto result = data->annotationManager.addPointAnnotations(annotations, *data);
+std::vector<uint32_t> Map::addPointAnnotations(const std::vector<LatLng>& points, const std::vector<std::string>& symbols) {
+    auto result = data->annotationManager.addPointAnnotations(points, symbols, *data);
     context->invoke(&MapContext::updateAnnotationTiles, result.first);
     return result.second;
 }
