@@ -143,6 +143,9 @@ ipackage-sim: Xcode/ios
 itest: ipackage-sim KIF
 	./scripts/ios/test.sh
 
+ianalyze:
+	./scripts/ios/analyze.sh
+
 # Legacy name
 iproj: ios-proj
 

@@ -29,4 +29,8 @@ else
     # build & test iOS
     mapbox_time "run_ios_tests" \
     make ipackage-sim
+
+    # run the static analyzer
+    mapbox_time "analyze_ios" \
+    make ianalyze
 fi
