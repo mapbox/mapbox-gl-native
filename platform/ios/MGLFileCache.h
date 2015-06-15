@@ -1,6 +1,8 @@
-#import <Foundation/Foundation.h>
+#import "MGLTypes.h"
 
 #include <mbgl/storage/sqlite_cache.hpp>
+
+NS_ASSUME_NONNULL_BEGIN
 
 @interface MGLFileCache : NSObject
 
@@ -8,3 +10,5 @@
 + (void)releaseSharedCacheForObject:(NSObject *)object;
 
 @end
+
+NS_ASSUME_NONNULL_END

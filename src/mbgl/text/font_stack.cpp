@@ -27,8 +27,8 @@ const Shaping FontStack::getShaping(const std::u32string &string, const float ma
     // the y offset *should* be part of the font metadata
     const int32_t yOffset = -17;
 
-    int32_t x = std::round(translate.x * 24); // one em
-    const int32_t y = std::round(translate.y * 24) + yOffset; // one em
+    float x = std::round(translate.x * 24); // one em
+    const float y = std::round(translate.y * 24) + yOffset; // one em
 
     // Loop through all characters of this label and shape.
     for (uint32_t chr : string) {

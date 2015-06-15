@@ -1,4 +1,6 @@
-#import <Foundation/Foundation.h>
+#import "MGLTypes.h"
+
+NS_ASSUME_NONNULL_BEGIN
 
 extern NSString *const MGLEventTypeAppUserTurnstile;
 extern NSString *const MGLEventTypeMapLoad;
@@ -31,7 +33,7 @@ extern NSString *const MGLEventGestureRotateStart;
 
 @interface MGLMapboxEvents : NSObject <NSURLSessionDelegate>
 
-+ (instancetype)sharedManager;
++ (nullable instancetype)sharedManager;
 
 // You must call these methods from the main thread.
 //
@@ -61,3 +63,5 @@ extern NSString *const MGLEventGestureRotateStart;
 + (void)validate;
 
 @end
+
+NS_ASSUME_NONNULL_END

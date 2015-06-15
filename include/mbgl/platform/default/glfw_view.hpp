@@ -37,9 +37,15 @@ public:
     void fps();
 
 private:
+    void addRandomPointAnnotations(int count);
+
+private:
     bool fullscreen = false;
     bool tracking = false;
     bool rotating = false;
+
+    int width = 1024;
+    int height = 768;
 
     double lastX = 0, lastY = 0;
 
