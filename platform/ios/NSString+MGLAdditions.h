@@ -1,8 +1,12 @@
-#import <Foundation/Foundation.h>
+#import "MGLTypes.h"
+
+NS_ASSUME_NONNULL_BEGIN
 
 @interface NSString (MGLAdditions)
 
 /** Returns the receiver if non-empty or nil if empty. */
-- (NSString *)mgl_stringOrNilIfEmpty;
+- (nullable NSString *)mgl_stringOrNilIfEmpty;
 
 @end
+
+NS_ASSUME_NONNULL_END

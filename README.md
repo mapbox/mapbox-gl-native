@@ -258,6 +258,7 @@ Some styles in JSON format are included at `./styles`. See the [style spec](http
 - Press `Tab` to toggle debug information
 - Press `C` to toggle symbol collision debug boxes
 - Press `Esc` to quit
+- Press `1` through `6` to add increasing numbers of point annotations for testing
 
 ## Mobile
 
@@ -267,6 +268,7 @@ Some styles in JSON format are included at `./styles`. See the [style spec](http
 - Double-tap to zoom in one level
 - Two-finger single-tap to zoom out one level
 - Double-tap, long-pressing the second, then pan up and down to "quick zoom" (iPhone only, meant for one-handed use)
+- Use the debug menu to add test annotations, reset position, and toggle debug info. 
 
 # Other notes
 

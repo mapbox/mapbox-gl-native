@@ -2,19 +2,24 @@
 
 #import "MGLMapView.h"
 
+NS_ASSUME_NONNULL_BEGIN
+
 @interface MGLUserLocation ()
 
 @property (nonatomic, weak) MGLMapView *mapView;
 
 @end
 
+NS_ASSUME_NONNULL_END
+
 @implementation MGLUserLocation
 
-- (instancetype)init
+- (instancetype)initWithMapView:(MGLMapView *)mapView
 {
     if (self = [super init])
     {
         _location = [[CLLocation alloc] initWithLatitude:MAXFLOAT longitude:MAXFLOAT];
+        _mapView = mapView;
     }
 
     return self;

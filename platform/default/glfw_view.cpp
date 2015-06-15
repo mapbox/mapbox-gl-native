@@ -4,6 +4,7 @@
 #include <mbgl/util/gl_helper.hpp>
 
 #include <cassert>
+#include <cstdlib>
 
 void glfwError(int error, const char *description) {
     mbgl::Log::Error(mbgl::Event::OpenGL, "GLFW error (%i): %s", error, description);
@@ -12,6 +13,8 @@ void glfwError(int error, const char *description) {
 
 GLFWView::GLFWView(bool fullscreen_) : fullscreen(fullscreen_) {
     glfwSetErrorCallback(glfwError);
+
+    std::srand(std::time(0));
 
     if (!glfwInit()) {
         mbgl::Log::Error(mbgl::Event::OpenGL, "failed to initialize glfw");
@@ -40,7 +43,7 @@ GLFWView::GLFWView(bool fullscreen_) : fullscreen(fullscreen_) {
     glfwWindowHint(GLFW_STENCIL_BITS, 8);
     glfwWindowHint(GLFW_DEPTH_BITS, 16);
 
-    window = glfwCreateWindow(1024, 768, "Mapbox GL", monitor, NULL);
+    window = glfwCreateWindow(width, height, "Mapbox GL", monitor, NULL);
     if (!window) {
         glfwTerminate();
         mbgl::Log::Error(mbgl::Event::OpenGL, "failed to initialize window");
@@ -71,7 +74,6 @@ GLFWView::~GLFWView() {
 void GLFWView::initialize(mbgl::Map *map_) {
     View::initialize(map_);
 
-    int width, height;
     glfwGetWindowSize(window, &width, &height);
     onResize(window, width, height);
 }
@@ -114,6 +116,35 @@ void GLFWView::onKey(GLFWwindow *window, int key, int /*scancode*/, int action, 
             break;
         }
     }
+
+    if (action == GLFW_RELEASE || action == GLFW_REPEAT) {
+        switch (key) {
+        case GLFW_KEY_1: view->addRandomPointAnnotations(1); break;
+        case GLFW_KEY_2: view->addRandomPointAnnotations(10); break;
+        case GLFW_KEY_3: view->addRandomPointAnnotations(100); break;
+        case GLFW_KEY_4: view->addRandomPointAnnotations(1000); break;
+        case GLFW_KEY_5: view->addRandomPointAnnotations(10000); break;
+        case GLFW_KEY_6: view->addRandomPointAnnotations(100000); break;
+        }
+    }
+}
+
+void GLFWView::addRandomPointAnnotations(int count) {
+    std::vector<mbgl::LatLng> points;
+    std::vector<std::string> markers;
+
+    const auto sw = map->latLngForPixel({ 0, 0 });
+    const auto ne = map->latLngForPixel({ double(width), double(height) });
+
+    for (int i = 0; i < count; i++) {
+        const double lon = sw.longitude + (ne.longitude - sw.longitude) * (double(std::rand()) / RAND_MAX);
+        const double lat = sw.latitude + (ne.latitude - sw.latitude) * (double(std::rand()) / RAND_MAX);
+
+        points.push_back({ lat, lon });
+        markers.push_back("default_marker");
+    }
+
+    map->addPointAnnotations(points, markers);
 }
 
 void GLFWView::onScroll(GLFWwindow *window, double /*xOffset*/, double yOffset) {
@@ -140,6 +171,8 @@ void GLFWView::onScroll(GLFWwindow *window, double /*xOffset*/, double yOffset) 
 
 void GLFWView::onResize(GLFWwindow *window, int width, int height ) {
     GLFWView *view = reinterpret_cast<GLFWView *>(glfwGetWindowUserPointer(window));
+    view->width = width;
+    view->height = height;
 
     int fbWidth, fbHeight;
     glfwGetFramebufferSize(window, &fbWidth, &fbHeight);

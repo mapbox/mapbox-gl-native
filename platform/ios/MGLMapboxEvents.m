@@ -304,7 +304,7 @@ const NSTimeInterval MGLFlushInterval = 60;
 // Can be called from any thread. Called implicitly from any
 // public class convenience methods. May return nil if this feature is disabled.
 //
-+ (instancetype)sharedManager {
++ (nullable instancetype)sharedManager {
     if (NSProcessInfo.processInfo.mgl_isInterfaceBuilderDesignablesAgent) {
         return nil;
     }
@@ -597,7 +597,9 @@ const NSTimeInterval MGLFlushInterval = 60;
             [request setHTTPBody:jsonData];
 
             // Send non blocking HTTP Request to server
-            NSURLSessionDataTask *task = [_session dataTaskWithRequest:request completionHandler: nil];
+            NSURLSessionDataTask *task = [_session dataTaskWithRequest:request completionHandler:^(__unused NSData * __nullable data, __unused NSURLResponse * __nullable response, __unused NSError * __nullable error)
+            {
+            }];
             [task resume];
         }
     });

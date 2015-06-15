@@ -22,17 +22,28 @@ const CGFloat MGLTrackingDotRingWidth = 24.0;
     CALayer *_dotLayer;
 }
 
+- (instancetype)initWithFrame:(CGRect)frame
+{
+    NSAssert(NO, @"No containing map view specified. Call -initInMapView: instead.");
+    return self = [self init];
+}
+
 - (instancetype)initInMapView:(MGLMapView *)mapView
 {
-    if (self = [super init])
+    if (self = [super initWithFrame:CGRectMake(0, 0, MGLTrackingDotRingWidth, MGLTrackingDotRingWidth)])
     {
-        self.annotation = [[MGLUserLocation alloc] init];
-        self.annotation.mapView = mapView;
+        self.annotation = [[MGLUserLocation alloc] initWithMapView:mapView];
         _mapView = mapView;
         [self setupLayers];
         self.accessibilityLabel = @"User location";
     }
     return self;
+}
+
+- (instancetype)initWithCoder:(NSCoder *)decoder
+{
+    MGLMapView *mapView = [decoder valueForKey:@"mapView"];
+    return [self initInMapView:mapView];
 }
 
 - (void)setTintColor:(UIColor *)tintColor
