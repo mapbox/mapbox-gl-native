@@ -88,6 +88,7 @@
         'style/mock_view.hpp',
         'style/pending_resources.cpp',
         'style/resource_loading.cpp',
+        'style/sprite.cpp',
       ],
       'libraries': [
         '<@(uv_static_libs)',

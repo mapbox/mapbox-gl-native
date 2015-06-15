@@ -53,7 +53,13 @@ private:
 void MockFileSource::Impl::replyWithSuccess(Request* req) const {
     std::shared_ptr<Response> res = std::make_shared<Response>();
     res->status = Response::Status::Successful;
-    res->data = util::read_file(req->resource.url);
+
+    try {
+        res->data = util::read_file(req->resource.url);
+    } catch (const std::exception& err) {
+        res->status = Response::Status::Error;
+        res->message = err.what();
+    }
 
     req->notify(res);
 }
