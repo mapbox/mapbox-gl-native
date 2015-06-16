@@ -4,7 +4,7 @@
 
 @implementation MGLPolyline
 
-@synthesize overlayBounds;
+@dynamic overlayBounds;
 
 + (instancetype)polylineWithCoordinates:(CLLocationCoordinate2D *)coords
                                   count:(NSUInteger)count
