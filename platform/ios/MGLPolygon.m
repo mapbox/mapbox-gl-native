@@ -4,7 +4,7 @@
 
 @implementation MGLPolygon
 
-@synthesize overlayBounds;
+@dynamic overlayBounds;
 
 + (instancetype)polygonWithCoordinates:(CLLocationCoordinate2D *)coords
                                  count:(NSUInteger)count
