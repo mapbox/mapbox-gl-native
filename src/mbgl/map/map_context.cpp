@@ -279,12 +279,24 @@ void MapContext::update() {
 }
 
 void MapContext::renderStill(StillImageCallback fn) {
+    if (!fn) {
+        Log::Error(Event::General, "StillImageCallback not set");
+        return;
+    }
+
     if (data.mode != MapMode::Still) {
-        throw util::Exception("Map is not in still image render mode");
+        fn(std::make_exception_ptr(util::MisuseException("Map is not in still image render mode")), nullptr);
+        return;
     }
 
     if (callback) {
-        throw util::Exception("Map is currently rendering an image");
+        fn(std::make_exception_ptr(util::MisuseException("Map is currently rendering an image")), nullptr);
+        return;
+    }
+
+    if (!style) {
+        fn(std::make_exception_ptr(util::MisuseException("Map doesn't have a style")), nullptr);
+        return;
     }
 
     if (style->getLastError()) {
