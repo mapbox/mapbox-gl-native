@@ -175,7 +175,7 @@ run-xlinux: xlinux
 
 .PRECIOUS: Makefile/android-%
 Makefile/android-%: CMD = deps/run_gyp android/mapboxgl-app.gyp $(CONFIG_android-$*) $(LIBS_android) --generator-output=./build/android-$* -f make-android
-Makefile/android-%: config/android-%.gypi styles/styles
+Makefile/android-%: config/android-%.gypi styles/styles geojsonvt
 	@echo $(CMD)
 	@$(ENV_android-$*) $(CMD)
 
