@@ -56,6 +56,9 @@
                   Identifier = "MapViewTests/testDelegateRegionWillChange">
                </Test>
                <Test
+                  Identifier = "MapViewTests/testUserTrackingModeFollowWithHeading">
+               </Test>
+               <Test
                   Identifier = "MetricsTests/testFlushPostsEvents">
                </Test>
                <Test
