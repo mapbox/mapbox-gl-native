@@ -229,13 +229,22 @@ void NodeMap::renderFinished() {
     assert(!image);
 
     if (error) {
+        std::string errorMessage;
+
+        try {
+            std::rethrow_exception(error);
+        } catch (const std::exception& ex) {
+            errorMessage = ex.what();
+        }
+
+        v8::Local<v8::Value> argv[] = {
+            NanError(errorMessage.c_str())
+        };
+
         // This must be empty to be prepared for the next render call.
         error = nullptr;
         assert(!error);
 
-        v8::Local<v8::Value> argv[] = {
-            NanError("Error rendering image")
-        };
         cb->Call(1, argv);
     } else if (img) {
         auto result = NanNew<v8::Object>();
