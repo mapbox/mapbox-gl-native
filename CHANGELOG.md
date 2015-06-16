@@ -1,3 +1,7 @@
+# 1.1.1
+
+- Bumps mbgl submodule to v0.3.5
+
 # 1.1.0
 
 - Adds Node.js v0.12.x and io.js support.
