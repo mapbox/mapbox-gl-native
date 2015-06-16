@@ -21,7 +21,7 @@ NS_ASSUME_NONNULL_BEGIN
 /** The string containing the annotation’s title.
 *
 * Although this property is optional, if you support the selection of annotations in your map view, you are expected to provide this property. This string is displayed in the callout for the associated annotation. */
-@property (nonatomic, readonly, copy) NSString *title;
+@property (nonatomic, readonly, copy, nullable) NSString *title;
 
 /** The string containing the annotation’s subtitle.
 *
