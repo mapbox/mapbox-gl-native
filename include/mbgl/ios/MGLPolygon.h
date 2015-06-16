@@ -4,6 +4,8 @@
 #import "MGLMultiPoint.h"
 #import "MGLOverlay.h"
 
+NS_ASSUME_NONNULL_BEGIN
+
 /** The `MGLPolygon` class represents a shape consisting of one or more points that define a closed polygon. The points are connected end-to-end in the order they are provided. The first and last points are connected to each other to create the closed shape. */
 @interface MGLPolygon : MGLMultiPoint <MGLOverlay>
 
@@ -15,3 +17,5 @@
                                  count:(NSUInteger)count;
 
 @end
+
+NS_ASSUME_NONNULL_END

@@ -4,6 +4,8 @@
 #import "MGLAnnotation.h"
 #import "MGLTypes.h"
 
+NS_ASSUME_NONNULL_BEGIN
+
 /** The `MGLOverlay` protocol defines a specific type of annotation that represents both a point and an area on a map. Overlay objects are essentially data objects that contain the geographic data needed to represent the map area. For example, overlays can take the form of common shapes such as rectangles and circles. They can also describe polygons and other complex shapes.
 *
 *   You use overlays to layer more sophisticated content on top of a map view. For example, you could use an overlay to show the boundaries of a national park or trace a bus route along city streets. Mapbox GL defines several concrete classes that conform to this protocol and define standard shapes.
@@ -29,3 +31,5 @@
 - (BOOL)intersectsOverlayBounds:(MGLCoordinateBounds)overlayBounds;
 
 @end
+
+NS_ASSUME_NONNULL_END

@@ -3,6 +3,8 @@
 
 #import "MGLShape.h"
 
+NS_ASSUME_NONNULL_BEGIN
+
 /** The `MGLMultiPoint` class is an abstract superclass used to define shapes composed of multiple points. You should not create instances of this class directly. Instead, you should create instances of the `MGLPolyline` or `MGLPolygon` classes. However, you can use the method and properties of this class to access information about the specific points associated with the line or polygon. */
 @interface MGLMultiPoint : MGLShape
 
@@ -15,3 +17,5 @@
 - (void)getCoordinates:(CLLocationCoordinate2D *)coords range:(NSRange)range;
 
 @end
+
+NS_ASSUME_NONNULL_END
