@@ -4,6 +4,7 @@
 #include <mbgl/util/chrono.hpp>
 #include <mbgl/map/update.hpp>
 #include <mbgl/map/mode.hpp>
+#include <mbgl/style/style_properties.hpp>
 #include <mbgl/util/geo.hpp>
 #include <mbgl/util/noncopyable.hpp>
 #include <mbgl/util/vec.hpp>
@@ -13,6 +14,7 @@
 #include <functional>
 #include <vector>
 #include <memory>
+#include <unordered_map>
 
 namespace mbgl {
 
@@ -25,6 +27,16 @@ class StillImage;
 namespace util {
 template <class T> class Thread;
 }
+
+enum class AnnotationType : uint8_t {
+    Any   = 0,
+    Point = 1 << 0,
+    Shape = 1 << 1,
+};
+
+using AnnotationIDs = std::vector<uint32_t>;
+using AnnotationSegment = std::vector<LatLng>;
+using AnnotationSegments = std::vector<AnnotationSegment>;
 
 class Map : private util::noncopyable {
     friend class View;
@@ -112,12 +124,16 @@ public:
     void setDefaultPointAnnotationSymbol(const std::string&);
     double getTopOffsetPixelsForAnnotationSymbol(const std::string&);
     uint32_t addPointAnnotation(const LatLng&, const std::string& symbol);
-    std::vector<uint32_t> addPointAnnotations(const std::vector<LatLng>&,
-                                              const std::vector<std::string>& symbols);
+    AnnotationIDs addPointAnnotations(const AnnotationSegment&,
+                                      const std::vector<std::string>& symbols);
+    uint32_t addShapeAnnotation(const AnnotationSegments&,
+                                const StyleProperties&);
+    AnnotationIDs addShapeAnnotations(const std::vector<AnnotationSegments>&,
+                                      const std::vector<StyleProperties>&);
     void removeAnnotation(uint32_t);
-    void removeAnnotations(const std::vector<uint32_t>&);
-    std::vector<uint32_t> getAnnotationsInBounds(const LatLngBounds&);
-    LatLngBounds getBoundsForAnnotations(const std::vector<uint32_t>&);
+    void removeAnnotations(const AnnotationIDs&);
+    AnnotationIDs getAnnotationsInBounds(const LatLngBounds&, const AnnotationType& = AnnotationType::Any);
+    LatLngBounds getBoundsForAnnotations(const AnnotationIDs&);
 
     // Memory
     void setSourceTileCacheSize(size_t);

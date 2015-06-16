@@ -17,6 +17,7 @@
 #include <forward_list>
 #include <iosfwd>
 #include <map>
+#include <unordered_set>
 
 namespace mbgl {
 
@@ -46,6 +47,7 @@ public:
     std::string attribution;
     std::array<float, 3> center = {{0, 0, 0}};
     std::array<float, 4> bounds = {{-180, -90, 180, 90}};
+    std::string source_id = "";
 
     void parseTileJSONProperties(const rapidjson::Value&);
     std::string tileURL(const TileID& id, float pixelRatio) const;
@@ -86,7 +88,7 @@ public:
                 TexturePool&,
                 bool shouldReparsePartialTiles);
 
-    void invalidateTiles(const std::vector<TileID>&);
+    void invalidateTiles(const std::unordered_set<TileID, TileID::Hash>&);
 
     void updateMatrices(const mat4 &projMatrix, const TransformState &transform);
     void drawClippingMasks(Painter &painter);

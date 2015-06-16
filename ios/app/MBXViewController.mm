@@ -6,8 +6,6 @@
 
 #import <CoreLocation/CoreLocation.h>
 
-#import "MBXAnnotation.h"
-
 static UIColor *const kTintColor = [UIColor colorWithRed:0.120 green:0.550 blue:0.670 alpha:1.000];
 
 static NSArray *const kStyleNames = @[
@@ -130,7 +128,8 @@ mbgl::Settings_NSUserDefaults *settings = nullptr;
                                                                 @"Add 100 Points",
                                                                 @"Add 1,000 Points",
                                                                 @"Add 10,000 Points",
-                                                                @"Remove Points",
+                                                                @"Add Test Shapes",
+                                                                @"Remove Annotations",
                                                                 nil];
 
     [sheet showFromBarButtonItem:self.navigationItem.leftBarButtonItem animated:YES];
@@ -168,6 +167,73 @@ mbgl::Settings_NSUserDefaults *settings = nullptr;
     }
     else if (buttonIndex == actionSheet.firstOtherButtonIndex + 7)
     {
+        // PNW triangle
+        //
+        CLLocationCoordinate2D triangleCoordinates[3] =
+        {
+            CLLocationCoordinate2DMake(44, -122),
+            CLLocationCoordinate2DMake(46, -122),
+            CLLocationCoordinate2DMake(46, -121)
+        };
+
+        MGLPolygon *triangle = [MGLPolygon polygonWithCoordinates:triangleCoordinates count:3];
+
+        [self.mapView addAnnotation:triangle];
+
+        // Orcas Island hike
+        //
+        NSDictionary *hike = [NSJSONSerialization JSONObjectWithData:
+                                 [NSData dataWithContentsOfFile:
+                                     [[NSBundle mainBundle] pathForResource:@"polyline" ofType:@"geojson"]]
+                                                             options:0
+                                                               error:nil];
+
+        NSArray *hikeCoordinatePairs = hike[@"features"][0][@"geometry"][@"coordinates"];
+
+        CLLocationCoordinate2D *polylineCoordinates = (CLLocationCoordinate2D *)malloc([hikeCoordinatePairs count] * sizeof(CLLocationCoordinate2D));
+
+        for (NSUInteger i = 0; i < [hikeCoordinatePairs count]; i++)
+        {
+            polylineCoordinates[i] = CLLocationCoordinate2DMake([hikeCoordinatePairs[i][1] doubleValue], [hikeCoordinatePairs[i][0] doubleValue]);
+        }
+
+        MGLPolyline *polyline = [MGLPolyline polylineWithCoordinates:polylineCoordinates
+                                                               count:[hikeCoordinatePairs count]];
+
+        [self.mapView addAnnotation:polyline];
+
+        free(polylineCoordinates);
+
+        // PA/NJ/DE polys
+        //
+        NSDictionary *threestates = [NSJSONSerialization JSONObjectWithData:
+                              [NSData dataWithContentsOfFile:
+                               [[NSBundle mainBundle] pathForResource:@"threestates" ofType:@"geojson"]]
+                                                             options:0
+                                                               error:nil];
+
+        for (NSDictionary *feature in threestates[@"features"])
+        {
+            NSArray *stateCoordinatePairs = feature[@"geometry"][@"coordinates"];
+
+            while ([stateCoordinatePairs count] == 1) stateCoordinatePairs = stateCoordinatePairs[0];
+
+            CLLocationCoordinate2D *polygonCoordinates = (CLLocationCoordinate2D *)malloc([stateCoordinatePairs count] * sizeof(CLLocationCoordinate2D));
+
+            for (NSUInteger i = 0; i < [stateCoordinatePairs count]; i++)
+            {
+                polygonCoordinates[i] = CLLocationCoordinate2DMake([stateCoordinatePairs[i][1] doubleValue], [stateCoordinatePairs[i][0] doubleValue]);
+            }
+
+            MGLPolygon *polygon = [MGLPolygon polygonWithCoordinates:polygonCoordinates count:[stateCoordinatePairs count]];
+
+            [self.mapView addAnnotation:polygon];
+
+            free(polygonCoordinates);
+        }
+    }
+    else if (buttonIndex == actionSheet.firstOtherButtonIndex + 8)
+    {
         [self.mapView removeAnnotations:self.mapView.annotations];
     }
 }
@@ -178,7 +244,7 @@ mbgl::Settings_NSUserDefaults *settings = nullptr;
 
     dispatch_async(dispatch_get_global_queue(DISPATCH_QUEUE_PRIORITY_DEFAULT, 0), ^
     {
-        NSData *featuresData = [NSData dataWithContentsOfFile:[[NSBundle mainBundle] pathForResource:@"features" ofType:@"geojson"]];
+        NSData *featuresData = [NSData dataWithContentsOfFile:[[NSBundle mainBundle] pathForResource:@"points" ofType:@"geojson"]];
 
         id features = [NSJSONSerialization JSONObjectWithData:featuresData
                                                       options:0
@@ -194,9 +260,9 @@ mbgl::Settings_NSUserDefaults *settings = nullptr;
                                                                                [feature[@"geometry"][@"coordinates"][0] doubleValue]);
                 NSString *title = feature[@"properties"][@"NAME"];
 
-                MBXAnnotation *annotation = [MBXAnnotation annotationWithLocation:coordinate
-                                                                            title:title
-                                                                         subtitle:nil];
+                MGLPointAnnotation *annotation = [MGLPointAnnotation new];
+                annotation.coordinate = coordinate;
+                annotation.title = title;
 
                 [annotations addObject:annotation];
 
@@ -277,6 +343,21 @@ mbgl::Settings_NSUserDefaults *settings = nullptr;
 - (BOOL)mapView:(__unused MGLMapView *)mapView annotationCanShowCallout:(__unused id <MGLAnnotation>)annotation
 {
     return YES;
+}
+
+- (CGFloat)mapView:(__unused MGLMapView *)mapView alphaForShapeAnnotation:(MGLShape *)annotation
+{
+    return ([annotation isKindOfClass:[MGLPolygon class]] ? 0.5 : 1.0);
+}
+
+- (UIColor *)mapView:(__unused MGLMapView *)mapView strokeColorForShapeAnnotation:(MGLShape *)annotation
+{
+    return ([annotation isKindOfClass:[MGLPolyline class]] ? [UIColor purpleColor] : [UIColor blackColor]);
+}
+
+- (UIColor *)mapView:(__unused MGLMapView *)mapView fillColorForPolygonAnnotation:(__unused MGLPolygon *)annotation
+{
+    return (annotation.pointCount > 3 ? [UIColor greenColor] : [UIColor redColor]);
 }
 
 - (void)mapView:(__unused MGLMapView *)mapView didChangeUserTrackingMode:(MGLUserTrackingMode)mode animated:(__unused BOOL)animated

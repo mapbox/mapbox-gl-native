@@ -10,7 +10,9 @@
       'mac_bundle': 1,
       'mac_bundle_resources': [
         '<!@(find ../ios/app/img -type f)',
-        './features.geojson',
+        './points.geojson',
+        './polyline.geojson',
+        './threestates.geojson',
         './Settings.bundle/'
       ],
 
@@ -29,8 +31,6 @@
         './MBXAppDelegate.m',
         './MBXViewController.h',
         './MBXViewController.mm',
-        './MBXAnnotation.h',
-        './MBXAnnotation.m',
         '../../platform/darwin/settings_nsuserdefaults.mm',
       ],
 

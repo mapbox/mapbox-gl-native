@@ -6,6 +6,9 @@
 NS_ASSUME_NONNULL_BEGIN
 
 @class MGLUserLocation;
+@class MGLPolyline;
+@class MGLPolygon;
+@class MGLShape;
 
 @protocol MGLMapViewDelegate;
 @protocol MGLAnnotation;
@@ -304,6 +307,30 @@ IB_DESIGNABLE
 *   @return The marker symbol to display for the specified annotation or `nil` if you want to display the default symbol. */
 - (nullable NSString *)mapView:(MGLMapView *)mapView symbolNameForAnnotation:(id <MGLAnnotation>)annotation;
 
+/** Returns the alpha value to use when rendering a shape annotation. Defaults to `1.0`.
+*   @param mapView The map view rendering the shape annotation.
+*   @param annotation The annotation being rendered.
+*   @return An alpha value between `0` and `1.0`. */
+- (CGFloat)mapView:(MGLMapView *)mapView alphaForShapeAnnotation:(MGLShape *)annotation;
+
+/** Returns the stroke color to use when rendering a shape annotation. Defaults to black.
+*   @param mapView The map view rendering the shape annotation.
+*   @param annotation The annotation being rendered.
+*   @return A color to use for the shape outline. */
+- (UIColor *)mapView:(MGLMapView *)mapView strokeColorForShapeAnnotation:(MGLShape *)annotation;
+
+/** Returns the fill color to use when rendering a polygon annotation. Defaults to blue.
+*   @param mapView The map view rendering the polygon annotation.
+*   @param annotation The annotation being rendered.
+*   @return A color to use for the polygon interior. */
+- (UIColor *)mapView:(MGLMapView *)mapView fillColorForPolygonAnnotation:(MGLPolygon *)annotation;
+
+/** Returns the line width to use when rendering a polyline annotation. Defaults to `3.0`.
+*   @param mapView The map view rendering the polygon annotation.
+*   @param annotation The annotation being rendered.
+*   @return A line width for the polyline. */
+- (CGFloat)mapView:(MGLMapView *)mapView lineWidthForPolylineAnnotation:(MGLPolyline *)annotation;
+
 /** Returns a Boolean value indicating whether the annotation is able to display extra information in a callout bubble.
 *
 *   If the value returned is `YES`, a standard callout bubble is shown when the user taps a selected annotation. The callout uses the title and subtitle text from the associated annotation object. If there is no title text, though, the annotation will not show a callout. The callout also displays any custom callout views returned by the delegate for the left and right callout accessory views.
@@ -370,6 +397,8 @@ IB_DESIGNABLE
 - (void)mapViewDidFinishRenderingMap:(MGLMapView *)mapView fullyRendered:(BOOL)fullyRendered;
 
 #pragma mark - Tracking the User Location
+
+/** @name Tracking the User Location */
 
 /** Tells the delegate that the map view will begin tracking the user’s location.
 *

@@ -6,6 +6,8 @@
 #include <mbgl/util/projection.hpp>
 #include <mbgl/util/thread.hpp>
 
+#include <unordered_map>
+
 namespace mbgl {
 
 Map::Map(View& view, FileSource& fileSource, MapMode mode)
@@ -239,8 +241,22 @@ uint32_t Map::addPointAnnotation(const LatLng& point, const std::string& symbol)
     return addPointAnnotations({ point }, { symbol }).front();
 }
 
-std::vector<uint32_t> Map::addPointAnnotations(const std::vector<LatLng>& points, const std::vector<std::string>& symbols) {
-    auto result = data->annotationManager.addPointAnnotations(points, symbols, *data);
+AnnotationIDs Map::addPointAnnotations(const AnnotationSegment& points,
+                                       const std::vector<std::string>& symbols) {
+    AnnotationsProperties properties = { { "symbols", symbols } };
+    auto result = data->annotationManager.addPointAnnotations(points, properties, *data);
+    context->invoke(&MapContext::updateAnnotationTiles, result.first);
+    return result.second;
+}
+
+uint32_t Map::addShapeAnnotation(const AnnotationSegments& shape,
+                                 const StyleProperties& styleProperties) {
+    return addShapeAnnotations({ shape }, { styleProperties }).front();
+}
+
+AnnotationIDs Map::addShapeAnnotations(const std::vector<AnnotationSegments>& shapes,
+                                       const std::vector<StyleProperties>& styleProperties) {
+    auto result = data->annotationManager.addShapeAnnotations(shapes, styleProperties, {{}}, *data);
     context->invoke(&MapContext::updateAnnotationTiles, result.first);
     return result.second;
 }
@@ -254,8 +270,8 @@ void Map::removeAnnotations(const std::vector<uint32_t>& annotations) {
     context->invoke(&MapContext::updateAnnotationTiles, result);
 }
 
-std::vector<uint32_t> Map::getAnnotationsInBounds(const LatLngBounds& bounds) {
-    return data->annotationManager.getAnnotationsInBounds(bounds, *data);
+std::vector<uint32_t> Map::getAnnotationsInBounds(const LatLngBounds& bounds, const AnnotationType& type) {
+    return data->annotationManager.getAnnotationsInBounds(bounds, *data, type);
 }
 
 LatLngBounds Map::getBoundsForAnnotations(const std::vector<uint32_t>& annotations) {

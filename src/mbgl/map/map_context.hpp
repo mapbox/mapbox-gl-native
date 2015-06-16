@@ -49,7 +49,7 @@ public:
     std::string getStyleJSON() const { return styleJSON; }
 
     double getTopOffsetPixelsForAnnotationSymbol(const std::string& symbol);
-    void updateAnnotationTiles(const std::vector<TileID>&);
+    void updateAnnotationTiles(const std::unordered_set<TileID, TileID::Hash>&);
 
     void setSourceTileCacheSize(size_t size);
     void onLowMemory();
@@ -62,6 +62,10 @@ public:
 
 private:
     void updateTiles();
+
+    // Style-related updates.
+    void cascadeClasses();
+    void recalculateStyle(TimePoint);
 
     // Update the state indicated by the accumulated Update flags, then render.
     void update();

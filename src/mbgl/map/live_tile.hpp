@@ -2,6 +2,7 @@
 #define MBGL_MAP_LIVE_TILE
 
 #include <map>
+#include <unordered_map>
 
 #include <mbgl/map/geometry_tile.hpp>
 
@@ -9,7 +10,8 @@ namespace mbgl {
 
 class LiveTileFeature : public GeometryTileFeature {
 public:
-    LiveTileFeature(FeatureType, GeometryCollection, std::map<std::string, std::string> properties = {{}});
+    LiveTileFeature(FeatureType, GeometryCollection,
+                    std::unordered_map<std::string, std::string> properties = {{}});
 
     FeatureType getType() const override { return type; }
     mapbox::util::optional<Value> getValue(const std::string&) const override;
@@ -17,7 +19,7 @@ public:
 
 private:
     FeatureType type = FeatureType::Unknown;
-    std::map<std::string, std::string> properties;
+    std::unordered_map<std::string, std::string> properties;
     GeometryCollection geometries;
 };
 
@@ -40,6 +42,7 @@ public:
     LiveTile();
 
     void addLayer(const std::string&, util::ptr<LiveTileLayer>);
+    void removeLayer(const std::string&);
     util::ptr<GeometryTileLayer> getLayer(const std::string&) const override;
     util::ptr<LiveTileLayer> getMutableLayer(const std::string&) const;
 
