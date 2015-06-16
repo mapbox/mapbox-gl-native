@@ -404,16 +404,18 @@
                                                       }
                                                   }];
 
-    [tester waitForTimeInterval:1];
+    // wait for initial reset before proceeding to actual tests
+    NSNotification *notification = [system waitForNotificationName:@"regionDidChangeAnimated"
+                                                            object:tester.mapView];
 
     unanimatedCount = 0;
     animatedCount = 0;
 
-    NSNotification *notification = [system waitForNotificationName:@"regionDidChangeAnimated"
-                                                            object:tester.mapView
-                                               whileExecutingBlock:^{
-                                                   tester.mapView.centerCoordinate = CLLocationCoordinate2DMake(0, 0);
-                                               }];
+    notification = [system waitForNotificationName:@"regionDidChangeAnimated"
+                                            object:tester.mapView
+                               whileExecutingBlock:^{
+                                   tester.mapView.centerCoordinate = CLLocationCoordinate2DMake(0, 0);
+                               }];
 
     [tester waitForTimeInterval:1];
 
@@ -430,7 +432,7 @@
                                    [tester.mapView setCenterCoordinate:CLLocationCoordinate2DMake(45, 100) animated:YES];
                                }];
 
-    [tester waitForTimeInterval:1];
+    [tester waitForAnimationsToFinishWithTimeout:1];
 
     XCTAssertEqual([notification.userInfo[@"animated"] boolValue],
                    YES,
