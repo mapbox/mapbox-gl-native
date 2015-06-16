@@ -1,11 +1,6 @@
 #import "MGLPolygon.h"
 
-@interface MGLMultiPoint (MGLPolygon)
-
-- (instancetype)initWithCoordinates:(CLLocationCoordinate2D *)coords count:(NSUInteger)count;
-- (BOOL)intersectsOverlayBounds:(MGLCoordinateBounds)overlayBounds;
-
-@end
+#import "MGLMultiPoint_Private.h"
 
 @implementation MGLPolygon
 
