@@ -35,8 +35,9 @@
         'fixtures/fixture_log_observer.hpp',
         'fixtures/fixture_log_observer.cpp',
 
-        'api/set_style.cpp',
+        'api/api_misuse.cpp',
         'api/repeated_render.cpp',
+        'api/set_style.cpp',
 
         'headless/headless.cpp',
 
