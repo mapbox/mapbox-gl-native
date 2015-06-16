@@ -116,7 +116,7 @@ test('gzip', function(t) {
                 map.release();
 
                 t.ok(err, 'returns error');
-                t.equal(err.message, 'Error rendering image');
+                t.ok(err.message.match(/Failed to parse/), 'error text matches');
 
                 t.end();
             });
