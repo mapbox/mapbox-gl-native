@@ -170,7 +170,7 @@ IB_DESIGNABLE
 @property (nonatomic, nullable) NSString *styleID;
 @property (nonatomic, nullable) NSString *mapID __attribute__((unavailable("Use styleID.")));
 
-/** Returns the URLs to the styles bundled with the library. */
+/** URLs of the styles bundled with the library. */
 @property (nonatomic, readonly) NSArray *bundledStyleURLs;
 
 /** URL of the style currently displayed in the receiver.
