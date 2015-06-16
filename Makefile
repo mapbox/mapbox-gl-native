@@ -59,7 +59,7 @@ xproj: build/binding.xcodeproj
 	open build/binding.xcodeproj
 
 $(MBGL)/config/%.gypi: $(MBGL) $(MBGL)/configure
-	make -C $(MBGL) config/$*.gypi
+	make -C $(MBGL) config/$*.gypi geojsonvt
 
 .PHONY: test-suite
 test-suite:
