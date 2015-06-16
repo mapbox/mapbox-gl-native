@@ -37,6 +37,7 @@
         '../include/mbgl/ios/MGLTypes.h',
         '../platform/ios/MGLTypes.m',
         '../include/mbgl/ios/MGLMultiPoint.h',
+        '../platform/ios/MGLMultiPoint_Private.h',
         '../platform/ios/MGLMultiPoint.mm',
         '../include/mbgl/ios/MGLOverlay.h',
         '../include/mbgl/ios/MGLPointAnnotation.h',
