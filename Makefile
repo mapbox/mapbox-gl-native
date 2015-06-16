@@ -39,9 +39,6 @@ else
 SMCalloutView:
 endif
 
-geojsonvt:
-	git submodule update --init src/mbgl/util/geojsonvt
-
 KIF:
 	git submodule update --init test/ios/KIF
 
@@ -49,11 +46,11 @@ KIF:
 #### Build files ###############################################################
 
 .PRECIOUS: Makefile/project
-Makefile/project: config/$(HOST).gypi styles/styles SMCalloutView geojsonvt
+Makefile/project: config/$(HOST).gypi styles/styles SMCalloutView
 	deps/run_gyp gyp/$(HOST).gyp $(CONFIG_$(HOST)) $(LIBS_$(HOST)) --generator-output=./build/$(HOST) -f make
 
 .PRECIOUS: Xcode/project
-Xcode/project: config/$(HOST).gypi styles/styles SMCalloutView geojsonvt
+Xcode/project: config/$(HOST).gypi styles/styles SMCalloutView
 	deps/run_gyp gyp/$(HOST).gyp $(CONFIG_$(HOST)) $(LIBS_$(HOST)) --generator-output=./build/$(HOST) -f xcode
 
 
@@ -118,7 +115,7 @@ xproj: xosx-proj
 #### iOS application builds ####################################################
 
 .PRECIOUS: Xcode/ios
-Xcode/ios: gyp/ios.gyp config/ios.gypi styles/styles SMCalloutView geojsonvt
+Xcode/ios: gyp/ios.gyp config/ios.gypi styles/styles SMCalloutView
 	deps/run_gyp gyp/ios.gyp $(CONFIG_ios) $(LIBS_ios) --generator-output=./build/ios -f xcode
 
 .PHONY: ios-proj ios isim ipackage
@@ -175,7 +172,7 @@ run-xlinux: xlinux
 
 .PRECIOUS: Makefile/android-%
 Makefile/android-%: CMD = deps/run_gyp android/mapboxgl-app.gyp $(CONFIG_android-$*) $(LIBS_android) --generator-output=./build/android-$* -f make-android
-Makefile/android-%: config/android-%.gypi styles/styles geojsonvt
+Makefile/android-%: config/android-%.gypi styles/styles
 	@echo $(CMD)
 	@$(ENV_android-$*) $(CMD)
 

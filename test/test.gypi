@@ -89,6 +89,8 @@
         'cflags_cc': [
           '<@(gtest_cflags)',
           '<@(variant_cflags)',
+          '<@(geojsonvt_cflags)',
+          '<@(variant_cflags)',
           '<@(rapidjson_cflags)',
           '<@(uv_cflags)',
           '<@(opengl_cflags)',

@@ -21,6 +21,7 @@ export PATH="`pwd`/.mason:${PATH}" MASON_DIR="`pwd`/.mason"
 RAPIDJSON_VERSION=1.0.2
 VARIANT_VERSION=1.0
 ZLIB_VERSION=system
+GEOJSONVT_VERSION=1.1.0
 
 case ${MASON_PLATFORM} in
     'ios')
@@ -187,6 +188,13 @@ if [ ! -z ${LIBUV_VERSION} ]; then
     CONFIG+="    'uv_static_libs%': $(quote_flags $(mason static_libs libuv ${LIBUV_VERSION})),"$LN
     CONFIG+="    'uv_cflags%': $(quote_flags $(mason cflags libuv ${LIBUV_VERSION})),"$LN
     CONFIG+="    'uv_ldflags%': $(quote_flags $(mason ldflags libuv ${LIBUV_VERSION})),"$LN
+fi
+
+if [ ! -z ${GEOJSONVT_VERSION} ]; then
+    mason install geojsonvt ${GEOJSONVT_VERSION}
+    CONFIG+="    'geojsonvt_static_libs%': $(quote_flags $(mason static_libs geojsonvt ${GEOJSONVT_VERSION})),"$LN
+    CONFIG+="    'geojsonvt_cflags%': $(quote_flags $(mason cflags geojsonvt ${GEOJSONVT_VERSION})),"$LN
+    CONFIG+="    'geojsonvt_ldflags%': $(quote_flags $(mason ldflags geojsonvt ${GEOJSONVT_VERSION})),"$LN
 fi
 
 if [ ! -z ${ZLIB_VERSION} ]; then

@@ -22,6 +22,7 @@
       ],
 
       'cflags_cc': [
+        '<@(variant_cflags)',
         '<@(boost_cflags)',
       ],
       'libraries': [

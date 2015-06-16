@@ -13,7 +13,7 @@ typedef long unsigned int XID;
 typedef XID GLXPbuffer;
 #endif
 
-#include <mbgl/mbgl.hpp>
+#include <mbgl/map/view.hpp>
 #include <mbgl/platform/gl.hpp>
 
 #include <memory>
