@@ -21,6 +21,10 @@ const std::map<PropertyKey, PropertyValue> PropertyFallbackValue::properties = {
     { PropertyKey::LineGapWidth, defaultStyleProperties<LineProperties>().gap_width },
     { PropertyKey::LineBlur, defaultStyleProperties<LineProperties>().blur },
 
+    { PropertyKey::CircleRadius, defaultStyleProperties<CircleProperties>().radius },
+    { PropertyKey::CircleColor, defaultStyleProperties<CircleProperties>().color },
+    { PropertyKey::CircleBlur, defaultStyleProperties<CircleProperties>().blur },
+
     { PropertyKey::IconOpacity, defaultStyleProperties<SymbolProperties>().icon.opacity },
     { PropertyKey::IconSize, defaultStyleProperties<SymbolProperties>().icon.size },
     { PropertyKey::IconColor, defaultStyleProperties<SymbolProperties>().icon.color },
