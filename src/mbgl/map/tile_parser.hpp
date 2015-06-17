@@ -6,6 +6,7 @@
 #include <mbgl/style/filter_expression.hpp>
 #include <mbgl/style/class_properties.hpp>
 #include <mbgl/style/style_bucket.hpp>
+#include <mbgl/style/style_layer.hpp>
 #include <mbgl/text/glyph.hpp>
 #include <mbgl/util/ptr.hpp>
 #include <mbgl/util/noncopyable.hpp>
@@ -22,7 +23,6 @@ class GlyphAtlas;
 class GlyphStore;
 class SpriteAtlas;
 class Sprite;
-class Style;
 class StyleBucket;
 class StyleLayoutFill;
 class StyleLayoutRaster;
@@ -34,7 +34,7 @@ class TileParser : private util::noncopyable {
 public:
     TileParser(const GeometryTile& geometryTile,
                VectorTileData& tile,
-               const Style& style,
+               const std::vector<util::ptr<StyleLayer>>& layers,
                GlyphAtlas& glyphAtlas,
                GlyphStore& glyphStore,
                SpriteAtlas& spriteAtlas,
@@ -61,8 +61,9 @@ private:
     const GeometryTile& geometryTile;
     VectorTileData& tile;
 
+    std::vector<util::ptr<StyleLayer>> layers;
+
     // Cross-thread shared data.
-    const Style& style;
     GlyphAtlas& glyphAtlas;
     GlyphStore& glyphStore;
     SpriteAtlas& spriteAtlas;
