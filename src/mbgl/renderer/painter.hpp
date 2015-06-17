@@ -48,6 +48,7 @@ class LineShader;
 class LinejoinShader;
 class LineSDFShader;
 class LinepatternShader;
+class CircleShader;
 class PatternShader;
 class IconShader;
 class RasterShader;
@@ -221,6 +222,7 @@ public:
     std::unique_ptr<DotShader> dotShader;
     std::unique_ptr<GaussianShader> gaussianShader;
     std::unique_ptr<CollisionBoxShader> collisionBoxShader;
+    std::unique_ptr<CircleShader> circleShader;
 
     StaticVertexBuffer backgroundBuffer = {
         { -1, -1 }, { 1, -1 },
