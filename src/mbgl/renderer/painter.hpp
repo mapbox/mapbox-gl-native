@@ -36,6 +36,7 @@ class Source;
 class DebugBucket;
 class FillBucket;
 class LineBucket;
+class CircleBucket;
 class SymbolBucket;
 class RasterBucket;
 
@@ -105,6 +106,7 @@ public:
     void renderDebugText(DebugBucket& bucket, const mat4 &matrix);
     void renderFill(FillBucket& bucket, const StyleLayer &layer_desc, const TileID& id, const mat4 &matrix);
     void renderLine(LineBucket& bucket, const StyleLayer &layer_desc, const TileID& id, const mat4 &matrix);
+    void renderCircle(CircleBucket& bucket, const StyleLayer &layer_desc, const TileID& id, const mat4 &matrix);
     void renderSymbol(SymbolBucket& bucket, const StyleLayer &layer_desc, const TileID& id, const mat4 &matrix);
     void renderRaster(RasterBucket& bucket, const StyleLayer &layer_desc, const TileID& id, const mat4 &matrix);
     void renderBackground(const StyleLayer &layer_desc);
