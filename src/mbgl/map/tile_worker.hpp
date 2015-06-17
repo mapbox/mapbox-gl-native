@@ -6,6 +6,7 @@
 #include <mbgl/geometry/elements_buffer.hpp>
 #include <mbgl/geometry/fill_buffer.hpp>
 #include <mbgl/geometry/line_buffer.hpp>
+#include <mbgl/geometry/circle_buffer.hpp>
 #include <mbgl/util/noncopyable.hpp>
 #include <mbgl/util/ptr.hpp>
 #include <mbgl/style/filter_expression.hpp>
@@ -52,6 +53,7 @@ private:
 
     std::unique_ptr<Bucket> createFillBucket(const GeometryTileLayer&, const StyleBucket&);
     std::unique_ptr<Bucket> createLineBucket(const GeometryTileLayer&, const StyleBucket&);
+    std::unique_ptr<Bucket> createCircleBucket(const GeometryTileLayer&, const StyleBucket&);
     std::unique_ptr<Bucket> createSymbolBucket(const GeometryTileLayer&, const StyleBucket&);
 
     template <class Bucket>
@@ -68,6 +70,7 @@ private:
 
     FillVertexBuffer fillVertexBuffer;
     LineVertexBuffer lineVertexBuffer;
+    CircleVertexBuffer circleVertexBuffer;
 
     TriangleElementsBuffer triangleElementsBuffer;
     LineElementsBuffer lineElementsBuffer;
