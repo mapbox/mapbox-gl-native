@@ -10,6 +10,8 @@
 - Returns an error callback for failed NodeFileSource requests.
 - Fixes handling of corrupt NodeFileSource request data.
 - Implements request coalescing to fix NodeRequest cancellation.
+- Removes `setAccessToken` method from NodeMap, `mapbox://` URLs
+  should be handled through `NodeFileSource` now.
 - Updates build scripts and Travis CI configuration.
 - Logs Environment ID and thread name when in an Environment scope.
 - Refactors NodeLog to implement mbgl::Log::Observer.
