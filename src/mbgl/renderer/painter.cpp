@@ -323,7 +323,8 @@ std::vector<RenderItem> Painter::determineRenderOrder(const Style& style) {
             continue;
         }
 
-        if (!layer.bucket->source) {
+        util::ptr<Source> source = style.getSource(layer.bucket->source);
+        if (!source) {
             Log::Warning(Event::Render, "can't find source for layer '%s'", layer.id.c_str());
             continue;
         }
@@ -345,7 +346,7 @@ std::vector<RenderItem> Painter::determineRenderOrder(const Style& style) {
         // Determine what render passes we need for this layer.
         const RenderPass passes = determineRenderPasses(layer);
 
-        const auto& tiles = layer.bucket->source->getTiles();
+        const auto& tiles = source->getTiles();
         for (auto tile : tiles) {
             assert(tile);
             if (!tile->data && !tile->data->isReady()) {
