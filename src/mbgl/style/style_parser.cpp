@@ -819,6 +819,10 @@ void StyleParser::parsePaint(JSVal value, ClassProperties &klass) {
     parseOptionalProperty<PiecewiseConstantFunction<Faded<std::vector<float>>>>("line-dasharray", Key::LineDashArray, klass, value, "line-dasharray-transition");
     parseOptionalProperty<PiecewiseConstantFunction<Faded<std::string>>>("line-image", Key::LineImage, klass, value, "line-image-transition");
 
+    parseOptionalProperty<Function<float>>("circle-radius", Key::CircleRadius, klass, value);
+    parseOptionalProperty<Function<Color>>("circle-color", Key::CircleColor, klass, value);
+    parseOptionalProperty<Function<float>>("circle-blur", Key::CircleBlur, klass, value);
+
     parseOptionalProperty<Function<float>>("icon-opacity", Key::IconOpacity, klass, value);
     parseOptionalProperty<PropertyTransition>("icon-opacity-transition", Key::IconOpacity, klass, value);
     parseOptionalProperty<Function<float>>("icon-size", Key::IconSize, klass, value);

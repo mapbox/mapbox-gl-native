@@ -19,6 +19,8 @@ bool StyleLayer::isVisible() const {
             return getProperties<FillProperties>().isVisible();
         case StyleLayerType::Line:
             return getProperties<LineProperties>().isVisible();
+        case StyleLayerType::Circle:
+            return getProperties<CircleProperties>().isVisible();
         case StyleLayerType::Symbol:
             return getProperties<SymbolProperties>().isVisible();
         case StyleLayerType::Raster:
