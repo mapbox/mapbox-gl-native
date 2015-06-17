@@ -570,9 +570,8 @@ void Source::tileLoadingCompleteCallback(const TileID& normalized_id, const Tran
         return;
     }
 
-    emitTileLoaded(true);
     data->redoPlacement(transformState.getAngle(), collisionDebug);
-
+    emitTileLoaded(true);
 }
 
 void Source::emitSourceLoaded() {
