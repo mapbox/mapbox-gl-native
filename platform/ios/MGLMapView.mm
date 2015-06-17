@@ -145,13 +145,20 @@ std::chrono::steady_clock::duration secondsAsDuration(float duration)
 
 - (nullable NSString *)accessToken
 {
-    NSAssert(NO, @"-[MGLMapView accessToken] has been removed. Use +[MGLAccountManager accessToken] or get MGLMapboxAccessToken from the Info.plist.");
+    [NSException raise:@"Method unavailable" format:
+     @"%s has been removed. "
+     @"Use +[MGLAccountManager accessToken] or get MGLMapboxAccessToken from the Info.plist.",
+     __PRETTY_FUNCTION__];
     return nil;
 }
 
 - (void)setAccessToken:(nullable NSString *)accessToken
 {
-    NSAssert(NO, @"-[MGLMapView setAccessToken:] has been replaced by +[MGLAccountManager setAccessToken:].\n\nIf you previously set this access token in a storyboard inspectable, select the MGLMapView in Interface Builder and delete the “accessToken” entry from the User Defined Runtime Attributes section of the Identity inspector. Then go to the Info.plist file and set MGLMapboxAccessToken to “%@”.", accessToken);
+    [NSException raise:@"Method unavailable" format:
+     @"%s has been replaced by +[MGLAccountManager setAccessToken:].\n\n"
+     @"If you previously set this access token in a storyboard inspectable, select the MGLMapView in Interface Builder and delete the “accessToken” entry from the User Defined Runtime Attributes section of the Identity inspector. "
+     @"Then go to the Info.plist file and set MGLMapboxAccessToken to “%@”.",
+     __PRETTY_FUNCTION__, accessToken];
 }
 
 + (NS_SET_OF(NSString *) *)keyPathsForValuesAffectingStyleURL
@@ -1573,13 +1580,19 @@ CLLocationCoordinate2D MGLLocationCoordinate2DFromLatLng(mbgl::LatLng latLng)
 
 - (nullable NSString *)mapID
 {
-    NSAssert(NO, @"-[MGLMapView mapID] has been renamed -[MGLMapView styleID].");
+    [NSException raise:@"Method unavailable" format:
+     @"%s has been renamed -[MGLMapView styleID].",
+     __PRETTY_FUNCTION__];
     return nil;
 }
 
 - (void)setMapID:(nullable NSString *)mapID
 {
-    NSAssert(NO, @"-[MGLMapView setMapID:] has been renamed -[MGLMapView setStyleID:].\n\nIf you previously set this map ID in a storyboard inspectable, select the MGLMapView in Interface Builder and delete the “mapID” entry from the User Defined Runtime Attributes section of the Identity inspector. Then go to the Attributes inspector and enter “%@” into the “Style ID” field.", mapID);
+    [NSException raise:@"Method unavailable" format:
+     @"%s has been renamed -[MGLMapView setStyleID:].\n\n"
+     @"If you previously set this map ID in a storyboard inspectable, select the MGLMapView in Interface Builder and delete the “mapID” entry from the User Defined Runtime Attributes section of the Identity inspector. "
+     @"Then go to the Attributes inspector and enter “%@” into the “Style ID” field.",
+     __PRETTY_FUNCTION__, mapID];
 }
 
 - (NS_ARRAY_OF(NSString *) *)styleClasses
@@ -2003,8 +2016,11 @@ CLLocationCoordinate2D MGLLocationCoordinate2DFromLatLng(mbgl::LatLng latLng)
         {
             BOOL hasLocationDescription = [[NSBundle mainBundle] objectForInfoDictionaryKey:@"NSLocationWhenInUseUsageDescription"] ||
                 [[NSBundle mainBundle] objectForInfoDictionaryKey:@"NSLocationAlwaysUsageDescription"];
-            NSAssert(hasLocationDescription,
-                @"For iOS 8 and above, your app must have a value for NSLocationWhenInUseUsageDescription or NSLocationAlwaysUsageDescription in its Info.plist");
+            if (!hasLocationDescription)
+            {
+                [NSException raise:@"Missing Location Services usage description" format:
+                 @"In iOS 8 and above, this app must have a value for NSLocationWhenInUseUsageDescription or NSLocationAlwaysUsageDescription in its Info.plist."];
+            }
             [self.locationManager requestWhenInUseAuthorization];
         }
 #endif
@@ -2553,7 +2569,11 @@ CLLocationCoordinate2D MGLLocationCoordinate2DFromLatLng(mbgl::LatLng latLng)
 {
     NSString *path = [[NSBundle bundleWithPath:[NSBundle mgl_resourceBundlePath]] pathForResource:name ofType:extension inDirectory:directory];
 
-    NSAssert(path, @"Resource %@ not found in application.", name);
+    if (!path)
+    {
+        [NSException raise:@"Resource not found" format:
+         @"The resource named “%@” could not be found in the Mapbox GL resource bundle.", name];
+    }
 
     return path;
 }

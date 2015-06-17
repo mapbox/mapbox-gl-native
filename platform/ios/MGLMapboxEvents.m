@@ -219,7 +219,12 @@ const NSTimeInterval MGLFlushInterval = 60;
                 }
             }
 
-            NSAssert(defaultEnabledValue, @"End users must be able to opt out of Metrics in your app, either inside Settings (via Settings.bundle) or inside this app. If you implement the opt-out control inside this app, disable this assertion by setting MGLMapboxMetricsEnabledSettingShownInApp to YES in Info.plist.");
+            if (!defaultEnabledValue)
+            {
+                [NSException raise:@"MGLMapboxMetricsEnabled setting missing" format:
+                 @"End users must be able to opt out of Metrics in your app, either inside Settings (via Settings.bundle) or inside this app. "
+                 @"If you implement the opt-out control inside this app, disable this assertion by setting MGLMapboxMetricsEnabledSettingShownInApp to YES in Info.plist."];
+            }
             [[NSUserDefaults standardUserDefaults] registerDefaults:@{
                  @"MGLMapboxMetricsEnabled": defaultEnabledValue,
              }];
