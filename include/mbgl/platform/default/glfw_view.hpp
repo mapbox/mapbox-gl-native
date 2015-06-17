@@ -37,7 +37,15 @@ public:
     void fps();
 
 private:
+    mbgl::LatLng makeRandomPoint() const;
+
     void addRandomPointAnnotations(int count);
+    void addRandomShapeAnnotations(int count);
+
+    void clearAnnotations();
+    void popAnnotation();
+
+    mbgl::AnnotationIDs annotationIDs;
 
 private:
     bool fullscreen = false;
