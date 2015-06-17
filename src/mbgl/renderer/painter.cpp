@@ -27,6 +27,7 @@
 #include <mbgl/shader/sdf_shader.hpp>
 #include <mbgl/shader/dot_shader.hpp>
 #include <mbgl/shader/box_shader.hpp>
+#include <mbgl/shader/circle_shader.hpp>
 
 #include <mbgl/util/constants.hpp>
 #include <mbgl/util/mat3.hpp>
@@ -66,6 +67,7 @@ void Painter::setup() {
     assert(sdfGlyphShader);
     assert(sdfIconShader);
     assert(dotShader);
+    assert(circleShader);
 
 
     // Blending
@@ -100,6 +102,7 @@ void Painter::setupShaders() {
     if (!sdfIconShader) sdfIconShader = std::make_unique<SDFIconShader>();
     if (!dotShader) dotShader = std::make_unique<DotShader>();
     if (!collisionBoxShader) collisionBoxShader = std::make_unique<CollisionBoxShader>();
+    if (!circleShader) circleShader = std::make_unique<CircleShader>();
 }
 
 void Painter::resize() {

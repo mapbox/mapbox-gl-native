@@ -19,6 +19,8 @@ bool StyleLayer::isVisible() const {
             return getProperties<FillProperties>().isVisible();
         case StyleLayerType::Line:
             return getProperties<LineProperties>().isVisible();
+        case StyleLayerType::Circle:
+            return getProperties<CircleProperties>().isVisible();
         case StyleLayerType::Symbol:
             return getProperties<SymbolProperties>().isVisible();
         case StyleLayerType::Raster:
@@ -205,6 +207,18 @@ void StyleLayer::applyStyleProperties<LineProperties>(const float z, const TimeP
 }
 
 template <>
+void StyleLayer::applyStyleProperties<CircleProperties>(const float z, const TimePoint& now, const ZoomHistory &zoomHistory) {
+    properties.set<CircleProperties>();
+    CircleProperties& circle = properties.get<CircleProperties>();
+    applyTransitionedStyleProperty(PropertyKey::CircleRadius, circle.radius, z, now, zoomHistory);
+    applyTransitionedStyleProperty(PropertyKey::CircleColor, circle.color, z, now, zoomHistory);
+    applyTransitionedStyleProperty(PropertyKey::CircleOpacity, circle.opacity, z, now, zoomHistory);
+    applyTransitionedStyleProperty(PropertyKey::CircleTranslate, circle.translate, z, now, zoomHistory);
+    applyStyleProperty(PropertyKey::CircleTranslateAnchor, circle.translateAnchor, z, now, zoomHistory);
+    applyTransitionedStyleProperty(PropertyKey::CircleBlur, circle.blur, z, now, zoomHistory);
+}
+
+template <>
 void StyleLayer::applyStyleProperties<SymbolProperties>(const float z, const TimePoint& now, const ZoomHistory &zoomHistory) {
     properties.set<SymbolProperties>();
     SymbolProperties &symbol = properties.get<SymbolProperties>();
@@ -255,6 +269,7 @@ void StyleLayer::updateProperties(float z, const TimePoint& now, ZoomHistory &zo
     switch (type) {
         case StyleLayerType::Fill: applyStyleProperties<FillProperties>(z, now, zoomHistory); break;
         case StyleLayerType::Line: applyStyleProperties<LineProperties>(z, now, zoomHistory); break;
+        case StyleLayerType::Circle: applyStyleProperties<CircleProperties>(z, now, zoomHistory); break;
         case StyleLayerType::Symbol: applyStyleProperties<SymbolProperties>(z, now, zoomHistory); break;
         case StyleLayerType::Raster: applyStyleProperties<RasterProperties>(z, now, zoomHistory); break;
         case StyleLayerType::Background: applyStyleProperties<BackgroundProperties>(z, now, zoomHistory); break;
