@@ -26,14 +26,14 @@ class GlyphAtlas;
 class GlyphStore;
 class SpriteAtlas;
 class Sprite;
-class Style;
 
 class VectorTileData : public TileData {
     friend class TileParser;
 
 public:
     VectorTileData(const TileID&,
-                   Style&,
+                   const std::vector<util::ptr<StyleLayer>>&,
+                   Worker&,
                    GlyphAtlas&,
                    GlyphStore&,
                    SpriteAtlas&,
@@ -66,11 +66,12 @@ protected:
     TriangleElementsBuffer triangleElementsBuffer;
     LineElementsBuffer lineElementsBuffer;
 
+    std::vector<util::ptr<StyleLayer>> layers;
+    Worker& workers;
     GlyphAtlas& glyphAtlas;
     GlyphStore& glyphStore;
     SpriteAtlas& spriteAtlas;
     util::ptr<Sprite> sprite;
-    Style& style;
 
 private:
     // Contains all the Bucket objects for the tile. Buckets are render
