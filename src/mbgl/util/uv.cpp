@@ -16,7 +16,7 @@ const static bool uvVersionCheck = []() {
     const unsigned int UV_VERSION_PATCH = version & 0xFF;
 #endif
 
-    if (major != UV_VERSION_MAJOR || minor != UV_VERSION_MINOR || patch != UV_VERSION_PATCH) {
+    if (major != UV_VERSION_MAJOR || (major == 0 && minor != UV_VERSION_MINOR)) {
         throw std::runtime_error(mbgl::util::sprintf<96>(
             "libuv version mismatch: headers report %d.%d.%d, but library reports %d.%d.%d", UV_VERSION_MAJOR,
             UV_VERSION_MINOR, UV_VERSION_PATCH, major, minor, patch));
