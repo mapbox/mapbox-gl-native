@@ -7,6 +7,7 @@
 #include <mbgl/geometry/icon_buffer.hpp>
 #include <mbgl/geometry/line_buffer.hpp>
 #include <mbgl/geometry/text_buffer.hpp>
+#include <mbgl/geometry/circle_buffer.hpp>
 #include <mbgl/geometry/collision_box_buffer.hpp>
 
 #include <iosfwd>
@@ -62,6 +63,7 @@ protected:
     // Holds the actual geometries in this tile.
     FillVertexBuffer fillVertexBuffer;
     LineVertexBuffer lineVertexBuffer;
+    CircleVertexBuffer circleVertexBuffer;
 
     TriangleElementsBuffer triangleElementsBuffer;
     LineElementsBuffer lineElementsBuffer;
