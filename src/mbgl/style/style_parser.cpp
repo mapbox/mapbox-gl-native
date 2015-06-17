@@ -57,6 +57,7 @@ void StyleParser::parse(JSVal document) {
         // create point annotations symbol bucket
         util::ptr<StyleBucket> pointBucket = std::make_shared<StyleBucket>(pointAnnotationsLayer->type);
         pointBucket->name = pointAnnotationsLayer->id;
+        pointBucket->source = pointID;
         pointBucket->source_layer = pointAnnotationsLayer->id;
 
         // build up point annotations style
@@ -74,7 +75,6 @@ void StyleParser::parse(JSVal document) {
         sources.emplace_back(pointAnnotationsSource);
         pointAnnotationsSource->info.type = SourceType::Annotations;
         pointAnnotationsSource->info.source_id = pointID;
-        pointBucket->source = pointAnnotationsSource;
         pointAnnotationsLayer->bucket = pointBucket;
     }
 
@@ -231,6 +231,7 @@ void StyleParser::parseSources(JSVal value) {
             parseRenderProperty<SourceTypeClass>(itr->value, source->info.type, "type");
             parseRenderProperty(itr->value, source->info.url, "url");
             parseRenderProperty(itr->value, source->info.tile_size, "tileSize");
+            source->info.source_id = name;
             source->info.parseTileJSONProperties(itr->value);
             sources.emplace_back(source);
             sourcesMap.emplace(name, source);
@@ -947,12 +948,10 @@ void StyleParser::parseBucket(JSVal value, util::ptr<StyleLayer> &layer) {
     if (value.HasMember("source")) {
         JSVal value_source = replaceConstant(value["source"]);
         if (value_source.IsString()) {
-            const std::string source_name = { value_source.GetString(), value_source.GetStringLength() };
-            auto source_it = sourcesMap.find(source_name);
-            if (source_it != sourcesMap.end()) {
-                bucket->source = source_it->second;
-            } else {
-                Log::Warning(Event::ParseStyle, "can't find source '%s' required for layer '%s'", source_name.c_str(), layer->id.c_str());
+            bucket->source = { value_source.GetString(), value_source.GetStringLength() };
+            auto source_it = sourcesMap.find(bucket->source);
+            if (source_it == sourcesMap.end()) {
+                Log::Warning(Event::ParseStyle, "can't find source '%s' required for layer '%s'", bucket->source.c_str(), layer->id.c_str());
             }
         } else {
             Log::Warning(Event::ParseStyle, "source of layer '%s' must be a string", layer->id.c_str());

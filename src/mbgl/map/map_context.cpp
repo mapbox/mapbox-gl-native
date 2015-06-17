@@ -139,13 +139,7 @@ void MapContext::updateAnnotationTiles(const std::unordered_set<TileID, TileID::
 
     // grab existing, single shape annotations source
     const auto& shapeID = AnnotationManager::ShapeLayerID;
-
-    const auto source_it = std::find_if(style->sources.begin(), style->sources.end(),
-        [&shapeID](util::ptr<Source> source) {
-        return (source->info.source_id == shapeID);
-    });
-    assert(source_it != style->sources.end());
-    source_it->get()->enabled = true;
+    style->getSource(shapeID)->enabled = true;
 
     // create (if necessary) layers and buckets for each shape
     for (const auto &shapeAnnotationID : data.annotationManager.getOrderedShapeAnnotations()) {
@@ -202,8 +196,8 @@ void MapContext::updateAnnotationTiles(const std::unordered_set<TileID, TileID::
             // create shape bucket & connect to source
             util::ptr<StyleBucket> shapeBucket = std::make_shared<StyleBucket>(shapeLayer->type);
             shapeBucket->name = shapeLayer->id;
+            shapeBucket->source = shapeID;
             shapeBucket->source_layer = shapeLayer->id;
-            shapeBucket->source = *source_it;
 
             // apply line layout properties to bucket
             if (shapeStyle.is<LineProperties>()) {
