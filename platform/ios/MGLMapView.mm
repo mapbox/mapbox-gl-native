@@ -1290,7 +1290,9 @@ std::chrono::steady_clock::duration secondsAsDuration(float duration)
     if ([keyPath isEqualToString:@"accessToken"] && object == [MGLAccountManager sharedManager])
     {
         NSString *accessToken = change[NSKeyValueChangeNewKey];
-        _mbglFileSource->setAccessToken(accessToken ? (std::string)[accessToken UTF8String] : "");
+        if (![accessToken isKindOfClass:[NSNull class]]) {
+            _mbglFileSource->setAccessToken((std::string)[accessToken UTF8String]);
+        }
     }
 }
 
