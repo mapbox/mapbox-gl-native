@@ -290,8 +290,10 @@ void SymbolBucket::addFeature(const std::vector<std::vector<Coordinate>> &lines,
         layout.placement == PlacementType::Line;
     const bool mayOverlap = layout.text.allow_overlap || layout.icon.allow_overlap ||
         layout.text.ignore_placement || layout.icon.ignore_placement;
+    const bool isLine = layout.placement == PlacementType::Line;
+    const float textRepeatDistance = symbolSpacing / 2;
 
-    auto& clippedLines = layout.placement == PlacementType::Line ?
+    auto& clippedLines = isLine ?
         util::clipLines(lines, 0, 0, 4096, 4096) :
         lines;
 
@@ -299,13 +301,17 @@ void SymbolBucket::addFeature(const std::vector<std::vector<Coordinate>> &lines,
         if (!line.size()) continue;
 
         // Calculate the anchor points around which you want to place labels
-        Anchors anchors = layout.placement == PlacementType::Line ?
-            getAnchors(line, symbolSpacing, textMaxAngle, shapedText.left, shapedText.right, glyphSize, textBoxScale, overscaling) :
+        Anchors anchors = isLine ?
+            getAnchors(line, symbolSpacing, textMaxAngle, shapedText.left, shapedText.right, shapedIcon.left, shapedIcon.right, glyphSize, textBoxScale, overscaling) :
             Anchors({ Anchor(float(line[0].x), float(line[0].y), 0, minScale) });
-
 
         // For each potential label, create the placement features used to check for collisions, and the quads use for rendering.
         for (Anchor &anchor : anchors) {
+            if (shapedText && isLine) {
+                if (anchorIsTooClose(shapedText.text, textRepeatDistance, anchor)) {
+                    continue;
+                }
+            }
 
             const bool inside = !(anchor.x < 0 || anchor.x > 4096 || anchor.y < 0 || anchor.y > 4096);
 
@@ -330,6 +336,21 @@ void SymbolBucket::addFeature(const std::vector<std::vector<Coordinate>> &lines,
                     face);
         }
     }
+}
+    
+bool SymbolBucket::anchorIsTooClose(const std::u32string &text, const float repeatDistance, Anchor &anchor) {
+    if (compareText.find(text) == compareText.end()) {
+        compareText.emplace(text, Anchors());
+    } else {
+        auto otherAnchors = compareText.find(text)->second;
+        for (Anchor &otherAnchor : otherAnchors) {
+            if (util::dist<float>(anchor, otherAnchor) < repeatDistance) {
+                return true;
+            }
+        }
+    }
+    compareText[text].push_back(anchor);
+    return false;
 }
 
 void SymbolBucket::placeFeatures() {

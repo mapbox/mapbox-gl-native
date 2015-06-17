@@ -22,7 +22,7 @@ const Shaping FontStack::getShaping(const std::u32string &string, const float ma
                                     const float lineHeight, const float horizontalAlign,
                                     const float verticalAlign, const float justify,
                                     const float spacing, const vec2<float> &translate) const {
-    Shaping shaping(translate.x * 24, translate.y * 24);
+    Shaping shaping(translate.x * 24, translate.y * 24, string);
 
     // the y offset *should* be part of the font metadata
     const int32_t yOffset = -17;
