@@ -21,8 +21,10 @@ LineAtlas::LineAtlas(uint16_t w, uint16_t h)
 LineAtlas::~LineAtlas() {
     std::lock_guard<std::recursive_mutex> lock(mtx);
 
-    Environment::Get().abandonTexture(texture);
-    texture = 0;
+    if (texture) {
+        Environment::Get().abandonTexture(texture);
+        texture = 0;
+    }
 }
 
 LinePatternPos LineAtlas::getDashPosition(const std::vector<float> &dasharray, bool round) {

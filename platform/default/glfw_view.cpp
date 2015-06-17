@@ -114,37 +114,96 @@ void GLFWView::onKey(GLFWwindow *window, int key, int /*scancode*/, int action, 
             if (!mods)
                 view->map->resetNorth();
             break;
+        case GLFW_KEY_Q:
+            view->clearAnnotations();
+            break;
         }
     }
 
     if (action == GLFW_RELEASE || action == GLFW_REPEAT) {
         switch (key) {
+        case GLFW_KEY_W: view->popAnnotation(); break;
         case GLFW_KEY_1: view->addRandomPointAnnotations(1); break;
         case GLFW_KEY_2: view->addRandomPointAnnotations(10); break;
         case GLFW_KEY_3: view->addRandomPointAnnotations(100); break;
         case GLFW_KEY_4: view->addRandomPointAnnotations(1000); break;
         case GLFW_KEY_5: view->addRandomPointAnnotations(10000); break;
         case GLFW_KEY_6: view->addRandomPointAnnotations(100000); break;
+        case GLFW_KEY_7: view->addRandomShapeAnnotations(1); break;
+        case GLFW_KEY_8: view->addRandomShapeAnnotations(10); break;
+        case GLFW_KEY_9: view->addRandomShapeAnnotations(100); break;
+        case GLFW_KEY_0: view->addRandomShapeAnnotations(1000); break;
         }
     }
 }
+
+mbgl::LatLng GLFWView::makeRandomPoint() const {
+    const auto sw = map->latLngForPixel({ 0, 0 });
+    const auto ne = map->latLngForPixel({ double(width), double(height) });
+
+    const double lon = sw.longitude + (ne.longitude - sw.longitude) * (double(std::rand()) / RAND_MAX);
+    const double lat = sw.latitude + (ne.latitude - sw.latitude) * (double(std::rand()) / RAND_MAX);
+
+    return { lat, lon };
+}
+
 
 void GLFWView::addRandomPointAnnotations(int count) {
     std::vector<mbgl::LatLng> points;
     std::vector<std::string> markers;
 
-    const auto sw = map->latLngForPixel({ 0, 0 });
-    const auto ne = map->latLngForPixel({ double(width), double(height) });
-
     for (int i = 0; i < count; i++) {
-        const double lon = sw.longitude + (ne.longitude - sw.longitude) * (double(std::rand()) / RAND_MAX);
-        const double lat = sw.latitude + (ne.latitude - sw.latitude) * (double(std::rand()) / RAND_MAX);
-
-        points.push_back({ lat, lon });
+        points.push_back(makeRandomPoint());
         markers.push_back("default_marker");
     }
 
-    map->addPointAnnotations(points, markers);
+    auto newIDs = map->addPointAnnotations(points, markers);
+    annotationIDs.insert(annotationIDs.end(), newIDs.begin(), newIDs.end());
+}
+
+void GLFWView::addRandomShapeAnnotations(int count) {
+    std::vector<mbgl::AnnotationSegments> shapes;
+    std::vector<mbgl::StyleProperties> shapesProperties;
+
+    mbgl::FillProperties fillProperties;
+    fillProperties.opacity = .1;
+
+    mbgl::StyleProperties properties;
+    properties.set<mbgl::FillProperties>(fillProperties);
+
+    for (int i = 0; i < count; i++) {
+        mbgl::AnnotationSegment triangle;
+        triangle.push_back(makeRandomPoint());
+        triangle.push_back(makeRandomPoint());
+        triangle.push_back(makeRandomPoint());
+
+        mbgl::AnnotationSegments segments;
+        segments.push_back(triangle);
+
+        shapes.push_back(segments);
+        shapesProperties.push_back(properties);
+    }
+
+    auto newIDs = map->addShapeAnnotations(shapes, shapesProperties);
+    annotationIDs.insert(annotationIDs.end(), newIDs.begin(), newIDs.end());
+}
+
+void GLFWView::clearAnnotations() {
+    if (annotationIDs.empty()) {
+        return;
+    }
+
+    map->removeAnnotations(annotationIDs);
+    annotationIDs.clear();
+}
+
+void GLFWView::popAnnotation() {
+    if (annotationIDs.empty()) {
+        return;
+    }
+
+    map->removeAnnotation(annotationIDs.back());
+    annotationIDs.pop_back();
 }
 
 void GLFWView::onScroll(GLFWwindow *window, double /*xOffset*/, double yOffset) {

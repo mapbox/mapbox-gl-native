@@ -294,7 +294,7 @@ TileData::State Source::addTile(MapData& data,
         // If we don't find working tile data, we're just going to load it.
         if (info.type == SourceType::Vector) {
             new_tile.data =
-                std::make_shared<VectorTileData>(normalized_id, style, glyphAtlas,
+                std::make_shared<VectorTileData>(normalized_id, style.layers, style.workers, glyphAtlas,
                                                  glyphStore, spriteAtlas, sprite, info,
                                                  transformState.getAngle(), data.getCollisionDebug());
             new_tile.data->request(style.workers, transformState.getPixelRatio(), callback);
@@ -304,7 +304,7 @@ TileData::State Source::addTile(MapData& data,
                 style.workers, transformState.getPixelRatio(), callback);
         } else if (info.type == SourceType::Annotations) {
             new_tile.data = std::make_shared<LiveTileData>(normalized_id, data.annotationManager,
-                                                           style, glyphAtlas,
+                                                           style.layers, style.workers, glyphAtlas,
                                                            glyphStore, spriteAtlas, sprite, info,
                                                            transformState.getAngle(), data.getCollisionDebug());
             new_tile.data->reparse(style.workers, callback);
@@ -570,9 +570,8 @@ void Source::tileLoadingCompleteCallback(const TileID& normalized_id, const Tran
         return;
     }
 
-    emitTileLoaded(true);
     data->redoPlacement(transformState.getAngle(), collisionDebug);
-
+    emitTileLoaded(true);
 }
 
 void Source::emitSourceLoaded() {

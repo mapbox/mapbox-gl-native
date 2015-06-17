@@ -63,6 +63,8 @@ public:
         return lastError;
     }
 
+    util::ptr<Source> getSource(const std::string& id) const;
+
     std::unique_ptr<GlyphStore> glyphStore;
     std::unique_ptr<GlyphAtlas> glyphAtlas;
     util::ptr<Sprite> sprite;
