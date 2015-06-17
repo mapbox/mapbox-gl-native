@@ -9,7 +9,9 @@ Renders map tiles with [Mapbox GL](https://github.com/mapbox/mapbox-gl-native).
 
 ## Installing
 
-By default, installs binaries. On these platforms no external dependencies are needed.
+Requires a modern C++ runtime that supports C++14.
+
+By default, installs binaries. On these platforms no additional dependencies are needed.
 
 - 64 bit OS X or 64 bit Linux
 - Node.js v0.10.x, Node.js v0.12.x, io.js v2.x
@@ -20,7 +22,7 @@ Just run:
 npm install mapbox-gl-native
 ```
 
-However, other platforms will fall back to a source compile with `npm run build`. To compile this module, make sure all submodules are initialized with `git submodule update --init`.
+Other platforms will fall back to a source compile with `npm run build`. To compile this module, make sure all submodules are initialized with `git submodule update --init` and install the [external dependencies required to build from source](https://github.com/mapbox/mapbox-gl-native#depends).
 
 ## Rendering a map tile
 
