@@ -110,10 +110,25 @@ void Style::recalculate(float z, TimePoint now) {
 
     for (const auto& layer : layers) {
         layer->updateProperties(z, now, zoomHistory);
-        if (layer->bucket && layer->bucket->source) {
-            layer->bucket->source->enabled = true;
+        if (!layer->bucket) {
+            continue;
         }
+
+        util::ptr<Source> source = getSource(layer->bucket->source);
+        if (!source) {
+            continue;
+        }
+
+        source->enabled = true;
     }
+}
+
+util::ptr<Source> Style::getSource(const std::string& id) const {
+    const auto it = std::find_if(sources.begin(), sources.end(), [&](util::ptr<Source> source) {
+        return source->info.source_id == id;
+    });
+
+    return it != sources.end() ? *it : nullptr;
 }
 
 void Style::setDefaultTransitionDuration(Duration duration) {
