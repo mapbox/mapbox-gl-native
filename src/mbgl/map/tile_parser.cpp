@@ -6,6 +6,7 @@
 #include <mbgl/map/sprite.hpp>
 #include <mbgl/renderer/fill_bucket.hpp>
 #include <mbgl/renderer/line_bucket.hpp>
+#include <mbgl/renderer/circle_bucket.hpp>
 #include <mbgl/renderer/symbol_bucket.hpp>
 #include <mbgl/util/constants.hpp>
 
@@ -111,15 +112,18 @@ std::unique_ptr<Bucket> TileParser::createBucket(const StyleBucket &bucketDesc) 
 
     auto layer = geometryTile.getLayer(bucketDesc.source_layer);
     if (layer) {
-        if (bucketDesc.type == StyleLayerType::Fill) {
+        switch (bucketDesc.type) {
+        case StyleLayerType::Fill:
             return createFillBucket(*layer, bucketDesc);
-        } else if (bucketDesc.type == StyleLayerType::Line) {
+        case StyleLayerType::Line:
             return createLineBucket(*layer, bucketDesc);
-        } else if (bucketDesc.type == StyleLayerType::Symbol) {
+        case StyleLayerType::Circle:
+            return createCircleBucket(*layer, bucketDesc);
+        case StyleLayerType::Symbol:
             return createSymbolBucket(*layer, bucketDesc);
-        } else if (bucketDesc.type == StyleLayerType::Raster) {
+        case StyleLayerType::Raster:
             return nullptr;
-        } else {
+        default:
             Log::Warning(Event::ParseTile, "unknown bucket render type for layer '%s' (source layer '%s')",
                     bucketDesc.name.c_str(), bucketDesc.source_layer.c_str());
         }
@@ -171,6 +175,17 @@ std::unique_ptr<Bucket> TileParser::createLineBucket(const GeometryTileLayer& la
     applyLayoutProperty(PropertyKey::LineJoin, bucket_desc.layout, layout.join, z);
     applyLayoutProperty(PropertyKey::LineMiterLimit, bucket_desc.layout, layout.miter_limit, z);
     applyLayoutProperty(PropertyKey::LineRoundLimit, bucket_desc.layout, layout.round_limit, z);
+
+    addBucketGeometries(bucket, layer, bucket_desc.filter);
+    return bucket->hasData() ? std::move(bucket) : nullptr;
+}
+
+std::unique_ptr<Bucket> TileParser::createCircleBucket(const GeometryTileLayer& layer,
+                                                       const StyleBucket& bucket_desc) {
+    auto bucket = std::make_unique<CircleBucket>(tile.circleVertexBuffer,
+                                                 tile.triangleElementsBuffer);
+
+    // Circle does not have layout properties to apply.
 
     addBucketGeometries(bucket, layer, bucket_desc.filter);
     return bucket->hasData() ? std::move(bucket) : nullptr;
