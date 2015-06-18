@@ -128,7 +128,7 @@ void Sprite::parseJSON(const std::string& jsonURL) {
         emitSpriteLoadingFailed(message.str());
     } else if (d.IsObject()) {
         for (rapidjson::Value::ConstMemberIterator itr = d.MemberBegin(); itr != d.MemberEnd(); ++itr) {
-            const std::string& name = itr->name.GetString();
+            const std::string name = { itr->name.GetString(), itr->name.GetStringLength() };
             const rapidjson::Value& value = itr->value;
 
             if (value.IsObject()) {
