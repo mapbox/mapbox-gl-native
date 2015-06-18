@@ -38,7 +38,6 @@ public:
 
     ~MockMapContext() {
         style_.reset();
-        env_.performCleanup();
     }
 
     void update() {
