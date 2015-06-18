@@ -14,6 +14,6 @@ var server = app.listen(2900, function () {
 
     if (process.argv[2]) {
         // Allow the test to continue running.
-        process.kill(+process.argv[2], 'SIGCONT');
+        process.stdin.write("Go!\n");
     }
 });
