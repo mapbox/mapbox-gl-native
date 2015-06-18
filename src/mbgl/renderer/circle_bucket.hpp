@@ -15,6 +15,7 @@ namespace mbgl {
 
 class CircleVertexBuffer;
 class CircleElementsBuffer;
+class CircleShader;
 
 class CircleBucket : public Bucket {
     using TriangleGroup = ElementGroup<3>;
@@ -29,9 +30,14 @@ public:
     bool hasData() const;
     void addGeometry(const GeometryCollection&);
 
+    void drawCircles(CircleShader& shader);
+
 private:
     CircleVertexBuffer& vertexBuffer_;
     TriangleElementsBuffer& elementsBuffer_;
+
+    const size_t vertexStart_;
+    const size_t elementsStart_;
 
     std::vector<std::unique_ptr<TriangleGroup>> triangleGroups_;
 };
