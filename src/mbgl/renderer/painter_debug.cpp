@@ -6,10 +6,6 @@
 #include <mbgl/util/string.hpp>
 #include <mbgl/gl/debugging.hpp>
 
-#ifndef BUFFER_OFFSET
-#define BUFFER_OFFSET(i) ((char *)nullptr + (i))
-#endif
-
 using namespace mbgl;
 
 void Painter::renderTileDebug(const Tile& tile) {

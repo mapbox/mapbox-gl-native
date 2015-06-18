@@ -6,10 +6,6 @@
 
 #include <cassert>
 
-#ifndef BUFFER_OFFSET
-#define BUFFER_OFFSET(i) ((char *)nullptr + (i))
-#endif
-
 using namespace mbgl;
 
 DebugBucket::DebugBucket(DebugFontBuffer& fontBuffer_)

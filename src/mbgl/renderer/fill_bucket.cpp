@@ -12,10 +12,6 @@
 
 #include <cassert>
 
-#ifndef BUFFER_OFFSET
-#define BUFFER_OFFSET(i) ((char *)nullptr + (i))
-#endif
-
 struct geometry_too_long_exception : std::exception {};
 
 using namespace mbgl;

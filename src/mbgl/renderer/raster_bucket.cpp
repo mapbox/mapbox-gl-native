@@ -2,10 +2,6 @@
 #include <mbgl/shader/raster_shader.hpp>
 #include <mbgl/renderer/painter.hpp>
 
-#ifndef BUFFER_OFFSET
-#define BUFFER_OFFSET(i) ((char *)nullptr + (i))
-#endif
-
 using namespace mbgl;
 
 RasterBucket::RasterBucket(TexturePool& texturePool, const StyleLayoutRaster& layout_)

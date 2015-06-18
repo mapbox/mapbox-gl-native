@@ -40,8 +40,6 @@
 
 using namespace mbgl;
 
-#define BUFFER_OFFSET(i) ((char *)nullptr + (i))
-
 Painter::Painter() {
 }
 

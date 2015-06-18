@@ -10,10 +10,6 @@
 #include <mbgl/util/math.hpp>
 #include <mbgl/platform/gl.hpp>
 
-#ifndef BUFFER_OFFSET
-#define BUFFER_OFFSET(i) ((char*)nullptr + (i))
-#endif
-
 #include <cassert>
 
 using namespace mbgl;

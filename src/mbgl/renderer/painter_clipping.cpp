@@ -4,10 +4,6 @@
 #include <mbgl/util/clip_id.hpp>
 #include <mbgl/gl/debugging.hpp>
 
-#ifndef BUFFER_OFFSET
-#define BUFFER_OFFSET(i) ((char *)nullptr + (i))
-#endif
-
 using namespace mbgl;
 
 void Painter::drawClippingMasks(const std::set<Source*>& sources) {

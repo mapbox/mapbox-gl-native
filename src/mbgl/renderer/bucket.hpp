@@ -5,6 +5,8 @@
 #include <mbgl/util/noncopyable.hpp>
 #include <mbgl/util/mat4.hpp>
 
+#define BUFFER_OFFSET(i) ((char*)nullptr + (i))
+
 namespace mbgl {
 
 class Painter;

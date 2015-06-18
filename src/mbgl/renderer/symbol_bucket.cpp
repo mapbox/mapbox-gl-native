@@ -24,10 +24,6 @@
 #include <mbgl/util/clip_lines.hpp>
 #include <mbgl/util/std.hpp>
 
-#ifndef BUFFER_OFFSET
-#define BUFFER_OFFSET(i) ((char *)nullptr + (i))
-#endif
-
 namespace mbgl {
 
 SymbolInstance::SymbolInstance(Anchor &anchor, const std::vector<Coordinate> &line,
