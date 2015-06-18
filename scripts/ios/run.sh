@@ -8,7 +8,7 @@ source ./scripts/ios/setup.sh
 
 BUILDTYPE=${BUILDTYPE:-Release}
 
-PUBLISH_TAG=($(git show -s --format=%B | sed -n 's/.*\[publish \([a-z]\{1,\}\)-v\([0-9.]\{1,\}\)\].*/\1 \2/p'))
+PUBLISH_TAG=($(git show -s --format=%B | sed -n 's/.*\[publish \([a-z]\{1,\}\)-v\([0-9a-z.\-]\{1,\}\)\].*/\1 \2/p'))
 PUBLISH_PLATFORM=${PUBLISH_TAG[0],-}
 PUBLISH_VERSION=${PUBLISH_TAG[1],-}
 
