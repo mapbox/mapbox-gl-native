@@ -13,10 +13,12 @@ using namespace mbgl;
 
 TileWorker::TileWorker(const TileID& id_,
                        Style& style_,
+                       std::vector<util::ptr<StyleLayer>> layers_,
                        const uint16_t maxZoom_,
                        const std::atomic<TileData::State>& state_,
                        std::unique_ptr<CollisionTile> collision_)
-    : style(style_),
+    : layers(std::move(layers_)),
+      style(style_),
       id(id_),
       maxZoom(maxZoom_),
       state(state_),
@@ -48,7 +50,7 @@ size_t TileWorker::countBuckets() const {
 TileParseResult TileWorker::parse(const GeometryTile& geometryTile) {
     partialParse = false;
 
-    for (const auto& layer : style.layers) {
+    for (const auto& layer : layers) {
         parseLayer(*layer, geometryTile);
     }
 
@@ -58,7 +60,7 @@ TileParseResult TileWorker::parse(const GeometryTile& geometryTile) {
 void TileWorker::redoPlacement(float angle, bool collisionDebug) {
     collision->reset(angle, 0);
     collision->setDebug(collisionDebug);
-    for (const auto& layer_desc : style.layers) {
+    for (const auto& layer_desc : layers) {
         auto bucket = getBucket(*layer_desc);
         if (bucket) {
             bucket->placeFeatures();

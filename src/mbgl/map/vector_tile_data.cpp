@@ -21,6 +21,7 @@ VectorTileData::VectorTileData(const TileID& id_,
       worker(style_.workers),
       tileWorker(id_,
                  style_,
+                 style_.layers,
                  source_.max_zoom,
                  state,
                  std::make_unique<CollisionTile>(id_.z, 4096,
@@ -115,7 +116,7 @@ void VectorTileData::redoPlacement(float angle, bool collisionDebug) {
     currentCollisionDebug = collisionDebug;
 
     workRequest = worker.redoPlacement(tileWorker, angle, collisionDebug, [this] {
-        for (const auto& layer : tileWorker.style.layers) {
+        for (const auto& layer : tileWorker.layers) {
             auto bucket = getBucket(*layer);
             if (bucket) {
                 bucket->swapRenderData();

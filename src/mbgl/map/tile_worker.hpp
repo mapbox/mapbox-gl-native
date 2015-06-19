@@ -7,6 +7,7 @@
 #include <mbgl/geometry/fill_buffer.hpp>
 #include <mbgl/geometry/line_buffer.hpp>
 #include <mbgl/util/noncopyable.hpp>
+#include <mbgl/util/ptr.hpp>
 #include <mbgl/style/filter_expression.hpp>
 
 #include <string>
@@ -20,6 +21,7 @@ class CollisionTile;
 class GeometryTile;
 class Style;
 class Bucket;
+class StyleLayer;
 class StyleBucket;
 class GeometryTileLayer;
 
@@ -31,6 +33,7 @@ class TileWorker : public util::noncopyable {
 public:
     TileWorker(const TileID&,
                Style&,
+               std::vector<util::ptr<StyleLayer>>,
                const uint16_t maxZoom,
                const std::atomic<TileData::State>&,
                std::unique_ptr<CollisionTile>);
@@ -42,7 +45,7 @@ public:
     TileParseResult parse(const GeometryTile&);
     void redoPlacement(float angle, bool collisionDebug);
 
-    Style& style;
+    std::vector<util::ptr<StyleLayer>> layers;
 
 private:
     void parseLayer(const StyleLayer&, const GeometryTile&);
@@ -53,6 +56,8 @@ private:
 
     template <class Bucket>
     void addBucketGeometries(Bucket&, const GeometryTileLayer&, const FilterExpression&);
+
+    Style& style;
 
     const TileID id;
     const uint16_t maxZoom;
