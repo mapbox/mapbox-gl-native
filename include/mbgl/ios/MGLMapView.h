@@ -42,7 +42,6 @@ IB_DESIGNABLE
 
 /** @name Authorizing Access */
 
-/** Mapbox API access token for the map view. */
 @property (nonatomic, nullable) NSString *accessToken __attribute__((unavailable("Use +[MGLAccountManager accessToken] and +[MGLAccountManager setAccessToken:].")));
 
 #pragma mark - Managing Constraints
