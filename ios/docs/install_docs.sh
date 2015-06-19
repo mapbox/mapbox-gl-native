@@ -12,7 +12,7 @@ echo "Creating new docs for ${VERSION}..."
 echo
 
 README="/tmp/GL-README.md"
-cat ../README.md | grep -v screenshot > ${README}
+cat ../README.md > ${README}
 echo >> ${README}
 echo -n "#" >> ${README}
 cat ../../CHANGELOG.md >> ${README}
