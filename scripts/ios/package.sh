@@ -111,7 +111,7 @@ fi
 DOCS_OUTPUT="${OUTPUT}/static/Docs"
 DOCS_VERSION=$( git tag --sort -v:refname | sed -n '1p' | sed 's/^v//' )
 README="/tmp/GL-README.md"
-cat ios/README.md > ${README}
+cat ios/README.md | grep -v screenshot > ${README}
 echo >> ${README}
 echo -n "#" >> ${README}
 cat CHANGELOG.md >> ${README}
