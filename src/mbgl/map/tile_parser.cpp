@@ -8,6 +8,7 @@
 #include <mbgl/renderer/line_bucket.hpp>
 #include <mbgl/renderer/symbol_bucket.hpp>
 #include <mbgl/util/constants.hpp>
+#include <mbgl/style/style.hpp>
 
 #include <locale>
 
@@ -20,14 +21,14 @@ TileParser::~TileParser() = default;
 
 TileParser::TileParser(const GeometryTile& geometryTile_,
                        VectorTileData& tile_,
-                       const std::vector<util::ptr<StyleLayer>>& layers_,
+                       const Style& style_,
                        GlyphAtlas& glyphAtlas_,
                        GlyphStore& glyphStore_,
                        SpriteAtlas& spriteAtlas_,
                        const util::ptr<Sprite>& sprite_)
     : geometryTile(geometryTile_),
       tile(tile_),
-      layers(layers_),
+      style(style_),
       glyphAtlas(glyphAtlas_),
       glyphStore(glyphStore_),
       spriteAtlas(spriteAtlas_),
@@ -41,7 +42,7 @@ bool TileParser::obsolete() const {
 }
 
 void TileParser::parse() {
-    for (const auto& layer_desc : layers) {
+    for (const auto& layer_desc : style.layers) {
         // Cancel early when parsing.
         if (obsolete()) {
             return;

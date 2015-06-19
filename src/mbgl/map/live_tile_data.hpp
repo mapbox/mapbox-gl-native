@@ -11,8 +11,7 @@ class LiveTileData : public VectorTileData {
 public:
     LiveTileData(const TileID&,
                  AnnotationManager&,
-                 const std::vector<util::ptr<StyleLayer>>&,
-                 Worker&,
+                 Style&,
                  GlyphAtlas&,
                  GlyphStore&,
                  SpriteAtlas&,

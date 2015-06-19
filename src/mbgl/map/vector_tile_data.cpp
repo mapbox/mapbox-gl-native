@@ -9,12 +9,12 @@
 #include <mbgl/util/pbf.hpp>
 #include <mbgl/util/worker.hpp>
 #include <mbgl/util/work_request.hpp>
+#include <mbgl/style/style.hpp>
 
 using namespace mbgl;
 
 VectorTileData::VectorTileData(const TileID& id_,
-                               const std::vector<util::ptr<StyleLayer>>& layers_,
-                               Worker& workers_,
+                               Style& style_,
                                GlyphAtlas& glyphAtlas_,
                                GlyphStore& glyphStore_,
                                SpriteAtlas& spriteAtlas_,
@@ -23,12 +23,11 @@ VectorTileData::VectorTileData(const TileID& id_,
                                float angle,
                                bool collisionDebug)
     : TileData(id_, source_),
-      layers(layers_),
-      workers(workers_),
       glyphAtlas(glyphAtlas_),
       glyphStore(glyphStore_),
       spriteAtlas(spriteAtlas_),
       sprite(sprite_),
+      style(style_),
       collision(std::make_unique<CollisionTile>(id_.z, 4096, source_.tile_size * id.overscaling, angle, collisionDebug)),
       lastAngle(angle),
       currentAngle(angle) {
@@ -52,7 +51,7 @@ void VectorTileData::parse() {
         // is going to be discarded afterwards.
         VectorTile vectorTile(pbf((const uint8_t *)data.data(), data.size()));
         const VectorTile* vt = &vectorTile;
-        TileParser parser(*vt, *this, layers, glyphAtlas, glyphStore, spriteAtlas, sprite);
+        TileParser parser(*vt, *this, style, glyphAtlas, glyphStore, spriteAtlas, sprite);
         parser.parse();
 
         if (getState() == State::obsolete) {
@@ -129,14 +128,15 @@ void VectorTileData::redoPlacement(float angle, bool collisionDebug) {
         currentCollisionDebug = collisionDebug;
 
         auto callback = std::bind(&VectorTileData::endRedoPlacement, this);
-        workRequest = workers.send([this, angle, collisionDebug] { workerRedoPlacement(angle, collisionDebug); }, callback);
+        workRequest = style.workers.send([this, angle, collisionDebug] { workerRedoPlacement(angle, collisionDebug); }, callback);
+
     }
 }
 
 void VectorTileData::workerRedoPlacement(float angle, bool collisionDebug) {
     collision->reset(angle, 0);
     collision->setDebug(collisionDebug);
-    for (const auto& layer_desc : layers) {
+    for (const auto& layer_desc : style.layers) {
         auto bucket = getBucket(*layer_desc);
         if (bucket) {
             bucket->placeFeatures();
@@ -145,7 +145,7 @@ void VectorTileData::workerRedoPlacement(float angle, bool collisionDebug) {
 }
 
 void VectorTileData::endRedoPlacement() {
-    for (const auto& layer_desc : layers) {
+    for (const auto& layer_desc : style.layers) {
         auto bucket = getBucket(*layer_desc);
         if (bucket) {
             bucket->swapRenderData();

@@ -10,8 +10,7 @@ using namespace mbgl;
 
 LiveTileData::LiveTileData(const TileID& id_,
                            AnnotationManager& annotationManager_,
-                           const std::vector<util::ptr<StyleLayer>>& layers_,
-                           Worker& workers_,
+                           Style& style_,
                            GlyphAtlas& glyphAtlas_,
                            GlyphStore& glyphStore_,
                            SpriteAtlas& spriteAtlas_,
@@ -19,7 +18,7 @@ LiveTileData::LiveTileData(const TileID& id_,
                            const SourceInfo& source_,
                            float angle_,
                            bool collisionDebug_)
-    : VectorTileData::VectorTileData(id_, layers_, workers_, glyphAtlas_, glyphStore_,
+    : VectorTileData::VectorTileData(id_, style_, glyphAtlas_, glyphStore_,
                                      spriteAtlas_, sprite_, source_, angle_, collisionDebug_),
       annotationManager(annotationManager_) {
     // live features are always ready
@@ -44,7 +43,7 @@ void LiveTileData::parse() {
             // Parsing creates state that is encapsulated in TileParser. While parsing,
             // the TileParser object writes results into this objects. All other state
             // is going to be discarded afterwards.
-            TileParser parser(*tile, *this, layers, glyphAtlas, glyphStore, spriteAtlas, sprite);
+            TileParser parser(*tile, *this, style, glyphAtlas, glyphStore, spriteAtlas, sprite);
             parser.parse();
         } catch (const std::exception& ex) {
             Log::Error(Event::ParseTile, "Live-parsing [%d/%d/%d] failed: %s", id.z, id.x, id.y, ex.what());
