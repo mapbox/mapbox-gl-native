@@ -7,7 +7,7 @@ fi
 
 OUTPUT="/tmp/`uuidgen`"
 
-VERSION=$( git tag -l ios\* --sort -v:refname | sed -n '1p' | sed 's/ios-v//' )
+VERSION=$( git tag --sort -v:refname | grep -v '\-rc.' | sed -n '1p' | sed 's/^v//' )
 echo "Creating new docs for ${VERSION}..."
 echo
 

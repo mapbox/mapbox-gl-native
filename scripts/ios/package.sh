@@ -109,7 +109,7 @@ if [ -z `which appledoc` ]; then
     exit 1
 fi
 DOCS_OUTPUT="${OUTPUT}/static/Docs"
-DOCS_VERSION=$( git tag -l ios\* --sort -v:refname | sed -n '1p' | sed 's/^v//' )
+DOCS_VERSION=$( git tag --sort -v:refname | grep -v '\-rc.' | sed -n '1p' | sed 's/^v//' )
 rm -rf /tmp/mbgl
 mkdir -p /tmp/mbgl/
 README=/tmp/mbgl/GL-README.md
