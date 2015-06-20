@@ -7,6 +7,8 @@
 
     <string name="action_debug">Toggle debug mode</string>
 
+    <string name="action_point_annotations">Toggle point annotations</string>
+
     <string name="label_fps">FPS:</string>
 
     <string name="compass_desc">Map compass. Click to reset the map rotation to North.</string>

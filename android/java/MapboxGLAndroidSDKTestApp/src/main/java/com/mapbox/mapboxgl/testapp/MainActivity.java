@@ -77,6 +77,9 @@ public class MainActivity extends ActionBarActivity {
     private float mCompassBearing;
     private boolean mCompassValid = false;
 
+    // Used for point annotations
+    private boolean mIsPointAnnotationsOn = false;
+
     //
     // Lifecycle events
     //
@@ -210,6 +213,10 @@ public class MainActivity extends ActionBarActivity {
                 }
                 return true;
 
+            case R.id.action_point_annotations:
+                // Toggle point annotations
+                togglePointAnnotations(!mIsPointAnnotationsOn);
+
             default:
                 return super.onOptionsItemSelected(item);
         }
@@ -247,6 +254,32 @@ public class MainActivity extends ActionBarActivity {
                 mGpsLocation = null;
             }
         }
+    }
+
+    /**
+     * Enable / Disable Point annotations.
+     *
+     * TODO: Implement updating the UI and removing point annotations from the map.
+     *
+     * @param enablePointAnnotations
+     */
+    private void togglePointAnnotations(boolean enablePointAnnotations) {
+        if (enablePointAnnotations) {
+            if (!mIsPointAnnotationsOn) {
+                mIsPointAnnotationsOn = true;
+                addPointAnnotations();
+            }
+        } else {
+            if (mIsPointAnnotationsOn) {
+                mIsPointAnnotationsOn = false;
+
+            }
+        }
+    }
+
+    private void addPointAnnotations() {
+        LatLng backLot = new LatLng(38.649441, -121.369064);
+        mMapFragment.getMap().addAnnotation(backLot);
     }
 
     // This class forwards location updates to updateLocation()
