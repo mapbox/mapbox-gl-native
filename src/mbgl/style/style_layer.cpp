@@ -212,6 +212,7 @@ void StyleLayer::applyStyleProperties<CircleProperties>(const float z, const Tim
     CircleProperties& circle = properties.get<CircleProperties>();
     applyTransitionedStyleProperty(PropertyKey::CircleRadius, circle.radius, z, now, zoomHistory);
     applyTransitionedStyleProperty(PropertyKey::CircleColor, circle.color, z, now, zoomHistory);
+    applyTransitionedStyleProperty(PropertyKey::CircleOpacity, circle.opacity, z, now, zoomHistory);
     applyTransitionedStyleProperty(PropertyKey::CircleBlur, circle.blur, z, now, zoomHistory);
 }
 
