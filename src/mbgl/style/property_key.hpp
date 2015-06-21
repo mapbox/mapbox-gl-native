@@ -29,6 +29,7 @@ enum class PropertyKey {
 
     CircleRadius,
     CircleColor,
+    CircleOpacity,
     CircleBlur,
 
     SymbolPlacement,

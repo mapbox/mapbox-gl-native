@@ -821,6 +821,7 @@ void StyleParser::parsePaint(JSVal value, ClassProperties &klass) {
 
     parseOptionalProperty<Function<float>>("circle-radius", Key::CircleRadius, klass, value);
     parseOptionalProperty<Function<Color>>("circle-color", Key::CircleColor, klass, value);
+    parseOptionalProperty<Function<float>>("circle-opacity", Key::CircleOpacity, klass, value);
     parseOptionalProperty<Function<float>>("circle-blur", Key::CircleBlur, klass, value);
 
     parseOptionalProperty<Function<float>>("icon-opacity", Key::IconOpacity, klass, value);

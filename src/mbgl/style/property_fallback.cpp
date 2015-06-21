@@ -23,6 +23,7 @@ const std::map<PropertyKey, PropertyValue> PropertyFallbackValue::properties = {
 
     { PropertyKey::CircleRadius, defaultStyleProperties<CircleProperties>().radius },
     { PropertyKey::CircleColor, defaultStyleProperties<CircleProperties>().color },
+    { PropertyKey::CircleOpacity, defaultStyleProperties<CircleProperties>().opacity },
     { PropertyKey::CircleBlur, defaultStyleProperties<CircleProperties>().blur },
 
     { PropertyKey::IconOpacity, defaultStyleProperties<SymbolProperties>().icon.opacity },
