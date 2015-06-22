@@ -102,6 +102,10 @@ NAN_METHOD(NodeMap::Load) {
 
     if (!nodeMap->isValid()) return NanThrowError(releasedMessage());
 
+    // Reset the flag as this could be the second time
+    // we are calling this (being the previous successful).
+    nodeMap->loaded = false;
+
     if (args.Length() < 1) {
         return NanThrowError("Requires a map style as first argument");
     }
@@ -121,6 +125,8 @@ NAN_METHOD(NodeMap::Load) {
     } catch (const std::exception &ex) {
         return NanThrowError(ex.what());
     }
+
+    nodeMap->loaded = true;
 
     NanReturnUndefined();
 }
@@ -166,6 +172,10 @@ NAN_METHOD(NodeMap::Render) {
 
     if (args.Length() <= 1 || !args[1]->IsFunction()) {
         return NanThrowTypeError("Second argument must be a callback function");
+    }
+
+    if (!nodeMap->isLoaded()) {
+        return NanThrowTypeError("Style is not loaded");
     }
 
     auto options = ParseOptions(args[0]->ToObject());
