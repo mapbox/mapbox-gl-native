@@ -1,3 +1,9 @@
+# 1.1.2
+
+- Fixes segfault, throws JavaScript error instead when attempting to 
+  render without first loading a style.
+- Bumps mbgl submodule to v0.4.0
+
 # 1.1.1
 
 - Bumps mbgl submodule to v0.3.5
@@ -20,11 +26,13 @@
 
 # 1.0.3
 
-- Fixes crash during garbage collection by assigning FileSource handle to a v8::Persistent in NodeMap constructor.
+- Fixes crash during garbage collection by assigning FileSource handle 
+  to a v8::Persistent in NodeMap constructor.
 
 # 1.0.2
 
-- Initialize shared display connection at module load time to avoid race condition when display connection is initialized on-demand.
+- Initialize shared display connection at module load time to avoid 
+  race condition when display connection is initialized on-demand.
 
 # 1.0.1
 
