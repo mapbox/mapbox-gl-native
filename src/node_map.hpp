@@ -33,6 +33,8 @@ public:
     void renderFinished();
 
     void release();
+
+    inline bool isLoaded() { return loaded; }
     inline bool isValid() { return valid; }
 
     static std::unique_ptr<NodeMap::RenderOptions> ParseOptions(v8::Local<v8::Object> obj);
@@ -60,6 +62,7 @@ private:
     // Async for delivering the notifications of render completion.
     uv_async_t *async;
 
+    bool loaded = false;
     bool valid = true;
 };
 

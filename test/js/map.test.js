@@ -338,11 +338,11 @@ test('Map', function(t) {
             });
         });
 
-        t.skip('requires a style to be set', function(t) {
+        t.test('requires a style to be set', function(t) {
             setup(fileSource, function(map) {
                 t.throws(function() {
                     map.render({}, function() {});
-                }, /Style is not set/);
+                }, /Style is not loaded/);
 
                 map.release();
 
@@ -365,7 +365,7 @@ test('Map', function(t) {
                     map.release();
 
                     t.ok(err, 'returns error');
-                    t.equal(err.message, 'Error rendering image');
+                    t.ok(err.message.match(/Failed to load/), 'error text matches');
 
                     t.end();
                 });
