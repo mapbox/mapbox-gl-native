@@ -286,7 +286,7 @@ std::tuple<bool, std::array<float, 2>> StyleParser::parseProperty(JSVal value, c
 
         float first = value[rapidjson::SizeType(0)].GetDouble();
         float second = value[rapidjson::SizeType(1)].GetDouble();
-        return std::tuple<bool, std::array<float, 2>> { false, {{ first, second }} };
+        return std::tuple<bool, std::array<float, 2>> { true, {{ first, second }} };
     } else {
         Log::Warning(Event::ParseStyle, "value must be array of two numbers");
         return std::tuple<bool, std::array<float, 2>> { false, {{ 0.0f, 0.0f }} };
@@ -367,7 +367,7 @@ std::tuple<bool, std::vector<std::pair<float, T>>> StyleParser::parseStops(JSVal
 template <typename T>
 std::tuple<bool, Function<T>> StyleParser::parseFunction(JSVal value, const char *property_name) {
     if (!value.IsObject()) {
-        return std::tuple<bool, Function<T>> { true, ConstantFunction<T>(std::get<1>(parseProperty<T>(value, property_name))) };
+        return parseProperty<T>(value, property_name);
     }
 
     if (!value.HasMember("stops")) {
