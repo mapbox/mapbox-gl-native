@@ -1,5 +1,7 @@
 # 1.1.2
 
+- Check libuv version semver-ishly, fixes segfaults in Node.js 0.12.x
+  and iojs.
 - Fixes segfault, throws JavaScript error instead when attempting to 
   render without first loading a style.
 - Bumps mbgl submodule to v0.4.0
