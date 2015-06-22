@@ -6,6 +6,9 @@
 *.pyc
 /android/debug
 /android/sdk
+/android/**/.classpath
+/android/**/.project
+/android/**/.settings/
 /mason_packages
 /config/*.gypi
 /build
