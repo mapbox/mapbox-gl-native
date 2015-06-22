@@ -13,6 +13,8 @@
 #include <mbgl/util/texture_pool.hpp>
 #include <mbgl/util/thread.hpp>
 
+#include <regex>
+
 using namespace mbgl;
 
 namespace {
@@ -123,21 +125,20 @@ void runTestCase(MockFileSource::Type type,
     // join and cease logging after this point.
     context.reset();
 
-    const FixtureLogObserver::LogMessage logMessage {
-        EventSeverity::Error,
-        Event::Style,
-        int64_t(-1),
-        message,
-    };
+    uint32_t match = 0;
+    std::vector<FixtureLogObserver::LogMessage> logMessages = log->unchecked();
 
-    if (type == MockFileSource::Success) {
-        EXPECT_EQ(log->count(logMessage), 0u);
-    } else {
-        EXPECT_GT(log->count(logMessage), 0u);
+    for (auto& logMessage : logMessages) {
+        if (std::regex_match(*logMessage.msg, std::regex(message))) {
+            match++;
+        }
     }
 
-    // Clear the remaining error messages
-    log->unchecked().size();
+    if (type == MockFileSource::Success) {
+        EXPECT_EQ(match, 0u);
+    } else {
+        EXPECT_GT(match, 0u);
+    }
 }
 
 }
@@ -151,7 +152,7 @@ TEST_P(ResourceLoading, Success) {
 
 TEST_P(ResourceLoading, RequestFail) {
     std::stringstream message;
-    message << "Failed to load [test/fixtures/resources/" << GetParam() << "]: Failed by the test case";
+    message << "Failed to load \\[test/fixtures/resources/" << GetParam() << "]: Failed by the test case";
 
     runTestCase(MockFileSource::RequestFail, GetParam(), message.str());
 }
@@ -163,9 +164,9 @@ TEST_P(ResourceLoading, RequestWithCorruptedData) {
     message << "Failed to parse ";
 
     if (param == "vector.pbf") {
-        message << "[15/16384/16384]: pbf unknown field type exception";
+        message << "\\[15/1638./1638.]: pbf unknown field type exception";
     } else {
-        message << "[test/fixtures/resources/" << param << "]";
+        message << "\\[test/fixtures/resources/" << param << "]";
     }
 
     if (param.find("json") != std::string::npos) {
