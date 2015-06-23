@@ -115,86 +115,86 @@ JSVal StyleParser::replaceConstant(JSVal value) {
 
 #pragma mark - Parse Render Properties
 
-template<> bool StyleParser::parseRenderProperty(JSVal value, bool &target, const char *name) {
+template<> StyleParser::Status StyleParser::parseRenderProperty(JSVal value, bool &target, const char *name) {
     if (value.HasMember(name)) {
         JSVal property = replaceConstant(value[name]);
         if (property.IsBool()) {
             target = property.GetBool();
-            return true;
+            return StyleParserSuccess;
         } else {
             Log::Warning(Event::ParseStyle, "'%s' must be a boolean", name);
         }
     }
-    return false;
+    return StyleParserFailure;
 }
 
 
-template<> bool StyleParser::parseRenderProperty(JSVal value, std::string &target, const char *name) {
+template<> StyleParser::Status StyleParser::parseRenderProperty(JSVal value, std::string &target, const char *name) {
     if (value.HasMember(name)) {
         JSVal property = replaceConstant(value[name]);
         if (property.IsString()) {
             target = { property.GetString(), property.GetStringLength() };
-            return true;
+            return StyleParserSuccess;
         } else {
             Log::Warning(Event::ParseStyle, "'%s' must be a string", name);
         }
     }
-    return false;
+    return StyleParserFailure;
 }
 
-template<> bool StyleParser::parseRenderProperty(JSVal value, float &target, const char *name) {
+template<> StyleParser::Status StyleParser::parseRenderProperty(JSVal value, float &target, const char *name) {
     if (value.HasMember(name)) {
         JSVal property = replaceConstant(value[name]);
         if (property.IsNumber()) {
             target = property.GetDouble();
-            return true;
+            return StyleParserSuccess;
         } else {
             Log::Warning(Event::ParseStyle, "'%s' must be a number", name);
         }
     }
-    return false;
+    return StyleParserFailure;
 }
 
-template<> bool StyleParser::parseRenderProperty(JSVal value, uint16_t &target, const char *name) {
+template<> StyleParser::Status StyleParser::parseRenderProperty(JSVal value, uint16_t &target, const char *name) {
     if (value.HasMember(name)) {
         JSVal property = replaceConstant(value[name]);
         if (property.IsUint()) {
             unsigned int int_value = property.GetUint();
             if (int_value > std::numeric_limits<uint16_t>::max()) {
                 Log::Warning(Event::ParseStyle, "values for %s that are larger than %d are not supported", name, std::numeric_limits<uint16_t>::max());
-                return false;
+                return StyleParserFailure;
             }
 
             target = int_value;
-            return true;
+            return StyleParserSuccess;
         } else {
             Log::Warning(Event::ParseStyle, "%s must be an unsigned integer", name);
         }
     }
-    return false;
+    return StyleParserFailure;
 }
 
-template<> bool StyleParser::parseRenderProperty(JSVal value, int32_t &target, const char *name) {
+template<> StyleParser::Status StyleParser::parseRenderProperty(JSVal value, int32_t &target, const char *name) {
     if (value.HasMember(name)) {
         JSVal property = replaceConstant(value[name]);
         if (property.IsInt()) {
             target = property.GetInt();
-            return true;
+            return StyleParserSuccess;
         } else {
             Log::Warning(Event::ParseStyle, "%s must be an integer", name);
         }
     }
-    return false;
+    return StyleParserFailure;
 }
 
-template<> bool StyleParser::parseRenderProperty(JSVal value, vec2<float> &target, const char *name) {
+template<> StyleParser::Status StyleParser::parseRenderProperty(JSVal value, vec2<float> &target, const char *name) {
     if (value.HasMember(name)) {
         JSVal property = replaceConstant(value[name]);
         if (property.IsArray()) {
             if (property.Size() >= 2) {
                 target.x = property[(rapidjson::SizeType)0].GetDouble();
                 target.y = property[(rapidjson::SizeType)1].GetDouble();
-                return true;
+                return StyleParserSuccess;
             } else {
                 Log::Warning(Event::ParseStyle, "%s must have at least two members", name);
             }
@@ -202,21 +202,21 @@ template<> bool StyleParser::parseRenderProperty(JSVal value, vec2<float> &targe
             Log::Warning(Event::ParseStyle, "%s must be an array of numbers", name);
         }
     }
-    return false;
+    return StyleParserFailure;
 }
 
 template<typename Parser, typename T>
-bool StyleParser::parseRenderProperty(JSVal value, T &target, const char *name) {
+StyleParser::Status StyleParser::parseRenderProperty(JSVal value, T &target, const char *name) {
     if (value.HasMember(name)) {
         JSVal property = replaceConstant(value[name]);
         if (property.IsString()) {
             target = Parser({ property.GetString(), property.GetStringLength() });
-            return true;
+            return StyleParserSuccess;
         } else {
             Log::Warning(Event::ParseStyle, "%s must have one of the enum values", name);
         }
     }
-    return false;
+    return StyleParserFailure;
 }
 
 
@@ -412,7 +412,7 @@ StyleParser::Result<PiecewiseConstantFunction<T>> StyleParser::parsePiecewiseCon
 }
 
 template <typename T>
-bool StyleParser::setProperty(JSVal value, const char *property_name, PropertyKey key, ClassProperties &klass) {
+StyleParser::Status StyleParser::setProperty(JSVal value, const char *property_name, PropertyKey key, ClassProperties &klass) {
     auto res = parseProperty<T>(value, property_name);
     if (std::get<0>(res)) {
         klass.set(key, std::get<1>(res));
@@ -421,7 +421,7 @@ bool StyleParser::setProperty(JSVal value, const char *property_name, PropertyKe
 }
 
 template <typename T>
-bool StyleParser::setProperty(JSVal value, const char *property_name, PropertyKey key, ClassProperties &klass, JSVal transition) {
+StyleParser::Status StyleParser::setProperty(JSVal value, const char *property_name, PropertyKey key, ClassProperties &klass, JSVal transition) {
     auto res = parseProperty<T>(value, property_name, transition);
     if (std::get<0>(res)) {
         klass.set(key, std::get<1>(res));
@@ -442,18 +442,18 @@ void StyleParser::parseVisibility(StyleBucket &bucket, JSVal value) {
 }
 
 template<typename T>
-bool StyleParser::parseOptionalProperty(const char *property_name, PropertyKey key, ClassProperties &klass, JSVal value) {
+StyleParser::Status StyleParser::parseOptionalProperty(const char *property_name, PropertyKey key, ClassProperties &klass, JSVal value) {
     if (!value.HasMember(property_name)) {
-        return false;
+        return StyleParserFailure;
     } else {
         return setProperty<T>(replaceConstant(value[property_name]), property_name, key, klass);
     }
 }
 
 template<typename T>
-bool StyleParser::parseOptionalProperty(const char *property_name, PropertyKey key, ClassProperties &klass, JSVal value, const char *transition_name) {
+StyleParser::Status StyleParser::parseOptionalProperty(const char *property_name, PropertyKey key, ClassProperties &klass, JSVal value, const char *transition_name) {
     if (!value.HasMember(property_name)) {
-        return false;
+        return StyleParserFailure;
     } else {
         if (value.HasMember(transition_name)) {
             return setProperty<T>(replaceConstant(value[property_name]), property_name, key, klass, value[transition_name]);
@@ -490,7 +490,7 @@ template<> StyleParser::Result<std::string> StyleParser::parseProperty(JSVal val
 template<> StyleParser::Result<bool> StyleParser::parseProperty(JSVal value, const char *property_name) {
     if (!value.IsBool()) {
         Log::Warning(Event::ParseStyle, "value of '%s' must be a boolean", property_name);
-        return Result<bool> { StyleParserFailure, true };
+        return Result<bool> { StyleParserFailure, StyleParserSuccess };
     }
 
     return Result<bool> { StyleParserSuccess, value.GetBool() };

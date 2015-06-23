@@ -68,21 +68,21 @@ private:
 
     // Parses optional properties into a render bucket.
     template<typename T>
-    bool parseRenderProperty(JSVal value, T &target, const char *name);
+    Status parseRenderProperty(JSVal value, T &target, const char *name);
     template <typename Parser, typename T>
-    bool parseRenderProperty(JSVal value, T &target, const char *name);
+    Status parseRenderProperty(JSVal value, T &target, const char *name);
 
     // Parses optional properties into style class properties.
     template <typename T>
     void parseVisibility(StyleBucket &bucket, JSVal value);
     template <typename T>
-    bool parseOptionalProperty(const char *property_name, PropertyKey key, ClassProperties &klass, JSVal value);
+    Status parseOptionalProperty(const char *property_name, PropertyKey key, ClassProperties &klass, JSVal value);
     template <typename T>
-    bool parseOptionalProperty(const char *property_name, PropertyKey key, ClassProperties &klass, JSVal value, const char *transition_name);
+    Status parseOptionalProperty(const char *property_name, PropertyKey key, ClassProperties &klass, JSVal value, const char *transition_name);
     template <typename T>
-    bool setProperty(JSVal value, const char *property_name, PropertyKey key, ClassProperties &klass);
+    Status setProperty(JSVal value, const char *property_name, PropertyKey key, ClassProperties &klass);
     template <typename T>
-    bool setProperty(JSVal value, const char *property_name, PropertyKey key, ClassProperties &klass, JSVal transition);
+    Status setProperty(JSVal value, const char *property_name, PropertyKey key, ClassProperties &klass, JSVal transition);
 
     template <typename T>
     Result<T> parseProperty(JSVal value, const char *property_name);
