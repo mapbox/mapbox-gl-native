@@ -28,6 +28,9 @@
 
       'variables': {
         'cflags_cc': [
+          '<@(variant_cflags)',
+          '<@(rapidjson_cflags)',
+          '<@(geojsonvt_cflags)',
           '<@(uv_cflags)',
           '<@(opengl_cflags)',
           '<@(boost_cflags)',
@@ -38,10 +41,12 @@
           '-fPIC'
         ],
         'ldflags': [
+          '<@(geojsonvt_ldflags)',
           '<@(uv_ldflags)',
           '<@(opengl_ldflags)',
         ],
         'libraries': [
+          '<@(geojsonvt_static_libs)',
           '<@(uv_static_libs)',
         ],
       },

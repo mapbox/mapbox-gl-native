@@ -2,9 +2,9 @@
 #define MBGL_MAP_GEOMETRY_TILE
 
 #include <mbgl/style/value.hpp>
-#include <mbgl/util/optional.hpp>
+#include <mapbox/optional.hpp>
 #include <mbgl/util/ptr.hpp>
-#include <mbgl/util/variant.hpp>
+#include <mapbox/variant.hpp>
 #include <mbgl/util/vec.hpp>
 #include <mbgl/util/noncopyable.hpp>
 

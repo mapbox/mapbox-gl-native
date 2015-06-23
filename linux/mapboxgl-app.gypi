@@ -29,6 +29,7 @@
 
       'variables' : {
         'cflags_cc': [
+          '<@(variant_cflags)',
           '<@(glfw3_cflags)',
         ],
         'ldflags': [

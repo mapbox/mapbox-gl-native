@@ -4,7 +4,8 @@
 #include <mbgl/map/live_tile.hpp>
 #include <mbgl/map/map_data.hpp>
 #include <mbgl/util/constants.hpp>
-#include <mbgl/util/geojsonvt/geojsonvt_convert.hpp>
+#include <mapbox/geojsonvt/geojsonvt.hpp>
+#include <mapbox/geojsonvt/geojsonvt_convert.hpp>
 #include <mbgl/util/ptr.hpp>
 
 #include <algorithm>

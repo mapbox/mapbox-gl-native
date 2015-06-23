@@ -61,6 +61,7 @@
 
       'variables': {
         'cflags_cc': [
+          '<@(variant_cflags)',
           '<@(uv_cflags)',
           '<@(boost_cflags)',
         ],

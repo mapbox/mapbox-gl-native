@@ -18,11 +18,15 @@ trap finish EXIT
 git submodule update --init .mason
 export PATH="`pwd`/.mason:${PATH}" MASON_DIR="`pwd`/.mason"
 
+RAPIDJSON_VERSION=1.0.2
+VARIANT_VERSION=1.0
+ZLIB_VERSION=system
+GEOJSONVT_VERSION=1.1.0
+
 case ${MASON_PLATFORM} in
     'ios')
         SQLITE_VERSION=system
         LIBUV_VERSION=0.10.28
-        ZLIB_VERSION=system
         BOOST_VERSION=system
         ;;
     'android')
@@ -32,19 +36,18 @@ case ${MASON_PLATFORM} in
         OPENSSL_VERSION=1.0.1l
         LIBCURL_VERSION=7.40.0
         LIBUV_VERSION=1.4.0
-        ZLIB_VERSION=system
         BOOST_VERSION=1.57.0
         NUNICODE_VERSION=1.5.1
         LIBZIP_VERSION=0.11.2
         ;;
     *)
+        GTEST_VERSION=1.7.0
         GLFW_VERSION=3.1
         SQLITE_VERSION=3.8.8.1
         LIBPNG_VERSION=1.6.16
         LIBJPEG_VERSION=v9a
         LIBCURL_VERSION=system
         LIBUV_VERSION=0.10.28
-        ZLIB_VERSION=system
         BOOST_VERSION=1.57.0
         BOOST_PROGRAM_OPTIONS_VERSION=1.57.0
         NUNICODE_VERSION=1.5.1
@@ -112,6 +115,24 @@ if [ ! -z ${BOOST_PROGRAM_OPTIONS_VERSION} ]; then
     CONFIG+="    'boost_program_options_static_libs%': $(quote_flags $(mason static_libs boost_libprogram_options ${BOOST_VERSION})),"$LN
 fi
 
+
+if [ ! -z ${RAPIDJSON_VERSION} ]; then
+    mason install rapidjson ${RAPIDJSON_VERSION}
+    CONFIG+="    'rapidjson_cflags%': $(quote_flags $(mason cflags rapidjson ${RAPIDJSON_VERSION})),"$LN
+fi
+
+if [ ! -z ${VARIANT_VERSION} ]; then
+    mason install variant ${VARIANT_VERSION}
+    CONFIG+="    'variant_cflags%': $(quote_flags $(mason cflags variant ${VARIANT_VERSION})),"$LN
+fi
+
+if [ ! -z ${GTEST_VERSION} ]; then
+    mason install gtest ${GTEST_VERSION}
+    CONFIG+="    'gtest_static_libs%': $(quote_flags $(mason static_libs gtest ${GTEST_VERSION})),"$LN
+    CONFIG+="    'gtest_cflags%': $(quote_flags $(mason cflags gtest ${GTEST_VERSION})),"$LN
+    CONFIG+="    'gtest_ldflags%': $(quote_flags $(mason ldflags gtest ${GTEST_VERSION})),"$LN
+fi
+
 if [ ! -z ${OPENSSL_VERSION} ]; then
     mason install openssl ${OPENSSL_VERSION}
     CONFIG+="    'openssl_static_libs%': $(quote_flags $(mason static_libs openssl ${OPENSSL_VERSION})),"$LN
@@ -167,6 +188,13 @@ if [ ! -z ${LIBUV_VERSION} ]; then
     CONFIG+="    'uv_static_libs%': $(quote_flags $(mason static_libs libuv ${LIBUV_VERSION})),"$LN
     CONFIG+="    'uv_cflags%': $(quote_flags $(mason cflags libuv ${LIBUV_VERSION})),"$LN
     CONFIG+="    'uv_ldflags%': $(quote_flags $(mason ldflags libuv ${LIBUV_VERSION})),"$LN
+fi
+
+if [ ! -z ${GEOJSONVT_VERSION} ]; then
+    mason install geojsonvt ${GEOJSONVT_VERSION}
+    CONFIG+="    'geojsonvt_static_libs%': $(quote_flags $(mason static_libs geojsonvt ${GEOJSONVT_VERSION})),"$LN
+    CONFIG+="    'geojsonvt_cflags%': $(quote_flags $(mason cflags geojsonvt ${GEOJSONVT_VERSION})),"$LN
+    CONFIG+="    'geojsonvt_ldflags%': $(quote_flags $(mason ldflags geojsonvt ${GEOJSONVT_VERSION})),"$LN
 fi
 
 if [ ! -z ${ZLIB_VERSION} ]; then
