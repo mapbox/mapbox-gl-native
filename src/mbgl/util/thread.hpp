@@ -8,6 +8,7 @@
 #include <functional>
 
 #include <mbgl/util/run_loop.hpp>
+#include <mbgl/util/thread_context.hpp>
 #include <mbgl/platform/platform.hpp>
 
 namespace mbgl {
@@ -21,16 +22,11 @@ namespace util {
 // Thread<> constructor blocks until the thread and the Object are fully created, so after the
 // object creation, it's safe to obtain the Object stored in this thread.
 
-enum class ThreadPriority : bool {
-    Regular,
-    Low,
-};
-
 template <class Object>
 class Thread {
 public:
     template <class... Args>
-    Thread(const std::string& name, ThreadPriority priority, Args&&... args);
+    Thread(const ThreadContext&, Args&&... args);
     ~Thread();
 
     // Invoke object->fn(args...) in the runloop thread.
@@ -81,7 +77,7 @@ private:
     }
 
     template <typename P, std::size_t... I>
-    void run(P&& params, std::index_sequence<I...>);
+    void run(ThreadContext, P&& params, std::index_sequence<I...>);
 
     std::promise<void> running;
     std::promise<void> joinable;
@@ -94,23 +90,21 @@ private:
 
 template <class Object>
 template <class... Args>
-Thread<Object>::Thread(const std::string& name, ThreadPriority priority, Args&&... args) {
+Thread<Object>::Thread(const ThreadContext& context, Args&&... args) {
     // Note: We're using std::tuple<> to store the arguments because GCC 4.9 has a bug
     // when expanding parameters packs captured in lambdas.
     std::tuple<Args...> params = std::forward_as_tuple(::std::forward<Args>(args)...);
 
     thread = std::thread([&] {
         #ifdef __APPLE__
-        pthread_setname_np(name.c_str());
-        #else
-        (void(name));
+        pthread_setname_np(context.name.c_str());
         #endif
 
-        if (priority == ThreadPriority::Low) {
+        if (context.priority == ThreadPriority::Low) {
             platform::makeThreadLowPriority();
         }
 
-        run(std::move(params), std::index_sequence_for<Args...>{});
+        run(context, std::move(params), std::index_sequence_for<Args...>{});
     });
 
     running.get_future().get();
@@ -118,10 +112,12 @@ Thread<Object>::Thread(const std::string& name, ThreadPriority priority, Args&&.
 
 template <class Object>
 template <typename P, std::size_t... I>
-void Thread<Object>::run(P&& params, std::index_sequence<I...>) {
+void Thread<Object>::run(ThreadContext context, P&& params, std::index_sequence<I...>) {
     uv::loop l;
 
     {
+        ThreadContext::current.set(&context);
+
         RunLoop loop_(l.get());
         loop = &loop_;
 
@@ -133,6 +129,8 @@ void Thread<Object>::run(P&& params, std::index_sequence<I...>) {
 
         loop = nullptr;
         object = nullptr;
+
+        ThreadContext::current.set(nullptr);
     }
 
     // Run the loop again to ensure that async close callbacks have been called.

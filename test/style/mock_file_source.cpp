@@ -133,7 +133,7 @@ void MockFileSource::Impl::dispatchPendingRequests() {
 }
 
 MockFileSource::MockFileSource(Type type, const std::string& match)
-    : thread_(std::make_unique<util::Thread<Impl>>("FileSource", util::ThreadPriority::Low, type, match)) {
+    : thread_(std::make_unique<util::Thread<Impl>>(util::ThreadContext{"FileSource", util::ThreadType::Unknown, util::ThreadPriority::Low}, type, match)) {
 }
 
 void MockFileSource::setOnRequestDelayedCallback(std::function<void(void)> callback) {

@@ -28,7 +28,7 @@ namespace algo = boost::algorithm;
 namespace mbgl {
 
 DefaultFileSource::DefaultFileSource(FileCache* cache, const std::string& root)
-    : thread(std::make_unique<util::Thread<Impl>>("FileSource", util::ThreadPriority::Low, cache, root)) {
+    : thread(std::make_unique<util::Thread<Impl>>(util::ThreadContext{"FileSource", util::ThreadType::Unknown, util::ThreadPriority::Low}, cache, root)) {
 }
 
 DefaultFileSource::~DefaultFileSource() {

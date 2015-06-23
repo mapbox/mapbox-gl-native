@@ -33,7 +33,7 @@ MapContext::MapContext(uv_loop_t* loop, View& view_, FileSource& fileSource, Map
       updated(static_cast<UpdateType>(Update::Nothing)),
       asyncUpdate(std::make_unique<uv::async>(loop, [this] { update(); })),
       texturePool(std::make_unique<TexturePool>()) {
-    assert(Environment::currentlyOn(ThreadType::Map));
+    assert(util::ThreadContext::currentlyOn(util::ThreadType::Map));
 
     asyncUpdate->unref();
 
@@ -108,7 +108,7 @@ void MapContext::setStyleJSON(const std::string& json, const std::string& base) 
 }
 
 void MapContext::loadStyleJSON(const std::string& json, const std::string& base) {
-    assert(Environment::currentlyOn(ThreadType::Map));
+    assert(util::ThreadContext::currentlyOn(util::ThreadType::Map));
 
     style.reset();
     style = std::make_unique<Style>(json, base, asyncUpdate->get()->loop, env);
@@ -125,13 +125,13 @@ void MapContext::loadStyleJSON(const std::string& json, const std::string& base)
 }
 
 void MapContext::updateTiles() {
-    assert(Environment::currentlyOn(ThreadType::Map));
+    assert(util::ThreadContext::currentlyOn(util::ThreadType::Map));
 
     style->update(data, transformState, *texturePool);
 }
 
 void MapContext::updateAnnotationTiles(const std::unordered_set<TileID, TileID::Hash>& ids) {
-    assert(Environment::currentlyOn(ThreadType::Map));
+    assert(util::ThreadContext::currentlyOn(util::ThreadType::Map));
 
     data.annotationManager.markStaleTiles(ids);
 
@@ -232,7 +232,7 @@ void MapContext::recalculateStyle(TimePoint now) {
 }
 
 void MapContext::update() {
-    assert(Environment::currentlyOn(ThreadType::Map));
+    assert(util::ThreadContext::currentlyOn(util::ThreadType::Map));
 
     const auto now = Clock::now();
     data.setAnimationTime(now);
@@ -303,7 +303,7 @@ void MapContext::renderStill(StillImageCallback fn) {
 }
 
 void MapContext::render() {
-    assert(Environment::currentlyOn(ThreadType::Map));
+    assert(util::ThreadContext::currentlyOn(util::ThreadType::Map));
 
     // Cleanup OpenGL objects that we abandoned since the last render call.
     env.performCleanup();
@@ -335,13 +335,13 @@ void MapContext::render() {
 }
 
 double MapContext::getTopOffsetPixelsForAnnotationSymbol(const std::string& symbol) {
-    assert(Environment::currentlyOn(ThreadType::Map));
+    assert(util::ThreadContext::currentlyOn(util::ThreadType::Map));
     const SpritePosition pos = style->sprite->getSpritePosition(symbol);
     return -pos.height / pos.pixelRatio / 2;
 }
 
 void MapContext::setSourceTileCacheSize(size_t size) {
-    assert(Environment::currentlyOn(ThreadType::Map));
+    assert(util::ThreadContext::currentlyOn(util::ThreadType::Map));
     if (size != sourceCacheSize) {
         sourceCacheSize = size;
         if (!style) return;
@@ -353,7 +353,7 @@ void MapContext::setSourceTileCacheSize(size_t size) {
 }
 
 void MapContext::onLowMemory() {
-    assert(Environment::currentlyOn(ThreadType::Map));
+    assert(util::ThreadContext::currentlyOn(util::ThreadType::Map));
     if (!style) return;
     for (const auto &source : style->sources) {
         source->onLowMemory();
@@ -362,12 +362,12 @@ void MapContext::onLowMemory() {
 }
 
 void MapContext::onTileDataChanged() {
-    assert(Environment::currentlyOn(ThreadType::Map));
+    assert(util::ThreadContext::currentlyOn(util::ThreadType::Map));
     triggerUpdate();
 }
 
 void MapContext::onResourceLoadingFailed(std::exception_ptr error) {
-    assert(Environment::currentlyOn(ThreadType::Map));
+    assert(util::ThreadContext::currentlyOn(util::ThreadType::Map));
 
     if (data.mode == MapMode::Still && callback) {
         callback(error, nullptr);

@@ -64,7 +64,7 @@ TEST(Thread, invoke) {
 
     loop.invoke([&] {
         EXPECT_EQ(tid, std::this_thread::get_id());
-        Thread<TestObject> thread("Test", ThreadPriority::Regular, tid);
+        Thread<TestObject> thread({"Test", ThreadType::Map, ThreadPriority::Regular}, tid);
 
         thread.invoke(&TestObject::fn1, 1);
         thread.invokeWithResult<int>(&TestObject::fn2, [&] (int result) {

@@ -12,7 +12,7 @@ namespace mbgl {
 
 Map::Map(View& view, FileSource& fileSource, MapMode mode)
     : data(std::make_unique<MapData>(view, mode)),
-      context(std::make_unique<util::Thread<MapContext>>("Map", util::ThreadPriority::Regular, view, fileSource, *data))
+      context(std::make_unique<util::Thread<MapContext>>(util::ThreadContext{"Map", util::ThreadType::Map, util::ThreadPriority::Regular}, view, fileSource, *data))
 {
     view.initialize(this);
 }

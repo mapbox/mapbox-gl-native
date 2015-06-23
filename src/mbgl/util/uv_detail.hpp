@@ -191,6 +191,10 @@ private:
 template <class T>
 class tls : public mbgl::util::noncopyable {
 public:
+    inline tls(T* val) {
+        tls();
+        set(val);
+    }
     inline tls() {
         if (uv_key_create(&key) != 0) {
             throw std::runtime_error("failed to initialize thread local storage key");

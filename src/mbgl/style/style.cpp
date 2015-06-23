@@ -159,7 +159,7 @@ bool Style::isLoaded() const {
 }
 
 void Style::setObserver(Observer* observer_) {
-    assert(Environment::currentlyOn(ThreadType::Map));
+    assert(util::ThreadContext::currentlyOn(util::ThreadType::Map));
     assert(!observer);
 
     observer = observer_;
@@ -206,7 +206,7 @@ void Style::onSpriteLoadingFailed(std::exception_ptr error) {
 }
 
 void Style::emitTileDataChanged() {
-    assert(Environment::currentlyOn(ThreadType::Map));
+    assert(util::ThreadContext::currentlyOn(util::ThreadType::Map));
 
     if (observer) {
         observer->onTileDataChanged();
@@ -214,7 +214,7 @@ void Style::emitTileDataChanged() {
 }
 
 void Style::emitResourceLoadingFailed(std::exception_ptr error) {
-    assert(Environment::currentlyOn(ThreadType::Map));
+    assert(util::ThreadContext::currentlyOn(util::ThreadType::Map));
 
     try {
         if (error) {

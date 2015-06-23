@@ -18,8 +18,9 @@ public:
 };
 
 Worker::Worker(std::size_t count) {
+    util::ThreadContext context = {"Worker", util::ThreadType::Worker, util::ThreadPriority::Low};
     for (std::size_t i = 0; i < count; i++) {
-        threads.emplace_back(std::make_unique<util::Thread<Impl>>("Worker", util::ThreadPriority::Low));
+        threads.emplace_back(std::make_unique<util::Thread<Impl>>(context));
     }
 }
 

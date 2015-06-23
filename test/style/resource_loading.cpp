@@ -117,7 +117,7 @@ void runTestCase(MockFileSource::Type type,
 
     std::unique_ptr<util::Thread<MockMapContext>> context(
         std::make_unique<util::Thread<MockMapContext>>(
-            "Map", util::ThreadPriority::Regular, view, fileSource, callback));
+            util::ThreadContext{"Map", util::ThreadType::Map, util::ThreadPriority::Regular}, view, fileSource, callback));
 
     uv_run(loop.get(), UV_RUN_DEFAULT);
 
