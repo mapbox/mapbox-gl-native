@@ -260,10 +260,10 @@ Color parseColor(JSVal value) {
                   css_color.a}};
 }
 
-std::tuple<bool,std::vector<float>> StyleParser::parseFloatArray(JSVal value) {
+StyleParser::Result<std::vector<float>> StyleParser::parseFloatArray(JSVal value) {
     if (!value.IsArray()) {
         Log::Warning(Event::ParseStyle, "dasharray value must be an array of numbers");
-        return std::tuple<bool, std::vector<float>> { false, std::vector<float>() };
+        return Result<std::vector<float>> { StyleParserFailure, std::vector<float>() };
     }
 
     std::vector<float> vec;
@@ -271,72 +271,72 @@ std::tuple<bool,std::vector<float>> StyleParser::parseFloatArray(JSVal value) {
         JSVal part = replaceConstant(value[i]);
         if (!part.IsNumber()) {
             Log::Warning(Event::ParseStyle, "dasharray value must be an array of numbers");
-            return std::tuple<bool, std::vector<float>> { false, std::vector<float>() };
+            return Result<std::vector<float>> { StyleParserFailure, std::vector<float>() };
         }
         vec.push_back(part.GetDouble());
     }
-    return std::tuple<bool, std::vector<float>> { true, vec };
+    return Result<std::vector<float>> { StyleParserSuccess, vec };
 }
 
 template <>
-std::tuple<bool, std::array<float, 2>> StyleParser::parseProperty(JSVal value, const char*) {
+StyleParser::Result<std::array<float, 2>> StyleParser::parseProperty(JSVal value, const char*) {
     if (value.IsArray() && value.Size() == 2 &&
             value[rapidjson::SizeType(0)].IsNumber() &&
             value[rapidjson::SizeType(1)].IsNumber()) {
 
         float first = value[rapidjson::SizeType(0)].GetDouble();
         float second = value[rapidjson::SizeType(1)].GetDouble();
-        return std::tuple<bool, std::array<float, 2>> { true, {{ first, second }} };
+        return Result<std::array<float, 2>> { StyleParserSuccess, {{ first, second }} };
     } else {
         Log::Warning(Event::ParseStyle, "value must be array of two numbers");
-        return std::tuple<bool, std::array<float, 2>> { false, {{ 0.0f, 0.0f }} };
+        return Result<std::array<float, 2>> { StyleParserFailure, {{ 0.0f, 0.0f }} };
     }
 }
 
 template <>
-std::tuple<bool, float> StyleParser::parseProperty(JSVal value, const char* property_name) {
+StyleParser::Result<float> StyleParser::parseProperty(JSVal value, const char* property_name) {
     JSVal rvalue = replaceConstant(value);
     if (rvalue.IsNumber()) {
-        return std::tuple<bool, float> { true, rvalue.GetDouble() };
+        return Result<float> { StyleParserSuccess, rvalue.GetDouble() };
     } else {
         Log::Warning(Event::ParseStyle, "value of '%s' must be a number, or a number function", property_name);
-        return std::tuple<bool, float> { false, 0.0f };
+        return Result<float> { StyleParserFailure, 0.0f };
     }
 }
 
 template <>
-std::tuple<bool, Color> StyleParser::parseProperty(JSVal value, const char*) {
+StyleParser::Result<Color> StyleParser::parseProperty(JSVal value, const char*) {
     JSVal rvalue = replaceConstant(value);
-    return std::tuple<bool, Color> { true, parseColor(rvalue) };
+    return Result<Color> { StyleParserSuccess, parseColor(rvalue) };
 }
 
 template <>
-std::tuple<bool, Faded<std::vector<float>>> StyleParser::parseProperty(JSVal value, const char*) {
+StyleParser::Result<Faded<std::vector<float>>> StyleParser::parseProperty(JSVal value, const char*) {
     Faded<std::vector<float>> parsed;
     JSVal rvalue = replaceConstant(value);
     parsed.to = std::get<1>(parseFloatArray(rvalue));
-    return std::tuple<bool, Faded<std::vector<float>>> { true, parsed };
+    return Result<Faded<std::vector<float>>> { StyleParserSuccess, parsed };
 }
 
 template <>
-std::tuple<bool, Faded<std::string>> StyleParser::parseProperty(JSVal value, const char *property_name) {
+StyleParser::Result<Faded<std::string>> StyleParser::parseProperty(JSVal value, const char *property_name) {
     JSVal rvalue = replaceConstant(value);
     Faded<std::string> parsed;
     if (rvalue.IsString()) {
         parsed.to = { value.GetString(), value.GetStringLength() };
-        return std::tuple<bool, Faded<std::string>> { true, parsed };
+        return Result<Faded<std::string>> { StyleParserSuccess, parsed };
     } else {
         Log::Warning(Event::ParseStyle, "value of '%s' must be a string, or a string function", property_name);
-        return std::tuple<bool, Faded<std::string>> { false, parsed };
+        return Result<Faded<std::string>> { StyleParserFailure, parsed };
     }
 }
 
 template <typename T>
-std::tuple<bool, std::vector<std::pair<float, T>>> StyleParser::parseStops(JSVal value_stops, const char *property_name) {
+StyleParser::Result<std::vector<std::pair<float, T>>> StyleParser::parseStops(JSVal value_stops, const char *property_name) {
 
     if (!value_stops.IsArray()) {
         Log::Warning(Event::ParseStyle, "stops function must specify a stops array");
-        return std::tuple<bool, std::vector<std::pair<float, T>>> { false, {}};
+        return Result<std::vector<std::pair<float, T>>> { StyleParserFailure, {}};
     }
 
     std::vector<std::pair<float, T>> stops;
@@ -346,33 +346,33 @@ std::tuple<bool, std::vector<std::pair<float, T>>> StyleParser::parseStops(JSVal
         if (stop.IsArray()) {
             if (stop.Size() != 2) {
                 Log::Warning(Event::ParseStyle, "stop must have zoom level and value specification");
-                return std::tuple<bool, std::vector<std::pair<float, T>>> { false, {}};
+                return Result<std::vector<std::pair<float, T>>> { StyleParserFailure, {}};
             }
 
             JSVal z = stop[rapidjson::SizeType(0)];
             if (!z.IsNumber()) {
                 Log::Warning(Event::ParseStyle, "zoom level in stop must be a number");
-                return std::tuple<bool, std::vector<std::pair<float, T>>> { false, {}};
+                return Result<std::vector<std::pair<float, T>>> { StyleParserFailure, {}};
             }
 
             stops.emplace_back(z.GetDouble(), std::get<1>(parseProperty<T>(replaceConstant(stop[rapidjson::SizeType(1)]), property_name)));
         } else {
             Log::Warning(Event::ParseStyle, "function argument must be a numeric value");
-            return std::tuple<bool, std::vector<std::pair<float, T>>> { false, {}};
+            return Result<std::vector<std::pair<float, T>>> { StyleParserFailure, {}};
         }
     }
-    return std::tuple<bool, std::vector<std::pair<float, T>>>(true, stops);
+    return Result<std::vector<std::pair<float, T>>>(StyleParserSuccess, stops);
 }
 
 template <typename T>
-std::tuple<bool, Function<T>> StyleParser::parseFunction(JSVal value, const char *property_name) {
+StyleParser::Result<Function<T>> StyleParser::parseFunction(JSVal value, const char *property_name) {
     if (!value.IsObject()) {
         return parseProperty<T>(value, property_name);
     }
 
     if (!value.HasMember("stops")) {
         Log::Warning(Event::ParseStyle, "function must specify a function type");
-        return std::tuple<bool, Function<T>> { false, ConstantFunction<T>(T()) };
+        return Result<Function<T>> { StyleParserFailure, ConstantFunction<T>(T()) };
     }
 
     float base = 1.0f;
@@ -389,26 +389,26 @@ std::tuple<bool, Function<T>> StyleParser::parseFunction(JSVal value, const char
     auto stops = parseStops<T>(value["stops"], property_name);
 
     if (!std::get<0>(stops)) {
-        return std::tuple<bool, Function<T>> { false, ConstantFunction<T>(T()) };
+        return Result<Function<T>> { StyleParserFailure, ConstantFunction<T>(T()) };
     }
 
-    return std::tuple<bool, Function<T>> { true, StopsFunction<T>(std::get<1>(stops), base) };
+    return Result<Function<T>> { StyleParserSuccess, StopsFunction<T>(std::get<1>(stops), base) };
 }
 
 template <typename T>
-std::tuple<bool, PiecewiseConstantFunction<T>> StyleParser::parsePiecewiseConstantFunction(JSVal value, Duration duration) {
+StyleParser::Result<PiecewiseConstantFunction<T>> StyleParser::parsePiecewiseConstantFunction(JSVal value, Duration duration) {
     if (!value.HasMember("stops")) {
         Log::Warning(Event::ParseStyle, "function must specify a function type");
-        return std::tuple<bool, PiecewiseConstantFunction<T>> { false, {} };
+        return Result<PiecewiseConstantFunction<T>> { StyleParserFailure, {} };
     }
 
     auto stops = parseStops<T>(value["stops"], "");
 
     if (!std::get<0>(stops)) {
-        return std::tuple<bool, PiecewiseConstantFunction<T>> { false, {} };
+        return Result<PiecewiseConstantFunction<T>> { StyleParserFailure, {} };
     }
 
-    return std::tuple<bool, PiecewiseConstantFunction<T>> { true, { std::get<1>(stops), duration } };
+    return Result<PiecewiseConstantFunction<T>> { StyleParserSuccess, { std::get<1>(stops), duration } };
 }
 
 template <typename T>
@@ -472,112 +472,112 @@ std::string normalizeFontStack(const std::string &name) {
     return algo::join(parts, ", ");
 }
 
-template<> std::tuple<bool, std::string> StyleParser::parseProperty(JSVal value, const char *property_name) {
+template<> StyleParser::Result<std::string> StyleParser::parseProperty(JSVal value, const char *property_name) {
     if (!value.IsString()) {
         Log::Warning(Event::ParseStyle, "value of '%s' must be a string", property_name);
-        return std::tuple<bool, std::string> { false, std::string() };
+        return Result<std::string> { StyleParserFailure, std::string() };
     }
 
     if (std::string { "text-font" } == property_name) {
-        return std::tuple<bool, std::string> {
-            true, normalizeFontStack({ value.GetString(), value.GetStringLength() })
+        return Result<std::string> {
+            StyleParserSuccess, normalizeFontStack({ value.GetString(), value.GetStringLength() })
         };
     } else {
-        return std::tuple<bool, std::string> { true, { value.GetString(), value.GetStringLength() } };
+        return Result<std::string> { StyleParserSuccess, { value.GetString(), value.GetStringLength() } };
     }
 }
 
-template<> std::tuple<bool, bool> StyleParser::parseProperty(JSVal value, const char *property_name) {
+template<> StyleParser::Result<bool> StyleParser::parseProperty(JSVal value, const char *property_name) {
     if (!value.IsBool()) {
         Log::Warning(Event::ParseStyle, "value of '%s' must be a boolean", property_name);
-        return std::tuple<bool, bool> { false, true };
+        return Result<bool> { StyleParserFailure, true };
     }
 
-    return std::tuple<bool, bool> { true, value.GetBool() };
+    return Result<bool> { StyleParserSuccess, value.GetBool() };
 }
 
-template<> std::tuple<bool, TranslateAnchorType> StyleParser::parseProperty(JSVal value, const char *property_name) {
+template<> StyleParser::Result<TranslateAnchorType> StyleParser::parseProperty(JSVal value, const char *property_name) {
     if (!value.IsString()) {
         Log::Warning(Event::ParseStyle, "value of '%s' must be a string", property_name);
-        return std::tuple<bool, TranslateAnchorType> { false, TranslateAnchorType::Map };
+        return Result<TranslateAnchorType> { StyleParserFailure, TranslateAnchorType::Map };
     }
 
-    return std::tuple<bool, TranslateAnchorType> { true, TranslateAnchorTypeClass({ value.GetString(), value.GetStringLength() }) };
+    return Result<TranslateAnchorType> { StyleParserSuccess, TranslateAnchorTypeClass({ value.GetString(), value.GetStringLength() }) };
 }
 
-template<> std::tuple<bool, RotateAnchorType> StyleParser::parseProperty<RotateAnchorType>(JSVal value, const char *property_name) {
+template<> StyleParser::Result<RotateAnchorType> StyleParser::parseProperty<RotateAnchorType>(JSVal value, const char *property_name) {
     if (!value.IsString()) {
         Log::Warning(Event::ParseStyle, "value of '%s' must be a string", property_name);
-        return std::tuple<bool, RotateAnchorType> { false, RotateAnchorType::Map };
+        return Result<RotateAnchorType> { StyleParserFailure, RotateAnchorType::Map };
     }
 
-    return std::tuple<bool, RotateAnchorType> { true, RotateAnchorTypeClass({ value.GetString(), value.GetStringLength() }) };
+    return Result<RotateAnchorType> { StyleParserSuccess, RotateAnchorTypeClass({ value.GetString(), value.GetStringLength() }) };
 }
 
-template<> std::tuple<bool, CapType> StyleParser::parseProperty<CapType>(JSVal value, const char *property_name) {
+template<> StyleParser::Result<CapType> StyleParser::parseProperty<CapType>(JSVal value, const char *property_name) {
     if (!value.IsString()) {
         Log::Warning(Event::ParseStyle, "value of '%s' must be a string", property_name);
-        return std::tuple<bool, CapType> { false, CapType::Butt };
+        return Result<CapType> { StyleParserFailure, CapType::Butt };
     }
 
-    return std::tuple<bool, CapType> { true, CapTypeClass({ value.GetString(), value.GetStringLength() }) };
+    return Result<CapType> { StyleParserSuccess, CapTypeClass({ value.GetString(), value.GetStringLength() }) };
 }
 
-template<> std::tuple<bool, JoinType> StyleParser::parseProperty<JoinType>(JSVal value, const char *property_name) {
+template<> StyleParser::Result<JoinType> StyleParser::parseProperty<JoinType>(JSVal value, const char *property_name) {
     if (!value.IsString()) {
         Log::Warning(Event::ParseStyle, "value of '%s' must be a string", property_name);
-        return std::tuple<bool, JoinType> { false, JoinType::Miter };
+        return Result<JoinType> { StyleParserFailure, JoinType::Miter };
     }
 
-    return std::tuple<bool, JoinType> { true, JoinTypeClass({ value.GetString(), value.GetStringLength() }) };
+    return Result<JoinType> { StyleParserSuccess, JoinTypeClass({ value.GetString(), value.GetStringLength() }) };
 }
 
-template<> std::tuple<bool, PlacementType> StyleParser::parseProperty<PlacementType>(JSVal value, const char *property_name) {
+template<> StyleParser::Result<PlacementType> StyleParser::parseProperty<PlacementType>(JSVal value, const char *property_name) {
     if (!value.IsString()) {
         Log::Warning(Event::ParseStyle, "value of '%s' must be a string", property_name);
-        return std::tuple<bool, PlacementType> { false, PlacementType::Point };
+        return Result<PlacementType> { StyleParserFailure, PlacementType::Point };
     }
 
-    return std::tuple<bool, PlacementType> { true, PlacementTypeClass({ value.GetString(), value.GetStringLength() }) };
+    return Result<PlacementType> { StyleParserSuccess, PlacementTypeClass({ value.GetString(), value.GetStringLength() }) };
 }
 
-template<> std::tuple<bool, TextAnchorType> StyleParser::parseProperty<TextAnchorType>(JSVal value, const char *property_name) {
+template<> StyleParser::Result<TextAnchorType> StyleParser::parseProperty<TextAnchorType>(JSVal value, const char *property_name) {
     if (!value.IsString()) {
         Log::Warning(Event::ParseStyle, "value of '%s' must be a string", property_name);
-        return std::tuple<bool, TextAnchorType> { false, TextAnchorType::Center };
+        return Result<TextAnchorType> { StyleParserFailure, TextAnchorType::Center };
     }
 
-    return std::tuple<bool, TextAnchorType> { true, TextAnchorTypeClass({ value.GetString(), value.GetStringLength() }) };
+    return Result<TextAnchorType> { StyleParserSuccess, TextAnchorTypeClass({ value.GetString(), value.GetStringLength() }) };
 }
 
-template<> std::tuple<bool, TextJustifyType> StyleParser::parseProperty<TextJustifyType>(JSVal value, const char *property_name) {
+template<> StyleParser::Result<TextJustifyType> StyleParser::parseProperty<TextJustifyType>(JSVal value, const char *property_name) {
     if (!value.IsString()) {
         Log::Warning(Event::ParseStyle, "value of '%s' must be a string", property_name);
-        return std::tuple<bool, TextJustifyType> { false, TextJustifyType::Center };
+        return Result<TextJustifyType> { StyleParserFailure, TextJustifyType::Center };
     }
 
-    return std::tuple<bool, TextJustifyType> { true, TextJustifyTypeClass({ value.GetString(), value.GetStringLength() }) };
+    return Result<TextJustifyType> { StyleParserSuccess, TextJustifyTypeClass({ value.GetString(), value.GetStringLength() }) };
 }
 
-template<> std::tuple<bool, TextTransformType> StyleParser::parseProperty<TextTransformType>(JSVal value, const char *property_name) {
+template<> StyleParser::Result<TextTransformType> StyleParser::parseProperty<TextTransformType>(JSVal value, const char *property_name) {
     if (!value.IsString()) {
         Log::Warning(Event::ParseStyle, "value of '%s' must be a string", property_name);
-        return std::tuple<bool, TextTransformType> { false, TextTransformType::None };
+        return Result<TextTransformType> { StyleParserFailure, TextTransformType::None };
     }
 
-    return std::tuple<bool, TextTransformType> { true, TextTransformTypeClass({ value.GetString(), value.GetStringLength() }) };
+    return Result<TextTransformType> { StyleParserSuccess, TextTransformTypeClass({ value.GetString(), value.GetStringLength() }) };
 }
 
-template<> std::tuple<bool, RotationAlignmentType> StyleParser::parseProperty<RotationAlignmentType>(JSVal value, const char *property_name) {
+template<> StyleParser::Result<RotationAlignmentType> StyleParser::parseProperty<RotationAlignmentType>(JSVal value, const char *property_name) {
     if (!value.IsString()) {
         Log::Warning(Event::ParseStyle, "value of '%s' must be a string", property_name);
-        return std::tuple<bool, RotationAlignmentType> { false, RotationAlignmentType::Map };
+        return Result<RotationAlignmentType> { StyleParserFailure, RotationAlignmentType::Map };
     }
 
-    return std::tuple<bool, RotationAlignmentType> { true, RotationAlignmentTypeClass({ value.GetString(), value.GetStringLength() }) };
+    return Result<RotationAlignmentType> { StyleParserSuccess, RotationAlignmentTypeClass({ value.GetString(), value.GetStringLength() }) };
 }
 
-template<> std::tuple<bool, PropertyTransition> StyleParser::parseProperty(JSVal value, const char */*property_name*/) {
+template<> StyleParser::Result<PropertyTransition> StyleParser::parseProperty(JSVal value, const char */*property_name*/) {
     PropertyTransition transition;
     if (value.IsObject()) {
         if (value.HasMember("duration") && value["duration"].IsNumber()) {
@@ -589,70 +589,70 @@ template<> std::tuple<bool, PropertyTransition> StyleParser::parseProperty(JSVal
     }
 
     if (transition.duration == Duration::zero() && transition.delay == Duration::zero()) {
-        return std::tuple<bool, PropertyTransition> { false, std::move(transition) };
+        return Result<PropertyTransition> { StyleParserFailure, std::move(transition) };
     }
 
-    return std::tuple<bool, PropertyTransition> { true, std::move(transition) };
+    return Result<PropertyTransition> { StyleParserSuccess, std::move(transition) };
 }
 
-template<> std::tuple<bool, Function<std::array<float, 2>>> StyleParser::parseProperty(JSVal value, const char *property_name) {
+template<> StyleParser::Result<Function<std::array<float, 2>>> StyleParser::parseProperty(JSVal value, const char *property_name) {
     return parseFunction<std::array<float, 2>>(value, property_name);
 }
 
-template<> std::tuple<bool, Function<std::string>> StyleParser::parseProperty(JSVal value, const char *property_name) {
+template<> StyleParser::Result<Function<std::string>> StyleParser::parseProperty(JSVal value, const char *property_name) {
     return parseFunction<std::string>(value, property_name);
 }
 
-template<> std::tuple<bool, Function<TranslateAnchorType>> StyleParser::parseProperty(JSVal value, const char *property_name) {
+template<> StyleParser::Result<Function<TranslateAnchorType>> StyleParser::parseProperty(JSVal value, const char *property_name) {
     return parseFunction<TranslateAnchorType>(value, property_name);
 }
 
-template<> std::tuple<bool, Function<RotateAnchorType>> StyleParser::parseProperty(JSVal value, const char *property_name) {
+template<> StyleParser::Result<Function<RotateAnchorType>> StyleParser::parseProperty(JSVal value, const char *property_name) {
     return parseFunction<RotateAnchorType>(value, property_name);
 }
 
-template<> std::tuple<bool, Function<CapType>> StyleParser::parseProperty(JSVal value, const char *property_name) {
+template<> StyleParser::Result<Function<CapType>> StyleParser::parseProperty(JSVal value, const char *property_name) {
     return parseFunction<CapType>(value, property_name);
 }
 
-template<> std::tuple<bool, Function<JoinType>> StyleParser::parseProperty(JSVal value, const char *property_name) {
+template<> StyleParser::Result<Function<JoinType>> StyleParser::parseProperty(JSVal value, const char *property_name) {
     return parseFunction<JoinType>(value, property_name);
 }
 
-template<> std::tuple<bool, Function<PlacementType>> StyleParser::parseProperty(JSVal value, const char *property_name) {
+template<> StyleParser::Result<Function<PlacementType>> StyleParser::parseProperty(JSVal value, const char *property_name) {
     return parseFunction<PlacementType>(value, property_name);
 }
 
-template<> std::tuple<bool, Function<TextAnchorType>> StyleParser::parseProperty(JSVal value, const char *property_name) {
+template<> StyleParser::Result<Function<TextAnchorType>> StyleParser::parseProperty(JSVal value, const char *property_name) {
     return parseFunction<TextAnchorType>(value, property_name);
 }
 
-template<> std::tuple<bool, Function<TextJustifyType>> StyleParser::parseProperty(JSVal value, const char *property_name) {
+template<> StyleParser::Result<Function<TextJustifyType>> StyleParser::parseProperty(JSVal value, const char *property_name) {
     return parseFunction<TextJustifyType>(value, property_name);
 }
 
-template<> std::tuple<bool, Function<TextTransformType>> StyleParser::parseProperty(JSVal value, const char *property_name) {
+template<> StyleParser::Result<Function<TextTransformType>> StyleParser::parseProperty(JSVal value, const char *property_name) {
     return parseFunction<TextTransformType>(value, property_name);
 }
 
-template<> std::tuple<bool, Function<RotationAlignmentType>> StyleParser::parseProperty(JSVal value, const char *property_name) {
+template<> StyleParser::Result<Function<RotationAlignmentType>> StyleParser::parseProperty(JSVal value, const char *property_name) {
     return parseFunction<RotationAlignmentType>(value, property_name);
 }
 
 
-template<> std::tuple<bool, Function<bool>> StyleParser::parseProperty(JSVal value, const char *property_name) {
+template<> StyleParser::Result<Function<bool>> StyleParser::parseProperty(JSVal value, const char *property_name) {
     return parseFunction<bool>(value, property_name);
 }
 
-template<> std::tuple<bool, Function<float>> StyleParser::parseProperty(JSVal value, const char *property_name) {
+template<> StyleParser::Result<Function<float>> StyleParser::parseProperty(JSVal value, const char *property_name) {
     return parseFunction<float>(value, property_name);
 }
 
-template<> std::tuple<bool, Function<Color>> StyleParser::parseProperty(JSVal value, const char *property_name) {
+template<> StyleParser::Result<Function<Color>> StyleParser::parseProperty(JSVal value, const char *property_name) {
     return parseFunction<Color>(value, property_name);
 }
 
-template<> std::tuple<bool, PiecewiseConstantFunction<Faded<std::vector<float>>>> StyleParser::parseProperty(JSVal value, const char *property_name, JSVal transition) {
+template<> StyleParser::Result<PiecewiseConstantFunction<Faded<std::vector<float>>>> StyleParser::parseProperty(JSVal value, const char *property_name, JSVal transition) {
     Duration duration = std::chrono::milliseconds(300);
     if (transition.HasMember("duration")) {
         duration = std::chrono::milliseconds(transition["duration"].GetUint());
@@ -662,16 +662,16 @@ template<> std::tuple<bool, PiecewiseConstantFunction<Faded<std::vector<float>>>
         return parsePiecewiseConstantFunction<Faded<std::vector<float>>>(value, duration);
     } else if (value.IsArray()) {
         Faded<std::vector<float>> parsed;
-        std::tuple<bool, std::vector<float>> floatarray = parseFloatArray(value);
+        Result<std::vector<float>> floatarray = parseFloatArray(value);
         parsed.to = std::get<1>(floatarray);
-        return std::tuple<bool, PiecewiseConstantFunction<Faded<std::vector<float>>>> { std::get<0>(floatarray),  { parsed, duration } };
+        return Result<PiecewiseConstantFunction<Faded<std::vector<float>>>> { std::get<0>(floatarray),  { parsed, duration } };
     } else {
         Log::Warning(Event::ParseStyle, "value of '%s' must be an array of numbers, or a number array function", property_name);
-        return std::tuple<bool, PiecewiseConstantFunction<Faded<std::vector<float>>>> { false, {} };
+        return Result<PiecewiseConstantFunction<Faded<std::vector<float>>>> { StyleParserFailure, {} };
     }
 }
 
-template<> std::tuple<bool, PiecewiseConstantFunction<Faded<std::string>>> StyleParser::parseProperty(JSVal value, const char *property_name, JSVal transition) {
+template<> StyleParser::Result<PiecewiseConstantFunction<Faded<std::string>>> StyleParser::parseProperty(JSVal value, const char *property_name, JSVal transition) {
 
     Duration duration = std::chrono::milliseconds(300);
     if (transition.HasMember("duration")) {
@@ -683,10 +683,10 @@ template<> std::tuple<bool, PiecewiseConstantFunction<Faded<std::string>>> Style
     } else if (value.IsString()) {
         Faded<std::string> parsed;
         parsed.to = { value.GetString(), value.GetStringLength() };
-        return std::tuple<bool, PiecewiseConstantFunction<Faded<std::string>>> { true,  { parsed, duration } };
+        return Result<PiecewiseConstantFunction<Faded<std::string>>> { StyleParserSuccess,  { parsed, duration } };
     } else {
         Log::Warning(Event::ParseStyle, "value of '%s' must be string or a string function", property_name);
-        return std::tuple<bool, PiecewiseConstantFunction<Faded<std::string>>> { false, {} };
+        return Result<PiecewiseConstantFunction<Faded<std::string>>> { StyleParserFailure, {} };
     }
 }
 

@@ -23,6 +23,14 @@ class StyleParser {
 public:
     using JSVal = const rapidjson::Value&;
 
+    enum Status : bool {
+        StyleParserFailure = 0,
+        StyleParserSuccess
+    };
+
+    template<typename T>
+    using Result = std::pair<Status, T>;
+
     StyleParser();
 
     void parse(JSVal document);
@@ -77,18 +85,18 @@ private:
     bool setProperty(JSVal value, const char *property_name, PropertyKey key, ClassProperties &klass, JSVal transition);
 
     template <typename T>
-    std::tuple<bool, T> parseProperty(JSVal value, const char *property_name);
+    Result<T> parseProperty(JSVal value, const char *property_name);
     template <typename T>
-    std::tuple<bool, T> parseProperty(JSVal value, const char *property_name, JSVal transition);
+    Result<T> parseProperty(JSVal value, const char *property_name, JSVal transition);
 
     template <typename T>
-    std::tuple<bool, Function<T>> parseFunction(JSVal value, const char *);
+    Result<Function<T>> parseFunction(JSVal value, const char *);
     template <typename T>
-    std::tuple<bool, PiecewiseConstantFunction<T>> parsePiecewiseConstantFunction(JSVal value, Duration duration);
+    Result<PiecewiseConstantFunction<T>> parsePiecewiseConstantFunction(JSVal value, Duration duration);
     template <typename T>
-    std::tuple<bool, std::vector<std::pair<float, T>>> parseStops(JSVal value, const char *property_name);
+    Result<std::vector<std::pair<float, T>>> parseStops(JSVal value, const char *property_name);
 
-    std::tuple<bool,std::vector<float>> parseFloatArray(JSVal value);
+    Result<std::vector<float>> parseFloatArray(JSVal value);
 
     FilterExpression parseFilter(JSVal);
 
