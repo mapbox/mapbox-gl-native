@@ -28,6 +28,13 @@ typedef struct {
     CLLocationCoordinate2D ne;
 } MGLCoordinateBounds;
 
+NS_INLINE MGLCoordinateBounds MGLCoordinateBoundsMake(CLLocationCoordinate2D sw, CLLocationCoordinate2D ne) {
+    MGLCoordinateBounds bounds;
+    bounds.sw = sw;
+    bounds.ne = ne;
+    return bounds;
+}
+
 NS_ASSUME_NONNULL_END
 
 #pragma clang diagnostic push

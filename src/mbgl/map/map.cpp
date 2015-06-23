@@ -146,6 +146,27 @@ void Map::setLatLngZoom(LatLng latLng, double zoom, Duration duration) {
     update(Update::Zoom);
 }
 
+void Map::fitBounds(LatLngBounds bounds, Duration duration) {
+    // Zoom level calculation below assumes no rotation.
+    setBearing(0);
+
+    // Calculate the center point, respecting the projection.
+    vec2<double> nePixel = pixelForLatLng(bounds.ne);
+    vec2<double> swPixel = pixelForLatLng(bounds.sw);
+    vec2<double> centerPixel = (nePixel + swPixel) * 0.5;
+    LatLng centerLatLng = latLngForPixel(centerPixel);
+
+    // Calculate the zoom level.
+    double scaleX = getWidth() / (nePixel.x - swPixel.x);
+    double scaleY = getHeight() / (nePixel.y - swPixel.y);
+    double minZoom = getMinZoom();
+    double maxZoom = getMaxZoom();
+    double zoom = std::log2(getScale() * std::fmin(scaleX, scaleY));
+    zoom = std::fmax(std::fmin(zoom, maxZoom), minZoom);
+
+    setLatLngZoom(centerLatLng, zoom, duration);
+}
+
 void Map::resetZoom() {
     setZoom(0);
 }

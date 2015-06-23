@@ -95,6 +95,7 @@ public:
     void setZoom(double zoom, Duration = Duration::zero());
     double getZoom() const;
     void setLatLngZoom(LatLng latLng, double zoom, Duration = Duration::zero());
+    void fitBounds(LatLngBounds bounds, Duration = Duration::zero());
     void resetZoom();
     double getMinZoom() const;
     double getMaxZoom() const;

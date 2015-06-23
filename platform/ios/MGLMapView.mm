@@ -1445,20 +1445,32 @@ std::chrono::steady_clock::duration secondsAsDuration(float duration)
     [self setZoomLevel:zoomLevel animated:NO];
 }
 
-- (void)zoomToSouthWestCoordinate:(CLLocationCoordinate2D)southWestCoordinate northEastCoordinate:(CLLocationCoordinate2D)northEastCoordinate animated:(BOOL)animated
+MGLCoordinateBounds MGLCoordinateBoundsFromLatLngBounds(mbgl::LatLngBounds latLngBounds)
+{
+    return MGLCoordinateBoundsMake(MGLLocationCoordinate2DFromLatLng(latLngBounds.sw),
+                                   MGLLocationCoordinate2DFromLatLng(latLngBounds.ne));
+}
+
+mbgl::LatLngBounds MGLLatLngBoundsFromCoordinateBounds(MGLCoordinateBounds coordinateBounds)
+{
+    return mbgl::LatLngBounds(MGLLatLngFromLocationCoordinate2D(coordinateBounds.sw), MGLLatLngFromLocationCoordinate2D(coordinateBounds.ne));
+}
+
+- (MGLCoordinateBounds)visibleCoordinateBounds
+{
+    return MGLCoordinateBoundsFromLatLngBounds(self.viewportBounds);
+}
+
+- (void)setVisibleCoordinateBounds:(MGLCoordinateBounds)bounds animated:(BOOL)animated
 {
     // NOTE: does not disrupt tracking mode
-
-    CLLocationCoordinate2D center = CLLocationCoordinate2DMake((northEastCoordinate.latitude + southWestCoordinate.latitude) / 2, (northEastCoordinate.longitude + southWestCoordinate.longitude) / 2);
-
-    CGFloat scale = _mbglMap->getScale();
-    CGFloat scaleX = _mbglMap->getWidth() / (northEastCoordinate.longitude - southWestCoordinate.longitude);
-    CGFloat scaleY = _mbglMap->getHeight() / (northEastCoordinate.latitude - southWestCoordinate.latitude);
-    CGFloat minZoom = _mbglMap->getMinZoom();
-    CGFloat maxZoom = _mbglMap->getMaxZoom();
-    CGFloat zoomLevel = MAX(MIN(log(scale * MIN(scaleX, scaleY)) / log(2), maxZoom), minZoom);
-
-    [self setCenterCoordinate:center zoomLevel:zoomLevel animated:animated];
+    CGFloat duration = animated ? MGLAnimationDuration : 0;
+    
+    _mbglMap->fitBounds(MGLLatLngBoundsFromCoordinateBounds(bounds), secondsAsDuration(duration));
+    
+    [self unrotateIfNeededAnimated:animated];
+    
+    [self notifyMapChange:@(animated ? mbgl::MapChangeRegionDidChangeAnimated : mbgl::MapChangeRegionDidChange)];
 }
 
 - (CLLocationDirection)direction
@@ -2212,7 +2224,7 @@ CLLocationCoordinate2D MGLLocationCoordinate2DFromLatLng(mbgl::LatLng latLng)
                     desiredSouthWest.longitude != actualSouthWest.longitude)
                 {
                     // assumes we won't disrupt tracking mode
-                    [self zoomToSouthWestCoordinate:desiredSouthWest northEastCoordinate:desiredNorthEast animated:YES];
+                    [self setVisibleCoordinateBounds:MGLCoordinateBoundsMake(desiredSouthWest, desiredNorthEast) animated:YES];
                 }
             }
         }
