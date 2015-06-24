@@ -152,6 +152,23 @@ def getRepositoryPassword() {
 }
 
 
+task setupCoreGL() {
+
+    def subdir = new File(project.projectDir, "src/main/jni")
+    println("subdir: " + subdir)
+
+    // Clean
+    if (subdir.exists()) {
+        subdir.delete();
+    }
+
+    // Make JNI
+    if (!subdir.mkdirs()) {
+        println("failed to make folder")
+    }
+
+}
+
 task apklib(type: Zip) {
     appendix = extension = 'apklib'
 
