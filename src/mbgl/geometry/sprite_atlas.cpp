@@ -1,12 +1,13 @@
-#include <mbgl/map/environment.hpp>
 #include <mbgl/geometry/sprite_atlas.hpp>
 #include <mbgl/platform/gl.hpp>
 #include <mbgl/platform/log.hpp>
 #include <mbgl/platform/platform.hpp>
+#include <mbgl/util/gl_object_store.hpp>
 #include <mbgl/util/math.hpp>
 #include <mbgl/util/std.hpp>
 #include <mbgl/util/constants.hpp>
 #include <mbgl/util/scaling.hpp>
+#include <mbgl/util/thread_context.hpp>
 
 #include <mbgl/map/sprite.hpp>
 
@@ -300,7 +301,7 @@ void SpriteAtlas::bind(bool linear) {
 SpriteAtlas::~SpriteAtlas() {
     std::lock_guard<std::recursive_mutex> lock(mtx);
     if (texture) {
-        Environment::Get().abandonTexture(texture);
+        mbgl::util::ThreadContext::getGLObjectStore()->abandonTexture(texture);
         texture = 0;
     }
 }

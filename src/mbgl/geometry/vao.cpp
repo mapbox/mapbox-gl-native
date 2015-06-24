@@ -1,7 +1,8 @@
 #include <mbgl/geometry/vao.hpp>
 #include <mbgl/platform/log.hpp>
+#include <mbgl/util/gl_object_store.hpp>
 #include <mbgl/util/string.hpp>
-#include <mbgl/map/environment.hpp>
+#include <mbgl/util/thread_context.hpp>
 
 namespace mbgl {
 
@@ -47,7 +48,7 @@ VertexArrayObject::~VertexArrayObject() {
     if (!DeleteVertexArrays) return;
 
     if (vao) {
-        Environment::Get().abandonVAO(vao);
+        util::ThreadContext::getGLObjectStore()->abandonVAO(vao);
     }
 }
 

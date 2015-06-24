@@ -1,5 +1,7 @@
 #include <mbgl/util/texture_pool.hpp>
-#include <mbgl/map/environment.hpp>
+
+#include <mbgl/util/gl_object_store.hpp>
+#include <mbgl/util/thread_context.hpp>
 
 #include <vector>
 
@@ -43,9 +45,9 @@ void TexturePool::removeTextureID(GLuint texture_id) {
 }
 
 void TexturePool::clearTextureIDs() {
-    auto& env = Environment::Get();
+    auto getGLObjectStore = util::ThreadContext::getGLObjectStore();
     for (auto texture : texture_ids) {
-        env.abandonTexture(texture);
+        getGLObjectStore->abandonTexture(texture);
     }
     texture_ids.clear();
 }

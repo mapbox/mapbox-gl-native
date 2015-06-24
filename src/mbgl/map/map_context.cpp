@@ -17,6 +17,7 @@
 #include <mbgl/style/style_bucket.hpp>
 #include <mbgl/style/style_layer.hpp>
 
+#include <mbgl/util/gl_object_store.hpp>
 #include <mbgl/util/uv_detail.hpp>
 #include <mbgl/util/worker.hpp>
 #include <mbgl/util/texture_pool.hpp>
@@ -37,6 +38,7 @@ MapContext::MapContext(uv_loop_t* loop, View& view_, FileSource& fileSource, Map
     assert(util::ThreadContext::currentlyOn(util::ThreadType::Map));
 
     util::ThreadContext::setFileSource(&fileSource);
+    util::ThreadContext::setGLObjectStore(&glObjectStore);
 
     asyncUpdate->unref();
 
@@ -52,12 +54,12 @@ void MapContext::cleanup() {
     view.notify();
 
     // Explicit resets currently necessary because these abandon resources that need to be
-    // cleaned up by env.performCleanup();
+    // cleaned up by glObjectStore.performCleanup();
     style.reset();
     painter.reset();
     texturePool.reset();
 
-    env.performCleanup();
+    glObjectStore.performCleanup();
 
     view.deactivate();
 }
@@ -310,7 +312,7 @@ void MapContext::render() {
     assert(util::ThreadContext::currentlyOn(util::ThreadType::Map));
 
     // Cleanup OpenGL objects that we abandoned since the last render call.
-    env.performCleanup();
+    glObjectStore.performCleanup();
 
     if (data.mode == MapMode::Still && (!callback || !data.getFullyLoaded())) {
         // We are either not waiting for a map to be rendered, or we don't have all resources yet.

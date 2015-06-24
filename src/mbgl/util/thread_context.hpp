@@ -13,6 +13,8 @@ class FileSource;
 
 namespace util {
 
+class GLObjectStore;
+
 enum class ThreadPriority : bool {
     Regular,
     Low,
@@ -49,12 +51,21 @@ public:
         current.get()->fileSource = fileSource;
     }
 
+    static GLObjectStore* getGLObjectStore() {
+        return current.get()->glObjectStore;
+    }
+
+    static void setGLObjectStore(GLObjectStore* glObjectStore) {
+        current.get()->glObjectStore = glObjectStore;
+    }
+
 private:
     std::string name;
     ThreadType type;
     ThreadPriority priority;
 
     FileSource* fileSource = nullptr;
+    GLObjectStore* glObjectStore = nullptr;
 
     static uv::tls<ThreadContext> current;
 

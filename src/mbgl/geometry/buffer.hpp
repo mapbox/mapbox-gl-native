@@ -3,8 +3,9 @@
 
 #include <mbgl/platform/gl.hpp>
 #include <mbgl/platform/log.hpp>
+#include <mbgl/util/gl_object_store.hpp>
 #include <mbgl/util/noncopyable.hpp>
-#include <mbgl/map/environment.hpp>
+#include <mbgl/util/thread_context.hpp>
 
 #include <cstdlib>
 #include <cassert>
@@ -23,7 +24,7 @@ public:
     ~Buffer() {
         cleanup();
         if (buffer != 0) {
-            Environment::Get().abandonBuffer(buffer);
+            util::ThreadContext::getGLObjectStore()->abandonBuffer(buffer);
             buffer = 0;
         }
     }

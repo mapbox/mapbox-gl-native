@@ -6,6 +6,7 @@
 #include <mbgl/map/environment.hpp>
 #include <mbgl/map/transform_state.hpp>
 #include <mbgl/style/style.hpp>
+#include <mbgl/util/gl_object_store.hpp>
 #include <mbgl/util/ptr.hpp>
 
 #include <vector>
@@ -75,6 +76,8 @@ private:
 
     View& view;
     MapData& data;
+
+    util::GLObjectStore glObjectStore;
 
     Environment env;
     EnvironmentScope envScope;

@@ -6,6 +6,13 @@
 
 #include <uv.h>
 
+// XXX: uv.h will include <bits/termios.h> that will
+// polute the namespace by defining "B0" which
+// will conflict with boost macros.
+#ifdef B0
+#undef B0
+#endif
+
 #include <functional>
 #include <cassert>
 #include <memory>
