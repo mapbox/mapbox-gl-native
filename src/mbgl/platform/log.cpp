@@ -1,6 +1,6 @@
 #include <mbgl/platform/log.hpp>
 
-#include <mbgl/map/environment.hpp>
+#include <mbgl/util/thread_context.hpp>
 
 #include <cstdarg>
 #include <sstream>
@@ -48,16 +48,7 @@ void Log::record(EventSeverity severity, Event event, int64_t code, const std::s
     }
 
     std::stringstream logStream;
-
-    if (Environment::inScope()) {
-        logStream << "{" << Environment::Get().getID() << "}";
-    }
-
-    const std::string threadName = Environment::threadName();
-    if (!threadName.empty()) {
-        logStream << "{" << threadName << "}";
-    }
-
+    logStream << "{" << util::ThreadContext::getName() << "}";
     logStream << "[" << event << "]";
 
     if (code >= 0) {
