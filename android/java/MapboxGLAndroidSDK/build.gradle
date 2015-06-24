@@ -169,9 +169,10 @@ task setupCoreGL() {
     }
     println("jniDir" + jniDir + " is ready to go.")
 
-    // Copy Core GL C++ Files
+    // Copy C++ Files
     // https://github.com/mapbox/mapbox-gl-native/blob/3396bcaaac5d317ee35b4cc2433663e3eb4b355d/android/mapboxgl-app.gyp#L11-L16
 
+    // Copy Android C++ Files
     String cppDirPath = project.rootDir
     cppDirPath = cppDirPath.substring(0, cppDirPath.lastIndexOf("java")) + "cpp"
 
@@ -180,6 +181,18 @@ task setupCoreGL() {
         into jniDir.absolutePath
         include '**/*.cpp'
     }
+    println("Copied Android C++ files.")
+
+    // Copy Core GL C++
+    String coreDirPath = project.rootDir
+    coreDirPath = coreDirPath.substring(0, coreDirPath.lastIndexOf("android")) + "src"
+
+    copy {
+        from coreDirPath
+        into jniDir.absolutePath
+        include '**/**'
+    }
+    println("Copied Core GL C++ files.")
 
 }
 
