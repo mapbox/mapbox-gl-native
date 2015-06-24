@@ -57,9 +57,7 @@ public:
     // Notifies a watcher of map x/y/scale/rotation changes.
     // Must only be called from the same thread that caused the change.
     // Must not be called from the render thread.
-    virtual void notifyMapChange(
-        MapChange change,
-        Duration delay = Duration::zero());
+    virtual void notifyMapChange(MapChange change);
 
 protected:
     mbgl::Map *map = nullptr;

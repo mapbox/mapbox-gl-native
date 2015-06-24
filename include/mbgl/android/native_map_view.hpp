@@ -26,7 +26,7 @@ public:
     void invalidate() override;
     void swap() override;
 
-    void notifyMapChange(mbgl::MapChange change, Duration delay = Duration::zero()) override;
+    void notifyMapChange(mbgl::MapChange) override;
 
     mbgl::Map &getMap();
     mbgl::DefaultFileSource &getFileSource();

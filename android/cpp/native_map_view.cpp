@@ -640,7 +640,7 @@ void NativeMapView::resume() {
     }
 }
 
-void NativeMapView::notifyMapChange(mbgl::MapChange, std::chrono::steady_clock::duration) {
+void NativeMapView::notifyMapChange(mbgl::MapChange) {
     mbgl::Log::Debug(mbgl::Event::Android, "NativeMapView::notifyMapChange()");
 
     assert(vm != nullptr);

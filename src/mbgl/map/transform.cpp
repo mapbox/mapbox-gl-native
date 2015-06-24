@@ -66,19 +66,21 @@ void Transform::moveBy(const double dx, const double dy, const Duration duration
 }
 
 void Transform::_moveBy(const double dx, const double dy, const Duration duration) {
-    view.notifyMapChange(duration != Duration::zero() ?
-                           MapChangeRegionWillChangeAnimated :
-                           MapChangeRegionWillChange);
-
     double x = state.x + std::cos(state.angle) * dx + std::sin( state.angle) * dy;
     double y = state.y + std::cos(state.angle) * dy + std::sin(-state.angle) * dx;
 
     state.constrain(state.scale, y);
 
     if (duration == Duration::zero()) {
+        view.notifyMapChange(MapChangeRegionWillChange);
+
         state.x = x;
         state.y = y;
+
+        view.notifyMapChange(MapChangeRegionDidChange);
     } else {
+        view.notifyMapChange(MapChangeRegionWillChangeAnimated);
+
         const double startX = state.x;
         const double startY = state.y;
         state.panning = true;
@@ -91,13 +93,9 @@ void Transform::_moveBy(const double dx, const double dy, const Duration duratio
             },
             [=] {
                 state.panning = false;
+                view.notifyMapChange(MapChangeRegionDidChangeAnimated);
             }, duration);
     }
-
-    view.notifyMapChange(duration != Duration::zero() ?
-                           MapChangeRegionDidChangeAnimated :
-                           MapChangeRegionDidChange,
-                           duration);
 }
 
 void Transform::setLatLng(const LatLng latLng, const Duration duration) {
@@ -211,10 +209,6 @@ void Transform::_setScale(double new_scale, double cx, double cy, const Duration
 
 void Transform::_setScaleXY(const double new_scale, const double xn, const double yn,
                             const Duration duration) {
-    view.notifyMapChange(duration != Duration::zero() ?
-                           MapChangeRegionWillChangeAnimated :
-                           MapChangeRegionWillChange);
-
     double scale = new_scale;
     double x = xn;
     double y = yn;
@@ -222,13 +216,19 @@ void Transform::_setScaleXY(const double new_scale, const double xn, const doubl
     state.constrain(scale, y);
 
     if (duration == Duration::zero()) {
+        view.notifyMapChange(MapChangeRegionWillChange);
+
         state.scale = scale;
         state.x = x;
         state.y = y;
         const double s = state.scale * util::tileSize;
         state.Bc = s / 360;
         state.Cc = s / util::M2PI;
+
+        view.notifyMapChange(MapChangeRegionDidChange);
     } else {
+        view.notifyMapChange(MapChangeRegionWillChangeAnimated);
+
         const double startS = state.scale;
         const double startX = state.x;
         const double startY = state.y;
@@ -248,13 +248,9 @@ void Transform::_setScaleXY(const double new_scale, const double xn, const doubl
             [=] {
                 state.panning = false;
                 state.scaling = false;
+                view.notifyMapChange(MapChangeRegionDidChangeAnimated);
             }, duration);
     }
-
-    view.notifyMapChange(duration != Duration::zero() ?
-                           MapChangeRegionDidChangeAnimated :
-                           MapChangeRegionDidChange,
-                           duration);
 }
 
 #pragma mark - Angle
@@ -321,16 +317,18 @@ void Transform::setAngle(const double new_angle, const double cx, const double c
 }
 
 void Transform::_setAngle(double new_angle, const Duration duration) {
-    view.notifyMapChange(duration != Duration::zero() ?
-                           MapChangeRegionWillChangeAnimated :
-                           MapChangeRegionWillChange);
-
     double angle = _normalizeAngle(new_angle, state.angle);
     state.angle = _normalizeAngle(state.angle, angle);
 
     if (duration == Duration::zero()) {
+        view.notifyMapChange(MapChangeRegionWillChange);
+
         state.angle = angle;
+
+        view.notifyMapChange(MapChangeRegionDidChange);
     } else {
+        view.notifyMapChange(MapChangeRegionWillChangeAnimated);
+
         const double startA = state.angle;
         state.rotating = true;
 
@@ -341,13 +339,9 @@ void Transform::_setAngle(double new_angle, const Duration duration) {
             },
             [=] {
                 state.rotating = false;
+                view.notifyMapChange(MapChangeRegionDidChangeAnimated);
             }, duration);
     }
-
-    view.notifyMapChange(duration != Duration::zero() ?
-                           MapChangeRegionDidChangeAnimated :
-                           MapChangeRegionDidChange,
-                           duration);
 }
 
 double Transform::getAngle() const {

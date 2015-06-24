@@ -19,7 +19,7 @@ std::unique_ptr<StillImage> View::readStillImage() {
     return nullptr;
 }
 
-void View::notifyMapChange(MapChange, Duration) {
+void View::notifyMapChange(MapChange) {
     // no-op
 }
 

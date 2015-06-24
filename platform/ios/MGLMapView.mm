@@ -2726,23 +2726,10 @@ class MBGLView : public mbgl::View
         // no-op
     }
 
-    void notifyMapChange(mbgl::MapChange change, std::chrono::steady_clock::duration delay = std::chrono::steady_clock::duration::zero()) override
+    void notifyMapChange(mbgl::MapChange change) override
     {
-        if (delay != std::chrono::steady_clock::duration::zero())
-        {
-            dispatch_after(dispatch_time(DISPATCH_TIME_NOW, std::chrono::duration_cast<std::chrono::nanoseconds>(delay).count()), dispatch_get_main_queue(), ^
-            {
-                [nativeView performSelector:@selector(notifyMapChange:)
-                                 withObject:@(change)
-                                 afterDelay:0];
-            });
-        }
-        else
-        {
-            assert([[NSThread currentThread] isMainThread]);
-
-            [nativeView notifyMapChange:@(change)];
-        }
+        assert([[NSThread currentThread] isMainThread]);
+        [nativeView notifyMapChange:@(change)];
     }
 
     void activate() override
