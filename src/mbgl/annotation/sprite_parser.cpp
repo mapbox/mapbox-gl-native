@@ -8,6 +8,7 @@
 #include <rapidjson/document.h>
 
 #include <cmath>
+#include <limits>
 
 namespace mbgl {
 

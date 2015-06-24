@@ -6,6 +6,8 @@
 #include <mbgl/util/image.hpp>
 #include <mbgl/util/io.hpp>
 
+#include <algorithm>
+
 using namespace mbgl;
 
 TEST(Annotations, SpriteImageCreationInvalid) {
