@@ -194,6 +194,18 @@ task setupCoreGL() {
     }
     println("Copied Core GL C++ files.")
 
+    // Copy Platform C++
+    String platformDirPath = project.rootDir
+    platformDirPath = platformDirPath.substring(0, platformDirPath.lastIndexOf("android")) + "platform"
+
+    copy {
+        from platformDirPath
+        into jniDir.absolutePath
+        include 'default/**'
+        include 'android/**'
+    }
+    println("Copied Platform C++ files.")
+
 }
 
 task apklib(type: Zip) {
