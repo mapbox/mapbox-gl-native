@@ -9,6 +9,7 @@
 
 #include <mbgl/renderer/painter.hpp>
 
+#include <mbgl/storage/file_source.hpp>
 #include <mbgl/storage/resource.hpp>
 #include <mbgl/storage/response.hpp>
 
@@ -34,6 +35,8 @@ MapContext::MapContext(uv_loop_t* loop, View& view_, FileSource& fileSource, Map
       asyncUpdate(std::make_unique<uv::async>(loop, [this] { update(); })),
       texturePool(std::make_unique<TexturePool>()) {
     assert(util::ThreadContext::currentlyOn(util::ThreadType::Map));
+
+    util::ThreadContext::setFileSource(&fileSource);
 
     asyncUpdate->unref();
 
@@ -91,7 +94,8 @@ void MapContext::setStyleURL(const std::string& url) {
         base = styleURL.substr(0, pos + 1);
     }
 
-    env.request({ Resource::Kind::Style, styleURL }, [this, base](const Response &res) {
+    FileSource* fs = util::ThreadContext::getFileSource();
+    fs->request({ Resource::Kind::Style, styleURL }, util::RunLoop::current.get()->get(), [this, base](const Response &res) {
         if (res.status == Response::Successful) {
             loadStyleJSON(res.data, base);
         } else {

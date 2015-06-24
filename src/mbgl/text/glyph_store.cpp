@@ -56,7 +56,7 @@ bool GlyphStore::requestGlyphRangesIfNeeded(const std::string& fontStackName,
     for (const auto& range : glyphRanges) {
         const auto& rangeSets_it = rangeSets.find(range);
         if (rangeSets_it == rangeSets.end()) {
-            auto glyph = std::make_unique<GlyphPBF>(glyphURL, fontStackName, range, env,
+            auto glyph = std::make_unique<GlyphPBF>(glyphURL, fontStackName, range,
                 successCallback, failureCallback);
             rangeSets.emplace(range, std::move(glyph));
             requestIsNeeded = true;

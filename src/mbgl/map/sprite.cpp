@@ -1,12 +1,13 @@
 #include <mbgl/map/sprite.hpp>
 
-#include <mbgl/map/environment.hpp>
 #include <mbgl/platform/log.hpp>
 #include <mbgl/platform/platform.hpp>
+#include <mbgl/storage/file_source.hpp>
 #include <mbgl/storage/resource.hpp>
 #include <mbgl/storage/response.hpp>
 #include <mbgl/util/exception.hpp>
 #include <mbgl/util/raster.hpp>
+#include <mbgl/util/thread.hpp>
 #include <mbgl/util/uv_detail.hpp>
 
 #include <rapidjson/document.h>
@@ -29,8 +30,7 @@ Sprite::Sprite(const std::string& baseUrl, float pixelRatio_)
     : pixelRatio(pixelRatio_ > 1 ? 2 : 1),
       raster(),
       loadedImage(false),
-      loadedJSON(false),
-      env(Environment::Get()) {
+      loadedJSON(false) {
     if (baseUrl.empty()) {
         // Treat a non-existent sprite as a successfully loaded empty sprite.
         loadedImage = true;
@@ -41,7 +41,8 @@ Sprite::Sprite(const std::string& baseUrl, float pixelRatio_)
     std::string spriteURL(baseUrl + (pixelRatio_ > 1 ? "@2x" : "") + ".png");
     std::string jsonURL(baseUrl + (pixelRatio_ > 1 ? "@2x" : "") + ".json");
 
-    jsonRequest = env.request({ Resource::Kind::JSON, jsonURL }, [this, jsonURL](const Response &res) {
+    FileSource* fs = util::ThreadContext::getFileSource();
+    jsonRequest = fs->request({ Resource::Kind::JSON, jsonURL }, util::RunLoop::current.get()->get(), [this, jsonURL](const Response &res) {
         jsonRequest = nullptr;
         if (res.status == Response::Successful) {
             body = res.data;
@@ -55,7 +56,7 @@ Sprite::Sprite(const std::string& baseUrl, float pixelRatio_)
         emitSpriteLoadedIfComplete();
     });
 
-    spriteRequest = env.request({ Resource::Kind::Image, spriteURL }, [this, spriteURL](const Response &res) {
+    spriteRequest = fs->request({ Resource::Kind::Image, spriteURL }, util::RunLoop::current.get()->get(), [this, spriteURL](const Response &res) {
         spriteRequest = nullptr;
         if (res.status == Response::Successful) {
             image = res.data;
@@ -72,11 +73,11 @@ Sprite::Sprite(const std::string& baseUrl, float pixelRatio_)
 
 Sprite::~Sprite() {
     if (jsonRequest) {
-        env.cancelRequest(jsonRequest);
+        util::ThreadContext::getFileSource()->cancel(jsonRequest);
     }
 
     if (spriteRequest) {
-        env.cancelRequest(spriteRequest);
+        util::ThreadContext::getFileSource()->cancel(spriteRequest);
     }
 }
 

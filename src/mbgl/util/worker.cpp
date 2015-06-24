@@ -20,7 +20,16 @@ public:
 Worker::Worker(std::size_t count) {
     util::ThreadContext context = {"Worker", util::ThreadType::Worker, util::ThreadPriority::Low};
     for (std::size_t i = 0; i < count; i++) {
-        threads.emplace_back(std::make_unique<util::Thread<Impl>>(context));
+        std::unique_ptr<util::Thread<Impl>> worker(new util::Thread<Impl>(context));
+
+        // FIXME: Workers should not access the FileSource but it
+        // is currently needed because of GlyphsPBF. See #1664.
+        auto task = std::make_shared<WorkTask>([fs = util::ThreadContext::getFileSource()]{
+            util::ThreadContext::setFileSource(fs);
+        }, []{});
+
+        worker->invoke(&Worker::Impl::doWork, task);
+        threads.emplace_back(std::move(worker));
     }
 }
 

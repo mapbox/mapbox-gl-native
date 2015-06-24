@@ -1,6 +1,5 @@
 #include <mbgl/map/tile_data.hpp>
 
-#include <mbgl/map/environment.hpp>
 #include <mbgl/map/source.hpp>
 #include <mbgl/map/transform_state.hpp>
 #include <mbgl/platform/log.hpp>
@@ -16,7 +15,6 @@ TileData::TileData(const TileID& id_, const SourceInfo& source_)
     : id(id_),
       name(id),
       source(source_),
-      env(Environment::Get()),
       state(State::initial),
       debugBucket(debugFontBuffer) {
     // Initialize tile debug coordinates
@@ -43,7 +41,8 @@ void TileData::request(Worker& worker,
     std::string url = source.tileURL(id, pixelRatio);
     state = State::loading;
 
-    req = env.request({ Resource::Kind::Tile, url }, [url, callback, &worker, this](const Response &res) {
+    FileSource* fs = util::ThreadContext::getFileSource();
+    req = fs->request({ Resource::Kind::Tile, url }, util::RunLoop::current.get()->get(), [url, callback, &worker, this](const Response &res) {
         req = nullptr;
 
         if (res.status != Response::Successful) {
@@ -67,7 +66,7 @@ void TileData::cancel() {
         state = State::obsolete;
     }
     if (req) {
-        env.cancelRequest(req);
+        util::ThreadContext::getFileSource()->cancel(req);
         req = nullptr;
     }
     workRequest.reset();

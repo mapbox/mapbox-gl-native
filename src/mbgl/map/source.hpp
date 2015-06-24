@@ -72,8 +72,6 @@ public:
     void load();
     bool isLoaded() const;
 
-    void load(MapData&, Environment&, std::function<void()> callback);
-
     // Request or parse all the tiles relevant for the "TransformState". This method
     // will return true if all the tiles were scheduled for updating of false if
     // they were not. shouldReparsePartialTiles must be set to "true" if there is

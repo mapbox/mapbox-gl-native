@@ -1,13 +1,13 @@
 #include <mbgl/text/glyph_pbf.hpp>
 #include <mbgl/text/font_stack.hpp>
 
-#include <mbgl/map/environment.hpp>
-
+#include <mbgl/storage/file_source.hpp>
 #include <mbgl/storage/resource.hpp>
 #include <mbgl/storage/response.hpp>
 
 #include <mbgl/util/pbf.hpp>
 #include <mbgl/util/string.hpp>
+#include <mbgl/util/thread.hpp>
 #include <mbgl/util/token.hpp>
 #include <mbgl/util/url.hpp>
 
@@ -18,10 +18,9 @@ namespace mbgl {
 GlyphPBF::GlyphPBF(const std::string& glyphURL,
                    const std::string& fontStack,
                    GlyphRange glyphRange,
-                   Environment& env_,
                    const GlyphLoadedCallback& successCallback,
                    const GlyphLoadingFailedCallback& failureCallback)
-    : parsed(false), env(env_) {
+    : parsed(false) {
     // Load the glyph set URL
     url = util::replaceTokens(glyphURL, [&](const std::string &name) -> std::string {
         if (name == "fontstack") return util::percentEncode(fontStack);
@@ -30,7 +29,8 @@ GlyphPBF::GlyphPBF(const std::string& glyphURL,
     });
 
     // The prepare call jumps back to the main thread.
-    req = env.request({ Resource::Kind::Glyphs, url }, [&, successCallback, failureCallback](const Response &res) {
+    FileSource* fs = util::ThreadContext::getFileSource();
+    req = fs->request({ Resource::Kind::Glyphs, url }, util::RunLoop::current.get()->get(), [&, successCallback, failureCallback](const Response &res) {
         req = nullptr;
 
         if (res.status != Response::Successful) {
@@ -50,7 +50,7 @@ GlyphPBF::GlyphPBF(const std::string& glyphURL,
 
 GlyphPBF::~GlyphPBF() {
     if (req) {
-        env.cancelRequest(req);
+        util::ThreadContext::getFileSource()->cancel(req);
     }
 }
 

@@ -29,6 +29,7 @@ public:
           envScope_(env_, ThreadType::Map, "Map"),
           data_(view, MapMode::Still),
           callback_(callback) {
+        util::ThreadContext::setFileSource(&fileSource);
 
         data_.transform.resize(1000, 1000, 1.0, 1000, 1000);
         data_.transform.setLatLngZoom({0, 0}, 16);

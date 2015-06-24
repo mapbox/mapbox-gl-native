@@ -9,7 +9,6 @@
 
 namespace mbgl {
 
-class Environment;
 class FontStack;
 class Request;
 
@@ -21,7 +20,6 @@ public:
     GlyphPBF(const std::string &glyphURL,
              const std::string &fontStack,
              GlyphRange glyphRange,
-             Environment &env,
              const GlyphLoadedCallback& successCallback,
              const GlyphLoadingFailedCallback& failureCallback);
     ~GlyphPBF();
@@ -43,7 +41,6 @@ private:
     std::string url;
     std::atomic<bool> parsed;
 
-    Environment& env;
     Request* req = nullptr;
 };
 

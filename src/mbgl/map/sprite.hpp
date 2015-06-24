@@ -14,7 +14,6 @@
 
 namespace mbgl {
 
-class Environment;
 class Request;
 
 class SpritePosition {
@@ -69,7 +68,6 @@ private:
     std::unordered_map<std::string, SpritePosition> pos;
     const SpritePosition empty;
 
-    Environment& env;
     Request* jsonRequest = nullptr;
     Request* spriteRequest = nullptr;
     Observer* observer = nullptr;

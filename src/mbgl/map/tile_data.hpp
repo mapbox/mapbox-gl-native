@@ -14,7 +14,6 @@
 
 namespace mbgl {
 
-class Environment;
 class Painter;
 class SourceInfo;
 class StyleLayer;
@@ -136,7 +135,6 @@ protected:
     bool mayStartParsing();
 
     const SourceInfo& source;
-    Environment& env;
 
     Request *req = nullptr;
     std::string data;

@@ -8,6 +8,9 @@
 #include <thread>
 
 namespace mbgl {
+
+class FileSource;
+
 namespace util {
 
 enum class ThreadPriority : bool {
@@ -38,10 +41,20 @@ public:
         return current.get()->priority;
     }
 
+    static FileSource* getFileSource() {
+        return current.get()->fileSource;
+    }
+
+    static void setFileSource(FileSource* fileSource) {
+        current.get()->fileSource = fileSource;
+    }
+
 private:
     std::string name;
     ThreadType type;
     ThreadPriority priority;
+
+    FileSource* fileSource = nullptr;
 
     static uv::tls<ThreadContext> current;
 

@@ -1,6 +1,5 @@
 #include <mbgl/map/source.hpp>
 #include <mbgl/map/map_data.hpp>
-#include <mbgl/map/environment.hpp>
 #include <mbgl/map/transform.hpp>
 #include <mbgl/map/tile.hpp>
 #include <mbgl/renderer/painter.hpp>
@@ -11,6 +10,7 @@
 #include <mbgl/util/math.hpp>
 #include <mbgl/util/box.hpp>
 #include <mbgl/util/mapbox.hpp>
+#include <mbgl/storage/file_source.hpp>
 #include <mbgl/style/style_layer.hpp>
 #include <mbgl/platform/log.hpp>
 #include <mbgl/util/uv_detail.hpp>
@@ -120,7 +120,7 @@ Source::Source() {}
 
 Source::~Source() {
     if (req) {
-        Environment::Get().cancelRequest(req);
+        util::ThreadContext::getFileSource()->cancel(req);
     }
 }
 
@@ -147,7 +147,8 @@ void Source::load() {
         return;
     }
 
-    req = Environment::Get().request({ Resource::Kind::Source, info.url }, [this](const Response &res) {
+    FileSource* fs = util::ThreadContext::getFileSource();
+    req = fs->request({ Resource::Kind::Source, info.url }, util::RunLoop::current.get()->get(), [this](const Response &res) {
         req = nullptr;
 
         if (res.status != Response::Successful) {
