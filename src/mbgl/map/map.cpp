@@ -146,23 +146,33 @@ void Map::setLatLngZoom(LatLng latLng, double zoom, Duration duration) {
     update(Update::Zoom);
 }
 
-void Map::fitBounds(LatLngBounds bounds, Duration duration) {
+void Map::fitBounds(LatLngBounds bounds, EdgeInsets padding, Duration duration) {
     // Zoom level calculation below assumes no rotation.
     setBearing(0);
 
-    // Calculate the center point, respecting the projection.
+    // Calculate the zoom level.
     vec2<double> nePixel = pixelForLatLng(bounds.ne);
     vec2<double> swPixel = pixelForLatLng(bounds.sw);
-    vec2<double> centerPixel = (nePixel + swPixel) * 0.5;
-    LatLng centerLatLng = latLngForPixel(centerPixel);
-
-    // Calculate the zoom level.
-    double scaleX = getWidth() / (nePixel.x - swPixel.x);
-    double scaleY = getHeight() / (nePixel.y - swPixel.y);
+    vec2<double> size = nePixel - swPixel;
+    double scaleX = (getWidth() - padding.left - padding.right) / size.x;
+    double scaleY = (getHeight() - padding.top - padding.bottom) / size.y;
     double minZoom = getMinZoom();
     double maxZoom = getMaxZoom();
-    double zoom = std::log2(getScale() * std::fmin(scaleX, scaleY));
+    double minScale = std::fmin(scaleX, scaleY);
+    double zoom = std::log2(getScale() * minScale);
     zoom = std::fmax(std::fmin(zoom, maxZoom), minZoom);
+
+    // Calculate the center point of a virtual bounds that is extended in all directions by padding.
+    vec2<double> paddedNEPixel = {
+        nePixel.x + padding.right / minScale,
+        nePixel.y + padding.top / minScale,
+    };
+    vec2<double> paddedSWPixel = {
+        swPixel.x - padding.left / minScale,
+        swPixel.y - padding.bottom / minScale,
+    };
+    vec2<double> centerPixel = (paddedNEPixel + paddedSWPixel) * 0.5;
+    LatLng centerLatLng = latLngForPixel(centerPixel);
 
     setLatLngZoom(centerLatLng, zoom, duration);
 }

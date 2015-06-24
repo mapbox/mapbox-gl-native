@@ -38,6 +38,10 @@ using AnnotationIDs = std::vector<uint32_t>;
 using AnnotationSegment = std::vector<LatLng>;
 using AnnotationSegments = std::vector<AnnotationSegment>;
 
+using EdgeInsets = struct {
+    double top, left, bottom, right;
+};
+
 class Map : private util::noncopyable {
     friend class View;
 
@@ -95,7 +99,7 @@ public:
     void setZoom(double zoom, Duration = Duration::zero());
     double getZoom() const;
     void setLatLngZoom(LatLng latLng, double zoom, Duration = Duration::zero());
-    void fitBounds(LatLngBounds bounds, Duration = Duration::zero());
+    void fitBounds(LatLngBounds bounds, EdgeInsets padding, Duration duration = Duration::zero());
     void resetZoom();
     double getMinZoom() const;
     double getMaxZoom() const;

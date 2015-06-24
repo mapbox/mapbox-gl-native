@@ -1463,10 +1463,16 @@ mbgl::LatLngBounds MGLLatLngBoundsFromCoordinateBounds(MGLCoordinateBounds coord
 
 - (void)setVisibleCoordinateBounds:(MGLCoordinateBounds)bounds animated:(BOOL)animated
 {
+    [self setVisibleCoordinateBounds:bounds edgePadding:UIEdgeInsetsZero animated:animated];
+}
+
+- (void)setVisibleCoordinateBounds:(MGLCoordinateBounds)bounds edgePadding:(UIEdgeInsets)insets animated:(BOOL)animated
+{
     // NOTE: does not disrupt tracking mode
     CGFloat duration = animated ? MGLAnimationDuration : 0;
     
-    _mbglMap->fitBounds(MGLLatLngBoundsFromCoordinateBounds(bounds), secondsAsDuration(duration));
+    mbgl::EdgeInsets mbglInsets = {insets.top, insets.left, insets.bottom, insets.right};
+    _mbglMap->fitBounds(MGLLatLngBoundsFromCoordinateBounds(bounds), mbglInsets, secondsAsDuration(duration));
     
     [self unrotateIfNeededAnimated:animated];
     
