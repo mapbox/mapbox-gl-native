@@ -39,6 +39,7 @@
 
         'annotations/sprite_image.cpp',
         'annotations/sprite_store.cpp',
+        'annotations/sprite_parser.cpp',
 
         'api/api_misuse.cpp',
         'api/repeated_render.cpp',
