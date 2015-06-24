@@ -6,21 +6,18 @@
 #include <mbgl/map/update.hpp>
 #include <mbgl/util/geo.hpp>
 #include <mbgl/util/noncopyable.hpp>
-#include <mbgl/util/vec.hpp>
 
 #include <cstdint>
 #include <cmath>
-#include <forward_list>
 #include <mutex>
 
 namespace mbgl {
 
 class View;
-namespace util { class transition; }
 
 class Transform : private util::noncopyable {
 public:
-    Transform(View &view);
+    Transform(View&);
 
     // Map view
     // Note: width * ratio does not necessarily equal fb_width
