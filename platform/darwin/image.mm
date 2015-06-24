@@ -11,7 +11,7 @@
 namespace mbgl {
 namespace util {
 
-std::string compress_png(int width, int height, void *rgba) {
+std::string compress_png(int width, int height, const void *rgba) {
     CGDataProviderRef provider = CGDataProviderCreateWithData(NULL, rgba, width * height * 4, NULL);
     if (!provider) {
         return "";
