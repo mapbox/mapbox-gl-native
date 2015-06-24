@@ -158,10 +158,46 @@ def getRepositoryPassword() {
 
 task setupCoreGL() {
 
+    // Copy Assets
+    // ===========
+    def assetsDir = new File(project.projectDir, "src/main/assets")
+    if (assetsDir.exists()) {
+        println("assets directory previously existed, so delete it to start fresh")
+        assetsDir.deleteDir();
+    }
+
+    // Make Assets
+    if (!assetsDir.mkdirs()) {
+        println("failed to make assets folder")
+    }
+    println("assetsDir" + assetsDir + " is ready to go.")
+
+    // Copy Certificates
+    String commonDirPath = project.rootDir
+    commonDirPath = commonDirPath.substring(0, commonDirPath.lastIndexOf("android")) + "common"
+
+    copy {
+        from commonDirPath
+        into assetsDir
+        include '**.crt'
+    }
+
+    // Copy Styles
+    String stylesDirPath = project.rootDir
+    stylesDirPath = stylesDirPath.substring(0, stylesDirPath.lastIndexOf("android")) + "styles" + File.separator + "styles"
+
+    copy {
+        from stylesDirPath
+        into assetsDir
+        include '**.**'
+    }
+
+    // Copy JNI
+    // ========
     def jniDir = new File(project.projectDir, "src/main/jni")
     println("jniDir: " + jniDir)
 
-    // Clean
+    // Clean JNI
     if (jniDir.exists()) {
         println("directory previously existed, so delete it to start fresh")
         jniDir.deleteDir();
@@ -169,7 +205,7 @@ task setupCoreGL() {
 
     // Make JNI
     if (!jniDir.mkdirs()) {
-        println("failed to make folder")
+        println("failed to make jni folder")
     }
     println("jniDir" + jniDir + " is ready to go.")
 
