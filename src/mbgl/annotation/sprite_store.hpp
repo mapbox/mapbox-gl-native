@@ -34,9 +34,10 @@ public:
     // Returns Sprite images that changed since the last invocation of this function.
     Sprites getDirty();
 
-private:
-    const float ratio;
+    // Pixel ratio of all sprite images in this storage object.
+    const float pixelRatio;
 
+private:
     // Lock for sprites and dirty maps.
     std::mutex mutex;
 

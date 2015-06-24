@@ -4,11 +4,11 @@
 
 namespace mbgl {
 
-SpriteStore::SpriteStore(const float ratio_) : ratio(ratio_) {
+SpriteStore::SpriteStore(const float pixelRatio_) : pixelRatio(pixelRatio_) {
 }
 
 void SpriteStore::setSprite(const std::string& name, std::shared_ptr<const SpriteImage> sprite) {
-    if (sprite && sprite->ratio != ratio) {
+    if (sprite && sprite->pixelRatio != pixelRatio) {
         throw util::SpriteImageException("Sprite image has wrong pixel ratio");
     }
     std::lock_guard<std::mutex> lock(mutex);

@@ -8,13 +8,13 @@ namespace mbgl {
 
 SpriteImage::SpriteImage(const uint16_t width_,
                          const uint16_t height_,
-                         const float ratio_,
+                         const float pixelRatio_,
                          std::string&& data_)
     : width(width_),
       height(height_),
-      ratio(ratio_),
-      pixelWidth(std::ceil(width * ratio)),
-      pixelHeight(std::ceil(height * ratio)),
+      pixelRatio(pixelRatio_),
+      pixelWidth(std::ceil(width * pixelRatio)),
+      pixelHeight(std::ceil(height * pixelRatio)),
       data(std::move(data_)) {
     const size_t size = pixelWidth * pixelHeight * 4;
     if (size == 0) {

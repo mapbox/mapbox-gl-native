@@ -48,7 +48,7 @@ TEST(Annotations, SpriteImage) {
     EXPECT_EQ(32, sprite.pixelWidth);
     EXPECT_EQ(12, sprite.height);
     EXPECT_EQ(24, sprite.pixelHeight);
-    EXPECT_EQ(2, sprite.ratio);
+    EXPECT_EQ(2, sprite.pixelRatio);
     EXPECT_EQ(32u * 24 * 4, sprite.data.size());
 }
 
@@ -59,6 +59,6 @@ TEST(Annotations, SpriteImageFractionalRatio) {
     EXPECT_EQ(20, sprite.pixelWidth);
     EXPECT_EQ(8, sprite.height);
     EXPECT_EQ(12, sprite.pixelHeight);
-    EXPECT_EQ(1.5, sprite.ratio);
+    EXPECT_EQ(1.5, sprite.pixelRatio);
     EXPECT_EQ(20u * 12 * 4, sprite.data.size());
 }
