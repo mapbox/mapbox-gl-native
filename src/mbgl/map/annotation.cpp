@@ -2,7 +2,6 @@
 #include <mbgl/map/map.hpp>
 #include <mbgl/map/tile_id.hpp>
 #include <mbgl/map/live_tile.hpp>
-#include <mbgl/map/map_data.hpp>
 #include <mbgl/util/constants.hpp>
 #include <mbgl/util/geojsonvt/geojsonvt_convert.hpp>
 #include <mbgl/util/ptr.hpp>
@@ -83,7 +82,7 @@ AnnotationManager::addAnnotations(const AnnotationType type,
                                   const std::vector<AnnotationSegments>& segments,
                                   const std::vector<StyleProperties>& styleProperties,
                                   const AnnotationsProperties& annotationsProperties,
-                                  const MapData& data) {
+                                  const uint8_t maxZoom) {
     std::lock_guard<std::mutex> lock(mtx);
 
     assert(type != AnnotationType::Any);
@@ -100,8 +99,6 @@ AnnotationManager::addAnnotations(const AnnotationType type,
                            segments[0][0].size())); // points
 
     std::unordered_set<TileID, TileID::Hash> affectedTiles;
-
-    const uint8_t maxZoom = data.transform.getMaxZoom();
 
     for (size_t s = 0; s < segments.size(); ++s) {
 
@@ -351,34 +348,34 @@ AnnotationManager::addTileFeature(const uint32_t annotationID,
 std::pair<std::unordered_set<TileID, TileID::Hash>, AnnotationIDs>
 AnnotationManager::addPointAnnotations(const AnnotationSegment& points,
                                        const AnnotationsProperties& annotationsProperties,
-                                       const MapData& data) {
+                                       const uint8_t maxZoom) {
     return addAnnotations(AnnotationType::Point,
                           {{ points }},
                           {{ }},
                           annotationsProperties,
-                          data);
+                          maxZoom);
 }
 
 std::pair<std::unordered_set<TileID, TileID::Hash>, AnnotationIDs>
 AnnotationManager::addShapeAnnotations(const std::vector<AnnotationSegments>& shapes,
                                        const std::vector<StyleProperties>& styleProperties,
                                        const AnnotationsProperties& annotationsProperties,
-                                       const MapData& data) {
+                                       const uint8_t maxZoom) {
     return addAnnotations(AnnotationType::Shape,
                           shapes,
                           styleProperties,
                           annotationsProperties,
-                          data);
+                          maxZoom);
 }
 
 std::unordered_set<TileID, TileID::Hash> AnnotationManager::removeAnnotations(const AnnotationIDs& ids,
-                                                                              const MapData& data) {
+                                                                              const uint8_t maxZoom) {
     std::lock_guard<std::mutex> lock(mtx);
 
     std::unordered_set<TileID, TileID::Hash> affectedTiles;
 
     std::vector<uint32_t> z2s;
-    const uint8_t zoomCount = data.transform.getMaxZoom() + 1;
+    const uint8_t zoomCount = maxZoom + 1;
     z2s.reserve(zoomCount);
     for (uint8_t z = 0; z < zoomCount; ++z) {
         z2s.emplace_back(1<< z);
@@ -450,11 +447,11 @@ const StyleProperties AnnotationManager::getAnnotationStyleProperties(uint32_t a
 }
 
 AnnotationIDs AnnotationManager::getAnnotationsInBounds(const LatLngBounds& queryBounds,
-                                                        const MapData& data,
+                                                        const uint8_t maxZoom,
                                                         const AnnotationType& type) const {
     std::lock_guard<std::mutex> lock(mtx);
 
-    const uint8_t z = data.transform.getMaxZoom();
+    const uint8_t z = maxZoom;
     const uint32_t z2 = 1 << z;
     const vec2<double> swPoint = projectPoint(queryBounds.sw);
     const vec2<double> nePoint = projectPoint(queryBounds.ne);

@@ -244,7 +244,7 @@ uint32_t Map::addPointAnnotation(const LatLng& point, const std::string& symbol)
 AnnotationIDs Map::addPointAnnotations(const AnnotationSegment& points,
                                        const std::vector<std::string>& symbols) {
     AnnotationsProperties properties = { { "symbols", symbols } };
-    auto result = data->annotationManager.addPointAnnotations(points, properties, *data);
+    auto result = data->annotationManager.addPointAnnotations(points, properties, data->transform.getMaxZoom());
     context->invoke(&MapContext::updateAnnotationTiles, result.first);
     return result.second;
 }
@@ -256,7 +256,7 @@ uint32_t Map::addShapeAnnotation(const AnnotationSegments& shape,
 
 AnnotationIDs Map::addShapeAnnotations(const std::vector<AnnotationSegments>& shapes,
                                        const std::vector<StyleProperties>& styleProperties) {
-    auto result = data->annotationManager.addShapeAnnotations(shapes, styleProperties, {{}}, *data);
+    auto result = data->annotationManager.addShapeAnnotations(shapes, styleProperties, {{}}, data->transform.getMaxZoom());
     context->invoke(&MapContext::updateAnnotationTiles, result.first);
     return result.second;
 }
@@ -266,12 +266,12 @@ void Map::removeAnnotation(uint32_t annotation) {
 }
 
 void Map::removeAnnotations(const std::vector<uint32_t>& annotations) {
-    auto result = data->annotationManager.removeAnnotations(annotations, *data);
+    auto result = data->annotationManager.removeAnnotations(annotations, data->transform.getMaxZoom());
     context->invoke(&MapContext::updateAnnotationTiles, result);
 }
 
 std::vector<uint32_t> Map::getAnnotationsInBounds(const LatLngBounds& bounds, const AnnotationType& type) {
-    return data->annotationManager.getAnnotationsInBounds(bounds, *data, type);
+    return data->annotationManager.getAnnotationsInBounds(bounds, data->transform.getMaxZoom(), type);
 }
 
 LatLngBounds Map::getBoundsForAnnotations(const std::vector<uint32_t>& annotations) {

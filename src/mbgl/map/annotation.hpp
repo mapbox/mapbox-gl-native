@@ -24,7 +24,6 @@ class Annotation;
 class Map;
 class LiveTile;
 class LiveTileFeature;
-class MapData;
 
 using AnnotationsProperties = std::unordered_map<std::string, std::vector<std::string>>;
 
@@ -61,16 +60,16 @@ public:
     std::pair<std::unordered_set<TileID, TileID::Hash>, AnnotationIDs> addPointAnnotations(
         const AnnotationSegment&,
         const AnnotationsProperties&,
-        const MapData&);
+        const uint8_t maxZoom);
     std::pair<std::unordered_set<TileID, TileID::Hash>, AnnotationIDs> addShapeAnnotations(
         const std::vector<AnnotationSegments>&,
         const std::vector<StyleProperties>&,
         const AnnotationsProperties&,
-        const MapData&);
-    std::unordered_set<TileID, TileID::Hash> removeAnnotations(const AnnotationIDs&, const MapData&);
+        const uint8_t maxZoom);
+    std::unordered_set<TileID, TileID::Hash> removeAnnotations(const AnnotationIDs&, const uint8_t maxZoom);
     AnnotationIDs getOrderedShapeAnnotations() const { return orderedShapeAnnotations; }
     const StyleProperties getAnnotationStyleProperties(uint32_t) const;
-    AnnotationIDs getAnnotationsInBounds(const LatLngBounds&, const MapData&, const AnnotationType& = AnnotationType::Any) const;
+    AnnotationIDs getAnnotationsInBounds(const LatLngBounds&, const uint8_t maxZoom, const AnnotationType& = AnnotationType::Any) const;
     LatLngBounds getBoundsForAnnotations(const AnnotationIDs&) const;
 
     const LiveTile* getTile(const TileID& id);
@@ -86,7 +85,7 @@ private:
         const std::vector<AnnotationSegments>&,
         const std::vector<StyleProperties>&,
         const AnnotationsProperties&,
-        const MapData&);
+        const uint8_t maxZoom);
     std::unordered_set<TileID, TileID::Hash> addTileFeature(
         const uint32_t annotationID,
         const AnnotationSegments&,
