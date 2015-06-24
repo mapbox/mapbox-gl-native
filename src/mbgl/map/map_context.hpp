@@ -3,7 +3,6 @@
 
 #include <mbgl/map/tile_id.hpp>
 #include <mbgl/map/update.hpp>
-#include <mbgl/map/environment.hpp>
 #include <mbgl/map/transform_state.hpp>
 #include <mbgl/style/style.hpp>
 #include <mbgl/util/gl_object_store.hpp>
@@ -78,9 +77,6 @@ private:
     MapData& data;
 
     util::GLObjectStore glObjectStore;
-
-    Environment env;
-    EnvironmentScope envScope;
 
     UpdateType updated { static_cast<UpdateType>(Update::Nothing) };
     std::unique_ptr<uv::async> asyncUpdate;

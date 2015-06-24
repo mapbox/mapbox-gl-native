@@ -1,8 +1,6 @@
 #include <mbgl/storage/request.hpp>
 
-#include <mbgl/map/environment.hpp>
 #include <mbgl/storage/response.hpp>
-
 #include <mbgl/util/util.hpp>
 #include <mbgl/util/uv_detail.hpp>
 

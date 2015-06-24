@@ -18,7 +18,6 @@ class async;
 
 namespace mbgl {
 
-class Environment;
 class FontStack;
 class GlyphPBF;
 
@@ -33,7 +32,7 @@ public:
         virtual void onGlyphRangeLoadingFailed(std::exception_ptr error) = 0;
     };
 
-    GlyphStore(uv_loop_t* loop, Environment &);
+    GlyphStore(uv_loop_t* loop);
     ~GlyphStore();
 
     // Asynchronously request for GlyphRanges and when it gets loaded, notifies the
@@ -55,7 +54,6 @@ private:
     util::exclusive<FontStack> createFontStack(const std::string &fontStack);
 
     std::string glyphURL;
-    Environment &env;
 
     std::unordered_map<std::string, std::map<GlyphRange, std::unique_ptr<GlyphPBF>>> ranges;
     std::mutex rangesMutex;

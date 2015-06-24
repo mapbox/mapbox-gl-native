@@ -7,9 +7,8 @@
 
 namespace mbgl {
 
-GlyphStore::GlyphStore(uv_loop_t* loop, Environment& env_)
-    : env(env_),
-      asyncEmitGlyphRangeLoaded(std::make_unique<uv::async>(loop, [this] { emitGlyphRangeLoaded(); })),
+GlyphStore::GlyphStore(uv_loop_t* loop)
+    : asyncEmitGlyphRangeLoaded(std::make_unique<uv::async>(loop, [this] { emitGlyphRangeLoaded(); })),
       asyncEmitGlyphRangeLoadedingFailed(std::make_unique<uv::async>(loop, [this] { emitGlyphRangeLoadingFailed(); })),
       observer(nullptr) {
     asyncEmitGlyphRangeLoaded->unref();

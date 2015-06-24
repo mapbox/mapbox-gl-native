@@ -1,7 +1,6 @@
 #include <mbgl/map/map_context.hpp>
 #include <mbgl/map/map_data.hpp>
 #include <mbgl/map/view.hpp>
-#include <mbgl/map/environment.hpp>
 #include <mbgl/map/still_image.hpp>
 #include <mbgl/map/annotation.hpp>
 
@@ -30,8 +29,6 @@ namespace mbgl {
 MapContext::MapContext(uv_loop_t* loop, View& view_, FileSource& fileSource, MapData& data_)
     : view(view_),
       data(data_),
-      env(fileSource),
-      envScope(env, ThreadType::Map, "Map"),
       updated(static_cast<UpdateType>(Update::Nothing)),
       asyncUpdate(std::make_unique<uv::async>(loop, [this] { update(); })),
       texturePool(std::make_unique<TexturePool>()) {
@@ -117,7 +114,7 @@ void MapContext::loadStyleJSON(const std::string& json, const std::string& base)
     assert(util::ThreadContext::currentlyOn(util::ThreadType::Map));
 
     style.reset();
-    style = std::make_unique<Style>(json, base, asyncUpdate->get()->loop, env);
+    style = std::make_unique<Style>(json, base, asyncUpdate->get()->loop);
     style->cascade(data.getClasses());
     style->setDefaultTransitionDuration(data.getDefaultTransitionDuration());
     style->setObserver(this);

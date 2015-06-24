@@ -11,7 +11,6 @@
 #include <condition_variable>
 
 #include <mbgl/map/mode.hpp>
-#include <mbgl/map/environment.hpp>
 #include <mbgl/map/transform.hpp>
 #include <mbgl/map/transform_state.hpp>
 #include <mbgl/map/annotation.hpp>

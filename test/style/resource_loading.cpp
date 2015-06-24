@@ -3,7 +3,6 @@
 #include "mock_file_source.hpp"
 #include "mock_view.hpp"
 
-#include <mbgl/map/environment.hpp>
 #include <mbgl/map/map_data.hpp>
 #include <mbgl/map/transform_state.hpp>
 #include <mbgl/style/style.hpp>
@@ -25,9 +24,7 @@ public:
                    View& view,
                    FileSource& fileSource,
                    const std::function<void(std::exception_ptr error)>& callback)
-        : env_(fileSource),
-          envScope_(env_, ThreadType::Map, "Map"),
-          data_(view, MapMode::Still),
+        : data_(view, MapMode::Still),
           callback_(callback) {
         util::ThreadContext::setFileSource(&fileSource);
 
@@ -35,7 +32,7 @@ public:
         data_.transform.setLatLngZoom({0, 0}, 16);
 
         const std::string style = util::read_file("test/fixtures/resources/style.json");
-        style_ = std::make_unique<Style>(style, "", loop, env_),
+        style_ = std::make_unique<Style>(style, "", loop),
         style_->setObserver(this);
     }
 
@@ -67,9 +64,6 @@ public:
     }
 
 private:
-    Environment env_;
-    EnvironmentScope envScope_;
-
     MapData data_;
     TransformState transformState_;
     TexturePool texturePool_;

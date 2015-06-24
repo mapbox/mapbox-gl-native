@@ -20,7 +20,6 @@
 
 namespace mbgl {
 
-class Environment;
 class GlyphAtlas;
 class GlyphStore;
 class SpriteAtlas;
@@ -34,7 +33,7 @@ class Style : public GlyphStore::Observer,
 public:
     Style(const std::string& data,
           const std::string& base,
-          uv_loop_t*, Environment&);
+          uv_loop_t*);
     ~Style();
 
     class Observer {

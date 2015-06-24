@@ -22,7 +22,6 @@
 namespace mbgl {
 
 class MapData;
-class Environment;
 class GlyphAtlas;
 class GlyphStore;
 class SpriteAtlas;
