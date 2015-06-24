@@ -9,18 +9,26 @@
 using namespace mbgl;
 
 TEST(Annotations, SpriteImageCreationInvalid) {
+    FixtureLog log;
+
     const util::Image image_1x = { util::read_file("test/fixtures/annotations/emerald.png") };
     ASSERT_TRUE(image_1x);
     ASSERT_EQ(200u, image_1x.getWidth());
     ASSERT_EQ(299u, image_1x.getHeight());
 
-    // invalid dimensions
     ASSERT_EQ(nullptr, createSpriteImage(image_1x, 0, 0, 0, 16, 1, false));    // width == 0
     ASSERT_EQ(nullptr, createSpriteImage(image_1x, 0, 0, 16, 0, 1, false));    // height == 0
     ASSERT_EQ(nullptr, createSpriteImage(image_1x, 0, 0, 1, 1, 0, false));     // ratio == 0
     ASSERT_EQ(nullptr, createSpriteImage(image_1x, 0, 0, 1, 1, 23, false));    // ratio too large
     ASSERT_EQ(nullptr, createSpriteImage(image_1x, 0, 0, 2048, 16, 1, false)); // too wide
     ASSERT_EQ(nullptr, createSpriteImage(image_1x, 0, 0, 16, 1025, 1, false)); // too tall
+
+    EXPECT_EQ(6u, log.count({
+                      EventSeverity::Warning,
+                      Event::Sprite,
+                      int64_t(-1),
+                      "Can't create sprite with invalid metrics",
+                  }));
 }
 
 TEST(Annotations, SpriteImageCreation1x) {
