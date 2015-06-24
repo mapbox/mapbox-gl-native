@@ -25,6 +25,9 @@ public:
     // Adds/replaces a Sprite image.
     void setSprite(const std::string&, std::shared_ptr<const SpriteImage> = nullptr);
 
+    // Adds/replaces mutliple Sprite images.
+    void setSprites(const Sprites& sprites);
+
     // Removes a Sprite.
     void removeSprite(const std::string&);
 

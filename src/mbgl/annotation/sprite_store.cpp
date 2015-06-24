@@ -30,6 +30,13 @@ void SpriteStore::_setSprite(const std::string& name,
     }
 }
 
+void SpriteStore::setSprites(const Sprites& newSprites) {
+    std::lock_guard<std::mutex> lock(mutex);
+    for (const auto& pair : newSprites) {
+        _setSprite(pair.first, pair.second);
+    }
+}
+
 void SpriteStore::removeSprite(const std::string& name) {
     std::lock_guard<std::mutex> lock(mutex);
     _setSprite(name);
