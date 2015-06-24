@@ -154,36 +154,30 @@ def getRepositoryPassword() {
 
 task setupCoreGL() {
 
-    def subdir = new File(project.projectDir, "src/main/jni")
-    println("subdir: " + subdir)
+    def jniDir = new File(project.projectDir, "src/main/jni")
+    println("jniDir: " + jniDir)
 
     // Clean
-    if (subdir.exists()) {
+    if (jniDir.exists()) {
         println("directory previously existed, so delete it to start fresh")
-        subdir.delete();
+        jniDir.deleteDir();
     }
 
     // Make JNI
-    if (!subdir.mkdirs()) {
+    if (!jniDir.mkdirs()) {
         println("failed to make folder")
     }
-    println("subdir" + subdir + " is ready to go.")
+    println("jniDir" + jniDir + " is ready to go.")
 
     // Copy Core GL C++ Files
     // https://github.com/mapbox/mapbox-gl-native/blob/3396bcaaac5d317ee35b4cc2433663e3eb4b355d/android/mapboxgl-app.gyp#L11-L16
 
-    String rd = project.rootDir
-    println("root dir = " + rd)
-    rd = rd.substring(0, rd.lastIndexOf("java")) + "cpp"
-    println("rd minus java = " + rd)
-
-    def cpp = new File(rd);
-    println("cpp = " + cpp);
-    println("subdir ap = " + subdir.absolutePath)
+    String cppDirPath = project.rootDir
+    cppDirPath = cppDirPath.substring(0, cppDirPath.lastIndexOf("java")) + "cpp"
 
     copy {
-        from cpp
-        into subdir.absolutePath
+        from cppDirPath
+        into jniDir.absolutePath
         include '**/*.cpp'
     }
 
