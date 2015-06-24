@@ -1,5 +1,7 @@
 #include <mbgl/annotation/sprite_store.hpp>
 
+#include <mbgl/platform/log.hpp>
+
 #include <mbgl/util/exception.hpp>
 
 namespace mbgl {
@@ -8,20 +10,29 @@ SpriteStore::SpriteStore(const float pixelRatio_) : pixelRatio(pixelRatio_) {
 }
 
 void SpriteStore::setSprite(const std::string& name, std::shared_ptr<const SpriteImage> sprite) {
-    if (sprite && sprite->pixelRatio != pixelRatio) {
-        throw util::SpriteImageException("Sprite image has wrong pixel ratio");
-    }
     std::lock_guard<std::mutex> lock(mutex);
+    _setSprite(name, sprite);
+}
+
+void SpriteStore::_setSprite(const std::string& name,
+                             const std::shared_ptr<const SpriteImage>& sprite) {
     if (sprite) {
-        sprites.emplace(name, sprite);
-    } else {
-        sprites.erase(name);
+        if (sprite->pixelRatio == pixelRatio) {
+            sprites.emplace(name, sprite);
+            dirty.emplace(name, sprite);
+            return;
+        } else {
+            Log::Warning(Event::Sprite, "Sprite image has wrong pixel ratio");
+        }
     }
-    dirty.emplace(name, sprite);
+    if (sprites.erase(name) > 0) {
+        dirty.emplace(name, nullptr);
+    }
 }
 
 void SpriteStore::removeSprite(const std::string& name) {
-    setSprite(name);
+    std::lock_guard<std::mutex> lock(mutex);
+    _setSprite(name);
 }
 
 std::shared_ptr<const SpriteImage> SpriteStore::getSprite(const std::string& name) {

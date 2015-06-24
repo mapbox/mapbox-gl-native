@@ -38,6 +38,8 @@ public:
     const float pixelRatio;
 
 private:
+    void _setSprite(const std::string&, const std::shared_ptr<const SpriteImage>& = nullptr);
+
     // Lock for sprites and dirty maps.
     std::mutex mutex;
 

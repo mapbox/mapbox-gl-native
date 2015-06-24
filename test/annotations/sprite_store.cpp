@@ -1,4 +1,5 @@
 #include "../fixtures/util.hpp"
+#include "../fixtures/fixture_log_observer.hpp"
 
 #include <mbgl/annotation/sprite_store.hpp>
 
@@ -48,4 +49,25 @@ TEST(Annotations, SpriteStore) {
         { "three", sprite1 },
     }), store.getDirty());
     EXPECT_EQ(Sprites(), store.getDirty());
+}
+
+
+TEST(Annotations, SpriteStoreWrongPixelRatio) {
+    FixtureLog log;
+
+    const auto sprite1 = std::make_shared<SpriteImage>(8, 8, 1, std::string(8 * 8 * 4, '\0'));
+
+    using Sprites = std::map<std::string, std::shared_ptr<const SpriteImage>>;
+    SpriteStore store(2);
+
+    // Adding mismatched sprite image
+    store.setSprite("one", sprite1);
+    EXPECT_EQ(Sprites({}), store.getDirty());
+
+    EXPECT_EQ(1u, log.count({
+                      EventSeverity::Warning,
+                      Event::Sprite,
+                      int64_t(-1),
+                      "Sprite image has wrong pixel ratio",
+                  }));
 }
