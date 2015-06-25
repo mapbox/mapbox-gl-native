@@ -89,6 +89,7 @@ void Transform::_moveBy(const double dx, const double dy, const Duration duratio
             [=](double t) {
                 state.x = util::interpolate(startX, x, t);
                 state.y = util::interpolate(startY, y, t);
+                view.notifyMapChange(MapChangeRegionIsChanging);
                 return Update::Nothing;
             },
             [=] {
@@ -243,6 +244,7 @@ void Transform::_setScaleXY(const double new_scale, const double xn, const doubl
                 const double s = state.scale * util::tileSize;
                 state.Bc = s / 360;
                 state.Cc = s / util::M2PI;
+                view.notifyMapChange(MapChangeRegionIsChanging);
                 return Update::Zoom;
             },
             [=] {
@@ -335,6 +337,7 @@ void Transform::_setAngle(double new_angle, const Duration duration) {
         startTransition(
             [=](double t) {
                 state.angle = util::interpolate(startA, angle, t);
+                view.notifyMapChange(MapChangeRegionIsChanging);
                 return Update::Nothing;
             },
             [=] {
