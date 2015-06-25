@@ -35,8 +35,6 @@ Transform::Transform(View &view_)
 
 bool Transform::resize(const uint16_t w, const uint16_t h, const float ratio,
                        const uint16_t fb_w, const uint16_t fb_h) {
-    std::lock_guard<std::recursive_mutex> lock(mtx);
-
     if (state.width != w || state.height != h || state.pixelRatio != ratio ||
         state.framebuffer[0] != fb_w || state.framebuffer[1] != fb_h) {
 
@@ -64,14 +62,10 @@ void Transform::moveBy(const double dx, const double dy, const Duration duration
         return;
     }
 
-    std::lock_guard<std::recursive_mutex> lock(mtx);
-
     _moveBy(dx, dy, duration);
 }
 
 void Transform::_moveBy(const double dx, const double dy, const Duration duration) {
-    // This is only called internally, so we don't need a lock here.
-
     view.notifyMapChange(duration != Duration::zero() ?
                            MapChangeRegionWillChangeAnimated :
                            MapChangeRegionWillChange);
@@ -111,8 +105,6 @@ void Transform::setLatLng(const LatLng latLng, const Duration duration) {
         return;
     }
 
-    std::lock_guard<std::recursive_mutex> lock(mtx);
-
     const double m = 1 - 1e-15;
     const double f = std::fmin(std::fmax(std::sin(util::DEG2RAD * latLng.latitude), -m), m);
 
@@ -126,8 +118,6 @@ void Transform::setLatLngZoom(const LatLng latLng, const double zoom, const Dura
     if (std::isnan(latLng.latitude) || std::isnan(latLng.longitude) || std::isnan(zoom)) {
         return;
     }
-
-    std::lock_guard<std::recursive_mutex> lock(mtx);
 
     double new_scale = std::pow(2.0, zoom);
 
@@ -152,8 +142,6 @@ void Transform::scaleBy(const double ds, const double cx, const double cy, const
         return;
     }
 
-    std::lock_guard<std::recursive_mutex> lock(mtx);
-
     // clamp scale to min/max values
     double new_scale = state.scale * ds;
     if (new_scale < state.min_scale) {
@@ -171,8 +159,6 @@ void Transform::setScale(const double scale, const double cx, const double cy,
         return;
     }
 
-    std::lock_guard<std::recursive_mutex> lock(mtx);
-
     _setScale(scale, cx, cy, duration);
 }
 
@@ -181,26 +167,18 @@ void Transform::setZoom(const double zoom, const Duration duration) {
         return;
     }
 
-    std::lock_guard<std::recursive_mutex> lock(mtx);
-
     _setScale(std::pow(2.0, zoom), -1, -1, duration);
 }
 
 double Transform::getZoom() const {
-    std::lock_guard<std::recursive_mutex> lock(mtx);
-
     return state.getZoom();
 }
 
 double Transform::getScale() const {
-    std::lock_guard<std::recursive_mutex> lock(mtx);
-
     return state.scale;
 }
 
 void Transform::_setScale(double new_scale, double cx, double cy, const Duration duration) {
-    // This is only called internally, so we don't need a lock here.
-
     // Ensure that we don't zoom in further than the maximum allowed.
     if (new_scale < state.min_scale) {
         new_scale = state.min_scale;
@@ -233,8 +211,6 @@ void Transform::_setScale(double new_scale, double cx, double cy, const Duration
 
 void Transform::_setScaleXY(const double new_scale, const double xn, const double yn,
                             const Duration duration) {
-    // This is only called internally, so we don't need a lock here.
-
     view.notifyMapChange(duration != Duration::zero() ?
                            MapChangeRegionWillChangeAnimated :
                            MapChangeRegionWillChange);
@@ -289,8 +265,6 @@ void Transform::rotateBy(const double start_x, const double start_y, const doubl
         return;
     }
 
-    std::lock_guard<std::recursive_mutex> lock(mtx);
-
     double center_x = static_cast<double>(state.width) / 2.0, center_y = static_cast<double>(state.height) / 2.0;
 
     const double begin_center_x = start_x - center_x;
@@ -323,8 +297,6 @@ void Transform::setAngle(const double new_angle, const Duration duration) {
         return;
     }
 
-    std::lock_guard<std::recursive_mutex> lock(mtx);
-
     _setAngle(new_angle, duration);
 }
 
@@ -332,8 +304,6 @@ void Transform::setAngle(const double new_angle, const double cx, const double c
     if (std::isnan(new_angle) || std::isnan(cx) || std::isnan(cy)) {
         return;
     }
-
-    std::lock_guard<std::recursive_mutex> lock(mtx);
 
     double dx = 0, dy = 0;
 
@@ -351,8 +321,6 @@ void Transform::setAngle(const double new_angle, const double cx, const double c
 }
 
 void Transform::_setAngle(double new_angle, const Duration duration) {
-    // This is only called internally, so we don't need a lock here.
-
     view.notifyMapChange(duration != Duration::zero() ?
                            MapChangeRegionWillChangeAnimated :
                            MapChangeRegionWillChange);
@@ -383,8 +351,6 @@ void Transform::_setAngle(double new_angle, const Duration duration) {
 }
 
 double Transform::getAngle() const {
-    std::lock_guard<std::recursive_mutex> lock(mtx);
-
     return state.angle;
 }
 
@@ -419,18 +385,14 @@ void Transform::startTransition(std::function<Update(double)> frame,
 }
 
 bool Transform::needsTransition() const {
-    std::lock_guard<std::recursive_mutex> lock(mtx);
     return !!transitionFrameFn;
 }
 
 UpdateType Transform::updateTransitions(const TimePoint now) {
-    std::lock_guard<std::recursive_mutex> lock(mtx);
     return static_cast<UpdateType>(transitionFrameFn ? transitionFrameFn(now) : Update::Nothing);
 }
 
 void Transform::cancelTransitions() {
-    std::lock_guard<std::recursive_mutex> lock(mtx);
-
     if (transitionFinishFn) {
         transitionFinishFn();
     }
@@ -440,15 +402,11 @@ void Transform::cancelTransitions() {
 }
 
 void Transform::setGestureInProgress(bool inProgress) {
-    std::lock_guard<std::recursive_mutex> lock(mtx);
-
     state.gestureInProgress = inProgress;
 }
 
 #pragma mark - Transform state
 
 const TransformState Transform::currentState() const {
-    std::lock_guard<std::recursive_mutex> lock(mtx);
-
     return state;
 }

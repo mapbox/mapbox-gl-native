@@ -1,14 +1,7 @@
 #include "../fixtures/util.hpp"
 #include "../fixtures/mock_view.hpp"
 
-#include <mbgl/util/run_loop.hpp>
-#include <mbgl/map/map_data.hpp>
-#include <mbgl/map/map_context.hpp>
-#include <mbgl/platform/default/headless_view.hpp>
-#include <mbgl/platform/default/headless_display.hpp>
-#include <mbgl/storage/default_file_source.hpp>
-
-#include <cstdlib>
+#include <mbgl/map/transform.hpp>
 
 using namespace mbgl;
 

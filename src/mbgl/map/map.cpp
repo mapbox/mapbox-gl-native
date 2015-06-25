@@ -1,6 +1,8 @@
 #include <mbgl/map/map.hpp>
 #include <mbgl/map/map_context.hpp>
 #include <mbgl/map/view.hpp>
+#include <mbgl/map/transform.hpp>
+#include <mbgl/map/transform_state.hpp>
 #include <mbgl/map/map_data.hpp>
 
 #include <mbgl/util/projection.hpp>
@@ -11,7 +13,8 @@
 namespace mbgl {
 
 Map::Map(View& view, FileSource& fileSource, MapMode mode)
-    : data(std::make_unique<MapData>(view, mode)),
+    : transform(std::make_unique<Transform>(view)),
+      data(std::make_unique<MapData>(mode)),
       context(std::make_unique<util::Thread<MapContext>>(util::ThreadContext{"Map", util::ThreadType::Map, util::ThreadPriority::Regular}, view, fileSource, *data))
 {
     view.initialize(this);
@@ -39,15 +42,21 @@ void Map::resume() {
 }
 
 void Map::renderStill(StillImageCallback callback) {
-    context->invoke(&MapContext::renderStill, callback);
+    context->invoke(&MapContext::renderStill, transform->currentState(), callback);
 }
 
 void Map::renderSync() {
-    context->invokeSync(&MapContext::renderSync);
+    bool rerender = context->invokeSync<bool>(&MapContext::renderSync, transform->currentState());
+
+    if (transform->needsTransition()) {
+        update(Update(transform->updateTransitions(Clock::now())));
+    } else if (rerender) {
+        update();
+    }
 }
 
 void Map::update(Update update_) {
-    context->invoke(&MapContext::triggerUpdate, update_);
+    context->invoke(&MapContext::triggerUpdate, transform->currentState(), update_);
 }
 
 #pragma mark - Style
@@ -71,43 +80,44 @@ std::string Map::getStyleJSON() const {
 #pragma mark - Size
 
 void Map::resize(uint16_t width, uint16_t height, float ratio) {
-    if (data->transform.resize(width, height, ratio, width * ratio, height * ratio)) {
+    if (transform->resize(width, height, ratio, width * ratio, height * ratio)) {
         context->invoke(&MapContext::resize, width, height, ratio);
+        update();
     }
 }
 
 #pragma mark - Transitions
 
 void Map::cancelTransitions() {
-    data->transform.cancelTransitions();
+    transform->cancelTransitions();
     update();
 }
 
 void Map::setGestureInProgress(bool inProgress) {
-    data->transform.setGestureInProgress(inProgress);
+    transform->setGestureInProgress(inProgress);
     update();
 }
 
 #pragma mark - Position
 
 void Map::moveBy(double dx, double dy, Duration duration) {
-    data->transform.moveBy(dx, dy, duration);
+    transform->moveBy(dx, dy, duration);
     update();
 }
 
 void Map::setLatLng(LatLng latLng, Duration duration) {
-    data->transform.setLatLng(latLng, duration);
+    transform->setLatLng(latLng, duration);
     update();
 }
 
 LatLng Map::getLatLng() const {
-    return data->transform.getLatLng();
+    return transform->getLatLng();
 }
 
 void Map::resetPosition() {
-    data->transform.setAngle(0);
-    data->transform.setLatLng(LatLng(0, 0));
-    data->transform.setZoom(0);
+    transform->setAngle(0);
+    transform->setLatLng(LatLng(0, 0));
+    transform->setZoom(0);
     update(Update::Zoom);
 }
 
@@ -115,30 +125,30 @@ void Map::resetPosition() {
 #pragma mark - Scale
 
 void Map::scaleBy(double ds, double cx, double cy, Duration duration) {
-    data->transform.scaleBy(ds, cx, cy, duration);
+    transform->scaleBy(ds, cx, cy, duration);
     update(Update::Zoom);
 }
 
 void Map::setScale(double scale, double cx, double cy, Duration duration) {
-    data->transform.setScale(scale, cx, cy, duration);
+    transform->setScale(scale, cx, cy, duration);
     update(Update::Zoom);
 }
 
 double Map::getScale() const {
-    return data->transform.getScale();
+    return transform->getScale();
 }
 
 void Map::setZoom(double zoom, Duration duration) {
-    data->transform.setZoom(zoom, duration);
+    transform->setZoom(zoom, duration);
     update(Update::Zoom);
 }
 
 double Map::getZoom() const {
-    return data->transform.getZoom();
+    return transform->getZoom();
 }
 
 void Map::setLatLngZoom(LatLng latLng, double zoom, Duration duration) {
-    data->transform.setLatLngZoom(latLng, zoom, duration);
+    transform->setLatLngZoom(latLng, zoom, duration);
     update(Update::Zoom);
 }
 
@@ -186,48 +196,48 @@ void Map::resetZoom() {
 }
 
 double Map::getMinZoom() const {
-    return data->transform.currentState().getMinZoom();
+    return transform->currentState().getMinZoom();
 }
 
 double Map::getMaxZoom() const {
-    return data->transform.currentState().getMaxZoom();
+    return transform->currentState().getMaxZoom();
 }
 
 
 #pragma mark - Size
 
 uint16_t Map::getWidth() const {
-    return data->transform.currentState().getWidth();
+    return transform->currentState().getWidth();
 }
 
 uint16_t Map::getHeight() const {
-    return data->transform.currentState().getHeight();
+    return transform->currentState().getHeight();
 }
 
 
 #pragma mark - Rotation
 
 void Map::rotateBy(double sx, double sy, double ex, double ey, Duration duration) {
-    data->transform.rotateBy(sx, sy, ex, ey, duration);
+    transform->rotateBy(sx, sy, ex, ey, duration);
     update();
 }
 
 void Map::setBearing(double degrees, Duration duration) {
-    data->transform.setAngle(-degrees * M_PI / 180, duration);
+    transform->setAngle(-degrees * M_PI / 180, duration);
     update();
 }
 
 void Map::setBearing(double degrees, double cx, double cy) {
-    data->transform.setAngle(-degrees * M_PI / 180, cx, cy);
+    transform->setAngle(-degrees * M_PI / 180, cx, cy);
     update();
 }
 
 double Map::getBearing() const {
-    return -data->transform.getAngle() / M_PI * 180;
+    return -transform->getAngle() / M_PI * 180;
 }
 
 void Map::resetNorth() {
-    data->transform.setAngle(0, std::chrono::milliseconds(500));
+    transform->setAngle(0, std::chrono::milliseconds(500));
     update();
 }
 
@@ -255,11 +265,11 @@ const LatLng Map::latLngForProjectedMeters(const ProjectedMeters projectedMeters
 }
 
 const vec2<double> Map::pixelForLatLng(const LatLng latLng) const {
-    return data->transform.currentState().pixelForLatLng(latLng);
+    return transform->currentState().pixelForLatLng(latLng);
 }
 
 const LatLng Map::latLngForPixel(const vec2<double> pixel) const {
-    return data->transform.currentState().latLngForPixel(pixel);
+    return transform->currentState().latLngForPixel(pixel);
 }
 
 #pragma mark - Annotations

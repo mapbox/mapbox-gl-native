@@ -13,7 +13,7 @@ TEST(MapContext, DoubleStyleLoad) {
     std::shared_ptr<HeadlessDisplay> display = std::make_shared<HeadlessDisplay>();
     HeadlessView view(display, 512, 512, 1);
     DefaultFileSource fileSource(nullptr);
-    MapData data(view, MapMode::Continuous);
+    MapData data(MapMode::Continuous);
 
     util::Thread<MapContext> context({"Map", util::ThreadType::Map, util::ThreadPriority::Regular}, view, fileSource, data);
 

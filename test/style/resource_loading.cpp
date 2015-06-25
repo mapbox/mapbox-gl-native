@@ -4,7 +4,7 @@
 #include "mock_file_source.hpp"
 
 #include <mbgl/map/map_data.hpp>
-#include <mbgl/map/transform_state.hpp>
+#include <mbgl/map/transform.hpp>
 #include <mbgl/style/style.hpp>
 #include <mbgl/util/exception.hpp>
 #include <mbgl/util/io.hpp>
@@ -24,12 +24,13 @@ public:
                    View& view,
                    FileSource& fileSource,
                    const std::function<void(std::exception_ptr error)>& callback)
-        : data_(view, MapMode::Still),
+        : data_(MapMode::Still),
+          transform_(view),
           callback_(callback) {
         util::ThreadContext::setFileSource(&fileSource);
 
-        data_.transform.resize(1000, 1000, 1.0, 1000, 1000);
-        data_.transform.setLatLngZoom({0, 0}, 16);
+        transform_.resize(1000, 1000, 1.0, 1000, 1000);
+        transform_.setLatLngZoom({0, 0}, 16);
 
         const std::string style = util::read_file("test/fixtures/resources/style.json");
         style_ = std::make_unique<Style>(style, "", loop),
@@ -44,10 +45,9 @@ public:
         const auto now = Clock::now();
 
         data_.setAnimationTime(now);
-        data_.transform.updateTransitions(now);
+        transform_.updateTransitions(now);
 
-        transformState_ = data_.transform.currentState();
-        style_->update(data_, transformState_, texturePool_);
+        style_->update(data_, transform_.currentState(), texturePool_);
     }
 
     // Style::Observer implementation.
@@ -65,7 +65,7 @@ public:
 
 private:
     MapData data_;
-    TransformState transformState_;
+    Transform transform_;
     TexturePool texturePool_;
 
     std::unique_ptr<Style> style_;

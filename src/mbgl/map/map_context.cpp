@@ -75,11 +75,12 @@ void MapContext::pause() {
 
 void MapContext::resize(uint16_t width, uint16_t height, float ratio) {
     view.resize(width, height, ratio);
-    triggerUpdate();
 }
 
-void MapContext::triggerUpdate(const Update u) {
+void MapContext::triggerUpdate(const TransformState& state, const Update u) {
+    transformState = state;
     updated |= static_cast<UpdateType>(u);
+
     asyncUpdate->send();
 }
 
@@ -119,7 +120,8 @@ void MapContext::loadStyleJSON(const std::string& json, const std::string& base)
     style->setDefaultTransitionDuration(data.getDefaultTransitionDuration());
     style->setObserver(this);
 
-    triggerUpdate(Update::Zoom);
+    updated |= static_cast<UpdateType>(Update::Zoom);
+    asyncUpdate->send();
 
     auto staleTiles = data.annotationManager.resetStaleTiles();
     if (staleTiles.size()) {
@@ -215,7 +217,8 @@ void MapContext::updateAnnotationTiles(const std::unordered_set<TileID, TileID::
 
     cascadeClasses();
 
-    triggerUpdate(Update::Classes);
+    updated |= static_cast<UpdateType>(Update::Classes);
+    asyncUpdate->send();
 
     data.annotationManager.resetStaleTiles();
 }
@@ -229,9 +232,6 @@ void MapContext::update() {
 
     const auto now = Clock::now();
     data.setAnimationTime(now);
-
-    updated |= data.transform.updateTransitions(now);
-    transformState = data.transform.currentState();
 
     if (style) {
         if (updated & static_cast<UpdateType>(Update::DefaultTransitionDuration)) {
@@ -259,8 +259,8 @@ void MapContext::update() {
             }
         }
 
-        if (mayRender) {
-            render();
+        if (callback) {
+            renderSync(transformState);
         } else {
             view.invalidate();
         }
@@ -269,7 +269,7 @@ void MapContext::update() {
     updated = static_cast<UpdateType>(Update::Nothing);
 }
 
-void MapContext::renderStill(StillImageCallback fn) {
+void MapContext::renderStill(const TransformState& state, StillImageCallback fn) {
     if (!fn) {
         Log::Error(Event::General, "StillImageCallback not set");
         return;
@@ -296,25 +296,23 @@ void MapContext::renderStill(StillImageCallback fn) {
     }
 
     callback = fn;
-    mayRender = true;
-    triggerUpdate(Update::RenderStill);
+    transformState = state;
+
+    updated |= static_cast<UpdateType>(Update::RenderStill);
+    asyncUpdate->send();
 }
 
-void MapContext::renderSync() {
-    mayRender = true;
-    render();
-    mayRender = false;
-}
-
-void MapContext::render() {
+bool MapContext::renderSync(const TransformState& state) {
     assert(util::ThreadContext::currentlyOn(util::ThreadType::Map));
+
+    transformState = state;
 
     // Cleanup OpenGL objects that we abandoned since the last render call.
     glObjectStore.performCleanup();
 
     if (data.mode == MapMode::Still && (!callback || !data.getFullyLoaded())) {
         // We are either not waiting for a map to be rendered, or we don't have all resources yet.
-        return;
+        return false;
     }
 
     assert(style);
@@ -327,8 +325,6 @@ void MapContext::render() {
     painter->setDebug(data.getDebug());
     painter->render(*style, transformState, data.getAnimationTime());
 
-    mayRender = false;
-
     if (data.mode == MapMode::Still) {
         callback(nullptr, view.readStillImage());
         callback = nullptr;
@@ -336,10 +332,7 @@ void MapContext::render() {
 
     view.swap();
 
-    // Schedule another rerender when we definitely need a next frame.
-    if (data.transform.needsTransition() || style->hasTransitions()) {
-        triggerUpdate();
-    }
+    return style->hasTransitions();
 }
 
 double MapContext::getTopOffsetPixelsForAnnotationSymbol(const std::string& symbol) {
@@ -371,7 +364,7 @@ void MapContext::onLowMemory() {
 
 void MapContext::onTileDataChanged() {
     assert(util::ThreadContext::currentlyOn(util::ThreadType::Map));
-    triggerUpdate();
+    asyncUpdate->send();
 }
 
 void MapContext::onResourceLoadingFailed(std::exception_ptr error) {

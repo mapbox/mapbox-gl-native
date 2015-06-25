@@ -23,6 +23,7 @@ class View;
 class MapData;
 class MapContext;
 class StillImage;
+class Transform;
 
 namespace util {
 template <class T> class Thread;
@@ -153,6 +154,7 @@ public:
     bool isFullyLoaded() const;
 
 private:
+    const std::unique_ptr<Transform> transform;
     const std::unique_ptr<MapData> data;
     const std::unique_ptr<util::Thread<MapContext>> context;
     bool paused = false;

@@ -11,8 +11,6 @@
 #include <condition_variable>
 
 #include <mbgl/map/mode.hpp>
-#include <mbgl/map/transform.hpp>
-#include <mbgl/map/transform_state.hpp>
 #include <mbgl/map/annotation.hpp>
 
 namespace mbgl {
@@ -21,7 +19,7 @@ class MapData {
     using Lock = std::lock_guard<std::mutex>;
 
 public:
-    inline MapData(View& view, MapMode mode_) : transform(view), mode(mode_) {
+    inline MapData(MapMode mode_) : mode(mode_) {
         setAnimationTime(TimePoint::min());
         setDefaultTransitionDuration(Duration::zero());
     }
@@ -88,7 +86,6 @@ public:
     };
 
 public:
-    Transform transform;
     AnnotationManager annotationManager;
     const MapMode mode;
 

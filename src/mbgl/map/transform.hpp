@@ -9,7 +9,7 @@
 
 #include <cstdint>
 #include <cmath>
-#include <mutex>
+#include <functional>
 
 namespace mbgl {
 
@@ -55,16 +55,12 @@ public:
     const TransformState currentState() const;
 
 private:
-    // Functions prefixed with underscores will *not* perform any locks. It is the caller's
-    // responsibility to lock this object.
     void _moveBy(double dx, double dy, Duration = Duration::zero());
     void _setScale(double scale, double cx, double cy, Duration = Duration::zero());
     void _setScaleXY(double new_scale, double xn, double yn, Duration = Duration::zero());
     void _setAngle(double angle, Duration = Duration::zero());
 
     View &view;
-
-    mutable std::recursive_mutex mtx;
 
     TransformState state;
 
