@@ -468,7 +468,7 @@ bool Source::update(MapData& data,
     if (info.type != SourceType::Raster && cache.getSize() == 0) {
         size_t conservativeCacheSize = ((float)transformState.getWidth()  / util::tileSize) *
                                        ((float)transformState.getHeight() / util::tileSize) *
-                                       (data.transform.getMaxZoom() - data.transform.getMinZoom() + 1) *
+                                       (transformState.getMaxZoom() - transformState.getMinZoom() + 1) *
                                        0.5;
         cache.setSize(conservativeCacheSize);
     }

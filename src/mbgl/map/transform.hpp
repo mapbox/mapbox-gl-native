@@ -36,8 +36,6 @@ public:
     void setZoom(double zoom, Duration = Duration::zero());
     double getZoom() const;
     double getScale() const;
-    double getMinZoom() const;
-    double getMaxZoom() const;
 
     // Angle
     void rotateBy(double sx, double sy, double ex, double ey, Duration = Duration::zero());
@@ -64,17 +62,11 @@ private:
     void _setScaleXY(double new_scale, double xn, double yn, Duration = Duration::zero());
     void _setAngle(double angle, Duration = Duration::zero());
 
-    void constrain(double& scale, double& y) const;
-
     View &view;
 
     mutable std::recursive_mutex mtx;
 
     TransformState state;
-
-    // Limit the amount of zooming possible on the map.
-    const double min_scale = std::pow(2, 0);
-    const double max_scale = std::pow(2, 18);
 
     void startTransition(std::function<Update(double)> frame,
                          std::function<void()> finish,

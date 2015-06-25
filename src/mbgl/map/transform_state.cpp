@@ -152,6 +152,18 @@ double TransformState::getScale() const {
     return scale;
 }
 
+double TransformState::getMinZoom() const {
+    double test_scale = scale;
+    double test_y = y;
+    constrain(test_scale, test_y);
+
+    return std::log2(std::fmin(min_scale, test_scale));
+}
+
+double TransformState::getMaxZoom() const {
+    return std::log2(max_scale);
+}
+
 
 #pragma mark - Rotation
 
@@ -256,6 +268,18 @@ bool TransformState::isChanging() const {
 
 #pragma mark - (private helper functions)
 
+void TransformState::constrain(double& scale_, double& y_) const {
+    // Constrain minimum zoom to avoid zooming out far enough to show off-world areas.
+    if (scale_ < height / util::tileSize) {
+        scale_ = height / util::tileSize;
+    }
+
+    // Constrain min/max vertical pan to avoid showing off-world areas.
+    double max_y = ((scale_ * util::tileSize) - height) / 2;
+
+    if (y_ > max_y) y_ = max_y;
+    if (y_ < -max_y) y_ = -max_y;
+}
 
 double TransformState::pixel_x() const {
     const double center = (width - scale * util::tileSize) / 2;

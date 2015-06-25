@@ -47,6 +47,8 @@ public:
     int32_t getIntegerZoom() const;
     double getZoomFraction() const;
     double getScale() const;
+    double getMinZoom() const;
+    double getMaxZoom() const;
 
     // Rotation
     float getAngle() const;
@@ -59,10 +61,15 @@ public:
     bool isChanging() const;
 
 private:
+    void constrain(double& scale, double& y) const;
+
+    // Limit the amount of zooming possible on the map.
+    double min_scale = std::pow(2, 0);
+    double max_scale = std::pow(2, 18);
+
     double pixel_x() const;
     double pixel_y() const;
 
-private:
     // logical dimensions
     uint16_t width = 0, height = 0;
 

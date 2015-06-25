@@ -47,7 +47,7 @@ bool Transform::resize(const uint16_t w, const uint16_t h, const float ratio,
         state.pixelRatio = ratio;
         state.framebuffer[0] = fb_w;
         state.framebuffer[1] = fb_h;
-        constrain(state.scale, state.y);
+        state.constrain(state.scale, state.y);
 
         view.notifyMapChange(MapChangeRegionDidChange);
 
@@ -79,7 +79,7 @@ void Transform::_moveBy(const double dx, const double dy, const Duration duratio
     double x = state.x + std::cos(state.angle) * dx + std::sin( state.angle) * dy;
     double y = state.y + std::cos(state.angle) * dy + std::sin(-state.angle) * dx;
 
-    constrain(state.scale, y);
+    state.constrain(state.scale, y);
 
     if (duration == Duration::zero()) {
         state.x = x;
@@ -156,10 +156,10 @@ void Transform::scaleBy(const double ds, const double cx, const double cy, const
 
     // clamp scale to min/max values
     double new_scale = state.scale * ds;
-    if (new_scale < min_scale) {
-        new_scale = min_scale;
-    } else if (new_scale > max_scale) {
-        new_scale = max_scale;
+    if (new_scale < state.min_scale) {
+        new_scale = state.min_scale;
+    } else if (new_scale > state.max_scale) {
+        new_scale = state.max_scale;
     }
 
     _setScale(new_scale, cx, cy, duration);
@@ -198,26 +198,14 @@ double Transform::getScale() const {
     return state.scale;
 }
 
-double Transform::getMinZoom() const {
-    double test_scale = state.scale;
-    double test_y = state.y;
-    constrain(test_scale, test_y);
-
-    return std::log2(std::fmin(min_scale, test_scale));
-}
-
-double Transform::getMaxZoom() const {
-    return std::log2(max_scale);
-}
-
 void Transform::_setScale(double new_scale, double cx, double cy, const Duration duration) {
     // This is only called internally, so we don't need a lock here.
 
     // Ensure that we don't zoom in further than the maximum allowed.
-    if (new_scale < min_scale) {
-        new_scale = min_scale;
-    } else if (new_scale > max_scale) {
-        new_scale = max_scale;
+    if (new_scale < state.min_scale) {
+        new_scale = state.min_scale;
+    } else if (new_scale > state.max_scale) {
+        new_scale = state.max_scale;
     }
 
     // Zoom in on the center if we don't have click or gesture anchor coordinates.
@@ -255,7 +243,7 @@ void Transform::_setScaleXY(const double new_scale, const double xn, const doubl
     double x = xn;
     double y = yn;
 
-    constrain(scale, y);
+    state.constrain(scale, y);
 
     if (duration == Duration::zero()) {
         state.scale = scale;
@@ -291,19 +279,6 @@ void Transform::_setScaleXY(const double new_scale, const double xn, const doubl
                            MapChangeRegionDidChangeAnimated :
                            MapChangeRegionDidChange,
                            duration);
-}
-
-#pragma mark - Constraints
-
-void Transform::constrain(double& scale, double& y) const {
-    // Constrain minimum zoom to avoid zooming out far enough to show off-world areas.
-    if (scale < (state.height / util::tileSize)) scale = (state.height / util::tileSize);
-
-    // Constrain min/max vertical pan to avoid showing off-world areas.
-    double max_y = ((scale * util::tileSize) - state.height) / 2;
-
-    if (y > max_y) y = max_y;
-    if (y < -max_y) y = -max_y;
 }
 
 #pragma mark - Angle
