@@ -127,12 +127,6 @@ void MapContext::loadStyleJSON(const std::string& json, const std::string& base)
     }
 }
 
-void MapContext::updateTiles() {
-    assert(util::ThreadContext::currentlyOn(util::ThreadType::Map));
-
-    style->update(data, transformState, *texturePool);
-}
-
 void MapContext::updateAnnotationTiles(const std::unordered_set<TileID, TileID::Hash>& ids) {
     assert(util::ThreadContext::currentlyOn(util::ThreadType::Map));
 
@@ -230,10 +224,6 @@ void MapContext::cascadeClasses() {
     style->cascade(data.getClasses());
 }
 
-void MapContext::recalculateStyle(TimePoint now) {
-    style->recalculate(transformState.getNormalizedZoom(), now);
-}
-
 void MapContext::update() {
     assert(util::ThreadContext::currentlyOn(util::ThreadType::Map));
 
@@ -254,10 +244,10 @@ void MapContext::update() {
 
         if (updated & static_cast<UpdateType>(Update::Classes) ||
             updated & static_cast<UpdateType>(Update::Zoom)) {
-            recalculateStyle(now);
+            style->recalculate(transformState.getNormalizedZoom(), now);
         }
 
-        updateTiles();
+        style->update(data, transformState, *texturePool);
 
         if (style->isLoaded()) {
             if (!data.getFullyLoaded()) {

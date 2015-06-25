@@ -61,12 +61,10 @@ public:
     void onResourceLoadingFailed(std::exception_ptr error) override;
 
 private:
-    void updateTiles();
     void render();
 
     // Style-related updates.
     void cascadeClasses();
-    void recalculateStyle(TimePoint);
 
     // Update the state indicated by the accumulated Update flags, then render.
     void update();
