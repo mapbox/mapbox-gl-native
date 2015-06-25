@@ -1,4 +1,4 @@
-#import "MGLTypes.h"
+#import "MGLGeometry.h"
 
 #import <UIKit/UIKit.h>
 #import <CoreLocation/CoreLocation.h>

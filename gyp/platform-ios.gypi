@@ -36,6 +36,8 @@
         '../platform/ios/MGLUserLocationAnnotationView.m',
         '../include/mbgl/ios/MGLTypes.h',
         '../platform/ios/MGLTypes.m',
+        '../include/mbgl/ios/MGLGeometry.h',
+        '../platform/ios/MGLGeometry.m',
         '../include/mbgl/ios/MGLMultiPoint.h',
         '../platform/ios/MGLMultiPoint_Private.h',
         '../platform/ios/MGLMultiPoint.mm',

@@ -1,5 +1,5 @@
 #import "MGLMultiPoint.h"
-#import "MGLTypes.h"
+#import "MGLGeometry.h"
 
 #import <mbgl/util/geo.hpp>
 

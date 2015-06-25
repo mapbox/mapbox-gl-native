@@ -150,6 +150,41 @@
                    @"disabling zoom gesture should disallow pinching");
 }
 
+- (void)testFitToBounds {
+    // No-op
+    MGLCoordinateBounds initialBounds = tester.mapView.visibleCoordinateBounds;
+    [tester.mapView setVisibleCoordinateBounds:initialBounds animated:NO];
+    XCTAssertEqualObjects(MGLStringFromCoordinateBounds(initialBounds),
+                          MGLStringFromCoordinateBounds(tester.mapView.visibleCoordinateBounds),
+                          @"setting visible coordinate bounds to currently visible coordinate bounds should be a no-op");
+    
+    // Roundtrip after zooming
+    tester.mapView.zoomLevel -= 3;
+    [tester.mapView setVisibleCoordinateBounds:initialBounds animated:NO];
+    XCTAssertEqualObjects(MGLStringFromCoordinateBounds(initialBounds),
+                          MGLStringFromCoordinateBounds(tester.mapView.visibleCoordinateBounds),
+                          @"after zooming out, setting visible coordinate bounds back to %@ should not leave them at %@",
+                          MGLStringFromCoordinateBounds(initialBounds),
+                          MGLStringFromCoordinateBounds(tester.mapView.visibleCoordinateBounds));
+    tester.mapView.zoomLevel += 3;
+    [tester.mapView setVisibleCoordinateBounds:initialBounds animated:NO];
+    XCTAssertEqualObjects(MGLStringFromCoordinateBounds(initialBounds),
+                          MGLStringFromCoordinateBounds(tester.mapView.visibleCoordinateBounds),
+                          @"after zooming in, setting visible coordinate bounds back to %@ should not leave them at %@",
+                          MGLStringFromCoordinateBounds(initialBounds),
+                          MGLStringFromCoordinateBounds(tester.mapView.visibleCoordinateBounds));
+    
+    // Roundtrip after panning
+    MGLCoordinateBounds offsetBounds = MGLCoordinateBoundsOffset(initialBounds, MGLCoordinateSpanMake(0, 30));
+    [tester.mapView setVisibleCoordinateBounds:offsetBounds animated:NO];
+    [tester.mapView setVisibleCoordinateBounds:initialBounds animated:NO];
+    XCTAssertEqualObjects(MGLStringFromCoordinateBounds(initialBounds),
+                          MGLStringFromCoordinateBounds(tester.mapView.visibleCoordinateBounds),
+                          @"after panning 30° to the east, setting visible coordinate bounds back to %@ should not leave them at %@",
+                          MGLStringFromCoordinateBounds(initialBounds),
+                          MGLStringFromCoordinateBounds(tester.mapView.visibleCoordinateBounds));
+}
+
 - (void)testPan {
     CLLocationCoordinate2D centerCoordinate = tester.mapView.centerCoordinate;
 

@@ -1,5 +1,6 @@
 #import <Foundation/Foundation.h>
-#import <CoreLocation/CoreLocation.h>
+
+#pragma once
 
 #if !__has_feature(nullability)
     #define NS_ASSUME_NONNULL_BEGIN
@@ -22,18 +23,6 @@ typedef NS_ENUM(NSUInteger, MGLUserTrackingMode) {
     /** The map follows the user location and rotates when the heading changes. */
     MGLUserTrackingModeFollowWithHeading
 };
-
-typedef struct {
-    CLLocationCoordinate2D sw;
-    CLLocationCoordinate2D ne;
-} MGLCoordinateBounds;
-
-NS_INLINE MGLCoordinateBounds MGLCoordinateBoundsMake(CLLocationCoordinate2D sw, CLLocationCoordinate2D ne) {
-    MGLCoordinateBounds bounds;
-    bounds.sw = sw;
-    bounds.ne = ne;
-    return bounds;
-}
 
 NS_ASSUME_NONNULL_END
 

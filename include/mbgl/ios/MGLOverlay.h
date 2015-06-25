@@ -2,7 +2,7 @@
 #import <CoreLocation/CoreLocation.h>
 
 #import "MGLAnnotation.h"
-#import "MGLTypes.h"
+#import "MGLGeometry.h"
 
 NS_ASSUME_NONNULL_BEGIN
 
