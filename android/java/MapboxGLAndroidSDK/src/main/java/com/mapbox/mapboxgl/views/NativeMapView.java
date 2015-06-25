@@ -2,6 +2,7 @@ package com.mapbox.mapboxgl.views;
 
 import android.graphics.PointF;
 import android.view.Surface;
+import android.util.Log;
 
 import com.mapbox.mapboxgl.geometry.LatLng;
 import com.mapbox.mapboxgl.geometry.LatLngZoom;
@@ -83,6 +84,10 @@ class NativeMapView {
 
     public void update() {
         nativeUpdate(mNativeMapViewPtr);
+    }
+
+    public void invalidate() {
+        nativeOnInvalidate(mNativeMapViewPtr);
     }
 
     public void resize(int width, int height, float ratio, int fbWidth,
@@ -342,6 +347,10 @@ class NativeMapView {
     // Callbacks
     //
 
+    protected void onInvalidate() {
+        mMapView.onInvalidate();
+    }
+
     protected void onMapChanged() {
         mMapView.onMapChanged();
     }
@@ -383,6 +392,8 @@ class NativeMapView {
     private native void nativeResume(long nativeMapViewPtr);
 
     private native void nativeUpdate(long nativeMapViewPtr);
+
+    private native void nativeOnInvalidate(long nativeMapViewPtr);
 
     private native void nativeResize(long nativeMapViewPtr, int width,
             int height, float ratio, int fbWidth, int fbHeight);

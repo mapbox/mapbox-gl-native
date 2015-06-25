@@ -16,6 +16,7 @@ extern std::string dataPath;
 extern std::string apkPath;
 extern std::string androidRelease;
 
+extern jmethodID onInvalidateId;
 extern jmethodID onMapChangedId;
 extern jmethodID onFpsChangedId;
 

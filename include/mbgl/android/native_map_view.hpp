@@ -46,6 +46,8 @@ public:
     void enableFps(bool enable);
     void updateFps();
 
+    void onInvalidate();
+
 private:
     EGLConfig chooseConfig(const EGLConfig configs[], EGLint numConfigs);
 
@@ -76,6 +78,7 @@ private:
     mbgl::DefaultFileSource fileSource;
     mbgl::Map map;
 
+    std::atomic_flag clean = ATOMIC_FLAG_INIT;
 };
 }
 }

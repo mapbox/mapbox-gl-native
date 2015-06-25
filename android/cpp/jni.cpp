@@ -30,6 +30,7 @@ std::string dataPath;
 std::string apkPath;
 std::string androidRelease;
 
+jmethodID onInvalidateId = nullptr;
 jmethodID onMapChangedId = nullptr;
 jmethodID onFpsChangedId = nullptr;
 
@@ -275,6 +276,13 @@ void JNICALL nativeUpdate(JNIEnv *env, jobject obj, jlong nativeMapViewPtr) {
     assert(nativeMapViewPtr != 0);
     NativeMapView *nativeMapView = reinterpret_cast<NativeMapView *>(nativeMapViewPtr);
     nativeMapView->getMap().update();
+}
+
+void JNICALL nativeOnInvalidate(JNIEnv *env, jobject obj, jlong nativeMapViewPtr) {
+    mbgl::Log::Debug(mbgl::Event::JNI, "nativeOnInvalidate");
+    assert(nativeMapViewPtr != 0);
+    NativeMapView *nativeMapView = reinterpret_cast<NativeMapView *>(nativeMapViewPtr);
+    nativeMapView->onInvalidate();
 }
 
 void JNICALL nativeResize(JNIEnv *env, jobject obj, jlong nativeMapViewPtr, jint width, jint height,
@@ -805,6 +813,12 @@ extern "C" JNIEXPORT jint JNICALL JNI_OnLoad(JavaVM *vm, void *reserved) {
         return JNI_ERR;
     }
 
+    onInvalidateId = env->GetMethodID(nativeMapViewClass, "onInvalidate", "()V");
+    if (onInvalidateId == nullptr) {
+        env->ExceptionDescribe();
+        return JNI_ERR;
+    }
+
     onMapChangedId = env->GetMethodID(nativeMapViewClass, "onMapChanged", "()V");
     if (onMapChangedId == nullptr) {
         env->ExceptionDescribe();
@@ -921,6 +935,7 @@ extern "C" JNIEXPORT jint JNICALL JNI_OnLoad(JavaVM *vm, void *reserved) {
         {"nativePause", "(J)V", reinterpret_cast<void *>(&nativePause)},
         {"nativeResume", "(J)V", reinterpret_cast<void *>(&nativeResume)},
         {"nativeUpdate", "(J)V", reinterpret_cast<void *>(&nativeUpdate)},
+        {"nativeOnInvalidate", "(J)V", reinterpret_cast<void *>(&nativeOnInvalidate)},
         {"nativeResize", "(JIIFII)V",
          reinterpret_cast<void *>(static_cast<void JNICALL (
              *)(JNIEnv *, jobject, jlong, jint, jint, jfloat, jint, jint)>(&nativeResize))},
@@ -1092,6 +1107,7 @@ extern "C" JNIEXPORT void JNICALL JNI_OnUnload(JavaVM *vm, void *reserved) {
     latLngZoomLatitudeId = nullptr;
     latLngZoomZoomId = nullptr;
 
+    onInvalidateId = nullptr;
     onMapChangedId = nullptr;
     onFpsChangedId = nullptr;
 

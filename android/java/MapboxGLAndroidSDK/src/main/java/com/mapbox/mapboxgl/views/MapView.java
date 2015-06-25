@@ -26,6 +26,7 @@ import android.view.SurfaceView;
 import android.view.View;
 import android.view.ViewConfiguration;
 import android.widget.ZoomButtonsController;
+import android.util.Log;
 
 import com.almeros.android.multitouch.gesturedetectors.RotateGestureDetector;
 import com.almeros.android.multitouch.gesturedetectors.TwoFingerGestureDetector;
@@ -1167,6 +1168,18 @@ public class MapView extends SurfaceView {
     //
     // Map events
     //
+
+    // Called when the map needs to be rerendered
+    // Called via JNI from NativeMapView
+    protected void onInvalidate() {
+        post(new Runnable() {
+            @Override
+            public void run() {
+                mNativeMapView.invalidate();
+            }
+        });
+    }
+
 
     public interface OnMapChangedListener {
         void onMapChanged();
