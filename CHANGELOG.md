@@ -1,3 +1,7 @@
+# 1.1.3
+
+- Removes deprecated mbgl::Environment from NodeLogObserver.
+
 # 1.1.2
 
 - Check libuv version semver-ishly, fixes segfaults in Node.js 0.12.x
