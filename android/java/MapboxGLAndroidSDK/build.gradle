@@ -199,21 +199,7 @@ task setupCoreGL() {
     // Copy JNI
     // ========
     def jniDir = new File(project.projectDir, "src/main/jni")
-    println("jniDir: " + jniDir)
-
-/*
-    // Clean JNI
-    if (jniDir.exists()) {
-        println("directory previously existed, so delete it to start fresh")
-        jniDir.deleteDir();
-    }
-
-    // Make JNI
-    if (!jniDir.mkdirs()) {
-        println("failed to make jni folder")
-    }
-    println("jniDir" + jniDir + " is ready to go.")
-*/
+//    println("jniDir: " + jniDir)
 
     // Copy C++ Files
     // https://github.com/mapbox/mapbox-gl-native/blob/3396bcaaac5d317ee35b4cc2433663e3eb4b355d/android/mapboxgl-app.gyp#L11-L16
