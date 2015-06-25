@@ -204,21 +204,6 @@ task setupCoreGL() {
     // Copy C++ Files
     // https://github.com/mapbox/mapbox-gl-native/blob/3396bcaaac5d317ee35b4cc2433663e3eb4b355d/android/mapboxgl-app.gyp#L11-L16
 
-    // Symlink Android C++ Files
-    String cppDirPath = project.rootDir
-    cppDirPath = cppDirPath.substring(0, cppDirPath.lastIndexOf("java")) + "cpp"
-
-    String jp = jniDir.absolutePath + File.separator + "androidcpp"
-
-    Path jpPath = Paths.get(jp)
-    Path cppPath = Paths.get(cppDirPath)
-
-    if (Files.exists(jpPath)) {
-        Files.delete(jpPath)
-        println("Removed jpPath as it had already existed.")
-    }
-    Files.createSymbolicLink(jpPath, cppPath)
-
     // Symlink Core GL C++
     String coreDirPath = project.rootDir
     coreDirPath = coreDirPath.substring(0, coreDirPath.lastIndexOf("android")) + "src"
