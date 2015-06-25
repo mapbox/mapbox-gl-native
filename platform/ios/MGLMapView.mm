@@ -1463,7 +1463,7 @@ std::chrono::steady_clock::duration secondsAsDuration(float duration)
 
 - (CLLocationDirection)direction
 {
-    double direction = _mbglMap->getBearing() * -1;
+    double direction = _mbglMap->getBearing();
 
     while (direction > 360) direction -= 360;
     while (direction < 0) direction += 360;
@@ -1479,7 +1479,7 @@ std::chrono::steady_clock::duration secondsAsDuration(float duration)
 
     CGFloat duration = (animated ? MGLAnimationDuration : 0);
 
-    _mbglMap->setBearing(direction * -1, secondsAsDuration(duration));
+    _mbglMap->setBearing(direction, secondsAsDuration(duration));
 
     [self notifyMapChange:@(animated ? mbgl::MapChangeRegionDidChangeAnimated : mbgl::MapChangeRegionDidChange)];
 }

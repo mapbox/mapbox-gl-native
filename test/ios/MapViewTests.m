@@ -53,7 +53,7 @@
                    @"compass should be visible when map is rotated");
 
     XCTAssertEqualObjects([NSValue valueWithCGAffineTransform:tester.compass.transform],
-                          [NSValue valueWithCGAffineTransform:CGAffineTransformMakeRotation(M_PI * 1.5)],
+                          [NSValue valueWithCGAffineTransform:CGAffineTransformMakeRotation(M_PI * 0.5)],
                           @"compass rotation should indicate map rotation");
 }
 
