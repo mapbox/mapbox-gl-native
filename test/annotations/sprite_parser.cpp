@@ -6,7 +6,23 @@
 #include <mbgl/util/image.hpp>
 #include <mbgl/util/io.hpp>
 
+#pragma GCC diagnostic push
+#pragma GCC diagnostic ignored "-Wshadow"
+#include <boost/crc.hpp>
+#pragma GCC diagnostic pop
+
 #include <algorithm>
+
+namespace {
+
+// from https://gist.github.com/ArtemGr/997887
+uint64_t crc64(const std::string& str) {
+    boost::crc_optimal<64, 0x04C11DB7, 0, 0, false, false> crc;
+    crc.process_bytes(str.data(), str.size());
+    return crc.checksum();
+}
+
+} // anonymous namespace
 
 using namespace mbgl;
 
@@ -47,7 +63,7 @@ TEST(Annotations, SpriteImageCreation1x) {
         EXPECT_EQ(18, sprite->pixelWidth);
         EXPECT_EQ(18, sprite->pixelHeight);
         EXPECT_EQ(1, sprite->pixelRatio);
-        EXPECT_EQ(0xC83FE8FA9665D177u, std::hash<std::string>()(sprite->data));
+        EXPECT_EQ(0x7FCC5F263D1FFE16u, crc64(sprite->data));
     }
 
     { // outside image == blank
@@ -58,7 +74,7 @@ TEST(Annotations, SpriteImageCreation1x) {
         EXPECT_EQ(16, sprite->pixelWidth);
         EXPECT_EQ(16, sprite->pixelHeight);
         EXPECT_EQ(1, sprite->pixelRatio);
-        EXPECT_EQ(0x5599CFD89CB402A6u, std::hash<std::string>()(sprite->data));
+        EXPECT_EQ(0x0000000000000000u, crc64(sprite->data)) << std::hex << crc64(sprite->data);
     }
 
     { // outside image == blank
@@ -69,7 +85,7 @@ TEST(Annotations, SpriteImageCreation1x) {
         EXPECT_EQ(16, sprite->pixelWidth);
         EXPECT_EQ(16, sprite->pixelHeight);
         EXPECT_EQ(1, sprite->pixelRatio);
-        EXPECT_EQ(0x5599CFD89CB402A6u, std::hash<std::string>()(sprite->data));
+        EXPECT_EQ(0x0000000000000000u, crc64(sprite->data)) << std::hex << crc64(sprite->data);
     }
 }
 
@@ -85,7 +101,7 @@ TEST(Annotations, SpriteImageCreation2x) {
     EXPECT_EQ(36, sprite->pixelWidth);
     EXPECT_EQ(36, sprite->pixelHeight);
     EXPECT_EQ(2, sprite->pixelRatio);
-    EXPECT_EQ(0x2446A6D2C350B6AEu, std::hash<std::string>()(sprite->data));
+    EXPECT_EQ(0x85F345098DD4F9E3u, crc64(sprite->data));
 }
 
 TEST(Annotations, SpriteImageCreation1_5x) {
@@ -100,7 +116,7 @@ TEST(Annotations, SpriteImageCreation1_5x) {
     EXPECT_EQ(36, sprite->pixelWidth);
     EXPECT_EQ(36, sprite->pixelHeight);
     EXPECT_EQ(1.5, sprite->pixelRatio);
-    EXPECT_EQ(0x2446A6D2C350B6AEu, std::hash<std::string>()(sprite->data));
+    EXPECT_EQ(0x85F345098DD4F9E3u, crc64(sprite->data));
 
     // "hospital_icon":{"x":314,"y":518,"width":36,"height":36,"pixelRatio":2,"sdf":false}
     const auto sprite2 = createSpriteImage(image_2x, 314, 518, 35, 35, 1.5, false);
@@ -110,7 +126,7 @@ TEST(Annotations, SpriteImageCreation1_5x) {
     EXPECT_EQ(36, sprite2->pixelWidth);
     EXPECT_EQ(36, sprite2->pixelHeight);
     EXPECT_EQ(1.5, sprite2->pixelRatio);
-    EXPECT_EQ(0xF5274FF7FABA1C8Du, std::hash<std::string>()(sprite2->data));
+    EXPECT_EQ(0x134A530C742DD141u, crc64(sprite2->data));
 }
 
 TEST(Annotations, SpriteParsing) {
@@ -205,7 +221,7 @@ TEST(Annotations, SpriteParsing) {
         EXPECT_EQ(18, sprite->pixelWidth);
         EXPECT_EQ(18, sprite->pixelHeight);
         EXPECT_EQ(1, sprite->pixelRatio);
-        EXPECT_EQ(0X4829734034980451u, std::hash<std::string>()(sprite->data));
+        EXPECT_EQ(0xFF56F5F48F707147u, crc64(sprite->data));
     }
 }
 
