@@ -237,7 +237,6 @@ task setupCoreGL() {
     String coreDirPath = project.rootDir
     coreDirPath = coreDirPath.substring(0, coreDirPath.lastIndexOf("android")) + "src"
 
-
     String cgl = jniDir.absolutePath + File.separator + "coregl"
 
     Path cglPath = Paths.get(cgl)
@@ -249,25 +248,31 @@ task setupCoreGL() {
     }
     Files.createSymbolicLink(cglPath, cdPath)
 
-//    copy {
-//        from coreDirPath
-//        into jniDir.absolutePath
-//        include '**/**'
-//    }
-//    println("Copied Core GL C++ files.")
-//
-//    // Copy Platform C++
-//    String platformDirPath = project.rootDir
-//    platformDirPath = platformDirPath.substring(0, platformDirPath.lastIndexOf("android")) + "platform"
-//
-//    copy {
-//        from platformDirPath
-//        into jniDir.absolutePath
-//        include 'default/**'
-//        include 'android/**'
-//    }
-//    println("Copied Platform C++ files.")
+    // Symlink Platform C++
+    String platformDirPath = project.rootDir
+    platformDirPath = platformDirPath.substring(0, platformDirPath.lastIndexOf("android")) + "platform"
+    String defaultDirPath = platformDirPath + File.separator + "default"
+    String androidDirPath = platformDirPath + File.separator + "android"
+    Path ddPath = Paths.get(defaultDirPath)
+    Path adPath = Paths.get(androidDirPath)
 
+    String platgl = jniDir.absolutePath + File.separator + "platformgl"
+    String defaultgl = platgl + File.separator + "default"
+    String androidgl = platgl + File.separator + "android"
+    Path pglPath = Paths.get(platgl)
+    Path dglPath = Paths.get(defaultgl)
+    Path aglPath = Paths.get(androidgl)
+
+
+    if (Files.exists(pglPath)) {
+        Files.delete(dglPath)
+        Files.delete(aglPath)
+        Files.delete(pglPath)
+        println("Removed pglPath as it had already existed.")
+    }
+    Files.createDirectory(pglPath)
+    Files.createSymbolicLink(dglPath, ddPath)
+    Files.createSymbolicLink(aglPath, adPath)
 }
 
 task apklib(type: Zip) {
