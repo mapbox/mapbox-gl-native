@@ -42,11 +42,11 @@ void Map::resume() {
 }
 
 void Map::renderStill(StillImageCallback callback) {
-    context->invoke(&MapContext::renderStill, transform->currentState(), callback);
+    context->invoke(&MapContext::renderStill, transform->getState(), callback);
 }
 
 void Map::renderSync() {
-    bool rerender = context->invokeSync<bool>(&MapContext::renderSync, transform->currentState());
+    bool rerender = context->invokeSync<bool>(&MapContext::renderSync, transform->getState());
 
     if (transform->needsTransition()) {
         update(Update(transform->updateTransitions(Clock::now())));
@@ -56,7 +56,7 @@ void Map::renderSync() {
 }
 
 void Map::update(Update update_) {
-    context->invoke(&MapContext::triggerUpdate, transform->currentState(), update_);
+    context->invoke(&MapContext::triggerUpdate, transform->getState(), update_);
 }
 
 #pragma mark - Style
@@ -196,22 +196,22 @@ void Map::resetZoom() {
 }
 
 double Map::getMinZoom() const {
-    return transform->currentState().getMinZoom();
+    return transform->getState().getMinZoom();
 }
 
 double Map::getMaxZoom() const {
-    return transform->currentState().getMaxZoom();
+    return transform->getState().getMaxZoom();
 }
 
 
 #pragma mark - Size
 
 uint16_t Map::getWidth() const {
-    return transform->currentState().getWidth();
+    return transform->getState().getWidth();
 }
 
 uint16_t Map::getHeight() const {
-    return transform->currentState().getHeight();
+    return transform->getState().getHeight();
 }
 
 
@@ -265,11 +265,11 @@ const LatLng Map::latLngForProjectedMeters(const ProjectedMeters projectedMeters
 }
 
 const vec2<double> Map::pixelForLatLng(const LatLng latLng) const {
-    return transform->currentState().pixelForLatLng(latLng);
+    return transform->getState().pixelForLatLng(latLng);
 }
 
 const LatLng Map::latLngForPixel(const vec2<double> pixel) const {
-    return transform->currentState().latLngForPixel(pixel);
+    return transform->getState().latLngForPixel(pixel);
 }
 
 #pragma mark - Annotations

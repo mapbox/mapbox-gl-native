@@ -404,9 +404,3 @@ void Transform::cancelTransitions() {
 void Transform::setGestureInProgress(bool inProgress) {
     state.gestureInProgress = inProgress;
 }
-
-#pragma mark - Transform state
-
-const TransformState Transform::currentState() const {
-    return state;
-}

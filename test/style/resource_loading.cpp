@@ -47,7 +47,7 @@ public:
         data_.setAnimationTime(now);
         transform_.updateTransitions(now);
 
-        style_->update(data_, transform_.currentState(), texturePool_);
+        style_->update(data_, transform_.getState(), texturePool_);
     }
 
     // Style::Observer implementation.

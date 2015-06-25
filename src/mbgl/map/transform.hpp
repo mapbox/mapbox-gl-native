@@ -52,7 +52,7 @@ public:
     void setGestureInProgress(bool);
 
     // Transform state
-    const TransformState currentState() const;
+    const TransformState getState() const { return state; }
 
 private:
     void _moveBy(double dx, double dy, Duration = Duration::zero());
