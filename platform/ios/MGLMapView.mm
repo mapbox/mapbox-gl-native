@@ -2597,10 +2597,7 @@ CLLocationCoordinate2D MGLLocationCoordinate2DFromLatLng(mbgl::LatLng latLng)
 - (void)invalidate
 {
     MGLAssertIsMainThread();
-
     [self.glView setNeedsDisplay];
-
-    [self notifyMapChange:@(mbgl::MapChangeRegionIsChanging)];
 }
 
 - (BOOL)isFullyLoaded
