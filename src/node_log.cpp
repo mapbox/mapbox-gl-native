@@ -1,8 +1,6 @@
 #include "node_log.hpp"
 #include "util/async_queue.hpp"
 
-#include <mbgl/map/environment.hpp>
-
 namespace node_mbgl {
 
 struct NodeLogObserver::LogMessage {
@@ -10,16 +8,6 @@ struct NodeLogObserver::LogMessage {
     mbgl::Event event;
     int64_t code;
     std::string text;
-    int environment = -1;
-    std::string threadName = "";
-
-    LogMessage(mbgl::EventSeverity severity_, mbgl::Event event_, int64_t code_, std::string text_, int environment_, std::string threadName_)
-        : severity(severity_),
-        event(event_),
-        code(code_),
-        text(text_),
-        environment(environment_),
-        threadName(threadName_) {};
 
     LogMessage(mbgl::EventSeverity severity_, mbgl::Event event_, int64_t code_, std::string text_)
         : severity(severity_),
@@ -41,12 +29,6 @@ NodeLogObserver::NodeLogObserver(v8::Handle<v8::Object> target)
           if (!message.text.empty()) {
               msg->Set(NanNew("text"), NanNew(message.text));
           }
-          if (message.environment != -1) {
-              msg->Set(NanNew("environment"), NanNew<v8::Number>(message.environment));
-          }
-          if (!message.threadName.empty()) {
-              msg->Set(NanNew("threadName"), NanNew(message.threadName));
-          }
 
           v8::Local<v8::Value> argv[] = { NanNew("message"), msg };
           auto handle = NanNew<v8::Object>(module);
@@ -65,13 +47,7 @@ NodeLogObserver::~NodeLogObserver() {
 }
 
 bool NodeLogObserver::onRecord(mbgl::EventSeverity severity, mbgl::Event event, int64_t code, const std::string &text) {
-    if (mbgl::Environment::inScope()) {
-        int env = static_cast<int>(mbgl::Environment::Get().getID());
-        std::string threadName = mbgl::Environment::threadName();
-        queue->send({ severity, event, code, text, env, threadName });
-    } else {
-        queue->send({ severity, event, code, text });
-    }
+    queue->send({ severity, event, code, text });
     return true;
 }
 
