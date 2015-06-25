@@ -147,7 +147,7 @@ TEST_P(ResourceLoading, Success) {
 
 TEST_P(ResourceLoading, RequestFail) {
     std::stringstream message;
-    message << "Failed to load \\[test/fixtures/resources/" << GetParam() << "]: Failed by the test case";
+    message << "Failed to load \\[test\\/fixtures\\/resources\\/" << GetParam() << "\\]\\: Failed by the test case";
 
     runTestCase(MockFileSource::RequestFail, GetParam(), message.str());
 }
@@ -159,13 +159,13 @@ TEST_P(ResourceLoading, RequestWithCorruptedData) {
     message << "Failed to parse ";
 
     if (param == "vector.pbf") {
-        message << "\\[15/1638./1638.]: pbf unknown field type exception";
+        message << "\\[15\\/1638(3|4)\\/1638(3|4)\\]\\: pbf unknown field type exception";
     } else {
-        message << "\\[test/fixtures/resources/" << param << "]";
+        message << "\\[test\\/fixtures\\/resources\\/" << param << "\\]";
     }
 
     if (param.find("json") != std::string::npos) {
-        message << ": 0 - Expect either an object or array at root";
+        message << "\\: 0 - Expect either an object or array at root";
     }
 
     runTestCase(MockFileSource::RequestWithCorruptedData, GetParam(), message.str());
