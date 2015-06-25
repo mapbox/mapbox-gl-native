@@ -221,10 +221,8 @@ task setupCoreGL() {
     // Symlink Android C++ Files
     String cppDirPath = project.rootDir
     cppDirPath = cppDirPath.substring(0, cppDirPath.lastIndexOf("java")) + "cpp"
-    println("cppDir = " + cppDirPath)
 
-    String jp = jniDir.absolutePath + File.separator + "cppsym"
-    println("jp = " + jp)
+    String jp = jniDir.absolutePath + File.separator + "androidcpp"
 
     Path jpPath = Paths.get(jp)
     Path cppPath = Paths.get(cppDirPath)
@@ -235,17 +233,22 @@ task setupCoreGL() {
     }
     Files.createSymbolicLink(jpPath, cppPath)
 
-//    copy {
-//        from cppDirPath
-//        into jniDir.absolutePath
-//        include '**/*.cpp'
-//    }
-//    println("Copied Android C++ files.")
+    // Symlink Core GL C++
+    String coreDirPath = project.rootDir
+    coreDirPath = coreDirPath.substring(0, coreDirPath.lastIndexOf("android")) + "src"
 
-    // Copy Core GL C++
-//    String coreDirPath = project.rootDir
-//    coreDirPath = coreDirPath.substring(0, coreDirPath.lastIndexOf("android")) + "src"
-//
+
+    String cgl = jniDir.absolutePath + File.separator + "coregl"
+
+    Path cglPath = Paths.get(cgl)
+    Path cdPath = Paths.get(coreDirPath)
+
+    if (Files.exists(cglPath)) {
+        Files.delete(cglPath)
+        println("Removed cglPath as it had already existed.")
+    }
+    Files.createSymbolicLink(cglPath, cdPath)
+
 //    copy {
 //        from coreDirPath
 //        into jniDir.absolutePath
