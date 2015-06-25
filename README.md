@@ -14,6 +14,7 @@ An OpenGL renderer for [Mapbox Vector Tiles](https://www.mapbox.com/blog/vector-
  - Apple Command Line Tools (for build on OS X; available at [Apple Developer](https://developer.apple.com/downloads))
  - `pkg-config` (for build only)
  - [Homebrew](http://brew.sh) (for building on OS X)
+ - [xcpretty](https://github.com/supermarin/xcpretty) (for building on OS X)
  - [Cask](http://caskroom.io/) (for building Android on OS X)
  - Python 2.x (for build only)
 
