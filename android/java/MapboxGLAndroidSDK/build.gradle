@@ -263,10 +263,13 @@ task setupCoreGL() {
     Path dglPath = Paths.get(defaultgl)
     Path aglPath = Paths.get(androidgl)
 
-
     if (Files.exists(pglPath)) {
-        Files.delete(dglPath)
-        Files.delete(aglPath)
+        if (Files.exists(dglPath)) {
+            Files.delete(dglPath)
+        }
+        if (Files.exists(aglPath)) {
+            Files.delete(aglPath)
+        }
         Files.delete(pglPath)
         println("Removed pglPath as it had already existed.")
     }
