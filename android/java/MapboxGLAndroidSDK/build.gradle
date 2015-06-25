@@ -1,6 +1,7 @@
 import java.nio.file.Files
 import java.nio.file.Path
 import java.nio.file.Paths
+import org.ajoberstar.grgit.*
 
 buildscript {
     repositories {
@@ -9,6 +10,7 @@ buildscript {
     dependencies {
         classpath 'com.android.tools.build:gradle:1.2.3'
         classpath 'com.jakewharton.sdkmanager:gradle-plugin:0.12.0'
+        classpath 'org.ajoberstar:gradle-git:1.2.0'
     }
 }
 
@@ -247,6 +249,20 @@ task setupCoreGL() {
     Files.createDirectory(pglPath)
     Files.createSymbolicLink(dglPath, ddPath)
     Files.createSymbolicLink(aglPath, adPath)
+}
+
+task installMason() {
+    String masonDirString = project.buildDir.absolutePath + File.separator + "mason"
+    Path masonDirPath = Paths.get(masonDirString)
+    if (Files.exists(masonDirPath)) {
+        println("Mason already installed.")
+        def grgit = Grgit.open(dir: masonDirString)
+        println("grgit opened = " + grgit)
+        return ;
+    }
+
+    def grgit = Grgit.clone(dir: masonDirString, uri: 'git@github.com:mapbox/mason.git')
+    println("grgit = " + grgit)
 }
 
 task apklib(type: Zip) {
