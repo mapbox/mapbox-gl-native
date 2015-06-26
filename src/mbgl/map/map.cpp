@@ -12,8 +12,9 @@
 
 namespace mbgl {
 
-Map::Map(View& view, FileSource& fileSource, MapMode mode)
-    : transform(std::make_unique<Transform>(view)),
+Map::Map(View& view_, FileSource& fileSource, MapMode mode)
+    : view(view_),
+      transform(std::make_unique<Transform>(view)),
       data(std::make_unique<MapData>(mode)),
       context(std::make_unique<util::Thread<MapContext>>(util::ThreadContext{"Map", util::ThreadType::Map, util::ThreadPriority::Regular}, view, fileSource, *data))
 {
@@ -46,8 +47,25 @@ void Map::renderStill(StillImageCallback callback) {
 }
 
 void Map::renderSync() {
+    if (renderState == RenderState::never) {
+        view.notifyMapChange(MapChangeWillStartRenderingMap);
+    }
+
+    view.notifyMapChange(MapChangeWillStartRenderingFrame);
+
     MapContext::RenderResult result =
         context->invokeSync<MapContext::RenderResult>(&MapContext::renderSync, transform->getState());
+
+    view.notifyMapChange(result.fullyLoaded ?
+        MapChangeDidFinishRenderingFrameFullyRendered :
+        MapChangeDidFinishRenderingFrame);
+
+    if (!result.fullyLoaded) {
+        renderState = RenderState::partial;
+    } else if (renderState != RenderState::fully) {
+        renderState = RenderState::fully;
+        view.notifyMapChange(MapChangeDidFinishRenderingMapFullyRendered);
+    }
 
     if (transform->needsTransition()) {
         update(Update(transform->updateTransitions(Clock::now())));

@@ -669,8 +669,6 @@ std::chrono::steady_clock::duration secondsAsDuration(float duration)
 {
     if ( ! self.isDormant)
     {
-        [self notifyMapChange:@(mbgl::MapChangeWillStartRenderingMap)];
-
         _mbglMap->resize(rect.size.width, rect.size.height, view.contentScaleFactor);
 
         CGFloat zoomFactor   = _mbglMap->getMaxZoom() - _mbglMap->getMinZoom() + 1;
@@ -684,8 +682,6 @@ std::chrono::steady_clock::duration secondsAsDuration(float duration)
         _mbglMap->setSourceTileCacheSize(cacheSize);
 
         _mbglMap->renderSync();
-
-        [self notifyMapChange:@(mbgl::MapChangeDidFinishRenderingMap)];
     }
 }
 
@@ -2561,18 +2557,28 @@ CLLocationCoordinate2D MGLLocationCoordinate2DFromLatLng(mbgl::LatLng latLng)
             break;
         }
         case mbgl::MapChangeDidFinishRenderingMap:
-        {
-            if ([self.delegate respondsToSelector:@selector(mapViewDidFinishRenderingMap:fullyRendered:)])
-            {
-                [self.delegate mapViewDidFinishRenderingMap:self fullyRendered:NO];
-            }
-            break;
-        }
         case mbgl::MapChangeDidFinishRenderingMapFullyRendered:
         {
             if ([self.delegate respondsToSelector:@selector(mapViewDidFinishRenderingMap:fullyRendered:)])
             {
-                [self.delegate mapViewDidFinishRenderingMap:self fullyRendered:YES];
+                [self.delegate mapViewDidFinishRenderingMap:self fullyRendered:(change == mbgl::MapChangeDidFinishRenderingMapFullyRendered)];
+            }
+            break;
+        }
+        case mbgl::MapChangeWillStartRenderingFrame:
+        {
+            if ([self.delegate respondsToSelector:@selector(mapViewWillStartRenderingFrame:)])
+            {
+                [self.delegate mapViewWillStartRenderingFrame:self];
+            }
+            break;
+        }
+        case mbgl::MapChangeDidFinishRenderingFrame:
+        case mbgl::MapChangeDidFinishRenderingFrameFullyRendered:
+        {
+            if ([self.delegate respondsToSelector:@selector(mapViewDidFinishRenderingFrame:fullyRendered:)])
+            {
+                [self.delegate mapViewDidFinishRenderingFrame:self fullyRendered:(change == mbgl::MapChangeDidFinishRenderingFrameFullyRendered)];
             }
             break;
         }

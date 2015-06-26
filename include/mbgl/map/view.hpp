@@ -20,9 +20,12 @@ enum MapChange : uint8_t {
     MapChangeWillStartLoadingMap = 5,
     MapChangeDidFinishLoadingMap = 6,
     MapChangeDidFailLoadingMap = 7,
-    MapChangeWillStartRenderingMap = 8,
-    MapChangeDidFinishRenderingMap = 9,
-    MapChangeDidFinishRenderingMapFullyRendered = 10
+    MapChangeWillStartRenderingFrame = 8,
+    MapChangeDidFinishRenderingFrame = 9,
+    MapChangeDidFinishRenderingFrameFullyRendered = 10,
+    MapChangeWillStartRenderingMap = 11,
+    MapChangeDidFinishRenderingMap = 12,
+    MapChangeDidFinishRenderingMapFullyRendered = 13,
 };
 
 class View {

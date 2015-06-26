@@ -418,6 +418,12 @@ IB_DESIGNABLE
 // TODO
 - (void)mapViewDidFinishRenderingMap:(MGLMapView *)mapView fullyRendered:(BOOL)fullyRendered;
 
+// TODO
+- (void)mapViewWillStartRenderingFrame:(MGLMapView *)mapView;
+
+// TODO
+- (void)mapViewDidFinishRenderingFrame:(MGLMapView *)mapView fullyRendered:(BOOL)fullyRendered;
+
 #pragma mark - Tracking the User Location
 
 /** @name Tracking the User Location */
