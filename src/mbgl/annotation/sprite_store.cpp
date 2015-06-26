@@ -17,15 +17,21 @@ void SpriteStore::setSprite(const std::string& name, std::shared_ptr<const Sprit
 void SpriteStore::_setSprite(const std::string& name,
                              const std::shared_ptr<const SpriteImage>& sprite) {
     if (sprite) {
-        if (sprite->pixelRatio == pixelRatio) {
-            sprites.emplace(name, sprite);
-            dirty.emplace(name, sprite);
-            return;
-        } else {
+        if (sprite->pixelRatio != pixelRatio) {
             Log::Warning(Event::Sprite, "Sprite image has wrong pixel ratio");
+            return;
         }
-    }
-    if (sprites.erase(name) > 0) {
+
+        auto it = sprites.find(name);
+        if (it != sprites.end() &&
+            (it->second->width != sprite->width || it->second->height != sprite->height)) {
+            Log::Warning(Event::Sprite, "Can't change sprite dimensions");
+            return;
+        }
+
+        sprites.emplace_hint(it, name, sprite);
+        dirty.emplace(name, sprite);
+    } else if (sprites.erase(name) > 0) {
         dirty.emplace(name, nullptr);
     }
 }

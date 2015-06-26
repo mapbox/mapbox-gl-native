@@ -89,3 +89,28 @@ TEST(Annotations, SpriteStoreMultiple) {
               store.getDirty());
     EXPECT_EQ(Sprites(), store.getDirty());
 }
+
+
+TEST(Annotations, SpriteStoreReplaceWithDifferentDimensions) {
+    FixtureLog log;
+
+    const auto sprite1 = std::make_shared<SpriteImage>(8, 8, 2, std::string(16 * 16 * 4, '\0'));
+    const auto sprite2 = std::make_shared<SpriteImage>(9, 9, 2, std::string(18 * 18 * 4, '\0'));
+
+    using Sprites = std::map<std::string, std::shared_ptr<const SpriteImage>>;
+    SpriteStore store(2);
+
+    store.setSprite("sprite", sprite1);
+    store.setSprite("sprite", sprite2);
+
+    EXPECT_EQ(1u, log.count({
+                      EventSeverity::Warning,
+                      Event::Sprite,
+                      int64_t(-1),
+                      "Can't change sprite dimensions",
+                  }));
+
+    EXPECT_EQ(sprite1, store.getSprite("sprite"));
+
+    EXPECT_EQ(Sprites({ { "sprite", sprite1 } }), store.getDirty());
+}
