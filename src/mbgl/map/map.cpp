@@ -46,11 +46,12 @@ void Map::renderStill(StillImageCallback callback) {
 }
 
 void Map::renderSync() {
-    bool rerender = context->invokeSync<bool>(&MapContext::renderSync, transform->getState());
+    MapContext::RenderResult result =
+        context->invokeSync<MapContext::RenderResult>(&MapContext::renderSync, transform->getState());
 
     if (transform->needsTransition()) {
         update(Update(transform->updateTransitions(Clock::now())));
-    } else if (rerender) {
+    } else if (result.needsRerender) {
         update();
     }
 }
@@ -361,7 +362,7 @@ bool Map::getCollisionDebug() const {
 }
 
 bool Map::isFullyLoaded() const {
-    return data->getFullyLoaded();
+    return context->invokeSync<bool>(&MapContext::isLoaded);
 }
 
 void Map::addClass(const std::string& klass) {

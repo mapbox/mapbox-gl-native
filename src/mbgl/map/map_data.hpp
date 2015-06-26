@@ -62,13 +62,6 @@ public:
         collisionDebug = value;
     }
 
-    inline bool getFullyLoaded() const {
-        return loaded;
-    }
-    inline void setFullyLoaded(bool value) {
-        loaded = value;
-    }
-
     inline TimePoint getAnimationTime() const {
         // We're casting the TimePoint to and from a Duration because libstdc++
         // has a bug that doesn't allow TimePoints to be atomic.
@@ -95,7 +88,6 @@ private:
     std::vector<std::string> classes;
     std::atomic<uint8_t> debug { false };
     std::atomic<uint8_t> collisionDebug { false };
-    std::atomic<bool> loaded { false };
     std::atomic<Duration> animationTime;
     std::atomic<Duration> defaultTransitionDuration;
 

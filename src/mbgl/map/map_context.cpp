@@ -249,20 +249,10 @@ void MapContext::update() {
 
         style->update(data, transformState, *texturePool);
 
-        if (style->isLoaded()) {
-            if (!data.getFullyLoaded()) {
-                data.setFullyLoaded(true);
-            }
-        } else {
-            if (data.getFullyLoaded()) {
-                data.setFullyLoaded(false);
-            }
-        }
-
-        if (callback) {
-            renderSync(transformState);
-        } else {
+        if (data.mode == MapMode::Continuous) {
             view.invalidate();
+        } else if (callback && style->isLoaded()) {
+            renderSync(transformState);
         }
     }
 
@@ -302,23 +292,18 @@ void MapContext::renderStill(const TransformState& state, StillImageCallback fn)
     asyncUpdate->send();
 }
 
-bool MapContext::renderSync(const TransformState& state) {
+MapContext::RenderResult MapContext::renderSync(const TransformState& state) {
     assert(util::ThreadContext::currentlyOn(util::ThreadType::Map));
 
     // Style was not loaded yet.
     if (!style) {
-        return false;
+        return { false, false };
     }
 
     transformState = state;
 
     // Cleanup OpenGL objects that we abandoned since the last render call.
     glObjectStore.performCleanup();
-
-    if (data.mode == MapMode::Still && (!callback || !data.getFullyLoaded())) {
-        // We are either not waiting for a map to be rendered, or we don't have all resources yet.
-        return false;
-    }
 
     if (!painter) {
         painter = std::make_unique<Painter>();
@@ -335,7 +320,14 @@ bool MapContext::renderSync(const TransformState& state) {
 
     view.swap();
 
-    return style->hasTransitions();
+    return RenderResult {
+        style->isLoaded(),
+        style->hasTransitions()
+    };
+}
+
+bool MapContext::isLoaded() const {
+    return style->isLoaded();
 }
 
 double MapContext::getTopOffsetPixelsForAnnotationSymbol(const std::string& symbol) {

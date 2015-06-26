@@ -33,6 +33,11 @@ public:
     MapContext(uv_loop_t*, View&, FileSource&, MapData&);
     ~MapContext();
 
+    struct RenderResult {
+        bool fullyLoaded;
+        bool needsRerender;
+    };
+
     void pause();
 
     void resize(uint16_t width, uint16_t height, float ratio);
@@ -41,12 +46,14 @@ public:
 
     void triggerUpdate(const TransformState&, Update = Update::Nothing);
     void renderStill(const TransformState&, StillImageCallback callback);
-    bool renderSync(const TransformState&);
+    RenderResult renderSync(const TransformState&);
 
     void setStyleURL(const std::string&);
     void setStyleJSON(const std::string& json, const std::string& base);
     std::string getStyleURL() const { return styleURL; }
     std::string getStyleJSON() const { return styleJSON; }
+
+    bool isLoaded() const;
 
     double getTopOffsetPixelsForAnnotationSymbol(const std::string& symbol);
     void updateAnnotationTiles(const std::unordered_set<TileID, TileID::Hash>&);
