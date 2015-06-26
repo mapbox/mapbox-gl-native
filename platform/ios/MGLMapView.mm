@@ -69,7 +69,9 @@ CLLocationDegrees MGLDegreesFromRadians(CGFloat radians)
 @property (nonatomic) NSOperationQueue *regionChangeDelegateQueue;
 @property (nonatomic) UIImageView *compass;
 @property (nonatomic) UIImageView *logoBug;
+@property (nonatomic) NS_MUTABLE_ARRAY_OF(NSLayoutConstraint *) *logoBugConstraints;
 @property (nonatomic) UIButton *attributionButton;
+@property (nonatomic) NS_MUTABLE_ARRAY_OF(NSLayoutConstraint *) *attributionButtonConstraints;
 @property (nonatomic) UIActionSheet *attributionSheet;
 @property (nonatomic) UIPanGestureRecognizer *pan;
 @property (nonatomic) UIPinchGestureRecognizer *pinch;
@@ -281,6 +283,7 @@ std::chrono::steady_clock::duration secondsAsDuration(float duration)
     _logoBug.accessibilityLabel = @"Mapbox logo";
     _logoBug.translatesAutoresizingMaskIntoConstraints = NO;
     [self addSubview:_logoBug];
+    _logoBugConstraints = [NSMutableArray array];
 
     // setup attribution
     //
@@ -289,6 +292,7 @@ std::chrono::steady_clock::duration secondsAsDuration(float duration)
     [_attributionButton addTarget:self action:@selector(showAttribution) forControlEvents:UIControlEventTouchUpInside];
     _attributionButton.translatesAutoresizingMaskIntoConstraints = NO;
     [self addSubview:_attributionButton];
+    _attributionButtonConstraints = [NSMutableArray array];
     
     _attributionSheet = [[UIActionSheet alloc] initWithTitle:@"Mapbox GL for iOS"
                                                     delegate:self
@@ -429,6 +433,11 @@ std::chrono::steady_clock::duration secondsAsDuration(float duration)
     {
         [EAGLContext setCurrentContext:nil];
     }
+    
+    [self.logoBugConstraints removeAllObjects];
+    self.logoBugConstraints = nil;
+    [self.attributionButtonConstraints removeAllObjects];
+    self.attributionButtonConstraints = nil;
 }
 
 - (void)setDelegate:(nullable id<MGLMapViewDelegate>)delegate
@@ -457,15 +466,6 @@ std::chrono::steady_clock::duration secondsAsDuration(float duration)
 + (BOOL)requiresConstraintBasedLayout
 {
     return YES;
-}
-
-- (void)didMoveToSuperview
-{
-    [self.compass.superview removeConstraints:self.compass.superview.constraints];
-    [self.logoBug removeConstraints:self.logoBug.constraints];
-    [self.attributionButton removeConstraints:self.attributionButton.constraints];
-
-    [self setNeedsUpdateConstraints];
 }
 
 - (UIViewController *)viewControllerForLayoutGuides
@@ -498,10 +498,19 @@ std::chrono::steady_clock::duration secondsAsDuration(float duration)
     // compass
     //
     UIView *compassContainer = self.compass.superview;
+    if ([NSLayoutConstraint respondsToSelector:@selector(deactivateConstraints:)])
+    {
+        [NSLayoutConstraint deactivateConstraints:compassContainer.constraints];
+    }
+    else
+    {
+        [compassContainer removeConstraints:compassContainer.constraints];
+    }
 
+    NSMutableArray *compassContainerConstraints = [NSMutableArray array];
     if (viewController)
     {
-        [constraintParentView addConstraint:
+        [compassContainerConstraints addObject:
          [NSLayoutConstraint constraintWithItem:compassContainer
                                       attribute:NSLayoutAttributeTop
                                       relatedBy:NSLayoutRelationGreaterThanOrEqual
@@ -510,7 +519,7 @@ std::chrono::steady_clock::duration secondsAsDuration(float duration)
                                      multiplier:1
                                        constant:5]];
     }
-    [constraintParentView addConstraint:
+    [compassContainerConstraints addObject:
      [NSLayoutConstraint constraintWithItem:compassContainer
                                   attribute:NSLayoutAttributeTop
                                   relatedBy:NSLayoutRelationGreaterThanOrEqual
@@ -519,7 +528,7 @@ std::chrono::steady_clock::duration secondsAsDuration(float duration)
                                  multiplier:1
                                    constant:5]];
 
-    [constraintParentView addConstraint:
+    [compassContainerConstraints addObject:
      [NSLayoutConstraint constraintWithItem:self
                                   attribute:NSLayoutAttributeTrailing
                                   relatedBy:NSLayoutRelationEqual
@@ -528,7 +537,7 @@ std::chrono::steady_clock::duration secondsAsDuration(float duration)
                                  multiplier:1
                                    constant:5]];
 
-    [compassContainer addConstraint:
+    [compassContainerConstraints addObject:
      [NSLayoutConstraint constraintWithItem:compassContainer
                                   attribute:NSLayoutAttributeWidth
                                   relatedBy:NSLayoutRelationEqual
@@ -537,7 +546,7 @@ std::chrono::steady_clock::duration secondsAsDuration(float duration)
                                  multiplier:1
                                    constant:self.compass.image.size.width]];
 
-    [compassContainer addConstraint:
+    [compassContainerConstraints addObject:
      [NSLayoutConstraint constraintWithItem:compassContainer
                                   attribute:NSLayoutAttributeHeight
                                   relatedBy:NSLayoutRelationEqual
@@ -545,12 +554,29 @@ std::chrono::steady_clock::duration secondsAsDuration(float duration)
                                   attribute:NSLayoutAttributeNotAnAttribute
                                  multiplier:1
                                    constant:self.compass.image.size.height]];
+    if ([NSLayoutConstraint respondsToSelector:@selector(activateConstraints:)])
+    {
+        [NSLayoutConstraint activateConstraints:compassContainerConstraints];
+    }
+    else
+    {
+        [compassContainer addConstraints:compassContainerConstraints];
+    }
 
     // logo bug
     //
+    if ([NSLayoutConstraint respondsToSelector:@selector(deactivateConstraints:)])
+    {
+        [NSLayoutConstraint deactivateConstraints:self.logoBugConstraints];
+    }
+    else
+    {
+        [self.logoBug removeConstraints:self.logoBugConstraints];
+    }
+    [self.logoBugConstraints removeAllObjects];
     if (viewController)
     {
-        [constraintParentView addConstraint:
+        [self.logoBugConstraints addObject:
          [NSLayoutConstraint constraintWithItem:viewController.bottomLayoutGuide
                                       attribute:NSLayoutAttributeTop
                                       relatedBy:NSLayoutRelationGreaterThanOrEqual
@@ -559,7 +585,7 @@ std::chrono::steady_clock::duration secondsAsDuration(float duration)
                                      multiplier:1
                                        constant:8]];
     }
-    [constraintParentView addConstraint:
+    [self.logoBugConstraints addObject:
      [NSLayoutConstraint constraintWithItem:self
                                   attribute:NSLayoutAttributeBottom
                                   relatedBy:NSLayoutRelationGreaterThanOrEqual
@@ -568,7 +594,7 @@ std::chrono::steady_clock::duration secondsAsDuration(float duration)
                                  multiplier:1
                                    constant:8]];
 
-    [constraintParentView addConstraint:
+    [self.logoBugConstraints addObject:
      [NSLayoutConstraint constraintWithItem:self.logoBug
                                   attribute:NSLayoutAttributeLeading
                                   relatedBy:NSLayoutRelationEqual
@@ -576,12 +602,29 @@ std::chrono::steady_clock::duration secondsAsDuration(float duration)
                                   attribute:NSLayoutAttributeLeading
                                  multiplier:1
                                    constant:8]];
+    if ([NSLayoutConstraint respondsToSelector:@selector(activateConstraints:)])
+    {
+        [NSLayoutConstraint activateConstraints:self.logoBugConstraints];
+    }
+    else
+    {
+        [constraintParentView addConstraints:self.logoBugConstraints];
+    }
 
     // attribution button
     //
+    if ([NSLayoutConstraint respondsToSelector:@selector(deactivateConstraints:)])
+    {
+        [NSLayoutConstraint deactivateConstraints:self.attributionButtonConstraints];
+    }
+    else
+    {
+        [self.attributionButton removeConstraints:self.attributionButtonConstraints];
+    }
+    [self.attributionButtonConstraints removeAllObjects];
     if (viewController)
     {
-        [constraintParentView addConstraint:
+        [self.attributionButtonConstraints addObject:
          [NSLayoutConstraint constraintWithItem:viewController.bottomLayoutGuide
                                       attribute:NSLayoutAttributeTop
                                       relatedBy:NSLayoutRelationGreaterThanOrEqual
@@ -590,7 +633,7 @@ std::chrono::steady_clock::duration secondsAsDuration(float duration)
                                      multiplier:1
                                        constant:8]];
     }
-    [constraintParentView addConstraint:
+    [self.attributionButtonConstraints addObject:
      [NSLayoutConstraint constraintWithItem:self
                                   attribute:NSLayoutAttributeBottom
                                   relatedBy:NSLayoutRelationGreaterThanOrEqual
@@ -599,7 +642,7 @@ std::chrono::steady_clock::duration secondsAsDuration(float duration)
                                  multiplier:1
                                    constant:8]];
 
-    [constraintParentView addConstraint:
+    [self.attributionButtonConstraints addObject:
      [NSLayoutConstraint constraintWithItem:self
                                   attribute:NSLayoutAttributeTrailing
                                   relatedBy:NSLayoutRelationEqual
@@ -607,6 +650,14 @@ std::chrono::steady_clock::duration secondsAsDuration(float duration)
                                   attribute:NSLayoutAttributeTrailing
                                  multiplier:1
                                    constant:8]];
+    if ([NSLayoutConstraint respondsToSelector:@selector(activateConstraints:)])
+    {
+        [NSLayoutConstraint activateConstraints:self.attributionButtonConstraints];
+    }
+    else
+    {
+        [constraintParentView addConstraints:self.attributionButtonConstraints];
+    }
 
     [super updateConstraints];
 }
