@@ -118,15 +118,17 @@ IB_DESIGNABLE
 *   @param animated Specify `YES` if you want the map view to animate scrolling and zooming to the new location or `NO` if you want the map to display the new location immediately. */
 - (void)setCenterCoordinate:(CLLocationCoordinate2D)centerCoordinate zoomLevel:(double)zoomLevel animated:(BOOL)animated;
 
-/** Returns the coordinate bounds visible in the receiver’s viewport. */
-- (MGLCoordinateBounds)visibleCoordinateBounds;
+/** The coordinate bounds visible in the receiver’s viewport.
+*   
+*   Changing the value of this property updates the receiver immediately. If you want to animate the change, call `setVisibleCoordinateBounds:animated:` instead. */
+@property (nonatomic) MGLCoordinateBounds visibleCoordinateBounds;
 
 /** Changes the receiver’s viewport to fit the given coordinate bounds, optionally animating the change.
 *   @param bounds The bounds that the viewport will show in its entirety.
 *   @param animated Specify `YES` to animate the change by smoothly scrolling and zooming or `NO` to immediately display the given bounds. */
 - (void)setVisibleCoordinateBounds:(MGLCoordinateBounds)bounds animated:(BOOL)animated;
 
-/** Changes the receiver’s viewport to fit the given coordinate bounds, optionally animating the change.
+/** Changes the receiver’s viewport to fit the given coordinate bounds and optionally some additional padding on each side.
 *   @param bounds The bounds that the viewport will show in its entirety.
 *   @param insets The minimum padding (in screen points) that will be visible around the given coordinate bounds.
 *   @param animated Specify `YES` to animate the change by smoothly scrolling and zooming or `NO` to immediately display the given bounds. */

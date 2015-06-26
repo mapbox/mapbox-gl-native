@@ -1461,6 +1461,11 @@ mbgl::LatLngBounds MGLLatLngBoundsFromCoordinateBounds(MGLCoordinateBounds coord
     return MGLCoordinateBoundsFromLatLngBounds(self.viewportBounds);
 }
 
+- (void)setVisibleCoordinateBounds:(MGLCoordinateBounds)bounds
+{
+    [self setVisibleCoordinateBounds:bounds animated:NO];
+}
+
 - (void)setVisibleCoordinateBounds:(MGLCoordinateBounds)bounds animated:(BOOL)animated
 {
     [self setVisibleCoordinateBounds:bounds edgePadding:UIEdgeInsetsZero animated:animated];
@@ -1471,8 +1476,10 @@ mbgl::LatLngBounds MGLLatLngBoundsFromCoordinateBounds(MGLCoordinateBounds coord
     // NOTE: does not disrupt tracking mode
     CGFloat duration = animated ? MGLAnimationDuration : 0;
     
+    [self willChangeValueForKey:@"visibleCoordinateBounds"];
     mbgl::EdgeInsets mbglInsets = {insets.top, insets.left, insets.bottom, insets.right};
     _mbglMap->fitBounds(MGLLatLngBoundsFromCoordinateBounds(bounds), mbglInsets, secondsAsDuration(duration));
+    [self didChangeValueForKey:@"visibleCoordinateBounds"];
     
     [self unrotateIfNeededAnimated:animated];
     
