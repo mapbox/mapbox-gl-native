@@ -41,6 +41,7 @@
 
         'headless/headless.cpp',
 
+        'miscellaneous/assert.cpp',
         'miscellaneous/clip_ids.cpp',
         'miscellaneous/binpack.cpp',
         'miscellaneous/bilinear.cpp',
