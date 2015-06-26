@@ -183,6 +183,27 @@
                           @"after panning 30° to the east, setting visible coordinate bounds back to %@ should not leave them at %@",
                           MGLStringFromCoordinateBounds(initialBounds),
                           MGLStringFromCoordinateBounds(tester.mapView.visibleCoordinateBounds));
+    
+    // Inscribed shapes with rotation
+    tester.mapView.direction = 45;
+    // https://en.wikipedia.org/wiki/Boundary_Markers_of_the_Original_District_of_Columbia
+    CLLocationCoordinate2D dcCoordinates[] = {
+        {38.790339, -77.040583},
+        {38.893219, -77.172304},
+        {38.995946, -77.040947},
+        {38.892829, -76.909229},
+    };
+    MGLCoordinateBounds dcBounds = {{38.790339, -77.172304}, {38.995946, -76.909229}};
+    [tester.mapView setVisibleCoordinateBounds:dcBounds
+                                      animated:NO];
+    double zoomLevel = tester.mapView.zoomLevel;
+    [tester.mapView setVisibleCoordinates:dcCoordinates
+                                    count:sizeof(dcCoordinates) / sizeof(dcCoordinates[0])
+                              edgePadding:UIEdgeInsetsZero
+                                 animated:NO];
+    XCTAssertGreaterThan(tester.mapView.zoomLevel, zoomLevel,
+                         @"when the map is rotated, DC should fit at a zoom level higher than %f, but instead the zoom level is %f",
+                         zoomLevel, tester.mapView.zoomLevel);
 }
 
 - (void)testPan {

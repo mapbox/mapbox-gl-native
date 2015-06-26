@@ -153,25 +153,35 @@ void Map::setLatLngZoom(LatLng latLng, double zoom, Duration duration) {
 }
 
 void Map::fitBounds(LatLngBounds bounds, EdgeInsets padding, Duration duration) {
-    // Calculate the bounds of the possibly rotated `bounds` parameter with respect to the viewport.
-    vec2<> nwPixel = pixelForLatLng({bounds.ne.latitude, bounds.sw.longitude});
-    vec2<> swPixel = pixelForLatLng(bounds.sw);
-    vec2<> sePixel = pixelForLatLng({bounds.sw.latitude, bounds.ne.longitude});
-    vec2<> nePixel = pixelForLatLng(bounds.ne);
-    vec2<> visualBounds = {
-        (std::max(std::max(nwPixel.x, swPixel.x),
-                  std::max(sePixel.x, nePixel.x)) -
-         std::min(std::min(nwPixel.x, swPixel.x),
-                  std::min(sePixel.x, nePixel.x))),
-        (std::max(std::max(nwPixel.y, swPixel.y),
-                  std::max(sePixel.y, nePixel.y)) -
-         std::min(std::min(nwPixel.y, swPixel.y),
-                  std::min(sePixel.y, nePixel.y))),
+    AnnotationSegment segment = {
+        {bounds.ne.latitude, bounds.sw.longitude},
+        bounds.sw,
+        {bounds.sw.latitude, bounds.ne.longitude},
+        bounds.ne,
     };
+    fitBounds(segment, padding, duration);
+}
+
+void Map::fitBounds(AnnotationSegment segment, EdgeInsets padding, Duration duration) {
+    if (segment.empty()) {
+        return;
+    }
+    
+    // Calculate the bounds of the possibly rotated shape with respect to the viewport.
+    vec2<> nePixel = {-INFINITY, -INFINITY};
+    vec2<> swPixel = {INFINITY, INFINITY};
+    for (LatLng latLng : segment) {
+        vec2<> pixel = pixelForLatLng(latLng);
+        swPixel.x = std::min(swPixel.x, pixel.x);
+        nePixel.x = std::max(nePixel.x, pixel.x);
+        swPixel.y = std::min(swPixel.y, pixel.y);
+        nePixel.y = std::max(nePixel.y, pixel.y);
+    }
+    vec2<> size = nePixel - swPixel;
 
     // Calculate the zoom level.
-    double scaleX = (getWidth() - padding.left - padding.right) / visualBounds.x;
-    double scaleY = (getHeight() - padding.top - padding.bottom) / visualBounds.y;
+    double scaleX = (getWidth() - padding.left - padding.right) / size.x;
+    double scaleY = (getHeight() - padding.top - padding.bottom) / size.y;
     double minScale = std::fmin(scaleX, scaleY);
     double zoom = std::log2(getScale() * minScale);
     zoom = std::fmax(std::fmin(zoom, getMaxZoom()), getMinZoom());

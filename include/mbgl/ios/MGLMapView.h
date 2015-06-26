@@ -134,6 +134,13 @@ IB_DESIGNABLE
 *   @param animated Specify `YES` to animate the change by smoothly scrolling and zooming or `NO` to immediately display the given bounds. */
 - (void)setVisibleCoordinateBounds:(MGLCoordinateBounds)bounds edgePadding:(UIEdgeInsets)insets animated:(BOOL)animated;
 
+/** Changes the receiver’s viewport to fit all of the given coordinates and optionally some additional padding on each side.
+*   @param coordinates The coordinates that the viewport will show.
+*   @param count The number of coordinates. This number must not be greater than the number of elements in `coordinates`.
+*   @param insets The minimum padding (in screen points) that will be visible around the given coordinate bounds.
+*   @param animated Specify `YES` to animate the change by smoothly scrolling and zooming or `NO` to immediately display the given bounds. */
+- (void)setVisibleCoordinates:(CLLocationCoordinate2D *)coordinates count:(NSUInteger)count edgePadding:(UIEdgeInsets)insets animated:(BOOL)animated;
+
 /** The heading of the map (measured in degrees) relative to true north. 
 *
 *   The value `0` means that the top edge of the map view corresponds to true north. The value `90` means the top of the map is pointing due east. The value `180` means the top of the map points due south, and so on. */

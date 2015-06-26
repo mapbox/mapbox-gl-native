@@ -1524,12 +1524,32 @@ mbgl::LatLngBounds MGLLatLngBoundsFromCoordinateBounds(MGLCoordinateBounds coord
 
 - (void)setVisibleCoordinateBounds:(MGLCoordinateBounds)bounds edgePadding:(UIEdgeInsets)insets animated:(BOOL)animated
 {
+    CLLocationCoordinate2D coordinates[] = {
+        {bounds.ne.latitude, bounds.sw.longitude},
+        bounds.sw,
+        {bounds.sw.latitude, bounds.ne.longitude},
+        bounds.ne,
+    };
+    [self setVisibleCoordinates:coordinates
+                          count:sizeof(coordinates) / sizeof(coordinates[0])
+                    edgePadding:insets
+                       animated:animated];
+}
+
+- (void)setVisibleCoordinates:(CLLocationCoordinate2D *)coordinates count:(NSUInteger)count edgePadding:(UIEdgeInsets)insets animated:(BOOL)animated
+{
     // NOTE: does not disrupt tracking mode
     CGFloat duration = animated ? MGLAnimationDuration : 0;
     
     [self willChangeValueForKey:@"visibleCoordinateBounds"];
     mbgl::EdgeInsets mbglInsets = {insets.top, insets.left, insets.bottom, insets.right};
-    _mbglMap->fitBounds(MGLLatLngBoundsFromCoordinateBounds(bounds), mbglInsets, secondsAsDuration(duration));
+    mbgl::AnnotationSegment segment;
+    segment.reserve(count);
+    for (NSUInteger i = 0; i < count; i++)
+    {
+        segment.push_back({coordinates[i].latitude, coordinates[i].longitude});
+    }
+    _mbglMap->fitBounds(segment, mbglInsets, secondsAsDuration(duration));
     [self didChangeValueForKey:@"visibleCoordinateBounds"];
     
     [self unrotateIfNeededAnimated:animated];

@@ -100,6 +100,7 @@ public:
     double getZoom() const;
     void setLatLngZoom(LatLng latLng, double zoom, Duration = Duration::zero());
     void fitBounds(LatLngBounds bounds, EdgeInsets padding, Duration duration = Duration::zero());
+    void fitBounds(AnnotationSegment segment, EdgeInsets padding, Duration duration = Duration::zero());
     void resetZoom();
     double getMinZoom() const;
     double getMaxZoom() const;
