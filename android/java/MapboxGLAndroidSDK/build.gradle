@@ -176,7 +176,7 @@ task setupCoreGL() {
     if (!assetsDir.mkdirs()) {
         println("failed to make assets folder")
     }
-    println("assetsDir" + assetsDir + " is ready to go.")
+    println("assetsDir " + assetsDir + " is ready to go.")
 
     // Copy Certificates
     String commonDirPath = project.rootDir
@@ -256,13 +256,19 @@ task installMason() {
     Path masonDirPath = Paths.get(masonDirString)
     if (Files.exists(masonDirPath)) {
         println("Mason already installed.")
-        def grgit = Grgit.open(dir: masonDirString)
-        println("grgit opened = " + grgit)
         return ;
     }
 
     def grgit = Grgit.clone(dir: masonDirString, uri: 'git@github.com:mapbox/mason.git')
-    println("grgit = " + grgit)
+    println("Mason installed")
+}
+
+task installJNILibs(dependsOn: 'installMason') {
+
+    exec {
+        workingDir = project.buildDir.absolutePath + File.separator + "mason"
+        executable = './mason'
+    }
 }
 
 task apklib(type: Zip) {
