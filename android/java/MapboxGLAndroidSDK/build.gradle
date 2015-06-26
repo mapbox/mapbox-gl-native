@@ -1,3 +1,8 @@
+import java.nio.file.Files
+import java.nio.file.Path
+import java.nio.file.Paths
+import org.ajoberstar.grgit.*
+
 buildscript {
     repositories {
         mavenCentral()
@@ -5,6 +10,7 @@ buildscript {
     dependencies {
         classpath 'com.android.tools.build:gradle:1.2.3'
         classpath 'com.jakewharton.sdkmanager:gradle-plugin:0.12.0'
+        classpath 'org.ajoberstar:gradle-git:1.2.0'
     }
 }
 
@@ -41,6 +47,10 @@ android {
     defaultConfig {
         minSdkVersion Integer.parseInt(project.ANDROID_MIN_SDK)
         targetSdkVersion Integer.parseInt(project.ANDROID_BUILD_TARGET_SDK_VERSION)
+
+        ndk {
+            moduleName "libmapbox-gl"
+        }
     }
 
     repositories {
@@ -151,6 +161,115 @@ def getRepositoryPassword() {
             (hasProperty('NEXUS_PASSWORD') ? NEXUS_PASSWORD : "")
 }
 
+
+task setupCoreGL() {
+
+    // Copy Assets
+    // ===========
+    def assetsDir = new File(project.projectDir, "src/main/assets")
+    if (assetsDir.exists()) {
+        println("assets directory previously existed, so delete it to start fresh")
+        assetsDir.deleteDir();
+    }
+
+    // Make Assets
+    if (!assetsDir.mkdirs()) {
+        println("failed to make assets folder")
+    }
+    println("assetsDir " + assetsDir + " is ready to go.")
+
+    // Copy Certificates
+    String commonDirPath = project.rootDir
+    commonDirPath = commonDirPath.substring(0, commonDirPath.lastIndexOf("android")) + "common"
+
+    copy {
+        from commonDirPath
+        into assetsDir
+        include '**.crt'
+    }
+
+    // Copy Styles
+    String stylesDirPath = project.rootDir
+    stylesDirPath = stylesDirPath.substring(0, stylesDirPath.lastIndexOf("android")) + "styles" + File.separator + "styles"
+
+    copy {
+        from stylesDirPath
+        into assetsDir
+        include '**.**'
+    }
+
+    // Copy JNI
+    // ========
+    def jniDir = new File(project.projectDir, "src/main/jni")
+//    println("jniDir: " + jniDir)
+
+    // Copy C++ Files
+    // https://github.com/mapbox/mapbox-gl-native/blob/3396bcaaac5d317ee35b4cc2433663e3eb4b355d/android/mapboxgl-app.gyp#L11-L16
+
+    // Symlink Core GL C++
+    String coreDirPath = project.rootDir
+    coreDirPath = coreDirPath.substring(0, coreDirPath.lastIndexOf("android")) + "src"
+
+    String cgl = jniDir.absolutePath + File.separator + "coregl"
+
+    Path cglPath = Paths.get(cgl)
+    Path cdPath = Paths.get(coreDirPath)
+
+    if (Files.exists(cglPath)) {
+        Files.delete(cglPath)
+        println("Removed cglPath as it had already existed.")
+    }
+    Files.createSymbolicLink(cglPath, cdPath)
+
+    // Symlink Platform C++
+    String platformDirPath = project.rootDir
+    platformDirPath = platformDirPath.substring(0, platformDirPath.lastIndexOf("android")) + "platform"
+    String defaultDirPath = platformDirPath + File.separator + "default"
+    String androidDirPath = platformDirPath + File.separator + "android"
+    Path ddPath = Paths.get(defaultDirPath)
+    Path adPath = Paths.get(androidDirPath)
+
+    String platgl = jniDir.absolutePath + File.separator + "platformgl"
+    String defaultgl = platgl + File.separator + "default"
+    String androidgl = platgl + File.separator + "android"
+    Path pglPath = Paths.get(platgl)
+    Path dglPath = Paths.get(defaultgl)
+    Path aglPath = Paths.get(androidgl)
+
+    if (Files.exists(pglPath)) {
+        if (Files.exists(dglPath)) {
+            Files.delete(dglPath)
+        }
+        if (Files.exists(aglPath)) {
+            Files.delete(aglPath)
+        }
+        Files.delete(pglPath)
+        println("Removed pglPath as it had already existed.")
+    }
+    Files.createDirectory(pglPath)
+    Files.createSymbolicLink(dglPath, ddPath)
+    Files.createSymbolicLink(aglPath, adPath)
+}
+
+task installMason() {
+    String masonDirString = project.buildDir.absolutePath + File.separator + "mason"
+    Path masonDirPath = Paths.get(masonDirString)
+    if (Files.exists(masonDirPath)) {
+        println("Mason already installed.")
+        return ;
+    }
+
+    def grgit = Grgit.clone(dir: masonDirString, uri: 'git@github.com:mapbox/mason.git')
+    println("Mason installed")
+}
+
+task installJNILibs(dependsOn: 'installMason') {
+
+    exec {
+        workingDir = project.buildDir.absolutePath + File.separator + "mason"
+        executable = './mason'
+    }
+}
 
 task apklib(type: Zip) {
     appendix = extension = 'apklib'
