@@ -4,11 +4,11 @@
 #include <mbgl/map/transform.hpp>
 #include <mbgl/map/transform_state.hpp>
 #include <mbgl/map/map_data.hpp>
+#include <mbgl/annotation/point_annotation.hpp>
+#include <mbgl/annotation/shape_annotation.hpp>
 
 #include <mbgl/util/projection.hpp>
 #include <mbgl/util/thread.hpp>
-
-#include <unordered_map>
 
 namespace mbgl {
 
@@ -292,26 +292,22 @@ double Map::getTopOffsetPixelsForAnnotationSymbol(const std::string& symbol) {
     return context->invokeSync<double>(&MapContext::getTopOffsetPixelsForAnnotationSymbol, symbol);
 }
 
-uint32_t Map::addPointAnnotation(const LatLng& point, const std::string& symbol) {
-    return addPointAnnotations({ point }, { symbol }).front();
+uint32_t Map::addPointAnnotation(const PointAnnotation& annotation) {
+    return addPointAnnotations({ annotation }).front();
 }
 
-AnnotationIDs Map::addPointAnnotations(const AnnotationSegment& points,
-                                       const std::vector<std::string>& symbols) {
-    AnnotationsProperties properties = { { "symbols", symbols } };
-    auto result = data->annotationManager.addPointAnnotations(points, properties, getMaxZoom());
+AnnotationIDs Map::addPointAnnotations(const std::vector<PointAnnotation>& annotations) {
+    auto result = data->annotationManager.addPointAnnotations(annotations, getMaxZoom());
     context->invoke(&MapContext::updateAnnotationTiles, result.first);
     return result.second;
 }
 
-uint32_t Map::addShapeAnnotation(const AnnotationSegments& shape,
-                                 const StyleProperties& styleProperties) {
-    return addShapeAnnotations({ shape }, { styleProperties }).front();
+uint32_t Map::addShapeAnnotation(const ShapeAnnotation& annotation) {
+    return addShapeAnnotations({ annotation }).front();
 }
 
-AnnotationIDs Map::addShapeAnnotations(const std::vector<AnnotationSegments>& shapes,
-                                       const std::vector<StyleProperties>& styleProperties) {
-    auto result = data->annotationManager.addShapeAnnotations(shapes, styleProperties, {{}}, getMaxZoom());
+AnnotationIDs Map::addShapeAnnotations(const std::vector<ShapeAnnotation>& annotations) {
+    auto result = data->annotationManager.addShapeAnnotations(annotations, getMaxZoom());
     context->invoke(&MapContext::updateAnnotationTiles, result.first);
     return result.second;
 }

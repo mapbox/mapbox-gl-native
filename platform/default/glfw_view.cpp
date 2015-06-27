@@ -1,3 +1,5 @@
+#include <mbgl/annotation/point_annotation.hpp>
+#include <mbgl/annotation/shape_annotation.hpp>
 #include <mbgl/platform/default/glfw_view.hpp>
 #include <mbgl/platform/gl.hpp>
 #include <mbgl/platform/log.hpp>
@@ -149,21 +151,18 @@ mbgl::LatLng GLFWView::makeRandomPoint() const {
 
 
 void GLFWView::addRandomPointAnnotations(int count) {
-    std::vector<mbgl::LatLng> points;
-    std::vector<std::string> markers;
+    std::vector<mbgl::PointAnnotation> points;
 
     for (int i = 0; i < count; i++) {
-        points.push_back(makeRandomPoint());
-        markers.push_back("default_marker");
+        points.emplace_back(makeRandomPoint(), "default_marker");
     }
 
-    auto newIDs = map->addPointAnnotations(points, markers);
+    auto newIDs = map->addPointAnnotations(points);
     annotationIDs.insert(annotationIDs.end(), newIDs.begin(), newIDs.end());
 }
 
 void GLFWView::addRandomShapeAnnotations(int count) {
-    std::vector<mbgl::AnnotationSegments> shapes;
-    std::vector<mbgl::StyleProperties> shapesProperties;
+    std::vector<mbgl::ShapeAnnotation> shapes;
 
     mbgl::FillProperties fillProperties;
     fillProperties.opacity = .1;
@@ -180,11 +179,10 @@ void GLFWView::addRandomShapeAnnotations(int count) {
         mbgl::AnnotationSegments segments;
         segments.push_back(triangle);
 
-        shapes.push_back(segments);
-        shapesProperties.push_back(properties);
+        shapes.emplace_back(segments, properties);
     }
 
-    auto newIDs = map->addShapeAnnotations(shapes, shapesProperties);
+    auto newIDs = map->addShapeAnnotations(shapes);
     annotationIDs.insert(annotationIDs.end(), newIDs.begin(), newIDs.end());
 }
 

@@ -4,7 +4,6 @@
 #include <mbgl/util/chrono.hpp>
 #include <mbgl/map/update.hpp>
 #include <mbgl/map/mode.hpp>
-#include <mbgl/style/style_properties.hpp>
 #include <mbgl/util/geo.hpp>
 #include <mbgl/util/noncopyable.hpp>
 #include <mbgl/util/vec.hpp>
@@ -14,7 +13,6 @@
 #include <functional>
 #include <vector>
 #include <memory>
-#include <unordered_map>
 
 namespace mbgl {
 
@@ -24,6 +22,8 @@ class MapData;
 class MapContext;
 class StillImage;
 class Transform;
+class PointAnnotation;
+class ShapeAnnotation;
 
 namespace util {
 template <class T> class Thread;
@@ -129,15 +129,16 @@ public:
     // Annotations
     void setDefaultPointAnnotationSymbol(const std::string&);
     double getTopOffsetPixelsForAnnotationSymbol(const std::string&);
-    uint32_t addPointAnnotation(const LatLng&, const std::string& symbol);
-    AnnotationIDs addPointAnnotations(const AnnotationSegment&,
-                                      const std::vector<std::string>& symbols);
-    uint32_t addShapeAnnotation(const AnnotationSegments&,
-                                const StyleProperties&);
-    AnnotationIDs addShapeAnnotations(const std::vector<AnnotationSegments>&,
-                                      const std::vector<StyleProperties>&);
+
+    uint32_t addPointAnnotation(const PointAnnotation&);
+    AnnotationIDs addPointAnnotations(const std::vector<PointAnnotation>&);
+
+    uint32_t addShapeAnnotation(const ShapeAnnotation&);
+    AnnotationIDs addShapeAnnotations(const std::vector<ShapeAnnotation>&);
+
     void removeAnnotation(uint32_t);
     void removeAnnotations(const AnnotationIDs&);
+
     AnnotationIDs getAnnotationsInBounds(const LatLngBounds&, const AnnotationType& = AnnotationType::Any);
     LatLngBounds getBoundsForAnnotations(const AnnotationIDs&);
 

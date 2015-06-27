@@ -1,5 +1,6 @@
 #include <mbgl/map/annotation.hpp>
-#include <mbgl/map/map.hpp>
+#include <mbgl/annotation/point_annotation.hpp>
+#include <mbgl/annotation/shape_annotation.hpp>
 #include <mbgl/map/tile_id.hpp>
 #include <mbgl/map/live_tile.hpp>
 #include <mbgl/util/constants.hpp>
@@ -75,94 +76,6 @@ vec2<double> AnnotationManager::projectPoint(const LatLng& point) {
     const double x = point.longitude / 360.0 + 0.5;
     const double y = 0.5 - 0.25 * std::log((1.0 + sine) / (1.0 - sine)) / M_PI;
     return { x, y };
-}
-
-std::pair<std::unordered_set<TileID, TileID::Hash>, AnnotationIDs>
-AnnotationManager::addAnnotations(const AnnotationType type,
-                                  const std::vector<AnnotationSegments>& segments,
-                                  const std::vector<StyleProperties>& styleProperties,
-                                  const AnnotationsProperties& annotationsProperties,
-                                  const uint8_t maxZoom) {
-    std::lock_guard<std::mutex> lock(mtx);
-
-    assert(type != AnnotationType::Any);
-
-    // We pre-generate tiles to contain each annotation up to the map's max zoom.
-    // We do this for fast rendering without projection conversions on the fly, as well as
-    // to simplify bounding box queries of annotations later. Tiles get invalidated when
-    // annotations are added or removed in order to refresh the map render without
-    // touching the base map underneath.
-
-    AnnotationIDs annotationIDs;
-    annotationIDs.reserve((type == AnnotationType::Shape ?
-                           segments.size() :        // shapes
-                           segments[0][0].size())); // points
-
-    std::unordered_set<TileID, TileID::Hash> affectedTiles;
-
-    for (size_t s = 0; s < segments.size(); ++s) {
-
-        if (type == AnnotationType::Point) {
-
-            for (size_t l = 0; l < segments[s].size(); ++l) {
-
-                for (size_t p = 0; p < segments[s][l].size(); ++p) {
-
-                    auto& point = segments[s][l][p];
-
-                    // projection conversion into unit space
-                    const auto pp = projectPoint(point);
-
-                    const uint32_t pointAnnotationID = nextID();
-
-                    // at render time we style the point according to its {sprite} field
-                    std::unordered_map<std::string, std::string> pointFeatureProperties;
-                    const std::string& symbol = annotationsProperties.at("symbols")[p];
-                    if (symbol.length()) {
-                        pointFeatureProperties.emplace("sprite", symbol);
-                    } else {
-                        pointFeatureProperties.emplace("sprite", defaultPointAnnotationSymbol);
-                    }
-
-                    // add individual point tile feature
-                    auto featureAffectedTiles = addTileFeature(
-                        pointAnnotationID,
-                        AnnotationSegments({{ point }}),
-                        std::vector<std::vector<vec2<double>>>({{ pp }}),
-                        AnnotationType::Point,
-                        {{ }},
-                        pointFeatureProperties,
-                        maxZoom
-                    );
-
-                    std::copy(featureAffectedTiles.begin(), featureAffectedTiles.end(), std::inserter(affectedTiles, affectedTiles.begin()));
-
-                    annotationIDs.push_back(pointAnnotationID);
-                }
-            }
-        } else {
-
-            const uint32_t shapeAnnotationID = nextID();
-
-            // current shape tiles are on-the-fly, so we don't get any "affected tiles"
-            // and just expire all annotation tiles for shape adds
-
-            addTileFeature(
-                shapeAnnotationID,
-                segments[s],
-                {{ }},
-                AnnotationType::Shape,
-                styleProperties[s],
-                {{ }},
-                maxZoom
-            );
-
-            annotationIDs.push_back(shapeAnnotationID);
-        }
-    }
-
-    // Tile:IDs that need refreshed and the annotation identifiers held onto by the client.
-    return std::make_pair(affectedTiles, annotationIDs);
 }
 
 std::unordered_set<TileID, TileID::Hash>
@@ -346,26 +259,91 @@ AnnotationManager::addTileFeature(const uint32_t annotationID,
 }
 
 std::pair<std::unordered_set<TileID, TileID::Hash>, AnnotationIDs>
-AnnotationManager::addPointAnnotations(const AnnotationSegment& points,
-                                       const AnnotationsProperties& annotationsProperties,
+AnnotationManager::addPointAnnotations(const std::vector<PointAnnotation>& points,
                                        const uint8_t maxZoom) {
-    return addAnnotations(AnnotationType::Point,
-                          {{ points }},
-                          {{ }},
-                          annotationsProperties,
-                          maxZoom);
+    std::lock_guard<std::mutex> lock(mtx);
+
+    // We pre-generate tiles to contain each annotation up to the map's max zoom.
+    // We do this for fast rendering without projection conversions on the fly, as well as
+    // to simplify bounding box queries of annotations later. Tiles get invalidated when
+    // annotations are added or removed in order to refresh the map render without
+    // touching the base map underneath.
+
+    AnnotationIDs annotationIDs;
+    annotationIDs.reserve(points.size());
+
+    std::unordered_set<TileID, TileID::Hash> affectedTiles;
+
+    for (const PointAnnotation& point : points) {
+        // projection conversion into unit space
+        const auto pp = projectPoint(point.position);
+        const uint32_t pointAnnotationID = nextID();
+
+        // at render time we style the point according to its {sprite} field
+        std::unordered_map<std::string, std::string> pointFeatureProperties;
+        if (point.icon.length()) {
+            pointFeatureProperties.emplace("sprite", point.icon);
+        } else {
+            pointFeatureProperties.emplace("sprite", defaultPointAnnotationSymbol);
+        }
+
+        // add individual point tile feature
+        auto featureAffectedTiles = addTileFeature(
+            pointAnnotationID,
+            AnnotationSegments({{ point.position }}),
+            std::vector<std::vector<vec2<double>>>({{ pp }}),
+            AnnotationType::Point,
+            {{ }},
+            pointFeatureProperties,
+            maxZoom
+        );
+
+        std::copy(featureAffectedTiles.begin(), featureAffectedTiles.end(), std::inserter(affectedTiles, affectedTiles.begin()));
+
+        annotationIDs.push_back(pointAnnotationID);
+    }
+
+    // Tile:IDs that need refreshed and the annotation identifiers held onto by the client.
+    return std::make_pair(affectedTiles, annotationIDs);
 }
 
 std::pair<std::unordered_set<TileID, TileID::Hash>, AnnotationIDs>
-AnnotationManager::addShapeAnnotations(const std::vector<AnnotationSegments>& shapes,
-                                       const std::vector<StyleProperties>& styleProperties,
-                                       const AnnotationsProperties& annotationsProperties,
+AnnotationManager::addShapeAnnotations(const std::vector<ShapeAnnotation>& shapes,
                                        const uint8_t maxZoom) {
-    return addAnnotations(AnnotationType::Shape,
-                          shapes,
-                          styleProperties,
-                          annotationsProperties,
-                          maxZoom);
+    std::lock_guard<std::mutex> lock(mtx);
+
+    // We pre-generate tiles to contain each annotation up to the map's max zoom.
+    // We do this for fast rendering without projection conversions on the fly, as well as
+    // to simplify bounding box queries of annotations later. Tiles get invalidated when
+    // annotations are added or removed in order to refresh the map render without
+    // touching the base map underneath.
+
+    AnnotationIDs annotationIDs;
+    annotationIDs.reserve(shapes.size());
+
+    std::unordered_set<TileID, TileID::Hash> affectedTiles;
+
+    for (const ShapeAnnotation& shape : shapes) {
+        const uint32_t shapeAnnotationID = nextID();
+
+        // current shape tiles are on-the-fly, so we don't get any "affected tiles"
+        // and just expire all annotation tiles for shape adds
+
+        addTileFeature(
+            shapeAnnotationID,
+            shape.segments,
+            {{ }},
+            AnnotationType::Shape,
+            shape.styleProperties,
+            {{ }},
+            maxZoom
+        );
+
+        annotationIDs.push_back(shapeAnnotationID);
+    }
+
+    // Tile:IDs that need refreshed and the annotation identifiers held onto by the client.
+    return std::make_pair(affectedTiles, annotationIDs);
 }
 
 std::unordered_set<TileID, TileID::Hash> AnnotationManager::removeAnnotations(const AnnotationIDs& ids,

@@ -21,11 +21,10 @@
 namespace mbgl {
 
 class Annotation;
-class Map;
+class PointAnnotation;
+class ShapeAnnotation;
 class LiveTile;
 class LiveTileFeature;
-
-using AnnotationsProperties = std::unordered_map<std::string, std::vector<std::string>>;
 
 using GeoJSONVT = mapbox::util::geojsonvt::GeoJSONVT;
 
@@ -57,18 +56,19 @@ public:
     std::unordered_set<TileID, TileID::Hash> resetStaleTiles();
 
     void setDefaultPointAnnotationSymbol(const std::string& symbol);
-    std::pair<std::unordered_set<TileID, TileID::Hash>, AnnotationIDs> addPointAnnotations(
-        const AnnotationSegment&,
-        const AnnotationsProperties&,
-        const uint8_t maxZoom);
-    std::pair<std::unordered_set<TileID, TileID::Hash>, AnnotationIDs> addShapeAnnotations(
-        const std::vector<AnnotationSegments>&,
-        const std::vector<StyleProperties>&,
-        const AnnotationsProperties&,
-        const uint8_t maxZoom);
+
+    std::pair<std::unordered_set<TileID, TileID::Hash>, AnnotationIDs>
+    addPointAnnotations(const std::vector<PointAnnotation>&,
+                        const uint8_t maxZoom);
+
+    std::pair<std::unordered_set<TileID, TileID::Hash>, AnnotationIDs>
+    addShapeAnnotations(const std::vector<ShapeAnnotation>&,
+                        const uint8_t maxZoom);
+
     std::unordered_set<TileID, TileID::Hash> removeAnnotations(const AnnotationIDs&, const uint8_t maxZoom);
     AnnotationIDs getOrderedShapeAnnotations() const { return orderedShapeAnnotations; }
     const StyleProperties getAnnotationStyleProperties(uint32_t) const;
+
     AnnotationIDs getAnnotationsInBounds(const LatLngBounds&, const uint8_t maxZoom, const AnnotationType& = AnnotationType::Any) const;
     LatLngBounds getBoundsForAnnotations(const AnnotationIDs&) const;
 
@@ -80,12 +80,6 @@ public:
 private:
     inline uint32_t nextID();
     static vec2<double> projectPoint(const LatLng& point);
-    std::pair<std::unordered_set<TileID, TileID::Hash>, AnnotationIDs> addAnnotations(
-        const AnnotationType,
-        const std::vector<AnnotationSegments>&,
-        const std::vector<StyleProperties>&,
-        const AnnotationsProperties&,
-        const uint8_t maxZoom);
     std::unordered_set<TileID, TileID::Hash> addTileFeature(
         const uint32_t annotationID,
         const AnnotationSegments&,

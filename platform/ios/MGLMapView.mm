@@ -8,6 +8,8 @@
 #import <OpenGLES/EAGL.h>
 
 #include <mbgl/mbgl.hpp>
+#include <mbgl/annotation/point_annotation.hpp>
+#include <mbgl/annotation/shape_annotation.hpp>
 #include <mbgl/platform/platform.hpp>
 #include <mbgl/platform/darwin/reachability.h>
 #include <mbgl/storage/default_file_source.hpp>
@@ -1780,11 +1782,8 @@ CLLocationCoordinate2D MGLLocationCoordinate2DFromLatLng(mbgl::LatLng latLng)
 {
     if ( ! annotations) return;
 
-    std::vector<mbgl::LatLng> points;
-    std::vector<std::string> symbols;
-
-    std::vector<mbgl::AnnotationSegments> shapes;
-    std::vector<mbgl::StyleProperties> shapesProperties;
+    std::vector<mbgl::PointAnnotation> points;
+    std::vector<mbgl::ShapeAnnotation> shapes;
 
     BOOL delegateImplementsSymbolLookup = [self.delegate respondsToSelector:@selector(mapView:symbolNameForAnnotation:)];
     BOOL delegateImplementsAlphaForShape = [self.delegate respondsToSelector:@selector(mapView:alphaForShapeAnnotation:)];
@@ -1851,29 +1850,25 @@ CLLocationCoordinate2D MGLLocationCoordinate2DFromLatLng(mbgl::LatLng latLng)
                                        userInfo:nil] raise];
             }
 
-            shapesProperties.push_back(shapeProperties);
-
             NSUInteger count = [(MGLMultiPoint *)annotation pointCount];
 
             CLLocationCoordinate2D *coordinates = (CLLocationCoordinate2D *)malloc(count * sizeof(CLLocationCoordinate2D));
             [(MGLMultiPoint *)annotation getCoordinates:coordinates range:NSMakeRange(0, count)];
 
-            mbgl::AnnotationSegment shape;
-            shape.reserve(count);
+            mbgl::AnnotationSegment segment;
+            segment.reserve(count);
 
             for (NSUInteger i = 0; i < count; i++)
             {
-                shape.push_back(mbgl::LatLng(coordinates[i].latitude, coordinates[i].longitude));
+                segment.push_back(mbgl::LatLng(coordinates[i].latitude, coordinates[i].longitude));
             }
 
             free(coordinates);
 
-            shapes.push_back({{ shape }});
+            shapes.emplace_back(mbgl::AnnotationSegments {{ segment }}, shapeProperties);
         }
         else
         {
-            points.push_back(MGLLatLngFromLocationCoordinate2D(annotation.coordinate));
-
             NSString *symbolName = nil;
 
             if (delegateImplementsSymbolLookup)
@@ -1881,13 +1876,13 @@ CLLocationCoordinate2D MGLLocationCoordinate2DFromLatLng(mbgl::LatLng latLng)
                 symbolName = [self.delegate mapView:self symbolNameForAnnotation:annotation];
             }
 
-            symbols.push_back((symbolName ? [symbolName UTF8String] : ""));
+            points.emplace_back(MGLLatLngFromLocationCoordinate2D(annotation.coordinate), symbolName ? [symbolName UTF8String] : "");
         }
     }
 
     if (points.size())
     {
-        std::vector<uint32_t> pointAnnotationIDs = _mbglMap->addPointAnnotations(points, symbols);
+        std::vector<uint32_t> pointAnnotationIDs = _mbglMap->addPointAnnotations(points);
 
         for (size_t i = 0; i < pointAnnotationIDs.size(); ++i)
         {
@@ -1898,7 +1893,7 @@ CLLocationCoordinate2D MGLLocationCoordinate2DFromLatLng(mbgl::LatLng latLng)
 
     if (shapes.size())
     {
-        std::vector<uint32_t> shapeAnnotationIDs = _mbglMap->addShapeAnnotations(shapes, shapesProperties);
+        std::vector<uint32_t> shapeAnnotationIDs = _mbglMap->addShapeAnnotations(shapes);
 
         for (size_t i = 0; i < shapeAnnotationIDs.size(); ++i)
         {
