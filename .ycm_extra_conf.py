@@ -1,4 +1,4 @@
-# Adapted version of .ycm_extra_conf.py sample file adapted
+# Version of .ycm_extra_conf.py sample file adapted
 # for the Mapbox GL Native project.
 #
 # This file is NOT licensed under the GPLv3, which is the license for the rest
