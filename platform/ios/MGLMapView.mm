@@ -820,7 +820,7 @@ std::chrono::steady_clock::duration secondsAsDuration(float duration)
 
         self.centerPoint = CGPointMake(self.centerPoint.x + delta.x, self.centerPoint.y + delta.y);
 
-        [self notifyMapChange:@(mbgl::MapChangeRegionDidChangeAnimated)];
+        [self notifyMapChange:mbgl::MapChangeRegionDidChangeAnimated];
     }
     else if (pan.state == UIGestureRecognizerStateEnded || pan.state == UIGestureRecognizerStateCancelled)
     {
@@ -850,12 +850,12 @@ std::chrono::steady_clock::duration secondsAsDuration(float duration)
             {
                 weakSelf.animatingGesture = NO;
 
-                [weakSelf notifyMapChange:@(mbgl::MapChangeRegionDidChangeAnimated)];
+                [weakSelf notifyMapChange:mbgl::MapChangeRegionDidChangeAnimated];
             }];
         }
         else
         {
-            [self notifyMapChange:@(mbgl::MapChangeRegionDidChange)];
+            [self notifyMapChange:mbgl::MapChangeRegionDidChange];
         }
 
         // metrics: pan end
@@ -947,12 +947,12 @@ std::chrono::steady_clock::duration secondsAsDuration(float duration)
             {
                 weakSelf.animatingGesture = NO;
 
-                [weakSelf notifyMapChange:@(mbgl::MapChangeRegionDidChangeAnimated)];
+                [weakSelf notifyMapChange:mbgl::MapChangeRegionDidChangeAnimated];
             }];
         }
         else
         {
-            [self notifyMapChange:@(mbgl::MapChangeRegionDidChange)];
+            [self notifyMapChange:mbgl::MapChangeRegionDidChange];
         }
     }
 }
@@ -1014,7 +1014,7 @@ std::chrono::steady_clock::duration secondsAsDuration(float duration)
 
                  [weakSelf unrotateIfNeededAnimated:YES];
 
-                 [weakSelf notifyMapChange:@(mbgl::MapChangeRegionDidChangeAnimated)];
+                 [weakSelf notifyMapChange:mbgl::MapChangeRegionDidChangeAnimated];
              }];
         }
         else
@@ -1023,7 +1023,7 @@ std::chrono::steady_clock::duration secondsAsDuration(float duration)
 
             [self unrotateIfNeededAnimated:YES];
 
-            [self notifyMapChange:@(mbgl::MapChangeRegionDidChange)];
+            [self notifyMapChange:mbgl::MapChangeRegionDidChange];
         }
     }
 }
@@ -1195,7 +1195,7 @@ std::chrono::steady_clock::duration secondsAsDuration(float duration)
 
             [weakSelf unrotateIfNeededAnimated:YES];
 
-            [weakSelf notifyMapChange:@(mbgl::MapChangeRegionDidChangeAnimated)];
+            [weakSelf notifyMapChange:mbgl::MapChangeRegionDidChangeAnimated];
         }];
     }
 }
@@ -1239,7 +1239,7 @@ std::chrono::steady_clock::duration secondsAsDuration(float duration)
 
             [weakSelf unrotateIfNeededAnimated:YES];
 
-            [weakSelf notifyMapChange:@(mbgl::MapChangeRegionDidChangeAnimated)];
+            [weakSelf notifyMapChange:mbgl::MapChangeRegionDidChangeAnimated];
         }];
     }
 }
@@ -1274,7 +1274,7 @@ std::chrono::steady_clock::duration secondsAsDuration(float duration)
     {
         [self unrotateIfNeededAnimated:YES];
 
-        [self notifyMapChange:@(mbgl::MapChangeRegionDidChange)];
+        [self notifyMapChange:mbgl::MapChangeRegionDidChange];
     }
 }
 
@@ -1403,7 +1403,7 @@ std::chrono::steady_clock::duration secondsAsDuration(float duration)
                      {
                          if (finished)
                          {
-                             [self notifyMapChange:@(animated ? mbgl::MapChangeRegionDidChangeAnimated : mbgl::MapChangeRegionDidChange)];
+                             [self notifyMapChange:(animated ? mbgl::MapChangeRegionDidChangeAnimated : mbgl::MapChangeRegionDidChange)];
                          }
                      }];
 }
@@ -1412,7 +1412,7 @@ std::chrono::steady_clock::duration secondsAsDuration(float duration)
 {
     _mbglMap->resetPosition();
 
-    [self notifyMapChange:@(mbgl::MapChangeRegionDidChange)];
+    [self notifyMapChange:mbgl::MapChangeRegionDidChange];
 }
 
 - (void)toggleDebug
@@ -1447,7 +1447,7 @@ std::chrono::steady_clock::duration secondsAsDuration(float duration)
                             fmaxf(_mbglMap->getZoom(), self.currentMinimumZoom),
                             secondsAsDuration(duration));
 
-    [self notifyMapChange:@(animated ? mbgl::MapChangeRegionDidChangeAnimated : mbgl::MapChangeRegionDidChange)];
+    [self notifyMapChange:(animated ? mbgl::MapChangeRegionDidChangeAnimated : mbgl::MapChangeRegionDidChange)];
 }
 
 - (void)setCenterCoordinate:(CLLocationCoordinate2D)centerCoordinate
@@ -1470,7 +1470,7 @@ std::chrono::steady_clock::duration secondsAsDuration(float duration)
 
     [self unrotateIfNeededAnimated:animated];
 
-    [self notifyMapChange:@(animated ? mbgl::MapChangeRegionDidChangeAnimated : mbgl::MapChangeRegionDidChange)];
+    [self notifyMapChange:(animated ? mbgl::MapChangeRegionDidChangeAnimated : mbgl::MapChangeRegionDidChange)];
 }
 
 - (double)zoomLevel
@@ -1490,7 +1490,7 @@ std::chrono::steady_clock::duration secondsAsDuration(float duration)
 
     [self unrotateIfNeededAnimated:animated];
 
-    [self notifyMapChange:@(animated ? mbgl::MapChangeRegionDidChangeAnimated : mbgl::MapChangeRegionDidChange)];
+    [self notifyMapChange:(animated ? mbgl::MapChangeRegionDidChangeAnimated : mbgl::MapChangeRegionDidChange)];
 }
 
 - (void)setZoomLevel:(double)zoomLevel
@@ -1556,7 +1556,7 @@ mbgl::LatLngBounds MGLLatLngBoundsFromCoordinateBounds(MGLCoordinateBounds coord
     
     [self unrotateIfNeededAnimated:animated];
     
-    [self notifyMapChange:@(animated ? mbgl::MapChangeRegionDidChangeAnimated : mbgl::MapChangeRegionDidChange)];
+    [self notifyMapChange:(animated ? mbgl::MapChangeRegionDidChangeAnimated : mbgl::MapChangeRegionDidChange)];
 }
 
 - (CLLocationDirection)direction
@@ -1579,7 +1579,7 @@ mbgl::LatLngBounds MGLLatLngBoundsFromCoordinateBounds(MGLCoordinateBounds coord
 
     _mbglMap->setBearing(direction, secondsAsDuration(duration));
 
-    [self notifyMapChange:@(animated ? mbgl::MapChangeRegionDidChangeAnimated : mbgl::MapChangeRegionDidChange)];
+    [self notifyMapChange:(animated ? mbgl::MapChangeRegionDidChangeAnimated : mbgl::MapChangeRegionDidChange)];
 }
 
 - (void)setDirection:(CLLocationDirection)direction
@@ -2457,9 +2457,9 @@ CLLocationCoordinate2D MGLLocationCoordinate2DFromLatLng(mbgl::LatLng latLng)
     }
 }
 
-- (void)notifyMapChange:(NSNumber *)change
+- (void)notifyMapChange:(mbgl::MapChange)change
 {
-    switch ([change unsignedIntegerValue])
+    switch (change)
     {
         case mbgl::MapChangeRegionWillChange:
         case mbgl::MapChangeRegionWillChangeAnimated:
@@ -2469,7 +2469,7 @@ CLLocationCoordinate2D MGLLocationCoordinate2DFromLatLng(mbgl::LatLng latLng)
 
             [self deselectAnnotation:self.selectedAnnotation animated:NO];
 
-            BOOL animated = ([change unsignedIntegerValue] == mbgl::MapChangeRegionWillChangeAnimated);
+            BOOL animated = (change == mbgl::MapChangeRegionWillChangeAnimated);
 
             @synchronized (self.regionChangeDelegateQueue)
             {
@@ -2792,7 +2792,7 @@ class MBGLView : public mbgl::View
     void notifyMapChange(mbgl::MapChange change) override
     {
         assert([[NSThread currentThread] isMainThread]);
-        [nativeView notifyMapChange:@(change)];
+        [nativeView notifyMapChange:change];
     }
 
     void activate() override
