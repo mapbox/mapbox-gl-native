@@ -367,6 +367,7 @@ std::chrono::steady_clock::duration secondsAsDuration(float duration)
 
     // observe app activity
     //
+    [[NSNotificationCenter defaultCenter] addObserver:self selector:@selector(willTerminate) name:UIApplicationWillTerminateNotification object:nil];
     [[NSNotificationCenter defaultCenter] addObserver:self selector:@selector(sleepGL:) name:UIApplicationWillResignActiveNotification object:nil];
     [[NSNotificationCenter defaultCenter] addObserver:self selector:@selector(sleepGL:) name:UIApplicationDidEnterBackgroundNotification object:nil];
     [[NSNotificationCenter defaultCenter] addObserver:self selector:@selector(wakeGL:) name:UIApplicationWillEnterForegroundNotification object:nil];
@@ -708,6 +709,18 @@ std::chrono::steady_clock::duration secondsAsDuration(float duration)
 }
 
 #pragma mark - Life Cycle -
+
+- (void)willTerminate
+{
+    MGLAssertIsMainThread();
+
+    if ( ! self.isDormant)
+    {
+        self.dormant = YES;
+        _mbglMap->pause();
+        [self.glView deleteDrawable];
+    }
+}
 
 - (void)sleepGL:(__unused NSNotification *)notification
 {
