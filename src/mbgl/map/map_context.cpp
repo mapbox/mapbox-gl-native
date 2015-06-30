@@ -305,6 +305,11 @@ void MapContext::renderStill(const TransformState& state, StillImageCallback fn)
 bool MapContext::renderSync(const TransformState& state) {
     assert(util::ThreadContext::currentlyOn(util::ThreadType::Map));
 
+    // Style was not loaded yet.
+    if (!style) {
+        return false;
+    }
+
     transformState = state;
 
     // Cleanup OpenGL objects that we abandoned since the last render call.
@@ -314,8 +319,6 @@ bool MapContext::renderSync(const TransformState& state) {
         // We are either not waiting for a map to be rendered, or we don't have all resources yet.
         return false;
     }
-
-    assert(style);
 
     if (!painter) {
         painter = std::make_unique<Painter>();
