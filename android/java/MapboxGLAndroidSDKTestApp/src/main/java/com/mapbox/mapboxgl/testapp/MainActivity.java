@@ -57,6 +57,7 @@ public class MainActivity extends ActionBarActivity {
 
     // Used for GPS
     private boolean mIsGpsOn = false;
+    private boolean mIsGpsOnState = true;
     private LostApiClient mLocationClient;
     private GpsListener mGpsListener;
     private LocationRequest mLocationRequest;
@@ -87,7 +88,8 @@ public class MainActivity extends ActionBarActivity {
         super.onCreate(savedInstanceState);
 
         if (savedInstanceState != null) {
-            mIsGpsOn = savedInstanceState.getBoolean(STATE_IS_GPS_ON, false);
+            // True because we want the GPS to be on by default
+            mIsGpsOnState = savedInstanceState.getBoolean(STATE_IS_GPS_ON, true);
         }
 
         mDensity = getResources().getDisplayMetrics().density;
@@ -148,6 +150,10 @@ public class MainActivity extends ActionBarActivity {
     public void onPause()  {
         super.onPause();
 
+        // Keep the value before we change it in toggleGps() below so that
+        // onSaveInstanceState() can see it if called and store it
+        mIsGpsOnState = mIsGpsOn;
+
         // Cancel GPS
         toggleGps(false);
     }
@@ -156,8 +162,8 @@ public class MainActivity extends ActionBarActivity {
     @Override
     public void onResume() {
         super.onResume();
-        // Restart GPS
-        toggleGps(true);
+        // Restart GPS unless the user chose otherwise
+        toggleGps(true && mIsGpsOnState);
     }
 
     // Called when we need to save instance state
@@ -165,7 +171,7 @@ public class MainActivity extends ActionBarActivity {
     protected void onSaveInstanceState(Bundle outState) {
         super.onSaveInstanceState(outState);
 
-        outState.putBoolean(STATE_IS_GPS_ON, mIsGpsOn);
+        outState.putBoolean(STATE_IS_GPS_ON, mIsGpsOnState);
     }
 
 
@@ -240,11 +246,15 @@ public class MainActivity extends ActionBarActivity {
                 if (mGpsMenuItem != null) {
                     mGpsMenuItem.setIcon(R.drawable.ic_action_location_searching);
                 }
-                LocationServices.FusedLocationApi.removeLocationUpdates(mGpsListener);
-                mLocationClient.disconnect();
-                mSensorManager.unregisterListener(mCompassListener, mSensorAccelerometer);
-                mSensorManager.unregisterListener(mCompassListener, mSensorMagneticField);
-                mGpsLocation = null;
+
+                // Disconnect only if we're connected
+                if (mLocationClient.isConnected()) {
+                    LocationServices.FusedLocationApi.removeLocationUpdates(mGpsListener);
+                    mLocationClient.disconnect();
+                    mSensorManager.unregisterListener(mCompassListener, mSensorAccelerometer);
+                    mSensorManager.unregisterListener(mCompassListener, mSensorMagneticField);
+                    mGpsLocation = null;
+                }
             }
         }
     }
