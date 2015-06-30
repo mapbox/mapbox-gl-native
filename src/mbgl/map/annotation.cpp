@@ -49,17 +49,14 @@ AnnotationManager::~AnnotationManager() {
 }
 
 void AnnotationManager::markStaleTiles(std::unordered_set<TileID, TileID::Hash> ids) {
-    std::lock_guard<std::mutex> lock(mtx);
     std::copy(ids.begin(), ids.end(), std::inserter(staleTiles, staleTiles.begin()));
 }
 
 std::unordered_set<TileID, TileID::Hash> AnnotationManager::resetStaleTiles() {
-    std::lock_guard<std::mutex> lock(mtx);
     return std::move(staleTiles);
 }
 
 void AnnotationManager::setDefaultPointAnnotationSymbol(const std::string& symbol) {
-    std::lock_guard<std::mutex> lock(mtx);
     defaultPointAnnotationSymbol = symbol;
 }
 
@@ -261,8 +258,6 @@ AnnotationManager::addTileFeature(const uint32_t annotationID,
 std::pair<std::unordered_set<TileID, TileID::Hash>, AnnotationIDs>
 AnnotationManager::addPointAnnotations(const std::vector<PointAnnotation>& points,
                                        const uint8_t maxZoom) {
-    std::lock_guard<std::mutex> lock(mtx);
-
     // We pre-generate tiles to contain each annotation up to the map's max zoom.
     // We do this for fast rendering without projection conversions on the fly, as well as
     // to simplify bounding box queries of annotations later. Tiles get invalidated when
@@ -310,8 +305,6 @@ AnnotationManager::addPointAnnotations(const std::vector<PointAnnotation>& point
 std::pair<std::unordered_set<TileID, TileID::Hash>, AnnotationIDs>
 AnnotationManager::addShapeAnnotations(const std::vector<ShapeAnnotation>& shapes,
                                        const uint8_t maxZoom) {
-    std::lock_guard<std::mutex> lock(mtx);
-
     // We pre-generate tiles to contain each annotation up to the map's max zoom.
     // We do this for fast rendering without projection conversions on the fly, as well as
     // to simplify bounding box queries of annotations later. Tiles get invalidated when
@@ -348,8 +341,6 @@ AnnotationManager::addShapeAnnotations(const std::vector<ShapeAnnotation>& shape
 
 std::unordered_set<TileID, TileID::Hash> AnnotationManager::removeAnnotations(const AnnotationIDs& ids,
                                                                               const uint8_t maxZoom) {
-    std::lock_guard<std::mutex> lock(mtx);
-
     std::unordered_set<TileID, TileID::Hash> affectedTiles;
 
     std::vector<uint32_t> z2s;
@@ -416,8 +407,6 @@ std::unordered_set<TileID, TileID::Hash> AnnotationManager::removeAnnotations(co
 }
 
 const StyleProperties AnnotationManager::getAnnotationStyleProperties(uint32_t annotationID) const {
-    std::lock_guard<std::mutex> lock(mtx);
-
     auto anno_it = annotations.find(annotationID);
     assert(anno_it != annotations.end());
 
@@ -427,8 +416,6 @@ const StyleProperties AnnotationManager::getAnnotationStyleProperties(uint32_t a
 AnnotationIDs AnnotationManager::getAnnotationsInBounds(const LatLngBounds& queryBounds,
                                                         const uint8_t maxZoom,
                                                         const AnnotationType& type) const {
-    std::lock_guard<std::mutex> lock(mtx);
-
     const uint8_t z = maxZoom;
     const uint32_t z2 = 1 << z;
     const vec2<double> swPoint = projectPoint(queryBounds.sw);
@@ -493,8 +480,6 @@ AnnotationIDs AnnotationManager::getAnnotationsInBounds(const LatLngBounds& quer
 }
 
 LatLngBounds AnnotationManager::getBoundsForAnnotations(const AnnotationIDs& ids) const {
-    std::lock_guard<std::mutex> lock(mtx);
-
     LatLngBounds bounds;
     for (auto id : ids) {
         const auto annotation_it = annotations.find(id);
@@ -507,8 +492,6 @@ LatLngBounds AnnotationManager::getBoundsForAnnotations(const AnnotationIDs& ids
 }
 
 const LiveTile* AnnotationManager::getTile(const TileID& id) {
-    std::lock_guard<std::mutex> lock(mtx);
-
     // look up any existing annotation tile
     LiveTile *renderTile = nullptr;
     const auto tile_lookup_it = tiles.find(id);

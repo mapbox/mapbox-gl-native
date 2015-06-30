@@ -136,7 +136,7 @@ void MapContext::loadStyleJSON(const std::string& json, const std::string& base)
     updated |= static_cast<UpdateType>(Update::Zoom);
     asyncUpdate->send();
 
-    auto staleTiles = data.annotationManager.resetStaleTiles();
+    auto staleTiles = data.getAnnotationManager()->resetStaleTiles();
     if (staleTiles.size()) {
         updateAnnotationTiles(staleTiles);
     }
@@ -145,7 +145,8 @@ void MapContext::loadStyleJSON(const std::string& json, const std::string& base)
 void MapContext::updateAnnotationTiles(const std::unordered_set<TileID, TileID::Hash>& ids) {
     assert(util::ThreadContext::currentlyOn(util::ThreadType::Map));
 
-    data.annotationManager.markStaleTiles(ids);
+    util::exclusive<AnnotationManager> annotationManager = data.getAnnotationManager();
+    annotationManager->markStaleTiles(ids);
 
     if (!style) return;
 
@@ -154,7 +155,7 @@ void MapContext::updateAnnotationTiles(const std::unordered_set<TileID, TileID::
     style->getSource(shapeID)->enabled = true;
 
     // create (if necessary) layers and buckets for each shape
-    for (const auto &shapeAnnotationID : data.annotationManager.getOrderedShapeAnnotations()) {
+    for (const auto &shapeAnnotationID : annotationManager->getOrderedShapeAnnotations()) {
         const std::string shapeLayerID = shapeID + "." + std::to_string(shapeAnnotationID);
 
         const auto layer_it = std::find_if(style->layers.begin(), style->layers.end(),
@@ -164,7 +165,7 @@ void MapContext::updateAnnotationTiles(const std::unordered_set<TileID, TileID::
 
         if (layer_it == style->layers.end()) {
             // query shape styling
-            auto& shapeStyle = data.annotationManager.getAnnotationStyleProperties(shapeAnnotationID);
+            auto& shapeStyle = annotationManager->getAnnotationStyleProperties(shapeAnnotationID);
 
             // apply shape paint properties
             ClassProperties paintProperties;
@@ -233,7 +234,7 @@ void MapContext::updateAnnotationTiles(const std::unordered_set<TileID, TileID::
     updated |= static_cast<UpdateType>(Update::Classes);
     asyncUpdate->send();
 
-    data.annotationManager.resetStaleTiles();
+    annotationManager->resetStaleTiles();
 }
 
 void MapContext::cascadeClasses() {

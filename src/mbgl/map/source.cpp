@@ -300,7 +300,7 @@ TileData::State Source::addTile(MapData& data,
             new_tile.data = tileData;
         } else if (info.type == SourceType::Annotations) {
             new_tile.data = std::make_shared<LiveTileData>(normalized_id,
-                data.annotationManager.getTile(normalized_id), style, info, callback);
+                data.getAnnotationManager()->getTile(normalized_id), style, info, callback);
         } else {
             throw std::runtime_error("source type not implemented");
         }

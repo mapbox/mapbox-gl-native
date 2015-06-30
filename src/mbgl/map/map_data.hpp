@@ -12,6 +12,7 @@
 
 #include <mbgl/map/mode.hpp>
 #include <mbgl/map/annotation.hpp>
+#include <mbgl/util/exclusive.hpp>
 
 namespace mbgl {
 
@@ -78,11 +79,19 @@ public:
         defaultTransitionDuration = duration;
     };
 
+    util::exclusive<AnnotationManager> getAnnotationManager() {
+        return util::exclusive<AnnotationManager>(
+            &annotationManager,
+            std::make_unique<std::lock_guard<std::mutex>>(annotationManagerMutex));
+    }
+
 public:
-    AnnotationManager annotationManager;
     const MapMode mode;
 
 private:
+    mutable std::mutex annotationManagerMutex;
+    AnnotationManager annotationManager;
+
     mutable std::mutex mtx;
 
     std::vector<std::string> classes;
