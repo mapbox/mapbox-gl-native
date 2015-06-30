@@ -42,7 +42,7 @@ Sprite::Sprite(const std::string& baseUrl, float pixelRatio_)
     std::string jsonURL(baseUrl + (pixelRatio_ > 1 ? "@2x" : "") + ".json");
 
     FileSource* fs = util::ThreadContext::getFileSource();
-    jsonRequest = fs->request({ Resource::Kind::JSON, jsonURL }, util::RunLoop::current.get()->get(), [this, jsonURL](const Response &res) {
+    jsonRequest = fs->request({ Resource::Kind::JSON, jsonURL }, util::RunLoop::getLoop(), [this, jsonURL](const Response &res) {
         jsonRequest = nullptr;
         if (res.status == Response::Successful) {
             body = res.data;
@@ -56,7 +56,7 @@ Sprite::Sprite(const std::string& baseUrl, float pixelRatio_)
         emitSpriteLoadedIfComplete();
     });
 
-    spriteRequest = fs->request({ Resource::Kind::Image, spriteURL }, util::RunLoop::current.get()->get(), [this, spriteURL](const Response &res) {
+    spriteRequest = fs->request({ Resource::Kind::Image, spriteURL }, util::RunLoop::getLoop(), [this, spriteURL](const Response &res) {
         spriteRequest = nullptr;
         if (res.status == Response::Successful) {
             image = res.data;

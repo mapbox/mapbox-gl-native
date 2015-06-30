@@ -30,7 +30,7 @@ GlyphPBF::GlyphPBF(const std::string& glyphURL,
 
     // The prepare call jumps back to the main thread.
     FileSource* fs = util::ThreadContext::getFileSource();
-    req = fs->request({ Resource::Kind::Glyphs, url }, util::RunLoop::current.get()->get(), [&, successCallback, failureCallback](const Response &res) {
+    req = fs->request({ Resource::Kind::Glyphs, url }, util::RunLoop::getLoop(), [&, successCallback, failureCallback](const Response &res) {
         req = nullptr;
 
         if (res.status != Response::Successful) {

@@ -19,6 +19,10 @@ public:
     RunLoop(uv_loop_t*);
     ~RunLoop();
 
+    static uv_loop_t* getLoop() {
+        return current.get()->get();
+    }
+
     void stop();
 
     // Invoke fn(args...) on this RunLoop.
@@ -68,8 +72,6 @@ public:
     }
 
     uv_loop_t* get() { return async.get()->loop; }
-
-    static uv::tls<RunLoop> current;
 
 private:
     template <class F, class P>
@@ -123,6 +125,8 @@ private:
     Queue queue;
     std::mutex mutex;
     uv::async async;
+
+    static uv::tls<RunLoop> current;
 };
 
 }
