@@ -88,6 +88,7 @@
         'storage/http_other_loop.cpp',
         'storage/http_reading.cpp',
 
+        'style/glyph_store.cpp',
         'style/pending_resources.cpp',
         'style/resource_loading.cpp',
         'style/sprite.cpp',
