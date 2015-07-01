@@ -24,7 +24,7 @@ Style::Style(const std::string& data, const std::string&,
              uv_loop_t* loop)
     : glyphStore(std::make_unique<GlyphStore>(loop)),
       glyphAtlas(std::make_unique<GlyphAtlas>(1024, 1024)),
-      spriteAtlas(std::make_unique<SpriteAtlas>(512, 512)),
+      spriteAtlas(std::make_unique<SpriteAtlas>(512, 512, *spriteStore)),
       lineAtlas(std::make_unique<LineAtlas>(512, 512)),
       mtx(std::make_unique<uv::rwlock>()),
       workers(4) {

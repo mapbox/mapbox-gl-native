@@ -15,7 +15,8 @@
 
 namespace mbgl {
 
-class Sprite;
+class SpriteStore;
+class SpriteImage;
 class SpritePosition;
 
 struct SpriteAtlasPosition {
@@ -33,14 +34,11 @@ public:
     typedef uint16_t dimension;
 
     // Add way to construct this from another SpriteAtlas (e.g. with another pixelRatio)
-    SpriteAtlas(dimension width, dimension height);
+    SpriteAtlas(dimension width, dimension height, SpriteStore& store);
     ~SpriteAtlas();
 
     // Changes the pixel ratio.
     bool resize(float newRatio);
-
-    // Changes the source sprite.
-    void setSprite(util::ptr<Sprite> sprite);
 
     // Returns the coordinates of an image that is sourced from the sprite image.
     // This getter attempts to read the image from the sprite if it is already loaded.
@@ -69,15 +67,23 @@ public:
     const dimension height = 0;
 
 private:
+    struct Holder : private util::noncopyable {
+        Holder(const std::shared_ptr<const SpriteImage>&, const Rect<dimension>&);
+        Holder(Holder&&);
+        std::shared_ptr<const SpriteImage> texture;
+        std::set<uintptr_t> references;
+        const Rect<dimension> pos;
+    };
+
     void allocate();
     Rect<SpriteAtlas::dimension> allocateImage(size_t width, size_t height);
-    void copy(const Rect<dimension>& dst, const SpritePosition& src, const bool wrap);
+    void copy(const Holder& holder, const bool wrap);
 
     std::recursive_mutex mtx;
     float pixelRatio = 1.0f;
     BinPack<dimension> bin;
-    util::ptr<Sprite> sprite;
-    std::map<std::string, Rect<dimension>> images;
+    SpriteStore& store;
+    std::map<std::string, Holder> images;
     std::set<std::string> uninitialized;
     std::unique_ptr<uint32_t[]> data;
     std::atomic<bool> dirty;
