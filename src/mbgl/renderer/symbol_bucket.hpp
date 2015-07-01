@@ -76,7 +76,6 @@ public:
 
     void addFeatures(uintptr_t tileUID,
                      SpriteAtlas&,
-                     Sprite&,
                      GlyphAtlas&,
                      GlyphStore&);
 

@@ -18,7 +18,7 @@ SpriteImagePtr createSpriteImage(const util::Image& image,
                                  const uint16_t srcWidth,
                                  const uint16_t srcHeight,
                                  const double ratio,
-                                 const bool) {
+                                 const bool sdf) {
     // Disallow invalid parameter configurations.
     if (srcWidth == 0 || srcHeight == 0 || ratio <= 0 || ratio > 10 || srcWidth > 1024 ||
         srcHeight > 1024) {
@@ -52,7 +52,7 @@ SpriteImagePtr createSpriteImage(const util::Image& image,
         }
     }
 
-    return std::make_unique<const SpriteImage>(width, height, ratio, std::move(data));
+    return std::make_unique<const SpriteImage>(width, height, ratio, std::move(data), sdf);
 }
 
 namespace {

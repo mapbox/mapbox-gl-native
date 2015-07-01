@@ -29,6 +29,11 @@ struct SpriteAtlasPosition {
     std::array<float, 2> br;
 };
 
+struct SpriteAtlasElement {
+    const Rect<uint16_t> pos;
+    const std::shared_ptr<const SpriteImage> texture;
+};
+
 class SpriteAtlas : public util::noncopyable {
 public:
     typedef uint16_t dimension;
@@ -37,15 +42,12 @@ public:
     SpriteAtlas(dimension width, dimension height, SpriteStore& store);
     ~SpriteAtlas();
 
-    // Changes the pixel ratio.
-    bool resize(float newRatio);
-
     // Returns the coordinates of an image that is sourced from the sprite image.
     // This getter attempts to read the image from the sprite if it is already loaded.
     // In that case, it copies it into the sprite atlas and returns the dimensions.
     // Otherwise, it returns a 0/0/0/0 rect.
     // This function is used during bucket creation.
-    Rect<dimension> getImage(const std::string& name, const bool wrap);
+    SpriteAtlasElement getImage(const std::string& name, const bool wrap);
 
     // This function is used for getting the position during render time.
     SpriteAtlasPosition getPosition(const std::string& name, bool repeating = false);
@@ -68,10 +70,9 @@ public:
 
 private:
     struct Holder : private util::noncopyable {
-        Holder(const std::shared_ptr<const SpriteImage>&, const Rect<dimension>&);
-        Holder(Holder&&);
+        inline Holder(const std::shared_ptr<const SpriteImage>&, const Rect<dimension>&);
+        inline Holder(Holder&&);
         std::shared_ptr<const SpriteImage> texture;
-        std::set<uintptr_t> references;
         const Rect<dimension> pos;
     };
 
@@ -80,9 +81,9 @@ private:
     void copy(const Holder& holder, const bool wrap);
 
     std::recursive_mutex mtx;
-    float pixelRatio = 1.0f;
-    BinPack<dimension> bin;
     SpriteStore& store;
+    const float pixelRatio;
+    BinPack<dimension> bin;
     std::map<std::string, Holder> images;
     std::set<std::string> uninitialized;
     std::unique_ptr<uint32_t[]> data;

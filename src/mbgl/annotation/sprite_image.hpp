@@ -12,7 +12,8 @@ namespace mbgl {
 
 class SpriteImage : private util::noncopyable {
 public:
-    SpriteImage(uint16_t width, uint16_t height, float pixelRatio, std::string&& data);
+    SpriteImage(
+        uint16_t width, uint16_t height, float pixelRatio, std::string&& data, bool sdf = false);
 
     // Logical dimensions of the sprite image.
     const uint16_t width;
@@ -29,6 +30,9 @@ public:
     // (width * ratio) * (height * ratio) * 4 (RGBA) bytes. The scan lines may
     // not have gaps between them (i.e. stride == 0).
     const std::string data;
+
+    // Whether this image should be interpreted as a signed distance field icon.
+    const bool sdf;
 };
 
 }

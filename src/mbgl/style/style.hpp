@@ -22,6 +22,7 @@ namespace mbgl {
 
 class GlyphAtlas;
 class GlyphStore;
+class SpriteStore;
 class SpriteAtlas;
 class LineAtlas;
 class StyleLayer;
@@ -33,6 +34,7 @@ class Style : public GlyphStore::Observer,
 public:
     Style(const std::string& data,
           const std::string& base,
+          MapData&,
           uv_loop_t*);
     ~Style();
 
@@ -50,7 +52,7 @@ public:
 
     // Fetch the tiles needed by the current viewport and emit a signal when
     // a tile is ready so observers can render the tile.
-    void update(MapData&, const TransformState&, TexturePool&);
+    void update(const TransformState&, TexturePool&);
 
     void cascade(const std::vector<std::string>&);
     void recalculate(float z, TimePoint now);
@@ -64,9 +66,11 @@ public:
 
     Source* getSource(const std::string& id) const;
 
+    MapData& data;
     std::unique_ptr<GlyphStore> glyphStore;
     std::unique_ptr<GlyphAtlas> glyphAtlas;
     util::ptr<Sprite> sprite;
+    std::unique_ptr<SpriteStore> spriteStore;
     std::unique_ptr<SpriteAtlas> spriteAtlas;
     std::unique_ptr<LineAtlas> lineAtlas;
 
@@ -97,7 +101,6 @@ private:
 
     std::exception_ptr lastError;
 
-    std::string spriteURL;
     PropertyTransition defaultTransition;
     std::unique_ptr<uv::rwlock> mtx;
     ZoomHistory zoomHistory;

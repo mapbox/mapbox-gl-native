@@ -265,8 +265,8 @@ std::unique_ptr<Bucket> TileWorker::createSymbolBucket(const GeometryTileLayer& 
         return nullptr;
     }
 
-    bucket->addFeatures(
-        reinterpret_cast<uintptr_t>(this), *style.spriteAtlas, *style.sprite, *style.glyphAtlas, *style.glyphStore);
+    bucket->addFeatures(reinterpret_cast<uintptr_t>(this), *style.spriteAtlas, *style.glyphAtlas,
+                        *style.glyphStore);
 
     return bucket->hasData() ? std::move(bucket) : nullptr;
 }

@@ -22,48 +22,10 @@ using namespace mbgl;
 SpriteAtlas::SpriteAtlas(dimension width_, dimension height_, SpriteStore& store_)
     : width(width_),
       height(height_),
-      bin(width_, height_),
       store(store_),
+      pixelRatio(store.pixelRatio),
+      bin(width_, height_),
       dirty(true) {
-}
-
-bool SpriteAtlas::resize(const float newRatio) {
-    if (pixelRatio == newRatio) return false;
-
-    std::lock_guard<std::recursive_mutex> lock(mtx);
-
-    const float oldRatio = pixelRatio;
-    pixelRatio = newRatio;
-
-    if (data) {
-        const auto oldData = std::move(data);
-        allocate();
-
-        const int old_w = width * oldRatio;
-        const int old_h = height * oldRatio;
-        const int new_w = width * newRatio;
-        const int new_h = height * newRatio;
-
-        // Basic image scaling. TODO: Replace this with better image scaling.
-        for (int y = 0; y < new_h; y++) {
-            const int old_yoffset = ((y * old_h) / new_h) * old_w;
-            const int new_yoffset = y * new_w;
-            for (int x = 0; x < new_w; x++) {
-                const int old_x = (x * old_w) / new_w;
-                data[new_yoffset + x] = oldData[old_yoffset + old_x];
-            }
-        }
-
-        dirty = true;
-        fullUploadRequired = true;
-
-        // Mark all sprite images as in need of update
-        for (const auto &pair : images) {
-            uninitialized.emplace(pair.first);
-        }
-    }
-
-    return dirty;
 }
 
 Rect<SpriteAtlas::dimension> SpriteAtlas::allocateImage(const size_t pixel_width, const size_t pixel_height) {
@@ -86,17 +48,17 @@ Rect<SpriteAtlas::dimension> SpriteAtlas::allocateImage(const size_t pixel_width
     return rect;
 }
 
-Rect<SpriteAtlas::dimension> SpriteAtlas::getImage(const std::string& name, const bool wrap) {
+SpriteAtlasElement SpriteAtlas::getImage(const std::string& name, const bool wrap) {
     std::lock_guard<std::recursive_mutex> lock(mtx);
 
     auto rect_it = images.find(name);
     if (rect_it != images.end()) {
-        return rect_it->second.pos;
+        return { rect_it->second.pos, rect_it->second.texture };
     }
 
     auto sprite = store.getSprite(name);
     if (!sprite) {
-        return Rect<dimension> { 0, 0, 0, 0 };
+        return { Rect<dimension> { 0, 0, 0, 0 }, nullptr };
     }
 
     Rect<dimension> rect = allocateImage(sprite->width, sprite->height);
@@ -104,19 +66,19 @@ Rect<SpriteAtlas::dimension> SpriteAtlas::getImage(const std::string& name, cons
         if (debug::spriteWarnings) {
             Log::Warning(Event::Sprite, "sprite atlas bitmap overflow");
         }
-        return rect;
+        return { Rect<dimension> { 0, 0, 0, 0 }, nullptr };
     }
 
     const Holder& holder = images.emplace(name, Holder{ sprite, rect }).first->second;
     copy(holder, wrap);
 
-    return rect;
+    return { rect, sprite };
 }
 
 SpriteAtlasPosition SpriteAtlas::getPosition(const std::string& name, bool repeating) {
     std::lock_guard<std::recursive_mutex> lock(mtx);
 
-    Rect<dimension> rect = getImage(name, repeating);
+    auto rect = getImage(name, repeating).pos;
     if (repeating) {
         // When the image is repeating, get the correct position of the image, rather than the
         // one rounded up to 4 pixels.
@@ -202,35 +164,6 @@ void SpriteAtlas::copy(const Holder& holder, const bool wrap) {
     dirty = true;
 }
 
-// void SpriteAtlas::setSprite(util::ptr<Sprite> sprite_) {
-//     std::lock_guard<std::recursive_mutex> lock(mtx);
-
-//     sprite = sprite_;
-
-//     if (!sprite->isLoaded()) return;
-
-//     util::erase_if(uninitialized, [this](const std::string &name) {
-//         Rect<dimension> dst = getImage(name, false);
-//         const SpritePosition& src = sprite->getSpritePosition(name);
-//         if (!src) {
-//             if (debug::spriteWarnings) {
-//                 Log::Warning(Event::Sprite, "sprite doesn't have image with name '%s'", name.c_str());
-//             }
-//             return true;
-//         }
-
-//         if (src.width == dst.w * pixelRatio && src.height == dst.h * pixelRatio && src.pixelRatio == pixelRatio) {
-//             copy(dst, src, false);
-//             return true;
-//         } else {
-//             if (debug::spriteWarnings) {
-//                 Log::Warning(Event::Sprite, "sprite icon dimension mismatch");
-//             }
-//             return false;
-//         }
-//     });
-// }
-
 void SpriteAtlas::upload() {
     if (dirty) {
         bind();
@@ -294,7 +227,9 @@ void SpriteAtlas::bind(bool linear) {
         dirty = false;
 
 #ifndef GL_ES_VERSION_2_0
-        // platform::showColorDebugImage("Sprite Atlas", reinterpret_cast<const char *>(data), width * pixelRatio, height * pixelRatio, width * pixelRatio, height * pixelRatio);
+        // platform::showColorDebugImage("Sprite Atlas", reinterpret_cast<const char*>(data.get()),
+        //                               width * pixelRatio, height * pixelRatio, width * pixelRatio,
+        //                               height * pixelRatio);
 #endif
     }
 };
@@ -305,4 +240,12 @@ SpriteAtlas::~SpriteAtlas() {
         mbgl::util::ThreadContext::getGLObjectStore()->abandonTexture(texture);
         texture = 0;
     }
+}
+
+SpriteAtlas::Holder::Holder(const std::shared_ptr<const SpriteImage>& texture_,
+                            const Rect<dimension>& pos_)
+    : texture(texture_), pos(pos_) {
+}
+
+SpriteAtlas::Holder::Holder(Holder&& h) : texture(std::move(h.texture)), pos(h.pos) {
 }

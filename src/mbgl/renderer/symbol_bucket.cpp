@@ -1,6 +1,7 @@
 #include <mbgl/renderer/symbol_bucket.hpp>
 #include <mbgl/map/geometry_tile.hpp>
 #include <mbgl/style/style_layout.hpp>
+#include <mbgl/annotation/sprite_image.hpp>
 #include <mbgl/geometry/text_buffer.hpp>
 #include <mbgl/geometry/icon_buffer.hpp>
 #include <mbgl/geometry/glyph_atlas.hpp>
@@ -172,7 +173,6 @@ bool SymbolBucket::needsDependencies(const GeometryTileLayer& layer,
 
 void SymbolBucket::addFeatures(uintptr_t tileUID,
                                SpriteAtlas& spriteAtlas,
-                               Sprite& sprite,
                                GlyphAtlas& glyphAtlas,
                                GlyphStore& glyphStore) {
     float horizontalAlign = 0.5;
@@ -246,11 +246,13 @@ void SymbolBucket::addFeatures(uintptr_t tileUID,
 
         // if feature has icon, get sprite atlas position
         if (feature.sprite.length()) {
-            Rect<uint16_t> image = spriteAtlas.getImage(feature.sprite, false);
-            shapedIcon = shapeIcon(image, layout);
-
-            if (sprite.getSpritePosition(feature.sprite).sdf) {
-                sdfIcons = true;
+            auto image = spriteAtlas.getImage(feature.sprite, false);
+            if (image.pos.hasArea() && image.texture) {
+                shapedIcon = shapeIcon(image.pos, layout);
+                assert(image.texture);
+                if (image.texture->sdf) {
+                    sdfIcons = true;
+                }
             }
         }
 

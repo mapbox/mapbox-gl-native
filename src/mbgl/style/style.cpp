@@ -3,6 +3,8 @@
 #include <mbgl/map/map_data.hpp>
 #include <mbgl/map/source.hpp>
 #include <mbgl/map/transform_state.hpp>
+#include <mbgl/annotation/sprite_store.hpp>
+#include <mbgl/annotation/sprite_parser.hpp>
 #include <mbgl/style/style_layer.hpp>
 #include <mbgl/style/style_parser.hpp>
 #include <mbgl/style/style_bucket.hpp>
@@ -20,17 +22,19 @@
 
 namespace mbgl {
 
-Style::Style(const std::string& data, const std::string&,
+Style::Style(const std::string& json, const std::string&, MapData& data_,
              uv_loop_t* loop)
-    : glyphStore(std::make_unique<GlyphStore>(loop)),
+    : data(data_),
+      glyphStore(std::make_unique<GlyphStore>(loop)),
       glyphAtlas(std::make_unique<GlyphAtlas>(1024, 1024)),
+      spriteStore(std::make_unique<SpriteStore>(data.pixelRatio)),
       spriteAtlas(std::make_unique<SpriteAtlas>(512, 512, *spriteStore)),
       lineAtlas(std::make_unique<LineAtlas>(512, 512)),
       mtx(std::make_unique<uv::rwlock>()),
       workers(4) {
 
     rapidjson::Document doc;
-    doc.Parse<0>((const char *const)data.c_str());
+    doc.Parse<0>((const char *const)json.c_str());
     if (doc.HasParseError()) {
         Log::Error(Event::ParseStyle, "Error parsing style JSON at %i: %s", doc.GetErrorOffset(), doc.GetParseError());
         return;
@@ -42,7 +46,9 @@ Style::Style(const std::string& data, const std::string&,
     sources = parser.getSources();
     layers = parser.getLayers();
 
-    spriteURL = parser.getSprite();
+    sprite = std::make_unique<Sprite>(parser.getSprite(), data.pixelRatio);
+    sprite->setObserver(this);
+
     glyphStore->setURL(parser.getGlyphURL());
 
     for (const auto& source : sources) {
@@ -65,17 +71,8 @@ Style::~Style() {
     }
 }
 
-void Style::update(MapData& data,
-                   const TransformState& transform,
+void Style::update(const TransformState& transform,
                    TexturePool& texturePool) {
-    if (!sprite || !sprite->hasPixelRatio(data.pixelRatio)) {
-        sprite = std::make_unique<Sprite>(spriteURL, data.pixelRatio);
-        sprite->setObserver(this);
-
-        spriteAtlas->resize(data.pixelRatio);
-        spriteAtlas->setSprite(sprite);
-    }
-
     bool allTilesUpdated = true;
     for (const auto& source : sources) {
         if (!source->update(data, transform, *this, texturePool, shouldReparsePartialTiles)) {
@@ -195,6 +192,9 @@ void Style::onTileLoadingFailed(std::exception_ptr error) {
 }
 
 void Style::onSpriteLoaded() {
+    // Add all sprite images to the SpriteStore object
+    spriteStore->setSprites(parseSprite(sprite->getImage(), sprite->getJSON()));
+
     shouldReparsePartialTiles = true;
 
     emitTileDataChanged();

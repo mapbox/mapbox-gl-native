@@ -3,6 +3,7 @@
 #include <mbgl/map/view.hpp>
 #include <mbgl/map/still_image.hpp>
 #include <mbgl/map/annotation.hpp>
+#include <mbgl/annotation/sprite_store.hpp>
 
 #include <mbgl/platform/log.hpp>
 
@@ -124,7 +125,7 @@ void MapContext::loadStyleJSON(const std::string& json, const std::string& base)
     assert(util::ThreadContext::currentlyOn(util::ThreadType::Map));
 
     style.reset();
-    style = std::make_unique<Style>(json, base, asyncUpdate->get()->loop);
+    style = std::make_unique<Style>(json, base, data, asyncUpdate->get()->loop);
     style->cascade(data.getClasses());
     style->setDefaultTransitionDuration(data.getDefaultTransitionDuration());
     style->setObserver(this);
@@ -257,7 +258,7 @@ void MapContext::update() {
             style->recalculate(transformState.getNormalizedZoom(), now);
         }
 
-        style->update(data, transformState, *texturePool);
+        style->update(transformState, *texturePool);
 
         if (data.mode == MapMode::Continuous) {
             view.invalidate();
@@ -343,8 +344,12 @@ bool MapContext::isLoaded() const {
 
 double MapContext::getTopOffsetPixelsForAnnotationSymbol(const std::string& symbol) {
     assert(util::ThreadContext::currentlyOn(util::ThreadType::Map));
-    const SpritePosition pos = style->sprite->getSpritePosition(symbol);
-    return -pos.height / pos.pixelRatio / 2;
+    auto sprite = style->spriteStore->getSprite(symbol);
+    if (sprite) {
+        return -sprite->height / 2;
+    } else {
+        return 0;
+    }
 }
 
 void MapContext::setSourceTileCacheSize(size_t size) {
