@@ -64,7 +64,10 @@ public:
     void renderStill(StillImageCallback callback);
 
     // Triggers a synchronous or asynchronous render.
-    void renderSync();
+    bool renderSync();
+
+    // Nudges transitions one step, possibly notifying of the need for a rerender.
+    void nudgeTransitions(bool forceRerender);
 
     // Notifies the Map thread that the state has changed and an update might be necessary.
     void update(Update update = Update::Nothing);
