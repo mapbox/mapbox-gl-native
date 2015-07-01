@@ -1384,8 +1384,6 @@ std::chrono::steady_clock::duration secondsAsDuration(float duration)
 
 - (void)resetNorthAnimated:(BOOL)animated
 {
-    self.userTrackingMode = MGLUserTrackingModeNone;
-
     CGFloat duration = (animated ? MGLAnimationDuration : 0);
 
     _mbglMap->setBearing(0, secondsAsDuration(duration));
