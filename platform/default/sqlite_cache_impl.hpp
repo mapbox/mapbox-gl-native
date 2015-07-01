@@ -3,8 +3,6 @@
 
 #include <mbgl/storage/sqlite_cache.hpp>
 
-typedef struct uv_loop_s uv_loop_t;
-
 namespace mapbox {
 namespace sqlite {
 class Database;
@@ -16,7 +14,7 @@ namespace mbgl {
 
 class SQLiteCache::Impl {
 public:
-    Impl(uv_loop_t*, const std::string &path = ":memory:");
+    Impl(const std::string &path = ":memory:");
     ~Impl();
 
     void get(const Resource&, Callback);

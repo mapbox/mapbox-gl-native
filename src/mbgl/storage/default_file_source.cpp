@@ -71,12 +71,12 @@ void DefaultFileSource::cancel(Request *req) {
 
 // ----- Impl -----
 
-DefaultFileSource::Impl::Impl(uv_loop_t* loop_, FileCache* cache_, const std::string& root)
-    : loop(loop_),
+DefaultFileSource::Impl::Impl(FileCache* cache_, const std::string& root)
+    : loop(util::RunLoop::getLoop()),
       cache(cache_),
       assetRoot(root.empty() ? platform::assetRoot() : root),
-      assetContext(AssetContext::createContext(loop_)),
-      httpContext(HTTPContext::createContext(loop_)) {
+      assetContext(AssetContext::createContext(loop)),
+      httpContext(HTTPContext::createContext(loop)) {
 }
 
 DefaultFileRequest* DefaultFileSource::Impl::find(const Resource& resource) {

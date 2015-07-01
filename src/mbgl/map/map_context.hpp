@@ -10,8 +10,6 @@
 
 #include <vector>
 
-typedef struct uv_loop_s uv_loop_t;
-
 namespace uv {
 class async;
 }
@@ -30,7 +28,7 @@ struct LatLngBounds;
 
 class MapContext : public Style::Observer {
 public:
-    MapContext(uv_loop_t*, View&, FileSource&, MapData&);
+    MapContext(View&, FileSource&, MapData&);
     ~MapContext();
 
     struct RenderResult {

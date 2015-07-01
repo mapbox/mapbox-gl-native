@@ -118,7 +118,7 @@ void Thread<Object>::run(ThreadContext context, P&& params, std::index_sequence<
         RunLoop loop_(l.get());
         loop = &loop_;
 
-        Object object_(l.get(), std::get<I>(std::forward<P>(params))...);
+        Object object_(std::get<I>(std::forward<P>(params))...);
         object = &object_;
 
         running.set_value();

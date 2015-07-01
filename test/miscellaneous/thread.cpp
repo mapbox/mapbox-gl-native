@@ -7,7 +7,7 @@ using namespace mbgl::util;
 
 class TestObject {
 public:
-    TestObject(uv_loop_t*, std::thread::id otherTid)
+    TestObject(std::thread::id otherTid)
         : tid(std::this_thread::get_id()) {
         EXPECT_NE(tid, otherTid);
     }
@@ -139,8 +139,7 @@ TEST(Thread, context) {
 
 class TestWorker {
 public:
-    TestWorker(uv_loop_t*) {
-    }
+    TestWorker() = default;
 
     void send(std::function<void ()> fn, std::function<void ()> cb) {
         fn();

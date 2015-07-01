@@ -26,11 +26,11 @@
 
 namespace mbgl {
 
-MapContext::MapContext(uv_loop_t* loop, View& view_, FileSource& fileSource, MapData& data_)
+MapContext::MapContext(View& view_, FileSource& fileSource, MapData& data_)
     : view(view_),
       data(data_),
       updated(static_cast<UpdateType>(Update::Nothing)),
-      asyncUpdate(std::make_unique<uv::async>(loop, [this] { update(); })),
+      asyncUpdate(std::make_unique<uv::async>(util::RunLoop::getLoop(), [this] { update(); })),
       texturePool(std::make_unique<TexturePool>()) {
     assert(util::ThreadContext::currentlyOn(util::ThreadType::Map));
 

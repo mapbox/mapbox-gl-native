@@ -20,8 +20,7 @@ namespace {
 
 class MockMapContext : public Style::Observer {
 public:
-    MockMapContext(uv_loop_t* loop,
-                   View& view,
+    MockMapContext(View& view,
                    FileSource& fileSource,
                    const std::function<void(std::exception_ptr error)>& callback)
         : data_(MapMode::Still),
@@ -33,7 +32,7 @@ public:
         transform_.setLatLngZoom({0, 0}, 16);
 
         const std::string style = util::read_file("test/fixtures/resources/style.json");
-        style_ = std::make_unique<Style>(style, "", loop),
+        style_ = std::make_unique<Style>(style, "", util::RunLoop::getLoop());
         style_->setObserver(this);
     }
 

@@ -14,7 +14,7 @@ namespace mbgl {
 
 class Worker::Impl {
 public:
-    Impl(uv_loop_t*, FileSource* fs) {
+    Impl(FileSource* fs) {
         // FIXME: Workers should not access the FileSource but it
         // is currently needed because of GlyphsPBF. See #1664.
         util::ThreadContext::setFileSource(fs);

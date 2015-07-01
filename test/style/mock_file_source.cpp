@@ -17,8 +17,8 @@ namespace mbgl {
 
 class MockFileSource::Impl {
 public:
-    Impl(uv_loop_t* loop, Type type, const std::string& match)
-        : type_(type), match_(match), timer_(loop) {
+    Impl(Type type, const std::string& match)
+        : type_(type), match_(match), timer_(util::RunLoop::getLoop()) {
         timer_.start(timeout, timeout, [this] { dispatchPendingRequests(); });
         timer_.unref();
     }

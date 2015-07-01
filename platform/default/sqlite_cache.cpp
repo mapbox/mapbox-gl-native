@@ -67,7 +67,7 @@ SQLiteCache::SQLiteCache(const std::string& path_)
 
 SQLiteCache::~SQLiteCache() = default;
 
-SQLiteCache::Impl::Impl(uv_loop_t*, const std::string& path_)
+SQLiteCache::Impl::Impl(const std::string& path_)
     : path(path_) {
 }
 
