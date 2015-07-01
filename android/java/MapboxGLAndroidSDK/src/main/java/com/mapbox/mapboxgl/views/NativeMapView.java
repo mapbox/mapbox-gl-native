@@ -39,11 +39,11 @@ class NativeMapView {
     // Constructors
     //
 
-    public NativeMapView(MapView mapView, String cachePath, String dataPath, String apkPath) {
+    public NativeMapView(MapView mapView, String cachePath, String dataPath, String apkPath, float pixelRatio) {
         mMapView = mapView;
 
         // Create the NativeMapView
-        mNativeMapViewPtr = nativeCreate(cachePath, dataPath, apkPath);
+        mNativeMapViewPtr = nativeCreate(cachePath, dataPath, apkPath, pixelRatio);
     }
 
     //
@@ -90,8 +90,7 @@ class NativeMapView {
         nativeOnInvalidate(mNativeMapViewPtr);
     }
 
-    public void resize(int width, int height, float ratio, int fbWidth,
-            int fbHeight) {
+    public void resizeView(int width, int height) {
         if (width < 0) {
             throw new IllegalArgumentException("width cannot be negative.");
         }
@@ -100,6 +99,19 @@ class NativeMapView {
             throw new IllegalArgumentException("height cannot be negative.");
         }
 
+        if (width > 65535) {
+            throw new IllegalArgumentException(
+                    "width cannot be greater than 65535.");
+        }
+
+        if (height > 65535) {
+            throw new IllegalArgumentException(
+                    "height cannot be greater than 65535.");
+        }
+        nativeViewResize(mNativeMapViewPtr, width, height);
+    }
+
+    public void resizeFramebuffer(int fbWidth, int fbHeight) {
         if (fbWidth < 0) {
             throw new IllegalArgumentException("fbWidth cannot be negative.");
         }
@@ -117,7 +129,7 @@ class NativeMapView {
             throw new IllegalArgumentException(
                     "fbHeight cannot be greater than 65535.");
         }
-        nativeResize(mNativeMapViewPtr, width, height, ratio, fbWidth, fbHeight);
+        nativeFramebufferResize(mNativeMapViewPtr, fbWidth, fbHeight);
     }
 
     public void addClass(String clazz) {
@@ -370,7 +382,7 @@ class NativeMapView {
         super.finalize();
     }
 
-    private native long nativeCreate(String cachePath, String dataPath, String apkPath);
+    private native long nativeCreate(String cachePath, String dataPath, String apkPath, float pixelRatio);
 
     private native void nativeDestroy(long nativeMapViewPtr);
 
@@ -395,8 +407,9 @@ class NativeMapView {
 
     private native void nativeOnInvalidate(long nativeMapViewPtr);
 
-    private native void nativeResize(long nativeMapViewPtr, int width,
-            int height, float ratio, int fbWidth, int fbHeight);
+    private native void nativeViewResize(long nativeMapViewPtr, int width, int height);
+
+    private native void nativeFramebufferResize(long nativeMapViewPtr, int fbWidth, int fbHeight);
 
     private native void nativeAddClass(long nativeMapViewPtr, String clazz);
 

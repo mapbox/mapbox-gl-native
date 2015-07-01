@@ -11,7 +11,7 @@ TEST(Map, PauseResume) {
     using namespace mbgl;
 
     auto display = std::make_shared<mbgl::HeadlessDisplay>();
-    HeadlessView view(display);
+    HeadlessView view(display, 1);
     DefaultFileSource fileSource(nullptr);
 
     Map map(view, fileSource, MapMode::Continuous);
@@ -24,7 +24,7 @@ TEST(Map, DoublePause) {
     using namespace mbgl;
 
     auto display = std::make_shared<mbgl::HeadlessDisplay>();
-    HeadlessView view(display);
+    HeadlessView view(display, 1);
     DefaultFileSource fileSource(nullptr);
 
     Map map(view, fileSource, MapMode::Continuous);
@@ -38,7 +38,7 @@ TEST(Map, ResumeWithoutPause) {
     using namespace mbgl;
 
     auto display = std::make_shared<mbgl::HeadlessDisplay>();
-    HeadlessView view(display);
+    HeadlessView view(display, 1);
     DefaultFileSource fileSource(nullptr);
 
     Map map(view, fileSource, MapMode::Continuous);
@@ -50,7 +50,7 @@ TEST(Map, DestroyPaused) {
     using namespace mbgl;
 
     auto display = std::make_shared<mbgl::HeadlessDisplay>();
-    HeadlessView view(display);
+    HeadlessView view(display, 1);
     DefaultFileSource fileSource(nullptr);
 
     Map map(view, fileSource, MapMode::Continuous);

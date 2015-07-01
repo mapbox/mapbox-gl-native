@@ -58,12 +58,16 @@ GLFWView::GLFWView(bool fullscreen_) : fullscreen(fullscreen_) {
 
     glfwSetCursorPosCallback(window, onMouseMove);
     glfwSetMouseButtonCallback(window, onMouseClick);
-    glfwSetWindowSizeCallback(window, onResize);
-    glfwSetFramebufferSizeCallback(window, onResize);
+    glfwSetWindowSizeCallback(window, onWindowResize);
+    glfwSetFramebufferSizeCallback(window, onFramebufferResize);
     glfwSetScrollCallback(window, onScroll);
     glfwSetKeyCallback(window, onKey);
 
     mbgl::gl::InitializeExtensions(glfwGetProcAddress);
+
+    glfwGetWindowSize(window, &width, &height);
+    glfwGetFramebufferSize(window, &fbWidth, &fbHeight);
+    pixelRatio = static_cast<float>(fbWidth) / width;
 
     glfwMakeContextCurrent(nullptr);
 }
@@ -75,9 +79,6 @@ GLFWView::~GLFWView() {
 
 void GLFWView::initialize(mbgl::Map *map_) {
     View::initialize(map_);
-
-    glfwGetWindowSize(window, &width, &height);
-    onResize(window, width, height);
 }
 
 void GLFWView::onKey(GLFWwindow *window, int key, int /*scancode*/, int action, int mods) {
@@ -226,15 +227,20 @@ void GLFWView::onScroll(GLFWwindow *window, double /*xOffset*/, double yOffset) 
     view->map->scaleBy(scale, view->lastX, view->lastY);
 }
 
-void GLFWView::onResize(GLFWwindow *window, int width, int height ) {
+void GLFWView::onWindowResize(GLFWwindow *window, int width, int height) {
     GLFWView *view = reinterpret_cast<GLFWView *>(glfwGetWindowUserPointer(window));
     view->width = width;
     view->height = height;
 
-    int fbWidth, fbHeight;
-    glfwGetFramebufferSize(window, &fbWidth, &fbHeight);
+    view->map->update(mbgl::Update::Dimensions);
+}
 
-    view->map->resize(width, height, static_cast<float>(fbWidth) / static_cast<float>(width));
+void GLFWView::onFramebufferResize(GLFWwindow *window, int width, int height) {
+    GLFWView *view = reinterpret_cast<GLFWView *>(glfwGetWindowUserPointer(window));
+    view->fbWidth = width;
+    view->fbHeight = height;
+
+    view->map->update();
 }
 
 void GLFWView::onMouseClick(GLFWwindow *window, int button, int action, int modifiers) {
@@ -285,6 +291,18 @@ void GLFWView::run() {
             map->renderSync();
         }
     }
+}
+
+float GLFWView::getPixelRatio() const {
+    return pixelRatio;
+}
+
+std::array<uint16_t, 2> GLFWView::getSize() const {
+    return {{ static_cast<uint16_t>(width), static_cast<uint16_t>(height) }};
+}
+
+std::array<uint16_t, 2> GLFWView::getFramebufferSize() const {
+    return {{ static_cast<uint16_t>(fbWidth), static_cast<uint16_t>(fbHeight) }};
 }
 
 void GLFWView::activate() {

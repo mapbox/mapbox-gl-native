@@ -292,11 +292,11 @@ TileData::State Source::addTile(MapData& data,
         if (info.type == SourceType::Vector) {
             auto tileData = std::make_shared<VectorTileData>(normalized_id, style, info,
                                                  transformState.getAngle(), data.getCollisionDebug());
-            tileData->request(transformState.getPixelRatio(), callback);
+            tileData->request(data.pixelRatio, callback);
             new_tile.data = tileData;
         } else if (info.type == SourceType::Raster) {
             auto tileData = std::make_shared<RasterTileData>(normalized_id, texturePool, info, style.workers);
-            tileData->request(transformState.getPixelRatio(), callback);
+            tileData->request(data.pixelRatio, callback);
             new_tile.data = tileData;
         } else if (info.type == SourceType::Annotations) {
             new_tile.data = std::make_shared<LiveTileData>(normalized_id,

@@ -11,10 +11,6 @@ void View::initialize(Map *map_) {
     map = map_;
 }
 
-void View::resize(uint16_t, uint16_t, float) {
-    // no-op
-}
-
 std::unique_ptr<StillImage> View::readStillImage() {
     return nullptr;
 }

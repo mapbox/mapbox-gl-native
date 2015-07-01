@@ -2,6 +2,7 @@
 #define MBGL_RENDERER_PAINTER
 
 #include <mbgl/map/transform_state.hpp>
+#include <mbgl/map/map_context.hpp>
 
 #include <mbgl/renderer/frame_history.hpp>
 #include <mbgl/renderer/bucket.hpp>
@@ -31,6 +32,7 @@ class SpriteAtlas;
 class GlyphAtlas;
 class LineAtlas;
 class Source;
+struct FrameData;
 
 
 class DebugBucket;
@@ -79,7 +81,7 @@ struct RenderItem {
 
 class Painter : private util::noncopyable {
 public:
-    Painter();
+    Painter(float pixelRatio);
     ~Painter();
 
     void setup();
@@ -93,6 +95,7 @@ public:
 
     void render(const Style& style,
                 TransformState state,
+                const FrameData& frame,
                 TimePoint time);
 
     // Renders debug information for a tile.
@@ -118,6 +121,7 @@ public:
 
     void createPrerendered(RasterBucket& bucket, const StyleLayer &layer_desc, const TileID& id);
 
+    // Adjusts the dimensions of the OpenGL viewport
     void resize();
 
     // Changes whether debug information is drawn onto the map
@@ -187,7 +191,10 @@ public:
     }();
 
 private:
+    const float pixelRatio;
+
     TransformState state;
+    FrameData frame;
 
     bool debug = false;
     int indent = 0;

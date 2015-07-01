@@ -27,10 +27,6 @@ public:
     bool hasSize() const;
     uint16_t getWidth() const;
     uint16_t getHeight() const;
-    uint16_t getFramebufferWidth() const;
-    uint16_t getFramebufferHeight() const;
-    const std::array<uint16_t, 2> getFramebufferDimensions() const;
-    float getPixelRatio() const;
 
     float worldSize() const;
     float lngX(float lon) const;
@@ -73,12 +69,7 @@ private:
     // logical dimensions
     uint16_t width = 0, height = 0;
 
-    // physical (framebuffer) dimensions
-    std::array<uint16_t, 2> framebuffer = {{ 0, 0 }};
-
-    // map scale factor
-    float pixelRatio = 0;
-
+private:
     // animation state
     bool rotating = false;
     bool scaling = false;

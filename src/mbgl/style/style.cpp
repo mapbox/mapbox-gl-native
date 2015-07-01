@@ -1,5 +1,6 @@
 #include <mbgl/style/style.hpp>
 #include <mbgl/map/sprite.hpp>
+#include <mbgl/map/map_data.hpp>
 #include <mbgl/map/source.hpp>
 #include <mbgl/map/transform_state.hpp>
 #include <mbgl/style/style_layer.hpp>
@@ -67,12 +68,11 @@ Style::~Style() {
 void Style::update(MapData& data,
                    const TransformState& transform,
                    TexturePool& texturePool) {
-    const float pixelRatio = transform.getPixelRatio();
-    if (!sprite || !sprite->hasPixelRatio(pixelRatio)) {
-        sprite = std::make_unique<Sprite>(spriteURL, pixelRatio);
+    if (!sprite || !sprite->hasPixelRatio(data.pixelRatio)) {
+        sprite = std::make_unique<Sprite>(spriteURL, data.pixelRatio);
         sprite->setObserver(this);
 
-        spriteAtlas->resize(pixelRatio);
+        spriteAtlas->resize(data.pixelRatio);
         spriteAtlas->setSprite(sprite);
     }
 

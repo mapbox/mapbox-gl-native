@@ -17,9 +17,12 @@ namespace android {
 
 class NativeMapView : public mbgl::View, private mbgl::util::noncopyable {
 public:
-    NativeMapView(JNIEnv *env, jobject obj);
+    NativeMapView(JNIEnv *env, jobject obj, float pixelRatio);
     virtual ~NativeMapView();
 
+    float getPixelRatio() const override;
+    std::array<uint16_t, 2> getSize() const override;
+    std::array<uint16_t, 2> getFramebufferSize() const override;
     void activate() override;
     void deactivate() override;
     void notify() override;
@@ -48,6 +51,9 @@ public:
 
     void onInvalidate();
 
+    void resizeView(int width, int height);
+    void resizeFramebuffer(int width, int height);
+
 private:
     EGLConfig chooseConfig(const EGLConfig configs[], EGLint numConfigs);
 
@@ -72,6 +78,12 @@ private:
 
     bool fpsEnabled = false;
     double fps = 0.0;
+
+    int width = 0;
+    int height = 0;
+    int fbWidth = 0;
+    int fbHeight = 0;
+    const float pixelRatio;
 
     // Ensure these are initialised last
     mbgl::SQLiteCache fileCache;

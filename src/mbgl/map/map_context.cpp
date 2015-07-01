@@ -79,10 +79,6 @@ void MapContext::pause() {
     view.activate();
 }
 
-void MapContext::resize(uint16_t width, uint16_t height, float ratio) {
-    view.resize(width, height, ratio);
-}
-
 void MapContext::triggerUpdate(const TransformState& state, const Update u) {
     transformState = state;
     updated |= static_cast<UpdateType>(u);
@@ -266,14 +262,14 @@ void MapContext::update() {
         if (data.mode == MapMode::Continuous) {
             view.invalidate();
         } else if (callback && style->isLoaded()) {
-            renderSync(transformState);
+            renderSync(transformState, frameData);
         }
     }
 
     updated = static_cast<UpdateType>(Update::Nothing);
 }
 
-void MapContext::renderStill(const TransformState& state, StillImageCallback fn) {
+void MapContext::renderStill(const TransformState& state, const FrameData& frame, StillImageCallback fn) {
     if (!fn) {
         Log::Error(Event::General, "StillImageCallback not set");
         return;
@@ -301,12 +297,13 @@ void MapContext::renderStill(const TransformState& state, StillImageCallback fn)
 
     callback = fn;
     transformState = state;
+    frameData = frame;
 
     updated |= static_cast<UpdateType>(Update::RenderStill);
     asyncUpdate->send();
 }
 
-MapContext::RenderResult MapContext::renderSync(const TransformState& state) {
+MapContext::RenderResult MapContext::renderSync(const TransformState& state, const FrameData& frame) {
     assert(util::ThreadContext::currentlyOn(util::ThreadType::Map));
 
     // Style was not loaded yet.
@@ -320,12 +317,12 @@ MapContext::RenderResult MapContext::renderSync(const TransformState& state) {
     glObjectStore.performCleanup();
 
     if (!painter) {
-        painter = std::make_unique<Painter>();
+        painter = std::make_unique<Painter>(data.pixelRatio);
         painter->setup();
     }
 
     painter->setDebug(data.getDebug());
-    painter->render(*style, transformState, data.getAnimationTime());
+    painter->render(*style, transformState, frame, data.getAnimationTime());
 
     if (data.mode == MapMode::Still) {
         callback(nullptr, view.readStillImage());

@@ -15,6 +15,10 @@ public:
     GLFWView(bool fullscreen = false);
     ~GLFWView();
 
+    float getPixelRatio() const override;
+    std::array<uint16_t, 2> getSize() const override;
+    std::array<uint16_t, 2> getFramebufferSize() const override;
+
     void initialize(mbgl::Map *map) override;
     void activate() override;
     void deactivate() override;
@@ -24,7 +28,8 @@ public:
 
     static void onKey(GLFWwindow *window, int key, int scancode, int action, int mods);
     static void onScroll(GLFWwindow *window, double xoffset, double yoffset);
-    static void onResize(GLFWwindow *window, int width, int height);
+    static void onWindowResize(GLFWwindow *window, int width, int height);
+    static void onFramebufferResize(GLFWwindow *window, int width, int height);
     static void onMouseClick(GLFWwindow *window, int button, int action, int modifiers);
     static void onMouseMove(GLFWwindow *window, double x, double y);
 
@@ -57,6 +62,9 @@ private:
 
     int width = 1024;
     int height = 768;
+    int fbWidth;
+    int fbHeight;
+    float pixelRatio;
 
     double lastX = 0, lastY = 0;
 

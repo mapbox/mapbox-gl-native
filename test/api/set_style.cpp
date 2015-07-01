@@ -11,7 +11,7 @@ TEST(API, SetStyle) {
     using namespace mbgl;
 
     auto display = std::make_shared<mbgl::HeadlessDisplay>();
-    HeadlessView view(display);
+    HeadlessView view(display, 1);
     DefaultFileSource fileSource(nullptr);
 
     Log::setObserver(std::make_unique<FixtureLogObserver>());

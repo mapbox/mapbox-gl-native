@@ -180,12 +180,12 @@ namespace {
 using namespace mbgl::android;
 
 jlong JNICALL
-nativeCreate(JNIEnv *env, jobject obj, jstring cachePath_, jstring dataPath_, jstring apkPath_) {
+nativeCreate(JNIEnv *env, jobject obj, jstring cachePath_, jstring dataPath_, jstring apkPath_, jfloat pixelRatio) {
     mbgl::Log::Debug(mbgl::Event::JNI, "nativeCreate");
     cachePath = std_string_from_jstring(env, cachePath_);
     dataPath = std_string_from_jstring(env, dataPath_);
     apkPath = std_string_from_jstring(env, apkPath_);
-    NativeMapView *nativeMapView = new NativeMapView(env, obj);
+    NativeMapView *nativeMapView = new NativeMapView(env, obj, pixelRatio);
     jlong mapViewPtr = reinterpret_cast<jlong>(nativeMapView);
     return mapViewPtr;
 }
@@ -285,20 +285,26 @@ void JNICALL nativeOnInvalidate(JNIEnv *env, jobject obj, jlong nativeMapViewPtr
     nativeMapView->onInvalidate();
 }
 
-void JNICALL nativeResize(JNIEnv *env, jobject obj, jlong nativeMapViewPtr, jint width, jint height,
-                          jfloat ratio, jint fbWidth, jint fbHeight) {
-    mbgl::Log::Debug(mbgl::Event::JNI, "nativeResize");
+void JNICALL nativeViewResize(JNIEnv *env, jobject obj, jlong nativeMapViewPtr, jint width, jint height) {
+    mbgl::Log::Debug(mbgl::Event::JNI, "nativeViewResize");
     assert(nativeMapViewPtr != 0);
     assert(width >= 0);
     assert(height >= 0);
     assert(width <= UINT16_MAX);
     assert(height <= UINT16_MAX);
+    NativeMapView *nativeMapView = reinterpret_cast<NativeMapView *>(nativeMapViewPtr);
+    nativeMapView->resizeView(width, height);
+}
+
+void JNICALL nativeFramebufferResize(JNIEnv *env, jobject obj, jlong nativeMapViewPtr, jint fbWidth, jint fbHeight) {
+    mbgl::Log::Debug(mbgl::Event::JNI, "nativeFramebufferResize");
+    assert(nativeMapViewPtr != 0);
     assert(fbWidth >= 0);
     assert(fbHeight >= 0);
     assert(fbWidth <= UINT16_MAX);
     assert(fbHeight <= UINT16_MAX);
     NativeMapView *nativeMapView = reinterpret_cast<NativeMapView *>(nativeMapViewPtr);
-    nativeMapView->getMap().resize(width, height, ratio);
+    nativeMapView->resizeFramebuffer(fbWidth, fbHeight);
 }
 
 void JNICALL nativeRemoveClass(JNIEnv *env, jobject obj, jlong nativeMapViewPtr, jstring clazz) {
@@ -922,7 +928,7 @@ extern "C" JNIEXPORT jint JNICALL JNI_OnLoad(JavaVM *vm, void *reserved) {
     }
 
     const std::vector<JNINativeMethod> methods = {
-        {"nativeCreate", "(Ljava/lang/String;Ljava/lang/String;Ljava/lang/String;)J",
+        {"nativeCreate", "(Ljava/lang/String;Ljava/lang/String;Ljava/lang/String;F)J",
          reinterpret_cast<void *>(&nativeCreate)},
         {"nativeDestroy", "(J)V", reinterpret_cast<void *>(&nativeDestroy)},
         {"nativeInitializeDisplay", "(J)V", reinterpret_cast<void *>(&nativeInitializeDisplay)},
@@ -936,9 +942,12 @@ extern "C" JNIEXPORT jint JNICALL JNI_OnLoad(JavaVM *vm, void *reserved) {
         {"nativeResume", "(J)V", reinterpret_cast<void *>(&nativeResume)},
         {"nativeUpdate", "(J)V", reinterpret_cast<void *>(&nativeUpdate)},
         {"nativeOnInvalidate", "(J)V", reinterpret_cast<void *>(&nativeOnInvalidate)},
-        {"nativeResize", "(JIIFII)V",
+        {"nativeViewResize", "(JII)V",
          reinterpret_cast<void *>(static_cast<void JNICALL (
-             *)(JNIEnv *, jobject, jlong, jint, jint, jfloat, jint, jint)>(&nativeResize))},
+             *)(JNIEnv *, jobject, jlong, jint, jint)>(&nativeViewResize))},
+        {"nativeFramebufferResize", "(JII)V",
+         reinterpret_cast<void *>(static_cast<void JNICALL (
+             *)(JNIEnv *, jobject, jlong, jint, jint)>(&nativeFramebufferResize))},
         {"nativeAddClass", "(JLjava/lang/String;)V",
          reinterpret_cast<void *>(&nativeAddClass)},
         {"nativeRemoveClass", "(JLjava/lang/String;)V",

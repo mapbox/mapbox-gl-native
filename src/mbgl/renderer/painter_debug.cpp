@@ -28,7 +28,7 @@ void Painter::renderDebugText(DebugBucket& bucket, const mat4 &matrix) {
 
     // Draw white outline
     plainShader->u_color = {{ 1.0f, 1.0f, 1.0f, 1.0f }};
-    lineWidth(4.0f * state.getPixelRatio());
+    lineWidth(4.0f * pixelRatio);
     bucket.drawLines(*plainShader);
 
 #ifndef GL_ES_VERSION_2_0
@@ -39,7 +39,7 @@ void Painter::renderDebugText(DebugBucket& bucket, const mat4 &matrix) {
 
     // Draw black text.
     plainShader->u_color = {{ 0.0f, 0.0f, 0.0f, 1.0f }};
-    lineWidth(2.0f * state.getPixelRatio());
+    lineWidth(2.0f * pixelRatio);
     bucket.drawLines(*plainShader);
 
     config.depthTest = true;
@@ -60,6 +60,6 @@ void Painter::renderDebugFrame(const mat4 &matrix) {
     // draw tile outline
     tileBorderArray.bind(*plainShader, tileBorderBuffer, BUFFER_OFFSET(0));
     plainShader->u_color = {{ 1.0f, 0.0f, 0.0f, 1.0f }};
-    lineWidth(4.0f * state.getPixelRatio());
+    lineWidth(4.0f * pixelRatio);
     MBGL_CHECK_ERROR(glDrawArrays(GL_LINE_STRIP, 0, (GLsizei)tileBorderBuffer.index()));
 }

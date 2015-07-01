@@ -20,9 +20,7 @@ public:
     Transform(View&);
 
     // Map view
-    // Note: width * ratio does not necessarily equal fb_width
-    bool resize(uint16_t width, uint16_t height, float ratio,
-                uint16_t fb_width, uint16_t fb_height);
+    bool resize(std::array<uint16_t, 2> size);
 
     // Position
     void moveBy(double dx, double dy, Duration = Duration::zero());

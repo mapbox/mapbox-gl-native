@@ -74,23 +74,6 @@ uint16_t TransformState::getHeight() const {
     return height;
 }
 
-uint16_t TransformState::getFramebufferWidth() const {
-    return framebuffer[0];
-}
-
-uint16_t TransformState::getFramebufferHeight() const {
-    return framebuffer[1];
-}
-
-const std::array<uint16_t, 2> TransformState::getFramebufferDimensions() const {
-    return framebuffer;
-}
-
-float TransformState::getPixelRatio() const {
-    return pixelRatio;
-}
-
-
 #pragma mark - Position
 
 const LatLng TransformState::getLatLng() const {

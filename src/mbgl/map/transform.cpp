@@ -34,18 +34,13 @@ Transform::Transform(View &view_)
 
 #pragma mark - Map View
 
-bool Transform::resize(const uint16_t w, const uint16_t h, const float ratio,
-                       const uint16_t fb_w, const uint16_t fb_h) {
-    if (state.width != w || state.height != h || state.pixelRatio != ratio ||
-        state.framebuffer[0] != fb_w || state.framebuffer[1] != fb_h) {
+bool Transform::resize(const std::array<uint16_t, 2> size) {
+    if (state.width != size[0] || state.height != size[1]) {
 
         view.notifyMapChange(MapChangeRegionWillChange);
 
-        state.width = w;
-        state.height = h;
-        state.pixelRatio = ratio;
-        state.framebuffer[0] = fb_w;
-        state.framebuffer[1] = fb_h;
+        state.width = size[0];
+        state.height = size[1];
         state.constrain(state.scale, state.y);
 
         view.notifyMapChange(MapChangeRegionDidChange);

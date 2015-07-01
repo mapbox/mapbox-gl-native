@@ -26,7 +26,7 @@ void Painter::renderLine(LineBucket& bucket, const StyleLayer &layer_desc, const
 
     // the distance over which the line edge fades out.
     // Retina devices need a smaller distance to avoid aliasing.
-    float antialiasing = 1 / state.getPixelRatio();
+    float antialiasing = 1.0 / pixelRatio;
 
     float blur = properties.blur + antialiasing;
     float edgeWidth = properties.width / 2.0;
@@ -50,7 +50,6 @@ void Painter::renderLine(LineBucket& bucket, const StyleLayer &layer_desc, const
     color[2] *= properties.opacity;
     color[3] *= properties.opacity;
 
-    float ratio = state.getPixelRatio();
     mat4 vtxMatrix = translatedMatrix(matrix, properties.translate, id, properties.translateAnchor);
 
     config.depthRange = { strata, 1.0f };
@@ -62,7 +61,7 @@ void Painter::renderLine(LineBucket& bucket, const StyleLayer &layer_desc, const
         linesdfShader->u_matrix = vtxMatrix;
         linesdfShader->u_exmatrix = extrudeMatrix;
         linesdfShader->u_linewidth = {{ outset, inset }};
-        linesdfShader->u_ratio = ratio;
+        linesdfShader->u_ratio = pixelRatio;
         linesdfShader->u_blur = blur;
         linesdfShader->u_color = color;
 
@@ -81,7 +80,7 @@ void Painter::renderLine(LineBucket& bucket, const StyleLayer &layer_desc, const
         linesdfShader->u_patternscale_b = {{ scaleXB, scaleYB }};
         linesdfShader->u_tex_y_b = posB.y;
         linesdfShader->u_image = 0;
-        linesdfShader->u_sdfgamma = lineAtlas->width / (properties.dash_line_width * std::min(posA.width, posB.width) * 256.0 * state.getPixelRatio()) / 2;
+        linesdfShader->u_sdfgamma = lineAtlas->width / (properties.dash_line_width * std::min(posA.width, posB.width) * 256.0 * pixelRatio) / 2;
         linesdfShader->u_mix = properties.dash_array.t;
 
         bucket.drawLineSDF(*linesdfShader);
@@ -97,7 +96,7 @@ void Painter::renderLine(LineBucket& bucket, const StyleLayer &layer_desc, const
         linepatternShader->u_matrix = vtxMatrix;
         linepatternShader->u_exmatrix = extrudeMatrix;
         linepatternShader->u_linewidth = {{ outset, inset }};
-        linepatternShader->u_ratio = ratio;
+        linepatternShader->u_ratio = pixelRatio;
         linepatternShader->u_blur = blur;
 
         linepatternShader->u_pattern_size_a = {{imagePosA.size[0] * factor * properties.image.fromScale, imagePosA.size[1]}};
@@ -121,7 +120,7 @@ void Painter::renderLine(LineBucket& bucket, const StyleLayer &layer_desc, const
         lineShader->u_matrix = vtxMatrix;
         lineShader->u_exmatrix = extrudeMatrix;
         lineShader->u_linewidth = {{ outset, inset }};
-        lineShader->u_ratio = ratio;
+        lineShader->u_ratio = pixelRatio;
         lineShader->u_blur = blur;
 
         lineShader->u_color = color;

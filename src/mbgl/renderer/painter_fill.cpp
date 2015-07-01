@@ -52,8 +52,8 @@ void Painter::renderFill(FillBucket& bucket, const StyleLayer &layer_desc, const
 
         // Draw the entire line
         outlineShader->u_world = {{
-            static_cast<float>(state.getFramebufferWidth()),
-            static_cast<float>(state.getFramebufferHeight())
+            static_cast<float>(frame.framebufferSize[0]),
+            static_cast<float>(frame.framebufferSize[1])
         }};
         config.depthRange = { strata, 1.0f };
         bucket.drawVertices(*outlineShader);
@@ -128,8 +128,8 @@ void Painter::renderFill(FillBucket& bucket, const StyleLayer &layer_desc, const
 
         // Draw the entire line
         outlineShader->u_world = {{
-            static_cast<float>(state.getFramebufferWidth()),
-            static_cast<float>(state.getFramebufferHeight())
+            static_cast<float>(frame.framebufferSize[0]),
+            static_cast<float>(frame.framebufferSize[1])
         }};
 
         config.depthRange = { strata + strata_epsilon + strata_epsilon, 1.0f };

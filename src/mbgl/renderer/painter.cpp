@@ -2,6 +2,7 @@
 
 #include <mbgl/map/source.hpp>
 #include <mbgl/map/tile.hpp>
+#include <mbgl/map/map_context.hpp>
 
 #include <mbgl/platform/log.hpp>
 #include <mbgl/gl/debugging.hpp>
@@ -40,7 +41,7 @@
 
 using namespace mbgl;
 
-Painter::Painter() {
+Painter::Painter(const float pixelRatio_) : pixelRatio(pixelRatio_) {
 }
 
 Painter::~Painter() {
@@ -104,8 +105,8 @@ void Painter::setupShaders() {
 }
 
 void Painter::resize() {
-    if (gl_viewport != state.getFramebufferDimensions()) {
-        gl_viewport = state.getFramebufferDimensions();
+    if (gl_viewport != frame.framebufferSize) {
+        gl_viewport = frame.framebufferSize;
         assert(gl_viewport[0] > 0 && gl_viewport[1] > 0);
         MBGL_CHECK_ERROR(glViewport(0, 0, gl_viewport[0], gl_viewport[1]));
     }
@@ -164,8 +165,9 @@ void Painter::prepareTile(const Tile& tile) {
     config.stencilFunc = { GL_EQUAL, ref, mask };
 }
 
-void Painter::render(const Style& style, TransformState state_, TimePoint time) {
+void Painter::render(const Style& style, TransformState state_, const FrameData& frame_, TimePoint time) {
     state = state_;
+    frame = frame_;
 
     glyphAtlas = style.glyphAtlas.get();
     spriteAtlas = style.spriteAtlas.get();

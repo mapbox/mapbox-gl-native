@@ -3,6 +3,8 @@
 
 #include <mbgl/map/view.hpp>
 
+#include <array>
+
 namespace mbgl {
 
 class MockView : public View {
@@ -10,6 +12,10 @@ public:
     MockView() = default;
 
     // View implementation.
+    float getPixelRatio() const { return 1; }
+    std::array<uint16_t, 2> getSize() const { return {{ 0, 0 }}; }
+    std::array<uint16_t, 2> getFramebufferSize() const { return {{ 0, 0 }}; }
+
     void activate() override {};
     void deactivate() override {};
     void notify() override {};

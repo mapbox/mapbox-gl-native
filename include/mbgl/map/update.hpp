@@ -9,6 +9,7 @@ using UpdateType = uint32_t;
 
 enum class Update : UpdateType {
     Nothing                   = 0,
+    Dimensions                = 1 << 1,
     DefaultTransitionDuration = 1 << 2,
     Classes                   = 1 << 3,
     Zoom                      = 1 << 4,

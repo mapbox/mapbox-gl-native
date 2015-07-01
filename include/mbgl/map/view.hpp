@@ -30,6 +30,21 @@ enum MapChange : uint8_t {
 
 class View {
 public:
+    // Called from the main thread directly after initialization. Must always return the same value,
+    // i.e. it may not change over time.
+    virtual float getPixelRatio() const = 0;
+
+    // Called from the main thread when the View signaled a dimension change. Must return the
+    // logical dimension of this map in pixels.
+    virtual std::array<uint16_t, 2> getSize() const = 0;
+
+    // Called from the main thread for every frame that is being rendered. Must return the absolute
+    // dimensions of the current framebuffer. Typically, this is the logical width scaled by the
+    // pixel ratio, but in case the view was moved to display with a different pixel ratio, it can
+    // also be different from that rule.
+    virtual std::array<uint16_t, 2> getFramebufferSize() const = 0;
+
+    // Called from the main thread when this View is associated with a Map object.
     virtual void initialize(Map *map_);
 
     // Called from the render thread. Makes the GL context active in the current
@@ -42,9 +57,6 @@ public:
     virtual void deactivate() = 0;
 
     virtual void notify() = 0;
-
-    // Called from the render thread. The implementation should resize the framebuffer.
-    virtual void resize(uint16_t width, uint16_t height, float pixelRatio);
 
     // Called from the render thread. The implementation must trigger a rerender.
     // (map->renderSync() from the main thread must be called as a result of this)

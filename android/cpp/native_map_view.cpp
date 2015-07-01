@@ -52,8 +52,9 @@ void log_gl_string(GLenum name, const char *label) {
     }
 }
 
-NativeMapView::NativeMapView(JNIEnv *env, jobject obj_)
+NativeMapView::NativeMapView(JNIEnv *env, jobject obj_, float pixelRatio_)
     : mbgl::View(*this),
+      pixelRatio(pixelRatio_),
       fileCache(mbgl::android::cachePath + "/mbgl-cache.db"),
       fileSource(&fileCache),
       map(*this, fileSource, MapMode::Continuous) {
@@ -96,6 +97,18 @@ NativeMapView::~NativeMapView() {
     }
     obj = nullptr;
     vm = nullptr;
+}
+
+float NativeMapView::getPixelRatio() const {
+    return pixelRatio;
+}
+
+std::array<uint16_t, 2> NativeMapView::getSize() const {
+    return {{ static_cast<uint16_t>(width), static_cast<uint16_t>(height) }};
+}
+
+std::array<uint16_t, 2> NativeMapView::getFramebufferSize() const {
+    return {{ static_cast<uint16_t>(fbWidth), static_cast<uint16_t>(fbHeight) }};
 }
 
 void NativeMapView::activate() {
@@ -752,6 +765,17 @@ void NativeMapView::onInvalidate() {
     if (dirty) {
         map.renderSync();
     }
+}
+
+void NativeMapView::resizeView(int w, int h) {
+    width = w;
+    height = h;
+    map.update(mbgl::Update::Dimensions);
+}
+
+void NativeMapView::resizeFramebuffer(int w, int h) {
+    fbWidth = w;
+    fbHeight = h;
 }
 
 }

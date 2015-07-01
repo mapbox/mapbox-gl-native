@@ -17,7 +17,7 @@ TEST(API, RepeatedRender) {
     const auto style = util::read_file("test/fixtures/api/water.json");
 
     auto display = std::make_shared<mbgl::HeadlessDisplay>();
-    HeadlessView view(display);
+    HeadlessView view(display, 1, 256, 512);
     DefaultFileSource fileSource(nullptr);
 
     Log::setObserver(std::make_unique<FixtureLogObserver>());
@@ -25,29 +25,27 @@ TEST(API, RepeatedRender) {
     Map map(view, fileSource, MapMode::Still);
 
     {
-        map.resize(128, 512, 1);
         map.setStyleJSON(style, "test/suite");
         std::promise<std::unique_ptr<const StillImage>> promise;
         map.renderStill([&promise](std::exception_ptr, std::unique_ptr<const StillImage> image) {
             promise.set_value(std::move(image));
         });
         auto result = promise.get_future().get();
-        ASSERT_EQ(128, result->width);
+        ASSERT_EQ(256, result->width);
         ASSERT_EQ(512, result->height);
         const std::string png = util::compress_png(result->width, result->height, result->pixels.get());
         util::write_file("test/fixtures/api/1.png", png);
     }
 
     {
-        map.resize(512, 512, 2);
         map.setStyleJSON(style, "TEST_DATA/suite");
         std::promise<std::unique_ptr<const StillImage>> promise;
         map.renderStill([&promise](std::exception_ptr, std::unique_ptr<const StillImage> image) {
             promise.set_value(std::move(image));
         });
         auto result = promise.get_future().get();
-        ASSERT_EQ(1024, result->width);
-        ASSERT_EQ(1024, result->height);
+        ASSERT_EQ(256, result->width);
+        ASSERT_EQ(512, result->height);
         const std::string png = util::compress_png(result->width, result->height, result->pixels.get());
         util::write_file("test/fixtures/api/2.png", png);
     }

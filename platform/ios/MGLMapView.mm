@@ -218,9 +218,9 @@ std::chrono::steady_clock::duration secondsAsDuration(float duration)
     _glView.enableSetNeedsDisplay = YES;
     _glView.drawableStencilFormat = GLKViewDrawableStencilFormat8;
     _glView.drawableDepthFormat = GLKViewDrawableDepthFormat16;
-    if ([UIScreen instancesRespondToSelector:@selector(nativeScale)]) {
-        _glView.contentScaleFactor = [[UIScreen mainScreen] nativeScale];
-    }
+
+    const float scaleFactor = [UIScreen instancesRespondToSelector:@selector(nativeScale)] ? [[UIScreen mainScreen] nativeScale] : [[UIScreen mainScreen] scale];
+    _glView.contentScaleFactor = scaleFactor;
     _glView.delegate = self;
     [_glView bindDrawable];
     [self insertSubview:_glView atIndex:0];
@@ -247,7 +247,7 @@ std::chrono::steady_clock::duration secondsAsDuration(float duration)
 
     // setup mbgl map
     //
-    _mbglView = new MBGLView(self);
+    _mbglView = new MBGLView(self, scaleFactor);
     _mbglFileSource = new mbgl::DefaultFileSource([MGLFileCache obtainSharedCacheWithObject:self]);
 
     // Start paused on the IB canvas
@@ -255,7 +255,6 @@ std::chrono::steady_clock::duration secondsAsDuration(float duration)
     if (_isTargetingInterfaceBuilder) {
         _mbglMap->pause();
     }
-    _mbglMap->resize(self.bounds.size.width, self.bounds.size.height, _glView.contentScaleFactor);
 
     // Observe for changes to the global access token (and find out the current one).
     [[MGLAccountManager sharedManager] addObserver:self
@@ -666,12 +665,10 @@ std::chrono::steady_clock::duration secondsAsDuration(float duration)
 }
 
 // This is the delegate of the GLKView object's display call.
-- (void)glkView:(GLKView *)view drawInRect:(CGRect)rect
+- (void)glkView:(__unused GLKView *)view drawInRect:(__unused CGRect)rect
 {
     if ( ! self.isDormant)
     {
-        _mbglMap->resize(rect.size.width, rect.size.height, view.contentScaleFactor);
-
         CGFloat zoomFactor   = _mbglMap->getMaxZoom() - _mbglMap->getMinZoom() + 1;
         CGFloat cpuFactor    = (CGFloat)[[NSProcessInfo processInfo] processorCount];
         CGFloat memoryFactor = (CGFloat)[[NSProcessInfo processInfo] physicalMemory] / 1000 / 1000 / 1000;
@@ -693,7 +690,7 @@ std::chrono::steady_clock::duration secondsAsDuration(float duration)
 
     if ( ! _isTargetingInterfaceBuilder)
     {
-        _mbglMap->update();
+        _mbglMap->update(mbgl::Update::Dimensions);
     }
     
     if (self.attributionSheet.visible)
@@ -2449,6 +2446,11 @@ CLLocationCoordinate2D MGLLocationCoordinate2DFromLatLng(mbgl::LatLng latLng)
 
 - (void)notifyMapChange:(mbgl::MapChange)change
 {
+    // Ignore map updates when the Map object isn't set.
+    if (!_mbglMap) {
+        return;
+    }
+
     switch (change)
     {
         case mbgl::MapChangeRegionWillChange:
@@ -2778,9 +2780,25 @@ CLLocationCoordinate2D MGLLocationCoordinate2DFromLatLng(mbgl::LatLng latLng)
 class MBGLView : public mbgl::View
 {
     public:
-        MBGLView(MGLMapView *nativeView_) : nativeView(nativeView_) {}
+        MBGLView(MGLMapView* nativeView_, const float scaleFactor_)
+            : nativeView(nativeView_), scaleFactor(scaleFactor_) {
+        }
         virtual ~MBGLView() {}
 
+
+    float getPixelRatio() const override {
+        return scaleFactor;
+    }
+
+    std::array<uint16_t, 2> getSize() const override {
+        return {{ static_cast<uint16_t>([nativeView bounds].size.width),
+                static_cast<uint16_t>([nativeView bounds].size.height) }};
+    }
+
+    std::array<uint16_t, 2> getFramebufferSize() const override {
+        return {{ static_cast<uint16_t>([[nativeView glView] drawableWidth]),
+                  static_cast<uint16_t>([[nativeView glView] drawableHeight]) }};
+    }
 
     void notify() override
     {
@@ -2817,6 +2835,7 @@ class MBGLView : public mbgl::View
 
     private:
         __weak MGLMapView *nativeView = nullptr;
+        const float scaleFactor;
 };
 
 @end

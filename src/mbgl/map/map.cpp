@@ -15,10 +15,11 @@ namespace mbgl {
 Map::Map(View& view_, FileSource& fileSource, MapMode mode)
     : view(view_),
       transform(std::make_unique<Transform>(view)),
-      data(std::make_unique<MapData>(mode)),
+      data(std::make_unique<MapData>(mode, view.getPixelRatio())),
       context(std::make_unique<util::Thread<MapContext>>(util::ThreadContext{"Map", util::ThreadType::Map, util::ThreadPriority::Regular}, view, fileSource, *data))
 {
     view.initialize(this);
+    update(Update::Dimensions);
 }
 
 Map::~Map() {
@@ -43,7 +44,8 @@ void Map::resume() {
 }
 
 void Map::renderStill(StillImageCallback callback) {
-    context->invoke(&MapContext::renderStill, transform->getState(), callback);
+    context->invoke(&MapContext::renderStill, transform->getState(),
+                    FrameData{ view.getFramebufferSize() }, callback);
 }
 
 void Map::renderSync() {
@@ -53,8 +55,8 @@ void Map::renderSync() {
 
     view.notifyMapChange(MapChangeWillStartRenderingFrame);
 
-    MapContext::RenderResult result =
-        context->invokeSync<MapContext::RenderResult>(&MapContext::renderSync, transform->getState());
+    MapContext::RenderResult result = context->invokeSync<MapContext::RenderResult>(
+        &MapContext::renderSync, transform->getState(), FrameData{ view.getFramebufferSize() });
 
     view.notifyMapChange(result.fullyLoaded ?
         MapChangeDidFinishRenderingFrameFullyRendered :
@@ -75,6 +77,10 @@ void Map::renderSync() {
 }
 
 void Map::update(Update update_) {
+    if (update_ == Update::Dimensions) {
+        transform->resize(view.getSize());
+    }
+
     context->invoke(&MapContext::triggerUpdate, transform->getState(), update_);
 }
 
@@ -94,15 +100,6 @@ std::string Map::getStyleURL() const {
 
 std::string Map::getStyleJSON() const {
     return context->invokeSync<std::string>(&MapContext::getStyleJSON);
-}
-
-#pragma mark - Size
-
-void Map::resize(uint16_t width, uint16_t height, float ratio) {
-    if (transform->resize(width, height, ratio, width * ratio, height * ratio)) {
-        context->invoke(&MapContext::resize, width, height, ratio);
-        update();
-    }
 }
 
 #pragma mark - Transitions
@@ -185,7 +182,7 @@ void Map::fitBounds(AnnotationSegment segment, EdgeInsets padding, Duration dura
     if (segment.empty()) {
         return;
     }
-    
+
     // Calculate the bounds of the possibly rotated shape with respect to the viewport.
     vec2<> nePixel = {-INFINITY, -INFINITY};
     vec2<> swPixel = {INFINITY, INFINITY};

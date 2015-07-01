@@ -25,17 +25,22 @@ class HeadlessDisplay;
 
 class HeadlessView : public View {
 public:
-    HeadlessView(uint16_t width = 256, uint16_t height = 256, float pixelRatio = 1);
-    HeadlessView(std::shared_ptr<HeadlessDisplay> display, uint16_t width = 256, uint16_t height = 256, float pixelRatio = 1);
+    HeadlessView(float pixelRatio, uint16_t width = 256, uint16_t height = 256);
+    HeadlessView(std::shared_ptr<HeadlessDisplay> display, float pixelRatio, uint16_t width = 256, uint16_t height = 256);
     ~HeadlessView();
+
+    float getPixelRatio() const override;
+    std::array<uint16_t, 2> getSize() const override;
+    std::array<uint16_t, 2> getFramebufferSize() const override;
 
     void activate() override;
     void deactivate() override;
     void notify() override;
-    void resize(uint16_t width, uint16_t height, float pixelRatio) override;
     void invalidate() override;
     void swap() override;
     std::unique_ptr<StillImage> readStillImage() override;
+
+    void resize(uint16_t width, uint16_t height);
 
 private:
     void createContext();
@@ -45,18 +50,8 @@ private:
 
 private:
     std::shared_ptr<HeadlessDisplay> display;
-
-    struct Dimensions {
-        inline Dimensions(uint16_t width = 0, uint16_t height = 0, float pixelRatio = 0);
-        inline uint16_t pixelWidth() const { return width * pixelRatio; }
-        inline uint16_t pixelHeight() const { return height * pixelRatio; }
-
-        uint16_t width = 0;
-        uint16_t height = 0;
-        float pixelRatio = 0;
-    };
-
-    Dimensions dimensions;
+    const float pixelRatio;
+    std::array<uint16_t, 2> dimensions;
 
 #if MBGL_USE_CGL
     CGLContextObj glContext = nullptr;

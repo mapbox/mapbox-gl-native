@@ -141,11 +141,10 @@ TEST_P(HeadlessTest, render) {
 
         std::promise<void> promise;
 
-        HeadlessView view(display, width, height, pixelRatio);
+        HeadlessView view(display, pixelRatio, width, height);
         DefaultFileSource fileSource(nullptr);
         Map map(view, fileSource, MapMode::Still);
 
-        map.resize(width, height, pixelRatio);
         map.setClasses(classes);
         map.setStyleJSON(style, "test/suite");
         map.setLatLngZoom(mbgl::LatLng(latitude, longitude), zoom);

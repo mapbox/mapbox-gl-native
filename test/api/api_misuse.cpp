@@ -17,11 +17,11 @@ TEST(API, RenderWithoutCallback) {
     Log::setObserver(std::unique_ptr<Log::Observer>(log));
 
     auto display = std::make_shared<mbgl::HeadlessDisplay>();
-    HeadlessView view(display);
+    HeadlessView view(display, 1);
+    view.resize(128, 512);
     DefaultFileSource fileSource(nullptr);
 
     std::unique_ptr<Map> map = std::make_unique<Map>(view, fileSource, MapMode::Still);
-    map->resize(128, 512, 1);
     map->renderStill(nullptr);
 
     // Force Map thread to join.
@@ -39,11 +39,11 @@ TEST(API, RenderWithoutCallback) {
 
 TEST(API, RenderWithoutStyle) {
     auto display = std::make_shared<mbgl::HeadlessDisplay>();
-    HeadlessView view(display);
+    HeadlessView view(display, 1);
+    view.resize(128, 512);
     DefaultFileSource fileSource(nullptr);
 
     Map map(view, fileSource, MapMode::Still);
-    map.resize(128, 512, 1);
 
     std::promise<std::exception_ptr> promise;
     map.renderStill([&promise](std::exception_ptr error, std::unique_ptr<const StillImage>) {

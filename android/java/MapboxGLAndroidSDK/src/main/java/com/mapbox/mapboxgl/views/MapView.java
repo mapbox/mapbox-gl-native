@@ -145,7 +145,7 @@ public class MapView extends SurfaceView {
         String apkPath = context.getPackageCodePath();
 
         // Create the NativeMapView
-        mNativeMapView = new NativeMapView(this, cachePath, dataPath, apkPath);
+        mNativeMapView = new NativeMapView(this, cachePath, dataPath, apkPath, mScreenDensity);
 
         // Load the attributes
         TypedArray typedArray = context.obtainStyledAttributes(attrs, R.styleable.MapView, 0, 0);
@@ -477,6 +477,10 @@ public class MapView extends SurfaceView {
         mNativeMapView.resume();
     }
 
+    public void onSizeChanged(int width, int height, int oldw, int oldh) {
+        mNativeMapView.resizeView((int)(width / mScreenDensity), (int)(height / mScreenDensity));
+    }
+
     // This class handles SurfaceHolder callbacks
     private class Callbacks implements SurfaceHolder.Callback {
 
@@ -498,9 +502,8 @@ public class MapView extends SurfaceView {
         // changed
         // Must handle window resizing here.
         @Override
-        public void surfaceChanged(SurfaceHolder holder, int format, int width,
-                                   int height) {
-            mNativeMapView.resize((int) (width / mScreenDensity), (int) (height / mScreenDensity), mScreenDensity, width, height);
+        public void surfaceChanged(SurfaceHolder holder, int format, int width, int height) {
+            mNativeMapView.resizeFramebuffer(width, height);
         }
     }
 

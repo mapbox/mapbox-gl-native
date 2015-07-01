@@ -60,7 +60,7 @@ void Painter::renderSDF(SymbolBucket &bucket,
 
     // The default gamma value has to be adjust for the current pixelratio so that we're not
     // drawing blurry font on retina screens.
-    const float gamma = 0.105 * sdfFontSize / fontSize / state.getPixelRatio();
+    const float gamma = 0.105 * sdfFontSize / fontSize / pixelRatio;
 
     const float sdfPx = 8.0f;
     const float blurOffset = 1.19f;

@@ -26,6 +26,11 @@ class StillImage;
 struct LatLng;
 struct LatLngBounds;
 
+
+struct FrameData {
+    std::array<uint16_t, 2> framebufferSize;
+};
+
 class MapContext : public Style::Observer {
 public:
     MapContext(View&, FileSource&, MapData&);
@@ -38,13 +43,11 @@ public:
 
     void pause();
 
-    void resize(uint16_t width, uint16_t height, float ratio);
-
     using StillImageCallback = std::function<void(std::exception_ptr, std::unique_ptr<const StillImage>)>;
 
     void triggerUpdate(const TransformState&, Update = Update::Nothing);
-    void renderStill(const TransformState&, StillImageCallback callback);
-    RenderResult renderSync(const TransformState&);
+    void renderStill(const TransformState&, const FrameData&, StillImageCallback callback);
+    RenderResult renderSync(const TransformState&, const FrameData&);
 
     void setStyleURL(const std::string&);
     void setStyleJSON(const std::string& json, const std::string& base);
@@ -95,6 +98,7 @@ private:
     StillImageCallback callback;
     size_t sourceCacheSize;
     TransformState transformState;
+    FrameData frameData;
 };
 
 }

@@ -23,12 +23,12 @@ public:
     MockMapContext(View& view,
                    FileSource& fileSource,
                    const std::function<void(std::exception_ptr error)>& callback)
-        : data_(MapMode::Still),
+        : data_(MapMode::Still, view.getPixelRatio()),
           transform_(view),
           callback_(callback) {
         util::ThreadContext::setFileSource(&fileSource);
 
-        transform_.resize(1000, 1000, 1.0, 1000, 1000);
+        transform_.resize({{ 1000, 1000 }});
         transform_.setLatLngZoom({0, 0}, 16);
 
         const std::string style = util::read_file("test/fixtures/resources/style.json");
