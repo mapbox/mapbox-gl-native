@@ -682,7 +682,8 @@ std::chrono::steady_clock::duration secondsAsDuration(float duration)
 
         _mbglMap->setSourceTileCacheSize(cacheSize);
 
-        _mbglMap->renderSync();
+        bool needsRerender = _mbglMap->renderSync();
+        _mbglMap->nudgeTransitions(needsRerender);
     }
 }
 
