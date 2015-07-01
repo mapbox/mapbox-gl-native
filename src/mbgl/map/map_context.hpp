@@ -92,6 +92,8 @@ private:
     std::string styleURL;
     std::string styleJSON;
 
+    Request* styleRequest = nullptr;
+
     StillImageCallback callback;
     size_t sourceCacheSize;
     TransformState transformState;
