@@ -73,6 +73,15 @@ IB_DESIGNABLE
 *   The default value of this property is `YES`. */
 @property(nonatomic, getter=isRotateEnabled) BOOL rotateEnabled;
 
+/** The compass image view shown in the upper-right when the map is rotated. */
+@property (nonatomic, readonly) UIImageView *compassView;
+
+/** The Mapbox logo image view shown in the lower-left of the map. */
+@property (nonatomic, readonly) UIImageView *logoView;
+
+/** The button shown in the lower-right of the map which when pressed displays the map attribution information. */
+@property (nonatomic, readonly) UIButton *attributionButton;
+
 #pragma mark - Accessing the Delegate
 
 /** @name Accessing the Delegate */

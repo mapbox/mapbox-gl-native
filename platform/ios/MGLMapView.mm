@@ -69,10 +69,10 @@ CLLocationDegrees MGLDegreesFromRadians(CGFloat radians)
 @property (nonatomic) GLKView *glView;
 @property (nonatomic) UIImageView *glSnapshotView;
 @property (nonatomic) NSOperationQueue *regionChangeDelegateQueue;
-@property (nonatomic) UIImageView *compass;
-@property (nonatomic) UIImageView *logoBug;
-@property (nonatomic) NS_MUTABLE_ARRAY_OF(NSLayoutConstraint *) *logoBugConstraints;
-@property (nonatomic) UIButton *attributionButton;
+@property (nonatomic, readwrite) UIImageView *compassView;
+@property (nonatomic, readwrite) UIImageView *logoView;
+@property (nonatomic) NS_MUTABLE_ARRAY_OF(NSLayoutConstraint *) *logoViewConstraints;
+@property (nonatomic, readwrite) UIButton *attributionButton;
 @property (nonatomic) NS_MUTABLE_ARRAY_OF(NSLayoutConstraint *) *attributionButtonConstraints;
 @property (nonatomic) UIActionSheet *attributionSheet;
 @property (nonatomic) UIPanGestureRecognizer *pan;
@@ -281,11 +281,11 @@ std::chrono::steady_clock::duration secondsAsDuration(float duration)
     // setup logo bug
     //
     UIImage *logo = [[MGLMapView resourceImageNamed:@"mapbox.png"] imageWithAlignmentRectInsets:UIEdgeInsetsMake(1.5, 4, 3.5, 2)];
-    _logoBug = [[UIImageView alloc] initWithImage:logo];
-    _logoBug.accessibilityLabel = @"Mapbox logo";
-    _logoBug.translatesAutoresizingMaskIntoConstraints = NO;
-    [self addSubview:_logoBug];
-    _logoBugConstraints = [NSMutableArray array];
+    _logoView = [[UIImageView alloc] initWithImage:logo];
+    _logoView.accessibilityLabel = @"Mapbox logo";
+    _logoView.translatesAutoresizingMaskIntoConstraints = NO;
+    [self addSubview:_logoView];
+    _logoViewConstraints = [NSMutableArray array];
 
     // setup attribution
     //
@@ -314,13 +314,12 @@ std::chrono::steady_clock::duration secondsAsDuration(float duration)
 
     // setup compass
     //
-    _compass = [[UIImageView alloc] initWithImage:[MGLMapView resourceImageNamed:@"Compass.png"]];
-    _compass.accessibilityLabel = @"Compass";
-    UIImage *compassImage = [MGLMapView resourceImageNamed:@"Compass.png"];
-    _compass.frame = CGRectMake(0, 0, compassImage.size.width, compassImage.size.height);
-    _compass.alpha = 0;
+    _compassView = [[UIImageView alloc] initWithImage:[MGLMapView resourceImageNamed:@"Compass.png"]];
+    _compassView.accessibilityLabel = @"Compass";
+    _compassView.frame = CGRectMake(0, 0, _compassView.image.size.width, _compassView.image.size.height);
+    _compassView.alpha = 0;
     UIView *container = [[UIView alloc] initWithFrame:CGRectZero];
-    [container addSubview:_compass];
+    [container addSubview:_compassView];
     container.translatesAutoresizingMaskIntoConstraints = NO;
     [container addGestureRecognizer:[[UITapGestureRecognizer alloc] initWithTarget:self action:@selector(handleCompassTapGesture:)]];
     [self addSubview:container];
@@ -437,8 +436,8 @@ std::chrono::steady_clock::duration secondsAsDuration(float duration)
         [EAGLContext setCurrentContext:nil];
     }
     
-    [self.logoBugConstraints removeAllObjects];
-    self.logoBugConstraints = nil;
+    [self.logoViewConstraints removeAllObjects];
+    self.logoViewConstraints = nil;
     [self.attributionButtonConstraints removeAllObjects];
     self.attributionButtonConstraints = nil;
 }
@@ -500,7 +499,7 @@ std::chrono::steady_clock::duration secondsAsDuration(float duration)
 
     // compass
     //
-    UIView *compassContainer = self.compass.superview;
+    UIView *compassContainer = self.compassView.superview;
     if ([NSLayoutConstraint respondsToSelector:@selector(deactivateConstraints:)])
     {
         [NSLayoutConstraint deactivateConstraints:compassContainer.constraints];
@@ -547,7 +546,7 @@ std::chrono::steady_clock::duration secondsAsDuration(float duration)
                                      toItem:nil
                                   attribute:NSLayoutAttributeNotAnAttribute
                                  multiplier:1
-                                   constant:self.compass.image.size.width]];
+                                   constant:self.compassView.image.size.width]];
 
     [compassContainerConstraints addObject:
      [NSLayoutConstraint constraintWithItem:compassContainer
@@ -556,7 +555,7 @@ std::chrono::steady_clock::duration secondsAsDuration(float duration)
                                      toItem:nil
                                   attribute:NSLayoutAttributeNotAnAttribute
                                  multiplier:1
-                                   constant:self.compass.image.size.height]];
+                                   constant:self.compassView.image.size.height]];
     if ([NSLayoutConstraint respondsToSelector:@selector(activateConstraints:)])
     {
         [NSLayoutConstraint activateConstraints:compassContainerConstraints];
@@ -570,35 +569,35 @@ std::chrono::steady_clock::duration secondsAsDuration(float duration)
     //
     if ([NSLayoutConstraint respondsToSelector:@selector(deactivateConstraints:)])
     {
-        [NSLayoutConstraint deactivateConstraints:self.logoBugConstraints];
+        [NSLayoutConstraint deactivateConstraints:self.logoViewConstraints];
     }
     else
     {
-        [self.logoBug removeConstraints:self.logoBugConstraints];
+        [self.logoView removeConstraints:self.logoViewConstraints];
     }
-    [self.logoBugConstraints removeAllObjects];
+    [self.logoViewConstraints removeAllObjects];
     if (viewController)
     {
-        [self.logoBugConstraints addObject:
+        [self.logoViewConstraints addObject:
          [NSLayoutConstraint constraintWithItem:viewController.bottomLayoutGuide
                                       attribute:NSLayoutAttributeTop
                                       relatedBy:NSLayoutRelationGreaterThanOrEqual
-                                         toItem:self.logoBug
+                                         toItem:self.logoView
                                       attribute:NSLayoutAttributeBaseline
                                      multiplier:1
                                        constant:8]];
     }
-    [self.logoBugConstraints addObject:
+    [self.logoViewConstraints addObject:
      [NSLayoutConstraint constraintWithItem:self
                                   attribute:NSLayoutAttributeBottom
                                   relatedBy:NSLayoutRelationGreaterThanOrEqual
-                                     toItem:self.logoBug
+                                     toItem:self.logoView
                                   attribute:NSLayoutAttributeBaseline
                                  multiplier:1
                                    constant:8]];
 
-    [self.logoBugConstraints addObject:
-     [NSLayoutConstraint constraintWithItem:self.logoBug
+    [self.logoViewConstraints addObject:
+     [NSLayoutConstraint constraintWithItem:self.logoView
                                   attribute:NSLayoutAttributeLeading
                                   relatedBy:NSLayoutRelationEqual
                                      toItem:self
@@ -607,11 +606,11 @@ std::chrono::steady_clock::duration secondsAsDuration(float duration)
                                    constant:8]];
     if ([NSLayoutConstraint respondsToSelector:@selector(activateConstraints:)])
     {
-        [NSLayoutConstraint activateConstraints:self.logoBugConstraints];
+        [NSLayoutConstraint activateConstraints:self.logoViewConstraints];
     }
     else
     {
-        [constraintParentView addConstraints:self.logoBugConstraints];
+        [constraintParentView addConstraints:self.logoViewConstraints];
     }
 
     // attribution button
@@ -701,7 +700,7 @@ std::chrono::steady_clock::duration secondsAsDuration(float duration)
         [self.attributionSheet dismissWithClickedButtonIndex:self.attributionSheet.cancelButtonIndex animated:YES];
     }
 
-    if (self.compass.alpha)
+    if (self.compassView.alpha)
     {
         [self updateHeadingForDeviceOrientation];
         [self updateCompass];
@@ -1404,7 +1403,7 @@ std::chrono::steady_clock::duration secondsAsDuration(float duration)
     [UIView animateWithDuration:duration
                      animations:^
                      {
-                         self.compass.transform = CGAffineTransformIdentity;
+                         self.compassView.transform = CGAffineTransformIdentity;
                      }
                      completion:^(BOOL finished)
                      {
@@ -2628,27 +2627,27 @@ CLLocationCoordinate2D MGLLocationCoordinate2DFromLatLng(mbgl::LatLng latLng)
     while (degrees >= 360) degrees -= 360;
     while (degrees < 0) degrees += 360;
 
-    self.compass.transform = CGAffineTransformMakeRotation(MGLRadiansFromDegrees(degrees));
+    self.compassView.transform = CGAffineTransformMakeRotation(MGLRadiansFromDegrees(degrees));
 
-    if (_mbglMap->getBearing() && self.compass.alpha < 1)
+    if (_mbglMap->getBearing() && self.compassView.alpha < 1)
     {
         [UIView animateWithDuration:MGLAnimationDuration
                               delay:0
                             options:UIViewAnimationOptionBeginFromCurrentState
                          animations:^
                          {
-                             self.compass.alpha = 1;
+                             self.compassView.alpha = 1;
                          }
                          completion:nil];
     }
-    else if (_mbglMap->getBearing() == 0 && self.compass.alpha > 0)
+    else if (_mbglMap->getBearing() == 0 && self.compassView.alpha > 0)
     {
         [UIView animateWithDuration:MGLAnimationDuration
                               delay:0
                             options:UIViewAnimationOptionBeginFromCurrentState
                          animations:^
                          {
-                             self.compass.alpha = 0;
+                             self.compassView.alpha = 0;
                          }
                          completion:nil];
     }
