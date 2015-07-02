@@ -15,6 +15,7 @@ using namespace mbgl;
 static double _normalizeAngle(double angle, double anchorAngle)
 {
     angle = util::wrap(angle, -M_PI, M_PI);
+    if (angle == -M_PI) angle = M_PI;
     double diff = std::abs(angle - anchorAngle);
     if (std::abs(angle - util::M2PI - anchorAngle) < diff) {
         angle -= util::M2PI;
