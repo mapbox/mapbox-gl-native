@@ -206,58 +206,28 @@ std::chrono::steady_clock::duration secondsAsDuration(float duration)
 - (void)commonInit
 {
     _isTargetingInterfaceBuilder = NSProcessInfo.processInfo.mgl_isInterfaceBuilderDesignablesAgent;
+    
+    BOOL background = [UIApplication sharedApplication].applicationState == UIApplicationStateBackground;
+    if (!background)
+    {
+        [self createGLView];
+    }
 
-    // create context
-    //
-    _context = [[EAGLContext alloc] initWithAPI:kEAGLRenderingAPIOpenGLES2];
-    NSAssert(_context, @"Failed to create OpenGL ES context.");
 
-    // setup accessibility
-    //
     self.accessibilityLabel = @"Map";
-
-    // create GL view
-    //
-    _glView = [[GLKView alloc] initWithFrame:self.bounds context:_context];
-    _glView.autoresizingMask = UIViewAutoresizingFlexibleWidth | UIViewAutoresizingFlexibleHeight;
-    _glView.enableSetNeedsDisplay = YES;
-    _glView.drawableStencilFormat = GLKViewDrawableStencilFormat8;
-    _glView.drawableDepthFormat = GLKViewDrawableDepthFormat16;
-
-    const float scaleFactor = [UIScreen instancesRespondToSelector:@selector(nativeScale)] ? [[UIScreen mainScreen] nativeScale] : [[UIScreen mainScreen] scale];
-    _glView.contentScaleFactor = scaleFactor;
-    _glView.delegate = self;
-    [_glView bindDrawable];
-    [self insertSubview:_glView atIndex:0];
-
-    _glView.contentMode = UIViewContentModeCenter;
-
     self.backgroundColor = [UIColor clearColor];
     self.clipsToBounds = YES;
 
-    // load extensions
-    //
-    mbgl::gl::InitializeExtensions([](const char * name) {
-        static CFBundleRef framework = CFBundleGetBundleWithIdentifier(CFSTR("com.apple.opengles"));
-        if (!framework) {
-            throw std::runtime_error("Failed to load OpenGL framework.");
-        }
-
-        CFStringRef str = CFStringCreateWithCString(kCFAllocatorDefault, name, kCFStringEncodingASCII);
-        void* symbol = CFBundleGetFunctionPointerForName(framework, str);
-        CFRelease(str);
-
-        return reinterpret_cast<mbgl::gl::glProc>(symbol);
-    });
-
     // setup mbgl map
     //
+    const float scaleFactor = [UIScreen instancesRespondToSelector:@selector(nativeScale)] ? [[UIScreen mainScreen] nativeScale] : [[UIScreen mainScreen] scale];
     _mbglView = new MBGLView(self, scaleFactor);
     _mbglFileSource = new mbgl::DefaultFileSource([MGLFileCache obtainSharedCacheWithObject:self]);
 
-    // Start paused on the IB canvas
+    // Start paused
     _mbglMap = new mbgl::Map(*_mbglView, *_mbglFileSource, mbgl::MapMode::Continuous);
-    if (_isTargetingInterfaceBuilder) {
+    if (_isTargetingInterfaceBuilder || background) {
+        self.dormant = YES;
         _mbglMap->pause();
     }
 
@@ -404,7 +374,59 @@ std::chrono::steady_clock::duration secondsAsDuration(float duration)
     }];
 }
 
--(void)reachabilityChanged:(NSNotification*)notification
+- (void)createGLView
+{
+    if (_context || [UIApplication sharedApplication].applicationState == UIApplicationStateBackground) {
+        return;
+    }
+    
+    // create context
+    //
+    _context = [[EAGLContext alloc] initWithAPI:kEAGLRenderingAPIOpenGLES2];
+    NSAssert(_context, @"Failed to create OpenGL ES context.");
+
+    // create GL view
+    //
+    _glView = [[GLKView alloc] initWithFrame:self.bounds context:_context];
+    _glView.autoresizingMask = UIViewAutoresizingFlexibleWidth | UIViewAutoresizingFlexibleHeight;
+    _glView.enableSetNeedsDisplay = YES;
+    _glView.drawableStencilFormat = GLKViewDrawableStencilFormat8;
+    _glView.drawableDepthFormat = GLKViewDrawableDepthFormat16;
+    _glView.contentScaleFactor = [UIScreen instancesRespondToSelector:@selector(nativeScale)] ? [[UIScreen mainScreen] nativeScale] : [[UIScreen mainScreen] scale];
+    _glView.delegate = self;
+    [_glView bindDrawable];
+    [self insertSubview:_glView atIndex:0];
+
+    _glView.contentMode = UIViewContentModeCenter;
+
+    // load extensions
+    //
+    mbgl::gl::InitializeExtensions([](const char * name) {
+        static CFBundleRef framework = CFBundleGetBundleWithIdentifier(CFSTR("com.apple.opengles"));
+        if (!framework) {
+            throw std::runtime_error("Failed to load OpenGL framework.");
+        }
+
+        CFStringRef str = CFStringCreateWithCString(kCFAllocatorDefault, name, kCFStringEncodingASCII);
+        void* symbol = CFBundleGetFunctionPointerForName(framework, str);
+        CFRelease(str);
+
+        return reinterpret_cast<mbgl::gl::glProc>(symbol);
+    });
+}
+
+- (void)viewWillEnterForeground
+{
+    [[NSNotificationCenter defaultCenter] removeObserver:self
+                                                    name:UIApplicationWillEnterForegroundNotification
+                                                  object:nil];
+    [[NSNotificationCenter defaultCenter] removeObserver:self
+                                                    name:UIApplicationDidBecomeActiveNotification
+                                                  object:nil];
+    [self commonInit];
+}
+
+- (void)reachabilityChanged:(NSNotification *)notification
 {
     MGLReachability *reachability = [notification object];
     if ([reachability isReachable]) {
@@ -777,6 +799,7 @@ std::chrono::steady_clock::duration secondsAsDuration(float duration)
 {
     MGLAssertIsMainThread();
 
+    [self createGLView];
     if (self.isDormant)
     {
         self.dormant = NO;
