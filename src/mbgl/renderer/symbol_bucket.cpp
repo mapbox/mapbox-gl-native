@@ -80,7 +80,7 @@ void SymbolBucket::render(Painter& painter,
     painter.renderSymbol(*this, layer_desc, id, matrix);
 }
 
-bool SymbolBucket::hasData() const { return hasTextData() || hasIconData(); }
+bool SymbolBucket::hasData() const { return hasTextData() || hasIconData() || symbolInstances.size(); }
 
 bool SymbolBucket::hasTextData() const { return renderData && !renderData->text.groups.empty(); }
 

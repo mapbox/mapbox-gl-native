@@ -122,9 +122,7 @@ void Painter::renderSymbol(SymbolBucket &bucket, const StyleLayer &layer_desc, c
     config.depthTest = true;
     config.depthMask = GL_FALSE;
 
-    if (bucket.hasCollisionBoxData() && (
-                (bucket.hasIconData() && properties.icon.opacity) ||
-                (bucket.hasTextData() && properties.text.opacity))) {
+    if (bucket.hasCollisionBoxData()) {
         config.stencilTest = true;
 
         useProgram(collisionBoxShader->program);
