@@ -24,11 +24,10 @@ public:
             image = decodeImage(*data);
         } catch (...) {
             callback(RasterTileParseResult("error parsing raster image"));
+            return;
         }
 
-        if (!bucket->setImage(std::move(image))) {
-            callback(RasterTileParseResult("error setting raster image to bucket"));
-        }
+        bucket->setImage(std::move(image));
 
         callback(RasterTileParseResult(std::move(bucket)));
     }

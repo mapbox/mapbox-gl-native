@@ -23,8 +23,8 @@ void RasterBucket::render(Painter& painter,
     painter.renderRaster(*this, *layer.as<RasterLayer>(), id, matrix);
 }
 
-bool RasterBucket::setImage(PremultipliedImage image) {
-    return raster.load(std::move(image));
+void RasterBucket::setImage(PremultipliedImage image) {
+    raster.load(std::move(image));
 }
 
 void RasterBucket::drawRaster(RasterShader& shader, StaticVertexBuffer &vertices, VertexArrayObject &array) {
