@@ -353,6 +353,12 @@ IB_DESIGNABLE
 *   @return A line width for the polyline. */
 - (CGFloat)mapView:(MGLMapView *)mapView lineWidthForPolylineAnnotation:(MGLPolyline *)annotation;
 
+/** Returns the line join to use when rendering a polyline annotation. Defaults to `kCGLineJoinRound`. */
+- (CGLineJoin)mapView:(MGLMapView *)mapView lineJoinForPolylineAnnotation:(MGLPolyline *)annotation;
+
+/** Returns the line cap to use when rendering a polyline annotation. Defaults to `kCGLineCapButt`. */
+- (CGLineCap)mapView:(MGLMapView *)mapView lineCapForPolylineAnnotation:(MGLPolyline *)annotation;
+
 /** Returns a Boolean value indicating whether the annotation is able to display extra information in a callout bubble.
 *
 *   If the value returned is `YES`, a standard callout bubble is shown when the user taps a selected annotation. The callout uses the title and subtitle text from the associated annotation object. If there is no title text, though, the annotation will not show a callout. The callout also displays any custom callout views returned by the delegate for the left and right callout accessory views.

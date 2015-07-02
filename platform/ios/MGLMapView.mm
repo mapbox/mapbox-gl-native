@@ -1808,6 +1808,8 @@ CLLocationCoordinate2D MGLLocationCoordinate2DFromLatLng(mbgl::LatLng latLng)
     BOOL delegateImplementsStrokeColorForShape = [self.delegate respondsToSelector:@selector(mapView:strokeColorForShapeAnnotation:)];
     BOOL delegateImplementsFillColorForPolygon = [self.delegate respondsToSelector:@selector(mapView:fillColorForPolygonAnnotation:)];
     BOOL delegateImplementsLineWidthForPolyline = [self.delegate respondsToSelector:@selector(mapView:lineWidthForPolylineAnnotation:)];
+    BOOL delegateImplementsLineJoinForPolyline = [self.delegate respondsToSelector:@selector(mapView:lineJoinForPolylineAnnotation:)];
+    BOOL delegateImplementsLineCapForPolyline = [self.delegate respondsToSelector:@selector(mapView:lineCapForPolylineAnnotation:)];
 
     for (id <MGLAnnotation> annotation in annotations)
     {
@@ -1846,6 +1848,47 @@ CLLocationCoordinate2D MGLLocationCoordinate2DFromLatLng(mbgl::LatLng latLng)
                 shapeStyle.emplace(mbgl::PropertyKey::LineWidth,
                     MGLShapeStyleConstantPropertyValue(float(width)));
 
+                if (delegateImplementsLineJoinForPolyline)
+                {
+                    CGLineJoin lineJoin = [self.delegate mapView:self lineJoinForPolylineAnnotation:(MGLPolyline *)annotation];
+
+                    if (lineJoin == kCGLineJoinBevel)
+                    {
+                        shapeStyle.emplace(mbgl::PropertyKey::LineJoin,
+                            MGLShapeStyleConstantPropertyValue(mbgl::JoinType::Bevel));
+                    }
+                    else if (lineJoin == kCGLineJoinMiter)
+                    {
+                        shapeStyle.emplace(mbgl::PropertyKey::LineJoin,
+                            MGLShapeStyleConstantPropertyValue(mbgl::JoinType::Miter));
+                    }
+                    else if (lineJoin == kCGLineJoinRound)
+                    {
+                        shapeStyle.emplace(mbgl::PropertyKey::LineJoin,
+                            MGLShapeStyleConstantPropertyValue(mbgl::JoinType::Round));
+                    }
+                }
+
+                if (delegateImplementsLineCapForPolyline)
+                {
+                    CGLineCap lineCap = [self.delegate mapView:self lineCapForPolylineAnnotation:(MGLPolyline *)annotation];
+
+                    if (lineCap == kCGLineCapButt)
+                    {
+                        shapeStyle.emplace(mbgl::PropertyKey::LineCap,
+                            MGLShapeStyleConstantPropertyValue(mbgl::CapType::Butt));
+                    }
+                    else if (lineCap == kCGLineCapRound)
+                    {
+                        shapeStyle.emplace(mbgl::PropertyKey::LineCap,
+                            MGLShapeStyleConstantPropertyValue(mbgl::CapType::Round));
+                    }
+                    else if (lineCap == kCGLineCapSquare)
+                    {
+                        shapeStyle.emplace(mbgl::PropertyKey::LineCap,
+                            MGLShapeStyleConstantPropertyValue(mbgl::CapType::Square));
+                    }
+                }
             }
             else if ([annotation isKindOfClass:[MGLPolygon class]])
             {
