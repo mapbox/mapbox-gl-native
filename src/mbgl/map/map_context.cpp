@@ -209,8 +209,11 @@ void MapContext::updateAnnotationTiles(const std::unordered_set<TileID, TileID::
 
             // apply shape layout properties
             if (isLine) {
-                // default to round join
-                shapeBucket->layout.set(PropertyKey::LineJoin, ConstantFunction<JoinType>(JoinType::Round));
+                if (shapeStyle.find(PropertyKey::LineJoin) != shapeStyle.end()) {
+                    shapeBucket->layout.set(PropertyKey::LineJoin, shapeStyle.at(PropertyKey::LineJoin));
+                } else {
+                    shapeBucket->layout.set(PropertyKey::LineJoin, ConstantFunction<JoinType>(JoinType::Round));
+                }
             }
 
             // connect layer to bucket
