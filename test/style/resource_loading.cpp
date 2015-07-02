@@ -176,8 +176,6 @@ INSTANTIATE_TEST_CASE_P(Style, ResourceLoading,
     ::testing::Values(
         "source_raster.json",
         "source_vector.json",
-        "sprite.json",
-        "sprite.png",
         "raster.png",
         "vector.pbf",
         "glyphs.pbf"));
