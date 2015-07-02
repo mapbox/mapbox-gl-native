@@ -152,60 +152,21 @@ AnnotationManager::addTileFeature(const uint32_t annotationID,
 
             std::unordered_map<TileID, GeometryCollection, TileID::Hash> featureTiles;
 
-            if (type == AnnotationType::Point) {
-                auto& pp = projectedFeature[0][0];
+            auto& pp = projectedFeature[0][0];
 
-                x = pp.x * z2;
-                y = pp.y * z2;
+            x = pp.x * z2;
+            y = pp.y * z2;
 
-                const Coordinate coordinate(extent * (pp.x * z2 - x), extent * (pp.y * z2 - y));
+            const Coordinate coordinate(extent * (pp.x * z2 - x), extent * (pp.y * z2 - y));
 
-                GeometryCollection geometries = {{ {{ coordinate }} }};
+            GeometryCollection geometries = {{ {{ coordinate }} }};
 
-                featureTiles.emplace(TileID(z, x, y, z), geometries);
-            } else {
-                for (size_t l = 0; l < projectedFeature.size(); ++l) {
-
-                    std::vector<Coordinate> line;
-
-                    for (size_t p = 0; p < projectedFeature[l].size(); ++p) {
-
-                        auto& pp = projectedFeature[l][p];
-
-                        x = pp.x * z2;
-                        y = pp.y * z2;
-
-                        const Coordinate coordinate(extent * (pp.x * z2 - x), extent * (pp.y * z2 - y));
-
-                        auto tile_it = featureTiles.find(TileID(z, x, y, z));
-
-                        if (tile_it != featureTiles.end()) {
-                            GeometryCollection& geometries = featureTiles.find(TileID(z, x, y, z))->second;
-                            if (geometries.size()) {
-                                geometries.back().push_back(coordinate);
-                            } else {
-                                geometries.push_back({{ coordinate }});
-                            }
-                        } else {
-                            GeometryCollection geometries = {{ {{ coordinate }} }};
-                            featureTiles.emplace(TileID(z, x, y, z), geometries);
-                        }
-                    }
-                }
-            }
+            featureTiles.emplace(TileID(z, x, y, z), geometries);
 
             for (auto& featureTile : featureTiles) {
                 // determine feature type
                 FeatureType featureType;
-                if (type == AnnotationType::Point) {
-                    featureType = FeatureType::Point;
-                } else if (styleProperties.is<LineProperties>()) {
-                    featureType = FeatureType::LineString;
-                } else if (styleProperties.is<FillProperties>()) {
-                    featureType = FeatureType::Polygon;
-                } else {
-                    throw std::runtime_error("Invalid feature type");
-                }
+                featureType = FeatureType::Point;
 
                 // create tile feature
                 auto feature = std::make_shared<const LiveTileFeature>(
