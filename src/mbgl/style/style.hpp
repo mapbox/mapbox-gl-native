@@ -32,9 +32,7 @@ class Style : public GlyphStore::Observer,
               public Sprite::Observer,
               public util::noncopyable {
 public:
-    Style(const std::string& data,
-          const std::string& base,
-          MapData&,
+    Style(MapData&,
           uv_loop_t*);
     ~Style();
 
@@ -45,6 +43,8 @@ public:
         virtual void onTileDataChanged() = 0;
         virtual void onResourceLoadingFailed(std::exception_ptr error) = 0;
     };
+
+    void setJSON(const std::string& data, const std::string& base);
 
     void setObserver(Observer*);
 

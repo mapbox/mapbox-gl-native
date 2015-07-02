@@ -99,6 +99,8 @@ void MapContext::setStyleURL(const std::string& url) {
     styleURL = url;
     styleJSON.clear();
 
+    style = std::make_unique<Style>(data, asyncUpdate->get()->loop);
+
     const size_t pos = styleURL.rfind('/');
     std::string base = "";
     if (pos != std::string::npos) {
@@ -120,14 +122,15 @@ void MapContext::setStyleJSON(const std::string& json, const std::string& base) 
     styleURL.clear();
     styleJSON = json;
 
+    style = std::make_unique<Style>(data, asyncUpdate->get()->loop);
+
     loadStyleJSON(json, base);
 }
 
 void MapContext::loadStyleJSON(const std::string& json, const std::string& base) {
     assert(util::ThreadContext::currentlyOn(util::ThreadType::Map));
 
-    style.reset();
-    style = std::make_unique<Style>(json, base, data, asyncUpdate->get()->loop);
+    style->setJSON(json, base);
     style->cascade(data.getClasses());
     style->setDefaultTransitionDuration(data.getDefaultTransitionDuration());
     style->setObserver(this);
@@ -376,7 +379,10 @@ void MapContext::onLowMemory() {
 }
 
 void MapContext::setSprite(const std::string& name, std::shared_ptr<const SpriteImage> sprite) {
-    if (!style) return;
+    if (!style) {
+        Log::Info(Event::Sprite, "Ignoring sprite without stylesheet");
+        return;
+    }
 
     style->spriteStore->setSprite(name, sprite);
 

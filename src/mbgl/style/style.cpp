@@ -22,8 +22,7 @@
 
 namespace mbgl {
 
-Style::Style(const std::string& json, const std::string&, MapData& data_,
-             uv_loop_t* loop)
+Style::Style(MapData& data_, uv_loop_t* loop)
     : data(data_),
       glyphStore(std::make_unique<GlyphStore>(loop)),
       glyphAtlas(std::make_unique<GlyphAtlas>(1024, 1024)),
@@ -32,7 +31,10 @@ Style::Style(const std::string& json, const std::string&, MapData& data_,
       lineAtlas(std::make_unique<LineAtlas>(512, 512)),
       mtx(std::make_unique<uv::rwlock>()),
       workers(4) {
+    glyphStore->setObserver(this);
+}
 
+void Style::setJSON(const std::string& json, const std::string&) {
     rapidjson::Document doc;
     doc.Parse<0>((const char *const)json.c_str());
     if (doc.HasParseError()) {
@@ -55,8 +57,6 @@ Style::Style(const std::string& json, const std::string&, MapData& data_,
         source->setObserver(this);
         source->load();
     }
-
-    glyphStore->setObserver(this);
 }
 
 Style::~Style() {
