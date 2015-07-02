@@ -29,7 +29,7 @@ using namespace mbgl;
 TEST(Annotations, SpriteImageCreationInvalid) {
     FixtureLog log;
 
-    const util::Image image_1x = { util::read_file("test/fixtures/annotations/emerald.png") };
+    const util::Image image_1x(util::read_file("test/fixtures/annotations/emerald.png"));
     ASSERT_TRUE(image_1x);
     ASSERT_EQ(200u, image_1x.getWidth());
     ASSERT_EQ(299u, image_1x.getHeight());
@@ -50,7 +50,7 @@ TEST(Annotations, SpriteImageCreationInvalid) {
 }
 
 TEST(Annotations, SpriteImageCreation1x) {
-    const util::Image image_1x = { util::read_file("test/fixtures/annotations/emerald.png") };
+    const util::Image image_1x(util::read_file("test/fixtures/annotations/emerald.png"));
     ASSERT_TRUE(image_1x);
     ASSERT_EQ(200u, image_1x.getWidth());
     ASSERT_EQ(299u, image_1x.getHeight());
@@ -90,7 +90,7 @@ TEST(Annotations, SpriteImageCreation1x) {
 }
 
 TEST(Annotations, SpriteImageCreation2x) {
-    const util::Image image_2x = { util::read_file("test/fixtures/annotations/emerald@2x.png") };
+    const util::Image image_2x(util::read_file("test/fixtures/annotations/emerald@2x.png"));
     ASSERT_TRUE(image_2x);
 
     // "museum_icon":{"x":354,"y":374,"width":36,"height":36,"pixelRatio":2,"sdf":false}
@@ -105,7 +105,7 @@ TEST(Annotations, SpriteImageCreation2x) {
 }
 
 TEST(Annotations, SpriteImageCreation1_5x) {
-    const util::Image image_2x = { util::read_file("test/fixtures/annotations/emerald@2x.png") };
+    const util::Image image_2x(util::read_file("test/fixtures/annotations/emerald@2x.png"));
     ASSERT_TRUE(image_2x);
 
     // "museum_icon":{"x":354,"y":374,"width":36,"height":36,"pixelRatio":2,"sdf":false}

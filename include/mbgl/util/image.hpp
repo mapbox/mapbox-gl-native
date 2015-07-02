@@ -12,7 +12,7 @@ std::string compress_png(int width, int height, const void *rgba);
 
 class Image {
 public:
-    Image(const std::string &img);
+    explicit Image(const std::string &img);
 
     inline const char *getData() const { return img.get(); }
     inline uint32_t getWidth() const { return width; }

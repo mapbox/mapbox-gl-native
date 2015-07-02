@@ -134,7 +134,7 @@ Sprites parseSprite(const std::string& image, const std::string& json) {
                 const double pixelRatio = getDouble(value, "pixelRatio", 1);
                 const bool sdf = getBoolean(value, "sdf", false);
 
-                auto sprite = createSpriteImage(image, x, y, width, height, pixelRatio, sdf);
+                auto sprite = createSpriteImage(raster, x, y, width, height, pixelRatio, sdf);
                 if (sprite) {
                     sprites.emplace(name, sprite);
                 }
