@@ -4,6 +4,8 @@
 #include <mbgl/util/chrono.hpp>
 #include <mbgl/map/update.hpp>
 #include <mbgl/map/mode.hpp>
+#include <mbgl/style/property_key.hpp>
+#include <mbgl/style/property_value.hpp>
 #include <mbgl/util/geo.hpp>
 #include <mbgl/util/noncopyable.hpp>
 #include <mbgl/util/vec.hpp>
@@ -13,6 +15,7 @@
 #include <functional>
 #include <vector>
 #include <memory>
+#include <map>
 
 namespace mbgl {
 
@@ -38,6 +41,7 @@ enum class AnnotationType : uint8_t {
 using AnnotationIDs = std::vector<uint32_t>;
 using AnnotationSegment = std::vector<LatLng>;
 using AnnotationSegments = std::vector<AnnotationSegment>;
+using AnnotationStyle = std::map<PropertyKey, PropertyValue>;
 
 using EdgeInsets = struct {
     double top, left, bottom, right;

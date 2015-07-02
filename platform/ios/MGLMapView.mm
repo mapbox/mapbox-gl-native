@@ -14,6 +14,7 @@
 #include <mbgl/platform/darwin/reachability.h>
 #include <mbgl/storage/default_file_source.hpp>
 #include <mbgl/storage/network_status.hpp>
+#include <mbgl/style/function_properties.hpp>
 #include <mbgl/util/geo.hpp>
 #include <mbgl/util/constants.hpp>
 
@@ -115,6 +116,16 @@ CLLocationDegrees MGLDegreesFromRadians(CGFloat radians)
 std::chrono::steady_clock::duration secondsAsDuration(float duration)
 {
     return std::chrono::duration_cast<std::chrono::steady_clock::duration>(std::chrono::duration<float, std::chrono::seconds::period>(duration));
+}
+
+template <typename T>
+mbgl::PropertyValue MGLShapeStyleConstantPropertyValue(T value)
+{
+    mbgl::ConstantFunction<T> constantFunction(value);
+    mbgl::Function<T> function(constantFunction);
+    mbgl::PropertyValue result(function);
+
+    return result;
 }
 
 - (instancetype)initWithFrame:(CGRect)frame
@@ -1818,19 +1829,22 @@ CLLocationCoordinate2D MGLLocationCoordinate2DFromLatLng(mbgl::LatLng latLng)
             [strokeColor getRed:&r green:&g blue:&b alpha:&a];
             mbgl::Color strokeNativeColor({{ (float)r, (float)g, (float)b, (float)a }});
 
-            mbgl::StyleProperties shapeProperties;
+            mbgl::AnnotationStyle shapeStyle;
 
             if ([annotation isKindOfClass:[MGLPolyline class]])
             {
-                CGFloat lineWidth = (delegateImplementsLineWidthForPolyline ?
+                CGFloat width = (delegateImplementsLineWidthForPolyline ?
                                 [self.delegate mapView:self lineWidthForPolylineAnnotation:(MGLPolyline *)annotation] :
                                 3.0);
 
-                mbgl::LineProperties lineProperties;
-                lineProperties.opacity = alpha;
-                lineProperties.color = strokeNativeColor;
-                lineProperties.width = lineWidth;
-                shapeProperties.set<mbgl::LineProperties>(lineProperties);
+                shapeStyle.emplace(mbgl::PropertyKey::LineOpacity,
+                    MGLShapeStyleConstantPropertyValue(float(alpha)));
+
+                shapeStyle.emplace(mbgl::PropertyKey::LineColor,
+                    MGLShapeStyleConstantPropertyValue(strokeNativeColor));
+
+                shapeStyle.emplace(mbgl::PropertyKey::LineWidth,
+                    MGLShapeStyleConstantPropertyValue(float(width)));
 
             }
             else if ([annotation isKindOfClass:[MGLPolygon class]])
@@ -1844,11 +1858,14 @@ CLLocationCoordinate2D MGLLocationCoordinate2DFromLatLng(mbgl::LatLng latLng)
                 [fillColor getRed:&r green:&g blue:&b alpha:&a];
                 mbgl::Color fillNativeColor({{ (float)r, (float)g, (float)b, (float)a }});
 
-                mbgl::FillProperties fillProperties;
-                fillProperties.opacity = alpha;
-                fillProperties.stroke_color = strokeNativeColor;
-                fillProperties.fill_color = fillNativeColor;
-                shapeProperties.set<mbgl::FillProperties>(fillProperties);
+                shapeStyle.emplace(mbgl::PropertyKey::FillOpacity,
+                    MGLShapeStyleConstantPropertyValue(float(alpha)));
+
+                shapeStyle.emplace(mbgl::PropertyKey::FillOutlineColor,
+                    MGLShapeStyleConstantPropertyValue(strokeNativeColor));
+
+                shapeStyle.emplace(mbgl::PropertyKey::FillColor,
+                    MGLShapeStyleConstantPropertyValue(fillNativeColor));
             }
             else
             {
@@ -1872,7 +1889,7 @@ CLLocationCoordinate2D MGLLocationCoordinate2DFromLatLng(mbgl::LatLng latLng)
 
             free(coordinates);
 
-            shapes.emplace_back(mbgl::AnnotationSegments {{ segment }}, shapeProperties);
+            shapes.emplace_back(mbgl::AnnotationSegments {{ segment }}, shapeStyle);
         }
         else
         {

@@ -14,8 +14,8 @@ namespace mbgl {
 
 Annotation::Annotation(AnnotationType type_,
                        const AnnotationSegments& geometry_,
-                       const StyleProperties& styleProperties_)
-    : styleProperties(styleProperties_),
+                       const AnnotationStyle& style_)
+    : style(style_),
       type(type_),
       geometry(geometry_),
       bounds([this] {
@@ -83,7 +83,7 @@ AnnotationManager::addTileFeature(const uint32_t annotationID,
                                   const AnnotationSegments& segments,
                                   const std::vector<std::vector<vec2<double>>>& projectedFeature,
                                   const AnnotationType& type,
-                                  const StyleProperties& styleProperties,
+                                  const AnnotationStyle& style,
                                   const std::unordered_map<std::string, std::string>& featureProperties,
                                   const uint8_t maxZoom) {
 
@@ -91,7 +91,7 @@ AnnotationManager::addTileFeature(const uint32_t annotationID,
 
     // track the annotation global ID and its original geometry
     auto anno_it = annotations.emplace(annotationID,
-        std::make_unique<Annotation>(type, segments, styleProperties));
+        std::make_unique<Annotation>(type, segments, style));
 
     std::unordered_set<TileID, TileID::Hash> affectedTiles;
 
@@ -118,7 +118,7 @@ AnnotationManager::addTileFeature(const uint32_t annotationID,
 
         ProjectedFeatureType featureType;
 
-        if (styleProperties.is<FillProperties>()) {
+        if (style.find(PropertyKey::FillColor) != style.end()) {
             featureType = ProjectedFeatureType::Polygon;
 
             if (points.front().lon != points.back().lon || points.front().lat != points.back().lat) {
@@ -334,7 +334,7 @@ AnnotationManager::addShapeAnnotations(const std::vector<ShapeAnnotation>& shape
             shape.segments,
             {{ }},
             AnnotationType::Shape,
-            shape.styleProperties,
+            shape.style,
             {{ }},
             maxZoom
         );
@@ -415,13 +415,13 @@ std::unordered_set<TileID, TileID::Hash> AnnotationManager::removeAnnotations(co
     return affectedTiles;
 }
 
-const StyleProperties AnnotationManager::getAnnotationStyleProperties(uint32_t annotationID) const {
+const AnnotationStyle& AnnotationManager::getAnnotationStyle(uint32_t annotationID) const {
     std::lock_guard<std::mutex> lock(mtx);
 
     auto anno_it = annotations.find(annotationID);
     assert(anno_it != annotations.end());
 
-    return anno_it->second->styleProperties;
+    return anno_it->second->style;
 }
 
 AnnotationIDs AnnotationManager::getAnnotationsInBounds(const LatLngBounds& queryBounds,
