@@ -51,7 +51,7 @@ Rect<SpriteAtlas::dimension> SpriteAtlas::allocateImage(const size_t pixel_width
 SpriteAtlasElement SpriteAtlas::getImage(const std::string& name, const bool wrap) {
     std::lock_guard<std::recursive_mutex> lock(mtx);
 
-    auto rect_it = images.find(name);
+    auto rect_it = images.find({ name, wrap });
     if (rect_it != images.end()) {
         return { rect_it->second.pos, rect_it->second.texture };
     }
@@ -69,7 +69,7 @@ SpriteAtlasElement SpriteAtlas::getImage(const std::string& name, const bool wra
         return { Rect<dimension> { 0, 0, 0, 0 }, nullptr };
     }
 
-    const Holder& holder = images.emplace(name, Holder{ sprite, rect }).first->second;
+    const Holder& holder = images.emplace(Key{ name, wrap }, Holder{ sprite, rect }).first->second;
     copy(holder, wrap);
 
     return { rect, sprite };

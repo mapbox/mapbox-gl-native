@@ -75,6 +75,8 @@ private:
         const Rect<dimension> pos;
     };
 
+    using Key = std::pair<std::string, bool>;
+
     void allocate();
     Rect<SpriteAtlas::dimension> allocateImage(size_t width, size_t height);
     void copy(const Holder& holder, const bool wrap);
@@ -83,7 +85,7 @@ private:
     SpriteStore& store;
     const float pixelRatio;
     BinPack<dimension> bin;
-    std::map<std::string, Holder> images;
+    std::map<Key, Holder> images;
     std::set<std::string> uninitialized;
     std::unique_ptr<uint32_t[]> data;
     std::atomic<bool> dirty;
