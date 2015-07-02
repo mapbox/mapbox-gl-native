@@ -15,6 +15,7 @@
 #include <mbgl/storage/default_file_source.hpp>
 #include <mbgl/storage/network_status.hpp>
 #include <mbgl/util/geo.hpp>
+#include <mbgl/util/math.hpp>
 #include <mbgl/util/constants.hpp>
 
 #import "MapboxGL.h"
@@ -1568,12 +1569,7 @@ mbgl::LatLngBounds MGLLatLngBoundsFromCoordinateBounds(MGLCoordinateBounds coord
 
 - (CLLocationDirection)direction
 {
-    double direction = _mbglMap->getBearing();
-
-    while (direction > 360) direction -= 360;
-    while (direction < 0) direction += 360;
-
-    return direction;
+    return mbgl::util::wrap(_mbglMap->getBearing(), 0., 360.);
 }
 
 - (void)setDirection:(CLLocationDirection)direction animated:(BOOL)animated
@@ -2624,9 +2620,7 @@ CLLocationCoordinate2D MGLLocationCoordinate2DFromLatLng(mbgl::LatLng latLng)
 
 - (void)updateCompass
 {
-    double degrees = _mbglMap->getBearing() * -1;
-    while (degrees >= 360) degrees -= 360;
-    while (degrees < 0) degrees += 360;
+    CLLocationDirection degrees = -self.direction;
 
     self.compassView.transform = CGAffineTransformMakeRotation(MGLRadiansFromDegrees(degrees));
 
