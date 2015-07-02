@@ -13,6 +13,8 @@
 #include <mbgl/storage/resource.hpp>
 #include <mbgl/storage/response.hpp>
 
+#include <mbgl/geometry/sprite_atlas.hpp>
+
 #include <mbgl/style/style.hpp>
 #include <mbgl/style/style_bucket.hpp>
 #include <mbgl/style/style_layer.hpp>
@@ -371,6 +373,14 @@ void MapContext::onLowMemory() {
         source->onLowMemory();
     }
     view.invalidate();
+}
+
+void MapContext::setSprite(const std::string& name, std::shared_ptr<const SpriteImage> sprite) {
+    if (!style) return;
+
+    style->spriteStore->setSprite(name, sprite);
+
+    style->spriteAtlas->updateDirty();
 }
 
 void MapContext::onTileDataChanged() {

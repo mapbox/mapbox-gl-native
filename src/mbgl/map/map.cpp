@@ -346,6 +346,17 @@ LatLngBounds Map::getBoundsForAnnotations(const std::vector<uint32_t>& annotatio
 }
 
 
+#pragma mark - Sprites
+
+void Map::setSprite(const std::string& name, std::shared_ptr<const SpriteImage> sprite) {
+    context->invoke(&MapContext::setSprite, name, sprite);
+}
+
+void Map::removeSprite(const std::string& name) {
+    setSprite(name, nullptr);
+}
+
+
 #pragma mark - Toggles
 
 void Map::setDebug(bool value) {

@@ -23,6 +23,7 @@ class Painter;
 class Sprite;
 class Worker;
 class StillImage;
+class SpriteImage;
 struct LatLng;
 struct LatLngBounds;
 
@@ -63,6 +64,8 @@ public:
     void onLowMemory();
 
     void cleanup();
+
+    void setSprite(const std::string&, std::shared_ptr<const SpriteImage>);
 
     // Style::Observer implementation.
     void onTileDataChanged() override;

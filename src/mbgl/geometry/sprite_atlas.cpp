@@ -170,6 +170,34 @@ void SpriteAtlas::upload() {
     }
 }
 
+void SpriteAtlas::updateDirty() {
+    auto dirtySprites = store.getDirty();
+    if (dirtySprites.empty()) {
+        return;
+    }
+
+    std::lock_guard<std::recursive_mutex> lock(mtx);
+
+    auto imageIterator = images.begin();
+    auto spriteIterator = dirtySprites.begin();
+    while (imageIterator != images.end() && spriteIterator != dirtySprites.end()) {
+        if (imageIterator->first.first < spriteIterator->first) {
+            ++imageIterator;
+        } else if (spriteIterator->first < imageIterator->first.first) {
+            ++spriteIterator;
+        } else {
+            // The two names match;
+            Holder& holder = imageIterator->second;
+            holder.texture = spriteIterator->second;
+            copy(holder, imageIterator->first.second);
+
+            ++imageIterator;
+            // Don't advance the spriteIterator because there might be another sprite with the same
+            // name, but a different wrap value.
+        }
+    }
+}
+
 void SpriteAtlas::bind(bool linear) {
     if (!texture) {
         MBGL_CHECK_ERROR(glGenTextures(1, &texture));

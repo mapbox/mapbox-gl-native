@@ -54,6 +54,9 @@ public:
     // Binds the atlas texture to the GPU, and uploads data if it is out of date.
     void bind(bool linear = false);
 
+    // Updates sprites in the atlas texture that may have changed in the source SpriteStore object.
+    void updateDirty();
+
     // Uploads the texture to the GPU to be available when we need it. This is a lazy operation;
     // the texture is only bound when the data is out of date (=dirty).
     void upload();

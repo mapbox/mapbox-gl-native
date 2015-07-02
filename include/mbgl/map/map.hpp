@@ -21,6 +21,7 @@ class View;
 class MapData;
 class MapContext;
 class StillImage;
+class SpriteImage;
 class Transform;
 class PointAnnotation;
 class ShapeAnnotation;
@@ -140,6 +141,10 @@ public:
 
     AnnotationIDs getAnnotationsInBounds(const LatLngBounds&, const AnnotationType& = AnnotationType::Any);
     LatLngBounds getBoundsForAnnotations(const AnnotationIDs&);
+
+    // Sprites
+    void setSprite(const std::string&, std::shared_ptr<const SpriteImage>);
+    void removeSprite(const std::string&);
 
     // Memory
     void setSourceTileCacheSize(size_t);
