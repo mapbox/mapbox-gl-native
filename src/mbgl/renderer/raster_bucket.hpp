@@ -20,7 +20,7 @@ public:
     void render(Painter&, const StyleLayer&, const TileID&, const mat4&) override;
     bool hasData() const;
 
-    bool setImage(const std::string &data);
+    bool setImage(std::unique_ptr<util::Image> image);
 
     const StyleLayoutRaster &layout;
 

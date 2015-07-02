@@ -44,15 +44,18 @@ void RasterTileData::request(float pixelRatio,
 
         state = State::loaded;
 
-        workRequest = worker.parseRasterTile(bucket, res.data, [this, callback] (bool result) {
+        workRequest = worker.parseRasterTile(bucket, res.data, [this, callback] (TileParseResult result) {
             if (state != State::loaded) {
                 return;
             }
 
-            if (result) {
-                state = State::parsed;
+            if (result.is<State>()) {
+                state = result.get<State>();
             } else {
-                state = State::invalid;
+                std::stringstream message;
+                message << "Failed to parse [" << std::string(id) << "]: " << result.get<std::string>();
+                error = message.str();
+                state = State::obsolete;
             }
 
             callback();

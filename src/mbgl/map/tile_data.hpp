@@ -28,9 +28,6 @@ public:
     //   the TileData object is not effectively on the 'invalid' state and will
     //   cause tiles on 'invalid' state to get reloaded.
     //
-    //   Raster tiles (only) are changing to 'invalid' on error, which will cause a
-    //   re-request of the tile.
-    //
     // loading:
     //   A request to the FileSource was made for the actual tile data and TileData
     //   is waiting for it to arrive.

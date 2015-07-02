@@ -34,7 +34,7 @@ public:
     Request parseRasterTile(
         RasterBucket&,
         std::string data,
-        std::function<void (bool)> callback);
+        std::function<void (TileParseResult)> callback);
 
     Request parseVectorTile(
         TileWorker&,
