@@ -183,8 +183,8 @@ void LineBucket::addGeometry(const std::vector<Coordinate>& vertices) {
             } else {
                 const float direction = prevNormal.x * nextNormal.y - prevNormal.y * nextNormal.x > 0 ? -1 : 1;
                 const float bevelLength = miterLength * util::mag(prevNormal + nextNormal) /
-                                          util::mag(prevNormal - nextNormal * direction);
-                joinNormal = util::perp(joinNormal) * bevelLength;
+                                          util::mag(prevNormal - nextNormal);
+                joinNormal = util::perp(joinNormal) * bevelLength * direction;
             }
 
             addCurrentVertex(currentVertex, flip, distance, joinNormal, 0, 0, false, startVertex,
