@@ -218,8 +218,8 @@ const LatLng TransformState::latLngForPixel(const vec2<double> pixel) const {
     LatLng ll = getLatLng();
     double zoom = getZoom();
 
-    const double centerX = width  / 2;
-    const double centerY = height / 2;
+    const double centerX = static_cast<double>(width) / 2.0;
+    const double centerY = static_cast<double>(height) / 2.0;
 
     const double m = Projection::getMetersPerPixelAtLatitude(0, zoom);
 
