@@ -8,14 +8,11 @@ FixtureLogObserver::LogMessage::LogMessage(EventSeverity severity_, Event event_
     : severity(severity_), event(event_), code(code_), msg(msg_) {
 }
 
-FixtureLogObserver::LogMessage::LogMessage() : severity(), event(), code(), msg() {
-}
-
 bool FixtureLogObserver::LogMessage::operator==(const LogMessage &rhs) const {
-    return (!severity || !rhs.severity || severity.get() == rhs.severity.get()) &&
-           (!event || !rhs.event || event.get() == rhs.event.get()) &&
-           (!code || !rhs.code || code.get() == rhs.code.get()) &&
-           (!msg || !rhs.msg || msg.get() == rhs.msg.get());
+    return severity == rhs.severity &&
+           event == rhs.event &&
+           code == rhs.code &&
+           msg == rhs.msg;
 }
 
 FixtureLogObserver::~FixtureLogObserver() {
@@ -60,11 +57,9 @@ std::vector<FixtureLogObserver::LogMessage> FixtureLogObserver::unchecked() cons
 }
 
 ::std::ostream &operator<<(::std::ostream &os, const FixtureLogObserver::LogMessage &message) {
-    os << "[\"" << message.severity.get() << "\", \"" << message.event.get() << "\"";
-    if (message.code)
-        os << ", " << message.code.get();
-    if (message.msg)
-        os << ", \"" << message.msg.get() << "\"";
+    os << "[\"" << message.severity << "\", \"" << message.event << "\"";
+    os << ", " << message.code;
+    os << ", \"" << message.msg << "\"";
     return os << "]" << std::endl;
 }
 

@@ -2,7 +2,6 @@
 #define MBGL_TEST_FIXTURE_LOG_OBSERVER
 
 #include <mbgl/platform/log.hpp>
-#include <mbgl/util/optional.hpp>
 
 #include <vector>
 #include <cstdarg>
@@ -14,14 +13,13 @@ class FixtureLogObserver : public Log::Observer {
 public:
     struct LogMessage {
         LogMessage(EventSeverity severity_, Event event_, int64_t code_, const std::string &msg_);
-        LogMessage();
 
         bool operator==(const LogMessage &rhs) const;
 
-        const mapbox::util::optional<EventSeverity> severity;
-        const mapbox::util::optional<Event> event;
-        const mapbox::util::optional<int64_t> code;
-        const mapbox::util::optional<std::string> msg;
+        const EventSeverity severity;
+        const Event event;
+        const int64_t code;
+        const std::string msg;
 
         mutable bool checked = false;
     };

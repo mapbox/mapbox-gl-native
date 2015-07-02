@@ -124,7 +124,7 @@ void runTestCase(MockFileSource::Type type,
     std::vector<FixtureLogObserver::LogMessage> logMessages = log->unchecked();
 
     for (auto& logMessage : logMessages) {
-        if (std::regex_match(*logMessage.msg, std::regex(message))) {
+        if (std::regex_match(logMessage.msg, std::regex(message))) {
             match++;
         }
     }
