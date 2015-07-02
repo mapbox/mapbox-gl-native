@@ -31,10 +31,10 @@ using GeoJSONVT = mapbox::util::geojsonvt::GeoJSONVT;
 class Annotation : private util::noncopyable {
     friend class AnnotationManager;
 public:
-    Annotation(AnnotationType, const AnnotationSegments&, const StyleProperties&);
+    Annotation(AnnotationType, const AnnotationSegments&, const AnnotationStyle&);
 
 public:
-    const StyleProperties styleProperties;
+    const AnnotationStyle style;
 
 private:
     LatLng getPoint() const;
@@ -67,7 +67,7 @@ public:
 
     std::unordered_set<TileID, TileID::Hash> removeAnnotations(const AnnotationIDs&, const uint8_t maxZoom);
     AnnotationIDs getOrderedShapeAnnotations() const { return orderedShapeAnnotations; }
-    const StyleProperties getAnnotationStyleProperties(uint32_t) const;
+    const AnnotationStyle& getAnnotationStyle(uint32_t) const;
 
     AnnotationIDs getAnnotationsInBounds(const LatLngBounds&, const uint8_t maxZoom, const AnnotationType& = AnnotationType::Any) const;
     LatLngBounds getBoundsForAnnotations(const AnnotationIDs&) const;
@@ -85,7 +85,7 @@ private:
         const AnnotationSegments&,
         const std::vector<std::vector<vec2<double>>>& projectedFeature,
         const AnnotationType&,
-        const StyleProperties&,
+        const AnnotationStyle&,
         const std::unordered_map<std::string, std::string>& featureProperties,
         const uint8_t maxZoom);
 

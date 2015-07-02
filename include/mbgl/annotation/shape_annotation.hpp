@@ -11,12 +11,12 @@ namespace mbgl {
 
 class ShapeAnnotation {
 public:
-    inline ShapeAnnotation(const AnnotationSegments& segments_, const StyleProperties& styleProperties_)
-        : segments(segments_), styleProperties(styleProperties_) {
+    inline ShapeAnnotation(const AnnotationSegments& segments_, const AnnotationStyle& style_)
+        : segments(segments_), style(style_) {
     }
 
     const AnnotationSegments segments;
-    const StyleProperties styleProperties;
+    const AnnotationStyle style;
 };
 
 }
