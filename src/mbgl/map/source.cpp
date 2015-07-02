@@ -290,18 +290,20 @@ TileData::State Source::addTile(MapData& data,
 
         // If we don't find working tile data, we're just going to load it.
         if (info.type == SourceType::Vector) {
-            new_tile.data =
-                std::make_shared<VectorTileData>(normalized_id, style, info,
+            auto tileData = std::make_shared<VectorTileData>(normalized_id, style, info,
                                                  transformState.getAngle(), data.getCollisionDebug());
-            new_tile.data->request(transformState.getPixelRatio(), callback);
+            tileData->request(transformState.getPixelRatio(), callback);
+            new_tile.data = tileData;
         } else if (info.type == SourceType::Raster) {
-            new_tile.data = std::make_shared<RasterTileData>(normalized_id, texturePool, info, style.workers);
-            new_tile.data->request(transformState.getPixelRatio(), callback);
+            auto tileData = std::make_shared<RasterTileData>(normalized_id, texturePool, info, style.workers);
+            tileData->request(transformState.getPixelRatio(), callback);
+            new_tile.data = tileData;
         } else if (info.type == SourceType::Annotations) {
-            new_tile.data = std::make_shared<LiveTileData>(normalized_id, data.annotationManager,
+            auto tileData = std::make_shared<LiveTileData>(normalized_id, data.annotationManager,
                                                            style, info,
                                                            transformState.getAngle(), data.getCollisionDebug());
-            new_tile.data->reparse(callback);
+            tileData->reparse(callback);
+            new_tile.data = tileData;
         } else {
             throw std::runtime_error("source type not implemented");
         }

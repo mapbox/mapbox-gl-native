@@ -60,11 +60,6 @@ void RasterTileData::request(float pixelRatio,
     });
 }
 
-bool RasterTileData::reparse(std::function<void()>) {
-    assert(false);
-    return false;
-}
-
 Bucket* RasterTileData::getBucket(StyleLayer const&) {
     return &bucket;
 }

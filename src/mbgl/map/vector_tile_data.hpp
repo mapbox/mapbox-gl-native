@@ -29,9 +29,9 @@ public:
     size_t countBuckets() const;
 
     void request(float pixelRatio,
-                 const std::function<void()>& callback) override;
+                 const std::function<void()>& callback);
 
-    bool reparse(std::function<void ()> callback) override;
+    virtual bool reparse(std::function<void ()> callback);
 
     void redoPlacement(float angle, bool collisionDebug) override;
 

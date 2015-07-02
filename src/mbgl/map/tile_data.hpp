@@ -70,15 +70,6 @@ public:
     TileData(const TileID&);
     virtual ~TileData() = default;
 
-    virtual void request(float pixelRatio,
-                         const std::function<void()>& callback) = 0;
-
-    // Schedule a tile reparse on a worker thread and call the callback on
-    // completion. It will return true if the work was schedule or false it was
-    // not, which can occur if the tile is already being parsed by another
-    // worker.
-    virtual bool reparse(std::function<void ()> callback) = 0;
-
     // Mark this tile as no longer needed and cancel any pending work.
     virtual void cancel() = 0;
 

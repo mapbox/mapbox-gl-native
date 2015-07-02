@@ -19,9 +19,7 @@ public:
     ~RasterTileData();
 
     void request(float pixelRatio,
-                 const std::function<void()>& callback) override;
-
-    bool reparse(std::function<void ()> callback) override;
+                 const std::function<void()>& callback);
 
     void cancel() override;
 
