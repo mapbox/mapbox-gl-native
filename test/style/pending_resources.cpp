@@ -55,7 +55,16 @@ TEST_P(PendingResources, DeleteMapObjectWithPendingRequest) {
 
 // In the test data below, "sprite" will match both "sprite.json" and "sprite.png" and cause two
 // requests to be canceled. "resources" will match everything but in practice will only test the
-// cancellation of the sprites and "source.json" because we only load the rest after "source.json"
+// cancellation of the sprites and "source_*.json" because we only load the rest after "source_*.json"
 // gets parsed.
 INSTANTIATE_TEST_CASE_P(Style, PendingResources,
-    ::testing::Values("source.json", "sprite.json", "sprite.png", "sprite", "vector.pbf", "glyphs.pbf", "resources"));
+    ::testing::Values(
+        "source_raster.json",
+        "source_vector.json",
+        "sprite.json",
+        "sprite.png",
+        "sprite",
+        "raster.png",
+        "vector.pbf",
+        "glyphs.pbf",
+        "resources"));

@@ -98,11 +98,11 @@ void runTestCase(MockFileSource::Type type,
         } catch (const util::GlyphRangeLoadingException&) {
             EXPECT_EQ(param, "glyphs.pbf");
         } catch (const util::SourceLoadingException&) {
-            EXPECT_EQ(param, "source.json");
+            EXPECT_TRUE(param == "source_raster.json" || param == "source_vector.json");
         } catch (const util::SpriteLoadingException&) {
             EXPECT_TRUE(param == "sprite.png" || param == "sprite.json");
         } catch (const util::TileLoadingException&) {
-            EXPECT_EQ(param, "vector.pbf");
+            EXPECT_TRUE(param == "raster.png" || param == "vector.pbf");
         } catch (const std::exception&) {
             EXPECT_TRUE(false) << "Unhandled exception.";
         }
@@ -160,6 +160,8 @@ TEST_P(ResourceLoading, RequestWithCorruptedData) {
 
     if (param == "vector.pbf") {
         message << "\\[1(5|6)\\/1638(3|4)\\/1638(3|4)\\]\\: pbf unknown field type exception";
+    } else if (param == "raster.png") {
+        message << "\\[17\\/6553(4|5|6|7)\\/6553(4|5|6|7)\\]\\: error parsing raster image";
     } else {
         message << "\\[test\\/fixtures\\/resources\\/" << param << "\\]";
     }
@@ -172,4 +174,11 @@ TEST_P(ResourceLoading, RequestWithCorruptedData) {
 }
 
 INSTANTIATE_TEST_CASE_P(Style, ResourceLoading,
-    ::testing::Values("source.json", "sprite.json", "sprite.png", "vector.pbf", "glyphs.pbf"));
+    ::testing::Values(
+        "source_raster.json",
+        "source_vector.json",
+        "sprite.json",
+        "sprite.png",
+        "raster.png",
+        "vector.pbf",
+        "glyphs.pbf"));
