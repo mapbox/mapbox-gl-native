@@ -1,49 +1,40 @@
 #include <mbgl/map/annotation.hpp>
 #include <mbgl/map/live_tile_data.hpp>
 #include <mbgl/map/live_tile.hpp>
+#include <mbgl/style/style_layer.hpp>
+#include <mbgl/map/source.hpp>
+#include <mbgl/text/collision_tile.hpp>
 #include <mbgl/util/worker.hpp>
 #include <mbgl/util/work_request.hpp>
+#include <mbgl/style/style.hpp>
 
 #include <sstream>
 
 using namespace mbgl;
 
 LiveTileData::LiveTileData(const TileID& id_,
-                           AnnotationManager& annotationManager_,
+                           const LiveTile* tile,
                            Style& style_,
                            const SourceInfo& source_,
-                           float angle_,
-                           bool collisionDebug_)
-    : VectorTileData(id_, style_, source_, angle_, collisionDebug_),
-      annotationManager(annotationManager_) {
-    // live features are always loaded
+                           std::function<void()> callback)
+    : TileData(id_),
+      worker(style_.workers),
+      tileWorker(id_,
+                 style_,
+                 style_.layers,
+                 source_.max_zoom,
+                 state,
+                 std::make_unique<CollisionTile>(id_.z, 4096,
+                                    source_.tile_size * id.overscaling,
+                                    0, false)) {
     state = State::loaded;
-}
 
-LiveTileData::~LiveTileData() {
-    cancel();
-}
-
-bool LiveTileData::reparse(std::function<void()> callback) {
-    if (parsing || (state != State::loaded && state != State::partial)) {
-        return false;
-    }
-
-    const LiveTile* tile = annotationManager.getTile(id);
     if (!tile) {
         state = State::parsed;
-        return true;
+        return;
     }
 
-    parsing = true;
-
     workRequest = worker.parseLiveTile(tileWorker, *tile, [this, callback] (TileParseResult result) {
-        parsing = false;
-
-        if (state == State::obsolete) {
-            return;
-        }
-
         if (result.is<State>()) {
             state = result.get<State>();
         } else {
@@ -53,6 +44,21 @@ bool LiveTileData::reparse(std::function<void()> callback) {
 
         callback();
     });
+}
 
-    return true;
+LiveTileData::~LiveTileData() {
+    cancel();
+}
+
+Bucket* LiveTileData::getBucket(const StyleLayer& layer) {
+    if (!isReady() || !layer.bucket) {
+        return nullptr;
+    }
+
+    return tileWorker.getBucket(layer);
+}
+
+void LiveTileData::cancel() {
+    state = State::obsolete;
+    workRequest.reset();
 }

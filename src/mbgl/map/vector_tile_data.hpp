@@ -8,13 +8,10 @@
 
 namespace mbgl {
 
-class SourceInfo;
-class Request;
-class Bucket;
-class SourceInfo;
-class StyleLayer;
 class Style;
+class SourceInfo;
 class WorkRequest;
+class Request;
 
 class VectorTileData : public TileData {
 public:
@@ -31,23 +28,20 @@ public:
     void request(float pixelRatio,
                  const std::function<void()>& callback);
 
-    virtual bool reparse(std::function<void ()> callback);
+    bool reparse(std::function<void ()> callback);
 
     void redoPlacement(float angle, bool collisionDebug) override;
 
     void cancel() override;
 
-protected:
+private:
     Worker& worker;
     TileWorker tileWorker;
     std::unique_ptr<WorkRequest> workRequest;
     bool parsing = false;
-
-private:
     const SourceInfo& source;
     Request* req = nullptr;
     std::string data;
-
     float lastAngle = 0;
     float currentAngle;
     bool lastCollisionDebug = 0;

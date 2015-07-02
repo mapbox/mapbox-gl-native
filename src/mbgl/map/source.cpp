@@ -235,7 +235,7 @@ bool Source::handlePartialTile(const TileID& id, Worker&) {
 
     // Note: this uses a raw pointer; we don't want the callback binding to have a
     // shared pointer.
-    VectorTileData* data = static_cast<VectorTileData*>(it->second.lock().get());
+    VectorTileData* data = dynamic_cast<VectorTileData*>(it->second.lock().get());
     if (!data) {
         return true;
     }
@@ -299,11 +299,8 @@ TileData::State Source::addTile(MapData& data,
             tileData->request(transformState.getPixelRatio(), callback);
             new_tile.data = tileData;
         } else if (info.type == SourceType::Annotations) {
-            auto tileData = std::make_shared<LiveTileData>(normalized_id, data.annotationManager,
-                                                           style, info,
-                                                           transformState.getAngle(), data.getCollisionDebug());
-            tileData->reparse(callback);
-            new_tile.data = tileData;
+            new_tile.data = std::make_shared<LiveTileData>(normalized_id,
+                data.annotationManager.getTile(normalized_id), style, info, callback);
         } else {
             throw std::runtime_error("source type not implemented");
         }
