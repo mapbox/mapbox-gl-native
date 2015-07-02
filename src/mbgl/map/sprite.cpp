@@ -15,62 +15,79 @@
 #include <string>
 #include <sstream>
 
-using namespace mbgl;
+namespace mbgl {
+
+struct Sprite::Loader {
+    bool loadedJSON = false;
+    bool loadedImage = false;
+    std::unique_ptr<Data> data = std::make_unique<Data>();
+
+    Request* jsonRequest = nullptr;
+    Request* spriteRequest = nullptr;
+
+    ~Loader() {
+        if (jsonRequest) {
+            util::ThreadContext::getFileSource()->cancel(jsonRequest);
+        }
+        if (spriteRequest) {
+            util::ThreadContext::getFileSource()->cancel(spriteRequest);
+        }
+    }
+};
 
 Sprite::Sprite(const std::string& baseUrl, float pixelRatio_)
     : pixelRatio(pixelRatio_ > 1 ? 2 : 1) {
     if (baseUrl.empty()) {
         // Treat a non-existent sprite as a successfully loaded empty sprite.
-        loadedImage = true;
-        loadedJSON = true;
         return;
     }
 
     std::string spriteURL(baseUrl + (pixelRatio_ > 1 ? "@2x" : "") + ".png");
     std::string jsonURL(baseUrl + (pixelRatio_ > 1 ? "@2x" : "") + ".json");
 
+    loader = std::make_unique<Loader>();
+
     FileSource* fs = util::ThreadContext::getFileSource();
-    jsonRequest = fs->request({ Resource::Kind::JSON, jsonURL }, util::RunLoop::getLoop(), [this, jsonURL](const Response &res) {
-        jsonRequest = nullptr;
+    loader->jsonRequest = fs->request({ Resource::Kind::JSON, jsonURL }, util::RunLoop::getLoop(),
+                                      [this, jsonURL](const Response& res) {
+        loader->jsonRequest = nullptr;
         if (res.status == Response::Successful) {
-            json = res.data;
-            loadedJSON = true;
+            loader->data->json = res.data;
+            loader->loadedJSON = true;
         } else {
             std::stringstream message;
-            message <<  "Failed to load [" << jsonURL << "]: " << res.message;
+            message << "Failed to load [" << jsonURL << "]: " << res.message;
             emitSpriteLoadingFailed(message.str());
             return;
         }
         emitSpriteLoadedIfComplete();
     });
 
-    spriteRequest = fs->request({ Resource::Kind::Image, spriteURL }, util::RunLoop::getLoop(), [this, spriteURL](const Response &res) {
-        spriteRequest = nullptr;
-        if (res.status == Response::Successful) {
-            image = res.data;
-            loadedImage = true;
-        } else {
-            std::stringstream message;
-            message <<  "Failed to load [" << spriteURL << "]: " << res.message;
-            emitSpriteLoadingFailed(message.str());
-            return;
-        }
-        emitSpriteLoadedIfComplete();
-    });
+    loader->spriteRequest =
+        fs->request({ Resource::Kind::Image, spriteURL }, util::RunLoop::getLoop(),
+                    [this, spriteURL](const Response& res) {
+            loader->spriteRequest = nullptr;
+            if (res.status == Response::Successful) {
+                loader->data->image = res.data;
+                loader->loadedImage = true;
+            } else {
+                std::stringstream message;
+                message << "Failed to load [" << spriteURL << "]: " << res.message;
+                emitSpriteLoadingFailed(message.str());
+                return;
+            }
+            emitSpriteLoadedIfComplete();
+        });
 }
 
 Sprite::~Sprite() {
-    if (jsonRequest) {
-        util::ThreadContext::getFileSource()->cancel(jsonRequest);
-    }
-
-    if (spriteRequest) {
-        util::ThreadContext::getFileSource()->cancel(spriteRequest);
-    }
 }
 
 void Sprite::emitSpriteLoadedIfComplete() {
-    if (isLoaded() && observer) {
+    assert(loader);
+    if (loader->loadedImage && loader->loadedJSON && observer) {
+        observer->onSpriteDataLoaded(std::move(loader->data));
+        loader.reset();
         observer->onSpriteLoaded();
     }
 }
@@ -84,10 +101,8 @@ void Sprite::emitSpriteLoadingFailed(const std::string& message) {
     observer->onSpriteLoadingFailed(error);
 }
 
-bool Sprite::isLoaded() const {
-    return loadedImage && loadedJSON;
-}
-
 void Sprite::setObserver(Observer* observer_) {
     observer = observer_;
 }
+
+} // namespace mbgl

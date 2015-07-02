@@ -18,10 +18,16 @@ class Request;
 
 class Sprite : private util::noncopyable {
 public:
+    struct Data {
+        std::string image;
+        std::string json;
+    };
+
     class Observer {
     public:
         virtual ~Observer() = default;
 
+        virtual void onSpriteDataLoaded(std::unique_ptr<Data>) = 0;
         virtual void onSpriteLoaded() = 0;
         virtual void onSpriteLoadingFailed(std::exception_ptr error) = 0;
     };
@@ -29,30 +35,24 @@ public:
     Sprite(const std::string& baseUrl, float pixelRatio);
     ~Sprite();
 
-    bool isLoaded() const;
+    inline bool isLoaded() const {
+        return loader == nullptr;
+    }
 
     const float pixelRatio;
 
     void setObserver(Observer* observer);
 
-    inline const std::string& getImage() const { return image; }
-    inline const std::string& getJSON() const { return json; }
-
 private:
     void emitSpriteLoadedIfComplete();
     void emitSpriteLoadingFailed(const std::string& message);
 
-    bool loadedJSON = false;
-    std::string json;
+    struct Loader;
+    std::unique_ptr<Loader> loader;
 
-    bool loadedImage = false;
-    std::string image;
-
-    Request* jsonRequest = nullptr;
-    Request* spriteRequest = nullptr;
     Observer* observer = nullptr;
 };
 
-}
+} // namespace mbgl
 
 #endif

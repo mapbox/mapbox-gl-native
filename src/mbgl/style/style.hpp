@@ -89,6 +89,7 @@ private:
     void onTileLoadingFailed(std::exception_ptr error) override;
 
     // Sprite::Observer implementation.
+    void onSpriteDataLoaded(std::unique_ptr<Sprite::Data>) override;
     void onSpriteLoaded() override;
     void onSpriteLoadingFailed(std::exception_ptr error) override;
 
