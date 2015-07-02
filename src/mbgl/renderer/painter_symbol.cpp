@@ -130,7 +130,7 @@ void Painter::renderSymbol(SymbolBucket &bucket, const StyleLayer &layer_desc, c
         collisionBoxShader->u_scale = std::pow(2, state.getNormalizedZoom() - id.z);
         collisionBoxShader->u_zoom = state.getNormalizedZoom() * 10;
         collisionBoxShader->u_maxzoom = (id.z + 1) * 10;
-        lineWidth(3.0f);
+        lineWidth(1.0f);
 
         config.depthRange = { strata, 1.0f };
         bucket.drawCollisionBoxes(*collisionBoxShader);
