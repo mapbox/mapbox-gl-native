@@ -69,7 +69,7 @@ CLLocationDegrees MGLDegreesFromRadians(CGFloat radians)
 @property (nonatomic) GLKView *glView;
 @property (nonatomic) UIImageView *glSnapshotView;
 @property (nonatomic) NSOperationQueue *regionChangeDelegateQueue;
-@property (nonatomic, readwrite) UIImageView *compassView;
+@property (nonatomic, readwrite) UIButton *compassButton;
 @property (nonatomic, readwrite) UIImageView *logoView;
 @property (nonatomic) NS_MUTABLE_ARRAY_OF(NSLayoutConstraint *) *logoViewConstraints;
 @property (nonatomic, readwrite) UIButton *attributionButton;
@@ -314,14 +314,16 @@ std::chrono::steady_clock::duration secondsAsDuration(float duration)
 
     // setup compass
     //
-    _compassView = [[UIImageView alloc] initWithImage:[MGLMapView resourceImageNamed:@"Compass.png"]];
-    _compassView.accessibilityLabel = @"Compass";
-    _compassView.frame = CGRectMake(0, 0, _compassView.image.size.width, _compassView.image.size.height);
-    _compassView.alpha = 0;
+    _compassButton = [UIButton buttonWithType:UIButtonTypeCustom];
+    UIImage *compassImage = [MGLMapView resourceImageNamed:@"Compass.png"];
+    [_compassButton setImage:compassImage forState:UIControlStateNormal];
+    _compassButton.accessibilityLabel = @"Compass";
+    _compassButton.frame = CGRectMake(0, 0, compassImage.size.width, compassImage.size.height);
+    _compassButton.alpha = 0;
+    [_compassButton addTarget:self action:@selector(resetNorthWithCompass:) forControlEvents:UIControlEventTouchUpInside];
     UIView *container = [[UIView alloc] initWithFrame:CGRectZero];
-    [container addSubview:_compassView];
+    [container addSubview:_compassButton];
     container.translatesAutoresizingMaskIntoConstraints = NO;
-    [container addGestureRecognizer:[[UITapGestureRecognizer alloc] initWithTarget:self action:@selector(handleCompassTapGesture:)]];
     [self addSubview:container];
 
     // setup interaction
@@ -499,7 +501,7 @@ std::chrono::steady_clock::duration secondsAsDuration(float duration)
 
     // compass
     //
-    UIView *compassContainer = self.compassView.superview;
+    UIView *compassContainer = self.compassButton.superview;
     if ([NSLayoutConstraint respondsToSelector:@selector(deactivateConstraints:)])
     {
         [NSLayoutConstraint deactivateConstraints:compassContainer.constraints];
@@ -539,6 +541,7 @@ std::chrono::steady_clock::duration secondsAsDuration(float duration)
                                  multiplier:1
                                    constant:5]];
 
+    UIImage *compassImage = [self.compassButton imageForState:UIControlStateNormal];
     [compassContainerConstraints addObject:
      [NSLayoutConstraint constraintWithItem:compassContainer
                                   attribute:NSLayoutAttributeWidth
@@ -546,7 +549,7 @@ std::chrono::steady_clock::duration secondsAsDuration(float duration)
                                      toItem:nil
                                   attribute:NSLayoutAttributeNotAnAttribute
                                  multiplier:1
-                                   constant:self.compassView.image.size.width]];
+                                   constant:compassImage.size.width]];
 
     [compassContainerConstraints addObject:
      [NSLayoutConstraint constraintWithItem:compassContainer
@@ -555,7 +558,7 @@ std::chrono::steady_clock::duration secondsAsDuration(float duration)
                                      toItem:nil
                                   attribute:NSLayoutAttributeNotAnAttribute
                                  multiplier:1
-                                   constant:self.compassView.image.size.height]];
+                                   constant:compassImage.size.height]];
     if ([NSLayoutConstraint respondsToSelector:@selector(activateConstraints:)])
     {
         [NSLayoutConstraint activateConstraints:compassContainerConstraints];
@@ -700,7 +703,7 @@ std::chrono::steady_clock::duration secondsAsDuration(float duration)
         [self.attributionSheet dismissWithClickedButtonIndex:self.attributionSheet.cancelButtonIndex animated:YES];
     }
 
-    if (self.compassView.alpha)
+    if (self.compassButton.alpha)
     {
         [self updateHeadingForDeviceOrientation];
         [self updateCompass];
@@ -789,7 +792,7 @@ std::chrono::steady_clock::duration secondsAsDuration(float duration)
 
 #pragma mark - Gestures -
 
-- (void)handleCompassTapGesture:(__unused id)sender
+- (void)resetNorthWithCompass:(__unused id)sender
 {
     [self resetNorthAnimated:YES];
 
@@ -1403,7 +1406,7 @@ std::chrono::steady_clock::duration secondsAsDuration(float duration)
     [UIView animateWithDuration:duration
                      animations:^
                      {
-                         self.compassView.transform = CGAffineTransformIdentity;
+                         self.compassButton.transform = CGAffineTransformIdentity;
                      }
                      completion:^(BOOL finished)
                      {
@@ -2628,27 +2631,27 @@ CLLocationCoordinate2D MGLLocationCoordinate2DFromLatLng(mbgl::LatLng latLng)
     while (degrees >= 360) degrees -= 360;
     while (degrees < 0) degrees += 360;
 
-    self.compassView.transform = CGAffineTransformMakeRotation(MGLRadiansFromDegrees(degrees));
+    self.compassButton.transform = CGAffineTransformMakeRotation(MGLRadiansFromDegrees(degrees));
 
-    if (_mbglMap->getBearing() && self.compassView.alpha < 1)
+    if (_mbglMap->getBearing() && self.compassButton.alpha < 1)
     {
         [UIView animateWithDuration:MGLAnimationDuration
                               delay:0
                             options:UIViewAnimationOptionBeginFromCurrentState
                          animations:^
                          {
-                             self.compassView.alpha = 1;
+                             self.compassButton.alpha = 1;
                          }
                          completion:nil];
     }
-    else if (_mbglMap->getBearing() == 0 && self.compassView.alpha > 0)
+    else if (_mbglMap->getBearing() == 0 && self.compassButton.alpha > 0)
     {
         [UIView animateWithDuration:MGLAnimationDuration
                               delay:0
                             options:UIViewAnimationOptionBeginFromCurrentState
                          animations:^
                          {
-                             self.compassView.alpha = 0;
+                             self.compassButton.alpha = 0;
                          }
                          completion:nil];
     }
