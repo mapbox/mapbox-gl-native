@@ -20,8 +20,6 @@ class SpriteStore : private util::noncopyable {
     using Sprites = std::map<std::string, std::shared_ptr<const SpriteImage>>;
 
 public:
-    SpriteStore(const float ratio);
-
     // Adds/replaces a Sprite image.
     void setSprite(const std::string&, std::shared_ptr<const SpriteImage> = nullptr);
 
@@ -36,9 +34,6 @@ public:
 
     // Returns Sprite images that changed since the last invocation of this function.
     Sprites getDirty();
-
-    // Pixel ratio of all sprite images in this storage object.
-    const float pixelRatio;
 
 private:
     void _setSprite(const std::string&, const std::shared_ptr<const SpriteImage>& = nullptr);

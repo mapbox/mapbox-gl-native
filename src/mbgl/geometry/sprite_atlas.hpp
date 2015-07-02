@@ -38,8 +38,7 @@ class SpriteAtlas : public util::noncopyable {
 public:
     typedef uint16_t dimension;
 
-    // Add way to construct this from another SpriteAtlas (e.g. with another pixelRatio)
-    SpriteAtlas(dimension width, dimension height, SpriteStore& store);
+    SpriteAtlas(dimension width, dimension height, float pixelRatio, SpriteStore& store);
     ~SpriteAtlas();
 
     // Returns the coordinates of an image that is sourced from the sprite image.

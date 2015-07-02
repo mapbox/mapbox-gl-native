@@ -11,7 +11,7 @@ TEST(Annotations, SpriteStore) {
     const auto sprite3 = std::make_shared<SpriteImage>(8, 8, 2, std::string(16 * 16 * 4, '\0'));
 
     using Sprites = std::map<std::string, std::shared_ptr<const SpriteImage>>;
-    SpriteStore store(2);
+    SpriteStore store;
 
     // Adding single
     store.setSprite("one", sprite1);
@@ -53,24 +53,17 @@ TEST(Annotations, SpriteStore) {
     EXPECT_EQ(Sprites(), store.getDirty());
 }
 
-TEST(Annotations, SpriteStoreWrongPixelRatio) {
+TEST(Annotations, SpriteStoreOtherPixelRatio) {
     FixtureLog log;
 
     const auto sprite1 = std::make_shared<SpriteImage>(8, 8, 1, std::string(8 * 8 * 4, '\0'));
 
     using Sprites = std::map<std::string, std::shared_ptr<const SpriteImage>>;
-    SpriteStore store(2);
+    SpriteStore store;
 
     // Adding mismatched sprite image
     store.setSprite("one", sprite1);
-    EXPECT_EQ(Sprites({}), store.getDirty());
-
-    EXPECT_EQ(1u, log.count({
-                      EventSeverity::Warning,
-                      Event::Sprite,
-                      int64_t(-1),
-                      "Sprite image has wrong pixel ratio",
-                  }));
+    EXPECT_EQ(Sprites({ { "one", sprite1 } }), store.getDirty());
 }
 
 TEST(Annotations, SpriteStoreMultiple) {
@@ -78,7 +71,7 @@ TEST(Annotations, SpriteStoreMultiple) {
     const auto sprite2 = std::make_shared<SpriteImage>(8, 8, 2, std::string(16 * 16 * 4, '\0'));
 
     using Sprites = std::map<std::string, std::shared_ptr<const SpriteImage>>;
-    SpriteStore store(2);
+    SpriteStore store;
 
     store.setSprites({
         { "one", sprite1 }, { "two", sprite2 },
@@ -98,7 +91,7 @@ TEST(Annotations, SpriteStoreReplaceWithDifferentDimensions) {
     const auto sprite2 = std::make_shared<SpriteImage>(9, 9, 2, std::string(18 * 18 * 4, '\0'));
 
     using Sprites = std::map<std::string, std::shared_ptr<const SpriteImage>>;
-    SpriteStore store(2);
+    SpriteStore store;
 
     store.setSprite("sprite", sprite1);
     store.setSprite("sprite", sprite2);

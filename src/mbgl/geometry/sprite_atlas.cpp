@@ -19,11 +19,11 @@
 
 using namespace mbgl;
 
-SpriteAtlas::SpriteAtlas(dimension width_, dimension height_, SpriteStore& store_)
+SpriteAtlas::SpriteAtlas(dimension width_, dimension height_, float pixelRatio_, SpriteStore& store_)
     : width(width_),
       height(height_),
       store(store_),
-      pixelRatio(store.pixelRatio),
+      pixelRatio(pixelRatio_),
       bin(width_, height_),
       dirty(true) {
 }
