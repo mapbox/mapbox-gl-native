@@ -321,7 +321,7 @@ std::vector<RenderItem> Painter::determineRenderOrder(const Style& style) {
             continue;
         }
 
-        util::ptr<Source> source = style.getSource(layer.bucket->source);
+        Source* source = style.getSource(layer.bucket->source);
         if (!source) {
             Log::Warning(Event::Render, "can't find source for layer '%s'", layer.id.c_str());
             continue;

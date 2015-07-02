@@ -113,7 +113,7 @@ void Style::recalculate(float z, TimePoint now) {
             continue;
         }
 
-        util::ptr<Source> source = getSource(layer->bucket->source);
+        Source* source = getSource(layer->bucket->source);
         if (!source) {
             continue;
         }
@@ -122,12 +122,12 @@ void Style::recalculate(float z, TimePoint now) {
     }
 }
 
-util::ptr<Source> Style::getSource(const std::string& id) const {
-    const auto it = std::find_if(sources.begin(), sources.end(), [&](util::ptr<Source> source) {
+Source* Style::getSource(const std::string& id) const {
+    const auto it = std::find_if(sources.begin(), sources.end(), [&](const auto& source) {
         return source->info.source_id == id;
     });
 
-    return it != sources.end() ? *it : nullptr;
+    return it != sources.end() ? it->get() : nullptr;
 }
 
 void Style::setDefaultTransitionDuration(Duration duration) {

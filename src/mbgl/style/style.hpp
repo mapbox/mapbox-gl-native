@@ -62,7 +62,7 @@ public:
         return lastError;
     }
 
-    util::ptr<Source> getSource(const std::string& id) const;
+    Source* getSource(const std::string& id) const;
 
     std::unique_ptr<GlyphStore> glyphStore;
     std::unique_ptr<GlyphAtlas> glyphAtlas;
@@ -70,7 +70,7 @@ public:
     std::unique_ptr<SpriteAtlas> spriteAtlas;
     std::unique_ptr<LineAtlas> lineAtlas;
 
-    std::vector<util::ptr<Source>> sources;
+    std::vector<std::unique_ptr<Source>> sources;
     std::vector<util::ptr<StyleLayer>> layers;
 
 private:

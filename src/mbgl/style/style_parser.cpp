@@ -39,11 +39,11 @@ void StyleParser::parse(JSVal document) {
         // create shape annotations source
         const std::string& shapeID = AnnotationManager::ShapeLayerID;
 
-        util::ptr<Source> shapeAnnotationsSource = std::make_shared<Source>();
-        sourcesMap.emplace(shapeID, shapeAnnotationsSource);
-        sources.emplace_back(shapeAnnotationsSource);
+        std::unique_ptr<Source> shapeAnnotationsSource = std::make_unique<Source>();
         shapeAnnotationsSource->info.type = SourceType::Annotations;
         shapeAnnotationsSource->info.source_id = shapeID;
+        sourcesMap.emplace(shapeID, shapeAnnotationsSource.get());
+        sources.emplace_back(std::move(shapeAnnotationsSource));
 
         // create point annotations layer
         const std::string& pointID = AnnotationManager::PointLayerID;
@@ -70,12 +70,12 @@ void StyleParser::parse(JSVal document) {
         parseLayout(iconOverlap, pointBucket);
 
         // create point annotations source & connect to bucket & layer
-        util::ptr<Source> pointAnnotationsSource = std::make_shared<Source>();
-        sourcesMap.emplace(pointID, pointAnnotationsSource);
-        sources.emplace_back(pointAnnotationsSource);
+        std::unique_ptr<Source> pointAnnotationsSource = std::make_unique<Source>();
         pointAnnotationsSource->info.type = SourceType::Annotations;
         pointAnnotationsSource->info.source_id = pointID;
         pointAnnotationsLayer->bucket = pointBucket;
+        sourcesMap.emplace(pointID, pointAnnotationsSource.get());
+        sources.emplace_back(std::move(pointAnnotationsSource));
     }
 
     if (document.HasMember("sprite")) {
@@ -227,14 +227,14 @@ void StyleParser::parseSources(JSVal value) {
         rapidjson::Value::ConstMemberIterator itr = value.MemberBegin();
         for (; itr != value.MemberEnd(); ++itr) {
             std::string name { itr->name.GetString(), itr->name.GetStringLength() };
-            util::ptr<Source> source = std::make_shared<Source>();
+            std::unique_ptr<Source> source = std::make_unique<Source>();
             parseRenderProperty<SourceTypeClass>(itr->value, source->info.type, "type");
             parseRenderProperty(itr->value, source->info.url, "url");
             parseRenderProperty(itr->value, source->info.tile_size, "tileSize");
             source->info.source_id = name;
             source->info.parseTileJSONProperties(itr->value);
-            sources.emplace_back(source);
-            sourcesMap.emplace(name, source);
+            sourcesMap.emplace(name, source.get());
+            sources.emplace_back(std::move(source));
         }
     } else {
         Log::Warning(Event::ParseStyle, "sources must be an object");
