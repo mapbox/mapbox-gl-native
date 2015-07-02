@@ -11,16 +11,18 @@
 
 using namespace mbgl;
 
-TileWorker::TileWorker(const TileID& id_,
+TileWorker::TileWorker(TileID id_,
+                       std::string sourceID_,
+                       const uint16_t maxZoom_,
                        Style& style_,
                        std::vector<util::ptr<StyleLayer>> layers_,
-                       const uint16_t maxZoom_,
                        const std::atomic<TileData::State>& state_,
                        std::unique_ptr<CollisionTile> collision_)
     : layers(std::move(layers_)),
-      style(style_),
       id(id_),
+      sourceID(sourceID_),
       maxZoom(maxZoom_),
+      style(style_),
       state(state_),
       collision(std::move(collision_)) {
     assert(style.sprite);
@@ -121,6 +123,8 @@ void TileWorker::parseLayer(const StyleLayer& layer, const GeometryTile& geometr
     const StyleBucket& styleBucket = *layer.bucket;
 
     // Skip this bucket if we are to not render this
+    if (styleBucket.source != sourceID)
+        return;
     if (id.z < std::floor(styleBucket.min_zoom) && std::floor(styleBucket.min_zoom) < maxZoom)
         return;
     if (id.z >= std::ceil(styleBucket.max_zoom))

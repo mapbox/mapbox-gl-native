@@ -31,10 +31,11 @@ using TileParseResult = mapbox::util::variant<
 
 class TileWorker : public util::noncopyable {
 public:
-    TileWorker(const TileID&,
+    TileWorker(TileID,
+               std::string sourceID,
+               uint16_t maxZoom,
                Style&,
                std::vector<util::ptr<StyleLayer>>,
-               const uint16_t maxZoom,
                const std::atomic<TileData::State>&,
                std::unique_ptr<CollisionTile>);
     ~TileWorker();
@@ -57,10 +58,11 @@ private:
     template <class Bucket>
     void addBucketGeometries(Bucket&, const GeometryTileLayer&, const FilterExpression&);
 
-    Style& style;
-
     const TileID id;
+    const std::string sourceID;
     const uint16_t maxZoom;
+
+    Style& style;
     const std::atomic<TileData::State>& state;
 
     bool partialParse = false;
