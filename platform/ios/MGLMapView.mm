@@ -1382,6 +1382,7 @@ std::chrono::steady_clock::duration secondsAsDuration(float duration)
 - (void)setDebugActive:(BOOL)debugActive
 {
     _mbglMap->setDebug(debugActive);
+    _mbglMap->setCollisionDebug(debugActive);
 }
 
 - (BOOL)isDebugActive
