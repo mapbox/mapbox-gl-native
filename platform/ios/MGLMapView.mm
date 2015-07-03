@@ -1400,19 +1400,6 @@ std::chrono::steady_clock::duration secondsAsDuration(float duration)
     CGFloat duration = (animated ? MGLAnimationDuration : 0);
 
     _mbglMap->setBearing(0, secondsAsDuration(duration));
-
-    [UIView animateWithDuration:duration
-                     animations:^
-                     {
-                         self.compassView.transform = CGAffineTransformIdentity;
-                     }
-                     completion:^(BOOL finished)
-                     {
-                         if (finished)
-                         {
-                             [self notifyMapChange:(animated ? mbgl::MapChangeRegionDidChangeAnimated : mbgl::MapChangeRegionDidChange)];
-                         }
-                     }];
 }
 
 - (void)resetPosition
@@ -2468,7 +2455,6 @@ CLLocationCoordinate2D MGLLocationCoordinate2DFromLatLng(mbgl::LatLng latLng)
         case mbgl::MapChangeRegionWillChangeAnimated:
         {
             [self updateUserLocationAnnotationView];
-            [self updateCompass];
 
             [self deselectAnnotation:self.selectedAnnotation animated:NO];
 
@@ -2511,6 +2497,7 @@ CLLocationCoordinate2D MGLLocationCoordinate2DFromLatLng(mbgl::LatLng latLng)
             {
                 [self.delegate mapViewRegionIsChanging:self];
             }
+            break;
         }
         case mbgl::MapChangeRegionDidChange:
         case mbgl::MapChangeRegionDidChangeAnimated:
@@ -2620,7 +2607,7 @@ CLLocationCoordinate2D MGLLocationCoordinate2DFromLatLng(mbgl::LatLng latLng)
 
 - (void)updateCompass
 {
-    CLLocationDirection degrees = -self.direction;
+    CLLocationDirection degrees = mbgl::util::wrap(-self.direction, 0., 360.);
 
     self.compassView.transform = CGAffineTransformMakeRotation(MGLRadiansFromDegrees(degrees));
 
