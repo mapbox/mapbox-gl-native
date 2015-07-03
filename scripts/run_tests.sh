@@ -5,7 +5,7 @@ set -o pipefail
 
 if [ `uname -s` = 'Darwin' ]; then HOST=${HOST:-osx} ; else HOST=${HOST:-linux} ; fi
 
-CMD=$1
+CMD=$@
 shift
 
 # allow writing core files
@@ -24,5 +24,9 @@ if [ ! -d "test/node_modules/express" ]; then
     (cd test; npm install express@4.11.1)
 fi
 
-gdb -batch -return-child-result -ex 'set print thread-events off' \
-    -ex 'run' -ex 'thread apply all bt' ${CMD}
+if which -s 'gdb'; then
+    gdb -batch -return-child-result -ex 'set print thread-events off' \
+        -ex 'run' -ex 'thread apply all bt' --args ${CMD} ;
+else
+    ${CMD} ;
+fi
