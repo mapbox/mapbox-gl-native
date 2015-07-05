@@ -337,7 +337,7 @@ void Transform::_setAngle(double new_angle, const Duration duration) {
 
         startTransition(
             [=](double t) {
-                state.angle = util::interpolate(startA, angle, t);
+                state.angle = util::wrap(util::interpolate(startA, angle, t), -M_PI, M_PI);
                 view.notifyMapChange(MapChangeRegionIsChanging);
                 return Update::Nothing;
             },
