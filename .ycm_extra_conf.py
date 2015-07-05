@@ -80,14 +80,18 @@ def MakeRelativePathsInFlagsAbsolute(flags, working_directory):
     return new_flags
 
 
+def FlagsForFileDefault():
+    return {
+        'flags': default_flags,
+        'do_cache': False,
+    }
+
+
 def FlagsForFileLinux(filename):
     working_directory = os.path.join('build', 'linux')
 
     if not os.path.exists(os.path.join(DirectoryOfThisScript(), working_directory)):
-        return {
-            'flags': default_flags,
-            'do_cache': False,
-        }
+        return FlagsForFileDefault()
 
     relative_source_path = filename.replace(DirectoryOfThisScript() + '/', '')
     relative_obj_path = os.path.splitext(relative_source_path)[0] + '.o'
@@ -98,10 +102,7 @@ def FlagsForFileLinux(filename):
     stdout, stderr = p.communicate()
 
     if p.returncode:
-        return {
-            'flags': default_flags,
-            'do_cache': False,
-        }
+        return FlagsForFileDefault()
 
     flags = stdout.split(' ')
     flags_relative = MakeRelativePathsInFlagsAbsolute(flags, os.path.join(DirectoryOfThisScript(), working_directory))
@@ -113,11 +114,49 @@ def FlagsForFileLinux(filename):
     }
 
 
+def FlagsForFileDarwin(filename):
+    working_directory = os.path.join('build', 'osx')
+
+    if not os.path.exists(os.path.join(DirectoryOfThisScript(), working_directory)):
+        return FlagsForFileDefault()
+
+    relative_source_path = filename.replace(DirectoryOfThisScript() + '/', '')
+    relative_obj_path = os.path.splitext(relative_source_path)[0] + '.o'
+
+    make_cmd = 'make -pn |grep "%s :=" |grep "NDEBUG" |tail -n 1 | cut -d\' \' -f4-' % relative_obj_path
+
+    p = subprocess.Popen([make_cmd], shell=True, stdout=subprocess.PIPE)
+    stdout, stderr = p.communicate()
+
+    if p.returncode:
+        return FlagsForFileDefault()
+
+    flags = stdout.split(' ')
+    flags_relative = MakeRelativePathsInFlagsAbsolute(flags, os.path.join(DirectoryOfThisScript(), working_directory))
+    flags_final = [flag for flag in flags_relative if flag.startswith("-")]
+
+    # Append OSX sysroot SDK path
+    xcrun_cmd = 'xcrun --show-sdk-path'
+
+    p = subprocess.Popen([xcrun_cmd], shell=True, stdout=subprocess.PIPE)
+    stdout, stderr = p.communicate()
+
+    if p.returncode:
+        return FlagsForFileDefault()
+
+    flags_final.append('-isysroot ' + stdout)
+
+    return {
+        'flags': flags_final,
+        'do_cache': True,
+    }
+
+
 def FlagsForFile(filename, **kwargs):
     if sys.platform.startswith('linux'):
         return FlagsForFileLinux(filename)
 
-    return {
-        'flags': default_flags,
-        'do_cache': False,
-    }
+    if sys.platform.startswith('darwin'):
+        return FlagsForFileDarwin(filename)
+
+    return FlagsForFileDefault()
