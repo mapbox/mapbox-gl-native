@@ -539,7 +539,7 @@ std::chrono::steady_clock::duration secondsAsDuration(float duration)
                                  multiplier:1
                                    constant:5]];
 
-    [compassContainerConstraints addObject:
+    [compassContainer addConstraint:
      [NSLayoutConstraint constraintWithItem:compassContainer
                                   attribute:NSLayoutAttributeWidth
                                   relatedBy:NSLayoutRelationEqual
@@ -548,7 +548,7 @@ std::chrono::steady_clock::duration secondsAsDuration(float duration)
                                  multiplier:1
                                    constant:self.compassView.image.size.width]];
 
-    [compassContainerConstraints addObject:
+    [compassContainer addConstraint:
      [NSLayoutConstraint constraintWithItem:compassContainer
                                   attribute:NSLayoutAttributeHeight
                                   relatedBy:NSLayoutRelationEqual
@@ -562,7 +562,7 @@ std::chrono::steady_clock::duration secondsAsDuration(float duration)
     }
     else
     {
-        [compassContainer addConstraints:compassContainerConstraints];
+        [constraintParentView addConstraints:compassContainerConstraints];
     }
 
     // logo bug
