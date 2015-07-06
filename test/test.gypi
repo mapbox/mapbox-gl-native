@@ -35,13 +35,14 @@
         'fixtures/fixture_log_observer.hpp',
         'fixtures/fixture_log_observer.cpp',
 
+        'miscellaneous/assert.cpp',
+
         'api/api_misuse.cpp',
         'api/repeated_render.cpp',
         'api/set_style.cpp',
 
         'headless/headless.cpp',
 
-        'miscellaneous/assert.cpp',
         'miscellaneous/clip_ids.cpp',
         'miscellaneous/binpack.cpp',
         'miscellaneous/bilinear.cpp',
