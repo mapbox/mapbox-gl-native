@@ -38,6 +38,7 @@ public:
                               int64_t code,
                               const std::string& msg) override;
 
+        bool empty() const;
         size_t count(const Message& message) const;
         std::vector<Message> unchecked() const;
 
@@ -48,6 +49,7 @@ public:
 
     FixtureLog();
 
+    bool empty() const;
     size_t count(const Message& message) const;
 
     ~FixtureLog();

@@ -6,6 +6,8 @@
 using namespace mbgl;
 
 TEST(Annotations, SpriteStore) {
+    FixtureLog log;
+
     const auto sprite1 = std::make_shared<SpriteImage>(8, 8, 2, std::string(16 * 16 * 4, '\0'));
     const auto sprite2 = std::make_shared<SpriteImage>(8, 8, 2, std::string(16 * 16 * 4, '\0'));
     const auto sprite3 = std::make_shared<SpriteImage>(8, 8, 2, std::string(16 * 16 * 4, '\0'));
@@ -41,8 +43,24 @@ TEST(Annotations, SpriteStore) {
 
     // Accessing
     EXPECT_EQ(sprite3, store.getSprite("three"));
+
+    EXPECT_TRUE(log.empty());
+
     EXPECT_EQ(nullptr, store.getSprite("two"));
     EXPECT_EQ(nullptr, store.getSprite("four"));
+
+    EXPECT_EQ(1u, log.count({
+                      EventSeverity::Info,
+                      Event::Sprite,
+                      int64_t(-1),
+                      "Can't find sprite named 'two'",
+                  }));
+    EXPECT_EQ(1u, log.count({
+                      EventSeverity::Info,
+                      Event::Sprite,
+                      int64_t(-1),
+                      "Can't find sprite named 'four'",
+                  }));
 
     // Overwriting
     store.setSprite("three", sprite1);

@@ -51,7 +51,12 @@ void SpriteStore::removeSprite(const std::string& name) {
 std::shared_ptr<const SpriteImage> SpriteStore::getSprite(const std::string& name) {
     std::lock_guard<std::mutex> lock(mutex);
     const auto it = sprites.find(name);
-    return it != sprites.end() ? it->second : nullptr;
+    if (it != sprites.end()) {
+        return it->second;
+    } else {
+         Log::Info(Event::Sprite, "Can't find sprite named '%s'", name.c_str());
+        return nullptr;
+    }
 }
 
 SpriteStore::Sprites SpriteStore::getDirty() {

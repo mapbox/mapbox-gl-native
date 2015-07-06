@@ -36,6 +36,10 @@ bool FixtureLog::Observer::onRecord(EventSeverity severity,
     return true;
 }
 
+bool FixtureLog::Observer::empty() const {
+    return messages.empty();
+}
+
 size_t FixtureLog::Observer::count(const Message& message) const {
     size_t message_count = 0;
     for (const auto& msg : messages) {
@@ -49,6 +53,10 @@ size_t FixtureLog::Observer::count(const Message& message) const {
 
 FixtureLog::FixtureLog() : observer(new FixtureLogObserver(this)) {
     Log::setObserver(std::unique_ptr<Log::Observer>(observer));
+}
+
+bool FixtureLog::empty() const {
+    return observer ? observer->empty() : true;
 }
 
 size_t FixtureLog::count(const FixtureLog::Message& message) const {

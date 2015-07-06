@@ -1,4 +1,5 @@
 #include "../fixtures/util.hpp"
+#include "../fixtures/fixture_log_observer.hpp"
 
 #include <mbgl/geometry/sprite_atlas.hpp>
 #include <mbgl/annotation/sprite_store.hpp>
@@ -9,6 +10,8 @@
 using namespace mbgl;
 
 TEST(Annotations, SpriteAtlas) {
+    FixtureLog log;
+
     SpriteStore store;
     store.setSprites(parseSprite(util::read_file("test/fixtures/annotations/emerald.png"),
                                  util::read_file("test/fixtures/annotations/emerald.json")));
@@ -55,6 +58,13 @@ TEST(Annotations, SpriteAtlas) {
     EXPECT_EQ(0, missing.pos.originalW);
     EXPECT_EQ(0, missing.pos.originalH);
     EXPECT_FALSE(missing.texture);
+
+    EXPECT_EQ(1u, log.count({
+                      EventSeverity::Info,
+                      Event::Sprite,
+                      int64_t(-1),
+                      "Can't find sprite named 'doesnotexist'",
+                  }));
 
     // Different wrapping mode produces different image.
     auto metro2 = atlas.getImage("metro", true);
