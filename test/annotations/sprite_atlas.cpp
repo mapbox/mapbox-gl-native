@@ -119,9 +119,58 @@ TEST(Annotations, SpriteAtlasSize) {
 
     const size_t bytes = atlas.getTextureWidth() * atlas.getTextureHeight() * 4;
     const auto hash = crc64(reinterpret_cast<const char*>(atlas.getData()), bytes);
-    EXPECT_EQ(0x2cdda7dbb04d116du, hash) << std::hex << hash;
+    EXPECT_EQ(0x2CDDA7DBB04D116Du, hash) << std::hex << hash;
 
     // util::write_file(
     //     "test/fixtures/annotations/atlas2.png",
+    //     util::compress_png(atlas.getTextureWidth(), atlas.getTextureHeight(), atlas.getData()));
+}
+
+TEST(Annotations, SpriteAtlasUpdates) {
+    SpriteStore store;
+
+    SpriteAtlas atlas(32, 32, 1, store);
+
+    EXPECT_EQ(1.0f, atlas.getPixelRatio());
+    EXPECT_EQ(32, atlas.getWidth());
+    EXPECT_EQ(32, atlas.getHeight());
+    EXPECT_EQ(32, atlas.getTextureWidth());
+    EXPECT_EQ(32, atlas.getTextureHeight());
+
+    store.setSprite("one", std::make_shared<SpriteImage>(16, 12, 1, std::string(16 * 12 * 4, '\x00')));
+    auto one = atlas.getImage("one", false);
+    EXPECT_EQ(0, one.pos.x);
+    EXPECT_EQ(0, one.pos.y);
+    EXPECT_EQ(20, one.pos.w);
+    EXPECT_EQ(16, one.pos.h);
+    EXPECT_EQ(16, one.pos.originalW);
+    EXPECT_EQ(12, one.pos.originalH);
+    EXPECT_EQ(16, one.texture->width);
+    EXPECT_EQ(12, one.texture->height);
+    EXPECT_EQ(16, one.texture->pixelWidth);
+    EXPECT_EQ(12, one.texture->pixelHeight);
+    EXPECT_EQ(1.0f, one.texture->pixelRatio);
+
+    const size_t bytes = atlas.getTextureWidth() * atlas.getTextureHeight() * 4;
+    const auto hash = crc64(reinterpret_cast<const char*>(atlas.getData()), bytes);
+    EXPECT_EQ(0x0000000000000000u, hash) << std::hex << hash;
+
+    // Update sprite
+    auto newSprite = std::make_shared<SpriteImage>(16, 12, 1, std::string(16 * 12 * 4, '\xFF'));
+    store.setSprite("one", newSprite);
+    ASSERT_EQ(newSprite, store.getSprite("one"));
+
+    // Atlas texture hasn't changed yet.
+    const auto hash2 = crc64(reinterpret_cast<const char*>(atlas.getData()), bytes);
+    EXPECT_EQ(0x0000000000000000u, hash2) << std::hex << hash2;
+
+    atlas.updateDirty();
+
+    // Now the atlas texture has changed.
+    const auto hash3 = crc64(reinterpret_cast<const char*>(atlas.getData()), bytes);
+    EXPECT_EQ(0x4E6D4900CD2D9149u, hash3) << std::hex << hash3;
+
+    // util::write_file(
+    //     "test/fixtures/annotations/atlas3.png",
     //     util::compress_png(atlas.getTextureWidth(), atlas.getTextureHeight(), atlas.getData()));
 }
