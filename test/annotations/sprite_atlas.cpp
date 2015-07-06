@@ -6,24 +6,6 @@
 #include <mbgl/util/io.hpp>
 #include <mbgl/util/image.hpp>
 
-#pragma GCC diagnostic push
-#pragma GCC diagnostic ignored "-Wshadow"
-#include <boost/crc.hpp>
-#pragma GCC diagnostic pop
-
-namespace {
-
-// from https://gist.github.com/ArtemGr/997887
-uint64_t crc64(const char* data, size_t size) {
-    boost::crc_optimal<64, 0x04C11DB7, 0, 0, false, false> crc;
-    crc.process_bytes(data, size);
-    return crc.checksum();
-}
-
-} // anonymous namespace
-
-using namespace mbgl;
-
 using namespace mbgl;
 
 TEST(Annotations, SpriteAtlas) {
@@ -84,7 +66,7 @@ TEST(Annotations, SpriteAtlas) {
     EXPECT_EQ(18, metro2.pos.originalH);
 
     const size_t bytes = atlas.getTextureWidth() * atlas.getTextureHeight() * 4;
-    const auto hash = crc64(reinterpret_cast<const char*>(atlas.getData()), bytes);
+    const auto hash = test::crc64(reinterpret_cast<const char*>(atlas.getData()), bytes);
     EXPECT_EQ(0x9875FC0595489A9Fu, hash) << std::hex << hash;
 
     // util::write_file(
@@ -118,7 +100,7 @@ TEST(Annotations, SpriteAtlasSize) {
     EXPECT_EQ(1.0f, metro.texture->pixelRatio);
 
     const size_t bytes = atlas.getTextureWidth() * atlas.getTextureHeight() * 4;
-    const auto hash = crc64(reinterpret_cast<const char*>(atlas.getData()), bytes);
+    const auto hash = test::crc64(reinterpret_cast<const char*>(atlas.getData()), bytes);
     EXPECT_EQ(0x2CDDA7DBB04D116Du, hash) << std::hex << hash;
 
     // util::write_file(
@@ -152,7 +134,7 @@ TEST(Annotations, SpriteAtlasUpdates) {
     EXPECT_EQ(1.0f, one.texture->pixelRatio);
 
     const size_t bytes = atlas.getTextureWidth() * atlas.getTextureHeight() * 4;
-    const auto hash = crc64(reinterpret_cast<const char*>(atlas.getData()), bytes);
+    const auto hash = test::crc64(reinterpret_cast<const char*>(atlas.getData()), bytes);
     EXPECT_EQ(0x0000000000000000u, hash) << std::hex << hash;
 
     // Update sprite
@@ -161,13 +143,13 @@ TEST(Annotations, SpriteAtlasUpdates) {
     ASSERT_EQ(newSprite, store.getSprite("one"));
 
     // Atlas texture hasn't changed yet.
-    const auto hash2 = crc64(reinterpret_cast<const char*>(atlas.getData()), bytes);
+    const auto hash2 = test::crc64(reinterpret_cast<const char*>(atlas.getData()), bytes);
     EXPECT_EQ(0x0000000000000000u, hash2) << std::hex << hash2;
 
     atlas.updateDirty();
 
     // Now the atlas texture has changed.
-    const auto hash3 = crc64(reinterpret_cast<const char*>(atlas.getData()), bytes);
+    const auto hash3 = test::crc64(reinterpret_cast<const char*>(atlas.getData()), bytes);
     EXPECT_EQ(0x4E6D4900CD2D9149u, hash3) << std::hex << hash3;
 
     // util::write_file(
