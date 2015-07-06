@@ -176,7 +176,7 @@ void GlyphAtlas::upload() {
         dirty = false;
 
 #if defined(DEBUG)
-        // platform::showDebugImage("Glyph Atlas", data.get(), width, height);
+        // platform::showDebugImage("Glyph Atlas", reinterpret_cast<char*>(data.get()), width, height);
 #endif
     }
 }
