@@ -63,6 +63,17 @@ TEST(Annotations, SpriteAtlas) {
     EXPECT_DOUBLE_EQ(21.0f / 63, pos.br[0]);
     EXPECT_DOUBLE_EQ(21.0f / 112, pos.br[1]);
 
+
+    auto missing = atlas.getImage("doesnotexist", false);
+    EXPECT_FALSE(missing.pos.hasArea());
+    EXPECT_EQ(0, missing.pos.x);
+    EXPECT_EQ(0, missing.pos.y);
+    EXPECT_EQ(0, missing.pos.w);
+    EXPECT_EQ(0, missing.pos.h);
+    EXPECT_EQ(0, missing.pos.originalW);
+    EXPECT_EQ(0, missing.pos.originalH);
+    EXPECT_FALSE(missing.texture);
+
     // Different wrapping mode produces different image.
     auto metro2 = atlas.getImage("metro", true);
     EXPECT_EQ(20, metro2.pos.x);
@@ -74,7 +85,7 @@ TEST(Annotations, SpriteAtlas) {
 
     const size_t bytes = atlas.getTextureWidth() * atlas.getTextureHeight() * 4;
     const auto hash = crc64(reinterpret_cast<const char*>(atlas.getData()), bytes);
-    EXPECT_EQ(0x9875fc0595489a9fu, hash) << std::hex << hash;
+    EXPECT_EQ(0x9875FC0595489A9Fu, hash) << std::hex << hash;
 
     // util::write_file(
     //     "test/fixtures/annotations/atlas1.png",
