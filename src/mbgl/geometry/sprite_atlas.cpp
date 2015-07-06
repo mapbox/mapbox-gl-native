@@ -22,8 +22,10 @@ using namespace mbgl;
 SpriteAtlas::SpriteAtlas(dimension width_, dimension height_, float pixelRatio_, SpriteStore& store_)
     : width(width_),
       height(height_),
-      store(store_),
+      pixelWidth(std::ceil(width * pixelRatio_)),
+      pixelHeight(std::ceil(height * pixelRatio_)),
       pixelRatio(pixelRatio_),
+      store(store_),
       bin(width_, height_),
       dirty(true) {
 }
@@ -103,10 +105,8 @@ SpriteAtlasPosition SpriteAtlas::getPosition(const std::string& name, bool repea
 
 void SpriteAtlas::allocate() {
     if (!data) {
-        dimension w = static_cast<dimension>(width * pixelRatio);
-        dimension h = static_cast<dimension>(height * pixelRatio);
-        data = std::make_unique<uint32_t[]>(w * h);
-        std::fill(data.get(), data.get() + w * h, 0);
+        data = std::make_unique<uint32_t[]>(pixelWidth * pixelHeight);
+        std::fill(data.get(), data.get() + pixelWidth * pixelHeight, 0);
     }
 }
 
@@ -121,12 +121,11 @@ void SpriteAtlas::copy(const Holder& holder, const bool wrap) {
 
     allocate();
     uint32_t *const dstData = data.get();
-    const vec2<uint32_t> dstSize { static_cast<unsigned int>(width * pixelRatio),
-                                   static_cast<unsigned int>(height * pixelRatio) };
-    const Rect<uint32_t> dstPos { static_cast<uint32_t>((offset + dst.x) * pixelRatio),
-                                  static_cast<uint32_t>((offset + dst.y) * pixelRatio),
-                                  static_cast<uint32_t>(dst.originalW * pixelRatio),
-                                  static_cast<uint32_t>(dst.originalH * pixelRatio) };
+    const vec2<uint32_t> dstSize{ pixelWidth, pixelHeight };
+    const Rect<uint32_t> dstPos{ static_cast<uint32_t>((offset + dst.x) * pixelRatio),
+                                 static_cast<uint32_t>((offset + dst.y) * pixelRatio),
+                                 static_cast<uint32_t>(dst.originalW * pixelRatio),
+                                 static_cast<uint32_t>(dst.originalH * pixelRatio) };
 
     util::bilinearScale(srcData, srcSize, srcPos, dstData, dstSize, dstPos, wrap);
 
@@ -230,8 +229,8 @@ void SpriteAtlas::bind(bool linear) {
                 GL_TEXTURE_2D, // GLenum target
                 0, // GLint level
                 GL_RGBA, // GLint internalformat
-                width * pixelRatio, // GLsizei width
-                height * pixelRatio, // GLsizei height
+                pixelWidth, // GLsizei width
+                pixelHeight, // GLsizei height
                 0, // GLint border
                 GL_RGBA, // GLenum format
                 GL_UNSIGNED_BYTE, // GLenum type
@@ -244,8 +243,8 @@ void SpriteAtlas::bind(bool linear) {
                 0, // GLint level
                 0, // GLint xoffset
                 0, // GLint yoffset
-                width * pixelRatio, // GLsizei width
-                height * pixelRatio, // GLsizei height
+                pixelWidth, // GLsizei width
+                pixelHeight, // GLsizei height
                 GL_RGBA, // GLenum format
                 GL_UNSIGNED_BYTE, // GLenum type
                 data.get() // const GLvoid *pixels
@@ -256,8 +255,7 @@ void SpriteAtlas::bind(bool linear) {
 
 #ifndef GL_ES_VERSION_2_0
         // platform::showColorDebugImage("Sprite Atlas", reinterpret_cast<const char*>(data.get()),
-        //                               width * pixelRatio, height * pixelRatio, width * pixelRatio,
-        //                               height * pixelRatio);
+        //                               pixelWidth, pixelHeight, pixelWidth, pixelHeight);
 #endif
     }
 };

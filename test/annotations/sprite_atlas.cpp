@@ -82,3 +82,14 @@ TEST(Annotations, SpriteAtlas) {
     //     "test/fixtures/annotations/atlas1.png",
     //     util::compress_png(atlas.getTextureWidth(), atlas.getTextureHeight(), atlas.getData()));
 }
+
+TEST(Annotations, SpriteAtlasSize) {
+    SpriteStore store;
+    SpriteAtlas atlas(63, 112, 1.4, store);
+
+    EXPECT_DOUBLE_EQ(1.4f, atlas.getPixelRatio());
+    EXPECT_EQ(63, atlas.getWidth());
+    EXPECT_EQ(112, atlas.getHeight());
+    EXPECT_EQ(89, atlas.getTextureWidth());
+    EXPECT_EQ(157, atlas.getTextureHeight());
+}

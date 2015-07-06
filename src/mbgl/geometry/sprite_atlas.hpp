@@ -61,17 +61,18 @@ public:
     // the texture is only bound when the data is out of date (=dirty).
     void upload();
 
-    inline float getWidth() const { return width; }
-    inline float getHeight() const { return height; }
-    inline float getTextureWidth() const { return width * pixelRatio; }
-    inline float getTextureHeight() const { return height * pixelRatio; }
+    inline dimension getWidth() const { return width; }
+    inline dimension getHeight() const { return height; }
+    inline dimension getTextureWidth() const { return pixelWidth; }
+    inline dimension getTextureHeight() const { return pixelHeight; }
     inline float getPixelRatio() const { return pixelRatio; }
     inline const uint32_t* getData() const { return data.get(); }
 
-    const dimension width = 0;
-    const dimension height = 0;
-
 private:
+    const dimension width, height;
+    const dimension pixelWidth, pixelHeight;
+    const float pixelRatio;
+
     struct Holder : private util::noncopyable {
         inline Holder(const std::shared_ptr<const SpriteImage>&, const Rect<dimension>&);
         inline Holder(Holder&&);
@@ -87,7 +88,6 @@ private:
 
     std::recursive_mutex mtx;
     SpriteStore& store;
-    const float pixelRatio;
     BinPack<dimension> bin;
     std::map<Key, Holder> images;
     std::set<std::string> uninitialized;
