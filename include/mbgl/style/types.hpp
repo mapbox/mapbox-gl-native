@@ -92,6 +92,8 @@ enum class JoinType : uint8_t {
     Miter,
     Bevel,
     Round,
+    // the following two types are for internal use only
+    FakeRound,
     FlipBevel
 };
 
@@ -99,6 +101,7 @@ MBGL_DEFINE_ENUM_CLASS(JoinTypeClass, JoinType, {
     { JoinType::Miter, "miter" },
     { JoinType::Bevel, "bevel" },
     { JoinType::Round, "round" },
+    { JoinType::FakeRound, "fakeround" },
     { JoinType::FlipBevel, "flipbevel" },
 });
 
