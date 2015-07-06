@@ -66,6 +66,7 @@ public:
     inline float getTextureWidth() const { return width * pixelRatio; }
     inline float getTextureHeight() const { return height * pixelRatio; }
     inline float getPixelRatio() const { return pixelRatio; }
+    inline const uint32_t* getData() const { return data.get(); }
 
     const dimension width = 0;
     const dimension height = 0;

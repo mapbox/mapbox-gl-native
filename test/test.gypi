@@ -37,6 +37,7 @@
 
         'miscellaneous/assert.cpp',
 
+        'annotations/sprite_atlas.cpp',
         'annotations/sprite_image.cpp',
         'annotations/sprite_store.cpp',
         'annotations/sprite_parser.cpp',
