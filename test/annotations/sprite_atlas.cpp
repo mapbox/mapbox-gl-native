@@ -40,7 +40,7 @@ TEST(Annotations, SpriteAtlas) {
     EXPECT_EQ(112, atlas.getTextureHeight());
 
     // Image hasn't been created yet.
-    EXPECT_FALSE(atlas.getData());
+    EXPECT_TRUE(atlas.getData());
 
     auto metro = atlas.getImage("metro", false);
     EXPECT_EQ(0, metro.pos.x);
@@ -72,8 +72,6 @@ TEST(Annotations, SpriteAtlas) {
     EXPECT_EQ(18, metro2.pos.originalW);
     EXPECT_EQ(18, metro2.pos.originalH);
 
-    EXPECT_TRUE(atlas.getData());
-
     const size_t bytes = atlas.getTextureWidth() * atlas.getTextureHeight() * 4;
     const auto hash = crc64(reinterpret_cast<const char*>(atlas.getData()), bytes);
     EXPECT_EQ(0x9875fc0595489a9fu, hash) << std::hex << hash;
@@ -85,6 +83,8 @@ TEST(Annotations, SpriteAtlas) {
 
 TEST(Annotations, SpriteAtlasSize) {
     SpriteStore store;
+    store.setSprites(parseSprite(util::read_file("test/fixtures/annotations/emerald.png"),
+                                 util::read_file("test/fixtures/annotations/emerald.json")));
     SpriteAtlas atlas(63, 112, 1.4, store);
 
     EXPECT_DOUBLE_EQ(1.4f, atlas.getPixelRatio());
@@ -92,4 +92,25 @@ TEST(Annotations, SpriteAtlasSize) {
     EXPECT_EQ(112, atlas.getHeight());
     EXPECT_EQ(89, atlas.getTextureWidth());
     EXPECT_EQ(157, atlas.getTextureHeight());
+
+    auto metro = atlas.getImage("metro", false);
+    EXPECT_EQ(0, metro.pos.x);
+    EXPECT_EQ(0, metro.pos.y);
+    EXPECT_EQ(20, metro.pos.w);
+    EXPECT_EQ(20, metro.pos.h);
+    EXPECT_EQ(18, metro.pos.originalW);
+    EXPECT_EQ(18, metro.pos.originalH);
+    EXPECT_EQ(18, metro.texture->width);
+    EXPECT_EQ(18, metro.texture->height);
+    EXPECT_EQ(18, metro.texture->pixelWidth);
+    EXPECT_EQ(18, metro.texture->pixelHeight);
+    EXPECT_EQ(1.0f, metro.texture->pixelRatio);
+
+    const size_t bytes = atlas.getTextureWidth() * atlas.getTextureHeight() * 4;
+    const auto hash = crc64(reinterpret_cast<const char*>(atlas.getData()), bytes);
+    EXPECT_EQ(0x2cdda7dbb04d116du, hash) << std::hex << hash;
+
+    // util::write_file(
+    //     "test/fixtures/annotations/atlas2.png",
+    //     util::compress_png(atlas.getTextureWidth(), atlas.getTextureHeight(), atlas.getData()));
 }

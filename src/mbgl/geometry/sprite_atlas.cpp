@@ -27,7 +27,9 @@ SpriteAtlas::SpriteAtlas(dimension width_, dimension height_, float pixelRatio_,
       pixelRatio(pixelRatio_),
       store(store_),
       bin(width_, height_),
+      data(std::make_unique<uint32_t[]>(pixelWidth * pixelHeight)),
       dirty(true) {
+    std::fill(data.get(), data.get() + pixelWidth * pixelHeight, 0);
 }
 
 Rect<SpriteAtlas::dimension> SpriteAtlas::allocateImage(const size_t pixel_width, const size_t pixel_height) {
@@ -103,13 +105,6 @@ SpriteAtlasPosition SpriteAtlas::getPosition(const std::string& name, bool repea
     };
 }
 
-void SpriteAtlas::allocate() {
-    if (!data) {
-        data = std::make_unique<uint32_t[]>(pixelWidth * pixelHeight);
-        std::fill(data.get(), data.get() + pixelWidth * pixelHeight, 0);
-    }
-}
-
 void SpriteAtlas::copy(const Holder& holder, const bool wrap) {
     const uint32_t *srcData = reinterpret_cast<const uint32_t *>(holder.texture->data.data());
     if (!srcData) return;
@@ -119,7 +114,6 @@ void SpriteAtlas::copy(const Holder& holder, const bool wrap) {
 
     const int offset = 1;
 
-    allocate();
     uint32_t *const dstData = data.get();
     const vec2<uint32_t> dstSize{ pixelWidth, pixelHeight };
     const Rect<uint32_t> dstPos{ static_cast<uint32_t>((offset + dst.x) * pixelRatio),
@@ -222,7 +216,6 @@ void SpriteAtlas::bind(bool linear) {
 
     if (dirty) {
         std::lock_guard<std::recursive_mutex> lock(mtx);
-        allocate();
 
         if (fullUploadRequired) {
             MBGL_CHECK_ERROR(glTexImage2D(

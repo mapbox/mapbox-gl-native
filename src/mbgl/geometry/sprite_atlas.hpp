@@ -82,7 +82,6 @@ private:
 
     using Key = std::pair<std::string, bool>;
 
-    void allocate();
     Rect<SpriteAtlas::dimension> allocateImage(size_t width, size_t height);
     void copy(const Holder& holder, const bool wrap);
 
@@ -91,7 +90,7 @@ private:
     BinPack<dimension> bin;
     std::map<Key, Holder> images;
     std::set<std::string> uninitialized;
-    std::unique_ptr<uint32_t[]> data;
+    const std::unique_ptr<uint32_t[]> data;
     std::atomic<bool> dirty;
     bool fullUploadRequired = true;
     uint32_t texture = 0;
