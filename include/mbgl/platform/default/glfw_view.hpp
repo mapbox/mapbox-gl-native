@@ -46,14 +46,18 @@ public:
 
 private:
     mbgl::LatLng makeRandomPoint() const;
+    static std::shared_ptr<const mbgl::SpriteImage>
+    makeSpriteImage(int width, int height, float pixelRatio);
 
     void addRandomPointAnnotations(int count);
     void addRandomShapeAnnotations(int count);
+    void addRandomCustomPointAnnotations(int count);
 
     void clearAnnotations();
     void popAnnotation();
 
     mbgl::AnnotationIDs annotationIDs;
+    std::vector<std::string> spriteIDs;
 
 private:
     bool fullscreen = false;

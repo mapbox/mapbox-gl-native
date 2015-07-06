@@ -1,5 +1,6 @@
 #include <mbgl/annotation/point_annotation.hpp>
 #include <mbgl/annotation/shape_annotation.hpp>
+#include <mbgl/annotation/sprite_image.hpp>
 #include <mbgl/platform/default/glfw_view.hpp>
 #include <mbgl/platform/gl.hpp>
 #include <mbgl/platform/log.hpp>
@@ -120,6 +121,9 @@ void GLFWView::onKey(GLFWwindow *window, int key, int /*scancode*/, int action, 
         case GLFW_KEY_Q:
             view->clearAnnotations();
             break;
+        case GLFW_KEY_P: {
+            view->addRandomCustomPointAnnotations(1);
+        } break;
         }
     }
 
@@ -150,6 +154,49 @@ mbgl::LatLng GLFWView::makeRandomPoint() const {
     return { lat, lon };
 }
 
+std::shared_ptr<const mbgl::SpriteImage>
+GLFWView::makeSpriteImage(int width, int height, float pixelRatio) {
+    const int r = 255 * (double(std::rand()) / RAND_MAX);
+    const int g = 255 * (double(std::rand()) / RAND_MAX);
+    const int b = 255 * (double(std::rand()) / RAND_MAX);
+
+    const int w = std::ceil(pixelRatio * width);
+    const int h = std::ceil(pixelRatio * height);
+
+    std::string pixels(w * h * 4, '\x00');
+    auto data = reinterpret_cast<uint32_t*>(const_cast<char*>(pixels.data()));
+    const int dist = (w / 2) * (w / 2);
+    for (int y = 0; y < h; y++) {
+        for (int x = 0; x < w; x++) {
+            const int dx = x - w / 2;
+            const int dy = y - h / 2;
+            const int diff = dist - (dx * dx + dy * dy);
+            if (diff > 0) {
+                const int a = std::min(0xFF, diff) * 0xFF / dist;
+                // Premultiply the rgb values with alpha
+                data[w * y + x] =
+                    (a << 24) | ((a * r / 0xFF) << 16) | ((a * g / 0xFF) << 8) | (a * b / 0xFF);
+            }
+        }
+    }
+
+    return std::make_shared<mbgl::SpriteImage>(width, height, pixelRatio, std::move(pixels));
+}
+
+void GLFWView::addRandomCustomPointAnnotations(int count) {
+    std::vector<mbgl::PointAnnotation> points;
+
+    for (int i = 0; i < count; i++) {
+        static int spriteID = 1;
+        const auto name = std::string{ "marker-" } + std::to_string(spriteID++);
+        map->setSprite(name, makeSpriteImage(22, 22, 1));
+        spriteIDs.push_back(name);
+        points.emplace_back(makeRandomPoint(), name);
+    }
+
+    auto newIDs = map->addPointAnnotations(points);
+    annotationIDs.insert(annotationIDs.end(), newIDs.begin(), newIDs.end());
+}
 
 void GLFWView::addRandomPointAnnotations(int count) {
     std::vector<mbgl::PointAnnotation> points;
