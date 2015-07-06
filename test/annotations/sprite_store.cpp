@@ -100,7 +100,7 @@ TEST(Annotations, SpriteStoreReplaceWithDifferentDimensions) {
                       EventSeverity::Warning,
                       Event::Sprite,
                       int64_t(-1),
-                      "Can't change sprite dimensions",
+                      "Can't change sprite dimensions for 'sprite'",
                   }));
 
     EXPECT_EQ(sprite1, store.getSprite("sprite"));

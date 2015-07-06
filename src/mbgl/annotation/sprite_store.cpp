@@ -15,7 +15,7 @@ void SpriteStore::_setSprite(const std::string& name,
         auto it = sprites.find(name);
         if (it != sprites.end() &&
             (it->second->width != sprite->width || it->second->height != sprite->height)) {
-            Log::Warning(Event::Sprite, "Can't change sprite dimensions");
+            Log::Warning(Event::Sprite, "Can't change sprite dimensions for '%s'", name.c_str());
             return;
         }
 
