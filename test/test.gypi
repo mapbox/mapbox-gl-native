@@ -46,6 +46,7 @@
         'api/repeated_render.cpp',
         'api/set_style.cpp',
 
+        'headless/custom_sprites.cpp',
         'headless/headless.cpp',
 
         'miscellaneous/clip_ids.cpp',

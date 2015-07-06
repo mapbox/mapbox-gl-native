@@ -150,7 +150,11 @@ TEST_P(HeadlessTest, render) {
         map.setLatLngZoom(mbgl::LatLng(latitude, longitude), zoom);
         map.setBearing(bearing);
 
-        map.renderStill([&](std::exception_ptr, std::unique_ptr<const StillImage> image) {
+        map.renderStill([&](std::exception_ptr error, std::unique_ptr<const StillImage> image) {
+            if (error) {
+                promise.set_exception(error);
+                return;
+            }
             const std::string png = util::compress_png(image->width, image->height, image->pixels.get());
             util::write_file("test/suite/tests/" + base + "/" + name +  "/actual.png", png);
             promise.set_value();
