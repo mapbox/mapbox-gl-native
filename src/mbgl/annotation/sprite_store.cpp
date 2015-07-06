@@ -13,14 +13,24 @@ void SpriteStore::_setSprite(const std::string& name,
                              const std::shared_ptr<const SpriteImage>& sprite) {
     if (sprite) {
         auto it = sprites.find(name);
-        if (it != sprites.end() &&
-            (it->second->width != sprite->width || it->second->height != sprite->height)) {
-            Log::Warning(Event::Sprite, "Can't change sprite dimensions for '%s'", name.c_str());
-            return;
+        if (it != sprites.end()) {
+            // There is already a sprite with that name in our store.
+            if ((it->second->width != sprite->width || it->second->height != sprite->height)) {
+                Log::Warning(Event::Sprite, "Can't change sprite dimensions for '%s'", name.c_str());
+                return;
+            }
+            it->second = sprite;
+        } else {
+            sprites.emplace(name, sprite);
         }
 
-        sprites.emplace_hint(it, name, sprite);
-        dirty.emplace(name, sprite);
+        // Always add/replace the value in the dirty list.
+        auto dirty_it = dirty.find(name);
+        if (dirty_it != dirty.end()) {
+            dirty_it->second = sprite;
+        } else {
+            dirty.emplace(name, sprite);
+        }
     } else if (sprites.erase(name) > 0) {
         dirty.emplace(name, nullptr);
     }
