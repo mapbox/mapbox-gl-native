@@ -19,6 +19,10 @@ public:
     RunLoop(uv_loop_t*);
     ~RunLoop();
 
+    static RunLoop* Get() {
+        return current.get();
+    }
+
     static uv_loop_t* getLoop() {
         return current.get()->get();
     }
@@ -35,6 +39,25 @@ public:
 
         withMutex([&] { queue.push(task); });
         async.send();
+    }
+
+    // Post the cancellable work fn(args...) to this RunLoop.
+    template <class Fn, class... Args>
+    std::unique_ptr<WorkRequest>
+    invokeCancellable(Fn&& fn, Args&&... args) {
+        auto flag = std::make_shared<bool>();
+        *flag = false;
+
+        auto tuple = std::make_tuple(std::move(args)...);
+        auto task = std::make_shared<Invoker<Fn, decltype(tuple)>>(
+            std::move(fn),
+            std::move(tuple),
+            flag);
+
+        withMutex([&] { queue.push(task); });
+        async.send();
+
+        return std::make_unique<WorkRequest>(task);
     }
 
     // Invoke fn(args...) on this RunLoop, then invoke callback(results...) on the current RunLoop.
@@ -85,7 +108,7 @@ private:
 
         void operator()() override {
             // Lock the mutex while processing so that cancel() will block.
-            std::lock_guard<std::mutex> lock(mutex);
+            std::lock_guard<std::recursive_mutex> lock(mutex);
             if (!canceled || !*canceled) {
                 invoke(std::make_index_sequence<std::tuple_size<P>::value>{});
             }
@@ -100,7 +123,7 @@ private:
         // If the task has completed and the after callback has executed, this will
         // do nothing.
         void cancel() override {
-            std::lock_guard<std::mutex> lock(mutex);
+            std::lock_guard<std::recursive_mutex> lock(mutex);
             *canceled = true;
         }
 
@@ -110,7 +133,7 @@ private:
             func(std::get<I>(std::forward<P>(params))...);
         }
 
-        std::mutex mutex;
+        std::recursive_mutex mutex;
         std::shared_ptr<bool> canceled;
 
         F func;
@@ -123,7 +146,7 @@ private:
     void process();
 
     Queue queue;
-    std::mutex mutex;
+    std::recursive_mutex mutex;
     uv::async async;
 
     static uv::tls<RunLoop> current;
