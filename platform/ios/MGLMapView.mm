@@ -1958,15 +1958,12 @@ CLLocationCoordinate2D MGLLocationCoordinate2DFromLatLng(mbgl::LatLng latLng)
     std::vector<uint32_t> annotationIDsToRemove;
     annotationIDsToRemove.reserve(annotations.count);
 
-    NSMutableSet *affectedSymbols = [NSMutableSet set];
-
     for (id <MGLAnnotation> annotation in annotations)
     {
         assert([annotation conformsToProtocol:@protocol(MGLAnnotation)]);
 
         NSDictionary *infoDictionary = [self.annotationIDsByAnnotation objectForKey:annotation];
         annotationIDsToRemove.push_back([[infoDictionary objectForKey:MGLAnnotationIDKey] unsignedIntValue]);
-        [affectedSymbols addObject:[infoDictionary objectForKey:MGLAnnotationSymbolKey]];
 
         [self.annotationIDsByAnnotation removeObjectForKey:annotation];
 
@@ -1977,22 +1974,6 @@ CLLocationCoordinate2D MGLLocationCoordinate2DFromLatLng(mbgl::LatLng latLng)
     }
 
     _mbglMap->removeAnnotations(annotationIDsToRemove);
-
-//    NSArray *symbolsInUse = (self.annotationIDsByAnnotation.count ?
-//        [self.annotationIDsByAnnotation valueForKey:MGLAnnotationSymbolKey] :
-//        @[]);
-//    NSSet *uniqueSymbolsInUse = [NSSet setWithArray:symbolsInUse];
-//
-//    for (NSString *symbol in affectedSymbols)
-//    {
-//        if ([symbol length] && ! [uniqueSymbolsInUse containsObject:symbol])
-//        {
-//            std::string sprite([symbol UTF8String]);
-//            _mbglMap->removeSprite(sprite);
-//
-//            NSLog(@"cleaned up sprite %s", sprite.c_str());
-//        }
-//    }
 }
 
 - (MGLAnnotationImage *)dequeueReusableAnnotationImageWithIdentifier:(NSString *)identifier
