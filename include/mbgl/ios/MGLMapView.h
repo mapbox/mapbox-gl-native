@@ -265,7 +265,7 @@ IB_DESIGNABLE
 *
 *   @param identifier A string identifying the annotation image to be reused. This string is the same one you specify when initially returning the annotation image object using the mapView:imageForAnnotation: method.
 *   @return An annotation image object with the specified identifier, or `nil` if no such object exists in the reuse queue. */
-- (MGLAnnotationImage *)dequeueReusableAnnotationImageWithIdentifier:(NSString *)identifier;
+- (nullable MGLAnnotationImage *)dequeueReusableAnnotationImageWithIdentifier:(NSString *)identifier;
 
 #pragma mark - Managing Annotation Selections
 
