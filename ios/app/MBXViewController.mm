@@ -349,8 +349,6 @@ mbgl::Settings_NSUserDefaults *settings = nullptr;
 
     if ( ! image)
     {
-        NSLog(@"iOS: creating sprite for %p / '%@'", annotation, lastTwoCharacters);
-
         CGRect rect = CGRectMake(0, 0, 20, 15);
 
         UIGraphicsBeginImageContextWithOptions(rect.size, NO, [[UIScreen mainScreen] scale]);
@@ -376,10 +374,6 @@ mbgl::Settings_NSUserDefaults *settings = nullptr;
         image = [MGLAnnotationImage annotationImageWithImage:UIGraphicsGetImageFromCurrentImageContext() reuseIdentifier:lastTwoCharacters];
 
         UIGraphicsEndImageContext();
-    }
-    else
-    {
-        NSLog(@"iOS: reusing sprite for %p / '%@'", annotation, lastTwoCharacters);
     }
 
     return image;

@@ -1907,13 +1907,7 @@ CLLocationCoordinate2D MGLLocationCoordinate2DFromLatLng(mbgl::LatLng latLng)
 
                         // sprite upload
                         _mbglMap->setSprite(cSymbolName, cSpriteImage);
-
-                        NSLog(@"GL: uploaded sprite with name '%@'", [NSString stringWithUTF8String:cSymbolName.c_str()]);
                     }
-                }
-                else
-                {
-                    NSLog(@"GL: using default symbol");
                 }
             }
 
