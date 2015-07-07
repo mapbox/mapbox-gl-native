@@ -1,5 +1,7 @@
 #import <UIKit/UIKit.h>
 
+NS_ASSUME_NONNULL_BEGIN
+
 @interface MGLAnnotationImage : NSObject
 
 @property (nonatomic, readonly) UIImage *image;
@@ -8,3 +10,5 @@
 + (instancetype)annotationImageWithImage:(UIImage *)image reuseIdentifier:(NSString *)reuseIdentifier;
 
 @end
+
+NS_ASSUME_NONNULL_END
