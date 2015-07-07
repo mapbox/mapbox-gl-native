@@ -361,7 +361,7 @@ mbgl::Settings_NSUserDefaults *settings = nullptr;
         UIGraphicsBeginImageContextWithOptions(rect.size, NO, [[UIScreen mainScreen] scale]);
         CGContextRef ctx = UIGraphicsGetCurrentContext();
         CGContextSetFillColorWithColor(ctx, [[[UIColor redColor] colorWithAlphaComponent:0.25] CGColor]);
-        CGContextFillEllipseInRect(ctx, rect);
+        CGContextFillRect(ctx, rect);
         image = [MGLAnnotationImage annotationImageWithImage:UIGraphicsGetImageFromCurrentImageContext() reuseIdentifier:identifier];
         UIGraphicsEndImageContext();
     }

@@ -18,6 +18,7 @@
 #include <mbgl/util/geo.hpp>
 #include <mbgl/util/math.hpp>
 #include <mbgl/util/constants.hpp>
+#include <mbgl/util/image.hpp>
 
 #import "MapboxGL.h"
 
@@ -1882,40 +1883,26 @@ CLLocationCoordinate2D MGLLocationCoordinate2DFromLatLng(mbgl::LatLng latLng)
                         // store image & symbol name
                         [self.annotationImages setObject:annotationImage forKey:annotationImage.reuseIdentifier];
 
-                        // manually draw random-colored sprite for now
-                        float pixelRatio = [[UIScreen mainScreen] scale];
-                        float width = 20;
-                        float height = 20;
-
-                        const int r = 255 * (double(std::rand()) / RAND_MAX);
-                        const int g = 255 * (double(std::rand()) / RAND_MAX);
-                        const int b = 255 * (double(std::rand()) / RAND_MAX);
-
-                        const int w = std::ceil(pixelRatio * width);
-                        const int h = std::ceil(pixelRatio * height);
-
-                        std::string pixels(w * h * 4, '\x00');
-                        auto data = reinterpret_cast<uint32_t*>(const_cast<char*>(pixels.data()));
-                        const int dist = (w / 2) * (w / 2);
-                        for (int y = 0; y < h; y++) {
-                            for (int x = 0; x < w; x++) {
-                                const int dx = x - w / 2;
-                                const int dy = y - h / 2;
-                                const int diff = dist - (dx * dx + dy * dy);
-                                if (diff > 0) {
-                                    const int a = std::min(0xFF, diff) * 0xFF / dist;
-                                    // Premultiply the rgb values with alpha
-                                    data[w * y + x] =
-                                    (a << 24) | ((a * r / 0xFF) << 16) | ((a * g / 0xFF) << 8) | (a * b / 0xFF);
-                                }
-                            }
-                        }
+                        // retrieve pixels
+                        CGImageRef image = annotationImage.image.CGImage;
+                        size_t width = CGImageGetWidth(image);
+                        size_t height = CGImageGetHeight(image);
+                        CGColorSpaceRef colorSpace = CGColorSpaceCreateDeviceRGB();
+                        std::string pixels(width * height * 4, '\0');
+                        size_t bytesPerPixel = 4;
+                        size_t bytesPerRow = bytesPerPixel * width;
+                        size_t bitsPerComponent = 8;
+                        char *pixelData = const_cast<char *>(pixels.data());
+                        CGContextRef context = CGBitmapContextCreate(pixelData, width, height, bitsPerComponent, bytesPerRow, colorSpace, kCGImageAlphaPremultipliedLast);
+                        CGContextDrawImage(context, CGRectMake(0, 0, width, height), image);
+                        CGContextRelease(context);
+                        CGColorSpaceRelease(colorSpace);
 
                         // add sprite
                         auto cSpriteImage = std::make_shared<mbgl::SpriteImage>(
-                            width,
-                            height,
-                            pixelRatio,
+                            uint16_t(annotationImage.image.size.width),
+                            uint16_t(annotationImage.image.size.height),
+                            float(annotationImage.image.scale),
                             std::move(pixels));
 
                         // sprite upload
