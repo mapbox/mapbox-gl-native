@@ -112,7 +112,12 @@ void MapContext::setStyleURL(const std::string& url) {
         if (res.status == Response::Successful) {
             loadStyleJSON(res.data, base);
         } else {
-            Log::Error(Event::Setup, "loading style failed: %s", res.message.c_str());
+            if (res.message.substr(res.message.length() - 3) == "404" &&
+                (styleURL.find("mapbox://") != std::string::npos)) {
+                Log::Error(Event::Setup, "style %s could not be found or is not compatible", styleURL.c_str());
+            } else {
+                Log::Error(Event::Setup, "loading style failed: %s", res.message.c_str());
+            }
         }
     });
 }
