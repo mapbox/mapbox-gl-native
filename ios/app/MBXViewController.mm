@@ -342,32 +342,44 @@ mbgl::Settings_NSUserDefaults *settings = nullptr;
 
 - (MGLAnnotationImage *)mapView:(MGLMapView * __nonnull)mapView imageForAnnotation:(id <MGLAnnotation> __nonnull)annotation
 {
-    if ([[((MGLPointAnnotation *)annotation) title] hasSuffix:@"7"])
-    {
-        NSLog(@"iOS: %p annotation title ends in '7'; using default sprite", annotation);
+    NSString *title = [(MGLPointAnnotation *)annotation title];
+    NSString *lastTwoCharacters = [title substringFromIndex:title.length - 2];
 
-        return nil;
-    }
-
-    static NSString *identifier = @"red_square";
-
-    MGLAnnotationImage *image = [mapView dequeueReusableAnnotationImageWithIdentifier:identifier];
+    MGLAnnotationImage *image = [mapView dequeueReusableAnnotationImageWithIdentifier:lastTwoCharacters];
 
     if ( ! image)
     {
-        NSLog(@"iOS: creating sprite for %p / %@", annotation, identifier);
+        NSLog(@"iOS: creating sprite for %p / '%@'", annotation, lastTwoCharacters);
 
-        CGRect rect = CGRectMake(0, 0, 20, 20);
+        CGRect rect = CGRectMake(0, 0, 20, 15);
+
         UIGraphicsBeginImageContextWithOptions(rect.size, NO, [[UIScreen mainScreen] scale]);
+
         CGContextRef ctx = UIGraphicsGetCurrentContext();
-        CGContextSetFillColorWithColor(ctx, [[[UIColor redColor] colorWithAlphaComponent:0.25] CGColor]);
+
+        CGContextSetFillColorWithColor(ctx, [[[UIColor redColor] colorWithAlphaComponent:0.75] CGColor]);
         CGContextFillRect(ctx, rect);
-        image = [MGLAnnotationImage annotationImageWithImage:UIGraphicsGetImageFromCurrentImageContext() reuseIdentifier:identifier];
+
+        CGContextSetStrokeColorWithColor(ctx, [[UIColor blackColor] CGColor]);
+        CGContextStrokeRectWithWidth(ctx, rect, 2);
+
+        NSAttributedString *drawString = [[NSAttributedString alloc] initWithString:lastTwoCharacters attributes:@{
+            NSFontAttributeName: [UIFont fontWithName:@"Arial-BoldMT" size:12],
+            NSForegroundColorAttributeName: [UIColor whiteColor] }];
+        CGSize stringSize = drawString.size;
+        CGRect stringRect = CGRectMake((rect.size.width - stringSize.width) / 2,
+                                       (rect.size.height - stringSize.height) / 2,
+                                       stringSize.width,
+                                       stringSize.height);
+        [drawString drawInRect:stringRect];
+
+        image = [MGLAnnotationImage annotationImageWithImage:UIGraphicsGetImageFromCurrentImageContext() reuseIdentifier:lastTwoCharacters];
+
         UIGraphicsEndImageContext();
     }
     else
     {
-        NSLog(@"iOS: reusing sprite for %p / %@", annotation, identifier);
+        NSLog(@"iOS: reusing sprite for %p / '%@'", annotation, lastTwoCharacters);
     }
 
     return image;
