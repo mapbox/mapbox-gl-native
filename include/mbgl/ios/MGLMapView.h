@@ -5,6 +5,7 @@
 
 NS_ASSUME_NONNULL_BEGIN
 
+@class MGLAnnotationImage;
 @class MGLUserLocation;
 @class MGLPolyline;
 @class MGLPolygon;
@@ -258,6 +259,18 @@ IB_DESIGNABLE
 *   @param annotations The array of annotations to remove. Objects in the array must conform to the MGLAnnotation protocol. */
 - (void)removeAnnotations:(NS_ARRAY_OF(id <MGLAnnotation>) *)annotations;
 
+/** Returns a reusable annotation image object located by its identifier.
+*
+*   For performance reasons, you should generally reuse MGLAnnotationImage objects for annotations in your map views. Dequeueing saves time and memory during performance-critical operations such as scrolling.
+*
+*   @param identifier A string identifying the annotation image to be reused. This string is the same one you specify when initially returning the annotation image object using the mapView:imageForAnnotation: method.
+*   @return An annotation image object with the specified identifier, or `nil` if no such object exists in the reuse queue. */
+- (MGLAnnotationImage *)dequeueReusableAnnotationImageWithIdentifier:(NSString *)identifier;
+
+#pragma mark - Managing Annotation Selections
+
+/** @name Managing Annotation Selections */
+
 /** The annotations that are currently selected.
 *
 *   Assigning a new array to this property selects only the first annotation in the array. */
@@ -336,7 +349,13 @@ IB_DESIGNABLE
 *   @param mapView The map view that requested the annotation symbol name.
 *   @param annotation The object representing the annotation that is about to be displayed. 
 *   @return The marker symbol to display for the specified annotation or `nil` if you want to display the default symbol. */
-- (nullable NSString *)mapView:(MGLMapView *)mapView symbolNameForAnnotation:(id <MGLAnnotation>)annotation;
+- (nullable NSString *)mapView:(MGLMapView *)mapView symbolNameForAnnotation:(id <MGLAnnotation>)annotation __attribute__((unavailable("Use -mapView:imageForAnnotation:.")));
+
+/** Returns an image object to use for the marker for the specified point annotation object.
+*   @param mapView The map view that requested the annotation image.
+*   @param annotation The object representing the annotation that is about to be displayed.
+*   @return The image object to display for the specified annotation or `nil` if you want to display the default marker image. */
+- (nullable MGLAnnotationImage *)mapView:(MGLMapView *)mapView imageForAnnotation:(id <MGLAnnotation>)annotation;
 
 /** Returns the alpha value to use when rendering a shape annotation. Defaults to `1.0`.
 *   @param mapView The map view rendering the shape annotation.

@@ -340,6 +340,39 @@ mbgl::Settings_NSUserDefaults *settings = nullptr;
 
 #pragma mark - MGLMapViewDelegate
 
+- (MGLAnnotationImage *)mapView:(MGLMapView * __nonnull)mapView imageForAnnotation:(id <MGLAnnotation> __nonnull)annotation
+{
+    if ([[((MGLPointAnnotation *)annotation) title] hasSuffix:@"7"])
+    {
+        NSLog(@"iOS: %p annotation title ends in '7'; using default sprite", annotation);
+
+        return nil;
+    }
+
+    static NSString *identifier = @"red_square";
+
+    MGLAnnotationImage *image = [mapView dequeueReusableAnnotationImageWithIdentifier:identifier];
+
+    if ( ! image)
+    {
+        NSLog(@"iOS: creating sprite for %p / %@", annotation, identifier);
+
+        CGRect rect = CGRectMake(0, 0, 20, 20);
+        UIGraphicsBeginImageContextWithOptions(rect.size, NO, [[UIScreen mainScreen] scale]);
+        CGContextRef ctx = UIGraphicsGetCurrentContext();
+        CGContextSetFillColorWithColor(ctx, [[[UIColor redColor] colorWithAlphaComponent:0.25] CGColor]);
+        CGContextFillEllipseInRect(ctx, rect);
+        image = [MGLAnnotationImage annotationImageWithImage:UIGraphicsGetImageFromCurrentImageContext() reuseIdentifier:identifier];
+        UIGraphicsEndImageContext();
+    }
+    else
+    {
+        NSLog(@"iOS: reusing sprite for %p / %@", annotation, identifier);
+    }
+
+    return image;
+}
+
 - (BOOL)mapView:(__unused MGLMapView *)mapView annotationCanShowCallout:(__unused id <MGLAnnotation>)annotation
 {
     return YES;

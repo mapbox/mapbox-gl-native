@@ -10,6 +10,7 @@
 #include <mbgl/mbgl.hpp>
 #include <mbgl/annotation/point_annotation.hpp>
 #include <mbgl/annotation/shape_annotation.hpp>
+#include <mbgl/annotation/sprite_image.hpp>
 #include <mbgl/platform/platform.hpp>
 #include <mbgl/platform/darwin/reachability.h>
 #include <mbgl/storage/default_file_source.hpp>
@@ -33,6 +34,7 @@
 #import "SMCalloutView.h"
 
 #import <algorithm>
+#import <cstdlib>
 
 class MBGLView;
 
@@ -46,6 +48,7 @@ const CGSize MGLAnnotationUpdateViewportOutset = {150, 150};
 const CGFloat MGLMinimumZoom = 3;
 
 NSString *const MGLAnnotationIDKey = @"MGLAnnotationIDKey";
+NSString *const MGLAnnotationSymbolKey = @"MGLAnnotationSymbolKey";
 
 static NSURL *MGLURLForBundledStyleNamed(NSString *styleName)
 {
@@ -81,6 +84,7 @@ CLLocationDegrees MGLDegreesFromRadians(CGFloat radians)
 @property (nonatomic) UIRotationGestureRecognizer *rotate;
 @property (nonatomic) UILongPressGestureRecognizer *quickZoom;
 @property (nonatomic) NSMapTable *annotationIDsByAnnotation;
+@property (nonatomic) NS_MUTABLE_DICTIONARY_OF(NSString *, MGLAnnotationImage *) *annotationImages;
 @property (nonatomic) std::vector<uint32_t> annotationsNearbyLastTap;
 @property (nonatomic, weak) id <MGLAnnotation> selectedAnnotation;
 @property (nonatomic) SMCalloutView *selectedAnnotationCalloutView;
@@ -275,6 +279,9 @@ std::chrono::steady_clock::duration secondsAsDuration(float duration)
     // setup annotations
     //
     _annotationIDsByAnnotation = [NSMapTable mapTableWithKeyOptions:NSMapTableStrongMemory valueOptions:NSMapTableStrongMemory];
+
+    _annotationImages = [NSMutableDictionary new];
+
     std::string defaultSymbolName([MGLDefaultStyleMarkerSymbolName UTF8String]);
     _mbglMap->setDefaultPointAnnotationSymbol(defaultSymbolName);
 
@@ -1772,11 +1779,13 @@ CLLocationCoordinate2D MGLLocationCoordinate2DFromLatLng(mbgl::LatLng latLng)
     std::vector<mbgl::PointAnnotation> points;
     std::vector<mbgl::ShapeAnnotation> shapes;
 
-    BOOL delegateImplementsSymbolLookup = [self.delegate respondsToSelector:@selector(mapView:symbolNameForAnnotation:)];
+    BOOL delegateImplementsImageForPoint = [self.delegate respondsToSelector:@selector(mapView:imageForAnnotation:)];
     BOOL delegateImplementsAlphaForShape = [self.delegate respondsToSelector:@selector(mapView:alphaForShapeAnnotation:)];
     BOOL delegateImplementsStrokeColorForShape = [self.delegate respondsToSelector:@selector(mapView:strokeColorForShapeAnnotation:)];
     BOOL delegateImplementsFillColorForPolygon = [self.delegate respondsToSelector:@selector(mapView:fillColorForPolygonAnnotation:)];
     BOOL delegateImplementsLineWidthForPolyline = [self.delegate respondsToSelector:@selector(mapView:lineWidthForPolylineAnnotation:)];
+
+    const std::string spritePrefix = "com.mapbox.sprites.";
 
     for (id <MGLAnnotation> annotation in annotations)
     {
@@ -1856,11 +1865,69 @@ CLLocationCoordinate2D MGLLocationCoordinate2DFromLatLng(mbgl::LatLng latLng)
         }
         else
         {
+            MGLAnnotationImage *annotationImage = nil;
             NSString *symbolName = nil;
 
-            if (delegateImplementsSymbolLookup)
+            if (delegateImplementsImageForPoint)
             {
-                symbolName = [self.delegate mapView:self symbolNameForAnnotation:annotation];
+                annotationImage = [self.delegate mapView:self imageForAnnotation:annotation];
+
+                if (annotationImage)
+                {
+                    const std::string cSymbolName = spritePrefix + std::string(annotationImage.reuseIdentifier.UTF8String);
+                    symbolName = [NSString stringWithUTF8String:cSymbolName.c_str()];
+
+                    if ( ! [self.annotationImages objectForKey:annotationImage.reuseIdentifier])
+                    {
+                        // store image & symbol name
+                        [self.annotationImages setObject:annotationImage forKey:annotationImage.reuseIdentifier];
+
+                        // manually draw random-colored sprite for now
+                        float pixelRatio = [[UIScreen mainScreen] scale];
+                        float width = 20;
+                        float height = 20;
+
+                        const int r = 255 * (double(std::rand()) / RAND_MAX);
+                        const int g = 255 * (double(std::rand()) / RAND_MAX);
+                        const int b = 255 * (double(std::rand()) / RAND_MAX);
+
+                        const int w = std::ceil(pixelRatio * width);
+                        const int h = std::ceil(pixelRatio * height);
+
+                        std::string pixels(w * h * 4, '\x00');
+                        auto data = reinterpret_cast<uint32_t*>(const_cast<char*>(pixels.data()));
+                        const int dist = (w / 2) * (w / 2);
+                        for (int y = 0; y < h; y++) {
+                            for (int x = 0; x < w; x++) {
+                                const int dx = x - w / 2;
+                                const int dy = y - h / 2;
+                                const int diff = dist - (dx * dx + dy * dy);
+                                if (diff > 0) {
+                                    const int a = std::min(0xFF, diff) * 0xFF / dist;
+                                    // Premultiply the rgb values with alpha
+                                    data[w * y + x] =
+                                    (a << 24) | ((a * r / 0xFF) << 16) | ((a * g / 0xFF) << 8) | (a * b / 0xFF);
+                                }
+                            }
+                        }
+
+                        // add sprite
+                        auto cSpriteImage = std::make_shared<mbgl::SpriteImage>(
+                            width,
+                            height,
+                            pixelRatio,
+                            std::move(pixels));
+
+                        // sprite upload
+                        _mbglMap->setSprite(cSymbolName, cSpriteImage);
+
+                        NSLog(@"GL: uploaded sprite with name '%@'", [NSString stringWithUTF8String:cSymbolName.c_str()]);
+                    }
+                }
+                else
+                {
+                    NSLog(@"GL: using default symbol");
+                }
             }
 
             points.emplace_back(MGLLatLngFromLocationCoordinate2D(annotation.coordinate), symbolName ? [symbolName UTF8String] : "");
@@ -1873,8 +1940,10 @@ CLLocationCoordinate2D MGLLocationCoordinate2DFromLatLng(mbgl::LatLng latLng)
 
         for (size_t i = 0; i < pointAnnotationIDs.size(); ++i)
         {
-            [self.annotationIDsByAnnotation setObject:@{ MGLAnnotationIDKey : @(pointAnnotationIDs[i]) }
-                                               forKey:annotations[i]];
+            [self.annotationIDsByAnnotation setObject:@{
+                MGLAnnotationIDKey     : @(pointAnnotationIDs[i]),
+                MGLAnnotationSymbolKey : [NSString stringWithUTF8String:points[i].icon.c_str()]
+            } forKey:annotations[i]];
         }
     }
 
@@ -1923,6 +1992,11 @@ CLLocationCoordinate2D MGLLocationCoordinate2DFromLatLng(mbgl::LatLng latLng)
     }
 
     _mbglMap->removeAnnotations(annotationIDsToRemove);
+}
+
+- (MGLAnnotationImage *)dequeueReusableAnnotationImageWithIdentifier:(NSString *)identifier
+{
+    return [self.annotationImages objectForKey:identifier];
 }
 
 - (NS_ARRAY_OF(id <MGLAnnotation>) *)selectedAnnotations
@@ -1977,16 +2051,13 @@ CLLocationCoordinate2D MGLLocationCoordinate2DFromLatLng(mbgl::LatLng latLng)
         else
         {
             // determine symbol in use for point
-            NSString *symbol = MGLDefaultStyleMarkerSymbolName;
-            if ([self.delegate respondsToSelector:@selector(mapView:symbolNameForAnnotation:)])
-            {
-                symbol = [self.delegate mapView:self symbolNameForAnnotation:annotation];
-            }
-            std::string symbolName([symbol UTF8String]);
+            NSString *customSymbol = [[self.annotationIDsByAnnotation objectForKey:annotation] objectForKey:MGLAnnotationSymbolKey];
+            NSString *symbolName = [customSymbol length] ? customSymbol : MGLDefaultStyleMarkerSymbolName;
+            std::string cSymbolName([symbolName UTF8String]);
 
             // determine anchor point based on symbol
             CGPoint calloutAnchorPoint = [self convertCoordinate:annotation.coordinate toPointToView:self];
-            double y = _mbglMap->getTopOffsetPixelsForAnnotationSymbol(symbolName);
+            double y = _mbglMap->getTopOffsetPixelsForAnnotationSymbol(cSymbolName);
             calloutBounds = CGRectMake(calloutAnchorPoint.x - 1, calloutAnchorPoint.y + y, 0, 0);
         }
 

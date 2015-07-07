@@ -50,6 +50,8 @@
         '../platform/ios/MGLPolygon.m',
         '../include/mbgl/ios/MGLShape.h',
         '../platform/ios/MGLShape.m',
+        '../include/mbgl/ios/MGLAnnotationImage.h',
+        '../platform/ios/MGLAnnotationImage.m',
         '../platform/ios/NSBundle+MGLAdditions.h',
         '../platform/ios/NSBundle+MGLAdditions.m',
         '../platform/ios/NSException+MGLAdditions.h',
