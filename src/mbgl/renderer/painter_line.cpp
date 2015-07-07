@@ -55,7 +55,7 @@ void Painter::renderLine(LineBucket& bucket, const StyleLayer &layer_desc, const
 
     config.depthRange = { strata, 1.0f };
 
-    if (properties.dash_array.from.size()) {
+    if (!properties.dash_array.from.empty()) {
 
         useProgram(linesdfShader->program);
 
@@ -86,7 +86,7 @@ void Painter::renderLine(LineBucket& bucket, const StyleLayer &layer_desc, const
 
         bucket.drawLineSDF(*linesdfShader);
 
-    } else if (properties.image.from.size()) {
+    } else if (!properties.image.from.empty()) {
         SpriteAtlasPosition imagePosA = spriteAtlas->getPosition(properties.image.from, true);
         SpriteAtlasPosition imagePosB = spriteAtlas->getPosition(properties.image.to, true);
 

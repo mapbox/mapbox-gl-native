@@ -142,7 +142,7 @@ void MapContext::loadStyleJSON(const std::string& json, const std::string& base)
     asyncUpdate->send();
 
     auto staleTiles = data.getAnnotationManager()->resetStaleTiles();
-    if (staleTiles.size()) {
+    if (!staleTiles.empty()) {
         updateAnnotationTiles(staleTiles);
     }
 }

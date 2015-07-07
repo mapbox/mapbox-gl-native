@@ -10,7 +10,7 @@ std::vector<std::vector<Coordinate>> clipLines(const std::vector<std::vector<Coo
 
     for (auto& line : lines) {
 
-        if (!line.size())
+        if (line.empty())
             continue;
 
         auto end = line.end() - 1;
@@ -50,7 +50,7 @@ std::vector<std::vector<Coordinate>> clipLines(const std::vector<std::vector<Coo
                 p1 = { static_cast<int16_t>(p0.x + (p1.x - p0.x) * ((float)(y2 - p0.y) / (p1.y - p0.y))), y2 };
             }
 
-            if (!clippedLines.size() || (clippedLines.back().size() && !(p0 == clippedLines.back().back()))) {
+            if (clippedLines.empty() || (!clippedLines.back().empty() && !(p0 == clippedLines.back().back()))) {
                 clippedLines.emplace_back();
                 clippedLines.back().push_back(p0);
             }

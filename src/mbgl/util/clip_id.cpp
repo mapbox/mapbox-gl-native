@@ -73,7 +73,7 @@ void ClipIDGenerator::update(std::forward_list<Tile *> tiles) {
         }
     }
 
-    if (pool.size()) {
+    if (!pool.empty()) {
         const uint32_t bit_count = util::ceil_log2(pool.size() + 1);
         const std::bitset<8> mask = uint64_t(((1ul << bit_count) - 1) << bit_offset);
 

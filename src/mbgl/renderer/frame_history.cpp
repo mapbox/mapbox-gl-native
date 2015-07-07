@@ -5,18 +5,18 @@ using namespace mbgl;
 // Record frame history that will be used to calculate fading params
 void FrameHistory::record(const TimePoint& now, float zoom) {
     // first frame ever
-    if (!history.size()) {
+    if (history.empty()) {
         history.emplace_back(FrameSnapshot{TimePoint::min(), zoom});
         history.emplace_back(FrameSnapshot{TimePoint::min(), zoom});
     }
 
-    if (history.size() > 0 || history.back().z != zoom) {
+    if (!history.empty() || history.back().z != zoom) {
         history.emplace_back(FrameSnapshot{now, zoom});
     }
 }
 
 bool FrameHistory::needsAnimation(const Duration& duration) const {
-    if (!history.size()) {
+    if (history.empty()) {
         return false;
     }
 

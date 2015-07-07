@@ -39,7 +39,7 @@ const Shaping FontStack::getShaping(const std::u32string &string, const float ma
         }
     }
 
-    if (!shaping.positionedGlyphs.size())
+    if (shaping.positionedGlyphs.empty())
         return shaping;
 
     lineWrap(shaping, lineHeight, maxWidth, horizontalAlign, verticalAlign, justify);

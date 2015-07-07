@@ -67,7 +67,7 @@ class Shaping {
     int32_t left;
     int32_t right;
 
-    operator bool() const { return positionedGlyphs.size(); }
+    operator bool() const { return !positionedGlyphs.empty(); }
 };
 
 class SDFGlyph {

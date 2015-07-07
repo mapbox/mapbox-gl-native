@@ -175,7 +175,7 @@ AnnotationManager::addTileFeature(const uint32_t annotationID,
 
                         if (tile_it != featureTiles.end()) {
                             GeometryCollection& geometries = featureTiles.find(TileID(z, x, y, z))->second;
-                            if (geometries.size()) {
+                            if (!geometries.empty()) {
                                 geometries.back().push_back(coordinate);
                             } else {
                                 geometries.push_back({{ coordinate }});
@@ -495,14 +495,14 @@ const LiveTile* AnnotationManager::getTile(const TileID& id) {
     if (tile_lookup_it != tiles.end()) {
         // it exists and may have annotations already
         renderTile = tile_lookup_it->second.second.get();
-    } else if (orderedShapeAnnotations.size()) {
+    } else if (!orderedShapeAnnotations.empty()) {
         // it needs created, but only for on-demand shapes
         renderTile = tiles.emplace(id,
             std::make_pair(std::unordered_set<uint32_t>(), std::make_unique<LiveTile>())
         ).first->second.second.get();
     }
 
-    if (renderTile != nullptr && orderedShapeAnnotations.size()) {
+    if (renderTile != nullptr && !orderedShapeAnnotations.empty()) {
 
         // create shape tile layers from GeoJSONVT queries
         for (auto& tiler_it : shapeTilers) {

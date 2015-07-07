@@ -308,8 +308,7 @@ void LineBucket::addGeometry(const std::vector<Coordinate>& vertices) {
 
     // Store the triangle/line groups.
     {
-        if (!triangleGroups.size() ||
-            (triangleGroups.back()->vertex_length + vertexCount > 65535)) {
+        if (triangleGroups.empty() || (triangleGroups.back()->vertex_length + vertexCount > 65535)) {
             // Move to a new group because the old one can't hold the geometry.
             triangleGroups.emplace_back(std::make_unique<TriangleGroup>());
         }

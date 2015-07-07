@@ -516,7 +516,7 @@ bool Source::update(MapData& data,
 
 void Source::invalidateTiles(const std::unordered_set<TileID, TileID::Hash>& ids) {
     cache.clear();
-    if (ids.size()) {
+    if (!ids.empty()) {
         for (auto& id : ids) {
             tiles.erase(id);
             tile_data.erase(id);

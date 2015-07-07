@@ -81,7 +81,7 @@ void SymbolBucket::render(Painter& painter,
     painter.renderSymbol(*this, layer_desc, id, matrix);
 }
 
-bool SymbolBucket::hasData() const { return hasTextData() || hasIconData() || symbolInstances.size(); }
+bool SymbolBucket::hasData() const { return hasTextData() || hasIconData() || !symbolInstances.empty(); }
 
 bool SymbolBucket::hasTextData() const { return renderData && !renderData->text.groups.empty(); }
 
@@ -128,7 +128,7 @@ bool SymbolBucket::needsDependencies(const GeometryTileLayer& layer,
 
             ft.label = util::utf8_to_utf32::convert(u8string);
 
-            if (ft.label.size()) {
+            if (!ft.label.empty()) {
                 // Loop through all characters of this text and collect unique codepoints.
                 for (char32_t chr : ft.label) {
                     ranges.insert(getGlyphRange(chr));
@@ -219,7 +219,7 @@ void SymbolBucket::addFeatures(uintptr_t tileUID,
     auto fontStack = glyphStore.getFontStack(layout.text.font);
 
     for (const auto& feature : features) {
-        if (!feature.geometry.size()) continue;
+        if (feature.geometry.empty()) continue;
 
         Shaping shapedText;
         PositionedIcon shapedIcon;
@@ -298,7 +298,7 @@ void SymbolBucket::addFeature(const std::vector<std::vector<Coordinate>> &lines,
         lines;
 
     for (const auto& line : clippedLines) {
-        if (!line.size()) continue;
+        if (line.empty()) continue;
 
         // Calculate the anchor points around which you want to place labels
         Anchors anchors = isLine ?
@@ -478,8 +478,7 @@ void SymbolBucket::addSymbols(Buffer &buffer, const SymbolQuads &symbols, float 
 
         const int glyph_vertex_length = 4;
 
-        if (!buffer.groups.size() ||
-            (buffer.groups.back()->vertex_length + glyph_vertex_length > 65535)) {
+        if (buffer.groups.empty() || (buffer.groups.back()->vertex_length + glyph_vertex_length > 65535)) {
             // Move to a new group because the old one can't hold the geometry.
             buffer.groups.emplace_back(std::make_unique<GroupType>());
         }
@@ -540,7 +539,7 @@ void SymbolBucket::addToDebugBuffers() {
                 const float placementZoom= util::max(0.0f, util::min(25.0f, static_cast<float>(zoom + log(box.placementScale) / log(2))));
 
                 auto& collisionBox = renderDataInProgress->collisionBox;
-                if (!collisionBox.groups.size()) {
+                if (collisionBox.groups.empty()) {
                     // Move to a new group because the old one can't hold the geometry.
                     collisionBox.groups.emplace_back(std::make_unique<CollisionBoxElementGroup>());
                 }

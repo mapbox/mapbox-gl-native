@@ -67,7 +67,7 @@ void FillBucket::addGeometry(const GeometryCollection& geometryCollection) {
         for (auto& v : line_) {
             line.emplace_back(v.x, v.y);
         }
-        if (line.size()) {
+        if (!line.empty()) {
             clipper.AddPath(line, ClipperLib::ptSubject, true);
             line.clear();
             hasVertices = true;
@@ -87,7 +87,7 @@ void FillBucket::tessellate() {
     clipper.Execute(ClipperLib::ctUnion, polygons, ClipperLib::pftEvenOdd, ClipperLib::pftEvenOdd);
     clipper.Clear();
 
-    if (polygons.size() == 0) {
+    if (polygons.empty()) {
         return;
     }
 
@@ -100,7 +100,7 @@ void FillBucket::tessellate() {
         throw geometry_too_long_exception();
     }
 
-    if (!lineGroups.size() || (lineGroups.back()->vertex_length + total_vertex_count > 65535)) {
+    if (lineGroups.empty() || (lineGroups.back()->vertex_length + total_vertex_count > 65535)) {
         // Move to a new group because the old one can't hold the geometry.
         lineGroups.emplace_back(std::make_unique<LineGroup>());
     }
@@ -147,7 +147,7 @@ void FillBucket::tessellate() {
             }
         }
 
-        if (!triangleGroups.size() || (triangleGroups.back()->vertex_length + total_vertex_count > 65535)) {
+        if (triangleGroups.empty() || (triangleGroups.back()->vertex_length + total_vertex_count > 65535)) {
             // Move to a new group because the old one can't hold the geometry.
             triangleGroups.emplace_back(std::make_unique<TriangleGroup>());
         }

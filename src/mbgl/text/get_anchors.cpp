@@ -43,7 +43,7 @@ Anchors resample(const std::vector<Coordinate> &line, const float offset, const 
         distance += segmentDist;
     }
 
-    if (!placeAtMiddle && !anchors.size() && !continuedLine) {
+    if (!placeAtMiddle && anchors.empty() && !continuedLine) {
         // The first attempt at finding anchors at which labels can be placed failed.
         // Try again, but this time just try placing one anchor at the middle of the line.
         // This has the most effect for short lines in overscaled tiles, since the

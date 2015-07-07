@@ -33,7 +33,7 @@ void Painter::renderFill(FillBucket& bucket, const StyleLayer &layer_desc, const
         stroke_color[3] *= properties.opacity;
     }
 
-    const bool pattern = properties.image.from.size();
+    const bool pattern = !properties.image.from.empty();
 
     bool outline = properties.antialias && !pattern && stroke_color != fill_color;
     bool fringeline = properties.antialias && !pattern && stroke_color == fill_color;
