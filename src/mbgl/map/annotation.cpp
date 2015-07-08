@@ -133,7 +133,7 @@ AnnotationManager::addTileFeature(const uint32_t annotationID,
 
         features.push_back(Convert::create(Tags(), featureType, rings));
 
-        shapeTilers.emplace(annotationID, std::make_unique<GeoJSONVT>(features, maxZoom));
+        shapeTilers.emplace(annotationID, std::make_unique<GeoJSONVT>(features, maxZoom, 4, 100, 10));
 
     } else {
 
