@@ -345,10 +345,6 @@ IB_DESIGNABLE
 
 /** @name Managing the Display of Annotations */
 
-/** Returns the style's symbol name to use for the marker for the specified point annotation object.
-*   @param mapView The map view that requested the annotation symbol name.
-*   @param annotation The object representing the annotation that is about to be displayed. 
-*   @return The marker symbol to display for the specified annotation or `nil` if you want to display the default symbol. */
 - (nullable NSString *)mapView:(MGLMapView *)mapView symbolNameForAnnotation:(id <MGLAnnotation>)annotation __attribute__((unavailable("Use -mapView:imageForAnnotation:.")));
 
 /** Returns an image object to use for the marker for the specified point annotation object.
