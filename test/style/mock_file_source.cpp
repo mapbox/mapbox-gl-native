@@ -117,11 +117,13 @@ void MockFileSource::Impl::handleRequest(Request* req) {
 void MockFileSource::Impl::cancelRequest(Request* req) {
     auto it = std::find(pendingRequests_.begin(), pendingRequests_.end(), req);
     if (it != pendingRequests_.end()) {
-        (*it)->destruct();
         pendingRequests_.erase(it);
     } else {
-        EXPECT_TRUE(false) << "Should never be reached.";
+        // There is no request for this URL anymore. Likely, the request already completed
+        // before we got around to process the cancelation request.
     }
+
+    req->destruct();
 }
 
 void MockFileSource::Impl::dispatchPendingRequests() {
@@ -142,7 +144,7 @@ void MockFileSource::setOnRequestDelayedCallback(std::function<void(void)> callb
 
 Request* MockFileSource::request(const Resource& resource, uv_loop_t* loop, Callback callback) {
     Request* req = new Request(resource, loop, std::move(callback));
-    thread_->invokeSync(&Impl::handleRequest, req);
+    thread_->invoke(&Impl::handleRequest, req);
 
     return req;
 }
