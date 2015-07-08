@@ -688,6 +688,9 @@ std::chrono::steady_clock::duration secondsAsDuration(float duration)
         _mbglMap->setSourceTileCacheSize(cacheSize);
 
         bool needsRerender = _mbglMap->renderSync();
+
+        [self updateUserLocationAnnotationView];
+
         _mbglMap->nudgeTransitions(needsRerender);
     }
 }
@@ -2352,8 +2355,6 @@ CLLocationCoordinate2D MGLLocationCoordinate2DFromLatLng(mbgl::LatLng latLng)
 
     self.userLocationAnnotationView.haloLayer.hidden = ! CLLocationCoordinate2DIsValid(self.userLocation.coordinate) ||
         newLocation.horizontalAccuracy > 10;
-
-    [self updateUserLocationAnnotationView];
 }
 
 - (BOOL)locationManagerShouldDisplayHeadingCalibration:(CLLocationManager *)manager
@@ -2510,8 +2511,6 @@ CLLocationCoordinate2D MGLLocationCoordinate2DFromLatLng(mbgl::LatLng latLng)
         case mbgl::MapChangeRegionWillChange:
         case mbgl::MapChangeRegionWillChangeAnimated:
         {
-            [self updateUserLocationAnnotationView];
-
             [self deselectAnnotation:self.selectedAnnotation animated:NO];
 
             BOOL animated = (change == mbgl::MapChangeRegionWillChangeAnimated);
@@ -2546,7 +2545,6 @@ CLLocationCoordinate2D MGLLocationCoordinate2DFromLatLng(mbgl::LatLng latLng)
         }
         case mbgl::MapChangeRegionIsChanging:
         {
-            [self updateUserLocationAnnotationView];
             [self updateCompass];
 
             if ([self.delegate respondsToSelector:@selector(mapViewRegionIsChanging:)])
@@ -2558,7 +2556,6 @@ CLLocationCoordinate2D MGLLocationCoordinate2DFromLatLng(mbgl::LatLng latLng)
         case mbgl::MapChangeRegionDidChange:
         case mbgl::MapChangeRegionDidChangeAnimated:
         {
-            [self updateUserLocationAnnotationView];
             [self updateCompass];
 
             if (self.pan.state       == UIGestureRecognizerStateChanged ||
