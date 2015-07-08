@@ -5,6 +5,7 @@
 
 #include <vector>
 #include <cstdarg>
+#include <mutex>
 #include <iostream>
 
 namespace mbgl {
@@ -42,9 +43,10 @@ public:
         size_t count(const Message& message) const;
         std::vector<Message> unchecked() const;
 
-    public:
+    private:
         FixtureLog* log;
         std::vector<Message> messages;
+        mutable std::mutex messagesMutex;
     };
 
     FixtureLog();
