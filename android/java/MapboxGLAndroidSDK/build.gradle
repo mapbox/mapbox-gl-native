@@ -162,7 +162,7 @@ def getRepositoryPassword() {
 }
 
 
-task setupCoreGL() {
+task setupCoreGL() << {
 
     // Copy Assets
     // ===========
@@ -251,7 +251,7 @@ task setupCoreGL() {
     Files.createSymbolicLink(aglPath, adPath)
 }
 
-task installMason() {
+task installMason() << {
     String masonDirString = project.buildDir.absolutePath + File.separator + "mason"
     Path masonDirPath = Paths.get(masonDirString)
     if (Files.exists(masonDirPath)) {
@@ -263,7 +263,7 @@ task installMason() {
     println("Mason installed")
 }
 
-task installJNILibs(dependsOn: 'installMason') {
+task installJNILibs(dependsOn: 'installMason') << {
 
     exec {
         workingDir = project.buildDir.absolutePath + File.separator + "mason"
