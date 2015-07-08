@@ -455,6 +455,14 @@ std::chrono::steady_clock::duration secondsAsDuration(float duration)
     if (_delegate == delegate) return;
 
     _delegate = delegate;
+    
+    if ([delegate respondsToSelector:@selector(mapView:symbolNameForAnnotation:)])
+    {
+        [NSException raise:@"Method unavailable" format:
+         @"-mapView:symbolNameForAnnotation: has been removed from the MGLMapViewDelegate protocol, but %@ still implements it. "
+         @"Implement -[%@ mapView:imageForAnnotation:] instead.",
+         NSStringFromClass([delegate class]), NSStringFromClass([delegate class])];
+    }
 }
 
 #pragma mark - Layout -
