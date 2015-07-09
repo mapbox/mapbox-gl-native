@@ -191,14 +191,11 @@ void Style::onTileLoadingFailed(std::exception_ptr error) {
     emitResourceLoadingFailed(error);
 }
 
-void Style::onSpriteDataLoaded(std::unique_ptr<Sprite::Data> spriteData) {
+void Style::onSpriteLoaded(std::unique_ptr<Sprite::Data> spriteData) {
     // Add all sprite images to the SpriteStore object
     spriteStore->setSprites(parseSprite(spriteData->image, spriteData->json));
-}
 
-void Style::onSpriteLoaded() {
     shouldReparsePartialTiles = true;
-
     emitTileDataChanged();
 }
 

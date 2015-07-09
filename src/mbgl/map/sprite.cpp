@@ -86,9 +86,10 @@ Sprite::~Sprite() {
 void Sprite::emitSpriteLoadedIfComplete() {
     assert(loader);
     if (loader->loadedImage && loader->loadedJSON && observer) {
-        observer->onSpriteDataLoaded(std::move(loader->data));
+        std::unique_ptr<Data> data(std::move(loader->data));
         loader.reset();
-        observer->onSpriteLoaded();
+
+        observer->onSpriteLoaded(std::move(data));
     }
 }
 

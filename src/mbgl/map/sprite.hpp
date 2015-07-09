@@ -27,8 +27,7 @@ public:
     public:
         virtual ~Observer() = default;
 
-        virtual void onSpriteDataLoaded(std::unique_ptr<Data>) = 0;
-        virtual void onSpriteLoaded() = 0;
+        virtual void onSpriteLoaded(std::unique_ptr<Data>) = 0;
         virtual void onSpriteLoadingFailed(std::exception_ptr error) = 0;
     };
 
