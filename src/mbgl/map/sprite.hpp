@@ -36,7 +36,7 @@ public:
     ~Sprite();
 
     inline bool isLoaded() const {
-        return loader == nullptr;
+        return loaded;
     }
 
     const float pixelRatio;
@@ -49,6 +49,8 @@ private:
 
     struct Loader;
     std::unique_ptr<Loader> loader;
+
+    bool loaded = false;
 
     Observer* observer = nullptr;
 };

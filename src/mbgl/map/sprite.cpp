@@ -39,6 +39,7 @@ Sprite::Sprite(const std::string& baseUrl, float pixelRatio_)
     : pixelRatio(pixelRatio_ > 1 ? 2 : 1) {
     if (baseUrl.empty()) {
         // Treat a non-existent sprite as a successfully loaded empty sprite.
+        loaded = true;
         return;
     }
 
@@ -95,6 +96,7 @@ void Sprite::emitSpriteLoadedIfComplete() {
 
     auto result = parseSprite(data->image, data->json);
     if (result.is<Sprites>()) {
+        loaded = true;
         observer->onSpriteLoaded(result.get<Sprites>());
     } else {
         emitSpriteLoadingFailed(result.get<std::string>());
