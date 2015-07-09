@@ -138,45 +138,30 @@ void runTestCase(MockFileSource::Type type,
 
 }
 
-class ResourceLoading : public ::testing::TestWithParam<std::string> {
+class ResourceLoading : public ::testing::TestWithParam<std::pair<std::string, std::string>> {
 };
 
 TEST_P(ResourceLoading, Success) {
-    runTestCase(MockFileSource::Success, GetParam(), std::string());
+    runTestCase(MockFileSource::Success, GetParam().first, std::string());
 }
 
 TEST_P(ResourceLoading, RequestFail) {
     std::stringstream message;
-    message << "Failed to load \\[test\\/fixtures\\/resources\\/" << GetParam() << "\\]\\: Failed by the test case";
+    message << "Failed to load \\[test\\/fixtures\\/resources\\/" << GetParam().first << "\\]\\: Failed by the test case";
 
-    runTestCase(MockFileSource::RequestFail, GetParam(), message.str());
+    runTestCase(MockFileSource::RequestFail, GetParam().first, message.str());
 }
 
 TEST_P(ResourceLoading, RequestWithCorruptedData) {
-    const std::string param(GetParam());
-
-    std::stringstream message;
-    message << "Failed to parse ";
-
-    if (param == "vector.pbf") {
-        message << "\\[1(5|6)\\/1638(3|4)\\/1638(3|4)\\]\\: pbf unknown field type exception";
-    } else if (param == "raster.png") {
-        message << "\\[17\\/6553(4|5|6|7)\\/6553(4|5|6|7)\\]\\: error parsing raster image";
-    } else {
-        message << "\\[test\\/fixtures\\/resources\\/" << param << "\\]";
-    }
-
-    if (param.find("json") != std::string::npos) {
-        message << "\\: 0 - Expect either an object or array at root";
-    }
-
-    runTestCase(MockFileSource::RequestWithCorruptedData, GetParam(), message.str());
+    runTestCase(MockFileSource::RequestWithCorruptedData, GetParam().first, GetParam().second);
 }
 
 INSTANTIATE_TEST_CASE_P(Style, ResourceLoading,
     ::testing::Values(
-        "source_raster.json",
-        "source_vector.json",
-        "raster.png",
-        "vector.pbf",
-        "glyphs.pbf"));
+        std::make_pair("source_raster.json", "Failed to parse \\[test\\/fixtures\\/resources\\/source_raster.json\\]: 0 - Expect either an object or array at root"),
+        std::make_pair("source_vector.json", "Failed to parse \\[test\\/fixtures\\/resources\\/source_vector.json\\]: 0 - Expect either an object or array at root"),
+        std::make_pair("sprite.json", "Failed to parse JSON: Expect either an object or array at root at offset 0"),
+        std::make_pair("sprite.png", "Could not parse sprite image"),
+        std::make_pair("raster.png", "Failed to parse \\[17\\/6553(4|5|6|7)\\/6553(4|5|6|7)\\]\\: error parsing raster image"),
+        std::make_pair("vector.pbf", "Failed to parse \\[1(5|6)\\/1638(3|4)\\/1638(3|4)\\]\\: pbf unknown field type exception"),
+        std::make_pair("glyphs.pbf", "Failed to parse \\[test\\/fixtures\\/resources\\/glyphs.pbf\\]")));
