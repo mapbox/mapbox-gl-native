@@ -9,6 +9,7 @@
 
 #include <cmath>
 #include <limits>
+#include <sstream>
 
 namespace mbgl {
 
@@ -99,7 +100,7 @@ inline bool getBoolean(const rapidjson::Value& value, const char* name, const bo
 
 } // namespace
 
-Sprites parseSprite(const std::string& image, const std::string& json) {
+SpriteParseResult parseSprite(const std::string& image, const std::string& json) {
     using namespace rapidjson;
 
     Sprites sprites;
@@ -107,20 +108,18 @@ Sprites parseSprite(const std::string& image, const std::string& json) {
     // Parse the sprite image.
     const util::Image raster(image);
     if (!raster) {
-        Log::Warning(Event::Sprite, "Could not parse sprite image");
-        return sprites;
+        return std::string("Could not parse sprite image");
     }
 
     Document doc;
     doc.Parse<0>(json.c_str());
 
     if (doc.HasParseError()) {
-        Log::Warning(Event::Sprite, std::string{ "Failed to parse JSON: " } + doc.GetParseError() +
-                                        " at offset " + std::to_string(doc.GetErrorOffset()));
-        return sprites;
+        std::stringstream message;
+        message << "Failed to parse JSON: " << doc.GetParseError() << " at offset " << doc.GetErrorOffset();
+        return message.str();
     } else if (!doc.IsObject()) {
-        Log::Warning(Event::Sprite, "Sprite JSON root must be an object");
-        return sprites;
+        return std::string("Sprite JSON root must be an object");
     } else {
         for (Value::ConstMemberIterator itr = doc.MemberBegin(); itr != doc.MemberEnd(); ++itr) {
             const std::string name = { itr->name.GetString(), itr->name.GetStringLength() };

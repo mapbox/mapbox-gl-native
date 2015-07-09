@@ -1,6 +1,7 @@
 #ifndef MBGL_STYLE_SPRITE
 #define MBGL_STYLE_SPRITE
 
+#include <mbgl/annotation/sprite_parser.hpp>
 #include <mbgl/util/image.hpp>
 #include <mbgl/util/noncopyable.hpp>
 #include <mbgl/util/ptr.hpp>
@@ -27,7 +28,7 @@ public:
     public:
         virtual ~Observer() = default;
 
-        virtual void onSpriteLoaded(std::unique_ptr<Data>) = 0;
+        virtual void onSpriteLoaded(const Sprites& sprites) = 0;
         virtual void onSpriteLoadingFailed(std::exception_ptr error) = 0;
     };
 

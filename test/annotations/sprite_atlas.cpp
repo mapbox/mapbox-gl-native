@@ -12,9 +12,11 @@ using namespace mbgl;
 TEST(Annotations, SpriteAtlas) {
     FixtureLog log;
 
+    auto spriteParseResult = parseSprite(util::read_file("test/fixtures/annotations/emerald.png"),
+                                         util::read_file("test/fixtures/annotations/emerald.json"));
+
     SpriteStore store;
-    store.setSprites(parseSprite(util::read_file("test/fixtures/annotations/emerald.png"),
-                                 util::read_file("test/fixtures/annotations/emerald.json")));
+    store.setSprites(spriteParseResult.get<Sprites>());
 
     SpriteAtlas atlas(63, 112, 1, store);
 
@@ -85,9 +87,12 @@ TEST(Annotations, SpriteAtlas) {
 }
 
 TEST(Annotations, SpriteAtlasSize) {
+    auto spriteParseResult = parseSprite(util::read_file("test/fixtures/annotations/emerald.png"),
+                                         util::read_file("test/fixtures/annotations/emerald.json"));
+
     SpriteStore store;
-    store.setSprites(parseSprite(util::read_file("test/fixtures/annotations/emerald.png"),
-                                 util::read_file("test/fixtures/annotations/emerald.json")));
+    store.setSprites(spriteParseResult.get<Sprites>());
+
     SpriteAtlas atlas(63, 112, 1.4, store);
 
     EXPECT_DOUBLE_EQ(1.4f, atlas.getPixelRatio());

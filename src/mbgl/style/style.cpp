@@ -4,7 +4,6 @@
 #include <mbgl/map/source.hpp>
 #include <mbgl/map/transform_state.hpp>
 #include <mbgl/annotation/sprite_store.hpp>
-#include <mbgl/annotation/sprite_parser.hpp>
 #include <mbgl/style/style_layer.hpp>
 #include <mbgl/style/style_parser.hpp>
 #include <mbgl/style/style_bucket.hpp>
@@ -191,9 +190,9 @@ void Style::onTileLoadingFailed(std::exception_ptr error) {
     emitResourceLoadingFailed(error);
 }
 
-void Style::onSpriteLoaded(std::unique_ptr<Sprite::Data> spriteData) {
+void Style::onSpriteLoaded(const Sprites& sprites) {
     // Add all sprite images to the SpriteStore object
-    spriteStore->setSprites(parseSprite(spriteData->image, spriteData->json));
+    spriteStore->setSprites(sprites);
 
     shouldReparsePartialTiles = true;
     emitTileDataChanged();

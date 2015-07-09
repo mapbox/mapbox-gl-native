@@ -117,7 +117,7 @@ TEST(Annotations, SpriteParsing) {
     const auto image_1x = util::read_file("test/fixtures/annotations/emerald.png");
     const auto json_1x = util::read_file("test/fixtures/annotations/emerald.json");
 
-    const auto images = parseSprite(image_1x, json_1x);
+    const auto images = parseSprite(image_1x, json_1x).get<Sprites>();
 
     std::set<std::string> names;
     std::transform(images.begin(), images.end(), std::inserter(names, names.begin()),
@@ -210,22 +210,13 @@ TEST(Annotations, SpriteParsing) {
 }
 
 TEST(Annotations, SpriteParsingInvalidJSON) {
-    FixtureLog log;
-
     const auto image_1x = util::read_file("test/fixtures/annotations/emerald.png");
     const auto json_1x = R"JSON({ "image": " })JSON";
 
-    const auto images = parseSprite(image_1x, json_1x);
-    EXPECT_EQ(0u, images.size());
+    const auto error = parseSprite(image_1x, json_1x).get<std::string>();
 
-    EXPECT_EQ(
-        1u,
-        log.count({
-            EventSeverity::Warning,
-            Event::Sprite,
-            int64_t(-1),
-            "Failed to parse JSON: lacks ending quotation before the end of string at offset 10",
-        }));
+    EXPECT_EQ(error,
+              std::string("Failed to parse JSON: lacks ending quotation before the end of string at offset 10"));
 }
 
 TEST(Annotations, SpriteParsingEmptyImage) {
@@ -234,7 +225,7 @@ TEST(Annotations, SpriteParsingEmptyImage) {
     const auto image_1x = util::read_file("test/fixtures/annotations/emerald.png");
     const auto json_1x = R"JSON({ "image": {} })JSON";
 
-    const auto images = parseSprite(image_1x, json_1x);
+    const auto images = parseSprite(image_1x, json_1x).get<Sprites>();
     EXPECT_EQ(0u, images.size());
 
     EXPECT_EQ(1u, log.count({
@@ -251,7 +242,7 @@ TEST(Annotations, SpriteParsingSimpleWidthHeight) {
     const auto image_1x = util::read_file("test/fixtures/annotations/emerald.png");
     const auto json_1x = R"JSON({ "image": { "width": 32, "height": 32 } })JSON";
 
-    const auto images = parseSprite(image_1x, json_1x);
+    const auto images = parseSprite(image_1x, json_1x).get<Sprites>();
     EXPECT_EQ(1u, images.size());
 }
 
@@ -261,7 +252,7 @@ TEST(Annotations, SpriteParsingWidthTooBig) {
     const auto image_1x = util::read_file("test/fixtures/annotations/emerald.png");
     const auto json_1x = R"JSON({ "image": { "width": 65536, "height": 32 } })JSON";
 
-    const auto images = parseSprite(image_1x, json_1x);
+    const auto images = parseSprite(image_1x, json_1x).get<Sprites>();
     EXPECT_EQ(0u, images.size());
 
     EXPECT_EQ(1u, log.count({
@@ -284,7 +275,7 @@ TEST(Annotations, SpriteParsingNegativeWidth) {
     const auto image_1x = util::read_file("test/fixtures/annotations/emerald.png");
     const auto json_1x = R"JSON({ "image": { "width": -1, "height": 32 } })JSON";
 
-    const auto images = parseSprite(image_1x, json_1x);
+    const auto images = parseSprite(image_1x, json_1x).get<Sprites>();
     EXPECT_EQ(0u, images.size());
 
     EXPECT_EQ(1u, log.count({
@@ -307,7 +298,7 @@ TEST(Annotations, SpriteParsingNullRatio) {
     const auto image_1x = util::read_file("test/fixtures/annotations/emerald.png");
     const auto json_1x = R"JSON({ "image": { "width": 32, "height": 32, "pixelRatio": 0 } })JSON";
 
-    const auto images = parseSprite(image_1x, json_1x);
+    const auto images = parseSprite(image_1x, json_1x).get<Sprites>();
     EXPECT_EQ(0u, images.size());
 
     EXPECT_EQ(1u, log.count({

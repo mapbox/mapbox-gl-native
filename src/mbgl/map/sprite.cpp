@@ -85,11 +85,19 @@ Sprite::~Sprite() {
 
 void Sprite::emitSpriteLoadedIfComplete() {
     assert(loader);
-    if (loader->loadedImage && loader->loadedJSON && observer) {
-        std::unique_ptr<Data> data(std::move(loader->data));
-        loader.reset();
 
-        observer->onSpriteLoaded(std::move(data));
+    if (!loader->loadedImage || !loader->loadedJSON || !observer) {
+        return;
+    }
+
+    std::unique_ptr<Data> data(std::move(loader->data));
+    loader.reset();
+
+    auto result = parseSprite(data->image, data->json);
+    if (result.is<Sprites>()) {
+        observer->onSpriteLoaded(result.get<Sprites>());
+    } else {
+        emitSpriteLoadingFailed(result.get<std::string>());
     }
 }
 

@@ -3,6 +3,7 @@
 
 #include <mbgl/util/noncopyable.hpp>
 #include <mbgl/util/geo.hpp>
+#include <mbgl/util/variant.hpp>
 
 #include <string>
 #include <memory>
@@ -31,8 +32,13 @@ SpriteImagePtr createSpriteImage(const util::Image& image,
 
 using Sprites = std::map<std::string, SpriteImagePtr>;
 
+
+using SpriteParseResult = mapbox::util::variant<
+    Sprites,      // success
+    std::string>; // error
+
 // Parses an image and an associated JSON file and returns the sprite objects.
-Sprites parseSprite(const std::string& image, const std::string& json);
+SpriteParseResult parseSprite(const std::string& image, const std::string& json);
 
 } // namespace mbgl
 
