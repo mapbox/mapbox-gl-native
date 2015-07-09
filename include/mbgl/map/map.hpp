@@ -36,13 +36,16 @@ enum class AnnotationType : uint8_t {
     Shape = 1 << 1,
 };
 
+struct EdgeInsets {
+    double top = 0;
+    double left = 0;
+    double bottom = 0;
+    double right = 0;
+};
+
 using AnnotationIDs = std::vector<uint32_t>;
 using AnnotationSegment = std::vector<LatLng>;
 using AnnotationSegments = std::vector<AnnotationSegment>;
-
-using EdgeInsets = struct {
-    double top, left, bottom, right;
-};
 
 class Map : private util::noncopyable {
     friend class View;
