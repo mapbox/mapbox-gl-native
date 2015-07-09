@@ -206,7 +206,7 @@ void MapContext::updateAnnotationTiles(const std::unordered_set<TileID, TileID::
             shapeLayer->type = (shapeStyle.is<LineProperties>() ? StyleLayerType::Line : StyleLayerType::Fill);
 
             // add to end of other shape layers just before (last) point layer
-            style->layers.emplace((style->layers.end() - 2), shapeLayer);
+            style->layers.emplace((style->layers.end() - 1), shapeLayer);
 
             // create shape bucket & connect to source
             util::ptr<StyleBucket> shapeBucket = std::make_shared<StyleBucket>(shapeLayer->type);
