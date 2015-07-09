@@ -22,9 +22,9 @@
 
 namespace mbgl {
 
-Style::Style(MapData& data_, uv_loop_t* loop)
+Style::Style(MapData& data_, uv_loop_t*)
     : data(data_),
-      glyphStore(std::make_unique<GlyphStore>(loop)),
+      glyphStore(std::make_unique<GlyphStore>()),
       glyphAtlas(std::make_unique<GlyphAtlas>(1024, 1024)),
       spriteStore(std::make_unique<SpriteStore>()),
       spriteAtlas(std::make_unique<SpriteAtlas>(512, 512, data.pixelRatio, *spriteStore)),
