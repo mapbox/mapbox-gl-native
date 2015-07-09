@@ -213,7 +213,6 @@ std::chrono::steady_clock::duration secondsAsDuration(float duration)
         [self createGLView];
     }
 
-
     self.accessibilityLabel = @"Map";
     self.backgroundColor = [UIColor clearColor];
     self.clipsToBounds = YES;
@@ -251,7 +250,7 @@ std::chrono::steady_clock::duration secondsAsDuration(float duration)
     //
     _annotationIDsByAnnotation = [NSMapTable mapTableWithKeyOptions:NSMapTableStrongMemory valueOptions:NSMapTableStrongMemory];
 
-    _annotationImages = [NSMutableDictionary new];
+    _annotationImages = [NSMutableDictionary dictionary];
 
     std::string defaultSymbolName([MGLDefaultStyleMarkerSymbolName UTF8String]);
     _mbglMap->setDefaultPointAnnotationSymbol(defaultSymbolName);
@@ -376,9 +375,7 @@ std::chrono::steady_clock::duration secondsAsDuration(float duration)
 
 - (void)createGLView
 {
-    if (_context || [UIApplication sharedApplication].applicationState == UIApplicationStateBackground) {
-        return;
-    }
+    if (_context) return;
     
     // create context
     //
@@ -413,17 +410,6 @@ std::chrono::steady_clock::duration secondsAsDuration(float duration)
 
         return reinterpret_cast<mbgl::gl::glProc>(symbol);
     });
-}
-
-- (void)viewWillEnterForeground
-{
-    [[NSNotificationCenter defaultCenter] removeObserver:self
-                                                    name:UIApplicationWillEnterForegroundNotification
-                                                  object:nil];
-    [[NSNotificationCenter defaultCenter] removeObserver:self
-                                                    name:UIApplicationDidBecomeActiveNotification
-                                                  object:nil];
-    [self commonInit];
 }
 
 - (void)reachabilityChanged:(NSNotification *)notification
@@ -797,11 +783,11 @@ std::chrono::steady_clock::duration secondsAsDuration(float duration)
 {
     MGLAssertIsMainThread();
 
-    [self createGLView];
-    if (self.isDormant)
+    if (self.isDormant && [UIApplication sharedApplication].applicationState != UIApplicationStateBackground)
     {
         self.dormant = NO;
         
+        [self createGLView];
         [MGLMapboxEvents validate];
 
         self.glSnapshotView.hidden = YES;
