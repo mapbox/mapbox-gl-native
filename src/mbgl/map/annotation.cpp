@@ -162,9 +162,6 @@ AnnotationManager::addTileFeature(const uint32_t annotationID,
                 featureTiles.emplace(TileID(z, x, y, z), geometries);
             } else {
                 for (size_t l = 0; l < projectedFeature.size(); ++l) {
-
-                    std::vector<Coordinate> line;
-
                     for (size_t p = 0; p < projectedFeature[l].size(); ++p) {
 
                         auto& pp = projectedFeature[l][p];
