@@ -73,7 +73,7 @@ void TileWorker::redoPlacement(float angle, bool collisionDebug) {
 template <typename T>
 struct PropertyEvaluator {
     typedef T result_type;
-    PropertyEvaluator(float z_) : z(z_) {}
+    explicit PropertyEvaluator(float z_) : z(z_) {}
 
     template <typename P, typename std::enable_if<std::is_convertible<P, T>::value, int>::type = 0>
     T operator()(const P &value) const {

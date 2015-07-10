@@ -60,7 +60,7 @@ class HTTPCURLContext : public HTTPContext {
     MBGL_STORE_THREAD(tid)
 
 public:
-    HTTPCURLContext(uv_loop_t *loop);
+    explicit HTTPCURLContext(uv_loop_t *loop);
     ~HTTPCURLContext();
 
     RequestBase* createRequest(const Resource&,

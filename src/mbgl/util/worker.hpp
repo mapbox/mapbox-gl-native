@@ -16,7 +16,7 @@ class LiveTile;
 
 class Worker : public mbgl::util::noncopyable {
 public:
-    Worker(std::size_t count);
+    explicit Worker(std::size_t count);
     ~Worker();
 
     // Request work be done on a thread pool. Callbacks are executed on the invoking

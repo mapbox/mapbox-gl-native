@@ -17,7 +17,7 @@ namespace mbgl {
 
 class AssetZipContext : public AssetContext {
 public:
-    AssetZipContext(uv_loop_t *loop);
+    explicit AssetZipContext(uv_loop_t *loop);
     ~AssetZipContext();
 
     RequestBase* createRequest(const Resource& resource,

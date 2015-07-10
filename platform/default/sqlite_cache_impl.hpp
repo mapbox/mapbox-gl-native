@@ -14,7 +14,7 @@ namespace mbgl {
 
 class SQLiteCache::Impl {
 public:
-    Impl(const std::string &path = ":memory:");
+    explicit Impl(const std::string &path = ":memory:");
     ~Impl();
 
     void get(const Resource&, Callback);
