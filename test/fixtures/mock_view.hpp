@@ -12,9 +12,9 @@ public:
     MockView() = default;
 
     // View implementation.
-    float getPixelRatio() const { return 1; }
-    std::array<uint16_t, 2> getSize() const { return {{ 0, 0 }}; }
-    std::array<uint16_t, 2> getFramebufferSize() const { return {{ 0, 0 }}; }
+    float getPixelRatio() const override { return 1; }
+    std::array<uint16_t, 2> getSize() const override { return {{ 0, 0 }}; }
+    std::array<uint16_t, 2> getFramebufferSize() const override { return {{ 0, 0 }}; }
 
     void activate() override {};
     void deactivate() override {};
