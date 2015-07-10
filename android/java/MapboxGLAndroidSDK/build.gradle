@@ -265,10 +265,23 @@ task installMason() << {
 
 task installJNILibs(dependsOn: 'installMason') << {
 
+    // Load mason.properties to get all dependencies
+    Properties masonProps = new Properties()
+
+    String path = project.projectDir.absolutePath + File.separator + "mason.properties"
+    masonProps = new Properties()
+    masonProps.load(new FileInputStream(path))
+
+    println("Number of mason props = " + masonProps.size())
+
+    // Iterate through them to load via Mason
+
+/*
     exec {
         workingDir = project.buildDir.absolutePath + File.separator + "mason"
         executable = './mason'
     }
+*/
 }
 
 task apklib(type: Zip) {
