@@ -12,8 +12,6 @@ typedef struct uv_fs_s uv_fs_t;
 
 namespace uv {
 
-std::string cwd();
-
 class rwlock;
 class loop;
 class async;
