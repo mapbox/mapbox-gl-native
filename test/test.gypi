@@ -30,6 +30,9 @@
       ],
       'sources': [
         'fixtures/main.cpp',
+        'fixtures/mock_file_source.cpp',
+        'fixtures/mock_file_source.hpp',
+        'fixtures/mock_view.hpp',
         'fixtures/util.hpp',
         'fixtures/util.cpp',
         'fixtures/fixture_log_observer.hpp',
@@ -83,9 +86,6 @@
         'storage/http_other_loop.cpp',
         'storage/http_reading.cpp',
 
-        'style/mock_file_source.cpp',
-        'style/mock_file_source.hpp',
-        'style/mock_view.hpp',
         'style/pending_resources.cpp',
         'style/resource_loading.cpp',
         'style/sprite.cpp',

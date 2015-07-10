@@ -1,6 +1,6 @@
 #include "../fixtures/fixture_log_observer.hpp"
+#include "../fixtures/mock_file_source.hpp"
 #include "../fixtures/util.hpp"
-#include "mock_file_source.hpp"
 
 #include <mbgl/map/map.hpp>
 #include <mbgl/map/still_image.hpp>
