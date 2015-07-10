@@ -404,8 +404,6 @@ void GLFWView::setWindowTitle(const std::string& title) {
 namespace mbgl {
 namespace platform {
 
-double elapsed() { return glfwGetTime(); }
-
 #ifndef GL_ES_VERSION_2_0
 void showDebugImage(std::string name, const char *data, size_t width, size_t height) {
     glfwInit();
