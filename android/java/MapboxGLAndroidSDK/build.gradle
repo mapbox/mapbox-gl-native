@@ -275,6 +275,14 @@ task installJNILibs(dependsOn: 'installMason') << {
     println("Number of mason props = " + masonProps.size())
 
     // Iterate through them to load via Mason
+    Enumeration e = masonProps.propertyNames();
+
+    while (e.hasMoreElements()) {
+        String key = (String) e.nextElement();
+        String lib = key.substring(0, key.indexOf("_VERSION")).toLowerCase();
+        String version = masonProps.getProperty(key);
+        println("key = " + key + "; lib = " + lib + "; version = " + version)
+    }
 
 /*
     exec {
