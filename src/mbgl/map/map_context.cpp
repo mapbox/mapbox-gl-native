@@ -150,11 +150,20 @@ void MapContext::updateAnnotationTiles(const std::unordered_set<TileID, TileID::
     util::exclusive<AnnotationManager> annotationManager = data.getAnnotationManager();
     annotationManager->markStaleTiles(ids);
 
-    if (!style) return;
+    if (!style) {
+        return;
+    }
 
     // grab existing, single shape annotations source
     const auto& shapeID = AnnotationManager::ShapeLayerID;
-    style->getSource(shapeID)->enabled = true;
+    Source* shapeAnnotationSource = style->getSource(shapeID);
+
+    // Style not parsed yet
+    if (!shapeAnnotationSource) {
+        return;
+    }
+
+    shapeAnnotationSource->enabled = true;
 
     // create (if necessary) layers and buckets for each shape
     for (const auto &shapeAnnotationID : annotationManager->getOrderedShapeAnnotations()) {
