@@ -45,6 +45,7 @@
         'annotations/sprite_store.cpp',
         'annotations/sprite_parser.cpp',
 
+        'api/annotations.cpp',
         'api/api_misuse.cpp',
         'api/repeated_render.cpp',
         'api/set_style.cpp',
