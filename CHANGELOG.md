@@ -1,5 +1,27 @@
 # Changelog
 
+## 0.5.0
+
+### Core
+
+- Support for runtime marker imagery. ([#941](https://github.com/mapbox/mapbox-gl-native/pull/941))
+- Added `Map::fitBounds()` for region-based viewport setting. ([#1092](https://github.com/mapbox/mapbox-gl-native/issues/1092))
+- Added a raster satellite bundled style and improved raster rendering. ([#963](https://github.com/mapbox/mapbox-gl-native/issues/963))
+- Improved round line joins for semi-transparent lines. ([#1839](https://github.com/mapbox/mapbox-gl-native/pull/1839))
+- Improved map render lifecycle notifications. ([#1026](https://github.com/mapbox/mapbox-gl-native/issues/1026))
+- Fixed a bug that caused annotations not to show at zoom level zero. ([#1279](https://github.com/mapbox/mapbox-gl-native/issues/1279))
+- Fixed a bug with the ordering of shape layers. ([#1866](https://github.com/mapbox/mapbox-gl-native/pull/1866))
+- Other bug fixes and performance improvements. 
+
+### iOS
+
+- **Breaking:** Removed `-[MGLMapViewDelegate mapView:symbolNameForAnnotation:]` since runtime imagery can be used. ([#1851](https://github.com/mapbox/mapbox-gl-native/issues/1851))
+- **Breaking:** Reversed the compass `direction` polarity to be consistent with other map frameworks. ([#1780](https://github.com/mapbox/mapbox-gl-native/issues/1780))
+- Added `MGLAnnotationImage` and `MGLGeometry` routines. 
+- Improved `UIView` tracking to the map. ([#1813](https://github.com/mapbox/mapbox-gl-native/pull/1813))
+- Exposed compass, Mapbox logo, and attribution button as hideable views. ([#1770](https://github.com/mapbox/mapbox-gl-native/pull/1770))
+- Build against iOS 8.4. ([#1868](https://github.com/mapbox/mapbox-gl-native/pull/1868))
+
 ## 0.4.0
 
 ### Core
