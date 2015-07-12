@@ -86,9 +86,7 @@ void Style::update(const TransformState& transform,
     }
 }
 
-void Style::cascade(const std::vector<std::string>& classes) {
-    TimePoint now = Clock::now();
-
+void Style::cascade(const std::vector<std::string>& classes, TimePoint now) {
     for (const auto& layer : layers) {
         layer->setClasses(classes, now, defaultTransition);
     }

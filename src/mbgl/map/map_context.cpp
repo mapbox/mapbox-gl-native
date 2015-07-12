@@ -131,10 +131,10 @@ void MapContext::loadStyleJSON(const std::string& json, const std::string& base)
     assert(util::ThreadContext::currentlyOn(util::ThreadType::Map));
 
     style->setJSON(json, base);
-    style->cascade(data.getClasses());
-    style->setDefaultTransitionDuration(data.getDefaultTransitionDuration());
     style->setObserver(this);
 
+    updated |= static_cast<UpdateType>(Update::DefaultTransitionDuration);
+    updated |= static_cast<UpdateType>(Update::Classes);
     updated |= static_cast<UpdateType>(Update::Zoom);
     asyncUpdate->send();
 
@@ -240,45 +240,43 @@ void MapContext::updateAnnotationTiles(const std::unordered_set<TileID, TileID::
         }
     }
 
-    cascadeClasses();
-
     updated |= static_cast<UpdateType>(Update::Classes);
     asyncUpdate->send();
 
     annotationManager->resetStaleTiles();
 }
 
-void MapContext::cascadeClasses() {
-    style->cascade(data.getClasses());
-}
-
 void MapContext::update() {
     assert(util::ThreadContext::currentlyOn(util::ThreadType::Map));
 
-    const auto now = Clock::now();
+    if (!style) {
+        updated = static_cast<UpdateType>(Update::Nothing);
+        return;
+    }
+
+    TimePoint now = Clock::now();
+
     data.setAnimationTime(now);
 
-    if (style) {
-        if (updated & static_cast<UpdateType>(Update::DefaultTransitionDuration)) {
-            style->setDefaultTransitionDuration(data.getDefaultTransitionDuration());
-        }
+    if (updated & static_cast<UpdateType>(Update::DefaultTransitionDuration)) {
+        style->setDefaultTransitionDuration(data.getDefaultTransitionDuration());
+    }
 
-        if (updated & static_cast<UpdateType>(Update::Classes)) {
-            cascadeClasses();
-        }
+    if (updated & static_cast<UpdateType>(Update::Classes)) {
+        style->cascade(data.getClasses(), now);
+    }
 
-        if (updated & static_cast<UpdateType>(Update::Classes) ||
+    if (updated & static_cast<UpdateType>(Update::Classes) ||
             updated & static_cast<UpdateType>(Update::Zoom)) {
-            style->recalculate(transformState.getNormalizedZoom(), now);
-        }
+        style->recalculate(transformState.getNormalizedZoom(), now);
+    }
 
-        style->update(transformState, *texturePool);
+    style->update(transformState, *texturePool);
 
-        if (data.mode == MapMode::Continuous) {
-            view.invalidate();
-        } else if (callback && style->isLoaded()) {
-            renderSync(transformState, frameData);
-        }
+    if (data.mode == MapMode::Continuous) {
+        view.invalidate();
+    } else if (callback && style->isLoaded()) {
+        renderSync(transformState, frameData);
     }
 
     updated = static_cast<UpdateType>(Update::Nothing);
