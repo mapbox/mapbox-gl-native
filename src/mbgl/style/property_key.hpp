@@ -27,6 +27,11 @@ enum class PropertyKey {
     LineMiterLimit,
     LineRoundLimit,
 
+    CircleRadius,
+    CircleColor,
+    CircleOpacity,
+    CircleBlur,
+
     SymbolPlacement,
     SymbolMinDistance,
     SymbolAvoidEdges,

@@ -45,6 +45,18 @@ struct LineProperties {
     }
 };
 
+struct CircleProperties {
+    inline CircleProperties() {}
+    float radius = 1.0f;
+    Color color = {{ 0, 0, 0, 1 }};
+    float opacity = 1.0f;
+    float blur = 0;
+
+    inline bool isVisible() const {
+        return radius > 0 && color[3] > 0 && opacity > 0;
+    }
+};
+
 struct SymbolProperties {
     inline SymbolProperties() {}
 
@@ -100,6 +112,7 @@ struct BackgroundProperties {
 typedef mapbox::util::variant<
     FillProperties,
     LineProperties,
+    CircleProperties,
     SymbolProperties,
     RasterProperties,
     BackgroundProperties,
