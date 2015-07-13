@@ -57,7 +57,7 @@ public:
         std::packaged_task<void ()> task(std::bind(fn, object, args...));
         std::future<void> future = task.get_future();
         loop->invoke(std::move(task));
-        return future.get();
+        future.get();
     }
 
 private:
