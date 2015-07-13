@@ -140,7 +140,7 @@ void StyleLayer::applyStyleProperty(PropertyKey key, T &target, const float z, c
         AppliedClassProperties &applied = it->second;
         // Iterate through all properties that we need to apply in order.
         const PropertyEvaluator<T> evaluator(z, zoomHistory);
-        for (auto& property : applied.properties) {
+        for (auto& property : applied.propertyValues) {
             if (now >= property.begin) {
                 // We overwrite the current property with the new value.
                 target = mapbox::util::apply_visitor(evaluator, property.value);
@@ -158,7 +158,7 @@ void StyleLayer::applyTransitionedStyleProperty(PropertyKey key, T &target, cons
         AppliedClassProperties &applied = it->second;
         // Iterate through all properties that we need to apply in order.
         const PropertyEvaluator<T> evaluator(z, zoomHistory);
-        for (auto& property : applied.properties) {
+        for (auto& property : applied.propertyValues) {
             if (now >= property.end) {
                 // We overwrite the current property with the new value.
                 target = mapbox::util::apply_visitor(evaluator, property.value);
@@ -270,7 +270,6 @@ bool StyleLayer::hasTransitions() const {
     }
     return false;
 }
-
 
 void StyleLayer::cleanupAppliedStyleProperties(TimePoint now) {
     for (auto it = appliedStyle.begin(); it != appliedStyle.end();) {
