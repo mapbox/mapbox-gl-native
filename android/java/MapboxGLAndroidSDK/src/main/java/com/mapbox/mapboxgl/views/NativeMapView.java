@@ -214,6 +214,10 @@ class NativeMapView {
         nativeSetLatLng(mNativeMapViewPtr, latLng, duration);
     }
 
+    public void addAnnotation(LatLng latLng) {
+        nativeAddAnnotation(mNativeMapViewPtr, latLng);
+    }
+
     public LatLng getLatLng() {
         return nativeGetLatLng(mNativeMapViewPtr);
     }
@@ -445,6 +449,8 @@ class NativeMapView {
 
     private native void nativeSetLatLng(long nativeMapViewPtr, LatLng latLng,
                                         long duration);
+
+    private native void nativeAddAnnotation(long nativeMapViewPtr, LatLng latLng);
 
     private native LatLng nativeGetLatLng(long nativeMapViewPtr);
 

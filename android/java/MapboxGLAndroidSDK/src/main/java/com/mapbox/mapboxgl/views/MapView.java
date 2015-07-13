@@ -205,6 +205,10 @@ public class MapView extends SurfaceView {
         }
     }
 
+    public void addAnnotation(LatLng marker) {
+        mNativeMapView.addAnnotation(marker);
+    }
+
     //
     // Property methods
     //

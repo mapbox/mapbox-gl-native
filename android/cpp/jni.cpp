@@ -16,6 +16,7 @@
 #include <mbgl/android/jni.hpp>
 #include <mbgl/android/native_map_view.hpp>
 #include <mbgl/map/map.hpp>
+#include <mbgl/annotation/point_annotation.hpp>
 #include <mbgl/platform/event.hpp>
 #include <mbgl/platform/log.hpp>
 #include <mbgl/storage/network_status.hpp>
@@ -431,6 +432,26 @@ void JNICALL nativeSetLatLng(JNIEnv *env, jobject obj, jlong nativeMapViewPtr, j
     }
 
     nativeMapView->getMap().setLatLng(mbgl::LatLng(latitude, longitude), std::chrono::milliseconds(duration));
+}
+
+void JNICALL nativeAddAnnotation(JNIEnv *env, jobject obj, jlong nativeMapViewPtr, jobject latLng) {
+    mbgl::Log::Debug(mbgl::Event::JNI, "nativeAddAnnotation");
+    assert(nativeMapViewPtr != 0);
+    NativeMapView *nativeMapView = reinterpret_cast<NativeMapView *>(nativeMapViewPtr);
+
+    jdouble latitude = env->GetDoubleField(latLng, latLngLatitudeId);
+    if (env->ExceptionCheck()) {
+        env->ExceptionDescribe();
+        return;
+    }
+
+    jdouble longitude = env->GetDoubleField(latLng, latLngLongitudeId);
+    if (env->ExceptionCheck()) {
+        env->ExceptionDescribe();
+        return;
+    }
+
+    nativeMapView->getMap().addPointAnnotation(mbgl::PointAnnotation(mbgl::LatLng(latitude, longitude), std::string("default_marker")));
 }
 
 jobject JNICALL nativeGetLatLng(JNIEnv *env, jobject obj, jlong nativeMapViewPtr) {
@@ -976,6 +997,8 @@ extern "C" JNIEXPORT jint JNICALL JNI_OnLoad(JavaVM *vm, void *reserved) {
         {"nativeMoveBy", "(JDDJ)V", reinterpret_cast<void *>(&nativeMoveBy)},
         {"nativeSetLatLng", "(JLcom/mapbox/mapboxgl/geometry/LatLng;J)V",
          reinterpret_cast<void *>(&nativeSetLatLng)},
+        {"nativeAddAnnotation", "(JLcom/mapbox/mapboxgl/geometry/LatLng;)V",
+         reinterpret_cast<void *>(&nativeAddAnnotation)},
         {"nativeGetLatLng", "(J)Lcom/mapbox/mapboxgl/geometry/LatLng;",
          reinterpret_cast<void *>(&nativeGetLatLng)},
         {"nativeResetPosition", "(J)V", reinterpret_cast<void *>(&nativeResetPosition)},
