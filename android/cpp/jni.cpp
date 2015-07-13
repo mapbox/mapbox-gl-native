@@ -436,7 +436,7 @@ void JNICALL nativeAddAnnotation(JNIEnv *env, jobject obj, jlong nativeMapViewPt
         return;
     }
 
-    nativeMapView->getMap().addPointAnnotation(mbgl::LatLng(latitude, longitude), std::string(""));
+    nativeMapView->getMap().addPointAnnotation(mbgl::LatLng(latitude, longitude), std::string("default_marker"));
 }
 
 jobject JNICALL nativeGetLatLng(JNIEnv *env, jobject obj, jlong nativeMapViewPtr) {
