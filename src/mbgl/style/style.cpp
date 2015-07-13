@@ -86,13 +86,13 @@ void Style::update(const TransformState& transform,
     }
 }
 
-void Style::cascade(const std::vector<std::string>& classes, TimePoint now) {
+void Style::cascade(const std::vector<std::string>& classes, const TimePoint& now) {
     for (const auto& layer : layers) {
         layer->setClasses(classes, now, defaultTransition);
     }
 }
 
-void Style::recalculate(float z, TimePoint now) {
+void Style::recalculate(float z, const TimePoint& now) {
     uv::writelock lock(mtx);
 
     for (const auto& source : sources) {

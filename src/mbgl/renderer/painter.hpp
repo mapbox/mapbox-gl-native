@@ -96,7 +96,7 @@ public:
     void render(const Style& style,
                 TransformState state,
                 const FrameData& frame,
-                TimePoint time);
+                const TimePoint& time);
 
     // Renders debug information for a tile.
     void renderTileDebug(const Tile& tile);

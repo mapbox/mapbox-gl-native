@@ -165,7 +165,7 @@ void Painter::prepareTile(const Tile& tile) {
     config.stencilFunc = { GL_EQUAL, ref, mask };
 }
 
-void Painter::render(const Style& style, TransformState state_, const FrameData& frame_, TimePoint time) {
+void Painter::render(const Style& style, TransformState state_, const FrameData& frame_, const TimePoint& time) {
     state = state_;
     frame = frame_;
 

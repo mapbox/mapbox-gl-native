@@ -28,7 +28,7 @@ bool StyleLayer::isVisible() const {
     }
 }
 
-void StyleLayer::setClasses(const std::vector<std::string> &class_names, const TimePoint now,
+void StyleLayer::setClasses(const std::vector<std::string> &class_names, const TimePoint& now,
                             const PropertyTransition &defaultTransition) {
     // Stores all keys that we have already added transitions for.
     std::set<PropertyKey> already_applied;
@@ -69,7 +69,7 @@ void StyleLayer::setClasses(const std::vector<std::string> &class_names, const T
 
 // Helper function for applying all properties of a a single class that haven't been applied yet.
 void StyleLayer::applyClassProperties(const ClassID class_id,
-                                      std::set<PropertyKey> &already_applied, TimePoint now,
+                                      std::set<PropertyKey> &already_applied, const TimePoint& now,
                                       const PropertyTransition &defaultTransition) {
     auto style_it = styles.find(class_id);
     if (style_it == styles.end()) {
@@ -134,7 +134,7 @@ private:
 };
 
 template <typename T>
-void StyleLayer::applyStyleProperty(PropertyKey key, T &target, const float z, const TimePoint now, const ZoomHistory &zoomHistory) {
+void StyleLayer::applyStyleProperty(PropertyKey key, T &target, const float z, const TimePoint& now, const ZoomHistory &zoomHistory) {
     auto it = appliedStyle.find(key);
     if (it != appliedStyle.end()) {
         AppliedClassProperties &applied = it->second;
@@ -152,7 +152,7 @@ void StyleLayer::applyStyleProperty(PropertyKey key, T &target, const float z, c
 }
 
 template <typename T>
-void StyleLayer::applyTransitionedStyleProperty(PropertyKey key, T &target, const float z, const TimePoint now, const ZoomHistory &zoomHistory) {
+void StyleLayer::applyTransitionedStyleProperty(PropertyKey key, T &target, const float z, const TimePoint& now, const ZoomHistory &zoomHistory) {
     auto it = appliedStyle.find(key);
     if (it != appliedStyle.end()) {
         AppliedClassProperties &applied = it->second;
@@ -174,7 +174,7 @@ void StyleLayer::applyTransitionedStyleProperty(PropertyKey key, T &target, cons
 }
 
 template <>
-void StyleLayer::applyStyleProperties<FillProperties>(const float z, const TimePoint now, const ZoomHistory &zoomHistory) {
+void StyleLayer::applyStyleProperties<FillProperties>(const float z, const TimePoint& now, const ZoomHistory &zoomHistory) {
     properties.set<FillProperties>();
     FillProperties &fill = properties.get<FillProperties>();
     applyStyleProperty(PropertyKey::FillAntialias, fill.antialias, z, now, zoomHistory);
@@ -187,7 +187,7 @@ void StyleLayer::applyStyleProperties<FillProperties>(const float z, const TimeP
 }
 
 template <>
-void StyleLayer::applyStyleProperties<LineProperties>(const float z, const TimePoint now, const ZoomHistory &zoomHistory) {
+void StyleLayer::applyStyleProperties<LineProperties>(const float z, const TimePoint& now, const ZoomHistory &zoomHistory) {
     properties.set<LineProperties>();
     LineProperties &line = properties.get<LineProperties>();
     applyTransitionedStyleProperty(PropertyKey::LineOpacity, line.opacity, z, now, zoomHistory);
@@ -201,11 +201,11 @@ void StyleLayer::applyStyleProperties<LineProperties>(const float z, const TimeP
     applyStyleProperty(PropertyKey::LineImage, line.image, z, now, zoomHistory);
 
     // for scaling dasharrays
-    applyStyleProperty(PropertyKey::LineWidth, line.dash_line_width, std::floor(z), TimePoint::max(), zoomHistory);
+    applyStyleProperty(PropertyKey::LineWidth, line.dash_line_width, std::floor(z), now, zoomHistory);
 }
 
 template <>
-void StyleLayer::applyStyleProperties<SymbolProperties>(const float z, const TimePoint now, const ZoomHistory &zoomHistory) {
+void StyleLayer::applyStyleProperties<SymbolProperties>(const float z, const TimePoint& now, const ZoomHistory &zoomHistory) {
     properties.set<SymbolProperties>();
     SymbolProperties &symbol = properties.get<SymbolProperties>();
     applyTransitionedStyleProperty(PropertyKey::IconOpacity, symbol.icon.opacity, z, now, zoomHistory);
@@ -228,7 +228,7 @@ void StyleLayer::applyStyleProperties<SymbolProperties>(const float z, const Tim
 }
 
 template <>
-void StyleLayer::applyStyleProperties<RasterProperties>(const float z, const TimePoint now, const ZoomHistory &zoomHistory) {
+void StyleLayer::applyStyleProperties<RasterProperties>(const float z, const TimePoint& now, const ZoomHistory &zoomHistory) {
     properties.set<RasterProperties>();
     RasterProperties &raster = properties.get<RasterProperties>();
     applyTransitionedStyleProperty(PropertyKey::RasterOpacity, raster.opacity, z, now, zoomHistory);
@@ -241,7 +241,7 @@ void StyleLayer::applyStyleProperties<RasterProperties>(const float z, const Tim
 }
 
 template <>
-void StyleLayer::applyStyleProperties<BackgroundProperties>(const float z, const TimePoint now, const ZoomHistory &zoomHistory) {
+void StyleLayer::applyStyleProperties<BackgroundProperties>(const float z, const TimePoint& now, const ZoomHistory &zoomHistory) {
     properties.set<BackgroundProperties>();
     BackgroundProperties &background = properties.get<BackgroundProperties>();
     applyTransitionedStyleProperty(PropertyKey::BackgroundOpacity, background.opacity, z, now, zoomHistory);
@@ -249,7 +249,7 @@ void StyleLayer::applyStyleProperties<BackgroundProperties>(const float z, const
     applyStyleProperty(PropertyKey::BackgroundImage, background.image, z, now, zoomHistory);
 }
 
-void StyleLayer::updateProperties(float z, const TimePoint now, ZoomHistory &zoomHistory) {
+void StyleLayer::updateProperties(float z, const TimePoint& now, ZoomHistory &zoomHistory) {
     cleanupAppliedStyleProperties(now);
 
     switch (type) {
@@ -271,7 +271,7 @@ bool StyleLayer::hasTransitions() const {
     return false;
 }
 
-void StyleLayer::cleanupAppliedStyleProperties(TimePoint now) {
+void StyleLayer::cleanupAppliedStyleProperties(const TimePoint& now) {
     for (auto it = appliedStyle.begin(); it != appliedStyle.end();) {
         AppliedClassProperties& appliedPropertyValues = it->second;
         appliedPropertyValues.cleanup(now);

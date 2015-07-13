@@ -69,14 +69,15 @@ public:
         // has a bug that doesn't allow TimePoints to be atomic.
         return TimePoint(animationTime);
     }
-    inline void setAnimationTime(TimePoint timePoint) {
+    inline void setAnimationTime(const TimePoint& timePoint) {
         animationTime = timePoint.time_since_epoch();
     };
 
     inline Duration getDefaultTransitionDuration() const {
         return defaultTransitionDuration;
     }
-    inline void setDefaultTransitionDuration(Duration duration) {
+
+    inline void setDefaultTransitionDuration(const Duration& duration) {
         defaultTransitionDuration = duration;
     }
 

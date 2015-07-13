@@ -54,8 +54,8 @@ public:
     // a tile is ready so observers can render the tile.
     void update(const TransformState&, TexturePool&);
 
-    void cascade(const std::vector<std::string>&, TimePoint now);
-    void recalculate(float z, TimePoint now);
+    void cascade(const std::vector<std::string>&, const TimePoint& now);
+    void recalculate(float z, const TimePoint& now);
 
     void setDefaultTransitionDuration(Duration);
     bool hasTransitions() const;

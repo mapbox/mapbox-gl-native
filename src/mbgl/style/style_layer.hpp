@@ -40,10 +40,10 @@ public:
 
     // Updates the StyleProperties information in this layer by evaluating all
     // pending transitions and applied classes in order.
-    void updateProperties(float z, TimePoint now, ZoomHistory &zoomHistory);
+    void updateProperties(float z, const TimePoint& now, ZoomHistory &zoomHistory);
 
     // Sets the list of classes and creates transitions to the currently applied values.
-    void setClasses(const std::vector<std::string> &class_names, TimePoint now,
+    void setClasses(const std::vector<std::string> &class_names, const TimePoint& now,
                     const PropertyTransition &defaultTransition);
 
     bool hasTransitions() const;
@@ -51,16 +51,16 @@ public:
 private:
     // Applies all properties from a class, if they haven't been applied already.
     void applyClassProperties(ClassID class_id, std::set<PropertyKey> &already_applied,
-                              TimePoint now, const PropertyTransition &defaultTransition);
+                              const TimePoint& now, const PropertyTransition &defaultTransition);
 
     // Sets the properties of this object by evaluating all pending transitions and
     // aplied classes in order.
-    template <typename T> void applyStyleProperties(float z, TimePoint now, const ZoomHistory &zoomHistory);
-    template <typename T> void applyStyleProperty(PropertyKey key, T &, float z, TimePoint now, const ZoomHistory &zoomHistory);
-    template <typename T> void applyTransitionedStyleProperty(PropertyKey key, T &, float z, TimePoint now, const ZoomHistory &zoomHistory);
+    template <typename T> void applyStyleProperties(float z, const TimePoint& now, const ZoomHistory &zoomHistory);
+    template <typename T> void applyStyleProperty(PropertyKey key, T &, float z, const TimePoint& now, const ZoomHistory &zoomHistory);
+    template <typename T> void applyTransitionedStyleProperty(PropertyKey key, T &, float z, const TimePoint& now, const ZoomHistory &zoomHistory);
 
     // Removes all expired style transitions.
-    void cleanupAppliedStyleProperties(TimePoint now);
+    void cleanupAppliedStyleProperties(const TimePoint& now);
 
 public:
     // The name of this layer.

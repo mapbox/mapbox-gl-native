@@ -254,7 +254,7 @@ void MapContext::update() {
         return;
     }
 
-    TimePoint now = Clock::now();
+    const TimePoint now = Clock::now();
 
     data.setAnimationTime(now);
 
