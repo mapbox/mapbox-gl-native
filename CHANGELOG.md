@@ -1,5 +1,11 @@
 # Changelog
 
+## 0.5.1
+
+### iOS
+
+- Added support for CocoaPods 0.38.0. ([#1876](https://github.com/mapbox/mapbox-gl-native/pull/1876))
+
 ## 0.5.0
 
 ### Core
