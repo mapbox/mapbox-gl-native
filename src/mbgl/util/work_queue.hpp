@@ -14,11 +14,18 @@ namespace util {
 
 class RunLoop;
 
+// The WorkQueue will manage a queue of closures
+// and it will make sure they get executed on the
+// thread that created the WorkQueue. All pending
+// works are canceled when the queue gets destructed.
 class WorkQueue : private util::noncopyable {
 public:
     WorkQueue();
-    virtual ~WorkQueue();
+    ~WorkQueue();
 
+    // Push a closure to the queue. It is advised to
+    // only push tasks calling functions on the object
+    // that owns the queue to avoid use after free errors.
     void push(std::function<void()>&&);
 
 private:

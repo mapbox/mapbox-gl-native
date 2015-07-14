@@ -59,8 +59,10 @@ bool GlyphStore::hasGlyphRanges(const std::string& fontStackName, const std::set
     for (const auto& range : glyphRanges) {
         const auto& rangeSetsIt = rangeSets.find(range);
         if (rangeSetsIt == rangeSets.end()) {
-            // Post the request to the Map thread.
+            // Push the request to the MapThread, so we can easly cancel
+            // if it is still pending when we destroy this object.
             workQueue.push(std::bind(&GlyphStore::requestGlyphRange, this, fontStackName, range));
+
             hasRanges = false;
             continue;
         }
@@ -81,6 +83,8 @@ util::exclusive<FontStack> GlyphStore::createFontStack(const std::string& fontSt
         it = stacks.emplace(fontStack, std::make_unique<FontStack>()).first;
     }
 
+    // FIXME: We lock all FontStacks, but what we should
+    // really do is lock only the one we are returning.
     return { it->second.get(), std::move(lock) };
 }
 

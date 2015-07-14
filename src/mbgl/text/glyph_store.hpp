@@ -16,7 +16,9 @@ namespace mbgl {
 class FontStack;
 class GlyphPBF;
 
-// Manages GlyphRange PBF loading.
+// The GlyphStore manages the loading and storage of Glyphs
+// and creation of FontStack objects. The GlyphStore lives
+// on the MapThread but can be queried from any thread.
 class GlyphStore {
 public:
     class Observer {
@@ -32,6 +34,11 @@ public:
 
     util::exclusive<FontStack> getFontStack(const std::string& fontStack);
 
+    // Returns true if the set of GlyphRanges are available and parsed or false
+    // if they are not. For the missing ranges, a request on the FileSource is
+    // made and when the glyph if finally parsed, it gets added to the respective
+    // FontStack and a signal is emitted to notify the observers. This method
+    // can be called from any thread.
     bool hasGlyphRanges(const std::string& fontStackName, const std::set<GlyphRange>& glyphRanges);
 
     void setURL(const std::string &url) {
