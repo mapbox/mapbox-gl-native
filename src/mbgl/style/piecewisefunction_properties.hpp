@@ -11,7 +11,6 @@ template <typename T>
 struct PiecewiseConstantFunction {
     inline PiecewiseConstantFunction(const std::vector<std::pair<float, T>> &values_, std::chrono::duration<float> duration_) : values(values_), duration(duration_) {}
     inline PiecewiseConstantFunction(T &value, std::chrono::duration<float> duration_) : values({{ 0, value }}), duration(duration_) {}
-    inline PiecewiseConstantFunction() : values(), duration(std::chrono::milliseconds(300)) {}
     T evaluate(float z, const ZoomHistory &zoomHistory) const;
 
 private:

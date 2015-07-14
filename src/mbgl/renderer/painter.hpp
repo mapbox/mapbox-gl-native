@@ -81,7 +81,7 @@ struct RenderItem {
 
 class Painter : private util::noncopyable {
 public:
-    Painter(float pixelRatio);
+    Painter(MapData& data);
     ~Painter();
 
     void setup();
@@ -191,7 +191,7 @@ public:
     }();
 
 private:
-    const float pixelRatio;
+    MapData& data;
 
     TransformState state;
     FrameData frame;

@@ -254,21 +254,15 @@ void MapContext::update() {
         return;
     }
 
-    const TimePoint now = Clock::now();
-
-    data.setAnimationTime(now);
-
-    if (updated & static_cast<UpdateType>(Update::DefaultTransitionDuration)) {
-        style->setDefaultTransitionDuration(data.getDefaultTransitionDuration());
-    }
+    data.setAnimationTime(Clock::now());
 
     if (updated & static_cast<UpdateType>(Update::Classes)) {
-        style->cascade(data.getClasses(), now);
+        style->cascade();
     }
 
     if (updated & static_cast<UpdateType>(Update::Classes) ||
             updated & static_cast<UpdateType>(Update::Zoom)) {
-        style->recalculate(transformState.getNormalizedZoom(), now);
+        style->recalculate(transformState.getNormalizedZoom());
     }
 
     style->update(transformState, *texturePool);
@@ -330,7 +324,7 @@ MapContext::RenderResult MapContext::renderSync(const TransformState& state, con
     glObjectStore.performCleanup();
 
     if (!painter) {
-        painter = std::make_unique<Painter>(data.pixelRatio);
+        painter = std::make_unique<Painter>(data);
         painter->setup();
     }
 

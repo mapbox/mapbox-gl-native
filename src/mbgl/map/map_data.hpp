@@ -20,10 +20,14 @@ class MapData {
     using Lock = std::lock_guard<std::mutex>;
 
 public:
-    inline MapData(MapMode mode_, const float pixelRatio_) : mode(mode_), pixelRatio(pixelRatio_) {
+    inline MapData(MapMode mode_, const float pixelRatio_)
+        : mode(mode_)
+        , pixelRatio(pixelRatio_)
+        , animationTime(Duration::zero())
+        , defaultFadeDuration(std::chrono::milliseconds(300))
+        , defaultTransitionDuration(Duration::zero())
+        , defaultTransitionDelay(Duration::zero()) {
         assert(pixelRatio > 0);
-        setAnimationTime(TimePoint::min());
-        setDefaultTransitionDuration(Duration::zero());
     }
 
     // Adds the class if it's not yet set. Returns true when it added the class, and false when it
@@ -73,12 +77,28 @@ public:
         animationTime = timePoint.time_since_epoch();
     };
 
+    inline Duration getDefaultFadeDuration() const {
+        return defaultFadeDuration;
+    }
+
+    inline void setDefaultFadeDuration(const Duration& duration) {
+        defaultFadeDuration = duration;
+    }
+
     inline Duration getDefaultTransitionDuration() const {
         return defaultTransitionDuration;
     }
 
     inline void setDefaultTransitionDuration(const Duration& duration) {
         defaultTransitionDuration = duration;
+    }
+
+    inline Duration getDefaultTransitionDelay() const {
+        return defaultTransitionDelay;
+    }
+
+    inline void setDefaultTransitionDelay(const Duration& delay) {
+        defaultTransitionDelay = delay;
     }
 
     util::exclusive<AnnotationManager> getAnnotationManager() {
@@ -101,7 +121,9 @@ private:
     std::atomic<uint8_t> debug { false };
     std::atomic<uint8_t> collisionDebug { false };
     std::atomic<Duration> animationTime;
+    std::atomic<Duration> defaultFadeDuration;
     std::atomic<Duration> defaultTransitionDuration;
+    std::atomic<Duration> defaultTransitionDelay;
 
 // TODO: make private
 public:

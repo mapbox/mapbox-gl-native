@@ -7,6 +7,7 @@
 #include <mbgl/style/style_layer.hpp>
 #include <mbgl/style/style_parser.hpp>
 #include <mbgl/style/style_bucket.hpp>
+#include <mbgl/style/property_transition.hpp>
 #include <mbgl/geometry/glyph_atlas.hpp>
 #include <mbgl/geometry/sprite_atlas.hpp>
 #include <mbgl/geometry/line_atlas.hpp>
@@ -41,7 +42,7 @@ void Style::setJSON(const std::string& json, const std::string&) {
         return;
     }
 
-    StyleParser parser;
+    StyleParser parser(data);
     parser.parse(doc);
 
     sources = parser.getSources();
@@ -86,23 +87,25 @@ void Style::update(const TransformState& transform,
     }
 }
 
-void Style::cascade(const std::vector<std::string>& classes, const TimePoint& now) {
+void Style::cascade() {
     for (const auto& layer : layers) {
-        layer->setClasses(classes, now, defaultTransition);
+        layer->setClasses(data.getClasses(),
+                data.getAnimationTime(),
+                PropertyTransition { data.getDefaultTransitionDuration(), data.getDefaultTransitionDelay() });
     }
 }
 
-void Style::recalculate(float z, const TimePoint& now) {
+void Style::recalculate(float z) {
     uv::writelock lock(mtx);
 
     for (const auto& source : sources) {
         source->enabled = false;
     }
 
-    zoomHistory.update(z, now);
+    zoomHistory.update(z, data.getAnimationTime());
 
     for (const auto& layer : layers) {
-        layer->updateProperties(z, now, zoomHistory);
+        layer->updateProperties(z, data.getAnimationTime(), zoomHistory);
         if (!layer->bucket) {
             continue;
         }
@@ -122,10 +125,6 @@ Source* Style::getSource(const std::string& id) const {
     });
 
     return it != sources.end() ? it->get() : nullptr;
-}
-
-void Style::setDefaultTransitionDuration(Duration duration) {
-    defaultTransition.duration = duration;
 }
 
 bool Style::hasTransitions() const {

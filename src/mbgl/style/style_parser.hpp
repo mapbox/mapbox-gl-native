@@ -31,7 +31,7 @@ public:
     template<typename T>
     using Result = std::pair<Status, T>;
 
-    StyleParser();
+    StyleParser(MapData& data);
 
     void parse(JSVal document);
 
@@ -117,6 +117,9 @@ private:
 
     // URL template for glyph PBFs.
     std::string glyph_url;
+
+    // Obtain default transition duration from map data.
+    MapData& data;
 };
 
 }

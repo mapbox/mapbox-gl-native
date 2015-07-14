@@ -54,10 +54,9 @@ public:
     // a tile is ready so observers can render the tile.
     void update(const TransformState&, TexturePool&);
 
-    void cascade(const std::vector<std::string>&, const TimePoint& now);
-    void recalculate(float z, const TimePoint& now);
+    void cascade();
+    void recalculate(float z);
 
-    void setDefaultTransitionDuration(Duration);
     bool hasTransitions() const;
 
     std::exception_ptr getLastError() const {
@@ -101,7 +100,6 @@ private:
 
     std::exception_ptr lastError;
 
-    PropertyTransition defaultTransition;
     std::unique_ptr<uv::rwlock> mtx;
     ZoomHistory zoomHistory;
 
