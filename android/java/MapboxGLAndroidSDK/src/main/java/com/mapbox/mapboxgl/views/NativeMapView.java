@@ -449,7 +449,7 @@ class NativeMapView {
     private native void nativeSetLatLng(long nativeMapViewPtr, LatLng latLng,
                                         long duration);
 
-    private native void nativeAddMarker(long nativeMapViewPtr, LatLng latLng);
+    private native long nativeAddMarker(long nativeMapViewPtr, LatLng latLng);
 
     private native LatLng nativeGetLatLng(long nativeMapViewPtr);
 

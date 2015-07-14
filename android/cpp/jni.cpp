@@ -434,7 +434,7 @@ void JNICALL nativeSetLatLng(JNIEnv *env, jobject obj, jlong nativeMapViewPtr, j
     nativeMapView->getMap().setLatLng(mbgl::LatLng(latitude, longitude), std::chrono::milliseconds(duration));
 }
 
-void JNICALL nativeAddMarker(JNIEnv *env, jobject obj, jlong nativeMapViewPtr, jobject latLng) {
+jlong JNICALL nativeAddMarker(JNIEnv *env, jobject obj, jlong nativeMapViewPtr, jobject latLng) {
     mbgl::Log::Debug(mbgl::Event::JNI, "nativeAddMarker");
     assert(nativeMapViewPtr != 0);
     NativeMapView *nativeMapView = reinterpret_cast<NativeMapView *>(nativeMapViewPtr);
@@ -442,16 +442,17 @@ void JNICALL nativeAddMarker(JNIEnv *env, jobject obj, jlong nativeMapViewPtr, j
     jdouble latitude = env->GetDoubleField(latLng, latLngLatitudeId);
     if (env->ExceptionCheck()) {
         env->ExceptionDescribe();
-        return;
+        return -1;
     }
 
     jdouble longitude = env->GetDoubleField(latLng, latLngLongitudeId);
     if (env->ExceptionCheck()) {
         env->ExceptionDescribe();
-        return;
+        return -1;
     }
 
-    nativeMapView->getMap().addPointAnnotation(mbgl::PointAnnotation(mbgl::LatLng(latitude, longitude), std::string("default_marker")));
+    // Because Java only has int, not unsigned int, we need to bump the annotation id up to a long.
+    return (jlong) nativeMapView->getMap().addPointAnnotation(mbgl::PointAnnotation(mbgl::LatLng(latitude, longitude), std::string("default_marker")));
 }
 
 jobject JNICALL nativeGetLatLng(JNIEnv *env, jobject obj, jlong nativeMapViewPtr) {
@@ -997,7 +998,7 @@ extern "C" JNIEXPORT jint JNICALL JNI_OnLoad(JavaVM *vm, void *reserved) {
         {"nativeMoveBy", "(JDDJ)V", reinterpret_cast<void *>(&nativeMoveBy)},
         {"nativeSetLatLng", "(JLcom/mapbox/mapboxgl/geometry/LatLng;J)V",
          reinterpret_cast<void *>(&nativeSetLatLng)},
-        {"nativeAddMarker", "(JLcom/mapbox/mapboxgl/geometry/LatLng;)V",
+        {"nativeAddMarker", "(JLcom/mapbox/mapboxgl/geometry/LatLng;)J",
          reinterpret_cast<void *>(&nativeAddMarker)},
         {"nativeGetLatLng", "(J)Lcom/mapbox/mapboxgl/geometry/LatLng;",
          reinterpret_cast<void *>(&nativeGetLatLng)},
