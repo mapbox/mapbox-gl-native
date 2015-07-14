@@ -2,28 +2,28 @@
 
 namespace mbgl {
 
-AppliedClassProperty::AppliedClassProperty(ClassID class_id, const TimePoint& begin_, const TimePoint& end_, const PropertyValue &value_)
+AppliedClassPropertyValue::AppliedClassPropertyValue(ClassID class_id, const TimePoint& begin_, const TimePoint& end_, const PropertyValue &value_)
     : name(class_id),
     begin(begin_),
     end(end_),
     value(value_) {}
 
 // Returns the ID of the most recent
-ClassID AppliedClassProperties::mostRecent() const {
+ClassID AppliedClassPropertyValues::mostRecent() const {
     return propertyValues.empty() ? ClassID::Fallback : propertyValues.back().name;
 }
 
-void AppliedClassProperties::add(ClassID class_id, const TimePoint& begin, const TimePoint& end, const PropertyValue &value) {
+void AppliedClassPropertyValues::add(ClassID class_id, const TimePoint& begin, const TimePoint& end, const PropertyValue &value) {
     propertyValues.emplace_back(class_id, begin, end, value);
 }
 
-bool AppliedClassProperties::hasTransitions() const {
+bool AppliedClassPropertyValues::hasTransitions() const {
     return propertyValues.size() > 1;
 }
 
 // Erase all items in the property list that are before a completed transition.
 // Then, if the only remaining property is a Fallback value, remove it too.
-void AppliedClassProperties::cleanup(const TimePoint& now) {
+void AppliedClassPropertyValues::cleanup(const TimePoint& now) {
     // Iterate backwards, but without using the rbegin/rend interface since we need forward
     // iterators to use .erase().
     for (auto it = propertyValues.end(), begin = propertyValues.begin(); it != begin;) {
@@ -45,7 +45,7 @@ void AppliedClassProperties::cleanup(const TimePoint& now) {
     }
 }
 
-bool AppliedClassProperties::empty() const {
+bool AppliedClassPropertyValues::empty() const {
     return propertyValues.empty();
 }
 

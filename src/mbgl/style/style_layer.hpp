@@ -78,7 +78,7 @@ public:
 private:
     // For every property, stores a list of applied property values, with
     // optional transition times.
-    std::map<PropertyKey, AppliedClassProperties> appliedStyle;
+    std::map<PropertyKey, AppliedClassPropertyValues> appliedStyle;
 
 public:
     // Stores the evaluated, and cascaded styling information, specific to this

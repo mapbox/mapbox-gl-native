@@ -54,7 +54,7 @@ void StyleLayer::setClasses(const std::vector<std::string> &class_names, const T
             continue;
         }
 
-        AppliedClassProperties &appliedProperties = property_pair.second;
+        AppliedClassPropertyValues &appliedProperties = property_pair.second;
         // Make sure that we don't do double transitions to the fallback value.
         if (appliedProperties.mostRecent() != ClassID::Fallback) {
             // This property key hasn't been set by a previous class, so we need to add a transition
@@ -93,7 +93,7 @@ void StyleLayer::applyClassProperties(const ClassID class_id,
 
         // If the most recent transition is not the one with the highest priority, create
         // a transition.
-        AppliedClassProperties &appliedProperties = appliedStyle[key];
+        AppliedClassPropertyValues &appliedProperties = appliedStyle[key];
         if (appliedProperties.mostRecent() != class_id) {
             const PropertyTransition &transition =
                 class_properties.getTransition(key, defaultTransition);
@@ -137,7 +137,7 @@ template <typename T>
 void StyleLayer::applyStyleProperty(PropertyKey key, T &target, const float z, const TimePoint& now, const ZoomHistory &zoomHistory) {
     auto it = appliedStyle.find(key);
     if (it != appliedStyle.end()) {
-        AppliedClassProperties &applied = it->second;
+        AppliedClassPropertyValues &applied = it->second;
         // Iterate through all properties that we need to apply in order.
         const PropertyEvaluator<T> evaluator(z, zoomHistory);
         for (auto& property : applied.propertyValues) {
@@ -155,7 +155,7 @@ template <typename T>
 void StyleLayer::applyTransitionedStyleProperty(PropertyKey key, T &target, const float z, const TimePoint& now, const ZoomHistory &zoomHistory) {
     auto it = appliedStyle.find(key);
     if (it != appliedStyle.end()) {
-        AppliedClassProperties &applied = it->second;
+        AppliedClassPropertyValues &applied = it->second;
         // Iterate through all properties that we need to apply in order.
         const PropertyEvaluator<T> evaluator(z, zoomHistory);
         for (auto& property : applied.propertyValues) {
@@ -273,10 +273,10 @@ bool StyleLayer::hasTransitions() const {
 
 void StyleLayer::cleanupAppliedStyleProperties(const TimePoint& now) {
     for (auto it = appliedStyle.begin(); it != appliedStyle.end();) {
-        AppliedClassProperties& appliedPropertyValues = it->second;
-        appliedPropertyValues.cleanup(now);
+        AppliedClassPropertyValues& values = it->second;
+        values.cleanup(now);
         // If the current properties object is empty, remove it from the map entirely.
-        appliedPropertyValues.empty() ? appliedStyle.erase(it++) : ++it;
+        values.empty() ? appliedStyle.erase(it++) : ++it;
     }
 }
 

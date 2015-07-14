@@ -9,9 +9,9 @@
 
 namespace mbgl {
 
-class AppliedClassProperty {
+class AppliedClassPropertyValue {
 public:
-    AppliedClassProperty(ClassID class_id, const TimePoint& begin, const TimePoint& end, const PropertyValue &value);
+    AppliedClassPropertyValue(ClassID class_id, const TimePoint& begin, const TimePoint& end, const PropertyValue &value);
 
 public:
     const ClassID name;
@@ -21,9 +21,9 @@ public:
 };
 
 
-class AppliedClassProperties {
+class AppliedClassPropertyValues {
 public:
-    std::list<AppliedClassProperty> propertyValues;
+    std::list<AppliedClassPropertyValue> propertyValues;
 
 public:
     // Returns the ID of the most recent
