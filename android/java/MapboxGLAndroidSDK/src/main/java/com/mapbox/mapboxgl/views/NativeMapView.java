@@ -220,7 +220,7 @@ class NativeMapView {
     }
 
     public void removeAnnotation(long id) {
-//        nativeRemoveAnnotation(mNativeMapViewPtr, id);
+        nativeRemoveAnnotation(mNativeMapViewPtr, id);
     }
 
     public LatLng getLatLng() {
