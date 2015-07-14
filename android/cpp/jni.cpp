@@ -434,8 +434,8 @@ void JNICALL nativeSetLatLng(JNIEnv *env, jobject obj, jlong nativeMapViewPtr, j
     nativeMapView->getMap().setLatLng(mbgl::LatLng(latitude, longitude), std::chrono::milliseconds(duration));
 }
 
-void JNICALL nativeAddAnnotation(JNIEnv *env, jobject obj, jlong nativeMapViewPtr, jobject latLng) {
-    mbgl::Log::Debug(mbgl::Event::JNI, "nativeAddAnnotation");
+void JNICALL nativeAddMarker(JNIEnv *env, jobject obj, jlong nativeMapViewPtr, jobject latLng) {
+    mbgl::Log::Debug(mbgl::Event::JNI, "nativeAddMarker");
     assert(nativeMapViewPtr != 0);
     NativeMapView *nativeMapView = reinterpret_cast<NativeMapView *>(nativeMapViewPtr);
 
@@ -997,8 +997,8 @@ extern "C" JNIEXPORT jint JNICALL JNI_OnLoad(JavaVM *vm, void *reserved) {
         {"nativeMoveBy", "(JDDJ)V", reinterpret_cast<void *>(&nativeMoveBy)},
         {"nativeSetLatLng", "(JLcom/mapbox/mapboxgl/geometry/LatLng;J)V",
          reinterpret_cast<void *>(&nativeSetLatLng)},
-        {"nativeAddAnnotation", "(JLcom/mapbox/mapboxgl/geometry/LatLng;)V",
-         reinterpret_cast<void *>(&nativeAddAnnotation)},
+        {"nativeAddMarker", "(JLcom/mapbox/mapboxgl/geometry/LatLng;)V",
+         reinterpret_cast<void *>(&nativeAddMarker)},
         {"nativeGetLatLng", "(J)Lcom/mapbox/mapboxgl/geometry/LatLng;",
          reinterpret_cast<void *>(&nativeGetLatLng)},
         {"nativeResetPosition", "(J)V", reinterpret_cast<void *>(&nativeResetPosition)},

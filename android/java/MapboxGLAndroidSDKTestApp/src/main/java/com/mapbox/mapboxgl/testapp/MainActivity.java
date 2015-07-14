@@ -77,8 +77,8 @@ public class MainActivity extends ActionBarActivity {
     private float mCompassBearing;
     private boolean mCompassValid = false;
 
-    // Used for point annotations
-    private boolean mIsPointAnnotationsOn = false;
+    // Used for markers
+    private boolean mIsMarkersOn = false;
 
     //
     // Lifecycle events
@@ -213,9 +213,9 @@ public class MainActivity extends ActionBarActivity {
                 }
                 return true;
 
-            case R.id.action_point_annotations:
-                // Toggle point annotations
-                togglePointAnnotations(!mIsPointAnnotationsOn);
+            case R.id.action_markers:
+                // Toggle markers
+                toggleMarkers(!mIsMarkersOn);
 
             default:
                 return super.onOptionsItemSelected(item);
@@ -257,29 +257,29 @@ public class MainActivity extends ActionBarActivity {
     }
 
     /**
-     * Enable / Disable Point annotations.
+     * Enable / Disable markers.
      *
-     * TODO: Implement updating the UI and removing point annotations from the map.
+     * TODO: Implement updating the UI and removing markers from the map.
      *
-     * @param enablePointAnnotations
+     * @param enableMarkers
      */
-    private void togglePointAnnotations(boolean enablePointAnnotations) {
-        if (enablePointAnnotations) {
-            if (!mIsPointAnnotationsOn) {
-                mIsPointAnnotationsOn = true;
-                addPointAnnotations();
+    private void toggleMarkers(boolean enableMarkers) {
+        if (enableMarkers) {
+            if (!mIsMarkersOn) {
+                mIsMarkersOn = true;
+                addMarkers();
             }
         } else {
-            if (mIsPointAnnotationsOn) {
-                mIsPointAnnotationsOn = false;
+            if (mIsMarkersOn) {
+                mIsMarkersOn = false;
 
             }
         }
     }
 
-    private void addPointAnnotations() {
+    private void addMarkers() {
         LatLng backLot = new LatLng(38.649441, -121.369064);
-        mMapFragment.getMap().addAnnotation(backLot);
+        mMapFragment.getMap().addMarker(backLot);
     }
 
     // This class forwards location updates to updateLocation()
