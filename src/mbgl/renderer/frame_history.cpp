@@ -23,11 +23,11 @@ bool FrameHistory::needsAnimation(const Duration& duration) const {
     // If we have a value that is older than duration and whose z value is the
     // same as the most current z value, and if all values inbetween have the
     // same z value, we don't need animation, otherwise we probably do.
-    const FrameSnapshot &pivot = history.back();
+    const FrameSnapshot& pivot = history.back();
 
     int i = -1;
     while ((int)history.size() > i + 1 && history[i + 1].now + duration < pivot.now) {
-        i++;
+        ++i;
     }
 
     if (i < 0) {
@@ -38,7 +38,7 @@ bool FrameHistory::needsAnimation(const Duration& duration) const {
 
     // Make sure that all subsequent snapshots have the same zoom as the last
     // pivot element.
-    for (; (int)history.size() > i; i++) {
+    for (; (int)history.size() > i; ++i) {
         if (history[i].z != pivot.z) {
             return true;
         }
