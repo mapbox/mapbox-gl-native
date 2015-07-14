@@ -29,6 +29,9 @@ import android.widget.ZoomButtonsController;
 
 import com.almeros.android.multitouch.gesturedetectors.RotateGestureDetector;
 import com.almeros.android.multitouch.gesturedetectors.TwoFingerGestureDetector;
+import com.mapbox.mapboxgl.annotations.Annotation;
+import com.mapbox.mapboxgl.annotations.Marker;
+import com.mapbox.mapboxgl.annotations.MarkerOptions;
 import com.mapbox.mapboxgl.geometry.LatLng;
 import com.mapbox.mapboxgl.geometry.LatLngZoom;
 
@@ -61,6 +64,11 @@ public class MapView extends SurfaceView {
     private static final String STATE_ACCESS_TOKEN = "accessToken";
     private static final String STATE_CLASSES = "classes";
     private static final String STATE_DEFAULT_TRANSITION_DURATION = "defaultTransitionDuration";
+
+    /**
+     * Every annotation that has been added to the map.
+     */
+    private List<Annotation> annotations = new ArrayList<>();
 
     //
     // Instance members
@@ -204,9 +212,20 @@ public class MapView extends SurfaceView {
         }
     }
 
-    public void addMarker(LatLng marker) {
-        mNativeMapView.addMarker(marker);
+    public Marker addMarker(MarkerOptions markerOptions) {
+        Marker marker = markerOptions.getMarker();
+        Long markerId = mNativeMapView.addMarker(marker);
+        marker.setId(markerId); // the annotation needs to know its id
+        marker.setMapView(this); // the annotation needs to know which map view it is in
+        annotations.add(marker);
+        return marker;
     }
+
+    public void removeAnnotation(Annotation annotation) {
+        long id = annotation.getId();
+        mNativeMapView.removeAnnotation(id);
+    }
+
 
     //
     // Property methods

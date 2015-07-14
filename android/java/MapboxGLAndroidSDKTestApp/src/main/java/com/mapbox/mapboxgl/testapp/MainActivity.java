@@ -23,6 +23,8 @@ import android.widget.ImageView;
 import android.widget.Spinner;
 import android.widget.TextView;
 
+import com.mapbox.mapboxgl.annotations.Marker;
+import com.mapbox.mapboxgl.annotations.MarkerOptions;
 import com.mapbox.mapboxgl.geometry.LatLng;
 import com.mapbox.mapboxgl.views.MapView;
 import com.mapzen.android.lost.api.LocationListener;
@@ -79,6 +81,8 @@ public class MainActivity extends ActionBarActivity {
 
     // Used for markers
     private boolean mIsMarkersOn = false;
+
+    private Marker marker;
 
     //
     // Lifecycle events
@@ -272,14 +276,22 @@ public class MainActivity extends ActionBarActivity {
         } else {
             if (mIsMarkersOn) {
                 mIsMarkersOn = false;
-
+                removeMarkers();
             }
         }
     }
 
     private void addMarkers() {
         LatLng backLot = new LatLng(38.649441, -121.369064);
-        mMapFragment.getMap().addMarker(backLot);
+        MapView map = mMapFragment.getMap();
+        marker = map.addMarker(new MarkerOptions()
+            .position(backLot)
+            .title("Back Lot")
+            .snippet("The back lot behind my house"));
+    }
+
+    private void removeMarkers() {
+        marker.remove();
     }
 
     // This class forwards location updates to updateLocation()

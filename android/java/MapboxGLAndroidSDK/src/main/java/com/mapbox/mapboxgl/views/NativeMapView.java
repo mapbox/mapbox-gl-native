@@ -3,6 +3,7 @@ package com.mapbox.mapboxgl.views;
 import android.graphics.PointF;
 import android.view.Surface;
 
+import com.mapbox.mapboxgl.annotations.Marker;
 import com.mapbox.mapboxgl.geometry.LatLng;
 import com.mapbox.mapboxgl.geometry.LatLngZoom;
 import com.mapbox.mapboxgl.geometry.ProjectedMeters;
@@ -213,8 +214,13 @@ class NativeMapView {
         nativeSetLatLng(mNativeMapViewPtr, latLng, duration);
     }
 
-    public void addMarker(LatLng latLng) {
-        nativeAddMarker(mNativeMapViewPtr, latLng);
+    public long addMarker(Marker marker) {
+        LatLng latLng = marker.getPosition();
+        return nativeAddMarker(mNativeMapViewPtr, latLng);
+    }
+
+    public void removeAnnotation(long id) {
+//        nativeRemoveAnnotation(mNativeMapViewPtr, id);
     }
 
     public LatLng getLatLng() {
@@ -450,6 +456,8 @@ class NativeMapView {
                                         long duration);
 
     private native long nativeAddMarker(long nativeMapViewPtr, LatLng latLng);
+
+    private native void nativeRemoveAnnotation(long nativeMapViewPtr, long id);
 
     private native LatLng nativeGetLatLng(long nativeMapViewPtr);
 
