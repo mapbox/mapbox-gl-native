@@ -422,11 +422,20 @@ std::vector<std::string> Map::getClasses() const {
 
 void Map::setDefaultTransitionDuration(const Duration& duration) {
     data->setDefaultTransitionDuration(duration);
-    update(Update::DefaultTransitionDuration);
+    update(Update::DefaultTransition);
 }
 
 Duration Map::getDefaultTransitionDuration() const {
     return data->getDefaultTransitionDuration();
+}
+
+void Map::setDefaultTransitionDelay(const Duration& delay) {
+    data->setDefaultTransitionDelay(delay);
+    update(Update::DefaultTransition);
+}
+
+Duration Map::getDefaultTransitionDelay() const {
+    return data->getDefaultTransitionDelay();
 }
 
 void Map::setSourceTileCacheSize(size_t size) {

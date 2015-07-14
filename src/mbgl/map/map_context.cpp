@@ -136,7 +136,7 @@ void MapContext::loadStyleJSON(const std::string& json, const std::string& base)
     // force style cascade, causing all pending transitions to complete.
     style->cascade();
 
-    updated |= static_cast<UpdateType>(Update::DefaultTransitionDuration);
+    updated |= static_cast<UpdateType>(Update::DefaultTransition);
     updated |= static_cast<UpdateType>(Update::Classes);
     updated |= static_cast<UpdateType>(Update::Zoom);
     asyncUpdate->send();
