@@ -48,9 +48,14 @@ android {
         minSdkVersion Integer.parseInt(project.ANDROID_MIN_SDK)
         targetSdkVersion Integer.parseInt(project.ANDROID_BUILD_TARGET_SDK_VERSION)
 
-        ndk {
-            moduleName "libmapbox-gl"
-        }
+//        ndk {
+//            moduleName "libmapbox-gl"
+//        }
+    }
+
+    sourceSets.main {
+        jniLibs.srcDir 'src/main/libs'
+        jni.srcDirs = [] //disable automatic ndk-build call
     }
 
     repositories {
@@ -277,19 +282,20 @@ task installJNILibs(dependsOn: 'installMason') << {
     // Iterate through them to load via Mason
     Enumeration e = masonProps.propertyNames();
 
+//    def myMap = ["MASON_DIR":project.buildDir.absolutePath + File.separator + "mason"]
+//    println(myMap)
+
     while (e.hasMoreElements()) {
         String key = (String) e.nextElement();
         String lib = key.substring(0, key.indexOf("_VERSION")).toLowerCase();
         String version = masonProps.getProperty(key);
         println("key = " + key + "; lib = " + lib + "; version = " + version)
+        exec {
+            environment = ["MASON_DIR":project.buildDir.absolutePath + File.separator + "mason"]
+            workingDir = project.buildDir.absolutePath + File.separator + "mason"
+            executable = "./mason install " + lib + " " + version
+        }
     }
-
-/*
-    exec {
-        workingDir = project.buildDir.absolutePath + File.separator + "mason"
-        executable = './mason'
-    }
-*/
 }
 
 task apklib(type: Zip) {
