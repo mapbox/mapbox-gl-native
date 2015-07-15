@@ -300,10 +300,10 @@ public class MainActivity extends ActionBarActivity {
             String geojsonStr = Util.loadStringFromAssets(this, "tillicum.geojson");
             LatLng[] latLngs = Util.parseGeoJSONCoordinates(geojsonStr);
             MapView map = mMapFragment.getMap();
-//            Polyline line = map.addPolyline(new PolylineOptions()
-//                    .add(new LatLng(51.5, -0.1), new LatLng(40.7, -74.0))
-//                    .width(5)
-//                    .color(Color.RED));
+            Polyline line = map.addPolyline(new PolylineOptions()
+                    .add(new LatLng(51.5, -0.1), new LatLng(40.7, -74.0))
+                    .width(5)
+                    .color(Color.RED));
         } catch (IOException e) {
             e.printStackTrace();
         } catch (JSONException e) {

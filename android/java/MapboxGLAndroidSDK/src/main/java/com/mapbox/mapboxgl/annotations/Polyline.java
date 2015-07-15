@@ -10,7 +10,6 @@ public class Polyline extends MultiPoint {
 
     int color = Color.BLACK; // default color is black
     float width = 10; // As specified by Google API Docs (in pixels)
-    List<LatLng> points;
 
     public Polyline() {
         super();

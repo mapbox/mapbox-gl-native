@@ -10,6 +10,7 @@ public abstract class MultiPoint extends Annotation {
     List<LatLng> points;
 
     public MultiPoint() {
+        super();
         points = new ArrayList<>();
     }
 
