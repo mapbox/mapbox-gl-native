@@ -216,8 +216,8 @@ public class MapView extends SurfaceView {
 
     public Marker addMarker(MarkerOptions markerOptions) {
         Marker marker = markerOptions.getMarker();
-        Long markerId = mNativeMapView.addMarker(marker);
-        marker.setId(markerId); // the annotation needs to know its id
+        Long id = mNativeMapView.addMarker(marker);
+        marker.setId(id); // the annotation needs to know its id
         marker.setMapView(this); // the annotation needs to know which map view it is in
         annotations.add(marker);
         return marker;
@@ -225,7 +225,10 @@ public class MapView extends SurfaceView {
 
     public Polyline addPolyline(PolylineOptions polylineOptions) {
         Polyline polyline = polylineOptions.getPolyline();
-
+        Long id = mNativeMapView.addPolyline(polyline);
+        polyline.setId(id);
+        polyline.setMapView(this);
+        annotations.add(polyline);
         return polyline;
     }
 

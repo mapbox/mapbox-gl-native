@@ -4,6 +4,7 @@ import android.graphics.PointF;
 import android.view.Surface;
 
 import com.mapbox.mapboxgl.annotations.Marker;
+import com.mapbox.mapboxgl.annotations.Polyline;
 import com.mapbox.mapboxgl.geometry.LatLng;
 import com.mapbox.mapboxgl.geometry.LatLngZoom;
 import com.mapbox.mapboxgl.geometry.ProjectedMeters;
@@ -217,6 +218,11 @@ class NativeMapView {
     public long addMarker(Marker marker) {
         LatLng latLng = marker.getPosition();
         return nativeAddMarker(mNativeMapViewPtr, latLng);
+    }
+
+    public long addPolyline(Polyline polyline) {
+
+        return -1;
     }
 
     public void removeAnnotation(long id) {
