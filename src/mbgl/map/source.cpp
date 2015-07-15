@@ -240,14 +240,8 @@ bool Source::handlePartialTile(const TileID& id, Worker&) {
         return true;
     }
 
-    // The signal is only emitted if there was an actual change on the tile. The
-    // tile can be in a "partial" state waiting for resources and get reparsed on
-    // the arrival of new resources that were needed by another tile.
-    size_t bucketCount = data->countBuckets();
-    return data->reparse([this, data, bucketCount]() {
-        if (data->countBuckets() > bucketCount) {
-            emitTileLoaded(false);
-        }
+    return data->reparse([this, data]() {
+	emitTileLoaded(false);
     });
 }
 

@@ -41,7 +41,6 @@ public:
     ~TileWorker();
 
     Bucket* getBucket(const StyleLayer&) const;
-    size_t countBuckets() const;
 
     TileParseResult parse(const GeometryTile&);
     void redoPlacement(float angle, bool collisionDebug);

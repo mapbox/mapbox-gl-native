@@ -44,11 +44,6 @@ Bucket* TileWorker::getBucket(const StyleLayer& layer) const {
     return it->second.get();
 }
 
-size_t TileWorker::countBuckets() const {
-    std::lock_guard<std::mutex> lock(bucketsMutex);
-    return buckets.size();
-}
-
 TileParseResult TileWorker::parse(const GeometryTile& geometryTile) {
     partialParse = false;
 
