@@ -221,8 +221,7 @@ class NativeMapView {
     }
 
     public long addPolyline(Polyline polyline) {
-
-        return -1;
+        return nativeAddPolyline(mNativeMapViewPtr, polyline);
     }
 
     public void removeAnnotation(long id) {
@@ -462,6 +461,8 @@ class NativeMapView {
                                         long duration);
 
     private native long nativeAddMarker(long nativeMapViewPtr, LatLng latLng);
+
+    private native long nativeAddPolyline(long nativeMapViewPtr, Polyline polyline);
 
     private native void nativeRemoveAnnotation(long nativeMapViewPtr, long id);
 

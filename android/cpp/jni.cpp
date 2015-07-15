@@ -455,6 +455,15 @@ jlong JNICALL nativeAddMarker(JNIEnv *env, jobject obj, jlong nativeMapViewPtr, 
     return (jlong) nativeMapView->getMap().addPointAnnotation(mbgl::PointAnnotation(mbgl::LatLng(latitude, longitude), std::string("default_marker")));
 }
 
+jlong JNICALL nativeAddPolyline(JNIEnv *env, jobject obj, jlong nativeMapViewPtr, jobject polyline) {
+    mbgl::Log::Debug(mbgl::Event::JNI, "nativeAddPolyline");
+    assert(nativeMapViewPtr != 0);
+    // NativeMapView *nativeMapView = reinterpret_cast<NativeMapView *>(nativeMapViewPtr);
+
+
+    return -1;
+}
+
 void JNICALL nativeRemoveAnnotation(JNIEnv *env, jobject obj, jlong nativeMapViewPtr, jlong annotationId) {
     mbgl::Log::Debug(mbgl::Event::JNI, "nativeRemoveAnnotation");
     assert(nativeMapViewPtr != 0);
@@ -1007,6 +1016,8 @@ extern "C" JNIEXPORT jint JNICALL JNI_OnLoad(JavaVM *vm, void *reserved) {
          reinterpret_cast<void *>(&nativeSetLatLng)},
         {"nativeAddMarker", "(JLcom/mapbox/mapboxgl/geometry/LatLng;)J",
          reinterpret_cast<void *>(&nativeAddMarker)},
+        {"nativeAddPolyline", "(JLcom/mapbox/mapboxgl/annotations/Polyline;)J",
+         reinterpret_cast<void *>(&nativeAddPolyline)},
         {"nativeRemoveAnnotation", "(JJ)V", reinterpret_cast<void *>(&nativeRemoveAnnotation)},
         {"nativeGetLatLng", "(J)Lcom/mapbox/mapboxgl/geometry/LatLng;",
          reinterpret_cast<void *>(&nativeGetLatLng)},
