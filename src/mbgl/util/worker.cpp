@@ -14,11 +14,7 @@ namespace mbgl {
 
 class Worker::Impl {
 public:
-    explicit Impl(FileSource* fs) {
-        // FIXME: Workers should not access the FileSource but it
-        // is currently needed because of GlyphsPBF. See #1664.
-        util::ThreadContext::setFileSource(fs);
-    }
+    Impl() = default;
 
     void parseRasterTile(RasterBucket* bucket, std::string data, std::function<void (TileParseResult)> callback) {
         std::unique_ptr<util::Image> image(new util::Image(data));
@@ -59,7 +55,7 @@ public:
 Worker::Worker(std::size_t count) {
     util::ThreadContext context = {"Worker", util::ThreadType::Worker, util::ThreadPriority::Low};
     for (std::size_t i = 0; i < count; i++) {
-        threads.emplace_back(std::make_unique<util::Thread<Impl>>(context, util::ThreadContext::getFileSource()));
+        threads.emplace_back(std::make_unique<util::Thread<Impl>>(context));
     }
 }
 
