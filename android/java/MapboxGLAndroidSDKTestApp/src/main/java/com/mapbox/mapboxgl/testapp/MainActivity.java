@@ -263,8 +263,6 @@ public class MainActivity extends ActionBarActivity {
     /**
      * Enable / Disable markers.
      *
-     * TODO: Implement updating the UI and removing markers from the map.
-     *
      * @param enableMarkers
      */
     private void toggleMarkers(boolean enableMarkers) {

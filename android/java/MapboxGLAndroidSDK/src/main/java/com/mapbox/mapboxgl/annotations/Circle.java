@@ -1,8 +1,61 @@
 package com.mapbox.mapboxgl.annotations;
 
-/**
- * Created by Nicholas Hallahan on 7/13/15.
- * nick@theoutpost.io
- */
-public class Circle {
+
+import android.graphics.Color;
+
+import com.mapbox.mapboxgl.geometry.LatLng;
+
+public class Circle extends Annotation {
+
+    LatLng center;
+    int fillColor = Color.BLACK;
+    double radius;
+    int strokeColor = Color.BLACK;
+    float strokeWidth = 10; // Google Maps API defaults to 10
+
+    public LatLng getCenter() {
+        return center;
+    }
+
+    public int getFillColor() {
+        return fillColor;
+    }
+
+    /**
+     * Returns the circle's radius, in meters.
+     *
+     * @return radius in meters
+     */
+    public double getRadius() {
+        return radius;
+    }
+
+    public int getStrokeColor() {
+        return strokeColor;
+    }
+
+    public float getStrokeWidth() {
+        return strokeWidth;
+    }
+
+    public void setCenter(LatLng center) {
+        this.center = center;
+    }
+
+    public void setFillColor(int color) {
+        fillColor = color;
+    }
+
+    public void setRadius(double radius) {
+        this.radius = radius;
+    }
+
+    public void setStrokeColor (int color) {
+        strokeColor = color;
+    }
+
+    public void setStrokeWidth (float width) {
+        strokeWidth = width;
+    }
+
 }

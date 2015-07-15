@@ -2,10 +2,7 @@ package com.mapbox.mapboxgl.annotations;
 
 import com.mapbox.mapboxgl.geometry.LatLng;
 
-/**
- * Created by Nicholas Hallahan on 7/13/15.
- * nick@theoutpost.io
- */
+
 public class Marker extends Annotation {
 
     /**
@@ -13,7 +10,6 @@ public class Marker extends Annotation {
      * so that they can be directly set by MarkerOptions
      * from within the module.
      */
-    float alpha;
     float anchorU;
     float anchorV;
     boolean draggable;
@@ -24,13 +20,10 @@ public class Marker extends Annotation {
     float rotation;
     String snippet;
     String title;
-    boolean visible;
 
     private boolean infoWindowShown = false;
 
-    public Marker() {
-
-    }
+    public Marker() {}
 
     public boolean equals(Object other) {
         double lat = position.getLatitude();
@@ -75,7 +68,7 @@ public class Marker extends Annotation {
 
     public void hideInfoWindow() {
         //TODO hideInfoWindow
-        infoWindowShown = true;
+        infoWindowShown = false;
     }
 
     public boolean isDraggable() {
@@ -90,9 +83,45 @@ public class Marker extends Annotation {
         return infoWindowShown;
     }
 
-    public boolean isVisible() {
-        return visible;
+    void setAlpha(float alpha) {
+        this.alpha = alpha;
     }
 
+    void setDraggable(boolean draggable) {
+        this.draggable = draggable;
+    }
 
+    void setFlat(boolean flat) {
+        this.flat = flat;
+    }
+
+    // TODO: Implement this method of Google Maps Android API
+//    void setIcon(BitmapDescriptor icon) {
+//
+//    }
+
+    void setInfoWindowAnchor(float u, float v) {
+        infoWindowAnchorU = u;
+        infoWindowAnchorV = v;
+    }
+
+    void setPosition(LatLng latlng) {
+        this.position = position;
+    }
+
+    void setRotation(float rotation) {
+        this.rotation = rotation;
+    }
+
+    void setSnippet(String snippet) {
+        this.snippet = snippet;
+    }
+
+    void setTitle(String title) {
+        this.title = title;
+    }
+
+    void showInfoWindow() {
+        infoWindowShown = true;
+    }
 }

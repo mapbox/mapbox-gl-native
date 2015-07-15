@@ -2,28 +2,29 @@ package com.mapbox.mapboxgl.annotations;
 
 import com.mapbox.mapboxgl.views.MapView;
 
-/**
- * Created by Nicholas Hallahan on 7/13/15.
- * nick@theoutpost.io
- */
+
 public abstract class Annotation {
 
     /**
      * The annotation id
-     *
+     * <p/>
      * Internal C++ id is stored as unsigned int.
      */
-    protected Long id;
+    protected Long id; // null unless added to a MapView
     private MapView mapView;
+
+    float alpha = 1;
+    boolean visible = true;
+
 
     public Annotation() {}
 
-    public Annotation(long id) {
-        this.id = id;
-    }
-
     public long getId() {
         return id;
+    }
+
+    public boolean isVisible() {
+        return visible;
     }
 
     public void remove() {
@@ -37,6 +38,10 @@ public abstract class Annotation {
 
     public void setMapView(MapView mapView) {
         this.mapView = mapView;
+    }
+
+    public void setVisible(boolean visible) {
+        this.visible = visible;
     }
 
 }
