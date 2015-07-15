@@ -1,6 +1,7 @@
 package com.mapbox.mapboxgl.testapp;
 
 import android.content.Context;
+import android.graphics.Color;
 import android.graphics.Matrix;
 import android.graphics.PointF;
 import android.hardware.GeomagneticField;
@@ -25,6 +26,8 @@ import android.widget.TextView;
 
 import com.mapbox.mapboxgl.annotations.Marker;
 import com.mapbox.mapboxgl.annotations.MarkerOptions;
+import com.mapbox.mapboxgl.annotations.Polyline;
+import com.mapbox.mapboxgl.annotations.PolylineOptions;
 import com.mapbox.mapboxgl.geometry.LatLng;
 import com.mapbox.mapboxgl.views.MapView;
 import com.mapzen.android.lost.api.LocationListener;
@@ -32,6 +35,9 @@ import com.mapzen.android.lost.api.LocationRequest;
 import com.mapzen.android.lost.api.LocationServices;
 import com.mapzen.android.lost.api.LostApiClient;
 
+import org.json.JSONException;
+
+import java.io.IOException;
 import java.util.ArrayList;
 
 public class MainActivity extends ActionBarActivity {
@@ -270,6 +276,7 @@ public class MainActivity extends ActionBarActivity {
             if (!mIsMarkersOn) {
                 mIsMarkersOn = true;
                 addMarkers();
+                addPolyline();
             }
         } else {
             if (mIsMarkersOn) {
@@ -286,6 +293,22 @@ public class MainActivity extends ActionBarActivity {
             .position(backLot)
             .title("Back Lot")
             .snippet("The back lot behind my house"));
+    }
+
+    private void addPolyline() {
+        try {
+            String geojsonStr = Util.loadStringFromAssets(this, "tillicum.geojson");
+            LatLng[] latLngs = Util.parseGeoJSONCoordinates(geojsonStr);
+            MapView map = mMapFragment.getMap();
+//            Polyline line = map.addPolyline(new PolylineOptions()
+//                    .add(new LatLng(51.5, -0.1), new LatLng(40.7, -74.0))
+//                    .width(5)
+//                    .color(Color.RED));
+        } catch (IOException e) {
+            e.printStackTrace();
+        } catch (JSONException e) {
+            e.printStackTrace();
+        }
     }
 
     private void removeMarkers() {

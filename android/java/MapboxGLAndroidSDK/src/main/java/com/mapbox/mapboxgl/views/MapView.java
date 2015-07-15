@@ -32,6 +32,8 @@ import com.almeros.android.multitouch.gesturedetectors.TwoFingerGestureDetector;
 import com.mapbox.mapboxgl.annotations.Annotation;
 import com.mapbox.mapboxgl.annotations.Marker;
 import com.mapbox.mapboxgl.annotations.MarkerOptions;
+import com.mapbox.mapboxgl.annotations.Polyline;
+import com.mapbox.mapboxgl.annotations.PolylineOptions;
 import com.mapbox.mapboxgl.geometry.LatLng;
 import com.mapbox.mapboxgl.geometry.LatLngZoom;
 
@@ -219,6 +221,12 @@ public class MapView extends SurfaceView {
         marker.setMapView(this); // the annotation needs to know which map view it is in
         annotations.add(marker);
         return marker;
+    }
+
+    public Polyline addPolyline(PolylineOptions polylineOptions) {
+        Polyline polyline = polylineOptions.getPolyline();
+
+        return polyline;
     }
 
     public void removeAnnotation(Annotation annotation) {

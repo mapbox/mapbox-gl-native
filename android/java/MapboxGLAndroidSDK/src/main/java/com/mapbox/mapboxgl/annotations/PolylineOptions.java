@@ -54,6 +54,10 @@ public class PolylineOptions {
         return polyline.points;
     }
 
+    public Polyline getPolyline() {
+        return polyline;
+    }
+
     public float getWidth() {
         return polyline.width;
     }

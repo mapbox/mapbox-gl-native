@@ -55,6 +55,10 @@ public class PolygonOptions {
         return polygon.holes;
     }
 
+    public Polygon getPolygon() {
+        return polygon;
+    }
+
     public int getStrokeColor() {
         return polygon.strokeColor;
     }
