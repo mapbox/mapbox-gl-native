@@ -1,8 +1,11 @@
 #ifndef MBGL_TEXT_GLYPH_STORE
 #define MBGL_TEXT_GLYPH_STORE
 
+#include <mbgl/text/font_stack.hpp>
 #include <mbgl/text/glyph.hpp>
+#include <mbgl/text/glyph_pbf.hpp>
 #include <mbgl/util/exclusive.hpp>
+#include <mbgl/util/noncopyable.hpp>
 #include <mbgl/util/run_loop.hpp>
 #include <mbgl/util/work_queue.hpp>
 
@@ -13,13 +16,10 @@
 
 namespace mbgl {
 
-class FontStack;
-class GlyphPBF;
-
 // The GlyphStore manages the loading and storage of Glyphs
 // and creation of FontStack objects. The GlyphStore lives
 // on the MapThread but can be queried from any thread.
-class GlyphStore {
+class GlyphStore : public GlyphPBF::Observer, private util::noncopyable {
 public:
     class Observer {
     public:
@@ -29,8 +29,8 @@ public:
         virtual void onGlyphRangeLoadingFailed(std::exception_ptr error) = 0;
     };
 
-    GlyphStore();
-    ~GlyphStore();
+    GlyphStore() = default;
+    virtual ~GlyphStore() = default;
 
     util::exclusive<FontStack> getFontStack(const std::string& fontStack);
 
@@ -45,13 +45,17 @@ public:
         glyphURL = url;
     }
 
+    std::string getURL() const {
+        return glyphURL;
+    }
+
+    // GlyphPBF::Observer implementation.
+    void onGlyphPBFLoaded() override;
+    void onGlyphPBFLoadingFailed(std::exception_ptr error) override;
+
     void setObserver(Observer* observer);
 
 private:
-    void emitGlyphRangeLoaded();
-    void emitGlyphRangeLoadingFailed(const std::string& message);
-
-    util::exclusive<FontStack> createFontStack(const std::string &fontStack);
     void requestGlyphRange(const std::string& fontStackName, const GlyphRange& range);
 
     std::string glyphURL;

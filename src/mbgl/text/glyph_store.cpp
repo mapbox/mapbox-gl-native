@@ -1,37 +1,12 @@
 #include <mbgl/text/glyph_store.hpp>
 
-#include <mbgl/text/font_stack.hpp>
 #include <mbgl/text/glyph_pbf.hpp>
-#include <mbgl/util/exception.hpp>
 #include <mbgl/util/thread_context.hpp>
 
 namespace mbgl {
 
-GlyphStore::GlyphStore() {
-}
-
-GlyphStore::~GlyphStore() {
-}
-
 void GlyphStore::requestGlyphRange(const std::string& fontStackName, const GlyphRange& range) {
     assert(util::ThreadContext::currentlyOn(util::ThreadType::Map));
-
-    auto successCallback = [this, fontStackName](GlyphPBF* glyph) {
-        try {
-            {
-                auto fontStack = createFontStack(fontStackName);
-                glyph->parse(**fontStack);
-            }
-            emitGlyphRangeLoaded();
-        } catch (const std::exception&) {
-            std::string message = "Failed to parse [" + glyph->getURL() + "]";
-            emitGlyphRangeLoadingFailed(message);
-        }
-    };
-
-    auto failureCallback = [this](const std::string& message) {
-        emitGlyphRangeLoadingFailed(message);
-    };
 
     std::lock_guard<std::mutex> lock(rangesMutex);
     auto& rangeSets = ranges[fontStackName];
@@ -41,8 +16,10 @@ void GlyphStore::requestGlyphRange(const std::string& fontStackName, const Glyph
         return;
     }
 
-    rangeSets.emplace(range, std::make_unique<GlyphPBF>(glyphURL, fontStackName, range,
-        successCallback, failureCallback));
+    auto glyphPBF = std::make_unique<GlyphPBF>(this, fontStackName, range);
+    glyphPBF->setObserver(this);
+
+    rangeSets.emplace(range, std::move(glyphPBF));
 }
 
 
@@ -55,7 +32,6 @@ bool GlyphStore::hasGlyphRanges(const std::string& fontStackName, const std::set
     const auto& rangeSets = ranges[fontStackName];
 
     bool hasRanges = true;
-
     for (const auto& range : glyphRanges) {
         const auto& rangeSetsIt = rangeSets.find(range);
         if (rangeSetsIt == rangeSets.end()) {
@@ -75,7 +51,7 @@ bool GlyphStore::hasGlyphRanges(const std::string& fontStackName, const std::set
     return hasRanges;
 }
 
-util::exclusive<FontStack> GlyphStore::createFontStack(const std::string& fontStack) {
+util::exclusive<FontStack> GlyphStore::getFontStack(const std::string& fontStack) {
     auto lock = std::make_unique<std::lock_guard<std::mutex>>(stacksMutex);
 
     auto it = stacks.find(fontStack);
@@ -88,34 +64,20 @@ util::exclusive<FontStack> GlyphStore::createFontStack(const std::string& fontSt
     return { it->second.get(), std::move(lock) };
 }
 
-util::exclusive<FontStack> GlyphStore::getFontStack(const std::string &fontStack) {
-    auto lock = std::make_unique<std::lock_guard<std::mutex>>(stacksMutex);
-
-    const auto& it = stacks.find(fontStack);
-    if (it == stacks.end()) {
-        return { nullptr, nullptr };
-    }
-
-    return { it->second.get(), std::move(lock) };
-}
-
-void GlyphStore::setObserver(Observer* observer_) {
-    observer = observer_;
-}
-
-void GlyphStore::emitGlyphRangeLoaded() {
+void GlyphStore::onGlyphPBFLoaded() {
     if (observer) {
         observer->onGlyphRangeLoaded();
     }
 }
 
-void GlyphStore::emitGlyphRangeLoadingFailed(const std::string& message) {
-    if (!observer) {
-        return;
+void GlyphStore::onGlyphPBFLoadingFailed(std::exception_ptr error) {
+    if (observer) {
+        observer->onGlyphRangeLoadingFailed(error);
     }
+}
 
-    auto error = std::make_exception_ptr(util::GlyphRangeLoadingException(message));
-    observer->onGlyphRangeLoadingFailed(error);
+void GlyphStore::setObserver(Observer* observer_) {
+    observer = observer_;
 }
 
 }

@@ -2,48 +2,53 @@
 #define MBGL_TEXT_GLYPH_PBF
 
 #include <mbgl/text/glyph.hpp>
+#include <mbgl/util/noncopyable.hpp>
 
-#include <functional>
 #include <atomic>
+#include <functional>
 #include <string>
 
 namespace mbgl {
 
+class GlyphStore;
 class FontStack;
 class Request;
 
-class GlyphPBF {
+class GlyphPBF : private util::noncopyable {
 public:
-    using GlyphLoadedCallback = std::function<void(GlyphPBF*)>;
-    using GlyphLoadingFailedCallback = std::function<void(const std::string&)>;
+    class Observer {
+    public:
+        virtual ~Observer() = default;
 
-    GlyphPBF(const std::string &glyphURL,
-             const std::string &fontStack,
-             GlyphRange glyphRange,
-             const GlyphLoadedCallback& successCallback,
-             const GlyphLoadingFailedCallback& failureCallback);
-    ~GlyphPBF();
+        virtual void onGlyphPBFLoaded() = 0;
+        virtual void onGlyphPBFLoadingFailed(std::exception_ptr error) = 0;
+    };
 
-    void parse(FontStack &stack);
-    bool isParsed() const;
+    GlyphPBF(GlyphStore* store,
+             const std::string& fontStack,
+             const GlyphRange& glyphRange);
+    virtual ~GlyphPBF();
 
-    std::string getURL() const {
-        return url;
-    }
+    bool isParsed() const {
+        return parsed;
+    };
+
+    void setObserver(Observer* observer);
 
 private:
-    GlyphPBF(const GlyphPBF &) = delete;
-    GlyphPBF(GlyphPBF &&) = delete;
-    GlyphPBF &operator=(const GlyphPBF &) = delete;
-    GlyphPBF &operator=(GlyphPBF &&) = delete;
+    void emitGlyphPBFLoaded();
+    void emitGlyphPBFLoadingFailed(const std::string& message);
+
+    void parse(GlyphStore* store, const std::string& fontStack, const std::string& url);
 
     std::string data;
-    std::string url;
     std::atomic<bool> parsed;
 
     Request* req = nullptr;
+
+    Observer* observer = nullptr;
 };
 
-} // end namespace mbgl
+}
 
 #endif

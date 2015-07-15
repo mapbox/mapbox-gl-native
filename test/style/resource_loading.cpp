@@ -164,4 +164,4 @@ INSTANTIATE_TEST_CASE_P(Style, ResourceLoading,
         std::make_pair("sprite.png", "Could not parse sprite image"),
         std::make_pair("raster.png", "Failed to parse \\[17\\/6553(4|5|6|7)\\/6553(4|5|6|7)\\]\\: error parsing raster image"),
         std::make_pair("vector.pbf", "Failed to parse \\[1(5|6)\\/1638(3|4)\\/1638(3|4)\\]\\: pbf unknown field type exception"),
-        std::make_pair("glyphs.pbf", "Failed to parse \\[test\\/fixtures\\/resources\\/glyphs.pbf\\]")));
+        std::make_pair("glyphs.pbf", "Failed to parse \\[test\\/fixtures\\/resources\\/glyphs.pbf\\]: pbf unknown field type exception")));

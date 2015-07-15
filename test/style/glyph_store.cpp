@@ -138,7 +138,8 @@ TEST_F(GlyphStoreTest, LoadingFail) {
         ASSERT_TRUE(error != nullptr);
 
         auto fontStack = store->getFontStack(params.stack);
-        ASSERT_EQ(*fontStack, nullptr);
+        ASSERT_TRUE(fontStack->getMetrics().empty());
+        ASSERT_TRUE(fontStack->getSDFs().empty());
 
         for (const auto& range : params.ranges) {
             ASSERT_FALSE(store->hasGlyphRanges(params.stack, {range}));
@@ -170,6 +171,10 @@ TEST_F(GlyphStoreTest, LoadingCorrupted) {
         }
 
         ASSERT_TRUE(error != nullptr);
+
+        auto fontStack = store->getFontStack(params.stack);
+        ASSERT_TRUE(fontStack->getMetrics().empty());
+        ASSERT_TRUE(fontStack->getSDFs().empty());
 
         for (const auto& range : params.ranges) {
             ASSERT_FALSE(store->hasGlyphRanges(params.stack, {range}));
@@ -215,7 +220,8 @@ TEST_F(GlyphStoreTest, InvalidURL) {
         ASSERT_TRUE(error != nullptr);
 
         auto fontStack = store->getFontStack(params.stack);
-        ASSERT_EQ(*fontStack, nullptr);
+        ASSERT_TRUE(fontStack->getMetrics().empty());
+        ASSERT_TRUE(fontStack->getSDFs().empty());
 
         stopTest();
     };
