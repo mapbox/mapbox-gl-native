@@ -69,6 +69,7 @@
         'miscellaneous/thread.cpp',
         'miscellaneous/tile.cpp',
         'miscellaneous/transform.cpp',
+        'miscellaneous/work_queue.cpp',
         'miscellaneous/variant.cpp',
 
         'storage/storage.hpp',
