@@ -3,15 +3,9 @@ import java.nio.file.Path
 import java.nio.file.Paths
 import org.ajoberstar.grgit.*
 
-buildscript {
-    repositories {
-        mavenCentral()
-    }
-    dependencies {
-        classpath 'com.android.tools.build:gradle:1.2.3'
-        classpath 'com.jakewharton.sdkmanager:gradle-plugin:0.12.0'
-        classpath 'org.ajoberstar:gradle-git:1.2.0'
-    }
+allprojects {
+    group project.GROUP
+    version project.VERSION_NAME
 }
 
 apply plugin: 'android-sdk-manager'
@@ -19,19 +13,6 @@ apply plugin: 'com.android.library'
 apply plugin: 'checkstyle'
 apply plugin: 'maven'
 apply plugin: 'signing'
-
-allprojects {
-    group project.GROUP
-    version project.VERSION_NAME
-
-    repositories {
-        mavenCentral()
-    }
-}
-
-repositories {
-    mavenCentral()
-}
 
 dependencies {
     compile 'commons-validator:commons-validator:1.4.1'
@@ -56,10 +37,6 @@ android {
     sourceSets.main {
         jniLibs.srcDir 'src/main/libs'
         jni.srcDirs = [] //disable automatic ndk-build call
-    }
-
-    repositories {
-        mavenCentral()
     }
 
     compileOptions {
