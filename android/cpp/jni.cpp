@@ -511,6 +511,19 @@ jlong JNICALL nativeAddPolyline(JNIEnv *env, jobject obj, jlong nativeMapViewPtr
         return -1;
     }
 
+    jobjectArray array =
+        reinterpret_cast<jobjectArray>(env->CallObjectMethod(points, listToArrayId));
+    if (env->ExceptionCheck() || (array == nullptr)) {
+        env->ExceptionDescribe();
+        return -1;
+    }
+
+    jsize len = env->GetArrayLength(array);
+    if (len < 0) {
+        env->ExceptionDescribe();
+        return -1;
+    }
+
     return (jlong)width;
 }
 
