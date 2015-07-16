@@ -7,7 +7,7 @@ public abstract class Annotation {
 
     /**
      * The annotation id
-     * <p/>
+     *
      * Internal C++ id is stored as unsigned int.
      */
     protected Long id; // null unless added to a MapView
@@ -18,6 +18,10 @@ public abstract class Annotation {
 
 
     public Annotation() {}
+
+    public float getAlpha() {
+        return alpha;
+    }
 
     public long getId() {
         return id;
@@ -32,6 +36,10 @@ public abstract class Annotation {
         mapView.removeAnnotation(this);
     }
 
+    public void setAlpha(float alpha) {
+        this.alpha = alpha;
+    }
+
     public void setId(Long id) {
         this.id = id;
     }
@@ -44,4 +52,13 @@ public abstract class Annotation {
         this.visible = visible;
     }
 
+    // TODO: Implement getZIndex of Google Maps Android API
+//    public float getZIndex() {
+//
+//    }
+
+    // TODO: Implement setZIndex of Google Maps Android API
+//    public void setZIndex(float zIndex) {
+//
+//    }
 }

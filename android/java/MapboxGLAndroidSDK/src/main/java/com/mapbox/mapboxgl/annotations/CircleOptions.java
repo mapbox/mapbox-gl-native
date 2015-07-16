@@ -3,7 +3,7 @@ package com.mapbox.mapboxgl.annotations;
 
 import com.mapbox.mapboxgl.geometry.LatLng;
 
-public class CircleOptions {
+public class CircleOptions extends AnnotationOptions {
 
     private Circle circle;
 

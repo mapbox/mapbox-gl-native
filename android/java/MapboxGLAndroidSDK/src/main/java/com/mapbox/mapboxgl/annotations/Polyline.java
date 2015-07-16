@@ -15,11 +15,6 @@ public class Polyline extends MultiPoint {
         super();
     }
 
-    // TODO: Implement equals of Google Maps Android API
-//    public boolean equals(Object other) {
-//
-//    }
-
     public int getColor() {
         return color;
     }
@@ -38,10 +33,6 @@ public class Polyline extends MultiPoint {
         this.color = color;
     }
 
-    // TODO: Implement setGeodesic of Google Maps Android API
-//    public void setGeodesic(boolean geodesic) {
-//
-//    }
 
     /**
      * Sets the width of the polyline.
@@ -53,9 +44,8 @@ public class Polyline extends MultiPoint {
         this.width = width;
     }
 
-    // TODO: Implement setZIndex of Google Maps Android API
-//    public void setZIndex(float zIndex) {
+    // TODO: Implement equals of Google Maps Android API
+//    public boolean equals(Object other) {
 //
 //    }
-
 }

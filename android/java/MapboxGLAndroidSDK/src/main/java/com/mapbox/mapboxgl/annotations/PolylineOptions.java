@@ -4,21 +4,14 @@ import com.mapbox.mapboxgl.geometry.LatLng;
 
 import java.util.List;
 
-public class PolylineOptions {
-
-    private Polyline polyline;
+public class PolylineOptions extends MultiPointOptions {
 
     public PolylineOptions() {
-        polyline = new Polyline();
-    }
-
-    public PolylineOptions alpha(float alpha) {
-        polyline.alpha = alpha;
-        return this;
+        annotation = new Polyline();
     }
 
     public PolylineOptions add(LatLng point) {
-        polyline.points.add(point);
+        ((MultiPoint)annotation).points.add(point);
         return this;
     }
 
@@ -37,47 +30,24 @@ public class PolylineOptions {
     }
 
     public PolylineOptions color(int color) {
-        polyline.color = color;
+        ((Polyline)annotation).color = color;
         return this;
     }
 
-    // TODO: Implement geodesic of Google Maps Android API
-//    public PolylineOptions geodesic (boolean geodesic) {
-//
-//    }
-
     public int getColor() {
-        return polyline.color;
-    }
-
-    public List<LatLng> getPoints() {
-        return polyline.points;
+        return ((Polyline)annotation).color;
     }
 
     public Polyline getPolyline() {
-        return polyline;
+        return ((Polyline)annotation);
     }
 
     public float getWidth() {
-        return polyline.width;
-    }
-
-    // TODO: Implement getZIndex of Google Maps Android API
-//    public float getZIndex() {
-//
-//    }
-
-    // TODO: Implement isGeodesic of Google Maps Android API
-//    public boolean isGeodesic() {
-//
-//    }
-
-    public boolean isVisible() {
-        return polyline.visible;
+        return ((Polyline)annotation).width;
     }
 
     public PolylineOptions visible(boolean visible) {
-        polyline.visible = visible;
+        annotation.visible = visible;
         return this;
     }
 
@@ -88,19 +58,13 @@ public class PolylineOptions {
      * @return
      */
     public PolylineOptions width(float width) {
-        polyline.width = width;
+        ((Polyline)annotation).width = width;
         return this;
     }
 
     // TODO: Implement writeToParcel of Google Maps Android API
 //    public void writeToParcel(Parcel out, int flags) {
 //
-//    }
-
-    // TODO: Implement zIndex of Google Maps Android API
-//    public PolylineOptions zIndex(float zIndex) {
-//
-//        return this;
 //    }
 
 }

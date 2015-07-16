@@ -5,11 +5,6 @@ import com.mapbox.mapboxgl.geometry.LatLng;
 
 public class Marker extends Annotation {
 
-    /**
-     * Member fields are without access qualifiers
-     * so that they can be directly set by MarkerOptions
-     * from within the module.
-     */
     float anchorU;
     float anchorV;
     boolean draggable;
@@ -34,6 +29,14 @@ public class Marker extends Annotation {
 
     public float getAlpha() {
         return alpha;
+    }
+
+    public float getAnchorU() {
+        return anchorU;
+    }
+
+    public float getAnchorV() {
+        return anchorV;
     }
 
     /**
@@ -63,9 +66,6 @@ public class Marker extends Annotation {
         return title;
     }
 
-//    Method in Google Maps Android API
-//    public int hashCode()
-
     public void hideInfoWindow() {
         //TODO hideInfoWindow
         infoWindowShown = false;
@@ -83,8 +83,9 @@ public class Marker extends Annotation {
         return infoWindowShown;
     }
 
-    void setAlpha(float alpha) {
-        this.alpha = alpha;
+    void setAnchor(float u, float v) {
+        this.anchorU = u;
+        this.anchorV = v;
     }
 
     void setDraggable(boolean draggable) {
@@ -94,11 +95,6 @@ public class Marker extends Annotation {
     void setFlat(boolean flat) {
         this.flat = flat;
     }
-
-    // TODO: Implement this method of Google Maps Android API
-//    void setIcon(BitmapDescriptor icon) {
-//
-//    }
 
     void setInfoWindowAnchor(float u, float v) {
         infoWindowAnchorU = u;
@@ -124,4 +120,13 @@ public class Marker extends Annotation {
     void showInfoWindow() {
         infoWindowShown = true;
     }
+
+
+    //  TODO Method in Google Maps Android API
+//    public int hashCode()
+
+    // TODO: Implement this method of Google Maps Android API
+//    void setIcon(BitmapDescriptor icon) {
+//
+//    }
 }

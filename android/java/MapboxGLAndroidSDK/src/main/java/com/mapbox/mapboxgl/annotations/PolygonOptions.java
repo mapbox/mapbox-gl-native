@@ -6,16 +6,14 @@ import com.mapbox.mapboxgl.geometry.LatLng;
 import java.util.ArrayList;
 import java.util.List;
 
-public class PolygonOptions {
-
-    private Polygon polygon;
+public class PolygonOptions extends MultiPointOptions {
 
     public PolygonOptions() {
-        polygon = new Polygon();
+        annotation = new Polygon();
     }
 
     public PolygonOptions add(LatLng point) {
-        polygon.points.add(point);
+        ((MultiPoint)annotation).points.add(point);
         return this;
     }
 
@@ -38,47 +36,47 @@ public class PolygonOptions {
         for (LatLng point : points) {
             hole.add(point);
         }
-        polygon.holes.add(hole);
+        ((Polygon)annotation).holes.add(hole);
         return this;
     }
 
     public PolygonOptions fillColor(int color) {
-        polygon.fillColor = color;
+        ((Polygon)annotation).fillColor = color;
         return this;
     }
 
     public int getFillColor() {
-        return polygon.fillColor;
+        return ((Polygon)annotation).fillColor;
     }
 
     public List<List<LatLng>> getHoles() {
-        return polygon.holes;
+        return ((Polygon)annotation).holes;
     }
 
     public Polygon getPolygon() {
-        return polygon;
+        return ((Polygon)annotation);
     }
 
     public int getStrokeColor() {
-        return polygon.strokeColor;
+        return ((Polygon)annotation).strokeColor;
     }
 
     public float getStrokeWidth() {
-        return polygon.strokeWidth;
+        return ((Polygon)annotation).strokeWidth;
     }
 
-    // TODO: Implement getZIndex of Google Maps Android API
-//    public float getZIndex() {
-//
-//    }
-
     public PolygonOptions strokeColor(int color) {
-        polygon.strokeColor = color;
+        ((Polygon)annotation).strokeColor = color;
         return this;
     }
 
     public PolygonOptions strokeWidth(float width) {
-        polygon.strokeWidth = width;
+        ((Polygon)annotation).strokeWidth = width;
+        return this;
+    }
+
+    public PolygonOptions visible(boolean visible) {
+        annotation.visible = visible;
         return this;
     }
 
@@ -87,9 +85,4 @@ public class PolygonOptions {
 //
 //    }
 
-    // TODO: Implement zIndex of Google Maps Android API
-//    public PolygonOptions zIndex(float zIndex) {
-//
-//        return this;
-//    }
 }

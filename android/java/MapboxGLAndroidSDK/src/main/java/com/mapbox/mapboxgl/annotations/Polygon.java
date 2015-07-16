@@ -22,11 +22,6 @@ public class Polygon extends MultiPoint {
         holes = new ArrayList<>();
     }
 
-    // TODO: Implement equals of Google Maps Android API
-//    public boolean equals (Object other) {
-//
-//    }
-
     public int getFillColor() {
         return fillColor;
     }
@@ -43,16 +38,6 @@ public class Polygon extends MultiPoint {
         return strokeWidth;
     }
 
-    // TODO: Implement getZIndex of Google Maps Android API
-//    public float getZIndex() {
-//
-//    }
-
-    // TODO: Implement hashCode of Google Maps Android API
-//    public int hashCode () {
-//
-//    }
-
     public void setFillAlpha(float alpha) {
         this.alpha = alpha;
     }
@@ -63,18 +48,14 @@ public class Polygon extends MultiPoint {
 
     /**
      * Sets the holes of this polygon. This method will take a copy of the holes,
-     * so further mutations to holes will have no effect on this polygon.
+     * so further mutations to holes parameter will have no effect on this polygon.
      *
      * @param holes
      */
     public void setHoles(List<? extends List<LatLng>> holes) {
         this.holes = new ArrayList<>();
         for (List<LatLng> hole : holes) {
-            List<LatLng> newHole = new ArrayList<>();
-            this.holes.add(newHole);
-            for (LatLng latLng : hole) {
-                newHole.add(latLng);
-            }
+            this.holes.add(new ArrayList<>(hole));
         }
     }
 
@@ -93,8 +74,14 @@ public class Polygon extends MultiPoint {
         strokeWidth = width;
     }
 
-    // TODO: Implement setZIndex of Google Maps Android API
-//    public void setZIndex(float zIndex) {
+
+    // TODO: Implement equals of Google Maps Android API
+//    public boolean equals (Object other) {
+//
+//    }
+
+    // TODO: Implement hashCode of Google Maps Android API
+//    public int hashCode () {
 //
 //    }
 }
