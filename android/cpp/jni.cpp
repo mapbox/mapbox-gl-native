@@ -165,6 +165,56 @@ std::vector<std::string> std_vector_string_from_jobject(JNIEnv *env, jobject jli
     return vector;
 }
 
+mbgl::AnnotationSegment annotation_segment_from_latlng_jlist(JNIEnv *env, jobject jlist) {
+    mbgl::AnnotationSegment segment;
+
+    if (jlist == nullptr) {
+        if (env->ThrowNew(nullPointerExceptionClass, "List cannot be null.") < 0) {
+            env->ExceptionDescribe();
+            return segment;
+        }
+        return segment;
+    }
+
+    jobjectArray array =
+        reinterpret_cast<jobjectArray>(env->CallObjectMethod(jlist, listToArrayId));
+    if (env->ExceptionCheck() || (array == nullptr)) {
+        env->ExceptionDescribe();
+        return segment;
+    }
+
+    jsize len = env->GetArrayLength(array);
+    if (len < 0) {
+        env->ExceptionDescribe();
+        return segment;
+    }
+
+    segment.reserve(len);
+
+    for (jsize i = 0; i < len; i++) {
+        jobject latLng = reinterpret_cast<jobject>(env->GetObjectArrayElement(array, i));
+        if (latLng == nullptr) {
+            env->ExceptionDescribe();
+            return segment;
+        }
+
+        jdouble latitude = env->GetDoubleField(latLng, latLngLatitudeId);
+        if (env->ExceptionCheck()) {
+            env->ExceptionDescribe();
+            return segment;
+        }
+
+        jdouble longitude = env->GetDoubleField(latLng, latLngLongitudeId);
+        if (env->ExceptionCheck()) {
+            env->ExceptionDescribe();
+            return segment;
+        }
+
+        segment.push_back(mbgl::LatLng(latitude, longitude));
+    }
+    return segment;
+}
+
 jobject std_vector_string_to_jobject(JNIEnv *env, std::vector<std::string> vector) {
     jobject jlist = env->NewObject(arrayListClass, arrayListConstructorId);
     if (jlist == nullptr) {
@@ -513,53 +563,8 @@ jlong JNICALL nativeAddPolyline(JNIEnv *env, jobject obj, jlong nativeMapViewPtr
     lineProperties.width = width;
     shapeProperties.set<mbgl::LineProperties>(lineProperties);
 
-
     jobject points = env->GetObjectField(polyline, polylinePointsId);
-    if (points == nullptr) {
-        if (env->ThrowNew(nullPointerExceptionClass, "List cannot be null.") < 0) {
-            env->ExceptionDescribe();
-            return -1;
-        }
-        return -1;
-    }
-
-    jobjectArray array =
-        reinterpret_cast<jobjectArray>(env->CallObjectMethod(points, listToArrayId));
-    if (env->ExceptionCheck() || (array == nullptr)) {
-        env->ExceptionDescribe();
-        return -1;
-    }
-
-    jsize len = env->GetArrayLength(array);
-    if (len < 0) {
-        env->ExceptionDescribe();
-        return -1;
-    }
-
-    mbgl::AnnotationSegment segment;
-    segment.reserve(len);
-
-    for (jsize i = 0; i < len; i++) {
-        jobject latLng = reinterpret_cast<jobject>(env->GetObjectArrayElement(array, i));
-        if (latLng == nullptr) {
-            env->ExceptionDescribe();
-            return -1;
-        }
-
-        jdouble latitude = env->GetDoubleField(latLng, latLngLatitudeId);
-        if (env->ExceptionCheck()) {
-            env->ExceptionDescribe();
-            return -1;
-        }
-
-        jdouble longitude = env->GetDoubleField(latLng, latLngLongitudeId);
-        if (env->ExceptionCheck()) {
-            env->ExceptionDescribe();
-            return -1;
-        }
-
-        segment.push_back(mbgl::LatLng(latitude, longitude));
-    }
+    mbgl::AnnotationSegment segment = annotation_segment_from_latlng_jlist(env, points);
 
     std::vector<mbgl::ShapeAnnotation> shapes;
     shapes.emplace_back(mbgl::AnnotationSegments {{ segment }}, shapeProperties);
