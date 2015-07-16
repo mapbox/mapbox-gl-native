@@ -221,6 +221,7 @@ class NativeMapView {
     }
 
     public long addPolyline(Polyline polyline) {
+        // NH TODO Throw exception if returns -1
         return nativeAddPolyline(mNativeMapViewPtr, polyline);
     }
 

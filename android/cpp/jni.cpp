@@ -40,6 +40,10 @@ jmethodID latLngConstructorId = nullptr;
 jfieldID latLngLatitudeId = nullptr;
 jfieldID latLngLongitudeId = nullptr;
 
+jclass polylineClass = nullptr;
+jmethodID polylineConstructorId = nullptr;
+jfieldID polylineAlphaId = nullptr;
+
 jclass latLngZoomClass = nullptr;
 jmethodID latLngZoomConstructorId = nullptr;
 jfieldID latLngZoomLatitudeId = nullptr;
@@ -460,8 +464,21 @@ jlong JNICALL nativeAddPolyline(JNIEnv *env, jobject obj, jlong nativeMapViewPtr
     assert(nativeMapViewPtr != 0);
     // NativeMapView *nativeMapView = reinterpret_cast<NativeMapView *>(nativeMapViewPtr);
 
+    // ***** Java fields ***** //
 
-    return -1;
+    // float alpha;
+    // boolean visible;
+    // List<LatLng> points
+    // int color
+    // float width
+
+    jfloat alpha = env->GetFloatField(polyline, polylineAlphaId);
+    if (env->ExceptionCheck()) {
+        env->ExceptionDescribe();
+        return -1;
+    }
+
+    return (jlong)alpha;
 }
 
 void JNICALL nativeRemoveAnnotation(JNIEnv *env, jobject obj, jlong nativeMapViewPtr, jlong annotationId) {
@@ -821,6 +838,24 @@ extern "C" JNIEXPORT jint JNICALL JNI_OnLoad(JavaVM *vm, void *reserved) {
         return JNI_ERR;
     }
 
+    polylineClass = env->FindClass("com/mapbox/mapboxgl/annotations/Polyline");
+    if (polylineClass == nullptr) {
+        env->ExceptionDescribe();
+        return JNI_ERR;
+    }
+
+    polylineConstructorId = env->GetMethodID(polylineClass, "<init>", "()V");
+    if (polylineConstructorId == nullptr) {
+        env->ExceptionDescribe();
+        return JNI_ERR;
+    }
+
+    polylineAlphaId = env->GetFieldID(polylineClass, "alpha", "F");
+    if (polylineAlphaId == nullptr) {
+        env->ExceptionDescribe();
+        return JNI_ERR;
+    }
+
     latLngZoomClass = env->FindClass("com/mapbox/mapboxgl/geometry/LatLngZoom");
     if (latLngZoomClass == nullptr) {
         env->ExceptionDescribe();
@@ -1069,6 +1104,12 @@ extern "C" JNIEXPORT jint JNICALL JNI_OnLoad(JavaVM *vm, void *reserved) {
         return JNI_ERR;
     }
 
+    polylineClass = reinterpret_cast<jclass>(env->NewGlobalRef(polylineClass));
+    if (polylineClass == nullptr) {
+        env->ExceptionDescribe();
+        return JNI_ERR;
+    }
+
     latLngZoomClass = reinterpret_cast<jclass>(env->NewGlobalRef(latLngZoomClass));
     if (latLngZoomClass == nullptr) {
         env->ExceptionDescribe();
@@ -1151,6 +1192,11 @@ extern "C" JNIEXPORT void JNICALL JNI_OnUnload(JavaVM *vm, void *reserved) {
     latLngConstructorId = nullptr;
     latLngLongitudeId = nullptr;
     latLngLatitudeId = nullptr;
+
+    env->DeleteGlobalRef(polylineClass);
+    polylineClass = nullptr;
+    polylineConstructorId = nullptr;
+    polylineAlphaId = nullptr;
 
     env->DeleteGlobalRef(latLngZoomClass);
     latLngZoomClass = nullptr;
