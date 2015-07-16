@@ -43,6 +43,9 @@ jfieldID latLngLongitudeId = nullptr;
 jclass polylineClass = nullptr;
 jmethodID polylineConstructorId = nullptr;
 jfieldID polylineAlphaId = nullptr;
+jfieldID polylineVisibleId = nullptr;
+jfieldID polylineColorId = nullptr;
+jfieldID polylineWidthId = nullptr;
 
 jclass latLngZoomClass = nullptr;
 jmethodID latLngZoomConstructorId = nullptr;
@@ -465,20 +468,40 @@ jlong JNICALL nativeAddPolyline(JNIEnv *env, jobject obj, jlong nativeMapViewPtr
     // NativeMapView *nativeMapView = reinterpret_cast<NativeMapView *>(nativeMapViewPtr);
 
     // ***** Java fields ***** //
-
     // float alpha;
     // boolean visible;
-    // List<LatLng> points
     // int color
     // float width
+    // List<LatLng> points
 
     jfloat alpha = env->GetFloatField(polyline, polylineAlphaId);
     if (env->ExceptionCheck()) {
         env->ExceptionDescribe();
         return -1;
     }
+    ++alpha;
 
-    return (jlong)alpha;
+    jboolean visible = env->GetBooleanField(polyline, polylineVisibleId);
+    if (env->ExceptionCheck()) {
+        env->ExceptionDescribe();
+        return -1;
+    }
+    visible = JNI_TRUE;
+
+    jint color = env->GetIntField(polyline, polylineColorId);
+    if (env->ExceptionCheck()) {
+        env->ExceptionDescribe();
+        return -1;
+    }
+    ++color;
+
+    jfloat width = env->GetFloatField(polyline, polylineWidthId);
+    if (env->ExceptionCheck()) {
+        env->ExceptionDescribe();
+        return -1;
+    }
+
+    return (jlong)width;
 }
 
 void JNICALL nativeRemoveAnnotation(JNIEnv *env, jobject obj, jlong nativeMapViewPtr, jlong annotationId) {
@@ -852,6 +875,24 @@ extern "C" JNIEXPORT jint JNICALL JNI_OnLoad(JavaVM *vm, void *reserved) {
 
     polylineAlphaId = env->GetFieldID(polylineClass, "alpha", "F");
     if (polylineAlphaId == nullptr) {
+        env->ExceptionDescribe();
+        return JNI_ERR;
+    }
+
+    polylineVisibleId = env->GetFieldID(polylineClass, "visible", "Z");
+    if (polylineVisibleId == nullptr) {
+        env->ExceptionDescribe();
+        return JNI_ERR;
+    }
+
+    polylineColorId = env->GetFieldID(polylineClass, "color", "I");
+    if (polylineColorId == nullptr) {
+        env->ExceptionDescribe();
+        return JNI_ERR;
+    }
+
+    polylineWidthId = env->GetFieldID(polylineClass, "width", "F");
+    if (polylineWidthId == nullptr) {
         env->ExceptionDescribe();
         return JNI_ERR;
     }
