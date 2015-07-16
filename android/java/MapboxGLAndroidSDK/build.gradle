@@ -61,6 +61,29 @@ android {
             proguardFiles getDefaultProguardFile('proguard-android.txt'), 'proguard-rules.txt'
         }
     }
+
+    productFlavors {
+        x86 {
+            ndk {
+                abiFilter "x86"
+            }
+        }
+        mips {
+            ndk {
+                abiFilter "mips"
+            }
+        }
+        armv7 {
+            ndk {
+                abiFilter "armeabi-v7a"
+            }
+        }
+        arm {
+            ndk {
+                abiFilter "armeabi"
+            }
+        }
+    }
 }
 
 configurations {
@@ -97,7 +120,7 @@ task cleanJNIBuilds {
 
 android.libraryVariants.all { variant ->
     def name = variant.buildType.name
-    def checkstyle = project.tasks.create "checkstyle${name.capitalize()}", Checkstyle
+    def checkstyle = project.tasks.create "checkstyle${variant.name.capitalize()}${name.capitalize()}", Checkstyle
     checkstyle.dependsOn variant.javaCompile
     checkstyle.source variant.javaCompile.source
     checkstyle.classpath = project.fileTree(variant.javaCompile.destinationDir)
