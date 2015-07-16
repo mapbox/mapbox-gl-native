@@ -557,9 +557,12 @@ jlong JNICALL nativeAddPolyline(JNIEnv *env, jobject obj, jlong nativeMapViewPtr
         segment.push_back(mbgl::LatLng(latitude, longitude));
     }
 
+    std::vector<mbgl::ShapeAnnotation> shapes;
+    shapes.emplace_back(mbgl::AnnotationSegments {{ segment }}, shapeProperties);
 
-
-    return (jlong) nativeMapView->getMap().addShapeAnnotation(mbgl::ShapeAnnotation(segment, shapeProperties));
+    std::vector<uint32_t> shapeAnnotationIDs = nativeMapView->getMap().addShapeAnnotations(shapes);
+    uint32_t id = shapeAnnotationIDs.at(0);
+    return (jlong) id;
 }
 
 void JNICALL nativeRemoveAnnotation(JNIEnv *env, jobject obj, jlong nativeMapViewPtr, jlong annotationId) {
