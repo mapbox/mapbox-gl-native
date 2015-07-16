@@ -29,7 +29,9 @@ public class Util {
 
     public static LatLng[] parseGeoJSONCoordinates(String geojsonStr) throws JSONException {
         JSONObject jsonObject = new JSONObject(geojsonStr);
-        JSONObject geometry = jsonObject.getJSONObject("geometry");
+        JSONArray features = jsonObject.getJSONArray("features");
+        JSONObject feature = features.getJSONObject(0);
+        JSONObject geometry = feature.getJSONObject("geometry");
         JSONArray coordinates = geometry.getJSONArray("coordinates");
         int len = coordinates.length();
         LatLng[] latLngs = new LatLng[coordinates.length()];

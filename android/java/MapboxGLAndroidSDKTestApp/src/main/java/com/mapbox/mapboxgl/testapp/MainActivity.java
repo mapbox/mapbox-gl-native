@@ -297,12 +297,12 @@ public class MainActivity extends ActionBarActivity {
 
     private void addPolyline() {
         try {
-            String geojsonStr = Util.loadStringFromAssets(this, "tillicum.geojson");
+            String geojsonStr = Util.loadStringFromAssets(this, "small_line.geojson");
             LatLng[] latLngs = Util.parseGeoJSONCoordinates(geojsonStr);
             MapView map = mMapFragment.getMap();
             Polyline line = map.addPolyline(new PolylineOptions()
-                    .add(new LatLng(51.5, -0.1), new LatLng(40.7, -74.0))
-                    .width(5)
+                    .add(latLngs)
+                    .width(2)
                     .color(Color.RED));
         } catch (IOException e) {
             e.printStackTrace();
