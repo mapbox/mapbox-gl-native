@@ -281,7 +281,7 @@ public class MainActivity extends ActionBarActivity {
         } else {
             if (mIsMarkersOn) {
                 mIsMarkersOn = false;
-                removeMarkers();
+                removeAnnotations();
             }
         }
     }
@@ -311,8 +311,8 @@ public class MainActivity extends ActionBarActivity {
         }
     }
 
-    private void removeMarkers() {
-        marker.remove();
+    private void removeAnnotations() {
+        mMapFragment.getMap().removeAnnotations();
     }
 
     // This class forwards location updates to updateLocation()

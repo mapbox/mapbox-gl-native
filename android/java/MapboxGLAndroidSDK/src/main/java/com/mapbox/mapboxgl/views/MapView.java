@@ -32,6 +32,8 @@ import com.almeros.android.multitouch.gesturedetectors.TwoFingerGestureDetector;
 import com.mapbox.mapboxgl.annotations.Annotation;
 import com.mapbox.mapboxgl.annotations.Marker;
 import com.mapbox.mapboxgl.annotations.MarkerOptions;
+import com.mapbox.mapboxgl.annotations.Polygon;
+import com.mapbox.mapboxgl.annotations.PolygonOptions;
 import com.mapbox.mapboxgl.annotations.Polyline;
 import com.mapbox.mapboxgl.annotations.PolylineOptions;
 import com.mapbox.mapboxgl.geometry.LatLng;
@@ -232,11 +234,29 @@ public class MapView extends SurfaceView {
         return polyline;
     }
 
+    public Polygon addPolygon(PolygonOptions polygonOptions) {
+        Polygon polygon = polygonOptions.getPolygon();
+        Long id = mNativeMapView.addPolygon(polygon);
+        polygon.setId(id);
+        polygon.setMapView(this);
+        annotations.add(polygon);
+        return polygon;
+    }
+
     public void removeAnnotation(Annotation annotation) {
         long id = annotation.getId();
         mNativeMapView.removeAnnotation(id);
     }
 
+    public void removeAnnotation(long annotationId) {
+        mNativeMapView.removeAnnotation(annotationId);
+    }
+
+    public void removeAnnotations() {
+        for (Annotation annotation : annotations) {
+            annotation.remove();
+        }
+    }
 
     //
     // Property methods
