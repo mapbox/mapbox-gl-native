@@ -17,6 +17,7 @@
 #include <mbgl/android/native_map_view.hpp>
 #include <mbgl/map/map.hpp>
 #include <mbgl/annotation/point_annotation.hpp>
+#include <mbgl/annotation/shape_annotation.hpp>
 #include <mbgl/platform/event.hpp>
 #include <mbgl/platform/log.hpp>
 #include <mbgl/storage/network_status.hpp>
@@ -466,7 +467,7 @@ jlong JNICALL nativeAddMarker(JNIEnv *env, jobject obj, jlong nativeMapViewPtr, 
 jlong JNICALL nativeAddPolyline(JNIEnv *env, jobject obj, jlong nativeMapViewPtr, jobject polyline) {
     mbgl::Log::Debug(mbgl::Event::JNI, "nativeAddPolyline");
     assert(nativeMapViewPtr != 0);
-    // NativeMapView *nativeMapView = reinterpret_cast<NativeMapView *>(nativeMapViewPtr);
+    NativeMapView *nativeMapView = reinterpret_cast<NativeMapView *>(nativeMapViewPtr);
 
     // ***** Java fields ***** //
     // float alpha;
@@ -480,7 +481,6 @@ jlong JNICALL nativeAddPolyline(JNIEnv *env, jobject obj, jlong nativeMapViewPtr
         env->ExceptionDescribe();
         return -1;
     }
-    ++alpha;
 
     jboolean visible = env->GetBooleanField(polyline, polylineVisibleId);
     if (env->ExceptionCheck()) {
@@ -501,6 +501,14 @@ jlong JNICALL nativeAddPolyline(JNIEnv *env, jobject obj, jlong nativeMapViewPtr
         env->ExceptionDescribe();
         return -1;
     }
+
+    mbgl::StyleProperties shapeProperties;
+    mbgl::LineProperties lineProperties;
+    lineProperties.opacity = alpha;
+    lineProperties.color = {{ 0.3, 0.7, 0.1, 1 }};;
+    lineProperties.width = width;
+    shapeProperties.set<mbgl::LineProperties>(lineProperties);
+
 
     jobject points = env->GetObjectField(polyline, polylinePointsId);
     if (points == nullptr) {
@@ -524,6 +532,9 @@ jlong JNICALL nativeAddPolyline(JNIEnv *env, jobject obj, jlong nativeMapViewPtr
         return -1;
     }
 
+    mbgl::AnnotationSegment segment;
+    segment.reserve(len);
+
     for (jsize i = 0; i < len; i++) {
         jobject latLng = reinterpret_cast<jobject>(env->GetObjectArrayElement(array, i));
         if (latLng == nullptr) {
@@ -536,16 +547,19 @@ jlong JNICALL nativeAddPolyline(JNIEnv *env, jobject obj, jlong nativeMapViewPtr
             env->ExceptionDescribe();
             return -1;
         }
-        latitude++;
+
         jdouble longitude = env->GetDoubleField(latLng, latLngLongitudeId);
         if (env->ExceptionCheck()) {
             env->ExceptionDescribe();
             return -1;
         }
-        longitude++;
+
+        segment.push_back(mbgl::LatLng(latitude, longitude));
     }
 
-    return (jlong)width;
+
+
+    return (jlong) nativeMapView->getMap().addShapeAnnotation(mbgl::ShapeAnnotation(segment, shapeProperties));
 }
 
 void JNICALL nativeRemoveAnnotation(JNIEnv *env, jobject obj, jlong nativeMapViewPtr, jlong annotationId) {
