@@ -494,7 +494,11 @@ jlong JNICALL nativeAddPolyline(JNIEnv *env, jobject obj, jlong nativeMapViewPtr
         env->ExceptionDescribe();
         return -1;
     }
-    ++color;
+
+    int r = (color>>16)&0xFF;
+    int g = (color>>8)&0xFF;
+    int b = (color)&0xFF;
+    int a = (color>>24)&0xFF;
 
     jfloat width = env->GetFloatField(polyline, polylineWidthId);
     if (env->ExceptionCheck()) {
@@ -505,7 +509,7 @@ jlong JNICALL nativeAddPolyline(JNIEnv *env, jobject obj, jlong nativeMapViewPtr
     mbgl::StyleProperties shapeProperties;
     mbgl::LineProperties lineProperties;
     lineProperties.opacity = alpha;
-    lineProperties.color = {{ 0.3, 0.7, 0.1, 1 }};;
+    lineProperties.color = {{ (float)r, (float)g, (float)b, (float)a }};
     lineProperties.width = width;
     shapeProperties.set<mbgl::LineProperties>(lineProperties);
 
