@@ -46,6 +46,7 @@ jfieldID polylineAlphaId = nullptr;
 jfieldID polylineVisibleId = nullptr;
 jfieldID polylineColorId = nullptr;
 jfieldID polylineWidthId = nullptr;
+jfieldID polylinePointsId = nullptr;
 
 jclass latLngZoomClass = nullptr;
 jmethodID latLngZoomConstructorId = nullptr;
@@ -501,6 +502,15 @@ jlong JNICALL nativeAddPolyline(JNIEnv *env, jobject obj, jlong nativeMapViewPtr
         return -1;
     }
 
+    jobject points = env->GetObjectField(polyline, polylinePointsId);
+    if (points == nullptr) {
+        if (env->ThrowNew(nullPointerExceptionClass, "List cannot be null.") < 0) {
+            env->ExceptionDescribe();
+            return -1;
+        }
+        return -1;
+    }
+
     return (jlong)width;
 }
 
@@ -892,6 +902,12 @@ extern "C" JNIEXPORT jint JNICALL JNI_OnLoad(JavaVM *vm, void *reserved) {
     }
 
     polylineWidthId = env->GetFieldID(polylineClass, "width", "F");
+    if (polylineWidthId == nullptr) {
+        env->ExceptionDescribe();
+        return JNI_ERR;
+    }
+
+    polylinePointsId = env->GetFieldID(polylineClass, "points", "Ljava/util/List;");
     if (polylineWidthId == nullptr) {
         env->ExceptionDescribe();
         return JNI_ERR;
