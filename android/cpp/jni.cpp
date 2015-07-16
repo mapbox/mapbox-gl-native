@@ -525,13 +525,24 @@ jlong JNICALL nativeAddPolyline(JNIEnv *env, jobject obj, jlong nativeMapViewPtr
     }
 
     for (jsize i = 0; i < len; i++) {
-        jobject jobj = reinterpret_cast<jobject>(env->GetObjectArrayElement(array, i));
-        if (jobj == nullptr) {
+        jobject latLng = reinterpret_cast<jobject>(env->GetObjectArrayElement(array, i));
+        if (latLng == nullptr) {
             env->ExceptionDescribe();
             return -1;
         }
 
-        // vector.push_back(std_string_from_jstring(env, jstr));
+        jdouble latitude = env->GetDoubleField(latLng, latLngLatitudeId);
+        if (env->ExceptionCheck()) {
+            env->ExceptionDescribe();
+            return -1;
+        }
+        latitude++;
+        jdouble longitude = env->GetDoubleField(latLng, latLngLongitudeId);
+        if (env->ExceptionCheck()) {
+            env->ExceptionDescribe();
+            return -1;
+        }
+        longitude++;
     }
 
     return (jlong)width;
