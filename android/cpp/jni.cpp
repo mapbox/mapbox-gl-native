@@ -524,6 +524,16 @@ jlong JNICALL nativeAddPolyline(JNIEnv *env, jobject obj, jlong nativeMapViewPtr
         return -1;
     }
 
+    for (jsize i = 0; i < len; i++) {
+        jobject jobj = reinterpret_cast<jobject>(env->GetObjectArrayElement(array, i));
+        if (jobj == nullptr) {
+            env->ExceptionDescribe();
+            return -1;
+        }
+
+        // vector.push_back(std_string_from_jstring(env, jstr));
+    }
+
     return (jlong)width;
 }
 
