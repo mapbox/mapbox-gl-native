@@ -98,6 +98,11 @@ public class MarkerOptions extends AnnotationOptions {
         return this;
     }
 
+    public MarkerOptions sprite(String sprite) {
+        ((Marker)annotation).sprite = sprite;
+        return this;
+    }
+
     public MarkerOptions title(String title) {
         ((Marker)annotation).title = title;
         return this;

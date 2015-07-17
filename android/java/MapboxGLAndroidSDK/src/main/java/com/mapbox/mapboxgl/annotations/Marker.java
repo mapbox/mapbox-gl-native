@@ -14,6 +14,7 @@ public class Marker extends Annotation {
     LatLng position;
     float rotation;
     String snippet;
+    String sprite = "default_marker";
     String title;
 
     private boolean infoWindowShown = false;
@@ -111,6 +112,10 @@ public class Marker extends Annotation {
 
     void setSnippet(String snippet) {
         this.snippet = snippet;
+    }
+
+    void setSprite(String sprite) {
+        this.sprite = sprite;
     }
 
     void setTitle(String title) {

@@ -300,6 +300,7 @@ public class MainActivity extends ActionBarActivity {
         LatLng cheeseRoom = new LatLng(38.531577,-122.010646);
         map.addMarker(new MarkerOptions()
                 .position(cheeseRoom)
+                .sprite("dog-park-15")
                 .title("Cheese Room")
                 .snippet("The only air conditioned room on the property!"));
     }

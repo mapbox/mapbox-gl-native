@@ -41,6 +41,11 @@ jmethodID latLngConstructorId = nullptr;
 jfieldID latLngLatitudeId = nullptr;
 jfieldID latLngLongitudeId = nullptr;
 
+jclass markerClass = nullptr;
+jmethodID markerConstructorId = nullptr;
+jfieldID markerPositionId = nullptr;
+jfieldID markerSpriteId = nullptr;
+
 jclass polylineClass = nullptr;
 jmethodID polylineConstructorId = nullptr;
 jfieldID polylineAlphaId = nullptr;
@@ -504,25 +509,34 @@ void JNICALL nativeSetLatLng(JNIEnv *env, jobject obj, jlong nativeMapViewPtr, j
     nativeMapView->getMap().setLatLng(mbgl::LatLng(latitude, longitude), std::chrono::milliseconds(duration));
 }
 
-jlong JNICALL nativeAddMarker(JNIEnv *env, jobject obj, jlong nativeMapViewPtr, jobject latLng) {
+jlong JNICALL nativeAddMarker(JNIEnv *env, jobject obj, jlong nativeMapViewPtr, jobject marker) {
     mbgl::Log::Debug(mbgl::Event::JNI, "nativeAddMarker");
     assert(nativeMapViewPtr != 0);
     NativeMapView *nativeMapView = reinterpret_cast<NativeMapView *>(nativeMapViewPtr);
 
-    jdouble latitude = env->GetDoubleField(latLng, latLngLatitudeId);
+    jobject position = env->GetObjectField(marker, markerPositionId);
     if (env->ExceptionCheck()) {
         env->ExceptionDescribe();
         return -1;
     }
 
-    jdouble longitude = env->GetDoubleField(latLng, latLngLongitudeId);
+    jstring jsprite = (jstring)env->GetObjectField(marker, markerSpriteId);
+    std::string sprite = std_string_from_jstring(env, jsprite);
+
+    jdouble latitude = env->GetDoubleField(position, latLngLatitudeId);
+    if (env->ExceptionCheck()) {
+        env->ExceptionDescribe();
+        return -1;
+    }
+
+    jdouble longitude = env->GetDoubleField(position, latLngLongitudeId);
     if (env->ExceptionCheck()) {
         env->ExceptionDescribe();
         return -1;
     }
 
     // Because Java only has int, not unsigned int, we need to bump the annotation id up to a long.
-    return (jlong) nativeMapView->getMap().addPointAnnotation(mbgl::PointAnnotation(mbgl::LatLng(latitude, longitude), std::string("default_marker")));
+    return (jlong) nativeMapView->getMap().addPointAnnotation(mbgl::PointAnnotation(mbgl::LatLng(latitude, longitude), sprite));
 }
 
 jlong JNICALL nativeAddPolyline(JNIEnv *env, jobject obj, jlong nativeMapViewPtr, jobject polyline) {
@@ -1015,6 +1029,30 @@ extern "C" JNIEXPORT jint JNICALL JNI_OnLoad(JavaVM *vm, void *reserved) {
         return JNI_ERR;
     }
 
+    markerClass = env->FindClass("com/mapbox/mapboxgl/annotations/Marker");
+    if (markerClass == nullptr) {
+        env->ExceptionDescribe();
+        return JNI_ERR;
+    }
+
+    markerConstructorId = env->GetMethodID(markerClass, "<init>", "()V");
+    if (markerConstructorId == nullptr) {
+        env->ExceptionDescribe();
+        return JNI_ERR;
+    }
+
+    markerPositionId = env->GetFieldID(markerClass, "position", "Lcom/mapbox/mapboxgl/geometry/LatLng;");
+    if (markerPositionId == nullptr) {
+        env->ExceptionDescribe();
+        return JNI_ERR;
+    }
+    
+    markerSpriteId = env->GetFieldID(markerClass, "sprite", "Ljava/lang/String;");
+    if (markerSpriteId == nullptr) {
+        env->ExceptionDescribe();
+        return JNI_ERR;
+    }
+
     polylineClass = env->FindClass("com/mapbox/mapboxgl/annotations/Polyline");
     if (polylineClass == nullptr) {
         env->ExceptionDescribe();
@@ -1064,7 +1102,7 @@ extern "C" JNIEXPORT jint JNICALL JNI_OnLoad(JavaVM *vm, void *reserved) {
     }
 
     polygonConstructorId = env->GetMethodID(polygonClass, "<init>", "()V");
-    if (polylineConstructorId == nullptr) {
+    if (polygonConstructorId == nullptr) {
         env->ExceptionDescribe();
         return JNI_ERR;
     }
@@ -1304,7 +1342,7 @@ extern "C" JNIEXPORT jint JNICALL JNI_OnLoad(JavaVM *vm, void *reserved) {
         {"nativeMoveBy", "(JDDJ)V", reinterpret_cast<void *>(&nativeMoveBy)},
         {"nativeSetLatLng", "(JLcom/mapbox/mapboxgl/geometry/LatLng;J)V",
          reinterpret_cast<void *>(&nativeSetLatLng)},
-        {"nativeAddMarker", "(JLcom/mapbox/mapboxgl/geometry/LatLng;)J",
+        {"nativeAddMarker", "(JLcom/mapbox/mapboxgl/annotations/Marker;)J",
          reinterpret_cast<void *>(&nativeAddMarker)},
         {"nativeAddPolyline", "(JLcom/mapbox/mapboxgl/annotations/Polyline;)J",
          reinterpret_cast<void *>(&nativeAddPolyline)},
@@ -1357,6 +1395,12 @@ extern "C" JNIEXPORT jint JNICALL JNI_OnLoad(JavaVM *vm, void *reserved) {
 
     latLngClass = reinterpret_cast<jclass>(env->NewGlobalRef(latLngClass));
     if (latLngClass == nullptr) {
+        env->ExceptionDescribe();
+        return JNI_ERR;
+    }
+
+    markerClass = reinterpret_cast<jclass>(env->NewGlobalRef(markerClass));
+    if (markerClass == nullptr) {
         env->ExceptionDescribe();
         return JNI_ERR;
     }
@@ -1455,6 +1499,12 @@ extern "C" JNIEXPORT void JNICALL JNI_OnUnload(JavaVM *vm, void *reserved) {
     latLngConstructorId = nullptr;
     latLngLongitudeId = nullptr;
     latLngLatitudeId = nullptr;
+
+    env->DeleteGlobalRef(markerClass);
+    markerClass = nullptr;
+    markerConstructorId = nullptr;
+    markerPositionId = nullptr;
+    markerSpriteId = nullptr;
 
     env->DeleteGlobalRef(polylineClass);
     polylineClass = nullptr;
