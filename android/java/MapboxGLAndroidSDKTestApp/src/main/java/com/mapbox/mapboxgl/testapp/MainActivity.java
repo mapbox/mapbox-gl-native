@@ -26,6 +26,8 @@ import android.widget.TextView;
 
 import com.mapbox.mapboxgl.annotations.Marker;
 import com.mapbox.mapboxgl.annotations.MarkerOptions;
+import com.mapbox.mapboxgl.annotations.Polygon;
+import com.mapbox.mapboxgl.annotations.PolygonOptions;
 import com.mapbox.mapboxgl.annotations.Polyline;
 import com.mapbox.mapboxgl.annotations.PolylineOptions;
 import com.mapbox.mapboxgl.geometry.LatLng;
@@ -277,6 +279,7 @@ public class MainActivity extends ActionBarActivity {
                 mIsMarkersOn = true;
                 addMarkers();
                 addPolyline();
+                addPolygon();
             }
         } else {
             if (mIsMarkersOn) {
@@ -304,6 +307,23 @@ public class MainActivity extends ActionBarActivity {
                     .add(latLngs)
                     .width(2)
                     .color(Color.RED));
+        } catch (IOException e) {
+            e.printStackTrace();
+        } catch (JSONException e) {
+            e.printStackTrace();
+        }
+    }
+
+    private void addPolygon() {
+        String geojsonStr = null;
+        try {
+            geojsonStr = Util.loadStringFromAssets(this, "small_polygon.geojson");
+            LatLng[] latLngs = Util.parseGeoJSONCoordinates(geojsonStr);
+            MapView map = mMapFragment.getMap();
+            Polygon polygon = map.addPolygon(new PolygonOptions()
+                    .add(new LatLng(0, 0), new LatLng(0, 5), new LatLng(3, 5), new LatLng(0, 0))
+                    .strokeColor(Color.MAGENTA)
+                    .fillColor(Color.BLUE));
         } catch (IOException e) {
             e.printStackTrace();
         } catch (JSONException e) {
