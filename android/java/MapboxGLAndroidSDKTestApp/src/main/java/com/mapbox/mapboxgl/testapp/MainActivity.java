@@ -296,6 +296,12 @@ public class MainActivity extends ActionBarActivity {
             .position(backLot)
             .title("Back Lot")
             .snippet("The back lot behind my house"));
+
+        LatLng cheeseRoom = new LatLng(38.531577,-122.010646);
+        map.addMarker(new MarkerOptions()
+                .position(cheeseRoom)
+                .title("Cheese Room")
+                .snippet("The only air conditioned room on the property!"));
     }
 
     private void addPolyline() {
@@ -321,7 +327,7 @@ public class MainActivity extends ActionBarActivity {
             LatLng[] latLngs = Util.parseGeoJSONCoordinates(geojsonStr);
             MapView map = mMapFragment.getMap();
             Polygon polygon = map.addPolygon(new PolygonOptions()
-                    .add(new LatLng(0, 0), new LatLng(0, 5), new LatLng(3, 5), new LatLng(0, 0))
+                    .add(latLngs)
                     .strokeColor(Color.MAGENTA)
                     .fillColor(Color.BLUE));
         } catch (IOException e) {

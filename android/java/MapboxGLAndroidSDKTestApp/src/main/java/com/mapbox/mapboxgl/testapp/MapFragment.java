@@ -7,6 +7,7 @@ import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
 
+import com.mapbox.mapboxgl.geometry.LatLng;
 import com.mapbox.mapboxgl.views.MapView;
 
 import java.io.BufferedReader;
@@ -77,6 +78,8 @@ public class MapFragment extends Fragment {
 
         // Need to pass on to view
         mMap.onStart();
+        mMap.setCenterCoordinate(new LatLng(38.247887,-121.843872));
+        mMap.setZoomLevel(7);
     }
 
     // Called when the fragment is invisible
