@@ -2,6 +2,7 @@
 #include <mbgl/map/source.hpp>
 #include <mbgl/style/style_layer.hpp>
 #include <mbgl/map/annotation.hpp>
+#include <mbgl/map/map_data.hpp>
 #include <mbgl/util/constants.hpp>
 #include <mbgl/util/vec.hpp>
 #include <mbgl/util/uv_detail.hpp>
@@ -21,7 +22,8 @@ namespace mbgl {
 
 using JSVal = const rapidjson::Value&;
 
-StyleParser::StyleParser() {
+StyleParser::StyleParser(MapData& data_)
+    : data(data_) {
 }
 
 void StyleParser::parse(JSVal document) {
@@ -399,13 +401,13 @@ template <typename T>
 StyleParser::Result<PiecewiseConstantFunction<T>> StyleParser::parsePiecewiseConstantFunction(JSVal value, Duration duration) {
     if (!value.HasMember("stops")) {
         Log::Warning(Event::ParseStyle, "function must specify a function type");
-        return Result<PiecewiseConstantFunction<T>> { StyleParserFailure, {} };
+        return Result<PiecewiseConstantFunction<T>> { StyleParserFailure, { {}, duration } };
     }
 
     auto stops = parseStops<T>(value["stops"], "");
 
     if (!std::get<0>(stops)) {
-        return Result<PiecewiseConstantFunction<T>> { StyleParserFailure, {} };
+        return Result<PiecewiseConstantFunction<T>> { StyleParserFailure, { {}, duration } };
     }
 
     return Result<PiecewiseConstantFunction<T>> { StyleParserSuccess, { std::get<1>(stops), duration } };
@@ -578,20 +580,21 @@ template<> StyleParser::Result<RotationAlignmentType> StyleParser::parseProperty
 }
 
 template<> StyleParser::Result<PropertyTransition> StyleParser::parseProperty(JSVal value, const char */*property_name*/) {
-    PropertyTransition transition;
+    PropertyTransition transition { data.getDefaultTransitionDuration(), data.getDefaultTransitionDelay() };
     if (value.IsObject()) {
+        bool parsed = false;
         if (value.HasMember("duration") && value["duration"].IsNumber()) {
             transition.duration = std::chrono::milliseconds(value["duration"].GetUint());
+            parsed = true;
         }
         if (value.HasMember("delay") && value["delay"].IsNumber()) {
             transition.delay = std::chrono::milliseconds(value["delay"].GetUint());
+            parsed = true;
+        }
+        if (!parsed) {
+            return Result<PropertyTransition> { StyleParserFailure, std::move(transition) };
         }
     }
-
-    if (transition.duration == Duration::zero() && transition.delay == Duration::zero()) {
-        return Result<PropertyTransition> { StyleParserFailure, std::move(transition) };
-    }
-
     return Result<PropertyTransition> { StyleParserSuccess, std::move(transition) };
 }
 
@@ -653,7 +656,7 @@ template<> StyleParser::Result<Function<Color>> StyleParser::parseProperty(JSVal
 }
 
 template<> StyleParser::Result<PiecewiseConstantFunction<Faded<std::vector<float>>>> StyleParser::parseProperty(JSVal value, const char *property_name, JSVal transition) {
-    Duration duration = std::chrono::milliseconds(300);
+    Duration duration = data.getDefaultFadeDuration();
     if (transition.HasMember("duration")) {
         duration = std::chrono::milliseconds(transition["duration"].GetUint());
     }
@@ -667,13 +670,12 @@ template<> StyleParser::Result<PiecewiseConstantFunction<Faded<std::vector<float
         return Result<PiecewiseConstantFunction<Faded<std::vector<float>>>> { std::get<0>(floatarray),  { parsed, duration } };
     } else {
         Log::Warning(Event::ParseStyle, "value of '%s' must be an array of numbers, or a number array function", property_name);
-        return Result<PiecewiseConstantFunction<Faded<std::vector<float>>>> { StyleParserFailure, {} };
+        return Result<PiecewiseConstantFunction<Faded<std::vector<float>>>> { StyleParserFailure, { {}, duration } };
     }
 }
 
 template<> StyleParser::Result<PiecewiseConstantFunction<Faded<std::string>>> StyleParser::parseProperty(JSVal value, const char *property_name, JSVal transition) {
-
-    Duration duration = std::chrono::milliseconds(300);
+    Duration duration = data.getDefaultFadeDuration();
     if (transition.HasMember("duration")) {
         duration = std::chrono::milliseconds(transition["duration"].GetUint());
     }
@@ -686,7 +688,7 @@ template<> StyleParser::Result<PiecewiseConstantFunction<Faded<std::string>>> St
         return Result<PiecewiseConstantFunction<Faded<std::string>>> { StyleParserSuccess,  { parsed, duration } };
     } else {
         Log::Warning(Event::ParseStyle, "value of '%s' must be string or a string function", property_name);
-        return Result<PiecewiseConstantFunction<Faded<std::string>>> { StyleParserFailure, {} };
+        return Result<PiecewiseConstantFunction<Faded<std::string>>> { StyleParserFailure, { {}, duration } };
     }
 }
 

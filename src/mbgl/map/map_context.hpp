@@ -72,9 +72,6 @@ public:
     void onResourceLoadingFailed(std::exception_ptr error) override;
 
 private:
-    // Style-related updates.
-    void cascadeClasses();
-
     // Update the state indicated by the accumulated Update flags, then render.
     void update();
 

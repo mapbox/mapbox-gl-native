@@ -23,7 +23,6 @@ public:
     ~VectorTileData();
 
     Bucket* getBucket(const StyleLayer&) override;
-    size_t countBuckets() const;
 
     void request(float pixelRatio,
                  const std::function<void()>& callback);

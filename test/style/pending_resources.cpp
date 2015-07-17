@@ -21,11 +21,6 @@ class PendingResources : public ::testing::TestWithParam<std::string> {
 // the Map object after that. The idea here is to test if these pending requests
 // are getting canceled correctly if on shutdown.
 TEST_P(PendingResources, DeleteMapObjectWithPendingRequest) {
-    // TODO: The glyphs test is blocked by the issue #1664.
-    if (GetParam() == "glyphs.pbf") {
-        return;
-    }
-
     util::RunLoop loop(uv_default_loop());
 
     auto display = std::make_shared<mbgl::HeadlessDisplay>();

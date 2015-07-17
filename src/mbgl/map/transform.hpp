@@ -23,27 +23,27 @@ public:
     bool resize(std::array<uint16_t, 2> size);
 
     // Position
-    void moveBy(double dx, double dy, Duration = Duration::zero());
-    void setLatLng(LatLng latLng, Duration = Duration::zero());
-    void setLatLngZoom(LatLng latLng, double zoom, Duration = Duration::zero());
+    void moveBy(double dx, double dy, const Duration& = Duration::zero());
+    void setLatLng(LatLng latLng, const Duration& = Duration::zero());
+    void setLatLngZoom(LatLng latLng, double zoom, const Duration& = Duration::zero());
     inline const LatLng getLatLng() const { return state.getLatLng(); }
 
     // Zoom
-    void scaleBy(double ds, double cx = -1, double cy = -1, Duration = Duration::zero());
-    void setScale(double scale, double cx = -1, double cy = -1, Duration = Duration::zero());
-    void setZoom(double zoom, Duration = Duration::zero());
+    void scaleBy(double ds, double cx = -1, double cy = -1, const Duration& = Duration::zero());
+    void setScale(double scale, double cx = -1, double cy = -1, const Duration& = Duration::zero());
+    void setZoom(double zoom, const Duration& = Duration::zero());
     double getZoom() const;
     double getScale() const;
 
     // Angle
-    void rotateBy(double sx, double sy, double ex, double ey, Duration = Duration::zero());
-    void setAngle(double angle, Duration = Duration::zero());
+    void rotateBy(double sx, double sy, double ex, double ey, const Duration& = Duration::zero());
+    void setAngle(double angle, const Duration& = Duration::zero());
     void setAngle(double angle, double cx, double cy);
     double getAngle() const;
 
     // Transitions
     bool needsTransition() const;
-    UpdateType updateTransitions(TimePoint now);
+    UpdateType updateTransitions(const TimePoint& now);
     void cancelTransitions();
 
     // Gesture
@@ -53,10 +53,10 @@ public:
     const TransformState getState() const { return state; }
 
 private:
-    void _moveBy(double dx, double dy, Duration = Duration::zero());
-    void _setScale(double scale, double cx, double cy, Duration = Duration::zero());
-    void _setScaleXY(double new_scale, double xn, double yn, Duration = Duration::zero());
-    void _setAngle(double angle, Duration = Duration::zero());
+    void _moveBy(double dx, double dy, const Duration& = Duration::zero());
+    void _setScale(double scale, double cx, double cy, const Duration& = Duration::zero());
+    void _setScaleXY(double new_scale, double xn, double yn, const Duration& = Duration::zero());
+    void _setAngle(double angle, const Duration& = Duration::zero());
 
     View &view;
 
@@ -64,11 +64,11 @@ private:
 
     void startTransition(std::function<Update(double)> frame,
                          std::function<void()> finish,
-                         Duration);
+                         const Duration& duration);
 
     TimePoint transitionStart;
     Duration transitionDuration;
-    std::function<Update(TimePoint)> transitionFrameFn;
+    std::function<Update(const TimePoint)> transitionFrameFn;
     std::function<void()> transitionFinishFn;
 };
 

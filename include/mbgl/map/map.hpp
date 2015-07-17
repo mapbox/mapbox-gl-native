@@ -67,7 +67,10 @@ public:
     void renderStill(StillImageCallback callback);
 
     // Triggers a synchronous or asynchronous render.
-    void renderSync();
+    bool renderSync();
+
+    // Nudges transitions one step, possibly notifying of the need for a rerender.
+    void nudgeTransitions(bool forceRerender);
 
     // Notifies the Map thread that the state has changed and an update might be necessary.
     void update(Update update = Update::Nothing);
@@ -79,8 +82,8 @@ public:
     void setClasses(const std::vector<std::string>&);
     std::vector<std::string> getClasses() const;
 
-    void setDefaultTransitionDuration(Duration = Duration::zero());
-    Duration getDefaultTransitionDuration();
+    void setDefaultTransitionDuration(const Duration& = Duration::zero());
+    Duration getDefaultTransitionDuration() const;
     void setStyleURL(const std::string& url);
     void setStyleJSON(const std::string& json, const std::string& base = "");
     std::string getStyleURL() const;
@@ -91,27 +94,27 @@ public:
     void setGestureInProgress(bool);
 
     // Position
-    void moveBy(double dx, double dy, Duration = Duration::zero());
-    void setLatLng(LatLng latLng, Duration = Duration::zero());
+    void moveBy(double dx, double dy, const Duration& = Duration::zero());
+    void setLatLng(LatLng latLng, const Duration& = Duration::zero());
     LatLng getLatLng() const;
     void resetPosition();
 
     // Scale
-    void scaleBy(double ds, double cx = -1, double cy = -1, Duration = Duration::zero());
-    void setScale(double scale, double cx = -1, double cy = -1, Duration = Duration::zero());
+    void scaleBy(double ds, double cx = -1, double cy = -1, const Duration& = Duration::zero());
+    void setScale(double scale, double cx = -1, double cy = -1, const Duration& = Duration::zero());
     double getScale() const;
-    void setZoom(double zoom, Duration = Duration::zero());
+    void setZoom(double zoom, const Duration& = Duration::zero());
     double getZoom() const;
-    void setLatLngZoom(LatLng latLng, double zoom, Duration = Duration::zero());
-    void fitBounds(LatLngBounds bounds, EdgeInsets padding, Duration duration = Duration::zero());
-    void fitBounds(AnnotationSegment segment, EdgeInsets padding, Duration duration = Duration::zero());
+    void setLatLngZoom(LatLng latLng, double zoom, const Duration& = Duration::zero());
+    void fitBounds(LatLngBounds bounds, EdgeInsets padding, const Duration& duration = Duration::zero());
+    void fitBounds(AnnotationSegment segment, EdgeInsets padding, const Duration& duration = Duration::zero());
     void resetZoom();
     double getMinZoom() const;
     double getMaxZoom() const;
 
     // Rotation
-    void rotateBy(double sx, double sy, double ex, double ey, Duration = Duration::zero());
-    void setBearing(double degrees, Duration = Duration::zero());
+    void rotateBy(double sx, double sy, double ex, double ey, const Duration& = Duration::zero());
+    void setBearing(double degrees, const Duration& = Duration::zero());
     void setBearing(double degrees, double cx, double cy);
     double getBearing() const;
     void resetNorth();

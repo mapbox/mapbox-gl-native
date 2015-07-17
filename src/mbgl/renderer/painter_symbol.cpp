@@ -8,6 +8,7 @@
 #include <mbgl/shader/icon_shader.hpp>
 #include <mbgl/shader/box_shader.hpp>
 #include <mbgl/map/tile_id.hpp>
+#include <mbgl/map/map_data.hpp>
 #include <mbgl/util/math.hpp>
 
 #include <cmath>
@@ -52,7 +53,7 @@ void Painter::renderSDF(SymbolBucket &bucket,
 
     sdfShader.u_zoom = (state.getNormalizedZoom() - zoomAdjust) * 10; // current zoom level
 
-    FadeProperties f = frameHistory.getFadeProperties(std::chrono::milliseconds(300));
+    FadeProperties f = frameHistory.getFadeProperties(data.getDefaultFadeDuration());
     sdfShader.u_fadedist = f.fadedist * 10;
     sdfShader.u_minfadezoom = std::floor(f.minfadezoom * 10);
     sdfShader.u_maxfadezoom = std::floor(f.maxfadezoom * 10);
@@ -60,7 +61,7 @@ void Painter::renderSDF(SymbolBucket &bucket,
 
     // The default gamma value has to be adjust for the current pixelratio so that we're not
     // drawing blurry font on retina screens.
-    const float gamma = 0.105 * sdfFontSize / fontSize / pixelRatio;
+    const float gamma = 0.105 * sdfFontSize / fontSize / data.pixelRatio;
 
     const float sdfPx = 8.0f;
     const float blurOffset = 1.19f;

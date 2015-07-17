@@ -48,7 +48,7 @@ void Map::renderStill(StillImageCallback callback) {
                     FrameData{ view.getFramebufferSize() }, callback);
 }
 
-void Map::renderSync() {
+bool Map::renderSync() {
     if (renderState == RenderState::never) {
         view.notifyMapChange(MapChangeWillStartRenderingMap);
     }
@@ -69,9 +69,13 @@ void Map::renderSync() {
         view.notifyMapChange(MapChangeDidFinishRenderingMapFullyRendered);
     }
 
+    return result.needsRerender;
+}
+
+void Map::nudgeTransitions(bool forceRerender) {
     if (transform->needsTransition()) {
         update(Update(transform->updateTransitions(Clock::now())));
-    } else if (result.needsRerender) {
+    } else if (forceRerender) {
         update();
     }
 }
@@ -116,12 +120,12 @@ void Map::setGestureInProgress(bool inProgress) {
 
 #pragma mark - Position
 
-void Map::moveBy(double dx, double dy, Duration duration) {
+void Map::moveBy(double dx, double dy, const Duration& duration) {
     transform->moveBy(dx, dy, duration);
     update();
 }
 
-void Map::setLatLng(LatLng latLng, Duration duration) {
+void Map::setLatLng(LatLng latLng, const Duration& duration) {
     transform->setLatLng(latLng, duration);
     update();
 }
@@ -140,12 +144,12 @@ void Map::resetPosition() {
 
 #pragma mark - Scale
 
-void Map::scaleBy(double ds, double cx, double cy, Duration duration) {
+void Map::scaleBy(double ds, double cx, double cy, const Duration& duration) {
     transform->scaleBy(ds, cx, cy, duration);
     update(Update::Zoom);
 }
 
-void Map::setScale(double scale, double cx, double cy, Duration duration) {
+void Map::setScale(double scale, double cx, double cy, const Duration& duration) {
     transform->setScale(scale, cx, cy, duration);
     update(Update::Zoom);
 }
@@ -154,7 +158,7 @@ double Map::getScale() const {
     return transform->getScale();
 }
 
-void Map::setZoom(double zoom, Duration duration) {
+void Map::setZoom(double zoom, const Duration& duration) {
     transform->setZoom(zoom, duration);
     update(Update::Zoom);
 }
@@ -163,12 +167,12 @@ double Map::getZoom() const {
     return transform->getZoom();
 }
 
-void Map::setLatLngZoom(LatLng latLng, double zoom, Duration duration) {
+void Map::setLatLngZoom(LatLng latLng, double zoom, const Duration& duration) {
     transform->setLatLngZoom(latLng, zoom, duration);
     update(Update::Zoom);
 }
 
-void Map::fitBounds(LatLngBounds bounds, EdgeInsets padding, Duration duration) {
+void Map::fitBounds(LatLngBounds bounds, EdgeInsets padding, const Duration& duration) {
     AnnotationSegment segment = {
         {bounds.ne.latitude, bounds.sw.longitude},
         bounds.sw,
@@ -178,7 +182,7 @@ void Map::fitBounds(LatLngBounds bounds, EdgeInsets padding, Duration duration) 
     fitBounds(segment, padding, duration);
 }
 
-void Map::fitBounds(AnnotationSegment segment, EdgeInsets padding, Duration duration) {
+void Map::fitBounds(AnnotationSegment segment, EdgeInsets padding, const Duration& duration) {
     if (segment.empty()) {
         return;
     }
@@ -243,12 +247,12 @@ uint16_t Map::getHeight() const {
 
 #pragma mark - Rotation
 
-void Map::rotateBy(double sx, double sy, double ex, double ey, Duration duration) {
+void Map::rotateBy(double sx, double sy, double ex, double ey, const Duration& duration) {
     transform->rotateBy(sx, sy, ex, ey, duration);
     update();
 }
 
-void Map::setBearing(double degrees, Duration duration) {
+void Map::setBearing(double degrees, const Duration& duration) {
     transform->setAngle(-degrees * M_PI / 180, duration);
     update();
 }
@@ -416,12 +420,12 @@ std::vector<std::string> Map::getClasses() const {
     return data->getClasses();
 }
 
-void Map::setDefaultTransitionDuration(Duration duration) {
+void Map::setDefaultTransitionDuration(const Duration& duration) {
     data->setDefaultTransitionDuration(duration);
     update(Update::DefaultTransitionDuration);
 }
 
-Duration Map::getDefaultTransitionDuration() {
+Duration Map::getDefaultTransitionDuration() const {
     return data->getDefaultTransitionDuration();
 }
 

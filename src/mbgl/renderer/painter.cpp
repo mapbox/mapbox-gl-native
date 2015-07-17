@@ -3,6 +3,7 @@
 #include <mbgl/map/source.hpp>
 #include <mbgl/map/tile.hpp>
 #include <mbgl/map/map_context.hpp>
+#include <mbgl/map/map_data.hpp>
 
 #include <mbgl/platform/log.hpp>
 #include <mbgl/gl/debugging.hpp>
@@ -41,14 +42,14 @@
 
 using namespace mbgl;
 
-Painter::Painter(const float pixelRatio_) : pixelRatio(pixelRatio_) {
+Painter::Painter(MapData& data_) : data(data_) {
 }
 
 Painter::~Painter() {
 }
 
 bool Painter::needsAnimation() const {
-    return frameHistory.needsAnimation(std::chrono::milliseconds(300));
+    return frameHistory.needsAnimation(data.getDefaultFadeDuration()) || state.isChanging();
 }
 
 void Painter::setup() {
@@ -165,7 +166,7 @@ void Painter::prepareTile(const Tile& tile) {
     config.stencilFunc = { GL_EQUAL, ref, mask };
 }
 
-void Painter::render(const Style& style, TransformState state_, const FrameData& frame_, TimePoint time) {
+void Painter::render(const Style& style, TransformState state_, const FrameData& frame_, const TimePoint& time) {
     state = state_;
     frame = frame_;
 

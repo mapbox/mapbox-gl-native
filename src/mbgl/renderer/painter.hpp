@@ -81,7 +81,7 @@ struct RenderItem {
 
 class Painter : private util::noncopyable {
 public:
-    Painter(float pixelRatio);
+    Painter(MapData& data);
     ~Painter();
 
     void setup();
@@ -96,7 +96,7 @@ public:
     void render(const Style& style,
                 TransformState state,
                 const FrameData& frame,
-                TimePoint time);
+                const TimePoint& time);
 
     // Renders debug information for a tile.
     void renderTileDebug(const Tile& tile);
@@ -191,7 +191,7 @@ public:
     }();
 
 private:
-    const float pixelRatio;
+    MapData& data;
 
     TransformState state;
     FrameData frame;

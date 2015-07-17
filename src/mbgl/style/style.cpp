@@ -7,6 +7,7 @@
 #include <mbgl/style/style_layer.hpp>
 #include <mbgl/style/style_parser.hpp>
 #include <mbgl/style/style_bucket.hpp>
+#include <mbgl/style/property_transition.hpp>
 #include <mbgl/geometry/glyph_atlas.hpp>
 #include <mbgl/geometry/sprite_atlas.hpp>
 #include <mbgl/geometry/line_atlas.hpp>
@@ -21,9 +22,9 @@
 
 namespace mbgl {
 
-Style::Style(MapData& data_, uv_loop_t* loop)
+Style::Style(MapData& data_, uv_loop_t*)
     : data(data_),
-      glyphStore(std::make_unique<GlyphStore>(loop)),
+      glyphStore(std::make_unique<GlyphStore>()),
       glyphAtlas(std::make_unique<GlyphAtlas>(1024, 1024)),
       spriteStore(std::make_unique<SpriteStore>()),
       spriteAtlas(std::make_unique<SpriteAtlas>(512, 512, data.pixelRatio, *spriteStore)),
@@ -41,7 +42,7 @@ void Style::setJSON(const std::string& json, const std::string&) {
         return;
     }
 
-    StyleParser parser;
+    StyleParser parser(data);
     parser.parse(doc);
 
     sources = parser.getSources();
@@ -86,25 +87,25 @@ void Style::update(const TransformState& transform,
     }
 }
 
-void Style::cascade(const std::vector<std::string>& classes) {
-    TimePoint now = Clock::now();
-
+void Style::cascade() {
     for (const auto& layer : layers) {
-        layer->setClasses(classes, now, defaultTransition);
+        layer->setClasses(data.getClasses(),
+                data.getAnimationTime(),
+                PropertyTransition { data.getDefaultTransitionDuration(), data.getDefaultTransitionDelay() });
     }
 }
 
-void Style::recalculate(float z, TimePoint now) {
+void Style::recalculate(float z) {
     uv::writelock lock(mtx);
 
     for (const auto& source : sources) {
         source->enabled = false;
     }
 
-    zoomHistory.update(z, now);
+    zoomHistory.update(z, data.getAnimationTime());
 
     for (const auto& layer : layers) {
-        layer->updateProperties(z, now, zoomHistory);
+        layer->updateProperties(z, data.getAnimationTime(), zoomHistory);
         if (!layer->bucket) {
             continue;
         }
@@ -124,10 +125,6 @@ Source* Style::getSource(const std::string& id) const {
     });
 
     return it != sources.end() ? it->get() : nullptr;
-}
-
-void Style::setDefaultTransitionDuration(Duration duration) {
-    defaultTransition.duration = duration;
 }
 
 bool Style::hasTransitions() const {

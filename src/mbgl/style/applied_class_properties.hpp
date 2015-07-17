@@ -11,7 +11,7 @@ namespace mbgl {
 
 class AppliedClassProperty {
 public:
-    AppliedClassProperty(ClassID class_id, TimePoint begin, TimePoint end, const PropertyValue &value);
+    AppliedClassProperty(ClassID class_id, const TimePoint& begin, const TimePoint& end, const PropertyValue &value);
 
 public:
     const ClassID name;
@@ -23,14 +23,14 @@ public:
 
 class AppliedClassProperties {
 public:
-    std::list<AppliedClassProperty> properties;
+    std::list<AppliedClassProperty> propertyValues;
 
 public:
     // Returns the ID of the most recent
     ClassID mostRecent() const;
-    void add(ClassID class_id, TimePoint begin, TimePoint end, const PropertyValue &value);
+    void add(ClassID class_id, const TimePoint& begin, const TimePoint& end, const PropertyValue &value);
+    void cleanup(const TimePoint& now);
     bool hasTransitions() const;
-    void cleanup(TimePoint now);
     bool empty() const;
 };
 

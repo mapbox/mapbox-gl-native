@@ -3,7 +3,7 @@
 using namespace mbgl;
 
 // Record frame history that will be used to calculate fading params
-void FrameHistory::record(TimePoint now, float zoom) {
+void FrameHistory::record(const TimePoint& now, float zoom) {
     // first frame ever
     if (!history.size()) {
         history.emplace_back(FrameSnapshot{TimePoint::min(), zoom});
@@ -15,7 +15,7 @@ void FrameHistory::record(TimePoint now, float zoom) {
     }
 }
 
-bool FrameHistory::needsAnimation(const Duration duration) const {
+bool FrameHistory::needsAnimation(const Duration& duration) const {
     if (!history.size()) {
         return false;
     }
@@ -47,7 +47,7 @@ bool FrameHistory::needsAnimation(const Duration duration) const {
     return false;
 }
 
-FadeProperties FrameHistory::getFadeProperties(Duration duration) {
+FadeProperties FrameHistory::getFadeProperties(const Duration& duration) {
     const TimePoint currentTime = Clock::now();
 
     // Remove frames until only one is outside the duration, or until there are only three

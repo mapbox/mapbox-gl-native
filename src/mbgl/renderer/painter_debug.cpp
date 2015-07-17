@@ -2,6 +2,7 @@
 #include <mbgl/renderer/debug_bucket.hpp>
 #include <mbgl/map/tile.hpp>
 #include <mbgl/map/tile_data.hpp>
+#include <mbgl/map/map_data.hpp>
 #include <mbgl/shader/plain_shader.hpp>
 #include <mbgl/util/string.hpp>
 #include <mbgl/gl/debugging.hpp>
@@ -28,7 +29,7 @@ void Painter::renderDebugText(DebugBucket& bucket, const mat4 &matrix) {
 
     // Draw white outline
     plainShader->u_color = {{ 1.0f, 1.0f, 1.0f, 1.0f }};
-    lineWidth(4.0f * pixelRatio);
+    lineWidth(4.0f * data.pixelRatio);
     bucket.drawLines(*plainShader);
 
 #ifndef GL_ES_VERSION_2_0
@@ -39,7 +40,7 @@ void Painter::renderDebugText(DebugBucket& bucket, const mat4 &matrix) {
 
     // Draw black text.
     plainShader->u_color = {{ 0.0f, 0.0f, 0.0f, 1.0f }};
-    lineWidth(2.0f * pixelRatio);
+    lineWidth(2.0f * data.pixelRatio);
     bucket.drawLines(*plainShader);
 
     config.depthTest = true;
@@ -60,6 +61,6 @@ void Painter::renderDebugFrame(const mat4 &matrix) {
     // draw tile outline
     tileBorderArray.bind(*plainShader, tileBorderBuffer, BUFFER_OFFSET(0));
     plainShader->u_color = {{ 1.0f, 0.0f, 0.0f, 1.0f }};
-    lineWidth(4.0f * pixelRatio);
+    lineWidth(4.0f * data.pixelRatio);
     MBGL_CHECK_ERROR(glDrawArrays(GL_LINE_STRIP, 0, (GLsizei)tileBorderBuffer.index()));
 }

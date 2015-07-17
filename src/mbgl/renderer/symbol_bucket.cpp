@@ -160,7 +160,7 @@ bool SymbolBucket::needsDependencies(const GeometryTileLayer& layer,
         util::mergeLines(features);
     }
 
-    if (glyphStore.requestGlyphRangesIfNeeded(layout.text.font, ranges)) {
+    if (!glyphStore.hasGlyphRanges(layout.text.font, ranges)) {
         return true;
     }
 

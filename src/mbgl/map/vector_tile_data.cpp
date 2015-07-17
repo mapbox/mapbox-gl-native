@@ -98,10 +98,6 @@ Bucket* VectorTileData::getBucket(const StyleLayer& layer) {
     return tileWorker.getBucket(layer);
 }
 
-size_t VectorTileData::countBuckets() const {
-    return tileWorker.countBuckets();
-}
-
 void VectorTileData::redoPlacement(float angle, bool collisionDebug) {
     if (angle == currentAngle && collisionDebug == currentCollisionDebug)
         return;

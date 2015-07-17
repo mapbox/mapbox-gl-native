@@ -69,6 +69,7 @@
         'miscellaneous/thread.cpp',
         'miscellaneous/tile.cpp',
         'miscellaneous/transform.cpp',
+        'miscellaneous/work_queue.cpp',
         'miscellaneous/variant.cpp',
 
         'storage/storage.hpp',
@@ -87,6 +88,7 @@
         'storage/http_other_loop.cpp',
         'storage/http_reading.cpp',
 
+        'style/glyph_store.cpp',
         'style/pending_resources.cpp',
         'style/resource_loading.cpp',
         'style/sprite.cpp',

@@ -53,7 +53,7 @@ bool Transform::resize(const std::array<uint16_t, 2> size) {
 
 #pragma mark - Position
 
-void Transform::moveBy(const double dx, const double dy, const Duration duration) {
+void Transform::moveBy(const double dx, const double dy, const Duration& duration) {
     if (std::isnan(dx) || std::isnan(dy)) {
         return;
     }
@@ -61,7 +61,7 @@ void Transform::moveBy(const double dx, const double dy, const Duration duration
     _moveBy(dx, dy, duration);
 }
 
-void Transform::_moveBy(const double dx, const double dy, const Duration duration) {
+void Transform::_moveBy(const double dx, const double dy, const Duration& duration) {
     double x = state.x + std::cos(state.angle) * dx + std::sin( state.angle) * dy;
     double y = state.y + std::cos(state.angle) * dy + std::sin(-state.angle) * dx;
 
@@ -95,7 +95,7 @@ void Transform::_moveBy(const double dx, const double dy, const Duration duratio
     }
 }
 
-void Transform::setLatLng(const LatLng latLng, const Duration duration) {
+void Transform::setLatLng(const LatLng latLng, const Duration& duration) {
     if (std::isnan(latLng.latitude) || std::isnan(latLng.longitude)) {
         return;
     }
@@ -109,7 +109,7 @@ void Transform::setLatLng(const LatLng latLng, const Duration duration) {
     _setScaleXY(state.scale, xn, yn, duration);
 }
 
-void Transform::setLatLngZoom(const LatLng latLng, const double zoom, const Duration duration) {
+void Transform::setLatLngZoom(const LatLng latLng, const double zoom, const Duration& duration) {
     if (std::isnan(latLng.latitude) || std::isnan(latLng.longitude) || std::isnan(zoom)) {
         return;
     }
@@ -132,7 +132,7 @@ void Transform::setLatLngZoom(const LatLng latLng, const double zoom, const Dura
 
 #pragma mark - Zoom
 
-void Transform::scaleBy(const double ds, const double cx, const double cy, const Duration duration) {
+void Transform::scaleBy(const double ds, const double cx, const double cy, const Duration& duration) {
     if (std::isnan(ds) || std::isnan(cx) || std::isnan(cy)) {
         return;
     }
@@ -149,7 +149,7 @@ void Transform::scaleBy(const double ds, const double cx, const double cy, const
 }
 
 void Transform::setScale(const double scale, const double cx, const double cy,
-                         const Duration duration) {
+                         const Duration& duration) {
     if (std::isnan(scale) || std::isnan(cx) || std::isnan(cy)) {
         return;
     }
@@ -157,7 +157,7 @@ void Transform::setScale(const double scale, const double cx, const double cy,
     _setScale(scale, cx, cy, duration);
 }
 
-void Transform::setZoom(const double zoom, const Duration duration) {
+void Transform::setZoom(const double zoom, const Duration& duration) {
     if (std::isnan(zoom)) {
         return;
     }
@@ -173,7 +173,7 @@ double Transform::getScale() const {
     return state.scale;
 }
 
-void Transform::_setScale(double new_scale, double cx, double cy, const Duration duration) {
+void Transform::_setScale(double new_scale, double cx, double cy, const Duration& duration) {
     // Ensure that we don't zoom in further than the maximum allowed.
     if (new_scale < state.min_scale) {
         new_scale = state.min_scale;
@@ -205,7 +205,7 @@ void Transform::_setScale(double new_scale, double cx, double cy, const Duration
 }
 
 void Transform::_setScaleXY(const double new_scale, const double xn, const double yn,
-                            const Duration duration) {
+                            const Duration& duration) {
     double scale = new_scale;
     double x = xn;
     double y = yn;
@@ -254,7 +254,7 @@ void Transform::_setScaleXY(const double new_scale, const double xn, const doubl
 #pragma mark - Angle
 
 void Transform::rotateBy(const double start_x, const double start_y, const double end_x,
-                         const double end_y, const Duration duration) {
+                         const double end_y, const Duration& duration) {
     if (std::isnan(start_x) || std::isnan(start_y) || std::isnan(end_x) || std::isnan(end_y)) {
         return;
     }
@@ -286,7 +286,7 @@ void Transform::rotateBy(const double start_x, const double start_y, const doubl
     _setAngle(ang, duration);
 }
 
-void Transform::setAngle(const double new_angle, const Duration duration) {
+void Transform::setAngle(const double new_angle, const Duration& duration) {
     if (std::isnan(new_angle)) {
         return;
     }
@@ -314,7 +314,7 @@ void Transform::setAngle(const double new_angle, const double cx, const double c
     }
 }
 
-void Transform::_setAngle(double new_angle, const Duration duration) {
+void Transform::_setAngle(double new_angle, const Duration& duration) {
     double angle = _normalizeAngle(new_angle, state.angle);
     state.angle = _normalizeAngle(state.angle, angle);
 
@@ -352,7 +352,7 @@ double Transform::getAngle() const {
 
 void Transform::startTransition(std::function<Update(double)> frame,
                                 std::function<void()> finish,
-                                Duration duration) {
+                                const Duration& duration) {
     if (transitionFinishFn) {
         transitionFinishFn();
     }
@@ -360,7 +360,7 @@ void Transform::startTransition(std::function<Update(double)> frame,
     transitionStart = Clock::now();
     transitionDuration = duration;
 
-    transitionFrameFn = [frame, this](TimePoint now) {
+    transitionFrameFn = [frame, this](const TimePoint now) {
         float t = std::chrono::duration<float>(now - transitionStart) / transitionDuration;
         if (t >= 1.0) {
             Update result = frame(1.0);
@@ -381,7 +381,7 @@ bool Transform::needsTransition() const {
     return !!transitionFrameFn;
 }
 
-UpdateType Transform::updateTransitions(const TimePoint now) {
+UpdateType Transform::updateTransitions(const TimePoint& now) {
     return static_cast<UpdateType>(transitionFrameFn ? transitionFrameFn(now) : Update::Nothing);
 }
 

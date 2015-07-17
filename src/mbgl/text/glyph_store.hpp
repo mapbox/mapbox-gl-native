@@ -2,19 +2,14 @@
 #define MBGL_TEXT_GLYPH_STORE
 
 #include <mbgl/text/glyph.hpp>
-
 #include <mbgl/util/exclusive.hpp>
+#include <mbgl/util/run_loop.hpp>
+#include <mbgl/util/work_queue.hpp>
 
+#include <exception>
 #include <set>
 #include <string>
 #include <unordered_map>
-#include <exception>
-
-typedef struct uv_loop_s uv_loop_t;
-
-namespace uv {
-class async;
-}
 
 namespace mbgl {
 
@@ -32,26 +27,25 @@ public:
         virtual void onGlyphRangeLoadingFailed(std::exception_ptr error) = 0;
     };
 
-    GlyphStore(uv_loop_t* loop);
+    GlyphStore();
     ~GlyphStore();
 
-    // Asynchronously request for GlyphRanges and when it gets loaded, notifies the
-    // observer subscribed to this object. Successive requests for the same range are
-    // going to be discarded. Returns true if a request was made or false if all the
-    // GlyphRanges are already available, and thus, no request is performed.
-    bool requestGlyphRangesIfNeeded(const std::string &fontStack, const std::set<GlyphRange> &glyphRanges);
+    util::exclusive<FontStack> getFontStack(const std::string& fontStack);
 
-    util::exclusive<FontStack> getFontStack(const std::string &fontStack);
+    bool hasGlyphRanges(const std::string& fontStackName, const std::set<GlyphRange>& glyphRanges);
 
-    void setURL(const std::string &url);
+    void setURL(const std::string &url) {
+        glyphURL = url;
+    }
 
     void setObserver(Observer* observer);
 
 private:
     void emitGlyphRangeLoaded();
-    void emitGlyphRangeLoadingFailed();
+    void emitGlyphRangeLoadingFailed(const std::string& message);
 
     util::exclusive<FontStack> createFontStack(const std::string &fontStack);
+    void requestGlyphRange(const std::string& fontStackName, const GlyphRange& range);
 
     std::string glyphURL;
 
@@ -61,13 +55,9 @@ private:
     std::unordered_map<std::string, std::unique_ptr<FontStack>> stacks;
     std::mutex stacksMutex;
 
-    std::string errorMessage;
-    std::mutex errorMessageMutex;
+    util::WorkQueue workQueue;
 
-    std::unique_ptr<uv::async> asyncEmitGlyphRangeLoaded;
-    std::unique_ptr<uv::async> asyncEmitGlyphRangeLoadedingFailed;
-
-    Observer* observer;
+    Observer* observer = nullptr;
 };
 
 }
