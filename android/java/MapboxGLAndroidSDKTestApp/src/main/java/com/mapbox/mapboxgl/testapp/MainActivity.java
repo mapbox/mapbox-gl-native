@@ -317,7 +317,7 @@ public class MainActivity extends ActionBarActivity {
     private void addPolygon() {
         String geojsonStr = null;
         try {
-            geojsonStr = Util.loadStringFromAssets(this, "small_polygon.geojson");
+            geojsonStr = Util.loadStringFromAssets(this, "small_poly.geojson");
             LatLng[] latLngs = Util.parseGeoJSONCoordinates(geojsonStr);
             MapView map = mMapFragment.getMap();
             Polygon polygon = map.addPolygon(new PolygonOptions()

@@ -32,7 +32,13 @@ public class Util {
         JSONArray features = jsonObject.getJSONArray("features");
         JSONObject feature = features.getJSONObject(0);
         JSONObject geometry = feature.getJSONObject("geometry");
-        JSONArray coordinates = geometry.getJSONArray("coordinates");
+        String type = geometry.getString("type");
+        JSONArray coordinates;
+        if (type.equals("Polygon")) {
+            coordinates = geometry.getJSONArray("coordinates").getJSONArray(0);
+        } else {
+            coordinates = geometry.getJSONArray("coordinates");
+        }
         int len = coordinates.length();
         LatLng[] latLngs = new LatLng[coordinates.length()];
         for (int i = 0; i < len; ++i) {
