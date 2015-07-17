@@ -21,11 +21,20 @@ public class Marker extends Annotation {
 
     public Marker() {}
 
+    /**
+     * If two markers have the same LatLng, they are equal.
+     *
+     * @param other object
+     * @return boolean - do they have the same LatLng
+     */
     public boolean equals(Object other) {
+        if (!(other instanceof Marker)) return false;
         double lat = position.getLatitude();
         double lng = position.getLongitude();
-        // TODO Implement equals
-        return false;
+        LatLng otherPosition = ((Marker)other).getPosition();
+        double otherLat = otherPosition.getLatitude();
+        double otherLng = otherPosition.getLongitude();
+        return (lat == otherLat && otherLng == lng);
     }
 
     public float getAlpha() {
