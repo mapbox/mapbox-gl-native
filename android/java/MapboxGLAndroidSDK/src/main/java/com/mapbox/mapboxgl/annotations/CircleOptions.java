@@ -3,6 +3,12 @@ package com.mapbox.mapboxgl.annotations;
 
 import com.mapbox.mapboxgl.geometry.LatLng;
 
+/**
+ * UNIMPLEMENTED: Needs implementation in Native.
+ *
+ * https://github.com/mapbox/mapbox-gl-native/issues/1882
+ * https://github.com/mapbox/mapbox-gl-native/issues/1726
+ */
 public class CircleOptions extends AnnotationOptions {
 
     private Circle circle;
@@ -40,11 +46,6 @@ public class CircleOptions extends AnnotationOptions {
         return circle.strokeWidth;
     }
 
-    // TODO: Implement getZIndex of Google Maps Android API
-//    public float getZIndex () {
-//
-//    }
-
     public CircleOptions radius (double radius) {
         circle.radius = radius;
         return this;
@@ -59,10 +60,5 @@ public class CircleOptions extends AnnotationOptions {
         circle.strokeWidth = width;
         return this;
     }
-
-    // TODO: Implement zIndex of Google Maps Android API
-//    public CircleOptions zIndex (float zIndex) {
-//
-//    }
 
 }

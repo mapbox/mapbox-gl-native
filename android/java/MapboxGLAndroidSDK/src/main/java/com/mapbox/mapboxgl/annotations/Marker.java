@@ -114,6 +114,14 @@ public class Marker extends Annotation {
         this.snippet = snippet;
     }
 
+    /**
+     * You can specify the name of a sprite to get a marker other than the default marker.
+     * This name can be found in the sprite json file:
+     *
+     * https://github.com/mapbox/mapbox-gl-styles/blob/mb-pages/sprites/mapbox-streets.json
+     *
+     * @param sprite
+     */
     void setSprite(String sprite) {
         this.sprite = sprite;
     }

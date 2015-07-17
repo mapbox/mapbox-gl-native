@@ -34,6 +34,11 @@ public class Polygon extends MultiPoint {
         return strokeColor;
     }
 
+    /**
+     * UNIMPLEMENTED: Needs implementation in Native.
+     * https://github.com/mapbox/mapbox-gl-native/issues/1737
+     * @return stroke width as float
+     */
     public float getStrokeWidth() {
         return strokeWidth;
     }
@@ -61,6 +66,8 @@ public class Polygon extends MultiPoint {
 
     /**
      * Sets the alpha (opacity) of the stroke
+     *
+     * UNIMPLEMENTED: Needs implementation in Native.
      */
     public void setStrokeAlpha(float alpha) {
         strokeAlpha = alpha;
@@ -70,6 +77,11 @@ public class Polygon extends MultiPoint {
         strokeColor = color;
     }
 
+    /**
+     * UNIMPLEMENTED: Needs implementation in Native.
+     * https://github.com/mapbox/mapbox-gl-native/issues/1737
+     * @return stroke width as float
+     */
     public void setStrokeWidth(float width) {
         strokeWidth = width;
     }

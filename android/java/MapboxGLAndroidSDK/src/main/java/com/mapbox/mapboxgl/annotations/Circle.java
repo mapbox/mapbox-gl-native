@@ -5,6 +5,12 @@ import android.graphics.Color;
 
 import com.mapbox.mapboxgl.geometry.LatLng;
 
+/**
+ * UNIMPLEMENTED: Needs implementation in Native.
+ *
+ * https://github.com/mapbox/mapbox-gl-native/issues/1882
+ * https://github.com/mapbox/mapbox-gl-native/issues/1726
+ */
 public class Circle extends Annotation {
 
     LatLng center;

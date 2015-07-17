@@ -29,6 +29,11 @@ public class PolylineOptions extends MultiPointOptions {
         return this;
     }
 
+    /**
+     * Sets the color of the polyline.
+     *
+     * @param color - the color in ARGB format
+     */
     public PolylineOptions color(int color) {
         ((Polyline)annotation).color = color;
         return this;
