@@ -230,6 +230,11 @@ class NativeMapView {
         return nativeAddPolygon(mNativeMapViewPtr, polygon);
     }
 
+    public long[] addPolygons(List<Polygon> polygon) {
+        // NH TODO Throw exception if returns -1
+        return nativeAddPolygons(mNativeMapViewPtr, polygon);
+    }
+
     public void removeAnnotation(long id) {
         nativeRemoveAnnotation(mNativeMapViewPtr, id);
     }
@@ -471,6 +476,8 @@ class NativeMapView {
     private native long nativeAddPolyline(long nativeMapViewPtr, Polyline polyline);
 
     private native long nativeAddPolygon(long mNativeMapViewPtr, Polygon polygon);
+
+    private native long[] nativeAddPolygons(long mNativeMapViewPtr, List<Polygon> polygon);
 
     private native void nativeRemoveAnnotation(long nativeMapViewPtr, long id);
 

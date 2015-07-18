@@ -243,6 +243,23 @@ public class MapView extends SurfaceView {
         return polygon;
     }
 
+    public List<Polygon> addPolygons(List<PolygonOptions> polygonOptions) {
+        List<Polygon> polygons = new ArrayList<>();
+        for(PolygonOptions popts : polygonOptions) {
+            polygons.add(popts.getPolygon());
+        }
+
+        long[] ids = mNativeMapView.addPolygons(polygons);
+
+        for(int i=0; i<polygons.size(); i++) {
+            polygons.get(i).setId(ids[i]);
+            polygons.get(i).setMapView(this);
+            annotations.add(polygons.get(i));
+        }
+
+        return polygons;
+    }
+
     public void removeAnnotation(Annotation annotation) {
         long id = annotation.getId();
         mNativeMapView.removeAnnotation(id);

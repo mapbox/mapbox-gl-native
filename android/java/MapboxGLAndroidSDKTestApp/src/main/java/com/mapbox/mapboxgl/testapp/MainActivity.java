@@ -327,10 +327,12 @@ public class MainActivity extends ActionBarActivity {
             geojsonStr = Util.loadStringFromAssets(this, "small_poly.geojson");
             LatLng[] latLngs = Util.parseGeoJSONCoordinates(geojsonStr);
             MapView map = mMapFragment.getMap();
-            Polygon polygon = map.addPolygon(new PolygonOptions()
-                    .add(latLngs)
-                    .strokeColor(Color.MAGENTA)
-                    .fillColor(Color.BLUE));
+            ArrayList<PolygonOptions> opts = new ArrayList<PolygonOptions>();
+            opts.add(new PolygonOptions()
+                        .add(latLngs)
+                        .strokeColor(Color.MAGENTA)
+                        .fillColor(Color.BLUE));
+            Polygon polygon = map.addPolygons(opts).get(0);
         } catch (IOException e) {
             e.printStackTrace();
         } catch (JSONException e) {

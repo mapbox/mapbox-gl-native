@@ -248,6 +248,27 @@ jobject std_vector_string_to_jobject(JNIEnv *env, std::vector<std::string> vecto
 
     return jlist;
 }
+
+jlongArray std_vector_uint_to_jobject(JNIEnv *env, std::vector<uint32_t> vector) {
+    jlongArray jarray = env->NewLongArray(vector.size());
+    if (jarray == nullptr) {
+        env->ExceptionDescribe();
+        return nullptr;
+    }
+
+    std::vector<jlong> v;
+    for (const uint32_t& id : vector) {
+        v.push_back((jlong)id);
+    }
+
+    env->SetLongArrayRegion(jarray, 0, v.size(), &(v[0]));
+    if (env->ExceptionCheck()) {
+        env->ExceptionDescribe();
+        return nullptr;
+    }
+
+    return jarray;
+}
 }
 }
 
@@ -599,11 +620,8 @@ jlong JNICALL nativeAddPolyline(JNIEnv *env, jobject obj, jlong nativeMapViewPtr
     return (jlong) id;
 }
 
-jlong JNICALL nativeAddPolygon(JNIEnv *env, jobject obj, jlong nativeMapViewPtr, jobject polygon) {
-    mbgl::Log::Debug(mbgl::Event::JNI, "nativeAddPolygon");
-    assert(nativeMapViewPtr != 0);
-    NativeMapView *nativeMapView = reinterpret_cast<NativeMapView *>(nativeMapViewPtr);
 
+std::pair<mbgl::AnnotationSegment, mbgl::StyleProperties> readPolygon(JNIEnv *env, jobject polygon) {
     // ***** Java fields ***** //
     // float alpha;
     // boolean visible;
@@ -614,29 +632,10 @@ jlong JNICALL nativeAddPolygon(JNIEnv *env, jobject obj, jlong nativeMapViewPtr,
     // List<List<LatLng>> holes
 
     jfloat alpha = env->GetFloatField(polygon, polygonAlphaId);
-    if (env->ExceptionCheck()) {
-        env->ExceptionDescribe();
-        return -1;
-    }
-
     jboolean visible = env->GetBooleanField(polygon, polygonVisibleId);
-    if (env->ExceptionCheck()) {
-        env->ExceptionDescribe();
-        return -1;
-    }
     visible = JNI_TRUE;
-
     jint fillColor = env->GetIntField(polygon, polygonFillColorId);
-    if (env->ExceptionCheck()) {
-        env->ExceptionDescribe();
-        return -1;
-    }
-
     jint strokeColor = env->GetIntField(polygon, polygonStrokeColorId);
-    if (env->ExceptionCheck()) {
-        env->ExceptionDescribe();
-        return -1;
-    }
 
     int rF = (fillColor>>16)&0xFF;
     int gF = (fillColor>>8)&0xFF;
@@ -664,13 +663,76 @@ jlong JNICALL nativeAddPolygon(JNIEnv *env, jobject obj, jlong nativeMapViewPtr,
     jobject points = env->GetObjectField(polygon, polygonPointsId);
     mbgl::AnnotationSegment segment = annotation_segment_from_latlng_jlist(env, points);
 
+    return std::make_pair(segment, shapeProperties);
+}
+
+
+jlong JNICALL nativeAddPolygon(JNIEnv *env, jobject obj, jlong nativeMapViewPtr, jobject polygon) {
+    mbgl::Log::Debug(mbgl::Event::JNI, "nativeAddPolygon");
+    assert(nativeMapViewPtr != 0);
+    NativeMapView *nativeMapView = reinterpret_cast<NativeMapView *>(nativeMapViewPtr);
+
     std::vector<mbgl::ShapeAnnotation> shapes;
-    shapes.emplace_back(mbgl::AnnotationSegments {{ segment }}, shapeProperties);
+    std::pair<mbgl::AnnotationSegment, mbgl::StyleProperties> segment = readPolygon(env, polygon);
+
+    if (env->ExceptionCheck()) {
+        env->ExceptionDescribe();
+        return -1;
+    }
+
+    shapes.emplace_back(mbgl::AnnotationSegments {{ segment.first }}, segment.second);
 
     std::vector<uint32_t> shapeAnnotationIDs = nativeMapView->getMap().addShapeAnnotations(shapes);
     uint32_t id = shapeAnnotationIDs.at(0);
     return (jlong) id;
 }
+
+jlongArray JNICALL nativeAddPolygons(JNIEnv *env, jobject obj, jlong nativeMapViewPtr, jobject jlist) {
+    mbgl::Log::Debug(mbgl::Event::JNI, "nativeAddPolygons");
+    assert(nativeMapViewPtr != 0);
+    NativeMapView *nativeMapView = reinterpret_cast<NativeMapView *>(nativeMapViewPtr);
+
+    std::vector<mbgl::ShapeAnnotation> shapes;
+
+    if (jlist == nullptr) {
+        if (env->ThrowNew(nullPointerExceptionClass, "List cannot be null.") < 0) {
+            env->ExceptionDescribe();
+            return nullptr;
+        }
+        return nullptr;
+    }
+
+    jobjectArray array =
+        reinterpret_cast<jobjectArray>(env->CallObjectMethod(jlist, listToArrayId));
+    if (env->ExceptionCheck() || (array == nullptr)) {
+        env->ExceptionDescribe();
+        return nullptr;
+    }
+
+    jsize len = env->GetArrayLength(array);
+    if (len < 0) {
+        env->ExceptionDescribe();
+        return nullptr;
+    }
+
+    shapes.reserve(len);
+
+    for (jsize i = 0; i < len; i++) {
+        jobject polygon = reinterpret_cast<jobject>(env->GetObjectArrayElement(array, i));
+
+        std::pair<mbgl::AnnotationSegment, mbgl::StyleProperties> segment = readPolygon(env, polygon);
+        if (env->ExceptionCheck()) {
+            env->ExceptionDescribe();
+            return nullptr;
+        }
+
+        shapes.emplace_back(mbgl::AnnotationSegments {{ segment.first }}, segment.second);
+    }
+
+    std::vector<uint32_t> shapeAnnotationIDs = nativeMapView->getMap().addShapeAnnotations(shapes);
+    return std_vector_uint_to_jobject(env, shapeAnnotationIDs);
+}
+
 
 void JNICALL nativeRemoveAnnotation(JNIEnv *env, jobject obj, jlong nativeMapViewPtr, jlong annotationId) {
     mbgl::Log::Debug(mbgl::Event::JNI, "nativeRemoveAnnotation");
@@ -1348,6 +1410,8 @@ extern "C" JNIEXPORT jint JNICALL JNI_OnLoad(JavaVM *vm, void *reserved) {
          reinterpret_cast<void *>(&nativeAddPolyline)},
         {"nativeAddPolygon", "(JLcom/mapbox/mapboxgl/annotations/Polygon;)J",
          reinterpret_cast<void *>(&nativeAddPolygon)},
+        {"nativeAddPolygons", "(JLjava/util/List;)[J",
+         reinterpret_cast<void *>(&nativeAddPolygons)},
         {"nativeRemoveAnnotation", "(JJ)V", reinterpret_cast<void *>(&nativeRemoveAnnotation)},
         {"nativeGetLatLng", "(J)Lcom/mapbox/mapboxgl/geometry/LatLng;",
          reinterpret_cast<void *>(&nativeGetLatLng)},
