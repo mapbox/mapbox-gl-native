@@ -227,7 +227,9 @@ mbgl::AnnotationSegment annotation_segment_from_latlng_jlist(JNIEnv *env, jobjec
         }
 
         segment.push_back(mbgl::LatLng(latitude, longitude));
+        env->DeleteLocalRef(latLng);
     }
+    env->DeleteLocalRef(array);
     return segment;
 }
 
@@ -662,6 +664,7 @@ std::pair<mbgl::AnnotationSegment, mbgl::StyleProperties> readPolygon(JNIEnv *en
 
     jobject points = env->GetObjectField(polygon, polygonPointsId);
     mbgl::AnnotationSegment segment = annotation_segment_from_latlng_jlist(env, points);
+    env->DeleteLocalRef(points);
 
     return std::make_pair(segment, shapeProperties);
 }
@@ -727,6 +730,8 @@ jlongArray JNICALL nativeAddPolygons(JNIEnv *env, jobject obj, jlong nativeMapVi
         }
 
         shapes.emplace_back(mbgl::AnnotationSegments {{ segment.first }}, segment.second);
+
+        env->DeleteLocalRef(polygon);
     }
 
     std::vector<uint32_t> shapeAnnotationIDs = nativeMapView->getMap().addShapeAnnotations(shapes);
