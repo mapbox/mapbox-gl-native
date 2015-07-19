@@ -270,9 +270,16 @@ public class MapView extends SurfaceView {
     }
 
     public void removeAnnotations() {
-        for (Annotation annotation : annotations) {
-            annotation.remove();
+        long[] ids = new long[annotations.size()];
+        for(int i=0; i<annotations.size(); i++) {
+            Long id = annotations.get(i).getId();
+            if(id == null) {
+                ids[i] = -1;
+            } else {
+                ids[i] = id;
+            }
         }
+        mNativeMapView.removeAnnotations(ids);
     }
 
     //

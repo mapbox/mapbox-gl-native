@@ -746,6 +746,36 @@ void JNICALL nativeRemoveAnnotation(JNIEnv *env, jobject obj, jlong nativeMapVie
     nativeMapView->getMap().removeAnnotation((uint32_t)annotationId);
 }
 
+void JNICALL nativeRemoveAnnotations(JNIEnv *env, jobject obj, jlong nativeMapViewPtr, jlongArray array) {
+    mbgl::Log::Debug(mbgl::Event::JNI, "nativeRemoveAnnotations");
+    assert(nativeMapViewPtr != 0);
+    NativeMapView *nativeMapView = reinterpret_cast<NativeMapView *>(nativeMapViewPtr);
+
+    std::vector<uint32_t> ids;
+
+    if (env->ExceptionCheck() || (array == nullptr)) {
+        env->ExceptionDescribe();
+        return;
+    }
+
+    jsize len = env->GetArrayLength(array);
+    if (len < 0) {
+        env->ExceptionDescribe();
+        return;
+    }
+
+    ids.reserve(len);
+    jlong* jids = env->GetLongArrayElements(array, nullptr);
+
+    for (jsize i = 0; i < len; i++) {
+        if(jids[i] == -1L)
+            continue;
+        ids.push_back((uint32_t) jids[i]);
+    }
+
+    nativeMapView->getMap().removeAnnotations(ids);
+}
+
 jobject JNICALL nativeGetLatLng(JNIEnv *env, jobject obj, jlong nativeMapViewPtr) {
     mbgl::Log::Debug(mbgl::Event::JNI, "nativeGetLatLng");
     assert(nativeMapViewPtr != 0);
@@ -1418,6 +1448,7 @@ extern "C" JNIEXPORT jint JNICALL JNI_OnLoad(JavaVM *vm, void *reserved) {
         {"nativeAddPolygons", "(JLjava/util/List;)[J",
          reinterpret_cast<void *>(&nativeAddPolygons)},
         {"nativeRemoveAnnotation", "(JJ)V", reinterpret_cast<void *>(&nativeRemoveAnnotation)},
+        {"nativeRemoveAnnotations", "(J[J)V", reinterpret_cast<void *>(&nativeRemoveAnnotations)},
         {"nativeGetLatLng", "(J)Lcom/mapbox/mapboxgl/geometry/LatLng;",
          reinterpret_cast<void *>(&nativeGetLatLng)},
         {"nativeResetPosition", "(J)V", reinterpret_cast<void *>(&nativeResetPosition)},

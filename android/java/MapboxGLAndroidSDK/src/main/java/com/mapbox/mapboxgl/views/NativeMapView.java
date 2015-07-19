@@ -239,6 +239,10 @@ class NativeMapView {
         nativeRemoveAnnotation(mNativeMapViewPtr, id);
     }
 
+    public void removeAnnotations(long[] ids) {
+        nativeRemoveAnnotations(mNativeMapViewPtr, ids);
+    }
+
     public LatLng getLatLng() {
         return nativeGetLatLng(mNativeMapViewPtr);
     }
@@ -480,6 +484,8 @@ class NativeMapView {
     private native long[] nativeAddPolygons(long mNativeMapViewPtr, List<Polygon> polygon);
 
     private native void nativeRemoveAnnotation(long nativeMapViewPtr, long id);
+
+    private native void nativeRemoveAnnotations(long nativeMapViewPtr, long[] id);
 
     private native LatLng nativeGetLatLng(long nativeMapViewPtr);
 
