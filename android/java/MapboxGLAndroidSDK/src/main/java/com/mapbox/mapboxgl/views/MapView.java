@@ -7,6 +7,7 @@ import android.content.Intent;
 import android.content.IntentFilter;
 import android.content.pm.PackageManager;
 import android.content.res.TypedArray;
+import android.graphics.Bitmap;
 import android.graphics.PointF;
 import android.net.ConnectivityManager;
 import android.net.NetworkInfo;
@@ -41,6 +42,8 @@ import com.mapbox.mapboxgl.geometry.LatLngZoom;
 
 import org.apache.commons.validator.routines.UrlValidator;
 
+import java.nio.Buffer;
+import java.nio.ByteBuffer;
 import java.util.ArrayList;
 import java.util.List;
 
@@ -214,6 +217,16 @@ public class MapView extends SurfaceView {
             boolean isConnected = (activeNetwork != null) && activeNetwork.isConnectedOrConnecting();
             onConnectivityChanged(isConnected);
         }
+    }
+
+    public void setSprite(String symbol, float scale, Bitmap bitmap) {
+        if(bitmap.getConfig() != Bitmap.Config.ARGB_8888) {
+            bitmap = bitmap.copy(Bitmap.Config.ARGB_8888, false);
+        }
+        ByteBuffer buffer = ByteBuffer.allocate(bitmap.getByteCount());
+        bitmap.copyPixelsToBuffer(buffer);
+
+        mNativeMapView.setSprite(symbol, bitmap.getWidth(), bitmap.getHeight(), scale, buffer.array());
     }
 
     public Marker addMarker(MarkerOptions markerOptions) {

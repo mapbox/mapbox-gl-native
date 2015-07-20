@@ -177,7 +177,7 @@ class NativeMapView {
     }
 
     public void setStyleJson(String newStyleJson) {
-        setStyleJson(newStyleJson,  "");
+        setStyleJson(newStyleJson, "");
     }
 
     public void setStyleJson(String newStyleJson, String base) {
@@ -214,6 +214,10 @@ class NativeMapView {
 
     public void setLatLng(LatLng latLng, long duration) {
         nativeSetLatLng(mNativeMapViewPtr, latLng, duration);
+    }
+
+    public void setSprite(String symbol, int width, int height, float scale, byte[] pixels) {
+        nativeSetSprite(mNativeMapViewPtr, symbol, width, height, scale, pixels);
     }
 
     public long addMarker(Marker marker) {
@@ -474,6 +478,9 @@ class NativeMapView {
 
     private native void nativeSetLatLng(long nativeMapViewPtr, LatLng latLng,
                                         long duration);
+
+    private native void nativeSetSprite(long nativeMapViewPtr, String symbol,
+                                        int width, int height, float scale, byte[] pixels);
 
     private native long nativeAddMarker(long nativeMapViewPtr, Marker marker);
 

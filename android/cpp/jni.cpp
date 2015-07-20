@@ -18,6 +18,7 @@
 #include <mbgl/map/map.hpp>
 #include <mbgl/annotation/point_annotation.hpp>
 #include <mbgl/annotation/shape_annotation.hpp>
+#include <mbgl/annotation/sprite_image.hpp>
 #include <mbgl/platform/event.hpp>
 #include <mbgl/platform/log.hpp>
 #include <mbgl/storage/network_status.hpp>
@@ -532,6 +533,27 @@ void JNICALL nativeSetLatLng(JNIEnv *env, jobject obj, jlong nativeMapViewPtr, j
     nativeMapView->getMap().setLatLng(mbgl::LatLng(latitude, longitude), std::chrono::milliseconds(duration));
 }
 
+void JNICALL nativeSetSprite(JNIEnv *env, jobject obj, jlong nativeMapViewPtr,
+        jstring symbol, jint width, jint height, jfloat scale, jbyteArray jpixels) {
+    mbgl::Log::Debug(mbgl::Event::JNI, "nativeSetSprite");
+    assert(nativeMapViewPtr != 0);
+    NativeMapView *nativeMapView = reinterpret_cast<NativeMapView *>(nativeMapViewPtr);
+
+    const std::string symbolName = std_string_from_jstring(env, symbol);
+
+    jbyte* pixelData = env->GetByteArrayElements(jpixels, nullptr);
+    std::string pixels((char*)pixelData, width * height * 4);
+    env->ReleaseByteArrayElements(jpixels, pixelData, JNI_ABORT);
+
+    auto spriteImage = std::make_shared<mbgl::SpriteImage>(
+        uint16_t(width),
+        uint16_t(height),
+        float(scale),
+        std::move(pixels));
+
+    nativeMapView->getMap().setSprite(symbolName, spriteImage);
+}
+
 jlong JNICALL nativeAddMarker(JNIEnv *env, jobject obj, jlong nativeMapViewPtr, jobject marker) {
     mbgl::Log::Debug(mbgl::Event::JNI, "nativeAddMarker");
     assert(nativeMapViewPtr != 0);
@@ -772,6 +794,8 @@ void JNICALL nativeRemoveAnnotations(JNIEnv *env, jobject obj, jlong nativeMapVi
             continue;
         ids.push_back((uint32_t) jids[i]);
     }
+
+    env->ReleaseLongArrayElements(array, jids, JNI_ABORT);
 
     nativeMapView->getMap().removeAnnotations(ids);
 }
@@ -1439,6 +1463,7 @@ extern "C" JNIEXPORT jint JNICALL JNI_OnLoad(JavaVM *vm, void *reserved) {
         {"nativeMoveBy", "(JDDJ)V", reinterpret_cast<void *>(&nativeMoveBy)},
         {"nativeSetLatLng", "(JLcom/mapbox/mapboxgl/geometry/LatLng;J)V",
          reinterpret_cast<void *>(&nativeSetLatLng)},
+        {"nativeSetSprite", "(JLjava/lang/String;IIF[B)V", reinterpret_cast<void *>(&nativeSetSprite)},
         {"nativeAddMarker", "(JLcom/mapbox/mapboxgl/annotations/Marker;)J",
          reinterpret_cast<void *>(&nativeAddMarker)},
         {"nativeAddPolyline", "(JLcom/mapbox/mapboxgl/annotations/Polyline;)J",
