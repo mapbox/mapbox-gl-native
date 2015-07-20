@@ -335,7 +335,8 @@ void GLFWView::run() {
         glfwWaitEvents();
         const bool dirty = !clean.test_and_set();
         if (dirty) {
-            map->renderSync();
+            const bool needsRerender = map->renderSync();
+            map->nudgeTransitions(needsRerender);
         }
     }
 }
