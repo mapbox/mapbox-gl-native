@@ -703,11 +703,9 @@ std::chrono::steady_clock::duration secondsAsDuration(float duration)
 
         _mbglMap->setSourceTileCacheSize(cacheSize);
 
-        bool needsRerender = _mbglMap->renderSync();
+        _mbglMap->renderSync();
 
         [self updateUserLocationAnnotationView];
-
-        _mbglMap->nudgeTransitions(needsRerender);
     }
 }
 

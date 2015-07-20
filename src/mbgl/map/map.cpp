@@ -48,7 +48,7 @@ void Map::renderStill(StillImageCallback callback) {
                     FrameData{ view.getFramebufferSize() }, callback);
 }
 
-bool Map::renderSync() {
+void Map::renderSync() {
     if (renderState == RenderState::never) {
         view.notifyMapChange(MapChangeWillStartRenderingMap);
     }
@@ -69,13 +69,9 @@ bool Map::renderSync() {
         view.notifyMapChange(MapChangeDidFinishRenderingMapFullyRendered);
     }
 
-    return result.needsRerender;
-}
-
-void Map::nudgeTransitions(bool forceRerender) {
     if (transform->needsTransition()) {
         update(Update(transform->updateTransitions(Clock::now())));
-    } else if (forceRerender) {
+    } else if (result.needsRerender) {
         update();
     }
 }
