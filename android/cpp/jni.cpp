@@ -607,7 +607,7 @@ jlong JNICALL nativeAddPolyline(JNIEnv *env, jobject obj, jlong nativeMapViewPtr
     mbgl::StyleProperties shapeProperties;
     mbgl::LineProperties lineProperties;
     lineProperties.opacity = alpha;
-    lineProperties.color = {{ (float)r, (float)g, (float)b, (float)a }};
+    lineProperties.color = {{ (float)r / 255.0f, (float)g / 255.0f, (float)b / 255.0f, (float)a / 255.0f }};
     lineProperties.width = width;
     shapeProperties.set<mbgl::LineProperties>(lineProperties);
 
@@ -658,8 +658,8 @@ std::pair<mbgl::AnnotationSegment, mbgl::StyleProperties> readPolygon(JNIEnv *en
     mbgl::StyleProperties shapeProperties;
     mbgl::FillProperties fillProperties;
     fillProperties.opacity = alpha;
-    fillProperties.stroke_color = {{ (float)rS, (float)gS, (float)bS, (float)aS }};
-    fillProperties.fill_color = {{ (float)rF, (float)gF, (float)bF, (float)aF }};
+    fillProperties.stroke_color = {{ (float)rS / 255.0f, (float)gS / 255.0f, (float)bS / 255.0f, (float)aS / 255.0f }};
+    fillProperties.fill_color = {{ (float)rF / 255.0f, (float)gF / 255.0f, (float)bF / 255.0f, (float)aF / 255.0f }};
     shapeProperties.set<mbgl::FillProperties>(fillProperties);
 
     jobject points = env->GetObjectField(polygon, polygonPointsId);
