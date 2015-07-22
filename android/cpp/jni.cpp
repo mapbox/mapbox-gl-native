@@ -16,6 +16,8 @@
 #include <mbgl/android/jni.hpp>
 #include <mbgl/android/native_map_view.hpp>
 #include <mbgl/map/map.hpp>
+#include <mbgl/annotation/point_annotation.hpp>
+#include <mbgl/annotation/shape_annotation.hpp>
 #include <mbgl/platform/event.hpp>
 #include <mbgl/platform/log.hpp>
 #include <mbgl/storage/network_status.hpp>
@@ -38,6 +40,30 @@ jclass latLngClass = nullptr;
 jmethodID latLngConstructorId = nullptr;
 jfieldID latLngLatitudeId = nullptr;
 jfieldID latLngLongitudeId = nullptr;
+
+jclass markerClass = nullptr;
+jmethodID markerConstructorId = nullptr;
+jfieldID markerPositionId = nullptr;
+jfieldID markerSpriteId = nullptr;
+
+jclass polylineClass = nullptr;
+jmethodID polylineConstructorId = nullptr;
+jfieldID polylineAlphaId = nullptr;
+jfieldID polylineVisibleId = nullptr;
+jfieldID polylineColorId = nullptr;
+jfieldID polylineWidthId = nullptr;
+jfieldID polylinePointsId = nullptr;
+
+jclass polygonClass = nullptr;
+jmethodID polygonConstructorId = nullptr;
+jfieldID polygonAlphaId = nullptr;
+jfieldID polygonVisibleId = nullptr;
+jfieldID polygonFillColorId = nullptr;
+jfieldID polygonStrokeColorId = nullptr;
+jfieldID polygonStrokeWidthId = nullptr;
+jfieldID polygonPointsId = nullptr;
+jfieldID polygonHolesId = nullptr;
+
 
 jclass latLngZoomClass = nullptr;
 jmethodID latLngZoomConstructorId = nullptr;
@@ -153,6 +179,56 @@ std::vector<std::string> std_vector_string_from_jobject(JNIEnv *env, jobject jli
     }
 
     return vector;
+}
+
+mbgl::AnnotationSegment annotation_segment_from_latlng_jlist(JNIEnv *env, jobject jlist) {
+    mbgl::AnnotationSegment segment;
+
+    if (jlist == nullptr) {
+        if (env->ThrowNew(nullPointerExceptionClass, "List cannot be null.") < 0) {
+            env->ExceptionDescribe();
+            return segment;
+        }
+        return segment;
+    }
+
+    jobjectArray array =
+        reinterpret_cast<jobjectArray>(env->CallObjectMethod(jlist, listToArrayId));
+    if (env->ExceptionCheck() || (array == nullptr)) {
+        env->ExceptionDescribe();
+        return segment;
+    }
+
+    jsize len = env->GetArrayLength(array);
+    if (len < 0) {
+        env->ExceptionDescribe();
+        return segment;
+    }
+
+    segment.reserve(len);
+
+    for (jsize i = 0; i < len; i++) {
+        jobject latLng = reinterpret_cast<jobject>(env->GetObjectArrayElement(array, i));
+        if (latLng == nullptr) {
+            env->ExceptionDescribe();
+            return segment;
+        }
+
+        jdouble latitude = env->GetDoubleField(latLng, latLngLatitudeId);
+        if (env->ExceptionCheck()) {
+            env->ExceptionDescribe();
+            return segment;
+        }
+
+        jdouble longitude = env->GetDoubleField(latLng, latLngLongitudeId);
+        if (env->ExceptionCheck()) {
+            env->ExceptionDescribe();
+            return segment;
+        }
+
+        segment.push_back(mbgl::LatLng(latitude, longitude));
+    }
+    return segment;
 }
 
 jobject std_vector_string_to_jobject(JNIEnv *env, std::vector<std::string> vector) {
@@ -431,6 +507,176 @@ void JNICALL nativeSetLatLng(JNIEnv *env, jobject obj, jlong nativeMapViewPtr, j
     }
 
     nativeMapView->getMap().setLatLng(mbgl::LatLng(latitude, longitude), std::chrono::milliseconds(duration));
+}
+
+jlong JNICALL nativeAddMarker(JNIEnv *env, jobject obj, jlong nativeMapViewPtr, jobject marker) {
+    mbgl::Log::Debug(mbgl::Event::JNI, "nativeAddMarker");
+    assert(nativeMapViewPtr != 0);
+    NativeMapView *nativeMapView = reinterpret_cast<NativeMapView *>(nativeMapViewPtr);
+
+    jobject position = env->GetObjectField(marker, markerPositionId);
+    if (env->ExceptionCheck()) {
+        env->ExceptionDescribe();
+        return -1;
+    }
+
+    jstring jsprite = (jstring)env->GetObjectField(marker, markerSpriteId);
+    std::string sprite = std_string_from_jstring(env, jsprite);
+
+    jdouble latitude = env->GetDoubleField(position, latLngLatitudeId);
+    if (env->ExceptionCheck()) {
+        env->ExceptionDescribe();
+        return -1;
+    }
+
+    jdouble longitude = env->GetDoubleField(position, latLngLongitudeId);
+    if (env->ExceptionCheck()) {
+        env->ExceptionDescribe();
+        return -1;
+    }
+
+    // Because Java only has int, not unsigned int, we need to bump the annotation id up to a long.
+    return (jlong) nativeMapView->getMap().addPointAnnotation(mbgl::PointAnnotation(mbgl::LatLng(latitude, longitude), sprite));
+}
+
+jlong JNICALL nativeAddPolyline(JNIEnv *env, jobject obj, jlong nativeMapViewPtr, jobject polyline) {
+    mbgl::Log::Debug(mbgl::Event::JNI, "nativeAddPolyline");
+    assert(nativeMapViewPtr != 0);
+    NativeMapView *nativeMapView = reinterpret_cast<NativeMapView *>(nativeMapViewPtr);
+
+    // ***** Java fields ***** //
+    // float alpha;
+    // boolean visible;
+    // int color
+    // float width
+    // List<LatLng> points
+
+    jfloat alpha = env->GetFloatField(polyline, polylineAlphaId);
+    if (env->ExceptionCheck()) {
+        env->ExceptionDescribe();
+        return -1;
+    }
+
+    jboolean visible = env->GetBooleanField(polyline, polylineVisibleId);
+    if (env->ExceptionCheck()) {
+        env->ExceptionDescribe();
+        return -1;
+    }
+    visible = JNI_TRUE;
+
+    jint color = env->GetIntField(polyline, polylineColorId);
+    if (env->ExceptionCheck()) {
+        env->ExceptionDescribe();
+        return -1;
+    }
+
+    int r = (color>>16)&0xFF;
+    int g = (color>>8)&0xFF;
+    int b = (color)&0xFF;
+    int a = (color>>24)&0xFF;
+
+    jfloat width = env->GetFloatField(polyline, polylineWidthId);
+    if (env->ExceptionCheck()) {
+        env->ExceptionDescribe();
+        return -1;
+    }
+
+    mbgl::StyleProperties shapeProperties;
+    mbgl::LineProperties lineProperties;
+    lineProperties.opacity = alpha;
+    lineProperties.color = {{ (float)r, (float)g, (float)b, (float)a }};
+    lineProperties.width = width;
+    shapeProperties.set<mbgl::LineProperties>(lineProperties);
+
+    jobject points = env->GetObjectField(polyline, polylinePointsId);
+    mbgl::AnnotationSegment segment = annotation_segment_from_latlng_jlist(env, points);
+
+    std::vector<mbgl::ShapeAnnotation> shapes;
+    shapes.emplace_back(mbgl::AnnotationSegments {{ segment }}, shapeProperties);
+
+    std::vector<uint32_t> shapeAnnotationIDs = nativeMapView->getMap().addShapeAnnotations(shapes);
+    uint32_t id = shapeAnnotationIDs.at(0);
+    return (jlong) id;
+}
+
+jlong JNICALL nativeAddPolygon(JNIEnv *env, jobject obj, jlong nativeMapViewPtr, jobject polygon) {
+    mbgl::Log::Debug(mbgl::Event::JNI, "nativeAddPolygon");
+    assert(nativeMapViewPtr != 0);
+    NativeMapView *nativeMapView = reinterpret_cast<NativeMapView *>(nativeMapViewPtr);
+
+    // ***** Java fields ***** //
+    // float alpha;
+    // boolean visible;
+    // int fillColor
+    // int strokeColor
+    // float strokeWidth
+    // List<LatLng> points
+    // List<List<LatLng>> holes
+
+    jfloat alpha = env->GetFloatField(polygon, polygonAlphaId);
+    if (env->ExceptionCheck()) {
+        env->ExceptionDescribe();
+        return -1;
+    }
+
+    jboolean visible = env->GetBooleanField(polygon, polygonVisibleId);
+    if (env->ExceptionCheck()) {
+        env->ExceptionDescribe();
+        return -1;
+    }
+    visible = JNI_TRUE;
+
+    jint fillColor = env->GetIntField(polygon, polygonFillColorId);
+    if (env->ExceptionCheck()) {
+        env->ExceptionDescribe();
+        return -1;
+    }
+
+    jint strokeColor = env->GetIntField(polygon, polygonStrokeColorId);
+    if (env->ExceptionCheck()) {
+        env->ExceptionDescribe();
+        return -1;
+    }
+
+    int rF = (fillColor>>16)&0xFF;
+    int gF = (fillColor>>8)&0xFF;
+    int bF = (fillColor)&0xFF;
+    int aF = (fillColor>>24)&0xFF;
+
+    int rS = (strokeColor>>16)&0xFF;
+    int gS = (strokeColor>>8)&0xFF;
+    int bS = (strokeColor)&0xFF;
+    int aS = (strokeColor>>24)&0xFF;
+
+    // jfloat strokeWidth = env->GetFloatField(polygon, polygonStrokeWidthId);
+    // if (env->ExceptionCheck()) {
+    //     env->ExceptionDescribe();
+    //     return -1;
+    // }
+
+    mbgl::StyleProperties shapeProperties;
+    mbgl::FillProperties fillProperties;
+    fillProperties.opacity = alpha;
+    fillProperties.stroke_color = {{ (float)rS, (float)gS, (float)bS, (float)aS }};
+    fillProperties.fill_color = {{ (float)rF, (float)gF, (float)bF, (float)aF }};
+    shapeProperties.set<mbgl::FillProperties>(fillProperties);
+
+    jobject points = env->GetObjectField(polygon, polygonPointsId);
+    mbgl::AnnotationSegment segment = annotation_segment_from_latlng_jlist(env, points);
+
+    std::vector<mbgl::ShapeAnnotation> shapes;
+    shapes.emplace_back(mbgl::AnnotationSegments {{ segment }}, shapeProperties);
+
+    std::vector<uint32_t> shapeAnnotationIDs = nativeMapView->getMap().addShapeAnnotations(shapes);
+    uint32_t id = shapeAnnotationIDs.at(0);
+    return (jlong) id;
+}
+
+void JNICALL nativeRemoveAnnotation(JNIEnv *env, jobject obj, jlong nativeMapViewPtr, jlong annotationId) {
+    mbgl::Log::Debug(mbgl::Event::JNI, "nativeRemoveAnnotation");
+    assert(nativeMapViewPtr != 0);
+    NativeMapView *nativeMapView = reinterpret_cast<NativeMapView *>(nativeMapViewPtr);
+    nativeMapView->getMap().removeAnnotation((uint32_t)annotationId);
 }
 
 jobject JNICALL nativeGetLatLng(JNIEnv *env, jobject obj, jlong nativeMapViewPtr) {
@@ -783,6 +1029,126 @@ extern "C" JNIEXPORT jint JNICALL JNI_OnLoad(JavaVM *vm, void *reserved) {
         return JNI_ERR;
     }
 
+    markerClass = env->FindClass("com/mapbox/mapboxgl/annotations/Marker");
+    if (markerClass == nullptr) {
+        env->ExceptionDescribe();
+        return JNI_ERR;
+    }
+
+    markerConstructorId = env->GetMethodID(markerClass, "<init>", "()V");
+    if (markerConstructorId == nullptr) {
+        env->ExceptionDescribe();
+        return JNI_ERR;
+    }
+
+    markerPositionId = env->GetFieldID(markerClass, "position", "Lcom/mapbox/mapboxgl/geometry/LatLng;");
+    if (markerPositionId == nullptr) {
+        env->ExceptionDescribe();
+        return JNI_ERR;
+    }
+    
+    markerSpriteId = env->GetFieldID(markerClass, "sprite", "Ljava/lang/String;");
+    if (markerSpriteId == nullptr) {
+        env->ExceptionDescribe();
+        return JNI_ERR;
+    }
+
+    polylineClass = env->FindClass("com/mapbox/mapboxgl/annotations/Polyline");
+    if (polylineClass == nullptr) {
+        env->ExceptionDescribe();
+        return JNI_ERR;
+    }
+
+    polylineConstructorId = env->GetMethodID(polylineClass, "<init>", "()V");
+    if (polylineConstructorId == nullptr) {
+        env->ExceptionDescribe();
+        return JNI_ERR;
+    }
+
+    polylineAlphaId = env->GetFieldID(polylineClass, "alpha", "F");
+    if (polylineAlphaId == nullptr) {
+        env->ExceptionDescribe();
+        return JNI_ERR;
+    }
+
+    polylineVisibleId = env->GetFieldID(polylineClass, "visible", "Z");
+    if (polylineVisibleId == nullptr) {
+        env->ExceptionDescribe();
+        return JNI_ERR;
+    }
+
+    polylineColorId = env->GetFieldID(polylineClass, "color", "I");
+    if (polylineColorId == nullptr) {
+        env->ExceptionDescribe();
+        return JNI_ERR;
+    }
+
+    polylineWidthId = env->GetFieldID(polylineClass, "width", "F");
+    if (polylineWidthId == nullptr) {
+        env->ExceptionDescribe();
+        return JNI_ERR;
+    }
+
+    polylinePointsId = env->GetFieldID(polylineClass, "points", "Ljava/util/List;");
+    if (polylineWidthId == nullptr) {
+        env->ExceptionDescribe();
+        return JNI_ERR;
+    }
+
+    polygonClass = env->FindClass("com/mapbox/mapboxgl/annotations/Polygon");
+    if (polygonClass == nullptr) {
+        env->ExceptionDescribe();
+        return JNI_ERR;
+    }
+
+    polygonConstructorId = env->GetMethodID(polygonClass, "<init>", "()V");
+    if (polygonConstructorId == nullptr) {
+        env->ExceptionDescribe();
+        return JNI_ERR;
+    }
+
+    polygonAlphaId = env->GetFieldID(polygonClass, "alpha", "F");
+    if (polygonAlphaId == nullptr) {
+        env->ExceptionDescribe();
+        return JNI_ERR;
+    }
+
+    polygonVisibleId = env->GetFieldID(polygonClass, "visible", "Z");
+    if (polygonVisibleId == nullptr) {
+        env->ExceptionDescribe();
+        return JNI_ERR;
+    }
+
+    polygonFillColorId = env->GetFieldID(polygonClass, "fillColor", "I");
+    if (polygonFillColorId == nullptr) {
+        env->ExceptionDescribe();
+        return JNI_ERR;
+    }
+
+    polygonStrokeColorId = env->GetFieldID(polygonClass, "strokeColor", "I");
+    if (polygonStrokeColorId == nullptr) {
+        env->ExceptionDescribe();
+        return JNI_ERR;
+    }
+
+    polygonStrokeWidthId = env->GetFieldID(polygonClass, "strokeWidth", "F");
+    if (polygonStrokeWidthId == nullptr) {
+        env->ExceptionDescribe();
+        return JNI_ERR;
+    }
+
+    polygonPointsId = env->GetFieldID(polygonClass, "points", "Ljava/util/List;");
+    if (polygonPointsId == nullptr) {
+        env->ExceptionDescribe();
+        return JNI_ERR;
+    }
+
+    polygonHolesId = env->GetFieldID(polygonClass, "holes", "Ljava/util/List;");
+    if (polygonHolesId == nullptr) {
+        env->ExceptionDescribe();
+        return JNI_ERR;
+    }
+
     latLngZoomClass = env->FindClass("com/mapbox/mapboxgl/geometry/LatLngZoom");
     if (latLngZoomClass == nullptr) {
         env->ExceptionDescribe();
@@ -976,6 +1342,13 @@ extern "C" JNIEXPORT jint JNICALL JNI_OnLoad(JavaVM *vm, void *reserved) {
         {"nativeMoveBy", "(JDDJ)V", reinterpret_cast<void *>(&nativeMoveBy)},
         {"nativeSetLatLng", "(JLcom/mapbox/mapboxgl/geometry/LatLng;J)V",
          reinterpret_cast<void *>(&nativeSetLatLng)},
+        {"nativeAddMarker", "(JLcom/mapbox/mapboxgl/annotations/Marker;)J",
+         reinterpret_cast<void *>(&nativeAddMarker)},
+        {"nativeAddPolyline", "(JLcom/mapbox/mapboxgl/annotations/Polyline;)J",
+         reinterpret_cast<void *>(&nativeAddPolyline)},
+        {"nativeAddPolygon", "(JLcom/mapbox/mapboxgl/annotations/Polygon;)J",
+         reinterpret_cast<void *>(&nativeAddPolygon)},
+        {"nativeRemoveAnnotation", "(JJ)V", reinterpret_cast<void *>(&nativeRemoveAnnotation)},
         {"nativeGetLatLng", "(J)Lcom/mapbox/mapboxgl/geometry/LatLng;",
          reinterpret_cast<void *>(&nativeGetLatLng)},
         {"nativeResetPosition", "(J)V", reinterpret_cast<void *>(&nativeResetPosition)},
@@ -1022,6 +1395,24 @@ extern "C" JNIEXPORT jint JNICALL JNI_OnLoad(JavaVM *vm, void *reserved) {
 
     latLngClass = reinterpret_cast<jclass>(env->NewGlobalRef(latLngClass));
     if (latLngClass == nullptr) {
+        env->ExceptionDescribe();
+        return JNI_ERR;
+    }
+
+    markerClass = reinterpret_cast<jclass>(env->NewGlobalRef(markerClass));
+    if (markerClass == nullptr) {
+        env->ExceptionDescribe();
+        return JNI_ERR;
+    }
+
+    polylineClass = reinterpret_cast<jclass>(env->NewGlobalRef(polylineClass));
+    if (polylineClass == nullptr) {
+        env->ExceptionDescribe();
+        return JNI_ERR;
+    }
+
+    polygonClass = reinterpret_cast<jclass>(env->NewGlobalRef(polygonClass));
+    if (polygonClass == nullptr) {
         env->ExceptionDescribe();
         return JNI_ERR;
     }
@@ -1108,6 +1499,33 @@ extern "C" JNIEXPORT void JNICALL JNI_OnUnload(JavaVM *vm, void *reserved) {
     latLngConstructorId = nullptr;
     latLngLongitudeId = nullptr;
     latLngLatitudeId = nullptr;
+
+    env->DeleteGlobalRef(markerClass);
+    markerClass = nullptr;
+    markerConstructorId = nullptr;
+    markerPositionId = nullptr;
+    markerSpriteId = nullptr;
+
+    env->DeleteGlobalRef(polylineClass);
+    polylineClass = nullptr;
+    polylineConstructorId = nullptr;
+    polylineAlphaId = nullptr;
+    polylineVisibleId = nullptr;
+    polylineColorId = nullptr;
+    polylineWidthId = nullptr;
+    polylinePointsId = nullptr;
+
+    env->DeleteGlobalRef(polygonClass);
+    polygonClass = nullptr;
+    polygonConstructorId = nullptr;
+    polygonAlphaId = nullptr;
+    polygonVisibleId = nullptr;
+    polygonFillColorId = nullptr;
+    polygonStrokeColorId = nullptr;
+    polygonStrokeWidthId = nullptr;
+    polygonPointsId = nullptr;
+    polygonHolesId = nullptr;
+
 
     env->DeleteGlobalRef(latLngZoomClass);
     latLngZoomClass = nullptr;

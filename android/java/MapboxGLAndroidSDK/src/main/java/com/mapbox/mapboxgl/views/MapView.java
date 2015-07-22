@@ -26,10 +26,16 @@ import android.view.SurfaceView;
 import android.view.View;
 import android.view.ViewConfiguration;
 import android.widget.ZoomButtonsController;
-import android.util.Log;
 
 import com.almeros.android.multitouch.gesturedetectors.RotateGestureDetector;
 import com.almeros.android.multitouch.gesturedetectors.TwoFingerGestureDetector;
+import com.mapbox.mapboxgl.annotations.Annotation;
+import com.mapbox.mapboxgl.annotations.Marker;
+import com.mapbox.mapboxgl.annotations.MarkerOptions;
+import com.mapbox.mapboxgl.annotations.Polygon;
+import com.mapbox.mapboxgl.annotations.PolygonOptions;
+import com.mapbox.mapboxgl.annotations.Polyline;
+import com.mapbox.mapboxgl.annotations.PolylineOptions;
 import com.mapbox.mapboxgl.geometry.LatLng;
 import com.mapbox.mapboxgl.geometry.LatLngZoom;
 
@@ -62,6 +68,11 @@ public class MapView extends SurfaceView {
     private static final String STATE_ACCESS_TOKEN = "accessToken";
     private static final String STATE_CLASSES = "classes";
     private static final String STATE_DEFAULT_TRANSITION_DURATION = "defaultTransitionDuration";
+
+    /**
+     * Every annotation that has been added to the map.
+     */
+    private List<Annotation> annotations = new ArrayList<>();
 
     //
     // Instance members
@@ -202,6 +213,48 @@ public class MapView extends SurfaceView {
             NetworkInfo activeNetwork = connectivityManager.getActiveNetworkInfo();
             boolean isConnected = (activeNetwork != null) && activeNetwork.isConnectedOrConnecting();
             onConnectivityChanged(isConnected);
+        }
+    }
+
+    public Marker addMarker(MarkerOptions markerOptions) {
+        Marker marker = markerOptions.getMarker();
+        Long id = mNativeMapView.addMarker(marker);
+        marker.setId(id); // the annotation needs to know its id
+        marker.setMapView(this); // the annotation needs to know which map view it is in
+        annotations.add(marker);
+        return marker;
+    }
+
+    public Polyline addPolyline(PolylineOptions polylineOptions) {
+        Polyline polyline = polylineOptions.getPolyline();
+        Long id = mNativeMapView.addPolyline(polyline);
+        polyline.setId(id);
+        polyline.setMapView(this);
+        annotations.add(polyline);
+        return polyline;
+    }
+
+    public Polygon addPolygon(PolygonOptions polygonOptions) {
+        Polygon polygon = polygonOptions.getPolygon();
+        Long id = mNativeMapView.addPolygon(polygon);
+        polygon.setId(id);
+        polygon.setMapView(this);
+        annotations.add(polygon);
+        return polygon;
+    }
+
+    public void removeAnnotation(Annotation annotation) {
+        long id = annotation.getId();
+        mNativeMapView.removeAnnotation(id);
+    }
+
+    public void removeAnnotation(long annotationId) {
+        mNativeMapView.removeAnnotation(annotationId);
+    }
+
+    public void removeAnnotations() {
+        for (Annotation annotation : annotations) {
+            annotation.remove();
         }
     }
 

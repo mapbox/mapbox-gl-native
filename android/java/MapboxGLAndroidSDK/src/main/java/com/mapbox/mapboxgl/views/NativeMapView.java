@@ -2,8 +2,10 @@ package com.mapbox.mapboxgl.views;
 
 import android.graphics.PointF;
 import android.view.Surface;
-import android.util.Log;
 
+import com.mapbox.mapboxgl.annotations.Marker;
+import com.mapbox.mapboxgl.annotations.Polygon;
+import com.mapbox.mapboxgl.annotations.Polyline;
 import com.mapbox.mapboxgl.geometry.LatLng;
 import com.mapbox.mapboxgl.geometry.LatLngZoom;
 import com.mapbox.mapboxgl.geometry.ProjectedMeters;
@@ -212,6 +214,24 @@ class NativeMapView {
 
     public void setLatLng(LatLng latLng, long duration) {
         nativeSetLatLng(mNativeMapViewPtr, latLng, duration);
+    }
+
+    public long addMarker(Marker marker) {
+        return nativeAddMarker(mNativeMapViewPtr, marker);
+    }
+
+    public long addPolyline(Polyline polyline) {
+        // NH TODO Throw exception if returns -1
+        return nativeAddPolyline(mNativeMapViewPtr, polyline);
+    }
+
+    public long addPolygon(Polygon polygon) {
+        // NH TODO Throw exception if returns -1
+        return nativeAddPolygon(mNativeMapViewPtr, polygon);
+    }
+
+    public void removeAnnotation(long id) {
+        nativeRemoveAnnotation(mNativeMapViewPtr, id);
     }
 
     public LatLng getLatLng() {
@@ -445,6 +465,14 @@ class NativeMapView {
 
     private native void nativeSetLatLng(long nativeMapViewPtr, LatLng latLng,
                                         long duration);
+
+    private native long nativeAddMarker(long nativeMapViewPtr, Marker marker);
+
+    private native long nativeAddPolyline(long nativeMapViewPtr, Polyline polyline);
+
+    private native long nativeAddPolygon(long mNativeMapViewPtr, Polygon polygon);
+
+    private native void nativeRemoveAnnotation(long nativeMapViewPtr, long id);
 
     private native LatLng nativeGetLatLng(long nativeMapViewPtr);
 

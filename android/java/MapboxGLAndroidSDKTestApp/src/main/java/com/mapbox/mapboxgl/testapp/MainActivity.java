@@ -1,6 +1,7 @@
 package com.mapbox.mapboxgl.testapp;
 
 import android.content.Context;
+import android.graphics.Color;
 import android.graphics.Matrix;
 import android.graphics.PointF;
 import android.hardware.GeomagneticField;
@@ -23,6 +24,12 @@ import android.widget.ImageView;
 import android.widget.Spinner;
 import android.widget.TextView;
 
+import com.mapbox.mapboxgl.annotations.Marker;
+import com.mapbox.mapboxgl.annotations.MarkerOptions;
+import com.mapbox.mapboxgl.annotations.Polygon;
+import com.mapbox.mapboxgl.annotations.PolygonOptions;
+import com.mapbox.mapboxgl.annotations.Polyline;
+import com.mapbox.mapboxgl.annotations.PolylineOptions;
 import com.mapbox.mapboxgl.geometry.LatLng;
 import com.mapbox.mapboxgl.views.MapView;
 import com.mapzen.android.lost.api.LocationListener;
@@ -30,6 +37,9 @@ import com.mapzen.android.lost.api.LocationRequest;
 import com.mapzen.android.lost.api.LocationServices;
 import com.mapzen.android.lost.api.LostApiClient;
 
+import org.json.JSONException;
+
+import java.io.IOException;
 import java.util.ArrayList;
 
 public class MainActivity extends ActionBarActivity {
@@ -76,6 +86,11 @@ public class MainActivity extends ActionBarActivity {
     private float[] mMatrixValues = new float[3];
     private float mCompassBearing;
     private boolean mCompassValid = false;
+
+    // Used for markers
+    private boolean mIsMarkersOn = false;
+
+    private Marker marker;
 
     //
     // Lifecycle events
@@ -210,6 +225,10 @@ public class MainActivity extends ActionBarActivity {
                 }
                 return true;
 
+            case R.id.action_markers:
+                // Toggle markers
+                toggleMarkers(!mIsMarkersOn);
+
             default:
                 return super.onOptionsItemSelected(item);
         }
@@ -247,6 +266,80 @@ public class MainActivity extends ActionBarActivity {
                 mGpsLocation = null;
             }
         }
+    }
+
+    /**
+     * Enable / Disable markers.
+     *
+     * @param enableMarkers
+     */
+    private void toggleMarkers(boolean enableMarkers) {
+        if (enableMarkers) {
+            if (!mIsMarkersOn) {
+                mIsMarkersOn = true;
+                addMarkers();
+                addPolyline();
+                addPolygon();
+            }
+        } else {
+            if (mIsMarkersOn) {
+                mIsMarkersOn = false;
+                removeAnnotations();
+            }
+        }
+    }
+
+    private void addMarkers() {
+        LatLng backLot = new LatLng(38.649441, -121.369064);
+        MapView map = mMapFragment.getMap();
+        marker = map.addMarker(new MarkerOptions()
+            .position(backLot)
+            .title("Back Lot")
+            .snippet("The back lot behind my house"));
+
+        LatLng cheeseRoom = new LatLng(38.531577,-122.010646);
+        map.addMarker(new MarkerOptions()
+                .position(cheeseRoom)
+                .sprite("dog-park-15")
+                .title("Cheese Room")
+                .snippet("The only air conditioned room on the property!"));
+    }
+
+    private void addPolyline() {
+        try {
+            String geojsonStr = Util.loadStringFromAssets(this, "small_line.geojson");
+            LatLng[] latLngs = Util.parseGeoJSONCoordinates(geojsonStr);
+            MapView map = mMapFragment.getMap();
+            Polyline line = map.addPolyline(new PolylineOptions()
+                    .add(latLngs)
+                    .width(2)
+                    .color(Color.RED));
+        } catch (IOException e) {
+            e.printStackTrace();
+        } catch (JSONException e) {
+            e.printStackTrace();
+        }
+    }
+
+    private void addPolygon() {
+        String geojsonStr = null;
+        try {
+            geojsonStr = Util.loadStringFromAssets(this, "small_poly.geojson");
+            LatLng[] latLngs = Util.parseGeoJSONCoordinates(geojsonStr);
+            MapView map = mMapFragment.getMap();
+            Polygon polygon = map.addPolygon(new PolygonOptions()
+                    .add(latLngs)
+                    .strokeColor(Color.MAGENTA)
+                    .fillColor(Color.BLUE));
+        } catch (IOException e) {
+            e.printStackTrace();
+        } catch (JSONException e) {
+            e.printStackTrace();
+        }
+    }
+
+    private void removeAnnotations() {
+        mMapFragment.getMap().removeAnnotations();
     }
 
     // This class forwards location updates to updateLocation()
