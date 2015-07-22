@@ -24,6 +24,7 @@ import android.widget.ImageView;
 import android.widget.Spinner;
 import android.widget.TextView;
 
+import com.crashlytics.android.Crashlytics;
 import com.mapbox.mapboxgl.annotations.Marker;
 import com.mapbox.mapboxgl.annotations.MarkerOptions;
 import com.mapbox.mapboxgl.annotations.Polygon;
@@ -37,6 +38,7 @@ import com.mapzen.android.lost.api.LocationRequest;
 import com.mapzen.android.lost.api.LocationServices;
 import com.mapzen.android.lost.api.LostApiClient;
 
+import io.fabric.sdk.android.Fabric;
 import org.json.JSONException;
 
 import java.io.IOException;
@@ -100,6 +102,7 @@ public class MainActivity extends ActionBarActivity {
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
+        Fabric.with(this, new Crashlytics());
 
         if (savedInstanceState != null) {
             mIsGpsOn = savedInstanceState.getBoolean(STATE_IS_GPS_ON, false);
