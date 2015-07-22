@@ -309,7 +309,10 @@ public class MainActivity extends ActionBarActivity {
         marker = map.addMarker(new MarkerOptions()
             .position(backLot)
             .title("Back Lot")
-            .snippet("The back lot behind my house"));
+            .snippet("The back lot behind my house")
+            .text("Back Lot")
+            .sprite("")
+        );
 
         LatLng cheeseRoom = new LatLng(38.531577,-122.010646);
         map.addMarker(new MarkerOptions()

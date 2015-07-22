@@ -52,6 +52,7 @@ jclass markerClass = nullptr;
 jmethodID markerConstructorId = nullptr;
 jfieldID markerPositionId = nullptr;
 jfieldID markerSpriteId = nullptr;
+jfieldID markerTextId = nullptr;
 
 jclass polylineClass = nullptr;
 jmethodID polylineConstructorId = nullptr;
@@ -740,6 +741,9 @@ jlong JNICALL nativeAddMarker(JNIEnv *env, jobject obj, jlong nativeMapViewPtr, 
     jstring jsprite = reinterpret_cast<jstring>(env->GetObjectField(marker, markerSpriteId));
     std::string sprite = std_string_from_jstring(env, jsprite);
 
+    jstring jtext = (jstring)env->GetObjectField(marker, markerTextId);
+    std::string text = std_string_from_jstring(env, jtext);
+
     jdouble latitude = env->GetDoubleField(position, latLngLatitudeId);
     if (env->ExceptionCheck()) {
         env->ExceptionDescribe();
@@ -753,7 +757,8 @@ jlong JNICALL nativeAddMarker(JNIEnv *env, jobject obj, jlong nativeMapViewPtr, 
     }
 
     // Because Java only has int, not unsigned int, we need to bump the annotation id up to a long.
-    return nativeMapView->getMap().addPointAnnotation(mbgl::PointAnnotation(mbgl::LatLng(latitude, longitude), sprite));
+    return nativeMapView->getMap().addPointAnnotation(
+            mbgl::PointAnnotation(mbgl::LatLng(latitude, longitude), sprite, text));
 }
 
 jlong JNICALL nativeAddPolyline(JNIEnv *env, jobject obj, jlong nativeMapViewPtr, jobject polyline) {
@@ -1212,6 +1217,12 @@ extern "C" JNIEXPORT jint JNICALL JNI_OnLoad(JavaVM *vm, void *reserved) {
 
     markerSpriteId = env->GetFieldID(markerClass, "sprite", "Ljava/lang/String;");
     if (markerSpriteId == nullptr) {
+        env->ExceptionDescribe();
+        return JNI_ERR;
+    }
+
+    markerTextId = env->GetFieldID(markerClass, "text", "Ljava/lang/String;");
+    if (markerTextId == nullptr) {
         env->ExceptionDescribe();
         return JNI_ERR;
     }
@@ -1676,6 +1687,7 @@ extern "C" JNIEXPORT void JNICALL JNI_OnUnload(JavaVM *vm, void *reserved) {
     markerConstructorId = nullptr;
     markerPositionId = nullptr;
     markerSpriteId = nullptr;
+    markerTextId = nullptr;
 
     env->DeleteGlobalRef(polylineClass);
     polylineClass = nullptr;
