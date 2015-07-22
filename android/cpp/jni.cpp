@@ -18,6 +18,7 @@
 #include <mbgl/map/map.hpp>
 #include <mbgl/annotation/point_annotation.hpp>
 #include <mbgl/annotation/shape_annotation.hpp>
+#include <mbgl/annotation/sprite_image.hpp>
 #include <mbgl/platform/event.hpp>
 #include <mbgl/platform/log.hpp>
 #include <mbgl/storage/network_status.hpp>
@@ -227,7 +228,9 @@ mbgl::AnnotationSegment annotation_segment_from_latlng_jlist(JNIEnv *env, jobjec
         }
 
         segment.push_back(mbgl::LatLng(latitude, longitude));
+        env->DeleteLocalRef(latLng);
     }
+    env->DeleteLocalRef(array);
     return segment;
 }
 
@@ -247,6 +250,27 @@ jobject std_vector_string_to_jobject(JNIEnv *env, std::vector<std::string> vecto
     }
 
     return jlist;
+}
+
+jlongArray std_vector_uint_to_jobject(JNIEnv *env, std::vector<uint32_t> vector) {
+    jlongArray jarray = env->NewLongArray(vector.size());
+    if (jarray == nullptr) {
+        env->ExceptionDescribe();
+        return nullptr;
+    }
+
+    std::vector<jlong> v;
+    for (const uint32_t& id : vector) {
+        v.push_back((jlong)id);
+    }
+
+    env->SetLongArrayRegion(jarray, 0, v.size(), &(v[0]));
+    if (env->ExceptionCheck()) {
+        env->ExceptionDescribe();
+        return nullptr;
+    }
+
+    return jarray;
 }
 }
 }
@@ -509,6 +533,27 @@ void JNICALL nativeSetLatLng(JNIEnv *env, jobject obj, jlong nativeMapViewPtr, j
     nativeMapView->getMap().setLatLng(mbgl::LatLng(latitude, longitude), std::chrono::milliseconds(duration));
 }
 
+void JNICALL nativeSetSprite(JNIEnv *env, jobject obj, jlong nativeMapViewPtr,
+        jstring symbol, jint width, jint height, jfloat scale, jbyteArray jpixels) {
+    mbgl::Log::Debug(mbgl::Event::JNI, "nativeSetSprite");
+    assert(nativeMapViewPtr != 0);
+    NativeMapView *nativeMapView = reinterpret_cast<NativeMapView *>(nativeMapViewPtr);
+
+    const std::string symbolName = std_string_from_jstring(env, symbol);
+
+    jbyte* pixelData = env->GetByteArrayElements(jpixels, nullptr);
+    std::string pixels((char*)pixelData, width * height * 4);
+    env->ReleaseByteArrayElements(jpixels, pixelData, JNI_ABORT);
+
+    auto spriteImage = std::make_shared<mbgl::SpriteImage>(
+        uint16_t(width),
+        uint16_t(height),
+        float(scale),
+        std::move(pixels));
+
+    nativeMapView->getMap().setSprite(symbolName, spriteImage);
+}
+
 jlong JNICALL nativeAddMarker(JNIEnv *env, jobject obj, jlong nativeMapViewPtr, jobject marker) {
     mbgl::Log::Debug(mbgl::Event::JNI, "nativeAddMarker");
     assert(nativeMapViewPtr != 0);
@@ -584,7 +629,7 @@ jlong JNICALL nativeAddPolyline(JNIEnv *env, jobject obj, jlong nativeMapViewPtr
     mbgl::StyleProperties shapeProperties;
     mbgl::LineProperties lineProperties;
     lineProperties.opacity = alpha;
-    lineProperties.color = {{ (float)r, (float)g, (float)b, (float)a }};
+    lineProperties.color = {{ (float)r / 255.0f, (float)g / 255.0f, (float)b / 255.0f, (float)a / 255.0f }};
     lineProperties.width = width;
     shapeProperties.set<mbgl::LineProperties>(lineProperties);
 
@@ -599,11 +644,8 @@ jlong JNICALL nativeAddPolyline(JNIEnv *env, jobject obj, jlong nativeMapViewPtr
     return (jlong) id;
 }
 
-jlong JNICALL nativeAddPolygon(JNIEnv *env, jobject obj, jlong nativeMapViewPtr, jobject polygon) {
-    mbgl::Log::Debug(mbgl::Event::JNI, "nativeAddPolygon");
-    assert(nativeMapViewPtr != 0);
-    NativeMapView *nativeMapView = reinterpret_cast<NativeMapView *>(nativeMapViewPtr);
 
+std::pair<mbgl::AnnotationSegment, mbgl::StyleProperties> readPolygon(JNIEnv *env, jobject polygon) {
     // ***** Java fields ***** //
     // float alpha;
     // boolean visible;
@@ -614,29 +656,10 @@ jlong JNICALL nativeAddPolygon(JNIEnv *env, jobject obj, jlong nativeMapViewPtr,
     // List<List<LatLng>> holes
 
     jfloat alpha = env->GetFloatField(polygon, polygonAlphaId);
-    if (env->ExceptionCheck()) {
-        env->ExceptionDescribe();
-        return -1;
-    }
-
     jboolean visible = env->GetBooleanField(polygon, polygonVisibleId);
-    if (env->ExceptionCheck()) {
-        env->ExceptionDescribe();
-        return -1;
-    }
     visible = JNI_TRUE;
-
     jint fillColor = env->GetIntField(polygon, polygonFillColorId);
-    if (env->ExceptionCheck()) {
-        env->ExceptionDescribe();
-        return -1;
-    }
-
     jint strokeColor = env->GetIntField(polygon, polygonStrokeColorId);
-    if (env->ExceptionCheck()) {
-        env->ExceptionDescribe();
-        return -1;
-    }
 
     int rF = (fillColor>>16)&0xFF;
     int gF = (fillColor>>8)&0xFF;
@@ -657,26 +680,124 @@ jlong JNICALL nativeAddPolygon(JNIEnv *env, jobject obj, jlong nativeMapViewPtr,
     mbgl::StyleProperties shapeProperties;
     mbgl::FillProperties fillProperties;
     fillProperties.opacity = alpha;
-    fillProperties.stroke_color = {{ (float)rS, (float)gS, (float)bS, (float)aS }};
-    fillProperties.fill_color = {{ (float)rF, (float)gF, (float)bF, (float)aF }};
+    fillProperties.stroke_color = {{ (float)rS / 255.0f, (float)gS / 255.0f, (float)bS / 255.0f, (float)aS / 255.0f }};
+    fillProperties.fill_color = {{ (float)rF / 255.0f, (float)gF / 255.0f, (float)bF / 255.0f, (float)aF / 255.0f }};
     shapeProperties.set<mbgl::FillProperties>(fillProperties);
 
     jobject points = env->GetObjectField(polygon, polygonPointsId);
     mbgl::AnnotationSegment segment = annotation_segment_from_latlng_jlist(env, points);
+    env->DeleteLocalRef(points);
+
+    return std::make_pair(segment, shapeProperties);
+}
+
+
+jlong JNICALL nativeAddPolygon(JNIEnv *env, jobject obj, jlong nativeMapViewPtr, jobject polygon) {
+    mbgl::Log::Debug(mbgl::Event::JNI, "nativeAddPolygon");
+    assert(nativeMapViewPtr != 0);
+    NativeMapView *nativeMapView = reinterpret_cast<NativeMapView *>(nativeMapViewPtr);
 
     std::vector<mbgl::ShapeAnnotation> shapes;
-    shapes.emplace_back(mbgl::AnnotationSegments {{ segment }}, shapeProperties);
+    std::pair<mbgl::AnnotationSegment, mbgl::StyleProperties> segment = readPolygon(env, polygon);
+
+    if (env->ExceptionCheck()) {
+        env->ExceptionDescribe();
+        return -1;
+    }
+
+    shapes.emplace_back(mbgl::AnnotationSegments {{ segment.first }}, segment.second);
 
     std::vector<uint32_t> shapeAnnotationIDs = nativeMapView->getMap().addShapeAnnotations(shapes);
     uint32_t id = shapeAnnotationIDs.at(0);
     return (jlong) id;
 }
 
+jlongArray JNICALL nativeAddPolygons(JNIEnv *env, jobject obj, jlong nativeMapViewPtr, jobject jlist) {
+    mbgl::Log::Debug(mbgl::Event::JNI, "nativeAddPolygons");
+    assert(nativeMapViewPtr != 0);
+    NativeMapView *nativeMapView = reinterpret_cast<NativeMapView *>(nativeMapViewPtr);
+
+    std::vector<mbgl::ShapeAnnotation> shapes;
+
+    if (jlist == nullptr) {
+        if (env->ThrowNew(nullPointerExceptionClass, "List cannot be null.") < 0) {
+            env->ExceptionDescribe();
+            return nullptr;
+        }
+        return nullptr;
+    }
+
+    jobjectArray array =
+        reinterpret_cast<jobjectArray>(env->CallObjectMethod(jlist, listToArrayId));
+    if (env->ExceptionCheck() || (array == nullptr)) {
+        env->ExceptionDescribe();
+        return nullptr;
+    }
+
+    jsize len = env->GetArrayLength(array);
+    if (len < 0) {
+        env->ExceptionDescribe();
+        return nullptr;
+    }
+
+    shapes.reserve(len);
+
+    for (jsize i = 0; i < len; i++) {
+        jobject polygon = reinterpret_cast<jobject>(env->GetObjectArrayElement(array, i));
+
+        std::pair<mbgl::AnnotationSegment, mbgl::StyleProperties> segment = readPolygon(env, polygon);
+        if (env->ExceptionCheck()) {
+            env->ExceptionDescribe();
+            return nullptr;
+        }
+
+        shapes.emplace_back(mbgl::AnnotationSegments {{ segment.first }}, segment.second);
+
+        env->DeleteLocalRef(polygon);
+    }
+
+    std::vector<uint32_t> shapeAnnotationIDs = nativeMapView->getMap().addShapeAnnotations(shapes);
+    return std_vector_uint_to_jobject(env, shapeAnnotationIDs);
+}
+
+
 void JNICALL nativeRemoveAnnotation(JNIEnv *env, jobject obj, jlong nativeMapViewPtr, jlong annotationId) {
     mbgl::Log::Debug(mbgl::Event::JNI, "nativeRemoveAnnotation");
     assert(nativeMapViewPtr != 0);
     NativeMapView *nativeMapView = reinterpret_cast<NativeMapView *>(nativeMapViewPtr);
     nativeMapView->getMap().removeAnnotation((uint32_t)annotationId);
+}
+
+void JNICALL nativeRemoveAnnotations(JNIEnv *env, jobject obj, jlong nativeMapViewPtr, jlongArray array) {
+    mbgl::Log::Debug(mbgl::Event::JNI, "nativeRemoveAnnotations");
+    assert(nativeMapViewPtr != 0);
+    NativeMapView *nativeMapView = reinterpret_cast<NativeMapView *>(nativeMapViewPtr);
+
+    std::vector<uint32_t> ids;
+
+    if (env->ExceptionCheck() || (array == nullptr)) {
+        env->ExceptionDescribe();
+        return;
+    }
+
+    jsize len = env->GetArrayLength(array);
+    if (len < 0) {
+        env->ExceptionDescribe();
+        return;
+    }
+
+    ids.reserve(len);
+    jlong* jids = env->GetLongArrayElements(array, nullptr);
+
+    for (jsize i = 0; i < len; i++) {
+        if(jids[i] == -1L)
+            continue;
+        ids.push_back((uint32_t) jids[i]);
+    }
+
+    env->ReleaseLongArrayElements(array, jids, JNI_ABORT);
+
+    nativeMapView->getMap().removeAnnotations(ids);
 }
 
 jobject JNICALL nativeGetLatLng(JNIEnv *env, jobject obj, jlong nativeMapViewPtr) {
@@ -1342,13 +1463,17 @@ extern "C" JNIEXPORT jint JNICALL JNI_OnLoad(JavaVM *vm, void *reserved) {
         {"nativeMoveBy", "(JDDJ)V", reinterpret_cast<void *>(&nativeMoveBy)},
         {"nativeSetLatLng", "(JLcom/mapbox/mapboxgl/geometry/LatLng;J)V",
          reinterpret_cast<void *>(&nativeSetLatLng)},
+        {"nativeSetSprite", "(JLjava/lang/String;IIF[B)V", reinterpret_cast<void *>(&nativeSetSprite)},
         {"nativeAddMarker", "(JLcom/mapbox/mapboxgl/annotations/Marker;)J",
          reinterpret_cast<void *>(&nativeAddMarker)},
         {"nativeAddPolyline", "(JLcom/mapbox/mapboxgl/annotations/Polyline;)J",
          reinterpret_cast<void *>(&nativeAddPolyline)},
         {"nativeAddPolygon", "(JLcom/mapbox/mapboxgl/annotations/Polygon;)J",
          reinterpret_cast<void *>(&nativeAddPolygon)},
+        {"nativeAddPolygons", "(JLjava/util/List;)[J",
+         reinterpret_cast<void *>(&nativeAddPolygons)},
         {"nativeRemoveAnnotation", "(JJ)V", reinterpret_cast<void *>(&nativeRemoveAnnotation)},
+        {"nativeRemoveAnnotations", "(J[J)V", reinterpret_cast<void *>(&nativeRemoveAnnotations)},
         {"nativeGetLatLng", "(J)Lcom/mapbox/mapboxgl/geometry/LatLng;",
          reinterpret_cast<void *>(&nativeGetLatLng)},
         {"nativeResetPosition", "(J)V", reinterpret_cast<void *>(&nativeResetPosition)},

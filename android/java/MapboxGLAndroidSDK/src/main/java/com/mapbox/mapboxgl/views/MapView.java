@@ -7,6 +7,7 @@ import android.content.Intent;
 import android.content.IntentFilter;
 import android.content.pm.PackageManager;
 import android.content.res.TypedArray;
+import android.graphics.Bitmap;
 import android.graphics.PointF;
 import android.net.ConnectivityManager;
 import android.net.NetworkInfo;
@@ -41,6 +42,8 @@ import com.mapbox.mapboxgl.geometry.LatLngZoom;
 
 import org.apache.commons.validator.routines.UrlValidator;
 
+import java.nio.Buffer;
+import java.nio.ByteBuffer;
 import java.util.ArrayList;
 import java.util.List;
 
@@ -216,6 +219,16 @@ public class MapView extends SurfaceView {
         }
     }
 
+    public void setSprite(String symbol, float scale, Bitmap bitmap) {
+        if(bitmap.getConfig() != Bitmap.Config.ARGB_8888) {
+            bitmap = bitmap.copy(Bitmap.Config.ARGB_8888, false);
+        }
+        ByteBuffer buffer = ByteBuffer.allocate(bitmap.getByteCount());
+        bitmap.copyPixelsToBuffer(buffer);
+
+        mNativeMapView.setSprite(symbol, bitmap.getWidth(), bitmap.getHeight(), scale, buffer.array());
+    }
+
     public Marker addMarker(MarkerOptions markerOptions) {
         Marker marker = markerOptions.getMarker();
         Long id = mNativeMapView.addMarker(marker);
@@ -243,6 +256,23 @@ public class MapView extends SurfaceView {
         return polygon;
     }
 
+    public List<Polygon> addPolygons(List<PolygonOptions> polygonOptions) {
+        List<Polygon> polygons = new ArrayList<>();
+        for(PolygonOptions popts : polygonOptions) {
+            polygons.add(popts.getPolygon());
+        }
+
+        long[] ids = mNativeMapView.addPolygons(polygons);
+
+        for(int i=0; i<polygons.size(); i++) {
+            polygons.get(i).setId(ids[i]);
+            polygons.get(i).setMapView(this);
+            annotations.add(polygons.get(i));
+        }
+
+        return polygons;
+    }
+
     public void removeAnnotation(Annotation annotation) {
         long id = annotation.getId();
         mNativeMapView.removeAnnotation(id);
@@ -253,9 +283,16 @@ public class MapView extends SurfaceView {
     }
 
     public void removeAnnotations() {
-        for (Annotation annotation : annotations) {
-            annotation.remove();
+        long[] ids = new long[annotations.size()];
+        for(int i=0; i<annotations.size(); i++) {
+            Long id = annotations.get(i).getId();
+            if(id == null) {
+                ids[i] = -1;
+            } else {
+                ids[i] = id;
+            }
         }
+        mNativeMapView.removeAnnotations(ids);
     }
 
     //

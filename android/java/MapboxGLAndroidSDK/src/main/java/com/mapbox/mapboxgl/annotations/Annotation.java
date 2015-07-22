@@ -23,7 +23,7 @@ public abstract class Annotation {
         return alpha;
     }
 
-    public long getId() {
+    public Long getId() {
         return id;
     }
 

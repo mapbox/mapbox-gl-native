@@ -177,7 +177,7 @@ class NativeMapView {
     }
 
     public void setStyleJson(String newStyleJson) {
-        setStyleJson(newStyleJson,  "");
+        setStyleJson(newStyleJson, "");
     }
 
     public void setStyleJson(String newStyleJson, String base) {
@@ -216,6 +216,10 @@ class NativeMapView {
         nativeSetLatLng(mNativeMapViewPtr, latLng, duration);
     }
 
+    public void setSprite(String symbol, int width, int height, float scale, byte[] pixels) {
+        nativeSetSprite(mNativeMapViewPtr, symbol, width, height, scale, pixels);
+    }
+
     public long addMarker(Marker marker) {
         return nativeAddMarker(mNativeMapViewPtr, marker);
     }
@@ -230,8 +234,17 @@ class NativeMapView {
         return nativeAddPolygon(mNativeMapViewPtr, polygon);
     }
 
+    public long[] addPolygons(List<Polygon> polygon) {
+        // NH TODO Throw exception if returns -1
+        return nativeAddPolygons(mNativeMapViewPtr, polygon);
+    }
+
     public void removeAnnotation(long id) {
         nativeRemoveAnnotation(mNativeMapViewPtr, id);
+    }
+
+    public void removeAnnotations(long[] ids) {
+        nativeRemoveAnnotations(mNativeMapViewPtr, ids);
     }
 
     public LatLng getLatLng() {
@@ -466,13 +479,20 @@ class NativeMapView {
     private native void nativeSetLatLng(long nativeMapViewPtr, LatLng latLng,
                                         long duration);
 
+    private native void nativeSetSprite(long nativeMapViewPtr, String symbol,
+                                        int width, int height, float scale, byte[] pixels);
+
     private native long nativeAddMarker(long nativeMapViewPtr, Marker marker);
 
     private native long nativeAddPolyline(long nativeMapViewPtr, Polyline polyline);
 
     private native long nativeAddPolygon(long mNativeMapViewPtr, Polygon polygon);
 
+    private native long[] nativeAddPolygons(long mNativeMapViewPtr, List<Polygon> polygon);
+
     private native void nativeRemoveAnnotation(long nativeMapViewPtr, long id);
+
+    private native void nativeRemoveAnnotations(long nativeMapViewPtr, long[] id);
 
     private native LatLng nativeGetLatLng(long nativeMapViewPtr);
 
