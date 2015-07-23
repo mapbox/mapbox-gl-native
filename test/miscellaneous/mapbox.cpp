@@ -15,6 +15,7 @@ TEST(Mapbox, SourceURL) {
 
 TEST(Mapbox, GlyphsURL) {
     EXPECT_EQ(mbgl::util::mapbox::normalizeGlyphsURL("mapbox://fontstack/{fontstack}/{range}.pbf", "key"), "https://api.tiles.mapbox.com/v4/fontstack/{fontstack}/{range}.pbf?access_token=key");
+    EXPECT_EQ(mbgl::util::mapbox::normalizeGlyphsURL("mapbox://fonts/v1/user/{fontstack}/{range}.pbf", "key"), "https://api.tiles.mapbox.com/fonts/v1/user/{fontstack}/{range}.pbf?access_token=key");
     EXPECT_EQ(mbgl::util::mapbox::normalizeGlyphsURL("http://path", "key"), "http://path");
 }
 

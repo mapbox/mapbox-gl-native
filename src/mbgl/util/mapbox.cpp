@@ -45,7 +45,11 @@ std::string normalizeGlyphsURL(const std::string& url, const std::string& access
     if (url.compare(0, mapbox.length(), mapbox) != 0)
         return url;
 
-    return normalizeURL(url, "/v4/", accessToken);
+    const std::string fontstack = "mapbox://fontstack/";
+    if (url.compare(0, fontstack.length(), fontstack) == 0) 
+        return normalizeURL(url, "/v4/", accessToken);
+
+    return normalizeURL(url, "/", accessToken);
 }
 
 std::string normalizeTileURL(const std::string& url, const std::string& sourceURL, SourceType sourceType) {
