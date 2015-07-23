@@ -77,8 +77,11 @@ IB_DESIGNABLE
 /** The compass image view shown in the upper-right when the map is rotated. */
 @property (nonatomic, readonly) UIImageView *compassView;
 
-/** The Mapbox logo image view shown in the lower-left of the map. */
+/** The Mapbox logo image view shown in the corner of the map. */
 @property (nonatomic, readonly) UIImageView *logoView;
+
+/** Which side of the map to show the Mapbox logo. Valid values are NSLayoutAttributeLeading (default) or NSLayoutAttributeTrailing. */
+@property (nonatomic, assign) NSLayoutAttribute logoSide;
 
 /** The button shown in the lower-right of the map which when pressed displays the map attribution information. */
 @property (nonatomic, readonly) UIButton *attributionButton;

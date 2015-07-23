@@ -263,6 +263,7 @@ std::chrono::steady_clock::duration secondsAsDuration(float duration)
     _logoView.translatesAutoresizingMaskIntoConstraints = NO;
     [self addSubview:_logoView];
     _logoViewConstraints = [NSMutableArray array];
+    _logoSide = NSLayoutAttributeLeading;
 
     // setup attribution
     //
@@ -512,6 +513,13 @@ std::chrono::steady_clock::duration secondsAsDuration(float duration)
     return nil;
 }
 
+- (void)setLogoSide:(NSLayoutAttribute)newValue {
+    if (_logoSide != newValue && (newValue == NSLayoutAttributeLeading || newValue == NSLayoutAttributeTrailing)) {
+        _logoSide = newValue;
+        [self updateConstraints];
+    }
+}
+
 - (void)updateConstraints
 {
     // If we have a view controller reference, use its layout guides for our various top & bottom
@@ -622,12 +630,12 @@ std::chrono::steady_clock::duration secondsAsDuration(float duration)
 
     [self.logoViewConstraints addObject:
      [NSLayoutConstraint constraintWithItem:self.logoView
-                                  attribute:NSLayoutAttributeLeading
+                                  attribute:self.logoSide
                                   relatedBy:NSLayoutRelationEqual
                                      toItem:self
-                                  attribute:NSLayoutAttributeLeading
+                                  attribute:self.logoSide
                                  multiplier:1
-                                   constant:8]];
+                                   constant:(self.logoSide == NSLayoutAttributeTrailing) ? -8 : 8]];
     if ([NSLayoutConstraint respondsToSelector:@selector(activateConstraints:)])
     {
         [NSLayoutConstraint activateConstraints:self.logoViewConstraints];
