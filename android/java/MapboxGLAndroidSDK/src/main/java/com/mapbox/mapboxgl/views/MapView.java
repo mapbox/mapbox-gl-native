@@ -1268,7 +1268,8 @@ public class MapView extends SurfaceView {
         post(new Runnable() {
             @Override
             public void run() {
-                mNativeMapView.invalidate();
+                boolean inProgress = mRotateGestureDetector.isInProgress() || mScaleGestureDetector.isInProgress();
+                mNativeMapView.invalidate(inProgress);
             }
         });
     }

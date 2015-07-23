@@ -88,8 +88,8 @@ class NativeMapView {
         nativeUpdate(mNativeMapViewPtr);
     }
 
-    public void invalidate() {
-        nativeOnInvalidate(mNativeMapViewPtr);
+    public void invalidate(boolean inProgress) {
+        nativeOnInvalidate(mNativeMapViewPtr, inProgress);
     }
 
     public void resizeView(int width, int height) {
@@ -438,7 +438,7 @@ class NativeMapView {
 
     private native void nativeUpdate(long nativeMapViewPtr);
 
-    private native void nativeOnInvalidate(long nativeMapViewPtr);
+    private native void nativeOnInvalidate(long nativeMapViewPtr, boolean inProgress);
 
     private native void nativeViewResize(long nativeMapViewPtr, int width, int height);
 

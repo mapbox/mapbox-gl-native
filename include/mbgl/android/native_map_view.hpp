@@ -49,7 +49,7 @@ public:
     void enableFps(bool enable);
     void updateFps();
 
-    void onInvalidate();
+    void onInvalidate(bool inProgress);
 
     void resizeView(int width, int height);
     void resizeFramebuffer(int width, int height);

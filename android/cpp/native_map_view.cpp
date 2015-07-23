@@ -758,12 +758,15 @@ void NativeMapView::updateFps() {
     env = nullptr;
 }
 
-void NativeMapView::onInvalidate() {
+void NativeMapView::onInvalidate(bool inProgress) {
     mbgl::Log::Debug(mbgl::Event::Android, "NativeMapView::onInvalidate()");
 
     const bool dirty = !clean.test_and_set();
     if (dirty) {
-        map.renderSync();
+        const bool needsRerender = map.renderSync();
+        if (!inProgress) {
+            map.nudgeTransitions(needsRerender);
+        }
     }
 }
 
