@@ -42,12 +42,15 @@ std::string normalizeStyleURL(const std::string& url, const std::string& accessT
 }
 
 std::string normalizeGlyphsURL(const std::string& url, const std::string& accessToken) {
-    if (url.compare(0, mapbox.length(), mapbox) != 0)
+    if (url.compare(0, mapbox.length(), mapbox) != 0) {
         return url;
+    }
 
     const std::string fontstack = "mapbox://fontstack/";
-    if (url.compare(0, fontstack.length(), fontstack) == 0) 
+
+    if (url.compare(0, fontstack.length(), fontstack) == 0) {
         return normalizeURL(url, "/v4/", accessToken);
+    }
 
     return normalizeURL(url, "/", accessToken);
 }
