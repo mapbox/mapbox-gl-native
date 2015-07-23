@@ -2309,7 +2309,7 @@ CLLocationCoordinate2D MGLLocationCoordinate2DFromLatLng(mbgl::LatLng latLng)
 {
     if ( ! _showsUserLocation || ! newLocation || ! CLLocationCoordinate2DIsValid(newLocation.coordinate)) return;
 
-    if ([newLocation distanceFromLocation:oldLocation] || ! oldLocation)
+    if (! oldLocation || ! CLLocationCoordinate2DIsValid(oldLocation.coordinate) || [newLocation distanceFromLocation:oldLocation])
     {
         self.userLocation.location = newLocation;
 
