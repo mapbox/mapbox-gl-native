@@ -969,13 +969,13 @@ jobject JNICALL nativeLatLngForPixel(JNIEnv *env, jobject obj, jlong nativeMapVi
     assert(nativeMapViewPtr != 0);
     NativeMapView *nativeMapView = reinterpret_cast<NativeMapView *>(nativeMapViewPtr);
 
-    jfloat x = env->GetDoubleField(pixel, pointFXId);
+    jfloat x = env->GetFloatField(pixel, pointFXId);
     if (env->ExceptionCheck()) {
         env->ExceptionDescribe();
         return nullptr;
     }
 
-    jfloat y = env->GetDoubleField(pixel, pointFYId);
+    jfloat y = env->GetFloatField(pixel, pointFYId);
     if (env->ExceptionCheck()) {
         env->ExceptionDescribe();
         return nullptr;
