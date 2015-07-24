@@ -111,6 +111,7 @@ public class MainActivity extends ActionBarActivity {
         // Load the layout
         setContentView(R.layout.activity_main);
         mapView = (MapView) findViewById(R.id.mainMapView);
+        mapView.onCreate(savedInstanceState);
         mapView.setOnFpsChangedListener(new MyOnFpsChangedListener());
         mapView.setOnMapChangedListener(new MyOnMapChangedListener());
 
@@ -169,10 +170,18 @@ public class MainActivity extends ActionBarActivity {
         mapView.onStart();
     }
 
+    @Override
+    protected void onStop() {
+        super.onStop();
+        mapView.onStop();
+    }
+
     // Called when our app goes into the background
     @Override
     public void onPause()  {
         super.onPause();
+
+        mapView.onPause();
 
         // Cancel GPS
         toggleGps(false);
@@ -182,8 +191,17 @@ public class MainActivity extends ActionBarActivity {
     @Override
     public void onResume() {
         super.onResume();
+
+        mapView.onResume();
+
         // Restart GPS
         toggleGps(true);
+    }
+
+    @Override
+    protected void onDestroy() {
+        super.onDestroy();
+        mapView.onDestroy();
     }
 
     // Called when we need to save instance state
@@ -191,6 +209,7 @@ public class MainActivity extends ActionBarActivity {
     protected void onSaveInstanceState(Bundle outState) {
         super.onSaveInstanceState(outState);
 
+        mapView.onSaveInstanceState(outState);
         outState.putBoolean(STATE_IS_GPS_ON, mIsGpsOn);
     }
 
