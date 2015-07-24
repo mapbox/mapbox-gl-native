@@ -16,6 +16,7 @@ import android.os.Bundle;
 import android.support.annotation.NonNull;
 import android.support.v4.view.GestureDetectorCompat;
 import android.support.v4.view.ScaleGestureDetectorCompat;
+import android.text.TextUtils;
 import android.view.GestureDetector;
 import android.view.ScaleGestureDetector;
 import android.util.AttributeSet;
@@ -27,7 +28,6 @@ import android.view.SurfaceView;
 import android.view.View;
 import android.view.ViewConfiguration;
 import android.widget.ZoomButtonsController;
-
 import com.almeros.android.multitouch.gesturedetectors.RotateGestureDetector;
 import com.almeros.android.multitouch.gesturedetectors.TwoFingerGestureDetector;
 import com.mapbox.mapboxgl.annotations.Annotation;
@@ -39,10 +39,7 @@ import com.mapbox.mapboxgl.annotations.Polyline;
 import com.mapbox.mapboxgl.annotations.PolylineOptions;
 import com.mapbox.mapboxgl.geometry.LatLng;
 import com.mapbox.mapboxgl.geometry.LatLngZoom;
-
 import org.apache.commons.validator.routines.UrlValidator;
-
-import java.nio.Buffer;
 import java.nio.ByteBuffer;
 import java.util.ArrayList;
 import java.util.List;
@@ -422,14 +419,14 @@ public class MapView extends SurfaceView {
         return mStyleUrl;
     }
 
-    private void validateAccessToken(String accessToken) {
+    private void validateAccessToken(@NonNull String accessToken) {
 
-        if (!accessToken.startsWith("pk.") && !accessToken.startsWith("sk.")) {
+        if (TextUtils.isEmpty(accessToken) || (!accessToken.startsWith("pk.") && !accessToken.startsWith("sk."))) {
             throw new RuntimeException("Using MapView requires setting a valid access token. See the README.md");
         }
     }
 
-    public void setAccessToken(String accessToken) {
+    public void setAccessToken(@NonNull String accessToken) {
         validateAccessToken(accessToken);
         mNativeMapView.setAccessToken(accessToken);
     }
