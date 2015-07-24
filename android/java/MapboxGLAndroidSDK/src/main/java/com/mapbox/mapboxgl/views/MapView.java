@@ -536,7 +536,7 @@ public class MapView extends SurfaceView {
     // Called when we need to create the GL context
     // Must be called from Activity onStart
     public void onStart() {
-        // Do nothing
+        validateAccessToken(getAccessToken());
     }
 
     // Called when we need to terminate the GL context
