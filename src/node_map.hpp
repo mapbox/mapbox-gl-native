@@ -1,5 +1,7 @@
 #pragma once
 
+#include "node_file_source.hpp"
+
 #include <mbgl/map/map.hpp>
 #include <mbgl/platform/default/headless_view.hpp>
 
@@ -13,8 +15,6 @@
 #include <queue>
 
 namespace node_mbgl {
-
-class NodeFileSource;
 
 class NodeMap : public node::ObjectWrap {
     struct RenderOptions;
@@ -52,7 +52,7 @@ private:
     v8::Persistent<v8::Object> source;
 
     mbgl::HeadlessView view;
-    NodeFileSource &fs;
+    NodeFileSource fs;
     std::unique_ptr<mbgl::Map> map;
 
     std::exception_ptr error;

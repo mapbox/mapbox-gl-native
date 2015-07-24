@@ -20,8 +20,8 @@ function filePath(name) {
     }, {});
 }
 
-function setup(fileSource, callback) {
-    callback(new mbgl.Map(fileSource));
+function setup(options, callback) {
+    callback(new mbgl.Map(options));
 }
 
 test('Map', function(t) {
@@ -34,47 +34,43 @@ test('Map', function(t) {
             t.end();
         });
 
-        t.test('should require a FileSource object as first parameter', function(t) {
+        t.test('should require a FileSource options object as first parameter', function(t) {
             t.throws(function() {
                 new mbgl.Map();
-            }, /Requires a FileSource as first argument/);
+            }, /Requires FileSource options as first argument/);
 
             t.throws(function() {
-                new mbgl.Map('fileSource');
-            }, /Requires a FileSource as first argument/);
-
-            t.throws(function() {
-                new mbgl.Map({});
-            }, /Requires a FileSource as first argument/);
+                new mbgl.Map('options');
+            }, /Requires FileSource options as first argument/);
 
             t.end();
         });
 
-        t.test('should require the FileSource object to have request and cancel methods', function(t) {
-            var fileSource = new mbgl.FileSource();
+        t.test('should require the FileSource options object to have request and cancel methods', function(t) {
+            var options = {};
 
             t.throws(function() {
-                new mbgl.Map(fileSource);
-            }, /FileSource must have a request member function/);
+                new mbgl.Map(options);
+            }, /FileSource options must have a request member function/);
 
-            fileSource.request = 'test';
+            options.request = 'test';
             t.throws(function() {
-                new mbgl.Map(fileSource);
-            }, /FileSource must have a request member function/);
+                new mbgl.Map(options);
+            }, /FileSource options must have a request member function/);
 
-            fileSource.request = function() {};
+            options.request = function() {};
             t.throws(function() {
-                new mbgl.Map(fileSource);
-            }, /FileSource must have a cancel member function/);
+                new mbgl.Map(options);
+            }, /FileSource options must have a cancel member function/);
 
-            fileSource.cancel = 'test';
+            options.cancel = 'test';
             t.throws(function() {
-                new mbgl.Map(fileSource);
-            }, /FileSource must have a cancel member function/);
+                new mbgl.Map(options);
+            }, /FileSource options must have a cancel member function/);
 
-            fileSource.cancel = function() {};
+            options.cancel = function() {};
             t.doesNotThrow(function() {
-                new mbgl.Map(fileSource);
+                new mbgl.Map(options);
             });
 
             t.end();
@@ -84,13 +80,13 @@ test('Map', function(t) {
     });
 
     t.test('load styles', function(t) {
-        var fileSource = new mbgl.FileSource();
-        fileSource.request = function() {};
-        fileSource.cancel = function() {};
+        var options = {};
+        options.request = function() {};
+        options.cancel = function() {};
 
         t.test('requires a string or object as the first parameter', function(t) {
             t.test('requires a map style as first argument', function(t) {
-                setup(fileSource, function(map) {
+                setup(options, function(map) {
                     t.throws(function() {
                         map.load();
                     }, /Requires a map style as first argument/);
@@ -102,7 +98,7 @@ test('Map', function(t) {
             });
 
             t.test('expect either an object or array at root', { timeout: 1000 }, function(t) {
-                setup(fileSource, function(map) {
+                setup(options, function(map) {
                     mbgl.once('message', function(msg) {
                         t.equal(msg.severity, 'ERROR');
                         t.equal(msg.class, 'ParseStyle');
@@ -121,7 +117,7 @@ test('Map', function(t) {
         });
 
         t.test('accepts an empty stylesheet string', function(t) {
-            setup(fileSource, function(map) {
+            setup(options, function(map) {
                 t.doesNotThrow(function() {
                     map.load('{}');
                 });
@@ -133,7 +129,7 @@ test('Map', function(t) {
         });
 
         t.test('accepts a JSON stylesheet', { timeout: 1000 }, function(t) {
-            setup(fileSource, function(map) {
+            setup(options, function(map) {
                 t.doesNotThrow(function() {
                     map.load(style);
                 });
@@ -145,7 +141,7 @@ test('Map', function(t) {
         });
 
         t.test('accepts a stringified stylesheet', { timeout: 1000 }, function(t) {
-            setup(fileSource, function(map) {
+            setup(options, function(map) {
                 t.doesNotThrow(function() {
                     map.load(JSON.stringify(style));
                 });
@@ -161,12 +157,12 @@ test('Map', function(t) {
 
     t.test('request coalesting', function(t) {
         var requestList = [];
-        var fileSourceDoNotReply = new mbgl.FileSource();
+        var optionsDoNotReply = {};
 
         // This file source will never reply to any
         // request other than "./fixtures/tiles.tilejson" which
         // will force the cancellation of the pending requests.
-        fileSourceDoNotReply.request = function(req) {
+        optionsDoNotReply.request = function(req) {
             if (req.url != "./fixtures/tiles.tilejson") {
                 requestList.push(req);
                 return;
@@ -177,16 +173,16 @@ test('Map', function(t) {
             });
         };
 
-        fileSourceDoNotReply.cancel = function() {
+        optionsDoNotReply.cancel = function() {
             requestList.pop();
         };
 
         t.test('merge requests/cancels for the same resource', function(t) {
-            var map1 = new mbgl.Map(fileSourceDoNotReply);
-            var map2 = new mbgl.Map(fileSourceDoNotReply);
-            var map3 = new mbgl.Map(fileSourceDoNotReply);
-            var map4 = new mbgl.Map(fileSourceDoNotReply);
-            var map5 = new mbgl.Map(fileSourceDoNotReply);
+            var map1 = new mbgl.Map(optionsDoNotReply);
+            var map2 = new mbgl.Map(optionsDoNotReply);
+            var map3 = new mbgl.Map(optionsDoNotReply);
+            var map4 = new mbgl.Map(optionsDoNotReply);
+            var map5 = new mbgl.Map(optionsDoNotReply);
 
             map1.load(style);
             map2.load(style);
@@ -231,13 +227,13 @@ test('Map', function(t) {
         });
 
         var vectorTileRequestCount = 0;
-        var fileSourceDelay = new mbgl.FileSource();
+        var optionsDelay = {};
 
         // This file source will add a little delay before
         // replying so we make sure that all the map objects
         // request the same resource will get a reply from the
         // same request.
-        fileSourceDelay.request = function(req) {
+        optionsDelay.request = function(req) {
             var timeout = 0;
 
             if (req.url != "./fixtures/tiles.tilejson") {
@@ -254,16 +250,16 @@ test('Map', function(t) {
             setTimeout(readFile, timeout);
         };
 
-        fileSourceDelay.cancel = function() {
+        optionsDelay.cancel = function() {
             t.fail("Should never cancel");
         };
 
         t.test('one request for the same resource notifies multiple map objects', function(t) {
-            var map1 = new mbgl.Map(fileSourceDelay);
-            var map2 = new mbgl.Map(fileSourceDelay);
-            var map3 = new mbgl.Map(fileSourceDelay);
-            var map4 = new mbgl.Map(fileSourceDelay);
-            var map5 = new mbgl.Map(fileSourceDelay);
+            var map1 = new mbgl.Map(optionsDelay);
+            var map2 = new mbgl.Map(optionsDelay);
+            var map3 = new mbgl.Map(optionsDelay);
+            var map4 = new mbgl.Map(optionsDelay);
+            var map5 = new mbgl.Map(optionsDelay);
 
             map1.load(style);
             map2.load(style);
@@ -298,16 +294,16 @@ test('Map', function(t) {
     });
 
     t.test('render argument requirements', function(t) {
-        var fileSource = new mbgl.FileSource();
-        fileSource.request = function(req) {
+        var options = {};
+        options.request = function(req) {
             fs.readFile(path.join('test', req.url), function(err, data) {
                 req.respond(err, { data: data });
             });
         };
-        fileSource.cancel = function() {};
+        options.cancel = function() {};
 
         t.test('requires an object as the first parameter', function(t) {
-            setup(fileSource, function(map) {
+            setup(options, function(map) {
                 t.throws(function() {
                     map.render();
                 }, /First argument must be an options object/);
@@ -323,7 +319,7 @@ test('Map', function(t) {
         });
 
         t.test('requires a callback as the second parameter', function(t) {
-            setup(fileSource, function(map) {
+            setup(options, function(map) {
                 t.throws(function() {
                     map.render({});
                 }, /Second argument must be a callback function/);
@@ -339,7 +335,7 @@ test('Map', function(t) {
         });
 
         t.test('requires a style to be set', function(t) {
-            setup(fileSource, function(map) {
+            setup(options, function(map) {
                 t.throws(function() {
                     map.render({}, function() {});
                 }, /Style is not loaded/);
@@ -358,7 +354,7 @@ test('Map', function(t) {
                 t.ok(msg.text.match(/Failed to load/), 'error text matches');
             });
 
-            setup(fileSource, function(map) {
+            setup(options, function(map) {
                 map.load(style);
                 map.render({ zoom: 1 }, function(err, data) {
                     mbgl.removeAllListeners('message');
@@ -373,7 +369,7 @@ test('Map', function(t) {
         });
 
         t.test('double release', function(t) {
-            setup(fileSource, function(map) {
+            setup(options, function(map) {
                 map.release();
 
                 t.throws(function() {
@@ -385,7 +381,7 @@ test('Map', function(t) {
         });
 
         t.test('returns an image', function(t) {
-            setup(fileSource, function(map) {
+            setup(options, function(map) {
                 map.load(style);
                 map.render({}, function(err, data) {
                     t.error(err);

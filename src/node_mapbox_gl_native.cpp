@@ -5,7 +5,6 @@
 #include <nan.h>
 #pragma GCC diagnostic pop
 
-#include "node_file_source.hpp"
 #include "node_map.hpp"
 #include "node_log.hpp"
 #include "node_request.hpp"
@@ -13,7 +12,6 @@
 void RegisterModule(v8::Handle<v8::Object> exports) {
     NanScope();
 
-    node_mbgl::NodeFileSource::Init(exports);
     node_mbgl::NodeMap::Init(exports);
     node_mbgl::NodeRequest::Init(exports);
 

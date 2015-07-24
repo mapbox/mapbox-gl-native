@@ -19,19 +19,9 @@ namespace node_mbgl {
 
 namespace util { template <typename T> class AsyncQueue; }
 
-class NodeFileSource : public node::ObjectWrap, public mbgl::FileSource {
-    ////////////////////////////////////////////////////////////////////////////////////////////////
-    // Static Node Methods
+class NodeFileSource : public mbgl::FileSource {
 public:
-    static void Init(v8::Handle<v8::Object> target);
-    static NAN_METHOD(New);
-
-    static v8::Persistent<v8::FunctionTemplate> constructorTemplate;
-
-    ////////////////////////////////////////////////////////////////////////////////////////////////
-    // Instance
-public:
-    NodeFileSource();
+    NodeFileSource(v8::Handle<v8::Object>);
     ~NodeFileSource();
 
     mbgl::Request* request(const mbgl::Resource&, uv_loop_t*, Callback);
@@ -46,6 +36,8 @@ private:
 
     void processAdd(const mbgl::Resource&);
     void processCancel(const mbgl::Resource&);
+
+    v8::Persistent<v8::Object> options;
 
 private:
 #if (NODE_MODULE_VERSION > NODE_0_10_MODULE_VERSION)

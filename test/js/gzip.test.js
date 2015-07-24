@@ -27,14 +27,14 @@ function filePath(name) {
     }, {});
 }
 
-function setup(fileSource, callback) {
-    callback(new mbgl.Map(fileSource));
+function setup(options, callback) {
+    callback(new mbgl.Map(options));
 }
 
-function getFileSource(gzip, t) {
-    var fileSource = new mbgl.FileSource();
+function getFileSourceOptions(gzip, t) {
+    var options = {};
 
-    fileSource.request = function(req) {
+    options.request = function(req) {
         var parts = req.url.split('.');
         var filetype = parts[parts.length - 1];
 
@@ -53,9 +53,9 @@ function getFileSource(gzip, t) {
         });
     };
 
-    fileSource.cancel = function(req) {};
+    options.cancel = function(req) {};
 
-    return fileSource;
+    return options;
 }
 
 test('gzip', function(t) {
@@ -64,7 +64,7 @@ test('gzip', function(t) {
             if (msg.severity == 'ERROR') t.error(msg);
         });
 
-        setup(getFileSource(true, t), function(map) {
+        setup(getFileSourceOptions(true, t), function(map) {
             map.load(style);
             map.render({}, function(err, data) {
                 mbgl.removeAllListeners('message');
@@ -110,7 +110,7 @@ test('gzip', function(t) {
             }
         });
 
-        setup(getFileSource(false, t), function(map) {
+        setup(getFileSourceOptions(false, t), function(map) {
             map.load(style);
             map.render({}, function(err, data) {
                 map.release();

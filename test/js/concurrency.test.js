@@ -16,16 +16,16 @@ function renderTest(style, info, dir, key) {
         var remaining = 10;
         var start = +new Date;
 
-        var fileSource = new mbgl.FileSource();
-        fileSource.request = function(req) {
+        var options = {};
+        options.request = function(req) {
             fs.readFile(path.join(suitePath, decodeURIComponent(req.url)), function(err, data) {
                 req.respond(err, { data: data });
                 t.error(err);
             });
         };
-        fileSource.cancel = function() {};
+        options.cancel = function() {};
 
-        var map = new mbgl.Map(fileSource);
+        var map = new mbgl.Map(options);
         map.load(style);
 
         function render() {
