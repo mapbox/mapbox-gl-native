@@ -13,6 +13,7 @@ import android.location.Location;
 import android.os.Bundle;
 import android.support.v7.app.ActionBarActivity;
 import android.support.v7.widget.Toolbar;
+import android.util.Log;
 import android.view.Menu;
 import android.view.MenuInflater;
 import android.view.MenuItem;
@@ -38,10 +39,14 @@ import com.mapzen.android.lost.api.LocationServices;
 import com.mapzen.android.lost.api.LostApiClient;
 import io.fabric.sdk.android.Fabric;
 import org.json.JSONException;
+import java.io.BufferedReader;
 import java.io.IOException;
+import java.io.InputStreamReader;
 import java.util.ArrayList;
 
 public class MainActivity extends ActionBarActivity {
+
+    private static final String TAG = "MainActivity";
 
     //
     // Static members
@@ -111,6 +116,15 @@ public class MainActivity extends ActionBarActivity {
         // Load the layout
         setContentView(R.layout.activity_main);
         mapView = (MapView) findViewById(R.id.mainMapView);
+        // Load the access token
+        try {
+            BufferedReader reader = new BufferedReader(new InputStreamReader(getResources().openRawResource(R.raw.token)));
+            String line = reader.readLine();
+            mapView.setAccessToken(line);
+        } catch (IOException e) {
+            Log.e(TAG, "Error loading access token from token.txt: " + e.toString());
+        }
+
         mapView.onCreate(savedInstanceState);
         mapView.setOnFpsChangedListener(new MyOnFpsChangedListener());
         mapView.setOnMapChangedListener(new MyOnMapChangedListener());
