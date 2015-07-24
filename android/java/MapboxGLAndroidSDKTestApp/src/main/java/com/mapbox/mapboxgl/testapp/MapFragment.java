@@ -44,6 +44,7 @@ public class MapFragment extends Fragment {
         mMap = (MapView) inflater.inflate(R.layout.fragment_main, container, true);
 
         // Load the access token
+/*
         try {
             BufferedReader reader = new BufferedReader(new InputStreamReader(getActivity().getApplicationContext().getResources().openRawResource(R.raw.token)));
             String line = reader.readLine();
@@ -51,6 +52,7 @@ public class MapFragment extends Fragment {
         } catch (IOException e) {
             return null;
         }
+*/
 
         // Need to pass on any saved state to the map
         mMap.onCreate(savedInstanceState);

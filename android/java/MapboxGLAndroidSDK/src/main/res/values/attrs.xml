@@ -1,23 +1,14 @@
 <resources>
-    <attr name="centerLongitude" format="float" />
-    <attr name="centerLatitude" format="float" />
-    <attr name="zoomLevel" format="float" />
-    <attr name="direction" format="float" />
-    <attr name="zoomEnabled" format="boolean" />
-    <attr name="scrollEnabled" format="boolean" />
-    <attr name="rotateEnabled" format="boolean" />
-    <attr name="debugActive" format="boolean" />
-    <attr name="styleUrl" format="string" />
-    
     <declare-styleable name="MapView">
-        <attr name="centerLongitude" />
-        <attr name="centerLatitude" />
-        <attr name="zoomLevel" />
-        <attr name="direction" />
-        <attr name="zoomEnabled" />
-        <attr name="scrollEnabled" />
-        <attr name="rotateEnabled" />
-        <attr name="debugActive" />
-        <attr name="styleUrl" />
+        <attr name="centerLongitude" format="float" />
+        <attr name="centerLatitude" format="float" />
+        <attr name="zoomLevel" format="float" />
+        <attr name="direction" format="float" />
+        <attr name="zoomEnabled" format="boolean" />
+        <attr name="scrollEnabled" format="boolean" />
+        <attr name="rotateEnabled" format="boolean" />
+        <attr name="debugActive" format="boolean" />
+        <attr name="styleUrl" format="string" />
+        <attr name="accessToken" format="string"/>
     </declare-styleable>
 </resources>

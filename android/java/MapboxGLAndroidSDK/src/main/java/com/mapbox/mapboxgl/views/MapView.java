@@ -174,6 +174,9 @@ public class MapView extends SurfaceView {
             if (typedArray.getString(R.styleable.MapView_styleUrl) != null) {
                 setStyleUrl(typedArray.getString(R.styleable.MapView_styleUrl));
             }
+            if (typedArray.getString(R.styleable.MapView_accessToken) != null) {
+                setAccessToken(typedArray.getString(R.styleable.MapView_accessToken));
+            }
         } finally {
             typedArray.recycle();
         }
