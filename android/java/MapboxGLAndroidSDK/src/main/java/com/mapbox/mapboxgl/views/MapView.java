@@ -503,8 +503,6 @@ public class MapView extends SurfaceView {
             mNativeMapView.setDefaultTransitionDuration(savedInstanceState.getLong(STATE_DEFAULT_TRANSITION_DURATION));
         }
 
-        validateAccessToken(getAccessToken());
-
         mNativeMapView.initializeDisplay();
         mNativeMapView.initializeContext();
     }
