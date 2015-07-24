@@ -23,7 +23,6 @@ import android.widget.FrameLayout;
 import android.widget.ImageView;
 import android.widget.Spinner;
 import android.widget.TextView;
-
 import com.crashlytics.android.Crashlytics;
 import com.mapbox.mapboxgl.annotations.Marker;
 import com.mapbox.mapboxgl.annotations.MarkerOptions;
@@ -37,10 +36,8 @@ import com.mapzen.android.lost.api.LocationListener;
 import com.mapzen.android.lost.api.LocationRequest;
 import com.mapzen.android.lost.api.LocationServices;
 import com.mapzen.android.lost.api.LostApiClient;
-
 import io.fabric.sdk.android.Fabric;
 import org.json.JSONException;
-
 import java.io.IOException;
 import java.util.ArrayList;
 
@@ -58,7 +55,8 @@ public class MainActivity extends ActionBarActivity {
     //
 
     // Used for the UI
-    private MapFragment mMapFragment;
+//    private MapFragment mMapFragment;
+    private MapView mapView;
     private TextView mFpsTextView;
     private ImageView mCompassView;
     private FrameLayout mMapFrameLayout;
@@ -112,9 +110,9 @@ public class MainActivity extends ActionBarActivity {
 
         // Load the layout
         setContentView(R.layout.activity_main);
-        mMapFragment = (MapFragment) getSupportFragmentManager().findFragmentById(R.id.fragment_map);
-        mMapFragment.getMap().setOnFpsChangedListener(new MyOnFpsChangedListener());
-        mMapFragment.getMap().setOnMapChangedListener(new MyOnMapChangedListener());
+        mapView = (MapView) findViewById(R.id.mainMapView);
+        mapView.setOnFpsChangedListener(new MyOnFpsChangedListener());
+        mapView.setOnMapChangedListener(new MyOnMapChangedListener());
 
         mFpsTextView = (TextView) findViewById(R.id.view_fps);
         mFpsTextView.setText("");
@@ -159,6 +157,16 @@ public class MainActivity extends ActionBarActivity {
         mSensorAccelerometer = mSensorManager.getDefaultSensor(Sensor.TYPE_ACCELEROMETER);
         mSensorMagneticField = mSensorManager.getDefaultSensor(Sensor.TYPE_MAGNETIC_FIELD);
         mCompassListener = new CompassListener();
+    }
+
+    /**
+     * Dispatch onStart() to all fragments.  Ensure any created loaders are
+     * now started.
+     */
+    @Override
+    protected void onStart() {
+        super.onStart();
+        mapView.onStart();
     }
 
     // Called when our app goes into the background
@@ -217,10 +225,10 @@ public class MainActivity extends ActionBarActivity {
 
             case R.id.action_debug:
                 // Toggle debug mode
-                mMapFragment.getMap().toggleDebug();
+                mapView.toggleDebug();
 
                 // Show the FPS counter
-                if (mMapFragment.getMap().isDebugActive()) {
+                if (mapView.isDebugActive()) {
                     mFpsTextView.setVisibility(View.VISIBLE);
                     mFpsTextView.setText(getResources().getString(R.string.label_fps));
                 } else {
@@ -294,7 +302,7 @@ public class MainActivity extends ActionBarActivity {
 
     private void addMarkers() {
         LatLng backLot = new LatLng(38.649441, -121.369064);
-        MapView map = mMapFragment.getMap();
+        MapView map = mapView;
         marker = map.addMarker(new MarkerOptions()
             .position(backLot)
             .title("Back Lot")
@@ -312,7 +320,7 @@ public class MainActivity extends ActionBarActivity {
         try {
             String geojsonStr = Util.loadStringFromAssets(this, "small_line.geojson");
             LatLng[] latLngs = Util.parseGeoJSONCoordinates(geojsonStr);
-            MapView map = mMapFragment.getMap();
+            MapView map = mapView;
             Polyline line = map.addPolyline(new PolylineOptions()
                     .add(latLngs)
                     .width(2)
@@ -329,7 +337,7 @@ public class MainActivity extends ActionBarActivity {
         try {
             geojsonStr = Util.loadStringFromAssets(this, "small_poly.geojson");
             LatLng[] latLngs = Util.parseGeoJSONCoordinates(geojsonStr);
-            MapView map = mMapFragment.getMap();
+            MapView map = mapView;
             ArrayList<PolygonOptions> opts = new ArrayList<PolygonOptions>();
             opts.add(new PolygonOptions()
                         .add(latLngs)
@@ -344,7 +352,7 @@ public class MainActivity extends ActionBarActivity {
     }
 
     private void removeAnnotations() {
-        mMapFragment.getMap().removeAnnotations();
+        mapView.removeAnnotations();
     }
 
     // This class forwards location updates to updateLocation()
@@ -417,8 +425,8 @@ public class MainActivity extends ActionBarActivity {
 
                 // Mapbox Streets
                 case 0:
-                    mMapFragment.getMap().setStyleUrl("asset://styles/mapbox-streets-v7.json");
-                    mMapFragment.getMap().removeAllClasses();
+                    mapView.setStyleUrl("asset://styles/mapbox-streets-v7.json");
+                    mapView.removeAllClasses();
                     mClassSpinner.setVisibility(View.INVISIBLE);
                     mClassSpinner.setAdapter(null);
                     mClassSpinner.setOnItemSelectedListener(null);
@@ -426,8 +434,8 @@ public class MainActivity extends ActionBarActivity {
 
                 // Emerald
                 case 1:
-                    mMapFragment.getMap().setStyleUrl("asset://styles/emerald-v7.json");
-                    mMapFragment.getMap().removeAllClasses();
+                    mapView.setStyleUrl("asset://styles/emerald-v7.json");
+                    mapView.removeAllClasses();
                     mClassSpinner.setVisibility(View.INVISIBLE);
                     mClassSpinner.setAdapter(null);
                     mClassSpinner.setOnItemSelectedListener(null);
@@ -435,8 +443,8 @@ public class MainActivity extends ActionBarActivity {
 
                 // Light
                 case 2:
-                    mMapFragment.getMap().setStyleUrl("asset://styles/light-v7.json");
-                    mMapFragment.getMap().removeAllClasses();
+                    mapView.setStyleUrl("asset://styles/light-v7.json");
+                    mapView.removeAllClasses();
                     mClassSpinner.setVisibility(View.INVISIBLE);
                     mClassSpinner.setAdapter(null);
                     mClassSpinner.setOnItemSelectedListener(null);
@@ -444,8 +452,8 @@ public class MainActivity extends ActionBarActivity {
 
                 // Dark
                 case 3:
-                    mMapFragment.getMap().setStyleUrl("asset://styles/dark-v7.json");
-                    mMapFragment.getMap().removeAllClasses();
+                    mapView.setStyleUrl("asset://styles/dark-v7.json");
+                    mapView.removeAllClasses();
                     mClassSpinner.setVisibility(View.INVISIBLE);
                     mClassSpinner.setAdapter(null);
                     mClassSpinner.setOnItemSelectedListener(null);
@@ -453,8 +461,8 @@ public class MainActivity extends ActionBarActivity {
 
                 // Outdoors
                 case 4:
-                    mMapFragment.getMap().setStyleUrl("asset://styles/outdoors-v7.json");
-                    mMapFragment.getMap().removeAllClasses();
+                    mapView.setStyleUrl("asset://styles/outdoors-v7.json");
+                    mapView.removeAllClasses();
                     mClassSpinner.setVisibility(View.VISIBLE);
                     mClassSpinner.setAdapter(mOutdoorsClassAdapter);
                     mClassSpinner.setOnItemSelectedListener(new OutdoorClassSpinnerListener());
@@ -468,7 +476,7 @@ public class MainActivity extends ActionBarActivity {
 
         @Override
         public void onNothingSelected(AdapterView<?> parent) {
-            mMapFragment.getMap().setStyleUrl("");
+            mapView.setStyleUrl("");
         }
     }
 
@@ -483,13 +491,13 @@ public class MainActivity extends ActionBarActivity {
                 // Day
                 case 0:
                     classes.add("day");
-                    mMapFragment.getMap().setClasses(classes);
+                    mapView.setClasses(classes);
                     break;
 
                 // Night
                 case 1:
                     classes.add("night");
-                    mMapFragment.getMap().setClasses(classes);
+                    mapView.setClasses(classes);
                     break;
 
                 default:
@@ -500,7 +508,7 @@ public class MainActivity extends ActionBarActivity {
 
         @Override
         public void onNothingSelected(AdapterView<?> parent) {
-            mMapFragment.getMap().removeAllClasses();
+            mapView.removeAllClasses();
         }
     }
 
@@ -516,18 +524,18 @@ public class MainActivity extends ActionBarActivity {
                 case 0:
                     classes.add("labels");
                     classes.add("contours");
-                    mMapFragment.getMap().setClasses(classes);
+                    mapView.setClasses(classes);
                     break;
 
                 // Labels Only
                 case 1:
                     classes.add("labels");
-                    mMapFragment.getMap().setClasses(classes);
+                    mapView.setClasses(classes);
                     break;
 
                 // No Labels
                 case 2:
-                    mMapFragment.getMap().setClasses(classes);
+                    mapView.setClasses(classes);
                     break;
 
                 default:
@@ -538,7 +546,7 @@ public class MainActivity extends ActionBarActivity {
 
         @Override
         public void onNothingSelected(AdapterView<?> parent) {
-            mMapFragment.getMap().removeAllClasses();
+            mapView.removeAllClasses();
         }
     }
 
@@ -562,12 +570,12 @@ public class MainActivity extends ActionBarActivity {
 
     // Updates the UI to match the current map's position
     private void updateMap() {
-        rotateImageView(mCompassView, (float) mMapFragment.getMap().getDirection());
+        rotateImageView(mCompassView, (float) mapView.getDirection());
 
         if (mGpsLocation != null) {
             mGpsMarker.setVisibility(View.VISIBLE);
             LatLng coordinate = new LatLng(mGpsLocation);
-            PointF screenLocation = mMapFragment.getMap().toScreenLocation(coordinate);
+            PointF screenLocation = mapView.toScreenLocation(coordinate);
 
             if (mGpsLocation.hasBearing() || mCompassValid) {
                 mGpsMarker.setImageResource(R.drawable.direction_arrow);
@@ -606,7 +614,7 @@ public class MainActivity extends ActionBarActivity {
 
         @Override
         public void onClick(View view) {
-            mMapFragment.getMap().resetNorth();
+            mapView.resetNorth();
         }
     }
 }

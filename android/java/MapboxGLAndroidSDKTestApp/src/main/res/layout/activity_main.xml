@@ -1,5 +1,7 @@
 <?xml version="1.0" encoding="utf-8"?>
-<LinearLayout xmlns:android="http://schemas.android.com/apk/res/android" xmlns:tools="http://schemas.android.com/tools"
+<LinearLayout
+    xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:mapbox="http://schemas.android.com/apk/res-auto"
     android:layout_width="match_parent"
     android:layout_height="match_parent"
     android:orientation="vertical">
@@ -29,6 +31,7 @@
         android:layout_height="fill_parent"
         android:orientation="vertical">
 
+<!--
         <fragment
             android:name="com.mapbox.mapboxgl.testapp.MapFragment"
             android:id="@+id/fragment_map"
@@ -36,6 +39,13 @@
             android:layout_height="match_parent"
             tools:context="${packageName}.${activityClass}"
             tools:layout="@layout/fragment_main" />
+-->
+
+        <com.mapbox.mapboxgl.views.MapView
+            android:id="@+id/mainMapView"
+            android:layout_width="match_parent"
+            android:layout_height="match_parent"
+            mapbox:accessToken=""/>
 
         <ImageView
             android:id="@+id/view_compass"
