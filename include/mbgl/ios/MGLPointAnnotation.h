@@ -11,7 +11,7 @@ NS_ASSUME_NONNULL_BEGIN
 /** The coordinate point of the annotation, specified as a latitude and longitude. */
 @property (nonatomic, assign) CLLocationCoordinate2D coordinate;
 
-@property (nonatomic, readonly, copy, nullable) NSString *text;
+@property (nonatomic, copy, nullable) NSString *text;
 
 @end
 
