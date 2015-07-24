@@ -49,7 +49,7 @@ Painter::~Painter() {
 }
 
 bool Painter::needsAnimation() const {
-    return frameHistory.needsAnimation(data.getDefaultFadeDuration()) || state.isChanging();
+    return frameHistory.needsAnimation(data.getDefaultFadeDuration());
 }
 
 void Painter::setup() {

@@ -336,7 +336,10 @@ void GLFWView::run() {
         const bool dirty = !clean.test_and_set();
         if (dirty) {
             const bool needsRerender = map->renderSync();
-            map->nudgeTransitions(needsRerender);
+            GLFWView *view = reinterpret_cast<GLFWView *>(glfwGetWindowUserPointer(window));
+            if (!view->tracking || !view->rotating) {
+                map->nudgeTransitions(needsRerender);
+            }
         }
     }
 }

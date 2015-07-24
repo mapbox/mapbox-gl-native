@@ -707,6 +707,12 @@ std::chrono::steady_clock::duration secondsAsDuration(float duration)
 
         [self updateUserLocationAnnotationView];
 
+        // don't nudge transitions if in the midst of a gesture.
+        if (self.pan.state       == UIGestureRecognizerStateChanged ||
+            self.pinch.state     == UIGestureRecognizerStateChanged ||
+            self.rotate.state    == UIGestureRecognizerStateChanged ||
+            self.quickZoom.state == UIGestureRecognizerStateChanged) return;
+
         _mbglMap->nudgeTransitions(needsRerender);
     }
 }
