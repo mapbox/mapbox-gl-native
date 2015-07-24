@@ -101,7 +101,8 @@ step "Copying Resources..."
 cp -pv LICENSE.md "${OUTPUT}/static"
 mkdir -p "${OUTPUT}/static/${NAME}.bundle"
 cp -pv platform/ios/resources/* "${OUTPUT}/static/${NAME}.bundle"
-cp -prv styles/styles "${OUTPUT}/static/${NAME}.bundle/styles"
+mkdir -p "${OUTPUT}/static/${NAME}.bundle/styles"
+cp -pv styles/styles/{dark,emerald,light,mapbox-streets,satellite}-v7.json "${OUTPUT}/static/${NAME}.bundle/styles"
 
 step "Creating API Docs..."
 if [ -z `which appledoc` ]; then

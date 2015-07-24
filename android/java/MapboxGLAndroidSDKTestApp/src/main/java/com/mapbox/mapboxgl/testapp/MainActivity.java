@@ -24,6 +24,7 @@ import android.widget.ImageView;
 import android.widget.Spinner;
 import android.widget.TextView;
 
+import com.crashlytics.android.Crashlytics;
 import com.mapbox.mapboxgl.annotations.Marker;
 import com.mapbox.mapboxgl.annotations.MarkerOptions;
 import com.mapbox.mapboxgl.annotations.Polygon;
@@ -37,6 +38,7 @@ import com.mapzen.android.lost.api.LocationRequest;
 import com.mapzen.android.lost.api.LocationServices;
 import com.mapzen.android.lost.api.LostApiClient;
 
+import io.fabric.sdk.android.Fabric;
 import org.json.JSONException;
 
 import java.io.IOException;
@@ -100,6 +102,7 @@ public class MainActivity extends ActionBarActivity {
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
+        Fabric.with(this, new Crashlytics());
 
         if (savedInstanceState != null) {
             mIsGpsOn = savedInstanceState.getBoolean(STATE_IS_GPS_ON, false);
@@ -327,10 +330,12 @@ public class MainActivity extends ActionBarActivity {
             geojsonStr = Util.loadStringFromAssets(this, "small_poly.geojson");
             LatLng[] latLngs = Util.parseGeoJSONCoordinates(geojsonStr);
             MapView map = mMapFragment.getMap();
-            Polygon polygon = map.addPolygon(new PolygonOptions()
-                    .add(latLngs)
-                    .strokeColor(Color.MAGENTA)
-                    .fillColor(Color.BLUE));
+            ArrayList<PolygonOptions> opts = new ArrayList<PolygonOptions>();
+            opts.add(new PolygonOptions()
+                        .add(latLngs)
+                        .strokeColor(Color.MAGENTA)
+                        .fillColor(Color.BLUE));
+            Polygon polygon = map.addPolygons(opts).get(0);
         } catch (IOException e) {
             e.printStackTrace();
         } catch (JSONException e) {

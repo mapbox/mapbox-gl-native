@@ -49,17 +49,6 @@ public class Marker extends Annotation {
         return anchorV;
     }
 
-    /**
-     * NOTE: Google Maps Android API uses String for IDs.
-     *
-     * Internal C++ id is stored as unsigned int.
-     *
-     * @return the annotation id
-     */
-    public long getId() {
-        return id;
-    }
-
     public LatLng getPosition() {
         return position;
     }
