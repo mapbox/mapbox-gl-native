@@ -13,7 +13,8 @@
         './points.geojson',
         './polyline.geojson',
         './threestates.geojson',
-        './Settings.bundle/'
+        './Settings.bundle/',
+        './app-info.plist'
       ],
 
       'dependencies': [
