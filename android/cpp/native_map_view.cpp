@@ -15,6 +15,7 @@
 #include <mbgl/platform/event.hpp>
 #include <mbgl/platform/log.hpp>
 #include <mbgl/platform/gl.hpp>
+#include <mbgl/util/constants.hpp>
 
 namespace mbgl {
 namespace android {
@@ -52,9 +53,11 @@ void log_gl_string(GLenum name, const char *label) {
     }
 }
 
-NativeMapView::NativeMapView(JNIEnv *env, jobject obj_, float pixelRatio_)
+NativeMapView::NativeMapView(JNIEnv *env, jobject obj_, float pixelRatio_, int availableProcessors_, size_t totalMemory_)
     : mbgl::View(*this),
       pixelRatio(pixelRatio_),
+      availableProcessors(availableProcessors_),
+      totalMemory(totalMemory_),
       fileCache(mbgl::android::cachePath + "/mbgl-cache.db"),
       fileSource(&fileCache),
       map(*this, fileSource, MapMode::Continuous) {
@@ -763,6 +766,16 @@ void NativeMapView::onInvalidate(bool inProgress) {
 
     const bool dirty = !clean.test_and_set();
     if (dirty) {
+        float zoomFactor   = map.getMaxZoom() - map.getMinZoom() + 1;
+        float cpuFactor    = availableProcessors;
+        float memoryFactor = static_cast<float>(totalMemory) / 1000.0f / 1000.0f / 1000.0f;
+        float sizeFactor   = (static_cast<float>(map.getWidth())  / mbgl::util::tileSize) *
+                             (static_cast<float>(map.getHeight()) / mbgl::util::tileSize);
+
+        size_t cacheSize = zoomFactor * cpuFactor * memoryFactor * sizeFactor * 0.5f;
+
+        map.setSourceTileCacheSize(cacheSize);
+
         const bool needsRerender = map.renderSync();
         if (!inProgress) {
             map.nudgeTransitions(needsRerender);

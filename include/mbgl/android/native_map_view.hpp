@@ -17,7 +17,7 @@ namespace android {
 
 class NativeMapView : public mbgl::View, private mbgl::util::noncopyable {
 public:
-    NativeMapView(JNIEnv *env, jobject obj, float pixelRatio);
+    NativeMapView(JNIEnv *env, jobject obj, float pixelRatio, int availableProcessors, size_t totalMemory);
     virtual ~NativeMapView();
 
     float getPixelRatio() const override;
@@ -84,6 +84,9 @@ private:
     int fbWidth = 0;
     int fbHeight = 0;
     const float pixelRatio;
+
+    int availableProcessors = 0;
+    size_t totalMemory = 0;
 
     // Ensure these are initialised last
     mbgl::SQLiteCache fileCache;

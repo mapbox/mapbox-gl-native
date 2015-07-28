@@ -1,6 +1,7 @@
 package com.mapbox.mapboxgl.views;
 
 import android.annotation.TargetApi;
+import android.app.ActivityManager;
 import android.content.BroadcastReceiver;
 import android.content.Context;
 import android.content.Intent;
@@ -66,7 +67,7 @@ public class MapView extends SurfaceView {
     private static final String STATE_DEBUG_ACTIVE = "debugActive";
     private static final String STATE_STYLE_URL = "styleUrl";
     private static final String STATE_ACCESS_TOKEN = "accessToken";
-    private static final String STATE_CLASSES = "classes";
+    private static final String STATE_STYLE_CLASSES = "styleClasses";
     private static final String STATE_DEFAULT_TRANSITION_DURATION = "defaultTransitionDuration";
 
     /**
@@ -156,7 +157,12 @@ public class MapView extends SurfaceView {
         String apkPath = context.getPackageCodePath();
 
         // Create the NativeMapView
-        mNativeMapView = new NativeMapView(this, cachePath, dataPath, apkPath, mScreenDensity);
+        int availableProcessors = Runtime.getRuntime().availableProcessors();
+        ActivityManager.MemoryInfo memoryInfo = new ActivityManager.MemoryInfo();
+        ActivityManager activityManager = (ActivityManager) context.getSystemService(Context.ACTIVITY_SERVICE);
+        activityManager.getMemoryInfo(memoryInfo);
+        long totalMemory = memoryInfo.totalMem;
+        mNativeMapView = new NativeMapView(this, cachePath, dataPath, apkPath, mScreenDensity,availableProcessors, totalMemory);
 
         // Load the attributes
         TypedArray typedArray = context.obtainStyledAttributes(attrs, R.styleable.MapView, 0, 0);
@@ -227,7 +233,7 @@ public class MapView extends SurfaceView {
         if(bitmap.getConfig() != Bitmap.Config.ARGB_8888) {
             bitmap = bitmap.copy(Bitmap.Config.ARGB_8888, false);
         }
-        ByteBuffer buffer = ByteBuffer.allocate(bitmap.getByteCount());
+        ByteBuffer buffer = ByteBuffer.allocate(bitmap.getRowBytes() * bitmap.getHeight());
         bitmap.copyPixelsToBuffer(buffer);
 
         mNativeMapView.setSprite(symbol, bitmap.getWidth(), bitmap.getHeight(), scale, buffer.array());
@@ -398,15 +404,21 @@ public class MapView extends SurfaceView {
     }
 
     public boolean isDebugActive() {
-        return mNativeMapView.getDebug();
+        return mNativeMapView.getDebug() || mNativeMapView.getCollisionDebug();
     }
 
     public void setDebugActive(boolean debugActive) {
         mNativeMapView.setDebug(debugActive);
+        mNativeMapView.setCollisionDebug(debugActive);
     }
 
     public void toggleDebug() {
         mNativeMapView.toggleDebug();
+        mNativeMapView.toggleCollisionDebug();
+    }
+
+    public boolean isFullyLoaded() {
+        return mNativeMapView.isFullyLoaded();
     }
 
     private void validateStyleUrl(String url) {
@@ -442,39 +454,39 @@ public class MapView extends SurfaceView {
         return mNativeMapView.getAccessToken();
     }
 
-    public List<String> getClasses() {
+    public List<String> getStyleClasses() {
         return mNativeMapView.getClasses();
     }
 
-    public void setClasses(List<String> classes) {
-        setClasses(classes, 0);
+    public void setStyleClasses(List<String> styleClasses) {
+        setStyleClasses(styleClasses, 0);
     }
 
-    public void setClasses(List<String> classes, long transitionDuration) {
+    public void setStyleClasses(List<String> styleClasses, long transitionDuration) {
         mNativeMapView.setDefaultTransitionDuration(transitionDuration);
-        mNativeMapView.setClasses(classes);
+        mNativeMapView.setClasses(styleClasses);
     }
 
-    public void addClass(String clazz) {
-        mNativeMapView.addClass(clazz);
+    public void addStyleClass(String styleClass) {
+        mNativeMapView.addClass(styleClass);
     }
 
-    public void removeClass(String clazz) {
-        mNativeMapView.removeClass(clazz);
+    public void removeStyleClass(String styleClass) {
+        mNativeMapView.removeClass(styleClass);
     }
 
-    public boolean hasClass(String clazz) {
-        return mNativeMapView.hasClass(clazz);
+    public boolean hasStyleClass(String styleClass) {
+        return mNativeMapView.hasClass(styleClass);
     }
 
-    public void removeAllClasses() {
-        removeAllClasses(0);
+    public void removeAllStyleClasses() {
+        removeAllStyleClasses(0);
     }
 
-    public void removeAllClasses(long transitionDuration) {
+    public void removeAllStyleClasses(long transitionDuration) {
         mNativeMapView.setDefaultTransitionDuration(transitionDuration);
-        ArrayList<String> classes = new ArrayList<>(0);
-        setClasses(classes);
+        ArrayList<String> styleClasses = new ArrayList<>(0);
+        setStyleClasses(styleClasses);
     }
 
     public LatLng fromScreenLocation(PointF point) {
@@ -503,9 +515,9 @@ public class MapView extends SurfaceView {
             setDebugActive(savedInstanceState.getBoolean(STATE_DEBUG_ACTIVE));
             setStyleUrl(savedInstanceState.getString(STATE_STYLE_URL));
             setAccessToken(savedInstanceState.getString(STATE_ACCESS_TOKEN));
-            List<String> appliedClasses = savedInstanceState.getStringArrayList(STATE_CLASSES);
-            if (!appliedClasses.isEmpty()) {
-                setClasses(appliedClasses);
+            List<String> appliedStyleClasses = savedInstanceState.getStringArrayList(STATE_STYLE_CLASSES);
+            if (!appliedStyleClasses.isEmpty()) {
+                setStyleClasses(appliedStyleClasses);
             }
             mNativeMapView.setDefaultTransitionDuration(savedInstanceState.getLong(STATE_DEFAULT_TRANSITION_DURATION));
         }
@@ -526,7 +538,7 @@ public class MapView extends SurfaceView {
         outState.putBoolean(STATE_DEBUG_ACTIVE, isDebugActive());
         outState.putString(STATE_STYLE_URL, mStyleUrl);
         outState.putString(STATE_ACCESS_TOKEN, getAccessToken());
-        outState.putStringArrayList(STATE_CLASSES, new ArrayList<>(getClasses()));
+        outState.putStringArrayList(STATE_STYLE_CLASSES, new ArrayList<>(getStyleClasses()));
         outState.putLong(STATE_DEFAULT_TRANSITION_DURATION, mNativeMapView.getDefaultTransitionDuration());
     }
 
@@ -632,6 +644,12 @@ public class MapView extends SurfaceView {
                 && mZoomEnabled) {
             mZoomButtonsController.setVisible(true);
         }
+    }
+
+    // Called when the system is running low on memory
+    // Must be called from Activity onLowMemory
+    public void onLowMemory() {
+        mNativeMapView.onLowMemory();
     }
 
     //

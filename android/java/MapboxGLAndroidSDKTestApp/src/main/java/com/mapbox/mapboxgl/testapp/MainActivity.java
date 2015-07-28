@@ -226,6 +226,14 @@ public class MainActivity extends ActionBarActivity {
         outState.putBoolean(STATE_IS_GPS_ON, mIsGpsOn);
     }
 
+    // Called when the system is running low on memory
+    @Override
+    public void onLowMemory() {
+        super.onLowMemory();
+
+        mapView.onLowMemory();
+    }
+
     //
     // Other events
     //
@@ -457,7 +465,7 @@ public class MainActivity extends ActionBarActivity {
                 // Mapbox Streets
                 case 0:
                     mapView.setStyleUrl("asset://styles/mapbox-streets-v7.json");
-                    mapView.removeAllClasses();
+                    mapView.removeAllStyleClasses();
                     mClassSpinner.setVisibility(View.INVISIBLE);
                     mClassSpinner.setAdapter(null);
                     mClassSpinner.setOnItemSelectedListener(null);
@@ -466,7 +474,7 @@ public class MainActivity extends ActionBarActivity {
                 // Emerald
                 case 1:
                     mapView.setStyleUrl("asset://styles/emerald-v7.json");
-                    mapView.removeAllClasses();
+                    mapView.removeAllStyleClasses();
                     mClassSpinner.setVisibility(View.INVISIBLE);
                     mClassSpinner.setAdapter(null);
                     mClassSpinner.setOnItemSelectedListener(null);
@@ -475,7 +483,7 @@ public class MainActivity extends ActionBarActivity {
                 // Light
                 case 2:
                     mapView.setStyleUrl("asset://styles/light-v7.json");
-                    mapView.removeAllClasses();
+                    mapView.removeAllStyleClasses();
                     mClassSpinner.setVisibility(View.INVISIBLE);
                     mClassSpinner.setAdapter(null);
                     mClassSpinner.setOnItemSelectedListener(null);
@@ -484,7 +492,7 @@ public class MainActivity extends ActionBarActivity {
                 // Dark
                 case 3:
                     mapView.setStyleUrl("asset://styles/dark-v7.json");
-                    mapView.removeAllClasses();
+                    mapView.removeAllStyleClasses();
                     mClassSpinner.setVisibility(View.INVISIBLE);
                     mClassSpinner.setAdapter(null);
                     mClassSpinner.setOnItemSelectedListener(null);
@@ -493,7 +501,7 @@ public class MainActivity extends ActionBarActivity {
                 // Outdoors
                 case 4:
                     mapView.setStyleUrl("asset://styles/outdoors-v7.json");
-                    mapView.removeAllClasses();
+                    mapView.removeAllStyleClasses();
                     mClassSpinner.setVisibility(View.VISIBLE);
                     mClassSpinner.setAdapter(mOutdoorsClassAdapter);
                     mClassSpinner.setOnItemSelectedListener(new OutdoorClassSpinnerListener());
@@ -516,19 +524,19 @@ public class MainActivity extends ActionBarActivity {
 
         @Override
         public void onItemSelected(AdapterView<?> parent, View view, int position, long id) {
-            ArrayList<String> classes = new ArrayList<>(1);
+            ArrayList<String> styleClasses = new ArrayList<>(1);
 
             switch (position) {
                 // Day
                 case 0:
-                    classes.add("day");
-                    mapView.setClasses(classes);
+                    styleClasses.add("day");
+                    mapView.setStyleClasses(styleClasses);
                     break;
 
                 // Night
                 case 1:
-                    classes.add("night");
-                    mapView.setClasses(classes);
+                    styleClasses.add("night");
+                    mapView.setStyleClasses(styleClasses);
                     break;
 
                 default:
@@ -539,7 +547,7 @@ public class MainActivity extends ActionBarActivity {
 
         @Override
         public void onNothingSelected(AdapterView<?> parent) {
-            mapView.removeAllClasses();
+            mapView.removeAllStyleClasses();
         }
     }
 
@@ -548,25 +556,25 @@ public class MainActivity extends ActionBarActivity {
 
         @Override
         public void onItemSelected(AdapterView<?> parent, View view, int position, long id) {
-            ArrayList<String> classes = new ArrayList<>(2);
+            ArrayList<String> styleClasses = new ArrayList<>(2);
 
             switch (position) {
                 // Labels + Contours
                 case 0:
-                    classes.add("labels");
-                    classes.add("contours");
-                    mapView.setClasses(classes);
+                    styleClasses.add("labels");
+                    styleClasses.add("contours");
+                    mapView.setStyleClasses(styleClasses);
                     break;
 
                 // Labels Only
                 case 1:
-                    classes.add("labels");
-                    mapView.setClasses(classes);
+                    styleClasses.add("labels");
+                    mapView.setStyleClasses(styleClasses);
                     break;
 
                 // No Labels
                 case 2:
-                    mapView.setClasses(classes);
+                    mapView.setStyleClasses(styleClasses);
                     break;
 
                 default:
@@ -577,7 +585,7 @@ public class MainActivity extends ActionBarActivity {
 
         @Override
         public void onNothingSelected(AdapterView<?> parent) {
-            mapView.removeAllClasses();
+            mapView.removeAllStyleClasses();
         }
     }
 

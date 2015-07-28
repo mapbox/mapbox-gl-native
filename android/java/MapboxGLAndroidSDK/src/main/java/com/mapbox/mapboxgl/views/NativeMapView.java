@@ -41,11 +41,19 @@ class NativeMapView {
     // Constructors
     //
 
-    public NativeMapView(MapView mapView, String cachePath, String dataPath, String apkPath, float pixelRatio) {
+    public NativeMapView(MapView mapView, String cachePath, String dataPath, String apkPath, float pixelRatio, int availableProcessors, long totalMemory) {
+        if (availableProcessors < 0) {
+            throw new IllegalArgumentException("availableProcessors cannot be negative.");
+        }
+
+        if (totalMemory < 0) {
+            throw new IllegalArgumentException("totalMemory cannot be negative.");
+        }
+
         mMapView = mapView;
 
         // Create the NativeMapView
-        mNativeMapViewPtr = nativeCreate(cachePath, dataPath, apkPath, pixelRatio);
+        mNativeMapViewPtr = nativeCreate(cachePath, dataPath, apkPath, pixelRatio, availableProcessors, totalMemory);
     }
 
     //
@@ -165,7 +173,7 @@ class NativeMapView {
     public void setDefaultTransitionDuration(long milliseconds) {
         if (milliseconds < 0) {
             throw new IllegalArgumentException(
-                    "durationMilliseconds cannot be negative.");
+                    "milliseconds cannot be negative.");
         }
 
         nativeSetDefaultTransitionDuration(mNativeMapViewPtr,
@@ -348,6 +356,10 @@ class NativeMapView {
         nativeResetNorth(mNativeMapViewPtr);
     }
 
+    public void onLowMemory() {
+        nativeOnLowMemory(mNativeMapViewPtr);
+    }
+
     public void setDebug(boolean debug) {
         nativeSetDebug(mNativeMapViewPtr, debug);
     }
@@ -358,6 +370,22 @@ class NativeMapView {
 
     public boolean getDebug() {
         return nativeGetDebug(mNativeMapViewPtr);
+    }
+
+    public void setCollisionDebug(boolean debug) {
+        nativeSetCollisionDebug(mNativeMapViewPtr, debug);
+    }
+
+    public void toggleCollisionDebug() {
+        nativeToggleCollisionDebug(mNativeMapViewPtr);
+    }
+
+    public boolean getCollisionDebug() {
+        return nativeGetCollisionDebug(mNativeMapViewPtr);
+    }
+
+    public boolean isFullyLoaded() {
+        return nativeIsFullyLoaded(mNativeMapViewPtr);
     }
 
     public void setReachability(boolean status) {
@@ -415,7 +443,7 @@ class NativeMapView {
         super.finalize();
     }
 
-    private native long nativeCreate(String cachePath, String dataPath, String apkPath, float pixelRatio);
+    private native long nativeCreate(String cachePath, String dataPath, String apkPath, float pixelRatio, int availableProcessors, long totalMemory);
 
     private native void nativeDestroy(long nativeMapViewPtr);
 
@@ -535,11 +563,21 @@ class NativeMapView {
 
     private native void nativeResetNorth(long nativeMapViewPtr);
 
+    private native void nativeOnLowMemory(long nativeMapViewPtr);
+
     private native void nativeSetDebug(long nativeMapViewPtr, boolean debug);
 
     private native void nativeToggleDebug(long nativeMapViewPtr);
 
     private native boolean nativeGetDebug(long nativeMapViewPtr);
+
+    private native void nativeSetCollisionDebug(long nativeMapViewPtr, boolean debug);
+
+    private native void nativeToggleCollisionDebug(long nativeMapViewPtr);
+
+    private native boolean nativeGetCollisionDebug(long nativeMapViewPtr);
+
+    private native boolean nativeIsFullyLoaded(long nativeMapViewPtr);
 
     private native void nativeSetReachability(long nativeMapViewPtr, boolean status);
 
