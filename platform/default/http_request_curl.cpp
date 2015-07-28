@@ -35,7 +35,7 @@ void handleError(CURLcode code) {
 
 namespace mbgl {
 
-class HTTPRequest;
+class HTTPCURLRequest;
 
 class HTTPCURLContext : public HTTPContext {
     MBGL_STORE_THREAD(tid)
@@ -44,7 +44,7 @@ public:
     explicit HTTPCURLContext(uv_loop_t *loop);
     ~HTTPCURLContext();
 
-    RequestBase* createRequest(const Resource&,
+    HTTPRequestBase* createRequest(const Resource&,
                                RequestBase::Callback,
                                uv_loop_t*,
                                std::shared_ptr<const Response>) override;
@@ -79,19 +79,19 @@ public:
     std::queue<CURL *> handles;
 };
 
-class HTTPRequest : public RequestBase {
+class HTTPCURLRequest : public HTTPRequestBase {
     MBGL_STORE_THREAD(tid)
 
 public:
-    HTTPRequest(HTTPCURLContext*,
+    HTTPCURLRequest(HTTPCURLContext*,
                 const Resource&,
                 Callback,
                 uv_loop_t*,
                 std::shared_ptr<const Response>);
-    ~HTTPRequest();
+    ~HTTPCURLRequest();
 
-    void cancel() override;
-    void retry() override;
+    void cancel() final;
+    void retry() final;
 
     void handleResult(CURLcode code);
 
@@ -99,7 +99,7 @@ private:
     static size_t headerCallback(char *const buffer, const size_t size, const size_t nmemb, void *userp);
     static size_t writeCallback(void *const contents, const size_t size, const size_t nmemb, void *userp);
 
-    void retry(uint64_t timeout);
+    void retry(uint64_t timeout) final;
 #if UV_VERSION_MAJOR == 0 && UV_VERSION_MINOR <= 10
     static void restart(uv_timer_t *timer, int);
 #else
@@ -109,7 +109,6 @@ private:
     void start();
 
     HTTPCURLContext *context = nullptr;
-    bool cancelled = false;
 
     // Will store the current response.
     std::unique_ptr<Response> response;
@@ -203,11 +202,11 @@ HTTPCURLContext::~HTTPCURLContext() {
     uv::close(timeout);
 }
 
-RequestBase* HTTPCURLContext::createRequest(const Resource& resource,
+HTTPRequestBase* HTTPCURLContext::createRequest(const Resource& resource,
                                             RequestBase::Callback callback,
                                             uv_loop_t* loop_,
                                             std::shared_ptr<const Response> response) {
-    return new HTTPRequest(this, resource, callback, loop_, response);
+    return new HTTPCURLRequest(this, resource, callback, loop_, response);
 }
 
 CURL *HTTPCURLContext::getHandle() {
@@ -233,7 +232,7 @@ void HTTPCURLContext::checkMultiInfo() {
     while ((message = curl_multi_info_read(multi, &pending))) {
         switch (message->msg) {
         case CURLMSG_DONE: {
-            HTTPRequest *baton = nullptr;
+            HTTPCURLRequest *baton = nullptr;
             curl_easy_getinfo(message->easy_handle, CURLINFO_PRIVATE, (char *)&baton);
             assert(baton);
             baton->handleResult(message->data.result);
@@ -428,8 +427,8 @@ static CURLcode sslctx_function(CURL * /* curl */, void *sslctx, void * /* parm 
 }
 #endif
 
-HTTPRequest::HTTPRequest(HTTPCURLContext* context_, const Resource& resource_, Callback callback_, uv_loop_t*, std::shared_ptr<const Response> response_)
-    : RequestBase(resource_, callback_),
+HTTPCURLRequest::HTTPCURLRequest(HTTPCURLContext* context_, const Resource& resource_, Callback callback_, uv_loop_t*, std::shared_ptr<const Response> response_)
+    : HTTPRequestBase(resource_, callback_),
       context(context_),
       existingResponse(response_),
       handle(context->getHandle()) {
@@ -476,7 +475,7 @@ HTTPRequest::HTTPRequest(HTTPCURLContext* context_, const Resource& resource_, C
     start();
 }
 
-HTTPRequest::~HTTPRequest() {
+HTTPCURLRequest::~HTTPCURLRequest() {
     MBGL_VERIFY_THREAD(tid);
 
     context->removeRequest(this);
@@ -498,11 +497,11 @@ HTTPRequest::~HTTPRequest() {
     }
 }
 
-void HTTPRequest::cancel() {
+void HTTPCURLRequest::cancel() {
    delete this;
 }
 
-void HTTPRequest::start() {
+void HTTPCURLRequest::start() {
     // Count up the attempts.
     attempts++;
 
@@ -512,9 +511,9 @@ void HTTPRequest::start() {
 
 // This function is called when we have new data for a request. We just append it to the string
 // containing the previous data.
-size_t HTTPRequest::writeCallback(void *const contents, const size_t size, const size_t nmemb, void *userp) {
+size_t HTTPCURLRequest::writeCallback(void *const contents, const size_t size, const size_t nmemb, void *userp) {
     assert(userp);
-    auto impl = reinterpret_cast<HTTPRequest *>(userp);
+    auto impl = reinterpret_cast<HTTPCURLRequest *>(userp);
     MBGL_VERIFY_THREAD(impl->tid);
 
     if (!impl->response) {
@@ -556,9 +555,9 @@ int64_t parseCacheControl(const char *value) {
     return 0;
 }
 
-size_t HTTPRequest::headerCallback(char *const buffer, const size_t size, const size_t nmemb, void *userp) {
+size_t HTTPCURLRequest::headerCallback(char *const buffer, const size_t size, const size_t nmemb, void *userp) {
     assert(userp);
-    auto baton = reinterpret_cast<HTTPRequest *>(userp);
+    auto baton = reinterpret_cast<HTTPCURLRequest *>(userp);
     MBGL_VERIFY_THREAD(baton->tid);
 
     if (!baton->response) {
@@ -585,7 +584,7 @@ size_t HTTPRequest::headerCallback(char *const buffer, const size_t size, const 
     return length;
 }
 
-void HTTPRequest::retry(uint64_t timeout) {
+void HTTPCURLRequest::retry(uint64_t timeout) {
     handleError(curl_multi_remove_handle(context->multi, handle));
 
     response.reset();
@@ -597,7 +596,7 @@ void HTTPRequest::retry(uint64_t timeout) {
     uv_timer_start(timer, restart, timeout, 0);
 }
 
-void HTTPRequest::retry() {
+void HTTPCURLRequest::retry() {
     // All batons get notified when the network status changed, but some of them
     // might not actually wait for the network to become available again.
     if (timer && strategy == PreemptImmediately) {
@@ -608,12 +607,12 @@ void HTTPRequest::retry() {
 }
 
 #if UV_VERSION_MAJOR == 0 && UV_VERSION_MINOR <= 10
-void HTTPRequest::restart(uv_timer_t *timer, int) {
+void HTTPCURLRequest::restart(uv_timer_t *timer, int) {
 #else
-void HTTPRequest::restart(uv_timer_t *timer) {
+void HTTPCURLRequest::restart(uv_timer_t *timer) {
 #endif
     // Restart the request.
-    auto baton = reinterpret_cast<HTTPRequest *>(timer->data);
+    auto baton = reinterpret_cast<HTTPCURLRequest *>(timer->data);
 
     // Get rid of the timer.
     baton->timer = nullptr;
@@ -622,7 +621,7 @@ void HTTPRequest::restart(uv_timer_t *timer) {
     baton->start();
 }
 
-void HTTPRequest::finish(ResponseStatus status) {
+void HTTPCURLRequest::finish(ResponseStatus status) {
     if (status == ResponseStatus::TemporaryError && attempts < maxAttempts) {
         strategy = ExponentialBackoff;
         return retry((1 << (attempts - 1)) * 1000);
@@ -643,7 +642,7 @@ void HTTPRequest::finish(ResponseStatus status) {
     delete this;
 }
 
-void HTTPRequest::handleResult(CURLcode code) {
+void HTTPCURLRequest::handleResult(CURLcode code) {
     MBGL_VERIFY_THREAD(tid);
 
     if (cancelled) {

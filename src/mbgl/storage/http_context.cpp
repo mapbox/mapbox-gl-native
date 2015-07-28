@@ -13,11 +13,11 @@ HTTPContext::~HTTPContext() {
     NetworkStatus::Unsubscribe(reachability.get());
 }
 
-void HTTPContext::addRequest(RequestBase* request) {
+void HTTPContext::addRequest(HTTPRequestBase* request) {
     requests.insert(request);
 }
 
-void HTTPContext::removeRequest(RequestBase* request) {
+void HTTPContext::removeRequest(HTTPRequestBase* request) {
     requests.erase(request);
 }
 

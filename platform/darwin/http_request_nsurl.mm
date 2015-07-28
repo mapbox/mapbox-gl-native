@@ -15,23 +15,23 @@ namespace mbgl {
 
 class HTTPNSURLContext;
 
-class HTTPRequest : public RequestBase {
+class HTTPNSURLRequest : public HTTPRequestBase {
 public:
-    HTTPRequest(HTTPNSURLContext*,
+    HTTPNSURLRequest(HTTPNSURLContext*,
                 const Resource&,
                 Callback,
                 uv_loop_t*,
                 std::shared_ptr<const Response>);
-    ~HTTPRequest();
+    ~HTTPNSURLRequest();
 
-    void cancel() override;
-    void retry() override;
+    void cancel() final;
+    void retry() final;
 
 private:
     void start();
     void handleResult(NSData *data, NSURLResponse *res, NSError *error);
     void handleResponse();
-    void retry(uint64_t timeout);
+    void retry(uint64_t timeout) final;
 
     HTTPNSURLContext *context = nullptr;
     bool cancelled = false;
@@ -54,7 +54,7 @@ public:
     HTTPNSURLContext(uv_loop_t *loop);
     ~HTTPNSURLContext();
 
-    RequestBase* createRequest(const Resource&,
+    HTTPRequestBase* createRequest(const Resource&,
                                RequestBase::Callback,
                                uv_loop_t*,
                                std::shared_ptr<const Response>) override;
@@ -91,17 +91,17 @@ HTTPNSURLContext::~HTTPNSURLContext() {
     userAgent = nullptr;
 }
 
-RequestBase* HTTPNSURLContext::createRequest(const Resource& resource,
+HTTPRequestBase* HTTPNSURLContext::createRequest(const Resource& resource,
                                              RequestBase::Callback callback,
                                              uv_loop_t* loop,
                                              std::shared_ptr<const Response> response) {
-    return new HTTPRequest(this, resource, callback, loop, response);
+    return new HTTPNSURLRequest(this, resource, callback, loop, response);
 }
 
 // -------------------------------------------------------------------------------------------------
 
-HTTPRequest::HTTPRequest(HTTPNSURLContext* context_, const Resource& resource_, Callback callback_, uv_loop_t *loop, std::shared_ptr<const Response> existingResponse_)
-    : RequestBase(resource_, callback_),
+HTTPNSURLRequest::HTTPNSURLRequest(HTTPNSURLContext* context_, const Resource& resource_, Callback callback_, uv_loop_t *loop, std::shared_ptr<const Response> existingResponse_)
+    : HTTPRequestBase(resource_, callback_),
       context(context_),
       existingResponse(existingResponse_),
       async(loop, [this] { handleResponse(); }),
@@ -110,7 +110,7 @@ HTTPRequest::HTTPRequest(HTTPNSURLContext* context_, const Resource& resource_, 
     start();
 }
 
-HTTPRequest::~HTTPRequest() {
+HTTPNSURLRequest::~HTTPNSURLRequest() {
     assert(!task);
 
     // Stop the backoff timer to avoid re-triggering this request.
@@ -119,7 +119,7 @@ HTTPRequest::~HTTPRequest() {
     context->removeRequest(this);
 }
 
-void HTTPRequest::start() {
+void HTTPNSURLRequest::start() {
     assert(!task);
 
     attempts++;
@@ -154,7 +154,7 @@ void HTTPRequest::start() {
     }
 }
 
-void HTTPRequest::handleResponse() {
+void HTTPNSURLRequest::handleResponse() {
     if (task) {
         [task release];
         task = nullptr;
@@ -182,7 +182,7 @@ void HTTPRequest::handleResponse() {
     delete this;
 }
 
-void HTTPRequest::cancel() {
+void HTTPNSURLRequest::cancel() {
     context->removeRequest(this);
     cancelled = true;
 
@@ -213,7 +213,7 @@ int64_t parseCacheControl(const char *value) {
     return 0;
 }
 
-void HTTPRequest::handleResult(NSData *data, NSURLResponse *res, NSError *error) {
+void HTTPNSURLRequest::handleResult(NSData *data, NSURLResponse *res, NSError *error) {
     if (error) {
         if ([error code] == NSURLErrorCancelled) {
             status = ResponseStatus::Canceled;
@@ -316,14 +316,14 @@ void HTTPRequest::handleResult(NSData *data, NSURLResponse *res, NSError *error)
     async.send();
 }
 
-void HTTPRequest::retry(uint64_t timeout) {
+void HTTPNSURLRequest::retry(uint64_t timeout) {
     response.reset();
 
     timer.stop();
     timer.start(timeout, 0, [this] { start(); });
 }
 
-void HTTPRequest::retry() {
+void HTTPNSURLRequest::retry() {
     // All batons get notified when the network status changed, but some of them
     // might not actually wait for the network to become available again.
     if (strategy == PreemptImmediately) {

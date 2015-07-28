@@ -1,5 +1,5 @@
-#ifndef MBGL_STORAGE_REQUEST
-#define MBGL_STORAGE_REQUEST
+#ifndef MBGL_STORAGE_REQUEST_BASE
+#define MBGL_STORAGE_REQUEST_BASE
 
 #include <mbgl/util/noncopyable.hpp>
 #include <mbgl/storage/file_cache.hpp>
@@ -23,13 +23,12 @@ public:
 
     virtual ~RequestBase() = default;
     virtual void cancel() = 0;
-    virtual void retry() {};
 
 protected:
     Resource resource;
     Callback notify;
 };
 
-}
+} // namespace mbgl
 
-#endif
+#endif // MBGL_STORAGE_REQUEST_BASE

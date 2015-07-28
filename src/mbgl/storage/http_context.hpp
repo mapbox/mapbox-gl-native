@@ -2,6 +2,7 @@
 #define MBGL_STORAGE_DEFAULT_HTTP_CONTEXT
 
 #include <mbgl/storage/request_base.hpp>
+#include <mbgl/storage/http_request_base.hpp>
 #include <mbgl/storage/network_status.hpp>
 #include <mbgl/util/uv_detail.hpp>
 
@@ -16,13 +17,13 @@ public:
     HTTPContext(uv_loop_t*);
     virtual ~HTTPContext();
 
-    virtual RequestBase* createRequest(const Resource&,
+    virtual HTTPRequestBase* createRequest(const Resource&,
                                        RequestBase::Callback,
                                        uv_loop_t*,
                                        std::shared_ptr<const Response>) = 0;
 
-    void addRequest(RequestBase*);
-    void removeRequest(RequestBase*);
+    void addRequest(HTTPRequestBase*);
+    void removeRequest(HTTPRequestBase*);
 
 private:
     void retryRequests();
@@ -32,7 +33,7 @@ private:
 
     // A list of all pending HTTPRequestImpls that we need to notify when the network status
     // changes.
-    std::set<RequestBase*> requests;
+    std::set<HTTPRequestBase*> requests;
 };
 
 }

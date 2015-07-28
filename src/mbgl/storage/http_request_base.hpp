@@ -1,6 +1,8 @@
 #ifndef MBGL_STORAGE_HTTP_REQUEST_BASE
 #define MBGL_STORAGE_HTTP_REQUEST_BASE
 
+#include <mbgl/storage/request_base.hpp>
+
 namespace mbgl {
 
 enum class ResponseStatus : uint8_t {
@@ -29,6 +31,22 @@ enum class ResponseStatus : uint8_t {
 
     // The request confirmed that the data wasn't changed. We already have the data.
     NotModified,
+};
+
+class HTTPRequestBase : public RequestBase {
+public:
+    HTTPRequestBase(const Resource& resource_, Callback notify_)
+        : RequestBase(resource_, notify_)
+        , cancelled(false) {
+    }
+
+    virtual ~HTTPRequestBase() = default;
+    virtual void cancel() override { cancelled = true; };
+    virtual void retry(uint64_t timeout) = 0;
+    virtual void retry() = 0;
+
+protected:
+    bool cancelled;
 };
 
 } // namespace mbgl
