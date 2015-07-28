@@ -1,4 +1,4 @@
-#include <mbgl/storage/http_context.hpp>
+#include <mbgl/storage/http_context_base.hpp>
 #include <mbgl/storage/http_request_base.hpp>
 #include <mbgl/storage/resource.hpp>
 #include <mbgl/storage/response.hpp>
@@ -37,7 +37,7 @@ namespace mbgl {
 
 class HTTPCURLRequest;
 
-class HTTPCURLContext : public HTTPContext {
+class HTTPCURLContext : public HTTPContextBase {
     MBGL_STORE_THREAD(tid)
 
 public:
@@ -167,7 +167,7 @@ private:
 // -------------------------------------------------------------------------------------------------
 
 HTTPCURLContext::HTTPCURLContext(uv_loop_t *loop_)
-    : HTTPContext(loop_),
+    : HTTPContextBase(loop_),
       loop(loop_) {
     if (curl_global_init(CURL_GLOBAL_ALL)) {
         throw std::runtime_error("Could not init cURL");
@@ -713,7 +713,7 @@ void HTTPCURLRequest::handleResult(CURLcode code) {
     throw std::runtime_error("Response hasn't been handled");
 }
 
-std::unique_ptr<HTTPContext> HTTPContext::createContext(uv_loop_t* loop) {
+std::unique_ptr<HTTPContextBase> HTTPContextBase::createContext(uv_loop_t* loop) {
     return std::make_unique<HTTPCURLContext>(loop);
 }
 

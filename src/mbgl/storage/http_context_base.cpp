@@ -1,27 +1,27 @@
-#include <mbgl/storage/http_context.hpp>
+#include <mbgl/storage/http_context_base.hpp>
 
 namespace mbgl {
 
-HTTPContext::HTTPContext(uv_loop_t* loop_)
+HTTPContextBase::HTTPContextBase(uv_loop_t* loop_)
     : reachability(loop_, [this] { retryRequests(); }) {
     NetworkStatus::Subscribe(reachability.get());
     reachability.unref();
 }
 
-HTTPContext::~HTTPContext() {
+HTTPContextBase::~HTTPContextBase() {
     assert(requests.empty());
     NetworkStatus::Unsubscribe(reachability.get());
 }
 
-void HTTPContext::addRequest(HTTPRequestBase* request) {
+void HTTPContextBase::addRequest(HTTPRequestBase* request) {
     requests.insert(request);
 }
 
-void HTTPContext::removeRequest(HTTPRequestBase* request) {
+void HTTPContextBase::removeRequest(HTTPRequestBase* request) {
     requests.erase(request);
 }
 
-void HTTPContext::retryRequests() {
+void HTTPContextBase::retryRequests() {
     for (auto request : requests) {
         request->retry();
     }

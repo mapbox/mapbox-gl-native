@@ -3,7 +3,7 @@
 
 #include <mbgl/storage/default_file_source.hpp>
 #include <mbgl/storage/asset_context.hpp>
-#include <mbgl/storage/http_context.hpp>
+#include <mbgl/storage/http_context_base.hpp>
 
 #include <set>
 #include <unordered_map>
@@ -48,7 +48,7 @@ private:
     FileCache* cache = nullptr;
     const std::string assetRoot;
     std::unique_ptr<AssetContext> assetContext;
-    std::unique_ptr<HTTPContext> httpContext;
+    std::unique_ptr<HTTPContextBase> httpContext;
 };
 
 }

@@ -1,7 +1,7 @@
 #include <mbgl/storage/default_file_source_impl.hpp>
 #include <mbgl/storage/request.hpp>
 #include <mbgl/storage/asset_context.hpp>
-#include <mbgl/storage/http_context.hpp>
+#include <mbgl/storage/http_context_base.hpp>
 
 #include <mbgl/storage/response.hpp>
 #include <mbgl/platform/platform.hpp>
@@ -76,7 +76,7 @@ DefaultFileSource::Impl::Impl(FileCache* cache_, const std::string& root)
       cache(cache_),
       assetRoot(root.empty() ? platform::assetRoot() : root),
       assetContext(AssetContext::createContext(loop)),
-      httpContext(HTTPContext::createContext(loop)) {
+      httpContext(HTTPContextBase::createContext(loop)) {
 }
 
 DefaultFileRequest* DefaultFileSource::Impl::find(const Resource& resource) {

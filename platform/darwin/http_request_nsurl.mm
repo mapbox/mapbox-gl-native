@@ -1,4 +1,4 @@
-#include <mbgl/storage/http_context.hpp>
+#include <mbgl/storage/http_context_base.hpp>
 #include <mbgl/storage/http_request_base.hpp>
 #include <mbgl/storage/resource.hpp>
 #include <mbgl/storage/response.hpp>
@@ -49,7 +49,7 @@ private:
 
 // -------------------------------------------------------------------------------------------------
 
-class HTTPNSURLContext : public HTTPContext {
+class HTTPNSURLContext : public HTTPContextBase {
 public:
     HTTPNSURLContext(uv_loop_t *loop);
     ~HTTPNSURLContext();
@@ -64,7 +64,7 @@ public:
     NSInteger accountType = 0;
 };
 
-HTTPNSURLContext::HTTPNSURLContext(uv_loop_t *loop_) : HTTPContext(loop_) {
+HTTPNSURLContext::HTTPNSURLContext(uv_loop_t *loop_) : HTTPContextBase(loop_) {
     @autoreleasepool {
         NSURLSessionConfiguration *sessionConfig =
                 [NSURLSessionConfiguration defaultSessionConfiguration];
@@ -333,7 +333,7 @@ void HTTPNSURLRequest::retry() {
     }
 }
 
-std::unique_ptr<HTTPContext> HTTPContext::createContext(uv_loop_t* loop) {
+std::unique_ptr<HTTPContextBase> HTTPContextBase::createContext(uv_loop_t* loop) {
     return std::make_unique<HTTPNSURLContext>(loop);
 }
 

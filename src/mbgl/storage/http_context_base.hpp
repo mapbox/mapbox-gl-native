@@ -1,5 +1,5 @@
-#ifndef MBGL_STORAGE_DEFAULT_HTTP_CONTEXT
-#define MBGL_STORAGE_DEFAULT_HTTP_CONTEXT
+#ifndef MBGL_STORAGE_HTTP_CONTEXT_BASE
+#define MBGL_STORAGE_HTTP_CONTEXT_BASE
 
 #include <mbgl/storage/request_base.hpp>
 #include <mbgl/storage/http_request_base.hpp>
@@ -10,12 +10,12 @@
 
 namespace mbgl {
 
-class HTTPContext {
+class HTTPContextBase {
 public:
-    static std::unique_ptr<HTTPContext> createContext(uv_loop_t*);
+    static std::unique_ptr<HTTPContextBase> createContext(uv_loop_t*);
 
-    HTTPContext(uv_loop_t*);
-    virtual ~HTTPContext();
+    HTTPContextBase(uv_loop_t*);
+    virtual ~HTTPContextBase();
 
     virtual HTTPRequestBase* createRequest(const Resource&,
                                        RequestBase::Callback,
@@ -36,6 +36,6 @@ private:
     std::set<HTTPRequestBase*> requests;
 };
 
-}
+} // namespace mbgl
 
-#endif
+#endif // MBGL_STORAGE_HTTP_CONTEXT_BASE
