@@ -1,4 +1,4 @@
-#include <mbgl/storage/asset_context.hpp>
+#include <mbgl/storage/asset_context_base.hpp>
 #include <mbgl/storage/resource.hpp>
 #include <mbgl/storage/response.hpp>
 #include <mbgl/util/util.hpp>
@@ -36,7 +36,7 @@ public:
     std::unique_ptr<Response> response;
 };
 
-class AssetFSContext : public AssetContext {
+class AssetFSContext : public AssetContextBase {
     RequestBase* createRequest(const Resource& resource,
                                RequestBase::Callback callback,
                                uv_loop_t* loop,
@@ -206,7 +206,7 @@ void AssetRequest::cancel() {
     uv_cancel((uv_req_t *)&req);
 }
 
-std::unique_ptr<AssetContext> AssetContext::createContext(uv_loop_t*) {
+std::unique_ptr<AssetContextBase> AssetContextBase::createContext(uv_loop_t*) {
     return std::make_unique<AssetFSContext>();
 }
 
