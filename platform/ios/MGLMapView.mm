@@ -106,6 +106,7 @@ CLLocationDegrees MGLDegreesFromRadians(CGFloat radians)
     mbgl::Map *_mbglMap;
     MBGLView *_mbglView;
     mbgl::DefaultFileSource *_mbglFileSource;
+    BOOL _isWaitingForRedundantReachableNotification;
     
     NS_MUTABLE_ARRAY_OF(NSURL *) *_bundledStyleURLs;
 
@@ -244,6 +245,10 @@ std::chrono::steady_clock::duration secondsAsDuration(float duration)
                                                object:nil];
 
     MGLReachability* reachability = [MGLReachability reachabilityForInternetConnection];
+    if ([reachability isReachable])
+    {
+        _isWaitingForRedundantReachableNotification = YES;
+    }
     [reachability startNotifier];
 
     // setup annotations
@@ -415,9 +420,11 @@ std::chrono::steady_clock::duration secondsAsDuration(float duration)
 - (void)reachabilityChanged:(NSNotification *)notification
 {
     MGLReachability *reachability = [notification object];
-    if ([reachability isReachable]) {
+    if ( ! _isWaitingForRedundantReachableNotification && [reachability isReachable])
+    {
         mbgl::NetworkStatus::Reachable();
     }
+    _isWaitingForRedundantReachableNotification = NO;
 }
 
 - (void)dealloc
