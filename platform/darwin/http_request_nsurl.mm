@@ -57,7 +57,7 @@ public:
     HTTPRequestBase* createRequest(const Resource&,
                                RequestBase::Callback,
                                uv_loop_t*,
-                               std::shared_ptr<const Response>) override;
+                               std::shared_ptr<const Response>) final;
 
     NSURLSession *session = nil;
     NSString *userAgent = nil;

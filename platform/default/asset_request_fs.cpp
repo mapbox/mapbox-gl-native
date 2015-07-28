@@ -19,7 +19,7 @@ public:
     AssetRequest(const Resource&, Callback, uv_loop_t*, const std::string& assetRoot);
     ~AssetRequest();
 
-    void cancel() override;
+    void cancel() final;
 
     static void fileOpened(uv_fs_t *req);
     static void fileStated(uv_fs_t *req);
@@ -40,7 +40,7 @@ class AssetFSContext : public AssetContext {
     RequestBase* createRequest(const Resource& resource,
                                RequestBase::Callback callback,
                                uv_loop_t* loop,
-                               const std::string& assetRoot) override {
+                               const std::string& assetRoot) final {
         return new AssetRequest(resource, callback, loop, assetRoot);
     }
 };

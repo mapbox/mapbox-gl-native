@@ -23,7 +23,7 @@ public:
     RequestBase* createRequest(const Resource& resource,
                                RequestBase::Callback callback,
                                uv_loop_t* loop,
-                               const std::string& assetRoot) override;
+                               const std::string& assetRoot) final;
 
     uv_zip_t *getHandle(const std::string &path);
     void returnHandle(const std::string &path, uv_zip_t *zip);
@@ -71,7 +71,7 @@ public:
     AssetRequest(AssetZipContext&, const Resource&, Callback, const std::string& assetRoot);
     ~AssetRequest();
 
-    void cancel() override;
+    void cancel() final;
 
 private:
     AssetZipContext &context;
