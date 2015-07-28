@@ -30,7 +30,7 @@ repositories {
 dependencies {
     compile 'commons-validator:commons-validator:1.4.1'
     compile 'com.android.support:support-annotations:22.1.1'
-    compile 'com.android.support:support-v4:22.1.1'
+    compile 'com.android.support:support-v4:22.2.1'
     compile 'com.squareup.okhttp:okhttp:2.3.0'
 }
 

@@ -60,7 +60,6 @@ public class MainActivity extends ActionBarActivity {
     //
 
     // Used for the UI
-//    private MapFragment mMapFragment;
     private MapView mapView;
     private TextView mFpsTextView;
     private ImageView mCompassView;
@@ -226,7 +225,6 @@ public class MainActivity extends ActionBarActivity {
         mapView.onSaveInstanceState(outState);
         outState.putBoolean(STATE_IS_GPS_ON, mIsGpsOn);
     }
-
 
     //
     // Other events
