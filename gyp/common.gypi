@@ -20,6 +20,7 @@
             '-Wno-variadic-macros',
             '-frtti',
             '-fexceptions',
+            '${CFLAGS}',
           ],
           'GCC_WARN_PEDANTIC': 'YES',
           'GCC_WARN_UNINITIALIZED_AUTOS': 'YES_AGGRESSIVE',
@@ -37,6 +38,7 @@
           '-Wno-c++1y-extensions',
           '-frtti',
           '-fexceptions',
+          '${CFLAGS}',
         ],
       }],
       ['OS=="linux"', {
