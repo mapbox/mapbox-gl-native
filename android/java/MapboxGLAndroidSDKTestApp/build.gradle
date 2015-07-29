@@ -82,11 +82,11 @@ dependencies {
     compile(project(':MapboxGLAndroidSDK')) {
         transitive = true
     }
-    compile 'com.android.support:support-annotations:22.1.1'
+    compile 'com.android.support:support-annotations:22.2.1'
     compile 'com.android.support:support-v4:22.2.1'
     compile 'com.android.support:appcompat-v7:22.2.1'
     compile 'com.mapzen.android:lost:1.0.0'
-    compile('com.crashlytics.sdk.android:crashlytics:2.4.0@aar') {
+    compile('com.crashlytics.sdk.android:crashlytics:2.5.0@aar') {
         transitive = true;
     }
 }
