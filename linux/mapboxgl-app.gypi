@@ -29,6 +29,7 @@
 
       'variables' : {
         'cflags_cc': [
+          '<@(opengl_cflags)',
           '<@(boost_cflags)',
           '<@(glfw3_cflags)',
         ],
