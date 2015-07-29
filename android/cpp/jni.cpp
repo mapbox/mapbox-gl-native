@@ -336,9 +336,8 @@ void JNICALL nativeDestroy(JNIEnv *env, jobject obj, jlong nativeMapViewPtr) {
 void JNICALL nativeSurfaceCreated(JNIEnv *env, jobject obj, jlong nativeMapViewPtr) {
     mbgl::Log::Debug(mbgl::Event::JNI, "nativeSurfaceCreated");
     assert(nativeMapViewPtr != 0);
-    //NativeMapView *nativeMapView = reinterpret_cast<NativeMapView *>(nativeMapViewPtr);
-    // TODO
-    //nativeMapView->surfaceCreated();
+    NativeMapView *nativeMapView = reinterpret_cast<NativeMapView *>(nativeMapViewPtr);
+    nativeMapView->surfaceCreated();
 }
 
 void JNICALL nativeSurfaceChanged(JNIEnv *env, jobject obj, jlong nativeMapViewPtr, jint width, jint height) {
@@ -348,17 +347,15 @@ void JNICALL nativeSurfaceChanged(JNIEnv *env, jobject obj, jlong nativeMapViewP
     assert(height >= 0);
     assert(width <= UINT16_MAX);
     assert(height <= UINT16_MAX);
-    //NativeMapView *nativeMapView = reinterpret_cast<NativeMapView *>(nativeMapViewPtr);
-    // TODO
-    //nativeMapView->surfaceChanged(width, height);
+    NativeMapView *nativeMapView = reinterpret_cast<NativeMapView *>(nativeMapViewPtr);
+    nativeMapView->surfaceChanged(width, height);
 }
 
-void JNICALL nativeDrawFrame(JNIEnv *env, jobject obj, jlong nativeMapViewPtr) {
+void JNICALL nativeDrawFrame(JNIEnv *env, jobject obj, jlong nativeMapViewPtr, jboolean inProgress) {
     mbgl::Log::Debug(mbgl::Event::JNI, "nativeDrawFrame");
     assert(nativeMapViewPtr != 0);
-    //NativeMapView *nativeMapView = reinterpret_cast<NativeMapView *>(nativeMapViewPtr);
-    // TODO
-    //nativeMapView->drawFrame();
+    NativeMapView *nativeMapView = reinterpret_cast<NativeMapView *>(nativeMapViewPtr);
+    nativeMapView->drawFrame(inProgress);
 }
 
 void JNICALL nativeAddClass(JNIEnv *env, jobject obj, jlong nativeMapViewPtr, jstring clazz) {
@@ -1354,7 +1351,7 @@ extern "C" JNIEXPORT jint JNICALL JNI_OnLoad(JavaVM *vm, void *reserved) {
         {"nativeSurfaceChanged", "(JII)V",
          reinterpret_cast<void *>(static_cast<void JNICALL (
              *)(JNIEnv *, jobject, jlong, jint, jint)>(&nativeSurfaceChanged))},
-        {"nativeDrawFrame", "(J)V", reinterpret_cast<void *>(&nativeDrawFrame)},
+        {"nativeDrawFrame", "(JZ)V", reinterpret_cast<void *>(&nativeDrawFrame)},
         {"nativeAddClass", "(JLjava/lang/String;)V",
          reinterpret_cast<void *>(&nativeAddClass)},
         {"nativeRemoveClass", "(JLjava/lang/String;)V",

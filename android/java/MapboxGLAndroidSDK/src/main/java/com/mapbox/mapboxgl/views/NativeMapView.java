@@ -85,8 +85,8 @@ class NativeMapView {
         nativeSurfaceChanged(mNativeMapViewPtr, width, height);
     }
 
-    public void drawFrame() {
-        nativeDrawFrame(mNativeMapViewPtr);
+    public void drawFrame(boolean inProgress) {
+        nativeDrawFrame(mNativeMapViewPtr, inProgress);
     }
 
     public void addClass(String clazz) {
@@ -395,7 +395,7 @@ class NativeMapView {
 
     private native void nativeSurfaceChanged(long nativeMapViewPtr, int width, int height);
 
-    private native void nativeDrawFrame(long nativeMapViewPtr);
+    private native void nativeDrawFrame(long nativeMapViewPtr, boolean inProgress);
 
     private native void nativeAddClass(long nativeMapViewPtr, String clazz);
 

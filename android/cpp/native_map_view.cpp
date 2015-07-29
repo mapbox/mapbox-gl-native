@@ -301,7 +301,6 @@ void NativeMapView::updateFps() {
     env = nullptr;
 }
 
-// TODO
 void NativeMapView::drawFrame(bool inProgress) {
     mbgl::Log::Debug(mbgl::Event::Android, "NativeMapView::drawFrame()");
 
@@ -323,20 +322,12 @@ void NativeMapView::drawFrame(bool inProgress) {
 }
 
 void NativeMapView::surfaceChanged(int w, int h) {
-    // TODO pixel ratio fb size?
-    width = w;
-    height = h;
-    map.update(mbgl::Update::Dimensions);
-}
-
-// TODO remove all fb?
-/*
-void NativeMapView::resizeFramebuffer(int w, int h) {
+    width = w / pixelRatio;
+    height = h / pixelRatio;
     fbWidth = w;
     fbHeight = h;
     map.update(mbgl::Update::Repaint);
 }
-*/
 
 }
 }
