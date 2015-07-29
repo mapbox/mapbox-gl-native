@@ -1360,6 +1360,12 @@ public class MapView extends FrameLayout implements LocationListener {
     /**
      * Defines callback for events OnMapChange
      */
+    // Called when the map needs to be rerendered
+    // Called via JNI from NativeMapView
+    protected void onInvalidate() {
+        mSurfaceView.requestRender();
+    }
+    
     public interface OnMapChangedListener {
         void onMapChanged();
     }
