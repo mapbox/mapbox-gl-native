@@ -29,9 +29,8 @@
 
 namespace mbgl {
 
-MapContext::MapContext(View& view_, FileSource& fileSource, MapData& data_)
-    : view(view_),
-      data(data_),
+MapContext::MapContext(FileSource& fileSource, MapData& data_)
+    : data(data_),
       updated(static_cast<UpdateType>(Update::Nothing)),
       asyncUpdate(std::make_unique<uv::async>(util::RunLoop::getLoop(), [this] { update(); })),
       texturePool(std::make_unique<TexturePool>()) {
@@ -41,13 +40,16 @@ MapContext::MapContext(View& view_, FileSource& fileSource, MapData& data_)
     util::ThreadContext::setGLObjectStore(&glObjectStore);
 
     asyncUpdate->unref();
-
-    view.activate();
 }
 
 MapContext::~MapContext() {
     // Make sure we call cleanup() before deleting this object.
     assert(!style);
+}
+
+void MapContext::setView(const View& view_) {
+    view(view_);
+    view.activate();
 }
 
 void MapContext::cleanup() {
