@@ -470,7 +470,11 @@ HTTPCURLRequest::HTTPCURLRequest(HTTPCURLContext* context_, const Resource& reso
     handleError(curl_easy_setopt(handle, CURLOPT_WRITEDATA, this));
     handleError(curl_easy_setopt(handle, CURLOPT_HEADERFUNCTION, headerCallback));
     handleError(curl_easy_setopt(handle, CURLOPT_HEADERDATA, this));
+#if LIBCURL_VERSION_NUM >= ((7) << 16 | (21) << 8 | 6) // Renamed in 7.21.6
     handleError(curl_easy_setopt(handle, CURLOPT_ACCEPT_ENCODING, "gzip, deflate"));
+#else
+    handleError(curl_easy_setopt(handle, CURLOPT_ENCODING, "gzip, deflate"));
+#endif
     handleError(curl_easy_setopt(handle, CURLOPT_USERAGENT, "MapboxGL/1.0"));
     handleError(curl_easy_setopt(handle, CURLOPT_SHARE, context->share));
 
