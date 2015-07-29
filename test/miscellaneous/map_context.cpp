@@ -15,8 +15,9 @@ TEST(MapContext, DoubleStyleLoad) {
     DefaultFileSource fileSource(nullptr);
     MapData data(MapMode::Continuous, view.getPixelRatio());
 
-    util::Thread<MapContext> context({"Map", util::ThreadType::Map, util::ThreadPriority::Regular}, view, fileSource, data);
+    util::Thread<MapContext> context({"Map", util::ThreadType::Map, util::ThreadPriority::Regular}, fileSource, data);
 
+    context.invokeSync(&MapContext::setView, &view);
     context.invokeSync(&MapContext::setStyleJSON, "", "");
     context.invokeSync(&MapContext::setStyleJSON, "", "");
     context.invokeSync(&MapContext::cleanup);

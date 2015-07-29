@@ -20,15 +20,17 @@
 
 namespace mbgl {
 
-HeadlessView::HeadlessView(float pixelRatio_, uint16_t width, uint16_t height)
+HeadlessView::HeadlessView(uint16_t width,
+                           uint16_t height,
+                           float pixelRatio_)
     : display(std::make_shared<HeadlessDisplay>()), pixelRatio(pixelRatio_) {
     resize(width, height);
 }
 
 HeadlessView::HeadlessView(std::shared_ptr<HeadlessDisplay> display_,
-                           float pixelRatio_,
                            uint16_t width,
-                           uint16_t height)
+                           uint16_t height,
+                           float pixelRatio_)
     : display(display_), pixelRatio(pixelRatio_) {
     resize(width, height);
 }
