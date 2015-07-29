@@ -47,9 +47,9 @@ MapContext::~MapContext() {
     assert(!style);
 }
 
-void MapContext::setView(const View& view_) {
-    view(view_);
-    view.activate();
+void MapContext::setView(View& view_) {
+    view = &view_;
+    view->activate();
 }
 
 void MapContext::cleanup() {
