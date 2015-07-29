@@ -34,8 +34,6 @@ import android.util.AttributeSet;
 import android.view.InputDevice;
 import android.view.KeyEvent;
 import android.view.MotionEvent;
-import android.view.SurfaceHolder;
-import android.view.SurfaceView;
 import android.view.View;
 import android.view.ViewConfiguration;
 import android.widget.FrameLayout;
@@ -584,8 +582,7 @@ public class MapView extends FrameLayout implements LocationListener {
             mNativeMapView.setDefaultTransitionDuration(savedInstanceState.getLong(STATE_DEFAULT_TRANSITION_DURATION));
         }
 
-        mNativeMapView.initializeDisplay();
-        mNativeMapView.initializeContext();
+        // TODO create
 
         addOnMapChangedListener(new OnMapChangedListener() {
             @Override
@@ -614,8 +611,7 @@ public class MapView extends FrameLayout implements LocationListener {
     // Called when we need to clean up
     // Must be called from Activity onDestroy
     public void onDestroy() {
-        mNativeMapView.terminateContext();
-        mNativeMapView.terminateDisplay();
+        // TODO destroy
     }
 
     // Called when we need to create the GL context
@@ -636,7 +632,7 @@ public class MapView extends FrameLayout implements LocationListener {
         getContext().unregisterReceiver(mConnectivityReceiver);
         mConnectivityReceiver = null;
 
-        mNativeMapView.pause();
+        // TODO pause -> super?
     }
 
     // Called when we need to start the render thread
@@ -647,11 +643,11 @@ public class MapView extends FrameLayout implements LocationListener {
         mConnectivityReceiver = new ConnectivityReceiver();
         mContext.registerReceiver(mConnectivityReceiver, new IntentFilter(ConnectivityManager.CONNECTIVITY_ACTION));
 
-        mNativeMapView.resume();
+        // TODO resume -> super?
     }
 
     public void onSizeChanged(int width, int height, int oldw, int oldh) {
-        mNativeMapView.resizeView((int)(width / mScreenDensity), (int)(height / mScreenDensity));
+        // TODO resizeView?
     }
 
     // This class handles GLSurfaceView callbacks
@@ -661,7 +657,7 @@ public class MapView extends FrameLayout implements LocationListener {
         // Must do all GL ES initialization here
         @Override
         public void onSurfaceCreated(GL10 gl, EGLConfig config) {
-            // TODO call createSurface
+            mNativeMapView.surfaceCreated();
         }
 
         // Called when the format or size of the surface buffer has been
@@ -669,14 +665,17 @@ public class MapView extends FrameLayout implements LocationListener {
         // Must handle window resizing here
         @Override
         public void onSurfaceChanged(GL10 gl, int width, int height) {
-            // TODO call resizeFramebuffer
+            mNativeMapView.surfaceChanged(width, height);
+            // TODO handling
         }
 
         // Called when we need to render a new frame to the surface buffer
         // Must do all GL ES rendering commands here
         @Override
         public void onDrawFrame(GL10 gl) {
-            // TODO call Map::renderSync
+            // TODO inProgress
+            boolean inProgress = mRotateGestureDetector.isInProgress() || mScaleGestureDetector.isInProgress();
+            mNativeMapView.drawFrame();
         }
     }
 
@@ -1338,18 +1337,6 @@ public class MapView extends FrameLayout implements LocationListener {
     //
     // Map events
     //
-
-    // Called when the map needs to be rerendered
-    // Called via JNI from NativeMapView
-    protected void onInvalidate() {
-        post(new Runnable() {
-            @Override
-            public void run() {
-                mNativeMapView.invalidate();
-            }
-        });
-    }
-
 
     /**
      * Defines callback for events OnMapChange
