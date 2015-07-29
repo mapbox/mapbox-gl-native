@@ -44,30 +44,30 @@ void Map::resume() {
 }
 
 void Map::setView(View& view_) {
-    view = view_;
-    transform = std::make_unique<Transform>(view);
-    context->invokeSync(&MapContext::setView, view);
+    view = &view_;
+    transform = std::make_unique<Transform>(*view);
+    context->invokeSync(&MapContext::setView, *view);
 
-    view.initialize(this);
+    view->initialize(this);
     update(Update::Dimensions);
 }
 
 void Map::renderStill(StillImageCallback callback) {
     context->invoke(&MapContext::renderStill, transform->getState(),
-                    FrameData{ view.getFramebufferSize() }, callback);
+                    FrameData{ view->getFramebufferSize() }, callback);
 }
 
 bool Map::renderSync() {
     if (renderState == RenderState::never) {
-        view.notifyMapChange(MapChangeWillStartRenderingMap);
+        view->notifyMapChange(MapChangeWillStartRenderingMap);
     }
 
-    view.notifyMapChange(MapChangeWillStartRenderingFrame);
+    view->notifyMapChange(MapChangeWillStartRenderingFrame);
 
     MapContext::RenderResult result = context->invokeSync<MapContext::RenderResult>(
-        &MapContext::renderSync, transform->getState(), FrameData{ view.getFramebufferSize() });
+        &MapContext::renderSync, transform->getState(), FrameData{ view->getFramebufferSize() });
 
-    view.notifyMapChange(result.fullyLoaded ?
+    view->notifyMapChange(result.fullyLoaded ?
         MapChangeDidFinishRenderingFrameFullyRendered :
         MapChangeDidFinishRenderingFrame);
 
@@ -75,7 +75,7 @@ bool Map::renderSync() {
         renderState = RenderState::partial;
     } else if (renderState != RenderState::fully) {
         renderState = RenderState::fully;
-        view.notifyMapChange(MapChangeDidFinishRenderingMapFullyRendered);
+        view->notifyMapChange(MapChangeDidFinishRenderingMapFullyRendered);
     }
 
     return result.needsRerender;
@@ -91,7 +91,7 @@ void Map::nudgeTransitions(bool forceRerender) {
 
 void Map::update(Update update_) {
     if (update_ == Update::Dimensions) {
-        transform->resize(view.getSize());
+        transform->resize(view->getSize());
     }
 
     context->invoke(&MapContext::triggerUpdate, transform->getState(), update_);

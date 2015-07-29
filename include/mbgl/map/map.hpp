@@ -175,7 +175,7 @@ public:
     bool isFullyLoaded() const;
 
 private:
-    View& view;
+    View* view;
     std::unique_ptr<Transform> transform;
     const std::unique_ptr<MapData> data;
     const std::unique_ptr<util::Thread<MapContext>> context;
