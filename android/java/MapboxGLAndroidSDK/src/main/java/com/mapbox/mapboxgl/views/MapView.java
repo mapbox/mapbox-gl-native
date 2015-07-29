@@ -19,6 +19,7 @@ import android.hardware.SensorManager;
 import android.location.Location;
 import android.net.ConnectivityManager;
 import android.net.NetworkInfo;
+import android.opengl.GLSurfaceView;
 import android.os.Build;
 import android.os.Bundle;
 import android.support.annotation.NonNull;
@@ -60,8 +61,11 @@ import java.nio.ByteBuffer;
 import java.util.ArrayList;
 import java.util.List;
 
+import javax.microedition.khronos.egl.EGLConfig;
+import javax.microedition.khronos.opengles.GL10;
+
 // Custom view that shows a Map
-// Based on SurfaceView as we use OpenGL ES to render
+// Based on GLSurfaceView as we use OpenGL ES to render
 public class MapView extends FrameLayout implements LocationListener {
 
     //
@@ -86,9 +90,7 @@ public class MapView extends FrameLayout implements LocationListener {
     private static final String STATE_STYLE_CLASSES = "styleClasses";
     private static final String STATE_DEFAULT_TRANSITION_DURATION = "defaultTransitionDuration";
 
-    /**
-     * Every annotation that has been added to the map.
-     */
+    // Every annotation that has been added to the map
     private List<Annotation> annotations = new ArrayList<>();
 
     //
@@ -96,7 +98,7 @@ public class MapView extends FrameLayout implements LocationListener {
     //
 
     // Used to call JNI NativeMapView
-    private SurfaceView mSurfaceView;
+    private GLSurfaceView mSurfaceView;
     private NativeMapView mNativeMapView;
 
     // Used to handle DPI scaling
@@ -169,12 +171,6 @@ public class MapView extends FrameLayout implements LocationListener {
         initialize(context, attrs);
     }
 
-    // Called when properties are being set from XML
-    public MapView(Context context, AttributeSet attrs, int defStyle) {
-        super(context, attrs, defStyle);
-        initialize(context, attrs);
-    }
-
     //
     // Initialization
     //
@@ -240,11 +236,7 @@ public class MapView extends FrameLayout implements LocationListener {
         requestFocus();
 
         // Register the SurfaceHolder callbacks
-        if (android.os.Build.VERSION.SDK_INT >= Build.VERSION_CODES.GINGERBREAD) {
-            mSurfaceView.getHolder().addCallback(new Callbacks2());
-        } else {
-            mSurfaceView.getHolder().addCallback(new Callbacks());
-        }
+        mSurfaceView.setRenderer(new MapRenderer());
 
         // Touch gesture detectors
         mGestureDetector = new GestureDetectorCompat(context, new GestureListener());
@@ -662,41 +654,29 @@ public class MapView extends FrameLayout implements LocationListener {
         mNativeMapView.resizeView((int)(width / mScreenDensity), (int)(height / mScreenDensity));
     }
 
-    // This class handles SurfaceHolder callbacks
-    private class Callbacks implements SurfaceHolder.Callback {
+    // This class handles GLSurfaceView callbacks
+    private class MapRenderer implements GLSurfaceView.Renderer {
 
-        // Called when the native surface buffer has been created
-        // Must do all EGL/GL ES initialization here
+        // Called when the surface buffer has been created
+        // Must do all GL ES initialization here
         @Override
-        public void surfaceCreated(SurfaceHolder holder) {
-            mNativeMapView.createSurface(holder.getSurface());
+        public void onSurfaceCreated(GL10 gl, EGLConfig config) {
+            // TODO call createSurface
         }
 
-        // Called when the native surface buffer has been destroyed
-        // Must do all EGL/GL ES destruction here
-        @Override
-        public void surfaceDestroyed(SurfaceHolder holder) {
-            mNativeMapView.destroySurface();
-        }
-
-        // Called when the format or size of the native surface buffer has been
+        // Called when the format or size of the surface buffer has been
         // changed
-        // Must handle window resizing here.
+        // Must handle window resizing here
         @Override
-        public void surfaceChanged(SurfaceHolder holder, int format, int width, int height) {
-            mNativeMapView.resizeFramebuffer(width, height);
+        public void onSurfaceChanged(GL10 gl, int width, int height) {
+            // TODO call resizeFramebuffer
         }
-    }
 
-    @TargetApi(9)
-    private class Callbacks2 extends Callbacks implements SurfaceHolder.Callback2 {
-
-        // Called when we need to redraw the view
-        // This is called before our view is first visible to prevent an initial
-        // flicker (see Android SDK documentation)
+        // Called when we need to render a new frame to the surface buffer
+        // Must do all GL ES rendering commands here
         @Override
-        public void surfaceRedrawNeeded(SurfaceHolder holder) {
-            mNativeMapView.update();
+        public void onDrawFrame(GL10 gl) {
+            // TODO call Map::renderSync
         }
     }
 
