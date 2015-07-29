@@ -34,13 +34,15 @@ struct FrameData {
 
 class MapContext : public Style::Observer {
 public:
-    MapContext(View&, FileSource&, MapData&);
+    MapContext(FileSource&, MapData&);
     ~MapContext();
 
     struct RenderResult {
         bool fullyLoaded;
         bool needsRerender;
     };
+
+    void setView(const View&);
 
     void pause();
 

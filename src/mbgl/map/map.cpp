@@ -13,14 +13,14 @@
 namespace mbgl {
 
 Map::Map(View& view_, FileSource& fileSource, MapMode mode)
-    : view(view_),
-      transform(std::make_unique<Transform>(view)),
-      data(std::make_unique<MapData>(mode, view.getPixelRatio())),
-      context(std::make_unique<util::Thread<MapContext>>(util::ThreadContext{"Map", util::ThreadType::Map, util::ThreadPriority::Regular}, view, fileSource, *data))
-{
-    view.initialize(this);
-    update(Update::Dimensions);
+    : data(std::make_unique<MapData>(mode, view_.getPixelRatio())),
+    context(std::make_unique<util::Thread<MapContext>>(util::ThreadContext{"Map", util::ThreadType::Map, util::ThreadPriority::Regular}, fileSource, *data)) {
+    setView(view_);
 }
+
+Map::Map(float pixelRatio, FileSource& fileSource, MapMode mode)
+    : data(std::make_unique<MapData>(mode, pixelRatio)),
+    context(std::make_unique<util::Thread<MapContext>>(util::ThreadContext{"Map", util::ThreadType::Map, util::ThreadPriority::Regular}, fileSource, *data)) {}
 
 Map::~Map() {
     resume();
@@ -41,6 +41,15 @@ void Map::pause() {
 void Map::resume() {
     data->condResume.notify_all();
     paused = false;
+}
+
+void Map::setView(View& view_) {
+    view = view_;
+    transform = std::make_unique<Transform>(view);
+    context->invokeSync(&MapContext::setView, view);
+
+    view.initialize(this);
+    update(Update::Dimensions);
 }
 
 void Map::renderStill(StillImageCallback callback) {
