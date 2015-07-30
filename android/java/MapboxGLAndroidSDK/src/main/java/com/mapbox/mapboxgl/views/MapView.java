@@ -490,11 +490,12 @@ public class MapView extends SurfaceView {
     }
 
     public LatLng fromScreenLocation(PointF point) {
-        return mNativeMapView.latLngForPixel(point);
+        return mNativeMapView.latLngForPixel(new PointF(point.x / mScreenDensity, point.y / mScreenDensity));
     }
 
     public PointF toScreenLocation(LatLng location) {
-        return mNativeMapView.pixelForLatLng(location);
+        PointF point = mNativeMapView.pixelForLatLng(location);
+        return new PointF(point.x * mScreenDensity, point.y * mScreenDensity);
     }
 
     //
