@@ -1,3 +1,4 @@
+#include <mbgl/map/camera.hpp>
 #include <mbgl/map/transform.hpp>
 #include <mbgl/map/view.hpp>
 #include <mbgl/util/constants.hpp>
@@ -53,6 +54,38 @@ bool Transform::resize(const std::array<uint16_t, 2> size) {
 
 #pragma mark - Position
 
+void Transform::jumpTo(const CameraOptions options) {
+    CameraOptions jumpOptions = options;
+    jumpOptions.duration.reset();
+    easeTo(jumpOptions);
+}
+
+void Transform::easeTo(CameraOptions options) {
+    LatLng latLng = options.center ? *options.center : getLatLng();
+    double zoom = options.zoom ? *options.zoom : getZoom();
+    double angle = options.angle ? *options.angle : getAngle();
+    if (std::isnan(latLng.latitude) || std::isnan(latLng.longitude) || std::isnan(zoom)) {
+        return;
+    }
+    
+    double new_scale = std::pow(2.0, zoom);
+    
+    const double s = new_scale * util::tileSize;
+    state.Bc = s / 360;
+    state.Cc = s / util::M2PI;
+    
+    const double m = 1 - 1e-15;
+    const double f = std::fmin(std::fmax(std::sin(util::DEG2RAD * latLng.latitude), -m), m);
+    
+    double xn = -latLng.longitude * state.Bc;
+    double yn = 0.5 * state.Cc * std::log((1 + f) / (1 - f));
+    
+    options.center.reset();
+    options.zoom.reset();
+    options.angle.reset();
+    _easeTo(options, new_scale, angle, xn, yn);
+}
+
 void Transform::moveBy(const double dx, const double dy, const Duration& duration) {
     if (std::isnan(dx) || std::isnan(dy)) {
         return;
@@ -62,71 +95,30 @@ void Transform::moveBy(const double dx, const double dy, const Duration& duratio
 }
 
 void Transform::_moveBy(const double dx, const double dy, const Duration& duration) {
+    
     double x = state.x + std::cos(state.angle) * dx + std::sin( state.angle) * dy;
     double y = state.y + std::cos(state.angle) * dy + std::sin(-state.angle) * dx;
 
     state.constrain(state.scale, y);
-
-    if (duration == Duration::zero()) {
-        view.notifyMapChange(MapChangeRegionWillChange);
-
-        state.x = x;
-        state.y = y;
-
-        view.notifyMapChange(MapChangeRegionDidChange);
-    } else {
-        view.notifyMapChange(MapChangeRegionWillChangeAnimated);
-
-        const double startX = state.x;
-        const double startY = state.y;
-        state.panning = true;
-
-        startTransition(
-            [=](double t) {
-                state.x = util::interpolate(startX, x, t);
-                state.y = util::interpolate(startY, y, t);
-                view.notifyMapChange(MapChangeRegionIsChanging);
-                return Update::Repaint;
-            },
-            [=] {
-                state.panning = false;
-                view.notifyMapChange(MapChangeRegionDidChangeAnimated);
-            }, duration);
-    }
+    
+    CameraOptions options;
+    options.duration = duration;
+    _easeTo(options, state.scale, state.angle, x, y);
 }
 
 void Transform::setLatLng(const LatLng latLng, const Duration& duration) {
-    if (std::isnan(latLng.latitude) || std::isnan(latLng.longitude)) {
-        return;
-    }
-
-    const double m = 1 - 1e-15;
-    const double f = ::fmin(::fmax(std::sin(util::DEG2RAD * latLng.latitude), -m), m);
-
-    double xn = -latLng.longitude * state.Bc;
-    double yn = 0.5 * state.Cc * std::log((1 + f) / (1 - f));
-
-    _setScaleXY(state.scale, xn, yn, duration);
+    CameraOptions options;
+    options.center = latLng;
+    options.duration = duration;
+    easeTo(options);
 }
 
 void Transform::setLatLngZoom(const LatLng latLng, const double zoom, const Duration& duration) {
-    if (std::isnan(latLng.latitude) || std::isnan(latLng.longitude) || std::isnan(zoom)) {
-        return;
-    }
-
-    double new_scale = std::pow(2.0, zoom);
-
-    const double s = new_scale * util::tileSize;
-    state.Bc = s / 360;
-    state.Cc = s / util::M2PI;
-
-    const double m = 1 - 1e-15;
-    const double f = ::fmin(::fmax(std::sin(util::DEG2RAD * latLng.latitude), -m), m);
-
-    double xn = -latLng.longitude * state.Bc;
-    double yn = 0.5 * state.Cc * std::log((1 + f) / (1 - f));
-
-    _setScaleXY(new_scale, xn, yn, duration);
+    CameraOptions options;
+    options.center = latLng;
+    options.zoom = zoom;
+    options.duration = duration;
+    easeTo(options);
 }
 
 
@@ -206,13 +198,27 @@ void Transform::_setScale(double new_scale, double cx, double cy, const Duration
 
 void Transform::_setScaleXY(const double new_scale, const double xn, const double yn,
                             const Duration& duration) {
+    CameraOptions options;
+    options.duration = duration;
+    _easeTo(options, new_scale, state.angle, xn, yn);
+}
+
+void Transform::_easeTo(CameraOptions options, const double new_scale, const double new_angle, const double xn, const double yn) {
+    Update update = state.scale == new_scale ? Update::Repaint : Update::Zoom;
     double scale = new_scale;
     double x = xn;
     double y = yn;
 
     state.constrain(scale, y);
+    
+    double angle = _normalizeAngle(new_angle, state.angle);
+    state.angle = _normalizeAngle(state.angle, angle);
+    double pitch = options.pitch ? *options.pitch : state.pitch;
 
-    if (duration == Duration::zero()) {
+    if (!options.duration) {
+        options.duration = Duration::zero();
+    }
+    if (!options.duration || *options.duration == Duration::zero()) {
         view.notifyMapChange(MapChangeRegionWillChange);
 
         state.scale = scale;
@@ -221,18 +227,28 @@ void Transform::_setScaleXY(const double new_scale, const double xn, const doubl
         const double s = state.scale * util::tileSize;
         state.Bc = s / 360;
         state.Cc = s / util::M2PI;
+        
+        state.angle = angle;
+        state.pitch = pitch;
 
         view.notifyMapChange(MapChangeRegionDidChange);
     } else {
         view.notifyMapChange(MapChangeRegionWillChangeAnimated);
 
         const double startS = state.scale;
+        const double startA = state.angle;
+        const double startP = state.pitch;
         const double startX = state.x;
         const double startY = state.y;
         state.panning = true;
         state.scaling = true;
+        state.rotating = true;
 
         startTransition(
+            [=](double t) {
+                util::UnitBezier ease = options.easing ? *options.easing : util::UnitBezier(0, 0, 0.25, 1);
+                return ease.solve(t, 0.001);
+            },
             [=](double t) {
                 state.scale = util::interpolate(startS, scale, t);
                 state.x = util::interpolate(startX, x, t);
@@ -240,14 +256,17 @@ void Transform::_setScaleXY(const double new_scale, const double xn, const doubl
                 const double s = state.scale * util::tileSize;
                 state.Bc = s / 360;
                 state.Cc = s / util::M2PI;
+                state.angle = util::wrap(util::interpolate(startA, angle, t), -M_PI, M_PI);
+                state.pitch = util::interpolate(startP, pitch, t);
                 view.notifyMapChange(MapChangeRegionIsChanging);
-                return Update::Zoom;
+                return update;
             },
             [=] {
                 state.panning = false;
                 state.scaling = false;
+                state.rotating = false;
                 view.notifyMapChange(MapChangeRegionDidChangeAnimated);
-            }, duration);
+            }, *options.duration);
     }
 }
 
@@ -307,7 +326,7 @@ void Transform::setAngle(const double new_angle, const double cx, const double c
         _moveBy(dx, dy, Duration::zero());
     }
 
-    _setAngle(new_angle, Duration::zero());
+    _setAngle(new_angle);
 
     if (cx >= 0 && cy >= 0) {
         _moveBy(-dx, -dy, Duration::zero());
@@ -315,32 +334,10 @@ void Transform::setAngle(const double new_angle, const double cx, const double c
 }
 
 void Transform::_setAngle(double new_angle, const Duration& duration) {
-    double angle = _normalizeAngle(new_angle, state.angle);
-    state.angle = _normalizeAngle(state.angle, angle);
-
-    if (duration == Duration::zero()) {
-        view.notifyMapChange(MapChangeRegionWillChange);
-
-        state.angle = angle;
-
-        view.notifyMapChange(MapChangeRegionDidChange);
-    } else {
-        view.notifyMapChange(MapChangeRegionWillChangeAnimated);
-
-        const double startA = state.angle;
-        state.rotating = true;
-
-        startTransition(
-            [=](double t) {
-                state.angle = util::wrap(util::interpolate(startA, angle, t), -M_PI, M_PI);
-                view.notifyMapChange(MapChangeRegionIsChanging);
-                return Update::Repaint;
-            },
-            [=] {
-                state.rotating = false;
-                view.notifyMapChange(MapChangeRegionDidChangeAnimated);
-            }, duration);
-    }
+    CameraOptions options;
+    options.angle = new_angle;
+    options.duration = duration;
+    easeTo(options);
 }
 
 double Transform::getAngle() const {
@@ -349,8 +346,11 @@ double Transform::getAngle() const {
 
 #pragma mark - Pitch
 
-void Transform::setPitch(double pitch) {
-    state.pitch = pitch;
+void Transform::setPitch(double pitch, const Duration& duration) {
+    CameraOptions options;
+    options.pitch = pitch;
+    options.duration = duration;
+    easeTo(options);
 }
 
 double Transform::getPitch() const {
@@ -359,7 +359,8 @@ double Transform::getPitch() const {
 
 #pragma mark - Transition
 
-void Transform::startTransition(std::function<Update(double)> frame,
+void Transform::startTransition(std::function<double(double)> easing,
+                                std::function<Update(double)> frame,
                                 std::function<void()> finish,
                                 const Duration& duration) {
     if (transitionFinishFn) {
@@ -369,7 +370,7 @@ void Transform::startTransition(std::function<Update(double)> frame,
     transitionStart = Clock::now();
     transitionDuration = duration;
 
-    transitionFrameFn = [frame, this](const TimePoint now) {
+    transitionFrameFn = [easing, frame, this](const TimePoint now) {
         float t = std::chrono::duration<float>(now - transitionStart) / transitionDuration;
         if (t >= 1.0) {
             Update result = frame(1.0);
@@ -378,8 +379,7 @@ void Transform::startTransition(std::function<Update(double)> frame,
             transitionFinishFn = nullptr;
             return result;
         } else {
-            util::UnitBezier ease(0, 0, 0.25, 1);
-            return frame(ease.solve(t, 0.001));
+            return frame(easing(t));
         }
     };
 

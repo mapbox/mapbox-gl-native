@@ -2,8 +2,6 @@
 
 #import <mbgl/ios/Mapbox.h>
 
-#import <mbgl/platform/darwin/settings_nsuserdefaults.hpp>
-
 #import <CoreLocation/CoreLocation.h>
 
 static UIColor *const kTintColor = [UIColor colorWithRed:0.120 green:0.550 blue:0.670 alpha:1.000];
@@ -26,9 +24,19 @@ static NSUInteger const kStyleVersion = 8;
 
 @implementation MBXViewController
 
-mbgl::Settings_NSUserDefaults *settings = nullptr;
-
 #pragma mark - Setup
+
++ (void)initialize
+{
+    if (self == [MBXViewController class])
+    {
+        [[NSUserDefaults standardUserDefaults] registerDefaults:@{
+            @"userTrackingMode": @(MGLUserTrackingModeNone),
+            @"showsUserLocation": @NO,
+            @"debug": @NO,
+        }];
+    }
+}
 
 - (id)init
 {
@@ -38,6 +46,7 @@ mbgl::Settings_NSUserDefaults *settings = nullptr;
     {
         [[NSNotificationCenter defaultCenter] addObserver:self selector:@selector(saveState:) name:UIApplicationDidEnterBackgroundNotification object:nil];
         [[NSNotificationCenter defaultCenter] addObserver:self selector:@selector(restoreState:) name:UIApplicationWillEnterForegroundNotification object:nil];
+        [[NSNotificationCenter defaultCenter] addObserver:self selector:@selector(saveState:) name:UIApplicationWillTerminateNotification object:nil];
     }
 
     return self;
@@ -73,7 +82,6 @@ mbgl::Settings_NSUserDefaults *settings = nullptr;
                                                                              target:self
                                                                              action:@selector(locateUser)];
 
-    settings = new mbgl::Settings_NSUserDefaults();
     [self restoreState:nil];
 
     if ( ! settings->showsUserLocation)
@@ -86,30 +94,37 @@ mbgl::Settings_NSUserDefaults *settings = nullptr;
 
 - (void)saveState:(__unused NSNotification *)notification
 {
-    if (self.mapView && settings)
+    if (self.mapView)
     {
-        settings->longitude = self.mapView.centerCoordinate.longitude;
-        settings->latitude = self.mapView.centerCoordinate.latitude;
-        settings->zoom = self.mapView.zoomLevel;
-        settings->bearing = self.mapView.direction;
-        settings->pitch = self.mapView.pitch;
-        settings->debug = self.mapView.isDebugActive;
-        settings->userTrackingMode = self.mapView.userTrackingMode;
-        settings->showsUserLocation = self.mapView.showsUserLocation;
-        settings->save();
+        NSUserDefaults *defaults = [NSUserDefaults standardUserDefaults];
+        NSData *archivedCamera = [NSKeyedArchiver archivedDataWithRootObject:self.mapView.camera];
+        [defaults setObject:archivedCamera forKey:@"camera"];
+        [defaults setInteger:self.mapView.userTrackingMode forKey:@"userTrackingMode"];
+        [defaults setBool:self.mapView.showsUserLocation forKey:@"showsUserLocation"];
+        [defaults setBool:self.mapView.debugActive forKey:@"debug"];
+        [defaults synchronize];
     }
 }
 
 - (void)restoreState:(__unused NSNotification *)notification
 {
-    if (self.mapView && settings) {
-        settings->load();
-        [self.mapView setCenterCoordinate:CLLocationCoordinate2DMake(settings->latitude, settings->longitude) zoomLevel:settings->zoom animated:NO];
-        self.mapView.direction = settings->bearing;
-        self.mapView.pitch = settings->pitch;
-        self.mapView.userTrackingMode = settings->userTrackingMode;
-        self.mapView.showsUserLocation = settings->showsUserLocation;
-        [self.mapView setDebugActive:settings->debug];
+    if (self.mapView) {
+        NSUserDefaults *defaults = [NSUserDefaults standardUserDefaults];
+        NSData *archivedCamera = [defaults objectForKey:@"camera"];
+        MGLMapCamera *camera = archivedCamera ? [NSKeyedUnarchiver unarchiveObjectWithData:archivedCamera] : nil;
+        if (camera)
+        {
+            self.mapView.camera = camera;
+        }
+        NSInteger uncheckedTrackingMode = [defaults integerForKey:@"userTrackingMode"];
+        if (uncheckedTrackingMode >= 0 &&
+            (NSUInteger)uncheckedTrackingMode >= MGLUserTrackingModeNone &&
+            (NSUInteger)uncheckedTrackingMode <= MGLUserTrackingModeFollowWithCourse)
+        {
+            self.mapView.userTrackingMode = (MGLUserTrackingMode)uncheckedTrackingMode;
+        }
+        self.mapView.showsUserLocation = [defaults boolForKey:@"showsUserLocation"];
+        self.mapView.debugActive = [defaults boolForKey:@"debug"];
     }
 }
 
@@ -339,12 +354,7 @@ mbgl::Settings_NSUserDefaults *settings = nullptr;
 {
     [[NSNotificationCenter defaultCenter] removeObserver:self];
 
-    if (settings)
-    {
-        [self saveState:nil];
-        delete settings;
-        settings = nullptr;
-    }
+    [self saveState:nil];
 }
 
 #pragma mark - MGLMapViewDelegate

@@ -2,6 +2,7 @@
 #define MBGL_MAP_MAP
 
 #include <mbgl/util/chrono.hpp>
+#include <mbgl/map/camera.hpp>
 #include <mbgl/map/update.hpp>
 #include <mbgl/map/mode.hpp>
 #include <mbgl/util/geo.hpp>
@@ -94,6 +95,10 @@ public:
     void cancelTransitions();
     void setGestureInProgress(bool);
 
+    // Camera
+    void jumpTo(CameraOptions options);
+    void easeTo(CameraOptions options);
+
     // Position
     void moveBy(double dx, double dy, const Duration& = Duration::zero());
     void setLatLng(LatLng latLng, const Duration& = Duration::zero());
@@ -107,8 +112,8 @@ public:
     void setZoom(double zoom, const Duration& = Duration::zero());
     double getZoom() const;
     void setLatLngZoom(LatLng latLng, double zoom, const Duration& = Duration::zero());
-    void fitBounds(LatLngBounds bounds, EdgeInsets padding, const Duration& duration = Duration::zero());
-    void fitBounds(AnnotationSegment segment, EdgeInsets padding, const Duration& duration = Duration::zero());
+    CameraOptions cameraForLatLngBounds(LatLngBounds bounds, EdgeInsets padding);
+    CameraOptions cameraForLatLngs(std::vector<LatLng> latLngs, EdgeInsets padding);
     void resetZoom();
     double getMinZoom() const;
     double getMaxZoom() const;
@@ -121,7 +126,7 @@ public:
     void resetNorth();
 
     // Pitch
-    void setPitch(double pitch);
+    void setPitch(double pitch, const Duration& = Duration::zero());
     double getPitch() const;
 
     // Size
