@@ -64,7 +64,7 @@ public:
     void resume();
 
     // Attaches a View to the Map
-    void setView(View&);
+    void setView(View*);
 
     // Register a callback that will get called (on the render thread) when all resources have
     // been loaded and a complete render occurs.

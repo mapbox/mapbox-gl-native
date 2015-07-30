@@ -42,7 +42,7 @@ public:
         bool needsRerender;
     };
 
-    void setView(View&);
+    void setView(View*);
 
     void pause();
 
