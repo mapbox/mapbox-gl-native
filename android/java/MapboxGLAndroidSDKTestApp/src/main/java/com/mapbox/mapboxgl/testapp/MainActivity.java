@@ -4,6 +4,7 @@ import android.content.Context;
 import android.graphics.Color;
 import android.graphics.Matrix;
 import android.graphics.PointF;
+import android.graphics.Rect;
 import android.hardware.GeomagneticField;
 import android.hardware.Sensor;
 import android.hardware.SensorEvent;
@@ -11,20 +12,29 @@ import android.hardware.SensorEventListener;
 import android.hardware.SensorManager;
 import android.location.Location;
 import android.os.Bundle;
+import android.os.Handler;
+import android.support.v4.widget.PopupMenuCompat;
+import android.support.v4.widget.PopupWindowCompat;
 import android.support.v7.app.ActionBarActivity;
 import android.support.v7.widget.Toolbar;
 import android.util.Log;
+import android.view.Gravity;
+import android.view.LayoutInflater;
 import android.view.Menu;
 import android.view.MenuInflater;
 import android.view.MenuItem;
+import android.view.MotionEvent;
 import android.view.View;
 import android.widget.AdapterView;
 import android.widget.ArrayAdapter;
 import android.widget.FrameLayout;
 import android.widget.ImageView;
+import android.widget.LinearLayout;
+import android.widget.PopupWindow;
 import android.widget.Spinner;
 import android.widget.TextView;
 import com.crashlytics.android.Crashlytics;
+import com.mapbox.mapboxgl.annotations.Annotation;
 import com.mapbox.mapboxgl.annotations.Marker;
 import com.mapbox.mapboxgl.annotations.MarkerOptions;
 import com.mapbox.mapboxgl.annotations.Polygon;
@@ -43,6 +53,7 @@ import java.io.BufferedReader;
 import java.io.IOException;
 import java.io.InputStreamReader;
 import java.util.ArrayList;
+import java.util.List;
 
 public class MainActivity extends ActionBarActivity {
 
@@ -127,6 +138,7 @@ public class MainActivity extends ActionBarActivity {
         mapView.onCreate(savedInstanceState);
         mapView.setOnFpsChangedListener(new MyOnFpsChangedListener());
         mapView.setOnMapChangedListener(new MyOnMapChangedListener());
+        mapView.setOnTouchListener(new MyOnMapTouchListener());
 
         mFpsTextView = (TextView) findViewById(R.id.view_fps);
         mFpsTextView.setText("");
@@ -343,9 +355,9 @@ public class MainActivity extends ActionBarActivity {
         LatLng backLot = new LatLng(38.649441, -121.369064);
         MapView map = mapView;
         marker = map.addMarker(new MarkerOptions()
-            .position(backLot)
-            .title("Back Lot")
-            .snippet("The back lot behind my house"));
+                .position(backLot)
+                .title("Back Lot")
+                .snippet("The back lot behind my house"));
 
         LatLng cheeseRoom = new LatLng(38.531577,-122.010646);
         map.addMarker(new MarkerOptions()
@@ -379,9 +391,9 @@ public class MainActivity extends ActionBarActivity {
             MapView map = mapView;
             ArrayList<PolygonOptions> opts = new ArrayList<PolygonOptions>();
             opts.add(new PolygonOptions()
-                        .add(latLngs)
-                        .strokeColor(Color.MAGENTA)
-                        .fillColor(Color.BLUE));
+                    .add(latLngs)
+                    .strokeColor(Color.MAGENTA)
+                    .fillColor(Color.BLUE));
             Polygon polygon = map.addPolygons(opts).get(0);
         } catch (IOException e) {
             e.printStackTrace();
@@ -656,4 +668,51 @@ public class MainActivity extends ActionBarActivity {
             mapView.resetNorth();
         }
     }
+
+    private class MyOnMapTouchListener implements View.OnTouchListener {
+        @Override
+        public boolean onTouch(View v, MotionEvent event) {
+
+            if(event.getAction()==MotionEvent.ACTION_UP){
+
+                List<Annotation> annotation = mapView.selectAnnotations(event.getX(), event.getY());
+
+                // https://github.com/jgilfelt/android-mapviewballoons
+
+                if(annotation.isEmpty()){
+                    return false;
+                }
+
+                //int x = (int) event.getX();
+                //int y = (int) event.getY();
+
+                // TODO get nearest
+                Marker marker = (Marker) annotation.get(0);
+
+                int POPUP_WIDTH = 256;
+                int POPUP_HEIGHT = 64;
+
+                PointF p = mapView.toScreenLocation(marker.getPosition());
+                int x = (int) (p.x * mDensity) - POPUP_WIDTH / 2;
+                int y = (int) (mapView.getHeight() - (p.y* mDensity)) + POPUP_HEIGHT / 2;
+
+                View content = getLayoutInflater().inflate(R.layout.popup_example, null, false);
+                TextView textView = (TextView) content.findViewById(R.id.title);
+                textView.setText(marker.getTitle());
+
+                final PopupWindow pw = new PopupWindow(content, POPUP_WIDTH, POPUP_HEIGHT, true);
+                pw.showAtLocation(mapView, Gravity.NO_GRAVITY, x, y);
+
+                new Handler().postDelayed(new Runnable() {
+                    public void run() {
+                        pw.dismiss();
+                    }}, 1000);
+
+                return true;
+            }
+
+            return false;
+        }
+    }
+
 }
