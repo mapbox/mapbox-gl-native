@@ -115,6 +115,18 @@ void Map::setGestureInProgress(bool inProgress) {
     update(Update::Repaint);
 }
 
+#pragma mark -
+
+void Map::jumpTo(CameraOptions options) {
+    transform->jumpTo(options);
+    update();
+}
+
+void Map::easeTo(CameraOptions options) {
+    transform->easeTo(options);
+    update(Update::Repaint);
+}
+
 #pragma mark - Position
 
 void Map::moveBy(double dx, double dy, const Duration& duration) {
@@ -123,7 +135,9 @@ void Map::moveBy(double dx, double dy, const Duration& duration) {
 }
 
 void Map::setLatLng(LatLng latLng, const Duration& duration) {
-    transform->setLatLng(latLng, duration);
+    CameraOptions options;
+    options.duration = duration;
+    transform->setLatLng(latLng, options);
     update(Update::Repaint);
 }
 
@@ -132,9 +146,11 @@ LatLng Map::getLatLng() const {
 }
 
 void Map::resetPosition() {
-    transform->setAngle(0);
-    transform->setLatLng(LatLng(0, 0));
-    transform->setZoom(0);
+    CameraOptions options;
+    options.angle = 0;
+    options.center = LatLng(0, 0);
+    options.zoom = 0;
+    transform->jumpTo(options);
     update(Update::Zoom);
 }
 
@@ -165,7 +181,9 @@ double Map::getZoom() const {
 }
 
 void Map::setLatLngZoom(LatLng latLng, double zoom, const Duration& duration) {
-    transform->setLatLngZoom(latLng, zoom, duration);
+    CameraOptions options;
+    options.duration = duration;
+    transform->setLatLngZoom(latLng, zoom, options);
     update(Update::Zoom);
 }
 
@@ -250,7 +268,9 @@ void Map::rotateBy(double sx, double sy, double ex, double ey, const Duration& d
 }
 
 void Map::setBearing(double degrees, const Duration& duration) {
-    transform->setAngle(-degrees * M_PI / 180, duration);
+    CameraOptions options;
+    options.duration = duration;
+    transform->setAngle(-degrees * M_PI / 180, options);
     update(Update::Repaint);
 }
 
@@ -264,7 +284,9 @@ double Map::getBearing() const {
 }
 
 void Map::resetNorth() {
-    transform->setAngle(0, std::chrono::milliseconds(500));
+    CameraOptions options;
+    options.duration = std::chrono::milliseconds(500);
+    transform->setAngle(0, options);
     update(Update::Repaint);
 }
 
