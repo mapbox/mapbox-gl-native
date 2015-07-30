@@ -358,7 +358,10 @@ std::chrono::steady_clock::duration secondsAsDuration(float duration)
 
     // set initial position
     //
-    _mbglMap->setLatLngZoom(mbgl::LatLng(0, 0), _mbglMap->getMinZoom());
+    mbgl::CameraOptions options;
+    options.center = mbgl::LatLng(0, 0);
+    options.zoom = _mbglMap->getMinZoom();
+    _mbglMap->jumpTo(options);
     _pendingLatitude = NAN;
     _pendingLongitude = NAN;
 
@@ -1476,11 +1479,14 @@ std::chrono::steady_clock::duration secondsAsDuration(float duration)
 
 - (void)setCenterCoordinate:(CLLocationCoordinate2D)coordinate animated:(BOOL)animated
 {
-    CGFloat duration = (animated ? MGLAnimationDuration : 0);
-
-    _mbglMap->setLatLngZoom(MGLLatLngFromLocationCoordinate2D(coordinate),
-                            fmaxf(_mbglMap->getZoom(), self.currentMinimumZoom),
-                            secondsAsDuration(duration));
+    mbgl::CameraOptions options;
+    options.center = MGLLatLngFromLocationCoordinate2D(coordinate);
+    options.zoom = fmaxf(_mbglMap->getZoom(), self.currentMinimumZoom);
+    if (animated)
+    {
+        options.duration = secondsAsDuration(MGLAnimationDuration);
+    }
+    _mbglMap->easeTo(options);
 
     [self notifyMapChange:(animated ? mbgl::MapChangeRegionDidChangeAnimated : mbgl::MapChangeRegionDidChange)];
 }
@@ -1497,11 +1503,22 @@ std::chrono::steady_clock::duration secondsAsDuration(float duration)
 
 - (void)setCenterCoordinate:(CLLocationCoordinate2D)centerCoordinate zoomLevel:(double)zoomLevel animated:(BOOL)animated
 {
+    [self setCenterCoordinate:centerCoordinate zoomLevel:zoomLevel direction:self.direction animated:animated];
+}
+
+- (void)setCenterCoordinate:(CLLocationCoordinate2D)centerCoordinate zoomLevel:(double)zoomLevel direction:(CLLocationDirection)direction animated:(BOOL)animated
+{
     self.userTrackingMode = MGLUserTrackingModeNone;
 
-    CGFloat duration = (animated ? MGLAnimationDuration : 0);
-
-    _mbglMap->setLatLngZoom(MGLLatLngFromLocationCoordinate2D(centerCoordinate), zoomLevel, secondsAsDuration(duration));
+    mbgl::CameraOptions options;
+    options.center = MGLLatLngFromLocationCoordinate2D(centerCoordinate);
+    options.zoom = zoomLevel;
+    options.angle = direction;
+    if (animated)
+    {
+        options.duration = secondsAsDuration(MGLAnimationDuration);
+    }
+    _mbglMap->easeTo(options);
 
     [self unrotateIfNeededAnimated:animated];
 
@@ -1517,11 +1534,13 @@ std::chrono::steady_clock::duration secondsAsDuration(float duration)
 {
     self.userTrackingMode = MGLUserTrackingModeNone;
 
-    CGFloat duration = (animated ? MGLAnimationDuration : 0);
-
-    _mbglMap->setLatLngZoom(_mbglMap->getLatLng(),
-                           fmaxf(zoomLevel, self.currentMinimumZoom),
-                           secondsAsDuration(duration));
+    mbgl::CameraOptions options;
+    options.zoom = fmaxf(zoomLevel, self.currentMinimumZoom);
+    if (animated)
+    {
+        options.duration = secondsAsDuration(MGLAnimationDuration);
+    }
+    _mbglMap->easeTo(options);
 
     [self unrotateIfNeededAnimated:animated];
 

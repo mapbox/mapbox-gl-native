@@ -2,6 +2,7 @@
 #define MBGL_MAP_MAP
 
 #include <mbgl/util/chrono.hpp>
+#include <mbgl/map/camera.hpp>
 #include <mbgl/map/update.hpp>
 #include <mbgl/map/mode.hpp>
 #include <mbgl/util/geo.hpp>
@@ -96,6 +97,9 @@ public:
     // Transition
     void cancelTransitions();
     void setGestureInProgress(bool);
+
+    void jumpTo(CameraOptions options);
+    void easeTo(CameraOptions options);
 
     // Position
     void moveBy(double dx, double dy, const Duration& = Duration::zero());

@@ -128,6 +128,8 @@ IB_DESIGNABLE
 *   @param animated Specify `YES` if you want the map view to animate scrolling and zooming to the new location or `NO` if you want the map to display the new location immediately. */
 - (void)setCenterCoordinate:(CLLocationCoordinate2D)centerCoordinate zoomLevel:(double)zoomLevel animated:(BOOL)animated;
 
+- (void)setCenterCoordinate:(CLLocationCoordinate2D)centerCoordinate zoomLevel:(double)zoomLevel direction:(CLLocationDirection)direction animated:(BOOL)animated;
+
 /** The coordinate bounds visible in the receiver’s viewport.
 *   
 *   Changing the value of this property updates the receiver immediately. If you want to animate the change, call `setVisibleCoordinateBounds:animated:` instead. */
