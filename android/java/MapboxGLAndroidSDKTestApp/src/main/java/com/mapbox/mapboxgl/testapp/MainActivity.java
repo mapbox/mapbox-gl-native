@@ -43,6 +43,7 @@ import java.io.BufferedReader;
 import java.io.IOException;
 import java.io.InputStreamReader;
 import java.util.ArrayList;
+import java.util.Date;
 
 public class MainActivity extends ActionBarActivity {
 
@@ -95,6 +96,7 @@ public class MainActivity extends ActionBarActivity {
     private boolean mIsMarkersOn = false;
 
     private Marker marker;
+    private float avg_bearing;
 
     //
     // Lifecycle events
@@ -406,6 +408,9 @@ public class MainActivity extends ActionBarActivity {
     // This class handles sensor updates to calculate compass bearing
     private class CompassListener implements SensorEventListener {
 
+        AngleLowpassFilter angleLowpassFilter = new AngleLowpassFilter();
+        long t0 = -1;
+
         @Override
         public void onSensorChanged(SensorEvent event) {
             switch (event.sensor.getType()) {
@@ -437,8 +442,61 @@ public class MainActivity extends ActionBarActivity {
                 }
             }
 
-            updateMap();
+            float new_bearing = mGpsLocation != null && mGpsLocation.hasBearing() ? mGpsLocation.getBearing() : mCompassBearing;
+            angleLowpassFilter.add((float) Math.toRadians(new_bearing));
+            avg_bearing = (float) Math.toDegrees(angleLowpassFilter.average());
+
+            if(shouldSetDirection(new_bearing, avg_bearing)) {
+                //Log.d(Constants.logTag, "-avg_bearing " + -avg_bearing + " td " + td);
+                t0 = new Date().getTime();
+                updateMap();
+            }
         }
+
+        private boolean shouldSetDirection(float new_bearing, float avg) {
+            boolean setDirection = true;
+            float diff = Math.abs(new_bearing - avg);
+            final float MIN_DEG_CHANGED = 3.5f;
+            if(diff < MIN_DEG_CHANGED){
+                setDirection = false;
+            }
+
+            long t = new Date().getTime();
+            if(t0 == -1) {
+                t0 = new Date().getTime();
+            }
+            long td = t - t0;
+            final float MIN_TIME_IN_MS_PASSED = 120.0f;
+            if(td < MIN_TIME_IN_MS_PASSED) {
+                setDirection = false;
+            }
+            return setDirection;
+        }
+
+        // http://stackoverflow.com/questions/4699417/android-compass-orientation-on-unreliable-low-pass-filter
+        public class AngleLowpassFilter {
+            private final int LENGTH = 10;
+            private float sumSin, sumCos;
+            private ArrayList<Float> list = new ArrayList<>();
+
+            public void add(float radians){
+                sumSin += (float) Math.sin(radians);
+                sumCos += (float) Math.cos(radians);
+                list.add(radians);
+                if(list.size() > LENGTH){
+                    float old = list.remove(0);
+
+                    sumSin -= Math.sin(old);
+                    sumCos -= Math.cos(old);
+                }
+            }
+
+            public float average(){
+                int size = list.size();
+                return (float) Math.atan2(sumSin / size, sumCos / size);
+            }
+        }
+
 
         @Override
         public void onAccuracyChanged(Sensor sensor, int accuracy) {
@@ -622,8 +680,8 @@ public class MainActivity extends ActionBarActivity {
                 lp.leftMargin = (int) ((screenLocation.x - 54.0f / 2.0f) * mDensity);
                 lp.topMargin = mMapFrameLayout.getHeight() - (int) ((screenLocation.y + 54.0f / 2.0f) * mDensity);
                 mGpsMarker.setLayoutParams(lp);
-                float bearing = mGpsLocation.hasBearing() ? mGpsLocation.getBearing() : mCompassBearing;
-                rotateImageView(mGpsMarker, bearing);
+                //float bearing = mGpsLocation.hasBearing() ? mGpsLocation.getBearing() : mCompassBearing;
+                rotateImageView(mGpsMarker, avg_bearing);
                 mGpsMarker.requestLayout();
             } else {
                 mGpsMarker.setImageResource(R.drawable.location_marker);
