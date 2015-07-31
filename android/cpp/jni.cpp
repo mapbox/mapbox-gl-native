@@ -28,6 +28,8 @@
 namespace mbgl {
 namespace android {
 
+JavaVM* theJVM;
+
 std::string cachePath;
 std::string dataPath;
 std::string apkPath;
@@ -90,13 +92,56 @@ jmethodID pointFConstructorId = nullptr;
 jfieldID pointFXId = nullptr;
 jfieldID pointFYId = nullptr;
 
-bool throw_error(JNIEnv *env, const char *msg) {
+jclass httpContextClass = nullptr;
+jmethodID httpContextGetInstanceId = nullptr;
+jmethodID httpContextCreateRequestId = nullptr;
+
+jclass httpRequestClass = nullptr;
+jmethodID httpRequestStartId = nullptr;
+jmethodID httpRequestCancelId = nullptr;
+
+bool throw_jni_error(JNIEnv *env, const char *msg) {
     if (env->ThrowNew(runtimeExceptionClass, msg) < 0) {
         env->ExceptionDescribe();
         return false;
     }
 
     return true;
+}
+
+bool attach_jni_thread(JavaVM* vm, JNIEnv** env, std::string threadName) {
+    JavaVMAttachArgs args = {JNI_VERSION_1_2, threadName.c_str(), NULL};
+
+    jint ret;
+    *env = nullptr;
+    bool detach = false;
+    ret = vm->GetEnv(reinterpret_cast<void **>(env), JNI_VERSION_1_6);
+    if (ret != JNI_OK) {
+        if (ret != JNI_EDETACHED) {
+            mbgl::Log::Error(mbgl::Event::JNI, "GetEnv() failed with %i", ret);
+            throw new std::runtime_error("GetEnv() failed");
+        } else {
+            ret = vm->AttachCurrentThread(env, &args);
+            if (ret != JNI_OK) {
+                mbgl::Log::Error(mbgl::Event::JNI, "AttachCurrentThread() failed with %i", ret);
+                throw new std::runtime_error("AttachCurrentThread() failed");
+            }
+            detach = true;
+        }
+    }
+
+    return detach;
+}
+
+void detach_jni_thread(JavaVM* vm, JNIEnv** env, bool detach) {
+    if (detach) {
+        jint ret;
+        if ((ret = vm->DetachCurrentThread()) != JNI_OK) {
+            mbgl::Log::Error(mbgl::Event::JNI, "DetachCurrentThread() failed with %i", ret);
+            throw new std::runtime_error("DetachCurrentThread() failed");
+        }
+    }
+    *env = nullptr;
 }
 
 std::string std_string_from_jstring(JNIEnv *env, jstring jstr) {
@@ -342,7 +387,7 @@ void JNICALL nativeInitializeDisplay(JNIEnv *env, jobject obj, jlong nativeMapVi
     {
         nativeMapView->initializeDisplay();
     } catch(const std::exception& e) {
-        throw_error(env, "Unable to initialize GL display.");
+        throw_jni_error(env, "Unable to initialize GL display.");
     }
 }
 
@@ -361,7 +406,7 @@ void JNICALL nativeInitializeContext(JNIEnv *env, jobject obj, jlong nativeMapVi
     try {
         nativeMapView->initializeContext();
     } catch(const std::exception& e) {
-        throw_error(env, "Unable to initialize GL context.");
+        throw_jni_error(env, "Unable to initialize GL context.");
     }
 }
 
@@ -380,7 +425,7 @@ void JNICALL nativeCreateSurface(JNIEnv *env, jobject obj, jlong nativeMapViewPt
     try {
         nativeMapView->createSurface(ANativeWindow_fromSurface(env, surface));
     } catch(const std::exception& e) {
-        throw_error(env, "Unable to create GL surface.");
+        throw_jni_error(env, "Unable to create GL surface.");
     }
 }
 
@@ -1131,6 +1176,8 @@ extern "C" {
 extern "C" JNIEXPORT jint JNICALL JNI_OnLoad(JavaVM *vm, void *reserved) {
     mbgl::Log::Debug(mbgl::Event::JNI, "JNI_OnLoad");
 
+    theJVM = vm;
+
     JNIEnv *env = nullptr;
     jint ret = vm->GetEnv(reinterpret_cast<void **>(&env), JNI_VERSION_1_6);
     if (ret != JNI_OK) {
@@ -1426,6 +1473,36 @@ extern "C" JNIEXPORT jint JNICALL JNI_OnLoad(JavaVM *vm, void *reserved) {
         return JNI_ERR;
     }
 
+    httpContextClass = env->FindClass("com/mapbox/mapboxgl/http/HTTPContext");
+    if (httpContextClass == nullptr) {
+        env->ExceptionDescribe();
+    }
+
+    httpContextGetInstanceId = env->GetStaticMethodID(httpContextClass, "getInstance", "()Lcom/mapbox/mapboxgl/http/HTTPContext;");
+    if (httpContextGetInstanceId == nullptr) {
+        env->ExceptionDescribe();
+    }
+
+    httpContextCreateRequestId = env->GetMethodID(httpContextClass, "createRequest", "(JLjava/lang/String;Ljava/lang/String;Ljava/lang/String;Ljava/lang/String;)Lcom/mapbox/mapboxgl/http/HTTPContext$HTTPRequest;");
+    if (httpContextCreateRequestId == nullptr) {
+        env->ExceptionDescribe();
+    }
+
+    httpRequestClass = env->FindClass("com/mapbox/mapboxgl/http/HTTPContext$HTTPRequest");
+    if (httpRequestClass == nullptr) {
+        env->ExceptionDescribe();
+    }
+
+    httpRequestStartId = env->GetMethodID(httpRequestClass, "start", "()V");
+    if (httpRequestStartId == nullptr) {
+        env->ExceptionDescribe();
+    }
+
+    httpRequestCancelId = env->GetMethodID(httpRequestClass, "cancel", "()V");
+    if (httpRequestCancelId == nullptr) {
+        env->ExceptionDescribe();
+    }
+
     const std::vector<JNINativeMethod> methods = {
         {"nativeCreate", "(Ljava/lang/String;Ljava/lang/String;Ljava/lang/String;FIJ)J",
          reinterpret_cast<void *>(&nativeCreate)},
@@ -1524,10 +1601,16 @@ extern "C" JNIEXPORT jint JNICALL JNI_OnLoad(JavaVM *vm, void *reserved) {
         //{"nativeGetWorldBoundsMeters", "(J)V", reinterpret_cast<void *>(&nativeGetWorldBoundsMeters)},
         //{"nativeGetWorldBoundsLatLng", "(J)V", reinterpret_cast<void *>(&nativeGetWorldBoundsLatLng)},
         {"nativeGetMetersPerPixelAtLatitude", "(JDD)D", reinterpret_cast<void *>(&nativeGetMetersPerPixelAtLatitude)},
-        {"nativeProjectedMetersForLatLng", "(JLcom/mapbox/mapboxgl/geometry/LatLng;)Lcom/mapbox/mapboxgl/geometry/ProjectedMeters;", reinterpret_cast<void *>(&nativeProjectedMetersForLatLng)},
-        {"nativeLatLngForProjectedMeters", "(JLcom/mapbox/mapboxgl/geometry/ProjectedMeters;)Lcom/mapbox/mapboxgl/geometry/LatLng;", reinterpret_cast<void *>(&nativeLatLngForProjectedMeters)},
-        {"nativePixelForLatLng", "(JLcom/mapbox/mapboxgl/geometry/LatLng;)Landroid/graphics/PointF;", reinterpret_cast<void *>(&nativePixelForLatLng)},
-        {"nativeLatLngForPixel", "(JLandroid/graphics/PointF;)Lcom/mapbox/mapboxgl/geometry/LatLng;", reinterpret_cast<void *>(&nativeLatLngForPixel)},
+        {"nativeProjectedMetersForLatLng",
+         "(JLcom/mapbox/mapboxgl/geometry/LatLng;)Lcom/mapbox/mapboxgl/geometry/ProjectedMeters;",
+         reinterpret_cast<void *>(&nativeProjectedMetersForLatLng)},
+        {"nativeLatLngForProjectedMeters",
+         "(JLcom/mapbox/mapboxgl/geometry/ProjectedMeters;)Lcom/mapbox/mapboxgl/geometry/LatLng;",
+         reinterpret_cast<void *>(&nativeLatLngForProjectedMeters)},
+        {"nativePixelForLatLng", "(JLcom/mapbox/mapboxgl/geometry/LatLng;)Landroid/graphics/PointF;",
+         reinterpret_cast<void *>(&nativePixelForLatLng)},
+        {"nativeLatLngForPixel", "(JLandroid/graphics/PointF;)Lcom/mapbox/mapboxgl/geometry/LatLng;",
+         reinterpret_cast<void *>(&nativeLatLngForPixel)},
     };
 
     if (env->RegisterNatives(nativeMapViewClass, methods.data(), methods.size()) < 0) {
@@ -1641,6 +1724,37 @@ extern "C" JNIEXPORT jint JNICALL JNI_OnLoad(JavaVM *vm, void *reserved) {
         return JNI_ERR;
     }
 
+    httpContextClass = reinterpret_cast<jclass>(env->NewGlobalRef(httpContextClass));
+    if (httpContextClass == nullptr) {
+        env->ExceptionDescribe();
+        env->DeleteGlobalRef(latLngClass);
+        env->DeleteGlobalRef(markerClass);
+        env->DeleteGlobalRef(latLngZoomClass);
+        env->DeleteGlobalRef(polylineClass);
+        env->DeleteGlobalRef(polygonClass);
+        env->DeleteGlobalRef(runtimeExceptionClass);
+        env->DeleteGlobalRef(nullPointerExceptionClass);
+        env->DeleteGlobalRef(arrayListClass);
+        env->DeleteGlobalRef(projectedMetersClass);
+        env->DeleteGlobalRef(pointFClass);
+    }
+
+    httpRequestClass = reinterpret_cast<jclass>(env->NewGlobalRef(httpRequestClass));
+    if (httpRequestClass == nullptr) {
+        env->ExceptionDescribe();
+        env->DeleteGlobalRef(latLngClass);
+        env->DeleteGlobalRef(markerClass);
+        env->DeleteGlobalRef(latLngZoomClass);
+        env->DeleteGlobalRef(polylineClass);
+        env->DeleteGlobalRef(polygonClass);
+        env->DeleteGlobalRef(runtimeExceptionClass);
+        env->DeleteGlobalRef(nullPointerExceptionClass);
+        env->DeleteGlobalRef(arrayListClass);
+        env->DeleteGlobalRef(projectedMetersClass);
+        env->DeleteGlobalRef(pointFClass);
+        env->DeleteGlobalRef(httpContextClass);
+    }
+
     char release[PROP_VALUE_MAX] = "";
     __system_property_get("ro.build.version.release", release);
     androidRelease = std::string(release);
@@ -1650,6 +1764,8 @@ extern "C" JNIEXPORT jint JNICALL JNI_OnLoad(JavaVM *vm, void *reserved) {
 
 extern "C" JNIEXPORT void JNICALL JNI_OnUnload(JavaVM *vm, void *reserved) {
     mbgl::Log::Debug(mbgl::Event::JNI, "JNI_OnUnload");
+
+    theJVM = vm;
 
     JNIEnv *env = nullptr;
     jint ret = vm->GetEnv(reinterpret_cast<void **>(&env), JNI_VERSION_1_6);
@@ -1725,5 +1841,15 @@ extern "C" JNIEXPORT void JNICALL JNI_OnUnload(JavaVM *vm, void *reserved) {
     pointFConstructorId = nullptr;
     pointFXId = nullptr;
     pointFYId = nullptr;
+
+    env->DeleteGlobalRef(httpContextClass);
+    httpContextGetInstanceId = nullptr;
+    httpContextCreateRequestId = nullptr;
+
+    env->DeleteGlobalRef(httpRequestClass);
+    httpRequestStartId = nullptr;
+    httpRequestCancelId = nullptr;
+
+    theJVM = nullptr;
 }
 }

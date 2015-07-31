@@ -11,12 +11,6 @@
 
 #include <curl/curl.h>
 
-#ifdef __ANDROID__
-#include <mbgl/android/jni.hpp>
-#include <zip.h>
-#include <openssl/ssl.h>
-#endif
-
 #include <queue>
 #include <map>
 #include <cassert>
@@ -331,104 +325,6 @@ int HTTPCURLContext::startTimeout(CURLM * /* multi */, long timeout_ms, void *us
 
 // -------------------------------------------------------------------------------------------------
 
-#ifdef __ANDROID__
-
-// This function is called to load the CA bundle
-// from http://curl.haxx.se/libcurl/c/cacertinmem.html¯
-static CURLcode sslctx_function(CURL * /* curl */, void *sslctx, void * /* parm */) {
-
-    int error = 0;
-    struct zip *apk = zip_open(mbgl::android::apkPath.c_str(), 0, &error);
-    if (apk == nullptr) {
-        return CURLE_SSL_CACERT_BADFILE;
-    }
-
-    struct zip_file *apkFile = zip_fopen(apk, "assets/ca-bundle.crt", ZIP_FL_NOCASE);
-    if (apkFile == nullptr) {
-        zip_close(apk);
-        apk = nullptr;
-        return CURLE_SSL_CACERT_BADFILE;
-    }
-
-    struct zip_stat stat;
-    if (zip_stat(apk, "assets/ca-bundle.crt", ZIP_FL_NOCASE, &stat) != 0) {
-        zip_fclose(apkFile);
-        apkFile = nullptr;
-        zip_close(apk);
-        apk = nullptr;
-        return CURLE_SSL_CACERT_BADFILE;
-    }
-
-    if (stat.size > std::numeric_limits<int>::max()) {
-        zip_fclose(apkFile);
-        apkFile = nullptr;
-        zip_close(apk);
-        apk = nullptr;
-        return CURLE_SSL_CACERT_BADFILE;
-    }
-
-    const auto pem = std::make_unique<char[]>(stat.size);
-
-    if (static_cast<zip_uint64_t>(zip_fread(apkFile, reinterpret_cast<void *>(pem.get()), stat.size)) != stat.size) {
-        zip_fclose(apkFile);
-        apkFile = nullptr;
-        zip_close(apk);
-        apk = nullptr;
-        return CURLE_SSL_CACERT_BADFILE;
-    }
-
-    // get a pointer to the X509 certificate store (which may be empty!)
-    X509_STORE *store = SSL_CTX_get_cert_store((SSL_CTX *)sslctx);
-    if (store == nullptr) {
-        return CURLE_SSL_CACERT_BADFILE;
-    }
-
-    // get a BIO
-    BIO *bio = BIO_new_mem_buf(pem.get(), static_cast<int>(stat.size));
-    if (bio == nullptr) {
-        store = nullptr;
-        return CURLE_SSL_CACERT_BADFILE;
-    }
-
-    // use it to read the PEM formatted certificate from memory into an X509
-    // structure that SSL can use
-    X509 *cert = nullptr;
-    while (PEM_read_bio_X509(bio, &cert, 0, nullptr) != nullptr) {
-        if (cert == nullptr) {
-            BIO_free(bio);
-            bio = nullptr;
-            store = nullptr;
-            return CURLE_SSL_CACERT_BADFILE;
-        }
-
-        // add our certificate to this store
-        if (X509_STORE_add_cert(store, cert) == 0) {
-            X509_free(cert);
-            cert = nullptr;
-            BIO_free(bio);
-            bio = nullptr;
-            store = nullptr;
-            return CURLE_SSL_CACERT_BADFILE;
-        }
-
-        X509_free(cert);
-        cert = nullptr;
-    }
-
-    // decrease reference counts
-    BIO_free(bio);
-    bio = nullptr;
-
-    zip_fclose(apkFile);
-    apkFile = nullptr;
-    zip_close(apk);
-    apk = nullptr;
-
-    // all set to go
-    return CURLE_OK;
-}
-#endif
-
 HTTPCURLRequest::HTTPCURLRequest(HTTPCURLContext* context_, const Resource& resource_, Callback callback_, uv_loop_t*, std::shared_ptr<const Response> response_)
     : HTTPRequestBase(resource_, callback_),
       context(context_),
@@ -458,12 +354,7 @@ HTTPCURLRequest::HTTPCURLRequest(HTTPCURLContext* context_, const Resource& reso
 
     handleError(curl_easy_setopt(handle, CURLOPT_PRIVATE, this));
     handleError(curl_easy_setopt(handle, CURLOPT_ERRORBUFFER, error));
-#ifdef __ANDROID__
-    handleError(curl_easy_setopt(handle, CURLOPT_SSLCERTTYPE, "PEM"));
-    handleError(curl_easy_setopt(handle, CURLOPT_SSL_CTX_FUNCTION, sslctx_function));
-#else
     handleError(curl_easy_setopt(handle, CURLOPT_CAINFO, "ca-bundle.crt"));
-#endif
     handleError(curl_easy_setopt(handle, CURLOPT_FOLLOWLOCATION, 1));
     handleError(curl_easy_setopt(handle, CURLOPT_URL, resource.url.c_str()));
     handleError(curl_easy_setopt(handle, CURLOPT_WRITEFUNCTION, writeCallback));
