@@ -414,13 +414,22 @@ IB_DESIGNABLE
 
 // Responding to Map Position Changes
 
-// TODO
+/** Tells the delegate that the region displayed by the map view is about to change.
+ *
+ *   This method is called whenever the currently displayed map region will start changing.
+ *   @param animated Whether the change will cause an animated effect on the map. */
 - (void)mapView:(MGLMapView *)mapView regionWillChangeAnimated:(BOOL)animated;
 
-// TODO
+/** Tells the delegate that the region displayed by the map view is changing.
+ *
+ *   This method is called whenever the currently displayed map region changes. During movement, this method may be called many times to report updates to the map position. Therefore, your implementation of this method should be as lightweight as possible to avoid affecting performance.
+ *   @param mapView The map view whose visible region is changing. */
 - (void)mapViewRegionIsChanging:(MGLMapView *)mapView;
 
-// TODO
+/** Tells the delegate that the region displayed by the map view just changed.
+ *
+ *   This method is called whenever the currently displayed map region has finished changing.
+ *   @param animated Whether the change caused an animated effect on the map. */
 - (void)mapView:(MGLMapView *)mapView regionDidChangeAnimated:(BOOL)animated;
 
 #pragma mark - Loading the Map Data
