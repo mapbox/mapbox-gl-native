@@ -10,6 +10,7 @@ import android.content.pm.PackageManager;
 import android.content.res.TypedArray;
 import android.graphics.Bitmap;
 import android.graphics.PointF;
+import android.location.Location;
 import android.net.ConnectivityManager;
 import android.net.NetworkInfo;
 import android.os.Build;
@@ -18,6 +19,7 @@ import android.support.annotation.NonNull;
 import android.support.v4.view.GestureDetectorCompat;
 import android.support.v4.view.ScaleGestureDetectorCompat;
 import android.text.TextUtils;
+import android.util.Log;
 import android.view.GestureDetector;
 import android.view.ScaleGestureDetector;
 import android.util.AttributeSet;
@@ -28,6 +30,8 @@ import android.view.SurfaceHolder;
 import android.view.SurfaceView;
 import android.view.View;
 import android.view.ViewConfiguration;
+import android.widget.FrameLayout;
+import android.widget.ImageView;
 import android.widget.ZoomButtonsController;
 import com.almeros.android.multitouch.gesturedetectors.RotateGestureDetector;
 import com.almeros.android.multitouch.gesturedetectors.TwoFingerGestureDetector;
@@ -40,6 +44,10 @@ import com.mapbox.mapboxgl.annotations.Polyline;
 import com.mapbox.mapboxgl.annotations.PolylineOptions;
 import com.mapbox.mapboxgl.geometry.LatLng;
 import com.mapbox.mapboxgl.geometry.LatLngZoom;
+import com.mapzen.android.lost.api.LocationListener;
+import com.mapzen.android.lost.api.LocationRequest;
+import com.mapzen.android.lost.api.LocationServices;
+import com.mapzen.android.lost.api.LostApiClient;
 import org.apache.commons.validator.routines.UrlValidator;
 import java.nio.ByteBuffer;
 import java.util.ArrayList;
@@ -47,11 +55,12 @@ import java.util.List;
 
 // Custom view that shows a Map
 // Based on SurfaceView as we use OpenGL ES to render
-public class MapView extends SurfaceView {
+public class MapView extends SurfaceView implements LocationListener {
 
     //
     // Static members
     //
+    private static final String TAG = "MapView";
 
     // Used for animation
     private static final long ANIMATION_DURATION = 300;
@@ -101,6 +110,13 @@ public class MapView extends SurfaceView {
 
     // Holds the context
     private Context mContext;
+
+    // Used for GPS
+    private boolean mIsGpsOn = false;
+    private LostApiClient mLocationClient;
+    private LocationRequest mLocationRequest;
+    private ImageView mGpsMarker;
+    private Location mGpsLocation;
 
     //
     // Properties
@@ -223,6 +239,20 @@ public class MapView extends SurfaceView {
             boolean isConnected = (activeNetwork != null) && activeNetwork.isConnectedOrConnecting();
             onConnectivityChanged(isConnected);
         }
+
+        // Setup User Location UI
+        mGpsMarker = new ImageView(getContext());
+        mGpsMarker.setVisibility(View.INVISIBLE);
+        mGpsMarker.setImageResource(R.drawable.location_marker);
+        mGpsMarker.setLayoutParams(new FrameLayout.LayoutParams((int) (27.0f * mScreenDensity), (int) (27.0f * mScreenDensity)));
+        mGpsMarker.requestLayout();
+
+        // Setup Location Services
+        mLocationClient = new LostApiClient.Builder(getContext()).build();
+        mLocationRequest = LocationRequest.create()
+                .setInterval(1000)
+                .setSmallestDisplacement(1)
+                .setPriority(LocationRequest.PRIORITY_HIGH_ACCURACY);
     }
 
     //
@@ -1342,6 +1372,114 @@ public class MapView extends SurfaceView {
                     mOnFpsChangedListener.onFpsChanged(fps);
                 }
             });
+        }
+    }
+
+    // Google Maps Inspired API
+
+    /**
+     * Gets the status of the my-location layer.
+     * @return True if the my-location layer is enabled, false otherwise.
+     */
+    public final boolean isMyLocationEnabled () {
+        return mIsGpsOn;
+    }
+
+    /**
+     * Enables or disables the my-location layer.
+     * While enabled, the my-location layer continuously draws an indication of a user's current
+     * location and bearing, and displays UI controls that allow a user to interact with their
+     * location (for example, to enable or disable camera tracking of their location and bearing).
+     * @param enabled True to enable; false to disable.
+     */
+    public final void setMyLocationEnabled (boolean enabled) {
+        toggleGps(enabled);
+    }
+
+    /**
+     * Returns the currently displayed user location, or null if there is no location data available.
+     * @return The currently displayed user location.
+     */
+    public final Location getMyLocation () {
+        return mGpsLocation;
+    }
+
+    /**
+     * Enabled / Disable GPS location updates along with updating the UI
+     * @param enableGps true if GPS is to be enabled, false if GPS is to be disabled
+     */
+    private void toggleGps(boolean enableGps) {
+
+        if (enableGps) {
+            if (!mIsGpsOn) {
+                mIsGpsOn = true;
+                mGpsLocation = null;
+                mLocationClient.connect();
+                updateLocation(LocationServices.FusedLocationApi.getLastLocation());
+                LocationServices.FusedLocationApi.requestLocationUpdates(mLocationRequest, this);
+            }
+        } else {
+            if (mIsGpsOn) {
+                mIsGpsOn = false;
+//                LocationServices.FusedLocationApi.removeLocationUpdates(this);
+                mLocationClient.disconnect();
+                mGpsLocation = null;
+            }
+        }
+    }
+
+    /**
+     * LOST's LocationListener Callback
+     * @param location New Location
+     */
+    @Override
+    public void onLocationChanged(Location location) {
+        Log.i(TAG, "onLocationChanged: " + location);
+        updateLocation(location);
+    }
+
+    // Handles location updates from GPS
+    private void updateLocation(Location location) {
+        if (location != null) {
+            mGpsLocation = location;
+        }
+
+        updateMap();
+    }
+
+    // Updates the UI to match the current map's position
+    private void updateMap() {
+//        rotateImageView(mCompassView, (float) mapView.getDirection());
+
+        if (mGpsLocation != null) {
+            mGpsMarker.setVisibility(View.VISIBLE);
+            LatLng coordinate = new LatLng(mGpsLocation);
+            PointF screenLocation = toScreenLocation(coordinate);
+
+/*
+            if (mGpsLocation.hasBearing() || mCompassValid) {
+                mGpsMarker.setImageResource(R.drawable.direction_arrow);
+                float iconSize = 54.0f * mScreenDensity;
+                FrameLayout.LayoutParams lp = new FrameLayout.LayoutParams((int) iconSize, (int) iconSize);
+                lp.leftMargin = (int) (screenLocation.x - iconSize / 2.0f);
+                lp.topMargin = mMapFrameLayout.getHeight() - (int) (screenLocation.y + iconSize / 2.0f);
+                mGpsMarker.setLayoutParams(lp);
+                float bearing = mGpsLocation.hasBearing() ? mGpsLocation.getBearing() : mCompassBearing;
+                rotateImageView(mGpsMarker, bearing);
+                mGpsMarker.requestLayout();
+            } else {
+*/
+                mGpsMarker.setImageResource(R.drawable.location_marker);
+                float iconSize = 27.0f * mScreenDensity;
+                FrameLayout.LayoutParams lp = new FrameLayout.LayoutParams((int) iconSize, (int) iconSize);
+                lp.leftMargin = (int) (screenLocation.x - iconSize / 2.0f);
+                lp.topMargin = getHeight() - (int) (screenLocation.y + iconSize / 2.0f);
+                mGpsMarker.setLayoutParams(lp);
+//                rotateImageView(mGpsMarker, 0.0f);
+                mGpsMarker.requestLayout();
+//            }
+        } else {
+            mGpsMarker.setVisibility(View.INVISIBLE);
         }
     }
 }
