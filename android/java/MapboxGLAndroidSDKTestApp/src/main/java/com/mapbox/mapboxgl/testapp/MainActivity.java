@@ -643,18 +643,20 @@ public class MainActivity extends ActionBarActivity {
 
             if (mGpsLocation.hasBearing() || mCompassValid) {
                 mGpsMarker.setImageResource(R.drawable.direction_arrow);
-                FrameLayout.LayoutParams lp = new FrameLayout.LayoutParams((int) (54.0f * mDensity), (int) (54.0f * mDensity));
-                lp.leftMargin = (int) ((screenLocation.x - 54.0f / 2.0f) * mDensity);
-                lp.topMargin = mMapFrameLayout.getHeight() - (int) ((screenLocation.y + 54.0f / 2.0f) * mDensity);
+                float iconSize = 54.0f * mDensity;
+                FrameLayout.LayoutParams lp = new FrameLayout.LayoutParams((int) iconSize, (int) iconSize);
+                lp.leftMargin = (int) (screenLocation.x - iconSize / 2.0f);
+                lp.topMargin = mMapFrameLayout.getHeight() - (int) (screenLocation.y + iconSize / 2.0f);
                 mGpsMarker.setLayoutParams(lp);
                 float bearing = mGpsLocation.hasBearing() ? mGpsLocation.getBearing() : mCompassBearing;
                 rotateImageView(mGpsMarker, bearing);
                 mGpsMarker.requestLayout();
             } else {
                 mGpsMarker.setImageResource(R.drawable.location_marker);
-                FrameLayout.LayoutParams lp = new FrameLayout.LayoutParams((int) (27.0f * mDensity), (int) (27.0f * mDensity));
-                lp.leftMargin = (int) ((screenLocation.x - 27.0f / 2.0f) * mDensity);
-                lp.topMargin = mMapFrameLayout.getHeight() - (int) ((screenLocation.y + 27.0f / 2.0f) * mDensity);
+                float iconSize = 27.0f * mDensity;
+                FrameLayout.LayoutParams lp = new FrameLayout.LayoutParams((int) iconSize, (int) iconSize);
+                lp.leftMargin = (int) (screenLocation.x - iconSize / 2.0f);
+                lp.topMargin = mMapFrameLayout.getHeight() - (int) (screenLocation.y + iconSize / 2.0f);
                 mGpsMarker.setLayoutParams(lp);
                 rotateImageView(mGpsMarker, 0.0f);
                 mGpsMarker.requestLayout();
