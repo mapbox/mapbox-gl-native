@@ -14,9 +14,11 @@ import android.os.Bundle;
 import android.support.v7.app.ActionBarActivity;
 import android.support.v7.widget.Toolbar;
 import android.util.Log;
+import android.view.GestureDetector;
 import android.view.Menu;
 import android.view.MenuInflater;
 import android.view.MenuItem;
+import android.view.MotionEvent;
 import android.view.View;
 import android.widget.AdapterView;
 import android.widget.ArrayAdapter;
@@ -127,6 +129,29 @@ public class MainActivity extends ActionBarActivity {
         mapView.onCreate(savedInstanceState);
         mapView.setOnFpsChangedListener(new MyOnFpsChangedListener());
         mapView.setOnMapChangedListener(new MyOnMapChangedListener());
+
+        final GestureDetector gestureDetector = new GestureDetector(this, new GestureDetector.SimpleOnGestureListener() {
+            public void onLongPress(final MotionEvent e) {
+                float x = e.getX();
+                float y = e.getY();
+
+                // flip y direction vertically to match core GL
+                y = mapView.getHeight() - y;
+
+                LatLng position = mapView.fromScreenLocation(new PointF(x, y));
+
+                mapView.addMarker(new MarkerOptions()
+                        .position(position)
+                        .title("Dropped Pin")
+                        .sprite("default_marker"));
+            }
+        });
+
+        mapView.setOnTouchListener(new View.OnTouchListener() {
+            public boolean onTouch(View v, MotionEvent event) {
+                return gestureDetector.onTouchEvent(event);
+            }
+        });
 
         mFpsTextView = (TextView) findViewById(R.id.view_fps);
         mFpsTextView.setText("");
