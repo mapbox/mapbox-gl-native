@@ -96,7 +96,7 @@ public class MainActivity extends ActionBarActivity {
     private boolean mIsMarkersOn = false;
 
     private Marker marker;
-    private float avg_bearing;
+    private float avgBearing;
 
     //
     // Lifecycle events
@@ -442,12 +442,11 @@ public class MainActivity extends ActionBarActivity {
                 }
             }
 
-            float new_bearing = mGpsLocation != null && mGpsLocation.hasBearing() ? mGpsLocation.getBearing() : mCompassBearing;
-            angleLowpassFilter.add((float) Math.toRadians(new_bearing));
-            avg_bearing = (float) Math.toDegrees(angleLowpassFilter.average());
+            float newBearing = mGpsLocation != null && mGpsLocation.hasBearing() ? mGpsLocation.getBearing() : mCompassBearing;
+            angleLowpassFilter.add((float) Math.toRadians(newBearing));
+            avgBearing = (float) Math.toDegrees(angleLowpassFilter.average());
 
-            if(shouldSetDirection(new_bearing, avg_bearing)) {
-                //Log.d(Constants.logTag, "-avg_bearing " + -avg_bearing + " td " + td);
+            if(shouldSetDirection(newBearing, avgBearing)) {
                 t0 = new Date().getTime();
                 updateMap();
             }
@@ -680,8 +679,7 @@ public class MainActivity extends ActionBarActivity {
                 lp.leftMargin = (int) ((screenLocation.x - 54.0f / 2.0f) * mDensity);
                 lp.topMargin = mMapFrameLayout.getHeight() - (int) ((screenLocation.y + 54.0f / 2.0f) * mDensity);
                 mGpsMarker.setLayoutParams(lp);
-                //float bearing = mGpsLocation.hasBearing() ? mGpsLocation.getBearing() : mCompassBearing;
-                rotateImageView(mGpsMarker, avg_bearing);
+                rotateImageView(mGpsMarker, avgBearing);
                 mGpsMarker.requestLayout();
             } else {
                 mGpsMarker.setImageResource(R.drawable.location_marker);
