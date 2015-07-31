@@ -239,7 +239,6 @@ public class MapView extends FrameLayout implements LocationListener {
         requestFocus();
 
         // Configure the GLSurfaceView
-        mSurfaceView.setRenderMode(GLSurfaceView.RENDERMODE_WHEN_DIRTY);
         mSurfaceView.setEGLConfigChooser(8, 8, 8, 0, 16, 8);
         mSurfaceView.setEGLContextClientVersion(2);
         if (android.os.Build.VERSION.SDK_INT >= Build.VERSION_CODES.HONEYCOMB) {
@@ -248,6 +247,7 @@ public class MapView extends FrameLayout implements LocationListener {
 
         // Register the GLSurfaceView callbacks
         mSurfaceView.setRenderer(new MapRenderer());
+        mSurfaceView.setRenderMode(GLSurfaceView.RENDERMODE_WHEN_DIRTY);
 
         // Touch gesture detectors
         mGestureDetector = new GestureDetectorCompat(context, new GestureListener());

@@ -7,6 +7,7 @@
 
 #include <sys/system_properties.h>
 
+#include <EGL/egl.h>
 #include <GLES2/gl2.h>
 
 #include <mbgl/android/native_map_view.hpp>
@@ -188,11 +189,9 @@ void NativeMapView::surfaceCreated() {
         }
 
         log_gl_string(GL_EXTENSIONS, "Extensions");
-        // TODO may requie call to Java?
-        // Tricky?
-        /*mbgl::gl::InitializeExtensions([] (const char * name) {
+        mbgl::gl::InitializeExtensions([] (const char * name) {
              return reinterpret_cast<mbgl::gl::glProc>(eglGetProcAddress(name));
-        });*/
+        });
     }
 }
 
