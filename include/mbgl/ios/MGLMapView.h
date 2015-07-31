@@ -417,6 +417,7 @@ IB_DESIGNABLE
 /** Tells the delegate that the region displayed by the map view is about to change.
  *
  *   This method is called whenever the currently displayed map region will start changing.
+ *   @param mapView The map view whose visible region will change.
  *   @param animated Whether the change will cause an animated effect on the map. */
 - (void)mapView:(MGLMapView *)mapView regionWillChangeAnimated:(BOOL)animated;
 
@@ -429,6 +430,7 @@ IB_DESIGNABLE
 /** Tells the delegate that the region displayed by the map view just changed.
  *
  *   This method is called whenever the currently displayed map region has finished changing.
+ *   @param mapView The map view whose visible region changed.
  *   @param animated Whether the change caused an animated effect on the map. */
 - (void)mapView:(MGLMapView *)mapView regionDidChangeAnimated:(BOOL)animated;
 
