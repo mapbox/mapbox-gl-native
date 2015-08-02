@@ -377,10 +377,6 @@ void Transform::startTransition(std::function<Update(double)> frame,
     transitionFinishFn = finish;
 }
 
-bool Transform::needsTransition() const {
-    return !!transitionFrameFn;
-}
-
 UpdateType Transform::updateTransitions(const TimePoint& now) {
     return static_cast<UpdateType>(transitionFrameFn ? transitionFrameFn(now) : Update::Nothing);
 }

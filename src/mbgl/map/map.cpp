@@ -73,11 +73,11 @@ bool Map::renderSync() {
 }
 
 void Map::nudgeTransitions(bool forceRerender) {
-    if (transform->needsTransition()) {
-        update(Update(transform->updateTransitions(Clock::now())));
-    } else if (forceRerender) {
-        update();
+    UpdateType update_ = transform->updateTransitions(Clock::now());
+    if (forceRerender) {
+        update_ |= static_cast<UpdateType>(Update::Repaint);
     }
+    update(Update(update_));
 }
 
 void Map::update(Update update_) {
