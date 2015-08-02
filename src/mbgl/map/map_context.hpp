@@ -38,16 +38,13 @@ public:
     MapContext(View&, FileSource&, MapData&);
     ~MapContext();
 
-    struct RenderResult {
-        bool fullyLoaded;
-        bool needsRerender;
-    };
-
     void pause();
 
     void triggerUpdate(const TransformState&, Update = Update::Nothing);
     void renderStill(const TransformState&, const FrameData&, Map::StillImageCallback callback);
-    RenderResult renderSync(const TransformState&, const FrameData&);
+
+    // Triggers a synchronous render. Returns true if style has been fully loaded.
+    bool renderSync(const TransformState&, const FrameData&);
 
     void setStyleURL(const std::string&);
     void setStyleJSON(const std::string& json, const std::string& base);

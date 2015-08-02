@@ -48,33 +48,31 @@ void Map::renderStill(StillImageCallback callback) {
                     FrameData{ view.getFramebufferSize() }, callback);
 }
 
-bool Map::renderSync() {
+void Map::renderSync() {
     if (renderState == RenderState::never) {
         view.notifyMapChange(MapChangeWillStartRenderingMap);
     }
 
     view.notifyMapChange(MapChangeWillStartRenderingFrame);
 
-    MapContext::RenderResult result = context->invokeSync<MapContext::RenderResult>(
-        &MapContext::renderSync, transform->getState(), FrameData{ view.getFramebufferSize() });
+    const bool fullyLoaded = context->invokeSync<bool>(
+            &MapContext::renderSync, transform->getState(), FrameData { view.getFramebufferSize() });
 
-    view.notifyMapChange(result.fullyLoaded ?
+    view.notifyMapChange(fullyLoaded ?
         MapChangeDidFinishRenderingFrameFullyRendered :
         MapChangeDidFinishRenderingFrame);
 
-    if (!result.fullyLoaded) {
+    if (!fullyLoaded) {
         renderState = RenderState::partial;
     } else if (renderState != RenderState::fully) {
         renderState = RenderState::fully;
         view.notifyMapChange(MapChangeDidFinishRenderingMapFullyRendered);
     }
-
-    return result.needsRerender;
 }
 
-void Map::nudgeTransitions(bool forceRerender) {
+void Map::nudgeTransitions() {
     UpdateType update_ = transform->updateTransitions(Clock::now());
-    if (forceRerender) {
+    if (data->getNeedsRepaint()) {
         update_ |= static_cast<UpdateType>(Update::Repaint);
     }
     update(Update(update_));
