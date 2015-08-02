@@ -77,6 +77,8 @@ private:
     // Loads the actual JSON object an creates a new Style object.
     void loadStyleJSON(const std::string& json, const std::string& base);
 
+    void invalidateView();
+
     View& view;
     MapData& data;
 
@@ -98,6 +100,7 @@ private:
     size_t sourceCacheSize;
     TransformState transformState;
     FrameData frameData;
+    bool viewInvalidated;
 };
 
 }
