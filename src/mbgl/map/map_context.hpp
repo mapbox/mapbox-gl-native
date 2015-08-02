@@ -4,6 +4,7 @@
 #include <mbgl/map/tile_id.hpp>
 #include <mbgl/map/update.hpp>
 #include <mbgl/map/transform_state.hpp>
+#include <mbgl/map/map.hpp>
 #include <mbgl/style/style.hpp>
 #include <mbgl/util/gl_object_store.hpp>
 #include <mbgl/util/ptr.hpp>
@@ -44,10 +45,8 @@ public:
 
     void pause();
 
-    using StillImageCallback = std::function<void(std::exception_ptr, std::unique_ptr<const StillImage>)>;
-
     void triggerUpdate(const TransformState&, Update = Update::Nothing);
-    void renderStill(const TransformState&, const FrameData&, StillImageCallback callback);
+    void renderStill(const TransformState&, const FrameData&, Map::StillImageCallback callback);
     RenderResult renderSync(const TransformState&, const FrameData&);
 
     void setStyleURL(const std::string&);
@@ -95,7 +94,7 @@ private:
 
     Request* styleRequest = nullptr;
 
-    StillImageCallback callback;
+    Map::StillImageCallback callback;
     size_t sourceCacheSize;
     TransformState transformState;
     FrameData frameData;

@@ -280,7 +280,7 @@ void MapContext::update() {
     updated = static_cast<UpdateType>(Update::Nothing);
 }
 
-void MapContext::renderStill(const TransformState& state, const FrameData& frame, StillImageCallback fn) {
+void MapContext::renderStill(const TransformState& state, const FrameData& frame, Map::StillImageCallback fn) {
     if (!fn) {
         Log::Error(Event::General, "StillImageCallback not set");
         return;
