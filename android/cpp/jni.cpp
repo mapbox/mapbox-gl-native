@@ -409,7 +409,7 @@ void JNICALL nativeUpdate(JNIEnv *env, jobject obj, jlong nativeMapViewPtr) {
     mbgl::Log::Debug(mbgl::Event::JNI, "nativeUpdate");
     assert(nativeMapViewPtr != 0);
     NativeMapView *nativeMapView = reinterpret_cast<NativeMapView *>(nativeMapViewPtr);
-    nativeMapView->getMap().update();
+    nativeMapView->getMap().update(mbgl::Update::Repaint);
 }
 
 void JNICALL nativeOnInvalidate(JNIEnv *env, jobject obj, jlong nativeMapViewPtr, jboolean inProgress) {

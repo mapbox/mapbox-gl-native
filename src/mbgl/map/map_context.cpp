@@ -396,6 +396,8 @@ void MapContext::setSprite(const std::string& name, std::shared_ptr<const Sprite
 
 void MapContext::onTileDataChanged() {
     assert(util::ThreadContext::currentlyOn(util::ThreadType::Map));
+
+    updated |= static_cast<UpdateType>(Update::Repaint);
     asyncUpdate->send();
 }
 

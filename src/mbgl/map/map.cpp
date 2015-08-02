@@ -110,24 +110,24 @@ std::string Map::getStyleJSON() const {
 
 void Map::cancelTransitions() {
     transform->cancelTransitions();
-    update();
+    update(Update::Repaint);
 }
 
 void Map::setGestureInProgress(bool inProgress) {
     transform->setGestureInProgress(inProgress);
-    update();
+    update(Update::Repaint);
 }
 
 #pragma mark - Position
 
 void Map::moveBy(double dx, double dy, const Duration& duration) {
     transform->moveBy(dx, dy, duration);
-    update();
+    update(Update::Repaint);
 }
 
 void Map::setLatLng(LatLng latLng, const Duration& duration) {
     transform->setLatLng(latLng, duration);
-    update();
+    update(Update::Repaint);
 }
 
 LatLng Map::getLatLng() const {
@@ -249,17 +249,17 @@ uint16_t Map::getHeight() const {
 
 void Map::rotateBy(double sx, double sy, double ex, double ey, const Duration& duration) {
     transform->rotateBy(sx, sy, ex, ey, duration);
-    update();
+    update(Update::Repaint);
 }
 
 void Map::setBearing(double degrees, const Duration& duration) {
     transform->setAngle(-degrees * M_PI / 180, duration);
-    update();
+    update(Update::Repaint);
 }
 
 void Map::setBearing(double degrees, double cx, double cy) {
     transform->setAngle(-degrees * M_PI / 180, cx, cy);
-    update();
+    update(Update::Repaint);
 }
 
 double Map::getBearing() const {
@@ -268,7 +268,7 @@ double Map::getBearing() const {
 
 void Map::resetNorth() {
     transform->setAngle(0, std::chrono::milliseconds(500));
-    update();
+    update(Update::Repaint);
 }
 
 
@@ -365,12 +365,12 @@ void Map::removeSprite(const std::string& name) {
 
 void Map::setDebug(bool value) {
     data->setDebug(value);
-    update();
+    update(Update::Repaint);
 }
 
 void Map::toggleDebug() {
     data->toggleDebug();
-    update();
+    update(Update::Repaint);
 }
 
 bool Map::getDebug() const {
@@ -379,12 +379,12 @@ bool Map::getDebug() const {
 
 void Map::setCollisionDebug(bool value) {
     data->setCollisionDebug(value);
-    update();
+    update(Update::Repaint);
 }
 
 void Map::toggleCollisionDebug() {
     data->toggleCollisionDebug();
-    update();
+    update(Update::Repaint);
 }
 
 bool Map::getCollisionDebug() const {

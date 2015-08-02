@@ -792,6 +792,7 @@ void NativeMapView::resizeView(int w, int h) {
 void NativeMapView::resizeFramebuffer(int w, int h) {
     fbWidth = w;
     fbHeight = h;
+    map.update(mbgl::Update::Repaint);
 }
 
 }

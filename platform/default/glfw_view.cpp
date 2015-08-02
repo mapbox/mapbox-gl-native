@@ -288,7 +288,7 @@ void GLFWView::onFramebufferResize(GLFWwindow *window, int width, int height) {
     view->fbWidth = width;
     view->fbHeight = height;
 
-    view->map->update();
+    view->map->update(mbgl::Update::Repaint);
 }
 
 void GLFWView::onMouseClick(GLFWwindow *window, int button, int action, int modifiers) {

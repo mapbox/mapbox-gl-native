@@ -73,7 +73,7 @@ public:
     void nudgeTransitions(bool forceRerender);
 
     // Notifies the Map thread that the state has changed and an update might be necessary.
-    void update(Update update = Update::Nothing);
+    void update(Update update);
 
     // Styling
     void addClass(const std::string&);
