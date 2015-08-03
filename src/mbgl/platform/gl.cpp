@@ -1,4 +1,5 @@
 #include <mbgl/platform/gl.hpp>
+#include <mbgl/util/string.hpp>
 
 #include <mutex>
 
@@ -51,7 +52,7 @@ void checkError(const char *cmd, const char *file, int line) {
             default: error = "(unknown)"; break;
         }
 
-        throw ::mbgl::gl::Error(err, std::string(cmd) + ": Error GL_" + error + " - " + file + ":" + std::to_string(line));
+        throw ::mbgl::gl::Error(err, std::string(cmd) + ": Error GL_" + error + " - " + file + ":" + util::toString(line));
     }
 }
 

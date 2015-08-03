@@ -6,6 +6,8 @@
 #include <mbgl/util/constants.hpp>
 #include <mbgl/util/geojsonvt/geojsonvt_convert.hpp>
 #include <mbgl/util/ptr.hpp>
+#include <mbgl/util/string.hpp>
+
 
 #include <algorithm>
 #include <memory>
@@ -66,7 +68,7 @@ uint32_t AnnotationManager::nextID() {
 
 vec2<double> AnnotationManager::projectPoint(const LatLng& point) {
     // Clamp to the latitude limits of Mercator.
-    const double constrainedLatitude = std::fmin(std::fmax(point.latitude, -util::LATITUDE_MAX), util::LATITUDE_MAX);
+    const double constrainedLatitude = ::fmin(::fmax(point.latitude, -util::LATITUDE_MAX), util::LATITUDE_MAX);
 
     // Project a coordinate into unit space in a square map.
     const double sine = std::sin(constrainedLatitude * M_PI / 180.0);
@@ -109,7 +111,7 @@ AnnotationManager::addTileFeature(const uint32_t annotationID,
         std::vector<LonLat> points;
 
         for (size_t i = 0; i < segments[0].size(); ++i) { // first segment for now (no holes)
-            const double constraintedLatitude = std::fmin(std::fmax(segments[0][i].latitude, -util::LATITUDE_MAX), util::LATITUDE_MAX);
+            const double constraintedLatitude = ::fmin(::fmax(segments[0][i].latitude, -util::LATITUDE_MAX), util::LATITUDE_MAX);
             points.push_back(LonLat(segments[0][i].longitude, constraintedLatitude));
         }
 
@@ -219,7 +221,7 @@ AnnotationManager::addTileFeature(const uint32_t annotationID,
                 if (type == AnnotationType::Point) {
                     layerID = PointLayerID;
                 } else {
-                    layerID = ShapeLayerID + "." + std::to_string(annotationID);
+                    layerID = ShapeLayerID + "." + util::toString(annotationID);
                 }
                 if (tile_pos.second || tile_pos.first->second.second->getMutableLayer(layerID) == nullptr) {
                     layer = std::make_shared<LiveTileLayer>();
@@ -382,7 +384,7 @@ std::unordered_set<TileID, TileID::Hash> AnnotationManager::removeAnnotations(co
                 // remove shape layer from tiles if relevant
                 for (auto tile_it = tiles.begin(); tile_it != tiles.end(); ++tile_it) {
                     if (tile_it->second.first.count(annotationID)) {
-                        tile_it->second.second->removeLayer(ShapeLayerID + "." + std::to_string(annotationID));
+                        tile_it->second.second->removeLayer(ShapeLayerID + "." + util::toString(annotationID));
                         affectedTiles.insert(tile_it->first);
                     }
                 }
@@ -507,7 +509,7 @@ const LiveTile* AnnotationManager::getTile(const TileID& id) {
         // create shape tile layers from GeoJSONVT queries
         for (auto& tiler_it : shapeTilers) {
             const auto annotationID = tiler_it.first;
-            const std::string layerID = ShapeLayerID + "." + std::to_string(annotationID);
+            const std::string layerID = ShapeLayerID + "." + util::toString(annotationID);
 
             // check for existing render layer
             auto renderLayer = renderTile->getMutableLayer(layerID);

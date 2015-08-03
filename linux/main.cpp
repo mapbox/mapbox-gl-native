@@ -12,6 +12,8 @@
 #include <getopt.h>
 #include <fstream>
 #include <sstream>
+#include <cstdlib>
+#include <cstdio>
 
 namespace {
 

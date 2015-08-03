@@ -44,7 +44,7 @@ float CollisionTile::placeFeature(const CollisionFeature &feature) {
             if (std::isnan(s1) || std::isnan(s2)) s1 = s2 = 1;
             if (std::isnan(s3) || std::isnan(s4)) s3 = s4 = 1;
 
-            float collisionFreeScale = std::fmin(std::fmax(s1, s2), std::fmax(s3, s4));
+            float collisionFreeScale = ::fmin(::fmax(s1, s2), ::fmax(s3, s4));
 
             if (collisionFreeScale > blocking.maxScale) {
                 // After a box's maxScale the label has shrunk enough that the box is no longer needed to cover it,

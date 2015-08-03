@@ -141,7 +141,7 @@ void FillBucket::tessellate() {
 
         for (size_t i = 0; i < vertex_count; ++i) {
             if (vertex_indices[i] == TESS_UNDEF) {
-                vertexBuffer.add(std::round(vertices[i * 2]), std::round(vertices[i * 2 + 1]));
+                vertexBuffer.add(::round(vertices[i * 2]), ::round(vertices[i * 2 + 1]));
                 vertex_indices[i] = (TESSindex)total_vertex_count;
                 total_vertex_count++;
             }

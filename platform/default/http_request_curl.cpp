@@ -7,6 +7,7 @@
 
 #include <mbgl/util/time.hpp>
 #include <mbgl/util/util.hpp>
+#include <mbgl/util/string.hpp>
 
 #include <curl/curl.h>
 
@@ -20,6 +21,7 @@
 #include <map>
 #include <cassert>
 #include <cstring>
+#include <cstdio>
 
 void handleError(CURLMcode code) {
     if (code != CURLM_OK) {
@@ -700,12 +702,12 @@ void HTTPCURLRequest::handleResult(CURLcode code) {
         } else if (responseCode >= 500 && responseCode < 600) {
             // Server errors may be temporary, so back off exponentially.
             response->status = Response::Error;
-            response->message = "HTTP status code " + std::to_string(responseCode);
+            response->message = "HTTP status code " + util::toString(responseCode);
             return finish(ResponseStatus::TemporaryError);
         } else {
             // We don't know how to handle any other errors, so declare them as permanently failing.
             response->status = Response::Error;
-            response->message = "HTTP status code " + std::to_string(responseCode);
+            response->message = "HTTP status code " + util::toString(responseCode);
             return finish(ResponseStatus::PermanentError);
         }
     }

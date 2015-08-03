@@ -63,8 +63,8 @@ FadeProperties FrameHistory::getFadeProperties(const Duration& duration) {
     float startingZ = history.front().z;
     const FrameSnapshot lastFrame = history.back();
     float endingZ = lastFrame.z;
-    float lowZ = std::fmin(startingZ, endingZ);
-    float highZ = std::fmax(startingZ, endingZ);
+    float lowZ = ::fmin(startingZ, endingZ);
+    float highZ = ::fmax(startingZ, endingZ);
 
     // Calculate the speed of zooming, and how far it would zoom in terms of zoom levels in one
     // duration

@@ -448,7 +448,7 @@ template <typename Buffer, typename GroupType>
 void SymbolBucket::addSymbols(Buffer &buffer, const SymbolQuads &symbols, float scale, const bool keepUpright, const bool alongLine) {
     const float zoom = collision.zoom;
 
-    const float placementZoom = std::fmax(std::log(scale) / std::log(2) + zoom, 0);
+    const float placementZoom = ::fmax(std::log(scale) / std::log(2) + zoom, 0);
 
     for (const auto& symbol : symbols) {
         const auto &tl = symbol.tl;

@@ -24,6 +24,7 @@
 #include <mbgl/util/worker.hpp>
 #include <mbgl/util/texture_pool.hpp>
 #include <mbgl/util/exception.hpp>
+#include <mbgl/util/string.hpp>
 
 #include <algorithm>
 
@@ -170,7 +171,7 @@ void MapContext::updateAnnotationTiles(const std::unordered_set<TileID, TileID::
 
     // create (if necessary) layers and buckets for each shape
     for (const auto &shapeAnnotationID : annotationManager->getOrderedShapeAnnotations()) {
-        const std::string shapeLayerID = shapeID + "." + std::to_string(shapeAnnotationID);
+        const std::string shapeLayerID = shapeID + "." + util::toString(shapeAnnotationID);
 
         const auto layer_it = std::find_if(style->layers.begin(), style->layers.end(),
             [&shapeLayerID](util::ptr<StyleLayer> layer) {

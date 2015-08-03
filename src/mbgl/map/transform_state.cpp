@@ -140,11 +140,11 @@ double TransformState::getMinZoom() const {
     double test_y = y;
     constrain(test_scale, test_y);
 
-    return std::log2(std::fmin(min_scale, test_scale));
+    return ::log2(::fmin(min_scale, test_scale));
 }
 
 double TransformState::getMaxZoom() const {
-    return std::log2(max_scale);
+    return ::log2(max_scale);
 }
 
 

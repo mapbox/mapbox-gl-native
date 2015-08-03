@@ -23,8 +23,8 @@ void DebugFontBuffer::addText(const char *text, double left, double baseline, do
             if (glyph.data[j] == -1 && glyph.data[j + 1] == -1) {
                 prev = false;
             } else {
-                int16_t x = std::round(left + glyph.data[j] * scale);
-                int16_t y = std::round(baseline - glyph.data[j + 1] * scale);
+                int16_t x = ::round(left + glyph.data[j] * scale);
+                int16_t y = ::round(baseline - glyph.data[j + 1] * scale);
                 if (prev) {
                     coords = static_cast<uint16_t *>(addElement());
                     coords[0] = prev_x;

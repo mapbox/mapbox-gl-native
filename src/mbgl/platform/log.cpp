@@ -2,6 +2,7 @@
 
 #include <mbgl/util/thread_context.hpp>
 
+#include <cstdio>
 #include <cstdarg>
 #include <sstream>
 

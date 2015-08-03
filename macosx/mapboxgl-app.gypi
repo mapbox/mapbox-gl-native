@@ -34,6 +34,7 @@
 
       'variables' : {
         'cflags_cc': [
+          '<@(boost_cflags)',
           '<@(glfw3_cflags)',
         ],
         'ldflags': [

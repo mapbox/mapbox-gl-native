@@ -202,9 +202,9 @@ void Map::fitBounds(AnnotationSegment segment, EdgeInsets padding, const Duratio
     // Calculate the zoom level.
     double scaleX = (getWidth() - padding.left - padding.right) / size.x;
     double scaleY = (getHeight() - padding.top - padding.bottom) / size.y;
-    double minScale = std::fmin(scaleX, scaleY);
-    double zoom = std::log2(getScale() * minScale);
-    zoom = std::fmax(std::fmin(zoom, getMaxZoom()), getMinZoom());
+    double minScale = ::fmin(scaleX, scaleY);
+    double zoom = ::log2(getScale() * minScale);
+    zoom = ::fmax(::fmin(zoom, getMaxZoom()), getMinZoom());
 
     // Calculate the center point of a virtual bounds that is extended in all directions by padding.
     vec2<> paddedNEPixel = {
