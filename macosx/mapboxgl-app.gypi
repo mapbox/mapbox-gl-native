@@ -35,14 +35,14 @@
       'variables' : {
         'cflags_cc': [
           '<@(boost_cflags)',
-          '<@(glfw3_cflags)',
+          '<@(glfw_cflags)',
         ],
         'ldflags': [
           '-framework SystemConfiguration', # For NSUserDefaults and Reachability
-          '<@(glfw3_ldflags)',
+          '<@(glfw_ldflags)',
         ],
         'libraries': [
-          '<@(glfw3_static_libs)',
+          '<@(glfw_static_libs)',
         ],
       },
 

@@ -18,21 +18,21 @@
 
       'variables': {
         'cflags': [
-          '<@(uv_cflags)',
-          '<@(zip_cflags)',
+          '<@(libuv_cflags)',
+          '<@(libzip_cflags)',
         ],
         'cflags_cc': [
-          '<@(uv_cflags)',
-          '<@(zip_cflags)',
+          '<@(libuv_cflags)',
+          '<@(libzip_cflags)',
           '<@(boost_cflags)',
         ],
         'ldflags': [
-          '<@(uv_ldflags)',
-          '<@(zip_ldflags)',
+          '<@(libuv_ldflags)',
+          '<@(libzip_ldflags)',
         ],
         'libraries': [
-          '<@(uv_static_libs)',
-          '<@(zip_static_libs)',
+          '<@(libuv_static_libs)',
+          '<@(libzip_static_libs)',
         ],
         'defines': [
           '-DMBGL_ASSET_ZIP'

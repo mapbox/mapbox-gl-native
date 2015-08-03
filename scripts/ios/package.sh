@@ -50,7 +50,7 @@ if [[ "${BUILD_FOR_DEVICE}" == true ]]; then
         ARCHS="arm64 armv7 armv7s" \
         ONLY_ACTIVE_ARCH=NO \
         GCC_GENERATE_DEBUGGING_SYMBOLS=${GCC_GENERATE_DEBUGGING_SYMBOLS} \
-        -project ./build/ios/mbgl.xcodeproj \
+        -project ./build/ios-all/mbgl.xcodeproj \
         -configuration ${BUILDTYPE} \
         -target everything \
         -jobs ${JOBS} | xcpretty -c
@@ -61,7 +61,7 @@ xcodebuild -sdk iphonesimulator${IOS_SDK_VERSION} \
     ARCHS="x86_64 i386" \
     ONLY_ACTIVE_ARCH=NO \
     GCC_GENERATE_DEBUGGING_SYMBOLS=${GCC_GENERATE_DEBUGGING_SYMBOLS} \
-    -project ./build/ios/mbgl.xcodeproj \
+    -project ./build/ios-all/mbgl.xcodeproj \
     -configuration ${BUILDTYPE} \
     -target everything \
     -jobs ${JOBS} | xcpretty -c

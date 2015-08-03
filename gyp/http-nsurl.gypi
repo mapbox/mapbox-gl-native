@@ -17,14 +17,14 @@
 
       'variables': {
         'cflags_cc': [
-          '<@(uv_cflags)',
+          '<@(libuv_cflags)',
         ],
         'ldflags': [
           '-framework Foundation', # For NSURLRequest
-          '<@(uv_ldflags)',
+          '<@(libuv_ldflags)',
         ],
         'libraries': [
-          '<@(uv_static_libs)',
+          '<@(libuv_static_libs)',
         ],
         'defines': [
           '-DMBGL_HTTP_NSURL'
