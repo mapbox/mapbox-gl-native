@@ -31,11 +31,11 @@ void quit_handler(int) {
 }
 
 int main(int argc, char *argv[]) {
-    int fullscreen_flag = 0;
+    bool fullscreen = false;
     std::string style;
 
     const struct option long_options[] = {
-        {"fullscreen", no_argument, &fullscreen_flag, 'f'},
+        {"fullscreen", no_argument, 0, 'f'},
         {"style", required_argument, 0, 's'},
         {0, 0, 0, 0}
     };
@@ -50,7 +50,7 @@ int main(int argc, char *argv[]) {
             if (long_options[option_index].flag != 0)
                 break;
         case 'f':
-            // handle fullscreen_flag
+            fullscreen = true;
             break;
         case 's':
             style = std::string("asset://") + std::string(optarg);
@@ -67,7 +67,7 @@ int main(int argc, char *argv[]) {
     sigIntHandler.sa_flags = 0;
     sigaction(SIGINT, &sigIntHandler, NULL);
 
-    view = std::make_unique<GLFWView>();
+    view = std::make_unique<GLFWView>(fullscreen);
 
     mbgl::SQLiteCache cache("/tmp/mbgl-cache.db");
     mbgl::DefaultFileSource fileSource(&cache);
