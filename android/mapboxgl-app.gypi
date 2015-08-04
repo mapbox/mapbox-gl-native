@@ -77,7 +77,7 @@
             '../common/ca-bundle.crt',
             '../styles/styles'
           ],
-          'destination': '<(pwd)/java/MapboxGLAndroidSDK/src/main/assets'
+          'destination': '<(pwd)/../android/java/MapboxGLAndroidSDK/src/main/assets'
         },
       ],
 
@@ -85,7 +85,7 @@
         {
           'action_name': 'Strip dynamic library',
           'inputs': [ '<(PRODUCT_DIR)/lib.target/libmapbox-gl.so' ],
-          'outputs': [ '<(pwd)/java/MapboxGLAndroidSDK/src/main/jniLibs/$(JNIDIR)/libmapbox-gl.so' ],
+          'outputs': [ '<(pwd)/../android/java/MapboxGLAndroidSDK/src/main/jniLibs/$(JNIDIR)/libmapbox-gl.so' ],
           'action': [ '$(STRIP)', '<@(_inputs)', '-o', '<@(_outputs)' ]
         },
       ],
