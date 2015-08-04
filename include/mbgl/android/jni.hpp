@@ -31,6 +31,29 @@ extern jfieldID latLngZoomLatitudeId;
 extern jfieldID latLngZoomLongitudeId;
 extern jfieldID latLngZoomZoomId;
 
+extern jclass markerClass;
+extern jmethodID markerConstructorId;
+extern jfieldID markerPositionId;
+extern jfieldID markerSpriteId;
+
+extern jclass polylineClass;
+extern jmethodID polylineConstructorId;
+extern jfieldID polylineAlphaId;
+extern jfieldID polylineVisibleId;
+extern jfieldID polylineColorId;
+extern jfieldID polylineWidthId;
+extern jfieldID polylinePointsId;
+
+extern jclass polygonClass;
+extern jmethodID polygonConstructorId;
+extern jfieldID polygonAlphaId;
+extern jfieldID polygonVisibleId;
+extern jfieldID polygonFillColorId;
+extern jfieldID polygonStrokeColorId;
+extern jfieldID polygonStrokeWidthId;
+extern jfieldID polygonPointsId;
+extern jfieldID polygonHolesId;
+
 extern jclass runtimeExceptionClass;
 extern jclass nullPointerExceptionClass;
 

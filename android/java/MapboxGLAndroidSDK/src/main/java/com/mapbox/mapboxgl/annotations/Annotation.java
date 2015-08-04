@@ -10,12 +10,11 @@ public abstract class Annotation {
      *
      * Internal C++ id is stored as unsigned int.
      */
-    protected Long id; // null unless added to a MapView
+    protected long id = -1; // -1 unless added to a MapView
     private MapView mapView;
 
-    float alpha = 1;
+    float alpha = 1.0f;
     boolean visible = true;
-
 
     public Annotation() {}
 
@@ -23,7 +22,7 @@ public abstract class Annotation {
         return alpha;
     }
 
-    public Long getId() {
+    public long getId() {
         return id;
     }
 
@@ -40,7 +39,7 @@ public abstract class Annotation {
         this.alpha = alpha;
     }
 
-    public void setId(Long id) {
+    public void setId(long id) {
         this.id = id;
     }
 
