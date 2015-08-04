@@ -46,6 +46,14 @@ std::string normalizeGlyphsURL(const std::string& url, const std::string& access
         return url;
     }
 
+    const std::string fonts = "mapbox://fonts/";
+    const std::string fontsv1 = "mapbox://fonts/v1/";
+
+    if (url.compare(0, fonts.length(), fonts) == 0 && url.compare(0, fontsv1.length(), fontsv1) != 0) {
+        const std::string newURL = fontsv1 + url.substr(fonts.length());
+        return normalizeURL(newURL, "/", accessToken);
+    }
+
     const std::string fontstack = "mapbox://fontstack/";
 
     if (url.compare(0, fontstack.length(), fontstack) == 0) {
