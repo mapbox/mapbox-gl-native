@@ -244,12 +244,6 @@ public class MapView extends FrameLayout implements LocationListener {
             onConnectivityChanged(isConnected);
         }
 
-        // Setup User Location UI
-        mGpsMarker = new ImageView(getContext());
-//        mGpsMarker.setVisibility(View.INVISIBLE);
-        mGpsMarker.setImageResource(R.drawable.location_marker);
-        mGpsMarker.setLayoutParams(new FrameLayout.LayoutParams((int) (27.0f * mScreenDensity), (int) (27.0f * mScreenDensity)));
-        addView(mGpsMarker);
 
         // Setup Location Services
         mLocationClient = new LostApiClient.Builder(getContext()).build();
@@ -257,6 +251,16 @@ public class MapView extends FrameLayout implements LocationListener {
                 .setInterval(1000)
                 .setSmallestDisplacement(1)
                 .setPriority(LocationRequest.PRIORITY_HIGH_ACCURACY);
+
+        setOnMapChangedListener(new OnMapChangedListener() {
+            @Override
+            public void onMapChanged() {
+                // TODO - doesn't seem to be firing like it does client side
+
+                Log.i(TAG, "onMapChanged!");
+                updateMap();
+            }
+        });
     }
 
     //
@@ -1425,11 +1429,12 @@ public class MapView extends FrameLayout implements LocationListener {
         } else {
             if (mIsGpsOn) {
                 mIsGpsOn = false;
-//                LocationServices.FusedLocationApi.removeLocationUpdates(this);
+                LocationServices.FusedLocationApi.removeLocationUpdates(this);
                 mLocationClient.disconnect();
                 mGpsLocation = null;
             }
         }
+        updateMap();
     }
 
     /**
@@ -1438,7 +1443,7 @@ public class MapView extends FrameLayout implements LocationListener {
      */
     @Override
     public void onLocationChanged(Location location) {
-        Log.i(TAG, "onLocationChanged: " + location);
+        Log.i(TAG, "onLocationChanged(): " + location);
         updateLocation(location);
     }
 
@@ -1446,19 +1451,36 @@ public class MapView extends FrameLayout implements LocationListener {
     private void updateLocation(Location location) {
         if (location != null) {
             mGpsLocation = location;
+            updateMap();
         }
-
-        updateMap();
     }
 
     // Updates the UI to match the current map's position
     private void updateMap() {
+        Log.i(TAG, "updateMap()");
 //        rotateImageView(mCompassView, (float) mapView.getDirection());
 
-        if (mGpsLocation != null) {
+        if (isMyLocationEnabled() && mGpsLocation != null) {
+            if (mGpsMarker == null) {
+                // Setup User Location UI
+                // NOTE: mIsGpsOn == false to begin with
+                mGpsMarker = new ImageView(getContext());
+                mGpsMarker.setImageResource(R.drawable.location_marker);
+                addView(mGpsMarker);
+            }
+
             mGpsMarker.setVisibility(View.VISIBLE);
             LatLng coordinate = new LatLng(mGpsLocation);
             PointF screenLocation = toScreenLocation(coordinate);
+
+            float iconSize = 27.0f * mScreenDensity;
+            // Update Location
+            FrameLayout.LayoutParams lp = new FrameLayout.LayoutParams((int) iconSize, (int) iconSize);
+            lp.leftMargin = (int) (screenLocation.x - iconSize / 2.0f);
+            lp.topMargin = getHeight() - (int) (screenLocation.y + iconSize / 2.0f);
+            mGpsMarker.setLayoutParams(lp);
+//                rotateImageView(mGpsMarker, 0.0f);
+            mGpsMarker.requestLayout();
 
 /*
             if (mGpsLocation.hasBearing() || mCompassValid) {
@@ -1473,15 +1495,6 @@ public class MapView extends FrameLayout implements LocationListener {
                 mGpsMarker.requestLayout();
             } else {
 */
-                mGpsMarker.setImageResource(R.drawable.location_marker);
-                float iconSize = 27.0f * mScreenDensity;
-                FrameLayout.LayoutParams lp = new FrameLayout.LayoutParams((int) iconSize, (int) iconSize);
-                lp.leftMargin = (int) (screenLocation.x - iconSize / 2.0f);
-                lp.topMargin = getHeight() - (int) (screenLocation.y + iconSize / 2.0f);
-                mGpsMarker.setLayoutParams(lp);
-//                rotateImageView(mGpsMarker, 0.0f);
-                mGpsMarker.requestLayout();
-//            }
         } else {
             mGpsMarker.setVisibility(View.INVISIBLE);
         }
