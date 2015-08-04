@@ -34,13 +34,15 @@ struct FrameData {
 
 class MapContext : public Style::Observer {
 public:
-    MapContext(View&, FileSource&, MapData&);
+    MapContext(FileSource&, MapData&);
     ~MapContext();
 
     struct RenderResult {
         bool fullyLoaded;
         bool needsRerender;
     };
+
+    void setView(View*);
 
     void pause();
 
@@ -78,7 +80,7 @@ private:
     // Loads the actual JSON object an creates a new Style object.
     void loadStyleJSON(const std::string& json, const std::string& base);
 
-    View& view;
+    View* view;
     MapData& data;
 
     util::GLObjectStore glObjectStore;
