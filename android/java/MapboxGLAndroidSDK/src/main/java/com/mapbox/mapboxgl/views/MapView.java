@@ -10,6 +10,7 @@ import android.content.pm.PackageManager;
 import android.content.res.TypedArray;
 import android.graphics.Bitmap;
 import android.graphics.PointF;
+import android.graphics.Rect;
 import android.location.Location;
 import android.net.ConnectivityManager;
 import android.net.NetworkInfo;
@@ -21,6 +22,7 @@ import android.support.v4.view.ScaleGestureDetectorCompat;
 import android.text.TextUtils;
 import android.util.Log;
 import android.view.GestureDetector;
+import android.view.Gravity;
 import android.view.ScaleGestureDetector;
 import android.util.AttributeSet;
 import android.view.InputDevice;
@@ -30,6 +32,7 @@ import android.view.SurfaceHolder;
 import android.view.SurfaceView;
 import android.view.View;
 import android.view.ViewConfiguration;
+import android.view.ViewGroup;
 import android.widget.FrameLayout;
 import android.widget.ImageView;
 import android.widget.ZoomButtonsController;
@@ -55,7 +58,7 @@ import java.util.List;
 
 // Custom view that shows a Map
 // Based on SurfaceView as we use OpenGL ES to render
-public class MapView extends SurfaceView implements LocationListener {
+public class MapView extends ViewGroup implements LocationListener {
 
     //
     // Static members
@@ -89,6 +92,7 @@ public class MapView extends SurfaceView implements LocationListener {
     //
 
     // Used to call JNI NativeMapView
+    private SurfaceView mSurfaceView;
     private NativeMapView mNativeMapView;
 
     // Used to handle DPI scaling
@@ -159,6 +163,9 @@ public class MapView extends SurfaceView implements LocationListener {
         // Save the context
         mContext = context;
 
+        mSurfaceView = new SurfaceView(mContext);
+        addView(mSurfaceView);
+
         // Check if we are in Eclipse UI editor
         if (isInEditMode()) {
             return;
@@ -212,9 +219,9 @@ public class MapView extends SurfaceView implements LocationListener {
 
         // Register the SurfaceHolder callbacks
         if (android.os.Build.VERSION.SDK_INT >= Build.VERSION_CODES.GINGERBREAD) {
-            getHolder().addCallback(new Callbacks2());
+            mSurfaceView.getHolder().addCallback(new Callbacks2());
         } else {
-            getHolder().addCallback(new Callbacks());
+            mSurfaceView.getHolder().addCallback(new Callbacks());
         }
 
         // Touch gesture detectors
@@ -661,6 +668,190 @@ public class MapView extends SurfaceView implements LocationListener {
         // Required by ZoomButtonController (from Android SDK documentation)
         if (mZoomButtonsController != null) {
             mZoomButtonsController.setVisible(false);
+        }
+    }
+
+    /**
+     * Layout Logic based on Android Documentation for ViewGroup
+     * http://developer.android.com/reference/android/view/ViewGroup.html
+     */
+
+    /** The amount of space used by children in the left gutter. */
+    private int mLeftWidth;
+
+    /** The amount of space used by children in the right gutter. */
+    private int mRightWidth;
+
+    /** These are used for computing child frames based on their gravity. */
+    private final Rect mTmpContainerRect = new Rect();
+    private final Rect mTmpChildRect = new Rect();
+
+    /**
+     * Ask all children to measure themselves and compute the measurement of this
+     * layout based on the children.
+     */
+    @Override
+    protected void onMeasure(int widthMeasureSpec, int heightMeasureSpec) {
+        int count = getChildCount();
+
+        // These keep track of the space we are using on the left and right for
+        // views positioned there; we need member variables so we can also use
+        // these for layout later.
+        mLeftWidth = 0;
+        mRightWidth = 0;
+
+        // Measurement will ultimately be computing these values.
+        int maxHeight = 0;
+        int maxWidth = 0;
+        int childState = 0;
+
+        // Iterate through all children, measuring them and computing our dimensions
+        // from their size.
+        for (int i = 0; i < count; i++) {
+            final View child = getChildAt(i);
+            if (child.getVisibility() != GONE) {
+                // Measure the child.
+                measureChildWithMargins(child, widthMeasureSpec, 0, heightMeasureSpec, 0);
+
+                // Update our size information based on the layout params.  Children
+                // that asked to be positioned on the left or right go in those gutters.
+                final LayoutParams lp = (LayoutParams) child.getLayoutParams();
+                if (lp.position == LayoutParams.POSITION_LEFT) {
+                    mLeftWidth += Math.max(maxWidth,
+                            child.getMeasuredWidth() + lp.leftMargin + lp.rightMargin);
+                } else if (lp.position == LayoutParams.POSITION_RIGHT) {
+                    mRightWidth += Math.max(maxWidth,
+                            child.getMeasuredWidth() + lp.leftMargin + lp.rightMargin);
+                } else {
+                    maxWidth = Math.max(maxWidth,
+                            child.getMeasuredWidth() + lp.leftMargin + lp.rightMargin);
+                }
+                maxHeight = Math.max(maxHeight,
+                        child.getMeasuredHeight() + lp.topMargin + lp.bottomMargin);
+                childState = combineMeasuredStates(childState, child.getMeasuredState());
+            }
+        }
+
+        // Total width is the maximum width of all inner children plus the gutters.
+        maxWidth += mLeftWidth + mRightWidth;
+
+        // Check against our minimum height and width
+        maxHeight = Math.max(maxHeight, getSuggestedMinimumHeight());
+        maxWidth = Math.max(maxWidth, getSuggestedMinimumWidth());
+
+        // Report our final dimensions.
+        setMeasuredDimension(resolveSizeAndState(maxWidth, widthMeasureSpec, childState),
+                resolveSizeAndState(maxHeight, heightMeasureSpec,
+                        childState << MEASURED_HEIGHT_STATE_SHIFT));
+    }
+
+    /**
+     * {@inheritDoc}
+     *
+     * @param changed
+     * @param left
+     * @param top
+     * @param right
+     * @param bottom
+     */
+    @Override
+    protected void onLayout(boolean changed, int left, int top, int right, int bottom) {
+        final int count = getChildCount();
+
+        // These are the far left and right edges in which we are performing layout.
+        int leftPos = getPaddingLeft();
+        int rightPos = right - left - getPaddingRight();
+
+        // This is the middle region inside of the gutter.
+        final int middleLeft = leftPos + mLeftWidth;
+        final int middleRight = rightPos - mRightWidth;
+
+        // These are the top and bottom edges in which we are performing layout.
+        final int parentTop = getPaddingTop();
+        final int parentBottom = bottom - top - getPaddingBottom();
+
+        for (int i = 0; i < count; i++) {
+            final View child = getChildAt(i);
+            if (child.getVisibility() != GONE) {
+                final LayoutParams lp = (LayoutParams) child.getLayoutParams();
+
+                final int width = child.getMeasuredWidth();
+                final int height = child.getMeasuredHeight();
+
+                // Compute the frame in which we are placing this child.
+                if (lp.position == LayoutParams.POSITION_LEFT) {
+                    mTmpContainerRect.left = leftPos + lp.leftMargin;
+                    mTmpContainerRect.right = leftPos + width + lp.rightMargin;
+                    leftPos = mTmpContainerRect.right;
+                } else if (lp.position == LayoutParams.POSITION_RIGHT) {
+                    mTmpContainerRect.right = rightPos - lp.rightMargin;
+                    mTmpContainerRect.left = rightPos - width - lp.leftMargin;
+                    rightPos = mTmpContainerRect.left;
+                } else {
+                    mTmpContainerRect.left = middleLeft + lp.leftMargin;
+                    mTmpContainerRect.right = middleRight - lp.rightMargin;
+                }
+                mTmpContainerRect.top = parentTop + lp.topMargin;
+                mTmpContainerRect.bottom = parentBottom - lp.bottomMargin;
+
+                // Use the child's gravity and size to determine its final
+                // frame within its container.
+                Gravity.apply(lp.gravity, width, height, mTmpContainerRect, mTmpChildRect);
+
+                // Place the child.
+                child.layout(mTmpChildRect.left, mTmpChildRect.top,
+                        mTmpChildRect.right, mTmpChildRect.bottom);
+            }
+        }
+
+    }
+
+    @Override
+    public LayoutParams generateLayoutParams(AttributeSet attrs) {
+        return new MapView.LayoutParams(getContext(), attrs);
+    }
+
+    @Override
+    protected LayoutParams generateDefaultLayoutParams() {
+        return new LayoutParams(LayoutParams.MATCH_PARENT, LayoutParams.MATCH_PARENT);
+    }
+
+    @Override
+    protected ViewGroup.LayoutParams generateLayoutParams(ViewGroup.LayoutParams p) {
+        return new LayoutParams(p);
+    }
+
+    @Override
+    protected boolean checkLayoutParams(ViewGroup.LayoutParams p) {
+        return p instanceof LayoutParams;
+    }
+
+    /**
+     * Custom per-child layout information.
+     */
+    public static class LayoutParams extends MarginLayoutParams {
+        /**
+         * The gravity to apply with the View to which these layout parameters
+         * are associated.
+         */
+        public int gravity = Gravity.TOP | Gravity.START;
+
+        public static int POSITION_MIDDLE = 0;
+        public static int POSITION_LEFT = 1;
+        public static int POSITION_RIGHT = 2;
+
+        public int position = POSITION_MIDDLE;
+
+        public LayoutParams(Context c, AttributeSet attrs) {
+            super(c, attrs);
+        }
+
+        public LayoutParams(int width, int height) {
+            super(width, height);
+        }
+
+        public LayoutParams(ViewGroup.LayoutParams source) {
+            super(source);
         }
     }
 
