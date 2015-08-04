@@ -160,8 +160,6 @@ void PngReader<T>::read(unsigned x0, unsigned y0, unsigned w, unsigned h, char *
 
 #ifdef PNG_ALPHA_PREMULTIPLIED
     png_set_alpha_mode(png_ptr, PNG_ALPHA_PREMULTIPLIED, PNG_GAMMA_LINEAR);
-#else
-    // TODO: Manually premultiply the image data.
 #endif
 
     if (x0 == 0 && y0 == 0 && w >= width_ && h >= height_)
@@ -180,6 +178,20 @@ void PngReader<T>::read(unsigned x0, unsigned y0, unsigned w, unsigned h, char *
         for (unsigned row = 0; row < height_; ++row)
             rows[row] = (png_bytep)image + row * width_ * 4 ;
         png_read_image(png_ptr, rows.get());
+        fprintf(stderr, "manual premultiplication\n");
+
+#ifndef PNG_ALPHA_PREMULTIPLIED
+        // Manually premultiply the image if libpng didn't do it for us.
+        for (unsigned row = 0; row < height_; ++row) {
+            for (unsigned x = 0; x < width_; x++) {
+                png_byte* ptr = &(rows[row][x * 4]);
+                const float a = ptr[3] / 255.0f;
+                ptr[0] *= a;
+                ptr[1] *= a;
+                ptr[2] *= a;
+            }
+        }
+#endif
     }
     else
     {
@@ -193,6 +205,7 @@ void PngReader<T>::read(unsigned x0, unsigned y0, unsigned w, unsigned h, char *
             png_read_row(png_ptr,row.get(),0);
             if (i >= y0 && i < (y0 + h))
             {
+                // TODO: premultiply this
                 std::copy(&row[x0 * 4], &row[x0 * 4] + w * 4, image + i * width_* 4);
             }
         }
