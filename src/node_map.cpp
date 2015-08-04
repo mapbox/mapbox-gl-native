@@ -192,7 +192,7 @@ NAN_METHOD(NodeMap::Render) {
 }
 
 void NodeMap::startRender(std::unique_ptr<NodeMap::RenderOptions> options) {
-    map->resize(options->width, options->height, options->ratio);
+    view.resize(options->width, options->height);
     map->setClasses(options->classes);
     map->setLatLngZoom(mbgl::LatLng(options->latitude, options->longitude), options->zoom);
     map->setBearing(options->bearing);
@@ -319,7 +319,7 @@ void NodeMap::release() {
 // Instance
 
 NodeMap::NodeMap(v8::Handle<v8::Object> options) :
-    view(sharedDisplay()),
+    view(sharedDisplay(), 1.0),
     fs(options),
     map(std::make_unique<mbgl::Map>(view, fs, mbgl::MapMode::Still)),
     async(new uv_async_t) {
