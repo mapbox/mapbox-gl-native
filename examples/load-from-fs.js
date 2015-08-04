@@ -9,18 +9,16 @@ var PNG = require('pngjs').PNG;
 
 var base = path.join(path.dirname(process.mainModule.filename), '../test');
 
-var fileSource = new mbgl.FileSource();
-fileSource.request = function(req) {
-    fs.readFile(path.join(base, req.url), function(err, data) {
-        req.respond(err, { data: data });
-    });
-};
+var map = new mbgl.Map({
+    request: function(req) {
+        fs.readFile(path.join(base, req.url), function(err, data) {
+            req.respond(err, { data: data });
+        });
+    }
+});
 
-fileSource.cancel = function(req) {
-};
-
-var map = new mbgl.Map(fileSource);
 map.load(require('../test/fixtures/style.json'));
+
 map.render({}, function(err, data) {
     if (err) throw err;
 

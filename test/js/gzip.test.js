@@ -31,31 +31,27 @@ function setup(options, callback) {
     callback(new mbgl.Map(options));
 }
 
-function getFileSourceOptions(gzip, t) {
-    var options = {};
+function getOptions(gzip, t) {
+    return {
+        request: function(req) {
+            var parts = req.url.split('.');
+            var filetype = parts[parts.length - 1];
 
-    options.request = function(req) {
-        var parts = req.url.split('.');
-        var filetype = parts[parts.length - 1];
-
-        request({
-            url: 'http://localhost:' + server.address().port + path.join('/', req.url),
-            encoding: null,
-            gzip: filetype === 'pbf' ? gzip : true,
-            headers: {
-                'Accept-Encoding': 'gzip'
-            }
-        }, function (err, res, body) {
-            t.error(err);
-            var response = {};
-            response.data = res.body;
-            req.respond(null, response);
-        });
+            request({
+                url: 'http://localhost:' + server.address().port + path.join('/', req.url),
+                encoding: null,
+                gzip: filetype === 'pbf' ? gzip : true,
+                headers: {
+                    'Accept-Encoding': 'gzip'
+                }
+            }, function (err, res, body) {
+                t.error(err);
+                var response = {};
+                response.data = res.body;
+                req.respond(null, response);
+            });
+        }
     };
-
-    options.cancel = function(req) {};
-
-    return options;
 }
 
 test('gzip', function(t) {
@@ -64,7 +60,7 @@ test('gzip', function(t) {
             if (msg.severity == 'ERROR') t.error(msg);
         });
 
-        setup(getFileSourceOptions(true, t), function(map) {
+        setup(getOptions(true, t), function(map) {
             map.load(style);
             map.render({}, function(err, data) {
                 mbgl.removeAllListeners('message');
@@ -110,7 +106,7 @@ test('gzip', function(t) {
             }
         });
 
-        setup(getFileSourceOptions(false, t), function(map) {
+        setup(getOptions(false, t), function(map) {
             map.load(style);
             map.render({}, function(err, data) {
                 map.release();

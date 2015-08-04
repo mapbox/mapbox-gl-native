@@ -61,17 +61,17 @@ NAN_METHOD(NodeMap::New) {
     }
 
     if (args.Length() < 1 || !args[0]->IsObject()) {
-        return NanThrowTypeError("Requires FileSource options as first argument");
+        return NanThrowTypeError("Requires an options object as first argument");
     }
 
     auto options = args[0]->ToObject();
 
     // Check that request() and cancel() are defined.
     if (!options->Has(NanNew("request")) || !options->Get(NanNew("request"))->IsFunction()) {
-        return NanThrowError("FileSource options must have a request member function");
+        return NanThrowError("Options object must have a 'request' method");
     }
-    if (!options->Has(NanNew("cancel")) || !options->Get(NanNew("cancel"))->IsFunction()) {
-        return NanThrowError("FileSource options must have a cancel member function");
+    if (options->Has(NanNew("cancel")) && !options->Get(NanNew("cancel"))->IsFunction()) {
+        return NanThrowError("Options object 'cancel' property must be a function");
     }
 
     try {

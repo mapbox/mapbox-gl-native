@@ -27,7 +27,7 @@ Other platforms will fall back to a source compile with `npm run build`. To comp
 ## Rendering a map tile
 
 ```js
-var map = new mbgl.Map(fileSource);
+var map = new mbgl.Map({ request: function() {} });
 map.load(require('./test/fixtures/style.json'));
 map.render({}, function(err, image) {
     if (err) throw err;
@@ -61,22 +61,20 @@ npm test
 
 ## Implementing a file source
 
-When creating a `Map` object, you need to pass a `FileSource` object as the first parameter
+When creating a `Map`, you must pass an options object (with a required `request` and optional `cancel` method) as the first parameter.
 
 ```js
-var request = require('request');
-
-var fileSource = new mbgl.FileSource();
-fileSource.request = function(req) {
-    // TODO
-};
-
-fileSource.cancel = function(req) {
-    // TODO
-};
+var map = new mbgl.Map({
+    request: function(req) {
+        // TODO
+    },
+    cancel: function(req) {
+        // TODO
+    }
+});
 ```
 
-The `request()` method starts a new request to a file, while `cancel()` tells your FileSource implementation to cancel the request (if possible). The `req` parameter has two properties:
+The `request()` method starts a new request to a file, while `cancel()` tells the FileSource to cancel the request (if possible). The `req` parameter has two properties:
 
 ```json
 {
@@ -104,12 +102,13 @@ It has no significance for anything but serves as a hint to your implemention as
 A sample implementation that reads files from disk would look like the following:
 
 ```js
-fileSource.request = function(req) {
-    fs.readFile(path.join('base/path', req.url), function(err, data) {
-        req.respond(err, { data: data });
-    });
-};
-fileSource.cancel = function() {};
+var map = new mbgl.Map({
+    request: function(req) {
+        fs.readFile(path.join('base/path', req.url), function(err, data) {
+            req.respond(err, { data: data });
+        });
+    }
+});
 ```
 
 This is a very barebones implementation and you'll probably want a better implementation. E.g. it passes the url verbatim to the file system, but you'd want add some logic that normalizes `http` URLs. You'll notice that once your implementation has obtained the requested file, you have to deliver it to the requestee by calling `req.respond()`, which takes either an error object or `null` and an object with several settings:
@@ -129,51 +128,51 @@ A sample implementation that uses [`request`](https://github.com/request/request
 var mbgl = require('mapbox-gl-native');
 var request = require('request');
 
-var fileSource = new mbgl.FileSource();
-fileSource.request = function(req) {
-    request({
-        url: req.url,
-        encoding: null,
-        gzip: true
-    }, function (err, res, body) {
-        if (req.canceled) {
-            return;
-        }
+var map = new mbgl.Map({
+    request: function(req) {
+        request({
+            url: req.url,
+            encoding: null,
+            gzip: true
+        }, function (err, res, body) {
+            if (req.canceled) {
+                return;
+            }
 
-        if (err) {
-            req.respond(err);
-        } else if (res.statusCode == 200) {
-            var response = {};
+            if (err) {
+                req.respond(err);
+            } else if (res.statusCode == 200) {
+                var response = {};
 
-            if (res.headers.modified) { response.modified = new Date(res.headers.modified); }
-            if (res.headers.expires) { response.expires = new Date(res.headers.expires); }
-            if (res.headers.etag) { response.etag = res.headers.etag; }
-            response.data = body;
-            req.respond(null, response);
-        } else {
-            req.respond(new Error(JSON.parse(body).message));
-        }
-    });
-};
-
-fileSource.cancel = function(req) {
-    req.canceled = true;
-};
+                if (res.headers.modified) { response.modified = new Date(res.headers.modified); }
+                if (res.headers.expires) { response.expires = new Date(res.headers.expires); }
+                if (res.headers.etag) { response.etag = res.headers.etag; }
+                response.data = body;
+                req.respond(null, response);
+            } else {
+                req.respond(new Error(JSON.parse(body).message));
+            }
+        });
+    },
+    cancel: function(req) {
+        req.canceled = true;
+    }
+});
 ```
 
-Note that in reality, Mapbox GL uses two types of protocols: `asset://` for files that should be loaded from some local static system, and `http://` (and `https://`), which should be loaded from the internet. However, stylesheets are free to use other protocols too, if your implementation of FileSource supports these; e.g. you could use `s3://` to indicate that files are supposed to be loaded from S3.
+Note that in reality, Mapbox GL uses two types of protocols: `asset://` for files that should be loaded from some local static system, and `http://` (and `https://`), which should be loaded from the internet. However, stylesheets are free to use other protocols too, if your implementation of `request` supports these; e.g. you could use `s3://` to indicate that files are supposed to be loaded from S3.
 
 ## Mapbox API Access tokens
 
-To use styles that rely on Mapbox vector tiles, you must pass an [API access token](https://www.mapbox.com/developers/api/#access-tokens) in your `FileSource` implementation with requests to `mapbox://` protocols.
+To use styles that rely on Mapbox vector tiles, you must pass an [API access token](https://www.mapbox.com/developers/api/#access-tokens) in your `request` implementation with requests to `mapbox://` protocols.
 
 ```js
 var mbgl = require('mapbox-gl-native');
 var request = require('request');
 var url = require('url');
 
-var fileSource = new mbgl.FileSource();
-fileSource.request = function(req) {
+var options = {};
+options.request = function(req) {
     var opts = {
         url: req.url,
         encoding: null,
@@ -201,7 +200,7 @@ fileSource.request = function(req) {
     });
 }
 
-var map = mbgl.Map(fileSource);
+var map = new mbgl.Map(options);
 var style = mapboxStyle; // includes a datasource with a reference to something like `mapbox://mapbox.mapbox-streets-v6`
 
 map.load(style);

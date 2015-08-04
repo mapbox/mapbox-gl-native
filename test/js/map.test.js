@@ -34,39 +34,35 @@ test('Map', function(t) {
             t.end();
         });
 
-        t.test('should require a FileSource options object as first parameter', function(t) {
+        t.test('should require an options object as first parameter', function(t) {
             t.throws(function() {
                 new mbgl.Map();
-            }, /Requires FileSource options as first argument/);
+            }, /Requires an options object as first argument/);
 
             t.throws(function() {
                 new mbgl.Map('options');
-            }, /Requires FileSource options as first argument/);
+            }, /Requires an options object as first argument/);
 
             t.end();
         });
 
-        t.test('should require the FileSource options object to have request and cancel methods', function(t) {
+        t.test('should require then options object to have request and cancel methods', function(t) {
             var options = {};
 
             t.throws(function() {
                 new mbgl.Map(options);
-            }, /FileSource options must have a request member function/);
+            }, /Options object must have a 'request' method/);
 
             options.request = 'test';
             t.throws(function() {
                 new mbgl.Map(options);
-            }, /FileSource options must have a request member function/);
+            }, /Options object must have a 'request' method/);
 
             options.request = function() {};
-            t.throws(function() {
-                new mbgl.Map(options);
-            }, /FileSource options must have a cancel member function/);
-
             options.cancel = 'test';
             t.throws(function() {
                 new mbgl.Map(options);
-            }, /FileSource options must have a cancel member function/);
+            }, /Options object 'cancel' property must be a function/);
 
             options.cancel = function() {};
             t.doesNotThrow(function() {
