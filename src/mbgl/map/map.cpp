@@ -46,7 +46,7 @@ void Map::resume() {
 void Map::setView(View* view_) {
     view = view_;
     transform = std::make_unique<Transform>(*view);
-    context->invoke(&MapContext::setView, view);
+    context->invokeSync(&MapContext::setView, view);
 
     view->initialize(this);
     update(Update::Dimensions);
