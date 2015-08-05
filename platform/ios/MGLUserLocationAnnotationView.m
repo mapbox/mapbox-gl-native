@@ -37,7 +37,7 @@ const CGFloat MGLUserLocationAnnotationHaloSize = 115.0;
 
 - (instancetype)initInMapView:(MGLMapView *)mapView
 {
-    if (self = [super initWithFrame:CGRectMake(0, 0, MGLTrackingDotRingWidth, MGLTrackingDotRingWidth)])
+    if (self = [super initWithFrame:CGRectMake(0, 0, MGLUserLocationAnnotationDotSize, MGLUserLocationAnnotationDotSize)])
     {
         self.annotation = [[MGLUserLocation alloc] initWithMapView:mapView];
         _mapView = mapView;
