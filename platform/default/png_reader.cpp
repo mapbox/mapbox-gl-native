@@ -178,7 +178,6 @@ void PngReader<T>::read(unsigned x0, unsigned y0, unsigned w, unsigned h, char *
         for (unsigned row = 0; row < height_; ++row)
             rows[row] = (png_bytep)image + row * width_ * 4 ;
         png_read_image(png_ptr, rows.get());
-        fprintf(stderr, "manual premultiplication\n");
 
 #ifndef PNG_ALPHA_PREMULTIPLIED
         // Manually premultiply the image if libpng didn't do it for us.
