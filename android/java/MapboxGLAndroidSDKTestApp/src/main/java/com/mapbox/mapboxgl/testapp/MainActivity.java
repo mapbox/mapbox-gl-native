@@ -1,15 +1,7 @@
 package com.mapbox.mapboxgl.testapp;
 
-import android.content.Context;
 import android.graphics.Color;
-import android.graphics.Matrix;
 import android.graphics.PointF;
-import android.hardware.GeomagneticField;
-import android.hardware.Sensor;
-import android.hardware.SensorEvent;
-import android.hardware.SensorEventListener;
-import android.hardware.SensorManager;
-import android.location.Location;
 import android.os.Bundle;
 import android.support.v7.app.ActionBarActivity;
 import android.support.v7.widget.Toolbar;
@@ -23,7 +15,6 @@ import android.view.View;
 import android.widget.AdapterView;
 import android.widget.ArrayAdapter;
 import android.widget.FrameLayout;
-import android.widget.ImageView;
 import android.widget.Spinner;
 import android.widget.TextView;
 import com.crashlytics.android.Crashlytics;
@@ -60,7 +51,6 @@ public class MainActivity extends ActionBarActivity {
     // Used for the UI
     private MapView mapView;
     private TextView mFpsTextView;
-    private ImageView mCompassView;
     private FrameLayout mMapFrameLayout;
     private float mDensity;
     private Spinner mClassSpinner;
@@ -69,19 +59,6 @@ public class MainActivity extends ActionBarActivity {
 
     // Used for GPS
     private MenuItem mGpsMenuItem;
-
-    // Used for compass
-    private SensorManager mSensorManager;
-    private Sensor mSensorAccelerometer;
-    private Sensor mSensorMagneticField;
-    private CompassListener mCompassListener;
-    private float[] mValuesAccelerometer = new float[3];
-    private float[] mValuesMagneticField = new float[3];
-    private float[] mMatrixR = new float[9];
-    private float[] mMatrixI = new float[9];
-    private float[] mMatrixValues = new float[3];
-    private float mCompassBearing;
-    private boolean mCompassValid = false;
 
     // Used for markers
     private boolean mIsMarkersOn = false;
@@ -142,9 +119,6 @@ public class MainActivity extends ActionBarActivity {
         mFpsTextView = (TextView) findViewById(R.id.view_fps);
         mFpsTextView.setText("");
 
-        mCompassView = (ImageView) findViewById(R.id.view_compass);
-        mCompassView.setOnClickListener(new CompassOnClickListener());
-
         mMapFrameLayout = (FrameLayout) findViewById(R.id.layout_map);
         // Add a toolbar as the action bar
         Toolbar mainToolbar = (Toolbar) findViewById(R.id.toolbar_main);
@@ -162,11 +136,6 @@ public class MainActivity extends ActionBarActivity {
         mClassSpinner = (Spinner) findViewById(R.id.spinner_class);
         mOutdoorsClassAdapter = ArrayAdapter.createFromResource(getSupportActionBar().getThemedContext(),
                 R.array.outdoors_class_list, android.R.layout.simple_spinner_dropdown_item);
-
-        mSensorManager = (SensorManager) getApplicationContext().getSystemService(Context.SENSOR_SERVICE);
-        mSensorAccelerometer = mSensorManager.getDefaultSensor(Sensor.TYPE_ACCELEROMETER);
-        mSensorMagneticField = mSensorManager.getDefaultSensor(Sensor.TYPE_MAGNETIC_FIELD);
-        mCompassListener = new CompassListener();
 
         if (savedInstanceState != null) {
             mapView.setMyLocationEnabled(savedInstanceState.getBoolean(STATE_IS_GPS_ON, false));
@@ -296,8 +265,6 @@ public class MainActivity extends ActionBarActivity {
                 if (mGpsMenuItem != null) {
                     mGpsMenuItem.setIcon(R.drawable.ic_action_location_found);
                 }
-                mSensorManager.registerListener(mCompassListener, mSensorAccelerometer, SensorManager.SENSOR_DELAY_UI);
-                mSensorManager.registerListener(mCompassListener, mSensorMagneticField, SensorManager.SENSOR_DELAY_UI);
             }
         } else {
             if (mapView.isMyLocationEnabled()) {
@@ -305,8 +272,6 @@ public class MainActivity extends ActionBarActivity {
                 if (mGpsMenuItem != null) {
                     mGpsMenuItem.setIcon(R.drawable.ic_action_location_searching);
                 }
-                mSensorManager.unregisterListener(mCompassListener, mSensorAccelerometer);
-                mSensorManager.unregisterListener(mCompassListener, mSensorMagneticField);
             }
         }
     }
@@ -385,50 +350,6 @@ public class MainActivity extends ActionBarActivity {
 
     private void removeAnnotations() {
         mapView.removeAnnotations();
-    }
-
-    // This class handles sensor updates to calculate compass bearing
-    private class CompassListener implements SensorEventListener {
-
-        @Override
-        public void onSensorChanged(SensorEvent event) {
-            switch (event.sensor.getType()) {
-                case Sensor.TYPE_ACCELEROMETER:
-                    System.arraycopy(event.values, 0, mValuesAccelerometer, 0, 3);
-                    break;
-                case Sensor.TYPE_MAGNETIC_FIELD:
-                    System.arraycopy(event.values, 0, mValuesMagneticField, 0, 3);
-                    break;
-            }
-
-            boolean valid = SensorManager.getRotationMatrix(mMatrixR, mMatrixI,
-                    mValuesAccelerometer,
-                    mValuesMagneticField);
-
-            if (valid) {
-                SensorManager.getOrientation(mMatrixR, mMatrixValues);
-                //mAzimuthRadians.putValue(mMatrixValues[0]);
-                //mAzimuth = Math.toDegrees(mAzimuthRadians.getAverage());
-
-                Location mGpsLocation = mapView.getMyLocation();
-                if (mGpsLocation != null) {
-                    GeomagneticField geomagneticField = new GeomagneticField(
-                            (float) mGpsLocation.getLatitude(),
-                            (float) mGpsLocation.getLongitude(),
-                            (float) mGpsLocation.getAltitude(),
-                            System.currentTimeMillis());
-                    mCompassBearing = (float) Math.toDegrees(mMatrixValues[0]) + geomagneticField.getDeclination();
-                    mCompassValid = true;
-                }
-            }
-
-            updateMap();
-        }
-
-        @Override
-        public void onAccuracyChanged(Sensor sensor, int accuracy) {
-            // TODO: ignore unreliable stuff
-        }
     }
 
     // This class handles style change events
@@ -574,18 +495,10 @@ public class MainActivity extends ActionBarActivity {
         }
     }
 
-    // Rotates an ImageView - does not work if the ImageView has padding, use margins
-    private void rotateImageView(ImageView imageView, float angle) {
-        Matrix matrix = new Matrix();
-        matrix.setScale((float) imageView.getWidth() / (float) imageView.getDrawable().getIntrinsicWidth(), (float) imageView.getHeight() / (float) imageView.getDrawable().getIntrinsicHeight());
-        matrix.postRotate(angle, (float) imageView.getWidth() / 2.0f, (float) imageView.getHeight() / 2.0f);
-        imageView.setImageMatrix(matrix);
-        imageView.setScaleType(ImageView.ScaleType.MATRIX);
-    }
 
     // Updates the UI to match the current map's position
     private void updateMap() {
-        rotateImageView(mCompassView, (float) mapView.getDirection());
+//        rotateImageView(mCompassView, (float) mapView.getDirection());
 
 /*
         if (mGpsLocation != null) {
@@ -628,12 +541,4 @@ public class MainActivity extends ActionBarActivity {
         }
     }
 
-    // Called when someone presses the compass
-    private class CompassOnClickListener implements View.OnClickListener {
-
-        @Override
-        public void onClick(View view) {
-            mapView.resetNorth();
-        }
-    }
 }

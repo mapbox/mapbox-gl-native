@@ -9,7 +9,13 @@ import android.content.IntentFilter;
 import android.content.pm.PackageManager;
 import android.content.res.TypedArray;
 import android.graphics.Bitmap;
+import android.graphics.Matrix;
 import android.graphics.PointF;
+import android.hardware.GeomagneticField;
+import android.hardware.Sensor;
+import android.hardware.SensorEvent;
+import android.hardware.SensorEventListener;
+import android.hardware.SensorManager;
 import android.location.Location;
 import android.net.ConnectivityManager;
 import android.net.NetworkInfo;
@@ -21,6 +27,7 @@ import android.support.v4.view.ScaleGestureDetectorCompat;
 import android.text.TextUtils;
 import android.util.Log;
 import android.view.GestureDetector;
+import android.view.Gravity;
 import android.view.ScaleGestureDetector;
 import android.util.AttributeSet;
 import android.view.InputDevice;
@@ -118,6 +125,20 @@ public class MapView extends FrameLayout implements LocationListener {
     private LocationRequest mLocationRequest;
     private ImageView mGpsMarker;
     private Location mGpsLocation;
+
+    // Used for compass
+    private ImageView mCompassView;
+    private SensorManager mSensorManager;
+    private Sensor mSensorAccelerometer;
+    private Sensor mSensorMagneticField;
+    private CompassListener mCompassListener;
+    private float[] mValuesAccelerometer = new float[3];
+    private float[] mValuesMagneticField = new float[3];
+    private float[] mMatrixR = new float[9];
+    private float[] mMatrixI = new float[9];
+    private float[] mMatrixValues = new float[3];
+    private float mCompassBearing;
+    private boolean mCompassValid = false;
 
     // Used to manage Event Listeners
     private ArrayList<OnMapChangedListener> mOnMapChangedListener;
@@ -253,6 +274,23 @@ public class MapView extends FrameLayout implements LocationListener {
                 .setInterval(1000)
                 .setSmallestDisplacement(1)
                 .setPriority(LocationRequest.PRIORITY_HIGH_ACCURACY);
+
+        // Setup Compass
+        mSensorManager = (SensorManager) mContext.getSystemService(Context.SENSOR_SERVICE);
+        mSensorAccelerometer = mSensorManager.getDefaultSensor(Sensor.TYPE_ACCELEROMETER);
+        mSensorMagneticField = mSensorManager.getDefaultSensor(Sensor.TYPE_MAGNETIC_FIELD);
+        mCompassListener = new CompassListener();
+
+        mCompassView = new ImageView(mContext);
+        mCompassView.setImageDrawable(getResources().getDrawable(R.drawable.compass));
+        mCompassView.setContentDescription(getResources().getString(R.string.compassContentDescription));
+        LayoutParams lp = new FrameLayout.LayoutParams((int)(48 * mScreenDensity), (int)(48 * mScreenDensity));
+        lp.gravity = Gravity.TOP | Gravity.END;
+        int tenDp = (int)(10 * mScreenDensity);
+        lp.setMargins(tenDp, tenDp, tenDp, tenDp);
+        mCompassView.setLayoutParams(lp);
+        addView(mCompassView);
+        mCompassView.setOnClickListener(new CompassOnClickListener());
 
         // Setup Support For Listener Tracking
         // MapView's internal listener is setup in onCreate()
@@ -1446,6 +1484,8 @@ public class MapView extends FrameLayout implements LocationListener {
                 mLocationClient.connect();
                 updateLocation(LocationServices.FusedLocationApi.getLastLocation());
                 LocationServices.FusedLocationApi.requestLocationUpdates(mLocationRequest, this);
+                mSensorManager.registerListener(mCompassListener, mSensorAccelerometer, SensorManager.SENSOR_DELAY_UI);
+                mSensorManager.registerListener(mCompassListener, mSensorMagneticField, SensorManager.SENSOR_DELAY_UI);
             }
         } else {
             if (mIsGpsOn) {
@@ -1453,9 +1493,64 @@ public class MapView extends FrameLayout implements LocationListener {
                 LocationServices.FusedLocationApi.removeLocationUpdates(this);
                 mLocationClient.disconnect();
                 mGpsLocation = null;
+                mSensorManager.unregisterListener(mCompassListener, mSensorAccelerometer);
+                mSensorManager.unregisterListener(mCompassListener, mSensorMagneticField);
             }
         }
         updateMap();
+    }
+
+    // This class handles sensor updates to calculate compass bearing
+    private class CompassListener implements SensorEventListener {
+
+        @Override
+        public void onSensorChanged(SensorEvent event) {
+            switch (event.sensor.getType()) {
+                case Sensor.TYPE_ACCELEROMETER:
+                    System.arraycopy(event.values, 0, mValuesAccelerometer, 0, 3);
+                    break;
+                case Sensor.TYPE_MAGNETIC_FIELD:
+                    System.arraycopy(event.values, 0, mValuesMagneticField, 0, 3);
+                    break;
+            }
+
+            boolean valid = SensorManager.getRotationMatrix(mMatrixR, mMatrixI,
+                    mValuesAccelerometer,
+                    mValuesMagneticField);
+
+            if (valid) {
+                SensorManager.getOrientation(mMatrixR, mMatrixValues);
+                //mAzimuthRadians.putValue(mMatrixValues[0]);
+                //mAzimuth = Math.toDegrees(mAzimuthRadians.getAverage());
+
+                Location mGpsLocation = getMyLocation();
+                if (mGpsLocation != null) {
+                    GeomagneticField geomagneticField = new GeomagneticField(
+                            (float) mGpsLocation.getLatitude(),
+                            (float) mGpsLocation.getLongitude(),
+                            (float) mGpsLocation.getAltitude(),
+                            System.currentTimeMillis());
+                    mCompassBearing = (float) Math.toDegrees(mMatrixValues[0]) + geomagneticField.getDeclination();
+                    mCompassValid = true;
+                }
+            }
+
+            updateMap();
+        }
+
+        @Override
+        public void onAccuracyChanged(Sensor sensor, int accuracy) {
+            // TODO: ignore unreliable stuff
+        }
+    }
+
+    // Called when someone presses the compass
+    private class CompassOnClickListener implements View.OnClickListener {
+
+        @Override
+        public void onClick(View view) {
+            resetNorth();
+        }
     }
 
     /**
@@ -1476,9 +1571,18 @@ public class MapView extends FrameLayout implements LocationListener {
         }
     }
 
+    // Rotates an ImageView - does not work if the ImageView has padding, use margins
+    private void rotateImageView(ImageView imageView, float angle) {
+        Matrix matrix = new Matrix();
+        matrix.setScale((float) imageView.getWidth() / (float) imageView.getDrawable().getIntrinsicWidth(), (float) imageView.getHeight() / (float) imageView.getDrawable().getIntrinsicHeight());
+        matrix.postRotate(angle, (float) imageView.getWidth() / 2.0f, (float) imageView.getHeight() / 2.0f);
+        imageView.setImageMatrix(matrix);
+        imageView.setScaleType(ImageView.ScaleType.MATRIX);
+    }
+
     // Updates the UI to match the current map's position
     private void updateMap() {
-//        rotateImageView(mCompassView, (float) mapView.getDirection());
+        rotateImageView(mCompassView, (float) getDirection());
 
         if (isMyLocationEnabled() && mGpsLocation != null) {
             if (mGpsMarker == null) {
@@ -1499,10 +1603,11 @@ public class MapView extends FrameLayout implements LocationListener {
             lp.leftMargin = (int) (screenLocation.x - iconSize / 2.0f);
             lp.topMargin = getHeight() - (int) (screenLocation.y + iconSize / 2.0f);
             mGpsMarker.setLayoutParams(lp);
-//                rotateImageView(mGpsMarker, 0.0f);
+            rotateImageView(mGpsMarker, 0.0f);
             mGpsMarker.requestLayout();
 
 /*
+            // Used For User Location Bearing UI
             if (mGpsLocation.hasBearing() || mCompassValid) {
                 mGpsMarker.setImageResource(R.drawable.direction_arrow);
                 float iconSize = 54.0f * mScreenDensity;
@@ -1513,7 +1618,7 @@ public class MapView extends FrameLayout implements LocationListener {
                 float bearing = mGpsLocation.hasBearing() ? mGpsLocation.getBearing() : mCompassBearing;
                 rotateImageView(mGpsMarker, bearing);
                 mGpsMarker.requestLayout();
-            } else {
+            }
 */
         } else {
             mGpsMarker.setVisibility(View.INVISIBLE);

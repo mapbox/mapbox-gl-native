@@ -47,15 +47,6 @@
             android:layout_height="match_parent"
             />
 
-        <ImageView
-            android:id="@+id/view_compass"
-            android:layout_width="48dp"
-            android:layout_height="48dp"
-            android:layout_gravity="end|top"
-            android:layout_margin="10dp"
-            android:contentDescription="@string/compass_desc"
-            android:src="@drawable/compass"/>
-
         <TextView
             android:id="@+id/view_fps"
             android:layout_width="wrap_content"

@@ -11,8 +11,6 @@
 
     <string name="label_fps">FPS:</string>
 
-    <string name="compass_desc">Map compass. Click to reset the map rotation to North.</string>
-
     <string-array name="style_list">
         <item>Mapbox Streets</item>
         <item>Emerald</item>
