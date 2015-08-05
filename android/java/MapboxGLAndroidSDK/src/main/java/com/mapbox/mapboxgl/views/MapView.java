@@ -1654,7 +1654,9 @@ public class MapView extends FrameLayout implements LocationListener {
             }
 */
         } else {
-            mGpsMarker.setVisibility(View.INVISIBLE);
+            if (mGpsMarker != null) {
+                mGpsMarker.setVisibility(View.INVISIBLE);
+            }
         }
     }
 }
