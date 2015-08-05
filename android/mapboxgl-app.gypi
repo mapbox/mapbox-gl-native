@@ -26,13 +26,13 @@
       ],
       'libraries': [
           '<@(openssl_static_libs)',
-          '<@(curl_static_libs)',
-          '<@(png_static_libs)',
+          '<@(libcurl_static_libs)',
+          '<@(libpng_static_libs)',
           '<@(jpeg_static_libs)',
-          '<@(sqlite3_static_libs)',
-          '<@(uv_static_libs)',
-          '<@(nu_static_libs)',
-          '<@(zip_static_libs)',
+          '<@(sqlite_static_libs)',
+          '<@(libuv_static_libs)',
+          '<@(nunicode_static_libs)',
+          '<@(libzip_static_libs)',
       ],
       'variables': {
         'ldflags': [
@@ -42,13 +42,13 @@
           '-lGLESv2',
           '-lstdc++',
           '-latomic',
-          '<@(png_ldflags)',
+          '<@(libpng_ldflags)',
           '<@(jpeg_ldflags)',
-          '<@(sqlite3_ldflags)',
+          '<@(sqlite_ldflags)',
           '<@(openssl_ldflags)',
-          '<@(curl_ldflags)',
+          '<@(libcurl_ldflags)',
           '<@(zlib_ldflags)',
-          '<@(zip_ldflags)',
+          '<@(libzip_ldflags)',
         ],
       },
       'conditions': [
@@ -77,7 +77,7 @@
             '../common/ca-bundle.crt',
             '../styles/styles'
           ],
-          'destination': '<(pwd)/java/MapboxGLAndroidSDK/src/main/assets'
+          'destination': '<(pwd)/../android/java/MapboxGLAndroidSDK/src/main/assets'
         },
       ],
 
@@ -85,7 +85,7 @@
         {
           'action_name': 'Strip dynamic library',
           'inputs': [ '<(PRODUCT_DIR)/lib.target/libmapbox-gl.so' ],
-          'outputs': [ '<(pwd)/java/MapboxGLAndroidSDK/src/main/jniLibs/$(JNIDIR)/libmapbox-gl.so' ],
+          'outputs': [ '<(pwd)/../android/java/MapboxGLAndroidSDK/src/main/jniLibs/$(JNIDIR)/libmapbox-gl.so' ],
           'action': [ '$(STRIP)', '<@(_inputs)', '-o', '<@(_outputs)' ]
         },
       ],

@@ -314,7 +314,7 @@ public class MapView extends FrameLayout implements LocationListener {
 
     public Marker addMarker(MarkerOptions markerOptions) {
         Marker marker = markerOptions.getMarker();
-        Long id = mNativeMapView.addMarker(marker);
+        long id = mNativeMapView.addMarker(marker);
         marker.setId(id);        // the annotation needs to know its id
         marker.setMapView(this); // the annotation needs to know which map view it is in
         annotations.add(marker);
@@ -323,7 +323,7 @@ public class MapView extends FrameLayout implements LocationListener {
 
     public Polyline addPolyline(PolylineOptions polylineOptions) {
         Polyline polyline = polylineOptions.getPolyline();
-        Long id = mNativeMapView.addPolyline(polyline);
+        long id = mNativeMapView.addPolyline(polyline);
         polyline.setId(id);
         polyline.setMapView(this);
         annotations.add(polyline);
@@ -332,7 +332,7 @@ public class MapView extends FrameLayout implements LocationListener {
 
     public Polygon addPolygon(PolygonOptions polygonOptions) {
         Polygon polygon = polygonOptions.getPolygon();
-        Long id = mNativeMapView.addPolygon(polygon);
+        long id = mNativeMapView.addPolygon(polygon);
         polygon.setId(id);
         polygon.setMapView(this);
         annotations.add(polygon);
@@ -347,7 +347,7 @@ public class MapView extends FrameLayout implements LocationListener {
 
         long[] ids = mNativeMapView.addPolygons(polygons);
 
-        for(int i=0; i<polygons.size(); i++) {
+        for(int i=0; i < polygons.size(); i++) {
             polygons.get(i).setId(ids[i]);
             polygons.get(i).setMapView(this);
             annotations.add(polygons.get(i));
@@ -367,13 +367,9 @@ public class MapView extends FrameLayout implements LocationListener {
 
     public void removeAnnotations() {
         long[] ids = new long[annotations.size()];
-        for(int i=0; i<annotations.size(); i++) {
-            Long id = annotations.get(i).getId();
-            if(id == null) {
-                ids[i] = -1;
-            } else {
-                ids[i] = id;
-            }
+        for(int i = 0; i < annotations.size(); i++) {
+            long id = annotations.get(i).getId();
+            ids[i] = id;
         }
         mNativeMapView.removeAnnotations(ids);
     }

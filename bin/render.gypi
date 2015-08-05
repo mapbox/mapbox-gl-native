@@ -27,18 +27,18 @@
 
       'variables' : {
         'cflags_cc': [
-          '<@(glfw3_cflags)',
-          '<@(uv_cflags)',
+          '<@(glfw_cflags)',
+          '<@(libuv_cflags)',
           '<@(boost_cflags)',
         ],
         'ldflags': [
-          '<@(glfw3_ldflags)',
-          '<@(uv_ldflags)',
+          '<@(glfw_ldflags)',
+          '<@(libuv_ldflags)',
         ],
         'libraries': [
-          '<@(glfw3_static_libs)',
-          '<@(uv_static_libs)',
-          '<@(boost_program_options_static_libs)'
+          '<@(glfw_static_libs)',
+          '<@(libuv_static_libs)',
+          '<@(boost_libprogram_options_static_libs)'
         ],
       },
 

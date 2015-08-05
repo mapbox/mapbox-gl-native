@@ -1,7 +1,10 @@
 {
   'includes': [
     '../linux/mapboxgl-app.gypi',
-    '../test/test.gypi',
-    '../bin/render.gypi',
+  ],
+
+  'conditions': [
+    ['test', { 'includes': [ '../test/test.gypi' ] } ],
+    ['render', { 'includes': [ '../bin/render.gypi' ] } ],
   ],
 }

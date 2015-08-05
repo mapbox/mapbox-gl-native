@@ -101,7 +101,7 @@ void Transform::setLatLng(const LatLng latLng, const Duration& duration) {
     }
 
     const double m = 1 - 1e-15;
-    const double f = std::fmin(std::fmax(std::sin(util::DEG2RAD * latLng.latitude), -m), m);
+    const double f = ::fmin(::fmax(std::sin(util::DEG2RAD * latLng.latitude), -m), m);
 
     double xn = -latLng.longitude * state.Bc;
     double yn = 0.5 * state.Cc * std::log((1 + f) / (1 - f));
@@ -121,7 +121,7 @@ void Transform::setLatLngZoom(const LatLng latLng, const double zoom, const Dura
     state.Cc = s / util::M2PI;
 
     const double m = 1 - 1e-15;
-    const double f = std::fmin(std::fmax(std::sin(util::DEG2RAD * latLng.latitude), -m), m);
+    const double f = ::fmin(::fmax(std::sin(util::DEG2RAD * latLng.latitude), -m), m);
 
     double xn = -latLng.longitude * state.Bc;
     double yn = 0.5 * state.Cc * std::log((1 + f) / (1 - f));

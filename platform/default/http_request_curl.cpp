@@ -7,6 +7,7 @@
 
 #include <mbgl/util/time.hpp>
 #include <mbgl/util/util.hpp>
+#include <mbgl/util/string.hpp>
 
 #include <curl/curl.h>
 
@@ -20,6 +21,7 @@
 #include <map>
 #include <cassert>
 #include <cstring>
+#include <cstdio>
 
 void handleError(CURLMcode code) {
     if (code != CURLM_OK) {
@@ -468,7 +470,11 @@ HTTPCURLRequest::HTTPCURLRequest(HTTPCURLContext* context_, const Resource& reso
     handleError(curl_easy_setopt(handle, CURLOPT_WRITEDATA, this));
     handleError(curl_easy_setopt(handle, CURLOPT_HEADERFUNCTION, headerCallback));
     handleError(curl_easy_setopt(handle, CURLOPT_HEADERDATA, this));
+#if LIBCURL_VERSION_NUM >= ((7) << 16 | (21) << 8 | 6) // Renamed in 7.21.6
     handleError(curl_easy_setopt(handle, CURLOPT_ACCEPT_ENCODING, "gzip, deflate"));
+#else
+    handleError(curl_easy_setopt(handle, CURLOPT_ENCODING, "gzip, deflate"));
+#endif
     handleError(curl_easy_setopt(handle, CURLOPT_USERAGENT, "MapboxGL/1.0"));
     handleError(curl_easy_setopt(handle, CURLOPT_SHARE, context->share));
 
@@ -700,12 +706,12 @@ void HTTPCURLRequest::handleResult(CURLcode code) {
         } else if (responseCode >= 500 && responseCode < 600) {
             // Server errors may be temporary, so back off exponentially.
             response->status = Response::Error;
-            response->message = "HTTP status code " + std::to_string(responseCode);
+            response->message = "HTTP status code " + util::toString(responseCode);
             return finish(ResponseStatus::TemporaryError);
         } else {
             // We don't know how to handle any other errors, so declare them as permanently failing.
             response->status = Response::Error;
-            response->message = "HTTP status code " + std::to_string(responseCode);
+            response->message = "HTTP status code " + util::toString(responseCode);
             return finish(ResponseStatus::PermanentError);
         }
     }

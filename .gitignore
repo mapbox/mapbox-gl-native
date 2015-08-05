@@ -17,6 +17,8 @@
 /ios/build
 /ios/app/build
 /test/build
+/gyp/build
+/gyp/java
 /test/node_modules
 /test/fixtures/*/*_actual.*
 /test/fixtures/api/1.png

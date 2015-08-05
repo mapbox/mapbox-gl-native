@@ -5,6 +5,7 @@
 #include <mbgl/platform/gl.hpp>
 #include <mbgl/platform/log.hpp>
 #include <mbgl/util/gl_helper.hpp>
+#include <mbgl/util/string.hpp>
 
 #include <cassert>
 #include <cstdlib>
@@ -188,7 +189,7 @@ void GLFWView::addRandomCustomPointAnnotations(int count) {
 
     for (int i = 0; i < count; i++) {
         static int spriteID = 1;
-        const auto name = std::string{ "marker-" } + std::to_string(spriteID++);
+        const auto name = std::string{ "marker-" } + mbgl::util::toString(spriteID++);
         map->setSprite(name, makeSpriteImage(22, 22, 1));
         spriteIDs.push_back(name);
         points.emplace_back(makeRandomPoint(), name);

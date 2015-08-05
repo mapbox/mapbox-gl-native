@@ -3,7 +3,7 @@
 
 #include <mbgl/mbgl.hpp>
 
-#ifdef NVIDIA
+#ifdef MBGL_USE_GLES2
 #define GLFW_INCLUDE_ES2
 #endif
 #include <GLFW/glfw3.h>

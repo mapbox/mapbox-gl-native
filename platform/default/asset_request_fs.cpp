@@ -4,6 +4,7 @@
 #include <mbgl/util/util.hpp>
 #include <mbgl/util/url.hpp>
 #include <mbgl/util/uv.hpp>
+#include <mbgl/util/string.hpp>
 
 #include <uv.h>
 
@@ -131,7 +132,7 @@ void AssetRequest::fileStated(uv_fs_t *req) {
 #else
             self->response->modified = stat->st_mtime;
 #endif
-            self->response->etag = std::to_string(stat->st_ino);
+            self->response->etag = util::toString(stat->st_ino);
             const auto size = (unsigned int)(stat->st_size);
             self->response->data.resize(size);
             self->buffer = uv_buf_init(const_cast<char *>(self->response->data.data()), size);

@@ -312,7 +312,7 @@ double Source::getZoom(const TransformState& state) const {
 int32_t Source::coveringZoomLevel(const TransformState& state) const {
     double zoom = getZoom(state);
     if (info.type == SourceType::Raster || info.type == SourceType::Video) {
-        zoom = std::round(zoom);
+        zoom = ::round(zoom);
     } else {
         zoom = std::floor(zoom);
     }
@@ -407,7 +407,7 @@ bool Source::update(MapData& data,
 
     double zoom = getZoom(transformState);
     if (info.type == SourceType::Raster || info.type == SourceType::Video) {
-        zoom = std::round(zoom);
+        zoom = ::round(zoom);
     } else {
         zoom = std::floor(zoom);
     }

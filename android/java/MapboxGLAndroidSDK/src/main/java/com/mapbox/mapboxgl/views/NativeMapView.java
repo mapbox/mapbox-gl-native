@@ -224,37 +224,6 @@ class NativeMapView {
         nativeSetLatLng(mNativeMapViewPtr, latLng, duration);
     }
 
-    public void setSprite(String symbol, int width, int height, float scale, byte[] pixels) {
-        nativeSetSprite(mNativeMapViewPtr, symbol, width, height, scale, pixels);
-    }
-
-    public long addMarker(Marker marker) {
-        return nativeAddMarker(mNativeMapViewPtr, marker);
-    }
-
-    public long addPolyline(Polyline polyline) {
-        // NH TODO Throw exception if returns -1
-        return nativeAddPolyline(mNativeMapViewPtr, polyline);
-    }
-
-    public long addPolygon(Polygon polygon) {
-        // NH TODO Throw exception if returns -1
-        return nativeAddPolygon(mNativeMapViewPtr, polygon);
-    }
-
-    public long[] addPolygons(List<Polygon> polygon) {
-        // NH TODO Throw exception if returns -1
-        return nativeAddPolygons(mNativeMapViewPtr, polygon);
-    }
-
-    public void removeAnnotation(long id) {
-        nativeRemoveAnnotation(mNativeMapViewPtr, id);
-    }
-
-    public void removeAnnotations(long[] ids) {
-        nativeRemoveAnnotations(mNativeMapViewPtr, ids);
-    }
-
     public LatLng getLatLng() {
         return nativeGetLatLng(mNativeMapViewPtr);
     }
@@ -356,6 +325,34 @@ class NativeMapView {
         nativeResetNorth(mNativeMapViewPtr);
     }
 
+    public long addMarker(Marker marker) {
+        return nativeAddMarker(mNativeMapViewPtr, marker);
+    }
+
+    public long addPolyline(Polyline polyline) {
+        return nativeAddPolyline(mNativeMapViewPtr, polyline);
+    }
+
+    public long addPolygon(Polygon polygon) {
+        return nativeAddPolygon(mNativeMapViewPtr, polygon);
+    }
+
+    public long[] addPolygons(List<Polygon> polygon) {
+        return nativeAddPolygons(mNativeMapViewPtr, polygon);
+    }
+
+    public void removeAnnotation(long id) {
+        nativeRemoveAnnotation(mNativeMapViewPtr, id);
+    }
+
+    public void removeAnnotations(long[] ids) {
+        nativeRemoveAnnotations(mNativeMapViewPtr, ids);
+    }
+
+    public void setSprite(String symbol, int width, int height, float scale, byte[] pixels) {
+        nativeSetSprite(mNativeMapViewPtr, symbol, width, height, scale, pixels);
+    }
+
     public void onLowMemory() {
         nativeOnLowMemory(mNativeMapViewPtr);
     }
@@ -392,7 +389,7 @@ class NativeMapView {
         nativeSetReachability(mNativeMapViewPtr, status);
     }
 
-    //public void getWorldBoundsMeters();
+    //public void                            ();
 
     //public void getWorldBoundsLatLng();
 
@@ -507,21 +504,6 @@ class NativeMapView {
     private native void nativeSetLatLng(long nativeMapViewPtr, LatLng latLng,
                                         long duration);
 
-    private native void nativeSetSprite(long nativeMapViewPtr, String symbol,
-                                        int width, int height, float scale, byte[] pixels);
-
-    private native long nativeAddMarker(long nativeMapViewPtr, Marker marker);
-
-    private native long nativeAddPolyline(long nativeMapViewPtr, Polyline polyline);
-
-    private native long nativeAddPolygon(long mNativeMapViewPtr, Polygon polygon);
-
-    private native long[] nativeAddPolygons(long mNativeMapViewPtr, List<Polygon> polygon);
-
-    private native void nativeRemoveAnnotation(long nativeMapViewPtr, long id);
-
-    private native void nativeRemoveAnnotations(long nativeMapViewPtr, long[] id);
-
     private native LatLng nativeGetLatLng(long nativeMapViewPtr);
 
     private native void nativeResetPosition(long nativeMapViewPtr);
@@ -562,6 +544,21 @@ class NativeMapView {
     private native double nativeGetBearing(long nativeMapViewPtr);
 
     private native void nativeResetNorth(long nativeMapViewPtr);
+
+    private native long nativeAddMarker(long nativeMapViewPtr, Marker marker);
+
+    private native long nativeAddPolyline(long nativeMapViewPtr, Polyline polyline);
+
+    private native long nativeAddPolygon(long mNativeMapViewPtr, Polygon polygon);
+
+    private native long[] nativeAddPolygons(long mNativeMapViewPtr, List<Polygon> polygon);
+
+    private native void nativeRemoveAnnotation(long nativeMapViewPtr, long id);
+
+    private native void nativeRemoveAnnotations(long nativeMapViewPtr, long[] id);
+
+    private native void nativeSetSprite(long nativeMapViewPtr, String symbol,
+                                        int width, int height, float scale, byte[] pixels);
 
     private native void nativeOnLowMemory(long nativeMapViewPtr);
 

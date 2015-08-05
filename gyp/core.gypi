@@ -28,21 +28,21 @@
 
       'variables': {
         'cflags_cc': [
-          '<@(uv_cflags)',
+          '<@(libuv_cflags)',
           '<@(opengl_cflags)',
           '<@(boost_cflags)',
         ],
         'cflags': [
-          '<@(uv_cflags)',
+          '<@(libuv_cflags)',
           '<@(opengl_cflags)',
           '-fPIC'
         ],
         'ldflags': [
-          '<@(uv_ldflags)',
+          '<@(libuv_ldflags)',
           '<@(opengl_ldflags)',
         ],
         'libraries': [
-          '<@(uv_static_libs)',
+          '<@(libuv_static_libs)',
         ],
       },
 

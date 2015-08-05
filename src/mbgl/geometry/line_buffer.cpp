@@ -14,8 +14,8 @@ size_t LineVertexBuffer::add(vertex_type x, vertex_type y, float ex, float ey, i
     coords[1] = (y * 2) | ty;
 
     int8_t *extrude = static_cast<int8_t *>(data);
-    extrude[4] = std::round(extrudeScale * ex);
-    extrude[5] = std::round(extrudeScale * ey);
+    extrude[4] = ::round(extrudeScale * ex);
+    extrude[5] = ::round(extrudeScale * ey);
     extrude[6] = static_cast<int8_t>(linesofar / 128);
     extrude[7] = static_cast<int8_t>(linesofar % 128);
 

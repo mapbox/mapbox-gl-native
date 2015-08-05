@@ -2,6 +2,7 @@
 
 #include <zlib.h>
 
+#include <cstdio>
 #include <cstring>
 #include <stdexcept>
 
