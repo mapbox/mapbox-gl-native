@@ -27,35 +27,31 @@ function filePath(name) {
     }, {});
 }
 
-function setup(fileSource, callback) {
-    callback(new mbgl.Map(fileSource));
+function setup(options, callback) {
+    callback(new mbgl.Map(options));
 }
 
-function getFileSource(gzip, t) {
-    var fileSource = new mbgl.FileSource();
+function getOptions(gzip, t) {
+    return {
+        request: function(req) {
+            var parts = req.url.split('.');
+            var filetype = parts[parts.length - 1];
 
-    fileSource.request = function(req) {
-        var parts = req.url.split('.');
-        var filetype = parts[parts.length - 1];
-
-        request({
-            url: 'http://localhost:' + server.address().port + path.join('/', req.url),
-            encoding: null,
-            gzip: filetype === 'pbf' ? gzip : true,
-            headers: {
-                'Accept-Encoding': 'gzip'
-            }
-        }, function (err, res, body) {
-            t.error(err);
-            var response = {};
-            response.data = res.body;
-            req.respond(null, response);
-        });
+            request({
+                url: 'http://localhost:' + server.address().port + path.join('/', req.url),
+                encoding: null,
+                gzip: filetype === 'pbf' ? gzip : true,
+                headers: {
+                    'Accept-Encoding': 'gzip'
+                }
+            }, function (err, res, body) {
+                t.error(err);
+                var response = {};
+                response.data = res.body;
+                req.respond(null, response);
+            });
+        }
     };
-
-    fileSource.cancel = function(req) {};
-
-    return fileSource;
 }
 
 test('gzip', function(t) {
@@ -64,7 +60,7 @@ test('gzip', function(t) {
             if (msg.severity == 'ERROR') t.error(msg);
         });
 
-        setup(getFileSource(true, t), function(map) {
+        setup(getOptions(true, t), function(map) {
             map.load(style);
             map.render({}, function(err, data) {
                 mbgl.removeAllListeners('message');
@@ -110,7 +106,7 @@ test('gzip', function(t) {
             }
         });
 
-        setup(getFileSource(false, t), function(map) {
+        setup(getOptions(false, t), function(map) {
             map.load(style);
             map.render({}, function(err, data) {
                 map.release();

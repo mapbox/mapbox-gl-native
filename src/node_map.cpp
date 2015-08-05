@@ -1,5 +1,4 @@
 #include "node_map.hpp"
-#include "node_file_source.hpp"
 
 #include <mbgl/platform/default/headless_display.hpp>
 #include <mbgl/map/still_image.hpp>
@@ -61,23 +60,22 @@ NAN_METHOD(NodeMap::New) {
         return NanThrowTypeError("Use the new operator to create new Map objects");
     }
 
-    if (args.Length() < 1 || !NanHasInstance(NodeFileSource::constructorTemplate, args[0])) {
-        return NanThrowTypeError("Requires a FileSource as first argument");
+    if (args.Length() < 1 || !args[0]->IsObject()) {
+        return NanThrowTypeError("Requires an options object as first argument");
     }
 
-    auto source = args[0]->ToObject();
+    auto options = args[0]->ToObject();
 
     // Check that request() and cancel() are defined.
-    if (!source->Has(NanNew("request")) || !source->Get(NanNew("request"))->IsFunction()) {
-        return NanThrowError("FileSource must have a request member function");
+    if (!options->Has(NanNew("request")) || !options->Get(NanNew("request"))->IsFunction()) {
+        return NanThrowError("Options object must have a 'request' method");
     }
-    if (!source->Has(NanNew("cancel")) || !source->Get(NanNew("cancel"))->IsFunction()) {
-        return NanThrowError("FileSource must have a cancel member function");
+    if (options->Has(NanNew("cancel")) && !options->Get(NanNew("cancel"))->IsFunction()) {
+        return NanThrowError("Options object 'cancel' property must be a function");
     }
-
 
     try {
-        auto nodeMap = new NodeMap(source);
+        auto nodeMap = new NodeMap(options);
         nodeMap->Wrap(args.This());
     } catch(std::exception &ex) {
         return NanThrowError(ex.what());
@@ -309,8 +307,6 @@ void NodeMap::release() {
 
     valid = false;
 
-    NanDisposePersistent(source);
-
     uv_close(reinterpret_cast<uv_handle_t *>(async), [] (uv_handle_t *handle) {
         delete reinterpret_cast<uv_async_t *>(handle);
     });
@@ -322,13 +318,11 @@ void NodeMap::release() {
 ////////////////////////////////////////////////////////////////////////////////////////////////
 // Instance
 
-NodeMap::NodeMap(v8::Handle<v8::Object> source_) :
+NodeMap::NodeMap(v8::Handle<v8::Object> options) :
     view(sharedDisplay()),
-    fs(*ObjectWrap::Unwrap<NodeFileSource>(source_)),
+    fs(options),
     map(std::make_unique<mbgl::Map>(view, fs, mbgl::MapMode::Still)),
     async(new uv_async_t) {
-
-    NanAssignPersistent(source, source_);
 
     async->data = this;
 #if UV_VERSION_MAJOR == 0 && UV_VERSION_MINOR <= 10

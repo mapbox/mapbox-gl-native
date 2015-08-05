@@ -31,21 +31,22 @@ NAN_METHOD(NodeRequest::New) {
     NanScope();
 
     // Extract the pointer from the first argument
-    if (args.Length() < 2 || !NanHasInstance(NodeFileSource::constructorTemplate, args[0]) || !args[1]->IsExternal()) {
+    if (args.Length() < 2 || !args[0]->IsExternal() || !args[1]->IsExternal()) {
         return NanThrowTypeError("Cannot create Request objects explicitly");
     }
 
+    auto source = reinterpret_cast<NodeFileSource*>(args[0].As<v8::External>()->Value());
     auto resource = reinterpret_cast<mbgl::Resource*>(args[1].As<v8::External>()->Value());
-    auto req = new NodeRequest(args[0]->ToObject(), *resource);
+    auto req = new NodeRequest(source, *resource);
     req->Wrap(args.This());
 
     NanReturnValue(args.This());
 }
 
-v8::Handle<v8::Object> NodeRequest::Create(v8::Handle<v8::Object> source, const mbgl::Resource& resource) {
+v8::Handle<v8::Object> NodeRequest::Create(NodeFileSource* source, const mbgl::Resource& resource) {
     NanEscapableScope();
 
-    v8::Local<v8::Value> argv[] = { NanNew<v8::Object>(source),
+    v8::Local<v8::Value> argv[] = { NanNew<v8::External>(const_cast<NodeFileSource*>(source)),
         NanNew<v8::External>(const_cast<mbgl::Resource*>(&resource)) };
     auto instance = NanNew<v8::FunctionTemplate>(constructorTemplate)->GetFunction()->NewInstance(2, argv);
 
@@ -61,7 +62,7 @@ NAN_METHOD(NodeRequest::Respond) {
         return NanThrowError("Request has already been responded to, or was canceled.");
     }
 
-    auto source = ObjectWrap::Unwrap<NodeFileSource>(NanNew<v8::Object>(nodeRequest->source));
+    auto source = nodeRequest->source;
     auto resource = std::move(nodeRequest->resource);
 
     if (args.Length() < 1) {
@@ -128,14 +129,11 @@ NAN_METHOD(NodeRequest::Respond) {
 ////////////////////////////////////////////////////////////////////////////////////////////////
 // Instance
 
-NodeRequest::NodeRequest(v8::Local<v8::Object> source_, const mbgl::Resource& resource_)
-    : resource(std::make_unique<mbgl::Resource>(resource_)) {
-    NanAssignPersistent(source, source_);
-}
+NodeRequest::NodeRequest(NodeFileSource* source_, const mbgl::Resource& resource_)
+    : source(source_),
+    resource(std::make_unique<mbgl::Resource>(resource_)) {}
 
-NodeRequest::~NodeRequest() {
-    NanDisposePersistent(source);
-}
+NodeRequest::~NodeRequest() {}
 
 void NodeRequest::cancel() {
     resource.reset();
