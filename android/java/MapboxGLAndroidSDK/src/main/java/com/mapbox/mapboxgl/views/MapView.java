@@ -127,6 +127,7 @@ public class MapView extends FrameLayout implements LocationListener {
     private Location mGpsLocation;
 
     // Used for compass
+    private boolean mIsCompassEnabled = true;
     private ImageView mCompassView;
     private SensorManager mSensorManager;
     private Sensor mSensorAccelerometer;
@@ -1500,6 +1501,39 @@ public class MapView extends FrameLayout implements LocationListener {
         updateMap();
     }
 
+    /**
+     * Gets whether the compass is enabled/disabled.
+     * @return true if the compass is enabled; false if the compass is disabled.
+     */
+    public boolean isCompassEnabled () {
+        return mIsCompassEnabled;
+    }
+
+    /**
+     * Enables or disables the compass. The compass is an icon on the map that indicates the
+     * direction of north on the map. If enabled, it is only shown when the camera is tilted or
+     * rotated away from its default orientation (tilt of 0 and a bearing of 0). When a user clicks
+     * the compass, the camera orients itself to its default orientation and fades away shortly
+     * after. If disabled, the compass will never be displayed.
+     *
+     * By default, the compass is enabled
+     * @param enabled true to enable the compass; false to disable the compass.
+     */
+    public void setCompassEnabled (boolean enabled) {
+        // Set value
+        this.mIsCompassEnabled = enabled;
+
+        // Toggle UI
+        if (mIsCompassEnabled && !mCompassView.isShown()) {
+            mCompassView.setVisibility(View.VISIBLE);
+        } else if (!mIsCompassEnabled) {
+            mCompassView.setVisibility(View.GONE);
+        }
+
+        // Update Map
+        updateMap();
+    }
+
     // This class handles sensor updates to calculate compass bearing
     private class CompassListener implements SensorEventListener {
 
@@ -1582,7 +1616,11 @@ public class MapView extends FrameLayout implements LocationListener {
 
     // Updates the UI to match the current map's position
     private void updateMap() {
-        rotateImageView(mCompassView, (float) getDirection());
+        // Using direct access to mIsCompassEnabled instead of isCompassEnabled() for
+        // small performance boost as this method is called rapidly.
+        if (mIsCompassEnabled) {
+            rotateImageView(mCompassView, (float) getDirection());
+        }
 
         if (isMyLocationEnabled() && mGpsLocation != null) {
             if (mGpsMarker == null) {
