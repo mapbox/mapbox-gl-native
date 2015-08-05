@@ -244,23 +244,22 @@ public class MapView extends FrameLayout implements LocationListener {
             onConnectivityChanged(isConnected);
         }
 
-
         // Setup Location Services
         mLocationClient = new LostApiClient.Builder(getContext()).build();
         mLocationRequest = LocationRequest.create()
                 .setInterval(1000)
                 .setSmallestDisplacement(1)
                 .setPriority(LocationRequest.PRIORITY_HIGH_ACCURACY);
+    }
 
-        setOnMapChangedListener(new OnMapChangedListener() {
-            @Override
-            public void onMapChanged() {
-                // TODO - doesn't seem to be firing like it does client side
+    // Called when map state changes
+    private class MyOnMapChangedListener implements MapView.OnMapChangedListener {
 
-                Log.i(TAG, "onMapChanged!");
-                updateMap();
-            }
-        });
+        @Override
+        public void onMapChanged() {
+            Log.i(TAG, "onMapChanged()!!  - Now a full class!");
+            updateMap();
+        }
     }
 
     //
@@ -563,6 +562,8 @@ public class MapView extends FrameLayout implements LocationListener {
 
         mNativeMapView.initializeDisplay();
         mNativeMapView.initializeContext();
+
+        addOnMapChangedListener(new MyOnMapChangedListener());
     }
 
     // Called when we need to save instance state
@@ -1338,11 +1339,19 @@ public class MapView extends FrameLayout implements LocationListener {
         void onMapChanged();
     }
 
-    private OnMapChangedListener mOnMapChangedListener;
+    private ArrayList<OnMapChangedListener> mOnMapChangedListener = new ArrayList<OnMapChangedListener>();
 
     // Adds a listener for onMapChanged
-    public void setOnMapChangedListener(OnMapChangedListener listener) {
-        mOnMapChangedListener = listener;
+    public void addOnMapChangedListener(@NonNull OnMapChangedListener listener) {
+        if (listener != null) {
+            mOnMapChangedListener.add(listener);
+        }
+    }
+
+    public void removeOnMapChangedListener(@NonNull OnMapChangedListener listener) {
+        if (listener != null) {
+            mOnMapChangedListener.remove(listener);
+        }
     }
 
     // Called when the map view transformation has changed
@@ -1353,7 +1362,9 @@ public class MapView extends FrameLayout implements LocationListener {
             post(new Runnable() {
                 @Override
                 public void run() {
-                    mOnMapChangedListener.onMapChanged();
+                    for (OnMapChangedListener listener : mOnMapChangedListener) {
+                        listener.onMapChanged();
+                    }
                 }
             });
         }

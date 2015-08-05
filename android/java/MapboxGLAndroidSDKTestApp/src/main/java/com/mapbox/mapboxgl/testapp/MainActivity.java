@@ -114,7 +114,7 @@ public class MainActivity extends ActionBarActivity {
 
         mapView.onCreate(savedInstanceState);
         mapView.setOnFpsChangedListener(new MyOnFpsChangedListener());
-        mapView.setOnMapChangedListener(new MyOnMapChangedListener());
+        mapView.addOnMapChangedListener(new MyOnMapChangedListener());
 
         final GestureDetector gestureDetector = new GestureDetector(this, new GestureDetector.SimpleOnGestureListener() {
             public void onLongPress(final MotionEvent e) {
