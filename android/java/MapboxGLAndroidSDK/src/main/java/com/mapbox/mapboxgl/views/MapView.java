@@ -119,6 +119,9 @@ public class MapView extends FrameLayout implements LocationListener {
     private ImageView mGpsMarker;
     private Location mGpsLocation;
 
+    // Used to manage Event Listeners
+    private ArrayList<OnMapChangedListener> mOnMapChangedListener;
+
     //
     // Properties
     //
@@ -250,16 +253,10 @@ public class MapView extends FrameLayout implements LocationListener {
                 .setInterval(1000)
                 .setSmallestDisplacement(1)
                 .setPriority(LocationRequest.PRIORITY_HIGH_ACCURACY);
-    }
 
-    // Called when map state changes
-    private class MyOnMapChangedListener implements MapView.OnMapChangedListener {
-
-        @Override
-        public void onMapChanged() {
-            Log.i(TAG, "onMapChanged()!!  - Now a full class!");
-            updateMap();
-        }
+        // Setup Support For Listener Tracking
+        // MapView's internal listener is setup in onCreate()
+        mOnMapChangedListener = new ArrayList<OnMapChangedListener>();
     }
 
     //
@@ -563,7 +560,12 @@ public class MapView extends FrameLayout implements LocationListener {
         mNativeMapView.initializeDisplay();
         mNativeMapView.initializeContext();
 
-        addOnMapChangedListener(new MyOnMapChangedListener());
+        addOnMapChangedListener(new OnMapChangedListener() {
+            @Override
+            public void onMapChanged() {
+                updateMap();
+            }
+        });
     }
 
     // Called when we need to save instance state
@@ -1335,19 +1337,27 @@ public class MapView extends FrameLayout implements LocationListener {
     }
 
 
+    /**
+     * Defines callback for events OnMapChange
+     */
     public interface OnMapChangedListener {
         void onMapChanged();
     }
 
-    private ArrayList<OnMapChangedListener> mOnMapChangedListener = new ArrayList<OnMapChangedListener>();
-
-    // Adds a listener for onMapChanged
+    /**
+     * Add an OnMapChangedListner
+     * @param listener Listener to add
+     */
     public void addOnMapChangedListener(@NonNull OnMapChangedListener listener) {
         if (listener != null) {
             mOnMapChangedListener.add(listener);
         }
     }
 
+    /**
+     * Remove an OnMapChangedListener
+     * @param listener Listener to remove
+     */
     public void removeOnMapChangedListener(@NonNull OnMapChangedListener listener) {
         if (listener != null) {
             mOnMapChangedListener.remove(listener);
@@ -1468,7 +1478,6 @@ public class MapView extends FrameLayout implements LocationListener {
 
     // Updates the UI to match the current map's position
     private void updateMap() {
-        Log.i(TAG, "updateMap()");
 //        rotateImageView(mCompassView, (float) mapView.getDirection());
 
         if (isMyLocationEnabled() && mGpsLocation != null) {

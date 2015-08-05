@@ -624,7 +624,6 @@ public class MainActivity extends ActionBarActivity {
 
         @Override
         public void onMapChanged() {
-            Log.i(TAG, "onMapChanged()");
             updateMap();
         }
     }
