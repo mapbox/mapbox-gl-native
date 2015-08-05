@@ -4,6 +4,7 @@
     <string name="app_name">Mapbox GL</string>
 
     <string name="action_gps">Toggle GPS location</string>
+    <string name="action_compass">Toggle Compass</string>
 
     <string name="action_debug">Toggle debug mode</string>
 

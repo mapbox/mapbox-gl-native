@@ -247,6 +247,12 @@ public class MainActivity extends ActionBarActivity {
             case R.id.action_markers:
                 // Toggle markers
                 toggleMarkers(!mIsMarkersOn);
+                return true;
+
+            case R.id.action_compass:
+                // Toggle compass
+                mapView.setCompassEnabled(!mapView.isCompassEnabled());
+                return true;
 
             default:
                 return super.onOptionsItemSelected(item);
