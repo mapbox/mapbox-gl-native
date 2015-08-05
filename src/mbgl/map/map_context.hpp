@@ -4,6 +4,7 @@
 #include <mbgl/map/tile_id.hpp>
 #include <mbgl/map/update.hpp>
 #include <mbgl/map/transform_state.hpp>
+#include <mbgl/map/map.hpp>
 #include <mbgl/style/style.hpp>
 #include <mbgl/util/gl_object_store.hpp>
 #include <mbgl/util/ptr.hpp>
@@ -37,18 +38,13 @@ public:
     MapContext(View&, FileSource&, MapData&);
     ~MapContext();
 
-    struct RenderResult {
-        bool fullyLoaded;
-        bool needsRerender;
-    };
-
     void pause();
 
-    using StillImageCallback = std::function<void(std::exception_ptr, std::unique_ptr<const StillImage>)>;
-
     void triggerUpdate(const TransformState&, Update = Update::Nothing);
-    void renderStill(const TransformState&, const FrameData&, StillImageCallback callback);
-    RenderResult renderSync(const TransformState&, const FrameData&);
+    void renderStill(const TransformState&, const FrameData&, Map::StillImageCallback callback);
+
+    // Triggers a synchronous render. Returns true if style has been fully loaded.
+    bool renderSync(const TransformState&, const FrameData&);
 
     void setStyleURL(const std::string&);
     void setStyleJSON(const std::string& json, const std::string& base);
@@ -78,6 +74,8 @@ private:
     // Loads the actual JSON object an creates a new Style object.
     void loadStyleJSON(const std::string& json, const std::string& base);
 
+    void invalidateView();
+
     View& view;
     MapData& data;
 
@@ -95,10 +93,11 @@ private:
 
     Request* styleRequest = nullptr;
 
-    StillImageCallback callback;
+    Map::StillImageCallback callback;
     size_t sourceCacheSize;
     TransformState transformState;
     FrameData frameData;
+    bool viewInvalidated;
 };
 
 }

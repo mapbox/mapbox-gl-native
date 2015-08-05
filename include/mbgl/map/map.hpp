@@ -66,14 +66,14 @@ public:
     using StillImageCallback = std::function<void(std::exception_ptr, std::unique_ptr<const StillImage>)>;
     void renderStill(StillImageCallback callback);
 
-    // Triggers a synchronous or asynchronous render.
-    bool renderSync();
+    // Triggers a synchronous render.
+    void renderSync();
 
-    // Nudges transitions one step, possibly notifying of the need for a rerender.
-    void nudgeTransitions(bool forceRerender);
+    // Nudges transitions one step, possibly notifying of the need for a rerender, if any.
+    void nudgeTransitions();
 
     // Notifies the Map thread that the state has changed and an update might be necessary.
-    void update(Update update = Update::Nothing);
+    void update(Update update);
 
     // Styling
     void addClass(const std::string&);

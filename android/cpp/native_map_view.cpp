@@ -761,7 +761,7 @@ void NativeMapView::updateFps() {
     env = nullptr;
 }
 
-void NativeMapView::onInvalidate(bool inProgress) {
+void NativeMapView::onInvalidate() {
     mbgl::Log::Debug(mbgl::Event::Android, "NativeMapView::onInvalidate()");
 
     const bool dirty = !clean.test_and_set();
@@ -776,10 +776,8 @@ void NativeMapView::onInvalidate(bool inProgress) {
 
         map.setSourceTileCacheSize(cacheSize);
 
-        const bool needsRerender = map.renderSync();
-        if (!inProgress) {
-            map.nudgeTransitions(needsRerender);
-        }
+        map.renderSync();
+        map.nudgeTransitions();
     }
 }
 
@@ -792,6 +790,7 @@ void NativeMapView::resizeView(int w, int h) {
 void NativeMapView::resizeFramebuffer(int w, int h) {
     fbWidth = w;
     fbHeight = h;
+    map.update(mbgl::Update::Repaint);
 }
 
 }

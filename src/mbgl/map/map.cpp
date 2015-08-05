@@ -48,36 +48,34 @@ void Map::renderStill(StillImageCallback callback) {
                     FrameData{ view.getFramebufferSize() }, callback);
 }
 
-bool Map::renderSync() {
+void Map::renderSync() {
     if (renderState == RenderState::never) {
         view.notifyMapChange(MapChangeWillStartRenderingMap);
     }
 
     view.notifyMapChange(MapChangeWillStartRenderingFrame);
 
-    MapContext::RenderResult result = context->invokeSync<MapContext::RenderResult>(
-        &MapContext::renderSync, transform->getState(), FrameData{ view.getFramebufferSize() });
+    const bool fullyLoaded = context->invokeSync<bool>(
+            &MapContext::renderSync, transform->getState(), FrameData { view.getFramebufferSize() });
 
-    view.notifyMapChange(result.fullyLoaded ?
+    view.notifyMapChange(fullyLoaded ?
         MapChangeDidFinishRenderingFrameFullyRendered :
         MapChangeDidFinishRenderingFrame);
 
-    if (!result.fullyLoaded) {
+    if (!fullyLoaded) {
         renderState = RenderState::partial;
     } else if (renderState != RenderState::fully) {
         renderState = RenderState::fully;
         view.notifyMapChange(MapChangeDidFinishRenderingMapFullyRendered);
     }
-
-    return result.needsRerender;
 }
 
-void Map::nudgeTransitions(bool forceRerender) {
-    if (transform->needsTransition()) {
-        update(Update(transform->updateTransitions(Clock::now())));
-    } else if (forceRerender) {
-        update();
+void Map::nudgeTransitions() {
+    UpdateType update_ = transform->updateTransitions(Clock::now());
+    if (data->getNeedsRepaint()) {
+        update_ |= static_cast<UpdateType>(Update::Repaint);
     }
+    update(Update(update_));
 }
 
 void Map::update(Update update_) {
@@ -110,24 +108,24 @@ std::string Map::getStyleJSON() const {
 
 void Map::cancelTransitions() {
     transform->cancelTransitions();
-    update();
+    update(Update::Repaint);
 }
 
 void Map::setGestureInProgress(bool inProgress) {
     transform->setGestureInProgress(inProgress);
-    update();
+    update(Update::Repaint);
 }
 
 #pragma mark - Position
 
 void Map::moveBy(double dx, double dy, const Duration& duration) {
     transform->moveBy(dx, dy, duration);
-    update();
+    update(Update::Repaint);
 }
 
 void Map::setLatLng(LatLng latLng, const Duration& duration) {
     transform->setLatLng(latLng, duration);
-    update();
+    update(Update::Repaint);
 }
 
 LatLng Map::getLatLng() const {
@@ -249,17 +247,17 @@ uint16_t Map::getHeight() const {
 
 void Map::rotateBy(double sx, double sy, double ex, double ey, const Duration& duration) {
     transform->rotateBy(sx, sy, ex, ey, duration);
-    update();
+    update(Update::Repaint);
 }
 
 void Map::setBearing(double degrees, const Duration& duration) {
     transform->setAngle(-degrees * M_PI / 180, duration);
-    update();
+    update(Update::Repaint);
 }
 
 void Map::setBearing(double degrees, double cx, double cy) {
     transform->setAngle(-degrees * M_PI / 180, cx, cy);
-    update();
+    update(Update::Repaint);
 }
 
 double Map::getBearing() const {
@@ -268,7 +266,7 @@ double Map::getBearing() const {
 
 void Map::resetNorth() {
     transform->setAngle(0, std::chrono::milliseconds(500));
-    update();
+    update(Update::Repaint);
 }
 
 
@@ -365,12 +363,12 @@ void Map::removeSprite(const std::string& name) {
 
 void Map::setDebug(bool value) {
     data->setDebug(value);
-    update();
+    update(Update::Repaint);
 }
 
 void Map::toggleDebug() {
     data->toggleDebug();
-    update();
+    update(Update::Repaint);
 }
 
 bool Map::getDebug() const {
@@ -379,12 +377,12 @@ bool Map::getDebug() const {
 
 void Map::setCollisionDebug(bool value) {
     data->setCollisionDebug(value);
-    update();
+    update(Update::Repaint);
 }
 
 void Map::toggleCollisionDebug() {
     data->toggleCollisionDebug();
-    update();
+    update(Update::Repaint);
 }
 
 bool Map::getCollisionDebug() const {

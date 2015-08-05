@@ -288,7 +288,7 @@ void GLFWView::onFramebufferResize(GLFWwindow *window, int width, int height) {
     view->fbWidth = width;
     view->fbHeight = height;
 
-    view->map->update();
+    view->map->update(mbgl::Update::Repaint);
 }
 
 void GLFWView::onMouseClick(GLFWwindow *window, int button, int action, int modifiers) {
@@ -336,11 +336,8 @@ void GLFWView::run() {
         glfwWaitEvents();
         const bool dirty = !clean.test_and_set();
         if (dirty) {
-            const bool needsRerender = map->renderSync();
-            GLFWView *view = reinterpret_cast<GLFWView *>(glfwGetWindowUserPointer(window));
-            if (!view->tracking || !view->rotating) {
-                map->nudgeTransitions(needsRerender);
-            }
+            map->renderSync();
+            map->nudgeTransitions();
         }
     }
 }

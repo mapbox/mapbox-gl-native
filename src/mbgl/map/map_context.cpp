@@ -35,7 +35,8 @@ MapContext::MapContext(View& view_, FileSource& fileSource, MapData& data_)
       data(data_),
       updated(static_cast<UpdateType>(Update::Nothing)),
       asyncUpdate(std::make_unique<uv::async>(util::RunLoop::getLoop(), [this] { update(); })),
-      texturePool(std::make_unique<TexturePool>()) {
+      texturePool(std::make_unique<TexturePool>()),
+      viewInvalidated(false) {
     assert(util::ThreadContext::currentlyOn(util::ThreadType::Map));
 
     util::ThreadContext::setFileSource(&fileSource);
@@ -255,6 +256,9 @@ void MapContext::update() {
 
     if (!style) {
         updated = static_cast<UpdateType>(Update::Nothing);
+    }
+
+    if (updated == static_cast<UpdateType>(Update::Nothing)) {
         return;
     }
 
@@ -272,15 +276,15 @@ void MapContext::update() {
     style->update(transformState, *texturePool);
 
     if (data.mode == MapMode::Continuous) {
-        view.invalidate();
-    } else if (callback && style->isLoaded()) {
+        invalidateView();
+    } else if (callback && isLoaded()) {
         renderSync(transformState, frameData);
     }
 
     updated = static_cast<UpdateType>(Update::Nothing);
 }
 
-void MapContext::renderStill(const TransformState& state, const FrameData& frame, StillImageCallback fn) {
+void MapContext::renderStill(const TransformState& state, const FrameData& frame, Map::StillImageCallback fn) {
     if (!fn) {
         Log::Error(Event::General, "StillImageCallback not set");
         return;
@@ -314,12 +318,12 @@ void MapContext::renderStill(const TransformState& state, const FrameData& frame
     asyncUpdate->send();
 }
 
-MapContext::RenderResult MapContext::renderSync(const TransformState& state, const FrameData& frame) {
+bool MapContext::renderSync(const TransformState& state, const FrameData& frame) {
     assert(util::ThreadContext::currentlyOn(util::ThreadType::Map));
 
     // Style was not loaded yet.
     if (!style) {
-        return { false, false };
+        return false;
     }
 
     transformState = state;
@@ -342,10 +346,13 @@ MapContext::RenderResult MapContext::renderSync(const TransformState& state, con
 
     view.swap();
 
-    return RenderResult {
-        style->isLoaded(),
-        style->hasTransitions() || painter->needsAnimation()
-    };
+    viewInvalidated = false;
+
+    if (style->hasTransitions() || painter->needsAnimation()) {
+        data.setNeedsRepaint(true);
+    }
+
+    return isLoaded();
 }
 
 bool MapContext::isLoaded() const {
@@ -370,7 +377,7 @@ void MapContext::setSourceTileCacheSize(size_t size) {
         for (const auto &source : style->sources) {
             source->setCacheSize(sourceCacheSize);
         }
-        view.invalidate();
+        invalidateView();
     }
 }
 
@@ -380,7 +387,7 @@ void MapContext::onLowMemory() {
     for (const auto &source : style->sources) {
         source->onLowMemory();
     }
-    view.invalidate();
+    invalidateView();
 }
 
 void MapContext::setSprite(const std::string& name, std::shared_ptr<const SpriteImage> sprite) {
@@ -396,6 +403,8 @@ void MapContext::setSprite(const std::string& name, std::shared_ptr<const Sprite
 
 void MapContext::onTileDataChanged() {
     assert(util::ThreadContext::currentlyOn(util::ThreadType::Map));
+
+    updated |= static_cast<UpdateType>(Update::Repaint);
     asyncUpdate->send();
 }
 
@@ -405,6 +414,13 @@ void MapContext::onResourceLoadingFailed(std::exception_ptr error) {
     if (data.mode == MapMode::Still && callback) {
         callback(error, nullptr);
         callback = nullptr;
+    }
+}
+
+void MapContext::invalidateView() {
+    if (!viewInvalidated) {
+        viewInvalidated = true;
+        view.invalidate();
     }
 }
 

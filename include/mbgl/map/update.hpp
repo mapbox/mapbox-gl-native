@@ -14,6 +14,7 @@ enum class Update : UpdateType {
     Classes                   = 1 << 3,
     Zoom                      = 1 << 4,
     RenderStill               = 1 << 5,
+    Repaint                   = 1 << 6,
 };
 
 }

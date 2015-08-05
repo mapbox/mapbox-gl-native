@@ -1365,8 +1365,7 @@ public class MapView extends FrameLayout implements LocationListener {
         post(new Runnable() {
             @Override
             public void run() {
-                boolean inProgress = mRotateGestureDetector.isInProgress() || mScaleGestureDetector.isInProgress();
-                mNativeMapView.invalidate(inProgress);
+                mNativeMapView.invalidate();
             }
         });
     }
