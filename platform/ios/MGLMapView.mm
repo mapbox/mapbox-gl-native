@@ -1513,7 +1513,7 @@ std::chrono::steady_clock::duration secondsAsDuration(float duration)
     mbgl::CameraOptions options;
     options.center = MGLLatLngFromLocationCoordinate2D(centerCoordinate);
     options.zoom = zoomLevel;
-    options.angle = direction;
+    options.angle = -direction * M_PI / 180;
     if (animated)
     {
         options.duration = secondsAsDuration(MGLAnimationDuration);
