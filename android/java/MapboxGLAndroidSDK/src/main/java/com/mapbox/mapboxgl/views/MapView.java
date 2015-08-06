@@ -180,7 +180,7 @@ public class MapView extends FrameLayout implements LocationListener {
         // Save the context
         mContext = context;
 
-        mSurfaceView = new SurfaceView(mContext);
+        mSurfaceView = new GLSurfaceView(mContext);
         addView(mSurfaceView);
 
         // Check if we are in Eclipse UI editor
@@ -639,9 +639,8 @@ public class MapView extends FrameLayout implements LocationListener {
 
     // Called when we need to stop the render thread
     // Must be called from Activity onPause
-    @Override
     public void onPause() {
-        super.onPause();
+        mSurfaceView.onPause();
 
         // Register for connectivity changes
         getContext().unregisterReceiver(mConnectivityReceiver);
@@ -651,9 +650,8 @@ public class MapView extends FrameLayout implements LocationListener {
     // Called when we need to start the render thread
     // Must be called from Activity onResume
 
-    @Override
     public void onResume() {
-        super.onResume();
+        mSurfaceView.onResume();
 
         // Register for connectivity changes
         mConnectivityReceiver = new ConnectivityReceiver();
