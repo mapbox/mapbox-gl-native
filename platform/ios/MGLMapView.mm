@@ -737,6 +737,7 @@ std::chrono::steady_clock::duration secondsAsDuration(float duration)
     {
         [self updateHeadingForDeviceOrientation];
         [self updateCompass];
+        [self updateUserLocationAnnotationView];
     }
 }
 
