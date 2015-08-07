@@ -5,19 +5,22 @@
 
     <string name="action_gps">Toggle GPS location</string>
     <string name="action_compass">Toggle Compass</string>
-
     <string name="action_debug">Toggle debug mode</string>
-
     <string name="action_point_annotations">Toggle point annotations</string>
 
     <string name="label_fps">FPS:</string>
 
-    <string-array name="style_list">
-        <item>Mapbox Streets</item>
-        <item>Emerald</item>
-        <item>Light</item>
-        <item>Dark</item>
-    </string-array>
+    <string name="styleMapboxStreets">Mapbox Streets</string>
+    <string name="styleEmerald">Emerald</string>
+    <string name="styleLight">Light</string>
+    <string name="styleDark">Dark</string>
+    <string name="styleSatellite">Satellite</string>
+
+    <string name="styleURLMapboxStreets">asset://styles/mapbox-streets-v7.json</string>
+    <string name="styleURLEmerald">asset://styles/emerald-v7.json</string>
+    <string name="styleURLLight">asset://styles/light-v7.json</string>
+    <string name="styleURLDark">asset://styles/dark-v7.json</string>
+    <string name="styleURLSatellite">asset://styles/satellite-v7.json</string>
 
     <string-array name="outdoors_class_list">
         <item>Day</item>

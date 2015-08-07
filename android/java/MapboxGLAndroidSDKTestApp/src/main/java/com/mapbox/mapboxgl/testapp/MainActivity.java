@@ -3,6 +3,7 @@ package com.mapbox.mapboxgl.testapp;
 import android.graphics.Color;
 import android.graphics.PointF;
 import android.os.Bundle;
+import android.support.annotation.NonNull;
 import android.support.design.widget.NavigationView;
 import android.support.v4.view.GravityCompat;
 import android.support.v4.widget.DrawerLayout;
@@ -294,11 +295,35 @@ public class MainActivity extends AppCompatActivity {
                                 // Toggle compass
                                 mapView.setCompassEnabled(!mapView.isCompassEnabled());
                                 break;
+
+                            case R.id.actionStyleMapboxStreets:
+                                changeMapStyle(getString(R.string.styleURLMapboxStreets));
+                                break;
+
+                            case R.id.actionStyleEmerald:
+                                changeMapStyle(getString(R.string.styleURLEmerald));
+                                break;
+
+                            case R.id.actionStyleLight:
+                                changeMapStyle(getString(R.string.styleURLLight));
+                                break;
+
+                            case R.id.actionStyleDark:
+                                changeMapStyle(getString(R.string.styleURLDark));
+                                break;
+
+                            case R.id.actionStyleSatellite:
+                                changeMapStyle(getString(R.string.styleURLSatellite));
+                                break;
                         }
 
                         return true;
                     }
                 });
+    }
+
+    private void changeMapStyle(@NonNull String styleURL) {
+        mapView.setStyleUrl(styleURL);
     }
 
     /**
@@ -398,70 +423,6 @@ public class MainActivity extends AppCompatActivity {
 
     private void removeAnnotations() {
         mapView.removeAnnotations();
-    }
-
-    // This class handles style change events
-    private class StyleSpinnerListener implements AdapterView.OnItemSelectedListener {
-
-        @Override
-        public void onItemSelected(AdapterView<?> parent, View view, int position, long id) {
-            switch (position) {
-
-                // Mapbox Streets
-                case 0:
-                    mapView.setStyleUrl("asset://styles/mapbox-streets-v7.json");
-                    mapView.removeAllStyleClasses();
-                    mClassSpinner.setVisibility(View.INVISIBLE);
-                    mClassSpinner.setAdapter(null);
-                    mClassSpinner.setOnItemSelectedListener(null);
-                    break;
-
-                // Emerald
-                case 1:
-                    mapView.setStyleUrl("asset://styles/emerald-v7.json");
-                    mapView.removeAllStyleClasses();
-                    mClassSpinner.setVisibility(View.INVISIBLE);
-                    mClassSpinner.setAdapter(null);
-                    mClassSpinner.setOnItemSelectedListener(null);
-                    break;
-
-                // Light
-                case 2:
-                    mapView.setStyleUrl("asset://styles/light-v7.json");
-                    mapView.removeAllStyleClasses();
-                    mClassSpinner.setVisibility(View.INVISIBLE);
-                    mClassSpinner.setAdapter(null);
-                    mClassSpinner.setOnItemSelectedListener(null);
-                    break;
-
-                // Dark
-                case 3:
-                    mapView.setStyleUrl("asset://styles/dark-v7.json");
-                    mapView.removeAllStyleClasses();
-                    mClassSpinner.setVisibility(View.INVISIBLE);
-                    mClassSpinner.setAdapter(null);
-                    mClassSpinner.setOnItemSelectedListener(null);
-                    break;
-
-                // Outdoors
-                case 4:
-                    mapView.setStyleUrl("asset://styles/outdoors-v7.json");
-                    mapView.removeAllStyleClasses();
-                    mClassSpinner.setVisibility(View.VISIBLE);
-                    mClassSpinner.setAdapter(mOutdoorsClassAdapter);
-                    mClassSpinner.setOnItemSelectedListener(new OutdoorClassSpinnerListener());
-                    break;
-
-                default:
-                    onNothingSelected(parent);
-                    break;
-            }
-        }
-
-        @Override
-        public void onNothingSelected(AdapterView<?> parent) {
-            mapView.setStyleUrl("");
-        }
     }
 
     // This class handles outdoor class change events
