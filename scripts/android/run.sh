@@ -3,12 +3,6 @@
 set -e
 set -o pipefail
 
-BUILDTYPE=${BUILDTYPE:-Release}
-TESTMUNK=${TESTMUNK:-no}
-export HOST=android
-export MASON_PLATFORM=android
-export MASON_ANDROID_ABI=${ANDROID_ABI:-arm-v7}
-
 # Add Mason to PATH
 export PATH="`pwd`/.mason:${PATH}" MASON_DIR="`pwd`/.mason"
 
@@ -23,7 +17,7 @@ mkdir -p ./android/java/MapboxGLAndroidSDKTestApp/src/main/res/raw
 echo "${MAPBOX_ACCESS_TOKEN}" > ./android/java/MapboxGLAndroidSDKTestApp/src/main/res/raw/token.txt
 
 mapbox_time "compile_library" \
-make android-lib -j${JOBS} BUILDTYPE=${BUILDTYPE}
+make android-lib-${ANDROID_ABI} -j${JOBS} BUILDTYPE=${BUILDTYPE}
 
 mapbox_time "build_apk" \
 make android -j${JOBS} BUILDTYPE=${BUILDTYPE}
