@@ -52,7 +52,6 @@
                 android:id="@+id/mainMapView"
                 android:layout_width="match_parent"
                 android:layout_height="match_parent"
-                mapbox:styleUrl="asset://styles/mapbox-streets-v7.json"
                 />
 
             <TextView

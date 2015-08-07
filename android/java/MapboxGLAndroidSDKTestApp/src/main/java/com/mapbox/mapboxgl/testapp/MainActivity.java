@@ -112,6 +112,9 @@ public class MainActivity extends AppCompatActivity {
         mapView.setOnFpsChangedListener(new MyOnFpsChangedListener());
         mapView.addOnMapChangedListener(new MyOnMapChangedListener());
 
+        changeMapStyle(getString(R.string.styleURLMapboxStreets));
+        navigationView.getMenu().findItem(R.id.actionStyleMapboxStreets).setChecked(true);
+
         final GestureDetector gestureDetector = new GestureDetector(this, new GestureDetector.SimpleOnGestureListener() {
             public void onLongPress(final MotionEvent e) {
                 float x = e.getX();
