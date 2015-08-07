@@ -30,7 +30,7 @@ import com.mapbox.mapboxgl.annotations.PolylineOptions;
 import com.mapbox.mapboxgl.geometry.LatLng;
 import com.mapbox.mapboxgl.views.MapView;
 import io.fabric.sdk.android.Fabric;
-import org.json.JSONException;
+
 import java.io.BufferedReader;
 import java.io.IOException;
 import java.io.InputStreamReader;
@@ -64,8 +64,8 @@ public class MainActivity extends AppCompatActivity {
     // Used for GPS
     private MenuItem mGpsMenuItem;
 
-    // Used for markers
-    private boolean mIsMarkersOn = false;
+    // Used for Annotations
+    private boolean mIsAnnotationsOn = false;
 
     private Marker marker;
 
@@ -279,7 +279,7 @@ public class MainActivity extends AppCompatActivity {
 
                             case R.id.action_markers:
                                 // Toggle markers
-                                toggleMarkers(!mIsMarkersOn);
+                                toggleAnnotations(!mIsAnnotationsOn);
                                 break;
 
                             case R.id.action_compass:
@@ -341,21 +341,23 @@ public class MainActivity extends AppCompatActivity {
     }
 
     /**
-     * Enable / Disable markers.
+     * Enable / Disable Annotations.
      *
-     * @param enableMarkers
+     * @param enableAnnotations True to display, False to hide
      */
-    private void toggleMarkers(boolean enableMarkers) {
-        if (enableMarkers) {
-            if (!mIsMarkersOn) {
-                mIsMarkersOn = true;
+    private void toggleAnnotations(boolean enableAnnotations) {
+        if (enableAnnotations) {
+            if (!mIsAnnotationsOn) {
+                mIsAnnotationsOn = true;
                 addMarkers();
                 addPolyline();
                 addPolygon();
+                mapView.setZoomLevel(7);
+                mapView.setCenterCoordinate(new LatLng(38.11727, -122.22839));
             }
         } else {
-            if (mIsMarkersOn) {
-                mIsMarkersOn = false;
+            if (mIsAnnotationsOn) {
+                mIsAnnotationsOn = false;
                 removeAnnotations();
             }
         }
@@ -386,9 +388,8 @@ public class MainActivity extends AppCompatActivity {
                     .add(latLngs)
                     .width(2)
                     .color(Color.RED));
-        } catch (IOException e) {
-            e.printStackTrace();
-        } catch (JSONException e) {
+        } catch (Exception e) {
+            Log.e(TAG, "Error adding Polyline: "+ e);
             e.printStackTrace();
         }
     }
@@ -405,9 +406,8 @@ public class MainActivity extends AppCompatActivity {
                         .strokeColor(Color.MAGENTA)
                         .fillColor(Color.BLUE));
             Polygon polygon = map.addPolygons(opts).get(0);
-        } catch (IOException e) {
-            e.printStackTrace();
-        } catch (JSONException e) {
+        } catch (Exception e) {
+            Log.e(TAG, "Error adding Polygon: "+ e);
             e.printStackTrace();
         }
     }
