@@ -179,16 +179,16 @@ void NativeMapView::surfaceCreated() {
         firstTime = true;
 
         // TODO move to Java?
-        log_gl_string(GL_VENDOR, "Vendor");
-        log_gl_string(GL_RENDERER, "Renderer");
-        log_gl_string(GL_VERSION, "Version");
+        //log_gl_string(GL_VENDOR, "Vendor");
+        //log_gl_string(GL_RENDERER, "Renderer");
+        //log_gl_string(GL_VERSION, "Version");
         if (!inEmulator()) {
-            log_gl_string(GL_SHADING_LANGUAGE_VERSION,
-                        "SL Version"); // In the emulator this returns NULL with error code 0?
+            //log_gl_string(GL_SHADING_LANGUAGE_VERSION,
+            //            "SL Version"); // In the emulator this returns NULL with error code 0?
                                         // https://code.google.com/p/android/issues/detail?id=78977
         }
 
-        log_gl_string(GL_EXTENSIONS, "Extensions");
+        //log_gl_string(GL_EXTENSIONS, "Extensions");
         mbgl::gl::InitializeExtensions([] (const char * name) {
              return reinterpret_cast<mbgl::gl::glProc>(eglGetProcAddress(name));
         });
