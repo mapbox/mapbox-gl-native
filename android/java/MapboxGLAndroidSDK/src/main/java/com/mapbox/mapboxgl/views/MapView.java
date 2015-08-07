@@ -309,7 +309,7 @@ public class MapView extends FrameLayout implements LocationListener {
         trackingModeButton = new FloatingActionButton(mContext);
         trackingModeButton.setContentDescription(getResources().getString(R.string.trackingModeButtonContentDescription));
         trackingModeButton.setBackgroundTintList(ColorStateList.valueOf(getResources().getColor(R.color.background_material_light)));
-        trackingModeButton.setElevation(4);
+//        trackingModeButton.setElevation(4);
         trackingModeButton.setImageBitmap(BitmapFactory.decodeResource(getResources(), R.drawable.ic_my_location_black_24dp));
         LayoutParams lp2 = new FrameLayout.LayoutParams(ViewGroup.LayoutParams.WRAP_CONTENT, ViewGroup.LayoutParams.WRAP_CONTENT);
         lp2.gravity = Gravity.BOTTOM | Gravity.END;
