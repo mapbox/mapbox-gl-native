@@ -1,4 +1,5 @@
 #import "MGLGeometry.h"
+#import "MGLMapCamera.h"
 
 #import <UIKit/UIKit.h>
 #import <CoreLocation/CoreLocation.h>
@@ -6,6 +7,7 @@
 NS_ASSUME_NONNULL_BEGIN
 
 @class MGLAnnotationImage;
+@class MGLMapCamera;
 @class MGLUserLocation;
 @class MGLPolyline;
 @class MGLPolygon;
@@ -174,6 +176,10 @@ IB_DESIGNABLE
 
 /** Resets the map rotation to a northern heading. */
 - (IBAction)resetNorth;
+
+@property (nonatomic, copy) MGLMapCamera *camera;
+
+- (void)setCamera:(MGLMapCamera *)camera animated:(BOOL)animated;
 
 #pragma mark - Converting Map Coordinates
 

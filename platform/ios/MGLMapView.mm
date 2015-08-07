@@ -1636,6 +1636,31 @@ mbgl::LatLngBounds MGLLatLngBoundsFromCoordinateBounds(MGLCoordinateBounds coord
     [self setDirection:direction animated:NO];
 }
 
+- (MGLMapCamera *)camera
+{
+    CLLocationDistance altitude = 6.53e7 * exp(-0.6931 * self.zoomLevel);
+//  landscape: CLLocationDistance altitude = 1.092e7 * exp(-0.6931 * self.zoomLevel);
+    return [MGLMapCamera cameraLookingAtCenterCoordinate:self.centerCoordinate fromDistance:altitude heading:self.direction];
+}
+
+- (void)setCamera:(MGLMapCamera *)camera
+{
+    [self setCamera:camera animated:NO];
+}
+
+- (void)setCamera:(MGLMapCamera *)camera animated:(BOOL)animated
+{
+    mbgl::CameraOptions options;
+    options.center = MGLLatLngFromLocationCoordinate2D(camera.centerCoordinate);
+    options.zoom = log(camera.altitude / 6.53e7) / -0.6931;
+    options.angle = -camera.heading * M_PI / 180;
+    if (animated)
+    {
+        options.duration = secondsAsDuration(MGLAnimationDuration);
+    }
+    _mbglMap->easeTo(options);
+}
+
 - (CLLocationCoordinate2D)convertPoint:(CGPoint)point toCoordinateFromView:(nullable UIView *)view
 {
     CGPoint convertedPoint = [self convertPoint:point fromView:view];
