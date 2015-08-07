@@ -92,7 +92,6 @@ public class MainActivity extends AppCompatActivity {
 
         mDrawerLayout = (DrawerLayout) findViewById(R.id.drawer_layout);
 
-
         mapView = (MapView) findViewById(R.id.mainMapView);
         // Load the access token
         try {
