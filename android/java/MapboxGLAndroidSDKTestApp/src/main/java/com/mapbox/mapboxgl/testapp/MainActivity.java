@@ -144,18 +144,6 @@ public class MainActivity extends AppCompatActivity {
         mMapFrameLayout = (FrameLayout) findViewById(R.id.layout_map);
 
 /*
-        // Add a toolbar as the action bar
-        Toolbar mainToolbar = (Toolbar) findViewById(R.id.toolbar_main);
-        setSupportActionBar(mainToolbar);
-        getSupportActionBar().setDisplayShowTitleEnabled(false);
-
-        // Add the spinner to select map styles
-        Spinner styleSpinner = (Spinner) findViewById(R.id.spinner_style);
-        ArrayAdapter styleAdapter = ArrayAdapter.createFromResource(getSupportActionBar().getThemedContext(),
-                R.array.style_list, android.R.layout.simple_spinner_dropdown_item);
-        styleSpinner.setAdapter(styleAdapter);
-        styleSpinner.setOnItemSelectedListener(new StyleSpinnerListener());
-
         // Add the spinner to select class styles
         mClassSpinner = (Spinner) findViewById(R.id.spinner_class);
         mOutdoorsClassAdapter = ArrayAdapter.createFromResource(getSupportActionBar().getThemedContext(),
