@@ -1,59 +1,91 @@
 <?xml version="1.0" encoding="utf-8"?>
-<LinearLayout
+
+<android.support.v4.widget.DrawerLayout
+    android:id="@+id/drawer_layout"
     xmlns:android="http://schemas.android.com/apk/res/android"
     xmlns:mapbox="http://schemas.android.com/apk/res-auto"
+    xmlns:tools="http://schemas.android.com/tools"
     android:layout_width="match_parent"
     android:layout_height="match_parent"
-    android:orientation="vertical">
+    android:fitsSystemWindows="true">
 
-    <android.support.v7.widget.Toolbar
-        android:id="@+id/toolbar_main"
-        android:layout_height="wrap_content"
+
+    <android.support.design.widget.CoordinatorLayout
+        android:id="@+id/main_content"
+        xmlns:android="http://schemas.android.com/apk/res/android"
+        xmlns:app="http://schemas.android.com/apk/res-auto"
         android:layout_width="match_parent"
-        android:minHeight="?attr/actionBarSize"
-        android:background="?attr/colorPrimary">
+        android:layout_height="match_parent">
 
-        <Spinner
-            android:id="@+id/spinner_style"
-            android:layout_width="wrap_content"
-            android:layout_height="wrap_content" />
-
-        <Spinner
-            android:id="@+id/spinner_class"
-            android:visibility="invisible"
-            android:layout_width="wrap_content"
-            android:layout_height="wrap_content" />
-    </android.support.v7.widget.Toolbar>
-
-    <FrameLayout
-        android:id="@+id/layout_map"
-        android:layout_width="match_parent"
-        android:layout_height="fill_parent"
-        android:orientation="vertical">
-
-<!--
-        <fragment
-            android:name="com.mapbox.mapboxgl.testapp.MapFragment"
-            android:id="@+id/fragment_map"
+        <android.support.design.widget.AppBarLayout
+            android:id="@+id/appbar"
             android:layout_width="match_parent"
-            android:layout_height="match_parent"
-            tools:context="${packageName}.${activityClass}"
-            tools:layout="@layout/fragment_main" />
--->
-
-        <com.mapbox.mapboxgl.views.MapView
-            android:id="@+id/mainMapView"
-            android:layout_width="match_parent"
-            android:layout_height="match_parent"
-            />
-
-        <TextView
-            android:id="@+id/view_fps"
-            android:layout_width="wrap_content"
             android:layout_height="wrap_content"
-            android:textAppearance="?android:attr/textAppearanceLarge"
-            android:text="@string/label_fps"
-            android:layout_margin="10dp" />
+            android:theme="@style/ThemeOverlay.AppCompat.Dark.ActionBar">
 
-    </FrameLayout>
-</LinearLayout>
+            <android.support.v7.widget.Toolbar
+                android:id="@+id/toolbar"
+                android:layout_width="match_parent"
+                android:layout_height="?attr/actionBarSize"
+                android:background="?attr/colorPrimary"
+                app:popupTheme="@style/ThemeOverlay.AppCompat.Light"/>
+
+
+        </android.support.design.widget.AppBarLayout>
+
+        <FrameLayout
+            android:id="@+id/layout_map"
+            android:layout_width="match_parent"
+            android:layout_height="match_parent"
+            >
+
+            <!--
+                    <fragment
+                        android:name="com.mapbox.mapboxgl.testapp.MapFragment"
+                        android:id="@+id/fragment_map"
+                        android:layout_width="match_parent"
+                        android:layout_height="match_parent"
+                        tools:context="${packageName}.${activityClass}"
+                        tools:layout="@layout/fragment_main" />
+            -->
+
+            <com.mapbox.mapboxgl.views.MapView
+                android:id="@+id/mainMapView"
+                android:layout_width="match_parent"
+                android:layout_height="match_parent"
+                />
+
+            <TextView
+                android:id="@+id/view_fps"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:layout_margin="10dp"
+                android:text="@string/label_fps"
+                android:textAppearance="?android:attr/textAppearanceLarge"/>
+
+        </FrameLayout>
+
+
+        <!--
+                <android.support.design.widget.FloatingActionButton
+                    android:id="@+id/fab"
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:layout_gravity="end|bottom"
+                    android:layout_margin="@dimen/fab_margin"
+                    />
+        -->
+
+    </android.support.design.widget.CoordinatorLayout>
+
+
+    <android.support.design.widget.NavigationView
+        android:id="@+id/nav_view"
+        android:layout_width="wrap_content"
+        android:layout_height="match_parent"
+        android:layout_gravity="start"
+        android:fitsSystemWindows="true"
+        tools:headerLayout="@layout/nav_header"
+        tools:menu="@menu/drawer_view"/>
+
+</android.support.v4.widget.DrawerLayout>

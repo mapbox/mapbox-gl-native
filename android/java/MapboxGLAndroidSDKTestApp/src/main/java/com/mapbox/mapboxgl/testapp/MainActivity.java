@@ -3,7 +3,9 @@ package com.mapbox.mapboxgl.testapp;
 import android.graphics.Color;
 import android.graphics.PointF;
 import android.os.Bundle;
-import android.support.v7.app.ActionBarActivity;
+import android.support.v4.widget.DrawerLayout;
+import android.support.v7.app.ActionBar;
+import android.support.v7.app.AppCompatActivity;
 import android.support.v7.widget.Toolbar;
 import android.util.Log;
 import android.view.GestureDetector;
@@ -33,7 +35,7 @@ import java.io.IOException;
 import java.io.InputStreamReader;
 import java.util.ArrayList;
 
-public class MainActivity extends ActionBarActivity {
+public class MainActivity extends AppCompatActivity {
 
     private static final String TAG = "MainActivity";
 
@@ -49,6 +51,7 @@ public class MainActivity extends ActionBarActivity {
     //
 
     // Used for the UI
+    private DrawerLayout mDrawerLayout;
     private MapView mapView;
     private TextView mFpsTextView;
     private FrameLayout mMapFrameLayout;
@@ -79,6 +82,17 @@ public class MainActivity extends ActionBarActivity {
 
         // Load the layout
         setContentView(R.layout.activity_main);
+
+        Toolbar toolbar = (Toolbar) findViewById(R.id.toolbar);
+        setSupportActionBar(toolbar);
+
+        final ActionBar ab = getSupportActionBar();
+        ab.setHomeAsUpIndicator(R.drawable.ic_menu);
+        ab.setDisplayHomeAsUpEnabled(true);
+
+        mDrawerLayout = (DrawerLayout) findViewById(R.id.drawer_layout);
+
+
         mapView = (MapView) findViewById(R.id.mainMapView);
         // Load the access token
         try {
@@ -120,6 +134,8 @@ public class MainActivity extends ActionBarActivity {
         mFpsTextView.setText("");
 
         mMapFrameLayout = (FrameLayout) findViewById(R.id.layout_map);
+
+/*
         // Add a toolbar as the action bar
         Toolbar mainToolbar = (Toolbar) findViewById(R.id.toolbar_main);
         setSupportActionBar(mainToolbar);
@@ -136,6 +152,7 @@ public class MainActivity extends ActionBarActivity {
         mClassSpinner = (Spinner) findViewById(R.id.spinner_class);
         mOutdoorsClassAdapter = ArrayAdapter.createFromResource(getSupportActionBar().getThemedContext(),
                 R.array.outdoors_class_list, android.R.layout.simple_spinner_dropdown_item);
+*/
 
         if (savedInstanceState != null) {
             mapView.setMyLocationEnabled(savedInstanceState.getBoolean(STATE_IS_GPS_ON, false));
