@@ -119,7 +119,7 @@ void Map::setGestureInProgress(bool inProgress) {
 
 void Map::jumpTo(CameraOptions options) {
     transform->jumpTo(options);
-    update();
+    update(Update::Repaint);
 }
 
 void Map::easeTo(CameraOptions options) {
