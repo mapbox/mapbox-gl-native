@@ -11,8 +11,6 @@ import android.support.v7.app.AppCompatActivity;
 import android.support.v7.widget.Toolbar;
 import android.util.Log;
 import android.view.GestureDetector;
-import android.view.Menu;
-import android.view.MenuInflater;
 import android.view.MenuItem;
 import android.view.MotionEvent;
 import android.view.View;
@@ -230,6 +228,7 @@ public class MainActivity extends AppCompatActivity {
     // Other events
     //
 
+/*
     // Adds items to the action bar menu
     @Override
     public boolean onCreateOptionsMenu(Menu menu) {
@@ -243,6 +242,7 @@ public class MainActivity extends AppCompatActivity {
         }
         return super.onCreateOptionsMenu(menu);
     }
+*/
 
     // Called when pressing action bar items
     @Override
@@ -251,36 +251,6 @@ public class MainActivity extends AppCompatActivity {
             case android.R.id.home:
                 mDrawerLayout.openDrawer(GravityCompat.START);
                 return true;
-
-            case R.id.action_gps:
-                // Toggle GPS position updates
-                toggleGps(!mapView.isMyLocationEnabled());
-                updateMap();
-                return true;
-
-            case R.id.action_debug:
-                // Toggle debug mode
-                mapView.toggleDebug();
-
-                // Show the FPS counter
-                if (mapView.isDebugActive()) {
-                    mFpsTextView.setVisibility(View.VISIBLE);
-                    mFpsTextView.setText(getResources().getString(R.string.label_fps));
-                } else {
-                    mFpsTextView.setVisibility(View.INVISIBLE);
-                }
-                return true;
-
-            case R.id.action_markers:
-                // Toggle markers
-                toggleMarkers(!mIsMarkersOn);
-                return true;
-
-            case R.id.action_compass:
-                // Toggle compass
-                mapView.setCompassEnabled(!mapView.isCompassEnabled());
-                return true;
-
             default:
                 return super.onOptionsItemSelected(item);
         }
@@ -293,6 +263,39 @@ public class MainActivity extends AppCompatActivity {
                     public boolean onNavigationItemSelected(MenuItem menuItem) {
                         menuItem.setChecked(true);
                         mDrawerLayout.closeDrawers();
+
+                        // Respond To Selection
+                        switch (menuItem.getItemId()) {
+                            case R.id.action_gps:
+                                // Toggle GPS position updates
+                                toggleGps(!mapView.isMyLocationEnabled());
+                                updateMap();
+                                break;
+
+                            case R.id.action_debug:
+                                // Toggle debug mode
+                                mapView.toggleDebug();
+
+                                // Show the FPS counter
+                                if (mapView.isDebugActive()) {
+                                    mFpsTextView.setVisibility(View.VISIBLE);
+                                    mFpsTextView.setText(getResources().getString(R.string.label_fps));
+                                } else {
+                                    mFpsTextView.setVisibility(View.INVISIBLE);
+                                }
+                                break;
+
+                            case R.id.action_markers:
+                                // Toggle markers
+                                toggleMarkers(!mIsMarkersOn);
+                                break;
+
+                            case R.id.action_compass:
+                                // Toggle compass
+                                mapView.setCompassEnabled(!mapView.isCompassEnabled());
+                                break;
+                        }
+
                         return true;
                     }
                 });
