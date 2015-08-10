@@ -48,7 +48,8 @@ MapContext::~MapContext() {
 }
 
 void MapContext::setView(View* view_) {
-    if (view) view->deactivate();
+    assert(util::ThreadContext::currentlyOn(util::ThreadType::Map));
+
     view = view_;
     view->activate();
 }
