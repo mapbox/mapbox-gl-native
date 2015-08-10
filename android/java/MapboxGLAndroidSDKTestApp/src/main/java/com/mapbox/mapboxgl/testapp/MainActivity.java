@@ -287,6 +287,20 @@ public class MainActivity extends AppCompatActivity {
                                 mapView.setCompassEnabled(!mapView.isCompassEnabled());
                                 break;
 
+/*
+                            case R.id.followNone:
+                                mapView.setUserLocationTrackingMode(MapView.UserLocationTrackingMode.NONE);
+                                break;
+
+                            case R.id.followFollow:
+                                mapView.setUserLocationTrackingMode(MapView.UserLocationTrackingMode.FOLLOW);
+                                break;
+
+                            case R.id.followBearing:
+                                mapView.setUserLocationTrackingMode(MapView.UserLocationTrackingMode.FOLLOW_BEARING);
+                                break;
+*/
+
                             case R.id.actionStyleMapboxStreets:
                                 changeMapStyle(getString(R.string.styleURLMapboxStreets));
                                 break;

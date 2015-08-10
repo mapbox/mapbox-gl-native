@@ -20,6 +20,19 @@
           android:title="@string/action_compass"
           />
 
+<!--
+    <group android:id="@+id/locationFollowModesSeparator"/>
+
+    <group android:id="@+id/locationFollowModes" android:checkableBehavior="single">
+        <item android:id="@+id/followNone"
+              android:title="@string/action_location_none"/>
+        <item android:id="@+id/followFollow"
+              android:title="@string/action_location_follow"/>
+        <item android:id="@+id/followBearing"
+              android:title="@string/action_location_bearing"/>
+    </group>
+-->
+
     <group android:id="@+id/stylesSeparator"/>
 
     <group android:id="@+id/stylesGroup" android:checkableBehavior="single">
