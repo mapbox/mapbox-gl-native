@@ -15,7 +15,8 @@ void glfwError(int error, const char *description) {
     assert(false);
 }
 
-GLFWView::GLFWView(bool fullscreen_) : fullscreen(fullscreen_) {
+GLFWView::GLFWView(bool fullscreen_, bool benchmark_)
+    : fullscreen(fullscreen_), benchmark(benchmark_) {
     glfwSetErrorCallback(glfwError);
 
     std::srand(std::time(0));
@@ -56,7 +57,13 @@ GLFWView::GLFWView(bool fullscreen_) : fullscreen(fullscreen_) {
 
     glfwSetWindowUserPointer(window, this);
     glfwMakeContextCurrent(window);
-    glfwSwapInterval(1);
+    if (benchmark) {
+        // Disables vsync on platforms that support it.
+        glfwSwapInterval(0);
+    } else {
+        glfwSwapInterval(1);
+    }
+
 
     glfwSetCursorPosCallback(window, onMouseMove);
     glfwSetMouseButtonCallback(window, onMouseClick);
@@ -336,7 +343,12 @@ void GLFWView::run() {
         glfwWaitEvents();
         const bool dirty = !clean.test_and_set();
         if (dirty) {
+            const double started = glfwGetTime();
             map->renderSync();
+            report(1000 * (glfwGetTime() - started));
+            if (benchmark) {
+                map->setNeedsRepaint();
+            }
             map->nudgeTransitions();
         }
     }
@@ -373,20 +385,20 @@ void GLFWView::invalidate() {
 
 void GLFWView::swap() {
     glfwSwapBuffers(window);
-    fps();
 }
 
-void GLFWView::fps() {
-    static int frames = 0;
-    static double timeElapsed = 0;
-
+void GLFWView::report(float duration) {
     frames++;
-    double currentTime = glfwGetTime();
+    frameTime += duration;
 
-    if (currentTime - timeElapsed >= 1) {
-        mbgl::Log::Info(mbgl::Event::OpenGL, "FPS: %4.2f", frames / (currentTime - timeElapsed));
-        timeElapsed = currentTime;
+    const double currentTime = glfwGetTime();
+    if (currentTime - lastReported >= 1) {
+        frameTime /= frames;
+        mbgl::Log::Info(mbgl::Event::OpenGL, "Frame time: %6.2fms (%6.2f fps)", frameTime,
+            1000 / frameTime);
         frames = 0;
+        frameTime = 0;
+        lastReported = currentTime;
     }
 }
 

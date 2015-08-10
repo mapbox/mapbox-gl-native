@@ -12,6 +12,19 @@
 
 #import <Foundation/Foundation.h>
 
+#pragma GCC diagnostic push
+#ifndef __clang__
+#pragma GCC diagnostic ignored "-Wunused-local-typedefs"
+#pragma GCC diagnostic ignored "-Wshadow"
+#endif
+#include <boost/program_options.hpp>
+#pragma GCC diagnostic pop
+
+#include <iostream>
+
+namespace po = boost::program_options;
+
+
 @interface URLHandler : NSObject
 @property (nonatomic) mbgl::Map *map;
 
@@ -101,8 +114,33 @@ const std::string &defaultCacheDatabase() {
     return path;
 }
 
-int main() {
-    GLFWView view;
+int main(int argc, char* argv[]) {
+    bool fullscreen = false;
+    bool benchmark = false;
+    std::string style;
+
+    po::options_description desc("Allowed options");
+    desc.add_options()
+        ("fullscreen,f", po::bool_switch(&fullscreen)->default_value(fullscreen), "Fullscreen mode")
+        ("style,s", po::value(&style)->value_name("json"), "Map stylesheet")
+        ("benchmark,b", po::bool_switch(&benchmark)->default_value(benchmark), "Benchmark mode")
+    ;
+
+    try {
+        auto parsed = po::command_line_parser(argc, argv).options(desc).allow_unregistered().run();
+        po::variables_map vm;
+        po::store(parsed, vm);
+        po::notify(vm);
+    } catch(std::exception& e) {
+        std::cout << "Error: " << e.what() << std::endl << desc;
+        exit(1);
+    }
+
+    if (benchmark) {
+        mbgl::Log::Info(mbgl::Event::General, "BENCHMARK MODE: Some optimizations are disabled.");
+    }
+
+    GLFWView view(fullscreen, benchmark);
 
     mbgl::SQLiteCache cache(defaultCacheDatabase());
     mbgl::DefaultFileSource fileSource(&cache);
@@ -146,10 +184,15 @@ int main() {
         mbgl::Log::Info(mbgl::Event::Setup, std::string("Changed style to: ") + newStyle.first);
     });
 
+
     // Load style
-    const auto& newStyle = mbgl::util::defaultStyles.front();
-    map.setStyleURL(newStyle.first);
-    view.setWindowTitle(newStyle.second);
+    if (style.empty()) {
+        const auto& newStyle = mbgl::util::defaultStyles.front();
+        style = newStyle.first;
+        view.setWindowTitle(newStyle.second);
+    }
+
+    map.setStyleURL(style);
 
     view.run();
 

@@ -32,17 +32,19 @@ void quit_handler(int) {
 
 int main(int argc, char *argv[]) {
     bool fullscreen = false;
+    bool benchmark = false;
     std::string style;
 
     const struct option long_options[] = {
         {"fullscreen", no_argument, 0, 'f'},
+        {"benchmark", no_argument, 0, 'b'},
         {"style", required_argument, 0, 's'},
         {0, 0, 0, 0}
     };
 
     while (true) {
         int option_index = 0;
-        int opt = getopt_long(argc, argv, "fs:", long_options, &option_index);
+        int opt = getopt_long(argc, argv, "fbs:", long_options, &option_index);
         if (opt == -1) break;
         switch (opt)
         {
@@ -51,6 +53,9 @@ int main(int argc, char *argv[]) {
                 break;
         case 'f':
             fullscreen = true;
+            break;
+        case 'b':
+            benchmark = true;
             break;
         case 's':
             style = std::string("asset://") + std::string(optarg);
@@ -67,7 +72,11 @@ int main(int argc, char *argv[]) {
     sigIntHandler.sa_flags = 0;
     sigaction(SIGINT, &sigIntHandler, NULL);
 
-    view = std::make_unique<GLFWView>(fullscreen);
+    if (benchmark) {
+        mbgl::Log::Info(mbgl::Event::General, "BENCHMARK MODE: Some optimizations are disabled.");
+    }
+
+    view = std::make_unique<GLFWView>(fullscreen, benchmark);
 
     mbgl::SQLiteCache cache("/tmp/mbgl-cache.db");
     mbgl::DefaultFileSource fileSource(&cache);

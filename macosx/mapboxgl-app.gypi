@@ -43,6 +43,7 @@
         ],
         'libraries': [
           '<@(glfw_static_libs)',
+          '<@(boost_libprogram_options_static_libs)'
         ],
       },
 
