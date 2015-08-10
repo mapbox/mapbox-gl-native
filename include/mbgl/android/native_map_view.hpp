@@ -9,8 +9,6 @@
 
 #include <string>
 #include <jni.h>
-#include <android/native_window.h>
-#include <EGL/egl.h>
 
 namespace mbgl {
 namespace android {
@@ -34,42 +32,19 @@ public:
     mbgl::Map &getMap();
     mbgl::DefaultFileSource &getFileSource();
 
-    void initializeDisplay();
-    void terminateDisplay();
-
-    void initializeContext();
-    void terminateContext();
-
-    void createSurface(ANativeWindow *window);
-    void destroySurface();
-
-    void resume();
-    void pause();
-
     void enableFps(bool enable);
     void updateFps();
 
-    void onInvalidate();
-
-    void resizeView(int width, int height);
-    void resizeFramebuffer(int width, int height);
+    void surfaceCreated();
+    void surfaceChanged(int width, int height);
+    void drawFrame(bool inProgress);
 
 private:
-    EGLConfig chooseConfig(const EGLConfig configs[], EGLint numConfigs);
-
     bool inEmulator();
 
 private:
     JavaVM *vm = nullptr;
     jobject obj = nullptr;
-
-    ANativeWindow *window = nullptr;
-    EGLDisplay display = EGL_NO_DISPLAY;
-    EGLSurface surface = EGL_NO_SURFACE;
-    EGLContext context = EGL_NO_CONTEXT;
-
-    EGLConfig config = nullptr;
-    EGLint format = -1;
 
     std::string styleUrl;
     std::string apiKey;

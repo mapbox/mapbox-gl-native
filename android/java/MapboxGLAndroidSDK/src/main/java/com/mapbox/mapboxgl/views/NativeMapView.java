@@ -60,47 +60,11 @@ class NativeMapView {
     // Methods
     //
 
-    public void initializeDisplay() {
-        nativeInitializeDisplay(mNativeMapViewPtr);
+    public void surfaceCreated() {
+        nativeSurfaceCreated(mNativeMapViewPtr);
     }
 
-    public void terminateDisplay() {
-        nativeTerminateDisplay(mNativeMapViewPtr);
-    }
-
-    public void initializeContext() {
-        nativeInitializeContext(mNativeMapViewPtr);
-    }
-
-    public void terminateContext() {
-        nativeTerminateContext(mNativeMapViewPtr);
-    }
-
-    public void createSurface(Surface surface) {
-        nativeCreateSurface(mNativeMapViewPtr, surface);
-    }
-
-    public void destroySurface() {
-        nativeDestroySurface(mNativeMapViewPtr);
-    }
-
-    public void pause() {
-        nativePause(mNativeMapViewPtr);
-    }
-
-    public void resume() {
-        nativeResume(mNativeMapViewPtr);
-    }
-
-    public void update() {
-        nativeUpdate(mNativeMapViewPtr);
-    }
-
-    public void invalidate() {
-        nativeOnInvalidate(mNativeMapViewPtr);
-    }
-
-    public void resizeView(int width, int height) {
+    public void surfaceChanged(int width, int height) {
         if (width < 0) {
             throw new IllegalArgumentException("width cannot be negative.");
         }
@@ -118,28 +82,11 @@ class NativeMapView {
             throw new IllegalArgumentException(
                     "height cannot be greater than 65535.");
         }
-        nativeViewResize(mNativeMapViewPtr, width, height);
+        nativeSurfaceChanged(mNativeMapViewPtr, width, height);
     }
 
-    public void resizeFramebuffer(int fbWidth, int fbHeight) {
-        if (fbWidth < 0) {
-            throw new IllegalArgumentException("fbWidth cannot be negative.");
-        }
-
-        if (fbHeight < 0) {
-            throw new IllegalArgumentException("fbHeight cannot be negative.");
-        }
-
-        if (fbWidth > 65535) {
-            throw new IllegalArgumentException(
-                    "fbWidth cannot be greater than 65535.");
-        }
-
-        if (fbHeight > 65535) {
-            throw new IllegalArgumentException(
-                    "fbHeight cannot be greater than 65535.");
-        }
-        nativeFramebufferResize(mNativeMapViewPtr, fbWidth, fbHeight);
+    public void drawFrame(boolean inProgress) {
+        nativeDrawFrame(mNativeMapViewPtr, inProgress);
     }
 
     public void addClass(String clazz) {
@@ -444,30 +391,11 @@ class NativeMapView {
 
     private native void nativeDestroy(long nativeMapViewPtr);
 
-    private native void nativeInitializeDisplay(long nativeMapViewPtr);
+    private native void nativeSurfaceCreated(long nativeMapViewPtr);
 
-    private native void nativeTerminateDisplay(long nativeMapViewPtr);
+    private native void nativeSurfaceChanged(long nativeMapViewPtr, int width, int height);
 
-    private native void nativeInitializeContext(long nativeMapViewPtr);
-
-    private native void nativeTerminateContext(long nativeMapViewPtr);
-
-    private native void nativeCreateSurface(long nativeMapViewPtr,
-            Surface surface);
-
-    private native void nativeDestroySurface(long nativeMapViewPtr);
-
-    private native void nativePause(long nativeMapViewPtr);
-
-    private native void nativeResume(long nativeMapViewPtr);
-
-    private native void nativeUpdate(long nativeMapViewPtr);
-
-    private native void nativeOnInvalidate(long nativeMapViewPtr);
-
-    private native void nativeViewResize(long nativeMapViewPtr, int width, int height);
-
-    private native void nativeFramebufferResize(long nativeMapViewPtr, int fbWidth, int fbHeight);
+    private native void nativeDrawFrame(long nativeMapViewPtr, boolean inProgress);
 
     private native void nativeAddClass(long nativeMapViewPtr, String clazz);
 

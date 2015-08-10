@@ -333,112 +333,36 @@ void JNICALL nativeDestroy(JNIEnv *env, jobject obj, jlong nativeMapViewPtr) {
     nativeMapView = nullptr;
 }
 
-void JNICALL nativeInitializeDisplay(JNIEnv *env, jobject obj, jlong nativeMapViewPtr) {
-    mbgl::Log::Debug(mbgl::Event::JNI, "nativeInitializeDisplay");
+void JNICALL nativeSurfaceCreated(JNIEnv *env, jobject obj, jlong nativeMapViewPtr) {
+    mbgl::Log::Debug(mbgl::Event::JNI, "nativeSurfaceCreated");
     assert(nativeMapViewPtr != 0);
     NativeMapView *nativeMapView = reinterpret_cast<NativeMapView *>(nativeMapViewPtr);
-
-    try
-    {
-        nativeMapView->initializeDisplay();
-    } catch(const std::exception& e) {
-        throw_error(env, "Unable to initialize GL display.");
-    }
+    nativeMapView->surfaceCreated();
 }
 
-void JNICALL nativeTerminateDisplay(JNIEnv *env, jobject obj, jlong nativeMapViewPtr) {
-    mbgl::Log::Debug(mbgl::Event::JNI, "nativeTerminateDisplay");
-    assert(nativeMapViewPtr != 0);
-    NativeMapView *nativeMapView = reinterpret_cast<NativeMapView *>(nativeMapViewPtr);
-    nativeMapView->terminateDisplay();
-}
-
-void JNICALL nativeInitializeContext(JNIEnv *env, jobject obj, jlong nativeMapViewPtr) {
-    mbgl::Log::Debug(mbgl::Event::JNI, "nativeInitializeContext");
-    assert(nativeMapViewPtr != 0);
-    NativeMapView *nativeMapView = reinterpret_cast<NativeMapView *>(nativeMapViewPtr);
-
-    try {
-        nativeMapView->initializeContext();
-    } catch(const std::exception& e) {
-        throw_error(env, "Unable to initialize GL context.");
-    }
-}
-
-void JNICALL nativeTerminateContext(JNIEnv *env, jobject obj, jlong nativeMapViewPtr) {
-    mbgl::Log::Debug(mbgl::Event::JNI, "nativeTerminateContext");
-    assert(nativeMapViewPtr != 0);
-    NativeMapView *nativeMapView = reinterpret_cast<NativeMapView *>(nativeMapViewPtr);
-    nativeMapView->terminateContext();
-}
-
-void JNICALL nativeCreateSurface(JNIEnv *env, jobject obj, jlong nativeMapViewPtr, jobject surface) {
-    mbgl::Log::Debug(mbgl::Event::JNI, "nativeCreateSurface");
-    assert(nativeMapViewPtr != 0);
-    NativeMapView *nativeMapView = reinterpret_cast<NativeMapView *>(nativeMapViewPtr);
-
-    try {
-        nativeMapView->createSurface(ANativeWindow_fromSurface(env, surface));
-    } catch(const std::exception& e) {
-        throw_error(env, "Unable to create GL surface.");
-    }
-}
-
-void JNICALL nativeDestroySurface(JNIEnv *env, jobject obj, jlong nativeMapViewPtr) {
-    mbgl::Log::Debug(mbgl::Event::JNI, "nativeDestroySurface");
-    assert(nativeMapViewPtr != 0);
-    NativeMapView *nativeMapView = reinterpret_cast<NativeMapView *>(nativeMapViewPtr);
-    nativeMapView->destroySurface();
-}
-
-void JNICALL nativePause(JNIEnv *env, jobject obj, jlong nativeMapViewPtr) {
-    mbgl::Log::Debug(mbgl::Event::JNI, "nativePause");
-    assert(nativeMapViewPtr != 0);
-    NativeMapView *nativeMapView = reinterpret_cast<NativeMapView *>(nativeMapViewPtr);
-    nativeMapView->pause();
-}
-
-void JNICALL nativeResume(JNIEnv *env, jobject obj, jlong nativeMapViewPtr) {
-    mbgl::Log::Debug(mbgl::Event::JNI, "nativeResume");
-    assert(nativeMapViewPtr != 0);
-    NativeMapView *nativeMapView = reinterpret_cast<NativeMapView *>(nativeMapViewPtr);
-    nativeMapView->resume();
-}
-
-void JNICALL nativeUpdate(JNIEnv *env, jobject obj, jlong nativeMapViewPtr) {
-    mbgl::Log::Debug(mbgl::Event::JNI, "nativeUpdate");
-    assert(nativeMapViewPtr != 0);
-    NativeMapView *nativeMapView = reinterpret_cast<NativeMapView *>(nativeMapViewPtr);
-    nativeMapView->getMap().update(mbgl::Update::Repaint);
-}
-
-void JNICALL nativeOnInvalidate(JNIEnv *env, jobject obj, jlong nativeMapViewPtr) {
-    mbgl::Log::Debug(mbgl::Event::JNI, "nativeOnInvalidate");
-    assert(nativeMapViewPtr != 0);
-    NativeMapView *nativeMapView = reinterpret_cast<NativeMapView *>(nativeMapViewPtr);
-    nativeMapView->onInvalidate();
-}
-
-void JNICALL nativeViewResize(JNIEnv *env, jobject obj, jlong nativeMapViewPtr, jint width, jint height) {
-    mbgl::Log::Debug(mbgl::Event::JNI, "nativeViewResize");
+void JNICALL nativeSurfaceChanged(JNIEnv *env, jobject obj, jlong nativeMapViewPtr, jint width, jint height) {
+    mbgl::Log::Debug(mbgl::Event::JNI, "nativeSurfaceChanged");
     assert(nativeMapViewPtr != 0);
     assert(width >= 0);
     assert(height >= 0);
     assert(width <= UINT16_MAX);
     assert(height <= UINT16_MAX);
     NativeMapView *nativeMapView = reinterpret_cast<NativeMapView *>(nativeMapViewPtr);
-    nativeMapView->resizeView(width, height);
+    nativeMapView->surfaceChanged(width, height);
 }
 
-void JNICALL nativeFramebufferResize(JNIEnv *env, jobject obj, jlong nativeMapViewPtr, jint fbWidth, jint fbHeight) {
-    mbgl::Log::Debug(mbgl::Event::JNI, "nativeFramebufferResize");
+void JNICALL nativeDrawFrame(JNIEnv *env, jobject obj, jlong nativeMapViewPtr, jboolean inProgress) {
+    mbgl::Log::Debug(mbgl::Event::JNI, "nativeDrawFrame");
     assert(nativeMapViewPtr != 0);
-    assert(fbWidth >= 0);
-    assert(fbHeight >= 0);
-    assert(fbWidth <= UINT16_MAX);
-    assert(fbHeight <= UINT16_MAX);
     NativeMapView *nativeMapView = reinterpret_cast<NativeMapView *>(nativeMapViewPtr);
-    nativeMapView->resizeFramebuffer(fbWidth, fbHeight);
+    nativeMapView->drawFrame(inProgress);
+}
+
+void JNICALL nativeAddClass(JNIEnv *env, jobject obj, jlong nativeMapViewPtr, jstring clazz) {
+    mbgl::Log::Debug(mbgl::Event::JNI, "nativeAddClass");
+    assert(nativeMapViewPtr != 0);
+    NativeMapView *nativeMapView = reinterpret_cast<NativeMapView *>(nativeMapViewPtr);
+    nativeMapView->getMap().addClass(std_string_from_jstring(env, clazz));
 }
 
 void JNICALL nativeRemoveClass(JNIEnv *env, jobject obj, jlong nativeMapViewPtr, jstring clazz) {
@@ -453,13 +377,6 @@ jboolean JNICALL nativeHasClass(JNIEnv *env, jobject obj, jlong nativeMapViewPtr
     assert(nativeMapViewPtr != 0);
     NativeMapView *nativeMapView = reinterpret_cast<NativeMapView *>(nativeMapViewPtr);
     return nativeMapView->getMap().hasClass(std_string_from_jstring(env, clazz));
-}
-
-void JNICALL nativeAddClass(JNIEnv *env, jobject obj, jlong nativeMapViewPtr, jstring clazz) {
-    mbgl::Log::Debug(mbgl::Event::JNI, "nativeAddClass");
-    assert(nativeMapViewPtr != 0);
-    NativeMapView *nativeMapView = reinterpret_cast<NativeMapView *>(nativeMapViewPtr);
-    nativeMapView->getMap().addClass(std_string_from_jstring(env, clazz));
 }
 
 void JNICALL nativeSetClasses(JNIEnv *env, jobject obj, jlong nativeMapViewPtr, jobject classes) {
@@ -1430,23 +1347,11 @@ extern "C" JNIEXPORT jint JNICALL JNI_OnLoad(JavaVM *vm, void *reserved) {
         {"nativeCreate", "(Ljava/lang/String;Ljava/lang/String;Ljava/lang/String;FIJ)J",
          reinterpret_cast<void *>(&nativeCreate)},
         {"nativeDestroy", "(J)V", reinterpret_cast<void *>(&nativeDestroy)},
-        {"nativeInitializeDisplay", "(J)V", reinterpret_cast<void *>(&nativeInitializeDisplay)},
-        {"nativeTerminateDisplay", "(J)V", reinterpret_cast<void *>(&nativeTerminateDisplay)},
-        {"nativeInitializeContext", "(J)V", reinterpret_cast<void *>(&nativeInitializeContext)},
-        {"nativeTerminateContext", "(J)V", reinterpret_cast<void *>(&nativeTerminateContext)},
-        {"nativeCreateSurface", "(JLandroid/view/Surface;)V",
-         reinterpret_cast<void *>(&nativeCreateSurface)},
-        {"nativeDestroySurface", "(J)V", reinterpret_cast<void *>(&nativeDestroySurface)},
-        {"nativePause", "(J)V", reinterpret_cast<void *>(&nativePause)},
-        {"nativeResume", "(J)V", reinterpret_cast<void *>(&nativeResume)},
-        {"nativeUpdate", "(J)V", reinterpret_cast<void *>(&nativeUpdate)},
-        {"nativeOnInvalidate", "(J)V", reinterpret_cast<void *>(&nativeOnInvalidate)},
-        {"nativeViewResize", "(JII)V",
+        {"nativeSurfaceCreated", "(J)V", reinterpret_cast<void *>(&nativeSurfaceCreated)},
+        {"nativeSurfaceChanged", "(JII)V",
          reinterpret_cast<void *>(static_cast<void JNICALL (
-             *)(JNIEnv *, jobject, jlong, jint, jint)>(&nativeViewResize))},
-        {"nativeFramebufferResize", "(JII)V",
-         reinterpret_cast<void *>(static_cast<void JNICALL (
-             *)(JNIEnv *, jobject, jlong, jint, jint)>(&nativeFramebufferResize))},
+             *)(JNIEnv *, jobject, jlong, jint, jint)>(&nativeSurfaceChanged))},
+        {"nativeDrawFrame", "(JZ)V", reinterpret_cast<void *>(&nativeDrawFrame)},
         {"nativeAddClass", "(JLjava/lang/String;)V",
          reinterpret_cast<void *>(&nativeAddClass)},
         {"nativeRemoveClass", "(JLjava/lang/String;)V",
