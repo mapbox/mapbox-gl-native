@@ -208,7 +208,7 @@ void HeadlessView::clearBuffers() {
 }
 
 HeadlessView::~HeadlessView() {
-    activate();
+    if (!isActive()) activate();
     clearBuffers();
     deactivate();
 
