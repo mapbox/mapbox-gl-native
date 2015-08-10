@@ -119,16 +119,10 @@ const CGFloat MGLUserLocationAnnotationHaloSize = 115.0;
             _oldHeadingAccuracy = self.annotation.heading.headingAccuracy;
         }
         
-        // update accuracy ring
+        // update accuracy ring (if zoom or horizontal accuracy have changed)
         //
-        if (_accuracyRingLayer)
+        if (_accuracyRingLayer && (_oldZoom != self.mapView.zoomLevel || _oldHorizontalAccuracy != self.annotation.location.horizontalAccuracy))
         {
-            // FIX: This stops EVERYTHING... and that isn't necessarily necessary, now is it?
-            if (_oldZoom == self.mapView.zoomLevel && _oldHorizontalAccuracy == self.annotation.location.horizontalAccuracy)
-            {
-                return;
-            }
-            
             CGFloat accuracyRingSize = [self calculateAccuracyRingSize];
             
             // only show the accuracy ring if it won't be obscured by the location dot
