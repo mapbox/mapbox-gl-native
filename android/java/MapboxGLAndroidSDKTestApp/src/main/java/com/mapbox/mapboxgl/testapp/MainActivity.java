@@ -4,6 +4,7 @@ import android.graphics.Color;
 import android.graphics.PointF;
 import android.os.Bundle;
 import android.support.annotation.NonNull;
+import android.support.design.widget.FloatingActionButton;
 import android.support.design.widget.NavigationView;
 import android.support.v4.view.GravityCompat;
 import android.support.v4.widget.DrawerLayout;
@@ -62,7 +63,7 @@ public class MainActivity extends AppCompatActivity {
     private ArrayAdapter mSatelliteClassAdapter;
 
     // Used for GPS
-    private MenuItem mGpsMenuItem;
+    private FloatingActionButton locationFAB;
 
     // Used for Annotations
     private boolean mIsAnnotationsOn = false;
@@ -143,6 +144,16 @@ public class MainActivity extends AppCompatActivity {
 
         mMapFrameLayout = (FrameLayout) findViewById(R.id.layout_map);
 
+        locationFAB = (FloatingActionButton)findViewById(R.id.locationFAB);
+        locationFAB.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View v) {
+                // Toggle GPS position updates
+                toggleGps(!mapView.isMyLocationEnabled());
+                updateMap();
+            }
+        });
+
 /*
         // Add the spinner to select class styles
         mClassSpinner = (Spinner) findViewById(R.id.spinner_class);
@@ -219,22 +230,6 @@ public class MainActivity extends AppCompatActivity {
     //
     // Other events
     //
-
-/*
-    // Adds items to the action bar menu
-    @Override
-    public boolean onCreateOptionsMenu(Menu menu) {
-        MenuInflater inflater = getMenuInflater();
-        inflater.inflate(R.menu.menu_main, menu);
-        mGpsMenuItem = menu.findItem(R.id.action_gps);
-        if (mapView.isMyLocationEnabled()) {
-            mGpsMenuItem.setIcon(R.drawable.ic_action_location_found);
-        } else {
-            mGpsMenuItem.setIcon(R.drawable.ic_action_location_searching);
-        }
-        return super.onCreateOptionsMenu(menu);
-    }
-*/
 
     // Called when pressing action bar items
     @Override
@@ -340,16 +335,12 @@ public class MainActivity extends AppCompatActivity {
         if (enableGps) {
             if (!mapView.isMyLocationEnabled()) {
                 mapView.setMyLocationEnabled(enableGps);
-                if (mGpsMenuItem != null) {
-                    mGpsMenuItem.setIcon(R.drawable.ic_action_location_found);
-                }
+                locationFAB.setColorFilter(getResources().getColor(R.color.primary));
             }
         } else {
             if (mapView.isMyLocationEnabled()) {
                 mapView.setMyLocationEnabled(enableGps);
-                if (mGpsMenuItem != null) {
-                    mGpsMenuItem.setIcon(R.drawable.ic_action_location_searching);
-                }
+                locationFAB.setColorFilter(Color.TRANSPARENT);
             }
         }
     }
