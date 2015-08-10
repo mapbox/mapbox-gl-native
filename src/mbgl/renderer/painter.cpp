@@ -152,7 +152,7 @@ void Painter::clear() {
     config.stencilMask = 0xFF;
     config.depthTest = false;
     config.depthMask = GL_TRUE;
-    config.clearColor = { 0.0f, 0.0f, 0.0f, 0.0f };
+    config.clearColor = { background[0], background[1], background[2], background[3] };
     MBGL_CHECK_ERROR(glClear(GL_COLOR_BUFFER_BIT | GL_STENCIL_BUFFER_BIT | GL_DEPTH_BUFFER_BIT));
 }
 
@@ -314,7 +314,21 @@ std::vector<RenderItem> Painter::determineRenderOrder(const Style& style) {
         if (layer.bucket->visibility == VisibilityType::None) continue;
         if (layer.type == StyleLayerType::Background) {
             // This layer defines a background color/image.
-            order.emplace_back(layer);
+            if (layer.properties.is<BackgroundProperties>()) {
+                auto &props = layer.properties.get<BackgroundProperties>();
+                if (props.image.from.empty()) {
+                    // This is a solid background. We can use glClear().
+                    background = props.color;
+                    background[0] *= props.opacity;
+                    background[1] *= props.opacity;
+                    background[2] *= props.opacity;
+                    background[3] *= props.opacity;
+                } else {
+                    // This is a textured background. We need to render it with a quad.
+                    background = {{ 0, 0, 0, 0 }};
+                    order.emplace_back(layer);
+                }
+            }
             continue;
         }
 
@@ -387,6 +401,8 @@ RenderPass Painter::determineRenderPasses(const StyleLayer& layer) {
 }
 
 void Painter::renderBackground(const StyleLayer &layer_desc) {
+    // Note: This function is only called for textured background. Otherwise, the background color
+    // is created with glClear.
     const BackgroundProperties& properties = layer_desc.getProperties<BackgroundProperties>();
 
     if (!properties.image.to.empty()) {
@@ -444,20 +460,6 @@ void Painter::renderBackground(const StyleLayer &layer_desc) {
         backgroundBuffer.bind();
         patternShader->bind(0);
         spriteAtlas->bind(true);
-    } else {
-        Color color = properties.color;
-        color[0] *= properties.opacity;
-        color[1] *= properties.opacity;
-        color[2] *= properties.opacity;
-        color[3] *= properties.opacity;
-
-        if ((color[3] >= 1.0f) != (pass == RenderPass::Opaque))
-            return;
-
-        useProgram(plainShader->program);
-        plainShader->u_matrix = identityMatrix;
-        plainShader->u_color = color;
-        backgroundArray.bind(*plainShader, backgroundBuffer, BUFFER_OFFSET(0));
     }
 
     config.stencilTest = false;

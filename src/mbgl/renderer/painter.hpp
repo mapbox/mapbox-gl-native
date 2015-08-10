@@ -207,6 +207,7 @@ private:
     float strata = 0;
     RenderPass pass = RenderPass::Opaque;
     const float strata_epsilon = 1.0f / (1 << 16);
+    Color background = {{ 0, 0, 0, 0 }};
 
 public:
     FrameHistory frameHistory;
