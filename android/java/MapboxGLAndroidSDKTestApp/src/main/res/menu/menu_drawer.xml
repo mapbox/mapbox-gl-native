@@ -11,10 +11,6 @@
         android:icon="@android:drawable/ic_menu_myplaces"
         android:title="@string/action_point_annotations"
         />
-    <item android:id="@+id/action_gps"
-          android:icon="@drawable/ic_action_location_searching"
-          android:title="@string/action_gps"
-          />
     <item android:id="@+id/action_compass"
           android:icon="@drawable/ic_explore_white_24dp"
           android:title="@string/action_compass"

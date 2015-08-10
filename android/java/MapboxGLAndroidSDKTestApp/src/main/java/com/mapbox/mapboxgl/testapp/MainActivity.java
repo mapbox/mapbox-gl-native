@@ -31,7 +31,6 @@ import com.mapbox.mapboxgl.annotations.PolylineOptions;
 import com.mapbox.mapboxgl.geometry.LatLng;
 import com.mapbox.mapboxgl.views.MapView;
 import io.fabric.sdk.android.Fabric;
-
 import java.io.BufferedReader;
 import java.io.IOException;
 import java.io.InputStreamReader;
@@ -253,11 +252,6 @@ public class MainActivity extends AppCompatActivity {
 
                         // Respond To Selection
                         switch (menuItem.getItemId()) {
-                            case R.id.action_gps:
-                                // Toggle GPS position updates
-                                toggleGps(!mapView.isMyLocationEnabled());
-                                updateMap();
-                                break;
 
                             case R.id.action_debug:
                                 // Toggle debug mode
