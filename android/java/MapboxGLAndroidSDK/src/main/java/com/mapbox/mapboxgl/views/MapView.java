@@ -1674,6 +1674,8 @@ public class MapView extends FrameLayout implements LocationListener {
             }
 
 /*
+            // TODO - Too much overhead on main thread.  Needs to be refactored before it
+            // can be re-enabled
             // Update map position if NOT in NONE mode
             if (userLocationTrackingMode != UserLocationTrackingMode.NONE) {
                 setCenterCoordinate(new LatLng(mGpsLocation));
