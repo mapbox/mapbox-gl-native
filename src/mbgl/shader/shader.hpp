@@ -15,6 +15,8 @@ public:
     const char *name;
     uint32_t program;
 
+    virtual void bind(char *offset) = 0;
+
     inline uint32_t getID() const {
         return program;
     }

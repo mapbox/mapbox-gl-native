@@ -10,7 +10,7 @@ class LinepatternShader : public Shader {
 public:
     LinepatternShader();
 
-    void bind(char *offset);
+    void bind(char *offset) override;
 
     UniformMatrix<4>              u_matrix       = {"u_matrix",       *this};
     UniformMatrix<4>              u_exmatrix     = {"u_exmatrix",     *this};
