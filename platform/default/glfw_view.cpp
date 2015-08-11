@@ -29,6 +29,9 @@ GLFWView::GLFWView(bool fullscreen_, bool benchmark_)
     GLFWmonitor *monitor = nullptr;
     if (fullscreen) {
         monitor = glfwGetPrimaryMonitor();
+        auto videoMode = glfwGetVideoMode(monitor);
+        width = videoMode->width;
+        height = videoMode->height;
     }
 
 #ifdef DEBUG
