@@ -141,7 +141,7 @@ public class MainActivity extends AppCompatActivity {
         mFpsTextView = (TextView) findViewById(R.id.view_fps);
         mFpsTextView.setText("");
 
-        mMapFrameLayout = (FrameLayout) findViewById(R.id.layout_map);
+//        mMapFrameLayout = (FrameLayout) findViewById(R.id.layout_map);
 
         locationFAB = (FloatingActionButton)findViewById(R.id.locationFAB);
         locationFAB.setOnClickListener(new View.OnClickListener() {

@@ -3,50 +3,28 @@
 <android.support.v4.widget.DrawerLayout
     android:id="@+id/drawer_layout"
     xmlns:android="http://schemas.android.com/apk/res/android"
-    xmlns:mapbox="http://schemas.android.com/apk/res-auto"
+    xmlns:app="http://schemas.android.com/apk/res-auto"
     android:layout_width="match_parent"
     android:layout_height="match_parent"
     android:fitsSystemWindows="true">
 
-
-    <android.support.design.widget.CoordinatorLayout
-        android:id="@+id/main_content"
-        xmlns:android="http://schemas.android.com/apk/res/android"
-        xmlns:app="http://schemas.android.com/apk/res-auto"
+    <RelativeLayout
         android:layout_width="match_parent"
         android:layout_height="match_parent">
 
-        <android.support.design.widget.AppBarLayout
-            android:id="@+id/appbar"
+        <android.support.v7.widget.Toolbar
+            android:id="@+id/toolbar"
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
-            android:theme="@style/ThemeOverlay.AppCompat.Dark.ActionBar">
-
-            <android.support.v7.widget.Toolbar
-                android:id="@+id/toolbar"
-                android:layout_width="match_parent"
-                android:layout_height="?attr/actionBarSize"
-                android:background="?attr/colorPrimary"
-                app:popupTheme="@style/ThemeOverlay.AppCompat.Light"/>
-
-
-        </android.support.design.widget.AppBarLayout>
+            android:background="?attr/colorPrimary"
+            android:minHeight="?attr/actionBarSize"
+            android:theme="@style/ThemeOverlay.AppCompat.Dark.ActionBar"/>
 
         <FrameLayout
-            android:id="@+id/layout_map"
+            android:id="@+id/content_frame"
             android:layout_width="match_parent"
             android:layout_height="match_parent"
-            >
-
-            <!--
-                    <fragment
-                        android:name="com.mapbox.mapboxgl.testapp.MapFragment"
-                        android:id="@+id/fragment_map"
-                        android:layout_width="match_parent"
-                        android:layout_height="match_parent"
-                        tools:context="${packageName}.${activityClass}"
-                        tools:layout="@layout/fragment_main" />
-            -->
+            android:layout_below="@+id/toolbar">
 
             <com.mapbox.mapboxgl.views.MapView
                 android:id="@+id/mainMapView"
@@ -62,20 +40,19 @@
                 android:text="@string/label_fps"
                 android:textAppearance="?android:attr/textAppearanceLarge"/>
 
+
+            <android.support.design.widget.FloatingActionButton
+                android:id="@+id/locationFAB"
+                android:src="@drawable/ic_my_location_white_24dp"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:layout_gravity="end|bottom"
+                android:layout_margin="@dimen/fab_margin"
+                />
+
         </FrameLayout>
 
-
-        <android.support.design.widget.FloatingActionButton
-            android:id="@+id/locationFAB"
-            android:src="@drawable/ic_my_location_white_24dp"
-            android:layout_width="wrap_content"
-            android:layout_height="wrap_content"
-            android:layout_gravity="end|bottom"
-            android:layout_margin="@dimen/fab_margin"
-            />
-
-    </android.support.design.widget.CoordinatorLayout>
-
+    </RelativeLayout>
 
     <android.support.design.widget.NavigationView
         android:id="@+id/nav_view"
@@ -83,6 +60,6 @@
         android:layout_height="match_parent"
         android:layout_gravity="start"
         android:fitsSystemWindows="true"
-        mapbox:menu="@menu/menu_drawer"/>
+        app:menu="@menu/menu_drawer"/>
 
 </android.support.v4.widget.DrawerLayout>
