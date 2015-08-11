@@ -7,12 +7,12 @@
 using namespace mbgl;
 
 TEST(Variant, toString) {
-    EXPECT_EQ("lord", toString( (std::string)"lord" ));
-    EXPECT_EQ("36", toString( (uint64_t)36 ));
-    EXPECT_EQ("-239", toString( (int64_t)-239 ));
-    EXPECT_EQ("0", toString( (int64_t)0 ));
-    EXPECT_EQ("3.14159268", toString( (double)3.14159268 ));
-    EXPECT_EQ("3.1415926535897931", toString( (double)3.1415926535897931 ));
+    EXPECT_EQ("lord", toString( std::string("lord") ));
+    EXPECT_EQ("36", toString( uint64_t(36) ));
+    EXPECT_EQ("-239", toString( int64_t(-239) ));
+    EXPECT_EQ("0", toString( int64_t(0) ));
+    EXPECT_EQ("3.14159268", toString( double(3.14159268) ));
+    EXPECT_EQ("3.1415926535897931", toString( double(3.1415926535897931) ));
     EXPECT_EQ("true", toString( true ));
     EXPECT_EQ("false", toString( false ));
 }

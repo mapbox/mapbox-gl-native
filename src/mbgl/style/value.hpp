@@ -2,7 +2,11 @@
 #define MBGL_STYLE_VALUE
 
 #include <mbgl/util/variant.hpp>
+
+#pragma GCC diagnostic push
+#pragma GCC diagnostic ignored "-Wold-style-cast"
 #include <rapidjson/document.h>
+#pragma GCC diagnostic pop
 
 #include <cstdlib>
 #include <cerrno>

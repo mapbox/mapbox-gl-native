@@ -136,9 +136,12 @@ template <> void Statement::bind(int offset, const char *value) {
     BIND_5(text, value, -1, nullptr, stmt)
 }
 
+#pragma GCC diagnostic push
+#pragma GCC diagnostic ignored "-Wold-style-cast" // for SQLITE_TRANSIENT and SQLITE_STATIC macros
 void Statement::bind(int offset, const std::string &value, bool retain) {
     BIND_5(blob, value.data(), int(value.size()), retain ? SQLITE_TRANSIENT : SQLITE_STATIC, stmt)
 }
+#pragma GCC diagnostic pop
 
 bool Statement::run() {
     assert(stmt);

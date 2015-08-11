@@ -16,7 +16,7 @@ bool checkMaxAngle(const std::vector<Coordinate> &line, Anchor &anchor, const fl
     // horizontal labels always pass
     if (anchor.segment < 0) return true;
 
-    Coordinate anchorPoint = Coordinate{ (int16_t)anchor.x, (int16_t)anchor.y };
+    Coordinate anchorPoint = Coordinate{ static_cast<int16_t>(anchor.x), static_cast<int16_t>(anchor.y) };
     Coordinate &p = anchorPoint;
     int index = anchor.segment + 1;
     float anchorDistance = 0;
@@ -43,7 +43,7 @@ bool checkMaxAngle(const std::vector<Coordinate> &line, Anchor &anchor, const fl
     while (anchorDistance < labelLength / 2) {
 
         // there isn't enough room for the label before the end of the line
-        if (index + 1 >= (int)line.size()) return false;
+        if (index + 1 >= static_cast<int>(line.size())) return false;
 
         auto& prev = line[index - 1];
         auto& current = line[index];

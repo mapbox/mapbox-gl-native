@@ -13,6 +13,7 @@
 #pragma GCC diagnostic ignored "-Wshadow"
 #pragma GCC diagnostic ignored "-Wunknown-pragmas"
 #pragma GCC diagnostic ignored "-Wunused-local-typedefs"
+#pragma GCC diagnostic ignored "-Wold-style-cast"
 #include <boost/algorithm/string.hpp>
 #pragma GCC diagnostic pop
 
@@ -194,8 +195,8 @@ template<> StyleParser::Status StyleParser::parseRenderProperty(JSVal value, vec
         JSVal property = replaceConstant(value[name]);
         if (property.IsArray()) {
             if (property.Size() >= 2) {
-                target.x = property[(rapidjson::SizeType)0].GetDouble();
-                target.y = property[(rapidjson::SizeType)1].GetDouble();
+                target.x = property[static_cast<rapidjson::SizeType>(0)].GetDouble();
+                target.y = property[static_cast<rapidjson::SizeType>(1)].GetDouble();
                 return StyleParserSuccess;
             } else {
                 Log::Warning(Event::ParseStyle, "%s must have at least two members", name);
@@ -256,9 +257,9 @@ Color parseColor(JSVal value) {
     // Premultiply the color.
     const float factor = css_color.a / 255;
 
-    return Color{{(float)css_color.r * factor,
-                  (float)css_color.g * factor,
-                  (float)css_color.b * factor,
+    return Color{{static_cast<float>(css_color.r) * factor,
+                  static_cast<float>(css_color.g) * factor,
+                  static_cast<float>(css_color.b) * factor,
                   css_color.a}};
 }
 

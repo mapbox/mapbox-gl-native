@@ -5,7 +5,7 @@
 #include <mbgl/util/noncopyable.hpp>
 #include <mbgl/util/mat4.hpp>
 
-#define BUFFER_OFFSET(i) ((char*)nullptr + (i))
+#define BUFFER_OFFSET(i) (reinterpret_cast<char *>(0) + (i))
 
 namespace mbgl {
 

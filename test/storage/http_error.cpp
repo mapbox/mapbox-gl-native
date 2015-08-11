@@ -18,7 +18,7 @@ TEST_F(Storage, HTTPError) {
     uv_timer_start(&statusChange, [](uv_timer_t *, int) {
         NetworkStatus::Reachable();
     }, 500, 500);
-    uv_unref((uv_handle_t *)&statusChange);
+    uv_unref(reinterpret_cast<uv_handle_t *>(&statusChange));
 
     DefaultFileSource fs(nullptr);
 

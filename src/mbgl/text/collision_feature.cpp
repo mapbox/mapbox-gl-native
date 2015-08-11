@@ -38,7 +38,7 @@ void CollisionFeature::bboxifyLabel(const std::vector<Coordinate> &line,
     // box is at the edge of the label.
     const float firstBoxOffset = -boxSize / 2;
 
-    Coordinate anchorPoint = Coordinate{ (int16_t)anchor.x, (int16_t)anchor.y };
+    Coordinate anchorPoint = Coordinate{ static_cast<int16_t>(anchor.x), static_cast<int16_t>(anchor.y) };
 
     Coordinate &p = anchorPoint;
     int index = anchor.segment + 1;
@@ -68,7 +68,7 @@ void CollisionFeature::bboxifyLabel(const std::vector<Coordinate> &line,
             index++;
 
             // There isn't enough room before the end of the line.
-            if (index + 1 >= (int)line.size()) return;
+            if (index + 1 >= static_cast<int>(line.size())) return;
 
             segmentLength = util::dist<float>(line[index], line[index + 1]);
         }

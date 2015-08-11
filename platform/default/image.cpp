@@ -37,7 +37,7 @@ std::string compress_png(int width, int height, const void *rgba) {
 
     png_infop info_ptr = png_create_info_struct(png_ptr);
     if (!png_ptr) {
-        png_destroy_write_struct(&png_ptr, (png_infopp)0);
+        png_destroy_write_struct(&png_ptr, nullptr);
         Log::Error(Event::Image, "couldn't create info_ptr");
         return "";
     }
@@ -45,7 +45,7 @@ std::string compress_png(int width, int height, const void *rgba) {
     png_set_IHDR(png_ptr, info_ptr, width, height, 8, PNG_COLOR_TYPE_RGB_ALPHA, PNG_INTERLACE_NONE,
                  PNG_COMPRESSION_TYPE_DEFAULT, PNG_FILTER_TYPE_DEFAULT);
 
-    jmp_buf *jmp_context = (jmp_buf *)png_get_error_ptr(png_ptr);
+    jmp_buf *jmp_context = reinterpret_cast<jmp_buf *>(png_get_error_ptr(png_ptr));
     if (jmp_context) {
         png_destroy_write_struct(&png_ptr, &info_ptr);
         return "";
@@ -64,7 +64,7 @@ std::string compress_png(int width, int height, const void *rgba) {
     } pointers(height);
 
     for (int i = 0; i < height; i++) {
-        pointers.rows[i] = (png_bytep)((png_bytep)rgba + width * 4 * i);
+        pointers.rows[i] = reinterpret_cast<png_bytep>(const_cast<void *>(rgba)) + width * 4 * i;
     }
 
     png_set_rows(png_ptr, info_ptr, pointers.rows);

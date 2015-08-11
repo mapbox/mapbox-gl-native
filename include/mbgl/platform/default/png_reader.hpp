@@ -15,6 +15,7 @@ extern "C"
 #pragma GCC diagnostic ignored "-Wunknown-pragmas"
 #pragma GCC diagnostic ignored "-Wunused-local-typedefs"
 #pragma GCC diagnostic ignored "-Wshadow"
+#pragma GCC diagnostic ignored "-Wold-style-cast"
 #include <boost/iostreams/stream.hpp>
 #pragma GCC diagnostic pop
 
