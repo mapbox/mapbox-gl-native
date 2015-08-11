@@ -302,8 +302,8 @@ public class MapView extends FrameLayout implements LocationListener {
         mCompassView.setContentDescription(getResources().getString(R.string.compassContentDescription));
         LayoutParams lp = new FrameLayout.LayoutParams((int)(48 * mScreenDensity), (int)(48 * mScreenDensity));
         lp.gravity = Gravity.TOP | Gravity.END;
-        int twentyDp = (int)(20 * mScreenDensity);
-        lp.setMargins(twentyDp, twentyDp * 4, twentyDp, twentyDp);
+        int tenDp = (int)(10 * mScreenDensity);
+        lp.setMargins(tenDp, tenDp, tenDp, tenDp);
         mCompassView.setLayoutParams(lp);
         addView(mCompassView);
         mCompassView.setOnClickListener(new CompassOnClickListener());
