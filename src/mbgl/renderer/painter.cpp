@@ -130,7 +130,7 @@ void Painter::lineWidth(float line_width) {
 
 void Painter::changeMatrix() {
     // Initialize projection matrix
-    matrix::ortho(projMatrix, 0, state.getWidth(), state.getHeight(), 0, 0, 1);
+    matrix::ortho(projMatrix, 0, state.getWidth(), state.getHeight(), 0, -1, 1);
 
     // The extrusion matrix.
     matrix::identity(extrudeMatrix);
