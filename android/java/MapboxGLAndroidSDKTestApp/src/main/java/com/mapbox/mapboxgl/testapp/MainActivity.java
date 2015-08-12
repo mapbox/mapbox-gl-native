@@ -302,22 +302,27 @@ public class MainActivity extends AppCompatActivity {
 
                             case R.id.actionStyleMapboxStreets:
                                 changeMapStyle(getString(R.string.styleURLMapboxStreets));
+                                menuItem.setChecked(true);
                                 break;
 
                             case R.id.actionStyleEmerald:
                                 changeMapStyle(getString(R.string.styleURLEmerald));
+                                menuItem.setChecked(true);
                                 break;
 
                             case R.id.actionStyleLight:
                                 changeMapStyle(getString(R.string.styleURLLight));
+                                menuItem.setChecked(true);
                                 break;
 
                             case R.id.actionStyleDark:
                                 changeMapStyle(getString(R.string.styleURLDark));
+                                menuItem.setChecked(true);
                                 break;
 
                             case R.id.actionStyleSatellite:
                                 changeMapStyle(getString(R.string.styleURLSatellite));
+                                menuItem.setChecked(true);
                                 break;
                         }
 
