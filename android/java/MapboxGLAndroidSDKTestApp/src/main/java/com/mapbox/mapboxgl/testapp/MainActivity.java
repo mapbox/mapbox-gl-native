@@ -3,6 +3,8 @@ package com.mapbox.mapboxgl.testapp;
 import android.graphics.Color;
 import android.graphics.PointF;
 import android.os.Bundle;
+import android.support.v4.app.FragmentManager;
+import android.support.v4.app.FragmentTransaction;
 import android.support.v7.app.ActionBarActivity;
 import android.support.v7.widget.Toolbar;
 import android.util.Log;
@@ -33,7 +35,7 @@ import java.io.IOException;
 import java.io.InputStreamReader;
 import java.util.ArrayList;
 
-public class MainActivity extends ActionBarActivity {
+public class MainActivity extends ActionBarActivity implements MapFragment.OnMapReadyCallback {
 
     private static final String TAG = "MainActivity";
 
@@ -64,6 +66,8 @@ public class MainActivity extends ActionBarActivity {
     private boolean mIsMarkersOn = false;
 
     private Marker marker;
+    private static MapFragment mMapFragment;
+    private Bundle savedInstanceState;
 
     //
     // Lifecycle events
@@ -79,15 +83,52 @@ public class MainActivity extends ActionBarActivity {
 
         // Load the layout
         setContentView(R.layout.activity_main);
-        mapView = (MapView) findViewById(R.id.mainMapView);
-        // Load the access token
-        try {
-            BufferedReader reader = new BufferedReader(new InputStreamReader(getResources().openRawResource(R.raw.token)));
-            String line = reader.readLine();
-            mapView.setAccessToken(line);
-        } catch (IOException e) {
-            Log.e(TAG, "Error loading access token from token.txt: " + e.toString());
+
+        if(mMapFragment == null){
+            mMapFragment = new MapFragment();
         }
+
+        this.savedInstanceState = savedInstanceState;
+        mMapFragment.getMapAsync(this);
+
+        FragmentManager fragmentManager = getSupportFragmentManager();
+        FragmentTransaction fragmentTransaction = fragmentManager.beginTransaction();
+        fragmentTransaction.replace(R.id.container, mMapFragment);
+        fragmentTransaction.commit();
+
+
+        mFpsTextView = (TextView) findViewById(R.id.view_fps);
+        mFpsTextView.setText("");
+
+        mMapFrameLayout = (FrameLayout) findViewById(R.id.layout_map);
+        // Add a toolbar as the action bar
+        Toolbar mainToolbar = (Toolbar) findViewById(R.id.toolbar_main);
+        setSupportActionBar(mainToolbar);
+        getSupportActionBar().setDisplayShowTitleEnabled(false);
+
+        // Add the spinner to select map styles
+        Spinner styleSpinner = (Spinner) findViewById(R.id.spinner_style);
+        ArrayAdapter styleAdapter = ArrayAdapter.createFromResource(getSupportActionBar().getThemedContext(),
+                R.array.style_list, android.R.layout.simple_spinner_dropdown_item);
+        styleSpinner.setAdapter(styleAdapter);
+        styleSpinner.setOnItemSelectedListener(new StyleSpinnerListener());
+
+        // Add the spinner to select class styles
+        mClassSpinner = (Spinner) findViewById(R.id.spinner_class);
+        mOutdoorsClassAdapter = ArrayAdapter.createFromResource(getSupportActionBar().getThemedContext(),
+                R.array.outdoors_class_list, android.R.layout.simple_spinner_dropdown_item);
+
+    }
+
+    @Override
+    public void onMapReady(MapView mapView) {
+        this.mapView = mapView;
+
+        initMapView(savedInstanceState);
+    }
+
+
+    private void initMapView(Bundle savedInstanceState) {
 
         mapView.onCreate(savedInstanceState);
         mapView.setOnFpsChangedListener(new MyOnFpsChangedListener());
@@ -116,54 +157,31 @@ public class MainActivity extends ActionBarActivity {
             }
         });
 
-        mFpsTextView = (TextView) findViewById(R.id.view_fps);
-        mFpsTextView.setText("");
-
-        mMapFrameLayout = (FrameLayout) findViewById(R.id.layout_map);
-        // Add a toolbar as the action bar
-        Toolbar mainToolbar = (Toolbar) findViewById(R.id.toolbar_main);
-        setSupportActionBar(mainToolbar);
-        getSupportActionBar().setDisplayShowTitleEnabled(false);
-
-        // Add the spinner to select map styles
-        Spinner styleSpinner = (Spinner) findViewById(R.id.spinner_style);
-        ArrayAdapter styleAdapter = ArrayAdapter.createFromResource(getSupportActionBar().getThemedContext(),
-                R.array.style_list, android.R.layout.simple_spinner_dropdown_item);
-        styleSpinner.setAdapter(styleAdapter);
-        styleSpinner.setOnItemSelectedListener(new StyleSpinnerListener());
-
-        // Add the spinner to select class styles
-        mClassSpinner = (Spinner) findViewById(R.id.spinner_class);
-        mOutdoorsClassAdapter = ArrayAdapter.createFromResource(getSupportActionBar().getThemedContext(),
-                R.array.outdoors_class_list, android.R.layout.simple_spinner_dropdown_item);
-
         if (savedInstanceState != null) {
             mapView.setMyLocationEnabled(savedInstanceState.getBoolean(STATE_IS_GPS_ON, false));
         }
     }
 
+
     /**
      * Dispatch onStart() to all fragments.  Ensure any created loaders are
      * now started.
      */
+
     @Override
     protected void onStart() {
         super.onStart();
-        mapView.onStart();
     }
 
     @Override
     protected void onStop() {
         super.onStop();
-        mapView.onStop();
     }
 
     // Called when our app goes into the background
     @Override
     public void onPause()  {
         super.onPause();
-
-        mapView.onPause();
 
         // Cancel GPS
         toggleGps(false);
@@ -174,8 +192,6 @@ public class MainActivity extends ActionBarActivity {
     public void onResume() {
         super.onResume();
 
-        mapView.onResume();
-
         // Restart GPS
         toggleGps(true);
     }
@@ -183,7 +199,6 @@ public class MainActivity extends ActionBarActivity {
     @Override
     protected void onDestroy() {
         super.onDestroy();
-        mapView.onDestroy();
     }
 
     // Called when we need to save instance state
@@ -191,8 +206,8 @@ public class MainActivity extends ActionBarActivity {
     protected void onSaveInstanceState(Bundle outState) {
         super.onSaveInstanceState(outState);
 
-        mapView.onSaveInstanceState(outState);
-        outState.putBoolean(STATE_IS_GPS_ON, mapView.isMyLocationEnabled());
+        //mapView.onSaveInstanceState(outState);
+        //outState.putBoolean(STATE_IS_GPS_ON, mapView.isMyLocationEnabled());
     }
 
     // Called when the system is running low on memory
@@ -200,7 +215,7 @@ public class MainActivity extends ActionBarActivity {
     public void onLowMemory() {
         super.onLowMemory();
 
-        mapView.onLowMemory();
+        //mapView.onLowMemory();
     }
 
     //
