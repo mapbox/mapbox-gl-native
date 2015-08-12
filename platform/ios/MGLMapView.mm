@@ -2151,6 +2151,29 @@ CLLocationCoordinate2D MGLLocationCoordinate2DFromLatLng(mbgl::LatLng latLng)
     }
 }
 
+- (void)showAnnotations:(NS_ARRAY_OF(id <MGLAnnotation>) *)annotations animated:(BOOL)animated
+{
+    if ( ! annotations || ! annotations.count) return;
+
+    mbgl::LatLngBounds bounds;
+
+    for (id <MGLAnnotation> annotation in annotations)
+    {
+        if ([annotation conformsToProtocol:@protocol(MGLOverlay)])
+        {
+            bounds.extend(MGLLatLngBoundsFromCoordinateBounds(((id <MGLOverlay>)annotation).overlayBounds));
+        }
+        else
+        {
+            bounds.extend(MGLLatLngFromLocationCoordinate2D(annotation.coordinate));
+        }
+    }
+
+    [self setVisibleCoordinateBounds:MGLCoordinateBoundsFromLatLngBounds(bounds)
+                         edgePadding:UIEdgeInsetsMake(100, 100, 100, 100)
+                            animated:animated];
+}
+
 #pragma mark - User Location -
 
 - (void)setShowsUserLocation:(BOOL)showsUserLocation
