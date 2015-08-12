@@ -7,11 +7,8 @@ import android.content.Context;
 import android.content.Intent;
 import android.content.IntentFilter;
 import android.content.pm.PackageManager;
-import android.content.res.ColorStateList;
 import android.content.res.TypedArray;
 import android.graphics.Bitmap;
-import android.graphics.BitmapFactory;
-import android.graphics.Color;
 import android.graphics.Matrix;
 import android.graphics.PointF;
 import android.hardware.GeomagneticField;
@@ -25,8 +22,6 @@ import android.net.NetworkInfo;
 import android.os.Build;
 import android.os.Bundle;
 import android.support.annotation.NonNull;
-import android.support.design.widget.FloatingActionButton;
-import android.support.v4.content.res.ResourcesCompat;
 import android.support.v4.view.GestureDetectorCompat;
 import android.support.v4.view.ScaleGestureDetectorCompat;
 import android.text.TextUtils;
@@ -42,7 +37,6 @@ import android.view.SurfaceHolder;
 import android.view.SurfaceView;
 import android.view.View;
 import android.view.ViewConfiguration;
-import android.view.ViewGroup;
 import android.widget.FrameLayout;
 import android.widget.ImageView;
 import android.widget.ZoomButtonsController;
@@ -126,12 +120,17 @@ public class MapView extends FrameLayout implements LocationListener {
     // Holds the context
     private Context mContext;
 
-    // Used for GPS
+    // Used for GPS / Location
     private boolean mIsGpsOn = false;
     private LostApiClient mLocationClient;
     private LocationRequest mLocationRequest;
     private ImageView mGpsMarker;
     private Location mGpsLocation;
+
+    public enum UserLocationTrackingMode {
+        NONE, FOLLOW, FOLLOW_BEARING;
+    }
+    private UserLocationTrackingMode userLocationTrackingMode = UserLocationTrackingMode.FOLLOW;
 
     // Used for compass
     private boolean mIsCompassEnabled = true;
@@ -149,12 +148,12 @@ public class MapView extends FrameLayout implements LocationListener {
     private boolean mCompassValid = false;
 
     // Used for map toggle mode
-    private FloatingActionButton trackingModeButton;
-    private int trackingMode = 0;
+//    private FloatingActionButton trackingModeButton;
     private long t0 = new Date().getTime();
 
     // Used to manage Event Listeners
     private ArrayList<OnMapChangedListener> mOnMapChangedListener;
+
 
     //
     // Properties
@@ -308,20 +307,6 @@ public class MapView extends FrameLayout implements LocationListener {
         mCompassView.setLayoutParams(lp);
         addView(mCompassView);
         mCompassView.setOnClickListener(new CompassOnClickListener());
-
-        // Setup tracking mode
-        trackingModeButton = new FloatingActionButton(mContext);
-        trackingModeButton.setContentDescription(getResources().getString(R.string.trackingModeButtonContentDescription));
-        trackingModeButton.setBackgroundTintList(ColorStateList.valueOf(getResources().getColor(R.color.background_material_light)));
-//        trackingModeButton.setElevation(4);
-        trackingModeButton.setImageBitmap(BitmapFactory.decodeResource(getResources(), R.drawable.ic_my_location_black_24dp));
-        LayoutParams lp2 = new FrameLayout.LayoutParams(ViewGroup.LayoutParams.WRAP_CONTENT, ViewGroup.LayoutParams.WRAP_CONTENT);
-        lp2.gravity = Gravity.BOTTOM | Gravity.END;
-        int twentyDp = (int)(20 * mScreenDensity);
-        lp2.setMargins(twentyDp, twentyDp, twentyDp, twentyDp);
-        trackingModeButton.setLayoutParams(lp2);
-        addView(trackingModeButton);
-        trackingModeButton.setOnClickListener(new ToggleModeClickListener());
 
         // Setup Support For Listener Tracking
         // MapView's internal listener is setup in onCreate()
@@ -514,6 +499,14 @@ public class MapView extends FrameLayout implements LocationListener {
     public void toggleDebug() {
         mNativeMapView.toggleDebug();
         mNativeMapView.toggleCollisionDebug();
+    }
+
+    public UserLocationTrackingMode getUserLocationTrackingMode() {
+        return userLocationTrackingMode;
+    }
+
+    public void setUserLocationTrackingMode(UserLocationTrackingMode userLocationTrackingMode) {
+        this.userLocationTrackingMode = userLocationTrackingMode;
     }
 
     public boolean isFullyLoaded() {
@@ -918,10 +911,6 @@ public class MapView extends FrameLayout implements LocationListener {
         public boolean onScroll(MotionEvent e1, MotionEvent e2, float distanceX, float distanceY) {
             if (!mScrollEnabled) {
                 return false;
-            }
-
-            if (trackingMode != 0) {
-                setTrackingMode(0);
             }
 
             // Cancel any animation
@@ -1612,11 +1601,9 @@ public class MapView extends FrameLayout implements LocationListener {
 
         @Override
         public void onClick(View view) {
-            if(trackingMode == 2){
-                setTrackingMode(0);
-            }
             resetNorth();
         }
+
     }
 
     /**
@@ -1633,12 +1620,6 @@ public class MapView extends FrameLayout implements LocationListener {
     private void updateLocation(Location location) {
         if (location != null) {
             mGpsLocation = location;
-
-            // Update map position if in follow mode
-            if (trackingMode != 0) {
-                setCenterCoordinate(new LatLng(mGpsLocation));
-            }
-
             updateMap();
         }
     }
@@ -1683,7 +1664,7 @@ public class MapView extends FrameLayout implements LocationListener {
             mGpsMarker.requestLayout();
 
             // Update direction if tracking mode
-            if(trackingMode == 2 && mCompassValid){
+            if(userLocationTrackingMode == UserLocationTrackingMode.FOLLOW_BEARING && mCompassValid){
                 // TODO need to do proper filtering (see branch filter-compass) or else map will lock up because of all the compass events
                 long t = new Date().getTime();
                 if((t-t0)>1000){
@@ -1691,6 +1672,15 @@ public class MapView extends FrameLayout implements LocationListener {
                     setDirection(-mCompassBearing, true);
                 }
             }
+
+/*
+            // TODO - Too much overhead on main thread.  Needs to be refactored before it
+            // can be re-enabled
+            // Update map position if NOT in NONE mode
+            if (userLocationTrackingMode != UserLocationTrackingMode.NONE) {
+                setCenterCoordinate(new LatLng(mGpsLocation));
+            }
+*/
 
 /*
             // Used For User Location Bearing UI
@@ -1710,51 +1700,6 @@ public class MapView extends FrameLayout implements LocationListener {
             if (mGpsMarker != null) {
                 mGpsMarker.setVisibility(View.INVISIBLE);
             }
-        }
-    }
-
-    private class ToggleModeClickListener implements OnClickListener {
-        @Override
-        public void onClick(View v) {
-            setTrackingMode((trackingMode + 1) % 3);
-        }
-    }
-
-    public void setTrackingMode(int trackingMode) {
-
-        this.trackingMode = trackingMode;
-
-        switch (trackingMode) {
-
-            case 0: {
-                trackingModeButton.setImageDrawable(ResourcesCompat.getDrawable(getResources(), R.drawable.ic_my_location_black_24dp, mContext.getTheme()));
-                trackingModeButton.setColorFilter(Color.TRANSPARENT);
-                updateMap();
-            }
-            break;
-
-            case 1: {
-                trackingModeButton.setImageDrawable(ResourcesCompat.getDrawable(getResources(), R.drawable.ic_my_location_black_24dp, mContext.getTheme()));
-                trackingModeButton.setColorFilter(Color.BLUE);
-                if(mGpsLocation != null){
-                    setCenterCoordinate(new LatLng(mGpsLocation));
-                }
-                updateMap();
-            }
-            break;
-
-            case 2: {
-                trackingModeButton.setImageDrawable(ResourcesCompat.getDrawable(getResources(), R.drawable.ic_explore_black_24dp, mContext.getTheme()));
-                trackingModeButton.setColorFilter(Color.BLUE);
-                if(mGpsLocation != null){
-                    setCenterCoordinate(new LatLng(mGpsLocation));
-                }
-                updateMap();
-            }
-            break;
-
-            default:
-                break;
         }
     }
 }
