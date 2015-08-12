@@ -2,6 +2,7 @@ package com.mapbox.mapboxgl.testapp;
 
 import android.graphics.Color;
 import android.graphics.PointF;
+import android.location.Location;
 import android.os.Bundle;
 import android.support.annotation.NonNull;
 import android.support.design.widget.FloatingActionButton;
@@ -331,6 +332,10 @@ public class MainActivity extends AppCompatActivity {
         if (enableGps) {
             if (!mapView.isMyLocationEnabled()) {
                 mapView.setMyLocationEnabled(enableGps);
+                Location location = mapView.getMyLocation();
+                if (location != null) {
+                    mapView.setCenterCoordinate(new LatLng(location), true);
+                }
                 locationFAB.setColorFilter(getResources().getColor(R.color.primary));
             }
         } else {
