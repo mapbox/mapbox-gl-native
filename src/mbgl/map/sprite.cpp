@@ -10,7 +10,10 @@
 #include <mbgl/util/thread.hpp>
 #include <mbgl/util/uv_detail.hpp>
 
+#pragma GCC diagnostic push
+#pragma GCC diagnostic ignored "-Wold-style-cast"
 #include <rapidjson/document.h>
+#pragma GCC diagnostic pop
 
 #include <string>
 #include <sstream>

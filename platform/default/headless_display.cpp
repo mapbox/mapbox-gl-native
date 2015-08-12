@@ -33,6 +33,8 @@ HeadlessDisplay::HeadlessDisplay() {
 #endif
 
 #if MBGL_USE_GLX
+#pragma GCC diagnostic push
+#pragma GCC diagnostic ignored "-Wold-style-cast" // for DefaultScreen macro
     if (!XInitThreads()) {
         throw std::runtime_error("Failed to XInitThreads.");
     }
@@ -67,6 +69,7 @@ HeadlessDisplay::HeadlessDisplay() {
     if (configs <= 0) {
         throw std::runtime_error("No Framebuffer configurations.");
     }
+#pragma GCC diagnostic pop
 #endif
 }
 

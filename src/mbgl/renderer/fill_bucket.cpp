@@ -77,6 +77,8 @@ void FillBucket::addGeometry(const GeometryCollection& geometryCollection) {
     tessellate();
 }
 
+#pragma GCC diagnostic push
+#pragma GCC diagnostic ignored "-Wold-style-cast" // for TESS_UNDEF macro
 void FillBucket::tessellate() {
     if (!hasVertices) {
         return;
@@ -127,7 +129,7 @@ void FillBucket::tessellate() {
 
         lineIndex += group_count;
 
-        tessAddContour(tesselator, vertexSize, clipped_line.data(), stride, (int)clipped_line.size() / vertexSize);
+        tessAddContour(tesselator, vertexSize, clipped_line.data(), stride, static_cast<int>(clipped_line.size()) / vertexSize);
     }
 
     lineGroup.elements_length += total_vertex_count;
@@ -142,7 +144,7 @@ void FillBucket::tessellate() {
         for (size_t i = 0; i < vertex_count; ++i) {
             if (vertex_indices[i] == TESS_UNDEF) {
                 vertexBuffer.add(::round(vertices[i * 2]), ::round(vertices[i * 2 + 1]));
-                vertex_indices[i] = (TESSindex)total_vertex_count;
+                vertex_indices[i] = static_cast<TESSindex>(total_vertex_count);
                 total_vertex_count++;
             }
         }
@@ -194,6 +196,7 @@ void FillBucket::tessellate() {
     // we need to skip over them anyway if we draw the next group.
     lineGroup.vertex_length += total_vertex_count;
 }
+#pragma GCC diagnostic pop
 
 void FillBucket::upload() {
     vertexBuffer.upload();

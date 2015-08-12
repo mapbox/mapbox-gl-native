@@ -3,7 +3,10 @@
 
 #include <memory>
 
+#pragma GCC diagnostic push
+#pragma GCC diagnostic ignored "-Wold-style-cast"
 #include <boost/regex/pending/unicode_iterator.hpp>
+#pragma GCC diagnostic pop
 
 namespace mbgl {
 

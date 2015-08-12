@@ -24,10 +24,10 @@ void DebugBucket::render(Painter& painter, const StyleLayer&, const TileID&, con
 
 void DebugBucket::drawLines(PlainShader& shader) {
     array.bind(shader, fontBuffer, BUFFER_OFFSET(0));
-    MBGL_CHECK_ERROR(glDrawArrays(GL_LINES, 0, (GLsizei)(fontBuffer.index())));
+    MBGL_CHECK_ERROR(glDrawArrays(GL_LINES, 0, static_cast<GLsizei>(fontBuffer.index())));
 }
 
 void DebugBucket::drawPoints(PlainShader& shader) {
     array.bind(shader, fontBuffer, BUFFER_OFFSET(0));
-    MBGL_CHECK_ERROR(glDrawArrays(GL_POINTS, 0, (GLsizei)(fontBuffer.index())));
+    MBGL_CHECK_ERROR(glDrawArrays(GL_POINTS, 0, static_cast<GLsizei>(fontBuffer.index())));
 }

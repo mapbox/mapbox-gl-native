@@ -35,7 +35,7 @@
 #import "SMCalloutView.h"
 
 #import <algorithm>
-#import <cstdlib>
+#import <memory>
 
 class MBGLView;
 
@@ -107,7 +107,7 @@ CLLocationDegrees MGLDegreesFromRadians(CGFloat radians)
     MBGLView *_mbglView;
     mbgl::DefaultFileSource *_mbglFileSource;
     BOOL _isWaitingForRedundantReachableNotification;
-    
+
     NS_MUTABLE_ARRAY_OF(NSURL *) *_bundledStyleURLs;
 
     BOOL _isTargetingInterfaceBuilder;
@@ -207,7 +207,7 @@ std::chrono::steady_clock::duration secondsAsDuration(float duration)
 - (void)commonInit
 {
     _isTargetingInterfaceBuilder = NSProcessInfo.processInfo.mgl_isInterfaceBuilderDesignablesAgent;
-    
+
     BOOL background = [UIApplication sharedApplication].applicationState == UIApplicationStateBackground;
     if (!background)
     {
@@ -277,7 +277,7 @@ std::chrono::steady_clock::duration secondsAsDuration(float duration)
     _attributionButton.translatesAutoresizingMaskIntoConstraints = NO;
     [self addSubview:_attributionButton];
     _attributionButtonConstraints = [NSMutableArray array];
-    
+
     _attributionSheet = [[UIActionSheet alloc] initWithTitle:@"Mapbox GL for iOS"
                                                     delegate:self
                                            cancelButtonTitle:@"Cancel"
@@ -381,7 +381,7 @@ std::chrono::steady_clock::duration secondsAsDuration(float duration)
 - (void)createGLView
 {
     if (_context) return;
-    
+
     // create context
     //
     _context = [[EAGLContext alloc] initWithAPI:kEAGLRenderingAPIOpenGLES2];
@@ -458,7 +458,7 @@ std::chrono::steady_clock::duration secondsAsDuration(float duration)
     {
         [EAGLContext setCurrentContext:nil];
     }
-    
+
     [self.logoViewConstraints removeAllObjects];
     self.logoViewConstraints = nil;
     [self.attributionButtonConstraints removeAllObjects];
@@ -470,7 +470,7 @@ std::chrono::steady_clock::duration secondsAsDuration(float duration)
     if (_delegate == delegate) return;
 
     _delegate = delegate;
-    
+
     if ([delegate respondsToSelector:@selector(mapView:symbolNameForAnnotation:)])
     {
         [NSException raise:@"Method unavailable" format:
@@ -514,7 +514,7 @@ std::chrono::steady_clock::duration secondsAsDuration(float duration)
     }
     if ([laterResponder isKindOfClass:[UIViewController class]])
     {
-        return (UIViewController *)laterResponder;
+        return reinterpret_cast<UIViewController *>(laterResponder);
     }
     return nil;
 }
@@ -701,10 +701,10 @@ std::chrono::steady_clock::duration secondsAsDuration(float duration)
     if ( ! self.isDormant)
     {
         CGFloat zoomFactor   = _mbglMap->getMaxZoom() - _mbglMap->getMinZoom() + 1;
-        CGFloat cpuFactor    = (CGFloat)[[NSProcessInfo processInfo] processorCount];
-        CGFloat memoryFactor = (CGFloat)[[NSProcessInfo processInfo] physicalMemory] / 1000 / 1000 / 1000;
-        CGFloat sizeFactor   = ((CGFloat)_mbglMap->getWidth()  / mbgl::util::tileSize) *
-                               ((CGFloat)_mbglMap->getHeight() / mbgl::util::tileSize);
+        CGFloat cpuFactor    = static_cast<CGFloat>([[NSProcessInfo processInfo] processorCount]);
+        CGFloat memoryFactor = static_cast<CGFloat>([[NSProcessInfo processInfo] physicalMemory] / 1000 / 1000 / 1000);
+        CGFloat sizeFactor   = (static_cast<CGFloat>(_mbglMap->getWidth())  / mbgl::util::tileSize) *
+                               (static_cast<CGFloat>(_mbglMap->getHeight()) / mbgl::util::tileSize);
 
         NSUInteger cacheSize = zoomFactor * cpuFactor * memoryFactor * sizeFactor * 0.5;
 
@@ -727,7 +727,7 @@ std::chrono::steady_clock::duration secondsAsDuration(float duration)
     {
         _mbglMap->update(mbgl::Update::Dimensions);
     }
-    
+
     if (self.attributionSheet.visible)
     {
         [self.attributionSheet dismissWithClickedButtonIndex:self.attributionSheet.cancelButtonIndex animated:YES];
@@ -796,7 +796,7 @@ std::chrono::steady_clock::duration secondsAsDuration(float duration)
     if (self.isDormant && [UIApplication sharedApplication].applicationState != UIApplicationStateBackground)
     {
         self.dormant = NO;
-        
+
         [self createGLView];
         [MGLMapboxEvents validate];
 
@@ -1327,7 +1327,7 @@ std::chrono::steady_clock::duration secondsAsDuration(float duration)
     {
         NSAssert([tap.view isKindOfClass:[UIControl class]], @"Tapped view %@ is not a UIControl", tap.view);
         [self.delegate mapView:self annotation:self.selectedAnnotation
-            calloutAccessoryControlTapped:(UIControl *)tap.view];
+            calloutAccessoryControlTapped:reinterpret_cast<UIControl *>(tap.view)];
     }
 }
 
@@ -1374,7 +1374,7 @@ std::chrono::steady_clock::duration secondsAsDuration(float duration)
     else if (buttonIndex == actionSheet.firstOtherButtonIndex + 2)
     {
         NSString *feedbackURL = [NSString stringWithFormat:@"https://www.mapbox.com/map-feedback/#/%.5f/%.5f/%i",
-                                 self.longitude, self.latitude, (int)round(self.zoomLevel)];
+                                 self.longitude, self.latitude, static_cast<int>(round(self.zoomLevel))];
         [[UIApplication sharedApplication] openURL:
          [NSURL URLWithString:feedbackURL]];
     }
@@ -1394,7 +1394,7 @@ std::chrono::steady_clock::duration secondsAsDuration(float duration)
     {
         NSString *accessToken = change[NSKeyValueChangeNewKey];
         if (![accessToken isKindOfClass:[NSNull class]]) {
-            _mbglFileSource->setAccessToken((std::string)[accessToken UTF8String]);
+            _mbglFileSource->setAccessToken(static_cast<std::string>([accessToken UTF8String]));
         }
     }
 }
@@ -1572,7 +1572,7 @@ mbgl::LatLngBounds MGLLatLngBoundsFromCoordinateBounds(MGLCoordinateBounds coord
 {
     // NOTE: does not disrupt tracking mode
     CGFloat duration = animated ? MGLAnimationDuration : 0;
-    
+
     [self willChangeValueForKey:@"visibleCoordinateBounds"];
     mbgl::EdgeInsets mbglInsets = {insets.top, insets.left, insets.bottom, insets.right};
     mbgl::AnnotationSegment segment;
@@ -1583,9 +1583,9 @@ mbgl::LatLngBounds MGLLatLngBoundsFromCoordinateBounds(MGLCoordinateBounds coord
     }
     _mbglMap->fitBounds(segment, mbglInsets, secondsAsDuration(duration));
     [self didChangeValueForKey:@"visibleCoordinateBounds"];
-    
+
     [self unrotateIfNeededAnimated:animated];
-    
+
     [self notifyMapChange:(animated ? mbgl::MapChangeRegionDidChangeAnimated : mbgl::MapChangeRegionDidChange)];
 }
 
@@ -1836,14 +1836,14 @@ CLLocationCoordinate2D MGLLocationCoordinate2DFromLatLng(mbgl::LatLng latLng)
 
             CGFloat r,g,b,a;
             [strokeColor getRed:&r green:&g blue:&b alpha:&a];
-            mbgl::Color strokeNativeColor({{ (float)r, (float)g, (float)b, (float)a }});
+            mbgl::Color strokeNativeColor({{ static_cast<float>(r), static_cast<float>(g), static_cast<float>(b), static_cast<float>(a) }});
 
             mbgl::StyleProperties shapeProperties;
 
             if ([annotation isKindOfClass:[MGLPolyline class]])
             {
                 CGFloat lineWidth = (delegateImplementsLineWidthForPolyline ?
-                                [self.delegate mapView:self lineWidthForPolylineAnnotation:(MGLPolyline *)annotation] :
+                                [self.delegate mapView:self lineWidthForPolylineAnnotation:reinterpret_cast<MGLPolyline *>(annotation)] :
                                 3.0);
 
                 mbgl::LineProperties lineProperties;
@@ -1856,13 +1856,13 @@ CLLocationCoordinate2D MGLLocationCoordinate2DFromLatLng(mbgl::LatLng latLng)
             else if ([annotation isKindOfClass:[MGLPolygon class]])
             {
                 UIColor *fillColor = (delegateImplementsFillColorForPolygon ?
-                                [self.delegate mapView:self fillColorForPolygonAnnotation:(MGLPolygon *)annotation] :
+                                [self.delegate mapView:self fillColorForPolygonAnnotation:reinterpret_cast<MGLPolygon *>(annotation)] :
                                 [UIColor blueColor]);
 
                 assert(fillColor);
 
                 [fillColor getRed:&r green:&g blue:&b alpha:&a];
-                mbgl::Color fillNativeColor({{ (float)r, (float)g, (float)b, (float)a }});
+                mbgl::Color fillNativeColor({{ static_cast<float>(r), static_cast<float>(g), static_cast<float>(b), static_cast<float>(a) }});
 
                 mbgl::FillProperties fillProperties;
                 fillProperties.opacity = alpha;
@@ -1877,10 +1877,10 @@ CLLocationCoordinate2D MGLLocationCoordinate2DFromLatLng(mbgl::LatLng latLng)
                                        userInfo:nil] raise];
             }
 
-            NSUInteger count = [(MGLMultiPoint *)annotation pointCount];
+            NSUInteger count = [reinterpret_cast<MGLMultiPoint *>(annotation) pointCount];
 
-            CLLocationCoordinate2D *coordinates = (CLLocationCoordinate2D *)malloc(count * sizeof(CLLocationCoordinate2D));
-            [(MGLMultiPoint *)annotation getCoordinates:coordinates range:NSMakeRange(0, count)];
+            std::unique_ptr<CLLocationCoordinate2D[]> coordinates(new CLLocationCoordinate2D[count]);
+            [reinterpret_cast<MGLMultiPoint *>(annotation) getCoordinates:coordinates.get() range:NSMakeRange(0, count)];
 
             mbgl::AnnotationSegment segment;
             segment.reserve(count);
@@ -1889,8 +1889,6 @@ CLLocationCoordinate2D MGLLocationCoordinate2DFromLatLng(mbgl::LatLng latLng)
             {
                 segment.push_back(mbgl::LatLng(coordinates[i].latitude, coordinates[i].longitude));
             }
-
-            free(coordinates);
 
             shapes.emplace_back(mbgl::AnnotationSegments {{ segment }}, shapeProperties);
         }
@@ -2491,7 +2489,7 @@ CLLocationCoordinate2D MGLLocationCoordinate2DFromLatLng(mbgl::LatLng latLng)
 
 - (void)animateWithDelay:(NSTimeInterval)delay animations:(void (^)(void))animations
 {
-    dispatch_after(dispatch_time(DISPATCH_TIME_NOW, (int64_t)(delay * NSEC_PER_SEC)), dispatch_get_main_queue(), animations);
+    dispatch_after(dispatch_time(DISPATCH_TIME_NOW, static_cast<int64_t>(delay * NSEC_PER_SEC)), dispatch_get_main_queue(), animations);
 }
 
 - (CGFloat)currentMinimumZoom

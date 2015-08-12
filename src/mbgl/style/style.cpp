@@ -36,7 +36,7 @@ Style::Style(MapData& data_, uv_loop_t*)
 
 void Style::setJSON(const std::string& json, const std::string&) {
     rapidjson::Document doc;
-    doc.Parse<0>((const char *const)json.c_str());
+    doc.Parse<0>(const_cast<const char *const>(json.c_str()));
     if (doc.HasParseError()) {
         Log::Error(Event::ParseStyle, "Error parsing style JSON at %i: %s", doc.GetErrorOffset(), doc.GetParseError());
         return;

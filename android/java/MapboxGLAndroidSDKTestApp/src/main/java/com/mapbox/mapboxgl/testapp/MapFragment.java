@@ -9,7 +9,22 @@ import android.view.ViewGroup;
 
 import com.mapbox.mapboxgl.views.MapView;
 
+import java.io.BufferedReader;
+import java.io.IOException;
+import java.io.InputStreamReader;
+
 public class MapFragment extends Fragment {
+
+    private OnMapReadyCallback onMapReadyCallback;
+
+    public interface OnMapReadyCallback
+    {
+        void onMapReady(MapView mapView);
+    }
+
+    public void getMapAsync(OnMapReadyCallback onMapReadyCallback) {
+        this.onMapReadyCallback = onMapReadyCallback;
+    }
 
     //
     // Static members
@@ -36,13 +51,30 @@ public class MapFragment extends Fragment {
         Log.v(TAG, "onCreateView");
 
         // Create the map
-        mMap = (MapView) inflater.inflate(R.layout.fragment_main, container, true);
+        mMap = (MapView) inflater.inflate(R.layout.fragment_main, container, false);
+
+        try {
+            BufferedReader reader = new BufferedReader(new InputStreamReader(getResources().openRawResource(R.raw.token)));
+            String line = reader.readLine();
+            mMap.setAccessToken(line);
+        } catch (IOException e) {
+            Log.e(TAG, "Error loading access token from token.txt: " + e.toString());
+        }
 
         // Need to pass on any saved state to the map
         mMap.onCreate(savedInstanceState);
 
         // Return the map as the root view
         return mMap;
+    }
+
+    @Override
+    public void onViewCreated(View view, Bundle savedInstanceState) {
+        super.onViewCreated(view, savedInstanceState);
+
+        if(this.onMapReadyCallback != null){
+            this.onMapReadyCallback.onMapReady(mMap);
+        }
     }
 
     // Called when the fragment is destroyed

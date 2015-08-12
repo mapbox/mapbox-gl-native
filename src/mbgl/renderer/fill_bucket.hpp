@@ -5,7 +5,10 @@
 #include <mbgl/map/geometry_tile.hpp>
 #include <mbgl/geometry/elements_buffer.hpp>
 
+#pragma GCC diagnostic push
+#pragma GCC diagnostic ignored "-Wold-style-cast"
 #include <clipper/clipper.hpp>
+#pragma GCC diagnostic pop
 #include <libtess2/tesselator.h>
 
 #include <vector>

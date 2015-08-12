@@ -13,6 +13,7 @@
           'GCC_ENABLE_CPP_RTTI': 'YES',
           'OTHER_CPLUSPLUSFLAGS': [
             '-std=c++1y',
+            '-Wold-style-cast',
             '-Werror',
             '-Wall',
             '-Wextra',
@@ -29,6 +30,7 @@
       }, {
         'cflags_cc': [
           '-std=c++14',
+          '-Wold-style-cast',
           '-Werror',
           '-Wall',
           '-Wextra',

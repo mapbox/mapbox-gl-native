@@ -5,7 +5,10 @@
 
 #include <mbgl/util/image.hpp>
 
+#pragma GCC diagnostic push
+#pragma GCC diagnostic ignored "-Wold-style-cast"
 #include <rapidjson/document.h>
+#pragma GCC diagnostic pop
 
 #include <cmath>
 #include <limits>

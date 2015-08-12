@@ -256,7 +256,7 @@ jlongArray std_vector_uint_to_jobject(JNIEnv *env, std::vector<uint32_t> vector)
 
     std::vector<jlong> v;
     for (const uint32_t& id : vector) {
-        v.push_back((jlong)id);
+        v.push_back(static_cast<jlong>(id));
     }
 
     env->SetLongArrayRegion(jarray, 0, v.size(), &(v[0]));

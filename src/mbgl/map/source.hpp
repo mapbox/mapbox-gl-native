@@ -11,7 +11,10 @@
 #include <mbgl/util/ptr.hpp>
 #include <mbgl/util/chrono.hpp>
 
+#pragma GCC diagnostic push
+#pragma GCC diagnostic ignored "-Wold-style-cast"
 #include <rapidjson/document.h>
+#pragma GCC diagnostic pop
 
 #include <cstdint>
 #include <forward_list>

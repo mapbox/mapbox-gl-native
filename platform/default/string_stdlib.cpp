@@ -1,9 +1,14 @@
 #include <mbgl/platform/platform.hpp>
 #include <mbgl/util/utf.hpp>
+
 #define NU_WITH_TOUPPER
 #define NU_WITH_TOLOWER
 #define NU_WITH_UTF8_WRITER
+#pragma GCC diagnostic push
+#pragma GCC diagnostic ignored "-Wold-style-cast"
 #include <libnu/libnu.h>
+#pragma GCC diagnostic pop
+
 #include <cstring>
 
 namespace mbgl { namespace platform {

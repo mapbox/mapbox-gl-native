@@ -12,7 +12,7 @@ void DebugFontBuffer::addText(const char *text, double left, double baseline, do
 
     const size_t len = strlen(text);
     for (size_t i = 0; i < len; ++i) {
-        if (text[i] < 32 || (unsigned char)(text[i]) >= 127) {
+        if (text[i] < 32 || static_cast<unsigned char>(text[i]) >= 127) {
             continue;
         }
 

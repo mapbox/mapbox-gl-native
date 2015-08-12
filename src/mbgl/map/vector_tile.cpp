@@ -37,7 +37,7 @@ VectorTileFeature::VectorTileFeature(pbf feature_pbf, const VectorTileLayer& lay
         } else if (feature_pbf.tag == 2) { // tags
             tags_pbf = feature_pbf.message();
         } else if (feature_pbf.tag == 3) { // type
-            type = (FeatureType)feature_pbf.varint();
+            type = static_cast<FeatureType>(feature_pbf.varint());
         } else if (feature_pbf.tag == 4) { // geometry
             geometry_pbf = feature_pbf.message();
         } else {

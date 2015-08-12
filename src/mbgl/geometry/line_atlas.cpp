@@ -5,7 +5,10 @@
 #include <mbgl/util/gl_object_store.hpp>
 #include <mbgl/util/thread_context.hpp>
 
+#pragma GCC diagnostic push
+#pragma GCC diagnostic ignored "-Wold-style-cast"
 #include <boost/functional/hash.hpp>
+#pragma GCC diagnostic pop
 
 #include <sstream>
 #include <cmath>
@@ -101,7 +104,7 @@ LinePatternPos LineAtlas::addDash(const std::vector<float> &dasharray, bool roun
             int signedDistance;
 
             if (round) {
-                float distMiddle = n ? (float)y / n * (halfWidth + 1) : 0;
+                float distMiddle = n ? static_cast<float>(y) / n * (halfWidth + 1) : 0;
                 if (inside) {
                     float distEdge = halfWidth - fabs(distMiddle);
                     signedDistance = sqrt(dist * dist + distEdge * distEdge);

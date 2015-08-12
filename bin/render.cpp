@@ -14,6 +14,7 @@
 #pragma GCC diagnostic ignored "-Wunused-local-typedefs"
 #pragma GCC diagnostic ignored "-Wshadow"
 #endif
+#pragma GCC diagnostic ignored "-Wold-style-cast"
 #include <boost/program_options.hpp>
 #pragma GCC diagnostic pop
 

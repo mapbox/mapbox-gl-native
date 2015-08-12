@@ -133,7 +133,7 @@ void AssetRequest::fileStated(uv_fs_t *req) {
             self->response->modified = stat->st_mtime;
 #endif
             self->response->etag = util::toString(stat->st_ino);
-            const auto size = (unsigned int)(stat->st_size);
+            const auto size = static_cast<unsigned int>(stat->st_size);
             self->response->data.resize(size);
             self->buffer = uv_buf_init(const_cast<char *>(self->response->data.data()), size);
             uv_fs_req_cleanup(req);
@@ -204,7 +204,7 @@ void AssetRequest::cancel() {
     // uv_cancel fails frequently when the request has already been started.
     // In that case, we have to let it complete and check the canceled bool
     // instead. The cancelation callback will delete the AssetRequest object.
-    uv_cancel((uv_req_t *)&req);
+    uv_cancel(reinterpret_cast<uv_req_t *>(&req));
 }
 
 std::unique_ptr<AssetContextBase> AssetContextBase::createContext(uv_loop_t*) {

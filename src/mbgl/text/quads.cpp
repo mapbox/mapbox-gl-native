@@ -75,7 +75,7 @@ void getSegmentGlyphs(std::back_insert_iterator<GlyphInstances> glyphs, Anchor &
     if (direction > 0)
         segment++;
 
-    assert((int)line.size() > segment);
+    assert(static_cast<int>(line.size()) > segment);
     vec2<float> end = line[segment];
     vec2<float> newAnchor = anchor;
     float prevscale = std::numeric_limits<float>::infinity();
@@ -108,7 +108,7 @@ void getSegmentGlyphs(std::back_insert_iterator<GlyphInstances> glyphs, Anchor &
         // skip duplicate nodes
         while (newAnchor == end) {
             segment += direction;
-            if ((int)line.size() <= segment || segment < 0) {
+            if (static_cast<int>(line.size()) <= segment || segment < 0) {
                 anchor.scale = scale;
                 return;
             }
@@ -122,7 +122,7 @@ void getSegmentGlyphs(std::back_insert_iterator<GlyphInstances> glyphs, Anchor &
     }
 }
 
-SymbolQuads getGlyphQuads(Anchor &anchor, const Shaping &shapedText, 
+SymbolQuads getGlyphQuads(Anchor &anchor, const Shaping &shapedText,
         const float boxScale, const std::vector<Coordinate> &line, const StyleLayoutSymbol &layout,
         const bool alongLine, const GlyphPositions &face) {
 

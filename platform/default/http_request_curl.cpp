@@ -148,7 +148,7 @@ public:
     void stop() {
         assert(poll.data);
         uv_poll_stop(&poll);
-        uv_close((uv_handle_t *)&poll, [](uv_handle_t *handle) {
+        uv_close(reinterpret_cast<uv_handle_t *>(&poll), [](uv_handle_t *handle) {
             assert(handle->data);
             delete reinterpret_cast<Socket *>(handle->data);
         });
@@ -229,7 +229,7 @@ void HTTPCURLContext::checkMultiInfo() {
         switch (message->msg) {
         case CURLMSG_DONE: {
             HTTPCURLRequest *baton = nullptr;
-            curl_easy_getinfo(message->easy_handle, CURLINFO_PRIVATE, (char *)&baton);
+            curl_easy_getinfo(message->easy_handle, CURLINFO_PRIVATE, reinterpret_cast<char *>(&baton));
             assert(baton);
             baton->handleResult(message->data.result);
         } break;
@@ -271,7 +271,7 @@ int HTTPCURLContext::handleSocket(CURL * /* handle */, curl_socket_t s, int acti
 
     if (!socket && action != CURL_POLL_REMOVE) {
         socket = new Socket(context, s);
-        curl_multi_assign(context->multi, s, (void *)socket);
+        curl_multi_assign(context->multi, s, reinterpret_cast<void *>(socket));
     }
 
     switch (action) {
@@ -417,7 +417,7 @@ size_t HTTPCURLRequest::writeCallback(void *const contents, const size_t size, c
         impl->response = std::make_unique<Response>();
     }
 
-    impl->response->data.append((char *)contents, size * nmemb);
+    impl->response->data.append(reinterpret_cast<char *>(contents), size * nmemb);
     return size * nmemb;
 }
 

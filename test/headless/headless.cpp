@@ -6,14 +6,18 @@
 #include <mbgl/util/image.hpp>
 
 #include <mbgl/util/io.hpp>
-#include <rapidjson/document.h>
-#include <rapidjson/writer.h>
-#include <rapidjson/stringbuffer.h>
 
 #include <mbgl/platform/platform.hpp>
 #include <mbgl/platform/default/headless_view.hpp>
 #include <mbgl/platform/default/headless_display.hpp>
 #include <mbgl/storage/default_file_source.hpp>
+
+#pragma GCC diagnostic push
+#pragma GCC diagnostic ignored "-Wold-style-cast"
+#include <rapidjson/document.h>
+#include <rapidjson/writer.h>
+#include <rapidjson/stringbuffer.h>
+#pragma GCC diagnostic pop
 
 #include <dirent.h>
 
@@ -60,7 +64,7 @@ TEST_P(HeadlessTest, render) {
 
     // Parse style.
     rapidjson::Document styleDoc;
-    styleDoc.Parse<0>((const char *const)style.c_str());
+    styleDoc.Parse<0>(reinterpret_cast<const char *const>(style.c_str()));
     ASSERT_FALSE(styleDoc.HasParseError());
     ASSERT_TRUE(styleDoc.IsObject());
 
@@ -99,7 +103,7 @@ TEST_P(HeadlessTest, render) {
 
     // Parse settings.
     rapidjson::Document infoDoc;
-    infoDoc.Parse<0>((const char *const)info.c_str());
+    infoDoc.Parse<0>(reinterpret_cast<const char *const>(info.c_str()));
     ASSERT_FALSE(infoDoc.HasParseError());
     ASSERT_TRUE(infoDoc.IsObject());
 
