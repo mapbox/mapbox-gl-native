@@ -44,15 +44,11 @@ std::string normalizeStyleURL(const std::string& url, const std::string& accessT
 std::string normalizeGlyphsURL(const std::string& url, const std::string& accessToken) {
     if (url.compare(0, mapbox.length(), mapbox) != 0) {
         return url;
+    } else {
+        const std::string prefix = "mapbox://fonts/";
+        const std::string user = url.substr(prefix.length(), url.find("/", prefix.length()) - prefix.length());
+        return normalizeURL("mapbox://" + user + "/{fontstack}/{range}.pbf", "/fonts/v1/", accessToken);
     }
-
-    const std::string fontstack = "mapbox://fontstack/";
-
-    if (url.compare(0, fontstack.length(), fontstack) == 0) {
-        return normalizeURL(url, "/v4/", accessToken);
-    }
-
-    return normalizeURL(url, "/", accessToken);
 }
 
 std::string normalizeTileURL(const std::string& url, const std::string& sourceURL, SourceType sourceType) {
@@ -60,15 +56,15 @@ std::string normalizeTileURL(const std::string& url, const std::string& sourceUR
         sourceType != SourceType::Raster) {
         return url;
     }
-    
+
     std::string::size_type queryIdx = url.rfind("?");
     // Trim off the right end but never touch anything before the extension dot.
     std::string urlSansParams((queryIdx == std::string::npos) ? url : url.substr(0, queryIdx));
-    
+
     while (!urlSansParams.empty() && isdigit(urlSansParams.back())) {
         urlSansParams.pop_back();
     }
-    
+
     std::string::size_type basenameIdx = url.rfind("/", queryIdx);
     std::string::size_type extensionIdx = url.rfind(".", queryIdx);
     if (basenameIdx == std::string::npos || extensionIdx == std::string::npos ||
@@ -76,7 +72,7 @@ std::string normalizeTileURL(const std::string& url, const std::string& sourceUR
         // No file extension: probably not a file name we can tack a ratio onto.
         return url;
     }
-    
+
     std::string normalizedURL(url);
     normalizedURL.insert(extensionIdx, "{ratio}");
     return normalizedURL;
