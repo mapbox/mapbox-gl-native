@@ -7,7 +7,6 @@ import android.os.Bundle;
 import android.support.annotation.NonNull;
 import android.support.design.widget.FloatingActionButton;
 import android.support.design.widget.NavigationView;
-import android.support.design.widget.Snackbar;
 import android.support.v4.view.GravityCompat;
 import android.support.v4.widget.DrawerLayout;
 import android.support.v7.app.ActionBar;
@@ -163,6 +162,11 @@ public class MainActivity extends AppCompatActivity {
                 R.array.outdoors_class_list, android.R.layout.simple_spinner_dropdown_item);
 */
 
+        // Set default UI state
+        navigationView.getMenu().findItem(R.id.action_compass).setChecked(mapView.isCompassEnabled());
+        navigationView.getMenu().findItem(R.id.action_debug).setChecked(mapView.isDebugActive());
+        navigationView.getMenu().findItem(R.id.action_markers).setChecked(mIsAnnotationsOn);
+
         if (savedInstanceState != null) {
             mapView.setMyLocationEnabled(savedInstanceState.getBoolean(STATE_IS_GPS_ON, false));
         }
@@ -250,7 +254,6 @@ public class MainActivity extends AppCompatActivity {
                 new NavigationView.OnNavigationItemSelectedListener() {
                     @Override
                     public boolean onNavigationItemSelected(MenuItem menuItem) {
-                        menuItem.setChecked(true);
                         mDrawerLayout.closeDrawers();
 
                         // Respond To Selection
@@ -259,6 +262,8 @@ public class MainActivity extends AppCompatActivity {
                             case R.id.action_debug:
                                 // Toggle debug mode
                                 mapView.toggleDebug();
+
+                                menuItem.setChecked(mapView.isDebugActive());
 
                                 // Show the FPS counter
                                 if (mapView.isDebugActive()) {
@@ -272,11 +277,13 @@ public class MainActivity extends AppCompatActivity {
                             case R.id.action_markers:
                                 // Toggle markers
                                 toggleAnnotations(!mIsAnnotationsOn);
+                                menuItem.setChecked(mIsAnnotationsOn);
                                 break;
 
                             case R.id.action_compass:
                                 // Toggle compass
                                 mapView.setCompassEnabled(!mapView.isCompassEnabled());
+                                menuItem.setChecked(mapView.isCompassEnabled());
                                 break;
 
 /*
