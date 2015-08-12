@@ -1,12 +1,16 @@
 #ifndef MBGL_STYLE_STYLE_PARSER
 #define MBGL_STYLE_STYLE_PARSER
 
-#include <rapidjson/document.h>
 #include <mbgl/style/style.hpp>
 #include <mbgl/map/source.hpp>
 #include <mbgl/style/filter_expression.hpp>
 #include <mbgl/style/class_properties.hpp>
 #include <mbgl/style/style_bucket.hpp>
+
+#pragma GCC diagnostic push
+#pragma GCC diagnostic ignored "-Wold-style-cast"
+#include <rapidjson/document.h>
+#pragma GCC diagnostic pop
 
 #include <unordered_map>
 #include <forward_list>

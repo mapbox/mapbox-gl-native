@@ -78,7 +78,7 @@ HTTPNSURLContext::HTTPNSURLContext(uv_loop_t *loop_) : HTTPContextBase(loop_) {
 
         // Write user agent string
         userAgent = @"MapboxGL";
-        
+
         accountType = [[NSUserDefaults standardUserDefaults] integerForKey:@"MGLMapboxAccountType"];
     }
 }
@@ -125,7 +125,7 @@ void HTTPNSURLRequest::start() {
     attempts++;
 
     @autoreleasepool {
-        
+
         NSURL *url = [NSURL URLWithString:@(resource.url.c_str())];
         if (context->accountType == 0 &&
             ([url.host isEqualToString:@"mapbox.com"] || [url.host hasSuffix:@".mapbox.com"])) {
@@ -250,12 +250,12 @@ void HTTPNSURLRequest::handleResult(NSData *data, NSURLResponse *res, NSError *e
             }
         }
     } else if ([res isKindOfClass:[NSHTTPURLResponse class]]) {
-        const long responseCode = [(NSHTTPURLResponse *)res statusCode];
+        const long responseCode = [reinterpret_cast<NSHTTPURLResponse *>(res) statusCode];
 
         response = std::make_unique<Response>();
-        response->data = {(const char *)[data bytes], [data length]};
+        response->data = {reinterpret_cast<const char *>([data bytes]), [data length]};
 
-        NSDictionary *headers = [(NSHTTPURLResponse *)res allHeaderFields];
+        NSDictionary *headers = [reinterpret_cast<NSHTTPURLResponse *>(res) allHeaderFields];
         NSString *cache_control = [headers objectForKey:@"Cache-Control"];
         if (cache_control) {
             response->expires = parseCacheControl([cache_control UTF8String]);

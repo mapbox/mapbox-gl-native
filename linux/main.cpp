@@ -32,17 +32,26 @@ void quit_handler(int) {
 
 int main(int argc, char *argv[]) {
     bool fullscreen = false;
+    bool benchmark = false;
     std::string style;
+    double latitude = 0, longitude = 0;
+    double bearing = 0, zoom = 1;
+    bool skipConfig = false;
 
     const struct option long_options[] = {
         {"fullscreen", no_argument, 0, 'f'},
+        {"benchmark", no_argument, 0, 'b'},
         {"style", required_argument, 0, 's'},
+        {"lon", required_argument, 0, 'x'},
+        {"lat", required_argument, 0, 'y'},
+        {"zoom", required_argument, 0, 'z'},
+        {"bearing", required_argument, 0, 'r'},
         {0, 0, 0, 0}
     };
 
     while (true) {
         int option_index = 0;
-        int opt = getopt_long(argc, argv, "fs:", long_options, &option_index);
+        int opt = getopt_long(argc, argv, "fbs:", long_options, &option_index);
         if (opt == -1) break;
         switch (opt)
         {
@@ -52,8 +61,28 @@ int main(int argc, char *argv[]) {
         case 'f':
             fullscreen = true;
             break;
+        case 'b':
+            benchmark = true;
+            break;
         case 's':
             style = std::string("asset://") + std::string(optarg);
+            break;
+        case 'x':
+            longitude = atof(optarg);
+            skipConfig = true;
+            break;
+        case 'y':
+            latitude = atof(optarg);
+            skipConfig = true;
+            break;
+        case 'z':
+            zoom = atof(optarg);
+            skipConfig = true;
+            break;
+        case 'r':
+            bearing = atof(optarg);
+            skipConfig = true;
+            break;
         default:
             break;
         }
@@ -67,7 +96,11 @@ int main(int argc, char *argv[]) {
     sigIntHandler.sa_flags = 0;
     sigaction(SIGINT, &sigIntHandler, NULL);
 
-    view = std::make_unique<GLFWView>(fullscreen);
+    if (benchmark) {
+        mbgl::Log::Info(mbgl::Event::General, "BENCHMARK MODE: Some optimizations are disabled.");
+    }
+
+    view = std::make_unique<GLFWView>(fullscreen, benchmark);
 
     mbgl::SQLiteCache cache("/tmp/mbgl-cache.db");
     mbgl::DefaultFileSource fileSource(&cache);
@@ -84,9 +117,16 @@ int main(int argc, char *argv[]) {
 
     // Load settings
     mbgl::Settings_JSON settings;
-    map.setLatLngZoom(mbgl::LatLng(settings.latitude, settings.longitude), settings.zoom);
-    map.setBearing(settings.bearing);
-    map.setDebug(settings.debug);
+
+    if (skipConfig) {
+        map.setLatLngZoom(mbgl::LatLng(latitude, longitude), zoom);
+        map.setBearing(bearing);
+        mbgl::Log::Info(mbgl::Event::General, "Location: %f/%f (z%.2f, %.2f deg)", latitude, longitude, zoom, bearing);
+    } else {
+        map.setLatLngZoom(mbgl::LatLng(settings.latitude, settings.longitude), settings.zoom);
+        map.setBearing(settings.bearing);
+        map.setDebug(settings.debug);
+    }
 
     view->setChangeStyleCallback([&map] () {
         static uint8_t currentStyleIndex;
@@ -120,7 +160,12 @@ int main(int argc, char *argv[]) {
     settings.zoom = map.getZoom();
     settings.bearing = map.getBearing();
     settings.debug = map.getDebug();
-    settings.save();
+    if (!skipConfig) {
+        settings.save();
+    }
+    mbgl::Log::Info(mbgl::Event::General,
+                    "Exit location: --lat=\"%f\" --lon=\"%f\" --zoom=\"%f\" --bearing \"%f\"",
+                    settings.latitude, settings.longitude, settings.zoom, settings.bearing);
 
     return 0;
 }

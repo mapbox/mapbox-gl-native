@@ -77,8 +77,8 @@ void JpegReader<T>::attach_stream (j_decompress_ptr cinfo, input_stream* in)
 {
     if (cinfo->src == 0)
     {
-        cinfo->src = (struct jpeg_source_mgr *)
-            (*cinfo->mem->alloc_small) ((j_common_ptr) cinfo, JPOOL_PERMANENT, sizeof(jpeg_stream_wrapper));
+        cinfo->src = reinterpret_cast<struct jpeg_source_mgr *>(
+            (*cinfo->mem->alloc_small) (reinterpret_cast<j_common_ptr>(cinfo), JPOOL_PERMANENT, sizeof(jpeg_stream_wrapper)));
     }
     JpegReader::jpeg_stream_wrapper * src = reinterpret_cast<JpegReader::jpeg_stream_wrapper*> (cinfo->src);
     src->manager.init_source = init_source;
@@ -104,6 +104,8 @@ void JpegReader<T>::on_error_message(j_common_ptr cinfo)
     throw ImageReaderException(std::string("JPEG Reader: libjpeg could not read image: ") + buffer);
 }
 
+#pragma GCC diagnostic push
+#pragma GCC diagnostic ignored "-Wold-style-cast" // for jpeg_create_decompress macro
 template <typename T>
 void JpegReader<T>::init()
 {
@@ -131,6 +133,7 @@ void JpegReader<T>::init()
         throw ImageReaderException("JPEG Reader: failed to read image size of");
     }
 }
+#pragma GCC diagnostic pop
 
 template <typename T>
 unsigned JpegReader<T>::width() const
@@ -144,6 +147,8 @@ unsigned JpegReader<T>::height() const
     return height_;
 }
 
+#pragma GCC diagnostic push
+#pragma GCC diagnostic ignored "-Wold-style-cast" // for jpeg_create_decompress macro
 template <typename T>
 void JpegReader<T>::read(unsigned x0, unsigned y0, unsigned w, unsigned h, char* image)
 {
@@ -197,6 +202,7 @@ void JpegReader<T>::read(unsigned x0, unsigned y0, unsigned w, unsigned h, char*
     }
     jpeg_finish_decompress(&cinfo);
 }
+#pragma GCC diagnostic pop
 
 template class JpegReader<boost::iostreams::array_source>;
 

@@ -161,8 +161,8 @@ void Painter::setStrata(float value) {
 }
 
 void Painter::prepareTile(const Tile& tile) {
-    const GLint ref = (GLint)tile.clip.reference.to_ulong();
-    const GLuint mask = (GLuint)tile.clip.mask.to_ulong();
+    const GLint ref = static_cast<GLint>(tile.clip.reference.to_ulong());
+    const GLuint mask = static_cast<GLuint>(tile.clip.mask.to_ulong());
     config.stencilFunc = { GL_EQUAL, ref, mask };
 }
 
@@ -471,7 +471,7 @@ mat4 Painter::translatedMatrix(const mat4& matrix, const std::array<float, 2> &t
         return matrix;
     } else {
         // TODO: Get rid of the 8 (scaling from 4096 to tile size)
-        const double factor = ((double)(1 << id.z)) / state.getScale() * (4096.0 / util::tileSize / id.overscaling);
+        const double factor = (static_cast<double>(1 << id.z)) / state.getScale() * (4096.0 / util::tileSize / id.overscaling);
 
         mat4 vtxMatrix;
         if (anchor == TranslateAnchorType::Viewport) {

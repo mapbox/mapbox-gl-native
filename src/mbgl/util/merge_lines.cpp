@@ -1,6 +1,9 @@
 #include "merge_lines.hpp"
 
+#pragma GCC diagnostic push
+#pragma GCC diagnostic ignored "-Wold-style-cast"
 #include <boost/functional/hash.hpp>
+#pragma GCC diagnostic pop
 
 namespace mbgl {
 namespace util {

@@ -38,6 +38,9 @@
 *                                                                              *
 *******************************************************************************/
 
+#pragma GCC diagnostic ignored "-Wshadow"
+#pragma GCC diagnostic ignored "-Wold-style-cast"
+
 #include "clipper.hpp"
 #include <cmath>
 #include <vector>
@@ -47,8 +50,6 @@
 #include <cstdlib>
 #include <ostream>
 #include <functional>
-
-#pragma GCC diagnostic ignored "-Wshadow"
 
 namespace ClipperLib {
 

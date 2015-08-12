@@ -90,7 +90,7 @@ void PngReader<T>::init()
     info_ptr = png_create_info_struct(png_ptr);
     if (!info_ptr) throw ImageReaderException("failed to create info_ptr");
 
-    png_set_read_fn(png_ptr, (png_voidp)&stream_, png_read_data);
+    png_set_read_fn(png_ptr, reinterpret_cast<png_voidp>(&stream_), png_read_data);
 
     png_set_sig_bytes(png_ptr,8);
     png_read_info(png_ptr, info_ptr);
@@ -136,7 +136,7 @@ void PngReader<T>::read(unsigned x0, unsigned y0, unsigned w, unsigned h, char *
     info_ptr = png_create_info_struct(png_ptr);
     if (!info_ptr) throw ImageReaderException("failed to create info_ptr");
 
-    png_set_read_fn(png_ptr, (png_voidp)&stream_, png_read_data);
+    png_set_read_fn(png_ptr, reinterpret_cast<png_voidp>(&stream_), png_read_data);
     png_read_info(png_ptr, info_ptr);
 
     if (color_type_ == PNG_COLOR_TYPE_PALETTE)
@@ -176,7 +176,7 @@ void PngReader<T>::read(unsigned x0, unsigned y0, unsigned w, unsigned h, char *
         // alloc row pointers
         const std::unique_ptr<png_bytep[]> rows(new png_bytep[height_]);
         for (unsigned row = 0; row < height_; ++row)
-            rows[row] = (png_bytep)image + row * width_ * 4 ;
+            rows[row] = reinterpret_cast<png_bytep>(image) + row * width_ * 4 ;
         png_read_image(png_ptr, rows.get());
 
 #ifndef PNG_ALPHA_PREMULTIPLIED

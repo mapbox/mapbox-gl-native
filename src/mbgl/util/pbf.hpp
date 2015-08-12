@@ -97,7 +97,7 @@ T pbf::varint() {
         if (data >= end) {
             throw unterminated_varint_exception();
         }
-        result |= ((T)(byte = *data) & 0x7F) << bitpos;
+        result |= (static_cast<T>(byte = *data) & 0x7F) << bitpos;
 
         data++;
     }
@@ -111,7 +111,7 @@ T pbf::varint() {
 template <typename T>
 T pbf::svarint() {
     T n = varint<T>();
-    return (n >> 1) ^ -(T)(n & 1);
+    return (n >> 1) ^ -static_cast<T>(n & 1);
 }
 
 template <typename T, int bytes>
@@ -139,7 +139,7 @@ std::string pbf::string() {
 
 bool pbf::boolean() {
     skipBytes(1);
-    return *(bool *)(data - 1);
+    return *reinterpret_cast<const bool *>(data - 1);
 }
 
 pbf pbf::message() {

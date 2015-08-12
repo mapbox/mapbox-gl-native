@@ -3,9 +3,11 @@
 
 #import <mbgl/util/geo.hpp>
 
+#import <memory>
+
 @implementation MGLMultiPoint
 {
-    CLLocationCoordinate2D *_coords;
+    std::unique_ptr<CLLocationCoordinate2D[]> _coords;
     size_t _count;
     mbgl::LatLngBounds _bounds;
 }
@@ -18,7 +20,7 @@
     if (self)
     {
         _count = count;
-        _coords = (CLLocationCoordinate2D *)malloc(_count * sizeof(CLLocationCoordinate2D));
+        _coords = std::unique_ptr<CLLocationCoordinate2D[]>(new CLLocationCoordinate2D[_count]);
 
         for (NSUInteger i = 0; i < _count; i++)
         {
@@ -28,11 +30,6 @@
     }
 
     return self;
-}
-
-- (void)dealloc
-{
-    free(_coords);
 }
 
 - (CLLocationCoordinate2D)coordinate

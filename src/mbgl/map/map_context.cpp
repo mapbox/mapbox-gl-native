@@ -345,12 +345,8 @@ bool MapContext::renderSync(const TransformState& state, const FrameData& frame)
     }
 
     view.swap();
-
     viewInvalidated = false;
-
-    if (style->hasTransitions() || painter->needsAnimation()) {
-        data.setNeedsRepaint(true);
-    }
+    data.setNeedsRepaint(style->hasTransitions() || painter->needsAnimation());
 
     return isLoaded();
 }

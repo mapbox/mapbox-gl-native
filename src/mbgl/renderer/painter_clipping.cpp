@@ -31,9 +31,9 @@ void Painter::drawClippingMasks(const std::set<Source*>& sources) {
 void Painter::drawClippingMask(const mat4& matrix, const ClipID &clip) {
     plainShader->u_matrix = matrix;
 
-    const GLint ref = (GLint)(clip.reference.to_ulong());
-    const GLuint mask = (GLuint)(clip.mask.to_ulong());
+    const GLint ref = static_cast<GLint>(clip.reference.to_ulong());
+    const GLuint mask = static_cast<GLuint>(clip.mask.to_ulong());
     config.stencilFunc = { GL_ALWAYS, ref, mask };
     config.stencilMask = mask;
-    MBGL_CHECK_ERROR(glDrawArrays(GL_TRIANGLES, 0, (GLsizei)tileStencilBuffer.index()));
+    MBGL_CHECK_ERROR(glDrawArrays(GL_TRIANGLES, 0, static_cast<GLsizei>(tileStencilBuffer.index())));
 }

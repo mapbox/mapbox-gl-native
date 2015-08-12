@@ -14,9 +14,9 @@ void TransformState::matrixFor(mat4& matrix, const TileID& id, const int8_t z) c
 
     matrix::identity(matrix);
 
-    matrix::translate(matrix, matrix, 0.5f * (float)width, 0.5f * (float)height, 0);
+    matrix::translate(matrix, matrix, 0.5f * static_cast<float>(width), 0.5f * static_cast<float>(height), 0);
     matrix::rotate_z(matrix, matrix, angle);
-    matrix::translate(matrix, matrix, -0.5f * (float)width, -0.5f * (float)height, 0);
+    matrix::translate(matrix, matrix, -0.5f * static_cast<float>(width), -0.5f * static_cast<float>(height), 0);
 
     matrix::translate(matrix, matrix, pixel_x() + id.x * tile_size, pixel_y() + id.y * tile_size, 0);
 
