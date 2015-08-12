@@ -341,7 +341,8 @@ public class MainActivity extends AppCompatActivity {
                 mapView.setMyLocationEnabled(enableGps);
                 Location location = mapView.getMyLocation();
                 if (location != null) {
-                    mapView.setCenterCoordinate(new LatLng(location), true);
+                    mapView.setZoomLevel(8);
+                    mapView.setCenterCoordinate(new LatLng(location));
                 }
                 locationFAB.setColorFilter(getResources().getColor(R.color.primary));
             }
