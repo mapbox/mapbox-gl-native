@@ -4,6 +4,7 @@
 #include <mbgl/shader/shader.hpp>
 #include <mbgl/platform/gl.hpp>
 #include <mbgl/util/noncopyable.hpp>
+#include <mbgl/renderer/gl_config.hpp>
 
 #include <stdexcept>
 
@@ -18,13 +19,16 @@ public:
     ~VertexArrayObject();
 
     template <typename Shader, typename VertexBuffer>
-    inline void bind(Shader& shader, VertexBuffer &vertexBuffer, char *offset) {
+    inline void bind(Shader& shader, VertexBuffer& vertexBuffer, gl::Config& config, char* offset) {
         bindVertexArrayObject();
         if (bound_shader == 0) {
             vertexBuffer.bind();
-            shader.bind(offset);
             if (vao) {
+                config.resetVertexAttributes();
+                shader.bind(config, offset);
                 storeBinding(shader, vertexBuffer.getID(), 0, offset);
+            } else {
+                shader.bind(config, offset);
             }
         } else {
             verifyBinding(shader, vertexBuffer.getID(), 0, offset);
@@ -32,14 +36,21 @@ public:
     }
 
     template <typename Shader, typename VertexBuffer, typename ElementsBuffer>
-    inline void bind(Shader& shader, VertexBuffer &vertexBuffer, ElementsBuffer &elementsBuffer, char *offset) {
+    inline void bind(Shader& shader,
+                     VertexBuffer& vertexBuffer,
+                     ElementsBuffer& elementsBuffer,
+                     gl::Config& config,
+                     char* offset) {
         bindVertexArrayObject();
         if (bound_shader == 0) {
             vertexBuffer.bind();
             elementsBuffer.bind();
-            shader.bind(offset);
             if (vao) {
+                config.resetVertexAttributes();
+                shader.bind(config, offset);
                 storeBinding(shader, vertexBuffer.getID(), elementsBuffer.getID(), offset);
+            } else {
+                shader.bind(config, offset);
             }
         } else {
             verifyBinding(shader, vertexBuffer.getID(), elementsBuffer.getID(), offset);

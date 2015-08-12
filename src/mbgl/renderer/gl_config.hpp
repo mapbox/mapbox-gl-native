@@ -4,6 +4,7 @@
 #include <cstdint>
 #include <tuple>
 #include <array>
+#include <set>
 
 #include <mbgl/platform/gl.hpp>
 
@@ -141,6 +142,12 @@ public:
     Value<ClearDepth> clearDepth;
     Value<ClearColor> clearColor;
     Value<ClearStencil> clearStencil;
+
+    void enableVertexAttributes(const std::set<int32_t>& attributes);
+    void resetVertexAttributes();
+
+private:
+    std::set<int32_t> enabledVertexAttributes;
 };
 
 }

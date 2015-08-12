@@ -27,11 +27,11 @@ bool RasterBucket::setImage(std::unique_ptr<util::Image> image) {
     return raster.load(std::move(image));
 }
 
-void RasterBucket::drawRaster(RasterShader& shader, StaticVertexBuffer &vertices, VertexArrayObject &array) {
+void RasterBucket::drawRaster(RasterShader& shader, StaticVertexBuffer &vertices, VertexArrayObject &array, gl::Config& config) {
     raster.bind(true);
     shader.u_image = 0;
-    array.bind(shader, vertices, BUFFER_OFFSET(0));
-    MBGL_CHECK_ERROR(glDrawArrays(GL_TRIANGLES, 0, (GLsizei)vertices.index()));
+    array.bind(shader, vertices, config, BUFFER_OFFSET(0));
+    MBGL_CHECK_ERROR(glDrawArrays(GL_TRIANGLES, 0, static_cast<GLsizei>(vertices.index())));
 }
 
 bool RasterBucket::hasData() const {

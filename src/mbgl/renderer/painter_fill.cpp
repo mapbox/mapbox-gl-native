@@ -56,7 +56,7 @@ void Painter::renderFill(FillBucket& bucket, const StyleLayer &layer_desc, const
             static_cast<float>(frame.framebufferSize[1])
         }};
         config.depthRange = { strata, 1.0f };
-        bucket.drawVertices(*outlineShader);
+        bucket.drawVertices(*outlineShader, config);
     }
 
     if (pattern) {
@@ -96,7 +96,7 @@ void Painter::renderFill(FillBucket& bucket, const StyleLayer &layer_desc, const
             // Draw the actual triangles into the color & stencil buffer.
             config.depthMask = GL_TRUE;
             config.depthRange = { strata, 1.0f };
-            bucket.drawElements(*patternShader);
+            bucket.drawElements(*patternShader, config);
         }
     }
     else {
@@ -113,7 +113,7 @@ void Painter::renderFill(FillBucket& bucket, const StyleLayer &layer_desc, const
             // Draw the actual triangles into the color & stencil buffer.
             config.depthMask = GL_TRUE;
             config.depthRange = { strata + strata_epsilon, 1.0f };
-            bucket.drawElements(*plainShader);
+            bucket.drawElements(*plainShader, config);
         }
     }
 
@@ -133,6 +133,6 @@ void Painter::renderFill(FillBucket& bucket, const StyleLayer &layer_desc, const
         }};
 
         config.depthRange = { strata + strata_epsilon + strata_epsilon, 1.0f };
-        bucket.drawVertices(*outlineShader);
+        bucket.drawVertices(*outlineShader, config);
     }
 }

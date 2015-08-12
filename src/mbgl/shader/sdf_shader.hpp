@@ -31,12 +31,12 @@ protected:
 
 class SDFGlyphShader : public SDFShader {
 public:
-    void bind(char *offset) override;
+    void bind(gl::Config&, char *offset) override;
 };
 
 class SDFIconShader : public SDFShader {
 public:
-    void bind(char *offset) override;
+    void bind(gl::Config&, char *offset) override;
 };
 
 }

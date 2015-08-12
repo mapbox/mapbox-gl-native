@@ -10,7 +10,7 @@ class OutlineShader : public Shader {
 public:
     OutlineShader();
 
-    void bind(char *offset) override;
+    void bind(gl::Config&, char *offset) override;
 
     UniformMatrix<4>              u_matrix = {"u_matrix", *this};
     Uniform<std::array<float, 4>> u_color  = {"u_color",  *this};

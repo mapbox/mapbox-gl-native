@@ -164,7 +164,7 @@ private:
                    float scaleDivisor,
                    std::array<float, 2> texsize,
                    SDFShader& sdfShader,
-                   void (SymbolBucket::*drawSDF)(SDFShader&));
+                   void (SymbolBucket::*drawSDF)(SDFShader&, gl::Config&));
 
 public:
     void useProgram(uint32_t program);

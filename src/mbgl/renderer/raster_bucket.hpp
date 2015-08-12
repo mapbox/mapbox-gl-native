@@ -6,6 +6,9 @@
 #include <mbgl/style/style_bucket.hpp>
 
 namespace mbgl {
+namespace gl {
+    class Config;
+} // end namespace gl
 
 class StyleLayoutRaster;
 class RasterShader;
@@ -24,7 +27,7 @@ public:
 
     const StyleLayoutRaster &layout;
 
-    void drawRaster(RasterShader& shader, StaticVertexBuffer &vertices, VertexArrayObject &array);
+    void drawRaster(RasterShader& shader, StaticVertexBuffer &vertices, VertexArrayObject &array, gl::Config& config);
 
     Raster raster;
 };

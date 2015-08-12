@@ -18,8 +18,8 @@ public:
     void upload() override;
     void render(Painter&, const StyleLayer&, const TileID&, const mat4&) override;
 
-    void drawLines(PlainShader& shader);
-    void drawPoints(PlainShader& shader);
+    void drawLines(PlainShader& shader, gl::Config& config);
+    void drawPoints(PlainShader& shader, gl::Config& config);
 
 private:
     DebugFontBuffer& fontBuffer;

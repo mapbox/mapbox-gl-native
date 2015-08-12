@@ -455,7 +455,7 @@ void Painter::renderBackground(const StyleLayer &layer_desc) {
         patternShader->u_patternmatrix_b = matrixB;
 
         backgroundBuffer.bind();
-        patternShader->bind(0);
+        patternShader->bind(config, 0);
         spriteAtlas->bind(true);
     }
 

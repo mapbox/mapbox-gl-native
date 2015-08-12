@@ -25,7 +25,7 @@ void Painter::renderRaster(RasterBucket& bucket, const StyleLayer &layer_desc, c
         config.stencilTest = true;
         config.depthTest = true;
         config.depthRange = { strata + strata_epsilon, 1.0f };
-        bucket.drawRaster(*rasterShader, tileStencilBuffer, coveringRasterArray);
+        bucket.drawRaster(*rasterShader, tileStencilBuffer, coveringRasterArray, config);
     }
 }
 
