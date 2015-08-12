@@ -737,6 +737,7 @@ std::chrono::steady_clock::duration secondsAsDuration(float duration)
     {
         [self updateHeadingForDeviceOrientation];
         [self updateCompass];
+        [self updateUserLocationAnnotationView];
     }
 }
 
@@ -2046,7 +2047,9 @@ CLLocationCoordinate2D MGLLocationCoordinate2DFromLatLng(mbgl::LatLng latLng)
 
     self.selectedAnnotation = annotation;
 
-    if (annotation.title && [self.delegate respondsToSelector:@selector(mapView:annotationCanShowCallout:)] &&
+    if ([annotation respondsToSelector:@selector(title)] &&
+        annotation.title &&
+        [self.delegate respondsToSelector:@selector(mapView:annotationCanShowCallout:)] &&
         [self.delegate mapView:self annotationCanShowCallout:annotation])
     {
         // build the callout

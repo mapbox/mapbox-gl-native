@@ -12,7 +12,7 @@
 
 class GLFWView : public mbgl::View {
 public:
-    GLFWView(bool fullscreen = false);
+    GLFWView(bool fullscreen = false, bool benchmark = false);
     ~GLFWView();
 
     float getPixelRatio() const override;
@@ -42,7 +42,7 @@ public:
     void setWindowTitle(const std::string&);
 
     void run();
-    void fps();
+    void report(float duration);
 
 private:
     mbgl::LatLng makeRandomPoint() const;
@@ -61,8 +61,14 @@ private:
 
 private:
     bool fullscreen = false;
+    const bool benchmark = false;
     bool tracking = false;
     bool rotating = false;
+
+    // Frame timer
+    int frames = 0;
+    float frameTime = 0;
+    double lastReported = 0;
 
     int width = 1024;
     int height = 768;

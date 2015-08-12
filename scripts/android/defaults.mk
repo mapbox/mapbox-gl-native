@@ -1,7 +1,7 @@
 HEADLESS ?= none
 PLATFORM ?= android
 ASSET ?= zip
-HTTP ?= curl
+HTTP ?= android
 CACHE ?= sqlite
 
 GYP_FLAVOR_SUFFIX=-android

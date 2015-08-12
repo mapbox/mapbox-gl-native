@@ -191,6 +191,7 @@ public class MapView extends FrameLayout implements LocationListener {
     //
 
     // Common initialization code goes here
+    @TargetApi(16)
     private void initialize(Context context, AttributeSet attrs) {
 
         // Save the context
@@ -217,9 +218,12 @@ public class MapView extends FrameLayout implements LocationListener {
         ActivityManager.MemoryInfo memoryInfo = new ActivityManager.MemoryInfo();
         ActivityManager activityManager = (ActivityManager) context.getSystemService(Context.ACTIVITY_SERVICE);
         activityManager.getMemoryInfo(memoryInfo);
-        long totalMemory = memoryInfo.totalMem;
-        mNativeMapView = new NativeMapView(this, cachePath, dataPath, apkPath, mScreenDensity,availableProcessors, totalMemory);
-
+        if (android.os.Build.VERSION.SDK_INT >= Build.VERSION_CODES.JELLY_BEAN) {
+            long totalMemory = memoryInfo.totalMem;
+            mNativeMapView = new NativeMapView(this, cachePath, dataPath, apkPath, mScreenDensity, availableProcessors, totalMemory);
+        } else {
+            throw new RuntimeException("Need to implement totalMemory on pre-Jelly Bean devices.");
+        }
         // Load the attributes
         TypedArray typedArray = context.obtainStyledAttributes(attrs, R.styleable.MapView, 0, 0);
         try {
@@ -678,7 +682,7 @@ public class MapView extends FrameLayout implements LocationListener {
     }
 
     public void onSizeChanged(int width, int height, int oldw, int oldh) {
-        mNativeMapView.resizeView((int)(width / mScreenDensity), (int)(height / mScreenDensity));
+        mNativeMapView.resizeView((int) (width / mScreenDensity), (int) (height / mScreenDensity));
     }
 
     // This class handles SurfaceHolder callbacks
