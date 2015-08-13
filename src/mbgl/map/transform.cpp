@@ -86,7 +86,7 @@ void Transform::_moveBy(const double dx, const double dy, const Duration& durati
                 state.x = util::interpolate(startX, x, t);
                 state.y = util::interpolate(startY, y, t);
                 view.notifyMapChange(MapChangeRegionIsChanging);
-                return Update::Nothing;
+                return Update::Repaint;
             },
             [=] {
                 state.panning = false;
@@ -334,7 +334,7 @@ void Transform::_setAngle(double new_angle, const Duration& duration) {
             [=](double t) {
                 state.angle = util::wrap(util::interpolate(startA, angle, t), -M_PI, M_PI);
                 view.notifyMapChange(MapChangeRegionIsChanging);
-                return Update::Nothing;
+                return Update::Repaint;
             },
             [=] {
                 state.rotating = false;
