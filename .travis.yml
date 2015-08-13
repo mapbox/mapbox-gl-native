@@ -58,13 +58,6 @@ matrix:
       addons:
         apt:
           packages: [ 'lib32stdc++6' ]
-    - os: linux
-      env: FLAVOR=android ANDROID_ABI=mips BUILDTYPE=Release
-      android:
-        components: [ 'build-tools-22.0.1', 'android-22', 'extra' ]
-      addons:
-        apt:
-          packages: [ 'lib32stdc++6' ]
 
 env:
   global:
