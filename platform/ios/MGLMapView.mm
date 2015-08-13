@@ -2349,7 +2349,8 @@ CLLocationCoordinate2D MGLLocationCoordinate2DFromLatLng(mbgl::LatLng latLng)
         // deselect user if applicable since we don't do callout tracking yet
         if ([self.selectedAnnotation isEqual:self.userLocation]) [self deselectAnnotation:self.userLocation animated:NO];
 
-        if ([self.delegate respondsToSelector:@selector(mapView:didUpdateUserLocation:)])
+        if ([UIApplication sharedApplication].applicationState != UIApplicationStateBackground &&
+            [self.delegate respondsToSelector:@selector(mapView:didUpdateUserLocation:)])
         {
             [self.delegate mapView:self didUpdateUserLocation:self.userLocation];
         }
@@ -2425,7 +2426,8 @@ CLLocationCoordinate2D MGLLocationCoordinate2DFromLatLng(mbgl::LatLng latLng)
 
     self.userLocation.heading = newHeading;
 
-    if ([self.delegate respondsToSelector:@selector(mapView:didUpdateUserLocation:)])
+    if ([UIApplication sharedApplication].applicationState != UIApplicationStateBackground &&
+        [self.delegate respondsToSelector:@selector(mapView:didUpdateUserLocation:)])
     {
         [self.delegate mapView:self didUpdateUserLocation:self.userLocation];
 
