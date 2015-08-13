@@ -81,7 +81,7 @@ private:
 
     util::GLObjectStore glObjectStore;
 
-    UpdateType updated { static_cast<UpdateType>(Update::Nothing) };
+    Update updateFlags = Update::Nothing;
     std::unique_ptr<uv::async> asyncUpdate;
 
     std::unique_ptr<TexturePool> texturePool;

@@ -71,19 +71,18 @@ void Map::renderSync() {
 }
 
 void Map::nudgeTransitions() {
-    UpdateType update_ = transform->updateTransitions(Clock::now());
+    Update flags = transform->updateTransitions(Clock::now());
     if (data->getNeedsRepaint()) {
-        update_ |= static_cast<UpdateType>(Update::Repaint);
+        flags |= Update::Repaint;
     }
-    update(Update(update_));
+    update(flags);
 }
 
-void Map::update(Update update_) {
-    if (update_ == Update::Dimensions) {
+void Map::update(Update flags) {
+    if (flags & Update::Dimensions) {
         transform->resize(view.getSize());
     }
-
-    context->invoke(&MapContext::triggerUpdate, transform->getState(), update_);
+    context->invoke(&MapContext::triggerUpdate, transform->getState(), flags);
 }
 
 #pragma mark - Style

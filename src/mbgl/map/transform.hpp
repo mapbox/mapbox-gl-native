@@ -42,7 +42,7 @@ public:
     double getAngle() const;
 
     // Transitions
-    UpdateType updateTransitions(const TimePoint& now);
+    Update updateTransitions(const TimePoint& now);
     void cancelTransitions();
 
     // Gesture

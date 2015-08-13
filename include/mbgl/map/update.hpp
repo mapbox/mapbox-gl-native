@@ -5,9 +5,7 @@
 
 namespace mbgl {
 
-using UpdateType = uint32_t;
-
-enum class Update : UpdateType {
+enum class Update : uint32_t {
     Nothing                   = 0,
     Dimensions                = 1 << 1,
     DefaultTransition         = 1 << 2,
@@ -17,6 +15,19 @@ enum class Update : UpdateType {
     Repaint                   = 1 << 6,
 };
 
+inline Update operator| (const Update& lhs, const Update& rhs) {
+    return Update(static_cast<uint32_t>(lhs) | static_cast<uint32_t>(rhs));
 }
 
-#endif
+inline Update& operator|=(Update& lhs, const Update& rhs) {
+    lhs = lhs | rhs;
+    return lhs;
+}
+
+inline bool operator& (const Update& lhs, const Update& rhs) {
+    return static_cast<uint32_t>(lhs) & static_cast<uint32_t>(rhs);
+}
+
+} // namespace mbgl
+
+#endif // MBGL_MAP_UPDATE
