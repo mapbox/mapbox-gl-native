@@ -34,10 +34,6 @@ void StyleParser::parse(JSVal document) {
         }
     }
 
-    if (document.HasMember("constants")) {
-        parseConstants(document["constants"]);
-    }
-
     if (document.HasMember("sources")) {
         parseSources(document["sources"]);
     }
@@ -96,37 +92,11 @@ void StyleParser::parse(JSVal document) {
     }
 }
 
-void StyleParser::parseConstants(JSVal value) {
-    if (value.IsObject()) {
-        rapidjson::Value::ConstMemberIterator itr = value.MemberBegin();
-        for (; itr != value.MemberEnd(); ++itr) {
-            std::string name { itr->name.GetString(), itr->name.GetStringLength() };
-            // Discard constants that don't start with an @ sign.
-            if (name.length() && name[0] == '@') {
-                constants.emplace(std::move(name), &itr->value);
-            }
-        }
-    } else {
-        Log::Warning(Event::ParseStyle, "constants must be an object");
-    }
-}
-
-JSVal StyleParser::replaceConstant(JSVal value) {
-    if (value.IsString()) {
-        auto it = constants.find({ value.GetString(), value.GetStringLength() });
-        if (it != constants.end()) {
-            return *it->second;
-        }
-    }
-
-    return value;
-}
-
 #pragma mark - Parse Render Properties
 
 template<> StyleParser::Status StyleParser::parseRenderProperty(JSVal value, bool &target, const char *name) {
     if (value.HasMember(name)) {
-        JSVal property = replaceConstant(value[name]);
+        JSVal property = value[name];
         if (property.IsBool()) {
             target = property.GetBool();
             return StyleParserSuccess;
@@ -140,7 +110,7 @@ template<> StyleParser::Status StyleParser::parseRenderProperty(JSVal value, boo
 
 template<> StyleParser::Status StyleParser::parseRenderProperty(JSVal value, std::string &target, const char *name) {
     if (value.HasMember(name)) {
-        JSVal property = replaceConstant(value[name]);
+        JSVal property = value[name];
         if (property.IsString()) {
             target = { property.GetString(), property.GetStringLength() };
             return StyleParserSuccess;
@@ -153,7 +123,7 @@ template<> StyleParser::Status StyleParser::parseRenderProperty(JSVal value, std
 
 template<> StyleParser::Status StyleParser::parseRenderProperty(JSVal value, float &target, const char *name) {
     if (value.HasMember(name)) {
-        JSVal property = replaceConstant(value[name]);
+        JSVal property = value[name];
         if (property.IsNumber()) {
             target = property.GetDouble();
             return StyleParserSuccess;
@@ -166,7 +136,7 @@ template<> StyleParser::Status StyleParser::parseRenderProperty(JSVal value, flo
 
 template<> StyleParser::Status StyleParser::parseRenderProperty(JSVal value, uint16_t &target, const char *name) {
     if (value.HasMember(name)) {
-        JSVal property = replaceConstant(value[name]);
+        JSVal property = value[name];
         if (property.IsUint()) {
             unsigned int int_value = property.GetUint();
             if (int_value > std::numeric_limits<uint16_t>::max()) {
@@ -185,7 +155,7 @@ template<> StyleParser::Status StyleParser::parseRenderProperty(JSVal value, uin
 
 template<> StyleParser::Status StyleParser::parseRenderProperty(JSVal value, int32_t &target, const char *name) {
     if (value.HasMember(name)) {
-        JSVal property = replaceConstant(value[name]);
+        JSVal property = value[name];
         if (property.IsInt()) {
             target = property.GetInt();
             return StyleParserSuccess;
@@ -198,7 +168,7 @@ template<> StyleParser::Status StyleParser::parseRenderProperty(JSVal value, int
 
 template<> StyleParser::Status StyleParser::parseRenderProperty(JSVal value, vec2<float> &target, const char *name) {
     if (value.HasMember(name)) {
-        JSVal property = replaceConstant(value[name]);
+        JSVal property = value[name];
         if (property.IsArray()) {
             if (property.Size() >= 2) {
                 target.x = property[(rapidjson::SizeType)0].GetDouble();
@@ -217,7 +187,7 @@ template<> StyleParser::Status StyleParser::parseRenderProperty(JSVal value, vec
 template<typename Parser, typename T>
 StyleParser::Status StyleParser::parseRenderProperty(JSVal value, T &target, const char *name) {
     if (value.HasMember(name)) {
-        JSVal property = replaceConstant(value[name]);
+        JSVal property = value[name];
         if (property.IsString()) {
             target = Parser({ property.GetString(), property.GetStringLength() });
             return StyleParserSuccess;
@@ -277,7 +247,7 @@ StyleParser::Result<std::vector<float>> StyleParser::parseFloatArray(JSVal value
 
     std::vector<float> vec;
     for (rapidjson::SizeType i = 0; i < value.Size(); ++i) {
-        JSVal part = replaceConstant(value[i]);
+        JSVal part = value[i];
         if (!part.IsNumber()) {
             Log::Warning(Event::ParseStyle, "dasharray value must be an array of numbers");
             return Result<std::vector<float>> { StyleParserFailure, std::vector<float>() };
@@ -304,9 +274,8 @@ StyleParser::Result<std::array<float, 2>> StyleParser::parseProperty(JSVal value
 
 template <>
 StyleParser::Result<float> StyleParser::parseProperty(JSVal value, const char* property_name) {
-    JSVal rvalue = replaceConstant(value);
-    if (rvalue.IsNumber()) {
-        return Result<float> { StyleParserSuccess, rvalue.GetDouble() };
+    if (value.IsNumber()) {
+        return Result<float> { StyleParserSuccess, value.GetDouble() };
     } else {
         Log::Warning(Event::ParseStyle, "value of '%s' must be a number, or a number function", property_name);
         return Result<float> { StyleParserFailure, 0.0f };
@@ -315,23 +284,20 @@ StyleParser::Result<float> StyleParser::parseProperty(JSVal value, const char* p
 
 template <>
 StyleParser::Result<Color> StyleParser::parseProperty(JSVal value, const char*) {
-    JSVal rvalue = replaceConstant(value);
-    return Result<Color> { StyleParserSuccess, parseColor(rvalue) };
+    return Result<Color> { StyleParserSuccess, parseColor(value) };
 }
 
 template <>
 StyleParser::Result<Faded<std::vector<float>>> StyleParser::parseProperty(JSVal value, const char*) {
     Faded<std::vector<float>> parsed;
-    JSVal rvalue = replaceConstant(value);
-    parsed.to = std::get<1>(parseFloatArray(rvalue));
+    parsed.to = std::get<1>(parseFloatArray(value));
     return Result<Faded<std::vector<float>>> { StyleParserSuccess, parsed };
 }
 
 template <>
 StyleParser::Result<Faded<std::string>> StyleParser::parseProperty(JSVal value, const char *property_name) {
-    JSVal rvalue = replaceConstant(value);
     Faded<std::string> parsed;
-    if (rvalue.IsString()) {
+    if (value.IsString()) {
         parsed.to = { value.GetString(), value.GetStringLength() };
         return Result<Faded<std::string>> { StyleParserSuccess, parsed };
     } else {
@@ -364,7 +330,7 @@ StyleParser::Result<std::vector<std::pair<float, T>>> StyleParser::parseStops(JS
                 return Result<std::vector<std::pair<float, T>>> { StyleParserFailure, {}};
             }
 
-            stops.emplace_back(z.GetDouble(), std::get<1>(parseProperty<T>(replaceConstant(stop[rapidjson::SizeType(1)]), property_name)));
+            stops.emplace_back(z.GetDouble(), std::get<1>(parseProperty<T>(stop[rapidjson::SizeType(1)], property_name)));
         } else {
             Log::Warning(Event::ParseStyle, "function argument must be a numeric value");
             return Result<std::vector<std::pair<float, T>>> { StyleParserFailure, {}};
@@ -455,7 +421,7 @@ StyleParser::Status StyleParser::parseOptionalProperty(const char *property_name
     if (!value.HasMember(property_name)) {
         return StyleParserFailure;
     } else {
-        return setProperty<T>(replaceConstant(value[property_name]), property_name, key, klass);
+        return setProperty<T>(value[property_name], property_name, key, klass);
     }
 }
 
@@ -465,10 +431,10 @@ StyleParser::Status StyleParser::parseOptionalProperty(const char *property_name
         return StyleParserFailure;
     } else {
         if (value.HasMember(transition_name)) {
-            return setProperty<T>(replaceConstant(value[property_name]), property_name, key, klass, value[transition_name]);
+            return setProperty<T>(value[property_name], property_name, key, klass, value[transition_name]);
         } else {
             JSVal val = JSVal(rapidjson::kObjectType);
-            return setProperty<T>(replaceConstant(value[property_name]), property_name, key, klass, val);
+            return setProperty<T>(value[property_name], property_name, key, klass, val);
         }
     }
 }
@@ -780,7 +746,7 @@ void StyleParser::parseLayer(std::pair<JSVal, util::ptr<StyleLayer>> &pair) {
     if (value.HasMember("ref")) {
         // This layer is referencing another layer. Inherit the bucket from that layer, if we
         // already parsed it.
-        parseReference(replaceConstant(value["ref"]), layer);
+        parseReference(value["ref"], layer);
     } else {
         // Otherwise, parse the source/source-layer/filter/render keys to form the bucket.
         parseBucket(value, layer);
@@ -795,10 +761,10 @@ void StyleParser::parsePaints(JSVal value, std::map<ClassID, ClassProperties> &p
         const std::string name { itr->name.GetString(), itr->name.GetStringLength() };
 
         if (name == "paint") {
-            parsePaint(replaceConstant(itr->value), paints[ClassID::Default]);
+            parsePaint(itr->value, paints[ClassID::Default]);
         } else if (name.compare(0, 6, "paint.") == 0 && name.length() > 6) {
             const ClassID class_id = ClassDictionary::Get().lookup(name.substr(6));
-            parsePaint(replaceConstant(itr->value), paints[class_id]);
+            parsePaint(itr->value, paints[class_id]);
         }
     }
 }
@@ -968,7 +934,7 @@ void StyleParser::parseBucket(JSVal value, util::ptr<StyleLayer> &layer) {
     bucket->name = layer->id;
 
     if (value.HasMember("source")) {
-        JSVal value_source = replaceConstant(value["source"]);
+        JSVal value_source = value["source"];
         if (value_source.IsString()) {
             bucket->source = { value_source.GetString(), value_source.GetStringLength() };
             auto source_it = sourcesMap.find(bucket->source);
@@ -981,7 +947,7 @@ void StyleParser::parseBucket(JSVal value, util::ptr<StyleLayer> &layer) {
     }
 
     if (value.HasMember("source-layer")) {
-        JSVal value_source_layer = replaceConstant(value["source-layer"]);
+        JSVal value_source_layer = value["source-layer"];
         if (value_source_layer.IsString()) {
             bucket->source_layer = { value_source_layer.GetString(), value_source_layer.GetStringLength() };
         } else {
@@ -990,13 +956,11 @@ void StyleParser::parseBucket(JSVal value, util::ptr<StyleLayer> &layer) {
     }
 
     if (value.HasMember("filter")) {
-        JSVal value_filter = replaceConstant(value["filter"]);
-        bucket->filter = parseFilterExpression(value_filter);
+        bucket->filter = parseFilterExpression(value["filter"]);
     }
 
     if (value.HasMember("layout")) {
-        JSVal value_render = replaceConstant(value["layout"]);
-        parseLayout(value_render, bucket);
+        parseLayout(value["layout"], bucket);
     }
 
     if (value.HasMember("minzoom")) {

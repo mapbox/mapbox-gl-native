@@ -52,9 +52,6 @@ public:
     }
 
 private:
-    void parseConstants(JSVal value);
-    JSVal replaceConstant(JSVal value);
-
     void parseSources(JSVal value);
     void parseLayers(JSVal value);
     void parseLayer(std::pair<JSVal, util::ptr<StyleLayer>> &pair);
@@ -101,8 +98,6 @@ private:
     FilterExpression parseFilter(JSVal);
 
 private:
-    std::unordered_map<std::string, const rapidjson::Value *> constants;
-
     std::uint8_t version;
 
     std::vector<std::unique_ptr<Source>> sources;
