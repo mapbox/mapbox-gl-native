@@ -100,7 +100,7 @@ Makefile/%: Makefile/__project__
 
 Xcode/%: Xcode/__project__
 	@printf "$(TEXT_BOLD)$(COLOR_GREEN)* Building target $*...$(FORMAT_END)\n"
-	$(QUIET)$(ENV) xcodebuild \
+	$(QUIET)$(ENV) set -o pipefail && xcodebuild \
 		$(XCODEBUILD_ARGS) \
 		-project ./build/$(HOST_SLUG)/gyp/$(HOST).xcodeproj \
 		-configuration $(BUILDTYPE) \
