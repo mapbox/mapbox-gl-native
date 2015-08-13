@@ -581,6 +581,13 @@ void JNICALL nativeCancelTransitions(JNIEnv *env, jobject obj, jlong nativeMapVi
     nativeMapView->getMap().cancelTransitions();
 }
 
+void JNICALL nativeSetGestureInProgress(JNIEnv *env, jobject obj, jlong nativeMapViewPtr, jboolean inProgress) {
+    mbgl::Log::Debug(mbgl::Event::JNI, "nativeSetGestureInProgress");
+    assert(nativeMapViewPtr != 0);
+    NativeMapView *nativeMapView = reinterpret_cast<NativeMapView *>(nativeMapViewPtr);
+    nativeMapView->getMap().setGestureInProgress(inProgress);
+}
+
 void JNICALL nativeMoveBy(JNIEnv *env, jobject obj, jlong nativeMapViewPtr, jdouble dx, jdouble dy,
                           jlong duration) {
     mbgl::Log::Debug(mbgl::Event::JNI, "nativeMoveBy");
@@ -1549,6 +1556,7 @@ extern "C" JNIEXPORT jint JNICALL JNI_OnLoad(JavaVM *vm, void *reserved) {
         {"nativeGetAccessToken", "(J)Ljava/lang/String;",
          reinterpret_cast<void *>(&nativeGetAccessToken)},
         {"nativeCancelTransitions", "(J)V", reinterpret_cast<void *>(&nativeCancelTransitions)},
+        {"nativeSetGestureInProgress", "(JZ)V", reinterpret_cast<void *>(&nativeSetGestureInProgress)},
         {"nativeMoveBy", "(JDDJ)V", reinterpret_cast<void *>(&nativeMoveBy)},
         {"nativeSetLatLng", "(JLcom/mapbox/mapboxgl/geometry/LatLng;J)V",
          reinterpret_cast<void *>(&nativeSetLatLng)},

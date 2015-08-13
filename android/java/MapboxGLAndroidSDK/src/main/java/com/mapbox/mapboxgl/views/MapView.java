@@ -793,6 +793,7 @@ public class MapView extends FrameLayout implements LocationListener {
         switch (event.getActionMasked()) {
             case MotionEvent.ACTION_DOWN:
                 // First pointer down
+                mNativeMapView.setGestureInProgress(true);
                 break;
 
             case MotionEvent.ACTION_POINTER_DOWN:
@@ -809,6 +810,7 @@ public class MapView extends FrameLayout implements LocationListener {
                 long tapInterval = event.getEventTime() - event.getDownTime();
                 boolean isTap = tapInterval <= ViewConfiguration.getTapTimeout();
                 boolean inProgress = mRotateGestureDetector.isInProgress() || mScaleGestureDetector.isInProgress();
+                mNativeMapView.setGestureInProgress(false);
 
                 if (mTwoTap && isTap && !inProgress) {
                     PointF focalPoint = TwoFingerGestureDetector.determineFocalPoint(event);
@@ -822,6 +824,7 @@ public class MapView extends FrameLayout implements LocationListener {
 
             case MotionEvent.ACTION_CANCEL:
                 mTwoTap = false;
+                mNativeMapView.setGestureInProgress(false);
                 break;
         }
 
@@ -938,7 +941,6 @@ public class MapView extends FrameLayout implements LocationListener {
             }
 
             mBeginTime = detector.getEventTime();
-
             return true;
         }
 

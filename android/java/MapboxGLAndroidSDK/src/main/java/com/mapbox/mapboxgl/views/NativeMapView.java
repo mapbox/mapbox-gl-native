@@ -208,6 +208,10 @@ class NativeMapView {
         nativeCancelTransitions(mNativeMapViewPtr);
     }
 
+    public void setGestureInProgress(boolean inProgress) {
+        nativeSetGestureInProgress(mNativeMapViewPtr, inProgress);
+    }
+
     public void moveBy(double dx, double dy) {
         moveBy(dx, dy, 0);
     }
@@ -497,6 +501,8 @@ class NativeMapView {
     private native String nativeGetAccessToken(long nativeMapViewPtr);
 
     private native void nativeCancelTransitions(long nativeMapViewPtr);
+
+    private native void nativeSetGestureInProgress(long nativeMapViewPtr, boolean inProgress);
 
     private native void nativeMoveBy(long nativeMapViewPtr, double dx,
             double dy, long duration);
