@@ -33,8 +33,10 @@ namespace matrix {
 
 void identity(mat4& out);
 void ortho(mat4& out, float left, float right, float bottom, float top, float near, float far);
+void perspective(mat4& out, float fovy, float aspect, float near, float far);
 void copy(mat4& out, const mat4& a);
 void translate(mat4& out, const mat4& a, float x, float y, float z);
+void rotate_x(mat4& out, const mat4& a, float rad);
 void rotate_z(mat4& out, const mat4& a, float rad);
 void scale(mat4& out, const mat4& a, float x, float y, float z);
 void multiply(mat4& out, const mat4& a, const mat4& b);
