@@ -72,7 +72,7 @@ android-lib: ; $(RUN) HOST=android Makefile/androidapp
 
 # Builds the selected/default Android library
 android: android-lib
-	cd android/java && ./gradlew --parallel-threads=$(JOBS) assemble$(BUILDTYPE)
+	cd android/java && ./gradlew --parallel --max-workers=$(JOBS) assemble$(BUILDTYPE)
 
 # Builds all android architectures.
 android-all: android-lib-arm-v5 android-lib-arm-v7 android-lib-arm-v8
