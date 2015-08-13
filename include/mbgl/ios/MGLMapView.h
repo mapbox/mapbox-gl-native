@@ -486,7 +486,7 @@ IB_DESIGNABLE
 
 /** Tells the delegate that the location of the user was updated.
 *
-*   While the showsUserLocation property is set to `YES`, this method is called whenever a new location update is received by the map view. This method is also called if the map view’s user tracking mode is set to MGLUserTrackingModeFollowWithHeading and the heading changes.
+*   While the showsUserLocation property is set to `YES`, this method is called whenever a new location update is received by the map view. This method is also called if the map view’s user tracking mode is set to MGLUserTrackingModeFollowWithHeading and the heading changes, or if it is set to MGLUserTrackingModeFollowWithCourse and the course changes.
 *
 *   This method is not called if the application is currently running in the background. If you want to receive location updates while running in the background, you must use the Core Location framework.
 *

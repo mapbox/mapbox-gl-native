@@ -74,7 +74,8 @@ const CGFloat MGLUserLocationAnnotationHaloSize = 115.0;
         //
         if (_headingIndicatorLayer)
         {
-            _headingIndicatorLayer.hidden = (_mapView.userTrackingMode == MGLUserTrackingModeFollowWithHeading) ? NO : YES;
+            _headingIndicatorLayer.hidden = !(_mapView.userTrackingMode == MGLUserTrackingModeFollowWithHeading ||
+                                              _mapView.userTrackingMode == MGLUserTrackingModeFollowWithCourse);
             
             if (_oldHeadingAccuracy != self.annotation.heading.headingAccuracy)
             {

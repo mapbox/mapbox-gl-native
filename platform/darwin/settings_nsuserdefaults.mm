@@ -30,7 +30,7 @@ void Settings_NSUserDefaults::load()
     
     unsigned uncheckedTrackingMode = [settings[@"trackingMode"] unsignedIntValue];
     if (uncheckedTrackingMode > MGLUserTrackingModeNone &&
-        uncheckedTrackingMode <= MGLUserTrackingModeFollowWithHeading)
+        uncheckedTrackingMode <= MGLUserTrackingModeFollowWithCourse)
     {
         userTrackingMode = (MGLUserTrackingMode)uncheckedTrackingMode;
     }

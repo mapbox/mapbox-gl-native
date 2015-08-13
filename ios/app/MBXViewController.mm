@@ -310,18 +310,20 @@ mbgl::Settings_NSUserDefaults *settings = nullptr;
 
 - (void)locateUser
 {
-    if (self.mapView.userTrackingMode == MGLUserTrackingModeNone)
-    {
-        self.mapView.userTrackingMode = MGLUserTrackingModeFollow;
+    MGLUserTrackingMode nextMode;
+    switch (self.mapView.userTrackingMode) {
+        case MGLUserTrackingModeNone:
+            nextMode = MGLUserTrackingModeFollow;
+            break;
+        case MGLUserTrackingModeFollow:
+            nextMode = MGLUserTrackingModeFollowWithHeading;
+            break;
+        case MGLUserTrackingModeFollowWithHeading:
+        case MGLUserTrackingModeFollowWithCourse:
+            nextMode = MGLUserTrackingModeNone;
+            break;
     }
-    else if (self.mapView.userTrackingMode == MGLUserTrackingModeFollow)
-    {
-        self.mapView.userTrackingMode = MGLUserTrackingModeFollowWithHeading;
-    }
-    else
-    {
-        self.mapView.userTrackingMode = MGLUserTrackingModeNone;
-    }
+    self.mapView.userTrackingMode = nextMode;
 }
 
 #pragma mark - Destruction
@@ -413,6 +415,7 @@ mbgl::Settings_NSUserDefaults *settings = nullptr;
             break;
             
         case MGLUserTrackingModeFollowWithHeading:
+        case MGLUserTrackingModeFollowWithCourse:
             newButtonImage = [UIImage imageNamed:@"TrackingHeadingMask.png"];
             break;
     }
