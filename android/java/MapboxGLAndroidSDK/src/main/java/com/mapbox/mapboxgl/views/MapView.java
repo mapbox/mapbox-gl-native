@@ -154,6 +154,24 @@ public class MapView extends FrameLayout implements LocationListener {
     // Used to manage Event Listeners
     private ArrayList<OnMapChangedListener> mOnMapChangedListener;
 
+    public interface OnFlingListener {
+        void onFling();
+    }
+
+    public interface OnScrollListener {
+        void onScroll();
+    }
+
+    private OnFlingListener onFlingListener;
+    private OnScrollListener onScrollListener;
+
+    public void setOnScrollListener(OnScrollListener onScrollListener) {
+        this.onScrollListener = onScrollListener;
+    }
+
+    public void setOnFlingListener(OnFlingListener onFlingListener) {
+        this.onFlingListener = onFlingListener;
+    }
 
     //
     // Properties
@@ -865,6 +883,8 @@ public class MapView extends FrameLayout implements LocationListener {
             // Cancel any animation
             mNativeMapView.cancelTransitions();
 
+            performClick();
+
             return true;
         }
 
@@ -878,6 +898,7 @@ public class MapView extends FrameLayout implements LocationListener {
         @Override
         public void onLongPress(MotionEvent e) {
             // TODO
+            performLongClick();
         }
 
         // Called for flings
@@ -905,6 +926,10 @@ public class MapView extends FrameLayout implements LocationListener {
 
             mNativeMapView.moveBy(velocityX * duration / 2.0 / mScreenDensity, velocityY * duration / 2.0 / mScreenDensity, (long) (duration * 1000.0f));
 
+            if(onFlingListener != null){
+                onFlingListener.onFling();
+            }
+
             return true;
         }
 
@@ -922,6 +947,11 @@ public class MapView extends FrameLayout implements LocationListener {
 
             // Scroll the map
             mNativeMapView.moveBy(-distanceX / mScreenDensity, -distanceY / mScreenDensity);
+
+            if(onScrollListener != null){
+                onScrollListener.onScroll();
+            }
+
             return true;
         }
     }
