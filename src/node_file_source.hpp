@@ -13,7 +13,6 @@
 #include <memory>
 #include <mutex>
 #include <unordered_map>
-#include <vector>
 
 namespace node_mbgl {
 
@@ -47,13 +46,12 @@ private:
 #endif
 
     // The observers list will hold pointers to all the requests waiting
-    // for a particular resource. It is also used for coalescing requests,
-    // so we don't ask for the same resources twice. The access must be
-    // guarded by a mutex because the list is also accessed by a thread
-    // from the mbgl::Map object and from the main thread when notifying
-    // requests of completion. Concurrent access is specially needed when
+    // for a particular resource. The access must be guarded by a mutex
+    // because the list is also accessed by a thread from the mbgl::Map
+    // object and from the main thread when notifying requests of
+    // completion. Concurrent access is specially needed when
     // canceling a request to avoid a deadlock (see #129).
-    std::unordered_map<mbgl::Resource, std::vector<mbgl::Request*>, mbgl::Resource::Hash> observers;
+    std::unordered_map<mbgl::Resource, mbgl::Request*, mbgl::Resource::Hash> observers;
     std::mutex observersMutex;
 
     Queue *queue = nullptr;
