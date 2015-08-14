@@ -4,8 +4,6 @@
 
 #include <mbgl/storage/request.hpp>
 
-#include <algorithm>
-
 namespace node_mbgl {
 
 struct NodeFileSource::Action {
@@ -39,16 +37,13 @@ mbgl::Request* NodeFileSource::request(const mbgl::Resource& resource, uv_loop_t
     auto req = new mbgl::Request(resource, loop, std::move(callback));
 
     std::lock_guard<std::mutex> lock(observersMutex);
-    auto it = observers.find(resource);
-    if (it == observers.end()) {
-        observers[resource] = { req };
 
-        // This function can be called from any thread. Make sure we're executing the actual call in the
-        // file source loop by sending it over the queue. It will be processed in processAction().
-        queue->send(Action{ Action::Add, resource });
-    } else {
-        it->second.emplace_back(req);
-    }
+    assert(observers.find(resource) == observers.end());
+    observers[resource] = req;
+
+    // This function can be called from any thread. Make sure we're executing the actual call in the
+    // file source loop by sending it over the queue. It will be processed in processAction().
+    queue->send(Action{ Action::Add, resource });
 
     return req;
 }
@@ -58,25 +53,16 @@ void NodeFileSource::cancel(mbgl::Request* req) {
 
     std::lock_guard<std::mutex> lock(observersMutex);
 
-    auto observersIter = observers.find(req->resource);
-    if (observersIter == observers.end()) {
+    auto it = observers.find(req->resource);
+    if (it == observers.end()) {
         return;
     }
 
-    auto& observersList = observersIter->second;
-    auto observersListIter = std::find(observersList.begin(), observersList.end(), req);
-    if (observersListIter == observersList.end()) {
-        return;
-    }
+    observers.erase(it);
 
-    observersList.erase(observersListIter);
-    if (observersList.empty()) {
-        observers.erase(observersIter);
-
-        // This function can be called from any thread. Make sure we're executing the actual call in the
-        // file source loop by sending it over the queue. It will be processed in processAction().
-        queue->send(Action{ Action::Cancel, req->resource });
-    }
+    // This function can be called from any thread. Make sure we're executing the actual call in the
+    // file source loop by sending it over the queue. It will be processed in processAction().
+    queue->send(Action{ Action::Cancel, req->resource });
 
     req->destruct();
 }
@@ -161,23 +147,15 @@ void NodeFileSource::notify(const mbgl::Resource& resource, const std::shared_pt
         }
     }
 
-    std::vector<mbgl::Request*> observersList;
+    std::lock_guard<std::mutex> lock(observersMutex);
 
-    {
-        std::lock_guard<std::mutex> lock(observersMutex);
-
-        auto observersIter = observers.find(resource);
-        if (observersIter == observers.end()) {
-            return;
-        }
-
-        observersList.swap(observersIter->second);
-        observers.erase(observersIter);
+    auto observersIt = observers.find(resource);
+    if (observersIt == observers.end()) {
+        return;
     }
 
-    for (auto request : observersList) {
-        request->notify(response);
-    }
+    observersIt->second->notify(response);
+    observers.erase(observersIt);
 }
 
 }
