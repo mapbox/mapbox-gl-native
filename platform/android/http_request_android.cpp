@@ -53,12 +53,7 @@ public:
 
 private:
     void retry(uint64_t timeout) final;
-#if UV_VERSION_MAJOR == 0 && UV_VERSION_MINOR <= 10
-    static void restart(uv_timer_t *timer, int);
-#else
-    static void restart(uv_timer_t *timer);
-#endif
-    void finish(ResponseStatus status);
+    void finish();
     void start();
 
     HTTPAndroidContext *context = nullptr;
@@ -67,10 +62,12 @@ private:
 
     std::unique_ptr<Response> response;
     const std::shared_ptr<const Response> existingResponse;
+    ResponseStatus status = ResponseStatus::PermanentError;
 
     jobject obj = nullptr;
 
-    uv_timer_t *timer = nullptr;
+    uv::async async;
+    uv::timer timer;
     enum : bool { PreemptImmediately, ExponentialBackoff } strategy = PreemptImmediately;
     int attempts = 0;
 
@@ -134,10 +131,12 @@ HTTPRequestBase* HTTPAndroidContext::createRequest(const Resource& resource,
     return new HTTPAndroidRequest(this, resource, callback, loop_, response);
 }
 
-HTTPAndroidRequest::HTTPAndroidRequest(HTTPAndroidContext* context_, const Resource& resource_, Callback callback_, uv_loop_t*, std::shared_ptr<const Response> response_)
+HTTPAndroidRequest::HTTPAndroidRequest(HTTPAndroidContext* context_, const Resource& resource_, Callback callback_, uv_loop_t* loop, std::shared_ptr<const Response> response_)
     : HTTPRequestBase(resource_, callback_),
       context(context_),
-      existingResponse(response_) {
+      existingResponse(response_),
+      async(loop, [this] { finish(); }),
+      timer(loop) {
 
     std::string etagStr;
     std::string modifiedStr;
@@ -183,11 +182,7 @@ HTTPAndroidRequest::~HTTPAndroidRequest() {
 
     mbgl::android::detach_jni_thread(context->vm, &env, detach);
 
-    if (timer) {
-        uv_timer_stop(timer);
-        uv::close(timer);
-        timer = nullptr;
-    }
+    timer.stop();
 }
 
 void HTTPAndroidRequest::cancel() {
@@ -221,46 +216,32 @@ void HTTPAndroidRequest::start() {
 void HTTPAndroidRequest::retry(uint64_t timeout) {
     response.reset();
 
-    assert(!timer);
-    timer = new uv_timer_t;
-    timer->data = this;
-    uv_timer_init(context->loop, timer);
-    uv_timer_start(timer, restart, timeout, 0);
+    timer.stop();
+    timer.start(timeout, 0, [this] { start(); });
 }
 
 void HTTPAndroidRequest::retry() {
-    if (timer && strategy == PreemptImmediately) {
-        uv_timer_stop(timer);
-        uv_timer_start(timer, restart, 0, 0);
+    if (strategy == PreemptImmediately) {
+        timer.stop();
+        timer.start(0, 0, [this] { start(); });
     }
 }
 
-#if UV_VERSION_MAJOR == 0 && UV_VERSION_MINOR <= 10
-void HTTPAndroidRequest::restart(uv_timer_t *timer, int) {
-#else
-void HTTPAndroidRequest::restart(uv_timer_t *timer) {
-#endif
-    auto baton = reinterpret_cast<HTTPAndroidRequest *>(timer->data);
+void HTTPAndroidRequest::finish() {
+    if (!cancelled) {
+        if (status == ResponseStatus::TemporaryError && attempts < maxAttempts) {
+            strategy = ExponentialBackoff;
+            return retry((1 << (attempts - 1)) * 1000);
+        } else if (status == ResponseStatus::ConnectionError && attempts < maxAttempts) {
+            strategy = PreemptImmediately;
+            return retry(30000);
+        }
 
-    baton->timer = nullptr;
-    uv::close(timer);
-
-    baton->start();
-}
-
-void HTTPAndroidRequest::finish(ResponseStatus status) {
-    if (status == ResponseStatus::TemporaryError && attempts < maxAttempts) {
-        strategy = ExponentialBackoff;
-        return retry((1 << (attempts - 1)) * 1000);
-    } else if (status == ResponseStatus::ConnectionError && attempts < maxAttempts) {
-        strategy = PreemptImmediately;
-        return retry(30000);
-    }
-
-    if (status == ResponseStatus::NotModified) {
-        notify(std::move(response), FileCache::Hint::Refresh);
-    } else {
-        notify(std::move(response), FileCache::Hint::Full);
+        if (status == ResponseStatus::NotModified) {
+            notify(std::move(response), FileCache::Hint::Refresh);
+        } else {
+            notify(std::move(response), FileCache::Hint::Full);
+        }
     }
 
     delete this;
@@ -282,11 +263,6 @@ int64_t parseCacheControl(const char *value) {
 }
 
 void HTTPAndroidRequest::onResponse(int code, std::string message, std::string etag, std::string modified, std::string cacheControl, std::string expires, std::string body) {
-    if (cancelled) {
-        delete this;
-        return;
-    }
-
     if (!response) {
         response = std::make_unique<Response>();
     }
@@ -307,33 +283,28 @@ void HTTPAndroidRequest::onResponse(int code, std::string message, std::string e
             response->modified = existingResponse->modified;
             response->etag = existingResponse->etag;
             response->data = existingResponse->data;
-            return finish(ResponseStatus::NotModified);
+            status = ResponseStatus::NotModified;
         } else {
             response->status = Response::Successful;
-            return finish(ResponseStatus::Successful);
+            status = ResponseStatus::Successful;
         }
     } else if (code == 200) {
         response->status = Response::Successful;
-        return finish(ResponseStatus::Successful);
+        status = ResponseStatus::Successful;
     } else if (code >= 500 && code < 600) {
         response->status = Response::Error;
         response->message = "HTTP status code " + util::toString(code);
-        return finish(ResponseStatus::TemporaryError);
+        status = ResponseStatus::TemporaryError;
     } else {
         response->status = Response::Error;
         response->message = "HTTP status code " + util::toString(code);
-        return finish(ResponseStatus::PermanentError);
+        status = ResponseStatus::PermanentError;
     }
 
-    throw std::runtime_error("Response hasn't been handled");
+    async.send();
 }
 
 void HTTPAndroidRequest::onFailure(int type, std::string message) {
-    if (cancelled) {
-        delete this;
-        return;
-    }
-
     if (!response) {
         response = std::make_unique<Response>();
     }
@@ -343,16 +314,16 @@ void HTTPAndroidRequest::onFailure(int type, std::string message) {
 
     switch (type) {
     case connectionError:
-        return finish(ResponseStatus::ConnectionError);
+        status = ResponseStatus::ConnectionError;
 
     case temporaryError:
-        return finish(ResponseStatus::TemporaryError);
+        status = ResponseStatus::TemporaryError;
 
     default:
-        return finish(ResponseStatus::PermanentError);
+        status = ResponseStatus::PermanentError;
     }
 
-    throw std::runtime_error("Response hasn't been handled");
+    async.send();
 }
 
 std::unique_ptr<HTTPContextBase> HTTPContextBase::createContext(uv_loop_t* loop) {

@@ -84,8 +84,15 @@ class HTTPContext {
 
         @Override
         public void onResponse(Response response) throws IOException {
-            byte[] body = response.body().bytes();
-            response.body().close();
+            byte[] body;
+            try {
+                body = response.body().bytes();
+            } catch (IOException e) {
+                onFailure(mRequest, e);
+                return;
+            } finally {
+                response.body().close();
+            }
 
             nativeOnResponse(mNativePtr, response.code(), response.message(), response.header("ETag"), response.header("Last-Modified"), response.header("Cache-Control"), response.header("Expires"), body);
         }
