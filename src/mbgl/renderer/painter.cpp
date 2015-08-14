@@ -132,8 +132,27 @@ void Painter::lineWidth(float line_width) {
 }
 
 void Painter::changeMatrix() {
-    // Initialize projection matrix
-    matrix::ortho(projMatrix, 0, state.getWidth(), state.getHeight(), 0, -1, 1);
+
+    double halfFov = std::atan(0.5 / state.getAltitude());
+    double topHalfSurfaceDistance = std::sin(halfFov) * state.getAltitude() /
+        std::sin(M_PI / 2.0f - state.getPitch() - halfFov);
+    // Calculate z value of the farthest fragment that should be rendered.
+    double farZ = std::cos(M_PI / 2.0f - state.getPitch()) * topHalfSurfaceDistance + state.getAltitude();
+
+    matrix::perspective(projMatrix, 2.0f * std::atan((state.getHeight() / 2.0f) / state.getAltitude()),
+            double(state.getWidth()) / state.getHeight(), 0.1, farZ);
+
+    matrix::translate(projMatrix, projMatrix, 0, 0, -state.getAltitude());
+
+    // After the rotateX, z values are in pixel units. Convert them to
+    // altitude unites. 1 altitude unit = the screen height.
+    matrix::scale(projMatrix, projMatrix, 1, -1, 1.0f / state.getHeight());
+
+    matrix::rotate_x(projMatrix, projMatrix, state.getPitch());
+    matrix::rotate_z(projMatrix, projMatrix, state.getAngle());
+
+    matrix::translate(projMatrix, projMatrix, state.pixel_x() - state.getWidth() / 2.0f,
+            state.pixel_y() - state.getWidth() / 2.0f, 0);
 
     // The extrusion matrix.
     matrix::identity(extrudeMatrix);

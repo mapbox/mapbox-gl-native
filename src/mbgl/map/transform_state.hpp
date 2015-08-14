@@ -49,6 +49,9 @@ public:
     // Rotation
     float getAngle() const;
 
+    float getAltitude() const;
+    float getPitch() const;
+
     // Projection
     const vec2<double> pixelForLatLng(const LatLng latLng) const;
     const LatLng latLngForPixel(const vec2<double> pixel) const;
@@ -56,15 +59,15 @@ public:
     // Changing
     bool isChanging() const;
 
+    double pixel_x() const;
+    double pixel_y() const;
+
 private:
     void constrain(double& scale, double& y) const;
 
     // Limit the amount of zooming possible on the map.
     double min_scale = std::pow(2, 0);
     double max_scale = std::pow(2, 18);
-
-    double pixel_x() const;
-    double pixel_y() const;
 
     // logical dimensions
     uint16_t width = 0, height = 0;
@@ -80,6 +83,8 @@ private:
     double x = 0, y = 0;
     double angle = 0;
     double scale = 1;
+    double altitude = 1.5;
+    double pitch = 0;
 
     // cache values for spherical mercator math
     double Bc = (scale * util::tileSize) / 360;

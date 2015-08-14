@@ -117,6 +117,7 @@ struct DepthTest {
     static const Type Default;
     inline static void Set(const Type& value) {
         MBGL_CHECK_ERROR(value ? glEnable(GL_DEPTH_TEST) : glDisable(GL_DEPTH_TEST));
+        MBGL_CHECK_ERROR(glDisable(GL_DEPTH_TEST));
     }
 };
 

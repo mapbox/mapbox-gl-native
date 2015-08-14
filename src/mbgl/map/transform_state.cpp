@@ -10,19 +10,11 @@ using namespace mbgl;
 
 void TransformState::matrixFor(mat4& matrix, const TileID& id, const int8_t z) const {
     const double tile_scale = std::pow(2, z);
-    const double tile_size = scale * util::tileSize / tile_scale;
+    double s = util::tileSize * scale / tile_scale;
 
     matrix::identity(matrix);
-
-    matrix::translate(matrix, matrix, 0.5f * (float)width, 0.5f * (float)height, 0);
-    matrix::rotate_z(matrix, matrix, angle);
-    matrix::translate(matrix, matrix, -0.5f * (float)width, -0.5f * (float)height, 0);
-
-    matrix::translate(matrix, matrix, pixel_x() + id.x * tile_size, pixel_y() + id.y * tile_size, 0);
-
-    // TODO: Get rid of the 8 (scaling from 4096 to tile size);
-    float factor = scale / tile_scale / (4096.0f / util::tileSize);
-    matrix::scale(matrix, matrix, factor, factor, 1);
+    matrix::translate(matrix, matrix, id.x * s, id.y * s, 0);
+    matrix::scale(matrix, matrix, s / 4096.0f, s / 4096.0f, 1);
 }
 
 box TransformState::cornersToBox(uint32_t z) const {
@@ -154,6 +146,13 @@ float TransformState::getAngle() const {
     return angle;
 }
 
+float TransformState::getAltitude() const {
+    return altitude;
+}
+
+float TransformState::getPitch() const {
+    return pitch;
+}
 
 #pragma mark - Projection
 
