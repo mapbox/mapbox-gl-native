@@ -58,9 +58,9 @@ v8::Handle<v8::Object> NodeRequest::Create(NodeFileSource* source, const mbgl::R
 
 NAN_METHOD(NodeRequest::Respond) {
     auto nodeRequest = ObjectWrap::Unwrap<NodeRequest>(args.Holder());
-    if (!nodeRequest->resource) {
-        return NanThrowError("Request has already been responded to, or was canceled.");
-    }
+
+    // Request has already been responded to, or was canceled, fail silently.
+    if (!nodeRequest->resource) NanReturnUndefined();
 
     auto source = nodeRequest->source;
     auto resource = std::move(nodeRequest->resource);
