@@ -28,25 +28,40 @@ void Painter::renderSDF(SymbolBucket &bucket,
 {
     mat4 vtxMatrix = translatedMatrix(matrix, styleProperties.translate, id, styleProperties.translate_anchor);
 
-    mat4 exMatrix;
-    matrix::copy(exMatrix, projMatrix);
-
     bool aligned_with_map = (bucketProperties.rotation_alignment == RotationAlignmentType::Map);
-    const float angleOffset = aligned_with_map ? state.getAngle() : 0;
+    bool skewed = aligned_with_map;
+    mat4 exMatrix;
+    float s;
+    float gammaScale;
 
-    if (angleOffset) {
-        matrix::rotate_z(exMatrix, exMatrix, angleOffset);
+    if (skewed) {
+        matrix::identity(exMatrix);
+        s = 4096.0f / util::tileSize / id.overscaling / std::pow(2, state.getZoom() - id.z);
+        gammaScale = 1.0f / std::cos(state.getPitch());
+    } else {
+        exMatrix = extrudeMatrix;
+        s = state.getAltitude();
+        gammaScale = 1.0f;
     }
+    matrix::scale(exMatrix, exMatrix, s, s, 1);
 
     // If layerStyle.size > bucket.info.fontSize then labels may collide
     float fontSize = styleProperties.size;
     float fontScale = fontSize / sdfFontSize;
     matrix::scale(exMatrix, exMatrix, fontScale, fontScale, 1.0f);
 
+    // calculate how much longer the real world distance is at the top of the screen
+    // than at the middle of the screen.
+    float topedgelength = std::sqrt(std::pow(state.getHeight(), 2) / 4.0f * (1.0f + std::pow(state.getAltitude(), 2)));
+    float x = state.getHeight() / 2.0f * std::tan(state.getPitch());
+    float extra = (topedgelength + x) / topedgelength - 1;
+
     useProgram(sdfShader.program);
     sdfShader.u_matrix = vtxMatrix;
     sdfShader.u_exmatrix = exMatrix;
     sdfShader.u_texsize = texsize;
+    sdfShader.u_skewed = skewed;
+    sdfShader.u_extra = extra;
 
     // adjust min/max zooms for variable font sies
     float zoomAdjust = std::log(fontSize / bucketProperties.size) / std::log(2);
@@ -70,7 +85,7 @@ void Painter::renderSDF(SymbolBucket &bucket,
     // We're drawing in the translucent pass which is bottom-to-top, so we need
     // to draw the halo first.
     if (styleProperties.halo_color[3] > 0.0f && styleProperties.halo_width > 0.0f) {
-        sdfShader.u_gamma = styleProperties.halo_blur * blurOffset / fontScale / sdfPx + gamma;
+        sdfShader.u_gamma = (styleProperties.halo_blur * blurOffset / fontScale / sdfPx + gamma) * gammaScale;
 
         if (styleProperties.opacity < 1.0f) {
             Color color = styleProperties.halo_color;
@@ -91,7 +106,7 @@ void Painter::renderSDF(SymbolBucket &bucket,
 
     // Then, we draw the text/icon over the halo
     if (styleProperties.color[3] > 0.0f) {
-        sdfShader.u_gamma = gamma;
+        sdfShader.u_gamma = gamma * gammaScale;
 
         if (styleProperties.opacity < 1.0f) {
             Color color = styleProperties.color;
@@ -120,7 +135,6 @@ void Painter::renderSymbol(SymbolBucket &bucket, const StyleLayer &layer_desc, c
     const auto &properties = layer_desc.getProperties<SymbolProperties>();
     const auto &layout = bucket.layout;
 
-    config.depthTest = true;
     config.depthMask = GL_FALSE;
 
     if (bucket.hasCollisionBoxData()) {
@@ -150,6 +164,8 @@ void Painter::renderSymbol(SymbolBucket &bucket, const StyleLayer &layer_desc, c
     config.stencilTest = drawAcrossEdges ? false : true;
 
     if (bucket.hasIconData()) {
+        config.depthTest = layout.icon.rotation_alignment == RotationAlignmentType::Map;
+
         bool sdf = bucket.sdfIcons;
 
         const float angleOffset =
@@ -160,7 +176,8 @@ void Painter::renderSymbol(SymbolBucket &bucket, const StyleLayer &layer_desc, c
         const float fontSize = properties.icon.size;
         const float fontScale = fontSize / 1.0f;
 
-        spriteAtlas->bind(state.isChanging() || layout.placement == PlacementType::Line || angleOffset != 0 || fontScale != 1 || sdf);
+        spriteAtlas->bind(state.isChanging() || layout.placement == PlacementType::Line
+                || angleOffset != 0 || fontScale != 1 || sdf || state.getPitch() != 0);
 
         if (sdf) {
             renderSDF(bucket,
@@ -175,19 +192,33 @@ void Painter::renderSymbol(SymbolBucket &bucket, const StyleLayer &layer_desc, c
         } else {
             mat4 vtxMatrix = translatedMatrix(matrix, properties.icon.translate, id, properties.icon.translate_anchor);
 
+            bool skewed = layout.icon.rotation_alignment == RotationAlignmentType::Map;
             mat4 exMatrix;
-            matrix::copy(exMatrix, projMatrix);
+            float s;
 
-            if (angleOffset) {
-                matrix::rotate_z(exMatrix, exMatrix, angleOffset);
+            if (skewed) {
+                matrix::identity(exMatrix);
+                s = 4096.0f / util::tileSize / id.overscaling / std::pow(2, state.getZoom() - id.z);
+            } else {
+                exMatrix = extrudeMatrix;
+                s = state.getAltitude();
             }
+            matrix::scale(exMatrix, exMatrix, s, s, 1);
 
             matrix::scale(exMatrix, exMatrix, fontScale, fontScale, 1.0f);
+
+            // calculate how much longer the real world distance is at the top of the screen
+            // than at the middle of the screen.
+            float topedgelength = std::sqrt(std::pow(state.getHeight(), 2) / 4.0f * (1.0f + std::pow(state.getAltitude(), 2)));
+            float x = state.getHeight() / 2.0f * std::tan(state.getPitch());
+            float extra = (topedgelength + x) / topedgelength - 1;
 
             useProgram(iconShader->program);
             iconShader->u_matrix = vtxMatrix;
             iconShader->u_exmatrix = exMatrix;
             iconShader->u_texsize = {{ float(spriteAtlas->getWidth()) / 4.0f, float(spriteAtlas->getHeight()) / 4.0f }};
+            iconShader->u_skewed = skewed;
+            iconShader->u_extra = extra;
 
             // adjust min/max zooms for variable font sies
             float zoomAdjust = std::log(fontSize / layout.icon.size) / std::log(2);
@@ -205,6 +236,8 @@ void Painter::renderSymbol(SymbolBucket &bucket, const StyleLayer &layer_desc, c
     }
 
     if (bucket.hasTextData()) {
+        config.depthTest = layout.text.rotation_alignment == RotationAlignmentType::Map;
+
         glyphAtlas->bind();
 
         renderSDF(bucket,

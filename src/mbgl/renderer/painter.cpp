@@ -155,9 +155,7 @@ void Painter::changeMatrix() {
             state.pixel_y() - state.getWidth() / 2.0f, 0);
 
     // The extrusion matrix.
-    matrix::identity(extrudeMatrix);
-    matrix::multiply(extrudeMatrix, projMatrix, extrudeMatrix);
-    matrix::rotate_z(extrudeMatrix, extrudeMatrix, state.getAngle());
+    matrix::ortho(extrudeMatrix, 0, state.getWidth(), state.getHeight(), 0, 0, -1);
 
     // The native matrix is a 1:1 matrix that paints the coordinates at the
     // same screen position as the vertex specifies.
