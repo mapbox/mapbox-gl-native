@@ -44,7 +44,7 @@ public:
     Bucket* getBucket(const StyleLayer&) const;
 
     TileParseResult parse(const GeometryTile&);
-    void redoPlacement(float angle, bool collisionDebug);
+    void redoPlacement(float angle, float pitch, bool collisionDebug);
 
     std::vector<util::ptr<StyleLayer>> layers;
 

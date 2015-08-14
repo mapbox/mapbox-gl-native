@@ -511,7 +511,7 @@ void SymbolBucket::addSymbols(Buffer &buffer, const SymbolQuads &symbols, float 
 
 void SymbolBucket::addToDebugBuffers() {
 
-    const float yStretch = 1.0f;
+    const float yStretch = collision.yStretch;
     const float angle = collision.angle;
     const float zoom = collision.zoom;
     float angle_sin = std::sin(-angle);

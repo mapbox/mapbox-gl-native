@@ -27,7 +27,7 @@ LiveTileData::LiveTileData(const TileID& id_,
                  state,
                  std::make_unique<CollisionTile>(id_.z, 4096,
                                     source_.tile_size * id.overscaling,
-                                    0, false)) {
+                                    0, 0, false)) {
     state = State::loaded;
 
     if (!tile) {

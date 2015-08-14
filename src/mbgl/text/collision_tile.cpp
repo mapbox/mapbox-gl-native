@@ -13,7 +13,7 @@ void CollisionTile::reset(const float _angle, const float pitch) {
     rotationMatrix = {{angle_cos, -angle_sin, angle_sin, angle_cos}};
 
     // Stretch boxes in y direction to account for the map tilt.
-    const float _yStretch = 1.0f / std::cos(pitch / 180 * M_PI);
+    const float _yStretch = 1.0f / std::cos(pitch);
 
     // The amount the map is squished depends on the y position.
     // Sort of account for this by making all boxes a bit bigger.

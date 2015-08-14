@@ -55,8 +55,8 @@ TileParseResult TileWorker::parse(const GeometryTile& geometryTile) {
     return partialParse ? TileData::State::partial : TileData::State::parsed;
 }
 
-void TileWorker::redoPlacement(float angle, bool collisionDebug) {
-    collision->reset(angle, 0);
+void TileWorker::redoPlacement(float angle, float pitch, bool collisionDebug) {
+    collision->reset(angle, pitch);
     collision->setDebug(collisionDebug);
     for (auto i = layers.rbegin(); i != layers.rend(); i++) {
         auto bucket = getBucket(**i);

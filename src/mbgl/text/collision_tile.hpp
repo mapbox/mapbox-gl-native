@@ -35,8 +35,8 @@ namespace mbgl {
 class CollisionTile {
 
     public:
-    inline explicit CollisionTile(float _zoom, float tileExtent, float tileSize, float angle_, bool debug_) :
-        zoom(_zoom), tilePixelRatio(tileExtent / tileSize), debug(debug_) { reset(angle_, 0); }
+    inline explicit CollisionTile(float _zoom, float tileExtent, float tileSize, float angle_, float pitch_, bool debug_) :
+        zoom(_zoom), tilePixelRatio(tileExtent / tileSize), debug(debug_) { reset(angle_, pitch_); }
 
     void reset(const float angle, const float pitch);
     float placeFeature(const CollisionFeature &feature);
@@ -51,6 +51,7 @@ class CollisionTile {
 
     const float minScale = 0.5f;
     const float maxScale = 2.0f;
+    float yStretch;
 
     private:
 
@@ -58,7 +59,6 @@ class CollisionTile {
 
     Tree tree;
     std::array<float, 4> rotationMatrix;
-    float yStretch;
     bool debug;
 
 };

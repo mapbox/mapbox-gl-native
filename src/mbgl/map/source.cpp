@@ -284,8 +284,8 @@ TileData::State Source::addTile(MapData& data,
 
         // If we don't find working tile data, we're just going to load it.
         if (info.type == SourceType::Vector) {
-            auto tileData = std::make_shared<VectorTileData>(normalized_id, style, info,
-                                                 transformState.getAngle(), data.getCollisionDebug());
+            auto tileData = std::make_shared<VectorTileData>(normalized_id, style, info, 
+                    transformState.getAngle(), transformState.getPitch(), data.getCollisionDebug());
             tileData->request(data.pixelRatio, callback);
             new_tile.data = tileData;
         } else if (info.type == SourceType::Raster) {
@@ -506,7 +506,7 @@ bool Source::update(MapData& data,
     updateTilePtrs();
 
     for (auto& tilePtr : tilePtrs) {
-        tilePtr->data->redoPlacement(transformState.getAngle(), data.getCollisionDebug());
+        tilePtr->data->redoPlacement(transformState.getAngle(), transformState.getPitch(), data.getCollisionDebug());
     }
 
     updated = data.getAnimationTime();
@@ -568,7 +568,7 @@ void Source::tileLoadingCompleteCallback(const TileID& normalized_id, const Tran
         return;
     }
 
-    data->redoPlacement(transformState.getAngle(), collisionDebug);
+    data->redoPlacement(transformState.getAngle(), transformState.getPitch(), collisionDebug);
     emitTileLoaded(true);
 }
 
