@@ -27,13 +27,13 @@
 
 namespace mbgl {
 
-typedef std::array<float, 4> mat2;
+typedef std::array<double, 4> mat2;
 
 namespace matrix {
 
 void identity(mat2& out);
-void rotate(mat2& out, const mat2& a, float rad);
-void scale(mat2& out, const mat2& a, float v0, float v1);
+void rotate(mat2& out, const mat2& a, double rad);
+void scale(mat2& out, const mat2& a, double v0, double v1);
 
 }
 }
