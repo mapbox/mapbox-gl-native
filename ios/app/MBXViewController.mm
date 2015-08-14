@@ -319,6 +319,8 @@ mbgl::Settings_NSUserDefaults *settings = nullptr;
             nextMode = MGLUserTrackingModeFollowWithHeading;
             break;
         case MGLUserTrackingModeFollowWithHeading:
+            nextMode = MGLUserTrackingModeFollowWithCourse;
+            break;
         case MGLUserTrackingModeFollowWithCourse:
             nextMode = MGLUserTrackingModeNone;
             break;
@@ -404,6 +406,7 @@ mbgl::Settings_NSUserDefaults *settings = nullptr;
 - (void)mapView:(__unused MGLMapView *)mapView didChangeUserTrackingMode:(MGLUserTrackingMode)mode animated:(__unused BOOL)animated
 {
     UIImage *newButtonImage;
+    NSString *newButtonTitle;
     
     switch (mode) {
         case MGLUserTrackingModeNone:
@@ -415,11 +418,15 @@ mbgl::Settings_NSUserDefaults *settings = nullptr;
             break;
             
         case MGLUserTrackingModeFollowWithHeading:
-        case MGLUserTrackingModeFollowWithCourse:
             newButtonImage = [UIImage imageNamed:@"TrackingHeadingMask.png"];
+            break;
+        case MGLUserTrackingModeFollowWithCourse:
+            newButtonImage = nil;
+            newButtonTitle = @"Course";
             break;
     }
     
+    self.navigationItem.rightBarButtonItem.title = newButtonTitle;
     [UIView animateWithDuration:0.25 animations:^{
         self.navigationItem.rightBarButtonItem.image = newButtonImage;
     }];
