@@ -20,7 +20,7 @@ LineAtlas::LineAtlas(uint16_t w, uint16_t h)
 }
 
 LineAtlas::~LineAtlas() {
-    std::lock_guard<std::recursive_mutex> lock(mtx);
+    assert(util::ThreadContext::currentlyOn(util::ThreadType::Map));
 
     if (texture) {
         mbgl::util::ThreadContext::getGLObjectStore()->abandonTexture(texture);
@@ -29,14 +29,14 @@ LineAtlas::~LineAtlas() {
 }
 
 LinePatternPos LineAtlas::getDashPosition(const std::vector<float> &dasharray, bool round) {
+    assert(util::ThreadContext::currentlyOn(util::ThreadType::Map));
+
     size_t key = round ? std::numeric_limits<size_t>::min() : std::numeric_limits<size_t>::max();
     for (const float part : dasharray) {
         boost::hash_combine<float>(key, part);
     }
 
     // Note: We're not handling hash collisions here.
-
-    std::lock_guard<std::recursive_mutex> lock(mtx);
     const auto it = positions.find(key);
     if (it == positions.end()) {
         auto inserted = positions.emplace(key, addDash(dasharray, round));
@@ -137,7 +137,7 @@ void LineAtlas::upload() {
 }
 
 void LineAtlas::bind() {
-    std::lock_guard<std::recursive_mutex> lock(mtx);
+    assert(util::ThreadContext::currentlyOn(util::ThreadType::Map));
 
     bool first = false;
     if (!texture) {
