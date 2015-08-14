@@ -84,7 +84,7 @@ private:
     double angle = 0;
     double scale = 1;
     double altitude = 1.5;
-    double pitch = 0;
+    double pitch = 0.001;
 
     // cache values for spherical mercator math
     double Bc = (scale * util::tileSize) / 360;
