@@ -7,7 +7,7 @@
 using namespace mbgl;
 
 void Painter::drawClippingMasks(const std::set<Source*>& sources) {
-    gl::debugging::group group("clipping masks");
+    MBGL_DEBUG_GROUP("clipping masks");
 
     useProgram(plainShader->program);
     config.stencilTest = true;

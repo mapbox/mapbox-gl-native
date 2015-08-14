@@ -147,7 +147,7 @@ void Painter::changeMatrix() {
 }
 
 void Painter::clear() {
-    gl::debugging::group group("clear");
+    MBGL_DEBUG_GROUP("clear");
     config.stencilTest = true;
     config.stencilMask = 0xFF;
     config.depthTest = false;
@@ -190,7 +190,7 @@ void Painter::render(const Style& style, TransformState state_, const FrameData&
     // - UPLOAD PASS -------------------------------------------------------------------------------
     // Uploads all required buffers and images before we do any actual rendering.
     {
-        const gl::debugging::group upload("upload");
+        MBGL_DEBUG_GROUP("upload");
 
         tileStencilBuffer.upload();
         tileBorderBuffer.upload();
@@ -209,7 +209,7 @@ void Painter::render(const Style& style, TransformState state_, const FrameData&
     // - CLIPPING MASKS ----------------------------------------------------------------------------
     // Draws the clipping masks to the stencil buffer.
     {
-        const gl::debugging::group clip("clip");
+        MBGL_DEBUG_GROUP("clip");
 
         // Update all clipping IDs.
         ClipIDGenerator generator;
@@ -248,7 +248,7 @@ void Painter::render(const Style& style, TransformState state_, const FrameData&
     // - DEBUG PASS --------------------------------------------------------------------------------
     // Renders debug overlays.
     {
-        const gl::debugging::group _("debug");
+        MBGL_DEBUG_GROUP("debug");
 
         // Finalize the rendering, e.g. by calling debug render calls per tile.
         // This guarantees that we have at least one function per tile called.
@@ -262,7 +262,7 @@ void Painter::render(const Style& style, TransformState state_, const FrameData&
     // TODO: Find a better way to unbind VAOs after we're done with them without introducing
     // unnecessary bind(0)/bind(N) sequences.
     {
-        const gl::debugging::group _("cleanup");
+        MBGL_DEBUG_GROUP("cleanup");
 
         MBGL_CHECK_ERROR(glBindTexture(GL_TEXTURE_2D, 0));
         MBGL_CHECK_ERROR(VertexArrayObject::Unbind());
@@ -276,11 +276,11 @@ void Painter::renderPass(RenderPass pass_,
                          const float strataThickness) {
     pass = pass_;
 
-    const char * passName = pass == RenderPass::Opaque ? "opaque" : "translucent";
-    const gl::debugging::group _(passName);
+    MBGL_DEBUG_GROUP(pass == RenderPass::Opaque ? "opaque" : "translucent");
 
     if (debug::renderTree) {
-        Log::Info(Event::Render, "%*s%s {", indent++ * 4, "", passName);
+        Log::Info(Event::Render, "%*s%s {", indent++ * 4, "",
+                  pass == RenderPass::Opaque ? "opaque" : "translucent");
     }
 
     config.blend = pass == RenderPass::Translucent;
@@ -289,13 +289,13 @@ void Painter::renderPass(RenderPass pass_,
         const auto& item = *it;
         if (item.bucket && item.tile) {
             if (item.hasRenderPass(pass)) {
-                const gl::debugging::group group(item.layer.id + " - " + std::string(item.tile->id));
+                MBGL_DEBUG_GROUP(item.layer.id + " - " + std::string(item.tile->id));
                 setStrata(i * strataThickness);
                 prepareTile(*item.tile);
                 item.bucket->render(*this, item.layer, item.tile->id, item.tile->matrix);
             }
         } else {
-            const gl::debugging::group group("background");
+            MBGL_DEBUG_GROUP("background");
             setStrata(i * strataThickness);
             renderBackground(item.layer);
         }
