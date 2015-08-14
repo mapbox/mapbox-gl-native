@@ -173,7 +173,7 @@ group::group(const std::string& str) {
     if (PushDebugGroup) {
         PushDebugGroup(GL_DEBUG_SOURCE_APPLICATION, 0, GLsizei(str.size()), str.c_str());
     } else if (PushGroupMarkerEXT) {
-        PushGroupMarkerEXT(GLsizei(str.size()), str.c_str());
+        PushGroupMarkerEXT(GLsizei(str.size() + 1), str.c_str());
     }
 }
 
