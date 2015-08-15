@@ -187,25 +187,26 @@ void Map::setLatLngZoom(LatLng latLng, double zoom, const Duration& duration) {
     update(Update::Zoom);
 }
 
-void Map::fitBounds(LatLngBounds bounds, EdgeInsets padding, const Duration& duration) {
+CameraOptions Map::cameraForLatLngBounds(LatLngBounds bounds, EdgeInsets padding) {
     AnnotationSegment segment = {
         {bounds.ne.latitude, bounds.sw.longitude},
         bounds.sw,
         {bounds.sw.latitude, bounds.ne.longitude},
         bounds.ne,
     };
-    fitBounds(segment, padding, duration);
+    return cameraForLatLngs(segment, padding);
 }
 
-void Map::fitBounds(AnnotationSegment segment, EdgeInsets padding, const Duration& duration) {
-    if (segment.empty()) {
-        return;
+CameraOptions Map::cameraForLatLngs(std::vector<LatLng> latLngs, EdgeInsets padding) {
+    CameraOptions options;
+    if (latLngs.empty()) {
+        return options;
     }
 
     // Calculate the bounds of the possibly rotated shape with respect to the viewport.
     vec2<> nePixel = {-INFINITY, -INFINITY};
     vec2<> swPixel = {INFINITY, INFINITY};
-    for (LatLng latLng : segment) {
+    for (LatLng latLng : latLngs) {
         vec2<> pixel = pixelForLatLng(latLng);
         swPixel.x = std::min(swPixel.x, pixel.x);
         nePixel.x = std::max(nePixel.x, pixel.x);
@@ -233,7 +234,9 @@ void Map::fitBounds(AnnotationSegment segment, EdgeInsets padding, const Duratio
     vec2<> centerPixel = (paddedNEPixel + paddedSWPixel) * 0.5;
     LatLng centerLatLng = latLngForPixel(centerPixel);
 
-    setLatLngZoom(centerLatLng, zoom, duration);
+    options.center = centerLatLng;
+    options.zoom = zoom;
+    return options;
 }
 
 void Map::resetZoom() {

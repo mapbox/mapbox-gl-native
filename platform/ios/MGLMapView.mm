@@ -1578,6 +1578,11 @@ std::chrono::steady_clock::duration secondsAsDuration(float duration)
 {
     self.userTrackingMode = MGLUserTrackingModeNone;
 
+    [self _setCenterCoordinate:centerCoordinate zoomLevel:zoomLevel direction:direction animated:animated];
+}
+
+- (void)_setCenterCoordinate:(CLLocationCoordinate2D)centerCoordinate zoomLevel:(double)zoomLevel direction:(CLLocationDirection)direction animated:(BOOL)animated
+{
     mbgl::CameraOptions options;
     options.center = MGLLatLngFromLocationCoordinate2D(centerCoordinate);
     options.zoom = zoomLevel;
@@ -1660,7 +1665,27 @@ mbgl::LatLngBounds MGLLatLngBoundsFromCoordinateBounds(MGLCoordinateBounds coord
                        animated:animated];
 }
 
+- (void)setVisibleCoordinateBounds:(MGLCoordinateBounds)bounds edgePadding:(UIEdgeInsets)insets direction:(CLLocationDirection)direction animated:(BOOL)animated
+{
+    CLLocationCoordinate2D coordinates[] = {
+        {bounds.ne.latitude, bounds.sw.longitude},
+        bounds.sw,
+        {bounds.sw.latitude, bounds.ne.longitude},
+        bounds.ne,
+    };
+    [self setVisibleCoordinates:coordinates
+                          count:sizeof(coordinates) / sizeof(coordinates[0])
+                    edgePadding:insets
+                      direction:direction
+                       animated:animated];
+}
+
 - (void)setVisibleCoordinates:(CLLocationCoordinate2D *)coordinates count:(NSUInteger)count edgePadding:(UIEdgeInsets)insets animated:(BOOL)animated
+{
+    [self setVisibleCoordinates:coordinates count:count edgePadding:insets direction:self.direction animated:animated];
+}
+
+- (void)setVisibleCoordinates:(CLLocationCoordinate2D *)coordinates count:(NSUInteger)count edgePadding:(UIEdgeInsets)insets direction:(CLLocationDirection)direction animated:(BOOL)animated
 {
     // NOTE: does not disrupt tracking mode
     CGFloat duration = animated ? MGLAnimationDuration : 0;
@@ -1673,7 +1698,13 @@ mbgl::LatLngBounds MGLLatLngBoundsFromCoordinateBounds(MGLCoordinateBounds coord
     {
         segment.push_back({coordinates[i].latitude, coordinates[i].longitude});
     }
-    _mbglMap->fitBounds(segment, mbglInsets, secondsAsDuration(duration));
+    mbgl::CameraOptions options = _mbglMap->cameraForLatLngs(segment, mbglInsets);
+    if (direction >= 0)
+    {
+        options.angle = MGLRadiansFromDegrees(-direction);
+    }
+    options.duration = secondsAsDuration(duration);
+    _mbglMap->easeTo(options);
     [self didChangeValueForKey:@"visibleCoordinateBounds"];
     
     [self unrotateIfNeededAnimated:animated];
@@ -2498,6 +2529,12 @@ CLLocationCoordinate2D MGLLocationCoordinate2DFromLatLng(mbgl::LatLng latLng)
             [self.delegate mapView:self didUpdateUserLocation:self.userLocation];
         }
     }
+    
+    CLLocationDirection course = self.userLocation.location.course;
+    if (course < 0 || self.userTrackingMode != MGLUserTrackingModeFollowWithCourse)
+    {
+        course = -1;
+    }
 
     if (self.userTrackingMode != MGLUserTrackingModeNone)
     {
@@ -2512,7 +2549,7 @@ CLLocationCoordinate2D MGLLocationCoordinate2DFromLatLng(mbgl::LatLng latLng)
             {
                 // at sufficient detail, just re-center the map; don't zoom
                 //
-                [self setCenterCoordinate:self.userLocation.location.coordinate animated:YES preservingTracking:YES];
+                [self _setCenterCoordinate:self.userLocation.location.coordinate zoomLevel:self.zoomLevel direction:course animated:YES];
             }
             else
             {
@@ -2542,16 +2579,10 @@ CLLocationCoordinate2D MGLLocationCoordinate2DFromLatLng(mbgl::LatLng latLng)
                     desiredSouthWest.longitude != actualSouthWest.longitude)
                 {
                     // assumes we won't disrupt tracking mode
-                    [self setVisibleCoordinateBounds:MGLCoordinateBoundsMake(desiredSouthWest, desiredNorthEast) animated:YES];
+                    [self setVisibleCoordinateBounds:MGLCoordinateBoundsMake(desiredSouthWest, desiredNorthEast) edgePadding:UIEdgeInsetsZero direction:course animated:YES];
                 }
             }
         }
-    }
-
-    CLLocationDirection course = self.userLocation.location.course;
-    if (course >= 0 && self.userTrackingMode == MGLUserTrackingModeFollowWithCourse)
-    {
-        _mbglMap->setBearing(course);
     }
     
     self.userLocationAnnotationView.haloLayer.hidden = ! CLLocationCoordinate2DIsValid(self.userLocation.coordinate) ||
