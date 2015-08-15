@@ -147,9 +147,10 @@ public class MapView extends FrameLayout implements LocationListener {
     private float mCompassBearing;
     private boolean mCompassValid = false;
 
+    private float mAverageCompassBearing;
+
     // Used for map toggle mode
 //    private FloatingActionButton trackingModeButton;
-    private long t0 = new Date().getTime();
 
     // Used to manage Event Listeners
     private ArrayList<OnMapChangedListener> mOnMapChangedListener;
@@ -1557,6 +1558,54 @@ public class MapView extends FrameLayout implements LocationListener {
     // This class handles sensor updates to calculate compass bearing
     private class CompassListener implements SensorEventListener {
 
+        private AngleLowpassFilter angleLowpassFilter = new AngleLowpassFilter();
+        private long t0 = -1;
+
+        // http://stackoverflow.com/questions/4699417/android-compass-orientation-on-unreliable-low-pass-filter
+        public class AngleLowpassFilter {
+            private final int LENGTH = 10;
+            private float sumSin, sumCos;
+            private ArrayList<Float> list = new ArrayList<>();
+
+            public void add(float radians){
+                sumSin += (float) Math.sin(radians);
+                sumCos += (float) Math.cos(radians);
+                list.add(radians);
+                if(list.size() > LENGTH){
+                    float old = list.remove(0);
+
+                    sumSin -= Math.sin(old);
+                    sumCos -= Math.cos(old);
+                }
+            }
+
+            public float average(){
+                int size = list.size();
+                return (float) Math.atan2(sumSin / size, sumCos / size);
+            }
+        }
+
+        private boolean shouldSetDirection(float new_bearing, float avg) {
+            boolean setDirection = true;
+            float diff = Math.abs(new_bearing - avg);
+            final float MIN_DEG_CHANGED = 3.5f;
+            if(diff < MIN_DEG_CHANGED){
+                setDirection = false;
+            }
+
+            long t = new Date().getTime();
+            if(t0 == -1) {
+                t0 = new Date().getTime();
+            }
+            long td = t - t0;
+            final float MIN_TIME_IN_MS_PASSED = 120.0f;
+            if(td < MIN_TIME_IN_MS_PASSED) {
+                setDirection = false;
+            }
+            return setDirection;
+        }
+
+
         @Override
         public void onSensorChanged(SensorEvent event) {
             switch (event.sensor.getType()) {
@@ -1589,7 +1638,14 @@ public class MapView extends FrameLayout implements LocationListener {
                 }
             }
 
-            updateMap();
+            float newBearing = mGpsLocation != null && mGpsLocation.hasBearing() ? mGpsLocation.getBearing() : mCompassBearing;
+            angleLowpassFilter.add((float) Math.toRadians(newBearing));
+            mAverageCompassBearing = (float) Math.toDegrees(angleLowpassFilter.average());
+
+            if(shouldSetDirection(newBearing, mAverageCompassBearing)) {
+                t0 = new Date().getTime();
+                updateMap();
+            }
         }
 
         @Override
@@ -1667,12 +1723,7 @@ public class MapView extends FrameLayout implements LocationListener {
 
             // Update direction if tracking mode
             if(userLocationTrackingMode == UserLocationTrackingMode.FOLLOW_BEARING && mCompassValid){
-                // TODO need to do proper filtering (see branch filter-compass) or else map will lock up because of all the compass events
-                long t = new Date().getTime();
-                if((t-t0)>1000){
-                    t0 = t;
-                    setDirection(-mCompassBearing, true);
-                }
+                setDirection(-mAverageCompassBearing, true);
             }
 
 /*
