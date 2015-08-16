@@ -20,6 +20,7 @@ import android.view.View;
 import android.widget.AdapterView;
 import android.widget.ArrayAdapter;
 import android.widget.FrameLayout;
+import android.widget.ImageButton;
 import android.widget.Spinner;
 import android.widget.TextView;
 import com.crashlytics.android.Crashlytics;
@@ -31,6 +32,8 @@ import com.mapbox.mapboxgl.annotations.Polyline;
 import com.mapbox.mapboxgl.annotations.PolylineOptions;
 import com.mapbox.mapboxgl.geometry.LatLng;
 import com.mapbox.mapboxgl.views.MapView;
+import com.mapbox.mapboxgl.views.PopupView;
+
 import io.fabric.sdk.android.Fabric;
 import java.io.BufferedReader;
 import java.io.IOException;
@@ -142,7 +145,7 @@ public class MainActivity extends AppCompatActivity {
         mFpsTextView = (TextView) findViewById(R.id.view_fps);
         mFpsTextView.setText("");
 
-//        mMapFrameLayout = (FrameLayout) findViewById(R.id.layout_map);
+        mMapFrameLayout = (FrameLayout) findViewById(R.id.content_frame);
 
         locationFAB = (FloatingActionButton)findViewById(R.id.locationFAB);
         locationFAB.setOnClickListener(new View.OnClickListener() {
@@ -170,6 +173,32 @@ public class MainActivity extends AppCompatActivity {
         if (savedInstanceState != null) {
             mapView.setMyLocationEnabled(savedInstanceState.getBoolean(STATE_IS_GPS_ON, false));
         }
+
+        showPopup();
+    }
+
+    private void showPopup(){
+
+        PopupView popup = (PopupView) getLayoutInflater().inflate(R.layout.popup, null);
+
+        TextView titleTextView = (TextView) popup.findViewById(R.id.title);
+        TextView subtitleTextView = (TextView) popup.findViewById(R.id.subtitle);
+        ImageButton imageButton = (ImageButton) popup.findViewById(R.id.imageButton);
+
+        titleTextView.setText("Title");
+        subtitleTextView.setText("Subtitle");
+        imageButton.setImageDrawable(getResources().getDrawable(R.drawable.location_marker));
+
+        popup.pos(400, 400);
+
+        imageButton.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View v) {
+                // TODO do something
+            }
+        });
+
+        mMapFrameLayout.addView(popup);
     }
 
     /**
@@ -386,9 +415,9 @@ public class MainActivity extends AppCompatActivity {
         LatLng backLot = new LatLng(38.649441, -121.369064);
         MapView map = mapView;
         marker = map.addMarker(new MarkerOptions()
-            .position(backLot)
-            .title("Back Lot")
-            .snippet("The back lot behind my house"));
+                .position(backLot)
+                .title("Back Lot")
+                .snippet("The back lot behind my house"));
 
         LatLng cheeseRoom = new LatLng(38.531577,-122.010646);
         map.addMarker(new MarkerOptions()
@@ -421,9 +450,9 @@ public class MainActivity extends AppCompatActivity {
             MapView map = mapView;
             ArrayList<PolygonOptions> opts = new ArrayList<PolygonOptions>();
             opts.add(new PolygonOptions()
-                        .add(latLngs)
-                        .strokeColor(Color.MAGENTA)
-                        .fillColor(Color.BLUE));
+                    .add(latLngs)
+                    .strokeColor(Color.MAGENTA)
+                    .fillColor(Color.BLUE));
             Polygon polygon = map.addPolygons(opts).get(0);
         } catch (Exception e) {
             Log.e(TAG, "Error adding Polygon: "+ e);
