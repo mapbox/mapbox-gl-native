@@ -4,7 +4,6 @@ import android.graphics.Color;
 import android.graphics.PointF;
 import android.location.Location;
 import android.os.Bundle;
-import android.support.annotation.NonNull;
 import android.support.design.widget.FloatingActionButton;
 import android.support.design.widget.NavigationView;
 import android.support.v4.view.GravityCompat;
@@ -18,12 +17,8 @@ import android.view.MenuItem;
 import android.view.MotionEvent;
 import android.view.View;
 import android.widget.AdapterView;
-import android.widget.ArrayAdapter;
-import android.widget.FrameLayout;
-import android.widget.Spinner;
 import android.widget.TextView;
 import com.crashlytics.android.Crashlytics;
-import com.mapbox.mapboxgl.annotations.Marker;
 import com.mapbox.mapboxgl.annotations.MarkerOptions;
 import com.mapbox.mapboxgl.annotations.Polygon;
 import com.mapbox.mapboxgl.annotations.PolygonOptions;
@@ -46,7 +41,8 @@ public class MainActivity extends AppCompatActivity {
     //
 
     // Used for saving instance state
-    private static final String STATE_IS_GPS_ON = "isGpsOn";
+    private static final String STATE_IS_ANNOTATIONS_ON = "isAnnotationsOn";
+    private static final String STATE_SELECTED_STYLE = "selectedStyle";
 
     //
     // Instance members
@@ -54,21 +50,16 @@ public class MainActivity extends AppCompatActivity {
 
     // Used for the UI
     private DrawerLayout mDrawerLayout;
-    private MapView mapView;
+    private MapView mMapView;
     private TextView mFpsTextView;
-    private FrameLayout mMapFrameLayout;
-    private float mDensity;
-    private Spinner mClassSpinner;
-    private ArrayAdapter mOutdoorsClassAdapter;
-    private ArrayAdapter mSatelliteClassAdapter;
+    private int mSelectedStyle = R.id.actionStyleMapboxStreets;
+    NavigationView mNavigationView;
 
     // Used for GPS
-    private FloatingActionButton locationFAB;
+    private FloatingActionButton mLocationFAB;
 
     // Used for Annotations
     private boolean mIsAnnotationsOn = false;
-
-    private Marker marker;
 
     //
     // Lifecycle events
@@ -79,8 +70,6 @@ public class MainActivity extends AppCompatActivity {
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         Fabric.with(this, new Crashlytics());
-
-        mDensity = getResources().getDisplayMetrics().density;
 
         // Load the layout
         setContentView(R.layout.activity_main);
@@ -94,27 +83,23 @@ public class MainActivity extends AppCompatActivity {
 
         mDrawerLayout = (DrawerLayout) findViewById(R.id.drawer_layout);
 
-        NavigationView navigationView = (NavigationView) findViewById(R.id.nav_view);
-        if (navigationView != null) {
-            setupDrawerContent(navigationView);
+        mNavigationView = (NavigationView) findViewById(R.id.nav_view);
+        if (mNavigationView != null) {
+            setupDrawerContent(mNavigationView);
         }
 
-        mapView = (MapView) findViewById(R.id.mainMapView);
+        mMapView = (MapView) findViewById(R.id.mainMapView);
         // Load the access token
         try {
             BufferedReader reader = new BufferedReader(new InputStreamReader(getResources().openRawResource(R.raw.token)));
             String line = reader.readLine();
-            mapView.setAccessToken(line);
+            mMapView.setAccessToken(line);
         } catch (IOException e) {
             Log.e(TAG, "Error loading access token from token.txt: " + e.toString());
         }
 
-        mapView.onCreate(savedInstanceState);
-        mapView.setOnFpsChangedListener(new MyOnFpsChangedListener());
-        mapView.addOnMapChangedListener(new MyOnMapChangedListener());
-
-        changeMapStyle(getString(R.string.styleURLMapboxStreets));
-        navigationView.getMenu().findItem(R.id.actionStyleMapboxStreets).setChecked(true);
+        mMapView.onCreate(savedInstanceState);
+        mMapView.setOnFpsChangedListener(new MyOnFpsChangedListener());
 
         final GestureDetector gestureDetector = new GestureDetector(this, new GestureDetector.SimpleOnGestureListener() {
             public void onLongPress(final MotionEvent e) {
@@ -122,18 +107,18 @@ public class MainActivity extends AppCompatActivity {
                 float y = e.getY();
 
                 // flip y direction vertically to match core GL
-                y = mapView.getHeight() - y;
+                y = mMapView.getHeight() - y;
 
-                LatLng position = mapView.fromScreenLocation(new PointF(x, y));
+                LatLng position = mMapView.fromScreenLocation(new PointF(x, y));
 
-                mapView.addMarker(new MarkerOptions()
+                mMapView.addMarker(new MarkerOptions()
                         .position(position)
                         .title("Dropped Pin")
                         .sprite("default_marker"));
             }
         });
 
-        mapView.setOnTouchListener(new View.OnTouchListener() {
+        mMapView.setOnTouchListener(new View.OnTouchListener() {
             public boolean onTouch(View v, MotionEvent event) {
                 return gestureDetector.onTouchEvent(event);
             }
@@ -142,34 +127,34 @@ public class MainActivity extends AppCompatActivity {
         mFpsTextView = (TextView) findViewById(R.id.view_fps);
         mFpsTextView.setText("");
 
-//        mMapFrameLayout = (FrameLayout) findViewById(R.id.layout_map);
-
-        locationFAB = (FloatingActionButton)findViewById(R.id.locationFAB);
-        locationFAB.setOnClickListener(new View.OnClickListener() {
+        mLocationFAB = (FloatingActionButton)findViewById(R.id.locationFAB);
+        mLocationFAB.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
                 // Toggle GPS position updates
-                toggleGps(!mapView.isMyLocationEnabled());
-                updateMap();
-//                Snackbar.make(v, "Snack time!", Snackbar.LENGTH_LONG).show();
+                toggleGps(!mMapView.isMyLocationEnabled());
+                if (mMapView.isMyLocationEnabled()) {
+                    Location location = mMapView.getMyLocation();
+                    if (location != null) {
+                        mMapView.setZoomLevel(8);
+                        mMapView.setCenterCoordinate(new LatLng(location));
+                    }
+                }
             }
         });
 
-/*
-        // Add the spinner to select class styles
-        mClassSpinner = (Spinner) findViewById(R.id.spinner_class);
-        mOutdoorsClassAdapter = ArrayAdapter.createFromResource(getSupportActionBar().getThemedContext(),
-                R.array.outdoors_class_list, android.R.layout.simple_spinner_dropdown_item);
-*/
+        // Restore saved state
+        if (savedInstanceState != null) {
+            mIsAnnotationsOn = savedInstanceState.getBoolean(STATE_IS_ANNOTATIONS_ON);
+            mSelectedStyle = savedInstanceState.getInt(STATE_SELECTED_STYLE);
+        }
 
         // Set default UI state
-        navigationView.getMenu().findItem(R.id.action_compass).setChecked(mapView.isCompassEnabled());
-        navigationView.getMenu().findItem(R.id.action_debug).setChecked(mapView.isDebugActive());
-        navigationView.getMenu().findItem(R.id.action_markers).setChecked(mIsAnnotationsOn);
-
-        if (savedInstanceState != null) {
-            mapView.setMyLocationEnabled(savedInstanceState.getBoolean(STATE_IS_GPS_ON, false));
-        }
+        mNavigationView.getMenu().findItem(R.id.action_compass).setChecked(mMapView.isCompassEnabled());
+        mNavigationView.getMenu().findItem(R.id.action_debug).setChecked(mMapView.isDebugActive());
+        mNavigationView.getMenu().findItem(R.id.action_markers).setChecked(mIsAnnotationsOn);
+        changeMapStyle(mSelectedStyle);
+        toggleGps(mMapView.isMyLocationEnabled());
     }
 
     /**
@@ -179,13 +164,13 @@ public class MainActivity extends AppCompatActivity {
     @Override
     protected void onStart() {
         super.onStart();
-        mapView.onStart();
+        mMapView.onStart();
     }
 
     @Override
     protected void onStop() {
         super.onStop();
-        mapView.onStop();
+        mMapView.onStop();
     }
 
     // Called when our app goes into the background
@@ -193,10 +178,7 @@ public class MainActivity extends AppCompatActivity {
     public void onPause()  {
         super.onPause();
 
-        mapView.onPause();
-
-        // Cancel GPS
-        toggleGps(false);
+        mMapView.onPause();
     }
 
     // Called when our app comes into the foreground
@@ -204,16 +186,13 @@ public class MainActivity extends AppCompatActivity {
     public void onResume() {
         super.onResume();
 
-        mapView.onResume();
-
-        // Restart GPS
-        toggleGps(true);
+        mMapView.onResume();
     }
 
     @Override
     protected void onDestroy() {
         super.onDestroy();
-        mapView.onDestroy();
+        mMapView.onDestroy();
     }
 
     // Called when we need to save instance state
@@ -221,8 +200,9 @@ public class MainActivity extends AppCompatActivity {
     protected void onSaveInstanceState(Bundle outState) {
         super.onSaveInstanceState(outState);
 
-        mapView.onSaveInstanceState(outState);
-        outState.putBoolean(STATE_IS_GPS_ON, mapView.isMyLocationEnabled());
+        mMapView.onSaveInstanceState(outState);
+        outState.putBoolean(STATE_IS_ANNOTATIONS_ON, mIsAnnotationsOn);
+        outState.putInt(STATE_SELECTED_STYLE, mSelectedStyle);
     }
 
     // Called when the system is running low on memory
@@ -230,7 +210,7 @@ public class MainActivity extends AppCompatActivity {
     public void onLowMemory() {
         super.onLowMemory();
 
-        mapView.onLowMemory();
+        mMapView.onLowMemory();
     }
 
     //
@@ -261,78 +241,88 @@ public class MainActivity extends AppCompatActivity {
 
                             case R.id.action_debug:
                                 // Toggle debug mode
-                                mapView.toggleDebug();
-
-                                menuItem.setChecked(mapView.isDebugActive());
-
-                                // Show the FPS counter
-                                if (mapView.isDebugActive()) {
-                                    mFpsTextView.setVisibility(View.VISIBLE);
-                                    mFpsTextView.setText(getResources().getString(R.string.label_fps));
-                                } else {
-                                    mFpsTextView.setVisibility(View.INVISIBLE);
-                                }
-                                break;
+                                mMapView.toggleDebug();
+                                toggleFpsCounter(mMapView.isDebugActive());
+                                menuItem.setChecked(mMapView.isDebugActive());
+                                return true;
 
                             case R.id.action_markers:
                                 // Toggle markers
                                 toggleAnnotations(!mIsAnnotationsOn);
                                 menuItem.setChecked(mIsAnnotationsOn);
-                                break;
+                                return true;
 
                             case R.id.action_compass:
                                 // Toggle compass
-                                mapView.setCompassEnabled(!mapView.isCompassEnabled());
-                                menuItem.setChecked(mapView.isCompassEnabled());
-                                break;
+                                mMapView.setCompassEnabled(!mMapView.isCompassEnabled());
+                                menuItem.setChecked(mMapView.isCompassEnabled());
+                                return true;
 
 /*
                             case R.id.followNone:
-                                mapView.setUserLocationTrackingMode(MapView.UserLocationTrackingMode.NONE);
-                                break;
+                                mMapView.setUserLocationTrackingMode(MapView.UserLocationTrackingMode.NONE);
+                                return true;
 
                             case R.id.followFollow:
-                                mapView.setUserLocationTrackingMode(MapView.UserLocationTrackingMode.FOLLOW);
-                                break;
+                                mMapView.setUserLocationTrackingMode(MapView.UserLocationTrackingMode.FOLLOW);
+                                return true;
 
                             case R.id.followBearing:
-                                mapView.setUserLocationTrackingMode(MapView.UserLocationTrackingMode.FOLLOW_BEARING);
-                                break;
+                                mMapView.setUserLocationTrackingMode(MapView.UserLocationTrackingMode.FOLLOW_BEARING);
+                                return true;
 */
-
-                            case R.id.actionStyleMapboxStreets:
-                                changeMapStyle(getString(R.string.styleURLMapboxStreets));
-                                menuItem.setChecked(true);
-                                break;
-
-                            case R.id.actionStyleEmerald:
-                                changeMapStyle(getString(R.string.styleURLEmerald));
-                                menuItem.setChecked(true);
-                                break;
-
-                            case R.id.actionStyleLight:
-                                changeMapStyle(getString(R.string.styleURLLight));
-                                menuItem.setChecked(true);
-                                break;
-
-                            case R.id.actionStyleDark:
-                                changeMapStyle(getString(R.string.styleURLDark));
-                                menuItem.setChecked(true);
-                                break;
-
-                            case R.id.actionStyleSatellite:
-                                changeMapStyle(getString(R.string.styleURLSatellite));
-                                menuItem.setChecked(true);
-                                break;
+                            default:
+                                return changeMapStyle(menuItem.getItemId());
                         }
-
-                        return true;
                     }
                 });
     }
 
-    private void changeMapStyle(@NonNull String styleURL) {
-        mapView.setStyleUrl(styleURL);
+    private void toggleFpsCounter(boolean enableFps) {
+        // Show the FPS counter
+        if (enableFps) {
+            mFpsTextView.setVisibility(View.VISIBLE);
+            mFpsTextView.setText(getResources().getString(R.string.label_fps));
+        } else {
+            mFpsTextView.setVisibility(View.INVISIBLE);
+        }
+    }
+
+    private boolean changeMapStyle(int id) {
+        switch (id) {
+            case R.id.actionStyleMapboxStreets:
+                mMapView.setStyleUrl(getString(R.string.styleURLMapboxStreets));
+                mNavigationView.getMenu().findItem(id).setChecked(true);
+                mSelectedStyle = id;
+                return true;
+
+            case R.id.actionStyleEmerald:
+                mMapView.setStyleUrl(getString(R.string.styleURLEmerald));
+                mNavigationView.getMenu().findItem(id).setChecked(true);
+                mSelectedStyle = id;
+                return true;
+
+            case R.id.actionStyleLight:
+                mMapView.setStyleUrl(getString(R.string.styleURLLight));
+                mNavigationView.getMenu().findItem(id).setChecked(true);
+                mSelectedStyle = id;
+                return true;
+
+            case R.id.actionStyleDark:
+                mMapView.setStyleUrl(getString(R.string.styleURLDark));
+                mNavigationView.getMenu().findItem(id).setChecked(true);
+                mSelectedStyle = id;
+                return true;
+
+            case R.id.actionStyleSatellite:
+                mMapView.setStyleUrl(getString(R.string.styleURLSatellite));
+                mNavigationView.getMenu().findItem(id).setChecked(true);
+                mSelectedStyle = id;
+                return true;
+
+            default:
+                return false;
+        }
     }
 
     /**
@@ -340,22 +330,12 @@ public class MainActivity extends AppCompatActivity {
      * @param enableGps true if GPS is to be enabled, false if GPS is to be disabled
      */
     private void toggleGps(boolean enableGps) {
-
         if (enableGps) {
-            if (!mapView.isMyLocationEnabled()) {
-                mapView.setMyLocationEnabled(enableGps);
-                Location location = mapView.getMyLocation();
-                if (location != null) {
-                    mapView.setZoomLevel(8);
-                    mapView.setCenterCoordinate(new LatLng(location));
-                }
-                locationFAB.setColorFilter(getResources().getColor(R.color.primary));
-            }
+            mMapView.setMyLocationEnabled(enableGps);
+            mLocationFAB.setColorFilter(getResources().getColor(R.color.primary));
         } else {
-            if (mapView.isMyLocationEnabled()) {
-                mapView.setMyLocationEnabled(enableGps);
-                locationFAB.setColorFilter(Color.TRANSPARENT);
-            }
+            mMapView.setMyLocationEnabled(enableGps);
+            mLocationFAB.setColorFilter(Color.TRANSPARENT);
         }
     }
 
@@ -371,8 +351,8 @@ public class MainActivity extends AppCompatActivity {
                 addMarkers();
                 addPolyline();
                 addPolygon();
-                mapView.setZoomLevel(7);
-                mapView.setCenterCoordinate(new LatLng(38.11727, -122.22839));
+                mMapView.setZoomLevel(7);
+                mMapView.setCenterCoordinate(new LatLng(38.11727, -122.22839));
             }
         } else {
             if (mIsAnnotationsOn) {
@@ -384,25 +364,25 @@ public class MainActivity extends AppCompatActivity {
 
     private void addMarkers() {
         LatLng backLot = new LatLng(38.649441, -121.369064);
-        MapView map = mapView;
-        marker = map.addMarker(new MarkerOptions()
+        MapView map = mMapView;
+        mMapView.addMarker(new MarkerOptions()
             .position(backLot)
             .title("Back Lot")
             .snippet("The back lot behind my house"));
 
         LatLng cheeseRoom = new LatLng(38.531577,-122.010646);
-        map.addMarker(new MarkerOptions()
-                .position(cheeseRoom)
-                .sprite("dog-park-15")
-                .title("Cheese Room")
-                .snippet("The only air conditioned room on the property!"));
+        mMapView.addMarker(new MarkerOptions()
+            .position(cheeseRoom)
+            .sprite("dog-park-15")
+            .title("Cheese Room")
+            .snippet("The only air conditioned room on the property!"));
     }
 
     private void addPolyline() {
         try {
             String geojsonStr = Util.loadStringFromAssets(this, "small_line.geojson");
             LatLng[] latLngs = Util.parseGeoJSONCoordinates(geojsonStr);
-            MapView map = mapView;
+            MapView map = mMapView;
             Polyline line = map.addPolyline(new PolylineOptions()
                     .add(latLngs)
                     .width(2)
@@ -418,7 +398,7 @@ public class MainActivity extends AppCompatActivity {
         try {
             geojsonStr = Util.loadStringFromAssets(this, "small_poly.geojson");
             LatLng[] latLngs = Util.parseGeoJSONCoordinates(geojsonStr);
-            MapView map = mapView;
+            MapView map = mMapView;
             ArrayList<PolygonOptions> opts = new ArrayList<PolygonOptions>();
             opts.add(new PolygonOptions()
                         .add(latLngs)
@@ -432,7 +412,7 @@ public class MainActivity extends AppCompatActivity {
     }
 
     private void removeAnnotations() {
-        mapView.removeAnnotations();
+        mMapView.removeAnnotations();
     }
 
     // This class handles outdoor class change events
@@ -446,13 +426,13 @@ public class MainActivity extends AppCompatActivity {
                 // Day
                 case 0:
                     styleClasses.add("day");
-                    mapView.setStyleClasses(styleClasses);
+                    mMapView.setStyleClasses(styleClasses);
                     break;
 
                 // Night
                 case 1:
                     styleClasses.add("night");
-                    mapView.setStyleClasses(styleClasses);
+                    mMapView.setStyleClasses(styleClasses);
                     break;
 
                 default:
@@ -463,7 +443,7 @@ public class MainActivity extends AppCompatActivity {
 
         @Override
         public void onNothingSelected(AdapterView<?> parent) {
-            mapView.removeAllStyleClasses();
+            mMapView.removeAllStyleClasses();
         }
     }
 
@@ -479,18 +459,18 @@ public class MainActivity extends AppCompatActivity {
                 case 0:
                     styleClasses.add("labels");
                     styleClasses.add("contours");
-                    mapView.setStyleClasses(styleClasses);
+                    mMapView.setStyleClasses(styleClasses);
                     break;
 
                 // Labels Only
                 case 1:
                     styleClasses.add("labels");
-                    mapView.setStyleClasses(styleClasses);
+                    mMapView.setStyleClasses(styleClasses);
                     break;
 
                 // No Labels
                 case 2:
-                    mapView.setStyleClasses(styleClasses);
+                    mMapView.setStyleClasses(styleClasses);
                     break;
 
                 default:
@@ -501,7 +481,7 @@ public class MainActivity extends AppCompatActivity {
 
         @Override
         public void onNothingSelected(AdapterView<?> parent) {
-            mapView.removeAllStyleClasses();
+            mMapView.removeAllStyleClasses();
         }
     }
 
@@ -511,52 +491,6 @@ public class MainActivity extends AppCompatActivity {
         @Override
         public void onFpsChanged(double fps) {
             mFpsTextView.setText(getResources().getString(R.string.label_fps) + String.format(" %4.2f", fps));
-        }
-    }
-
-
-    // Updates the UI to match the current map's position
-    private void updateMap() {
-//        rotateImageView(mCompassView, (float) mapView.getDirection());
-
-/*
-        if (mGpsLocation != null) {
-            mGpsMarker.setVisibility(View.VISIBLE);
-            LatLng coordinate = new LatLng(mGpsLocation);
-            PointF screenLocation = mapView.toScreenLocation(coordinate);
-
-            if (mGpsLocation.hasBearing() || mCompassValid) {
-                mGpsMarker.setImageResource(R.drawable.direction_arrow);
-                float iconSize = 54.0f * mDensity;
-                FrameLayout.LayoutParams lp = new FrameLayout.LayoutParams((int) iconSize, (int) iconSize);
-                lp.leftMargin = (int) (screenLocation.x - iconSize / 2.0f);
-                lp.topMargin = mMapFrameLayout.getHeight() - (int) (screenLocation.y + iconSize / 2.0f);
-                mGpsMarker.setLayoutParams(lp);
-                float bearing = mGpsLocation.hasBearing() ? mGpsLocation.getBearing() : mCompassBearing;
-                rotateImageView(mGpsMarker, bearing);
-                mGpsMarker.requestLayout();
-            } else {
-                mGpsMarker.setImageResource(R.drawable.location_marker);
-                float iconSize = 27.0f * mDensity;
-                FrameLayout.LayoutParams lp = new FrameLayout.LayoutParams((int) iconSize, (int) iconSize);
-                lp.leftMargin = (int) (screenLocation.x - iconSize / 2.0f);
-                lp.topMargin = mMapFrameLayout.getHeight() - (int) (screenLocation.y + iconSize / 2.0f);
-                mGpsMarker.setLayoutParams(lp);
-                rotateImageView(mGpsMarker, 0.0f);
-                mGpsMarker.requestLayout();
-            }
-        } else {
-            mGpsMarker.setVisibility(View.INVISIBLE);
-        }
-*/
-    }
-
-    // Called when map state changes
-    private class MyOnMapChangedListener implements MapView.OnMapChangedListener {
-
-        @Override
-        public void onMapChanged() {
-            updateMap();
         }
     }
 

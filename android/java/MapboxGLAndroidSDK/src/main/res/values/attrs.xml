@@ -10,5 +10,8 @@
         <attr name="debugActive" format="boolean" />
         <attr name="styleUrl" format="string" />
         <attr name="accessToken" format="string"/>
+        <attr name="styleClasses" format="string"/>
+        <attr name="compassEnabled" format="boolean" />
+        <attr name="myLocationEnabled" format="boolean" />
     </declare-styleable>
 </resources>

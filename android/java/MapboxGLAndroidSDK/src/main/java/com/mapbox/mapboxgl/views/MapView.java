@@ -89,11 +89,14 @@ public class MapView extends FrameLayout implements LocationListener {
     private static final String STATE_ACCESS_TOKEN = "accessToken";
     private static final String STATE_STYLE_CLASSES = "styleClasses";
     private static final String STATE_DEFAULT_TRANSITION_DURATION = "defaultTransitionDuration";
+    private static final String STATE_COMPASS_ENABLED = "compassEnabled";
+    private static final String STATE_MY_LOCATION_ENABLED = "myLocationEnabled";
+    private static final String STATE_USER_LOCATION_TRACKING_MODE = "userLocationTrackingMode";
 
     /**
      * Every annotation that has been added to the map.
      */
-    private List<Annotation> annotations = new ArrayList<>();
+    private List<Annotation> mAnnotations = new ArrayList<>();
 
     //
     // Instance members
@@ -124,7 +127,7 @@ public class MapView extends FrameLayout implements LocationListener {
     private Context mContext;
 
     // Used for GPS / Location
-    private boolean mIsGpsOn = false;
+    private boolean mIsMyLocationEnabled = false;
     private LostApiClient mLocationClient;
     private LocationRequest mLocationRequest;
     private ImageView mGpsMarker;
@@ -133,7 +136,7 @@ public class MapView extends FrameLayout implements LocationListener {
     public enum UserLocationTrackingMode {
         NONE, FOLLOW, FOLLOW_BEARING;
     }
-    private UserLocationTrackingMode userLocationTrackingMode = UserLocationTrackingMode.FOLLOW;
+    private UserLocationTrackingMode mUserLocationTrackingMode = UserLocationTrackingMode.FOLLOW;
 
     // Used for compass
     private boolean mIsCompassEnabled = true;
@@ -151,12 +154,10 @@ public class MapView extends FrameLayout implements LocationListener {
     private boolean mCompassValid = false;
 
     // Used for map toggle mode
-//    private FloatingActionButton trackingModeButton;
     private long t0 = new Date().getTime();
 
     // Used to manage Event Listeners
     private ArrayList<OnMapChangedListener> mOnMapChangedListener;
-
 
     //
     // Properties
@@ -240,28 +241,6 @@ public class MapView extends FrameLayout implements LocationListener {
         } else {
             throw new RuntimeException("Need to implement totalMemory on pre-Jelly Bean devices.");
         }
-        // Load the attributes
-        TypedArray typedArray = context.obtainStyledAttributes(attrs, R.styleable.MapView, 0, 0);
-        try {
-            double centerLatitude = typedArray.getFloat(R.styleable.MapView_centerLatitude, 0.0f);
-            double centerLongitude = typedArray.getFloat(R.styleable.MapView_centerLongitude, 0.0f);
-            LatLng centerCoordinate = new LatLng(centerLatitude, centerLongitude);
-            setCenterCoordinate(centerCoordinate);
-            setZoomLevel(typedArray.getFloat(R.styleable.MapView_zoomLevel, 0.0f)); // need to set zoom level first because of limitation on rotating when zoomed out
-            setDirection(typedArray.getFloat(R.styleable.MapView_direction, 0.0f));
-            setZoomEnabled(typedArray.getBoolean(R.styleable.MapView_zoomEnabled, true));
-            setScrollEnabled(typedArray.getBoolean(R.styleable.MapView_scrollEnabled, true));
-            setRotateEnabled(typedArray.getBoolean(R.styleable.MapView_rotateEnabled, true));
-            setDebugActive(typedArray.getBoolean(R.styleable.MapView_debugActive, false));
-            if (typedArray.getString(R.styleable.MapView_styleUrl) != null) {
-                setStyleUrl(typedArray.getString(R.styleable.MapView_styleUrl));
-            }
-            if (typedArray.getString(R.styleable.MapView_accessToken) != null) {
-                setAccessToken(typedArray.getString(R.styleable.MapView_accessToken));
-            }
-        } finally {
-            typedArray.recycle();
-        }
 
         // Ensure this view is interactable
         setClickable(true);
@@ -327,6 +306,40 @@ public class MapView extends FrameLayout implements LocationListener {
         // Setup Support For Listener Tracking
         // MapView's internal listener is setup in onCreate()
         mOnMapChangedListener = new ArrayList<OnMapChangedListener>();
+
+        // Load the attributes
+        TypedArray typedArray = context.obtainStyledAttributes(attrs, R.styleable.MapView, 0, 0);
+        try {
+            double centerLatitude = typedArray.getFloat(R.styleable.MapView_centerLatitude, 0.0f);
+            double centerLongitude = typedArray.getFloat(R.styleable.MapView_centerLongitude, 0.0f);
+            LatLng centerCoordinate = new LatLng(centerLatitude, centerLongitude);
+            setCenterCoordinate(centerCoordinate);
+            setZoomLevel(typedArray.getFloat(R.styleable.MapView_zoomLevel, 0.0f)); // need to set zoom level first because of limitation on rotating when zoomed out
+            setDirection(typedArray.getFloat(R.styleable.MapView_direction, 0.0f));
+            setZoomEnabled(typedArray.getBoolean(R.styleable.MapView_zoomEnabled, true));
+            setScrollEnabled(typedArray.getBoolean(R.styleable.MapView_scrollEnabled, true));
+            setRotateEnabled(typedArray.getBoolean(R.styleable.MapView_rotateEnabled, true));
+            setDebugActive(typedArray.getBoolean(R.styleable.MapView_debugActive, false));
+            if (typedArray.getString(R.styleable.MapView_styleUrl) != null) {
+                setStyleUrl(typedArray.getString(R.styleable.MapView_styleUrl));
+            }
+            if (typedArray.getString(R.styleable.MapView_accessToken) != null) {
+                setAccessToken(typedArray.getString(R.styleable.MapView_accessToken));
+            }
+            if (typedArray.getString(R.styleable.MapView_styleClasses) != null) {
+                List<String> styleClasses = Arrays.asList(typedArray.getString(R.styleable.MapView_styleClasses).split("\\s*,\\s*"));
+                for (String styleClass : styleClasses) {
+                    if (styleClass.length() == 0) {
+                        styleClasses.remove(styleClass);
+                    }
+                }
+                setStyleClasses(styleClasses);
+            }
+            setCompassEnabled(typedArray.getBoolean(R.styleable.MapView_compassEnabled, true));
+            setMyLocationEnabled(typedArray.getBoolean(R.styleable.MapView_myLocationEnabled, false));
+        } finally {
+            typedArray.recycle();
+        }
     }
 
     //
@@ -348,7 +361,7 @@ public class MapView extends FrameLayout implements LocationListener {
         long id = mNativeMapView.addMarker(marker);
         marker.setId(id);        // the annotation needs to know its id
         marker.setMapView(this); // the annotation needs to know which map view it is in
-        annotations.add(marker);
+        mAnnotations.add(marker);
         return marker;
     }
 
@@ -357,7 +370,7 @@ public class MapView extends FrameLayout implements LocationListener {
         long id = mNativeMapView.addPolyline(polyline);
         polyline.setId(id);
         polyline.setMapView(this);
-        annotations.add(polyline);
+        mAnnotations.add(polyline);
         return polyline;
     }
 
@@ -366,7 +379,7 @@ public class MapView extends FrameLayout implements LocationListener {
         long id = mNativeMapView.addPolygon(polygon);
         polygon.setId(id);
         polygon.setMapView(this);
-        annotations.add(polygon);
+        mAnnotations.add(polygon);
         return polygon;
     }
 
@@ -381,14 +394,14 @@ public class MapView extends FrameLayout implements LocationListener {
         for(int i=0; i < polygons.size(); i++) {
             polygons.get(i).setId(ids[i]);
             polygons.get(i).setMapView(this);
-            annotations.add(polygons.get(i));
+            mAnnotations.add(polygons.get(i));
         }
 
         return polygons;
     }
 
     private void removeAnnotationsWithId(long annotationId){
-        for (Iterator<Annotation> iterator = annotations.iterator(); iterator.hasNext();) {
+        for (Iterator<Annotation> iterator = mAnnotations.iterator(); iterator.hasNext();) {
             Annotation annotation = iterator.next();
             if (annotation.getId() == annotationId) {
                 iterator.remove();
@@ -399,7 +412,7 @@ public class MapView extends FrameLayout implements LocationListener {
     public void removeAnnotation(Annotation annotation) {
         long id = annotation.getId();
         mNativeMapView.removeAnnotation(id);
-        annotations.remove(annotation);
+        mAnnotations.remove(annotation);
     }
 
     public void removeAnnotation(long annotationId) {
@@ -408,13 +421,13 @@ public class MapView extends FrameLayout implements LocationListener {
     }
 
     public void removeAnnotations() {
-        long[] ids = new long[annotations.size()];
-        for(int i = 0; i < annotations.size(); i++) {
-            long id = annotations.get(i).getId();
+        long[] ids = new long[mAnnotations.size()];
+        for(int i = 0; i < mAnnotations.size(); i++) {
+            long id = mAnnotations.get(i).getId();
             ids[i] = id;
         }
         mNativeMapView.removeAnnotations(ids);
-        annotations.clear();
+        mAnnotations.clear();
     }
 
     //
@@ -530,11 +543,11 @@ public class MapView extends FrameLayout implements LocationListener {
     }
 
     public UserLocationTrackingMode getUserLocationTrackingMode() {
-        return userLocationTrackingMode;
+        return mUserLocationTrackingMode;
     }
 
     public void setUserLocationTrackingMode(UserLocationTrackingMode userLocationTrackingMode) {
-        this.userLocationTrackingMode = userLocationTrackingMode;
+        this.mUserLocationTrackingMode = userLocationTrackingMode;
     }
 
     public boolean isFullyLoaded() {
@@ -643,6 +656,9 @@ public class MapView extends FrameLayout implements LocationListener {
                 setStyleClasses(appliedStyleClasses);
             }
             mNativeMapView.setDefaultTransitionDuration(savedInstanceState.getLong(STATE_DEFAULT_TRANSITION_DURATION));
+            setCompassEnabled(savedInstanceState.getBoolean(STATE_COMPASS_ENABLED));
+            setMyLocationEnabled(savedInstanceState.getBoolean(STATE_MY_LOCATION_ENABLED));
+            setUserLocationTrackingMode((UserLocationTrackingMode) savedInstanceState.getSerializable(STATE_USER_LOCATION_TRACKING_MODE));
         }
 
         // Force a check for an access token
@@ -673,6 +689,9 @@ public class MapView extends FrameLayout implements LocationListener {
         outState.putString(STATE_ACCESS_TOKEN, getAccessToken());
         outState.putStringArrayList(STATE_STYLE_CLASSES, new ArrayList<>(getStyleClasses()));
         outState.putLong(STATE_DEFAULT_TRANSITION_DURATION, mNativeMapView.getDefaultTransitionDuration());
+        outState.putBoolean(STATE_COMPASS_ENABLED, isCompassEnabled());
+        outState.putBoolean(STATE_MY_LOCATION_ENABLED, isMyLocationEnabled());
+        outState.putSerializable(STATE_USER_LOCATION_TRACKING_MODE, getUserLocationTrackingMode());
     }
 
     // Called when we need to clean up
@@ -699,6 +718,8 @@ public class MapView extends FrameLayout implements LocationListener {
         getContext().unregisterReceiver(mConnectivityReceiver);
         mConnectivityReceiver = null;
 
+        toggleGps(!mIsMyLocationEnabled);
+
         mNativeMapView.pause();
     }
 
@@ -709,6 +730,8 @@ public class MapView extends FrameLayout implements LocationListener {
         // Register for connectivity changes
         mConnectivityReceiver = new ConnectivityReceiver();
         mContext.registerReceiver(mConnectivityReceiver, new IntentFilter(ConnectivityManager.CONNECTIVITY_ACTION));
+
+        toggleGps(mIsMyLocationEnabled);
 
         mNativeMapView.resume();
     }
@@ -1502,7 +1525,7 @@ public class MapView extends FrameLayout implements LocationListener {
      * @return True if the my-location layer is enabled, false otherwise.
      */
     public final boolean isMyLocationEnabled () {
-        return mIsGpsOn;
+        return mIsMyLocationEnabled;
     }
 
     /**
@@ -1513,7 +1536,9 @@ public class MapView extends FrameLayout implements LocationListener {
      * @param enabled True to enable; false to disable.
      */
     public final void setMyLocationEnabled (boolean enabled) {
+        mIsMyLocationEnabled = enabled;
         toggleGps(enabled);
+        updateMap();
     }
 
     /**
@@ -1529,10 +1554,8 @@ public class MapView extends FrameLayout implements LocationListener {
      * @param enableGps true if GPS is to be enabled, false if GPS is to be disabled
      */
     private void toggleGps(boolean enableGps) {
-
         if (enableGps) {
-            if (!mIsGpsOn) {
-                mIsGpsOn = true;
+            if (!mLocationClient.isConnected()) {
                 mGpsLocation = null;
                 mLocationClient.connect();
                 updateLocation(LocationServices.FusedLocationApi.getLastLocation());
@@ -1541,8 +1564,7 @@ public class MapView extends FrameLayout implements LocationListener {
                 mSensorManager.registerListener(mCompassListener, mSensorMagneticField, SensorManager.SENSOR_DELAY_UI);
             }
         } else {
-            if (mIsGpsOn) {
-                mIsGpsOn = false;
+            if (mLocationClient.isConnected()) {
                 LocationServices.FusedLocationApi.removeLocationUpdates(this);
                 mLocationClient.disconnect();
                 mGpsLocation = null;
@@ -1550,7 +1572,6 @@ public class MapView extends FrameLayout implements LocationListener {
                 mSensorManager.unregisterListener(mCompassListener, mSensorMagneticField);
             }
         }
-        updateMap();
     }
 
     /**
@@ -1569,16 +1590,16 @@ public class MapView extends FrameLayout implements LocationListener {
      * after. If disabled, the compass will never be displayed.
      *
      * By default, the compass is enabled
-     * @param enabled true to enable the compass; false to disable the compass.
+     * @param compassEnabled true to enable the compass; false to disable the compass.
      */
-    public void setCompassEnabled (boolean enabled) {
+    public void setCompassEnabled (boolean compassEnabled) {
         // Set value
-        this.mIsCompassEnabled = enabled;
+        this.mIsCompassEnabled = compassEnabled;
 
         // Toggle UI
-        if (mIsCompassEnabled && !mCompassView.isShown()) {
+        if (mIsCompassEnabled) {
             mCompassView.setVisibility(View.VISIBLE);
-        } else if (!mIsCompassEnabled) {
+        } else {
             mCompassView.setVisibility(View.GONE);
         }
 
@@ -1678,7 +1699,7 @@ public class MapView extends FrameLayout implements LocationListener {
         if (isMyLocationEnabled() && mGpsLocation != null) {
             if (mGpsMarker == null) {
                 // Setup User Location UI
-                // NOTE: mIsGpsOn == false to begin with
+                // NOTE: mIsMyLocationEnabled == false to begin with
                 mGpsMarker = new ImageView(getContext());
                 mGpsMarker.setImageResource(R.drawable.location_marker);
                 addView(mGpsMarker);
@@ -1698,7 +1719,7 @@ public class MapView extends FrameLayout implements LocationListener {
             mGpsMarker.requestLayout();
 
             // Update direction if tracking mode
-            if(userLocationTrackingMode == UserLocationTrackingMode.FOLLOW_BEARING && mCompassValid){
+            if(mUserLocationTrackingMode == UserLocationTrackingMode.FOLLOW_BEARING && mCompassValid){
                 // TODO need to do proper filtering (see branch filter-compass) or else map will lock up because of all the compass events
                 long t = new Date().getTime();
                 if((t-t0)>1000){
@@ -1711,7 +1732,7 @@ public class MapView extends FrameLayout implements LocationListener {
             // TODO - Too much overhead on main thread.  Needs to be refactored before it
             // can be re-enabled
             // Update map position if NOT in NONE mode
-            if (userLocationTrackingMode != UserLocationTrackingMode.NONE) {
+            if (mUserLocationTrackingMode != UserLocationTrackingMode.NONE) {
                 setCenterCoordinate(new LatLng(mGpsLocation));
             }
 */
