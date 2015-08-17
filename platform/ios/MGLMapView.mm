@@ -1828,6 +1828,10 @@ CLLocationCoordinate2D MGLLocationCoordinate2DFromLatLng(mbgl::LatLng latLng)
 
         if ([annotation isKindOfClass:[MGLMultiPoint class]])
         {
+            NSUInteger count = [(MGLMultiPoint *)annotation pointCount];
+
+            if (count == 0) break;
+
             CGFloat alpha = (delegateImplementsAlphaForShape ?
                                 [self.delegate mapView:self alphaForShapeAnnotation:annotation] :
                                 1.0);
@@ -1880,8 +1884,6 @@ CLLocationCoordinate2D MGLLocationCoordinate2DFromLatLng(mbgl::LatLng latLng)
                                          reason:[NSString stringWithFormat:@"%@ is an unknown shape class", [annotation class]]
                                        userInfo:nil] raise];
             }
-
-            NSUInteger count = [(MGLMultiPoint *)annotation pointCount];
 
             CLLocationCoordinate2D *coordinates = (CLLocationCoordinate2D *)malloc(count * sizeof(CLLocationCoordinate2D));
             [(MGLMultiPoint *)annotation getCoordinates:coordinates range:NSMakeRange(0, count)];
