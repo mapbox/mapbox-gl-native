@@ -59,7 +59,6 @@ import com.squareup.okhttp.HttpUrl;
 
 import java.nio.ByteBuffer;
 import java.util.ArrayList;
-import java.util.Arrays;
 import java.util.Date;
 import java.util.Iterator;
 import java.util.List;
@@ -93,7 +92,7 @@ public class MapView extends FrameLayout implements LocationListener {
     /**
      * Every annotation that has been added to the map.
      */
-    private List<Annotation> annotations = new ArrayList<>();
+    private List<Annotation> mAnnotation = new ArrayList<>();
 
     //
     // Instance members
@@ -348,7 +347,7 @@ public class MapView extends FrameLayout implements LocationListener {
         long id = mNativeMapView.addMarker(marker);
         marker.setId(id);        // the annotation needs to know its id
         marker.setMapView(this); // the annotation needs to know which map view it is in
-        annotations.add(marker);
+        mAnnotation.add(marker);
         return marker;
     }
 
@@ -357,7 +356,7 @@ public class MapView extends FrameLayout implements LocationListener {
         long id = mNativeMapView.addPolyline(polyline);
         polyline.setId(id);
         polyline.setMapView(this);
-        annotations.add(polyline);
+        mAnnotation.add(polyline);
         return polyline;
     }
 
@@ -366,7 +365,7 @@ public class MapView extends FrameLayout implements LocationListener {
         long id = mNativeMapView.addPolygon(polygon);
         polygon.setId(id);
         polygon.setMapView(this);
-        annotations.add(polygon);
+        mAnnotation.add(polygon);
         return polygon;
     }
 
@@ -381,18 +380,18 @@ public class MapView extends FrameLayout implements LocationListener {
         for(int i=0; i < polygons.size(); i++) {
             polygons.get(i).setId(ids[i]);
             polygons.get(i).setMapView(this);
-            annotations.add(polygons.get(i));
+            mAnnotation.add(polygons.get(i));
         }
 
         return polygons;
     }
 
     public List<Annotation> getAnnotations() {
-        return annotations;
+        return mAnnotation;
     }
 
     private void removeAnnotationsWithId(long annotationId){
-        for (Iterator<Annotation> iterator = annotations.iterator(); iterator.hasNext();) {
+        for (Iterator<Annotation> iterator = mAnnotation.iterator(); iterator.hasNext();) {
             Annotation annotation = iterator.next();
             if (annotation.getId() == annotationId) {
                 iterator.remove();
@@ -403,7 +402,7 @@ public class MapView extends FrameLayout implements LocationListener {
     public void removeAnnotation(Annotation annotation) {
         long id = annotation.getId();
         mNativeMapView.removeAnnotation(id);
-        annotations.remove(annotation);
+        mAnnotation.remove(annotation);
     }
 
     public void removeAnnotation(long annotationId) {
@@ -412,13 +411,13 @@ public class MapView extends FrameLayout implements LocationListener {
     }
 
     public void removeAnnotations() {
-        long[] ids = new long[annotations.size()];
-        for(int i = 0; i < annotations.size(); i++) {
-            long id = annotations.get(i).getId();
+        long[] ids = new long[mAnnotation.size()];
+        for(int i = 0; i < mAnnotation.size(); i++) {
+            long id = mAnnotation.get(i).getId();
             ids[i] = id;
         }
         mNativeMapView.removeAnnotations(ids);
-        annotations.clear();
+        mAnnotation.clear();
     }
 
     //
