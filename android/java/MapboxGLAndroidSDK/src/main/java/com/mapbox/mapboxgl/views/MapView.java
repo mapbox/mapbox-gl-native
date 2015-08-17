@@ -645,6 +645,9 @@ public class MapView extends FrameLayout implements LocationListener {
             mNativeMapView.setDefaultTransitionDuration(savedInstanceState.getLong(STATE_DEFAULT_TRANSITION_DURATION));
         }
 
+        // Force a check for an access token
+        validateAccessToken(getAccessToken());
+
         mNativeMapView.initializeDisplay();
         mNativeMapView.initializeContext();
 
@@ -682,7 +685,6 @@ public class MapView extends FrameLayout implements LocationListener {
     // Called when we need to create the GL context
     // Must be called from Activity onStart
     public void onStart() {
-        validateAccessToken(getAccessToken());
     }
 
     // Called when we need to terminate the GL context
