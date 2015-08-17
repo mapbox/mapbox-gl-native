@@ -67,7 +67,7 @@ void Painter::renderLine(LineBucket& bucket, const StyleLayer &layer_desc, const
 
     mat4 vtxMatrix = translatedMatrix(matrix, properties.translate, id, properties.translateAnchor);
 
-    config.depthRange = { strata, 1.0f };
+    setDepthSublayer(0);
 
     if (!properties.dash_array.from.empty()) {
 
@@ -125,7 +125,6 @@ void Painter::renderLine(LineBucket& bucket, const StyleLayer &layer_desc, const
 
         MBGL_CHECK_ERROR(glActiveTexture(GL_TEXTURE0));
         spriteAtlas->bind(true);
-        config.depthRange = { strata + strata_epsilon, 1.0f };  // may or may not matter
 
         bucket.drawLinePatterns(*linepatternShader);
 

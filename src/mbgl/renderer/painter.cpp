@@ -154,10 +154,6 @@ void Painter::clear() {
     MBGL_CHECK_ERROR(glClear(GL_COLOR_BUFFER_BIT | GL_STENCIL_BUFFER_BIT | GL_DEPTH_BUFFER_BIT));
 }
 
-void Painter::setStrata(float value) {
-    strata = value;
-}
-
 void Painter::prepareTile(const Tile& tile) {
     const GLint ref = (GLint)tile.clip.reference.to_ulong();
     const GLuint mask = (GLuint)tile.clip.mask.to_ulong();
@@ -223,19 +219,19 @@ void Painter::render(const Style& style, TransformState state_, const FrameData&
     if (debug::renderTree) { Log::Info(Event::Render, "{"); indent++; }
 
     // TODO: Correctly compute the number of layers recursively beforehand.
-    const float strataThickness = 1.0f / (order.size() + 1);
+    depthRangeSize = 1 - (order.size() + 2) * numSublayers * depthEpsilon;
 
     // - OPAQUE PASS -------------------------------------------------------------------------------
     // Render everything top-to-bottom by using reverse iterators. Render opaque objects first.
     renderPass(RenderPass::Opaque,
                order.rbegin(), order.rend(),
-               0, 1, strataThickness);
+               0, 1);
 
     // - TRANSLUCENT PASS --------------------------------------------------------------------------
     // Make a second pass, rendering translucent objects. This time, we render bottom-to-top.
     renderPass(RenderPass::Translucent,
                order.begin(), order.end(),
-               order.size() - 1, -1, strataThickness);
+               order.size() - 1, -1);
 
     if (debug::renderTree) { Log::Info(Event::Render, "}"); indent--; }
 
@@ -266,8 +262,7 @@ void Painter::render(const Style& style, TransformState state_, const FrameData&
 template <class Iterator>
 void Painter::renderPass(RenderPass pass_,
                          Iterator it, Iterator end,
-                         std::size_t i, int8_t increment,
-                         const float strataThickness) {
+                         std::size_t i, int8_t increment) {
     pass = pass_;
 
     const double zoom = state.getZoom();
@@ -282,6 +277,7 @@ void Painter::renderPass(RenderPass pass_,
     config.blend = pass == RenderPass::Translucent;
 
     for (; it != end; ++it, i += increment) {
+        currentLayer = i;
         const auto& item = *it;
         if (item.bucket && item.tile) {
             // Skip this layer if it's outside the range of min/maxzoom.
@@ -293,13 +289,11 @@ void Painter::renderPass(RenderPass pass_,
             }
             if (item.layer.hasRenderPass(pass)) {
                 MBGL_DEBUG_GROUP(item.layer.id + " - " + std::string(item.tile->id));
-                setStrata(i * strataThickness);
                 prepareTile(*item.tile);
                 item.bucket->render(*this, item.layer, item.tile->id, item.tile->matrix);
             }
         } else {
             MBGL_DEBUG_GROUP("background");
-            setStrata(i * strataThickness);
             renderBackground(item.layer);
         }
     }
@@ -426,7 +420,8 @@ void Painter::renderBackground(const StyleLayer &layer_desc) {
 
     config.stencilTest = false;
     config.depthTest = true;
-    config.depthRange = { strata + strata_epsilon, 1.0f };
+    config.depthRange = { 1.0f, 1.0f };
+
     MBGL_CHECK_ERROR(glDrawArrays(GL_TRIANGLE_STRIP, 0, 4));
 }
 
@@ -454,4 +449,10 @@ mat4 Painter::translatedMatrix(const mat4& matrix, const std::array<float, 2> &t
 
         return vtxMatrix;
     }
+}
+
+void Painter::setDepthSublayer(int n) {
+    float nearDepth = ((1 + currentLayer) * numSublayers + n) * depthEpsilon;
+    float farDepth = nearDepth + depthRangeSize;
+    config.depthRange = { nearDepth, farDepth };
 }

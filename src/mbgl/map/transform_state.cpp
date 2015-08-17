@@ -39,7 +39,7 @@ void TransformState::getProjMatrix(mat4& projMatrix) const {
     matrix::rotate_z(projMatrix, projMatrix, getAngle());
 
     matrix::translate(projMatrix, projMatrix, pixel_x() - getWidth() / 2.0f,
-            pixel_y() - getWidth() / 2.0f, 0);
+            pixel_y() - getHeight() / 2.0f, 0);
 }
 
 box TransformState::cornersToBox(uint32_t z) const {

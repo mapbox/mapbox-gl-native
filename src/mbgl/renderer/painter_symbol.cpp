@@ -100,7 +100,7 @@ void Painter::renderSDF(SymbolBucket &bucket,
 
         sdfShader.u_buffer = (haloOffset - styleProperties.halo_width / fontScale) / sdfPx;
 
-        config.depthRange = { strata, 1.0f };
+        setDepthSublayer(0);
         (bucket.*drawSDF)(sdfShader);
     }
 
@@ -121,7 +121,7 @@ void Painter::renderSDF(SymbolBucket &bucket,
 
         sdfShader.u_buffer = (256.0f - 64.0f) / 256.0f;
 
-        config.depthRange = { strata + strata_epsilon, 1.0f };
+        setDepthSublayer(1);
         (bucket.*drawSDF)(sdfShader);
     }
 }
@@ -147,7 +147,7 @@ void Painter::renderSymbol(SymbolBucket &bucket, const StyleLayer &layer_desc, c
         collisionBoxShader->u_maxzoom = (id.z + 1) * 10;
         lineWidth(1.0f);
 
-        config.depthRange = { strata, 1.0f };
+        setDepthSublayer(0);
         bucket.drawCollisionBoxes(*collisionBoxShader);
 
     }
@@ -230,7 +230,7 @@ void Painter::renderSymbol(SymbolBucket &bucket, const StyleLayer &layer_desc, c
             iconShader->u_fadezoom = state.getNormalizedZoom() * 10;
             iconShader->u_opacity = properties.icon.opacity;
 
-            config.depthRange = { strata, 1.0f };
+            setDepthSublayer(0);
             bucket.drawIcons(*iconShader);
         }
     }
