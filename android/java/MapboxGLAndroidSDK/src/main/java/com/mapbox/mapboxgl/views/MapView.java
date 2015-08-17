@@ -59,6 +59,7 @@ import org.apache.commons.validator.routines.UrlValidator;
 import java.nio.ByteBuffer;
 import java.util.ArrayList;
 import java.util.Date;
+import java.util.Iterator;
 import java.util.List;
 
 // Custom view that shows a Map
@@ -371,13 +372,24 @@ public class MapView extends FrameLayout implements LocationListener {
         return polygons;
     }
 
+    private void removeAnnotationsWithId(long annotationId){
+        for (Iterator<Annotation> iterator = annotations.iterator(); iterator.hasNext();) {
+            Annotation annotation = iterator.next();
+            if (annotation.getId() == annotationId) {
+                iterator.remove();
+            }
+        }
+    }
+
     public void removeAnnotation(Annotation annotation) {
         long id = annotation.getId();
         mNativeMapView.removeAnnotation(id);
+        annotations.remove(annotation);
     }
 
     public void removeAnnotation(long annotationId) {
         mNativeMapView.removeAnnotation(annotationId);
+        removeAnnotationsWithId(annotationId);
     }
 
     public void removeAnnotations() {
@@ -387,6 +399,7 @@ public class MapView extends FrameLayout implements LocationListener {
             ids[i] = id;
         }
         mNativeMapView.removeAnnotations(ids);
+        annotations.clear();
     }
 
     //
