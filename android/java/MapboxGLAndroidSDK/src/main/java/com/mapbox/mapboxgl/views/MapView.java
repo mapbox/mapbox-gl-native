@@ -387,6 +387,10 @@ public class MapView extends FrameLayout implements LocationListener {
         return polygons;
     }
 
+    public List<Annotation> getAnnotations() {
+        return annotations;
+    }
+
     private void removeAnnotationsWithId(long annotationId){
         for (Iterator<Annotation> iterator = annotations.iterator(); iterator.hasNext();) {
             Annotation annotation = iterator.next();
