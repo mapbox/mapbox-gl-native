@@ -55,9 +55,11 @@ import com.mapzen.android.lost.api.LocationListener;
 import com.mapzen.android.lost.api.LocationRequest;
 import com.mapzen.android.lost.api.LocationServices;
 import com.mapzen.android.lost.api.LostApiClient;
-import org.apache.commons.validator.routines.UrlValidator;
+import com.squareup.okhttp.HttpUrl;
+
 import java.nio.ByteBuffer;
 import java.util.ArrayList;
+import java.util.Arrays;
 import java.util.Date;
 import java.util.Iterator;
 import java.util.List;
@@ -172,6 +174,19 @@ public class MapView extends FrameLayout implements LocationListener {
     // Called when no properties are being set from XML
     public MapView(Context context) {
         super(context);
+        initialize(context, null);
+    }
+
+    public MapView(Context context, @NonNull String accessToken) {
+        super(context);
+        setAccessToken(accessToken);
+        initialize(context, null);
+    }
+
+    public MapView(Context context, @NonNull String accessToken, String styleUrl) {
+        super(context);
+        setAccessToken(accessToken);
+        setStyleUrl(styleUrl);
         initialize(context, null);
     }
 
@@ -527,14 +542,16 @@ public class MapView extends FrameLayout implements LocationListener {
     }
 
     private void validateStyleUrl(String url) {
-        String[] schemes = {"http", "https", "file", "asset"};
-        UrlValidator urlValidator = new UrlValidator(schemes, UrlValidator.NO_FRAGMENTS | UrlValidator.ALLOW_LOCAL_URLS);
-        if (!urlValidator.isValid(url)) {
-            throw new RuntimeException("Style URL is not a valid http, https, file or asset URL.");
+        String[] schemes = {"http", "https", "asset"};
+        url = url.replaceFirst("asset://", "http://");
+        HttpUrl parsedUrl = HttpUrl.parse(url);
+        if (parsedUrl == null) {
+            throw new RuntimeException("Style URL is not a valid http, https or asset URL.");
         }
     }
 
     public void setStyleUrl(String url) {
+        validateStyleUrl(url);
         mStyleUrl = url;
         mNativeMapView.setStyleUrl(url);
     }
