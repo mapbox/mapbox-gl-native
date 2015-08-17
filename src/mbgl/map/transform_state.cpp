@@ -3,6 +3,8 @@
 #include <mbgl/util/projection.hpp>
 #include <mbgl/util/constants.hpp>
 #include <mbgl/util/box.hpp>
+#include <mbgl/util/tile_coordinate.hpp>
+#include <mbgl/util/interpolate.hpp>
 
 using namespace mbgl;
 
@@ -17,37 +19,37 @@ void TransformState::matrixFor(mat4& matrix, const TileID& id, const int8_t z) c
     matrix::scale(matrix, matrix, s / 4096.0f, s / 4096.0f, 1);
 }
 
+void TransformState::getProjMatrix(mat4& projMatrix) const {
+    double halfFov = std::atan(0.5 / getAltitude());
+    double topHalfSurfaceDistance = std::sin(halfFov) * getAltitude() /
+        std::sin(M_PI / 2.0f - getPitch() - halfFov);
+    // Calculate z value of the farthest fragment that should be rendered.
+    double farZ = std::cos(M_PI / 2.0f - getPitch()) * topHalfSurfaceDistance + getAltitude();
+
+    matrix::perspective(projMatrix, 2.0f * std::atan((getHeight() / 2.0f) / getAltitude()),
+            double(getWidth()) / getHeight(), 0.1, farZ);
+
+    matrix::translate(projMatrix, projMatrix, 0, 0, -getAltitude());
+
+    // After the rotateX, z values are in pixel units. Convert them to
+    // altitude unites. 1 altitude unit = the screen height.
+    matrix::scale(projMatrix, projMatrix, 1, -1, 1.0f / getHeight());
+
+    matrix::rotate_x(projMatrix, projMatrix, getPitch());
+    matrix::rotate_z(projMatrix, projMatrix, getAngle());
+
+    matrix::translate(projMatrix, projMatrix, pixel_x() - getWidth() / 2.0f,
+            pixel_y() - getWidth() / 2.0f, 0);
+}
+
 box TransformState::cornersToBox(uint32_t z) const {
-    const double ref_scale = std::pow(2, z);
-
-    const double angle_sin = std::sin(-angle);
-    const double angle_cos = std::cos(-angle);
-
-    const double w_2 = static_cast<double>(width) / 2.0;
-    const double h_2 = static_cast<double>(height) / 2.0;
-    const double ss_0 = scale * util::tileSize;
-    const double ss_1 = ref_scale / ss_0;
-    const double ss_2 = ss_0 / 2.0;
-
-    // Calculate the corners of the map view. The resulting coordinates will be
-    // in fractional tile coordinates.
-    box b;
-
-    b.tl.x = ((-w_2) * angle_cos - (-h_2) * angle_sin + ss_2 - x) * ss_1;
-    b.tl.y = ((-w_2) * angle_sin + (-h_2) * angle_cos + ss_2 - y) * ss_1;
-
-    b.tr.x = ((+w_2) * angle_cos - (-h_2) * angle_sin + ss_2 - x) * ss_1;
-    b.tr.y = ((+w_2) * angle_sin + (-h_2) * angle_cos + ss_2 - y) * ss_1;
-
-    b.bl.x = ((-w_2) * angle_cos - (+h_2) * angle_sin + ss_2 - x) * ss_1;
-    b.bl.y = ((-w_2) * angle_sin + (+h_2) * angle_cos + ss_2 - y) * ss_1;
-
-    b.br.x = ((+w_2) * angle_cos - (+h_2) * angle_sin + ss_2 - x) * ss_1;
-    b.br.y = ((+w_2) * angle_sin + (+h_2) * angle_cos + ss_2 - y) * ss_1;
-
-    b.center.x = (ss_2 - x) * ss_1;
-    b.center.y = (ss_2 - y) * ss_1;
-
+    double w = width;
+    double h = height;
+    box b(
+    pointCoordinate({ 0, 0 }).zoomTo(z),
+    pointCoordinate({ w, 0 }).zoomTo(z),
+    pointCoordinate({ w, h }).zoomTo(z),
+    pointCoordinate({ 0, h }).zoomTo(z));
     return b;
 }
 
@@ -238,6 +240,61 @@ const LatLng TransformState::latLngForPixel(const vec2<double> pixel) const {
     while (givenMeters.easting > ne.easting) givenMeters.easting -= d;
 
     return Projection::latLngForProjectedMeters(givenMeters);
+}
+
+TileCoordinate TransformState::pointCoordinate(const vec2<double> point) const {
+
+    float targetZ = 0;
+    float tileZoom = std::floor(getZoom());
+
+    mat4 mat = coordinatePointMatrix(tileZoom);
+
+    mat4 inverted;
+    bool err = matrix::invert(inverted, mat);
+
+    if (err) throw std::runtime_error("failed to invert coordinatePointMatrix");
+
+    // since we don't know the correct projected z value for the point,
+    // unproject two points to get a line and then find the point on that
+    // line with z=0
+
+    matrix::vec4 coord0;
+    matrix::vec4 coord1;
+    matrix::vec4 point0 = {{ point.x, point.y, 0, 1 }};
+    matrix::vec4 point1 = {{ point.x, point.y, 1, 1 }};
+    matrix::transformMat4(coord0, point0, inverted);
+    matrix::transformMat4(coord1, point1, inverted);
+
+    float w0 = coord0[3];
+    float w1 = coord1[3];
+    float x0 = coord0[0] / w0;
+    float x1 = coord1[0] / w1;
+    float y0 = coord0[1] / w0;
+    float y1 = coord1[1] / w1;
+    float z0 = coord0[2] / w0;
+    float z1 = coord1[2] / w1;
+
+
+    float t = z0 == z1 ? 0 : (targetZ - z0) / (z1 - z0);
+  
+    return { util::interpolate(x0, x1, t), util::interpolate(y0, y1, t), tileZoom };
+}
+
+mat4 TransformState::coordinatePointMatrix(float z) const {
+    mat4 proj;
+    getProjMatrix(proj);
+    float s = util::tileSize * scale / std::pow(2, z);
+    matrix::scale(proj, proj, s , s, 1);
+    matrix::multiply(proj, getPixelMatrix(), proj);
+    return proj;
+}
+
+mat4 TransformState::getPixelMatrix() const {
+    mat4 m;
+    matrix::identity(m);
+    matrix::scale(m, m, width / 2.0f, -height / 2.0f, 1);
+    matrix::translate(m, m, 1, -1, 0);
+    return m;
 }
 
 

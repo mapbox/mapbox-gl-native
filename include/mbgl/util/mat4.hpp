@@ -32,6 +32,7 @@ typedef std::array<double, 16> mat4;
 namespace matrix {
 
 void identity(mat4& out);
+bool invert(mat4& out, mat4& a);
 void ortho(mat4& out, double left, double right, double bottom, double top, double near, double far);
 void perspective(mat4& out, double fovy, double aspect, double near, double far);
 void copy(mat4& out, const mat4& a);

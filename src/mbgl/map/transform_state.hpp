@@ -1,10 +1,11 @@
 #ifndef MBGL_MAP_TRANSFORM_STATE
 #define MBGL_MAP_TRANSFORM_STATE
 
-#include <mbgl/util/mat4.hpp>
 #include <mbgl/util/geo.hpp>
 #include <mbgl/util/constants.hpp>
 #include <mbgl/util/vec.hpp>
+#include <mbgl/util/mat4.hpp>
+#include <mbgl/util/vec4.hpp>
 
 #include <cstdint>
 #include <array>
@@ -14,6 +15,7 @@ namespace mbgl {
 
 class TileID;
 struct box;
+struct TileCoordinate;
 
 class TransformState {
     friend class Transform;
@@ -21,6 +23,7 @@ class TransformState {
 public:
     // Matrix
     void matrixFor(mat4& matrix, const TileID& id, const int8_t z) const;
+    void getProjMatrix(mat4& matrix) const;
     box cornersToBox(uint32_t z) const;
 
     // Dimensions
@@ -62,6 +65,9 @@ public:
     double pixel_x() const;
     double pixel_y() const;
 
+    // Conversions
+    TileCoordinate pointCoordinate(const vec2<double> point) const;
+
 private:
     void constrain(double& scale, double& y) const;
 
@@ -71,6 +77,9 @@ private:
 
     // logical dimensions
     uint16_t width = 0, height = 0;
+
+    mat4 coordinatePointMatrix(float z) const;
+    mat4 getPixelMatrix() const;
 
 private:
     // animation state
