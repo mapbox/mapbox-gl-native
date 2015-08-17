@@ -2308,10 +2308,7 @@ CLLocationCoordinate2D MGLLocationCoordinate2DFromLatLng(mbgl::LatLng latLng)
 
             if (self.userLocationAnnotationView)
             {
-                #pragma clang diagnostic push
-                #pragma clang diagnostic ignored "-Wdeprecated-declarations"
-                [self locationManager:self.locationManager didUpdateToLocation:self.userLocation.location fromLocation:self.userLocation.location];
-                #pragma clang diagnostic pop
+                [self locationManager:self.locationManager didUpdateLocations:@[self.userLocation.location]];
             }
 
             break;
@@ -2325,10 +2322,7 @@ CLLocationCoordinate2D MGLLocationCoordinate2DFromLatLng(mbgl::LatLng latLng)
 
             if (self.userLocationAnnotationView)
             {
-                #pragma clang diagnostic push
-                #pragma clang diagnostic ignored "-Wdeprecated-declarations"
-                [self locationManager:self.locationManager didUpdateToLocation:self.userLocation.location fromLocation:self.userLocation.location];
-                #pragma clang diagnostic pop
+                [self locationManager:self.locationManager didUpdateLocations:@[self.userLocation.location]];
             }
 
             [self updateHeadingForDeviceOrientation];
@@ -2345,8 +2339,11 @@ CLLocationCoordinate2D MGLLocationCoordinate2DFromLatLng(mbgl::LatLng latLng)
     }
 }
 
-- (void)locationManager:(__unused CLLocationManager *)manager didUpdateToLocation:(CLLocation *)newLocation fromLocation:(CLLocation *)oldLocation
+- (void)locationManager:(__unused CLLocationManager *)manager didUpdateLocations:(NSArray *)locations
 {
+    CLLocation *oldLocation = self.userLocation.location;
+    CLLocation *newLocation = locations.lastObject;
+    
     if ( ! _showsUserLocation || ! newLocation || ! CLLocationCoordinate2DIsValid(newLocation.coordinate)) return;
 
     if (! oldLocation || ! CLLocationCoordinate2DIsValid(oldLocation.coordinate) || [newLocation distanceFromLocation:oldLocation])
