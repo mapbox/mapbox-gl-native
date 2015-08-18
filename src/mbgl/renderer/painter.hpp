@@ -203,7 +203,7 @@ private:
     std::vector<RenderItem> order;
 
     int numSublayers = 3;
-    int currentLayer;
+    size_t currentLayer;
     float depthRangeSize;
     const float depthEpsilon = 1.0f / (1 << 16);
 
