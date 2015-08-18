@@ -17,10 +17,10 @@ mkdir -p ./android/java/MapboxGLAndroidSDKTestApp/src/main/res/raw
 echo "${MAPBOX_ACCESS_TOKEN}" > ./android/java/MapboxGLAndroidSDKTestApp/src/main/res/raw/token.txt
 
 mapbox_time "compile_library" \
-make android-lib-${ANDROID_ABI} -j${JOBS} BUILDTYPE=${BUILDTYPE}
+make android-lib HOST_VERSION=${ANDROID_ABI} -j${JOBS} BUILDTYPE=${BUILDTYPE}
 
 mapbox_time "build_apk" \
-make android -j${JOBS} BUILDTYPE=${BUILDTYPE}
+make android HOST_VERSION=${ANDROID_ABI} -j${JOBS} BUILDTYPE=${BUILDTYPE}
 
 ################################################################################
 # Deploy
