@@ -74,6 +74,8 @@ void MapContext::cleanup() {
 void MapContext::pause() {
     MBGL_CHECK_ERROR(glFinish());
 
+    viewInvalidated = false;
+
     view.deactivate();
 
     std::unique_lock<std::mutex> lockPause(data.mutexPause);
@@ -81,6 +83,8 @@ void MapContext::pause() {
     data.condResume.wait(lockPause);
 
     view.activate();
+
+    invalidateView();
 }
 
 void MapContext::triggerUpdate(const TransformState& state, const Update flags) {
