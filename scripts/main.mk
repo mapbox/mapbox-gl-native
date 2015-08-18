@@ -125,3 +125,6 @@ print-env: $(SUBMODULES)
 		@printf "asset=$(COLOR_CYAN)%s$(FORMAT_END)  " $(ASSET)
 		@printf "http=$(COLOR_CYAN)%s$(FORMAT_END)  " $(HTTP)
 		@printf "cache=$(COLOR_CYAN)%s$(FORMAT_END)\n" $(CACHE)
+
+# Never remove intermediate files
+.SECONDARY:
