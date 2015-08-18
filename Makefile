@@ -15,7 +15,7 @@ $(error Cannot determine build platform)
 endif
 export BUILD_VERSION = $(shell uname -m)
 
-RUN =  @$(MAKE) -f scripts/main.mk
+RUN =  +@$(MAKE) -f scripts/main.mk
 
 default: ; @printf "You must specify a valid target\n"
 
