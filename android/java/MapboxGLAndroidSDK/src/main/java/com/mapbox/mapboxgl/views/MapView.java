@@ -60,6 +60,7 @@ import com.squareup.okhttp.HttpUrl;
 import java.nio.ByteBuffer;
 import java.util.ArrayList;
 import java.util.Arrays;
+import java.util.Collections;
 import java.util.Date;
 import java.util.Iterator;
 import java.util.List;
@@ -397,7 +398,7 @@ public class MapView extends FrameLayout implements LocationListener {
             mAnnotations.add(polygons.get(i));
         }
 
-        return polygons;
+        return Collections.unmodifiableList(polygons);
     }
 
     private void removeAnnotationsWithId(long annotationId){
@@ -428,6 +429,10 @@ public class MapView extends FrameLayout implements LocationListener {
         }
         mNativeMapView.removeAnnotations(ids);
         mAnnotations.clear();
+    }
+
+    public List<Annotation> getAnnotations() {
+        return Collections.unmodifiableList(mAnnotations);
     }
 
     //
@@ -590,7 +595,7 @@ public class MapView extends FrameLayout implements LocationListener {
     }
 
     public List<String> getStyleClasses() {
-        return mNativeMapView.getClasses();
+        return Collections.unmodifiableList(mNativeMapView.getClasses());
     }
 
     public void setStyleClasses(List<String> styleClasses) {
