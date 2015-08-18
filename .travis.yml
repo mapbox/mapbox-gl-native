@@ -33,28 +33,28 @@ matrix:
     - os: linux
       env: FLAVOR=android ANDROID_ABI=arm-v7 BUILDTYPE=Release
       android:
-        components: [ 'build-tools-23', 'android-23', 'extra' ]
+        components: [ 'build-tools-23', 'android-23', 'extra-android-m2repository' ]
       addons:
         apt:
           packages: [ 'lib32stdc++6' ]
     - os: linux
       env: FLAVOR=android ANDROID_ABI=arm-v7 BUILDTYPE=Debug
       android:
-        components: [ 'build-tools-23', 'android-23', 'extra' ]
+        components: [ 'build-tools-23', 'android-23', 'extra-android-m2repository' ]
       addons:
         apt:
           packages: [ 'lib32stdc++6' ]
     - os: linux
       env: FLAVOR=android ANDROID_ABI=arm-v8 BUILDTYPE=Release
       android:
-        components: [ 'build-tools-23', 'android-23', 'extra' ]
+        components: [ 'build-tools-23', 'android-23', 'extra-android-m2repository' ]
       addons:
         apt:
           packages: [ 'lib32stdc++6' ]
     - os: linux
       env: FLAVOR=android ANDROID_ABI=x86 BUILDTYPE=Release
       android:
-        components: [ 'build-tools-23', 'android-23', 'extra' ]
+        components: [ 'build-tools-23', 'android-23', 'extra-android-m2repository' ]
       addons:
         apt:
           packages: [ 'lib32stdc++6' ]
