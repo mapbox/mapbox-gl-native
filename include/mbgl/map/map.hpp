@@ -123,6 +123,10 @@ public:
     double getBearing() const;
     void resetNorth();
 
+    // Pitch
+    void setPitch(double pitch);
+    double getPitch() const;
+
     // Size
     uint16_t getWidth() const;
     uint16_t getHeight() const;

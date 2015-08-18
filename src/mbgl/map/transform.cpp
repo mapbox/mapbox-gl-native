@@ -347,6 +347,15 @@ double Transform::getAngle() const {
     return state.angle;
 }
 
+#pragma mark - Pitch
+
+void Transform::setPitch(double pitch) {
+    state.pitch = pitch;
+}
+
+double Transform::getPitch() const {
+    return state.pitch;
+}
 
 #pragma mark - Transition
 

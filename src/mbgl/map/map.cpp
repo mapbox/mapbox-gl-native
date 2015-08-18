@@ -269,6 +269,18 @@ void Map::resetNorth() {
 }
 
 
+#pragma mark - Pitch
+
+void Map::setPitch(double pitch) {
+    transform->setPitch(std::min(pitch, 60.0) * M_PI / 180);
+    update(Update::Repaint);
+}
+
+double Map::getPitch() const {
+    return transform->getPitch() / M_PI * 180;
+}
+
+
 #pragma mark - Projection
 
 void Map::getWorldBoundsMeters(ProjectedMeters& sw, ProjectedMeters& ne) const {
