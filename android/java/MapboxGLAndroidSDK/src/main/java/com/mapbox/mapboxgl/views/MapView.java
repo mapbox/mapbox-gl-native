@@ -742,7 +742,9 @@ public class MapView extends FrameLayout implements LocationListener {
     }
 
     public void onSizeChanged(int width, int height, int oldw, int oldh) {
-        mNativeMapView.resizeView((int) (width / mScreenDensity), (int) (height / mScreenDensity));
+        if (!isInEditMode()) {
+            mNativeMapView.resizeView((int) (width / mScreenDensity), (int) (height / mScreenDensity));
+        }
     }
 
     // This class handles SurfaceHolder callbacks
