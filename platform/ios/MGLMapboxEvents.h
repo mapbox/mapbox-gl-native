@@ -30,6 +30,7 @@ extern NSString *const MGLEventGestureQuickZoom;
 extern NSString *const MGLEventGesturePanStart;
 extern NSString *const MGLEventGesturePinchStart;
 extern NSString *const MGLEventGestureRotateStart;
+extern NSString *const MGLEventGesturePitchStart;
 
 typedef NS_DICTIONARY_OF(NSString *, id) MGLMapboxEventAttributes;
 typedef NS_MUTABLE_DICTIONARY_OF(NSString *, id) MGLMutableMapboxEventAttributes;

@@ -85,6 +85,7 @@ CLLocationDegrees MGLDegreesFromRadians(CGFloat radians)
 @property (nonatomic) UIPinchGestureRecognizer *pinch;
 @property (nonatomic) UIRotationGestureRecognizer *rotate;
 @property (nonatomic) UILongPressGestureRecognizer *quickZoom;
+@property (nonatomic) UIPanGestureRecognizer *twoFingerDrag;
 @property (nonatomic) NSMapTable *annotationIDsByAnnotation;
 @property (nonatomic) NS_MUTABLE_DICTIONARY_OF(NSString *, MGLAnnotationImage *) *annotationImages;
 @property (nonatomic) std::vector<uint32_t> annotationsNearbyLastTap;
@@ -338,6 +339,15 @@ std::chrono::steady_clock::duration secondsAsDuration(float duration)
     [twoFingerTap requireGestureRecognizerToFail:_pinch];
     [twoFingerTap requireGestureRecognizerToFail:_rotate];
     [self addGestureRecognizer:twoFingerTap];
+    
+    _twoFingerDrag = [[UIPanGestureRecognizer alloc] initWithTarget:self action:@selector(handleTwoFingerDragGesture:)];
+    _twoFingerDrag.minimumNumberOfTouches = 2;
+    _twoFingerDrag.maximumNumberOfTouches = 2;
+    _twoFingerDrag.delegate = self;
+    [_twoFingerDrag requireGestureRecognizerToFail:twoFingerTap];
+    [_twoFingerDrag requireGestureRecognizerToFail:_pan];
+    [self addGestureRecognizer:_twoFingerDrag];
+    _pitchEnabled = YES;
 
     if ([[UIDevice currentDevice] userInterfaceIdiom] == UIUserInterfaceIdiomPhone)
     {
@@ -1326,6 +1336,59 @@ std::chrono::steady_clock::duration secondsAsDuration(float duration)
     }
 }
 
+- (void)handleTwoFingerDragGesture:(UIPanGestureRecognizer *)twoFingerDrag
+{
+    if ( ! self.isPitchEnabled) return;
+    
+    _mbglMap->cancelTransitions();
+    
+    if (twoFingerDrag.state == UIGestureRecognizerStateBegan)
+    {
+        [self trackGestureEvent:MGLEventGesturePitchStart forRecognizer:twoFingerDrag];
+    }
+    else if (twoFingerDrag.state == UIGestureRecognizerStateBegan || twoFingerDrag.state == UIGestureRecognizerStateChanged)
+    {
+        CGFloat gestureDistance = CGPoint([twoFingerDrag translationInView:twoFingerDrag.view]).y;
+        double currentPitch = _mbglMap->getPitch();
+        double minPitch = 0;
+        double maxPitch = 60.0;
+        double slowdown = 20.0;
+
+        double pitchNew = fmax(fmin(currentPitch - (gestureDistance / slowdown), maxPitch), minPitch);
+        
+        _mbglMap->setPitch(pitchNew);
+    }
+    else if (twoFingerDrag.state == UIGestureRecognizerStateEnded || twoFingerDrag.state == UIGestureRecognizerStateCancelled)
+    {
+        [self unrotateIfNeededAnimated:YES];
+
+        //[self notifyMapChange:(mbgl::MapChangeRegionDidChange)];
+    }
+    
+}
+
+- (BOOL)gestureRecognizerShouldBegin:(UIGestureRecognizer *)gestureRecognizer
+{
+    if ([gestureRecognizer isKindOfClass:[UIPanGestureRecognizer class]])
+    {
+        UIPanGestureRecognizer *panGesture = (UIPanGestureRecognizer *)gestureRecognizer;
+
+        if (panGesture.minimumNumberOfTouches == 2)
+        {
+            CGPoint velocity = [panGesture velocityInView:panGesture.view];
+            double gestureAngle = MGLDegreesFromRadians(atan(velocity.y / velocity.x));
+            double horizontalToleranceDegrees = 20.0;
+
+            // cancel if gesture angle is not 90º±20º (more or less vertical)
+            if ( ! (fabs((fabs(gestureAngle) - 90.0)) < horizontalToleranceDegrees))
+            {
+                return NO;
+            }
+        }
+    }
+    return YES;
+}
+
 - (void)handleCalloutAccessoryTapGesture:(UITapGestureRecognizer *)tap
 {
     if ([self.delegate respondsToSelector:@selector(mapView:annotation:calloutAccessoryControlTapped:)])
@@ -1417,6 +1480,11 @@ std::chrono::steady_clock::duration secondsAsDuration(float duration)
 + (NS_SET_OF(NSString *) *)keyPathsForValuesAffectingRotateEnabled
 {
     return [NSSet setWithObject:@"allowsRotating"];
+}
+
++ (NS_SET_OF(NSString *) *)keyPathsForValuesAffectingPitchEnabled
+{
+    return [NSSet setWithObject:@"allowsPitching"];
 }
 
 - (void)setDebugActive:(BOOL)debugActive
@@ -1615,6 +1683,25 @@ mbgl::LatLngBounds MGLLatLngBoundsFromCoordinateBounds(MGLCoordinateBounds coord
 - (void)setDirection:(CLLocationDirection)direction
 {
     [self setDirection:direction animated:NO];
+}
+
+- (double)pitch
+{
+    return _mbglMap->getPitch();
+}
+
+- (void)setPitch:(double)pitch
+{
+    // constrain pitch to between 0º and 60º
+    //
+    _mbglMap->setPitch(fmax(fmin(pitch, 60), 0));
+    
+    //[self notifyMapChange:(mbgl::MapChangeRegionDidChange)];
+}
+
+- (void)resetPitch
+{
+    [self setPitch:0];
 }
 
 - (CLLocationCoordinate2D)convertPoint:(CGPoint)point toCoordinateFromView:(nullable UIView *)view
@@ -2630,10 +2717,11 @@ CLLocationCoordinate2D MGLLocationCoordinate2DFromLatLng(mbgl::LatLng latLng)
         {
             [self updateCompass];
 
-            if (self.pan.state       == UIGestureRecognizerStateChanged ||
-                self.pinch.state     == UIGestureRecognizerStateChanged ||
-                self.rotate.state    == UIGestureRecognizerStateChanged ||
-                self.quickZoom.state == UIGestureRecognizerStateChanged) return;
+            if (self.pan.state           == UIGestureRecognizerStateChanged ||
+                self.pinch.state         == UIGestureRecognizerStateChanged ||
+                self.rotate.state        == UIGestureRecognizerStateChanged ||
+                self.quickZoom.state     == UIGestureRecognizerStateChanged ||
+                self.twoFingerDrag.state == UIGestureRecognizerStateChanged) return;
 
             if (self.isAnimatingGesture) return;
 
@@ -3060,6 +3148,21 @@ class MBGLView : public mbgl::View
 - (void)setAllowsRotating:(BOOL)allowsRotating
 {
     self.rotateEnabled = allowsRotating;
+}
+
++ (NS_SET_OF(NSString *) *)keyPathsForValuesAffectingAllowsPitching
+{
+    return [NSSet setWithObject:@"pitchEnabled"];
+}
+
+- (BOOL)allowsPitching
+{
+    return self.pitchEnabled;
+}
+
+- (void)setAllowsPitching:(BOOL)allowsPitching
+{
+    self.pitchEnabled = allowsPitching;
 }
 
 - (void)didReceiveMemoryWarning

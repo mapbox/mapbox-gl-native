@@ -11,6 +11,7 @@ Settings_NSUserDefaults::Settings_NSUserDefaults()
         @"latitude"          : @(latitude),
         @"zoom"              : @(zoom),
         @"bearing"           : @(bearing),
+        @"pitch"             : @(pitch),
         @"userTrackingMode"  : @(userTrackingMode),
         @"showsUserLocation" : @(showsUserLocation),
         @"debug"             : @(debug),
@@ -26,6 +27,7 @@ void Settings_NSUserDefaults::load()
     latitude  = [settings[@"latitude"]  doubleValue];
     zoom      = [settings[@"zoom"]      doubleValue];
     bearing   = [settings[@"bearing"]   doubleValue];
+    pitch     = [settings[@"pitch"]     doubleValue];
     debug     = [settings[@"debug"]     boolValue];
     
     unsigned uncheckedTrackingMode = [settings[@"trackingMode"] unsignedIntValue];
@@ -44,6 +46,7 @@ void Settings_NSUserDefaults::save()
         @"latitude"          : @(latitude),
         @"zoom"              : @(zoom),
         @"bearing"           : @(bearing),
+        @"pitch"             : @(pitch),
         @"userTrackingMode"  : @(userTrackingMode),
         @"showsUserLocation" : @(showsUserLocation),
         @"debug"             : @(debug),
