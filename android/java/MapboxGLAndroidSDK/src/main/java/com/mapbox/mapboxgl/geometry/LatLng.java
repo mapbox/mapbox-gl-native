@@ -97,18 +97,8 @@ public class LatLng implements ILatLng, Parcelable, Serializable {
 
         LatLng latLng = (LatLng) o;
 
-        if (Double.compare(latLng.altitude, altitude) != 0) {
-            return false;
-        }
+        return Double.compare(latLng.altitude, altitude) == 0 && Double.compare(latLng.latitude, latitude) == 0 && Double.compare(latLng.longitude, longitude) == 0;
 
-        if (Double.compare(latLng.latitude, latitude) != 0) {
-            return false;
-        }
-        if (Double.compare(latLng.longitude, longitude) != 0) {
-            return false;
-        }
-
-        return true;
     }
 
     @Override

@@ -22,6 +22,7 @@ import android.net.NetworkInfo;
 import android.os.Build;
 import android.os.Bundle;
 import android.support.annotation.NonNull;
+import android.support.v4.content.ContextCompat;
 import android.support.v4.view.GestureDetectorCompat;
 import android.support.v4.view.ScaleGestureDetectorCompat;
 import android.text.TextUtils;
@@ -104,7 +105,6 @@ public class MapView extends FrameLayout implements LocationListener {
     //
 
     // Used to call JNI NativeMapView
-    private SurfaceView mSurfaceView;
     private NativeMapView mNativeMapView;
 
     // Used to handle DPI scaling
@@ -135,7 +135,7 @@ public class MapView extends FrameLayout implements LocationListener {
     private Location mGpsLocation;
 
     public enum UserLocationTrackingMode {
-        NONE, FOLLOW, FOLLOW_BEARING;
+        NONE, FOLLOW, FOLLOW_BEARING
     }
     private UserLocationTrackingMode mUserLocationTrackingMode = UserLocationTrackingMode.FOLLOW;
 
@@ -215,8 +215,8 @@ public class MapView extends FrameLayout implements LocationListener {
         // Save the context
         mContext = context;
 
-        mSurfaceView = new SurfaceView(mContext);
-        addView(mSurfaceView);
+        SurfaceView surfaceView = new SurfaceView(mContext);
+        addView(surfaceView);
 
         // Check if we are in Eclipse UI editor
         if (isInEditMode()) {
@@ -252,9 +252,9 @@ public class MapView extends FrameLayout implements LocationListener {
 
         // Register the SurfaceHolder callbacks
         if (android.os.Build.VERSION.SDK_INT >= Build.VERSION_CODES.GINGERBREAD) {
-            mSurfaceView.getHolder().addCallback(new Callbacks2());
+            surfaceView.getHolder().addCallback(new Callbacks2());
         } else {
-            mSurfaceView.getHolder().addCallback(new Callbacks());
+            surfaceView.getHolder().addCallback(new Callbacks());
         }
 
         // Touch gesture detectors
@@ -294,7 +294,7 @@ public class MapView extends FrameLayout implements LocationListener {
         mCompassListener = new CompassListener();
 
         mCompassView = new ImageView(mContext);
-        mCompassView.setImageDrawable(getResources().getDrawable(R.drawable.compass));
+        mCompassView.setImageDrawable(ContextCompat.getDrawable(getContext(), R.drawable.compass));
         mCompassView.setContentDescription(getResources().getString(R.string.compassContentDescription));
         LayoutParams lp = new FrameLayout.LayoutParams((int)(48 * mScreenDensity), (int)(48 * mScreenDensity));
         lp.gravity = Gravity.TOP | Gravity.END;
@@ -306,7 +306,7 @@ public class MapView extends FrameLayout implements LocationListener {
 
         // Setup Support For Listener Tracking
         // MapView's internal listener is setup in onCreate()
-        mOnMapChangedListener = new ArrayList<OnMapChangedListener>();
+        mOnMapChangedListener = new ArrayList<>();
 
         // Load the attributes
         TypedArray typedArray = context.obtainStyledAttributes(attrs, R.styleable.MapView, 0, 0);
@@ -560,7 +560,6 @@ public class MapView extends FrameLayout implements LocationListener {
     }
 
     private void validateStyleUrl(String url) {
-        String[] schemes = {"http", "https", "asset"};
         url = url.replaceFirst("asset://", "http://");
         HttpUrl parsedUrl = HttpUrl.parse(url);
         if (parsedUrl == null) {
@@ -723,7 +722,9 @@ public class MapView extends FrameLayout implements LocationListener {
         getContext().unregisterReceiver(mConnectivityReceiver);
         mConnectivityReceiver = null;
 
-        toggleGps(!mIsMyLocationEnabled);
+        if (mIsMyLocationEnabled) {
+            toggleGps(false);
+        };
 
         mNativeMapView.pause();
     }
@@ -736,7 +737,9 @@ public class MapView extends FrameLayout implements LocationListener {
         mConnectivityReceiver = new ConnectivityReceiver();
         mContext.registerReceiver(mConnectivityReceiver, new IntentFilter(ConnectivityManager.CONNECTIVITY_ACTION));
 
-        toggleGps(mIsMyLocationEnabled);
+        if (mIsMyLocationEnabled) {
+            toggleGps(true);
+        }
 
         mNativeMapView.resume();
     }

@@ -1,11 +1,15 @@
 package com.mapbox.mapboxgl.testapp;
 
+import android.Manifest;
+import android.content.pm.PackageManager;
 import android.graphics.Color;
 import android.graphics.PointF;
 import android.location.Location;
 import android.os.Bundle;
 import android.support.design.widget.FloatingActionButton;
 import android.support.design.widget.NavigationView;
+import android.support.v4.app.ActivityCompat;
+import android.support.v4.content.ContextCompat;
 import android.support.v4.view.GravityCompat;
 import android.support.v4.widget.DrawerLayout;
 import android.support.v7.app.ActionBar;
@@ -16,13 +20,10 @@ import android.view.GestureDetector;
 import android.view.MenuItem;
 import android.view.MotionEvent;
 import android.view.View;
-import android.widget.AdapterView;
 import android.widget.TextView;
 import com.crashlytics.android.Crashlytics;
 import com.mapbox.mapboxgl.annotations.MarkerOptions;
-import com.mapbox.mapboxgl.annotations.Polygon;
 import com.mapbox.mapboxgl.annotations.PolygonOptions;
-import com.mapbox.mapboxgl.annotations.Polyline;
 import com.mapbox.mapboxgl.annotations.PolylineOptions;
 import com.mapbox.mapboxgl.geometry.LatLng;
 import com.mapbox.mapboxgl.views.MapView;
@@ -43,6 +44,9 @@ public class MainActivity extends AppCompatActivity {
     // Used for saving instance state
     private static final String STATE_IS_ANNOTATIONS_ON = "isAnnotationsOn";
     private static final String STATE_SELECTED_STYLE = "selectedStyle";
+
+    // Used for permissions requests
+    private static final int PERMISSIONS_LOCATION = 0;
 
     //
     // Instance members
@@ -78,8 +82,10 @@ public class MainActivity extends AppCompatActivity {
         setSupportActionBar(toolbar);
 
         final ActionBar ab = getSupportActionBar();
-        ab.setHomeAsUpIndicator(R.drawable.ic_menu);
-        ab.setDisplayHomeAsUpEnabled(true);
+        if (ab != null) {
+            ab.setHomeAsUpIndicator(R.drawable.ic_menu);
+            ab.setDisplayHomeAsUpEnabled(true);
+        }
 
         mDrawerLayout = (DrawerLayout) findViewById(R.id.drawer_layout);
 
@@ -229,6 +235,17 @@ public class MainActivity extends AppCompatActivity {
         }
     }
 
+    @Override
+    public void onRequestPermissionsResult(int requestCode, String permissions[], int[] grantResults) {
+        switch (requestCode) {
+            case PERMISSIONS_LOCATION: {
+                if (grantResults[0] == PackageManager.PERMISSION_GRANTED) {
+                    enableGps();
+                }
+            }
+        }
+    }
+
     private void setupDrawerContent(NavigationView navigationView) {
         navigationView.setNavigationItemSelectedListener(
                 new NavigationView.OnNavigationItemSelectedListener() {
@@ -331,12 +348,22 @@ public class MainActivity extends AppCompatActivity {
      */
     private void toggleGps(boolean enableGps) {
         if (enableGps) {
-            mMapView.setMyLocationEnabled(enableGps);
-            mLocationFAB.setColorFilter(getResources().getColor(R.color.primary));
+            if ((ContextCompat.checkSelfPermission(this, Manifest.permission.ACCESS_COARSE_LOCATION) != PackageManager.PERMISSION_GRANTED) ||
+                    (ContextCompat.checkSelfPermission(this, Manifest.permission.ACCESS_FINE_LOCATION) != PackageManager.PERMISSION_GRANTED))
+            {
+                ActivityCompat.requestPermissions(this, new String[]{Manifest.permission.ACCESS_COARSE_LOCATION, Manifest.permission.ACCESS_FINE_LOCATION}, PERMISSIONS_LOCATION);
+            } else {
+                enableGps();
+            }
         } else {
-            mMapView.setMyLocationEnabled(enableGps);
+            mMapView.setMyLocationEnabled(false);
             mLocationFAB.setColorFilter(Color.TRANSPARENT);
         }
+    }
+
+    private void enableGps() {
+        mMapView.setMyLocationEnabled(true);
+        mLocationFAB.setColorFilter(ContextCompat.getColor(this, R.color.primary));
     }
 
     /**
@@ -364,7 +391,6 @@ public class MainActivity extends AppCompatActivity {
 
     private void addMarkers() {
         LatLng backLot = new LatLng(38.649441, -121.369064);
-        MapView map = mMapView;
         mMapView.addMarker(new MarkerOptions()
             .position(backLot)
             .title("Back Lot")
@@ -383,7 +409,7 @@ public class MainActivity extends AppCompatActivity {
             String geojsonStr = Util.loadStringFromAssets(this, "small_line.geojson");
             LatLng[] latLngs = Util.parseGeoJSONCoordinates(geojsonStr);
             MapView map = mMapView;
-            Polyline line = map.addPolyline(new PolylineOptions()
+            map.addPolyline(new PolylineOptions()
                     .add(latLngs)
                     .width(2)
                     .color(Color.RED));
@@ -394,17 +420,16 @@ public class MainActivity extends AppCompatActivity {
     }
 
     private void addPolygon() {
-        String geojsonStr = null;
         try {
-            geojsonStr = Util.loadStringFromAssets(this, "small_poly.geojson");
+            String geojsonStr = Util.loadStringFromAssets(this, "small_poly.geojson");
             LatLng[] latLngs = Util.parseGeoJSONCoordinates(geojsonStr);
             MapView map = mMapView;
-            ArrayList<PolygonOptions> opts = new ArrayList<PolygonOptions>();
+            ArrayList<PolygonOptions> opts = new ArrayList<>();
             opts.add(new PolygonOptions()
                         .add(latLngs)
                         .strokeColor(Color.MAGENTA)
                         .fillColor(Color.BLUE));
-            Polygon polygon = map.addPolygons(opts).get(0);
+            map.addPolygons(opts).get(0);
         } catch (Exception e) {
             Log.e(TAG, "Error adding Polygon: "+ e);
             e.printStackTrace();
@@ -413,76 +438,6 @@ public class MainActivity extends AppCompatActivity {
 
     private void removeAnnotations() {
         mMapView.removeAnnotations();
-    }
-
-    // This class handles outdoor class change events
-    private class OutdoorClassSpinnerListener implements AdapterView.OnItemSelectedListener {
-
-        @Override
-        public void onItemSelected(AdapterView<?> parent, View view, int position, long id) {
-            ArrayList<String> styleClasses = new ArrayList<>(1);
-
-            switch (position) {
-                // Day
-                case 0:
-                    styleClasses.add("day");
-                    mMapView.setStyleClasses(styleClasses);
-                    break;
-
-                // Night
-                case 1:
-                    styleClasses.add("night");
-                    mMapView.setStyleClasses(styleClasses);
-                    break;
-
-                default:
-                    onNothingSelected(parent);
-                    break;
-            }
-        }
-
-        @Override
-        public void onNothingSelected(AdapterView<?> parent) {
-            mMapView.removeAllStyleClasses();
-        }
-    }
-
-    // This class handles satellite class change events
-    private class SatelliteClassSpinnerListener implements AdapterView.OnItemSelectedListener {
-
-        @Override
-        public void onItemSelected(AdapterView<?> parent, View view, int position, long id) {
-            ArrayList<String> styleClasses = new ArrayList<>(2);
-
-            switch (position) {
-                // Labels + Contours
-                case 0:
-                    styleClasses.add("labels");
-                    styleClasses.add("contours");
-                    mMapView.setStyleClasses(styleClasses);
-                    break;
-
-                // Labels Only
-                case 1:
-                    styleClasses.add("labels");
-                    mMapView.setStyleClasses(styleClasses);
-                    break;
-
-                // No Labels
-                case 2:
-                    mMapView.setStyleClasses(styleClasses);
-                    break;
-
-                default:
-                    onNothingSelected(parent);
-                    break;
-            }
-        }
-
-        @Override
-        public void onNothingSelected(AdapterView<?> parent) {
-            mMapView.removeAllStyleClasses();
-        }
     }
 
     // Called when FPS changes

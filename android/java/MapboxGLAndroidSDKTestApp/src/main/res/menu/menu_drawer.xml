@@ -3,7 +3,7 @@
 
     <item
         android:id="@+id/action_debug"
-        android:icon="@drawable/ic_action_about"
+        android:icon="@android:drawable/ic_menu_info_details"
         android:title="@string/action_debug"
         android:checkable="true"
         />
@@ -14,7 +14,7 @@
         android:checkable="true"
         />
     <item android:id="@+id/action_compass"
-          android:icon="@drawable/ic_explore_white_24dp"
+          android:icon="@android:drawable/ic_menu_compass"
           android:title="@string/action_compass"
           android:checkable="true"
           />

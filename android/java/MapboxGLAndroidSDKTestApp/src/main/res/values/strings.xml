@@ -4,10 +4,10 @@
     <string name="app_name">Mapbox GL</string>
 
     <string name="action_gps">Toggle GPS location</string>
-    <string name="action_location_none">Toggle Location Bearing Tracking</string>
-    <string name="action_location_follow">Follow</string>
-    <string name="action_location_bearing">Bearing</string>
-    <string name="action_compass">Toggle Compass</string>
+    <string name="action_location_none">Disable tracking</string>
+    <string name="action_location_follow">Use follow tracking mode</string>
+    <string name="action_location_bearing">Use bearing tracking mode tracking</string>
+    <string name="action_compass">Toggle compass</string>
     <string name="action_debug">Toggle debug mode</string>
     <string name="action_point_annotations">Toggle point annotations</string>
 

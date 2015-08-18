@@ -119,15 +119,7 @@ public final class BoundingBox implements Parcelable, Serializable {
 
     @Override
     public String toString() {
-        return new StringBuffer().append("N:")
-                .append(this.mLatNorth)
-                .append("; E:")
-                .append(this.mLonEast)
-                .append("; S:")
-                .append(this.mLatSouth)
-                .append("; W:")
-                .append(this.mLonWest)
-                .toString();
+        return "N:" + this.mLatNorth + "; E:" + this.mLonEast + "; S:" + this.mLatSouth + "; W:" + this.mLonWest;
     }
 
     /**
@@ -164,17 +156,8 @@ public final class BoundingBox implements Parcelable, Serializable {
      */
     public boolean equals(final BoundingBox other) {
 
-        if (other == null) {
-            return false;
-        }
-        if (other == this) {
-            return true;
-        }
+        return other != null && (other == this || mLatNorth == other.getLatNorth() && mLatSouth == other.getLatSouth() && mLonEast == other.getLonEast() && mLonWest == other.getLonWest());
 
-        return mLatNorth == other.getLatNorth()
-                && mLatSouth == other.getLatSouth()
-                && mLonEast == other.getLonEast()
-                && mLonWest == other.getLonWest();
     }
 
     /**
