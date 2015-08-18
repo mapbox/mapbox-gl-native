@@ -48,8 +48,8 @@ Bucket* TileWorker::getBucket(const StyleLayer& layer) const {
 TileParseResult TileWorker::parse(const GeometryTile& geometryTile) {
     partialParse = false;
 
-    for (const auto& layer : layers) {
-        parseLayer(*layer, geometryTile);
+    for (auto i = layers.rbegin(); i != layers.rend(); i++) {
+        parseLayer(**i, geometryTile);
     }
 
     return partialParse ? TileData::State::partial : TileData::State::parsed;
@@ -58,8 +58,8 @@ TileParseResult TileWorker::parse(const GeometryTile& geometryTile) {
 void TileWorker::redoPlacement(float angle, bool collisionDebug) {
     collision->reset(angle, 0);
     collision->setDebug(collisionDebug);
-    for (const auto& layer_desc : layers) {
-        auto bucket = getBucket(*layer_desc);
+    for (auto i = layers.rbegin(); i != layers.rend(); i++) {
+        auto bucket = getBucket(**i);
         if (bucket) {
             bucket->placeFeatures();
         }
