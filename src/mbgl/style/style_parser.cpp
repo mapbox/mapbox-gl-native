@@ -875,7 +875,7 @@ void StyleParser::parseLayout(JSVal value, util::ptr<StyleBucket> &bucket) {
     parseOptionalProperty<Function<bool>>("icon-ignore-placement", Key::IconIgnorePlacement, bucket->layout, value);
     parseOptionalProperty<Function<bool>>("icon-optional", Key::IconOptional, bucket->layout, value);
     parseOptionalProperty<Function<RotationAlignmentType>>("icon-rotation-alignment", Key::IconRotationAlignment, bucket->layout, value);
-    parseOptionalProperty<Function<float>>("icon-max-size", Key::IconMaxSize, bucket->layout, value);
+    parseOptionalProperty<Function<float>>("icon-size", Key::IconSize, bucket->layout, value);
     parseOptionalProperty<Function<std::string>>("icon-image", Key::IconImage, bucket->layout, value);
     parseOptionalProperty<Function<float>>("icon-rotate", Key::IconRotate, bucket->layout, value);
     parseOptionalProperty<Function<float>>("icon-padding", Key::IconPadding, bucket->layout, value);
@@ -884,7 +884,7 @@ void StyleParser::parseLayout(JSVal value, util::ptr<StyleBucket> &bucket) {
     parseOptionalProperty<Function<RotationAlignmentType>>("text-rotation-alignment", Key::TextRotationAlignment, bucket->layout, value);
     parseOptionalProperty<Function<std::string>>("text-field", Key::TextField, bucket->layout, value);
     parseOptionalProperty<Function<std::string>>("text-font", Key::TextFont, bucket->layout, value);
-    parseOptionalProperty<Function<float>>("text-max-size", Key::TextMaxSize, bucket->layout, value);
+    parseOptionalProperty<Function<float>>("text-size", Key::TextSize, bucket->layout, value);
     parseOptionalProperty<Function<float>>("text-max-width", Key::TextMaxWidth, bucket->layout, value);
     parseOptionalProperty<Function<float>>("text-line-height", Key::TextLineHeight, bucket->layout, value);
     parseOptionalProperty<Function<float>>("text-letter-spacing", Key::TextLetterSpacing, bucket->layout, value);

@@ -241,7 +241,6 @@ std::unique_ptr<Bucket> TileWorker::createSymbolBucket(const GeometryTileLayer& 
     applyLayoutProperty(PropertyKey::IconIgnorePlacement, bucket_desc.layout, layout.icon.ignore_placement, z);
     applyLayoutProperty(PropertyKey::IconOptional, bucket_desc.layout, layout.icon.optional, z);
     applyLayoutProperty(PropertyKey::IconRotationAlignment, bucket_desc.layout, layout.icon.rotation_alignment, z);
-    applyLayoutProperty(PropertyKey::IconMaxSize, bucket_desc.layout, layout.icon.max_size, z);
     applyLayoutProperty(PropertyKey::IconImage, bucket_desc.layout, layout.icon.image, z);
     applyLayoutProperty(PropertyKey::IconPadding, bucket_desc.layout, layout.icon.padding, z);
     applyLayoutProperty(PropertyKey::IconRotate, bucket_desc.layout, layout.icon.rotate, z);
@@ -251,7 +250,6 @@ std::unique_ptr<Bucket> TileWorker::createSymbolBucket(const GeometryTileLayer& 
     applyLayoutProperty(PropertyKey::TextRotationAlignment, bucket_desc.layout, layout.text.rotation_alignment, z);
     applyLayoutProperty(PropertyKey::TextField, bucket_desc.layout, layout.text.field, z);
     applyLayoutProperty(PropertyKey::TextFont, bucket_desc.layout, layout.text.font, z);
-    applyLayoutProperty(PropertyKey::TextMaxSize, bucket_desc.layout, layout.text.max_size, z);
     applyLayoutProperty(PropertyKey::TextMaxWidth, bucket_desc.layout, layout.text.max_width, z);
     applyLayoutProperty(PropertyKey::TextLineHeight, bucket_desc.layout, layout.text.line_height, z);
     applyLayoutProperty(PropertyKey::TextLetterSpacing, bucket_desc.layout, layout.text.letter_spacing, z);
@@ -266,6 +264,11 @@ std::unique_ptr<Bucket> TileWorker::createSymbolBucket(const GeometryTileLayer& 
     applyLayoutProperty(PropertyKey::TextTransform, bucket_desc.layout, layout.text.transform, z);
     applyLayoutProperty(PropertyKey::TextOffset, bucket_desc.layout, layout.text.offset, z);
     applyLayoutProperty(PropertyKey::TextAllowOverlap, bucket_desc.layout, layout.text.allow_overlap, z);
+
+    applyLayoutProperty(PropertyKey::IconSize, bucket_desc.layout, layout.icon.size, z + 1);
+    applyLayoutProperty(PropertyKey::IconSize, bucket_desc.layout, layout.icon.max_size, 18);
+    applyLayoutProperty(PropertyKey::TextSize, bucket_desc.layout, layout.text.size, z + 1);
+    applyLayoutProperty(PropertyKey::TextSize, bucket_desc.layout, layout.text.max_size, 18);
 
     if (bucket->needsDependencies(layer, bucket_desc.filter, *style.glyphStore, *style.sprite)) {
         partialParse = true;
