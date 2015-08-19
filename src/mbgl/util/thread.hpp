@@ -112,9 +112,9 @@ template <typename P, std::size_t... I>
 void Thread<Object>::run(ThreadContext context, P&& params, std::index_sequence<I...>) {
     uv::loop l;
 
-    {
-        ThreadContext::current.set(&context);
+    ThreadContext::current.set(&context);
 
+    {
         RunLoop loop_(l.get());
         loop = &loop_;
 
@@ -126,12 +126,12 @@ void Thread<Object>::run(ThreadContext context, P&& params, std::index_sequence<
 
         loop = nullptr;
         object = nullptr;
-
-        ThreadContext::current.set(nullptr);
     }
 
     // Run the loop again to ensure that async close callbacks have been called.
     l.run();
+
+    ThreadContext::current.set(nullptr);
 
     joinable.get_future().get();
 }
