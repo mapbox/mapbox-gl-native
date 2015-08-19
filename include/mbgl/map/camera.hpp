@@ -13,6 +13,7 @@ struct CameraOptions {
     mapbox::util::optional<LatLng> center;
     mapbox::util::optional<double> zoom;
     mapbox::util::optional<double> angle;
+    mapbox::util::optional<double> pitch;
     mapbox::util::optional<Duration> duration;
     mapbox::util::optional<std::function<double(double)> > easing;
 };

@@ -206,6 +206,7 @@ void Transform::_easeTo(CameraOptions options, const double new_scale, const dou
     
     double angle = _normalizeAngle(new_angle, state.angle);
     state.angle = _normalizeAngle(state.angle, angle);
+    double pitch = options.pitch ? *options.pitch : state.pitch;
 
     if (!options.duration) {
         options.duration = Duration::zero();
@@ -221,6 +222,7 @@ void Transform::_easeTo(CameraOptions options, const double new_scale, const dou
         state.Cc = s / util::M2PI;
         
         state.angle = angle;
+        state.pitch = pitch;
 
         view.notifyMapChange(MapChangeRegionDidChange);
     } else {
@@ -228,6 +230,7 @@ void Transform::_easeTo(CameraOptions options, const double new_scale, const dou
 
         const double startS = state.scale;
         const double startA = state.angle;
+        const double startP = state.pitch;
         const double startX = state.x;
         const double startY = state.y;
         state.panning = true;
@@ -247,6 +250,7 @@ void Transform::_easeTo(CameraOptions options, const double new_scale, const dou
                 state.Bc = s / 360;
                 state.Cc = s / util::M2PI;
                 state.angle = util::wrap(util::interpolate(startA, angle, t), -M_PI, M_PI);
+                state.pitch = util::interpolate(startP, pitch, t);
                 view.notifyMapChange(MapChangeRegionIsChanging);
                 return update;
             },
@@ -336,8 +340,9 @@ double Transform::getAngle() const {
 
 #pragma mark - Pitch
 
-void Transform::setPitch(double pitch) {
-    state.pitch = pitch;
+void Transform::setPitch(double pitch, CameraOptions options) {
+    options.pitch = pitch;
+    easeTo(options);
 }
 
 double Transform::getPitch() const {
