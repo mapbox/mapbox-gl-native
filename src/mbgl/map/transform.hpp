@@ -46,7 +46,7 @@ public:
     double getAngle() const;
 
     // Pitch
-    void setPitch(double pitch);
+    void setPitch(double pitch, CameraOptions options);
     double getPitch() const;
 
     // Transitions

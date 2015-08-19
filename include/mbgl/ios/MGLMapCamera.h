@@ -12,6 +12,9 @@ NS_ASSUME_NONNULL_BEGIN
 /** Heading measured in degrees clockwise from true north. */
 @property (nonatomic) CLLocationDirection heading;
 
+/** Pitch toward the horizon measured in degrees, with 0 degrees resulting in a two-dimensional map. */
+@property (nonatomic) CGFloat pitch;
+
 /** Meters above ground level. */
 @property (nonatomic) CLLocationDistance altitude;
 
@@ -24,6 +27,7 @@ NS_ASSUME_NONNULL_BEGIN
 
 + (instancetype)cameraLookingAtCenterCoordinate:(CLLocationCoordinate2D)centerCoordinate
                                    fromDistance:(CLLocationDistance)distance
+                                          pitch:(CGFloat)pitch
                                         heading:(CLLocationDirection)heading;
 
 @end

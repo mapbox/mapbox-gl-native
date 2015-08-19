@@ -296,8 +296,10 @@ void Map::resetNorth() {
 
 #pragma mark - Pitch
 
-void Map::setPitch(double pitch) {
-    transform->setPitch(std::min(pitch, 60.0) * M_PI / 180);
+void Map::setPitch(double pitch, const Duration& duration) {
+    CameraOptions options;
+    options.duration = duration;
+    transform->setPitch(std::min(pitch, 60.0) * M_PI / 180, options);
     update(Update::Repaint);
 }
 

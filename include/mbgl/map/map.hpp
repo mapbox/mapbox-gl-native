@@ -128,7 +128,7 @@ public:
     void resetNorth();
 
     // Pitch
-    void setPitch(double pitch);
+    void setPitch(double pitch, const Duration& = Duration::zero());
     double getPitch() const;
 
     // Size
