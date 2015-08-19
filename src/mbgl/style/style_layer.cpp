@@ -223,7 +223,6 @@ void StyleLayer::applyStyleProperties<SymbolProperties>(const float z, const Tim
     properties.set<SymbolProperties>();
     SymbolProperties &symbol = properties.get<SymbolProperties>();
     applyTransitionedStyleProperty(PropertyKey::IconOpacity, symbol.icon.opacity, z, now, zoomHistory);
-    applyTransitionedStyleProperty(PropertyKey::IconSize, symbol.icon.size, z, now, zoomHistory);
     applyTransitionedStyleProperty(PropertyKey::IconColor, symbol.icon.color, z, now, zoomHistory);
     applyTransitionedStyleProperty(PropertyKey::IconHaloColor, symbol.icon.halo_color, z, now, zoomHistory);
     applyTransitionedStyleProperty(PropertyKey::IconHaloWidth, symbol.icon.halo_width, z, now, zoomHistory);
@@ -232,13 +231,24 @@ void StyleLayer::applyStyleProperties<SymbolProperties>(const float z, const Tim
     applyStyleProperty(PropertyKey::IconTranslateAnchor, symbol.icon.translate_anchor, z, now, zoomHistory);
 
     applyTransitionedStyleProperty(PropertyKey::TextOpacity, symbol.text.opacity, z, now, zoomHistory);
-    applyTransitionedStyleProperty(PropertyKey::TextSize, symbol.text.size, z, now, zoomHistory);
     applyTransitionedStyleProperty(PropertyKey::TextColor, symbol.text.color, z, now, zoomHistory);
     applyTransitionedStyleProperty(PropertyKey::TextHaloColor, symbol.text.halo_color, z, now, zoomHistory);
     applyTransitionedStyleProperty(PropertyKey::TextHaloWidth, symbol.text.halo_width, z, now, zoomHistory);
     applyTransitionedStyleProperty(PropertyKey::TextHaloBlur, symbol.text.halo_blur, z, now, zoomHistory);
     applyTransitionedStyleProperty(PropertyKey::TextTranslate, symbol.text.translate, z, now, zoomHistory);
     applyStyleProperty(PropertyKey::TextTranslateAnchor, symbol.text.translate_anchor, z, now, zoomHistory);
+
+    // text-size and icon-size are layout properties but they also need to be evaluated as paint properties:
+    auto it = bucket->layout.properties.find(PropertyKey::IconSize);
+    if (it != bucket->layout.properties.end()) {
+        const PropertyEvaluator<float> evaluator(z, zoomHistory);
+        symbol.icon.size = mapbox::util::apply_visitor(evaluator, it->second);
+    }
+    it = bucket->layout.properties.find(PropertyKey::TextSize);
+    if (it != bucket->layout.properties.end()) {
+        const PropertyEvaluator<float> evaluator(z, zoomHistory);
+        symbol.text.size = mapbox::util::apply_visitor(evaluator, it->second);
+    }
 }
 
 template <>
