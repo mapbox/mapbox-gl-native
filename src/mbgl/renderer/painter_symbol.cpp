@@ -69,7 +69,7 @@ void Painter::renderSDF(SymbolBucket &bucket,
 
     // We're drawing in the translucent pass which is bottom-to-top, so we need
     // to draw the halo first.
-    if (styleProperties.halo_color[3] > 0.0f) {
+    if (styleProperties.halo_color[3] > 0.0f && styleProperties.halo_width > 0.0f) {
         sdfShader.u_gamma = styleProperties.halo_blur * blurOffset / fontScale / sdfPx + gamma;
 
         if (styleProperties.opacity < 1.0f) {
