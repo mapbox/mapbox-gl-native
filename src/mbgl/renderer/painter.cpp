@@ -379,7 +379,7 @@ void Painter::renderBackground(const StyleLayer &layer_desc) {
         patternShader->u_opacity = properties.opacity;
 
         LatLng latLng = state.getLatLng();
-        vec2<double> center = state.pixelForLatLng(latLng);
+        vec2<double> center = state.latLngToPoint(latLng);
         float scale = 1 / std::pow(2, zoomFraction);
 
         std::array<float, 2> sizeA = imagePosA.size;

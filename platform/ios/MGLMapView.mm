@@ -1621,20 +1621,12 @@ mbgl::LatLngBounds MGLLatLngBoundsFromCoordinateBounds(MGLCoordinateBounds coord
 {
     CGPoint convertedPoint = [self convertPoint:point fromView:view];
 
-    // flip y coordinate for iOS view origin top left
-    //
-    convertedPoint.y = self.bounds.size.height - convertedPoint.y;
-
     return MGLLocationCoordinate2DFromLatLng(_mbglMap->latLngForPixel(mbgl::vec2<double>(convertedPoint.x, convertedPoint.y)));
 }
 
 - (CGPoint)convertCoordinate:(CLLocationCoordinate2D)coordinate toPointToView:(nullable UIView *)view
 {
     mbgl::vec2<double> pixel = _mbglMap->pixelForLatLng(MGLLatLngFromLocationCoordinate2D(coordinate));
-
-    // flip y coordinate for iOS view origin in top left
-    //
-    pixel.y = self.bounds.size.height - pixel.y;
 
     return [self convertPoint:CGPointMake(pixel.x, pixel.y) toView:view];
 }

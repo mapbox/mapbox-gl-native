@@ -1,6 +1,5 @@
 #include <mbgl/map/transform_state.hpp>
 #include <mbgl/map/tile_id.hpp>
-#include <mbgl/util/projection.hpp>
 #include <mbgl/util/constants.hpp>
 #include <mbgl/util/box.hpp>
 #include <mbgl/util/tile_coordinate.hpp>
@@ -46,10 +45,10 @@ box TransformState::cornersToBox(uint32_t z) const {
     double w = width;
     double h = height;
     box b(
-    pointCoordinate({ 0, 0 }).zoomTo(z),
-    pointCoordinate({ w, 0 }).zoomTo(z),
-    pointCoordinate({ w, h }).zoomTo(z),
-    pointCoordinate({ 0, h }).zoomTo(z));
+    pointToCoordinate({ 0, 0 }).zoomTo(z),
+    pointToCoordinate({ w, 0 }).zoomTo(z),
+    pointToCoordinate({ w, h }).zoomTo(z),
+    pointToCoordinate({ 0, h }).zoomTo(z));
     return b;
 }
 
@@ -158,94 +157,73 @@ float TransformState::getPitch() const {
 
 #pragma mark - Projection
 
-const vec2<double> TransformState::pixelForLatLng(const LatLng latLng) const {
-    LatLng ll = getLatLng();
-    double zoom = getZoom();
-
-    const double centerX = static_cast<double>(width) / 2.0;
-    const double centerY = static_cast<double>(height) / 2.0;
-
-    const double m = Projection::getMetersPerPixelAtLatitude(0, zoom);
-
-    const double angle_sin = std::sin(-angle);
-    const double angle_cos = std::cos(-angle);
-
-    const ProjectedMeters givenMeters = Projection::projectedMetersForLatLng(latLng);
-
-    const double givenAbsoluteX = givenMeters.easting  / m;
-    const double givenAbsoluteY = givenMeters.northing / m;
-
-    const ProjectedMeters centerMeters = Projection::projectedMetersForLatLng(ll);
-
-    const double centerAbsoluteX = centerMeters.easting  / m;
-    const double centerAbsoluteY = centerMeters.northing / m;
-
-    const double deltaX = givenAbsoluteX - centerAbsoluteX;
-    const double deltaY = givenAbsoluteY - centerAbsoluteY;
-
-    const double translatedX = deltaX + centerX;
-    const double translatedY = deltaY + centerY;
-
-    const double rotatedX = translatedX * angle_cos - translatedY * angle_sin;
-    const double rotatedY = translatedX * angle_sin + translatedY * angle_cos;
-
-    const double rotatedCenterX = centerX * angle_cos - centerY * angle_sin;
-    const double rotatedCenterY = centerX * angle_sin + centerY * angle_cos;
-
-    double x_ = rotatedX + (centerX - rotatedCenterX);
-    double y_ = rotatedY + (centerY - rotatedCenterY);
-
-    return vec2<double>(x_, y_);
+float TransformState::lngX(float lng) const {
+    return (180.0f + lng) * worldSize() / 360.0f;
 }
 
-const LatLng TransformState::latLngForPixel(const vec2<double> pixel) const {
-    LatLng ll = getLatLng();
-    double zoom = getZoom();
-
-    const double centerX = static_cast<double>(width) / 2.0;
-    const double centerY = static_cast<double>(height) / 2.0;
-
-    const double m = Projection::getMetersPerPixelAtLatitude(0, zoom);
-
-    const double angle_sin = std::sin(angle);
-    const double angle_cos = std::cos(angle);
-
-    const double unrotatedCenterX = centerX * angle_cos - centerY * angle_sin;
-    const double unrotatedCenterY = centerX * angle_sin + centerY * angle_cos;
-
-    const double unrotatedX = pixel.x * angle_cos - pixel.y * angle_sin;
-    const double unrotatedY = pixel.x * angle_sin + pixel.y * angle_cos;
-
-    const double givenX = unrotatedX + (centerX - unrotatedCenterX);
-    const double givenY = unrotatedY + (centerY - unrotatedCenterY);
-
-    const ProjectedMeters centerMeters = Projection::projectedMetersForLatLng(ll);
-
-    const double centerAbsoluteX = centerMeters.easting  / m;
-    const double centerAbsoluteY = centerMeters.northing / m;
-
-    const double givenAbsoluteX = givenX + centerAbsoluteX - centerX;
-    const double givenAbsoluteY = givenY + centerAbsoluteY - centerY;
-
-    ProjectedMeters givenMeters = ProjectedMeters(givenAbsoluteY * m, givenAbsoluteX * m);
-
-    // adjust for date line
-    ProjectedMeters sw, ne;
-    Projection::getWorldBoundsMeters(sw, ne);
-    double d = ne.easting - sw.easting;
-    if (ll.longitude > 0 && givenMeters.easting > centerMeters.easting) givenMeters.easting -= d;
-
-    // adjust for world wrap
-    while (givenMeters.easting < sw.easting) givenMeters.easting += d;
-    while (givenMeters.easting > ne.easting) givenMeters.easting -= d;
-
-    return Projection::latLngForProjectedMeters(givenMeters);
+float TransformState::latY(float lat) const {
+    float y_ = 180.0f / M_PI * std::log(std::tan(M_PI / 4 + lat * M_PI / 360.0f));
+    return (180.0f - y_) * worldSize() / 360.0f;
 }
 
-TileCoordinate TransformState::pointCoordinate(const vec2<double> point) const {
+float TransformState::xLng(float x_, float worldSize_) const {
+    return x_ * 360.0f / worldSize_ - 180.0f;
+}
+
+float TransformState::yLat(float y_, float worldSize_) const {
+    float y2 = 180.0f - y_ * 360.0f / worldSize_;
+    return 360.0f / M_PI * std::atan(std::exp(y2 * M_PI / 180.0f)) - 90.0f;
+}
+
+float TransformState::zoomScale(float zoom) const {
+    return std::pow(2.0f, zoom);
+}
+
+float TransformState::worldSize() const {
+    return util::tileSize * scale;
+}
+
+vec2<double> TransformState::latLngToPoint(const LatLng& latLng) const {
+    return coordinateToPoint(latLngToCoordinate(latLng));
+}
+
+LatLng TransformState::pointToLatLng(const vec2<double> point) const {
+    return coordinateToLatLng(pointToCoordinate(point));
+}
+
+TileCoordinate TransformState::latLngToCoordinate(const LatLng& latLng) const {
+    const float tileZoom = getIntegerZoom();
+    const float k = zoomScale(tileZoom) / worldSize();
+    return {
+        lngX(latLng.longitude) * k,
+        latY(latLng.latitude) * k,
+        tileZoom
+    };
+}
+
+LatLng TransformState::coordinateToLatLng(const TileCoordinate& coord) const {
+    const float worldSize_ = zoomScale(coord.zoom);
+    LatLng latLng = {
+        yLat(coord.row, worldSize_),
+        xLng(coord.column, worldSize_)
+    };
+    while (latLng.longitude < 180.0f) latLng.longitude += 360.0f;
+    while (latLng.longitude > 180.0f) latLng.longitude -= 360.0f;
+    return latLng;
+}
+
+vec2<double> TransformState::coordinateToPoint(const TileCoordinate& coord) const {
+    mat4 mat = coordinatePointMatrix(coord.zoom);
+    matrix::vec4 p;
+    matrix::vec4 c = {{ coord.column, coord.row, 0, 1 }};
+    matrix::transformMat4(p, c, mat);
+    return { p[0] / p[3], p[1] / p[3] };
+}
+
+TileCoordinate TransformState::pointToCoordinate(const vec2<double> point) const {
 
     float targetZ = 0;
-    float tileZoom = std::floor(getZoom());
+    const float tileZoom = getIntegerZoom();
 
     mat4 mat = coordinatePointMatrix(tileZoom);
 

@@ -304,11 +304,11 @@ const LatLng Map::latLngForProjectedMeters(const ProjectedMeters projectedMeters
 }
 
 const vec2<double> Map::pixelForLatLng(const LatLng latLng) const {
-    return transform->getState().pixelForLatLng(latLng);
+    return transform->getState().latLngToPoint(latLng);
 }
 
 const LatLng Map::latLngForPixel(const vec2<double> pixel) const {
-    return transform->getState().latLngForPixel(pixel);
+    return transform->getState().pointToLatLng(pixel);
 }
 
 #pragma mark - Annotations

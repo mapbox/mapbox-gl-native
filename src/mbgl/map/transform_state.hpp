@@ -31,9 +31,6 @@ public:
     uint16_t getWidth() const;
     uint16_t getHeight() const;
 
-    float worldSize() const;
-    float lngX(float lon) const;
-    float latY(float lat) const;
     std::array<float, 2> locationCoordinate(float lon, float lat) const;
     void getLonLat(double &lon, double &lat) const;
 
@@ -55,18 +52,22 @@ public:
     float getAltitude() const;
     float getPitch() const;
 
-    // Projection
-    const vec2<double> pixelForLatLng(const LatLng latLng) const;
-    const LatLng latLngForPixel(const vec2<double> pixel) const;
-
     // Changing
     bool isChanging() const;
 
     double pixel_x() const;
     double pixel_y() const;
 
-    // Conversions
-    TileCoordinate pointCoordinate(const vec2<double> point) const;
+    // Conversion and projection
+
+    vec2<double> latLngToPoint(const LatLng& latLng) const;
+    LatLng pointToLatLng(const vec2<double> point) const;
+
+    TileCoordinate latLngToCoordinate(const LatLng& latLng) const;
+    LatLng coordinateToLatLng(const TileCoordinate& coord) const;
+
+    vec2<double> coordinateToPoint(const TileCoordinate& coord) const;
+    TileCoordinate pointToCoordinate(const vec2<double> point) const;
 
 private:
     void constrain(double& scale, double& y) const;
@@ -77,6 +78,13 @@ private:
 
     // logical dimensions
     uint16_t width = 0, height = 0;
+
+    float xLng(float x, float worldSize) const;
+    float yLat(float y, float worldSize) const;
+    float lngX(float lon) const;
+    float latY(float lat) const;
+    float zoomScale(float zoom) const;
+    float worldSize() const;
 
     mat4 coordinatePointMatrix(float z) const;
     mat4 getPixelMatrix() const;
