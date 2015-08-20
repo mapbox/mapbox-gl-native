@@ -26,7 +26,6 @@
 #include <mbgl/shader/raster_shader.hpp>
 #include <mbgl/shader/sdf_shader.hpp>
 #include <mbgl/shader/dot_shader.hpp>
-#include <mbgl/shader/gaussian_shader.hpp>
 #include <mbgl/shader/box_shader.hpp>
 
 #include <mbgl/util/constants.hpp>
@@ -67,7 +66,6 @@ void Painter::setup() {
     assert(sdfGlyphShader);
     assert(sdfIconShader);
     assert(dotShader);
-    assert(gaussianShader);
 
 
     // Blending
@@ -101,7 +99,6 @@ void Painter::setupShaders() {
     if (!sdfGlyphShader) sdfGlyphShader = std::make_unique<SDFGlyphShader>();
     if (!sdfIconShader) sdfIconShader = std::make_unique<SDFIconShader>();
     if (!dotShader) dotShader = std::make_unique<DotShader>();
-    if (!gaussianShader) gaussianShader = std::make_unique<GaussianShader>();
     if (!collisionBoxShader) collisionBoxShader = std::make_unique<CollisionBoxShader>();
 }
 
