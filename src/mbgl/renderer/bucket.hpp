@@ -12,6 +12,7 @@ namespace mbgl {
 class Painter;
 class StyleLayer;
 class TileID;
+class CollisionTile;
 
 class Bucket : private util::noncopyable {
 public:
@@ -29,7 +30,7 @@ public:
         return !uploaded;
     }
 
-    virtual void placeFeatures() {}
+    virtual void placeFeatures(CollisionTile&) {}
     virtual void swapRenderData() {}
 
 protected:

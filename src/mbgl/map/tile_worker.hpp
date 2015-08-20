@@ -75,7 +75,7 @@ private:
     TriangleElementsBuffer triangleElementsBuffer;
     LineElementsBuffer lineElementsBuffer;
 
-    std::unique_ptr<CollisionTile> collision;
+    std::unique_ptr<CollisionTile> collisionTile;
 
     // Contains all the Bucket objects for the tile. Buckets are render
     // objects and they get added to this map as they get processed.
