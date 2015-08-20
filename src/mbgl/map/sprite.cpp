@@ -9,6 +9,7 @@
 #include <mbgl/util/raster.hpp>
 #include <mbgl/util/thread.hpp>
 #include <mbgl/util/uv_detail.hpp>
+#include <mbgl/util/mapbox.hpp>
 
 #include <rapidjson/document.h>
 
@@ -43,8 +44,8 @@ Sprite::Sprite(const std::string& baseUrl, float pixelRatio_)
         return;
     }
 
-    std::string spriteURL(baseUrl + (pixelRatio_ > 1 ? "@2x" : "") + ".png");
-    std::string jsonURL(baseUrl + (pixelRatio_ > 1 ? "@2x" : "") + ".json");
+    std::string spriteURL = mbgl::util::mapbox::normalizeSpriteURL(baseUrl, (pixelRatio_ > 1 ? "@2x" : ""), ".png", "NOCOMMIT");
+    std::string jsonURL = mbgl::util::mapbox::normalizeSpriteURL(baseUrl, (pixelRatio_ > 1 ? "@2x" : ""), ".json", "NOCOMMIT");
 
     loader = std::make_unique<Loader>();
 
