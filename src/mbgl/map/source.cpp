@@ -529,9 +529,14 @@ void Source::invalidateTiles(const std::unordered_set<TileID, TileID::Hash>& ids
 }
 
 void Source::updateTilePtrs() {
-    tilePtrs.clear();
+    std::vector<Tile*> newPtrs;
     for (const auto& pair : tiles) {
-        tilePtrs.push_back(pair.second.get());
+        newPtrs.push_back(pair.second.get());
+    }
+
+    if (tilePtrs != newPtrs) {
+        tilePtrs = newPtrs;
+        emitTileLoaded(true);
     }
 }
 

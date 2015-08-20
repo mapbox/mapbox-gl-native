@@ -134,11 +134,11 @@ public:
 
     bool needsAnimation() const;
 
+    void updateRenderOrder(const Style& style);
+
 private:
     void setupShaders();
     mat4 translatedMatrix(const mat4& matrix, const std::array<float, 2> &translation, const TileID &id, TranslateAnchorType anchor);
-
-    std::vector<RenderItem> determineRenderOrder(const Style& style);
 
     template <class Iterator>
     void renderPass(RenderPass,
@@ -200,6 +200,8 @@ private:
     RenderPass pass = RenderPass::Opaque;
     const float strata_epsilon = 1.0f / (1 << 16);
     Color background = {{ 0, 0, 0, 0 }};
+
+    std::vector<RenderItem> order;
 
 public:
     FrameHistory frameHistory;
