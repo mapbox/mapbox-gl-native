@@ -21,66 +21,63 @@ bool isMapboxURL(const std::string& url) {
     return url.compare(0, protocol.length(), protocol) == 0;
 }
 
-void parseMapboxURL(const std::string& url, MapboxURLParts &parts) {
+MapboxURLParts parseMapboxURL(const std::string& url) {
     std::size_t endpointEndIndex = url.find('/', protocol.length());
     std::size_t userStartIndex = endpointEndIndex + 1;
     std::size_t userEndIndex = url.find('/', userStartIndex);
     std::size_t idStartIndex = userEndIndex + 1;
     std::size_t idEndIndex = url.find('/', idStartIndex);
 
-    parts.endpoint = url.substr(protocol.length(), endpointEndIndex - protocol.length());
-    parts.user = url.substr(userStartIndex, userEndIndex - userStartIndex);
-    parts.id = url.substr(idStartIndex, idEndIndex - idStartIndex);
-
-    parts.draft = url.compare(idEndIndex + 1, draft.length(), draft) == 0;
+    return (MapboxURLParts) {
+      url.substr(protocol.length(), endpointEndIndex - protocol.length()),
+      url.substr(userStartIndex, userEndIndex - userStartIndex),
+      url.substr(idStartIndex, idEndIndex - idStartIndex),
+      url.compare(idEndIndex + 1, draft.length(), draft) == 0
+    };
 }
 
 
 std::string normalizeSourceURL(const std::string& url, const std::string& accessToken) {
     if (!isMapboxURL(url)) {
         return url;
-    } else {
-        if (accessToken.empty()) {
-            throw std::runtime_error("You must provide a Mapbox API access token for Mapbox tile sources");
-        } else {
-            return baseURL + "v4/" + url.substr(protocol.length()) + ".json?access_token=" + accessToken + "&secure";
-        }
     }
+
+    if (accessToken.empty()) {
+        throw std::runtime_error("You must provide a Mapbox API access token for Mapbox tile sources");
+    }
+
+    return baseURL + "v4/" + url.substr(protocol.length()) + ".json?access_token=" + accessToken + "&secure";
 }
 
 std::string normalizeStyleURL(const std::string& url, const std::string& accessToken) {
     if (!isMapboxURL(url)) {
         return url;
-    } else {
-        static MapboxURLParts parts;
-        parseMapboxURL(url, parts);
-        return baseURL + "styles/v1/" + parts.user + "/" + parts.id + (parts.draft ? "/draft" : "") + "?access_token=" + accessToken;
     }
+
+    MapboxURLParts parts = parseMapboxURL(url);
+    return baseURL + "styles/v1/" + parts.user + "/" + parts.id + (parts.draft ? "/draft" : "") + "?access_token=" + accessToken;
 }
 
 std::string normalizeSpriteURL(const std::string& url, const std::string& format, const std::string& extension, const std::string& accessToken) {
     if (!isMapboxURL(url)) {
         return url + format + extension;
-    } else {
-        static MapboxURLParts parts;
-        parseMapboxURL(url, parts);
-        return baseURL + "styles/v1/" + parts.user + "/" + parts.id + (parts.draft ? "/draft" : "") + "/sprite" + format + extension + "?access_token=" + accessToken;
     }
+
+    MapboxURLParts parts = parseMapboxURL(url);
+    return baseURL + "styles/v1/" + parts.user + "/" + parts.id + (parts.draft ? "/draft" : "") + "/sprite" + format + extension + "?access_token=" + accessToken;
 }
 
 std::string normalizeGlyphsURL(const std::string& url, const std::string& accessToken) {
     if (!isMapboxURL(url)) {
         return url;
-    } else {
-        static MapboxURLParts parts;
-        parseMapboxURL(url, parts);
-        return baseURL + "fonts/v1/" + parts.user + "/{fontstack}/{range}.pbf?access_token=" + accessToken;
     }
+
+    MapboxURLParts parts = parseMapboxURL(url);
+    return baseURL + "fonts/v1/" + parts.user + "/{fontstack}/{range}.pbf?access_token=" + accessToken;
 }
 
 std::string normalizeTileURL(const std::string& url, const std::string& sourceURL, SourceType sourceType) {
-    if (sourceURL.empty() || sourceURL.compare(0, protocol.length(), protocol) != 0 ||
-        sourceType != SourceType::Raster) {
+    if (sourceURL.empty() || !isMapboxURL(sourceURL) || sourceType != SourceType::Raster) {
         return url;
     }
 
