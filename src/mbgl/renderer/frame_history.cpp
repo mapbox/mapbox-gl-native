@@ -3,7 +3,7 @@
 using namespace mbgl;
 
 // Record frame history that will be used to calculate fading params
-void FrameHistory::record(const TimePoint& now, float zoom) {
+void FrameHistory::record(const TimePoint now, float zoom) {
     // first frame ever
     if (history.empty()) {
         history.emplace_back(FrameSnapshot{TimePoint::min(), zoom});
@@ -47,15 +47,13 @@ bool FrameHistory::needsAnimation(const Duration& duration) const {
     return false;
 }
 
-FadeProperties FrameHistory::getFadeProperties(const Duration& duration) {
-    const TimePoint currentTime = Clock::now();
-
+FadeProperties FrameHistory::getFadeProperties(const TimePoint now, const Duration& duration) {
     // Remove frames until only one is outside the duration, or until there are only three
-    while (history.size() > 3 && history[1].now + duration < currentTime) {
+    while (history.size() > 3 && history[1].now + duration < now) {
         history.pop_front();
     }
 
-    if (history[1].now + duration < currentTime) {
+    if (history[1].now + duration < now) {
         history[0].z = history[1].z;
     }
 
@@ -74,7 +72,7 @@ FadeProperties FrameHistory::getFadeProperties(const Duration& duration) {
 
     // At end of a zoom when the zoom stops changing continue pretending to zoom at that speed
     // bump is how much farther it would have been if it had continued zooming at the same rate
-    float bump = std::chrono::duration<float>(currentTime - lastFrame.now) / duration * fadedist;
+    float bump = std::chrono::duration<float>(now - lastFrame.now) / duration * fadedist;
 
     return FadeProperties {
         fadedist,
