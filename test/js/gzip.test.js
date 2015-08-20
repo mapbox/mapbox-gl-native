@@ -50,7 +50,8 @@ function getOptions(gzip, t) {
                 response.data = res.body;
                 req.respond(null, response);
             });
-        }
+        },
+        ratio: 1.0
     };
 }
 

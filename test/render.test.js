@@ -47,6 +47,7 @@ function renderTest(style, info, base, key) {
             });
         };
         options.cancel = function() {};
+        options.ratio = 1.0;
 
         var map = new mbgl.Map(options);
         map.load(style);

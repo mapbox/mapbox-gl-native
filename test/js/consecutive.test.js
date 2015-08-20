@@ -24,6 +24,7 @@ function renderTest(style, info, dir, key) {
             });
         };
         options.cancel = function() {};
+        options.ratio = 1.0;
 
         var map = new mbgl.Map(options);
         map.load(style);
@@ -50,7 +51,7 @@ function rewriteLocalSchema(uri) {
     return uri.replace(/^local:\/\//, '');
 }
 
-test('Concurrency', function(t) {
+test('Consecutive', function(t) {
     var dir = 'line-join';
     var k = 'round';
 

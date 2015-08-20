@@ -66,12 +66,16 @@ NAN_METHOD(NodeMap::New) {
 
     auto options = args[0]->ToObject();
 
-    // Check that request() and cancel() are defined.
+    // Check that 'request', 'cancel' and 'ratio' are defined.
     if (!options->Has(NanNew("request")) || !options->Get(NanNew("request"))->IsFunction()) {
         return NanThrowError("Options object must have a 'request' method");
     }
     if (options->Has(NanNew("cancel")) && !options->Get(NanNew("cancel"))->IsFunction()) {
         return NanThrowError("Options object 'cancel' property must be a function");
+    }
+
+    if (!options->Has(NanNew("ratio")) || !options->Get(NanNew("ratio"))->IsNumber()) {
+        return NanThrowError("Options object must have a numerical 'ratio' property");
     }
 
     try {
@@ -193,6 +197,7 @@ NAN_METHOD(NodeMap::Render) {
 
 void NodeMap::startRender(std::unique_ptr<NodeMap::RenderOptions> options) {
     view.resize(options->width, options->height);
+    map->update(mbgl::Update::Dimensions);
     map->setClasses(options->classes);
     map->setLatLngZoom(mbgl::LatLng(options->latitude, options->longitude), options->zoom);
     map->setBearing(options->bearing);
@@ -319,7 +324,7 @@ void NodeMap::release() {
 // Instance
 
 NodeMap::NodeMap(v8::Handle<v8::Object> options) :
-    view(sharedDisplay(), 1.0),
+    view(sharedDisplay(), options->Get(NanNew("ratio"))->NumberValue()),
     fs(options),
     map(std::make_unique<mbgl::Map>(view, fs, mbgl::MapMode::Still)),
     async(new uv_async_t) {

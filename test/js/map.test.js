@@ -65,6 +65,16 @@ test('Map', function(t) {
             }, /Options object 'cancel' property must be a function/);
 
             options.cancel = function() {};
+            t.throws(function() {
+                new mbgl.Map(options);
+            }, /Options object must have a numerical 'ratio' property/);
+
+            options.ratio = 'test';
+            t.throws(function() {
+                new mbgl.Map(options);
+            }, /Options object must have a numerical 'ratio' property/);
+
+            options.ratio = 1.0;
             t.doesNotThrow(function() {
                 new mbgl.Map(options);
             });
@@ -79,6 +89,7 @@ test('Map', function(t) {
         var options = {};
         options.request = function() {};
         options.cancel = function() {};
+        options.ratio = 1.0;
 
         t.test('requires a string or object as the first parameter', function(t) {
             t.test('requires a map style as first argument', function(t) {
@@ -159,6 +170,7 @@ test('Map', function(t) {
             });
         };
         options.cancel = function() {};
+        options.ratio = 1.0;
 
         t.test('requires an object as the first parameter', function(t) {
             setup(options, function(map) {
