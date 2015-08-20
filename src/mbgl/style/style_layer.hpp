@@ -7,6 +7,8 @@
 #include <mbgl/style/applied_class_properties.hpp>
 #include <mbgl/style/zoom_history.hpp>
 
+#include <mbgl/renderer/render_pass.hpp>
+
 #include <mbgl/util/ptr.hpp>
 #include <mbgl/util/noncopyable.hpp>
 #include <mbgl/util/chrono.hpp>
@@ -35,8 +37,9 @@ public:
     // Determines whether this layer is the background layer.
     bool isBackground() const;
 
-    // Checks whether the layer is currently visible at all.
-    bool isVisible() const;
+public:
+    // Checks whether this layer needs to be rendered in the given render pass.
+    bool hasRenderPass(RenderPass) const;
 
     // Updates the StyleProperties information in this layer by evaluating all
     // pending transitions and applied classes in order.
@@ -62,6 +65,9 @@ private:
     // Removes all expired style transitions.
     void cleanupAppliedStyleProperties(const TimePoint& now);
 
+    // Checks whether the layer is currently visible at all.
+    bool isVisible() const;
+
 public:
     // The name of this layer.
     const std::string id;
@@ -79,6 +85,10 @@ private:
     // For every property, stores a list of applied property values, with
     // optional transition times.
     std::map<PropertyKey, AppliedClassPropertyValues> appliedStyle;
+
+    // Stores what render passes this layer is currently enabled for. This depends on the
+    // evaluated StyleProperties object and is updated accordingly.
+    RenderPass passes = RenderPass::None;
 
 public:
     // Stores the evaluated, and cascaded styling information, specific to this

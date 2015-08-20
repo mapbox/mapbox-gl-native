@@ -28,6 +28,10 @@ bool StyleLayer::isVisible() const {
     }
 }
 
+bool StyleLayer::hasRenderPass(RenderPass pass) const {
+    return bool(passes & pass);
+}
+
 void StyleLayer::setClasses(const std::vector<std::string> &class_names, const TimePoint& now,
                             const PropertyTransition &defaultTransition) {
     // Stores all keys that we have already added transitions for.
@@ -259,6 +263,26 @@ void StyleLayer::updateProperties(float z, const TimePoint& now, ZoomHistory &zo
         case StyleLayerType::Raster: applyStyleProperties<RasterProperties>(z, now, zoomHistory); break;
         case StyleLayerType::Background: applyStyleProperties<BackgroundProperties>(z, now, zoomHistory); break;
         default: properties.set<std::false_type>(); break;
+    }
+
+    // Update the render passes when this layer is visible.
+    passes = RenderPass::None;
+    if (isVisible()) {
+        if (properties.is<FillProperties>()) {
+            const FillProperties &fillProperties = properties.get<FillProperties>();
+            const float alpha = fillProperties.fill_color[3] * fillProperties.opacity;
+
+            if (fillProperties.antialias) {
+                passes |= RenderPass::Translucent;
+            }
+            if (!fillProperties.image.from.empty() || alpha < 1.0f) {
+                passes |= RenderPass::Translucent;
+            } else {
+                passes |= RenderPass::Opaque;
+            }
+        } else {
+            passes |= RenderPass::Translucent;
+        }
     }
 }
 

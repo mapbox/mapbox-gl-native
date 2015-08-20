@@ -63,19 +63,13 @@ struct ClipID;
 struct RenderItem {
     inline RenderItem(const StyleLayer& layer_,
                       const Tile* tile_ = nullptr,
-                      Bucket* bucket_ = nullptr,
-                      RenderPass passes_ = RenderPass::Opaque)
-        : tile(tile_), bucket(bucket_), layer(layer_), passes(passes_) {
+                      Bucket* bucket_ = nullptr)
+        : tile(tile_), bucket(bucket_), layer(layer_) {
     }
 
     const Tile* const tile;
     Bucket* const bucket;
     const StyleLayer& layer;
-    const RenderPass passes;
-
-    inline bool hasRenderPass(RenderPass pass) const {
-        return bool(passes & pass);
-    }
 };
 
 class Painter : private util::noncopyable {
@@ -145,7 +139,6 @@ private:
     mat4 translatedMatrix(const mat4& matrix, const std::array<float, 2> &translation, const TileID &id, TranslateAnchorType anchor);
 
     std::vector<RenderItem> determineRenderOrder(const Style& style);
-    static RenderPass determineRenderPasses(const StyleLayer&);
 
     template <class Iterator>
     void renderPass(RenderPass,

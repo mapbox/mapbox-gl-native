@@ -285,7 +285,7 @@ void Painter::renderPass(RenderPass pass_,
     for (; it != end; ++it, i += increment) {
         const auto& item = *it;
         if (item.bucket && item.tile) {
-            if (item.hasRenderPass(pass)) {
+            if (item.layer.hasRenderPass(pass)) {
                 MBGL_DEBUG_GROUP(item.layer.id + " - " + std::string(item.tile->id));
                 setStrata(i * strataThickness);
                 prepareTile(*item.tile);
@@ -350,14 +350,6 @@ std::vector<RenderItem> Painter::determineRenderOrder(const Style& style) {
             continue;
         }
 
-        // Don't include invisible layers.
-        if (!layer.isVisible()) {
-            continue;
-        }
-
-        // Determine what render passes we need for this layer.
-        const RenderPass passes = determineRenderPasses(layer);
-
         const auto& tiles = source->getTiles();
         for (auto tile : tiles) {
             assert(tile);
@@ -367,34 +359,12 @@ std::vector<RenderItem> Painter::determineRenderOrder(const Style& style) {
 
             auto bucket = tile->data->getBucket(layer);
             if (bucket) {
-                order.emplace_back(layer, tile, bucket, passes);
+                order.emplace_back(layer, tile, bucket);
             }
         }
     }
 
     return order;
-}
-
-RenderPass Painter::determineRenderPasses(const StyleLayer& layer) {
-    RenderPass passes = RenderPass::None;
-
-    if (layer.properties.is<FillProperties>()) {
-        const FillProperties &properties = layer.properties.get<FillProperties>();
-        const float alpha = properties.fill_color[3] * properties.opacity;
-
-        if (properties.antialias) {
-            passes |= RenderPass::Translucent;
-        }
-        if (!properties.image.from.empty() || alpha < 1.0f) {
-            passes |= RenderPass::Translucent;
-        } else {
-            passes |= RenderPass::Opaque;
-        }
-    } else {
-        passes |= RenderPass::Translucent;
-    }
-
-    return passes;
 }
 
 void Painter::renderBackground(const StyleLayer &layer_desc) {
