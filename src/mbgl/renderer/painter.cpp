@@ -146,9 +146,6 @@ void Painter::render(const Style& style, TransformState state_, const FrameData&
     resize();
     changeMatrix();
 
-    // Figure out what buckets we have to draw and what order we have to draw them in.
-    const auto order = determineRenderOrder(style);
-
     // - UPLOAD PASS -------------------------------------------------------------------------------
     // Uploads all required buffers and images before we do any actual rendering.
     {
@@ -166,7 +163,6 @@ void Painter::render(const Style& style, TransformState state_, const FrameData&
             }
         }
     }
-
 
     // - CLIPPING MASKS ----------------------------------------------------------------------------
     // Draws the clipping masks to the stencil buffer.
@@ -241,6 +237,8 @@ void Painter::renderPass(RenderPass pass_,
                          GLsizei i, int8_t increment) {
     pass = pass_;
 
+    const double zoom = state.getZoom();
+
     MBGL_DEBUG_GROUP(pass == RenderPass::Opaque ? "opaque" : "translucent");
 
     if (debug::renderTree) {
@@ -254,6 +252,13 @@ void Painter::renderPass(RenderPass pass_,
         currentLayer = i;
         const auto& item = *it;
         if (item.bucket && item.tile) {
+            // Skip this layer if it's outside the range of min/maxzoom.
+            // This may occur when there /is/ a bucket created for this layer, but the min/max-zoom
+            // is set to a fractional value, or value that is larger than the source maxzoom.
+            if (item.layer.minZoom > zoom ||
+                item.layer.maxZoom <= zoom) {
+                continue;
+            }
             if (item.layer.hasRenderPass(pass)) {
                 MBGL_DEBUG_GROUP(item.layer.id + " - " + std::string(item.tile->id));
                 prepareTile(*item.tile);
@@ -270,8 +275,8 @@ void Painter::renderPass(RenderPass pass_,
     }
 }
 
-std::vector<RenderItem> Painter::determineRenderOrder(const Style& style) {
-    std::vector<RenderItem> order;
+void Painter::updateRenderOrder(const Style& style) {
+    order.clear();
 
     for (const auto& layerPtr : style.layers) {
         const auto& layer = *layerPtr;
@@ -297,15 +302,6 @@ std::vector<RenderItem> Painter::determineRenderOrder(const Style& style) {
         Source* source = style.getSource(layer.source);
         if (!source) {
             Log::Warning(Event::Render, "can't find source for layer '%s'", layer.id.c_str());
-            continue;
-        }
-
-        // Skip this layer if it's outside the range of min/maxzoom.
-        // This may occur when there /is/ a bucket created for this layer, but the min/max-zoom
-        // is set to a fractional value, or value that is larger than the source maxzoom.
-        const double zoom = state.getZoom();
-        if (layer.minZoom > zoom ||
-            layer.maxZoom <= zoom) {
             continue;
         }
 
@@ -341,8 +337,6 @@ std::vector<RenderItem> Painter::determineRenderOrder(const Style& style) {
             }
         }
     }
-
-    return order;
 }
 
 void Painter::renderBackground(const BackgroundLayer& layer) {

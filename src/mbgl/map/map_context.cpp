@@ -242,7 +242,11 @@ bool MapContext::renderSync(const TransformState& state, const FrameData& frame)
     // Cleanup OpenGL objects that we abandoned since the last render call.
     glObjectStore.performCleanup();
 
-    if (!painter) painter = std::make_unique<Painter>(data);
+    if (!painter) {
+        painter = std::make_unique<Painter>(data);
+        painter->updateRenderOrder(*style);
+    }
+
     painter->render(*style, transformState, frame);
 
     if (data.mode == MapMode::Still) {
@@ -313,6 +317,10 @@ void MapContext::setSprite(const std::string& name, std::shared_ptr<const Sprite
 
 void MapContext::onTileDataChanged() {
     assert(util::ThreadContext::currentlyOn(util::ThreadType::Map));
+
+    if (painter) {
+        painter->updateRenderOrder(*style);
+    }
 
     updateFlags |= Update::Repaint;
     asyncUpdate->send();
