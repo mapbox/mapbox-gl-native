@@ -1666,7 +1666,6 @@ public class MapView extends FrameLayout implements LocationListener {
      */
     @Override
     public void onLocationChanged(Location location) {
-        Log.i(TAG, "onLocationChanged(): " + location);
         updateLocation(location);
     }
 
