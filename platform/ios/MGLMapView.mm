@@ -48,6 +48,7 @@ NSUInteger const MGLStyleVersion = 8;
 const NSTimeInterval MGLAnimationDuration = 0.3;
 const CGSize MGLAnnotationUpdateViewportOutset = {150, 150};
 const CGFloat MGLMinimumZoom = 3;
+const CLLocationDegrees MGLAngularFieldOfView = M_PI / 6;
 
 NSString *const MGLAnnotationIDKey = @"MGLAnnotationIDKey";
 NSString *const MGLAnnotationSymbolKey = @"MGLAnnotationSymbolKey";
@@ -1756,9 +1757,15 @@ mbgl::LatLngBounds MGLLatLngBoundsFromCoordinateBounds(MGLCoordinateBounds coord
 
 - (MGLMapCamera *)camera
 {
-    CLLocationDistance altitude = 6.53e7 * exp(-0.6931 * self.zoomLevel);
-//  landscape: CLLocationDistance altitude = 1.092e7 * exp(-0.6931 * self.zoomLevel);
+    mbgl::ProjectedMeters neMeters = _mbglMap->projectedMetersForLatLng(self.viewportBounds.ne);
+    mbgl::ProjectedMeters centerMeters = _mbglMap->projectedMetersForLatLng(_mbglMap->getLatLng());
+    CLLocationDistance longitudinalDistance = neMeters.easting - centerMeters.easting;
+    CLLocationDistance latitudinalDistance = neMeters.northing - centerMeters.northing;
+    CLLocationDistance distance = (latitudinalDistance + longitudinalDistance) / 2;
+    CLLocationDistance altitude = distance / std::tan(MGLAngularFieldOfView / 2);
+    
     CGFloat pitch = MGLDegreesFromRadians(_mbglMap->getPitch());
+    
     return [MGLMapCamera cameraLookingAtCenterCoordinate:self.centerCoordinate
                                             fromDistance:altitude
                                                    pitch:pitch
@@ -1772,9 +1779,15 @@ mbgl::LatLngBounds MGLLatLngBoundsFromCoordinateBounds(MGLCoordinateBounds coord
 
 - (void)setCamera:(MGLMapCamera *)camera animated:(BOOL)animated
 {
-    mbgl::CameraOptions options;
-    options.center = MGLLatLngFromLocationCoordinate2D(camera.centerCoordinate);
-    options.zoom = log(camera.altitude / 6.53e7) / -0.6931;
+    mbgl::LatLng center = MGLLatLngFromLocationCoordinate2D(camera.centerCoordinate);
+    mbgl::ProjectedMeters centerMeters = _mbglMap->projectedMetersForLatLng(center);
+    CLLocationDistance distance = camera.altitude * std::tan(MGLAngularFieldOfView / 2);
+    mbgl::LatLngBounds bounds = {
+        { centerMeters.northing - distance, centerMeters.easting - distance },
+        { centerMeters.northing + distance, centerMeters.easting + distance },
+    };
+    mbgl::CameraOptions options = _mbglMap->cameraForLatLngBounds(bounds, {});
+    
     options.angle = MGLRadiansFromDegrees(-camera.heading);
     options.pitch = MGLRadiansFromDegrees(camera.pitch);
     if (animated)

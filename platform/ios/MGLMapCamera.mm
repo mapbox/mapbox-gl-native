@@ -23,12 +23,12 @@
     
     mbgl::ProjectedMeters centerMeters = mbgl::Projection::projectedMetersForLatLng(centerLatLng);
     mbgl::ProjectedMeters eyeMeters = mbgl::Projection::projectedMetersForLatLng(eyeLatLng);
-    CLLocationDirection heading = std::tan((centerMeters.northing - eyeMeters.northing) /
-                                           (centerMeters.easting - eyeMeters.easting));
+    CLLocationDirection heading = std::atan((centerMeters.northing - eyeMeters.northing) /
+                                            (centerMeters.easting - eyeMeters.easting));
     
     double groundDistance = std::sqrt(std::pow(centerMeters.northing - eyeMeters.northing, 2) +
                                       std::pow(centerMeters.easting - eyeMeters.easting, 2));
-    CGFloat pitch = std::tan(eyeAltitude / groundDistance);
+    CGFloat pitch = std::atan(eyeAltitude / groundDistance);
     
     return [[self alloc] initWithCenterCoordinate:centerCoordinate
                                          altitude:eyeAltitude
@@ -90,6 +90,12 @@
                                                               altitude:_altitude
                                                                  pitch:_pitch
                                                                heading:_heading];
+}
+
+- (NSString *)description
+{
+    return [NSString stringWithFormat:@"<MKMapCamera %p centerCoordinate:%f, %f altitude:%.0fm heading:%.0f° pitch:%.0f°>",
+            self, _centerCoordinate.latitude, _centerCoordinate.longitude, _altitude, _heading, _pitch];
 }
 
 @end
