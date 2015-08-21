@@ -124,7 +124,7 @@ void Map::jumpTo(CameraOptions options) {
 
 void Map::easeTo(CameraOptions options) {
     transform->easeTo(options);
-    update(Update::Repaint);
+    update(options.zoom ? Update::Zoom : Update::Repaint);
 }
 
 #pragma mark - Position
