@@ -20,7 +20,7 @@
 #include <mbgl/util/constants.hpp>
 #include <mbgl/util/image.hpp>
 
-#import "MapboxGL.h"
+#import "Mapbox.h"
 
 #import "NSBundle+MGLAdditions.h"
 #import "NSString+MGLAdditions.h"
@@ -278,7 +278,7 @@ std::chrono::steady_clock::duration secondsAsDuration(float duration)
     [self addSubview:_attributionButton];
     _attributionButtonConstraints = [NSMutableArray array];
     
-    _attributionSheet = [[UIActionSheet alloc] initWithTitle:@"Mapbox GL for iOS"
+    _attributionSheet = [[UIActionSheet alloc] initWithTitle:@"Mapbox for iOS"
                                                     delegate:self
                                            cancelButtonTitle:@"Cancel"
                                       destructiveButtonTitle:nil
@@ -2768,7 +2768,7 @@ CLLocationCoordinate2D MGLLocationCoordinate2DFromLatLng(mbgl::LatLng latLng)
     if (!path)
     {
         [NSException raise:@"Resource not found" format:
-         @"The resource named “%@” could not be found in the Mapbox GL resource bundle.", name];
+         @"The resource named “%@” could not be found in the Mapbox resource bundle.", name];
     }
 
     return path;

@@ -5,7 +5,7 @@
 #import <KIF/KIF.h>
 #import <OCMock/OCMock.h>
 
-#import "MapboxGL.h"
+#import "Mapbox.h"
 #import "OHHTTPStubs.h"
 
 const NSUInteger MGLMaximumEventsPerFlush = 20;

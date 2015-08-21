@@ -4,7 +4,7 @@ set -e
 set -o pipefail
 set -u
 
-NAME=MapboxGL
+NAME=Mapbox
 OUTPUT=build/ios/pkg
 IOS_SDK_VERSION=`xcrun --sdk iphoneos --show-sdk-version`
 LIBUV_VERSION=0.10.28
@@ -115,7 +115,7 @@ DOCS_VERSION=$( git tag --sort -v:refname | grep -v '\-rc.' | sed -n '1p' | sed 
 rm -rf /tmp/mbgl
 mkdir -p /tmp/mbgl/
 README=/tmp/mbgl/README.md
-cat ios/README.md > ${README}
+cat ios/docs/pod-README.md > ${README}
 echo >> ${README}
 echo -n "#" >> ${README}
 cat CHANGELOG.md >> ${README}
@@ -127,7 +127,7 @@ perl \
     /tmp/mbgl/Headers/*.h
 appledoc \
     --output ${DOCS_OUTPUT} \
-    --project-name "Mapbox GL for iOS ${DOCS_VERSION}" \
+    --project-name "Mapbox iOS SDK ${DOCS_VERSION}" \
     --project-company Mapbox \
     --create-html \
     --no-create-docset \

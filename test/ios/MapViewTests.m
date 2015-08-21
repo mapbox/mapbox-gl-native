@@ -3,7 +3,7 @@
 
 #import "KIFTestActor+MapboxGL.h"
 
-#import "MapboxGL.h"
+#import "Mapbox.h"
 #import "MGLTViewController.h"
 
 #import "LocationMocker/LocationMocker.h"
