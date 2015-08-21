@@ -2,7 +2,7 @@
 
 #import <mbgl/ios/Mapbox.h>
 
-#import <mbgl/platform/darwin/settings_nsuserdefaults.hpp>
+#import <mbgl/platform/settings_nsuserdefaults.hpp>
 
 #import <CoreLocation/CoreLocation.h>
 

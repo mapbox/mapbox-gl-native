@@ -1,64 +1,19 @@
 {
+  'includes': [ 'platform-darwin.gypi' ],
   'targets': [
     { 'target_name': 'platform-osx',
-      'product_name': 'mbgl-platform-osx',
-      'type': 'static_library',
-      'standalone_static_library': 1,
+      'type': 'none',
       'hard_dependency': 1,
       'dependencies': [
-        'version',
+        'platform-darwin',
       ],
-
-      'sources': [
-        '../platform/darwin/log_nslog.mm',
-        '../platform/darwin/string_nsstring.mm',
-        '../platform/darwin/application_root.mm',
-        '../platform/darwin/asset_root.mm',
-        '../platform/darwin/image.mm',
-        '../platform/darwin/nsthread.mm',
-        '../platform/darwin/reachability.m',
-        '../platform/darwin/settings_nsuserdefaults.mm',
-      ],
-
-      'variables': {
-        'cflags_cc': [
-          '<@(libuv_cflags)',
-          '<@(boost_cflags)',
-        ],
-        'libraries': [
-          '<@(libuv_static_libs)',
-        ],
-        'ldflags': [
-          '-framework Foundation',
-          '-framework ImageIO',
-          '-framework CoreServices',
-          '-framework OpenGL',
-          '-framework ApplicationServices',
-        ],
-      },
-
-      'include_dirs': [
-        '../include',
-        '../src',
-      ],
-
-      'xcode_settings': {
-        'OTHER_CPLUSPLUSFLAGS': [ '<@(cflags_cc)' ],
-        'CLANG_ENABLE_OBJC_ARC': 'YES',
-        'CLANG_ENABLE_MODULES': 'YES',
-      },
-
       'link_settings': {
-        'libraries': [ '<@(libraries)' ],
         'xcode_settings': {
-          'OTHER_LDFLAGS': [ '<@(ldflags)' ],
+          'OTHER_LDFLAGS': [
+            '-framework OpenGL',
+            '-framework ApplicationServices',
+          ],
         },
-      },
-
-      'direct_dependent_settings': {
-        'include_dirs': [
-          '../include',
-        ],
       },
     },
   ],

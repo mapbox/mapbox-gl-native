@@ -1,4 +1,5 @@
 {
+  'includes': [ 'platform-darwin.gypi' ],
   'targets': [
     { 'target_name': 'platform-ios',
       'product_name': 'mbgl-platform-ios',
@@ -6,18 +7,10 @@
       'standalone_static_library': 1,
       'hard_dependency': 1,
       'dependencies': [
-        'version',
+        'platform-darwin',
       ],
 
       'sources': [
-        '../platform/darwin/log_nslog.mm',
-        '../platform/darwin/string_nsstring.mm',
-        '../platform/darwin/application_root.mm',
-        '../platform/darwin/asset_root.mm',
-        '../platform/darwin/image.mm',
-        '../platform/darwin/nsthread.mm',
-        '../platform/darwin/reachability.m',
-        '../platform/darwin/settings_nsuserdefaults.mm',
         '../include/mbgl/ios/Mapbox.h',
         '../platform/ios/MGLMapboxEvents.h',
         '../platform/ios/MGLMapboxEvents.m',
@@ -65,13 +58,6 @@
       ],
 
       'variables': {
-        'cflags_cc': [
-          '<@(libuv_cflags)',
-          '<@(boost_cflags)',
-        ],
-        'libraries': [
-          '<@(libuv_static_libs)',
-        ],
         'ldflags': [
           '-framework CoreLocation',
           '-framework CoreTelephony',
@@ -89,13 +75,11 @@
       ],
 
       'xcode_settings': {
-        'OTHER_CPLUSPLUSFLAGS': [ '<@(cflags_cc)' ],
         'CLANG_ENABLE_OBJC_ARC': 'YES',
         'CLANG_ENABLE_MODULES': 'YES',
       },
 
       'link_settings': {
-        'libraries': [ '<@(libraries)' ],
         'xcode_settings': {
           'OTHER_LDFLAGS': [ '<@(ldflags)' ],
         },

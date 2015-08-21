@@ -7,7 +7,7 @@
       'hard_dependency': 1,
 
       'sources': [
-        '../platform/darwin/http_request_nsurl.mm',
+        '../platform/darwin/src/mbgl/storage/http_request_nsurl.mm',
       ],
 
       'include_dirs': [
