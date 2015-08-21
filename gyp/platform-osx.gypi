@@ -16,6 +16,8 @@
         '../platform/darwin/asset_root.mm',
         '../platform/darwin/image.mm',
         '../platform/darwin/nsthread.mm',
+        '../platform/darwin/reachability.m',
+        '../platform/darwin/settings_nsuserdefaults.mm',
       ],
 
       'variables': {

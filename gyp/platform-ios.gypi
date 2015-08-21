@@ -17,6 +17,7 @@
         '../platform/darwin/image.mm',
         '../platform/darwin/nsthread.mm',
         '../platform/darwin/reachability.m',
+        '../platform/darwin/settings_nsuserdefaults.mm',
         '../include/mbgl/ios/Mapbox.h',
         '../platform/ios/MGLMapboxEvents.h',
         '../platform/ios/MGLMapboxEvents.m',
