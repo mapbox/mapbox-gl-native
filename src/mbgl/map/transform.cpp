@@ -197,7 +197,7 @@ void Transform::_setScaleXY(const double new_scale, const double xn, const doubl
 }
 
 void Transform::_easeTo(CameraOptions options, const double new_scale, const double new_angle, const double xn, const double yn) {
-    Update update = state.scale == new_scale ? Update::Zoom : Update::Repaint;
+    Update update = state.scale == new_scale ? Update::Repaint : Update::Zoom;
     double scale = new_scale;
     double x = xn;
     double y = yn;
