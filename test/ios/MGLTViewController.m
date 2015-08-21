@@ -1,5 +1,5 @@
 #import "MGLTViewController.h"
-#import "MapboxGL.h"
+#import "Mapbox.h"
 
 @implementation MGLTViewController
 {

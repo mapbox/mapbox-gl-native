@@ -17,8 +17,6 @@
 		DD043366196DBBE000E6F39D /* main.m in Sources */ = {isa = PBXBuildFile; fileRef = DD043365196DBBE000E6F39D /* main.m */; };
 		DD0580E81ACB628200B112C9 /* IOKit.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = DD0580E71ACB628200B112C9 /* IOKit.framework */; };
 		DD0581041ACB661200B112C9 /* Headers in Resources */ = {isa = PBXBuildFile; fileRef = DD0581031ACB661200B112C9 /* Headers */; };
-		DD0581061ACB661C00B112C9 /* MapboxGL.bundle in Resources */ = {isa = PBXBuildFile; fileRef = DD0581051ACB661C00B112C9 /* MapboxGL.bundle */; };
-		DD0581081ACB663200B112C9 /* libMapboxGL.a in Frameworks */ = {isa = PBXBuildFile; fileRef = DD0581071ACB663200B112C9 /* libMapboxGL.a */; };
 		DD0E6F671B01806600DC035A /* MetricsTests.m in Sources */ = {isa = PBXBuildFile; fileRef = DD0E6F661B01806600DC035A /* MetricsTests.m */; };
 		DD0E6F841B0190E200DC035A /* libOCMock.a in Frameworks */ = {isa = PBXBuildFile; fileRef = DD0E6F701B0190E200DC035A /* libOCMock.a */; };
 		DD0E6F981B01B68E00DC035A /* OHHTTPStubs.m in Sources */ = {isa = PBXBuildFile; fileRef = DD0E6F8E1B01B68E00DC035A /* OHHTTPStubs.m */; };
@@ -38,6 +36,8 @@
 		DDBD016C196DC4740033959E /* MapViewTests.m in Sources */ = {isa = PBXBuildFile; fileRef = DDBD0168196DC4740033959E /* MapViewTests.m */; };
 		DDBD016D196DC4740033959E /* KIFTestActor+MapboxGL.m in Sources */ = {isa = PBXBuildFile; fileRef = DDBD016A196DC4740033959E /* KIFTestActor+MapboxGL.m */; };
 		DDBD016E196DC4A10033959E /* libKIF.a in Frameworks */ = {isa = PBXBuildFile; fileRef = DDBD0144196DC3AE0033959E /* libKIF.a */; };
+		DDC5C7BC1B84D62B00E1EA6B /* libMapbox.a in Frameworks */ = {isa = PBXBuildFile; fileRef = DDC5C7BA1B84D62B00E1EA6B /* libMapbox.a */; };
+		DDC5C7BD1B84D62B00E1EA6B /* Mapbox.bundle in Resources */ = {isa = PBXBuildFile; fileRef = DDC5C7BB1B84D62B00E1EA6B /* Mapbox.bundle */; };
 /* End PBXBuildFile section */
 
 /* Begin PBXContainerItemProxy section */
@@ -105,8 +105,6 @@
 		DD0580E71ACB628200B112C9 /* IOKit.framework */ = {isa = PBXFileReference; lastKnownFileType = wrapper.framework; name = IOKit.framework; path = Platforms/iPhoneSimulator.platform/Developer/SDKs/iPhoneSimulator.sdk/System/Library/Frameworks/IOKit.framework; sourceTree = DEVELOPER_DIR; };
 		DD0580EF1ACB62BE00B112C9 /* CoreGraphics.framework */ = {isa = PBXFileReference; lastKnownFileType = wrapper.framework; name = CoreGraphics.framework; path = System/Library/Frameworks/CoreGraphics.framework; sourceTree = SDKROOT; };
 		DD0581031ACB661200B112C9 /* Headers */ = {isa = PBXFileReference; lastKnownFileType = folder; name = Headers; path = ../../build/ios/pkg/static/Headers; sourceTree = SOURCE_ROOT; };
-		DD0581051ACB661C00B112C9 /* MapboxGL.bundle */ = {isa = PBXFileReference; lastKnownFileType = "wrapper.plug-in"; name = MapboxGL.bundle; path = ../../build/ios/pkg/static/MapboxGL.bundle; sourceTree = SOURCE_ROOT; };
-		DD0581071ACB663200B112C9 /* libMapboxGL.a */ = {isa = PBXFileReference; lastKnownFileType = archive.ar; name = libMapboxGL.a; path = ../../build/ios/pkg/static/libMapboxGL.a; sourceTree = SOURCE_ROOT; };
 		DD0E6F661B01806600DC035A /* MetricsTests.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = MetricsTests.m; sourceTree = SOURCE_ROOT; };
 		DD0E6F701B0190E200DC035A /* libOCMock.a */ = {isa = PBXFileReference; lastKnownFileType = archive.ar; name = libOCMock.a; path = OCMock/libOCMock.a; sourceTree = SOURCE_ROOT; };
 		DD0E6F721B0190E200DC035A /* NSNotificationCenter+OCMAdditions.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = "NSNotificationCenter+OCMAdditions.h"; sourceTree = "<group>"; };
@@ -144,6 +142,8 @@
 		DDBD0168196DC4740033959E /* MapViewTests.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = MapViewTests.m; sourceTree = SOURCE_ROOT; };
 		DDBD016A196DC4740033959E /* KIFTestActor+MapboxGL.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = "KIFTestActor+MapboxGL.m"; sourceTree = SOURCE_ROOT; };
 		DDBD016B196DC4740033959E /* KIFTestActor+MapboxGL.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = "KIFTestActor+MapboxGL.h"; sourceTree = SOURCE_ROOT; };
+		DDC5C7BA1B84D62B00E1EA6B /* libMapbox.a */ = {isa = PBXFileReference; lastKnownFileType = archive.ar; name = libMapbox.a; path = ../../../build/ios/pkg/static/libMapbox.a; sourceTree = "<group>"; };
+		DDC5C7BB1B84D62B00E1EA6B /* Mapbox.bundle */ = {isa = PBXFileReference; lastKnownFileType = "wrapper.plug-in"; name = Mapbox.bundle; path = ../../../build/ios/pkg/static/Mapbox.bundle; sourceTree = "<group>"; };
 /* End PBXFileReference section */
 
 /* Begin PBXFrameworksBuildPhase section */
@@ -155,8 +155,8 @@
 				DD41CE171ACB5DE700FA7979 /* GLKit.framework in Frameworks */,
 				DD41CE151ACB5DE000FA7979 /* ImageIO.framework in Frameworks */,
 				DD41CE131ACB5DDA00FA7979 /* MobileCoreServices.framework in Frameworks */,
+				DDC5C7BC1B84D62B00E1EA6B /* libMapbox.a in Frameworks */,
 				DD41CE0B1ACB5DC400FA7979 /* SystemConfiguration.framework in Frameworks */,
-				DD0581081ACB663200B112C9 /* libMapboxGL.a in Frameworks */,
 				DD41CE0D1ACB5DCB00FA7979 /* libc++.dylib in Frameworks */,
 				DD41CE0F1ACB5DD000FA7979 /* libsqlite3.dylib in Frameworks */,
 				DD41CE111ACB5DD500FA7979 /* libz.dylib in Frameworks */,
@@ -300,8 +300,8 @@
 			children = (
 				DD0581031ACB661200B112C9 /* Headers */,
 				DACAD7111B08719F009119DC /* MGLMapboxEvents.h */,
-				DD0581071ACB663200B112C9 /* libMapboxGL.a */,
-				DD0581051ACB661C00B112C9 /* MapboxGL.bundle */,
+				DDC5C7BA1B84D62B00E1EA6B /* libMapbox.a */,
+				DDC5C7BB1B84D62B00E1EA6B /* Mapbox.bundle */,
 			);
 			name = "GL Library";
 			sourceTree = "<group>";
@@ -474,7 +474,7 @@
 			files = (
 				96567A311B0E8BB900D78776 /* Images.xcassets in Resources */,
 				DD0581041ACB661200B112C9 /* Headers in Resources */,
-				DD0581061ACB661C00B112C9 /* MapboxGL.bundle in Resources */,
+				DDC5C7BD1B84D62B00E1EA6B /* Mapbox.bundle in Resources */,
 				96567A231B0E84CD00D78776 /* LaunchScreen.xib in Resources */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;

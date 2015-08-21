@@ -26,7 +26,7 @@ perl \
     /tmp/mbgl/ios/*.h
 appledoc \
     --output ${OUTPUT} \
-    --project-name "Mapbox GL for iOS ${VERSION}" \
+    --project-name "Mapbox iOS SDK ${VERSION}" \
     --project-company Mapbox \
     --create-docset \
     --company-id com.mapbox \
