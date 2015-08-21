@@ -117,7 +117,7 @@ Currently, until [#1437](https://github.com/mapbox/mapbox-gl-native/issues/1437)
 1. Zip up the build product. 
 
     cd build/ios/pkg/static
-    ZIP=mapbox-gl-ios.zip
+    ZIP=mapbox-ios-sdk.zip
     rm -f ../${ZIP}
     zip -r ../${ZIP} *
 
@@ -126,7 +126,7 @@ Currently, until [#1437](https://github.com/mapbox/mapbox-gl-native/issues/1437)
     {...}
     
     m.source = {
-        :http => "http://{...}/mapbox-gl-ios.zip",
+        :http => "http://{...}/mapbox-ios-sdk.zip",
         :flatten => true
     }
     
