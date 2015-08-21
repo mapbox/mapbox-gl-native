@@ -1,0 +1,7 @@
+{
+    "default": {
+        "log": [
+            [1, "WARNING", "ParseStyle", "value must be array of two numbers"]
+        ]
+    }
+}

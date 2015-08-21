@@ -1,0 +1,43 @@
+{
+  "version": 6,
+  "sources": {
+    "mapbox": {
+      "type": "vector",
+      "url": "mapbox://mapbox.mapbox-terrain-v1,mapbox.mapbox-streets-v5",
+      "maxzoom": 14
+    }
+  },
+  "layers": [{
+    "id": "waterway_river_canal",
+    "type": "line",
+    "source": "mapbox",
+    "source-layer": "waterway",
+    "filter": ["in", "type", "river", "canal"],
+    "layout": {
+        "line-cap": {
+            "stops": [[0, "round"], [10, "round"]]
+        }
+    },
+    "paint": {
+      "line-translate-anchor": {
+        "stops": [[0, "map"], [10, "viewport"]]
+      }
+    }
+  },
+  {
+      "id": "label",
+      "type": "symbol",
+      "source": "mapbox",
+      "source-layer": "waterway",
+      "layout": {
+          "text-font": {
+              "stops": [[0, "Open Sans Regular"]]
+          },
+          "text-keep-upright": {
+              "stops": [[0, false], [10, true]]
+          }
+      },
+      "paint": {
+      }
+  }]
+}

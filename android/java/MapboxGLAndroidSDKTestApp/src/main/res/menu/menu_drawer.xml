@@ -1,0 +1,55 @@
+<?xml version="1.0" encoding="utf-8"?>
+<menu xmlns:android="http://schemas.android.com/apk/res/android">
+
+    <item
+        android:id="@+id/action_debug"
+        android:icon="@android:drawable/ic_menu_info_details"
+        android:title="@string/action_debug"
+        android:checkable="true"
+        />
+    <item
+        android:id="@+id/action_markers"
+        android:icon="@android:drawable/ic_menu_myplaces"
+        android:title="@string/action_point_annotations"
+        android:checkable="true"
+        />
+    <item android:id="@+id/action_compass"
+          android:icon="@android:drawable/ic_menu_compass"
+          android:title="@string/action_compass"
+          android:checkable="true"
+          />
+
+<!--
+    <group android:id="@+id/locationFollowModesSeparator"/>
+
+    <group android:id="@+id/locationFollowModes" android:checkableBehavior="single">
+        <item android:id="@+id/followNone"
+              android:title="@string/action_location_none"/>
+        <item android:id="@+id/followFollow"
+              android:title="@string/action_location_follow"/>
+        <item android:id="@+id/followBearing"
+              android:title="@string/action_location_bearing"/>
+    </group>
+-->
+
+    <group android:id="@+id/stylesSeparator"/>
+
+    <group android:id="@+id/stylesGroup" android:checkableBehavior="single">
+        <item
+            android:id="@+id/actionStyleMapboxStreets"
+            android:title="@string/styleMapboxStreets" />
+        <item
+            android:id="@+id/actionStyleEmerald"
+            android:title="@string/styleEmerald" />
+        <item
+            android:id="@+id/actionStyleLight"
+            android:title="@string/styleLight" />
+        <item
+            android:id="@+id/actionStyleDark"
+            android:title="@string/styleDark" />
+        <item
+            android:id="@+id/actionStyleSatellite"
+            android:title="@string/styleSatellite" />
+    </group>
+
+</menu>

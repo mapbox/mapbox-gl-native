@@ -1,0 +1,40 @@
+{
+  "version": 6,
+  "constants": {
+    "@land": "r44,239,225)",
+    "@snow": "f4f8foNGbjf#",
+    "@crop": "#eerLznieed4"
+  },
+  "sources": {
+    "mapbox": {
+      "type": "vector",
+      "url": "mapbox://mapbox.mapbox-terrain-v1,mapbox.mapbox-streets-v5",
+      "maxzoom": 14
+    }
+  },
+  "layers": [{
+    "id": "background",
+    "type": "background",
+    "paint": {
+      "background-color": "@land"
+    }
+  }, {
+    "id": "landcover_snow",
+    "type": "fill",
+    "source": "mapbox",
+    "source-layer": "landcover",
+    "filter": ["==", "class", "snow"],
+    "paint": {
+      "fill-color": "@snow"
+    }
+  }, {
+    "id": "landcover_crop",
+    "type": "fill",
+    "source": "mapbox",
+    "source-layer": "landcover",
+    "filter": ["==", "class", "crop"],
+    "paint": {
+      "fill-color": "@crop"
+    }
+  }]
+}

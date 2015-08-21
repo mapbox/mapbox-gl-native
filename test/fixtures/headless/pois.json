@@ -1,0 +1,26 @@
+{
+  "version": 7,
+  "name": "POIs",
+  "sources": {
+    "mapbox": {
+      "type": "vector",
+      "url": "asset://TEST_DATA/fixtures/tiles/streets.json"
+    }
+  },
+  "layers": [{
+    "id": "background",
+    "type": "background",
+    "paint": {
+      "background-color": "#CCCCCC"
+    }
+  }, {
+    "id": "pois",
+    "type": "symbol",
+    "source": "mapbox",
+    "source-layer": "poi_label",
+    "filter": ["in", "maki", "cafe", "bakery"],
+    "layout": {
+      "icon-image": "{maki}"
+    }
+  }]
+}

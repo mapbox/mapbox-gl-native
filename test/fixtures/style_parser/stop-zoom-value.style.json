@@ -1,0 +1,45 @@
+{
+  "version": 6,
+  "sources": {
+    "mapbox": {
+      "type": "vector",
+      "url": "mapbox://mapbox.mapbox-terrain-v1,mapbox.mapbox-streets-v5",
+      "maxzoom": 14
+    }
+  },
+  "layers": [{
+    "id": "landcover_grass",
+    "type": "fill",
+    "source": "mapbox",
+    "source-layer": "landcover",
+    "filter": ["==", "class", "grass"],
+    "paint": {
+      "fill-opacity": {
+        "stops": []
+      }
+    }
+  }, {
+    "id": "landcover_scrub",
+    "type": "fill",
+    "source": "mapbox",
+    "source-layer": "landcover",
+    "filter": ["==", "class", "scrub"],
+    "paint": {
+      "fill-opacity": {
+        "stops": [[12]]
+      }
+    }
+  }, {
+    "id": "landcover_wood",
+    "type": "fill",
+    "source": "mapbox",
+    "source-layer": "landcover",
+    "filter": ["==", "class", "wood"],
+    "paint": {
+      "fill-color": "@wood",
+      "fill-opacity": {
+        "stops": [[12, 1], [13, 0.8], [16, 0.2]]
+      }
+    }
+  }]
+}

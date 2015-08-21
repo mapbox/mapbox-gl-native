@@ -1,0 +1,100 @@
+language: android
+
+sudo: false
+
+matrix:
+  exclude:
+    - os: linux
+  include:
+    - os: linux
+      env: FLAVOR=linux CXX=g++-4.9 BUILDTYPE=Release
+      addons:
+        apt:
+          sources: [ 'ubuntu-toolchain-r-test' ]
+          packages: [ 'gdb', 'g++-4.9', 'gcc-4.9', 'libllvm3.4', 'xutils-dev', 'libxxf86vm-dev', 'x11proto-xf86vidmode-dev', 'mesa-utils' ]
+    - os: linux
+      env: FLAVOR=linux CXX=clang++-3.5 BUILDTYPE=Debug
+      addons:
+        apt:
+          sources: [ 'ubuntu-toolchain-r-test', 'llvm-toolchain-precise-3.5' ]
+          packages: [ 'gdb', 'clang-3.5', 'libstdc++-4.9-dev', 'libstdc++6', 'libllvm3.4', 'xutils-dev', 'libxxf86vm-dev', 'x11proto-xf86vidmode-dev', 'mesa-utils' ]
+    - os: linux
+      env: FLAVOR=linux CXX=clang++-3.5 BUILDTYPE=Release
+      addons:
+        apt:
+          sources: [ 'ubuntu-toolchain-r-test', 'llvm-toolchain-precise-3.5' ]
+          packages: [ 'gdb', 'clang-3.5', 'libstdc++-4.9-dev', 'libstdc++6', 'libllvm3.4', 'xutils-dev', 'libxxf86vm-dev', 'x11proto-xf86vidmode-dev', 'mesa-utils' ]
+    - os: osx
+      osx_image: xcode6.4
+      env: FLAVOR=osx BUILDTYPE=Debug
+    - os: osx
+      osx_image: xcode6.4
+      env: FLAVOR=ios BUILDTYPE=Release
+    - os: linux
+      env: FLAVOR=android ANDROID_ABI=arm-v7 BUILDTYPE=Release
+      android:
+        components: [ 'build-tools-23', 'android-23', 'extra-android-m2repository' ]
+      addons:
+        apt:
+          packages: [ 'lib32stdc++6' ]
+    - os: linux
+      env: FLAVOR=android ANDROID_ABI=arm-v7 BUILDTYPE=Debug
+      android:
+        components: [ 'build-tools-23', 'android-23', 'extra-android-m2repository' ]
+      addons:
+        apt:
+          packages: [ 'lib32stdc++6' ]
+    - os: linux
+      env: FLAVOR=android ANDROID_ABI=arm-v8 BUILDTYPE=Release
+      android:
+        components: [ 'build-tools-23', 'android-23', 'extra-android-m2repository' ]
+      addons:
+        apt:
+          packages: [ 'lib32stdc++6' ]
+    - os: linux
+      env: FLAVOR=android ANDROID_ABI=x86 BUILDTYPE=Release
+      android:
+        components: [ 'build-tools-23', 'android-23', 'extra-android-m2repository' ]
+      addons:
+        apt:
+          packages: [ 'lib32stdc++6' ]
+
+env:
+  global:
+    - TERM: dumb
+    # AWS
+    - secure: "MZHblLZXG/jWf2w0ZFlxCLDwx2qtGgRDODQyg1BR7JIuMz6AtWv8XR/sUczWLbiABCL0a/NzJF1g4v2pI7X69IntcjOdIABBgTh7++6+1TJ0Kp8viEltb55nQG3lHy/R6fOaI7Pj9tuCX0PCRtGA5C/fGnodLGEjy3RVOJ09ln0="
+    - secure: "KaSQbhgjtV7ZCkesHmvrNsbQVjk5SPfGKB1VkWenRGYhLF45HpSRNwSxMQddZ566Pg7qIFgF1iWl/B0QW3B6AWL5WmzQ5AOJgwS876pNIc/UT7ubMPtgAtjpvw1bQvQP3B8MrB+3OE5c6tD+a3LhR9krV//dOsfErR5Yy+3Mbkc="
+    # Access Token
+    - secure: "RiBIBfVhhaMjU5ksuwJO3shdvG9FpinBjdSv4co9jg9171SR8edNriedHjVKSIeBhSGNmZmX+twS3dJS/By6tl/LKh9sTynA+ZAYYljkE7jn881B/gMrlYvdAA6og5KvkhV1/0iJWlhuZrMTkhpDR200iLgg3EWBhWjltzmDW/I="
+    # Testmunk
+    - secure: "CHBiUM60TolDbQnn+4IRA/tvOKwKs3g9EDvv8YHSJMg3FuHmjKQkprBasvxf3hnTXg4WLZEubmeDcyJ6RRzPP5mMSr/hksYl0pSjj/6TUecE5fHPVVeN7txVqkpOBf9i45Y+iBUQMjBb1NnDK3pHXxpnAs1Q/pe7vReErj4GF1U="
+    # iOS code signing
+    - secure: "I6Iu75X1E+js5tzijtKi1EGtIuBcA4/25nDYe0svV4HAtujY71ZJZ4eB6355CKhFXpLXrF3i7eKVX3v+zWS0QROPEWacgsqsvNg+Ba9cnznW/faUSOYekCfhzWd/6reYDM7KzKAQwSUHLk9JIWK/kkmi4r+vVJK7h+tjPllK5YA="
+    - IOS_APP_NAME="Mapbox GL"
+    - 'IOS_DEVELOPER_NAME="iPhone Distribution: Mapbox, Inc."'
+    - IOS_PROFILE_NAME="ios-in-house"
+    - secure: "nQqSM8rd7OHtV4MqmNqVnkrVHqxKqQsaWRYk4/nPdhbeVWtTtkk0df711LrF1TUtbEPEewHxYUvTZ/UXmwJNeoKdzTHavI8hnatRkgjyxGERPn1il1Otelht9I+LQQHf+plrpRjVWBrNIW0Zox1B3cqn6d3NglpbXrEQ2EjYGNA="
+    - KIF_SCREENSHOTS="${TRAVIS_BUILD_DIR}/screenshots"
+
+before_install:
+- source ./scripts/travis_helper.sh
+
+install:
+- ./scripts/${FLAVOR}/install.sh
+
+script:
+- ./scripts/${FLAVOR}/run.sh
+
+after_failure:
+- "[ -f ./scripts/${FLAVOR}/after_failure.sh ] && ./scripts/${FLAVOR}/after_failure.sh"
+
+after_script:
+- "[ -f ./scripts/${FLAVOR}/after_script.sh ] && ./scripts/${FLAVOR}/after_script.sh"
+
+notifications:
+  slack:
+    secure: HHQYr7sF8M1SzoWSqgKVYtwAgGdLLCyTMsQjFhEEQNYO92ZwURE5s03qWTGH5k8+4Yqn26yrXt3NztLC4JIOpcGervN2mSZyq4dZgFTcWEd61igw0qwSenlwvFfbE1ASK/KYCzfyn9MIfHN+ovwLoRxXZkPwinKDvl3DXjBaFNg=
+
+git:
+  submodules: false

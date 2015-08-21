@@ -1,0 +1,7 @@
+{
+    "default": {
+        "log": [
+            [1, "WARNING", "ParseStyle", "value of 'line-opacity' must be a number, or a number function"]
+        ]
+    }
+}

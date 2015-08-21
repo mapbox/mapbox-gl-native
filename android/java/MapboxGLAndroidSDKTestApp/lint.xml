@@ -1,0 +1,34 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<lint>
+    <!-- Ignore errors caused by icon burning -->
+    <issue id="IconLauncherShape" severity="ignore">
+        <ignore path="res/drawable-mdpi/icon.png" />
+        <ignore path="res/drawable-hdpi/icon.png" />
+        <ignore path="res/drawable-xdpi/icon.png" />
+        <ignore path="res/drawable-xxdpi/icon.png" />
+        <ignore path="res/drawable-mdpi/icon_burned.png" />
+        <ignore path="res/drawable-hdpi/icon_burned.png" />
+        <ignore path="res/drawable-xdpi/icon_burned.png" />
+        <ignore path="res/drawable-xxdpi/icon_burned.png" />
+    </issue>
+    <issue id="IconDuplicates" severity="ignore">
+        <ignore path="res/drawable-mdpi/icon.png" />
+        <ignore path="res/drawable-hdpi/icon.png" />
+        <ignore path="res/drawable-xdpi/icon.png" />
+        <ignore path="res/drawable-xxdpi/icon.png" />
+        <ignore path="res/drawable-mdpi/icon_burned.png" />
+        <ignore path="res/drawable-hdpi/icon_burned.png" />
+        <ignore path="res/drawable-xdpi/icon_burned.png" />
+        <ignore path="res/drawable-xxdpi/icon_burned.png" />
+    </issue>
+    <issue id="UnusedResources" severity="ignore">
+        <ignore path="res/drawable-mdpi/icon.png" />
+        <ignore path="res/drawable-hdpi/icon.png" />
+        <ignore path="res/drawable-xdpi/icon.png" />
+        <ignore path="res/drawable-xxdpi/icon.png" />
+        <ignore path="res/drawable-mdpi/icon_burned.png" />
+        <ignore path="res/drawable-hdpi/icon_burned.png" />
+        <ignore path="res/drawable-xdpi/icon_burned.png" />
+        <ignore path="res/drawable-xxdpi/icon_burned.png" />
+    </issue>
+</lint>

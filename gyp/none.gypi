@@ -1,0 +1,20 @@
+{
+  'targets': [
+    { 'target_name': 'http-none',
+      'product_name': 'mbgl-http-none',
+      'type': 'none',
+    },
+    { 'target_name': 'asset-none',
+      'product_name': 'mbgl-asset-none',
+      'type': 'none',
+    },
+    { 'target_name': 'cache-none',
+      'product_name': 'mbgl-cache-none',
+      'type': 'none',
+    },
+    { 'target_name': 'headless-none',
+      'product_name': 'mbgl-headless-none',
+      'type': 'none',
+    },
+  ],
+}

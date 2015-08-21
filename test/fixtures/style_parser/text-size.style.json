@@ -1,0 +1,20 @@
+{
+  "version": 6,
+  "sources": {
+    "mapbox": {
+      "type": "vector",
+      "url": "mapbox://mapbox.mapbox-terrain-v1,mapbox.mapbox-streets-v5",
+      "maxzoom": 14
+    }
+  },
+  "layers": [{
+    "id": "country_label",
+    "type": "text",
+    "source": "mapbox",
+    "source-layer": "country_label",
+    "filter": ["==", "$type", "Point"],
+    "paint": {
+      "text-size": null
+    }
+  }]
+}
