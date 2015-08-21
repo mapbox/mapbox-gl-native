@@ -55,6 +55,11 @@ Request* DefaultFileSource::request(const Resource& resource,
         url = util::mapbox::normalizeGlyphsURL(resource.url, accessToken);
         break;
 
+    case Resource::Kind::SpriteImage:
+    case Resource::Kind::SpriteJSON:
+        url = util::mapbox::normalizeSpriteURL(resource.url, accessToken);
+        break;
+
     default:
         url = resource.url;
     }

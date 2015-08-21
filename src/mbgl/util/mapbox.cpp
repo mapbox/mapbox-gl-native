@@ -1,6 +1,7 @@
 #include <mbgl/util/mapbox.hpp>
 
 #include <stdexcept>
+#include <vector>
 
 namespace mbgl {
 namespace util {
@@ -8,36 +9,22 @@ namespace mapbox {
 
 const std::string protocol = "mapbox://";
 const std::string baseURL = "https://api.mapbox.com/";
-const std::string draft = "draft";
-
-struct MapboxURLParts {
-    std::string endpoint;
-    std::string user;
-    std::string id;
-    bool draft;
-};
 
 bool isMapboxURL(const std::string& url) {
     return url.compare(0, protocol.length(), protocol) == 0;
 }
 
-MapboxURLParts parseMapboxURL(const std::string& url) {
-    std::size_t endpointEndIndex = url.find('/', protocol.length());
-    std::size_t userStartIndex = endpointEndIndex + 1;
-    std::size_t userEndIndex = url.find('/', userStartIndex);
-    std::size_t idStartIndex = userEndIndex + 1;
-    std::size_t idEndIndex = url.find('/', idStartIndex);
-
-    MapboxURLParts parts;
-
-    parts.endpoint = url.substr(protocol.length(), endpointEndIndex - protocol.length());
-    parts.user = url.substr(userStartIndex, userEndIndex - userStartIndex);
-    parts.id = url.substr(idStartIndex, idEndIndex - idStartIndex);
-    parts.draft = url.compare(idEndIndex + 1, draft.length(), draft) == 0;
-
-    return parts;
+std::vector<std::string> getMapboxURLPathname(const std::string& url) {
+    std::vector<std::string> pathname;
+    std::size_t startIndex = protocol.length();
+    while (startIndex < url.length()) {
+        std::size_t endIndex = url.find("/", startIndex);
+        if (endIndex == std::string::npos) endIndex = url.length();
+        pathname.push_back(url.substr(startIndex, endIndex - startIndex));
+        startIndex = endIndex + 1;
+    }
+    return pathname;
 }
-
 
 std::string normalizeSourceURL(const std::string& url, const std::string& accessToken) {
     if (!isMapboxURL(url)) {
@@ -56,17 +43,34 @@ std::string normalizeStyleURL(const std::string& url, const std::string& accessT
         return url;
     }
 
-    MapboxURLParts parts = parseMapboxURL(url);
-    return baseURL + "styles/v1/" + parts.user + "/" + parts.id + (parts.draft ? "/draft" : "") + "?access_token=" + accessToken;
+    std::vector<std::string> pathname = getMapboxURLPathname(url);
+    std::string user = pathname[1];
+    std::string id = pathname[2];
+    bool isDraft = pathname.size() > 3;
+    return baseURL + "styles/v1/" + user + "/" + id + (isDraft ? "/draft" : "") + "?access_token=" + accessToken;
 }
 
-std::string normalizeSpriteURL(const std::string& url, const std::string& format, const std::string& extension, const std::string& accessToken) {
+std::string normalizeSpriteURL(const std::string& url, const std::string& accessToken) {
     if (!isMapboxURL(url)) {
-        return url + format + extension;
+        return url;
     }
 
-    MapboxURLParts parts = parseMapboxURL(url);
-    return baseURL + "styles/v1/" + parts.user + "/" + parts.id + (parts.draft ? "/draft" : "") + "/sprite" + format + extension + "?access_token=" + accessToken;
+    std::vector<std::string> pathname = getMapboxURLPathname(url);
+    std::string user = pathname[1];
+    bool isDraft = pathname.size() > 3;
+
+    std::string id, extension;
+    if (isDraft) {
+        size_t index = pathname[3].find_first_of("@.");
+        id = pathname[2];
+        extension = pathname[3].substr(index);
+    } else {
+        size_t index = pathname[2].find_first_of("@.");
+        id = pathname[2].substr(0, index);
+        extension = pathname[2].substr(index);
+    }
+
+    return baseURL + "styles/v1/" + user + "/" + id + "/" + (isDraft ? "draft/" : "") + "sprite" + extension + "?access_token=" + accessToken;
 }
 
 std::string normalizeGlyphsURL(const std::string& url, const std::string& accessToken) {
@@ -74,8 +78,9 @@ std::string normalizeGlyphsURL(const std::string& url, const std::string& access
         return url;
     }
 
-    MapboxURLParts parts = parseMapboxURL(url);
-    return baseURL + "fonts/v1/" + parts.user + "/{fontstack}/{range}.pbf?access_token=" + accessToken;
+    std::vector<std::string> pathname = getMapboxURLPathname(url);
+    std::string user = pathname[1];
+    return baseURL + "fonts/v1/" + user + "/{fontstack}/{range}.pbf?access_token=" + accessToken;
 }
 
 std::string normalizeTileURL(const std::string& url, const std::string& sourceURL, SourceType sourceType) {

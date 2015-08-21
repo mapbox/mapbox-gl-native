@@ -14,7 +14,9 @@ struct Resource {
         Tile,
         Glyphs,
         JSON,
-        Image
+        Image,
+        SpriteImage,
+        SpriteJSON
     };
 
     const Kind kind;

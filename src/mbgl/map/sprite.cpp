@@ -44,13 +44,13 @@ Sprite::Sprite(const std::string& baseUrl, float pixelRatio_)
         return;
     }
 
-    std::string spriteURL = mbgl::util::mapbox::normalizeSpriteURL(baseUrl, (pixelRatio_ > 1 ? "@2x" : ""), ".png", "NOCOMMIT");
-    std::string jsonURL = mbgl::util::mapbox::normalizeSpriteURL(baseUrl, (pixelRatio_ > 1 ? "@2x" : ""), ".json", "NOCOMMIT");
+    std::string spriteURL(baseUrl + (pixelRatio_ > 1 ? "@2x" : "") + ".png");
+    std::string jsonURL(baseUrl + (pixelRatio_ > 1 ? "@2x" : "") + ".json");
 
     loader = std::make_unique<Loader>();
 
     FileSource* fs = util::ThreadContext::getFileSource();
-    loader->jsonRequest = fs->request({ Resource::Kind::JSON, jsonURL }, util::RunLoop::getLoop(),
+    loader->jsonRequest = fs->request({ Resource::Kind::SpriteJSON, jsonURL }, util::RunLoop::getLoop(),
                                       [this, jsonURL](const Response& res) {
         loader->jsonRequest = nullptr;
         if (res.status == Response::Successful) {
@@ -66,7 +66,7 @@ Sprite::Sprite(const std::string& baseUrl, float pixelRatio_)
     });
 
     loader->spriteRequest =
-        fs->request({ Resource::Kind::Image, spriteURL }, util::RunLoop::getLoop(),
+        fs->request({ Resource::Kind::SpriteImage, spriteURL }, util::RunLoop::getLoop(),
                     [this, spriteURL](const Response& res) {
             loader->spriteRequest = nullptr;
             if (res.status == Response::Successful) {

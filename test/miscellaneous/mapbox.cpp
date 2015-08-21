@@ -25,10 +25,10 @@ TEST(Mapbox, StyleURL) {
 }
 
 TEST(Mapbox, SpriteURL) {
-    EXPECT_EQ(mbgl::util::mapbox::normalizeSpriteURL("map/box/sprites", "@2x", ".json", "key"), "map/box/sprites@2x.json");
-    EXPECT_EQ(mbgl::util::mapbox::normalizeSpriteURL("mapbox://sprites/mapbox/streets-v8", "", ".json", "key"), "https://api.mapbox.com/styles/v1/mapbox/streets-v8/sprite.json?access_token=key");
-    EXPECT_EQ(mbgl::util::mapbox::normalizeSpriteURL("mapbox://sprites/mapbox/streets-v8", "@2x", ".png", "key"), "https://api.mapbox.com/styles/v1/mapbox/streets-v8/sprite@2x.png?access_token=key");
-    EXPECT_EQ(mbgl::util::mapbox::normalizeSpriteURL("mapbox://sprites/mapbox/streets-v8/draft", "@2x", ".png", "key"), "https://api.mapbox.com/styles/v1/mapbox/streets-v8/draft/sprite@2x.png?access_token=key");
+    EXPECT_EQ(mbgl::util::mapbox::normalizeSpriteURL("map/box/sprites@2x.json", "key"), "map/box/sprites@2x.json");
+    EXPECT_EQ(mbgl::util::mapbox::normalizeSpriteURL("mapbox://sprites/mapbox/streets-v8.json", "key"), "https://api.mapbox.com/styles/v1/mapbox/streets-v8/sprite.json?access_token=key");
+    EXPECT_EQ(mbgl::util::mapbox::normalizeSpriteURL("mapbox://sprites/mapbox/streets-v8@2x.png", "key"), "https://api.mapbox.com/styles/v1/mapbox/streets-v8/sprite@2x.png?access_token=key");
+    EXPECT_EQ(mbgl::util::mapbox::normalizeSpriteURL("mapbox://sprites/mapbox/streets-v8/draft@2x.png", "key"), "https://api.mapbox.com/styles/v1/mapbox/streets-v8/draft/sprite@2x.png?access_token=key");
 }
 
 TEST(Mapbox, TileURL) {
