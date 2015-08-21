@@ -13,8 +13,6 @@ struct Resource {
         Source,
         Tile,
         Glyphs,
-        JSON,
-        Image,
         SpriteImage,
         SpriteJSON
     };
