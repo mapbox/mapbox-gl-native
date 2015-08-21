@@ -136,11 +136,26 @@ mbgl::Settings_NSUserDefaults *settings = nullptr;
 {
     if (buttonIndex == actionSheet.firstOtherButtonIndex)
     {
-        [self.mapView resetNorth];
+//        [self.mapView resetNorth];
+//        [self.mapView setCenterCoordinate:CLLocationCoordinate2DMake(29.95, -90.066667) zoomLevel:14 direction:90 animated:YES];
+        CLLocationCoordinate2D coordinates[] = {
+            CLLocationCoordinate2DMake(37, -109+2/60+48/(60*60)),
+            CLLocationCoordinate2DMake(37, -102.05),
+            CLLocationCoordinate2DMake(41, -102.05),
+            CLLocationCoordinate2DMake(41, -109+2/60+48/(60*60)),
+        };
+        [self.mapView setVisibleCoordinates:coordinates count:4 edgePadding:UIEdgeInsetsMake(32, 0, 0, 0) animated:NO];
+//        self.mapView.camera = [MGLMapCamera cameraLookingAtCenterCoordinate:CLLocationCoordinate2DMake(29.95, -90.066667) fromDistance:1837212.607578 heading:90];
+        // 1982881.568373
+        NSLog(@"Camera: %@", self.mapView.camera);
+        NSLog(@"Altitude: %f", self.mapView.camera.altitude);
     }
     else if (buttonIndex == actionSheet.firstOtherButtonIndex + 1)
     {
-        [self.mapView resetPosition];
+//        [self.mapView resetPosition];
+        MGLMapCamera *camera = [self.mapView.camera copy];
+        camera.pitch = 45;
+        [self.mapView setCamera:camera animated:YES];
     }
     else if (buttonIndex == actionSheet.firstOtherButtonIndex + 2)
     {
