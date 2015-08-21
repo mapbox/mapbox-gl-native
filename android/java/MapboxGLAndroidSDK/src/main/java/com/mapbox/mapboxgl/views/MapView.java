@@ -57,7 +57,6 @@ import com.mapzen.android.lost.api.LocationRequest;
 import com.mapzen.android.lost.api.LocationServices;
 import com.mapzen.android.lost.api.LostApiClient;
 import com.squareup.okhttp.HttpUrl;
-
 import java.nio.ByteBuffer;
 import java.util.ArrayList;
 import java.util.Arrays;
@@ -249,11 +248,7 @@ public class MapView extends FrameLayout implements LocationListener {
         requestFocus();
 
         // Register the SurfaceHolder callbacks
-        if (android.os.Build.VERSION.SDK_INT >= Build.VERSION_CODES.GINGERBREAD) {
-            surfaceView.getHolder().addCallback(new Callbacks2());
-        } else {
-            surfaceView.getHolder().addCallback(new Callbacks());
-        }
+        surfaceView.getHolder().addCallback(new CallbacksHandler());
 
         // Touch gesture detectors
         mGestureDetector = new GestureDetectorCompat(context, new GestureListener());
@@ -749,7 +744,7 @@ public class MapView extends FrameLayout implements LocationListener {
     }
 
     // This class handles SurfaceHolder callbacks
-    private class Callbacks implements SurfaceHolder.Callback {
+    private class CallbacksHandler implements SurfaceHolder.Callback, SurfaceHolder.Callback2 {
 
         // Called when the native surface buffer has been created
         // Must do all EGL/GL ES initialization here
@@ -772,9 +767,6 @@ public class MapView extends FrameLayout implements LocationListener {
         public void surfaceChanged(SurfaceHolder holder, int format, int width, int height) {
             mNativeMapView.resizeFramebuffer(width, height);
         }
-    }
-
-    private class Callbacks2 extends Callbacks implements SurfaceHolder.Callback2 {
 
         // Called when we need to redraw the view
         // This is called before our view is first visible to prevent an initial
