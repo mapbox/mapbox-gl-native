@@ -28,12 +28,14 @@ MapboxURLParts parseMapboxURL(const std::string& url) {
     std::size_t idStartIndex = userEndIndex + 1;
     std::size_t idEndIndex = url.find('/', idStartIndex);
 
-    return (MapboxURLParts) {
-      url.substr(protocol.length(), endpointEndIndex - protocol.length()),
-      url.substr(userStartIndex, userEndIndex - userStartIndex),
-      url.substr(idStartIndex, idEndIndex - idStartIndex),
-      url.compare(idEndIndex + 1, draft.length(), draft) == 0
-    };
+    MapboxURLParts parts;
+
+    parts.endpoint = url.substr(protocol.length(), endpointEndIndex - protocol.length());
+    parts.user = url.substr(userStartIndex, userEndIndex - userStartIndex);
+    parts.id = url.substr(idStartIndex, idEndIndex - idStartIndex);
+    parts.draft = url.compare(idEndIndex + 1, draft.length(), draft) == 0;
+
+    return parts;
 }
 
 
