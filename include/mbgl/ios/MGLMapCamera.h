@@ -4,6 +4,7 @@
 
 NS_ASSUME_NONNULL_BEGIN
 
+/** An `MGLMapCamera` object represents a viewpoint from which the user observes some point on an `MGLMapView`. */
 @interface MGLMapCamera : NSObject <NSSecureCoding, NSCopying>
 
 /** Coordinate at the center of the map view. */
