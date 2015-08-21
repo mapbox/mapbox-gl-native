@@ -209,7 +209,6 @@ public class MapView extends FrameLayout implements LocationListener {
     //
 
     // Common initialization code goes here
-    @TargetApi(16)
     private void initialize(Context context, AttributeSet attrs) {
 
         // Save the context
@@ -236,12 +235,11 @@ public class MapView extends FrameLayout implements LocationListener {
         ActivityManager.MemoryInfo memoryInfo = new ActivityManager.MemoryInfo();
         ActivityManager activityManager = (ActivityManager) context.getSystemService(Context.ACTIVITY_SERVICE);
         activityManager.getMemoryInfo(memoryInfo);
+        long maxMemory = memoryInfo.availMem;
         if (android.os.Build.VERSION.SDK_INT >= Build.VERSION_CODES.JELLY_BEAN) {
-            long totalMemory = memoryInfo.totalMem;
-            mNativeMapView = new NativeMapView(this, cachePath, dataPath, apkPath, mScreenDensity, availableProcessors, totalMemory);
-        } else {
-            throw new RuntimeException("Need to implement totalMemory on pre-Jelly Bean devices.");
+            maxMemory = memoryInfo.totalMem;
         }
+        mNativeMapView = new NativeMapView(this, cachePath, dataPath, apkPath, mScreenDensity, availableProcessors, maxMemory);
 
         // Ensure this view is interactable
         setClickable(true);
@@ -776,7 +774,6 @@ public class MapView extends FrameLayout implements LocationListener {
         }
     }
 
-    @TargetApi(9)
     private class Callbacks2 extends Callbacks implements SurfaceHolder.Callback2 {
 
         // Called when we need to redraw the view
@@ -843,7 +840,7 @@ public class MapView extends FrameLayout implements LocationListener {
     }
 
     // Called when user touches the screen, all positions are absolute
-    @Override @TargetApi(14)
+    @Override
     public boolean onTouchEvent(@NonNull MotionEvent event) {
         // Check and ignore non touch or left clicks
         if ((android.os.Build.VERSION.SDK_INT >= Build.VERSION_CODES.ICE_CREAM_SANDWICH) && (event.getButtonState() != 0) && (event.getButtonState() != MotionEvent.BUTTON_PRIMARY)) {
@@ -1396,7 +1393,7 @@ public class MapView extends FrameLayout implements LocationListener {
 
     // Called when the mouse pointer enters or exits the view
     // or when it fades in or out due to movement
-    @Override @TargetApi(14)
+    @Override
     public boolean onHoverEvent(@NonNull MotionEvent event) {
         switch (event.getActionMasked()) {
             case MotionEvent.ACTION_HOVER_ENTER:
