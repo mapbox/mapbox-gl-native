@@ -1,4 +1,4 @@
-#import "MGLAccountManager.h"
+#import "MGLConfigurationManager.h"
 #import "MGLAnnotation.h"
 #import "MGLAnnotationImage.h"
 #import "MGLGeometry.h"

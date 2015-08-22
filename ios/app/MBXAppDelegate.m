@@ -6,8 +6,8 @@
 
 - (BOOL)application:(UIApplication *)application didFinishLaunchingWithOptions:(NSDictionary *)launchOptions
 {
-    // Set access token, unless MGLAccountManager already read it in from Info.plist.
-    if ( ! [MGLAccountManager accessToken]) {
+    // Set access token, unless MGLConfigurationManager already read it in from Info.plist.
+    if ( ! [MGLConfigurationManager accessToken]) {
         NSString *accessToken = [[NSProcessInfo processInfo] environment][@"MAPBOX_ACCESS_TOKEN"];
         if (accessToken) {
             // Store to preferences so that we can launch the app later on without having to specify
@@ -20,7 +20,7 @@
         }
         if ( ! accessToken) NSLog(@"No access token set. Mapbox vector tiles won't work.");
 
-        [MGLAccountManager setAccessToken:accessToken];
+        [MGLConfigurationManager setAccessToken:accessToken];
     }
 
     self.window = [[UIWindow alloc] initWithFrame:[[UIScreen mainScreen] bounds]];

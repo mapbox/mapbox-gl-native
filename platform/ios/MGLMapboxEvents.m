@@ -2,11 +2,11 @@
 
 #import <UIKit/UIKit.h>
 #import <SystemConfiguration/CaptiveNetwork.h>
+#import <CoreLocation/CoreLocation.h>
 #import <CoreTelephony/CTTelephonyNetworkInfo.h>
 #import <CoreTelephony/CTCarrier.h>
-#import <CoreLocation/CoreLocation.h>
 
-#import "MGLAccountManager.h"
+#import "MGLConfigurationManager.h"
 #import "NSProcessInfo+MGLAdditions.h"
 #import "NSBundle+MGLAdditions.h"
 #import "NSException+MGLAdditions.h"
@@ -64,6 +64,7 @@ const NSTimeInterval MGLFlushInterval = 60;
 @end
 
 @implementation MGLMapboxEventsData
+
 
 - (instancetype)init {
     if (self = [super init]) {
@@ -200,7 +201,7 @@ const NSTimeInterval MGLFlushInterval = 60;
 
     self = [super init];
     if (self) {
-        if (! [MGLAccountManager mapboxMetricsEnabledSettingShownInApp] &&
+        if (! [MGLConfigurationManager mapboxMetricsEnabledSettingShownInApp] &&
             [[NSUserDefaults standardUserDefaults] integerForKey:@"MGLMapboxAccountType"] == 0) {
             // Opt Out is not configured in UI, so check for Settings.bundle
             // Put Settings bundle into memory
@@ -427,10 +428,12 @@ const NSTimeInterval MGLFlushInterval = 60;
                  @"MGLMapboxEvents should not have a CLLocationManager while paused.");
         return;
     }
+    
     _locationManager = [[CLLocationManager alloc] init];
     _locationManager.desiredAccuracy = kCLLocationAccuracyKilometer;
     _locationManager.distanceFilter = 10;
     _locationManager.delegate = self;
+    _locationManager.activityType = [MGLConfigurationManager accessToken];
     
     [_locationManager startUpdatingLocation];
     
@@ -556,7 +559,7 @@ const NSTimeInterval MGLFlushInterval = 60;
 // Can be called from any thread.
 //
 - (void) flush {
-    if ([MGLAccountManager accessToken] == nil) return;
+    if ([MGLConfigurationManager accessToken] == nil) return;
 
     __weak MGLMapboxEvents *weakSelf = self;
 
@@ -592,7 +595,7 @@ const NSTimeInterval MGLFlushInterval = 60;
         if (!strongSelf) return;
 
         // Setup URL Request
-        NSString *url = [NSString stringWithFormat:@"%@/events/v1?access_token=%@", MGLMapboxEventsAPIBase, [MGLAccountManager accessToken]];
+        NSString *url = [NSString stringWithFormat:@"%@/events/v1?access_token=%@", MGLMapboxEventsAPIBase, [MGLConfigurationManager accessToken]];
         NSMutableURLRequest *request = [[NSMutableURLRequest alloc] initWithURL:[NSURL URLWithString:url]];
         [request setValue:strongSelf.userAgent forHTTPHeaderField:@"User-Agent"];
         [request setValue:@"application/json" forHTTPHeaderField:@"Content-Type"];
