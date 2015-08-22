@@ -1336,7 +1336,7 @@ std::chrono::steady_clock::duration secondsAsDuration(float duration)
     }
     else if (quickZoom.state == UIGestureRecognizerStateChanged)
     {
-        CGFloat distance = self.quickZoomStart - [quickZoom locationInView:quickZoom.view].y;
+        CGFloat distance = [quickZoom locationInView:quickZoom.view].y - self.quickZoomStart;
 
         CGFloat newZoom = log2f(self.scale) + (distance / 100);
 
