@@ -370,7 +370,8 @@ std::chrono::steady_clock::duration secondsAsDuration(float duration)
     {
         _quickZoom = [[UILongPressGestureRecognizer alloc] initWithTarget:self action:@selector(handleQuickZoomGesture:)];
         _quickZoom.numberOfTapsRequired = 1;
-        _quickZoom.minimumPressDuration = 0.25;
+        _quickZoom.minimumPressDuration = 0;
+        [_quickZoom requireGestureRecognizerToFail:doubleTap];
         [self addGestureRecognizer:_quickZoom];
     }
 
