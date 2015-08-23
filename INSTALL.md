@@ -283,7 +283,7 @@ Run:
     make android
     open -a Android\ Studio
 
-You can then open `android/java` in Android Studio via "Import Non-Android Studio Project".
+You can then open `android/java` in Android Studio via "import project (Eclipse ADT, Gradle, etc.)".
 
 ### Setting up Android emulator
 
