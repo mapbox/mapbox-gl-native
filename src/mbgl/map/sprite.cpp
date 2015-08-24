@@ -9,6 +9,7 @@
 #include <mbgl/util/raster.hpp>
 #include <mbgl/util/thread.hpp>
 #include <mbgl/util/uv_detail.hpp>
+#include <mbgl/util/mapbox.hpp>
 
 #include <rapidjson/document.h>
 
@@ -49,7 +50,7 @@ Sprite::Sprite(const std::string& baseUrl, float pixelRatio_)
     loader = std::make_unique<Loader>();
 
     FileSource* fs = util::ThreadContext::getFileSource();
-    loader->jsonRequest = fs->request({ Resource::Kind::JSON, jsonURL }, util::RunLoop::getLoop(),
+    loader->jsonRequest = fs->request({ Resource::Kind::SpriteJSON, jsonURL }, util::RunLoop::getLoop(),
                                       [this, jsonURL](const Response& res) {
         loader->jsonRequest = nullptr;
         if (res.status == Response::Successful) {
@@ -65,7 +66,7 @@ Sprite::Sprite(const std::string& baseUrl, float pixelRatio_)
     });
 
     loader->spriteRequest =
-        fs->request({ Resource::Kind::Image, spriteURL }, util::RunLoop::getLoop(),
+        fs->request({ Resource::Kind::SpriteImage, spriteURL }, util::RunLoop::getLoop(),
                     [this, spriteURL](const Response& res) {
             loader->spriteRequest = nullptr;
             if (res.status == Response::Successful) {

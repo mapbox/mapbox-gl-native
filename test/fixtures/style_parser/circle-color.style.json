@@ -8,13 +8,11 @@
     }
   },
   "layers": [{
-    "id": "country_label",
-    "type": "text",
+    "id": "circle_color_example",
+    "type": "circle",
     "source": "mapbox",
-    "source-layer": "country_label",
-    "filter": ["==", "$type", "Point"],
     "paint": {
-      "text-size": null
+      "circle-color": null
     }
   }]
 }

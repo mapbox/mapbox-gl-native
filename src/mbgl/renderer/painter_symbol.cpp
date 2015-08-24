@@ -49,7 +49,7 @@ void Painter::renderSDF(SymbolBucket &bucket,
     sdfShader.u_texsize = texsize;
 
     // adjust min/max zooms for variable font sies
-    float zoomAdjust = std::log(fontSize / bucketProperties.max_size) / std::log(2);
+    float zoomAdjust = std::log(fontSize / bucketProperties.size) / std::log(2);
 
     sdfShader.u_zoom = (state.getNormalizedZoom() - zoomAdjust) * 10; // current zoom level
 
@@ -69,7 +69,7 @@ void Painter::renderSDF(SymbolBucket &bucket,
 
     // We're drawing in the translucent pass which is bottom-to-top, so we need
     // to draw the halo first.
-    if (styleProperties.halo_color[3] > 0.0f) {
+    if (styleProperties.halo_color[3] > 0.0f && styleProperties.halo_width > 0.0f) {
         sdfShader.u_gamma = styleProperties.halo_blur * blurOffset / fontScale / sdfPx + gamma;
 
         if (styleProperties.opacity < 1.0f) {
@@ -157,8 +157,7 @@ void Painter::renderSymbol(SymbolBucket &bucket, const StyleLayer &layer_desc, c
                 ? state.getAngle()
                 : 0;
 
-        // If layerStyle.size > bucket.info.fontSize then labels may collide
-        const float fontSize = properties.icon.size != 0 ? properties.icon.size : layout.icon.max_size;
+        const float fontSize = properties.icon.size;
         const float fontScale = fontSize / 1.0f;
 
         spriteAtlas->bind(state.isChanging() || layout.placement == PlacementType::Line || angleOffset != 0 || fontScale != 1 || sdf);
@@ -191,7 +190,7 @@ void Painter::renderSymbol(SymbolBucket &bucket, const StyleLayer &layer_desc, c
             iconShader->u_texsize = {{ float(spriteAtlas->getWidth()) / 4.0f, float(spriteAtlas->getHeight()) / 4.0f }};
 
             // adjust min/max zooms for variable font sies
-            float zoomAdjust = std::log(fontSize / layout.icon.max_size) / std::log(2);
+            float zoomAdjust = std::log(fontSize / layout.icon.size) / std::log(2);
 
             iconShader->u_zoom = (state.getNormalizedZoom() - zoomAdjust) * 10; // current zoom level
             iconShader->u_fadedist = 0 * 10;

@@ -5,6 +5,7 @@
 #include <mbgl/geometry/glyph_atlas.hpp>
 #include <mbgl/renderer/fill_bucket.hpp>
 #include <mbgl/renderer/line_bucket.hpp>
+#include <mbgl/renderer/circle_bucket.hpp>
 #include <mbgl/renderer/symbol_bucket.hpp>
 #include <mbgl/platform/log.hpp>
 #include <mbgl/util/constants.hpp>
@@ -47,8 +48,8 @@ Bucket* TileWorker::getBucket(const StyleLayer& layer) const {
 TileParseResult TileWorker::parse(const GeometryTile& geometryTile) {
     partialParse = false;
 
-    for (const auto& layer : layers) {
-        parseLayer(*layer, geometryTile);
+    for (auto i = layers.rbegin(); i != layers.rend(); i++) {
+        parseLayer(**i, geometryTile);
     }
 
     return partialParse ? TileData::State::partial : TileData::State::parsed;
@@ -57,8 +58,8 @@ TileParseResult TileWorker::parse(const GeometryTile& geometryTile) {
 void TileWorker::redoPlacement(float angle, bool collisionDebug) {
     collision->reset(angle, 0);
     collision->setDebug(collisionDebug);
-    for (const auto& layer_desc : layers) {
-        auto bucket = getBucket(*layer_desc);
+    for (auto i = layers.rbegin(); i != layers.rend(); i++) {
+        auto bucket = getBucket(**i);
         if (bucket) {
             bucket->placeFeatures();
         }
@@ -139,15 +140,22 @@ void TileWorker::parseLayer(const StyleLayer& layer, const GeometryTile& geometr
 
     std::unique_ptr<Bucket> bucket;
 
-    if (styleBucket.type == StyleLayerType::Fill) {
+    switch (styleBucket.type) {
+    case StyleLayerType::Fill:
         bucket = createFillBucket(*geometryLayer, styleBucket);
-    } else if (styleBucket.type == StyleLayerType::Line) {
+        break;
+    case StyleLayerType::Line:
         bucket = createLineBucket(*geometryLayer, styleBucket);
-    } else if (styleBucket.type == StyleLayerType::Symbol) {
+        break;
+    case StyleLayerType::Circle:
+        bucket = createCircleBucket(*geometryLayer, styleBucket);
+        break;
+    case StyleLayerType::Symbol:
         bucket = createSymbolBucket(*geometryLayer, styleBucket);
-    } else if (styleBucket.type == StyleLayerType::Raster) {
+        break;
+    case StyleLayerType::Raster:
         return;
-    } else {
+    default:
         Log::Warning(Event::ParseTile, "unknown bucket render type for layer '%s' (source layer '%s')",
                 styleBucket.name.c_str(), styleBucket.source_layer.c_str());
     }
@@ -203,6 +211,17 @@ std::unique_ptr<Bucket> TileWorker::createLineBucket(const GeometryTileLayer& la
     return bucket->hasData() ? std::move(bucket) : nullptr;
 }
 
+std::unique_ptr<Bucket> TileWorker::createCircleBucket(const GeometryTileLayer& layer,
+                                                       const StyleBucket& bucket_desc) {
+    auto bucket = std::make_unique<CircleBucket>(circleVertexBuffer,
+                                                 triangleElementsBuffer);
+
+    // Circle does not have layout properties to apply.
+
+    addBucketGeometries(bucket, layer, bucket_desc.filter);
+    return bucket->hasData() ? std::move(bucket) : nullptr;
+}
+
 std::unique_ptr<Bucket> TileWorker::createSymbolBucket(const GeometryTileLayer& layer,
                                                        const StyleBucket& bucket_desc) {
     auto bucket = std::make_unique<SymbolBucket>(*collision, id.overscaling);
@@ -215,14 +234,13 @@ std::unique_ptr<Bucket> TileWorker::createSymbolBucket(const GeometryTileLayer& 
         layout.icon.rotation_alignment = RotationAlignmentType::Map;
         layout.text.rotation_alignment = RotationAlignmentType::Map;
     };
-    applyLayoutProperty(PropertyKey::SymbolMinDistance, bucket_desc.layout, layout.min_distance, z);
+    applyLayoutProperty(PropertyKey::SymbolSpacing, bucket_desc.layout, layout.spacing, z);
     applyLayoutProperty(PropertyKey::SymbolAvoidEdges, bucket_desc.layout, layout.avoid_edges, z);
 
     applyLayoutProperty(PropertyKey::IconAllowOverlap, bucket_desc.layout, layout.icon.allow_overlap, z);
     applyLayoutProperty(PropertyKey::IconIgnorePlacement, bucket_desc.layout, layout.icon.ignore_placement, z);
     applyLayoutProperty(PropertyKey::IconOptional, bucket_desc.layout, layout.icon.optional, z);
     applyLayoutProperty(PropertyKey::IconRotationAlignment, bucket_desc.layout, layout.icon.rotation_alignment, z);
-    applyLayoutProperty(PropertyKey::IconMaxSize, bucket_desc.layout, layout.icon.max_size, z);
     applyLayoutProperty(PropertyKey::IconImage, bucket_desc.layout, layout.icon.image, z);
     applyLayoutProperty(PropertyKey::IconPadding, bucket_desc.layout, layout.icon.padding, z);
     applyLayoutProperty(PropertyKey::IconRotate, bucket_desc.layout, layout.icon.rotate, z);
@@ -232,7 +250,6 @@ std::unique_ptr<Bucket> TileWorker::createSymbolBucket(const GeometryTileLayer& 
     applyLayoutProperty(PropertyKey::TextRotationAlignment, bucket_desc.layout, layout.text.rotation_alignment, z);
     applyLayoutProperty(PropertyKey::TextField, bucket_desc.layout, layout.text.field, z);
     applyLayoutProperty(PropertyKey::TextFont, bucket_desc.layout, layout.text.font, z);
-    applyLayoutProperty(PropertyKey::TextMaxSize, bucket_desc.layout, layout.text.max_size, z);
     applyLayoutProperty(PropertyKey::TextMaxWidth, bucket_desc.layout, layout.text.max_width, z);
     applyLayoutProperty(PropertyKey::TextLineHeight, bucket_desc.layout, layout.text.line_height, z);
     applyLayoutProperty(PropertyKey::TextLetterSpacing, bucket_desc.layout, layout.text.letter_spacing, z);
@@ -247,6 +264,11 @@ std::unique_ptr<Bucket> TileWorker::createSymbolBucket(const GeometryTileLayer& 
     applyLayoutProperty(PropertyKey::TextTransform, bucket_desc.layout, layout.text.transform, z);
     applyLayoutProperty(PropertyKey::TextOffset, bucket_desc.layout, layout.text.offset, z);
     applyLayoutProperty(PropertyKey::TextAllowOverlap, bucket_desc.layout, layout.text.allow_overlap, z);
+
+    applyLayoutProperty(PropertyKey::IconSize, bucket_desc.layout, layout.icon.size, z + 1);
+    applyLayoutProperty(PropertyKey::IconSize, bucket_desc.layout, layout.icon.max_size, 18);
+    applyLayoutProperty(PropertyKey::TextSize, bucket_desc.layout, layout.text.size, z + 1);
+    applyLayoutProperty(PropertyKey::TextSize, bucket_desc.layout, layout.text.max_size, 18);
 
     if (bucket->needsDependencies(layer, bucket_desc.filter, *style.glyphStore, *style.sprite)) {
         partialParse = true;
