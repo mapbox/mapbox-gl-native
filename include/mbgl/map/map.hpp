@@ -98,6 +98,7 @@ public:
 
     // Position
     void moveBy(double dx, double dy, const Duration& = Duration::zero());
+    void setLatLng(LatLng latLng, vec2<double> point, const Duration& = Duration::zero());
     void setLatLng(LatLng latLng, const Duration& = Duration::zero());
     LatLng getLatLng() const;
     void resetPosition();

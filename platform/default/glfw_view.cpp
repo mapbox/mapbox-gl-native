@@ -329,7 +329,10 @@ void GLFWView::onMouseMove(GLFWwindow *window, double x, double y) {
         double dx = x - view->lastX;
         double dy = y - view->lastY;
         if (dx || dy) {
-            view->map->moveBy(dx, dy);
+            double flippedY = view->height - y;
+            view->map->setLatLng(
+                    view->map->latLngForPixel(mbgl::vec2<double>(x - dx, flippedY + dy)),
+                    mbgl::vec2<double>(x, flippedY));
         }
     } else if (view->rotating) {
         view->map->rotateBy(view->lastX, view->lastY, x, y);

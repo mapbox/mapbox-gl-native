@@ -6,6 +6,7 @@
 #include <mbgl/util/math.hpp>
 #include <mbgl/util/unitbezier.hpp>
 #include <mbgl/util/interpolate.hpp>
+#include <mbgl/util/tile_coordinate.hpp>
 #include <mbgl/platform/platform.hpp>
 
 #include <cstdio>
@@ -113,6 +114,27 @@ void Transform::setLatLng(const LatLng latLng, const Duration& duration) {
     easeTo(options);
 }
 
+void Transform::setLatLng(const LatLng latLng, vec2<double> point, const Duration& duration) {
+    if (std::isnan(latLng.latitude) || std::isnan(latLng.longitude)) {
+        return;
+    }
+
+    auto coord = state.latLngToCoordinate(latLng);
+    auto coordAtPoint = state.pointToCoordinate(point);
+    auto coordCenter = state.pointToCoordinate({ state.width / 2.0f, state.height / 2.0f });
+
+    float columnDiff = coordAtPoint.column - coord.column;
+    float rowDiff = coordAtPoint.row - coord.row;
+
+    auto newLatLng = state.coordinateToLatLng({
+            coordCenter.column - columnDiff,
+            coordCenter.row - rowDiff,
+            coordCenter.zoom
+    });
+
+    setLatLng(newLatLng, duration);
+}
+
 void Transform::setLatLngZoom(const LatLng latLng, const double zoom, const Duration& duration) {
     CameraOptions options;
     options.center = latLng;
@@ -173,25 +195,20 @@ void Transform::_setScale(double new_scale, double cx, double cy, const Duration
         new_scale = state.max_scale;
     }
 
-    // Zoom in on the center if we don't have click or gesture anchor coordinates.
-    if (cx < 0 || cy < 0) {
-        cx = static_cast<double>(state.width) / 2.0;
-        cy = static_cast<double>(state.height) / 2.0;
+    const double factor = new_scale / state.scale;
+    double dx = 0;
+    double dy = 0;
+
+    if (cx > 0 || cy > 0) {
+        auto coord = state.pointToCoordinate({ cx, state.getHeight() - cy }).zoomTo(state.getZoom());
+        auto centerCoord = state.pointToCoordinate({ state.width / 2.0f, state.height / 2.0f }).zoomTo(state.getZoom());
+        auto coordDiff = centerCoord - coord;
+        dx = coordDiff.column * util::tileSize * (1.0 - factor);
+        dy = coordDiff.row * util::tileSize * (1.0 - factor);
     }
 
-    // Account for the x/y offset from the center (= where the user clicked or pinched)
-    const double factor = new_scale / state.scale;
-    const double dx = (cx - static_cast<double>(state.width) / 2.0) * (1.0 - factor);
-    const double dy = (cy - static_cast<double>(state.height) / 2.0) * (1.0 - factor);
-
-    // Account for angle
-    const double angle_sin = std::sin(-state.angle);
-    const double angle_cos = std::cos(-state.angle);
-    const double ax = angle_cos * dx - angle_sin * dy;
-    const double ay = angle_sin * dx + angle_cos * dy;
-
-    const double xn = state.x * factor + ax;
-    const double yn = state.y * factor + ay;
+    const double xn = state.x * factor - dx;
+    const double yn = state.y * factor - dy;
 
     _setScaleXY(new_scale, xn, yn, duration);
 }
@@ -318,18 +335,17 @@ void Transform::setAngle(const double new_angle, const double cx, const double c
         return;
     }
 
-    double dx = 0, dy = 0;
+    LatLng rotationCenter;
 
     if (cx >= 0 && cy >= 0) {
-        dx = (static_cast<double>(state.width) / 2.0) - cx;
-        dy = (static_cast<double>(state.height) / 2.0) - cy;
-        _moveBy(dx, dy, Duration::zero());
+        rotationCenter = state.pointToLatLng({ cx, cy });
+        setLatLng(rotationCenter, Duration::zero());
     }
 
     _setAngle(new_angle);
 
     if (cx >= 0 && cy >= 0) {
-        _moveBy(-dx, -dy, Duration::zero());
+        setLatLng(rotationCenter, { cx, cy }, Duration::zero());
     }
 }
 

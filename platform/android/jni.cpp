@@ -637,7 +637,7 @@ void JNICALL nativeSetLatLng(JNIEnv *env, jobject obj, jlong nativeMapViewPtr, j
         return;
     }
 
-    nativeMapView->getMap().setLatLng(mbgl::LatLng(latitude, longitude), std::chrono::milliseconds(duration));
+    nativeMapView->getMap().setLatLng(mbgl::LatLng(latitude, longitude), mbgl::Duration(duration));
 }
 
 jobject JNICALL nativeGetLatLng(JNIEnv *env, jobject obj, jlong nativeMapViewPtr) {

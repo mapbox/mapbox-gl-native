@@ -879,7 +879,14 @@ std::chrono::steady_clock::duration secondsAsDuration(float duration)
         CGPoint delta = CGPointMake([pan translationInView:pan.view].x - self.centerPoint.x,
                                     [pan translationInView:pan.view].y - self.centerPoint.y);
 
-        _mbglMap->moveBy(delta.x, delta.y);
+        double flippedY = self.bounds.size.height - [pan locationInView:pan.view].y;
+        _mbglMap->setLatLng(
+            _mbglMap->latLngForPixel(mbgl::vec2<double>(
+                [pan locationInView:pan.view].x - delta.x,
+                flippedY + delta.y)),
+            mbgl::vec2<double>(
+                [pan locationInView:pan.view].x,
+                flippedY));
 
         self.centerPoint = CGPointMake(self.centerPoint.x + delta.x, self.centerPoint.y + delta.y);
 
@@ -1052,7 +1059,7 @@ std::chrono::steady_clock::duration secondsAsDuration(float duration)
 
         _mbglMap->setBearing(newDegrees,
                             [rotate locationInView:rotate.view].x,
-                            [rotate locationInView:rotate.view].y);
+                            self.bounds.size.height - [rotate locationInView:rotate.view].y);
         
         [self notifyMapChange:mbgl::MapChangeRegionIsChanging];
     }
