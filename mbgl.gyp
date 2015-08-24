@@ -15,7 +15,6 @@
     ['platform_lib == "osx" and host == "osx"', { 'includes': [ './gyp/platform-osx.gypi' ] } ],
     ['platform_lib == "ios" and host == "ios"', { 'includes': [ './gyp/platform-ios.gypi' ] } ],
     ['platform_lib == "linux"', { 'includes': [ './gyp/platform-linux.gypi' ] } ],
-    ['platform_lib == "node"', { 'includes': [ './gyp/platform-node.gypi' ] } ],
     ['platform_lib == "android" and host == "android"', { 'includes': [ './gyp/platform-android.gypi' ] } ],
     ['http_lib == "curl"', { 'includes': [ './gyp/http-curl.gypi' ] } ],
     ['http_lib == "nsurl" and (host == "osx" or host == "ios")', { 'includes': [ './gyp/http-nsurl.gypi' ] } ],

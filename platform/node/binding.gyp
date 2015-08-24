@@ -1,23 +1,25 @@
 {
   'targets': [
-    { 'target_name': 'platform-node',
+    { 'target_name': '<(module_name)',
       'dependencies': [
-        'version',
+        './<(mbgl)/mbgl.gyp:core',
+        './<(mbgl)/mbgl.gyp:platform-<(platform_lib)',
+        './<(mbgl)/mbgl.gyp:headless-<(headless_lib)',
       ],
 
       'include_dirs': [ "<!(node -e \"require('nan')\")" ],
 
       'sources': [
-        '../platform/node/src/node_mapbox_gl_native.cpp',
-        '../platform/node/src/node_log.hpp',
-        '../platform/node/src/node_log.cpp',
-        '../platform/node/src/node_file_source.hpp',
-        '../platform/node/src/node_file_source.cpp',
-        '../platform/node/src/node_map.hpp',
-        '../platform/node/src/node_map.cpp',
-        '../platform/node/src/node_request.hpp',
-        '../platform/node/src/node_request.cpp',
-        '../platform/node/src/util/async_queue.hpp',
+        'src/node_mapbox_gl_native.cpp',
+        'src/node_log.hpp',
+        'src/node_log.cpp',
+        'src/node_file_source.hpp',
+        'src/node_file_source.cpp',
+        'src/node_map.hpp',
+        'src/node_map.cpp',
+        'src/node_request.hpp',
+        'src/node_request.cpp',
+        'src/util/async_queue.hpp',
       ],
 
       'conditions': [
