@@ -34,6 +34,8 @@ public class PopupView extends FrameLayout {
     public void pos(int x, int y) {
         this.x = x;
         this.y = y;
+        invalidate();
+        requestLayout();
     }
 
     @Override
@@ -45,11 +47,17 @@ public class PopupView extends FrameLayout {
     protected void onLayout(boolean changed, int l, int t, int r, int b) {
         super.onLayout(changed, l, t, r, b);
 
+        /*
         int w = getWidth();
         int h = getHeight();
 
         FrameLayout.LayoutParams layoutParams = new LayoutParams(w, h);
         layoutParams.setMargins(x, y, x+w, y+h);
         setLayoutParams(layoutParams);
+        */
+
+        // TODO requires API level 11, but i had an issue with updating position on the code above
+        setTranslationX(x);
+        setTranslationY(y);
     }
 }
