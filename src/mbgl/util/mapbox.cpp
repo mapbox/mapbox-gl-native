@@ -2,6 +2,7 @@
 
 #include <stdexcept>
 #include <vector>
+#include <iostream>
 
 namespace mbgl {
 namespace util {
@@ -19,7 +20,12 @@ std::vector<std::string> getMapboxURLPathname(const std::string& url) {
     std::size_t startIndex = protocol.length();
     while (startIndex < url.length()) {
         std::size_t endIndex = url.find("/", startIndex);
-        if (endIndex == std::string::npos) endIndex = url.length();
+        if (endIndex == std::string::npos) {
+            endIndex = url.find_first_of("?#");
+        }
+        if (endIndex == std::string::npos) {
+            endIndex = url.length();
+        }
         pathname.push_back(url.substr(startIndex, endIndex - startIndex));
         startIndex = endIndex + 1;
     }
@@ -80,7 +86,10 @@ std::string normalizeGlyphsURL(const std::string& url, const std::string& access
 
     std::vector<std::string> pathname = getMapboxURLPathname(url);
     std::string user = pathname[1];
-    return baseURL + "fonts/v1/" + user + "/{fontstack}/{range}.pbf?access_token=" + accessToken;
+    std::string fontstack = pathname[2];
+    std::string range = pathname[3];
+
+    return baseURL + "fonts/v1/" + user + "/" + fontstack + "/" + range + "?access_token=" + accessToken;
 }
 
 std::string normalizeTileURL(const std::string& url, const std::string& sourceURL, SourceType sourceType) {
