@@ -9,7 +9,7 @@
 static UIColor *const kTintColor = [UIColor colorWithRed:0.120 green:0.550 blue:0.670 alpha:1.000];
 
 static NSArray *const kStyleNames = @[
-    @"Mapbox Streets",
+    @"Streets",
     @"Emerald",
     @"Light",
     @"Dark",
@@ -19,7 +19,7 @@ static NSArray *const kStyleNames = @[
     @"Satellite",
 ];
 
-static NSString *const kStyleVersion = @"7";
+static NSUInteger const kStyleVersion = 8;
 
 @interface MBXViewController () <UIActionSheetDelegate, MGLMapViewDelegate>
 
@@ -301,9 +301,9 @@ mbgl::Settings_NSUserDefaults *settings = nullptr;
     }
 
     self.mapView.styleURL = [NSURL URLWithString:
-        [NSString stringWithFormat:@"asset://styles/%@-v%@.json",
-            [[styleName lowercaseString] stringByReplacingOccurrencesOfString:@" " withString:@"-"],
-            kStyleVersion]];
+        [NSString stringWithFormat:@"asset://styles/%@-v%lu.json",
+            [styleName lowercaseString],
+            (unsigned long)kStyleVersion]];
 
     [titleButton setTitle:styleName forState:UIControlStateNormal];
 }
