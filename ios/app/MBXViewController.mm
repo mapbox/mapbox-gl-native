@@ -13,9 +13,6 @@ static NSArray *const kStyleNames = @[
     @"Emerald",
     @"Light",
     @"Dark",
-    @"Bright",
-    @"Basic",
-    @"Outdoors",
     @"Satellite",
 ];
 
