@@ -274,8 +274,8 @@ By default, the SDK will be installed to `/usr/local/opt/android-sdk`. If you op
 
     echo "export ANDROID_HOME=`brew --prefix android-sdk`" >> .bash_profile
     echo "export ANDROID_NDK_PATH=`brew --cellar android-ndk`/r10e" >> .bash_profile
-    # Replace <path to JDK> with something like /Library/Java/JavaVirtualMachines/jdk1.8.0_31.jdk
-    echo "export JAVA_HOME=<path to JDK>" >> .bash_profile
+    # Replace <path> with something like /Library/Java/JavaVirtualMachines/jdk1.8.0_31.jdk/Contents/Home
+    echo "export JAVA_HOME=<path>" >> .bash_profile
     echo "export STUDIO_JDK=$JAVA_HOME" >> .bash_profile
 
 Run:
@@ -283,7 +283,7 @@ Run:
     make android
     open -a Android\ Studio
 
-You can then open `android/java` in Android Studio via "Import Non-Android Studio Project".
+You can then open `android/java` in Android Studio via "import project (Eclipse ADT, Gradle, etc.)".
 
 ### Setting up Android emulator
 
