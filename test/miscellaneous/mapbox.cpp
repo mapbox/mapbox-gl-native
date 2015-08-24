@@ -14,6 +14,7 @@ TEST(Mapbox, SourceURL) {
 }
 
 TEST(Mapbox, GlyphsURL) {
+    EXPECT_EQ(mbgl::util::mapbox::normalizeGlyphsURL("mapbox://fonts/boxmap/Comic%20Sans/0-255.pbf", "key"), "https://api.mapbox.com/fonts/v1/boxmap/Comic%20Sans/0-255.pbf?access_token=key");
     EXPECT_EQ(mbgl::util::mapbox::normalizeGlyphsURL("mapbox://fonts/boxmap/{fontstack}/{range}.pbf", "key"), "https://api.mapbox.com/fonts/v1/boxmap/{fontstack}/{range}.pbf?access_token=key");
     EXPECT_EQ(mbgl::util::mapbox::normalizeGlyphsURL("http://path", "key"), "http://path");
 }
