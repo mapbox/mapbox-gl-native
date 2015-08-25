@@ -1521,7 +1521,7 @@ std::chrono::steady_clock::duration secondsAsDuration(float duration)
     options.zoom = zoomLevel;
     if (direction >= 0)
     {
-        options.angle = -direction * M_PI / 180;
+        options.angle = MGLRadiansFromDegrees(-direction);
     }
     if (animated)
     {
