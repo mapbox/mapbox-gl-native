@@ -111,7 +111,7 @@ if [ -z `which appledoc` ]; then
 fi
 DOCS_OUTPUT="${OUTPUT}/static/Docs"
 git fetch --tags
-DOCS_VERSION=$( git tag --sort -v:refname | grep -v '\-rc.' | sed -n '1p' | sed 's/^v//' )
+DOCS_VERSION=$( git tag | sed 's/^ios-//' | sort -r | grep -v '\-rc.' | grep -v '\-pre.' | sed -n '1p' | sed 's/^v//' )
 rm -rf /tmp/mbgl
 mkdir -p /tmp/mbgl/
 README=/tmp/mbgl/README.md
