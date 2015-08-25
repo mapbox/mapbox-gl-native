@@ -19,10 +19,12 @@ void RegisterModule(v8::Handle<v8::Object> exports) {
     auto ConstantProperty = static_cast<v8::PropertyAttribute>(v8::ReadOnly | v8::DontDelete);
     auto resource = NanNew<v8::Object>();
     resource->ForceSet(NanNew("Unknown"), NanNew(mbgl::Resource::Unknown), ConstantProperty);
+    resource->ForceSet(NanNew("Style"), NanNew(mbgl::Resource::Style), ConstantProperty);
+    resource->ForceSet(NanNew("Source"), NanNew(mbgl::Resource::Source), ConstantProperty);
     resource->ForceSet(NanNew("Tile"), NanNew(mbgl::Resource::Tile), ConstantProperty);
     resource->ForceSet(NanNew("Glyphs"), NanNew(mbgl::Resource::Glyphs), ConstantProperty);
-    resource->ForceSet(NanNew("Image"), NanNew(mbgl::Resource::Image), ConstantProperty);
-    resource->ForceSet(NanNew("JSON"), NanNew(mbgl::Resource::JSON), ConstantProperty);
+    resource->ForceSet(NanNew("SpriteImage"), NanNew(mbgl::Resource::SpriteImage), ConstantProperty);
+    resource->ForceSet(NanNew("SpriteJSON"), NanNew(mbgl::Resource::SpriteJSON), ConstantProperty);
     exports->ForceSet(NanNew("Resource"), resource, ConstantProperty);
 
     // Make the exported object inerhit from process.EventEmitter
