@@ -53,9 +53,12 @@ function renderTest(style, info, base, key) {
         map.load(style);
 
         map.render(info[key], function(err, data) {
-            t.error(err);
-
             map.release();
+
+            if (err) {
+                t.error(err);
+                return t.end();
+            }
 
             var expected = path.join(dir, 'expected.png');
             var actual = path.join(dir, 'actual.png');

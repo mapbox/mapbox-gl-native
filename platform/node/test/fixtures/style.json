@@ -1,26 +1,29 @@
 {
-    "version": 7,
-    "name": "Empty",
-    "sources": {
-        "mapbox": {
-          "type": "vector",
-          "url": "./fixtures/tiles.tilejson",
-          "maxzoom": 15
-        }
+  "version": 8,
+  "name": "Empty",
+  "sources": {
+    "mapbox": {
+      "type": "vector",
+      "url": "./fixtures/tiles.tilejson",
+      "maxzoom": 15
+    }
+  },
+  "layers": [
+    {
+      "id": "background",
+      "type": "background",
+      "paint": {
+        "background-color": "white"
+      }
     },
-    "layers": [{
-        "id": "background",
-        "type": "background",
-        "paint": {
-            "background-color": "white"
-        }
-    }, {
-        "id": "water",
-        "type": "fill",
-        "source": "mapbox",
-        "source-layer": "water",
-        "paint": {
-            "fill-color": "blue"
-        }
-    }]
+    {
+      "id": "water",
+      "type": "fill",
+      "source": "mapbox",
+      "source-layer": "water",
+      "paint": {
+        "fill-color": "blue"
+      }
+    }
+  ]
 }
