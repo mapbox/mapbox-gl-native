@@ -35,10 +35,9 @@
     "tape": "^4.0.0"
   },
   "scripts": {
-    "install": "node-pre-gyp install || make",
-    "test": "make test",
-    "rebuild": "make clean && make",
-    "build": "make"
+    "install": "node-pre-gyp install",
+    "test": "tape test/js/**/*.test.js | faucet",
+    "test-suite": "tape test/render.test.js | faucet"
   },
   "gypfile": true,
   "binary": {
