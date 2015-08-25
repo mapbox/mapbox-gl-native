@@ -217,7 +217,7 @@ vec2<double> TransformState::coordinateToPoint(const TileCoordinate& coord) cons
     matrix::vec4 p;
     matrix::vec4 c = {{ coord.column, coord.row, 0, 1 }};
     matrix::transformMat4(p, c, mat);
-    return { p[0] / p[3], p[1] / p[3] };
+    return { p[0] / p[3], height - p[1] / p[3] };
 }
 
 TileCoordinate TransformState::pointToCoordinate(const vec2<double> point) const {
@@ -232,14 +232,16 @@ TileCoordinate TransformState::pointToCoordinate(const vec2<double> point) const
 
     if (err) throw std::runtime_error("failed to invert coordinatePointMatrix");
 
+    double flippedY = height - point.y;
+
     // since we don't know the correct projected z value for the point,
     // unproject two points to get a line and then find the point on that
     // line with z=0
 
     matrix::vec4 coord0;
     matrix::vec4 coord1;
-    matrix::vec4 point0 = {{ point.x, point.y, 0, 1 }};
-    matrix::vec4 point1 = {{ point.x, point.y, 1, 1 }};
+    matrix::vec4 point0 = {{ point.x, flippedY, 0, 1 }};
+    matrix::vec4 point1 = {{ point.x, flippedY, 1, 1 }};
     matrix::transformMat4(coord0, point0, inverted);
     matrix::transformMat4(coord1, point1, inverted);
 
