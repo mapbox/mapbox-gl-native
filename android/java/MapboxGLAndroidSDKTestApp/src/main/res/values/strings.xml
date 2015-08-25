@@ -19,11 +19,11 @@
     <string name="styleDark">Dark</string>
     <string name="styleSatellite">Satellite</string>
 
-    <string name="styleURLMapboxStreets">asset://styles/mapbox-streets-v7.json</string>
-    <string name="styleURLEmerald">asset://styles/emerald-v7.json</string>
-    <string name="styleURLLight">asset://styles/light-v7.json</string>
-    <string name="styleURLDark">asset://styles/dark-v7.json</string>
-    <string name="styleURLSatellite">asset://styles/satellite-v7.json</string>
+    <string name="styleURLMapboxStreets">asset://styles/streets-v8.json</string>
+    <string name="styleURLEmerald">asset://styles/emerald-v8.json</string>
+    <string name="styleURLLight">asset://styles/light-v8.json</string>
+    <string name="styleURLDark">asset://styles/dark-v8.json</string>
+    <string name="styleURLSatellite">asset://styles/satellite-v8.json</string>
 
     <string-array name="outdoors_class_list">
         <item>Day</item>
