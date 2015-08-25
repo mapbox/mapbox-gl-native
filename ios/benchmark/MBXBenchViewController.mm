@@ -32,7 +32,7 @@
 {
     [super viewDidLoad];
 
-    NSURL* url = [[NSURL alloc] initWithString:@"asset://styles/mapbox-streets-v7.json"];
+    NSURL* url = [[NSURL alloc] initWithString:@"asset://styles/streets-v8.json"];
     self.mapView = [[MGLMapView alloc] initWithFrame:self.view.bounds styleURL:url];
     self.mapView.autoresizingMask = UIViewAutoresizingFlexibleWidth | UIViewAutoresizingFlexibleHeight;
     self.mapView.delegate = self;

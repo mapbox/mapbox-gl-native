@@ -19,6 +19,8 @@ bool StyleLayer::isVisible() const {
             return getProperties<FillProperties>().isVisible();
         case StyleLayerType::Line:
             return getProperties<LineProperties>().isVisible();
+        case StyleLayerType::Circle:
+            return getProperties<CircleProperties>().isVisible();
         case StyleLayerType::Symbol:
             return getProperties<SymbolProperties>().isVisible();
         case StyleLayerType::Raster:
@@ -209,11 +211,22 @@ void StyleLayer::applyStyleProperties<LineProperties>(const float z, const TimeP
 }
 
 template <>
+void StyleLayer::applyStyleProperties<CircleProperties>(const float z, const TimePoint& now, const ZoomHistory &zoomHistory) {
+    properties.set<CircleProperties>();
+    CircleProperties& circle = properties.get<CircleProperties>();
+    applyTransitionedStyleProperty(PropertyKey::CircleRadius, circle.radius, z, now, zoomHistory);
+    applyTransitionedStyleProperty(PropertyKey::CircleColor, circle.color, z, now, zoomHistory);
+    applyTransitionedStyleProperty(PropertyKey::CircleOpacity, circle.opacity, z, now, zoomHistory);
+    applyTransitionedStyleProperty(PropertyKey::CircleTranslate, circle.translate, z, now, zoomHistory);
+    applyStyleProperty(PropertyKey::CircleTranslateAnchor, circle.translateAnchor, z, now, zoomHistory);
+    applyTransitionedStyleProperty(PropertyKey::CircleBlur, circle.blur, z, now, zoomHistory);
+}
+
+template <>
 void StyleLayer::applyStyleProperties<SymbolProperties>(const float z, const TimePoint& now, const ZoomHistory &zoomHistory) {
     properties.set<SymbolProperties>();
     SymbolProperties &symbol = properties.get<SymbolProperties>();
     applyTransitionedStyleProperty(PropertyKey::IconOpacity, symbol.icon.opacity, z, now, zoomHistory);
-    applyTransitionedStyleProperty(PropertyKey::IconSize, symbol.icon.size, z, now, zoomHistory);
     applyTransitionedStyleProperty(PropertyKey::IconColor, symbol.icon.color, z, now, zoomHistory);
     applyTransitionedStyleProperty(PropertyKey::IconHaloColor, symbol.icon.halo_color, z, now, zoomHistory);
     applyTransitionedStyleProperty(PropertyKey::IconHaloWidth, symbol.icon.halo_width, z, now, zoomHistory);
@@ -222,13 +235,24 @@ void StyleLayer::applyStyleProperties<SymbolProperties>(const float z, const Tim
     applyStyleProperty(PropertyKey::IconTranslateAnchor, symbol.icon.translate_anchor, z, now, zoomHistory);
 
     applyTransitionedStyleProperty(PropertyKey::TextOpacity, symbol.text.opacity, z, now, zoomHistory);
-    applyTransitionedStyleProperty(PropertyKey::TextSize, symbol.text.size, z, now, zoomHistory);
     applyTransitionedStyleProperty(PropertyKey::TextColor, symbol.text.color, z, now, zoomHistory);
     applyTransitionedStyleProperty(PropertyKey::TextHaloColor, symbol.text.halo_color, z, now, zoomHistory);
     applyTransitionedStyleProperty(PropertyKey::TextHaloWidth, symbol.text.halo_width, z, now, zoomHistory);
     applyTransitionedStyleProperty(PropertyKey::TextHaloBlur, symbol.text.halo_blur, z, now, zoomHistory);
     applyTransitionedStyleProperty(PropertyKey::TextTranslate, symbol.text.translate, z, now, zoomHistory);
     applyStyleProperty(PropertyKey::TextTranslateAnchor, symbol.text.translate_anchor, z, now, zoomHistory);
+
+    // text-size and icon-size are layout properties but they also need to be evaluated as paint properties:
+    auto it = bucket->layout.properties.find(PropertyKey::IconSize);
+    if (it != bucket->layout.properties.end()) {
+        const PropertyEvaluator<float> evaluator(z, zoomHistory);
+        symbol.icon.size = mapbox::util::apply_visitor(evaluator, it->second);
+    }
+    it = bucket->layout.properties.find(PropertyKey::TextSize);
+    if (it != bucket->layout.properties.end()) {
+        const PropertyEvaluator<float> evaluator(z, zoomHistory);
+        symbol.text.size = mapbox::util::apply_visitor(evaluator, it->second);
+    }
 }
 
 template <>
@@ -259,6 +283,7 @@ void StyleLayer::updateProperties(float z, const TimePoint& now, ZoomHistory &zo
     switch (type) {
         case StyleLayerType::Fill: applyStyleProperties<FillProperties>(z, now, zoomHistory); break;
         case StyleLayerType::Line: applyStyleProperties<LineProperties>(z, now, zoomHistory); break;
+        case StyleLayerType::Circle: applyStyleProperties<CircleProperties>(z, now, zoomHistory); break;
         case StyleLayerType::Symbol: applyStyleProperties<SymbolProperties>(z, now, zoomHistory); break;
         case StyleLayerType::Raster: applyStyleProperties<RasterProperties>(z, now, zoomHistory); break;
         case StyleLayerType::Background: applyStyleProperties<BackgroundProperties>(z, now, zoomHistory); break;

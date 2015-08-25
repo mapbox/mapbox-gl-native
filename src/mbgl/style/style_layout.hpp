@@ -42,7 +42,7 @@ public:
     StyleLayoutSymbol& operator=(const StyleLayoutSymbol &) = delete;
 
     PlacementType placement = PlacementType::Point;
-    float min_distance = 250.0f;
+    float spacing = 250.0f;
     bool avoid_edges = false;
 
     struct {
@@ -50,6 +50,7 @@ public:
         bool ignore_placement = false;
         bool optional = false;
         RotationAlignmentType rotation_alignment = RotationAlignmentType::Viewport;
+        float size = 1.0f;
         float max_size = 1.0f;
         std::string image;
         float rotate = 0.0f;
@@ -62,6 +63,7 @@ public:
         RotationAlignmentType rotation_alignment = RotationAlignmentType::Viewport;
         std::string field;
         std::string font = "Open Sans Regular, Arial Unicode MS Regular";
+        float size = 16.0f;
         float max_size = 16.0f;
         float max_width = 15.0f /* em */;
         float line_height = 1.2f /* em */;

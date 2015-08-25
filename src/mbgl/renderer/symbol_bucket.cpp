@@ -274,10 +274,11 @@ void SymbolBucket::addFeature(const std::vector<std::vector<Coordinate>> &lines,
     const float minScale = 0.5f;
     const float glyphSize = 24.0f;
 
-    const float fontScale = layout.text.max_size / glyphSize;
+    const float fontScale = layout.text.size / glyphSize;
     const float textBoxScale = collision.tilePixelRatio * fontScale;
-    const float iconBoxScale = collision.tilePixelRatio * layout.icon.max_size;
-    const float symbolSpacing = collision.tilePixelRatio * layout.min_distance;
+    const float textMaxBoxScale = collision.tilePixelRatio * layout.text.max_size / glyphSize;
+    const float iconBoxScale = collision.tilePixelRatio * layout.icon.size;
+    const float symbolSpacing = collision.tilePixelRatio * layout.spacing;
     const bool avoidEdges = layout.avoid_edges && layout.placement != PlacementType::Line;
     const float textPadding = layout.text.padding * collision.tilePixelRatio;
     const float iconPadding = layout.icon.padding * collision.tilePixelRatio;
@@ -302,7 +303,7 @@ void SymbolBucket::addFeature(const std::vector<std::vector<Coordinate>> &lines,
 
         // Calculate the anchor points around which you want to place labels
         Anchors anchors = isLine ?
-            getAnchors(line, symbolSpacing, textMaxAngle, shapedText.left, shapedText.right, shapedIcon.left, shapedIcon.right, glyphSize, textBoxScale, overscaling) :
+            getAnchors(line, symbolSpacing, textMaxAngle, shapedText.left, shapedText.right, shapedIcon.left, shapedIcon.right, glyphSize, textMaxBoxScale, overscaling) :
             Anchors({ Anchor(float(line[0].x), float(line[0].y), 0, minScale) });
 
         // For each potential label, create the placement features used to check for collisions, and the quads use for rendering.

@@ -102,7 +102,7 @@ cp -pv LICENSE.md "${OUTPUT}/static"
 mkdir -p "${OUTPUT}/static/${NAME}.bundle"
 cp -pv platform/ios/resources/* "${OUTPUT}/static/${NAME}.bundle"
 mkdir -p "${OUTPUT}/static/${NAME}.bundle/styles"
-cp -pv styles/styles/{dark,emerald,light,mapbox-streets,satellite}-v7.json "${OUTPUT}/static/${NAME}.bundle/styles"
+cp -pv styles/styles/{dark,emerald,light,streets,satellite}-v8.json "${OUTPUT}/static/${NAME}.bundle/styles"
 
 step "Creating API Docs..."
 if [ -z `which appledoc` ]; then
@@ -111,7 +111,7 @@ if [ -z `which appledoc` ]; then
 fi
 DOCS_OUTPUT="${OUTPUT}/static/Docs"
 git fetch --tags
-DOCS_VERSION=$( git tag --sort -v:refname | grep -v '\-rc.' | sed -n '1p' | sed 's/^v//' )
+DOCS_VERSION=$( git tag | sed 's/^ios-//' | sort -r | grep -v '\-rc.' | grep -v '\-pre.' | sed -n '1p' | sed 's/^v//' )
 rm -rf /tmp/mbgl
 mkdir -p /tmp/mbgl/
 README=/tmp/mbgl/README.md

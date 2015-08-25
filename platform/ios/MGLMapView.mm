@@ -39,10 +39,11 @@
 
 class MBGLView;
 
-NSString *const MGLDefaultStyleName = @"mapbox-streets";
-NSString *const MGLStyleVersion = @"7";
+NSString *const MGLDefaultStyleName = @"streets";
 NSString *const MGLDefaultStyleMarkerSymbolName = @"default_marker";
-NSString *const MGLMapboxSetupDocumentationURLDisplayString = @"mapbox.com/guides/first-steps-gl-ios";
+NSString *const MGLMapboxSetupDocumentationURLDisplayString = @"mapbox.com/guides/first-steps-ios-sdk";
+
+NSUInteger const MGLStyleVersion = 8;
 
 const NSTimeInterval MGLAnimationDuration = 0.3;
 const CGSize MGLAnnotationUpdateViewportOutset = {150, 150};
@@ -190,9 +191,9 @@ std::chrono::steady_clock::duration secondsAsDuration(float duration)
 
     if ( ! styleURL)
     {
-        styleURL = MGLURLForBundledStyleNamed([NSString stringWithFormat:@"%@-v%@",
+        styleURL = MGLURLForBundledStyleNamed([NSString stringWithFormat:@"%@-v%lu",
                                                MGLDefaultStyleName.lowercaseString,
-                                               MGLStyleVersion]);
+                                               (unsigned long)MGLStyleVersion]);
     }
 
     if ( ! [styleURL scheme])
@@ -2942,7 +2943,12 @@ class MBGLView : public mbgl::View
                                   waitUntilDone:NO];
     }
 
-    void swap() override
+    void beforeRender() override
+    {
+        // no-op
+    }
+
+    void afterRender() override
     {
         // no-op
     }

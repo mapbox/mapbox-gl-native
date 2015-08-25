@@ -38,6 +38,7 @@ struct FrameData;
 class DebugBucket;
 class FillBucket;
 class LineBucket;
+class CircleBucket;
 class SymbolBucket;
 class RasterBucket;
 
@@ -50,6 +51,7 @@ class LineShader;
 class LinejoinShader;
 class LineSDFShader;
 class LinepatternShader;
+class CircleShader;
 class PatternShader;
 class IconShader;
 class RasterShader;
@@ -100,6 +102,7 @@ public:
     void renderDebugText(DebugBucket& bucket, const mat4 &matrix);
     void renderFill(FillBucket& bucket, const StyleLayer &layer_desc, const TileID& id, const mat4 &matrix);
     void renderLine(LineBucket& bucket, const StyleLayer &layer_desc, const TileID& id, const mat4 &matrix);
+    void renderCircle(CircleBucket& bucket, const StyleLayer &layer_desc, const TileID& id, const mat4 &matrix);
     void renderSymbol(SymbolBucket& bucket, const StyleLayer &layer_desc, const TileID& id, const mat4 &matrix);
     void renderRaster(RasterBucket& bucket, const StyleLayer &layer_desc, const TileID& id, const mat4 &matrix);
     void renderBackground(const StyleLayer &layer_desc);
@@ -222,6 +225,7 @@ public:
     std::unique_ptr<SDFIconShader> sdfIconShader;
     std::unique_ptr<DotShader> dotShader;
     std::unique_ptr<CollisionBoxShader> collisionBoxShader;
+    std::unique_ptr<CircleShader> circleShader;
 
     StaticVertexBuffer backgroundBuffer = {
         { -1, -1 }, { 1, -1 },

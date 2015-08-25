@@ -217,7 +217,7 @@ void SQLiteCache::Impl::put(const Resource& resource, std::shared_ptr<const Resp
         putStmt->bind(6 /* expires */, response->expires);
 
         std::string data;
-        if (resource.kind != Resource::Image) {
+        if (resource.kind != Resource::SpriteImage) {
             // Do not compress images, since they are typically compressed already.
             data = util::compress(response->data);
         }

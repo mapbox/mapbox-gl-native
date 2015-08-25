@@ -27,8 +27,15 @@ enum class PropertyKey {
     LineMiterLimit,
     LineRoundLimit,
 
+    CircleRadius,
+    CircleColor,
+    CircleOpacity,
+    CircleTranslate,
+    CircleTranslateAnchor,
+    CircleBlur,
+
     SymbolPlacement,
-    SymbolMinDistance,
+    SymbolSpacing,
     SymbolAvoidEdges,
 
     IconOpacity,
@@ -44,7 +51,6 @@ enum class PropertyKey {
     IconIgnorePlacement,
     IconOptional,
     IconRotationAlignment,
-    IconMaxSize,
     IconImage,
     IconOffset,
     IconPadding,
@@ -52,7 +58,6 @@ enum class PropertyKey {
     IconKeepUpright,
 
     TextOpacity,
-    TextSize,
     TextColor,
     TextHaloColor,
     TextHaloWidth,
@@ -63,7 +68,7 @@ enum class PropertyKey {
     TextRotationAlignment,
     TextField,
     TextFont,
-    TextMaxSize,
+    TextSize,
     TextMaxWidth,
     TextLineHeight,
     TextLetterSpacing,
