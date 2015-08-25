@@ -134,11 +134,11 @@ public:
 
     bool needsAnimation() const;
 
-    void updateRenderOrder(const Style& style);
-
 private:
     void setupShaders();
     mat4 translatedMatrix(const mat4& matrix, const std::array<float, 2> &translation, const TileID &id, TranslateAnchorType anchor);
+
+    std::vector<RenderItem> determineRenderOrder(const Style& style);
 
     template <class Iterator>
     void renderPass(RenderPass,
@@ -199,8 +199,6 @@ private:
     std::array<uint16_t, 2> gl_viewport = {{ 0, 0 }};
     RenderPass pass = RenderPass::Opaque;
     Color background = {{ 0, 0, 0, 0 }};
-
-    std::vector<RenderItem> order;
 
     int numSublayers = 3;
     size_t currentLayer;
