@@ -70,7 +70,6 @@ config/%.gypi: $(SUBMODULES) configure $(CONFIGURE_FILES)
 #### Build files ###############################################################
 
 GYP_FLAGS += -Dhost=$(HOST)
-GYP_FLAGS += -Iconfig/$(HOST_SLUG).gypi
 GYP_FLAGS += -Dplatform_lib=$(PLATFORM)
 GYP_FLAGS += -Dhttp_lib=$(HTTP)
 GYP_FLAGS += -Dasset_lib=$(ASSET)
@@ -85,14 +84,27 @@ GYP_FLAGS += --generator-output=./build/$(HOST_SLUG)
 .PHONY: Makefile/__project__
 Makefile/__project__: print-env $(SUBMODULES) config/$(HOST_SLUG).gypi
 	@printf "$(TEXT_BOLD)$(COLOR_GREEN)* Recreating project...$(FORMAT_END)\n"
-	$(QUIET)$(ENV) deps/run_gyp gyp/$(HOST).gyp $(GYP_FLAGS) -f make$(GYP_FLAVOR_SUFFIX)
+	$(QUIET)$(ENV) deps/run_gyp gyp/$(HOST).gyp $(GYP_FLAGS) \
+		-Iconfig/$(HOST_SLUG).gypi -f make$(GYP_FLAVOR_SUFFIX)
 
 .PHONY: Xcode/__project__
 Xcode/__project__: print-env $(SUBMODULES) config/$(HOST_SLUG).gypi
 	@printf "$(TEXT_BOLD)$(COLOR_GREEN)* Recreating project...$(FORMAT_END)\n"
-	$(QUIET)$(ENV) deps/run_gyp gyp/$(HOST).gyp $(GYP_FLAGS) -f xcode$(GYP_FLAVOR_SUFFIX)
+	$(QUIET)$(ENV) deps/run_gyp gyp/$(HOST).gyp $(GYP_FLAGS) \
+		-Iconfig/$(HOST_SLUG).gypi -f xcode$(GYP_FLAVOR_SUFFIX)
 
 #### Build individual targets ##################################################
+
+NODE_PRE_GYP = $(shell cd platform/node && npm bin)/node-pre-gyp
+node/configure:
+	cd platform/node && $(NODE_PRE_GYP) configure --clang -- \
+	$(GYP_FLAGS) -I../../config/$(HOST_SLUG).gypi \
+	-Dlibuv_ldflags= -Dlibuv_static_libs=
+
+Makefile/node: Makefile/__project__ node/configure
+	@printf "$(TEXT_BOLD)$(COLOR_GREEN)* Building target node...$(FORMAT_END)\n"
+	cd platform/node && $(NODE_PRE_GYP) build --clang -- \
+	-j$(JOBS)
 
 Makefile/%: Makefile/__project__
 	@printf "$(TEXT_BOLD)$(COLOR_GREEN)* Building target $*...$(FORMAT_END)\n"

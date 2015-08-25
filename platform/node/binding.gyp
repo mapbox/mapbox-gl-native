@@ -1,10 +1,13 @@
 {
+  'includes': [
+    '../../gyp/common.gypi',
+  ],
   'targets': [
     { 'target_name': '<(module_name)',
       'dependencies': [
-        './<(mbgl)/mbgl.gyp:core',
-        './<(mbgl)/mbgl.gyp:platform-<(platform_lib)',
-        './<(mbgl)/mbgl.gyp:headless-<(headless_lib)',
+        '../../mbgl.gyp:core',
+        '../../mbgl.gyp:platform-<(platform_lib)',
+        '../../mbgl.gyp:headless-<(headless_lib)',
       ],
 
       'include_dirs': [ "<!(node -e \"require('nan')\")" ],

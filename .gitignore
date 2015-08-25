@@ -28,6 +28,8 @@
 /src/shader/shaders_gl.cpp
 /src/shader/shaders_gles2.cpp
 /bin/style.bin.js
+/platform/*.mk
+/platform/*.Makefile
 *~
 
 /ios/benchmark/assets/tiles/mapbox.mapbox-streets-v6/
