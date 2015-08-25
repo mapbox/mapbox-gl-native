@@ -6,7 +6,7 @@ set -o pipefail
 mapbox_time "checkout_mason" \
 git submodule update --init .mason
 
-PATH="`pwd`/.mason:${PATH}" MASON_DIR="`pwd`/.mason" \
+export PATH="`pwd`/.mason:${PATH}" MASON_DIR="`pwd`/.mason"
 
 if [ ${TRAVIS_OS_NAME} == "linux" ]; then
     mapbox_time "install_mesa" \
