@@ -2310,6 +2310,7 @@ CLLocationCoordinate2D MGLLocationCoordinate2DFromLatLng(mbgl::LatLng latLng)
             break;
         }
         case MGLUserTrackingModeFollow:
+        case MGLUserTrackingModeFollowWithCourse:
         {
             self.showsUserLocation = YES;
 
@@ -2323,7 +2324,6 @@ CLLocationCoordinate2D MGLLocationCoordinate2DFromLatLng(mbgl::LatLng latLng)
             break;
         }
         case MGLUserTrackingModeFollowWithHeading:
-        case MGLUserTrackingModeFollowWithCourse:
         {
             self.showsUserLocation = YES;
 
