@@ -1,5 +1,13 @@
 # Changelog
 
+## iOS 2.0.0
+
+Repackaging 2.0.0-pre.1 as it contained no issues. 
+
+## iOS 2.0.0-pre.1
+
+Repackaging 0.5.1 as the Mapbox iOS SDK 2.0.0 series. 
+
 ## 0.5.1
 
 ### iOS
