@@ -2214,7 +2214,15 @@ CLLocationCoordinate2D MGLLocationCoordinate2DFromLatLng(mbgl::LatLng latLng)
                 [NSException raise:@"Missing Location Services usage description" format:
                  @"In iOS 8 and above, this app must have a value for NSLocationWhenInUseUsageDescription or NSLocationAlwaysUsageDescription in its Info.plist."];
             }
-            [self.locationManager requestWhenInUseAuthorization];
+            // request location permissions, if both keys exist ask for less permissive
+            if ([[NSBundle mainBundle] objectForInfoDictionaryKey:@"NSLocationWhenInUseUsageDescription"])
+            {
+                [self.locationManager requestWhenInUseAuthorization];
+            }
+            else if ([[NSBundle mainBundle] objectForInfoDictionaryKey:@"NSLocationAlwaysUsageDescription"])
+            {
+                [self.locationManager requestAlwaysAuthorization];
+            }
         }
 #endif
 
@@ -2302,6 +2310,7 @@ CLLocationCoordinate2D MGLLocationCoordinate2DFromLatLng(mbgl::LatLng latLng)
             break;
         }
         case MGLUserTrackingModeFollow:
+        case MGLUserTrackingModeFollowWithCourse:
         {
             self.showsUserLocation = YES;
 
@@ -2315,7 +2324,6 @@ CLLocationCoordinate2D MGLLocationCoordinate2DFromLatLng(mbgl::LatLng latLng)
             break;
         }
         case MGLUserTrackingModeFollowWithHeading:
-        case MGLUserTrackingModeFollowWithCourse:
         {
             self.showsUserLocation = YES;
 
