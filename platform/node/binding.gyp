@@ -58,7 +58,7 @@
             '-frtti',
             '-fexceptions',
           ],
-          'libraries': [ '<@(glfw3_ldflags)' ],
+          'libraries': [ '<@(glfw_ldflags)' ],
         }],
         ['OS=="linux"', {
           'cflags_cc': [
