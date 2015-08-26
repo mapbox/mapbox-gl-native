@@ -15,7 +15,7 @@ mapbox_time "checkout_styles" \
 git submodule update --init styles
 
 mapbox_time "compile_program" \
-make node -j${JOBS} BUILDTYPE=${BUILDTYPE} 
+cd platform/node && npm install --build-from-source
 
 ################################################################################
 # Test

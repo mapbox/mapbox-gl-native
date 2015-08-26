@@ -35,7 +35,7 @@
     "tape": "^4.0.0"
   },
   "scripts": {
-    "install": "node-pre-gyp install",
+    "install": "node-pre-gyp install || make node -C ../../",
     "test": "tape test/js/**/*.test.js | faucet",
     "test-suite": "tape test/render.test.js | faucet"
   },
