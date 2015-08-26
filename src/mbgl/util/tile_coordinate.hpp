@@ -6,15 +6,15 @@
 namespace mbgl {
 
 struct TileCoordinate {
-    float column;
-    float row;
-    float zoom;
+    double column;
+    double row;
+    double zoom;
 
-    TileCoordinate(float column_, float row_, float zoom_) :
+    TileCoordinate(double column_, double row_, double zoom_) :
         column(column_), row(row_), zoom(zoom_) {}
 
-    TileCoordinate zoomTo(float targetZoom) {
-        float scale = std::pow(2, targetZoom - zoom);
+    TileCoordinate zoomTo(double targetZoom) {
+        double scale = std::pow(2, targetZoom - zoom);
         return { column * scale, row * scale, targetZoom };
     }
 
