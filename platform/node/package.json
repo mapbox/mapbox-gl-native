@@ -19,20 +19,19 @@
   ],
   "dependencies": {
     "nan": "^1.9.0",
-    "node-pre-gyp": "^0.6.7"
+    "node-pre-gyp": "^0.6.9"
   },
   "bundledDependencies": [
     "node-pre-gyp"
   ],
   "devDependencies": {
-    "aws-sdk": "^2.1.27",
+    "aws-sdk": "^2.1.47",
     "faucet": "0.0.1",
-    "mapbox-gl-test-suite": "git://github.com/mapbox/mapbox-gl-test-suite#7251829de9d2804fe02cd8f7acc0e30ea278429d",
     "mkdirp": "^0.5.1",
     "pngjs": "^0.4.0",
-    "request": "^2.55.0",
-    "st": "^0.5.3",
-    "tape": "^4.0.0"
+    "request": "^2.61.0",
+    "st": "^0.5.5",
+    "tape": "^4.2.0"
   },
   "scripts": {
     "install": "node-pre-gyp install || make node -C ../../",

@@ -9,10 +9,10 @@ var path = require('path');
 var mkdirp = require('mkdirp');
 var PNG = require('pngjs').PNG;
 var compare = require('./compare.js');
-var suitePath = path.dirname(require.resolve('mapbox-gl-test-suite/package.json'));
+var suitePath = path.join(__dirname, '../../../test/suite');
 
 function template(name) {
-    return fs.readFileSync(require.resolve('mapbox-gl-test-suite/templates/' + name + '.html.tmpl')).toString();
+    return fs.readFileSync(path.join(suitePath, 'templates', name + '.html.tmpl')).toString();
 }
 
 var results = '';
