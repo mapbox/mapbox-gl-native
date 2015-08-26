@@ -48,6 +48,8 @@ NSUInteger const MGLStyleVersion = 8;
 const NSTimeInterval MGLAnimationDuration = 0.3;
 const CGSize MGLAnnotationUpdateViewportOutset = {150, 150};
 const CGFloat MGLMinimumZoom = 3;
+const CGFloat MGLMinimumPitch = 0;
+const CGFloat MGLMaximumPitch = 60;
 const CLLocationDegrees MGLAngularFieldOfView = M_PI / 6;
 
 NSString *const MGLAnnotationIDKey = @"MGLAnnotationIDKey";
@@ -1354,11 +1356,9 @@ std::chrono::steady_clock::duration secondsAsDuration(float duration)
     {
         CGFloat gestureDistance = CGPoint([twoFingerDrag translationInView:twoFingerDrag.view]).y;
         double currentPitch = _mbglMap->getPitch();
-        double minPitch = 0;
-        double maxPitch = 60.0;
         double slowdown = 20.0;
 
-        double pitchNew = fmax(fmin(currentPitch - (gestureDistance / slowdown), maxPitch), minPitch);
+        double pitchNew = mbgl::util::clamp(currentPitch - (gestureDistance / slowdown), MGLMinimumPitch, MGLMaximumPitch);
         
         _mbglMap->setPitch(pitchNew);
     }
@@ -1754,16 +1754,22 @@ mbgl::LatLngBounds MGLLatLngBoundsFromCoordinateBounds(MGLCoordinateBounds coord
     return [NSSet setWithObject:@"camera"];
 }
 
-- (double)pitch
+- (CGFloat)pitch
 {
     return _mbglMap->getPitch();
 }
 
-- (void)setPitch:(double)pitch
+- (void)setPitch:(CGFloat)pitch
+{
+    [self setPitch:pitch animated:NO];
+}
+
+- (void)setPitch:(CGFloat)pitch animated:(BOOL)animated
 {
     // constrain pitch to between 0º and 60º
     //
-    _mbglMap->setPitch(fmax(fmin(pitch, 60), 0));
+    CGFloat duration = animated ? MGLAnimationDuration : 0;
+    _mbglMap->setPitch(mbgl::util::clamp(pitch, MGLMinimumPitch, MGLMaximumPitch), secondsAsDuration(duration));
     
     //[self notifyMapChange:(mbgl::MapChangeRegionDidChange)];
 }

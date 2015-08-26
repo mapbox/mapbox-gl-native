@@ -9,6 +9,7 @@
 
 #include <mbgl/util/projection.hpp>
 #include <mbgl/util/thread.hpp>
+#include <mbgl/util/math.hpp>
 
 namespace mbgl {
 
@@ -299,7 +300,7 @@ void Map::resetNorth() {
 void Map::setPitch(double pitch, const Duration& duration) {
     CameraOptions options;
     options.duration = duration;
-    transform->setPitch(std::min(pitch, 60.0) * M_PI / 180, options);
+    transform->setPitch(util::clamp(pitch, 0., 90.) * M_PI / 180, options);
     update(Update::Repaint);
 }
 
