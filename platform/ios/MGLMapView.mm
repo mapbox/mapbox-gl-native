@@ -1536,7 +1536,7 @@ std::chrono::steady_clock::duration secondsAsDuration(float duration)
 
 + (NS_SET_OF(NSString *) *)keyPathsForValuesAffectingCenterCoordinate
 {
-    return [NSSet setWithObjects:@"latitude", @"longitude", nil];
+    return [NSSet setWithObjects:@"latitude", @"longitude", @"camera", nil];
 }
 
 - (void)setCenterCoordinate:(CLLocationCoordinate2D)coordinate animated:(BOOL)animated preservingTracking:(BOOL)tracking
@@ -1600,6 +1600,11 @@ std::chrono::steady_clock::duration secondsAsDuration(float duration)
     [self unrotateIfNeededAnimated:animated];
 
     [self notifyMapChange:(animated ? mbgl::MapChangeRegionDidChangeAnimated : mbgl::MapChangeRegionDidChange)];
+}
+
++ (NS_SET_OF(NSString *) *)keyPathsForValuesAffectingZoomLevel
+{
+    return [NSSet setWithObject:@"camera"];
 }
 
 - (double)zoomLevel
@@ -1716,6 +1721,11 @@ mbgl::LatLngBounds MGLLatLngBoundsFromCoordinateBounds(MGLCoordinateBounds coord
     [self notifyMapChange:(animated ? mbgl::MapChangeRegionDidChangeAnimated : mbgl::MapChangeRegionDidChange)];
 }
 
++ (NS_SET_OF(NSString *) *)keyPathsForValuesAffectingDirection
+{
+    return [NSSet setWithObject:@"camera"];
+}
+
 - (CLLocationDirection)direction
 {
     return mbgl::util::wrap(_mbglMap->getBearing(), 0., 360.);
@@ -1737,6 +1747,11 @@ mbgl::LatLngBounds MGLLatLngBoundsFromCoordinateBounds(MGLCoordinateBounds coord
 - (void)setDirection:(CLLocationDirection)direction
 {
     [self setDirection:direction animated:NO];
+}
+
++ (NS_SET_OF(NSString *) *)keyPathsForValuesAffectingPitch
+{
+    return [NSSet setWithObject:@"camera"];
 }
 
 - (double)pitch
@@ -1773,6 +1788,11 @@ mbgl::LatLngBounds MGLLatLngBoundsFromCoordinateBounds(MGLCoordinateBounds coord
                                             fromDistance:altitude
                                                    pitch:pitch
                                                  heading:self.direction];
+}
+
++ (NS_SET_OF(NSString *) *)keyPathsForValuesAffectingCamera
+{
+    return [NSSet setWithObjects:@"longitude", @"latitude", @"centerCoordinate", @"zoomLevel", @"direction", @"pitch", nil];
 }
 
 - (void)setCamera:(MGLMapCamera *)camera
@@ -3157,7 +3177,7 @@ class MBGLView : public mbgl::View
 
 + (NS_SET_OF(NSString *) *)keyPathsForValuesAffectingLatitude
 {
-    return [NSSet setWithObject:@"centerCoordinate"];
+    return [NSSet setWithObjects:@"centerCoordinate", @"camera", nil];
 }
 
 - (double)latitude
@@ -3183,7 +3203,7 @@ class MBGLView : public mbgl::View
 
 + (NS_SET_OF(NSString *) *)keyPathsForValuesAffectingLongitude
 {
-    return [NSSet setWithObject:@"centerCoordinate"];
+    return [NSSet setWithObjects:@"centerCoordinate", @"camera", nil];
 }
 
 - (double)longitude
