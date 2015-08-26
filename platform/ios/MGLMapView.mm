@@ -1776,7 +1776,7 @@ mbgl::LatLngBounds MGLLatLngBoundsFromCoordinateBounds(MGLCoordinateBounds coord
 
 - (void)resetPitch
 {
-    [self setPitch:0];
+    [self setPitch:0 animated:YES];
 }
 
 - (MGLMapCamera *)camera
