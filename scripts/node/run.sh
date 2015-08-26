@@ -15,7 +15,7 @@ mapbox_time "checkout_styles" \
 git submodule update --init styles
 
 mapbox_time "compile_program" \
-cd platform/node && npm install --build-from-source
+pushd platform/node && npm install --build-from-source && popd
 
 ################################################################################
 # Test
@@ -25,7 +25,7 @@ mapbox_time "checkout_test_suite" \
 git submodule update --init test/suite
 
 mapbox_time "run_tests" \
-cd platform/node && npm test
+pushd platform/node && npm test && popd
 
 mapbox_time "run_render_tests" \
-cd platform/node && npm run test-suite
+pushd platform/node && npm run test-suite && popd
