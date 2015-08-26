@@ -1355,10 +1355,10 @@ std::chrono::steady_clock::duration secondsAsDuration(float duration)
     else if (twoFingerDrag.state == UIGestureRecognizerStateBegan || twoFingerDrag.state == UIGestureRecognizerStateChanged)
     {
         CGFloat gestureDistance = CGPoint([twoFingerDrag translationInView:twoFingerDrag.view]).y;
-        double currentPitch = _mbglMap->getPitch();
-        double slowdown = 20.0;
+        CGFloat currentPitch = _mbglMap->getPitch();
+        CGFloat slowdown = 20.0;
 
-        double pitchNew = mbgl::util::clamp(currentPitch - (gestureDistance / slowdown), MGLMinimumPitch, MGLMaximumPitch);
+        CGFloat pitchNew = mbgl::util::clamp(currentPitch - (gestureDistance / slowdown), MGLMinimumPitch, MGLMaximumPitch);
         
         _mbglMap->setPitch(pitchNew);
     }
