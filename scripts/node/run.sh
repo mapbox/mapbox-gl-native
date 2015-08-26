@@ -25,7 +25,7 @@ mapbox_time "checkout_test_suite" \
 git submodule update --init test/suite
 
 mapbox_time "run_tests" \
-npm test
+cd platform/node && npm test
 
 mapbox_time "run_render_tests" \
-npm run test-suite
+cd platform/node && npm run test-suite
