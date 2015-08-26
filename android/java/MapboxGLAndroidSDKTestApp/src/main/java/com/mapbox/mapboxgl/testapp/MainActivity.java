@@ -28,6 +28,8 @@ import com.mapbox.mapboxgl.annotations.PolygonOptions;
 import com.mapbox.mapboxgl.annotations.PolylineOptions;
 import com.mapbox.mapboxgl.geometry.LatLng;
 import com.mapbox.mapboxgl.views.MapView;
+import com.mapbox.mapboxgl.views.PopupView;
+
 import io.fabric.sdk.android.Fabric;
 import java.io.BufferedReader;
 import java.io.IOException;
@@ -162,6 +164,32 @@ public class MainActivity extends AppCompatActivity {
         mNavigationView.getMenu().findItem(R.id.action_markers).setChecked(mIsAnnotationsOn);
         changeMapStyle(mSelectedStyle);
         toggleGps(mMapView.isMyLocationEnabled());
+
+        showPopup();
+    }
+
+    private void showPopup(){
+
+        PopupView popup = (PopupView) getLayoutInflater().inflate(R.layout.popup, null);
+
+        TextView titleTextView = (TextView) popup.findViewById(R.id.title);
+        TextView subtitleTextView = (TextView) popup.findViewById(R.id.subtitle);
+        ImageButton imageButton = (ImageButton) popup.findViewById(R.id.imageButton);
+
+        titleTextView.setText("Title");
+        subtitleTextView.setText("Subtitle");
+        imageButton.setImageDrawable(getResources().getDrawable(R.drawable.location_marker));
+
+        popup.pos(400, 400);
+
+        imageButton.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View v) {
+                // TODO do something
+            }
+        });
+
+        mMapFrameLayout.addView(popup);
     }
 
     /**
