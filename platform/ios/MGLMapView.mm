@@ -50,7 +50,7 @@ const CGSize MGLAnnotationUpdateViewportOutset = {150, 150};
 const CGFloat MGLMinimumZoom = 3;
 const CGFloat MGLMinimumPitch = 0;
 const CGFloat MGLMaximumPitch = 60;
-const CLLocationDegrees MGLAngularFieldOfView = M_PI / 6;
+const CLLocationDegrees MGLAngularFieldOfView = M_PI / 6.;
 
 NSString *const MGLAnnotationIDKey = @"MGLAnnotationIDKey";
 NSString *const MGLAnnotationSymbolKey = @"MGLAnnotationSymbolKey";
@@ -1781,12 +1781,26 @@ mbgl::LatLngBounds MGLLatLngBoundsFromCoordinateBounds(MGLCoordinateBounds coord
 
 - (MGLMapCamera *)camera
 {
-    mbgl::ProjectedMeters neMeters = _mbglMap->projectedMetersForLatLng(self.viewportBounds.ne);
-    mbgl::ProjectedMeters centerMeters = _mbglMap->projectedMetersForLatLng(_mbglMap->getLatLng());
-    CLLocationDistance longitudinalDistance = neMeters.easting - centerMeters.easting;
-    CLLocationDistance latitudinalDistance = neMeters.northing - centerMeters.northing;
-    CLLocationDistance distance = (latitudinalDistance + longitudinalDistance) / 2;
-    CLLocationDistance altitude = distance / std::tan(MGLAngularFieldOfView / 2);
+    CGSize size = self.bounds.size;
+    mbgl::ProjectedMeters topLeftMeters;
+    CGPoint opposite;
+    if (size.width > size.height) // landscape
+    {
+        CLLocationCoordinate2D centerLeft = [self convertPoint:CGPointMake(0, size.height / 2) toCoordinateFromView:self];
+        topLeftMeters = _mbglMap->projectedMetersForLatLng(MGLLatLngFromLocationCoordinate2D(centerLeft));
+        opposite = CGPointMake(size.width, 0);
+    }
+    else // portrait
+    {
+        CLLocationCoordinate2D topCenter = [self convertPoint:CGPointMake(size.width / 2, 0) toCoordinateFromView:self];
+        topLeftMeters = _mbglMap->projectedMetersForLatLng(MGLLatLngFromLocationCoordinate2D(topCenter));
+        opposite = CGPointMake(0, size.height);
+    }
+    CLLocationCoordinate2D oppositeCoordinate = [self convertPoint:opposite toCoordinateFromView:self];
+    mbgl::ProjectedMeters oppositeMeters = _mbglMap->projectedMetersForLatLng(MGLLatLngFromLocationCoordinate2D(oppositeCoordinate));
+    CLLocationDistance distance = std::hypot(oppositeMeters.easting - topLeftMeters.easting,
+                                             oppositeMeters.northing - topLeftMeters.northing);
+    CLLocationDistance altitude = distance / std::tan(MGLAngularFieldOfView / 2.) * 0.5;
     
     CGFloat pitch = MGLDegreesFromRadians(_mbglMap->getPitch());
     
@@ -1808,14 +1822,33 @@ mbgl::LatLngBounds MGLLatLngBoundsFromCoordinateBounds(MGLCoordinateBounds coord
 
 - (void)setCamera:(MGLMapCamera *)camera animated:(BOOL)animated
 {
-    mbgl::LatLng center = MGLLatLngFromLocationCoordinate2D(camera.centerCoordinate);
-    mbgl::ProjectedMeters centerMeters = _mbglMap->projectedMetersForLatLng(center);
-    CLLocationDistance distance = camera.altitude * std::tan(MGLAngularFieldOfView / 2);
-    mbgl::LatLngBounds bounds = {
-        { centerMeters.northing - distance, centerMeters.easting - distance },
-        { centerMeters.northing + distance, centerMeters.easting + distance },
-    };
-    mbgl::CameraOptions options = _mbglMap->cameraForLatLngBounds(bounds, {});
+    CGSize size = self.bounds.size;
+    mbgl::ProjectedMeters centerMeters = _mbglMap->projectedMetersForLatLng(MGLLatLngFromLocationCoordinate2D(camera.centerCoordinate));
+    CLLocationDistance distance = camera.altitude * std::tan(MGLAngularFieldOfView / 2.);
+    mbgl::LatLng sw, ne;
+    if (size.width > size.height) // landscape
+    {
+        sw = _mbglMap->latLngForProjectedMeters({
+            centerMeters.northing,
+            centerMeters.easting - distance,
+        });
+        ne = _mbglMap->latLngForProjectedMeters({
+            centerMeters.northing,
+            centerMeters.easting + distance,
+        });
+    }
+    else // portrait
+    {
+        sw = _mbglMap->latLngForProjectedMeters({
+            centerMeters.northing - distance,
+            centerMeters.easting,
+        });
+        ne = _mbglMap->latLngForProjectedMeters({
+            centerMeters.northing + distance,
+            centerMeters.easting,
+        });
+    }
+    mbgl::CameraOptions options = _mbglMap->cameraForLatLngBounds({ sw, ne }, {});
     
     if (camera.heading >= 0)
     {
