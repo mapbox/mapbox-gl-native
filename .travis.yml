@@ -77,12 +77,15 @@ matrix:
           sources: [ 'ubuntu-toolchain-r-test', 'llvm-toolchain-precise-3.5' ]
           packages: [ 'gdb', 'clang-3.5', 'libstdc++-4.9-dev', 'libstdc++6', 'libllvm3.4', 'xutils-dev', 'libxxf86vm-dev', 'x11proto-xf86vidmode-dev', 'mesa-utils' ]
     - os: osx
+      osx_image: xcode6.4
       compiler: clang
       env: FLAVOR=node NODE_EXE=iojs NODE_VERSION=2.0.1
     - os: osx
+      osx_image: xcode6.4
       compiler: clang
       env: FLAVOR=node NODE_EXE=node NODE_VERSION=0.12.0
     - os: osx
+      osx_image: xcode6.4
       compiler: clang
       env: FLAVOR=node NODE_EXE=node NODE_VERSION=0.10.36
 
