@@ -79,10 +79,10 @@ private:
     // logical dimensions
     uint16_t width = 0, height = 0;
 
-    float xLng(float x, float worldSize) const;
-    float yLat(float y, float worldSize) const;
-    float lngX(float lon) const;
-    float latY(float lat) const;
+    double xLng(double x, double worldSize) const;
+    double yLat(double y, double worldSize) const;
+    double lngX(double lon) const;
+    double latY(double lat) const;
     float zoomScale(float zoom) const;
     float worldSize() const;
 
