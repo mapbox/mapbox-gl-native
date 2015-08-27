@@ -79,10 +79,10 @@ public:
                      GlyphAtlas&,
                      GlyphStore&);
 
-    void drawGlyphs(SDFShader& shader);
-    void drawIcons(SDFShader& shader);
-    void drawIcons(IconShader& shader);
-    void drawCollisionBoxes(CollisionBoxShader& shader);
+    void drawGlyphs(SDFShader& shader, gl::Config& config);
+    void drawIcons(SDFShader& shader, gl::Config& config);
+    void drawIcons(IconShader& shader, gl::Config& config);
+    void drawCollisionBoxes(CollisionBoxShader& shader, gl::Config& config);
 
     bool needsDependencies(const GeometryTileLayer&,
                            const FilterExpression&,

@@ -35,9 +35,9 @@ public:
     void addGeometry(const GeometryCollection&);
     void addGeometry(const std::vector<Coordinate>& line);
 
-    void drawLines(LineShader& shader);
-    void drawLineSDF(LineSDFShader& shader);
-    void drawLinePatterns(LinepatternShader& shader);
+    void drawLines(LineShader& shader, gl::Config& config);
+    void drawLineSDF(LineSDFShader& shader, gl::Config& config);
+    void drawLinePatterns(LinepatternShader& shader, gl::Config& config);
 
 private:
     struct TriangleElement {

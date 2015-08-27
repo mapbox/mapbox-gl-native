@@ -40,9 +40,9 @@ public:
     void addGeometry(const GeometryCollection&);
     void tessellate();
 
-    void drawElements(PlainShader& shader);
-    void drawElements(PatternShader& shader);
-    void drawVertices(OutlineShader& shader);
+    void drawElements(PlainShader& shader, gl::Config& config);
+    void drawElements(PatternShader& shader, gl::Config& config);
+    void drawVertices(OutlineShader& shader, gl::Config& config);
 
 private:
     TESSalloc *allocator;

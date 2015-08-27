@@ -10,7 +10,7 @@ class PlainShader : public Shader {
 public:
     PlainShader();
 
-    void bind(char *offset);
+    void bind(gl::Config&, char *offset) override;
 
     UniformMatrix<4>              u_matrix   = {"u_matrix", *this};
     Uniform<std::array<float, 4>> u_color    = {"u_color",  *this};

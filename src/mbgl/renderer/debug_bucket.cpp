@@ -22,12 +22,12 @@ void DebugBucket::render(Painter& painter, const StyleLayer&, const TileID&, con
     painter.renderDebugText(*this, matrix);
 }
 
-void DebugBucket::drawLines(PlainShader& shader) {
-    array.bind(shader, fontBuffer, BUFFER_OFFSET(0));
-    MBGL_CHECK_ERROR(glDrawArrays(GL_LINES, 0, (GLsizei)(fontBuffer.index())));
+void DebugBucket::drawLines(PlainShader& shader, gl::Config& config) {
+    array.bind(shader, fontBuffer, config, BUFFER_OFFSET(0));
+    MBGL_CHECK_ERROR(glDrawArrays(GL_LINES, 0, static_cast<GLsizei>(fontBuffer.index())));
 }
 
-void DebugBucket::drawPoints(PlainShader& shader) {
-    array.bind(shader, fontBuffer, BUFFER_OFFSET(0));
-    MBGL_CHECK_ERROR(glDrawArrays(GL_POINTS, 0, (GLsizei)(fontBuffer.index())));
+void DebugBucket::drawPoints(PlainShader& shader, gl::Config& config) {
+    array.bind(shader, fontBuffer, config, BUFFER_OFFSET(0));
+    MBGL_CHECK_ERROR(glDrawArrays(GL_POINTS, 0, static_cast<GLsizei>(fontBuffer.index())));
 }

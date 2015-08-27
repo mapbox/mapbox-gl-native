@@ -10,7 +10,7 @@ class CollisionBoxShader : public Shader {
 public:
     CollisionBoxShader();
 
-    void bind(char *offset);
+    void bind(gl::Config&, char *offset) override;
 
     UniformMatrix<4>              u_matrix      = {"u_matrix",      *this};
     Uniform<float>                u_scale      = {"u_scale",      *this};

@@ -84,7 +84,7 @@ void Painter::renderLine(LineBucket& bucket, const StyleLayer &layer_desc, const
         linesdfShader->u_sdfgamma = lineAtlas->width / (properties.dash_line_width * std::min(posA.width, posB.width) * 256.0 * data.pixelRatio) / 2;
         linesdfShader->u_mix = properties.dash_array.t;
 
-        bucket.drawLineSDF(*linesdfShader);
+        bucket.drawLineSDF(*linesdfShader, config);
 
     } else if (!properties.image.from.empty()) {
         SpriteAtlasPosition imagePosA = spriteAtlas->getPosition(properties.image.from, true);
@@ -113,7 +113,7 @@ void Painter::renderLine(LineBucket& bucket, const StyleLayer &layer_desc, const
         spriteAtlas->bind(true);
         config.depthRange = { strata + strata_epsilon, 1.0f };  // may or may not matter
 
-        bucket.drawLinePatterns(*linepatternShader);
+        bucket.drawLinePatterns(*linepatternShader, config);
 
     } else {
         useProgram(lineShader->program);
@@ -126,6 +126,6 @@ void Painter::renderLine(LineBucket& bucket, const StyleLayer &layer_desc, const
 
         lineShader->u_color = color;
 
-        bucket.drawLines(*lineShader);
+        bucket.drawLines(*lineShader, config);
     }
 }

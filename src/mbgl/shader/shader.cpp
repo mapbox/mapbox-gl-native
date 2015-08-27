@@ -13,7 +13,7 @@
 
 using namespace mbgl;
 
-Shader::Shader(const char *name_, const GLchar *vertSource, const GLchar *fragSource)
+Shader::Shader(const char *name_, const GLchar *vertSource, const GLchar *fragSource, BindIndices bindIndices)
     : name(name_),
       program(0) {
     util::stopwatch stopwatch("shader compilation", Event::Shader);
@@ -41,6 +41,10 @@ Shader::Shader(const char *name_, const GLchar *vertSource, const GLchar *fragSo
     // Attach shaders
     MBGL_CHECK_ERROR(glAttachShader(program, vertShader));
     MBGL_CHECK_ERROR(glAttachShader(program, fragShader));
+
+    if (bindIndices) {
+        bindIndices(program);
+    }
 
     {
         // Link program

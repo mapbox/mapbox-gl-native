@@ -30,18 +30,18 @@ void Painter::renderDebugText(DebugBucket& bucket, const mat4 &matrix) {
     // Draw white outline
     plainShader->u_color = {{ 1.0f, 1.0f, 1.0f, 1.0f }};
     lineWidth(4.0f * data.pixelRatio);
-    bucket.drawLines(*plainShader);
+    bucket.drawLines(*plainShader, config);
 
 #ifndef GL_ES_VERSION_2_0
     // Draw line "end caps"
     MBGL_CHECK_ERROR(glPointSize(2));
-    bucket.drawPoints(*plainShader);
+    bucket.drawPoints(*plainShader, config);
 #endif
 
     // Draw black text.
     plainShader->u_color = {{ 0.0f, 0.0f, 0.0f, 1.0f }};
     lineWidth(2.0f * data.pixelRatio);
-    bucket.drawLines(*plainShader);
+    bucket.drawLines(*plainShader, config);
 
     config.depthTest = true;
 }
@@ -59,7 +59,7 @@ void Painter::renderDebugFrame(const mat4 &matrix) {
     plainShader->u_matrix = matrix;
 
     // draw tile outline
-    tileBorderArray.bind(*plainShader, tileBorderBuffer, BUFFER_OFFSET(0));
+    tileBorderArray.bind(*plainShader, tileBorderBuffer, config, BUFFER_OFFSET(0));
     plainShader->u_color = {{ 1.0f, 0.0f, 0.0f, 1.0f }};
     lineWidth(4.0f * data.pixelRatio);
     MBGL_CHECK_ERROR(glDrawArrays(GL_LINE_STRIP, 0, (GLsizei)tileBorderBuffer.index()));

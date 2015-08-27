@@ -24,7 +24,7 @@ void Painter::renderSDF(SymbolBucket &bucket,
                         float sdfFontSize,
                         std::array<float, 2> texsize,
                         SDFShader& sdfShader,
-                        void (SymbolBucket::*drawSDF)(SDFShader&))
+                        void (SymbolBucket::*drawSDF)(SDFShader&, gl::Config&))
 {
     mat4 vtxMatrix = translatedMatrix(matrix, styleProperties.translate, id, styleProperties.translate_anchor);
 
@@ -86,7 +86,7 @@ void Painter::renderSDF(SymbolBucket &bucket,
         sdfShader.u_buffer = (haloOffset - styleProperties.halo_width / fontScale) / sdfPx;
 
         config.depthRange = { strata, 1.0f };
-        (bucket.*drawSDF)(sdfShader);
+        (bucket.*drawSDF)(sdfShader, config);
     }
 
     // Then, we draw the text/icon over the halo
@@ -107,7 +107,7 @@ void Painter::renderSDF(SymbolBucket &bucket,
         sdfShader.u_buffer = (256.0f - 64.0f) / 256.0f;
 
         config.depthRange = { strata + strata_epsilon, 1.0f };
-        (bucket.*drawSDF)(sdfShader);
+        (bucket.*drawSDF)(sdfShader, config);
     }
 }
 
@@ -134,7 +134,7 @@ void Painter::renderSymbol(SymbolBucket &bucket, const StyleLayer &layer_desc, c
         lineWidth(1.0f);
 
         config.depthRange = { strata, 1.0f };
-        bucket.drawCollisionBoxes(*collisionBoxShader);
+        bucket.drawCollisionBoxes(*collisionBoxShader, config);
 
     }
 
@@ -200,7 +200,7 @@ void Painter::renderSymbol(SymbolBucket &bucket, const StyleLayer &layer_desc, c
             iconShader->u_opacity = properties.icon.opacity;
 
             config.depthRange = { strata, 1.0f };
-            bucket.drawIcons(*iconShader);
+            bucket.drawIcons(*iconShader, config);
         }
     }
 
