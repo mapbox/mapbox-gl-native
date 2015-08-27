@@ -97,6 +97,8 @@ void Painter::renderLine(LineBucket& bucket, const StyleLayer &layer_desc, const
         linesdfShader->u_image = 0;
         linesdfShader->u_sdfgamma = lineAtlas->width / (properties.dash_line_width * std::min(posA.width, posB.width) * 256.0 * data.pixelRatio) / 2;
         linesdfShader->u_mix = properties.dash_array.t;
+        linesdfShader->u_extra = extra;
+        linesdfShader->u_antialiasingmatrix = antialiasingMatrix;
 
         bucket.drawLineSDF(*linesdfShader);
 
@@ -122,6 +124,8 @@ void Painter::renderLine(LineBucket& bucket, const StyleLayer &layer_desc, const
         linepatternShader->u_pattern_br_b = imagePosB.br;
         linepatternShader->u_fade = properties.image.t;
         linepatternShader->u_opacity = properties.opacity;
+        linepatternShader->u_extra = extra;
+        linepatternShader->u_antialiasingmatrix = antialiasingMatrix;
 
         MBGL_CHECK_ERROR(glActiveTexture(GL_TEXTURE0));
         spriteAtlas->bind(true);
