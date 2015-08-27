@@ -42,11 +42,17 @@ function renderTest(style, info, base, key) {
         var options = {};
         options.request = function(req) {
             var url =  decodeURIComponent(req.url);
-            console.log('REQUEST: ', url);
+            console.log('JAVASCRIPT REQUEST:', url);
             fs.readFile(path.join(suitePath, url), function(err, data) {
                 // t.error(err);
-                req.respond(err, { data: data });
+                console.log('CANCELED?', req.canceled, 'ERROR?', err, url);
+                if (!req.canceled) req.respond(err, { data: data });
             });
+        };
+        options.cancel = function(req) {
+            var url =  decodeURIComponent(req.url);
+            console.log('JAVASCRIPT CANCEL:', url);
+            req.canceled = true;
         };
         options.ratio = 1.0;
 

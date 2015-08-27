@@ -62,7 +62,7 @@ NAN_METHOD(NodeRequest::Respond) {
 
     // Request has already been responded to, or was canceled, fail silently.
     if (!nodeRequest->resource) NanReturnUndefined();
-    std::cout << "RESPOND: " << nodeRequest->resource->url << std::endl;
+    std::cout << "C++ RESPOND: " << nodeRequest->resource->url << std::endl;
 
     auto source = nodeRequest->source;
     auto resource = std::move(nodeRequest->resource);
@@ -136,10 +136,11 @@ NodeRequest::NodeRequest(NodeFileSource* source_, const mbgl::Resource& resource
     resource(std::make_unique<mbgl::Resource>(resource_)) {}
 
 NodeRequest::~NodeRequest() {
-    if (resource) std::cout << "DESTROY: " << resource->url << std::endl;
+    if (resource) std::cout << "C++ DESTROY: " << resource->url << std::endl;
 }
 
 void NodeRequest::cancel() {
+    std::cout << "C++ CANCEL: " << resource->url << std::endl;
     resource.reset();
 }
 
