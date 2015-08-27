@@ -12,7 +12,7 @@
 #include <mbgl/annotation/shape_annotation.hpp>
 #include <mbgl/annotation/sprite_image.hpp>
 #include <mbgl/platform/platform.hpp>
-#include <mbgl/platform/darwin/reachability.h>
+#include <mbgl/platform/reachability.h>
 #include <mbgl/storage/default_file_source.hpp>
 #include <mbgl/storage/network_status.hpp>
 #include <mbgl/util/geo.hpp>

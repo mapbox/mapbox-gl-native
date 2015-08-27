@@ -1,8 +1,8 @@
 #include <mbgl/platform/log.hpp>
 #include "../platform/default/default_styles.hpp"
 #include <mbgl/platform/platform.hpp>
-#include <mbgl/platform/darwin/settings_nsuserdefaults.hpp>
-#include <mbgl/platform/darwin/reachability.h>
+#include <mbgl/platform/settings_nsuserdefaults.hpp>
+#include <mbgl/platform/reachability.h>
 #include <mbgl/platform/default/glfw_view.hpp>
 #include <mbgl/storage/default_file_source.hpp>
 #include <mbgl/storage/sqlite_cache.hpp>

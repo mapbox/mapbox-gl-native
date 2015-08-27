@@ -23,9 +23,6 @@
 
       'sources': [
         './main.mm',
-        '../platform/darwin/settings_nsuserdefaults.hpp',
-        '../platform/darwin/settings_nsuserdefaults.mm',
-        '../platform/darwin/reachability.m',
         '../platform/default/glfw_view.hpp',
         '../platform/default/glfw_view.cpp',
         '../platform/default/default_styles.hpp',

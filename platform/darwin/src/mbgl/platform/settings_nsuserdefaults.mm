@@ -1,6 +1,6 @@
 #import <Foundation/Foundation.h>
 
-#include <mbgl/platform/darwin/settings_nsuserdefaults.hpp>
+#include <mbgl/platform/settings_nsuserdefaults.hpp>
 
 using namespace mbgl;
 
@@ -27,7 +27,7 @@ void Settings_NSUserDefaults::load()
     zoom      = [settings[@"zoom"]      doubleValue];
     bearing   = [settings[@"bearing"]   doubleValue];
     debug     = [settings[@"debug"]     boolValue];
-    
+
     unsigned uncheckedTrackingMode = [settings[@"trackingMode"] unsignedIntValue];
     if (uncheckedTrackingMode > MGLUserTrackingModeNone &&
         uncheckedTrackingMode <= MGLUserTrackingModeFollowWithCourse)
