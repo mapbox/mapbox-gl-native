@@ -24,7 +24,8 @@ public:
     void deactivate() override;
     void notify() override;
     void invalidate() override;
-    void swap() override;
+    void beforeRender() override;
+    void afterRender() override;
 
     static void onKey(GLFWwindow *window, int key, int scancode, int action, int mods);
     static void onScroll(GLFWwindow *window, double xoffset, double yoffset);

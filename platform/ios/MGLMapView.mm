@@ -2951,7 +2951,12 @@ class MBGLView : public mbgl::View
                                   waitUntilDone:NO];
     }
 
-    void swap() override
+    void beforeRender() override
+    {
+        // no-op
+    }
+
+    void afterRender() override
     {
         // no-op
     }

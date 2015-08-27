@@ -386,7 +386,11 @@ void GLFWView::invalidate() {
     glfwPostEmptyEvent();
 }
 
-void GLFWView::swap() {
+void GLFWView::beforeRender() {
+    // no-op
+}
+
+void GLFWView::afterRender() {
     glfwSwapBuffers(window);
 }
 

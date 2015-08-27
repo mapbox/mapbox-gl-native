@@ -114,10 +114,10 @@ bool HeadlessView::isActive() {
     return std::this_thread::get_id() == thread;
 }
 
-void HeadlessView::resize(const uint16_t width, const uint16_t height) {
-    activate();
+void HeadlessView::resizeFramebuffer() {
+    assert(isActive());
 
-    dimensions = {{ width, height }};
+    if (!needsResize) return;
 
     clearBuffers();
 
@@ -158,7 +158,12 @@ void HeadlessView::resize(const uint16_t width, const uint16_t height) {
         throw std::runtime_error(error);
     }
 
-    deactivate();
+    needsResize = false;
+}
+
+void HeadlessView::resize(const uint16_t width, const uint16_t height) {
+    dimensions = {{ width, height }};
+    needsResize = true;
 }
 
 std::unique_ptr<StillImage> HeadlessView::readStillImage() {
@@ -293,7 +298,11 @@ void HeadlessView::invalidate() {
     // no-op
 }
 
-void HeadlessView::swap() {
+void HeadlessView::beforeRender() {
+    resizeFramebuffer();
+}
+
+void HeadlessView::afterRender() {
     // no-op
 }
 

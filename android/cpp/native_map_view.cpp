@@ -159,7 +159,11 @@ void NativeMapView::invalidate() {
     detach_jni_thread(vm, &env, detach);
 }
 
-void NativeMapView::swap() {
+void NativeMapView::beforeRender() {
+    // no-op
+}
+
+void NativeMapView::afterRender() {
     mbgl::Log::Debug(mbgl::Event::Android, "NativeMapView::swap");
 
     if ((display != EGL_NO_DISPLAY) && (surface != EGL_NO_SURFACE)) {
