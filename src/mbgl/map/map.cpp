@@ -9,6 +9,7 @@
 
 #include <mbgl/util/projection.hpp>
 #include <mbgl/util/thread.hpp>
+#include <mbgl/util/math.hpp>
 
 namespace mbgl {
 
@@ -115,6 +116,18 @@ void Map::setGestureInProgress(bool inProgress) {
     update(Update::Repaint);
 }
 
+#pragma mark -
+
+void Map::jumpTo(CameraOptions options) {
+    transform->jumpTo(options);
+    update(Update::Repaint);
+}
+
+void Map::easeTo(CameraOptions options) {
+    transform->easeTo(options);
+    update(options.zoom ? Update::Zoom : Update::Repaint);
+}
+
 #pragma mark - Position
 
 void Map::moveBy(double dx, double dy, const Duration& duration) {
@@ -123,7 +136,9 @@ void Map::moveBy(double dx, double dy, const Duration& duration) {
 }
 
 void Map::setLatLng(LatLng latLng, const Duration& duration) {
-    transform->setLatLng(latLng, duration);
+    CameraOptions options;
+    options.duration = duration;
+    transform->setLatLng(latLng, options);
     update(Update::Repaint);
 }
 
@@ -132,9 +147,11 @@ LatLng Map::getLatLng() const {
 }
 
 void Map::resetPosition() {
-    transform->setAngle(0);
-    transform->setLatLng(LatLng(0, 0));
-    transform->setZoom(0);
+    CameraOptions options;
+    options.angle = 0;
+    options.center = LatLng(0, 0);
+    options.zoom = 0;
+    transform->jumpTo(options);
     update(Update::Zoom);
 }
 
@@ -165,29 +182,32 @@ double Map::getZoom() const {
 }
 
 void Map::setLatLngZoom(LatLng latLng, double zoom, const Duration& duration) {
-    transform->setLatLngZoom(latLng, zoom, duration);
+    CameraOptions options;
+    options.duration = duration;
+    transform->setLatLngZoom(latLng, zoom, options);
     update(Update::Zoom);
 }
 
-void Map::fitBounds(LatLngBounds bounds, EdgeInsets padding, const Duration& duration) {
+CameraOptions Map::cameraForLatLngBounds(LatLngBounds bounds, EdgeInsets padding) {
     AnnotationSegment segment = {
         {bounds.ne.latitude, bounds.sw.longitude},
         bounds.sw,
         {bounds.sw.latitude, bounds.ne.longitude},
         bounds.ne,
     };
-    fitBounds(segment, padding, duration);
+    return cameraForLatLngs(segment, padding);
 }
 
-void Map::fitBounds(AnnotationSegment segment, EdgeInsets padding, const Duration& duration) {
-    if (segment.empty()) {
-        return;
+CameraOptions Map::cameraForLatLngs(std::vector<LatLng> latLngs, EdgeInsets padding) {
+    CameraOptions options;
+    if (latLngs.empty()) {
+        return options;
     }
 
     // Calculate the bounds of the possibly rotated shape with respect to the viewport.
     vec2<> nePixel = {-INFINITY, -INFINITY};
     vec2<> swPixel = {INFINITY, INFINITY};
-    for (LatLng latLng : segment) {
+    for (LatLng latLng : latLngs) {
         vec2<> pixel = pixelForLatLng(latLng);
         swPixel.x = std::min(swPixel.x, pixel.x);
         nePixel.x = std::max(nePixel.x, pixel.x);
@@ -215,7 +235,9 @@ void Map::fitBounds(AnnotationSegment segment, EdgeInsets padding, const Duratio
     vec2<> centerPixel = (paddedNEPixel + paddedSWPixel) * 0.5;
     LatLng centerLatLng = latLngForPixel(centerPixel);
 
-    setLatLngZoom(centerLatLng, zoom, duration);
+    options.center = centerLatLng;
+    options.zoom = zoom;
+    return options;
 }
 
 void Map::resetZoom() {
@@ -250,7 +272,9 @@ void Map::rotateBy(double sx, double sy, double ex, double ey, const Duration& d
 }
 
 void Map::setBearing(double degrees, const Duration& duration) {
-    transform->setAngle(-degrees * M_PI / 180, duration);
+    CameraOptions options;
+    options.duration = duration;
+    transform->setAngle(-degrees * M_PI / 180, options);
     update(Update::Repaint);
 }
 
@@ -264,15 +288,19 @@ double Map::getBearing() const {
 }
 
 void Map::resetNorth() {
-    transform->setAngle(0, std::chrono::milliseconds(500));
+    CameraOptions options;
+    options.duration = std::chrono::milliseconds(500);
+    transform->setAngle(0, options);
     update(Update::Repaint);
 }
 
 
 #pragma mark - Pitch
 
-void Map::setPitch(double pitch) {
-    transform->setPitch(std::min(pitch, 60.0) * M_PI / 180);
+void Map::setPitch(double pitch, const Duration& duration) {
+    CameraOptions options;
+    options.duration = duration;
+    transform->setPitch(util::clamp(pitch, 0., 90.) * M_PI / 180, options);
     update(Update::Repaint);
 }
 

@@ -20,6 +20,8 @@
         '../include/mbgl/ios/Mapbox.h',
         '../platform/ios/MGLMapboxEvents.h',
         '../platform/ios/MGLMapboxEvents.m',
+        '../include/mbgl/ios/MGLMapCamera.h',
+        '../platform/ios/MGLMapCamera.mm',
         '../include/mbgl/ios/MGLMapView.h',
         '../include/mbgl/ios/MGLMapView+IBAdditions.h',
         '../platform/ios/MGLMapView.mm',

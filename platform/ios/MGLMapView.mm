@@ -48,6 +48,9 @@ NSUInteger const MGLStyleVersion = 8;
 const NSTimeInterval MGLAnimationDuration = 0.3;
 const CGSize MGLAnnotationUpdateViewportOutset = {150, 150};
 const CGFloat MGLMinimumZoom = 3;
+const CGFloat MGLMinimumPitch = 0;
+const CGFloat MGLMaximumPitch = 60;
+const CLLocationDegrees MGLAngularFieldOfView = M_PI / 6.;
 
 NSString *const MGLAnnotationIDKey = @"MGLAnnotationIDKey";
 NSString *const MGLAnnotationSymbolKey = @"MGLAnnotationSymbolKey";
@@ -368,7 +371,10 @@ std::chrono::steady_clock::duration secondsAsDuration(float duration)
 
     // set initial position
     //
-    _mbglMap->setLatLngZoom(mbgl::LatLng(0, 0), _mbglMap->getMinZoom());
+    mbgl::CameraOptions options;
+    options.center = mbgl::LatLng(0, 0);
+    options.zoom = _mbglMap->getMinZoom();
+    _mbglMap->jumpTo(options);
     _pendingLatitude = NAN;
     _pendingLongitude = NAN;
 
@@ -1349,12 +1355,10 @@ std::chrono::steady_clock::duration secondsAsDuration(float duration)
     else if (twoFingerDrag.state == UIGestureRecognizerStateBegan || twoFingerDrag.state == UIGestureRecognizerStateChanged)
     {
         CGFloat gestureDistance = CGPoint([twoFingerDrag translationInView:twoFingerDrag.view]).y;
-        double currentPitch = _mbglMap->getPitch();
-        double minPitch = 0;
-        double maxPitch = 60.0;
-        double slowdown = 20.0;
+        CGFloat currentPitch = _mbglMap->getPitch();
+        CGFloat slowdown = 20.0;
 
-        double pitchNew = fmax(fmin(currentPitch - (gestureDistance / slowdown), maxPitch), minPitch);
+        CGFloat pitchNew = mbgl::util::clamp(currentPitch - (gestureDistance / slowdown), MGLMinimumPitch, MGLMaximumPitch);
         
         _mbglMap->setPitch(pitchNew);
     }
@@ -1532,7 +1536,7 @@ std::chrono::steady_clock::duration secondsAsDuration(float duration)
 
 + (NS_SET_OF(NSString *) *)keyPathsForValuesAffectingCenterCoordinate
 {
-    return [NSSet setWithObjects:@"latitude", @"longitude", nil];
+    return [NSSet setWithObjects:@"latitude", @"longitude", @"camera", nil];
 }
 
 - (void)setCenterCoordinate:(CLLocationCoordinate2D)coordinate animated:(BOOL)animated preservingTracking:(BOOL)tracking
@@ -1544,11 +1548,14 @@ std::chrono::steady_clock::duration secondsAsDuration(float duration)
 
 - (void)setCenterCoordinate:(CLLocationCoordinate2D)coordinate animated:(BOOL)animated
 {
-    CGFloat duration = (animated ? MGLAnimationDuration : 0);
-
-    _mbglMap->setLatLngZoom(MGLLatLngFromLocationCoordinate2D(coordinate),
-                            fmaxf(_mbglMap->getZoom(), self.currentMinimumZoom),
-                            secondsAsDuration(duration));
+    mbgl::CameraOptions options;
+    options.center = MGLLatLngFromLocationCoordinate2D(coordinate);
+    options.zoom = fmaxf(_mbglMap->getZoom(), self.currentMinimumZoom);
+    if (animated)
+    {
+        options.duration = secondsAsDuration(MGLAnimationDuration);
+    }
+    _mbglMap->easeTo(options);
 
     [self notifyMapChange:(animated ? mbgl::MapChangeRegionDidChangeAnimated : mbgl::MapChangeRegionDidChange)];
 }
@@ -1565,15 +1572,39 @@ std::chrono::steady_clock::duration secondsAsDuration(float duration)
 
 - (void)setCenterCoordinate:(CLLocationCoordinate2D)centerCoordinate zoomLevel:(double)zoomLevel animated:(BOOL)animated
 {
+    [self setCenterCoordinate:centerCoordinate zoomLevel:zoomLevel direction:self.direction animated:animated];
+}
+
+- (void)setCenterCoordinate:(CLLocationCoordinate2D)centerCoordinate zoomLevel:(double)zoomLevel direction:(CLLocationDirection)direction animated:(BOOL)animated
+{
     self.userTrackingMode = MGLUserTrackingModeNone;
 
-    CGFloat duration = (animated ? MGLAnimationDuration : 0);
+    [self _setCenterCoordinate:centerCoordinate zoomLevel:zoomLevel direction:direction animated:animated];
+}
 
-    _mbglMap->setLatLngZoom(MGLLatLngFromLocationCoordinate2D(centerCoordinate), zoomLevel, secondsAsDuration(duration));
+- (void)_setCenterCoordinate:(CLLocationCoordinate2D)centerCoordinate zoomLevel:(double)zoomLevel direction:(CLLocationDirection)direction animated:(BOOL)animated
+{
+    mbgl::CameraOptions options;
+    options.center = MGLLatLngFromLocationCoordinate2D(centerCoordinate);
+    options.zoom = zoomLevel;
+    if (direction >= 0)
+    {
+        options.angle = MGLRadiansFromDegrees(-direction);
+    }
+    if (animated)
+    {
+        options.duration = secondsAsDuration(MGLAnimationDuration);
+    }
+    _mbglMap->easeTo(options);
 
     [self unrotateIfNeededAnimated:animated];
 
     [self notifyMapChange:(animated ? mbgl::MapChangeRegionDidChangeAnimated : mbgl::MapChangeRegionDidChange)];
+}
+
++ (NS_SET_OF(NSString *) *)keyPathsForValuesAffectingZoomLevel
+{
+    return [NSSet setWithObject:@"camera"];
 }
 
 - (double)zoomLevel
@@ -1585,11 +1616,13 @@ std::chrono::steady_clock::duration secondsAsDuration(float duration)
 {
     self.userTrackingMode = MGLUserTrackingModeNone;
 
-    CGFloat duration = (animated ? MGLAnimationDuration : 0);
-
-    _mbglMap->setLatLngZoom(_mbglMap->getLatLng(),
-                           fmaxf(zoomLevel, self.currentMinimumZoom),
-                           secondsAsDuration(duration));
+    mbgl::CameraOptions options;
+    options.zoom = fmaxf(zoomLevel, self.currentMinimumZoom);
+    if (animated)
+    {
+        options.duration = secondsAsDuration(MGLAnimationDuration);
+    }
+    _mbglMap->easeTo(options);
 
     [self unrotateIfNeededAnimated:animated];
 
@@ -1641,7 +1674,27 @@ mbgl::LatLngBounds MGLLatLngBoundsFromCoordinateBounds(MGLCoordinateBounds coord
                        animated:animated];
 }
 
+- (void)setVisibleCoordinateBounds:(MGLCoordinateBounds)bounds edgePadding:(UIEdgeInsets)insets direction:(CLLocationDirection)direction animated:(BOOL)animated
+{
+    CLLocationCoordinate2D coordinates[] = {
+        {bounds.ne.latitude, bounds.sw.longitude},
+        bounds.sw,
+        {bounds.sw.latitude, bounds.ne.longitude},
+        bounds.ne,
+    };
+    [self setVisibleCoordinates:coordinates
+                          count:sizeof(coordinates) / sizeof(coordinates[0])
+                    edgePadding:insets
+                      direction:direction
+                       animated:animated];
+}
+
 - (void)setVisibleCoordinates:(CLLocationCoordinate2D *)coordinates count:(NSUInteger)count edgePadding:(UIEdgeInsets)insets animated:(BOOL)animated
+{
+    [self setVisibleCoordinates:coordinates count:count edgePadding:insets direction:self.direction animated:animated];
+}
+
+- (void)setVisibleCoordinates:(CLLocationCoordinate2D *)coordinates count:(NSUInteger)count edgePadding:(UIEdgeInsets)insets direction:(CLLocationDirection)direction animated:(BOOL)animated
 {
     // NOTE: does not disrupt tracking mode
     CGFloat duration = animated ? MGLAnimationDuration : 0;
@@ -1654,12 +1707,23 @@ mbgl::LatLngBounds MGLLatLngBoundsFromCoordinateBounds(MGLCoordinateBounds coord
     {
         segment.push_back({coordinates[i].latitude, coordinates[i].longitude});
     }
-    _mbglMap->fitBounds(segment, mbglInsets, secondsAsDuration(duration));
+    mbgl::CameraOptions options = _mbglMap->cameraForLatLngs(segment, mbglInsets);
+    if (direction >= 0)
+    {
+        options.angle = MGLRadiansFromDegrees(-direction);
+    }
+    options.duration = secondsAsDuration(duration);
+    _mbglMap->easeTo(options);
     [self didChangeValueForKey:@"visibleCoordinateBounds"];
     
     [self unrotateIfNeededAnimated:animated];
     
     [self notifyMapChange:(animated ? mbgl::MapChangeRegionDidChangeAnimated : mbgl::MapChangeRegionDidChange)];
+}
+
++ (NS_SET_OF(NSString *) *)keyPathsForValuesAffectingDirection
+{
+    return [NSSet setWithObject:@"camera"];
 }
 
 - (CLLocationDirection)direction
@@ -1685,23 +1749,120 @@ mbgl::LatLngBounds MGLLatLngBoundsFromCoordinateBounds(MGLCoordinateBounds coord
     [self setDirection:direction animated:NO];
 }
 
-- (double)pitch
++ (NS_SET_OF(NSString *) *)keyPathsForValuesAffectingPitch
+{
+    return [NSSet setWithObject:@"camera"];
+}
+
+- (CGFloat)pitch
 {
     return _mbglMap->getPitch();
 }
 
-- (void)setPitch:(double)pitch
+- (void)setPitch:(CGFloat)pitch
+{
+    [self setPitch:pitch animated:NO];
+}
+
+- (void)setPitch:(CGFloat)pitch animated:(BOOL)animated
 {
     // constrain pitch to between 0º and 60º
     //
-    _mbglMap->setPitch(fmax(fmin(pitch, 60), 0));
+    CGFloat duration = animated ? MGLAnimationDuration : 0;
+    _mbglMap->setPitch(mbgl::util::clamp(pitch, MGLMinimumPitch, MGLMaximumPitch), secondsAsDuration(duration));
     
     //[self notifyMapChange:(mbgl::MapChangeRegionDidChange)];
 }
 
 - (void)resetPitch
 {
-    [self setPitch:0];
+    [self setPitch:0 animated:YES];
+}
+
+- (MGLMapCamera *)camera
+{
+    CGSize size = self.bounds.size;
+    mbgl::ProjectedMeters topLeftMeters;
+    CGPoint opposite;
+    if (size.width > size.height) // landscape
+    {
+        CLLocationCoordinate2D centerLeft = [self convertPoint:CGPointMake(0, size.height / 2) toCoordinateFromView:self];
+        topLeftMeters = _mbglMap->projectedMetersForLatLng(MGLLatLngFromLocationCoordinate2D(centerLeft));
+        opposite = CGPointMake(size.width, 0);
+    }
+    else // portrait
+    {
+        CLLocationCoordinate2D topCenter = [self convertPoint:CGPointMake(size.width / 2, 0) toCoordinateFromView:self];
+        topLeftMeters = _mbglMap->projectedMetersForLatLng(MGLLatLngFromLocationCoordinate2D(topCenter));
+        opposite = CGPointMake(0, size.height);
+    }
+    CLLocationCoordinate2D oppositeCoordinate = [self convertPoint:opposite toCoordinateFromView:self];
+    mbgl::ProjectedMeters oppositeMeters = _mbglMap->projectedMetersForLatLng(MGLLatLngFromLocationCoordinate2D(oppositeCoordinate));
+    CLLocationDistance distance = std::hypot(oppositeMeters.easting - topLeftMeters.easting,
+                                             oppositeMeters.northing - topLeftMeters.northing);
+    CLLocationDistance altitude = distance / std::tan(MGLAngularFieldOfView / 2.) * 0.5;
+    
+    CGFloat pitch = MGLDegreesFromRadians(_mbglMap->getPitch());
+    
+    return [MGLMapCamera cameraLookingAtCenterCoordinate:self.centerCoordinate
+                                            fromDistance:altitude
+                                                   pitch:pitch
+                                                 heading:self.direction];
+}
+
++ (NS_SET_OF(NSString *) *)keyPathsForValuesAffectingCamera
+{
+    return [NSSet setWithObjects:@"longitude", @"latitude", @"centerCoordinate", @"zoomLevel", @"direction", @"pitch", nil];
+}
+
+- (void)setCamera:(MGLMapCamera *)camera
+{
+    [self setCamera:camera animated:NO];
+}
+
+- (void)setCamera:(MGLMapCamera *)camera animated:(BOOL)animated
+{
+    CGSize size = self.bounds.size;
+    mbgl::ProjectedMeters centerMeters = _mbglMap->projectedMetersForLatLng(MGLLatLngFromLocationCoordinate2D(camera.centerCoordinate));
+    CLLocationDistance distance = camera.altitude * std::tan(MGLAngularFieldOfView / 2.);
+    mbgl::LatLng sw, ne;
+    if (size.width > size.height) // landscape
+    {
+        sw = _mbglMap->latLngForProjectedMeters({
+            centerMeters.northing,
+            centerMeters.easting - distance,
+        });
+        ne = _mbglMap->latLngForProjectedMeters({
+            centerMeters.northing,
+            centerMeters.easting + distance,
+        });
+    }
+    else // portrait
+    {
+        sw = _mbglMap->latLngForProjectedMeters({
+            centerMeters.northing - distance,
+            centerMeters.easting,
+        });
+        ne = _mbglMap->latLngForProjectedMeters({
+            centerMeters.northing + distance,
+            centerMeters.easting,
+        });
+    }
+    mbgl::CameraOptions options = _mbglMap->cameraForLatLngBounds({ sw, ne }, {});
+    
+    if (camera.heading >= 0)
+    {
+        options.angle = MGLRadiansFromDegrees(-camera.heading);
+    }
+    if (camera.pitch >= 0)
+    {
+        options.pitch = MGLRadiansFromDegrees(camera.pitch);
+    }
+    if (animated)
+    {
+        options.duration = secondsAsDuration(MGLAnimationDuration);
+    }
+    _mbglMap->easeTo(options);
 }
 
 - (CLLocationCoordinate2D)convertPoint:(CGPoint)point toCoordinateFromView:(nullable UIView *)view
@@ -2454,6 +2615,12 @@ CLLocationCoordinate2D MGLLocationCoordinate2DFromLatLng(mbgl::LatLng latLng)
             [self.delegate mapView:self didUpdateUserLocation:self.userLocation];
         }
     }
+    
+    CLLocationDirection course = self.userLocation.location.course;
+    if (course < 0 || self.userTrackingMode != MGLUserTrackingModeFollowWithCourse)
+    {
+        course = -1;
+    }
 
     if (self.userTrackingMode != MGLUserTrackingModeNone)
     {
@@ -2468,7 +2635,7 @@ CLLocationCoordinate2D MGLLocationCoordinate2DFromLatLng(mbgl::LatLng latLng)
             {
                 // at sufficient detail, just re-center the map; don't zoom
                 //
-                [self setCenterCoordinate:self.userLocation.location.coordinate animated:YES preservingTracking:YES];
+                [self _setCenterCoordinate:self.userLocation.location.coordinate zoomLevel:self.zoomLevel direction:course animated:YES];
             }
             else
             {
@@ -2498,16 +2665,10 @@ CLLocationCoordinate2D MGLLocationCoordinate2DFromLatLng(mbgl::LatLng latLng)
                     desiredSouthWest.longitude != actualSouthWest.longitude)
                 {
                     // assumes we won't disrupt tracking mode
-                    [self setVisibleCoordinateBounds:MGLCoordinateBoundsMake(desiredSouthWest, desiredNorthEast) animated:YES];
+                    [self setVisibleCoordinateBounds:MGLCoordinateBoundsMake(desiredSouthWest, desiredNorthEast) edgePadding:UIEdgeInsetsZero direction:course animated:YES];
                 }
             }
         }
-    }
-
-    CLLocationDirection course = self.userLocation.location.course;
-    if (course >= 0 && self.userTrackingMode == MGLUserTrackingModeFollowWithCourse)
-    {
-        _mbglMap->setBearing(course);
     }
     
     self.userLocationAnnotationView.haloLayer.hidden = ! CLLocationCoordinate2DIsValid(self.userLocation.coordinate) ||
@@ -3055,7 +3216,7 @@ class MBGLView : public mbgl::View
 
 + (NS_SET_OF(NSString *) *)keyPathsForValuesAffectingLatitude
 {
-    return [NSSet setWithObject:@"centerCoordinate"];
+    return [NSSet setWithObjects:@"centerCoordinate", @"camera", nil];
 }
 
 - (double)latitude
@@ -3081,7 +3242,7 @@ class MBGLView : public mbgl::View
 
 + (NS_SET_OF(NSString *) *)keyPathsForValuesAffectingLongitude
 {
-    return [NSSet setWithObject:@"centerCoordinate"];
+    return [NSSet setWithObjects:@"centerCoordinate", @"camera", nil];
 }
 
 - (double)longitude
