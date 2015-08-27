@@ -4,6 +4,7 @@
 #include <mbgl/storage/response.hpp>
 
 #include <cmath>
+#include <iostream>
 
 namespace node_mbgl {
 
@@ -61,6 +62,7 @@ NAN_METHOD(NodeRequest::Respond) {
 
     // Request has already been responded to, or was canceled, fail silently.
     if (!nodeRequest->resource) NanReturnUndefined();
+    std::cout << "RESPOND: " << nodeRequest->resource->url << std::endl;
 
     auto source = nodeRequest->source;
     auto resource = std::move(nodeRequest->resource);
@@ -133,7 +135,9 @@ NodeRequest::NodeRequest(NodeFileSource* source_, const mbgl::Resource& resource
     : source(source_),
     resource(std::make_unique<mbgl::Resource>(resource_)) {}
 
-NodeRequest::~NodeRequest() {}
+NodeRequest::~NodeRequest() {
+    if (resource) std::cout << "DESTROY: " << resource->url << std::endl;
+}
 
 void NodeRequest::cancel() {
     resource.reset();

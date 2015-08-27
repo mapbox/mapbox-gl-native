@@ -41,12 +41,13 @@ function renderTest(style, info, base, key) {
 
         var options = {};
         options.request = function(req) {
-            fs.readFile(path.join(suitePath, decodeURIComponent(req.url)), function(err, data) {
+            var url =  decodeURIComponent(req.url);
+            console.log('REQUEST: ', url);
+            fs.readFile(path.join(suitePath, url), function(err, data) {
+                // t.error(err);
                 req.respond(err, { data: data });
-                t.error(err);
             });
         };
-        options.cancel = function() {};
         options.ratio = 1.0;
 
         var map = new mbgl.Map(options);
@@ -56,6 +57,7 @@ function renderTest(style, info, base, key) {
             map.release();
 
             if (err) {
+                console.log('THIS IS AN ERROR');
                 t.error(err);
                 return t.end();
             }
