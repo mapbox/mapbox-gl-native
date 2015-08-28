@@ -14,6 +14,7 @@ if [ ${TRAVIS_OS_NAME} == "linux" ]; then
 fi
 
 # nvm already exists on the Travis image
+. ~/.nvm/nvm.sh
 nvm install $NODE_VERSION
 
 node --version
