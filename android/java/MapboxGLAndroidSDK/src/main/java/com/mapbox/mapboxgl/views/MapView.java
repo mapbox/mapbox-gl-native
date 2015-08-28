@@ -50,6 +50,7 @@ import com.mapbox.mapboxgl.annotations.Polygon;
 import com.mapbox.mapboxgl.annotations.PolygonOptions;
 import com.mapbox.mapboxgl.annotations.Polyline;
 import com.mapbox.mapboxgl.annotations.PolylineOptions;
+import com.mapbox.mapboxgl.geometry.BoundingBox;
 import com.mapbox.mapboxgl.geometry.LatLng;
 import com.mapbox.mapboxgl.geometry.LatLngZoom;
 import com.mapzen.android.lost.api.LocationListener;
@@ -426,6 +427,25 @@ public class MapView extends FrameLayout implements LocationListener {
 
     public List<Annotation> getAnnotations() {
         return Collections.unmodifiableList(mAnnotations);
+    }
+
+    public List<Annotation> getAnnotationsInBounds(BoundingBox bbox) {
+        List<Annotation> annotations = new ArrayList<>();
+        long[] ids = mNativeMapView.getAnnotationsInBounds(bbox);
+        List<Long> idsList = new ArrayList<>();
+        for(int i = 0; i < ids.length; i++) {
+            idsList.add(new Long(ids[i]));
+        }
+        for(int i = 0; i < mAnnotations.size(); i++) {
+            Annotation annotation = mAnnotations.get(i);
+            if (annotation instanceof Marker && idsList.contains(annotation.getId())) {
+                annotations.add(annotation);
+            }
+        }
+        for(int i = 0; i < annotations.size(); i++) {
+            Log.d(TAG, "tapped: " + Long.toString(annotations.get(i).getId()));
+        }
+        return annotations;
     }
 
     //
@@ -918,6 +938,22 @@ public class MapView extends FrameLayout implements LocationListener {
         public boolean onSingleTapUp(MotionEvent e) {
             // Cancel any animation
             mNativeMapView.cancelTransitions();
+
+            // Select or deselect point annotations
+            PointF tapPoint = new PointF(e.getX(), e.getY());
+
+            float toleranceWidth = 60 * mScreenDensity;
+            float toleranceHeight = 80 * mScreenDensity;
+
+            PointF tr = new PointF(tapPoint.x + toleranceWidth / 2, tapPoint.y + 2 * toleranceHeight / 3);
+            PointF bl = new PointF(tapPoint.x - toleranceWidth / 2, tapPoint.y - 1 * toleranceHeight / 3);
+
+            LatLng sw = fromScreenLocation(bl);
+            LatLng ne = fromScreenLocation(tr);
+
+            BoundingBox bbox = new BoundingBox(ne, sw);
+
+            List<Annotation> annotations = getAnnotationsInBounds(bbox);
 
             return true;
         }
