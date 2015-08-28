@@ -13,10 +13,7 @@ if [ ${TRAVIS_OS_NAME} == "linux" ]; then
     mason install mesa 10.4.3
 fi
 
-mapbox_time "install_nvm" \
-curl -o- https://raw.githubusercontent.com/creationix/nvm/v0.26.1/install.sh | bash
-
-mapbox_time $NODE_VERSION \
+# nvm already exists on the Travis image
 nvm install $NODE_VERSION
 
 node --version
