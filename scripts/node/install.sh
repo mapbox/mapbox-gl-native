@@ -17,11 +17,16 @@ if [ ! -d ~/.nvm ]; then
     git clone https://github.com/creationix/nvm.git ~/.nvm
 fi
 
-pushd ~/.nvm && git fetch && git checkout `git describe --abbrev=0 --tags` && popd
+pushd ~/.nvm
+git fetch
+git checkout `git describe --abbrev=0 --tags`
+popd
+
 source ~/.nvm/nvm.sh
 
 mapbox_time $NODE_VERSION \
 nvm install $NODE_VERSION
+
 nvm alias default $NODE_VERSION
 
 node --version
