@@ -13,10 +13,11 @@ if [ ${TRAVIS_OS_NAME} == "linux" ]; then
     mason install mesa 10.4.3
 fi
 
-mapbox_time $NODE_EXE \
-mason install $NODE_EXE $NODE_VERSION
+mapbox_time "install_nvm" \
+curl -o- https://raw.githubusercontent.com/creationix/nvm/v0.26.1/install.sh | bash
 
-export PATH="`mason prefix $NODE_EXE $NODE_VERSION`/bin":"$PATH"
+mapbox_time $NODE_VERSION \
+nvm install $NODE_VERSION
 
-$NODE_EXE --version
+node --version
 npm --version
