@@ -7,8 +7,7 @@ var mbgl = require('../..');
 var fs = require('fs');
 var path = require('path');
 
-var suitePath = path.dirname(require.resolve('mapbox-gl-test-suite/package.json'));
-
+var suitePath = path.join(__dirname, '../../../test/suite');
 
 function renderTest(style, info, dir, key) {
     return function (t) {
