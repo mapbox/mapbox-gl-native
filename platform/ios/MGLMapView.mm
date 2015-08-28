@@ -280,7 +280,7 @@ std::chrono::steady_clock::duration secondsAsDuration(float duration)
     [self addSubview:_attributionButton];
     _attributionButtonConstraints = [NSMutableArray array];
     
-    _attributionSheet = [[UIActionSheet alloc] initWithTitle:@"Mapbox for iOS"
+    _attributionSheet = [[UIActionSheet alloc] initWithTitle:@"Mapbox iOS SDK"
                                                     delegate:self
                                            cancelButtonTitle:@"Cancel"
                                       destructiveButtonTitle:nil
