@@ -11,6 +11,9 @@ BUILDTYPE=${BUILDTYPE:-Release}
 # Build
 ################################################################################
 
+. ~/.nvm/nvm.sh
+nvm use $NODE_VERSION
+
 mapbox_time "checkout_styles" \
 git submodule update --init styles
 
