@@ -7,7 +7,7 @@ var mbgl = require('../..');
 var fs = require('fs');
 var path = require('path');
 
-var suitePath = path.join(__dirname, '../../../test/suite');
+var suitePath = path.join(__dirname, '../../../../test/suite');
 
 function renderTest(style, info, dir, key) {
     return function (t) {
