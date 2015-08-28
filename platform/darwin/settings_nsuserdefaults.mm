@@ -30,7 +30,7 @@ void Settings_NSUserDefaults::load()
     pitch     = [settings[@"pitch"]     doubleValue];
     debug     = [settings[@"debug"]     boolValue];
     
-    unsigned uncheckedTrackingMode = [settings[@"trackingMode"] unsignedIntValue];
+    unsigned uncheckedTrackingMode = [settings[@"userTrackingMode"] unsignedIntValue];
     if (uncheckedTrackingMode > MGLUserTrackingModeNone &&
         uncheckedTrackingMode <= MGLUserTrackingModeFollowWithCourse)
     {
