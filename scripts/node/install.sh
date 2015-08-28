@@ -13,8 +13,11 @@ if [ ${TRAVIS_OS_NAME} == "linux" ]; then
     mason install mesa 10.4.3
 fi
 
-git clone git@github.com:creationix/nvm.git ~/.nvm
-pushd ~/.nvm && git checkout `git describe --abbrev=0 --tags` && popd
+if [ ! -d ~/.nvm ]; then
+    git clone https://github.com/creationix/nvm.git ~/.nvm
+fi
+
+pushd ~/.nvm && git fetch && git checkout `git describe --abbrev=0 --tags` && popd
 source ~/.nvm/nvm.sh
 
 mapbox_time $NODE_VERSION \
