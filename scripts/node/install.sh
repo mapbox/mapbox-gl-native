@@ -17,6 +17,7 @@ fi
 
 mapbox_time "install_$NODE_VERSION" \
 nvm install $NODE_VERSION
+nvm alias default $NODE_VERSION
 
 node --version
 npm --version
