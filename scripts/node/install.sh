@@ -15,7 +15,7 @@ fi
 
 . ~/.nvm/nvm.sh
 
-mapbox_time "install_$NODE_VERSION" \
+mapbox_time $NODE_VERSION \
 nvm install $NODE_VERSION
 nvm alias default $NODE_VERSION
 
