@@ -1,7 +1,8 @@
 package com.mapbox.mapboxgl.annotations;
 
+import android.graphics.Point;
 import com.mapbox.mapboxgl.geometry.LatLng;
-
+import com.mapbox.mapboxgl.views.R;
 
 public class Marker extends Annotation {
 
@@ -16,10 +17,16 @@ public class Marker extends Annotation {
     String snippet;
     String sprite = "default_marker";
     String title;
+    private InfoWindow infoWindow = null;
 
     private boolean infoWindowShown = false;
 
-    public Marker() {}
+    /**
+     * Constructor
+     */
+    public Marker() {
+        super();
+    }
 
     /**
      * If two markers have the same LatLng, they are equal.
@@ -39,6 +46,10 @@ public class Marker extends Annotation {
 
     public float getAlpha() {
         return alpha;
+    }
+
+    public Point getAnchor() {
+        return new Point((int)anchorU, (int)anchorV);
     }
 
     public float getAnchorU() {
@@ -66,7 +77,7 @@ public class Marker extends Annotation {
     }
 
     public void hideInfoWindow() {
-        //TODO hideInfoWindow
+        infoWindow.close();
         infoWindowShown = false;
     }
 
@@ -82,33 +93,33 @@ public class Marker extends Annotation {
         return infoWindowShown;
     }
 
-    void setAnchor(float u, float v) {
+    public void setAnchor(float u, float v) {
         this.anchorU = u;
         this.anchorV = v;
     }
 
-    void setDraggable(boolean draggable) {
+    public void setDraggable(boolean draggable) {
         this.draggable = draggable;
     }
 
-    void setFlat(boolean flat) {
+    public void setFlat(boolean flat) {
         this.flat = flat;
     }
 
-    void setInfoWindowAnchor(float u, float v) {
+    public void setInfoWindowAnchor(float u, float v) {
         infoWindowAnchorU = u;
         infoWindowAnchorV = v;
     }
 
-    void setPosition(LatLng latlng) {
+    public void setPosition(LatLng latlng) {
         this.position = position;
     }
 
-    void setRotation(float rotation) {
+    public void setRotation(float rotation) {
         this.rotation = rotation;
     }
 
-    void setSnippet(String snippet) {
+    public void setSnippet(String snippet) {
         this.snippet = snippet;
     }
 
@@ -120,18 +131,36 @@ public class Marker extends Annotation {
      *
      * @param sprite
      */
-    void setSprite(String sprite) {
+    public void setSprite(String sprite) {
         this.sprite = sprite;
     }
 
-    void setTitle(String title) {
+    public void setTitle(String title) {
         this.title = title;
     }
 
-    void showInfoWindow() {
+    public void showInfoWindow() {
+
+        if (!isVisible() || mapView == null) {
+            return;
+        }
+
+        if (infoWindow == null) {
+            infoWindow = new InfoWindow(R.layout.infowindow, mapView);
+        }
+
+        infoWindow.open(this, getPosition(), (int)anchorU, (int)anchorV);
+        infoWindow.setBoundMarker(this);
         infoWindowShown = true;
     }
 
+    @Override
+    public void setVisible(boolean visible) {
+        super.setVisible(visible);
+        if (!visible && infoWindowShown) {
+            hideInfoWindow();
+        }
+    }
 
     //  TODO Method in Google Maps Android API
 //    public int hashCode()

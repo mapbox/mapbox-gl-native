@@ -2,7 +2,6 @@ package com.mapbox.mapboxgl.annotations;
 
 import com.mapbox.mapboxgl.views.MapView;
 
-
 public abstract class Annotation {
 
     /**
@@ -11,7 +10,7 @@ public abstract class Annotation {
      * Internal C++ id is stored as unsigned int.
      */
     protected long id = -1; // -1 unless added to a MapView
-    private MapView mapView;
+    protected MapView mapView;
 
     float alpha = 1.0f;
     boolean visible = true;

@@ -1,4 +1,7 @@
 <?xml version="1.0" encoding="utf-8"?>
 <resources>
     <string name="compassContentDescription">Map compass. Click to reset the map rotation to North.</string>
+    <string name="infoWindowTitle">Title</string>
+    <string name="infoWindowDescription">Description</string>
+    <string name="infoWindowAddress">Address</string>
 </resources>
