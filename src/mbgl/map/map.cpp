@@ -385,10 +385,6 @@ bool Map::getDebug() const {
     return data->getDebug();
 }
 
-void Map::setNeedsRepaint() {
-    data->setNeedsRepaint(true);
-}
-
 void Map::setCollisionDebug(bool value) {
     data->setCollisionDebug(value);
     update(Update::Repaint);

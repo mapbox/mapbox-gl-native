@@ -350,7 +350,7 @@ void GLFWView::run() {
             map->renderSync();
             report(1000 * (glfwGetTime() - started));
             if (benchmark) {
-                map->setNeedsRepaint();
+                map->update(mbgl::Update::Repaint);
             }
         }
     }

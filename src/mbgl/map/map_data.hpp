@@ -101,14 +101,6 @@ public:
         defaultTransitionDelay = delay;
     }
 
-    inline bool getNeedsRepaint() const {
-        return needsRepaint;
-    }
-
-    inline void setNeedsRepaint(const bool needsRepaint_) {
-        needsRepaint = needsRepaint_;
-    }
-
     util::exclusive<AnnotationManager> getAnnotationManager() {
         return util::exclusive<AnnotationManager>(
             &annotationManager,
@@ -132,7 +124,6 @@ private:
     std::atomic<Duration> defaultFadeDuration;
     std::atomic<Duration> defaultTransitionDuration;
     std::atomic<Duration> defaultTransitionDelay;
-    std::atomic<bool> needsRepaint;
 
 // TODO: make private
 public:
