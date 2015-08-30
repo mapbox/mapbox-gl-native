@@ -352,7 +352,6 @@ void GLFWView::run() {
             if (benchmark) {
                 map->setNeedsRepaint();
             }
-            map->nudgeTransitions();
         }
     }
 }

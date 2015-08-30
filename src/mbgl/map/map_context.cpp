@@ -256,6 +256,8 @@ void MapContext::update() {
 
     if (!style) {
         updateFlags = Update::Nothing;
+    } else if (data.getNeedsRepaint()) {
+        updateFlags |= Update::Repaint;
     }
 
     if (updateFlags == Update::Nothing || (data.mode == MapMode::Still && !callback)) {
@@ -347,7 +349,12 @@ bool MapContext::renderSync(const TransformState& state, const FrameData& frame)
 
     view.afterRender();
 
-    data.setNeedsRepaint(style->hasTransitions() || painter->needsAnimation());
+    if (style->hasTransitions() || painter->needsAnimation()) {
+        data.setNeedsRepaint(true);
+        asyncUpdate->send();
+    } else {
+        data.setNeedsRepaint(false);
+    }
 
     return isLoaded();
 }

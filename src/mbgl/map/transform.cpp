@@ -386,6 +386,10 @@ void Transform::startTransition(std::function<Update(double)> frame,
     transitionFinishFn = finish;
 }
 
+bool Transform::inTransition() const {
+    return transitionFrameFn != nullptr;
+}
+
 Update Transform::updateTransitions(const TimePoint& now) {
     return transitionFrameFn ? transitionFrameFn(now) : Update::Nothing;
 }

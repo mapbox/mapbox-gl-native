@@ -69,9 +69,6 @@ public:
     // Triggers a synchronous render.
     void renderSync();
 
-    // Nudges transitions one step, possibly notifying of the need for a rerender, if any.
-    void nudgeTransitions();
-
     // Notifies the Map thread that the state has changed and an update might be necessary.
     void update(Update update);
 

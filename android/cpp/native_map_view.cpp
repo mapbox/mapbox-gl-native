@@ -712,7 +712,6 @@ void NativeMapView::onInvalidate() {
         map.setSourceTileCacheSize(cacheSize);
 
         map.renderSync();
-        map.nudgeTransitions();
     }
 }
 

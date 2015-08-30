@@ -55,6 +55,7 @@ void Map::renderSync() {
 
     view.notifyMapChange(MapChangeWillStartRenderingFrame);
 
+    const Update flags = transform->updateTransitions(Clock::now());
     const bool fullyLoaded = context->invokeSync<bool>(
             &MapContext::renderSync, transform->getState(), FrameData { view.getFramebufferSize() });
 
@@ -68,14 +69,12 @@ void Map::renderSync() {
         renderState = RenderState::fully;
         view.notifyMapChange(MapChangeDidFinishRenderingMapFullyRendered);
     }
-}
 
-void Map::nudgeTransitions() {
-    Update flags = transform->updateTransitions(Clock::now());
-    if (data->getNeedsRepaint()) {
-        flags |= Update::Repaint;
+    // Triggers an asynchronous update, that eventually triggers a view
+    // invalidation, causing renderSync to be called again if in transition.
+    if (transform->inTransition()) {
+        update(flags);
     }
-    update(flags);
 }
 
 void Map::update(Update flags) {

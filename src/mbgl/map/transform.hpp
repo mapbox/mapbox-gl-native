@@ -46,6 +46,7 @@ public:
     double getPitch() const;
 
     // Transitions
+    bool inTransition() const;
     Update updateTransitions(const TimePoint& now);
     void cancelTransitions();
 

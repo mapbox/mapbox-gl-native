@@ -724,8 +724,6 @@ std::chrono::steady_clock::duration secondsAsDuration(float duration)
         _mbglMap->renderSync();
 
         [self updateUserLocationAnnotationView];
-
-        _mbglMap->nudgeTransitions();
     }
 }
 
