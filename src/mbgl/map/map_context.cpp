@@ -34,14 +34,15 @@ MapContext::MapContext(View& view_, FileSource& fileSource, MapData& data_)
     : view(view_),
       data(data_),
       asyncUpdate(std::make_unique<uv::async>(util::RunLoop::getLoop(), [this] { update(); })),
-      texturePool(std::make_unique<TexturePool>()),
-      viewInvalidated(false) {
+      asyncInvalidate(std::make_unique<uv::async>(util::RunLoop::getLoop(), [&view_] { view_.invalidate(); })),
+      texturePool(std::make_unique<TexturePool>()) {
     assert(util::ThreadContext::currentlyOn(util::ThreadType::Map));
 
     util::ThreadContext::setFileSource(&fileSource);
     util::ThreadContext::setGLObjectStore(&glObjectStore);
 
     asyncUpdate->unref();
+    asyncInvalidate->unref();
 
     view.activate();
 }
@@ -74,8 +75,6 @@ void MapContext::cleanup() {
 void MapContext::pause() {
     MBGL_CHECK_ERROR(glFinish());
 
-    viewInvalidated = false;
-
     view.deactivate();
 
     std::unique_lock<std::mutex> lockPause(data.mutexPause);
@@ -84,7 +83,7 @@ void MapContext::pause() {
 
     view.activate();
 
-    invalidateView();
+    asyncInvalidate->send();
 }
 
 void MapContext::triggerUpdate(const TransformState& state, const Update flags) {
@@ -276,8 +275,8 @@ void MapContext::update() {
     style->update(transformState, *texturePool);
 
     if (data.mode == MapMode::Continuous) {
-        invalidateView();
-    } else if (callback && isLoaded()) {
+        asyncInvalidate->send();
+    } else if (callback && style->isLoaded()) {
         renderSync(transformState, frameData);
     }
 
@@ -347,7 +346,7 @@ bool MapContext::renderSync(const TransformState& state, const FrameData& frame)
     }
 
     view.afterRender();
-    viewInvalidated = false;
+
     data.setNeedsRepaint(style->hasTransitions() || painter->needsAnimation());
 
     return isLoaded();
@@ -375,7 +374,7 @@ void MapContext::setSourceTileCacheSize(size_t size) {
         for (const auto &source : style->sources) {
             source->setCacheSize(sourceCacheSize);
         }
-        invalidateView();
+        asyncInvalidate->send();
     }
 }
 
@@ -385,7 +384,7 @@ void MapContext::onLowMemory() {
     for (const auto &source : style->sources) {
         source->onLowMemory();
     }
-    invalidateView();
+    asyncInvalidate->send();
 }
 
 void MapContext::setSprite(const std::string& name, std::shared_ptr<const SpriteImage> sprite) {
@@ -412,13 +411,6 @@ void MapContext::onResourceLoadingFailed(std::exception_ptr error) {
     if (data.mode == MapMode::Still && callback) {
         callback(error, nullptr);
         callback = nullptr;
-    }
-}
-
-void MapContext::invalidateView() {
-    if (!viewInvalidated) {
-        viewInvalidated = true;
-        view.invalidate();
     }
 }
 
