@@ -104,7 +104,7 @@ void MapContext::setStyleURL(const std::string& url) {
     styleURL = url;
     styleJSON.clear();
 
-    style = std::make_unique<Style>(data, asyncUpdate->get()->loop);
+    style = std::make_unique<Style>(data);
 
     const size_t pos = styleURL.rfind('/');
     std::string base = "";
@@ -127,7 +127,7 @@ void MapContext::setStyleJSON(const std::string& json, const std::string& base) 
     styleURL.clear();
     styleJSON = json;
 
-    style = std::make_unique<Style>(data, asyncUpdate->get()->loop);
+    style = std::make_unique<Style>(data);
 
     loadStyleJSON(json, base);
 }
