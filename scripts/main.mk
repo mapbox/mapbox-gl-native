@@ -95,7 +95,7 @@ Xcode/__project__: print-env $(SUBMODULES) config/$(HOST_SLUG).gypi
 
 #### Build individual targets ##################################################
 
-NODE_PRE_GYP = $(shell cd platform/node && npm bin)/node-pre-gyp
+NODE_PRE_GYP = $(shell cd platform/node > /dev/null && npm bin)/node-pre-gyp
 node/configure:
 	cd platform/node && $(NODE_PRE_GYP) configure --clang -- \
 	$(GYP_FLAGS) -I../../config/$(HOST_SLUG).gypi \
