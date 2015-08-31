@@ -26,7 +26,6 @@
   ],
   "devDependencies": {
     "aws-sdk": "^2.1.47",
-    "faucet": "0.0.1",
     "mkdirp": "^0.5.1",
     "pngjs": "^0.4.0",
     "request": "^2.61.0",
@@ -35,7 +34,7 @@
   },
   "scripts": {
     "install": "node-pre-gyp install || make node -C ../../",
-    "test": "tape test/js/**/*.test.js | faucet",
+    "test": "tape test/js/**/*.test.js",
     "test-suite": "tape test/render.test.js || true"
   },
   "gypfile": true,

@@ -63,11 +63,11 @@ $(MBGL)/config/%.gypi: $(MBGL) $(MBGL)/configure
 
 .PHONY: test-suite
 test-suite:
-	-@(`npm bin`/tape test/render.test.js | `npm bin`/faucet)
+	-@(`npm bin`/tape test/render.test.js)
 
 .PHONY: test-js
 test-js:
-	@(`npm bin`/tape test/js/**/*.test.js | `npm bin`/faucet)
+	@(`npm bin`/tape test/js/**/*.test.js)
 
 .PHONY: test
 test: test-js test-suite
