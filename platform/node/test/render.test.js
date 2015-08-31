@@ -47,7 +47,7 @@ function renderTest(style, info, base, key) {
                 req.respond(err, { data: data });
             });
         };
-        options.ratio = 1.0;
+        options.ratio = info[key].pixelRatio || 1;
 
         var map = new mbgl.Map(options);
         map.load(style);
@@ -83,13 +83,20 @@ function renderTest(style, info, base, key) {
                         compare(actual, expected, diff, t, function(err, diff) {
                             t.error(err);
 
-                            var allowed = ('diff' in info) ? info.diff : 0.001;
-                            var color = diff <= allowed ? 'green' : 'red';
+                            var allowed = 0.001;
+
+                            if ('diff' in info[key]) {
+                                if (typeof info[key].diff === 'number') {
+                                    allowed = info[key].diff;
+                                } else if ('native' in info[key].diff) {
+                                    allowed = info[key].diff.native;
+                                }
+                            }
 
                             results += format(resultTemplate, {
                                 name: base,
                                 key: key,
-                                color: color,
+                                color: diff <= allowed ? 'green' : 'red',
                                 error: err ? '<p>' + err + '</p>' : '',
                                 difference: diff,
                                 zoom: info.zoom || 0,
@@ -99,7 +106,10 @@ function renderTest(style, info, base, key) {
                                 height: info.height || 512
                             });
 
-                            t.ok(diff <= allowed, 'actual matches expected');
+                            if (!info[key].ignored || !('native' in info[key].ignored)) {
+                                t.ok(diff <= allowed, 'expected ' + diff + ' to be less than ' + allowed);
+                            }
+
                             t.end();
                         });
                 });
