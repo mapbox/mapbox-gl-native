@@ -35,7 +35,7 @@
   "scripts": {
     "install": "node-pre-gyp install || make node -C ../../",
     "test": "tape test/js/**/*.test.js",
-    "test-suite": "tape test/render.test.js || true"
+    "test-suite": "tape test/render.test.js"
   },
   "gypfile": true,
   "binary": {
