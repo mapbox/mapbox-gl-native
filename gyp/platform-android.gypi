@@ -12,6 +12,7 @@
       'sources': [
         '../platform/android/log_android.cpp',
         '../platform/android/asset_root.cpp',
+        '../platform/default/async_task.cpp',
         '../platform/default/thread.cpp',
         '../platform/default/string_stdlib.cpp',
         '../platform/default/image.cpp',

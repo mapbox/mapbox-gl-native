@@ -10,6 +10,7 @@
       ],
 
       'sources': [
+        '../platform/default/async_task.cpp',
         '../platform/default/log_stderr.cpp',
         '../platform/default/string_stdlib.cpp',
         '../platform/default/application_root.cpp',
