@@ -4,6 +4,7 @@
 
 #include <mbgl/storage/default_file_source.hpp>
 #include <mbgl/storage/sqlite_cache.hpp>
+#include <mbgl/util/run_loop.hpp>
 
 TEST_F(Storage, CacheResponse) {
     SCOPED_TEST(CacheResponse);
@@ -12,12 +13,16 @@ TEST_F(Storage, CacheResponse) {
 
     SQLiteCache cache(":memory:");
     DefaultFileSource fs(&cache);
+    util::RunLoop loop(uv_default_loop());
 
     const Resource resource { Resource::Unknown, "http://127.0.0.1:3000/cache" };
     Response response;
 
-    Request* req = fs.request(resource, uv_default_loop(), [&](const Response &res) {
-        fs.cancel(req);
+    Request* req1 = nullptr;
+    Request* req2 = nullptr;
+
+    req1 = fs.request(resource, [&](const Response &res) {
+        fs.cancel(req1);
         EXPECT_EQ(nullptr, res.error);
         EXPECT_EQ(false, res.stale);
         ASSERT_TRUE(res.data.get());
@@ -26,23 +31,22 @@ TEST_F(Storage, CacheResponse) {
         EXPECT_EQ(0, res.modified);
         EXPECT_EQ("", res.etag);
         response = res;
-    });
 
-    uv_run(uv_default_loop(), UV_RUN_DEFAULT);
+        // Now test that we get the same values as in the previous request. If we'd go to the server
+        // again, we'd get different values.
+        req2 = fs.request(resource, [&](const Response &res2) {
+            fs.cancel(req2);
+            EXPECT_EQ(response.error, res2.error);
+            EXPECT_EQ(response.stale, res2.stale);
+            ASSERT_TRUE(res2.data.get());
+            EXPECT_EQ(*response.data, *res2.data);
+            EXPECT_EQ(response.expires, res2.expires);
+            EXPECT_EQ(response.modified, res2.modified);
+            EXPECT_EQ(response.etag, res2.etag);
 
-    // Now test that we get the same values as in the previous request. If we'd go to the server
-    // again, we'd get different values.
-    req = fs.request(resource, uv_default_loop(), [&](const Response &res) {
-        fs.cancel(req);
-        EXPECT_EQ(response.error, res.error);
-        EXPECT_EQ(response.stale, res.stale);
-        ASSERT_TRUE(res.data.get());
-        EXPECT_EQ(*response.data, *res.data);
-        EXPECT_EQ(response.expires, res.expires);
-        EXPECT_EQ(response.modified, res.modified);
-        EXPECT_EQ(response.etag, res.etag);
-
-        CacheResponse.finish();
+            loop.stop();
+            CacheResponse.finish();
+        });
     });
 
     uv_run(uv_default_loop(), UV_RUN_DEFAULT);

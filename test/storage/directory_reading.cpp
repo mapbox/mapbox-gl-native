@@ -3,6 +3,7 @@
 #include <uv.h>
 
 #include <mbgl/storage/default_file_source.hpp>
+#include <mbgl/util/run_loop.hpp>
 
 TEST_F(Storage, AssetReadDirectory) {
     SCOPED_TEST(ReadDirectory)
@@ -15,7 +16,9 @@ TEST_F(Storage, AssetReadDirectory) {
     DefaultFileSource fs(nullptr);
 #endif
 
-    Request* req = fs.request({ Resource::Unknown, "asset://TEST_DATA/fixtures/storage" }, uv_default_loop(),
+    util::RunLoop loop(uv_default_loop());
+
+    Request* req = fs.request({ Resource::Unknown, "asset://TEST_DATA/fixtures/storage" },
                [&](const Response &res) {
         fs.cancel(req);
         ASSERT_NE(nullptr, res.error);
@@ -30,6 +33,8 @@ TEST_F(Storage, AssetReadDirectory) {
 #elif MBGL_ASSET_FS
         EXPECT_EQ("illegal operation on a directory", res.error->message);
 #endif
+
+        loop.stop();
         ReadDirectory.finish();
     });
 

@@ -4,6 +4,7 @@
 
 #include <mbgl/storage/default_file_source.hpp>
 #include <mbgl/storage/sqlite_cache.hpp>
+#include <mbgl/util/run_loop.hpp>
 
 // Test for https://github.com/mapbox/mapbox-gl-native/issue/1369
 //
@@ -23,14 +24,15 @@ TEST_F(Storage, HTTPIssue1369) {
 
     SQLiteCache cache;
     DefaultFileSource fs(&cache);
+    util::RunLoop loop(uv_default_loop());
 
     const Resource resource { Resource::Unknown, "http://127.0.0.1:3000/test" };
 
-    auto req = fs.request(resource, uv_default_loop(), [&](const Response&) {
+    auto req = fs.request(resource, [&](const Response&) {
         ADD_FAILURE() << "Callback should not be called";
     });
     fs.cancel(req);
-    req = fs.request(resource, uv_default_loop(), [&](const Response &res) {
+    req = fs.request(resource, [&](const Response &res) {
         fs.cancel(req);
         EXPECT_EQ(nullptr, res.error);
         EXPECT_EQ(false, res.stale);
@@ -39,6 +41,7 @@ TEST_F(Storage, HTTPIssue1369) {
         EXPECT_EQ(0, res.expires);
         EXPECT_EQ(0, res.modified);
         EXPECT_EQ("", res.etag);
+        loop.stop();
         HTTPIssue1369.finish();
     });
 

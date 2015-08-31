@@ -47,7 +47,7 @@ public:
     void setOnRequestDelayedCallback(std::function<void(void)> callback);
 
     // FileSource implementation.
-    Request* request(const Resource&, uv_loop_t*, Callback) override;
+    Request* request(const Resource&, Callback) override;
     void cancel(Request*) override;
 
 private:

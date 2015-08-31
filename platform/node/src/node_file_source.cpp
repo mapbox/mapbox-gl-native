@@ -3,6 +3,7 @@
 #include "util/async_queue.hpp"
 
 #include <mbgl/storage/request.hpp>
+#include <mbgl/util/run_loop.hpp>
 
 namespace node_mbgl {
 
@@ -33,8 +34,8 @@ NodeFileSource::~NodeFileSource() {
     options.Reset();
 }
 
-mbgl::Request* NodeFileSource::request(const mbgl::Resource& resource, uv_loop_t* loop, Callback callback) {
-    auto req = new mbgl::Request(resource, loop, std::move(callback));
+mbgl::Request* NodeFileSource::request(const mbgl::Resource& resource, Callback callback) {
+    auto req = new mbgl::Request(resource, mbgl::util::RunLoop::getLoop(), std::move(callback));
 
     std::lock_guard<std::mutex> lock(observersMutex);
 

@@ -19,7 +19,7 @@ public:
     std::string getAccessToken() const { return accessToken; }
 
     // FileSource API
-    Request* request(const Resource&, uv_loop_t*, Callback) override;
+    Request* request(const Resource&, Callback) override;
     void cancel(Request*) override;
 
 public:

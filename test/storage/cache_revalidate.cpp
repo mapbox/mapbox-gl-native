@@ -4,6 +4,7 @@
 
 #include <mbgl/storage/default_file_source.hpp>
 #include <mbgl/storage/sqlite_cache.hpp>
+#include <mbgl/util/run_loop.hpp>
 
 TEST_F(Storage, CacheRevalidateSame) {
     SCOPED_TEST(CacheRevalidateSame)
@@ -12,11 +13,12 @@ TEST_F(Storage, CacheRevalidateSame) {
 
     SQLiteCache cache(":memory:");
     DefaultFileSource fs(&cache);
+    util::RunLoop loop(uv_default_loop());
 
     const Resource revalidateSame { Resource::Unknown, "http://127.0.0.1:3000/revalidate-same" };
     Request* req1 = nullptr;
     Request* req2 = nullptr;
-    req1 = fs.request(revalidateSame, uv_default_loop(), [&](const Response &res) {
+    req1 = fs.request(revalidateSame, [&](const Response &res) {
         // This callback can get triggered multiple times. We only care about the first invocation.
         // It will get triggered again when refreshing the req2 (see below).
         static bool first = true;
@@ -33,7 +35,7 @@ TEST_F(Storage, CacheRevalidateSame) {
         EXPECT_EQ(0, res.modified);
         EXPECT_EQ("snowfall", res.etag);
 
-        req2 = fs.request(revalidateSame, uv_default_loop(), [&, res](const Response &res2) {
+        req2 = fs.request(revalidateSame, [&, res](const Response &res2) {
             if (res2.stale) {
                 // Discard stale responses, if any.
                 return;
@@ -58,6 +60,7 @@ TEST_F(Storage, CacheRevalidateSame) {
             // We're not sending the ETag in the 304 reply, but it should still be there.
             EXPECT_EQ("snowfall", res2.etag);
 
+            loop.stop();
             CacheRevalidateSame.finish();
         });
     });
@@ -72,12 +75,13 @@ TEST_F(Storage, CacheRevalidateModified) {
 
     SQLiteCache cache(":memory:");
     DefaultFileSource fs(&cache);
+    util::RunLoop loop(uv_default_loop());
 
     const Resource revalidateModified{ Resource::Unknown,
                                        "http://127.0.0.1:3000/revalidate-modified" };
     Request* req1 = nullptr;
     Request* req2 = nullptr;
-    req1 = fs.request(revalidateModified, uv_default_loop(), [&](const Response& res) {
+    req1 = fs.request(revalidateModified, [&](const Response& res) {
         // This callback can get triggered multiple times. We only care about the first invocation.
         // It will get triggered again when refreshing the req2 (see below).
         static bool first = true;
@@ -94,7 +98,7 @@ TEST_F(Storage, CacheRevalidateModified) {
         EXPECT_EQ(1420070400, res.modified);
         EXPECT_EQ("", res.etag);
 
-        req2 = fs.request(revalidateModified, uv_default_loop(), [&, res](const Response &res2) {
+        req2 = fs.request(revalidateModified, [&, res](const Response &res2) {
             if (res2.stale) {
                 // Discard stale responses, if any.
                 return;
@@ -118,6 +122,7 @@ TEST_F(Storage, CacheRevalidateModified) {
             EXPECT_EQ(1420070400, res2.modified);
             EXPECT_EQ("", res2.etag);
 
+            loop.stop();
             CacheRevalidateModified.finish();
         });
     });
@@ -132,11 +137,12 @@ TEST_F(Storage, CacheRevalidateEtag) {
 
     SQLiteCache cache(":memory:");
     DefaultFileSource fs(&cache);
+    util::RunLoop loop(uv_default_loop());
 
     const Resource revalidateEtag { Resource::Unknown, "http://127.0.0.1:3000/revalidate-etag" };
     Request* req1 = nullptr;
     Request* req2 = nullptr;
-    req1 = fs.request(revalidateEtag, uv_default_loop(), [&](const Response &res) {
+    req1 = fs.request(revalidateEtag, [&](const Response &res) {
         // This callback can get triggered multiple times. We only care about the first invocation.
         // It will get triggered again when refreshing the req2 (see below).
         static bool first = true;
@@ -153,7 +159,7 @@ TEST_F(Storage, CacheRevalidateEtag) {
         EXPECT_EQ(0, res.modified);
         EXPECT_EQ("response-1", res.etag);
 
-        req2 = fs.request(revalidateEtag, uv_default_loop(), [&, res](const Response &res2) {
+        req2 = fs.request(revalidateEtag, [&, res](const Response &res2) {
             if (res2.stale) {
                 // Discard stale responses, if any.
                 return;
@@ -176,6 +182,7 @@ TEST_F(Storage, CacheRevalidateEtag) {
             EXPECT_EQ(0, res2.modified);
             EXPECT_EQ("response-2", res2.etag);
 
+            loop.stop();
             CacheRevalidateEtag.finish();
         });
     });

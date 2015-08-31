@@ -22,7 +22,7 @@ public:
     NodeFileSource(v8::Local<v8::Object>);
     ~NodeFileSource();
 
-    mbgl::Request* request(const mbgl::Resource&, uv_loop_t*, Callback);
+    mbgl::Request* request(const mbgl::Resource&, Callback);
     void cancel(mbgl::Request*);
 
     // visiblity?

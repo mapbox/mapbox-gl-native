@@ -39,9 +39,7 @@ DefaultFileSource::~DefaultFileSource() {
     MBGL_VERIFY_THREAD(tid);
 }
 
-Request* DefaultFileSource::request(const Resource& resource, uv_loop_t* l, Callback callback) {
-    assert(l);
-
+Request* DefaultFileSource::request(const Resource& resource, Callback callback) {
     if (!callback) {
         throw util::MisuseException("FileSource callback can't be empty");
     }
@@ -70,7 +68,7 @@ Request* DefaultFileSource::request(const Resource& resource, uv_loop_t* l, Call
         url = resource.url;
     }
 
-    auto req = new Request({ resource.kind, url }, l, std::move(callback));
+    auto req = new Request({ resource.kind, url }, util::RunLoop::getLoop(), std::move(callback));
     thread->invoke(&Impl::add, req);
     return req;
 }

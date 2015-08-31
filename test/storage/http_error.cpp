@@ -4,26 +4,21 @@
 
 #include <mbgl/storage/default_file_source.hpp>
 #include <mbgl/storage/network_status.hpp>
+#include <mbgl/util/run_loop.hpp>
 
 #include <cmath>
 
-#if UV_VERSION_MAJOR == 0 && UV_VERSION_MINOR <= 10
-#define UV_TIMER_PARAMS uv_timer_t*, int
-#else
-#define UV_TIMER_PARAMS uv_timer_t*
-#endif
-
-TEST_F(Storage, HTTPError) {
+TEST_F(Storage, HTTPTemporaryError) {
     SCOPED_TEST(HTTPTemporaryError)
-    SCOPED_TEST(HTTPConnectionError)
 
     using namespace mbgl;
 
     DefaultFileSource fs(nullptr);
+    util::RunLoop loop(uv_default_loop());
 
     const auto start = uv_hrtime();
 
-    Request* req1 = fs.request({ Resource::Unknown, "http://127.0.0.1:3000/temporary-error" }, uv_default_loop(),
+    Request* req1 = fs.request({ Resource::Unknown, "http://127.0.0.1:3000/temporary-error" },
                [&](const Response &res) {
         static int counter = 0;
         switch (counter++) {
@@ -52,12 +47,26 @@ TEST_F(Storage, HTTPError) {
             EXPECT_EQ(0, res.expires);
             EXPECT_EQ(0, res.modified);
             EXPECT_EQ("", res.etag);
+            loop.stop();
             HTTPTemporaryError.finish();
         } break;
         }
     });
 
-    Request* req2 = fs.request({ Resource::Unknown, "http://127.0.0.1:3001/" }, uv_default_loop(),
+    uv_run(uv_default_loop(), UV_RUN_DEFAULT);
+}
+
+TEST_F(Storage, HTTPConnectionError) {
+    SCOPED_TEST(HTTPConnectionError)
+
+    using namespace mbgl;
+
+    DefaultFileSource fs(nullptr);
+    util::RunLoop loop(uv_default_loop());
+
+    const auto start = uv_hrtime();
+
+    Request* req2 = fs.request({ Resource::Unknown, "http://127.0.0.1:3001/" },
                [&](const Response &res) {
         static int counter = 0;
         static int wait = 0;
@@ -85,6 +94,7 @@ TEST_F(Storage, HTTPError) {
 
         if (counter == 2) {
             fs.cancel(req2);
+            loop.stop();
             HTTPConnectionError.finish();
         }
         wait += (1 << counter);

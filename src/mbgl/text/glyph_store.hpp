@@ -6,7 +6,6 @@
 #include <mbgl/text/glyph_pbf.hpp>
 #include <mbgl/util/exclusive.hpp>
 #include <mbgl/util/noncopyable.hpp>
-#include <mbgl/util/run_loop.hpp>
 #include <mbgl/util/work_queue.hpp>
 
 #include <exception>

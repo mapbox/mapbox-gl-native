@@ -145,8 +145,8 @@ void MockFileSource::setOnRequestDelayedCallback(std::function<void(void)> callb
     thread_->invokeSync(&Impl::setOnRequestDelayedCallback, callback);
 }
 
-Request* MockFileSource::request(const Resource& resource, uv_loop_t* loop, Callback callback) {
-    Request* req = new Request(resource, loop, std::move(callback));
+Request* MockFileSource::request(const Resource& resource, Callback callback) {
+    Request* req = new Request(resource, util::RunLoop::getLoop(), std::move(callback));
     thread_->invoke(&Impl::handleRequest, req);
 
     return req;

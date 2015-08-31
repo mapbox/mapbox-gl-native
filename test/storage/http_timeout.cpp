@@ -4,6 +4,7 @@
 
 #include <mbgl/storage/default_file_source.hpp>
 #include <mbgl/storage/network_status.hpp>
+#include <mbgl/util/run_loop.hpp>
 
 
 TEST_F(Storage, HTTPTimeout) {
@@ -12,11 +13,12 @@ TEST_F(Storage, HTTPTimeout) {
     using namespace mbgl;
 
     DefaultFileSource fs(nullptr);
+    util::RunLoop loop(uv_default_loop());
 
     int counter = 0;
 
     const Resource resource { Resource::Unknown, "http://127.0.0.1:3000/test?cachecontrol=max-age=1" };
-    Request* req = fs.request(resource, uv_default_loop(), [&](const Response &res) {
+    Request* req = fs.request(resource, [&](const Response &res) {
         counter++;
         EXPECT_EQ(nullptr, res.error);
         EXPECT_EQ(false, res.stale);
@@ -27,6 +29,7 @@ TEST_F(Storage, HTTPTimeout) {
         EXPECT_EQ("", res.etag);
         if (counter == 4) {
             fs.cancel(req);
+            loop.stop();
             HTTPTimeout.finish();
         }
     });

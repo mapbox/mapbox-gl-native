@@ -3,6 +3,7 @@
 #include <uv.h>
 
 #include <mbgl/storage/default_file_source.hpp>
+#include <mbgl/util/run_loop.hpp>
 
 TEST_F(Storage, HTTPLoad) {
     SCOPED_TEST(HTTPLoad)
@@ -10,6 +11,7 @@ TEST_F(Storage, HTTPLoad) {
     using namespace mbgl;
 
     DefaultFileSource fs(nullptr);
+    util::RunLoop loop(uv_default_loop());
 
     const int concurrency = 50;
     const int max = 10000;
@@ -21,7 +23,7 @@ TEST_F(Storage, HTTPLoad) {
         const auto current = number++;
         reqs[i] = fs.request({ Resource::Unknown,
                      std::string("http://127.0.0.1:3000/load/") + std::to_string(current) },
-                   uv_default_loop(), [&, i, current](const Response &res) {
+                   [&, i, current](const Response &res) {
             fs.cancel(reqs[i]);
             reqs[i] = nullptr;
             EXPECT_EQ(nullptr, res.error);
@@ -35,6 +37,7 @@ TEST_F(Storage, HTTPLoad) {
             if (number <= max) {
                 req(i);
             } else if (current == max) {
+                loop.stop();
                 HTTPLoad.finish();
             }
         });

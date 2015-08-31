@@ -3,6 +3,7 @@
 #include <uv.h>
 
 #include <mbgl/storage/default_file_source.hpp>
+#include <mbgl/util/run_loop.hpp>
 
 TEST_F(Storage, HTTPCoalescing) {
     SCOPED_TEST(HTTPCoalescing)
@@ -13,6 +14,7 @@ TEST_F(Storage, HTTPCoalescing) {
     using namespace mbgl;
 
     DefaultFileSource fs(nullptr);
+    util::RunLoop loop(uv_default_loop());
 
     static const Response *reference = nullptr;
 
@@ -34,6 +36,7 @@ TEST_F(Storage, HTTPCoalescing) {
         EXPECT_EQ("", res.etag);
 
         if (counter >= total) {
+            loop.stop();
             HTTPCoalescing.finish();
         }
     };
@@ -42,7 +45,7 @@ TEST_F(Storage, HTTPCoalescing) {
 
     Request* reqs[total];
     for (int i = 0; i < total; i++) {
-        reqs[i] = fs.request(resource, uv_default_loop(), [&complete, &fs, &reqs, i] (const Response &res) {
+        reqs[i] = fs.request(resource, [&complete, &fs, &reqs, i] (const Response &res) {
             fs.cancel(reqs[i]);
             complete(res);
         });
@@ -57,13 +60,14 @@ TEST_F(Storage, HTTPMultiple) {
     using namespace mbgl;
 
     DefaultFileSource fs(nullptr);
+    util::RunLoop loop(uv_default_loop());
 
     const Response *reference = nullptr;
 
     const Resource resource { Resource::Unknown, "http://127.0.0.1:3000/test?expires=2147483647" };
     Request* req1 = nullptr;
     Request* req2 = nullptr;
-    req1 = fs.request(resource, uv_default_loop(), [&] (const Response &res) {
+    req1 = fs.request(resource, [&] (const Response &res) {
         EXPECT_EQ(nullptr, reference);
         reference = &res;
 
@@ -76,7 +80,7 @@ TEST_F(Storage, HTTPMultiple) {
         EXPECT_EQ("", res.etag);
 
         // Start a second request for the same resource after the first one has been completed.
-        req2 = fs.request(resource, uv_default_loop(), [&] (const Response &res2) {
+        req2 = fs.request(resource, [&] (const Response &res2) {
             // Make sure we get the same object ID as before.
             EXPECT_EQ(reference, &res2);
 
@@ -91,6 +95,7 @@ TEST_F(Storage, HTTPMultiple) {
             EXPECT_EQ(0, res2.modified);
             EXPECT_EQ("", res2.etag);
 
+            loop.stop();
             HTTPMultiple.finish();
         });
     });
@@ -105,6 +110,7 @@ TEST_F(Storage, HTTPStale) {
     using namespace mbgl;
 
     DefaultFileSource fs(nullptr);
+    util::RunLoop loop(uv_default_loop());
 
     int updates = 0;
     int stale = 0;
@@ -112,7 +118,7 @@ TEST_F(Storage, HTTPStale) {
     const Resource resource { Resource::Unknown, "http://127.0.0.1:3000/test" };
     Request* req1 = nullptr;
     Request* req2 = nullptr;
-    req1 = fs.request(resource, uv_default_loop(), [&] (const Response &res) {
+    req1 = fs.request(resource, [&] (const Response &res) {
         // Do not cancel the request right away.
         EXPECT_EQ(nullptr, res.error);
         ASSERT_TRUE(res.data.get());
@@ -130,7 +136,7 @@ TEST_F(Storage, HTTPStale) {
         updates++;
 
         // Start a second request for the same resource after the first one has been completed.
-        req2 = fs.request(resource, uv_default_loop(), [&] (const Response &res2) {
+        req2 = fs.request(resource, [&] (const Response &res2) {
             EXPECT_EQ(nullptr, res2.error);
             ASSERT_TRUE(res2.data.get());
             EXPECT_EQ("Hello World!", *res2.data);
@@ -145,6 +151,7 @@ TEST_F(Storage, HTTPStale) {
                 // Now cancel both requests after both have been notified.
                 fs.cancel(req1);
                 fs.cancel(req2);
+                loop.stop();
                 HTTPStale.finish();
             }
         });
