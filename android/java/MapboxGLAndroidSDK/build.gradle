@@ -65,9 +65,8 @@ android {
         }
 
         release {
-            minifyEnabled false
             jniDebuggable false
-            proguardFiles getDefaultProguardFile('proguard-android.txt'), 'proguard-rules.txt'
+            consumerProguardFiles 'proguard-rules.pro'
         }
     }
 }

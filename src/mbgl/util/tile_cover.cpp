@@ -1,6 +1,7 @@
 #include <mbgl/util/tile_cover.hpp>
 #include <mbgl/util/vec.hpp>
 #include <mbgl/util/box.hpp>
+#include <mbgl/util/tile_coordinate.hpp>
 
 namespace mbgl {
 
@@ -78,13 +79,19 @@ std::forward_list<TileID> tileCover(int8_t z, const mbgl::box &bounds, int8_t ac
         }
     };
 
+    mbgl::vec2<double> tl = { bounds.tl.column, bounds.tl.row };
+    mbgl::vec2<double> tr = { bounds.tr.column, bounds.tr.row };
+    mbgl::vec2<double> br = { bounds.br.column, bounds.br.row };
+    mbgl::vec2<double> bl = { bounds.bl.column, bounds.bl.row };
+
     // Divide the screen up in two triangles and scan each of them:
     // \---+
     // | \ |
     // +---\.
-    scanTriangle(bounds.tl, bounds.tr, bounds.br, 0, tiles, scanLine);
-    scanTriangle(bounds.br, bounds.bl, bounds.tl, 0, tiles, scanLine);
+    scanTriangle(tl, tr, br, 0, tiles, scanLine);
+    scanTriangle(br, bl, tl, 0, tiles, scanLine);
 
+    t.sort();
     t.unique();
 
     return t;

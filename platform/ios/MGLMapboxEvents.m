@@ -45,6 +45,7 @@ NSString *const MGLEventGestureQuickZoom = @"QuickZoom";
 NSString *const MGLEventGesturePanStart = @"Pan";
 NSString *const MGLEventGesturePinchStart = @"Pinch";
 NSString *const MGLEventGestureRotateStart = @"Rotation";
+NSString *const MGLEventGesturePitchStart = @"Pitch";
 
 const NSUInteger MGLMaximumEventsPerFlush = 20;
 const NSTimeInterval MGLFlushInterval = 60;

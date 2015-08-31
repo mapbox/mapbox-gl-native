@@ -40,7 +40,7 @@ void Painter::renderCircle(CircleBucket& bucket,
     useProgram(circleShader->program);
 
     circleShader->u_matrix = vtxMatrix;
-    circleShader->u_exmatrix = projMatrix;
+    circleShader->u_exmatrix = extrudeMatrix;
     circleShader->u_color = color;
     circleShader->u_blur = std::max(properties.blur, antialiasing);
     circleShader->u_size = properties.radius;

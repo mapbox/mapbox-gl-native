@@ -50,6 +50,7 @@ import com.mapbox.mapboxgl.annotations.Polygon;
 import com.mapbox.mapboxgl.annotations.PolygonOptions;
 import com.mapbox.mapboxgl.annotations.Polyline;
 import com.mapbox.mapboxgl.annotations.PolylineOptions;
+import com.mapbox.mapboxgl.geometry.BoundingBox;
 import com.mapbox.mapboxgl.geometry.LatLng;
 import com.mapbox.mapboxgl.geometry.LatLngZoom;
 import com.mapzen.android.lost.api.LocationListener;
@@ -158,6 +159,25 @@ public class MapView extends FrameLayout implements LocationListener {
 
     // Used to manage Event Listeners
     private ArrayList<OnMapChangedListener> mOnMapChangedListener;
+
+    public interface OnFlingListener {
+        void onFling();
+    }
+
+    public interface OnScrollListener {
+        void onScroll();
+    }
+
+    private OnFlingListener onFlingListener;
+    private OnScrollListener onScrollListener;
+
+    public void setOnScrollListener(OnScrollListener onScrollListener) {
+        this.onScrollListener = onScrollListener;
+    }
+
+    public void setOnFlingListener(OnFlingListener onFlingListener) {
+        this.onFlingListener = onFlingListener;
+    }
 
     //
     // Properties
@@ -287,7 +307,7 @@ public class MapView extends FrameLayout implements LocationListener {
         mCompassListener = new CompassListener();
 
         mCompassView = new ImageView(mContext);
-        mCompassView.setImageDrawable(ContextCompat.getDrawable(getContext(), R.drawable.compass));
+        mCompassView.setImageDrawable(ContextCompat.getDrawable(getContext(), R.drawable.compass_custom_flat));
         mCompassView.setContentDescription(getResources().getString(R.string.compassContentDescription));
         LayoutParams lp = new FrameLayout.LayoutParams((int)(48 * mScreenDensity), (int)(48 * mScreenDensity));
         lp.gravity = Gravity.TOP | Gravity.END;
@@ -426,6 +446,25 @@ public class MapView extends FrameLayout implements LocationListener {
 
     public List<Annotation> getAnnotations() {
         return Collections.unmodifiableList(mAnnotations);
+    }
+
+    public List<Annotation> getAnnotationsInBounds(BoundingBox bbox) {
+        List<Annotation> annotations = new ArrayList<>();
+        long[] ids = mNativeMapView.getAnnotationsInBounds(bbox);
+        List<Long> idsList = new ArrayList<>();
+        for(int i = 0; i < ids.length; i++) {
+            idsList.add(new Long(ids[i]));
+        }
+        for(int i = 0; i < mAnnotations.size(); i++) {
+            Annotation annotation = mAnnotations.get(i);
+            if (annotation instanceof Marker && idsList.contains(annotation.getId())) {
+                annotations.add(annotation);
+            }
+        }
+        for(int i = 0; i < annotations.size(); i++) {
+            Log.d(TAG, "tapped: " + Long.toString(annotations.get(i).getId()));
+        }
+        return annotations;
     }
 
     //
@@ -919,6 +958,24 @@ public class MapView extends FrameLayout implements LocationListener {
             // Cancel any animation
             mNativeMapView.cancelTransitions();
 
+            // Select or deselect point annotations
+            PointF tapPoint = new PointF(e.getX(), e.getY());
+
+            float toleranceWidth = 60 * mScreenDensity;
+            float toleranceHeight = 80 * mScreenDensity;
+
+            PointF tr = new PointF(tapPoint.x + toleranceWidth / 2, tapPoint.y + 2 * toleranceHeight / 3);
+            PointF bl = new PointF(tapPoint.x - toleranceWidth / 2, tapPoint.y - 1 * toleranceHeight / 3);
+
+            LatLng sw = fromScreenLocation(bl);
+            LatLng ne = fromScreenLocation(tr);
+
+            BoundingBox bbox = new BoundingBox(ne, sw);
+
+            List<Annotation> annotations = getAnnotationsInBounds(bbox);
+
+            performClick();
+
             return true;
         }
 
@@ -932,6 +989,7 @@ public class MapView extends FrameLayout implements LocationListener {
         @Override
         public void onLongPress(MotionEvent e) {
             // TODO
+            performLongClick();
         }
 
         // Called for flings
@@ -959,6 +1017,10 @@ public class MapView extends FrameLayout implements LocationListener {
 
             mNativeMapView.moveBy(velocityX * duration / 2.0 / mScreenDensity, velocityY * duration / 2.0 / mScreenDensity, (long) (duration * 1000.0f));
 
+            if(onFlingListener != null){
+                onFlingListener.onFling();
+            }
+
             return true;
         }
 
@@ -976,6 +1038,11 @@ public class MapView extends FrameLayout implements LocationListener {
 
             // Scroll the map
             mNativeMapView.moveBy(-distanceX / mScreenDensity, -distanceY / mScreenDensity);
+
+            if(onScrollListener != null){
+                onScrollListener.onScroll();
+            }
+
             return true;
         }
     }

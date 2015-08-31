@@ -132,13 +132,11 @@ void Painter::lineWidth(float line_width) {
 }
 
 void Painter::changeMatrix() {
-    // Initialize projection matrix
-    matrix::ortho(projMatrix, 0, state.getWidth(), state.getHeight(), 0, -1, 1);
+
+    state.getProjMatrix(projMatrix);
 
     // The extrusion matrix.
-    matrix::identity(extrudeMatrix);
-    matrix::multiply(extrudeMatrix, projMatrix, extrudeMatrix);
-    matrix::rotate_z(extrudeMatrix, extrudeMatrix, state.getAngle());
+    matrix::ortho(extrudeMatrix, 0, state.getWidth(), state.getHeight(), 0, 0, -1);
 
     // The native matrix is a 1:1 matrix that paints the coordinates at the
     // same screen position as the vertex specifies.
@@ -154,10 +152,6 @@ void Painter::clear() {
     config.depthMask = GL_TRUE;
     config.clearColor = { background[0], background[1], background[2], background[3] };
     MBGL_CHECK_ERROR(glClear(GL_COLOR_BUFFER_BIT | GL_STENCIL_BUFFER_BIT | GL_DEPTH_BUFFER_BIT));
-}
-
-void Painter::setStrata(float value) {
-    strata = value;
 }
 
 void Painter::prepareTile(const Tile& tile) {
@@ -184,6 +178,9 @@ void Painter::render(const Style& style, TransformState state_, const FrameData&
     resize();
     changeMatrix();
 
+    // Figure out what buckets we have to draw and what order we have to draw them in.
+    const auto order = determineRenderOrder(style);
+
     // - UPLOAD PASS -------------------------------------------------------------------------------
     // Uploads all required buffers and images before we do any actual rendering.
     {
@@ -201,6 +198,7 @@ void Painter::render(const Style& style, TransformState state_, const FrameData&
             }
         }
     }
+
 
     // - CLIPPING MASKS ----------------------------------------------------------------------------
     // Draws the clipping masks to the stencil buffer.
@@ -225,19 +223,19 @@ void Painter::render(const Style& style, TransformState state_, const FrameData&
     if (debug::renderTree) { Log::Info(Event::Render, "{"); indent++; }
 
     // TODO: Correctly compute the number of layers recursively beforehand.
-    const float strataThickness = 1.0f / (order.size() + 1);
+    depthRangeSize = 1 - (order.size() + 2) * numSublayers * depthEpsilon;
 
     // - OPAQUE PASS -------------------------------------------------------------------------------
     // Render everything top-to-bottom by using reverse iterators. Render opaque objects first.
     renderPass(RenderPass::Opaque,
                order.rbegin(), order.rend(),
-               0, 1, strataThickness);
+               0, 1);
 
     // - TRANSLUCENT PASS --------------------------------------------------------------------------
     // Make a second pass, rendering translucent objects. This time, we render bottom-to-top.
     renderPass(RenderPass::Translucent,
                order.begin(), order.end(),
-               order.size() - 1, -1, strataThickness);
+               order.size() - 1, -1);
 
     if (debug::renderTree) { Log::Info(Event::Render, "}"); indent--; }
 
@@ -268,11 +266,8 @@ void Painter::render(const Style& style, TransformState state_, const FrameData&
 template <class Iterator>
 void Painter::renderPass(RenderPass pass_,
                          Iterator it, Iterator end,
-                         std::size_t i, int8_t increment,
-                         const float strataThickness) {
+                         std::size_t i, int8_t increment) {
     pass = pass_;
-
-    const double zoom = state.getZoom();
 
     MBGL_DEBUG_GROUP(pass == RenderPass::Opaque ? "opaque" : "translucent");
 
@@ -284,24 +279,16 @@ void Painter::renderPass(RenderPass pass_,
     config.blend = pass == RenderPass::Translucent;
 
     for (; it != end; ++it, i += increment) {
+        currentLayer = i;
         const auto& item = *it;
         if (item.bucket && item.tile) {
-            // Skip this layer if it's outside the range of min/maxzoom.
-            // This may occur when there /is/ a bucket created for this layer, but the min/max-zoom
-            // is set to a fractional value, or value that is larger than the source maxzoom.
-            if (item.layer.bucket->min_zoom > zoom ||
-                item.layer.bucket->max_zoom <= zoom) {
-                continue;
-            }
             if (item.layer.hasRenderPass(pass)) {
                 MBGL_DEBUG_GROUP(item.layer.id + " - " + std::string(item.tile->id));
-                setStrata(i * strataThickness);
                 prepareTile(*item.tile);
                 item.bucket->render(*this, item.layer, item.tile->id, item.tile->matrix);
             }
         } else {
             MBGL_DEBUG_GROUP("background");
-            setStrata(i * strataThickness);
             renderBackground(item.layer);
         }
     }
@@ -311,8 +298,8 @@ void Painter::renderPass(RenderPass pass_,
     }
 }
 
-void Painter::updateRenderOrder(const Style& style) {
-    order.clear();
+std::vector<RenderItem> Painter::determineRenderOrder(const Style& style) {
+    std::vector<RenderItem> order;
 
     for (const auto& layerPtr : style.layers) {
         const auto& layer = *layerPtr;
@@ -349,6 +336,15 @@ void Painter::updateRenderOrder(const Style& style) {
             continue;
         }
 
+        // Skip this layer if it's outside the range of min/maxzoom.
+        // This may occur when there /is/ a bucket created for this layer, but the min/max-zoom
+        // is set to a fractional value, or value that is larger than the source maxzoom.
+        const double zoom = state.getZoom();
+        if (layer.bucket->min_zoom > zoom ||
+            layer.bucket->max_zoom <= zoom) {
+            continue;
+        }
+
         const auto& tiles = source->getTiles();
         for (auto tile : tiles) {
             assert(tile);
@@ -362,6 +358,8 @@ void Painter::updateRenderOrder(const Style& style) {
             }
         }
     }
+
+    return order;
 }
 
 void Painter::renderBackground(const StyleLayer &layer_desc) {
@@ -387,7 +385,7 @@ void Painter::renderBackground(const StyleLayer &layer_desc) {
         patternShader->u_opacity = properties.opacity;
 
         LatLng latLng = state.getLatLng();
-        vec2<double> center = state.pixelForLatLng(latLng);
+        vec2<double> center = state.latLngToPoint(latLng);
         float scale = 1 / std::pow(2, zoomFraction);
 
         std::array<float, 2> sizeA = imagePosA.size;
@@ -428,7 +426,8 @@ void Painter::renderBackground(const StyleLayer &layer_desc) {
 
     config.stencilTest = false;
     config.depthTest = true;
-    config.depthRange = { strata + strata_epsilon, 1.0f };
+    config.depthRange = { 1.0f, 1.0f };
+
     MBGL_CHECK_ERROR(glDrawArrays(GL_TRIANGLE_STRIP, 0, 4));
 }
 
@@ -456,4 +455,10 @@ mat4 Painter::translatedMatrix(const mat4& matrix, const std::array<float, 2> &t
 
         return vtxMatrix;
     }
+}
+
+void Painter::setDepthSublayer(int n) {
+    float nearDepth = ((1 + currentLayer) * numSublayers + n) * depthEpsilon;
+    float farDepth = nearDepth + depthRangeSize;
+    config.depthRange = { nearDepth, farDepth };
 }

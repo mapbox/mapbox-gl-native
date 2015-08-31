@@ -3,13 +3,16 @@ package com.mapbox.mapboxgl.views;
 import android.graphics.PointF;
 import android.view.Surface;
 
+import com.mapbox.mapboxgl.annotations.Annotation;
 import com.mapbox.mapboxgl.annotations.Marker;
 import com.mapbox.mapboxgl.annotations.Polygon;
 import com.mapbox.mapboxgl.annotations.Polyline;
+import com.mapbox.mapboxgl.geometry.BoundingBox;
 import com.mapbox.mapboxgl.geometry.LatLng;
 import com.mapbox.mapboxgl.geometry.LatLngZoom;
 import com.mapbox.mapboxgl.geometry.ProjectedMeters;
 
+import java.util.ArrayList;
 import java.util.List;
 
 // Class that wraps the native methods for convenience
@@ -353,6 +356,10 @@ class NativeMapView {
         nativeRemoveAnnotations(mNativeMapViewPtr, ids);
     }
 
+    public long[] getAnnotationsInBounds(BoundingBox bbox) {
+        return nativeGetAnnotationsInBounds(mNativeMapViewPtr, bbox);
+    }
+
     public void setSprite(String symbol, int width, int height, float scale, byte[] pixels) {
         nativeSetSprite(mNativeMapViewPtr, symbol, width, height, scale, pixels);
     }
@@ -562,6 +569,8 @@ class NativeMapView {
     private native void nativeRemoveAnnotation(long nativeMapViewPtr, long id);
 
     private native void nativeRemoveAnnotations(long nativeMapViewPtr, long[] id);
+
+    private native long[] nativeGetAnnotationsInBounds(long mNativeMapViewPtr, BoundingBox bbox);
 
     private native void nativeSetSprite(long nativeMapViewPtr, String symbol,
                                         int width, int height, float scale, byte[] pixels);

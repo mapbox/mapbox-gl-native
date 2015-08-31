@@ -74,6 +74,13 @@ IB_DESIGNABLE
 *   The default value of this property is `YES`. */
 @property(nonatomic, getter=isRotateEnabled) BOOL rotateEnabled;
 
+/** A Boolean value that determines whether the user may change the pitch (tilt) of the map.
+ *
+ *   This property controls only user interactions with the map. If you set the value of this property to `NO`, you may still change the pitch of the map programmatically.
+ *
+ *   The default value of this property is `YES`. */
+@property(nonatomic, getter=isPitchEnabled) BOOL pitchEnabled;
+
 /** The compass image view shown in the upper-right when the map is rotated. */
 @property (nonatomic, readonly) UIImageView *compassView;
 
@@ -172,6 +179,20 @@ IB_DESIGNABLE
 
 /** Resets the map rotation to a northern heading. */
 - (IBAction)resetNorth;
+
+/** The pitch of the map (measured in degrees).
+ *
+ *   The default value `0` shows a completely flat map. Maximum value is `60`. */
+@property (nonatomic) double pitch;
+
+/** Changes the pitch of the map.
+ *   @param pitch The pitch of the map (measured in degrees) relative to top-down.
+ *
+ *   Changing the pitch tilts the map without changing the current center coordinate or zoom level. */
+- (void)setPitch:(double)pitch;
+
+/** Resets the map pitch to head-on. */
+- (IBAction)resetPitch;
 
 #pragma mark - Converting Map Coordinates
 

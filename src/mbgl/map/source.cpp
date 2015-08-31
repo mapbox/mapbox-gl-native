@@ -9,6 +9,7 @@
 #include <mbgl/storage/response.hpp>
 #include <mbgl/util/math.hpp>
 #include <mbgl/util/box.hpp>
+#include <mbgl/util/tile_coordinate.hpp>
 #include <mbgl/util/mapbox.hpp>
 #include <mbgl/storage/file_source.hpp>
 #include <mbgl/style/style_layer.hpp>
@@ -284,8 +285,8 @@ TileData::State Source::addTile(MapData& data,
 
         // If we don't find working tile data, we're just going to load it.
         if (info.type == SourceType::Vector) {
-            auto tileData = std::make_shared<VectorTileData>(normalized_id, style, info,
-                                                 transformState.getAngle(), data.getCollisionDebug());
+            auto tileData = std::make_shared<VectorTileData>(normalized_id, style, info, 
+                    transformState.getAngle(), transformState.getPitch(), data.getCollisionDebug());
             tileData->request(data.pixelRatio, callback);
             new_tile.data = tileData;
         } else if (info.type == SourceType::Raster) {
@@ -332,14 +333,14 @@ std::forward_list<TileID> Source::coveringTiles(const TransformState& state) con
 
     // Map four viewport corners to pixel coordinates
     box points = state.cornersToBox(z);
-    const vec2<double>& center = points.center;
+    const TileCoordinate center = state.pointToCoordinate({ state.getWidth() / 2.0f, state.getHeight()/ 2.0f }).zoomTo(z);
 
     std::forward_list<TileID> covering_tiles = tileCover(z, points, reparseOverscaled ? actualZ : z);
 
     covering_tiles.sort([&center](const TileID& a, const TileID& b) {
         // Sorts by distance from the box center
-        return std::fabs(a.x - center.x) + std::fabs(a.y - center.y) <
-               std::fabs(b.x - center.x) + std::fabs(b.y - center.y);
+        return std::fabs(a.x - center.column) + std::fabs(a.y - center.row) <
+               std::fabs(b.x - center.column) + std::fabs(b.y - center.row);
     });
 
     return covering_tiles;
@@ -506,7 +507,7 @@ bool Source::update(MapData& data,
     updateTilePtrs();
 
     for (auto& tilePtr : tilePtrs) {
-        tilePtr->data->redoPlacement(transformState.getAngle(), data.getCollisionDebug());
+        tilePtr->data->redoPlacement(transformState.getAngle(), transformState.getPitch(), data.getCollisionDebug());
     }
 
     updated = data.getAnimationTime();
@@ -529,14 +530,9 @@ void Source::invalidateTiles(const std::unordered_set<TileID, TileID::Hash>& ids
 }
 
 void Source::updateTilePtrs() {
-    std::vector<Tile*> newPtrs;
+    tilePtrs.clear();
     for (const auto& pair : tiles) {
-        newPtrs.push_back(pair.second.get());
-    }
-
-    if (tilePtrs != newPtrs) {
-        tilePtrs = newPtrs;
-        emitTileLoaded(true);
+        tilePtrs.push_back(pair.second.get());
     }
 }
 
@@ -568,7 +564,7 @@ void Source::tileLoadingCompleteCallback(const TileID& normalized_id, const Tran
         return;
     }
 
-    data->redoPlacement(transformState.getAngle(), collisionDebug);
+    data->redoPlacement(transformState.getAngle(), transformState.getPitch(), collisionDebug);
     emitTileLoaded(true);
 }
 

@@ -336,7 +336,6 @@ bool MapContext::renderSync(const TransformState& state, const FrameData& frame)
     if (!painter) {
         painter = std::make_unique<Painter>(data);
         painter->setup();
-        painter->updateRenderOrder(*style);
     }
 
     painter->setDebug(data.getDebug());
@@ -402,10 +401,6 @@ void MapContext::setSprite(const std::string& name, std::shared_ptr<const Sprite
 
 void MapContext::onTileDataChanged() {
     assert(util::ThreadContext::currentlyOn(util::ThreadType::Map));
-
-    if (painter) {
-        painter->updateRenderOrder(*style);
-    }
 
     updateFlags |= Update::Repaint;
     asyncUpdate->send();
