@@ -1,6 +1,5 @@
 #include <mbgl/mbgl.hpp>
 #include <mbgl/util/default_styles.hpp>
-#include <mbgl/util/uv.hpp>
 #include <mbgl/platform/log.hpp>
 #include <mbgl/platform/platform.hpp>
 #include <mbgl/platform/default/settings_json.hpp>

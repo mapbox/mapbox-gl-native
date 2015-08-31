@@ -9,8 +9,6 @@
 
 #include <mutex>
 
-typedef struct uv_loop_s uv_loop_t;
-
 namespace mbgl {
 
 class Raster : public std::enable_shared_from_this<Raster> {

@@ -1,14 +1,12 @@
 #include <mbgl/style/class_dictionary.hpp>
 
-#include <uv.h>
+#include <pthread.h>
 
 namespace mbgl {
 
 ClassDictionary::ClassDictionary() {}
 
 ClassDictionary &ClassDictionary::Get() {
-    // Note: We should eventually switch to uv_key_* functions, but libuv 0.10 doesn't have these
-    // yet. Instead, we're using the pthread functions directly for now.
     static pthread_once_t store_once = PTHREAD_ONCE_INIT;
     static pthread_key_t store_key;
 

@@ -3,6 +3,8 @@
 #include <mbgl/text/glyph_pbf.hpp>
 #include <mbgl/util/thread_context.hpp>
 
+#include <cassert>
+
 namespace mbgl {
 
 void GlyphStore::requestGlyphRange(const std::string& fontStackName, const GlyphRange& range) {

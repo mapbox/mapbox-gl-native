@@ -3,7 +3,6 @@
 #include <mbgl/platform/log.hpp>
 
 #include <mbgl/util/raster.hpp>
-#include <mbgl/util/uv_detail.hpp>
 
 #include <cassert>
 #include <cstring>
