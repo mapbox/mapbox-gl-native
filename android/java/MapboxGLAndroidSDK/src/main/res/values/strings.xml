@@ -1,4 +1,7 @@
 <?xml version="1.0" encoding="utf-8"?>
 <resources>
     <string name="compassContentDescription">Map compass. Click to reset the map rotation to North.</string>
+    <string name="attributionsIconContentDescription">Attribution icon. Click to show attribution dialog.</string>
+    <string name="attributionsDialogTitle">Mapbox for Android</string>
+    <string name="mapboxIconContentDescription">Mapbox logo.</string>
 </resources>
