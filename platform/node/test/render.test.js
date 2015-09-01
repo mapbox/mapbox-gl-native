@@ -31,11 +31,16 @@ function renderTest(style, info, base, key) {
     mkdirp.sync(dir);
 
     return function(t) {
+        console.log('STARTING');
+
         var watchdog = setTimeout(function() {
+            console.log('THIS IS A TIMEOUT');
             t.fail('timed out after 20 seconds');
         }, 20000);
 
         t.once('end', function() {
+            console.log('THIS IS THE END');
+
             clearTimeout(watchdog);
 
             if (map) {
