@@ -161,7 +161,7 @@ public class MapView extends FrameLayout implements LocationListener {
     private long t0 = new Date().getTime();
 
     // Used to manage Event Listeners
-    private ArrayList<OnMapChangedListener> mOnMapChangedListener;
+    private List<OnMapChangedListener> mOnMapChangedListener;
 
     public interface OnFlingListener {
         void onFling();
@@ -401,17 +401,20 @@ public class MapView extends FrameLayout implements LocationListener {
     }
 
     public List<Polygon> addPolygons(List<PolygonOptions> polygonOptions) {
-        List<Polygon> polygons = new ArrayList<>();
-        for (PolygonOptions popts : polygonOptions) {
-            polygons.add(popts.getPolygon());
+        int size = polygonOptions.size();
+        List<Polygon> polygons = new ArrayList<>(size);
+        for (int i = 0; i < size; i++) {
+            polygons.add(polygonOptions.get(i).getPolygon());
         }
 
         long[] ids = mNativeMapView.addPolygons(polygons);
 
-        for (int i = 0; i < polygons.size(); i++) {
-            polygons.get(i).setId(ids[i]);
-            polygons.get(i).setMapView(this);
-            mAnnotations.add(polygons.get(i));
+        Polygon polygon;
+        for (int i = 0; i < size; i++) {
+            polygon = polygons.get(i);
+            polygon.setId(ids[i]);
+            polygon.setMapView(this);
+            mAnnotations.add(polygon);
         }
 
         return Collections.unmodifiableList(polygons);
@@ -680,24 +683,7 @@ public class MapView extends FrameLayout implements LocationListener {
     // Must be called from Activity onCreate
     public void onCreate(Bundle savedInstanceState) {
         if (savedInstanceState != null) {
-            setCenterCoordinate((LatLng) savedInstanceState.getParcelable(STATE_CENTER_COORDINATE));
-            setZoomLevel(savedInstanceState.getDouble(STATE_ZOOM_LEVEL)); // need to set zoom level first because of limitation on rotating when zoomed out
-            setDirection(savedInstanceState.getDouble(STATE_CENTER_DIRECTION));
-            setDirection(savedInstanceState.getDouble(STATE_DIRECTION));
-            setZoomEnabled(savedInstanceState.getBoolean(STATE_ZOOM_ENABLED));
-            setScrollEnabled(savedInstanceState.getBoolean(STATE_SCROLL_ENABLED));
-            setRotateEnabled(savedInstanceState.getBoolean(STATE_ROTATE_ENABLED));
-            setDebugActive(savedInstanceState.getBoolean(STATE_DEBUG_ACTIVE));
-            setStyleUrl(savedInstanceState.getString(STATE_STYLE_URL));
-            setAccessToken(savedInstanceState.getString(STATE_ACCESS_TOKEN));
-            List<String> appliedStyleClasses = savedInstanceState.getStringArrayList(STATE_STYLE_CLASSES);
-            if (!appliedStyleClasses.isEmpty()) {
-                setStyleClasses(appliedStyleClasses);
-            }
-            mNativeMapView.setDefaultTransitionDuration(savedInstanceState.getLong(STATE_DEFAULT_TRANSITION_DURATION));
-            setCompassEnabled(savedInstanceState.getBoolean(STATE_COMPASS_ENABLED));
-            setMyLocationEnabled(savedInstanceState.getBoolean(STATE_MY_LOCATION_ENABLED));
-            setUserLocationTrackingMode((UserLocationTrackingMode) savedInstanceState.getSerializable(STATE_USER_LOCATION_TRACKING_MODE));
+            onRestoreInstanceState(savedInstanceState);
         }
 
         // Force a check for an access token
@@ -712,6 +698,29 @@ public class MapView extends FrameLayout implements LocationListener {
                 updateMap();
             }
         });
+    }
+
+    // Called when we need to resrore instance state
+    // Must be called from MapView onCreate
+    private void onRestoreInstanceState(@NonNull Bundle savedInstanceState){
+        setCenterCoordinate((LatLng) savedInstanceState.getParcelable(STATE_CENTER_COORDINATE));
+        setZoomLevel(savedInstanceState.getDouble(STATE_ZOOM_LEVEL)); // need to set zoom level first because of limitation on rotating when zoomed out
+        setDirection(savedInstanceState.getDouble(STATE_CENTER_DIRECTION));
+        setDirection(savedInstanceState.getDouble(STATE_DIRECTION));
+        setZoomEnabled(savedInstanceState.getBoolean(STATE_ZOOM_ENABLED));
+        setScrollEnabled(savedInstanceState.getBoolean(STATE_SCROLL_ENABLED));
+        setRotateEnabled(savedInstanceState.getBoolean(STATE_ROTATE_ENABLED));
+        setDebugActive(savedInstanceState.getBoolean(STATE_DEBUG_ACTIVE));
+        setStyleUrl(savedInstanceState.getString(STATE_STYLE_URL));
+        setAccessToken(savedInstanceState.getString(STATE_ACCESS_TOKEN));
+        List<String> appliedStyleClasses = savedInstanceState.getStringArrayList(STATE_STYLE_CLASSES);
+        if (!appliedStyleClasses.isEmpty()) {
+            setStyleClasses(appliedStyleClasses);
+        }
+        mNativeMapView.setDefaultTransitionDuration(savedInstanceState.getLong(STATE_DEFAULT_TRANSITION_DURATION));
+        setCompassEnabled(savedInstanceState.getBoolean(STATE_COMPASS_ENABLED));
+        setMyLocationEnabled(savedInstanceState.getBoolean(STATE_MY_LOCATION_ENABLED));
+        setUserLocationTrackingMode((UserLocationTrackingMode) savedInstanceState.getSerializable(STATE_USER_LOCATION_TRACKING_MODE));
     }
 
     // Called when we need to save instance state
