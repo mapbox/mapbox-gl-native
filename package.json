@@ -9,12 +9,12 @@
   "main": "lib/mapbox-gl-native.node",
   "repository": {
     "type": "git",
-    "url": "git://github.com/mapbox/node-mapbox-gl-native.git"
+    "url": "git://github.com/mapbox/mapbox-gl-native.git"
   },
   "licenses": [
     {
       "type": "BSD",
-      "url": "https://github.com/mapbox/node-mapbox-gl-native/blob/master/LICENSE.txt"
+      "url": "https://github.com/mapbox/mapbox-gl-native/blob/master/LICENSE.md"
     }
   ],
   "dependencies": {
