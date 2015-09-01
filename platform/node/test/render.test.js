@@ -37,6 +37,11 @@ function renderTest(style, info, base, key) {
 
         t.once('end', function() {
             clearTimeout(watchdog);
+
+            if (map) {
+                map.release();
+                map = null;
+            }
         });
 
         var options = {};
@@ -53,8 +58,6 @@ function renderTest(style, info, base, key) {
         map.load(style);
 
         map.render(info[key], function(err, data) {
-            map.release();
-
             if (err) {
                 console.log('THIS IS AN ERROR');
                 t.error(err);
