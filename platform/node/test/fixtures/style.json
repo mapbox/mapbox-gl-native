@@ -4,8 +4,10 @@
   "sources": {
     "mapbox": {
       "type": "vector",
-      "url": "./fixtures/tiles.tilejson",
-      "maxzoom": 15
+      "maxzoom": 15,
+      "tiles": [
+        "./fixtures/tiles/{z}-{x}-{y}.vector.pbf"
+      ]
     }
   },
   "layers": [

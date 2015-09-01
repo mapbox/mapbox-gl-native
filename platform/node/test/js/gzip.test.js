@@ -3,24 +3,23 @@
 /* jshint node: true */
 
 var test = require('tape').test;
-var mbgl = require('../..');
+var mbgl = require('../../../..');
 var fs = require('fs');
 var path = require('path');
 var mkdirp = require('mkdirp');
 var http = require('http');
 var request = require('request');
 var st = require('st');
-var style = require('../../test/fixtures/style.json');
+var style = require('../fixtures/style.json');
 var PNG = require('pngjs').PNG;
 var compare = require('../compare.js');
 
-var dirPath = path.join(path.dirname(require.resolve('../../package.json')), 'test');
-var server = http.createServer(st({ path: dirPath }));
+var server = http.createServer(st({ path: path.join(__dirname, '..') }));
 server.listen(0);
 
 function filePath(name) {
     return ['expected', 'actual', 'diff'].reduce(function(prev, key) {
-        var dir = path.join('test', key, 'gzip');
+        var dir = path.join(__dirname, '..', key, 'gzip');
         mkdirp.sync(dir);
         prev[key] = path.join(dir, name);
         return prev;

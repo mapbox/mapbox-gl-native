@@ -3,7 +3,7 @@
 /* jshint node: true */
 
 var test = require('tape');
-var mbgl = require('../..');
+var mbgl = require('../../../..');
 var fs = require('fs');
 var path = require('path');
 var mkdirp = require('mkdirp');
@@ -13,7 +13,7 @@ var compare = require('../compare.js');
 
 function filePath(name) {
     return ['expected', 'actual', 'diff'].reduce(function(prev, key) {
-        var dir = path.join('test', key, 'map');
+        var dir = path.join(__dirname, '..', key, 'map');
         mkdirp.sync(dir);
         prev[key] = path.join(dir, name);
         return prev;
@@ -145,13 +145,7 @@ test('Map', function(t) {
         t.test('does not immediately trigger any tile loads', function(t) {
             var map = new mbgl.Map({
                 request: function(req) {
-                    if (req.url === './fixtures/tiles.tilejson') {
-                        fs.readFile(path.join('test', req.url), function (err, data) {
-                            req.respond(err, {data: data});
-                        });
-                    } else {
-                        t.fail('unexpected request ' + req.url);
-                    }
+                    t.fail('unexpected request ' + req.url);
                 },
                 ratio: 1
             });
@@ -168,7 +162,7 @@ test('Map', function(t) {
     t.test('.render', function(t) {
         var options = {
             request: function(req) {
-                fs.readFile(path.join('test', req.url), function(err, data) {
+                fs.readFile(path.join(__dirname, '..', req.url), function(err, data) {
                     req.respond(err, { data: data });
                 });
             },

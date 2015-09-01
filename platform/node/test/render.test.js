@@ -3,7 +3,7 @@
 /* jshint node:true */
 
 var test = require('tape');
-var mbgl = require('..');
+var mbgl = require('../../..');
 var fs = require('fs');
 var path = require('path');
 var mkdirp = require('mkdirp');

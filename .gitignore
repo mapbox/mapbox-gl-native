@@ -12,6 +12,7 @@
 /mason_packages
 /config/*.gypi
 /build
+/lib
 /macosx/build
 /linux/build
 /ios/build
@@ -28,8 +29,6 @@
 /src/shader/shaders_gl.cpp
 /src/shader/shaders_gles2.cpp
 /bin/style.bin.js
-/platform/*.mk
-/platform/*.Makefile
 *~
 
 /ios/benchmark/assets/tiles/mapbox.mapbox-streets-v6/

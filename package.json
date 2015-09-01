@@ -33,9 +33,9 @@
     "tape": "^4.2.0"
   },
   "scripts": {
-    "install": "node-pre-gyp install || make node -C ../../",
-    "test": "tape test/js/**/*.test.js",
-    "test-suite": "tape test/render.test.js"
+    "install": "node-pre-gyp install --fallback-to-build=false || make node",
+    "test": "tape platform/node/test/js/**/*.test.js",
+    "test-suite": "tape platform/node/test/render.test.js"
   },
   "gypfile": true,
   "binary": {
