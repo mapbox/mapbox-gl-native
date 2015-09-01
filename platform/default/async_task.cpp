@@ -12,7 +12,7 @@ namespace util {
 class AsyncTask::Impl {
 public:
     Impl(std::function<void()>&& fn)
-        : async(RunLoop::getLoop(), [this] { runTask(); })
+        : async(reinterpret_cast<uv_loop_t*>(RunLoop::getLoopHandle()), [this] { runTask(); })
         , task(std::move(fn)) {
     }
 

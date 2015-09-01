@@ -112,26 +112,19 @@ Thread<Object>::Thread(const ThreadContext& context, Args&&... args) {
 template <class Object>
 template <typename P, std::size_t... I>
 void Thread<Object>::run(ThreadContext context, P&& params, std::index_sequence<I...>) {
-    uv::loop l;
-
     ThreadContext::current.set(&context);
 
-    {
-        RunLoop loop_(l.get());
-        loop = &loop_;
+    RunLoop loop_(RunLoop::Type::New);
+    loop = &loop_;
 
-        Object object_(std::get<I>(std::forward<P>(params))...);
-        object = &object_;
+    Object object_(std::get<I>(std::forward<P>(params))...);
+    object = &object_;
 
-        running.set_value();
-        l.run();
+    running.set_value();
+    loop_.run();
 
-        loop = nullptr;
-        object = nullptr;
-    }
-
-    // Run the loop again to ensure that async close callbacks have been called.
-    l.run();
+    loop = nullptr;
+    object = nullptr;
 
     ThreadContext::current.set(nullptr);
 

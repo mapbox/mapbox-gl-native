@@ -78,7 +78,7 @@ void DefaultFileSource::cancel(const Resource& res, FileRequest* req) {
 // ----- Impl -----
 
 DefaultFileSource::Impl::Impl(FileCache* cache_, const std::string& root)
-    : loop(util::RunLoop::getLoop()),
+    : loop(reinterpret_cast<uv_loop_t*>(util::RunLoop::getLoopHandle())),
       cache(cache_),
       assetRoot(root.empty() ? platform::assetRoot() : root),
       assetContext(AssetContextBase::createContext(loop)),
