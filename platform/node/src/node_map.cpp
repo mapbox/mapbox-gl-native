@@ -15,7 +15,6 @@ struct NodeMap::RenderOptions {
     double longitude = 0;
     unsigned int width = 512;
     unsigned int height = 512;
-    float ratio = 1.0f;
     std::vector<std::string> classes;
 };
 
@@ -147,7 +146,6 @@ std::unique_ptr<NodeMap::RenderOptions> NodeMap::ParseOptions(v8::Local<v8::Obje
     }
     if (obj->Has(NanNew("width"))) { options->width = obj->Get(NanNew("width"))->IntegerValue(); }
     if (obj->Has(NanNew("height"))) { options->height = obj->Get(NanNew("height"))->IntegerValue(); }
-    if (obj->Has(NanNew("ratio"))) { options->ratio = obj->Get(NanNew("ratio"))->IntegerValue(); }
 
     if (obj->Has(NanNew("classes"))) {
         auto classes = obj->Get(NanNew("classes"))->ToObject().As<v8::Array>();
