@@ -259,7 +259,7 @@ void MapContext::update() {
         updateFlags = Update::Nothing;
     }
 
-    if (updateFlags == Update::Nothing) {
+    if (updateFlags == Update::Nothing || (data.mode == MapMode::Still && !callback)) {
         return;
     }
 

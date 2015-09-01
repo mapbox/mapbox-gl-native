@@ -141,6 +141,28 @@ test('Map', function(t) {
             map.release();
             t.end();
         });
+
+        t.test('does not immediately trigger any tile loads', function(t) {
+            var map = new mbgl.Map({
+                request: function(req) {
+                    if (req.url === './fixtures/tiles.tilejson') {
+                        fs.readFile(path.join('test', req.url), function (err, data) {
+                            req.respond(err, {data: data});
+                        });
+                    } else {
+                        t.fail('unexpected request ' + req.url);
+                    }
+                },
+                ratio: 1
+            });
+
+            map.load(style);
+
+            setTimeout(function() {
+                map.release();
+                t.end();
+            }, 100);
+        });
     });
 
     t.test('.render', function(t) {
