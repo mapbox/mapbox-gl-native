@@ -37,8 +37,6 @@ public:
 
     MapData& getData() { return data; }
 
-    void pause();
-
     void triggerUpdate(const TransformState&, Update = Update::Nothing);
     void renderStill(const TransformState&, const FrameData&, Map::StillImageCallback callback);
 
@@ -97,7 +95,6 @@ private:
 
     Update updateFlags = Update::Nothing;
     util::AsyncTask asyncUpdate;
-    util::AsyncTask asyncInvalidate;
 
     std::unique_ptr<gl::TexturePool> texturePool;
     std::unique_ptr<Painter> painter;

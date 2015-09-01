@@ -1,10 +1,8 @@
 #include "node_map.hpp"
 #include "node_request.hpp"
-#include "node_mapbox_gl_native.hpp"
 
 #include <mbgl/platform/default/headless_display.hpp>
 #include <mbgl/util/exception.hpp>
-#include <mbgl/util/work_request.hpp>
 
 #include <unistd.h>
 
@@ -474,18 +472,16 @@ NodeMap::~NodeMap() {
     if (valid) release();
 }
 
-std::unique_ptr<mbgl::AsyncRequest> NodeMap::request(const mbgl::Resource& resource, Callback cb1) {
-    // This function can be called from any thread. Make sure we're executing the
-    // JS implementation in the node event loop.
-    return NodeRunLoop().invokeWithCallback([this] (mbgl::Resource res, Callback cb2) {
-        Nan::HandleScope scope;
+std::unique_ptr<mbgl::AsyncRequest> NodeMap::request(const mbgl::Resource& resource, Callback callback_) {
+    Nan::HandleScope scope;
 
-        auto requestHandle = NodeRequest::Create(res, cb2)->ToObject();
-        auto callbackHandle = Nan::New<v8::Function>(NodeRequest::Respond, requestHandle);
+    auto requestHandle = NodeRequest::Create(resource, callback_)->ToObject();
+    auto callbackHandle = Nan::New<v8::Function>(NodeRequest::Respond, requestHandle);
 
-        v8::Local<v8::Value> argv[] = { requestHandle, callbackHandle };
-        Nan::MakeCallback(handle()->GetInternalField(1)->ToObject(), "request", 2, argv);
-    }, cb1, resource);
+    v8::Local<v8::Value> argv[] = { requestHandle, callbackHandle };
+    Nan::MakeCallback(handle()->GetInternalField(1)->ToObject(), "request", 2, argv);
+
+    return std::make_unique<mbgl::AsyncRequest>();
 }
 
 }

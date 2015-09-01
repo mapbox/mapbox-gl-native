@@ -521,7 +521,6 @@ public class MapView extends FrameLayout {
         mConnectivityReceiver = null;
 
         mUserLocationView.onPause();
-        mNativeMapView.pause();
     }
 
     /**
@@ -533,7 +532,6 @@ public class MapView extends FrameLayout {
         mConnectivityReceiver = new ConnectivityReceiver();
         getContext().registerReceiver(mConnectivityReceiver, new IntentFilter(ConnectivityManager.CONNECTIVITY_ACTION));
 
-        mNativeMapView.resume();
         mNativeMapView.update();
         mUserLocationView.onResume();
 
@@ -1094,9 +1092,7 @@ public class MapView extends FrameLayout {
     }
 
     int getTopOffsetPixelsForIcon(Icon icon) {
-        // This method will dead lock if map paused. Causes a freeze if you add a marker in an
-        // activity's onCreate()
-        if (mDestroyed || mNativeMapView.isPaused()) {
+        if (mDestroyed) {
             return 0;
         }
 
@@ -1243,11 +1239,11 @@ public class MapView extends FrameLayout {
             return;
         }
 
-        if (mDestroyed || mNativeMapView.isPaused()) {
+        if (mDestroyed) {
             return;
         }
 
-        mNativeMapView.renderSync();
+        mNativeMapView.render();
     }
 
     @Override

@@ -119,24 +119,12 @@ final class NativeMapView {
         nativeDestroySurface(mNativeMapViewPtr);
     }
 
-    public void pause() {
-        nativePause(mNativeMapViewPtr);
-    }
-
-    public boolean isPaused() {
-        return nativeIsPaused(mNativeMapViewPtr);
-    }
-
-    public void resume() {
-        nativeResume(mNativeMapViewPtr);
-    }
-
     public void update() {
         nativeUpdate(mNativeMapViewPtr);
     }
 
-    public void renderSync() {
-        nativeRenderSync(mNativeMapViewPtr);
+    public void render() {
+        nativeRender(mNativeMapViewPtr);
     }
 
     public void resizeView(int width, int height) {
@@ -515,15 +503,9 @@ final class NativeMapView {
 
     private native void nativeDestroySurface(long nativeMapViewPtr);
 
-    private native void nativePause(long nativeMapViewPtr);
-
-    private native boolean nativeIsPaused(long nativeMapViewPtr);
-
-    private native void nativeResume(long nativeMapViewPtr);
-
     private native void nativeUpdate(long nativeMapViewPtr);
 
-    private native void nativeRenderSync(long nativeMapViewPtr);
+    private native void nativeRender(long nativeMapViewPtr);
 
     private native void nativeViewResize(long nativeMapViewPtr, int width, int height);
 

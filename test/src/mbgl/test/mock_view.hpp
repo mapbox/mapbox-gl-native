@@ -18,10 +18,7 @@ public:
 
     void activate() override {};
     void deactivate() override {};
-    void notify() override {};
     void invalidate() override {}
-    void beforeRender() override {}
-    void afterRender() override {}
 };
 
 }

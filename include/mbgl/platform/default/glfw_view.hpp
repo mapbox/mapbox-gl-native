@@ -22,13 +22,10 @@ public:
     std::array<uint16_t, 2> getSize() const override;
     std::array<uint16_t, 2> getFramebufferSize() const override;
 
-    void initialize(mbgl::Map *map) override;
+    void initialize(mbgl::Map*) override;
     void activate() override;
     void deactivate() override;
-    void notify() override;
     void invalidate() override;
-    void beforeRender() override;
-    void afterRender() override;
 
     static void onKey(GLFWwindow *window, int key, int scancode, int action, int mods);
     static void onScroll(GLFWwindow *window, double xoffset, double yoffset);

@@ -3,59 +3,17 @@
 #include <mbgl/map/map.hpp>
 #include <mbgl/platform/default/headless_view.hpp>
 #include <mbgl/platform/default/headless_display.hpp>
-#include <mbgl/storage/online_file_source.hpp>
 #include <mbgl/storage/network_status.hpp>
-#include <mbgl/storage/offline_database.hpp>
 #include <mbgl/storage/default_file_source.hpp>
 #include <mbgl/util/io.hpp>
+#include <mbgl/util/run_loop.hpp>
 
 using namespace mbgl;
 using namespace std::literals::string_literals;
 
-TEST(Map, PauseResume) {
-    auto display = std::make_shared<mbgl::HeadlessDisplay>();
-    HeadlessView view(display, 1);
-    OnlineFileSource fileSource;
-
-    Map map(view, fileSource, MapMode::Continuous);
-
-    map.pause();
-    map.resume();
-}
-
-TEST(Map, DoublePause) {
-    auto display = std::make_shared<mbgl::HeadlessDisplay>();
-    HeadlessView view(display, 1);
-    OnlineFileSource fileSource;
-
-    Map map(view, fileSource, MapMode::Continuous);
-
-    map.pause();
-    map.pause();
-    map.resume();
-}
-
-TEST(Map, ResumeWithoutPause) {
-    auto display = std::make_shared<mbgl::HeadlessDisplay>();
-    HeadlessView view(display, 1);
-    OnlineFileSource fileSource;
-
-    Map map(view, fileSource, MapMode::Continuous);
-
-    map.resume();
-}
-
-TEST(Map, DestroyPaused) {
-    auto display = std::make_shared<mbgl::HeadlessDisplay>();
-    HeadlessView view(display, 1);
-    OnlineFileSource fileSource;
-
-    Map map(view, fileSource, MapMode::Continuous);
-
-    map.pause();
-}
-
 TEST(Map, Offline) {
+    util::RunLoop runLoop;
+
     auto display = std::make_shared<mbgl::HeadlessDisplay>();
     HeadlessView view(display, 1);
     DefaultFileSource fileSource(":memory:", ".");

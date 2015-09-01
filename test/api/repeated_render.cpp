@@ -7,11 +7,14 @@
 #include <mbgl/storage/default_file_source.hpp>
 #include <mbgl/util/image.hpp>
 #include <mbgl/util/io.hpp>
+#include <mbgl/util/run_loop.hpp>
 
 #include <future>
 
 TEST(API, RepeatedRender) {
     using namespace mbgl;
+
+    util::RunLoop loop;
 
     const auto style = util::read_file("test/fixtures/api/water.json");
 
@@ -30,11 +33,15 @@ TEST(API, RepeatedRender) {
 
     {
         map.setStyleJSON(style, "");
-        std::promise<PremultipliedImage> promise;
-        map.renderStill([&promise](std::exception_ptr, PremultipliedImage&& image) {
-            promise.set_value(std::move(image));
+        PremultipliedImage result;
+        map.renderStill([&result](std::exception_ptr, PremultipliedImage&& image) {
+            result = std::move(image);
         });
-        auto result = promise.get_future().get();
+
+        while (!result.size()) {
+            loop.runOnce();
+        }
+
         ASSERT_EQ(256, result.width);
         ASSERT_EQ(512, result.height);
 #if !TEST_READ_ONLY
@@ -44,11 +51,15 @@ TEST(API, RepeatedRender) {
 
     {
         map.setStyleJSON(style, "");
-        std::promise<PremultipliedImage> promise;
-        map.renderStill([&promise](std::exception_ptr, PremultipliedImage&& image) {
-            promise.set_value(std::move(image));
+        PremultipliedImage result;
+        map.renderStill([&result](std::exception_ptr, PremultipliedImage&& image) {
+            result = std::move(image);
         });
-        auto result = promise.get_future().get();
+
+        while (!result.size()) {
+            loop.runOnce();
+        }
+
         ASSERT_EQ(256, result.width);
         ASSERT_EQ(512, result.height);
 #if !TEST_READ_ONLY

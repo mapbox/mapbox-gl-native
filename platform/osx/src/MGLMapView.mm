@@ -540,7 +540,6 @@ public:
     [self deselectAnnotation:self.selectedAnnotation];
     if (!self.dormant && !newWindow) {
         self.dormant = YES;
-        _mbglMap->pause();
     }
     
     [self.window removeObserver:self forKeyPath:@"contentLayoutRect"];
@@ -550,7 +549,6 @@ public:
 - (void)viewDidMoveToWindow {
     NSWindow *window = self.window;
     if (self.dormant && window) {
-        _mbglMap->resume();
         self.dormant = NO;
     }
     
@@ -686,8 +684,31 @@ public:
         NSUInteger cacheSize = zoomFactor * cpuFactor * memoryFactor * sizeFactor * 0.5;
         
         _mbglMap->setSourceTileCacheSize(cacheSize);
-        _mbglMap->renderSync();
-        
+
+        // Enable vertex buffer objects.
+        mbgl::gl::InitializeExtensions([](const char *name) {
+            static CFBundleRef framework = CFBundleGetBundleWithIdentifier(CFSTR("com.apple.opengl"));
+            if (!framework) {
+                throw std::runtime_error("Failed to load OpenGL framework.");
+            }
+
+            CFStringRef str = CFStringCreateWithCString(kCFAllocatorDefault, name, kCFStringEncodingASCII);
+            void *symbol = CFBundleGetFunctionPointerForName(framework, str);
+            CFRelease(str);
+
+            return reinterpret_cast<mbgl::gl::glProc>(symbol);
+        });
+
+        _mbglMap->render();
+
+        if (_isPrinting) {
+            _isPrinting = NO;
+            std::string png = encodePNG(_mbglView->readStillImage());
+            NSData *data = [[NSData alloc] initWithBytes:png.data() length:png.size()];
+            NSImage *image = [[NSImage alloc] initWithData:data];
+            [self printWithImage:image];
+        }
+
 //        [self updateUserLocationAnnotationView];
     }
 }
@@ -2270,85 +2291,39 @@ class MGLMapViewImpl : public mbgl::View {
 public:
     MGLMapViewImpl(MGLMapView *nativeView_, const float scaleFactor_)
         : nativeView(nativeView_), scaleFactor(scaleFactor_) {}
-    virtual ~MGLMapViewImpl() {}
-    
-    
+
     float getPixelRatio() const override {
         return scaleFactor;
     }
-    
+
     std::array<uint16_t, 2> getSize() const override {
         return {{ static_cast<uint16_t>(nativeView.bounds.size.width),
-            static_cast<uint16_t>(nativeView.bounds.size.height) }};
+                  static_cast<uint16_t>(nativeView.bounds.size.height) }};
     }
-    
+
     std::array<uint16_t, 2> getFramebufferSize() const override {
         NSRect bounds = [nativeView convertRectToBacking:nativeView.bounds];
         return {{ static_cast<uint16_t>(bounds.size.width),
-            static_cast<uint16_t>(bounds.size.height) }};
+                  static_cast<uint16_t>(bounds.size.height) }};
     }
-    
-    void notify() override {}
-    
+
     void notifyMapChange(mbgl::MapChange change) override {
-        assert([[NSThread currentThread] isMainThread]);
         [nativeView notifyMapChange:change];
     }
-    
+
+    void invalidate() override {
+        [nativeView invalidate];
+    }
+
     void activate() override {
         MGLOpenGLLayer *layer = (MGLOpenGLLayer *)nativeView.layer;
-        if ([NSOpenGLContext currentContext] != layer.openGLContext) {
-            // Enable our OpenGL context on the Map thread.
-            [layer.openGLContext makeCurrentContext];
-            
-            // Enable vertex buffer objects.
-            mbgl::gl::InitializeExtensions([](const char *name) {
-                static CFBundleRef framework = CFBundleGetBundleWithIdentifier(CFSTR("com.apple.opengl"));
-                if (!framework) {
-                    throw std::runtime_error("Failed to load OpenGL framework.");
-                }
-                
-                CFStringRef str = CFStringCreateWithCString(kCFAllocatorDefault, name, kCFStringEncodingASCII);
-                void *symbol = CFBundleGetFunctionPointerForName(framework, str);
-                CFRelease(str);
-                
-                return reinterpret_cast<mbgl::gl::glProc>(symbol);
-            });
-        }
+        [layer.openGLContext makeCurrentContext];
     }
-    
+
     void deactivate() override {
         [NSOpenGLContext clearCurrentContext];
     }
-    
-    void invalidate() override {
-        [nativeView performSelectorOnMainThread:@selector(invalidate)
-                                     withObject:nil
-                                  waitUntilDone:NO];
-    }
-    
-    void beforeRender() override {
-        // This normally gets called right away by mbgl::Map, but only on the
-        // main thread. OpenGL contexts and extensions are thread-local, so this
-        // has to happen on the Map thread too.
-        activate();
-        
-//        auto size = getFramebufferSize();
-//        MBGL_CHECK_ERROR(glViewport(0, 0, size[0], size[1]));
-    }
-    
-    void afterRender() override {
-        if (nativeView->_isPrinting) {
-            nativeView->_isPrinting = NO;
-            std::string png = encodePNG(readStillImage());
-            NSData *data = [[NSData alloc] initWithBytes:png.data() length:png.size()];
-            NSImage *image = [[NSImage alloc] initWithData:data];
-            [nativeView performSelectorOnMainThread:@selector(printWithImage:)
-                                         withObject:image
-                                      waitUntilDone:NO];
-        }
-    }
-    
+
     mbgl::PremultipliedImage readStillImage() override {
         auto size = getFramebufferSize();
         const unsigned int w = size[0];

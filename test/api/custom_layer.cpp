@@ -7,6 +7,7 @@
 #include <mbgl/layer/custom_layer.hpp>
 #include <mbgl/util/io.hpp>
 #include <mbgl/util/mat4.hpp>
+#include <mbgl/util/run_loop.hpp>
 
 using namespace mbgl;
 
@@ -68,6 +69,8 @@ public:
 };
 
 TEST(CustomLayer, Basic) {
+    util::RunLoop loop;
+
     auto display = std::make_shared<mbgl::HeadlessDisplay>();
     HeadlessView view(display, 1);
     OnlineFileSource fileSource;

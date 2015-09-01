@@ -38,34 +38,31 @@ public:
     std::array<uint16_t, 2> getSize() const override;
     std::array<uint16_t, 2> getFramebufferSize() const override;
 
+    void invalidate() override;
     void activate() override;
     void deactivate() override;
-    void notify() override;
-    void invalidate() override;
-    void beforeRender() override;
-    void afterRender() override;
+
     PremultipliedImage readStillImage() override;
 
-    void resizeFramebuffer();
     void resize(uint16_t width, uint16_t height);
 
 private:
-    void loadExtensions();
-    bool isActive() const;
-
     // Implementation specific functions
     static gl::glProc initializeExtension(const char*);
     void createContext();
     void destroyContext();
     void clearBuffers();
+    void resizeFramebuffer();
     void activateContext();
     void deactivateContext();
 
-private:
     std::shared_ptr<HeadlessDisplay> display;
     const float pixelRatio;
     std::array<uint16_t, 2> dimensions;
+
     bool needsResize = false;
+    bool extensionsLoaded = false;
+    bool active = false;
 
 #if MBGL_USE_CGL
     CGLContextObj glContext = nullptr;
@@ -82,13 +79,9 @@ private:
     GLXPbuffer glxPbuffer = 0;
 #endif
 
-    bool extensionsLoaded = false;
-
     GLuint fbo = 0;
     GLuint fboDepthStencil = 0;
     GLuint fboColor = 0;
-
-    std::thread::id thread;
 };
 
 } // namespace mbgl

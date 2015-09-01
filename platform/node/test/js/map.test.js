@@ -298,7 +298,9 @@ test('Map', function(t) {
         t.test('returning an error', function(t) {
             var map = new mbgl.Map({
                 request: function(req, callback) {
-                    callback(new Error('request error'));
+                    setImmediate(function () {
+                        callback(new Error('request error'));
+                    });
                 },
             });
             map.load(style);

@@ -5,10 +5,13 @@
 #include <mbgl/platform/default/headless_view.hpp>
 #include <mbgl/platform/default/headless_display.hpp>
 #include <mbgl/storage/online_file_source.hpp>
+#include <mbgl/util/run_loop.hpp>
 
 
 TEST(API, SetStyle) {
     using namespace mbgl;
+
+    util::RunLoop loop;
 
     auto display = std::make_shared<mbgl::HeadlessDisplay>();
     HeadlessView view(display, 1);

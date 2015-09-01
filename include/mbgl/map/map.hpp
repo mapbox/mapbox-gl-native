@@ -32,10 +32,6 @@ class ShapeAnnotation;
 struct CameraOptions;
 struct AnimationOptions;
 
-namespace util {
-template <class T> class Thread;
-} // namespace util
-
 class Map : private util::noncopyable {
     friend class View;
 
@@ -46,22 +42,15 @@ public:
                  ConstrainMode constrainMode = ConstrainMode::HeightOnly);
     ~Map();
 
-    // Pauses the render thread. The render thread will stop running but will not be terminated and will not lose state until resumed.
-    void pause();
-    bool isPaused();
-
-    // Resumes a paused render thread
-    void resume();
-
     // Register a callback that will get called (on the render thread) when all resources have
     // been loaded and a complete render occurs.
     using StillImageCallback = std::function<void (std::exception_ptr, PremultipliedImage&&)>;
     void renderStill(StillImageCallback callback);
 
-    // Triggers a synchronous render.
-    void renderSync();
+    // Main render function.
+    void render();
 
-    // Notifies the Map thread that the state has changed and an update might be necessary.
+    // Notifies the Map that the state has changed and an update might be necessary.
     void update(Update update);
 
     // Styling
@@ -189,7 +178,7 @@ public:
 private:
     View& view;
     const std::unique_ptr<Transform> transform;
-    const std::unique_ptr<util::Thread<MapContext>> context;
+    const std::unique_ptr<MapContext> context;
     MapData* data;
 
     enum class RenderState {

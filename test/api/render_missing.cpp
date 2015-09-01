@@ -7,6 +7,7 @@
 #include <mbgl/storage/default_file_source.hpp>
 #include <mbgl/util/image.hpp>
 #include <mbgl/util/io.hpp>
+#include <mbgl/util/run_loop.hpp>
 
 #include <future>
 
@@ -18,6 +19,8 @@
 
 TEST(API, TEST_REQUIRES_SERVER(RenderMissingTile)) {
     using namespace mbgl;
+
+    util::RunLoop loop;
 
     const auto style = util::read_file("test/fixtures/api/water_missing_tiles.json");
 
@@ -38,8 +41,7 @@ TEST(API, TEST_REQUIRES_SERVER(RenderMissingTile)) {
 
     // This host does not respond (== connection error).
     map.setStyleJSON(style, "");
-    std::promise<void> promise;
-    map.renderStill([&promise, &message](std::exception_ptr err, PremultipliedImage&&) {
+    map.renderStill([&](std::exception_ptr err, PremultipliedImage&&) {
         ASSERT_TRUE(err.operator bool());
         try {
             std::rethrow_exception(err);
@@ -47,9 +49,10 @@ TEST(API, TEST_REQUIRES_SERVER(RenderMissingTile)) {
             message = ex.what();
             EXPECT_TRUE(message.find("connect") != std::string::npos);
         }
-        promise.set_value();
+        loop.stop();
     });
-    promise.get_future().get();
+
+    loop.run();
 
     auto observer = Log::removeObserver();
     auto flo = dynamic_cast<FixtureLogObserver*>(observer.get());

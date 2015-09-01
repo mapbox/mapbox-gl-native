@@ -35,11 +35,7 @@ MapContext::MapContext(View& view_, FileSource& fileSource_, MapMode mode_, GLCo
       dataPtr(std::make_unique<MapData>(mode_, contextMode_, pixelRatio_)),
       data(*dataPtr),
       asyncUpdate([this] { update(); }),
-      asyncInvalidate([&view_] { view_.invalidate(); }),
       texturePool(std::make_unique<gl::TexturePool>()) {
-    assert(util::ThreadContext::currentlyOn(util::ThreadType::Map));
-
-    view.activate();
 }
 
 MapContext::~MapContext() {
@@ -48,7 +44,7 @@ MapContext::~MapContext() {
 }
 
 void MapContext::cleanup() {
-    view.notify();
+    view.activate();
 
     styleRequest = nullptr;
 
@@ -62,21 +58,6 @@ void MapContext::cleanup() {
     glObjectStore.performCleanup();
 
     view.deactivate();
-}
-
-void MapContext::pause() {
-    MBGL_CHECK_ERROR(glFinish());
-
-    view.deactivate();
-
-    std::unique_lock<std::mutex> lockPause(data.mutexPause);
-    data.paused = true;
-    data.condPause.notify_all();
-    data.condPause.wait(lockPause, [&]{ return !data.paused; });
-
-    view.activate();
-
-    asyncInvalidate.send();
 }
 
 void MapContext::updateAsync(Update flags) {
@@ -180,9 +161,11 @@ void MapContext::update() {
     style->update(transformState, frameData.timePoint, *texturePool);
 
     if (data.mode == MapMode::Continuous) {
-        asyncInvalidate.send();
+        view.invalidate();
     } else if (callback && isLoaded()) {
+        view.activate();
         renderSync(transformState, frameData);
+        view.deactivate();
     }
 
     updateFlags = Update::Nothing;
@@ -229,8 +212,6 @@ bool MapContext::renderSync(const TransformState& state, const FrameData& frame)
         return false;
     }
 
-    view.beforeRender();
-
     transformState = state;
     frameData = frame;
 
@@ -244,8 +225,6 @@ bool MapContext::renderSync(const TransformState& state, const FrameData& frame)
 
     // Cleanup OpenGL objects that we abandoned since the last render call.
     glObjectStore.performCleanup();
-
-    view.afterRender();
 
     if (style->hasTransitions()) {
         updateAsync(Update::RecalculateStyle);
@@ -312,7 +291,7 @@ void MapContext::setSourceTileCacheSize(size_t size) {
         sourceCacheSize = size;
         if (!style) return;
         style->setSourceTileCacheSize(size);
-        asyncInvalidate.send();
+        view.invalidate();
     }
 }
 
@@ -320,7 +299,7 @@ void MapContext::onLowMemory() {
     assert(util::ThreadContext::currentlyOn(util::ThreadType::Map));
     if (!style) return;
     style->onLowMemory();
-    asyncInvalidate.send();
+    view.invalidate();
 }
 
 void MapContext::onResourceLoaded() {

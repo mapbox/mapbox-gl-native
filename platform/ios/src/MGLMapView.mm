@@ -320,7 +320,6 @@ mbgl::Duration MGLDurationInSeconds(NSTimeInterval duration)
     // start paused if in IB
     if (_isTargetingInterfaceBuilder || background) {
         self.dormant = YES;
-        _mbglMap->pause();
     }
 
     // Notify map object when network reachability status changes.
@@ -751,8 +750,7 @@ mbgl::Duration MGLDurationInSeconds(NSTimeInterval duration)
         NSUInteger cacheSize = zoomFactor * cpuFactor * memoryFactor * sizeFactor * 0.5;
 
         _mbglMap->setSourceTileCacheSize(cacheSize);
-
-        _mbglMap->renderSync();
+        _mbglMap->render();
 
         [self updateUserLocationAnnotationView];
     }
@@ -895,7 +893,6 @@ mbgl::Duration MGLDurationInSeconds(NSTimeInterval duration)
     {
         [self validateDisplayLink];
         self.dormant = YES;
-        _mbglMap->pause();
         [self.glView deleteDrawable];
     }
 }
@@ -967,8 +964,6 @@ mbgl::Duration MGLDurationInSeconds(NSTimeInterval duration)
             [self.glSnapshotView addSubview:snapshotTint];
         }
 
-        _mbglMap->pause();
-
         [self.glView deleteDrawable];
     }
 }
@@ -988,8 +983,6 @@ mbgl::Duration MGLDurationInSeconds(NSTimeInterval duration)
         [self.glSnapshotView.subviews makeObjectsPerformSelector:@selector(removeFromSuperview)];
 
         [self.glView bindDrawable];
-
-        _mbglMap->resume();
         
         _displayLink.paused = NO;
 
@@ -3957,12 +3950,10 @@ mbgl::Duration MGLDurationInSeconds(NSTimeInterval duration)
 
 class MBGLView : public mbgl::View
 {
-    public:
-        MBGLView(MGLMapView* nativeView_, const float scaleFactor_)
-            : nativeView(nativeView_), scaleFactor(scaleFactor_) {
-        }
-        virtual ~MBGLView() {}
-
+public:
+    MBGLView(MGLMapView* nativeView_, const float scaleFactor_)
+        : nativeView(nativeView_), scaleFactor(scaleFactor_) {
+    }
 
     float getPixelRatio() const override {
         return scaleFactor;
@@ -3970,7 +3961,7 @@ class MBGLView : public mbgl::View
 
     std::array<uint16_t, 2> getSize() const override {
         return {{ static_cast<uint16_t>([nativeView bounds].size.width),
-                static_cast<uint16_t>([nativeView bounds].size.height) }};
+                  static_cast<uint16_t>([nativeView bounds].size.height) }};
     }
 
     std::array<uint16_t, 2> getFramebufferSize() const override {
@@ -3978,15 +3969,14 @@ class MBGLView : public mbgl::View
                   static_cast<uint16_t>([[nativeView glView] drawableHeight]) }};
     }
 
-    void notify() override
-    {
-        // no-op
-    }
-
     void notifyMapChange(mbgl::MapChange change) override
     {
-        assert([[NSThread currentThread] isMainThread]);
         [nativeView notifyMapChange:change];
+    }
+
+    void invalidate() override
+    {
+        [nativeView setNeedsGLDisplay];
     }
 
     void activate() override
@@ -3999,26 +3989,9 @@ class MBGLView : public mbgl::View
         [EAGLContext setCurrentContext:nil];
     }
 
-    void invalidate() override
-    {
-        [nativeView performSelectorOnMainThread:@selector(setNeedsGLDisplay)
-                                     withObject:nil
-                                  waitUntilDone:NO];
-    }
-
-    void beforeRender() override
-    {
-        // no-op
-    }
-
-    void afterRender() override
-    {
-        // no-op
-    }
-
-    private:
-        __weak MGLMapView *nativeView = nullptr;
-        const float scaleFactor;
+private:
+    __weak MGLMapView *nativeView = nullptr;
+    const float scaleFactor;
 };
 
 @end

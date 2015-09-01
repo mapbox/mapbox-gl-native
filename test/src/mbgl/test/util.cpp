@@ -5,6 +5,7 @@
 #include <mbgl/util/image.hpp>
 #include <mbgl/util/io.hpp>
 #include <mbgl/util/chrono.hpp>
+#include <mbgl/util/run_loop.hpp>
 
 #include <mapbox/pixelmatch.hpp>
 
@@ -86,11 +87,16 @@ Server::~Server() {
 }
 
 PremultipliedImage render(Map& map) {
-    std::promise<PremultipliedImage> promise;
-    map.renderStill([&](std::exception_ptr, PremultipliedImage&& image) {
-        promise.set_value(std::move(image));
+    PremultipliedImage result;
+    map.renderStill([&result](std::exception_ptr, PremultipliedImage&& image) {
+        result = std::move(image);
     });
-    return promise.get_future().get();
+
+    while (!result.size()) {
+        util::RunLoop::Get()->runOnce();
+    }
+
+    return result;
 }
 
 void checkImage(const std::string& base,
