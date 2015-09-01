@@ -1,11 +1,6 @@
 # node-mapbox-gl-native
 
-Renders map tiles with [Mapbox GL](https://github.com/mapbox/mapbox-gl-native).
-
-
 [![NPM](https://nodei.co/npm/mapbox-gl-native.png)](https://npmjs.org/package/mapbox-gl-native)
-
-[![Build Status](https://travis-ci.org/mapbox/node-mapbox-gl-native.svg?branch=master)](https://travis-ci.org/mapbox/node-mapbox-gl-native)
 
 ## Installing
 
@@ -22,7 +17,7 @@ Just run:
 npm install mapbox-gl-native
 ```
 
-Other platforms will fall back to a source compile with `npm run build`. To compile this module, make sure all submodules are initialized with `git submodule update --init` and install the [external dependencies required to build from source](https://github.com/mapbox/mapbox-gl-native#depends).
+Other platforms will fall back to a source compile with `make node`. To compile this module, make sure all submodules are initialized with `git submodule update --init` and install the [external dependencies required to build from source](https://github.com/mapbox/mapbox-gl-native/blob/master/INSTALL.md#depends).
 
 ## Rendering a map tile
 
@@ -44,12 +39,9 @@ The first argument passed to `map.render` is an options object, all keys are opt
     height: {height}, // number (px), defaults to 512
     center: [{latitude}, {longitude}], // array of numbers (coordinates), defaults to [0,0]
     bearing: {bearing}, // number (in degrees, counter-clockwise from north), defaults to 0
-    ratio: {ratio} // number (scale factor), defaults to 1.0,
-    classes: {classes} // array of strings, optional
+    classes: {classes} // array of strings
 }
 ```
-
-_More about classes: https://github.com/mapbox/mapbox-gl-js/blob/master/API.md#working-with-style-classes_
 
 When you are finished using a map object, you can call `map.release()` to dispose the internal map resources manually. This is not necessary, but can be helpful to optimize resource usage (memory, file sockets) on a more granualar level than v8's garbage collector.
 
@@ -61,7 +53,7 @@ npm test
 
 ## Implementing a file source
 
-When creating a `Map`, you must pass an options object (with a required `request` and optional `cancel` method) as the first parameter.
+When creating a `Map`, you must pass an options object (with a required `ratio`, required `request` and optional `cancel` method) as the first parameter.
 
 ```js
 var map = new mbgl.Map({
@@ -70,11 +62,12 @@ var map = new mbgl.Map({
     },
     cancel: function(req) {
         // TODO
-    }
+    },
+    ratio: 1.0
 });
 ```
 
-The `request()` method starts a new request to a file, while `cancel()` tells the FileSource to cancel the request (if possible). The `req` parameter has two properties:
+The `request()` method starts a new request to a file, while `cancel()` tells the FileSource to cancel the request (if possible). The `ratio` sets the scale at which the map will render tiles, such as `2.0` for rendering images for high pixel density displays. The `req` parameter has two properties:
 
 ```json
 {
@@ -83,7 +76,7 @@ The `request()` method starts a new request to a file, while `cancel()` tells th
 }
 ```
 
-The `kind` is an enum and defined in `mbgl.Resource`:
+The `kind` is an enum and defined in [`mbgl.Resource`](https://github.com/mapbox/mapbox-gl-native/blob/node/include/mbgl/storage/resource.hpp):
 
 ```json
 {
@@ -92,8 +85,8 @@ The `kind` is an enum and defined in `mbgl.Resource`:
     "Source": 2,
     "Tile": 3,
     "Glyphs": 4,
-    "JSON": 5,
-    "Image": 6
+    "SpriteImage": 5,
+    "SpriteJSON": 6
 }
 ```
 
@@ -107,7 +100,8 @@ var map = new mbgl.Map({
         fs.readFile(path.join('base/path', req.url), function(err, data) {
             req.respond(err, { data: data });
         });
-    }
+    },
+    ratio: 1.0
 });
 ```
 
@@ -135,10 +129,6 @@ var map = new mbgl.Map({
             encoding: null,
             gzip: true
         }, function (err, res, body) {
-            if (req.canceled) {
-                return;
-            }
-
             if (err) {
                 req.respond(err);
             } else if (res.statusCode == 200) {
@@ -147,20 +137,20 @@ var map = new mbgl.Map({
                 if (res.headers.modified) { response.modified = new Date(res.headers.modified); }
                 if (res.headers.expires) { response.expires = new Date(res.headers.expires); }
                 if (res.headers.etag) { response.etag = res.headers.etag; }
+                
                 response.data = body;
+                
                 req.respond(null, response);
             } else {
                 req.respond(new Error(JSON.parse(body).message));
             }
         });
     },
-    cancel: function(req) {
-        req.canceled = true;
-    }
+    ratio: 1.0
 });
 ```
 
-Note that in reality, Mapbox GL uses two types of protocols: `asset://` for files that should be loaded from some local static system, and `http://` (and `https://`), which should be loaded from the internet. However, stylesheets are free to use other protocols too, if your implementation of `request` supports these; e.g. you could use `s3://` to indicate that files are supposed to be loaded from S3.
+Mapbox GL uses two types of protocols: `asset://` for files that should be loaded from some local static system, and `http://` (and `https://`), which should be loaded from the internet. However, stylesheets are free to use other protocols too, if your implementation of `request` supports these; e.g. you could use `s3://` to indicate that files are supposed to be loaded from S3.
 
 ## Mapbox API Access tokens
 
@@ -171,37 +161,41 @@ var mbgl = require('mapbox-gl-native');
 var request = require('request');
 var url = require('url');
 
-var options = {};
-options.request = function(req) {
-    var opts = {
-        url: req.url,
-        encoding: null,
-        gzip: true
-    };
+var map = new mbgl.Map({
+    request: function(req) {
+        var opts = {
+            url: req.url,
+            encoding: null,
+            gzip: true
+        };
 
-    if (url.parse(req.url).protocol === 'mapbox:') {
-        opts.qs = { access_token: process.env.MAPBOX_ACCESS_TOKEN};
-    }
-
-    request(opts, function (err, res, body) {
-        if (err) {
-            req.respond(err);
-        } else if (res.statusCode == 200) {
-            var response = {};
-
-            if (res.headers.modified) { response.modified = new Date(res.headers.modified); }
-            if (res.headers.expires) { response.expires = new Date(res.headers.expires); }
-            if (res.headers.etag) { response.etag = res.headers.etag; }
-            response.data = body;
-            req.respond(null, response);
-        } else {
-            req.respond(new Error(JSON.parse(body).message));
+        if (url.parse(req.url).protocol === 'mapbox:') {
+            opts.qs = { access_token: process.env.MAPBOX_ACCESS_TOKEN};
         }
-    });
-}
 
-var map = new mbgl.Map(options);
-var style = mapboxStyle; // includes a datasource with a reference to something like `mapbox://mapbox.mapbox-streets-v6`
+        request(opts, function (err, res, body) {
+            if (err) {
+                req.respond(err);
+            } else if (res.statusCode == 200) {
+                var response = {};
+
+                if (res.headers.modified) { response.modified = new Date(res.headers.modified); }
+                if (res.headers.expires) { response.expires = new Date(res.headers.expires); }
+                if (res.headers.etag) { response.etag = res.headers.etag; }
+            
+                response.data = body;
+            
+                req.respond(null, response);
+            } else {
+                req.respond(new Error(JSON.parse(body).message));
+            }
+        });
+    },
+    ratio: 1.0
+});
+
+// includes a datasource with a reference to something like `mapbox://mapbox.mapbox-streets-v6`
+var style = mapboxStyle;
 
 map.load(style);
 map.render({}, function(err, image) {
