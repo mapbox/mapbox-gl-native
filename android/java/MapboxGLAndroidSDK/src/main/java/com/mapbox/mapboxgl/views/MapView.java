@@ -200,15 +200,15 @@ public class MapView extends FrameLayout implements LocationListener {
 
     public MapView(Context context, @NonNull String accessToken) {
         super(context);
-        setAccessToken(accessToken);
         initialize(context, null);
+        setAccessToken(accessToken);
     }
 
     public MapView(Context context, @NonNull String accessToken, String styleUrl) {
         super(context);
+        initialize(context, null);
         setAccessToken(accessToken);
         setStyleUrl(styleUrl);
-        initialize(context, null);
     }
 
     // Called when properties are being set from XML
