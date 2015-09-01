@@ -1,17 +1,23 @@
 package com.mapbox.mapboxgl.views;
 
 import android.app.ActivityManager;
+import android.app.AlertDialog;
+import android.app.Dialog;
 import android.content.BroadcastReceiver;
 import android.content.Context;
+import android.content.DialogInterface;
 import android.content.Intent;
 import android.content.IntentFilter;
 import android.content.pm.PackageManager;
+import android.content.res.ColorStateList;
 import android.content.res.TypedArray;
+import android.content.res.XmlResourceParser;
 import android.graphics.Bitmap;
 import android.graphics.Matrix;
 import android.graphics.PointF;
 import android.graphics.RectF;
 import android.graphics.SurfaceTexture;
+import android.graphics.drawable.Drawable;
 import android.hardware.GeomagneticField;
 import android.hardware.Sensor;
 import android.hardware.SensorEvent;
@@ -20,10 +26,12 @@ import android.hardware.SensorManager;
 import android.location.Location;
 import android.net.ConnectivityManager;
 import android.net.NetworkInfo;
+import android.net.Uri;
 import android.os.Build;
 import android.os.Bundle;
 import android.support.annotation.NonNull;
 import android.support.v4.content.ContextCompat;
+import android.support.v4.graphics.drawable.DrawableCompat;
 import android.support.v4.view.GestureDetectorCompat;
 import android.support.v4.view.ScaleGestureDetectorCompat;
 import android.text.TextUtils;
@@ -38,6 +46,8 @@ import android.view.Surface;
 import android.view.TextureView;
 import android.view.View;
 import android.view.ViewConfiguration;
+import android.view.ViewGroup;
+import android.widget.ArrayAdapter;
 import android.widget.FrameLayout;
 import android.widget.ImageView;
 import android.widget.ZoomButtonsController;
@@ -94,6 +104,10 @@ public class MapView extends FrameLayout implements LocationListener {
     private static final String STATE_COMPASS_ENABLED = "compassEnabled";
     private static final String STATE_MY_LOCATION_ENABLED = "myLocationEnabled";
     private static final String STATE_USER_LOCATION_TRACKING_MODE = "userLocationTrackingMode";
+
+    // Used for positioning views
+    private static final float DIMENSION_SIXTEEN_DP = 16f;
+    private static final float DIMENSION_TEN_DP = 10f;
 
     /**
      * Every annotation that has been added to the map.
@@ -155,6 +169,12 @@ public class MapView extends FrameLayout implements LocationListener {
     private float[] mMatrixValues = new float[3];
     private float mCompassBearing;
     private boolean mCompassValid = false;
+
+    // Used for MapboxLogo
+    private ImageView mLogoView;
+
+    // Used for attributions control
+    private ImageView mAttributionsView;
 
     // Used for map toggle mode
     private long t0 = new Date().getTime();
@@ -306,6 +326,8 @@ public class MapView extends FrameLayout implements LocationListener {
 
         // Get the screen's density
         mScreenDensity = context.getResources().getDisplayMetrics().density;
+        int tenDp = (int)(10 * mScreenDensity);
+        int sixteenDp = (int)(16 * mScreenDensity);
 
         // Get the cache path
         String cachePath = context.getCacheDir().getAbsolutePath();
@@ -373,12 +395,29 @@ public class MapView extends FrameLayout implements LocationListener {
         mCompassView.setImageDrawable(ContextCompat.getDrawable(getContext(), R.drawable.compass));
         mCompassView.setContentDescription(getResources().getString(R.string.compassContentDescription));
         LayoutParams lp = new FrameLayout.LayoutParams((int)(48 * mScreenDensity), (int)(48 * mScreenDensity));
-        lp.gravity = Gravity.TOP | Gravity.END;
-        int tenDp = (int)(10 * mScreenDensity);
-        lp.setMargins(tenDp, tenDp, tenDp, tenDp);
         mCompassView.setLayoutParams(lp);
         addView(mCompassView);
         mCompassView.setOnClickListener(new CompassOnClickListener());
+
+        // Setup Mapbox logo
+        mLogoView = new ImageView(mContext);
+        mLogoView.setImageDrawable(ContextCompat.getDrawable(mContext, R.drawable.ic_logo_mapbox));
+        mLogoView.setContentDescription(getResources().getString(R.string.mapboxIconContentDescription));
+        LayoutParams logoParams = new FrameLayout.LayoutParams(ViewGroup.LayoutParams.WRAP_CONTENT, ViewGroup.LayoutParams.WRAP_CONTENT);
+        mLogoView.setLayoutParams(logoParams);
+        addView(mLogoView);
+
+        // Setup Attributions control
+        mAttributionsView = new ImageView(mContext);
+        Drawable attrDrawable = ContextCompat.getDrawable(mContext, R.drawable.ic_info_outline_black_24dp);
+        attrDrawable = DrawableCompat.wrap(attrDrawable);
+        DrawableCompat.setTintList(attrDrawable, getResources().getColorStateList(R.color.material_bg_selector, mContext.getTheme()));
+        mAttributionsView.setImageDrawable(attrDrawable);
+        mAttributionsView.setContentDescription(getResources().getString(R.string.attributionsIconContentDescription));
+        LayoutParams attrParams = new FrameLayout.LayoutParams(ViewGroup.LayoutParams.WRAP_CONTENT, ViewGroup.LayoutParams.WRAP_CONTENT);
+        mAttributionsView.setLayoutParams(attrParams);
+        addView(mAttributionsView);
+        mAttributionsView.setOnClickListener(new AttributionOnClickListener());
 
         // Setup Support For Listener Tracking
         // MapView's internal listener is setup in onCreate()
@@ -412,7 +451,29 @@ public class MapView extends FrameLayout implements LocationListener {
                 }
                 setStyleClasses(styleClasses);
             }
+
+            // Compass
             setCompassEnabled(typedArray.getBoolean(R.styleable.MapView_compassEnabled, true));
+            setCompassGravity(typedArray.getInt(R.styleable.MapView_compassGravity, Gravity.TOP | Gravity.END));
+            setWidgetMargins(mCompassView, typedArray.getDimension(R.styleable.MapView_compassMarginLeft, DIMENSION_TEN_DP)
+                    , typedArray.getDimension(R.styleable.MapView_compassMarginTop, DIMENSION_TEN_DP)
+                    , typedArray.getDimension(R.styleable.MapView_compassMarginRight, DIMENSION_TEN_DP)
+                    , typedArray.getDimension(R.styleable.MapView_compassMarginBottom, DIMENSION_TEN_DP));
+
+            // Logo
+            setLogoGravity(typedArray.getInt(R.styleable.MapView_logoGravity, Gravity.BOTTOM | Gravity.START));
+            setWidgetMargins(mLogoView, typedArray.getDimension(R.styleable.MapView_logoMarginLeft, DIMENSION_SIXTEEN_DP)
+                    , typedArray.getDimension(R.styleable.MapView_logoMarginTop, DIMENSION_SIXTEEN_DP)
+                    , typedArray.getDimension(R.styleable.MapView_logoMarginRight, DIMENSION_SIXTEEN_DP)
+                    , typedArray.getDimension(R.styleable.MapView_logoMarginBottom, DIMENSION_SIXTEEN_DP));
+
+            // Attribution
+            setAttributionGravity(typedArray.getInt(R.styleable.MapView_attributionGravity, Gravity.BOTTOM | Gravity.END));
+            setWidgetMargins(mAttributionsView, typedArray.getDimension(R.styleable.MapView_attributionMarginLeft, DIMENSION_SIXTEEN_DP)
+                    , typedArray.getDimension(R.styleable.MapView_attributionMarginTop, DIMENSION_SIXTEEN_DP)
+                    , typedArray.getDimension(R.styleable.MapView_attributionMarginRight, DIMENSION_SIXTEEN_DP)
+                    , typedArray.getDimension(R.styleable.MapView_attributionMarginBottom, DIMENSION_SIXTEEN_DP));
+
             setMyLocationEnabled(typedArray.getBoolean(R.styleable.MapView_myLocationEnabled, false));
         } finally {
             typedArray.recycle();
@@ -1835,6 +1896,48 @@ public class MapView extends FrameLayout implements LocationListener {
         updateMap(MapChange.MapChangeNullChange);
     }
 
+    public void setCompassGravity(int gravity){
+        setWidgetGravity(mCompassView, gravity);
+    }
+
+    public void setCompassMargins(int left, int top, int right, int bottom){
+        setWidgetMargins(mCompassView, left, top, right, bottom);
+    }
+
+    public void setLogoGravity(int gravity){
+        setWidgetGravity(mLogoView, gravity);
+    }
+
+    public void setLogoMargins(int left, int top, int right, int bottom){
+        setWidgetMargins(mLogoView, left, top, right, bottom);
+    }
+
+    public void setAttributionGravity(int gravity){
+        setWidgetGravity(mAttributionsView, gravity);
+    }
+
+    public void setAttributionMargins(int left, int top, int right, int bottom) {
+        setWidgetMargins(mAttributionsView, left, top, right, bottom);
+    }
+
+    private void setWidgetGravity(@NonNull final View view, int gravity){
+        LayoutParams layoutParams = (LayoutParams) view.getLayoutParams();
+        layoutParams.gravity = gravity;
+        view.setLayoutParams(layoutParams);
+    }
+
+    private void setWidgetMargins(@NonNull final View view, int left, int top, int right, int bottom){
+        LayoutParams layoutParams = (LayoutParams) view.getLayoutParams();
+        layoutParams.setMargins(left,top,right,bottom);
+        view.setLayoutParams(layoutParams);
+    }
+
+    private void setWidgetMargins(@NonNull final View view, float leftDp, float topDp, float rightDp, float bottomDp){
+        LayoutParams layoutParams = (LayoutParams) view.getLayoutParams();
+        layoutParams.setMargins((int)(leftDp*mScreenDensity),(int)(topDp*mScreenDensity),(int)(rightDp*mScreenDensity),(int)(bottomDp*mScreenDensity));
+        view.setLayoutParams(layoutParams);
+    }
+
     // This class handles sensor updates to calculate compass bearing
     private class CompassListener implements SensorEventListener {
 
@@ -1887,6 +1990,30 @@ public class MapView extends FrameLayout implements LocationListener {
             resetNorth();
         }
 
+    }
+
+    private static class AttributionOnClickListener implements View.OnClickListener, DialogInterface.OnClickListener {
+
+        // Called when someone presses the attribution icon
+        @Override
+        public void onClick(View v) {
+            Context context = v.getContext();
+            String[] items = context.getResources().getStringArray(R.array.attribution_names);
+            AlertDialog.Builder builder = new AlertDialog.Builder(context);
+            builder.setTitle(R.string.attributionsDialogTitle);
+            builder.setAdapter(new ArrayAdapter<>(context, android.R.layout.simple_list_item_1, items), this);
+            builder.show();
+        }
+
+        // Called when someone selects an attribution
+        @Override
+        public void onClick(DialogInterface dialog, int which) {
+            Context context = ((Dialog)dialog).getContext();
+            String[]links = context.getResources().getStringArray(R.array.attribution_links);
+            Intent intent = new Intent(Intent.ACTION_VIEW);
+            intent.setData(Uri.parse(links[which]));
+            context.startActivity(intent);
+        }
     }
 
     /**
