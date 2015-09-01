@@ -9,7 +9,6 @@
 
 #include <mbgl/util/projection.hpp>
 #include <mbgl/util/thread.hpp>
-#include <iostream>
 
 namespace mbgl {
 
@@ -64,7 +63,6 @@ void Map::renderSync() {
         MapChangeDidFinishRenderingFrame);
 
     if (!fullyLoaded) {
-        std::cout << "RenderState::partial" << std::endl;
         renderState = RenderState::partial;
     } else if (renderState != RenderState::fully) {
         renderState = RenderState::fully;

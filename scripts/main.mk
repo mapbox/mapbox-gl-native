@@ -70,7 +70,7 @@ config/%.gypi: $(SUBMODULES) configure $(CONFIGURE_FILES)
 #### Build files ###############################################################
 
 GYP_FLAGS += -Dhost=$(HOST)
-GYP_FLAGS += -Iconfig/$(HOST_SLUG).gypi 
+GYP_FLAGS += -Iconfig/$(HOST_SLUG).gypi
 GYP_FLAGS += -Dplatform_lib=$(PLATFORM)
 GYP_FLAGS += -Dhttp_lib=$(HTTP)
 GYP_FLAGS += -Dasset_lib=$(ASSET)
