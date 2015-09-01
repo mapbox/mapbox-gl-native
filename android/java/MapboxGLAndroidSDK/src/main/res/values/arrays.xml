@@ -1,0 +1,13 @@
+<?xml version="1.0" encoding="utf-8"?>
+<resources>
+    <array name="attribution_names">
+        <item>&#169; Mapbox</item>
+        <item>&#169; OpenStreetMap</item>
+        <item>Improve this map</item>
+    </array>
+    <array name="attribution_links" formatted="false" translatable="false">
+        <item>https://www.mapbox.com/about/maps/</item>
+        <item>http://www.openstreetmap.org/about/</item>
+        <item>https://www.mapbox.com/map-feedback</item>
+    </array>
+</resources>
