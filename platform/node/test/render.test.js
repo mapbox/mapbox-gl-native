@@ -31,16 +31,11 @@ function renderTest(style, info, base, key) {
     mkdirp.sync(dir);
 
     return function(t) {
-        console.log('STARTING');
-
         var watchdog = setTimeout(function() {
-            console.log('THIS IS A TIMEOUT');
             t.fail('timed out after 20 seconds');
         }, 20000);
 
         t.once('end', function() {
-            console.log('THIS IS THE END');
-
             clearTimeout(watchdog);
 
             if (map) {
@@ -52,7 +47,6 @@ function renderTest(style, info, base, key) {
         var options = {};
         options.request = function(req) {
             var url =  decodeURIComponent(req.url);
-            console.log('JAVASCRIPT REQUEST:', url);
             fs.readFile(path.join(suitePath, url), function(err, data) {
                 req.respond(err, { data: data });
             });
@@ -64,7 +58,6 @@ function renderTest(style, info, base, key) {
 
         map.render(info[key], function(err, data) {
             if (err) {
-                console.log('THIS IS AN ERROR');
                 t.error(err);
                 return t.end();
             }
