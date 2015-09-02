@@ -27,6 +27,8 @@ if test "${COMMIT_MESSAGE#*'[publish binary]'}" != "$COMMIT_MESSAGE"; then
     ./node_modules/.bin/node-pre-gyp publish info
 
     if [[ ${TRAVIS_OS_NAME} == "linux" ]]; then
+        source ./scripts/${TRAVIS_OS_NAME}/setup.sh
+
         rm -rf build
         rm -rf lib
         npm install --fallback-to-build=false
