@@ -35,3 +35,16 @@ if test "${COMMIT_MESSAGE#*'[publish binary]'}" != "$COMMIT_MESSAGE"; then
         npm test
     fi
 fi
+
+if [ ! -z "${AWS_ACCESS_KEY_ID}" ] && [ ! -z "${AWS_SECRET_ACCESS_KEY}" ] ; then
+    # Install and add awscli to PATH for uploading the results
+    pip install --user awscli
+    export PATH="`python -m site --user-base`/bin:${PATH}"
+
+    REPO_NAME=$(basename $TRAVIS_REPO_SLUG)
+    gzip --stdout node_modules/mapbox-gl-test-suite/tests/index.html | \
+        aws s3 cp --acl public-read --content-encoding gzip --content-type text/html \
+            - s3://mapbox/$REPO_NAME/tests/$TRAVIS_JOB_NUMBER/index.html
+
+    echo http://mapbox.s3.amazonaws.com/$REPO_NAME/tests/$TRAVIS_JOB_NUMBER/index.html
+fi

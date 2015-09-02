@@ -1,24 +1,10 @@
 'use strict';
 
-/* jshint node: true */
-
 var test = require('tape');
 var mbgl = require('../../../..');
 var fs = require('fs');
 var path = require('path');
-var mkdirp = require('mkdirp');
 var style = require('../fixtures/style.json');
-var PNG = require('pngjs').PNG;
-var compare = require('../compare.js');
-
-function filePath(name) {
-    return ['expected', 'actual', 'diff'].reduce(function(prev, key) {
-        var dir = path.join(__dirname, '..', key, 'map');
-        mkdirp.sync(dir);
-        prev[key] = path.join(dir, name);
-        return prev;
-    }, {});
-}
 
 test('Map', function(t) {
     t.test('must be constructed with new', function(t) {
@@ -250,31 +236,53 @@ test('Map', function(t) {
 
                 map.release();
 
-                var filename = filePath('image.png');
-
-                var png = new PNG({
-                    width: data.width,
-                    height: data.height
-                });
-
-                png.data = data.pixels;
-
-                if (process.env.UPDATE) {
-                    png.pack()
-                        .pipe(fs.createWriteStream(filename.expected))
-                        .on('finish', t.end);
-                } else {
-                    png.pack()
-                        .pipe(fs.createWriteStream(filename.actual))
-                        .on('finish', function() {
-                            compare(filename.actual, filename.expected, filename.diff, t, function(err, diff) {
-                                t.error(err);
-                                t.ok(diff <= 0.01, 'actual matches expected');
-                                t.end();
-                            });
-                        });
-                }
+                t.ok(data.pixels);
+                t.equal(data.width, 512);
+                t.equal(data.height, 512);
+                t.end();
             });
+        });
+
+        t.test('can be called several times in serial', function(t) {
+            var completed = 0;
+            var remaining = 10;
+            var start = +new Date;
+
+            var map = new mbgl.Map(options);
+            map.load(style);
+
+            function render() {
+                map.render({}, function(err, data) {
+                    t.error(err);
+
+                    t.ok(true, 'render @ ' + ((+new Date) - start) + 'ms');
+                    if (++completed === remaining) {
+                        map.release();
+                        t.end();
+                    } else {
+                        render();
+                    }
+                });
+            }
+
+            render();
+        });
+
+        t.skip('throws if called in parallel', function(t) {
+            var completed = 0;
+            var remaining = 10;
+            var start = +new Date;
+
+            var map = new mbgl.Map(options);
+            map.load(style);
+
+            t.throws(function() {
+                map.render({}, function() {});
+                map.render({}, function() {});
+            });
+
+            map.release();
+            t.end();
         });
     });
 });

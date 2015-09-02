@@ -46,10 +46,6 @@ SUBMODULES += src/mbgl/util/geojsonvt/geojsonvt.hpp
 src/mbgl/util/geojsonvt/geojsonvt.hpp:
 	./scripts/flock.py .git/Submodule.lock git submodule update --init src/mbgl/util/geojsonvt
 
-SUBMODULES += test/suite/package.json
-test/suite/package.json:
-	./scripts/flock.py .git/Submodule.lock git submodule update --init test/suite
-
 ifeq ($(HOST),ios)
 SUBMODULES += platform/ios/vendor/SMCalloutView/SMCalloutView.h
 platform/ios/vendor/SMCalloutView/SMCalloutView.h:

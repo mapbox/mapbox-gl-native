@@ -30,7 +30,7 @@ TEST(Headless, CustomSpriteImages) {
 
     map.setLatLngZoom(LatLng{ 52.499167, 13.418056 }, 15);
 
-    map.setStyleJSON(style, "test/suite");
+    map.setStyleJSON(style, "");
     map.setSprite("cafe",
                   std::make_shared<SpriteImage>(12, 12, 1, std::string(12 * 12 * 4, '\xFF')));
     std::promise<std::unique_ptr<const StillImage>> promise;

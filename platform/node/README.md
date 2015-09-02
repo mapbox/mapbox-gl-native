@@ -92,6 +92,8 @@ The `kind` is an enum and defined in [`mbgl.Resource`](https://github.com/mapbox
 
 It has no significance for anything but serves as a hint to your implemention as to what sort of resource to expect. E.g., your implementation could choose caching strategies based on the expected file type.
 
+THe `request` implementation should pass uncompressed data to `req.respond`. If you are downloading assets from a source that applies gzip transport encoding, the implementation must decompress the results before passing them on.
+
 A sample implementation that reads files from disk would look like the following:
 
 ```js
