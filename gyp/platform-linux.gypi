@@ -28,6 +28,8 @@
           '<@(libuv_cflags)',
           '<@(nunicode_cflags)',
           '<@(boost_cflags)',
+          '<@(geojsonvt_cflags)',
+          '<@(variant_cflags)',
         ],
         'ldflags': [
           '<@(libpng_ldflags)',
@@ -40,6 +42,7 @@
           '<@(jpeg_static_libs)',
           '<@(libuv_static_libs)',
           '<@(nunicode_static_libs)',
+          '<@(geojsonvt_static_libs)',
         ],
       },
 
