@@ -101,9 +101,24 @@ public class MapView extends FrameLayout implements LocationListener {
     private static final String STATE_ACCESS_TOKEN = "accessToken";
     private static final String STATE_STYLE_CLASSES = "styleClasses";
     private static final String STATE_DEFAULT_TRANSITION_DURATION = "defaultTransitionDuration";
-    private static final String STATE_COMPASS_ENABLED = "compassEnabled";
     private static final String STATE_MY_LOCATION_ENABLED = "myLocationEnabled";
     private static final String STATE_USER_LOCATION_TRACKING_MODE = "userLocationTrackingMode";
+    private static final String STATE_COMPASS_ENABLED = "compassEnabled";
+    private static final String STATE_COMPASS_GRAVITY = "compassGravity";
+    private static final String STATE_COMPASS_MARGIN_LEFT = "compassMarginLeft";
+    private static final String STATE_COMPASS_MARGIN_TOP = "compassMarginTop";
+    private static final String STATE_COMPASS_MARGIN_RIGHT = "compassMarginRight";
+    private static final String STATE_COMPASS_MARGIN_BOTTOM = "compassMarginBottom";
+    private static final String STATE_LOGO_GRAVITY = "logoGravity";
+    private static final String STATE_LOGO_MARGIN_LEFT = "logoMarginLeft";
+    private static final String STATE_LOGO_MARGIN_TOP = "logoMarginTop";
+    private static final String STATE_LOGO_MARGIN_RIGHT = "logoMarginRight";
+    private static final String STATE_LOGO_MARGIN_BOTTOM = "logoMarginBottom";
+    private static final String STATE_ATTRIBUTION_GRAVITY = "attrGravity";
+    private static final String STATE_ATTRIBUTION_MARGIN_LEFT = "attrMarginLeft";
+    private static final String STATE_ATTRIBUTION_MARGIN_TOP = "attrMarginTop";
+    private static final String STATE_ATTRIBUTION_MARGIN_RIGHT = "attrMarginRight";
+    private static final String STATE_ATTRIBUTION_MARGIN_BOTTOM = "atrrMarginBottom";
 
     // Used for positioning views
     private static final float DIMENSION_SIXTEEN_DP = 16f;
@@ -835,9 +850,30 @@ public class MapView extends FrameLayout implements LocationListener {
                 setStyleClasses(appliedStyleClasses);
             }
             mNativeMapView.setDefaultTransitionDuration(savedInstanceState.getLong(STATE_DEFAULT_TRANSITION_DURATION));
-            setCompassEnabled(savedInstanceState.getBoolean(STATE_COMPASS_ENABLED));
             setMyLocationEnabled(savedInstanceState.getBoolean(STATE_MY_LOCATION_ENABLED));
             setUserLocationTrackingMode((UserLocationTrackingMode) savedInstanceState.getSerializable(STATE_USER_LOCATION_TRACKING_MODE));
+
+            // Compass
+            setCompassEnabled(savedInstanceState.getBoolean(STATE_COMPASS_ENABLED));
+            setCompassGravity(savedInstanceState.getInt(STATE_COMPASS_GRAVITY));
+            setCompassMargins(savedInstanceState.getInt(STATE_COMPASS_MARGIN_LEFT)
+                    , savedInstanceState.getInt(STATE_COMPASS_MARGIN_TOP)
+                    , savedInstanceState.getInt(STATE_COMPASS_MARGIN_RIGHT)
+                    , savedInstanceState.getInt(STATE_COMPASS_MARGIN_BOTTOM));
+
+            // Logo
+            setLogoGravity(savedInstanceState.getInt(STATE_LOGO_GRAVITY));
+            setLogoMargins(savedInstanceState.getInt(STATE_LOGO_MARGIN_LEFT)
+                    , savedInstanceState.getInt(STATE_LOGO_MARGIN_TOP)
+                    , savedInstanceState.getInt(STATE_LOGO_MARGIN_RIGHT)
+                    , savedInstanceState.getInt(STATE_LOGO_MARGIN_BOTTOM));
+
+            // Attribution
+            setAttributionGravity(savedInstanceState.getInt(STATE_ATTRIBUTION_GRAVITY));
+            setAttributionMargins(savedInstanceState.getInt(STATE_ATTRIBUTION_MARGIN_LEFT)
+                    , savedInstanceState.getInt(STATE_ATTRIBUTION_MARGIN_TOP)
+                    , savedInstanceState.getInt(STATE_ATTRIBUTION_MARGIN_RIGHT)
+                    , savedInstanceState.getInt(STATE_ATTRIBUTION_MARGIN_BOTTOM));
         }
 
         // Force a check for an access token
@@ -868,9 +904,33 @@ public class MapView extends FrameLayout implements LocationListener {
         outState.putString(STATE_ACCESS_TOKEN, getAccessToken());
         outState.putStringArrayList(STATE_STYLE_CLASSES, new ArrayList<>(getStyleClasses()));
         outState.putLong(STATE_DEFAULT_TRANSITION_DURATION, mNativeMapView.getDefaultTransitionDuration());
-        outState.putBoolean(STATE_COMPASS_ENABLED, isCompassEnabled());
         outState.putBoolean(STATE_MY_LOCATION_ENABLED, isMyLocationEnabled());
         outState.putSerializable(STATE_USER_LOCATION_TRACKING_MODE, getUserLocationTrackingMode());
+
+        // Compass
+        LayoutParams compassParams = (LayoutParams) mCompassView.getLayoutParams();
+        outState.putBoolean(STATE_COMPASS_ENABLED, isCompassEnabled());
+        outState.putInt(STATE_COMPASS_GRAVITY, compassParams.gravity );
+        outState.putInt(STATE_COMPASS_MARGIN_LEFT, compassParams.leftMargin);
+        outState.putInt(STATE_COMPASS_MARGIN_TOP, compassParams.topMargin);
+        outState.putInt(STATE_COMPASS_MARGIN_BOTTOM, compassParams.bottomMargin);
+        outState.putInt(STATE_COMPASS_MARGIN_RIGHT, compassParams.rightMargin);
+
+        // Logo
+        LayoutParams logoParams = (LayoutParams) mLogoView.getLayoutParams();
+        outState.putInt(STATE_LOGO_GRAVITY, logoParams.gravity);
+        outState.putInt(STATE_LOGO_MARGIN_LEFT, logoParams.leftMargin);
+        outState.putInt(STATE_LOGO_MARGIN_TOP, logoParams.topMargin);
+        outState.putInt(STATE_LOGO_MARGIN_RIGHT, logoParams.rightMargin);
+        outState.putInt(STATE_LOGO_MARGIN_BOTTOM, logoParams.bottomMargin);
+
+        // Attribution
+        LayoutParams attrParams = (LayoutParams) mAttributionsView.getLayoutParams();
+        outState.putInt(STATE_ATTRIBUTION_GRAVITY, attrParams.gravity);
+        outState.putInt(STATE_ATTRIBUTION_MARGIN_LEFT, attrParams.leftMargin);
+        outState.putInt(STATE_ATTRIBUTION_MARGIN_TOP, attrParams.topMargin);
+        outState.putInt(STATE_ATTRIBUTION_MARGIN_RIGHT, attrParams.rightMargin);
+        outState.putInt(STATE_ATTRIBUTION_MARGIN_BOTTOM, attrParams.bottomMargin);
     }
 
     // Called when we need to clean up
