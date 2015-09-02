@@ -46,8 +46,8 @@ public:
         }
     }
 
-    void redoPlacement(TileWorker* worker, float angle, bool collisionDebug, std::function<void ()> callback) {
-        worker->redoPlacement(angle, collisionDebug);
+    void redoPlacement(TileWorker* worker, float angle, float pitch, bool collisionDebug, std::function<void ()> callback) {
+        worker->redoPlacement(angle, pitch, collisionDebug);
         callback();
     }
 };
@@ -76,9 +76,9 @@ std::unique_ptr<WorkRequest> Worker::parseLiveTile(TileWorker& worker, const Liv
     return threads[current]->invokeWithCallback(&Worker::Impl::parseLiveTile, callback, &worker, &tile);
 }
 
-std::unique_ptr<WorkRequest> Worker::redoPlacement(TileWorker& worker, float angle, bool collisionDebug, std::function<void ()> callback) {
+std::unique_ptr<WorkRequest> Worker::redoPlacement(TileWorker& worker, float angle, float pitch, bool collisionDebug, std::function<void ()> callback) {
     current = (current + 1) % threads.size();
-    return threads[current]->invokeWithCallback(&Worker::Impl::redoPlacement, callback, &worker, angle, collisionDebug);
+    return threads[current]->invokeWithCallback(&Worker::Impl::redoPlacement, callback, &worker, angle, pitch, collisionDebug);
 }
 
 } // end namespace mbgl

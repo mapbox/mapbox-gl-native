@@ -11,7 +11,7 @@ namespace mbgl {
     struct SymbolQuad {
         explicit SymbolQuad(const vec2<float> &tl_, const vec2<float> &tr_,
                 const vec2<float> &bl_, const vec2<float> &br_,
-                const Rect<uint16_t> &tex_, float angle_, const vec2<float> &anchor_,
+                const Rect<uint16_t> &tex_, float angle_, const vec2<float> &anchorPoint_,
                 float minScale_, float maxScale_)
             : tl(tl_),
             tr(tr_),
@@ -19,14 +19,14 @@ namespace mbgl {
             br(br_),
             tex(tex_),
             angle(angle_),
-            anchor(anchor_),
+            anchorPoint(anchorPoint_),
             minScale(minScale_),
             maxScale(maxScale_) {}
 
         vec2<float> tl, tr, bl, br;
         Rect<uint16_t> tex;
         float angle;
-        vec2<float> anchor;
+        vec2<float> anchorPoint;
         float minScale, maxScale;
     };
 

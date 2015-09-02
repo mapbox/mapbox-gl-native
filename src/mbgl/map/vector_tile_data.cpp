@@ -16,6 +16,7 @@ VectorTileData::VectorTileData(const TileID& id_,
                                Style& style_,
                                const SourceInfo& source_,
                                float angle,
+                               float pitch,
                                bool collisionDebug)
     : TileData(id_),
       worker(style_.workers),
@@ -25,9 +26,7 @@ VectorTileData::VectorTileData(const TileID& id_,
                  style_,
                  style_.layers,
                  state,
-                 std::make_unique<CollisionTile>(id_.z, 4096,
-                                    source_.tile_size * id.overscaling,
-                                    angle, collisionDebug)),
+                 std::make_unique<CollisionTile>(angle, pitch, collisionDebug)),
       source(source_),
       lastAngle(angle),
       currentAngle(angle) {
@@ -98,11 +97,14 @@ Bucket* VectorTileData::getBucket(const StyleLayer& layer) {
     return tileWorker.getBucket(layer);
 }
 
-void VectorTileData::redoPlacement(float angle, bool collisionDebug) {
-    if (angle == currentAngle && collisionDebug == currentCollisionDebug)
+void VectorTileData::redoPlacement(float angle, float pitch, bool collisionDebug) {
+    if (angle == currentAngle &&
+        pitch == currentPitch &&
+        collisionDebug == currentCollisionDebug)
         return;
 
     lastAngle = angle;
+    lastPitch = pitch;
     lastCollisionDebug = collisionDebug;
 
     if (state != State::parsed || redoingPlacement)
@@ -110,9 +112,10 @@ void VectorTileData::redoPlacement(float angle, bool collisionDebug) {
 
     redoingPlacement = true;
     currentAngle = angle;
+    currentPitch = pitch;
     currentCollisionDebug = collisionDebug;
 
-    workRequest = worker.redoPlacement(tileWorker, angle, collisionDebug, [this] {
+    workRequest = worker.redoPlacement(tileWorker, angle, pitch, collisionDebug, [this] {
         for (const auto& layer : tileWorker.layers) {
             auto bucket = getBucket(*layer);
             if (bucket) {
@@ -120,7 +123,7 @@ void VectorTileData::redoPlacement(float angle, bool collisionDebug) {
             }
         }
         redoingPlacement = false;
-        redoPlacement(lastAngle, lastCollisionDebug);
+        redoPlacement(lastAngle, lastPitch, lastCollisionDebug);
     });
 }
 

@@ -41,6 +41,10 @@ public:
     void setAngle(double angle, double cx, double cy);
     double getAngle() const;
 
+    // Pitch
+    void setPitch(double pitch);
+    double getPitch() const;
+
     // Transitions
     Update updateTransitions(const TimePoint& now);
     void cancelTransitions();

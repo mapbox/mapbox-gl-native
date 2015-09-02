@@ -20,21 +20,20 @@
 //
 // 3. This notice may not be removed or altered from any source distribution.
 
-#ifndef MBGL_UTIL_MAT3
-#define MBGL_UTIL_MAT3
+#ifndef MBGL_UTIL_MAT2
+#define MBGL_UTIL_MAT2
 
 #include <array>
 
 namespace mbgl {
 
-typedef std::array<double, 9> mat3;
+typedef std::array<double, 4> mat2;
 
 namespace matrix {
 
-void identity(mat3& out);
-void translate(mat3& out, const mat3& a, double x, double y);
-void rotate(mat3& out, const mat3& a, double rad);
-void scale(mat3& out, const mat3& a, double x, double y);
+void identity(mat2& out);
+void rotate(mat2& out, const mat2& a, double rad);
+void scale(mat2& out, const mat2& a, double v0, double v1);
 
 }
 }

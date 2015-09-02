@@ -49,6 +49,7 @@ public:
     Request redoPlacement(
         TileWorker&,
         float angle,
+        float pitch,
         bool collisionDebug,
         std::function<void ()> callback);
 

@@ -20,23 +20,33 @@
 //
 // 3. This notice may not be removed or altered from any source distribution.
 
-#ifndef MBGL_UTIL_MAT3
-#define MBGL_UTIL_MAT3
+#include <mbgl/util/mat2.hpp>
 
-#include <array>
+#include <cmath>
 
-namespace mbgl {
+using namespace mbgl;
 
-typedef std::array<double, 9> mat3;
-
-namespace matrix {
-
-void identity(mat3& out);
-void translate(mat3& out, const mat3& a, double x, double y);
-void rotate(mat3& out, const mat3& a, double rad);
-void scale(mat3& out, const mat3& a, double x, double y);
-
-}
+void matrix::identity(mat2& out) {
+    out[0] = 1.0f;
+    out[1] = 0.0f;
+    out[2] = 0.0f;
+    out[3] = 1.0f;
 }
 
-#endif
+void matrix::rotate(mat2& out, const mat2& a, double rad) {
+    double a0 = a[0], a1 = a[1], a2 = a[2], a3 = a[3],
+        s = std::sin(rad),
+        c = std::cos(rad);
+    out[0] = a0 *  c + a2 * s;
+    out[1] = a1 *  c + a3 * s;
+    out[2] = a0 * -s + a2 * c;
+    out[3] = a1 * -s + a3 * c;
+};
+
+void matrix::scale(mat2& out, const mat2& a, double v0, double v1) {
+    double a0 = a[0], a1 = a[1], a2 = a[2], a3 = a[3];
+    out[0] = a0 * v0;
+    out[1] = a1 * v0;
+    out[2] = a2 * v1;
+    out[3] = a3 * v1;
+}

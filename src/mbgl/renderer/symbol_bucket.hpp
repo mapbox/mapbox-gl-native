@@ -64,7 +64,7 @@ class SymbolBucket : public Bucket {
     typedef ElementGroup<1> CollisionBoxElementGroup;
 
 public:
-    SymbolBucket(CollisionTile &collision, float overscaling);
+    SymbolBucket(float overscaling, float zoom);
     ~SymbolBucket() override;
 
     void upload() override;
@@ -77,7 +77,8 @@ public:
     void addFeatures(uintptr_t tileUID,
                      SpriteAtlas&,
                      GlyphAtlas&,
-                     GlyphStore&);
+                     GlyphStore&,
+                     CollisionTile&);
 
     void drawGlyphs(SDFShader& shader);
     void drawIcons(SDFShader& shader);
@@ -88,7 +89,7 @@ public:
                            const FilterExpression&,
                            GlyphStore&,
                            Sprite&);
-    void placeFeatures() override;
+    void placeFeatures(CollisionTile&) override;
 
 private:
     void addFeature(const std::vector<std::vector<Coordinate>> &lines,
@@ -97,22 +98,28 @@ private:
     bool anchorIsTooClose(const std::u32string &text, const float repeatDistance, Anchor &anchor);
     std::map<std::u32string, std::vector<Anchor>> compareText;
     
-    void addToDebugBuffers();
+    void addToDebugBuffers(CollisionTile &collisionTile);
 
-    void placeFeatures(bool swapImmediately);
+    void placeFeatures(CollisionTile& collisionTile, bool swapImmediately);
     void swapRenderData() override;
 
     // Adds placed items to the buffer.
     template <typename Buffer, typename GroupType>
-    void addSymbols(Buffer &buffer, const SymbolQuads &symbols, float scale, const bool keepUpright, const bool alongLine);
+    void addSymbols(Buffer &buffer, const SymbolQuads &symbols, float scale,
+            const bool keepUpright, const bool alongLine, const float placementAngle);
 
 public:
     StyleLayoutSymbol layout;
     bool sdfIcons = false;
 
 private:
-    CollisionTile &collision;
+
     const float overscaling;
+    const float zoom;
+    const float tileSize;
+    const float tileExtent = 4096.0f;
+    const float tilePixelRatio;
+
     std::vector<SymbolInstance> symbolInstances;
     std::vector<SymbolFeature> features;
 

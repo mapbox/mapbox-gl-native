@@ -25,7 +25,7 @@ TileWorker::TileWorker(TileID id_,
       maxZoom(maxZoom_),
       style(style_),
       state(state_),
-      collision(std::move(collision_)) {
+      collisionTile(std::move(collision_)) {
     assert(style.sprite);
 }
 
@@ -55,13 +55,12 @@ TileParseResult TileWorker::parse(const GeometryTile& geometryTile) {
     return partialParse ? TileData::State::partial : TileData::State::parsed;
 }
 
-void TileWorker::redoPlacement(float angle, bool collisionDebug) {
-    collision->reset(angle, 0);
-    collision->setDebug(collisionDebug);
+void TileWorker::redoPlacement(float angle, float pitch, bool collisionDebug) {
+    collisionTile = std::make_unique<CollisionTile>(angle, pitch, collisionDebug);
     for (auto i = layers.rbegin(); i != layers.rend(); i++) {
         auto bucket = getBucket(**i);
         if (bucket) {
-            bucket->placeFeatures();
+            bucket->placeFeatures(*collisionTile);
         }
     }
 }
@@ -224,7 +223,7 @@ std::unique_ptr<Bucket> TileWorker::createCircleBucket(const GeometryTileLayer& 
 
 std::unique_ptr<Bucket> TileWorker::createSymbolBucket(const GeometryTileLayer& layer,
                                                        const StyleBucket& bucket_desc) {
-    auto bucket = std::make_unique<SymbolBucket>(*collision, id.overscaling);
+    auto bucket = std::make_unique<SymbolBucket>(id.overscaling, id.z);
 
     const float z = id.z;
     auto& layout = bucket->layout;
@@ -283,7 +282,7 @@ std::unique_ptr<Bucket> TileWorker::createSymbolBucket(const GeometryTileLayer& 
     }
 
     bucket->addFeatures(reinterpret_cast<uintptr_t>(this), *style.spriteAtlas, *style.glyphAtlas,
-                        *style.glyphStore);
+                        *style.glyphStore, *collisionTile);
 
     return bucket->hasData() ? std::move(bucket) : nullptr;
 }

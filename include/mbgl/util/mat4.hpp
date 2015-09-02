@@ -27,16 +27,19 @@
 
 namespace mbgl {
 
-typedef std::array<float, 16> mat4;
+typedef std::array<double, 16> mat4;
 
 namespace matrix {
 
 void identity(mat4& out);
-void ortho(mat4& out, float left, float right, float bottom, float top, float near, float far);
+bool invert(mat4& out, mat4& a);
+void ortho(mat4& out, double left, double right, double bottom, double top, double near, double far);
+void perspective(mat4& out, double fovy, double aspect, double near, double far);
 void copy(mat4& out, const mat4& a);
-void translate(mat4& out, const mat4& a, float x, float y, float z);
-void rotate_z(mat4& out, const mat4& a, float rad);
-void scale(mat4& out, const mat4& a, float x, float y, float z);
+void translate(mat4& out, const mat4& a, double x, double y, double z);
+void rotate_x(mat4& out, const mat4& a, double rad);
+void rotate_z(mat4& out, const mat4& a, double rad);
+void scale(mat4& out, const mat4& a, double x, double y, double z);
 void multiply(mat4& out, const mat4& a, const mat4& b);
 
 }

@@ -20,21 +20,19 @@
 //
 // 3. This notice may not be removed or altered from any source distribution.
 
-#ifndef MBGL_UTIL_MAT3
-#define MBGL_UTIL_MAT3
+#ifndef MBGL_UTIL_VEC4
+#define MBGL_UTIL_VEC4
 
 #include <array>
+#include <mbgl/util/mat4.hpp>
 
 namespace mbgl {
 
-typedef std::array<double, 9> mat3;
-
 namespace matrix {
 
-void identity(mat3& out);
-void translate(mat3& out, const mat3& a, double x, double y);
-void rotate(mat3& out, const mat3& a, double rad);
-void scale(mat3& out, const mat3& a, double x, double y);
+typedef std::array<double, 4> vec4;
+
+void transformMat4(vec4& out, vec4& a, mat4& m);
 
 }
 }

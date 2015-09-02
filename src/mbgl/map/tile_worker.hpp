@@ -44,7 +44,7 @@ public:
     Bucket* getBucket(const StyleLayer&) const;
 
     TileParseResult parse(const GeometryTile&);
-    void redoPlacement(float angle, bool collisionDebug);
+    void redoPlacement(float angle, float pitch, bool collisionDebug);
 
     std::vector<util::ptr<StyleLayer>> layers;
 
@@ -75,7 +75,7 @@ private:
     TriangleElementsBuffer triangleElementsBuffer;
     LineElementsBuffer lineElementsBuffer;
 
-    std::unique_ptr<CollisionTile> collision;
+    std::unique_ptr<CollisionTile> collisionTile;
 
     // Contains all the Bucket objects for the tile. Buckets are render
     // objects and they get added to this map as they get processed.
