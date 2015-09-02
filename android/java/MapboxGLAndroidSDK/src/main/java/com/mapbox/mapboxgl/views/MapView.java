@@ -1,6 +1,5 @@
 package com.mapbox.mapboxgl.views;
 
-import android.annotation.TargetApi;
 import android.app.ActivityManager;
 import android.content.BroadcastReceiver;
 import android.content.Context;
@@ -1476,7 +1475,7 @@ public class MapView extends FrameLayout implements LocationListener {
 
     // Called for events that don't fit the other handlers
     // such as mouse scroll events, mouse moves, joystick, trackpad
-    @Override @TargetApi(12)
+    @Override
     public boolean onGenericMotionEvent(MotionEvent event) {
         // Mouse events
         //if (event.isFromSource(InputDevice.SOURCE_CLASS_POINTER)) { // this is not available before API 18

@@ -1,7 +1,7 @@
 package com.mapbox.mapboxgl.annotations;
 
 import android.content.Context;
-import android.view.Gravity;
+import android.graphics.PointF;
 import android.view.LayoutInflater;
 import android.view.MotionEvent;
 import android.view.View;
@@ -82,8 +82,14 @@ public class InfoWindow {
      */
     public InfoWindow open(Marker object, LatLng position, int offsetX, int offsetY) {
         onOpen(object);
-        MapView.LayoutParams lp = new MapView.LayoutParams(MapView.LayoutParams.WRAP_CONTENT,
-                MapView.LayoutParams.WRAP_CONTENT, Gravity.CENTER|Gravity.BOTTOM);
+        MapView.LayoutParams lp = new MapView.LayoutParams(MapView.LayoutParams.WRAP_CONTENT, MapView.LayoutParams.WRAP_CONTENT);
+        PointF coords = mMapView.toScreenLocation(position);
+
+        // Flip y coordinate as Android view origin is upper left corner
+        coords.y = mMapView.getHeight() - coords.y;
+        lp.leftMargin = (int) coords.x;
+        lp.topMargin = (int) coords.y;
+
         close(); //if it was already opened
         mMapView.addView(mView, lp);
         mIsVisible = true;
