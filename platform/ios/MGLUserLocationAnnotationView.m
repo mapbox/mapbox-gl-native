@@ -21,8 +21,6 @@ const CGFloat MGLUserLocationAnnotationArrowSize = MGLUserLocationAnnotationPuck
 
 @implementation MGLUserLocationAnnotationView
 {
-    CGFloat _frameSize;
-
     BOOL _puckModeActivated;
 
     CALayer *_puckDot;
@@ -47,9 +45,9 @@ const CGFloat MGLUserLocationAnnotationArrowSize = MGLUserLocationAnnotationPuck
 
 - (instancetype)initInMapView:(MGLMapView *)mapView
 {
-    _frameSize = (mapView.userTrackingMode == MGLUserTrackingModeFollowWithCourse) ? MGLUserLocationAnnotationPuckSize : MGLUserLocationAnnotationDotSize;
+    CGFloat frameSize = (mapView.userTrackingMode == MGLUserTrackingModeFollowWithCourse) ? MGLUserLocationAnnotationPuckSize : MGLUserLocationAnnotationDotSize;
 
-    if (self = [super initWithFrame:CGRectMake(0, 0, _frameSize, _frameSize)])
+    if (self = [super initWithFrame:CGRectMake(0, 0, frameSize, frameSize)])
     {
         self.annotation = [[MGLUserLocation alloc] initWithMapView:mapView];
         _mapView = mapView;
