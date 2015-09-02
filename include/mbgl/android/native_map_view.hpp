@@ -27,7 +27,8 @@ public:
     void deactivate() override;
     void notify() override;
     void invalidate() override;
-    void swap() override;
+    void beforeRender() override;
+    void afterRender() override;
 
     void notifyMapChange(mbgl::MapChange) override;
 

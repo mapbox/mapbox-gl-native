@@ -12,6 +12,7 @@
 /mason_packages
 /config/*.gypi
 /build
+/lib
 /macosx/build
 /linux/build
 /ios/build
@@ -33,3 +34,6 @@
 /ios/benchmark/assets/tiles/mapbox.mapbox-streets-v6/
 /ios/benchmark/assets/tiles/mapbox.mapbox-terrain-v2/
 /ios/benchmark/assets/glyphs/DIN Offc Pro*/
+
+/platform/node/test/actual
+/platform/node/test/diff

@@ -62,8 +62,11 @@ public:
     // (map->renderSync() from the main thread must be called as a result of this)
     virtual void invalidate() = 0;
 
+    // Called from the render thread before the render begins.
+    virtual void beforeRender() = 0;
+
     // Called from the render thread after the render is complete.
-    virtual void swap() = 0;
+    virtual void afterRender() = 0;
 
     // Reads the pixel data from the current framebuffer. If your View implementation
     // doesn't support reading from the framebuffer, return a null pointer.

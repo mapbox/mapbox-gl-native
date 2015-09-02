@@ -85,14 +85,26 @@ GYP_FLAGS += --generator-output=./build/$(HOST_SLUG)
 .PHONY: Makefile/__project__
 Makefile/__project__: print-env $(SUBMODULES) config/$(HOST_SLUG).gypi
 	@printf "$(TEXT_BOLD)$(COLOR_GREEN)* Recreating project...$(FORMAT_END)\n"
-	$(QUIET)$(ENV) deps/run_gyp gyp/$(HOST).gyp $(GYP_FLAGS) -f make$(GYP_FLAVOR_SUFFIX)
+	$(QUIET)$(ENV) deps/run_gyp gyp/$(HOST).gyp $(GYP_FLAGS) \
+		-f make$(GYP_FLAVOR_SUFFIX)
 
 .PHONY: Xcode/__project__
 Xcode/__project__: print-env $(SUBMODULES) config/$(HOST_SLUG).gypi
 	@printf "$(TEXT_BOLD)$(COLOR_GREEN)* Recreating project...$(FORMAT_END)\n"
-	$(QUIET)$(ENV) deps/run_gyp gyp/$(HOST).gyp $(GYP_FLAGS) -f xcode$(GYP_FLAVOR_SUFFIX)
+	$(QUIET)$(ENV) deps/run_gyp gyp/$(HOST).gyp $(GYP_FLAGS) \
+		-f xcode$(GYP_FLAVOR_SUFFIX)
 
 #### Build individual targets ##################################################
+
+NODE_PRE_GYP = $(shell npm bin)/node-pre-gyp
+node/configure:
+	$(QUIET)$(ENV) $(NODE_PRE_GYP) configure --clang -- \
+	$(GYP_FLAGS) -Dlibuv_ldflags= -Dlibuv_static_libs=
+
+Makefile/node: Makefile/__project__ node/configure
+	@printf "$(TEXT_BOLD)$(COLOR_GREEN)* Building target node...$(FORMAT_END)\n"
+	$(QUIET)$(ENV) $(NODE_PRE_GYP) build --clang -- \
+ 	-j$(JOBS)
 
 Makefile/%: Makefile/__project__
 	@printf "$(TEXT_BOLD)$(COLOR_GREEN)* Building target $*...$(FORMAT_END)\n"

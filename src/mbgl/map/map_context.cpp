@@ -259,7 +259,7 @@ void MapContext::update() {
         updateFlags = Update::Nothing;
     }
 
-    if (updateFlags == Update::Nothing) {
+    if (updateFlags == Update::Nothing || (data.mode == MapMode::Still && !callback)) {
         return;
     }
 
@@ -326,6 +326,8 @@ bool MapContext::renderSync(const TransformState& state, const FrameData& frame)
         return false;
     }
 
+    view.beforeRender();
+
     transformState = state;
 
     // Cleanup OpenGL objects that we abandoned since the last render call.
@@ -344,7 +346,7 @@ bool MapContext::renderSync(const TransformState& state, const FrameData& frame)
         callback = nullptr;
     }
 
-    view.swap();
+    view.afterRender();
     viewInvalidated = false;
     data.setNeedsRepaint(style->hasTransitions() || painter->needsAnimation());
 

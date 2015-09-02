@@ -80,6 +80,10 @@ android-all: android-lib-x86 android-lib-x86-64
 android-all: android-lib-mips android-lib-mips-64
 	cd android/java && ./gradlew --parallel-threads=$(JOBS) assemble$(BUILDTYPE)
 
+# Builds the Node.js library
+.PHONY: node
+node: ; $(RUN) HTTP=none ASSET=none CACHE=none Makefile/node
+
 .PHONY: test
 test: ; $(RUN) Makefile/test
 test-%: ; $(RUN) test-$*

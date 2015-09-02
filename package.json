@@ -1,0 +1,48 @@
+{
+  "name": "mapbox-gl-native",
+  "version": "2.0.0-pre.3",
+  "description": "Renders map tiles with Mapbox GL",
+  "keywords": [
+    "mapbox",
+    "gl"
+  ],
+  "main": "lib/mapbox-gl-native.node",
+  "repository": {
+    "type": "git",
+    "url": "git://github.com/mapbox/mapbox-gl-native.git"
+  },
+  "licenses": [
+    {
+      "type": "BSD",
+      "url": "https://github.com/mapbox/mapbox-gl-native/blob/master/LICENSE.md"
+    }
+  ],
+  "dependencies": {
+    "nan": "^1.9.0",
+    "node-pre-gyp": "^0.6.9"
+  },
+  "bundledDependencies": [
+    "node-pre-gyp"
+  ],
+  "devDependencies": {
+    "aws-sdk": "^2.1.47",
+    "mkdirp": "^0.5.1",
+    "pngjs": "^0.4.0",
+    "request": "^2.61.0",
+    "st": "^0.5.5",
+    "tape": "^4.2.0"
+  },
+  "scripts": {
+    "install": "node-pre-gyp install --fallback-to-build=false || make node",
+    "test": "tape platform/node/test/js/**/*.test.js",
+    "test-suite": "tape platform/node/test/render.test.js"
+  },
+  "gypfile": true,
+  "binary": {
+    "module_name": "mapbox-gl-native",
+    "module_path": "./lib/",
+    "host": "https://mapbox-node-binary.s3.amazonaws.com",
+    "remote_path": "./{name}/v{version}",
+    "package_name": "{node_abi}-{platform}-{arch}.tar.gz"
+  }
+}
