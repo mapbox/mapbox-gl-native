@@ -9,7 +9,6 @@ An OpenGL ES-based renderer for [Mapbox Vector Tiles](https://www.mapbox.com/blo
 If you want to use products _based on_ Mapbox GL, check out: 
 
 - [Mapbox Mobile](http://mapbox.com/mobile) — iOS and Android native development libraries for vector maps in apps
-- [`node-mapbox-gl-native`](https://github.com/mapbox/node-mapbox-gl-native) — Node.js library for vector map rendering
 - [`react-native-mapbox-gl`](https://github.com/mapbox/react-native-mapbox-gl`) — React Native library for vector maps in apps
 - [`qmapboxgl`](https://github.com/tmpsantos/qmapboxgl) — Qt library for vector map rendering
 
