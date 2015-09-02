@@ -1,6 +1,6 @@
 {
   "name": "mapbox-gl-native",
-  "version": "2.0.0-pre.1",
+  "version": "2.0.0-pre.2",
   "description": "Renders map tiles with Mapbox GL",
   "keywords": [
     "mapbox",
