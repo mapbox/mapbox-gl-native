@@ -21,7 +21,10 @@ import android.net.ConnectivityManager;
 import android.net.NetworkInfo;
 import android.os.Build;
 import android.os.Bundle;
+import android.support.annotation.AttrRes;
 import android.support.annotation.NonNull;
+import android.support.annotation.Nullable;
+import android.support.annotation.StyleRes;
 import android.support.v4.content.ContextCompat;
 import android.support.v4.view.GestureDetectorCompat;
 import android.support.v4.view.ScaleGestureDetectorCompat;
@@ -193,34 +196,41 @@ public class MapView extends FrameLayout implements LocationListener {
     //
 
     // Called when no properties are being set from XML
-    public MapView(Context context) {
+    public MapView(@NonNull Context context) {
         super(context);
-        initialize(context, null);
+        initialize(context, null, 0, 0);
     }
 
-    public MapView(Context context, @NonNull String accessToken) {
+    public MapView(@NonNull Context context, @NonNull String accessToken) {
         super(context);
         setAccessToken(accessToken);
-        initialize(context, null);
+        initialize(context, null, 0, 0);
     }
 
-    public MapView(Context context, @NonNull String accessToken, String styleUrl) {
+    public MapView(@NonNull Context context, @NonNull String accessToken, String styleUrl) {
         super(context);
         setAccessToken(accessToken);
         setStyleUrl(styleUrl);
-        initialize(context, null);
+        initialize(context, null, 0, 0);
     }
 
     // Called when properties are being set from XML
-    public MapView(Context context, AttributeSet attrs) {
+    public MapView(@NonNull Context context, @Nullable AttributeSet attrs) {
         super(context, attrs);
-        initialize(context, attrs);
+        initialize(context, attrs, 0, 0);
     }
 
     // Called when properties are being set from XML
-    public MapView(Context context, AttributeSet attrs, int defStyle) {
+    public MapView(@NonNull Context context, @Nullable AttributeSet attrs, @AttrRes int defStyle) {
         super(context, attrs, defStyle);
-        initialize(context, attrs);
+        initialize(context, attrs, defStyle, 0);
+    }
+
+    // Called when properties are being set from XML
+    @TargetApi(Build.VERSION_CODES.LOLLIPOP)
+    public MapView(@NonNull Context context, @Nullable AttributeSet attrs, @AttrRes int defStyle, @StyleRes int defStyleRes) {
+        super(context, attrs, defStyle, defStyleRes);
+        initialize(context, attrs, defStyle, defStyleRes);
     }
 
     //
@@ -228,7 +238,7 @@ public class MapView extends FrameLayout implements LocationListener {
     //
 
     // Common initialization code goes here
-    private void initialize(Context context, AttributeSet attrs) {
+    private void initialize(@NonNull Context context, @Nullable AttributeSet attrs, @AttrRes int defStyle, @StyleRes int defStyleRes) {
 
         // Save the context
         mContext = context;
@@ -322,7 +332,7 @@ public class MapView extends FrameLayout implements LocationListener {
         mOnMapChangedListener = new ArrayList<>();
 
         // Load the attributes
-        TypedArray typedArray = context.obtainStyledAttributes(attrs, R.styleable.MapView, 0, 0);
+        TypedArray typedArray = context.obtainStyledAttributes(attrs, R.styleable.MapView, defStyle, defStyleRes);
         try {
             double centerLatitude = typedArray.getFloat(R.styleable.MapView_centerLatitude, 0.0f);
             double centerLongitude = typedArray.getFloat(R.styleable.MapView_centerLongitude, 0.0f);
