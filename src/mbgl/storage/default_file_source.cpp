@@ -2,6 +2,7 @@
 #include <mbgl/storage/request.hpp>
 #include <mbgl/storage/asset_context_base.hpp>
 #include <mbgl/storage/http_context_base.hpp>
+#include <mbgl/storage/network_status.hpp>
 
 #include <mbgl/storage/response.hpp>
 #include <mbgl/platform/platform.hpp>
@@ -118,7 +119,7 @@ void DefaultFileSource::Impl::startCacheRequest(DefaultFileRequest* request) {
         auto expired = [&response] {
             const int64_t now = std::chrono::duration_cast<std::chrono::seconds>(
                                     SystemClock::now().time_since_epoch()).count();
-            return response->expires <= now;
+            return (response->expires <= now) && NetworkStatus::IsReachable();
         };
 
         if (!response || expired()) {

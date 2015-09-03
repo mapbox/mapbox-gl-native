@@ -11,6 +11,8 @@ namespace mbgl {
 class NetworkStatus {
 public:
     static void Reachable();
+    static void Unreachable();
+    static bool IsReachable();
 
     static void Subscribe(uv_async_t *async);
     static void Unsubscribe(uv_async_t *async);
@@ -18,6 +20,7 @@ public:
 private:
     static std::mutex mtx;
     static std::set<uv_async_t *> observers;
+    static bool reachable;
 };
 
 }
