@@ -119,10 +119,6 @@ const CGFloat MGLUserLocationAnnotationArrowSize = MGLUserLocationAnnotationPuck
         _puckDot.shadowOpacity = 0.1;
 
         [self.layer addSublayer:_puckDot];
-
-        _puckDot = [self circleLayerWithSize:MGLUserLocationAnnotationPuckSize];
-        _puckDot.borderWidth = 2.0;
-        _puckDot.borderColor = [[UIColor redColor] CGColor];
     }
 
     // arrow
@@ -132,7 +128,6 @@ const CGFloat MGLUserLocationAnnotationArrowSize = MGLUserLocationAnnotationPuck
         _puckArrow = [CAShapeLayer layer];
         _puckArrow.path = [[self puckArrow] CGPath];
         _puckArrow.fillColor = [_mapView.tintColor CGColor];
-
         _puckArrow.bounds = CGRectMake(0, 0, MGLUserLocationAnnotationArrowSize, MGLUserLocationAnnotationArrowSize);
         _puckArrow.position = CGPointMake(super.bounds.size.width / 2.0, super.bounds.size.height / 2.0);
         _puckArrow.shouldRasterize = YES;
