@@ -14,6 +14,7 @@ import android.graphics.Matrix;
 import android.graphics.Paint;
 import android.graphics.PointF;
 import android.graphics.RectF;
+import android.graphics.SurfaceTexture;
 import android.hardware.GeomagneticField;
 import android.hardware.Sensor;
 import android.hardware.SensorEvent;
@@ -37,8 +38,8 @@ import android.util.AttributeSet;
 import android.view.InputDevice;
 import android.view.KeyEvent;
 import android.view.MotionEvent;
-import android.view.SurfaceHolder;
-import android.view.SurfaceView;
+import android.view.Surface;
+import android.view.TextureView;
 import android.view.View;
 import android.view.ViewConfiguration;
 import android.widget.FrameLayout;
@@ -299,8 +300,8 @@ public class MapView extends FrameLayout implements LocationListener {
         // Save the context
         mContext = context;
 
-        SurfaceView surfaceView = new SurfaceView(mContext);
-        addView(surfaceView);
+        TextureView textureView = new TextureView(mContext);
+        addView(textureView);
 
         // Check if we are in Eclipse UI editor
         if (isInEditMode()) {
@@ -333,8 +334,8 @@ public class MapView extends FrameLayout implements LocationListener {
         setFocusableInTouchMode(true);
         requestFocus();
 
-        // Register the SurfaceHolder callbacks
-        surfaceView.getHolder().addCallback(new CallbacksHandler());
+        // Register the TextureView callbacks
+        textureView.setSurfaceTextureListener(new SurfaceTextureListener());
 
         // Touch gesture detectors
         mGestureDetector = new GestureDetectorCompat(context, new GestureListener());
@@ -857,37 +858,44 @@ public class MapView extends FrameLayout implements LocationListener {
         }
     }
 
-    // This class handles SurfaceHolder callbacks
-    private class CallbacksHandler implements SurfaceHolder.Callback, SurfaceHolder.Callback2 {
+    // This class handles TextureView callbacks
+    private class SurfaceTextureListener implements TextureView.SurfaceTextureListener {
 
-        // Called when the native surface buffer has been created
+        // Called when the native surface texture has been created
         // Must do all EGL/GL ES initialization here
         @Override
-        public void surfaceCreated(SurfaceHolder holder) {
-            mNativeMapView.createSurface(holder.getSurface());
+        public void onSurfaceTextureAvailable (SurfaceTexture surface, int width, int height) {
+            mNativeMapView.createSurface(new Surface(surface));
+            mNativeMapView.resizeFramebuffer(width, height);
         }
 
-        // Called when the native surface buffer has been destroyed
+        // Called when the native surface texture has been destroyed
         // Must do all EGL/GL ES destruction here
         @Override
-        public void surfaceDestroyed(SurfaceHolder holder) {
+        public boolean onSurfaceTextureDestroyed (SurfaceTexture surface) {
             mNativeMapView.destroySurface();
+            return true;
         }
 
-        // Called when the format or size of the native surface buffer has been
-        // changed
+        // Called when the format or size of the native surface texture has been changed
         // Must handle window resizing here.
         @Override
-        public void surfaceChanged(SurfaceHolder holder, int format, int width, int height) {
+        public void onSurfaceTextureSizeChanged (SurfaceTexture surface, int width, int height) {
             mNativeMapView.resizeFramebuffer(width, height);
         }
 
         // Called when we need to redraw the view
         // This is called before our view is first visible to prevent an initial
         // flicker (see Android SDK documentation)
-        @Override
+        /*@Override
         public void surfaceRedrawNeeded(SurfaceHolder holder) {
             mNativeMapView.update();
+        }*/ // TODO call update somewhere?
+
+        // Not used
+        @Override
+        public void onSurfaceTextureUpdated (SurfaceTexture surface) {
+            // Do nothing
         }
     }
 
