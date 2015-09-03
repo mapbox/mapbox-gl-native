@@ -1910,7 +1910,7 @@ CLLocationCoordinate2D MGLLocationCoordinate2DFromLatLng(mbgl::LatLng latLng)
 
     for (id <MGLAnnotation> annotation in annotations)
     {
-        assert([annotation conformsToProtocol:@protocol(MGLAnnotation)]);
+        NSAssert([annotation conformsToProtocol:@protocol(MGLAnnotation)], @"annotation should conform to MGLAnnotation");
 
         if ([annotation isKindOfClass:[MGLMultiPoint class]])
         {
@@ -2082,7 +2082,7 @@ CLLocationCoordinate2D MGLLocationCoordinate2DFromLatLng(mbgl::LatLng latLng)
 
     for (id <MGLAnnotation> annotation in annotations)
     {
-        assert([annotation conformsToProtocol:@protocol(MGLAnnotation)]);
+        NSAssert([annotation conformsToProtocol:@protocol(MGLAnnotation)], @"annotation should conform to MGLAnnotation");
 
         NSDictionary *infoDictionary = [self.annotationIDsByAnnotation objectForKey:annotation];
         annotationIDsToRemove.push_back([[infoDictionary objectForKey:MGLAnnotationIDKey] unsignedIntValue]);
@@ -2107,7 +2107,7 @@ CLLocationCoordinate2D MGLLocationCoordinate2DFromLatLng(mbgl::LatLng latLng)
 {
     for (id <MGLOverlay> overlay in overlays)
     {
-        assert([overlay conformsToProtocol:@protocol(MGLOverlay)]);
+        NSAssert([overlay conformsToProtocol:@protocol(MGLOverlay)], @"overlay should conform to MGLOverlay");
     }
 
     [self addAnnotations:overlays];
@@ -2122,7 +2122,7 @@ CLLocationCoordinate2D MGLLocationCoordinate2DFromLatLng(mbgl::LatLng latLng)
 {
     for (id <MGLOverlay> overlay in overlays)
     {
-        assert([overlay conformsToProtocol:@protocol(MGLOverlay)]);
+        NSAssert([overlay conformsToProtocol:@protocol(MGLOverlay)], @"overlay should conform to MGLOverlay");
     }
 
     [self removeAnnotations:overlays];
@@ -2144,7 +2144,7 @@ CLLocationCoordinate2D MGLLocationCoordinate2DFromLatLng(mbgl::LatLng latLng)
 
     id <MGLAnnotation> firstAnnotation = selectedAnnotations[0];
 
-    assert([firstAnnotation conformsToProtocol:@protocol(MGLAnnotation)]);
+    NSAssert([firstAnnotation conformsToProtocol:@protocol(MGLAnnotation)], @"annotation should conform to MGLAnnotation");
 
     if ([firstAnnotation isKindOfClass:[MGLMultiPoint class]]) return;
 
