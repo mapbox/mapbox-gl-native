@@ -1,3 +1,15 @@
+# 2.0.0
+
+- Integrates Node.js bindings into core mapbox-gl-native project.
+- Requires an options object argument to `new mbgl.Map()`
+  (with required `request` and optional `cancel` methods),
+  drops `mbgl.FileSource`.
+- Requires numerical `ratio` in `mbgl.Map` options argument.
+  Map pixel ratio is now immutable and can no longer be set with
+  render options.
+- Adds support for rendering v8 styles.
+- No longer load resources before a render request is made.
+
 # 1.1.3
 
 - Removes deprecated mbgl::Environment from NodeLogObserver.
