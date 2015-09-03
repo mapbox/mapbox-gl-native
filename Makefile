@@ -74,10 +74,10 @@ android-lib: ; $(RUN) HOST=android Makefile/androidapp
 android: android-lib
 	cd android/java && ./gradlew --parallel --max-workers=$(JOBS) assemble$(BUILDTYPE)
 
-# Builds all android architectures.
-android-all: android-lib-arm-v5 android-lib-arm-v7 android-lib-arm-v8
-android-all: android-lib-x86 android-lib-x86-64
-android-all: android-lib-mips android-lib-mips-64
+# Builds all android architectures for distribution.
+apackage: android-lib-arm-v5 android-lib-arm-v7 android-lib-arm-v8
+apackage: android-lib-x86 android-lib-x86-64
+apackage: android-lib-mips android-lib-mips-64
 	cd android/java && ./gradlew --parallel-threads=$(JOBS) assemble$(BUILDTYPE)
 
 # Builds the Node.js library

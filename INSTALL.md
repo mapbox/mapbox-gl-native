@@ -315,6 +315,10 @@ When you plug your device in and then run or debug the Android project you will 
 
 If your device does not show up,  you have not set it up properly. Double check the [Google documentation](http://developer.android.com/tools/device.html).
 
+### Distribution
+
+Use the `Makefile` target `make apackage` in order to build JNI libraries for all supported ABI's for eventual distribution of the whole package. 
+
 ### Target
 
 Devices running Android 4.0+ (API level 14+).
