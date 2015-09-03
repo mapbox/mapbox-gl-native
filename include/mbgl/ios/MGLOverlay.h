@@ -10,7 +10,7 @@ NS_ASSUME_NONNULL_BEGIN
 *
 *   You use overlays to layer more sophisticated content on top of a map view. For example, you could use an overlay to show the boundaries of a national park or trace a bus route along city streets. The Mapbox iOS SDK defines several concrete classes that conform to this protocol and define standard shapes.
 *
-*   Because overlays are also annotations, they have similar usage pattern to annotations. When added to a map view using the `addOverlay:` method, that view detects whenever the overlay’s defined region intersects the visible portion of the map. At that point, the map view asks its delegate to provide a special overlay view to draw the visual representation of the overlay. If you add an overlay to a map view as an annotation instead, it is treated as an annotation with a single point. */
+*   Because overlays are also annotations, they have similar usage pattern to annotations. When added to a map view, that view detects whenever the overlay’s defined region intersects the visible portion of the map. At that point, the map view asks its delegate to provide a special overlay view to draw the visual representation of the overlay. If you add an overlay to a map view as an annotation instead, it is treated as an annotation with a single point. */
 @protocol MGLOverlay <MGLAnnotation>
 
 /* The approximate center point of the overlay area. (required) (read-only)
