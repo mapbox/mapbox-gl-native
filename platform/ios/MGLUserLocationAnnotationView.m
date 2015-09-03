@@ -114,9 +114,9 @@ const CGFloat MGLUserLocationAnnotationArrowSize = MGLUserLocationAnnotationPuck
         _puckDot = [self circleLayerWithSize:MGLUserLocationAnnotationPuckSize];
         _puckDot.backgroundColor = [[UIColor whiteColor] CGColor];
         _puckDot.shadowColor = [[UIColor blackColor] CGColor];
-        _puckDot.shadowOffset = CGSizeMake(0, 0);
-        _puckDot.shadowRadius = 3;
-        _puckDot.shadowOpacity = 0.25;
+        _puckDot.shadowOffset = CGSizeMake(0, 1);
+        _puckDot.shadowRadius = 1;
+        _puckDot.shadowOpacity = 0.1;
 
         [self.layer addSublayer:_puckDot];
 
