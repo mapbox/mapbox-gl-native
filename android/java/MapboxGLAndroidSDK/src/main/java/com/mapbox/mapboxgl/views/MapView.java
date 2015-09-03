@@ -732,7 +732,15 @@ public class MapView extends FrameLayout implements LocationListener {
         return mNativeMapView.getTopOffsetPixelsForAnnotationSymbol(symbolName);
     }
 
-        //
+    /**
+     * Common Screen Density
+     * @return Screen Density
+     */
+    public float getScreenDensity() {
+        return mScreenDensity;
+    }
+
+    //
     // Lifecycle events
     //
 
