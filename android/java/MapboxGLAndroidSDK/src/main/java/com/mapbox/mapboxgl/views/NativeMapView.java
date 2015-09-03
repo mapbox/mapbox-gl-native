@@ -3,7 +3,6 @@ package com.mapbox.mapboxgl.views;
 import android.graphics.PointF;
 import android.view.Surface;
 
-import com.mapbox.mapboxgl.annotations.Annotation;
 import com.mapbox.mapboxgl.annotations.Marker;
 import com.mapbox.mapboxgl.annotations.Polygon;
 import com.mapbox.mapboxgl.annotations.Polyline;
@@ -12,7 +11,6 @@ import com.mapbox.mapboxgl.geometry.LatLng;
 import com.mapbox.mapboxgl.geometry.LatLngZoom;
 import com.mapbox.mapboxgl.geometry.ProjectedMeters;
 
-import java.util.ArrayList;
 import java.util.List;
 
 // Class that wraps the native methods for convenience
@@ -424,6 +422,10 @@ class NativeMapView {
         return nativeLatLngForPixel(mNativeMapViewPtr, pixel);
     }
 
+    public double getTopOffsetPixelsForAnnotationSymbol(String symbolName) {
+        return nativeGetTopOffsetPixelsForAnnotationSymbol(mNativeMapViewPtr, symbolName);
+    }
+
     //
     // Callbacks
     //
@@ -606,4 +608,6 @@ class NativeMapView {
     private native PointF nativePixelForLatLng(long nativeMapViewPtr, LatLng latLng);
 
     private native LatLng nativeLatLngForPixel(long nativeMapViewPtr, PointF pixel);
+
+    private native double nativeGetTopOffsetPixelsForAnnotationSymbol(long nativeMapViewPtr, String symbolName);
 }
