@@ -728,7 +728,11 @@ public class MapView extends FrameLayout implements LocationListener {
         return new PointF(point.x * mScreenDensity, point.y * mScreenDensity);
     }
 
-    //
+    public double getTopOffsetPixelsForAnnotationSymbol(@NonNull String symbolName) {
+        return mNativeMapView.getTopOffsetPixelsForAnnotationSymbol(symbolName);
+    }
+
+        //
     // Lifecycle events
     //
 

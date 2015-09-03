@@ -85,10 +85,12 @@ public class InfoWindow {
         MapView.LayoutParams lp = new MapView.LayoutParams(MapView.LayoutParams.WRAP_CONTENT, MapView.LayoutParams.WRAP_CONTENT);
         PointF coords = mMapView.toScreenLocation(position);
 
+        double y = mMapView.getTopOffsetPixelsForAnnotationSymbol(object.sprite);
+
         // Flip y coordinate as Android view origin is upper left corner
         coords.y = mMapView.getHeight() - coords.y;
-        lp.leftMargin = (int) coords.x;
-        lp.topMargin = (int) coords.y;
+        lp.leftMargin = (int) coords.x - 1;
+        lp.topMargin = (int) coords.y + (int) y;
 
         close(); //if it was already opened
         mMapView.addView(mView, lp);
