@@ -83,14 +83,15 @@ public class InfoWindow {
     public InfoWindow open(Marker object, LatLng position, int offsetX, int offsetY) {
         onOpen(object);
         MapView.LayoutParams lp = new MapView.LayoutParams(MapView.LayoutParams.WRAP_CONTENT, MapView.LayoutParams.WRAP_CONTENT);
-        PointF coords = mMapView.toScreenLocation(position);
+        mView.measure(View.MeasureSpec.UNSPECIFIED, View.MeasureSpec.UNSPECIFIED);
 
-        double y = mMapView.getTopOffsetPixelsForAnnotationSymbol(object.sprite);
+        PointF coords = mMapView.toScreenLocation(position);
+//        double y = mMapView.getTopOffsetPixelsForAnnotationSymbol(object.sprite);
 
         // Flip y coordinate as Android view origin is upper left corner
         coords.y = mMapView.getHeight() - coords.y;
-        lp.leftMargin = (int) coords.x - 1;
-        lp.topMargin = (int) coords.y + (int) y;
+        lp.leftMargin = (int) coords.x - (mView.getMeasuredWidth() / 2);
+        lp.topMargin = (int) coords.y - (mView.getMeasuredHeight());
 
         close(); //if it was already opened
         mMapView.addView(mView, lp);
