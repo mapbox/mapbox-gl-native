@@ -2098,6 +2098,36 @@ CLLocationCoordinate2D MGLLocationCoordinate2DFromLatLng(mbgl::LatLng latLng)
     _mbglMap->removeAnnotations(annotationIDsToRemove);
 }
 
+- (void)addOverlay:(id <MGLOverlay>)overlay
+{
+    [self addOverlays:@[ overlay ]];
+}
+
+- (void)addOverlays:(NS_ARRAY_OF(id <MGLOverlay>) *)overlays
+{
+    for (id <MGLOverlay> overlay in overlays)
+    {
+        assert([overlay conformsToProtocol:@protocol(MGLOverlay)]);
+    }
+
+    [self addAnnotations:overlays];
+}
+
+- (void)removeOverlay:(id <MGLOverlay>)overlay
+{
+    [self removeOverlays:@[ overlay ]];
+}
+
+- (void)removeOverlays:(NS_ARRAY_OF(id <MGLOverlay>) *)overlays
+{
+    for (id <MGLOverlay> overlay in overlays)
+    {
+        assert([overlay conformsToProtocol:@protocol(MGLOverlay)]);
+    }
+
+    [self removeAnnotations:overlays];
+}
+
 - (MGLAnnotationImage *)dequeueReusableAnnotationImageWithIdentifier:(NSString *)identifier
 {
     return [self.annotationImages objectForKey:identifier];

@@ -13,6 +13,7 @@ NS_ASSUME_NONNULL_BEGIN
 
 @protocol MGLMapViewDelegate;
 @protocol MGLAnnotation;
+@protocol MGLOverlay;
 
 /** An MGLMapView object provides an embeddable map interface, similar to the one provided by Apple's MapKit. You use this class to display map information and to manipulate the map contents from your application. You can center the map on a given coordinate, specify the size of the area you want to display, and style the features of the map to fit your application's use case.
 *
@@ -316,6 +317,38 @@ IB_DESIGNABLE
 *   @param annotation The annotation object to deselect.
 *   @param animated If `YES`, the callout view is animated offscreen. */
 - (void)deselectAnnotation:(id <MGLAnnotation>)annotation animated:(BOOL)animated;
+
+#pragma mark - Adding Overlays
+
+/** @name Adding Overlays */
+
+/** Adds a single overlay object to the map.
+*
+*   To remove an overlay from a map, use the removeOverlay: method.
+*   @param overlay The overlay object to add. This object must conform to the MGLOverlay protocol. */
+- (void)addOverlay:(id <MGLOverlay>)overlay;
+
+/** Adds an array of overlay objects to the map.
+*
+*   To remove multiple overlays from a map, use the removeOverlays: method.
+*   @param overlays An array of objects, each of which must conform to the MGLOverlay protocol. */
+- (void)addOverlays:(NS_ARRAY_OF(id <MGLOverlay>) *)overlays;
+
+#pragma mark - Removing Overlays
+
+/** @name Removing Overlays */
+
+/** Removes a single overlay object from the map.
+*
+*   If the specified overlay is not currently associated with the map view, this method does nothing.
+*   @param The overlay object to remove. */
+- (void)removeOverlay:(id <MGLOverlay>)overlay;
+
+/** Removes one or more overlay objects from the map.
+*
+*   If a given overlay object is not associated with the map view, it is ignored.
+*   @param overlays An array of objects, each of which conforms to the MGLOverlay protocol. */
+- (void)removeOverlays:(NS_ARRAY_OF(id <MGLOverlay>) *)overlays;
 
 #pragma mark - Displaying the User's Location
 
