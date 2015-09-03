@@ -21,7 +21,7 @@ struct NodeMap::RenderOptions {
 ////////////////////////////////////////////////////////////////////////////////////////////////
 // Static Node Methods
 
-v8::Persistent<v8::FunctionTemplate> NodeMap::constructorTemplate;
+Nan::Persistent<v8::Function> NodeMap::constructor;
 
 static std::shared_ptr<mbgl::HeadlessDisplay> sharedDisplay() {
     static auto display = std::make_shared<mbgl::HeadlessDisplay>();
@@ -32,127 +32,137 @@ const static char* releasedMessage() {
     return "Map resources have already been released";
 }
 
-void NodeMap::Init(v8::Handle<v8::Object> target) {
-    NanScope();
+NAN_MODULE_INIT(NodeMap::Init) {
+    v8::Local<v8::FunctionTemplate> tpl = Nan::New<v8::FunctionTemplate>(New);
 
-    v8::Local<v8::FunctionTemplate> t = NanNew<v8::FunctionTemplate>(New);
+    tpl->InstanceTemplate()->SetInternalFieldCount(1);
+    tpl->SetClassName(Nan::New("Map").ToLocalChecked());
 
-    t->InstanceTemplate()->SetInternalFieldCount(1);
-    t->SetClassName(NanNew("Map"));
+    Nan::SetPrototypeMethod(tpl, "load", Load);
+    Nan::SetPrototypeMethod(tpl, "render", Render);
+    Nan::SetPrototypeMethod(tpl, "release", Release);
 
-    NODE_SET_PROTOTYPE_METHOD(t, "load", Load);
-    NODE_SET_PROTOTYPE_METHOD(t, "render", Render);
-    NODE_SET_PROTOTYPE_METHOD(t, "release", Release);
-
-    NanAssignPersistent(constructorTemplate, t);
-
-    target->Set(NanNew("Map"), t->GetFunction());
+    constructor.Reset(tpl->GetFunction());
+    Nan::Set(target, Nan::New("Map").ToLocalChecked(), tpl->GetFunction());
 
     // Initialize display connection on module load.
     sharedDisplay();
 }
 
 NAN_METHOD(NodeMap::New) {
-    NanScope();
-
-    if (!args.IsConstructCall()) {
-        return NanThrowTypeError("Use the new operator to create new Map objects");
+    if (!info.IsConstructCall()) {
+        return Nan::ThrowTypeError("Use the new operator to create new Map objects");
     }
 
-    if (args.Length() < 1 || !args[0]->IsObject()) {
-        return NanThrowTypeError("Requires an options object as first argument");
+    if (info.Length() < 1 || !info[0]->IsObject()) {
+        return Nan::ThrowTypeError("Requires an options object as first argument");
     }
 
-    auto options = args[0]->ToObject();
+    auto options = info[0]->ToObject();
 
     // Check that 'request', 'cancel' and 'ratio' are defined.
-    if (!options->Has(NanNew("request")) || !options->Get(NanNew("request"))->IsFunction()) {
-        return NanThrowError("Options object must have a 'request' method");
-    }
-    if (options->Has(NanNew("cancel")) && !options->Get(NanNew("cancel"))->IsFunction()) {
-        return NanThrowError("Options object 'cancel' property must be a function");
+    if (!Nan::Has(options, Nan::New("request").ToLocalChecked()).FromJust()
+     || !Nan::Get(options, Nan::New("request").ToLocalChecked()).ToLocalChecked()->IsFunction()) {
+        return Nan::ThrowError("Options object must have a 'request' method");
     }
 
-    if (!options->Has(NanNew("ratio")) || !options->Get(NanNew("ratio"))->IsNumber()) {
-        return NanThrowError("Options object must have a numerical 'ratio' property");
+    if ( Nan::Has(options, Nan::New("cancel").ToLocalChecked()).FromJust()
+     && !Nan::Get(options, Nan::New("cancel").ToLocalChecked()).ToLocalChecked()->IsFunction()) {
+        return Nan::ThrowError("Options object 'cancel' property must be a function");
+    }
+
+    if (!Nan::Has(options, Nan::New("ratio").ToLocalChecked()).FromJust()
+     || !Nan::Get(options, Nan::New("ratio").ToLocalChecked()).ToLocalChecked()->IsNumber()) {
+        return Nan::ThrowError("Options object must have a numerical 'ratio' property");
     }
 
     try {
         auto nodeMap = new NodeMap(options);
-        nodeMap->Wrap(args.This());
+        nodeMap->Wrap(info.This());
     } catch(std::exception &ex) {
-        return NanThrowError(ex.what());
+        return Nan::ThrowError(ex.what());
     }
 
-    NanReturnValue(args.This());
+    info.GetReturnValue().Set(info.This());
 }
 
-const std::string StringifyStyle(v8::Handle<v8::Value> styleHandle) {
-    NanScope();
+const std::string StringifyStyle(v8::Local<v8::Value> styleHandle) {
+    Nan::HandleScope scope;
 
-    auto JSON = NanGetCurrentContext()->Global()->Get(NanNew("JSON"))->ToObject();
-    auto stringify = v8::Handle<v8::Function>::Cast(JSON->Get(NanNew("stringify")));
+    v8::Local<v8::Object> JSON = Nan::Get(
+        Nan::GetCurrentContext()->Global(),
+        Nan::New("JSON").ToLocalChecked()).ToLocalChecked()->ToObject();
 
-    return *NanUtf8String(stringify->Call(JSON, 1, &styleHandle));
+    return *Nan::Utf8String(Nan::MakeCallback(JSON, "stringify", 1, &styleHandle));
 }
 
 NAN_METHOD(NodeMap::Load) {
-    NanScope();
+    auto nodeMap = Nan::ObjectWrap::Unwrap<NodeMap>(info.Holder());
 
-    auto nodeMap = node::ObjectWrap::Unwrap<NodeMap>(args.Holder());
-
-    if (!nodeMap->isValid()) return NanThrowError(releasedMessage());
+    if (!nodeMap->isValid()) return Nan::ThrowError(releasedMessage());
 
     // Reset the flag as this could be the second time
     // we are calling this (being the previous successful).
     nodeMap->loaded = false;
 
-    if (args.Length() < 1) {
-        return NanThrowError("Requires a map style as first argument");
+    if (info.Length() < 1) {
+        return Nan::ThrowError("Requires a map style as first argument");
     }
 
     std::string style;
 
-    if (args[0]->IsObject()) {
-        style = StringifyStyle(args[0]);
-    } else if (args[0]->IsString()) {
-        style = *NanUtf8String(args[0]);
+    if (info[0]->IsObject()) {
+        style = StringifyStyle(info[0]);
+    } else if (info[0]->IsString()) {
+        style = *Nan::Utf8String(info[0]);
     } else {
-        return NanThrowTypeError("First argument must be a string or object");
+        return Nan::ThrowTypeError("First argument must be a string or object");
     }
 
     try {
         nodeMap->map->setStyleJSON(style, ".");
     } catch (const std::exception &ex) {
-        return NanThrowError(ex.what());
+        return Nan::ThrowError(ex.what());
     }
 
     nodeMap->loaded = true;
 
-    NanReturnUndefined();
+    info.GetReturnValue().SetUndefined();
 }
 
 std::unique_ptr<NodeMap::RenderOptions> NodeMap::ParseOptions(v8::Local<v8::Object> obj) {
-    NanScope();
+    Nan::HandleScope scope;
 
     auto options = std::make_unique<RenderOptions>();
 
-    if (obj->Has(NanNew("zoom"))) { options->zoom = obj->Get(NanNew("zoom"))->NumberValue(); }
-    if (obj->Has(NanNew("bearing"))) { options->bearing = obj->Get(NanNew("bearing"))->NumberValue(); }
-    if (obj->Has(NanNew("center"))) {
-        auto center = obj->Get(NanNew("center")).As<v8::Array>();
-        if (center->Length() > 0) { options->latitude = center->Get(0)->NumberValue(); }
-        if (center->Length() > 1) { options->longitude = center->Get(1)->NumberValue(); }
+    if (Nan::Has(obj, Nan::New("zoom").ToLocalChecked()).FromJust()) {
+        options->zoom = Nan::Get(obj, Nan::New("zoom").ToLocalChecked()).ToLocalChecked()->NumberValue();
     }
-    if (obj->Has(NanNew("width"))) { options->width = obj->Get(NanNew("width"))->IntegerValue(); }
-    if (obj->Has(NanNew("height"))) { options->height = obj->Get(NanNew("height"))->IntegerValue(); }
 
-    if (obj->Has(NanNew("classes"))) {
-        auto classes = obj->Get(NanNew("classes"))->ToObject().As<v8::Array>();
+    if (Nan::Has(obj, Nan::New("bearing").ToLocalChecked()).FromJust()) {
+        options->bearing = Nan::Get(obj, Nan::New("bearing").ToLocalChecked()).ToLocalChecked()->NumberValue();
+    }
+
+    if (Nan::Has(obj, Nan::New("center").ToLocalChecked()).FromJust()) {
+        auto center = Nan::Get(obj, Nan::New("center").ToLocalChecked()).ToLocalChecked().As<v8::Array>();
+        if (center->Length() > 0) { options->latitude = Nan::Get(center, 0).ToLocalChecked()->NumberValue(); }
+        if (center->Length() > 1) { options->longitude = Nan::Get(center, 1).ToLocalChecked()->NumberValue(); }
+    }
+
+    if (Nan::Has(obj, Nan::New("width").ToLocalChecked()).FromJust()) {
+        options->width = Nan::Get(obj, Nan::New("width").ToLocalChecked()).ToLocalChecked()->IntegerValue();
+    }
+
+    if (Nan::Has(obj, Nan::New("height").ToLocalChecked()).FromJust()) {
+        options->height = Nan::Get(obj, Nan::New("height").ToLocalChecked()).ToLocalChecked()->IntegerValue();
+    }
+
+    if (Nan::Has(obj, Nan::New("classes").ToLocalChecked()).FromJust()) {
+        auto classes = Nan::Get(obj, Nan::New("classes").ToLocalChecked()).ToLocalChecked()->ToObject().As<v8::Array>();
         const int length = classes->Length();
         options->classes.reserve(length);
         for (int i = 0; i < length; i++) {
-            options->classes.push_back(std::string { *NanUtf8String(classes->Get(i)->ToString()) });
+            options->classes.push_back(std::string { *Nan::Utf8String(Nan::Get(classes, i).ToLocalChecked()->ToString()) });
         }
     }
 
@@ -160,37 +170,35 @@ std::unique_ptr<NodeMap::RenderOptions> NodeMap::ParseOptions(v8::Local<v8::Obje
 }
 
 NAN_METHOD(NodeMap::Render) {
-    NanScope();
+    auto nodeMap = Nan::ObjectWrap::Unwrap<NodeMap>(info.Holder());
 
-    auto nodeMap = node::ObjectWrap::Unwrap<NodeMap>(args.Holder());
+    if (!nodeMap->isValid()) return Nan::ThrowError(releasedMessage());
 
-    if (!nodeMap->isValid()) return NanThrowError(releasedMessage());
-
-    if (args.Length() <= 0 || !args[0]->IsObject()) {
-        return NanThrowTypeError("First argument must be an options object");
+    if (info.Length() <= 0 || !info[0]->IsObject()) {
+        return Nan::ThrowTypeError("First argument must be an options object");
     }
 
-    if (args.Length() <= 1 || !args[1]->IsFunction()) {
-        return NanThrowTypeError("Second argument must be a callback function");
+    if (info.Length() <= 1 || !info[1]->IsFunction()) {
+        return Nan::ThrowTypeError("Second argument must be a callback function");
     }
 
     if (!nodeMap->isLoaded()) {
-        return NanThrowTypeError("Style is not loaded");
+        return Nan::ThrowTypeError("Style is not loaded");
     }
 
-    auto options = ParseOptions(args[0]->ToObject());
+    auto options = ParseOptions(info[0]->ToObject());
 
     assert(!nodeMap->callback);
     assert(!nodeMap->image);
-    nodeMap->callback = std::unique_ptr<NanCallback>(new NanCallback(args[1].As<v8::Function>()));
+    nodeMap->callback = std::make_unique<Nan::Callback>(info[1].As<v8::Function>());
 
     try {
         nodeMap->startRender(std::move(options));
     } catch (mbgl::util::Exception &ex) {
-        return NanThrowError(ex.what());
+        return Nan::ThrowError(ex.what());
     }
 
-    NanReturnUndefined();
+    info.GetReturnValue().SetUndefined();
 }
 
 void NodeMap::startRender(std::unique_ptr<NodeMap::RenderOptions> options) {
@@ -221,7 +229,7 @@ void NodeMap::startRender(std::unique_ptr<NodeMap::RenderOptions> options) {
 }
 
 void NodeMap::renderFinished() {
-    NanScope();
+    Nan::HandleScope scope;
 
     // We're done with this render call, so we're unrefing so that the loop could close.
     uv_unref(reinterpret_cast<uv_handle_t *>(async));
@@ -249,7 +257,7 @@ void NodeMap::renderFinished() {
         }
 
         v8::Local<v8::Value> argv[] = {
-            NanError(errorMessage.c_str())
+            Nan::Error(errorMessage.c_str())
         };
 
         // This must be empty to be prepared for the next render call.
@@ -258,7 +266,7 @@ void NodeMap::renderFinished() {
 
         cb->Call(1, argv);
     } else if (img) {
-        v8::Local<v8::Object> pixels = NanNewBufferHandle(
+        v8::Local<v8::Object> pixels = Nan::NewBuffer(
             reinterpret_cast<char *>(img->pixels.get()),
             size_t(img->width) * size_t(img->height) * sizeof(mbgl::StillImage::Pixel),
 
@@ -267,36 +275,34 @@ void NodeMap::renderFinished() {
                 delete reinterpret_cast<const mbgl::StillImage *>(hint);
             },
             const_cast<mbgl::StillImage *>(img.get())
-        );
+        ).ToLocalChecked();
         img.release();
 
         v8::Local<v8::Value> argv[] = {
-            NanNull(),
+            Nan::Null(),
             pixels,
         };
         cb->Call(2, argv);
     } else {
         v8::Local<v8::Value> argv[] = {
-            NanError("Didn't get an image")
+            Nan::Error("Didn't get an image")
         };
         cb->Call(1, argv);
     }
 }
 
 NAN_METHOD(NodeMap::Release) {
-    NanScope();
+    auto nodeMap = Nan::ObjectWrap::Unwrap<NodeMap>(info.Holder());
 
-    auto nodeMap = node::ObjectWrap::Unwrap<NodeMap>(args.Holder());
-
-    if (!nodeMap->isValid()) return NanThrowError(releasedMessage());
+    if (!nodeMap->isValid()) return Nan::ThrowError(releasedMessage());
 
     try {
         nodeMap->release();
     } catch (const std::exception &ex) {
-        return NanThrowError(ex.what());
+        return Nan::ThrowError(ex.what());
     }
 
-    NanReturnUndefined();
+    info.GetReturnValue().SetUndefined();
 }
 
 void NodeMap::release() {
@@ -315,8 +321,8 @@ void NodeMap::release() {
 ////////////////////////////////////////////////////////////////////////////////////////////////
 // Instance
 
-NodeMap::NodeMap(v8::Handle<v8::Object> options) :
-    view(sharedDisplay(), options->Get(NanNew("ratio"))->NumberValue()),
+NodeMap::NodeMap(v8::Local<v8::Object> options) :
+    view(sharedDisplay(), Nan::Get(options, Nan::New("ratio").ToLocalChecked()).ToLocalChecked()->NumberValue()),
     fs(options),
     map(std::make_unique<mbgl::Map>(view, fs, mbgl::MapMode::Still)),
     async(new uv_async_t) {
