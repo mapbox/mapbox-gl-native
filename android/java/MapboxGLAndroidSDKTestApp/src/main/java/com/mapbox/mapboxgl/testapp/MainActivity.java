@@ -121,6 +121,7 @@ public class MainActivity extends AppCompatActivity {
                 mMapView.addMarker(new MarkerOptions()
                         .position(position)
                         .title("Dropped Pin")
+                        .snippet("Some snippet text.")
                         .sprite("default_marker")).showInfoWindow();
             }
         });
