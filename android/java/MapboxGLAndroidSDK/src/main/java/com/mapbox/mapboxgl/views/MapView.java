@@ -438,7 +438,6 @@ public class MapView extends FrameLayout implements LocationListener {
         marker.setId(id);        // the annotation needs to know its id
         marker.setMapView(this); // the annotation needs to know which map view it is in
         mAnnotations.add(marker);
-        selectAnnotation(marker);
         return marker;
     }
 
@@ -1968,8 +1967,21 @@ public class MapView extends FrameLayout implements LocationListener {
 
     private void selectAnnotation(Annotation annotation) {
 
-        // Need to deselect any currently selected annotation first
+        if (annotation == null) {
+            return;
+        }
 
+        if (annotation == mSelectedAnnotation) {
+            return;
+        }
+
+        if (annotation instanceof Marker) {
+            // Need to deselect any currently selected annotation first
+            deselectAnnotation();
+
+            ((Marker)annotation).showInfoWindow();
+            mSelectedAnnotation = annotation;
+        }
     }
 
     private void deselectAnnotation() {

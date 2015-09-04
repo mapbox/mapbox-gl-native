@@ -122,7 +122,7 @@ public class MainActivity extends AppCompatActivity {
                         .position(position)
                         .title("Dropped Pin")
                         .snippet("Some snippet text.")
-                        .sprite("default_marker")).showInfoWindow();
+                        .sprite("default_marker"));
             }
         });
 
