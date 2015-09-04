@@ -89,6 +89,18 @@ const CGFloat MGLUserLocationAnnotationArrowSize = MGLUserLocationAnnotationPuck
     if (CLLocationCoordinate2DIsValid(self.annotation.coordinate))
     {
         (_mapView.userTrackingMode == MGLUserTrackingModeFollowWithCourse) ? [self drawPuck] : [self drawDot];
+        [self updatePitch];
+    }
+}
+
+- (void)updatePitch
+{
+    if (self.mapView.pitch && (self.mapView.pitch != _oldPitch))
+    {
+        CATransform3D t = CATransform3DRotate(CATransform3DIdentity, MGLRadiansFromDegrees(self.mapView.pitch), 1.0, 0, 0);
+        self.layer.sublayerTransform = t;
+
+        _oldPitch = self.mapView.pitch;
     }
 }
 
@@ -137,14 +149,6 @@ const CGFloat MGLUserLocationAnnotationArrowSize = MGLUserLocationAnnotationPuck
 
         [self.layer addSublayer:_puckArrow];
     }
-
-    if (self.mapView.pitch && (self.mapView.pitch != _oldPitch))
-    {
-        CATransform3D t = CATransform3DRotate(CATransform3DIdentity, MGLRadiansFromDegrees(self.mapView.pitch), 1.0, 0, 0);
-        self.layer.sublayerTransform = t;
-
-        _oldPitch = self.mapView.pitch;
-    }
 }
 
 - (UIBezierPath *)puckArrow
@@ -172,8 +176,6 @@ const CGFloat MGLUserLocationAnnotationArrowSize = MGLUserLocationAnnotationPuck
         _puckArrow = nil;
 
         _puckModeActivated = NO;
-
-        self.layer.sublayerTransform = CATransform3DIdentity;
     }
 
     // update heading indicator
