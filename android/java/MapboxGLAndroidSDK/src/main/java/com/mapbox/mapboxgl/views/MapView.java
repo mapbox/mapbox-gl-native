@@ -1894,5 +1894,18 @@ public class MapView extends FrameLayout implements LocationListener {
                 mGpsMarker.setVisibility(View.INVISIBLE);
             }
         }
+
+        if (change.equals(MapChange.MapChangeRegionWillChange) || change.equals(MapChange.MapChangeRegionWillChangeAnimated)) {
+            // Close any open InfoWindows
+            for (Annotation annotation : mAnnotations) {
+                if (annotation instanceof Marker) {
+                    Marker marker = (Marker) annotation;
+                    if (marker.isInfoWindowShown()) {
+                        marker.hideInfoWindow();
+                    }
+                }
+            }
+        }
+
     }
 }
