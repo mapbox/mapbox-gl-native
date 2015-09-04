@@ -108,21 +108,18 @@ const CGFloat MGLUserLocationAnnotationArrowSize = MGLUserLocationAnnotationPuck
 
 - (void)updateFaux3DEffect
 {
-    if (self.mapView.pitch)
+    CGFloat pitch = MGLRadiansFromDegrees(self.mapView.pitch);
+
+    if (_puckDot)
     {
-        CGFloat pitch = MGLRadiansFromDegrees(self.mapView.pitch);
+        _puckDot.shadowOffset = CGSizeMake(0, fmaxf(pitch * 10, 1));
+        _puckDot.shadowRadius = fmaxf(pitch * 5, 0.75);
+    }
 
-        if (_puckDot)
-        {
-            _puckDot.shadowOffset = CGSizeMake(0, fmaxf(pitch * 10, 1));
-            _puckDot.shadowRadius = fmaxf(pitch * 5, 0.75);
-        }
-
-        if (_dotBorderLayer)
-        {
-            _dotBorderLayer.shadowOffset = CGSizeMake(0, pitch * 10);
-            _dotBorderLayer.shadowRadius = fmaxf(pitch * 5, 3);
-        }
+    if (_dotBorderLayer)
+    {
+        _dotBorderLayer.shadowOffset = CGSizeMake(0, pitch * 10);
+        _dotBorderLayer.shadowRadius = fmaxf(pitch * 5, 3);
     }
 }
 
@@ -149,11 +146,17 @@ const CGFloat MGLUserLocationAnnotationArrowSize = MGLUserLocationAnnotationPuck
         _puckDot = [self circleLayerWithSize:MGLUserLocationAnnotationPuckSize];
         _puckDot.backgroundColor = [[UIColor whiteColor] CGColor];
         _puckDot.shadowColor = [[UIColor blackColor] CGColor];
-        _puckDot.shadowOffset = CGSizeMake(0, 1);
-        _puckDot.shadowRadius = 0.75;
         _puckDot.shadowOpacity = 0.25;
 
-        [self updateFaux3DEffect];
+        if (self.mapView.pitch)
+        {
+            [self updateFaux3DEffect];
+        }
+        else
+        {
+            _puckDot.shadowOffset = CGSizeMake(0, 1);
+            _puckDot.shadowRadius = 0.75;
+        }
 
         [self.layer addSublayer:_puckDot];
     }
@@ -334,11 +337,17 @@ const CGFloat MGLUserLocationAnnotationArrowSize = MGLUserLocationAnnotationPuck
         _dotBorderLayer = [self circleLayerWithSize:MGLUserLocationAnnotationDotSize];
         _dotBorderLayer.backgroundColor = [[UIColor whiteColor] CGColor];
         _dotBorderLayer.shadowColor = [[UIColor blackColor] CGColor];
-        _dotBorderLayer.shadowOffset = CGSizeMake(0, 0);
-        _dotBorderLayer.shadowRadius = 3;
         _dotBorderLayer.shadowOpacity = 0.25;
 
-        [self updateFaux3DEffect];
+        if (self.mapView.pitch)
+        {
+            [self updateFaux3DEffect];
+        }
+        else
+        {
+            _dotBorderLayer.shadowOffset = CGSizeMake(0, 0);
+            _dotBorderLayer.shadowRadius = 3;
+        }
 
         [self.layer addSublayer:_dotBorderLayer];
     }
