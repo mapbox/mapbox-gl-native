@@ -103,6 +103,8 @@ const CGFloat MGLUserLocationAnnotationArrowSize = MGLUserLocationAnnotationPuck
         
         if (_dotLayer && _dotBorderLayer)
         {
+            _puckDot.transform = t;
+            _puckArrow.transform = t;
             _headingIndicatorLayer.transform = t;
             _headingIndicatorMaskLayer.transform = t;
             _accuracyRingLayer.transform = t;
