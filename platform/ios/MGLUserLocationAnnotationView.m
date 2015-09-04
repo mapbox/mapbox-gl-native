@@ -8,7 +8,7 @@
 const CGFloat MGLUserLocationAnnotationDotSize = 22.0;
 const CGFloat MGLUserLocationAnnotationHaloSize = 115.0;
 
-const CGFloat MGLUserLocationAnnotationPuckSize = 35.0;
+const CGFloat MGLUserLocationAnnotationPuckSize = 45.0;
 const CGFloat MGLUserLocationAnnotationArrowSize = MGLUserLocationAnnotationPuckSize * 0.6;
 
 @interface MGLUserLocationAnnotationView ()
@@ -35,6 +35,7 @@ const CGFloat MGLUserLocationAnnotationArrowSize = MGLUserLocationAnnotationPuck
     double _oldHeadingAccuracy;
     CLLocationAccuracy _oldHorizontalAccuracy;
     double _oldZoom;
+    double _oldPitch;
 }
 
 - (instancetype)initWithFrame:(CGRect)frame
@@ -88,6 +89,42 @@ const CGFloat MGLUserLocationAnnotationArrowSize = MGLUserLocationAnnotationPuck
     if (CLLocationCoordinate2DIsValid(self.annotation.coordinate))
     {
         (_mapView.userTrackingMode == MGLUserTrackingModeFollowWithCourse) ? [self drawPuck] : [self drawDot];
+        [self updatePitch];
+    }
+}
+
+- (void)updatePitch
+{
+    if (self.mapView.camera.pitch && (self.mapView.camera.pitch != _oldPitch))
+    {
+        CATransform3D t = CATransform3DRotate(CATransform3DIdentity, MGLRadiansFromDegrees(self.mapView.camera.pitch), 1.0, 0, 0);
+        self.layer.sublayerTransform = t;
+
+        [self updateFaux3DEffect];
+
+        _oldPitch = self.mapView.camera.pitch;
+    }
+}
+
+- (void)updateFaux3DEffect
+{
+    CGFloat pitch = MGLRadiansFromDegrees(self.mapView.camera.pitch);
+
+    if (_puckDot)
+    {
+        _puckDot.shadowOffset = CGSizeMake(0, fmaxf(pitch * 10.f, 1.f));
+        _puckDot.shadowRadius = fmaxf(pitch * 5.f, 0.75f);
+    }
+
+    if (_dotBorderLayer)
+    {
+        _dotBorderLayer.shadowOffset = CGSizeMake(0.f, pitch * 10.f);
+        _dotBorderLayer.shadowRadius = fmaxf(pitch * 5.f, 3.f);
+    }
+
+    if (_dotLayer)
+    {
+        _dotLayer.zPosition = pitch * 2.f;
     }
 }
 
@@ -103,8 +140,6 @@ const CGFloat MGLUserLocationAnnotationArrowSize = MGLUserLocationAnnotationPuck
         _haloLayer = nil;
         _dotBorderLayer = nil;
         _dotLayer = nil;
-
-        _puckModeActivated = YES;
     }
 
     // background dot (white with black shadow)
@@ -114,9 +149,17 @@ const CGFloat MGLUserLocationAnnotationArrowSize = MGLUserLocationAnnotationPuck
         _puckDot = [self circleLayerWithSize:MGLUserLocationAnnotationPuckSize];
         _puckDot.backgroundColor = [[UIColor whiteColor] CGColor];
         _puckDot.shadowColor = [[UIColor blackColor] CGColor];
-        _puckDot.shadowOffset = CGSizeMake(0, 1);
-        _puckDot.shadowRadius = 1;
-        _puckDot.shadowOpacity = 0.1;
+        _puckDot.shadowOpacity = 0.25;
+
+        if (self.mapView.camera.pitch)
+        {
+            [self updateFaux3DEffect];
+        }
+        else
+        {
+            _puckDot.shadowOffset = CGSizeMake(0, 1);
+            _puckDot.shadowRadius = 0.75;
+        }
 
         [self.layer addSublayer:_puckDot];
     }
@@ -137,10 +180,11 @@ const CGFloat MGLUserLocationAnnotationArrowSize = MGLUserLocationAnnotationPuck
         [self.layer addSublayer:_puckArrow];
     }
 
-    if (self.mapView.pitch)
+    if ( ! _puckModeActivated)
     {
-        CATransform3D t = CATransform3DRotate(CATransform3DIdentity, MGLRadiansFromDegrees(self.mapView.pitch), 1.0, 0, 0);
-        self.layer.sublayerTransform = t;
+        _puckModeActivated = YES;
+
+        [self updateFaux3DEffect];
     }
 }
 
@@ -167,10 +211,6 @@ const CGFloat MGLUserLocationAnnotationArrowSize = MGLUserLocationAnnotationPuck
 
         _puckDot = nil;
         _puckArrow = nil;
-
-        _puckModeActivated = NO;
-
-        self.layer.sublayerTransform = CATransform3DIdentity;
     }
 
     // update heading indicator
@@ -277,6 +317,7 @@ const CGFloat MGLUserLocationAnnotationArrowSize = MGLUserLocationAnnotationPuck
         _haloLayer = [self circleLayerWithSize:MGLUserLocationAnnotationHaloSize];
         _haloLayer.backgroundColor = [_mapView.tintColor CGColor];
         _haloLayer.allowsGroupOpacity = NO;
+        _haloLayer.zPosition = -0.1f;
 
         // set defaults for the animations
         CAAnimationGroup *animationGroup = [self loopingAnimationGroupWithDuration:3.0];
@@ -305,10 +346,18 @@ const CGFloat MGLUserLocationAnnotationArrowSize = MGLUserLocationAnnotationPuck
         _dotBorderLayer = [self circleLayerWithSize:MGLUserLocationAnnotationDotSize];
         _dotBorderLayer.backgroundColor = [[UIColor whiteColor] CGColor];
         _dotBorderLayer.shadowColor = [[UIColor blackColor] CGColor];
-        _dotBorderLayer.shadowOffset = CGSizeMake(0, 0);
-        _dotBorderLayer.shadowRadius = 3;
         _dotBorderLayer.shadowOpacity = 0.25;
-        
+
+        if (self.mapView.camera.pitch)
+        {
+            [self updateFaux3DEffect];
+        }
+        else
+        {
+            _dotBorderLayer.shadowOffset = CGSizeMake(0, 0);
+            _dotBorderLayer.shadowRadius = 3;
+        }
+
         [self.layer addSublayer:_dotBorderLayer];
     }
     
@@ -340,6 +389,13 @@ const CGFloat MGLUserLocationAnnotationArrowSize = MGLUserLocationAnnotationPuck
         [_dotLayer addAnimation:animationGroup forKey:@"animateTransformAndOpacity"];
 
         [self.layer addSublayer:_dotLayer];
+    }
+
+    if (_puckModeActivated)
+    {
+        _puckModeActivated = NO;
+
+        [self updateFaux3DEffect];
     }
 }
 
