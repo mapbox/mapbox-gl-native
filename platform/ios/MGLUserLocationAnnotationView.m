@@ -144,16 +144,6 @@ const CGFloat MGLUserLocationAnnotationArrowSize = MGLUserLocationAnnotationPuck
     }
 }
 
-CGFloat MGLRadiansFromDegrees(CLLocationDegrees degrees)
-{
-    return degrees * M_PI / 180;
-}
-
-CLLocationDegrees MGLDegreesFromRadians(CGFloat radians)
-{
-    return radians * 180 / M_PI;
-}
-
 - (UIBezierPath *)puckArrow
 {
     CGFloat max = MGLUserLocationAnnotationArrowSize;
