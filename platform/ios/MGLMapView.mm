@@ -1825,7 +1825,7 @@ mbgl::LatLngBounds MGLLatLngBoundsFromCoordinateBounds(MGLCoordinateBounds coord
     double angle = -1;
     if (camera.heading >= 0)
     {
-        angle = MGLRadiansFromDegrees(mbgl::util::wrap(-camera.heading, 0., 360.));
+        angle = MGLRadiansFromDegrees(-camera.heading);
     }
     double pitch = -1;
     if (camera.pitch >= 0)
@@ -1851,12 +1851,12 @@ mbgl::LatLngBounds MGLLatLngBoundsFromCoordinateBounds(MGLCoordinateBounds coord
     else // portrait
     {
         sw = _mbglMap->latLngForProjectedMeters({
-            centerMeters.northing - centerToEdge * std::cos(angle) + centerToEdge * std::cos(angle) * std::sin(pitch) / 2,
-            centerMeters.easting - centerToEdge * std::sin(angle) + centerToEdge * std::sin(angle) * std::sin(pitch) / 2,
+            centerMeters.northing - centerToEdge * std::cos(-angle) + centerToEdge * std::cos(-angle) * std::sin(pitch) / 2,
+            centerMeters.easting - centerToEdge * std::sin(-angle) + centerToEdge * std::sin(-angle) * std::sin(pitch) / 2,
         });
         ne = _mbglMap->latLngForProjectedMeters({
-            centerMeters.northing + centerToEdge * std::cos(angle) - centerToEdge * std::cos(angle) * std::sin(pitch) / 2,
-            centerMeters.easting + centerToEdge * std::sin(angle) - centerToEdge * std::sin(angle) * std::sin(pitch) / 2,
+            centerMeters.northing + centerToEdge * std::cos(-angle) - centerToEdge * std::cos(-angle) * std::sin(pitch) / 2,
+            centerMeters.easting + centerToEdge * std::sin(-angle) - centerToEdge * std::sin(-angle) * std::sin(pitch) / 2,
         });
     }
     
@@ -1865,7 +1865,7 @@ mbgl::LatLngBounds MGLLatLngBoundsFromCoordinateBounds(MGLCoordinateBounds coord
     mbgl::CameraOptions options = _mbglMap->cameraForLatLngs({ sw, ne }, {});
     options.center = centerLatLng;
     
-    if (angle >= 0)
+    if (camera.heading >= 0)
     {
         options.angle = angle;
     }
