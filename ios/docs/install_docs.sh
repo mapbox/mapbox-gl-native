@@ -14,7 +14,7 @@ echo
 rm -rf /tmp/mbgl
 mkdir -p /tmp/mbgl/
 README=/tmp/mbgl/GL-README.md
-cat ../README.md > ${README}
+cat ./pod-README.md > ${README}
 echo >> ${README}
 echo -n "#" >> ${README}
 cat ../../CHANGELOG.md >> ${README}
