@@ -231,14 +231,12 @@ test('Map', function(t) {
         t.test('returns an image', function(t) {
             var map = new mbgl.Map(options);
             map.load(style);
-            map.render({}, function(err, data) {
+            map.render({}, function(err, pixels) {
                 t.error(err);
 
                 map.release();
 
-                t.ok(data.pixels);
-                t.equal(data.width, 512);
-                t.equal(data.height, 512);
+                t.ok(pixels);
                 t.end();
             });
         });

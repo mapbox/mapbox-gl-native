@@ -21,8 +21,8 @@ suite.run('native', {tests: tests}, function (style, options, callback) {
     });
 
     map.load(style);
-    map.render(options, function (err, result) {
+    map.render(options, function (err, pixels) {
         map.release();
-        callback(err, result && result.pixels);
+        callback(err, pixels);
     });
 });
