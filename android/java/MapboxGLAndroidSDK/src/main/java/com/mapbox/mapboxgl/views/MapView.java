@@ -1044,10 +1044,9 @@ public class MapView extends FrameLayout implements LocationListener {
             y = getHeight() - y;
 
             PointF tapPoint = new PointF(x, y);
-            LatLng tapLatLng = fromScreenLocation(tapPoint);
 
             float toleranceWidth = 60 * mScreenDensity;
-            float toleranceHeight = 200 * mScreenDensity;
+            float toleranceHeight = 80 * mScreenDensity;
 
             PointF tr = new PointF(tapPoint.x + toleranceWidth / 2, tapPoint.y + 2 * toleranceHeight / 3);
             PointF bl = new PointF(tapPoint.x - toleranceWidth / 2, tapPoint.y - 1 * toleranceHeight / 3);
