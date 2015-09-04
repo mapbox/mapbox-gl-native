@@ -245,7 +245,7 @@ test('Map', function(t) {
         t.test('returns an image', function(t) {
             var map = new mbgl.Map(options);
             map.load(style);
-            map.render({}, function(err, data) {
+            map.render({}, function(err, pixels) {
                 t.error(err);
 
                 map.release();
@@ -253,11 +253,11 @@ test('Map', function(t) {
                 var filename = filePath('image.png');
 
                 var png = new PNG({
-                    width: data.width,
-                    height: data.height
+                    width: 512,
+                    height: 512
                 });
 
-                png.data = data.pixels;
+                png.data = pixels;
 
                 if (process.env.UPDATE) {
                     png.pack()

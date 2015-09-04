@@ -258,9 +258,6 @@ void NodeMap::renderFinished() {
 
         cb->Call(1, argv);
     } else if (img) {
-        auto result = NanNew<v8::Object>();
-        result->Set(NanNew("width"), NanNew(img->width));
-        result->Set(NanNew("height"), NanNew(img->height));
 
         v8::Local<v8::Object> pixels = NanNewBufferHandle(
             reinterpret_cast<char *>(img->pixels.get()),
@@ -274,11 +271,9 @@ void NodeMap::renderFinished() {
         );
         img.release();
 
-        result->Set(NanNew("pixels"), pixels);
-
         v8::Local<v8::Value> argv[] = {
             NanNull(),
-            result,
+            pixels,
         };
         cb->Call(2, argv);
     } else {
