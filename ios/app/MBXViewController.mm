@@ -49,7 +49,6 @@ mbgl::Settings_NSUserDefaults *settings = nullptr;
 
     self.mapView = [[MGLMapView alloc] initWithFrame:self.view.bounds];
     self.mapView.autoresizingMask = UIViewAutoresizingFlexibleWidth | UIViewAutoresizingFlexibleHeight;
-    self.mapView.showsUserLocation = YES;
     self.mapView.delegate = self;
     [self.view addSubview:self.mapView];
 
@@ -76,6 +75,13 @@ mbgl::Settings_NSUserDefaults *settings = nullptr;
 
     settings = new mbgl::Settings_NSUserDefaults();
     [self restoreState:nil];
+
+    if ( ! settings->showsUserLocation)
+    {
+        dispatch_after(dispatch_time(DISPATCH_TIME_NOW, 2 * NSEC_PER_SEC), dispatch_get_main_queue(), ^{
+            self.mapView.showsUserLocation = YES;
+        });
+    }
 }
 
 - (void)saveState:(__unused NSNotification *)notification
