@@ -98,6 +98,8 @@ public class MapView extends FrameLayout implements LocationListener {
      * Every annotation that has been added to the map.
      */
     private List<Annotation> mAnnotations = new ArrayList<>();
+    private List<Annotation> mAnnotationsNearLastTap = new ArrayList<>();
+    private Annotation mSelectedAnnotation = null;
 
     //
     // Instance members
@@ -436,6 +438,7 @@ public class MapView extends FrameLayout implements LocationListener {
         marker.setId(id);        // the annotation needs to know its id
         marker.setMapView(this); // the annotation needs to know which map view it is in
         mAnnotations.add(marker);
+        selectAnnotation(marker);
         return marker;
     }
 
@@ -971,6 +974,86 @@ public class MapView extends FrameLayout implements LocationListener {
                 break;
 
             case MotionEvent.ACTION_UP:
+
+                // Open / Close InfoWindow
+                PointF tapPoint = new PointF(event.getX(), event.getY());
+
+                float toleranceWidth = 60 * mScreenDensity;
+                float toleranceHeight = 80 * mScreenDensity;
+
+                PointF tr = new PointF(tapPoint.x + toleranceWidth / 2, tapPoint.y + 2 * toleranceHeight / 3);
+                PointF bl = new PointF(tapPoint.x - toleranceWidth / 2, tapPoint.y - 1 * toleranceHeight / 3);
+
+                LatLng sw = fromScreenLocation(bl);
+                LatLng ne = fromScreenLocation(tr);
+
+                BoundingBox bbox = new BoundingBox(ne, sw);
+
+                List<Annotation> nearbyAnnotations = getAnnotationsInBounds(bbox);
+
+                long newSelectedAnnotationID = -1;
+
+                if (nearbyAnnotations.size() > 0) {
+
+                    // there is at least one nearby annotation; select one
+                    //
+                    // first, sort for comparison and iteration
+                    Collections.sort(nearbyAnnotations);
+
+                    if (nearbyAnnotations == mAnnotationsNearLastTap)
+                    {
+                        // the selection candidates haven't changed; cycle through them
+                        if (mSelectedAnnotation != null && (mSelectedAnnotation.getId() == mAnnotationsNearLastTap.get(mAnnotationsNearLastTap.size() - 1).getId()))
+                        {
+                            // the selected annotation is the last in the set; cycle back to the first
+                            // note: this could be the selected annotation if only one in set
+                            newSelectedAnnotationID = mAnnotationsNearLastTap.get(0).getId();
+                        }
+                        else if (mSelectedAnnotation != null)
+                        {
+                            // otherwise increment the selection through the candidates
+                        long currentID = mSelectedAnnotation.getId();
+                        long result = mAnnotationsNearLastTap.indexOf(mSelectedAnnotation);
+                        newSelectedAnnotationID = mAnnotationsNearLastTap.get((int) result + 1).getId();
+                        }
+                        else
+                        {
+                            // no current selection; select the first one
+                            newSelectedAnnotationID = mAnnotationsNearLastTap.get(0).getId();
+                        }
+                    }
+                    else
+                    {
+                        // start tracking a new set of nearby annotations
+                        mAnnotationsNearLastTap = nearbyAnnotations;
+
+                        // select the first one
+                        newSelectedAnnotationID = mAnnotationsNearLastTap.get(0).getId();
+                    }
+
+                } else  {
+                    // there are no nearby annotations; deselect if necessary
+                    newSelectedAnnotationID = -1;
+                }
+
+                if (newSelectedAnnotationID > 0) {
+
+                    for (Annotation annotation : mAnnotations) {
+                        if (annotation.getId() == newSelectedAnnotationID) {
+                            if (annotation.getId() == mSelectedAnnotation.getId()) {
+                                selectAnnotation(annotation);
+                            }
+                            break;
+                        }
+                    }
+
+                } else {
+                    // deselect any selected annotation
+                    if (mSelectedAnnotation != null) {
+                        deselectAnnotation();
+                    }
+                }
+
                 // First pointer up
                 long tapInterval = event.getEventTime() - event.getDownTime();
                 boolean isTap = tapInterval <= ViewConfiguration.getTapTimeout();
@@ -1029,25 +1112,7 @@ public class MapView extends FrameLayout implements LocationListener {
         public boolean onSingleTapUp(MotionEvent e) {
             // Cancel any animation
             mNativeMapView.cancelTransitions();
-
-            // Select or deselect point annotations
-            PointF tapPoint = new PointF(e.getX(), e.getY());
-
-            float toleranceWidth = 60 * mScreenDensity;
-            float toleranceHeight = 80 * mScreenDensity;
-
-            PointF tr = new PointF(tapPoint.x + toleranceWidth / 2, tapPoint.y + 2 * toleranceHeight / 3);
-            PointF bl = new PointF(tapPoint.x - toleranceWidth / 2, tapPoint.y - 1 * toleranceHeight / 3);
-
-            LatLng sw = fromScreenLocation(bl);
-            LatLng ne = fromScreenLocation(tr);
-
-            BoundingBox bbox = new BoundingBox(ne, sw);
-
-            List<Annotation> annotations = getAnnotationsInBounds(bbox);
-
             performClick();
-
             return true;
         }
 
@@ -1896,16 +1961,23 @@ public class MapView extends FrameLayout implements LocationListener {
         }
 
         if (change.equals(MapChange.MapChangeRegionWillChange) || change.equals(MapChange.MapChangeRegionWillChangeAnimated)) {
-            // Close any open InfoWindows
-            for (Annotation annotation : mAnnotations) {
-                if (annotation instanceof Marker) {
-                    Marker marker = (Marker) annotation;
-                    if (marker.isInfoWindowShown()) {
-                        marker.hideInfoWindow();
-                    }
-                }
-            }
+            deselectAnnotation();
         }
 
+    }
+
+    private void selectAnnotation(Annotation annotation) {
+
+        // Need to deselect any currently selected annotation first
+
+    }
+
+    private void deselectAnnotation() {
+        if (mSelectedAnnotation != null && mSelectedAnnotation instanceof Marker) {
+            Marker marker = (Marker) mSelectedAnnotation;
+            if (marker.isInfoWindowShown()) {
+                marker.hideInfoWindow();
+            }
+        }
     }
 }
