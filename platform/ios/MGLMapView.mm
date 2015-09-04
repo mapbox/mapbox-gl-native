@@ -60,16 +60,6 @@ static NSURL *MGLURLForBundledStyleNamed(NSString *styleName)
     return [NSURL URLWithString:[NSString stringWithFormat:@"asset://styles/%@.json", styleName]];
 }
 
-CGFloat MGLRadiansFromDegrees(CLLocationDegrees degrees)
-{
-    return degrees * M_PI / 180;
-}
-
-CLLocationDegrees MGLDegreesFromRadians(CGFloat radians)
-{
-    return radians * 180 / M_PI;
-}
-
 mbgl::util::UnitBezier MGLUnitBezierForMediaTimingFunction(CAMediaTimingFunction *function)
 {
     if ( ! function)
