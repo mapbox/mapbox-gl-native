@@ -341,7 +341,7 @@ IB_DESIGNABLE
 /** Removes a single overlay object from the map.
 *
 *   If the specified overlay is not currently associated with the map view, this method does nothing.
-*   @param The overlay object to remove. */
+*   @param overlay The overlay object to remove. */
 - (void)removeOverlay:(id <MGLOverlay>)overlay;
 
 /** Removes one or more overlay objects from the map.
