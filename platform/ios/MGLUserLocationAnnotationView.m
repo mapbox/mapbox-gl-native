@@ -103,8 +103,6 @@ const CGFloat MGLUserLocationAnnotationArrowSize = MGLUserLocationAnnotationPuck
         
         if (_dotLayer && _dotBorderLayer)
         {
-            _puckDot.transform = t;
-            _puckArrow.transform = t;
             _headingIndicatorLayer.transform = t;
             _headingIndicatorMaskLayer.transform = t;
             _accuracyRingLayer.transform = t;
@@ -112,6 +110,8 @@ const CGFloat MGLUserLocationAnnotationArrowSize = MGLUserLocationAnnotationPuck
             _dotLayer.transform = t;
             self.haloLayer.transform = t;
         }
+        _puckDot.transform = t;
+        _puckArrow.transform = t;
 
         [self updateFaux3DEffect];
 
