@@ -160,6 +160,67 @@ public class MapView extends FrameLayout implements LocationListener {
     // Used to manage Event Listeners
     private ArrayList<OnMapChangedListener> mOnMapChangedListener;
 
+    private enum MapChange {
+        MapChangeNullChange(-1),
+        MapChangeRegionWillChange(0),
+        MapChangeRegionWillChangeAnimated(1),
+        MapChangeRegionIsChanging(2),
+        MapChangeRegionDidChange(3),
+        MapChangeRegionDidChangeAnimated(4),
+        MapChangeWillStartLoadingMap(5),
+        MapChangeDidFinishLoadingMap(6),
+        MapChangeDidFailLoadingMap(7),
+        MapChangeWillStartRenderingFrame(8),
+        MapChangeDidFinishRenderingFrame(9),
+        MapChangeDidFinishRenderingFrameFullyRendered(10),
+        MapChangeWillStartRenderingMap(11),
+        MapChangeDidFinishRenderingMap(12),
+        MapChangeDidFinishRenderingMapFullyRendered(13);
+
+        private int value;
+
+        private MapChange(int value) {
+            this.value = value;
+        }
+
+        public static MapChange fromInteger(int value) {
+            switch (value) {
+                case -1:
+                    return MapChange.MapChangeNullChange;
+                case 0:
+                    return MapChange.MapChangeRegionWillChange;
+                case 1:
+                    return MapChange.MapChangeRegionWillChangeAnimated;
+                case 2:
+                    return MapChange.MapChangeRegionIsChanging;
+                case 3:
+                    return MapChange.MapChangeRegionDidChange;
+                case 4:
+                    return MapChange.MapChangeRegionDidChangeAnimated;
+                case 5:
+                    return MapChange.MapChangeWillStartLoadingMap;
+                case 6:
+                    return MapChange.MapChangeDidFinishLoadingMap;
+                case 7:
+                    return MapChange.MapChangeDidFailLoadingMap;
+                case 8:
+                    return MapChange.MapChangeWillStartRenderingFrame;
+                case 9:
+                    return MapChange.MapChangeDidFinishRenderingFrame;
+                case 10:
+                    return MapChange.MapChangeDidFinishRenderingFrameFullyRendered;
+                case 11:
+                    return MapChange.MapChangeWillStartRenderingMap;
+                case 12:
+                    return MapChange.MapChangeDidFinishRenderingMap;
+                case 13:
+                    return MapChange.MapChangeDidFinishRenderingMapFullyRendered;
+                default:
+                    return null;
+            }
+        }
+    }
+
     public interface OnFlingListener {
         void onFling();
     }
@@ -705,8 +766,8 @@ public class MapView extends FrameLayout implements LocationListener {
 
         addOnMapChangedListener(new OnMapChangedListener() {
             @Override
-            public void onMapChanged() {
-                updateMap();
+            public void onMapChanged(MapChange change) {
+                updateMap(change);
             }
         });
     }
@@ -1521,7 +1582,7 @@ public class MapView extends FrameLayout implements LocationListener {
      * Defines callback for events OnMapChange
      */
     public interface OnMapChangedListener {
-        void onMapChanged();
+        void onMapChanged(MapChange change);
     }
 
     /**
@@ -1547,13 +1608,14 @@ public class MapView extends FrameLayout implements LocationListener {
     // Called when the map view transformation has changed
     // Called via JNI from NativeMapView
     // Need to update anything that relies on map state
-    protected void onMapChanged() {
+    protected void onMapChanged(int rawChange) {
+        final MapChange change = MapChange.fromInteger(rawChange);
         if (mOnMapChangedListener != null) {
             post(new Runnable() {
                 @Override
                 public void run() {
                     for (OnMapChangedListener listener : mOnMapChangedListener) {
-                        listener.onMapChanged();
+                        listener.onMapChanged(change);
                     }
                 }
             });
@@ -1604,7 +1666,7 @@ public class MapView extends FrameLayout implements LocationListener {
     public final void setMyLocationEnabled (boolean enabled) {
         mIsMyLocationEnabled = enabled;
         toggleGps(enabled);
-        updateMap();
+        updateMap(MapChange.MapChangeNullChange);
     }
 
     /**
@@ -1670,7 +1732,7 @@ public class MapView extends FrameLayout implements LocationListener {
         }
 
         // Update Map
-        updateMap();
+        updateMap(MapChange.MapChangeNullChange);
     }
 
     // This class handles sensor updates to calculate compass bearing
@@ -1708,7 +1770,7 @@ public class MapView extends FrameLayout implements LocationListener {
                 }
             }
 
-            updateMap();
+            updateMap(MapChange.MapChangeNullChange);
         }
 
         @Override
@@ -1740,7 +1802,7 @@ public class MapView extends FrameLayout implements LocationListener {
     private void updateLocation(Location location) {
         if (location != null) {
             mGpsLocation = location;
-            updateMap();
+            updateMap(MapChange.MapChangeNullChange);
         }
     }
 
@@ -1754,7 +1816,7 @@ public class MapView extends FrameLayout implements LocationListener {
     }
 
     // Updates the UI to match the current map's position
-    private void updateMap() {
+    private void updateMap(MapChange change) {
         // Using direct access to mIsCompassEnabled instead of isCompassEnabled() for
         // small performance boost as this method is called rapidly.
         if (mIsCompassEnabled) {

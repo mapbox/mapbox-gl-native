@@ -432,8 +432,8 @@ class NativeMapView {
         mMapView.onInvalidate();
     }
 
-    protected void onMapChanged() {
-        mMapView.onMapChanged();
+    protected void onMapChanged(int rawChange) {
+        mMapView.onMapChanged(rawChange);
     }
 
     protected void onFpsChanged(double fps) {

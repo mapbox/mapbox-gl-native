@@ -637,7 +637,7 @@ void NativeMapView::resume() {
     }
 }
 
-void NativeMapView::notifyMapChange(mbgl::MapChange) {
+void NativeMapView::notifyMapChange(mbgl::MapChange change) {
     mbgl::Log::Debug(mbgl::Event::Android, "NativeMapView::notifyMapChange()");
 
     assert(vm != nullptr);
@@ -646,7 +646,7 @@ void NativeMapView::notifyMapChange(mbgl::MapChange) {
     JNIEnv *env = nullptr;
     bool detach = attach_jni_thread(vm, &env, "NativeMapView::notifyMapChange()");
 
-    env->CallVoidMethod(obj, onMapChangedId);
+    env->CallVoidMethod(obj, onMapChangedId, change);
     if (env->ExceptionCheck()) {
         env->ExceptionDescribe();
     }
