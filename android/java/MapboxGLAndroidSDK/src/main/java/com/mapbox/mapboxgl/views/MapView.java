@@ -8,7 +8,10 @@ import android.content.IntentFilter;
 import android.content.pm.PackageManager;
 import android.content.res.TypedArray;
 import android.graphics.Bitmap;
+import android.graphics.Canvas;
+import android.graphics.Color;
 import android.graphics.Matrix;
+import android.graphics.Paint;
 import android.graphics.PointF;
 import android.hardware.GeomagneticField;
 import android.hardware.Sensor;
@@ -1033,10 +1036,18 @@ public class MapView extends FrameLayout implements LocationListener {
             mNativeMapView.cancelTransitions();
 
             // Open / Close InfoWindow
-            PointF tapPoint = new PointF(e.getX(), e.getY());
+
+            float x = e.getX();
+            float y = e.getY();
+
+            // flip y direction vertically to match core GL
+            y = getHeight() - y;
+
+            PointF tapPoint = new PointF(x, y);
+            LatLng tapLatLng = fromScreenLocation(tapPoint);
 
             float toleranceWidth = 60 * mScreenDensity;
-            float toleranceHeight = 80 * mScreenDensity;
+            float toleranceHeight = 200 * mScreenDensity;
 
             PointF tr = new PointF(tapPoint.x + toleranceWidth / 2, tapPoint.y + 2 * toleranceHeight / 3);
             PointF bl = new PointF(tapPoint.x - toleranceWidth / 2, tapPoint.y - 1 * toleranceHeight / 3);
@@ -1045,6 +1056,8 @@ public class MapView extends FrameLayout implements LocationListener {
             LatLng ne = fromScreenLocation(tr);
 
             BoundingBox bbox = new BoundingBox(ne, sw);
+
+            addPolyline(new PolylineOptions().add(sw, ne).color(Color.RED).width(5));
 
             List<Annotation> nearbyAnnotations = getAnnotationsInBounds(bbox);
 
@@ -1096,11 +1109,13 @@ public class MapView extends FrameLayout implements LocationListener {
             if (newSelectedAnnotationID >= 0) {
 
                 for (Annotation annotation : mAnnotations) {
-                    if (annotation.getId() == newSelectedAnnotationID) {
-                        if (annotation.getId() == mSelectedAnnotation.getId()) {
-                            selectAnnotation(annotation);
+                    if (annotation instanceof Marker) {
+                        if (annotation.getId() == newSelectedAnnotationID) {
+                            if (mSelectedAnnotation == null || annotation.getId() != mSelectedAnnotation.getId()) {
+                                selectAnnotation(annotation);
+                            }
+                            break;
                         }
-                        break;
                     }
                 }
 
@@ -1989,6 +2004,7 @@ public class MapView extends FrameLayout implements LocationListener {
             Marker marker = (Marker) mSelectedAnnotation;
             if (marker.isInfoWindowShown()) {
                 marker.hideInfoWindow();
+                mSelectedAnnotation = null;
             }
         }
     }
