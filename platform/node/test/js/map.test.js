@@ -233,10 +233,10 @@ test('Map', function(t) {
             map.load(style);
             map.render({}, function(err, pixels) {
                 t.error(err);
-
                 map.release();
-
                 t.ok(pixels);
+                t.ok(pixels instanceof Buffer);
+                t.equal(pixels.length, 512 * 512 * 4)
                 t.end();
             });
         });
