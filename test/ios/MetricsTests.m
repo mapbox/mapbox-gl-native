@@ -40,7 +40,7 @@ const NSTimeInterval MGLFlushInterval = 60;
     [[NSUserDefaults standardUserDefaults] setBool:YES forKey:@"MGLMapboxMetricsEnabled"];
     [MGLMapboxEvents resumeMetricsCollection];
 
-    [MGLAccountManager setAccessToken:@"pk.eyJ1IjoianVzdGluIiwiYSI6IlpDbUJLSUEifQ.4mG8vhelFMju6HpIY-Hi5A"];
+    [MGLConfigurationManager setAccessToken:@"pk.eyJ1IjoianVzdGluIiwiYSI6IlpDbUJLSUEifQ.4mG8vhelFMju6HpIY-Hi5A"];
 }
 
 - (void)afterEach {
@@ -191,7 +191,7 @@ const NSTimeInterval MGLFlushInterval = 60;
     [OHHTTPStubs stubRequestsPassingTest:^BOOL(NSURLRequest *request) {
         return [request.URL.path hasPrefix:@"/events/v1"];
     } withStubResponse:^OHHTTPStubsResponse *(NSURLRequest *request) {
-        if ([request.URL.absoluteString isEqualToString:[@"https://api.tiles.mapbox.com/events/v1?access_token=" stringByAppendingString:[MGLAccountManager accessToken]]]) {
+        if ([request.URL.absoluteString isEqualToString:[@"https://api.tiles.mapbox.com/events/v1?access_token=" stringByAppendingString:[MGLConfigurationManager accessToken]]]) {
             [requestExpectation fulfill];
         }
 

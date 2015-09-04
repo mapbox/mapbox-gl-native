@@ -29,7 +29,7 @@
 #import "MGLUserLocationAnnotationView.h"
 #import "MGLUserLocation_Private.h"
 #import "MGLFileCache.h"
-#import "MGLAccountManager_Private.h"
+#import "MGLConfigurationManager_Private.h"
 #import "MGLMapboxEvents.h"
 
 #import "SMCalloutView.h"
@@ -160,7 +160,7 @@ std::chrono::steady_clock::duration secondsAsDuration(float duration)
 {
     [NSException raise:@"Method unavailable" format:
      @"%s has been removed. "
-     @"Use +[MGLAccountManager accessToken] or get MGLMapboxAccessToken from the Info.plist.",
+     @"Use +[MGLConfigurationManager accessToken] or get MGLMapboxAccessToken from the Info.plist.",
      __PRETTY_FUNCTION__];
     return nil;
 }
@@ -168,7 +168,7 @@ std::chrono::steady_clock::duration secondsAsDuration(float duration)
 - (void)setAccessToken:(nullable NSString *)accessToken
 {
     [NSException raise:@"Method unavailable" format:
-     @"%s has been replaced by +[MGLAccountManager setAccessToken:].\n\n"
+     @"%s has been replaced by +[MGLConfigurationManager setAccessToken:].\n\n"
      @"If you previously set this access token in a storyboard inspectable, select the MGLMapView in Interface Builder and delete the “accessToken” entry from the User Defined Runtime Attributes section of the Identity inspector. "
      @"Then go to the Info.plist file and set MGLMapboxAccessToken to “%@”.",
      __PRETTY_FUNCTION__, accessToken];
@@ -234,7 +234,7 @@ std::chrono::steady_clock::duration secondsAsDuration(float duration)
     }
 
     // Observe for changes to the global access token (and find out the current one).
-    [[MGLAccountManager sharedManager] addObserver:self
+    [[MGLConfigurationManager sharedManager] addObserver:self
                                         forKeyPath:@"accessToken"
                                            options:(NSKeyValueObservingOptionInitial |
                                                     NSKeyValueObservingOptionNew)
@@ -291,7 +291,7 @@ std::chrono::steady_clock::duration secondsAsDuration(float duration)
                          nil];
 
     // iOS 8+: add action that opens app's Settings.app panel, if applicable
-    if (&UIApplicationOpenSettingsURLString != NULL && ! [MGLAccountManager mapboxMetricsEnabledSettingShownInApp])
+    if (&UIApplicationOpenSettingsURLString != NULL && ! [MGLConfigurationManager mapboxMetricsEnabledSettingShownInApp])
     {
         [_attributionSheet addButtonWithTitle:@"Adjust Privacy Settings"];
     }
@@ -443,7 +443,7 @@ std::chrono::steady_clock::duration secondsAsDuration(float duration)
     [_regionChangeDelegateQueue cancelAllOperations];
 
     [[NSNotificationCenter defaultCenter] removeObserver:self];
-    [[MGLAccountManager sharedManager] removeObserver:self forKeyPath:@"accessToken"];
+    [[MGLConfigurationManager sharedManager] removeObserver:self forKeyPath:@"accessToken"];
 
     if (_mbglMap)
     {
@@ -1455,8 +1455,8 @@ std::chrono::steady_clock::duration secondsAsDuration(float duration)
 
 - (void)observeValueForKeyPath:(NSString *)keyPath ofObject:(id)object change:(NSDictionary *)change context:(__unused void *)context
 {
-    // Synchronize mbgl::Map’s access token with the global one in MGLAccountManager.
-    if ([keyPath isEqualToString:@"accessToken"] && object == [MGLAccountManager sharedManager])
+    // Synchronize mbgl::Map’s access token with the global one in MGLConfigurationManager.
+    if ([keyPath isEqualToString:@"accessToken"] && object == [MGLConfigurationManager sharedManager])
     {
         NSString *accessToken = change[NSKeyValueChangeNewKey];
         if (![accessToken isKindOfClass:[NSNull class]]) {
