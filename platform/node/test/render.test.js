@@ -56,7 +56,7 @@ function renderTest(style, info, base, key) {
         var map = new mbgl.Map(options);
         map.load(style);
 
-        map.render(info[key], function(err, data) {
+        map.render(info[key], function(err, pixels) {
             if (err) {
                 t.error(err);
                 return t.end();
@@ -66,55 +66,59 @@ function renderTest(style, info, base, key) {
             var actual = path.join(dir, 'actual.png');
             var diff = path.join(dir, 'diff.png');
 
-            var png = new PNG({
-                width: data.width,
-                height: data.height
-            });
+            fs.createReadStream(path.join(dir, 'expected.png'))
+                .pipe(new PNG())
+                .on('metadata', function(e){
+                    var png = new PNG({
+                        width: e.width,
+                        height: e.height
+                    });
 
-            png.data = data.pixels;
+                    png.data = pixels;
 
-            if (process.env.UPDATE) {
-                png.pack()
-                    .pipe(fs.createWriteStream(expected))
-                    .on('finish', t.end);
-            } else {
-                png.pack()
-                    .pipe(fs.createWriteStream(actual))
-                    .on('finish', function() {
-                        compare(actual, expected, diff, t, function(err, diff) {
-                            t.error(err);
+                    if (process.env.UPDATE) {
+                        png.pack()
+                            .pipe(fs.createWriteStream(expected))
+                            .on('finish', t.end);
+                    } else {
+                        png.pack()
+                            .pipe(fs.createWriteStream(actual))
+                            .on('finish', function() {
+                                compare(actual, expected, diff, t, function(err, diff) {
+                                    t.error(err);
 
-                            var allowed = 0.001;
+                                    var allowed = 0.001;
 
-                            if ('diff' in info[key]) {
-                                if (typeof info[key].diff === 'number') {
-                                    allowed = info[key].diff;
-                                } else if ('native' in info[key].diff) {
-                                    allowed = info[key].diff.native;
-                                }
-                            }
+                                    if ('diff' in info[key]) {
+                                        if (typeof info[key].diff === 'number') {
+                                            allowed = info[key].diff;
+                                        } else if ('native' in info[key].diff) {
+                                            allowed = info[key].diff.native;
+                                        }
+                                    }
 
-                            results += format(resultTemplate, {
-                                name: base,
-                                key: key,
-                                color: diff <= allowed ? 'green' : 'red',
-                                error: err ? '<p>' + err + '</p>' : '',
-                                difference: diff,
-                                zoom: info.zoom || 0,
-                                center: info.center || [0, 0],
-                                bearing: info.bearing || 0,
-                                width: info.width || 512,
-                                height: info.height || 512
-                            });
+                                    results += format(resultTemplate, {
+                                        name: base,
+                                        key: key,
+                                        color: diff <= allowed ? 'green' : 'red',
+                                        error: err ? '<p>' + err + '</p>' : '',
+                                        difference: diff,
+                                        zoom: info.zoom || 0,
+                                        center: info.center || [0, 0],
+                                        bearing: info.bearing || 0,
+                                        width: info.width || 512,
+                                        height: info.height || 512
+                                    });
 
-                            if (!info[key].ignored || !('native' in info[key].ignored)) {
-                                t.ok(diff <= allowed, 'expected ' + diff + ' to be less than ' + allowed);
-                            }
+                                    if (!info[key].ignored || !('native' in info[key].ignored)) {
+                                        t.ok(diff <= allowed, 'expected ' + diff + ' to be less than ' + allowed);
+                                    }
 
-                            t.end();
+                                    t.end();
+                                });
                         });
-                });
-            }
+                    }
+            });
         });
     };
 }
