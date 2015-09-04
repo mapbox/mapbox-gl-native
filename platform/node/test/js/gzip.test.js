@@ -62,7 +62,7 @@ test('gzip', function(t) {
 
         setup(getOptions(true, t), function(map) {
             map.load(style);
-            map.render({}, function(err, data) {
+            map.render({}, function(err, pixels) {
                 mbgl.removeAllListeners('message');
                 map.release();
 
@@ -71,11 +71,11 @@ test('gzip', function(t) {
                 var filename = filePath('success.png');
 
                 var png = new PNG({
-                    width: data.width,
-                    height: data.height
+                    width: 512,
+                    height: 512
                 });
 
-                png.data = data.pixels;
+                png.data = pixels;
 
                 if (process.env.UPDATE) {
                     png.pack()
