@@ -100,7 +100,29 @@ const CGFloat MGLUserLocationAnnotationArrowSize = MGLUserLocationAnnotationPuck
         CATransform3D t = CATransform3DRotate(CATransform3DIdentity, MGLRadiansFromDegrees(self.mapView.pitch), 1.0, 0, 0);
         self.layer.sublayerTransform = t;
 
+        [self updateFaux3DEffect];
+
         _oldPitch = self.mapView.pitch;
+    }
+}
+
+- (void)updateFaux3DEffect
+{
+    if (self.mapView.pitch)
+    {
+        CGFloat pitch = MGLRadiansFromDegrees(self.mapView.pitch);
+
+        if (_puckDot)
+        {
+            _puckDot.shadowOffset = CGSizeMake(0, fmaxf(pitch * 10, 1));
+            _puckDot.shadowRadius = fmaxf(pitch * 5, 0.75);
+        }
+
+        if (_dotBorderLayer)
+        {
+            _dotBorderLayer.shadowOffset = CGSizeMake(0, pitch * 10);
+            _dotBorderLayer.shadowRadius = fmaxf(pitch * 5, 3);
+        }
     }
 }
 
@@ -130,6 +152,8 @@ const CGFloat MGLUserLocationAnnotationArrowSize = MGLUserLocationAnnotationPuck
         _puckDot.shadowOffset = CGSizeMake(0, 1);
         _puckDot.shadowRadius = 0.75;
         _puckDot.shadowOpacity = 0.25;
+
+        [self updateFaux3DEffect];
 
         [self.layer addSublayer:_puckDot];
     }
@@ -313,7 +337,9 @@ const CGFloat MGLUserLocationAnnotationArrowSize = MGLUserLocationAnnotationPuck
         _dotBorderLayer.shadowOffset = CGSizeMake(0, 0);
         _dotBorderLayer.shadowRadius = 3;
         _dotBorderLayer.shadowOpacity = 0.25;
-        
+
+        [self updateFaux3DEffect];
+
         [self.layer addSublayer:_dotBorderLayer];
     }
     
