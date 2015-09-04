@@ -61,8 +61,9 @@ test('gzip', function(t) {
         });
 
         setup(getOptions(true, t), function(map) {
+            var options = { height: 512, width: 512 };
             map.load(style);
-            map.render({}, function(err, pixels) {
+            map.render(options, function(err, pixels) {
                 mbgl.removeAllListeners('message');
                 map.release();
 
@@ -70,10 +71,7 @@ test('gzip', function(t) {
 
                 var filename = filePath('success.png');
 
-                var png = new PNG({
-                    width: 512,
-                    height: 512
-                });
+                var png = new PNG(options);
 
                 png.data = pixels;
 
