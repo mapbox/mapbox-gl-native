@@ -244,7 +244,6 @@ test('Map', function(t) {
 
         t.test('returns an image', function(t) {
             var map = new mbgl.Map(options);
-            console.log(options);
             map.load(style);
             map.render({}, function(err, pixels) {
                 t.error(err);
