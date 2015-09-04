@@ -35,6 +35,7 @@ const CGFloat MGLUserLocationAnnotationArrowSize = MGLUserLocationAnnotationPuck
     double _oldHeadingAccuracy;
     CLLocationAccuracy _oldHorizontalAccuracy;
     double _oldZoom;
+    double _oldPitch;
 }
 
 - (instancetype)initWithFrame:(CGRect)frame
@@ -137,10 +138,12 @@ const CGFloat MGLUserLocationAnnotationArrowSize = MGLUserLocationAnnotationPuck
         [self.layer addSublayer:_puckArrow];
     }
 
-    if (self.mapView.pitch)
+    if (self.mapView.pitch && (self.mapView.pitch != _oldPitch))
     {
         CATransform3D t = CATransform3DRotate(CATransform3DIdentity, MGLRadiansFromDegrees(self.mapView.pitch), 1.0, 0, 0);
         self.layer.sublayerTransform = t;
+
+        _oldPitch = self.mapView.pitch;
     }
 }
 
