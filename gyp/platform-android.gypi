@@ -27,7 +27,6 @@
           '<@(libuv_cflags)',
           '<@(nunicode_cflags)',
           '<@(boost_cflags)',
-          '<@(variant_cflags)',
         ],
         'ldflags': [
           '<@(libpng_ldflags)',
