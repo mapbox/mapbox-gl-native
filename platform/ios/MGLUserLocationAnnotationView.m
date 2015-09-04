@@ -8,7 +8,7 @@
 const CGFloat MGLUserLocationAnnotationDotSize = 22.0;
 const CGFloat MGLUserLocationAnnotationHaloSize = 115.0;
 
-const CGFloat MGLUserLocationAnnotationPuckSize = 35.0;
+const CGFloat MGLUserLocationAnnotationPuckSize = 45.0;
 const CGFloat MGLUserLocationAnnotationArrowSize = MGLUserLocationAnnotationPuckSize * 0.6;
 
 @interface MGLUserLocationAnnotationView ()
@@ -115,8 +115,8 @@ const CGFloat MGLUserLocationAnnotationArrowSize = MGLUserLocationAnnotationPuck
         _puckDot.backgroundColor = [[UIColor whiteColor] CGColor];
         _puckDot.shadowColor = [[UIColor blackColor] CGColor];
         _puckDot.shadowOffset = CGSizeMake(0, 1);
-        _puckDot.shadowRadius = 1;
-        _puckDot.shadowOpacity = 0.1;
+        _puckDot.shadowRadius = 0.75;
+        _puckDot.shadowOpacity = 0.25;
 
         [self.layer addSublayer:_puckDot];
     }
