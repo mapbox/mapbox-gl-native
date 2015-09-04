@@ -10,7 +10,6 @@ import com.mapbox.mapboxgl.geometry.BoundingBox;
 import com.mapbox.mapboxgl.geometry.LatLng;
 import com.mapbox.mapboxgl.geometry.LatLngZoom;
 import com.mapbox.mapboxgl.geometry.ProjectedMeters;
-
 import java.util.List;
 
 // Class that wraps the native methods for convenience

@@ -25,6 +25,7 @@ import android.support.v4.content.ContextCompat;
 import android.support.v4.view.GestureDetectorCompat;
 import android.support.v4.view.ScaleGestureDetectorCompat;
 import android.text.TextUtils;
+import android.util.Log;
 import android.view.GestureDetector;
 import android.view.Gravity;
 import android.view.ScaleGestureDetector;
@@ -521,7 +522,7 @@ public class MapView extends FrameLayout implements LocationListener {
             }
         }
         for(int i = 0; i < annotations.size(); i++) {
-            Log.d(TAG, "tapped: " + Long.toString(annotations.get(i).getId()));
+            Log.d(TAG, "tapped: " + annotations.get(i).getId());
         }
         return annotations;
     }
