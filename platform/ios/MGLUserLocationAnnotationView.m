@@ -136,6 +136,22 @@ const CGFloat MGLUserLocationAnnotationArrowSize = MGLUserLocationAnnotationPuck
 
         [self.layer addSublayer:_puckArrow];
     }
+
+    if (self.mapView.pitch)
+    {
+        CATransform3D t = CATransform3DRotate(CATransform3DIdentity, MGLRadiansFromDegrees(self.mapView.pitch), 1.0, 0, 0);
+        self.layer.sublayerTransform = t;
+    }
+}
+
+CGFloat MGLRadiansFromDegrees(CLLocationDegrees degrees)
+{
+    return degrees * M_PI / 180;
+}
+
+CLLocationDegrees MGLDegreesFromRadians(CGFloat radians)
+{
+    return radians * 180 / M_PI;
 }
 
 - (UIBezierPath *)puckArrow
@@ -163,6 +179,8 @@ const CGFloat MGLUserLocationAnnotationArrowSize = MGLUserLocationAnnotationPuck
         _puckArrow = nil;
 
         _puckModeActivated = NO;
+
+        self.layer.sublayerTransform = CATransform3DIdentity;
     }
 
     // update heading indicator
