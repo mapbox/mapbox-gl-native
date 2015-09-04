@@ -37,6 +37,23 @@ function print_flags {
     fi
 }
 
+function print_build_flags {
+    local NAME=$1; shift
+    if [ "$(type -t print_${NAME}_flags)" = 'function' ]; then
+        print_${NAME}_flags
+    else
+        local VERSION=`echo "${NAME}_VERSION" | tr "[:lower:]" "[:upper:]"`
+        if [ ! -z ${!VERSION:-} ] ; then
+            mason build ${NAME} ${!VERSION}
+            for FLAGS in "$@" ; do
+                CONFIG+="    '${NAME}_${FLAGS}%': $(quote_flags $(mason ${FLAGS} ${NAME} ${!VERSION})),"$LN
+            done
+        else
+            warn "* Not using ${NAME}"
+        fi
+    fi
+}
+
 function print_default_flags {
     :
 }
@@ -93,7 +110,7 @@ print_flags libuv static_libs cflags ldflags
 print_flags zlib static_libs cflags ldflags
 print_flags nunicode static_libs cflags ldflags
 print_flags libzip static_libs cflags ldflags
-print_flags geojsonvt static_libs cflags ldflags
+print_build_flags geojsonvt static_libs cflags ldflags
 print_flags variant static_libs cflags ldflags
 
 CONFIG+="  }
