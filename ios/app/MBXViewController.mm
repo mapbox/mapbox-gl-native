@@ -261,7 +261,8 @@ mbgl::Settings_NSUserDefaults *settings = nullptr;
 
                 MGLPointAnnotation *annotation = [MGLPointAnnotation new];
                 annotation.coordinate = coordinate;
-                annotation.title = title;
+//                annotation.title = title;
+                annotation.text = title;
 
                 [annotations addObject:annotation];
 

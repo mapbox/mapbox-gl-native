@@ -277,6 +277,8 @@ AnnotationManager::addPointAnnotations(const std::vector<PointAnnotation>& point
         std::unordered_map<std::string, std::string> pointFeatureProperties;
         if (point.icon.length()) {
             pointFeatureProperties.emplace("sprite", point.icon);
+        } else if (point.text.length()) {
+            pointFeatureProperties.emplace("marker-text", point.text);
         } else {
             pointFeatureProperties.emplace("sprite", defaultPointAnnotationSymbol);
         }

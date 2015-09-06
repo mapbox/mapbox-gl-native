@@ -16,6 +16,7 @@ public class Marker extends Annotation {
     String snippet;
     String sprite = "default_marker";
     String title;
+    String text = "";
 
     private boolean infoWindowShown = false;
 

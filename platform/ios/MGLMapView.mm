@@ -1990,10 +1990,14 @@ CLLocationCoordinate2D MGLLocationCoordinate2DFromLatLng(mbgl::LatLng latLng)
         {
             MGLAnnotationImage *annotationImage = nil;
             NSString *symbolName = nil;
+            NSString *text = nil;
+            if ((MGLPointAnnotation *)annotation != nil) {
+                 text = [(MGLPointAnnotation *)annotation text];
+            }
 
             if (delegateImplementsImageForPoint)
             {
-                annotationImage = [self.delegate mapView:self imageForAnnotation:annotation];
+//                annotationImage = [self.delegate mapView:self imageForAnnotation:annotation];
 
                 if (annotationImage)
                 {
@@ -2033,7 +2037,9 @@ CLLocationCoordinate2D MGLLocationCoordinate2DFromLatLng(mbgl::LatLng latLng)
                 }
             }
 
-            points.emplace_back(MGLLatLngFromLocationCoordinate2D(annotation.coordinate), symbolName ? [symbolName UTF8String] : "");
+            points.emplace_back(MGLLatLngFromLocationCoordinate2D(annotation.coordinate),
+                                symbolName ? [symbolName UTF8String] : "",
+                                text ? [text UTF8String] : "");
         }
     }
 

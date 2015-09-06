@@ -61,7 +61,7 @@ public:
 
     struct {
         RotationAlignmentType rotation_alignment = RotationAlignmentType::Viewport;
-        std::string field;
+        std::string field = "{marker-text}";
         std::string font = "Open Sans Regular, Arial Unicode MS Regular";
         float size = 16.0f;
         float max_size = 16.0f;

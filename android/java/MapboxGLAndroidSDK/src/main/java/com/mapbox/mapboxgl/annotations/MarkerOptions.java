@@ -103,6 +103,11 @@ public class MarkerOptions extends AnnotationOptions {
         return this;
     }
 
+    public MarkerOptions text(String text) {
+        ((Marker)annotation).text = text;
+        return this;
+    }
+
     public MarkerOptions title(String title) {
         ((Marker)annotation).title = title;
         return this;
@@ -112,7 +117,6 @@ public class MarkerOptions extends AnnotationOptions {
         annotation.visible = visible;
         return this;
     }
-
 
     // TODO: Implement this method of Google Maps Android API
 //    public MarkerOptions icon(BitmapDescriptor icon) {
