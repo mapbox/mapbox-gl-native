@@ -9,9 +9,7 @@ import android.content.DialogInterface;
 import android.content.Intent;
 import android.content.IntentFilter;
 import android.content.pm.PackageManager;
-import android.content.res.ColorStateList;
 import android.content.res.TypedArray;
-import android.content.res.XmlResourceParser;
 import android.graphics.Bitmap;
 import android.graphics.Matrix;
 import android.graphics.PointF;
@@ -30,7 +28,6 @@ import android.os.Build;
 import android.os.Bundle;
 import android.support.annotation.NonNull;
 import android.support.v4.content.ContextCompat;
-import android.support.v4.graphics.drawable.DrawableCompat;
 import android.support.v4.view.GestureDetectorCompat;
 import android.support.v4.view.ScaleGestureDetectorCompat;
 import android.text.TextUtils;
@@ -423,10 +420,7 @@ public class MapView extends FrameLayout implements LocationListener {
 
         // Setup Attributions control
         mAttributionsView = new ImageView(mContext);
-        Drawable attrDrawable = ContextCompat.getDrawable(mContext, R.drawable.ic_info_outline_black_24dp);
-        attrDrawable = DrawableCompat.wrap(attrDrawable);
-        DrawableCompat.setTintList(attrDrawable, getResources().getColorStateList(R.color.material_bg_selector, mContext.getTheme()));
-        mAttributionsView.setImageDrawable(attrDrawable);
+        mAttributionsView.setBackgroundResource(R.drawable.ic_info_selector);
         mAttributionsView.setContentDescription(getResources().getString(R.string.attributionsIconContentDescription));
         LayoutParams attrParams = new FrameLayout.LayoutParams(ViewGroup.LayoutParams.WRAP_CONTENT, ViewGroup.LayoutParams.WRAP_CONTENT);
         mAttributionsView.setLayoutParams(attrParams);
