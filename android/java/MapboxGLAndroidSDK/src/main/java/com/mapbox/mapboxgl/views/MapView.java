@@ -2053,9 +2053,9 @@ public class MapView extends FrameLayout implements LocationListener {
         public void onClick(View v) {
             Context context = v.getContext();
             String[] items = context.getResources().getStringArray(R.array.attribution_names);
-            AlertDialog.Builder builder = new AlertDialog.Builder(context);
+            AlertDialog.Builder builder = new AlertDialog.Builder(context, R.style.AttributionAlertDialogStyle);
             builder.setTitle(R.string.attributionsDialogTitle);
-            builder.setAdapter(new ArrayAdapter<>(context, android.R.layout.simple_list_item_1, items), this);
+            builder.setAdapter(new ArrayAdapter<>(context, R.layout.attribution_list_item, items), this);
             builder.show();
         }
 
