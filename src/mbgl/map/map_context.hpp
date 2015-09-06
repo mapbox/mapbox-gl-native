@@ -74,8 +74,6 @@ private:
     // Loads the actual JSON object an creates a new Style object.
     void loadStyleJSON(const std::string& json, const std::string& base);
 
-    void invalidateView();
-
     View& view;
     MapData& data;
 
@@ -83,6 +81,7 @@ private:
 
     Update updateFlags = Update::Nothing;
     std::unique_ptr<uv::async> asyncUpdate;
+    std::unique_ptr<uv::async> asyncInvalidate;
 
     std::unique_ptr<TexturePool> texturePool;
     std::unique_ptr<Painter> painter;
@@ -97,7 +96,6 @@ private:
     size_t sourceCacheSize;
     TransformState transformState;
     FrameData frameData;
-    bool viewInvalidated;
 };
 
 }

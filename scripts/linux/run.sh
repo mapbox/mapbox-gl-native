@@ -27,11 +27,5 @@ make test -j${JOBS} BUILDTYPE=${BUILDTYPE}
 # Test
 ################################################################################
 
-mapbox_time "checkout_test_suite" \
-git submodule update --init test/suite
-
 mapbox_time "run_tests" \
 make test-* BUILDTYPE=${BUILDTYPE}
-
-mapbox_time "compare_results" \
-./scripts/compare_images.sh

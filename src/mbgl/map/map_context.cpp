@@ -34,14 +34,15 @@ MapContext::MapContext(View& view_, FileSource& fileSource, MapData& data_)
     : view(view_),
       data(data_),
       asyncUpdate(std::make_unique<uv::async>(util::RunLoop::getLoop(), [this] { update(); })),
-      texturePool(std::make_unique<TexturePool>()),
-      viewInvalidated(false) {
+      asyncInvalidate(std::make_unique<uv::async>(util::RunLoop::getLoop(), [&view_] { view_.invalidate(); })),
+      texturePool(std::make_unique<TexturePool>()) {
     assert(util::ThreadContext::currentlyOn(util::ThreadType::Map));
 
     util::ThreadContext::setFileSource(&fileSource);
     util::ThreadContext::setGLObjectStore(&glObjectStore);
 
     asyncUpdate->unref();
+    asyncInvalidate->unref();
 
     view.activate();
 }
@@ -74,8 +75,6 @@ void MapContext::cleanup() {
 void MapContext::pause() {
     MBGL_CHECK_ERROR(glFinish());
 
-    viewInvalidated = false;
-
     view.deactivate();
 
     std::unique_lock<std::mutex> lockPause(data.mutexPause);
@@ -84,7 +83,7 @@ void MapContext::pause() {
 
     view.activate();
 
-    invalidateView();
+    asyncInvalidate->send();
 }
 
 void MapContext::triggerUpdate(const TransformState& state, const Update flags) {
@@ -104,7 +103,7 @@ void MapContext::setStyleURL(const std::string& url) {
     styleURL = url;
     styleJSON.clear();
 
-    style = std::make_unique<Style>(data, asyncUpdate->get()->loop);
+    style = std::make_unique<Style>(data);
 
     const size_t pos = styleURL.rfind('/');
     std::string base = "";
@@ -127,7 +126,7 @@ void MapContext::setStyleJSON(const std::string& json, const std::string& base) 
     styleURL.clear();
     styleJSON = json;
 
-    style = std::make_unique<Style>(data, asyncUpdate->get()->loop);
+    style = std::make_unique<Style>(data);
 
     loadStyleJSON(json, base);
 }
@@ -259,7 +258,7 @@ void MapContext::update() {
         updateFlags = Update::Nothing;
     }
 
-    if (updateFlags == Update::Nothing) {
+    if (updateFlags == Update::Nothing || (data.mode == MapMode::Still && !callback)) {
         return;
     }
 
@@ -276,8 +275,8 @@ void MapContext::update() {
     style->update(transformState, *texturePool);
 
     if (data.mode == MapMode::Continuous) {
-        invalidateView();
-    } else if (callback && isLoaded()) {
+        asyncInvalidate->send();
+    } else if (callback && style->isLoaded()) {
         renderSync(transformState, frameData);
     }
 
@@ -326,6 +325,8 @@ bool MapContext::renderSync(const TransformState& state, const FrameData& frame)
         return false;
     }
 
+    view.beforeRender();
+
     transformState = state;
 
     // Cleanup OpenGL objects that we abandoned since the last render call.
@@ -344,9 +345,12 @@ bool MapContext::renderSync(const TransformState& state, const FrameData& frame)
         callback = nullptr;
     }
 
-    view.swap();
-    viewInvalidated = false;
-    data.setNeedsRepaint(style->hasTransitions() || painter->needsAnimation());
+    view.afterRender();
+
+    if (style->hasTransitions() || painter->needsAnimation()) {
+        updateFlags |= Update::Repaint;
+        asyncUpdate->send();
+    }
 
     return isLoaded();
 }
@@ -373,7 +377,7 @@ void MapContext::setSourceTileCacheSize(size_t size) {
         for (const auto &source : style->sources) {
             source->setCacheSize(sourceCacheSize);
         }
-        invalidateView();
+        asyncInvalidate->send();
     }
 }
 
@@ -383,7 +387,7 @@ void MapContext::onLowMemory() {
     for (const auto &source : style->sources) {
         source->onLowMemory();
     }
-    invalidateView();
+    asyncInvalidate->send();
 }
 
 void MapContext::setSprite(const std::string& name, std::shared_ptr<const SpriteImage> sprite) {
@@ -410,13 +414,6 @@ void MapContext::onResourceLoadingFailed(std::exception_ptr error) {
     if (data.mode == MapMode::Still && callback) {
         callback(error, nullptr);
         callback = nullptr;
-    }
-}
-
-void MapContext::invalidateView() {
-    if (!viewInvalidated) {
-        viewInvalidated = true;
-        view.invalidate();
     }
 }
 

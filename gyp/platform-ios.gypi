@@ -61,6 +61,7 @@
         '../platform/ios/NSString+MGLAdditions.m',
         '../platform/ios/vendor/SMCalloutView/SMCalloutView.h',
         '../platform/ios/vendor/SMCalloutView/SMCalloutView.m',
+        '../platform/ios/resources/',
       ],
 
       'variables': {
@@ -105,7 +106,7 @@
           '../include',
         ],
         'mac_bundle_resources': [
-          '<!@(find ./platform/ios/resources -type f)',
+          '<!@(find ./platform/ios/resources -type f \! -name "README")',
         ],
       },
     },

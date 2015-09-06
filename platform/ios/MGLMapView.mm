@@ -724,8 +724,6 @@ std::chrono::steady_clock::duration secondsAsDuration(float duration)
         _mbglMap->renderSync();
 
         [self updateUserLocationAnnotationView];
-
-        _mbglMap->nudgeTransitions();
     }
 }
 
@@ -1912,7 +1910,7 @@ CLLocationCoordinate2D MGLLocationCoordinate2DFromLatLng(mbgl::LatLng latLng)
 
     for (id <MGLAnnotation> annotation in annotations)
     {
-        assert([annotation conformsToProtocol:@protocol(MGLAnnotation)]);
+        NSAssert([annotation conformsToProtocol:@protocol(MGLAnnotation)], @"annotation should conform to MGLAnnotation");
 
         if ([annotation isKindOfClass:[MGLMultiPoint class]])
         {
@@ -2084,7 +2082,7 @@ CLLocationCoordinate2D MGLLocationCoordinate2DFromLatLng(mbgl::LatLng latLng)
 
     for (id <MGLAnnotation> annotation in annotations)
     {
-        assert([annotation conformsToProtocol:@protocol(MGLAnnotation)]);
+        NSAssert([annotation conformsToProtocol:@protocol(MGLAnnotation)], @"annotation should conform to MGLAnnotation");
 
         NSDictionary *infoDictionary = [self.annotationIDsByAnnotation objectForKey:annotation];
         annotationIDsToRemove.push_back([[infoDictionary objectForKey:MGLAnnotationIDKey] unsignedIntValue]);
@@ -2098,6 +2096,36 @@ CLLocationCoordinate2D MGLLocationCoordinate2DFromLatLng(mbgl::LatLng latLng)
     }
 
     _mbglMap->removeAnnotations(annotationIDsToRemove);
+}
+
+- (void)addOverlay:(id <MGLOverlay>)overlay
+{
+    [self addOverlays:@[ overlay ]];
+}
+
+- (void)addOverlays:(NS_ARRAY_OF(id <MGLOverlay>) *)overlays
+{
+    for (id <MGLOverlay> overlay in overlays)
+    {
+        NSAssert([overlay conformsToProtocol:@protocol(MGLOverlay)], @"overlay should conform to MGLOverlay");
+    }
+
+    [self addAnnotations:overlays];
+}
+
+- (void)removeOverlay:(id <MGLOverlay>)overlay
+{
+    [self removeOverlays:@[ overlay ]];
+}
+
+- (void)removeOverlays:(NS_ARRAY_OF(id <MGLOverlay>) *)overlays
+{
+    for (id <MGLOverlay> overlay in overlays)
+    {
+        NSAssert([overlay conformsToProtocol:@protocol(MGLOverlay)], @"overlay should conform to MGLOverlay");
+    }
+
+    [self removeAnnotations:overlays];
 }
 
 - (MGLAnnotationImage *)dequeueReusableAnnotationImageWithIdentifier:(NSString *)identifier
@@ -2116,7 +2144,7 @@ CLLocationCoordinate2D MGLLocationCoordinate2DFromLatLng(mbgl::LatLng latLng)
 
     id <MGLAnnotation> firstAnnotation = selectedAnnotations[0];
 
-    assert([firstAnnotation conformsToProtocol:@protocol(MGLAnnotation)]);
+    NSAssert([firstAnnotation conformsToProtocol:@protocol(MGLAnnotation)], @"annotation should conform to MGLAnnotation");
 
     if ([firstAnnotation isKindOfClass:[MGLMultiPoint class]]) return;
 
@@ -3039,7 +3067,12 @@ class MBGLView : public mbgl::View
                                   waitUntilDone:NO];
     }
 
-    void swap() override
+    void beforeRender() override
+    {
+        // no-op
+    }
+
+    void afterRender() override
     {
         // no-op
     }

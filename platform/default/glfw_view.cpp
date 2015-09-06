@@ -350,9 +350,8 @@ void GLFWView::run() {
             map->renderSync();
             report(1000 * (glfwGetTime() - started));
             if (benchmark) {
-                map->setNeedsRepaint();
+                map->update(mbgl::Update::Repaint);
             }
-            map->nudgeTransitions();
         }
     }
 }
@@ -386,7 +385,11 @@ void GLFWView::invalidate() {
     glfwPostEmptyEvent();
 }
 
-void GLFWView::swap() {
+void GLFWView::beforeRender() {
+    // no-op
+}
+
+void GLFWView::afterRender() {
     glfwSwapBuffers(window);
 }
 
