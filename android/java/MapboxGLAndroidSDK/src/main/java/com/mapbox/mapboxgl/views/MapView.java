@@ -120,6 +120,8 @@ public class MapView extends FrameLayout implements LocationListener {
     private static final float DIMENSION_SIXTEEN_DP = 16f;
     private static final float DIMENSION_TEN_DP = 10f;
 
+    private static final int IMPROVE_THIS_MAP_INDEX = 2;
+
     /**
      * Every annotation that has been added to the map.
      */
@@ -423,7 +425,7 @@ public class MapView extends FrameLayout implements LocationListener {
         LayoutParams attrParams = new FrameLayout.LayoutParams(ViewGroup.LayoutParams.WRAP_CONTENT, ViewGroup.LayoutParams.WRAP_CONTENT);
         mAttributionsView.setLayoutParams(attrParams);
         addView(mAttributionsView);
-        mAttributionsView.setOnClickListener(new AttributionOnClickListener());
+        mAttributionsView.setOnClickListener(new AttributionOnClickListener(this));
 
         // Setup Support For Listener Tracking
         // MapView's internal listener is setup in onCreate()
@@ -1947,6 +1949,12 @@ public class MapView extends FrameLayout implements LocationListener {
 
     private static class AttributionOnClickListener implements View.OnClickListener, DialogInterface.OnClickListener {
 
+        private MapView mMapView;
+
+        public AttributionOnClickListener(MapView mapView) {
+            mMapView = mapView;
+        }
+
         // Called when someone presses the attribution icon
         @Override
         public void onClick(View v) {
@@ -1958,13 +1966,17 @@ public class MapView extends FrameLayout implements LocationListener {
             builder.show();
         }
 
-        // Called when someone selects an attribution
+        // Called when someone selects an attribution, 'Improve this map' adds location data to the url
         @Override
         public void onClick(DialogInterface dialog, int which) {
-            Context context = ((Dialog)dialog).getContext();
-            String[]links = context.getResources().getStringArray(R.array.attribution_links);
+            Context context = ((Dialog) dialog).getContext();
+            String url = context.getResources().getStringArray(R.array.attribution_links)[which];
+            if (which == IMPROVE_THIS_MAP_INDEX) {
+                LatLng latLng = mMapView.getCenterCoordinate();
+                url = String.format(url, latLng.getLongitude(), latLng.getLatitude(), (int) mMapView.getZoomLevel());
+            }
             Intent intent = new Intent(Intent.ACTION_VIEW);
-            intent.setData(Uri.parse(links[which]));
+            intent.setData(Uri.parse(url));
             context.startActivity(intent);
         }
     }

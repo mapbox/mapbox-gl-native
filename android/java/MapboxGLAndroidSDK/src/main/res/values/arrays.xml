@@ -8,6 +8,6 @@
     <array name="attribution_links" formatted="false" translatable="false">
         <item>https://www.mapbox.com/about/maps/</item>
         <item>http://www.openstreetmap.org/about/</item>
-        <item>https://www.mapbox.com/map-feedback</item>
+        <item>https://www.mapbox.com/map-feedback/#/%1$f/%2$f/%3$d</item>
     </array>
 </resources>
