@@ -1032,7 +1032,11 @@ public class MapView extends FrameLayout implements LocationListener {
         public boolean onSingleTapUp(MotionEvent e) {
             // Cancel any animation
             mNativeMapView.cancelTransitions();
+            return true;
+        }
 
+        @Override
+        public boolean onSingleTapConfirmed(MotionEvent e) {
             // Open / Close InfoWindow
 
             float x = e.getX();
@@ -1125,14 +1129,7 @@ public class MapView extends FrameLayout implements LocationListener {
                 }
             }
 
-            performClick();
             return true;
-        }
-
-        // Called for single taps after a delay
-        @Override
-        public boolean onSingleTapConfirmed(MotionEvent e) {
-            return false;
         }
 
         // Called for a long press
