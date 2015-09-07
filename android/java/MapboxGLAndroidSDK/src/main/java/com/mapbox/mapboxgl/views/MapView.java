@@ -13,6 +13,7 @@ import android.graphics.Color;
 import android.graphics.Matrix;
 import android.graphics.Paint;
 import android.graphics.PointF;
+import android.graphics.RectF;
 import android.hardware.GeomagneticField;
 import android.hardware.Sensor;
 import android.hardware.SensorEvent;
@@ -1045,20 +1046,24 @@ public class MapView extends FrameLayout implements LocationListener {
 
             PointF tapPoint = new PointF(x, y);
 
-            float toleranceWidth = 60 * mScreenDensity;
-            float toleranceHeight = 80 * mScreenDensity;
+            float toleranceWidth  = 40 * mScreenDensity;
+            float toleranceHeight = 60 * mScreenDensity;
 
-            PointF tr = new PointF(tapPoint.x + toleranceWidth / 2, tapPoint.y + 2 * toleranceHeight / 3);
-            PointF bl = new PointF(tapPoint.x - toleranceWidth / 2, tapPoint.y - 1 * toleranceHeight / 3);
+            RectF tapRect = new RectF(tapPoint.x - toleranceWidth / 2, tapPoint.y - 2 * toleranceHeight / 3,
+                                      tapPoint.x + toleranceWidth / 2, tapPoint.y + 1 * toleranceHeight / 3);
 
-            LatLng sw = fromScreenLocation(bl);
-            LatLng ne = fromScreenLocation(tr);
+            List<LatLng> corners = Arrays.asList(
+                fromScreenLocation(new PointF(tapRect.left, tapRect.bottom)),
+                fromScreenLocation(new PointF(tapRect.left, tapRect.top)),
+                fromScreenLocation(new PointF(tapRect.right, tapRect.top)),
+                fromScreenLocation(new PointF(tapRect.right, tapRect.bottom))
+            );
 
-            BoundingBox bbox = new BoundingBox(ne, sw);
+            BoundingBox tapBounds = BoundingBox.fromLatLngs(corners);
 
-            addPolyline(new PolylineOptions().add(sw, ne).color(Color.RED).width(5));
+            addPolyline(new PolylineOptions().addAll(corners).add(corners.get(0)).color(Color.RED).width(2));
 
-            List<Annotation> nearbyAnnotations = getAnnotationsInBounds(bbox);
+            List<Annotation> nearbyAnnotations = getAnnotationsInBounds(tapBounds);
 
             long newSelectedAnnotationID = -1;
 
