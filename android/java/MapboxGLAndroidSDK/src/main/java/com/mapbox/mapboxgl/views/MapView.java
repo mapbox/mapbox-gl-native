@@ -1061,8 +1061,6 @@ public class MapView extends FrameLayout implements LocationListener {
 
             BoundingBox tapBounds = BoundingBox.fromLatLngs(corners);
 
-            addPolyline(new PolylineOptions().addAll(corners).add(corners.get(0)).color(Color.RED).width(2));
-
             List<Annotation> nearbyAnnotations = getAnnotationsInBounds(tapBounds);
 
             long newSelectedAnnotationID = -1;
