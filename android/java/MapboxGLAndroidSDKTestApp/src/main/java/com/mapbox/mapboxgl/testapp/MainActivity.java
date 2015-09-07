@@ -32,6 +32,7 @@ import io.fabric.sdk.android.Fabric;
 import java.io.BufferedReader;
 import java.io.IOException;
 import java.io.InputStreamReader;
+import java.text.DecimalFormat;
 import java.util.ArrayList;
 
 public class MainActivity extends AppCompatActivity {
@@ -121,7 +122,8 @@ public class MainActivity extends AppCompatActivity {
                 mMapView.addMarker(new MarkerOptions()
                         .position(position)
                         .title("Dropped Pin")
-                        .snippet("Some snippet text.")
+                        .snippet(new DecimalFormat("#.#####").format(position.getLatitude()) + ", " +
+                                 new DecimalFormat("#.#####").format(position.getLongitude()))
                         .sprite("default_marker"));
             }
         });
