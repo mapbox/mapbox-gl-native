@@ -527,9 +527,6 @@ public class MapView extends FrameLayout implements LocationListener {
                 annotations.add(annotation);
             }
         }
-        for(int i = 0; i < annotations.size(); i++) {
-            Log.d(TAG, "tapped: " + annotations.get(i).getId());
-        }
         return annotations;
     }
 
