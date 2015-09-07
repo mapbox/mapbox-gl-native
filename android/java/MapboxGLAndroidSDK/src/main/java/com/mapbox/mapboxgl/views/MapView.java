@@ -1049,8 +1049,8 @@ public class MapView extends FrameLayout implements LocationListener {
             float toleranceWidth  = 40 * mScreenDensity;
             float toleranceHeight = 60 * mScreenDensity;
 
-            RectF tapRect = new RectF(tapPoint.x - toleranceWidth / 2, tapPoint.y - 2 * toleranceHeight / 3,
-                                      tapPoint.x + toleranceWidth / 2, tapPoint.y + 1 * toleranceHeight / 3);
+            RectF tapRect = new RectF(tapPoint.x - toleranceWidth / 2, tapPoint.y + 2 * toleranceHeight / 3,
+                                      tapPoint.x + toleranceWidth / 2, tapPoint.y - 1 * toleranceHeight / 3);
 
             List<LatLng> corners = Arrays.asList(
                 fromScreenLocation(new PointF(tapRect.left, tapRect.bottom)),
