@@ -32,6 +32,7 @@ const CGFloat MGLUserLocationAnnotationArrowSize = MGLUserLocationAnnotationPuck
     CALayer *_dotBorderLayer;
     CALayer *_dotLayer;
     CALayer *_dotDomeLayer;
+    CALayer *_dotMaskDomeFrontLayer;
 
     double _oldHeadingAccuracy;
     CLLocationAccuracy _oldHorizontalAccuracy;
@@ -104,16 +105,19 @@ const CGFloat MGLUserLocationAnnotationArrowSize = MGLUserLocationAnnotationPuck
 
         if (_dotDomeLayer)
         {
-            CATransform3D t = CATransform3DRotate(CATransform3DIdentity, MGLRadiansFromDegrees(self.mapView.pitch * -1), 1.0, 0, 0);
+            /*CATransform3D t = CATransform3DRotate(CATransform3DIdentity, MGLRadiansFromDegrees(self.mapView.pitch * -1), 1.0, 0, 0);
             _dotDomeLayer.transform = t;
             
             CABasicAnimation *scaleAnimation = [CABasicAnimation animationWithKeyPath:@"transform.scale.xy"];
             scaleAnimation.toValue = @0;
             
-            [_dotDomeLayer addAnimation:scaleAnimation forKey:@"domeScaleDown"];
+            [_dotDomeLayer addAnimation:scaleAnimation forKey:@"domeScaleDown"];*/
             
             _dotDomeLayer.hidden = YES;
             _dotDomeLayer.mask.hidden = YES;
+            _dotDomeLayer.speed = 0.0;
+            
+            _dotLayer.mask = nil;
         }
 
         [self updateFaux3DEffect];
@@ -122,11 +126,20 @@ const CGFloat MGLUserLocationAnnotationArrowSize = MGLUserLocationAnnotationPuck
     }
     else if (_dotDomeLayer.hidden && (self.mapView.pitch == _oldPitch))
     {
+        if ( ! self.mapView.pitch) return;
+        
+        CATransform3D t = CATransform3DRotate(CATransform3DIdentity, MGLRadiansFromDegrees(-self.mapView.pitch), 1.0, 0, 0);
+        _dotDomeLayer.transform = t;
+        
         _dotDomeLayer.hidden = NO;
         _dotDomeLayer.mask.hidden = NO;
+        _dotDomeLayer.speed = 1.0;
+        
+        _dotLayer.mask = _dotMaskDomeFrontLayer;
         
         CABasicAnimation *scaleAnimation = [CABasicAnimation animationWithKeyPath:@"transform.scale.xy"];
         scaleAnimation.toValue = @1;
+        scaleAnimation.fillMode = kCAFillModeBackwards;
         
         [_dotDomeLayer addAnimation:scaleAnimation forKey:@"domeScaleUp"];
     }
@@ -393,12 +406,12 @@ const CGFloat MGLUserLocationAnnotationArrowSize = MGLUserLocationAnnotationPuck
         dotMaskDomeTopLayer.backgroundColor = [[UIColor blackColor] CGColor];
         dotMaskDomeTopLayer.shouldRasterize = NO;
         
-//        CALayer *dotMaskDomeFrontLayer = [CALayer layer];
-//        dotMaskDomeFrontLayer.bounds = dotMaskDomeTopLayer.bounds;
-//        dotMaskDomeFrontLayer.position = CGPointMake(dotMaskDomeTopLayer.position.x, dotMaskDomeTopLayer.position.y + dotMaskDomeTopLayer.bounds.size.height);
-//        dotMaskDomeFrontLayer.backgroundColor = dotMaskDomeTopLayer.backgroundColor;
+        _dotMaskDomeFrontLayer = [CALayer layer];
+        _dotMaskDomeFrontLayer.bounds = dotMaskDomeTopLayer.bounds;
+        _dotMaskDomeFrontLayer.position = CGPointMake(dotMaskDomeTopLayer.position.x, dotMaskDomeTopLayer.position.y + dotMaskDomeTopLayer.bounds.size.height);
+        _dotMaskDomeFrontLayer.backgroundColor = dotMaskDomeTopLayer.backgroundColor;
         
-        //_dotLayer.mask = dotMaskDomeFrontLayer;
+        _dotLayer.mask = _dotMaskDomeFrontLayer;
         
         _dotDomeLayer = [self circleLayerWithSize:MGLUserLocationAnnotationDotSize * 0.75];
         _dotDomeLayer.backgroundColor = [_mapView.tintColor CGColor];
