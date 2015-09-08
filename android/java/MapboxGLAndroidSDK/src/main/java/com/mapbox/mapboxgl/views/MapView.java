@@ -8,10 +8,7 @@ import android.content.IntentFilter;
 import android.content.pm.PackageManager;
 import android.content.res.TypedArray;
 import android.graphics.Bitmap;
-import android.graphics.Canvas;
-import android.graphics.Color;
 import android.graphics.Matrix;
-import android.graphics.Paint;
 import android.graphics.PointF;
 import android.graphics.RectF;
 import android.hardware.GeomagneticField;
@@ -29,7 +26,6 @@ import android.support.v4.content.ContextCompat;
 import android.support.v4.view.GestureDetectorCompat;
 import android.support.v4.view.ScaleGestureDetectorCompat;
 import android.text.TextUtils;
-import android.util.Log;
 import android.view.GestureDetector;
 import android.view.Gravity;
 import android.view.ScaleGestureDetector;
@@ -483,6 +479,9 @@ public class MapView extends FrameLayout implements LocationListener {
     private void removeAnnotationsWithId(long annotationId){
         for (Iterator<Annotation> iterator = mAnnotations.iterator(); iterator.hasNext();) {
             Annotation annotation = iterator.next();
+            if (annotation instanceof Marker) {
+                ((Marker)annotation).hideInfoWindow();
+            }
             if (annotation.getId() == annotationId) {
                 iterator.remove();
             }
@@ -490,6 +489,9 @@ public class MapView extends FrameLayout implements LocationListener {
     }
 
     public void removeAnnotation(Annotation annotation) {
+        if (annotation instanceof Marker) {
+            ((Marker)annotation).hideInfoWindow();
+        }
         long id = annotation.getId();
         mNativeMapView.removeAnnotation(id);
         mAnnotations.remove(annotation);
@@ -503,8 +505,12 @@ public class MapView extends FrameLayout implements LocationListener {
     public void removeAnnotations() {
         long[] ids = new long[mAnnotations.size()];
         for(int i = 0; i < mAnnotations.size(); i++) {
-            long id = mAnnotations.get(i).getId();
+            Annotation annotation = mAnnotations.get(i);
+            long id = annotation.getId();
             ids[i] = id;
+            if (annotation instanceof Marker) {
+                ((Marker)annotation).hideInfoWindow();
+            }
         }
         mNativeMapView.removeAnnotations(ids);
         mAnnotations.clear();
