@@ -22,7 +22,9 @@ import android.view.MenuItem;
 import android.view.MotionEvent;
 import android.view.View;
 import android.widget.TextView;
+import android.widget.Toast;
 import com.crashlytics.android.Crashlytics;
+import com.mapbox.mapboxgl.annotations.Marker;
 import com.mapbox.mapboxgl.annotations.MarkerOptions;
 import com.mapbox.mapboxgl.annotations.PolygonOptions;
 import com.mapbox.mapboxgl.annotations.PolylineOptions;
@@ -395,10 +397,18 @@ public class MainActivity extends AppCompatActivity {
 
     private void addMarkers() {
         LatLng backLot = new LatLng(38.649441, -121.369064);
-        mMapView.addMarker(new MarkerOptions()
+        final Marker marker = mMapView.addMarker(new MarkerOptions()
             .position(backLot)
             .title("Back Lot")
             .snippet("The back lot behind my house"));
+        marker.setInfoWindowOnTouchListener(new View.OnTouchListener() {
+            @Override
+            public boolean onTouch(View view, MotionEvent motionEvent) {
+                Toast.makeText(getApplicationContext(), "Custom Info Touch Listener!!", Toast.LENGTH_SHORT).show();
+                marker.hideInfoWindow();
+                return true;
+            }
+        });
 
         LatLng cheeseRoom = new LatLng(38.531577,-122.010646);
         mMapView.addMarker(new MarkerOptions()

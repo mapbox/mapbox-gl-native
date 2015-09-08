@@ -1,6 +1,7 @@
 package com.mapbox.mapboxgl.annotations;
 
 import android.graphics.Point;
+import android.view.View;
 import com.mapbox.mapboxgl.geometry.LatLng;
 import com.mapbox.mapboxgl.views.R;
 
@@ -145,13 +146,32 @@ public class Marker extends Annotation {
             return;
         }
 
+        getInfoWindow().open(this, getPosition(), (int) anchorU, (int) anchorV);
+        getInfoWindow().setBoundMarker(this);
+        infoWindowShown = true;
+    }
+
+    /**
+     * Use to set a custom OnTouchListener for the InfoWindow.
+     * By default the InfoWindow will close on touch.
+     * @param listener Custom OnTouchListener
+     */
+    public void setInfoWindowOnTouchListener(View.OnTouchListener  listener) {
+        if (listener == null) {
+            return;
+        }
+        getInfoWindow().setOnTouchListener(listener);
+    }
+
+    /**
+     * Common internal InfoWindow initialization method
+     * @return InfoWindow for Marker
+     */
+    private InfoWindow getInfoWindow() {
         if (infoWindow == null) {
             infoWindow = new InfoWindow(R.layout.infowindow, mapView);
         }
-
-        infoWindow.open(this, getPosition(), (int)anchorU, (int)anchorV);
-        infoWindow.setBoundMarker(this);
-        infoWindowShown = true;
+        return infoWindow;
     }
 
     @Override
