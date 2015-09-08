@@ -100,6 +100,7 @@ mbgl::util::UnitBezier MGLUnitBezierForMediaTimingFunction(CAMediaTimingFunction
 @property (nonatomic) UIPinchGestureRecognizer *pinch;
 @property (nonatomic) UIRotationGestureRecognizer *rotate;
 @property (nonatomic) UILongPressGestureRecognizer *quickZoom;
+@property (nonatomic) UILongPressGestureRecognizer *longPress;
 @property (nonatomic) UIPanGestureRecognizer *twoFingerDrag;
 @property (nonatomic) NSMapTable *annotationIDsByAnnotation;
 @property (nonatomic) NS_MUTABLE_DICTIONARY_OF(NSString *, MGLAnnotationImage *) *annotationImages;
@@ -372,6 +373,11 @@ std::chrono::steady_clock::duration secondsAsDuration(float duration)
         [self addGestureRecognizer:_quickZoom];
     }
 
+    _longPress = [[UILongPressGestureRecognizer alloc] initWithTarget:self action:@selector(handleLongPressGesture:)];
+    _longPress.numberOfTapsRequired = 0;
+    _longPress.minimumPressDuration = 0.5;
+    [self addGestureRecognizer:_longPress];
+    
     // observe app activity
     //
     [[NSNotificationCenter defaultCenter] addObserver:self selector:@selector(willTerminate) name:UIApplicationWillTerminateNotification object:nil];
@@ -1224,6 +1230,13 @@ std::chrono::steady_clock::duration secondsAsDuration(float duration)
         {
             // deselect any selected annotation
             if (self.selectedAnnotation) [self deselectAnnotation:self.selectedAnnotation animated:YES];
+            
+            // notify the delegate about a single tap on the map
+            if ([self.delegate respondsToSelector:@selector(mapView:singleTapOnMapAtCoordinate:)])
+            {
+                CLLocationCoordinate2D tapCoordinate = [self convertPoint:tapPoint toCoordinateFromView:self];
+                [self.delegate mapView:self singleTapOnMapAtCoordinate:tapCoordinate];
+            }
         }
     }
 }
@@ -1349,6 +1362,19 @@ std::chrono::steady_clock::duration secondsAsDuration(float duration)
         [self unrotateIfNeededAnimated:YES];
 
         [self notifyMapChange:mbgl::MapChangeRegionDidChange];
+    }
+}
+
+- (void)handleLongPressGesture:(UILongPressGestureRecognizer *)longPress
+{
+    if (longPress.state == UIGestureRecognizerStateBegan) {
+        // notify the delegate about a long press on the map
+        if ([self.delegate respondsToSelector:@selector(mapView:longPressOnMapAtCoordinate:)])
+        {
+            CGPoint tapPoint = [longPress locationInView:self];
+            CLLocationCoordinate2D tapCoordinate = [self convertPoint:tapPoint toCoordinateFromView:self];
+            [self.delegate mapView:self longPressOnMapAtCoordinate:tapCoordinate];
+        }
     }
 }
 
