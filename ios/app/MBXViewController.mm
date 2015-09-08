@@ -83,13 +83,6 @@ static NSUInteger const kStyleVersion = 8;
                                                                              action:@selector(locateUser)];
 
     [self restoreState:nil];
-
-    if ( ! settings->showsUserLocation)
-    {
-        dispatch_after(dispatch_time(DISPATCH_TIME_NOW, 2 * NSEC_PER_SEC), dispatch_get_main_queue(), ^{
-            self.mapView.showsUserLocation = YES;
-        });
-    }
 }
 
 - (void)saveState:(__unused NSNotification *)notification
