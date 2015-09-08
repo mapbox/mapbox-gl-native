@@ -83,7 +83,7 @@ void Transform::easeTo(const CameraOptions& options) {
     state.Cc = s / util::M2PI;
 
     const double m = 1 - 1e-15;
-    const double f = std::fmin(std::fmax(std::sin(util::DEG2RAD * latLng.latitude), -m), m);
+    const double f = ::fmin(::fmax(std::sin(util::DEG2RAD * latLng.latitude), -m), m);
 
     double xn = -latLng.longitude * state.Bc;
     double yn = 0.5 * state.Cc * std::log((1 + f) / (1 - f));
@@ -330,7 +330,7 @@ void Transform::flyTo(const CameraOptions &options) {
     state.Cc = scaled_tile_size / util::M2PI;
     
     const double m = 1 - 1e-15;
-    const double f = std::fmin(std::fmax(std::sin(util::DEG2RAD * latLng.latitude), -m), m);
+    const double f = ::fmin(::fmax(std::sin(util::DEG2RAD * latLng.latitude), -m), m);
     
     double xn = -latLng.longitude * state.Bc;
     double yn = 0.5 * state.Cc * std::log((1 + f) / (1 - f));
@@ -346,7 +346,7 @@ void Transform::flyTo(const CameraOptions &options) {
     const double rho = 1.42;
     double w0 = std::max(state.width, state.height);
     double w1 = w0 / new_scale;
-    double u1 = std::hypot(xn, yn);
+    double u1 = ::hypot(xn, yn);
     double rho2 = rho * rho;
     
     auto r = [=](double i) {
@@ -395,7 +395,7 @@ void Transform::flyTo(const CameraOptions &options) {
                         state.Bc = new_scaled_tile_size / 360;
                         state.Cc = new_scaled_tile_size / util::M2PI;
                         
-                        const double f2 = std::fmin(std::fmax(std::sin(util::DEG2RAD * desiredLat), -m), m);
+                        const double f2 = ::fmin(::fmax(std::sin(util::DEG2RAD * desiredLat), -m), m);
                         state.x = -desiredLng * state.Bc;
                         state.y = 0.5 * state.Cc * std::log((1 + f2) / (1 - f2));
                         
