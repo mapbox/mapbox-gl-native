@@ -84,7 +84,7 @@ mbgl::util::UnitBezier MGLUnitBezierForMediaTimingFunction(CAMediaTimingFunction
 
 #pragma mark - Private -
 
-@interface MGLMapView () <UIGestureRecognizerDelegate, GLKViewDelegate, CLLocationManagerDelegate, UIActionSheetDelegate>
+@interface MGLMapView () <UIGestureRecognizerDelegate, GLKViewDelegate, CLLocationManagerDelegate, UIActionSheetDelegate, SMCalloutViewDelegate>
 
 @property (nonatomic) EAGLContext *context;
 @property (nonatomic) GLKView *glView;
@@ -1413,6 +1413,14 @@ std::chrono::steady_clock::duration secondsAsDuration(float duration)
     }
 }
 
+- (void)calloutViewClicked:(SMCalloutView *__attribute__ ((unused)))calloutView
+{
+    if ([self.delegate respondsToSelector:@selector(mapView:tapOnLabelForAnnotation:)])
+    {
+        [self.delegate mapView:self tapOnLabelForAnnotation:self.selectedAnnotation];
+    }
+}
+
 - (BOOL)gestureRecognizer:(UIGestureRecognizer *)gestureRecognizer shouldRecognizeSimultaneouslyWithGestureRecognizer:(UIGestureRecognizer *)otherGestureRecognizer
 {
     NSArray *validSimultaneousGestures = @[ self.pan, self.pinch, self.rotate ];
@@ -2404,7 +2412,10 @@ CLLocationCoordinate2D MGLLocationCoordinate2DFromLatLng(mbgl::LatLng latLng)
                 [self.selectedAnnotationCalloutView.rightAccessoryView addGestureRecognizer:calloutAccessoryTap];
             }
         }
-
+        
+        // set annotation delegate to handle taps on the callout view
+        self.selectedAnnotationCalloutView.delegate = self;
+        
         // present popup
         [self.selectedAnnotationCalloutView presentCalloutFromRect:calloutBounds
                                                             inView:self.glView
