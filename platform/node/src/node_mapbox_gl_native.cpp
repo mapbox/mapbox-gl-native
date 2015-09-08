@@ -59,7 +59,7 @@ NAN_MODULE_INIT(RegisterModule) {
     Nan::SetPrototype(target,
         Nan::Get(EventEmitter, Nan::New("prototype").ToLocalChecked()).ToLocalChecked());
 
-    mbgl::Log::setObserver(std::make_unique<node_mbgl::NodeLogObserver>(Nan::New(target)));
+    mbgl::Log::setObserver(std::make_unique<node_mbgl::NodeLogObserver>(target->ToObject()));
 }
 
 NODE_MODULE(mapbox_gl_native, RegisterModule)

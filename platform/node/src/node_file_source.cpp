@@ -75,7 +75,7 @@ void NodeFileSource::processAdd(const mbgl::Resource& resource) {
         queue->ref();
     }
 
-    auto requestHandle = Nan::New<v8::Object>(NodeRequest::Create(this, resource));
+    v8::Local<v8::Object> requestHandle = NodeRequest::Create(this, resource)->ToObject();
     pending.emplace(resource, requestHandle);
 
     v8::Local<v8::Value> argv[] = { requestHandle };

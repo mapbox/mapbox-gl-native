@@ -59,7 +59,7 @@ matrix:
         apt:
           packages: [ 'lib32stdc++6' ]
     - os: linux
-      env: FLAVOR=node CXX=clang++-3.5 BUILDTYPE=Release NODE_VERSION=iojs-v2
+      env: FLAVOR=node CXX=clang++-3.5 BUILDTYPE=Release NODE_VERSION=iojs-v3
       addons:
         apt:
           sources: [ 'ubuntu-toolchain-r-test', 'llvm-toolchain-precise-3.5' ]
@@ -79,7 +79,7 @@ matrix:
     - os: osx
       osx_image: xcode6.4
       compiler: clang
-      env: FLAVOR=node NODE_VERSION=iojs-v2
+      env: FLAVOR=node NODE_VERSION=iojs-v3
     - os: osx
       osx_image: xcode6.4
       compiler: clang

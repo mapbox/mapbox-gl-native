@@ -9,6 +9,7 @@
   render options.
 - Adds support for rendering v8 styles.
 - No longer load resources before a render request is made.
+- Adds io.js v3.x support.
 
 # 1.1.3
 
