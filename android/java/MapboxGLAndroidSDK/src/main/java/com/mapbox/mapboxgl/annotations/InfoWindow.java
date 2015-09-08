@@ -28,11 +28,10 @@ public class InfoWindow {
     public InfoWindow(int layoutResId, MapView mapView) {
         mMapView = mapView;
         mIsVisible = false;
-        ViewGroup parent = (ViewGroup) mapView.getParent();
         Context context = mapView.getContext();
         LayoutInflater inflater =
                 (LayoutInflater) context.getSystemService(Context.LAYOUT_INFLATER_SERVICE);
-        mView = inflater.inflate(layoutResId, parent, false);
+        mView = inflater.inflate(layoutResId, (ViewGroup) mapView, false);
 
         if (mTitleId == 0) {
             setResIds(mapView.getContext());
