@@ -280,7 +280,7 @@ void NodeMap::renderFinished() {
 
         v8::Local<v8::Value> argv[] = {
             Nan::Null(),
-            pixels,
+            pixels
         };
         cb->Call(2, argv);
     } else {

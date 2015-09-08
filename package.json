@@ -18,7 +18,7 @@
     }
   ],
   "dependencies": {
-    "nan": "^2.0.8",
+    "nan": "nodejs/nan#a71301e0f62877ca017c4ebec7fbac9f4359038e",
     "node-pre-gyp": "^0.6.9"
   },
   "bundledDependencies": [
