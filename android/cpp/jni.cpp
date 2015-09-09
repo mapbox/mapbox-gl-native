@@ -1227,6 +1227,14 @@ jobject JNICALL nativeLatLngForPixel(JNIEnv *env, jobject obj, jlong nativeMapVi
     return ret;
 }
 
+jdouble JNICALL nativeGetTopOffsetPixelsForAnnotationSymbol(JNIEnv *env, jobject obj, jlong nativeMapViewPtr, jstring symbolName) {
+    mbgl::Log::Debug(mbgl::Event::JNI, "nativeGetTopOffsetPixelsForAnnotationSymbol");
+    assert(nativeMapViewPtr != 0);
+    NativeMapView *nativeMapView = reinterpret_cast<NativeMapView *>(nativeMapViewPtr);
+    return nativeMapView->getMap().getTopOffsetPixelsForAnnotationSymbol(std_string_from_jstring(env, symbolName));
+}
+
+
 }
 
 extern "C" {
@@ -1708,6 +1716,8 @@ extern "C" JNIEXPORT jint JNICALL JNI_OnLoad(JavaVM *vm, void *reserved) {
          reinterpret_cast<void *>(&nativePixelForLatLng)},
         {"nativeLatLngForPixel", "(JLandroid/graphics/PointF;)Lcom/mapbox/mapboxgl/geometry/LatLng;",
          reinterpret_cast<void *>(&nativeLatLngForPixel)},
+        {"nativeGetTopOffsetPixelsForAnnotationSymbol", "(JLjava/lang/String;)D",
+         reinterpret_cast<void *>(&nativeGetTopOffsetPixelsForAnnotationSymbol)},
     };
 
     if (env->RegisterNatives(nativeMapViewClass, methods.data(), methods.size()) < 0) {

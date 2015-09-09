@@ -40,7 +40,7 @@
 	<key>NSHumanReadableCopyright</key>
 	<string>(c) 2014 Mapbox</string>
 	<key>NSLocationWhenInUseUsageDescription</key>
-	<string>The map will be centered on the user's location.</string>
+	<string>The map will display the user&apos;s location.</string>
 	<key>UILaunchStoryboardName</key>
 	<string>Default</string>
 	<key>UIRequiredDeviceCapabilities</key>

@@ -1,6 +1,5 @@
 package com.mapbox.mapboxgl.views;
 
-import android.annotation.TargetApi;
 import android.app.ActivityManager;
 import android.content.BroadcastReceiver;
 import android.content.Context;
@@ -11,6 +10,7 @@ import android.content.res.TypedArray;
 import android.graphics.Bitmap;
 import android.graphics.Matrix;
 import android.graphics.PointF;
+import android.graphics.RectF;
 import android.graphics.SurfaceTexture;
 import android.hardware.GeomagneticField;
 import android.hardware.Sensor;
@@ -27,7 +27,6 @@ import android.support.v4.content.ContextCompat;
 import android.support.v4.view.GestureDetectorCompat;
 import android.support.v4.view.ScaleGestureDetectorCompat;
 import android.text.TextUtils;
-import android.util.Log;
 import android.view.GestureDetector;
 import android.view.Gravity;
 import android.view.ScaleGestureDetector;
@@ -100,6 +99,8 @@ public class MapView extends FrameLayout implements LocationListener {
      * Every annotation that has been added to the map.
      */
     private List<Annotation> mAnnotations = new ArrayList<>();
+    private List<Annotation> mAnnotationsNearLastTap = new ArrayList<>();
+    private Annotation mSelectedAnnotation = null;
 
     //
     // Instance members
@@ -479,6 +480,9 @@ public class MapView extends FrameLayout implements LocationListener {
     private void removeAnnotationsWithId(long annotationId){
         for (Iterator<Annotation> iterator = mAnnotations.iterator(); iterator.hasNext();) {
             Annotation annotation = iterator.next();
+            if (annotation instanceof Marker) {
+                ((Marker)annotation).hideInfoWindow();
+            }
             if (annotation.getId() == annotationId) {
                 iterator.remove();
             }
@@ -486,6 +490,9 @@ public class MapView extends FrameLayout implements LocationListener {
     }
 
     public void removeAnnotation(Annotation annotation) {
+        if (annotation instanceof Marker) {
+            ((Marker)annotation).hideInfoWindow();
+        }
         long id = annotation.getId();
         mNativeMapView.removeAnnotation(id);
         mAnnotations.remove(annotation);
@@ -499,8 +506,12 @@ public class MapView extends FrameLayout implements LocationListener {
     public void removeAnnotations() {
         long[] ids = new long[mAnnotations.size()];
         for(int i = 0; i < mAnnotations.size(); i++) {
-            long id = mAnnotations.get(i).getId();
+            Annotation annotation = mAnnotations.get(i);
+            long id = annotation.getId();
             ids[i] = id;
+            if (annotation instanceof Marker) {
+                ((Marker)annotation).hideInfoWindow();
+            }
         }
         mNativeMapView.removeAnnotations(ids);
         mAnnotations.clear();
@@ -522,9 +533,6 @@ public class MapView extends FrameLayout implements LocationListener {
             if (annotation instanceof Marker && idsList.contains(annotation.getId())) {
                 annotations.add(annotation);
             }
-        }
-        for(int i = 0; i < annotations.size(); i++) {
-            Log.d(TAG, "tapped: " + Long.toString(annotations.get(i).getId()));
         }
         return annotations;
     }
@@ -729,6 +737,18 @@ public class MapView extends FrameLayout implements LocationListener {
     public PointF toScreenLocation(LatLng location) {
         PointF point = mNativeMapView.pixelForLatLng(location);
         return new PointF(point.x * mScreenDensity, point.y * mScreenDensity);
+    }
+
+    public double getTopOffsetPixelsForAnnotationSymbol(@NonNull String symbolName) {
+        return mNativeMapView.getTopOffsetPixelsForAnnotationSymbol(symbolName);
+    }
+
+    /**
+     * Common Screen Density
+     * @return Screen Density
+     */
+    public float getScreenDensity() {
+        return mScreenDensity;
     }
 
     //
@@ -1026,32 +1046,104 @@ public class MapView extends FrameLayout implements LocationListener {
         public boolean onSingleTapUp(MotionEvent e) {
             // Cancel any animation
             mNativeMapView.cancelTransitions();
-
-            // Select or deselect point annotations
-            PointF tapPoint = new PointF(e.getX(), e.getY());
-
-            float toleranceWidth = 60 * mScreenDensity;
-            float toleranceHeight = 80 * mScreenDensity;
-
-            PointF tr = new PointF(tapPoint.x + toleranceWidth / 2, tapPoint.y + 2 * toleranceHeight / 3);
-            PointF bl = new PointF(tapPoint.x - toleranceWidth / 2, tapPoint.y - 1 * toleranceHeight / 3);
-
-            LatLng sw = fromScreenLocation(bl);
-            LatLng ne = fromScreenLocation(tr);
-
-            BoundingBox bbox = new BoundingBox(ne, sw);
-
-            List<Annotation> annotations = getAnnotationsInBounds(bbox);
-
-            performClick();
-
             return true;
         }
 
-        // Called for single taps after a delay
         @Override
         public boolean onSingleTapConfirmed(MotionEvent e) {
-            return false;
+            // Open / Close InfoWindow
+
+            float x = e.getX();
+            float y = e.getY();
+
+            // flip y direction vertically to match core GL
+            y = getHeight() - y;
+
+            PointF tapPoint = new PointF(x, y);
+
+            float toleranceWidth  = 40 * mScreenDensity;
+            float toleranceHeight = 60 * mScreenDensity;
+
+            RectF tapRect = new RectF(tapPoint.x - toleranceWidth / 2, tapPoint.y + 2 * toleranceHeight / 3,
+                                      tapPoint.x + toleranceWidth / 2, tapPoint.y - 1 * toleranceHeight / 3);
+
+            List<LatLng> corners = Arrays.asList(
+                fromScreenLocation(new PointF(tapRect.left, tapRect.bottom)),
+                fromScreenLocation(new PointF(tapRect.left, tapRect.top)),
+                fromScreenLocation(new PointF(tapRect.right, tapRect.top)),
+                fromScreenLocation(new PointF(tapRect.right, tapRect.bottom))
+            );
+
+            BoundingBox tapBounds = BoundingBox.fromLatLngs(corners);
+
+            List<Annotation> nearbyAnnotations = getAnnotationsInBounds(tapBounds);
+
+            long newSelectedAnnotationID = -1;
+
+            if (nearbyAnnotations.size() > 0) {
+
+                // there is at least one nearby annotation; select one
+                //
+                // first, sort for comparison and iteration
+                Collections.sort(nearbyAnnotations);
+
+                if (nearbyAnnotations == mAnnotationsNearLastTap)
+                {
+                    // the selection candidates haven't changed; cycle through them
+                    if (mSelectedAnnotation != null && (mSelectedAnnotation.getId() == mAnnotationsNearLastTap.get(mAnnotationsNearLastTap.size() - 1).getId()))
+                    {
+                        // the selected annotation is the last in the set; cycle back to the first
+                        // note: this could be the selected annotation if only one in set
+                        newSelectedAnnotationID = mAnnotationsNearLastTap.get(0).getId();
+                    }
+                    else if (mSelectedAnnotation != null)
+                    {
+                        // otherwise increment the selection through the candidates
+                        long currentID = mSelectedAnnotation.getId();
+                        long result = mAnnotationsNearLastTap.indexOf(mSelectedAnnotation);
+                        newSelectedAnnotationID = mAnnotationsNearLastTap.get((int) result + 1).getId();
+                    }
+                    else
+                    {
+                        // no current selection; select the first one
+                        newSelectedAnnotationID = mAnnotationsNearLastTap.get(0).getId();
+                    }
+                }
+                else
+                {
+                    // start tracking a new set of nearby annotations
+                    mAnnotationsNearLastTap = nearbyAnnotations;
+
+                    // select the first one
+                    newSelectedAnnotationID = mAnnotationsNearLastTap.get(0).getId();
+                }
+
+            } else  {
+                // there are no nearby annotations; deselect if necessary
+                newSelectedAnnotationID = -1;
+            }
+
+            if (newSelectedAnnotationID >= 0) {
+
+                for (Annotation annotation : mAnnotations) {
+                    if (annotation instanceof Marker) {
+                        if (annotation.getId() == newSelectedAnnotationID) {
+                            if (mSelectedAnnotation == null || annotation.getId() != mSelectedAnnotation.getId()) {
+                                selectAnnotation(annotation);
+                            }
+                            break;
+                        }
+                    }
+                }
+
+            } else {
+                // deselect any selected annotation
+                if (mSelectedAnnotation != null) {
+                    deselectAnnotation();
+                }
+            }
+
+            return true;
         }
 
         // Called for a long press
@@ -1485,7 +1577,7 @@ public class MapView extends FrameLayout implements LocationListener {
 
     // Called for events that don't fit the other handlers
     // such as mouse scroll events, mouse moves, joystick, trackpad
-    @Override @TargetApi(12)
+    @Override
     public boolean onGenericMotionEvent(MotionEvent event) {
         // Mouse events
         //if (event.isFromSource(InputDevice.SOURCE_CLASS_POINTER)) { // this is not available before API 18
@@ -1889,6 +1981,40 @@ public class MapView extends FrameLayout implements LocationListener {
         } else {
             if (mGpsMarker != null) {
                 mGpsMarker.setVisibility(View.INVISIBLE);
+            }
+        }
+
+        if (change.equals(MapChange.MapChangeRegionWillChange) || change.equals(MapChange.MapChangeRegionWillChangeAnimated)) {
+            deselectAnnotation();
+        }
+
+    }
+
+    private void selectAnnotation(Annotation annotation) {
+
+        if (annotation == null) {
+            return;
+        }
+
+        if (annotation == mSelectedAnnotation) {
+            return;
+        }
+
+        if (annotation instanceof Marker) {
+            // Need to deselect any currently selected annotation first
+            deselectAnnotation();
+
+            ((Marker)annotation).showInfoWindow();
+            mSelectedAnnotation = annotation;
+        }
+    }
+
+    private void deselectAnnotation() {
+        if (mSelectedAnnotation != null && mSelectedAnnotation instanceof Marker) {
+            Marker marker = (Marker) mSelectedAnnotation;
+            if (marker.isInfoWindowShown()) {
+                marker.hideInfoWindow();
+                mSelectedAnnotation = null;
             }
         }
     }

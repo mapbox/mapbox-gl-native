@@ -32,7 +32,6 @@
         './MBXAppDelegate.m',
         './MBXViewController.h',
         './MBXViewController.mm',
-        '../../platform/darwin/settings_nsuserdefaults.mm',
       ],
 
       'xcode_settings': {

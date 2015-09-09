@@ -2,6 +2,7 @@
 #define MBGL_MAP_TRANSFORM
 
 #include <mbgl/map/transform_state.hpp>
+#include <mbgl/map/camera.hpp>
 #include <mbgl/util/chrono.hpp>
 #include <mbgl/map/update.hpp>
 #include <mbgl/util/geo.hpp>
@@ -21,6 +22,9 @@ public:
 
     // Map view
     bool resize(std::array<uint16_t, 2> size);
+
+    void jumpTo(const CameraOptions options);
+    void easeTo(const CameraOptions options);
 
     // Position
     void moveBy(double dx, double dy, const Duration& = Duration::zero());
@@ -42,7 +46,7 @@ public:
     double getAngle() const;
 
     // Pitch
-    void setPitch(double pitch);
+    void setPitch(double pitch, const Duration& = Duration::zero());
     double getPitch() const;
 
     // Transitions
@@ -60,13 +64,16 @@ private:
     void _moveBy(double dx, double dy, const Duration& = Duration::zero());
     void _setScale(double scale, double cx, double cy, const Duration& = Duration::zero());
     void _setScaleXY(double new_scale, double xn, double yn, const Duration& = Duration::zero());
+    void _easeTo(CameraOptions options, const double new_scale, const double new_angle,
+                 const double xn, const double yn);
     void _setAngle(double angle, const Duration& = Duration::zero());
 
     View &view;
 
     TransformState state;
 
-    void startTransition(std::function<Update(double)> frame,
+    void startTransition(std::function<double(double)> easing,
+                         std::function<Update(double)> frame,
                          std::function<void()> finish,
                          const Duration& duration);
 
