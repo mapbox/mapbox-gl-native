@@ -1,4 +1,5 @@
 #import "MGLGeometry.h"
+#import "MGLMapCamera.h"
 
 #import <UIKit/UIKit.h>
 #import <CoreLocation/CoreLocation.h>
@@ -6,6 +7,7 @@
 NS_ASSUME_NONNULL_BEGIN
 
 @class MGLAnnotationImage;
+@class MGLMapCamera;
 @class MGLUserLocation;
 @class MGLPolyline;
 @class MGLPolygon;
@@ -136,6 +138,8 @@ IB_DESIGNABLE
 *   @param animated Specify `YES` if you want the map view to animate scrolling and zooming to the new location or `NO` if you want the map to display the new location immediately. */
 - (void)setCenterCoordinate:(CLLocationCoordinate2D)centerCoordinate zoomLevel:(double)zoomLevel animated:(BOOL)animated;
 
+- (void)setCenterCoordinate:(CLLocationCoordinate2D)centerCoordinate zoomLevel:(double)zoomLevel direction:(CLLocationDirection)direction animated:(BOOL)animated;
+
 /** The coordinate bounds visible in the receiver’s viewport.
 *   
 *   Changing the value of this property updates the receiver immediately. If you want to animate the change, call `setVisibleCoordinateBounds:animated:` instead. */
@@ -181,19 +185,19 @@ IB_DESIGNABLE
 /** Resets the map rotation to a northern heading. */
 - (IBAction)resetNorth;
 
-/** The pitch of the map (measured in degrees).
- *
- *   The default value `0` shows a completely flat map. Maximum value is `60`. */
-@property (nonatomic) double pitch;
+/** A camera representing the current viewpoint of the map. */
+@property (nonatomic, copy) MGLMapCamera *camera;
 
-/** Changes the pitch of the map.
- *   @param pitch The pitch of the map (measured in degrees) relative to top-down.
- *
- *   Changing the pitch tilts the map without changing the current center coordinate or zoom level. */
-- (void)setPitch:(double)pitch;
+/** Moves the viewpoint to a different location with respect to the map with an optional transition animation.
+*   @param camera The new viewpoint.
+*   @param animated Specify `YES` if you want the map view to animate the change to the new viewpoint or `NO` if you want the map to display the new viewpoint immediately. */
+- (void)setCamera:(MGLMapCamera *)camera animated:(BOOL)animated;
 
-/** Resets the map pitch to head-on. */
-- (IBAction)resetPitch;
+/** Moves the viewpoint to a different location with respect to the map with an optional transition duration and timing function.
+*   @param camera The new viewpoint.
+*   @param duration The amount of time, measured in seconds, that the transition animation should take. Specify `0` to jump to the new viewpoint instantaneously.
+*   @param function A timing function used for the animation. Set this parameter to `nil` for a transition that matches most system animations. If the duration is `0`, this parameter is ignored. */
+- (void)setCamera:(MGLMapCamera *)camera withDuration:(NSTimeInterval)duration animationTimingFunction:(nullable CAMediaTimingFunction *)function;
 
 #pragma mark - Converting Map Coordinates
 
