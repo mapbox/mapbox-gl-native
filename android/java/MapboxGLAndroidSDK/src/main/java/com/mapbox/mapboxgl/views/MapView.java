@@ -117,10 +117,12 @@ public class MapView extends FrameLayout implements LocationListener {
     private static final String STATE_ATTRIBUTION_MARGIN_BOTTOM = "atrrMarginBottom";
 
     // Used for positioning views
-    private static final float DIMENSION_SIXTEEN_DP = 16f;
+    private static final float DIMENSION_SEVEN_DP = 7f;
     private static final float DIMENSION_TEN_DP = 10f;
+    private static final float DIMENSION_SIXTEEN_DP = 16f;
+    private static final float DIMENSION_SEVENTYSIX_DP = 76f;
 
-    private static final int IMPROVE_THIS_MAP_INDEX = 2;
+    private static final int ATTRIBUTION_INDEX_IMPROVE_THIS_MAP = 2;
 
     /**
      * Every annotation that has been added to the map.
@@ -422,7 +424,11 @@ public class MapView extends FrameLayout implements LocationListener {
 
         // Setup Attributions control
         mAttributionsView = new ImageView(mContext);
-        mAttributionsView.setBackgroundResource(R.drawable.ic_info_selector);
+        mAttributionsView.setClickable(true);
+        mAttributionsView.setImageResource(R.drawable.ic_info_selector);
+        int attrPadding = (int) (DIMENSION_SEVEN_DP * mScreenDensity);
+        mAttributionsView.setPadding(attrPadding, attrPadding, attrPadding, attrPadding);
+        mAttributionsView.setAdjustViewBounds(true);
         mAttributionsView.setContentDescription(getResources().getString(R.string.attributionsIconContentDescription));
         LayoutParams attrParams = new FrameLayout.LayoutParams(ViewGroup.LayoutParams.WRAP_CONTENT, ViewGroup.LayoutParams.WRAP_CONTENT);
         mAttributionsView.setLayoutParams(attrParams);
@@ -478,11 +484,11 @@ public class MapView extends FrameLayout implements LocationListener {
                     , typedArray.getDimension(R.styleable.MapView_logoMarginBottom, DIMENSION_SIXTEEN_DP));
 
             // Attribution
-            setAttributionGravity(typedArray.getInt(R.styleable.MapView_attributionGravity, Gravity.BOTTOM | Gravity.END));
-            setWidgetMargins(mAttributionsView, typedArray.getDimension(R.styleable.MapView_attributionMarginLeft, DIMENSION_SIXTEEN_DP)
-                    , typedArray.getDimension(R.styleable.MapView_attributionMarginTop, DIMENSION_SIXTEEN_DP)
-                    , typedArray.getDimension(R.styleable.MapView_attributionMarginRight, DIMENSION_SIXTEEN_DP)
-                    , typedArray.getDimension(R.styleable.MapView_attributionMarginBottom, DIMENSION_SIXTEEN_DP));
+            setAttributionGravity(typedArray.getInt(R.styleable.MapView_attributionGravity, Gravity.BOTTOM));
+            setWidgetMargins(mAttributionsView, typedArray.getDimension(R.styleable.MapView_attributionMarginLeft, DIMENSION_SEVENTYSIX_DP)
+                    , typedArray.getDimension(R.styleable.MapView_attributionMarginTop, DIMENSION_SEVEN_DP)
+                    , typedArray.getDimension(R.styleable.MapView_attributionMarginRight, DIMENSION_SEVEN_DP)
+                    , typedArray.getDimension(R.styleable.MapView_attributionMarginBottom, DIMENSION_SEVEN_DP));
 
             setMyLocationEnabled(typedArray.getBoolean(R.styleable.MapView_myLocationEnabled, false));
         } finally {
@@ -2064,7 +2070,7 @@ public class MapView extends FrameLayout implements LocationListener {
         public void onClick(DialogInterface dialog, int which) {
             Context context = ((Dialog) dialog).getContext();
             String url = context.getResources().getStringArray(R.array.attribution_links)[which];
-            if (which == IMPROVE_THIS_MAP_INDEX) {
+            if (which == ATTRIBUTION_INDEX_IMPROVE_THIS_MAP) {
                 LatLng latLng = mMapView.getCenterCoordinate();
                 url = String.format(url, latLng.getLongitude(), latLng.getLatitude(), (int) mMapView.getZoomLevel());
             }
