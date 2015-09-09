@@ -142,9 +142,11 @@ void MapContext::loadStyleJSON(const std::string& json, const std::string& base)
 
     updateFlags |= Update::DefaultTransition | Update::Classes | Update::Zoom;
     asyncUpdate->send();
+}
 
-    auto staleTiles = data.getAnnotationManager()->resetStaleTiles();
-    if (!staleTiles.empty()) {
+void MapContext::updateAnnotationTilesIfNeeded() {
+    if (data.getAnnotationManager()->getStaleTileCount()) {
+        auto staleTiles = data.getAnnotationManager()->resetStaleTiles();
         updateAnnotationTiles(staleTiles);
     }
 }
@@ -415,6 +417,10 @@ void MapContext::onResourceLoadingFailed(std::exception_ptr error) {
         callback(error, nullptr);
         callback = nullptr;
     }
+}
+
+void MapContext::onSpriteStoreLoaded() {
+    updateAnnotationTilesIfNeeded();
 }
 
 }

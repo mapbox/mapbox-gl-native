@@ -52,6 +52,7 @@ public:
     ~AnnotationManager();
 
     void markStaleTiles(std::unordered_set<TileID, TileID::Hash>);
+    size_t getStaleTileCount() const { return staleTiles.size(); }
     std::unordered_set<TileID, TileID::Hash> resetStaleTiles();
 
     void setDefaultPointAnnotationSymbol(const std::string& symbol);
