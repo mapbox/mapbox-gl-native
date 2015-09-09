@@ -197,7 +197,7 @@ public class MapView extends FrameLayout implements LocationListener {
     // Used to manage Event Listeners
     private ArrayList<OnMapChangedListener> mOnMapChangedListener;
 
-    private enum MapChange {
+    public enum MapChange {
         MapChangeNullChange(-1),
         MapChangeRegionWillChange(0),
         MapChangeRegionWillChangeAnimated(1),
