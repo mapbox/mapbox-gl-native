@@ -17,6 +17,8 @@ NS_ASSUME_NONNULL_BEGIN
 
 - (instancetype)initInMapView:(MGLMapView *)mapView NS_DESIGNATED_INITIALIZER;
 - (void)setupLayers;
+- (void)pauseAnimations;
+- (void)unPauseAnimations;
 
 @end
 
