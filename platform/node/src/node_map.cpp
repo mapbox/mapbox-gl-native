@@ -322,7 +322,10 @@ void NodeMap::release() {
 // Instance
 
 NodeMap::NodeMap(v8::Local<v8::Object> options) :
-    view(sharedDisplay(), Nan::Get(options, Nan::New("ratio").ToLocalChecked()).ToLocalChecked()->NumberValue()),
+    view(sharedDisplay(), [&] {
+        Nan::HandleScope scope;
+        return Nan::Get(options, Nan::New("ratio").ToLocalChecked()).ToLocalChecked()->NumberValue();
+    }()),
     fs(options),
     map(std::make_unique<mbgl::Map>(view, fs, mbgl::MapMode::Still)),
     async(new uv_async_t) {
