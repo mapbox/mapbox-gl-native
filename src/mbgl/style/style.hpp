@@ -39,6 +39,7 @@ public:
         virtual ~Observer() = default;
 
         virtual void onTileDataChanged() = 0;
+        virtual void onSpriteStoreLoaded() = 0;
         virtual void onResourceLoadingFailed(std::exception_ptr error) = 0;
     };
 

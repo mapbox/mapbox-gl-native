@@ -63,6 +63,10 @@ public:
         callback_(error);
     }
 
+    void onSpriteStoreLoaded() override {
+        // no-op
+    }
+
 private:
     MapData data_;
     Transform transform_;

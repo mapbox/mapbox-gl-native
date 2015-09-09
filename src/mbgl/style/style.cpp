@@ -190,6 +190,10 @@ void Style::onSpriteLoaded(const Sprites& sprites) {
     // Add all sprite images to the SpriteStore object
     spriteStore->setSprites(sprites);
 
+    if (observer) {
+        observer->onSpriteStoreLoaded();
+    }
+
     shouldReparsePartialTiles = true;
     emitTileDataChanged();
 }
