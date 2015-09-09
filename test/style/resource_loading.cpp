@@ -32,7 +32,7 @@ public:
         transform_.setLatLngZoom({0, 0}, 16);
 
         const std::string style = util::read_file("test/fixtures/resources/style.json");
-        style_ = std::make_unique<Style>(data_, util::RunLoop::getLoop());
+        style_ = std::make_unique<Style>(data_);
         style_->setJSON(style, "");
         style_->setObserver(this);
     }

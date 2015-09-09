@@ -25,7 +25,7 @@ TEST(API, RepeatedRender) {
     Map map(view, fileSource, MapMode::Still);
 
     {
-        map.setStyleJSON(style, "test/suite");
+        map.setStyleJSON(style, "");
         std::promise<std::unique_ptr<const StillImage>> promise;
         map.renderStill([&promise](std::exception_ptr, std::unique_ptr<const StillImage> image) {
             promise.set_value(std::move(image));

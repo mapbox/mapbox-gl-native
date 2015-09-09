@@ -1,0 +1,5 @@
+When adding new image resources, make sure that you've reduced the file size as much as possible using a tool such as:
+
+ImageOptim — https://imageoptim.com
+
+See also: https://github.com/mapbox/mapbox-gl-native/pull/2227

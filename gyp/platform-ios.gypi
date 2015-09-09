@@ -20,6 +20,8 @@
         '../include/mbgl/ios/Mapbox.h',
         '../platform/ios/MGLMapboxEvents.h',
         '../platform/ios/MGLMapboxEvents.m',
+        '../include/mbgl/ios/MGLMapCamera.h',
+        '../platform/ios/MGLMapCamera.mm',
         '../include/mbgl/ios/MGLMapView.h',
         '../include/mbgl/ios/MGLMapView+IBAdditions.h',
         '../platform/ios/MGLMapView.mm',
@@ -61,6 +63,7 @@
         '../platform/ios/NSString+MGLAdditions.m',
         '../platform/ios/vendor/SMCalloutView/SMCalloutView.h',
         '../platform/ios/vendor/SMCalloutView/SMCalloutView.m',
+        '../platform/ios/resources/',
       ],
 
       'variables': {
@@ -105,7 +108,7 @@
           '../include',
         ],
         'mac_bundle_resources': [
-          '<!@(find ./platform/ios/resources -type f)',
+          '<!@(find ./platform/ios/resources -type f \! -name "README")',
         ],
       },
     },

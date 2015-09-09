@@ -1,4 +1,5 @@
 #import "MGLGeometry.h"
+#import "MGLMapCamera.h"
 
 #import <UIKit/UIKit.h>
 #import <CoreLocation/CoreLocation.h>
@@ -6,6 +7,7 @@
 NS_ASSUME_NONNULL_BEGIN
 
 @class MGLAnnotationImage;
+@class MGLMapCamera;
 @class MGLUserLocation;
 @class MGLPolyline;
 @class MGLPolygon;
@@ -13,6 +15,7 @@ NS_ASSUME_NONNULL_BEGIN
 
 @protocol MGLMapViewDelegate;
 @protocol MGLAnnotation;
+@protocol MGLOverlay;
 
 /** An MGLMapView object provides an embeddable map interface, similar to the one provided by Apple's MapKit. You use this class to display map information and to manipulate the map contents from your application. You can center the map on a given coordinate, specify the size of the area you want to display, and style the features of the map to fit your application's use case.
 *
@@ -135,6 +138,8 @@ IB_DESIGNABLE
 *   @param animated Specify `YES` if you want the map view to animate scrolling and zooming to the new location or `NO` if you want the map to display the new location immediately. */
 - (void)setCenterCoordinate:(CLLocationCoordinate2D)centerCoordinate zoomLevel:(double)zoomLevel animated:(BOOL)animated;
 
+- (void)setCenterCoordinate:(CLLocationCoordinate2D)centerCoordinate zoomLevel:(double)zoomLevel direction:(CLLocationDirection)direction animated:(BOOL)animated;
+
 /** The coordinate bounds visible in the receiver’s viewport.
 *   
 *   Changing the value of this property updates the receiver immediately. If you want to animate the change, call `setVisibleCoordinateBounds:animated:` instead. */
@@ -180,19 +185,19 @@ IB_DESIGNABLE
 /** Resets the map rotation to a northern heading. */
 - (IBAction)resetNorth;
 
-/** The pitch of the map (measured in degrees).
- *
- *   The default value `0` shows a completely flat map. Maximum value is `60`. */
-@property (nonatomic) double pitch;
+/** A camera representing the current viewpoint of the map. */
+@property (nonatomic, copy) MGLMapCamera *camera;
 
-/** Changes the pitch of the map.
- *   @param pitch The pitch of the map (measured in degrees) relative to top-down.
- *
- *   Changing the pitch tilts the map without changing the current center coordinate or zoom level. */
-- (void)setPitch:(double)pitch;
+/** Moves the viewpoint to a different location with respect to the map with an optional transition animation.
+*   @param camera The new viewpoint.
+*   @param animated Specify `YES` if you want the map view to animate the change to the new viewpoint or `NO` if you want the map to display the new viewpoint immediately. */
+- (void)setCamera:(MGLMapCamera *)camera animated:(BOOL)animated;
 
-/** Resets the map pitch to head-on. */
-- (IBAction)resetPitch;
+/** Moves the viewpoint to a different location with respect to the map with an optional transition duration and timing function.
+*   @param camera The new viewpoint.
+*   @param duration The amount of time, measured in seconds, that the transition animation should take. Specify `0` to jump to the new viewpoint instantaneously.
+*   @param function A timing function used for the animation. Set this parameter to `nil` for a transition that matches most system animations. If the duration is `0`, this parameter is ignored. */
+- (void)setCamera:(MGLMapCamera *)camera withDuration:(NSTimeInterval)duration animationTimingFunction:(nullable CAMediaTimingFunction *)function;
 
 #pragma mark - Converting Map Coordinates
 
@@ -316,6 +321,38 @@ IB_DESIGNABLE
 *   @param annotation The annotation object to deselect.
 *   @param animated If `YES`, the callout view is animated offscreen. */
 - (void)deselectAnnotation:(id <MGLAnnotation>)annotation animated:(BOOL)animated;
+
+#pragma mark - Adding Overlays
+
+/** @name Adding Overlays */
+
+/** Adds a single overlay object to the map.
+*
+*   To remove an overlay from a map, use the removeOverlay: method.
+*   @param overlay The overlay object to add. This object must conform to the MGLOverlay protocol. */
+- (void)addOverlay:(id <MGLOverlay>)overlay;
+
+/** Adds an array of overlay objects to the map.
+*
+*   To remove multiple overlays from a map, use the removeOverlays: method.
+*   @param overlays An array of objects, each of which must conform to the MGLOverlay protocol. */
+- (void)addOverlays:(NS_ARRAY_OF(id <MGLOverlay>) *)overlays;
+
+#pragma mark - Removing Overlays
+
+/** @name Removing Overlays */
+
+/** Removes a single overlay object from the map.
+*
+*   If the specified overlay is not currently associated with the map view, this method does nothing.
+*   @param overlay The overlay object to remove. */
+- (void)removeOverlay:(id <MGLOverlay>)overlay;
+
+/** Removes one or more overlay objects from the map.
+*
+*   If a given overlay object is not associated with the map view, it is ignored.
+*   @param overlays An array of objects, each of which conforms to the MGLOverlay protocol. */
+- (void)removeOverlays:(NS_ARRAY_OF(id <MGLOverlay>) *)overlays;
 
 #pragma mark - Displaying the User's Location
 

@@ -50,13 +50,12 @@
         'api/repeated_render.cpp',
         'api/set_style.cpp',
 
-        'headless/custom_sprites.cpp',
-        'headless/headless.cpp',
 
         'miscellaneous/clip_ids.cpp',
         'miscellaneous/binpack.cpp',
         'miscellaneous/bilinear.cpp',
         'miscellaneous/comparisons.cpp',
+        'miscellaneous/custom_sprites.cpp',
         'miscellaneous/enums.cpp',
         'miscellaneous/functions.cpp',
         'miscellaneous/geo.cpp',

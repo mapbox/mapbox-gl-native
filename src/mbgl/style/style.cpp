@@ -12,7 +12,6 @@
 #include <mbgl/geometry/sprite_atlas.hpp>
 #include <mbgl/geometry/line_atlas.hpp>
 #include <mbgl/util/constants.hpp>
-#include <mbgl/util/uv_detail.hpp>
 #include <mbgl/platform/log.hpp>
 #include <csscolorparser/csscolorparser.hpp>
 
@@ -22,7 +21,7 @@
 
 namespace mbgl {
 
-Style::Style(MapData& data_, uv_loop_t*)
+Style::Style(MapData& data_)
     : data(data_),
       glyphStore(std::make_unique<GlyphStore>()),
       glyphAtlas(std::make_unique<GlyphAtlas>(1024, 1024)),
