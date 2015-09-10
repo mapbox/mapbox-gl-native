@@ -488,7 +488,7 @@ void SymbolBucket::addSymbols(Buffer &buffer, const SymbolQuads &symbols, float 
         // coordinate in this polygon.
         assert(buffer.groups.back());
         auto &triangleGroup = *buffer.groups.back();
-        uint32_t triangleIndex = triangleGroup.vertex_length;
+        GLsizei triangleIndex = triangleGroup.vertex_length;
 
         // coordinates (2 triangles)
         buffer.vertices.add(anchorPoint.x, anchorPoint.y, tl.x, tl.y, tex.x, tex.y, minZoom,

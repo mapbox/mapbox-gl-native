@@ -117,14 +117,14 @@ void Painter::setDebug(bool enabled) {
     debug = enabled;
 }
 
-void Painter::useProgram(uint32_t program) {
+void Painter::useProgram(GLuint program) {
     if (gl_program != program) {
         MBGL_CHECK_ERROR(glUseProgram(program));
         gl_program = program;
     }
 }
 
-void Painter::lineWidth(float line_width) {
+void Painter::lineWidth(GLfloat line_width) {
     if (gl_lineWidth != line_width) {
         MBGL_CHECK_ERROR(glLineWidth(line_width));
         gl_lineWidth = line_width;

@@ -107,7 +107,7 @@ void FillBucket::tessellate() {
 
     assert(lineGroups.back());
     LineGroup& lineGroup = *lineGroups.back();
-    uint32_t lineIndex = lineGroup.vertex_length;
+    GLsizei lineIndex = lineGroup.vertex_length;
 
     for (const auto& polygon : polygons) {
         const size_t group_count = polygon.size();
@@ -156,7 +156,7 @@ void FillBucket::tessellate() {
         // coordinate in this polygon.
         assert(triangleGroups.back());
         TriangleGroup& triangleGroup = *triangleGroups.back();
-        uint32_t triangleIndex = triangleGroup.vertex_length;
+        GLsizei triangleIndex = triangleGroup.vertex_length;
 
         for (int i = 0; i < triangle_count; ++i) {
             const TESSindex *element_group = &elements[i * vertices_per_group];

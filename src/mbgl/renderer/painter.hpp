@@ -161,8 +161,8 @@ private:
     void setDepthSublayer(int n);
 
 public:
-    void useProgram(uint32_t program);
-    void lineWidth(float lineWidth);
+    void useProgram(GLuint program);
+    void lineWidth(GLfloat lineWidth);
 
 public:
     mat4 projMatrix;
@@ -194,8 +194,8 @@ private:
 
     gl::Config config;
 
-    uint32_t gl_program = 0;
-    float gl_lineWidth = 0;
+    GLuint gl_program = 0;
+    GLfloat gl_lineWidth = 0;
     std::array<uint16_t, 2> gl_viewport = {{ 0, 0 }};
     RenderPass pass = RenderPass::Opaque;
     Color background = {{ 0, 0, 0, 0 }};

@@ -4,6 +4,7 @@
 #include <mbgl/geometry/binpack.hpp>
 #include <mbgl/text/glyph_store.hpp>
 #include <mbgl/util/noncopyable.hpp>
+#include <mbgl/platform/gl.hpp>
 
 #include <string>
 #include <set>
@@ -51,7 +52,7 @@ private:
     std::map<std::string, std::map<uint32_t, GlyphValue>> index;
     const std::unique_ptr<uint8_t[]> data;
     std::atomic<bool> dirty;
-    uint32_t texture = 0;
+    GLuint texture = 0;
 };
 
 };

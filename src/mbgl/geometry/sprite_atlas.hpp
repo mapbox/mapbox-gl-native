@@ -2,7 +2,7 @@
 #define MBGL_GEOMETRY_SPRITE_ATLAS
 
 #include <mbgl/geometry/binpack.hpp>
-
+#include <mbgl/platform/gl.hpp>
 #include <mbgl/util/noncopyable.hpp>
 #include <mbgl/util/ptr.hpp>
 
@@ -93,7 +93,7 @@ private:
     const std::unique_ptr<uint32_t[]> data;
     std::atomic<bool> dirty;
     bool fullUploadRequired = true;
-    uint32_t texture = 0;
+    GLuint texture = 0;
     uint32_t filter = 0;
     static const int buffer = 1;
 };

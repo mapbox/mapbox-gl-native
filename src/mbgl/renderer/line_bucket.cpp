@@ -75,7 +75,7 @@ void LineBucket::addGeometry(const std::vector<Coordinate>& vertices) {
         nextNormal = util::perp(util::unit(vec2<double>(firstVertex - currentVertex)));
     }
 
-    const int32_t startVertex = (int32_t)vertexBuffer.index();
+    const GLint startVertex = vertexBuffer.index();
     std::vector<TriangleElement> triangleStore;
 
     for (size_t i = 0; i < len; ++i) {
@@ -333,16 +333,15 @@ void LineBucket::addCurrentVertex(const Coordinate& currentVertex,
                                   float endLeft,
                                   float endRight,
                                   bool round,
-                                  int32_t startVertex,
+                                  GLint startVertex,
                                   std::vector<TriangleElement>& triangleStore) {
     int8_t tx = round ? 1 : 0;
 
     vec2<double> extrude = normal * flip;
     if (endLeft)
         extrude = extrude - (util::perp(normal) * endLeft);
-    e3 = (int32_t)vertexBuffer.add(currentVertex.x, currentVertex.y, extrude.x, extrude.y, tx, 0,
-                                   distance) -
-         startVertex;
+    e3 = vertexBuffer.add(currentVertex.x, currentVertex.y, extrude.x, extrude.y, tx, 0, distance)
+         - startVertex;
     if (e1 >= 0 && e2 >= 0) {
         triangleStore.emplace_back(e1, e2, e3);
     }
@@ -352,9 +351,8 @@ void LineBucket::addCurrentVertex(const Coordinate& currentVertex,
     extrude = normal * (-flip);
     if (endRight)
         extrude = extrude - (util::perp(normal) * endRight);
-    e3 = (int32_t)vertexBuffer.add(currentVertex.x, currentVertex.y, extrude.x, extrude.y, tx, 1,
-                                   distance) -
-         startVertex;
+    e3 = vertexBuffer.add(currentVertex.x, currentVertex.y, extrude.x, extrude.y, tx, 1, distance)
+         - startVertex;
     if (e1 >= 0 && e2 >= 0) {
         triangleStore.emplace_back(e1, e2, e3);
     }
@@ -367,13 +365,13 @@ void LineBucket::addPieSliceVertex(const Coordinate& currentVertex,
                                    double distance,
                                    const vec2<double>& extrude,
                                    bool lineTurnsLeft,
-                                   int32_t startVertex,
+                                   GLint startVertex,
                                   std::vector<TriangleElement>& triangleStore) {
     int8_t ty = lineTurnsLeft;
 
     auto flippedExtrude = extrude * (flip * (lineTurnsLeft ? -1 : 1));
-    e3 = (int32_t)vertexBuffer.add(currentVertex.x, currentVertex.y, flippedExtrude.x, flippedExtrude.y, 0, ty,
-                                   distance) - startVertex;
+    e3 = vertexBuffer.add(currentVertex.x, currentVertex.y, flippedExtrude.x, flippedExtrude.y, 0, ty, distance)
+         - startVertex;
     if (e1 >= 0 && e2 >= 0) {
         triangleStore.emplace_back(e1, e2, e3);
     }
