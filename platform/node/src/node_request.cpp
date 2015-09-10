@@ -19,8 +19,6 @@ NAN_MODULE_INIT(NodeRequest::Init) {
     tpl->InstanceTemplate()->SetInternalFieldCount(1);
     tpl->SetClassName(Nan::New("Request").ToLocalChecked());
 
-    Nan::SetPrototypeMethod(tpl, "respond", Respond);
-
     constructor.Reset(tpl->GetFunction());
     Nan::Set(target, Nan::New("Request").ToLocalChecked(), tpl->GetFunction());
 }
@@ -55,7 +53,7 @@ v8::Handle<v8::Object> NodeRequest::Create(NodeFileSource* source, const mbgl::R
 }
 
 NAN_METHOD(NodeRequest::Respond) {
-    auto nodeRequest = Nan::ObjectWrap::Unwrap<NodeRequest>(info.Holder());
+    auto nodeRequest = Nan::ObjectWrap::Unwrap<NodeRequest>(info.Data().As<v8::Object>());
 
     // Request has already been responded to, or was canceled, fail silently.
     if (!nodeRequest->resource) {

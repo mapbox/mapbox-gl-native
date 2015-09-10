@@ -13,9 +13,9 @@ if (process.argv[1] === __filename && process.argv.length > 2) {
 suite.run('native', {tests: tests}, function (style, options, callback) {
     var map = new mbgl.Map({
         ratio: options.pixelRatio,
-        request: function (req) {
+        request: function(req, callback) {
             request(req.url, {encoding: null}, function (err, response, body) {
-                req.respond(err, {data: body});
+                callback(err, {data: body});
             });
         }
     });

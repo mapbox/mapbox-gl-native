@@ -147,9 +147,9 @@ test('Map', function(t) {
 
     t.test('.render', function(t) {
         var options = {
-            request: function(req) {
+            request: function(req, callback) {
                 fs.readFile(path.join(__dirname, '..', req.url), function(err, data) {
-                    req.respond(err, { data: data });
+                    callback(err, { data: data });
                 });
             },
             ratio: 1
