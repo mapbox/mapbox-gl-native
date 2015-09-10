@@ -175,7 +175,7 @@ double TransformState::yLat(double y_, double worldSize_) const {
     return 360.0f / M_PI * std::atan(std::exp(y2 * M_PI / 180.0f)) - 90.0f;
 }
 
-float TransformState::zoomScale(float zoom) const {
+double TransformState::zoomScale(double zoom) const {
     return std::pow(2.0f, zoom);
 }
 
@@ -192,8 +192,8 @@ LatLng TransformState::pointToLatLng(const vec2<double> point) const {
 }
 
 TileCoordinate TransformState::latLngToCoordinate(const LatLng& latLng) const {
-    const float tileZoom = getIntegerZoom();
-    const float k = zoomScale(tileZoom) / worldSize();
+    const double tileZoom = getZoom();
+    const double k = zoomScale(tileZoom) / worldSize();
     return {
         lngX(latLng.longitude) * k,
         latY(latLng.latitude) * k,
@@ -202,12 +202,12 @@ TileCoordinate TransformState::latLngToCoordinate(const LatLng& latLng) const {
 }
 
 LatLng TransformState::coordinateToLatLng(const TileCoordinate& coord) const {
-    const float worldSize_ = zoomScale(coord.zoom);
+    const double worldSize_ = zoomScale(coord.zoom);
     LatLng latLng = {
         yLat(coord.row, worldSize_),
         xLng(coord.column, worldSize_)
     };
-    while (latLng.longitude < 180.0f) latLng.longitude += 360.0f;
+    while (latLng.longitude < -180.0f) latLng.longitude += 360.0f;
     while (latLng.longitude > 180.0f) latLng.longitude -= 360.0f;
     return latLng;
 }
@@ -223,7 +223,7 @@ vec2<double> TransformState::coordinateToPoint(const TileCoordinate& coord) cons
 TileCoordinate TransformState::pointToCoordinate(const vec2<double> point) const {
 
     float targetZ = 0;
-    const float tileZoom = getIntegerZoom();
+    const double tileZoom = getZoom();
 
     mat4 mat = coordinatePointMatrix(tileZoom);
 
@@ -259,11 +259,11 @@ TileCoordinate TransformState::pointToCoordinate(const vec2<double> point) const
     return { util::interpolate(x0, x1, t), util::interpolate(y0, y1, t), tileZoom };
 }
 
-mat4 TransformState::coordinatePointMatrix(float z) const {
+mat4 TransformState::coordinatePointMatrix(double z) const {
     mat4 proj;
     getProjMatrix(proj);
     float s = util::tileSize * scale / std::pow(2, z);
-    matrix::scale(proj, proj, s , s, 1);
+    matrix::scale(proj, proj, s, s, 1);
     matrix::multiply(proj, getPixelMatrix(), proj);
     return proj;
 }

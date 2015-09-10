@@ -83,10 +83,10 @@ private:
     double yLat(double y, double worldSize) const;
     double lngX(double lon) const;
     double latY(double lat) const;
-    float zoomScale(float zoom) const;
+    double zoomScale(double zoom) const;
     float worldSize() const;
 
-    mat4 coordinatePointMatrix(float z) const;
+    mat4 coordinatePointMatrix(double z) const;
     mat4 getPixelMatrix() const;
 
 private:
