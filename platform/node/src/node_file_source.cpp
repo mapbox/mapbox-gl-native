@@ -75,11 +75,14 @@ void NodeFileSource::processAdd(const mbgl::Resource& resource) {
         queue->ref();
     }
 
-    v8::Local<v8::Object> requestHandle = NodeRequest::Create(this, resource)->ToObject();
+    auto requestHandle = NodeRequest::Create(this, resource)->ToObject();
     pending.emplace(resource, requestHandle);
 
-    v8::Local<v8::Value> argv[] = { requestHandle };
-    Nan::MakeCallback(Nan::New(options), "request", 1, argv);
+    auto callback = Nan::GetFunction(Nan::New<v8::FunctionTemplate>(NodeRequest::Respond, requestHandle)).ToLocalChecked();
+    callback->SetName(Nan::New("respond").ToLocalChecked());
+
+    v8::Local<v8::Value> argv[] = { requestHandle, callback };
+    Nan::MakeCallback(Nan::New(options), "request", 2, argv);
 }
 
 void NodeFileSource::processCancel(const mbgl::Resource& resource) {

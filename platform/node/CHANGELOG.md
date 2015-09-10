@@ -4,11 +4,13 @@
 - Requires an options object argument to `new mbgl.Map()`
   (with required `request` and optional `cancel` methods),
   drops `mbgl.FileSource`.
+- Changes `request` semantics to pass a second, callback argument instead
+  of needing to call `req.respond`.
 - Requires numerical `ratio` in `mbgl.Map` options argument.
   Map pixel ratio is now immutable and can no longer be set with
   render options.
 - Adds support for rendering v8 styles.
-- No longer load resources before a render request is made.
+- No longer loads resources before a render request is made.
 - Adds io.js v3.x support.
 
 # 1.1.3
