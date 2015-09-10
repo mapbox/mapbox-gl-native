@@ -74,8 +74,8 @@ void CircleBucket::addGeometry(const GeometryCollection& geometryCollection) {
 }
 
 void CircleBucket::drawCircles(CircleShader& shader) {
-    char* vertexIndex = BUFFER_OFFSET(vertexStart_ * vertexBuffer_.itemSize);
-    char* elementsIndex = BUFFER_OFFSET(elementsStart_ * elementsBuffer_.itemSize);
+    GLbyte *vertexIndex = BUFFER_OFFSET(vertexStart_ * vertexBuffer_.itemSize);
+    GLbyte *elementsIndex = BUFFER_OFFSET(elementsStart_ * elementsBuffer_.itemSize);
 
     for (auto& group : triangleGroups_) {
         assert(group);

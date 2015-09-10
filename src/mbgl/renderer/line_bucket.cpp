@@ -405,8 +405,8 @@ bool LineBucket::hasData() const {
 }
 
 void LineBucket::drawLines(LineShader& shader) {
-    char* vertex_index = BUFFER_OFFSET(vertex_start * vertexBuffer.itemSize);
-    char* elements_index = BUFFER_OFFSET(triangle_elements_start * triangleElementsBuffer.itemSize);
+    GLbyte* vertex_index = BUFFER_OFFSET(vertex_start * vertexBuffer.itemSize);
+    GLbyte* elements_index = BUFFER_OFFSET(triangle_elements_start * triangleElementsBuffer.itemSize);
     for (auto& group : triangleGroups) {
         assert(group);
         if (!group->elements_length) {
@@ -421,8 +421,8 @@ void LineBucket::drawLines(LineShader& shader) {
 }
 
 void LineBucket::drawLineSDF(LineSDFShader& shader) {
-    char* vertex_index = BUFFER_OFFSET(vertex_start * vertexBuffer.itemSize);
-    char* elements_index = BUFFER_OFFSET(triangle_elements_start * triangleElementsBuffer.itemSize);
+    GLbyte* vertex_index = BUFFER_OFFSET(vertex_start * vertexBuffer.itemSize);
+    GLbyte* elements_index = BUFFER_OFFSET(triangle_elements_start * triangleElementsBuffer.itemSize);
     for (auto& group : triangleGroups) {
         assert(group);
         if (!group->elements_length) {
@@ -437,8 +437,8 @@ void LineBucket::drawLineSDF(LineSDFShader& shader) {
 }
 
 void LineBucket::drawLinePatterns(LinepatternShader& shader) {
-    char* vertex_index = BUFFER_OFFSET(vertex_start * vertexBuffer.itemSize);
-    char* elements_index = BUFFER_OFFSET(triangle_elements_start * triangleElementsBuffer.itemSize);
+    GLbyte* vertex_index = BUFFER_OFFSET(vertex_start * vertexBuffer.itemSize);
+    GLbyte* elements_index = BUFFER_OFFSET(triangle_elements_start * triangleElementsBuffer.itemSize);
     for (auto& group : triangleGroups) {
         assert(group);
         if (!group->elements_length) {

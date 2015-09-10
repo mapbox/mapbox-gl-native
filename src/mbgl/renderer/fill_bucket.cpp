@@ -216,8 +216,8 @@ bool FillBucket::hasData() const {
 }
 
 void FillBucket::drawElements(PlainShader& shader) {
-    char *vertex_index = BUFFER_OFFSET(vertex_start * vertexBuffer.itemSize);
-    char *elements_index = BUFFER_OFFSET(triangle_elements_start * triangleElementsBuffer.itemSize);
+    GLbyte *vertex_index = BUFFER_OFFSET(vertex_start * vertexBuffer.itemSize);
+    GLbyte *elements_index = BUFFER_OFFSET(triangle_elements_start * triangleElementsBuffer.itemSize);
     for (auto& group : triangleGroups) {
         assert(group);
         group->array[0].bind(shader, vertexBuffer, triangleElementsBuffer, vertex_index);
@@ -228,8 +228,8 @@ void FillBucket::drawElements(PlainShader& shader) {
 }
 
 void FillBucket::drawElements(PatternShader& shader) {
-    char *vertex_index = BUFFER_OFFSET(vertex_start * vertexBuffer.itemSize);
-    char *elements_index = BUFFER_OFFSET(triangle_elements_start * triangleElementsBuffer.itemSize);
+    GLbyte *vertex_index = BUFFER_OFFSET(vertex_start * vertexBuffer.itemSize);
+    GLbyte *elements_index = BUFFER_OFFSET(triangle_elements_start * triangleElementsBuffer.itemSize);
     for (auto& group : triangleGroups) {
         assert(group);
         group->array[1].bind(shader, vertexBuffer, triangleElementsBuffer, vertex_index);
@@ -240,8 +240,8 @@ void FillBucket::drawElements(PatternShader& shader) {
 }
 
 void FillBucket::drawVertices(OutlineShader& shader) {
-    char *vertex_index = BUFFER_OFFSET(vertex_start * vertexBuffer.itemSize);
-    char *elements_index = BUFFER_OFFSET(line_elements_start * lineElementsBuffer.itemSize);
+    GLbyte *vertex_index = BUFFER_OFFSET(vertex_start * vertexBuffer.itemSize);
+    GLbyte *elements_index = BUFFER_OFFSET(line_elements_start * lineElementsBuffer.itemSize);
     for (auto& group : lineGroups) {
         assert(group);
         group->array[0].bind(shader, vertexBuffer, lineElementsBuffer, vertex_index);

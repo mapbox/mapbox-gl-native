@@ -1,13 +1,15 @@
 #ifndef MBGL_RENDERER_BUCKET
 #define MBGL_RENDERER_BUCKET
 
+#include <mbgl/platform/gl.hpp>
 #include <mbgl/renderer/render_pass.hpp>
 #include <mbgl/util/noncopyable.hpp>
 #include <mbgl/util/mat4.hpp>
 
 #include <atomic>
 
-#define BUFFER_OFFSET(i) ((char*)nullptr + (i))
+#define BUFFER_OFFSET_0  ((GLbyte*)nullptr)
+#define BUFFER_OFFSET(i) ((BUFFER_OFFSET_0) + (i))
 
 namespace mbgl {
 
