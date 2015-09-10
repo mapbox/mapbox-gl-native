@@ -1351,7 +1351,6 @@ std::chrono::steady_clock::duration secondsAsDuration(float duration)
     if (twoFingerDrag.state == UIGestureRecognizerStateBegan)
     {
         [self trackGestureEvent:MGLEventGesturePitchStart forRecognizer:twoFingerDrag];
-        [self.userLocationAnnotationView pauseAnimations];
     }
     else if (twoFingerDrag.state == UIGestureRecognizerStateBegan || twoFingerDrag.state == UIGestureRecognizerStateChanged)
     {
@@ -1365,7 +1364,6 @@ std::chrono::steady_clock::duration secondsAsDuration(float duration)
     }
     else if (twoFingerDrag.state == UIGestureRecognizerStateEnded || twoFingerDrag.state == UIGestureRecognizerStateCancelled)
     {
-        [self.userLocationAnnotationView unPauseAnimations];
         [self unrotateIfNeededAnimated:YES];
 
         //[self notifyMapChange:(mbgl::MapChangeRegionDidChange)];

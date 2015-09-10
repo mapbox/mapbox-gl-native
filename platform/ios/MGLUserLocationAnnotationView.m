@@ -31,14 +31,11 @@ const CGFloat MGLUserLocationAnnotationArrowSize = MGLUserLocationAnnotationPuck
     CALayer *_accuracyRingLayer;
     CALayer *_dotBorderLayer;
     CALayer *_dotLayer;
-    CALayer *_dotDomeLayer;
-    CALayer *_dotMaskDomeFrontLayer;
 
     double _oldHeadingAccuracy;
     CLLocationAccuracy _oldHorizontalAccuracy;
     double _oldZoom;
     double _oldPitch;
-    CFTimeInterval _pauseTime;
 }
 
 - (instancetype)initWithFrame:(CGRect)frame
@@ -82,7 +79,6 @@ const CGFloat MGLUserLocationAnnotationArrowSize = MGLUserLocationAnnotationPuck
 
         _haloLayer.backgroundColor = [tintColor CGColor];
         _dotLayer.backgroundColor = [tintColor CGColor];
-        _dotDomeLayer.backgroundColor = [tintColor CGColor];
 
         _headingIndicatorLayer.contents = (__bridge id)[[self headingIndicatorTintedGradientImage] CGImage];
     }
@@ -116,69 +112,19 @@ const CGFloat MGLUserLocationAnnotationArrowSize = MGLUserLocationAnnotationPuck
 
     if (_puckDot)
     {
-        _puckDot.shadowOffset = CGSizeMake(0, fmaxf(pitch * 10, 1));
-        _puckDot.shadowRadius = fmaxf(pitch * 5, 0.75);
+        _puckDot.shadowOffset = CGSizeMake(0, fmaxf(pitch * 10.f, 1.f));
+        _puckDot.shadowRadius = fmaxf(pitch * 5.f, 0.75f);
     }
 
     if (_dotBorderLayer)
     {
-        _dotBorderLayer.shadowOffset = CGSizeMake(0, pitch * 10);
-        _dotBorderLayer.shadowRadius = fmaxf(pitch * 5, 3);
+        _dotBorderLayer.shadowOffset = CGSizeMake(0.f, pitch * 10.f);
+        _dotBorderLayer.shadowRadius = fmaxf(pitch * 5.f, 3.f);
     }
-}
 
-- (void)pauseAnimations
-{
-    /*CATransform3D t = CATransform3DRotate(CATransform3DIdentity, MGLRadiansFromDegrees(-self.mapView.camera.pitch), 1.0, 0, 0);
-     _dotDomeLayer.transform = t;
-     
-     CABasicAnimation *scaleAnimation = [CABasicAnimation animationWithKeyPath:@"transform.scale.xy"];
-     scaleAnimation.toValue = @0;
-     
-     [_dotDomeLayer addAnimation:scaleAnimation forKey:@"domeScaleDown"];*/
-    
-    if (_dotDomeLayer)
+    if (_dotLayer)
     {
-        _pauseTime = [_dotLayer convertTime:CACurrentMediaTime() fromLayer:nil];
-        
-        _dotDomeLayer.speed = 0.0;
-        _dotDomeLayer.timeOffset = _pauseTime;
-        _dotDomeLayer.hidden = YES;
-        _dotDomeLayer.mask.hidden = YES;
-        
-        _dotLayer.mask = nil;
-        _dotLayer.speed = 0.0;
-        _dotLayer.timeOffset = _pauseTime;
-    }
-}
-
-- (void)unPauseAnimations
-{
-    _dotLayer.speed = 1.0;
-    _dotLayer.timeOffset = 0.0;
-    _dotLayer.beginTime = 0.0;
-    
-    CFTimeInterval timeSincePause = CACurrentMediaTime() - _pauseTime;
-    _dotLayer.beginTime = timeSincePause;
-    
-    if (_dotDomeLayer && (self.mapView.camera.pitch > 20.0))
-    {
-        CATransform3D t = CATransform3DRotate(CATransform3DIdentity, MGLRadiansFromDegrees(-self.mapView.camera.pitch), 1.0, 0, 0);
-        _dotDomeLayer.transform = t;
-        
-        CABasicAnimation *scaleAnimation = [CABasicAnimation animationWithKeyPath:@"transform.scale.xy"];
-        scaleAnimation.toValue = @1;
-        scaleAnimation.fillMode = kCAFillModeBackwards;
-        
-        [_dotDomeLayer addAnimation:scaleAnimation forKey:@"domeScaleUp"];
-        
-        _dotDomeLayer.hidden = NO;
-        _dotDomeLayer.mask.hidden = NO;
-        _dotDomeLayer.speed = 1.0;
-        _dotDomeLayer.timeOffset = 0.0;
-        _dotDomeLayer.beginTime = timeSincePause;
-        
-        _dotLayer.mask = _dotMaskDomeFrontLayer;
+        _dotLayer.zPosition = pitch * 2.f;
     }
 }
 
@@ -194,9 +140,6 @@ const CGFloat MGLUserLocationAnnotationArrowSize = MGLUserLocationAnnotationPuck
         _haloLayer = nil;
         _dotBorderLayer = nil;
         _dotLayer = nil;
-        _dotDomeLayer = nil;
-
-        _puckModeActivated = YES;
     }
 
     // background dot (white with black shadow)
@@ -236,6 +179,13 @@ const CGFloat MGLUserLocationAnnotationArrowSize = MGLUserLocationAnnotationPuck
 
         [self.layer addSublayer:_puckArrow];
     }
+
+    if ( ! _puckModeActivated)
+    {
+        _puckModeActivated = YES;
+
+        [self updateFaux3DEffect];
+    }
 }
 
 - (UIBezierPath *)puckArrow
@@ -261,8 +211,6 @@ const CGFloat MGLUserLocationAnnotationArrowSize = MGLUserLocationAnnotationPuck
 
         _puckDot = nil;
         _puckArrow = nil;
-
-        _puckModeActivated = NO;
     }
 
     // update heading indicator
@@ -369,6 +317,7 @@ const CGFloat MGLUserLocationAnnotationArrowSize = MGLUserLocationAnnotationPuck
         _haloLayer = [self circleLayerWithSize:MGLUserLocationAnnotationHaloSize];
         _haloLayer.backgroundColor = [_mapView.tintColor CGColor];
         _haloLayer.allowsGroupOpacity = NO;
+        _haloLayer.zPosition = -0.1f;
 
         // set defaults for the animations
         CAAnimationGroup *animationGroup = [self loopingAnimationGroupWithDuration:3.0];
@@ -419,24 +368,6 @@ const CGFloat MGLUserLocationAnnotationArrowSize = MGLUserLocationAnnotationPuck
         _dotLayer = [self circleLayerWithSize:MGLUserLocationAnnotationDotSize * 0.75];
         _dotLayer.backgroundColor = [_mapView.tintColor CGColor];
         _dotLayer.shouldRasterize = NO;
-        
-        CALayer *dotMaskDomeTopLayer = [CALayer layer];
-        dotMaskDomeTopLayer.bounds = CGRectMake(0, 0, MGLUserLocationAnnotationDotSize * 0.75, MGLUserLocationAnnotationDotSize * 0.75 / 2.0);
-        dotMaskDomeTopLayer.position = CGPointMake(super.bounds.size.width * 0.75 / 2.0, super.bounds.size.height * 0.75 / 4.0);
-        dotMaskDomeTopLayer.backgroundColor = [[UIColor blackColor] CGColor];
-        dotMaskDomeTopLayer.shouldRasterize = NO;
-        
-        _dotMaskDomeFrontLayer = [CALayer layer];
-        _dotMaskDomeFrontLayer.bounds = dotMaskDomeTopLayer.bounds;
-        _dotMaskDomeFrontLayer.position = CGPointMake(dotMaskDomeTopLayer.position.x, dotMaskDomeTopLayer.position.y + dotMaskDomeTopLayer.bounds.size.height);
-        _dotMaskDomeFrontLayer.backgroundColor = dotMaskDomeTopLayer.backgroundColor;
-        
-        _dotLayer.mask = _dotMaskDomeFrontLayer;
-        
-        _dotDomeLayer = [self circleLayerWithSize:MGLUserLocationAnnotationDotSize * 0.75];
-        _dotDomeLayer.backgroundColor = [_mapView.tintColor CGColor];
-        _dotDomeLayer.shouldRasterize = NO;
-        _dotDomeLayer.mask = dotMaskDomeTopLayer;
 
         // set defaults for the animations
         CAAnimationGroup *animationGroup = [self loopingAnimationGroupWithDuration:1.5];
@@ -456,10 +387,15 @@ const CGFloat MGLUserLocationAnnotationArrowSize = MGLUserLocationAnnotationPuck
         animationGroup.animations = @[pulseAnimation, opacityAnimation];
 
         [_dotLayer addAnimation:animationGroup forKey:@"animateTransformAndOpacity"];
-        [_dotDomeLayer addAnimation:animationGroup forKey:@"animateTransformAndOpacity"];
 
         [self.layer addSublayer:_dotLayer];
-        [self.layer addSublayer:_dotDomeLayer];
+    }
+
+    if (_puckModeActivated)
+    {
+        _puckModeActivated = NO;
+
+        [self updateFaux3DEffect];
     }
 }
 
