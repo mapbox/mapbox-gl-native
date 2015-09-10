@@ -95,7 +95,7 @@ const CGFloat MGLUserLocationAnnotationArrowSize = MGLUserLocationAnnotationPuck
 
 - (void)updatePitch
 {
-    if (self.mapView.camera.pitch && (self.mapView.camera.pitch != _oldPitch))
+    if (self.mapView.camera.pitch != _oldPitch)
     {
         CATransform3D t = CATransform3DRotate(CATransform3DIdentity, MGLRadiansFromDegrees(self.mapView.camera.pitch), 1.0, 0, 0);
         self.layer.sublayerTransform = t;
