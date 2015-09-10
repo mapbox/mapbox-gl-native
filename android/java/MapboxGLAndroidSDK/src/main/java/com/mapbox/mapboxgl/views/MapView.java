@@ -627,6 +627,7 @@ public class MapView extends FrameLayout implements LocationListener {
     }
 
     public void setCenterCoordinate(LatLng centerCoordinate, boolean animated) {
+        mNativeMapView.cancelTransitions();
         long duration = animated ? ANIMATION_DURATION : 0;
         mNativeMapView.setLatLng(centerCoordinate, duration);
     }
