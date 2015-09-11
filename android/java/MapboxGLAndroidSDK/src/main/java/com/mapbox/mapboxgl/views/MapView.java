@@ -628,6 +628,7 @@ public class MapView extends FrameLayout implements LocationListener {
 
     public void setCenterCoordinate(LatLng centerCoordinate, boolean animated) {
         long duration = animated ? ANIMATION_DURATION : 0;
+        mNativeMapView.cancelTransitions();
         mNativeMapView.setLatLng(centerCoordinate, duration);
     }
 
@@ -638,6 +639,7 @@ public class MapView extends FrameLayout implements LocationListener {
     public void setCenterCoordinate(LatLngZoom centerCoordinate,
                                     boolean animated) {
         long duration = animated ? ANIMATION_DURATION : 0;
+        mNativeMapView.cancelTransitions();
         mNativeMapView.setLatLngZoom(centerCoordinate, duration);
     }
 
@@ -660,14 +662,17 @@ public class MapView extends FrameLayout implements LocationListener {
 
     public void setDirection(double direction, boolean animated) {
         long duration = animated ? ANIMATION_DURATION : 0;
+        mNativeMapView.cancelTransitions();
         mNativeMapView.setBearing(-direction, duration);
     }
 
     public void resetPosition() {
+        mNativeMapView.cancelTransitions();
         mNativeMapView.resetPosition();
     }
 
     public void resetNorth() {
+        mNativeMapView.cancelTransitions();
         mNativeMapView.resetNorth();
     }
 
@@ -681,6 +686,7 @@ public class MapView extends FrameLayout implements LocationListener {
 
     public void setZoomLevel(double zoomLevel, boolean animated) {
         long duration = animated ? ANIMATION_DURATION : 0;
+        mNativeMapView.cancelTransitions();
         mNativeMapView.setZoom(zoomLevel, duration);
     }
 
