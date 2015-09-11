@@ -33,6 +33,7 @@ dependencies {
     compile 'com.android.support:design:23.0.1'
     compile 'com.squareup.okhttp:okhttp:2.4.0'
     compile 'com.mapzen.android:lost:1.0.1'
+    compile 'math.geom2d:javaGeom:0.11.1'
 }
 
 android {

@@ -71,6 +71,7 @@ import java.util.Collections;
 import java.util.Date;
 import java.util.Iterator;
 import java.util.List;
+import math.geom2d.Point2D;
 
 // Custom view that shows a Map
 // Based on SurfaceView as we use OpenGL ES to render
@@ -813,13 +814,13 @@ public class MapView extends FrameLayout implements LocationListener {
         setStyleClasses(styleClasses);
     }
 
-    public LatLng fromScreenLocation(PointF point) {
-        return mNativeMapView.latLngForPixel(new PointF(point.x / mScreenDensity, point.y / mScreenDensity));
+    public LatLng fromScreenLocation(Point2D point) {
+        return mNativeMapView.latLngForPixel(new Point2D(point.x() / mScreenDensity, point.y() / mScreenDensity));
     }
 
-    public PointF toScreenLocation(LatLng location) {
-        PointF point = mNativeMapView.pixelForLatLng(location);
-        return new PointF(point.x * mScreenDensity, point.y * mScreenDensity);
+    public Point2D toScreenLocation(LatLng location) {
+        Point2D point = mNativeMapView.pixelForLatLng(location);
+        return new Point2D(point.x() * mScreenDensity, point.y() * mScreenDensity);
     }
 
     public double getTopOffsetPixelsForAnnotationSymbol(@NonNull String symbolName) {
@@ -1196,10 +1197,10 @@ public class MapView extends FrameLayout implements LocationListener {
                                       tapPoint.x + toleranceWidth / 2, tapPoint.y - 1 * toleranceHeight / 3);
 
             List<LatLng> corners = Arrays.asList(
-                fromScreenLocation(new PointF(tapRect.left, tapRect.bottom)),
-                fromScreenLocation(new PointF(tapRect.left, tapRect.top)),
-                fromScreenLocation(new PointF(tapRect.right, tapRect.top)),
-                fromScreenLocation(new PointF(tapRect.right, tapRect.bottom))
+                fromScreenLocation(new Point2D(tapRect.left, tapRect.bottom)),
+                fromScreenLocation(new Point2D(tapRect.left, tapRect.top)),
+                fromScreenLocation(new Point2D(tapRect.right, tapRect.top)),
+                fromScreenLocation(new Point2D(tapRect.right, tapRect.bottom))
             );
 
             BoundingBox tapBounds = BoundingBox.fromLatLngs(corners);
@@ -2137,17 +2138,20 @@ public class MapView extends FrameLayout implements LocationListener {
             }
 
             mGpsMarker.setVisibility(View.VISIBLE);
-            LatLng coordinate = new LatLng(mGpsLocation);
-            PointF screenLocation = toScreenLocation(coordinate);
 
-            float iconSize = 27.0f * mScreenDensity;
-            // Update Location
-            FrameLayout.LayoutParams lp = new FrameLayout.LayoutParams((int) iconSize, (int) iconSize);
-            lp.leftMargin = (int) (screenLocation.x - iconSize / 2.0f);
-            lp.topMargin = getHeight() - (int) (screenLocation.y + iconSize / 2.0f);
-            mGpsMarker.setLayoutParams(lp);
-            rotateImageView(mGpsMarker, 0.0f);
-            mGpsMarker.requestLayout();
+            if (change.value >= MapChange.MapChangeWillStartRenderingFrame.value) { // any frame render activity
+                LatLng coordinate = new LatLng(mGpsLocation);
+                Point2D screenLocation = toScreenLocation(coordinate);
+
+                float iconSize = 27.0f * mScreenDensity;
+                // Update Location
+                FrameLayout.LayoutParams lp = new FrameLayout.LayoutParams((int) iconSize, (int) iconSize);
+                lp.leftMargin = (int) (screenLocation.x() - iconSize / 2.0f);
+                lp.topMargin = getHeight() - (int) (screenLocation.y() + iconSize / 2.0f);
+                mGpsMarker.setLayoutParams(lp);
+                rotateImageView(mGpsMarker, 0.0f);
+                mGpsMarker.forceLayout();
+            }
 
             // Update direction if tracking mode
             if(mUserLocationTrackingMode == UserLocationTrackingMode.FOLLOW_BEARING && mCompassValid){

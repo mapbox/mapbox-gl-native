@@ -1,6 +1,5 @@
 package com.mapbox.mapboxgl.views;
 
-import android.graphics.PointF;
 import android.view.Surface;
 
 import com.mapbox.mapboxgl.annotations.Marker;
@@ -11,6 +10,8 @@ import com.mapbox.mapboxgl.geometry.LatLng;
 import com.mapbox.mapboxgl.geometry.LatLngZoom;
 import com.mapbox.mapboxgl.geometry.ProjectedMeters;
 import java.util.List;
+
+import math.geom2d.Point2D;
 
 // Class that wraps the native methods for convenience
 class NativeMapView {
@@ -413,11 +414,11 @@ class NativeMapView {
         return nativeLatLngForProjectedMeters(mNativeMapViewPtr, projectedMeters);
     }
 
-    public PointF pixelForLatLng(LatLng latLng) {
+    public Point2D pixelForLatLng(LatLng latLng) {
         return nativePixelForLatLng(mNativeMapViewPtr, latLng);
     }
 
-    public LatLng latLngForPixel(PointF pixel) {
+    public LatLng latLngForPixel(Point2D pixel) {
         return nativeLatLngForPixel(mNativeMapViewPtr, pixel);
     }
 
@@ -604,9 +605,9 @@ class NativeMapView {
 
     private native LatLng nativeLatLngForProjectedMeters(long nativeMapViewPtr, ProjectedMeters projectedMeters);
 
-    private native PointF nativePixelForLatLng(long nativeMapViewPtr, LatLng latLng);
+    private native Point2D nativePixelForLatLng(long nativeMapViewPtr, LatLng latLng);
 
-    private native LatLng nativeLatLngForPixel(long nativeMapViewPtr, PointF pixel);
+    private native LatLng nativeLatLngForPixel(long nativeMapViewPtr, Point2D pixel);
 
     private native double nativeGetTopOffsetPixelsForAnnotationSymbol(long nativeMapViewPtr, String symbolName);
 }
