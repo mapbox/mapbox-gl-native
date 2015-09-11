@@ -365,10 +365,8 @@ std::chrono::steady_clock::duration secondsAsDuration(float duration)
     // observe app activity
     //
     [[NSNotificationCenter defaultCenter] addObserver:self selector:@selector(willTerminate) name:UIApplicationWillTerminateNotification object:nil];
-    [[NSNotificationCenter defaultCenter] addObserver:self selector:@selector(sleepGL:) name:UIApplicationWillResignActiveNotification object:nil];
     [[NSNotificationCenter defaultCenter] addObserver:self selector:@selector(sleepGL:) name:UIApplicationDidEnterBackgroundNotification object:nil];
     [[NSNotificationCenter defaultCenter] addObserver:self selector:@selector(wakeGL:) name:UIApplicationWillEnterForegroundNotification object:nil];
-    [[NSNotificationCenter defaultCenter] addObserver:self selector:@selector(wakeGL:) name:UIApplicationDidBecomeActiveNotification object:nil];
     [[NSNotificationCenter defaultCenter] addObserver:self selector:@selector(didReceiveMemoryWarning) name:UIApplicationDidReceiveMemoryWarningNotification object:nil];
 
     // set initial position
@@ -441,8 +439,8 @@ std::chrono::steady_clock::duration secondsAsDuration(float duration)
     MGLReachability *reachability = [notification object];
     if ( ! _isWaitingForRedundantReachableNotification && [reachability isReachable])
     {
-        mbgl::NetworkStatus::Reachable();
-    }
+            mbgl::NetworkStatus::Reachable();
+        }
     _isWaitingForRedundantReachableNotification = NO;
 }
 
@@ -786,6 +784,7 @@ std::chrono::steady_clock::duration secondsAsDuration(float duration)
         {
             self.glSnapshotView = [[UIImageView alloc] initWithFrame:self.glView.frame];
             self.glSnapshotView.autoresizingMask = self.glView.autoresizingMask;
+            self.glSnapshotView.contentMode = UIViewContentModeCenter;
             [self insertSubview:self.glSnapshotView aboveSubview:self.glView];
         }
 
