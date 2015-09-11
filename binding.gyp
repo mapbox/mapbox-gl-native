@@ -22,6 +22,8 @@
         'platform/node/src/node_map.cpp',
         'platform/node/src/node_request.hpp',
         'platform/node/src/node_request.cpp',
+        'platform/node/src/node_view.hpp',
+        'platform/node/src/node_view.cpp',
         'platform/node/src/util/async_queue.hpp',
       ],
     },

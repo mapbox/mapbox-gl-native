@@ -27,7 +27,7 @@ test('Map', function(t) {
         t.end();
     });
 
-    t.test('requires request and ratio options', function(t) {
+    t.test('requires request and view or ratio options', function(t) {
         var options = {};
 
         t.throws(function() {
@@ -48,14 +48,24 @@ test('Map', function(t) {
         options.cancel = function() {};
         t.throws(function() {
             new mbgl.Map(options);
-        }, /Options object must have a numerical 'ratio' property/);
+        }, /Options object must have a 'view' or numerical 'ratio' property/);
 
         options.ratio = 'test';
         t.throws(function() {
             new mbgl.Map(options);
-        }, /Options object must have a numerical 'ratio' property/);
+        }, /Options object must have a 'view' or numerical 'ratio' property/);
 
         options.ratio = 1.0;
+        t.doesNotThrow(function() {
+            new mbgl.Map(options);
+        });
+
+        delete options.ratio;
+        options.view = new mbgl.View({
+            width: 512,
+            height: 512,
+            ratio: 1.0
+        });
         t.doesNotThrow(function() {
             new mbgl.Map(options);
         });
@@ -152,7 +162,11 @@ test('Map', function(t) {
                     callback(err, { data: data });
                 });
             },
-            ratio: 1
+            view: new mbgl.View({
+                width: 512,
+                height: 512,
+                ratio: 1.0
+            })
         };
 
         t.test('requires an object as the first parameter', function(t) {
@@ -206,6 +220,7 @@ test('Map', function(t) {
 
             var map = new mbgl.Map(options);
             map.load(style);
+
             map.render({ zoom: 1 }, function(err, data) {
                 mbgl.removeAllListeners('message');
                 map.release();
@@ -225,6 +240,60 @@ test('Map', function(t) {
                 map.release();
             }, /Map resources have already been released/);
 
+            t.end();
+        });
+
+        t.test('view not set', function(t) {
+            var map = new mbgl.Map({
+                request: function() {},
+                ratio: 1.0
+            });
+
+            map.load(style);
+
+            t.throws(function() {
+                map.render({}, function() {});
+            }, /View has not been set/);
+
+            map.release();
+            t.end();
+        });
+
+        t.test('view dimensions mismatch', function(t) {
+            var map = new mbgl.Map({
+                request: function() {},
+                view: new mbgl.View({
+                    width: 256,
+                    height: 256,
+                    ratio: 1.0
+                })
+            });
+
+            map.load(style);
+
+            t.throws(function() {
+                map.render({ width: 512, height: 512 }, function() {});
+            }, /View dimensions do not match/);
+
+            map.release();
+            t.end();
+        });
+
+        t.test('view pixel ratio mismatch', function(t) {
+            var map = new mbgl.Map({
+                request: function() {},
+                ratio: 2.0
+            });
+
+            t.throws(function() {
+                map.setView(new mbgl.View({
+                    width: 512,
+                    height: 512,
+                    ratio: 1.0
+                }));
+            }, /View pixel ratio does not match/);
+
+            map.release();
             t.end();
         });
 

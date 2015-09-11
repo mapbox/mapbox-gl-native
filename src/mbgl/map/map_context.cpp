@@ -27,7 +27,6 @@
 #include <mbgl/util/string.hpp>
 
 #include <algorithm>
-#include <iostream>
 
 namespace mbgl {
 

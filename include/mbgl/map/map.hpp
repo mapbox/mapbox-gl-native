@@ -139,6 +139,9 @@ public:
     uint16_t getWidth() const;
     uint16_t getHeight() const;
 
+    // Pixel ratio
+    float getPixelRatio() const;
+
     // Projection
     void getWorldBoundsMeters(ProjectedMeters &sw, ProjectedMeters &ne) const;
     void getWorldBoundsLatLng(LatLng &sw, LatLng &ne) const;

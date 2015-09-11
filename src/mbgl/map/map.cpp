@@ -272,6 +272,10 @@ uint16_t Map::getHeight() const {
     return transform->getState().getHeight();
 }
 
+float Map::getPixelRatio() const {
+    return data->pixelRatio;
+}
+
 
 #pragma mark - Rotation
 
