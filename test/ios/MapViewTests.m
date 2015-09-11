@@ -46,7 +46,7 @@
                    270,
                    @"setting direction should take effect");
 
-    [tester waitForTimeInterval:1];
+    [tester waitForTimeInterval:2];
 
     XCTAssertEqual(tester.compass.alpha,
                    1,
@@ -89,7 +89,7 @@
 
     [tester.mapView resetNorth];
 
-    [tester waitForTimeInterval:1];
+    [tester waitForTimeInterval:2];
 
     XCTAssertEqual(tester.mapView.direction,
                    0,
