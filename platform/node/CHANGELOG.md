@@ -12,7 +12,7 @@
 - `map.render` now returns a raw image buffer instead of an object with 
   `width`, `height` and `pixels` properties. ([#2262](https://github.com/mapbox/mapbox-gl-native/pull/2262))
 - Adds support for rendering v8 styles.
-- No longer loads resources before a render request is made.
+- No longer loads resources before a render request is made. ([`55d25a8`](https://github.com/mapbox/mapbox-gl-native/commit/55d25a80a77c06ef5e66acc0d8518867b03fe8a4))
 - Adds io.js v3.x support. ([#2261](https://github.com/mapbox/mapbox-gl-native/pull/2261))
 
 # 1.1.3
