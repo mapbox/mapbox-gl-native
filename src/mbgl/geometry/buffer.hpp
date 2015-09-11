@@ -110,10 +110,10 @@ public:
 
 private:
     // CPU buffer
-    void *array = nullptr;
+    GLvoid *array = nullptr;
 
     // Byte position where we are writing.
-    size_t pos = 0;
+    GLsizeiptr pos = 0;
 
     // Number of bytes that are valid in this buffer.
     size_t length = 0;

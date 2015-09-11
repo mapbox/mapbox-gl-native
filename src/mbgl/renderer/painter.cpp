@@ -235,7 +235,7 @@ void Painter::render(const Style& style, TransformState state_, const FrameData&
     // Make a second pass, rendering translucent objects. This time, we render bottom-to-top.
     renderPass(RenderPass::Translucent,
                order.begin(), order.end(),
-               order.size() - 1, -1);
+               static_cast<GLsizei>(order.size()) - 1, -1);
 
     if (debug::renderTree) { Log::Info(Event::Render, "}"); indent--; }
 
@@ -266,7 +266,7 @@ void Painter::render(const Style& style, TransformState state_, const FrameData&
 template <class Iterator>
 void Painter::renderPass(RenderPass pass_,
                          Iterator it, Iterator end,
-                         std::size_t i, int8_t increment) {
+                         GLsizei i, int8_t increment) {
     pass = pass_;
 
     MBGL_DEBUG_GROUP(pass == RenderPass::Opaque ? "opaque" : "translucent");

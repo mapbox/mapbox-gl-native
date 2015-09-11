@@ -58,8 +58,8 @@ private:
     LineVertexBuffer& vertexBuffer;
     TriangleElementsBuffer& triangleElementsBuffer;
 
-    const size_t vertex_start;
-    const size_t triangle_elements_start;
+    const GLsizei vertex_start;
+    const GLsizei triangle_elements_start;
 
     GLint e1;
     GLint e2;

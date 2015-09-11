@@ -32,8 +32,8 @@ public:
     // the texture is only bound when the data is out of date (=dirty).
     void upload();
 
-    const uint16_t width = 0;
-    const uint16_t height = 0;
+    const GLsizei width;
+    const GLsizei height;
 
 private:
     struct GlyphValue {

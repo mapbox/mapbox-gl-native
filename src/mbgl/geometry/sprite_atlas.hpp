@@ -69,7 +69,7 @@ public:
     inline const uint32_t* getData() const { return data.get(); }
 
 private:
-    const dimension width, height;
+    const GLsizei width, height;
     const dimension pixelWidth, pixelHeight;
     const float pixelRatio;
 

@@ -103,7 +103,8 @@ bool SymbolBucket::needsDependencies(const GeometryTileLayer& layer,
     // Determine and load glyph ranges
     std::set<GlyphRange> ranges;
 
-    for (std::size_t i = 0; i < layer.featureCount(); i++) {
+    const GLsizei featureCount = static_cast<GLsizei>(layer.featureCount());
+    for (GLsizei i = 0; i < featureCount; i++) {
         auto feature = layer.getFeature(i);
 
         GeometryTileFeatureExtractor extractor(*feature);

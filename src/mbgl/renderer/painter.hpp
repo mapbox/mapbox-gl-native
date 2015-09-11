@@ -143,7 +143,7 @@ private:
     template <class Iterator>
     void renderPass(RenderPass,
                     Iterator it, Iterator end,
-                    std::size_t i, int8_t increment);
+                    GLsizei i, int8_t increment);
 
     void prepareTile(const Tile& tile);
 
@@ -201,7 +201,7 @@ private:
     Color background = {{ 0, 0, 0, 0 }};
 
     int numSublayers = 3;
-    size_t currentLayer;
+    GLsizei currentLayer;
     float depthRangeSize;
     const float depthEpsilon = 1.0f / (1 << 16);
 

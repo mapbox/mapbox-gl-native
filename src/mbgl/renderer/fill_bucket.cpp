@@ -91,7 +91,7 @@ void FillBucket::tessellate() {
         return;
     }
 
-    size_t total_vertex_count = 0;
+    GLsizei total_vertex_count = 0;
     for (const auto& polygon : polygons) {
         total_vertex_count += polygon.size();
     }
@@ -110,7 +110,7 @@ void FillBucket::tessellate() {
     GLsizei lineIndex = lineGroup.vertex_length;
 
     for (const auto& polygon : polygons) {
-        const size_t group_count = polygon.size();
+        const GLsizei group_count = static_cast<GLsizei>(polygon.size());
         assert(group_count >= 3);
 
         std::vector<TESSreal> clipped_line;
@@ -120,8 +120,8 @@ void FillBucket::tessellate() {
             vertexBuffer.add(pt.X, pt.Y);
         }
 
-        for (size_t i = 0; i < group_count; i++) {
-            const size_t prev_i = (i == 0 ? group_count : i) - 1;
+        for (GLsizei i = 0; i < group_count; i++) {
+            const GLsizei prev_i = (i == 0 ? group_count : i) - 1;
             lineElementsBuffer.add(lineIndex + prev_i, lineIndex + i);
         }
 
@@ -134,12 +134,12 @@ void FillBucket::tessellate() {
 
     if (tessTesselate(tesselator, TESS_WINDING_ODD, TESS_POLYGONS, vertices_per_group, vertexSize, 0)) {
         const TESSreal *vertices = tessGetVertices(tesselator);
-        const size_t vertex_count = tessGetVertexCount(tesselator);
+        const GLsizei vertex_count = tessGetVertexCount(tesselator);
         TESSindex *vertex_indices = const_cast<TESSindex *>(tessGetVertexIndices(tesselator));
         const TESSindex *elements = tessGetElements(tesselator);
         const int triangle_count = tessGetElementCount(tesselator);
 
-        for (size_t i = 0; i < vertex_count; ++i) {
+        for (GLsizei i = 0; i < vertex_count; ++i) {
             if (vertex_indices[i] == TESS_UNDEF) {
                 vertexBuffer.add(::round(vertices[i * 2]), ::round(vertices[i * 2 + 1]));
                 vertex_indices[i] = (TESSindex)total_vertex_count;

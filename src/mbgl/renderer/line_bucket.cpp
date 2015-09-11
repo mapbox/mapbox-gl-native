@@ -32,8 +32,8 @@ void LineBucket::addGeometry(const GeometryCollection& geometryCollection) {
 }
 
 void LineBucket::addGeometry(const std::vector<Coordinate>& vertices) {
-    const auto len = [&vertices] {
-        auto l = vertices.size();
+    const GLsizei len = [&vertices] {
+        GLsizei l = static_cast<GLsizei>(vertices.size());
         // If the line has duplicate vertices at the end, adjust length to remove them.
         while (l > 2 && vertices[l - 1] == vertices[l - 2]) {
             l--;
@@ -78,7 +78,7 @@ void LineBucket::addGeometry(const std::vector<Coordinate>& vertices) {
     const GLint startVertex = vertexBuffer.index();
     std::vector<TriangleElement> triangleStore;
 
-    for (size_t i = 0; i < len; ++i) {
+    for (GLsizei i = 0; i < len; ++i) {
         if (closed && i == len - 1) {
             // if the line is closed, we treat the last vertex like the first
             nextVertex = vertices[1];
@@ -303,8 +303,8 @@ void LineBucket::addGeometry(const std::vector<Coordinate>& vertices) {
         startOfLine = false;
     }
 
-    const size_t endVertex = vertexBuffer.index();
-    const size_t vertexCount = endVertex - startVertex;
+    const GLsizei endVertex = vertexBuffer.index();
+    const GLsizei vertexCount = endVertex - startVertex;
 
     // Store the triangle/line groups.
     {
