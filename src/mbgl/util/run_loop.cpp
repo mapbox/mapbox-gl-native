@@ -15,7 +15,7 @@ RunLoop::~RunLoop() {
 }
 
 void RunLoop::withMutex(std::function<void()>&& fn) {
-    std::lock_guard<std::mutex> lock(mutex);
+    std::lock_guard<std::recursive_mutex> lock(mutex);
     fn();
 }
 

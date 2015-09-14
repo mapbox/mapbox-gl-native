@@ -1,8 +1,9 @@
 #include <mbgl/map/transform_state.hpp>
 #include <mbgl/map/tile_id.hpp>
-#include <mbgl/util/projection.hpp>
 #include <mbgl/util/constants.hpp>
 #include <mbgl/util/box.hpp>
+#include <mbgl/util/tile_coordinate.hpp>
+#include <mbgl/util/interpolate.hpp>
 
 using namespace mbgl;
 
@@ -10,52 +11,44 @@ using namespace mbgl;
 
 void TransformState::matrixFor(mat4& matrix, const TileID& id, const int8_t z) const {
     const double tile_scale = std::pow(2, z);
-    const double tile_size = scale * util::tileSize / tile_scale;
+    double s = util::tileSize * scale / tile_scale;
 
     matrix::identity(matrix);
+    matrix::translate(matrix, matrix, id.x * s, id.y * s, 0);
+    matrix::scale(matrix, matrix, s / 4096.0f, s / 4096.0f, 1);
+}
 
-    matrix::translate(matrix, matrix, 0.5f * (float)width, 0.5f * (float)height, 0);
-    matrix::rotate_z(matrix, matrix, angle);
-    matrix::translate(matrix, matrix, -0.5f * (float)width, -0.5f * (float)height, 0);
+void TransformState::getProjMatrix(mat4& projMatrix) const {
+    double halfFov = std::atan(0.5 / getAltitude());
+    double topHalfSurfaceDistance = std::sin(halfFov) * getAltitude() /
+        std::sin(M_PI / 2.0f - getPitch() - halfFov);
+    // Calculate z value of the farthest fragment that should be rendered.
+    double farZ = std::cos(M_PI / 2.0f - getPitch()) * topHalfSurfaceDistance + getAltitude();
 
-    matrix::translate(matrix, matrix, pixel_x() + id.x * tile_size, pixel_y() + id.y * tile_size, 0);
+    matrix::perspective(projMatrix, 2.0f * std::atan((getHeight() / 2.0f) / getAltitude()),
+            double(getWidth()) / getHeight(), 0.1, farZ);
 
-    // TODO: Get rid of the 8 (scaling from 4096 to tile size);
-    float factor = scale / tile_scale / (4096.0f / util::tileSize);
-    matrix::scale(matrix, matrix, factor, factor, 1);
+    matrix::translate(projMatrix, projMatrix, 0, 0, -getAltitude());
+
+    // After the rotateX, z values are in pixel units. Convert them to
+    // altitude unites. 1 altitude unit = the screen height.
+    matrix::scale(projMatrix, projMatrix, 1, -1, 1.0f / getHeight());
+
+    matrix::rotate_x(projMatrix, projMatrix, getPitch());
+    matrix::rotate_z(projMatrix, projMatrix, getAngle());
+
+    matrix::translate(projMatrix, projMatrix, pixel_x() - getWidth() / 2.0f,
+            pixel_y() - getHeight() / 2.0f, 0);
 }
 
 box TransformState::cornersToBox(uint32_t z) const {
-    const double ref_scale = std::pow(2, z);
-
-    const double angle_sin = std::sin(-angle);
-    const double angle_cos = std::cos(-angle);
-
-    const double w_2 = static_cast<double>(width) / 2.0;
-    const double h_2 = static_cast<double>(height) / 2.0;
-    const double ss_0 = scale * util::tileSize;
-    const double ss_1 = ref_scale / ss_0;
-    const double ss_2 = ss_0 / 2.0;
-
-    // Calculate the corners of the map view. The resulting coordinates will be
-    // in fractional tile coordinates.
-    box b;
-
-    b.tl.x = ((-w_2) * angle_cos - (-h_2) * angle_sin + ss_2 - x) * ss_1;
-    b.tl.y = ((-w_2) * angle_sin + (-h_2) * angle_cos + ss_2 - y) * ss_1;
-
-    b.tr.x = ((+w_2) * angle_cos - (-h_2) * angle_sin + ss_2 - x) * ss_1;
-    b.tr.y = ((+w_2) * angle_sin + (-h_2) * angle_cos + ss_2 - y) * ss_1;
-
-    b.bl.x = ((-w_2) * angle_cos - (+h_2) * angle_sin + ss_2 - x) * ss_1;
-    b.bl.y = ((-w_2) * angle_sin + (+h_2) * angle_cos + ss_2 - y) * ss_1;
-
-    b.br.x = ((+w_2) * angle_cos - (+h_2) * angle_sin + ss_2 - x) * ss_1;
-    b.br.y = ((+w_2) * angle_sin + (+h_2) * angle_cos + ss_2 - y) * ss_1;
-
-    b.center.x = (ss_2 - x) * ss_1;
-    b.center.y = (ss_2 - y) * ss_1;
-
+    double w = width;
+    double h = height;
+    box b(
+    pointToCoordinate({ 0, 0 }).zoomTo(z),
+    pointToCoordinate({ w, 0 }).zoomTo(z),
+    pointToCoordinate({ w, h }).zoomTo(z),
+    pointToCoordinate({ 0, h }).zoomTo(z));
     return b;
 }
 
@@ -73,23 +66,6 @@ uint16_t TransformState::getWidth() const {
 uint16_t TransformState::getHeight() const {
     return height;
 }
-
-uint16_t TransformState::getFramebufferWidth() const {
-    return framebuffer[0];
-}
-
-uint16_t TransformState::getFramebufferHeight() const {
-    return framebuffer[1];
-}
-
-const std::array<uint16_t, 2> TransformState::getFramebufferDimensions() const {
-    return framebuffer;
-}
-
-float TransformState::getPixelRatio() const {
-    return pixelRatio;
-}
-
 
 #pragma mark - Position
 
@@ -157,11 +133,11 @@ double TransformState::getMinZoom() const {
     double test_y = y;
     constrain(test_scale, test_y);
 
-    return std::log2(std::fmin(min_scale, test_scale));
+    return ::log2(::fmin(min_scale, test_scale));
 }
 
 double TransformState::getMaxZoom() const {
-    return std::log2(max_scale);
+    return ::log2(max_scale);
 }
 
 
@@ -171,91 +147,133 @@ float TransformState::getAngle() const {
     return angle;
 }
 
+float TransformState::getAltitude() const {
+    return altitude;
+}
+
+float TransformState::getPitch() const {
+    return pitch;
+}
 
 #pragma mark - Projection
 
-const vec2<double> TransformState::pixelForLatLng(const LatLng latLng) const {
-    LatLng ll = getLatLng();
-    double zoom = getZoom();
-
-    const double centerX = static_cast<double>(width) / 2.0;
-    const double centerY = static_cast<double>(height) / 2.0;
-
-    const double m = Projection::getMetersPerPixelAtLatitude(0, zoom);
-
-    const double angle_sin = std::sin(-angle);
-    const double angle_cos = std::cos(-angle);
-
-    const ProjectedMeters givenMeters = Projection::projectedMetersForLatLng(latLng);
-
-    const double givenAbsoluteX = givenMeters.easting  / m;
-    const double givenAbsoluteY = givenMeters.northing / m;
-
-    const ProjectedMeters centerMeters = Projection::projectedMetersForLatLng(ll);
-
-    const double centerAbsoluteX = centerMeters.easting  / m;
-    const double centerAbsoluteY = centerMeters.northing / m;
-
-    const double deltaX = givenAbsoluteX - centerAbsoluteX;
-    const double deltaY = givenAbsoluteY - centerAbsoluteY;
-
-    const double translatedX = deltaX + centerX;
-    const double translatedY = deltaY + centerY;
-
-    const double rotatedX = translatedX * angle_cos - translatedY * angle_sin;
-    const double rotatedY = translatedX * angle_sin + translatedY * angle_cos;
-
-    const double rotatedCenterX = centerX * angle_cos - centerY * angle_sin;
-    const double rotatedCenterY = centerX * angle_sin + centerY * angle_cos;
-
-    double x_ = rotatedX + (centerX - rotatedCenterX);
-    double y_ = rotatedY + (centerY - rotatedCenterY);
-
-    return vec2<double>(x_, y_);
+double TransformState::lngX(double lng) const {
+    return (180.0f + lng) * worldSize() / 360.0f;
 }
 
-const LatLng TransformState::latLngForPixel(const vec2<double> pixel) const {
-    LatLng ll = getLatLng();
-    double zoom = getZoom();
+double TransformState::latY(double lat) const {
+    double y_ = 180.0f / M_PI * std::log(std::tan(M_PI / 4 + lat * M_PI / 360.0f));
+    return (180.0f - y_) * worldSize() / 360.0f;
+}
 
-    const double centerX = width  / 2;
-    const double centerY = height / 2;
+double TransformState::xLng(double x_, double worldSize_) const {
+    return x_ * 360.0f / worldSize_ - 180.0f;
+}
 
-    const double m = Projection::getMetersPerPixelAtLatitude(0, zoom);
+double TransformState::yLat(double y_, double worldSize_) const {
+    double y2 = 180.0f - y_ * 360.0f / worldSize_;
+    return 360.0f / M_PI * std::atan(std::exp(y2 * M_PI / 180.0f)) - 90.0f;
+}
 
-    const double angle_sin = std::sin(angle);
-    const double angle_cos = std::cos(angle);
+double TransformState::zoomScale(double zoom) const {
+    return std::pow(2.0f, zoom);
+}
 
-    const double unrotatedCenterX = centerX * angle_cos - centerY * angle_sin;
-    const double unrotatedCenterY = centerX * angle_sin + centerY * angle_cos;
+float TransformState::worldSize() const {
+    return util::tileSize * scale;
+}
 
-    const double unrotatedX = pixel.x * angle_cos - pixel.y * angle_sin;
-    const double unrotatedY = pixel.x * angle_sin + pixel.y * angle_cos;
+vec2<double> TransformState::latLngToPoint(const LatLng& latLng) const {
+    return coordinateToPoint(latLngToCoordinate(latLng));
+}
 
-    const double givenX = unrotatedX + (centerX - unrotatedCenterX);
-    const double givenY = unrotatedY + (centerY - unrotatedCenterY);
+LatLng TransformState::pointToLatLng(const vec2<double> point) const {
+    return coordinateToLatLng(pointToCoordinate(point));
+}
 
-    const ProjectedMeters centerMeters = Projection::projectedMetersForLatLng(ll);
+TileCoordinate TransformState::latLngToCoordinate(const LatLng& latLng) const {
+    const double tileZoom = getZoom();
+    const double k = zoomScale(tileZoom) / worldSize();
+    return {
+        lngX(latLng.longitude) * k,
+        latY(latLng.latitude) * k,
+        tileZoom
+    };
+}
 
-    const double centerAbsoluteX = centerMeters.easting  / m;
-    const double centerAbsoluteY = centerMeters.northing / m;
+LatLng TransformState::coordinateToLatLng(const TileCoordinate& coord) const {
+    const double worldSize_ = zoomScale(coord.zoom);
+    LatLng latLng = {
+        yLat(coord.row, worldSize_),
+        xLng(coord.column, worldSize_)
+    };
+    while (latLng.longitude < -180.0f) latLng.longitude += 360.0f;
+    while (latLng.longitude > 180.0f) latLng.longitude -= 360.0f;
+    return latLng;
+}
 
-    const double givenAbsoluteX = givenX + centerAbsoluteX - centerX;
-    const double givenAbsoluteY = givenY + centerAbsoluteY - centerY;
+vec2<double> TransformState::coordinateToPoint(const TileCoordinate& coord) const {
+    mat4 mat = coordinatePointMatrix(coord.zoom);
+    matrix::vec4 p;
+    matrix::vec4 c = {{ coord.column, coord.row, 0, 1 }};
+    matrix::transformMat4(p, c, mat);
+    return { p[0] / p[3], height - p[1] / p[3] };
+}
 
-    ProjectedMeters givenMeters = ProjectedMeters(givenAbsoluteY * m, givenAbsoluteX * m);
+TileCoordinate TransformState::pointToCoordinate(const vec2<double> point) const {
 
-    // adjust for date line
-    ProjectedMeters sw, ne;
-    Projection::getWorldBoundsMeters(sw, ne);
-    double d = ne.easting - sw.easting;
-    if (ll.longitude > 0 && givenMeters.easting > centerMeters.easting) givenMeters.easting -= d;
+    float targetZ = 0;
+    const double tileZoom = getZoom();
 
-    // adjust for world wrap
-    while (givenMeters.easting < sw.easting) givenMeters.easting += d;
-    while (givenMeters.easting > ne.easting) givenMeters.easting -= d;
+    mat4 mat = coordinatePointMatrix(tileZoom);
 
-    return Projection::latLngForProjectedMeters(givenMeters);
+    mat4 inverted;
+    bool err = matrix::invert(inverted, mat);
+
+    if (err) throw std::runtime_error("failed to invert coordinatePointMatrix");
+
+    double flippedY = height - point.y;
+
+    // since we don't know the correct projected z value for the point,
+    // unproject two points to get a line and then find the point on that
+    // line with z=0
+
+    matrix::vec4 coord0;
+    matrix::vec4 coord1;
+    matrix::vec4 point0 = {{ point.x, flippedY, 0, 1 }};
+    matrix::vec4 point1 = {{ point.x, flippedY, 1, 1 }};
+    matrix::transformMat4(coord0, point0, inverted);
+    matrix::transformMat4(coord1, point1, inverted);
+
+    double w0 = coord0[3];
+    double w1 = coord1[3];
+    double x0 = coord0[0] / w0;
+    double x1 = coord1[0] / w1;
+    double y0 = coord0[1] / w0;
+    double y1 = coord1[1] / w1;
+    double z0 = coord0[2] / w0;
+    double z1 = coord1[2] / w1;
+
+    double t = z0 == z1 ? 0 : (targetZ - z0) / (z1 - z0);
+  
+    return { util::interpolate(x0, x1, t), util::interpolate(y0, y1, t), tileZoom };
+}
+
+mat4 TransformState::coordinatePointMatrix(double z) const {
+    mat4 proj;
+    getProjMatrix(proj);
+    float s = util::tileSize * scale / std::pow(2, z);
+    matrix::scale(proj, proj, s, s, 1);
+    matrix::multiply(proj, getPixelMatrix(), proj);
+    return proj;
+}
+
+mat4 TransformState::getPixelMatrix() const {
+    mat4 m;
+    matrix::identity(m);
+    matrix::scale(m, m, width / 2.0f, -height / 2.0f, 1);
+    matrix::translate(m, m, 1, -1, 0);
+    return m;
 }
 
 

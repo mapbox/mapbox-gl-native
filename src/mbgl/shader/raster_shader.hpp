@@ -10,7 +10,7 @@ class RasterShader : public Shader {
 public:
     RasterShader();
 
-    void bind(char *offset);
+    void bind(GLbyte *offset) final;
 
     UniformMatrix<4>              u_matrix            = {"u_matrix",            *this};
     Uniform<int32_t>              u_image             = {"u_image",             *this};
@@ -21,9 +21,6 @@ public:
     Uniform<float>                u_saturation_factor = {"u_saturation_factor", *this};
     Uniform<float>                u_contrast_factor   = {"u_contrast_factor",   *this};
     Uniform<std::array<float, 3>> u_spin_weights      = {"u_spin_weights",      *this};
-
-private:
-    int32_t a_pos = -1;
 };
 
 }

@@ -20,21 +20,17 @@
 
 namespace mbgl {
 
-HeadlessView::HeadlessView(uint16_t width, uint16_t height, float pixelRatio)
-    : display(std::make_shared<HeadlessDisplay>()) {
-    activate();
-    resize(width, height, pixelRatio);
-    deactivate();
+HeadlessView::HeadlessView(float pixelRatio_, uint16_t width, uint16_t height)
+    : display(std::make_shared<HeadlessDisplay>()), pixelRatio(pixelRatio_) {
+    resize(width, height);
 }
 
 HeadlessView::HeadlessView(std::shared_ptr<HeadlessDisplay> display_,
+                           float pixelRatio_,
                            uint16_t width,
-                           uint16_t height,
-                           float pixelRatio)
-    : display(display_) {
-    activate();
-    resize(width, height, pixelRatio);
-    deactivate();
+                           uint16_t height)
+    : display(display_), pixelRatio(pixelRatio_) {
+    resize(width, height);
 }
 
 void HeadlessView::loadExtensions() {
@@ -118,17 +114,15 @@ bool HeadlessView::isActive() {
     return std::this_thread::get_id() == thread;
 }
 
-HeadlessView::Dimensions::Dimensions(uint16_t width_, uint16_t height_, float pixelRatio_)
-    : width(width_), height(height_), pixelRatio(pixelRatio_) {
-}
+void HeadlessView::resizeFramebuffer() {
+    assert(isActive());
 
-void HeadlessView::resize(const uint16_t width, const uint16_t height, const float pixelRatio) {
-    dimensions = { width, height, pixelRatio };
+    if (!needsResize) return;
 
     clearBuffers();
 
-    const unsigned int w = dimensions.width * dimensions.pixelRatio;
-    const unsigned int h = dimensions.height * dimensions.pixelRatio;
+    const unsigned int w = dimensions[0] * pixelRatio;
+    const unsigned int h = dimensions[1] * pixelRatio;
 
     // Create depth/stencil buffer
     MBGL_CHECK_ERROR(glGenRenderbuffersEXT(1, &fboDepthStencil));
@@ -150,26 +144,33 @@ void HeadlessView::resize(const uint16_t width, const uint16_t height, const flo
     GLenum status = MBGL_CHECK_ERROR(glCheckFramebufferStatusEXT(GL_FRAMEBUFFER_EXT));
 
     if (status != GL_FRAMEBUFFER_COMPLETE_EXT) {
-        std::stringstream error("Couldn't create framebuffer: ");
+        std::string error("Couldn't create framebuffer: ");
         switch (status) {
-            case GL_FRAMEBUFFER_INCOMPLETE_ATTACHMENT_EXT: (error << "incomplete attachment.\n"); break;
-            case GL_FRAMEBUFFER_INCOMPLETE_MISSING_ATTACHMENT_EXT: error << "incomplete missing attachment.\n"; break;
-            case GL_FRAMEBUFFER_INCOMPLETE_DIMENSIONS_EXT: error << "incomplete dimensions.\n"; break;
-            case GL_FRAMEBUFFER_INCOMPLETE_FORMATS_EXT: error << "incomplete formats.\n"; break;
-            case GL_FRAMEBUFFER_INCOMPLETE_DRAW_BUFFER_EXT: error << "incomplete draw buffer.\n"; break;
-            case GL_FRAMEBUFFER_INCOMPLETE_READ_BUFFER_EXT: error << "incomplete read buffer.\n"; break;
-            case GL_FRAMEBUFFER_UNSUPPORTED: error << "unsupported.\n"; break;
-            default: error << "other\n"; break;
+            case GL_FRAMEBUFFER_INCOMPLETE_ATTACHMENT_EXT: (error += "incomplete attachment"); break;
+            case GL_FRAMEBUFFER_INCOMPLETE_MISSING_ATTACHMENT_EXT: error += "incomplete missing attachment"; break;
+            case GL_FRAMEBUFFER_INCOMPLETE_DIMENSIONS_EXT: error += "incomplete dimensions"; break;
+            case GL_FRAMEBUFFER_INCOMPLETE_FORMATS_EXT: error += "incomplete formats"; break;
+            case GL_FRAMEBUFFER_INCOMPLETE_DRAW_BUFFER_EXT: error += "incomplete draw buffer"; break;
+            case GL_FRAMEBUFFER_INCOMPLETE_READ_BUFFER_EXT: error += "incomplete read buffer"; break;
+            case GL_FRAMEBUFFER_UNSUPPORTED: error += "unsupported"; break;
+            default: error += "other"; break;
         }
-        throw std::runtime_error(error.str());
+        throw std::runtime_error(error);
     }
+
+    needsResize = false;
+}
+
+void HeadlessView::resize(const uint16_t width, const uint16_t height) {
+    dimensions = {{ width, height }};
+    needsResize = true;
 }
 
 std::unique_ptr<StillImage> HeadlessView::readStillImage() {
     assert(isActive());
 
-    const unsigned int w = dimensions.pixelWidth();
-    const unsigned int h = dimensions.pixelHeight();
+    const unsigned int w = dimensions[0] * pixelRatio;
+    const unsigned int h = dimensions[1] * pixelRatio;
 
     auto image = std::make_unique<StillImage>();
     image->width = w;
@@ -234,6 +235,19 @@ void HeadlessView::notify() {
     // no-op
 }
 
+float HeadlessView::getPixelRatio() const {
+    return pixelRatio;
+}
+
+std::array<uint16_t, 2> HeadlessView::getSize() const {
+    return dimensions;
+}
+
+std::array<uint16_t, 2> HeadlessView::getFramebufferSize() const {
+    return {{ static_cast<uint16_t>(dimensions[0] * pixelRatio),
+              static_cast<uint16_t>(dimensions[1] * pixelRatio) }};
+}
+
 void HeadlessView::activate() {
      if (thread != std::thread::id()) {
         throw std::runtime_error("OpenGL context was already current");
@@ -284,7 +298,11 @@ void HeadlessView::invalidate() {
     // no-op
 }
 
-void HeadlessView::swap() {
+void HeadlessView::beforeRender() {
+    resizeFramebuffer();
+}
+
+void HeadlessView::afterRender() {
     // no-op
 }
 

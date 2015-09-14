@@ -13,7 +13,6 @@
 
 #include <string>
 #include <vector>
-#include <mutex>
 #include <memory>
 #include <unordered_map>
 #include <unordered_set>
@@ -53,6 +52,7 @@ public:
     ~AnnotationManager();
 
     void markStaleTiles(std::unordered_set<TileID, TileID::Hash>);
+    size_t getStaleTileCount() const { return staleTiles.size(); }
     std::unordered_set<TileID, TileID::Hash> resetStaleTiles();
 
     void setDefaultPointAnnotationSymbol(const std::string& symbol);
@@ -90,7 +90,6 @@ private:
         const uint8_t maxZoom);
 
 private:
-    mutable std::mutex mtx;
     std::string defaultPointAnnotationSymbol;
     std::unordered_map<uint32_t, std::unique_ptr<Annotation>> annotations;
     std::vector<uint32_t> orderedShapeAnnotations;

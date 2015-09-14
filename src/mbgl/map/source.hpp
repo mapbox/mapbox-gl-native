@@ -22,10 +22,6 @@
 namespace mbgl {
 
 class MapData;
-class GlyphAtlas;
-class GlyphStore;
-class SpriteAtlas;
-class Sprite;
 class TexturePool;
 class Style;
 class Painter;
@@ -78,10 +74,6 @@ public:
     bool update(MapData&,
                 const TransformState&,
                 Style&,
-                GlyphAtlas&,
-                GlyphStore&,
-                SpriteAtlas&,
-                util::ptr<Sprite>,
                 TexturePool&,
                 bool shouldReparsePartialTiles);
 
@@ -119,10 +111,6 @@ private:
     TileData::State addTile(MapData&,
                             const TransformState&,
                             Style&,
-                            GlyphAtlas&,
-                            GlyphStore&,
-                            SpriteAtlas&,
-                            util::ptr<Sprite>,
                             TexturePool&,
                             const TileID&);
 

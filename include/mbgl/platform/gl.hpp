@@ -19,7 +19,7 @@
     #else
         #error Unsupported Apple platform
     #endif
-#elif __ANDROID__
+#elif __ANDROID__ || MBGL_USE_GLES2
     #define GL_GLEXT_PROTOTYPES
     #include <GLES2/gl2.h>
     #include <GLES2/gl2ext.h>

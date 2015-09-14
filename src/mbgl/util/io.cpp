@@ -1,6 +1,7 @@
 #include <mbgl/util/io.hpp>
 
 #include <cstdio>
+#include <cerrno>
 #include <iostream>
 #include <sstream>
 #include <fstream>

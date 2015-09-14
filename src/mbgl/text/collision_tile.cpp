@@ -3,17 +3,17 @@
 
 namespace mbgl {
 
-void CollisionTile::reset(const float _angle, const float pitch) {
+CollisionTile::CollisionTile(const float angle_, const float pitch, bool debug_) :
+    angle(angle_), debug(debug_) {
     tree.clear();
-    angle = _angle;
 
      // Compute the transformation matrix.
-    float angle_sin = std::sin(_angle);
-    float angle_cos = std::cos(_angle);
+    float angle_sin = std::sin(angle);
+    float angle_cos = std::cos(angle);
     rotationMatrix = {{angle_cos, -angle_sin, angle_sin, angle_cos}};
 
     // Stretch boxes in y direction to account for the map tilt.
-    const float _yStretch = 1.0f / std::cos(pitch / 180 * M_PI);
+    const float _yStretch = 1.0f / std::cos(pitch);
 
     // The amount the map is squished depends on the y position.
     // Sort of account for this by making all boxes a bit bigger.
@@ -44,7 +44,7 @@ float CollisionTile::placeFeature(const CollisionFeature &feature) {
             if (std::isnan(s1) || std::isnan(s2)) s1 = s2 = 1;
             if (std::isnan(s3) || std::isnan(s4)) s3 = s4 = 1;
 
-            float collisionFreeScale = std::fmin(std::fmax(s1, s2), std::fmax(s3, s4));
+            float collisionFreeScale = ::fmin(::fmax(s1, s2), ::fmax(s3, s4));
 
             if (collisionFreeScale > blocking.maxScale) {
                 // After a box's maxScale the label has shrunk enough that the box is no longer needed to cover it,
@@ -91,11 +91,11 @@ void CollisionTile::insertFeature(CollisionFeature &feature, const float minPlac
 
 Box CollisionTile::getTreeBox(const vec2<float> &anchor, const CollisionBox &box) {
     return Box{
-        Point{
+        CollisionPoint{
             anchor.x + box.x1,
             anchor.y + box.y1 * yStretch
         },
-        Point{
+        CollisionPoint{
             anchor.x + box.x2,
             anchor.y + box.y2 * yStretch
         }

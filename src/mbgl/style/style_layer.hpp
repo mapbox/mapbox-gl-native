@@ -7,6 +7,8 @@
 #include <mbgl/style/applied_class_properties.hpp>
 #include <mbgl/style/zoom_history.hpp>
 
+#include <mbgl/renderer/render_pass.hpp>
+
 #include <mbgl/util/ptr.hpp>
 #include <mbgl/util/noncopyable.hpp>
 #include <mbgl/util/chrono.hpp>
@@ -35,15 +37,16 @@ public:
     // Determines whether this layer is the background layer.
     bool isBackground() const;
 
-    // Checks whether the layer is currently visible at all.
-    bool isVisible() const;
+public:
+    // Checks whether this layer needs to be rendered in the given render pass.
+    bool hasRenderPass(RenderPass) const;
 
     // Updates the StyleProperties information in this layer by evaluating all
     // pending transitions and applied classes in order.
-    void updateProperties(float z, TimePoint now, ZoomHistory &zoomHistory);
+    void updateProperties(float z, const TimePoint& now, ZoomHistory &zoomHistory);
 
     // Sets the list of classes and creates transitions to the currently applied values.
-    void setClasses(const std::vector<std::string> &class_names, TimePoint now,
+    void setClasses(const std::vector<std::string> &class_names, const TimePoint& now,
                     const PropertyTransition &defaultTransition);
 
     bool hasTransitions() const;
@@ -51,16 +54,19 @@ public:
 private:
     // Applies all properties from a class, if they haven't been applied already.
     void applyClassProperties(ClassID class_id, std::set<PropertyKey> &already_applied,
-                              TimePoint now, const PropertyTransition &defaultTransition);
+                              const TimePoint& now, const PropertyTransition &defaultTransition);
 
     // Sets the properties of this object by evaluating all pending transitions and
     // aplied classes in order.
-    template <typename T> void applyStyleProperties(float z, TimePoint now, const ZoomHistory &zoomHistory);
-    template <typename T> void applyStyleProperty(PropertyKey key, T &, float z, TimePoint now, const ZoomHistory &zoomHistory);
-    template <typename T> void applyTransitionedStyleProperty(PropertyKey key, T &, float z, TimePoint now, const ZoomHistory &zoomHistory);
+    template <typename T> void applyStyleProperties(float z, const TimePoint& now, const ZoomHistory &zoomHistory);
+    template <typename T> void applyStyleProperty(PropertyKey key, T &, float z, const TimePoint& now, const ZoomHistory &zoomHistory);
+    template <typename T> void applyTransitionedStyleProperty(PropertyKey key, T &, float z, const TimePoint& now, const ZoomHistory &zoomHistory);
 
     // Removes all expired style transitions.
-    void cleanupAppliedStyleProperties(TimePoint now);
+    void cleanupAppliedStyleProperties(const TimePoint& now);
+
+    // Checks whether the layer is currently visible at all.
+    bool isVisible() const;
 
 public:
     // The name of this layer.
@@ -78,7 +84,11 @@ public:
 private:
     // For every property, stores a list of applied property values, with
     // optional transition times.
-    std::map<PropertyKey, AppliedClassProperties> appliedStyle;
+    std::map<PropertyKey, AppliedClassPropertyValues> appliedStyle;
+
+    // Stores what render passes this layer is currently enabled for. This depends on the
+    // evaluated StyleProperties object and is updated accordingly.
+    RenderPass passes = RenderPass::None;
 
 public:
     // Stores the evaluated, and cascaded styling information, specific to this

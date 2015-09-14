@@ -7,7 +7,7 @@
 using namespace mbgl;
 
 void Painter::drawClippingMasks(const std::set<Source*>& sources) {
-    gl::debugging::group group("clipping masks");
+    MBGL_DEBUG_GROUP("clipping masks");
 
     useProgram(plainShader->program);
     config.stencilTest = true;
@@ -16,7 +16,7 @@ void Painter::drawClippingMasks(const std::set<Source*>& sources) {
     config.colorMask = { false, false, false, false };
     config.depthRange = { 1.0f, 1.0f };
 
-    coveringPlainArray.bind(*plainShader, tileStencilBuffer, BUFFER_OFFSET(0));
+    coveringPlainArray.bind(*plainShader, tileStencilBuffer, BUFFER_OFFSET_0);
 
     for (const auto& source : sources) {
         source->drawClippingMasks(*this);

@@ -27,7 +27,7 @@ const static bool png_version_check = []() {
 namespace mbgl {
 namespace util {
 
-std::string compress_png(int width, int height, void *rgba) {
+std::string compress_png(int width, int height, const void *rgba) {
     png_voidp error_ptr = 0;
     png_structp png_ptr = png_create_write_struct(PNG_LIBPNG_VER_STRING, error_ptr, NULL, NULL);
     if (!png_ptr) {

@@ -30,22 +30,32 @@
       ],
       'sources': [
         'fixtures/main.cpp',
+        'fixtures/mock_file_source.cpp',
+        'fixtures/mock_file_source.hpp',
+        'fixtures/mock_view.hpp',
         'fixtures/util.hpp',
         'fixtures/util.cpp',
         'fixtures/fixture_log_observer.hpp',
         'fixtures/fixture_log_observer.cpp',
 
+        'miscellaneous/assert.cpp',
+
+        'annotations/sprite_atlas.cpp',
+        'annotations/sprite_image.cpp',
+        'annotations/sprite_store.cpp',
+        'annotations/sprite_parser.cpp',
+
+        'api/annotations.cpp',
         'api/api_misuse.cpp',
         'api/repeated_render.cpp',
         'api/set_style.cpp',
 
-        'headless/headless.cpp',
 
-        'miscellaneous/assert.cpp',
         'miscellaneous/clip_ids.cpp',
         'miscellaneous/binpack.cpp',
         'miscellaneous/bilinear.cpp',
         'miscellaneous/comparisons.cpp',
+        'miscellaneous/custom_sprites.cpp',
         'miscellaneous/enums.cpp',
         'miscellaneous/functions.cpp',
         'miscellaneous/geo.cpp',
@@ -58,8 +68,8 @@
         'miscellaneous/thread.cpp',
         'miscellaneous/tile.cpp',
         'miscellaneous/transform.cpp',
+        'miscellaneous/work_queue.cpp',
         'miscellaneous/variant.cpp',
-        'miscellaneous/worker.cpp',
 
         'storage/storage.hpp',
         'storage/storage.cpp',
@@ -77,26 +87,25 @@
         'storage/http_other_loop.cpp',
         'storage/http_reading.cpp',
 
-        'style/mock_file_source.cpp',
-        'style/mock_file_source.hpp',
-        'style/mock_view.hpp',
+        'style/glyph_store.cpp',
         'style/pending_resources.cpp',
         'style/resource_loading.cpp',
+        'style/sprite.cpp',
       ],
       'libraries': [
-        '<@(uv_static_libs)',
-        '<@(sqlite3_static_libs)',
+        '<@(libuv_static_libs)',
+        '<@(sqlite_static_libs)',
       ],
       'variables': {
         'cflags_cc': [
-          '<@(uv_cflags)',
+          '<@(libuv_cflags)',
           '<@(opengl_cflags)',
           '<@(boost_cflags)',
-          '<@(sqlite3_cflags)',
+          '<@(sqlite_cflags)',
         ],
         'ldflags': [
-          '<@(uv_ldflags)',
-          '<@(sqlite3_ldflags)',
+          '<@(libuv_ldflags)',
+          '<@(sqlite_ldflags)',
         ],
       },
       'conditions': [

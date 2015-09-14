@@ -4,10 +4,11 @@ namespace mbgl {
 namespace util {
 
 const std::vector<std::pair<std::string, std::string>> defaultStyles = {
-    { "asset://styles/mapbox-streets-v7.json", "Mapbox Streets" },
-    { "asset://styles/emerald-v7.json", "Emerald" },
-    { "asset://styles/light-v7.json", "Light" },
-    { "asset://styles/dark-v7.json", "Dark" }
+    { "asset://styles/streets-v8.json", "Mapbox Streets" },
+    { "asset://styles/emerald-v8.json", "Emerald" },
+    { "asset://styles/light-v8.json", "Light" },
+    { "asset://styles/dark-v8.json", "Dark" },
+    { "asset://styles/satellite-v8.json", "Satellite" }
 };
 
 } // end namespace util

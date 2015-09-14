@@ -67,7 +67,7 @@ void FillBucket::addGeometry(const GeometryCollection& geometryCollection) {
         for (auto& v : line_) {
             line.emplace_back(v.x, v.y);
         }
-        if (line.size()) {
+        if (!line.empty()) {
             clipper.AddPath(line, ClipperLib::ptSubject, true);
             line.clear();
             hasVertices = true;
@@ -87,7 +87,7 @@ void FillBucket::tessellate() {
     clipper.Execute(ClipperLib::ctUnion, polygons, ClipperLib::pftEvenOdd, ClipperLib::pftEvenOdd);
     clipper.Clear();
 
-    if (polygons.size() == 0) {
+    if (polygons.empty()) {
         return;
     }
 
@@ -100,7 +100,7 @@ void FillBucket::tessellate() {
         throw geometry_too_long_exception();
     }
 
-    if (!lineGroups.size() || (lineGroups.back()->vertex_length + total_vertex_count > 65535)) {
+    if (lineGroups.empty() || (lineGroups.back()->vertex_length + total_vertex_count > 65535)) {
         // Move to a new group because the old one can't hold the geometry.
         lineGroups.emplace_back(std::make_unique<LineGroup>());
     }
@@ -141,13 +141,13 @@ void FillBucket::tessellate() {
 
         for (size_t i = 0; i < vertex_count; ++i) {
             if (vertex_indices[i] == TESS_UNDEF) {
-                vertexBuffer.add(std::round(vertices[i * 2]), std::round(vertices[i * 2 + 1]));
+                vertexBuffer.add(::round(vertices[i * 2]), ::round(vertices[i * 2 + 1]));
                 vertex_indices[i] = (TESSindex)total_vertex_count;
                 total_vertex_count++;
             }
         }
 
-        if (!triangleGroups.size() || (triangleGroups.back()->vertex_length + total_vertex_count > 65535)) {
+        if (triangleGroups.empty() || (triangleGroups.back()->vertex_length + total_vertex_count > 65535)) {
             // Move to a new group because the old one can't hold the geometry.
             triangleGroups.emplace_back(std::make_unique<TriangleGroup>());
         }
@@ -216,8 +216,8 @@ bool FillBucket::hasData() const {
 }
 
 void FillBucket::drawElements(PlainShader& shader) {
-    char *vertex_index = BUFFER_OFFSET(vertex_start * vertexBuffer.itemSize);
-    char *elements_index = BUFFER_OFFSET(triangle_elements_start * triangleElementsBuffer.itemSize);
+    GLbyte *vertex_index = BUFFER_OFFSET(vertex_start * vertexBuffer.itemSize);
+    GLbyte *elements_index = BUFFER_OFFSET(triangle_elements_start * triangleElementsBuffer.itemSize);
     for (auto& group : triangleGroups) {
         assert(group);
         group->array[0].bind(shader, vertexBuffer, triangleElementsBuffer, vertex_index);
@@ -228,8 +228,8 @@ void FillBucket::drawElements(PlainShader& shader) {
 }
 
 void FillBucket::drawElements(PatternShader& shader) {
-    char *vertex_index = BUFFER_OFFSET(vertex_start * vertexBuffer.itemSize);
-    char *elements_index = BUFFER_OFFSET(triangle_elements_start * triangleElementsBuffer.itemSize);
+    GLbyte *vertex_index = BUFFER_OFFSET(vertex_start * vertexBuffer.itemSize);
+    GLbyte *elements_index = BUFFER_OFFSET(triangle_elements_start * triangleElementsBuffer.itemSize);
     for (auto& group : triangleGroups) {
         assert(group);
         group->array[1].bind(shader, vertexBuffer, triangleElementsBuffer, vertex_index);
@@ -240,8 +240,8 @@ void FillBucket::drawElements(PatternShader& shader) {
 }
 
 void FillBucket::drawVertices(OutlineShader& shader) {
-    char *vertex_index = BUFFER_OFFSET(vertex_start * vertexBuffer.itemSize);
-    char *elements_index = BUFFER_OFFSET(line_elements_start * lineElementsBuffer.itemSize);
+    GLbyte *vertex_index = BUFFER_OFFSET(vertex_start * vertexBuffer.itemSize);
+    GLbyte *elements_index = BUFFER_OFFSET(line_elements_start * lineElementsBuffer.itemSize);
     for (auto& group : lineGroups) {
         assert(group);
         group->array[0].bind(shader, vertexBuffer, lineElementsBuffer, vertex_index);

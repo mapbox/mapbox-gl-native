@@ -45,6 +45,7 @@ NSString *const MGLEventGestureQuickZoom = @"QuickZoom";
 NSString *const MGLEventGesturePanStart = @"Pan";
 NSString *const MGLEventGesturePinchStart = @"Pinch";
 NSString *const MGLEventGestureRotateStart = @"Rotation";
+NSString *const MGLEventGesturePitchStart = @"Pitch";
 
 const NSUInteger MGLMaximumEventsPerFlush = 20;
 const NSTimeInterval MGLFlushInterval = 60;
@@ -604,10 +605,7 @@ const NSTimeInterval MGLFlushInterval = 60;
             [request setHTTPBody:jsonData];
 
             // Send non blocking HTTP Request to server
-            NSURLSessionDataTask *task = [_session dataTaskWithRequest:request completionHandler:^(__unused NSData * __nullable data, __unused NSURLResponse * __nullable response, __unused NSError * __nullable error)
-            {
-            }];
-            [task resume];
+            [[_session dataTaskWithRequest:request] resume];
         }
     });
 }

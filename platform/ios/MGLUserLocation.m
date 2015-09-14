@@ -37,13 +37,13 @@ NS_ASSUME_NONNULL_END
 
 - (void)setLocation:(CLLocation *)newLocation
 {
-    if ([newLocation distanceFromLocation:_location] && newLocation.coordinate.latitude != 0 &&
-            newLocation.coordinate.longitude != 0)
-    {
-        [self willChangeValueForKey:@"location"];
-        _location = newLocation;
-        [self didChangeValueForKey:@"location"];
-    }
+    if ( ! newLocation || ! CLLocationCoordinate2DIsValid(newLocation.coordinate)) return;
+    if ( _location && CLLocationCoordinate2DIsValid(_location.coordinate) && [newLocation distanceFromLocation:_location] == 0) return;
+    if (newLocation.coordinate.latitude == 0 && newLocation.coordinate.longitude == 0) return;
+
+    [self willChangeValueForKey:@"location"];
+    _location = newLocation;
+    [self didChangeValueForKey:@"location"];
 }
 
 - (BOOL)isUpdating

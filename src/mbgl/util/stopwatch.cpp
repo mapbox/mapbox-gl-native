@@ -28,7 +28,7 @@ void stopwatch::report(const std::string &name_) {
 }
 
 stopwatch::~stopwatch() {
-    if (name.size()) {
+    if (!name.empty()) {
         report(name);
     }
 }

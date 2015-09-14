@@ -32,19 +32,14 @@ public:
     // Invoke object->fn(args...) in the runloop thread.
     template <typename Fn, class... Args>
     void invoke(Fn fn, Args&&... args) {
-        loop->invoke(bind<Fn, Args...>(fn), std::forward<Args>(args)...);
+        loop->invoke(bind(fn), std::forward<Args>(args)...);
     }
 
     // Invoke object->fn(args...) in the runloop thread, then invoke callback(result) in the current thread.
-    template <class R, typename Fn, class... Args>
-    void invokeWithResult(Fn fn, std::function<void (R)> callback, Args&&... args) {
-        loop->invokeWithResult(bind<Fn, Args...>(fn), callback, std::forward<Args>(args)...);
-    }
-
-    // Invoke object->fn(args...) in the runloop thread, then invoke callback() in the current thread.
-    template <typename Fn, class... Args>
-    void invokeWithResult(Fn fn, std::function<void ()> callback, Args&&... args) {
-        loop->invokeWithResult(bind<Fn, Args...>(fn), callback, std::forward<Args>(args)...);
+    template <typename Fn, class Cb, class... Args>
+    std::unique_ptr<WorkRequest>
+    invokeWithCallback(Fn fn, Cb&& callback, Args&&... args) {
+        return loop->invokeWithCallback(bind(fn), callback, std::forward<Args>(args)...);
     }
 
     // Invoke object->fn(args...) in the runloop thread, and wait for the result.
@@ -62,7 +57,7 @@ public:
         std::packaged_task<void ()> task(std::bind(fn, object, args...));
         std::future<void> future = task.get_future();
         loop->invoke(std::move(task));
-        return future.get();
+        future.get();
     }
 
 private:
@@ -71,9 +66,11 @@ private:
     Thread& operator=(const Thread&) = delete;
     Thread& operator=(Thread&&) = delete;
 
-    template <typename Fn, class... Args>
+    template <typename Fn>
     auto bind(Fn fn) {
-        return [fn, this] (Args&&... a) { return (object->*fn)(std::forward<Args>(a)...); };
+        return [fn, this] (auto &&... args) {
+            return (object->*fn)(std::forward<decltype(args)>(args)...);
+        };
     }
 
     template <typename P, std::size_t... I>
@@ -115,13 +112,13 @@ template <typename P, std::size_t... I>
 void Thread<Object>::run(ThreadContext context, P&& params, std::index_sequence<I...>) {
     uv::loop l;
 
-    {
-        ThreadContext::current.set(&context);
+    ThreadContext::current.set(&context);
 
+    {
         RunLoop loop_(l.get());
         loop = &loop_;
 
-        Object object_(l.get(), std::get<I>(std::forward<P>(params))...);
+        Object object_(std::get<I>(std::forward<P>(params))...);
         object = &object_;
 
         running.set_value();
@@ -129,12 +126,12 @@ void Thread<Object>::run(ThreadContext context, P&& params, std::index_sequence<
 
         loop = nullptr;
         object = nullptr;
-
-        ThreadContext::current.set(nullptr);
     }
 
     // Run the loop again to ensure that async close callbacks have been called.
     l.run();
+
+    ThreadContext::current.set(nullptr);
 
     joinable.get_future().get();
 }

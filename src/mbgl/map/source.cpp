@@ -9,6 +9,7 @@
 #include <mbgl/storage/response.hpp>
 #include <mbgl/util/math.hpp>
 #include <mbgl/util/box.hpp>
+#include <mbgl/util/tile_coordinate.hpp>
 #include <mbgl/util/mapbox.hpp>
 #include <mbgl/storage/file_source.hpp>
 #include <mbgl/style/style_layer.hpp>
@@ -98,7 +99,7 @@ void SourceInfo::parseTileJSONProperties(const rapidjson::Value& value) {
 }
 
 std::string SourceInfo::tileURL(const TileID& id, float pixelRatio) const {
-    std::string result = tiles.at((id.x + id.y) % tiles.size());
+    std::string result = tiles.at(0);
     result = util::mapbox::normalizeTileURL(result, url, type);
     result = util::replaceTokens(result, [&](const std::string &token) -> std::string {
         if (token == "z") return util::toString(std::min(id.z, static_cast<int8_t>(max_zoom)));
@@ -148,7 +149,7 @@ void Source::load() {
     }
 
     FileSource* fs = util::ThreadContext::getFileSource();
-    req = fs->request({ Resource::Kind::Source, info.url }, util::RunLoop::current.get()->get(), [this](const Response &res) {
+    req = fs->request({ Resource::Kind::Source, info.url }, util::RunLoop::getLoop(), [this](const Response &res) {
         req = nullptr;
 
         if (res.status != Response::Successful) {
@@ -186,7 +187,7 @@ void Source::updateMatrices(const mat4 &projMatrix, const TransformState &transf
 void Source::drawClippingMasks(Painter &painter) {
     for (const auto& pair : tiles) {
         Tile &tile = *pair.second;
-        gl::debugging::group group(std::string { "mask: " } + std::string(tile.id));
+        MBGL_DEBUG_GROUP(std::string { "mask: " } + std::string(tile.id));
         painter.drawClippingMask(tile.matrix, tile.clip);
     }
 }
@@ -225,7 +226,7 @@ TileData::State Source::hasTile(const TileID& id) {
     return TileData::State::invalid;
 }
 
-bool Source::handlePartialTile(const TileID& id, Worker& worker) {
+bool Source::handlePartialTile(const TileID& id, Worker&) {
     const TileID normalized_id = id.normalized();
 
     auto it = tile_data.find(normalized_id);
@@ -233,31 +234,21 @@ bool Source::handlePartialTile(const TileID& id, Worker& worker) {
         return true;
     }
 
-    util::ptr<TileData> data = it->second.lock();
+    // Note: this uses a raw pointer; we don't want the callback binding to have a
+    // shared pointer.
+    VectorTileData* data = dynamic_cast<VectorTileData*>(it->second.lock().get());
     if (!data) {
         return true;
     }
 
-    // The signal is only emitted if there was an actual change on the tile. The
-    // tile can be in a "partial" state waiting for resources and get reparsed on
-    // the arrival of new resources that were needed by another tile.
-    size_t bucketCount = static_cast<VectorTileData*>(data.get())->countBuckets();
-    auto callback = [this, data, bucketCount]() {
-        if (static_cast<VectorTileData*>(data.get())->countBuckets() > bucketCount) {
-            emitTileLoaded(false);
-        }
-    };
-
-    return data->reparse(worker, callback);
+    return data->reparse([this, data]() {
+	emitTileLoaded(false);
+    });
 }
 
 TileData::State Source::addTile(MapData& data,
                                 const TransformState& transformState,
                                 Style& style,
-                                GlyphAtlas& glyphAtlas,
-                                GlyphStore& glyphStore,
-                                SpriteAtlas& spriteAtlas,
-                                util::ptr<Sprite> sprite,
                                 TexturePool& texturePool,
                                 const TileID& id) {
     const TileData::State state = hasTile(id);
@@ -294,21 +285,17 @@ TileData::State Source::addTile(MapData& data,
 
         // If we don't find working tile data, we're just going to load it.
         if (info.type == SourceType::Vector) {
-            new_tile.data =
-                std::make_shared<VectorTileData>(normalized_id, style.layers, style.workers, glyphAtlas,
-                                                 glyphStore, spriteAtlas, sprite, info,
-                                                 transformState.getAngle(), data.getCollisionDebug());
-            new_tile.data->request(style.workers, transformState.getPixelRatio(), callback);
+            auto tileData = std::make_shared<VectorTileData>(normalized_id, style, info, 
+                    transformState.getAngle(), transformState.getPitch(), data.getCollisionDebug());
+            tileData->request(data.pixelRatio, callback);
+            new_tile.data = tileData;
         } else if (info.type == SourceType::Raster) {
-            new_tile.data = std::make_shared<RasterTileData>(normalized_id, texturePool, info);
-            new_tile.data->request(
-                style.workers, transformState.getPixelRatio(), callback);
+            auto tileData = std::make_shared<RasterTileData>(normalized_id, texturePool, info, style.workers);
+            tileData->request(data.pixelRatio, callback);
+            new_tile.data = tileData;
         } else if (info.type == SourceType::Annotations) {
-            new_tile.data = std::make_shared<LiveTileData>(normalized_id, data.annotationManager,
-                                                           style.layers, style.workers, glyphAtlas,
-                                                           glyphStore, spriteAtlas, sprite, info,
-                                                           transformState.getAngle(), data.getCollisionDebug());
-            new_tile.data->reparse(style.workers, callback);
+            new_tile.data = std::make_shared<LiveTileData>(normalized_id,
+                data.getAnnotationManager()->getTile(normalized_id), style, info, callback);
         } else {
             throw std::runtime_error("source type not implemented");
         }
@@ -324,7 +311,13 @@ double Source::getZoom(const TransformState& state) const {
 }
 
 int32_t Source::coveringZoomLevel(const TransformState& state) const {
-    return std::floor(getZoom(state));
+    double zoom = getZoom(state);
+    if (info.type == SourceType::Raster || info.type == SourceType::Video) {
+        zoom = ::round(zoom);
+    } else {
+        zoom = std::floor(zoom);
+    }
+    return zoom;
 }
 
 std::forward_list<TileID> Source::coveringTiles(const TransformState& state) const {
@@ -340,14 +333,14 @@ std::forward_list<TileID> Source::coveringTiles(const TransformState& state) con
 
     // Map four viewport corners to pixel coordinates
     box points = state.cornersToBox(z);
-    const vec2<double>& center = points.center;
+    const TileCoordinate center = state.pointToCoordinate({ state.getWidth() / 2.0f, state.getHeight()/ 2.0f }).zoomTo(z);
 
     std::forward_list<TileID> covering_tiles = tileCover(z, points, reparseOverscaled ? actualZ : z);
 
     covering_tiles.sort([&center](const TileID& a, const TileID& b) {
         // Sorts by distance from the box center
-        return std::fabs(a.x - center.x) + std::fabs(a.y - center.y) <
-               std::fabs(b.x - center.x) + std::fabs(b.y - center.y);
+        return std::fabs(a.x - center.column) + std::fabs(a.y - center.row) <
+               std::fabs(b.x - center.column) + std::fabs(b.y - center.row);
     });
 
     return covering_tiles;
@@ -405,10 +398,6 @@ bool Source::findLoadedParent(const TileID& id, int32_t minCoveringZoom, std::fo
 bool Source::update(MapData& data,
                     const TransformState& transformState,
                     Style& style,
-                    GlyphAtlas& glyphAtlas,
-                    GlyphStore& glyphStore,
-                    SpriteAtlas& spriteAtlas,
-                    util::ptr<Sprite> sprite,
                     TexturePool& texturePool,
                     bool shouldReparsePartialTiles) {
     bool allTilesUpdated = true;
@@ -417,7 +406,12 @@ bool Source::update(MapData& data,
         return allTilesUpdated;
     }
 
-    int32_t zoom = std::floor(getZoom(transformState));
+    double zoom = getZoom(transformState);
+    if (info.type == SourceType::Raster || info.type == SourceType::Video) {
+        zoom = ::round(zoom);
+    } else {
+        zoom = std::floor(zoom);
+    }
     std::forward_list<TileID> required = coveringTiles(transformState);
 
     // Determine the overzooming/underzooming amounts.
@@ -442,8 +436,7 @@ bool Source::update(MapData& data,
             }
             break;
         case TileData::State::invalid:
-            state = addTile(data, transformState, style, glyphAtlas, glyphStore,
-                            spriteAtlas, sprite, texturePool, id);
+            state = addTile(data, transformState, style, texturePool, id);
             break;
         default:
             break;
@@ -514,7 +507,7 @@ bool Source::update(MapData& data,
     updateTilePtrs();
 
     for (auto& tilePtr : tilePtrs) {
-        tilePtr->data->redoPlacement(transformState.getAngle(), data.getCollisionDebug());
+        tilePtr->data->redoPlacement(transformState.getAngle(), transformState.getPitch(), data.getCollisionDebug());
     }
 
     updated = data.getAnimationTime();
@@ -524,7 +517,7 @@ bool Source::update(MapData& data,
 
 void Source::invalidateTiles(const std::unordered_set<TileID, TileID::Hash>& ids) {
     cache.clear();
-    if (ids.size()) {
+    if (!ids.empty()) {
         for (auto& id : ids) {
             tiles.erase(id);
             tile_data.erase(id);
@@ -571,7 +564,7 @@ void Source::tileLoadingCompleteCallback(const TileID& normalized_id, const Tran
         return;
     }
 
-    data->redoPlacement(transformState.getAngle(), collisionDebug);
+    data->redoPlacement(transformState.getAngle(), transformState.getPitch(), collisionDebug);
     emitTileLoaded(true);
 }
 

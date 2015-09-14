@@ -24,10 +24,23 @@
 	<string>0.0.3</string>
 	<key>LSRequiresIPhoneOS</key>
 	<true/>
+	<key>MGLMetricsTestServerURL</key>
+	<string>https://cloudfront-staging.tilestream.net</string>
+	<key>NSAppTransportSecurity</key>
+	<dict>
+		<key>NSExceptionDomains</key>
+		<dict>
+			<key>cloudfront-staging.tilestream.net</key>
+			<dict>
+				<key>NSExceptionRequiresForwardSecrecy</key>
+				<false/>
+			</dict>
+		</dict>
+	</dict>
 	<key>NSHumanReadableCopyright</key>
 	<string>(c) 2014 Mapbox</string>
 	<key>NSLocationWhenInUseUsageDescription</key>
-	<string>The map will be centered on the user's location.</string>
+	<string>The map will display the user&apos;s location.</string>
 	<key>UILaunchStoryboardName</key>
 	<string>Default</string>
 	<key>UIRequiredDeviceCapabilities</key>
@@ -47,7 +60,5 @@
 		<string>UIInterfaceOrientationLandscapeLeft</string>
 		<string>UIInterfaceOrientationLandscapeRight</string>
 	</array>
-	<key>MGLMetricsTestServerURL</key>
-	<string>https://cloudfront-staging.tilestream.net</string>
 </dict>
 </plist>

@@ -29,13 +29,15 @@
 
       'variables' : {
         'cflags_cc': [
-          '<@(glfw3_cflags)',
+          '<@(opengl_cflags)',
+          '<@(boost_cflags)',
+          '<@(glfw_cflags)',
         ],
         'ldflags': [
-          '<@(glfw3_ldflags)',
+          '<@(glfw_ldflags)',
         ],
         'libraries': [
-          '<@(glfw3_static_libs)',
+          '<@(glfw_static_libs)',
         ],
       },
 

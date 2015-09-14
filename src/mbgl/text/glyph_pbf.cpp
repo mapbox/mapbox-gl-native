@@ -1,77 +1,32 @@
 #include <mbgl/text/glyph_pbf.hpp>
-#include <mbgl/text/font_stack.hpp>
 
 #include <mbgl/storage/file_source.hpp>
 #include <mbgl/storage/resource.hpp>
 #include <mbgl/storage/response.hpp>
-
+#include <mbgl/text/font_stack.hpp>
+#include <mbgl/text/glyph_store.hpp>
+#include <mbgl/util/exception.hpp>
 #include <mbgl/util/pbf.hpp>
 #include <mbgl/util/string.hpp>
-#include <mbgl/util/thread.hpp>
+#include <mbgl/util/thread_context.hpp>
 #include <mbgl/util/token.hpp>
 #include <mbgl/util/url.hpp>
 
 #include <sstream>
 
-namespace mbgl {
+namespace {
 
-GlyphPBF::GlyphPBF(const std::string& glyphURL,
-                   const std::string& fontStack,
-                   GlyphRange glyphRange,
-                   const GlyphLoadedCallback& successCallback,
-                   const GlyphLoadingFailedCallback& failureCallback)
-    : parsed(false) {
-    // Load the glyph set URL
-    url = util::replaceTokens(glyphURL, [&](const std::string &name) -> std::string {
-        if (name == "fontstack") return util::percentEncode(fontStack);
-        if (name == "range") return util::toString(glyphRange.first) + "-" + util::toString(glyphRange.second);
-        return "";
-    });
-
-    // The prepare call jumps back to the main thread.
-    FileSource* fs = util::ThreadContext::getFileSource();
-    req = fs->request({ Resource::Kind::Glyphs, url }, util::RunLoop::current.get()->get(), [&, successCallback, failureCallback](const Response &res) {
-        req = nullptr;
-
-        if (res.status != Response::Successful) {
-            std::stringstream message;
-            message <<  "Failed to load [" << url << "]: " << res.message;
-            failureCallback(message.str());
-        } else {
-            // Transfer the data to the GlyphSet and signal its availability.
-            // Once it is available, the caller will need to call parse() to actually
-            // parse the data we received. We are not doing this here since this callback is being
-            // called from another (unknown) thread.
-            data = res.data;
-            successCallback(this);
-        }
-    });
-}
-
-GlyphPBF::~GlyphPBF() {
-    if (req) {
-        util::ThreadContext::getFileSource()->cancel(req);
-    }
-}
-
-void GlyphPBF::parse(FontStack &stack) {
-    if (!data.size()) {
-        // If there is no data, this means we either haven't received any data, or
-        // we have already parsed the data.
-        return;
-    }
-
-    // Parse the glyph PBF
-    pbf glyphs_pbf(reinterpret_cast<const uint8_t *>(data.data()), data.size());
+void parseGlyphPBF(mbgl::FontStack& stack, const std::string& data) {
+    mbgl::pbf glyphs_pbf(reinterpret_cast<const uint8_t *>(data.data()), data.size());
 
     while (glyphs_pbf.next()) {
         if (glyphs_pbf.tag == 1) { // stacks
-            pbf fontstack_pbf = glyphs_pbf.message();
+            mbgl::pbf fontstack_pbf = glyphs_pbf.message();
             while (fontstack_pbf.next()) {
                 if (fontstack_pbf.tag == 3) { // glyphs
-                    pbf glyph_pbf = fontstack_pbf.message();
+                    mbgl::pbf glyph_pbf = fontstack_pbf.message();
 
-                    SDFGlyph glyph;
+                    mbgl::SDFGlyph glyph;
 
                     while (glyph_pbf.next()) {
                         if (glyph_pbf.tag == 1) { // id
@@ -102,14 +57,84 @@ void GlyphPBF::parse(FontStack &stack) {
             glyphs_pbf.skip();
         }
     }
-
-    data.clear();
-
-    parsed = true;
 }
 
-bool GlyphPBF::isParsed() const {
-    return parsed;
+}
+
+namespace mbgl {
+
+GlyphPBF::GlyphPBF(GlyphStore* store,
+                   const std::string& fontStack,
+                   const GlyphRange& glyphRange)
+    : parsed(false) {
+    // Load the glyph set URL
+    std::string url = util::replaceTokens(store->getURL(), [&](const std::string &name) -> std::string {
+        if (name == "fontstack") return util::percentEncode(fontStack);
+        if (name == "range") return util::toString(glyphRange.first) + "-" + util::toString(glyphRange.second);
+        return "";
+    });
+
+    auto requestCallback = [this, store, fontStack, url](const Response &res) {
+        req = nullptr;
+
+        if (res.status != Response::Successful) {
+            std::stringstream message;
+            message <<  "Failed to load [" << url << "]: " << res.message;
+            emitGlyphPBFLoadingFailed(message.str());
+        } else {
+            data = res.data;
+            parse(store, fontStack, url);
+        }
+    };
+
+    FileSource* fs = util::ThreadContext::getFileSource();
+    req = fs->request({ Resource::Kind::Glyphs, url }, util::RunLoop::getLoop(), requestCallback);
+}
+
+GlyphPBF::~GlyphPBF() {
+    if (req) {
+        util::ThreadContext::getFileSource()->cancel(req);
+    }
+}
+
+void GlyphPBF::parse(GlyphStore* store, const std::string& fontStack, const std::string& url) {
+    if (data.empty()) {
+        // If there is no data, this means we either haven't
+        // received any data.
+        return;
+    }
+
+    try {
+        parseGlyphPBF(**store->getFontStack(fontStack), std::move(data));
+    } catch (const std::exception& ex) {
+        std::stringstream message;
+        message <<  "Failed to parse [" << url << "]: " << ex.what();
+        emitGlyphPBFLoadingFailed(message.str());
+        return;
+    }
+
+    parsed = true;
+
+    emitGlyphPBFLoaded();
+}
+
+void GlyphPBF::setObserver(Observer* observer_) {
+    observer = observer_;
+}
+
+void GlyphPBF::emitGlyphPBFLoaded() {
+    if (observer) {
+        observer->onGlyphPBFLoaded();
+    }
+}
+
+void GlyphPBF::emitGlyphPBFLoadingFailed(const std::string& message) {
+    if (!observer) {
+        return;
+    }
+
+    auto error = std::make_exception_ptr(util::GlyphRangeLoadingException(message));
+    observer->onGlyphPBFLoadingFailed(error);
 }
 
 }

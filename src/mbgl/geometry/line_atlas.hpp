@@ -4,8 +4,6 @@
 #include <vector>
 #include <map>
 #include <memory>
-#include <mutex>
-#include <atomic>
 
 namespace mbgl {
 
@@ -34,9 +32,8 @@ public:
     const int height;
 
 private:
-    std::recursive_mutex mtx;
     const std::unique_ptr<uint8_t[]> data;
-    std::atomic<bool> dirty;
+    bool dirty;
     uint32_t texture = 0;
     int nextRow = 0;
     std::map<size_t, LinePatternPos> positions;

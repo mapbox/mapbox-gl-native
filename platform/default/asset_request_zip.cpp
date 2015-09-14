@@ -1,4 +1,4 @@
-#include <mbgl/storage/asset_context.hpp>
+#include <mbgl/storage/asset_context_base.hpp>
 #include <mbgl/android/jni.hpp>
 #include <mbgl/storage/resource.hpp>
 #include <mbgl/storage/response.hpp>
@@ -15,15 +15,15 @@
 
 namespace mbgl {
 
-class AssetZipContext : public AssetContext {
+class AssetZipContext : public AssetContextBase {
 public:
-    AssetZipContext(uv_loop_t *loop);
+    explicit AssetZipContext(uv_loop_t *loop);
     ~AssetZipContext();
 
     RequestBase* createRequest(const Resource& resource,
                                RequestBase::Callback callback,
                                uv_loop_t* loop,
-                               const std::string& assetRoot) override;
+                               const std::string& assetRoot) final;
 
     uv_zip_t *getHandle(const std::string &path);
     void returnHandle(const std::string &path, uv_zip_t *zip);
@@ -71,7 +71,7 @@ public:
     AssetRequest(AssetZipContext&, const Resource&, Callback, const std::string& assetRoot);
     ~AssetRequest();
 
-    void cancel() override;
+    void cancel() final;
 
 private:
     AssetZipContext &context;
@@ -259,7 +259,7 @@ void AssetRequest::cancel() {
     cancelled = true;
 }
 
-std::unique_ptr<AssetContext> AssetContext::createContext(uv_loop_t* loop) {
+std::unique_ptr<AssetContextBase> AssetContextBase::createContext(uv_loop_t* loop) {
     return std::make_unique<AssetZipContext>(loop);
 }
 

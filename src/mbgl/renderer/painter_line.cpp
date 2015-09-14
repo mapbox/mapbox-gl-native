@@ -5,11 +5,13 @@
 #include <mbgl/style/style_layout.hpp>
 #include <mbgl/map/sprite.hpp>
 #include <mbgl/map/tile_id.hpp>
+#include <mbgl/map/map_data.hpp>
 #include <mbgl/shader/line_shader.hpp>
 #include <mbgl/shader/linesdf_shader.hpp>
 #include <mbgl/shader/linepattern_shader.hpp>
 #include <mbgl/geometry/sprite_atlas.hpp>
 #include <mbgl/geometry/line_atlas.hpp>
+#include <mbgl/util/mat2.hpp>
 
 using namespace mbgl;
 
@@ -26,7 +28,7 @@ void Painter::renderLine(LineBucket& bucket, const StyleLayer &layer_desc, const
 
     // the distance over which the line edge fades out.
     // Retina devices need a smaller distance to avoid aliasing.
-    float antialiasing = 1 / state.getPixelRatio();
+    float antialiasing = 1.0 / data.pixelRatio;
 
     float blur = properties.blur + antialiasing;
     float edgeWidth = properties.width / 2.0;
@@ -50,12 +52,24 @@ void Painter::renderLine(LineBucket& bucket, const StyleLayer &layer_desc, const
     color[2] *= properties.opacity;
     color[3] *= properties.opacity;
 
-    float ratio = state.getPixelRatio();
+    float ratio = state.getScale() / std::pow(2, id.z) / 8.0 * id.overscaling;
+
+    mat2 antialiasingMatrix;
+    matrix::identity(antialiasingMatrix);
+    matrix::scale(antialiasingMatrix, antialiasingMatrix, 1.0, std::cos(state.getPitch()));
+    matrix::rotate(antialiasingMatrix, antialiasingMatrix, state.getAngle());
+
+    // calculate how much longer the real world distance is at the top of the screen
+    // than at the middle of the screen.
+    float topedgelength = std::sqrt(std::pow(state.getHeight(), 2) / 4  * (1 + std::pow(state.getAltitude(), 2)));
+    float x = state.getHeight() / 2.0f * std::tan(state.getPitch());
+    float extra = (topedgelength + x) / topedgelength - 1;
+
     mat4 vtxMatrix = translatedMatrix(matrix, properties.translate, id, properties.translateAnchor);
 
-    config.depthRange = { strata, 1.0f };
+    setDepthSublayer(0);
 
-    if (properties.dash_array.from.size()) {
+    if (!properties.dash_array.from.empty()) {
 
         useProgram(linesdfShader->program);
 
@@ -70,7 +84,7 @@ void Painter::renderLine(LineBucket& bucket, const StyleLayer &layer_desc, const
         LinePatternPos posB = lineAtlas->getDashPosition(properties.dash_array.to, layout.cap == CapType::Round);
         lineAtlas->bind();
 
-        float patternratio = std::pow(2.0, std::floor(std::log2(state.getScale())) - id.z) / 8.0 * id.overscaling;
+        float patternratio = std::pow(2.0, std::floor(::log2(state.getScale())) - id.z) / 8.0 * id.overscaling;
         float scaleXA = patternratio / posA.width / properties.dash_line_width / properties.dash_array.fromScale;
         float scaleYA = -posA.height / 2.0;
         float scaleXB = patternratio / posB.width / properties.dash_line_width / properties.dash_array.toScale;
@@ -81,12 +95,14 @@ void Painter::renderLine(LineBucket& bucket, const StyleLayer &layer_desc, const
         linesdfShader->u_patternscale_b = {{ scaleXB, scaleYB }};
         linesdfShader->u_tex_y_b = posB.y;
         linesdfShader->u_image = 0;
-        linesdfShader->u_sdfgamma = lineAtlas->width / (properties.dash_line_width * std::min(posA.width, posB.width) * 256.0 * state.getPixelRatio()) / 2;
+        linesdfShader->u_sdfgamma = lineAtlas->width / (properties.dash_line_width * std::min(posA.width, posB.width) * 256.0 * data.pixelRatio) / 2;
         linesdfShader->u_mix = properties.dash_array.t;
+        linesdfShader->u_extra = extra;
+        linesdfShader->u_antialiasingmatrix = antialiasingMatrix;
 
         bucket.drawLineSDF(*linesdfShader);
 
-    } else if (properties.image.from.size()) {
+    } else if (!properties.image.from.empty()) {
         SpriteAtlasPosition imagePosA = spriteAtlas->getPosition(properties.image.from, true);
         SpriteAtlasPosition imagePosB = spriteAtlas->getPosition(properties.image.to, true);
 
@@ -108,10 +124,11 @@ void Painter::renderLine(LineBucket& bucket, const StyleLayer &layer_desc, const
         linepatternShader->u_pattern_br_b = imagePosB.br;
         linepatternShader->u_fade = properties.image.t;
         linepatternShader->u_opacity = properties.opacity;
+        linepatternShader->u_extra = extra;
+        linepatternShader->u_antialiasingmatrix = antialiasingMatrix;
 
         MBGL_CHECK_ERROR(glActiveTexture(GL_TEXTURE0));
         spriteAtlas->bind(true);
-        config.depthRange = { strata + strata_epsilon, 1.0f };  // may or may not matter
 
         bucket.drawLinePatterns(*linepatternShader);
 
@@ -123,6 +140,8 @@ void Painter::renderLine(LineBucket& bucket, const StyleLayer &layer_desc, const
         lineShader->u_linewidth = {{ outset, inset }};
         lineShader->u_ratio = ratio;
         lineShader->u_blur = blur;
+        lineShader->u_extra = extra;
+        lineShader->u_antialiasingmatrix = antialiasingMatrix;
 
         lineShader->u_color = color;
 

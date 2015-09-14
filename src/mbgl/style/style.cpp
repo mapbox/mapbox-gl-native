@@ -1,15 +1,17 @@
 #include <mbgl/style/style.hpp>
 #include <mbgl/map/sprite.hpp>
+#include <mbgl/map/map_data.hpp>
 #include <mbgl/map/source.hpp>
 #include <mbgl/map/transform_state.hpp>
+#include <mbgl/annotation/sprite_store.hpp>
 #include <mbgl/style/style_layer.hpp>
 #include <mbgl/style/style_parser.hpp>
 #include <mbgl/style/style_bucket.hpp>
+#include <mbgl/style/property_transition.hpp>
 #include <mbgl/geometry/glyph_atlas.hpp>
 #include <mbgl/geometry/sprite_atlas.hpp>
 #include <mbgl/geometry/line_atlas.hpp>
 #include <mbgl/util/constants.hpp>
-#include <mbgl/util/uv_detail.hpp>
 #include <mbgl/platform/log.hpp>
 #include <csscolorparser/csscolorparser.hpp>
 
@@ -19,37 +21,41 @@
 
 namespace mbgl {
 
-Style::Style(const std::string& data, const std::string&,
-             uv_loop_t* loop)
-    : glyphStore(std::make_unique<GlyphStore>(loop)),
+Style::Style(MapData& data_)
+    : data(data_),
+      glyphStore(std::make_unique<GlyphStore>()),
       glyphAtlas(std::make_unique<GlyphAtlas>(1024, 1024)),
-      spriteAtlas(std::make_unique<SpriteAtlas>(512, 512)),
+      spriteStore(std::make_unique<SpriteStore>()),
+      spriteAtlas(std::make_unique<SpriteAtlas>(512, 512, data.pixelRatio, *spriteStore)),
       lineAtlas(std::make_unique<LineAtlas>(512, 512)),
       mtx(std::make_unique<uv::rwlock>()),
       workers(4) {
+    glyphStore->setObserver(this);
+}
 
+void Style::setJSON(const std::string& json, const std::string&) {
     rapidjson::Document doc;
-    doc.Parse<0>((const char *const)data.c_str());
+    doc.Parse<0>((const char *const)json.c_str());
     if (doc.HasParseError()) {
         Log::Error(Event::ParseStyle, "Error parsing style JSON at %i: %s", doc.GetErrorOffset(), doc.GetParseError());
         return;
     }
 
-    StyleParser parser;
+    StyleParser parser(data);
     parser.parse(doc);
 
     sources = parser.getSources();
     layers = parser.getLayers();
 
-    spriteURL = parser.getSprite();
+    sprite = std::make_unique<Sprite>(parser.getSprite(), data.pixelRatio);
+    sprite->setObserver(this);
+
     glyphStore->setURL(parser.getGlyphURL());
 
     for (const auto& source : sources) {
         source->setObserver(this);
         source->load();
     }
-
-    glyphStore->setObserver(this);
 }
 
 Style::~Style() {
@@ -64,22 +70,11 @@ Style::~Style() {
     }
 }
 
-void Style::update(MapData& data,
-                   const TransformState& transform,
+void Style::update(const TransformState& transform,
                    TexturePool& texturePool) {
-    const float pixelRatio = transform.getPixelRatio();
-    if (!sprite || !sprite->hasPixelRatio(pixelRatio)) {
-        sprite = std::make_unique<Sprite>(spriteURL, pixelRatio);
-        sprite->setObserver(this);
-
-        spriteAtlas->resize(pixelRatio);
-        spriteAtlas->setSprite(sprite);
-    }
-
     bool allTilesUpdated = true;
     for (const auto& source : sources) {
-        if (!source->update(data, transform, *this, *glyphAtlas, *glyphStore,
-                       *spriteAtlas, sprite, texturePool, shouldReparsePartialTiles)) {
+        if (!source->update(data, transform, *this, texturePool, shouldReparsePartialTiles)) {
             allTilesUpdated = false;
         }
     }
@@ -91,30 +86,30 @@ void Style::update(MapData& data,
     }
 }
 
-void Style::cascade(const std::vector<std::string>& classes) {
-    TimePoint now = Clock::now();
-
+void Style::cascade() {
     for (const auto& layer : layers) {
-        layer->setClasses(classes, now, defaultTransition);
+        layer->setClasses(data.getClasses(),
+                data.getAnimationTime(),
+                PropertyTransition { data.getDefaultTransitionDuration(), data.getDefaultTransitionDelay() });
     }
 }
 
-void Style::recalculate(float z, TimePoint now) {
+void Style::recalculate(float z) {
     uv::writelock lock(mtx);
 
     for (const auto& source : sources) {
         source->enabled = false;
     }
 
-    zoomHistory.update(z, now);
+    zoomHistory.update(z, data.getAnimationTime());
 
     for (const auto& layer : layers) {
-        layer->updateProperties(z, now, zoomHistory);
+        layer->updateProperties(z, data.getAnimationTime(), zoomHistory);
         if (!layer->bucket) {
             continue;
         }
 
-        util::ptr<Source> source = getSource(layer->bucket->source);
+        Source* source = getSource(layer->bucket->source);
         if (!source) {
             continue;
         }
@@ -123,16 +118,12 @@ void Style::recalculate(float z, TimePoint now) {
     }
 }
 
-util::ptr<Source> Style::getSource(const std::string& id) const {
-    const auto it = std::find_if(sources.begin(), sources.end(), [&](util::ptr<Source> source) {
+Source* Style::getSource(const std::string& id) const {
+    const auto it = std::find_if(sources.begin(), sources.end(), [&](const auto& source) {
         return source->info.source_id == id;
     });
 
-    return it != sources.end() ? *it : nullptr;
-}
-
-void Style::setDefaultTransitionDuration(Duration duration) {
-    defaultTransition.duration = duration;
+    return it != sources.end() ? it->get() : nullptr;
 }
 
 bool Style::hasTransitions() const {
@@ -195,9 +186,15 @@ void Style::onTileLoadingFailed(std::exception_ptr error) {
     emitResourceLoadingFailed(error);
 }
 
-void Style::onSpriteLoaded() {
-    shouldReparsePartialTiles = true;
+void Style::onSpriteLoaded(const Sprites& sprites) {
+    // Add all sprite images to the SpriteStore object
+    spriteStore->setSprites(sprites);
 
+    if (observer) {
+        observer->onSpriteStoreLoaded();
+    }
+
+    shouldReparsePartialTiles = true;
     emitTileDataChanged();
 }
 

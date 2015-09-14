@@ -1,5 +1,5 @@
 {
-  "version": 6,
+  "version": 8,
   "sources": {
     "mapbox": {
       "type": "vector",
@@ -31,7 +31,7 @@
       "source-layer": "waterway",
       "layout": {
           "text-font": {
-              "stops": [[0, "Open Sans Regular"]]
+              "stops": [[0, ["Open Sans Regular"]]]
           },
           "text-keep-upright": {
               "stops": [[0, false], [10, true]]

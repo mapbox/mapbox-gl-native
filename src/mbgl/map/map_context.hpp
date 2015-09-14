@@ -4,13 +4,12 @@
 #include <mbgl/map/tile_id.hpp>
 #include <mbgl/map/update.hpp>
 #include <mbgl/map/transform_state.hpp>
+#include <mbgl/map/map.hpp>
 #include <mbgl/style/style.hpp>
 #include <mbgl/util/gl_object_store.hpp>
 #include <mbgl/util/ptr.hpp>
 
 #include <vector>
-
-typedef struct uv_loop_s uv_loop_t;
 
 namespace uv {
 class async;
@@ -25,28 +24,27 @@ class Painter;
 class Sprite;
 class Worker;
 class StillImage;
+class SpriteImage;
 struct LatLng;
 struct LatLngBounds;
 
+
+struct FrameData {
+    std::array<uint16_t, 2> framebufferSize;
+};
+
 class MapContext : public Style::Observer {
 public:
-    MapContext(uv_loop_t*, View&, FileSource&, MapData&);
+    MapContext(View&, FileSource&, MapData&);
     ~MapContext();
-
-    struct RenderResult {
-        bool fullyLoaded;
-        bool needsRerender;
-    };
 
     void pause();
 
-    void resize(uint16_t width, uint16_t height, float ratio);
-
-    using StillImageCallback = std::function<void(std::exception_ptr, std::unique_ptr<const StillImage>)>;
-
     void triggerUpdate(const TransformState&, Update = Update::Nothing);
-    void renderStill(const TransformState&, StillImageCallback callback);
-    RenderResult renderSync(const TransformState&);
+    void renderStill(const TransformState&, const FrameData&, Map::StillImageCallback callback);
+
+    // Triggers a synchronous render. Returns true if style has been fully loaded.
+    bool renderSync(const TransformState&, const FrameData&);
 
     void setStyleURL(const std::string&);
     void setStyleJSON(const std::string& json, const std::string& base);
@@ -56,6 +54,7 @@ public:
     bool isLoaded() const;
 
     double getTopOffsetPixelsForAnnotationSymbol(const std::string& symbol);
+    void updateAnnotationTilesIfNeeded();
     void updateAnnotationTiles(const std::unordered_set<TileID, TileID::Hash>&);
 
     void setSourceTileCacheSize(size_t size);
@@ -63,14 +62,14 @@ public:
 
     void cleanup();
 
+    void setSprite(const std::string&, std::shared_ptr<const SpriteImage>);
+
     // Style::Observer implementation.
     void onTileDataChanged() override;
     void onResourceLoadingFailed(std::exception_ptr error) override;
+    void onSpriteStoreLoaded() override;
 
 private:
-    // Style-related updates.
-    void cascadeClasses();
-
     // Update the state indicated by the accumulated Update flags, then render.
     void update();
 
@@ -82,8 +81,9 @@ private:
 
     util::GLObjectStore glObjectStore;
 
-    UpdateType updated { static_cast<UpdateType>(Update::Nothing) };
+    Update updateFlags = Update::Nothing;
     std::unique_ptr<uv::async> asyncUpdate;
+    std::unique_ptr<uv::async> asyncInvalidate;
 
     std::unique_ptr<TexturePool> texturePool;
     std::unique_ptr<Painter> painter;
@@ -92,9 +92,12 @@ private:
     std::string styleURL;
     std::string styleJSON;
 
-    StillImageCallback callback;
+    Request* styleRequest = nullptr;
+
+    Map::StillImageCallback callback;
     size_t sourceCacheSize;
     TransformState transformState;
+    FrameData frameData;
 };
 
 }

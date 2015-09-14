@@ -2,6 +2,7 @@
 #define MBGL_MAP_MAP
 
 #include <mbgl/util/chrono.hpp>
+#include <mbgl/map/camera.hpp>
 #include <mbgl/map/update.hpp>
 #include <mbgl/map/mode.hpp>
 #include <mbgl/util/geo.hpp>
@@ -21,6 +22,7 @@ class View;
 class MapData;
 class MapContext;
 class StillImage;
+class SpriteImage;
 class Transform;
 class PointAnnotation;
 class ShapeAnnotation;
@@ -35,13 +37,16 @@ enum class AnnotationType : uint8_t {
     Shape = 1 << 1,
 };
 
+struct EdgeInsets {
+    double top = 0;
+    double left = 0;
+    double bottom = 0;
+    double right = 0;
+};
+
 using AnnotationIDs = std::vector<uint32_t>;
 using AnnotationSegment = std::vector<LatLng>;
 using AnnotationSegments = std::vector<AnnotationSegment>;
-
-using EdgeInsets = struct {
-    double top, left, bottom, right;
-};
 
 class Map : private util::noncopyable {
     friend class View;
@@ -62,11 +67,11 @@ public:
     using StillImageCallback = std::function<void(std::exception_ptr, std::unique_ptr<const StillImage>)>;
     void renderStill(StillImageCallback callback);
 
-    // Triggers a synchronous or asynchronous render.
+    // Triggers a synchronous render.
     void renderSync();
 
     // Notifies the Map thread that the state has changed and an update might be necessary.
-    void update(Update update = Update::Nothing);
+    void update(Update update);
 
     // Styling
     void addClass(const std::string&);
@@ -75,8 +80,12 @@ public:
     void setClasses(const std::vector<std::string>&);
     std::vector<std::string> getClasses() const;
 
-    void setDefaultTransitionDuration(Duration = Duration::zero());
-    Duration getDefaultTransitionDuration();
+    void setDefaultTransitionDuration(const Duration& = Duration::zero());
+    Duration getDefaultTransitionDuration() const;
+
+    void setDefaultTransitionDelay(const Duration& = Duration::zero());
+    Duration getDefaultTransitionDelay() const;
+
     void setStyleURL(const std::string& url);
     void setStyleJSON(const std::string& json, const std::string& base = "");
     std::string getStyleURL() const;
@@ -86,34 +95,41 @@ public:
     void cancelTransitions();
     void setGestureInProgress(bool);
 
+    // Camera
+    void jumpTo(CameraOptions options);
+    void easeTo(CameraOptions options);
+
     // Position
-    void moveBy(double dx, double dy, Duration = Duration::zero());
-    void setLatLng(LatLng latLng, Duration = Duration::zero());
+    void moveBy(double dx, double dy, const Duration& = Duration::zero());
+    void setLatLng(LatLng latLng, const Duration& = Duration::zero());
     LatLng getLatLng() const;
     void resetPosition();
 
     // Scale
-    void scaleBy(double ds, double cx = -1, double cy = -1, Duration = Duration::zero());
-    void setScale(double scale, double cx = -1, double cy = -1, Duration = Duration::zero());
+    void scaleBy(double ds, double cx = -1, double cy = -1, const Duration& = Duration::zero());
+    void setScale(double scale, double cx = -1, double cy = -1, const Duration& = Duration::zero());
     double getScale() const;
-    void setZoom(double zoom, Duration = Duration::zero());
+    void setZoom(double zoom, const Duration& = Duration::zero());
     double getZoom() const;
-    void setLatLngZoom(LatLng latLng, double zoom, Duration = Duration::zero());
-    void fitBounds(LatLngBounds bounds, EdgeInsets padding, Duration duration = Duration::zero());
-    void fitBounds(AnnotationSegment segment, EdgeInsets padding, Duration duration = Duration::zero());
+    void setLatLngZoom(LatLng latLng, double zoom, const Duration& = Duration::zero());
+    CameraOptions cameraForLatLngBounds(LatLngBounds bounds, EdgeInsets padding);
+    CameraOptions cameraForLatLngs(std::vector<LatLng> latLngs, EdgeInsets padding);
     void resetZoom();
     double getMinZoom() const;
     double getMaxZoom() const;
 
     // Rotation
-    void rotateBy(double sx, double sy, double ex, double ey, Duration = Duration::zero());
-    void setBearing(double degrees, Duration = Duration::zero());
+    void rotateBy(double sx, double sy, double ex, double ey, const Duration& = Duration::zero());
+    void setBearing(double degrees, const Duration& = Duration::zero());
     void setBearing(double degrees, double cx, double cy);
     double getBearing() const;
     void resetNorth();
 
+    // Pitch
+    void setPitch(double pitch, const Duration& = Duration::zero());
+    double getPitch() const;
+
     // Size
-    void resize(uint16_t width, uint16_t height, float ratio = 1);
     uint16_t getWidth() const;
     uint16_t getHeight() const;
 
@@ -141,6 +157,10 @@ public:
 
     AnnotationIDs getAnnotationsInBounds(const LatLngBounds&, const AnnotationType& = AnnotationType::Any);
     LatLngBounds getBoundsForAnnotations(const AnnotationIDs&);
+
+    // Sprites
+    void setSprite(const std::string&, std::shared_ptr<const SpriteImage>);
+    void removeSprite(const std::string&);
 
     // Memory
     void setSourceTileCacheSize(size_t);

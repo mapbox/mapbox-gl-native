@@ -21,7 +21,9 @@ typedef NS_ENUM(NSUInteger, MGLUserTrackingMode) {
     /** The map follows the user location. */
     MGLUserTrackingModeFollow,
     /** The map follows the user location and rotates when the heading changes. */
-    MGLUserTrackingModeFollowWithHeading
+    MGLUserTrackingModeFollowWithHeading,
+    /** The map follows the user location and rotates when the course changes. */
+    MGLUserTrackingModeFollowWithCourse,
 };
 
 NS_ASSUME_NONNULL_END

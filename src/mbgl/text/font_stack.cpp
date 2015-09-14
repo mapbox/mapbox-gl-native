@@ -22,13 +22,13 @@ const Shaping FontStack::getShaping(const std::u32string &string, const float ma
                                     const float lineHeight, const float horizontalAlign,
                                     const float verticalAlign, const float justify,
                                     const float spacing, const vec2<float> &translate) const {
-    Shaping shaping(translate.x * 24, translate.y * 24);
+    Shaping shaping(translate.x * 24, translate.y * 24, string);
 
     // the y offset *should* be part of the font metadata
     const int32_t yOffset = -17;
 
-    float x = std::round(translate.x * 24); // one em
-    const float y = std::round(translate.y * 24) + yOffset; // one em
+    float x = ::round(translate.x * 24); // one em
+    const float y = ::round(translate.y * 24) + yOffset; // one em
 
     // Loop through all characters of this label and shape.
     for (uint32_t chr : string) {
@@ -39,7 +39,7 @@ const Shaping FontStack::getShaping(const std::u32string &string, const float ma
         }
     }
 
-    if (!shaping.positionedGlyphs.size())
+    if (shaping.positionedGlyphs.empty())
         return shaping;
 
     lineWrap(shaping, lineHeight, maxWidth, horizontalAlign, verticalAlign, justify);

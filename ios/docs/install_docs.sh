@@ -14,7 +14,7 @@ echo
 rm -rf /tmp/mbgl
 mkdir -p /tmp/mbgl/
 README=/tmp/mbgl/GL-README.md
-cat ../README.md > ${README}
+cat ./pod-README.md > ${README}
 echo >> ${README}
 echo -n "#" >> ${README}
 cat ../../CHANGELOG.md >> ${README}
@@ -26,7 +26,7 @@ perl \
     /tmp/mbgl/ios/*.h
 appledoc \
     --output ${OUTPUT} \
-    --project-name "Mapbox GL for iOS ${VERSION}" \
+    --project-name "Mapbox iOS SDK ${VERSION}" \
     --project-company Mapbox \
     --create-docset \
     --company-id com.mapbox \

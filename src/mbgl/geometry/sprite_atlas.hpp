@@ -15,7 +15,8 @@
 
 namespace mbgl {
 
-class Sprite;
+class SpriteStore;
+class SpriteImage;
 class SpritePosition;
 
 struct SpriteAtlasPosition {
@@ -28,56 +29,68 @@ struct SpriteAtlasPosition {
     std::array<float, 2> br;
 };
 
+struct SpriteAtlasElement {
+    const Rect<uint16_t> pos;
+    const std::shared_ptr<const SpriteImage> texture;
+};
+
 class SpriteAtlas : public util::noncopyable {
 public:
     typedef uint16_t dimension;
 
-    // Add way to construct this from another SpriteAtlas (e.g. with another pixelRatio)
-    SpriteAtlas(dimension width, dimension height);
+    SpriteAtlas(dimension width, dimension height, float pixelRatio, SpriteStore& store);
     ~SpriteAtlas();
-
-    // Changes the pixel ratio.
-    bool resize(float newRatio);
-
-    // Changes the source sprite.
-    void setSprite(util::ptr<Sprite> sprite);
 
     // Returns the coordinates of an image that is sourced from the sprite image.
     // This getter attempts to read the image from the sprite if it is already loaded.
     // In that case, it copies it into the sprite atlas and returns the dimensions.
     // Otherwise, it returns a 0/0/0/0 rect.
-    Rect<dimension> getImage(const std::string& name, const bool wrap);
+    // This function is used during bucket creation.
+    SpriteAtlasElement getImage(const std::string& name, const bool wrap);
 
+    // This function is used for getting the position during render time.
     SpriteAtlasPosition getPosition(const std::string& name, bool repeating = false);
 
     // Binds the atlas texture to the GPU, and uploads data if it is out of date.
     void bind(bool linear = false);
 
+    // Updates sprites in the atlas texture that may have changed in the source SpriteStore object.
+    void updateDirty();
+
     // Uploads the texture to the GPU to be available when we need it. This is a lazy operation;
     // the texture is only bound when the data is out of date (=dirty).
     void upload();
 
-    inline float getWidth() const { return width; }
-    inline float getHeight() const { return height; }
-    inline float getTextureWidth() const { return width * pixelRatio; }
-    inline float getTextureHeight() const { return height * pixelRatio; }
+    inline dimension getWidth() const { return width; }
+    inline dimension getHeight() const { return height; }
+    inline dimension getTextureWidth() const { return pixelWidth; }
+    inline dimension getTextureHeight() const { return pixelHeight; }
     inline float getPixelRatio() const { return pixelRatio; }
-
-    const dimension width = 0;
-    const dimension height = 0;
+    inline const uint32_t* getData() const { return data.get(); }
 
 private:
-    void allocate();
+    const dimension width, height;
+    const dimension pixelWidth, pixelHeight;
+    const float pixelRatio;
+
+    struct Holder : private util::noncopyable {
+        inline Holder(const std::shared_ptr<const SpriteImage>&, const Rect<dimension>&);
+        inline Holder(Holder&&);
+        std::shared_ptr<const SpriteImage> texture;
+        const Rect<dimension> pos;
+    };
+
+    using Key = std::pair<std::string, bool>;
+
     Rect<SpriteAtlas::dimension> allocateImage(size_t width, size_t height);
-    void copy(const Rect<dimension>& dst, const SpritePosition& src, const bool wrap);
+    void copy(const Holder& holder, const bool wrap);
 
     std::recursive_mutex mtx;
-    float pixelRatio = 1.0f;
+    SpriteStore& store;
     BinPack<dimension> bin;
-    util::ptr<Sprite> sprite;
-    std::map<std::string, Rect<dimension>> images;
+    std::map<Key, Holder> images;
     std::set<std::string> uninitialized;
-    std::unique_ptr<uint32_t[]> data;
+    const std::unique_ptr<uint32_t[]> data;
     std::atomic<bool> dirty;
     bool fullUploadRequired = true;
     uint32_t texture = 0;

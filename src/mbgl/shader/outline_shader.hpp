@@ -10,14 +10,11 @@ class OutlineShader : public Shader {
 public:
     OutlineShader();
 
-    void bind(char *offset);
+    void bind(GLbyte *offset) final;
 
     UniformMatrix<4>              u_matrix = {"u_matrix", *this};
     Uniform<std::array<float, 4>> u_color  = {"u_color",  *this};
     Uniform<std::array<float, 2>> u_world  = {"u_world",  *this};
-
-private:
-    int32_t a_pos = -1;
 };
 
 }

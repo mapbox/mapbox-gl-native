@@ -50,12 +50,12 @@ SymbolQuads getIconQuads(Anchor &anchor, const PositionedIcon &shapedIcon,
 }
 
 struct GlyphInstance {
-    explicit GlyphInstance(const vec2<float> &anchor_) : anchor(anchor_) {}
-    explicit GlyphInstance(const vec2<float> &anchor_, float offset_, float minScale_, float maxScale_,
+    explicit GlyphInstance(const vec2<float> &anchorPoint_) : anchorPoint(anchorPoint_) {}
+    explicit GlyphInstance(const vec2<float> &anchorPoint_, float offset_, float minScale_, float maxScale_,
             float angle_)
-        : anchor(anchor_), offset(offset_), minScale(minScale_), maxScale(maxScale_), angle(angle_) {}
+        : anchorPoint(anchorPoint_), offset(offset_), minScale(minScale_), maxScale(maxScale_), angle(angle_) {}
 
-    const vec2<float> anchor;
+    const vec2<float> anchorPoint;
     const float offset = 0.0f;
     const float minScale = globalMinScale;
     const float maxScale = std::numeric_limits<float>::infinity();
@@ -65,19 +65,19 @@ struct GlyphInstance {
 typedef std::vector<GlyphInstance> GlyphInstances;
 
 void getSegmentGlyphs(std::back_insert_iterator<GlyphInstances> glyphs, Anchor &anchor,
-        float offset, const std::vector<Coordinate> &line, int segment, int8_t direction) {
+        float offset, const std::vector<Coordinate> &line, int segment, bool forward) {
 
-    const bool upsideDown = direction < 0;
+    const bool upsideDown = !forward;
 
     if (offset < 0)
-        direction *= -1;
+        forward = !forward;
 
-    if (direction > 0)
+    if (forward)
         segment++;
 
     assert((int)line.size() > segment);
     vec2<float> end = line[segment];
-    vec2<float> newAnchor = anchor;
+    vec2<float> newAnchorPoint = anchor;
     float prevscale = std::numeric_limits<float>::infinity();
 
     offset = std::fabs(offset);
@@ -85,16 +85,16 @@ void getSegmentGlyphs(std::back_insert_iterator<GlyphInstances> glyphs, Anchor &
     const float placementScale = anchor.scale;
 
     while (true) {
-        const float dist = util::dist<float>(newAnchor, end);
+        const float dist = util::dist<float>(newAnchorPoint, end);
         const float scale = offset / dist;
-        float angle = std::atan2(end.y - newAnchor.y, end.x - newAnchor.x);
-        if (direction < 0)
+        float angle = std::atan2(end.y - newAnchorPoint.y, end.x - newAnchorPoint.x);
+        if (!forward)
             angle += M_PI;
         if (upsideDown)
             angle += M_PI;
 
         glyphs = GlyphInstance{
-            /* anchor */ newAnchor,
+            /* anchor */ newAnchorPoint,
             /* offset */ static_cast<float>(upsideDown ? M_PI : 0.0),
             /* minScale */ scale,
             /* maxScale */ prevscale,
@@ -103,11 +103,11 @@ void getSegmentGlyphs(std::back_insert_iterator<GlyphInstances> glyphs, Anchor &
         if (scale <= placementScale)
             break;
 
-        newAnchor = end;
+        newAnchorPoint = end;
 
         // skip duplicate nodes
-        while (newAnchor == end) {
-            segment += direction;
+        while (newAnchorPoint == end) {
+            segment += forward ? 1 : -1;
             if ((int)line.size() <= segment || segment < 0) {
                 anchor.scale = scale;
                 return;
@@ -115,8 +115,8 @@ void getSegmentGlyphs(std::back_insert_iterator<GlyphInstances> glyphs, Anchor &
             end = line[segment];
         }
 
-        vec2<float> normal = util::normal<float>(newAnchor, end) * dist;
-        newAnchor = newAnchor - normal;
+        vec2<float> normal = util::normal<float>(newAnchorPoint, end) * dist;
+        newAnchorPoint = newAnchorPoint - normal;
 
         prevscale = scale;
     }
@@ -148,9 +148,9 @@ SymbolQuads getGlyphQuads(Anchor &anchor, const Shaping &shapedText,
 
         GlyphInstances glyphInstances;
         if (alongLine) {
-            getSegmentGlyphs(std::back_inserter(glyphInstances), anchor, centerX, line, anchor.segment, 1);
+            getSegmentGlyphs(std::back_inserter(glyphInstances), anchor, centerX, line, anchor.segment, true);
             if (keepUpright)
-                getSegmentGlyphs(std::back_inserter(glyphInstances), anchor, centerX, line, anchor.segment, -1);
+                getSegmentGlyphs(std::back_inserter(glyphInstances), anchor, centerX, line, anchor.segment, false);
 
         } else {
             glyphInstances.emplace_back(GlyphInstance{anchor});
@@ -194,7 +194,7 @@ SymbolQuads getGlyphQuads(Anchor &anchor, const Shaping &shapedText,
             const float glyphMinScale = std::max(instance.minScale, anchor.scale);
 
             const float glyphAngle = std::fmod((anchor.angle + textRotate + instance.offset + 2 * M_PI), (2 * M_PI));
-            quads.emplace_back(tl, tr, bl, br, rect, glyphAngle, instance.anchor, glyphMinScale, instance.maxScale);
+            quads.emplace_back(tl, tr, bl, br, rect, glyphAngle, instance.anchorPoint, glyphMinScale, instance.maxScale);
 
         }
 

@@ -10,7 +10,7 @@ class IconShader : public Shader {
 public:
     IconShader();
 
-    void bind(char *offset);
+    void bind(GLbyte *offset) final;
 
     UniformMatrix<4>              u_matrix      = {"u_matrix",      *this};
     UniformMatrix<4>              u_exmatrix    = {"u_exmatrix",    *this};
@@ -21,9 +21,10 @@ public:
     Uniform<float>                u_fadezoom    = {"u_fadezoom",    *this};
     Uniform<float>                u_opacity     = {"u_opacity",     *this};
     Uniform<std::array<float, 2>> u_texsize     = {"u_texsize",     *this};
+    Uniform<int32_t>              u_skewed      = {"u_skewed",      *this};
+    Uniform<float>                u_extra       = {"u_extra",       *this};
 
 private:
-    int32_t a_pos = -1;
     int32_t a_offset = -1;
     int32_t a_data1 = -1;
     int32_t a_data2 = -1;

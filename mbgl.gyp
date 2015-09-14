@@ -18,6 +18,7 @@
     ['platform_lib == "android" and host == "android"', { 'includes': [ './gyp/platform-android.gypi' ] } ],
     ['http_lib == "curl"', { 'includes': [ './gyp/http-curl.gypi' ] } ],
     ['http_lib == "nsurl" and (host == "osx" or host == "ios")', { 'includes': [ './gyp/http-nsurl.gypi' ] } ],
+    ['http_lib == "android" and host == "android"', { 'includes': [ './gyp/http-android.gypi' ] } ],
     ['asset_lib == "fs"', { 'includes': [ './gyp/asset-fs.gypi' ] } ],
     ['asset_lib == "zip"', { 'includes': [ './gyp/asset-zip.gypi' ] } ],
     ['cache_lib == "sqlite"', { 'includes': [ './gyp/cache-sqlite.gypi' ] } ],

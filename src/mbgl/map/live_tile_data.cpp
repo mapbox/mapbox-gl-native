@@ -1,59 +1,63 @@
 #include <mbgl/map/annotation.hpp>
 #include <mbgl/map/live_tile_data.hpp>
 #include <mbgl/map/live_tile.hpp>
-#include <mbgl/map/tile_parser.hpp>
+#include <mbgl/style/style_layer.hpp>
 #include <mbgl/map/source.hpp>
-#include <mbgl/map/vector_tile.hpp>
-#include <mbgl/platform/log.hpp>
+#include <mbgl/text/collision_tile.hpp>
+#include <mbgl/util/worker.hpp>
+#include <mbgl/util/work_request.hpp>
+#include <mbgl/style/style.hpp>
+
+#include <sstream>
 
 using namespace mbgl;
 
 LiveTileData::LiveTileData(const TileID& id_,
-                           AnnotationManager& annotationManager_,
-                           const std::vector<util::ptr<StyleLayer>>& layers_,
-                           Worker& workers_,
-                           GlyphAtlas& glyphAtlas_,
-                           GlyphStore& glyphStore_,
-                           SpriteAtlas& spriteAtlas_,
-                           util::ptr<Sprite> sprite_,
+                           const LiveTile* tile,
+                           Style& style_,
                            const SourceInfo& source_,
-                           float angle_,
-                           bool collisionDebug_)
-    : VectorTileData::VectorTileData(id_, layers_, workers_, glyphAtlas_, glyphStore_,
-                                     spriteAtlas_, sprite_, source_, angle_, collisionDebug_),
-      annotationManager(annotationManager_) {
-    // live features are always ready
-    setState(State::loaded);
-}
+                           std::function<void()> callback)
+    : TileData(id_),
+      worker(style_.workers),
+      tileWorker(id_,
+                 source_.source_id,
+                 source_.max_zoom,
+                 style_,
+                 style_.layers,
+                 state,
+                 std::make_unique<CollisionTile>(0, 0, false)) {
+    state = State::loaded;
 
-LiveTileData::~LiveTileData() {
-    // Cancel in most derived class destructor so that worker tasks are joined before
-    // any member data goes away.
-    cancel();
-}
-
-void LiveTileData::parse() {
-    if (getState() != State::loaded) {
+    if (!tile) {
+        state = State::parsed;
         return;
     }
 
-    const LiveTile* tile = annotationManager.getTile(id);
-
-    if (tile) {
-        try {
-            // Parsing creates state that is encapsulated in TileParser. While parsing,
-            // the TileParser object writes results into this objects. All other state
-            // is going to be discarded afterwards.
-            TileParser parser(*tile, *this, layers, glyphAtlas, glyphStore, spriteAtlas, sprite);
-            parser.parse();
-        } catch (const std::exception& ex) {
-            Log::Error(Event::ParseTile, "Live-parsing [%d/%d/%d] failed: %s", id.z, id.x, id.y, ex.what());
-            setState(State::obsolete);
-            return;
+    workRequest = worker.parseLiveTile(tileWorker, *tile, [this, callback] (TileParseResult result) {
+        if (result.is<State>()) {
+            state = result.get<State>();
+        } else {
+            error = result.get<std::string>();
+            state = State::obsolete;
         }
+
+        callback();
+    });
+}
+
+LiveTileData::~LiveTileData() {
+    cancel();
+}
+
+Bucket* LiveTileData::getBucket(const StyleLayer& layer) {
+    if (!isReady() || !layer.bucket) {
+        return nullptr;
     }
 
-    if (getState() != State::obsolete) {
-        setState(State::parsed);
-    }
+    return tileWorker.getBucket(layer);
+}
+
+void LiveTileData::cancel() {
+    state = State::obsolete;
+    workRequest.reset();
 }

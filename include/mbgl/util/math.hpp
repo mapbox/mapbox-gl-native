@@ -112,10 +112,12 @@ T clamp(T value, T min, T max) {
     return value < min ? min : (value > max ? max : value);
 }
 
+// Constrains n to the given range (including min, excluding max) via modular
+// arithmetic.
 template <typename T>
 T wrap(T value, T min, T max) {
     T d = max - min;
-    return value == max ? value : std::fmod((std::fmod((value - min), d) + d), d) + min;
+    return std::fmod((std::fmod((value - min), d) + d), d) + min;
 }
 
 template <typename T>

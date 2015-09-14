@@ -13,7 +13,8 @@
         './points.geojson',
         './polyline.geojson',
         './threestates.geojson',
-        './Settings.bundle/'
+        './Settings.bundle/',
+        './app-info.plist'
       ],
 
       'dependencies': [
@@ -31,7 +32,6 @@
         './MBXAppDelegate.m',
         './MBXViewController.h',
         './MBXViewController.mm',
-        '../../platform/darwin/settings_nsuserdefaults.mm',
       ],
 
       'xcode_settings': {

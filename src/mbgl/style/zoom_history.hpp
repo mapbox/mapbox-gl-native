@@ -13,12 +13,12 @@ struct ZoomHistory {
     TimePoint lastIntegerZoomTime;
     bool first = true;
 
-    void update(float z, TimePoint now) {
+    void update(float z, const TimePoint& now) {
         if (first) {
             first = false;
 
             lastIntegerZoom = std::floor(z);
-            lastIntegerZoomTime = TimePoint(Duration(0));
+            lastIntegerZoomTime = TimePoint(Duration::zero());
             lastZoom = z;
         }
 

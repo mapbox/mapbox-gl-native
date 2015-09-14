@@ -25,46 +25,69 @@ matrix:
           sources: [ 'ubuntu-toolchain-r-test', 'llvm-toolchain-precise-3.5' ]
           packages: [ 'gdb', 'clang-3.5', 'libstdc++-4.9-dev', 'libstdc++6', 'libllvm3.4', 'xutils-dev', 'libxxf86vm-dev', 'x11proto-xf86vidmode-dev', 'mesa-utils' ]
     - os: osx
-      osx_image: beta-xcode6.3
+      osx_image: xcode6.4
       env: FLAVOR=osx BUILDTYPE=Debug
     - os: osx
-      osx_image: beta-xcode6.3
+      osx_image: xcode6.4
       env: FLAVOR=ios BUILDTYPE=Release
     - os: linux
       env: FLAVOR=android ANDROID_ABI=arm-v7 BUILDTYPE=Release
       android:
-        components: [ 'build-tools-22.0.1', 'android-22', 'extra' ]
+        components: [ 'build-tools-23.0.1', 'android-23', 'extra-android-m2repository', 'extra-android-support', 'extra-google-m2repository' ]
       addons:
         apt:
           packages: [ 'lib32stdc++6' ]
     - os: linux
       env: FLAVOR=android ANDROID_ABI=arm-v7 BUILDTYPE=Debug
       android:
-        components: [ 'build-tools-22.0.1', 'android-22', 'extra' ]
+        components: [ 'build-tools-23.0.1', 'android-23', 'extra-android-m2repository', 'extra-android-support', 'extra-google-m2repository' ]
       addons:
         apt:
           packages: [ 'lib32stdc++6' ]
     - os: linux
       env: FLAVOR=android ANDROID_ABI=arm-v8 BUILDTYPE=Release
       android:
-        components: [ 'build-tools-22.0.1', 'android-22', 'extra' ]
+        components: [ 'build-tools-23.0.1', 'android-23', 'extra-android-m2repository', 'extra-android-support', 'extra-google-m2repository' ]
       addons:
         apt:
           packages: [ 'lib32stdc++6' ]
     - os: linux
       env: FLAVOR=android ANDROID_ABI=x86 BUILDTYPE=Release
       android:
-        components: [ 'build-tools-22.0.1', 'android-22', 'extra' ]
+        components: [ 'build-tools-23.0.1', 'android-23', 'extra-android-m2repository', 'extra-android-support', 'extra-google-m2repository' ]
       addons:
         apt:
           packages: [ 'lib32stdc++6' ]
     - os: linux
-      env: FLAVOR=android ANDROID_ABI=mips BUILDTYPE=Release
-      android:
-        components: [ 'build-tools-22.0.1', 'android-22', 'extra' ]
+      env: FLAVOR=node CXX=clang++-3.5 BUILDTYPE=Release NODE_VERSION=iojs-v3
       addons:
         apt:
-          packages: [ 'lib32stdc++6' ]
+          sources: [ 'ubuntu-toolchain-r-test', 'llvm-toolchain-precise-3.5' ]
+          packages: [ 'gdb', 'clang-3.5', 'libstdc++-4.9-dev', 'libstdc++6', 'libllvm3.4', 'xutils-dev', 'libxxf86vm-dev', 'x11proto-xf86vidmode-dev', 'mesa-utils' ]
+    - os: linux
+      env: FLAVOR=node CXX=clang++-3.5 BUILDTYPE=Release NODE_VERSION=0.12
+      addons:
+        apt:
+          sources: [ 'ubuntu-toolchain-r-test', 'llvm-toolchain-precise-3.5' ]
+          packages: [ 'gdb', 'clang-3.5', 'libstdc++-4.9-dev', 'libstdc++6', 'libllvm3.4', 'xutils-dev', 'libxxf86vm-dev', 'x11proto-xf86vidmode-dev', 'mesa-utils' ]
+    - os: linux
+      env: FLAVOR=node CXX=clang++-3.5 BUILDTYPE=Release NODE_VERSION=0.10
+      addons:
+        apt:
+          sources: [ 'ubuntu-toolchain-r-test', 'llvm-toolchain-precise-3.5' ]
+          packages: [ 'gdb', 'clang-3.5', 'libstdc++-4.9-dev', 'libstdc++6', 'libllvm3.4', 'xutils-dev', 'libxxf86vm-dev', 'x11proto-xf86vidmode-dev', 'mesa-utils' ]
+    - os: osx
+      osx_image: xcode6.4
+      compiler: clang
+      env: FLAVOR=node NODE_VERSION=iojs-v3
+    - os: osx
+      osx_image: xcode6.4
+      compiler: clang
+      env: FLAVOR=node NODE_VERSION=0.12
+    - os: osx
+      osx_image: xcode6.4
+      compiler: clang
+      env: FLAVOR=node NODE_VERSION=0.10
 
 env:
   global:

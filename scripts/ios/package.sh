@@ -4,7 +4,7 @@ set -e
 set -o pipefail
 set -u
 
-NAME=MapboxGL
+NAME=Mapbox
 OUTPUT=build/ios/pkg
 IOS_SDK_VERSION=`xcrun --sdk iphoneos --show-sdk-version`
 LIBUV_VERSION=0.10.28
@@ -50,7 +50,7 @@ if [[ "${BUILD_FOR_DEVICE}" == true ]]; then
         ARCHS="arm64 armv7 armv7s" \
         ONLY_ACTIVE_ARCH=NO \
         GCC_GENERATE_DEBUGGING_SYMBOLS=${GCC_GENERATE_DEBUGGING_SYMBOLS} \
-        -project ./build/ios/mbgl.xcodeproj \
+        -project ./build/ios-all/mbgl.xcodeproj \
         -configuration ${BUILDTYPE} \
         -target everything \
         -jobs ${JOBS} | xcpretty -c
@@ -61,7 +61,7 @@ xcodebuild -sdk iphonesimulator${IOS_SDK_VERSION} \
     ARCHS="x86_64 i386" \
     ONLY_ACTIVE_ARCH=NO \
     GCC_GENERATE_DEBUGGING_SYMBOLS=${GCC_GENERATE_DEBUGGING_SYMBOLS} \
-    -project ./build/ios/mbgl.xcodeproj \
+    -project ./build/ios-all/mbgl.xcodeproj \
     -configuration ${BUILDTYPE} \
     -target everything \
     -jobs ${JOBS} | xcpretty -c
@@ -101,7 +101,8 @@ step "Copying Resources..."
 cp -pv LICENSE.md "${OUTPUT}/static"
 mkdir -p "${OUTPUT}/static/${NAME}.bundle"
 cp -pv platform/ios/resources/* "${OUTPUT}/static/${NAME}.bundle"
-cp -prv styles/styles "${OUTPUT}/static/${NAME}.bundle/styles"
+mkdir -p "${OUTPUT}/static/${NAME}.bundle/styles"
+cp -pv styles/styles/{dark,emerald,light,streets,satellite}-v8.json "${OUTPUT}/static/${NAME}.bundle/styles"
 
 step "Creating API Docs..."
 if [ -z `which appledoc` ]; then
@@ -109,11 +110,12 @@ if [ -z `which appledoc` ]; then
     exit 1
 fi
 DOCS_OUTPUT="${OUTPUT}/static/Docs"
-DOCS_VERSION=$( git tag --sort -v:refname | grep -v '\-rc.' | sed -n '1p' | sed 's/^v//' )
+git fetch --tags
+DOCS_VERSION=$( git tag | sed 's/^ios-//' | sort -r | grep -v '\-rc.' | grep -v '\-pre.' | sed -n '1p' | sed 's/^v//' )
 rm -rf /tmp/mbgl
 mkdir -p /tmp/mbgl/
-README=/tmp/mbgl/GL-README.md
-cat ios/README.md > ${README}
+README=/tmp/mbgl/README.md
+cat ios/docs/pod-README.md > ${README}
 echo >> ${README}
 echo -n "#" >> ${README}
 cat CHANGELOG.md >> ${README}
@@ -125,7 +127,7 @@ perl \
     /tmp/mbgl/Headers/*.h
 appledoc \
     --output ${DOCS_OUTPUT} \
-    --project-name "Mapbox GL for iOS ${DOCS_VERSION}" \
+    --project-name "Mapbox iOS SDK ${DOCS_VERSION}" \
     --project-company Mapbox \
     --create-html \
     --no-create-docset \
@@ -133,3 +135,4 @@ appledoc \
     --company-id com.mapbox \
     --index-desc ${README} \
     /tmp/mbgl/Headers
+cp ${README} "${OUTPUT}/static"

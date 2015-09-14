@@ -25,8 +25,8 @@ bool Raster::isLoaded() const {
     return loaded;
 }
 
-bool Raster::load(const std::string &data) {
-    img = std::make_unique<util::Image>(data);
+bool Raster::load(std::unique_ptr<util::Image> image) {
+    img = std::move(image);
     width = img->getWidth();
     height = img->getHeight();
 

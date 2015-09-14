@@ -85,13 +85,12 @@ int main(int argc, char *argv[]) {
         fileSource.setAccessToken(std::string(token));
     }
 
-    HeadlessView view;
+    HeadlessView view(pixelRatio, width, height);
     Map map(view, fileSource, MapMode::Still);
 
     map.setStyleJSON(style, ".");
     map.setClasses(classes);
 
-    map.resize(width, height, pixelRatio);
     map.setLatLngZoom({ lat, lon }, zoom);
     map.setBearing(bearing);
 

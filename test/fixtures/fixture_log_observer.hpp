@@ -2,46 +2,70 @@
 #define MBGL_TEST_FIXTURE_LOG_OBSERVER
 
 #include <mbgl/platform/log.hpp>
-#include <mbgl/util/optional.hpp>
 
 #include <vector>
 #include <cstdarg>
+#include <mutex>
 #include <iostream>
 
 namespace mbgl {
 
-class FixtureLogObserver : public Log::Observer {
+class FixtureLog {
 public:
-    struct LogMessage {
-        LogMessage(EventSeverity severity_, Event event_, int64_t code_, const std::string &msg_);
-        LogMessage();
+    struct Message {
+        Message(EventSeverity severity_, Event event_, int64_t code_, const std::string &msg_);
+        Message();
 
-        bool operator==(const LogMessage &rhs) const;
+        bool operator==(const Message& rhs) const;
 
-        const mapbox::util::optional<EventSeverity> severity;
-        const mapbox::util::optional<Event> event;
-        const mapbox::util::optional<int64_t> code;
-        const mapbox::util::optional<std::string> msg;
+        const EventSeverity severity;
+        const Event event;
+        const int64_t code;
+        const std::string msg;
 
         mutable bool checked = false;
     };
 
-    ~FixtureLogObserver();
+    class Observer : public Log::Observer {
+    public:
+        using LogMessage = Message;
 
-    // Log::Observer implementation
-    virtual bool onRecord(EventSeverity severity, Event event, int64_t code, const std::string &msg) override;
+        Observer(FixtureLog* log = nullptr);
+        ~Observer();
 
-    size_t count(const LogMessage &message) const;
-    std::vector<LogMessage> unchecked() const;
+        // Log::Observer implementation
+        virtual bool onRecord(EventSeverity severity,
+                              Event event,
+                              int64_t code,
+                              const std::string& msg) override;
 
-public:
-    std::vector<LogMessage> messages;
+        bool empty() const;
+        size_t count(const Message& message) const;
+        std::vector<Message> unchecked() const;
+
+    private:
+        FixtureLog* log;
+        std::vector<Message> messages;
+        mutable std::mutex messagesMutex;
+    };
+
+    FixtureLog();
+
+    bool empty() const;
+    size_t count(const Message& message) const;
+
+    ~FixtureLog();
+
+private:
+    Observer* observer;
 };
 
 ::std::ostream &operator<<(::std::ostream &os,
-                           const std::vector<FixtureLogObserver::LogMessage> &messages);
-::std::ostream &operator<<(::std::ostream &os, const FixtureLogObserver::LogMessage &message);
+                           const std::vector<FixtureLog::Observer::LogMessage> &messages);
+::std::ostream &operator<<(::std::ostream &os, const FixtureLog::Observer::LogMessage &message);
 
-}
+using FixtureLogObserver = FixtureLog::Observer;
+
+} // namespace mbgl
 
 #endif

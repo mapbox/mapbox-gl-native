@@ -30,7 +30,6 @@ struct uv_zip_s {
 void uv_zip_init(uv_zip_t *zip);
 void uv_zip_cleanup(uv_zip_t *zip);
 
-int uv_zip_open(uv_loop_t* loop, uv_zip_t *zip, const char *path, zip_flags_t flags, uv_zip_cb cb);
 int uv_zip_fdopen(uv_loop_t* loop, uv_zip_t *zip, uv_file fd, int flags, uv_zip_cb cb);
 int uv_zip_stat(uv_loop_t* loop, uv_zip_t *zip, const char *fname, zip_flags_t flags, uv_zip_cb cb);
 int uv_zip_fopen(uv_loop_t* loop, uv_zip_t *zip, const char *fname, zip_flags_t flags, uv_zip_cb cb);

@@ -3,7 +3,7 @@
 
 #import "KIFTestActor+MapboxGL.h"
 
-#import "MapboxGL.h"
+#import "Mapbox.h"
 #import "MGLTViewController.h"
 
 #import "LocationMocker/LocationMocker.h"
@@ -544,7 +544,7 @@
 - (void)testUserTrackingModeFollow {
     tester.mapView.userTrackingMode = MGLUserTrackingModeFollow;
 
-    [tester waitForTimeInterval:1];
+    [tester acknowledgeSystemAlert];
 
     XCTAssertEqual(tester.mapView.userLocationVisible,
                    YES,
@@ -570,7 +570,7 @@
 - (void)testUserTrackingModeFollowWithHeading {
     tester.mapView.userTrackingMode = MGLUserTrackingModeFollowWithHeading;
     
-    [tester waitForTimeInterval:1];
+    [tester acknowledgeSystemAlert];
     
     XCTAssertEqual(tester.mapView.userLocationVisible,
                    YES,

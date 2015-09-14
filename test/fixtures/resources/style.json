@@ -1,10 +1,15 @@
 {
-  "version": 1,
+  "version": 8,
   "name": "Test",
   "sources": {
-    "compositedsource": {
-      "url": "test/fixtures/resources/source.json",
+    "vectorsource": {
+      "url": "test/fixtures/resources/source_vector.json",
       "type": "vector"
+    },
+    "rastersource": {
+      "url": "test/fixtures/resources/source_raster.json",
+      "type": "raster",
+      "tileSize": 256
     }
   },
   "sprite": "test/fixtures/resources/sprite",
@@ -12,19 +17,19 @@
   "layers": [{
     "id": "road",
     "type": "symbol",
-    "source": "compositedsource",
+    "source": "vectorsource",
     "source-layer": "road_label",
     "layout": {
-      "text-font": "Open Sans Regular, Arial Unicode MS Regular",
+      "text-font": ["Open Sans Regular", "Arial Unicode MS Regular"],
       "text-field": "{name_en}"
     }
   }, {
     "id": "poi",
     "type": "symbol",
-    "source": "compositedsource",
+    "source": "vectorsource",
     "source-layer": "poi_label",
     "layout": {
-      "text-font": "Open Sans Regular, Arial Unicode MS Regular",
+      "text-font": ["Open Sans Regular", "Arial Unicode MS Regular"],
       "icon-image": "{maki}_icon"
     }
   }]

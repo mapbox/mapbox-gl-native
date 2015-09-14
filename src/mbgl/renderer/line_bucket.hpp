@@ -47,6 +47,9 @@ private:
     void addCurrentVertex(const Coordinate& currentVertex, float flip, double distance,
             const vec2<double>& normal, float endLeft, float endRight, bool round,
             int32_t startVertex, std::vector<LineBucket::TriangleElement>& triangleStore);
+    void addPieSliceVertex(const Coordinate& currentVertex, float flip, double distance,
+            const vec2<double>& extrude, bool lineTurnsLeft, int32_t startVertex,
+            std::vector<TriangleElement>& triangleStore);
 
 public:
     StyleLayoutLine layout;

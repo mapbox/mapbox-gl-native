@@ -27,30 +27,26 @@ namespace mbgl {
     namespace bg = boost::geometry;
     namespace bgm = bg::model;
     namespace bgi = bg::index;
-    typedef bgm::point<float, 2, bg::cs::cartesian> Point;
-    typedef bgm::box<Point> Box;
+    typedef bgm::point<float, 2, bg::cs::cartesian> CollisionPoint;
+    typedef bgm::box<CollisionPoint> Box;
     typedef std::pair<Box, CollisionBox> CollisionTreeBox;
     typedef bgi::rtree<CollisionTreeBox, bgi::linear<16,4>> Tree;
 
 class CollisionTile {
 
     public:
-    inline explicit CollisionTile(float _zoom, float tileExtent, float tileSize, float angle_, bool debug_) :
-        zoom(_zoom), tilePixelRatio(tileExtent / tileSize), debug(debug_) { reset(angle_, 0); }
+    explicit CollisionTile(float angle_, float pitch_, bool debug_);
 
-    void reset(const float angle, const float pitch);
     float placeFeature(const CollisionFeature &feature);
     void insertFeature(CollisionFeature &feature, const float minPlacementScale);
 
-    void setDebug(bool debug_) { debug = debug_; }
     bool getDebug() { return debug; }
 
-    const float zoom;
-    const float tilePixelRatio;
-    float angle = 0;
+    const float angle = 0;
 
     const float minScale = 0.5f;
     const float maxScale = 2.0f;
+    float yStretch;
 
     private:
 
@@ -58,7 +54,6 @@ class CollisionTile {
 
     Tree tree;
     std::array<float, 4> rotationMatrix;
-    float yStretch;
     bool debug;
 
 };

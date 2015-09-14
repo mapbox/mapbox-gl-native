@@ -12,13 +12,12 @@ IconShader::IconShader()
          shaders[ICON_SHADER].vertex,
          shaders[ICON_SHADER].fragment
          ) {
-    a_pos = MBGL_CHECK_ERROR(glGetAttribLocation(program, "a_pos"));
     a_offset = MBGL_CHECK_ERROR(glGetAttribLocation(program, "a_offset"));
     a_data1 = MBGL_CHECK_ERROR(glGetAttribLocation(program, "a_data1"));
     a_data2 = MBGL_CHECK_ERROR(glGetAttribLocation(program, "a_data2"));
 }
 
-void IconShader::bind(char *offset) {
+void IconShader::bind(GLbyte *offset) {
     const int stride = 16;
 
     MBGL_CHECK_ERROR(glEnableVertexAttribArray(a_pos));

@@ -1,115 +1,83 @@
 #include <mbgl/text/glyph_store.hpp>
-#include <mbgl/text/glyph_pbf.hpp>
-#include <mbgl/text/font_stack.hpp>
 
-#include <mbgl/util/exception.hpp>
-#include <mbgl/util/uv_detail.hpp>
+#include <mbgl/text/glyph_pbf.hpp>
+#include <mbgl/util/thread_context.hpp>
 
 namespace mbgl {
 
-GlyphStore::GlyphStore(uv_loop_t* loop)
-    : asyncEmitGlyphRangeLoaded(std::make_unique<uv::async>(loop, [this] { emitGlyphRangeLoaded(); })),
-      asyncEmitGlyphRangeLoadedingFailed(std::make_unique<uv::async>(loop, [this] { emitGlyphRangeLoadingFailed(); })),
-      observer(nullptr) {
-    asyncEmitGlyphRangeLoaded->unref();
-    asyncEmitGlyphRangeLoadedingFailed->unref();
-}
-
-GlyphStore::~GlyphStore() {
-    observer = nullptr;
-}
-
-void GlyphStore::setURL(const std::string &url) {
-    glyphURL = url;
-}
-
-bool GlyphStore::requestGlyphRangesIfNeeded(const std::string& fontStackName,
-                                            const std::set<GlyphRange>& glyphRanges) {
-    bool requestIsNeeded = false;
-
-    if (glyphRanges.empty()) {
-        return requestIsNeeded;
-    }
-
-    auto successCallback = [this, fontStackName](GlyphPBF* glyph) {
-        auto fontStack = createFontStack(fontStackName);
-        try {
-            glyph->parse(**fontStack);
-            asyncEmitGlyphRangeLoaded->send();
-        } catch (const std::exception&) {
-            std::lock_guard<std::mutex> lock(errorMessageMutex);
-            errorMessage = "Failed to parse [" + glyph->getURL() + "]";
-            asyncEmitGlyphRangeLoadedingFailed->send();
-        }
-    };
-
-    auto failureCallback = [this](const std::string& message) {
-        std::lock_guard<std::mutex> lock(errorMessageMutex);
-        errorMessage = message;
-        asyncEmitGlyphRangeLoadedingFailed->send();
-    };
+void GlyphStore::requestGlyphRange(const std::string& fontStackName, const GlyphRange& range) {
+    assert(util::ThreadContext::currentlyOn(util::ThreadType::Map));
 
     std::lock_guard<std::mutex> lock(rangesMutex);
     auto& rangeSets = ranges[fontStackName];
 
+    const auto& rangeSetsIt = rangeSets.find(range);
+    if (rangeSetsIt != rangeSets.end()) {
+        return;
+    }
+
+    auto glyphPBF = std::make_unique<GlyphPBF>(this, fontStackName, range);
+    glyphPBF->setObserver(this);
+
+    rangeSets.emplace(range, std::move(glyphPBF));
+}
+
+
+bool GlyphStore::hasGlyphRanges(const std::string& fontStackName, const std::set<GlyphRange>& glyphRanges) {
+    if (glyphRanges.empty()) {
+        return true;
+    }
+
+    std::lock_guard<std::mutex> lock(rangesMutex);
+    const auto& rangeSets = ranges[fontStackName];
+
+    bool hasRanges = true;
     for (const auto& range : glyphRanges) {
-        const auto& rangeSets_it = rangeSets.find(range);
-        if (rangeSets_it == rangeSets.end()) {
-            auto glyph = std::make_unique<GlyphPBF>(glyphURL, fontStackName, range,
-                successCallback, failureCallback);
-            rangeSets.emplace(range, std::move(glyph));
-            requestIsNeeded = true;
+        const auto& rangeSetsIt = rangeSets.find(range);
+        if (rangeSetsIt == rangeSets.end()) {
+            // Push the request to the MapThread, so we can easly cancel
+            // if it is still pending when we destroy this object.
+            workQueue.push(std::bind(&GlyphStore::requestGlyphRange, this, fontStackName, range));
+
+            hasRanges = false;
             continue;
         }
 
-        if (!rangeSets_it->second->isParsed()) {
-            requestIsNeeded = true;
+        if (!rangeSetsIt->second->isParsed()) {
+            hasRanges = false;
         }
     }
 
-    return requestIsNeeded;
+    return hasRanges;
 }
 
-util::exclusive<FontStack> GlyphStore::createFontStack(const std::string &fontStack) {
+util::exclusive<FontStack> GlyphStore::getFontStack(const std::string& fontStack) {
     auto lock = std::make_unique<std::lock_guard<std::mutex>>(stacksMutex);
 
-    auto stack_it = stacks.find(fontStack);
-    if (stack_it == stacks.end()) {
-        stack_it = stacks.emplace(fontStack, std::make_unique<FontStack>()).first;
+    auto it = stacks.find(fontStack);
+    if (it == stacks.end()) {
+        it = stacks.emplace(fontStack, std::make_unique<FontStack>()).first;
     }
 
-    return { stack_it->second.get(), std::move(lock) };
+    // FIXME: We lock all FontStacks, but what we should
+    // really do is lock only the one we are returning.
+    return { it->second.get(), std::move(lock) };
 }
 
-util::exclusive<FontStack> GlyphStore::getFontStack(const std::string &fontStack) {
-    auto lock = std::make_unique<std::lock_guard<std::mutex>>(stacksMutex);
-
-    const auto& stack_it = stacks.find(fontStack);
-    if (stack_it == stacks.end()) {
-        return { nullptr, nullptr };
-    }
-
-    return { stack_it->second.get(), std::move(lock) };
-}
-
-void GlyphStore::setObserver(Observer* observer_) {
-    observer = observer_;
-}
-
-void GlyphStore::emitGlyphRangeLoaded() {
+void GlyphStore::onGlyphPBFLoaded() {
     if (observer) {
         observer->onGlyphRangeLoaded();
     }
 }
 
-void GlyphStore::emitGlyphRangeLoadingFailed() {
-    if (!observer) {
-        return;
+void GlyphStore::onGlyphPBFLoadingFailed(std::exception_ptr error) {
+    if (observer) {
+        observer->onGlyphRangeLoadingFailed(error);
     }
+}
 
-    std::lock_guard<std::mutex> lock(errorMessageMutex);
-    auto error = std::make_exception_ptr(util::GlyphRangeLoadingException(errorMessage));
-    observer->onGlyphRangeLoadingFailed(error);
+void GlyphStore::setObserver(Observer* observer_) {
+    observer = observer_;
 }
 
 }

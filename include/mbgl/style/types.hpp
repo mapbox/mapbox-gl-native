@@ -27,6 +27,7 @@ enum class StyleLayerType : uint8_t {
     Unknown,
     Fill,
     Line,
+    Circle,
     Symbol,
     Raster,
     Background
@@ -36,6 +37,7 @@ MBGL_DEFINE_ENUM_CLASS(StyleLayerTypeClass, StyleLayerType, {
     { StyleLayerType::Unknown, "unknown" },
     { StyleLayerType::Fill, "fill" },
     { StyleLayerType::Line, "line" },
+    { StyleLayerType::Circle, "circle" },
     { StyleLayerType::Symbol, "symbol" },
     { StyleLayerType::Raster, "raster" },
     { StyleLayerType::Background, "background" },
@@ -92,6 +94,8 @@ enum class JoinType : uint8_t {
     Miter,
     Bevel,
     Round,
+    // the following two types are for internal use only
+    FakeRound,
     FlipBevel
 };
 
@@ -99,6 +103,7 @@ MBGL_DEFINE_ENUM_CLASS(JoinTypeClass, JoinType, {
     { JoinType::Miter, "miter" },
     { JoinType::Bevel, "bevel" },
     { JoinType::Round, "round" },
+    { JoinType::FakeRound, "fakeround" },
     { JoinType::FlipBevel, "flipbevel" },
 });
 

@@ -17,6 +17,9 @@ namespace test {
 pid_t startServer(const char *executable);
 void stopServer(pid_t pid);
 
+uint64_t crc64(const char*, size_t);
+uint64_t crc64(const std::string&);
+
 }
 }
 

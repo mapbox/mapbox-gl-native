@@ -17,7 +17,7 @@ public:
     ~SQLiteCache() override;
 
     // FileCache API
-    void get(const Resource &resource, Callback callback) override;
+    std::unique_ptr<WorkRequest> get(const Resource &resource, Callback callback) override;
     void put(const Resource &resource, std::shared_ptr<const Response> response, Hint hint) override;
 
     class Impl;

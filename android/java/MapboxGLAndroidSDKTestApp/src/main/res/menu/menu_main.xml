@@ -1,11 +1,3 @@
 <?xml version="1.0" encoding="utf-8"?>
 <menu xmlns:android="http://schemas.android.com/apk/res/android" xmlns:app="http://schemas.android.com/apk/res-auto">
-    <item android:id="@+id/action_gps"
-        android:icon="@drawable/ic_action_location_searching"
-        android:title="@string/action_gps"
-        app:showAsAction="ifRoom" />
-    <item android:id="@+id/action_debug"
-        android:icon="@drawable/ic_action_about"
-        android:title="@string/action_debug"
-        app:showAsAction="ifRoom" />
 </menu>

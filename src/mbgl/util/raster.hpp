@@ -6,7 +6,6 @@
 #include <mbgl/util/ptr.hpp>
 #include <mbgl/util/chrono.hpp>
 
-#include <string>
 #include <mutex>
 
 typedef struct uv_loop_s uv_loop_t;
@@ -20,7 +19,7 @@ public:
     ~Raster();
 
     // load image data
-    bool load(const std::string &img);
+    bool load(std::unique_ptr<util::Image> image);
 
     // bind current texture
     void bind(bool linear = false);

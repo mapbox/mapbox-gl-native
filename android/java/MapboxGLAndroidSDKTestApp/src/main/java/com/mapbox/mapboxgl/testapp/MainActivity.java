@@ -1,81 +1,73 @@
 package com.mapbox.mapboxgl.testapp;
 
-import android.content.Context;
-import android.graphics.Matrix;
+import android.Manifest;
+import android.content.pm.PackageManager;
+import android.graphics.Color;
 import android.graphics.PointF;
-import android.hardware.GeomagneticField;
-import android.hardware.Sensor;
-import android.hardware.SensorEvent;
-import android.hardware.SensorEventListener;
-import android.hardware.SensorManager;
 import android.location.Location;
 import android.os.Bundle;
-import android.support.v7.app.ActionBarActivity;
+import android.support.annotation.NonNull;
+import android.support.design.widget.FloatingActionButton;
+import android.support.design.widget.NavigationView;
+import android.support.v4.app.ActivityCompat;
+import android.support.v4.content.ContextCompat;
+import android.support.v4.view.GravityCompat;
+import android.support.v4.widget.DrawerLayout;
+import android.support.v7.app.ActionBar;
+import android.support.v7.app.AppCompatActivity;
 import android.support.v7.widget.Toolbar;
-import android.view.Menu;
-import android.view.MenuInflater;
+import android.util.Log;
+import android.view.GestureDetector;
 import android.view.MenuItem;
+import android.view.MotionEvent;
 import android.view.View;
-import android.widget.AdapterView;
-import android.widget.ArrayAdapter;
-import android.widget.FrameLayout;
-import android.widget.ImageView;
-import android.widget.Spinner;
 import android.widget.TextView;
-
+import android.widget.Toast;
+import com.crashlytics.android.Crashlytics;
+import com.mapbox.mapboxgl.annotations.Marker;
+import com.mapbox.mapboxgl.annotations.MarkerOptions;
+import com.mapbox.mapboxgl.annotations.PolygonOptions;
+import com.mapbox.mapboxgl.annotations.PolylineOptions;
 import com.mapbox.mapboxgl.geometry.LatLng;
 import com.mapbox.mapboxgl.views.MapView;
-import com.mapzen.android.lost.api.LocationListener;
-import com.mapzen.android.lost.api.LocationRequest;
-import com.mapzen.android.lost.api.LocationServices;
-import com.mapzen.android.lost.api.LostApiClient;
-
+import io.fabric.sdk.android.Fabric;
+import java.io.BufferedReader;
+import java.io.IOException;
+import java.io.InputStreamReader;
+import java.text.DecimalFormat;
 import java.util.ArrayList;
 
-public class MainActivity extends ActionBarActivity {
+public class MainActivity extends AppCompatActivity {
+
+    private static final String TAG = "MainActivity";
 
     //
     // Static members
     //
 
     // Used for saving instance state
-    private static final String STATE_IS_GPS_ON = "isGpsOn";
+    private static final String STATE_IS_ANNOTATIONS_ON = "isAnnotationsOn";
+    private static final String STATE_SELECTED_STYLE = "selectedStyle";
+
+    // Used for permissions requests
+    private static final int PERMISSIONS_LOCATION = 0;
 
     //
     // Instance members
     //
 
     // Used for the UI
-    private MapFragment mMapFragment;
+    private DrawerLayout mDrawerLayout;
+    private MapView mMapView;
     private TextView mFpsTextView;
-    private ImageView mCompassView;
-    private FrameLayout mMapFrameLayout;
-    private float mDensity;
-    private Spinner mClassSpinner;
-    private ArrayAdapter mOutdoorsClassAdapter;
-    private ArrayAdapter mSatelliteClassAdapter;
+    private int mSelectedStyle = R.id.actionStyleMapboxStreets;
+    NavigationView mNavigationView;
 
     // Used for GPS
-    private boolean mIsGpsOn = false;
-    private LostApiClient mLocationClient;
-    private GpsListener mGpsListener;
-    private LocationRequest mLocationRequest;
-    private ImageView mGpsMarker;
-    private Location mGpsLocation;
-    private MenuItem mGpsMenuItem;
+    private FloatingActionButton mLocationFAB;
 
-    // Used for compass
-    private SensorManager mSensorManager;
-    private Sensor mSensorAccelerometer;
-    private Sensor mSensorMagneticField;
-    private CompassListener mCompassListener;
-    private float[] mValuesAccelerometer = new float[3];
-    private float[] mValuesMagneticField = new float[3];
-    private float[] mMatrixR = new float[9];
-    private float[] mMatrixI = new float[9];
-    private float[] mMatrixValues = new float[3];
-    private float mCompassBearing;
-    private boolean mCompassValid = false;
+    // Used for Annotations
+    private boolean mIsAnnotationsOn = false;
 
     //
     // Lifecycle events
@@ -85,62 +77,112 @@ public class MainActivity extends ActionBarActivity {
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
-
-        if (savedInstanceState != null) {
-            mIsGpsOn = savedInstanceState.getBoolean(STATE_IS_GPS_ON, false);
-        }
-
-        mDensity = getResources().getDisplayMetrics().density;
+        Fabric.with(this, new Crashlytics());
 
         // Load the layout
         setContentView(R.layout.activity_main);
-        mMapFragment = (MapFragment) getSupportFragmentManager().findFragmentById(R.id.fragment_map);
-        mMapFragment.getMap().setOnFpsChangedListener(new MyOnFpsChangedListener());
-        mMapFragment.getMap().setOnMapChangedListener(new MyOnMapChangedListener());
+
+        Toolbar toolbar = (Toolbar) findViewById(R.id.toolbar);
+        setSupportActionBar(toolbar);
+
+        final ActionBar ab = getSupportActionBar();
+        if (ab != null) {
+            ab.setHomeAsUpIndicator(R.drawable.ic_menu);
+            ab.setDisplayHomeAsUpEnabled(true);
+        }
+
+        mDrawerLayout = (DrawerLayout) findViewById(R.id.drawer_layout);
+
+        mNavigationView = (NavigationView) findViewById(R.id.nav_view);
+        if (mNavigationView != null) {
+            setupDrawerContent(mNavigationView);
+        }
+
+        mMapView = (MapView) findViewById(R.id.mainMapView);
+        // Load the access token
+        try {
+            BufferedReader reader = new BufferedReader(new InputStreamReader(getResources().openRawResource(R.raw.token)));
+            String line = reader.readLine();
+            mMapView.setAccessToken(line);
+        } catch (IOException e) {
+            Log.e(TAG, "Error loading access token from token.txt: " + e.toString());
+        }
+
+        mMapView.onCreate(savedInstanceState);
+        mMapView.setOnFpsChangedListener(new MyOnFpsChangedListener());
+
+        final GestureDetector gestureDetector = new GestureDetector(this, new GestureDetector.SimpleOnGestureListener() {
+            public void onLongPress(final MotionEvent e) {
+                float x = e.getX();
+                float y = e.getY();
+
+                // flip y direction vertically to match core GL
+                y = mMapView.getHeight() - y;
+
+                LatLng position = mMapView.fromScreenLocation(new PointF(x, y));
+
+                mMapView.addMarker(new MarkerOptions()
+                        .position(position)
+                        .title("Dropped Pin")
+                        .snippet(new DecimalFormat("#.#####").format(position.getLatitude()) + ", " +
+                                 new DecimalFormat("#.#####").format(position.getLongitude()))
+                        .sprite("default_marker"));
+            }
+        });
+
+        mMapView.setOnTouchListener(new View.OnTouchListener() {
+            public boolean onTouch(View v, MotionEvent event) {
+                return gestureDetector.onTouchEvent(event);
+            }
+        });
 
         mFpsTextView = (TextView) findViewById(R.id.view_fps);
         mFpsTextView.setText("");
 
-        mCompassView = (ImageView) findViewById(R.id.view_compass);
-        mCompassView.setOnClickListener(new CompassOnClickListener());
+        mLocationFAB = (FloatingActionButton)findViewById(R.id.locationFAB);
+        mLocationFAB.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View v) {
+                // Toggle GPS position updates
+                toggleGps(!mMapView.isMyLocationEnabled());
+                if (mMapView.isMyLocationEnabled()) {
+                    Location location = mMapView.getMyLocation();
+                    if (location != null) {
+                        mMapView.setZoomLevel(8);
+                        mMapView.setCenterCoordinate(new LatLng(location));
+                    }
+                }
+            }
+        });
 
-        mGpsMarker = new ImageView(getApplicationContext());
-        mGpsMarker.setVisibility(View.INVISIBLE);
-        mGpsMarker.setImageResource(R.drawable.location_marker);
-        mGpsMarker.setLayoutParams(new FrameLayout.LayoutParams((int) (27.0f * mDensity), (int) (27.0f * mDensity)));
-        mGpsMarker.requestLayout();
+        // Restore saved state
+        if (savedInstanceState != null) {
+            mIsAnnotationsOn = savedInstanceState.getBoolean(STATE_IS_ANNOTATIONS_ON);
+            mSelectedStyle = savedInstanceState.getInt(STATE_SELECTED_STYLE);
+        }
 
-        mMapFrameLayout = (FrameLayout) findViewById(R.id.layout_map);
-        mMapFrameLayout.addView(mGpsMarker);
-        // Add a toolbar as the action bar
-        Toolbar mainToolbar = (Toolbar) findViewById(R.id.toolbar_main);
-        setSupportActionBar(mainToolbar);
-        getSupportActionBar().setDisplayShowTitleEnabled(false);
+        // Set default UI state
+        mNavigationView.getMenu().findItem(R.id.action_compass).setChecked(mMapView.isCompassEnabled());
+        mNavigationView.getMenu().findItem(R.id.action_debug).setChecked(mMapView.isDebugActive());
+        mNavigationView.getMenu().findItem(R.id.action_markers).setChecked(mIsAnnotationsOn);
+        changeMapStyle(mSelectedStyle);
+        toggleGps(mMapView.isMyLocationEnabled());
+    }
 
-        // Add the spinner to select map styles
-        Spinner styleSpinner = (Spinner) findViewById(R.id.spinner_style);
-        ArrayAdapter styleAdapter = ArrayAdapter.createFromResource(getSupportActionBar().getThemedContext(),
-                R.array.style_list, android.R.layout.simple_spinner_dropdown_item);
-        styleSpinner.setAdapter(styleAdapter);
-        styleSpinner.setOnItemSelectedListener(new StyleSpinnerListener());
+    /**
+     * Dispatch onStart() to all fragments.  Ensure any created loaders are
+     * now started.
+     */
+    @Override
+    protected void onStart() {
+        super.onStart();
+        mMapView.onStart();
+    }
 
-        // Add the spinner to select class styles
-        mClassSpinner = (Spinner) findViewById(R.id.spinner_class);
-        mOutdoorsClassAdapter = ArrayAdapter.createFromResource(getSupportActionBar().getThemedContext(),
-                R.array.outdoors_class_list, android.R.layout.simple_spinner_dropdown_item);
-
-        // Prepare for GPS
-        mLocationClient = new LostApiClient.Builder(this).build();
-        mLocationRequest = LocationRequest.create()
-                .setInterval(1000)
-                .setSmallestDisplacement(1)
-                .setPriority(LocationRequest.PRIORITY_HIGH_ACCURACY);
-        mGpsListener = new GpsListener();
-
-        mSensorManager = (SensorManager) getApplicationContext().getSystemService(Context.SENSOR_SERVICE);
-        mSensorAccelerometer = mSensorManager.getDefaultSensor(Sensor.TYPE_ACCELEROMETER);
-        mSensorMagneticField = mSensorManager.getDefaultSensor(Sensor.TYPE_MAGNETIC_FIELD);
-        mCompassListener = new CompassListener();
+    @Override
+    protected void onStop() {
+        super.onStop();
+        mMapView.onStop();
     }
 
     // Called when our app goes into the background
@@ -148,16 +190,21 @@ public class MainActivity extends ActionBarActivity {
     public void onPause()  {
         super.onPause();
 
-        // Cancel GPS
-        toggleGps(false);
+        mMapView.onPause();
     }
 
     // Called when our app comes into the foreground
     @Override
     public void onResume() {
         super.onResume();
-        // Restart GPS
-        toggleGps(true);
+
+        mMapView.onResume();
+    }
+
+    @Override
+    protected void onDestroy() {
+        super.onDestroy();
+        mMapView.onDestroy();
     }
 
     // Called when we need to save instance state
@@ -165,53 +212,139 @@ public class MainActivity extends ActionBarActivity {
     protected void onSaveInstanceState(Bundle outState) {
         super.onSaveInstanceState(outState);
 
-        outState.putBoolean(STATE_IS_GPS_ON, mIsGpsOn);
+        mMapView.onSaveInstanceState(outState);
+        outState.putBoolean(STATE_IS_ANNOTATIONS_ON, mIsAnnotationsOn);
+        outState.putInt(STATE_SELECTED_STYLE, mSelectedStyle);
     }
 
+    // Called when the system is running low on memory
+    @Override
+    public void onLowMemory() {
+        super.onLowMemory();
+
+        mMapView.onLowMemory();
+    }
 
     //
     // Other events
     //
 
-    // Adds items to the action bar menu
-    @Override
-    public boolean onCreateOptionsMenu(Menu menu) {
-        MenuInflater inflater = getMenuInflater();
-        inflater.inflate(R.menu.menu_main, menu);
-        mGpsMenuItem = menu.findItem(R.id.action_gps);
-        if (mIsGpsOn) {
-            mGpsMenuItem.setIcon(R.drawable.ic_action_location_found);
-        } else {
-            mGpsMenuItem.setIcon(R.drawable.ic_action_location_searching);
-        }
-        return super.onCreateOptionsMenu(menu);
-    }
-
     // Called when pressing action bar items
     @Override
     public boolean onOptionsItemSelected(MenuItem item) {
         switch (item.getItemId()) {
-            case R.id.action_gps:
-                // Toggle GPS position updates
-                toggleGps(!mIsGpsOn);
-                updateMap();
+            case android.R.id.home:
+                mDrawerLayout.openDrawer(GravityCompat.START);
+                return true;
+            default:
+                return super.onOptionsItemSelected(item);
+        }
+    }
+
+    @Override
+    public void onRequestPermissionsResult(int requestCode, @NonNull String permissions[], @NonNull int[] grantResults) {
+        switch (requestCode) {
+            case PERMISSIONS_LOCATION: {
+                if (grantResults[0] == PackageManager.PERMISSION_GRANTED) {
+                    enableGps();
+                }
+            }
+        }
+    }
+
+    private void setupDrawerContent(NavigationView navigationView) {
+        navigationView.setNavigationItemSelectedListener(
+                new NavigationView.OnNavigationItemSelectedListener() {
+                    @Override
+                    public boolean onNavigationItemSelected(MenuItem menuItem) {
+                        mDrawerLayout.closeDrawers();
+
+                        // Respond To Selection
+                        switch (menuItem.getItemId()) {
+
+                            case R.id.action_debug:
+                                // Toggle debug mode
+                                mMapView.toggleDebug();
+                                toggleFpsCounter(mMapView.isDebugActive());
+                                menuItem.setChecked(mMapView.isDebugActive());
+                                return true;
+
+                            case R.id.action_markers:
+                                // Toggle markers
+                                toggleAnnotations(!mIsAnnotationsOn);
+                                menuItem.setChecked(mIsAnnotationsOn);
+                                return true;
+
+                            case R.id.action_compass:
+                                // Toggle compass
+                                mMapView.setCompassEnabled(!mMapView.isCompassEnabled());
+                                menuItem.setChecked(mMapView.isCompassEnabled());
+                                return true;
+
+/*
+                            case R.id.followNone:
+                                mMapView.setUserLocationTrackingMode(MapView.UserLocationTrackingMode.NONE);
+                                return true;
+
+                            case R.id.followFollow:
+                                mMapView.setUserLocationTrackingMode(MapView.UserLocationTrackingMode.FOLLOW);
+                                return true;
+
+                            case R.id.followBearing:
+                                mMapView.setUserLocationTrackingMode(MapView.UserLocationTrackingMode.FOLLOW_BEARING);
+                                return true;
+*/
+                            default:
+                                return changeMapStyle(menuItem.getItemId());
+                        }
+                    }
+                });
+    }
+
+    private void toggleFpsCounter(boolean enableFps) {
+        // Show the FPS counter
+        if (enableFps) {
+            mFpsTextView.setVisibility(View.VISIBLE);
+            mFpsTextView.setText(getResources().getString(R.string.label_fps));
+        } else {
+            mFpsTextView.setVisibility(View.INVISIBLE);
+        }
+    }
+
+    private boolean changeMapStyle(int id) {
+        switch (id) {
+            case R.id.actionStyleMapboxStreets:
+                mMapView.setStyleUrl(getString(R.string.styleURLMapboxStreets));
+                mNavigationView.getMenu().findItem(id).setChecked(true);
+                mSelectedStyle = id;
                 return true;
 
-            case R.id.action_debug:
-                // Toggle debug mode
-                mMapFragment.getMap().toggleDebug();
+            case R.id.actionStyleEmerald:
+                mMapView.setStyleUrl(getString(R.string.styleURLEmerald));
+                mNavigationView.getMenu().findItem(id).setChecked(true);
+                mSelectedStyle = id;
+                return true;
 
-                // Show the FPS counter
-                if (mMapFragment.getMap().isDebugActive()) {
-                    mFpsTextView.setVisibility(View.VISIBLE);
-                    mFpsTextView.setText(getResources().getString(R.string.label_fps));
-                } else {
-                    mFpsTextView.setVisibility(View.INVISIBLE);
-                }
+            case R.id.actionStyleLight:
+                mMapView.setStyleUrl(getString(R.string.styleURLLight));
+                mNavigationView.getMenu().findItem(id).setChecked(true);
+                mSelectedStyle = id;
+                return true;
+
+            case R.id.actionStyleDark:
+                mMapView.setStyleUrl(getString(R.string.styleURLDark));
+                mNavigationView.getMenu().findItem(id).setChecked(true);
+                mSelectedStyle = id;
+                return true;
+
+            case R.id.actionStyleSatellite:
+                mMapView.setStyleUrl(getString(R.string.styleURLSatellite));
+                mNavigationView.getMenu().findItem(id).setChecked(true);
+                mSelectedStyle = id;
                 return true;
 
             default:
-                return super.onOptionsItemSelected(item);
+                return false;
         }
     }
 
@@ -220,228 +353,105 @@ public class MainActivity extends ActionBarActivity {
      * @param enableGps true if GPS is to be enabled, false if GPS is to be disabled
      */
     private void toggleGps(boolean enableGps) {
-
         if (enableGps) {
-            if (!mIsGpsOn) {
-                mIsGpsOn = true;
-                if (mGpsMenuItem != null) {
-                    mGpsMenuItem.setIcon(R.drawable.ic_action_location_found);
-                }
-                mGpsLocation = null;
-                mLocationClient.connect();
-                updateLocation(LocationServices.FusedLocationApi.getLastLocation());
-                LocationServices.FusedLocationApi.requestLocationUpdates(mLocationRequest, new GpsListener());
-                mSensorManager.registerListener(mCompassListener, mSensorAccelerometer, SensorManager.SENSOR_DELAY_UI);
-                mSensorManager.registerListener(mCompassListener, mSensorMagneticField, SensorManager.SENSOR_DELAY_UI);
+            if ((ContextCompat.checkSelfPermission(this, Manifest.permission.ACCESS_COARSE_LOCATION) != PackageManager.PERMISSION_GRANTED) ||
+                    (ContextCompat.checkSelfPermission(this, Manifest.permission.ACCESS_FINE_LOCATION) != PackageManager.PERMISSION_GRANTED))
+            {
+                ActivityCompat.requestPermissions(this, new String[]{Manifest.permission.ACCESS_COARSE_LOCATION, Manifest.permission.ACCESS_FINE_LOCATION}, PERMISSIONS_LOCATION);
+            } else {
+                enableGps();
             }
         } else {
-            if (mIsGpsOn) {
-                mIsGpsOn = false;
-                if (mGpsMenuItem != null) {
-                    mGpsMenuItem.setIcon(R.drawable.ic_action_location_searching);
-                }
-                LocationServices.FusedLocationApi.removeLocationUpdates(mGpsListener);
-                mLocationClient.disconnect();
-                mSensorManager.unregisterListener(mCompassListener, mSensorAccelerometer);
-                mSensorManager.unregisterListener(mCompassListener, mSensorMagneticField);
-                mGpsLocation = null;
+            mMapView.setMyLocationEnabled(false);
+            mLocationFAB.setColorFilter(Color.TRANSPARENT);
+        }
+    }
+
+    private void enableGps() {
+        mMapView.setMyLocationEnabled(true);
+        mLocationFAB.setColorFilter(ContextCompat.getColor(this, R.color.primary));
+    }
+
+    /**
+     * Enable / Disable Annotations.
+     *
+     * @param enableAnnotations True to display, False to hide
+     */
+    private void toggleAnnotations(boolean enableAnnotations) {
+        if (enableAnnotations) {
+            if (!mIsAnnotationsOn) {
+                mIsAnnotationsOn = true;
+                addMarkers();
+                addPolyline();
+                addPolygon();
+                mMapView.setZoomLevel(7);
+                mMapView.setCenterCoordinate(new LatLng(38.11727, -122.22839));
+            }
+        } else {
+            if (mIsAnnotationsOn) {
+                mIsAnnotationsOn = false;
+                removeAnnotations();
             }
         }
     }
 
-    // This class forwards location updates to updateLocation()
-    private class GpsListener implements LocationListener {
+    private void addMarkers() {
+        LatLng backLot = new LatLng(38.649441, -121.369064);
+        final Marker marker = mMapView.addMarker(new MarkerOptions()
+            .position(backLot)
+            .title("Back Lot")
+            .snippet("The back lot behind my house"));
+        marker.setInfoWindowOnTouchListener(new View.OnTouchListener() {
+            @Override
+            public boolean onTouch(View view, MotionEvent motionEvent) {
+                Toast.makeText(getApplicationContext(), "Custom Info Touch Listener!!", Toast.LENGTH_SHORT).show();
+                marker.hideInfoWindow();
+                return true;
+            }
+        });
 
-        @Override
-        public void onLocationChanged(Location location) {
-            updateLocation(location);
+        LatLng cheeseRoom = new LatLng(38.531577,-122.010646);
+        mMapView.addMarker(new MarkerOptions()
+            .position(cheeseRoom)
+            .sprite("dog-park-15")
+            .title("Cheese Room")
+            .snippet("The only air conditioned room on the property!"));
+    }
+
+    private void addPolyline() {
+        try {
+            String geojsonStr = Util.loadStringFromAssets(this, "small_line.geojson");
+            LatLng[] latLngs = Util.parseGeoJSONCoordinates(geojsonStr);
+            MapView map = mMapView;
+            map.addPolyline(new PolylineOptions()
+                    .add(latLngs)
+                    .width(2)
+                    .color(Color.RED));
+        } catch (Exception e) {
+            Log.e(TAG, "Error adding Polyline: "+ e);
+            e.printStackTrace();
         }
     }
 
-    // This class handles sensor updates to calculate compass bearing
-    private class CompassListener implements SensorEventListener {
-
-        @Override
-        public void onSensorChanged(SensorEvent event) {
-            switch (event.sensor.getType()) {
-                case Sensor.TYPE_ACCELEROMETER:
-                    System.arraycopy(event.values, 0, mValuesAccelerometer, 0, 3);
-                    break;
-                case Sensor.TYPE_MAGNETIC_FIELD:
-                    System.arraycopy(event.values, 0, mValuesMagneticField, 0, 3);
-                    break;
-            }
-
-            boolean valid = SensorManager.getRotationMatrix(mMatrixR, mMatrixI,
-                    mValuesAccelerometer,
-                    mValuesMagneticField);
-
-            if (valid) {
-                SensorManager.getOrientation(mMatrixR, mMatrixValues);
-                //mAzimuthRadians.putValue(mMatrixValues[0]);
-                //mAzimuth = Math.toDegrees(mAzimuthRadians.getAverage());
-
-                if (mGpsLocation != null) {
-                    GeomagneticField geomagneticField = new GeomagneticField(
-                            (float) mGpsLocation.getLatitude(),
-                            (float) mGpsLocation.getLongitude(),
-                            (float) mGpsLocation.getAltitude(),
-                            System.currentTimeMillis());
-                    mCompassBearing = (float) Math.toDegrees(mMatrixValues[0]) + geomagneticField.getDeclination();
-                    mCompassValid = true;
-                }
-            }
-
-            updateMap();
-        }
-
-        @Override
-        public void onAccuracyChanged(Sensor sensor, int accuracy) {
-            // TODO: ignore unreliable stuff
+    private void addPolygon() {
+        try {
+            String geojsonStr = Util.loadStringFromAssets(this, "small_poly.geojson");
+            LatLng[] latLngs = Util.parseGeoJSONCoordinates(geojsonStr);
+            MapView map = mMapView;
+            ArrayList<PolygonOptions> opts = new ArrayList<>();
+            opts.add(new PolygonOptions()
+                        .add(latLngs)
+                        .strokeColor(Color.MAGENTA)
+                        .fillColor(Color.BLUE));
+            map.addPolygons(opts).get(0);
+        } catch (Exception e) {
+            Log.e(TAG, "Error adding Polygon: "+ e);
+            e.printStackTrace();
         }
     }
 
-    // Handles location updates from GPS
-    private void updateLocation(Location location) {
-        if (location != null) {
-            mGpsLocation = location;
-        }
-
-        updateMap();
-    }
-
-    // This class handles style change events
-    private class StyleSpinnerListener implements AdapterView.OnItemSelectedListener {
-
-        @Override
-        public void onItemSelected(AdapterView<?> parent, View view, int position, long id) {
-            switch (position) {
-
-                // Mapbox Streets
-                case 0:
-                    mMapFragment.getMap().setStyleUrl("asset://styles/mapbox-streets-v7.json");
-                    mMapFragment.getMap().removeAllClasses();
-                    mClassSpinner.setVisibility(View.INVISIBLE);
-                    mClassSpinner.setAdapter(null);
-                    mClassSpinner.setOnItemSelectedListener(null);
-                    break;
-
-                // Emerald
-                case 1:
-                    mMapFragment.getMap().setStyleUrl("asset://styles/emerald-v7.json");
-                    mMapFragment.getMap().removeAllClasses();
-                    mClassSpinner.setVisibility(View.INVISIBLE);
-                    mClassSpinner.setAdapter(null);
-                    mClassSpinner.setOnItemSelectedListener(null);
-                    break;
-
-                // Light
-                case 2:
-                    mMapFragment.getMap().setStyleUrl("asset://styles/light-v7.json");
-                    mMapFragment.getMap().removeAllClasses();
-                    mClassSpinner.setVisibility(View.INVISIBLE);
-                    mClassSpinner.setAdapter(null);
-                    mClassSpinner.setOnItemSelectedListener(null);
-                    break;
-
-                // Dark
-                case 3:
-                    mMapFragment.getMap().setStyleUrl("asset://styles/dark-v7.json");
-                    mMapFragment.getMap().removeAllClasses();
-                    mClassSpinner.setVisibility(View.INVISIBLE);
-                    mClassSpinner.setAdapter(null);
-                    mClassSpinner.setOnItemSelectedListener(null);
-                    break;
-
-                // Outdoors
-                case 4:
-                    mMapFragment.getMap().setStyleUrl("asset://styles/outdoors-v7.json");
-                    mMapFragment.getMap().removeAllClasses();
-                    mClassSpinner.setVisibility(View.VISIBLE);
-                    mClassSpinner.setAdapter(mOutdoorsClassAdapter);
-                    mClassSpinner.setOnItemSelectedListener(new OutdoorClassSpinnerListener());
-                    break;
-
-                default:
-                    onNothingSelected(parent);
-                    break;
-            }
-        }
-
-        @Override
-        public void onNothingSelected(AdapterView<?> parent) {
-            mMapFragment.getMap().setStyleUrl("");
-        }
-    }
-
-    // This class handles outdoor class change events
-    private class OutdoorClassSpinnerListener implements AdapterView.OnItemSelectedListener {
-
-        @Override
-        public void onItemSelected(AdapterView<?> parent, View view, int position, long id) {
-            ArrayList<String> classes = new ArrayList<>(1);
-
-            switch (position) {
-                // Day
-                case 0:
-                    classes.add("day");
-                    mMapFragment.getMap().setClasses(classes);
-                    break;
-
-                // Night
-                case 1:
-                    classes.add("night");
-                    mMapFragment.getMap().setClasses(classes);
-                    break;
-
-                default:
-                    onNothingSelected(parent);
-                    break;
-            }
-        }
-
-        @Override
-        public void onNothingSelected(AdapterView<?> parent) {
-            mMapFragment.getMap().removeAllClasses();
-        }
-    }
-
-    // This class handles satellite class change events
-    private class SatelliteClassSpinnerListener implements AdapterView.OnItemSelectedListener {
-
-        @Override
-        public void onItemSelected(AdapterView<?> parent, View view, int position, long id) {
-            ArrayList<String> classes = new ArrayList<>(2);
-
-            switch (position) {
-                // Labels + Contours
-                case 0:
-                    classes.add("labels");
-                    classes.add("contours");
-                    mMapFragment.getMap().setClasses(classes);
-                    break;
-
-                // Labels Only
-                case 1:
-                    classes.add("labels");
-                    mMapFragment.getMap().setClasses(classes);
-                    break;
-
-                // No Labels
-                case 2:
-                    mMapFragment.getMap().setClasses(classes);
-                    break;
-
-                default:
-                    onNothingSelected(parent);
-                    break;
-            }
-        }
-
-        @Override
-        public void onNothingSelected(AdapterView<?> parent) {
-            mMapFragment.getMap().removeAllClasses();
-        }
+    private void removeAnnotations() {
+        mMapView.removeAnnotations();
     }
 
     // Called when FPS changes
@@ -453,62 +463,4 @@ public class MainActivity extends ActionBarActivity {
         }
     }
 
-    // Rotates an ImageView - does not work if the ImageView has padding, use margins
-    private void rotateImageView(ImageView imageView, float angle) {
-        Matrix matrix = new Matrix();
-        matrix.setScale((float) imageView.getWidth() / (float) imageView.getDrawable().getIntrinsicWidth(), (float) imageView.getHeight() / (float) imageView.getDrawable().getIntrinsicHeight());
-        matrix.postRotate(angle, (float) imageView.getWidth() / 2.0f, (float) imageView.getHeight() / 2.0f);
-        imageView.setImageMatrix(matrix);
-        imageView.setScaleType(ImageView.ScaleType.MATRIX);
-    }
-
-    // Updates the UI to match the current map's position
-    private void updateMap() {
-        rotateImageView(mCompassView, (float) mMapFragment.getMap().getDirection());
-
-        if (mGpsLocation != null) {
-            mGpsMarker.setVisibility(View.VISIBLE);
-            LatLng coordinate = new LatLng(mGpsLocation);
-            PointF screenLocation = mMapFragment.getMap().toScreenLocation(coordinate);
-
-            if (mGpsLocation.hasBearing() || mCompassValid) {
-                mGpsMarker.setImageResource(R.drawable.direction_arrow);
-                FrameLayout.LayoutParams lp = new FrameLayout.LayoutParams((int) (54.0f * mDensity), (int) (54.0f * mDensity));
-                lp.leftMargin = (int) ((screenLocation.x - 54.0f / 2.0f) * mDensity);
-                lp.topMargin = mMapFrameLayout.getHeight() - (int) ((screenLocation.y + 54.0f / 2.0f) * mDensity);
-                mGpsMarker.setLayoutParams(lp);
-                float bearing = mGpsLocation.hasBearing() ? mGpsLocation.getBearing() : mCompassBearing;
-                rotateImageView(mGpsMarker, bearing);
-                mGpsMarker.requestLayout();
-            } else {
-                mGpsMarker.setImageResource(R.drawable.location_marker);
-                FrameLayout.LayoutParams lp = new FrameLayout.LayoutParams((int) (27.0f * mDensity), (int) (27.0f * mDensity));
-                lp.leftMargin = (int) ((screenLocation.x - 27.0f / 2.0f) * mDensity);
-                lp.topMargin = mMapFrameLayout.getHeight() - (int) ((screenLocation.y + 27.0f / 2.0f) * mDensity);
-                mGpsMarker.setLayoutParams(lp);
-                rotateImageView(mGpsMarker, 0.0f);
-                mGpsMarker.requestLayout();
-            }
-        } else {
-            mGpsMarker.setVisibility(View.INVISIBLE);
-        }
-    }
-
-    // Called when map state changes
-    private class MyOnMapChangedListener implements MapView.OnMapChangedListener {
-
-        @Override
-        public void onMapChanged() {
-            updateMap();
-        }
-    }
-
-    // Called when someone presses the compass
-    private class CompassOnClickListener implements View.OnClickListener {
-
-        @Override
-        public void onClick(View view) {
-            mMapFragment.getMap().resetNorth();
-        }
-    }
 }

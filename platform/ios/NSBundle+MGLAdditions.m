@@ -6,7 +6,7 @@
 
 + (NSString *)mgl_resourceBundlePath
 {
-    NSString *resourceBundlePath = [[NSBundle bundleForClass:[MGLMapView class]] pathForResource:@"MapboxGL" ofType:@"bundle"];
+    NSString *resourceBundlePath = [[NSBundle bundleForClass:[MGLMapView class]] pathForResource:@"Mapbox" ofType:@"bundle"];
 
     if ( ! resourceBundlePath) resourceBundlePath = [[NSBundle mainBundle] bundlePath];
 

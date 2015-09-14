@@ -23,14 +23,14 @@ void RasterBucket::render(Painter& painter,
     painter.renderRaster(*this, layer_desc, id, matrix);
 }
 
-bool RasterBucket::setImage(const std::string &data) {
-    return raster.load(data);
+bool RasterBucket::setImage(std::unique_ptr<util::Image> image) {
+    return raster.load(std::move(image));
 }
 
 void RasterBucket::drawRaster(RasterShader& shader, StaticVertexBuffer &vertices, VertexArrayObject &array) {
     raster.bind(true);
     shader.u_image = 0;
-    array.bind(shader, vertices, BUFFER_OFFSET(0));
+    array.bind(shader, vertices, BUFFER_OFFSET_0);
     MBGL_CHECK_ERROR(glDrawArrays(GL_TRIANGLES, 0, (GLsizei)vertices.index()));
 }
 

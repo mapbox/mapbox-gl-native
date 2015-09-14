@@ -1,6 +1,7 @@
 #include <mbgl/util/tile_cover.hpp>
 #include <mbgl/util/vec.hpp>
 #include <mbgl/util/box.hpp>
+#include <mbgl/util/tile_coordinate.hpp>
 
 namespace mbgl {
 
@@ -27,8 +28,8 @@ typedef const std::function<void(int32_t x0, int32_t x1, int32_t y)> ScanLine;
 
 // scan-line conversion
 static void scanSpans(edge e0, edge e1, int32_t ymin, int32_t ymax, ScanLine scanLine) {
-    double y0 = std::fmax(ymin, std::floor(e1.y0));
-    double y1 = std::fmin(ymax, std::ceil(e1.y1));
+    double y0 = ::fmax(ymin, std::floor(e1.y0));
+    double y1 = ::fmin(ymax, std::ceil(e1.y1));
 
     // sort edges by x-coordinate
     if ((e0.x0 == e1.x0 && e0.y0 == e1.y0) ?
@@ -43,8 +44,8 @@ static void scanSpans(edge e0, edge e1, int32_t ymin, int32_t ymax, ScanLine sca
     double d0 = e0.dx > 0; // use y + 1 to compute x0
     double d1 = e1.dx < 0; // use y + 1 to compute x1
     for (int32_t y = y0; y < y1; y++) {
-        double x0 = m0 * std::fmax(0, std::fmin(e0.dy, y + d0 - e0.y0)) + e0.x0;
-        double x1 = m1 * std::fmax(0, std::fmin(e1.dy, y + d1 - e1.y0)) + e1.x0;
+        double x0 = m0 * ::fmax(0, ::fmin(e0.dy, y + d0 - e0.y0)) + e0.x0;
+        double x1 = m1 * ::fmax(0, ::fmin(e1.dy, y + d1 - e1.y0)) + e1.x0;
         scanLine(std::floor(x1), std::ceil(x0), y);
     }
 }
@@ -78,13 +79,19 @@ std::forward_list<TileID> tileCover(int8_t z, const mbgl::box &bounds, int8_t ac
         }
     };
 
+    mbgl::vec2<double> tl = { bounds.tl.column, bounds.tl.row };
+    mbgl::vec2<double> tr = { bounds.tr.column, bounds.tr.row };
+    mbgl::vec2<double> br = { bounds.br.column, bounds.br.row };
+    mbgl::vec2<double> bl = { bounds.bl.column, bounds.bl.row };
+
     // Divide the screen up in two triangles and scan each of them:
     // \---+
     // | \ |
     // +---\.
-    scanTriangle(bounds.tl, bounds.tr, bounds.br, 0, tiles, scanLine);
-    scanTriangle(bounds.br, bounds.bl, bounds.tl, 0, tiles, scanLine);
+    scanTriangle(tl, tr, br, 0, tiles, scanLine);
+    scanTriangle(br, bl, tl, 0, tiles, scanLine);
 
+    t.sort();
     t.unique();
 
     return t;

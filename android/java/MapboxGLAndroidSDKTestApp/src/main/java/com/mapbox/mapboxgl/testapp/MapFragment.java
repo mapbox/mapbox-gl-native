@@ -9,10 +9,6 @@ import android.view.ViewGroup;
 
 import com.mapbox.mapboxgl.views.MapView;
 
-import java.io.BufferedReader;
-import java.io.IOException;
-import java.io.InputStreamReader;
-
 public class MapFragment extends Fragment {
 
     //
@@ -41,15 +37,6 @@ public class MapFragment extends Fragment {
 
         // Create the map
         mMap = (MapView) inflater.inflate(R.layout.fragment_main, container, true);
-
-        // Load the access token
-        try {
-            BufferedReader reader = new BufferedReader(new InputStreamReader(getActivity().getApplicationContext().getResources().openRawResource(R.raw.token)));
-            String line = reader.readLine();
-            mMap.setAccessToken(line);
-        } catch (IOException e) {
-            return null;
-        }
 
         // Need to pass on any saved state to the map
         mMap.onCreate(savedInstanceState);

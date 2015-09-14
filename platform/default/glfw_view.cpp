@@ -1,9 +1,11 @@
 #include <mbgl/annotation/point_annotation.hpp>
 #include <mbgl/annotation/shape_annotation.hpp>
+#include <mbgl/annotation/sprite_image.hpp>
 #include <mbgl/platform/default/glfw_view.hpp>
 #include <mbgl/platform/gl.hpp>
 #include <mbgl/platform/log.hpp>
 #include <mbgl/util/gl_helper.hpp>
+#include <mbgl/util/string.hpp>
 
 #include <cassert>
 #include <cstdlib>
@@ -13,7 +15,8 @@ void glfwError(int error, const char *description) {
     assert(false);
 }
 
-GLFWView::GLFWView(bool fullscreen_) : fullscreen(fullscreen_) {
+GLFWView::GLFWView(bool fullscreen_, bool benchmark_)
+    : fullscreen(fullscreen_), benchmark(benchmark_) {
     glfwSetErrorCallback(glfwError);
 
     std::srand(std::time(0));
@@ -26,6 +29,9 @@ GLFWView::GLFWView(bool fullscreen_) : fullscreen(fullscreen_) {
     GLFWmonitor *monitor = nullptr;
     if (fullscreen) {
         monitor = glfwGetPrimaryMonitor();
+        auto videoMode = glfwGetVideoMode(monitor);
+        width = videoMode->width;
+        height = videoMode->height;
     }
 
 #ifdef DEBUG
@@ -54,16 +60,26 @@ GLFWView::GLFWView(bool fullscreen_) : fullscreen(fullscreen_) {
 
     glfwSetWindowUserPointer(window, this);
     glfwMakeContextCurrent(window);
-    glfwSwapInterval(1);
+    if (benchmark) {
+        // Disables vsync on platforms that support it.
+        glfwSwapInterval(0);
+    } else {
+        glfwSwapInterval(1);
+    }
+
 
     glfwSetCursorPosCallback(window, onMouseMove);
     glfwSetMouseButtonCallback(window, onMouseClick);
-    glfwSetWindowSizeCallback(window, onResize);
-    glfwSetFramebufferSizeCallback(window, onResize);
+    glfwSetWindowSizeCallback(window, onWindowResize);
+    glfwSetFramebufferSizeCallback(window, onFramebufferResize);
     glfwSetScrollCallback(window, onScroll);
     glfwSetKeyCallback(window, onKey);
 
     mbgl::gl::InitializeExtensions(glfwGetProcAddress);
+
+    glfwGetWindowSize(window, &width, &height);
+    glfwGetFramebufferSize(window, &fbWidth, &fbHeight);
+    pixelRatio = static_cast<float>(fbWidth) / width;
 
     glfwMakeContextCurrent(nullptr);
 }
@@ -75,9 +91,6 @@ GLFWView::~GLFWView() {
 
 void GLFWView::initialize(mbgl::Map *map_) {
     View::initialize(map_);
-
-    glfwGetWindowSize(window, &width, &height);
-    onResize(window, width, height);
 }
 
 void GLFWView::onKey(GLFWwindow *window, int key, int /*scancode*/, int action, int mods) {
@@ -119,6 +132,9 @@ void GLFWView::onKey(GLFWwindow *window, int key, int /*scancode*/, int action, 
         case GLFW_KEY_Q:
             view->clearAnnotations();
             break;
+        case GLFW_KEY_P: {
+            view->addRandomCustomPointAnnotations(1);
+        } break;
         }
     }
 
@@ -149,6 +165,49 @@ mbgl::LatLng GLFWView::makeRandomPoint() const {
     return { lat, lon };
 }
 
+std::shared_ptr<const mbgl::SpriteImage>
+GLFWView::makeSpriteImage(int width, int height, float pixelRatio) {
+    const int r = 255 * (double(std::rand()) / RAND_MAX);
+    const int g = 255 * (double(std::rand()) / RAND_MAX);
+    const int b = 255 * (double(std::rand()) / RAND_MAX);
+
+    const int w = std::ceil(pixelRatio * width);
+    const int h = std::ceil(pixelRatio * height);
+
+    std::string pixels(w * h * 4, '\x00');
+    auto data = reinterpret_cast<uint32_t*>(const_cast<char*>(pixels.data()));
+    const int dist = (w / 2) * (w / 2);
+    for (int y = 0; y < h; y++) {
+        for (int x = 0; x < w; x++) {
+            const int dx = x - w / 2;
+            const int dy = y - h / 2;
+            const int diff = dist - (dx * dx + dy * dy);
+            if (diff > 0) {
+                const int a = std::min(0xFF, diff) * 0xFF / dist;
+                // Premultiply the rgb values with alpha
+                data[w * y + x] =
+                    (a << 24) | ((a * r / 0xFF) << 16) | ((a * g / 0xFF) << 8) | (a * b / 0xFF);
+            }
+        }
+    }
+
+    return std::make_shared<mbgl::SpriteImage>(width, height, pixelRatio, std::move(pixels));
+}
+
+void GLFWView::addRandomCustomPointAnnotations(int count) {
+    std::vector<mbgl::PointAnnotation> points;
+
+    for (int i = 0; i < count; i++) {
+        static int spriteID = 1;
+        const auto name = std::string{ "marker-" } + mbgl::util::toString(spriteID++);
+        map->setSprite(name, makeSpriteImage(22, 22, 1));
+        spriteIDs.push_back(name);
+        points.emplace_back(makeRandomPoint(), name);
+    }
+
+    auto newIDs = map->addPointAnnotations(points);
+    annotationIDs.insert(annotationIDs.end(), newIDs.begin(), newIDs.end());
+}
 
 void GLFWView::addRandomPointAnnotations(int count) {
     std::vector<mbgl::PointAnnotation> points;
@@ -226,15 +285,20 @@ void GLFWView::onScroll(GLFWwindow *window, double /*xOffset*/, double yOffset) 
     view->map->scaleBy(scale, view->lastX, view->lastY);
 }
 
-void GLFWView::onResize(GLFWwindow *window, int width, int height ) {
+void GLFWView::onWindowResize(GLFWwindow *window, int width, int height) {
     GLFWView *view = reinterpret_cast<GLFWView *>(glfwGetWindowUserPointer(window));
     view->width = width;
     view->height = height;
 
-    int fbWidth, fbHeight;
-    glfwGetFramebufferSize(window, &fbWidth, &fbHeight);
+    view->map->update(mbgl::Update::Dimensions);
+}
 
-    view->map->resize(width, height, static_cast<float>(fbWidth) / static_cast<float>(width));
+void GLFWView::onFramebufferResize(GLFWwindow *window, int width, int height) {
+    GLFWView *view = reinterpret_cast<GLFWView *>(glfwGetWindowUserPointer(window));
+    view->fbWidth = width;
+    view->fbHeight = height;
+
+    view->map->update(mbgl::Update::Repaint);
 }
 
 void GLFWView::onMouseClick(GLFWwindow *window, int button, int action, int modifiers) {
@@ -282,9 +346,26 @@ void GLFWView::run() {
         glfwWaitEvents();
         const bool dirty = !clean.test_and_set();
         if (dirty) {
+            const double started = glfwGetTime();
             map->renderSync();
+            report(1000 * (glfwGetTime() - started));
+            if (benchmark) {
+                map->update(mbgl::Update::Repaint);
+            }
         }
     }
+}
+
+float GLFWView::getPixelRatio() const {
+    return pixelRatio;
+}
+
+std::array<uint16_t, 2> GLFWView::getSize() const {
+    return {{ static_cast<uint16_t>(width), static_cast<uint16_t>(height) }};
+}
+
+std::array<uint16_t, 2> GLFWView::getFramebufferSize() const {
+    return {{ static_cast<uint16_t>(fbWidth), static_cast<uint16_t>(fbHeight) }};
 }
 
 void GLFWView::activate() {
@@ -304,22 +385,26 @@ void GLFWView::invalidate() {
     glfwPostEmptyEvent();
 }
 
-void GLFWView::swap() {
-    glfwSwapBuffers(window);
-    fps();
+void GLFWView::beforeRender() {
+    // no-op
 }
 
-void GLFWView::fps() {
-    static int frames = 0;
-    static double timeElapsed = 0;
+void GLFWView::afterRender() {
+    glfwSwapBuffers(window);
+}
 
+void GLFWView::report(float duration) {
     frames++;
-    double currentTime = glfwGetTime();
+    frameTime += duration;
 
-    if (currentTime - timeElapsed >= 1) {
-        mbgl::Log::Info(mbgl::Event::OpenGL, "FPS: %4.2f", frames / (currentTime - timeElapsed));
-        timeElapsed = currentTime;
+    const double currentTime = glfwGetTime();
+    if (currentTime - lastReported >= 1) {
+        frameTime /= frames;
+        mbgl::Log::Info(mbgl::Event::OpenGL, "Frame time: %6.2fms (%6.2f fps)", frameTime,
+            1000 / frameTime);
         frames = 0;
+        frameTime = 0;
+        lastReported = currentTime;
     }
 }
 
@@ -338,8 +423,6 @@ void GLFWView::setWindowTitle(const std::string& title) {
 
 namespace mbgl {
 namespace platform {
-
-double elapsed() { return glfwGetTime(); }
 
 #ifndef GL_ES_VERSION_2_0
 void showDebugImage(std::string name, const char *data, size_t width, size_t height) {

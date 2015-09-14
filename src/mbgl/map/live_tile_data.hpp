@@ -1,31 +1,32 @@
 #ifndef MBGL_MAP_LIVE_TILE_DATA
 #define MBGL_MAP_LIVE_TILE_DATA
 
-#include <mbgl/map/vector_tile_data.hpp>
+#include <mbgl/map/tile_data.hpp>
+#include <mbgl/map/tile_worker.hpp>
 
 namespace mbgl {
 
-class AnnotationManager;
+class Style;
+class SourceInfo;
+class WorkRequest;
+class LiveTile;
 
-class LiveTileData : public VectorTileData {
+class LiveTileData : public TileData {
 public:
     LiveTileData(const TileID&,
-                 AnnotationManager&,
-                 const std::vector<util::ptr<StyleLayer>>&,
-                 Worker&,
-                 GlyphAtlas&,
-                 GlyphStore&,
-                 SpriteAtlas&,
-                 util::ptr<Sprite>,
+                 const LiveTile*,
+                 Style&,
                  const SourceInfo&,
-                 float angle_,
-                 bool collisionDebug_);
+                 std::function<void ()> callback);
     ~LiveTileData();
 
-    void parse() override;
+    void cancel() override;
+    Bucket* getBucket(const StyleLayer&) override;
 
 private:
-    AnnotationManager& annotationManager;
+    Worker& worker;
+    TileWorker tileWorker;
+    std::unique_ptr<WorkRequest> workRequest;
 };
 
 }

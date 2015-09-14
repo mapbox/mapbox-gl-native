@@ -36,27 +36,51 @@ public:
     }
 
     static std::string getName() {
-        return current.get()->name;
+        if (current.get() != nullptr) {
+            return current.get()->name;
+        } else {
+            return "Unknown";
+        }
     }
 
     static ThreadPriority getPriority() {
-        return current.get()->priority;
+        if (current.get() != nullptr) {
+            return current.get()->priority;
+        } else {
+            return ThreadPriority::Regular;
+        }
     }
 
     static FileSource* getFileSource() {
-        return current.get()->fileSource;
+        if (current.get() != nullptr) {
+            return current.get()->fileSource;
+        } else {
+            return nullptr;
+        }
     }
 
     static void setFileSource(FileSource* fileSource) {
-        current.get()->fileSource = fileSource;
+        if (current.get() != nullptr) {
+            current.get()->fileSource = fileSource;
+        } else {
+            throw new std::runtime_error("Current thread has no current ThreadContext.");
+        }
     }
 
     static GLObjectStore* getGLObjectStore() {
-        return current.get()->glObjectStore;
+        if (current.get() != nullptr) {
+            return current.get()->glObjectStore;
+        } else {
+            return nullptr;
+        }
     }
 
     static void setGLObjectStore(GLObjectStore* glObjectStore) {
-        current.get()->glObjectStore = glObjectStore;
+        if (current.get() != nullptr) {
+            current.get()->glObjectStore = glObjectStore;
+        } else {
+            throw new std::runtime_error("Current thread has no current ThreadContext.");
+        }
     }
 
 private:

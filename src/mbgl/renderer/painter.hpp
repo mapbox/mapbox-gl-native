@@ -2,6 +2,7 @@
 #define MBGL_RENDERER_PAINTER
 
 #include <mbgl/map/transform_state.hpp>
+#include <mbgl/map/map_context.hpp>
 
 #include <mbgl/renderer/frame_history.hpp>
 #include <mbgl/renderer/bucket.hpp>
@@ -31,11 +32,13 @@ class SpriteAtlas;
 class GlyphAtlas;
 class LineAtlas;
 class Source;
+struct FrameData;
 
 
 class DebugBucket;
 class FillBucket;
 class LineBucket;
+class CircleBucket;
 class SymbolBucket;
 class RasterBucket;
 
@@ -48,13 +51,13 @@ class LineShader;
 class LinejoinShader;
 class LineSDFShader;
 class LinepatternShader;
+class CircleShader;
 class PatternShader;
 class IconShader;
 class RasterShader;
 class SDFGlyphShader;
 class SDFIconShader;
 class DotShader;
-class GaussianShader;
 class CollisionBoxShader;
 
 struct ClipID;
@@ -62,24 +65,18 @@ struct ClipID;
 struct RenderItem {
     inline RenderItem(const StyleLayer& layer_,
                       const Tile* tile_ = nullptr,
-                      Bucket* bucket_ = nullptr,
-                      RenderPass passes_ = RenderPass::Opaque)
-        : tile(tile_), bucket(bucket_), layer(layer_), passes(passes_) {
+                      Bucket* bucket_ = nullptr)
+        : tile(tile_), bucket(bucket_), layer(layer_) {
     }
 
     const Tile* const tile;
     Bucket* const bucket;
     const StyleLayer& layer;
-    const RenderPass passes;
-
-    inline bool hasRenderPass(RenderPass pass) const {
-        return bool(passes & pass);
-    }
 };
 
 class Painter : private util::noncopyable {
 public:
-    Painter();
+    Painter(MapData& data);
     ~Painter();
 
     void setup();
@@ -93,7 +90,8 @@ public:
 
     void render(const Style& style,
                 TransformState state,
-                TimePoint time);
+                const FrameData& frame,
+                const TimePoint& time);
 
     // Renders debug information for a tile.
     void renderTileDebug(const Tile& tile);
@@ -104,6 +102,7 @@ public:
     void renderDebugText(DebugBucket& bucket, const mat4 &matrix);
     void renderFill(FillBucket& bucket, const StyleLayer &layer_desc, const TileID& id, const mat4 &matrix);
     void renderLine(LineBucket& bucket, const StyleLayer &layer_desc, const TileID& id, const mat4 &matrix);
+    void renderCircle(CircleBucket& bucket, const StyleLayer &layer_desc, const TileID& id, const mat4 &matrix);
     void renderSymbol(SymbolBucket& bucket, const StyleLayer &layer_desc, const TileID& id, const mat4 &matrix);
     void renderRaster(RasterBucket& bucket, const StyleLayer &layer_desc, const TileID& id, const mat4 &matrix);
     void renderBackground(const StyleLayer &layer_desc);
@@ -118,13 +117,11 @@ public:
 
     void createPrerendered(RasterBucket& bucket, const StyleLayer &layer_desc, const TileID& id);
 
+    // Adjusts the dimensions of the OpenGL viewport
     void resize();
 
     // Changes whether debug information is drawn onto the map
     void setDebug(bool enabled);
-
-    // Configures the painter strata that is used for early z-culling of fragments.
-    void setStrata(float strata);
 
     void drawClippingMasks(const std::set<Source*>&);
     void drawClippingMask(const mat4& matrix, const ClipID& clip);
@@ -142,13 +139,11 @@ private:
     mat4 translatedMatrix(const mat4& matrix, const std::array<float, 2> &translation, const TileID &id, TranslateAnchorType anchor);
 
     std::vector<RenderItem> determineRenderOrder(const Style& style);
-    static RenderPass determineRenderPasses(const StyleLayer&);
 
     template <class Iterator>
     void renderPass(RenderPass,
                     Iterator it, Iterator end,
-                    std::size_t i, int8_t iIncrement,
-                    const float strataThickness);
+                    std::size_t i, int8_t increment);
 
     void prepareTile(const Tile& tile);
 
@@ -162,6 +157,8 @@ private:
                    std::array<float, 2> texsize,
                    SDFShader& sdfShader,
                    void (SymbolBucket::*drawSDF)(SDFShader&));
+
+    void setDepthSublayer(int n);
 
 public:
     void useProgram(uint32_t program);
@@ -187,7 +184,10 @@ public:
     }();
 
 private:
+    MapData& data;
+
     TransformState state;
+    FrameData frame;
 
     bool debug = false;
     int indent = 0;
@@ -197,9 +197,13 @@ private:
     uint32_t gl_program = 0;
     float gl_lineWidth = 0;
     std::array<uint16_t, 2> gl_viewport = {{ 0, 0 }};
-    float strata = 0;
     RenderPass pass = RenderPass::Opaque;
-    const float strata_epsilon = 1.0f / (1 << 16);
+    Color background = {{ 0, 0, 0, 0 }};
+
+    int numSublayers = 3;
+    size_t currentLayer;
+    float depthRangeSize;
+    const float depthEpsilon = 1.0f / (1 << 16);
 
 public:
     FrameHistory frameHistory;
@@ -219,8 +223,8 @@ public:
     std::unique_ptr<SDFGlyphShader> sdfGlyphShader;
     std::unique_ptr<SDFIconShader> sdfIconShader;
     std::unique_ptr<DotShader> dotShader;
-    std::unique_ptr<GaussianShader> gaussianShader;
     std::unique_ptr<CollisionBoxShader> collisionBoxShader;
+    std::unique_ptr<CircleShader> circleShader;
 
     StaticVertexBuffer backgroundBuffer = {
         { -1, -1 }, { 1, -1 },
@@ -244,7 +248,6 @@ public:
 
     VertexArrayObject coveringPlainArray;
     VertexArrayObject coveringRasterArray;
-    VertexArrayObject coveringGaussianArray;
 
     // Set up the tile boundary lines we're using to draw the tile outlines.
     StaticVertexBuffer tileBorderBuffer = {

@@ -11,14 +11,14 @@ TEST(API, SetStyle) {
     using namespace mbgl;
 
     auto display = std::make_shared<mbgl::HeadlessDisplay>();
-    HeadlessView view(display);
+    HeadlessView view(display, 1);
     DefaultFileSource fileSource(nullptr);
 
     Log::setObserver(std::make_unique<FixtureLogObserver>());
 
     {
         Map map(view, fileSource, MapMode::Still);
-        map.setStyleJSON("invalid", "test/suite");
+        map.setStyleJSON("invalid", "");
     }
 
     auto observer = Log::removeObserver();

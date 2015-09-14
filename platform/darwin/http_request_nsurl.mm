@@ -1,4 +1,5 @@
-#include <mbgl/storage/http_context.hpp>
+#include <mbgl/storage/http_context_base.hpp>
+#include <mbgl/storage/http_request_base.hpp>
 #include <mbgl/storage/resource.hpp>
 #include <mbgl/storage/response.hpp>
 
@@ -12,55 +13,25 @@
 
 namespace mbgl {
 
-enum class ResponseStatus : uint8_t {
-    // This error probably won't be resolved by retrying anytime soon. We are giving up.
-    PermanentError,
-
-    // This error might be resolved by waiting some time (e.g. server issues).
-    // We are going to do an exponential back-off and will try again in a few seconds.
-    TemporaryError,
-
-    // This error was caused by a temporary error and it is likely that it will be resolved
-    // immediately. We are going to try again right away. This is like the TemporaryError, except
-    // that we will not perform exponential back-off.
-    SingularError,
-
-    // This error might be resolved once the network reachability status changes.
-    // We are going to watch the network status for changes and will retry as soon as the
-    // operating system notifies us of a network status change.
-    ConnectionError,
-
-    // The request was canceled mid-way.
-    Canceled,
-
-    // The request returned data successfully. We retrieved and decoded the data successfully.
-    Successful,
-
-    // The request confirmed that the data wasn't changed. We already have the data.
-    NotModified,
-};
-
-// -------------------------------------------------------------------------------------------------
-
 class HTTPNSURLContext;
 
-class HTTPRequest : public RequestBase {
+class HTTPNSURLRequest : public HTTPRequestBase {
 public:
-    HTTPRequest(HTTPNSURLContext*,
+    HTTPNSURLRequest(HTTPNSURLContext*,
                 const Resource&,
                 Callback,
                 uv_loop_t*,
                 std::shared_ptr<const Response>);
-    ~HTTPRequest();
+    ~HTTPNSURLRequest();
 
-    void cancel() override;
-    void retry() override;
+    void cancel() final;
+    void retry() final;
 
 private:
     void start();
     void handleResult(NSData *data, NSURLResponse *res, NSError *error);
     void handleResponse();
-    void retry(uint64_t timeout);
+    void retry(uint64_t timeout) final;
 
     HTTPNSURLContext *context = nullptr;
     bool cancelled = false;
@@ -78,22 +49,22 @@ private:
 
 // -------------------------------------------------------------------------------------------------
 
-class HTTPNSURLContext : public HTTPContext {
+class HTTPNSURLContext : public HTTPContextBase {
 public:
     HTTPNSURLContext(uv_loop_t *loop);
     ~HTTPNSURLContext();
 
-    RequestBase* createRequest(const Resource&,
+    HTTPRequestBase* createRequest(const Resource&,
                                RequestBase::Callback,
                                uv_loop_t*,
-                               std::shared_ptr<const Response>) override;
+                               std::shared_ptr<const Response>) final;
 
     NSURLSession *session = nil;
     NSString *userAgent = nil;
     NSInteger accountType = 0;
 };
 
-HTTPNSURLContext::HTTPNSURLContext(uv_loop_t *loop_) : HTTPContext(loop_) {
+HTTPNSURLContext::HTTPNSURLContext(uv_loop_t *loop_) : HTTPContextBase(loop_) {
     @autoreleasepool {
         NSURLSessionConfiguration *sessionConfig =
                 [NSURLSessionConfiguration defaultSessionConfiguration];
@@ -120,17 +91,17 @@ HTTPNSURLContext::~HTTPNSURLContext() {
     userAgent = nullptr;
 }
 
-RequestBase* HTTPNSURLContext::createRequest(const Resource& resource,
+HTTPRequestBase* HTTPNSURLContext::createRequest(const Resource& resource,
                                              RequestBase::Callback callback,
                                              uv_loop_t* loop,
                                              std::shared_ptr<const Response> response) {
-    return new HTTPRequest(this, resource, callback, loop, response);
+    return new HTTPNSURLRequest(this, resource, callback, loop, response);
 }
 
 // -------------------------------------------------------------------------------------------------
 
-HTTPRequest::HTTPRequest(HTTPNSURLContext* context_, const Resource& resource_, Callback callback_, uv_loop_t *loop, std::shared_ptr<const Response> existingResponse_)
-    : RequestBase(resource_, callback_),
+HTTPNSURLRequest::HTTPNSURLRequest(HTTPNSURLContext* context_, const Resource& resource_, Callback callback_, uv_loop_t *loop, std::shared_ptr<const Response> existingResponse_)
+    : HTTPRequestBase(resource_, callback_),
       context(context_),
       existingResponse(existingResponse_),
       async(loop, [this] { handleResponse(); }),
@@ -139,7 +110,7 @@ HTTPRequest::HTTPRequest(HTTPNSURLContext* context_, const Resource& resource_, 
     start();
 }
 
-HTTPRequest::~HTTPRequest() {
+HTTPNSURLRequest::~HTTPNSURLRequest() {
     assert(!task);
 
     // Stop the backoff timer to avoid re-triggering this request.
@@ -148,7 +119,7 @@ HTTPRequest::~HTTPRequest() {
     context->removeRequest(this);
 }
 
-void HTTPRequest::start() {
+void HTTPNSURLRequest::start() {
     assert(!task);
 
     attempts++;
@@ -183,7 +154,7 @@ void HTTPRequest::start() {
     }
 }
 
-void HTTPRequest::handleResponse() {
+void HTTPNSURLRequest::handleResponse() {
     if (task) {
         [task release];
         task = nullptr;
@@ -211,7 +182,7 @@ void HTTPRequest::handleResponse() {
     delete this;
 }
 
-void HTTPRequest::cancel() {
+void HTTPNSURLRequest::cancel() {
     context->removeRequest(this);
     cancelled = true;
 
@@ -242,7 +213,7 @@ int64_t parseCacheControl(const char *value) {
     return 0;
 }
 
-void HTTPRequest::handleResult(NSData *data, NSURLResponse *res, NSError *error) {
+void HTTPNSURLRequest::handleResult(NSData *data, NSURLResponse *res, NSError *error) {
     if (error) {
         if ([error code] == NSURLErrorCancelled) {
             status = ResponseStatus::Canceled;
@@ -345,14 +316,14 @@ void HTTPRequest::handleResult(NSData *data, NSURLResponse *res, NSError *error)
     async.send();
 }
 
-void HTTPRequest::retry(uint64_t timeout) {
+void HTTPNSURLRequest::retry(uint64_t timeout) {
     response.reset();
 
     timer.stop();
     timer.start(timeout, 0, [this] { start(); });
 }
 
-void HTTPRequest::retry() {
+void HTTPNSURLRequest::retry() {
     // All batons get notified when the network status changed, but some of them
     // might not actually wait for the network to become available again.
     if (strategy == PreemptImmediately) {
@@ -362,7 +333,7 @@ void HTTPRequest::retry() {
     }
 }
 
-std::unique_ptr<HTTPContext> HTTPContext::createContext(uv_loop_t* loop) {
+std::unique_ptr<HTTPContextBase> HTTPContextBase::createContext(uv_loop_t* loop) {
     return std::make_unique<HTTPNSURLContext>(loop);
 }
 

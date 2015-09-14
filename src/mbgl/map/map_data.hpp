@@ -12,6 +12,7 @@
 
 #include <mbgl/map/mode.hpp>
 #include <mbgl/map/annotation.hpp>
+#include <mbgl/util/exclusive.hpp>
 
 namespace mbgl {
 
@@ -19,9 +20,14 @@ class MapData {
     using Lock = std::lock_guard<std::mutex>;
 
 public:
-    inline MapData(MapMode mode_) : mode(mode_) {
-        setAnimationTime(TimePoint::min());
-        setDefaultTransitionDuration(Duration::zero());
+    inline MapData(MapMode mode_, const float pixelRatio_)
+        : mode(mode_)
+        , pixelRatio(pixelRatio_)
+        , animationTime(Duration::zero())
+        , defaultFadeDuration(std::chrono::milliseconds(300))
+        , defaultTransitionDuration(Duration::zero())
+        , defaultTransitionDelay(Duration::zero()) {
+        assert(pixelRatio > 0);
     }
 
     // Adds the class if it's not yet set. Returns true when it added the class, and false when it
@@ -67,29 +73,57 @@ public:
         // has a bug that doesn't allow TimePoints to be atomic.
         return TimePoint(animationTime);
     }
-    inline void setAnimationTime(TimePoint timePoint) {
+    inline void setAnimationTime(const TimePoint& timePoint) {
         animationTime = timePoint.time_since_epoch();
     };
+
+    inline Duration getDefaultFadeDuration() const {
+        return defaultFadeDuration;
+    }
+
+    inline void setDefaultFadeDuration(const Duration& duration) {
+        defaultFadeDuration = duration;
+    }
 
     inline Duration getDefaultTransitionDuration() const {
         return defaultTransitionDuration;
     }
-    inline void setDefaultTransitionDuration(Duration duration) {
+
+    inline void setDefaultTransitionDuration(const Duration& duration) {
         defaultTransitionDuration = duration;
-    };
+    }
+
+    inline Duration getDefaultTransitionDelay() const {
+        return defaultTransitionDelay;
+    }
+
+    inline void setDefaultTransitionDelay(const Duration& delay) {
+        defaultTransitionDelay = delay;
+    }
+
+    util::exclusive<AnnotationManager> getAnnotationManager() {
+        return util::exclusive<AnnotationManager>(
+            &annotationManager,
+            std::make_unique<std::lock_guard<std::mutex>>(annotationManagerMutex));
+    }
 
 public:
-    AnnotationManager annotationManager;
     const MapMode mode;
+    const float pixelRatio;
 
 private:
+    mutable std::mutex annotationManagerMutex;
+    AnnotationManager annotationManager;
+
     mutable std::mutex mtx;
 
     std::vector<std::string> classes;
     std::atomic<uint8_t> debug { false };
     std::atomic<uint8_t> collisionDebug { false };
     std::atomic<Duration> animationTime;
+    std::atomic<Duration> defaultFadeDuration;
     std::atomic<Duration> defaultTransitionDuration;
+    std::atomic<Duration> defaultTransitionDelay;
 
 // TODO: make private
 public:

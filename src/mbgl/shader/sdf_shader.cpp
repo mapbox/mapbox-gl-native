@@ -12,13 +12,12 @@ SDFShader::SDFShader()
         shaders[SDF_SHADER].vertex,
         shaders[SDF_SHADER].fragment
     ) {
-    a_pos = MBGL_CHECK_ERROR(glGetAttribLocation(program, "a_pos"));
     a_offset = MBGL_CHECK_ERROR(glGetAttribLocation(program, "a_offset"));
     a_data1 = MBGL_CHECK_ERROR(glGetAttribLocation(program, "a_data1"));
     a_data2 = MBGL_CHECK_ERROR(glGetAttribLocation(program, "a_data2"));
 }
 
-void SDFGlyphShader::bind(char *offset) {
+void SDFGlyphShader::bind(GLbyte *offset) {
     const int stride = 16;
 
     MBGL_CHECK_ERROR(glEnableVertexAttribArray(a_pos));
@@ -34,7 +33,7 @@ void SDFGlyphShader::bind(char *offset) {
     MBGL_CHECK_ERROR(glVertexAttribPointer(a_data2, 4, GL_UNSIGNED_BYTE, false, stride, offset + 12));
 }
 
-void SDFIconShader::bind(char *offset) {
+void SDFIconShader::bind(GLbyte *offset) {
     const int stride = 16;
 
     MBGL_CHECK_ERROR(glEnableVertexAttribArray(a_pos));

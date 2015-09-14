@@ -21,6 +21,13 @@ const std::map<PropertyKey, PropertyValue> PropertyFallbackValue::properties = {
     { PropertyKey::LineGapWidth, defaultStyleProperties<LineProperties>().gap_width },
     { PropertyKey::LineBlur, defaultStyleProperties<LineProperties>().blur },
 
+    { PropertyKey::CircleRadius, defaultStyleProperties<CircleProperties>().radius },
+    { PropertyKey::CircleColor, defaultStyleProperties<CircleProperties>().color },
+    { PropertyKey::CircleOpacity, defaultStyleProperties<CircleProperties>().opacity },
+    { PropertyKey::CircleTranslate, defaultStyleProperties<CircleProperties>().translate },
+    { PropertyKey::CircleTranslateAnchor, defaultStyleProperties<CircleProperties>().translateAnchor },
+    { PropertyKey::CircleBlur, defaultStyleProperties<CircleProperties>().blur },
+
     { PropertyKey::IconOpacity, defaultStyleProperties<SymbolProperties>().icon.opacity },
     { PropertyKey::IconSize, defaultStyleProperties<SymbolProperties>().icon.size },
     { PropertyKey::IconColor, defaultStyleProperties<SymbolProperties>().icon.color },
@@ -56,14 +63,13 @@ const std::map<PropertyKey, PropertyValue> PropertyFallbackValue::properties = {
     { PropertyKey::LineRoundLimit, defaultStyleLayout<StyleLayoutLine>().round_limit },
 
     { PropertyKey::SymbolPlacement, defaultStyleLayout<StyleLayoutSymbol>().placement },
-    { PropertyKey::SymbolMinDistance, defaultStyleLayout<StyleLayoutSymbol>().min_distance },
+    { PropertyKey::SymbolSpacing, defaultStyleLayout<StyleLayoutSymbol>().spacing },
     { PropertyKey::SymbolAvoidEdges, defaultStyleLayout<StyleLayoutSymbol>().avoid_edges },
 
     { PropertyKey::IconAllowOverlap, defaultStyleLayout<StyleLayoutSymbol>().icon.allow_overlap },
     { PropertyKey::IconIgnorePlacement, defaultStyleLayout<StyleLayoutSymbol>().icon.ignore_placement },
     { PropertyKey::IconOptional, defaultStyleLayout<StyleLayoutSymbol>().icon.optional },
     { PropertyKey::IconRotationAlignment, defaultStyleLayout<StyleLayoutSymbol>().icon.rotation_alignment },
-    { PropertyKey::IconMaxSize, defaultStyleLayout<StyleLayoutSymbol>().icon.max_size },
     { PropertyKey::IconImage, defaultStyleLayout<StyleLayoutSymbol>().icon.image },
     { PropertyKey::IconRotate, defaultStyleLayout<StyleLayoutSymbol>().icon.rotate },
     { PropertyKey::IconPadding, defaultStyleLayout<StyleLayoutSymbol>().icon.padding },
@@ -73,7 +79,6 @@ const std::map<PropertyKey, PropertyValue> PropertyFallbackValue::properties = {
     { PropertyKey::TextRotationAlignment, defaultStyleLayout<StyleLayoutSymbol>().text.rotation_alignment },
     { PropertyKey::TextField, defaultStyleLayout<StyleLayoutSymbol>().text.field },
     { PropertyKey::TextFont, defaultStyleLayout<StyleLayoutSymbol>().text.font },
-    { PropertyKey::TextMaxSize, defaultStyleLayout<StyleLayoutSymbol>().text.max_size },
     { PropertyKey::TextMaxWidth, defaultStyleLayout<StyleLayoutSymbol>().text.max_width },
     { PropertyKey::TextLineHeight, defaultStyleLayout<StyleLayoutSymbol>().text.line_height },
     { PropertyKey::TextLetterSpacing, defaultStyleLayout<StyleLayoutSymbol>().text.letter_spacing },

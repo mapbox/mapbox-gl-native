@@ -61,7 +61,7 @@ Rect<uint16_t> GlyphAtlas::addGlyph(uintptr_t tileUID,
     }
 
     // The glyph bitmap has zero width.
-    if (!glyph.bitmap.size()) {
+    if (glyph.bitmap.empty()) {
         return Rect<uint16_t>{ 0, 0, 0, 0 };
     }
 
@@ -114,7 +114,7 @@ void GlyphAtlas::removeGlyphs(uintptr_t tileUID) {
             GlyphValue& value = it->second;
             value.ids.erase(tileUID);
 
-            if (!value.ids.size()) {
+            if (value.ids.empty()) {
                 const Rect<uint16_t>& rect = value.rect;
 
                 // Clear out the bitmap.
@@ -176,7 +176,7 @@ void GlyphAtlas::upload() {
         dirty = false;
 
 #if defined(DEBUG)
-        // platform::showDebugImage("Glyph Atlas", data.get(), width, height);
+        // platform::showDebugImage("Glyph Atlas", reinterpret_cast<char*>(data.get()), width, height);
 #endif
     }
 }

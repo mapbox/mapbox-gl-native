@@ -1,4 +1,5 @@
-#include <mbgl/storage/http_context.hpp>
+#include <mbgl/storage/http_context_base.hpp>
+#include <mbgl/storage/http_request_base.hpp>
 #include <mbgl/storage/resource.hpp>
 #include <mbgl/storage/response.hpp>
 #include <mbgl/util/chrono.hpp>
@@ -6,19 +7,15 @@
 
 #include <mbgl/util/time.hpp>
 #include <mbgl/util/util.hpp>
+#include <mbgl/util/string.hpp>
 
 #include <curl/curl.h>
-
-#ifdef __ANDROID__
-#include <mbgl/android/jni.hpp>
-#include <zip.h>
-#include <openssl/ssl.h>
-#endif
 
 #include <queue>
 #include <map>
 #include <cassert>
 #include <cstring>
+#include <cstdio>
 
 void handleError(CURLMcode code) {
     if (code != CURLM_OK) {
@@ -34,39 +31,19 @@ void handleError(CURLcode code) {
 
 namespace mbgl {
 
-enum class ResponseStatus : int8_t {
-    // This error probably won't be resolved by retrying anytime soon. We are giving up.
-    PermanentError,
+class HTTPCURLRequest;
 
-    // This error might be resolved by waiting some time (e.g. server issues).
-    // We are going to do an exponential back-off and will try again in a few seconds.
-    TemporaryError,
-
-    // This error might be resolved once the network reachability status changes.
-    // We are going to watch the network status for changes and will retry as soon as the
-    // operating system notifies us of a network status change.
-    ConnectionError,
-
-    // The request returned data successfully. We retrieved and decoded the data successfully.
-    Successful,
-
-    // The request confirmed that the data wasn't changed. We already have the data.
-    NotModified,
-};
-
-class HTTPRequest;
-
-class HTTPCURLContext : public HTTPContext {
+class HTTPCURLContext : public HTTPContextBase {
     MBGL_STORE_THREAD(tid)
 
 public:
-    HTTPCURLContext(uv_loop_t *loop);
+    explicit HTTPCURLContext(uv_loop_t *loop);
     ~HTTPCURLContext();
 
-    RequestBase* createRequest(const Resource&,
+    HTTPRequestBase* createRequest(const Resource&,
                                RequestBase::Callback,
                                uv_loop_t*,
-                               std::shared_ptr<const Response>) override;
+                               std::shared_ptr<const Response>) final;
 
     static int handleSocket(CURL *handle, curl_socket_t s, int action, void *userp, void *socketp);
     static void perform(uv_poll_t *req, int status, int events);
@@ -98,19 +75,19 @@ public:
     std::queue<CURL *> handles;
 };
 
-class HTTPRequest : public RequestBase {
+class HTTPCURLRequest : public HTTPRequestBase {
     MBGL_STORE_THREAD(tid)
 
 public:
-    HTTPRequest(HTTPCURLContext*,
+    HTTPCURLRequest(HTTPCURLContext*,
                 const Resource&,
                 Callback,
                 uv_loop_t*,
                 std::shared_ptr<const Response>);
-    ~HTTPRequest();
+    ~HTTPCURLRequest();
 
-    void cancel() override;
-    void retry() override;
+    void cancel() final;
+    void retry() final;
 
     void handleResult(CURLcode code);
 
@@ -118,7 +95,7 @@ private:
     static size_t headerCallback(char *const buffer, const size_t size, const size_t nmemb, void *userp);
     static size_t writeCallback(void *const contents, const size_t size, const size_t nmemb, void *userp);
 
-    void retry(uint64_t timeout);
+    void retry(uint64_t timeout) final;
 #if UV_VERSION_MAJOR == 0 && UV_VERSION_MINOR <= 10
     static void restart(uv_timer_t *timer, int);
 #else
@@ -128,7 +105,6 @@ private:
     void start();
 
     HTTPCURLContext *context = nullptr;
-    bool cancelled = false;
 
     // Will store the current response.
     std::unique_ptr<Response> response;
@@ -187,7 +163,7 @@ private:
 // -------------------------------------------------------------------------------------------------
 
 HTTPCURLContext::HTTPCURLContext(uv_loop_t *loop_)
-    : HTTPContext(loop_),
+    : HTTPContextBase(loop_),
       loop(loop_) {
     if (curl_global_init(CURL_GLOBAL_ALL)) {
         throw std::runtime_error("Could not init cURL");
@@ -222,11 +198,11 @@ HTTPCURLContext::~HTTPCURLContext() {
     uv::close(timeout);
 }
 
-RequestBase* HTTPCURLContext::createRequest(const Resource& resource,
+HTTPRequestBase* HTTPCURLContext::createRequest(const Resource& resource,
                                             RequestBase::Callback callback,
                                             uv_loop_t* loop_,
                                             std::shared_ptr<const Response> response) {
-    return new HTTPRequest(this, resource, callback, loop_, response);
+    return new HTTPCURLRequest(this, resource, callback, loop_, response);
 }
 
 CURL *HTTPCURLContext::getHandle() {
@@ -252,7 +228,7 @@ void HTTPCURLContext::checkMultiInfo() {
     while ((message = curl_multi_info_read(multi, &pending))) {
         switch (message->msg) {
         case CURLMSG_DONE: {
-            HTTPRequest *baton = nullptr;
+            HTTPCURLRequest *baton = nullptr;
             curl_easy_getinfo(message->easy_handle, CURLINFO_PRIVATE, (char *)&baton);
             assert(baton);
             baton->handleResult(message->data.result);
@@ -349,106 +325,8 @@ int HTTPCURLContext::startTimeout(CURLM * /* multi */, long timeout_ms, void *us
 
 // -------------------------------------------------------------------------------------------------
 
-#ifdef __ANDROID__
-
-// This function is called to load the CA bundle
-// from http://curl.haxx.se/libcurl/c/cacertinmem.html¯
-static CURLcode sslctx_function(CURL * /* curl */, void *sslctx, void * /* parm */) {
-
-    int error = 0;
-    struct zip *apk = zip_open(mbgl::android::apkPath.c_str(), 0, &error);
-    if (apk == nullptr) {
-        return CURLE_SSL_CACERT_BADFILE;
-    }
-
-    struct zip_file *apkFile = zip_fopen(apk, "assets/ca-bundle.crt", ZIP_FL_NOCASE);
-    if (apkFile == nullptr) {
-        zip_close(apk);
-        apk = nullptr;
-        return CURLE_SSL_CACERT_BADFILE;
-    }
-
-    struct zip_stat stat;
-    if (zip_stat(apk, "assets/ca-bundle.crt", ZIP_FL_NOCASE, &stat) != 0) {
-        zip_fclose(apkFile);
-        apkFile = nullptr;
-        zip_close(apk);
-        apk = nullptr;
-        return CURLE_SSL_CACERT_BADFILE;
-    }
-
-    if (stat.size > std::numeric_limits<int>::max()) {
-        zip_fclose(apkFile);
-        apkFile = nullptr;
-        zip_close(apk);
-        apk = nullptr;
-        return CURLE_SSL_CACERT_BADFILE;
-    }
-
-    const auto pem = std::make_unique<char[]>(stat.size);
-
-    if (static_cast<zip_uint64_t>(zip_fread(apkFile, reinterpret_cast<void *>(pem.get()), stat.size)) != stat.size) {
-        zip_fclose(apkFile);
-        apkFile = nullptr;
-        zip_close(apk);
-        apk = nullptr;
-        return CURLE_SSL_CACERT_BADFILE;
-    }
-
-    // get a pointer to the X509 certificate store (which may be empty!)
-    X509_STORE *store = SSL_CTX_get_cert_store((SSL_CTX *)sslctx);
-    if (store == nullptr) {
-        return CURLE_SSL_CACERT_BADFILE;
-    }
-
-    // get a BIO
-    BIO *bio = BIO_new_mem_buf(pem.get(), static_cast<int>(stat.size));
-    if (bio == nullptr) {
-        store = nullptr;
-        return CURLE_SSL_CACERT_BADFILE;
-    }
-
-    // use it to read the PEM formatted certificate from memory into an X509
-    // structure that SSL can use
-    X509 *cert = nullptr;
-    while (PEM_read_bio_X509(bio, &cert, 0, nullptr) != nullptr) {
-        if (cert == nullptr) {
-            BIO_free(bio);
-            bio = nullptr;
-            store = nullptr;
-            return CURLE_SSL_CACERT_BADFILE;
-        }
-
-        // add our certificate to this store
-        if (X509_STORE_add_cert(store, cert) == 0) {
-            X509_free(cert);
-            cert = nullptr;
-            BIO_free(bio);
-            bio = nullptr;
-            store = nullptr;
-            return CURLE_SSL_CACERT_BADFILE;
-        }
-
-        X509_free(cert);
-        cert = nullptr;
-    }
-
-    // decrease reference counts
-    BIO_free(bio);
-    bio = nullptr;
-
-    zip_fclose(apkFile);
-    apkFile = nullptr;
-    zip_close(apk);
-    apk = nullptr;
-
-    // all set to go
-    return CURLE_OK;
-}
-#endif
-
-HTTPRequest::HTTPRequest(HTTPCURLContext* context_, const Resource& resource_, Callback callback_, uv_loop_t*, std::shared_ptr<const Response> response_)
-    : RequestBase(resource_, callback_),
+HTTPCURLRequest::HTTPCURLRequest(HTTPCURLContext* context_, const Resource& resource_, Callback callback_, uv_loop_t*, std::shared_ptr<const Response> response_)
+    : HTTPRequestBase(resource_, callback_),
       context(context_),
       existingResponse(response_),
       handle(context->getHandle()) {
@@ -476,26 +354,25 @@ HTTPRequest::HTTPRequest(HTTPCURLContext* context_, const Resource& resource_, C
 
     handleError(curl_easy_setopt(handle, CURLOPT_PRIVATE, this));
     handleError(curl_easy_setopt(handle, CURLOPT_ERRORBUFFER, error));
-#ifdef __ANDROID__
-    handleError(curl_easy_setopt(handle, CURLOPT_SSLCERTTYPE, "PEM"));
-    handleError(curl_easy_setopt(handle, CURLOPT_SSL_CTX_FUNCTION, sslctx_function));
-#else
     handleError(curl_easy_setopt(handle, CURLOPT_CAINFO, "ca-bundle.crt"));
-#endif
     handleError(curl_easy_setopt(handle, CURLOPT_FOLLOWLOCATION, 1));
     handleError(curl_easy_setopt(handle, CURLOPT_URL, resource.url.c_str()));
     handleError(curl_easy_setopt(handle, CURLOPT_WRITEFUNCTION, writeCallback));
     handleError(curl_easy_setopt(handle, CURLOPT_WRITEDATA, this));
     handleError(curl_easy_setopt(handle, CURLOPT_HEADERFUNCTION, headerCallback));
     handleError(curl_easy_setopt(handle, CURLOPT_HEADERDATA, this));
+#if LIBCURL_VERSION_NUM >= ((7) << 16 | (21) << 8 | 6) // Renamed in 7.21.6
     handleError(curl_easy_setopt(handle, CURLOPT_ACCEPT_ENCODING, "gzip, deflate"));
+#else
+    handleError(curl_easy_setopt(handle, CURLOPT_ENCODING, "gzip, deflate"));
+#endif
     handleError(curl_easy_setopt(handle, CURLOPT_USERAGENT, "MapboxGL/1.0"));
     handleError(curl_easy_setopt(handle, CURLOPT_SHARE, context->share));
 
     start();
 }
 
-HTTPRequest::~HTTPRequest() {
+HTTPCURLRequest::~HTTPCURLRequest() {
     MBGL_VERIFY_THREAD(tid);
 
     context->removeRequest(this);
@@ -517,11 +394,11 @@ HTTPRequest::~HTTPRequest() {
     }
 }
 
-void HTTPRequest::cancel() {
+void HTTPCURLRequest::cancel() {
    delete this;
 }
 
-void HTTPRequest::start() {
+void HTTPCURLRequest::start() {
     // Count up the attempts.
     attempts++;
 
@@ -531,9 +408,9 @@ void HTTPRequest::start() {
 
 // This function is called when we have new data for a request. We just append it to the string
 // containing the previous data.
-size_t HTTPRequest::writeCallback(void *const contents, const size_t size, const size_t nmemb, void *userp) {
+size_t HTTPCURLRequest::writeCallback(void *const contents, const size_t size, const size_t nmemb, void *userp) {
     assert(userp);
-    auto impl = reinterpret_cast<HTTPRequest *>(userp);
+    auto impl = reinterpret_cast<HTTPCURLRequest *>(userp);
     MBGL_VERIFY_THREAD(impl->tid);
 
     if (!impl->response) {
@@ -575,9 +452,9 @@ int64_t parseCacheControl(const char *value) {
     return 0;
 }
 
-size_t HTTPRequest::headerCallback(char *const buffer, const size_t size, const size_t nmemb, void *userp) {
+size_t HTTPCURLRequest::headerCallback(char *const buffer, const size_t size, const size_t nmemb, void *userp) {
     assert(userp);
-    auto baton = reinterpret_cast<HTTPRequest *>(userp);
+    auto baton = reinterpret_cast<HTTPCURLRequest *>(userp);
     MBGL_VERIFY_THREAD(baton->tid);
 
     if (!baton->response) {
@@ -604,7 +481,7 @@ size_t HTTPRequest::headerCallback(char *const buffer, const size_t size, const 
     return length;
 }
 
-void HTTPRequest::retry(uint64_t timeout) {
+void HTTPCURLRequest::retry(uint64_t timeout) {
     handleError(curl_multi_remove_handle(context->multi, handle));
 
     response.reset();
@@ -616,7 +493,7 @@ void HTTPRequest::retry(uint64_t timeout) {
     uv_timer_start(timer, restart, timeout, 0);
 }
 
-void HTTPRequest::retry() {
+void HTTPCURLRequest::retry() {
     // All batons get notified when the network status changed, but some of them
     // might not actually wait for the network to become available again.
     if (timer && strategy == PreemptImmediately) {
@@ -627,12 +504,12 @@ void HTTPRequest::retry() {
 }
 
 #if UV_VERSION_MAJOR == 0 && UV_VERSION_MINOR <= 10
-void HTTPRequest::restart(uv_timer_t *timer, int) {
+void HTTPCURLRequest::restart(uv_timer_t *timer, int) {
 #else
-void HTTPRequest::restart(uv_timer_t *timer) {
+void HTTPCURLRequest::restart(uv_timer_t *timer) {
 #endif
     // Restart the request.
-    auto baton = reinterpret_cast<HTTPRequest *>(timer->data);
+    auto baton = reinterpret_cast<HTTPCURLRequest *>(timer->data);
 
     // Get rid of the timer.
     baton->timer = nullptr;
@@ -641,7 +518,7 @@ void HTTPRequest::restart(uv_timer_t *timer) {
     baton->start();
 }
 
-void HTTPRequest::finish(ResponseStatus status) {
+void HTTPCURLRequest::finish(ResponseStatus status) {
     if (status == ResponseStatus::TemporaryError && attempts < maxAttempts) {
         strategy = ExponentialBackoff;
         return retry((1 << (attempts - 1)) * 1000);
@@ -662,7 +539,7 @@ void HTTPRequest::finish(ResponseStatus status) {
     delete this;
 }
 
-void HTTPRequest::handleResult(CURLcode code) {
+void HTTPCURLRequest::handleResult(CURLcode code) {
     MBGL_VERIFY_THREAD(tid);
 
     if (cancelled) {
@@ -720,12 +597,12 @@ void HTTPRequest::handleResult(CURLcode code) {
         } else if (responseCode >= 500 && responseCode < 600) {
             // Server errors may be temporary, so back off exponentially.
             response->status = Response::Error;
-            response->message = "HTTP status code " + std::to_string(responseCode);
+            response->message = "HTTP status code " + util::toString(responseCode);
             return finish(ResponseStatus::TemporaryError);
         } else {
             // We don't know how to handle any other errors, so declare them as permanently failing.
             response->status = Response::Error;
-            response->message = "HTTP status code " + std::to_string(responseCode);
+            response->message = "HTTP status code " + util::toString(responseCode);
             return finish(ResponseStatus::PermanentError);
         }
     }
@@ -733,7 +610,7 @@ void HTTPRequest::handleResult(CURLcode code) {
     throw std::runtime_error("Response hasn't been handled");
 }
 
-std::unique_ptr<HTTPContext> HTTPContext::createContext(uv_loop_t* loop) {
+std::unique_ptr<HTTPContextBase> HTTPContextBase::createContext(uv_loop_t* loop) {
     return std::make_unique<HTTPCURLContext>(loop);
 }
 

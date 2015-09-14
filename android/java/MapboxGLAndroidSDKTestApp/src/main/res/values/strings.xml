@@ -4,19 +4,26 @@
     <string name="app_name">Mapbox GL</string>
 
     <string name="action_gps">Toggle GPS location</string>
-
+    <string name="action_location_none">Disable tracking</string>
+    <string name="action_location_follow">Use follow tracking mode</string>
+    <string name="action_location_bearing">Use bearing tracking mode tracking</string>
+    <string name="action_compass">Toggle compass</string>
     <string name="action_debug">Toggle debug mode</string>
+    <string name="action_point_annotations">Toggle point annotations</string>
 
     <string name="label_fps">FPS:</string>
 
-    <string name="compass_desc">Map compass. Click to reset the map rotation to North.</string>
+    <string name="styleMapboxStreets">Mapbox Streets</string>
+    <string name="styleEmerald">Emerald</string>
+    <string name="styleLight">Light</string>
+    <string name="styleDark">Dark</string>
+    <string name="styleSatellite">Satellite</string>
 
-    <string-array name="style_list">
-        <item>Mapbox Streets</item>
-        <item>Emerald</item>
-        <item>Light</item>
-        <item>Dark</item>
-    </string-array>
+    <string name="styleURLMapboxStreets">asset://styles/streets-v8.json</string>
+    <string name="styleURLEmerald">asset://styles/emerald-v8.json</string>
+    <string name="styleURLLight">asset://styles/light-v8.json</string>
+    <string name="styleURLDark">asset://styles/dark-v8.json</string>
+    <string name="styleURLSatellite">asset://styles/satellite-v8.json</string>
 
     <string-array name="outdoors_class_list">
         <item>Day</item>

@@ -19,6 +19,8 @@ bool StyleLayer::isVisible() const {
             return getProperties<FillProperties>().isVisible();
         case StyleLayerType::Line:
             return getProperties<LineProperties>().isVisible();
+        case StyleLayerType::Circle:
+            return getProperties<CircleProperties>().isVisible();
         case StyleLayerType::Symbol:
             return getProperties<SymbolProperties>().isVisible();
         case StyleLayerType::Raster:
@@ -28,7 +30,11 @@ bool StyleLayer::isVisible() const {
     }
 }
 
-void StyleLayer::setClasses(const std::vector<std::string> &class_names, const TimePoint now,
+bool StyleLayer::hasRenderPass(RenderPass pass) const {
+    return bool(passes & pass);
+}
+
+void StyleLayer::setClasses(const std::vector<std::string> &class_names, const TimePoint& now,
                             const PropertyTransition &defaultTransition) {
     // Stores all keys that we have already added transitions for.
     std::set<PropertyKey> already_applied;
@@ -54,7 +60,7 @@ void StyleLayer::setClasses(const std::vector<std::string> &class_names, const T
             continue;
         }
 
-        AppliedClassProperties &appliedProperties = property_pair.second;
+        AppliedClassPropertyValues &appliedProperties = property_pair.second;
         // Make sure that we don't do double transitions to the fallback value.
         if (appliedProperties.mostRecent() != ClassID::Fallback) {
             // This property key hasn't been set by a previous class, so we need to add a transition
@@ -69,7 +75,7 @@ void StyleLayer::setClasses(const std::vector<std::string> &class_names, const T
 
 // Helper function for applying all properties of a a single class that haven't been applied yet.
 void StyleLayer::applyClassProperties(const ClassID class_id,
-                                      std::set<PropertyKey> &already_applied, TimePoint now,
+                                      std::set<PropertyKey> &already_applied, const TimePoint& now,
                                       const PropertyTransition &defaultTransition) {
     auto style_it = styles.find(class_id);
     if (style_it == styles.end()) {
@@ -93,7 +99,7 @@ void StyleLayer::applyClassProperties(const ClassID class_id,
 
         // If the most recent transition is not the one with the highest priority, create
         // a transition.
-        AppliedClassProperties &appliedProperties = appliedStyle[key];
+        AppliedClassPropertyValues &appliedProperties = appliedStyle[key];
         if (appliedProperties.mostRecent() != class_id) {
             const PropertyTransition &transition =
                 class_properties.getTransition(key, defaultTransition);
@@ -134,13 +140,13 @@ private:
 };
 
 template <typename T>
-void StyleLayer::applyStyleProperty(PropertyKey key, T &target, const float z, const TimePoint now, const ZoomHistory &zoomHistory) {
+void StyleLayer::applyStyleProperty(PropertyKey key, T &target, const float z, const TimePoint& now, const ZoomHistory &zoomHistory) {
     auto it = appliedStyle.find(key);
     if (it != appliedStyle.end()) {
-        AppliedClassProperties &applied = it->second;
+        AppliedClassPropertyValues &applied = it->second;
         // Iterate through all properties that we need to apply in order.
         const PropertyEvaluator<T> evaluator(z, zoomHistory);
-        for (auto& property : applied.properties) {
+        for (auto& property : applied.propertyValues) {
             if (now >= property.begin) {
                 // We overwrite the current property with the new value.
                 target = mapbox::util::apply_visitor(evaluator, property.value);
@@ -152,13 +158,13 @@ void StyleLayer::applyStyleProperty(PropertyKey key, T &target, const float z, c
 }
 
 template <typename T>
-void StyleLayer::applyTransitionedStyleProperty(PropertyKey key, T &target, const float z, const TimePoint now, const ZoomHistory &zoomHistory) {
+void StyleLayer::applyTransitionedStyleProperty(PropertyKey key, T &target, const float z, const TimePoint& now, const ZoomHistory &zoomHistory) {
     auto it = appliedStyle.find(key);
     if (it != appliedStyle.end()) {
-        AppliedClassProperties &applied = it->second;
+        AppliedClassPropertyValues &applied = it->second;
         // Iterate through all properties that we need to apply in order.
         const PropertyEvaluator<T> evaluator(z, zoomHistory);
-        for (auto& property : applied.properties) {
+        for (auto& property : applied.propertyValues) {
             if (now >= property.end) {
                 // We overwrite the current property with the new value.
                 target = mapbox::util::apply_visitor(evaluator, property.value);
@@ -174,7 +180,7 @@ void StyleLayer::applyTransitionedStyleProperty(PropertyKey key, T &target, cons
 }
 
 template <>
-void StyleLayer::applyStyleProperties<FillProperties>(const float z, const TimePoint now, const ZoomHistory &zoomHistory) {
+void StyleLayer::applyStyleProperties<FillProperties>(const float z, const TimePoint& now, const ZoomHistory &zoomHistory) {
     properties.set<FillProperties>();
     FillProperties &fill = properties.get<FillProperties>();
     applyStyleProperty(PropertyKey::FillAntialias, fill.antialias, z, now, zoomHistory);
@@ -187,7 +193,7 @@ void StyleLayer::applyStyleProperties<FillProperties>(const float z, const TimeP
 }
 
 template <>
-void StyleLayer::applyStyleProperties<LineProperties>(const float z, const TimePoint now, const ZoomHistory &zoomHistory) {
+void StyleLayer::applyStyleProperties<LineProperties>(const float z, const TimePoint& now, const ZoomHistory &zoomHistory) {
     properties.set<LineProperties>();
     LineProperties &line = properties.get<LineProperties>();
     applyTransitionedStyleProperty(PropertyKey::LineOpacity, line.opacity, z, now, zoomHistory);
@@ -201,15 +207,26 @@ void StyleLayer::applyStyleProperties<LineProperties>(const float z, const TimeP
     applyStyleProperty(PropertyKey::LineImage, line.image, z, now, zoomHistory);
 
     // for scaling dasharrays
-    applyStyleProperty(PropertyKey::LineWidth, line.dash_line_width, std::floor(z), TimePoint::max(), zoomHistory);
+    applyStyleProperty(PropertyKey::LineWidth, line.dash_line_width, std::floor(z), now, zoomHistory);
 }
 
 template <>
-void StyleLayer::applyStyleProperties<SymbolProperties>(const float z, const TimePoint now, const ZoomHistory &zoomHistory) {
+void StyleLayer::applyStyleProperties<CircleProperties>(const float z, const TimePoint& now, const ZoomHistory &zoomHistory) {
+    properties.set<CircleProperties>();
+    CircleProperties& circle = properties.get<CircleProperties>();
+    applyTransitionedStyleProperty(PropertyKey::CircleRadius, circle.radius, z, now, zoomHistory);
+    applyTransitionedStyleProperty(PropertyKey::CircleColor, circle.color, z, now, zoomHistory);
+    applyTransitionedStyleProperty(PropertyKey::CircleOpacity, circle.opacity, z, now, zoomHistory);
+    applyTransitionedStyleProperty(PropertyKey::CircleTranslate, circle.translate, z, now, zoomHistory);
+    applyStyleProperty(PropertyKey::CircleTranslateAnchor, circle.translateAnchor, z, now, zoomHistory);
+    applyTransitionedStyleProperty(PropertyKey::CircleBlur, circle.blur, z, now, zoomHistory);
+}
+
+template <>
+void StyleLayer::applyStyleProperties<SymbolProperties>(const float z, const TimePoint& now, const ZoomHistory &zoomHistory) {
     properties.set<SymbolProperties>();
     SymbolProperties &symbol = properties.get<SymbolProperties>();
     applyTransitionedStyleProperty(PropertyKey::IconOpacity, symbol.icon.opacity, z, now, zoomHistory);
-    applyTransitionedStyleProperty(PropertyKey::IconSize, symbol.icon.size, z, now, zoomHistory);
     applyTransitionedStyleProperty(PropertyKey::IconColor, symbol.icon.color, z, now, zoomHistory);
     applyTransitionedStyleProperty(PropertyKey::IconHaloColor, symbol.icon.halo_color, z, now, zoomHistory);
     applyTransitionedStyleProperty(PropertyKey::IconHaloWidth, symbol.icon.halo_width, z, now, zoomHistory);
@@ -218,17 +235,28 @@ void StyleLayer::applyStyleProperties<SymbolProperties>(const float z, const Tim
     applyStyleProperty(PropertyKey::IconTranslateAnchor, symbol.icon.translate_anchor, z, now, zoomHistory);
 
     applyTransitionedStyleProperty(PropertyKey::TextOpacity, symbol.text.opacity, z, now, zoomHistory);
-    applyTransitionedStyleProperty(PropertyKey::TextSize, symbol.text.size, z, now, zoomHistory);
     applyTransitionedStyleProperty(PropertyKey::TextColor, symbol.text.color, z, now, zoomHistory);
     applyTransitionedStyleProperty(PropertyKey::TextHaloColor, symbol.text.halo_color, z, now, zoomHistory);
     applyTransitionedStyleProperty(PropertyKey::TextHaloWidth, symbol.text.halo_width, z, now, zoomHistory);
     applyTransitionedStyleProperty(PropertyKey::TextHaloBlur, symbol.text.halo_blur, z, now, zoomHistory);
     applyTransitionedStyleProperty(PropertyKey::TextTranslate, symbol.text.translate, z, now, zoomHistory);
     applyStyleProperty(PropertyKey::TextTranslateAnchor, symbol.text.translate_anchor, z, now, zoomHistory);
+
+    // text-size and icon-size are layout properties but they also need to be evaluated as paint properties:
+    auto it = bucket->layout.properties.find(PropertyKey::IconSize);
+    if (it != bucket->layout.properties.end()) {
+        const PropertyEvaluator<float> evaluator(z, zoomHistory);
+        symbol.icon.size = mapbox::util::apply_visitor(evaluator, it->second);
+    }
+    it = bucket->layout.properties.find(PropertyKey::TextSize);
+    if (it != bucket->layout.properties.end()) {
+        const PropertyEvaluator<float> evaluator(z, zoomHistory);
+        symbol.text.size = mapbox::util::apply_visitor(evaluator, it->second);
+    }
 }
 
 template <>
-void StyleLayer::applyStyleProperties<RasterProperties>(const float z, const TimePoint now, const ZoomHistory &zoomHistory) {
+void StyleLayer::applyStyleProperties<RasterProperties>(const float z, const TimePoint& now, const ZoomHistory &zoomHistory) {
     properties.set<RasterProperties>();
     RasterProperties &raster = properties.get<RasterProperties>();
     applyTransitionedStyleProperty(PropertyKey::RasterOpacity, raster.opacity, z, now, zoomHistory);
@@ -241,7 +269,7 @@ void StyleLayer::applyStyleProperties<RasterProperties>(const float z, const Tim
 }
 
 template <>
-void StyleLayer::applyStyleProperties<BackgroundProperties>(const float z, const TimePoint now, const ZoomHistory &zoomHistory) {
+void StyleLayer::applyStyleProperties<BackgroundProperties>(const float z, const TimePoint& now, const ZoomHistory &zoomHistory) {
     properties.set<BackgroundProperties>();
     BackgroundProperties &background = properties.get<BackgroundProperties>();
     applyTransitionedStyleProperty(PropertyKey::BackgroundOpacity, background.opacity, z, now, zoomHistory);
@@ -249,16 +277,37 @@ void StyleLayer::applyStyleProperties<BackgroundProperties>(const float z, const
     applyStyleProperty(PropertyKey::BackgroundImage, background.image, z, now, zoomHistory);
 }
 
-void StyleLayer::updateProperties(float z, const TimePoint now, ZoomHistory &zoomHistory) {
+void StyleLayer::updateProperties(float z, const TimePoint& now, ZoomHistory &zoomHistory) {
     cleanupAppliedStyleProperties(now);
 
     switch (type) {
         case StyleLayerType::Fill: applyStyleProperties<FillProperties>(z, now, zoomHistory); break;
         case StyleLayerType::Line: applyStyleProperties<LineProperties>(z, now, zoomHistory); break;
+        case StyleLayerType::Circle: applyStyleProperties<CircleProperties>(z, now, zoomHistory); break;
         case StyleLayerType::Symbol: applyStyleProperties<SymbolProperties>(z, now, zoomHistory); break;
         case StyleLayerType::Raster: applyStyleProperties<RasterProperties>(z, now, zoomHistory); break;
         case StyleLayerType::Background: applyStyleProperties<BackgroundProperties>(z, now, zoomHistory); break;
         default: properties.set<std::false_type>(); break;
+    }
+
+    // Update the render passes when this layer is visible.
+    passes = RenderPass::None;
+    if (isVisible()) {
+        if (properties.is<FillProperties>()) {
+            const FillProperties &fillProperties = properties.get<FillProperties>();
+            const float alpha = fillProperties.fill_color[3] * fillProperties.opacity;
+
+            if (fillProperties.antialias) {
+                passes |= RenderPass::Translucent;
+            }
+            if (!fillProperties.image.from.empty() || alpha < 1.0f) {
+                passes |= RenderPass::Translucent;
+            } else {
+                passes |= RenderPass::Opaque;
+            }
+        } else {
+            passes |= RenderPass::Translucent;
+        }
     }
 }
 
@@ -271,20 +320,12 @@ bool StyleLayer::hasTransitions() const {
     return false;
 }
 
-
-void StyleLayer::cleanupAppliedStyleProperties(TimePoint now) {
-    auto it = appliedStyle.begin();
-    const auto end = appliedStyle.end();
-    while (it != end) {
-        AppliedClassProperties &applied_properties = it->second;
-        applied_properties.cleanup(now);
-
+void StyleLayer::cleanupAppliedStyleProperties(const TimePoint& now) {
+    for (auto it = appliedStyle.begin(); it != appliedStyle.end();) {
+        AppliedClassPropertyValues& values = it->second;
+        values.cleanup(now);
         // If the current properties object is empty, remove it from the map entirely.
-        if (applied_properties.empty()) {
-            appliedStyle.erase(it++);
-        } else {
-            ++it;
-        }
+        values.empty() ? appliedStyle.erase(it++) : ++it;
     }
 }
 

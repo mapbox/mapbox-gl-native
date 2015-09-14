@@ -56,11 +56,8 @@ public class LatLngZoom extends LatLng implements Parcelable, Serializable {
 
         LatLngZoom that = (LatLngZoom) o;
 
-        if (Double.compare(that.zoom, zoom) != 0) {
-            return false;
-        }
+        return Double.compare(that.zoom, zoom) == 0;
 
-        return true;
     }
 
     @Override

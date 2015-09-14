@@ -1,4 +1,5 @@
 #include <mbgl/geometry/sprite_atlas.hpp>
+#include <mbgl/annotation/sprite_store.hpp>
 #include <mbgl/platform/gl.hpp>
 #include <mbgl/platform/log.hpp>
 #include <mbgl/platform/platform.hpp>
@@ -18,50 +19,17 @@
 
 using namespace mbgl;
 
-SpriteAtlas::SpriteAtlas(dimension width_, dimension height_)
+SpriteAtlas::SpriteAtlas(dimension width_, dimension height_, float pixelRatio_, SpriteStore& store_)
     : width(width_),
       height(height_),
+      pixelWidth(std::ceil(width * pixelRatio_)),
+      pixelHeight(std::ceil(height * pixelRatio_)),
+      pixelRatio(pixelRatio_),
+      store(store_),
       bin(width_, height_),
+      data(std::make_unique<uint32_t[]>(pixelWidth * pixelHeight)),
       dirty(true) {
-}
-
-bool SpriteAtlas::resize(const float newRatio) {
-    if (pixelRatio == newRatio) return false;
-
-    std::lock_guard<std::recursive_mutex> lock(mtx);
-
-    const float oldRatio = pixelRatio;
-    pixelRatio = newRatio;
-
-    if (data) {
-        const auto oldData = std::move(data);
-        allocate();
-
-        const int old_w = width * oldRatio;
-        const int old_h = height * oldRatio;
-        const int new_w = width * newRatio;
-        const int new_h = height * newRatio;
-
-        // Basic image scaling. TODO: Replace this with better image scaling.
-        for (int y = 0; y < new_h; y++) {
-            const int old_yoffset = ((y * old_h) / new_h) * old_w;
-            const int new_yoffset = y * new_w;
-            for (int x = 0; x < new_w; x++) {
-                const int old_x = (x * old_w) / new_w;
-                data[new_yoffset + x] = oldData[old_yoffset + old_x];
-            }
-        }
-
-        dirty = true;
-        fullUploadRequired = true;
-
-        // Mark all sprite images as in need of update
-        for (const auto &pair : images) {
-            uninitialized.emplace(pair.first);
-        }
-    }
-
-    return dirty;
+    std::fill(data.get(), data.get() + pixelWidth * pixelHeight, 0);
 }
 
 Rect<SpriteAtlas::dimension> SpriteAtlas::allocateImage(const size_t pixel_width, const size_t pixel_height) {
@@ -84,48 +52,48 @@ Rect<SpriteAtlas::dimension> SpriteAtlas::allocateImage(const size_t pixel_width
     return rect;
 }
 
-Rect<SpriteAtlas::dimension> SpriteAtlas::getImage(const std::string& name, const bool wrap) {
+SpriteAtlasElement SpriteAtlas::getImage(const std::string& name, const bool wrap) {
     std::lock_guard<std::recursive_mutex> lock(mtx);
 
-    auto rect_it = images.find(name);
+    auto rect_it = images.find({ name, wrap });
     if (rect_it != images.end()) {
-        return rect_it->second;
+        return { rect_it->second.pos, rect_it->second.texture };
     }
 
-    const SpritePosition &pos = sprite->getSpritePosition(name);
-    if (!pos.width || !pos.height) {
-        return Rect<dimension> { 0, 0, 0, 0 };
+    auto sprite = store.getSprite(name);
+    if (!sprite) {
+        return { Rect<dimension> { 0, 0, 0, 0 }, nullptr };
     }
 
-    Rect<dimension> rect = allocateImage(pos.width / pos.pixelRatio, pos.height / pos.pixelRatio);
+    Rect<dimension> rect = allocateImage(sprite->width, sprite->height);
     if (rect.w == 0) {
         if (debug::spriteWarnings) {
             Log::Warning(Event::Sprite, "sprite atlas bitmap overflow");
         }
-        return rect;
+        return { Rect<dimension> { 0, 0, 0, 0 }, nullptr };
     }
 
-    images.emplace(name, rect);
+    const Holder& holder = images.emplace(Key{ name, wrap }, Holder{ sprite, rect }).first->second;
+    copy(holder, wrap);
 
-    copy(rect, pos, wrap);
-
-    return rect;
+    return { rect, sprite };
 }
 
 SpriteAtlasPosition SpriteAtlas::getPosition(const std::string& name, bool repeating) {
     std::lock_guard<std::recursive_mutex> lock(mtx);
 
-    Rect<dimension> rect = getImage(name, repeating);
+    auto rect = getImage(name, repeating).pos;
     if (repeating) {
         // When the image is repeating, get the correct position of the image, rather than the
         // one rounded up to 4 pixels.
-        const SpritePosition &pos = sprite->getSpritePosition(name);
-        if (!pos.width || !pos.height) {
+        // TODO: Can't we just use originalW/originalH?
+        auto sprite = store.getSprite(name);
+        if (!sprite) {
             return SpriteAtlasPosition {};
         }
 
-        rect.w = pos.width / pos.pixelRatio;
-        rect.h = pos.height / pos.pixelRatio;
+        rect.w = sprite->width;
+        rect.h = sprite->height;
     }
 
     const float padding = 1;
@@ -137,33 +105,21 @@ SpriteAtlasPosition SpriteAtlas::getPosition(const std::string& name, bool repea
     };
 }
 
-void SpriteAtlas::allocate() {
-    if (!data) {
-        dimension w = static_cast<dimension>(width * pixelRatio);
-        dimension h = static_cast<dimension>(height * pixelRatio);
-        data = std::make_unique<uint32_t[]>(w * h);
-        std::fill(data.get(), data.get() + w * h, 0);
-    }
-}
-
-void SpriteAtlas::copy(const Rect<dimension>& dst, const SpritePosition& src, const bool wrap) {
-    if (!sprite->raster) return;
-
-    const uint32_t *srcData = reinterpret_cast<const uint32_t *>(sprite->raster->getData());
+void SpriteAtlas::copy(const Holder& holder, const bool wrap) {
+    const uint32_t *srcData = reinterpret_cast<const uint32_t *>(holder.texture->data.data());
     if (!srcData) return;
-    const vec2<uint32_t> srcSize { sprite->raster->getWidth(), sprite->raster->getHeight() };
-    const Rect<uint32_t> srcPos { src.x, src.y, src.width, src.height };
+    const vec2<uint32_t> srcSize { holder.texture->pixelWidth, holder.texture->pixelHeight };
+    const Rect<uint32_t> srcPos { 0, 0, srcSize.x, srcSize.y };
+    const auto& dst = holder.pos;
 
     const int offset = 1;
 
-    allocate();
     uint32_t *const dstData = data.get();
-    const vec2<uint32_t> dstSize { static_cast<unsigned int>(width * pixelRatio),
-                                   static_cast<unsigned int>(height * pixelRatio) };
-    const Rect<uint32_t> dstPos { static_cast<uint32_t>((offset + dst.x) * pixelRatio),
-                                  static_cast<uint32_t>((offset + dst.y) * pixelRatio),
-                                  static_cast<uint32_t>(dst.originalW * pixelRatio),
-                                  static_cast<uint32_t>(dst.originalH * pixelRatio) };
+    const vec2<uint32_t> dstSize{ pixelWidth, pixelHeight };
+    const Rect<uint32_t> dstPos{ static_cast<uint32_t>((offset + dst.x) * pixelRatio),
+                                 static_cast<uint32_t>((offset + dst.y) * pixelRatio),
+                                 static_cast<uint32_t>(dst.originalW * pixelRatio),
+                                 static_cast<uint32_t>(dst.originalH * pixelRatio) };
 
     util::bilinearScale(srcData, srcSize, srcPos, dstData, dstSize, dstPos, wrap);
 
@@ -201,38 +157,37 @@ void SpriteAtlas::copy(const Rect<dimension>& dst, const SpritePosition& src, co
     dirty = true;
 }
 
-void SpriteAtlas::setSprite(util::ptr<Sprite> sprite_) {
-    std::lock_guard<std::recursive_mutex> lock(mtx);
-
-    sprite = sprite_;
-
-    if (!sprite->isLoaded()) return;
-
-    util::erase_if(uninitialized, [this](const std::string &name) {
-        Rect<dimension> dst = getImage(name, false);
-        const SpritePosition& src = sprite->getSpritePosition(name);
-        if (!src) {
-            if (debug::spriteWarnings) {
-                Log::Warning(Event::Sprite, "sprite doesn't have image with name '%s'", name.c_str());
-            }
-            return true;
-        }
-
-        if (src.width == dst.w * pixelRatio && src.height == dst.h * pixelRatio && src.pixelRatio == pixelRatio) {
-            copy(dst, src, false);
-            return true;
-        } else {
-            if (debug::spriteWarnings) {
-                Log::Warning(Event::Sprite, "sprite icon dimension mismatch");
-            }
-            return false;
-        }
-    });
-}
-
 void SpriteAtlas::upload() {
     if (dirty) {
         bind();
+    }
+}
+
+void SpriteAtlas::updateDirty() {
+    auto dirtySprites = store.getDirty();
+    if (dirtySprites.empty()) {
+        return;
+    }
+
+    std::lock_guard<std::recursive_mutex> lock(mtx);
+
+    auto imageIterator = images.begin();
+    auto spriteIterator = dirtySprites.begin();
+    while (imageIterator != images.end() && spriteIterator != dirtySprites.end()) {
+        if (imageIterator->first.first < spriteIterator->first) {
+            ++imageIterator;
+        } else if (spriteIterator->first < imageIterator->first.first) {
+            ++spriteIterator;
+        } else {
+            // The two names match;
+            Holder& holder = imageIterator->second;
+            holder.texture = spriteIterator->second;
+            copy(holder, imageIterator->first.second);
+
+            ++imageIterator;
+            // Don't advance the spriteIterator because there might be another sprite with the same
+            // name, but a different wrap value.
+        }
     }
 }
 
@@ -261,15 +216,14 @@ void SpriteAtlas::bind(bool linear) {
 
     if (dirty) {
         std::lock_guard<std::recursive_mutex> lock(mtx);
-        allocate();
 
         if (fullUploadRequired) {
             MBGL_CHECK_ERROR(glTexImage2D(
                 GL_TEXTURE_2D, // GLenum target
                 0, // GLint level
                 GL_RGBA, // GLint internalformat
-                width * pixelRatio, // GLsizei width
-                height * pixelRatio, // GLsizei height
+                pixelWidth, // GLsizei width
+                pixelHeight, // GLsizei height
                 0, // GLint border
                 GL_RGBA, // GLenum format
                 GL_UNSIGNED_BYTE, // GLenum type
@@ -282,8 +236,8 @@ void SpriteAtlas::bind(bool linear) {
                 0, // GLint level
                 0, // GLint xoffset
                 0, // GLint yoffset
-                width * pixelRatio, // GLsizei width
-                height * pixelRatio, // GLsizei height
+                pixelWidth, // GLsizei width
+                pixelHeight, // GLsizei height
                 GL_RGBA, // GLenum format
                 GL_UNSIGNED_BYTE, // GLenum type
                 data.get() // const GLvoid *pixels
@@ -293,7 +247,8 @@ void SpriteAtlas::bind(bool linear) {
         dirty = false;
 
 #ifndef GL_ES_VERSION_2_0
-        // platform::showColorDebugImage("Sprite Atlas", reinterpret_cast<const char *>(data), width * pixelRatio, height * pixelRatio, width * pixelRatio, height * pixelRatio);
+        // platform::showColorDebugImage("Sprite Atlas", reinterpret_cast<const char*>(data.get()),
+        //                               pixelWidth, pixelHeight, pixelWidth, pixelHeight);
 #endif
     }
 };
@@ -304,4 +259,12 @@ SpriteAtlas::~SpriteAtlas() {
         mbgl::util::ThreadContext::getGLObjectStore()->abandonTexture(texture);
         texture = 0;
     }
+}
+
+SpriteAtlas::Holder::Holder(const std::shared_ptr<const SpriteImage>& texture_,
+                            const Rect<dimension>& pos_)
+    : texture(texture_), pos(pos_) {
+}
+
+SpriteAtlas::Holder::Holder(Holder&& h) : texture(std::move(h.texture)), pos(h.pos) {
 }

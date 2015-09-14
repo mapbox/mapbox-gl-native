@@ -7,24 +7,33 @@
 
 namespace mbgl {
 
-class Painter;
 class SourceInfo;
+class Request;
 class StyleLayer;
 class TexturePool;
+class WorkRequest;
 
 class RasterTileData : public TileData {
-    friend class TileParser;
-
 public:
-    RasterTileData(const TileID&, TexturePool&, const SourceInfo&);
+    RasterTileData(const TileID&, TexturePool&, const SourceInfo&, Worker&);
     ~RasterTileData();
 
-    void parse() override;
+    void request(float pixelRatio,
+                 const std::function<void()>& callback);
+
+    void cancel() override;
+
     Bucket* getBucket(StyleLayer const &layer_desc) override;
 
-protected:
+private:
+    const SourceInfo& source;
+    Worker& worker;
+    Request* req = nullptr;
+
     StyleLayoutRaster layout;
     RasterBucket bucket;
+
+    std::unique_ptr<WorkRequest> workRequest;
 };
 
 }

@@ -1,10 +1,12 @@
 #ifndef MBGL_RENDERER_SHADER
 #define MBGL_RENDERER_SHADER
 
+#include <mbgl/platform/gl.hpp>
+#include <mbgl/util/noncopyable.hpp>
+
 #include <cstdint>
 #include <array>
 #include <string>
-#include <mbgl/util/noncopyable.hpp>
 
 namespace mbgl {
 
@@ -19,8 +21,16 @@ public:
         return program;
     }
 
+    virtual void bind(GLbyte *offset) = 0;
+
+protected:
+    GLint a_pos = -1;
+
 private:
     bool compileShader(uint32_t *shader, uint32_t type, const char *source);
+
+    uint32_t vertShader = 0;
+    uint32_t fragShader = 0;
 };
 
 }

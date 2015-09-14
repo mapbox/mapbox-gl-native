@@ -1,10 +1,11 @@
 #ifndef MBGL_MAP_TRANSFORM_STATE
 #define MBGL_MAP_TRANSFORM_STATE
 
-#include <mbgl/util/mat4.hpp>
 #include <mbgl/util/geo.hpp>
 #include <mbgl/util/constants.hpp>
 #include <mbgl/util/vec.hpp>
+#include <mbgl/util/mat4.hpp>
+#include <mbgl/util/vec4.hpp>
 
 #include <cstdint>
 #include <array>
@@ -14,6 +15,7 @@ namespace mbgl {
 
 class TileID;
 struct box;
+struct TileCoordinate;
 
 class TransformState {
     friend class Transform;
@@ -21,20 +23,14 @@ class TransformState {
 public:
     // Matrix
     void matrixFor(mat4& matrix, const TileID& id, const int8_t z) const;
+    void getProjMatrix(mat4& matrix) const;
     box cornersToBox(uint32_t z) const;
 
     // Dimensions
     bool hasSize() const;
     uint16_t getWidth() const;
     uint16_t getHeight() const;
-    uint16_t getFramebufferWidth() const;
-    uint16_t getFramebufferHeight() const;
-    const std::array<uint16_t, 2> getFramebufferDimensions() const;
-    float getPixelRatio() const;
 
-    float worldSize() const;
-    float lngX(float lon) const;
-    float latY(float lat) const;
     std::array<float, 2> locationCoordinate(float lon, float lat) const;
     void getLonLat(double &lon, double &lat) const;
 
@@ -53,12 +49,25 @@ public:
     // Rotation
     float getAngle() const;
 
-    // Projection
-    const vec2<double> pixelForLatLng(const LatLng latLng) const;
-    const LatLng latLngForPixel(const vec2<double> pixel) const;
+    float getAltitude() const;
+    float getPitch() const;
 
     // Changing
     bool isChanging() const;
+
+    double pixel_x() const;
+    double pixel_y() const;
+
+    // Conversion and projection
+
+    vec2<double> latLngToPoint(const LatLng& latLng) const;
+    LatLng pointToLatLng(const vec2<double> point) const;
+
+    TileCoordinate latLngToCoordinate(const LatLng& latLng) const;
+    LatLng coordinateToLatLng(const TileCoordinate& coord) const;
+
+    vec2<double> coordinateToPoint(const TileCoordinate& coord) const;
+    TileCoordinate pointToCoordinate(const vec2<double> point) const;
 
 private:
     void constrain(double& scale, double& y) const;
@@ -67,18 +76,20 @@ private:
     double min_scale = std::pow(2, 0);
     double max_scale = std::pow(2, 18);
 
-    double pixel_x() const;
-    double pixel_y() const;
-
     // logical dimensions
     uint16_t width = 0, height = 0;
 
-    // physical (framebuffer) dimensions
-    std::array<uint16_t, 2> framebuffer = {{ 0, 0 }};
+    double xLng(double x, double worldSize) const;
+    double yLat(double y, double worldSize) const;
+    double lngX(double lon) const;
+    double latY(double lat) const;
+    double zoomScale(double zoom) const;
+    float worldSize() const;
 
-    // map scale factor
-    float pixelRatio = 0;
+    mat4 coordinatePointMatrix(double z) const;
+    mat4 getPixelMatrix() const;
 
+private:
     // animation state
     bool rotating = false;
     bool scaling = false;
@@ -89,6 +100,8 @@ private:
     double x = 0, y = 0;
     double angle = 0;
     double scale = 1;
+    double altitude = 1.5;
+    double pitch = 0.0;
 
     // cache values for spherical mercator math
     double Bc = (scale * util::tileSize) / 360;

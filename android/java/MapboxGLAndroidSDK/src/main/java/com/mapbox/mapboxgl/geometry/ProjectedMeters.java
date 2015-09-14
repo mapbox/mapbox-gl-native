@@ -56,14 +56,8 @@ public class ProjectedMeters implements IProjectedMeters, Parcelable, Serializab
 
         ProjectedMeters projectedMeters = (ProjectedMeters) o;
 
-        if (Double.compare(projectedMeters.easting, easting) != 0) {
-            return false;
-        }
-        if (Double.compare(projectedMeters.northing, northing) != 0) {
-            return false;
-        }
+        return Double.compare(projectedMeters.easting, easting) == 0 && Double.compare(projectedMeters.northing, northing) == 0;
 
-        return true;
     }
 
     @Override

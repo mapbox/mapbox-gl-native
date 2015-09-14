@@ -1,9 +1,10 @@
-#include <mbgl/storage/asset_context.hpp>
+#include <mbgl/storage/asset_context_base.hpp>
 #include <mbgl/storage/resource.hpp>
 #include <mbgl/storage/response.hpp>
 #include <mbgl/util/util.hpp>
 #include <mbgl/util/url.hpp>
 #include <mbgl/util/uv.hpp>
+#include <mbgl/util/string.hpp>
 
 #include <uv.h>
 
@@ -19,7 +20,7 @@ public:
     AssetRequest(const Resource&, Callback, uv_loop_t*, const std::string& assetRoot);
     ~AssetRequest();
 
-    void cancel() override;
+    void cancel() final;
 
     static void fileOpened(uv_fs_t *req);
     static void fileStated(uv_fs_t *req);
@@ -36,11 +37,11 @@ public:
     std::unique_ptr<Response> response;
 };
 
-class AssetFSContext : public AssetContext {
+class AssetFSContext : public AssetContextBase {
     RequestBase* createRequest(const Resource& resource,
                                RequestBase::Callback callback,
                                uv_loop_t* loop,
-                               const std::string& assetRoot) override {
+                               const std::string& assetRoot) final {
         return new AssetRequest(resource, callback, loop, assetRoot);
     }
 };
@@ -131,7 +132,7 @@ void AssetRequest::fileStated(uv_fs_t *req) {
 #else
             self->response->modified = stat->st_mtime;
 #endif
-            self->response->etag = std::to_string(stat->st_ino);
+            self->response->etag = util::toString(stat->st_ino);
             const auto size = (unsigned int)(stat->st_size);
             self->response->data.resize(size);
             self->buffer = uv_buf_init(const_cast<char *>(self->response->data.data()), size);
@@ -206,7 +207,7 @@ void AssetRequest::cancel() {
     uv_cancel((uv_req_t *)&req);
 }
 
-std::unique_ptr<AssetContext> AssetContext::createContext(uv_loop_t*) {
+std::unique_ptr<AssetContextBase> AssetContextBase::createContext(uv_loop_t*) {
     return std::make_unique<AssetFSContext>();
 }
 

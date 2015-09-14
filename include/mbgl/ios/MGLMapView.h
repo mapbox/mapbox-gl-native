@@ -1,10 +1,13 @@
 #import "MGLGeometry.h"
+#import "MGLMapCamera.h"
 
 #import <UIKit/UIKit.h>
 #import <CoreLocation/CoreLocation.h>
 
 NS_ASSUME_NONNULL_BEGIN
 
+@class MGLAnnotationImage;
+@class MGLMapCamera;
 @class MGLUserLocation;
 @class MGLPolyline;
 @class MGLPolygon;
@@ -12,6 +15,7 @@ NS_ASSUME_NONNULL_BEGIN
 
 @protocol MGLMapViewDelegate;
 @protocol MGLAnnotation;
+@protocol MGLOverlay;
 
 /** An MGLMapView object provides an embeddable map interface, similar to the one provided by Apple's MapKit. You use this class to display map information and to manipulate the map contents from your application. You can center the map on a given coordinate, specify the size of the area you want to display, and style the features of the map to fit your application's use case.
 *
@@ -73,6 +77,22 @@ IB_DESIGNABLE
 *   The default value of this property is `YES`. */
 @property(nonatomic, getter=isRotateEnabled) BOOL rotateEnabled;
 
+/** A Boolean value that determines whether the user may change the pitch (tilt) of the map.
+ *
+ *   This property controls only user interactions with the map. If you set the value of this property to `NO`, you may still change the pitch of the map programmatically.
+ *
+ *   The default value of this property is `YES`. */
+@property(nonatomic, getter=isPitchEnabled) BOOL pitchEnabled;
+
+/** The compass image view shown in the upper-right when the map is rotated. */
+@property (nonatomic, readonly) UIImageView *compassView;
+
+/** The Mapbox logo image view shown in the lower-left of the map. */
+@property (nonatomic, readonly) UIImageView *logoView;
+
+/** The button shown in the lower-right of the map which when pressed displays the map attribution information. */
+@property (nonatomic, readonly) UIButton *attributionButton;
+
 #pragma mark - Accessing the Delegate
 
 /** @name Accessing the Delegate */
@@ -118,6 +138,8 @@ IB_DESIGNABLE
 *   @param animated Specify `YES` if you want the map view to animate scrolling and zooming to the new location or `NO` if you want the map to display the new location immediately. */
 - (void)setCenterCoordinate:(CLLocationCoordinate2D)centerCoordinate zoomLevel:(double)zoomLevel animated:(BOOL)animated;
 
+- (void)setCenterCoordinate:(CLLocationCoordinate2D)centerCoordinate zoomLevel:(double)zoomLevel direction:(CLLocationDirection)direction animated:(BOOL)animated;
+
 /** The coordinate bounds visible in the receiver’s viewport.
 *   
 *   Changing the value of this property updates the receiver immediately. If you want to animate the change, call `setVisibleCoordinateBounds:animated:` instead. */
@@ -141,6 +163,13 @@ IB_DESIGNABLE
 *   @param animated Specify `YES` to animate the change by smoothly scrolling and zooming or `NO` to immediately display the given bounds. */
 - (void)setVisibleCoordinates:(CLLocationCoordinate2D *)coordinates count:(NSUInteger)count edgePadding:(UIEdgeInsets)insets animated:(BOOL)animated;
 
+/** Sets the visible region so that the map displays the specified annotations.
+*
+*   Calling this method updates the value in the visibleCoordinateBounds property and potentially other properties to reflect the new map region.
+*   @param annotations The annotations that you want to be visible in the map.
+*   @param animated `YES` if you want the map region change to be animated, or `NO` if you want the map to display the new region immediately without animations. */
+- (void)showAnnotations:(NS_ARRAY_OF(id <MGLAnnotation>) *)annotations animated:(BOOL)animated;
+
 /** The heading of the map (measured in degrees) relative to true north. 
 *
 *   The value `0` means that the top edge of the map view corresponds to true north. The value `90` means the top of the map is pointing due east. The value `180` means the top of the map points due south, and so on. */
@@ -155,6 +184,20 @@ IB_DESIGNABLE
 
 /** Resets the map rotation to a northern heading. */
 - (IBAction)resetNorth;
+
+/** A camera representing the current viewpoint of the map. */
+@property (nonatomic, copy) MGLMapCamera *camera;
+
+/** Moves the viewpoint to a different location with respect to the map with an optional transition animation.
+*   @param camera The new viewpoint.
+*   @param animated Specify `YES` if you want the map view to animate the change to the new viewpoint or `NO` if you want the map to display the new viewpoint immediately. */
+- (void)setCamera:(MGLMapCamera *)camera animated:(BOOL)animated;
+
+/** Moves the viewpoint to a different location with respect to the map with an optional transition duration and timing function.
+*   @param camera The new viewpoint.
+*   @param duration The amount of time, measured in seconds, that the transition animation should take. Specify `0` to jump to the new viewpoint instantaneously.
+*   @param function A timing function used for the animation. Set this parameter to `nil` for a transition that matches most system animations. If the duration is `0`, this parameter is ignored. */
+- (void)setCamera:(MGLMapCamera *)camera withDuration:(NSTimeInterval)duration animationTimingFunction:(nullable CAMediaTimingFunction *)function;
 
 #pragma mark - Converting Map Coordinates
 
@@ -249,6 +292,18 @@ IB_DESIGNABLE
 *   @param annotations The array of annotations to remove. Objects in the array must conform to the MGLAnnotation protocol. */
 - (void)removeAnnotations:(NS_ARRAY_OF(id <MGLAnnotation>) *)annotations;
 
+/** Returns a reusable annotation image object located by its identifier.
+*
+*   For performance reasons, you should generally reuse MGLAnnotationImage objects for annotations in your map views. Dequeueing saves time and memory during performance-critical operations such as scrolling.
+*
+*   @param identifier A string identifying the annotation image to be reused. This string is the same one you specify when initially returning the annotation image object using the mapView:imageForAnnotation: method.
+*   @return An annotation image object with the specified identifier, or `nil` if no such object exists in the reuse queue. */
+- (nullable MGLAnnotationImage *)dequeueReusableAnnotationImageWithIdentifier:(NSString *)identifier;
+
+#pragma mark - Managing Annotation Selections
+
+/** @name Managing Annotation Selections */
+
 /** The annotations that are currently selected.
 *
 *   Assigning a new array to this property selects only the first annotation in the array. */
@@ -266,6 +321,38 @@ IB_DESIGNABLE
 *   @param annotation The annotation object to deselect.
 *   @param animated If `YES`, the callout view is animated offscreen. */
 - (void)deselectAnnotation:(id <MGLAnnotation>)annotation animated:(BOOL)animated;
+
+#pragma mark - Adding Overlays
+
+/** @name Adding Overlays */
+
+/** Adds a single overlay object to the map.
+*
+*   To remove an overlay from a map, use the removeOverlay: method.
+*   @param overlay The overlay object to add. This object must conform to the MGLOverlay protocol. */
+- (void)addOverlay:(id <MGLOverlay>)overlay;
+
+/** Adds an array of overlay objects to the map.
+*
+*   To remove multiple overlays from a map, use the removeOverlays: method.
+*   @param overlays An array of objects, each of which must conform to the MGLOverlay protocol. */
+- (void)addOverlays:(NS_ARRAY_OF(id <MGLOverlay>) *)overlays;
+
+#pragma mark - Removing Overlays
+
+/** @name Removing Overlays */
+
+/** Removes a single overlay object from the map.
+*
+*   If the specified overlay is not currently associated with the map view, this method does nothing.
+*   @param overlay The overlay object to remove. */
+- (void)removeOverlay:(id <MGLOverlay>)overlay;
+
+/** Removes one or more overlay objects from the map.
+*
+*   If a given overlay object is not associated with the map view, it is ignored.
+*   @param overlays An array of objects, each of which conforms to the MGLOverlay protocol. */
+- (void)removeOverlays:(NS_ARRAY_OF(id <MGLOverlay>) *)overlays;
 
 #pragma mark - Displaying the User's Location
 
@@ -323,11 +410,13 @@ IB_DESIGNABLE
 
 /** @name Managing the Display of Annotations */
 
-/** Returns the style's symbol name to use for the marker for the specified point annotation object.
-*   @param mapView The map view that requested the annotation symbol name.
-*   @param annotation The object representing the annotation that is about to be displayed. 
-*   @return The marker symbol to display for the specified annotation or `nil` if you want to display the default symbol. */
-- (nullable NSString *)mapView:(MGLMapView *)mapView symbolNameForAnnotation:(id <MGLAnnotation>)annotation;
+- (nullable NSString *)mapView:(MGLMapView *)mapView symbolNameForAnnotation:(id <MGLAnnotation>)annotation __attribute__((unavailable("Use -mapView:imageForAnnotation:.")));
+
+/** Returns an image object to use for the marker for the specified point annotation object.
+*   @param mapView The map view that requested the annotation image.
+*   @param annotation The object representing the annotation that is about to be displayed.
+*   @return The image object to display for the specified annotation or `nil` if you want to display the default marker image. */
+- (nullable MGLAnnotationImage *)mapView:(MGLMapView *)mapView imageForAnnotation:(id <MGLAnnotation>)annotation;
 
 /** Returns the alpha value to use when rendering a shape annotation. Defaults to `1.0`.
 *   @param mapView The map view rendering the shape annotation.
@@ -390,13 +479,24 @@ IB_DESIGNABLE
 
 // Responding to Map Position Changes
 
-// TODO
+/** Tells the delegate that the region displayed by the map view is about to change.
+ *
+ *   This method is called whenever the currently displayed map region will start changing.
+ *   @param mapView The map view whose visible region will change.
+ *   @param animated Whether the change will cause an animated effect on the map. */
 - (void)mapView:(MGLMapView *)mapView regionWillChangeAnimated:(BOOL)animated;
 
-// TODO
+/** Tells the delegate that the region displayed by the map view is changing.
+ *
+ *   This method is called whenever the currently displayed map region changes. During movement, this method may be called many times to report updates to the map position. Therefore, your implementation of this method should be as lightweight as possible to avoid affecting performance.
+ *   @param mapView The map view whose visible region is changing. */
 - (void)mapViewRegionIsChanging:(MGLMapView *)mapView;
 
-// TODO
+/** Tells the delegate that the region displayed by the map view just changed.
+ *
+ *   This method is called whenever the currently displayed map region has finished changing.
+ *   @param mapView The map view whose visible region changed.
+ *   @param animated Whether the change caused an animated effect on the map. */
 - (void)mapView:(MGLMapView *)mapView regionDidChangeAnimated:(BOOL)animated;
 
 #pragma mark - Loading the Map Data
@@ -444,7 +544,7 @@ IB_DESIGNABLE
 
 /** Tells the delegate that the location of the user was updated.
 *
-*   While the showsUserLocation property is set to `YES`, this method is called whenever a new location update is received by the map view. This method is also called if the map view’s user tracking mode is set to MGLUserTrackingModeFollowWithHeading and the heading changes.
+*   While the showsUserLocation property is set to `YES`, this method is called whenever a new location update is received by the map view. This method is also called if the map view’s user tracking mode is set to MGLUserTrackingModeFollowWithHeading and the heading changes, or if it is set to MGLUserTrackingModeFollowWithCourse and the course changes.
 *
 *   This method is not called if the application is currently running in the background. If you want to receive location updates while running in the background, you must use the Core Location framework.
 *
