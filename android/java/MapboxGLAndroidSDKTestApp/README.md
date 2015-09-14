@@ -2,7 +2,7 @@
 
 ## Testing
 
-### Run Espresso tests on a device
+### Running Espresso tests on a device
 
 This test project comes with all the required Android Testing Support Library dependencies
 in the Gradle file. Tests are under the `app/src/androidTest` folder.
@@ -22,7 +22,7 @@ To create a new run configuration:
 
 You can now run this configuration from the main toolbar dropdown menu.
 
-# Run Espresso tests on AWS Device Farm
+### Running Espresso tests on AWS Device Farm
 
 On a terminal, within `mapbox-gl-native/android/java`,
 run the tests (`cC` stands for `connectedCheck`):
@@ -42,3 +42,17 @@ Then:
 
 If you have no tests for your app, or want to test some random user behaviour,
 you can just choose "Built-in: Fuzz" in step 2.
+
+### Running the UI/Application Exerciser Monkey
+
+Similar to the "Built-in: Fuzz" test mentioned above, Android provides
+[Monkey](http://developer.android.com/tools/help/monkey.html),
+"a program that runs on your emulator or device and generates pseudo-random streams of user events
+such as clicks, touches, or gestures, as well as a number of system-level events."
+
+To exercise Monkey on the test app, install the package on the device (e.g. via Android Studio)
+and then:
+
+```
+$ adb shell monkey -p com.mapbox.mapboxgl.testapp -v 500
+```
