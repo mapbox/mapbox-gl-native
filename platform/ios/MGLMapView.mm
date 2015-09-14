@@ -256,6 +256,9 @@ std::chrono::steady_clock::duration secondsAsDuration(float duration)
     {
         _isWaitingForRedundantReachableNotification = YES;
     }
+    else {
+        mbgl::NetworkStatus::Unreachable();
+    }
     [reachability startNotifier];
 
     // setup annotations
@@ -439,10 +442,15 @@ std::chrono::steady_clock::duration secondsAsDuration(float duration)
 - (void)reachabilityChanged:(NSNotification *)notification
 {
     MGLReachability *reachability = [notification object];
-    if ( ! _isWaitingForRedundantReachableNotification && [reachability isReachable])
-    {
-        mbgl::NetworkStatus::Reachable();
+    if ([reachability isReachable]) {
+        if ( ! _isWaitingForRedundantReachableNotification) {
+            mbgl::NetworkStatus::Reachable();
+        }
     }
+    else {
+        mbgl::NetworkStatus::Unreachable();
+    }
+    
     _isWaitingForRedundantReachableNotification = NO;
 }
 
