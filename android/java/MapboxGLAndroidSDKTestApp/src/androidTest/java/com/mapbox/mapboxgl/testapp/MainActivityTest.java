@@ -20,7 +20,7 @@ public class MainActivityTest extends BaseTest {
 
     @Test
     public void testSanity() {
-        onView(withId(R.id.layout_map))
+        onView(withId(R.id.mainMapView))
                 .check(matches(isDisplayed()));
     }
 
