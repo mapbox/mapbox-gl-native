@@ -10,6 +10,7 @@
     <string name="action_compass">Toggle compass</string>
     <string name="action_debug">Toggle debug mode</string>
     <string name="action_point_annotations">Toggle point annotations</string>
+    <string name="action_second_map_activity">Launch 2nd Map</string>
 
     <string name="label_fps">FPS:</string>
 

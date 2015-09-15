@@ -1,6 +1,7 @@
 package com.mapbox.mapboxgl.testapp;
 
 import android.Manifest;
+import android.content.Intent;
 import android.content.pm.PackageManager;
 import android.graphics.Color;
 import android.graphics.PointF;
@@ -279,6 +280,10 @@ public class MainActivity extends AppCompatActivity {
                                 // Toggle compass
                                 mMapView.setCompassEnabled(!mMapView.isCompassEnabled());
                                 menuItem.setChecked(mMapView.isCompassEnabled());
+                                return true;
+
+                            case R.id.action_second_map_activity:
+                                startActivity(new Intent(getApplicationContext(), SecondMapActivity.class));
                                 return true;
 
 /*
