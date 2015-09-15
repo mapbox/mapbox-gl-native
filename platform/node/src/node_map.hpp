@@ -1,9 +1,9 @@
 #pragma once
 
 #include "node_file_source.hpp"
+#include "node_view.hpp"
 
 #include <mbgl/map/map.hpp>
-#include <mbgl/platform/default/headless_view.hpp>
 
 #pragma GCC diagnostic push
 #pragma GCC diagnostic ignored "-Wunused-parameter"
@@ -25,9 +25,10 @@ public:
     static NAN_METHOD(New);
     static NAN_METHOD(Load);
     static NAN_METHOD(Render);
+    static NAN_METHOD(SetView);
     static NAN_METHOD(Release);
 
-    void startRender(std::unique_ptr<NodeMap::RenderOptions> options);
+    void startRender(std::unique_ptr<NodeMap::RenderOptions>);
     void renderFinished();
 
     void release();
@@ -42,7 +43,7 @@ private:
     NodeMap(v8::Local<v8::Object>);
     ~NodeMap();
 
-    mbgl::HeadlessView view;
+    Nan::Persistent<v8::Object> view;
     NodeFileSource fs;
     std::unique_ptr<mbgl::Map> map;
 

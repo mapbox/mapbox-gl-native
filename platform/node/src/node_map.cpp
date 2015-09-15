@@ -1,6 +1,5 @@
 #include "node_map.hpp"
 
-#include <mbgl/platform/default/headless_display.hpp>
 #include <mbgl/map/still_image.hpp>
 #include <mbgl/util/exception.hpp>
 
@@ -13,8 +12,8 @@ struct NodeMap::RenderOptions {
     double bearing = 0;
     double latitude = 0;
     double longitude = 0;
-    unsigned int width = 512;
-    unsigned int height = 512;
+    uint16_t width = 512;
+    uint16_t height = 512;
     std::vector<std::string> classes;
 };
 
@@ -22,11 +21,6 @@ struct NodeMap::RenderOptions {
 // Static Node Methods
 
 Nan::Persistent<v8::Function> NodeMap::constructor;
-
-static std::shared_ptr<mbgl::HeadlessDisplay> sharedDisplay() {
-    static auto display = std::make_shared<mbgl::HeadlessDisplay>();
-    return display;
-}
 
 const static char* releasedMessage() {
     return "Map resources have already been released";
@@ -41,12 +35,10 @@ NAN_MODULE_INIT(NodeMap::Init) {
     Nan::SetPrototypeMethod(tpl, "load", Load);
     Nan::SetPrototypeMethod(tpl, "render", Render);
     Nan::SetPrototypeMethod(tpl, "release", Release);
+    Nan::SetPrototypeMethod(tpl, "setView", SetView);
 
     constructor.Reset(tpl->GetFunction());
     Nan::Set(target, Nan::New("Map").ToLocalChecked(), tpl->GetFunction());
-
-    // Initialize display connection on module load.
-    sharedDisplay();
 }
 
 NAN_METHOD(NodeMap::New) {
@@ -60,7 +52,7 @@ NAN_METHOD(NodeMap::New) {
 
     auto options = info[0]->ToObject();
 
-    // Check that 'request', 'cancel' and 'ratio' are defined.
+    // Check that 'request', 'cancel' and 'view' or 'ratio' are defined.
     if (!Nan::Has(options, Nan::New("request").ToLocalChecked()).FromJust()
      || !Nan::Get(options, Nan::New("request").ToLocalChecked()).ToLocalChecked()->IsFunction()) {
         return Nan::ThrowError("Options object must have a 'request' method");
@@ -71,9 +63,11 @@ NAN_METHOD(NodeMap::New) {
         return Nan::ThrowError("Options object 'cancel' property must be a function");
     }
 
-    if (!Nan::Has(options, Nan::New("ratio").ToLocalChecked()).FromJust()
-     || !Nan::Get(options, Nan::New("ratio").ToLocalChecked()).ToLocalChecked()->IsNumber()) {
-        return Nan::ThrowError("Options object must have a numerical 'ratio' property");
+    if ((!Nan::Has(options, Nan::New("view").ToLocalChecked()).FromJust()
+     || !Nan::New(NodeView::constructorTemplate)->HasInstance(Nan::Get(options, Nan::New("view").ToLocalChecked()).ToLocalChecked()))
+     && (!Nan::Has(options, Nan::New("ratio").ToLocalChecked()).FromJust()
+     || !Nan::Get(options, Nan::New("ratio").ToLocalChecked()).ToLocalChecked()->IsNumber())) {
+        return Nan::ThrowError("Options object must have a 'view' or numerical 'ratio' property");
     }
 
     try {
@@ -186,7 +180,19 @@ NAN_METHOD(NodeMap::Render) {
         return Nan::ThrowTypeError("Style is not loaded");
     }
 
+    if (nodeMap->view.IsEmpty()) {
+        return Nan::ThrowTypeError("View has not been set");
+    }
+
     auto options = ParseOptions(info[0]->ToObject());
+
+    // Throw exception if View dimensions do not match render dimensions.
+    auto nodeView = Nan::ObjectWrap::Unwrap<NodeView>(Nan::New(nodeMap->view));
+
+    auto viewDimensions = nodeView->getSize();
+    if (viewDimensions[0] != options->width || viewDimensions[1] != options->height) {
+        return Nan::ThrowTypeError("View dimensions do not match requested render dimensions");
+    }
 
     assert(!nodeMap->callback);
     assert(!nodeMap->image);
@@ -202,7 +208,6 @@ NAN_METHOD(NodeMap::Render) {
 }
 
 void NodeMap::startRender(std::unique_ptr<NodeMap::RenderOptions> options) {
-    view.resize(options->width, options->height);
     map->update(mbgl::Update::Dimensions);
     map->setClasses(options->classes);
     map->setLatLngZoom(mbgl::LatLng(options->latitude, options->longitude), options->zoom);
@@ -291,6 +296,29 @@ void NodeMap::renderFinished() {
     }
 }
 
+NAN_METHOD(NodeMap::SetView) {
+    Nan::HandleScope scope;
+
+    auto nodeMap = Nan::ObjectWrap::Unwrap<NodeMap>(info.Holder());
+
+    if (info.Length() < 1 || !Nan::New(NodeView::constructorTemplate)->HasInstance(info[0])) {
+        return Nan::ThrowTypeError("Requires a View as first argument");
+    }
+
+    auto nodeViewHandle = info[0].As<v8::Object>();
+    auto nodeView = Nan::ObjectWrap::Unwrap<NodeView>(nodeViewHandle);
+
+    // Throw exception if View dimensions do not match render dimensions.
+    if (nodeView->getPixelRatio() != nodeMap->map->getPixelRatio()) {
+        return Nan::ThrowTypeError("View pixel ratio does not match map pixel ratio");
+    }
+
+    nodeMap->view.Reset(nodeViewHandle);
+    nodeMap->map->setView(nodeView->get());
+
+    info.GetReturnValue().SetUndefined();
+}
+
 NAN_METHOD(NodeMap::Release) {
     auto nodeMap = Nan::ObjectWrap::Unwrap<NodeMap>(info.Holder());
 
@@ -314,6 +342,8 @@ void NodeMap::release() {
         delete reinterpret_cast<uv_async_t *>(handle);
     });
 
+    view.Reset();
+
     map.reset(nullptr);
 }
 
@@ -322,13 +352,18 @@ void NodeMap::release() {
 // Instance
 
 NodeMap::NodeMap(v8::Local<v8::Object> options) :
-    view(sharedDisplay(), [&] {
-        Nan::HandleScope scope;
-        return Nan::Get(options, Nan::New("ratio").ToLocalChecked()).ToLocalChecked()->NumberValue();
-    }()),
     fs(options),
-    map(std::make_unique<mbgl::Map>(view, fs, mbgl::MapMode::Still)),
     async(new uv_async_t) {
+
+    Nan::HandleScope scope;
+
+    if (Nan::Has(options, Nan::New("view").ToLocalChecked()).FromJust()) {
+        auto view_ = Nan::Get(options, Nan::New("view").ToLocalChecked()).ToLocalChecked().As<v8::Object>();
+        view.Reset(view_);
+        map = std::make_unique<mbgl::Map>(*Nan::ObjectWrap::Unwrap<NodeView>(view_)->get(), fs, mbgl::MapMode::Still);
+    } else if (Nan::Has(options, Nan::New("ratio").ToLocalChecked()).FromJust()) {
+        map = std::make_unique<mbgl::Map>(fs, Nan::Get(options, Nan::New("ratio").ToLocalChecked()).ToLocalChecked()->NumberValue(), mbgl::MapMode::Still);
+    }
 
     async->data = this;
 #if UV_VERSION_MAJOR == 0 && UV_VERSION_MINOR <= 10

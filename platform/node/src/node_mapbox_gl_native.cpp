@@ -12,6 +12,7 @@
 NAN_MODULE_INIT(RegisterModule) {
     node_mbgl::NodeMap::Init(target);
     node_mbgl::NodeRequest::Init(target);
+    node_mbgl::NodeView::Init(target);
 
     // Exports Resource constants.
     v8::Local<v8::Object> resource = Nan::New<v8::Object>();

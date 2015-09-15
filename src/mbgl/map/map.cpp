@@ -14,14 +14,14 @@
 namespace mbgl {
 
 Map::Map(View& view_, FileSource& fileSource, MapMode mode)
-    : view(view_),
-      transform(std::make_unique<Transform>(view)),
-      data(std::make_unique<MapData>(mode, view.getPixelRatio())),
-      context(std::make_unique<util::Thread<MapContext>>(util::ThreadContext{"Map", util::ThreadType::Map, util::ThreadPriority::Regular}, view, fileSource, *data))
-{
-    view.initialize(this);
-    update(Update::Dimensions);
+    : data(std::make_unique<MapData>(mode, view_.getPixelRatio())),
+    context(std::make_unique<util::Thread<MapContext>>(util::ThreadContext{"Map", util::ThreadType::Map, util::ThreadPriority::Regular}, fileSource, *data)) {
+    setView(&view_);
 }
+
+Map::Map(FileSource& fileSource, float pixelRatio, MapMode mode)
+    : data(std::make_unique<MapData>(mode, pixelRatio)),
+    context(std::make_unique<util::Thread<MapContext>>(util::ThreadContext{"Map", util::ThreadType::Map, util::ThreadPriority::Regular}, fileSource, *data)) {}
 
 Map::~Map() {
     resume();
@@ -44,23 +44,36 @@ void Map::resume() {
     paused = false;
 }
 
+void Map::setView(View* view_) {
+    view = view_;
+    transform = std::make_unique<Transform>(*view);
+    context->invokeSync(&MapContext::setView, view);
+
+    view->initialize(this);
+    update(Update::Dimensions);
+}
+
 void Map::renderStill(StillImageCallback callback) {
+    assert(view);
+
     context->invoke(&MapContext::renderStill, transform->getState(),
-                    FrameData{ view.getFramebufferSize() }, callback);
+                    FrameData{ view->getFramebufferSize() }, callback);
 }
 
 void Map::renderSync() {
+    assert(view);
+
     if (renderState == RenderState::never) {
-        view.notifyMapChange(MapChangeWillStartRenderingMap);
+        view->notifyMapChange(MapChangeWillStartRenderingMap);
     }
 
-    view.notifyMapChange(MapChangeWillStartRenderingFrame);
+    view->notifyMapChange(MapChangeWillStartRenderingFrame);
 
     const Update flags = transform->updateTransitions(Clock::now());
     const bool fullyLoaded = context->invokeSync<bool>(
-            &MapContext::renderSync, transform->getState(), FrameData { view.getFramebufferSize() });
+            &MapContext::renderSync, transform->getState(), FrameData { view->getFramebufferSize() });
 
-    view.notifyMapChange(fullyLoaded ?
+    view->notifyMapChange(fullyLoaded ?
         MapChangeDidFinishRenderingFrameFullyRendered :
         MapChangeDidFinishRenderingFrame);
 
@@ -68,7 +81,7 @@ void Map::renderSync() {
         renderState = RenderState::partial;
     } else if (renderState != RenderState::fully) {
         renderState = RenderState::fully;
-        view.notifyMapChange(MapChangeDidFinishRenderingMapFullyRendered);
+        view->notifyMapChange(MapChangeDidFinishRenderingMapFullyRendered);
     }
 
     // Triggers an asynchronous update, that eventually triggers a view
@@ -79,8 +92,9 @@ void Map::renderSync() {
 }
 
 void Map::update(Update flags) {
+    assert(view);
     if (flags & Update::Dimensions) {
-        transform->resize(view.getSize());
+        transform->resize(view->getSize());
     }
     context->invoke(&MapContext::triggerUpdate, transform->getState(), flags);
 }
@@ -256,6 +270,10 @@ uint16_t Map::getWidth() const {
 
 uint16_t Map::getHeight() const {
     return transform->getState().getHeight();
+}
+
+float Map::getPixelRatio() const {
+    return data->pixelRatio;
 }
 
 

@@ -4,7 +4,6 @@
 #include <mbgl/storage/response.hpp>
 
 #include <cmath>
-#include <iostream>
 
 namespace node_mbgl {
 
