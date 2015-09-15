@@ -1,5 +1,7 @@
 package com.mapbox.mapboxgl.testapp;
 
+import android.test.suitebuilder.annotation.LargeTest;
+
 import org.junit.Test;
 
 import static android.support.test.espresso.Espresso.onView;
@@ -20,6 +22,7 @@ import static org.hamcrest.Matchers.not;
 /**
  * Tests on MainActivity
  */
+@LargeTest
 public class MainActivityTest extends BaseTest {
 
     private final static String HOME_BUTTON_STRING = "Navigate up";
