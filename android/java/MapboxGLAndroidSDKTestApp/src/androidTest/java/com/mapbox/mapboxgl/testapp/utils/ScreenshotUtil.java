@@ -30,7 +30,7 @@ public class ScreenshotUtil {
     private static final Bitmap.CompressFormat DEFAULT_IMAGE_FORMAT = Bitmap.CompressFormat.PNG;
     private static final int DEFAULT_IMAGE_QUALITY = 100;
 
-    public static void take(Activity activity) {
+    public static void take(Activity activity, String testName) {
 
         // Check if storage is available
         if (!isExternalStorageWritable()) {
@@ -46,7 +46,7 @@ public class ScreenshotUtil {
         rootView.setDrawingCacheEnabled(false);
 
         // Save the bitmap in external storage
-        String uniqueAbsolutePath = getUniqueAbsolutePath();
+        String uniqueAbsolutePath = getUniqueAbsolutePath(testName);
         File outputFile = new File(uniqueAbsolutePath);
         OutputStream outputStream = null;
         try {
@@ -77,9 +77,14 @@ public class ScreenshotUtil {
         return false;
     }
 
-    private static String getUniqueAbsolutePath() {
-        String externalPath = Environment.getExternalStorageDirectory().toString();
+    private static String getUniqueAbsolutePath(String testName) {
+        // A screenshot after every test vs. manual tests
         String filename = UUID.randomUUID().toString() + DEFAULT_IMAGE_EXTENSION;
+        if (testName != null && !testName.isEmpty()) {
+            filename = testName + DEFAULT_IMAGE_EXTENSION;
+        }
+
+        String externalPath = Environment.getExternalStorageDirectory().toString();
         String path = externalPath + File.separator + SCREENSHOT_FOLDER + File.separator + filename;
         Log.d(LOG_TAG, "Screenshot path: " + path);
         return path;
