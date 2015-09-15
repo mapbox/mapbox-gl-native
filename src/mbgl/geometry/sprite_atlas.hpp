@@ -2,7 +2,7 @@
 #define MBGL_GEOMETRY_SPRITE_ATLAS
 
 #include <mbgl/geometry/binpack.hpp>
-
+#include <mbgl/platform/gl.hpp>
 #include <mbgl/util/noncopyable.hpp>
 #include <mbgl/util/ptr.hpp>
 
@@ -69,7 +69,7 @@ public:
     inline const uint32_t* getData() const { return data.get(); }
 
 private:
-    const dimension width, height;
+    const GLsizei width, height;
     const dimension pixelWidth, pixelHeight;
     const float pixelRatio;
 
@@ -93,7 +93,7 @@ private:
     const std::unique_ptr<uint32_t[]> data;
     std::atomic<bool> dirty;
     bool fullUploadRequired = true;
-    uint32_t texture = 0;
+    GLuint texture = 0;
     uint32_t filter = 0;
     static const int buffer = 1;
 };

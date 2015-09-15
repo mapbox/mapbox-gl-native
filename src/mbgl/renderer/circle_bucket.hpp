@@ -35,8 +35,8 @@ private:
     CircleVertexBuffer& vertexBuffer_;
     TriangleElementsBuffer& elementsBuffer_;
 
-    const size_t vertexStart_;
-    const size_t elementsStart_;
+    const GLsizei vertexStart_;
+    const GLsizei elementsStart_;
 
     std::vector<std::unique_ptr<TriangleGroup>> triangleGroups_;
 };
