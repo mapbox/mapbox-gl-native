@@ -266,18 +266,14 @@ test('Map', function(t) {
             render();
         });
 
-        t.skip('throws if called in parallel', function(t) {
-            var completed = 0;
-            var remaining = 10;
-            var start = +new Date;
-
+        t.test('throws if called in parallel', function(t) {
             var map = new mbgl.Map(options);
             map.load(style);
 
             t.throws(function() {
                 map.render({}, function() {});
                 map.render({}, function() {});
-            });
+            }, /Map is currently rendering an image/);
 
             map.release();
             t.end();
