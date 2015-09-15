@@ -36,6 +36,8 @@ public:
 
     // Position
     const LatLng getLatLng() const;
+    double pixel_x() const;
+    double pixel_y() const;
 
     // Zoom
     float getNormalizedZoom() const;
@@ -48,18 +50,17 @@ public:
 
     // Rotation
     float getAngle() const;
-
     float getAltitude() const;
     float getPitch() const;
 
-    // Changing
+    // State
     bool isChanging() const;
-
-    double pixel_x() const;
-    double pixel_y() const;
+    bool isRotating() const;
+    bool isScaling() const;
+    bool isPanning() const;
+    bool isGestureInProgress() const;
 
     // Conversion and projection
-
     vec2<double> latLngToPoint(const LatLng& latLng) const;
     LatLng pointToLatLng(const vec2<double> point) const;
 
@@ -108,6 +109,6 @@ private:
     double Cc = (scale * util::tileSize) / util::M2PI;
 };
 
-}
+} // namespace mbgl
 
-#endif
+#endif // MBGL_MAP_TRANSFORM_STATE

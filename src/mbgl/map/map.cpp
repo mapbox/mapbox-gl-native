@@ -126,6 +126,22 @@ void Map::setGestureInProgress(bool inProgress) {
     update(Update::Repaint);
 }
 
+bool Map::isGestureInProgress() const {
+    return transform->isGestureInProgress();
+}
+
+bool Map::isRotating() const {
+    return transform->isRotating();
+}
+
+bool Map::isScaling() const {
+    return transform->isScaling();
+}
+
+bool Map::isPanning() const {
+    return transform->isPanning();
+}
+
 #pragma mark -
 
 void Map::jumpTo(CameraOptions options) {

@@ -86,6 +86,10 @@ public:
     // Transition
     void cancelTransitions();
     void setGestureInProgress(bool);
+    bool isGestureInProgress() const;
+    bool isRotating() const;
+    bool isScaling() const;
+    bool isPanning() const;
 
     // Camera
     void jumpTo(CameraOptions options);

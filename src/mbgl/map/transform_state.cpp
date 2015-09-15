@@ -105,6 +105,15 @@ const LatLng TransformState::getLatLng() const {
     return ll;
 }
 
+double TransformState::pixel_x() const {
+    const double center = (width - scale * util::tileSize) / 2;
+    return center + x;
+}
+
+double TransformState::pixel_y() const {
+    const double center = (height - scale * util::tileSize) / 2;
+    return center + y;
+}
 
 #pragma mark - Zoom
 
@@ -154,6 +163,30 @@ float TransformState::getAltitude() const {
 float TransformState::getPitch() const {
     return pitch;
 }
+
+
+#pragma mark - State
+
+bool TransformState::isChanging() const {
+    return rotating || scaling || panning || gestureInProgress;
+}
+
+bool TransformState::isRotating() const {
+    return rotating;
+}
+
+bool TransformState::isScaling() const {
+    return scaling;
+}
+
+bool TransformState::isPanning() const {
+    return panning;
+}
+
+bool TransformState::isGestureInProgress() const {
+    return gestureInProgress;
+}
+
 
 #pragma mark - Projection
 
@@ -277,13 +310,6 @@ mat4 TransformState::getPixelMatrix() const {
 }
 
 
-#pragma mark - Changing
-
-bool TransformState::isChanging() const {
-    return rotating || scaling || panning || gestureInProgress;
-}
-
-
 #pragma mark - (private helper functions)
 
 void TransformState::constrain(double& scale_, double& y_) const {
@@ -299,12 +325,4 @@ void TransformState::constrain(double& scale_, double& y_) const {
     if (y_ < -max_y) y_ = -max_y;
 }
 
-double TransformState::pixel_x() const {
-    const double center = (width - scale * util::tileSize) / 2;
-    return center + x;
-}
 
-double TransformState::pixel_y() const {
-    const double center = (height - scale * util::tileSize) / 2;
-    return center + y;
-}
