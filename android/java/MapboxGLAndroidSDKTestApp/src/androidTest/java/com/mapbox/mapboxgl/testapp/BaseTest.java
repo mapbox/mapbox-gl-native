@@ -14,6 +14,7 @@ public class BaseTest
         extends ActivityInstrumentationTestCase2<MainActivity> {
 
     private MainActivity mActivity;
+    private final static boolean screenshotOnTearDown = false;
 
     public BaseTest() {
         super(MainActivity.class);
@@ -36,12 +37,16 @@ public class BaseTest
 
     @Override
     protected void tearDown() throws Exception {
+        if (!screenshotOnTearDown) {
+            return;
+        }
+
         try {
             // Screenshots should be taken on the UI thread
             runTestOnUiThread(new Runnable() {
                 @Override
                 public void run() {
-                    ScreenshotUtil.take(getActivity());
+                    ScreenshotUtil.take(getActivity(), null);
                 }
             });
         } catch (Throwable throwable) {
@@ -49,6 +54,20 @@ public class BaseTest
         }
 
         super.tearDown();
+    }
+
+    protected void takeNamedScreenshot(final String name) {
+        try {
+            // Screenshots should be taken on the UI thread
+            runTestOnUiThread(new Runnable() {
+                @Override
+                public void run() {
+                    ScreenshotUtil.take(getActivity(), name);
+                }
+            });
+        } catch (Throwable throwable) {
+            throwable.printStackTrace();
+        }
     }
 
 }
