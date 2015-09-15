@@ -48,10 +48,11 @@ isim: ; $(RUN) HOST=ios Xcode/iosapp
 ibench: export XCODEBUILD_ARGS += -sdk iphoneos ARCHS="arm64"
 ibench: ; $(RUN) HOST=ios Xcode/ios-bench
 
-.PHONY: ipackage ipackage-strip ipackage-sim itest
+.PHONY: ipackage ipackage-strip ipackage-sim ipackage-tv itest
 ipackage: Xcode/ios ; @JOBS=$(JOBS) ./scripts/ios/package.sh
 ipackage-strip: Xcode/ios ; @JOBS=$(JOBS) ./scripts/ios/package.sh strip
 ipackage-sim: Xcode/ios ; @JOBS=$(JOBS) ./scripts/ios/package.sh sim
+ipackage-tv: Xcode/ios ; @JOBS=$(JOBS) ./scripts/ios/package.sh tv
 itest: ipackage-sim ; ./scripts/ios/test.sh
 endif
 

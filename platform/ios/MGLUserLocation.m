@@ -50,7 +50,7 @@ NS_ASSUME_NONNULL_END
 {
     return self.mapView.userTrackingMode != MGLUserTrackingModeNone;
 }
-
+#if defined TARGET_TV_OS && !TARGET_TV_OS
 - (void)setHeading:(CLHeading *)newHeading
 {
     if (newHeading.trueHeading != _heading.trueHeading)
@@ -60,7 +60,7 @@ NS_ASSUME_NONNULL_END
         [self didChangeValueForKey:@"heading"];
     }
 }
-
+#endif
 - (CLLocationCoordinate2D)coordinate
 {
     return self.location.coordinate;

@@ -15,10 +15,12 @@ NS_ASSUME_NONNULL_BEGIN
 /** A Boolean value indicating whether the user’s location is currently being updated. (read-only) */
 @property (nonatomic, readonly, getter=isUpdating) BOOL updating;
 
+#if defined TARGET_TV_OS && !TARGET_TV_OS
 /** The heading of the user location. (read-only)
 *
 * This property is `nil` if the user location tracking mode is not `MGLUserTrackingModeFollowWithHeading`. */
 @property (nonatomic, readonly, nullable) CLHeading *heading;
+#endif
 
 /** @name Accessing the User Annotation Text */
 
