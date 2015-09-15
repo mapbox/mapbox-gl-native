@@ -28,7 +28,7 @@ matrix:
       osx_image: xcode6.4
       env: FLAVOR=osx BUILDTYPE=Debug
     - os: osx
-      osx_image: xcode6.4
+      osx_image: xcode7
       env: FLAVOR=ios BUILDTYPE=Release
     - os: linux
       env: FLAVOR=android ANDROID_ABI=arm-v7 BUILDTYPE=Release

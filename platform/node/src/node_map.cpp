@@ -186,6 +186,10 @@ NAN_METHOD(NodeMap::Render) {
         return Nan::ThrowTypeError("Style is not loaded");
     }
 
+    if (nodeMap->callback) {
+        return Nan::ThrowError("Map is currently rendering an image");
+    }
+
     auto options = ParseOptions(info[0]->ToObject());
 
     assert(!nodeMap->callback);
