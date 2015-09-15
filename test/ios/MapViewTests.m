@@ -221,6 +221,8 @@
 }
 
 - (void)testSetCenterCancelsTransitions {
+    XCTestExpectation *cameraIsInDCExpectation = [self expectationWithDescription:@"camera reset to DC"];
+    
     CLLocationCoordinate2D dc = CLLocationCoordinate2DMake(38.894368, -77.036487);
     CLLocationCoordinate2D dc_west = CLLocationCoordinate2DMake(38.894368, -77.076487);
     [tester.mapView setCenterCoordinate:dc animated:NO];
@@ -237,7 +239,12 @@
                                                   tester.mapView.centerCoordinate.longitude,
                                                   0.0005,
                                                   @"setting center coordinate should cancel transitions");
+                       [cameraIsInDCExpectation fulfill];
                    });
+    
+    [self waitForExpectationsWithTimeout:1.0 handler:^(NSError *error) {
+        ;
+    }];
 }
 
 - (void)testPanDisabled {
