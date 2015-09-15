@@ -22,7 +22,7 @@
     <item android:id="@+id/action_second_map_activity"
           android:icon="@drawable/ic_looks_two_white_24dp"
           android:title="@string/action_second_map_activity"
-          android:checkable="true"
+          android:checkable="false"
         />
 
     <!--
