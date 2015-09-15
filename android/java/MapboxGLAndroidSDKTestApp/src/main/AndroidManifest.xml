@@ -17,7 +17,7 @@
                 <category android:name="android.intent.category.LAUNCHER" />
             </intent-filter>
         </activity>
-        <activity android:name=".SecondMapActivity"/>
+        <activity android:name=".SecondMapActivity" android:label="@string/activity_second"/>
         <meta-data
             android:name="io.fabric.ApiKey"
             android:value="9724157045ff7d083492c6d9ae03e60e8609d461" />

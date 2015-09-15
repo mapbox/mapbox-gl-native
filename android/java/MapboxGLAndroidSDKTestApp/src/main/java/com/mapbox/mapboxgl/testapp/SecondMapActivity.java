@@ -1,8 +1,12 @@
 package com.mapbox.mapboxgl.testapp;
 
 import android.os.Bundle;
+import android.support.v4.view.GravityCompat;
 import android.support.v7.app.AppCompatActivity;
+import android.support.v7.widget.Toolbar;
 import android.util.Log;
+import android.view.MenuItem;
+import android.view.View;
 import com.mapbox.mapboxgl.views.MapView;
 import java.io.BufferedReader;
 import java.io.IOException;
@@ -19,6 +23,11 @@ public class SecondMapActivity extends AppCompatActivity {
         super.onCreate(savedInstanceState);
 
         setContentView(R.layout.activity_second);
+
+        Toolbar toolbar = (Toolbar) findViewById(R.id.secondToolBar);
+        setSupportActionBar(toolbar);
+        getSupportActionBar().setDisplayHomeAsUpEnabled(true);
+        getSupportActionBar().setDisplayShowHomeEnabled(true);
 
         mMapView = (MapView) findViewById(R.id.secondMapView);
         // Load the access token
@@ -79,5 +88,16 @@ public class SecondMapActivity extends AppCompatActivity {
         super.onLowMemory();
 
         mMapView.onLowMemory();
+    }
+
+    @Override
+    public boolean onOptionsItemSelected(MenuItem item) {
+        switch (item.getItemId()) {
+            case android.R.id.home:
+                onBackPressed();
+                return true;
+            default:
+                return super.onOptionsItemSelected(item);
+        }
     }
 }

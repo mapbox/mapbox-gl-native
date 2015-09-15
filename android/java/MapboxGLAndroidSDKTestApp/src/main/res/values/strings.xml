@@ -3,6 +3,8 @@
 
     <string name="app_name">Mapbox GL</string>
 
+    <string name="activity_second">Second Activity</string>
+
     <string name="action_gps">Toggle GPS location</string>
     <string name="action_location_none">Disable tracking</string>
     <string name="action_location_follow">Use follow tracking mode</string>
