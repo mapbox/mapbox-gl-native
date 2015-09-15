@@ -1,5 +1,9 @@
 # Changelog
 
+## iOS 2.1.1
+
+- Fixes for Xcode 7 and Bitcode. ([#2238](https://github.com/mapbox/mapbox-gl-native/pull/2238))
+
 ## iOS 2.1.0
 
 - A two-finger vertical swipe now tilts the map into perspective mode. ([#2116](https://github.com/mapbox/mapbox-gl-native/pull/2116))
