@@ -37,23 +37,22 @@ public class BaseTest
 
     @Override
     protected void tearDown() throws Exception {
-        if (!screenshotOnTearDown) {
-            return;
-        }
-
-        try {
-            // Screenshots should be taken on the UI thread
-            runTestOnUiThread(new Runnable() {
-                @Override
-                public void run() {
-                    ScreenshotUtil.take(getActivity(), null);
-                }
-            });
-        } catch (Throwable throwable) {
-            throwable.printStackTrace();
+        if (screenshotOnTearDown) {
+            try {
+                // Screenshots should be taken on the UI thread
+                runTestOnUiThread(new Runnable() {
+                    @Override
+                    public void run() {
+                        ScreenshotUtil.take(getActivity(), null);
+                    }
+                });
+            } catch (Throwable throwable) {
+                throwable.printStackTrace();
+            }
         }
 
         super.tearDown();
+        mActivity = null;
     }
 
     protected void takeNamedScreenshot(final String name) {
