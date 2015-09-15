@@ -150,7 +150,7 @@ public class MainActivityTest extends BaseTest {
                 .perform(click());
         onView(withText(R.string.action_debug))
                 .perform(click());
-        
+
         // Clicking the item closes the drawer
         onView(withId(R.id.nav_view))
                 .check(matches(not(isDisplayed())));
@@ -266,6 +266,20 @@ public class MainActivityTest extends BaseTest {
         onView(withContentDescription(getActivity().getResources()
                 .getString(R.string.attributionsIconContentDescription)))
                 .check(matches(isDisplayed()));
+    }
+
+    /*
+     * Take a screenshot of Mapbox Streets to monitor #1649
+     */
+
+    @Test
+    public void testMapboxStreetsBlackAndWhite() {
+        // Click home and switch to Mapbox streets
+        onView(withContentDescription(HOME_BUTTON_STRING))
+                .perform(click());
+        onView(withText(R.string.styleMapboxStreets))
+                .perform(click());
+        takeNamedScreenshot("testMapboxStreetsBlackAndWhite");
     }
 
 }
