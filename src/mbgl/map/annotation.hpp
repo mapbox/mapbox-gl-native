@@ -1,13 +1,14 @@
 #ifndef MBGL_MAP_ANNOTATIONS
 #define MBGL_MAP_ANNOTATIONS
 
+#include <mapbox/geojsonvt/geojsonvt.hpp>
+
 #include <mbgl/map/map.hpp>
 #include <mbgl/map/geometry_tile.hpp>
 #include <mbgl/map/tile_id.hpp>
 #include <mbgl/style/style_properties.hpp>
 #include <mbgl/style/types.hpp>
 #include <mbgl/util/geo.hpp>
-#include <mbgl/util/geojsonvt/geojsonvt.hpp>
 #include <mbgl/util/noncopyable.hpp>
 #include <mbgl/util/vec.hpp>
 
