@@ -80,14 +80,27 @@ public:
 private:
     inline uint32_t nextID();
     static vec2<double> projectPoint(const LatLng& point);
-    std::unordered_set<TileID, TileID::Hash> addTileFeature(
-        const uint32_t annotationID,
-        const AnnotationSegments&,
-        const std::vector<std::vector<vec2<double>>>& projectedFeature,
-        const AnnotationType&,
-        const StyleProperties&,
-        const std::unordered_map<std::string, std::string>& featureProperties,
-        const uint8_t maxZoom);
+
+    std::unordered_set<TileID, TileID::Hash>
+    addTileFeature(const uint32_t annotationID,
+                   const AnnotationSegments&,
+                   const std::vector<std::vector<vec2<double>>>& projectedFeature,
+                   const AnnotationType&,
+                   const StyleProperties&,
+                   const std::unordered_map<std::string, std::string>& featureProperties,
+                   const uint8_t maxZoom);
+
+    std::unordered_set<TileID, TileID::Hash>
+    addShapeFeature(const uint32_t annotationID,
+                    const AnnotationSegments& segments,
+                    const StyleProperties& styleProperties,
+                    const uint8_t maxZoom);
+
+    std::unordered_set<TileID, TileID::Hash>
+    addPointFeature(const uint32_t annotationID,
+                    const std::vector<std::vector<vec2<double>>>& projectedFeature,
+                    const std::unordered_map<std::string, std::string>& featureProperties,
+                    const uint8_t maxZoom);
 
 private:
     std::string defaultPointAnnotationSymbol;
