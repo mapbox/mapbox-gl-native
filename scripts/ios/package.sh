@@ -74,14 +74,12 @@ if [[ "${BUILD_FOR_DEVICE}" == true ]]; then
         -o ${OUTPUT}/static/lib${NAME}.a \
         ${LIBS[@]/#/build/${BUILDTYPE}-iphoneos/libmbgl-} \
         ${LIBS[@]/#/build/${BUILDTYPE}-iphonesimulator/libmbgl-} \
-        `find mason_packages/ios-${IOS_SDK_VERSION} -type f -name libuv.a` \
-        `find mason_packages/ios-${IOS_SDK_VERSION} -type f -name libgeojsonvt.a`
+        `find mason_packages/ios-${IOS_SDK_VERSION} -type f -name libuv.a`
 else
     libtool -static -no_warning_for_no_symbols \
         -o ${OUTPUT}/static/lib${NAME}.a \
         ${LIBS[@]/#/build/${BUILDTYPE}-iphonesimulator/libmbgl-} \
-        `find mason_packages/ios-${IOS_SDK_VERSION} -type f -name libuv.a` \
-        `find mason_packages/ios-${IOS_SDK_VERSION} -type f -name libgeojsonvt.a`
+        `find mason_packages/ios-${IOS_SDK_VERSION} -type f -name libuv.a`
 fi
 echo "Created ${OUTPUT}/static/lib${NAME}.a"
 

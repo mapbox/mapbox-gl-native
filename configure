@@ -15,15 +15,8 @@ function abort { >&2 echo -e "\033[1m\033[31m$1\033[0m"; exit 1; }
 function info { >&2 echo -e "\033[1m\033[33m$1\033[0m"; }
 function warn { >&2 echo -e "\033[1m\033[33m$1\033[0m"; }
 
-if [ -d "`pwd`/.git" ]; then
-    info "This build is within a git repository"
-    export MASON_DIR="`pwd`/.mason"
-    export PATH="${MASON_DIR}:${PATH}"
-else
-    info "This build is NOT within a git repository"
-    which mason || abort "You must install mason to build mapbox-gl-native (https://github.com/mapbox/mason)"
-    export MASON_DIR="$(dirname $(readlink $(which mason)))"
-fi
+# Install mason
+export PATH="`pwd`/.mason:${PATH}" MASON_DIR="`pwd`/.mason"
 
 # You can override the function for a particular set of flags by defining a
 # print_XXX_flags function in your dependencies.sh file
@@ -35,23 +28,6 @@ function print_flags {
         local VERSION=`echo "${NAME}_VERSION" | tr "[:lower:]" "[:upper:]"`
         if [ ! -z ${!VERSION:-} ] ; then
             mason install ${NAME} ${!VERSION}
-            for FLAGS in "$@" ; do
-                CONFIG+="    '${NAME}_${FLAGS}%': $(quote_flags $(mason ${FLAGS} ${NAME} ${!VERSION})),"$LN
-            done
-        else
-            warn "* Not using ${NAME}"
-        fi
-    fi
-}
-
-function print_build_flags {
-    local NAME=$1; shift
-    if [ "$(type -t print_${NAME}_flags)" = 'function' ]; then
-        print_${NAME}_flags
-    else
-        local VERSION=`echo "${NAME}_VERSION" | tr "[:lower:]" "[:upper:]"`
-        if [ ! -z ${!VERSION:-} ] ; then
-            mason build ${NAME} ${!VERSION}
             for FLAGS in "$@" ; do
                 CONFIG+="    '${NAME}_${FLAGS}%': $(quote_flags $(mason ${FLAGS} ${NAME} ${!VERSION})),"$LN
             done
@@ -117,8 +93,6 @@ print_flags libuv static_libs cflags ldflags
 print_flags zlib static_libs cflags ldflags
 print_flags nunicode static_libs cflags ldflags
 print_flags libzip static_libs cflags ldflags
-print_build_flags geojsonvt static_libs cflags ldflags
-print_flags variant static_libs cflags ldflags
 
 CONFIG+="  }
 }

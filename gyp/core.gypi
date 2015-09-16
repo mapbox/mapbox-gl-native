@@ -31,14 +31,10 @@
           '<@(libuv_cflags)',
           '<@(opengl_cflags)',
           '<@(boost_cflags)',
-          '<@(geojsonvt_cflags)',
-          '<@(variant_cflags)',
         ],
         'cflags': [
           '<@(libuv_cflags)',
           '<@(opengl_cflags)',
-          '<@(geojsonvt_cflags)',
-          '<@(variant_cflags)',
           '-fPIC'
         ],
         'ldflags': [
@@ -47,7 +43,6 @@
         ],
         'libraries': [
           '<@(libuv_static_libs)',
-          '<@(geojsonvt_static_libs)',
         ],
       },
 

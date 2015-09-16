@@ -1,11 +1,10 @@
-#include <mapbox/geojsonvt/geojsonvt_convert.hpp>
-
 #include <mbgl/map/annotation.hpp>
 #include <mbgl/annotation/point_annotation.hpp>
 #include <mbgl/annotation/shape_annotation.hpp>
 #include <mbgl/map/tile_id.hpp>
 #include <mbgl/map/live_tile.hpp>
 #include <mbgl/util/constants.hpp>
+#include <mbgl/util/geojsonvt/geojsonvt_convert.hpp>
 #include <mbgl/util/ptr.hpp>
 #include <mbgl/util/string.hpp>
 
