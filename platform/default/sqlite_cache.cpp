@@ -264,4 +264,16 @@ void SQLiteCache::Impl::refresh(const Resource& resource, int64_t expires) {
     }
 }
 
+std::shared_ptr<SQLiteCache> SharedSQLiteCache::get(const std::string &path) {
+    std::shared_ptr<SQLiteCache> temp = masterPtr.lock();
+    if (!temp) {
+        temp.reset(new SQLiteCache(path));
+        masterPtr = temp;
+    }
+
+    return temp;
+}
+
+std::weak_ptr<SQLiteCache> SharedSQLiteCache::masterPtr;
+
 }
