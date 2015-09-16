@@ -2,15 +2,19 @@ package com.mapbox.mapboxgl.testapp.utils;
 
 import android.app.Activity;
 import android.graphics.Bitmap;
+import android.graphics.Canvas;
 import android.os.Environment;
 import android.util.Log;
+import android.view.TextureView;
 import android.view.View;
+import android.view.ViewGroup;
 
 import java.io.File;
-import java.io.FileNotFoundException;
 import java.io.FileOutputStream;
 import java.io.IOException;
 import java.io.OutputStream;
+import java.util.ArrayList;
+import java.util.List;
 import java.util.UUID;
 
 /**
@@ -45,6 +49,20 @@ public class ScreenshotUtil {
         Bitmap bitmap = Bitmap.createBitmap(rootView.getDrawingCache());
         rootView.setDrawingCacheEnabled(false);
 
+        // Add the SurfaceView bit (see getAllTextureViews() below)
+        List<TextureView> tilingViews = getAllTextureViews(rootView);
+        if (tilingViews.size() > 0) {
+            Canvas canvas = new Canvas(bitmap);
+            for (TextureView TextureView : tilingViews) {
+                Bitmap b = TextureView.getBitmap(TextureView.getWidth(), TextureView.getHeight());
+                int[] location = new int[2];
+                TextureView.getLocationInWindow(location);
+                int[] location2 = new int[2];
+                TextureView.getLocationOnScreen(location2);
+                canvas.drawBitmap(b, location[0], location[1], null);
+            }
+        }
+
         // Save the bitmap in external storage
         String uniqueAbsolutePath = getUniqueAbsolutePath(testName);
         File outputFile = new File(uniqueAbsolutePath);
@@ -53,8 +71,6 @@ public class ScreenshotUtil {
             outputStream = new FileOutputStream(outputFile);
             bitmap.compress(DEFAULT_IMAGE_FORMAT, DEFAULT_IMAGE_QUALITY, outputStream);
             outputStream.flush();
-        } catch (FileNotFoundException e) {
-            e.printStackTrace();
         } catch (IOException e) {
             e.printStackTrace();
         } finally {
@@ -68,13 +84,34 @@ public class ScreenshotUtil {
         }
     }
 
-    /* Checks if external storage is available for read and write */
-    public static boolean isExternalStorageWritable() {
-        String state = Environment.getExternalStorageState();
-        if (Environment.MEDIA_MOUNTED.equals(state)) {
-            return true;
+    /*
+     * The classic way of taking a screenshot (above) doesn't work with TextureView, this fixes it:
+     * http://stackoverflow.com/questions/19704060/screen-capture-textureview-is-black-using-drawingcache
+     */
+
+    public static List<TextureView> getAllTextureViews(View view)
+    {
+        List<TextureView> tilingViews = new ArrayList<TextureView>();
+        if (view instanceof TextureView) {
+            tilingViews.add((TextureView)view);
+        }  else if(view instanceof ViewGroup) {
+            ViewGroup viewGroup = (ViewGroup)view;
+            for (int i = 0; i < viewGroup.getChildCount(); i++) {
+                tilingViews.addAll(getAllTextureViews(viewGroup.getChildAt(i)));
+            }
         }
-        return false;
+
+        return tilingViews;
+    }
+
+    /*
+     * Utils
+     */
+
+    public static boolean isExternalStorageWritable() {
+        // Checks if external storage is available for read and write
+        String state = Environment.getExternalStorageState();
+        return Environment.MEDIA_MOUNTED.equals(state);
     }
 
     private static String getUniqueAbsolutePath(String testName) {
