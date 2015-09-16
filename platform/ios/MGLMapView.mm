@@ -211,6 +211,29 @@ std::chrono::steady_clock::duration secondsAsDuration(float duration)
     _mbglMap->setStyleURL([[styleURL absoluteString] UTF8String]);
 }
 
+- (void)setRasterMapID:(NSString *)mapID
+{
+    NSMutableString *templateJSON = [[[NSString alloc] initWithContentsOfFile:
+                                         [MGLMapView pathForBundleResourceNamed:@"raster-v7"
+                                                                         ofType:@"json"
+                                                                    inDirectory:nil]
+                                                              encoding:NSUTF8StringEncoding
+                                                                 error:nil] mutableCopy];
+
+    [templateJSON replaceOccurrencesOfString:@"mapbox://xxxxxx"
+                                  withString:[NSString stringWithFormat:@"mapbox://%@", mapID]
+                                     options:0
+                                       range:NSMakeRange(0, templateJSON.length)];
+
+    NSString *tempFile = [[NSTemporaryDirectory()
+                             stringByAppendingString:@"/"]
+                             stringByAppendingString:[[NSUUID UUID] UUIDString]];
+
+    [templateJSON writeToFile:tempFile atomically:YES encoding:NSUTF8StringEncoding error:nil];
+
+    _mbglMap->setStyleURL([[@"asset://" stringByAppendingString:tempFile] UTF8String]);
+}
+
 - (void)commonInit
 {
     _isTargetingInterfaceBuilder = NSProcessInfo.processInfo.mgl_isInterfaceBuilderDesignablesAgent;

@@ -245,6 +245,10 @@ IB_DESIGNABLE
 *   To display the default style, set this property to `nil`. */
 @property (nonatomic, null_resettable) NSURL *styleURL;
 
+/** Compatibility API to use legacy raster-only tile sources. Expected format is e.g. `examples.map-pgygbwdm`.
+*   @param mapID A legacy Mapbox raster-only map ID. */
+- (void)setRasterMapID:(NSString *)mapID;
+
 /** Currently active style classes, represented as an array of string identifiers. */
 @property (nonatomic) NS_ARRAY_OF(NSString *) *styleClasses;
 

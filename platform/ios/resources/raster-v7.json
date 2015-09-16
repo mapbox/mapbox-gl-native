@@ -1,0 +1,25 @@
+{
+  "version": 7,
+  "name": "Raster",
+  "sources": {
+    "raster": {
+      "type": "raster",
+      "url": "mapbox://xxxxxx",
+      "tileSize": 256
+    }
+  },
+  "layers": [{
+    "id": "background",
+    "type": "background",
+    "paint": {
+      "background-color": "#666"
+    }
+  }, {
+    "id": "raster",
+    "type": "raster",
+    "source": "raster",
+    "paint": {
+      "raster-fade-duration": 100
+    }
+  }]
+}
