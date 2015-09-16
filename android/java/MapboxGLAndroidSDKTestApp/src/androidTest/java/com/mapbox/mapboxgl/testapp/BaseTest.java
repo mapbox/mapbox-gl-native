@@ -1,5 +1,6 @@
 package com.mapbox.mapboxgl.testapp;
 
+import android.app.Activity;
 import android.support.test.InstrumentationRegistry;
 import android.test.ActivityInstrumentationTestCase2;
 
@@ -7,66 +8,31 @@ import com.mapbox.mapboxgl.testapp.utils.ScreenshotUtil;
 
 import org.junit.Before;
 
+import static android.support.test.espresso.Espresso.onView;
+import static android.support.test.espresso.assertion.ViewAssertions.matches;
+import static android.support.test.espresso.matcher.ViewMatchers.isDisplayed;
+import static android.support.test.espresso.matcher.ViewMatchers.withId;
+
 /**
  * Base Espresso class for all tests, helps working with ActivityInstrumentationTestCase2
  */
-public class BaseTest
-        extends ActivityInstrumentationTestCase2<MainActivity> {
+public class BaseTest {
 
-    private MainActivity mActivity;
-    private final static boolean screenshotOnTearDown = false;
+    /*
+     * Shortcuts for common UI tests
+     */
 
-    public BaseTest() {
-        super(MainActivity.class);
+    protected void checkViewIsDisplayed(int id) {
+        onView(withId(id))
+                .check(matches(isDisplayed()));
     }
 
     /*
-     * Get the activity before running every test
+     * Screenshots logic
      */
 
-    @Before
-    public void setUp() throws Exception {
-        super.setUp();
-        injectInstrumentation(InstrumentationRegistry.getInstrumentation());
-        mActivity = getActivity();
-    }
-
-    /*
-     * Take a screenshot after every test
-     */
-
-    @Override
-    protected void tearDown() throws Exception {
-        if (screenshotOnTearDown) {
-            try {
-                // Screenshots should be taken on the UI thread
-                runTestOnUiThread(new Runnable() {
-                    @Override
-                    public void run() {
-                        ScreenshotUtil.take(getActivity(), null);
-                    }
-                });
-            } catch (Throwable throwable) {
-                throwable.printStackTrace();
-            }
-        }
-
-        super.tearDown();
-        mActivity = null;
-    }
-
-    protected void takeNamedScreenshot(final String name) {
-        try {
-            // Screenshots should be taken on the UI thread
-            runTestOnUiThread(new Runnable() {
-                @Override
-                public void run() {
-                    ScreenshotUtil.take(getActivity(), name);
-                }
-            });
-        } catch (Throwable throwable) {
-            throwable.printStackTrace();
-        }
+    protected void takeNamedScreenshot(Activity activity, String name) {
+        ScreenshotUtil.take(activity, name);
     }
 
 }

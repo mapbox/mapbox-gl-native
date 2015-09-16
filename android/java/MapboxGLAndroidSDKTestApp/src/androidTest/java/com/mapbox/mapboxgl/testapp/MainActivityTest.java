@@ -1,8 +1,13 @@
 package com.mapbox.mapboxgl.testapp;
 
+import android.support.test.rule.ActivityTestRule;
+import android.support.test.runner.AndroidJUnit4;
 import android.test.suitebuilder.annotation.LargeTest;
 
+import org.junit.Before;
+import org.junit.Rule;
 import org.junit.Test;
+import org.junit.runner.RunWith;
 
 import static android.support.test.espresso.Espresso.onView;
 import static android.support.test.espresso.action.ViewActions.click;
@@ -22,10 +27,22 @@ import static org.hamcrest.Matchers.not;
 /**
  * Tests on MainActivity
  */
+@RunWith(AndroidJUnit4.class)
 @LargeTest
 public class MainActivityTest extends BaseTest {
 
     private final static String HOME_BUTTON_STRING = "Navigate up";
+
+    @Rule
+    public ActivityTestRule<MainActivity> mActivityRule = new ActivityTestRule<>(
+            MainActivity.class);
+
+    private MainActivity mActivity = null;
+
+    @Before
+    public void setActivity() {
+        mActivity = mActivityRule.getActivity();
+    }
 
     /*
      * Note that we need to keep the `test` prefix if we want to be able to run these
@@ -250,7 +267,7 @@ public class MainActivityTest extends BaseTest {
     @Test
     public void testMapIconContentDescription() {
         // Mapbox logo
-        onView(withContentDescription(getActivity().getResources()
+        onView(withContentDescription(mActivity.getResources()
                 .getString(R.string.mapboxIconContentDescription)))
                 .check(matches(isDisplayed()));
     }
@@ -258,7 +275,7 @@ public class MainActivityTest extends BaseTest {
     @Test
     public void testMapCompassContentDescription() {
         // Map compass
-        onView(withContentDescription(getActivity().getResources()
+        onView(withContentDescription(mActivity.getResources()
                 .getString(R.string.compassContentDescription)))
                 .check(matches(isDisplayed()));
     }
@@ -266,23 +283,9 @@ public class MainActivityTest extends BaseTest {
     @Test
     public void testMapAttributionsIconContentDescription() {
         // Attribution icon
-        onView(withContentDescription(getActivity().getResources()
+        onView(withContentDescription(mActivity.getResources()
                 .getString(R.string.attributionsIconContentDescription)))
                 .check(matches(isDisplayed()));
-    }
-
-    /*
-     * Take a screenshot of Mapbox Streets to monitor #1649
-     */
-
-    @Test
-    public void testMapboxStreetsBlackAndWhite() {
-        // Click home and switch to Mapbox streets
-        onView(withContentDescription(HOME_BUTTON_STRING))
-                .perform(click());
-        onView(withText(R.string.styleMapboxStreets))
-                .perform(click());
-        takeNamedScreenshot("testMapboxStreetsBlackAndWhite");
     }
 
 }
