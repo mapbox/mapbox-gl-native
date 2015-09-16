@@ -48,8 +48,9 @@ you can just choose "Built-in: Fuzz" in step 2.
 ### Running pure JUnit tests
 
 These tests run on a local JVM on your development machine and they are extremely fast to run
-(as compared to Espresso). These tests are located under `src/test/java` and to run them you just
-need to right click the corresponding test class or method and select "Run ...".
+(as compared to Espresso). These tests are located under `src/test/java`. To run them you switch
+to the Unit Tests build variant, then right click the corresponding test class or method
+and select "Run ...".
 
 You can also have a run configuration:
 * Click on Run -> Edit Configurations...
@@ -58,6 +59,12 @@ You can also have a run configuration:
 * As "Test Kind", choose "All in directory"
 * As folder, choose the following folder: `mapbox-gl-native/android/java/MapboxGLAndroidSDKTestApp/src/test/java`
 * Click OK to save the new configuration
+
+You can also run the tests from the command line with:
+
+```
+$ ./gradlew test --continue -p MapboxGLAndroidSDKTestApp
+```
 
 ### Running the UI/Application Exerciser Monkey
 
