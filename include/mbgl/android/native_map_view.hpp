@@ -90,7 +90,7 @@ private:
     size_t totalMemory = 0;
 
     // Ensure these are initialised last
-    mbgl::SQLiteCache fileCache;
+    std::shared_ptr<mbgl::SQLiteCache> fileCache;
     mbgl::DefaultFileSource fileSource;
     mbgl::Map map;
 
