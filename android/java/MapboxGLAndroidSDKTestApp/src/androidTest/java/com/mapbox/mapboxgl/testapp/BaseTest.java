@@ -31,8 +31,16 @@ public class BaseTest {
      * Screenshots logic
      */
 
-    protected void takeNamedScreenshot(Activity activity, String name) {
-        ScreenshotUtil.take(activity, name);
+    protected void takeNamedScreenshot(final Activity activity, final String name) {
+
+        // Screenshots need to be taken on the UI thread
+        activity.runOnUiThread(new Runnable() {
+            @Override
+            public void run() {
+                ScreenshotUtil.take(activity, name);
+            }
+        });
+
     }
 
 }
