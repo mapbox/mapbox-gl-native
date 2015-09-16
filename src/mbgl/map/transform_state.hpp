@@ -57,10 +57,14 @@ public:
 
     double pixel_x() const;
     double pixel_y() const;
+    
+    // User constraints
+    LatLngBounds userConstraints = LatLngBounds(LatLng(-90, -180), LatLng(90, 180));
 
     // Conversion and projection
 
     vec2<double> latLngToPoint(const LatLng& latLng) const;
+    vec2<double> latLngToXY(LatLng latlng) const;
     LatLng pointToLatLng(const vec2<double> point) const;
 
     TileCoordinate latLngToCoordinate(const LatLng& latLng) const;
@@ -71,6 +75,7 @@ public:
 
 private:
     void constrain(double& scale, double& y) const;
+    void userConstrain(double& scale_, double& x_, double& y_) const;
 
     // Limit the amount of zooming possible on the map.
     double min_scale = std::pow(2, 0);

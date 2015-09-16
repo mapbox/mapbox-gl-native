@@ -60,6 +60,9 @@ public:
     // Transform state
     const TransformState getState() const { return state; }
 
+    // User constraints
+    void setUserConstraints(LatLngBounds userConstraints) { state.userConstraints = userConstraints; }
+    
 private:
     void _moveBy(double dx, double dy, const Duration& = Duration::zero());
     void _setScale(double scale, double cx, double cy, const Duration& = Duration::zero());

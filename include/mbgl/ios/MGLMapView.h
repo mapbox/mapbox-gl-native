@@ -199,6 +199,14 @@ IB_DESIGNABLE
 *   @param function A timing function used for the animation. Set this parameter to `nil` for a transition that matches most system animations. If the duration is `0`, this parameter is ignored. */
 - (void)setCamera:(MGLMapCamera *)camera withDuration:(NSTimeInterval)duration animationTimingFunction:(nullable CAMediaTimingFunction *)function;
 
+/**
+ *  Constrains map movement within the given coordinates.
+ *
+ *  @param southWest The south west coordinate to constrain the map to.
+ *  @param northEast The north east coordinate to constrain the map to.
+ */
+- (void)setUserConstraintsSouthWest:(CLLocationCoordinate2D)southWest andNorthEast:(CLLocationCoordinate2D)northEast;
+
 #pragma mark - Converting Map Coordinates
 
 /** @name Converting Map Coordinates */

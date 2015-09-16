@@ -187,6 +187,20 @@ vec2<double> TransformState::latLngToPoint(const LatLng& latLng) const {
     return coordinateToPoint(latLngToCoordinate(latLng));
 }
 
+vec2<double> TransformState::latLngToXY(LatLng latLng) const {
+    const double m = 1 - 1e-15;
+    const double f = std::fmin(std::fmax(std::sin(util::DEG2RAD * latLng.latitude), -m), m);
+    
+    const double s = scale * util::tileSize;
+    double Bc_ = s / 360;
+    double Cc_ = s / util::M2PI;
+    
+    double xn = -latLng.longitude * Bc_;
+    double yn = 0.5 * Cc_ * std::log((1 + f) / (1 - f));
+    
+    return {xn, yn};
+}
+
 LatLng TransformState::pointToLatLng(const vec2<double> point) const {
     return coordinateToLatLng(pointToCoordinate(point));
 }
@@ -285,6 +299,47 @@ bool TransformState::isChanging() const {
 
 
 #pragma mark - (private helper functions)
+
+void TransformState::userConstrain(double& scale_, double& x_, double& y_) const {
+    // Calculate a constraining bounding box
+    double scaleFactor = scale_ / scale;
+    double max_x = latLngToXY(userConstraints.ne).x * scaleFactor;
+    double min_x = latLngToXY(userConstraints.sw).x * scaleFactor;
+    double max_y = latLngToXY(userConstraints.ne).y * scaleFactor;
+    double min_y = latLngToXY(userConstraints.sw).y * scaleFactor;
+    
+    // Check if the requested zoom level fits in the constraining box, if not generate a scale factor to adjust the requesed zoom level by
+    double fitScaleFactor = height / fabs(max_y - min_y);
+    if (width / fabs(max_x - min_x) > fitScaleFactor) {
+        fitScaleFactor = width / fabs(max_x - min_x);
+    }
+    
+    // Adjust the new zoom level if necessary and update the constrained bounding box to the new scale
+    if (fitScaleFactor > 1.0) {
+        scale_ = scale_ * fitScaleFactor;
+        
+        scaleFactor = scale_ / scale;
+        max_x = latLngToXY(userConstraints.ne).x * scaleFactor;
+        min_x = latLngToXY(userConstraints.sw).x * scaleFactor;
+        max_y = latLngToXY(userConstraints.ne).y * scaleFactor;
+        min_y = latLngToXY(userConstraints.sw).y * scaleFactor;
+    }
+    
+    // Calculate the requested visible bounds to use when checking against the constraints
+    double x_left = x_ + (width / 2);
+    double x_right = x_ - (width / 2);
+    double y_bottom = y_ - (height / 2);
+    double y_top = y_ + (height / 2);
+    
+    // Check each side of the bounding box and constrain if necessary
+	// Only constrain x if necessary to allow continuous scroll if no user constraints are set
+    if (userConstraints.ne.longitude < 180 || userConstraints.sw.longitude > -180) {
+        if (x_left > min_x) x_ = min_x - (width / 2);
+        if (x_right < max_x) x_ = max_x + (width / 2);
+    }
+    if (y_bottom < min_y) y_ = min_y + (height / 2);
+    if (y_top > max_y) y_ = max_y - (height / 2);
+}
 
 void TransformState::constrain(double& scale_, double& y_) const {
     // Constrain minimum zoom to avoid zooming out far enough to show off-world areas.

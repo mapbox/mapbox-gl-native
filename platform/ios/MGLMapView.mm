@@ -1871,6 +1871,11 @@ mbgl::LatLngBounds MGLLatLngBoundsFromCoordinateBounds(MGLCoordinateBounds coord
     _mbglMap->easeTo(options);
 }
 
+- (void)setUserConstraintsSouthWest:(CLLocationCoordinate2D)southWest andNorthEast:(CLLocationCoordinate2D)northEast
+{
+    _mbglMap->setUserConstraints(mbgl::LatLngBounds(mbgl::LatLng(southWest.latitude, southWest.longitude), mbgl::LatLng(northEast.latitude, northEast.longitude)));
+}
+
 - (CLLocationCoordinate2D)convertPoint:(CGPoint)point toCoordinateFromView:(nullable UIView *)view
 {
     CGPoint convertedPoint = [self convertPoint:point fromView:view];
