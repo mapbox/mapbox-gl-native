@@ -35,10 +35,14 @@ bool CircleBucket::hasData() const {
 }
 
 void CircleBucket::addGeometry(const GeometryCollection& geometryCollection) {
+    const int extent = 4096;
     for (auto& circle : geometryCollection) {
         for(auto & geometry : circle) {
             auto x = geometry.x;
             auto y = geometry.y;
+
+            // Do not include points that are outside the tile boundaries.
+            if (x < 0 || x >= extent || y < 0 || y >= extent) continue;
 
             // this geometry will be of the Point type, and we'll derive
             // two triangles from it.
