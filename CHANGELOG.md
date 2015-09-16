@@ -1,5 +1,9 @@
 # Changelog
 
+## iOS 2.1.2
+
+- Built with Xcode 6.4 to not yet trigger Bitcode compatibility until Xcode 7 stabilizes. ([#2332](https://github.com/mapbox/mapbox-gl-native/issues/2332))
+
 ## iOS 2.1.1
 
 - Fixes for Xcode 7 and Bitcode. ([#2238](https://github.com/mapbox/mapbox-gl-native/pull/2238))
