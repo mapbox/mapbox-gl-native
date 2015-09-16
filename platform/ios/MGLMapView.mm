@@ -2722,6 +2722,7 @@ CLLocationCoordinate2D MGLLocationCoordinate2DFromLatLng(mbgl::LatLng latLng)
     return self.displayHeadingCalibration;
 }
 
+#if !__TVOS_9_0
 - (void)locationManager:(__unused CLLocationManager *)manager didUpdateHeading:(CLHeading *)newHeading
 {
     if ( ! _showsUserLocation || self.pan.state == UIGestureRecognizerStateBegan || newHeading.headingAccuracy < 0) return;
@@ -2742,6 +2743,7 @@ CLLocationCoordinate2D MGLLocationCoordinate2DFromLatLng(mbgl::LatLng latLng)
         _mbglMap->setBearing(headingDirection, secondsAsDuration(MGLAnimationDuration));
     }
 }
+#endif
 
 - (void)locationManager:(__unused CLLocationManager *)manager didFailWithError:(NSError *)error
 {

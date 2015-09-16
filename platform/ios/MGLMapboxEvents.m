@@ -2,9 +2,12 @@
 
 #import <UIKit/UIKit.h>
 #import <SystemConfiguration/CaptiveNetwork.h>
+#import <CoreLocation/CoreLocation.h>
+
+#if !__TVOS_9_0
 #import <CoreTelephony/CTTelephonyNetworkInfo.h>
 #import <CoreTelephony/CTCarrier.h>
-#import <CoreLocation/CoreLocation.h>
+#endif
 
 #import "MGLAccountManager.h"
 #import "NSProcessInfo+MGLAdditions.h"
@@ -94,8 +97,17 @@ const NSTimeInterval MGLFlushInterval = 60;
         } else {
             _scale = [UIScreen mainScreen].scale;
         }
-        CTCarrier *carrierVendor = [[[CTTelephonyNetworkInfo alloc] init] subscriberCellularProvider];
-        _carrier = [carrierVendor carrierName];
+
+        if ([[UIDevice currentDevice].systemName isEqualToString:@"tvOS"])
+        {
+            _carrier = @"N/A";
+        }
+        else
+        {
+            CTCarrier *carrierVendor = [[[CTTelephonyNetworkInfo alloc] init] subscriberCellularProvider];
+            _carrier = [carrierVendor carrierName];
+        }
+
     }
     return self;
 }
@@ -755,9 +767,14 @@ const NSTimeInterval MGLFlushInterval = 60;
 // Can be called from any thread.
 //
 - (NSString *) currentCellularNetworkConnectionType {
+    if ([[UIDevice currentDevice].systemName isEqualToString:@"tvOS"])
+    {
+        return nil;
+    }
+    
     CTTelephonyNetworkInfo *telephonyInfo = [[CTTelephonyNetworkInfo alloc] init];
     NSString *radioTech = telephonyInfo.currentRadioAccessTechnology;
-    
+
     if (radioTech == nil) {
         return nil;
     } else if ([radioTech isEqualToString:CTRadioAccessTechnologyGPRS]) {
@@ -790,6 +807,11 @@ const NSTimeInterval MGLFlushInterval = 60;
 // Can be called from any thread.
 //
 + (BOOL) checkPushEnabled {
+    if ([[UIDevice currentDevice].systemName isEqualToString:@"tvOS"])
+    {
+        return NO;
+    }
+
     BOOL (^pushCheckBlock)(void) = ^{
         BOOL blockResult;
         if ([[UIApplication sharedApplication] respondsToSelector:@selector(isRegisteredForRemoteNotifications)]) {
