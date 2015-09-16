@@ -58,8 +58,8 @@ NativeMapView::NativeMapView(JNIEnv *env, jobject obj_, float pixelRatio_, int a
       pixelRatio(pixelRatio_),
       availableProcessors(availableProcessors_),
       totalMemory(totalMemory_),
-      fileCache(mbgl::android::cachePath + "/mbgl-cache.db"),
-      fileSource(&fileCache),
+      fileCache(mbgl::SharedSQLiteCache::get(mbgl::android::cachePath + "/mbgl-cache.db")),
+      fileSource(fileCache.get()),
       map(*this, fileSource, MapMode::Continuous) {
     mbgl::Log::Debug(mbgl::Event::Android, "NativeMapView::NativeMapView");
 
