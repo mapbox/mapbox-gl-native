@@ -43,6 +43,20 @@ Then:
 If you have no tests for your app, or want to test some random user behaviour,
 you can just choose "Built-in: Fuzz" in step 2.
 
+### Running pure JUnit tests
+
+These tests run on a local JVM on your development machine and they are extremely fast to run
+(as compared to Espresso). These tests are located under `src/test/java` and to run them you just
+need to right click the corresponding test class or method and select "Run ...".
+
+You can also have a run configuration:
+* Click on Run -> Edit Configurations...
+* Click on "Junit Tests"
+* Give a name to the configuration, e.g. `JUnit tests`
+* As "Test Kind", choose "All in directory"
+* As folder, choose the following folder: `mapbox-gl-native/android/java/MapboxGLAndroidSDKTestApp/src/test/java`
+* Click OK to save the new configuration
+
 ### Running the UI/Application Exerciser Monkey
 
 Similar to the "Built-in: Fuzz" test mentioned above, Android provides
