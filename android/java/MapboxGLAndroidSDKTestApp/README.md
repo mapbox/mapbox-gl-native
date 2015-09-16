@@ -40,6 +40,8 @@ Then:
 * On step 4, customize your device state (if needed)
 * Finally, confirm the configuration and run the tests.
 
+On Step 2, you can also separate by commas different classes: `com.mapbox.mapboxgl.testapp.MainActivityTest,com.mapbox.mapboxgl.testapp.MainActivityScreenTest`
+
 If you have no tests for your app, or want to test some random user behaviour,
 you can just choose "Built-in: Fuzz" in step 2.
 
