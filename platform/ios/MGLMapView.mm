@@ -87,8 +87,10 @@ mbgl::util::UnitBezier MGLUnitBezierForMediaTimingFunction(CAMediaTimingFunction
 @property (nonatomic) NS_MUTABLE_ARRAY_OF(NSLayoutConstraint *) *attributionButtonConstraints;
 @property (nonatomic) UIActionSheet *attributionSheet;
 @property (nonatomic) UIPanGestureRecognizer *pan;
+#if !__TVOS_9_0
 @property (nonatomic) UIPinchGestureRecognizer *pinch;
 @property (nonatomic) UIRotationGestureRecognizer *rotate;
+#endif
 @property (nonatomic) UILongPressGestureRecognizer *quickZoom;
 @property (nonatomic) UIPanGestureRecognizer *twoFingerDrag;
 @property (nonatomic) NSMapTable *annotationIDsByAnnotation;
@@ -320,7 +322,8 @@ std::chrono::steady_clock::duration secondsAsDuration(float duration)
     _pan.maximumNumberOfTouches = 1;
     [self addGestureRecognizer:_pan];
     _scrollEnabled = YES;
-
+   
+#if !__TVOS_9_0
     _pinch = [[UIPinchGestureRecognizer alloc] initWithTarget:self action:@selector(handlePinchGesture:)];
     _pinch.delegate = self;
     [self addGestureRecognizer:_pinch];
@@ -330,7 +333,8 @@ std::chrono::steady_clock::duration secondsAsDuration(float duration)
     _rotate.delegate = self;
     [self addGestureRecognizer:_rotate];
     _rotateEnabled = YES;
-
+   
+#endif
     UITapGestureRecognizer *doubleTap = [[UITapGestureRecognizer alloc] initWithTarget:self action:@selector(handleDoubleTapGesture:)];
     doubleTap.numberOfTapsRequired = 2;
     [self addGestureRecognizer:doubleTap];
@@ -341,8 +345,10 @@ std::chrono::steady_clock::duration secondsAsDuration(float duration)
 
     UITapGestureRecognizer *twoFingerTap = [[UITapGestureRecognizer alloc] initWithTarget:self action:@selector(handleTwoFingerTapGesture:)];
     twoFingerTap.numberOfTouchesRequired = 2;
+#if !__TVOS_9_0
     [twoFingerTap requireGestureRecognizerToFail:_pinch];
     [twoFingerTap requireGestureRecognizerToFail:_rotate];
+#endif
     [self addGestureRecognizer:twoFingerTap];
     
     _twoFingerDrag = [[UIPanGestureRecognizer alloc] initWithTarget:self action:@selector(handleTwoFingerDragGesture:)];
@@ -1040,7 +1046,8 @@ std::chrono::steady_clock::duration secondsAsDuration(float duration)
     else if (rotate.state == UIGestureRecognizerStateChanged)
     {
         CGFloat newDegrees = MGLDegreesFromRadians(self.angle + rotate.rotation) * -1;
-
+       
+#if !__TVOS_9_0
         // constrain to +/-30 degrees when merely rotating like Apple does
         //
         if ( ! self.isRotationAllowed && std::abs(self.pinch.scale) < 10)
@@ -1048,7 +1055,8 @@ std::chrono::steady_clock::duration secondsAsDuration(float duration)
             newDegrees = fminf(newDegrees,  30);
             newDegrees = fmaxf(newDegrees, -30);
         }
-
+       
+#endif
         _mbglMap->setBearing(newDegrees,
                             [rotate locationInView:rotate.view].x,
                             [rotate locationInView:rotate.view].y);
@@ -2485,7 +2493,8 @@ CLLocationCoordinate2D MGLLocationCoordinate2DFromLatLng(mbgl::LatLng latLng)
                                                             UIViewAutoresizingFlexibleTopMargin | UIViewAutoresizingFlexibleBottomMargin);
 
         self.locationManager = [CLLocationManager new];
-
+       
+#if !__TVOS_9_0
 #if __IPHONE_OS_VERSION_MAX_ALLOWED >= 80000
         // enable iOS 8+ location authorization API
         //
@@ -2531,6 +2540,7 @@ CLLocationCoordinate2D MGLLocationCoordinate2DFromLatLng(mbgl::LatLng latLng)
         [self.userLocationAnnotationView removeFromSuperview];
         self.userLocationAnnotationView = nil;
     }
+#endif
 }
 
 - (void)setUserLocationAnnotationView:(MGLUserLocationAnnotationView *)newAnnotationView
@@ -2721,6 +2731,7 @@ CLLocationCoordinate2D MGLLocationCoordinate2DFromLatLng(mbgl::LatLng latLng)
 
     return self.displayHeadingCalibration;
 }
+
 
 #if !__TVOS_9_0
 - (void)locationManager:(__unused CLLocationManager *)manager didUpdateHeading:(CLHeading *)newHeading

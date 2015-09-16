@@ -297,10 +297,12 @@ const NSTimeInterval MGLFlushInterval = 60;
         // Clear Any System TimeZone Cache
         [NSTimeZone resetSystemTimeZone];
         [_rfc3339DateFormatter setTimeZone:[NSTimeZone systemTimeZone]];
-        
-        // Enable Battery Monitoring
+
+#if !__TVOS_9_0
+       // Enable Battery Monitoring
         [UIDevice currentDevice].batteryMonitoringEnabled = YES;
-        
+       
+#endif
         __weak MGLMapboxEvents *weakSelf = self;
         _userDefaultsObserver = [[NSNotificationCenter defaultCenter] addObserverForName:NSUserDefaultsDidChangeNotification
                                                                                   object:nil
@@ -371,6 +373,7 @@ const NSTimeInterval MGLFlushInterval = 60;
     if (self.paused) {
         [self stopUpdatingLocation];
     } else {
+#if !__TVOS_9_0
         CLAuthorizationStatus authStatus = [CLLocationManager authorizationStatus];
         if (authStatus == kCLAuthorizationStatusDenied ||
             authStatus == kCLAuthorizationStatusRestricted) {
@@ -379,6 +382,7 @@ const NSTimeInterval MGLFlushInterval = 60;
                    authStatus == kCLAuthorizationStatusAuthorizedWhenInUse) {
             [self startUpdatingLocation];
         }
+#endif
     }
 }
 
@@ -406,12 +410,14 @@ const NSTimeInterval MGLFlushInterval = 60;
 
 - (void)stopUpdatingLocation {
     [_locationManager stopUpdatingLocation];
-    
+   
+#if !__TVOS_9_0
     // -[CLLocationManager stopMonitoringVisits] is only available in iOS 8+.
     if ([_locationManager respondsToSelector:@selector(stopMonitoringVisits)]) {
         [_locationManager stopMonitoringVisits];
     }
-    
+   
+#endif
     _locationManager = nil;
 }
 
@@ -444,13 +450,15 @@ const NSTimeInterval MGLFlushInterval = 60;
     _locationManager.desiredAccuracy = kCLLocationAccuracyKilometer;
     _locationManager.distanceFilter = 10;
     _locationManager.delegate = self;
-    
+   
+#if !__TVOS_9_0
     [_locationManager startUpdatingLocation];
     
     // -[CLLocationManager startMonitoringVisits] is only available in iOS 8+.
     if ([_locationManager respondsToSelector:@selector(startMonitoringVisits)]) {
         [_locationManager startMonitoringVisits];
     }
+#endif
 }
 
 - (void) pushTurnstileEvent {
@@ -524,7 +532,9 @@ const NSTimeInterval MGLFlushInterval = 60;
         [evt setValue:strongSelf.data.model forKey:@"model"];
         [evt setValue:strongSelf.data.iOSVersion forKey:@"operatingSystem"];
         [evt setValue:[strongSelf deviceOrientation] forKey:@"orientation"];
+#if !__TVOS_9_0
         [evt setValue:@((int)(100 * [UIDevice currentDevice].batteryLevel)) forKey:@"batteryLevel"];
+#endif
         [evt setValue:@(strongSelf.data.scale) forKey:@"resolution"];
         [evt setValue:strongSelf.data.carrier forKey:@"carrier"];
         
@@ -655,8 +665,9 @@ const NSTimeInterval MGLFlushInterval = 60;
 // Can be called from any thread.
 //
 - (NSString *) deviceOrientation {
+#if !__TVOS_9_0
     __block NSString *result;
-
+   
     NSString *(^deviceOrientationBlock)(void) = ^{
         switch ([UIDevice currentDevice].orientation) {
             case UIDeviceOrientationUnknown:
@@ -684,10 +695,11 @@ const NSTimeInterval MGLFlushInterval = 60;
                 result = @"Default - Unknown";
                 break;
         }
-
+       
         return result;
-    };
+        };
 
+   
     if ( ! [[NSThread currentThread] isMainThread]) {
         dispatch_sync(dispatch_get_main_queue(), ^{
             result = deviceOrientationBlock();
@@ -697,6 +709,9 @@ const NSTimeInterval MGLFlushInterval = 60;
     }
 
     return result;
+#else
+   return @"Unknown";
+#endif
 }
 
 // Can be called from any thread.
@@ -767,11 +782,12 @@ const NSTimeInterval MGLFlushInterval = 60;
 // Can be called from any thread.
 //
 - (NSString *) currentCellularNetworkConnectionType {
+
     if ([[UIDevice currentDevice].systemName isEqualToString:@"tvOS"])
     {
         return nil;
     }
-    
+   
     CTTelephonyNetworkInfo *telephonyInfo = [[CTTelephonyNetworkInfo alloc] init];
     NSString *radioTech = telephonyInfo.currentRadioAccessTechnology;
 
@@ -848,8 +864,10 @@ const NSTimeInterval MGLFlushInterval = 60;
         [MGLMapboxEvents pushEvent:MGLEventTypeLocation withAttributes:@{
             MGLEventKeyLatitude: @(loc.coordinate.latitude),
             MGLEventKeyLongitude: @(loc.coordinate.longitude),
+#if !__TVOS_9_0
             MGLEventKeySpeed: @(loc.speed),
             MGLEventKeyCourse: @(loc.course),
+#endif
             MGLEventKeyAltitude: @(loc.altitude),
             MGLEventKeyHorizontalAccuracy: @(loc.horizontalAccuracy),
             MGLEventKeyVerticalAccuracy: @(loc.verticalAccuracy)
