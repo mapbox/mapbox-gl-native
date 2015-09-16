@@ -17,6 +17,7 @@ namespace mbgl {
 class GlyphAtlas : public util::noncopyable {
 public:
     GlyphAtlas(uint16_t width, uint16_t height);
+    ~GlyphAtlas();
 
     void addGlyphs(uintptr_t tileUID,
                    const std::u32string& text,
