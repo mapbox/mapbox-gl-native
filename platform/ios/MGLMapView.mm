@@ -323,18 +323,19 @@ std::chrono::steady_clock::duration secondsAsDuration(float duration)
     [self addGestureRecognizer:_pan];
     _scrollEnabled = YES;
    
-#if !__TVOS_9_0
-    _pinch = [[UIPinchGestureRecognizer alloc] initWithTarget:self action:@selector(handlePinchGesture:)];
-    _pinch.delegate = self;
-    [self addGestureRecognizer:_pinch];
-    _zoomEnabled = YES;
-
-    _rotate = [[UIRotationGestureRecognizer alloc] initWithTarget:self action:@selector(handleRotateGesture:)];
-    _rotate.delegate = self;
-    [self addGestureRecognizer:_rotate];
-    _rotateEnabled = YES;
-   
-#endif
+    if(![[UIDevice currentDevice].systemName isEqualToString:@"tvOS"])
+    {
+        _pinch = [[UIPinchGestureRecognizer alloc] initWithTarget:self action:@selector(handlePinchGesture:)];
+        _pinch.delegate = self;
+        [self addGestureRecognizer:_pinch];
+        _zoomEnabled = YES;
+        
+        _rotate = [[UIRotationGestureRecognizer alloc] initWithTarget:self action:@selector(handleRotateGesture:)];
+        _rotate.delegate = self;
+        [self addGestureRecognizer:_rotate];
+        _rotateEnabled = YES;
+    }
+    
     UITapGestureRecognizer *doubleTap = [[UITapGestureRecognizer alloc] initWithTarget:self action:@selector(handleDoubleTapGesture:)];
     doubleTap.numberOfTapsRequired = 2;
     [self addGestureRecognizer:doubleTap];
@@ -345,10 +346,11 @@ std::chrono::steady_clock::duration secondsAsDuration(float duration)
 
     UITapGestureRecognizer *twoFingerTap = [[UITapGestureRecognizer alloc] initWithTarget:self action:@selector(handleTwoFingerTapGesture:)];
     twoFingerTap.numberOfTouchesRequired = 2;
-#if !__TVOS_9_0
-    [twoFingerTap requireGestureRecognizerToFail:_pinch];
-    [twoFingerTap requireGestureRecognizerToFail:_rotate];
-#endif
+    if(![[UIDevice currentDevice].systemName isEqualToString:@"tvOS"])
+    {
+        [twoFingerTap requireGestureRecognizerToFail:_pinch];
+        [twoFingerTap requireGestureRecognizerToFail:_rotate];
+    }
     [self addGestureRecognizer:twoFingerTap];
     
     _twoFingerDrag = [[UIPanGestureRecognizer alloc] initWithTarget:self action:@selector(handleTwoFingerDragGesture:)];
@@ -1047,16 +1049,17 @@ std::chrono::steady_clock::duration secondsAsDuration(float duration)
     {
         CGFloat newDegrees = MGLDegreesFromRadians(self.angle + rotate.rotation) * -1;
        
-#if !__TVOS_9_0
-        // constrain to +/-30 degrees when merely rotating like Apple does
-        //
-        if ( ! self.isRotationAllowed && std::abs(self.pinch.scale) < 10)
+        if(![[UIDevice currentDevice].systemName isEqualToString:@"tvOS"])
         {
-            newDegrees = fminf(newDegrees,  30);
-            newDegrees = fmaxf(newDegrees, -30);
+            // constrain to +/-30 degrees when merely rotating like Apple does
+            //
+            if ( ! self.isRotationAllowed && std::abs(self.pinch.scale) < 10)
+            {
+                newDegrees = fminf(newDegrees,  30);
+                newDegrees = fmaxf(newDegrees, -30);
+            }
         }
-       
-#endif
+        
         _mbglMap->setBearing(newDegrees,
                             [rotate locationInView:rotate.view].x,
                             [rotate locationInView:rotate.view].y);
@@ -2494,53 +2497,54 @@ CLLocationCoordinate2D MGLLocationCoordinate2DFromLatLng(mbgl::LatLng latLng)
 
         self.locationManager = [CLLocationManager new];
        
-#if !__TVOS_9_0
+        if(![[UIDevice currentDevice].systemName isEqualToString:@"tvOS"])
+        {
 #if __IPHONE_OS_VERSION_MAX_ALLOWED >= 80000
-        // enable iOS 8+ location authorization API
-        //
-        if ([CLLocationManager instancesRespondToSelector:@selector(requestWhenInUseAuthorization)])
-        {
-            BOOL hasLocationDescription = [[NSBundle mainBundle] objectForInfoDictionaryKey:@"NSLocationWhenInUseUsageDescription"] ||
+            // enable iOS 8+ location authorization API
+            //
+            if ([CLLocationManager instancesRespondToSelector:@selector(requestWhenInUseAuthorization)])
+            {
+                BOOL hasLocationDescription = [[NSBundle mainBundle] objectForInfoDictionaryKey:@"NSLocationWhenInUseUsageDescription"] ||
                 [[NSBundle mainBundle] objectForInfoDictionaryKey:@"NSLocationAlwaysUsageDescription"];
-            if (!hasLocationDescription)
-            {
-                [NSException raise:@"Missing Location Services usage description" format:
-                 @"In iOS 8 and above, this app must have a value for NSLocationWhenInUseUsageDescription or NSLocationAlwaysUsageDescription in its Info.plist."];
+                if (!hasLocationDescription)
+                {
+                    [NSException raise:@"Missing Location Services usage description" format:
+                     @"In iOS 8 and above, this app must have a value for NSLocationWhenInUseUsageDescription or NSLocationAlwaysUsageDescription in its Info.plist."];
+                }
+                // request location permissions, if both keys exist ask for less permissive
+                if ([[NSBundle mainBundle] objectForInfoDictionaryKey:@"NSLocationWhenInUseUsageDescription"])
+                {
+                    [self.locationManager requestWhenInUseAuthorization];
+                }
+                else if ([[NSBundle mainBundle] objectForInfoDictionaryKey:@"NSLocationAlwaysUsageDescription"])
+                {
+                    [self.locationManager requestAlwaysAuthorization];
+                }
             }
-            // request location permissions, if both keys exist ask for less permissive
-            if ([[NSBundle mainBundle] objectForInfoDictionaryKey:@"NSLocationWhenInUseUsageDescription"])
-            {
-                [self.locationManager requestWhenInUseAuthorization];
-            }
-            else if ([[NSBundle mainBundle] objectForInfoDictionaryKey:@"NSLocationAlwaysUsageDescription"])
-            {
-                [self.locationManager requestAlwaysAuthorization];
-            }
-        }
 #endif
-
-        self.locationManager.headingFilter = 5.0;
-        self.locationManager.delegate = self;
-        [self.locationManager startUpdatingLocation];
-    }
-    else
-    {
-        [self.locationManager stopUpdatingLocation];
-        [self.locationManager stopUpdatingHeading];
-        self.locationManager.delegate = nil;
-        self.locationManager = nil;
-
-        if ([self.delegate respondsToSelector:@selector(mapViewDidStopLocatingUser:)])
+            
+            self.locationManager.headingFilter = 5.0;
+            self.locationManager.delegate = self;
+            [self.locationManager startUpdatingLocation];
+        }
+        else
         {
-            [self.delegate mapViewDidStopLocatingUser:self];
+            [self.locationManager stopUpdatingLocation];
+            [self.locationManager stopUpdatingHeading];
+            self.locationManager.delegate = nil;
+            self.locationManager = nil;
+            
+            if ([self.delegate respondsToSelector:@selector(mapViewDidStopLocatingUser:)])
+            {
+                [self.delegate mapViewDidStopLocatingUser:self];
+            }
+            
+            [self setUserTrackingMode:MGLUserTrackingModeNone animated:YES];
+            
+            [self.userLocationAnnotationView removeFromSuperview];
+            self.userLocationAnnotationView = nil;
         }
-
-        [self setUserTrackingMode:MGLUserTrackingModeNone animated:YES];
-
-        [self.userLocationAnnotationView removeFromSuperview];
-        self.userLocationAnnotationView = nil;
     }
-#endif
 }
 
 - (void)setUserLocationAnnotationView:(MGLUserLocationAnnotationView *)newAnnotationView

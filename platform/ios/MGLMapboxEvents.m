@@ -298,11 +298,12 @@ const NSTimeInterval MGLFlushInterval = 60;
         [NSTimeZone resetSystemTimeZone];
         [_rfc3339DateFormatter setTimeZone:[NSTimeZone systemTimeZone]];
 
-#if !__TVOS_9_0
-       // Enable Battery Monitoring
-        [UIDevice currentDevice].batteryMonitoringEnabled = YES;
+       if(![[UIDevice currentDevice].systemName isEqualToString:@"tvOS"])
+       {
+          // Enable Battery Monitoring
+          [UIDevice currentDevice].batteryMonitoringEnabled = YES;
+       }
        
-#endif
         __weak MGLMapboxEvents *weakSelf = self;
         _userDefaultsObserver = [[NSNotificationCenter defaultCenter] addObserverForName:NSUserDefaultsDidChangeNotification
                                                                                   object:nil
@@ -373,16 +374,17 @@ const NSTimeInterval MGLFlushInterval = 60;
     if (self.paused) {
         [self stopUpdatingLocation];
     } else {
-#if !__TVOS_9_0
-        CLAuthorizationStatus authStatus = [CLLocationManager authorizationStatus];
-        if (authStatus == kCLAuthorizationStatusDenied ||
-            authStatus == kCLAuthorizationStatusRestricted) {
-            [self stopUpdatingLocation];
-        } else if (authStatus == kCLAuthorizationStatusAuthorized ||
-                   authStatus == kCLAuthorizationStatusAuthorizedWhenInUse) {
-            [self startUpdatingLocation];
+        if(![[UIDevice currentDevice].systemName isEqualToString:@"tvOS"])
+        {
+            CLAuthorizationStatus authStatus = [CLLocationManager authorizationStatus];
+            if (authStatus == kCLAuthorizationStatusDenied ||
+                authStatus == kCLAuthorizationStatusRestricted) {
+                [self stopUpdatingLocation];
+            } else if (authStatus == kCLAuthorizationStatusAuthorized ||
+                       authStatus == kCLAuthorizationStatusAuthorizedWhenInUse) {
+                [self startUpdatingLocation];
+            }
         }
-#endif
     }
 }
 
@@ -411,13 +413,13 @@ const NSTimeInterval MGLFlushInterval = 60;
 - (void)stopUpdatingLocation {
     [_locationManager stopUpdatingLocation];
    
-#if !__TVOS_9_0
-    // -[CLLocationManager stopMonitoringVisits] is only available in iOS 8+.
-    if ([_locationManager respondsToSelector:@selector(stopMonitoringVisits)]) {
-        [_locationManager stopMonitoringVisits];
+    if(![[UIDevice currentDevice].systemName isEqualToString:@"tvOS"])
+    {
+        // -[CLLocationManager stopMonitoringVisits] is only available in iOS 8+.
+        if ([_locationManager respondsToSelector:@selector(stopMonitoringVisits)]) {
+            [_locationManager stopMonitoringVisits];
+        }
     }
-   
-#endif
     _locationManager = nil;
 }
 
@@ -451,14 +453,15 @@ const NSTimeInterval MGLFlushInterval = 60;
     _locationManager.distanceFilter = 10;
     _locationManager.delegate = self;
    
-#if !__TVOS_9_0
-    [_locationManager startUpdatingLocation];
-    
-    // -[CLLocationManager startMonitoringVisits] is only available in iOS 8+.
-    if ([_locationManager respondsToSelector:@selector(startMonitoringVisits)]) {
-        [_locationManager startMonitoringVisits];
+    if(![[UIDevice currentDevice].systemName isEqualToString:@"tvOS"])
+    {
+        [_locationManager startUpdatingLocation];
+        
+        // -[CLLocationManager startMonitoringVisits] is only available in iOS 8+.
+        if ([_locationManager respondsToSelector:@selector(startMonitoringVisits)]) {
+            [_locationManager startMonitoringVisits];
+        }
     }
-#endif
 }
 
 - (void) pushTurnstileEvent {
@@ -532,9 +535,10 @@ const NSTimeInterval MGLFlushInterval = 60;
         [evt setValue:strongSelf.data.model forKey:@"model"];
         [evt setValue:strongSelf.data.iOSVersion forKey:@"operatingSystem"];
         [evt setValue:[strongSelf deviceOrientation] forKey:@"orientation"];
-#if !__TVOS_9_0
-        [evt setValue:@((int)(100 * [UIDevice currentDevice].batteryLevel)) forKey:@"batteryLevel"];
-#endif
+        if(![[UIDevice currentDevice].systemName isEqualToString:@"tvOS"])
+        {
+            [evt setValue:@((int)(100 * [UIDevice currentDevice].batteryLevel)) forKey:@"batteryLevel"];
+        }
         [evt setValue:@(strongSelf.data.scale) forKey:@"resolution"];
         [evt setValue:strongSelf.data.carrier forKey:@"carrier"];
         
@@ -665,53 +669,53 @@ const NSTimeInterval MGLFlushInterval = 60;
 // Can be called from any thread.
 //
 - (NSString *) deviceOrientation {
-#if !__TVOS_9_0
-    __block NSString *result;
-   
-    NSString *(^deviceOrientationBlock)(void) = ^{
-        switch ([UIDevice currentDevice].orientation) {
-            case UIDeviceOrientationUnknown:
-                result = @"Unknown";
-                break;
-            case UIDeviceOrientationPortrait:
-                result = @"Portrait";
-                break;
-            case UIDeviceOrientationPortraitUpsideDown:
-                result = @"PortraitUpsideDown";
-                break;
-            case UIDeviceOrientationLandscapeLeft:
-                result = @"LandscapeLeft";
-                break;
-            case UIDeviceOrientationLandscapeRight:
-                result = @"LandscapeRight";
-                break;
-            case UIDeviceOrientationFaceUp:
-                result = @"FaceUp";
-                break;
-            case UIDeviceOrientationFaceDown:
-                result = @"FaceDown";
-                break;
-            default:
-                result = @"Default - Unknown";
-                break;
-        }
-       
-        return result;
+    if(![[UIDevice currentDevice].systemName isEqualToString:@"tvOS"])
+    {
+        __block NSString *result;
+        
+        NSString *(^deviceOrientationBlock)(void) = ^{
+            switch ([UIDevice currentDevice].orientation) {
+                case UIDeviceOrientationUnknown:
+                    result = @"Unknown";
+                    break;
+                case UIDeviceOrientationPortrait:
+                    result = @"Portrait";
+                    break;
+                case UIDeviceOrientationPortraitUpsideDown:
+                    result = @"PortraitUpsideDown";
+                    break;
+                case UIDeviceOrientationLandscapeLeft:
+                    result = @"LandscapeLeft";
+                    break;
+                case UIDeviceOrientationLandscapeRight:
+                    result = @"LandscapeRight";
+                    break;
+                case UIDeviceOrientationFaceUp:
+                    result = @"FaceUp";
+                    break;
+                case UIDeviceOrientationFaceDown:
+                    result = @"FaceDown";
+                    break;
+                default:
+                    result = @"Default - Unknown";
+                    break;
+            }
+            
+            return result;
         };
-
-   
-    if ( ! [[NSThread currentThread] isMainThread]) {
-        dispatch_sync(dispatch_get_main_queue(), ^{
+        
+        
+        if ( ! [[NSThread currentThread] isMainThread]) {
+            dispatch_sync(dispatch_get_main_queue(), ^{
+                result = deviceOrientationBlock();
+            });
+        } else {
             result = deviceOrientationBlock();
-        });
-    } else {
-        result = deviceOrientationBlock();
+        }
+        
+        return result;
     }
-
-    return result;
-#else
-   return @"Unknown";
-#endif
+    return @"Unknown";
 }
 
 // Can be called from any thread.

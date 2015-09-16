@@ -7,7 +7,6 @@ set -u
 NAME=Mapbox
 OUTPUT=build/ios/pkg
 IOS_SDK_VERSION=`xcrun --sdk iphoneos --show-sdk-version`
-TV_SDK_VERSION=`xcrun --sdk appletvos --show-sdk-version`
 LIBUV_VERSION=0.10.28
 
 if [[ ${#} -eq 0 ]]; then # e.g. "make ipackage"
@@ -53,32 +52,13 @@ export HOST=ios
 make Xcode/ios
 
 if [[ "${BUILD_FOR_TV}" == true ]]; then
-step "Building TV Simulator targets..."
-xcodebuild -sdk appletvsimulator${TV_SDK_VERSION} \
-    ARCHS="x86_64 arm64" \
-    ONLY_ACTIVE_ARCH=NO \
-    GCC_GENERATE_DEBUGGING_SYMBOLS=${GCC_GENERATE_DEBUGGING_SYMBOLS} \
-    -project ./build/ios-all/mbgl.xcodeproj \
-    -configuration ${BUILDTYPE} \
-    -target everything \
-    -jobs ${JOBS} | xcpretty -c
-else
+export GCC_PREPROCESSOR_DEFINITIONS='__TVOS_9_0'
+fi
 
-    if [[ "${BUILD_FOR_DEVICE}" == true ]]; then
-        step "Building iOS device targets..."
-        xcodebuild -sdk iphoneos${IOS_SDK_VERSION} \
-            ARCHS="arm64 armv7 armv7s" \
-            ONLY_ACTIVE_ARCH=NO \
-            GCC_GENERATE_DEBUGGING_SYMBOLS=${GCC_GENERATE_DEBUGGING_SYMBOLS} \
-            -project ./build/ios-all/mbgl.xcodeproj \
-            -configuration ${BUILDTYPE} \
-            -target everything \
-            -jobs ${JOBS} | xcpretty -c
-    fi
-
-    step "Building iOS Simulator targets..."
-    xcodebuild -sdk iphonesimulator${IOS_SDK_VERSION} \
-        ARCHS="x86_64 i386" \
+if [[ "${BUILD_FOR_DEVICE}" == true ]]; then
+    step "Building iOS device targets..."
+    xcodebuild -sdk iphoneos${IOS_SDK_VERSION} \
+        ARCHS="arm64 armv7 armv7s" \
         ONLY_ACTIVE_ARCH=NO \
         GCC_GENERATE_DEBUGGING_SYMBOLS=${GCC_GENERATE_DEBUGGING_SYMBOLS} \
         -project ./build/ios-all/mbgl.xcodeproj \
@@ -86,6 +66,17 @@ else
         -target everything \
         -jobs ${JOBS} | xcpretty -c
 fi
+
+step "Building iOS Simulator targets..."
+xcodebuild -sdk iphonesimulator${IOS_SDK_VERSION} \
+    ARCHS="x86_64 i386" \
+    ONLY_ACTIVE_ARCH=NO \
+    GCC_GENERATE_DEBUGGING_SYMBOLS=${GCC_GENERATE_DEBUGGING_SYMBOLS} \
+    -project ./build/ios-all/mbgl.xcodeproj \
+    -configuration ${BUILDTYPE} \
+    -target everything \
+    -jobs ${JOBS} | xcpretty -c
+
 
 step "Building static library..."
 LIBS=(core.a platform-ios.a asset-fs.a cache-sqlite.a http-nsurl.a)
