@@ -76,6 +76,21 @@ android {
             proguardFiles getDefaultProguardFile('proguard-android.txt'), 'proguard-rules.pro'
         }
     }
+
+    splits {
+        abi {
+            enable true
+            reset()
+            include 'armeabi', 'armeabi-v7a', 'x86', 'mips'
+            universalApk true
+        }
+    }
+}
+
+crashlytics {
+    enableNdk true
+    androidNdkOut '../MapboxGLAndroidSDK/src/main/obj.target'
+    androidNdkLibsOut '../MapboxGLAndroidSDK/src/main/obj.target'
 }
 
 dependencies {
@@ -87,6 +102,9 @@ dependencies {
     compile 'com.android.support:appcompat-v7:23.0.1'
     compile 'com.android.support:design:23.0.1'
     compile('com.crashlytics.sdk.android:crashlytics:2.5.1@aar') {
+        transitive = true;
+    }
+    compile('com.crashlytics.sdk.android:crashlytics-ndk:1.1.1@aar') {
         transitive = true;
     }
 }

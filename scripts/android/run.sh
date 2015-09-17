@@ -39,16 +39,20 @@ if [ ! -z "${AWS_ACCESS_KEY_ID}" ] && [ ! -z "${AWS_SECRET_ACCESS_KEY}" ] ; then
 
     S3_PREFIX=s3://mapbox/mapbox-gl-native/android/build/${TRAVIS_JOB_NUMBER}
     APK_OUTPUTS=./android/java/MapboxGLAndroidSDKTestApp/build/outputs/apk
+    JNILIB=`mason env JNIDIR`
 
-    # Upload either the debug or the release build
-    if [ ${BUILDTYPE} == "Debug" ] ; then
-        aws s3 cp \
-            ${APK_OUTPUTS}/MapboxGLAndroidSDKTestApp-debug.apk \
-            ${S3_PREFIX}/MapboxGLAndroidSDKTestApp-debug.apk
-    elif [ ${BUILDTYPE} == "Release" ] ; then
-        aws s3 cp \
-            ${APK_OUTPUTS}/MapboxGLAndroidSDKTestApp-release-unsigned.apk \
-            ${S3_PREFIX}/MapboxGLAndroidSDKTestApp-release-unsigned.apk
+    # ARM64 does not build APK for now
+    if [ ${JNIDIR} != "arm64-v8a" ] ; then
+        # Upload either the debug or the release build
+        if [ ${BUILDTYPE} == "Debug" ] ; then
+            aws s3 cp \
+                ${APK_OUTPUTS}/MapboxGLAndroidSDKTestApp-${JNILIB}-debug.apk \
+                ${S3_PREFIX}/MapboxGLAndroidSDKTestApp-debug.apk
+        elif [ ${BUILDTYPE} == "Release" ] ; then
+            aws s3 cp \
+                ${APK_OUTPUTS}/MapboxGLAndroidSDKTestApp-${JNILIB}-release-unsigned.apk \
+                ${S3_PREFIX}/MapboxGLAndroidSDKTestApp-release-unsigned.apk
+        fi
     fi
 
     mapbox_time_finish
