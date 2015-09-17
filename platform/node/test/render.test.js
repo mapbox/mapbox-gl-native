@@ -1,6 +1,6 @@
 'use strict';
 
-var mbgl = require('../../..');
+var mbgl = require('../../../lib/mapbox-gl-native');
 var suite = require('mapbox-gl-test-suite').render;
 var request = require('request');
 

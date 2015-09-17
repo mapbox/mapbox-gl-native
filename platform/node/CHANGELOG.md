@@ -14,11 +14,10 @@
   render options. ([`a8d9b92`](https://github.com/mapbox/mapbox-gl-native/commit/a8d9b921d71a91d7f8eff82e5a584aaab8b7d1c6), [#1799](https://github.com/mapbox/mapbox-gl-native/pull/1799))
 - `map.render` now returns a raw image buffer instead of an object with
   `width`, `height` and `pixels` properties. ([#2262](https://github.com/mapbox/mapbox-gl-native/pull/2262))
-- Adds support for rendering v8 styles.
+- Adds support for rendering [mapbox-gl-style-spec](https://github.com/mapbox/mapbox-gl-style-spec) v8 styles.
 - No longer loads resources before a render request is made. ([`55d25a8`](https://github.com/mapbox/mapbox-gl-native/commit/55d25a80a77c06ef5e66acc0d8518867b03fe8a4))
-- Adds io.js v3.x support. ([#2261](https://github.com/mapbox/mapbox-gl-native/pull/2261))
+- Adds Node.js v4.x and io.js v3.x support. ([#2261](https://github.com/mapbox/mapbox-gl-native/pull/2261))
 - Fixes a bug which prevented raster tiles that `404`'ed from rendering ([#2458](https://github.com/mapbox/mapbox-gl-native/pull/2458))
-- Adds Node.js v4.1.x support.
 - Fade transitions are now ignored to prevent half faded labels. ([#942](https://github.com/mapbox/mapbox-gl-native/pull/942))
 - Adds option `pitch` ([#2702](https://github.com/mapbox/mapbox-gl-native/pull/2702))
 

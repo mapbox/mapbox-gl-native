@@ -1,22 +1,22 @@
 #!/usr/bin/env python
 
-import sys, os, errno, re
+import sys, os, errno, re, subprocess
 
+DEFAULT_TAG = [0, 0, 0]
+DEFAULT_REV = 'unknown'
 
-output_dir = sys.argv[1]
+def is_git_repo():
+    try:
+        subprocess.check_output("git rev-parse", shell=True)
+        return True
+    except subprocess.CalledProcessError as exc:
+        return False
 
-if len(sys.argv) <= 3:
-    tag = [0, 0, 0]
-    rev = sys.argv[2][0:8]
-else:
-    # When they're identical, the git describe can't find a tag and reports the rev instead.
-    if sys.argv[2] == sys.argv[3]:
-        tag = [0, 0, 0]
-    else:
-        ver = re.sub("[^0-9.]", "", sys.argv[2])
-        tag = map(int, ver.split('.'))
-        rev = sys.argv[3][0:8]
+def parse_tag(raw_tag):
+    return map(int, re.sub("[^0-9.]", "", raw_tag).split('.'))
 
+def parse_rev(raw_rev):
+    return raw_rev[0:8]
 
 def mkdir_p(path):
     try:
@@ -26,6 +26,22 @@ def mkdir_p(path):
             pass
         else: raise
 
+output_dir = sys.argv[1]
+
+if is_git_repo():
+    raw_tag = subprocess.check_output("git describe --tags --always --abbrev=0", shell=True)
+    raw_rev = subprocess.check_output("git rev-parse HEAD", shell=True)
+
+    # When they're identical, the "git describe" can't find a tag and reports the rev instead.
+    if raw_tag == raw_rev:
+        tag = DEFAULT_TAG
+        rev = parse_rev(raw_rev)
+    else:
+        tag = parse_tag(raw_tag)
+        rev = parse_rev(raw_rev)
+else:
+    tag = DEFAULT_TAG
+    rev = DEFAULT_REV
 
 header = """// NOTE: DO NOT CHANGE THIS FILE. IT IS AUTOMATICALLY GENERATED.
 #ifndef MBGL_UTIL_VERSION
@@ -60,4 +76,3 @@ extern const unsigned int number;
 header_path = os.path.join(output_dir, 'include/mbgl/util/version.hpp')
 mkdir_p(os.path.dirname(header_path))
 with open(header_path, 'w') as f: f.write(header)
-

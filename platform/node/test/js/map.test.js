@@ -1,7 +1,7 @@
 'use strict';
 
 var test = require('tape');
-var mbgl = require('../../../..');
+var mbgl = require('../../../../lib/mapbox-gl-native');
 var fs = require('fs');
 var path = require('path');
 var style = require('../fixtures/style.json');
