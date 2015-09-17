@@ -1,6 +1,8 @@
 #ifndef MBGL_RENDERER_GL
 #define MBGL_RENDERER_GL
 
+//#define GL_TRACK
+
 #include <string>
 #include <stdexcept>
 #include <vector>
@@ -82,6 +84,44 @@ void InitializeExtensions(glProc (*getProcAddress)(const char *));
 #ifdef GL_ES_VERSION_2_0
     #define glClearDepth glClearDepthf
     #define glDepthRange glDepthRangef
+#endif
+
+#ifdef GL_TRACK
+#define glBindTexture mbx_glBindTexture
+#define glDeleteTexture mbx_glDeleteTexture
+#define glTexImage2D mbx_glTexImage2D
+#define glClear mbx_glClear
+#define glShaderSource mbx_glShaderSource
+#define glBufferData mbx_glBufferData
+#define glBindBuffer mbx_glBindBuffer
+#define glDeleteBuffers mbx_glDeleteBuffers
+
+void mbx_glDeleteBuffers(GLsizei n,
+                     const GLuint * buffers);
+void mbx_glBindBuffer(GLenum target,
+                      GLuint buffer);
+void mbx_glBufferData(GLenum target,
+                      GLsizeiptr size,
+                      const GLvoid * data,
+                      GLenum usage);
+void mbx_glShaderSource(GLuint shader,
+                        GLsizei count,
+                        const GLchar * const *string,
+                        const GLint *length);
+void mbx_glClear(GLbitfield mask);
+void mbx_glBindTexture(	GLenum target,
+                       GLuint texture);
+void mbx_glDeleteTextures(GLsizei n,
+                          const GLuint * textures);
+void mbx_glTexImage2D(GLenum target,
+                      GLint level,
+                      GLint internalformat,
+                      GLsizei width,
+                      GLsizei height,
+                      GLint border,
+                      GLenum format,
+                      GLenum type,
+                      const GLvoid * data);
 #endif
 
 #endif

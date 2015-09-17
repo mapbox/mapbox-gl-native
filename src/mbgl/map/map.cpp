@@ -11,6 +11,8 @@
 #include <mbgl/util/thread.hpp>
 #include <mbgl/util/math.hpp>
 
+#include <iostream>
+
 namespace mbgl {
 
 Map::Map(View& view_, FileSource& fileSource, MapMode mode)

@@ -11,6 +11,7 @@
 #include <string>
 #include <cstring>
 #include <cassert>
+#include <iostream>
 
 #ifdef MBGL_USE_CGL
 #include <CoreFoundation/CoreFoundation.h>
@@ -22,6 +23,7 @@ namespace mbgl {
 
 HeadlessView::HeadlessView(float pixelRatio_, uint16_t width, uint16_t height)
     : display(std::make_shared<HeadlessDisplay>()), pixelRatio(pixelRatio_) {
+    std::cout << "HeadlessView::HeadlessView" << std::endl;
     resize(width, height);
 }
 
@@ -30,10 +32,12 @@ HeadlessView::HeadlessView(std::shared_ptr<HeadlessDisplay> display_,
                            uint16_t width,
                            uint16_t height)
     : display(display_), pixelRatio(pixelRatio_) {
+    std::cout << "HeadlessView::HeadlessView" << std::endl;
     resize(width, height);
 }
 
 void HeadlessView::loadExtensions() {
+    std::cout << "HeadlessView::loadExtensions" << std::endl;
     if (extensionsLoaded) {
         return;
     }
@@ -63,6 +67,7 @@ void HeadlessView::loadExtensions() {
 }
 
 void HeadlessView::createContext() {
+    std::cout << "HeadlessView::createContext" << std::endl;
     if (!display) {
         throw std::runtime_error("Display is not set");
     }
@@ -115,6 +120,7 @@ bool HeadlessView::isActive() {
 }
 
 void HeadlessView::resizeFramebuffer() {
+    std::cout << "HeadlessView::resizeFramebuffer: " << this << std::endl;
     assert(isActive());
 
     if (!needsResize) return;
@@ -135,6 +141,7 @@ void HeadlessView::resizeFramebuffer() {
     MBGL_CHECK_ERROR(glRenderbufferStorageEXT(GL_RENDERBUFFER_EXT, GL_RGBA8, w, h));
     MBGL_CHECK_ERROR(glBindRenderbufferEXT(GL_RENDERBUFFER_EXT, 0));
 
+    std::cout << "I am creating a new framebuffer right here: " << this << " " << fbo << std::endl;
     MBGL_CHECK_ERROR(glGenFramebuffersEXT(1, &fbo));
     MBGL_CHECK_ERROR(glBindFramebufferEXT(GL_FRAMEBUFFER_EXT, fbo));
 
@@ -162,11 +169,16 @@ void HeadlessView::resizeFramebuffer() {
 }
 
 void HeadlessView::resize(const uint16_t width, const uint16_t height) {
+    if(dimensions[0] == width &&
+       dimensions[1] == height) {
+        return;
+    }
     dimensions = {{ width, height }};
     needsResize = true;
 }
 
 std::unique_ptr<StillImage> HeadlessView::readStillImage() {
+    std::cout << "HeadlessView::readStillImage: " << this  << "fbo = " << fbo<< std::endl;
     assert(isActive());
 
     const unsigned int w = dimensions[0] * pixelRatio;
@@ -192,13 +204,16 @@ std::unique_ptr<StillImage> HeadlessView::readStillImage() {
 }
 
 void HeadlessView::clearBuffers() {
+    std::cout << "HeadlessView::clearBuffers: " << this << "fbo = " << fbo << std::endl;
     assert(isActive());
 
     MBGL_CHECK_ERROR(glBindFramebufferEXT(GL_FRAMEBUFFER_EXT, 0));
 
     if (fbo) {
         MBGL_CHECK_ERROR(glDeleteFramebuffersEXT(1, &fbo));
+        std::cout << "HeadlessView::clearBuffers2: " << this << "fbo = " << fbo << std::endl;
         fbo = 0;
+        std::cout << "HeadlessView::clearBuffers3: " << this << "fbo = " << fbo << std::endl;
     }
 
     if (fboColor) {
@@ -213,6 +228,7 @@ void HeadlessView::clearBuffers() {
 }
 
 HeadlessView::~HeadlessView() {
+    std::cout << "HeadlessView::~HeadlessView" << std::endl;
     activate();
     clearBuffers();
     deactivate();
@@ -249,7 +265,8 @@ std::array<uint16_t, 2> HeadlessView::getFramebufferSize() const {
 }
 
 void HeadlessView::activate() {
-     if (thread != std::thread::id()) {
+    std::cout << "HeadlessView::activate" << std::endl;
+    if (thread != std::thread::id()) {
         throw std::runtime_error("OpenGL context was already current");
     }
     thread = std::this_thread::get_id();
@@ -275,6 +292,7 @@ void HeadlessView::activate() {
 }
 
 void HeadlessView::deactivate() {
+    std::cout << "HeadlessView::deactivate" << std::endl;
     if (thread == std::thread::id()) {
         throw std::runtime_error("OpenGL context was not current");
     }
