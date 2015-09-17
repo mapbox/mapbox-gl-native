@@ -13,6 +13,7 @@
 #include <mbgl/annotation/sprite_image.hpp>
 #include <mbgl/platform/platform.hpp>
 #include <mbgl/platform/darwin/reachability.h>
+#include <mbgl/storage/sqlite_cache.hpp>
 #include <mbgl/storage/default_file_source.hpp>
 #include <mbgl/storage/network_status.hpp>
 #include <mbgl/util/geo.hpp>
@@ -28,7 +29,6 @@
 #import "NSException+MGLAdditions.h"
 #import "MGLUserLocationAnnotationView.h"
 #import "MGLUserLocation_Private.h"
-#import "MGLFileCache.h"
 #import "MGLAccountManager_Private.h"
 #import "MGLMapboxEvents.h"
 
@@ -112,12 +112,14 @@ mbgl::util::UnitBezier MGLUnitBezierForMediaTimingFunction(CAMediaTimingFunction
 {
     mbgl::Map *_mbglMap;
     MBGLView *_mbglView;
+    std::shared_ptr<mbgl::SQLiteCache> _mbglFileCache;
     mbgl::DefaultFileSource *_mbglFileSource;
-    BOOL _isWaitingForRedundantReachableNotification;
-    
+
     NS_MUTABLE_ARRAY_OF(NSURL *) *_bundledStyleURLs;
 
+    BOOL _isWaitingForRedundantReachableNotification;
     BOOL _isTargetingInterfaceBuilder;
+
     CLLocationDegrees _pendingLatitude;
     CLLocationDegrees _pendingLongitude;
 }
@@ -225,14 +227,24 @@ std::chrono::steady_clock::duration secondsAsDuration(float duration)
     self.backgroundColor = [UIColor clearColor];
     self.clipsToBounds = YES;
 
-    // setup mbgl map
-    //
+    // setup mbgl view
     const float scaleFactor = [UIScreen instancesRespondToSelector:@selector(nativeScale)] ? [[UIScreen mainScreen] nativeScale] : [[UIScreen mainScreen] scale];
     _mbglView = new MBGLView(self, scaleFactor);
-    _mbglFileSource = new mbgl::DefaultFileSource([MGLFileCache obtainSharedCacheWithObject:self]);
 
-    // Start paused
+    // setup mbgl cache & file source
+    NSString *fileCachePath = @"";
+    NSArray *paths = NSSearchPathForDirectoriesInDomains(NSCachesDirectory, NSUserDomainMask, YES);
+    if ([paths count] != 0) {
+        NSString *libraryDirectory = [paths objectAtIndex:0];
+        fileCachePath = [libraryDirectory stringByAppendingPathComponent:@"cache.db"];
+    }
+    _mbglFileCache = mbgl::SharedSQLiteCache::get([fileCachePath UTF8String]);
+    _mbglFileSource = new mbgl::DefaultFileSource(_mbglFileCache.get());
+
+    // setup mbgl map
     _mbglMap = new mbgl::Map(*_mbglView, *_mbglFileSource, mbgl::MapMode::Continuous);
+
+    // start paused if in IB
     if (_isTargetingInterfaceBuilder || background) {
         self.dormant = YES;
         _mbglMap->pause();
@@ -464,8 +476,6 @@ std::chrono::steady_clock::duration secondsAsDuration(float duration)
         delete _mbglFileSource;
         _mbglFileSource = nullptr;
     }
-
-    [MGLFileCache releaseSharedCacheForObject:self];
 
     if (_mbglView)
     {
