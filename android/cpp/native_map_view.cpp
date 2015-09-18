@@ -73,7 +73,7 @@ NativeMapView::NativeMapView(JNIEnv *env, jobject obj_, float pixelRatio_, int a
         return;
     }
 
-    obj = env->NewGlobalRef(obj_);
+    obj = env->NewWeakGlobalRef(obj_);
     if (obj == nullptr) {
         env->ExceptionDescribe();
         return;
@@ -93,7 +93,7 @@ NativeMapView::~NativeMapView() {
     JNIEnv *env = nullptr;
     ret = vm->GetEnv(reinterpret_cast<void **>(&env), JNI_VERSION_1_6);
     if (ret == JNI_OK) {
-        env->DeleteGlobalRef(obj);
+        env->DeleteWeakGlobalRef(obj);
     } else {
         mbgl::Log::Error(mbgl::Event::JNI, "GetEnv() failed with %i", ret);
         throw new std::runtime_error("GetEnv() failed");
