@@ -66,7 +66,7 @@
 
     [tester.compass tap];
 
-    [tester waitForTimeInterval:1];
+    [tester waitForTimeInterval:2];
 
     XCTAssertEqual(tester.mapView.direction,
                    0,
