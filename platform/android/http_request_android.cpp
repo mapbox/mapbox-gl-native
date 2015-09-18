@@ -75,7 +75,8 @@ private:
 
     static const int connectionError = 0;
     static const int temporaryError = 1;
-    static const int permanentError = 1;
+    static const int permanentError = 2;
+    static const int canceledError = 3;
 };
 
 // -------------------------------------------------------------------------------------------------
@@ -305,22 +306,26 @@ void HTTPAndroidRequest::onResponse(int code, std::string message, std::string e
 }
 
 void HTTPAndroidRequest::onFailure(int type, std::string message) {
-    if (!response) {
-        response = std::make_unique<Response>();
-    }
+    if (type != canceledError) {
+        if (!response) {
+            response = std::make_unique<Response>();
+        }
 
-    response->status = Response::Error;
-    response->message = message;
+        response->status = Response::Error;
+        response->message = message;
 
-    switch (type) {
-    case connectionError:
-        status = ResponseStatus::ConnectionError;
-
-    case temporaryError:
-        status = ResponseStatus::TemporaryError;
-
-    default:
-        status = ResponseStatus::PermanentError;
+        switch (type) {
+        case connectionError:
+            status = ResponseStatus::ConnectionError;
+            break;
+        case temporaryError:
+            status = ResponseStatus::TemporaryError;
+            break;
+        default:
+            status = ResponseStatus::PermanentError;
+        }
+    } else {
+        status = ResponseStatus::Canceled;
     }
 
     async.send();

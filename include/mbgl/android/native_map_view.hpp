@@ -62,7 +62,7 @@ private:
 
 private:
     JavaVM *vm = nullptr;
-    jobject obj = nullptr;
+    jweak obj = nullptr;
 
     ANativeWindow *window = nullptr;
     EGLDisplay display = EGL_NO_DISPLAY;

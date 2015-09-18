@@ -20,6 +20,7 @@ class HTTPContext {
     private static final int CONNECTION_ERROR = 0;
     private static final int TEMPORARY_ERROR = 1;
     private static final int PERMANENT_ERROR = 2;
+    private static final int CANCELED_ERROR = 3;
 
     private static HTTPContext mInstance = null;
 
@@ -78,7 +79,10 @@ class HTTPContext {
                 type = CONNECTION_ERROR;
             } else if ((e instanceof InterruptedIOException)) {
                 type = TEMPORARY_ERROR;
+            } else if (mCall.isCanceled()) {
+                type = CANCELED_ERROR;
             }
+
             nativeOnFailure(mNativePtr, type, e.getMessage());
         }
 
