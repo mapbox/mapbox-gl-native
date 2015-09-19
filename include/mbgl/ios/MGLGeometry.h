@@ -85,7 +85,7 @@ NS_INLINE NSString *MGLStringFromCoordinateBounds(MGLCoordinateBounds bounds) {
 
 NS_INLINE CGFloat MGLRadiansFromDegrees(CLLocationDegrees degrees)
 {
-    return degrees * M_PI / 180;
+    return (CGFloat)(degrees * M_PI) / 180;
 }
 
 NS_INLINE CLLocationDegrees MGLDegreesFromRadians(CGFloat radians)
