@@ -48,6 +48,8 @@ private:
 
 class AnnotationManager : private util::noncopyable {
 public:
+    typedef std::unordered_set<TileID, TileID::Hash> AffectedTiles;
+
     AnnotationManager();
     ~AnnotationManager();
 
@@ -57,15 +59,15 @@ public:
 
     void setDefaultPointAnnotationSymbol(const std::string& symbol);
 
-    std::pair<std::unordered_set<TileID, TileID::Hash>, AnnotationIDs>
-    addPointAnnotations(const std::vector<PointAnnotation>&,
-                        const uint8_t maxZoom);
+    std::pair<AffectedTiles, AnnotationIDs>
+    addPointAnnotations(const std::vector<PointAnnotation>&, const uint8_t maxZoom);
 
-    std::pair<std::unordered_set<TileID, TileID::Hash>, AnnotationIDs>
-    addShapeAnnotations(const std::vector<ShapeAnnotation>&,
-                        const uint8_t maxZoom);
+    std::pair<AffectedTiles, AnnotationIDs>
+    addShapeAnnotations(const std::vector<ShapeAnnotation>&, const uint8_t maxZoom);
 
-    std::unordered_set<TileID, TileID::Hash> removeAnnotations(const AnnotationIDs&, const uint8_t maxZoom);
+    AffectedTiles
+    removeAnnotations(const AnnotationIDs&, const uint8_t maxZoom);
+
     AnnotationIDs getOrderedShapeAnnotations() const { return orderedShapeAnnotations; }
     const StyleProperties getAnnotationStyleProperties(uint32_t) const;
 
@@ -81,17 +83,8 @@ private:
     inline uint32_t nextID();
     static vec2<double> projectPoint(const LatLng& point);
 
-    std::unordered_set<TileID, TileID::Hash>
-    addShapeFeature(const uint32_t annotationID,
-                    const AnnotationSegments& segments,
-                    const StyleProperties& styleProperties,
-                    const uint8_t maxZoom);
-
-    std::unordered_set<TileID, TileID::Hash>
-    addPointFeature(const uint32_t annotationID,
-                    const std::vector<std::vector<vec2<double>>>& projectedFeature,
-                    const std::unordered_map<std::string, std::string>& featureProperties,
-                    const uint8_t maxZoom);
+    uint32_t addShapeAnnotation(const ShapeAnnotation&, const uint8_t maxZoom);
+    uint32_t addPointAnnotation(const PointAnnotation&, const uint8_t maxZoom, AffectedTiles&);
 
 private:
     std::string defaultPointAnnotationSymbol;
