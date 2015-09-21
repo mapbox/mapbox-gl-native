@@ -18,7 +18,7 @@ elif [[ ${1} == "sim" ]]; then # e.g. "make ipackage-sim"
     BUILD_FOR_TV=false
     GCC_GENERATE_DEBUGGING_SYMBOLS="YES"
 elif [[ ${1} == "tv" ]]; then # e.g. "make ipackage-tv"
-    BUILD_FOR_DEVICE=false
+    BUILD_FOR_DEVICE=true
     BUILD_FOR_TV=true
     GCC_GENERATE_DEBUGGING_SYMBOLS="YES"
 else # e.g. "make ipackage-strip"
