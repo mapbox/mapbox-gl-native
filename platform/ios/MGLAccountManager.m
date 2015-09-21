@@ -2,15 +2,19 @@
 #import "MGLMapboxEvents.h"
 #import "NSProcessInfo+MGLAdditions.h"
 
-@interface MGLAccountManager()
+#import <Fabric/FABKitProtocol.h>
+#import <Fabric/Fabric+FABKits.h>
+
+@interface MGLAccountManager() <FABKit>
 
 @property (atomic) BOOL mapboxMetricsEnabledSettingShownInApp;
 @property (atomic) NSString *accessToken;
 
 @end
 
-
 @implementation MGLAccountManager
+
+#pragma mark - Internal
 
 + (void)load {
     // Read the initial configuration from Info.plist. The shown-in-app setting
@@ -69,5 +73,31 @@
     return [MGLAccountManager sharedManager].accessToken;
 }
 
+#pragma mark - Fabric
+
++ (NSString *)bundleIdentifier {
+    return @"com.mapbox.sdk.ios";
+}
+
++ (NSString *)kitDisplayVersion {
+    return @"2.2.0-pre.1";
+}
+
++ (void)initializeIfNeeded {
+    Class fabric = NSClassFromString(@"Fabric");
+
+    if (fabric) {
+        NSDictionary *configuration = [fabric configurationDictionaryForKitClass:[MGLAccountManager class]];
+        if ( ! configuration || ! configuration[@"accessToken"]) {
+            NSLog(@"Configuration dictionary returned by Fabric was nil or doesn't have accessToken. Can't initialize MGLAccountManager.");
+            return;
+        }
+        [self setAccessToken:configuration[@"accessToken"]];
+        MGLAccountManager *sharedAccountManager = [self sharedManager];
+        NSLog(@"MGLAccountManager was initialized with access token: %@", sharedAccountManager.accessToken);
+    } else {
+        NSLog(@"MGLAccountManager is used in a project that doesn't have Fabric.");
+    }
+}
 
 @end

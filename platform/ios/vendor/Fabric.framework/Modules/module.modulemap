@@ -1,0 +1,8 @@
+framework module Fabric {
+    umbrella header "Fabric.h"
+    header "FABKitProtocol.h"
+    header "Fabric+FABKits.h"
+
+    export *
+    module * { export * }
+}

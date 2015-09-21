@@ -92,6 +92,7 @@
         'OTHER_CPLUSPLUSFLAGS': [ '<@(cflags_cc)' ],
         'CLANG_ENABLE_OBJC_ARC': 'YES',
         'CLANG_ENABLE_MODULES': 'YES',
+        'FRAMEWORK_SEARCH_PATHS': './platform/ios/vendor',
       },
 
       'link_settings': {
