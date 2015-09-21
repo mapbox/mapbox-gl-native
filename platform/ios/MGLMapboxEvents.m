@@ -4,11 +4,6 @@
 #import <SystemConfiguration/CaptiveNetwork.h>
 #import <CoreLocation/CoreLocation.h>
 
-#if !__TVOS_9_0
-#import <CoreTelephony/CTTelephonyNetworkInfo.h>
-#import <CoreTelephony/CTCarrier.h>
-#endif
-
 #import "MGLAccountManager.h"
 #import "NSProcessInfo+MGLAdditions.h"
 #import "NSBundle+MGLAdditions.h"
@@ -101,11 +96,6 @@ const NSTimeInterval MGLFlushInterval = 60;
         if ([[UIDevice currentDevice].systemName isEqualToString:@"tvOS"])
         {
             _carrier = @"N/A";
-        }
-        else
-        {
-            CTCarrier *carrierVendor = [[[CTTelephonyNetworkInfo alloc] init] subscriberCellularProvider];
-            _carrier = [carrierVendor carrierName];
         }
 
     }
@@ -792,36 +782,7 @@ const NSTimeInterval MGLFlushInterval = 60;
         return nil;
     }
    
-    CTTelephonyNetworkInfo *telephonyInfo = [[CTTelephonyNetworkInfo alloc] init];
-    NSString *radioTech = telephonyInfo.currentRadioAccessTechnology;
-
-    if (radioTech == nil) {
-        return nil;
-    } else if ([radioTech isEqualToString:CTRadioAccessTechnologyGPRS]) {
-        return @"GPRS";
-    } else if ([radioTech isEqualToString:CTRadioAccessTechnologyEdge]) {
-        return @"EDGE";
-    } else if ([radioTech isEqualToString:CTRadioAccessTechnologyWCDMA]) {
-        return @"WCDMA";
-    } else if ([radioTech isEqualToString:CTRadioAccessTechnologyHSDPA]) {
-        return @"HSDPA";
-    } else if ([radioTech isEqualToString:CTRadioAccessTechnologyHSUPA]) {
-        return @"HSUPA";
-    } else if ([radioTech isEqualToString:CTRadioAccessTechnologyCDMA1x]) {
-        return @"CDMA1x";
-    } else if ([radioTech isEqualToString:CTRadioAccessTechnologyCDMAEVDORev0]) {
-        return @"CDMAEVDORev0";
-    } else if ([radioTech isEqualToString:CTRadioAccessTechnologyCDMAEVDORevA]) {
-        return @"CDMAEVDORevA";
-    } else if ([radioTech isEqualToString:CTRadioAccessTechnologyCDMAEVDORevB]) {
-        return @"CDMAEVDORevB";
-    } else if ([radioTech isEqualToString:CTRadioAccessTechnologyeHRPD]) {
-        return @"HRPD";
-    } else if ([radioTech isEqualToString:CTRadioAccessTechnologyLTE]) {
-        return @"LTE";
-    } else {
-        return @"Unknown";
-    }
+    return @"Unknown";
 }
 
 // Can be called from any thread.
