@@ -78,27 +78,6 @@ vec2<double> AnnotationManager::projectPoint(const LatLng& point) {
 }
 
 std::unordered_set<TileID, TileID::Hash>
-AnnotationManager::addTileFeature(const uint32_t annotationID,
-                                  const AnnotationSegments& segments,
-                                  const std::vector<std::vector<vec2<double>>>& projectedFeature,
-                                  const AnnotationType& type,
-                                  const StyleProperties& styleProperties,
-                                  const std::unordered_map<std::string, std::string>& featureProperties,
-                                  const uint8_t maxZoom) {
-
-    assert(type != AnnotationType::Any);
-
-    // track the annotation global ID and its original geometry
-    annotations.emplace(annotationID, std::make_unique<Annotation>(type, segments, styleProperties));
-
-    if (type == AnnotationType::Shape) {
-        return addShapeFeature(annotationID, segments, styleProperties, maxZoom);
-    } else {
-        return addPointFeature(annotationID, projectedFeature, featureProperties, maxZoom);
-    }
-}
-
-std::unordered_set<TileID, TileID::Hash>
 AnnotationManager::addShapeFeature(const uint32_t annotationID,
                                    const AnnotationSegments& segments,
                                    const StyleProperties& styleProperties,
@@ -233,16 +212,17 @@ AnnotationManager::addPointAnnotations(const std::vector<PointAnnotation>& point
             pointFeatureProperties.emplace("sprite", defaultPointAnnotationSymbol);
         }
 
-        // add individual point tile feature
-        auto featureAffectedTiles = addTileFeature(
-            pointAnnotationID,
-            AnnotationSegments({{ point.position }}),
-            std::vector<std::vector<vec2<double>>>({{ pp }}),
+        // track the annotation global ID and its original geometry
+        annotations.emplace(pointAnnotationID, std::make_unique<Annotation>(
             AnnotationType::Point,
-            {{ }},
+            AnnotationSegments({{ point.position }}),
+            StyleProperties({{ }})));
+
+        auto featureAffectedTiles = addPointFeature(
+            pointAnnotationID,
+            std::vector<std::vector<vec2<double>>>({{ pp }}),
             pointFeatureProperties,
-            maxZoom
-        );
+            maxZoom);
 
         std::copy(featureAffectedTiles.begin(), featureAffectedTiles.end(), std::inserter(affectedTiles, affectedTiles.begin()));
 
@@ -273,15 +253,13 @@ AnnotationManager::addShapeAnnotations(const std::vector<ShapeAnnotation>& shape
         // current shape tiles are on-the-fly, so we don't get any "affected tiles"
         // and just expire all annotation tiles for shape adds
 
-        addTileFeature(
-            shapeAnnotationID,
-            shape.segments,
-            {{ }},
+        // track the annotation global ID and its original geometry
+        annotations.emplace(shapeAnnotationID, std::make_unique<Annotation>(
             AnnotationType::Shape,
-            shape.styleProperties,
-            {{ }},
-            maxZoom
-        );
+            shape.segments,
+            shape.styleProperties));
+
+        addShapeFeature(shapeAnnotationID, shape.segments, shape.styleProperties, maxZoom);
 
         annotationIDs.push_back(shapeAnnotationID);
     }
