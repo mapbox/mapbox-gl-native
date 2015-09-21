@@ -22,22 +22,21 @@ public final class BoundingBox implements Parcelable, Serializable {
      * Construct a new bounding box based on its corners, given in NESW
      * order.
      *
-     * @param north Northern Coordinate
-     * @param east Eastern Coordinate
-     * @param south Southern Coordinate
-     * @param west Western Coordinate
+     * @param northLatitude Northern Latitude
+     * @param eastLongitude   Eastern Longitude
+     * @param southLatitude Southern Latitude
+     * @param westLongitude   Western Longitude
      */
-    public BoundingBox(final double north, final double east, final double south, final double west) {
-        this.mLatNorth = north;
-        this.mLonEast = east;
-        this.mLatSouth = south;
-        this.mLonWest = west;
+    public BoundingBox(final double northLatitude, final double eastLongitude, final double southLatitude, final double westLongitude) {
+        this.mLatNorth = northLatitude;
+        this.mLonEast = eastLongitude;
+        this.mLatSouth = southLatitude;
+        this.mLonWest = westLongitude;
         this.mIsValid = ((this.mLonWest < this.mLonEast) && (this.mLatNorth > this.mLatSouth));
     }
 
     /**
-     * Construct a new bounding box based on its corners, given in NESW
-     * order.
+     * Construct a new bounding box based on its corners, given in NESW order.
      *
      * @param northEast Coordinate
      * @param southWest Coordinate
@@ -98,6 +97,15 @@ public final class BoundingBox implements Parcelable, Serializable {
     }
 
     /**
+     * Get the area spanned by this bounding box
+     *
+     * @return CoordinateSpan area
+     */
+    public CoordinateSpan getSpan() {
+        return new CoordinateSpan(getLatitudeSpan(), getLongitudeSpan());
+    }
+
+    /**
      * Get the absolute distance, in degrees, between the north and
      * south boundaries of this bounding box
      *
@@ -115,6 +123,16 @@ public final class BoundingBox implements Parcelable, Serializable {
      */
     public double getLongitudeSpan() {
         return Math.abs(this.mLonEast - this.mLonWest);
+    }
+
+
+    /**
+     * Validate if bounding box is empty, determined if absolute distance is
+     *
+     * @return boolean indicating if span is empty
+     */
+    public boolean isEmpty() {
+        return getLongitudeSpan() == 0.0 || getLatitudeSpan() == 0.0;
     }
 
     @Override
@@ -151,13 +169,20 @@ public final class BoundingBox implements Parcelable, Serializable {
     /**
      * Determines whether this bounding box matches another one via coordinates.
      *
-     * @param other another bounding box
+     * @param o another object
      * @return a boolean indicating whether the bounding boxes are equal
      */
-    public boolean equals(final BoundingBox other) {
-
-        return other != null && (other == this || mLatNorth == other.getLatNorth() && mLatSouth == other.getLatSouth() && mLonEast == other.getLonEast() && mLonWest == other.getLonWest());
-
+    @Override
+    public boolean equals(final Object o) {
+        if (this == o) return true;
+        if (o instanceof BoundingBox) {
+            BoundingBox other = (BoundingBox) o;
+            return mLatNorth == other.getLatNorth()
+                    && mLatSouth == other.getLatSouth()
+                    && mLonEast == other.getLonEast()
+                    && mLonWest == other.getLonWest();
+        }
+        return false;
     }
 
     /**
@@ -170,8 +195,10 @@ public final class BoundingBox implements Parcelable, Serializable {
     public boolean contains(final ILatLng pGeoPoint) {
         final double latitude = pGeoPoint.getLatitude();
         final double longitude = pGeoPoint.getLongitude();
-        return ((latitude < this.mLatNorth) && (latitude > this.mLatSouth)) && ((longitude
-                < this.mLonEast) && (longitude > this.mLonWest));
+        return ((latitude < this.mLatNorth)
+                && (latitude > this.mLatSouth))
+                && ((longitude < this.mLonEast)
+                && (longitude > this.mLonWest));
     }
 
     /**
@@ -188,18 +215,17 @@ public final class BoundingBox implements Parcelable, Serializable {
      * Returns a new BoundingBox that stretches to include another bounding box,
      * given by corner points.
      *
-     * @param pLatNorth Northern Coordinate
-     * @param pLonEast Eastern Coordinate
-     * @param pLatSouth Southern Coordinate
-     * @param pLonWest Western Coordinate
+     * @param lonNorth Northern Longitude
+     * @param latEast  Eastern Latitude
+     * @param lonSouth Southern Longitude
+     * @param latWest  Western Longitude
      * @return BoundingBox
      */
-    public BoundingBox union(final double pLatNorth, final double pLonEast, final double pLatSouth,
-                             final double pLonWest) {
-        return new BoundingBox((this.mLatNorth < pLatNorth) ? pLatNorth : this.mLatNorth,
-                (this.mLonEast < pLonEast) ? pLonEast : this.mLonEast,
-                (this.mLatSouth > pLatSouth) ? pLatSouth : this.mLatSouth,
-                (this.mLonWest > pLonWest) ? pLonWest : this.mLonWest);
+    public BoundingBox union(final double lonNorth, final double latEast, final double lonSouth, final double latWest) {
+        return new BoundingBox((this.mLatNorth < lonNorth) ? lonNorth : this.mLatNorth,
+                (this.mLonEast < latEast) ? latEast : this.mLonEast,
+                (this.mLatSouth > lonSouth) ? lonSouth : this.mLatSouth,
+                (this.mLonWest > latWest) ? latWest : this.mLonWest);
     }
 
     /**
@@ -209,24 +235,29 @@ public final class BoundingBox implements Parcelable, Serializable {
      * @return BoundingBox
      */
     public BoundingBox intersect(BoundingBox box) {
-        double maxLonWest = Math.max(this.mLonWest, box.getLonWest());
-        double minLonEast = Math.min(this.mLonEast, box.getLonEast());
-        double maxLatNorth = Math.min(this.mLatNorth, box.getLatNorth());
-        double minLatSouth = Math.max(this.mLatSouth, box.getLatSouth());
-        return new BoundingBox(maxLatNorth, minLonEast, minLatSouth, maxLonWest);
+        double minLatWest = Math.max(getLonWest(), box.getLonWest());
+        double maxLatEast = Math.min(getLonEast(), box.getLonEast());
+        if (maxLatEast > minLatWest) {
+            double minLonSouth = Math.max(getLatSouth(), box.getLatSouth());
+            double maxLonNorth = Math.min(getLatNorth(), box.getLatNorth());
+            if (maxLonNorth > minLonSouth) {
+                return new BoundingBox(maxLonNorth, maxLatEast, minLonSouth, minLatWest);
+            }
+        }
+        return null;
     }
 
     /**
      * Returns a new BoundingBox that is the intersection of this with another box
      *
-     * @param north Northern Coordinate
-     * @param east Eastern Coordinate
-     * @param south Southern Coordinate
-     * @param west Western Coordinate
+     * @param northLongitude Northern Longitude
+     * @param eastLatitude   Eastern Latitude
+     * @param southLongitude Southern Longitude
+     * @param westLatitude   Western Latitude
      * @return BoundingBox
      */
-    public BoundingBox intersect(double north, double east, double south, double west) {
-        return intersect(new BoundingBox(north, east, south, west));
+    public BoundingBox intersect(double northLongitude, double eastLatitude, double southLongitude, double westLatitude) {
+        return intersect(new BoundingBox(northLongitude, eastLatitude, southLongitude, westLatitude));
     }
 
     public static final Parcelable.Creator<BoundingBox> CREATOR =
@@ -264,10 +295,10 @@ public final class BoundingBox implements Parcelable, Serializable {
     }
 
     private static BoundingBox readFromParcel(final Parcel in) {
-        final double latNorth = in.readDouble();
-        final double lonEast = in.readDouble();
-        final double latSouth = in.readDouble();
-        final double lonWest = in.readDouble();
-        return new BoundingBox(latNorth, lonEast, latSouth, lonWest);
+        final double lonNorth = in.readDouble();
+        final double latEast = in.readDouble();
+        final double lonSouth = in.readDouble();
+        final double latWest = in.readDouble();
+        return new BoundingBox(lonNorth, latEast, lonSouth, latWest);
     }
 }
