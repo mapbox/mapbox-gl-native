@@ -137,13 +137,7 @@ void MapContext::loadStyleJSON(const std::string& json, const std::string& base)
     // force style cascade, causing all pending transitions to complete.
     style->cascade();
 
-    updateFlags |= Update::DefaultTransition | Update::Classes | Update::Zoom;
-    asyncUpdate->send();
-}
-
-void MapContext::updateAnnotationTiles(const std::unordered_set<TileID, TileID::Hash>& ids) {
-    data.getAnnotationManager()->updateTiles(ids, style.get());
-    updateFlags |= Update::Classes;
+    updateFlags |= Update::DefaultTransition | Update::Classes | Update::Zoom | Update::Annotations;
     asyncUpdate->send();
 }
 
@@ -159,6 +153,11 @@ void MapContext::update() {
     }
 
     data.setAnimationTime(Clock::now());
+
+    if (style->sprite && updateFlags & Update::Annotations) {
+        data.getAnnotationManager()->updateStyle(*style);
+        updateFlags |= Update::Classes;
+    }
 
     if (updateFlags & Update::Classes) {
         style->cascade();
@@ -311,12 +310,6 @@ void MapContext::onResourceLoadingFailed(std::exception_ptr error) {
         callback(error, nullptr);
         callback = nullptr;
     }
-}
-
-void MapContext::onSpriteStoreLoaded() {
-    data.getAnnotationManager()->updateTilesIfNeeded(style.get());
-    updateFlags |= Update::Classes;
-    asyncUpdate->send();
 }
 
 }

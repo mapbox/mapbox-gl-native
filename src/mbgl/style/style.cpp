@@ -44,18 +44,18 @@ void Style::setJSON(const std::string& json, const std::string&) {
     StyleParser parser(data);
     parser.parse(doc);
 
-    sources = parser.getSources();
-    layers = parser.getLayers();
+    for (auto& source : parser.getSources()) {
+        addSource(std::move(source));
+    }
+
+    for (auto& layer : parser.getLayers()) {
+        addLayer(std::move(layer));
+    }
 
     sprite = std::make_unique<Sprite>(parser.getSprite(), data.pixelRatio);
     sprite->setObserver(this);
 
     glyphStore->setURL(parser.getGlyphURL());
-
-    for (const auto& source : sources) {
-        source->setObserver(this);
-        source->load();
-    }
 }
 
 Style::~Style() {
@@ -68,6 +68,20 @@ Style::~Style() {
     if (sprite) {
         sprite->setObserver(nullptr);
     }
+}
+
+void Style::addSource(std::unique_ptr<Source> source) {
+    source->setObserver(this);
+    source->load();
+    sources.emplace_back(std::move(source));
+}
+
+void Style::addLayer(util::ptr<StyleLayer> layer) {
+    layers.emplace_back(std::move(layer));
+}
+
+void Style::addLayer(util::ptr<StyleLayer> layer, const std::string& before) {
+    layers.emplace(std::find_if(layers.begin(), layers.end(), [&](const auto& l) { return l->id == before; }), std::move(layer));
 }
 
 void Style::update(const TransformState& transform,
@@ -124,6 +138,14 @@ Source* Style::getSource(const std::string& id) const {
     });
 
     return it != sources.end() ? it->get() : nullptr;
+}
+
+StyleLayer* Style::getLayer(const std::string& id) const {
+    const auto it = std::find_if(layers.begin(), layers.end(), [&](const auto& layer) {
+        return layer->id == id;
+    });
+
+    return it != layers.end() ? it->get() : nullptr;
 }
 
 bool Style::hasTransitions() const {
@@ -189,10 +211,6 @@ void Style::onTileLoadingFailed(std::exception_ptr error) {
 void Style::onSpriteLoaded(const Sprites& sprites) {
     // Add all sprite images to the SpriteStore object
     spriteStore->setSprites(sprites);
-
-    if (observer) {
-        observer->onSpriteStoreLoaded();
-    }
 
     shouldReparsePartialTiles = true;
     emitTileDataChanged();

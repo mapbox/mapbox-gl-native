@@ -39,7 +39,6 @@ public:
         virtual ~Observer() = default;
 
         virtual void onTileDataChanged() = 0;
-        virtual void onSpriteStoreLoaded() = 0;
         virtual void onResourceLoadingFailed(std::exception_ptr error) = 0;
     };
 
@@ -63,6 +62,11 @@ public:
     }
 
     Source* getSource(const std::string& id) const;
+    StyleLayer* getLayer(const std::string& id) const;
+
+    void addSource(std::unique_ptr<Source>);
+    void addLayer(util::ptr<StyleLayer>);
+    void addLayer(util::ptr<StyleLayer>, const std::string& beforeLayerID);
 
     MapData& data;
     std::unique_ptr<GlyphStore> glyphStore;

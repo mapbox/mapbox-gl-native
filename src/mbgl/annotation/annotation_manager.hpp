@@ -29,48 +29,37 @@ using GeoJSONVT = mapbox::util::geojsonvt::GeoJSONVT;
 
 class AnnotationManager : private util::noncopyable {
 public:
-    typedef std::unordered_set<TileID, TileID::Hash> AffectedTiles;
-
     AnnotationManager();
     ~AnnotationManager();
 
     void setDefaultPointAnnotationSymbol(const std::string& symbol);
 
-    std::pair<AffectedTiles, AnnotationIDs>
-    addPointAnnotations(const std::vector<PointAnnotation>&, const uint8_t maxZoom);
-
-    std::pair<AffectedTiles, AnnotationIDs>
-    addShapeAnnotations(const std::vector<ShapeAnnotation>&, const uint8_t maxZoom);
-
-    AffectedTiles
-    removeAnnotations(const AnnotationIDs&, const uint8_t maxZoom);
-
-    void updateTilesIfNeeded(Style*);
-    void updateTiles(const AffectedTiles&, Style*);
+    AnnotationIDs addPointAnnotations(const std::vector<PointAnnotation>&, const uint8_t maxZoom);
+    AnnotationIDs addShapeAnnotations(const std::vector<ShapeAnnotation>&, const uint8_t maxZoom);
+    void removeAnnotations(const AnnotationIDs&, const uint8_t maxZoom);
 
     AnnotationIDs getAnnotationsInBounds(const LatLngBounds&, const uint8_t maxZoom, const AnnotationType& = AnnotationType::Any) const;
     LatLngBounds getBoundsForAnnotations(const AnnotationIDs&) const;
 
+    void updateStyle(Style&);
     const LiveTile* getTile(const TileID& id);
 
-    static const std::string PointLayerID;
-    static const std::string ShapeLayerID;
+    static const std::string PointSourceID;
+    static const std::string ShapeSourceID;
 
 private:
     inline uint32_t nextID();
     static vec2<double> projectPoint(const LatLng& point);
 
     uint32_t addShapeAnnotation(const ShapeAnnotation&, const uint8_t maxZoom);
-    uint32_t addPointAnnotation(const PointAnnotation&, const uint8_t maxZoom, AffectedTiles&);
-
-    const StyleProperties getAnnotationStyleProperties(uint32_t) const;
+    uint32_t addPointAnnotation(const PointAnnotation&, const uint8_t maxZoom);
 
     std::string defaultPointAnnotationSymbol;
     std::unordered_map<uint32_t, std::unique_ptr<Annotation>> annotations;
     std::vector<uint32_t> orderedShapeAnnotations;
     std::unordered_map<TileID, std::pair<std::unordered_set<uint32_t>, std::unique_ptr<LiveTile>>, TileID::Hash> tiles;
     std::unordered_map<uint32_t, std::unique_ptr<GeoJSONVT>> shapeTilers;
-    std::unordered_set<TileID, TileID::Hash> staleTiles;
+    std::unordered_set<TileID, TileID::Hash> stalePointTileIDs;
     uint32_t nextID_ = 0;
 };
 

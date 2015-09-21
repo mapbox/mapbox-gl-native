@@ -137,8 +137,13 @@ AnnotationManager::addShapeAnnotation(const ShapeAnnotation& shape, const uint8_
 }
 
 uint32_t
-AnnotationManager::addPointAnnotation(const PointAnnotation& point, const uint8_t maxZoom,
-                                      std::unordered_set<TileID, TileID::Hash>& affectedTiles) {
+AnnotationManager::addPointAnnotation(const PointAnnotation& point, const uint8_t maxZoom) {
+    // We pre-generate tiles to contain each annotation up to the map's max zoom.
+    // We do this for fast rendering without projection conversions on the fly, as well as
+    // to simplify bounding box queries of annotations later. Tiles get invalidated when
+    // annotations are added or removed in order to refresh the map render without
+    // touching the base map underneath.
+
     const uint32_t annotationID = nextID();
 
     // at render time we style the point according to its {sprite} field
@@ -178,7 +183,7 @@ AnnotationManager::addPointAnnotation(const PointAnnotation& point, const uint8_
 
         // check for annotation layer & create if necessary
         util::ptr<LiveTileLayer> layer;
-        std::string layerID = PointLayerID;
+        std::string layerID = PointSourceID;
 
         if (tile_pos.second || tile_pos.first->second.second->getMutableLayer(layerID) == nullptr) {
             layer = std::make_shared<LiveTileLayer>();
@@ -198,7 +203,7 @@ AnnotationManager::addPointAnnotation(const PointAnnotation& point, const uint8_
         annotation->tilePointFeatures.emplace(featureTileID, std::weak_ptr<const LiveTileFeature>(feature));
 
         // track affected tile
-        affectedTiles.insert(featureTileID);
+        stalePointTileIDs.insert(featureTileID);
     }
 
     annotations.emplace(annotationID, std::move(annotation));
@@ -206,37 +211,22 @@ AnnotationManager::addPointAnnotation(const PointAnnotation& point, const uint8_
     return annotationID;
 }
 
-std::pair<AnnotationManager::AffectedTiles, AnnotationIDs>
+AnnotationIDs
 AnnotationManager::addPointAnnotations(const std::vector<PointAnnotation>& points,
                                        const uint8_t maxZoom) {
-    // We pre-generate tiles to contain each annotation up to the map's max zoom.
-    // We do this for fast rendering without projection conversions on the fly, as well as
-    // to simplify bounding box queries of annotations later. Tiles get invalidated when
-    // annotations are added or removed in order to refresh the map render without
-    // touching the base map underneath.
-
     AnnotationIDs annotationIDs;
     annotationIDs.reserve(points.size());
 
-    AffectedTiles affectedTiles;
-
     for (const auto& point : points) {
-        annotationIDs.push_back(addPointAnnotation(point, maxZoom, affectedTiles));
+        annotationIDs.push_back(addPointAnnotation(point, maxZoom));
     }
 
-    // Tile:IDs that need refreshed and the annotation identifiers held onto by the client.
-    return std::make_pair(affectedTiles, annotationIDs);
+    return annotationIDs;
 }
 
-std::pair<AnnotationManager::AffectedTiles, AnnotationIDs>
+AnnotationIDs
 AnnotationManager::addShapeAnnotations(const std::vector<ShapeAnnotation>& shapes,
                                        const uint8_t maxZoom) {
-    // We pre-generate tiles to contain each annotation up to the map's max zoom.
-    // We do this for fast rendering without projection conversions on the fly, as well as
-    // to simplify bounding box queries of annotations later. Tiles get invalidated when
-    // annotations are added or removed in order to refresh the map render without
-    // touching the base map underneath.
-
     AnnotationIDs annotationIDs;
     annotationIDs.reserve(shapes.size());
 
@@ -244,16 +234,10 @@ AnnotationManager::addShapeAnnotations(const std::vector<ShapeAnnotation>& shape
         annotationIDs.push_back(addShapeAnnotation(shape, maxZoom));
     }
 
-    // Tile:IDs that need refreshed and the annotation identifiers held onto by the client.
-    // Shapes are tiled "on-the-fly", so we don't get any "affected tiles" and just expire
-    // all annotation tiles for shape adds.
-    return std::make_pair(AffectedTiles(), annotationIDs);
+    return annotationIDs;
 }
 
-std::unordered_set<TileID, TileID::Hash> AnnotationManager::removeAnnotations(const AnnotationIDs& ids,
-                                                                              const uint8_t maxZoom) {
-    std::unordered_set<TileID, TileID::Hash> affectedTiles;
-
+void AnnotationManager::removeAnnotations(const AnnotationIDs& ids, const uint8_t maxZoom) {
     std::vector<uint32_t> z2s;
     const uint8_t zoomCount = maxZoom + 1;
     z2s.reserve(zoomCount);
@@ -287,17 +271,16 @@ std::unordered_set<TileID, TileID::Hash> AnnotationManager::removeAnnotations(co
                     const auto& features_it = annotation->tilePointFeatures.find(tid);
                     if (features_it != annotation->tilePointFeatures.end()) {
                         // points share a layer; remove feature
-                        auto layer = tiles[tid].second->getMutableLayer(PointLayerID);
+                        auto layer = tiles[tid].second->getMutableLayer(PointSourceID);
                         layer->removeFeature(features_it->second);
-                        affectedTiles.insert(tid);
+                        stalePointTileIDs.insert(tid);
                     }
                 }
             } else {
                 // remove shape layer from tiles if relevant
                 for (auto tile_it = tiles.begin(); tile_it != tiles.end(); ++tile_it) {
                     if (tile_it->second.first.count(annotationID)) {
-                        tile_it->second.second->removeLayer(ShapeLayerID + "." + util::toString(annotationID));
-                        affectedTiles.insert(tile_it->first);
+                        tile_it->second.second->removeLayer(ShapeSourceID + "." + util::toString(annotationID));
                     }
                 }
 
@@ -312,9 +295,6 @@ std::unordered_set<TileID, TileID::Hash> AnnotationManager::removeAnnotations(co
             annotations.erase(annotationID);
         }
     }
-
-    // TileIDs for tiles that need refreshed.
-    return affectedTiles;
 }
 
 AnnotationIDs AnnotationManager::getAnnotationsInBounds(const LatLngBounds& queryBounds,
@@ -414,7 +394,7 @@ const LiveTile* AnnotationManager::getTile(const TileID& id) {
         // create shape tile layers from GeoJSONVT queries
         for (auto& tiler_it : shapeTilers) {
             const auto annotationID = tiler_it.first;
-            const std::string layerID = ShapeLayerID + "." + util::toString(annotationID);
+            const std::string layerID = ShapeSourceID + "." + util::toString(annotationID);
 
             // check for existing render layer
             auto renderLayer = renderTile->getMutableLayer(layerID);
@@ -478,42 +458,48 @@ const LiveTile* AnnotationManager::getTile(const TileID& id) {
     return renderTile;
 }
 
-void AnnotationManager::updateTilesIfNeeded(Style* style) {
-    if (!staleTiles.empty()) {
-        updateTiles(staleTiles, style);
-    }
-}
-
-void AnnotationManager::updateTiles(const AffectedTiles& ids, Style* style) {
-    std::copy(ids.begin(), ids.end(), std::inserter(staleTiles, staleTiles.begin()));
-
-    if (!style) {
-        return;
+void AnnotationManager::updateStyle(Style& style) {
+    // Create shape source
+    if (!style.getSource(ShapeSourceID)) {
+        std::unique_ptr<Source> shapeSource = std::make_unique<Source>();
+        shapeSource->info.type = SourceType::Annotations;
+        shapeSource->info.source_id = ShapeSourceID;
+        shapeSource->enabled = true;
+        style.addSource(std::move(shapeSource));
     }
 
-    // grab existing, single shape annotations source
-    const auto& shapeID = AnnotationManager::ShapeLayerID;
-    Source* shapeAnnotationSource = style->getSource(shapeID);
+    // Create point source and singular layer and bucket
+    if (!style.getSource(PointSourceID)) {
+        std::unique_ptr<Source> pointSource = std::make_unique<Source>();
+        pointSource->info.type = SourceType::Annotations;
+        pointSource->info.source_id = PointSourceID;
+        pointSource->enabled = true;
+        style.addSource(std::move(pointSource));
 
-    // Style not parsed yet
-    if (!shapeAnnotationSource) {
-        return;
+        std::map<ClassID, ClassProperties> pointPaints;
+        pointPaints.emplace(ClassID::Default, ClassProperties());
+        std::unique_ptr<StyleLayer> pointLayer = std::make_unique<StyleLayer>(PointSourceID, std::move(pointPaints));
+        pointLayer->type = StyleLayerType::Symbol;
+
+        util::ptr<StyleBucket> pointBucket = std::make_shared<StyleBucket>(pointLayer->type);
+        pointBucket->name = pointLayer->id;
+        pointBucket->source = PointSourceID;
+        pointBucket->source_layer = pointLayer->id;
+        pointBucket->layout.set(PropertyKey::IconImage, ConstantFunction<std::string>("{sprite}"));
+        pointBucket->layout.set(PropertyKey::IconAllowOverlap, ConstantFunction<bool>(true));
+
+        pointLayer->bucket = pointBucket;
+        style.addLayer(std::move(pointLayer));
     }
 
-    shapeAnnotationSource->enabled = true;
-
-    const auto& layers = style->layers;
-
-    // create (if necessary) layers and buckets for each shape
-    for (const auto& shapeAnnotationID : orderedShapeAnnotations) {
-        const std::string shapeLayerID = shapeID + "." + util::toString(shapeAnnotationID);
-
-        if (std::find_if(layers.begin(), layers.end(), [&](auto l) { return l->id == shapeLayerID; }) != layers.end()) {
+    // Create new shape layers and buckets
+    for (const auto& shapeID : orderedShapeAnnotations) {
+        const std::string shapeLayerID = ShapeSourceID + "." + util::toString(shapeID);
+        if (style.getLayer(shapeLayerID)) {
             continue;
         }
 
-        // apply shape paint properties
-        const StyleProperties& shapeStyle = annotations.at(shapeAnnotationID)->styleProperties;
+        const StyleProperties& shapeStyle = annotations.at(shapeID)->styleProperties;
         ClassProperties paintProperties;
 
         if (shapeStyle.is<LineProperties>()) {
@@ -530,40 +516,28 @@ void AnnotationManager::updateTiles(const AffectedTiles& ids, Style* style) {
 
         std::map<ClassID, ClassProperties> shapePaints;
         shapePaints.emplace(ClassID::Default, std::move(paintProperties));
-
-        // create shape layer
-        util::ptr<StyleLayer> shapeLayer = std::make_shared<StyleLayer>(shapeLayerID, std::move(shapePaints));
+        std::unique_ptr<StyleLayer> shapeLayer = std::make_unique<StyleLayer>(shapeLayerID, std::move(shapePaints));
         shapeLayer->type = (shapeStyle.is<LineProperties>() ? StyleLayerType::Line : StyleLayerType::Fill);
 
-        // add to end of other shape layers just before (last) point layer
-        style->layers.emplace((style->layers.end() - 1), shapeLayer);
-
-        // create shape bucket & connect to source
         util::ptr<StyleBucket> shapeBucket = std::make_shared<StyleBucket>(shapeLayer->type);
         shapeBucket->name = shapeLayer->id;
-        shapeBucket->source = shapeID;
+        shapeBucket->source = ShapeSourceID;
         shapeBucket->source_layer = shapeLayer->id;
-
-        // apply line layout properties to bucket
         if (shapeStyle.is<LineProperties>()) {
             shapeBucket->layout.set(PropertyKey::LineJoin, ConstantFunction<JoinType>(JoinType::Round));
         }
 
-        // connect layer to bucket
         shapeLayer->bucket = shapeBucket;
+        style.addLayer(std::move(shapeLayer), PointSourceID);
     }
 
-    // invalidate annotations layer tiles
-    for (const auto &source : style->sources) {
-        if (source->info.type == SourceType::Annotations) {
-            source->invalidateTiles(ids);
-        }
-    }
+    style.getSource(PointSourceID)->invalidateTiles(stalePointTileIDs);
+    style.getSource(ShapeSourceID)->invalidateTiles();
 
-    staleTiles.clear();
+    stalePointTileIDs.clear();
 }
 
-const std::string AnnotationManager::PointLayerID = "com.mapbox.annotations.points";
-const std::string AnnotationManager::ShapeLayerID = "com.mapbox.annotations.shape";
+const std::string AnnotationManager::PointSourceID = "com.mapbox.annotations.points";
+const std::string AnnotationManager::ShapeSourceID = "com.mapbox.annotations.shape";
 
 }
