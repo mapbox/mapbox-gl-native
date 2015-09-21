@@ -744,16 +744,7 @@ public class MapView extends FrameLayout implements LocationListener {
         return mNativeMapView.isFullyLoaded();
     }
 
-    private void validateStyleUrl(String url) {
-        url = url.replaceFirst("asset://", "http://");
-        HttpUrl parsedUrl = HttpUrl.parse(url);
-        if (parsedUrl == null) {
-            throw new RuntimeException("Style URL is not a valid http, https or asset URL.");
-        }
-    }
-
     public void setStyleUrl(String url) {
-        validateStyleUrl(url);
         mStyleUrl = url;
         mNativeMapView.setStyleUrl(url);
     }
