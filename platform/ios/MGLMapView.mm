@@ -884,7 +884,7 @@ std::chrono::steady_clock::duration secondsAsDuration(float duration)
 
         self.centerPoint = CGPointMake(self.centerPoint.x + delta.x, self.centerPoint.y + delta.y);
 
-        [self notifyMapChange:mbgl::MapChangeRegionDidChangeAnimated];
+        [self notifyMapChange:mbgl::MapChangeRegionIsChanging];
     }
     else if (pan.state == UIGestureRecognizerStateEnded || pan.state == UIGestureRecognizerStateCancelled)
     {
