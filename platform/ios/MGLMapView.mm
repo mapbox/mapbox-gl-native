@@ -960,6 +960,8 @@ std::chrono::steady_clock::duration secondsAsDuration(float duration)
         if (log2(newScale) < _mbglMap->getMinZoom()) return;
 
         _mbglMap->setScale(newScale, [pinch locationInView:pinch.view].x, [pinch locationInView:pinch.view].y);
+        
+        [self notifyMapChange:mbgl::MapChangeRegionIsChanging];
     }
     else if (pinch.state == UIGestureRecognizerStateEnded || pinch.state == UIGestureRecognizerStateCancelled)
     {
