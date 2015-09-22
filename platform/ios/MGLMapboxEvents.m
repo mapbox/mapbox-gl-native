@@ -6,6 +6,8 @@
 #import <CoreTelephony/CTCarrier.h>
 #import <CoreLocation/CoreLocation.h>
 
+#include <mbgl/platform/darwin/reachability.h>
+
 #import "MGLAccountManager.h"
 #import "NSProcessInfo+MGLAdditions.h"
 #import "NSBundle+MGLAdditions.h"
@@ -738,17 +740,21 @@ const NSTimeInterval MGLFlushInterval = 60;
 // Can be called from any thread.
 //
 - (NSString *) wifiNetworkName {
+    NSString *ssid = NULL;
     
-    NSString *ssid = nil;
-    CFArrayRef interfaces = CNCopySupportedInterfaces();
-    if (interfaces) {
-        NSDictionary *info = CFBridgingRelease(CNCopyCurrentNetworkInfo(CFArrayGetValueAtIndex(interfaces, 0)));
-        if (info) {
-            ssid = info[@"SSID"];
+    MGLReachability *reachability = [MGLReachability reachabilityForLocalWiFi];
+    if ([reachability isReachableViaWiFi])
+    {
+        CFArrayRef interfaces = CNCopySupportedInterfaces();
+        if (interfaces) {
+            NSDictionary *info = CFBridgingRelease(CNCopyCurrentNetworkInfo(CFArrayGetValueAtIndex(interfaces, 0)));
+            if (info) {
+                ssid = info[@"SSID"];
+            }
+            CFRelease(interfaces);
         }
-        CFRelease(interfaces);
     }
-    
+
     return ssid;
 }
 
