@@ -1,4 +1,3 @@
-#include <mbgl/map/annotation.hpp>
 #include <mbgl/map/live_tile_data.hpp>
 #include <mbgl/map/live_tile.hpp>
 #include <mbgl/style/style_layer.hpp>

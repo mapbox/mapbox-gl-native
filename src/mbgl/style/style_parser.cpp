@@ -1,7 +1,7 @@
 #include <mbgl/style/style_parser.hpp>
 #include <mbgl/map/source.hpp>
 #include <mbgl/style/style_layer.hpp>
-#include <mbgl/map/annotation.hpp>
+#include <mbgl/annotation/annotation_manager.hpp>
 #include <mbgl/map/map_data.hpp>
 #include <mbgl/util/constants.hpp>
 #include <mbgl/util/vec.hpp>

@@ -1,4 +1,4 @@
-#include <mbgl/map/annotation.hpp>
+#include <mbgl/annotation/annotation_manager.hpp>
 #include <mbgl/annotation/point_annotation.hpp>
 #include <mbgl/annotation/shape_annotation.hpp>
 #include <mbgl/map/tile_id.hpp>
