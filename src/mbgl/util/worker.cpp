@@ -18,12 +18,8 @@ public:
 
     void parseRasterTile(RasterBucket* bucket, std::string data, std::function<void (TileParseResult)> callback) {
         std::unique_ptr<util::Image> image(new util::Image(data));
-        if (!(*image)) {
-            callback(TileParseResult("error parsing raster image"));
-        }
-
-        if (!bucket->setImage(std::move(image))) {
-            callback(TileParseResult("error setting raster image to bucket"));
+        if (*image) {
+            bucket->setImage(std::move(image));
         }
 
         callback(TileParseResult(TileData::State::parsed));
