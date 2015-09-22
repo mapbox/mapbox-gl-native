@@ -9,13 +9,17 @@
 #include <mbgl/storage/default_file_source.hpp>
 #include <mbgl/storage/sqlite_cache.hpp>
 
+#pragma clang diagnostic push
 #pragma GCC diagnostic push
-#ifndef __clang__
+#ifdef __clang__
+#pragma clang diagnostic ignored "-Wunused-local-typedefs"
+#else
 #pragma GCC diagnostic ignored "-Wunused-local-typedefs"
 #pragma GCC diagnostic ignored "-Wshadow"
 #endif
 #include <boost/program_options.hpp>
 #pragma GCC diagnostic pop
+#pragma clang diagnostic pop
 
 namespace po = boost::program_options;
 
