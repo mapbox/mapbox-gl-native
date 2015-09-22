@@ -23,28 +23,8 @@ class Annotation;
 class PointAnnotation;
 class ShapeAnnotation;
 class LiveTile;
-class LiveTileFeature;
 
 using GeoJSONVT = mapbox::util::geojsonvt::GeoJSONVT;
-
-class Annotation : private util::noncopyable {
-    friend class AnnotationManager;
-public:
-    Annotation(AnnotationType, const AnnotationSegments&, const StyleProperties&);
-
-public:
-    const StyleProperties styleProperties;
-
-private:
-    LatLng getPoint() const;
-    LatLngBounds getBounds() const { return bounds; }
-
-private:
-    const AnnotationType type = AnnotationType::Point;
-    const AnnotationSegments geometry;
-    std::unordered_map<TileID, std::weak_ptr<const LiveTileFeature>, TileID::Hash> tilePointFeatures;
-    const LatLngBounds bounds;
-};
 
 class AnnotationManager : private util::noncopyable {
 public:

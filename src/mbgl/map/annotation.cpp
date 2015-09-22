@@ -8,11 +8,24 @@
 #include <mbgl/util/ptr.hpp>
 #include <mbgl/util/string.hpp>
 
-
 #include <algorithm>
-#include <memory>
 
 namespace mbgl {
+
+class Annotation : private util::noncopyable {
+public:
+    Annotation(AnnotationType, const AnnotationSegments&, const StyleProperties&);
+
+    const StyleProperties styleProperties;
+
+    LatLng getPoint() const;
+    LatLngBounds getBounds() const { return bounds; }
+
+    const AnnotationType type = AnnotationType::Point;
+    const AnnotationSegments geometry;
+    std::unordered_map<TileID, std::weak_ptr<const LiveTileFeature>, TileID::Hash> tilePointFeatures;
+    const LatLngBounds bounds;
+};
 
 Annotation::Annotation(AnnotationType type_,
                        const AnnotationSegments& geometry_,
