@@ -1335,6 +1335,8 @@ std::chrono::steady_clock::duration secondsAsDuration(float duration)
         if (newZoom < _mbglMap->getMinZoom()) return;
 
         _mbglMap->scaleBy(powf(2, newZoom) / _mbglMap->getScale(), self.bounds.size.width / 2, self.bounds.size.height / 2);
+        
+        [self notifyMapChange:mbgl::MapChangeRegionIsChanging];
     }
     else if (quickZoom.state == UIGestureRecognizerStateEnded || quickZoom.state == UIGestureRecognizerStateCancelled)
     {
