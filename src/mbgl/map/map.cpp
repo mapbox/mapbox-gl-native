@@ -39,6 +39,10 @@ void Map::pause() {
     }
 }
 
+bool Map::isPaused() {
+    return paused;
+}
+
 void Map::resume() {
     data->condResume.notify_all();
     paused = false;

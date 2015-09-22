@@ -699,6 +699,11 @@ void NativeMapView::updateFps() {
 void NativeMapView::onInvalidate() {
     mbgl::Log::Debug(mbgl::Event::Android, "NativeMapView::onInvalidate()");
 
+    if (map.isPaused()) {
+        mbgl::Log::Debug(mbgl::Event::Android, "Not rendering as map is paused");
+        return;
+    }
+
     const bool dirty = !clean.test_and_set();
     if (dirty) {
         float zoomFactor   = map.getMaxZoom() - map.getMinZoom() + 1;

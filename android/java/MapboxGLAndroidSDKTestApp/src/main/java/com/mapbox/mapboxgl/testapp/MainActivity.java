@@ -177,12 +177,14 @@ public class MainActivity extends AppCompatActivity {
     @Override
     protected void onStart() {
         super.onStart();
+
         mMapView.onStart();
     }
 
     @Override
     protected void onStop() {
         super.onStop();
+
         mMapView.onStop();
     }
 
@@ -205,6 +207,7 @@ public class MainActivity extends AppCompatActivity {
     @Override
     protected void onDestroy() {
         super.onDestroy();
+
         mMapView.onDestroy();
     }
 

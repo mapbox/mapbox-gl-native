@@ -1009,14 +1009,6 @@ public class MapView extends FrameLayout implements LocationListener {
             mNativeMapView.resizeFramebuffer(width, height);
         }
 
-        // Called when we need to redraw the view
-        // This is called before our view is first visible to prevent an initial
-        // flicker (see Android SDK documentation)
-        /*@Override
-        public void surfaceRedrawNeeded(SurfaceHolder holder) {
-            mNativeMapView.update();
-        }*/ // TODO call update somewhere?
-
         // Not used
         @Override
         public void onSurfaceTextureUpdated (SurfaceTexture surface) {
@@ -1795,7 +1787,6 @@ public class MapView extends FrameLayout implements LocationListener {
             }
         });
     }
-
 
     /**
      * Defines callback for events OnMapChange
