@@ -234,15 +234,13 @@ bool Source::handlePartialTile(const TileID& id, Worker&) {
         return true;
     }
 
-    // Note: this uses a raw pointer; we don't want the callback binding to have a
-    // shared pointer.
-    VectorTileData* data = dynamic_cast<VectorTileData*>(it->second.lock().get());
+    auto data = it->second.lock();
     if (!data) {
         return true;
     }
 
-    return data->reparse([this, data]() {
-	emitTileLoaded(false);
+    return data->reparse([this]() {
+        emitTileLoaded(false);
     });
 }
 

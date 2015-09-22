@@ -13,7 +13,7 @@
 using namespace mbgl;
 
 LiveTileData::LiveTileData(const TileID& id_,
-                           const LiveTile* tile,
+                           const LiveTile* tile_,
                            Style& style_,
                            const SourceInfo& source_,
                            std::function<void()> callback)
@@ -25,7 +25,8 @@ LiveTileData::LiveTileData(const TileID& id_,
                  style_,
                  style_.layers,
                  state,
-                 std::make_unique<CollisionTile>(0, 0, false)) {
+                 std::make_unique<CollisionTile>(0, 0, false)),
+      tile(tile_) {
     state = State::loaded;
 
     if (!tile) {
@@ -33,7 +34,19 @@ LiveTileData::LiveTileData(const TileID& id_,
         return;
     }
 
+    reparse(callback);
+}
+
+bool LiveTileData::reparse(std::function<void()> callback) {
+    if (parsing || (state != State::loaded && state != State::partial)) {
+        return false;
+    }
+
+    parsing = true;
+
     workRequest = worker.parseLiveTile(tileWorker, *tile, [this, callback] (TileParseResult result) {
+        parsing = false;
+
         if (result.is<State>()) {
             state = result.get<State>();
         } else {
@@ -43,6 +56,8 @@ LiveTileData::LiveTileData(const TileID& id_,
 
         callback();
     });
+
+    return true;
 }
 
 LiveTileData::~LiveTileData() {
