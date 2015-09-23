@@ -10,12 +10,6 @@ build/
 *.so
 *.apk
 
-# JNI
-MapboxGLAndroidSDK/src/main/libs/
-MapboxGLAndroidSDK/src/main/jniLibs/
-MapboxGLAndroidSDK/src/main/obj/
-MapboxGLAndroidSDK/src/main/obj.target/
-
 # Lib assets
 MapboxGLAndroidSDK/src/main/assets/
 
