@@ -15,6 +15,7 @@
 - No longer loads resources before a render request is made. ([`55d25a8`](https://github.com/mapbox/mapbox-gl-native/commit/55d25a80a77c06ef5e66acc0d8518867b03fe8a4))
 - Adds io.js v3.x support. ([#2261](https://github.com/mapbox/mapbox-gl-native/pull/2261))
 - Fixes a bug which prevented raster tiles that `404`'ed from rendering ([#2458](https://github.com/mapbox/mapbox-gl-native/pull/2458))
+- Adds Node.js v4.1.x support.
 
 # 1.1.3
 
@@ -23,7 +24,7 @@
 # 1.1.2
 
 - Check libuv version semver-ishly, fixes segfaults in Node.js 0.12.x
-  and iojs.
+  and io.js.
 - Fixes segfault, throws JavaScript error instead when attempting to 
   render without first loading a style.
 - Bumps mbgl submodule to v0.4.0
