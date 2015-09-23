@@ -54,7 +54,6 @@ public:
     bool isLoaded() const;
 
     double getTopOffsetPixelsForAnnotationSymbol(const std::string& symbol);
-    void updateAnnotationTilesIfNeeded();
     void updateAnnotationTiles(const std::unordered_set<TileID, TileID::Hash>&);
 
     void setSourceTileCacheSize(size_t size);

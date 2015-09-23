@@ -23,6 +23,7 @@ class Annotation;
 class PointAnnotation;
 class ShapeAnnotation;
 class LiveTile;
+class Style;
 
 using GeoJSONVT = mapbox::util::geojsonvt::GeoJSONVT;
 
@@ -32,10 +33,6 @@ public:
 
     AnnotationManager();
     ~AnnotationManager();
-
-    void markStaleTiles(std::unordered_set<TileID, TileID::Hash>);
-    size_t getStaleTileCount() const { return staleTiles.size(); }
-    std::unordered_set<TileID, TileID::Hash> resetStaleTiles();
 
     void setDefaultPointAnnotationSymbol(const std::string& symbol);
 
@@ -48,8 +45,8 @@ public:
     AffectedTiles
     removeAnnotations(const AnnotationIDs&, const uint8_t maxZoom);
 
-    AnnotationIDs getOrderedShapeAnnotations() const { return orderedShapeAnnotations; }
-    const StyleProperties getAnnotationStyleProperties(uint32_t) const;
+    void updateTilesIfNeeded(Style*);
+    void updateTiles(const AffectedTiles&, Style*);
 
     AnnotationIDs getAnnotationsInBounds(const LatLngBounds&, const uint8_t maxZoom, const AnnotationType& = AnnotationType::Any) const;
     LatLngBounds getBoundsForAnnotations(const AnnotationIDs&) const;
@@ -66,7 +63,8 @@ private:
     uint32_t addShapeAnnotation(const ShapeAnnotation&, const uint8_t maxZoom);
     uint32_t addPointAnnotation(const PointAnnotation&, const uint8_t maxZoom, AffectedTiles&);
 
-private:
+    const StyleProperties getAnnotationStyleProperties(uint32_t) const;
+
     std::string defaultPointAnnotationSymbol;
     std::unordered_map<uint32_t, std::unique_ptr<Annotation>> annotations;
     std::vector<uint32_t> orderedShapeAnnotations;

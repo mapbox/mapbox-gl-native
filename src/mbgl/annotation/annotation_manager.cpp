@@ -7,6 +7,9 @@
 #include <mbgl/util/geojsonvt/geojsonvt_convert.hpp>
 #include <mbgl/util/ptr.hpp>
 #include <mbgl/util/string.hpp>
+#include <mbgl/style/style.hpp>
+#include <mbgl/style/style_bucket.hpp>
+#include <mbgl/style/style_layer.hpp>
 
 #include <algorithm>
 
@@ -61,14 +64,6 @@ AnnotationManager::AnnotationManager() {}
 AnnotationManager::~AnnotationManager() {
     // leave this here because the header file doesn't have a definition of
     // Annotation so we can't destruct the object with just the header file.
-}
-
-void AnnotationManager::markStaleTiles(std::unordered_set<TileID, TileID::Hash> ids) {
-    std::copy(ids.begin(), ids.end(), std::inserter(staleTiles, staleTiles.begin()));
-}
-
-std::unordered_set<TileID, TileID::Hash> AnnotationManager::resetStaleTiles() {
-    return std::move(staleTiles);
 }
 
 void AnnotationManager::setDefaultPointAnnotationSymbol(const std::string& symbol) {
@@ -322,13 +317,6 @@ std::unordered_set<TileID, TileID::Hash> AnnotationManager::removeAnnotations(co
     return affectedTiles;
 }
 
-const StyleProperties AnnotationManager::getAnnotationStyleProperties(uint32_t annotationID) const {
-    auto anno_it = annotations.find(annotationID);
-    assert(anno_it != annotations.end());
-
-    return anno_it->second->styleProperties;
-}
-
 AnnotationIDs AnnotationManager::getAnnotationsInBounds(const LatLngBounds& queryBounds,
                                                         const uint8_t maxZoom,
                                                         const AnnotationType& type) const {
@@ -488,6 +476,91 @@ const LiveTile* AnnotationManager::getTile(const TileID& id) {
     }
 
     return renderTile;
+}
+
+void AnnotationManager::updateTilesIfNeeded(Style* style) {
+    if (!staleTiles.empty()) {
+        updateTiles(staleTiles, style);
+    }
+}
+
+void AnnotationManager::updateTiles(const AffectedTiles& ids, Style* style) {
+    std::copy(ids.begin(), ids.end(), std::inserter(staleTiles, staleTiles.begin()));
+
+    if (!style) {
+        return;
+    }
+
+    // grab existing, single shape annotations source
+    const auto& shapeID = AnnotationManager::ShapeLayerID;
+    Source* shapeAnnotationSource = style->getSource(shapeID);
+
+    // Style not parsed yet
+    if (!shapeAnnotationSource) {
+        return;
+    }
+
+    shapeAnnotationSource->enabled = true;
+
+    const auto& layers = style->layers;
+
+    // create (if necessary) layers and buckets for each shape
+    for (const auto& shapeAnnotationID : orderedShapeAnnotations) {
+        const std::string shapeLayerID = shapeID + "." + util::toString(shapeAnnotationID);
+
+        if (std::find_if(layers.begin(), layers.end(), [&](auto l) { return l->id == shapeLayerID; }) != layers.end()) {
+            continue;
+        }
+
+        // apply shape paint properties
+        const StyleProperties& shapeStyle = annotations.at(shapeAnnotationID)->styleProperties;
+        ClassProperties paintProperties;
+
+        if (shapeStyle.is<LineProperties>()) {
+            const LineProperties& lineProperties = shapeStyle.get<LineProperties>();
+            paintProperties.set(PropertyKey::LineOpacity, ConstantFunction<float>(lineProperties.opacity));
+            paintProperties.set(PropertyKey::LineWidth, ConstantFunction<float>(lineProperties.width));
+            paintProperties.set(PropertyKey::LineColor, ConstantFunction<Color>(lineProperties.color));
+        } else if (shapeStyle.is<FillProperties>()) {
+            const FillProperties& fillProperties = shapeStyle.get<FillProperties>();
+            paintProperties.set(PropertyKey::FillOpacity, ConstantFunction<float>(fillProperties.opacity));
+            paintProperties.set(PropertyKey::FillColor, ConstantFunction<Color>(fillProperties.fill_color));
+            paintProperties.set(PropertyKey::FillOutlineColor, ConstantFunction<Color>(fillProperties.stroke_color));
+        }
+
+        std::map<ClassID, ClassProperties> shapePaints;
+        shapePaints.emplace(ClassID::Default, std::move(paintProperties));
+
+        // create shape layer
+        util::ptr<StyleLayer> shapeLayer = std::make_shared<StyleLayer>(shapeLayerID, std::move(shapePaints));
+        shapeLayer->type = (shapeStyle.is<LineProperties>() ? StyleLayerType::Line : StyleLayerType::Fill);
+
+        // add to end of other shape layers just before (last) point layer
+        style->layers.emplace((style->layers.end() - 1), shapeLayer);
+
+        // create shape bucket & connect to source
+        util::ptr<StyleBucket> shapeBucket = std::make_shared<StyleBucket>(shapeLayer->type);
+        shapeBucket->name = shapeLayer->id;
+        shapeBucket->source = shapeID;
+        shapeBucket->source_layer = shapeLayer->id;
+
+        // apply line layout properties to bucket
+        if (shapeStyle.is<LineProperties>()) {
+            shapeBucket->layout.set(PropertyKey::LineJoin, ConstantFunction<JoinType>(JoinType::Round));
+        }
+
+        // connect layer to bucket
+        shapeLayer->bucket = shapeBucket;
+    }
+
+    // invalidate annotations layer tiles
+    for (const auto &source : style->sources) {
+        if (source->info.type == SourceType::Annotations) {
+            source->invalidateTiles(ids);
+        }
+    }
+
+    staleTiles.clear();
 }
 
 const std::string AnnotationManager::PointLayerID = "com.mapbox.annotations.points";
