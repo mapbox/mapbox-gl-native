@@ -14,11 +14,6 @@ import android.graphics.Matrix;
 import android.graphics.PointF;
 import android.graphics.RectF;
 import android.graphics.SurfaceTexture;
-import android.hardware.GeomagneticField;
-import android.hardware.Sensor;
-import android.hardware.SensorEvent;
-import android.hardware.SensorEventListener;
-import android.hardware.SensorManager;
 import android.location.Location;
 import android.net.ConnectivityManager;
 import android.net.NetworkInfo;
@@ -59,11 +54,12 @@ import com.mapbox.mapboxgl.annotations.PolylineOptions;
 import com.mapbox.mapboxgl.geometry.BoundingBox;
 import com.mapbox.mapboxgl.geometry.LatLng;
 import com.mapbox.mapboxgl.geometry.LatLngZoom;
+import com.mapbox.mapboxgl.views.widget.CompassDelegate;
+import com.mapbox.mapboxgl.views.widget.CompassView;
 import com.mapzen.android.lost.api.LocationListener;
 import com.mapzen.android.lost.api.LocationRequest;
 import com.mapzen.android.lost.api.LocationServices;
 import com.mapzen.android.lost.api.LostApiClient;
-import com.squareup.okhttp.HttpUrl;
 import java.nio.ByteBuffer;
 import java.util.ArrayList;
 import java.util.Arrays;
@@ -74,7 +70,7 @@ import java.util.List;
 
 // Custom view that shows a Map
 // Based on SurfaceView as we use OpenGL ES to render
-public class MapView extends FrameLayout implements LocationListener {
+public class MapView extends FrameLayout implements LocationListener, CompassDelegate {
 
     //
     // Static members
@@ -171,19 +167,8 @@ public class MapView extends FrameLayout implements LocationListener {
     private UserLocationTrackingMode mUserLocationTrackingMode = UserLocationTrackingMode.FOLLOW;
 
     // Used for compass
-    private boolean mIsCompassEnabled = true;
-    private ImageView mCompassView;
-    private SensorManager mSensorManager;
-    private Sensor mSensorAccelerometer;
-    private Sensor mSensorMagneticField;
-    private CompassListener mCompassListener;
-    private float[] mValuesAccelerometer = new float[3];
-    private float[] mValuesMagneticField = new float[3];
-    private float[] mMatrixR = new float[9];
-    private float[] mMatrixI = new float[9];
-    private float[] mMatrixValues = new float[3];
-    private float mCompassBearing;
-    private boolean mCompassValid = false;
+    private CompassView mCompassView;
+    private boolean mIsCompassEnabled;
 
     // Used for MapboxLogo
     private ImageView mLogoView;
@@ -341,8 +326,6 @@ public class MapView extends FrameLayout implements LocationListener {
 
         // Get the screen's density
         mScreenDensity = context.getResources().getDisplayMetrics().density;
-        int tenDp = (int)(10 * mScreenDensity);
-        int sixteenDp = (int)(16 * mScreenDensity);
 
         // Get the cache path
         String cachePath = context.getCacheDir().getAbsolutePath();
@@ -401,18 +384,9 @@ public class MapView extends FrameLayout implements LocationListener {
                 .setPriority(LocationRequest.PRIORITY_HIGH_ACCURACY);
 
         // Setup Compass
-        mSensorManager = (SensorManager) mContext.getSystemService(Context.SENSOR_SERVICE);
-        mSensorAccelerometer = mSensorManager.getDefaultSensor(Sensor.TYPE_ACCELEROMETER);
-        mSensorMagneticField = mSensorManager.getDefaultSensor(Sensor.TYPE_MAGNETIC_FIELD);
-        mCompassListener = new CompassListener();
-
-        mCompassView = new ImageView(mContext);
-        mCompassView.setImageDrawable(ContextCompat.getDrawable(getContext(), R.drawable.compass));
-        mCompassView.setContentDescription(getResources().getString(R.string.compassContentDescription));
-        LayoutParams lp = new FrameLayout.LayoutParams((int)(48 * mScreenDensity), (int)(48 * mScreenDensity));
-        mCompassView.setLayoutParams(lp);
-        addView(mCompassView);
+        mCompassView = new CompassView(mContext);
         mCompassView.setOnClickListener(new CompassOnClickListener());
+        addView(mCompassView);
 
         // Setup Mapbox logo
         mLogoView = new ImageView(mContext);
@@ -1883,6 +1857,7 @@ public class MapView extends FrameLayout implements LocationListener {
      * Returns the currently displayed user location, or null if there is no location data available.
      * @return The currently displayed user location.
      */
+    @Override
     public final Location getMyLocation () {
         return mGpsLocation;
     }
@@ -1898,16 +1873,14 @@ public class MapView extends FrameLayout implements LocationListener {
                 mLocationClient.connect();
                 updateLocation(LocationServices.FusedLocationApi.getLastLocation());
                 LocationServices.FusedLocationApi.requestLocationUpdates(mLocationRequest, this);
-                mSensorManager.registerListener(mCompassListener, mSensorAccelerometer, SensorManager.SENSOR_DELAY_UI);
-                mSensorManager.registerListener(mCompassListener, mSensorMagneticField, SensorManager.SENSOR_DELAY_UI);
+                mCompassView.registerListeners(this);
             }
         } else {
             if (mLocationClient.isConnected()) {
                 LocationServices.FusedLocationApi.removeLocationUpdates(this);
                 mLocationClient.disconnect();
                 mGpsLocation = null;
-                mSensorManager.unregisterListener(mCompassListener, mSensorAccelerometer);
-                mSensorManager.unregisterListener(mCompassListener, mSensorMagneticField);
+                mCompassView.unRegisterListeners();
             }
         }
     }
@@ -1931,17 +1904,8 @@ public class MapView extends FrameLayout implements LocationListener {
      * @param compassEnabled true to enable the compass; false to disable the compass.
      */
     public void setCompassEnabled (boolean compassEnabled) {
-        // Set value
-        this.mIsCompassEnabled = compassEnabled;
-
-        // Toggle UI
-        if (mIsCompassEnabled) {
-            mCompassView.setVisibility(View.VISIBLE);
-        } else {
-            mCompassView.setVisibility(View.GONE);
-        }
-
-        // Update Map
+        mIsCompassEnabled = compassEnabled;
+        mCompassView.setVisibility(compassEnabled ? View.VISIBLE : View.GONE);
         updateMap(MapChange.MapChangeNullChange);
     }
 
@@ -1988,48 +1952,7 @@ public class MapView extends FrameLayout implements LocationListener {
     }
 
     // This class handles sensor updates to calculate compass bearing
-    private class CompassListener implements SensorEventListener {
 
-        @Override
-        public void onSensorChanged(SensorEvent event) {
-            switch (event.sensor.getType()) {
-                case Sensor.TYPE_ACCELEROMETER:
-                    System.arraycopy(event.values, 0, mValuesAccelerometer, 0, 3);
-                    break;
-                case Sensor.TYPE_MAGNETIC_FIELD:
-                    System.arraycopy(event.values, 0, mValuesMagneticField, 0, 3);
-                    break;
-            }
-
-            boolean valid = SensorManager.getRotationMatrix(mMatrixR, mMatrixI,
-                    mValuesAccelerometer,
-                    mValuesMagneticField);
-
-            if (valid) {
-                SensorManager.getOrientation(mMatrixR, mMatrixValues);
-                //mAzimuthRadians.putValue(mMatrixValues[0]);
-                //mAzimuth = Math.toDegrees(mAzimuthRadians.getAverage());
-
-                Location mGpsLocation = getMyLocation();
-                if (mGpsLocation != null) {
-                    GeomagneticField geomagneticField = new GeomagneticField(
-                            (float) mGpsLocation.getLatitude(),
-                            (float) mGpsLocation.getLongitude(),
-                            (float) mGpsLocation.getAltitude(),
-                            System.currentTimeMillis());
-                    mCompassBearing = (float) Math.toDegrees(mMatrixValues[0]) + geomagneticField.getDeclination();
-                    mCompassValid = true;
-                }
-            }
-
-            updateMap(MapChange.MapChangeNullChange);
-        }
-
-        @Override
-        public void onAccuracyChanged(Sensor sensor, int accuracy) {
-            // TODO: ignore unreliable stuff
-        }
-    }
 
     // Called when someone presses the compass
     private class CompassOnClickListener implements View.OnClickListener {
@@ -2102,7 +2025,8 @@ public class MapView extends FrameLayout implements LocationListener {
     }
 
     // Updates the UI to match the current map's position
-    private void updateMap(MapChange change) {
+    @Override
+    public void updateMap(MapChange change) {
         // Using direct access to mIsCompassEnabled instead of isCompassEnabled() for
         // small performance boost as this method is called rapidly.
         if (mIsCompassEnabled) {
@@ -2132,12 +2056,12 @@ public class MapView extends FrameLayout implements LocationListener {
             mGpsMarker.requestLayout();
 
             // Update direction if tracking mode
-            if(mUserLocationTrackingMode == UserLocationTrackingMode.FOLLOW_BEARING && mCompassValid){
+            if(mUserLocationTrackingMode == UserLocationTrackingMode.FOLLOW_BEARING && mCompassView.isValid()){
                 // TODO need to do proper filtering (see branch filter-compass) or else map will lock up because of all the compass events
                 long t = new Date().getTime();
                 if((t-t0)>1000){
                     t0 = t;
-                    setDirection(-mCompassBearing, true);
+                    setDirection(-mCompassView.getBearing(), true);
                 }
             }
 
