@@ -60,6 +60,9 @@ public:
     double longitude() const;
     void setLongitude(double longitude);
 
+    double scale() const;
+    void setScale(double scale, const QPointF &center = QPointF(), int milliseconds = 0);
+
     double zoom() const;
     void setZoom(double zoom, int milliseconds = 0);
 

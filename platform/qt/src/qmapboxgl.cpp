@@ -105,6 +105,16 @@ void QMapboxGL::setLongitude(double longitude_)
     d_ptr->mapObj->setLatLng(mbgl::LatLng { latitude(), longitude_ });
 }
 
+double QMapboxGL::scale() const
+{
+    return d_ptr->mapObj->getScale();
+}
+
+void QMapboxGL::setScale(double scale_, const QPointF &center, int milliseconds)
+{
+    d_ptr->mapObj->setScale(scale_, mbgl::ScreenCoordinate{ center.x(), center.y() }, std::chrono::milliseconds(milliseconds));
+}
+
 double QMapboxGL::zoom() const
 {
     return d_ptr->mapObj->getZoom();
