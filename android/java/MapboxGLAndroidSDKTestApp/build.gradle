@@ -86,7 +86,6 @@ android {
             enable true
             reset()
             include 'armeabi', 'armeabi-v7a', 'x86', 'mips'
-            universalApk true
         }
     }
 }
