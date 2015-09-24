@@ -78,7 +78,9 @@ public class Marker extends Annotation {
     }
 
     public void hideInfoWindow() {
-        infoWindow.close();
+        if (infoWindow != null) {
+            infoWindow.close();
+        }
         infoWindowShown = false;
     }
 
