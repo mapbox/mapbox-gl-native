@@ -57,13 +57,8 @@ NativeMapView::NativeMapView(JNIEnv *env, jobject obj_, float pixelRatio_, int a
     : mbgl::View(*this),
       pixelRatio(pixelRatio_),
       availableProcessors(availableProcessors_),
-      totalMemory(totalMemory_),
-      fileCache(mbgl::SharedSQLiteCache::get(mbgl::android::cachePath + "/mbgl-cache.db")),
-      fileSource(fileCache.get()),
-      map(*this, fileSource, MapMode::Continuous) {
+      totalMemory(totalMemory_) {
     mbgl::Log::Debug(mbgl::Event::Android, "NativeMapView::NativeMapView");
-
-    map.pause();
 
     assert(env != nullptr);
     assert(obj_ != nullptr);
@@ -78,6 +73,12 @@ NativeMapView::NativeMapView(JNIEnv *env, jobject obj_, float pixelRatio_, int a
         env->ExceptionDescribe();
         return;
     }
+
+    fileCache = mbgl::SharedSQLiteCache::get(mbgl::android::cachePath + "/mbgl-cache.db");
+    fileSource = std::make_unique<mbgl::DefaultFileSource>(fileCache.get());
+    map = std::make_unique<mbgl::Map>(*this, *fileSource, MapMode::Continuous);
+
+    map->pause();
 }
 
 NativeMapView::~NativeMapView() {
@@ -88,6 +89,10 @@ NativeMapView::~NativeMapView() {
 
     assert(vm != nullptr);
     assert(obj != nullptr);
+
+    map.reset();
+    fileSource.reset();
+    fileCache.reset();
 
     jint ret;
     JNIEnv *env = nullptr;
@@ -183,9 +188,9 @@ void NativeMapView::notify() {
     // noop
 }
 
-mbgl::Map &NativeMapView::getMap() { return map; }
+mbgl::Map &NativeMapView::getMap() { return *map; }
 
-mbgl::DefaultFileSource &NativeMapView::getFileSource() { return fileSource; }
+mbgl::DefaultFileSource &NativeMapView::getFileSource() { return *fileSource; }
 
 bool NativeMapView::inEmulator() {
     // Detect if we are in emulator
@@ -620,7 +625,7 @@ void NativeMapView::pause() {
     mbgl::Log::Debug(mbgl::Event::Android, "NativeMapView::pause");
 
     if ((display != EGL_NO_DISPLAY) && (context != EGL_NO_CONTEXT)) {
-        map.pause();
+        map->pause();
     }
 }
 
@@ -631,7 +636,7 @@ void NativeMapView::resume() {
     assert(context != EGL_NO_CONTEXT);
 
     if (surface != EGL_NO_SURFACE) {
-        map.resume();
+        map->resume();
     } else {
         mbgl::Log::Debug(mbgl::Event::Android, "Not resuming because we are not ready");
     }
@@ -699,37 +704,37 @@ void NativeMapView::updateFps() {
 void NativeMapView::onInvalidate() {
     mbgl::Log::Debug(mbgl::Event::Android, "NativeMapView::onInvalidate()");
 
-    if (map.isPaused()) {
+    if (map->isPaused()) {
         mbgl::Log::Debug(mbgl::Event::Android, "Not rendering as map is paused");
         return;
     }
 
     const bool dirty = !clean.test_and_set();
     if (dirty) {
-        float zoomFactor   = map.getMaxZoom() - map.getMinZoom() + 1;
+        float zoomFactor   = map->getMaxZoom() - map->getMinZoom() + 1;
         float cpuFactor    = availableProcessors;
         float memoryFactor = static_cast<float>(totalMemory) / 1000.0f / 1000.0f / 1000.0f;
-        float sizeFactor   = (static_cast<float>(map.getWidth())  / mbgl::util::tileSize) *
-                             (static_cast<float>(map.getHeight()) / mbgl::util::tileSize);
+        float sizeFactor   = (static_cast<float>(map->getWidth())  / mbgl::util::tileSize) *
+                             (static_cast<float>(map->getHeight()) / mbgl::util::tileSize);
 
         size_t cacheSize = zoomFactor * cpuFactor * memoryFactor * sizeFactor * 0.5f;
 
-        map.setSourceTileCacheSize(cacheSize);
+        map->setSourceTileCacheSize(cacheSize);
 
-        map.renderSync();
+        map->renderSync();
     }
 }
 
 void NativeMapView::resizeView(int w, int h) {
     width = w;
     height = h;
-    map.update(mbgl::Update::Dimensions);
+    map->update(mbgl::Update::Dimensions);
 }
 
 void NativeMapView::resizeFramebuffer(int w, int h) {
     fbWidth = w;
     fbHeight = h;
-    map.update(mbgl::Update::Repaint);
+    map->update(mbgl::Update::Repaint);
 }
 
 }
