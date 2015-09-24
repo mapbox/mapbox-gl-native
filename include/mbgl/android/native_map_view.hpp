@@ -91,8 +91,8 @@ private:
 
     // Ensure these are initialised last
     std::shared_ptr<mbgl::SQLiteCache> fileCache;
-    mbgl::DefaultFileSource fileSource;
-    mbgl::Map map;
+    std::unique_ptr<mbgl::DefaultFileSource> fileSource;
+    std::unique_ptr<mbgl::Map> map;
 
     std::atomic_flag clean = ATOMIC_FLAG_INIT;
 };
