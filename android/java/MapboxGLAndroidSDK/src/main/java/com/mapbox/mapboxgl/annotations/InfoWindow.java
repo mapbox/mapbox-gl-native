@@ -1,7 +1,6 @@
 package com.mapbox.mapboxgl.annotations;
 
 import android.content.Context;
-import android.graphics.PointF;
 import android.view.LayoutInflater;
 import android.view.MotionEvent;
 import android.view.View;
@@ -9,6 +8,7 @@ import android.view.ViewGroup;
 import android.widget.TextView;
 import com.mapbox.mapboxgl.geometry.LatLng;
 import com.mapbox.mapboxgl.views.MapView;
+import math.geom2d.Point2D;
 
 /**
  * A tooltip view
@@ -84,15 +84,15 @@ public class InfoWindow {
         MapView.LayoutParams lp = new MapView.LayoutParams(MapView.LayoutParams.WRAP_CONTENT, MapView.LayoutParams.WRAP_CONTENT);
         mView.measure(View.MeasureSpec.UNSPECIFIED, View.MeasureSpec.UNSPECIFIED);
 
-        PointF coords = mMapView.toScreenLocation(position);
+        Point2D coords = mMapView.toScreenLocation(position);
         double y = mMapView.getTopOffsetPixelsForAnnotationSymbol(object.sprite);
         y = y * mMapView.getScreenDensity();
 
         // Flip y coordinate as Android view origin is upper left corner
-        coords.y = mMapView.getHeight() - coords.y;
-        lp.leftMargin = (int) coords.x - (mView.getMeasuredWidth() / 2);
+        coords = new Point2D(coords.x(), mMapView.getHeight() - coords.y());
+        lp.leftMargin = (int) coords.x() - (mView.getMeasuredWidth() / 2);
         // Add y because it's a negative value
-        lp.topMargin = (int) coords.y - mView.getMeasuredHeight() + (int) y;
+        lp.topMargin = (int) coords.y() - mView.getMeasuredHeight() + (int) y;
 
         close(); //if it was already opened
         mMapView.addView(mView, lp);

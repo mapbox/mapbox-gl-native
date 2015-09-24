@@ -33,6 +33,8 @@ import com.mapbox.mapboxgl.annotations.PolylineOptions;
 import com.mapbox.mapboxgl.geometry.LatLng;
 import com.mapbox.mapboxgl.views.MapView;
 import io.fabric.sdk.android.Fabric;
+import math.geom2d.Point2D;
+
 import java.io.BufferedReader;
 import java.io.IOException;
 import java.io.InputStreamReader;
@@ -121,7 +123,7 @@ public class MainActivity extends AppCompatActivity {
                 // flip y direction vertically to match core GL
                 y = mMapView.getHeight() - y;
 
-                LatLng position = mMapView.fromScreenLocation(new PointF(x, y));
+                LatLng position = mMapView.fromScreenLocation(new Point2D(x, y));
 
                 mMapView.addMarker(new MarkerOptions()
                         .position(position)

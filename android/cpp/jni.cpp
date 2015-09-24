@@ -94,10 +94,10 @@ jmethodID projectedMetersConstructorId = nullptr;
 jfieldID projectedMetersNorthingId = nullptr;
 jfieldID projectedMetersEastingId = nullptr;
 
-jclass pointFClass = nullptr;
-jmethodID pointFConstructorId = nullptr;
-jfieldID pointFXId = nullptr;
-jfieldID pointFYId = nullptr;
+jclass point2DClass = nullptr;
+jmethodID point2DConstructorId = nullptr;
+jfieldID point2DXId = nullptr;
+jfieldID point2DYId = nullptr;
 
 jclass httpContextClass = nullptr;
 jmethodID httpContextGetInstanceId = nullptr;
@@ -1190,7 +1190,7 @@ jobject JNICALL nativePixelForLatLng(JNIEnv *env, jobject obj, jlong nativeMapVi
 
     mbgl::vec2<double> pixel = nativeMapView->getMap().pixelForLatLng(mbgl::LatLng(latitude, longitude));
 
-    jobject ret = env->NewObject(pointFClass, pointFConstructorId, static_cast<jfloat>(pixel.x), static_cast<jfloat>(pixel.y));
+    jobject ret = env->NewObject(point2DClass, point2DConstructorId, static_cast<jdouble>(pixel.x), static_cast<jdouble>(pixel.y));
     if (ret == nullptr) {
         env->ExceptionDescribe();
         return nullptr;
@@ -1204,13 +1204,13 @@ jobject JNICALL nativeLatLngForPixel(JNIEnv *env, jobject obj, jlong nativeMapVi
     assert(nativeMapViewPtr != 0);
     NativeMapView *nativeMapView = reinterpret_cast<NativeMapView *>(nativeMapViewPtr);
 
-    jfloat x = env->GetFloatField(pixel, pointFXId);
+    jfloat x = env->GetDoubleField(pixel, point2DXId);
     if (env->ExceptionCheck()) {
         env->ExceptionDescribe();
         return nullptr;
     }
 
-    jfloat y = env->GetFloatField(pixel, pointFYId);
+    jfloat y = env->GetDoubleField(pixel, point2DYId);
     if (env->ExceptionCheck()) {
         env->ExceptionDescribe();
         return nullptr;
@@ -1551,26 +1551,26 @@ extern "C" JNIEXPORT jint JNICALL JNI_OnLoad(JavaVM *vm, void *reserved) {
         return JNI_ERR;
     }
 
-    pointFClass = env->FindClass("android/graphics/PointF");
-    if (pointFClass == nullptr) {
+    point2DClass = env->FindClass("math/geom2d/Point2D");
+    if (point2DClass == nullptr) {
         env->ExceptionDescribe();
         return JNI_ERR;
     }
 
-    pointFConstructorId = env->GetMethodID(pointFClass, "<init>", "(FF)V");
-    if (pointFConstructorId == nullptr) {
+    point2DConstructorId = env->GetMethodID(point2DClass, "<init>", "(DD)V");
+    if (point2DConstructorId == nullptr) {
         env->ExceptionDescribe();
         return JNI_ERR;
     }
 
-    pointFXId = env->GetFieldID(pointFClass, "x", "F");
-    if (pointFXId == nullptr) {
+    point2DXId = env->GetFieldID(point2DClass, "x", "D");
+    if (point2DXId == nullptr) {
         env->ExceptionDescribe();
         return JNI_ERR;
     }
 
-    pointFYId = env->GetFieldID(pointFClass, "y", "F");
-    if (pointFYId == nullptr) {
+    point2DYId = env->GetFieldID(point2DClass, "y", "D");
+    if (point2DYId == nullptr) {
         env->ExceptionDescribe();
         return JNI_ERR;
     }
@@ -1712,9 +1712,9 @@ extern "C" JNIEXPORT jint JNICALL JNI_OnLoad(JavaVM *vm, void *reserved) {
         {"nativeLatLngForProjectedMeters",
          "(JLcom/mapbox/mapboxgl/geometry/ProjectedMeters;)Lcom/mapbox/mapboxgl/geometry/LatLng;",
          reinterpret_cast<void *>(&nativeLatLngForProjectedMeters)},
-        {"nativePixelForLatLng", "(JLcom/mapbox/mapboxgl/geometry/LatLng;)Landroid/graphics/PointF;",
+        {"nativePixelForLatLng", "(JLcom/mapbox/mapboxgl/geometry/LatLng;)Lmath/geom2d/Point2D;",
          reinterpret_cast<void *>(&nativePixelForLatLng)},
-        {"nativeLatLngForPixel", "(JLandroid/graphics/PointF;)Lcom/mapbox/mapboxgl/geometry/LatLng;",
+        {"nativeLatLngForPixel", "(JLmath/geom2d/Point2D;)Lcom/mapbox/mapboxgl/geometry/LatLng;",
          reinterpret_cast<void *>(&nativeLatLngForPixel)},
         {"nativeGetTopOffsetPixelsForAnnotationSymbol", "(JLjava/lang/String;)D",
          reinterpret_cast<void *>(&nativeGetTopOffsetPixelsForAnnotationSymbol)},
@@ -1832,8 +1832,8 @@ extern "C" JNIEXPORT jint JNICALL JNI_OnLoad(JavaVM *vm, void *reserved) {
         return JNI_ERR;
     }
 
-    pointFClass = reinterpret_cast<jclass>(env->NewGlobalRef(pointFClass));
-    if (pointFClass == nullptr) {
+    point2DClass = reinterpret_cast<jclass>(env->NewGlobalRef(point2DClass));
+    if (point2DClass == nullptr) {
         env->ExceptionDescribe();
         env->DeleteGlobalRef(latLngClass);
         env->DeleteGlobalRef(markerClass);
@@ -1861,7 +1861,7 @@ extern "C" JNIEXPORT jint JNICALL JNI_OnLoad(JavaVM *vm, void *reserved) {
         env->DeleteGlobalRef(nullPointerExceptionClass);
         env->DeleteGlobalRef(arrayListClass);
         env->DeleteGlobalRef(projectedMetersClass);
-        env->DeleteGlobalRef(pointFClass);
+        env->DeleteGlobalRef(point2DClass);
     }
 
     httpRequestClass = reinterpret_cast<jclass>(env->NewGlobalRef(httpRequestClass));
@@ -1877,7 +1877,7 @@ extern "C" JNIEXPORT jint JNICALL JNI_OnLoad(JavaVM *vm, void *reserved) {
         env->DeleteGlobalRef(nullPointerExceptionClass);
         env->DeleteGlobalRef(arrayListClass);
         env->DeleteGlobalRef(projectedMetersClass);
-        env->DeleteGlobalRef(pointFClass);
+        env->DeleteGlobalRef(point2DClass);
         env->DeleteGlobalRef(httpContextClass);
     }
 
@@ -1970,11 +1970,11 @@ extern "C" JNIEXPORT void JNICALL JNI_OnUnload(JavaVM *vm, void *reserved) {
     projectedMetersNorthingId = nullptr;
     projectedMetersEastingId = nullptr;
 
-    env->DeleteGlobalRef(pointFClass);
-    pointFClass = nullptr;
-    pointFConstructorId = nullptr;
-    pointFXId = nullptr;
-    pointFYId = nullptr;
+    env->DeleteGlobalRef(point2DClass);
+    point2DClass = nullptr;
+    point2DConstructorId = nullptr;
+    point2DXId = nullptr;
+    point2DYId = nullptr;
 
     env->DeleteGlobalRef(httpContextClass);
     httpContextGetInstanceId = nullptr;
