@@ -109,6 +109,7 @@ env:
 
 before_install:
 - source ./scripts/travis_helper.sh
+- cat ~/apt-get-update.log
 
 install:
 - ./scripts/${FLAVOR}/install.sh
