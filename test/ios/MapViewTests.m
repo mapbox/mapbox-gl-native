@@ -8,6 +8,7 @@
 
 #import "LocationMocker/LocationMocker.h"
 #import <CoreLocation/CoreLocation.h>
+#import <KIF/UIAutomationHelper.h>
 
 @interface MGLMapView (LocationManager)
 
@@ -39,6 +40,15 @@
     tester.viewController.navigationController.toolbarHidden = YES;
 
     tester.mapView.delegate = self;
+}
+
+- (void)approveLocationIfNeeded {
+    if ([CLLocationManager authorizationStatus] == kCLAuthorizationStatusNotDetermined) {
+        [UIAutomationHelper acknowledgeSystemAlert];
+        [tester waitForTimeInterval:1];
+    }
+    XCTAssertTrue([CLLocationManager locationServicesEnabled]);
+    XCTAssertEqual([CLLocationManager authorizationStatus], kCLAuthorizationStatusAuthorizedAlways);
 }
 
 - (void)testDirectionSet {
@@ -576,10 +586,9 @@
                                                             object:tester.mapView
                                                whileExecutingBlock:^{
                                                    tester.mapView.showsUserLocation = YES;
+                                                   [self approveLocationIfNeeded];
                                                }];
 
-    [tester acknowledgeSystemAlert];
-    
     XCTAssertEqualObjects(notification.name,
                           @"mapViewWillStartLocatingUser",
                           @"mapViewWillStartLocatingUser delegate should receive message");
@@ -613,7 +622,8 @@
 - (void)testUserTrackingModeFollow {
     tester.mapView.userTrackingMode = MGLUserTrackingModeFollow;
 
-    [tester acknowledgeSystemAlert];
+    [self approveLocationIfNeeded];
+    [tester waitForAnimationsToFinish];
 
     XCTAssertEqual(tester.mapView.userLocationVisible,
                    YES,
@@ -639,8 +649,9 @@
 - (void)testUserTrackingModeFollowWithHeading {
     tester.mapView.userTrackingMode = MGLUserTrackingModeFollowWithHeading;
     
-    [tester acknowledgeSystemAlert];
-    
+    [self approveLocationIfNeeded];
+    [tester waitForAnimationsToFinish];
+
     XCTAssertEqual(tester.mapView.userLocationVisible,
                    YES,
                    @"user location should be visible");
