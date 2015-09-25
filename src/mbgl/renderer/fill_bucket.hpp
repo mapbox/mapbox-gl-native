@@ -54,9 +54,9 @@ private:
     LineElementsBuffer& lineElementsBuffer;
 
     // hold information on where the vertices are located in the FillBuffer
-    const size_t vertex_start;
-    const size_t triangle_elements_start;
-    const size_t line_elements_start;
+    const GLsizei vertex_start;
+    const GLsizei triangle_elements_start;
+    const GLsizei line_elements_start;
 
     std::vector<std::unique_ptr<TriangleGroup>> triangleGroups;
     std::vector<std::unique_ptr<LineGroup>> lineGroups;

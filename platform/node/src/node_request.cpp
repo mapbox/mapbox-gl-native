@@ -11,112 +11,109 @@ namespace node_mbgl {
 ////////////////////////////////////////////////////////////////////////////////////////////////
 // Static Node Methods
 
-v8::Persistent<v8::FunctionTemplate> NodeRequest::constructorTemplate;
+Nan::Persistent<v8::Function> NodeRequest::constructor;
 
-void NodeRequest::Init(v8::Handle<v8::Object> target) {
-    NanScope();
+NAN_MODULE_INIT(NodeRequest::Init) {
+    v8::Local<v8::FunctionTemplate> tpl = Nan::New<v8::FunctionTemplate>(New);
 
-    v8::Local<v8::FunctionTemplate> t = NanNew<v8::FunctionTemplate>(New);
+    tpl->InstanceTemplate()->SetInternalFieldCount(1);
+    tpl->SetClassName(Nan::New("Request").ToLocalChecked());
 
-    t->InstanceTemplate()->SetInternalFieldCount(1);
-    t->SetClassName(NanNew("Request"));
-
-    NODE_SET_PROTOTYPE_METHOD(t, "respond", Respond);
-
-    NanAssignPersistent(constructorTemplate, t);
-
-    target->Set(NanNew("Request"), t->GetFunction());
+    constructor.Reset(tpl->GetFunction());
+    Nan::Set(target, Nan::New("Request").ToLocalChecked(), tpl->GetFunction());
 }
 
 NAN_METHOD(NodeRequest::New) {
-    NanScope();
-
     // Extract the pointer from the first argument
-    if (args.Length() < 2 || !args[0]->IsExternal() || !args[1]->IsExternal()) {
-        return NanThrowTypeError("Cannot create Request objects explicitly");
+    if (info.Length() < 2 || !info[0]->IsExternal() || !info[1]->IsExternal()) {
+        return Nan::ThrowTypeError("Cannot create Request objects explicitly");
     }
 
-    auto source = reinterpret_cast<NodeFileSource*>(args[0].As<v8::External>()->Value());
-    auto resource = reinterpret_cast<mbgl::Resource*>(args[1].As<v8::External>()->Value());
+    auto source = reinterpret_cast<NodeFileSource*>(info[0].As<v8::External>()->Value());
+    auto resource = reinterpret_cast<mbgl::Resource*>(info[1].As<v8::External>()->Value());
     auto req = new NodeRequest(source, *resource);
-    req->Wrap(args.This());
+    req->Wrap(info.This());
 
-    NanReturnValue(args.This());
+    info.GetReturnValue().Set(info.This());
 }
 
 v8::Handle<v8::Object> NodeRequest::Create(NodeFileSource* source, const mbgl::Resource& resource) {
-    NanEscapableScope();
+    Nan::EscapableHandleScope scope;
 
-    v8::Local<v8::Value> argv[] = { NanNew<v8::External>(const_cast<NodeFileSource*>(source)),
-        NanNew<v8::External>(const_cast<mbgl::Resource*>(&resource)) };
-    auto instance = NanNew<v8::FunctionTemplate>(constructorTemplate)->GetFunction()->NewInstance(2, argv);
+    v8::Local<v8::Value> argv[] = {
+        Nan::New<v8::External>(const_cast<NodeFileSource*>(source)),
+        Nan::New<v8::External>(const_cast<mbgl::Resource*>(&resource))
+    };
+    auto instance = Nan::New(constructor)->NewInstance(2, argv);
 
-    instance->ForceSet(NanNew("url"), NanNew(resource.url), v8::ReadOnly);
-    instance->ForceSet(NanNew("kind"), NanNew<v8::Integer>(int(resource.kind)), v8::ReadOnly);
+    Nan::Set(instance, Nan::New("url").ToLocalChecked(), Nan::New(resource.url).ToLocalChecked());
+    Nan::Set(instance, Nan::New("kind").ToLocalChecked(), Nan::New<v8::Integer>(int(resource.kind)));
 
-    return NanEscapeScope(instance);
+    return scope.Escape(instance);
 }
 
 NAN_METHOD(NodeRequest::Respond) {
-    auto nodeRequest = ObjectWrap::Unwrap<NodeRequest>(args.Holder());
+    auto nodeRequest = Nan::ObjectWrap::Unwrap<NodeRequest>(info.Data().As<v8::Object>());
 
     // Request has already been responded to, or was canceled, fail silently.
-    if (!nodeRequest->resource) NanReturnUndefined();
+    if (!nodeRequest->resource) {
+        return info.GetReturnValue().SetUndefined();
+    }
 
     auto source = nodeRequest->source;
     auto resource = std::move(nodeRequest->resource);
 
-    if (args.Length() < 1) {
-        return NanThrowTypeError("First argument must be an error object");
-    } else if (args[0]->BooleanValue()) {
+    if (info.Length() < 1) {
+        return Nan::ThrowTypeError("First argument must be an error object");
+    } else if (info[0]->BooleanValue()) {
         auto response = std::make_shared<mbgl::Response>();
 
         response->status = mbgl::Response::Error;
 
         // Store the error string.
-        const NanUtf8String message { args[0]->ToString() };
+        const Nan::Utf8String message { info[0]->ToString() };
         response->message = std::string { *message, size_t(message.length()) };
 
         source->notify(*resource, response);
-    } else if (args.Length() < 2 || !args[1]->IsObject()) {
-        return NanThrowTypeError("Second argument must be a response object");
+    } else if (info.Length() < 2 || !info[1]->IsObject()) {
+        return Nan::ThrowTypeError("Second argument must be a response object");
     } else {
         auto response = std::make_shared<mbgl::Response>();
-        auto res = args[1]->ToObject();
+        auto res = info[1]->ToObject();
 
         response->status = mbgl::Response::Successful;
 
-        if (res->Has(NanNew("modified"))) {
-            const double modified = res->Get(NanNew("modified"))->ToNumber()->Value();
+        if (Nan::Has(res, Nan::New("modified").ToLocalChecked()).FromJust()) {
+            const double modified = Nan::Get(res, Nan::New("modified").ToLocalChecked()).ToLocalChecked()->ToNumber()->Value();
             if (!std::isnan(modified)) {
                 response->modified = modified / 1000; // JS timestamps are milliseconds
             }
         }
 
-        if (res->Has(NanNew("expires"))) {
-            const double expires = res->Get(NanNew("expires"))->ToNumber()->Value();
+        if (Nan::Has(res, Nan::New("expires").ToLocalChecked()).FromJust()) {
+            const double expires = Nan::Get(res, Nan::New("expires").ToLocalChecked()).ToLocalChecked()->ToNumber()->Value();
             if (!std::isnan(expires)) {
                 response->expires = expires / 1000; // JS timestamps are milliseconds
             }
         }
 
-        if (res->Has(NanNew("etag"))) {
-            auto etagHandle = res->Get(NanNew("etag"));
+        if (Nan::Has(res, Nan::New("etag").ToLocalChecked()).FromJust()) {
+            auto etagHandle = Nan::Get(res, Nan::New("etag").ToLocalChecked()).ToLocalChecked();
             if (etagHandle->BooleanValue()) {
-                const NanUtf8String etag { etagHandle->ToString() };
+                const Nan::Utf8String etag { etagHandle->ToString() };
                 response->etag = std::string { *etag, size_t(etag.length()) };
             }
         }
 
-        if (res->Has(NanNew("data"))) {
-            auto dataHandle = res->Get(NanNew("data"));
+        if (Nan::Has(res, Nan::New("data").ToLocalChecked()).FromJust()) {
+            auto dataHandle = Nan::Get(res, Nan::New("data").ToLocalChecked()).ToLocalChecked();
             if (node::Buffer::HasInstance(dataHandle)) {
                 response->data = std::string {
                     node::Buffer::Data(dataHandle),
                     node::Buffer::Length(dataHandle)
                 };
             } else {
-                return NanThrowTypeError("Response data must be a Buffer");
+                return Nan::ThrowTypeError("Response data must be a Buffer");
             }
         }
 
@@ -124,7 +121,7 @@ NAN_METHOD(NodeRequest::Respond) {
         source->notify(*resource, response);
     }
 
-    NanReturnUndefined();
+    info.GetReturnValue().SetUndefined();
 }
 
 ////////////////////////////////////////////////////////////////////////////////////////////////

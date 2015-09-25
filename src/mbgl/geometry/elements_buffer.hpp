@@ -10,16 +10,16 @@
 
 namespace mbgl {
 
-template <int count>
+template <GLsizei count>
 struct ElementGroup : public util::noncopyable {
     std::array<VertexArrayObject, count> array;
-    uint32_t vertex_length;
-    uint32_t elements_length;
+    GLsizei vertex_length;
+    GLsizei elements_length;
 
-    ElementGroup() : vertex_length(0), elements_length(0) {}
-    ElementGroup(uint32_t vertex_length_, uint32_t elements_length_)
-        : vertex_length(vertex_length_),
-          elements_length(elements_length_) {
+    ElementGroup(GLsizei vertex_length_ = 0, GLsizei elements_length_ = 0)
+        : vertex_length(vertex_length_)
+        , elements_length(elements_length_)
+    {
     }
 };
 

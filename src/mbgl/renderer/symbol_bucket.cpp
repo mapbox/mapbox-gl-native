@@ -103,7 +103,8 @@ bool SymbolBucket::needsDependencies(const GeometryTileLayer& layer,
     // Determine and load glyph ranges
     std::set<GlyphRange> ranges;
 
-    for (std::size_t i = 0; i < layer.featureCount(); i++) {
+    const GLsizei featureCount = static_cast<GLsizei>(layer.featureCount());
+    for (GLsizei i = 0; i < featureCount; i++) {
         auto feature = layer.getFeature(i);
 
         GeometryTileFeatureExtractor extractor(*feature);
@@ -488,7 +489,7 @@ void SymbolBucket::addSymbols(Buffer &buffer, const SymbolQuads &symbols, float 
         // coordinate in this polygon.
         assert(buffer.groups.back());
         auto &triangleGroup = *buffer.groups.back();
-        uint32_t triangleIndex = triangleGroup.vertex_length;
+        GLsizei triangleIndex = triangleGroup.vertex_length;
 
         // coordinates (2 triangles)
         buffer.vertices.add(anchorPoint.x, anchorPoint.y, tl.x, tl.y, tex.x, tex.y, minZoom,
@@ -565,8 +566,8 @@ void SymbolBucket::swapRenderData() {
 }
 
 void SymbolBucket::drawGlyphs(SDFShader &shader) {
-    char *vertex_index = BUFFER_OFFSET(0);
-    char *elements_index = BUFFER_OFFSET(0);
+    GLbyte *vertex_index = BUFFER_OFFSET_0;
+    GLbyte *elements_index = BUFFER_OFFSET_0;
     auto& text = renderData->text;
     for (auto &group : text.groups) {
         assert(group);
@@ -578,8 +579,8 @@ void SymbolBucket::drawGlyphs(SDFShader &shader) {
 }
 
 void SymbolBucket::drawIcons(SDFShader &shader) {
-    char *vertex_index = BUFFER_OFFSET(0);
-    char *elements_index = BUFFER_OFFSET(0);
+    GLbyte *vertex_index = BUFFER_OFFSET_0;
+    GLbyte *elements_index = BUFFER_OFFSET_0;
     auto& icon = renderData->icon;
     for (auto &group : icon.groups) {
         assert(group);
@@ -591,8 +592,8 @@ void SymbolBucket::drawIcons(SDFShader &shader) {
 }
 
 void SymbolBucket::drawIcons(IconShader &shader) {
-    char *vertex_index = BUFFER_OFFSET(0);
-    char *elements_index = BUFFER_OFFSET(0);
+    GLbyte *vertex_index = BUFFER_OFFSET_0;
+    GLbyte *elements_index = BUFFER_OFFSET_0;
     auto& icon = renderData->icon;
     for (auto &group : icon.groups) {
         assert(group);
@@ -604,7 +605,7 @@ void SymbolBucket::drawIcons(IconShader &shader) {
 }
 
 void SymbolBucket::drawCollisionBoxes(CollisionBoxShader &shader) {
-    char *vertex_index = BUFFER_OFFSET(0);
+    GLbyte *vertex_index = BUFFER_OFFSET_0;
     auto& collisionBox = renderData->collisionBox;
     for (auto &group : collisionBox.groups) {
         group->array[0].bind(shader, collisionBox.vertices, vertex_index);

@@ -13,6 +13,7 @@
 #include <mbgl/annotation/sprite_image.hpp>
 #include <mbgl/platform/platform.hpp>
 #include <mbgl/platform/darwin/reachability.h>
+#include <mbgl/storage/sqlite_cache.hpp>
 #include <mbgl/storage/default_file_source.hpp>
 #include <mbgl/storage/network_status.hpp>
 #include <mbgl/util/geo.hpp>
@@ -28,7 +29,6 @@
 #import "NSException+MGLAdditions.h"
 #import "MGLUserLocationAnnotationView.h"
 #import "MGLUserLocation_Private.h"
-#import "MGLFileCache.h"
 #import "MGLAccountManager_Private.h"
 #import "MGLMapboxEvents.h"
 
@@ -58,16 +58,6 @@ NSString *const MGLAnnotationSymbolKey = @"MGLAnnotationSymbolKey";
 static NSURL *MGLURLForBundledStyleNamed(NSString *styleName)
 {
     return [NSURL URLWithString:[NSString stringWithFormat:@"asset://styles/%@.json", styleName]];
-}
-
-CGFloat MGLRadiansFromDegrees(CLLocationDegrees degrees)
-{
-    return degrees * M_PI / 180;
-}
-
-CLLocationDegrees MGLDegreesFromRadians(CGFloat radians)
-{
-    return radians * 180 / M_PI;
 }
 
 mbgl::util::UnitBezier MGLUnitBezierForMediaTimingFunction(CAMediaTimingFunction *function)
@@ -122,12 +112,14 @@ mbgl::util::UnitBezier MGLUnitBezierForMediaTimingFunction(CAMediaTimingFunction
 {
     mbgl::Map *_mbglMap;
     MBGLView *_mbglView;
+    std::shared_ptr<mbgl::SQLiteCache> _mbglFileCache;
     mbgl::DefaultFileSource *_mbglFileSource;
-    BOOL _isWaitingForRedundantReachableNotification;
-    
+
     NS_MUTABLE_ARRAY_OF(NSURL *) *_bundledStyleURLs;
 
+    BOOL _isWaitingForRedundantReachableNotification;
     BOOL _isTargetingInterfaceBuilder;
+
     CLLocationDegrees _pendingLatitude;
     CLLocationDegrees _pendingLongitude;
 }
@@ -235,14 +227,24 @@ std::chrono::steady_clock::duration secondsAsDuration(float duration)
     self.backgroundColor = [UIColor clearColor];
     self.clipsToBounds = YES;
 
-    // setup mbgl map
-    //
+    // setup mbgl view
     const float scaleFactor = [UIScreen instancesRespondToSelector:@selector(nativeScale)] ? [[UIScreen mainScreen] nativeScale] : [[UIScreen mainScreen] scale];
     _mbglView = new MBGLView(self, scaleFactor);
-    _mbglFileSource = new mbgl::DefaultFileSource([MGLFileCache obtainSharedCacheWithObject:self]);
 
-    // Start paused
+    // setup mbgl cache & file source
+    NSString *fileCachePath = @"";
+    NSArray *paths = NSSearchPathForDirectoriesInDomains(NSCachesDirectory, NSUserDomainMask, YES);
+    if ([paths count] != 0) {
+        NSString *libraryDirectory = [paths objectAtIndex:0];
+        fileCachePath = [libraryDirectory stringByAppendingPathComponent:@"cache.db"];
+    }
+    _mbglFileCache = mbgl::SharedSQLiteCache::get([fileCachePath UTF8String]);
+    _mbglFileSource = new mbgl::DefaultFileSource(_mbglFileCache.get());
+
+    // setup mbgl map
     _mbglMap = new mbgl::Map(*_mbglView, *_mbglFileSource, mbgl::MapMode::Continuous);
+
+    // start paused if in IB
     if (_isTargetingInterfaceBuilder || background) {
         self.dormant = YES;
         _mbglMap->pause();
@@ -368,7 +370,8 @@ std::chrono::steady_clock::duration secondsAsDuration(float duration)
     {
         _quickZoom = [[UILongPressGestureRecognizer alloc] initWithTarget:self action:@selector(handleQuickZoomGesture:)];
         _quickZoom.numberOfTapsRequired = 1;
-        _quickZoom.minimumPressDuration = 0.25;
+        _quickZoom.minimumPressDuration = 0;
+        [_quickZoom requireGestureRecognizerToFail:doubleTap];
         [self addGestureRecognizer:_quickZoom];
     }
 
@@ -474,8 +477,6 @@ std::chrono::steady_clock::duration secondsAsDuration(float duration)
         delete _mbglFileSource;
         _mbglFileSource = nullptr;
     }
-
-    [MGLFileCache releaseSharedCacheForObject:self];
 
     if (_mbglView)
     {
@@ -1336,9 +1337,9 @@ std::chrono::steady_clock::duration secondsAsDuration(float duration)
     }
     else if (quickZoom.state == UIGestureRecognizerStateChanged)
     {
-        CGFloat distance = self.quickZoomStart - [quickZoom locationInView:quickZoom.view].y;
+        CGFloat distance = [quickZoom locationInView:quickZoom.view].y - self.quickZoomStart;
 
-        CGFloat newZoom = log2f(self.scale) + (distance / 100);
+        CGFloat newZoom = log2f(self.scale) + (distance / 75);
 
         if (newZoom < _mbglMap->getMinZoom()) return;
 

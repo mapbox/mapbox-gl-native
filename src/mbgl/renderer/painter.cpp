@@ -117,14 +117,14 @@ void Painter::setDebug(bool enabled) {
     debug = enabled;
 }
 
-void Painter::useProgram(uint32_t program) {
+void Painter::useProgram(GLuint program) {
     if (gl_program != program) {
         MBGL_CHECK_ERROR(glUseProgram(program));
         gl_program = program;
     }
 }
 
-void Painter::lineWidth(float line_width) {
+void Painter::lineWidth(GLfloat line_width) {
     if (gl_lineWidth != line_width) {
         MBGL_CHECK_ERROR(glLineWidth(line_width));
         gl_lineWidth = line_width;
@@ -235,7 +235,7 @@ void Painter::render(const Style& style, TransformState state_, const FrameData&
     // Make a second pass, rendering translucent objects. This time, we render bottom-to-top.
     renderPass(RenderPass::Translucent,
                order.begin(), order.end(),
-               order.size() - 1, -1);
+               static_cast<GLsizei>(order.size()) - 1, -1);
 
     if (debug::renderTree) { Log::Info(Event::Render, "}"); indent--; }
 
@@ -266,7 +266,7 @@ void Painter::render(const Style& style, TransformState state_, const FrameData&
 template <class Iterator>
 void Painter::renderPass(RenderPass pass_,
                          Iterator it, Iterator end,
-                         std::size_t i, int8_t increment) {
+                         GLsizei i, int8_t increment) {
     pass = pass_;
 
     MBGL_DEBUG_GROUP(pass == RenderPass::Opaque ? "opaque" : "translucent");

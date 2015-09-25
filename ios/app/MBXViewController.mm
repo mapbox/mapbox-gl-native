@@ -31,9 +31,9 @@ static NSUInteger const kStyleVersion = 8;
     if (self == [MBXViewController class])
     {
         [[NSUserDefaults standardUserDefaults] registerDefaults:@{
-            @"userTrackingMode": @(MGLUserTrackingModeNone),
-            @"showsUserLocation": @NO,
-            @"debug": @NO,
+            @"MBXUserTrackingMode": @(MGLUserTrackingModeNone),
+            @"MBXShowsUserLocation": @NO,
+            @"MBXDebug": @NO,
         }];
     }
 }
@@ -83,13 +83,6 @@ static NSUInteger const kStyleVersion = 8;
                                                                              action:@selector(locateUser)];
 
     [self restoreState:nil];
-
-    if ( ! settings->showsUserLocation)
-    {
-        dispatch_after(dispatch_time(DISPATCH_TIME_NOW, 2 * NSEC_PER_SEC), dispatch_get_main_queue(), ^{
-            self.mapView.showsUserLocation = YES;
-        });
-    }
 }
 
 - (void)saveState:(__unused NSNotification *)notification
@@ -98,10 +91,10 @@ static NSUInteger const kStyleVersion = 8;
     {
         NSUserDefaults *defaults = [NSUserDefaults standardUserDefaults];
         NSData *archivedCamera = [NSKeyedArchiver archivedDataWithRootObject:self.mapView.camera];
-        [defaults setObject:archivedCamera forKey:@"camera"];
-        [defaults setInteger:self.mapView.userTrackingMode forKey:@"userTrackingMode"];
-        [defaults setBool:self.mapView.showsUserLocation forKey:@"showsUserLocation"];
-        [defaults setBool:self.mapView.debugActive forKey:@"debug"];
+        [defaults setObject:archivedCamera forKey:@"MBXCamera"];
+        [defaults setInteger:self.mapView.userTrackingMode forKey:@"MBXUserTrackingMode"];
+        [defaults setBool:self.mapView.showsUserLocation forKey:@"MBXShowsUserLocation"];
+        [defaults setBool:self.mapView.debugActive forKey:@"MBXDebug"];
         [defaults synchronize];
     }
 }
@@ -110,21 +103,21 @@ static NSUInteger const kStyleVersion = 8;
 {
     if (self.mapView) {
         NSUserDefaults *defaults = [NSUserDefaults standardUserDefaults];
-        NSData *archivedCamera = [defaults objectForKey:@"camera"];
+        NSData *archivedCamera = [defaults objectForKey:@"MBXCamera"];
         MGLMapCamera *camera = archivedCamera ? [NSKeyedUnarchiver unarchiveObjectWithData:archivedCamera] : nil;
         if (camera)
         {
             self.mapView.camera = camera;
         }
-        NSInteger uncheckedTrackingMode = [defaults integerForKey:@"userTrackingMode"];
+        NSInteger uncheckedTrackingMode = [defaults integerForKey:@"MBXUserTrackingMode"];
         if (uncheckedTrackingMode >= 0 &&
             (NSUInteger)uncheckedTrackingMode >= MGLUserTrackingModeNone &&
             (NSUInteger)uncheckedTrackingMode <= MGLUserTrackingModeFollowWithCourse)
         {
             self.mapView.userTrackingMode = (MGLUserTrackingMode)uncheckedTrackingMode;
         }
-        self.mapView.showsUserLocation = [defaults boolForKey:@"showsUserLocation"];
-        self.mapView.debugActive = [defaults boolForKey:@"debug"];
+        self.mapView.showsUserLocation = [defaults boolForKey:@"MBXShowsUserLocation"];
+        self.mapView.debugActive = [defaults boolForKey:@"MBXDebug"];
     }
 }
 

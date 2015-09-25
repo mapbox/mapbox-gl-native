@@ -202,7 +202,7 @@ void HeadlessView::clearBuffers() {
     }
 
     if (fboColor) {
-        MBGL_CHECK_ERROR(glDeleteTextures(1, &fboColor));
+        MBGL_CHECK_ERROR(glDeleteRenderbuffersEXT(1, &fboColor));
         fboColor = 0;
     }
 

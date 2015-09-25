@@ -12,10 +12,10 @@
 
 using namespace mbgl;
 
-LineAtlas::LineAtlas(uint16_t w, uint16_t h)
+LineAtlas::LineAtlas(GLsizei w, GLsizei h)
     : width(w),
       height(h),
-      data(std::make_unique<uint8_t[]>(w * h)),
+      data(std::make_unique<GLbyte[]>(w * h)),
       dirty(true) {
 }
 

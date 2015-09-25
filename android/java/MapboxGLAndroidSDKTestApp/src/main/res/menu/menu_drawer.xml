@@ -19,18 +19,24 @@
           android:checkable="true"
           />
 
-<!--
-    <group android:id="@+id/locationFollowModesSeparator"/>
+    <item android:id="@+id/action_second_map_activity"
+          android:icon="@drawable/ic_looks_two_white_24dp"
+          android:title="@string/action_second_map_activity"
+          android:checkable="false"
+        />
 
-    <group android:id="@+id/locationFollowModes" android:checkableBehavior="single">
-        <item android:id="@+id/followNone"
-              android:title="@string/action_location_none"/>
-        <item android:id="@+id/followFollow"
-              android:title="@string/action_location_follow"/>
-        <item android:id="@+id/followBearing"
-              android:title="@string/action_location_bearing"/>
-    </group>
--->
+    <!--
+        <group android:id="@+id/locationFollowModesSeparator"/>
+
+        <group android:id="@+id/locationFollowModes" android:checkableBehavior="single">
+            <item android:id="@+id/followNone"
+                  android:title="@string/action_location_none"/>
+            <item android:id="@+id/followFollow"
+                  android:title="@string/action_location_follow"/>
+            <item android:id="@+id/followBearing"
+                  android:title="@string/action_location_bearing"/>
+        </group>
+    -->
 
     <group android:id="@+id/stylesSeparator"/>
 

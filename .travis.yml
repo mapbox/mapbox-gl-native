@@ -25,10 +25,10 @@ matrix:
           sources: [ 'ubuntu-toolchain-r-test', 'llvm-toolchain-precise-3.5' ]
           packages: [ 'gdb', 'clang-3.5', 'libstdc++-4.9-dev', 'libstdc++6', 'libllvm3.4', 'xutils-dev', 'libxxf86vm-dev', 'x11proto-xf86vidmode-dev', 'mesa-utils' ]
     - os: osx
-      osx_image: xcode6.4
+      osx_image: xcode7
       env: FLAVOR=osx BUILDTYPE=Debug
     - os: osx
-      osx_image: xcode6.4
+      osx_image: xcode7
       env: FLAVOR=ios BUILDTYPE=Release
     - os: linux
       env: FLAVOR=android ANDROID_ABI=arm-v7 BUILDTYPE=Release
@@ -59,7 +59,7 @@ matrix:
         apt:
           packages: [ 'lib32stdc++6' ]
     - os: linux
-      env: FLAVOR=node CXX=clang++-3.5 BUILDTYPE=Release NODE_VERSION=iojs-v2
+      env: FLAVOR=node CXX=clang++-3.5 BUILDTYPE=Release NODE_VERSION=iojs-v3
       addons:
         apt:
           sources: [ 'ubuntu-toolchain-r-test', 'llvm-toolchain-precise-3.5' ]
@@ -77,15 +77,15 @@ matrix:
           sources: [ 'ubuntu-toolchain-r-test', 'llvm-toolchain-precise-3.5' ]
           packages: [ 'gdb', 'clang-3.5', 'libstdc++-4.9-dev', 'libstdc++6', 'libllvm3.4', 'xutils-dev', 'libxxf86vm-dev', 'x11proto-xf86vidmode-dev', 'mesa-utils' ]
     - os: osx
-      osx_image: xcode6.4
+      osx_image: xcode7
       compiler: clang
-      env: FLAVOR=node NODE_VERSION=iojs-v2
+      env: FLAVOR=node NODE_VERSION=iojs-v3
     - os: osx
-      osx_image: xcode6.4
+      osx_image: xcode7
       compiler: clang
       env: FLAVOR=node NODE_VERSION=0.12
     - os: osx
-      osx_image: xcode6.4
+      osx_image: xcode7
       compiler: clang
       env: FLAVOR=node NODE_VERSION=0.10
 

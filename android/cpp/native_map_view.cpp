@@ -78,6 +78,16 @@ NativeMapView::NativeMapView(JNIEnv *env, jobject obj_, float pixelRatio_, int a
     fileSource = std::make_unique<mbgl::DefaultFileSource>(fileCache.get());
     map = std::make_unique<mbgl::Map>(*this, *fileSource, MapMode::Continuous);
 
+    float zoomFactor   = map->getMaxZoom() - map->getMinZoom() + 1;
+    float cpuFactor    = availableProcessors;
+    float memoryFactor = static_cast<float>(totalMemory) / 1000.0f / 1000.0f / 1000.0f;
+    float sizeFactor   = (static_cast<float>(map->getWidth())  / mbgl::util::tileSize) *
+                         (static_cast<float>(map->getHeight()) / mbgl::util::tileSize);
+
+    size_t cacheSize = zoomFactor * cpuFactor * memoryFactor * sizeFactor * 0.5f;
+
+    map->setSourceTileCacheSize(cacheSize);
+
     map->pause();
 }
 
@@ -148,8 +158,6 @@ void NativeMapView::deactivate() {
 void NativeMapView::invalidate() {
     mbgl::Log::Debug(mbgl::Event::Android, "NativeMapView::invalidate()");
 
-    clean.clear();
-
     assert(vm != nullptr);
     assert(obj != nullptr);
 
@@ -169,7 +177,7 @@ void NativeMapView::beforeRender() {
 }
 
 void NativeMapView::afterRender() {
-    mbgl::Log::Debug(mbgl::Event::Android, "NativeMapView::swap");
+    mbgl::Log::Debug(mbgl::Event::Android, "NativeMapView::afterRender");
 
     if ((display != EGL_NO_DISPLAY) && (surface != EGL_NO_SURFACE)) {
         if (!eglSwapBuffers(display, surface)) {
@@ -701,28 +709,15 @@ void NativeMapView::updateFps() {
     detach_jni_thread(vm, &env, detach);
 }
 
-void NativeMapView::onInvalidate() {
-    mbgl::Log::Debug(mbgl::Event::Android, "NativeMapView::onInvalidate()");
+void NativeMapView::renderSync() {
+    mbgl::Log::Debug(mbgl::Event::Android, "NativeMapView::renderSync()");
 
     if (map->isPaused()) {
         mbgl::Log::Debug(mbgl::Event::Android, "Not rendering as map is paused");
         return;
     }
 
-    const bool dirty = !clean.test_and_set();
-    if (dirty) {
-        float zoomFactor   = map->getMaxZoom() - map->getMinZoom() + 1;
-        float cpuFactor    = availableProcessors;
-        float memoryFactor = static_cast<float>(totalMemory) / 1000.0f / 1000.0f / 1000.0f;
-        float sizeFactor   = (static_cast<float>(map->getWidth())  / mbgl::util::tileSize) *
-                             (static_cast<float>(map->getHeight()) / mbgl::util::tileSize);
-
-        size_t cacheSize = zoomFactor * cpuFactor * memoryFactor * sizeFactor * 0.5f;
-
-        map->setSourceTileCacheSize(cacheSize);
-
-        map->renderSync();
-    }
+    map->renderSync();
 }
 
 void NativeMapView::resizeView(int w, int h) {

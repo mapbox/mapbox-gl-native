@@ -34,11 +34,13 @@ def write_header():
 #ifndef MBGL_SHADER_SHADERS
 #define MBGL_SHADER_SHADERS
 
+#include <mbgl/platform/gl.hpp>
+
 namespace mbgl {
 
 struct shader_source {
-    const char *vertex;
-    const char *fragment;
+    const GLchar *vertex;
+    const GLchar *fragment;
 };
 
 enum {

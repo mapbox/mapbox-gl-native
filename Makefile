@@ -130,8 +130,8 @@ clean: clear_sqlite_cache clear_xcode_cache
 	-rm -rf ./ios/build
 	-rm -rf ./test/build
 	-rm -rf ./config/*.gypi
-	-rm -rf ./android/java/build ./android/java/MapboxGLAndroidSDKTestApp/build ./android/java/MapboxGLAndroidSDKTestApp/build
-	-rm -rf ./android/java/MapboxGLAndroidSDK/src/main/jniLibs ./android/java/MapboxGLAndroidSDK/src/main/assets
+	-rm -rf ./android/java/build ./android/java/MapboxGLAndroidSDK/build ./android/java/MapboxGLAndroidSDKTestApp/build
+	-rm -rf ./android/java/MapboxGLAndroidSDK/src/main/jniLibs ./android/java/MapboxGLAndroidSDK/src/main/obj.target ./android/java/MapboxGLAndroidSDK/src/main/assets
 	-rm -f ./android/test/features.zip
 
 distclean: clean
