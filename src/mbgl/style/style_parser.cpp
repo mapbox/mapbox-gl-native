@@ -1,7 +1,6 @@
 #include <mbgl/style/style_parser.hpp>
 #include <mbgl/map/source.hpp>
 #include <mbgl/style/style_layer.hpp>
-#include <mbgl/map/annotation.hpp>
 #include <mbgl/map/map_data.hpp>
 #include <mbgl/util/constants.hpp>
 #include <mbgl/util/vec.hpp>
@@ -40,47 +39,6 @@ void StyleParser::parse(JSVal document) {
 
     if (document.HasMember("layers")) {
         parseLayers(document["layers"]);
-
-        // create shape annotations source
-        const std::string& shapeID = AnnotationManager::ShapeLayerID;
-
-        std::unique_ptr<Source> shapeAnnotationsSource = std::make_unique<Source>();
-        shapeAnnotationsSource->info.type = SourceType::Annotations;
-        shapeAnnotationsSource->info.source_id = shapeID;
-        sourcesMap.emplace(shapeID, shapeAnnotationsSource.get());
-        sources.emplace_back(std::move(shapeAnnotationsSource));
-
-        // create point annotations layer
-        const std::string& pointID = AnnotationManager::PointLayerID;
-
-        std::map<ClassID, ClassProperties> pointPaints;
-        util::ptr<StyleLayer> pointAnnotationsLayer = std::make_shared<StyleLayer>(pointID, std::move(pointPaints));
-        pointAnnotationsLayer->type = StyleLayerType::Symbol;
-        layersMap.emplace(pointID, std::pair<JSVal, util::ptr<StyleLayer>> { JSVal(pointID), pointAnnotationsLayer });
-        layers.emplace_back(pointAnnotationsLayer);
-
-        // create point annotations symbol bucket
-        util::ptr<StyleBucket> pointBucket = std::make_shared<StyleBucket>(pointAnnotationsLayer->type);
-        pointBucket->name = pointAnnotationsLayer->id;
-        pointBucket->source = pointID;
-        pointBucket->source_layer = pointAnnotationsLayer->id;
-
-        // build up point annotations style
-        rapidjson::Document d;
-        rapidjson::Value iconImage(rapidjson::kObjectType);
-        iconImage.AddMember("icon-image", "{sprite}", d.GetAllocator());
-        parseLayout(iconImage, pointBucket);
-        rapidjson::Value iconOverlap(rapidjson::kObjectType);
-        iconOverlap.AddMember("icon-allow-overlap", true, d.GetAllocator());
-        parseLayout(iconOverlap, pointBucket);
-
-        // create point annotations source & connect to bucket & layer
-        std::unique_ptr<Source> pointAnnotationsSource = std::make_unique<Source>();
-        pointAnnotationsSource->info.type = SourceType::Annotations;
-        pointAnnotationsSource->info.source_id = pointID;
-        pointAnnotationsLayer->bucket = pointBucket;
-        sourcesMap.emplace(pointID, pointAnnotationsSource.get());
-        sources.emplace_back(std::move(pointAnnotationsSource));
     }
 
     if (document.HasMember("sprite")) {

@@ -2,7 +2,6 @@
 #include <mbgl/map/map_data.hpp>
 #include <mbgl/map/view.hpp>
 #include <mbgl/map/still_image.hpp>
-#include <mbgl/map/annotation.hpp>
 #include <mbgl/annotation/sprite_store.hpp>
 
 #include <mbgl/platform/log.hpp>
@@ -16,8 +15,6 @@
 #include <mbgl/geometry/sprite_atlas.hpp>
 
 #include <mbgl/style/style.hpp>
-#include <mbgl/style/style_bucket.hpp>
-#include <mbgl/style/style_layer.hpp>
 
 #include <mbgl/util/gl_object_store.hpp>
 #include <mbgl/util/uv_detail.hpp>
@@ -140,117 +137,8 @@ void MapContext::loadStyleJSON(const std::string& json, const std::string& base)
     // force style cascade, causing all pending transitions to complete.
     style->cascade();
 
-    updateFlags |= Update::DefaultTransition | Update::Classes | Update::Zoom;
+    updateFlags |= Update::DefaultTransition | Update::Classes | Update::Zoom | Update::Annotations;
     asyncUpdate->send();
-}
-
-void MapContext::updateAnnotationTilesIfNeeded() {
-    if (data.getAnnotationManager()->getStaleTileCount()) {
-        auto staleTiles = data.getAnnotationManager()->resetStaleTiles();
-        updateAnnotationTiles(staleTiles);
-    }
-}
-
-void MapContext::updateAnnotationTiles(const std::unordered_set<TileID, TileID::Hash>& ids) {
-    assert(util::ThreadContext::currentlyOn(util::ThreadType::Map));
-
-    util::exclusive<AnnotationManager> annotationManager = data.getAnnotationManager();
-    annotationManager->markStaleTiles(ids);
-
-    if (!style) {
-        return;
-    }
-
-    // grab existing, single shape annotations source
-    const auto& shapeID = AnnotationManager::ShapeLayerID;
-    Source* shapeAnnotationSource = style->getSource(shapeID);
-
-    // Style not parsed yet
-    if (!shapeAnnotationSource) {
-        return;
-    }
-
-    shapeAnnotationSource->enabled = true;
-
-    // create (if necessary) layers and buckets for each shape
-    for (const auto &shapeAnnotationID : annotationManager->getOrderedShapeAnnotations()) {
-        const std::string shapeLayerID = shapeID + "." + util::toString(shapeAnnotationID);
-
-        const auto layer_it = std::find_if(style->layers.begin(), style->layers.end(),
-            [&shapeLayerID](util::ptr<StyleLayer> layer) {
-            return (layer->id == shapeLayerID);
-        });
-
-        if (layer_it == style->layers.end()) {
-            // query shape styling
-            auto& shapeStyle = annotationManager->getAnnotationStyleProperties(shapeAnnotationID);
-
-            // apply shape paint properties
-            ClassProperties paintProperties;
-
-            if (shapeStyle.is<LineProperties>()) {
-                // opacity
-                PropertyValue lineOpacity = ConstantFunction<float>(shapeStyle.get<LineProperties>().opacity);
-                paintProperties.set(PropertyKey::LineOpacity, lineOpacity);
-
-                // line width
-                PropertyValue lineWidth = ConstantFunction<float>(shapeStyle.get<LineProperties>().width);
-                paintProperties.set(PropertyKey::LineWidth, lineWidth);
-
-                // stroke color
-                PropertyValue strokeColor = ConstantFunction<Color>(shapeStyle.get<LineProperties>().color);
-                paintProperties.set(PropertyKey::LineColor, strokeColor);
-            } else if (shapeStyle.is<FillProperties>()) {
-                // opacity
-                PropertyValue fillOpacity = ConstantFunction<float>(shapeStyle.get<FillProperties>().opacity);
-                paintProperties.set(PropertyKey::FillOpacity, fillOpacity);
-
-                // fill color
-                PropertyValue fillColor = ConstantFunction<Color>(shapeStyle.get<FillProperties>().fill_color);
-                paintProperties.set(PropertyKey::FillColor, fillColor);
-
-                // stroke color
-                PropertyValue strokeColor = ConstantFunction<Color>(shapeStyle.get<FillProperties>().stroke_color);
-                paintProperties.set(PropertyKey::FillOutlineColor, strokeColor);
-            }
-
-            std::map<ClassID, ClassProperties> shapePaints;
-            shapePaints.emplace(ClassID::Default, std::move(paintProperties));
-
-            // create shape layer
-            util::ptr<StyleLayer> shapeLayer = std::make_shared<StyleLayer>(shapeLayerID, std::move(shapePaints));
-            shapeLayer->type = (shapeStyle.is<LineProperties>() ? StyleLayerType::Line : StyleLayerType::Fill);
-
-            // add to end of other shape layers just before (last) point layer
-            style->layers.emplace((style->layers.end() - 1), shapeLayer);
-
-            // create shape bucket & connect to source
-            util::ptr<StyleBucket> shapeBucket = std::make_shared<StyleBucket>(shapeLayer->type);
-            shapeBucket->name = shapeLayer->id;
-            shapeBucket->source = shapeID;
-            shapeBucket->source_layer = shapeLayer->id;
-
-            // apply line layout properties to bucket
-            if (shapeStyle.is<LineProperties>()) {
-                shapeBucket->layout.set(PropertyKey::LineJoin, ConstantFunction<JoinType>(JoinType::Round));
-            }
-
-            // connect layer to bucket
-            shapeLayer->bucket = shapeBucket;
-        }
-    }
-
-    // invalidate annotations layer tiles
-    for (const auto &source : style->sources) {
-        if (source->info.type == SourceType::Annotations) {
-            source->invalidateTiles(ids);
-        }
-    }
-
-    updateFlags |= Update::Classes;
-    asyncUpdate->send();
-
-    annotationManager->resetStaleTiles();
 }
 
 void MapContext::update() {
@@ -265,6 +153,11 @@ void MapContext::update() {
     }
 
     data.setAnimationTime(Clock::now());
+
+    if (style->sprite && updateFlags & Update::Annotations) {
+        data.getAnnotationManager()->updateStyle(*style);
+        updateFlags |= Update::Classes;
+    }
 
     if (updateFlags & Update::Classes) {
         style->cascade();
@@ -417,10 +310,6 @@ void MapContext::onResourceLoadingFailed(std::exception_ptr error) {
         callback(error, nullptr);
         callback = nullptr;
     }
-}
-
-void MapContext::onSpriteStoreLoaded() {
-    updateAnnotationTilesIfNeeded();
 }
 
 }

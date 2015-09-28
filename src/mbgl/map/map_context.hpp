@@ -54,8 +54,7 @@ public:
     bool isLoaded() const;
 
     double getTopOffsetPixelsForAnnotationSymbol(const std::string& symbol);
-    void updateAnnotationTilesIfNeeded();
-    void updateAnnotationTiles(const std::unordered_set<TileID, TileID::Hash>&);
+    void updateAnnotations();
 
     void setSourceTileCacheSize(size_t size);
     void onLowMemory();
@@ -67,7 +66,6 @@ public:
     // Style::Observer implementation.
     void onTileDataChanged() override;
     void onResourceLoadingFailed(std::exception_ptr error) override;
-    void onSpriteStoreLoaded() override;
 
 private:
     // Update the state indicated by the accumulated Update flags, then render.
