@@ -1,23 +1,18 @@
 buildscript {
     repositories {
-        mavenCentral()
         maven { url 'https://maven.fabric.io/public' }
     }
     dependencies {
-        classpath 'com.android.tools.build:gradle:1.3.0'
-        classpath 'com.jakewharton.sdkmanager:gradle-plugin:0.12.0'
         classpath 'io.fabric.tools:gradle:1.+'
     }
+}
+repositories {
+    maven { url 'https://maven.fabric.io/public' }
 }
 
 apply plugin: 'android-sdk-manager'
 apply plugin: 'com.android.application'
 apply plugin: 'io.fabric'
-
-repositories {
-    maven { url 'https://maven.fabric.io/public' }
-}
-
 apply plugin: 'checkstyle'
 
 task accessToken {
@@ -40,10 +35,6 @@ gradle.projectsEvaluated {
 android {
     compileSdkVersion 23
     buildToolsVersion "23.0.1"
-
-    repositories {
-        mavenCentral()
-    }
 
     defaultConfig {
         applicationId "com.mapbox.mapboxgl.testapp"
