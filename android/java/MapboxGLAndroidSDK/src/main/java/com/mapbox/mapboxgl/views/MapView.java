@@ -56,6 +56,7 @@ import com.mapbox.mapboxgl.geometry.LatLng;
 import com.mapbox.mapboxgl.geometry.LatLngZoom;
 import com.mapbox.mapboxgl.views.widget.CompassDelegate;
 import com.mapbox.mapboxgl.views.widget.CompassView;
+import com.mapbox.mapboxgl.views.widget.LogoView;
 import com.mapzen.android.lost.api.LocationListener;
 import com.mapzen.android.lost.api.LocationRequest;
 import com.mapzen.android.lost.api.LocationServices;
@@ -171,7 +172,7 @@ public class MapView extends FrameLayout implements LocationListener, CompassDel
     private boolean mIsCompassEnabled;
 
     // Used for MapboxLogo
-    private ImageView mLogoView;
+    private LogoView mLogoView;
 
     // Used for attributions control
     private ImageView mAttributionsView;
@@ -389,11 +390,7 @@ public class MapView extends FrameLayout implements LocationListener, CompassDel
         addView(mCompassView);
 
         // Setup Mapbox logo
-        mLogoView = new ImageView(mContext);
-        mLogoView.setImageDrawable(ContextCompat.getDrawable(mContext, R.drawable.ic_logo_mapbox));
-        mLogoView.setContentDescription(getResources().getString(R.string.mapboxIconContentDescription));
-        LayoutParams logoParams = new FrameLayout.LayoutParams(ViewGroup.LayoutParams.WRAP_CONTENT, ViewGroup.LayoutParams.WRAP_CONTENT);
-        mLogoView.setLayoutParams(logoParams);
+        mLogoView = new LogoView(mContext);
         addView(mLogoView);
 
         // Setup Attributions control
