@@ -129,7 +129,7 @@ public class MainActivity extends AppCompatActivity {
                         .title("Dropped Pin")
                         .snippet(new DecimalFormat("#.#####").format(position.getLatitude()) + ", " +
                                  new DecimalFormat("#.#####").format(position.getLongitude()))
-                        .sprite("default_marker"));
+                        .sprite(null));
             }
         });
 
@@ -417,7 +417,7 @@ public class MainActivity extends AppCompatActivity {
     private void addMarkers() {
         List<Marker> markerList = new ArrayList<>();
 
-        final Marker backLot = generateMarker("Back Lot", "The back lot behind my house", "default_marker", 38.649441, -121.369064);
+        final Marker backLot = generateMarker("Back Lot", "The back lot behind my house", null, 38.649441, -121.369064);
         markerList.add(backLot);
 
         final Marker cheeseRoom = generateMarker("Cheese Room", "The only air conditioned room on the property", "dog-park-15", 38.531577, -122.010646);

@@ -55,6 +55,7 @@ const CLLocationDegrees MGLAngularFieldOfView = M_PI / 6.;
 
 NSString *const MGLAnnotationIDKey = @"MGLAnnotationIDKey";
 NSString *const MGLAnnotationSymbolKey = @"MGLAnnotationSymbolKey";
+NSString *const MGLAnnotationSpritePrefix = @"com.mapbox.sprites.";
 
 static NSURL *MGLURLForBundledStyleNamed(NSString *styleName)
 {
@@ -2087,8 +2088,6 @@ CLLocationCoordinate2D MGLLocationCoordinate2DFromLatLng(mbgl::LatLng latLng)
     BOOL delegateImplementsFillColorForPolygon = [self.delegate respondsToSelector:@selector(mapView:fillColorForPolygonAnnotation:)];
     BOOL delegateImplementsLineWidthForPolyline = [self.delegate respondsToSelector:@selector(mapView:lineWidthForPolylineAnnotation:)];
 
-    const std::string spritePrefix = "com.mapbox.sprites.";
-
     for (id <MGLAnnotation> annotation in annotations)
     {
         NSAssert([annotation conformsToProtocol:@protocol(MGLAnnotation)], @"annotation should conform to MGLAnnotation");
@@ -2169,50 +2168,23 @@ CLLocationCoordinate2D MGLLocationCoordinate2DFromLatLng(mbgl::LatLng latLng)
         }
         else
         {
-            MGLAnnotationImage *annotationImage = nil;
-            NSString *symbolName = nil;
-
-            if (delegateImplementsImageForPoint)
+            MGLAnnotationImage *annotationImage = delegateImplementsImageForPoint ? [self.delegate mapView:self imageForAnnotation:annotation] : nil;
+            if ( ! annotationImage)
             {
-                annotationImage = [self.delegate mapView:self imageForAnnotation:annotation];
-
-                if (annotationImage)
-                {
-                    const std::string cSymbolName = spritePrefix + std::string(annotationImage.reuseIdentifier.UTF8String);
-                    symbolName = [NSString stringWithUTF8String:cSymbolName.c_str()];
-
-                    if ( ! [self.annotationImages objectForKey:annotationImage.reuseIdentifier])
-                    {
-                        // store image & symbol name
-                        [self.annotationImages setObject:annotationImage forKey:annotationImage.reuseIdentifier];
-
-                        // retrieve pixels
-                        CGImageRef image = annotationImage.image.CGImage;
-                        size_t width = CGImageGetWidth(image);
-                        size_t height = CGImageGetHeight(image);
-                        CGColorSpaceRef colorSpace = CGColorSpaceCreateDeviceRGB();
-                        std::string pixels(width * height * 4, '\0');
-                        size_t bytesPerPixel = 4;
-                        size_t bytesPerRow = bytesPerPixel * width;
-                        size_t bitsPerComponent = 8;
-                        char *pixelData = const_cast<char *>(pixels.data());
-                        CGContextRef context = CGBitmapContextCreate(pixelData, width, height, bitsPerComponent, bytesPerRow, colorSpace, kCGImageAlphaPremultipliedLast);
-                        CGContextDrawImage(context, CGRectMake(0, 0, width, height), image);
-                        CGContextRelease(context);
-                        CGColorSpaceRelease(colorSpace);
-
-                        // add sprite
-                        auto cSpriteImage = std::make_shared<mbgl::SpriteImage>(
-                            uint16_t(annotationImage.image.size.width),
-                            uint16_t(annotationImage.image.size.height),
-                            float(annotationImage.image.scale),
-                            std::move(pixels));
-
-                        // sprite upload
-                        _mbglMap->setSprite(cSymbolName, cSpriteImage);
-                    }
-                }
+                UIImage *defaultAnnotationImage = [MGLMapView resourceImageNamed:MGLDefaultStyleMarkerSymbolName];
+                annotationImage = [MGLAnnotationImage annotationImageWithImage:defaultAnnotationImage
+                                                               reuseIdentifier:MGLDefaultStyleMarkerSymbolName];
             }
+
+            if ( ! [self.annotationImages objectForKey:annotationImage.reuseIdentifier])
+            {
+                // store image & symbol name
+                [self.annotationImages setObject:annotationImage forKey:annotationImage.reuseIdentifier];
+                
+                [self installAnnotationImage:annotationImage];
+            }
+
+            NSString *symbolName = [MGLAnnotationSpritePrefix stringByAppendingString:annotationImage.reuseIdentifier];
 
             points.emplace_back(MGLLatLngFromLocationCoordinate2D(annotation.coordinate), symbolName ? [symbolName UTF8String] : "");
         }
@@ -2241,6 +2213,35 @@ CLLocationCoordinate2D MGLLocationCoordinate2DFromLatLng(mbgl::LatLng latLng)
                                                forKey:annotations[i]];
         }
     }
+}
+
+- (void)installAnnotationImage:(MGLAnnotationImage *)annotationImage
+{
+    // retrieve pixels
+    CGImageRef image = annotationImage.image.CGImage;
+    size_t width = CGImageGetWidth(image);
+    size_t height = CGImageGetHeight(image);
+    CGColorSpaceRef colorSpace = CGColorSpaceCreateDeviceRGB();
+    std::string pixels(width * height * 4, '\0');
+    size_t bytesPerPixel = 4;
+    size_t bytesPerRow = bytesPerPixel * width;
+    size_t bitsPerComponent = 8;
+    char *pixelData = const_cast<char *>(pixels.data());
+    CGContextRef context = CGBitmapContextCreate(pixelData, width, height, bitsPerComponent, bytesPerRow, colorSpace, kCGImageAlphaPremultipliedLast);
+    CGContextDrawImage(context, CGRectMake(0, 0, width, height), image);
+    CGContextRelease(context);
+    CGColorSpaceRelease(colorSpace);
+    
+    // add sprite
+    auto cSpriteImage = std::make_shared<mbgl::SpriteImage>(
+        uint16_t(annotationImage.image.size.width),
+        uint16_t(annotationImage.image.size.height),
+        float(annotationImage.image.scale),
+        std::move(pixels));
+    
+    // sprite upload
+    NSString *symbolName = [MGLAnnotationSpritePrefix stringByAppendingString:annotationImage.reuseIdentifier];
+    _mbglMap->setSprite(symbolName.UTF8String, cSpriteImage);
 }
 
 - (void)removeAnnotation:(id <MGLAnnotation>)annotation

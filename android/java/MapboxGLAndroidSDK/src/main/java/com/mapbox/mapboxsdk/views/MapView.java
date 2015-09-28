@@ -16,6 +16,7 @@ import android.graphics.Matrix;
 import android.graphics.PointF;
 import android.graphics.RectF;
 import android.graphics.SurfaceTexture;
+import android.graphics.drawable.BitmapDrawable;
 import android.location.Location;
 import android.net.ConnectivityManager;
 import android.net.NetworkInfo;
@@ -142,6 +143,9 @@ public final class MapView extends FrameLayout implements LocationListener, Comp
     // Index into R.arrays.attribution_links
     private static final int ATTRIBUTION_INDEX_IMPROVE_THIS_MAP = 2;
 
+    // Used for loading default marker sprite
+    private static final String DEFAULT_SPRITE = "com.mapbox.sprites.default";
+
     //
     // Instance members
     //
@@ -154,6 +158,7 @@ public final class MapView extends FrameLayout implements LocationListener, Comp
 
     // Used to handle DPI scaling
     private float mScreenDensity = 1.0f;
+    private float mScreenDensityDpi = 1.0f;
 
     // Touch gesture detectors
     private GestureDetectorCompat mGestureDetector;
@@ -482,8 +487,7 @@ public final class MapView extends FrameLayout implements LocationListener, Comp
 
         // Get the screen's density
         mScreenDensity = context.getResources().getDisplayMetrics().density;
-        int tenDp = (int) (10 * mScreenDensity);
-        int sixteenDp = (int) (16 * mScreenDensity);
+        mScreenDensityDpi = context.getResources().getDisplayMetrics().densityDpi;
 
         // Get the cache path
         String cachePath = context.getCacheDir().getAbsolutePath();
@@ -1322,18 +1326,31 @@ public final class MapView extends FrameLayout implements LocationListener, Comp
     // Annotations
     //
 
-    public void setSprite(String symbol, float scale, Bitmap bitmap) {
+    public void setSprite(String symbol, Bitmap bitmap) {
         if (bitmap.getConfig() != Bitmap.Config.ARGB_8888) {
             bitmap = bitmap.copy(Bitmap.Config.ARGB_8888, false);
         }
         ByteBuffer buffer = ByteBuffer.allocate(bitmap.getRowBytes() * bitmap.getHeight());
         bitmap.copyPixelsToBuffer(buffer);
 
+        //float scale = mScreenDensityDpi / bitmap.getDensity() * mScreenDensity;
+        float scale = 1.0f;
+
         mNativeMapView.setSprite(symbol, bitmap.getWidth(), bitmap.getHeight(), scale, buffer.array());
     }
 
     public Marker addMarker(MarkerOptions markerOptions) {
         Marker marker = markerOptions.getMarker();
+
+        // Load the default marker sprite
+        if (marker.getSprite() == null) {
+            BitmapDrawable bitmapDrawable = (BitmapDrawable) ContextCompat.getDrawable(mContext, R.drawable.default_marker);
+            Bitmap bitmap = bitmapDrawable.getBitmap();
+            setSprite(DEFAULT_SPRITE, bitmap);
+
+            marker.setSprite(DEFAULT_SPRITE);
+        }
+
         long id = mNativeMapView.addMarker(marker);
         marker.setId(id);        // the annotation needs to know its id
         marker.setMapView(this); // the annotation needs to know which map view it is in
