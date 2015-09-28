@@ -2,3 +2,8 @@
 task wrapper(type: Wrapper) {
     gradleVersion = '2.5'
 }
+
+task makeClean(type: Exec) {
+    workingDir '../../'
+    commandLine 'make', 'clean'
+}
