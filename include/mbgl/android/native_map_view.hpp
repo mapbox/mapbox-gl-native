@@ -50,7 +50,7 @@ public:
     void enableFps(bool enable);
     void updateFps();
 
-    void onInvalidate();
+    void renderSync();
 
     void resizeView(int width, int height);
     void resizeFramebuffer(int width, int height);
@@ -91,10 +91,8 @@ private:
 
     // Ensure these are initialised last
     std::shared_ptr<mbgl::SQLiteCache> fileCache;
-    mbgl::DefaultFileSource fileSource;
-    mbgl::Map map;
-
-    std::atomic_flag clean = ATOMIC_FLAG_INIT;
+    std::unique_ptr<mbgl::DefaultFileSource> fileSource;
+    std::unique_ptr<mbgl::Map> map;
 };
 }
 }

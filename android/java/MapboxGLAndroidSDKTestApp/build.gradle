@@ -49,8 +49,8 @@ android {
         applicationId "com.mapbox.mapboxgl.testapp"
         minSdkVersion 15
         targetSdkVersion 23
-        versionCode 4
-        versionName "0.1.3"
+        versionCode 5
+        versionName "0.2.0"
 
         // Specify AndroidJUnitRunner as the default test instrumentation runner
         testInstrumentationRunner "android.support.test.runner.AndroidJUnitRunner"
@@ -86,15 +86,8 @@ android {
             enable true
             reset()
             include 'armeabi', 'armeabi-v7a', 'x86', 'mips'
-            universalApk true
         }
     }
-}
-
-crashlytics {
-    enableNdk true
-    androidNdkOut '../MapboxGLAndroidSDK/src/main/obj.target'
-    androidNdkLibsOut '../MapboxGLAndroidSDK/src/main/obj.target'
 }
 
 dependencies {
@@ -105,10 +98,7 @@ dependencies {
     compile 'com.android.support:support-v4:23.0.1'
     compile 'com.android.support:appcompat-v7:23.0.1'
     compile 'com.android.support:design:23.0.1'
-    compile('com.crashlytics.sdk.android:crashlytics:2.5.1@aar') {
-        transitive = true;
-    }
-    compile('com.crashlytics.sdk.android:crashlytics-ndk:1.1.1@aar') {
+    compile('com.crashlytics.sdk.android:crashlytics:2.5.2@aar') {
         transitive = true;
     }
 

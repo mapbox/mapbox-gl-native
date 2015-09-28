@@ -1,8 +1,6 @@
 package com.mapbox.mapboxgl.views.widget;
 
 import android.content.Context;
-import android.graphics.Bitmap;
-import android.graphics.BitmapFactory;
 import android.graphics.drawable.Drawable;
 import android.graphics.drawable.Icon;
 import android.net.Uri;
@@ -13,9 +11,12 @@ import android.view.ViewGroup;
 import android.widget.FrameLayout;
 import android.widget.ImageView;
 
+import com.mapbox.mapboxgl.utils.ImageViewUtil;
 import com.mapbox.mapboxgl.views.R;
 
-public class LogoView extends ImageView {
+public final class LogoView extends ImageView {
+
+    private static final int MAPBOX_LOGO_SIZE = 46800;
 
     public LogoView(Context context) {
         super(context);
@@ -35,48 +36,35 @@ public class LogoView extends ImageView {
     private void initialize() {
         setImageDrawable(ContextCompat.getDrawable(getContext(), R.drawable.ic_logo_mapbox));
         setContentDescription(getResources().getString(R.string.mapboxIconContentDescription));
-        super.setLayoutParams(new FrameLayout.LayoutParams(ViewGroup.LayoutParams.WRAP_CONTENT, ViewGroup.LayoutParams.WRAP_CONTENT));
+        setLayoutParams(new FrameLayout.LayoutParams(ViewGroup.LayoutParams.WRAP_CONTENT, ViewGroup.LayoutParams.WRAP_CONTENT));
     }
 
     @Override
-    public void setVisibility(int visibility) {
+    public  void setVisibility(int visibility) {
         super.setVisibility(View.VISIBLE);
     }
 
     @Override
     public void setImageDrawable(Drawable drawable) {
-        if (LogoValidator.validate(getContext(), R.drawable.ic_logo_mapbox)) {
+        if (ImageViewUtil.validateByteSize(getContext(), R.drawable.ic_logo_mapbox, MAPBOX_LOGO_SIZE)) {
             super.setImageDrawable(drawable);
         } else {
-            throw new RuntimeException("Not possible to change the MapboxLogo");
+            throw new RuntimeException("Not possible to change the Logo of Mapbox");
         }
     }
 
     @Override
     public void setImageIcon(Icon icon) {
-        //ignore
+        //lockdown
     }
 
     @Override
     public void setImageURI(Uri uri) {
-        //ignore
+        //lockdown
     }
 
     @Override
     public void setImageResource(int resId) {
-        //ignore
-    }
-
-    private static class LogoValidator {
-
-        private static final int BYTE_COUNT = 46800;
-
-        public static boolean validate(final Context context, final int resourceId) {
-            BitmapFactory.Options opts = new BitmapFactory.Options();
-            opts.inScaled = false;
-            Bitmap bitmap = BitmapFactory.decodeResource(context.getResources(), resourceId, opts);
-            int byteCount = bitmap.getByteCount();
-            return byteCount == BYTE_COUNT;
-        }
+        //lockdown
     }
 }

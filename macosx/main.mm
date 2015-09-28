@@ -12,13 +12,17 @@
 
 #import <Foundation/Foundation.h>
 
+#pragma clang diagnostic push
 #pragma GCC diagnostic push
-#ifndef __clang__
+#ifdef __clang__
+#pragma clang diagnostic ignored "-Wunused-local-typedefs"
+#else
 #pragma GCC diagnostic ignored "-Wunused-local-typedefs"
 #pragma GCC diagnostic ignored "-Wshadow"
 #endif
 #include <boost/program_options.hpp>
 #pragma GCC diagnostic pop
+#pragma clang diagnostic pop
 
 #include <iostream>
 

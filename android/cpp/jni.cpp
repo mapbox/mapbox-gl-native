@@ -117,6 +117,9 @@ bool throw_jni_error(JNIEnv *env, const char *msg) {
 }
 
 bool attach_jni_thread(JavaVM* vm, JNIEnv** env, std::string threadName) {
+    assert(vm != nullptr);
+    assert(env != nullptr);
+
     JavaVMAttachArgs args = {JNI_VERSION_1_2, threadName.c_str(), NULL};
 
     jint ret;
@@ -142,6 +145,9 @@ bool attach_jni_thread(JavaVM* vm, JNIEnv** env, std::string threadName) {
 
 void detach_jni_thread(JavaVM* vm, JNIEnv** env, bool detach) {
     if (detach) {
+        assert(vm != nullptr);
+        assert(env != nullptr);
+
         jint ret;
         if ((ret = vm->DetachCurrentThread()) != JNI_OK) {
             mbgl::Log::Error(mbgl::Event::JNI, "DetachCurrentThread() failed with %i", ret);
@@ -464,11 +470,11 @@ void JNICALL nativeUpdate(JNIEnv *env, jobject obj, jlong nativeMapViewPtr) {
     nativeMapView->getMap().update(mbgl::Update::Repaint);
 }
 
-void JNICALL nativeOnInvalidate(JNIEnv *env, jobject obj, jlong nativeMapViewPtr) {
-    mbgl::Log::Debug(mbgl::Event::JNI, "nativeOnInvalidate");
+void JNICALL nativeRenderSync(JNIEnv *env, jobject obj, jlong nativeMapViewPtr) {
+    mbgl::Log::Debug(mbgl::Event::JNI, "nativeRenderSync");
     assert(nativeMapViewPtr != 0);
     NativeMapView *nativeMapView = reinterpret_cast<NativeMapView *>(nativeMapViewPtr);
-    nativeMapView->onInvalidate();
+    nativeMapView->renderSync();
 }
 
 void JNICALL nativeViewResize(JNIEnv *env, jobject obj, jlong nativeMapViewPtr, jint width, jint height) {
@@ -1619,7 +1625,7 @@ extern "C" JNIEXPORT jint JNICALL JNI_OnLoad(JavaVM *vm, void *reserved) {
         {"nativePause", "(J)V", reinterpret_cast<void *>(&nativePause)},
         {"nativeResume", "(J)V", reinterpret_cast<void *>(&nativeResume)},
         {"nativeUpdate", "(J)V", reinterpret_cast<void *>(&nativeUpdate)},
-        {"nativeOnInvalidate", "(J)V", reinterpret_cast<void *>(&nativeOnInvalidate)},
+        {"nativeRenderSync", "(J)V", reinterpret_cast<void *>(&nativeRenderSync)},
         {"nativeViewResize", "(JII)V",
          reinterpret_cast<void *>(static_cast<void JNICALL (
              *)(JNIEnv *, jobject, jlong, jint, jint)>(&nativeViewResize))},

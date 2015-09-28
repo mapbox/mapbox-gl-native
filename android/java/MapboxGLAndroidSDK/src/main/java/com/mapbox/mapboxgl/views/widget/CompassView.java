@@ -1,6 +1,7 @@
 package com.mapbox.mapboxgl.views.widget;
 
 import android.content.Context;
+import android.content.res.TypedArray;
 import android.hardware.GeomagneticField;
 import android.hardware.Sensor;
 import android.hardware.SensorEvent;
@@ -9,11 +10,17 @@ import android.hardware.SensorManager;
 import android.location.Location;
 import android.support.v4.content.ContextCompat;
 import android.util.AttributeSet;
+import android.view.Gravity;
+import android.view.View;
 import android.widget.FrameLayout;
 import android.widget.ImageView;
 
 import com.mapbox.mapboxgl.views.MapView;
 import com.mapbox.mapboxgl.views.R;
+
+import org.w3c.dom.Attr;
+
+import java.lang.ref.WeakReference;
 
 public class CompassView extends ImageView implements SensorEventListener {
 
@@ -36,9 +43,10 @@ public class CompassView extends ImageView implements SensorEventListener {
     private GeomagneticField mGeomagneticField;
     private Location mGpsLocation;
 
-    // Compass values
+    // Compass date
     private float mCompassBearing;
-    private boolean mCompassValid = false;
+    private boolean mCompassValid;
+    private boolean mCompassEnabled;
 
     public CompassView(Context context) {
         super(context);
@@ -108,10 +116,7 @@ public class CompassView extends ImageView implements SensorEventListener {
 
         if (mSensorValid && mCompassDelegate != null) {
             SensorManager.getOrientation(mMatrixR, mMatrixValues);
-            //mAzimuthRadians.putValue(mMatrixValues[0]);
-            //mAzimuth = Math.toDegrees(mAzimuthRadians.getAverage());
-
-            mGpsLocation = mCompassDelegate.getMyLocation();
+            mGpsLocation = mCompassDelegate.getLocation();
             if (mGpsLocation != null) {
                 mGeomagneticField = new GeomagneticField(
                         (float) mGpsLocation.getLatitude(),
@@ -122,15 +127,34 @@ public class CompassView extends ImageView implements SensorEventListener {
                 mCompassValid = true;
             }
         }
-
-        if(mCompassDelegate!=null){
-            mCompassDelegate.updateMap(MapView.MapChange.MapChangeNullChange);
-        }
     }
 
     @Override
     public void onAccuracyChanged(Sensor sensor, int accuracy) {
         // TODO: ignore unreliable stuff
+    }
+
+    public interface CompassDelegate {
+
+        Location getLocation();
+
+    }
+
+    public static class CompassClickListener implements View.OnClickListener{
+
+        private WeakReference<MapView> mMapView;
+
+        public CompassClickListener(final MapView mapView) {
+            mMapView = new WeakReference<>(mapView);
+        }
+
+        @Override
+        public void onClick(View v) {
+            final MapView mapView = mMapView.get();
+            if(mapView!=null){
+                mapView.resetNorth();
+            }
+        }
     }
 
 }
