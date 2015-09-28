@@ -5,59 +5,13 @@
 #include <mbgl/util/compression.hpp>
 #include <mbgl/util/io.hpp>
 #include <mbgl/util/thread.hpp>
+#include <mbgl/util/mapbox.hpp>
 #include <mbgl/platform/log.hpp>
 
 #include "sqlite3.hpp"
 #include <sqlite3.h>
 
 namespace mbgl {
-
-std::string removeAccessTokenFromURL(const std::string &url) {
-    const size_t token_start = url.find("access_token=");
-    // Ensure that token exists, isn't at the front and is preceded by either & or ?.
-    if (token_start == std::string::npos || token_start == 0 || !(url[token_start - 1] == '&' || url[token_start - 1] == '?')) {
-        return url;
-    }
-
-    const size_t token_end = url.find_first_of('&', token_start);
-    if (token_end == std::string::npos) {
-        // The token is the last query argument. We slice away the "&access_token=..." part
-        return url.substr(0, token_start - 1);
-    } else {
-        // We slice away the "access_token=...&" part.
-        return url.substr(0, token_start) + url.substr(token_end + 1);
-    }
-}
-
-std::string convertMapboxDomainsToProtocol(const std::string &url) {
-    const size_t protocol_separator = url.find("://");
-    if (protocol_separator == std::string::npos) {
-        return url;
-    }
-
-    const std::string protocol = url.substr(0, protocol_separator);
-    if (!(protocol == "http" || protocol == "https")) {
-        return url;
-    }
-
-    const size_t domain_begin = protocol_separator + 3;
-    const size_t path_separator = url.find("/", domain_begin);
-    if (path_separator == std::string::npos) {
-        return url;
-    }
-
-    const std::string domain = url.substr(domain_begin, path_separator - domain_begin);
-    if (domain.find(".tiles.mapbox.com") != std::string::npos) {
-        return "mapbox://" + url.substr(path_separator + 1);
-    } else {
-        return url;
-    }
-}
-
-std::string unifyMapboxURLs(const std::string &url) {
-    return removeAccessTokenFromURL(convertMapboxDomainsToProtocol(url));
-}
-
 
 using namespace mapbox::sqlite;
 
@@ -154,8 +108,8 @@ void SQLiteCache::Impl::get(const Resource &resource, Callback callback) {
             getStmt->reset();
         }
 
-        const std::string unifiedURL = unifyMapboxURLs(resource.url);
-        getStmt->bind(1, unifiedURL.c_str());
+        const auto canonicalURL = util::mapbox::canonicalURL(resource.url);
+        getStmt->bind(1, canonicalURL.c_str());
         if (getStmt->run()) {
             // There is data.
             auto response = std::make_unique<Response>();
@@ -208,8 +162,8 @@ void SQLiteCache::Impl::put(const Resource& resource, std::shared_ptr<const Resp
             putStmt->reset();
         }
 
-        const std::string unifiedURL = unifyMapboxURLs(resource.url);
-        putStmt->bind(1 /* url */, unifiedURL.c_str());
+        const auto canonicalURL = util::mapbox::canonicalURL(resource.url);
+        putStmt->bind(1 /* url */, canonicalURL.c_str());
         putStmt->bind(2 /* status */, int(response->status));
         putStmt->bind(3 /* kind */, int(resource.kind));
         putStmt->bind(4 /* modified */, response->modified);
@@ -255,9 +209,9 @@ void SQLiteCache::Impl::refresh(const Resource& resource, int64_t expires) {
             refreshStmt->reset();
         }
 
-        const std::string unifiedURL = unifyMapboxURLs(resource.url);
+        const auto canonicalURL = util::mapbox::canonicalURL(resource.url);
         refreshStmt->bind(1, int64_t(expires));
-        refreshStmt->bind(2, unifiedURL.c_str());
+        refreshStmt->bind(2, canonicalURL.c_str());
         refreshStmt->run();
     } catch (mapbox::sqlite::Exception& ex) {
         Log::Error(Event::Database, ex.code, ex.what());
