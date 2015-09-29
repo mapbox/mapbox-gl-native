@@ -37,6 +37,7 @@ import java.io.IOException;
 import java.io.InputStreamReader;
 import java.text.DecimalFormat;
 import java.util.ArrayList;
+import java.util.List;
 
 public class MainActivity extends AppCompatActivity {
 
@@ -404,26 +405,34 @@ public class MainActivity extends AppCompatActivity {
     }
 
     private void addMarkers() {
-        LatLng backLot = new LatLng(38.649441, -121.369064);
-        final Marker marker = mMapView.addMarker(new MarkerOptions()
-            .position(backLot)
-            .title("Back Lot")
-            .snippet("The back lot behind my house"));
-        marker.setInfoWindowOnTouchListener(new View.OnTouchListener() {
+        List<Marker> markerList = new ArrayList<>();
+
+        final Marker backLot = generateMarker("Back Lot", "The back lot behind my house", "default_marker", 38.649441, -121.369064);
+        markerList.add(backLot);
+
+        final Marker cheeseRoom = generateMarker("Cheese Room", "The only air conditioned room on the property", "dog-park-15", 38.531577, -122.010646);
+        markerList.add(cheeseRoom);
+
+        mMapView.addMarkers(markerList);
+
+        // need to call this after adding markers to map, click event hook into InfoWindow needs refactoring
+        backLot.setInfoWindowOnTouchListener(new View.OnTouchListener() {
             @Override
             public boolean onTouch(View view, MotionEvent motionEvent) {
                 Toast.makeText(getApplicationContext(), "Custom Info Touch Listener!!", Toast.LENGTH_SHORT).show();
-                marker.hideInfoWindow();
+                backLot.hideInfoWindow();
                 return true;
             }
         });
+    }
 
-        LatLng cheeseRoom = new LatLng(38.531577,-122.010646);
-        mMapView.addMarker(new MarkerOptions()
-            .position(cheeseRoom)
-            .sprite("dog-park-15")
-            .title("Cheese Room")
-            .snippet("The only air conditioned room on the property!"));
+    private Marker generateMarker(String title, String snippet, String sprite, double lat, double lng){
+        return new MarkerOptions()
+                .position(new LatLng(lat,lng))
+                .title(title)
+                .sprite(sprite)
+                .snippet(snippet)
+                .getMarker();
     }
 
     private void addPolyline() {
