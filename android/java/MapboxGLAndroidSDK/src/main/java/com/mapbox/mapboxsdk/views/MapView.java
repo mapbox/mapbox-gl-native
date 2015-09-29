@@ -192,6 +192,7 @@ public final class MapView extends FrameLayout implements LocationListener, Comp
     private List<Annotation> mAnnotations = new ArrayList<>();
     private List<Annotation> mAnnotationsNearLastTap = new ArrayList<>();
     private Annotation mSelectedAnnotation = null;
+    private InfoWindowAdapter mInfoWindowAdapter;
 
     // Used for the Mapbox Logo
     private ImageView mLogoView;
@@ -393,6 +394,19 @@ public final class MapView extends FrameLayout implements LocationListener, Comp
          * @param change The type of map change event.
          */
         void onMapChanged(MapChange change);
+    }
+
+    /**
+     * Interface definition for a callback to be invoked when an {@link InfoWindow} will be shown.
+     */
+    public interface InfoWindowAdapter {
+        /**
+         * Called when the user clicks on a marker.
+         *
+         * @param marker The marker the user clicked on.
+         * @return View to be shown as a {@link InfoWindow}
+         */
+        View getInfoWindow(Marker marker);
     }
 
     //
@@ -1503,12 +1517,20 @@ public final class MapView extends FrameLayout implements LocationListener, Comp
             deselectAnnotation();
 
             Marker marker = (Marker) annotation;
-            boolean handledClick = false;
+            boolean handledDefaultClick = false;
             if (onMarkerClickListener != null) {
-                handledClick = onMarkerClickListener.onMarkerClick(marker);
+                // end developer has provided a custom click listener
+                handledDefaultClick = onMarkerClickListener.onMarkerClick(marker);
             }
 
-            if (!handledClick) {
+            if(mInfoWindowAdapter!=null){
+                // end developer is using a custom InfoWindowAdapter
+                View content =  mInfoWindowAdapter.getInfoWindow(marker);
+                if(content != null){
+                    marker.showInfoWindow(content);
+                }
+            }else if (!handledDefaultClick) {
+                // default behaviour
                 marker.showInfoWindow();
             }
 
@@ -2331,7 +2353,7 @@ public final class MapView extends FrameLayout implements LocationListener, Comp
     //
 
     /**
-     * Add an OnMapChangedListner
+     * Add an OnMapChangedListener
      *
      * @param listener Listener to add
      */
@@ -2339,6 +2361,15 @@ public final class MapView extends FrameLayout implements LocationListener, Comp
         if (listener != null) {
             mOnMapChangedListener.add(listener);
         }
+    }
+
+    /**
+     * Add an InfoWindowAdapter
+     *
+     * @param infoWindowAdapter to set
+     */
+    public void setInfoWindowAdapter(@NonNull InfoWindowAdapter infoWindowAdapter){
+        mInfoWindowAdapter = infoWindowAdapter;
     }
 
     /**

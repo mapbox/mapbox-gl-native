@@ -1,11 +1,20 @@
 package com.mapbox.mapboxsdk.testapp;
 
+import android.graphics.Color;
 import android.os.Bundle;
+import android.support.v7.app.ActionBar;
 import android.support.v7.app.AppCompatActivity;
 import android.support.v7.widget.Toolbar;
 import android.util.Log;
 import android.view.MenuItem;
+import android.view.View;
+import android.widget.TextView;
+
+import com.mapbox.mapboxsdk.annotations.Marker;
+import com.mapbox.mapboxsdk.annotations.MarkerOptions;
+import com.mapbox.mapboxsdk.geometry.LatLng;
 import com.mapbox.mapboxsdk.views.MapView;
+
 import java.io.BufferedReader;
 import java.io.IOException;
 import java.io.InputStreamReader;
@@ -24,8 +33,12 @@ public class SecondMapActivity extends AppCompatActivity {
 
         Toolbar toolbar = (Toolbar) findViewById(R.id.secondToolBar);
         setSupportActionBar(toolbar);
-        getSupportActionBar().setDisplayHomeAsUpEnabled(true);
-        getSupportActionBar().setDisplayShowHomeEnabled(true);
+
+        ActionBar actionBar = getSupportActionBar();
+        if(actionBar!=null) {
+            actionBar.setDisplayHomeAsUpEnabled(true);
+            actionBar.setDisplayShowHomeEnabled(true);
+        }
 
         mMapView = (MapView) findViewById(R.id.secondMapView);
         // Load the access token
@@ -40,6 +53,36 @@ public class SecondMapActivity extends AppCompatActivity {
         mMapView.onCreate(savedInstanceState);
 
         mMapView.setStyleUrl(MapView.StyleUrls.EMERALD);
+
+        mMapView.setInfoWindowAdapter(new MapView.InfoWindowAdapter() {
+
+            @Override
+            public View getInfoWindow(Marker marker) {
+                TextView textView = new TextView(SecondMapActivity.this);
+                textView.setText(marker.getTitle());
+                textView.setBackgroundColor(Color.WHITE);
+                return textView;
+            }
+        });
+
+        mMapView.addMarker(generateMarker("Andorra", 42.505777, 1.525294));
+        mMapView.addMarker(generateMarker("Luxembourg", 49.815273, 6.129583));
+        mMapView.addMarker(generateMarker("Monaco", 43.738418, 7.424616));
+        mMapView.addMarker(generateMarker("Vatican City", 41.902916, 12.453389));
+        mMapView.addMarker(generateMarker("San Marino", 43.942360, 12.457777));
+        mMapView.addMarker(generateMarker("Malta", 35.892110, 14.427795));
+        mMapView.addMarker(generateMarker("Liechtenstein", 47.166000, 9.555373));
+
+        mMapView.setCenterCoordinate(new LatLng(47.798202, 3.573781));
+        mMapView.setZoomLevel(3);
+    }
+
+    private MarkerOptions generateMarker(String title, double lat, double lng){
+        MarkerOptions marker = new MarkerOptions();
+        marker.title(title);
+        marker.snippet(title);
+        marker.position(new LatLng(lat, lng));
+        return marker;
     }
 
     /**

@@ -157,8 +157,21 @@ public class Marker extends Annotation {
             return;
         }
 
+        getInfoWindow().adaptDefaultMarker(this);
         getInfoWindow().open(this, getPosition(), (int) anchorU, (int) anchorV);
         getInfoWindow().setBoundMarker(this);
+        infoWindowShown = true;
+    }
+
+    public void showInfoWindow(View view){
+
+        if (!isVisible() || mapView == null) {
+            return;
+        }
+
+        infoWindow = new InfoWindow(view, mapView);
+        infoWindow.open(this, getPosition(), (int) anchorU, (int) anchorV);
+        infoWindow.setBoundMarker(this);
         infoWindowShown = true;
     }
 

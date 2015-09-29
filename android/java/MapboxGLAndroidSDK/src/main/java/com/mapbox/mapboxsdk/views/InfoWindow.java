@@ -81,7 +81,6 @@ public final class InfoWindow {
      * @return this infowindow
      */
     public InfoWindow open(Marker object, LatLng position, int offsetX, int offsetY) {
-        onOpen(object);
         MapView.LayoutParams lp = new MapView.LayoutParams(MapView.LayoutParams.WRAP_CONTENT, MapView.LayoutParams.WRAP_CONTENT);
         mView.measure(View.MeasureSpec.UNSPECIFIED, View.MeasureSpec.UNSPECIFIED);
 
@@ -141,7 +140,7 @@ public final class InfoWindow {
      *
      * @param overlayItem the tapped overlay item
      */
-    public void onOpen(Marker overlayItem) {
+    public void adaptDefaultMarker(Marker overlayItem) {
         String title = overlayItem.getTitle();
         ((TextView) mView.findViewById(mTitleId /*R.id.title*/)).setText(title);
         String snippet = overlayItem.getSnippet();
