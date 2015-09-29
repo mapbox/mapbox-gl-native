@@ -7,7 +7,7 @@ namespace mbgl {
 
 class Response {
 public:
-    enum Status : bool { Error, Successful };
+    enum Status { Error, Successful, NotFound };
 
     Status status = Error;
     std::string message;

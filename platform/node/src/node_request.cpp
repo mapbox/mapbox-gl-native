@@ -64,7 +64,9 @@ NAN_METHOD(NodeRequest::Respond) {
     auto resource = std::move(nodeRequest->resource);
 
     if (info.Length() < 1) {
-        return Nan::ThrowTypeError("First argument must be an error object");
+        auto response = std::make_shared<mbgl::Response>();
+        response->status = mbgl::Response::NotFound;
+        source->notify(*resource, response);
     } else if (info[0]->BooleanValue()) {
         auto response = std::make_shared<mbgl::Response>();
 
