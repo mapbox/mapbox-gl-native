@@ -72,41 +72,41 @@ void checkError(const char *cmd, const char *file, int line) {
 #undef glBindBuffer
 #undef glDeleteBuffers
 #undef glBufferData
-static unsigned int current_used_bytes = 0;
-static GLint current_bound_texture = 0;
-static std::map<GLint, unsigned int> binding_to_size_map;
+static unsigned int currentUsedBytes = 0;
+static GLint currentBoundTexture = 0;
+static std::map<GLint, unsigned int> bindingToSizeMap;
 
-static GLuint current_array_buffer = 0;
-static GLuint current_element_array_buffer = 0;
-static std::map<GLint, GLsizeiptr> buffer_binding_to_size_map;
-static unsigned int current_used_buffer_bytes = 0;
-static unsigned int largest_amount_used_so_far = 0;
+static GLuint currentArrayBuffer = 0;
+static GLuint currentElementArrayBuffer = 0;
+static std::map<GLint, GLsizeiptr> bufferBindingToSizeMap;
+static unsigned int currentUsedBufferBytes = 0;
+static unsigned int largestAmountUsedSoFar = 0;
 
-static std::mutex g_debug_mutex;
+static std::mutex gDebugMutex;
 
 void mbx_glBindBuffer(GLenum target,
                       GLuint buffer) {
-    g_debug_mutex.lock();
-    if(target == GL_ARRAY_BUFFER) {
-        current_array_buffer = buffer;
-    } else if(target == GL_ELEMENT_ARRAY_BUFFER) {
-        current_element_array_buffer = buffer;
+    std::unique_lock<std::mutex> lock(gDebugMutex);
+    if (target == GL_ARRAY_BUFFER) {
+        currentArrayBuffer = buffer;
+    } else if (target == GL_ELEMENT_ARRAY_BUFFER) {
+        currentElementArrayBuffer = buffer;
     }
-    g_debug_mutex.unlock();
+    lock.unlock();
     glBindBuffer(target, buffer);
 }
 
 void mbx_glDeleteBuffers(GLsizei n,
                      const GLuint * buffers) {
-    g_debug_mutex.lock();
-    for(int i = 0; i < n; ++i) {
-        if(buffer_binding_to_size_map.find(buffers[i]) != buffer_binding_to_size_map.end()) {
-            current_used_buffer_bytes -= buffer_binding_to_size_map[buffers[i]];
-            std::cout << "GL glDeleteBuffers: " << buffers[i] << " freeing " << buffer_binding_to_size_map[buffers[i]] << " bytes current total " << current_used_buffer_bytes << "\n";
-            buffer_binding_to_size_map.erase(buffers[i]);
+    std::unique_lock<std::mutex> lock(gDebugMutex);
+    for (int i = 0; i < n; ++i) {
+        if (bufferBindingToSizeMap.find(buffers[i]) != bufferBindingToSizeMap.end()) {
+            currentUsedBufferBytes -= bufferBindingToSizeMap[buffers[i]];
+            std::cout << "GL glDeleteBuffers: " << buffers[i] << " freeing " << bufferBindingToSizeMap[buffers[i]] << " bytes current total " << currentUsedBufferBytes << "\n";
+            bufferBindingToSizeMap.erase(buffers[i]);
         }
     }
-    g_debug_mutex.unlock();
+    lock.unlock();
     glDeleteBuffers(n, buffers);
 }
 
@@ -114,25 +114,25 @@ void mbx_glBufferData(GLenum target,
                       GLsizeiptr size,
                       const GLvoid * data,
                       GLenum usage) {
-    g_debug_mutex.lock();
-    GLuint current_binding = 0;
-    if(target == GL_ARRAY_BUFFER) {
-        current_binding = current_array_buffer;
-    } else if(target == GL_ELEMENT_ARRAY_BUFFER) {
-        current_binding = current_element_array_buffer;
+    std::unique_lock<std::mutex> lock(gDebugMutex);
+    GLuint currentBinding = 0;
+    if (target == GL_ARRAY_BUFFER) {
+        currentBinding = currentArrayBuffer;
+    } else if (target == GL_ELEMENT_ARRAY_BUFFER) {
+        currentBinding = currentElementArrayBuffer;
     }
-    if(buffer_binding_to_size_map.find(current_binding) != buffer_binding_to_size_map.end()) {
-        current_used_buffer_bytes -= buffer_binding_to_size_map[current_binding];
-        std::cout << "GL glBufferData: " << current_binding << " freeing " << buffer_binding_to_size_map[current_binding] << " bytes current total " << current_used_buffer_bytes << "\n";
+    if (bufferBindingToSizeMap.find(currentBinding) != bufferBindingToSizeMap.end()) {
+        currentUsedBufferBytes -= bufferBindingToSizeMap[currentBinding];
+        std::cout << "GL glBufferData: " << currentBinding << " freeing " << bufferBindingToSizeMap[currentBinding] << " bytes current total " << currentUsedBufferBytes << "\n";
     }
-    buffer_binding_to_size_map[current_binding] = size;
-    current_used_buffer_bytes += size;
-    if (current_used_buffer_bytes > largest_amount_used_so_far) {
-        largest_amount_used_so_far = current_used_buffer_bytes;
+    bufferBindingToSizeMap[currentBinding] = size;
+    currentUsedBufferBytes += size;
+    if (currentUsedBufferBytes > largestAmountUsedSoFar) {
+        largestAmountUsedSoFar = currentUsedBufferBytes;
     }
-    std::cout << "GL glBufferData: " << current_binding << " using " << buffer_binding_to_size_map[current_binding] << " bytes current total " << current_used_buffer_bytes << " high water mark " << largest_amount_used_so_far << "\n";
-    g_debug_mutex.unlock();
-
+    std::cout << "GL glBufferData: " << currentBinding << " using " << bufferBindingToSizeMap[currentBinding] << " bytes current total " << currentUsedBufferBytes << " high water mark " << largestAmountUsedSoFar << "\n";
+    lock.unlock();
+    
     glBufferData(target, size, data, usage);
 }
 
@@ -152,25 +152,25 @@ void mbx_glClear(GLbitfield mask) {
 
 void mbx_glBindTexture(	GLenum target,
                        GLuint texture) {
-    g_debug_mutex.lock();
+    std::unique_lock<std::mutex> lock(gDebugMutex);
     if (target == GL_TEXTURE_2D) {
-        current_bound_texture = texture;
+        currentBoundTexture = texture;
     }
-    g_debug_mutex.unlock();
+    lock.unlock();
     glBindTexture(target, texture);
 }
 
 void mbx_glDeleteTextures(GLsizei n,
                           const GLuint * textures) {
-    g_debug_mutex.lock();
-    for(int i = 0; i < n; ++i) {
-        if(binding_to_size_map.find(textures[i]) != binding_to_size_map.end()) {
-            std::cout << "GL deleteTexture:" << textures[i] << "freeing " << binding_to_size_map[textures[i]] << " bytes current total " << current_used_bytes << "\n";
-            current_used_bytes -= binding_to_size_map[textures[i]];
-            binding_to_size_map.erase(textures[i]);
+    std::unique_lock<std::mutex> lock(gDebugMutex);
+    for (int i = 0; i < n; ++i) {
+        if (bindingToSizeMap.find(textures[i]) != bindingToSizeMap.end()) {
+            std::cout << "GL deleteTexture:" << textures[i] << "freeing " << bindingToSizeMap[textures[i]] << " bytes current total " << currentUsedBytes << "\n";
+            currentUsedBytes -= bindingToSizeMap[textures[i]];
+            bindingToSizeMap.erase(textures[i]);
         }
     }
-    g_debug_mutex.unlock();
+    lock.unlock();
     glDeleteTextures(n, textures);
 }
 
@@ -183,18 +183,18 @@ void mbx_glTexImage2D(GLenum target,
                       GLenum format,
                       GLenum type,
                       const GLvoid * data) {
-    g_debug_mutex.lock();
+    std::unique_lock<std::mutex> lock(gDebugMutex);
     if (internalformat == GL_RGBA &&
         type == GL_UNSIGNED_BYTE) {
-        if (binding_to_size_map.find(current_bound_texture) != binding_to_size_map.end()) {
-            current_used_bytes -= binding_to_size_map[current_bound_texture];
-            std::cout << "GL glTexImage2D: " << current_bound_texture << " freeing " << binding_to_size_map[current_bound_texture] << " bytes current total " << current_used_bytes << "\n";
+        if (bindingToSizeMap.find(currentBoundTexture) != bindingToSizeMap.end()) {
+            currentUsedBytes -= bindingToSizeMap[currentBoundTexture];
+            std::cout << "GL glTexImage2D: " << currentBoundTexture << " freeing " << bindingToSizeMap[currentBoundTexture] << " bytes current total " << currentUsedBytes << "\n";
         }
-        binding_to_size_map[current_bound_texture] = width * height * 4;
-        current_used_bytes += binding_to_size_map[current_bound_texture];
-        std::cout << "GL glTexImage2D: " << current_bound_texture << " freeing " << binding_to_size_map[current_bound_texture] << " bytes current total " << current_used_bytes << "\n";
+        bindingToSizeMap[currentBoundTexture] = width * height * 4;
+        currentUsedBytes += bindingToSizeMap[currentBoundTexture];
+        std::cout << "GL glTexImage2D: " << currentBoundTexture << " freeing " << bindingToSizeMap[currentBoundTexture] << " bytes current total " << currentUsedBytes << "\n";
     }
-    g_debug_mutex.unlock();
+    lock.unlock();
     glTexImage2D(target, level, internalformat, width, height, border, format, type, data);
 }
 #endif

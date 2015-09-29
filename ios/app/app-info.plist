@@ -2,8 +2,6 @@
 <!DOCTYPE plist PUBLIC "-//Apple//DTD PLIST 1.0//EN" "http://www.apple.com/DTDs/PropertyList-1.0.dtd">
 <plist version="1.0">
 <dict>
-	<key>MGLMapboxAccessToken</key>
-	<string>pk.eyJ1IjoiYWRhbS1tYXBib3giLCJhIjoiMWE1M2QzNmI0YTk4OGRmMDlkYTRkY2UyOTM5Y2E1ZjQifQ.YYiIeO_J_JyPmRvh_zf-gw</string>
 	<key>CFBundleDevelopmentRegion</key>
 	<string>en</string>
 	<key>CFBundleDisplayName</key>
