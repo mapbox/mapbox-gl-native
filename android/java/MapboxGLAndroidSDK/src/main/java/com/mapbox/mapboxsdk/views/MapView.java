@@ -201,6 +201,10 @@ public final class MapView extends FrameLayout implements LocationListener, Comp
     private OnFlingListener onFlingListener;
     private OnScrollListener onScrollListener;
 
+    // Used to manage marker click event listeners
+    private OnMarkerClickListener onMarkerClickListener;
+
+
     //
     // Properties
     //
@@ -354,6 +358,21 @@ public final class MapView extends FrameLayout implements LocationListener, Comp
          * @param fps The average number of frames rendered over the last second.
          */
         void onFpsChanged(double fps);
+    }
+
+    /**
+     * Interface definition for a callback to be invoked when the user clicks on a marker.
+     *
+     * @see MapView#setOnMarkerClickListener(OnMarkerClickListener)
+     */
+    public interface OnMarkerClickListener {
+        /**
+         * Called when the user clicks on a marker.
+         *
+         * @param marker The marker the user clicked on.
+         * @return If true the event was handled and the {@link InfoWindow} will not be shown.
+         */
+        boolean onMarkerClick(Marker marker);
     }
 
     /**
@@ -1454,7 +1473,16 @@ public final class MapView extends FrameLayout implements LocationListener, Comp
             // Need to deselect any currently selected annotation first
             deselectAnnotation();
 
-            ((Marker) annotation).showInfoWindow();
+            Marker marker = (Marker) annotation;
+            boolean handledClick = false;
+            if (onMarkerClickListener != null) {
+                handledClick = onMarkerClickListener.onMarkerClick(marker);
+            }
+
+            if (!handledClick) {
+                marker.showInfoWindow();
+            }
+
             mSelectedAnnotation = annotation;
         }
     }
@@ -2338,6 +2366,10 @@ public final class MapView extends FrameLayout implements LocationListener, Comp
 
     public void setOnFlingListener(OnFlingListener onFlingListener) {
         this.onFlingListener = onFlingListener;
+    }
+
+    public void setOnMarkerClickListener(OnMarkerClickListener onMarkerClickListener){
+        this.onMarkerClickListener = onMarkerClickListener;
     }
 
     //

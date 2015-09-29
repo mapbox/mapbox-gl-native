@@ -10,6 +10,7 @@ import android.os.Bundle;
 import android.support.annotation.NonNull;
 import android.support.design.widget.FloatingActionButton;
 import android.support.design.widget.NavigationView;
+import android.support.design.widget.Snackbar;
 import android.support.v4.app.ActivityCompat;
 import android.support.v4.content.ContextCompat;
 import android.support.v4.view.GravityCompat;
@@ -135,6 +136,15 @@ public class MainActivity extends AppCompatActivity {
         mMapView.setOnTouchListener(new View.OnTouchListener() {
             public boolean onTouch(View v, MotionEvent event) {
                 return gestureDetector.onTouchEvent(event);
+            }
+        });
+
+        mMapView.setOnMarkerClickListener(new MapView.OnMarkerClickListener() {
+            @Override
+            public boolean onMarkerClick(Marker marker) {
+                Snackbar.make(findViewById(android.R.id.content),"Custom Marker Click Listener",Snackbar.LENGTH_SHORT).show();
+                marker.showInfoWindow();
+                return true;
             }
         });
 
