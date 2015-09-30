@@ -703,6 +703,9 @@ void HTTPCURLRequest::handleResult(CURLcode code) {
         } else if (responseCode == 200) {
             response->status = Response::Successful;
             return finish(ResponseStatus::Successful);
+        } else if (responseCode == 404) {
+            response->status = Response::NotFound;
+            return finish(ResponseStatus::Successful);
         } else if (responseCode >= 500 && responseCode < 600) {
             // Server errors may be temporary, so back off exponentially.
             response->status = Response::Error;
