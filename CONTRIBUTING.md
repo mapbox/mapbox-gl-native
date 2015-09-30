@@ -9,3 +9,6 @@ If you want to contribute code:
 1. Ensure that the [existing issues](https://github.com/mapbox/mapbox-gl-native/issues?utf8=✓&q=) don't already cover your question or contribution. 
 
 1. Pull requests gladly accepted. 
+
+1. Prefix your commit messages with the platform(s) your changes affect: `[core]`, `[ios]`, `[android]`, `[node]`, and so on.
+
