@@ -1,3 +1,5 @@
+# master
+
 # 2.0.0
 
 - Integrates Node.js bindings into core mapbox-gl-native project. ([#2179](https://github.com/mapbox/mapbox-gl-native/pull/2179))
