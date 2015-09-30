@@ -53,6 +53,7 @@
         <attr name="logoMarginTop" format="dimension"/>
         <attr name="logoMarginRight" format="dimension"/>
         <attr name="logoMarginBottom" format="dimension"/>
+        <attr name="logoVisibility" format="integer"/>
         <attr name="attributionGravity">
             <flag name="top" value="0x30" />
             <flag name="bottom" value="0x50" />
@@ -73,5 +74,6 @@
         <attr name="attributionMarginTop" format="dimension"/>
         <attr name="attributionMarginRight" format="dimension"/>
         <attr name="attributionMarginBottom" format="dimension"/>
+        <attr name="attributionVisibility" format="integer"/>
     </declare-styleable>
 </resources>
