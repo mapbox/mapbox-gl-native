@@ -391,7 +391,7 @@ StyleParser::Status StyleParser::parseOptionalProperty(const char *property_name
         if (value.HasMember(transition_name)) {
             return setProperty<T>(value[property_name], property_name, key, klass, value[transition_name]);
         } else {
-            JSVal val = JSVal(rapidjson::kObjectType);
+            JSVal val = JSVal { rapidjson::kObjectType };
             return setProperty<T>(value[property_name], property_name, key, klass, val);
         }
     }
