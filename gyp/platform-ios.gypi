@@ -68,6 +68,7 @@
         'cflags_cc': [
           '<@(libuv_cflags)',
           '<@(boost_cflags)',
+          '<@(variant_cflags)',
         ],
         'libraries': [
           '<@(libuv_static_libs)',

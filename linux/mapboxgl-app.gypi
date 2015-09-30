@@ -32,6 +32,7 @@
           '<@(opengl_cflags)',
           '<@(boost_cflags)',
           '<@(glfw_cflags)',
+          '<@(variant_cflags)',
         ],
         'ldflags': [
           '<@(glfw_ldflags)',

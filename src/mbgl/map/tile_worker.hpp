@@ -1,7 +1,8 @@
 #ifndef MBGL_MAP_TILE_WORKER
 #define MBGL_MAP_TILE_WORKER
 
-#include <mbgl/util/variant.hpp>
+#include <mapbox/variant.hpp>
+
 #include <mbgl/map/tile_data.hpp>
 #include <mbgl/geometry/elements_buffer.hpp>
 #include <mbgl/geometry/fill_buffer.hpp>

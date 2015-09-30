@@ -23,6 +23,7 @@
 
       'cflags_cc': [
         '<@(boost_cflags)',
+        '<@(variant_cflags)',
       ],
       'libraries': [
           '<@(openssl_static_libs)',

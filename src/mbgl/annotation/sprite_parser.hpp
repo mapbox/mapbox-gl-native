@@ -1,9 +1,10 @@
 #ifndef MBGL_ANNOTATIONS_SPRITE_PARSER
 #define MBGL_ANNOTATIONS_SPRITE_PARSER
 
+#include <mapbox/variant.hpp>
+
 #include <mbgl/util/noncopyable.hpp>
 #include <mbgl/util/geo.hpp>
-#include <mbgl/util/variant.hpp>
 
 #include <string>
 #include <memory>

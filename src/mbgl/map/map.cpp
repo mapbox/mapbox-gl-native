@@ -1,5 +1,6 @@
 #include <mbgl/map/map.hpp>
 #include <mbgl/map/map_context.hpp>
+#include <mbgl/map/camera.hpp>
 #include <mbgl/map/view.hpp>
 #include <mbgl/map/transform.hpp>
 #include <mbgl/map/transform_state.hpp>

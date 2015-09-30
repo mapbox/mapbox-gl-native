@@ -102,6 +102,7 @@
           '<@(opengl_cflags)',
           '<@(boost_cflags)',
           '<@(sqlite_cflags)',
+          '<@(variant_cflags)',
         ],
         'ldflags': [
           '<@(libuv_ldflags)',
