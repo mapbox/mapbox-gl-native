@@ -62,5 +62,7 @@
 	</array>
 	<key>NSLocationAlwaysUsageDescription</key>
 	<string>The map will ALWAYS display the user&apos;s location.</string>
+	<key>MGLMapboxAccessToken</key>
+	<string>sk.eyJ1IjoibnVyYm90IiwiYSI6ImIzNjJlODU0ZjkzNDc1OGQwZTlmMGExMDJmNmE4ODNhIn0.xwT0nlWnJ_UO_MMZKFEaiA</string>
 </dict>
 </plist>
