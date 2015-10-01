@@ -39,7 +39,7 @@ public class SecondMapActivity extends AppCompatActivity {
 
         mMapView.onCreate(savedInstanceState);
 
-        mMapView.setStyleUrl(getString(R.string.styleURLEmerald));
+        mMapView.setStyleUrl(MapView.StyleUrls.EMERALD);
     }
 
     /**
