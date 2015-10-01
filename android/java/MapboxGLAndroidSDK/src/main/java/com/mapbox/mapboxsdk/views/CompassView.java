@@ -12,8 +12,6 @@ import android.util.AttributeSet;
 import android.view.View;
 import android.widget.FrameLayout;
 import android.widget.ImageView;
-
-import com.mapbox.mapboxgl.views.MapView;
 import com.mapbox.mapboxgl.views.R;
 
 import java.lang.ref.WeakReference;
