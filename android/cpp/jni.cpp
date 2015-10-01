@@ -1324,7 +1324,7 @@ extern "C" JNIEXPORT jint JNICALL JNI_OnLoad(JavaVM *vm, void *reserved) {
         return JNI_ERR;
     }
 
-    latLngClass = env->FindClass("com/mapbox/mapboxgl/geometry/LatLng");
+    latLngClass = env->FindClass("com/mapbox/mapboxsdk/geometry/LatLng");
     if (latLngClass == nullptr) {
         env->ExceptionDescribe();
         return JNI_ERR;
@@ -1348,7 +1348,7 @@ extern "C" JNIEXPORT jint JNICALL JNI_OnLoad(JavaVM *vm, void *reserved) {
         return JNI_ERR;
     }
 
-    latLngZoomClass = env->FindClass("com/mapbox/mapboxgl/geometry/LatLngZoom");
+    latLngZoomClass = env->FindClass("com/mapbox/mapboxsdk/geometry/LatLngZoom");
     if (latLngZoomClass == nullptr) {
         env->ExceptionDescribe();
         return JNI_ERR;
@@ -1378,7 +1378,7 @@ extern "C" JNIEXPORT jint JNICALL JNI_OnLoad(JavaVM *vm, void *reserved) {
         return JNI_ERR;
     }
 
-    bboxClass = env->FindClass("com/mapbox/mapboxgl/geometry/BoundingBox");
+    bboxClass = env->FindClass("com/mapbox/mapboxsdk/geometry/BoundingBox");
     if (bboxClass == nullptr) {
         env->ExceptionDescribe();
         return JNI_ERR;
@@ -1414,7 +1414,7 @@ extern "C" JNIEXPORT jint JNICALL JNI_OnLoad(JavaVM *vm, void *reserved) {
         return JNI_ERR;
     }
 
-    markerClass = env->FindClass("com/mapbox/mapboxgl/annotations/Marker");
+    markerClass = env->FindClass("com/mapbox/mapboxsdk/annotations/Marker");
     if (markerClass == nullptr) {
         env->ExceptionDescribe();
         return JNI_ERR;
@@ -1426,7 +1426,7 @@ extern "C" JNIEXPORT jint JNICALL JNI_OnLoad(JavaVM *vm, void *reserved) {
         return JNI_ERR;
     }
 
-    markerPositionId = env->GetFieldID(markerClass, "position", "Lcom/mapbox/mapboxgl/geometry/LatLng;");
+    markerPositionId = env->GetFieldID(markerClass, "position", "Lcom/mapbox/mapboxsdk/geometry/LatLng;");
     if (markerPositionId == nullptr) {
         env->ExceptionDescribe();
         return JNI_ERR;
@@ -1438,7 +1438,7 @@ extern "C" JNIEXPORT jint JNICALL JNI_OnLoad(JavaVM *vm, void *reserved) {
         return JNI_ERR;
     }
 
-    polylineClass = env->FindClass("com/mapbox/mapboxgl/annotations/Polyline");
+    polylineClass = env->FindClass("com/mapbox/mapboxsdk/annotations/Polyline");
     if (polylineClass == nullptr) {
         env->ExceptionDescribe();
         return JNI_ERR;
@@ -1480,7 +1480,7 @@ extern "C" JNIEXPORT jint JNICALL JNI_OnLoad(JavaVM *vm, void *reserved) {
         return JNI_ERR;
     }
 
-    polygonClass = env->FindClass("com/mapbox/mapboxgl/annotations/Polygon");
+    polygonClass = env->FindClass("com/mapbox/mapboxsdk/annotations/Polygon");
     if (polygonClass == nullptr) {
         env->ExceptionDescribe();
         return JNI_ERR;
@@ -1534,7 +1534,7 @@ extern "C" JNIEXPORT jint JNICALL JNI_OnLoad(JavaVM *vm, void *reserved) {
         return JNI_ERR;
     }
 
-    jclass nativeMapViewClass = env->FindClass("com/mapbox/mapboxgl/views/NativeMapView");
+    jclass nativeMapViewClass = env->FindClass("com/mapbox/mapboxsdk/views/NativeMapView");
     if (nativeMapViewClass == nullptr) {
         env->ExceptionDescribe();
         return JNI_ERR;
@@ -1600,7 +1600,7 @@ extern "C" JNIEXPORT jint JNICALL JNI_OnLoad(JavaVM *vm, void *reserved) {
         return JNI_ERR;
     }
 
-    projectedMetersClass = env->FindClass("com/mapbox/mapboxgl/geometry/ProjectedMeters");
+    projectedMetersClass = env->FindClass("com/mapbox/mapboxsdk/geometry/ProjectedMeters");
     if (projectedMetersClass == nullptr) {
         env->ExceptionDescribe();
         return JNI_ERR;
@@ -1648,22 +1648,22 @@ extern "C" JNIEXPORT jint JNICALL JNI_OnLoad(JavaVM *vm, void *reserved) {
         return JNI_ERR;
     }
 
-    httpContextClass = env->FindClass("com/mapbox/mapboxgl/http/HTTPContext");
+    httpContextClass = env->FindClass("com/mapbox/mapboxsdk/http/HTTPContext");
     if (httpContextClass == nullptr) {
         env->ExceptionDescribe();
     }
 
-    httpContextGetInstanceId = env->GetStaticMethodID(httpContextClass, "getInstance", "()Lcom/mapbox/mapboxgl/http/HTTPContext;");
+    httpContextGetInstanceId = env->GetStaticMethodID(httpContextClass, "getInstance", "()Lcom/mapbox/mapboxsdk/http/HTTPContext;");
     if (httpContextGetInstanceId == nullptr) {
         env->ExceptionDescribe();
     }
 
-    httpContextCreateRequestId = env->GetMethodID(httpContextClass, "createRequest", "(JLjava/lang/String;Ljava/lang/String;Ljava/lang/String;Ljava/lang/String;)Lcom/mapbox/mapboxgl/http/HTTPContext$HTTPRequest;");
+    httpContextCreateRequestId = env->GetMethodID(httpContextClass, "createRequest", "(JLjava/lang/String;Ljava/lang/String;Ljava/lang/String;Ljava/lang/String;)Lcom/mapbox/mapboxsdk/http/HTTPContext$HTTPRequest;");
     if (httpContextCreateRequestId == nullptr) {
         env->ExceptionDescribe();
     }
 
-    httpRequestClass = env->FindClass("com/mapbox/mapboxgl/http/HTTPContext$HTTPRequest");
+    httpRequestClass = env->FindClass("com/mapbox/mapboxsdk/http/HTTPContext$HTTPRequest");
     if (httpRequestClass == nullptr) {
         env->ExceptionDescribe();
     }
@@ -1726,9 +1726,9 @@ extern "C" JNIEXPORT jint JNICALL JNI_OnLoad(JavaVM *vm, void *reserved) {
         {"nativeCancelTransitions", "(J)V", reinterpret_cast<void *>(&nativeCancelTransitions)},
         {"nativeSetGestureInProgress", "(JZ)V", reinterpret_cast<void *>(&nativeSetGestureInProgress)},
         {"nativeMoveBy", "(JDDJ)V", reinterpret_cast<void *>(&nativeMoveBy)},
-        {"nativeSetLatLng", "(JLcom/mapbox/mapboxgl/geometry/LatLng;J)V",
+        {"nativeSetLatLng", "(JLcom/mapbox/mapboxsdk/geometry/LatLng;J)V",
          reinterpret_cast<void *>(&nativeSetLatLng)},
-        {"nativeGetLatLng", "(J)Lcom/mapbox/mapboxgl/geometry/LatLng;",
+        {"nativeGetLatLng", "(J)Lcom/mapbox/mapboxsdk/geometry/LatLng;",
          reinterpret_cast<void *>(&nativeGetLatLng)},
         {"nativeResetPosition", "(J)V", reinterpret_cast<void *>(&nativeResetPosition)},
         {"nativeScaleBy", "(JDDDJ)V", reinterpret_cast<void *>(&nativeScaleBy)},
@@ -1736,9 +1736,9 @@ extern "C" JNIEXPORT jint JNICALL JNI_OnLoad(JavaVM *vm, void *reserved) {
         {"nativeGetScale", "(J)D", reinterpret_cast<void *>(&nativeGetScale)},
         {"nativeSetZoom", "(JDJ)V", reinterpret_cast<void *>(&nativeSetZoom)},
         {"nativeGetZoom", "(J)D", reinterpret_cast<void *>(&nativeGetZoom)},
-        {"nativeSetLatLngZoom", "(JLcom/mapbox/mapboxgl/geometry/LatLngZoom;J)V",
+        {"nativeSetLatLngZoom", "(JLcom/mapbox/mapboxsdk/geometry/LatLngZoom;J)V",
          reinterpret_cast<void *>(&nativeSetLatLngZoom)},
-        {"nativeGetLatLngZoom", "(J)Lcom/mapbox/mapboxgl/geometry/LatLngZoom;",
+        {"nativeGetLatLngZoom", "(J)Lcom/mapbox/mapboxsdk/geometry/LatLngZoom;",
          reinterpret_cast<void *>(&nativeGetLatLngZoom)},
         {"nativeResetZoom", "(J)V", reinterpret_cast<void *>(&nativeResetZoom)},
         {"nativeGetMinZoom", "(J)D", reinterpret_cast<void *>(&nativeGetMinZoom)},
@@ -1754,19 +1754,19 @@ extern "C" JNIEXPORT jint JNICALL JNI_OnLoad(JavaVM *vm, void *reserved) {
                  &nativeSetBearing))},
         {"nativeGetBearing", "(J)D", reinterpret_cast<void *>(&nativeGetBearing)},
         {"nativeResetNorth", "(J)V", reinterpret_cast<void *>(&nativeResetNorth)},
-        {"nativeAddMarker", "(JLcom/mapbox/mapboxgl/annotations/Marker;)J",
+        {"nativeAddMarker", "(JLcom/mapbox/mapboxsdk/annotations/Marker;)J",
          reinterpret_cast<void *>(&nativeAddMarker)},
          {"nativeAddMarkers", "(JLjava/util/List;)[J",
          reinterpret_cast<void *>(&nativeAddMarkers)},
-        {"nativeAddPolyline", "(JLcom/mapbox/mapboxgl/annotations/Polyline;)J",
+        {"nativeAddPolyline", "(JLcom/mapbox/mapboxsdk/annotations/Polyline;)J",
          reinterpret_cast<void *>(&nativeAddPolyline)},
-        {"nativeAddPolygon", "(JLcom/mapbox/mapboxgl/annotations/Polygon;)J",
+        {"nativeAddPolygon", "(JLcom/mapbox/mapboxsdk/annotations/Polygon;)J",
          reinterpret_cast<void *>(&nativeAddPolygon)},
         {"nativeAddPolygons", "(JLjava/util/List;)[J",
          reinterpret_cast<void *>(&nativeAddPolygons)},
         {"nativeRemoveAnnotation", "(JJ)V", reinterpret_cast<void *>(&nativeRemoveAnnotation)},
         {"nativeRemoveAnnotations", "(J[J)V", reinterpret_cast<void *>(&nativeRemoveAnnotations)},
-        {"nativeGetAnnotationsInBounds", "(JLcom/mapbox/mapboxgl/geometry/BoundingBox;)[J",
+        {"nativeGetAnnotationsInBounds", "(JLcom/mapbox/mapboxsdk/geometry/BoundingBox;)[J",
          reinterpret_cast<void *>(&nativeGetAnnotationsInBounds)},
         {"nativeSetSprite", "(JLjava/lang/String;IIF[B)V", reinterpret_cast<void *>(&nativeSetSprite)},
         {"nativeOnLowMemory", "(J)V", reinterpret_cast<void *>(&nativeOnLowMemory)},
@@ -1782,14 +1782,14 @@ extern "C" JNIEXPORT jint JNICALL JNI_OnLoad(JavaVM *vm, void *reserved) {
         //{"nativeGetWorldBoundsLatLng", "(J)V", reinterpret_cast<void *>(&nativeGetWorldBoundsLatLng)},
         {"nativeGetMetersPerPixelAtLatitude", "(JDD)D", reinterpret_cast<void *>(&nativeGetMetersPerPixelAtLatitude)},
         {"nativeProjectedMetersForLatLng",
-         "(JLcom/mapbox/mapboxgl/geometry/LatLng;)Lcom/mapbox/mapboxgl/geometry/ProjectedMeters;",
+         "(JLcom/mapbox/mapboxsdk/geometry/LatLng;)Lcom/mapbox/mapboxsdk/geometry/ProjectedMeters;",
          reinterpret_cast<void *>(&nativeProjectedMetersForLatLng)},
         {"nativeLatLngForProjectedMeters",
-         "(JLcom/mapbox/mapboxgl/geometry/ProjectedMeters;)Lcom/mapbox/mapboxgl/geometry/LatLng;",
+         "(JLcom/mapbox/mapboxsdk/geometry/ProjectedMeters;)Lcom/mapbox/mapboxsdk/geometry/LatLng;",
          reinterpret_cast<void *>(&nativeLatLngForProjectedMeters)},
-        {"nativePixelForLatLng", "(JLcom/mapbox/mapboxgl/geometry/LatLng;)Landroid/graphics/PointF;",
+        {"nativePixelForLatLng", "(JLcom/mapbox/mapboxsdk/geometry/LatLng;)Landroid/graphics/PointF;",
          reinterpret_cast<void *>(&nativePixelForLatLng)},
-        {"nativeLatLngForPixel", "(JLandroid/graphics/PointF;)Lcom/mapbox/mapboxgl/geometry/LatLng;",
+        {"nativeLatLngForPixel", "(JLandroid/graphics/PointF;)Lcom/mapbox/mapboxsdk/geometry/LatLng;",
          reinterpret_cast<void *>(&nativeLatLngForPixel)},
         {"nativeGetTopOffsetPixelsForAnnotationSymbol", "(JLjava/lang/String;)D",
          reinterpret_cast<void *>(&nativeGetTopOffsetPixelsForAnnotationSymbol)},
