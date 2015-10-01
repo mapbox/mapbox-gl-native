@@ -12,7 +12,7 @@
         android:minHeight="?attr/actionBarSize"
         android:theme="@style/ThemeOverlay.AppCompat.Dark.ActionBar"/>
 
-    <com.mapbox.mapboxgl.views.MapView
+    <com.mapbox.mapboxsdk.views.MapView
         android:id="@+id/secondMapView"
         android:layout_width="match_parent"
         android:layout_height="match_parent"

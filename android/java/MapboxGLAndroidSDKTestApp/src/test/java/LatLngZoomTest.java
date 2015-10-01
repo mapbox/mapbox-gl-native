@@ -1,4 +1,4 @@
-import com.mapbox.mapboxgl.geometry.LatLngZoom;
+import com.mapbox.mapboxsdk.geometry.LatLngZoom;
 
 import org.junit.Test;
 

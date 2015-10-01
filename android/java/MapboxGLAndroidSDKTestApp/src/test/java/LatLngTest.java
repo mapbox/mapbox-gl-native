@@ -1,6 +1,6 @@
 import android.location.Location;
 
-import com.mapbox.mapboxgl.geometry.LatLng;
+import com.mapbox.mapboxsdk.geometry.LatLng;
 
 import org.junit.Test;
 

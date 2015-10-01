@@ -1,4 +1,4 @@
-import com.mapbox.mapboxgl.geometry.CoordinateSpan;
+import com.mapbox.mapboxsdk.geometry.CoordinateSpan;
 
 import org.junit.Test;
 
