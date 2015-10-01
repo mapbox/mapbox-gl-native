@@ -87,6 +87,9 @@ public:
     virtual std::unique_ptr<AsyncRequest> monitorTile(const Callback&) = 0;
 };
 
+// classifies an array of rings into polygons with outer rings and holes
+std::vector<GeometryCollection> classifyRings(const GeometryCollection&);
+
 } // namespace mbgl
 
 #endif
