@@ -14,12 +14,8 @@
 
 using namespace mbgl;
 
-LineBucket::LineBucket(LineVertexBuffer& vertexBuffer_,
-                       TriangleElementsBuffer& triangleElementsBuffer_)
-    : vertexBuffer(vertexBuffer_),
-      triangleElementsBuffer(triangleElementsBuffer_),
-      vertex_start(vertexBuffer_.index()),
-      triangle_elements_start(triangleElementsBuffer_.index()){};
+LineBucket::LineBucket() {
+}
 
 LineBucket::~LineBucket() {
     // Do not remove. header file only contains forward definitions to unique pointers.
@@ -403,8 +399,8 @@ bool LineBucket::hasData() const {
 }
 
 void LineBucket::drawLines(LineShader& shader) {
-    GLbyte* vertex_index = BUFFER_OFFSET(vertex_start * vertexBuffer.itemSize);
-    GLbyte* elements_index = BUFFER_OFFSET(triangle_elements_start * triangleElementsBuffer.itemSize);
+    GLbyte* vertex_index = BUFFER_OFFSET(0);
+    GLbyte* elements_index = BUFFER_OFFSET(0);
     for (auto& group : triangleGroups) {
         assert(group);
         if (!group->elements_length) {
@@ -419,8 +415,8 @@ void LineBucket::drawLines(LineShader& shader) {
 }
 
 void LineBucket::drawLineSDF(LineSDFShader& shader) {
-    GLbyte* vertex_index = BUFFER_OFFSET(vertex_start * vertexBuffer.itemSize);
-    GLbyte* elements_index = BUFFER_OFFSET(triangle_elements_start * triangleElementsBuffer.itemSize);
+    GLbyte* vertex_index = BUFFER_OFFSET(0);
+    GLbyte* elements_index = BUFFER_OFFSET(0);
     for (auto& group : triangleGroups) {
         assert(group);
         if (!group->elements_length) {
@@ -435,8 +431,8 @@ void LineBucket::drawLineSDF(LineSDFShader& shader) {
 }
 
 void LineBucket::drawLinePatterns(LinepatternShader& shader) {
-    GLbyte* vertex_index = BUFFER_OFFSET(vertex_start * vertexBuffer.itemSize);
-    GLbyte* elements_index = BUFFER_OFFSET(triangle_elements_start * triangleElementsBuffer.itemSize);
+    GLbyte* vertex_index = BUFFER_OFFSET(0);
+    GLbyte* elements_index = BUFFER_OFFSET(0);
     for (auto& group : triangleGroups) {
         assert(group);
         if (!group->elements_length) {

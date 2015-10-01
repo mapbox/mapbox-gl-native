@@ -28,9 +28,7 @@ void FillBucket::free(void *, void *ptr) {
     ::free(ptr);
 }
 
-FillBucket::FillBucket(FillVertexBuffer &vertexBuffer_,
-                       TriangleElementsBuffer &triangleElementsBuffer_,
-                       LineElementsBuffer &lineElementsBuffer_)
+FillBucket::FillBucket()
     : allocator(new TESSalloc{
           &alloc,
           &realloc,
@@ -43,13 +41,7 @@ FillBucket::FillBucket(FillVertexBuffer &vertexBuffer_,
           8,       // regionBucketSize
           128,     // extraVertices allocated for the priority queue.
       }),
-      tesselator(tessNewTess(allocator)),
-      vertexBuffer(vertexBuffer_),
-      triangleElementsBuffer(triangleElementsBuffer_),
-      lineElementsBuffer(lineElementsBuffer_),
-      vertex_start(vertexBuffer_.index()),
-      triangle_elements_start(triangleElementsBuffer_.index()),
-      line_elements_start(lineElementsBuffer.index()) {
+      tesselator(tessNewTess(allocator)) {
     assert(tesselator);
 }
 
@@ -216,8 +208,8 @@ bool FillBucket::hasData() const {
 }
 
 void FillBucket::drawElements(PlainShader& shader) {
-    GLbyte *vertex_index = BUFFER_OFFSET(vertex_start * vertexBuffer.itemSize);
-    GLbyte *elements_index = BUFFER_OFFSET(triangle_elements_start * triangleElementsBuffer.itemSize);
+    GLbyte* vertex_index = BUFFER_OFFSET(0);
+    GLbyte* elements_index = BUFFER_OFFSET(0);
     for (auto& group : triangleGroups) {
         assert(group);
         group->array[0].bind(shader, vertexBuffer, triangleElementsBuffer, vertex_index);
@@ -228,8 +220,8 @@ void FillBucket::drawElements(PlainShader& shader) {
 }
 
 void FillBucket::drawElements(PatternShader& shader) {
-    GLbyte *vertex_index = BUFFER_OFFSET(vertex_start * vertexBuffer.itemSize);
-    GLbyte *elements_index = BUFFER_OFFSET(triangle_elements_start * triangleElementsBuffer.itemSize);
+    GLbyte* vertex_index = BUFFER_OFFSET(0);
+    GLbyte* elements_index = BUFFER_OFFSET(0);
     for (auto& group : triangleGroups) {
         assert(group);
         group->array[1].bind(shader, vertexBuffer, triangleElementsBuffer, vertex_index);
@@ -240,8 +232,8 @@ void FillBucket::drawElements(PatternShader& shader) {
 }
 
 void FillBucket::drawVertices(OutlineShader& shader) {
-    GLbyte *vertex_index = BUFFER_OFFSET(vertex_start * vertexBuffer.itemSize);
-    GLbyte *elements_index = BUFFER_OFFSET(line_elements_start * lineElementsBuffer.itemSize);
+    GLbyte* vertex_index = BUFFER_OFFSET(0);
+    GLbyte* elements_index = BUFFER_OFFSET(0);
     for (auto& group : lineGroups) {
         assert(group);
         group->array[0].bind(shader, vertexBuffer, lineElementsBuffer, vertex_index);

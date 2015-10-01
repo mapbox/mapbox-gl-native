@@ -25,7 +25,7 @@ class LineBucket : public Bucket {
     using TriangleGroup = ElementGroup<3>;
 
 public:
-    LineBucket(LineVertexBuffer &vertexBuffer, TriangleElementsBuffer &triangleElementsBuffer);
+    LineBucket();
     ~LineBucket() override;
 
     void upload() override;
@@ -55,11 +55,8 @@ public:
     StyleLayoutLine layout;
 
 private:
-    LineVertexBuffer& vertexBuffer;
-    TriangleElementsBuffer& triangleElementsBuffer;
-
-    const GLsizei vertex_start;
-    const GLsizei triangle_elements_start;
+    LineVertexBuffer vertexBuffer;
+    TriangleElementsBuffer triangleElementsBuffer;
 
     GLint e1;
     GLint e2;

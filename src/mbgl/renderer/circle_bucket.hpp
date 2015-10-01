@@ -20,7 +20,7 @@ class CircleBucket : public Bucket {
     using TriangleGroup = ElementGroup<3>;
 
 public:
-    CircleBucket(CircleVertexBuffer &vertexBuffer, TriangleElementsBuffer &elementsBuffer);
+    CircleBucket();
     ~CircleBucket() override;
 
     void upload() override;
@@ -32,11 +32,8 @@ public:
     void drawCircles(CircleShader& shader);
 
 private:
-    CircleVertexBuffer& vertexBuffer_;
-    TriangleElementsBuffer& elementsBuffer_;
-
-    const GLsizei vertexStart_;
-    const GLsizei elementsStart_;
+    CircleVertexBuffer vertexBuffer_;
+    TriangleElementsBuffer elementsBuffer_;
 
     std::vector<std::unique_ptr<TriangleGroup>> triangleGroups_;
 };

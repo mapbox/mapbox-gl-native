@@ -5,12 +5,7 @@
 
 using namespace mbgl;
 
-CircleBucket::CircleBucket(CircleVertexBuffer& vertexBuffer,
-                           TriangleElementsBuffer& elementsBuffer)
-    : vertexBuffer_(vertexBuffer)
-    , elementsBuffer_(elementsBuffer)
-    , vertexStart_(vertexBuffer_.index())
-    , elementsStart_(elementsBuffer_.index()) {
+CircleBucket::CircleBucket() {
 }
 
 CircleBucket::~CircleBucket() {
@@ -78,8 +73,8 @@ void CircleBucket::addGeometry(const GeometryCollection& geometryCollection) {
 }
 
 void CircleBucket::drawCircles(CircleShader& shader) {
-    GLbyte *vertexIndex = BUFFER_OFFSET(vertexStart_ * vertexBuffer_.itemSize);
-    GLbyte *elementsIndex = BUFFER_OFFSET(elementsStart_ * elementsBuffer_.itemSize);
+    GLbyte* vertexIndex = BUFFER_OFFSET(0);
+    GLbyte* elementsIndex = BUFFER_OFFSET(0);
 
     for (auto& group : triangleGroups_) {
         assert(group);
