@@ -1,7 +1,5 @@
 #include <mbgl/renderer/fill_bucket.hpp>
-#include <mbgl/geometry/fill_buffer.hpp>
 #include <mbgl/layer/fill_layer.hpp>
-#include <mbgl/geometry/elements_buffer.hpp>
 #include <mbgl/renderer/painter.hpp>
 #include <mbgl/shader/plain_shader.hpp>
 #include <mbgl/shader/pattern_shader.hpp>
@@ -9,181 +7,158 @@
 #include <mbgl/platform/gl.hpp>
 #include <mbgl/platform/log.hpp>
 
+#include <mapbox/earcut.hpp>
+
 #include <cassert>
 
-struct geometry_too_long_exception : std::exception {};
+struct GeometryTooLongException : std::exception {};
 
 using namespace mbgl;
 
-void *FillBucket::alloc(void *, unsigned int size) {
-    return ::malloc(size);
+namespace mapbox {
+namespace util {
+template <> struct nth<0, Coordinate> {
+    inline static int64_t get(const Coordinate& t) { return t.x; };
+};
+
+template <> struct nth<1, Coordinate> {
+    inline static int64_t get(const Coordinate& t) { return t.y; };
+};
+}
 }
 
-void *FillBucket::realloc(void *, void *ptr, unsigned int size) {
-    return ::realloc(ptr, size);
+using Ring = std::vector<Coordinate>;
+
+bool ringContains(const Ring& points, const Coordinate& p) {
+    std::size_t len = points.size();
+    bool inside = false;
+
+    for (std::size_t i = 0, j = len - 1; i < len; j = i++) {
+        const Coordinate& p1 = points[i];
+        const Coordinate& p2 = points[j];
+        if (((p1.y > p.y) != (p2.y > p.y)) &&
+                (p.x < (p2.x - p1.x) * (p.y - p1.y) / (p2.y - p1.y) + p1.x)) inside = !inside;
+    }
+
+    return inside;
 }
 
-void FillBucket::free(void *, void *ptr) {
-    ::free(ptr);
+bool ringPartiallyContains(const Ring& outer, const Ring& inner) {
+    std::size_t num = 0;
+    std::size_t counted = 0;
+
+    for (const auto& p : inner) {
+        if (p.x == -128 || p.y == -128 || p.x == 4224 || p.y == 4224) continue;
+        counted++;
+        if (ringContains(outer, p)) num++;
+        if (counted >= 10) break;
+    }
+
+    return counted != 0 && num / counted >= 0.8;
 }
 
-FillBucket::FillBucket()
-    : allocator(new TESSalloc{
-          &alloc,
-          &realloc,
-          &free,
-          nullptr, // userData
-          64,      // meshEdgeBucketSize
-          64,      // meshVertexBucketSize
-          32,      // meshFaceBucketSize
-          64,      // dictNodeBucketSize
-          8,       // regionBucketSize
-          128,     // extraVertices allocated for the priority queue.
-      }),
-      tesselator(tessNewTess(allocator)) {
-    assert(tesselator);
+// classifies an array of rings into polygons with outer rings and holes
+std::vector<std::vector<Ring>> classifyRings(const std::vector<Ring>& rings) {
+    std::vector<std::vector<Ring>> result;
+    std::vector<bool> placed(rings.size(), false);
+
+    for (std::size_t i = 0; i < rings.size(); i++) {
+        if (placed[i])
+            continue;
+
+        std::vector<Ring>* current = nullptr;
+
+        for (std::size_t j = 0; j < rings.size(); j++) {
+            if (i == j || placed[j])
+                continue;
+
+            if (ringPartiallyContains(rings[i], rings[j])) {
+                // mark i as outer ring; add j as inner ring
+                placed[i] = true;
+                placed[j] = true;
+
+                if (!current) {
+                    result.emplace_back();
+                    current = &result.back();
+                    current->push_back(rings[i]);
+                }
+
+                current->push_back(rings[j]);
+            }
+        }
+    }
+
+    for (std::size_t i = 0; i < rings.size(); i++) {
+        if (!placed[i]) {
+            result.emplace_back(std::vector<Ring>({ rings[i] }));
+        }
+    }
+
+    return result;
+}
+
+FillBucket::FillBucket() {
 }
 
 FillBucket::~FillBucket() {
-    if (tesselator) {
-        tessDeleteTess(tesselator);
-    }
-    if (allocator) {
-        delete allocator;
-    }
 }
 
-void FillBucket::addGeometry(const GeometryCollection& geometryCollection) {
-    for (auto& line_ : geometryCollection) {
-        for (auto& v : line_) {
-            line.emplace_back(v.x, v.y);
-        }
-        if (!line.empty()) {
-            clipper.AddPath(line, ClipperLib::ptSubject, true);
-            line.clear();
-            hasVertices = true;
-        }
-    }
+void FillBucket::addGeometry(const GeometryCollection& geometry) {
+    for (const auto& polygon : classifyRings(geometry)) {
+        std::size_t totalVertices = 0;
 
-    tessellate();
-}
-
-void FillBucket::tessellate() {
-    if (!hasVertices) {
-        return;
-    }
-    hasVertices = false;
-
-    std::vector<std::vector<ClipperLib::IntPoint>> polygons;
-    clipper.Execute(ClipperLib::ctUnion, polygons, ClipperLib::pftEvenOdd, ClipperLib::pftEvenOdd);
-    clipper.Clear();
-
-    if (polygons.empty()) {
-        return;
-    }
-
-    GLsizei total_vertex_count = 0;
-    for (const auto& polygon : polygons) {
-        total_vertex_count += polygon.size();
-    }
-
-    if (total_vertex_count > 65536) {
-        throw geometry_too_long_exception();
-    }
-
-    if (lineGroups.empty() || (lineGroups.back()->vertex_length + total_vertex_count > 65535)) {
-        // Move to a new group because the old one can't hold the geometry.
-        lineGroups.emplace_back(std::make_unique<LineGroup>());
-    }
-
-    assert(lineGroups.back());
-    LineGroup& lineGroup = *lineGroups.back();
-    GLsizei lineIndex = lineGroup.vertex_length;
-
-    for (const auto& polygon : polygons) {
-        const GLsizei group_count = static_cast<GLsizei>(polygon.size());
-        assert(group_count >= 3);
-
-        std::vector<TESSreal> clipped_line;
-        for (const auto& pt : polygon) {
-            clipped_line.push_back(pt.X);
-            clipped_line.push_back(pt.Y);
-            vertexBuffer.add(pt.X, pt.Y);
+        for (const auto& ring : polygon) {
+            totalVertices += ring.size();
+            if (totalVertices > 65535)
+                throw GeometryTooLongException();
         }
 
-        for (GLsizei i = 0; i < group_count; i++) {
-            const GLsizei prev_i = (i == 0 ? group_count : i) - 1;
-            lineElementsBuffer.add(lineIndex + prev_i, lineIndex + i);
-        }
+        for (const auto& ring : polygon) {
+            std::size_t nVertices = ring.size();
 
-        lineIndex += group_count;
+            if (nVertices == 0)
+                continue;
 
-        tessAddContour(tesselator, vertexSize, clipped_line.data(), stride, (int)clipped_line.size() / vertexSize);
-    }
+            if (lineGroups.empty() || lineGroups.back()->vertex_length + nVertices > 65535)
+                lineGroups.emplace_back(std::make_unique<LineGroup>());
 
-    lineGroup.elements_length += total_vertex_count;
+            LineGroup& lineGroup = *lineGroups.back();
+            GLsizei lineIndex = lineGroup.vertex_length;
 
-    if (tessTesselate(tesselator, TESS_WINDING_ODD, TESS_POLYGONS, vertices_per_group, vertexSize, 0)) {
-        const TESSreal *vertices = tessGetVertices(tesselator);
-        const GLsizei vertex_count = tessGetVertexCount(tesselator);
-        TESSindex *vertex_indices = const_cast<TESSindex *>(tessGetVertexIndices(tesselator));
-        const TESSindex *elements = tessGetElements(tesselator);
-        const int triangle_count = tessGetElementCount(tesselator);
+            vertexBuffer.add(ring[0].x, ring[0].y);
+            lineElementsBuffer.add(lineIndex + nVertices - 1, lineIndex);
 
-        for (GLsizei i = 0; i < vertex_count; ++i) {
-            if (vertex_indices[i] == TESS_UNDEF) {
-                vertexBuffer.add(::round(vertices[i * 2]), ::round(vertices[i * 2 + 1]));
-                vertex_indices[i] = (TESSindex)total_vertex_count;
-                total_vertex_count++;
+            for (uint32_t i = 1; i < nVertices; i++) {
+                vertexBuffer.add(ring[i].x, ring[i].y);
+                lineElementsBuffer.add(lineIndex + i - 1, lineIndex + i);
             }
+
+            lineGroup.vertex_length += nVertices;
+            lineGroup.elements_length += nVertices;
         }
 
-        if (triangleGroups.empty() || (triangleGroups.back()->vertex_length + total_vertex_count > 65535)) {
-            // Move to a new group because the old one can't hold the geometry.
+        mapbox::Earcut<Coordinate::Type, uint16_t> earcut;
+        earcut(polygon);
+
+        std::size_t nIndicies = earcut.indices.size();
+        assert(nIndicies % 3 == 0);
+
+        if (triangleGroups.empty() || triangleGroups.back()->vertex_length + totalVertices > 65535) {
             triangleGroups.emplace_back(std::make_unique<TriangleGroup>());
         }
 
-        // We're generating triangle fans, so we always start with the first
-        // coordinate in this polygon.
-        assert(triangleGroups.back());
         TriangleGroup& triangleGroup = *triangleGroups.back();
         GLsizei triangleIndex = triangleGroup.vertex_length;
 
-        for (int i = 0; i < triangle_count; ++i) {
-            const TESSindex *element_group = &elements[i * vertices_per_group];
-
-            if (element_group[0] != TESS_UNDEF && element_group[1] != TESS_UNDEF && element_group[2] != TESS_UNDEF) {
-                const TESSindex a = vertex_indices[element_group[0]];
-                const TESSindex b = vertex_indices[element_group[1]];
-                const TESSindex c = vertex_indices[element_group[2]];
-
-                if (a != TESS_UNDEF && b != TESS_UNDEF && c != TESS_UNDEF) {
-                    triangleElementsBuffer.add(triangleIndex + a, triangleIndex + b, triangleIndex + c);
-                } else {
-#if defined(DEBUG)
-                    // TODO: We're missing a vertex that was not part of the line.
-                    Log::Error(Event::OpenGL, "undefined element buffer");
-#endif
-                }
-            } else {
-#if defined(DEBUG)
-                Log::Error(Event::OpenGL, "undefined element buffer");
-#endif
-            }
+        for (uint32_t i = 0; i < nIndicies; i += 3) {
+            triangleElementsBuffer.add(triangleIndex + earcut.indices[i],
+                                       triangleIndex + earcut.indices[i + 1],
+                                       triangleIndex + earcut.indices[i + 2]);
         }
 
-        triangleGroup.vertex_length += total_vertex_count;
-        triangleGroup.elements_length += triangle_count;
-    } else {
-#if defined(DEBUG)
-        Log::Error(Event::OpenGL, "tessellation failed");
-#endif
+        triangleGroup.vertex_length += totalVertices;
+        triangleGroup.elements_length += nIndicies / 3;
     }
-
-    // We're adding the total vertex count *after* we added additional vertices
-    // in the tessellation step. They won't be part of the actual lines, but
-    // we need to skip over them anyway if we draw the next group.
-    lineGroup.vertex_length += total_vertex_count;
 }
 
 void FillBucket::upload() {
