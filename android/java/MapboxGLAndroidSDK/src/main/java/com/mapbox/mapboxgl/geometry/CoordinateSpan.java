@@ -28,4 +28,16 @@ public class CoordinateSpan {
     public void setLongitudeSpan(final double longitudeSpan) {
         this.longitudeSpan = longitudeSpan;
     }
+
+    @Override
+    public boolean equals(Object o) {
+        if (this == o) return true;
+        if (o instanceof CoordinateSpan) {
+            CoordinateSpan other = (CoordinateSpan) o;
+            return longitudeSpan == other.getLongitudeSpan()
+                    && latitudeSpan == other.getLatitudeSpan();
+        }
+        return false;
+    }
+
 }
