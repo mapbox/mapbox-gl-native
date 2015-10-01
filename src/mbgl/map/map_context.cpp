@@ -118,7 +118,7 @@ void MapContext::setStyleURL(const std::string& url) {
 
         if (res.status == Response::Successful) {
             loadStyleJSON(res.data, base);
-        } else if (res.status == Response::NotFound && (styleURL.find("mapbox://") != std::string::npos)) {
+        } else if (res.status == Response::NotFound && styleURL.find("mapbox://") == 0) {
             Log::Error(Event::Setup, "style %s could not be found or is an incompatible legacy map or style", styleURL.c_str());
         } else {
             Log::Error(Event::Setup, "loading style failed: %s", res.message.c_str());
