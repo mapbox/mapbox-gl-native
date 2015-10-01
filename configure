@@ -120,6 +120,7 @@ print_flags gtest static_libs cflags ldflags
 print_flags pixelmatch static_libs cflags ldflags
 print_flags webp static_libs cflags ldflags
 print_flags jni.hpp static_libs cflags ldflags
+print_flags earcut static_libs cflags ldflags
 
 CONFIG+="  }
 }
