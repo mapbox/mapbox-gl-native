@@ -1,4 +1,4 @@
-import com.mapbox.mapboxgl.geometry.ProjectedMeters;
+import com.mapbox.mapboxsdk.geometry.ProjectedMeters;
 
 import org.junit.Test;
 

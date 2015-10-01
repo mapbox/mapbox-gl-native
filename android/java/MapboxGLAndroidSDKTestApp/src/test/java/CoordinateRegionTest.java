@@ -1,6 +1,6 @@
-import com.mapbox.mapboxgl.geometry.CoordinateRegion;
-import com.mapbox.mapboxgl.geometry.CoordinateSpan;
-import com.mapbox.mapboxgl.geometry.LatLng;
+import com.mapbox.mapboxsdk.geometry.CoordinateRegion;
+import com.mapbox.mapboxsdk.geometry.CoordinateSpan;
+import com.mapbox.mapboxsdk.geometry.LatLng;
 
 import org.junit.Test;
 
