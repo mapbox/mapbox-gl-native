@@ -74,18 +74,20 @@ import java.util.List;
 
 
 /**
- * <p>A {@link MapView} provides an embeddable map interface, similar to the one provided by Google's Google Maps API.
+ * A {@link MapView} provides an embeddable map interface, similar to the one provided by the Google Maps API.
  * You use this class to display map information and to manipulate the map contents from your application.
  * You can center the map on a given coordinate, specify the size of the area you want to display,
- * and style the features of the map to fit your application’s use case.</p>
+ * and style the features of the map to fit your application's use case.
  * <p/>
- * <p>Use of {@link MapView} requires a Mapbox API access token.
- * Obtain an access token on the <a href="https://www.mapbox.com/account/apps/">Mapbox account page</a>.</p>
+ * Use of {@link MapView} requires a Mapbox API access token.
+ * Obtain an access token on the <a href="https://www.mapbox.com/account/apps/">Mapbox account page</a>.
  * <p/>
- * <p><b>Warning:</b> Please note that you are responsible for getting permission to use the map data,
- * and for ensuring your use adheres to the relevant terms of use.</p>
+ * <strong>Warning:</strong> Please note that you are responsible for getting permission to use the map data,
+ * and for ensuring your use adheres to the relevant terms of use.
+ *
+ * @see MapView#setAccessToken(String)
  */
-public class MapView extends FrameLayout implements LocationListener, CompassView.CompassDelegate {
+public final class MapView extends FrameLayout implements LocationListener, CompassView.CompassDelegate {
 
     //
     // Static members
@@ -211,17 +213,55 @@ public class MapView extends FrameLayout implements LocationListener, CompassVie
     private boolean mIsMyLocationEnabled = false;
 
     //
+    // Inner classes
+    //
+
+    // These provide easy access to the bundled styles
+
+    /**
+     * StyleUrls provides URLs to several professional styles designed by Mapbox.
+     * <p/>
+     * These styles are all ready to go in your app. To load one, pass it into {@link MapView#setStyleUrl(String)}
+     *
+     * @see MapView#setStyleUrl(String)
+     */
+    public static final class StyleUrls {
+        private StyleUrls() {
+        }
+
+        /**
+         * Mapbox Streets: Our signature style.
+         */
+        public static final String MAPBOX_STREETS = "asset://styles/streets-v8.json";
+        /**
+         * Emerald: Great for transportation and outdoor terrain.
+         */
+        public static final String EMERALD = "asset://styles/emerald-v8.json";
+        /**
+         * Light: Light-colored style that is great for data overlay.
+         */
+        public static final String LIGHT = "asset://styles/light-v8.json";
+        /**
+         * Dark: Dark-colored style that is great for data overlay.
+         */
+        public static final String DARK = "asset://styles/dark-v8.json";
+        /**
+         * Satellite: The best-looking, most accurate, and most up-to-date satellite imagery available anywhere.
+         */
+        public static final String SATELLITE = "asset://styles/satellite-v8.json";
+    }
+
+    //
     // Enums
     //
 
     /**
-     * Map change event types received by
-     * {@link com.mapbox.mapboxsdk.views.MapView.OnMapChangedListener#onMapChanged(MapChange)}
+     * Map change event types.
+     *
+     * @see MapView.OnMapChangedListener#onMapChanged(MapChange)
      */
     public enum MapChange {
-        /**
-         * TODO pull descriptions from C++
-         */
+        // TODO pull descriptions from C++
         RegionWillChange,
         RegionWillChangeAnimated,
         RegionIsChanging,
@@ -280,6 +320,8 @@ public class MapView extends FrameLayout implements LocationListener, CompassVie
 
     /**
      * Interface definition for a callback to be invoked when the map is flinged.
+     *
+     * @see MapView#setOnFlingListener(OnFlingListener)
      */
     public interface OnFlingListener {
         /**
@@ -290,12 +332,43 @@ public class MapView extends FrameLayout implements LocationListener, CompassVie
 
     /**
      * Interface definition for a callback to be invoked when the map is scrolled.
+     *
+     * @see MapView#setOnScrollListener(OnScrollListener)
      */
     public interface OnScrollListener {
         /**
          * Called when the map is scrolled.
          */
         void onScroll();
+    }
+
+    /**
+     * Interface definition for a callback to be invoked on every frame rendered to the map view.
+     *
+     * @see MapView#setOnFpsChangedListener(OnFpsChangedListener)
+     */
+    public interface OnFpsChangedListener {
+        /**
+         * Called for every frame rendered to the map view.
+         *
+         * @param fps The average number of frames rendered over the last second.
+         */
+        void onFpsChanged(double fps);
+    }
+
+    /**
+     * Interface definition for a callback to be invoked when the displayed map view changes.
+     *
+     * @see MapView#addOnMapChangedListener(OnMapChangedListener)
+     * @see MapView.MapChange
+     */
+    public interface OnMapChangedListener {
+        /**
+         * Called when the displayed map view changes.
+         *
+         * @param change The type of map change event.
+         */
+        void onMapChanged(MapChange change);
     }
 
     //
@@ -318,6 +391,7 @@ public class MapView extends FrameLayout implements LocationListener, CompassVie
         }
         initialize(context, null);
         setAccessToken(accessToken);
+        setStyleUrl(null);
     }
 
     /**
@@ -326,7 +400,8 @@ public class MapView extends FrameLayout implements LocationListener, CompassVie
      * @param context     The {@link Context} of the {@link android.app.Activity}
      *                    or {@link android.app.Fragment} the {@link MapView} is running in.
      * @param accessToken Your public Mapbox access token. Used to load map styles and tiles.
-     * @param styleUrl    A URL to the map style initially displayed.
+     * @param styleUrl    A URL to the map style initially displayed. See {@link MapView#setStyleUrl(String)} for possible values.
+     * @see MapView#setStyleUrl(String)
      */
     @UiThread
     public MapView(@NonNull Context context, @NonNull String accessToken, @NonNull String styleUrl) {
@@ -762,10 +837,14 @@ public class MapView extends FrameLayout implements LocationListener, CompassVie
     }
 
     /**
-     * <p>Centers the map on a new coordinate immediately without changing the zoom level.</p>
-     * <p>If you want to animate the change, use {@link MapView#setCenterCoordinate(LatLng, boolean)}.</p>
+     * Centers the map on a new coordinate immediately without changing the zoom level.
+     * <p/>
+     * The initial coordinate is (0, 0).
+     * <p/>
+     * If you want to animate the change, use {@link MapView#setCenterCoordinate(LatLng, boolean)}.
      *
      * @param centerCoordinate The new coordinate.
+     * @see MapView#setCenterCoordinate(LatLng, boolean)
      */
     @UiThread
     public void setCenterCoordinate(@NonNull LatLng centerCoordinate) {
@@ -774,6 +853,8 @@ public class MapView extends FrameLayout implements LocationListener, CompassVie
 
     /**
      * Centers the map on a new coordinate without changing the zoom level and optionally animates the change.
+     * <p/>
+     * The initial coordinate is (0, 0).
      *
      * @param centerCoordinate The new coordinate.
      * @param animated         If true, animates the change. If false, immediately changes the map.
@@ -790,10 +871,14 @@ public class MapView extends FrameLayout implements LocationListener, CompassVie
 
 
     /**
-     * <p>Centers the map on a new coordinate immediately while changing the current zoom level.</p>
-     * <p>If you want to animate the change, use {@link MapView#setCenterCoordinate(LatLngZoom, boolean)}.</p>
+     * Centers the map on a new coordinate immediately while changing the current zoom level.
+     * <p/>
+     * The initial value is a center coordinate of (0, 0) and a zoom level of 0.
+     * <p/>
+     * If you want to animate the change, use {@link MapView#setCenterCoordinate(LatLngZoom, boolean)}.
      *
      * @param centerCoordinate The new coordinate and zoom level.
+     * @see MapView#setCenterCoordinate(LatLngZoom, boolean)
      */
     @UiThread
     public void setCenterCoordinate(@NonNull LatLngZoom centerCoordinate) {
@@ -801,7 +886,19 @@ public class MapView extends FrameLayout implements LocationListener, CompassVie
     }
 
     /**
+     * Resets the map to the minimum zoom level, a center coordinate of (0, 0), a true north heading,
+     * and animates the change.
+     */
+    @UiThread
+    public void resetPosition() {
+        mNativeMapView.cancelTransitions();
+        mNativeMapView.resetPosition();
+    }
+
+    /**
      * Centers the map on a new coordinate while changing the zoom level and optionally animates the change.
+     * <p/>
+     * The initial value is a center coordinate of (0, 0) and a zoom level of 0.
      *
      * @param centerCoordinate The new coordinate and zoom level.
      * @param animated         If true, animates the change. If false, immediately changes the map.
@@ -820,7 +917,7 @@ public class MapView extends FrameLayout implements LocationListener, CompassVie
     /**
      * Returns whether the user may scroll around the map.
      *
-     * @return If true, scrolling is enabled. If false, scrolling is disabled.
+     * @return If true, scrolling is enabled.
      */
     @UiThread
     public boolean isScrollEnabled() {
@@ -828,11 +925,14 @@ public class MapView extends FrameLayout implements LocationListener, CompassVie
     }
 
     /**
-     * <p>Changes whether the user may scroll around the map.</p>
-     * <p>This setting controls only user interactions with the map. If you set the value to false,
-     * you may still change the map location programmatically.</p>
+     * Changes whether the user may scroll around the map.
+     * <p/>
+     * This setting controls only user interactions with the map. If you set the value to false,
+     * you may still change the map location programmatically.
+     * <p/>
+     * The default value is true.
      *
-     * @param scrollEnabled If true, scrolling is enabled. If false, scrolling is disabled.
+     * @param scrollEnabled If true, scrolling is enabled.
      */
     @UiThread
     public void setScrollEnabled(boolean scrollEnabled) {
@@ -843,6 +943,12 @@ public class MapView extends FrameLayout implements LocationListener, CompassVie
     // Rotation
     //
 
+    /**
+     * Returns the current heading of the map relative to true north.
+     *
+     * @return The current heading measured in degrees.
+     */
+    @UiThread
     public double getDirection() {
         double direction = -mNativeMapView.getBearing();
 
@@ -856,30 +962,76 @@ public class MapView extends FrameLayout implements LocationListener, CompassVie
         return direction;
     }
 
+    /**
+     * Rotates the map to a new heading relative to true north immediately.
+     * <p/>
+     * The value 0 means that the top edge of the map view will correspond to true north.<br>
+     * The value 90 means the top of the map will point due east.<br>
+     * The value 180 means the top of the map will point due south.<br>
+     * The value 270 means the top of the map will point due west.
+     * <p/>
+     * The initial heading is 0.
+     * <p/>
+     * If you want to animate the change, use {@link MapView#setDirection(double, boolean)}.
+     *
+     * @param direction The new heading measured in degrees.
+     * @see MapView#setDirection(double, boolean)
+     */
+    @UiThread
     public void setDirection(double direction) {
         setDirection(direction, false);
     }
 
+    /**
+     * Rotates the map to a new heading relative to true north and optionally animates the change.
+     * <p/>
+     * The value 0 means that the top edge of the map view will correspond to true north.<br/>
+     * The value 90 means the top of the map will point due east.<br/>
+     * The value 180 means the top of the map will point due south.<br/>
+     * The value 270 means the top of the map will point due west
+     * <p/>
+     * The initial heading is 0.
+     *
+     * @param direction The new heading measured in degrees from true north.
+     * @param animated  If true, animates the change. If false, immediately changes the map.
+     */
+    @UiThread
     public void setDirection(double direction, boolean animated) {
         long duration = animated ? ANIMATION_DURATION : 0;
         mNativeMapView.cancelTransitions();
         mNativeMapView.setBearing(-direction, duration);
     }
 
-    public void resetPosition() {
-        mNativeMapView.cancelTransitions();
-        mNativeMapView.resetPosition();
-    }
-
+    /**
+     * Resets the map heading to true north and animates the change.
+     */
+    @UiThread
     public void resetNorth() {
         mNativeMapView.cancelTransitions();
         mNativeMapView.resetNorth();
     }
 
+    /**
+     * Returns whether the user may rotate the map.
+     *
+     * @return If true, rotating is enabled.
+     */
+    @UiThread
     public boolean isRotateEnabled() {
         return mRotateEnabled;
     }
 
+    /**
+     * Changes whether the user may rotate the map.
+     * <p/>
+     * This setting controls only user interactions with the map. If you set the value to false,
+     * you may still change the map location programmatically.
+     * <p/>
+     * The default value is true.
+     *
+     * @param rotateEnabled If true, rotating is enabled.
+     */
+    @UiThread
     public void setRotateEnabled(boolean rotateEnabled) {
         this.mRotateEnabled = rotateEnabled;
     }
@@ -888,24 +1040,75 @@ public class MapView extends FrameLayout implements LocationListener, CompassVie
     // Scale
     //
 
+    /**
+     * Returns the current zoom level of the map view.
+     *
+     * @return The current zoom level.
+     */
+    @UiThread
     public double getZoomLevel() {
         return mNativeMapView.getZoom();
     }
 
+    /**
+     * Zooms the map to a new zoom level immediately without changing the center coordinate.
+     * <p/>
+     * At zoom level 0, tiles cover the entire world map;
+     * at zoom level 1, tiles cover &frac14 of the world;
+     * at zoom level 2, tiles cover 1/16 of the world, and so on.
+     * <p/>
+     * The initial zoom level is 0.
+     * <p/>
+     * If you want to animate the change, use {@link MapView#setZoomLevel(double, boolean)}.
+     *
+     * @param zoomLevel The new coordinate.
+     * @see MapView#setZoomLevel(double, boolean)
+     */
+    @UiThread
     public void setZoomLevel(double zoomLevel) {
         setZoomLevel(zoomLevel, false);
     }
 
+    /**
+     * Zooms the map to a new zoom level and optionally animates the change without changing the center coordinate.
+     * <p/>
+     * At zoom level 0, tiles cover the entire world map;
+     * at zoom level 1, tiles cover &frac14 of the world;
+     * at zoom level 2, tiles cover 1/16 of the world, and so on.
+     * <p/>
+     * The initial zoom level is 0.
+     *
+     * @param zoomLevel The new coordinate.
+     * @param animated  If true, animates the change. If false, immediately changes the map.
+     */
+    @UiThread
     public void setZoomLevel(double zoomLevel, boolean animated) {
         long duration = animated ? ANIMATION_DURATION : 0;
         mNativeMapView.cancelTransitions();
         mNativeMapView.setZoom(zoomLevel, duration);
     }
 
+    /**
+     * Returns whether the user may zoom the map.
+     *
+     * @return If true, zooming is enabled.
+     */
+    @UiThread
     public boolean isZoomEnabled() {
         return mZoomEnabled;
     }
 
+    /**
+     * Changes whether the user may zoom the map.
+     * <p/>
+     * This setting controls only user interactions with the map. If you set the value to false,
+     * you may still change the map location programmatically.
+     * <p/>
+     * The default value is true.
+     *
+     * @param zoomEnabled If true, zooming is enabled.
+     */
+    @UiThread
     public void setZoomEnabled(boolean zoomEnabled) {
         this.mZoomEnabled = zoomEnabled;
 
@@ -926,7 +1129,6 @@ public class MapView extends FrameLayout implements LocationListener, CompassVie
         if (zoomIn) {
             mNativeMapView.scaleBy(2.0, x / mScreenDensity, y / mScreenDensity, ANIMATION_DURATION);
         } else {
-            // TODO two finger tap zoom out
             mNativeMapView.scaleBy(0.5, x / mScreenDensity, y / mScreenDensity, ANIMATION_DURATION);
         }
     }
@@ -935,21 +1137,44 @@ public class MapView extends FrameLayout implements LocationListener, CompassVie
     // Debug
     //
 
+    /**
+     * Returns whether the map debug information is currently shown.
+     *
+     * @return If true, map debug information is currently shown.
+     */
+    @UiThread
     public boolean isDebugActive() {
         return mNativeMapView.getDebug() || mNativeMapView.getCollisionDebug();
     }
 
+    /**
+     * Changes whether the map debug information is shown.
+     * <p/>
+     * The default value is false.
+     *
+     * @param debugActive If true, map debug information is shown.
+     */
+    @UiThread
     public void setDebugActive(boolean debugActive) {
         mNativeMapView.setDebug(debugActive);
         mNativeMapView.setCollisionDebug(debugActive);
     }
 
+    /**
+     * Toggles whether the map debug information is shown.
+     * <p/>
+     * The value of {@link MapView#isDebugActive()} is toggled.
+     *
+     * @see MapView#isDebugActive()
+     */
+    @UiThread
     public void toggleDebug() {
         mNativeMapView.toggleDebug();
         mNativeMapView.toggleCollisionDebug();
     }
 
-    public boolean isFullyLoaded() {
+    // True if map has finished loading the view
+    private boolean isFullyLoaded() {
         return mNativeMapView.isFullyLoaded();
     }
 
@@ -957,11 +1182,51 @@ public class MapView extends FrameLayout implements LocationListener, CompassVie
     // Styling
     //
 
-    public void setStyleUrl(String url) {
+    /**
+     * Loads a new map style from the specified URL.
+     * <p/>
+     * {@code url} can take the following forms:
+     * <ul>
+     * <li>{@code MapView.StyleUrls.*}: load one of the bundled styles in {@link MapView.StyleUrls}.</li>
+     * <li>{@code mapbox://styles/<user>/<style>}:
+     * retrieves the style from a <a href="https://www.mapbox.com/account/">Mapbox account.</a>
+     * {@code user} is your username. {@code style} is the ID of your custom
+     * style created in <a href="https://www.mapbox.com/studio">Mapbox Studio</a>.</li>
+     * <li>{@code http://...} or {@code https://...}:
+     * retrieves the style over the Internet from any web server.</li>
+     * <li>{@code asset://...}:
+     * reads the style from the APK {@code asset/} directory.
+     * This is used to load a style bundled with your app.</li>
+     * <li>{@code null}: loads the default {@link MapView.StyleUrls#MAPBOX_STREETS} style.</li>
+     * </ul>
+     * <p/>
+     * This method is asynchronous and will return immediately before the style finishes loading.
+     * If you wish to wait for the map to finish loading listen for the {@link MapView.MapChange#DidFinishLoadingMap} event.
+     * <p/>
+     * If the style fails to load or an invalid style URL is set, the map view will become blank.
+     * An error message will be logged in the Android logcat and {@link MapView.MapChange#DidFailLoadingMap} event will be sent.
+     *
+     * @param url The URL of the map style
+     * @see MapView.StyleUrls
+     */
+    @UiThread
+    public void setStyleUrl(@Nullable String url) {
+        if (url == null) {
+            url = StyleUrls.MAPBOX_STREETS;
+        }
         mStyleUrl = url;
         mNativeMapView.setStyleUrl(url);
     }
 
+    /**
+     * Returns the map style currently displayed in the map view.
+     * <p/>
+     * If the default style is currently displayed, a URL will be returned instead of null.
+     *
+     * @return The URL of the map style.
+     */
+    @UiThread
+    @NonNull
     public String getStyleUrl() {
         return mStyleUrl;
     }
@@ -1057,7 +1322,7 @@ public class MapView extends FrameLayout implements LocationListener, CompassVie
         return marker;
     }
 
-    public List<Marker> addMarkers(List<Marker> markers){
+    public List<Marker> addMarkers(List<Marker> markers) {
         long[] ids = mNativeMapView.addMarkers(markers);
         Marker m;
         int count = markers.size();
@@ -1987,7 +2252,7 @@ public class MapView extends FrameLayout implements LocationListener, CompassVie
     //
 
     // This class handles connectivity changes
-    public class ConnectivityReceiver extends BroadcastReceiver {
+    class ConnectivityReceiver extends BroadcastReceiver {
 
         // Called when an action we are listening to in the manifest has been sent
         @Override
@@ -2007,13 +2272,6 @@ public class MapView extends FrameLayout implements LocationListener, CompassVie
     //
     // Map events
     //
-
-    /**
-     * Defines callback for events OnMapChange
-     */
-    public interface OnMapChangedListener {
-        void onMapChanged(MapChange change);
-    }
 
     /**
      * Add an OnMapChangedListner
@@ -2052,10 +2310,6 @@ public class MapView extends FrameLayout implements LocationListener, CompassVie
                 }
             });
         }
-    }
-
-    public interface OnFpsChangedListener {
-        void onFpsChanged(double fps);
     }
 
     private OnFpsChangedListener mOnFpsChangedListener;
@@ -2285,7 +2539,7 @@ public class MapView extends FrameLayout implements LocationListener, CompassVie
         setWidgetMargins(mAttributionsView, left, top, right, bottom);
     }
 
-    public void setAttributionVisibility(int visibility){
+    public void setAttributionVisibility(int visibility) {
         mAttributionsView.setVisibility(visibility);
     }
 

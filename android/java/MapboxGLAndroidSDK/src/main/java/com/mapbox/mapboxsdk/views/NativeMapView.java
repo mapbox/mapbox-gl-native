@@ -13,7 +13,7 @@ import com.mapbox.mapboxsdk.geometry.ProjectedMeters;
 import java.util.List;
 
 // Class that wraps the native methods for convenience
-class NativeMapView {
+final class NativeMapView {
 
     //
     // Static members

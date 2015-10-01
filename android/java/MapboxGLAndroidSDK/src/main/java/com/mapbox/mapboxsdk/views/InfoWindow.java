@@ -14,7 +14,7 @@ import com.mapbox.mapboxsdk.geometry.LatLng;
 /**
  * A tooltip view
  */
-public class InfoWindow {
+public final class InfoWindow {
 
     private Marker boundMarker;
     private MapView mMapView;

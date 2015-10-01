@@ -323,31 +323,31 @@ public class MainActivity extends AppCompatActivity {
     private boolean changeMapStyle(int id) {
         switch (id) {
             case R.id.actionStyleMapboxStreets:
-                mMapView.setStyleUrl(getString(R.string.styleURLMapboxStreets));
+                mMapView.setStyleUrl(MapView.StyleUrls.MAPBOX_STREETS);
                 mNavigationView.getMenu().findItem(id).setChecked(true);
                 mSelectedStyle = id;
                 return true;
 
             case R.id.actionStyleEmerald:
-                mMapView.setStyleUrl(getString(R.string.styleURLEmerald));
+                mMapView.setStyleUrl(MapView.StyleUrls.EMERALD);
                 mNavigationView.getMenu().findItem(id).setChecked(true);
                 mSelectedStyle = id;
                 return true;
 
             case R.id.actionStyleLight:
-                mMapView.setStyleUrl(getString(R.string.styleURLLight));
+                mMapView.setStyleUrl(MapView.StyleUrls.LIGHT);
                 mNavigationView.getMenu().findItem(id).setChecked(true);
                 mSelectedStyle = id;
                 return true;
 
             case R.id.actionStyleDark:
-                mMapView.setStyleUrl(getString(R.string.styleURLDark));
+                mMapView.setStyleUrl(MapView.StyleUrls.DARK);
                 mNavigationView.getMenu().findItem(id).setChecked(true);
                 mSelectedStyle = id;
                 return true;
 
             case R.id.actionStyleSatellite:
-                mMapView.setStyleUrl(getString(R.string.styleURLSatellite));
+                mMapView.setStyleUrl(MapView.StyleUrls.SATELLITE);
                 mNavigationView.getMenu().findItem(id).setChecked(true);
                 mSelectedStyle = id;
                 return true;
