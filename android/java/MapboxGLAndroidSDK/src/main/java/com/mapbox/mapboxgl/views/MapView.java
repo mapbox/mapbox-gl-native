@@ -127,11 +127,13 @@ public class MapView extends FrameLayout implements LocationListener {
     private static final String STATE_LOGO_MARGIN_TOP = "logoMarginTop";
     private static final String STATE_LOGO_MARGIN_RIGHT = "logoMarginRight";
     private static final String STATE_LOGO_MARGIN_BOTTOM = "logoMarginBottom";
+    private static final String STATE_LOGO_VISIBILITY = "logoVisibility";
     private static final String STATE_ATTRIBUTION_GRAVITY = "attrGravity";
     private static final String STATE_ATTRIBUTION_MARGIN_LEFT = "attrMarginLeft";
     private static final String STATE_ATTRIBUTION_MARGIN_TOP = "attrMarginTop";
     private static final String STATE_ATTRIBUTION_MARGIN_RIGHT = "attrMarginRight";
     private static final String STATE_ATTRIBUTION_MARGIN_BOTTOM = "atrrMarginBottom";
+    private static final String STATE_ATTRIBUTION_VISIBILITY = "atrrVisibility";
 
     // Used for positioning views
     private static final float DIMENSION_SEVEN_DP = 7f;
@@ -558,6 +560,7 @@ public class MapView extends FrameLayout implements LocationListener {
                     , typedArray.getDimension(R.styleable.MapView_compassMarginBottom, DIMENSION_TEN_DP));
 
             // Logo
+            setLogoVisibility(typedArray.getInt(R.styleable.MapView_logoVisibility, VISIBLE));
             setLogoGravity(typedArray.getInt(R.styleable.MapView_logoGravity, Gravity.BOTTOM | Gravity.START));
             setWidgetMargins(mLogoView, typedArray.getDimension(R.styleable.MapView_logoMarginLeft, DIMENSION_SIXTEEN_DP)
                     , typedArray.getDimension(R.styleable.MapView_logoMarginTop, DIMENSION_SIXTEEN_DP)
@@ -565,6 +568,7 @@ public class MapView extends FrameLayout implements LocationListener {
                     , typedArray.getDimension(R.styleable.MapView_logoMarginBottom, DIMENSION_SIXTEEN_DP));
 
             // Attribution
+            setAttributionVisibility(typedArray.getInt(R.styleable.MapView_attributionVisibility, VISIBLE));
             setAttributionGravity(typedArray.getInt(R.styleable.MapView_attributionGravity, Gravity.BOTTOM));
             setWidgetMargins(mAttributionsView, typedArray.getDimension(R.styleable.MapView_attributionMarginLeft, DIMENSION_SEVENTYSIX_DP)
                     , typedArray.getDimension(R.styleable.MapView_attributionMarginTop, DIMENSION_SEVEN_DP)
@@ -619,6 +623,7 @@ public class MapView extends FrameLayout implements LocationListener {
                     , savedInstanceState.getInt(STATE_COMPASS_MARGIN_BOTTOM));
 
             // Logo
+            setLogoVisibility(savedInstanceState.getInt(STATE_LOGO_VISIBILITY));
             setLogoGravity(savedInstanceState.getInt(STATE_LOGO_GRAVITY));
             setLogoMargins(savedInstanceState.getInt(STATE_LOGO_MARGIN_LEFT)
                     , savedInstanceState.getInt(STATE_LOGO_MARGIN_TOP)
@@ -626,6 +631,7 @@ public class MapView extends FrameLayout implements LocationListener {
                     , savedInstanceState.getInt(STATE_LOGO_MARGIN_BOTTOM));
 
             // Attribution
+            setAttributionVisibility(savedInstanceState.getInt(STATE_ATTRIBUTION_VISIBILITY));
             setAttributionGravity(savedInstanceState.getInt(STATE_ATTRIBUTION_GRAVITY));
             setAttributionMargins(savedInstanceState.getInt(STATE_ATTRIBUTION_MARGIN_LEFT)
                     , savedInstanceState.getInt(STATE_ATTRIBUTION_MARGIN_TOP)
@@ -694,6 +700,7 @@ public class MapView extends FrameLayout implements LocationListener {
         outState.putInt(STATE_LOGO_MARGIN_TOP, logoParams.topMargin);
         outState.putInt(STATE_LOGO_MARGIN_RIGHT, logoParams.rightMargin);
         outState.putInt(STATE_LOGO_MARGIN_BOTTOM, logoParams.bottomMargin);
+        outState.putInt(STATE_LOGO_VISIBILITY, mLogoView.getVisibility());
 
         // Attribution
         LayoutParams attrParams = (LayoutParams) mAttributionsView.getLayoutParams();
@@ -702,6 +709,7 @@ public class MapView extends FrameLayout implements LocationListener {
         outState.putInt(STATE_ATTRIBUTION_MARGIN_TOP, attrParams.topMargin);
         outState.putInt(STATE_ATTRIBUTION_MARGIN_RIGHT, attrParams.rightMargin);
         outState.putInt(STATE_ATTRIBUTION_MARGIN_BOTTOM, attrParams.bottomMargin);
+        outState.putInt(STATE_ATTRIBUTION_VISIBILITY, mAttributionsView.getVisibility());
     }
 
     /**
@@ -2332,12 +2340,20 @@ public class MapView extends FrameLayout implements LocationListener {
         setWidgetMargins(mLogoView, left, top, right, bottom);
     }
 
+    public void setLogoVisibility(int visibility) {
+        mLogoView.setVisibility(visibility);
+    }
+
     public void setAttributionGravity(int gravity) {
         setWidgetGravity(mAttributionsView, gravity);
     }
 
     public void setAttributionMargins(int left, int top, int right, int bottom) {
         setWidgetMargins(mAttributionsView, left, top, right, bottom);
+    }
+
+    public void setAttributionVisibility(int visibility){
+        mAttributionsView.setVisibility(visibility);
     }
 
     private void setWidgetGravity(@NonNull final View view, int gravity) {
