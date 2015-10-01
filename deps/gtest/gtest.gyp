@@ -12,6 +12,9 @@
         'sources': [
             'gtest-all.cc'
         ],
+        'xcode_settings': {
+            'MACOSX_DEPLOYMENT_TARGET': '10.9',
+        },
         'link_settings': {
             'xcode_settings': { 'OTHER_LDFLAGS': [ '-lpthread' ] },
             'ldflags': [ '-lpthread' ],
