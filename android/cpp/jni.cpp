@@ -821,6 +821,73 @@ jlong JNICALL nativeAddMarker(JNIEnv *env, jobject obj, jlong nativeMapViewPtr, 
     return nativeMapView->getMap().addPointAnnotation(mbgl::PointAnnotation(mbgl::LatLng(latitude, longitude), sprite));
 }
 
+jlongArray JNICALL nativeAddMarkers(JNIEnv *env, jobject obj, jlong nativeMapViewPtr, jobject jlist) {
+    mbgl::Log::Debug(mbgl::Event::JNI, "nativeAddMarkers");
+    assert(nativeMapViewPtr != 0);
+    NativeMapView *nativeMapView = reinterpret_cast<NativeMapView *>(nativeMapViewPtr);
+
+    std::vector<mbgl::PointAnnotation> markers;
+
+    if (jlist == nullptr) {
+        if (env->ThrowNew(nullPointerExceptionClass, "List cannot be null.") < 0) {
+            env->ExceptionDescribe();
+            return nullptr;
+        }
+        return nullptr;
+    }
+
+    jobjectArray jarray =
+        reinterpret_cast<jobjectArray>(env->CallObjectMethod(jlist, listToArrayId));
+    if (env->ExceptionCheck() || (jarray == nullptr)) {
+        env->ExceptionDescribe();
+        return nullptr;
+    }
+
+    jsize len = env->GetArrayLength(jarray);
+    if (len < 0) {
+        env->ExceptionDescribe();
+        return nullptr;
+    }
+
+    markers.reserve(len);
+
+    for (jsize i = 0; i < len; i++) {
+        jobject marker = reinterpret_cast<jobject>(env->GetObjectArrayElement(jarray, i));
+
+        jobject position = env->GetObjectField(marker, markerPositionId);
+        if (env->ExceptionCheck()) {
+            env->ExceptionDescribe();
+            return nullptr;
+        }
+
+        jstring jsprite = reinterpret_cast<jstring>(env->GetObjectField(marker, markerSpriteId));
+        std::string sprite = std_string_from_jstring(env, jsprite);
+
+        jdouble latitude = env->GetDoubleField(position, latLngLatitudeId);
+        if (env->ExceptionCheck()) {
+            env->ExceptionDescribe();
+            return nullptr;
+        }
+
+        jdouble longitude = env->GetDoubleField(position, latLngLongitudeId);
+        if (env->ExceptionCheck()) {
+            env->ExceptionDescribe();
+            return nullptr;
+        }
+
+        markers.emplace_back(mbgl::PointAnnotation(mbgl::LatLng(latitude, longitude), sprite));
+
+        /* Do I need to delete other LocalRefs? */
+        env->DeleteLocalRef(marker);
+     }
+
+    env->DeleteLocalRef(jarray);
+
+    std::vector<uint32_t> pointAnnotationIDs = nativeMapView->getMap().addPointAnnotations(markers);
+    return std_vector_uint_to_jobject(env, pointAnnotationIDs);
+}
+
+
 jlong JNICALL nativeAddPolyline(JNIEnv *env, jobject obj, jlong nativeMapViewPtr, jobject polyline) {
     mbgl::Log::Debug(mbgl::Event::JNI, "nativeAddPolyline");
     assert(nativeMapViewPtr != 0);
@@ -1689,6 +1756,8 @@ extern "C" JNIEXPORT jint JNICALL JNI_OnLoad(JavaVM *vm, void *reserved) {
         {"nativeResetNorth", "(J)V", reinterpret_cast<void *>(&nativeResetNorth)},
         {"nativeAddMarker", "(JLcom/mapbox/mapboxgl/annotations/Marker;)J",
          reinterpret_cast<void *>(&nativeAddMarker)},
+         {"nativeAddMarkers", "(JLjava/util/List;)[J",
+         reinterpret_cast<void *>(&nativeAddMarkers)},
         {"nativeAddPolyline", "(JLcom/mapbox/mapboxgl/annotations/Polyline;)J",
          reinterpret_cast<void *>(&nativeAddPolyline)},
         {"nativeAddPolygon", "(JLcom/mapbox/mapboxgl/annotations/Polygon;)J",

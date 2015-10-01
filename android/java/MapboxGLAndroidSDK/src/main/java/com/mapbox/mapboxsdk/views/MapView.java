@@ -1057,6 +1057,19 @@ public class MapView extends FrameLayout implements LocationListener, CompassVie
         return marker;
     }
 
+    public List<Marker> addMarkers(List<Marker> markers){
+        long[] ids = mNativeMapView.addMarkers(markers);
+        Marker m;
+        int count = markers.size();
+        for (int i = 0; i < count; i++) {
+            m = markers.get(i);
+            m.setId(ids[i]);
+            m.setMapView(this);
+            mAnnotations.add(m);
+        }
+        return markers;
+    }
+
     public Polyline addPolyline(PolylineOptions polylineOptions) {
         Polyline polyline = polylineOptions.getPolyline();
         long id = mNativeMapView.addPolyline(polyline);

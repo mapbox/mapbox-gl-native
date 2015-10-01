@@ -333,6 +333,10 @@ class NativeMapView {
         return nativeAddMarker(mNativeMapViewPtr, marker);
     }
 
+    public long[] addMarkers(List<Marker> markers) {
+        return nativeAddMarkers(mNativeMapViewPtr, markers);
+    }
+
     public long addPolyline(Polyline polyline) {
         return nativeAddPolyline(mNativeMapViewPtr, polyline);
     }
@@ -560,6 +564,8 @@ class NativeMapView {
     private native void nativeResetNorth(long nativeMapViewPtr);
 
     private native long nativeAddMarker(long nativeMapViewPtr, Marker marker);
+
+    private native long[] nativeAddMarkers(long nativeMapViewPtr, List<Marker> markers);
 
     private native long nativeAddPolyline(long nativeMapViewPtr, Polyline polyline);
 
