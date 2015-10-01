@@ -34,6 +34,10 @@ android {
         targetSdkVersion Integer.parseInt(project.ANDROID_BUILD_TARGET_SDK_VERSION)
     }
 
+    sourceSets {
+        main.res.srcDirs += 'src/main/res-public'
+    }
+
     repositories {
         mavenCentral()
     }
