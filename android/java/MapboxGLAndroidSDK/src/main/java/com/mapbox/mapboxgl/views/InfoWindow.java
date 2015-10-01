@@ -1,4 +1,4 @@
-package com.mapbox.mapboxgl.annotations;
+package com.mapbox.mapboxgl.views;
 
 import android.content.Context;
 import android.graphics.PointF;
@@ -7,8 +7,9 @@ import android.view.MotionEvent;
 import android.view.View;
 import android.view.ViewGroup;
 import android.widget.TextView;
+
+import com.mapbox.mapboxgl.annotations.Marker;
 import com.mapbox.mapboxgl.geometry.LatLng;
-import com.mapbox.mapboxgl.views.MapView;
 
 /**
  * A tooltip view
@@ -85,7 +86,7 @@ public class InfoWindow {
         mView.measure(View.MeasureSpec.UNSPECIFIED, View.MeasureSpec.UNSPECIFIED);
 
         PointF coords = mMapView.toScreenLocation(position);
-        double y = mMapView.getTopOffsetPixelsForAnnotationSymbol(object.sprite);
+        double y = mMapView.getTopOffsetPixelsForAnnotationSymbol(object.getSprite());
         y = y * mMapView.getScreenDensity();
 
         // Flip y coordinate as Android view origin is upper left corner

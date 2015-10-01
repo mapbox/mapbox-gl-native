@@ -1,4 +1,4 @@
-package com.mapbox.mapboxgl.annotations;
+package com.mapbox.mapboxgl.views;
 
 import android.content.Context;
 import android.graphics.Canvas;

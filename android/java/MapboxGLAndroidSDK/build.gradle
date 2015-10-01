@@ -75,9 +75,14 @@ android.libraryVariants.all { variant ->
         destinationDir = new File(destinationDir, variant.baseName)
         source = files(variant.javaCompile.source)
         classpath = files(variant.javaCompile.classpath.files) + files(android.bootClasspath)
+        options.windowTitle("Mapbox Android SDK")
+        options.docTitle("Mapbox Android SDK")
+        options.header("<b>Mapbox Android SDK</b>")
+        options.bottom("&copy; 2015 Mapbox. All rights reserved.")
         options.links("http://docs.oracle.com/javase/7/docs/api/")
+        // TODO this will fail as package-list file not online, need to use offline
         options.links("http://d.android.com/reference/")
-        exclude '**/R.html', '**/R.*.html'
+        // TODO exclude generated R, BuildConfig, com.almeros.*
     }
 }
 

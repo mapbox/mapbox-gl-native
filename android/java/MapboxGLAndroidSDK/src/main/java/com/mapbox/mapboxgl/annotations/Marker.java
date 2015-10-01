@@ -3,6 +3,7 @@ package com.mapbox.mapboxgl.annotations;
 import android.graphics.Point;
 import android.view.View;
 import com.mapbox.mapboxgl.geometry.LatLng;
+import com.mapbox.mapboxgl.views.InfoWindow;
 import com.mapbox.mapboxgl.views.R;
 
 public class Marker extends Annotation {
@@ -136,6 +137,10 @@ public class Marker extends Annotation {
      */
     public void setSprite(String sprite) {
         this.sprite = sprite;
+    }
+
+    public String getSprite() {
+        return sprite;
     }
 
     public void setTitle(String title) {
