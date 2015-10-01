@@ -92,7 +92,7 @@ mbgl::util::UnitBezier MGLUnitBezierForMediaTimingFunction(CAMediaTimingFunction
 @property (nonatomic) UIRotationGestureRecognizer *rotate;
 @property (nonatomic) UILongPressGestureRecognizer *quickZoom;
 @property (nonatomic) UIPanGestureRecognizer *twoFingerDrag;
-@property (nonatomic) NSMapTable *annotationIDsByAnnotation;
+@property (nonatomic) NSMapTable *annotationMetadataByAnnotation;
 @property (nonatomic) NS_MUTABLE_DICTIONARY_OF(NSString *, MGLAnnotationImage *) *annotationImages;
 @property (nonatomic) std::vector<uint32_t> annotationsNearbyLastTap;
 @property (nonatomic, weak) id <MGLAnnotation> selectedAnnotation;
@@ -273,7 +273,7 @@ std::chrono::steady_clock::duration secondsAsDuration(float duration)
 
     // setup annotations
     //
-    _annotationIDsByAnnotation = [NSMapTable mapTableWithKeyOptions:NSMapTableStrongMemory valueOptions:NSMapTableStrongMemory];
+    _annotationMetadataByAnnotation = [NSMapTable mapTableWithKeyOptions:NSMapTableStrongMemory valueOptions:NSMapTableStrongMemory];
 
     _annotationImages = [NSMutableDictionary dictionary];
 
@@ -1166,7 +1166,7 @@ std::chrono::steady_clock::duration secondsAsDuration(float duration)
             {
                 // the selection candidates haven't changed; cycle through them
                 if (self.selectedAnnotation &&
-                    [[[self.annotationIDsByAnnotation objectForKey:self.selectedAnnotation]
+                    [[[self.annotationMetadataByAnnotation objectForKey:self.selectedAnnotation]
                         objectForKey:MGLAnnotationIDKey] unsignedIntValue] == self.annotationsNearbyLastTap.back())
                 {
                     // the selected annotation is the last in the set; cycle back to the first
@@ -1176,7 +1176,7 @@ std::chrono::steady_clock::duration secondsAsDuration(float duration)
                 else if (self.selectedAnnotation)
                 {
                     // otherwise increment the selection through the candidates
-                    uint32_t currentID = [[[self.annotationIDsByAnnotation objectForKey:self.selectedAnnotation] objectForKey:MGLAnnotationIDKey] unsignedIntValue];
+                    uint32_t currentID = [[[self.annotationMetadataByAnnotation objectForKey:self.selectedAnnotation] objectForKey:MGLAnnotationIDKey] unsignedIntValue];
                     auto result = std::find(self.annotationsNearbyLastTap.begin(), self.annotationsNearbyLastTap.end(), currentID);
                     auto distance = std::distance(self.annotationsNearbyLastTap.begin(), result);
                     newSelectedAnnotationID = self.annotationsNearbyLastTap[distance + 1];
@@ -1205,11 +1205,11 @@ std::chrono::steady_clock::duration secondsAsDuration(float duration)
         if (newSelectedAnnotationID >= 0)
         {
             // find & select model object for selection
-            NSEnumerator *enumerator = self.annotationIDsByAnnotation.keyEnumerator;
+            NSEnumerator *enumerator = self.annotationMetadataByAnnotation.keyEnumerator;
 
             while (id <MGLAnnotation> annotation = enumerator.nextObject)
             {
-                if ([[[self.annotationIDsByAnnotation objectForKey:annotation] objectForKey:MGLAnnotationIDKey] integerValue] == newSelectedAnnotationID)
+                if ([[[self.annotationMetadataByAnnotation objectForKey:annotation] objectForKey:MGLAnnotationIDKey] integerValue] == newSelectedAnnotationID)
                 {
                     // only change selection status if not the currently selected annotation
                     if ( ! [annotation isEqual:self.selectedAnnotation])
@@ -2046,11 +2046,11 @@ CLLocationCoordinate2D MGLLocationCoordinate2DFromLatLng(mbgl::LatLng latLng)
 
 - (nullable NS_ARRAY_OF(id <MGLAnnotation>) *)annotations
 {
-    if ([_annotationIDsByAnnotation count])
+    if ([_annotationMetadataByAnnotation count])
     {
         NSMutableArray *result = [NSMutableArray array];
 
-        NSEnumerator *keyEnumerator = [_annotationIDsByAnnotation keyEnumerator];
+        NSEnumerator *keyEnumerator = [_annotationMetadataByAnnotation keyEnumerator];
         id <MGLAnnotation> annotation;
 
         while (annotation = [keyEnumerator nextObject])
@@ -2224,7 +2224,7 @@ CLLocationCoordinate2D MGLLocationCoordinate2DFromLatLng(mbgl::LatLng latLng)
 
         for (size_t i = 0; i < pointAnnotationIDs.size(); ++i)
         {
-            [self.annotationIDsByAnnotation setObject:@{
+            [self.annotationMetadataByAnnotation setObject:@{
                 MGLAnnotationIDKey     : @(pointAnnotationIDs[i]),
                 MGLAnnotationSymbolKey : [NSString stringWithUTF8String:points[i].icon.c_str()]
             } forKey:annotations[i]];
@@ -2237,7 +2237,7 @@ CLLocationCoordinate2D MGLLocationCoordinate2DFromLatLng(mbgl::LatLng latLng)
 
         for (size_t i = 0; i < shapeAnnotationIDs.size(); ++i)
         {
-            [self.annotationIDsByAnnotation setObject:@{ MGLAnnotationIDKey : @(shapeAnnotationIDs[i]) }
+            [self.annotationMetadataByAnnotation setObject:@{ MGLAnnotationIDKey : @(shapeAnnotationIDs[i]) }
                                                forKey:annotations[i]];
         }
     }
@@ -2265,10 +2265,10 @@ CLLocationCoordinate2D MGLLocationCoordinate2DFromLatLng(mbgl::LatLng latLng)
     {
         NSAssert([annotation conformsToProtocol:@protocol(MGLAnnotation)], @"annotation should conform to MGLAnnotation");
 
-        NSDictionary *infoDictionary = [self.annotationIDsByAnnotation objectForKey:annotation];
+        NSDictionary *infoDictionary = [self.annotationMetadataByAnnotation objectForKey:annotation];
         annotationIDsToRemove.push_back([[infoDictionary objectForKey:MGLAnnotationIDKey] unsignedIntValue]);
 
-        [self.annotationIDsByAnnotation removeObjectForKey:annotation];
+        [self.annotationMetadataByAnnotation removeObjectForKey:annotation];
 
         if (annotation == self.selectedAnnotation)
         {
@@ -2368,7 +2368,7 @@ CLLocationCoordinate2D MGLLocationCoordinate2DFromLatLng(mbgl::LatLng latLng)
         else
         {
             // determine symbol in use for point
-            NSString *customSymbol = [[self.annotationIDsByAnnotation objectForKey:annotation] objectForKey:MGLAnnotationSymbolKey];
+            NSString *customSymbol = [[self.annotationMetadataByAnnotation objectForKey:annotation] objectForKey:MGLAnnotationSymbolKey];
             NSString *symbolName = [customSymbol length] ? customSymbol : MGLDefaultStyleMarkerSymbolName;
             std::string cSymbolName([symbolName UTF8String]);
 
