@@ -33,10 +33,12 @@
           '<@(geojsonvt_cflags)',
           '<@(rapidjson_cflags)',
           '<@(variant_cflags)',
+          '<@(earcut_cflags)',
         ],
         'cflags': [
           '<@(opengl_cflags)',
           '<@(rapidjson_cflags)',
+          '<@(earcut_cflags)',
           '-fPIC'
         ],
         'ldflags': [

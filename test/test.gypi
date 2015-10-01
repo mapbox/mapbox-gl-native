@@ -110,6 +110,7 @@
           '<@(rapidjson_cflags)',
           '<@(pixelmatch_cflags)',
           '<@(variant_cflags)',
+          '<@(earcut_cflags)',
         ],
         'ldflags': [
           '<@(gtest_ldflags)',
