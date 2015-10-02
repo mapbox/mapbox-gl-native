@@ -134,7 +134,7 @@ void SQLiteCache::Impl::get(const Resource &resource, Callback callback) {
         Log::Error(Event::Database, ex.code, ex.what());
         callback(nullptr);
     } catch (std::runtime_error& ex) {
-        Log::Error(Event::Database, ex.what());
+        Log::Error(Event::Database, "%s", ex.what());
         callback(nullptr);
     }
 }
@@ -204,7 +204,7 @@ void SQLiteCache::Impl::put(const Resource& resource, std::shared_ptr<const Resp
     } catch (mapbox::sqlite::Exception& ex) {
         Log::Error(Event::Database, ex.code, ex.what());
     } catch (std::runtime_error& ex) {
-        Log::Error(Event::Database, ex.what());
+        Log::Error(Event::Database, "%s", ex.what());
     }
 }
 

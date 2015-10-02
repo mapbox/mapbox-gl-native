@@ -86,7 +86,7 @@ Image::Image(std::string const& data)
     }
     catch (ImageReaderException const& ex)
     {
-        Log::Error(Event::Image, ex.what());
+        Log::Error(Event::Image, "%s", ex.what());
         img.reset();
         width = 0;
         height = 0;
