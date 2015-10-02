@@ -37,7 +37,7 @@ IB_DESIGNABLE
 
 /** Initializes and returns a newly allocated map view with the specified frame and style URL.
 *   @param frame The frame for the view, measured in points.
-*   @param styleURL The map style URL to use. Can be either an HTTP/HTTPS URL or a Mapbox map ID style URL (`mapbox://<user.style>`). Specify `nil` for the default style.
+*   @param styleURL The map style URL to use. Can be either an HTTP/HTTPS URL or a Mapbox map ID style URL (`mapbox://styles/<user>/<style>`). Specify `nil` for the default style.
 *   @return An initialized map view. */
 - (instancetype)initWithFrame:(CGRect)frame styleURL:(nullable NSURL *)styleURL;
 - (instancetype)initWithFrame:(CGRect)frame accessToken:(NSString *)accessToken styleURL:(nullable NSURL *)styleURL __attribute__((unavailable("Use -initWithFrame:styleURL:. Set MGLMapboxAccessToken in the Info.plist or call +[MGLAccountManager setAccessToken:].")));
@@ -240,7 +240,7 @@ IB_DESIGNABLE
 
 /** URL of the style currently displayed in the receiver.
 *
-*   The URL may be a full HTTP or HTTPS URL or a Mapbox URL indicating the style’s map ID (`mapbox://<user.style>`).
+*   The URL may be a full HTTP or HTTPS URL or a Mapbox URL indicating the style’s map ID (`mapbox://styles/<user>/<style>`).
 *
 *   To display the default style, set this property to `nil`. */
 @property (nonatomic, null_resettable) NSURL *styleURL;
