@@ -2,7 +2,7 @@ package com.mapbox.mapboxsdk.annotations;
 
 import android.graphics.Point;
 import android.view.View;
-import com.mapbox.mapboxgl.views.R;
+import com.mapbox.mapboxsdk.R;
 import com.mapbox.mapboxsdk.geometry.LatLng;
 import com.mapbox.mapboxsdk.views.InfoWindow;
 
