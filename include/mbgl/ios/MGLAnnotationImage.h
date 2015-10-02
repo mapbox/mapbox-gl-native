@@ -27,6 +27,11 @@ NS_ASSUME_NONNULL_BEGIN
 *   If you define distinctly different types of annotations (with distinctly different annotation images to go with them), you can differentiate between the annotation types by specifying different reuse identifiers for each one. */
 @property (nonatomic, readonly) NSString *reuseIdentifier;
 
+/** A Boolean value indicating whether the annotation is enabled.
+*
+*   The default value of this property is `YES`. If the value of this property is `NO`, the annotation image ignores touch events and cannot be selected. */
+@property (nonatomic, getter=isEnabled) BOOL enabled;
+
 @end
 
 NS_ASSUME_NONNULL_END

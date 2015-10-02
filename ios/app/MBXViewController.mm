@@ -357,6 +357,15 @@ static NSUInteger const kStyleVersion = 8;
     NSString *title = [(MGLPointAnnotation *)annotation title];
     NSString *lastTwoCharacters = [title substringFromIndex:title.length - 2];
 
+    UIColor *color;
+
+    // make every tenth annotation blue
+    if ([lastTwoCharacters hasSuffix:@"0"]) {
+        color = [UIColor blueColor];
+    } else {
+        color = [UIColor redColor];
+    }
+
     MGLAnnotationImage *image = [mapView dequeueReusableAnnotationImageWithIdentifier:lastTwoCharacters];
 
     if ( ! image)
@@ -367,7 +376,7 @@ static NSUInteger const kStyleVersion = 8;
 
         CGContextRef ctx = UIGraphicsGetCurrentContext();
 
-        CGContextSetFillColorWithColor(ctx, [[[UIColor redColor] colorWithAlphaComponent:0.75] CGColor]);
+        CGContextSetFillColorWithColor(ctx, [[color colorWithAlphaComponent:0.75] CGColor]);
         CGContextFillRect(ctx, rect);
 
         CGContextSetStrokeColorWithColor(ctx, [[UIColor blackColor] CGColor]);
@@ -384,6 +393,9 @@ static NSUInteger const kStyleVersion = 8;
         [drawString drawInRect:stringRect];
 
         image = [MGLAnnotationImage annotationImageWithImage:UIGraphicsGetImageFromCurrentImageContext() reuseIdentifier:lastTwoCharacters];
+
+        // don't allow touches on blue annotations
+        if ([color isEqual:[UIColor blueColor]]) image.enabled = NO;
 
         UIGraphicsEndImageContext();
     }

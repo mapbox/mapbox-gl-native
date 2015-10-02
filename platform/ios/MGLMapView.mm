@@ -21,6 +21,7 @@
 #include <mbgl/util/math.hpp>
 #include <mbgl/util/constants.hpp>
 #include <mbgl/util/image.hpp>
+#include <mbgl/util/std.hpp>
 
 #import "Mapbox.h"
 
@@ -37,6 +38,7 @@
 
 #import <algorithm>
 #import <cstdlib>
+#import <unordered_set>
 
 class MBGLView;
 
@@ -52,6 +54,7 @@ const CGFloat MGLMinimumZoom = 3;
 const CGFloat MGLMinimumPitch = 0;
 const CGFloat MGLMaximumPitch = 60;
 const CLLocationDegrees MGLAngularFieldOfView = M_PI / 6.;
+const std::string spritePrefix = "com.mapbox.sprites.";
 
 NSString *const MGLAnnotationIDKey = @"MGLAnnotationIDKey";
 NSString *const MGLAnnotationSymbolKey = @"MGLAnnotationSymbolKey";
@@ -1158,43 +1161,77 @@ std::chrono::steady_clock::duration secondsAsDuration(float duration)
 
         if (nearbyAnnotations.size())
         {
-            // there is at least one nearby annotation; select one
-            //
-            // first, sort for comparison and iteration
-            std::sort(nearbyAnnotations.begin(), nearbyAnnotations.end());
+            // pare down nearby annotations to only enabled ones
+            NSEnumerator *metadataEnumerator = [self.annotationMetadataByAnnotation objectEnumerator];
+            NSString *prefix = [NSString stringWithUTF8String:spritePrefix.c_str()];
+            std::unordered_set<uint32_t> disabledAnnotationIDs;
 
-            if (nearbyAnnotations == self.annotationsNearbyLastTap)
+            while (NSDictionary *metadata = [metadataEnumerator nextObject])
             {
-                // the selection candidates haven't changed; cycle through them
-                if (self.selectedAnnotation &&
-                    [[[self.annotationMetadataByAnnotation objectForKey:self.selectedAnnotation]
-                        objectForKey:MGLAnnotationIDKey] unsignedIntValue] == self.annotationsNearbyLastTap.back())
+                // This iterates ALL annotations' metadata dictionaries, using their
+                // reuse identifiers to get at the stored annotation image objects,
+                // which we can then query for enabled status.
+                NSString *reuseIdentifier = [metadata[MGLAnnotationSymbolKey] stringByReplacingOccurrencesOfString:prefix
+                                                                                                        withString:@""
+                                                                                                           options:NSAnchoredSearch
+                                                                                                             range:NSMakeRange(0, prefix.length)];
+
+                MGLAnnotationImage *annotationImage = self.annotationImages[reuseIdentifier];
+
+                if (annotationImage.isEnabled == NO)
                 {
-                    // the selected annotation is the last in the set; cycle back to the first
-                    // note: this could be the selected annotation if only one in set
-                    newSelectedAnnotationID = self.annotationsNearbyLastTap.front();
+                    disabledAnnotationIDs.emplace([metadata[MGLAnnotationIDKey] unsignedIntValue]);
                 }
-                else if (self.selectedAnnotation)
+            }
+
+            if (disabledAnnotationIDs.size())
+            {
+                // Clear out any nearby annotations that are in our set of
+                // disabled annotations. 
+                mbgl::util::erase_if(nearbyAnnotations, [&](const uint32_t annotationID) {
+                    return disabledAnnotationIDs.count(annotationID) != 0;
+                });
+            }
+
+            // only proceed if there are still annotations
+            if (nearbyAnnotations.size() > 0)
+            {
+                // first, sort for comparison and iteration
+                std::sort(nearbyAnnotations.begin(), nearbyAnnotations.end());
+
+                if (nearbyAnnotations == self.annotationsNearbyLastTap)
                 {
-                    // otherwise increment the selection through the candidates
-                    uint32_t currentID = [[[self.annotationMetadataByAnnotation objectForKey:self.selectedAnnotation] objectForKey:MGLAnnotationIDKey] unsignedIntValue];
-                    auto result = std::find(self.annotationsNearbyLastTap.begin(), self.annotationsNearbyLastTap.end(), currentID);
-                    auto distance = std::distance(self.annotationsNearbyLastTap.begin(), result);
-                    newSelectedAnnotationID = self.annotationsNearbyLastTap[distance + 1];
+                    // the selection candidates haven't changed; cycle through them
+                    if (self.selectedAnnotation &&
+                        [[[self.annotationMetadataByAnnotation objectForKey:self.selectedAnnotation]
+                            objectForKey:MGLAnnotationIDKey] unsignedIntValue] == self.annotationsNearbyLastTap.back())
+                    {
+                        // the selected annotation is the last in the set; cycle back to the first
+                        // note: this could be the selected annotation if only one in set
+                        newSelectedAnnotationID = self.annotationsNearbyLastTap.front();
+                    }
+                    else if (self.selectedAnnotation)
+                    {
+                        // otherwise increment the selection through the candidates
+                        uint32_t currentID = [[[self.annotationMetadataByAnnotation objectForKey:self.selectedAnnotation] objectForKey:MGLAnnotationIDKey] unsignedIntValue];
+                        auto result = std::find(self.annotationsNearbyLastTap.begin(), self.annotationsNearbyLastTap.end(), currentID);
+                        auto distance = std::distance(self.annotationsNearbyLastTap.begin(), result);
+                        newSelectedAnnotationID = self.annotationsNearbyLastTap[distance + 1];
+                    }
+                    else
+                    {
+                        // no current selection; select the first one
+                        newSelectedAnnotationID = self.annotationsNearbyLastTap.front();
+                    }
                 }
                 else
                 {
-                    // no current selection; select the first one
+                    // start tracking a new set of nearby annotations
+                    self.annotationsNearbyLastTap = nearbyAnnotations;
+
+                    // select the first one
                     newSelectedAnnotationID = self.annotationsNearbyLastTap.front();
                 }
-            }
-            else
-            {
-                // start tracking a new set of nearby annotations
-                self.annotationsNearbyLastTap = nearbyAnnotations;
-
-                // select the first one
-                newSelectedAnnotationID = self.annotationsNearbyLastTap.front();
             }
         }
         else

@@ -22,6 +22,7 @@
     {
         _image = image;
         _reuseIdentifier = [reuseIdentifier copy];
+        _enabled = YES;
     }
 
     return self;
