@@ -1471,6 +1471,18 @@ public final class MapView extends FrameLayout implements LocationListener, Comp
         return mNativeMapView.getTopOffsetPixelsForAnnotationSymbol(symbolName);
     }
 
+    /**
+     * Returns the distance spanned by one pixel at the specified latitude and current zoom level.
+     * <p/>
+     * The distance between pixels decreases as the latitude approaches the poles. This relationship parallels the relationship between longitudinal coordinates at different latitudes.
+     *
+     * @param latitude The latitude for which to return the value.
+     * @return The distance (in meters) spanned by a single pixel.
+     */
+    public double getMetersPerPixelAtLatitude(double latitude) {
+        return mNativeMapView.getMetersPerPixelAtLatitude(latitude, getZoomLevel());
+    }
+
     // Used by InfoWindow
     float getScreenDensity() {
         return mScreenDensity;
