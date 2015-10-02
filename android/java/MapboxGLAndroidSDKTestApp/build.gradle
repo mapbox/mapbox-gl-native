@@ -46,7 +46,7 @@ android {
     }
 
     defaultConfig {
-        applicationId "com.mapbox.mapboxgl.testapp"
+        applicationId "com.mapbox.mapboxsdk.testapp"
         minSdkVersion 15
         targetSdkVersion 23
         versionCode 4
