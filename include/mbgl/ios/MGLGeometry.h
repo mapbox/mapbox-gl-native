@@ -83,11 +83,13 @@ NS_INLINE NSString *MGLStringFromCoordinateBounds(MGLCoordinateBounds bounds) {
             bounds.ne.latitude, bounds.ne.longitude];
 }
 
+/** Returns radians, converted from degrees. */
 NS_INLINE CGFloat MGLRadiansFromDegrees(CLLocationDegrees degrees)
 {
     return (CGFloat)(degrees * M_PI) / 180;
 }
 
+/** Returns degrees, converted from radians. */
 NS_INLINE CLLocationDegrees MGLDegreesFromRadians(CGFloat radians)
 {
     return radians * 180 / M_PI;
