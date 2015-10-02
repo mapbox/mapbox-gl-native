@@ -16,7 +16,7 @@ import com.mapbox.mapboxgl.views.R;
 
 import java.lang.ref.WeakReference;
 
-public class CompassView extends ImageView implements SensorEventListener {
+final class CompassView extends ImageView implements SensorEventListener {
 
     private CompassDelegate mCompassDelegate;
 
