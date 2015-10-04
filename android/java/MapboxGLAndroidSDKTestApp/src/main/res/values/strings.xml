@@ -23,6 +23,7 @@
     <string name="action_map_fragment">MapFragment</string>
     <string name="action_press_for_marker">Press For Marker</string>
     <string name="action_info_window">InfoWindow</string>
+    <string name="action_visible_bounds">Set Visible Bounds</string>
 
     <string name="label_fps">FPS:</string>
 

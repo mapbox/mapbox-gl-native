@@ -16,6 +16,7 @@
 #include <mbgl/android/jni.hpp>
 #include <mbgl/android/native_map_view.hpp>
 #include <mbgl/map/map.hpp>
+#include <mbgl/map/camera.hpp>
 #include <mbgl/annotation/point_annotation.hpp>
 #include <mbgl/annotation/shape_annotation.hpp>
 #include <mbgl/annotation/sprite_image.hpp>
@@ -94,6 +95,13 @@ jclass pointFClass = nullptr;
 jmethodID pointFConstructorId = nullptr;
 jfieldID pointFXId = nullptr;
 jfieldID pointFYId = nullptr;
+
+jclass rectFClass = nullptr;
+jmethodID rectFConstructorId = nullptr;
+jfieldID rectFLeftId = nullptr;
+jfieldID rectFTopId = nullptr;
+jfieldID rectFRightId = nullptr;
+jfieldID rectFBottomId = nullptr;
 
 jclass httpContextClass = nullptr;
 jmethodID httpContextGetInstanceId = nullptr;
@@ -1124,6 +1132,72 @@ void JNICALL nativeSetSprite(JNIEnv *env, jobject obj, jlong nativeMapViewPtr,
     nativeMapView->getMap().setSprite(symbolName, spriteImage);
 }
 
+void JNICALL nativeSetVisibleCoordinateBounds(JNIEnv *env, jobject obj, jlong nativeMapViewPtr,
+        jobjectArray coordinates, jobject padding, jdouble direction, jlong duration) {
+    mbgl::Log::Debug(mbgl::Event::JNI, "nativeSetVisibleCoordinateBounds");
+    assert(nativeMapViewPtr != 0);
+    NativeMapView *nativeMapView = reinterpret_cast<NativeMapView *>(nativeMapViewPtr);
+
+    jfloat left = env->GetFloatField(padding, rectFLeftId);
+    if (env->ExceptionCheck()) {
+        env->ExceptionDescribe();
+        return;
+    }
+
+    jfloat right = env->GetFloatField(padding, rectFRightId);
+    if (env->ExceptionCheck()) {
+        env->ExceptionDescribe();
+        return;
+    }
+
+    jfloat top = env->GetFloatField(padding, rectFTopId);
+    if (env->ExceptionCheck()) {
+        env->ExceptionDescribe();
+        return;
+    }
+
+    jfloat bottom = env->GetFloatField(padding, rectFBottomId);
+    if (env->ExceptionCheck()) {
+        env->ExceptionDescribe();
+        return;
+    }
+
+    jsize count = env->GetArrayLength(coordinates);
+
+    mbgl::EdgeInsets mbglInsets = {top, left, bottom, right};
+    mbgl::AnnotationSegment segment;
+    segment.reserve(count);
+
+    for (int i = 0; i < count; i++) {
+        jobject latLng = reinterpret_cast<jobject>(env->GetObjectArrayElement(coordinates, i));
+        jdouble latitude = env->GetDoubleField(latLng, latLngLatitudeId);
+        if (env->ExceptionCheck()) {
+            env->ExceptionDescribe();
+            return;
+        }
+        jdouble longitude = env->GetDoubleField(latLng, latLngLongitudeId);
+        if (env->ExceptionCheck()) {
+            env->ExceptionDescribe();
+            return;
+        }
+        segment.push_back(mbgl::LatLng(latitude, longitude));
+    }
+
+    mbgl::CameraOptions options = nativeMapView->getMap().cameraForLatLngs(segment, mbglInsets);
+
+    if (direction >= 0) {
+        // convert from degrees to radians
+        options.angle = (-direction * M_PI) / 180;
+    }
+    if (duration > 0) {
+        options.duration = std::chrono::milliseconds(duration);
+        // equivalent to kCAMediaTimingFunctionDefault in iOS
+        options.easing = {0.25, 0.1, 0.25, 0.1};
+    }
+
+    nativeMapView->getMap().easeTo(options);
+}
+
 void JNICALL nativeOnLowMemory(JNIEnv *env, jobject obj, jlong nativeMapViewPtr) {
     mbgl::Log::Debug(mbgl::Event::JNI, "nativeOnLowMemory");
     assert(nativeMapViewPtr != 0);
@@ -1627,6 +1701,42 @@ extern "C" JNIEXPORT jint JNICALL JNI_OnLoad(JavaVM *vm, void *reserved) {
         return JNI_ERR;
     }
 
+    rectFClass = env->FindClass("android/graphics/RectF");
+    if (rectFClass == nullptr) {
+        env->ExceptionDescribe();
+        return JNI_ERR;
+    }
+
+    rectFConstructorId = env->GetMethodID(rectFClass, "<init>", "()V");
+    if (rectFConstructorId == nullptr) {
+        env->ExceptionDescribe();
+        return JNI_ERR;
+    }
+
+    rectFLeftId = env->GetFieldID(rectFClass, "left", "F");
+    if (rectFLeftId == nullptr) {
+        env->ExceptionDescribe();
+        return JNI_ERR;
+    }
+
+    rectFRightId = env->GetFieldID(rectFClass, "right", "F");
+    if (rectFRightId == nullptr) {
+        env->ExceptionDescribe();
+        return JNI_ERR;
+    }
+
+    rectFTopId = env->GetFieldID(rectFClass, "top", "F");
+    if (rectFTopId == nullptr) {
+        env->ExceptionDescribe();
+        return JNI_ERR;
+    }
+
+    rectFBottomId = env->GetFieldID(rectFClass, "bottom", "F");
+    if (rectFBottomId == nullptr) {
+        env->ExceptionDescribe();
+        return JNI_ERR;
+    }
+
     httpContextClass = env->FindClass("com/mapbox/mapboxsdk/http/HTTPContext");
     if (httpContextClass == nullptr) {
         env->ExceptionDescribe();
@@ -1749,6 +1859,8 @@ extern "C" JNIEXPORT jint JNICALL JNI_OnLoad(JavaVM *vm, void *reserved) {
         {"nativeGetAnnotationsInBounds", "(JLcom/mapbox/mapboxsdk/geometry/BoundingBox;)[J",
          reinterpret_cast<void *>(&nativeGetAnnotationsInBounds)},
         {"nativeSetSprite", "(JLjava/lang/String;IIF[B)V", reinterpret_cast<void *>(&nativeSetSprite)},
+        {"nativeSetVisibleCoordinateBounds", "(J[Lcom/mapbox/mapboxsdk/geometry/LatLng;Landroid/graphics/RectF;DJ)V",
+                reinterpret_cast<void *>(&nativeSetVisibleCoordinateBounds)},
         {"nativeOnLowMemory", "(J)V", reinterpret_cast<void *>(&nativeOnLowMemory)},
         {"nativeSetDebug", "(JZ)V", reinterpret_cast<void *>(&nativeSetDebug)},
         {"nativeToggleDebug", "(J)V", reinterpret_cast<void *>(&nativeToggleDebug)},
@@ -1918,6 +2030,23 @@ extern "C" JNIEXPORT jint JNICALL JNI_OnLoad(JavaVM *vm, void *reserved) {
         return JNI_ERR;
     }
 
+    rectFClass = reinterpret_cast<jclass>(env->NewGlobalRef(rectFClass));
+    if (rectFClass == nullptr) {
+        env->ExceptionDescribe();
+        env->DeleteGlobalRef(latLngClass);
+        env->DeleteGlobalRef(markerClass);
+        env->DeleteGlobalRef(latLngZoomClass);
+        env->DeleteGlobalRef(bboxClass);
+        env->DeleteGlobalRef(polylineClass);
+        env->DeleteGlobalRef(polygonClass);
+        env->DeleteGlobalRef(runtimeExceptionClass);
+        env->DeleteGlobalRef(nullPointerExceptionClass);
+        env->DeleteGlobalRef(arrayListClass);
+        env->DeleteGlobalRef(projectedMetersClass);
+        env->DeleteGlobalRef(pointFClass);
+        return JNI_ERR;
+    }
+
     httpContextClass = reinterpret_cast<jclass>(env->NewGlobalRef(httpContextClass));
     if (httpContextClass == nullptr) {
         env->ExceptionDescribe();
@@ -1933,6 +2062,7 @@ extern "C" JNIEXPORT jint JNICALL JNI_OnLoad(JavaVM *vm, void *reserved) {
         env->DeleteGlobalRef(arrayListClass);
         env->DeleteGlobalRef(projectedMetersClass);
         env->DeleteGlobalRef(pointFClass);
+        env->DeleteGlobalRef(rectFClass);
     }
 
     httpRequestClass = reinterpret_cast<jclass>(env->NewGlobalRef(httpRequestClass));
@@ -1950,6 +2080,7 @@ extern "C" JNIEXPORT jint JNICALL JNI_OnLoad(JavaVM *vm, void *reserved) {
         env->DeleteGlobalRef(arrayListClass);
         env->DeleteGlobalRef(projectedMetersClass);
         env->DeleteGlobalRef(pointFClass);
+        env->DeleteGlobalRef(rectFClass);
         env->DeleteGlobalRef(httpContextClass);
     }
 
@@ -2044,6 +2175,14 @@ extern "C" JNIEXPORT void JNICALL JNI_OnUnload(JavaVM *vm, void *reserved) {
     pointFConstructorId = nullptr;
     pointFXId = nullptr;
     pointFYId = nullptr;
+
+    env->DeleteGlobalRef(rectFClass);
+    rectFClass = nullptr;
+    rectFConstructorId = nullptr;
+    rectFLeftId = nullptr;
+    rectFTopId = nullptr;
+    rectFRightId = nullptr;
+    rectFBottomId = nullptr;
 
     env->DeleteGlobalRef(httpContextClass);
     httpContextGetInstanceId = nullptr;

@@ -88,6 +88,13 @@ extern jmethodID pointFConstructorId;
 extern jfieldID pointFXId;
 extern jfieldID pointFYId;
 
+extern jclass rectFClass;
+extern jmethodID rectFConstructorId;
+extern jfieldID rectFLeftId;
+extern jfieldID rectFTopId;
+extern jfieldID rectFRightId;
+extern jfieldID rectFBottomId;
+
 extern jclass httpContextClass;
 extern jmethodID httpContextGetInstanceId;
 extern jmethodID httpContextCreateRequestId;

@@ -68,6 +68,7 @@ import com.mapbox.mapboxsdk.constants.Style;
 import com.mapbox.mapboxsdk.exceptions.InvalidAccessTokenException;
 import com.mapbox.mapboxsdk.exceptions.SpriteBitmapChangedException;
 import com.mapbox.mapboxsdk.geometry.BoundingBox;
+import com.mapbox.mapboxsdk.geometry.CoordinateBounds;
 import com.mapbox.mapboxsdk.geometry.LatLng;
 import com.mapbox.mapboxsdk.geometry.LatLngZoom;
 import com.mapbox.mapboxsdk.utils.ApiAccess;
@@ -1980,6 +1981,42 @@ public final class MapView extends FrameLayout {
                 mSelectedMarker = null;
             }
         }
+    }
+    
+    //
+    // Camera
+    //
+    public void setVisibleCoordinateBounds(@NonNull CoordinateBounds bounds) {
+        setVisibleCoordinateBounds(bounds, false);
+    }
+
+    public void setVisibleCoordinateBounds(@NonNull CoordinateBounds bounds, boolean animated) {
+        setVisibleCoordinateBounds(bounds, new RectF(), animated);
+    }
+
+    public void setVisibleCoordinateBounds(@NonNull CoordinateBounds bounds, @NonNull RectF padding, boolean animated) {
+        LatLng[] coordinates = {
+                new LatLng(bounds.getNe().getLatitude(), bounds.getSw().getLongitude()),
+                bounds.getSw(),
+                new LatLng(bounds.getSw().getLatitude(), bounds.getNe().getLongitude()),
+                bounds.getNe()
+
+        };
+        setVisibleCoordinateBounds(coordinates, padding, animated);
+    }
+
+    public void setVisibleCoordinateBounds(@NonNull LatLng[] coordinates, @NonNull RectF padding, boolean animated) {
+        setVisibleCoordinateBounds(coordinates, padding, getDirection(), animated);
+    }
+
+    private void setVisibleCoordinateBounds(LatLng[] coordinates, RectF padding, double direction, boolean animated) {
+        setVisibleCoordinateBounds(coordinates, padding, direction, animated ? ANIMATION_DURATION : 0l);
+    }
+
+    private void setVisibleCoordinateBounds(LatLng[] coordinates, RectF padding, double direction, long duration) {
+        mNativeMapView.setVisibleCoordinateBounds(coordinates, new RectF(padding.left / mScreenDensity,
+                padding.top / mScreenDensity, padding.right / mScreenDensity, padding.bottom / mScreenDensity),
+                direction, duration);
     }
 
     /**
