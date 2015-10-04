@@ -114,37 +114,32 @@ public class MainActivity extends AppCompatActivity {
         mMapView.onCreate(savedInstanceState);
         mMapView.setOnFpsChangedListener(new MyOnFpsChangedListener());
 
-        final GestureDetector gestureDetector = new GestureDetector(this, new GestureDetector.SimpleOnGestureListener() {
-            public void onLongPress(final MotionEvent e) {
-                float x = e.getX();
-                float y = e.getY();
-
-                // flip y direction vertically to match core GL
-                y = mMapView.getHeight() - y;
-
-                LatLng position = mMapView.fromScreenLocation(new PointF(x, y));
-
+        mMapView.setOnMapLongClickListener(new MapView.OnMapLongClickListener() {
+            @Override
+            public void onMapLongClick(LatLng point) {
                 mMapView.addMarker(new MarkerOptions()
-                        .position(position)
+                        .position(point)
                         .title("Dropped Pin")
-                        .snippet(new DecimalFormat("#.#####").format(position.getLatitude()) + ", " +
-                                 new DecimalFormat("#.#####").format(position.getLongitude()))
-                        .sprite(null));
+                        .snippet(new DecimalFormat("#.#####").format(point.getLatitude()) + ", " +
+                                new DecimalFormat("#.#####").format(point.getLongitude()))
+                        .sprite("default_marker"));
             }
         });
 
-        mMapView.setOnTouchListener(new View.OnTouchListener() {
-            public boolean onTouch(View v, MotionEvent event) {
-                return gestureDetector.onTouchEvent(event);
+        mMapView.setOnMapClickListener(new MapView.OnMapClickListener() {
+            @Override
+            public void onMapClick(LatLng point) {
+                String location = new DecimalFormat("#.#####").format(point.getLatitude()) + ", " +
+                        new DecimalFormat("#.#####").format(point.getLongitude());
+                Snackbar.make(findViewById(android.R.id.content), "Map Click Listener " + location, Snackbar.LENGTH_SHORT).show();
             }
         });
 
         mMapView.setOnMarkerClickListener(new MapView.OnMarkerClickListener() {
             @Override
             public boolean onMarkerClick(Marker marker) {
-                Snackbar.make(findViewById(android.R.id.content),"Custom Marker Click Listener",Snackbar.LENGTH_SHORT).show();
-                marker.showInfoWindow();
-                return true;
+                Snackbar.make(findViewById(android.R.id.content), "Custom Marker Click Listener", Snackbar.LENGTH_SHORT).show();
+                return false;
             }
         });
 

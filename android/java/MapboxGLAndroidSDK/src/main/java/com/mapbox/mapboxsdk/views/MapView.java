@@ -189,9 +189,9 @@ public final class MapView extends FrameLayout implements LocationListener, Comp
 
     // Used for displaying annotation markers
     // Every annotation that has been added to the map
-    private List<Annotation> mAnnotations = new ArrayList<>();
+    private final List<Annotation> mAnnotations = new ArrayList<>();
     private List<Annotation> mAnnotationsNearLastTap = new ArrayList<>();
-    private Annotation mSelectedAnnotation = null;
+    private Annotation mSelectedAnnotation;
     private InfoWindowAdapter mInfoWindowAdapter;
 
     // Used for the Mapbox Logo
@@ -203,12 +203,16 @@ public final class MapView extends FrameLayout implements LocationListener, Comp
     // Used to manage MapChange event listeners
     private ArrayList<OnMapChangedListener> mOnMapChangedListener;
 
+    // Used to manage map click event listeners
+    private OnMapClickListener mOnMapClickListener;
+    private OnMapLongClickListener mOnMapLongClickListener;
+
     // Used to manage fling and scroll event listeners
-    private OnFlingListener onFlingListener;
-    private OnScrollListener onScrollListener;
+    private OnFlingListener mOnFlingListener;
+    private OnScrollListener mOnScrollListener;
 
     // Used to manage marker click event listeners
-    private OnMarkerClickListener onMarkerClickListener;
+    private OnMarkerClickListener mOnMarkerClickListener;
 
 
     //
@@ -367,6 +371,34 @@ public final class MapView extends FrameLayout implements LocationListener, Comp
     }
 
     /**
+     * Interface definition for a callback to be invoked when the user clicks on the map view.
+     *
+     * @see MapView#setOnMapClickListener(OnMapClickListener)
+     */
+    public interface OnMapClickListener {
+        /**
+         * Called when the user clicks on the map view.
+         *
+         * @param point The projected map coordinate the user clicked on.
+         */
+        void onMapClick(LatLng point);
+    }
+
+    /**
+     * Interface definition for a callback to be invoked when the user long clicks on the map view.
+     *
+     * @see MapView#setOnMapLongClickListener(OnMapLongClickListener)
+     */
+    public interface OnMapLongClickListener {
+        /**
+         * Called when the user long clicks on the map view.
+         *
+         * @param point The projected map coordinate the user long clicked on.
+         */
+        void onMapLongClick(LatLng point);
+    }
+
+    /**
      * Interface definition for a callback to be invoked when the user clicks on a marker.
      *
      * @see MapView#setOnMarkerClickListener(OnMarkerClickListener)
@@ -376,7 +408,7 @@ public final class MapView extends FrameLayout implements LocationListener, Comp
          * Called when the user clicks on a marker.
          *
          * @param marker The marker the user clicked on.
-         * @return If true the event was handled and the {@link InfoWindow} will not be shown.
+         * @return If true the listener has consumed the event and the {@link InfoWindow} will not be shown.
          */
         boolean onMarkerClick(Marker marker);
     }
@@ -398,13 +430,15 @@ public final class MapView extends FrameLayout implements LocationListener, Comp
 
     /**
      * Interface definition for a callback to be invoked when an {@link InfoWindow} will be shown.
+     *
+     * @see MapView#setInfoWindowAdapter(InfoWindowAdapter)
      */
     public interface InfoWindowAdapter {
         /**
-         * Called when the user clicks on a marker.
+         * Called when an {@link InfoWindow} will be shown as a result of a marker click.
          *
          * @param marker The marker the user clicked on.
-         * @return View to be shown as a {@link InfoWindow}
+         * @return View to be shown as a {@link InfoWindow}.
          */
         View getInfoWindow(Marker marker);
     }
@@ -1328,12 +1362,25 @@ public final class MapView extends FrameLayout implements LocationListener, Comp
     //
 
     public LatLng fromScreenLocation(PointF point) {
-        return mNativeMapView.latLngForPixel(new PointF(point.x / mScreenDensity, point.y / mScreenDensity));
+        float x = point.x;
+        float y = point.y;
+
+        // flip y direction vertically to match core GL
+        y = getHeight() - y;
+
+        return mNativeMapView.latLngForPixel(new PointF(x / mScreenDensity, y / mScreenDensity));
     }
 
     public PointF toScreenLocation(LatLng location) {
         PointF point = mNativeMapView.pixelForLatLng(location);
-        return new PointF(point.x * mScreenDensity, point.y * mScreenDensity);
+
+        float x = point.x * mScreenDensity;
+        float y = point.y * mScreenDensity;
+
+        // flip y direction vertically to match core GL
+        y = getHeight() - y;
+
+        return new PointF(x, y);
     }
 
     //
@@ -1362,7 +1409,9 @@ public final class MapView extends FrameLayout implements LocationListener, Comp
             Bitmap bitmap = bitmapDrawable.getBitmap();
             setSprite(DEFAULT_SPRITE, bitmap);
 
-            marker.setSprite(DEFAULT_SPRITE);
+            // Red default marker is currently broken
+            marker.setSprite("default_marker");
+            //marker.setSprite(DEFAULT_SPRITE);
         }
 
         long id = mNativeMapView.addMarker(marker);
@@ -1468,8 +1517,8 @@ public final class MapView extends FrameLayout implements LocationListener, Comp
         List<Annotation> annotations = new ArrayList<>();
         long[] ids = mNativeMapView.getAnnotationsInBounds(bbox);
         List<Long> idsList = new ArrayList<>();
-        for (int i = 0; i < ids.length; i++) {
-            idsList.add(new Long(ids[i]));
+        for (long id : ids) {
+            idsList.add(id);
         }
         for (int i = 0; i < mAnnotations.size(); i++) {
             Annotation annotation = mAnnotations.get(i);
@@ -1518,9 +1567,9 @@ public final class MapView extends FrameLayout implements LocationListener, Comp
 
             Marker marker = (Marker) annotation;
             boolean handledDefaultClick = false;
-            if (onMarkerClickListener != null) {
+            if (mOnMarkerClickListener != null) {
                 // end developer has provided a custom click listener
-                handledDefaultClick = onMarkerClickListener.onMarkerClick(marker);
+                handledDefaultClick = mOnMarkerClickListener.onMarkerClick(marker);
             }
 
             if(mInfoWindowAdapter!=null){
@@ -1531,6 +1580,8 @@ public final class MapView extends FrameLayout implements LocationListener, Comp
                 }
             }else if (!handledDefaultClick) {
                 // default behaviour
+                // Can't do this as InfoWindow will get hidden
+                //setCenterCoordinate(marker.getPosition(), true);
                 marker.showInfoWindow();
             }
 
@@ -1555,12 +1606,10 @@ public final class MapView extends FrameLayout implements LocationListener, Comp
 
     // Called when the map needs to be rerendered
     // Called via JNI from NativeMapView
-    protected void onInvalidate() {
-        synchronized (mDirty) {
-            if (!mDirty) {
+    synchronized protected void onInvalidate() {
+         if (!mDirty) {
                 mDirty = true;
                 postRender();
-            }
         }
     }
 
@@ -1746,20 +1795,13 @@ public final class MapView extends FrameLayout implements LocationListener, Comp
         @Override
         public boolean onSingleTapConfirmed(MotionEvent e) {
             // Open / Close InfoWindow
-
-            float x = e.getX();
-            float y = e.getY();
-
-            // flip y direction vertically to match core GL
-            y = getHeight() - y;
-
-            PointF tapPoint = new PointF(x, y);
+            PointF tapPoint = new PointF(e.getX(), e.getY());
 
             float toleranceWidth = 40 * mScreenDensity;
             float toleranceHeight = 60 * mScreenDensity;
 
-            RectF tapRect = new RectF(tapPoint.x - toleranceWidth / 2, tapPoint.y + 2 * toleranceHeight / 3,
-                    tapPoint.x + toleranceWidth / 2, tapPoint.y - 1 * toleranceHeight / 3);
+            RectF tapRect = new RectF(tapPoint.x - toleranceWidth / 2, tapPoint.y - 2 * toleranceHeight / 3,
+                    tapPoint.x + toleranceWidth / 2, tapPoint.y + 1 * toleranceHeight / 3);
 
             List<LatLng> corners = Arrays.asList(
                     fromScreenLocation(new PointF(tapRect.left, tapRect.bottom)),
@@ -1772,7 +1814,7 @@ public final class MapView extends FrameLayout implements LocationListener, Comp
 
             List<Annotation> nearbyAnnotations = getAnnotationsInBounds(tapBounds);
 
-            long newSelectedAnnotationID = -1;
+            long newSelectedAnnotationID;
 
             if (nearbyAnnotations.size() > 0) {
 
@@ -1789,7 +1831,6 @@ public final class MapView extends FrameLayout implements LocationListener, Comp
                         newSelectedAnnotationID = mAnnotationsNearLastTap.get(0).getId();
                     } else if (mSelectedAnnotation != null) {
                         // otherwise increment the selection through the candidates
-                        long currentID = mSelectedAnnotation.getId();
                         long result = mAnnotationsNearLastTap.indexOf(mSelectedAnnotation);
                         newSelectedAnnotationID = mAnnotationsNearLastTap.get((int) result + 1).getId();
                     } else {
@@ -1827,6 +1868,12 @@ public final class MapView extends FrameLayout implements LocationListener, Comp
                 if (mSelectedAnnotation != null) {
                     deselectAnnotation();
                 }
+
+                // notify app of map click
+                if (mOnMapClickListener != null) {
+                    LatLng point = fromScreenLocation(tapPoint);
+                    mOnMapClickListener.onMapClick(point);
+                }
             }
 
             return true;
@@ -1835,8 +1882,10 @@ public final class MapView extends FrameLayout implements LocationListener, Comp
         // Called for a long press
         @Override
         public void onLongPress(MotionEvent e) {
-            // TODO
-            performLongClick();
+            if (mOnMapLongClickListener != null) {
+                LatLng point = fromScreenLocation(new PointF(e.getX(), e.getY()));
+                mOnMapLongClickListener.onMapLongClick(point);
+            }
         }
 
         // Called for flings
@@ -1864,8 +1913,8 @@ public final class MapView extends FrameLayout implements LocationListener, Comp
 
             mNativeMapView.moveBy(velocityX * duration / 2.0 / mScreenDensity, velocityY * duration / 2.0 / mScreenDensity, (long) (duration * 1000.0f));
 
-            if (onFlingListener != null) {
-                onFlingListener.onFling();
+            if (mOnFlingListener != null) {
+                mOnFlingListener.onFling();
             }
 
             return true;
@@ -1886,8 +1935,8 @@ public final class MapView extends FrameLayout implements LocationListener, Comp
             // Scroll the map
             mNativeMapView.moveBy(-distanceX / mScreenDensity, -distanceY / mScreenDensity);
 
-            if (onScrollListener != null) {
-                onScrollListener.onScroll();
+            if (mOnScrollListener != null) {
+                mOnScrollListener.onScroll();
             }
 
             return true;
@@ -2421,15 +2470,23 @@ public final class MapView extends FrameLayout implements LocationListener, Comp
     }
 
     public void setOnScrollListener(OnScrollListener onScrollListener) {
-        this.onScrollListener = onScrollListener;
+        mOnScrollListener = onScrollListener;
     }
 
     public void setOnFlingListener(OnFlingListener onFlingListener) {
-        this.onFlingListener = onFlingListener;
+        mOnFlingListener = onFlingListener;
     }
 
-    public void setOnMarkerClickListener(OnMarkerClickListener onMarkerClickListener){
-        this.onMarkerClickListener = onMarkerClickListener;
+    public void setOnMapClickListener(OnMapClickListener onMapClickListener) {
+        mOnMapClickListener = onMapClickListener;
+    }
+
+    public void setOnMapLongClickListener(OnMapLongClickListener onMapLongClickListener) {
+        mOnMapLongClickListener = onMapLongClickListener;
+    }
+
+    public void setOnMarkerClickListener(OnMarkerClickListener onMarkerClickListener) {
+        mOnMarkerClickListener = onMarkerClickListener;
     }
 
     //
@@ -2521,7 +2578,7 @@ public final class MapView extends FrameLayout implements LocationListener, Comp
             // Update Location
             FrameLayout.LayoutParams lp = new FrameLayout.LayoutParams((int) iconSize, (int) iconSize);
             lp.leftMargin = (int) (screenLocation.x - iconSize / 2.0f);
-            lp.topMargin = getHeight() - (int) (screenLocation.y + iconSize / 2.0f);
+            lp.topMargin = (int) (screenLocation.y + iconSize / 2.0f);
             mGpsMarker.setLayoutParams(lp);
             rotateImageView(mGpsMarker, 0.0f);
             mGpsMarker.requestLayout();

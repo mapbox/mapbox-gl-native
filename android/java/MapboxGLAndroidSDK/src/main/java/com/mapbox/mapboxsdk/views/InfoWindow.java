@@ -88,8 +88,6 @@ public final class InfoWindow {
         double y = mMapView.getTopOffsetPixelsForAnnotationSymbol(object.getSprite());
         y = y * mMapView.getScreenDensity();
 
-        // Flip y coordinate as Android view origin is upper left corner
-        coords.y = mMapView.getHeight() - coords.y;
         lp.leftMargin = (int) coords.x - (mView.getMeasuredWidth() / 2);
         // Add y because it's a negative value
         lp.topMargin = (int) coords.y - mView.getMeasuredHeight() + (int) y;
