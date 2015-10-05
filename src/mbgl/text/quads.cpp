@@ -28,7 +28,13 @@ SymbolQuads getIconQuads(Anchor &anchor, const PositionedIcon &shapedIcon,
     if (alongLine) {
         assert(static_cast<unsigned int>(anchor.segment) < line.size());
         const Coordinate &prev= line[anchor.segment];
-        angle += std::atan2(anchor.y - prev.y, anchor.x - prev.x);
+        if (anchor.y == prev.y && anchor.x == prev.x &&
+            static_cast<unsigned int>(anchor.segment + 1) < line.size()) {
+            const Coordinate &next= line[anchor.segment + 1];
+            angle += std::atan2(anchor.y - next.y, anchor.x - next.x) + M_PI;
+        } else {
+            angle += std::atan2(anchor.y - prev.y, anchor.x - prev.x);
+        }
     }
 
 
