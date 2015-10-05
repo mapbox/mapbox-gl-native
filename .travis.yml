@@ -7,11 +7,11 @@ matrix:
     - os: linux
   include:
     - os: linux
-      env: FLAVOR=linux CXX=g++-4.9 BUILDTYPE=Release
+      env: FLAVOR=linux CXX=g++-5 BUILDTYPE=Release
       addons:
         apt:
           sources: [ 'ubuntu-toolchain-r-test' ]
-          packages: [ 'gdb', 'g++-4.9', 'gcc-4.9', 'libllvm3.4', 'xutils-dev', 'libxxf86vm-dev', 'x11proto-xf86vidmode-dev', 'mesa-utils' ]
+          packages: [ 'gdb', 'g++-5', 'gcc-5', 'libllvm3.4', 'xutils-dev', 'libxxf86vm-dev', 'x11proto-xf86vidmode-dev', 'mesa-utils' ]
     - os: linux
       env: FLAVOR=linux CXX=clang++-3.5 BUILDTYPE=Debug
       addons:

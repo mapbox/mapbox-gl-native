@@ -4,6 +4,8 @@
 
 #include <uv.h>
 
+#pragma GCC diagnostic push
+#pragma GCC diagnostic ignored "-Wunused-variable"
 // Check libuv library version.
 const static bool uvVersionCheck = []() {
     const unsigned int version = uv_version();
@@ -23,6 +25,7 @@ const static bool uvVersionCheck = []() {
     }
     return true;
 }();
+#pragma GCC diagnostic pop
 
 #if UV_VERSION_MAJOR == 0 && UV_VERSION_MINOR <= 10
 
