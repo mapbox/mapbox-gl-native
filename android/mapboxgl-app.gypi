@@ -23,6 +23,7 @@
 
       'cflags_cc': [
         '<@(boost_cflags)',
+        '<@(variant_cflags)',
       ],
       'libraries': [
           '<@(openssl_static_libs)',
@@ -78,6 +79,12 @@
             '../styles/styles'
           ],
           'destination': '<(pwd)/../android/java/MapboxGLAndroidSDK/src/main/assets'
+        },
+        {
+        'files': [
+          '<(PRODUCT_DIR)/obj.target'
+        ],
+        'destination': '<(pwd)/../android/java/MapboxGLAndroidSDK/src/main'
         },
       ],
 

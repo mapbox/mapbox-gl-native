@@ -186,17 +186,14 @@ void TileWorker::addBucketGeometries(Bucket& bucket, const GeometryTileLayer& la
 
 std::unique_ptr<Bucket> TileWorker::createFillBucket(const GeometryTileLayer& layer,
                                                      const StyleBucket& bucket_desc) {
-    auto bucket = std::make_unique<FillBucket>(fillVertexBuffer,
-                                                triangleElementsBuffer,
-                                                lineElementsBuffer);
+    auto bucket = std::make_unique<FillBucket>();
     addBucketGeometries(bucket, layer, bucket_desc.filter);
     return bucket->hasData() ? std::move(bucket) : nullptr;
 }
 
 std::unique_ptr<Bucket> TileWorker::createLineBucket(const GeometryTileLayer& layer,
                                                      const StyleBucket& bucket_desc) {
-    auto bucket = std::make_unique<LineBucket>(lineVertexBuffer,
-                                                triangleElementsBuffer);
+    auto bucket = std::make_unique<LineBucket>();
 
     const float z = id.z;
     auto& layout = bucket->layout;
@@ -212,8 +209,7 @@ std::unique_ptr<Bucket> TileWorker::createLineBucket(const GeometryTileLayer& la
 
 std::unique_ptr<Bucket> TileWorker::createCircleBucket(const GeometryTileLayer& layer,
                                                        const StyleBucket& bucket_desc) {
-    auto bucket = std::make_unique<CircleBucket>(circleVertexBuffer,
-                                                 triangleElementsBuffer);
+    auto bucket = std::make_unique<CircleBucket>();
 
     // Circle does not have layout properties to apply.
 

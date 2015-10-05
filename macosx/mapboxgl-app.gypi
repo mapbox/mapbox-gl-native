@@ -36,6 +36,7 @@
         'cflags_cc': [
           '<@(boost_cflags)',
           '<@(glfw_cflags)',
+          '<@(variant_cflags)',
         ],
         'ldflags': [
           '-framework SystemConfiguration', # For NSUserDefaults and Reachability

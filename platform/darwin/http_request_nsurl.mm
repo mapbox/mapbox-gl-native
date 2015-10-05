@@ -294,6 +294,9 @@ void HTTPNSURLRequest::handleResult(NSData *data, NSURLResponse *res, NSError *e
         } else if (responseCode == 200) {
             response->status = Response::Successful;
             status = ResponseStatus::Successful;
+        } else if (responseCode == 404) {
+            response->status = Response::NotFound;
+            status = ResponseStatus::Successful;
         } else if (responseCode >= 500 && responseCode < 600) {
             // Server errors may be temporary, so back off exponentially.
             response->status = Response::Error;

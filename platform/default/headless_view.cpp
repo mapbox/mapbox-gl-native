@@ -162,6 +162,10 @@ void HeadlessView::resizeFramebuffer() {
 }
 
 void HeadlessView::resize(const uint16_t width, const uint16_t height) {
+    if(dimensions[0] == width &&
+       dimensions[1] == height) {
+        return;
+    }
     dimensions = {{ width, height }};
     needsResize = true;
 }
@@ -202,7 +206,7 @@ void HeadlessView::clearBuffers() {
     }
 
     if (fboColor) {
-        MBGL_CHECK_ERROR(glDeleteTextures(1, &fboColor));
+        MBGL_CHECK_ERROR(glDeleteRenderbuffersEXT(1, &fboColor));
         fboColor = 0;
     }
 
@@ -249,7 +253,7 @@ std::array<uint16_t, 2> HeadlessView::getFramebufferSize() const {
 }
 
 void HeadlessView::activate() {
-     if (thread != std::thread::id()) {
+    if (thread != std::thread::id()) {
         throw std::runtime_error("OpenGL context was already current");
     }
     thread = std::this_thread::get_id();

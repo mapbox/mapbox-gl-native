@@ -50,7 +50,7 @@ void Raster::bind(bool linear) {
         MBGL_CHECK_ERROR(glBindTexture(GL_TEXTURE_2D, texture));
     }
 
-    GLuint new_filter = linear ? GL_LINEAR : GL_NEAREST;
+    GLint new_filter = linear ? GL_LINEAR : GL_NEAREST;
     if (new_filter != this->filter) {
         MBGL_CHECK_ERROR(glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MIN_FILTER, new_filter));
         MBGL_CHECK_ERROR(glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MAG_FILTER, new_filter));

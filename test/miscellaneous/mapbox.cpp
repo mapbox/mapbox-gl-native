@@ -81,3 +81,59 @@ TEST(Mapbox, TileURL) {
         throw e;
     }
 }
+
+TEST(Mapbox, CanonicalURL) {
+    using mbgl::util::mapbox::canonicalURL;
+    EXPECT_EQ(
+        canonicalURL("https://a.tiles.mapbox.com/v4/"
+                     "mapbox.mapbox-terrain-v2,mapbox.mapbox-streets-v6/15/17599/"
+                     "10744.vector.pbf?access_token=pk.kAeslEm93Sjf3mXk."
+                     "vbiF02XnvkPkzlFhGSn2iIm6De3Cxsk5tmips2tvkG8sF"),
+        "mapbox://v4/mapbox.mapbox-terrain-v2,mapbox.mapbox-streets-v6/15/17599/10744.vector.pbf");
+
+    EXPECT_EQ(
+        canonicalURL("http://a.tiles.mapbox.com/v4/"
+                     "mapbox.mapbox-terrain-v2,mapbox.mapbox-streets-v6/15/17599/"
+                     "10744.vector.pbf?access_token=pk.kAeslEm93Sjf3mXk."
+                     "vbiF02XnvkPkzlFhGSn2iIm6De3Cxsk5tmips2tvkG8sF"),
+        "mapbox://v4/mapbox.mapbox-terrain-v2,mapbox.mapbox-streets-v6/15/17599/10744.vector.pbf");
+
+    EXPECT_EQ(
+        canonicalURL("https://b.tiles.mapbox.com/v4/"
+                     "mapbox.mapbox-terrain-v2,mapbox.mapbox-streets-v6/15/17599/"
+                     "10744.vector.pbf?access_token=pk.kAeslEm93Sjf3mXk."
+                     "vbiF02XnvkPkzlFhGSn2iIm6De3Cxsk5tmips2tvkG8sF"),
+        "mapbox://v4/mapbox.mapbox-terrain-v2,mapbox.mapbox-streets-v6/15/17599/10744.vector.pbf");
+
+    EXPECT_EQ(
+        canonicalURL("http://c.tiles.mapbox.com/v4/"
+                     "mapbox.mapbox-terrain-v2,mapbox.mapbox-streets-v6/15/17599/"
+                     "10744.vector.pbf?access_token=pk.kAeslEm93Sjf3mXk."
+                     "vbiF02XnvkPkzlFhGSn2iIm6De3Cxsk5tmips2tvkG8sF"),
+        "mapbox://v4/mapbox.mapbox-terrain-v2,mapbox.mapbox-streets-v6/15/17599/10744.vector.pbf");
+
+    EXPECT_EQ(
+        canonicalURL("https://api.mapbox.com/v4/"
+                     "mapbox.mapbox-terrain-v2,mapbox.mapbox-streets-v6/15/17599/"
+                     "10744.vector.pbf?access_token=pk.kAeslEm93Sjf3mXk."
+                     "vbiF02XnvkPkzlFhGSn2iIm6De3Cxsk5tmips2tvkG8sF"),
+        "mapbox://v4/mapbox.mapbox-terrain-v2,mapbox.mapbox-streets-v6/15/17599/10744.vector.pbf");
+
+    EXPECT_EQ(
+        canonicalURL("http://api.mapbox.com/v4/"
+                     "mapbox.mapbox-terrain-v2,mapbox.mapbox-streets-v6/15/17599/"
+                     "10744.vector.pbf"),
+        "mapbox://v4/mapbox.mapbox-terrain-v2,mapbox.mapbox-streets-v6/15/17599/10744.vector.pbf");
+
+    EXPECT_EQ(canonicalURL("https://api.mapbox.com/fonts/v1/mapbox/"
+                           "DIN%20Offc%20Pro%20Italic%2cArial%20Unicode%20MS%20Regular/"
+                           "0-255.pbf?access_token=pk.kAeslEm93Sjf3mXk."
+                           "vbiF02XnvkPkzlFhGSn2iIm6De3Cxsk5tmips2tvkG8sF"),
+              "mapbox://fonts/v1/mapbox/DIN%20Offc%20Pro%20Italic%2cArial%20Unicode%20MS%20Regular/"
+              "0-255.pbf");
+
+    EXPECT_EQ(canonicalURL("https://api.mapbox.com/styles/v1/mapbox/streets-v8/"
+                           "sprite.json?access_token=pk.kAeslEm93Sjf3mXk."
+                           "vbiF02XnvkPkzlFhGSn2iIm6De3Cxsk5tmips2tvkG8sF"),
+              "mapbox://styles/v1/mapbox/streets-v8/sprite.json");
+}

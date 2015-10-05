@@ -1,5 +1,6 @@
 #include <mbgl/map/map.hpp>
 #include <mbgl/map/map_context.hpp>
+#include <mbgl/map/camera.hpp>
 #include <mbgl/map/view.hpp>
 #include <mbgl/map/transform.hpp>
 #include <mbgl/map/transform_state.hpp>
@@ -348,8 +349,8 @@ uint32_t Map::addPointAnnotation(const PointAnnotation& annotation) {
 
 AnnotationIDs Map::addPointAnnotations(const std::vector<PointAnnotation>& annotations) {
     auto result = data->getAnnotationManager()->addPointAnnotations(annotations, getMaxZoom());
-    context->invoke(&MapContext::updateAnnotationTiles, result.first);
-    return result.second;
+    update(Update::Annotations);
+    return result;
 }
 
 uint32_t Map::addShapeAnnotation(const ShapeAnnotation& annotation) {
@@ -358,8 +359,8 @@ uint32_t Map::addShapeAnnotation(const ShapeAnnotation& annotation) {
 
 AnnotationIDs Map::addShapeAnnotations(const std::vector<ShapeAnnotation>& annotations) {
     auto result = data->getAnnotationManager()->addShapeAnnotations(annotations, getMaxZoom());
-    context->invoke(&MapContext::updateAnnotationTiles, result.first);
-    return result.second;
+    update(Update::Annotations);
+    return result;
 }
 
 void Map::removeAnnotation(uint32_t annotation) {
@@ -367,8 +368,8 @@ void Map::removeAnnotation(uint32_t annotation) {
 }
 
 void Map::removeAnnotations(const std::vector<uint32_t>& annotations) {
-    auto result = data->getAnnotationManager()->removeAnnotations(annotations, getMaxZoom());
-    context->invoke(&MapContext::updateAnnotationTiles, result);
+    data->getAnnotationManager()->removeAnnotations(annotations, getMaxZoom());
+    update(Update::Annotations);
 }
 
 std::vector<uint32_t> Map::getAnnotationsInBounds(const LatLngBounds& bounds, const AnnotationType& type) {

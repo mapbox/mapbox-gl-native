@@ -1,6 +1,7 @@
 package com.mapbox.mapboxsdk.testapp;
 
 import android.Manifest;
+import android.content.Intent;
 import android.content.pm.PackageManager;
 import android.graphics.Color;
 import android.graphics.PointF;
@@ -9,6 +10,7 @@ import android.os.Bundle;
 import android.support.annotation.NonNull;
 import android.support.design.widget.FloatingActionButton;
 import android.support.design.widget.NavigationView;
+import android.support.design.widget.Snackbar;
 import android.support.v4.app.ActivityCompat;
 import android.support.v4.content.ContextCompat;
 import android.support.v4.view.GravityCompat;
@@ -36,6 +38,7 @@ import java.io.IOException;
 import java.io.InputStreamReader;
 import java.text.DecimalFormat;
 import java.util.ArrayList;
+import java.util.List;
 
 public class MainActivity extends AppCompatActivity {
 
@@ -126,13 +129,22 @@ public class MainActivity extends AppCompatActivity {
                         .title("Dropped Pin")
                         .snippet(new DecimalFormat("#.#####").format(position.getLatitude()) + ", " +
                                  new DecimalFormat("#.#####").format(position.getLongitude()))
-                        .sprite("default_marker"));
+                        .sprite(null));
             }
         });
 
         mMapView.setOnTouchListener(new View.OnTouchListener() {
             public boolean onTouch(View v, MotionEvent event) {
                 return gestureDetector.onTouchEvent(event);
+            }
+        });
+
+        mMapView.setOnMarkerClickListener(new MapView.OnMarkerClickListener() {
+            @Override
+            public boolean onMarkerClick(Marker marker) {
+                Snackbar.make(findViewById(android.R.id.content),"Custom Marker Click Listener",Snackbar.LENGTH_SHORT).show();
+                marker.showInfoWindow();
+                return true;
             }
         });
 
@@ -284,6 +296,10 @@ public class MainActivity extends AppCompatActivity {
                                 menuItem.setChecked(mMapView.isCompassEnabled());
                                 return true;
 
+                            case R.id.action_second_map_activity:
+                                startActivity(new Intent(getApplicationContext(), SecondMapActivity.class));
+                                return true;
+
 /*
                             case R.id.followNone:
                                 mMapView.setUserLocationTrackingMode(MapView.UserLocationTrackingMode.NONE);
@@ -317,31 +333,31 @@ public class MainActivity extends AppCompatActivity {
     private boolean changeMapStyle(int id) {
         switch (id) {
             case R.id.actionStyleMapboxStreets:
-                mMapView.setStyleUrl(getString(R.string.styleURLMapboxStreets));
+                mMapView.setStyleUrl(MapView.StyleUrls.MAPBOX_STREETS);
                 mNavigationView.getMenu().findItem(id).setChecked(true);
                 mSelectedStyle = id;
                 return true;
 
             case R.id.actionStyleEmerald:
-                mMapView.setStyleUrl(getString(R.string.styleURLEmerald));
+                mMapView.setStyleUrl(MapView.StyleUrls.EMERALD);
                 mNavigationView.getMenu().findItem(id).setChecked(true);
                 mSelectedStyle = id;
                 return true;
 
             case R.id.actionStyleLight:
-                mMapView.setStyleUrl(getString(R.string.styleURLLight));
+                mMapView.setStyleUrl(MapView.StyleUrls.LIGHT);
                 mNavigationView.getMenu().findItem(id).setChecked(true);
                 mSelectedStyle = id;
                 return true;
 
             case R.id.actionStyleDark:
-                mMapView.setStyleUrl(getString(R.string.styleURLDark));
+                mMapView.setStyleUrl(MapView.StyleUrls.DARK);
                 mNavigationView.getMenu().findItem(id).setChecked(true);
                 mSelectedStyle = id;
                 return true;
 
             case R.id.actionStyleSatellite:
-                mMapView.setStyleUrl(getString(R.string.styleURLSatellite));
+                mMapView.setStyleUrl(MapView.StyleUrls.SATELLITE);
                 mNavigationView.getMenu().findItem(id).setChecked(true);
                 mSelectedStyle = id;
                 return true;
@@ -399,26 +415,34 @@ public class MainActivity extends AppCompatActivity {
     }
 
     private void addMarkers() {
-        LatLng backLot = new LatLng(38.649441, -121.369064);
-        final Marker marker = mMapView.addMarker(new MarkerOptions()
-            .position(backLot)
-            .title("Back Lot")
-            .snippet("The back lot behind my house"));
-        marker.setInfoWindowOnTouchListener(new View.OnTouchListener() {
+        List<Marker> markerList = new ArrayList<>();
+
+        final Marker backLot = generateMarker("Back Lot", "The back lot behind my house", null, 38.649441, -121.369064);
+        markerList.add(backLot);
+
+        final Marker cheeseRoom = generateMarker("Cheese Room", "The only air conditioned room on the property", "dog-park-15", 38.531577, -122.010646);
+        markerList.add(cheeseRoom);
+
+        mMapView.addMarkers(markerList);
+
+        // need to call this after adding markers to map, click event hook into InfoWindow needs refactoring
+        backLot.setInfoWindowOnTouchListener(new View.OnTouchListener() {
             @Override
             public boolean onTouch(View view, MotionEvent motionEvent) {
                 Toast.makeText(getApplicationContext(), "Custom Info Touch Listener!!", Toast.LENGTH_SHORT).show();
-                marker.hideInfoWindow();
+                backLot.hideInfoWindow();
                 return true;
             }
         });
+    }
 
-        LatLng cheeseRoom = new LatLng(38.531577,-122.010646);
-        mMapView.addMarker(new MarkerOptions()
-            .position(cheeseRoom)
-            .sprite("dog-park-15")
-            .title("Cheese Room")
-            .snippet("The only air conditioned room on the property!"));
+    private Marker generateMarker(String title, String snippet, String sprite, double lat, double lng){
+        return new MarkerOptions()
+                .position(new LatLng(lat,lng))
+                .title(title)
+                .sprite(sprite)
+                .snippet(snippet)
+                .getMarker();
     }
 
     private void addPolyline() {

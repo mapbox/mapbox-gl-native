@@ -1,8 +1,9 @@
 #ifndef MBGL_MAP_CAMERA
 #define MBGL_MAP_CAMERA
 
+#include <mapbox/optional.hpp>
+
 #include <mbgl/util/geo.hpp>
-#include <mbgl/util/optional.hpp>
 #include <mbgl/util/chrono.hpp>
 #include <mbgl/util/unitbezier.hpp>
 

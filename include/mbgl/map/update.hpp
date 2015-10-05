@@ -13,6 +13,7 @@ enum class Update : uint32_t {
     Zoom                      = 1 << 4,
     RenderStill               = 1 << 5,
     Repaint                   = 1 << 6,
+    Annotations               = 1 << 7,
 };
 
 inline Update operator| (const Update& lhs, const Update& rhs) {

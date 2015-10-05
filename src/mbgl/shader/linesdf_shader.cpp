@@ -12,11 +12,10 @@ LineSDFShader::LineSDFShader()
         shaders[LINESDF_SHADER].vertex,
         shaders[LINESDF_SHADER].fragment
     ) {
-    a_pos = MBGL_CHECK_ERROR(glGetAttribLocation(program, "a_pos"));
     a_data = MBGL_CHECK_ERROR(glGetAttribLocation(program, "a_data"));
 }
 
-void LineSDFShader::bind(char *offset) {
+void LineSDFShader::bind(GLbyte *offset) {
     MBGL_CHECK_ERROR(glEnableVertexAttribArray(a_pos));
     MBGL_CHECK_ERROR(glVertexAttribPointer(a_pos, 2, GL_SHORT, false, 8, offset + 0));
 

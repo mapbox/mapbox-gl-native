@@ -1,6 +1,7 @@
 #ifndef MBGL_UTIL_RASTER
 #define MBGL_UTIL_RASTER
 
+#include <mbgl/platform/gl.hpp>
 #include <mbgl/util/texture_pool.hpp>
 #include <mbgl/util/image.hpp>
 #include <mbgl/util/ptr.hpp>
@@ -32,13 +33,14 @@ public:
 
 public:
     // loaded image dimensions
-    uint32_t width = 0, height = 0;
+    GLsizei width = 0;
+    GLsizei height = 0;
 
     // has been uploaded to texture
     bool textured = false;
 
     // the uploaded texture
-    uint32_t texture = 0;
+    GLuint texture = 0;
 
     // texture opacity
     double opacity = 0;
@@ -53,7 +55,7 @@ private:
     TexturePool& texturePool;
 
     // min/mag filter
-    uint32_t filter = 0;
+    GLint filter = 0;
 
     // the raw pixels
     std::unique_ptr<util::Image> img;

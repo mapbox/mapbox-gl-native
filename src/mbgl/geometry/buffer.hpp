@@ -14,9 +14,9 @@
 namespace mbgl {
 
 template <
-    size_t item_size,
-    int bufferType = GL_ARRAY_BUFFER,
-    size_t defaultLength = 8192,
+    GLsizei item_size,
+    GLenum bufferType = GL_ARRAY_BUFFER,
+    GLsizei defaultLength = 8192,
     bool retainAfterUpload = false
 >
 class Buffer : private util::noncopyable {
@@ -31,8 +31,8 @@ public:
 
     // Returns the number of elements in this buffer. This is not the number of
     // bytes, but rather the number of coordinates with associated information.
-    inline size_t index() const {
-        return pos / itemSize;
+    inline GLsizei index() const {
+        return static_cast<GLsizei>(pos / itemSize);
     }
 
     inline bool empty() const {
@@ -110,10 +110,10 @@ public:
 
 private:
     // CPU buffer
-    void *array = nullptr;
+    GLvoid *array = nullptr;
 
     // Byte position where we are writing.
-    size_t pos = 0;
+    GLsizeiptr pos = 0;
 
     // Number of bytes that are valid in this buffer.
     size_t length = 0;

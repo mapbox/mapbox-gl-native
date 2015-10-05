@@ -86,7 +86,7 @@ test('Map', function(t) {
             mbgl.once('message', function(msg) {
                 t.equal(msg.severity, 'ERROR');
                 t.equal(msg.class, 'ParseStyle');
-                t.ok(msg.text.match(/Expect either an object or array at root/));
+                t.ok(msg.text.match(/Invalid value/));
 
                 map.release();
                 t.end();
@@ -147,9 +147,9 @@ test('Map', function(t) {
 
     t.test('.render', function(t) {
         var options = {
-            request: function(req) {
+            request: function(req, callback) {
                 fs.readFile(path.join(__dirname, '..', req.url), function(err, data) {
-                    req.respond(err, { data: data });
+                    callback(err, { data: data });
                 });
             },
             ratio: 1
@@ -266,18 +266,14 @@ test('Map', function(t) {
             render();
         });
 
-        t.skip('throws if called in parallel', function(t) {
-            var completed = 0;
-            var remaining = 10;
-            var start = +new Date;
-
+        t.test('throws if called in parallel', function(t) {
             var map = new mbgl.Map(options);
             map.load(style);
 
             t.throws(function() {
                 map.render({}, function() {});
                 map.render({}, function() {});
-            });
+            }, /Map is currently rendering an image/);
 
             map.release();
             t.end();

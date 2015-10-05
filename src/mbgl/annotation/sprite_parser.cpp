@@ -6,6 +6,7 @@
 #include <mbgl/util/image.hpp>
 
 #include <rapidjson/document.h>
+#include <rapidjson/error/en.h>
 
 #include <cmath>
 #include <limits>
@@ -116,7 +117,7 @@ SpriteParseResult parseSprite(const std::string& image, const std::string& json)
 
     if (doc.HasParseError()) {
         std::stringstream message;
-        message << "Failed to parse JSON: " << doc.GetParseError() << " at offset " << doc.GetErrorOffset();
+        message << "Failed to parse JSON: " << rapidjson::GetParseError_En(doc.GetParseError()) << " at offset " << doc.GetErrorOffset();
         return message.str();
     } else if (!doc.IsObject()) {
         return std::string("Sprite JSON root must be an object");

@@ -78,6 +78,7 @@ public:
                 bool shouldReparsePartialTiles);
 
     void invalidateTiles(const std::unordered_set<TileID, TileID::Hash>&);
+    void invalidateTiles();
 
     void updateMatrices(const mat4 &projMatrix, const TransformState &transform);
     void drawClippingMasks(Painter &painter);

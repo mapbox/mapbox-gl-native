@@ -13,10 +13,9 @@
 #import <Foundation/Foundation.h>
 
 #pragma GCC diagnostic push
-#ifndef __clang__
+#pragma GCC diagnostic ignored "-Wunknown-pragmas"
 #pragma GCC diagnostic ignored "-Wunused-local-typedefs"
 #pragma GCC diagnostic ignored "-Wshadow"
-#endif
 #include <boost/program_options.hpp>
 #pragma GCC diagnostic pop
 

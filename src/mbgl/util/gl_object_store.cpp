@@ -7,17 +7,17 @@
 namespace mbgl {
 namespace util {
 
-void GLObjectStore::abandonVAO(uint32_t vao) {
+void GLObjectStore::abandonVAO(GLuint vao) {
     assert(ThreadContext::currentlyOn(ThreadType::Map));
     abandonedVAOs.emplace_back(vao);
 }
 
-void GLObjectStore::abandonBuffer(uint32_t buffer) {
+void GLObjectStore::abandonBuffer(GLuint buffer) {
     assert(ThreadContext::currentlyOn(ThreadType::Map));
     abandonedBuffers.emplace_back(buffer);
 }
 
-void GLObjectStore::abandonTexture(uint32_t texture) {
+void GLObjectStore::abandonTexture(GLuint texture) {
     assert(ThreadContext::currentlyOn(ThreadType::Map));
     abandonedTextures.emplace_back(texture);
 }

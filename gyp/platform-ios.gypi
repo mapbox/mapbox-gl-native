@@ -25,8 +25,6 @@
         '../include/mbgl/ios/MGLMapView.h',
         '../include/mbgl/ios/MGLMapView+IBAdditions.h',
         '../platform/ios/MGLMapView.mm',
-        '../platform/ios/MGLFileCache.h',
-        '../platform/ios/MGLFileCache.mm',
         '../include/mbgl/ios/MGLAccountManager.h',
         '../platform/ios/MGLAccountManager_Private.h',
         '../platform/ios/MGLAccountManager.m',
@@ -70,6 +68,7 @@
         'cflags_cc': [
           '<@(libuv_cflags)',
           '<@(boost_cflags)',
+          '<@(variant_cflags)',
         ],
         'libraries': [
           '<@(libuv_static_libs)',

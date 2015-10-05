@@ -2,7 +2,6 @@
 #define MBGL_MAP_MAP
 
 #include <mbgl/util/chrono.hpp>
-#include <mbgl/map/camera.hpp>
 #include <mbgl/map/update.hpp>
 #include <mbgl/map/mode.hpp>
 #include <mbgl/util/geo.hpp>
@@ -26,6 +25,7 @@ class SpriteImage;
 class Transform;
 class PointAnnotation;
 class ShapeAnnotation;
+struct CameraOptions;
 
 namespace util {
 template <class T> class Thread;

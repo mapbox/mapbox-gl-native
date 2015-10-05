@@ -1,7 +1,8 @@
 #ifndef MBGL_STYLE_PROPERTY_VALUE
 #define MBGL_STYLE_PROPERTY_VALUE
 
-#include <mbgl/util/variant.hpp>
+#include <mapbox/variant.hpp>
+
 #include <mbgl/style/function_properties.hpp>
 #include <mbgl/style/piecewisefunction_properties.hpp>
 #include <mbgl/style/types.hpp>

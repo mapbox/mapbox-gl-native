@@ -1,26 +1,37 @@
 #ifndef MBGL_RENDERER_SHADER
 #define MBGL_RENDERER_SHADER
 
+#include <mbgl/platform/gl.hpp>
+#include <mbgl/util/noncopyable.hpp>
+
 #include <cstdint>
 #include <array>
 #include <string>
-#include <mbgl/util/noncopyable.hpp>
 
 namespace mbgl {
 
 class Shader : private util::noncopyable {
 public:
-    Shader(const char *name, const char *vertex, const char *fragment);
-    ~Shader();
-    const char *name;
-    uint32_t program;
+    Shader(const GLchar *name, const GLchar *vertex, const GLchar *fragment);
 
-    inline uint32_t getID() const {
+    ~Shader();
+    const GLchar *name;
+    GLuint program;
+
+    inline GLuint getID() const {
         return program;
     }
 
+    virtual void bind(GLbyte *offset) = 0;
+
+protected:
+    GLint a_pos = -1;
+
 private:
-    bool compileShader(uint32_t *shader, uint32_t type, const char *source);
+    bool compileShader(GLuint *shader, GLenum type, const GLchar *source[]);
+
+    GLuint vertShader = 0;
+    GLuint fragShader = 0;
 };
 
 }

@@ -1,6 +1,7 @@
 #ifndef MBGL_MAP_UTIL_GL_OBJECT_STORE
 #define MBGL_MAP_UTIL_GL_OBJECT_STORE
 
+#include <mbgl/platform/gl.hpp>
 #include <mbgl/util/noncopyable.hpp>
 
 #include <cstdint>
@@ -14,18 +15,18 @@ public:
     GLObjectStore() = default;
 
     // Mark OpenGL objects for deletion
-    void abandonVAO(uint32_t vao);
-    void abandonBuffer(uint32_t buffer);
-    void abandonTexture(uint32_t texture);
+    void abandonVAO(GLuint vao);
+    void abandonBuffer(GLuint buffer);
+    void abandonTexture(GLuint texture);
 
     // Actually remove the objects we marked as abandoned with the above methods.
     // Only call this while the OpenGL context is exclusive to this thread.
     void performCleanup();
 
 private:
-    std::vector<uint32_t> abandonedVAOs;
-    std::vector<uint32_t> abandonedBuffers;
-    std::vector<uint32_t> abandonedTextures;
+    std::vector<GLuint> abandonedVAOs;
+    std::vector<GLuint> abandonedBuffers;
+    std::vector<GLuint> abandonedTextures;
 };
 
 }

@@ -13,7 +13,7 @@ import com.mapbox.mapboxsdk.geometry.ProjectedMeters;
 import java.util.List;
 
 // Class that wraps the native methods for convenience
-class NativeMapView {
+final class NativeMapView {
 
     //
     // Static members
@@ -96,8 +96,8 @@ class NativeMapView {
         nativeUpdate(mNativeMapViewPtr);
     }
 
-    public void invalidate() {
-        nativeOnInvalidate(mNativeMapViewPtr);
+    public void renderSync() {
+        nativeRenderSync(mNativeMapViewPtr);
     }
 
     public void resizeView(int width, int height) {
@@ -333,6 +333,10 @@ class NativeMapView {
         return nativeAddMarker(mNativeMapViewPtr, marker);
     }
 
+    public long[] addMarkers(List<Marker> markers) {
+        return nativeAddMarkers(mNativeMapViewPtr, markers);
+    }
+
     public long addPolyline(Polyline polyline) {
         return nativeAddPolyline(mNativeMapViewPtr, polyline);
     }
@@ -475,7 +479,7 @@ class NativeMapView {
 
     private native void nativeUpdate(long nativeMapViewPtr);
 
-    private native void nativeOnInvalidate(long nativeMapViewPtr);
+    private native void nativeRenderSync(long nativeMapViewPtr);
 
     private native void nativeViewResize(long nativeMapViewPtr, int width, int height);
 
@@ -560,6 +564,8 @@ class NativeMapView {
     private native void nativeResetNorth(long nativeMapViewPtr);
 
     private native long nativeAddMarker(long nativeMapViewPtr, Marker marker);
+
+    private native long[] nativeAddMarkers(long nativeMapViewPtr, List<Marker> markers);
 
     private native long nativeAddPolyline(long nativeMapViewPtr, Polyline polyline);
 

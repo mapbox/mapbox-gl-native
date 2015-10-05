@@ -11,14 +11,17 @@
 #include <mbgl/annotation/point_annotation.hpp>
 #include <mbgl/annotation/shape_annotation.hpp>
 #include <mbgl/annotation/sprite_image.hpp>
+#include <mbgl/map/camera.hpp>
 #include <mbgl/platform/platform.hpp>
 #include <mbgl/platform/darwin/reachability.h>
+#include <mbgl/storage/sqlite_cache.hpp>
 #include <mbgl/storage/default_file_source.hpp>
 #include <mbgl/storage/network_status.hpp>
 #include <mbgl/util/geo.hpp>
 #include <mbgl/util/math.hpp>
 #include <mbgl/util/constants.hpp>
 #include <mbgl/util/image.hpp>
+#include <mbgl/util/std.hpp>
 
 #import "Mapbox.h"
 
@@ -28,7 +31,6 @@
 #import "NSException+MGLAdditions.h"
 #import "MGLUserLocationAnnotationView.h"
 #import "MGLUserLocation_Private.h"
-#import "MGLFileCache.h"
 #import "MGLAccountManager_Private.h"
 #import "MGLMapboxEvents.h"
 
@@ -36,6 +38,7 @@
 
 #import <algorithm>
 #import <cstdlib>
+#import <unordered_set>
 
 class MBGLView;
 
@@ -51,23 +54,15 @@ const CGFloat MGLMinimumZoom = 3;
 const CGFloat MGLMinimumPitch = 0;
 const CGFloat MGLMaximumPitch = 60;
 const CLLocationDegrees MGLAngularFieldOfView = M_PI / 6.;
+const std::string spritePrefix = "com.mapbox.sprites.";
 
 NSString *const MGLAnnotationIDKey = @"MGLAnnotationIDKey";
 NSString *const MGLAnnotationSymbolKey = @"MGLAnnotationSymbolKey";
+NSString *const MGLAnnotationSpritePrefix = @"com.mapbox.sprites.";
 
 static NSURL *MGLURLForBundledStyleNamed(NSString *styleName)
 {
     return [NSURL URLWithString:[NSString stringWithFormat:@"asset://styles/%@.json", styleName]];
-}
-
-CGFloat MGLRadiansFromDegrees(CLLocationDegrees degrees)
-{
-    return degrees * M_PI / 180;
-}
-
-CLLocationDegrees MGLDegreesFromRadians(CGFloat radians)
-{
-    return radians * 180 / M_PI;
 }
 
 mbgl::util::UnitBezier MGLUnitBezierForMediaTimingFunction(CAMediaTimingFunction *function)
@@ -101,7 +96,7 @@ mbgl::util::UnitBezier MGLUnitBezierForMediaTimingFunction(CAMediaTimingFunction
 @property (nonatomic) UIRotationGestureRecognizer *rotate;
 @property (nonatomic) UILongPressGestureRecognizer *quickZoom;
 @property (nonatomic) UIPanGestureRecognizer *twoFingerDrag;
-@property (nonatomic) NSMapTable *annotationIDsByAnnotation;
+@property (nonatomic) NSMapTable *annotationMetadataByAnnotation;
 @property (nonatomic) NS_MUTABLE_DICTIONARY_OF(NSString *, MGLAnnotationImage *) *annotationImages;
 @property (nonatomic) std::vector<uint32_t> annotationsNearbyLastTap;
 @property (nonatomic, weak) id <MGLAnnotation> selectedAnnotation;
@@ -122,12 +117,14 @@ mbgl::util::UnitBezier MGLUnitBezierForMediaTimingFunction(CAMediaTimingFunction
 {
     mbgl::Map *_mbglMap;
     MBGLView *_mbglView;
+    std::shared_ptr<mbgl::SQLiteCache> _mbglFileCache;
     mbgl::DefaultFileSource *_mbglFileSource;
-    BOOL _isWaitingForRedundantReachableNotification;
-    
+
     NS_MUTABLE_ARRAY_OF(NSURL *) *_bundledStyleURLs;
 
+    BOOL _isWaitingForRedundantReachableNotification;
     BOOL _isTargetingInterfaceBuilder;
+
     CLLocationDegrees _pendingLatitude;
     CLLocationDegrees _pendingLongitude;
 }
@@ -235,14 +232,24 @@ std::chrono::steady_clock::duration secondsAsDuration(float duration)
     self.backgroundColor = [UIColor clearColor];
     self.clipsToBounds = YES;
 
-    // setup mbgl map
-    //
+    // setup mbgl view
     const float scaleFactor = [UIScreen instancesRespondToSelector:@selector(nativeScale)] ? [[UIScreen mainScreen] nativeScale] : [[UIScreen mainScreen] scale];
     _mbglView = new MBGLView(self, scaleFactor);
-    _mbglFileSource = new mbgl::DefaultFileSource([MGLFileCache obtainSharedCacheWithObject:self]);
 
-    // Start paused
+    // setup mbgl cache & file source
+    NSString *fileCachePath = @"";
+    NSArray *paths = NSSearchPathForDirectoriesInDomains(NSCachesDirectory, NSUserDomainMask, YES);
+    if ([paths count] != 0) {
+        NSString *libraryDirectory = [paths objectAtIndex:0];
+        fileCachePath = [libraryDirectory stringByAppendingPathComponent:@"cache.db"];
+    }
+    _mbglFileCache = mbgl::SharedSQLiteCache::get([fileCachePath UTF8String]);
+    _mbglFileSource = new mbgl::DefaultFileSource(_mbglFileCache.get());
+
+    // setup mbgl map
     _mbglMap = new mbgl::Map(*_mbglView, *_mbglFileSource, mbgl::MapMode::Continuous);
+
+    // start paused if in IB
     if (_isTargetingInterfaceBuilder || background) {
         self.dormant = YES;
         _mbglMap->pause();
@@ -270,7 +277,7 @@ std::chrono::steady_clock::duration secondsAsDuration(float duration)
 
     // setup annotations
     //
-    _annotationIDsByAnnotation = [NSMapTable mapTableWithKeyOptions:NSMapTableStrongMemory valueOptions:NSMapTableStrongMemory];
+    _annotationMetadataByAnnotation = [NSMapTable mapTableWithKeyOptions:NSMapTableStrongMemory valueOptions:NSMapTableStrongMemory];
 
     _annotationImages = [NSMutableDictionary dictionary];
 
@@ -368,7 +375,8 @@ std::chrono::steady_clock::duration secondsAsDuration(float duration)
     {
         _quickZoom = [[UILongPressGestureRecognizer alloc] initWithTarget:self action:@selector(handleQuickZoomGesture:)];
         _quickZoom.numberOfTapsRequired = 1;
-        _quickZoom.minimumPressDuration = 0.25;
+        _quickZoom.minimumPressDuration = 0;
+        [_quickZoom requireGestureRecognizerToFail:doubleTap];
         [self addGestureRecognizer:_quickZoom];
     }
 
@@ -474,8 +482,6 @@ std::chrono::steady_clock::duration secondsAsDuration(float duration)
         delete _mbglFileSource;
         _mbglFileSource = nullptr;
     }
-
-    [MGLFileCache releaseSharedCacheForObject:self];
 
     if (_mbglView)
     {
@@ -1155,43 +1161,77 @@ std::chrono::steady_clock::duration secondsAsDuration(float duration)
 
         if (nearbyAnnotations.size())
         {
-            // there is at least one nearby annotation; select one
-            //
-            // first, sort for comparison and iteration
-            std::sort(nearbyAnnotations.begin(), nearbyAnnotations.end());
+            // pare down nearby annotations to only enabled ones
+            NSEnumerator *metadataEnumerator = [self.annotationMetadataByAnnotation objectEnumerator];
+            NSString *prefix = [NSString stringWithUTF8String:spritePrefix.c_str()];
+            std::unordered_set<uint32_t> disabledAnnotationIDs;
 
-            if (nearbyAnnotations == self.annotationsNearbyLastTap)
+            while (NSDictionary *metadata = [metadataEnumerator nextObject])
             {
-                // the selection candidates haven't changed; cycle through them
-                if (self.selectedAnnotation &&
-                    [[[self.annotationIDsByAnnotation objectForKey:self.selectedAnnotation]
-                        objectForKey:MGLAnnotationIDKey] unsignedIntValue] == self.annotationsNearbyLastTap.back())
+                // This iterates ALL annotations' metadata dictionaries, using their
+                // reuse identifiers to get at the stored annotation image objects,
+                // which we can then query for enabled status.
+                NSString *reuseIdentifier = [metadata[MGLAnnotationSymbolKey] stringByReplacingOccurrencesOfString:prefix
+                                                                                                        withString:@""
+                                                                                                           options:NSAnchoredSearch
+                                                                                                             range:NSMakeRange(0, prefix.length)];
+
+                MGLAnnotationImage *annotationImage = self.annotationImages[reuseIdentifier];
+
+                if (annotationImage.isEnabled == NO)
                 {
-                    // the selected annotation is the last in the set; cycle back to the first
-                    // note: this could be the selected annotation if only one in set
-                    newSelectedAnnotationID = self.annotationsNearbyLastTap.front();
+                    disabledAnnotationIDs.emplace([metadata[MGLAnnotationIDKey] unsignedIntValue]);
                 }
-                else if (self.selectedAnnotation)
+            }
+
+            if (disabledAnnotationIDs.size())
+            {
+                // Clear out any nearby annotations that are in our set of
+                // disabled annotations. 
+                mbgl::util::erase_if(nearbyAnnotations, [&](const uint32_t annotationID) {
+                    return disabledAnnotationIDs.count(annotationID) != 0;
+                });
+            }
+
+            // only proceed if there are still annotations
+            if (nearbyAnnotations.size() > 0)
+            {
+                // first, sort for comparison and iteration
+                std::sort(nearbyAnnotations.begin(), nearbyAnnotations.end());
+
+                if (nearbyAnnotations == self.annotationsNearbyLastTap)
                 {
-                    // otherwise increment the selection through the candidates
-                    uint32_t currentID = [[[self.annotationIDsByAnnotation objectForKey:self.selectedAnnotation] objectForKey:MGLAnnotationIDKey] unsignedIntValue];
-                    auto result = std::find(self.annotationsNearbyLastTap.begin(), self.annotationsNearbyLastTap.end(), currentID);
-                    auto distance = std::distance(self.annotationsNearbyLastTap.begin(), result);
-                    newSelectedAnnotationID = self.annotationsNearbyLastTap[distance + 1];
+                    // the selection candidates haven't changed; cycle through them
+                    if (self.selectedAnnotation &&
+                        [[[self.annotationMetadataByAnnotation objectForKey:self.selectedAnnotation]
+                            objectForKey:MGLAnnotationIDKey] unsignedIntValue] == self.annotationsNearbyLastTap.back())
+                    {
+                        // the selected annotation is the last in the set; cycle back to the first
+                        // note: this could be the selected annotation if only one in set
+                        newSelectedAnnotationID = self.annotationsNearbyLastTap.front();
+                    }
+                    else if (self.selectedAnnotation)
+                    {
+                        // otherwise increment the selection through the candidates
+                        uint32_t currentID = [[[self.annotationMetadataByAnnotation objectForKey:self.selectedAnnotation] objectForKey:MGLAnnotationIDKey] unsignedIntValue];
+                        auto result = std::find(self.annotationsNearbyLastTap.begin(), self.annotationsNearbyLastTap.end(), currentID);
+                        auto distance = std::distance(self.annotationsNearbyLastTap.begin(), result);
+                        newSelectedAnnotationID = self.annotationsNearbyLastTap[distance + 1];
+                    }
+                    else
+                    {
+                        // no current selection; select the first one
+                        newSelectedAnnotationID = self.annotationsNearbyLastTap.front();
+                    }
                 }
                 else
                 {
-                    // no current selection; select the first one
+                    // start tracking a new set of nearby annotations
+                    self.annotationsNearbyLastTap = nearbyAnnotations;
+
+                    // select the first one
                     newSelectedAnnotationID = self.annotationsNearbyLastTap.front();
                 }
-            }
-            else
-            {
-                // start tracking a new set of nearby annotations
-                self.annotationsNearbyLastTap = nearbyAnnotations;
-
-                // select the first one
-                newSelectedAnnotationID = self.annotationsNearbyLastTap.front();
             }
         }
         else
@@ -1203,11 +1243,11 @@ std::chrono::steady_clock::duration secondsAsDuration(float duration)
         if (newSelectedAnnotationID >= 0)
         {
             // find & select model object for selection
-            NSEnumerator *enumerator = self.annotationIDsByAnnotation.keyEnumerator;
+            NSEnumerator *enumerator = self.annotationMetadataByAnnotation.keyEnumerator;
 
             while (id <MGLAnnotation> annotation = enumerator.nextObject)
             {
-                if ([[[self.annotationIDsByAnnotation objectForKey:annotation] objectForKey:MGLAnnotationIDKey] integerValue] == newSelectedAnnotationID)
+                if ([[[self.annotationMetadataByAnnotation objectForKey:annotation] objectForKey:MGLAnnotationIDKey] integerValue] == newSelectedAnnotationID)
                 {
                     // only change selection status if not the currently selected annotation
                     if ( ! [annotation isEqual:self.selectedAnnotation])
@@ -1336,9 +1376,9 @@ std::chrono::steady_clock::duration secondsAsDuration(float duration)
     }
     else if (quickZoom.state == UIGestureRecognizerStateChanged)
     {
-        CGFloat distance = self.quickZoomStart - [quickZoom locationInView:quickZoom.view].y;
+        CGFloat distance = [quickZoom locationInView:quickZoom.view].y - self.quickZoomStart;
 
-        CGFloat newZoom = log2f(self.scale) + (distance / 100);
+        CGFloat newZoom = log2f(self.scale) + (distance / 75);
 
         if (newZoom < _mbglMap->getMinZoom()) return;
 
@@ -2044,11 +2084,11 @@ CLLocationCoordinate2D MGLLocationCoordinate2DFromLatLng(mbgl::LatLng latLng)
 
 - (nullable NS_ARRAY_OF(id <MGLAnnotation>) *)annotations
 {
-    if ([_annotationIDsByAnnotation count])
+    if ([_annotationMetadataByAnnotation count])
     {
         NSMutableArray *result = [NSMutableArray array];
 
-        NSEnumerator *keyEnumerator = [_annotationIDsByAnnotation keyEnumerator];
+        NSEnumerator *keyEnumerator = [_annotationMetadataByAnnotation keyEnumerator];
         id <MGLAnnotation> annotation;
 
         while (annotation = [keyEnumerator nextObject])
@@ -2084,8 +2124,6 @@ CLLocationCoordinate2D MGLLocationCoordinate2DFromLatLng(mbgl::LatLng latLng)
     BOOL delegateImplementsStrokeColorForShape = [self.delegate respondsToSelector:@selector(mapView:strokeColorForShapeAnnotation:)];
     BOOL delegateImplementsFillColorForPolygon = [self.delegate respondsToSelector:@selector(mapView:fillColorForPolygonAnnotation:)];
     BOOL delegateImplementsLineWidthForPolyline = [self.delegate respondsToSelector:@selector(mapView:lineWidthForPolylineAnnotation:)];
-
-    const std::string spritePrefix = "com.mapbox.sprites.";
 
     for (id <MGLAnnotation> annotation in annotations)
     {
@@ -2167,50 +2205,23 @@ CLLocationCoordinate2D MGLLocationCoordinate2DFromLatLng(mbgl::LatLng latLng)
         }
         else
         {
-            MGLAnnotationImage *annotationImage = nil;
-            NSString *symbolName = nil;
-
-            if (delegateImplementsImageForPoint)
+            MGLAnnotationImage *annotationImage = delegateImplementsImageForPoint ? [self.delegate mapView:self imageForAnnotation:annotation] : nil;
+            if ( ! annotationImage)
             {
-                annotationImage = [self.delegate mapView:self imageForAnnotation:annotation];
-
-                if (annotationImage)
-                {
-                    const std::string cSymbolName = spritePrefix + std::string(annotationImage.reuseIdentifier.UTF8String);
-                    symbolName = [NSString stringWithUTF8String:cSymbolName.c_str()];
-
-                    if ( ! [self.annotationImages objectForKey:annotationImage.reuseIdentifier])
-                    {
-                        // store image & symbol name
-                        [self.annotationImages setObject:annotationImage forKey:annotationImage.reuseIdentifier];
-
-                        // retrieve pixels
-                        CGImageRef image = annotationImage.image.CGImage;
-                        size_t width = CGImageGetWidth(image);
-                        size_t height = CGImageGetHeight(image);
-                        CGColorSpaceRef colorSpace = CGColorSpaceCreateDeviceRGB();
-                        std::string pixels(width * height * 4, '\0');
-                        size_t bytesPerPixel = 4;
-                        size_t bytesPerRow = bytesPerPixel * width;
-                        size_t bitsPerComponent = 8;
-                        char *pixelData = const_cast<char *>(pixels.data());
-                        CGContextRef context = CGBitmapContextCreate(pixelData, width, height, bitsPerComponent, bytesPerRow, colorSpace, kCGImageAlphaPremultipliedLast);
-                        CGContextDrawImage(context, CGRectMake(0, 0, width, height), image);
-                        CGContextRelease(context);
-                        CGColorSpaceRelease(colorSpace);
-
-                        // add sprite
-                        auto cSpriteImage = std::make_shared<mbgl::SpriteImage>(
-                            uint16_t(annotationImage.image.size.width),
-                            uint16_t(annotationImage.image.size.height),
-                            float(annotationImage.image.scale),
-                            std::move(pixels));
-
-                        // sprite upload
-                        _mbglMap->setSprite(cSymbolName, cSpriteImage);
-                    }
-                }
+                UIImage *defaultAnnotationImage = [MGLMapView resourceImageNamed:MGLDefaultStyleMarkerSymbolName];
+                annotationImage = [MGLAnnotationImage annotationImageWithImage:defaultAnnotationImage
+                                                               reuseIdentifier:MGLDefaultStyleMarkerSymbolName];
             }
+
+            if ( ! [self.annotationImages objectForKey:annotationImage.reuseIdentifier])
+            {
+                // store image & symbol name
+                [self.annotationImages setObject:annotationImage forKey:annotationImage.reuseIdentifier];
+                
+                [self installAnnotationImage:annotationImage];
+            }
+
+            NSString *symbolName = [MGLAnnotationSpritePrefix stringByAppendingString:annotationImage.reuseIdentifier];
 
             points.emplace_back(MGLLatLngFromLocationCoordinate2D(annotation.coordinate), symbolName ? [symbolName UTF8String] : "");
         }
@@ -2222,7 +2233,7 @@ CLLocationCoordinate2D MGLLocationCoordinate2DFromLatLng(mbgl::LatLng latLng)
 
         for (size_t i = 0; i < pointAnnotationIDs.size(); ++i)
         {
-            [self.annotationIDsByAnnotation setObject:@{
+            [self.annotationMetadataByAnnotation setObject:@{
                 MGLAnnotationIDKey     : @(pointAnnotationIDs[i]),
                 MGLAnnotationSymbolKey : [NSString stringWithUTF8String:points[i].icon.c_str()]
             } forKey:annotations[i]];
@@ -2235,10 +2246,39 @@ CLLocationCoordinate2D MGLLocationCoordinate2DFromLatLng(mbgl::LatLng latLng)
 
         for (size_t i = 0; i < shapeAnnotationIDs.size(); ++i)
         {
-            [self.annotationIDsByAnnotation setObject:@{ MGLAnnotationIDKey : @(shapeAnnotationIDs[i]) }
+            [self.annotationMetadataByAnnotation setObject:@{ MGLAnnotationIDKey : @(shapeAnnotationIDs[i]) }
                                                forKey:annotations[i]];
         }
     }
+}
+
+- (void)installAnnotationImage:(MGLAnnotationImage *)annotationImage
+{
+    // retrieve pixels
+    CGImageRef image = annotationImage.image.CGImage;
+    size_t width = CGImageGetWidth(image);
+    size_t height = CGImageGetHeight(image);
+    CGColorSpaceRef colorSpace = CGColorSpaceCreateDeviceRGB();
+    std::string pixels(width * height * 4, '\0');
+    size_t bytesPerPixel = 4;
+    size_t bytesPerRow = bytesPerPixel * width;
+    size_t bitsPerComponent = 8;
+    char *pixelData = const_cast<char *>(pixels.data());
+    CGContextRef context = CGBitmapContextCreate(pixelData, width, height, bitsPerComponent, bytesPerRow, colorSpace, kCGImageAlphaPremultipliedLast);
+    CGContextDrawImage(context, CGRectMake(0, 0, width, height), image);
+    CGContextRelease(context);
+    CGColorSpaceRelease(colorSpace);
+    
+    // add sprite
+    auto cSpriteImage = std::make_shared<mbgl::SpriteImage>(
+        uint16_t(annotationImage.image.size.width),
+        uint16_t(annotationImage.image.size.height),
+        float(annotationImage.image.scale),
+        std::move(pixels));
+    
+    // sprite upload
+    NSString *symbolName = [MGLAnnotationSpritePrefix stringByAppendingString:annotationImage.reuseIdentifier];
+    _mbglMap->setSprite(symbolName.UTF8String, cSpriteImage);
 }
 
 - (void)removeAnnotation:(id <MGLAnnotation>)annotation
@@ -2263,10 +2303,10 @@ CLLocationCoordinate2D MGLLocationCoordinate2DFromLatLng(mbgl::LatLng latLng)
     {
         NSAssert([annotation conformsToProtocol:@protocol(MGLAnnotation)], @"annotation should conform to MGLAnnotation");
 
-        NSDictionary *infoDictionary = [self.annotationIDsByAnnotation objectForKey:annotation];
+        NSDictionary *infoDictionary = [self.annotationMetadataByAnnotation objectForKey:annotation];
         annotationIDsToRemove.push_back([[infoDictionary objectForKey:MGLAnnotationIDKey] unsignedIntValue]);
 
-        [self.annotationIDsByAnnotation removeObjectForKey:annotation];
+        [self.annotationMetadataByAnnotation removeObjectForKey:annotation];
 
         if (annotation == self.selectedAnnotation)
         {
@@ -2366,7 +2406,7 @@ CLLocationCoordinate2D MGLLocationCoordinate2DFromLatLng(mbgl::LatLng latLng)
         else
         {
             // determine symbol in use for point
-            NSString *customSymbol = [[self.annotationIDsByAnnotation objectForKey:annotation] objectForKey:MGLAnnotationSymbolKey];
+            NSString *customSymbol = [[self.annotationMetadataByAnnotation objectForKey:annotation] objectForKey:MGLAnnotationSymbolKey];
             NSString *symbolName = [customSymbol length] ? customSymbol : MGLDefaultStyleMarkerSymbolName;
             std::string cSymbolName([symbolName UTF8String]);
 

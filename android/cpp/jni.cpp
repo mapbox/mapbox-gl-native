@@ -470,11 +470,11 @@ void JNICALL nativeUpdate(JNIEnv *env, jobject obj, jlong nativeMapViewPtr) {
     nativeMapView->getMap().update(mbgl::Update::Repaint);
 }
 
-void JNICALL nativeOnInvalidate(JNIEnv *env, jobject obj, jlong nativeMapViewPtr) {
-    mbgl::Log::Debug(mbgl::Event::JNI, "nativeOnInvalidate");
+void JNICALL nativeRenderSync(JNIEnv *env, jobject obj, jlong nativeMapViewPtr) {
+    mbgl::Log::Debug(mbgl::Event::JNI, "nativeRenderSync");
     assert(nativeMapViewPtr != 0);
     NativeMapView *nativeMapView = reinterpret_cast<NativeMapView *>(nativeMapViewPtr);
-    nativeMapView->onInvalidate();
+    nativeMapView->renderSync();
 }
 
 void JNICALL nativeViewResize(JNIEnv *env, jobject obj, jlong nativeMapViewPtr, jint width, jint height) {
@@ -820,6 +820,73 @@ jlong JNICALL nativeAddMarker(JNIEnv *env, jobject obj, jlong nativeMapViewPtr, 
     // Because Java only has int, not unsigned int, we need to bump the annotation id up to a long.
     return nativeMapView->getMap().addPointAnnotation(mbgl::PointAnnotation(mbgl::LatLng(latitude, longitude), sprite));
 }
+
+jlongArray JNICALL nativeAddMarkers(JNIEnv *env, jobject obj, jlong nativeMapViewPtr, jobject jlist) {
+    mbgl::Log::Debug(mbgl::Event::JNI, "nativeAddMarkers");
+    assert(nativeMapViewPtr != 0);
+    NativeMapView *nativeMapView = reinterpret_cast<NativeMapView *>(nativeMapViewPtr);
+
+    std::vector<mbgl::PointAnnotation> markers;
+
+    if (jlist == nullptr) {
+        if (env->ThrowNew(nullPointerExceptionClass, "List cannot be null.") < 0) {
+            env->ExceptionDescribe();
+            return nullptr;
+        }
+        return nullptr;
+    }
+
+    jobjectArray jarray =
+        reinterpret_cast<jobjectArray>(env->CallObjectMethod(jlist, listToArrayId));
+    if (env->ExceptionCheck() || (jarray == nullptr)) {
+        env->ExceptionDescribe();
+        return nullptr;
+    }
+
+    jsize len = env->GetArrayLength(jarray);
+    if (len < 0) {
+        env->ExceptionDescribe();
+        return nullptr;
+    }
+
+    markers.reserve(len);
+
+    for (jsize i = 0; i < len; i++) {
+        jobject marker = reinterpret_cast<jobject>(env->GetObjectArrayElement(jarray, i));
+
+        jobject position = env->GetObjectField(marker, markerPositionId);
+        if (env->ExceptionCheck()) {
+            env->ExceptionDescribe();
+            return nullptr;
+        }
+
+        jstring jsprite = reinterpret_cast<jstring>(env->GetObjectField(marker, markerSpriteId));
+        std::string sprite = std_string_from_jstring(env, jsprite);
+
+        jdouble latitude = env->GetDoubleField(position, latLngLatitudeId);
+        if (env->ExceptionCheck()) {
+            env->ExceptionDescribe();
+            return nullptr;
+        }
+
+        jdouble longitude = env->GetDoubleField(position, latLngLongitudeId);
+        if (env->ExceptionCheck()) {
+            env->ExceptionDescribe();
+            return nullptr;
+        }
+
+        markers.emplace_back(mbgl::PointAnnotation(mbgl::LatLng(latitude, longitude), sprite));
+
+        /* Do I need to delete other LocalRefs? */
+        env->DeleteLocalRef(marker);
+     }
+
+    env->DeleteLocalRef(jarray);
+
+    std::vector<uint32_t> pointAnnotationIDs = nativeMapView->getMap().addPointAnnotations(markers);
+    return std_vector_uint_to_jobject(env, pointAnnotationIDs);
+}
+
 
 jlong JNICALL nativeAddPolyline(JNIEnv *env, jobject obj, jlong nativeMapViewPtr, jobject polyline) {
     mbgl::Log::Debug(mbgl::Event::JNI, "nativeAddPolyline");
@@ -1625,7 +1692,7 @@ extern "C" JNIEXPORT jint JNICALL JNI_OnLoad(JavaVM *vm, void *reserved) {
         {"nativePause", "(J)V", reinterpret_cast<void *>(&nativePause)},
         {"nativeResume", "(J)V", reinterpret_cast<void *>(&nativeResume)},
         {"nativeUpdate", "(J)V", reinterpret_cast<void *>(&nativeUpdate)},
-        {"nativeOnInvalidate", "(J)V", reinterpret_cast<void *>(&nativeOnInvalidate)},
+        {"nativeRenderSync", "(J)V", reinterpret_cast<void *>(&nativeRenderSync)},
         {"nativeViewResize", "(JII)V",
          reinterpret_cast<void *>(static_cast<void JNICALL (
              *)(JNIEnv *, jobject, jlong, jint, jint)>(&nativeViewResize))},
@@ -1689,6 +1756,8 @@ extern "C" JNIEXPORT jint JNICALL JNI_OnLoad(JavaVM *vm, void *reserved) {
         {"nativeResetNorth", "(J)V", reinterpret_cast<void *>(&nativeResetNorth)},
         {"nativeAddMarker", "(JLcom/mapbox/mapboxsdk/annotations/Marker;)J",
          reinterpret_cast<void *>(&nativeAddMarker)},
+         {"nativeAddMarkers", "(JLjava/util/List;)[J",
+         reinterpret_cast<void *>(&nativeAddMarkers)},
         {"nativeAddPolyline", "(JLcom/mapbox/mapboxsdk/annotations/Polyline;)J",
          reinterpret_cast<void *>(&nativeAddPolyline)},
         {"nativeAddPolygon", "(JLcom/mapbox/mapboxsdk/annotations/Polygon;)J",

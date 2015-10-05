@@ -26,6 +26,8 @@
 #include <mbgl/style/style.hpp>
 #include <mbgl/gl/debugging.hpp>
 
+#include <rapidjson/error/en.h>
+
 #include <algorithm>
 
 namespace mbgl {
@@ -164,7 +166,7 @@ void Source::load() {
 
         if (d.HasParseError()) {
             std::stringstream message;
-            message << "Failed to parse [" << info.url << "]: " << d.GetErrorOffset() << " - " << d.GetParseError();
+            message << "Failed to parse [" << info.url << "]: " << d.GetErrorOffset() << " - " << rapidjson::GetParseError_En(d.GetParseError());
             emitSourceLoadingFailed(message.str());
             return;
         }
@@ -234,15 +236,13 @@ bool Source::handlePartialTile(const TileID& id, Worker&) {
         return true;
     }
 
-    // Note: this uses a raw pointer; we don't want the callback binding to have a
-    // shared pointer.
-    VectorTileData* data = dynamic_cast<VectorTileData*>(it->second.lock().get());
+    auto data = it->second.lock();
     if (!data) {
         return true;
     }
 
-    return data->reparse([this, data]() {
-	emitTileLoaded(false);
+    return data->reparse([this]() {
+        emitTileLoaded(false);
     });
 }
 
@@ -517,15 +517,17 @@ bool Source::update(MapData& data,
 
 void Source::invalidateTiles(const std::unordered_set<TileID, TileID::Hash>& ids) {
     cache.clear();
-    if (!ids.empty()) {
-        for (auto& id : ids) {
-            tiles.erase(id);
-            tile_data.erase(id);
-        }
-    } else {
-        tiles.clear();
-        tile_data.clear();
+    for (const auto& id : ids) {
+        tiles.erase(id);
+        tile_data.erase(id);
     }
+    updateTilePtrs();
+}
+
+void Source::invalidateTiles() {
+    cache.clear();
+    tiles.clear();
+    tile_data.clear();
     updateTilePtrs();
 }
 

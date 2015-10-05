@@ -44,6 +44,12 @@ void VectorTileData::request(float pixelRatio, const std::function<void()>& call
     req = fs->request({ Resource::Kind::Tile, url }, util::RunLoop::getLoop(), [url, callback, this](const Response &res) {
         req = nullptr;
 
+        if (res.status == Response::NotFound) {
+            state = State::parsed;
+            callback();
+            return;
+        }
+
         if (res.status != Response::Successful) {
             std::stringstream message;
             message <<  "Failed to load [" << url << "]: " << res.message;

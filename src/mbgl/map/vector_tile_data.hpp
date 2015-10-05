@@ -28,7 +28,7 @@ public:
     void request(float pixelRatio,
                  const std::function<void()>& callback);
 
-    bool reparse(std::function<void ()> callback);
+    bool reparse(std::function<void ()> callback) override;
 
     void redoPlacement(float angle, float pitch, bool collisionDebug) override;
 
