@@ -16,7 +16,6 @@ import android.graphics.Matrix;
 import android.graphics.PointF;
 import android.graphics.RectF;
 import android.graphics.SurfaceTexture;
-import android.graphics.drawable.BitmapDrawable;
 import android.location.Location;
 import android.net.ConnectivityManager;
 import android.net.NetworkInfo;
@@ -194,11 +193,11 @@ public final class MapView extends FrameLayout implements LocationListener, Comp
     // Used for the compass
     private CompassView mCompassView;
 
-    // Used for displaying annotation markers
+    // Used for displaying annotations
     // Every annotation that has been added to the map
     private final List<Annotation> mAnnotations = new ArrayList<>();
-    private List<Annotation> mAnnotationsNearLastTap = new ArrayList<>();
-    private Annotation mSelectedAnnotation;
+    private List<Marker> mMarkersNearLastTap = new ArrayList<>();
+    private Marker mSelectedMarker;
     private InfoWindowAdapter mInfoWindowAdapter;
 
     // Used for the Mapbox Logo
@@ -833,7 +832,7 @@ public final class MapView extends FrameLayout implements LocationListener, Comp
             public void onMapChanged(MapChange change) {
                 if (change.equals(MapChange.RegionWillChange) ||
                         change.equals(MapChange.RegionWillChangeAnimated)) {
-                    deselectAnnotation();
+                    deselectMarker();
                 }
             }
         });
@@ -1612,9 +1611,9 @@ public final class MapView extends FrameLayout implements LocationListener, Comp
 
         // Load the default marker sprite
         if (marker.getSprite() == null) {
-            BitmapDrawable bitmapDrawable = (BitmapDrawable) ContextCompat.getDrawable(mContext, R.drawable.default_marker);
-            Bitmap bitmap = bitmapDrawable.getBitmap();
-            setSprite(DEFAULT_SPRITE, bitmap);
+            //BitmapDrawable bitmapDrawable = (BitmapDrawable) ContextCompat.getDrawable(mContext, R.drawable.default_marker);
+            //Bitmap bitmap = bitmapDrawable.getBitmap();
+            //setSprite(DEFAULT_SPRITE, bitmap);
 
             // Red default marker is currently broken
             marker.setSprite("default_marker");
@@ -1628,8 +1627,26 @@ public final class MapView extends FrameLayout implements LocationListener, Comp
         return marker;
     }
 
-    public List<Marker> addMarkers(List<Marker> markers) {
+    public List<Marker> addMarkers(List<MarkerOptions> markerOptionsList) {
+        List<Marker> markers = new ArrayList<>(markerOptionsList.size());
+        for (MarkerOptions markerOptions : markerOptionsList) {
+            Marker marker = markerOptions.getMarker();
+
+            // Load the default marker sprite
+            if (marker.getSprite() == null) {
+                //BitmapDrawable bitmapDrawable = (BitmapDrawable) ContextCompat.getDrawable(mContext, R.drawable.default_marker);
+                //Bitmap bitmap = bitmapDrawable.getBitmap();
+                //setSprite(DEFAULT_SPRITE, bitmap);
+
+                // Red default marker is currently broken
+                marker.setSprite("default_marker");
+                //marker.setSprite(DEFAULT_SPRITE);
+            }
+            markers.add(markerOptions.getMarker());
+        }
+
         long[] ids = mNativeMapView.addMarkers(markers);
+
         Marker m;
         int count = markers.size();
         for (int i = 0; i < count; i++) {
@@ -1638,7 +1655,8 @@ public final class MapView extends FrameLayout implements LocationListener, Comp
             m.setMapView(this);
             mAnnotations.add(m);
         }
-        return markers;
+
+        return new ArrayList<>(markers);
     }
 
     public Polyline addPolyline(PolylineOptions polylineOptions) {
@@ -1650,6 +1668,16 @@ public final class MapView extends FrameLayout implements LocationListener, Comp
         return polyline;
     }
 
+    public List<Polyline> addPolylines(List<PolylineOptions> polylineOptionsList) {
+        // TODO make faster in JNI
+        List<Polyline> polylines = new ArrayList<>(polylineOptionsList.size());
+        for (PolylineOptions polylineOptions : polylineOptionsList) {
+            polylines.add(addPolyline(polylineOptions));
+        }
+
+        return new ArrayList<>(polylines);
+    }
+
     public Polygon addPolygon(PolygonOptions polygonOptions) {
         Polygon polygon = polygonOptions.getPolygon();
         long id = mNativeMapView.addPolygon(polygon);
@@ -1659,21 +1687,24 @@ public final class MapView extends FrameLayout implements LocationListener, Comp
         return polygon;
     }
 
-    public List<Polygon> addPolygons(List<PolygonOptions> polygonOptions) {
-        List<Polygon> polygons = new ArrayList<>();
-        for (PolygonOptions popts : polygonOptions) {
-            polygons.add(popts.getPolygon());
+    public List<Polygon> addPolygons(List<PolygonOptions> polygonOptionsList) {
+        List<Polygon> polygons = new ArrayList<>(polygonOptionsList.size());
+        for (PolygonOptions polygonOptions : polygonOptionsList) {
+            polygons.add(polygonOptions.getPolygon());
         }
 
         long[] ids = mNativeMapView.addPolygons(polygons);
 
+        Polygon p;
+        int count = polygons.size();
         for (int i = 0; i < polygons.size(); i++) {
-            polygons.get(i).setId(ids[i]);
-            polygons.get(i).setMapView(this);
-            mAnnotations.add(polygons.get(i));
+            p = polygons.get(i);
+            p.setId(ids[i]);
+            p.setMapView(this);
+            mAnnotations.add(p);
         }
 
-        return Collections.unmodifiableList(polygons);
+        return new ArrayList<>(polygons);
     }
 
     private void removeAnnotationsWithId(long annotationId) {
@@ -1697,13 +1728,16 @@ public final class MapView extends FrameLayout implements LocationListener, Comp
         mAnnotations.remove(annotation);
     }
 
-    public void removeAnnotation(long annotationId) {
-        mNativeMapView.removeAnnotation(annotationId);
-        removeAnnotationsWithId(annotationId);
+    public void removeAnnotations(List<Annotation> annotationList) {
+        // TODO make faster in JNI
+        for (Annotation annotation : annotationList) {
+            removeAnnotation(annotation);
+        }
     }
 
-    public void removeAnnotations() {
+    public void removeAllAnnotations() {
         long[] ids = new long[mAnnotations.size()];
+
         for (int i = 0; i < mAnnotations.size(); i++) {
             Annotation annotation = mAnnotations.get(i);
             long id = annotation.getId();
@@ -1712,28 +1746,33 @@ public final class MapView extends FrameLayout implements LocationListener, Comp
                 ((Marker) annotation).hideInfoWindow();
             }
         }
+
         mNativeMapView.removeAnnotations(ids);
         mAnnotations.clear();
     }
 
-    public List<Annotation> getAnnotations() {
-        return Collections.unmodifiableList(mAnnotations);
+    public List<Annotation> getAllAnnotations() {
+        return new ArrayList<>(mAnnotations);
     }
 
-    public List<Annotation> getAnnotationsInBounds(BoundingBox bbox) {
-        List<Annotation> annotations = new ArrayList<>();
+    private List<Marker> getMarkersInBounds(BoundingBox bbox) {
+        // TODO: filter in JNI using C++ parameter to getAnnotationsInBounds
         long[] ids = mNativeMapView.getAnnotationsInBounds(bbox);
-        List<Long> idsList = new ArrayList<>();
+
+        List<Long> idsList = new ArrayList<>(ids.length);
         for (long id : ids) {
             idsList.add(id);
         }
+
+        List<Marker> annotations = new ArrayList<>(ids.length);
         for (int i = 0; i < mAnnotations.size(); i++) {
             Annotation annotation = mAnnotations.get(i);
             if (annotation instanceof Marker && idsList.contains(annotation.getId())) {
-                annotations.add(annotation);
+                annotations.add((Marker)annotation);
             }
         }
-        return annotations;
+
+        return new ArrayList<>(annotations);
     }
 
     // Used by InfoWindow
@@ -1744,10 +1783,11 @@ public final class MapView extends FrameLayout implements LocationListener, Comp
     /**
      * Returns the distance spanned by one pixel at the specified latitude and current zoom level.
      * <p/>
-     * The distance between pixels decreases as the latitude approaches the poles. This relationship parallels the relationship between longitudinal coordinates at different latitudes.
+     * The distance between pixels decreases as the latitude approaches the poles.
+     * This relationship parallels the relationship between longitudinal coordinates at different latitudes.
      *
      * @param latitude The latitude for which to return the value.
-     * @return The distance (in meters) spanned by a single pixel.
+     * @return The distance measured in meters.
      */
     public double getMetersPerPixelAtLatitude(double latitude) {
         return mNativeMapView.getMetersPerPixelAtLatitude(latitude, getZoomLevel());
@@ -1758,49 +1798,45 @@ public final class MapView extends FrameLayout implements LocationListener, Comp
         return mScreenDensity;
     }
 
-    private void selectAnnotation(Annotation annotation) {
-        if (annotation == null) {
+    private void selectMarker(Marker marker) {
+        if (marker == null) {
             return;
         }
 
-        if (annotation == mSelectedAnnotation) {
+        if (marker == mSelectedMarker) {
             return;
         }
 
-        if (annotation instanceof Marker) {
-            // Need to deselect any currently selected annotation first
-            deselectAnnotation();
+        // Need to deselect any currently selected annotation first
+        deselectMarker();
 
-            Marker marker = (Marker) annotation;
-            boolean handledDefaultClick = false;
-            if (mOnMarkerClickListener != null) {
-                // end developer has provided a custom click listener
-                handledDefaultClick = mOnMarkerClickListener.onMarkerClick(marker);
-            }
-
-            if (mInfoWindowAdapter != null) {
-                // end developer is using a custom InfoWindowAdapter
-                View content = mInfoWindowAdapter.getInfoWindow(marker);
-                if (content != null) {
-                    marker.showInfoWindow(content);
-                }
-            } else if (!handledDefaultClick) {
-                // default behaviour
-                // Can't do this as InfoWindow will get hidden
-                //setCenterCoordinate(marker.getPosition(), true);
-                marker.showInfoWindow();
-            }
-
-            mSelectedAnnotation = annotation;
+        boolean handledDefaultClick = false;
+        if (mOnMarkerClickListener != null) {
+            // end developer has provided a custom click listener
+            handledDefaultClick = mOnMarkerClickListener.onMarkerClick(marker);
         }
+
+        if (mInfoWindowAdapter != null) {
+            // end developer is using a custom InfoWindowAdapter
+            View content = mInfoWindowAdapter.getInfoWindow(marker);
+            if (content != null) {
+                marker.showInfoWindow(content);
+            }
+        } else if (!handledDefaultClick) {
+            // default behaviour
+            // Can't do this as InfoWindow will get hidden
+            //setCenterCoordinate(marker.getPosition(), true);
+            marker.showInfoWindow();
+        }
+
+        mSelectedMarker = marker;
     }
 
-    private void deselectAnnotation() {
-        if (mSelectedAnnotation != null && mSelectedAnnotation instanceof Marker) {
-            Marker marker = (Marker) mSelectedAnnotation;
-            if (marker.isInfoWindowShown()) {
-                marker.hideInfoWindow();
-                mSelectedAnnotation = null;
+    private void deselectMarker() {
+        if (mSelectedMarker != null) {
+            if (mSelectedMarker.isInfoWindowShown()) {
+                mSelectedMarker.hideInfoWindow();
+                mSelectedMarker = null;
             }
         }
     }
@@ -2017,51 +2053,51 @@ public final class MapView extends FrameLayout implements LocationListener, Comp
 
             BoundingBox tapBounds = BoundingBox.fromLatLngs(corners);
 
-            List<Annotation> nearbyAnnotations = getAnnotationsInBounds(tapBounds);
+            List<Marker> nearbyMarkers = getMarkersInBounds(tapBounds);
 
-            long newSelectedAnnotationID;
+            long newSelectedMarkerId;
 
-            if (nearbyAnnotations.size() > 0) {
+            if (nearbyMarkers.size() > 0) {
 
-                // there is at least one nearby annotation; select one
+                // there is at least one nearby marker; select one
                 //
                 // first, sort for comparison and iteration
-                Collections.sort(nearbyAnnotations);
+                Collections.sort(nearbyMarkers);
 
-                if (nearbyAnnotations == mAnnotationsNearLastTap) {
+                if (nearbyMarkers == mMarkersNearLastTap) {
                     // the selection candidates haven't changed; cycle through them
-                    if (mSelectedAnnotation != null && (mSelectedAnnotation.getId() == mAnnotationsNearLastTap.get(mAnnotationsNearLastTap.size() - 1).getId())) {
-                        // the selected annotation is the last in the set; cycle back to the first
-                        // note: this could be the selected annotation if only one in set
-                        newSelectedAnnotationID = mAnnotationsNearLastTap.get(0).getId();
-                    } else if (mSelectedAnnotation != null) {
+                    if (mSelectedMarker != null && (mSelectedMarker.getId() == mMarkersNearLastTap.get(mMarkersNearLastTap.size() - 1).getId())) {
+                        // the selected marker is the last in the set; cycle back to the first
+                        // note: this could be the selected marker if only one in set
+                        newSelectedMarkerId = mMarkersNearLastTap.get(0).getId();
+                    } else if (mSelectedMarker != null) {
                         // otherwise increment the selection through the candidates
-                        long result = mAnnotationsNearLastTap.indexOf(mSelectedAnnotation);
-                        newSelectedAnnotationID = mAnnotationsNearLastTap.get((int) result + 1).getId();
+                        long result = mMarkersNearLastTap.indexOf(mSelectedMarker);
+                        newSelectedMarkerId = mMarkersNearLastTap.get((int) result + 1).getId();
                     } else {
                         // no current selection; select the first one
-                        newSelectedAnnotationID = mAnnotationsNearLastTap.get(0).getId();
+                        newSelectedMarkerId = mMarkersNearLastTap.get(0).getId();
                     }
                 } else {
-                    // start tracking a new set of nearby annotations
-                    mAnnotationsNearLastTap = nearbyAnnotations;
+                    // start tracking a new set of nearby markers
+                    mMarkersNearLastTap = nearbyMarkers;
 
                     // select the first one
-                    newSelectedAnnotationID = mAnnotationsNearLastTap.get(0).getId();
+                    newSelectedMarkerId = mMarkersNearLastTap.get(0).getId();
                 }
 
             } else {
-                // there are no nearby annotations; deselect if necessary
-                newSelectedAnnotationID = -1;
+                // there are no nearby markers; deselect if necessary
+                newSelectedMarkerId = -1;
             }
 
-            if (newSelectedAnnotationID >= 0) {
+            if (newSelectedMarkerId >= 0) {
 
                 for (Annotation annotation : mAnnotations) {
                     if (annotation instanceof Marker) {
-                        if (annotation.getId() == newSelectedAnnotationID) {
-                            if (mSelectedAnnotation == null || annotation.getId() != mSelectedAnnotation.getId()) {
-                                selectAnnotation(annotation);
+                        if (annotation.getId() == newSelectedMarkerId) {
+                            if (mSelectedMarker == null || annotation.getId() != mSelectedMarker.getId()) {
+                                selectMarker((Marker)annotation);
                             }
                             break;
                         }
@@ -2069,9 +2105,9 @@ public final class MapView extends FrameLayout implements LocationListener, Comp
                 }
 
             } else {
-                // deselect any selected annotation
-                if (mSelectedAnnotation != null) {
-                    deselectAnnotation();
+                // deselect any selected marker
+                if (mSelectedMarker != null) {
+                    deselectMarker();
                 }
 
                 // notify app of map click

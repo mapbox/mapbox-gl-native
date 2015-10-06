@@ -402,34 +402,34 @@ public class MainActivity extends AppCompatActivity {
     }
 
     private void addMarkers() {
-        List<Marker> markerList = new ArrayList<>();
+        List<MarkerOptions> markerOptionsList = new ArrayList<>();
 
-        final Marker backLot = generateMarker("Back Lot", "The back lot behind my house", null, 38.649441, -121.369064);
-        markerList.add(backLot);
+        final MarkerOptions backLot = generateMarker("Back Lot", "The back lot behind my house", null, 38.649441, -121.369064);
+        markerOptionsList.add(backLot);
 
-        final Marker cheeseRoom = generateMarker("Cheese Room", "The only air conditioned room on the property", "dog-park-15", 38.531577, -122.010646);
-        markerList.add(cheeseRoom);
+        final MarkerOptions cheeseRoom = generateMarker("Cheese Room", "The only air conditioned room on the property", "dog-park-15", 38.531577, -122.010646);
+        markerOptionsList.add(cheeseRoom);
 
-        mMapView.addMarkers(markerList);
+       List<Marker> markers = mMapView.addMarkers(markerOptionsList);
 
         // need to call this after adding markers to map, click event hook into InfoWindow needs refactoring
-        backLot.setInfoWindowOnTouchListener(new View.OnTouchListener() {
+        final Marker backLotMarker = markers.get(0);
+        backLotMarker.setInfoWindowOnTouchListener(new View.OnTouchListener() {
             @Override
             public boolean onTouch(View view, MotionEvent motionEvent) {
                 Toast.makeText(getApplicationContext(), "Custom Info Touch Listener!!", Toast.LENGTH_SHORT).show();
-                backLot.hideInfoWindow();
+                backLotMarker.hideInfoWindow();
                 return true;
             }
         });
     }
 
-    private Marker generateMarker(String title, String snippet, String sprite, double lat, double lng) {
+    private MarkerOptions generateMarker(String title, String snippet, String sprite, double lat, double lng){
         return new MarkerOptions()
                 .position(new LatLng(lat, lng))
                 .title(title)
                 .sprite(sprite)
-                .snippet(snippet)
-                .getMarker();
+                .snippet(snippet);
     }
 
     private void addPolyline() {
@@ -465,7 +465,7 @@ public class MainActivity extends AppCompatActivity {
     }
 
     private void removeAnnotations() {
-        mMapView.removeAnnotations();
+        mMapView.removeAllAnnotations();
     }
 
     // Called when FPS changes
