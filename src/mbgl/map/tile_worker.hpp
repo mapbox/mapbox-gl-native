@@ -31,7 +31,6 @@ class TileWorker : public util::noncopyable {
 public:
     TileWorker(TileID,
                std::string sourceID,
-               uint16_t maxZoom,
                Style&,
                std::vector<util::ptr<StyleLayer>>,
                const std::atomic<TileData::State>&,
@@ -58,7 +57,6 @@ private:
 
     const TileID id;
     const std::string sourceID;
-    const uint16_t maxZoom;
 
     Style& style;
     const std::atomic<TileData::State>& state;
