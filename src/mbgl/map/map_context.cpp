@@ -75,8 +75,9 @@ void MapContext::pause() {
     view.deactivate();
 
     std::unique_lock<std::mutex> lockPause(data.mutexPause);
-    data.condPaused.notify_all();
-    data.condResume.wait(lockPause);
+    data.paused = true;
+    data.condPause.notify_all();
+    data.condPause.wait(lockPause, [&]{ return !data.paused; });
 
     view.activate();
 

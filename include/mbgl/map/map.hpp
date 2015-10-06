@@ -189,7 +189,6 @@ private:
     };
 
     RenderState renderState = RenderState::never;
-    bool paused = false;
 };
 
 }

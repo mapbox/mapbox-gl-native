@@ -32,21 +32,20 @@ Map::~Map() {
 void Map::pause() {
     assert(data->mode == MapMode::Continuous);
 
-    if (!paused) {
+    if (!data->paused) {
         std::unique_lock<std::mutex> lockPause(data->mutexPause);
         context->invoke(&MapContext::pause);
-        data->condPaused.wait(lockPause);
-        paused = true;
+        data->condPause.wait(lockPause, [&]{ return data->paused; });
     }
 }
 
 bool Map::isPaused() {
-    return paused;
+    return data->paused;
 }
 
 void Map::resume() {
-    data->condResume.notify_all();
-    paused = false;
+    data->paused = false;
+    data->condPause.notify_all();
 }
 
 void Map::renderStill(StillImageCallback callback) {
