@@ -243,7 +243,12 @@ bool MapContext::renderSync(const TransformState& state, const FrameData& frame)
 
     view.afterRender();
 
-    if (style->hasTransitions() || painter->needsAnimation()) {
+    if (style->hasTransitions()) {
+        updateFlags |= Update::Classes;
+        asyncUpdate->send();
+    }
+
+    if (painter->needsAnimation()) {
         updateFlags |= Update::Repaint;
         asyncUpdate->send();
     }
