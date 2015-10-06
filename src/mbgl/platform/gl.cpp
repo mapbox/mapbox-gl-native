@@ -29,6 +29,9 @@ void InitializeExtensions(glProc (*getProcAddress)(const char *)) {
         for (auto fn : ExtensionFunctionBase::functions()) {
             for (auto probe : fn->probes) {
                 if (extensions.find(probe.first) != std::string::npos) {
+#ifdef GL_TRACK
+                    fn->foundName = probe.second;
+#endif
                     fn->ptr = getProcAddress(probe.second);
                     break;
                 }
@@ -82,13 +85,45 @@ static std::map<GLint, GLsizeiptr> bufferBindingToSizeMap;
 static unsigned int currentUsedBufferBytes = 0;
 static unsigned int largestAmountUsedSoFar = 0;
 
+static std::map<GLuint, GLuint> vertexArrayToArrayBufferMap;
+static GLuint currentVertexArray = 0;
+
 static std::mutex gDebugMutex;
+
+namespace mbgl {
+    namespace gl {
+        void mbx_trapExtension(const char *) { }
+        void mbx_trapExtension(const char *, GLint, const char *) { }
+        void mbx_trapExtension(const char *, GLsizei, GLuint *) { }
+        void mbx_trapExtension(const char *, GLsizei, const GLuint *) { }
+        void mbx_trapExtension(const char *, GLenum, GLenum, GLenum, GLsizei, const GLuint *, GLboolean) { }
+        void mbx_trapExtension(const char *, GLenum, GLuint, GLsizei, const GLchar *) { }
+        void mbx_trapExtension(const char *, GLDEBUGPROC, const void *) { }
+        void mbx_trapExtension(const char *, GLuint, GLuint, GLuint, GLuint, GLint, const char *, const void*) { }
+        
+        void mbx_trapExtension(const char *name, GLuint array) {
+            if(strncasecmp(name, "glBindVertexArray", 17) == 0) {
+                currentVertexArray = array;
+                std::cout << name << ": " << array << std::endl;
+            }
+        }
+    }
+}
 
 void mbx_glBindBuffer(GLenum target,
                       GLuint buffer) {
     std::unique_lock<std::mutex> lock(gDebugMutex);
     if (target == GL_ARRAY_BUFFER) {
         currentArrayBuffer = buffer;
+        if (currentVertexArray != 0) {
+            if (vertexArrayToArrayBufferMap.find(currentVertexArray) != vertexArrayToArrayBufferMap.end()) {
+                if (vertexArrayToArrayBufferMap[currentVertexArray] != currentArrayBuffer) {
+                    std::cout << "glBindBuffer: ERROR: You are re-binding a VAO to point to a new array buffer.  This is almost certainly unintended." << std::endl;
+                }
+            }
+            std::cout << "glBindBuffer: binding VAO " << currentVertexArray << " to array buffer " << currentArrayBuffer << std::endl;
+            vertexArrayToArrayBufferMap[currentVertexArray] = currentArrayBuffer;
+        }
     } else if (target == GL_ELEMENT_ARRAY_BUFFER) {
         currentElementArrayBuffer = buffer;
     }
@@ -138,11 +173,11 @@ void mbx_glBufferData(GLenum target,
 
 
 void mbx_glShaderSource(GLuint shader,
-                    GLsizei count,
-                    const GLchar * const *string,
+                        GLsizei count,
+                        const GLchar * const *string,
                         const GLint *length) {
     //std::cout << "Calling glShaderSource: " << *string << std::endl;
-    glShaderSource(shader, count, string, length);
+    glShaderSource(shader, count, const_cast<const GLchar **>(string), length);
 }
 
 void mbx_glClear(GLbitfield mask) {

@@ -7,6 +7,10 @@
 #include <stdexcept>
 #include <vector>
 
+#ifdef GL_TRACK
+#include <iostream>
+#endif
+
 #if __APPLE__
     #include "TargetConditionals.h"
     #if TARGET_OS_IPHONE
@@ -34,6 +38,28 @@
 namespace mbgl {
 namespace gl {
 
+#ifdef GL_TRACK
+    typedef void (*GLDEBUGPROC)(GLenum source,
+                                GLenum type,
+                                GLuint id,
+                                GLenum severity,
+                                GLsizei length,
+                                const GLchar *message,
+                                const void *userParam);
+    
+    template <class... Args> void mbx_trapExtension(const char *name, Args... args);
+    
+    void mbx_trapExtension(const char *);
+    void mbx_trapExtension(const char *, GLint, const char *);
+    void mbx_trapExtension(const char *, GLsizei, GLuint *);
+    void mbx_trapExtension(const char *, GLsizei, const GLuint *);
+    void mbx_trapExtension(const char *, GLenum, GLenum, GLenum, GLsizei, const GLuint *, GLboolean);
+    void mbx_trapExtension(const char *, GLenum, GLuint, GLsizei, const GLchar *);
+    void mbx_trapExtension(const char *, GLDEBUGPROC, const void *);
+    void mbx_trapExtension(const char *, GLuint, GLuint, GLuint, GLuint, GLint, const char *, const void*);
+    void mbx_trapExtension(const char *name, GLuint array);
+#endif
+    
 struct Error : ::std::runtime_error {
     inline Error(GLenum err, const std::string &msg) : ::std::runtime_error(msg), code(err) {};
     const GLenum code;
@@ -53,6 +79,9 @@ public:
     typedef std::pair<const char *, const char *> Probe;
     std::vector<Probe> probes;
     void (*ptr)();
+#ifdef GL_TRACK
+    const char *foundName;
+#endif
 };
 
 template <class>
@@ -71,6 +100,9 @@ public:
     }
 
     R operator()(Args... args) const {
+#ifdef GL_TRACK
+        mbx_trapExtension(foundName, args...);
+#endif
         return (*reinterpret_cast<R (*)(Args...)>(ptr))(std::forward<Args>(args)...);
     }
 };
