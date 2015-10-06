@@ -71,14 +71,6 @@ android {
             proguardFiles getDefaultProguardFile('proguard-android.txt'), 'proguard-rules.pro'
         }
     }
-
-    splits {
-        abi {
-            enable true
-            reset()
-            include 'armeabi', 'armeabi-v7a', 'x86', 'mips'
-        }
-    }
 }
 
 dependencies {
