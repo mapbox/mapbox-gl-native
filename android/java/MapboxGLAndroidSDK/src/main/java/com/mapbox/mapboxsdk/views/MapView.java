@@ -23,6 +23,8 @@ import android.net.NetworkInfo;
 import android.net.Uri;
 import android.os.Build;
 import android.os.Bundle;
+import android.support.annotation.FloatRange;
+import android.support.annotation.IntRange;
 import android.support.annotation.NonNull;
 import android.support.annotation.Nullable;
 import android.support.annotation.UiThread;
@@ -146,6 +148,13 @@ public final class MapView extends FrameLayout implements LocationListener, Comp
     // Used for loading default marker sprite
     private static final String DEFAULT_SPRITE = "com.mapbox.sprites.default";
 
+    /**
+     * The currently supported maximum zoom level.
+     *
+     * @see MapView#setZoomLevel(double)
+     */
+    public static final double MAXIMUM_ZOOM_LEVEL = 18.0;
+
     //
     // Instance members
     //
@@ -213,7 +222,6 @@ public final class MapView extends FrameLayout implements LocationListener, Comp
 
     // Used to manage marker click event listeners
     private OnMarkerClickListener mOnMarkerClickListener;
-
 
     //
     // Properties
@@ -452,9 +460,8 @@ public final class MapView extends FrameLayout implements LocationListener, Comp
      *
      * @param context     The {@link Context} of the {@link android.app.Activity}
      *                    or {@link android.app.Fragment} the {@link MapView} is running in.
-     * @param accessToken Your Mapbox access token.
+     * @param accessToken Your public Mapbox access token. Used to load map styles and tiles.
      */
-    // TODO default map style
     @UiThread
     public MapView(@NonNull Context context, @NonNull String accessToken) {
         super(context);
@@ -705,9 +712,13 @@ public final class MapView extends FrameLayout implements LocationListener, Comp
 
     /**
      * You must call this method from the parent's {@link android.app.Activity#onCreate(Bundle)} or
-     * {@link android.app.Fragment#onCreate(Bundle)}
+     * {@link android.app.Fragment#onCreate(Bundle)}.
+     * </p>
+     * You must set a valid access token with {@link MapView#setAccessToken(String)} before you this method
+     * or an exception will be thrown.
      *
      * @param savedInstanceState Pass in the parent's savedInstanceState.
+     * @see MapView#setAccessToken(String)
      */
     @UiThread
     public void onCreate(@Nullable Bundle savedInstanceState) {
@@ -777,7 +788,7 @@ public final class MapView extends FrameLayout implements LocationListener, Comp
 
     /**
      * You must call this method from the parent's {@link android.app.Activity#onSaveInstanceState(Bundle)}
-     * or {@link android.app.Fragment#onSaveInstanceState(Bundle)}
+     * or {@link android.app.Fragment#onSaveInstanceState(Bundle)}.
      *
      * @param outState Pass in the parent's outState.
      */
@@ -830,7 +841,7 @@ public final class MapView extends FrameLayout implements LocationListener, Comp
     }
 
     /**
-     * You must call this method from the parent's {@link Activity#onDestroy()} or {@link Fragment#onDestroy()}
+     * You must call this method from the parent's {@link Activity#onDestroy()} or {@link Fragment#onDestroy()}.
      */
     @UiThread
     public void onDestroy() {
@@ -839,7 +850,7 @@ public final class MapView extends FrameLayout implements LocationListener, Comp
     }
 
     /**
-     * You must call this method from the parent's {@link Activity#onStart()} or {@link Fragment#onStart()}
+     * You must call this method from the parent's {@link Activity#onStart()} or {@link Fragment#onStart()}.
      */
     @UiThread
     public void onStart() {
@@ -853,7 +864,7 @@ public final class MapView extends FrameLayout implements LocationListener, Comp
     }
 
     /**
-     * You must call this method from the parent's {@link Activity#onPause()} or {@link Fragment#onPause()}
+     * You must call this method from the parent's {@link Activity#onPause()} or {@link Fragment#onPause()}.
      */
     @UiThread
     public void onPause() {
@@ -869,7 +880,7 @@ public final class MapView extends FrameLayout implements LocationListener, Comp
     }
 
     /**
-     * You must call this method from the parent's {@link Activity#onResume()} or {@link Fragment#onResume()}
+     * You must call this method from the parent's {@link Activity#onResume()} or {@link Fragment#onResume()}.
      */
     @UiThread
     public void onResume() {
@@ -885,7 +896,7 @@ public final class MapView extends FrameLayout implements LocationListener, Comp
     }
 
     /**
-     * You must call this method from the parent's {@link Activity#onLowMemory()} or {@link Fragment#onLowMemory()}
+     * You must call this method from the parent's {@link Activity#onLowMemory()} or {@link Fragment#onLowMemory()}.
      */
     @UiThread
     public void onLowMemory() {
@@ -1020,6 +1031,7 @@ public final class MapView extends FrameLayout implements LocationListener, Comp
      * @return The current heading measured in degrees.
      */
     @UiThread
+    @FloatRange(from = 0, to = 360)
     public double getDirection() {
         double direction = -mNativeMapView.getBearing();
 
@@ -1049,7 +1061,7 @@ public final class MapView extends FrameLayout implements LocationListener, Comp
      * @see MapView#setDirection(double, boolean)
      */
     @UiThread
-    public void setDirection(double direction) {
+    public void setDirection(@FloatRange(from = 0, to = 360) double direction) {
         setDirection(direction, false);
     }
 
@@ -1067,9 +1079,10 @@ public final class MapView extends FrameLayout implements LocationListener, Comp
      * @param animated  If true, animates the change. If false, immediately changes the map.
      */
     @UiThread
-    public void setDirection(double direction, boolean animated) {
+    public void setDirection(@FloatRange(from = 0, to = 360) double direction, boolean animated) {
         long duration = animated ? ANIMATION_DURATION : 0;
         mNativeMapView.cancelTransitions();
+        // Out of range direactions are normallised in setBearing
         mNativeMapView.setBearing(-direction, duration);
     }
 
@@ -1117,6 +1130,7 @@ public final class MapView extends FrameLayout implements LocationListener, Comp
      * @return The current zoom level.
      */
     @UiThread
+    @FloatRange(from = 0.0, to = MAXIMUM_ZOOM_LEVEL)
     public double getZoomLevel() {
         return mNativeMapView.getZoom();
     }
@@ -1128,15 +1142,16 @@ public final class MapView extends FrameLayout implements LocationListener, Comp
      * at zoom level 1, tiles cover &frac14 of the world;
      * at zoom level 2, tiles cover 1/16 of the world, and so on.
      * <p/>
-     * The initial zoom level is 0.
+     * The initial zoom level is 0. The maximum zoom level is {@link MapView#MAXIMUM_ZOOM_LEVEL}.
      * <p/>
      * If you want to animate the change, use {@link MapView#setZoomLevel(double, boolean)}.
      *
      * @param zoomLevel The new coordinate.
      * @see MapView#setZoomLevel(double, boolean)
+     * @see MapView#MAXIMUM_ZOOM_LEVEL
      */
     @UiThread
-    public void setZoomLevel(double zoomLevel) {
+    public void setZoomLevel(@FloatRange(from = 0.0, to = MAXIMUM_ZOOM_LEVEL) double zoomLevel) {
         setZoomLevel(zoomLevel, false);
     }
 
@@ -1147,13 +1162,17 @@ public final class MapView extends FrameLayout implements LocationListener, Comp
      * at zoom level 1, tiles cover &frac14 of the world;
      * at zoom level 2, tiles cover 1/16 of the world, and so on.
      * <p/>
-     * The initial zoom level is 0.
+     * The initial zoom level is 0. The maximum zoom level is {@link MapView#MAXIMUM_ZOOM_LEVEL}.
      *
      * @param zoomLevel The new coordinate.
      * @param animated  If true, animates the change. If false, immediately changes the map.
+     * @see MapView#MAXIMUM_ZOOM_LEVEL
      */
     @UiThread
-    public void setZoomLevel(double zoomLevel, boolean animated) {
+    public void setZoomLevel(@FloatRange(from = 0.0, to = MAXIMUM_ZOOM_LEVEL) double zoomLevel, boolean animated) {
+        if ((zoomLevel < 0.0) || (zoomLevel > MAXIMUM_ZOOM_LEVEL)) {
+            throw new IllegalArgumentException("zoomLevel is < 0 or > MapView.MAXIMUM_ZOOM_LEVEL");
+        }
         long duration = animated ? ANIMATION_DURATION : 0;
         mNativeMapView.cancelTransitions();
         mNativeMapView.setZoom(zoomLevel, duration);
@@ -1302,36 +1321,124 @@ public final class MapView extends FrameLayout implements LocationListener, Comp
         return mStyleUrl;
     }
 
+    /**
+     * Returns the set of currently active map style classes.
+     *
+     * @return A list of class identifiers.
+     */
+    @UiThread
+    @NonNull
     public List<String> getStyleClasses() {
         return Collections.unmodifiableList(mNativeMapView.getClasses());
     }
 
-    public void setStyleClasses(List<String> styleClasses) {
+    /**
+     * Changes the set of currently active map style classes immediately.
+     * <p/>
+     * The list of valid class identifiers is defined by the currently loaded map style.
+     * <p/>
+     * If you want to animate the change, use {@link MapView#setStyleClasses(List, long)}.
+     *
+     * @param styleClasses A list of class identifiers.
+     * @see MapView#setStyleClasses(List, long)
+     * @see MapView#setStyleUrl(String)
+     */
+    @UiThread
+    public void setStyleClasses(@NonNull List<String> styleClasses) {
         setStyleClasses(styleClasses, 0);
     }
 
-    public void setStyleClasses(List<String> styleClasses, long transitionDuration) {
+    /**
+     * Changes the set of currently active map style classes with an animated transition.
+     * <p/>
+     * The list of valid class identifiers is defined by the currently loaded map style.
+     *
+     * @param styleClasses       A list of class identifiers.
+     * @param transitionDuration The duration of the transition animation in milliseconds.
+     * @see MapView#setStyleClasses(List, long)
+     * @see MapView#setStyleUrl(String)
+     */
+    @UiThread
+    public void setStyleClasses(@NonNull List<String> styleClasses, @IntRange(from = 0) long transitionDuration) {
+        if (styleClasses == null) {
+            throw new NullPointerException("styleClasses is null");
+        }
+        if (transitionDuration < 0) {
+            throw new IllegalArgumentException("transitionDuration is < 0");
+        }
+        // TODO non negative check and annotation (go back and check other functions too)
         mNativeMapView.setDefaultTransitionDuration(transitionDuration);
         mNativeMapView.setClasses(styleClasses);
     }
 
-    public void addStyleClass(String styleClass) {
+    /**
+     * Activates the specified map style class.
+     * <p/>
+     * If you want to animate the change, use {@link MapView#setStyleClasses(List, long)}.
+     *
+     * @param styleClass The class identifier.
+     * @see MapView#setStyleClasses(List, long)
+     */
+    @UiThread
+    public void addStyleClass(@NonNull String styleClass) {
+        if (styleClass == null) {
+            throw new NullPointerException("styleClass is null");
+        }
         mNativeMapView.addClass(styleClass);
     }
 
-    public void removeStyleClass(String styleClass) {
+    /**
+     * Deactivates the specified map style class.
+     * <p/>
+     * If you want to animate the change, use {@link MapView#setStyleClasses(List, long)}.
+     *
+     * @param styleClass The class identifier.
+     * @see MapView#setStyleClasses(List, long)
+     */
+    @UiThread
+    public void removeStyleClass(@NonNull String styleClass) {
+        if (styleClass == null) {
+            throw new NullPointerException("styleClass is null");
+        }
         mNativeMapView.removeClass(styleClass);
     }
 
-    public boolean hasStyleClass(String styleClass) {
+    /**
+     * Returns whether the specified map style class is currently active.
+     *
+     * @param styleClass The class identifier.
+     * @return If true, the class is currently active.
+     */
+    @UiThread
+    public boolean hasStyleClass(@NonNull String styleClass) {
+        if (styleClass == null) {
+            throw new NullPointerException("styleClass is null");
+        }
         return mNativeMapView.hasClass(styleClass);
     }
 
+    /**
+     * Deactivates all the currently active map style classes immediately.
+     * <p/>
+     * If you want to animate the change, use {@link MapView#removeAllStyleClasses(long)}.
+     *
+     * @see MapView#removeAllStyleClasses(long)
+     */
+    @UiThread
     public void removeAllStyleClasses() {
         removeAllStyleClasses(0);
     }
 
-    public void removeAllStyleClasses(long transitionDuration) {
+    /**
+     * Deactivates all the currently active map style classes with an animated transition.
+     *
+     * @param transitionDuration The duration of the transition animation in milliseconds.
+     */
+    @UiThread
+    public void removeAllStyleClasses(@IntRange(from = 0) long transitionDuration) {
+        if (transitionDuration < 0) {
+            throw new IllegalArgumentException("transitionDuration is < 0");
+        }
         mNativeMapView.setDefaultTransitionDuration(transitionDuration);
         ArrayList<String> styleClasses = new ArrayList<>(0);
         setStyleClasses(styleClasses);
@@ -1341,18 +1448,36 @@ public final class MapView extends FrameLayout implements LocationListener, Comp
     // Access token
     //
 
-    private void validateAccessToken(@NonNull String accessToken) {
-
+    // Checks if the given token is valid
+    private void validateAccessToken(String accessToken) {
         if (TextUtils.isEmpty(accessToken) || (!accessToken.startsWith("pk.") && !accessToken.startsWith("sk."))) {
             throw new RuntimeException("Using MapView requires setting a valid access token. See the README.md");
         }
     }
 
+    /**
+     * Sets the current Mapbox access token used to load map styles and tiles.
+     * <p/>
+     * You must set a valid access token before you call {@link MapView#onCreate(Bundle)}
+     * or an exception will be thrown.
+     *
+     * @param accessToken Your public Mapbox access token.
+     * @see MapView#onCreate(Bundle)
+     */
+    @UiThread
     public void setAccessToken(@NonNull String accessToken) {
+        // validateAccessToken does the null check
         validateAccessToken(accessToken);
         mNativeMapView.setAccessToken(accessToken);
     }
 
+    /**
+     * Returns the current Mapbox access token used to load map styles and tiles.
+     *
+     * @return The current Mapbox access token.
+     */
+    @UiThread
+    @Nullable
     public String getAccessToken() {
         return mNativeMapView.getAccessToken();
     }
@@ -1361,7 +1486,19 @@ public final class MapView extends FrameLayout implements LocationListener, Comp
     // Projection
     //
 
-    public LatLng fromScreenLocation(PointF point) {
+    /**
+     * Converts a point in this view's coordinate system to a map coordinate.
+     *
+     * @param point A point in this view's coordinate system.
+     * @return The converted map coordinate.
+     */
+    @UiThread
+    @NonNull
+    public LatLng fromScreenLocation(@NonNull PointF point) {
+        if (point == null) {
+            throw new NullPointerException("point is null");
+        }
+
         float x = point.x;
         float y = point.y;
 
@@ -1371,7 +1508,19 @@ public final class MapView extends FrameLayout implements LocationListener, Comp
         return mNativeMapView.latLngForPixel(new PointF(x / mScreenDensity, y / mScreenDensity));
     }
 
-    public PointF toScreenLocation(LatLng location) {
+    /**
+     * Converts a map coordinate to a point in this view's coordinate system.
+     *
+     * @param location A map coordinate.
+     * @return The converted point in this view's coordinate system.
+     */
+    @UiThread
+    @NonNull
+    public PointF toScreenLocation(@NonNull LatLng location) {
+        if (location == null) {
+            throw new NullPointerException("location is null");
+        }
+
         PointF point = mNativeMapView.pixelForLatLng(location);
 
         float x = point.x * mScreenDensity;
@@ -1387,7 +1536,8 @@ public final class MapView extends FrameLayout implements LocationListener, Comp
     // Annotations
     //
 
-    public void setSprite(String symbol, Bitmap bitmap) {
+    // Marking this function private until #2506 fixed
+    private void setSprite(String symbol, Bitmap bitmap) {
         if (bitmap.getConfig() != Bitmap.Config.ARGB_8888) {
             bitmap = bitmap.copy(Bitmap.Config.ARGB_8888, false);
         }
@@ -1572,13 +1722,13 @@ public final class MapView extends FrameLayout implements LocationListener, Comp
                 handledDefaultClick = mOnMarkerClickListener.onMarkerClick(marker);
             }
 
-            if(mInfoWindowAdapter!=null){
+            if (mInfoWindowAdapter != null) {
                 // end developer is using a custom InfoWindowAdapter
-                View content =  mInfoWindowAdapter.getInfoWindow(marker);
-                if(content != null){
+                View content = mInfoWindowAdapter.getInfoWindow(marker);
+                if (content != null) {
                     marker.showInfoWindow(content);
                 }
-            }else if (!handledDefaultClick) {
+            } else if (!handledDefaultClick) {
                 // default behaviour
                 // Can't do this as InfoWindow will get hidden
                 //setCenterCoordinate(marker.getPosition(), true);
@@ -1607,9 +1757,9 @@ public final class MapView extends FrameLayout implements LocationListener, Comp
     // Called when the map needs to be rerendered
     // Called via JNI from NativeMapView
     synchronized protected void onInvalidate() {
-         if (!mDirty) {
-                mDirty = true;
-                postRender();
+        if (!mDirty) {
+            mDirty = true;
+            postRender();
         }
     }
 
@@ -2417,7 +2567,7 @@ public final class MapView extends FrameLayout implements LocationListener, Comp
      *
      * @param infoWindowAdapter to set
      */
-    public void setInfoWindowAdapter(@NonNull InfoWindowAdapter infoWindowAdapter){
+    public void setInfoWindowAdapter(@NonNull InfoWindowAdapter infoWindowAdapter) {
         mInfoWindowAdapter = infoWindowAdapter;
     }
 
