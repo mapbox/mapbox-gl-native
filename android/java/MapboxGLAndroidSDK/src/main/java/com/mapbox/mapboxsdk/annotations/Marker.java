@@ -2,6 +2,7 @@ package com.mapbox.mapboxsdk.annotations;
 
 import android.graphics.Point;
 import android.support.annotation.Nullable;
+import android.text.TextUtils;
 import android.view.View;
 import com.mapbox.mapboxsdk.R;
 import com.mapbox.mapboxsdk.geometry.LatLng;
@@ -19,7 +20,7 @@ public class Marker extends Annotation {
     LatLng position;
     float rotation;
     String snippet;
-    String sprite;
+    private String sprite = "default_marker";
     String title;
     private InfoWindow infoWindow = null;
 
@@ -140,7 +141,9 @@ public class Marker extends Annotation {
      * @param sprite The name of the sprite.
      */
     public void setSprite(@Nullable String sprite) {
-        this.sprite = sprite;
+        if (!TextUtils.isEmpty(sprite)) {
+            this.sprite = sprite;
+        }
     }
 
     public String getSprite() {
