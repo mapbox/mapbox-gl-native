@@ -41,15 +41,7 @@ public class InfoWindowAdapterActivity extends AppCompatActivity {
         }
 
         mMapView = (MapView) findViewById(R.id.secondMapView);
-        // Load the access token
-        try {
-            BufferedReader reader = new BufferedReader(new InputStreamReader(getResources().openRawResource(R.raw.token)));
-            String line = reader.readLine();
-            mMapView.setAccessToken(line);
-        } catch (IOException e) {
-            Log.e(TAG, "Error loading access token from token.txt: " + e.toString());
-        }
-
+        mMapView.setAccessToken(Util.getAccessToken(this));
         mMapView.onCreate(savedInstanceState);
 
         mMapView.setStyleUrl(MapView.StyleUrls.EMERALD);

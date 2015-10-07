@@ -1,6 +1,8 @@
 package com.mapbox.mapboxsdk.testapp;
 
 import android.content.Context;
+import android.content.pm.ApplicationInfo;
+import android.content.pm.PackageManager;
 import android.text.TextUtils;
 import android.util.Log;
 
@@ -62,14 +64,35 @@ public class Util {
         return sb.toString();
     }
 
-    public static String getAccessToken(final Context context){
-        // Load the access token
+    // TODO move this to SDK
+    public static String getAccessToken(Context context) {
+        String accessToken = getReleaseAccessToken(context);
+        if (TextUtils.isEmpty(accessToken)) {
+            accessToken = getDevelopmentAccessToken(context);
+        }
+        // TODO add validation + throw exception
+        return accessToken;
+    }
+
+    // TODO move this to SDK
+    private static String getReleaseAccessToken(Context context){
+        try {
+            PackageManager packageManager = context.getPackageManager();
+            ApplicationInfo appInfo = packageManager.getApplicationInfo(context.getPackageName(), PackageManager.GET_META_DATA);
+            return appInfo.metaData.getString("com.mapbox.accessToken");
+        } catch (Exception e) {
+            Log.e(TAG, "Failed to load AccessToken:  " + e.getMessage());
+            return null;
+        }
+    }
+
+    // TODO move this to SDK
+    private static String getDevelopmentAccessToken(Context context) {
         try {
             BufferedReader reader = new BufferedReader(new InputStreamReader(context.getResources().openRawResource(R.raw.token)));
             return reader.readLine();
-        } catch (IOException e) {
-            Log.e(TAG, "Error loading access token from token.txt: " + e.toString());
+        }catch (IOException e){
+            return null;
         }
-        return "";
     }
 }
