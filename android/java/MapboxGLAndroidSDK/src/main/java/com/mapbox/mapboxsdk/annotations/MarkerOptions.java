@@ -10,27 +10,26 @@ public class MarkerOptions extends AnnotationOptions {
     }
 
     public MarkerOptions anchor(float u, float v) {
-        ((Marker)annotation).anchorU = u;
-        ((Marker)annotation).anchorV = v;
+        ((Marker)annotation).setAnchor(u, v);
         return this;
     }
 
     public MarkerOptions draggable(boolean draggable) {
-        ((Marker)annotation).draggable = draggable;
+        ((Marker)annotation).setDraggable(draggable);
         return this;
     }
 
     public MarkerOptions flat(boolean flat) {
-        ((Marker)annotation).flat = flat;
+        ((Marker)annotation).setFlat(flat);
         return this;
     }
 
     public float getAnchorU() {
-        return ((Marker)annotation).anchorU;
+        return ((Marker)annotation).getAnchorU();
     }
 
     public float getAnchorV() {
-        return ((Marker)annotation).anchorV;
+        return ((Marker)annotation).getAnchorV();
     }
 
     // TODO: Implement this method of Google Maps Android API
@@ -39,11 +38,11 @@ public class MarkerOptions extends AnnotationOptions {
 //    }
 
     public float getInfoWindowAnchorU() {
-        return ((Marker)annotation).infoWindowAnchorU;
+        return ((Marker)annotation).getInfoWindowAnchorU();
     }
 
     public float getInfoWindowAnchorV() {
-        return ((Marker)annotation).infoWindowAnchorV;
+        return ((Marker)annotation).getInfoWindowAnchorV();
     }
 
     public Marker getMarker() {
@@ -51,37 +50,36 @@ public class MarkerOptions extends AnnotationOptions {
     }
 
     public LatLng getPosition() {
-        return ((Marker)annotation).position;
+        return ((Marker)annotation).getPosition();
     }
 
     public float getRotation() {
-        return ((Marker)annotation).rotation;
+        return ((Marker)annotation).getRotation();
     }
 
     public String getSnippet() {
-        return ((Marker)annotation).snippet;
+        return ((Marker)annotation).getSnippet();
     }
 
     public String getTitle() {
-        return ((Marker)annotation).title;
+        return ((Marker)annotation).getTitle();
     }
 
     public MarkerOptions infoWindowAnchor(float u, float v) {
-        ((Marker)annotation).infoWindowAnchorU = u;
-        ((Marker)annotation).infoWindowAnchorV = v;
+        ((Marker)annotation).setInfoWindowAnchor(u, v);
         return this;
     }
 
     public boolean isDraggable() {
-        return ((Marker)annotation).draggable;
+        return ((Marker)annotation).isDraggable();
     }
 
     public boolean isFlat() {
-        return ((Marker)annotation).flat;
+        return ((Marker)annotation).isFlat();
     }
 
     public boolean isVisible() {
-        return ((Marker)annotation).visible;
+        return ((Marker)annotation).isVisible();
     }
 
     public MarkerOptions position(LatLng position) {
@@ -90,12 +88,12 @@ public class MarkerOptions extends AnnotationOptions {
     }
 
     public MarkerOptions rotation(float rotation) {
-        ((Marker)annotation).rotation = rotation;
+        ((Marker)annotation).setRotation(rotation);
         return this;
     }
 
     public MarkerOptions snippet(String snippet) {
-        ((Marker)annotation).snippet = snippet;
+        ((Marker)annotation).setSnippet(snippet);
         return this;
     }
 
@@ -105,12 +103,12 @@ public class MarkerOptions extends AnnotationOptions {
     }
 
     public MarkerOptions title(String title) {
-        ((Marker)annotation).title = title;
+        ((Marker)annotation).setTitle(title);
         return this;
     }
 
     public MarkerOptions visible(boolean visible) {
-        annotation.visible = visible;
+        annotation.setVisible(visible);
         return this;
     }
 
