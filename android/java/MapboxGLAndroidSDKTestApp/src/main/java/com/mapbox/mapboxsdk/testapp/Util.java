@@ -2,6 +2,7 @@ package com.mapbox.mapboxsdk.testapp;
 
 import android.content.Context;
 import android.text.TextUtils;
+import android.util.Log;
 
 import com.mapbox.mapboxsdk.geometry.LatLng;
 
@@ -17,6 +18,8 @@ import java.io.Reader;
 import java.nio.charset.Charset;
 
 public class Util {
+
+    private static final String TAG = "Util";
 
     public static String loadStringFromAssets(final Context context, final String fileName) throws IOException {
         if (TextUtils.isEmpty(fileName)) {
@@ -57,5 +60,16 @@ public class Util {
             sb.append((char) cp);
         }
         return sb.toString();
+    }
+
+    public static String getAccessToken(final Context context){
+        // Load the access token
+        try {
+            BufferedReader reader = new BufferedReader(new InputStreamReader(context.getResources().openRawResource(R.raw.token)));
+            return reader.readLine();
+        } catch (IOException e) {
+            Log.e(TAG, "Error loading access token from token.txt: " + e.toString());
+        }
+        return "";
     }
 }
