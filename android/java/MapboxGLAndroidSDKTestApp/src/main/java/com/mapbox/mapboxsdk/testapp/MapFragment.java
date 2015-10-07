@@ -9,6 +9,7 @@ import android.view.ViewGroup;
 
 import com.mapbox.mapboxsdk.views.MapView;
 
+// TODO move this to SDK
 public class MapFragment extends Fragment {
 
     //
@@ -36,7 +37,10 @@ public class MapFragment extends Fragment {
         Log.v(TAG, "onCreateView");
 
         // Create the map
-        mMap = (MapView) inflater.inflate(R.layout.fragment_main, container, true);
+        mMap = (MapView) inflater.inflate(R.layout.fragment_main, container, false);
+
+        // Set accessToken
+        mMap.setAccessToken(Util.getAccessToken(container.getContext()));
 
         // Need to pass on any saved state to the map
         mMap.onCreate(savedInstanceState);
