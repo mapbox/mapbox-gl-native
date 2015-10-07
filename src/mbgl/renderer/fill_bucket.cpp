@@ -29,72 +29,53 @@ template <> struct nth<1, Coordinate> {
 
 using Ring = std::vector<Coordinate>;
 
-bool ringContains(const Ring& points, const Coordinate& p) {
-    std::size_t len = points.size();
-    bool inside = false;
+double signedArea(const Ring& ring) {
+    double sum = 0;
 
-    for (std::size_t i = 0, j = len - 1; i < len; j = i++) {
-        const Coordinate& p1 = points[i];
-        const Coordinate& p2 = points[j];
-        if (((p1.y > p.y) != (p2.y > p.y)) &&
-                (p.x < (p2.x - p1.x) * (p.y - p1.y) / (p2.y - p1.y) + p1.x)) inside = !inside;
+    for (std::size_t i = 0, len = ring.size(), j = len - 1; i < len; j = i++) {
+        const Coordinate& p1 = ring[i];
+        const Coordinate& p2 = ring[j];
+        sum += (p2.x - p1.x) * (p1.y + p2.y);
     }
 
-    return inside;
-}
-
-bool ringPartiallyContains(const Ring& outer, const Ring& inner) {
-    std::size_t num = 0;
-    std::size_t counted = 0;
-
-    for (const auto& p : inner) {
-        if (p.x == -128 || p.y == -128 || p.x == 4224 || p.y == 4224) continue;
-        counted++;
-        if (ringContains(outer, p)) num++;
-        if (counted >= 10) break;
-    }
-
-    return counted != 0 && num / counted >= 0.8;
+    return sum;
 }
 
 // classifies an array of rings into polygons with outer rings and holes
 std::vector<std::vector<Ring>> classifyRings(const std::vector<Ring>& rings) {
-    std::vector<std::vector<Ring>> result;
-    std::vector<bool> placed(rings.size(), false);
+    std::vector<std::vector<Ring>> polygons;
 
-    for (std::size_t i = 0; i < rings.size(); i++) {
-        if (placed[i])
+    std::size_t len = rings.size();
+
+    if (len <= 1) {
+        polygons.push_back(rings);
+        return polygons;
+    }
+
+    std::vector<Ring> polygon;
+    bool ccw = false;
+
+    for (std::size_t i = 0; i < len; i++) {
+        double area = signedArea(rings[i]);
+
+        if (area == 0)
             continue;
 
-        std::vector<Ring>* current = nullptr;
+        if (!ccw)
+            ccw = area < 0;
 
-        for (std::size_t j = 0; j < rings.size(); j++) {
-            if (i == j || placed[j])
-                continue;
-
-            if (ringPartiallyContains(rings[i], rings[j])) {
-                // mark i as outer ring; add j as inner ring
-                placed[i] = true;
-                placed[j] = true;
-
-                if (!current) {
-                    result.emplace_back();
-                    current = &result.back();
-                    current->push_back(rings[i]);
-                }
-
-                current->push_back(rings[j]);
-            }
+        if (ccw == (area < 0) && !polygon.empty()) {
+            polygons.push_back(polygon);
+            polygon.clear();
         }
+
+        polygon.push_back(rings[i]);
     }
 
-    for (std::size_t i = 0; i < rings.size(); i++) {
-        if (!placed[i]) {
-            result.emplace_back(std::vector<Ring>({ rings[i] }));
-        }
-    }
+    if (!polygon.empty())
+        polygons.push_back(polygon);
 
-    return result;
+    return polygons;
 }
 
 FillBucket::FillBucket() {
