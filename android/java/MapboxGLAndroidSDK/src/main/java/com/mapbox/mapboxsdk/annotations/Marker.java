@@ -20,7 +20,7 @@ public class Marker extends Annotation {
     LatLng position;
     private float rotation;
     private String snippet;
-    private String sprite = "default_marker";
+    String sprite = "default_marker";
     private String title;
     private InfoWindow infoWindow = null;
 
