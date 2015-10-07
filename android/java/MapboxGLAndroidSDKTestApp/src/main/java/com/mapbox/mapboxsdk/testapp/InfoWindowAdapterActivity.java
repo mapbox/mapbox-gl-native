@@ -19,9 +19,9 @@ import java.io.BufferedReader;
 import java.io.IOException;
 import java.io.InputStreamReader;
 
-public class SecondMapActivity extends AppCompatActivity {
+public class InfoWindowAdapterActivity extends AppCompatActivity {
 
-    private static final String TAG = "SecondMapActivity";
+    private static final String TAG = "InfoWindowAdapter";
 
     private MapView mMapView;
 
@@ -58,7 +58,7 @@ public class SecondMapActivity extends AppCompatActivity {
 
             @Override
             public View getInfoWindow(Marker marker) {
-                TextView textView = new TextView(SecondMapActivity.this);
+                TextView textView = new TextView(InfoWindowAdapterActivity.this);
                 textView.setText(marker.getTitle());
                 textView.setBackgroundColor(Color.WHITE);
                 return textView;

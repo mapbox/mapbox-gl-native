@@ -15,17 +15,17 @@ import static android.support.test.espresso.matcher.ViewMatchers.isDisplayed;
 import static android.support.test.espresso.matcher.ViewMatchers.withId;
 
 /**
- * Tests on SecondMapActivity.
+ * Tests on InfoWindowAdapterActivity.
  */
 @RunWith(AndroidJUnit4.class)
 @LargeTest
-public class SecondMapActivityTest extends BaseTest {
+public class InfoWindowAdapterActivityTest extends BaseTest {
 
     @Rule
-    public ActivityTestRule<SecondMapActivity> mActivityRule = new ActivityTestRule<>(
-            SecondMapActivity.class);
+    public ActivityTestRule<InfoWindowAdapterActivity> mActivityRule = new ActivityTestRule<>(
+            InfoWindowAdapterActivity.class);
 
-    private SecondMapActivity mActivity = null;
+    private InfoWindowAdapterActivity mActivity = null;
 
     @Before
     public void setActivity() {

@@ -19,12 +19,6 @@
         android:icon="@android:drawable/ic_menu_compass"
         android:title="@string/action_compass" />
 
-    <item
-        android:id="@+id/action_second_map_activity"
-        android:checkable="false"
-        android:icon="@drawable/ic_looks_two_white_24dp"
-        android:title="@string/action_second_map_activity" />
-
     <!--
         <group android:id="@+id/locationFollowModesSeparator"/>
 
@@ -65,5 +59,11 @@
             android:title="@string/styleSatellite" />
 
     </group>
+
+    <item
+        android:id="@+id/action_second_map_activity"
+        android:checkable="false"
+        android:icon="@drawable/ic_looks_two_white_24dp"
+        android:title="@string/action_info_window_adapter" />
 
 </menu>
