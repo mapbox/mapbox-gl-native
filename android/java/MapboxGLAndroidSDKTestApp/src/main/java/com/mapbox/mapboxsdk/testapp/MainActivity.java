@@ -34,9 +34,6 @@ import com.mapbox.mapboxsdk.views.MapView;
 
 import io.fabric.sdk.android.Fabric;
 
-import java.io.BufferedReader;
-import java.io.IOException;
-import java.io.InputStreamReader;
 import java.text.DecimalFormat;
 import java.util.ArrayList;
 import java.util.List;
@@ -285,7 +282,7 @@ public class MainActivity extends AppCompatActivity {
                                 menuItem.setChecked(mMapView.isCompassEnabled());
                                 return true;
 
-                            case R.id.action_second_map_activity:
+                            case R.id.action_info_window_adapter:
                                 startActivity(new Intent(getApplicationContext(), InfoWindowAdapterActivity.class));
                                 return true;
 

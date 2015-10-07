@@ -3,7 +3,8 @@
 
     <string name="app_name">Mapbox GL</string>
 
-    <string name="activity_second">Second Activity</string>
+    <string name="activity_infowindow_adapter">InfoWindow Adapter</string>
+    <string name="activity_map_fragment">Map Fragment Activity</string>
 
     <string name="action_gps">Toggle GPS location</string>
     <string name="action_location_none">Disable tracking</string>
@@ -13,6 +14,7 @@
     <string name="action_debug">Toggle debug mode</string>
     <string name="action_point_annotations">Toggle point annotations</string>
     <string name="action_info_window_adapter">InfoWindow Adapter</string>
+    <string name="action_map_fragment">MapFragment</string>
 
     <string name="label_fps">FPS:</string>
 
