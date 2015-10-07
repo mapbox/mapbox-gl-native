@@ -1,7 +1,7 @@
 'use strict';
 
 var mbgl = require('../../..');
-var suite = require('mapbox-gl-test-suite');
+var suite = require('mapbox-gl-test-suite').render;
 var request = require('request');
 
 var tests;
