@@ -63,13 +63,13 @@
     <item
         android:id="@+id/action_info_window_adapter"
         android:checkable="false"
-        android:icon="@drawable/ic_looks_two_white_24dp"
+        android:icon="@drawable/ic_filter_none_white_24dp"
         android:title="@string/action_info_window_adapter" />
 
     <item
         android:id="@+id/action_map_fragment"
         android:checkable="false"
-        android:icon="@drawable/ic_looks_two_white_24dp"
+        android:icon="@drawable/ic_widgets_white_24dp"
         android:title="@string/action_map_fragment" />
 
 </menu>
