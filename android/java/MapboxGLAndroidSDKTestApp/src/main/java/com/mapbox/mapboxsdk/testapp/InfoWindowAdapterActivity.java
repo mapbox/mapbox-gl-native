@@ -5,7 +5,6 @@ import android.os.Bundle;
 import android.support.v7.app.ActionBar;
 import android.support.v7.app.AppCompatActivity;
 import android.support.v7.widget.Toolbar;
-import android.util.Log;
 import android.view.MenuItem;
 import android.view.View;
 import android.widget.TextView;
@@ -14,10 +13,6 @@ import com.mapbox.mapboxsdk.annotations.Marker;
 import com.mapbox.mapboxsdk.annotations.MarkerOptions;
 import com.mapbox.mapboxsdk.geometry.LatLng;
 import com.mapbox.mapboxsdk.views.MapView;
-
-import java.io.BufferedReader;
-import java.io.IOException;
-import java.io.InputStreamReader;
 
 public class InfoWindowAdapterActivity extends AppCompatActivity {
 
@@ -28,14 +23,13 @@ public class InfoWindowAdapterActivity extends AppCompatActivity {
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
-
-        setContentView(R.layout.activity_second);
+        setContentView(R.layout.activity_infowindow_adapter);
 
         Toolbar toolbar = (Toolbar) findViewById(R.id.secondToolBar);
         setSupportActionBar(toolbar);
 
         ActionBar actionBar = getSupportActionBar();
-        if(actionBar!=null) {
+        if (actionBar != null) {
             actionBar.setDisplayHomeAsUpEnabled(true);
             actionBar.setDisplayShowHomeEnabled(true);
         }
@@ -43,36 +37,37 @@ public class InfoWindowAdapterActivity extends AppCompatActivity {
         mMapView = (MapView) findViewById(R.id.secondMapView);
         mMapView.setAccessToken(Util.getAccessToken(this));
         mMapView.onCreate(savedInstanceState);
-
-        mMapView.setStyleUrl(MapView.StyleUrls.EMERALD);
-
+        mMapView.setStyleUrl(MapView.StyleUrls.MAPBOX_STREETS);
         mMapView.setInfoWindowAdapter(new MapView.InfoWindowAdapter() {
+
+            private int tenDp = (int) getResources().getDimension(R.dimen.attr_margin);
 
             @Override
             public View getInfoWindow(Marker marker) {
                 TextView textView = new TextView(InfoWindowAdapterActivity.this);
                 textView.setText(marker.getTitle());
-                textView.setBackgroundColor(Color.WHITE);
+                textView.setTextColor(Color.WHITE);
+                textView.setBackgroundColor(Color.parseColor(marker.getSnippet()));
+                textView.setPadding(tenDp, tenDp, tenDp, tenDp);
                 return textView;
             }
         });
 
-        mMapView.addMarker(generateMarker("Andorra", 42.505777, 1.525294));
-        mMapView.addMarker(generateMarker("Luxembourg", 49.815273, 6.129583));
-        mMapView.addMarker(generateMarker("Monaco", 43.738418, 7.424616));
-        mMapView.addMarker(generateMarker("Vatican City", 41.902916, 12.453389));
-        mMapView.addMarker(generateMarker("San Marino", 43.942360, 12.457777));
-        mMapView.addMarker(generateMarker("Malta", 35.892110, 14.427795));
-        mMapView.addMarker(generateMarker("Liechtenstein", 47.166000, 9.555373));
+        mMapView.addMarker(generateMarker("Andorra", 42.505777, 1.52529, "#F44336"));
+        mMapView.addMarker(generateMarker("Luxembourg", 49.815273, 6.129583, "#3F51B5"));
+        mMapView.addMarker(generateMarker("Monaco", 43.738418, 7.424616, "#673AB7"));
+        mMapView.addMarker(generateMarker("Vatican City", 41.902916, 12.453389, "#009688"));
+        mMapView.addMarker(generateMarker("San Marino", 43.942360, 12.457777, "#795548"));
+        mMapView.addMarker(generateMarker("Liechtenstein", 47.166000, 9.555373, "#FF5722"));
 
-        mMapView.setCenterCoordinate(new LatLng(47.798202, 3.573781));
-        mMapView.setZoomLevel(3);
+        mMapView.setCenterCoordinate(new LatLng(47.798202, 7.573781));
+        mMapView.setZoomLevel(4);
     }
 
-    private MarkerOptions generateMarker(String title, double lat, double lng){
+    private MarkerOptions generateMarker(String title, double lat, double lng, String color) {
         MarkerOptions marker = new MarkerOptions();
         marker.title(title);
-        marker.snippet(title);
+        marker.snippet(color);
         marker.position(new LatLng(lat, lng));
         return marker;
     }
@@ -95,7 +90,7 @@ public class InfoWindowAdapterActivity extends AppCompatActivity {
 
     // Called when our app goes into the background
     @Override
-    public void onPause()  {
+    public void onPause() {
         super.onPause();
 
         mMapView.onPause();
