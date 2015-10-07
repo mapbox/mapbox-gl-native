@@ -11,17 +11,17 @@ import com.mapbox.mapboxsdk.views.MapView;
 
 public class Marker extends Annotation {
 
-    float anchorU;
-    float anchorV;
-    boolean draggable;
-    boolean flat;
-    float infoWindowAnchorU;
-    float infoWindowAnchorV;
+    private float anchorU;
+    private float anchorV;
+    private boolean draggable;
+    private boolean flat;
+    private float infoWindowAnchorU;
+    private float infoWindowAnchorV;
     LatLng position;
-    float rotation;
-    String snippet;
+    private float rotation;
+    private String snippet;
     private String sprite = "default_marker";
-    String title;
+    private String title;
     private InfoWindow infoWindow = null;
 
     private boolean infoWindowShown = false;
@@ -63,6 +63,14 @@ public class Marker extends Annotation {
 
     public float getAnchorV() {
         return anchorV;
+    }
+
+    public float getInfoWindowAnchorU() {
+        return infoWindowAnchorU;
+    }
+
+    public float getInfoWindowAnchorV() {
+        return infoWindowAnchorV;
     }
 
     public LatLng getPosition() {
