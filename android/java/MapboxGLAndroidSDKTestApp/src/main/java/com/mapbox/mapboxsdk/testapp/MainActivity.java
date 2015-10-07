@@ -23,6 +23,7 @@ import android.view.MotionEvent;
 import android.view.View;
 import android.widget.TextView;
 import android.widget.Toast;
+
 import com.crashlytics.android.Crashlytics;
 import com.mapbox.mapboxsdk.annotations.Marker;
 import com.mapbox.mapboxsdk.annotations.MarkerOptions;
@@ -30,7 +31,9 @@ import com.mapbox.mapboxsdk.annotations.PolygonOptions;
 import com.mapbox.mapboxsdk.annotations.PolylineOptions;
 import com.mapbox.mapboxsdk.geometry.LatLng;
 import com.mapbox.mapboxsdk.views.MapView;
+
 import io.fabric.sdk.android.Fabric;
+
 import java.io.BufferedReader;
 import java.io.IOException;
 import java.io.InputStreamReader;
@@ -100,16 +103,9 @@ public class MainActivity extends AppCompatActivity {
         }
 
         mMapView = (MapView) findViewById(R.id.mainMapView);
-        // Load the access token
-        try {
-            BufferedReader reader = new BufferedReader(new InputStreamReader(getResources().openRawResource(R.raw.token)));
-            String line = reader.readLine();
-            mMapView.setAccessToken(line);
-        } catch (IOException e) {
-            Log.e(TAG, "Error loading access token from token.txt: " + e.toString());
-        }
-
+        mMapView.setAccessToken(Util.getAccessToken(this));
         mMapView.onCreate(savedInstanceState);
+
         mMapView.setOnFpsChangedListener(new MyOnFpsChangedListener());
 
         mMapView.setOnMapLongClickListener(new MapView.OnMapLongClickListener() {
@@ -144,7 +140,7 @@ public class MainActivity extends AppCompatActivity {
         mFpsTextView = (TextView) findViewById(R.id.view_fps);
         mFpsTextView.setText("");
 
-        mLocationFAB = (FloatingActionButton)findViewById(R.id.locationFAB);
+        mLocationFAB = (FloatingActionButton) findViewById(R.id.locationFAB);
         mLocationFAB.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
@@ -194,7 +190,7 @@ public class MainActivity extends AppCompatActivity {
 
     // Called when our app goes into the background
     @Override
-    public void onPause()  {
+    public void onPause() {
         super.onPause();
 
         mMapView.onPause();
@@ -362,13 +358,13 @@ public class MainActivity extends AppCompatActivity {
 
     /**
      * Enabled / Disable GPS location updates along with updating the UI
+     *
      * @param enableGps true if GPS is to be enabled, false if GPS is to be disabled
      */
     private void toggleGps(boolean enableGps) {
         if (enableGps) {
             if ((ContextCompat.checkSelfPermission(this, Manifest.permission.ACCESS_COARSE_LOCATION) != PackageManager.PERMISSION_GRANTED) ||
-                    (ContextCompat.checkSelfPermission(this, Manifest.permission.ACCESS_FINE_LOCATION) != PackageManager.PERMISSION_GRANTED))
-            {
+                    (ContextCompat.checkSelfPermission(this, Manifest.permission.ACCESS_FINE_LOCATION) != PackageManager.PERMISSION_GRANTED)) {
                 ActivityCompat.requestPermissions(this, new String[]{Manifest.permission.ACCESS_COARSE_LOCATION, Manifest.permission.ACCESS_FINE_LOCATION}, PERMISSIONS_LOCATION);
             } else {
                 enableGps();
@@ -429,9 +425,9 @@ public class MainActivity extends AppCompatActivity {
         });
     }
 
-    private Marker generateMarker(String title, String snippet, String sprite, double lat, double lng){
+    private Marker generateMarker(String title, String snippet, String sprite, double lat, double lng) {
         return new MarkerOptions()
-                .position(new LatLng(lat,lng))
+                .position(new LatLng(lat, lng))
                 .title(title)
                 .sprite(sprite)
                 .snippet(snippet)
@@ -448,7 +444,7 @@ public class MainActivity extends AppCompatActivity {
                     .width(2)
                     .color(Color.RED));
         } catch (Exception e) {
-            Log.e(TAG, "Error adding Polyline: "+ e);
+            Log.e(TAG, "Error adding Polyline: " + e);
             e.printStackTrace();
         }
     }
@@ -460,12 +456,12 @@ public class MainActivity extends AppCompatActivity {
             MapView map = mMapView;
             ArrayList<PolygonOptions> opts = new ArrayList<>();
             opts.add(new PolygonOptions()
-                        .add(latLngs)
-                        .strokeColor(Color.MAGENTA)
-                        .fillColor(Color.BLUE));
+                    .add(latLngs)
+                    .strokeColor(Color.MAGENTA)
+                    .fillColor(Color.BLUE));
             map.addPolygons(opts).get(0);
         } catch (Exception e) {
-            Log.e(TAG, "Error adding Polygon: "+ e);
+            Log.e(TAG, "Error adding Polygon: " + e);
             e.printStackTrace();
         }
     }
