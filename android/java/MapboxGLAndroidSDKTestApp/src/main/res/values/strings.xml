@@ -6,6 +6,9 @@
     <string name="activity_infowindow_adapter">InfoWindow Adapter</string>
     <string name="activity_map_fragment">Map Fragment Activity</string>
 
+    <string name="navdrawer_menu_title_mainactivity_controls">Main Activity Controls</string>
+    <string name="navdrawer_menu_title_mainactivity_styles">Main Activity Styles</string>
+    <string name="navdrawer_menu_title_individual_tests">Individual Tests</string>
     <string name="action_gps">Toggle GPS location</string>
     <string name="action_location_none">Disable tracking</string>
     <string name="action_location_follow">Use follow tracking mode</string>
