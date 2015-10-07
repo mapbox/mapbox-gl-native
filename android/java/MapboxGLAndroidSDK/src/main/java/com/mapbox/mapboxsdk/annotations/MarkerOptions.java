@@ -1,7 +1,6 @@
 package com.mapbox.mapboxsdk.annotations;
 
 import android.support.annotation.Nullable;
-
 import com.mapbox.mapboxsdk.geometry.LatLng;
 
 public class MarkerOptions extends AnnotationOptions {
@@ -101,7 +100,7 @@ public class MarkerOptions extends AnnotationOptions {
     }
 
     public MarkerOptions sprite(@Nullable String sprite) {
-        ((Marker)annotation).sprite = sprite;
+        ((Marker)annotation).setSprite(sprite);
         return this;
     }
 
