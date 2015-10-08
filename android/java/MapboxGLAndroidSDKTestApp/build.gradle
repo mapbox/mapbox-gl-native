@@ -16,9 +16,9 @@ apply plugin: 'io.fabric'
 apply plugin: 'checkstyle'
 
 task accessToken {
-    def rawDir = new File("MapboxGLAndroidSDKTestApp/src/main/res/raw")
+    def rawDir = new File("MapboxGLAndroidSDK/src/main/res/raw")
     rawDir.mkdirs()
-    def tokenFile = new File("MapboxGLAndroidSDKTestApp/src/main/res/raw/token.txt")
+    def tokenFile = new File("MapboxGLAndroidSDK/src/main/res/raw/token.txt")
     if (!tokenFile.exists()) {
         String token = "$System.env.MAPBOX_ACCESS_TOKEN"
         if (token == null) {
