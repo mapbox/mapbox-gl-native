@@ -12,6 +12,7 @@ import android.widget.TextView;
 import com.mapbox.mapboxsdk.annotations.Marker;
 import com.mapbox.mapboxsdk.annotations.MarkerOptions;
 import com.mapbox.mapboxsdk.geometry.LatLng;
+import com.mapbox.mapboxsdk.utils.ApiAccess;
 import com.mapbox.mapboxsdk.views.MapView;
 
 public class InfoWindowAdapterActivity extends AppCompatActivity {
@@ -35,7 +36,7 @@ public class InfoWindowAdapterActivity extends AppCompatActivity {
         }
 
         mMapView = (MapView) findViewById(R.id.secondMapView);
-        mMapView.setAccessToken(Util.getAccessToken(this));
+        mMapView.setAccessToken(ApiAccess.getToken(this));
         mMapView.onCreate(savedInstanceState);
         mMapView.setStyleUrl(MapView.StyleUrls.MAPBOX_STREETS);
         mMapView.setInfoWindowAdapter(new MapView.InfoWindowAdapter() {

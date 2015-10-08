@@ -30,6 +30,7 @@ import com.mapbox.mapboxsdk.annotations.MarkerOptions;
 import com.mapbox.mapboxsdk.annotations.PolygonOptions;
 import com.mapbox.mapboxsdk.annotations.PolylineOptions;
 import com.mapbox.mapboxsdk.geometry.LatLng;
+import com.mapbox.mapboxsdk.utils.ApiAccess;
 import com.mapbox.mapboxsdk.views.MapView;
 
 import io.fabric.sdk.android.Fabric;
@@ -100,7 +101,7 @@ public class MainActivity extends AppCompatActivity {
         }
 
         mMapView = (MapView) findViewById(R.id.mainMapView);
-        mMapView.setAccessToken(Util.getAccessToken(this));
+        mMapView.setAccessToken(ApiAccess.getToken(this));
         mMapView.onCreate(savedInstanceState);
 
         mMapView.setOnFpsChangedListener(new MyOnFpsChangedListener());
