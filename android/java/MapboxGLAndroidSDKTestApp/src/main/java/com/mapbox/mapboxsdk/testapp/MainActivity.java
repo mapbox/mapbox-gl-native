@@ -268,19 +268,16 @@ public class MainActivity extends AppCompatActivity {
                                 // Toggle debug mode
                                 mMapView.toggleDebug();
                                 toggleFpsCounter(mMapView.isDebugActive());
-                                menuItem.setChecked(mMapView.isDebugActive());
                                 return true;
 
                             case R.id.action_markers:
                                 // Toggle markers
                                 toggleAnnotations(!mIsAnnotationsOn);
-                                menuItem.setChecked(mIsAnnotationsOn);
                                 return true;
 
                             case R.id.action_compass:
                                 // Toggle compass
                                 mMapView.setCompassEnabled(!mMapView.isCompassEnabled());
-                                menuItem.setChecked(mMapView.isCompassEnabled());
                                 return true;
 
                             case R.id.action_info_window_adapter:
@@ -324,31 +321,26 @@ public class MainActivity extends AppCompatActivity {
         switch (id) {
             case R.id.actionStyleMapboxStreets:
                 mMapView.setStyleUrl(MapView.StyleUrls.MAPBOX_STREETS);
-                mNavigationView.getMenu().findItem(id).setChecked(true);
                 mSelectedStyle = id;
                 return true;
 
             case R.id.actionStyleEmerald:
                 mMapView.setStyleUrl(MapView.StyleUrls.EMERALD);
-                mNavigationView.getMenu().findItem(id).setChecked(true);
                 mSelectedStyle = id;
                 return true;
 
             case R.id.actionStyleLight:
                 mMapView.setStyleUrl(MapView.StyleUrls.LIGHT);
-                mNavigationView.getMenu().findItem(id).setChecked(true);
                 mSelectedStyle = id;
                 return true;
 
             case R.id.actionStyleDark:
                 mMapView.setStyleUrl(MapView.StyleUrls.DARK);
-                mNavigationView.getMenu().findItem(id).setChecked(true);
                 mSelectedStyle = id;
                 return true;
 
             case R.id.actionStyleSatellite:
                 mMapView.setStyleUrl(MapView.StyleUrls.SATELLITE);
-                mNavigationView.getMenu().findItem(id).setChecked(true);
                 mSelectedStyle = id;
                 return true;
 
