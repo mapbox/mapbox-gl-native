@@ -51,6 +51,7 @@ NS_ASSUME_NONNULL_END
     return self.mapView.userTrackingMode != MGLUserTrackingModeNone;
 }
 
+#if !__TVOS_9_0
 - (void)setHeading:(CLHeading *)newHeading
 {
     if (newHeading.trueHeading != _heading.trueHeading)
@@ -60,6 +61,7 @@ NS_ASSUME_NONNULL_END
         [self didChangeValueForKey:@"heading"];
     }
 }
+#endif
 
 - (CLLocationCoordinate2D)coordinate
 {
