@@ -42,6 +42,9 @@ public:
     std::unique_ptr<mbgl::DefaultFileSource> fileSourceObj;
     std::unique_ptr<mbgl::Map> mapObj;
 
+public slots:
+    void connectionEstablished();
+
 signals:
     void mapRegionDidChange();
     void needsRendering();
