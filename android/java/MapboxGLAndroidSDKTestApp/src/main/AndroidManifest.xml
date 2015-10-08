@@ -33,6 +33,9 @@
             android:name=".MapFragmentActivity"
             android:label="@string/activity_map_fragment" />
 
+        <activity android:name=".PressForMarkerActivity"
+                  android:label="@string/activity_press_for_marker"/>
+
         <meta-data
             android:name="io.fabric.ApiKey"
             android:value="9724157045ff7d083492c6d9ae03e60e8609d461" />
