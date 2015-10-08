@@ -20,9 +20,7 @@ import java.io.Reader;
 import java.nio.charset.Charset;
 
 public class Util {
-
-    private static final String TAG = "Util";
-
+    
     public static String loadStringFromAssets(final Context context, final String fileName) throws IOException {
         if (TextUtils.isEmpty(fileName)) {
             throw new NullPointerException("No GeoJSON File Name passed in.");
