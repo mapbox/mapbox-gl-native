@@ -66,19 +66,15 @@ jfieldID markerIconId = nullptr;
 
 jclass polylineClass = nullptr;
 jfieldID polylineAlphaId = nullptr;
-jfieldID polylineVisibleId = nullptr;
 jfieldID polylineColorId = nullptr;
 jfieldID polylineWidthId = nullptr;
 jfieldID polylinePointsId = nullptr;
 
 jclass polygonClass = nullptr;
 jfieldID polygonAlphaId = nullptr;
-jfieldID polygonVisibleId = nullptr;
 jfieldID polygonFillColorId = nullptr;
 jfieldID polygonStrokeColorId = nullptr;
-jfieldID polygonStrokeWidthId = nullptr;
 jfieldID polygonPointsId = nullptr;
-jfieldID polygonHolesId = nullptr;
 
 jclass runtimeExceptionClass = nullptr;
 jclass nullPointerExceptionClass = nullptr;
@@ -338,7 +334,6 @@ mbgl::AnnotationSegment annotation_segment_from_latlng_jlist(JNIEnv *env, jobjec
 
 std::pair<mbgl::AnnotationSegment, mbgl::StyleProperties> annotation_std_pair_from_polygon_jobject(JNIEnv *env, jobject polygon) {
     jfloat alpha = env->GetFloatField(polygon, polygonAlphaId);
-    //jboolean visible = env->GetBooleanField(polygon, polygonVisibleId);
     jint fillColor = env->GetIntField(polygon, polygonFillColorId);
     jint strokeColor = env->GetIntField(polygon, polygonStrokeColorId);
 
@@ -918,12 +913,6 @@ jlong JNICALL nativeAddPolyline(JNIEnv *env, jobject obj, jlong nativeMapViewPtr
         return -1;
     }
 
-    /*jboolean visible = env->GetBooleanField(polyline, polylineVisibleId);
-    if (env->ExceptionCheck()) {
-        env->ExceptionDescribe();
-        return -1;
-    }*/
-
     jint color = env->GetIntField(polyline, polylineColorId);
     if (env->ExceptionCheck()) {
         env->ExceptionDescribe();
@@ -1476,12 +1465,6 @@ extern "C" JNIEXPORT jint JNICALL JNI_OnLoad(JavaVM *vm, void *reserved) {
         return JNI_ERR;
     }
 
-    polylineVisibleId = env->GetFieldID(polylineClass, "visible", "Z");
-    if (polylineVisibleId == nullptr) {
-        env->ExceptionDescribe();
-        return JNI_ERR;
-    }
-
     polylineColorId = env->GetFieldID(polylineClass, "color", "I");
     if (polylineColorId == nullptr) {
         env->ExceptionDescribe();
@@ -1512,12 +1495,6 @@ extern "C" JNIEXPORT jint JNICALL JNI_OnLoad(JavaVM *vm, void *reserved) {
         return JNI_ERR;
     }
 
-    polygonVisibleId = env->GetFieldID(polygonClass, "visible", "Z");
-    if (polygonVisibleId == nullptr) {
-        env->ExceptionDescribe();
-        return JNI_ERR;
-    }
-
     polygonFillColorId = env->GetFieldID(polygonClass, "fillColor", "I");
     if (polygonFillColorId == nullptr) {
         env->ExceptionDescribe();
@@ -1530,20 +1507,8 @@ extern "C" JNIEXPORT jint JNICALL JNI_OnLoad(JavaVM *vm, void *reserved) {
         return JNI_ERR;
     }
 
-    polygonStrokeWidthId = env->GetFieldID(polygonClass, "strokeWidth", "F");
-    if (polygonStrokeWidthId == nullptr) {
-        env->ExceptionDescribe();
-        return JNI_ERR;
-    }
-
     polygonPointsId = env->GetFieldID(polygonClass, "points", "Ljava/util/List;");
     if (polygonPointsId == nullptr) {
-        env->ExceptionDescribe();
-        return JNI_ERR;
-    }
-
-    polygonHolesId = env->GetFieldID(polygonClass, "holes", "Ljava/util/List;");
-    if (polygonHolesId == nullptr) {
         env->ExceptionDescribe();
         return JNI_ERR;
     }
@@ -2040,7 +2005,6 @@ extern "C" JNIEXPORT void JNICALL JNI_OnUnload(JavaVM *vm, void *reserved) {
     env->DeleteGlobalRef(polylineClass);
     polylineClass = nullptr;
     polylineAlphaId = nullptr;
-    polylineVisibleId = nullptr;
     polylineColorId = nullptr;
     polylineWidthId = nullptr;
     polylinePointsId = nullptr;
@@ -2048,12 +2012,9 @@ extern "C" JNIEXPORT void JNICALL JNI_OnUnload(JavaVM *vm, void *reserved) {
     env->DeleteGlobalRef(polygonClass);
     polygonClass = nullptr;
     polygonAlphaId = nullptr;
-    polygonVisibleId = nullptr;
     polygonFillColorId = nullptr;
     polygonStrokeColorId = nullptr;
-    polygonStrokeWidthId = nullptr;
     polygonPointsId = nullptr;
-    polygonHolesId = nullptr;
 
     onInvalidateId = nullptr;
     onMapChangedId = nullptr;

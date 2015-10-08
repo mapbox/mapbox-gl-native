@@ -8,6 +8,7 @@ import java.util.List;
 public abstract class MultiPoint extends Annotation {
 
     private List<LatLng> points;
+    private float alpha = 1.0f;
 
     protected MultiPoint() {
         super();
@@ -28,7 +29,7 @@ public abstract class MultiPoint extends Annotation {
      * of the points, so further mutations to points will have no effect
      * on this polyline.
      *
-     * @param points
+     * @param points the points of the polyline
      */
     void setPoints(List<LatLng> points) {
         this.points = new ArrayList<>(points);
@@ -38,20 +39,11 @@ public abstract class MultiPoint extends Annotation {
         points.add(point);
     }
 
+    public float getAlpha() {
+        return alpha;
+    }
 
-    // TODO: Implement hashCode of Google Maps Android API
-//    public int hashCode() {
-//
-//    }
-
-    // TODO: Implement isGeodesic of Google Maps Android API
-//    public boolean isGeodesic() {
-//
-//    }
-
-    // TODO: Implement setGeodesic of Google Maps Android API
-//    public void setGeodesic(boolean geodesic) {
-//
-//    }
-
+    void setAlpha(float alpha) {
+        this.alpha = alpha;
+    }
 }

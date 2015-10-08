@@ -3,9 +3,7 @@ package com.mapbox.mapboxsdk.annotations;
 import android.content.Context;
 import android.graphics.Bitmap;
 import android.graphics.BitmapFactory;
-import android.graphics.drawable.BitmapDrawable;
 import android.os.Build;
-import android.support.v4.content.ContextCompat;
 import android.util.DisplayMetrics;
 import android.view.WindowManager;
 
@@ -17,13 +15,12 @@ import java.io.FileInputStream;
 import java.io.FileNotFoundException;
 import java.io.IOException;
 import java.io.InputStream;
-import java.lang.ref.WeakReference;
-import java.util.Map;
 
 public final class SpriteFactory {
 
     private static final String SPRITE_ID_PREFIX = "com.mapbox.sprites.sprite_";
 
+    // TODO make weak
     private MapView mMapView;
     private Sprite mDefaultMarker;
     private BitmapFactory.Options mOptions;
@@ -98,7 +95,7 @@ public final class SpriteFactory {
     }
 
     public Sprite fromFile(String fileName) {
-        FileInputStream is = null;
+        FileInputStream is;
         try {
             is = mMapView.getContext().openFileInput(fileName);
         } catch (FileNotFoundException e) {

@@ -59,19 +59,15 @@ extern jfieldID markerIconId;
 
 extern jclass polylineClass;
 extern jfieldID polylineAlphaId;
-extern jfieldID polylineVisibleId;
 extern jfieldID polylineColorId;
 extern jfieldID polylineWidthId;
 extern jfieldID polylinePointsId;
 
 extern jclass polygonClass;
 extern jfieldID polygonAlphaId;
-extern jfieldID polygonVisibleId;
 extern jfieldID polygonFillColorId;
 extern jfieldID polygonStrokeColorId;
-extern jfieldID polygonStrokeWidthId;
 extern jfieldID polygonPointsId;
-extern jfieldID polygonHolesId;
 
 extern jclass runtimeExceptionClass;
 extern jclass nullPointerExceptionClass;

@@ -19,6 +19,11 @@ public class LatLngZoom extends LatLng implements Parcelable, Serializable {
 
     private double zoom;
 
+    public LatLngZoom() {
+        super();
+        this.zoom = 0.0;
+    }
+
     public LatLngZoom(double latitude, double longitude, double zoom) {
         super(latitude, longitude);
         this.zoom = zoom;

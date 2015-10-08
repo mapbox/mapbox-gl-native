@@ -7,7 +7,7 @@ import android.widget.RelativeLayout;
 
 import com.mapbox.mapboxsdk.R;
 
-class InfoWindowView extends RelativeLayout{
+class InfoWindowView extends RelativeLayout {
 
     private InfoWindowTipView mTipView;
 
@@ -24,13 +24,13 @@ class InfoWindowView extends RelativeLayout{
         initialize(context);
     }
 
-    private void initialize(Context context){
+    private void initialize(Context context) {
         LayoutInflater.from(context).inflate(R.layout.infowindow_content, this);
         mTipView = (InfoWindowTipView) findViewById(R.id.infowindow_tipview);
     }
 
-    public void setTipViewMarginLeft(int marginLeft){
-        RelativeLayout.LayoutParams layoutParams =  (RelativeLayout.LayoutParams) mTipView.getLayoutParams();
+    void setTipViewMarginLeft(int marginLeft) {
+        RelativeLayout.LayoutParams layoutParams = (RelativeLayout.LayoutParams) mTipView.getLayoutParams();
         layoutParams.leftMargin = marginLeft;
         // This is a bit of a hack but prevents an occasional 1 pixel gap between the InfoWindow and
         // the tip

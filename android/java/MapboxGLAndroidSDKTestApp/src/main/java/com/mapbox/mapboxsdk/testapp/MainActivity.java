@@ -137,8 +137,17 @@ public class MainActivity extends AppCompatActivity {
         mMapView.setOnMarkerClickListener(new MapView.OnMarkerClickListener() {
             @Override
             public boolean onMarkerClick(@NonNull Marker marker) {
-                Snackbar.make(mCoordinatorLayout, "Custom Marker Click Listener", Snackbar.LENGTH_SHORT).show();
+                Snackbar.make(mCoordinatorLayout, "Marker Click Listener for " + marker.getTitle(), Snackbar.LENGTH_SHORT).show();
                 return false;
+            }
+        });
+
+        mMapView.setOnInfoWindowClickListener(new MapView.OnInfoWindowClickListener() {
+            @Override
+            public boolean onMarkerClick(@NonNull Marker marker) {
+                Snackbar.make(mCoordinatorLayout, "InfoWindow Click Listener for " + marker.getTitle(), Snackbar.LENGTH_SHORT).show();
+                marker.hideInfoWindow();
+                return true;
             }
         });
 
@@ -430,18 +439,7 @@ public class MainActivity extends AppCompatActivity {
         final MarkerOptions cheeseRoom = generateMarker("Cheese Room", "The only air conditioned room on the property", dogIcon, 38.531577, -122.010646);
         markerOptionsList.add(cheeseRoom);
 
-       List<Marker> markers = mMapView.addMarkers(markerOptionsList);
-
-        // need to call this after adding markers to map, click event hook into InfoWindow needs refactoring
-        final Marker backLotMarker = markers.get(0);
-        backLotMarker.setInfoWindowOnTouchListener(new View.OnTouchListener() {
-            @Override
-            public boolean onTouch(View view, MotionEvent motionEvent) {
-                Toast.makeText(getApplicationContext(), "Custom Info Touch Listener!!", Toast.LENGTH_SHORT).show();
-                backLotMarker.hideInfoWindow();
-                return true;
-            }
-        });
+        List<Marker> markers = mMapView.addMarkers(markerOptionsList);
     }
 
     private MarkerOptions generateMarker(String title, String snippet, Sprite icon, double lat, double lng){

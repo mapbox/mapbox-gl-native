@@ -65,15 +65,6 @@ public final class PolylineOptions {
         return polyline.getWidth();
     }
 
-    PolylineOptions visible(boolean visible) {
-        polyline.setVisible(visible);
-        return this;
-    }
-
-    private boolean isVisible() {
-        return polyline.isVisible();
-    }
-
     /**
      * Sets the width of the polyline.
      *
@@ -90,9 +81,26 @@ public final class PolylineOptions {
         return polyline.getPoints();
     }
 
-    // TODO: Implement writeToParcel of Google Maps Android API
-//    public void writeToParcel(Parcel out, int flags) {
-//
-//    }
+    @Override
+    public boolean equals(Object o) {
+        if (this == o) return true;
+        if (o == null || getClass() != o.getClass()) return false;
 
+        PolylineOptions polyline = (PolylineOptions) o;
+
+        if (Float.compare(polyline.getAlpha(), getAlpha()) != 0) return false;
+        if (getColor() != polyline.getColor()) return false;
+        if (Float.compare(polyline.getWidth(), getWidth()) != 0) return false;
+        return !(getPoints() != null ? !getPoints().equals(polyline.getPoints()) : polyline.getPoints() != null);
+    }
+
+    @Override
+    public int hashCode() {
+        int result = 1;
+        result = 31 * result + (getAlpha() != +0.0f ? Float.floatToIntBits(getAlpha()) : 0);
+        result = 31 * result + getColor();
+        result = 31 * result + (getWidth() != +0.0f ? Float.floatToIntBits(getWidth()) : 0);
+        result = 31 * result + (getPoints() != null ? getPoints().hashCode() : 0);
+        return result;
+    }
 }

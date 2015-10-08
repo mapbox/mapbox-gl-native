@@ -26,6 +26,14 @@ public class LatLng implements ILatLng, Parcelable, Serializable {
     private double altitude = 0.0;
 
     /**
+     * Construct a new latitude, longitude point at (0, 0)
+     */
+    public LatLng() {
+        this.latitude = 0.0;
+        this.longitude = 0.0;
+    }
+
+    /**
      * Construct a new latitude, longitude point given float arguments
      * @param latitude Latitude in degrees
      * @param longitude Longitude in degrees

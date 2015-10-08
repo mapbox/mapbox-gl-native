@@ -19,7 +19,6 @@ public final class Polyline extends MultiPoint {
         return width;
     }
 
-
     /**
      * Sets the color of the polyline.
      *
@@ -29,7 +28,6 @@ public final class Polyline extends MultiPoint {
         this.color = color;
     }
 
-
     /**
      * Sets the width of the polyline.
      *
@@ -38,9 +36,4 @@ public final class Polyline extends MultiPoint {
     void setWidth(float width) {
         this.width = width;
     }
-
-    // TODO: Implement equals of Google Maps Android API
-//    public boolean equals(Object other) {
-//
-//    }
 }

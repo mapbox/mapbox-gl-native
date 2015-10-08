@@ -108,6 +108,7 @@ final class UserLocationView extends View {
         // Setup the custom paint
         Resources resources = context.getResources();
         mDensity = resources.getDisplayMetrics().density;
+        mMarkerCoordinate = new LatLng(0.0, 0.0);
         mMarkerScreenPoint = new PointF();
         mMarkerScreenMatrix = new Matrix();
 
@@ -305,7 +306,6 @@ final class UserLocationView extends View {
             cancelAnimations();
 
             mUserLocation = null;
-            mMarkerCoordinate = null;
             return;
         }
 

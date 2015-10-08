@@ -221,6 +221,7 @@ public final class MapView extends FrameLayout {
 
     // Used to manage marker click event listeners
     private OnMarkerClickListener mOnMarkerClickListener;
+    private OnInfoWindowClickListener mOnInfoWindowClickListener;
 
     // Used to manage FPS change event listeners
     private OnFpsChangedListener mOnFpsChangedListener;
@@ -432,7 +433,22 @@ public final class MapView extends FrameLayout {
          * Called when the user clicks on a marker.
          *
          * @param marker The marker the user clicked on.
-         * @return If true the listener has consumed the event and the {@link InfoWindow} will not be shown.
+         * @return If true the listener has consumed the event and the info window will not be shown.
+         */
+        boolean onMarkerClick(@NonNull Marker marker);
+    }
+
+    /**
+     * Interface definition for a callback to be invoked when the user clicks on an info window.
+     *
+     * @see MapView#setOnInfoWindowClickListener(OnInfoWindowClickListener)
+     */
+    public interface OnInfoWindowClickListener {
+        /**
+         * Called when the user clicks on an info window.
+         *
+         * @param marker The marker of the info window the user clicked on.
+         * @return If true the listener has consumed the event and the info window will not be closed.
          */
         boolean onMarkerClick(@NonNull Marker marker);
     }
@@ -453,17 +469,17 @@ public final class MapView extends FrameLayout {
     }
 
     /**
-     * Interface definition for a callback to be invoked when an {@link InfoWindow} will be shown.
+     * Interface definition for a callback to be invoked when an info window will be shown.
      *
      * @see MapView#setInfoWindowAdapter(InfoWindowAdapter)
      */
     public interface InfoWindowAdapter {
         /**
-         * Called when an {@link InfoWindow} will be shown as a result of a marker click.
+         * Called when an info window will be shown as a result of a marker click.
          *
          * @param marker The marker the user clicked on.
-         * @return View to be shown as a {@code InfoWindow}. If null is returned the default
-         * {@code InfoWindow} will be shown.
+         * @return View to be shown as a info window. If null is returned the default
+         * info window will be shown.
          */
         @Nullable
         View getInfoWindow(@NonNull Marker marker);
@@ -1777,7 +1793,8 @@ public final class MapView extends FrameLayout {
             throw new NullPointerException("polygonOptionsList is null");
         }
 
-        List<Polygon> polygons = new ArrayList<>(polygonOptionsList.size());
+        int count = polygonOptionsList.size();
+        List<Polygon> polygons = new ArrayList<>(count);
         for (PolygonOptions polygonOptions : polygonOptionsList) {
             polygons.add(polygonOptions.getPolygon());
         }
@@ -1785,8 +1802,7 @@ public final class MapView extends FrameLayout {
         long[] ids = mNativeMapView.addPolygons(polygons);
 
         Polygon p;
-        int count = polygons.size();
-        for (int i = 0; i < polygons.size(); i++) {
+        for (int i = 0; i < count; i++) {
             p = polygons.get(i);
             p.setId(ids[i]);
             p.setMapView(this);
@@ -1839,9 +1855,10 @@ public final class MapView extends FrameLayout {
      */
     @UiThread
     public void removeAllAnnotations() {
+        int count = mAnnotations.size();
         long[] ids = new long[mAnnotations.size()];
 
-        for (int i = 0; i < mAnnotations.size(); i++) {
+        for (int i = 0; i < count; i++) {
             Annotation annotation = mAnnotations.get(i);
             long id = annotation.getId();
             ids[i] = id;
@@ -1879,7 +1896,8 @@ public final class MapView extends FrameLayout {
         }
 
         List<Marker> annotations = new ArrayList<>(ids.length);
-        for (int i = 0; i < mAnnotations.size(); i++) {
+        int count = mAnnotations.size();
+        for (int i = 0; i < count; i++) {
             Annotation annotation = mAnnotations.get(i);
             if (annotation instanceof Marker && idsList.contains(annotation.getId())) {
                 annotations.add((Marker) annotation);
@@ -1914,9 +1932,18 @@ public final class MapView extends FrameLayout {
         return mNativeMapView.getMetersPerPixelAtLatitude(latitude, getZoomLevel()) / mScreenDensity;
     }
 
-    private void selectMarker(Marker marker) {
+    /**
+     * Selects a marker. The selected marker will have it's info window opened.
+     * Any other open info windows will be closed.
+     * <p/>
+     * Selecting an already selected marker will have no effect.
+     *
+     * @param marker The marker to select.
+     */
+    @UiThread
+    public void selectMarker(@NonNull Marker marker) {
         if (marker == null) {
-            return;
+            throw new NullPointerException("marker is null");
         }
 
         if (marker == mSelectedMarker) {
@@ -1936,31 +1963,33 @@ public final class MapView extends FrameLayout {
             // default behaviour
             // Can't do this as InfoWindow will get hidden
             //setCenterCoordinate(marker.getPosition(), true);
-            showInfoWindow(marker);
+            marker.showInfoWindow();
         }
 
         mSelectedMarker = marker;
     }
 
-    private void showInfoWindow(Marker marker) {
-        if (mInfoWindowAdapter != null) {
-            // end developer is using a custom InfoWindowAdapter
-            View content = mInfoWindowAdapter.getInfoWindow(marker);
-            if (content != null) {
-                marker.showInfoWindow(content);
-            }
-        } else {
-            marker.showInfoWindow();
-        }
-    }
-
-    private void deselectMarker() {
+    /**
+     * Deselects any currently selected marker. The selected marker will have it's info window closed.
+     */
+    @UiThread
+    public void deselectMarker() {
         if (mSelectedMarker != null) {
             if (mSelectedMarker.isInfoWindowShown()) {
                 mSelectedMarker.hideInfoWindow();
                 mSelectedMarker = null;
             }
         }
+    }
+
+    /**
+     * Gets the currently selected marker.
+     * @return The currently selected marker.
+     */
+    @UiThread
+    @Nullable
+    public Marker getSelectedMarker() {
+        return mSelectedMarker;
     }
 
     private void adjustTopOffsetPixels() {
@@ -1976,8 +2005,10 @@ public final class MapView extends FrameLayout {
 
         if (mSelectedMarker != null) {
             if (mSelectedMarker.isInfoWindowShown()) {
-                mSelectedMarker.hideInfoWindow();
-                showInfoWindow(mSelectedMarker);
+                Marker temp = mSelectedMarker;
+                temp.hideInfoWindow();
+                temp.showInfoWindow();
+                mSelectedMarker = temp;
             }
         }
     }
@@ -2260,9 +2291,7 @@ public final class MapView extends FrameLayout {
 
             } else {
                 // deselect any selected marker
-                if (mSelectedMarker != null) {
-                    deselectMarker();
-                }
+                deselectMarker();
 
                 // notify app of map click
                 if (mOnMapClickListener != null) {
@@ -2837,17 +2866,31 @@ public final class MapView extends FrameLayout {
     }
 
     /**
-     * Sets a custom renderer for the contents of {@link InfoWindow}.
+     * Sets a custom renderer for the contents of info window.
      * <p/>
-     * When set your callback is invoked when an {@code InfoWindow} is about to be shown. By returning
-     * a custom {@link View}, the default {@code InfoWindow} will be replaced.
+     * When set your callback is invoked when an info window is about to be shown. By returning
+     * a custom {@link View}, the default info window will be replaced.
      *
-     * @param infoWindowAdapter The callback to be invoked when an {@link InfoWindow} will be shown.
+     * @param infoWindowAdapter The callback to be invoked when an info window will be shown.
+     *                          To unset the callback, use null.
      */
     @UiThread
     public void setInfoWindowAdapter(@Nullable InfoWindowAdapter infoWindowAdapter) {
         mInfoWindowAdapter = infoWindowAdapter;
     }
+
+    /**
+     * Gets the callback to be invoked when an info window will be shown.
+     *
+     * @return The callback to be invoked when an info window will be shown.
+     */
+    @UiThread
+    @Nullable
+    public InfoWindowAdapter getInfoWindowAdapter() {
+        return mInfoWindowAdapter;
+    }
+
+
 
     /**
      * Sets a callback that's invoked on every frame rendered to the map view.
@@ -2927,6 +2970,28 @@ public final class MapView extends FrameLayout {
     @UiThread
     public void setOnMarkerClickListener(@Nullable OnMarkerClickListener listener) {
         mOnMarkerClickListener = listener;
+    }
+
+    /**
+     * Sets a callback that's invoked when the user clicks on an info window.
+     *
+     * @return The callback that's invoked when the user clicks on an info window.
+     */
+    @UiThread
+    @Nullable
+    public OnInfoWindowClickListener getOnInfoWindowClickListener() {
+        return mOnInfoWindowClickListener;
+    }
+
+    /**
+     * Sets a callback that's invoked when the user clicks on an info window.
+     *
+     * @param listener The callback that's invoked when the user clicks on an info window.
+     *                 To unset the callback, use null.
+     */
+    @UiThread
+    public void setOnInfoWindowClickListener(@Nullable OnInfoWindowClickListener listener) {
+        mOnInfoWindowClickListener = listener;
     }
 
     //

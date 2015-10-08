@@ -1,5 +1,7 @@
 package com.mapbox.mapboxsdk.annotations;
 
+import android.support.annotation.NonNull;
+
 import com.mapbox.mapboxsdk.views.MapView;
 
 import java.lang.ref.WeakReference;
@@ -8,19 +10,13 @@ public abstract class Annotation implements Comparable<Annotation> {
 
     /**
      * The annotation id
-     *
+     * <p/>
      * Internal C++ id is stored as unsigned int.
      */
     private long id = -1; // -1 unless added to a MapView
     private WeakReference<MapView> mapView;
 
-    private float alpha = 1.0f;
-    private boolean visible = true;
-
-    protected Annotation() {}
-
-    public float getAlpha() {
-        return alpha;
+    protected Annotation() {
     }
 
     /**
@@ -30,19 +26,11 @@ public abstract class Annotation implements Comparable<Annotation> {
         return id;
     }
 
-    boolean isVisible() {
-        return visible;
-    }
-
     public void remove() {
         if ((mapView == null) || (mapView.get() == null)) {
             return;
         }
         mapView.get().removeAnnotation(this);
-    }
-
-    void setAlpha(float alpha) {
-        this.alpha = alpha;
     }
 
     /**
@@ -56,7 +44,7 @@ public abstract class Annotation implements Comparable<Annotation> {
      * Do not use this method. Used internally by the SDK.
      */
     public void setMapView(MapView mapView) {
-        this.mapView = new WeakReference<MapView>(mapView);
+        this.mapView = new WeakReference<>(mapView);
     }
 
     protected MapView getMapView() {
@@ -66,41 +54,8 @@ public abstract class Annotation implements Comparable<Annotation> {
         return mapView.get();
     }
 
-    void setVisible(boolean visible) {
-        this.visible = visible;
-    }
-
-    // TODO: Implement getZIndex of Google Maps Android API
-//    public float getZIndex() {
-//
-//    }
-
-    // TODO: Implement setZIndex of Google Maps Android API
-//    public void setZIndex(float zIndex) {
-//
-//    }
-
-
     @Override
-    public boolean equals(Object o) {
-        if (o == null) {
-            return false;
-        }
-
-        if (o instanceof Annotation) {
-            Annotation comp = (Annotation) o;
-            return id == comp.id;
-        }
-        return false;
-    }
-
-    @Override
-    public int compareTo(Annotation annotation) {
-
-        if (annotation == null) {
-            return -1;
-        }
-
+    public int compareTo(@NonNull Annotation annotation) {
         if (id < annotation.getId()) {
             return 1;
         } else if (id > annotation.getId()) {
@@ -109,5 +64,20 @@ public abstract class Annotation implements Comparable<Annotation> {
 
         // Equal
         return 0;
+    }
+
+    @Override
+    public boolean equals(Object o) {
+        if (this == o) return true;
+        if (o == null || getClass() != o.getClass()) return false;
+
+        Annotation that = (Annotation) o;
+
+        return getId() == that.getId();
+    }
+
+    @Override
+    public int hashCode() {
+        return (int) (getId() ^ (getId() >>> 32));
     }
 }

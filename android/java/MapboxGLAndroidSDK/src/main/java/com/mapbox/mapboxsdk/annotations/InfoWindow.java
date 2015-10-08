@@ -30,54 +30,59 @@ final class InfoWindow {
     static int mSubDescriptionId = 0;
     static int mImageId = 0;
 
-    public InfoWindow(int layoutResId, MapView mapView) {
-        mMapView = new WeakReference<MapView>(mapView);
-        mIsVisible = false;
-        mView = LayoutInflater.from(mapView.getContext()).inflate(layoutResId, mapView, false);
+    InfoWindow(int layoutResId, MapView mapView) {
+        View view = LayoutInflater.from(mapView.getContext()).inflate(layoutResId, mapView, false);
 
         if (mTitleId == 0) {
             setResIds(mapView.getContext());
         }
 
-        // default behavior: close it when clicking on the tooltip:
-        setOnTouchListener(new View.OnTouchListener() {
-            @Override
-            public boolean onTouch(View v, MotionEvent e) {
-                if (e.getAction() == MotionEvent.ACTION_UP) {
-                    close();
-                }
-                return true;
-            }
-        });
+        initialize(view, mapView);
     }
 
-    public InfoWindow(View view, MapView mapView) {
-        mMapView = new WeakReference<MapView>(mapView);
+    InfoWindow(View view, MapView mapView) {
+        initialize(view, mapView);
+    }
+
+    private void initialize(View view, MapView mapView) {
+        mMapView = new WeakReference<>(mapView);
         mIsVisible = false;
         mView = view;
 
         // default behavior: close it when clicking on the tooltip:
-        setOnTouchListener(new View.OnTouchListener() {
+        mView.setOnTouchListener(new View.OnTouchListener() {
             @Override
             public boolean onTouch(View v, MotionEvent e) {
                 if (e.getAction() == MotionEvent.ACTION_UP) {
-                    close();
+                    boolean handledDefaultClick = false;
+                    MapView.OnInfoWindowClickListener onInfoWindowClickListener =
+                            mMapView.get().getOnInfoWindowClickListener();
+                    if (onInfoWindowClickListener != null) {
+                        handledDefaultClick = onInfoWindowClickListener.onMarkerClick(getBoundMarker());
+                    }
+
+                    if (!handledDefaultClick) {
+                        close();
+                    }
                 }
                 return true;
             }
         });
     }
 
+
     /**
      * open the window at the specified position.
      *
-     * @param object   the graphical object on which is hooked the view
-     * @param position to place the window on the map
-     * @param offsetX  (&offsetY) the offset of the view to the position, in pixels.
-     *                 This allows to offset the view from the object position.
+     * @param boundMarker the marker on which is hooked the view
+     * @param position    to place the window on the map
+     * @param offsetX     (&offsetY) the offset of the view to the position, in pixels.
+     *                    This allows to offset the view from the object position.
      * @return this infowindow
      */
-    public InfoWindow open(Marker object, LatLng position, int offsetX, int offsetY) {
+    InfoWindow open(Marker boundMarker, LatLng position, int offsetX, int offsetY) {
+        setBoundMarker(boundMarker);
+
         MapView.LayoutParams lp = new MapView.LayoutParams(MapView.LayoutParams.WRAP_CONTENT, MapView.LayoutParams.WRAP_CONTENT);
         mView.measure(View.MeasureSpec.UNSPECIFIED, View.MeasureSpec.UNSPECIFIED);
 
@@ -148,33 +153,14 @@ final class InfoWindow {
      *
      * @return this info window
      */
-    public InfoWindow close() {
+    InfoWindow close() {
         if (mIsVisible) {
             mIsVisible = false;
             ((ViewGroup) mView.getParent()).removeView(mView);
-//            this.boundMarker.blur();
             setBoundMarker(null);
             onClose();
         }
         return this;
-    }
-
-    /**
-     * Returns the Android view. This allows to set its content.
-     *
-     * @return the Android view
-     */
-    public View getView() {
-        return mView;
-    }
-
-    /**
-     * Returns the mapView this InfoWindow is bound to
-     *
-     * @return the mapView
-     */
-    public MapView getMapView() {
-        return mMapView.get();
     }
 
     /**
@@ -183,7 +169,7 @@ final class InfoWindow {
      *
      * @param overlayItem the tapped overlay item
      */
-    public void adaptDefaultMarker(Marker overlayItem) {
+    void adaptDefaultMarker(Marker overlayItem) {
         String title = overlayItem.getTitle();
         ((TextView) mView.findViewById(mTitleId /*R.id.title*/)).setText(title);
         String snippet = overlayItem.getSnippet();
@@ -202,16 +188,16 @@ final class InfoWindow {
 */
     }
 
-    public void onClose() {
-        //by default, do nothing
+    private void onClose() {
+        mMapView.get().deselectMarker();
     }
 
-    public InfoWindow setBoundMarker(Marker boundMarker) {
-        mBoundMarker = new WeakReference<Marker>(boundMarker);
+    InfoWindow setBoundMarker(Marker boundMarker) {
+        mBoundMarker = new WeakReference<>(boundMarker);
         return this;
     }
 
-    public Marker getBoundMarker() {
+    Marker getBoundMarker() {
         if (mBoundMarker == null) {
             return null;
         }
@@ -222,7 +208,7 @@ final class InfoWindow {
      * Given a context, set the resource ids for the layout
      * of the InfoWindow.
      *
-     * @param context
+     * @param context the apps Context
      */
     private static void setResIds(Context context) {
         String packageName = context.getPackageName(); //get application package name
@@ -232,14 +218,5 @@ final class InfoWindow {
         mSubDescriptionId = context.getResources()
                 .getIdentifier("id/infowindow_subdescription", null, packageName);
         mImageId = context.getResources().getIdentifier("id/infowindow_image", null, packageName);
-    }
-
-    /**
-     * Use to override default touch events handling on InfoWindow (ie, close automatically)
-     *
-     * @param listener New View.OnTouchListener to use
-     */
-    public void setOnTouchListener(View.OnTouchListener listener) {
-        mView.setOnTouchListener(listener);
     }
 }
