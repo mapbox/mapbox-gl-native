@@ -86,6 +86,8 @@
                 android:title="@string/action_map_fragment" />
 
             <item android:id="@+id/action_press_for_marker"
+                  android:checkable="false"
+                  android:icon="@drawable/ic_pin_drop_white_24dp"
                   android:title="@string/action_press_for_marker"/>
         </menu>
     </item>

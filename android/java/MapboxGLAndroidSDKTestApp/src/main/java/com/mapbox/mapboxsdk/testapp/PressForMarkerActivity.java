@@ -14,12 +14,15 @@ import com.mapbox.mapboxsdk.annotations.MarkerOptions;
 import com.mapbox.mapboxsdk.geometry.LatLng;
 import com.mapbox.mapboxsdk.utils.ApiAccess;
 import com.mapbox.mapboxsdk.views.MapView;
+import java.text.DecimalFormat;
 
 public class PressForMarkerActivity extends AppCompatActivity {
 
     private static final String TAG = "PressForMarkerActivity";
 
     private MapView mMapView;
+
+    private static final DecimalFormat latLonFormatter = new DecimalFormat("#.#####");
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -37,13 +40,11 @@ public class PressForMarkerActivity extends AppCompatActivity {
 
         mMapView = (MapView) findViewById(R.id.pressForMarkerMapView);
         mMapView.setAccessToken(ApiAccess.getToken(this));
-        mMapView.setStyleUrl(MapView.StyleUrls.MAPBOX_STREETS);
+        mMapView.setStyleUrl(MapView.StyleUrls.EMERALD);
         mMapView.onCreate(savedInstanceState);
 
-
-        mMapView.setCenterCoordinate(new LatLng(47.798202, 7.573781));
-        mMapView.setZoomLevel(4);
-
+        mMapView.setCenterCoordinate(new LatLng(45.1855569, 5.7215506));
+        mMapView.setZoomLevel(11);
 
         final GestureDetector gestureDetector = new GestureDetector(this, new GestureDetector.SimpleOnGestureListener() {
             public void onLongPress(final MotionEvent e) {
@@ -52,11 +53,13 @@ public class PressForMarkerActivity extends AppCompatActivity {
 
                 final LatLng position = mMapView.fromScreenLocation(new PointF(x, y));
 
-                Marker marker = mMapView.addMarker(new MarkerOptions()
+                String title = latLonFormatter.format(position.getLatitude()) + ", " + latLonFormatter.format(position.getLongitude());
+                String snippet = "X = " + (int)x + ", Y = " + (int)y;
+
+                mMapView.addMarker(new MarkerOptions()
                         .position(position)
-                        .title("Dropped Pin")
-                        .snippet("Tap for directions")
-                        .sprite("default_marker"));
+                        .title(title)
+                        .snippet(snippet));
             }
         });
 
