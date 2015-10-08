@@ -287,6 +287,11 @@ public class MainActivity extends AppCompatActivity {
                             case R.id.action_map_fragment:
                                 startActivity(new Intent(getApplicationContext(), MapFragmentActivity.class));
                                 return true;
+
+                            case R.id.action_press_for_marker:
+                                startActivity(new Intent(getApplicationContext(), PressForMarkerActivity.class));
+                                return true;
+
 /*
                             case R.id.followNone:
                                 mMapView.setUserLocationTrackingMode(MapView.UserLocationTrackingMode.NONE);
