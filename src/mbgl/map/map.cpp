@@ -32,8 +32,8 @@ Map::~Map() {
 void Map::pause() {
     assert(data->mode == MapMode::Continuous);
 
+    std::unique_lock<std::mutex> lockPause(data->mutexPause);
     if (!data->paused) {
-        std::unique_lock<std::mutex> lockPause(data->mutexPause);
         context->invoke(&MapContext::pause);
         data->condPause.wait(lockPause, [&]{ return data->paused; });
     }
@@ -44,6 +44,7 @@ bool Map::isPaused() {
 }
 
 void Map::resume() {
+    std::unique_lock<std::mutex> lockPause(data->mutexPause);
     data->paused = false;
     data->condPause.notify_all();
 }
