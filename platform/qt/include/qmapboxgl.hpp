@@ -51,6 +51,8 @@ public:
     QMapboxGL(QObject *parent = 0, const QMapboxGLSettings& = QMapboxGLSettings());
     virtual ~QMapboxGL();
 
+    void cycleDebugOptions();
+
     void setStyleJSON(const QString &);
     void setStyleURL(const QString &);
 

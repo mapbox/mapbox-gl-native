@@ -75,6 +75,11 @@ QMapboxGL::~QMapboxGL()
     delete d_ptr;
 }
 
+void QMapboxGL::cycleDebugOptions()
+{
+    d_ptr->mapObj->cycleDebugOptions();
+}
+
 void QMapboxGL::setStyleJSON(const QString &style)
 {
     d_ptr->mapObj->setStyleJSON(style.toUtf8().constData());
