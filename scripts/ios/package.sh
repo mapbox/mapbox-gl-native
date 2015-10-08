@@ -106,7 +106,7 @@ cp -pv styles/styles/{dark,emerald,light,streets,satellite}-v8.json "${OUTPUT}/s
 
 step "Creating API Docs..."
 if [ -z `which appledoc` ]; then
-    echo "Unable to find appledoc. See https://github.com/mapbox/mapbox-gl-native#manually"
+    echo "Unable to find appledoc. See https://github.com/mapbox/mapbox-gl-native/blob/master/INSTALL.md"
     exit 1
 fi
 DOCS_OUTPUT="${OUTPUT}/static/Docs"
