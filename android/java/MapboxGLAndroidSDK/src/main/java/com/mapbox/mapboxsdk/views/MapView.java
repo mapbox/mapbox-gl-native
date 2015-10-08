@@ -220,6 +220,9 @@ public final class MapView extends FrameLayout implements LocationListener, Comp
     // Used to manage marker click event listeners
     private OnMarkerClickListener mOnMarkerClickListener;
 
+    // Used to manage FPS change event listeners
+    private OnFpsChangedListener mOnFpsChangedListener;
+
     //
     // Properties
     //
@@ -280,20 +283,71 @@ public final class MapView extends FrameLayout implements LocationListener, Comp
      * @see MapView.OnMapChangedListener#onMapChanged(MapChange)
      */
     public enum MapChange {
-        // TODO pull descriptions from C++
+        /**
+         * This event is triggered whenever the currently displayed map region is about to changing
+         * without an animation.
+         * <p/>
+         * This event is followed by a series of {@link MapView.MapChange#RegionIsChanging} and ends
+         * with {@link MapView.MapChange#RegionDidChange}.
+         */
         RegionWillChange,
+        /**
+         * This event is triggered whenever the currently displayed map region is about to changing
+         * with an animation.
+         * <p/>
+         * This event is followed by a series of {@link MapView.MapChange#RegionIsChanging} and ends
+         * with {@link MapView.MapChange#RegionDidChangeAnimated}.
+         */
         RegionWillChangeAnimated,
+        /**
+         * This event is triggered whenever the currently displayed map region is changing.
+         */
         RegionIsChanging,
+        /**
+         * This event is triggered whenever the currently displayed map region finished changing
+         * without an animation.
+         */
         RegionDidChange,
+        /**
+         * This event is triggered whenever the currently displayed map region finished changing
+         * with an animation.
+         */
         RegionDidChangeAnimated,
+        /**
+         * Currently not implemented.
+         */
         WillStartLoadingMap,
+        /**
+         * Currently not implemented.
+         */
         DidFinishLoadingMap,
+        /**
+         * Currently not implemented.
+         */
         DidFailLoadingMap,
+        /**
+         * Currently not implemented.
+         */
         WillStartRenderingFrame,
+        /**
+         * Currently not implemented.
+         */
         DidFinishRenderingFrame,
+        /**
+         * Currently not implemented.
+         */
         DidFinishRenderingFrameFullyRendered,
+        /**
+         * Currently not implemented.
+         */
         WillStartRenderingMap,
+        /**
+         * Currently not implemented.
+         */
         DidFinishRenderingMap,
+        /**
+         * Currently not implemented.
+         */
         DidFinishRenderingMapFullyRendered;
 
         // Converts the C++ values from include/mpbgl/map/view.hpp MapChange to Java enum values
@@ -443,7 +497,8 @@ public final class MapView extends FrameLayout implements LocationListener, Comp
          * Called when an {@link InfoWindow} will be shown as a result of a marker click.
          *
          * @param marker The marker the user clicked on.
-         * @return View to be shown as a {@link InfoWindow}.
+         * @return View to be shown as a {@code InfoWindow}. If null is returned the default
+         * {@code InfoWindow} will be shown.
          */
         View getInfoWindow(Marker marker);
     }
@@ -1699,7 +1754,6 @@ public final class MapView extends FrameLayout implements LocationListener, Comp
     }
 
     private void selectAnnotation(Annotation annotation) {
-
         if (annotation == null) {
             return;
         }
@@ -1745,7 +1799,6 @@ public final class MapView extends FrameLayout implements LocationListener, Comp
             }
         }
     }
-
 
     //
     // Rendering
@@ -2549,31 +2602,28 @@ public final class MapView extends FrameLayout implements LocationListener, Comp
     //
 
     /**
-     * Add an OnMapChangedListener
+     * Add a callback that's invoked when the displayed map view changes.
+     * <p/>
+     * To remove the callback, use {@link MapView#removeOnMapChangedListener(OnMapChangedListener)}.
      *
-     * @param listener Listener to add
+     * @param listener The callback that's invoked on every frame rendered to the map view.
+     * @see MapView#removeOnMapChangedListener(OnMapChangedListener)
      */
-    public void addOnMapChangedListener(@NonNull OnMapChangedListener listener) {
+    @UiThread
+    public void addOnMapChangedListener(@Nullable OnMapChangedListener listener) {
         if (listener != null) {
             mOnMapChangedListener.add(listener);
         }
     }
 
     /**
-     * Add an InfoWindowAdapter
+     * Remove a callback added with {@link MapView#addOnMapChangedListener(OnMapChangedListener)}
      *
-     * @param infoWindowAdapter to set
+     * @param listener The previously added callback to remove.
+     * @see MapView#addOnMapChangedListener(OnMapChangedListener)
      */
-    public void setInfoWindowAdapter(@NonNull InfoWindowAdapter infoWindowAdapter) {
-        mInfoWindowAdapter = infoWindowAdapter;
-    }
-
-    /**
-     * Remove an OnMapChangedListener
-     *
-     * @param listener Listener to remove
-     */
-    public void removeOnMapChangedListener(@NonNull OnMapChangedListener listener) {
+    @UiThread
+    public void removeOnMapChangedListener(@Nullable OnMapChangedListener listener) {
         if (listener != null) {
             mOnMapChangedListener.remove(listener);
         }
@@ -2581,7 +2631,7 @@ public final class MapView extends FrameLayout implements LocationListener, Comp
 
     // Called when the map view transformation has changed
     // Called via JNI from NativeMapView
-    // Need to update anything that relies on map state
+    // Forward to any listeners
     protected void onMapChanged(int rawChange) {
         final MapChange change = MapChange.fromInteger(rawChange);
         if (mOnMapChangedListener != null) {
@@ -2596,15 +2646,33 @@ public final class MapView extends FrameLayout implements LocationListener, Comp
         }
     }
 
-    private OnFpsChangedListener mOnFpsChangedListener;
+    /**
+     * Sets a custom renderer for the contents of {@link InfoWindow}.
+     * <p/>
+     * When set your callback is invoked when an {@code InfoWindow} is about to be shown. By returning
+     * a custom {@link View}, the default {@code InfoWindow} will be replaced.
+     *
+     * @param infoWindowAdapter The callback to be invoked when an {@link InfoWindow} will be shown.
+     */
+    @UiThread
+    public void setInfoWindowAdapter(@Nullable InfoWindowAdapter infoWindowAdapter) {
+        mInfoWindowAdapter = infoWindowAdapter;
+    }
 
-    // Adds a listener for onFpsChanged
-    public void setOnFpsChangedListener(OnFpsChangedListener listener) {
+    /**
+     * Sets a callback that's invoked on every frame rendered to the map view.
+     *
+     * @param listener The callback that's invoked on every frame rendered to the map view.
+     *                 To unset the callback, use null.
+     */
+    @UiThread
+    public void setOnFpsChangedListener(@Nullable OnFpsChangedListener listener) {
         mOnFpsChangedListener = listener;
     }
 
     // Called when debug mode is enabled to update a FPS counter
     // Called via JNI from NativeMapView
+    // Forward to any listener
     protected void onFpsChanged(final double fps) {
         if (mOnFpsChangedListener != null) {
             post(new Runnable() {
@@ -2616,24 +2684,59 @@ public final class MapView extends FrameLayout implements LocationListener, Comp
         }
     }
 
-    public void setOnScrollListener(OnScrollListener onScrollListener) {
-        mOnScrollListener = onScrollListener;
+    /**
+     * Sets a callback that's invoked when the map is scrolled.
+     *
+     * @param listener The callback that's invoked when the map is scrolled.
+     *                 To unset the callback, use null.
+     */
+    @UiThread
+    public void setOnScrollListener(@Nullable OnScrollListener listener) {
+        mOnScrollListener = listener;
     }
 
-    public void setOnFlingListener(OnFlingListener onFlingListener) {
-        mOnFlingListener = onFlingListener;
+    /**
+     * Sets a callback that's invoked when the map is flinged.
+     *
+     * @param listener The callback that's invoked when the map is flinged.
+     *                 To unset the callback, use null.
+     */
+    @UiThread
+    public void setOnFlingListener(@Nullable OnFlingListener listener) {
+        mOnFlingListener = listener;
     }
 
-    public void setOnMapClickListener(OnMapClickListener onMapClickListener) {
-        mOnMapClickListener = onMapClickListener;
+    /**
+     * Sets a callback that's invoked when the user clicks on the map view.
+     *
+     * @param listener The callback that's invoked when the user clicks on the map view.
+     *                 To unset the callback, use null.
+     */
+    @UiThread
+    public void setOnMapClickListener(@Nullable OnMapClickListener listener) {
+        mOnMapClickListener = listener;
     }
 
-    public void setOnMapLongClickListener(OnMapLongClickListener onMapLongClickListener) {
-        mOnMapLongClickListener = onMapLongClickListener;
+    /**
+     * Sets a callback that's invoked when the user long clicks on the map view.
+     *
+     * @param listener The callback that's invoked when the user long clicks on the map view.
+     *                 To unset the callback, use null.
+     */
+    @UiThread
+    public void setOnMapLongClickListener(@Nullable OnMapLongClickListener listener) {
+        mOnMapLongClickListener = listener;
     }
 
-    public void setOnMarkerClickListener(OnMarkerClickListener onMarkerClickListener) {
-        mOnMarkerClickListener = onMarkerClickListener;
+    /**
+     * Sets a callback that's invoked when the user clicks on a marker.
+     *
+     * @param listener The callback that's invoked when the user clicks on a marker.
+     *                 To unset the callback, use null.
+     */
+    @UiThread
+    public void setOnMarkerClickListener(@Nullable OnMarkerClickListener listener) {
+        mOnMarkerClickListener = listener;
     }
 
     //
@@ -2697,11 +2800,7 @@ public final class MapView extends FrameLayout implements LocationListener, Comp
         onInvalidate();
     }
 
-    /**
-     * LOST's LocationListener Callback
-     *
-     * @param location New Location
-     */
+    // LOST's LocationListener callback
     @Override
     public void onLocationChanged(Location location) {
         updateLocation(location);
@@ -2729,20 +2828,6 @@ public final class MapView extends FrameLayout implements LocationListener, Comp
             mGpsMarker.setLayoutParams(lp);
             rotateImageView(mGpsMarker, 0.0f);
             mGpsMarker.requestLayout();
-/*
-            // Used For User Location Bearing UI
-            if (mGpsLocation.hasBearing() || mCompassValid) {
-                mGpsMarker.setImageResource(R.drawable.direction_arrow);
-                float iconSize = 54.0f * mScreenDensity;
-                FrameLayout.LayoutParams lp = new FrameLayout.LayoutParams((int) iconSize, (int) iconSize);
-                lp.leftMargin = (int) (screenLocation.x - iconSize / 2.0f);
-                lp.topMargin = mMapFrameLayout.getHeight() - (int) (screenLocation.y + iconSize / 2.0f);
-                mGpsMarker.setLayoutParams(lp);
-                float bearing = mGpsLocation.hasBearing() ? mGpsLocation.getBearing() : mCompassBearing;
-                rotateImageView(mGpsMarker, bearing);
-                mGpsMarker.requestLayout();
-            }
-*/
         } else {
             if (mGpsMarker != null) {
                 mGpsMarker.setVisibility(View.INVISIBLE);
