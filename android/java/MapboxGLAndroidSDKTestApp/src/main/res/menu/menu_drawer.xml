@@ -7,19 +7,16 @@
             <group>
                 <item
                     android:id="@+id/action_debug"
-                    android:checkable="true"
                     android:icon="@android:drawable/ic_menu_info_details"
                     android:title="@string/action_debug" />
 
                 <item
                     android:id="@+id/action_markers"
-                    android:checkable="true"
                     android:icon="@android:drawable/ic_menu_myplaces"
                     android:title="@string/action_point_annotations" />
 
                 <item
                     android:id="@+id/action_compass"
-                    android:checkable="true"
                     android:icon="@android:drawable/ic_menu_compass"
                     android:title="@string/action_compass" />
             </group>
@@ -32,9 +29,7 @@
         android:title="@string/navdrawer_menu_title_mainactivity_styles">
         <menu>
             <group
-                android:id="@+id/stylesGroup"
-                android:checkableBehavior="single"
-                android:enabled="true">
+                android:id="@+id/stylesGroup">
                 <item
                     android:id="@+id/actionStyleMapboxStreets"
                     android:title="@string/styleMapboxStreets" />
