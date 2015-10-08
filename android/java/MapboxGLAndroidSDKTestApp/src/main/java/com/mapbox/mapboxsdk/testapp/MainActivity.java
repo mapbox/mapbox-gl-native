@@ -23,7 +23,6 @@ import android.view.MotionEvent;
 import android.view.View;
 import android.widget.TextView;
 import android.widget.Toast;
-
 import com.crashlytics.android.Crashlytics;
 import com.mapbox.mapboxsdk.annotations.Marker;
 import com.mapbox.mapboxsdk.annotations.MarkerOptions;
@@ -32,9 +31,7 @@ import com.mapbox.mapboxsdk.annotations.PolylineOptions;
 import com.mapbox.mapboxsdk.geometry.LatLng;
 import com.mapbox.mapboxsdk.utils.ApiAccess;
 import com.mapbox.mapboxsdk.views.MapView;
-
 import io.fabric.sdk.android.Fabric;
-
 import java.text.DecimalFormat;
 import java.util.ArrayList;
 import java.util.List;
@@ -63,13 +60,16 @@ public class MainActivity extends AppCompatActivity {
     private MapView mMapView;
     private TextView mFpsTextView;
     private int mSelectedStyle = R.id.actionStyleMapboxStreets;
-    NavigationView mNavigationView;
+    private NavigationView mNavigationView;
 
     // Used for GPS
     private FloatingActionButton mLocationFAB;
 
     // Used for Annotations
     private boolean mIsAnnotationsOn = false;
+
+
+    private static final DecimalFormat latLngFormatter = new DecimalFormat("#.#####");
 
     //
     // Lifecycle events
@@ -112,8 +112,8 @@ public class MainActivity extends AppCompatActivity {
                 mMapView.addMarker(new MarkerOptions()
                         .position(point)
                         .title("Dropped Pin")
-                        .snippet(new DecimalFormat("#.#####").format(point.getLatitude()) + ", " +
-                                new DecimalFormat("#.#####").format(point.getLongitude()))
+                        .snippet(latLngFormatter.format(point.getLatitude()) + ", " +
+                                latLngFormatter.format(point.getLongitude()))
                         .sprite("default_marker"));
             }
         });
@@ -121,8 +121,8 @@ public class MainActivity extends AppCompatActivity {
         mMapView.setOnMapClickListener(new MapView.OnMapClickListener() {
             @Override
             public void onMapClick(LatLng point) {
-                String location = new DecimalFormat("#.#####").format(point.getLatitude()) + ", " +
-                        new DecimalFormat("#.#####").format(point.getLongitude());
+                String location = latLngFormatter.format(point.getLatitude()) + ", " +
+                        latLngFormatter.format(point.getLongitude());
                 Snackbar.make(findViewById(android.R.id.content), "Map Click Listener " + location, Snackbar.LENGTH_SHORT).show();
             }
         });
