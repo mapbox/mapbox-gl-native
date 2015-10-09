@@ -1,10 +1,11 @@
+#include <mapbox/geojsonvt/geojsonvt_convert.hpp>
+
 #include <mbgl/annotation/annotation_manager.hpp>
 #include <mbgl/annotation/point_annotation.hpp>
 #include <mbgl/annotation/shape_annotation.hpp>
 #include <mbgl/map/tile_id.hpp>
 #include <mbgl/map/live_tile.hpp>
 #include <mbgl/util/constants.hpp>
-#include <mbgl/util/geojsonvt/geojsonvt_convert.hpp>
 #include <mbgl/util/ptr.hpp>
 #include <mbgl/util/string.hpp>
 #include <mbgl/style/style.hpp>
@@ -425,7 +426,7 @@ const LiveTile* AnnotationManager::getTile(const TileID& id) {
 
                         GeometryCollection renderGeometry;
 
-                        for (auto& shapeGeometry : shapeFeature.geometry) {
+                        for (auto& shapeGeometry : shapeFeature.tileGeometry) {
 
                             std::vector<Coordinate> renderLine;
 

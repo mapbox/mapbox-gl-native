@@ -43,6 +43,8 @@
       }],
       ['OS=="linux"', {
         'cflags_cc': [
+          '-fabi-version=0', # For compatibility with C++ libraries compiled with clang++;
+                             # see https://github.com/mapbox/mapbox-gl-native/issues/2502
           '-Wno-unknown-pragmas', # We are using '#pragma mark', but it is only available on Darwin.
         ],
       }],

@@ -95,6 +95,7 @@
         '<@(gtest_static_libs)',
         '<@(libuv_static_libs)',
         '<@(sqlite_static_libs)',
+        '<@(geojsonvt_static_libs)',
       ],
       'variables': {
         'cflags_cc': [
@@ -103,6 +104,7 @@
           '<@(opengl_cflags)',
           '<@(boost_cflags)',
           '<@(sqlite_cflags)',
+          '<@(geojsonvt_cflags)',
           '<@(variant_cflags)',
           '<@(rapidjson_cflags)',
         ],
