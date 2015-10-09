@@ -14,12 +14,7 @@ if [ ${TRAVIS_OS_NAME} == "linux" ]; then
 fi
 
 if [ ! -d ~/.nvm ]; then
-    git clone https://github.com/creationix/nvm.git ~/.nvm
-
-    pushd ~/.nvm
-    git fetch
-    git checkout `git describe --abbrev=0 --tags`
-    popd
+    curl -o- https://raw.githubusercontent.com/creationix/nvm/v0.29.0/install.sh | bash
 fi
 
 source ~/.nvm/nvm.sh
