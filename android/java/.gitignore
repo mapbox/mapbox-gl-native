@@ -21,7 +21,7 @@ MapboxGLAndroidSDK/src/main/assets/
 local.properties
 
 # Token file
-MapboxGLAndroidSDK/src/main/res/raw/token.txt
+MapboxGLAndroidSDKTestApp/src/main/res/raw/token.txt
 
 # Twitter Fabric / Crashlytics
 fabric.properties

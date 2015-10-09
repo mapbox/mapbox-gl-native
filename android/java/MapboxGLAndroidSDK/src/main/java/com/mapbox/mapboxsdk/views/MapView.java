@@ -62,6 +62,7 @@ import com.mapbox.mapboxsdk.annotations.PolylineOptions;
 import com.mapbox.mapboxsdk.geometry.BoundingBox;
 import com.mapbox.mapboxsdk.geometry.LatLng;
 import com.mapbox.mapboxsdk.geometry.LatLngZoom;
+import com.mapbox.mapboxsdk.utils.ApiAccess;
 import com.mapzen.android.lost.api.LocationListener;
 import com.mapzen.android.lost.api.LocationRequest;
 import com.mapzen.android.lost.api.LocationServices;
@@ -79,7 +80,7 @@ import java.util.List;
  * You can center the map on a given coordinate, specify the size of the area you want to display,
  * and style the features of the map to fit your application's use case.
  * <p/>
- * Use of {@link MapView} requires a Mapbox API access token.
+ * Use of {@code MapView} requires a Mapbox API access token.
  * Obtain an access token on the <a href="https://www.mapbox.com/account/apps/">Mapbox account page</a>.
  * <p/>
  * <strong>Warning:</strong> Please note that you are responsible for getting permission to use the map data,
@@ -1503,7 +1504,7 @@ public final class MapView extends FrameLayout implements LocationListener, Comp
     // Checks if the given token is valid
     private void validateAccessToken(String accessToken) {
         if (TextUtils.isEmpty(accessToken) || (!accessToken.startsWith("pk.") && !accessToken.startsWith("sk."))) {
-            throw new RuntimeException("Using MapView requires setting a valid access token. See the README.md");
+            throw new InvalidAccessTokenException();
         }
     }
 
@@ -1512,9 +1513,13 @@ public final class MapView extends FrameLayout implements LocationListener, Comp
      * <p/>
      * You must set a valid access token before you call {@link MapView#onCreate(Bundle)}
      * or an exception will be thrown.
+     * <p/>
+     * You can use {@link ApiAccess#getToken(Context)} to load an access token from your
+     * application's manifest.
      *
      * @param accessToken Your public Mapbox access token.
      * @see MapView#onCreate(Bundle)
+     * @see ApiAccess#getToken(Context)
      */
     @UiThread
     public void setAccessToken(@NonNull String accessToken) {
