@@ -14,7 +14,7 @@ if [ ${TRAVIS_OS_NAME} == "linux" ]; then
 fi
 
 if [ ! -d ~/.nvm ]; then
-    curl -o- https://raw.githubusercontent.com/creationix/nvm/v0.29.0/install.sh | bash
+    curl -o- https://raw.githubusercontent.com/creationix/nvm/v0.28.0/install.sh | bash
 fi
 
 source ~/.nvm/nvm.sh
