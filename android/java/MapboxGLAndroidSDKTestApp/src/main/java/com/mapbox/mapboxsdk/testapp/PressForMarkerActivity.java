@@ -46,26 +46,19 @@ public class PressForMarkerActivity extends AppCompatActivity {
         mMapView.setCenterCoordinate(new LatLng(45.1855569, 5.7215506));
         mMapView.setZoomLevel(11);
 
-        final GestureDetector gestureDetector = new GestureDetector(this, new GestureDetector.SimpleOnGestureListener() {
-            public void onLongPress(final MotionEvent e) {
-                float x = e.getX();
-                float y = e.getY();
+        mMapView.setOnMapLongClickListener(new MapView.OnMapLongClickListener() {
+            @Override
+            public void onMapLongClick(LatLng point) {
+                final PointF pixel = mMapView.toScreenLocation(point);
 
-                final LatLng position = mMapView.fromScreenLocation(new PointF(x, y));
-
-                String title = latLonFormatter.format(position.getLatitude()) + ", " + latLonFormatter.format(position.getLongitude());
-                String snippet = "X = " + (int)x + ", Y = " + (int)y;
+                String title = latLonFormatter.format(point.getLatitude()) + ", " + latLonFormatter.format(point.getLongitude());
+                String snippet = "X = " + (int)pixel.x + ", Y = " + (int)pixel.y;
 
                 mMapView.addMarker(new MarkerOptions()
-                        .position(position)
+                        .position(point)
                         .title(title)
                         .snippet(snippet));
-            }
-        });
 
-        mMapView.setOnTouchListener(new View.OnTouchListener() {
-            public boolean onTouch(View v, MotionEvent event) {
-                return gestureDetector.onTouchEvent(event);
             }
         });
     }
