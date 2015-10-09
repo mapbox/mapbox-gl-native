@@ -48,6 +48,7 @@ import android.widget.ArrayAdapter;
 import android.widget.FrameLayout;
 import android.widget.ImageView;
 import android.widget.ZoomButtonsController;
+
 import com.almeros.android.multitouch.gesturedetectors.RotateGestureDetector;
 import com.almeros.android.multitouch.gesturedetectors.TwoFingerGestureDetector;
 import com.mapbox.mapboxsdk.R;
@@ -66,6 +67,7 @@ import com.mapzen.android.lost.api.LocationListener;
 import com.mapzen.android.lost.api.LocationRequest;
 import com.mapzen.android.lost.api.LocationServices;
 import com.mapzen.android.lost.api.LostApiClient;
+
 import java.nio.ByteBuffer;
 import java.util.ArrayList;
 import java.util.Arrays;
@@ -1768,7 +1770,7 @@ public final class MapView extends FrameLayout implements LocationListener, Comp
         for (int i = 0; i < mAnnotations.size(); i++) {
             Annotation annotation = mAnnotations.get(i);
             if (annotation instanceof Marker && idsList.contains(annotation.getId())) {
-                annotations.add((Marker)annotation);
+                annotations.add((Marker) annotation);
             }
         }
 
@@ -2097,7 +2099,7 @@ public final class MapView extends FrameLayout implements LocationListener, Comp
                     if (annotation instanceof Marker) {
                         if (annotation.getId() == newSelectedMarkerId) {
                             if (mSelectedMarker == null || annotation.getId() != mSelectedMarker.getId()) {
-                                selectMarker((Marker)annotation);
+                                selectMarker((Marker) annotation);
                             }
                             break;
                         }
@@ -2785,23 +2787,28 @@ public final class MapView extends FrameLayout implements LocationListener, Comp
     //
 
     /**
-     * Gets the status of the my-location layer.
+     * Returns the status of the my-location layer.
      *
      * @return True if the my-location layer is enabled, false otherwise.
      */
-    public final boolean isMyLocationEnabled() {
+    @UiThread
+    public boolean isMyLocationEnabled() {
         return mIsMyLocationEnabled;
     }
 
     /**
      * Enables or disables the my-location layer.
      * While enabled, the my-location layer continuously draws an indication of a user's current
-     * location and bearing, and displays UI controls that allow a user to interact with their
-     * location (for example, to enable or disable camera tracking of their location and bearing).
+     * location.
+     * <p/>
+     * In order to use the my-location-layer feature you need to request permission for either
+     * {@link android.Manifest.permission#ACCESS_COARSE_LOCATION}
+     * or @link android.Manifest.permission#ACCESS_FINE_LOCATION.
      *
      * @param enabled True to enable; false to disable.
      */
-    public final void setMyLocationEnabled(boolean enabled) {
+    @UiThread
+    public void setMyLocationEnabled(boolean enabled) {
         mIsMyLocationEnabled = enabled;
         toggleGps(enabled);
     }
@@ -2811,7 +2818,9 @@ public final class MapView extends FrameLayout implements LocationListener, Comp
      *
      * @return The currently displayed user location.
      */
-    public final Location getMyLocation() {
+    @UiThread
+    @Nullable
+    public Location getMyLocation() {
         return mGpsLocation;
     }
 
@@ -2881,34 +2890,55 @@ public final class MapView extends FrameLayout implements LocationListener, Comp
     //
 
     /**
-     * Gets whether the compass is enabled/disabled.
+     * Returns whether the compass is enabled.
      *
-     * @return true if the compass is enabled; false if the compass is disabled.
+     * @return True if the compass is enabled; false if the compass is disabled.
      */
+    @UiThread
     public boolean isCompassEnabled() {
         return mCompassView.isEnabled();
     }
 
     /**
      * Enables or disables the compass. The compass is an icon on the map that indicates the
-     * direction of north on the map. If enabled, it is only shown when the camera is tilted or
-     * rotated away from its default orientation (tilt of 0 and a bearing of 0). When a user clicks
+     * direction of north on the map. When a user clicks
      * the compass, the camera orients itself to its default orientation and fades away shortly
      * after. If disabled, the compass will never be displayed.
      * <p/>
-     * By default, the compass is enabled
+     * By default, the compass is enabled.
      *
-     * @param compassEnabled true to enable the compass; false to disable the compass.
+     * @param compassEnabled True to enable the compass; false to disable the compass.
      */
+    @UiThread
     public void setCompassEnabled(boolean compassEnabled) {
         mCompassView.setEnabled(compassEnabled);
         onInvalidate();
     }
 
+    /**
+     * Sets the gravity of the compass view. Use this to change the corner of the map view that the
+     * compass is displayed in.
+     * <p/>
+     * By default, the compass is in the top right corner.
+     *
+     * @param gravity One of the values from {@link Gravity}.
+     * @see Gravity
+     */
+    @UiThread
     public void setCompassGravity(int gravity) {
         setWidgetGravity(mCompassView, gravity);
     }
 
+    /**
+     * Sets the margins of the compass view. Use this to change the distance of the compass from the
+     * map view edge.
+     *
+     * @param left   The left margin in pixels.
+     * @param top    The top margin in pixels.
+     * @param right  The right margin in pixels.
+     * @param bottom The bottom margin in pixels.
+     */
+    @UiThread
     public void setCompassMargins(int left, int top, int right, int bottom) {
         setWidgetMargins(mCompassView, left, top, right, bottom);
     }
@@ -2941,26 +2971,88 @@ public final class MapView extends FrameLayout implements LocationListener, Comp
     // Logo
     //
 
+    /**
+     * Sets the gravity of the logo view. Use this to change the corner of the map view that the
+     * Mapbox logo is displayed in.
+     * <p/>
+     * By default, the logo is in the bottom left corner.
+     *
+     * @param gravity One of the values from {@link Gravity}.
+     * @see Gravity
+     */
+    @UiThread
     public void setLogoGravity(int gravity) {
         setWidgetGravity(mLogoView, gravity);
     }
 
+    /**
+     * Sets the margins of the logo view. Use this to change the distance of the Mapbox logo from the
+     * map view edge.
+     *
+     * @param left   The left margin in pixels.
+     * @param top    The top margin in pixels.
+     * @param right  The right margin in pixels.
+     * @param bottom The bottom margin in pixels.
+     */
+    @UiThread
     public void setLogoMargins(int left, int top, int right, int bottom) {
         setWidgetMargins(mLogoView, left, top, right, bottom);
     }
 
+    /**
+     * Enables or disables the Mapbox logo.
+     * <p/>
+     * By default, the compass is enabled.
+     *
+     * @param visibility True to enable the logo; false to disable the logo.
+     */
+    @UiThread
     public void setLogoVisibility(int visibility) {
         mLogoView.setVisibility(visibility);
     }
 
+    //
+    // Attribution
+    //
+
+    /**
+     * Sets the gravity of the attribution button view. Use this to change the corner of the map
+     * view that the attribution button is displayed in.
+     * <p/>
+     * By default, the attribution button is in the bottom left corner.
+     *
+     * @param gravity One of the values from {@link Gravity}.
+     * @see Gravity
+     */
+    @UiThread
     public void setAttributionGravity(int gravity) {
         setWidgetGravity(mAttributionsView, gravity);
     }
 
+    /**
+     * Sets the margins of the attribution button view. Use this to change the distance of the
+     * attribution button from the map view edge.
+     *
+     * @param left   The left margin in pixels.
+     * @param top    The top margin in pixels.
+     * @param right  The right margin in pixels.
+     * @param bottom The bottom margin in pixels.
+     */
+    @UiThread
     public void setAttributionMargins(int left, int top, int right, int bottom) {
         setWidgetMargins(mAttributionsView, left, top, right, bottom);
     }
 
+    /**
+     * Enables or disables the attribution button. The attribution is a button with an "i" than when
+     * clicked shows a menu with copyright and legal notices. The menu also inlcudes the "Improve
+     * this map" link which user can report map errors with.
+     * <p/>
+     * By default, the attribution button is enabled.
+     *
+     * @param visibility True to enable the attribution button; false to disable the attribution button.
+     */
+    @UiThread
     public void setAttributionVisibility(int visibility) {
         mAttributionsView.setVisibility(visibility);
     }
@@ -2982,10 +3074,6 @@ public final class MapView extends FrameLayout implements LocationListener, Comp
         layoutParams.setMargins((int) (leftDp * mScreenDensity), (int) (topDp * mScreenDensity), (int) (rightDp * mScreenDensity), (int) (bottomDp * mScreenDensity));
         view.setLayoutParams(layoutParams);
     }
-
-    //
-    // Attribution
-    //
 
     private static class AttributionOnClickListener implements View.OnClickListener, DialogInterface.OnClickListener {
 
