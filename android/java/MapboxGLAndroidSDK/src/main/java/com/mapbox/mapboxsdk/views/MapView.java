@@ -76,7 +76,7 @@ import java.util.Iterator;
 import java.util.List;
 
 /**
- * A {@link MapView} provides an embeddable map interface, similar to the one provided by the Google Maps API.
+ * A {@code MapView} provides an embeddable map interface, similar to the one provided by the Google Maps API.
  * You use this class to display map information and to manipulate the map contents from your application.
  * You can center the map on a given coordinate, specify the size of the area you want to display,
  * and style the features of the map to fit your application's use case.
@@ -1608,7 +1608,22 @@ public final class MapView extends FrameLayout implements LocationListener, Comp
         mNativeMapView.setSprite(symbol, bitmap.getWidth(), bitmap.getHeight(), scale, buffer.array());
     }
 
-    public Marker addMarker(MarkerOptions markerOptions) {
+    /**
+     * Adds a marker to this map.
+     * <p/>
+     * The marker's icon is rendered on the map at the location {@code Marker.position}.
+     * If {@code Marker.title} is defined, the map shows an info box with the marker's title and snippet.
+     *
+     * @param markerOptions A marker options object that defines how to render the marker.
+     * @return The {@code Marker} that was added to the map.
+     */
+    @UiThread
+    @NonNull
+    public Marker addMarker(@NonNull MarkerOptions markerOptions) {
+        if (markerOptions == null) {
+            throw new NullPointerException("markerOptions is null");
+        }
+
         Marker marker = markerOptions.getMarker();
 
         // Load the default marker sprite
@@ -1629,7 +1644,22 @@ public final class MapView extends FrameLayout implements LocationListener, Comp
         return marker;
     }
 
-    public List<Marker> addMarkers(List<MarkerOptions> markerOptionsList) {
+    /**
+     * Adds multiple markers to this map.
+     * <p/>
+     * The marker's icon is rendered on the map at the location {@code Marker.position}.
+     * If {@code Marker.title} is defined, the map shows an info box with the marker's title and snippet.
+     *
+     * @param markerOptionsList A list of marker options objects that defines how to render the markers.
+     * @return A list of the {@code Marker}s that were added to the map.
+     */
+    @UiThread
+    @NonNull
+    public List<Marker> addMarkers(@NonNull List<MarkerOptions> markerOptionsList) {
+        if (markerOptionsList == null) {
+            throw new NullPointerException("markerOptionsList is null");
+        }
+
         List<Marker> markers = new ArrayList<>(markerOptionsList.size());
         for (MarkerOptions markerOptions : markerOptionsList) {
             Marker marker = markerOptions.getMarker();
@@ -1661,7 +1691,19 @@ public final class MapView extends FrameLayout implements LocationListener, Comp
         return new ArrayList<>(markers);
     }
 
-    public Polyline addPolyline(PolylineOptions polylineOptions) {
+    /**
+     * Adds a polyline to this map.
+     *
+     * @param polylineOptions A polyline options object that defines how to render the polyline.
+     * @return The {@code Polyine} that was added to the map.
+     */
+    @UiThread
+    @NonNull
+    public Polyline addPolyline(@NonNull PolylineOptions polylineOptions) {
+        if (polylineOptions == null) {
+            throw new NullPointerException("polylineOptions is null");
+        }
+
         Polyline polyline = polylineOptions.getPolyline();
         long id = mNativeMapView.addPolyline(polyline);
         polyline.setId(id);
@@ -1670,7 +1712,19 @@ public final class MapView extends FrameLayout implements LocationListener, Comp
         return polyline;
     }
 
-    public List<Polyline> addPolylines(List<PolylineOptions> polylineOptionsList) {
+    /**
+     * Adds multiple polylines to this map.
+     *
+     * @param polylineOptionsList A list of polyline options objects that defines how to render the polylines.
+     * @return A list of the {@code Polyline}s that were added to the map.
+     */
+    @UiThread
+    @NonNull
+    public List<Polyline> addPolylines(@NonNull List<PolylineOptions> polylineOptionsList) {
+        if (polylineOptionsList == null) {
+            throw new NullPointerException("polylineOptionsList is null");
+        }
+
         // TODO make faster in JNI
         List<Polyline> polylines = new ArrayList<>(polylineOptionsList.size());
         for (PolylineOptions polylineOptions : polylineOptionsList) {
@@ -1680,7 +1734,19 @@ public final class MapView extends FrameLayout implements LocationListener, Comp
         return new ArrayList<>(polylines);
     }
 
-    public Polygon addPolygon(PolygonOptions polygonOptions) {
+    /**
+     * Adds a polygon to this map.
+     *
+     * @param polygonOptions A polygon options object that defines how to render the polygon.
+     * @return The {@code Polygon} that was added to the map.
+     */
+    @UiThread
+    @NonNull
+    public Polygon addPolygon(@NonNull PolygonOptions polygonOptions) {
+        if (polygonOptions == null) {
+            throw new NullPointerException("polygonOptions is null");
+        }
+
         Polygon polygon = polygonOptions.getPolygon();
         long id = mNativeMapView.addPolygon(polygon);
         polygon.setId(id);
@@ -1689,7 +1755,20 @@ public final class MapView extends FrameLayout implements LocationListener, Comp
         return polygon;
     }
 
-    public List<Polygon> addPolygons(List<PolygonOptions> polygonOptionsList) {
+
+    /**
+     * Adds multiple polygons to this map.
+     *
+     * @param polygonOptionsList A list of polygon options objects that defines how to render the polygons.
+     * @return A list of the {@code Polygon}s that were added to the map.
+     */
+    @UiThread
+    @NonNull
+    public List<Polygon> addPolygons(@NonNull List<PolygonOptions> polygonOptionsList) {
+        if (polygonOptionsList == null) {
+            throw new NullPointerException("polygonOptionsList is null");
+        }
+
         List<Polygon> polygons = new ArrayList<>(polygonOptionsList.size());
         for (PolygonOptions polygonOptions : polygonOptionsList) {
             polygons.add(polygonOptions.getPolygon());
@@ -1709,19 +1788,17 @@ public final class MapView extends FrameLayout implements LocationListener, Comp
         return new ArrayList<>(polygons);
     }
 
-    private void removeAnnotationsWithId(long annotationId) {
-        for (Iterator<Annotation> iterator = mAnnotations.iterator(); iterator.hasNext(); ) {
-            Annotation annotation = iterator.next();
-            if (annotation instanceof Marker) {
-                ((Marker) annotation).hideInfoWindow();
-            }
-            if (annotation.getId() == annotationId) {
-                iterator.remove();
-            }
+    /**
+     * Removes an annotation from the map.
+     *
+     * @param annotation The annotation object to remove.
+     */
+    @UiThread
+    public void removeAnnotation(@NonNull Annotation annotation) {
+        if (annotation == null) {
+            throw new NullPointerException("annotation is null");
         }
-    }
 
-    public void removeAnnotation(Annotation annotation) {
         if (annotation instanceof Marker) {
             ((Marker) annotation).hideInfoWindow();
         }
@@ -1730,13 +1807,27 @@ public final class MapView extends FrameLayout implements LocationListener, Comp
         mAnnotations.remove(annotation);
     }
 
-    public void removeAnnotations(List<Annotation> annotationList) {
+    /**
+     * Removes multiple annotations from the map.
+     *
+     * @param annotationList A list of annotation objects to remove.
+     */
+    @UiThread
+    public void removeAnnotations(@NonNull List<Annotation> annotationList) {
+        if (annotationList == null) {
+            throw new NullPointerException("annotationList is null");
+        }
+
         // TODO make faster in JNI
         for (Annotation annotation : annotationList) {
             removeAnnotation(annotation);
         }
     }
 
+    /**
+     * Removes all annotations from the map.
+     */
+    @UiThread
     public void removeAllAnnotations() {
         long[] ids = new long[mAnnotations.size()];
 
@@ -1753,11 +1844,22 @@ public final class MapView extends FrameLayout implements LocationListener, Comp
         mAnnotations.clear();
     }
 
+    /**
+     * Returns a list of all the annotations on the map.
+     *
+     * @return A list of all the annotation objects. The returned object is a copy so modifying this
+     * list will not update the map.
+     */
+    @NonNull
     public List<Annotation> getAllAnnotations() {
         return new ArrayList<>(mAnnotations);
     }
 
-    private List<Marker> getMarkersInBounds(BoundingBox bbox) {
+    private List<Marker> getMarkersInBounds(@NonNull BoundingBox bbox) {
+        if (bbox == null) {
+            throw new NullPointerException("bbox is null");
+        }
+
         // TODO: filter in JNI using C++ parameter to getAnnotationsInBounds
         long[] ids = mNativeMapView.getAnnotationsInBounds(bbox);
 
@@ -1791,7 +1893,8 @@ public final class MapView extends FrameLayout implements LocationListener, Comp
      * @param latitude The latitude for which to return the value.
      * @return The distance measured in meters.
      */
-    public double getMetersPerPixelAtLatitude(double latitude) {
+    @UiThread
+    public double getMetersPerPixelAtLatitude(@FloatRange(from = -180, to = 180) double latitude) {
         return mNativeMapView.getMetersPerPixelAtLatitude(latitude, getZoomLevel());
     }
 

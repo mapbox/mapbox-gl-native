@@ -15,7 +15,7 @@ import java.io.IOException;
 import java.io.InputStreamReader;
 
 /**
- * {@link ApiAccess} provides a method to load the Mapbox access token.
+ * {@code ApiAccess} provides a method to load the Mapbox access token.
  */
 public final class ApiAccess {
 
