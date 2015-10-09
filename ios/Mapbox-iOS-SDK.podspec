@@ -28,7 +28,7 @@ Pod::Spec.new do |m|
   m.vendored_library = 'libMapbox.a'
   m.module_name = 'Mapbox'
 
-  m.frameworks = 'CoreLocation', 'CoreTelephony', 'GLKit', 'ImageIO', 'MobileCoreServices', 'QuartzCore', 'SystemConfiguration'
+  m.frameworks = 'CoreLocation', 'GLKit', 'ImageIO', 'MobileCoreServices', 'QuartzCore', 'SystemConfiguration'
   m.libraries = 'c++', 'sqlite3', 'z'
   m.xcconfig = {
     'OTHER_CPLUSPLUSFLAGS' => '-std=gnu++11 -stdlib=libc++',

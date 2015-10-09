@@ -150,7 +150,6 @@ Currently, until [#1437](https://github.com/mapbox/mapbox-gl-native/issues/1437)
 
 1. Add the following Cocoa framework dependencies to your target's *Link Binary With Libraries* build phase:
 
-   - `CoreTelephony.framework`
    - `GLKit.framework`
    - `ImageIO.framework`
    - `MobileCoreServices.framework`
@@ -159,6 +158,7 @@ Currently, until [#1437](https://github.com/mapbox/mapbox-gl-native/issues/1437)
    - `libc++.dylib`
    - `libsqlite3.dylib`
    - `libz.dylib`
+   - `CoreTelephony.framework` (optional, telemetry-only)
 
 1. Add `-ObjC` to your target's "Other Linker Flags" build setting (`OTHER_LDFLAGS`).
 
@@ -167,6 +167,10 @@ Currently, until [#1437](https://github.com/mapbox/mapbox-gl-native/issues/1437)
 Devices: iPhone 4S and above (5, 5c, 5s, 6, 6 Plus), iPad 2 and above (3, 4, Mini, Air, Mini 2, Air 2), iPod touch 5th gen and above
 
 iOS: 7.0+
+
+### Telemetry
+
+The iOS SDK collects [telemetry data](https://www.mapbox.com/telemetry/) during use and [requires additional setup](https://www.mapbox.com/ios-sdk/#metrics_opt_out).
 
 
 ## Linux

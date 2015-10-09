@@ -1,8 +1,6 @@
 #import "MGLMapboxEvents.h"
 
 #import <UIKit/UIKit.h>
-#import <CoreTelephony/CTTelephonyNetworkInfo.h>
-#import <CoreTelephony/CTCarrier.h>
 #import <CoreLocation/CoreLocation.h>
 
 #include <mbgl/platform/darwin/reachability.h>
@@ -77,8 +75,19 @@ const NSTimeInterval MGLFlushInterval = 60;
         } else {
             _scale = [UIScreen mainScreen].scale;
         }
-        CTCarrier *carrierVendor = [[[CTTelephonyNetworkInfo alloc] init] subscriberCellularProvider];
-        _carrier = [carrierVendor carrierName];
+
+        // Collect cellular carrier data if CoreTelephony is linked
+        Class CTTelephonyNetworkInfo = NSClassFromString(@"CTTelephonyNetworkInfo");
+        if (CTTelephonyNetworkInfo) {
+            id telephonyNetworkInfo = [[CTTelephonyNetworkInfo alloc] init];
+
+            SEL subscriberCellularProviderSelector = NSSelectorFromString(@"subscriberCellularProvider");
+            id carrierVendor = ((id (*)(id, SEL))[telephonyNetworkInfo methodForSelector:subscriberCellularProviderSelector])(telephonyNetworkInfo, subscriberCellularProviderSelector);
+
+            SEL carrierNameSelector = NSSelectorFromString(@"carrierName");
+            NSString *carrierName = ((id (*)(id, SEL))[carrierVendor methodForSelector:carrierNameSelector])(carrierVendor, carrierNameSelector);
+            _carrier = carrierName;
+        }
     }
     return self;
 }
@@ -497,14 +506,13 @@ const NSTimeInterval MGLFlushInterval = 60;
         [evt setValue:@((int)(100 * [UIDevice currentDevice].batteryLevel)) forKey:@"batteryLevel"];
         [evt setValue:@(strongSelf.data.scale) forKey:@"resolution"];
         [evt setValue:strongSelf.data.carrier forKey:@"carrier"];
-        
-        NSString *cell = [strongSelf currentCellularNetworkConnectionType];
-        if (cell) {
-            [evt setValue:cell forKey:@"cellularNetworkType"];
-        } else {
-            [evt setObject:[NSNull null] forKey:@"cellularNetworkType"];
+
+        NSString *cell;
+        if (strongSelf.data.carrier) {
+            cell = [strongSelf currentCellularNetworkConnectionType];
         }
-        
+        [evt setObject:(cell ? cell : [NSNull null]) forKey:@"cellularNetworkType"];
+
         MGLReachability *reachability = [MGLReachability reachabilityForLocalWiFi];
         [evt setValue:([reachability isReachableViaWiFi] ? @YES : @NO) forKey:@"wifi"];
         
@@ -716,33 +724,19 @@ const NSTimeInterval MGLFlushInterval = 60;
 // Can be called from any thread.
 //
 - (NSString *) currentCellularNetworkConnectionType {
-    CTTelephonyNetworkInfo *telephonyInfo = [[CTTelephonyNetworkInfo alloc] init];
-    NSString *radioTech = telephonyInfo.currentRadioAccessTechnology;
-    
+    NSString *radioTech;
+
+    Class CTTelephonyNetworkInfo = NSClassFromString(@"CTTelephonyNetworkInfo");
+    if (CTTelephonyNetworkInfo) {
+        id telephonyNetworkInfo = [[CTTelephonyNetworkInfo alloc] init];
+        SEL currentRadioAccessTechnologySelector = NSSelectorFromString(@"currentRadioAccessTechnology");
+        radioTech = ((id (*)(id, SEL))[telephonyNetworkInfo methodForSelector:currentRadioAccessTechnologySelector])(telephonyNetworkInfo, currentRadioAccessTechnologySelector);
+    }
+
     if (radioTech == nil) {
         return nil;
-    } else if ([radioTech isEqualToString:CTRadioAccessTechnologyGPRS]) {
-        return @"GPRS";
-    } else if ([radioTech isEqualToString:CTRadioAccessTechnologyEdge]) {
-        return @"EDGE";
-    } else if ([radioTech isEqualToString:CTRadioAccessTechnologyWCDMA]) {
-        return @"WCDMA";
-    } else if ([radioTech isEqualToString:CTRadioAccessTechnologyHSDPA]) {
-        return @"HSDPA";
-    } else if ([radioTech isEqualToString:CTRadioAccessTechnologyHSUPA]) {
-        return @"HSUPA";
-    } else if ([radioTech isEqualToString:CTRadioAccessTechnologyCDMA1x]) {
-        return @"CDMA1x";
-    } else if ([radioTech isEqualToString:CTRadioAccessTechnologyCDMAEVDORev0]) {
-        return @"CDMAEVDORev0";
-    } else if ([radioTech isEqualToString:CTRadioAccessTechnologyCDMAEVDORevA]) {
-        return @"CDMAEVDORevA";
-    } else if ([radioTech isEqualToString:CTRadioAccessTechnologyCDMAEVDORevB]) {
-        return @"CDMAEVDORevB";
-    } else if ([radioTech isEqualToString:CTRadioAccessTechnologyeHRPD]) {
-        return @"HRPD";
-    } else if ([radioTech isEqualToString:CTRadioAccessTechnologyLTE]) {
-        return @"LTE";
+    } else if ([radioTech hasPrefix:@"CTRadioAccessTechnology"]) {
+        return [radioTech substringFromIndex:23];
     } else {
         return @"Unknown";
     }

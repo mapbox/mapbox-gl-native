@@ -75,7 +75,6 @@
         ],
         'ldflags': [
           '-framework CoreLocation',
-          '-framework CoreTelephony',
           '-framework GLKit',
           '-framework ImageIO',
           '-framework MobileCoreServices',

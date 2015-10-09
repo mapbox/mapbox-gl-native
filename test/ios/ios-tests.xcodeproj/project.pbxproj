@@ -25,7 +25,6 @@
 		DD0E6F9B1B01B68E00DC035A /* OHHTTPStubsResponse+HTTPMessage.m in Sources */ = {isa = PBXBuildFile; fileRef = DD0E6F931B01B68E00DC035A /* OHHTTPStubsResponse+HTTPMessage.m */; };
 		DD0E6F9C1B01B68E00DC035A /* OHHTTPStubsResponse+JSON.m in Sources */ = {isa = PBXBuildFile; fileRef = DD0E6F951B01B68E00DC035A /* OHHTTPStubsResponse+JSON.m */; };
 		DD0E6F9D1B01B68E00DC035A /* OHPathHelpers.m in Sources */ = {isa = PBXBuildFile; fileRef = DD0E6F971B01B68E00DC035A /* OHPathHelpers.m */; };
-		DD41CE091ACB5DBC00FA7979 /* CoreTelephony.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = DD41CE081ACB5DBC00FA7979 /* CoreTelephony.framework */; };
 		DD41CE0B1ACB5DC400FA7979 /* SystemConfiguration.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = DD41CE0A1ACB5DC400FA7979 /* SystemConfiguration.framework */; };
 		DD41CE0D1ACB5DCB00FA7979 /* libc++.dylib in Frameworks */ = {isa = PBXBuildFile; fileRef = DD41CE0C1ACB5DCB00FA7979 /* libc++.dylib */; };
 		DD41CE0F1ACB5DD000FA7979 /* libsqlite3.dylib in Frameworks */ = {isa = PBXBuildFile; fileRef = DD41CE0E1ACB5DD000FA7979 /* libsqlite3.dylib */; };
@@ -145,7 +144,6 @@
 			isa = PBXFrameworksBuildPhase;
 			buildActionMask = 2147483647;
 			files = (
-				DD41CE091ACB5DBC00FA7979 /* CoreTelephony.framework in Frameworks */,
 				DD41CE171ACB5DE700FA7979 /* GLKit.framework in Frameworks */,
 				DD41CE151ACB5DE000FA7979 /* ImageIO.framework in Frameworks */,
 				DD41CE131ACB5DDA00FA7979 /* MobileCoreServices.framework in Frameworks */,
