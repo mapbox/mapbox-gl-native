@@ -22,6 +22,7 @@ import android.net.NetworkInfo;
 import android.net.Uri;
 import android.os.Build;
 import android.os.Bundle;
+import android.support.annotation.CallSuper;
 import android.support.annotation.FloatRange;
 import android.support.annotation.IntRange;
 import android.support.annotation.NonNull;
@@ -89,7 +90,7 @@ import java.util.List;
  *
  * @see MapView#setAccessToken(String)
  */
-public final class MapView extends FrameLayout implements LocationListener, CompassView.CompassDelegate {
+public final class MapView extends FrameLayout {
 
     //
     // Static members
@@ -191,6 +192,7 @@ public final class MapView extends FrameLayout implements LocationListener, Comp
     private LocationRequest mLocationRequest;
     private ImageView mGpsMarker;
     private Location mGpsLocation;
+    private MyLocationListener mLocationListener;
 
     // Used for the compass
     private CompassView mCompassView;
@@ -442,7 +444,7 @@ public final class MapView extends FrameLayout implements LocationListener, Comp
          *
          * @param point The projected map coordinate the user clicked on.
          */
-        void onMapClick(LatLng point);
+        void onMapClick(@NonNull LatLng point);
     }
 
     /**
@@ -456,7 +458,7 @@ public final class MapView extends FrameLayout implements LocationListener, Comp
          *
          * @param point The projected map coordinate the user long clicked on.
          */
-        void onMapLongClick(LatLng point);
+        void onMapLongClick(@NonNull LatLng point);
     }
 
     /**
@@ -471,7 +473,7 @@ public final class MapView extends FrameLayout implements LocationListener, Comp
          * @param marker The marker the user clicked on.
          * @return If true the listener has consumed the event and the {@link InfoWindow} will not be shown.
          */
-        boolean onMarkerClick(Marker marker);
+        boolean onMarkerClick(@NonNull Marker marker);
     }
 
     /**
@@ -486,7 +488,7 @@ public final class MapView extends FrameLayout implements LocationListener, Comp
          *
          * @param change The type of map change event.
          */
-        void onMapChanged(MapChange change);
+        void onMapChanged(@NonNull MapChange change);
     }
 
     /**
@@ -502,7 +504,8 @@ public final class MapView extends FrameLayout implements LocationListener, Comp
          * @return View to be shown as a {@code InfoWindow}. If null is returned the default
          * {@code InfoWindow} will be shown.
          */
-        View getInfoWindow(Marker marker);
+        @NonNull
+        View getInfoWindow(@NonNull Marker marker);
     }
 
     //
@@ -831,7 +834,7 @@ public final class MapView extends FrameLayout implements LocationListener, Comp
         // Add annotation deselection listener
         addOnMapChangedListener(new OnMapChangedListener() {
             @Override
-            public void onMapChanged(MapChange change) {
+            public void onMapChanged(@NonNull MapChange change) {
                 if (change.equals(MapChange.RegionWillChange) ||
                         change.equals(MapChange.RegionWillChangeAnimated)) {
                     deselectMarker();
@@ -1977,7 +1980,8 @@ public final class MapView extends FrameLayout implements LocationListener, Comp
         }
     }
 
-    public void onSizeChanged(int width, int height, int oldw, int oldh) {
+    @Override
+    protected void onSizeChanged(int width, int height, int oldw, int oldh) {
         if (!isInEditMode()) {
             mNativeMapView.resizeView((int) (width / mScreenDensity), (int) (height / mScreenDensity));
         }
@@ -2022,6 +2026,7 @@ public final class MapView extends FrameLayout implements LocationListener, Comp
 
     // Called when view is no longer connected
     @Override
+    @CallSuper
     protected void onDetachedFromWindow() {
         super.onDetachedFromWindow();
         // Required by ZoomButtonController (from Android SDK documentation)
@@ -2049,7 +2054,7 @@ public final class MapView extends FrameLayout implements LocationListener, Comp
 
     // Called when user touches the screen, all positions are absolute
     @Override
-    public boolean onTouchEvent(@NonNull MotionEvent event) {
+    public boolean onTouchEvent(MotionEvent event) {
         // Check and ignore non touch or left clicks
 
         if ((event.getButtonState() != 0) && (event.getButtonState() != MotionEvent.BUTTON_PRIMARY)) {
@@ -2450,7 +2455,7 @@ public final class MapView extends FrameLayout implements LocationListener, Comp
     // Called when the user presses a key, also called for repeating keys held
     // down
     @Override
-    public boolean onKeyDown(int keyCode, @NonNull KeyEvent event) {
+    public boolean onKeyDown(int keyCode, KeyEvent event) {
         // If the user has held the scroll key down for a while then accelerate
         // the scroll speed
         double scrollDist = event.getRepeatCount() >= 5 ? 50.0 : 10.0;
@@ -2699,7 +2704,7 @@ public final class MapView extends FrameLayout implements LocationListener, Comp
     // Called when the mouse pointer enters or exits the view
     // or when it fades in or out due to movement
     @Override
-    public boolean onHoverEvent(@NonNull MotionEvent event) {
+    public boolean onHoverEvent(MotionEvent event) {
         switch (event.getActionMasked()) {
             case MotionEvent.ACTION_HOVER_ENTER:
             case MotionEvent.ACTION_HOVER_MOVE:
@@ -2726,7 +2731,7 @@ public final class MapView extends FrameLayout implements LocationListener, Comp
     //
 
     // This class handles connectivity changes
-    class ConnectivityReceiver extends BroadcastReceiver {
+    private class ConnectivityReceiver extends BroadcastReceiver {
 
         // Called when an action we are listening to in the manifest has been sent
         @Override
@@ -2938,13 +2943,15 @@ public final class MapView extends FrameLayout implements LocationListener, Comp
                 mGpsLocation = null;
                 mLocationClient.connect();
                 updateLocation(LocationServices.FusedLocationApi.getLastLocation());
-                LocationServices.FusedLocationApi.requestLocationUpdates(mLocationRequest, this);
-                mCompassView.registerListeners(this);
+                mLocationListener = new MyLocationListener();
+                LocationServices.FusedLocationApi.requestLocationUpdates(mLocationRequest, mLocationListener);
+                mCompassView.registerListeners(new CompassDelegate());
             }
         } else {
             if (mLocationClient.isConnected()) {
                 mCompassView.unRegisterListeners();
-                LocationServices.FusedLocationApi.removeLocationUpdates(this);
+                LocationServices.FusedLocationApi.removeLocationUpdates(mLocationListener);
+                mLocationListener = null;
                 mLocationClient.disconnect();
                 mGpsLocation = null;
             }
@@ -2953,10 +2960,11 @@ public final class MapView extends FrameLayout implements LocationListener, Comp
         onInvalidate();
     }
 
-    // LOST's LocationListener callback
-    @Override
-    public void onLocationChanged(Location location) {
-        updateLocation(location);
+    private class MyLocationListener implements LocationListener {
+        @Override
+        public void onLocationChanged(Location location) {
+            updateLocation(location);
+        }
     }
 
     // Handles location updates from GPS
@@ -3065,9 +3073,11 @@ public final class MapView extends FrameLayout implements LocationListener, Comp
         }
     }
 
-    @Override
-    public Location getLocation() {
-        return mGpsLocation;
+    private class CompassDelegate implements CompassView.CompassDelegate {
+        @Override
+        public Location getLocation() {
+            return mGpsLocation;
+        }
     }
 
     //

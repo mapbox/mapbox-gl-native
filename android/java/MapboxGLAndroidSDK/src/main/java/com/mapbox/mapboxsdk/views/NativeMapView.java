@@ -401,10 +401,6 @@ final class NativeMapView {
         nativeSetReachability(mNativeMapViewPtr, status);
     }
 
-    //public void                            ();
-
-    //public void getWorldBoundsLatLng();
-
     public double getMetersPerPixelAtLatitude(double lat, double zoom) {
         return nativeGetMetersPerPixelAtLatitude(mNativeMapViewPtr, lat, zoom);
     }
@@ -599,10 +595,6 @@ final class NativeMapView {
     private native boolean nativeIsFullyLoaded(long nativeMapViewPtr);
 
     private native void nativeSetReachability(long nativeMapViewPtr, boolean status);
-
-    //private native void nativeGetWorldBoundsMeters(long nativeMapViewPtr);
-
-    //private native void nativeGetWorldBoundsLatLng(long nativeMapViewPtr);
 
     private native double nativeGetMetersPerPixelAtLatitude(long nativeMapViewPtr, double lat, double zoom);
 
