@@ -20,6 +20,8 @@ public:
                  std::function<void ()> callback);
     ~LiveTileData();
 
+    bool reparse(std::function<void ()> callback) override;
+
     void cancel() override;
     Bucket* getBucket(const StyleLayer&) override;
 
@@ -27,6 +29,8 @@ private:
     Worker& worker;
     TileWorker tileWorker;
     std::unique_ptr<WorkRequest> workRequest;
+    bool parsing = false;
+    const LiveTile* tile;
 };
 
 }

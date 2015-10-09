@@ -11,7 +11,7 @@
 #include <condition_variable>
 
 #include <mbgl/map/mode.hpp>
-#include <mbgl/map/annotation.hpp>
+#include <mbgl/annotation/annotation_manager.hpp>
 #include <mbgl/util/exclusive.hpp>
 
 namespace mbgl {
@@ -127,9 +127,9 @@ private:
 
 // TODO: make private
 public:
+    bool paused = false;
     std::mutex mutexPause;
-    std::condition_variable condPaused;
-    std::condition_variable condResume;
+    std::condition_variable condPause;
 };
 
 }

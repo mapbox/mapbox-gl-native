@@ -30,7 +30,7 @@ public:
      * @param {number} tx texture normal
      * @param {number} ty texture normal
      */
-    size_t add(vertex_type x, vertex_type y, float ex, float ey, int8_t tx, int8_t ty, int32_t linesofar = 0);
+    GLsizei add(vertex_type x, vertex_type y, float ex, float ey, int8_t tx, int8_t ty, int32_t linesofar = 0);
 };
 
 

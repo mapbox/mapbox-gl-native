@@ -92,22 +92,22 @@ The `kind` is an enum and defined in [`mbgl.Resource`](https://github.com/mapbox
 
 It has no significance for anything but serves as a hint to your implemention as to what sort of resource to expect. E.g., your implementation could choose caching strategies based on the expected file type.
 
-THe `request` implementation should pass uncompressed data to `req.respond`. If you are downloading assets from a source that applies gzip transport encoding, the implementation must decompress the results before passing them on.
+The `request` implementation should pass uncompressed data to `callback`. If you are downloading assets from a source that applies gzip transport encoding, the implementation must decompress the results before passing them on.
 
 A sample implementation that reads files from disk would look like the following:
 
 ```js
 var map = new mbgl.Map({
-    request: function(req) {
+    request: function(req, callback) {
         fs.readFile(path.join('base/path', req.url), function(err, data) {
-            req.respond(err, { data: data });
+            callback(err, { data: data });
         });
     },
     ratio: 1.0
 });
 ```
 
-This is a very barebones implementation and you'll probably want a better implementation. E.g. it passes the url verbatim to the file system, but you'd want add some logic that normalizes `http` URLs. You'll notice that once your implementation has obtained the requested file, you have to deliver it to the requestee by calling `req.respond()`, which takes either an error object or `null` and an object with several settings:
+This is a very barebones implementation and you'll probably want a better implementation. E.g. it passes the url verbatim to the file system, but you'd want add some logic that normalizes `http` URLs. You'll notice that once your implementation has obtained the requested file, you have to deliver it to the requestee by calling `callback()`, which takes either an error object or `null` and an object with several settings:
 
 ```js
 {
@@ -125,14 +125,14 @@ var mbgl = require('mapbox-gl-native');
 var request = require('request');
 
 var map = new mbgl.Map({
-    request: function(req) {
+    request: function(req, callback) {
         request({
             url: req.url,
             encoding: null,
             gzip: true
         }, function (err, res, body) {
             if (err) {
-                req.respond(err);
+                callback(err);
             } else if (res.statusCode == 200) {
                 var response = {};
 
@@ -142,9 +142,9 @@ var map = new mbgl.Map({
                 
                 response.data = body;
                 
-                req.respond(null, response);
+                callback(null, response);
             } else {
-                req.respond(new Error(JSON.parse(body).message));
+                callback(new Error(JSON.parse(body).message));
             }
         });
     },
@@ -164,7 +164,7 @@ var request = require('request');
 var url = require('url');
 
 var map = new mbgl.Map({
-    request: function(req) {
+    request: function(req, callback) {
         var opts = {
             url: req.url,
             encoding: null,
@@ -177,7 +177,7 @@ var map = new mbgl.Map({
 
         request(opts, function (err, res, body) {
             if (err) {
-                req.respond(err);
+                callback(err);
             } else if (res.statusCode == 200) {
                 var response = {};
 
@@ -187,9 +187,9 @@ var map = new mbgl.Map({
             
                 response.data = body;
             
-                req.respond(null, response);
+                callback(null, response);
             } else {
-                req.respond(new Error(JSON.parse(body).message));
+                callback(new Error(JSON.parse(body).message));
             }
         });
     },

@@ -1,6 +1,6 @@
 # Install
 
-This document describes the process for setting up Mapbox GL for development _on the framework itself_. 
+This document describes the process for setting up Mapbox GL for development _on the framework itself_.
 
 # Depends
 
@@ -29,7 +29,7 @@ Be sure to pull down all submodules first:
 
 ## OS X
 
-This process gives you either a native OS X windowed app or a Linux desktop app with a map view for development purposes, built on an OS X host system. 
+This process gives you either a native OS X windowed app or a Linux desktop app with a map view for development purposes, built on an OS X host system.
 
 ### Build
 
@@ -65,9 +65,9 @@ OS X 10.9+
 
 ## iOS (Test App)
 
-This process gives you a native iOS app for simulator or device which compiles the source to GL within it for fastest turnaround time during development. Normal, production use of the library is via a precompiled binary linked into the app target. 
+This process gives you a native iOS app for simulator or device which compiles the source to GL within it for fastest turnaround time during development. Normal, production use of the library is via a precompiled binary linked into the app target.
 
-Developing for iOS implies an OS X host system. 
+Developing for iOS implies an OS X host system.
 
 ### Build
 
@@ -85,13 +85,13 @@ You can run `make itest` to run the included integration tests. Requires `gem in
 - Double-tap to zoom in one level
 - Two-finger single-tap to zoom out one level
 - Double-tap, long-pressing the second, then pan up and down to "quick zoom" (iPhone only, meant for one-handed use)
-- Use the debug menu to add test annotations, reset position, and toggle debug info. 
+- Use the debug menu to add test annotations, reset position, and toggle debug info.
 
 ## iOS (Your App)
 
-**If you want a production version of this project, use [Mapbox Mobile](http://mapbox.com/mobile).** 
+**If you want a production version of this project, use [Mapbox Mobile](http://mapbox.com/mobile).**
 
-This section is for people contributing to Mapbox GL directly in the context of their own app. 
+This section is for people contributing to Mapbox GL directly in the context of their own app.
 
 ### Build
 
@@ -103,44 +103,44 @@ This section is for people contributing to Mapbox GL directly in the context of 
    cp appledoc /usr/local/bin
    cp -Rf Templates/ ~/.appledoc
    ```
-     
+
 1. Run `make ipackage`. The packaging script will produce the statically-linked `libMapbox.a`, `Mapbox.bundle` for resources, a `Headers` folder, and a `Docs` folder with HTML API documentation.
 
 ### Test
 
-In the context of your own app, you can now either: 
+In the context of your own app, you can now either:
 
 #### CocoaPods
 
-Currently, until [#1437](https://github.com/mapbox/mapbox-gl-native/issues/1437) is completed, to install a _development version_ of Mapbox GL using CocoaPods you will need to build it from source manually per above. 
+Currently, until [#1437](https://github.com/mapbox/mapbox-gl-native/issues/1437) is completed, to install a _development version_ of Mapbox GL using CocoaPods you will need to build it from source manually per above.
 
-1. Zip up the build product. 
+1. Zip up the build product.
 
     cd build/ios/pkg/static
     ZIP=mapbox-ios-sdk.zip
     rm -f ../${ZIP}
     zip -r ../${ZIP} *
 
-1. Modify a custom `Mapbox-iOS-SDK.podspec` to download this zip file. 
+1. Modify a custom `Mapbox-iOS-SDK.podspec` to download this zip file.
 
     {...}
-    
+
     m.source = {
         :http => "http://{...}/mapbox-ios-sdk.zip",
         :flatten => true
     }
-    
+
     {...}
 
-1. Update your app's `Podfile` to point to the `Mapbox-iOS-SDK.podspec`. 
+1. Update your app's `Podfile` to point to the `Mapbox-iOS-SDK.podspec`.
 
     pod 'Mapbox-iOS-SDK', :podspec => 'http://{...}/Mapbox-iOS-SDK.podspec'
 
-1. Run `pod update` to grab the newly-built library. 
+1. Run `pod update` to grab the newly-built library.
 
 #### Binary
 
-1. Built from source manually per above. 
+1. Built from source manually per above.
 
 1. Copy the contents of `build/ios/pkg/static` into your project. It should happen automatically, but ensure that:
 
@@ -173,7 +173,7 @@ iOS: 7.0+
 
 We are using Ubuntu for development. While the software should work on other distributions as well, we are not providing explicit build instructions here.
 
-This process gives you a Linux desktop app built on a Linux host system. 
+This process gives you a Linux desktop app built on a Linux host system.
 
 ### Build
 
@@ -239,19 +239,19 @@ Install Oracle JDK 7 (requires license agreement) from http://www.oracle.com/tec
 
     export JAVA_HOME="/dir/to/jdk1.7.0_71"
 
-Install the [Android NDK Revision 10e](https://developer.android.com/tools/sdk/ndk/index.html).
-
-    export ANDROID_NDK_PATH="/dir/to/android-ndk-r10e"
-
 Install the Android SDK. We recommend doing this by way of [Android Studio](https://developer.android.com/sdk/installing/studio.html).
 
     export ANDROID_HOME="/dir/to/android-sdk-linux"
+
+In the Android SDK Manager also select and install "Android Support Repository" and "Android Support Library" from "Extras":
+
+![image](https://cloud.githubusercontent.com/assets/98601/9915837/289f398e-5c6e-11e5-9a84-ed4d08d52d1f.png)
 
 Run:
 
     make android
 
-You can then open `android/java` in Android Studio via "Import Non-Android Studio Project". 
+You can then open `android/java` in Android Studio via "Import project (Eclipse ADT, Gradle, etc.)".
 
 ### Build (OS X Host)
 
@@ -259,16 +259,18 @@ Install Oracle JDK 7+:
 
     brew cask install java
 
-Install the [Android NDK Revision 10e](https://developer.android.com/tools/sdk/ndk/index.html) for 64-bit OS X:
+Install the Android SDK:
 
-    brew install android-ndk
+    brew install android-sdk
 
-This will also install the dependency `android-sdk`.
-
-Install [Android Studio](https://developer.android.com/sdk/installing/studio.html):
+Install Android Studio:
 
     brew cask install android-studio
     android
+
+In the Android SDK Manager also select and install "Android Support Repository" and "Android Support Library" from "Extras":
+
+![image](https://cloud.githubusercontent.com/assets/98601/9915837/289f398e-5c6e-11e5-9a84-ed4d08d52d1f.png)
 
 By default, the SDK will be installed to `/usr/local/opt/android-sdk`. If you open Android Studio at this point, you may get an error message telling you that it can't find a JVM, it's because you installed a custom Java VM from Oracle. Follow [these instructions](http://tools.android.com/recent/androidstudio1rc3_releasecandidate3released) to start Android Studio. You'll wind up setting these environment variables in your .bash_profile or similar:
 
@@ -283,7 +285,7 @@ Run:
     make android
     open -a Android\ Studio
 
-You can then open `android/java` in Android Studio via "import project (Eclipse ADT, Gradle, etc.)".
+You can then open `android/java` in Android Studio via "Import project (Eclipse ADT, Gradle, etc.)".
 
 ### Setting up Android emulator
 
@@ -291,7 +293,7 @@ If you want to run the test app in the emulator, we recommend the x86 build beca
 
 First ensure you have an `MAPBOX_ACCESS_TOKEN` environment variable set, as described below. Then, create an x86 build:
 
-    ANDROID_ABI=x86 make android
+    make android-lib-x86
 
 In Android Studio, create an x86 AVD (Android Virtual Device):
 
@@ -317,7 +319,7 @@ If your device does not show up,  you have not set it up properly. Double check 
 
 ### Distribution
 
-Use the `Makefile` target `make apackage` in order to build JNI libraries for all supported ABI's for eventual distribution of the whole package. 
+Use the `Makefile` target `make apackage` in order to build JNI libraries for all supported ABI's for eventual distribution of the whole package.
 
 ### Target
 

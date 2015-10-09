@@ -14,7 +14,6 @@ using namespace mbgl;
 
 TileWorker::TileWorker(TileID id_,
                        std::string sourceID_,
-                       const uint16_t maxZoom_,
                        Style& style_,
                        std::vector<util::ptr<StyleLayer>> layers_,
                        const std::atomic<TileData::State>& state_,
@@ -22,7 +21,6 @@ TileWorker::TileWorker(TileID id_,
     : layers(std::move(layers_)),
       id(id_),
       sourceID(sourceID_),
-      maxZoom(maxZoom_),
       style(style_),
       state(state_),
       collisionTile(std::move(collision_)) {
@@ -120,7 +118,7 @@ void TileWorker::parseLayer(const StyleLayer& layer, const GeometryTile& geometr
     // Skip this bucket if we are to not render this
     if (styleBucket.source != sourceID)
         return;
-    if (id.z < std::floor(styleBucket.min_zoom) && std::floor(styleBucket.min_zoom) < maxZoom)
+    if (id.z < std::floor(styleBucket.min_zoom))
         return;
     if (id.z >= std::ceil(styleBucket.max_zoom))
         return;
@@ -186,17 +184,14 @@ void TileWorker::addBucketGeometries(Bucket& bucket, const GeometryTileLayer& la
 
 std::unique_ptr<Bucket> TileWorker::createFillBucket(const GeometryTileLayer& layer,
                                                      const StyleBucket& bucket_desc) {
-    auto bucket = std::make_unique<FillBucket>(fillVertexBuffer,
-                                                triangleElementsBuffer,
-                                                lineElementsBuffer);
+    auto bucket = std::make_unique<FillBucket>();
     addBucketGeometries(bucket, layer, bucket_desc.filter);
     return bucket->hasData() ? std::move(bucket) : nullptr;
 }
 
 std::unique_ptr<Bucket> TileWorker::createLineBucket(const GeometryTileLayer& layer,
                                                      const StyleBucket& bucket_desc) {
-    auto bucket = std::make_unique<LineBucket>(lineVertexBuffer,
-                                                triangleElementsBuffer);
+    auto bucket = std::make_unique<LineBucket>();
 
     const float z = id.z;
     auto& layout = bucket->layout;
@@ -212,8 +207,7 @@ std::unique_ptr<Bucket> TileWorker::createLineBucket(const GeometryTileLayer& la
 
 std::unique_ptr<Bucket> TileWorker::createCircleBucket(const GeometryTileLayer& layer,
                                                        const StyleBucket& bucket_desc) {
-    auto bucket = std::make_unique<CircleBucket>(circleVertexBuffer,
-                                                 triangleElementsBuffer);
+    auto bucket = std::make_unique<CircleBucket>();
 
     // Circle does not have layout properties to apply.
 

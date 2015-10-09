@@ -18,7 +18,7 @@ public:
     ~VertexArrayObject();
 
     template <typename Shader, typename VertexBuffer>
-    inline void bind(Shader& shader, VertexBuffer &vertexBuffer, char *offset) {
+    inline void bind(Shader& shader, VertexBuffer &vertexBuffer, GLbyte *offset) {
         bindVertexArrayObject();
         if (bound_shader == 0) {
             vertexBuffer.bind();
@@ -32,7 +32,7 @@ public:
     }
 
     template <typename Shader, typename VertexBuffer, typename ElementsBuffer>
-    inline void bind(Shader& shader, VertexBuffer &vertexBuffer, ElementsBuffer &elementsBuffer, char *offset) {
+    inline void bind(Shader& shader, VertexBuffer &vertexBuffer, ElementsBuffer &elementsBuffer, GLbyte *offset) {
         bindVertexArrayObject();
         if (bound_shader == 0) {
             vertexBuffer.bind();
@@ -52,8 +52,8 @@ public:
 
 private:
     void bindVertexArrayObject();
-    void storeBinding(Shader &shader, GLuint vertexBuffer, GLuint elementsBuffer, char *offset);
-    void verifyBinding(Shader &shader, GLuint vertexBuffer, GLuint elementsBuffer, char *offset);
+    void storeBinding(Shader &shader, GLuint vertexBuffer, GLuint elementsBuffer, GLbyte *offset);
+    void verifyBinding(Shader &shader, GLuint vertexBuffer, GLuint elementsBuffer, GLbyte *offset);
 
     GLuint vao = 0;
 
@@ -63,7 +63,7 @@ private:
     const char *bound_shader_name = "";
     GLuint bound_vertex_buffer = 0;
     GLuint bound_elements_buffer = 0;
-    char *bound_offset = 0;
+    GLbyte *bound_offset = 0;
 };
 
 }

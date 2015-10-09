@@ -46,7 +46,7 @@
                    270,
                    @"setting direction should take effect");
 
-    [tester waitForTimeInterval:1];
+    [tester waitForTimeInterval:2];
 
     XCTAssertEqual(tester.compass.alpha,
                    1,
@@ -66,7 +66,7 @@
 
     [tester.compass tap];
 
-    [tester waitForTimeInterval:1];
+    [tester waitForTimeInterval:2];
 
     XCTAssertEqual(tester.mapView.direction,
                    0,
@@ -89,7 +89,7 @@
 
     [tester.mapView resetNorth];
 
-    [tester waitForTimeInterval:1];
+    [tester waitForTimeInterval:2];
 
     XCTAssertEqual(tester.mapView.direction,
                    0,
@@ -218,6 +218,33 @@
     XCTAssertLessThan(tester.mapView.centerCoordinate.longitude,
                       centerCoordinate.longitude,
                       @"panning map right should decrease center longitude");
+}
+
+- (void)testSetCenterCancelsTransitions {
+    XCTestExpectation *cameraIsInDCExpectation = [self expectationWithDescription:@"camera reset to DC"];
+    
+    CLLocationCoordinate2D dc = CLLocationCoordinate2DMake(38.894368, -77.036487);
+    CLLocationCoordinate2D dc_west = CLLocationCoordinate2DMake(38.894368, -77.076487);
+    [tester.mapView setCenterCoordinate:dc animated:NO];
+    [tester.mapView setCenterCoordinate:dc_west animated:YES];
+    dispatch_after(dispatch_time(DISPATCH_TIME_NOW, 0.15 * NSEC_PER_SEC),
+                   dispatch_get_main_queue(),
+                   ^{
+                       [tester.mapView setCenterCoordinate:dc animated:NO];
+                       XCTAssertEqualWithAccuracy(dc.latitude,
+                                                  tester.mapView.centerCoordinate.latitude,
+                                                  0.0005,
+                                                  @"setting center coordinate should cancel transitions");
+                       XCTAssertEqualWithAccuracy(dc.longitude,
+                                                  tester.mapView.centerCoordinate.longitude,
+                                                  0.0005,
+                                                  @"setting center coordinate should cancel transitions");
+                       [cameraIsInDCExpectation fulfill];
+                   });
+    
+    [self waitForExpectationsWithTimeout:1.0 handler:^(NSError *error) {
+        ;
+    }];
 }
 
 - (void)testPanDisabled {

@@ -118,6 +118,57 @@ std::string normalizeTileURL(const std::string& url, const std::string& sourceUR
     return normalizedURL;
 }
 
+
+std::string removeAccessTokenFromURL(const std::string &url) {
+    const size_t token_start = url.find("access_token=");
+    // Ensure that token exists, isn't at the front and is preceded by either & or ?.
+    if (token_start == std::string::npos || token_start == 0 || !(url[token_start - 1] == '&' || url[token_start - 1] == '?')) {
+        return url;
+    }
+
+    const size_t token_end = url.find_first_of('&', token_start);
+    if (token_end == std::string::npos) {
+        // The token is the last query argument. We slice away the "&access_token=..." part
+        return url.substr(0, token_start - 1);
+    } else {
+        // We slice away the "access_token=...&" part.
+        return url.substr(0, token_start) + url.substr(token_end + 1);
+    }
 }
+
+namespace {
+
+std::string convertMapboxDomainsToProtocol(const std::string &url) {
+    const size_t protocol_separator = url.find("://");
+    if (protocol_separator == std::string::npos) {
+        return url;
+    }
+
+    const std::string protocol = url.substr(0, protocol_separator);
+    if (!(protocol == "http" || protocol == "https")) {
+        return url;
+    }
+
+    const size_t domain_begin = protocol_separator + 3;
+    const size_t path_separator = url.find("/", domain_begin);
+    if (path_separator == std::string::npos) {
+        return url;
+    }
+
+    const std::string domain = url.substr(domain_begin, path_separator - domain_begin);
+    if (domain == "api.mapbox.com" || domain.find(".tiles.mapbox.com") != std::string::npos) {
+        return std::string{ "mapbox://" } + url.substr(path_separator + 1);
+    } else {
+        return url;
+    }
 }
+
+} // end namespace
+
+std::string canonicalURL(const std::string &url) {
+    return removeAccessTokenFromURL(convertMapboxDomainsToProtocol(url));
 }
+
+} // end namespace mapbox
+} // end namespace util
+} // end namespace mbgl

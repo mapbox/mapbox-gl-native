@@ -28,6 +28,18 @@
 
 #pragma mark - Setup
 
++ (void)initialize
+{
+    if (self == [MBXBenchViewController class])
+    {
+        [[NSUserDefaults standardUserDefaults] registerDefaults:@{
+            @"MBXUserTrackingMode": @(MGLUserTrackingModeNone),
+            @"MBXShowsUserLocation": @NO,
+            @"MBXDebug": @NO,
+        }];
+    }
+}
+
 - (void)viewDidLoad
 {
     [super viewDidLoad];

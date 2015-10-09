@@ -47,7 +47,10 @@ TEST_F(Storage, HTTPError) {
         EXPECT_GT(1.7, duration) << "Resource wasn't retried the correct number of times";
         EXPECT_EQ(Response::Error, res.status);
 #ifdef MBGL_HTTP_NSURL
-        EXPECT_STREQ(res.message.c_str(), "The operation couldn’t be completed. (NSURLErrorDomain error -1004.)");
+        EXPECT_TRUE(res.message ==
+                        "The operation couldn’t be completed. (NSURLErrorDomain error -1004.)" ||
+                    res.message == "Could not connect to the server.")
+            << "Full message is: \"" << res.message << "\"";
 #elif MBGL_HTTP_CURL
         const std::string prefix { "Couldn't connect to server: " };
         EXPECT_STREQ(prefix.c_str(), res.message.substr(0, prefix.size()).c_str()) << "Full message is: \"" << res.message << "\"";

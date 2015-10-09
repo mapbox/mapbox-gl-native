@@ -1,13 +1,3 @@
-buildscript {
-    repositories {
-        mavenCentral()
-    }
-    dependencies {
-        classpath 'com.android.tools.build:gradle:1.3.0'
-        classpath 'com.jakewharton.sdkmanager:gradle-plugin:0.12.0'
-    }
-}
-
 apply plugin: 'android-sdk-manager'
 apply plugin: 'com.android.library'
 apply plugin: 'checkstyle'
@@ -42,6 +32,10 @@ android {
     defaultConfig {
         minSdkVersion Integer.parseInt(project.ANDROID_MIN_SDK)
         targetSdkVersion Integer.parseInt(project.ANDROID_BUILD_TARGET_SDK_VERSION)
+    }
+
+    sourceSets {
+        main.res.srcDirs += 'src/main/res-public'
     }
 
     repositories {
@@ -85,9 +79,14 @@ android.libraryVariants.all { variant ->
         destinationDir = new File(destinationDir, variant.baseName)
         source = files(variant.javaCompile.source)
         classpath = files(variant.javaCompile.classpath.files) + files(android.bootClasspath)
+        options.windowTitle("Mapbox Android SDK")
+        options.docTitle("Mapbox Android SDK")
+        options.header("<b>Mapbox Android SDK</b>")
+        options.bottom("&copy; 2015 Mapbox. All rights reserved.")
         options.links("http://docs.oracle.com/javase/7/docs/api/")
+        // TODO this will fail as package-list file not online, need to use offline
         options.links("http://d.android.com/reference/")
-        exclude '**/R.html', '**/R.*.html'
+        // TODO exclude generated R, BuildConfig, com.almeros.*
     }
 }
 

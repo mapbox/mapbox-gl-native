@@ -3,15 +3,14 @@
 set -u
 
 LIST=(
-    "DIN%20Offc%20Pro%20Regular%2c%20Arial%20Unicode%20MS%20Regular/0-255.pbf"
-    "DIN%20Offc%20Pro%20Medium%2c%20Arial%20Unicode%20MS%20Bold/0-255.pbf"
-    "DIN%20Offc%20Pro%20Medium%2c%20Arial%20Unicode%20MS%20Regular/0-255.pbf"
-    "DIN%20Offc%20Pro%20Medium%2c%20Arial%20Unicode%20MS%20Regular/8192-8447.pbf"
-    "DIN%20Offc%20Pro%20Bold%2c%20Arial%20Unicode%20MS%20Regular/0-255.pbf"
-    "DIN%20Offc%20Pro%20Regular%2c%20Arial%20Unicode%20MS%20Regular/256-511.pbf"
-    "DIN%20Offc%20Pro%20Regular%2c%20Arial%20Unicode%20MS%20Regular/8192-8447.pbf"
-    "DIN%20Offc%20Pro%20Italic%2c%20Arial%20Unicode%20MS%20Regular/0-255.pbf"
-    "DIN%20Offc%20Pro%20Medium%2c%20Arial%20Unicode%20MS%20Regular/256-511.pbf"
+    "DIN%20Offc%20Pro%20Regular%2cArial%20Unicode%20MS%20Regular/0-255.pbf"
+    "DIN%20Offc%20Pro%20Medium%2cArial%20Unicode%20MS%20Regular/0-255.pbf"
+    "DIN%20Offc%20Pro%20Bold%2cArial%20Unicode%20MS%20Bold/0-255.pbf"
+    "DIN%20Offc%20Pro%20Regular%2cArial%20Unicode%20MS%20Regular/256-511.pbf"
+    "DIN%20Offc%20Pro%20Regular%2cArial%20Unicode%20MS%20Regular/8192-8447.pbf"
+    "DIN%20Offc%20Pro%20Medium%2cArial%20Unicode%20MS%20Regular/8192-8447.pbf"
+    "DIN%20Offc%20Pro%20Italic%2cArial%20Unicode%20MS%20Regular/0-255.pbf"
+
 )
 
 # from https://gist.github.com/cdown/1163649

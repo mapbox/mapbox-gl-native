@@ -22,7 +22,6 @@ VectorTileData::VectorTileData(const TileID& id_,
       worker(style_.workers),
       tileWorker(id_,
                  source_.source_id,
-                 source_.max_zoom,
                  style_,
                  style_.layers,
                  state,
@@ -43,6 +42,12 @@ void VectorTileData::request(float pixelRatio, const std::function<void()>& call
     FileSource* fs = util::ThreadContext::getFileSource();
     req = fs->request({ Resource::Kind::Tile, url }, util::RunLoop::getLoop(), [url, callback, this](const Response &res) {
         req = nullptr;
+
+        if (res.status == Response::NotFound) {
+            state = State::parsed;
+            callback();
+            return;
+        }
 
         if (res.status != Response::Successful) {
             std::stringstream message;

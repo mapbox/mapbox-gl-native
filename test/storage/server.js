@@ -73,6 +73,9 @@ app.get('/revalidate-etag', function(req, res) {
     revalidateEtagCounter++;
 });
 
+app.get('/permanent-error', function(req, res) {
+    res.status(500).end();
+});
 
 var temporaryErrorCounter = 0;
 app.get('/temporary-error', function(req, res) {

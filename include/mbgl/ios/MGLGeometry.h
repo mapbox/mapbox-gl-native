@@ -3,6 +3,7 @@
 #import "MGLTypes.h"
 
 #import <CoreLocation/CoreLocation.h>
+#import <CoreGraphics/CGBase.h>
 
 NS_ASSUME_NONNULL_BEGIN
 
@@ -80,6 +81,18 @@ NS_INLINE NSString *MGLStringFromCoordinateBounds(MGLCoordinateBounds bounds) {
     return [NSString stringWithFormat:@"{{%.1f, %.1f}, {%.1f, %.1f}}",
             bounds.sw.latitude, bounds.sw.longitude,
             bounds.ne.latitude, bounds.ne.longitude];
+}
+
+/** Returns radians, converted from degrees. */
+NS_INLINE CGFloat MGLRadiansFromDegrees(CLLocationDegrees degrees)
+{
+    return (CGFloat)(degrees * M_PI) / 180;
+}
+
+/** Returns degrees, converted from radians. */
+NS_INLINE CLLocationDegrees MGLDegreesFromRadians(CGFloat radians)
+{
+    return radians * 180 / M_PI;
 }
 
 NS_ASSUME_NONNULL_END

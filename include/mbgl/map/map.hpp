@@ -2,7 +2,6 @@
 #define MBGL_MAP_MAP
 
 #include <mbgl/util/chrono.hpp>
-#include <mbgl/map/camera.hpp>
 #include <mbgl/map/update.hpp>
 #include <mbgl/map/mode.hpp>
 #include <mbgl/util/geo.hpp>
@@ -26,6 +25,7 @@ class SpriteImage;
 class Transform;
 class PointAnnotation;
 class ShapeAnnotation;
+struct CameraOptions;
 
 namespace util {
 template <class T> class Thread;
@@ -58,6 +58,7 @@ public:
 
     // Pauses the render thread. The render thread will stop running but will not be terminated and will not lose state until resumed.
     void pause();
+    bool isPaused();
 
     // Resumes a paused render thread
     void resume();
@@ -188,7 +189,6 @@ private:
     };
 
     RenderState renderState = RenderState::never;
-    bool paused = false;
 };
 
 }

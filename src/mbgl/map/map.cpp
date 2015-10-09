@@ -1,5 +1,6 @@
 #include <mbgl/map/map.hpp>
 #include <mbgl/map/map_context.hpp>
+#include <mbgl/map/camera.hpp>
 #include <mbgl/map/view.hpp>
 #include <mbgl/map/transform.hpp>
 #include <mbgl/map/transform_state.hpp>
@@ -31,17 +32,21 @@ Map::~Map() {
 void Map::pause() {
     assert(data->mode == MapMode::Continuous);
 
-    if (!paused) {
-        std::unique_lock<std::mutex> lockPause(data->mutexPause);
+    std::unique_lock<std::mutex> lockPause(data->mutexPause);
+    if (!data->paused) {
         context->invoke(&MapContext::pause);
-        data->condPaused.wait(lockPause);
-        paused = true;
+        data->condPause.wait(lockPause, [&]{ return data->paused; });
     }
 }
 
+bool Map::isPaused() {
+    return data->paused;
+}
+
 void Map::resume() {
-    data->condResume.notify_all();
-    paused = false;
+    std::unique_lock<std::mutex> lockPause(data->mutexPause);
+    data->paused = false;
+    data->condPause.notify_all();
 }
 
 void Map::renderStill(StillImageCallback callback) {
@@ -344,8 +349,8 @@ uint32_t Map::addPointAnnotation(const PointAnnotation& annotation) {
 
 AnnotationIDs Map::addPointAnnotations(const std::vector<PointAnnotation>& annotations) {
     auto result = data->getAnnotationManager()->addPointAnnotations(annotations, getMaxZoom());
-    context->invoke(&MapContext::updateAnnotationTiles, result.first);
-    return result.second;
+    update(Update::Annotations);
+    return result;
 }
 
 uint32_t Map::addShapeAnnotation(const ShapeAnnotation& annotation) {
@@ -354,8 +359,8 @@ uint32_t Map::addShapeAnnotation(const ShapeAnnotation& annotation) {
 
 AnnotationIDs Map::addShapeAnnotations(const std::vector<ShapeAnnotation>& annotations) {
     auto result = data->getAnnotationManager()->addShapeAnnotations(annotations, getMaxZoom());
-    context->invoke(&MapContext::updateAnnotationTiles, result.first);
-    return result.second;
+    update(Update::Annotations);
+    return result;
 }
 
 void Map::removeAnnotation(uint32_t annotation) {
@@ -363,8 +368,8 @@ void Map::removeAnnotation(uint32_t annotation) {
 }
 
 void Map::removeAnnotations(const std::vector<uint32_t>& annotations) {
-    auto result = data->getAnnotationManager()->removeAnnotations(annotations, getMaxZoom());
-    context->invoke(&MapContext::updateAnnotationTiles, result);
+    data->getAnnotationManager()->removeAnnotations(annotations, getMaxZoom());
+    update(Update::Annotations);
 }
 
 std::vector<uint32_t> Map::getAnnotationsInBounds(const LatLngBounds& bounds, const AnnotationType& type) {

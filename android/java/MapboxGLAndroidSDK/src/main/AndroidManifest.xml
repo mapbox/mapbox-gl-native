@@ -1,5 +1,5 @@
 <manifest xmlns:android="http://schemas.android.com/apk/res/android"
-    package="com.mapbox.mapboxgl.views">
+    package="com.mapbox.mapboxsdk">
 
     <uses-feature android:glEsVersion="0x00020000" android:required="true" />
 

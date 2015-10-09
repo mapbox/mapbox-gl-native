@@ -32,6 +32,7 @@
             dispatch_after(dispatch_time(DISPATCH_TIME_NOW, 0.1 * NSEC_PER_SEC), dispatch_get_main_queue(), ^{
                 #pragma clang diagnostic push
                 #pragma clang diagnostic ignored "-Wdeprecated-declarations"
+                #pragma clang diagnostic ignored "-Wnonnull"
                 [self.delegate locationManager:self didUpdateToLocation:self.location fromLocation:nil];
                 #pragma clang diagnostic pop
             });

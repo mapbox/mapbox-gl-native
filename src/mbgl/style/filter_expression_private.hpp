@@ -1,4 +1,5 @@
-#include <mbgl/util/optional.hpp>
+#include <mapbox/optional.hpp>
+
 #include <mbgl/style/value_comparison.hpp>
 
 namespace mbgl {

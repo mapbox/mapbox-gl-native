@@ -23,11 +23,11 @@ void DebugBucket::render(Painter& painter, const StyleLayer&, const TileID&, con
 }
 
 void DebugBucket::drawLines(PlainShader& shader) {
-    array.bind(shader, fontBuffer, BUFFER_OFFSET(0));
+    array.bind(shader, fontBuffer, BUFFER_OFFSET_0);
     MBGL_CHECK_ERROR(glDrawArrays(GL_LINES, 0, (GLsizei)(fontBuffer.index())));
 }
 
 void DebugBucket::drawPoints(PlainShader& shader) {
-    array.bind(shader, fontBuffer, BUFFER_OFFSET(0));
+    array.bind(shader, fontBuffer, BUFFER_OFFSET_0);
     MBGL_CHECK_ERROR(glDrawArrays(GL_POINTS, 0, (GLsizei)(fontBuffer.index())));
 }

@@ -172,6 +172,7 @@ void StyleLayer::applyTransitionedStyleProperty(PropertyKey key, T &target, cons
                 // We overwrite the current property partially with the new value.
                 float progress = std::chrono::duration<float>(now - property.begin) / (property.end - property.begin);
                 target = util::interpolate(target, mapbox::util::apply_visitor(evaluator, property.value), progress);
+                hasPendingTransitions = true;
             } else {
                 // Do not apply this property because its transition hasn't begun yet.
             }
@@ -280,6 +281,9 @@ void StyleLayer::applyStyleProperties<BackgroundProperties>(const float z, const
 void StyleLayer::updateProperties(float z, const TimePoint& now, ZoomHistory &zoomHistory) {
     cleanupAppliedStyleProperties(now);
 
+    // Clear the pending transitions flag upon each update.
+    hasPendingTransitions = false;
+
     switch (type) {
         case StyleLayerType::Fill: applyStyleProperties<FillProperties>(z, now, zoomHistory); break;
         case StyleLayerType::Line: applyStyleProperties<LineProperties>(z, now, zoomHistory); break;
@@ -317,7 +321,7 @@ bool StyleLayer::hasTransitions() const {
             return true;
         }
     }
-    return false;
+    return hasPendingTransitions;
 }
 
 void StyleLayer::cleanupAppliedStyleProperties(const TimePoint& now) {

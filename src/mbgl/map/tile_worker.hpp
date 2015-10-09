@@ -1,12 +1,9 @@
 #ifndef MBGL_MAP_TILE_WORKER
 #define MBGL_MAP_TILE_WORKER
 
-#include <mbgl/util/variant.hpp>
+#include <mapbox/variant.hpp>
+
 #include <mbgl/map/tile_data.hpp>
-#include <mbgl/geometry/elements_buffer.hpp>
-#include <mbgl/geometry/fill_buffer.hpp>
-#include <mbgl/geometry/line_buffer.hpp>
-#include <mbgl/geometry/circle_buffer.hpp>
 #include <mbgl/util/noncopyable.hpp>
 #include <mbgl/util/ptr.hpp>
 #include <mbgl/style/filter_expression.hpp>
@@ -34,7 +31,6 @@ class TileWorker : public util::noncopyable {
 public:
     TileWorker(TileID,
                std::string sourceID,
-               uint16_t maxZoom,
                Style&,
                std::vector<util::ptr<StyleLayer>>,
                const std::atomic<TileData::State>&,
@@ -61,19 +57,11 @@ private:
 
     const TileID id;
     const std::string sourceID;
-    const uint16_t maxZoom;
 
     Style& style;
     const std::atomic<TileData::State>& state;
 
     bool partialParse = false;
-
-    FillVertexBuffer fillVertexBuffer;
-    LineVertexBuffer lineVertexBuffer;
-    CircleVertexBuffer circleVertexBuffer;
-
-    TriangleElementsBuffer triangleElementsBuffer;
-    LineElementsBuffer lineElementsBuffer;
 
     std::unique_ptr<CollisionTile> collisionTile;
 

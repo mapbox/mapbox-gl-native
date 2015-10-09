@@ -5,12 +5,7 @@
 
 using namespace mbgl;
 
-CircleBucket::CircleBucket(CircleVertexBuffer& vertexBuffer,
-                           TriangleElementsBuffer& elementsBuffer)
-    : vertexBuffer_(vertexBuffer)
-    , elementsBuffer_(elementsBuffer)
-    , vertexStart_(vertexBuffer_.index())
-    , elementsStart_(elementsBuffer_.index()) {
+CircleBucket::CircleBucket() {
 }
 
 CircleBucket::~CircleBucket() {
@@ -35,10 +30,14 @@ bool CircleBucket::hasData() const {
 }
 
 void CircleBucket::addGeometry(const GeometryCollection& geometryCollection) {
+    const int extent = 4096;
     for (auto& circle : geometryCollection) {
         for(auto & geometry : circle) {
             auto x = geometry.x;
             auto y = geometry.y;
+
+            // Do not include points that are outside the tile boundaries.
+            if (x < 0 || x >= extent || y < 0 || y >= extent) continue;
 
             // this geometry will be of the Point type, and we'll derive
             // two triangles from it.
@@ -74,8 +73,8 @@ void CircleBucket::addGeometry(const GeometryCollection& geometryCollection) {
 }
 
 void CircleBucket::drawCircles(CircleShader& shader) {
-    char* vertexIndex = BUFFER_OFFSET(vertexStart_ * vertexBuffer_.itemSize);
-    char* elementsIndex = BUFFER_OFFSET(elementsStart_ * elementsBuffer_.itemSize);
+    GLbyte* vertexIndex = BUFFER_OFFSET(0);
+    GLbyte* elementsIndex = BUFFER_OFFSET(0);
 
     for (auto& group : triangleGroups_) {
         assert(group);
