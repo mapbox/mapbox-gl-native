@@ -10,6 +10,7 @@ import android.view.MenuItem;
 import android.view.View;
 
 import com.mapbox.mapboxsdk.MapFragment;
+import com.mapbox.mapboxsdk.constants.Style;
 import com.mapbox.mapboxsdk.geometry.LatLng;
 import com.mapbox.mapboxsdk.views.MapView;
 
@@ -48,7 +49,7 @@ public class MapFragmentActivity extends AppCompatActivity {
             super.onViewCreated(view, savedInstanceState);
 
             MapView mapView = getMap();
-            mapView.setStyleUrl(MapView.StyleUrls.EMERALD);
+            mapView.setStyleUrl(Style.EMERALD);
             mapView.setZoomLevel(12);
             mapView.setCenterCoordinate(new LatLng(50.853658, 4.352419));
 

@@ -28,6 +28,7 @@ import com.mapbox.mapboxsdk.annotations.Marker;
 import com.mapbox.mapboxsdk.annotations.MarkerOptions;
 import com.mapbox.mapboxsdk.annotations.PolygonOptions;
 import com.mapbox.mapboxsdk.annotations.PolylineOptions;
+import com.mapbox.mapboxsdk.constants.Style;
 import com.mapbox.mapboxsdk.geometry.LatLng;
 import com.mapbox.mapboxsdk.utils.ApiAccess;
 import com.mapbox.mapboxsdk.views.MapView;
@@ -159,6 +160,7 @@ public class MainActivity extends AppCompatActivity {
             mIsAnnotationsOn = savedInstanceState.getBoolean(STATE_IS_ANNOTATIONS_ON);
             mSelectedStyle = savedInstanceState.getInt(STATE_SELECTED_STYLE);
         }
+
 
         // Set default UI state
         mNavigationView.getMenu().findItem(R.id.action_compass).setChecked(mMapView.isCompassEnabled());
@@ -325,27 +327,27 @@ public class MainActivity extends AppCompatActivity {
     private boolean changeMapStyle(int id) {
         switch (id) {
             case R.id.actionStyleMapboxStreets:
-                mMapView.setStyleUrl(MapView.StyleUrls.MAPBOX_STREETS);
+                mMapView.setStyle(Style.MAPBOX_STREETS);
                 mSelectedStyle = id;
                 return true;
 
             case R.id.actionStyleEmerald:
-                mMapView.setStyleUrl(MapView.StyleUrls.EMERALD);
+                mMapView.setStyle(Style.EMERALD);
                 mSelectedStyle = id;
                 return true;
 
             case R.id.actionStyleLight:
-                mMapView.setStyleUrl(MapView.StyleUrls.LIGHT);
+                mMapView.setStyle(Style.LIGHT);
                 mSelectedStyle = id;
                 return true;
 
             case R.id.actionStyleDark:
-                mMapView.setStyleUrl(MapView.StyleUrls.DARK);
+                mMapView.setStyle(Style.DARK);
                 mSelectedStyle = id;
                 return true;
 
             case R.id.actionStyleSatellite:
-                mMapView.setStyleUrl(MapView.StyleUrls.SATELLITE);
+                mMapView.setStyle(Style.SATELLITE);
                 mSelectedStyle = id;
                 return true;
 

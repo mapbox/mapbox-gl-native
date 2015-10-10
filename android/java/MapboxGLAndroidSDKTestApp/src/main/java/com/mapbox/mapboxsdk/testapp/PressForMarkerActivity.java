@@ -11,6 +11,7 @@ import android.view.MotionEvent;
 import android.view.View;
 import com.mapbox.mapboxsdk.annotations.Marker;
 import com.mapbox.mapboxsdk.annotations.MarkerOptions;
+import com.mapbox.mapboxsdk.constants.Style;
 import com.mapbox.mapboxsdk.geometry.LatLng;
 import com.mapbox.mapboxsdk.utils.ApiAccess;
 import com.mapbox.mapboxsdk.views.MapView;
@@ -40,7 +41,7 @@ public class PressForMarkerActivity extends AppCompatActivity {
 
         mMapView = (MapView) findViewById(R.id.pressForMarkerMapView);
         mMapView.setAccessToken(ApiAccess.getToken(this));
-        mMapView.setStyleUrl(MapView.StyleUrls.EMERALD);
+        mMapView.setStyleUrl(Style.EMERALD);
         mMapView.onCreate(savedInstanceState);
 
         mMapView.setCenterCoordinate(new LatLng(45.1855569, 5.7215506));

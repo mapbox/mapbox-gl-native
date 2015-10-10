@@ -61,6 +61,7 @@ import com.mapbox.mapboxsdk.annotations.Polygon;
 import com.mapbox.mapboxsdk.annotations.PolygonOptions;
 import com.mapbox.mapboxsdk.annotations.Polyline;
 import com.mapbox.mapboxsdk.annotations.PolylineOptions;
+import com.mapbox.mapboxsdk.constants.Style;
 import com.mapbox.mapboxsdk.exceptions.InvalidAccessTokenException;
 import com.mapbox.mapboxsdk.geometry.BoundingBox;
 import com.mapbox.mapboxsdk.geometry.LatLng;
@@ -242,41 +243,6 @@ public final class MapView extends FrameLayout {
     //
     // Inner classes
     //
-
-    // These provide easy access to the bundled styles
-
-    /**
-     * StyleUrls provides URLs to several professional styles designed by Mapbox.
-     * <p/>
-     * These styles are all ready to go in your app. To load one, pass it into {@link MapView#setStyleUrl(String)}
-     *
-     * @see MapView#setStyleUrl(String)
-     */
-    public static final class StyleUrls {
-        private StyleUrls() {
-        }
-
-        /**
-         * Mapbox Streets: Our signature style.
-         */
-        public static final String MAPBOX_STREETS = "asset://styles/streets-v8.json";
-        /**
-         * Emerald: Great for transportation and outdoor terrain.
-         */
-        public static final String EMERALD = "asset://styles/emerald-v8.json";
-        /**
-         * Light: Light-colored style that is great for data overlay.
-         */
-        public static final String LIGHT = "asset://styles/light-v8.json";
-        /**
-         * Dark: Dark-colored style that is great for data overlay.
-         */
-        public static final String DARK = "asset://styles/dark-v8.json";
-        /**
-         * Satellite: The best-looking, most accurate, and most up-to-date satellite imagery available anywhere.
-         */
-        public static final String SATELLITE = "asset://styles/satellite-v8.json";
-    }
 
     //
     // Enums
@@ -1335,7 +1301,7 @@ public final class MapView extends FrameLayout {
      * <p/>
      * {@code url} can take the following forms:
      * <ul>
-     * <li>{@code MapView.StyleUrls.*}: load one of the bundled styles in {@link MapView.StyleUrls}.</li>
+     * <li>{@code MapView.StyleUrls.*}: load one of the bundled styles in {@link Style}.</li>
      * <li>{@code mapbox://styles/<user>/<style>}:
      * retrieves the style from a <a href="https://www.mapbox.com/account/">Mapbox account.</a>
      * {@code user} is your username. {@code style} is the ID of your custom
@@ -1345,7 +1311,7 @@ public final class MapView extends FrameLayout {
      * <li>{@code asset://...}:
      * reads the style from the APK {@code asset/} directory.
      * This is used to load a style bundled with your app.</li>
-     * <li>{@code null}: loads the default {@link MapView.StyleUrls#MAPBOX_STREETS} style.</li>
+     * <li>{@code null}: loads the default {@link Style#MAPBOX_STREETS} style.</li>
      * </ul>
      * <p/>
      * This method is asynchronous and will return immediately before the style finishes loading.
@@ -1355,15 +1321,21 @@ public final class MapView extends FrameLayout {
      * An error message will be logged in the Android logcat and {@link MapView.MapChange#DidFailLoadingMap} event will be sent.
      *
      * @param url The URL of the map style
-     * @see MapView.StyleUrls
+     * @see Style
      */
     @UiThread
     public void setStyleUrl(@Nullable String url) {
         if (url == null) {
-            url = StyleUrls.MAPBOX_STREETS;
+            url = Style.MAPBOX_STREETS;
         }
         mStyleUrl = url;
         mNativeMapView.setStyleUrl(url);
+    }
+
+    @UiThread
+    @NonNull
+    public void setStyle(@Style.StyleUrl String style){
+        setStyleUrl(style);
     }
 
     /**
