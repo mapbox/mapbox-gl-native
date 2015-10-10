@@ -54,6 +54,7 @@ import com.almeros.android.multitouch.gesturedetectors.RotateGestureDetector;
 import com.almeros.android.multitouch.gesturedetectors.TwoFingerGestureDetector;
 import com.mapbox.mapboxsdk.R;
 import com.mapbox.mapboxsdk.annotations.Annotation;
+import com.mapbox.mapboxsdk.annotations.InfoWindow;
 import com.mapbox.mapboxsdk.annotations.Marker;
 import com.mapbox.mapboxsdk.annotations.MarkerOptions;
 import com.mapbox.mapboxsdk.annotations.Polygon;
@@ -1882,8 +1883,13 @@ public final class MapView extends FrameLayout {
         return new ArrayList<>(annotations);
     }
 
-    // Used by InfoWindow
-    double getTopOffsetPixelsForAnnotationSymbol(@NonNull String symbolName) {
+    /**
+     * Get Top Offset for the annotation symbol.
+     * Used by InfoWindow
+     * @param symbolName Annotation Symbol
+     * @return Top Offset in pixels
+     */
+    public double getTopOffsetPixelsForAnnotationSymbol(@NonNull String symbolName) {
         return mNativeMapView.getTopOffsetPixelsForAnnotationSymbol(symbolName);
     }
 
@@ -1901,8 +1907,11 @@ public final class MapView extends FrameLayout {
         return mNativeMapView.getMetersPerPixelAtLatitude(latitude, getZoomLevel());
     }
 
-    // Used by InfoWindow
-    float getScreenDensity() {
+    /**
+     * Get ScreenDensity of device
+     * @return Screen Density ratio
+     */
+    public float getScreenDensity() {
         return mScreenDensity;
     }
 

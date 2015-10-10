@@ -6,8 +6,6 @@ import android.text.TextUtils;
 import android.view.View;
 import com.mapbox.mapboxsdk.R;
 import com.mapbox.mapboxsdk.geometry.LatLng;
-import com.mapbox.mapboxsdk.views.InfoWindow;
-import com.mapbox.mapboxsdk.views.MapView;
 
 public class Marker extends Annotation {
 
