@@ -24,6 +24,7 @@ import android.os.Build;
 import android.os.Bundle;
 import android.support.annotation.CallSuper;
 import android.support.annotation.FloatRange;
+import android.support.annotation.IntDef;
 import android.support.annotation.IntRange;
 import android.support.annotation.NonNull;
 import android.support.annotation.Nullable;
@@ -72,6 +73,8 @@ import com.mapzen.android.lost.api.LocationRequest;
 import com.mapzen.android.lost.api.LocationServices;
 import com.mapzen.android.lost.api.LostApiClient;
 
+import java.lang.annotation.Retention;
+import java.lang.annotation.RetentionPolicy;
 import java.nio.ByteBuffer;
 import java.util.ArrayList;
 import java.util.Arrays;
@@ -251,112 +254,106 @@ public final class MapView extends FrameLayout {
     /**
      * Map change event types.
      *
-     * @see MapView.OnMapChangedListener#onMapChanged(MapChange)
+     * @see MapView.OnMapChangedListener#onMapChanged(int)
      */
-    public enum MapChange {
-        /**
-         * This event is triggered whenever the currently displayed map region is about to changing
-         * without an animation.
-         * <p/>
-         * This event is followed by a series of {@link MapView.MapChange#RegionIsChanging} and ends
-         * with {@link MapView.MapChange#RegionDidChange}.
-         */
-        RegionWillChange,
-        /**
-         * This event is triggered whenever the currently displayed map region is about to changing
-         * with an animation.
-         * <p/>
-         * This event is followed by a series of {@link MapView.MapChange#RegionIsChanging} and ends
-         * with {@link MapView.MapChange#RegionDidChangeAnimated}.
-         */
-        RegionWillChangeAnimated,
-        /**
-         * This event is triggered whenever the currently displayed map region is changing.
-         */
-        RegionIsChanging,
-        /**
-         * This event is triggered whenever the currently displayed map region finished changing
-         * without an animation.
-         */
-        RegionDidChange,
-        /**
-         * This event is triggered whenever the currently displayed map region finished changing
-         * with an animation.
-         */
-        RegionDidChangeAnimated,
-        /**
-         * Currently not implemented.
-         */
-        WillStartLoadingMap,
-        /**
-         * Currently not implemented.
-         */
-        DidFinishLoadingMap,
-        /**
-         * Currently not implemented.
-         */
-        DidFailLoadingMap,
-        /**
-         * Currently not implemented.
-         */
-        WillStartRenderingFrame,
-        /**
-         * Currently not implemented.
-         */
-        DidFinishRenderingFrame,
-        /**
-         * Currently not implemented.
-         */
-        DidFinishRenderingFrameFullyRendered,
-        /**
-         * Currently not implemented.
-         */
-        WillStartRenderingMap,
-        /**
-         * Currently not implemented.
-         */
-        DidFinishRenderingMap,
-        /**
-         * Currently not implemented.
-         */
-        DidFinishRenderingMapFullyRendered;
-
-        // Converts the C++ values from include/mpbgl/map/view.hpp MapChange to Java enum values
-        private static MapChange fromInteger(int value) {
-            switch (value) {
-                case 0:
-                    return MapChange.RegionWillChange;
-                case 1:
-                    return MapChange.RegionWillChangeAnimated;
-                case 2:
-                    return MapChange.RegionIsChanging;
-                case 3:
-                    return MapChange.RegionDidChange;
-                case 4:
-                    return MapChange.RegionDidChangeAnimated;
-                case 5:
-                    return MapChange.WillStartLoadingMap;
-                case 6:
-                    return MapChange.DidFinishLoadingMap;
-                case 7:
-                    return MapChange.DidFailLoadingMap;
-                case 8:
-                    return MapChange.WillStartRenderingFrame;
-                case 9:
-                    return MapChange.DidFinishRenderingFrame;
-                case 10:
-                    return MapChange.DidFinishRenderingFrameFullyRendered;
-                case 11:
-                    return MapChange.WillStartRenderingMap;
-                case 12:
-                    return MapChange.DidFinishRenderingMap;
-                case 13:
-                    return MapChange.DidFinishRenderingMapFullyRendered;
-                default:
-                    return null;
-            }
-        }
+    @IntDef({REGION_WILL_CHANGE,
+            REGION_WILL_CHANGE_ANIMATED,
+            REGION_IS_CHANGING,
+            REGION_DID_CHANGE,
+            REGION_DID_CHANGE_ANIMATED,
+            WILL_START_LOADING_MAP,
+            DID_FINISH_LOADING_MAP,
+            DID_FAIL_LOADING_MAP,
+            WILL_START_RENDERING_FRAME,
+            DID_FINISH_RENDERING_FRAME,
+            DID_FINISH_RENDERING_FRAME_FULLY_RENDERED,
+            WILL_START_RENDERING_MAP,
+            DID_FINISH_RENDERING_MAP,
+            DID_FINISH_RENDERING_MAP_FULLY_RENDERED
+    })
+    @Retention(RetentionPolicy.SOURCE)
+    public @interface MapChange {
     }
+
+    /**
+     * This event is triggered whenever the currently displayed map region is about to changing
+     * without an animation.
+     * <p/>
+     * This event is followed by a series of {@link MapView#REGION_IS_CHANGING} and ends
+     * with {@link MapView#REGION_DID_CHANGE}.
+     */
+    public static final int REGION_WILL_CHANGE = 0;
+
+    /**
+     * This event is triggered whenever the currently displayed map region is about to changing
+     * with an animation.
+     * <p/>
+     * This event is followed by a series of {@link MapView#REGION_IS_CHANGING} and ends
+     * with {@link MapView#REGION_DID_CHANGE_ANIMATED}.
+     */
+    public static final int REGION_WILL_CHANGE_ANIMATED = 1;
+
+    /**
+     * This event is triggered whenever the currently displayed map region is changing.
+     */
+    public static final int REGION_IS_CHANGING = 2;
+
+    /**
+     * This event is triggered whenever the currently displayed map region finished changing
+     * without an animation.
+     */
+    public static final int REGION_DID_CHANGE = 3;
+
+    /**
+     * This event is triggered whenever the currently displayed map region finished changing
+     * with an animation.
+     */
+    public static final int REGION_DID_CHANGE_ANIMATED = 4;
+
+    /**
+     * Currently not implemented.
+     */
+    public static final int WILL_START_LOADING_MAP = 5;
+
+    /**
+     * Currently not implemented.
+     */
+    public static final int DID_FINISH_LOADING_MAP = 6;
+
+    /**
+     * Currently not implemented.
+     */
+    public static final int DID_FAIL_LOADING_MAP = 7;
+
+    /**
+     * Currently not implemented.
+     */
+    public static final int WILL_START_RENDERING_FRAME = 8;
+
+    /**
+     * Currently not implemented.
+     */
+    public static final int DID_FINISH_RENDERING_FRAME = 9;
+
+    /**
+     * Currently not implemented.
+     */
+    public static final int DID_FINISH_RENDERING_FRAME_FULLY_RENDERED = 10;
+
+    /**
+     * Currently not implemented.
+     */
+    public static final int WILL_START_RENDERING_MAP = 11;
+
+    /**
+     * Currently not implemented.
+     */
+    public static final int DID_FINISH_RENDERING_MAP = 12;
+
+    /**
+     * Currently not implemented.
+     */
+    public static final int DID_FINISH_RENDERING_MAP_FULLY_RENDERED = 13;
 
     //
     // Interfaces
@@ -455,7 +452,7 @@ public final class MapView extends FrameLayout {
          *
          * @param change The type of map change event.
          */
-        void onMapChanged(@NonNull MapChange change);
+        void onMapChanged(@MapChange int change);
     }
 
     /**
@@ -801,9 +798,8 @@ public final class MapView extends FrameLayout {
         // Add annotation deselection listener
         addOnMapChangedListener(new OnMapChangedListener() {
             @Override
-            public void onMapChanged(@NonNull MapChange change) {
-                if (change.equals(MapChange.RegionWillChange) ||
-                        change.equals(MapChange.RegionWillChangeAnimated)) {
+            public void onMapChanged(@MapChange int change) {
+                if (change == REGION_WILL_CHANGE || change == REGION_WILL_CHANGE_ANIMATED) {
                     deselectMarker();
                 }
             }
@@ -1315,10 +1311,10 @@ public final class MapView extends FrameLayout {
      * </ul>
      * <p/>
      * This method is asynchronous and will return immediately before the style finishes loading.
-     * If you wish to wait for the map to finish loading listen for the {@link MapView.MapChange#DidFinishLoadingMap} event.
+     * If you wish to wait for the map to finish loading listen for the {@link MapView#DID_FINISH_LOADING_MAP} event.
      * <p/>
      * If the style fails to load or an invalid style URL is set, the map view will become blank.
-     * An error message will be logged in the Android logcat and {@link MapView.MapChange#DidFailLoadingMap} event will be sent.
+     * An error message will be logged in the Android logcat and {@link MapView#DID_FAIL_LOADING_MAP} event will be sent.
      *
      * @param url The URL of the map style
      * @see Style
@@ -2765,13 +2761,14 @@ public final class MapView extends FrameLayout {
     // Called via JNI from NativeMapView
     // Forward to any listeners
     protected void onMapChanged(int rawChange) {
-        final MapChange change = MapChange.fromInteger(rawChange);
+        final int mapChange = rawChange;
         if (mOnMapChangedListener != null) {
             post(new Runnable() {
                 @Override
                 public void run() {
                     for (OnMapChangedListener listener : mOnMapChangedListener) {
-                        listener.onMapChanged(change);
+                        //noinspection ResourceType
+                        listener.onMapChanged(mapChange);
                     }
                 }
             });
