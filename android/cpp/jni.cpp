@@ -456,6 +456,13 @@ void JNICALL nativePause(JNIEnv *env, jobject obj, jlong nativeMapViewPtr) {
     nativeMapView->pause();
 }
 
+jboolean JNICALL nativeIsPaused(JNIEnv *env, jobject obj, jlong nativeMapViewPtr) {
+    mbgl::Log::Debug(mbgl::Event::JNI, "nativeIsPaused");
+    assert(nativeMapViewPtr != 0);
+    NativeMapView *nativeMapView = reinterpret_cast<NativeMapView *>(nativeMapViewPtr);
+    return nativeMapView->getMap().isPaused();
+}
+
 void JNICALL nativeResume(JNIEnv *env, jobject obj, jlong nativeMapViewPtr) {
     mbgl::Log::Debug(mbgl::Event::JNI, "nativeResume");
     assert(nativeMapViewPtr != 0);
@@ -1690,6 +1697,7 @@ extern "C" JNIEXPORT jint JNICALL JNI_OnLoad(JavaVM *vm, void *reserved) {
          reinterpret_cast<void *>(&nativeCreateSurface)},
         {"nativeDestroySurface", "(J)V", reinterpret_cast<void *>(&nativeDestroySurface)},
         {"nativePause", "(J)V", reinterpret_cast<void *>(&nativePause)},
+        {"nativeIsPaused", "(J)Z", reinterpret_cast<void *>(&nativeIsPaused)},
         {"nativeResume", "(J)V", reinterpret_cast<void *>(&nativeResume)},
         {"nativeUpdate", "(J)V", reinterpret_cast<void *>(&nativeUpdate)},
         {"nativeRenderSync", "(J)V", reinterpret_cast<void *>(&nativeRenderSync)},

@@ -74,6 +74,10 @@ void Map::renderSync() {
     } else if (renderState != RenderState::fully) {
         renderState = RenderState::fully;
         view.notifyMapChange(MapChangeDidFinishRenderingMapFullyRendered);
+        if (data->loading) {
+            data->loading = false;
+            view.notifyMapChange(MapChangeDidFinishLoadingMap);
+        }
     }
 
     // Triggers an asynchronous update, that eventually triggers a view
@@ -93,10 +97,12 @@ void Map::update(Update flags) {
 #pragma mark - Style
 
 void Map::setStyleURL(const std::string &url) {
+    view.notifyMapChange(MapChangeWillStartLoadingMap);
     context->invoke(&MapContext::setStyleURL, url);
 }
 
 void Map::setStyleJSON(const std::string& json, const std::string& base) {
+    view.notifyMapChange(MapChangeWillStartLoadingMap);
     context->invoke(&MapContext::setStyleJSON, json, base);
 }
 

@@ -92,10 +92,6 @@ void MapContext::triggerUpdate(const TransformState& state, const Update flags) 
 }
 
 void MapContext::setStyleURL(const std::string& url) {
-    if (styleURL == url) {
-        return;
-    }
-
     FileSource* fs = util::ThreadContext::getFileSource();
 
     if (styleRequest) {
@@ -120,15 +116,12 @@ void MapContext::setStyleURL(const std::string& url) {
             loadStyleJSON(res.data, base);
         } else {
             Log::Error(Event::Setup, "loading style failed: %s", res.message.c_str());
+            data.loading = false;
         }
     });
 }
 
 void MapContext::setStyleJSON(const std::string& json, const std::string& base) {
-    if (styleJSON == json) {
-        return;
-    }
-
     styleURL.clear();
     styleJSON = json;
 
@@ -145,6 +138,10 @@ void MapContext::loadStyleJSON(const std::string& json, const std::string& base)
 
     // force style cascade, causing all pending transitions to complete.
     style->cascade();
+
+    // set loading here so we don't get a false loaded event as soon as map is
+    // created but before a style is loaded
+    data.loading = true;
 
     updateFlags |= Update::DefaultTransition | Update::Classes | Update::Zoom | Update::Annotations;
     asyncUpdate->send();

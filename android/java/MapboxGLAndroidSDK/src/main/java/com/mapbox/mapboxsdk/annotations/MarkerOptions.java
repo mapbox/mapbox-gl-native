@@ -66,6 +66,10 @@ public class MarkerOptions extends AnnotationOptions {
         return ((Marker)annotation).getTitle();
     }
 
+    public String getSprite() {
+        return ((Marker)annotation).getSprite();
+    }
+
     public MarkerOptions infoWindowAnchor(float u, float v) {
         ((Marker)annotation).setInfoWindowAnchor(u, v);
         return this;
@@ -84,7 +88,7 @@ public class MarkerOptions extends AnnotationOptions {
     }
 
     public MarkerOptions position(LatLng position) {
-        ((Marker)annotation).position = position;
+        ((Marker)annotation).setPosition(position);
         return this;
     }
 
@@ -100,7 +104,7 @@ public class MarkerOptions extends AnnotationOptions {
 
     public MarkerOptions sprite(@Nullable String sprite) {
         if (!TextUtils.isEmpty(sprite)) {
-            ((Marker)annotation).sprite = sprite;
+            ((Marker)annotation).setSprite(sprite);
         }
         return this;
     }

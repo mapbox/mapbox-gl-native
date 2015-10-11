@@ -81,14 +81,8 @@ public final class InfoWindow {
 
         // Calculate default Android x,y coordinate
         PointF coords = mMapView.toScreenLocation(position);
-        float x = coords.x - (mView.getMeasuredWidth() / 2);
-        float y = (float) mMapView.getTopOffsetPixelsForAnnotationSymbol(object.getSprite());
-        y = y * mMapView.getScreenDensity();
-        y += coords.y - mView.getMeasuredHeight();
-
-// if getTopOffsetPixelsForAnnotationSymbol lands
-//        float x = coords.x - (mView.getMeasuredWidth() / 2) + offsetX;
-//        float y = coords.y - mView.getMeasuredHeight() + offsetY;
+        float x = coords.x - (mView.getMeasuredWidth() / 2) + offsetX;
+        float y = coords.y - mView.getMeasuredHeight() + offsetY;
 
         // get right/left popup window
         float right = x + mView.getMeasuredWidth();

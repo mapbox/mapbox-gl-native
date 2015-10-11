@@ -88,6 +88,10 @@ final class NativeMapView {
         nativePause(mNativeMapViewPtr);
     }
 
+    public boolean isPaused() {
+        return nativeIsPaused(mNativeMapViewPtr);
+    }
+
     public void resume() {
         nativeResume(mNativeMapViewPtr);
     }
@@ -470,6 +474,8 @@ final class NativeMapView {
     private native void nativeDestroySurface(long nativeMapViewPtr);
 
     private native void nativePause(long nativeMapViewPtr);
+
+    private native boolean nativeIsPaused(long nativeMapViewPtr);
 
     private native void nativeResume(long nativeMapViewPtr);
 
