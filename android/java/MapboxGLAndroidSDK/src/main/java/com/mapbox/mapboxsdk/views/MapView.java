@@ -35,6 +35,7 @@ import android.support.v4.view.ScaleGestureDetectorCompat;
 import android.support.v7.app.AlertDialog;
 import android.text.TextUtils;
 import android.util.AttributeSet;
+import android.util.Log;
 import android.view.GestureDetector;
 import android.view.Gravity;
 import android.view.InputDevice;
@@ -311,17 +312,22 @@ public final class MapView extends FrameLayout {
     public static final int REGION_DID_CHANGE_ANIMATED = 4;
 
     /**
-     * Currently not implemented.
+     * This event is triggered when the map is about to start loading a new map style.
+     * <p/>
+     * This event is followed by {@link MapView#DID_FINISH_LOADING_MAP} or
+     * {@link MapView#DID_FAIL_LOADING_MAP}.
      */
     public static final int WILL_START_LOADING_MAP = 5;
 
     /**
-     * Currently not implemented.
+     * This event is triggered when the map has successfully loaded a new map style.
      */
     public static final int DID_FINISH_LOADING_MAP = 6;
 
     /**
      * Currently not implemented.
+     * <p/>
+     * This event is triggered when the map has failed to load a new map style.
      */
     public static final int DID_FAIL_LOADING_MAP = 7;
 
@@ -799,8 +805,12 @@ public final class MapView extends FrameLayout {
         addOnMapChangedListener(new OnMapChangedListener() {
             @Override
             public void onMapChanged(@MapChange int change) {
-                if (change == REGION_WILL_CHANGE || change == REGION_WILL_CHANGE_ANIMATED) {
+                if ((change == REGION_WILL_CHANGE) || (change == REGION_WILL_CHANGE_ANIMATED)) {
                     deselectMarker();
+                }
+
+                if (change == DID_FINISH_LOADING_MAP) {
+                    adjustTopOffsetPixels();
                 }
             }
         });
@@ -1620,6 +1630,8 @@ public final class MapView extends FrameLayout {
             //marker.setSprite(DEFAULT_SPRITE);
         }
 
+        marker.setTopOffsetPixels(getTopOffsetPixelsForAnnotationSymbol(marker.getSprite()));
+
         long id = mNativeMapView.addMarker(marker);
         marker.setId(id);        // the annotation needs to know its id
         marker.setMapView(this); // the annotation needs to know which map view it is in
@@ -1657,7 +1669,10 @@ public final class MapView extends FrameLayout {
                 marker.setSprite("default_marker");
                 //marker.setSprite(DEFAULT_SPRITE);
             }
-            markers.add(markerOptions.getMarker());
+
+            marker.setTopOffsetPixels(getTopOffsetPixelsForAnnotationSymbol(marker.getSprite()));
+
+            markers.add(marker);
         }
 
         long[] ids = mNativeMapView.addMarkers(markers);
@@ -1869,8 +1884,14 @@ public final class MapView extends FrameLayout {
      * @param symbolName Annotation Symbol
      * @return Top Offset in pixels
      */
-    public double getTopOffsetPixelsForAnnotationSymbol(@NonNull String symbolName) {
-        return mNativeMapView.getTopOffsetPixelsForAnnotationSymbol(symbolName);
+    private int getTopOffsetPixelsForAnnotationSymbol(String symbolName) {
+        // This method will dead lock if map paused. Causes a freeze if you add a marker in an
+        // activity's onCreate()
+        if (mNativeMapView.isPaused()) {
+            return 0;
+        }
+
+        return (int) (mNativeMapView.getTopOffsetPixelsForAnnotationSymbol(symbolName) * mScreenDensity);
     }
 
     /**
@@ -1885,15 +1906,6 @@ public final class MapView extends FrameLayout {
     @UiThread
     public double getMetersPerPixelAtLatitude(@FloatRange(from = -180, to = 180) double latitude) {
         return mNativeMapView.getMetersPerPixelAtLatitude(latitude, getZoomLevel());
-    }
-
-    /**
-     * Get ScreenDensity of device
-     *
-     * @return Screen Density ratio
-     */
-    public float getScreenDensity() {
-        return mScreenDensity;
     }
 
     private void selectMarker(Marker marker) {
@@ -1914,20 +1926,26 @@ public final class MapView extends FrameLayout {
             handledDefaultClick = mOnMarkerClickListener.onMarkerClick(marker);
         }
 
+        if (!handledDefaultClick) {
+            // default behaviour
+            // Can't do this as InfoWindow will get hidden
+            //setCenterCoordinate(marker.getPosition(), true);
+            showInfoWindow(marker);
+        }
+
+        mSelectedMarker = marker;
+    }
+
+    private void showInfoWindow(Marker marker) {
         if (mInfoWindowAdapter != null) {
             // end developer is using a custom InfoWindowAdapter
             View content = mInfoWindowAdapter.getInfoWindow(marker);
             if (content != null) {
                 marker.showInfoWindow(content);
             }
-        } else if (!handledDefaultClick) {
-            // default behaviour
-            // Can't do this as InfoWindow will get hidden
-            //setCenterCoordinate(marker.getPosition(), true);
+        } else {
             marker.showInfoWindow();
         }
-
-        mSelectedMarker = marker;
     }
 
     private void deselectMarker() {
@@ -1935,6 +1953,23 @@ public final class MapView extends FrameLayout {
             if (mSelectedMarker.isInfoWindowShown()) {
                 mSelectedMarker.hideInfoWindow();
                 mSelectedMarker = null;
+            }
+        }
+    }
+
+    private void adjustTopOffsetPixels() {
+        for (Annotation annotation : mAnnotations) {
+            if (annotation instanceof Marker) {
+                Marker marker = (Marker) annotation;
+                marker.setTopOffsetPixels(
+                        getTopOffsetPixelsForAnnotationSymbol(marker.getSprite()));
+            }
+        }
+
+        if (mSelectedMarker != null) {
+            if (mSelectedMarker.isInfoWindowShown()) {
+                mSelectedMarker.hideInfoWindow();
+                showInfoWindow(mSelectedMarker);
             }
         }
     }
