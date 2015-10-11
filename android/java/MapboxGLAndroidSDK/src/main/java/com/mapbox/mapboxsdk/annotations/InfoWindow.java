@@ -84,12 +84,10 @@ public final class InfoWindow {
         mView.measure(View.MeasureSpec.UNSPECIFIED, View.MeasureSpec.UNSPECIFIED);
 
         PointF coords = mMapView.toScreenLocation(position);
-        double y = mMapView.getTopOffsetPixelsForAnnotationSymbol(object.getSprite());
-        y = y * mMapView.getScreenDensity();
 
-        lp.leftMargin = (int) coords.x - (mView.getMeasuredWidth() / 2);
+        lp.leftMargin = (int) coords.x - (mView.getMeasuredWidth() / 2) + offsetX;
         // Add y because it's a negative value
-        lp.topMargin = (int) coords.y - mView.getMeasuredHeight() + (int) y;
+        lp.topMargin = (int) coords.y - mView.getMeasuredHeight() + offsetY;
 
         close(); //if it was already opened
         mMapView.addView(mView, lp);

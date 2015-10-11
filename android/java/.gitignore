@@ -25,3 +25,6 @@ MapboxGLAndroidSDKTestApp/src/main/res/raw/token.txt
 
 # Twitter Fabric / Crashlytics
 fabric.properties
+
+# Capture files
+captures/

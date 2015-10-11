@@ -15,14 +15,15 @@ public class Marker extends Annotation {
     private boolean flat;
     private float infoWindowAnchorU;
     private float infoWindowAnchorV;
-    LatLng position;
+    private LatLng position;
     private float rotation;
     private String snippet;
-    String sprite = "default_marker";
+    private String sprite = "default_marker";
     private String title;
     private InfoWindow infoWindow = null;
 
     private boolean infoWindowShown = false;
+    private int topOffsetPixels;
 
     /**
      * Constructor
@@ -124,7 +125,7 @@ public class Marker extends Annotation {
         infoWindowAnchorV = v;
     }
 
-    public void setPosition(LatLng latlng) {
+    public void setPosition(LatLng position) {
         this.position = position;
     }
 
@@ -161,26 +162,26 @@ public class Marker extends Annotation {
     }
 
     public void showInfoWindow() {
-
         if (!isVisible() || mapView == null) {
             return;
         }
 
         getInfoWindow().adaptDefaultMarker(this);
-        getInfoWindow().open(this, getPosition(), (int) anchorU, (int) anchorV);
-        getInfoWindow().setBoundMarker(this);
-        infoWindowShown = true;
+        showInfoWindow(getInfoWindow());
     }
 
     public void showInfoWindow(View view){
-
         if (!isVisible() || mapView == null) {
             return;
         }
 
         infoWindow = new InfoWindow(view, mapView);
-        infoWindow.open(this, getPosition(), (int) anchorU, (int) anchorV);
-        infoWindow.setBoundMarker(this);
+        showInfoWindow(infoWindow);
+    }
+
+    private void showInfoWindow(InfoWindow iw) {
+        iw.open(this, getPosition(), (int) anchorU, (int) anchorV + topOffsetPixels);
+        iw.setBoundMarker(this);
         infoWindowShown = true;
     }
 
@@ -222,4 +223,8 @@ public class Marker extends Annotation {
 //    void setIcon(BitmapDescriptor icon) {
 //
 //    }
+
+    void setTopOffsetPixels(int topOffsetPixels) {
+        this.topOffsetPixels = topOffsetPixels;
+    }
 }
