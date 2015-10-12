@@ -202,7 +202,7 @@ public class Marker extends Annotation {
      */
     private InfoWindow getInfoWindow() {
         if (infoWindow == null) {
-            infoWindow = new InfoWindow(R.layout.infowindow, mapView);
+            infoWindow = new InfoWindow(R.layout.infowindow_view, mapView);
         }
         return infoWindow;
     }

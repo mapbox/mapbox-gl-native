@@ -294,19 +294,10 @@ public class MainActivity extends AppCompatActivity {
                                 startActivity(new Intent(getApplicationContext(), PressForMarkerActivity.class));
                                 return true;
 
-/*
-                            case R.id.followNone:
-                                mMapView.setUserLocationTrackingMode(MapView.UserLocationTrackingMode.NONE);
+                            case R.id.action_info_window:
+                                startActivity(new Intent(getApplicationContext(), InfoWindowActivity.class));
                                 return true;
 
-                            case R.id.followFollow:
-                                mMapView.setUserLocationTrackingMode(MapView.UserLocationTrackingMode.FOLLOW);
-                                return true;
-
-                            case R.id.followBearing:
-                                mMapView.setUserLocationTrackingMode(MapView.UserLocationTrackingMode.FOLLOW_BEARING);
-                                return true;
-*/
                             default:
                                 return changeMapStyle(menuItem.getItemId());
                         }

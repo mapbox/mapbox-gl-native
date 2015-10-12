@@ -1,12 +1,15 @@
 package com.mapbox.mapboxsdk.annotations;
 
 import android.content.Context;
+import android.content.res.Resources;
 import android.graphics.PointF;
 import android.view.LayoutInflater;
 import android.view.MotionEvent;
 import android.view.View;
 import android.view.ViewGroup;
 import android.widget.TextView;
+
+import com.mapbox.mapboxsdk.R;
 import com.mapbox.mapboxsdk.geometry.LatLng;
 import com.mapbox.mapboxsdk.views.MapView;
 
@@ -28,10 +31,7 @@ public final class InfoWindow {
     public InfoWindow(int layoutResId, MapView mapView) {
         mMapView = mapView;
         mIsVisible = false;
-        Context context = mapView.getContext();
-        LayoutInflater inflater =
-                (LayoutInflater) context.getSystemService(Context.LAYOUT_INFLATER_SERVICE);
-        mView = inflater.inflate(layoutResId, (ViewGroup) mapView, false);
+        mView = LayoutInflater.from(mapView.getContext()).inflate(layoutResId, mapView, false);
 
         if (mTitleId == 0) {
             setResIds(mapView.getContext());
@@ -52,10 +52,6 @@ public final class InfoWindow {
     public InfoWindow(View view, MapView mapView) {
         mMapView = mapView;
         mIsVisible = false;
-        ViewGroup parent = (ViewGroup) mapView.getParent();
-        Context context = mapView.getContext();
-        LayoutInflater inflater =
-                (LayoutInflater) context.getSystemService(Context.LAYOUT_INFLATER_SERVICE);
         mView = view;
 
         // default behavior: close it when clicking on the tooltip:
@@ -83,13 +79,67 @@ public final class InfoWindow {
         MapView.LayoutParams lp = new MapView.LayoutParams(MapView.LayoutParams.WRAP_CONTENT, MapView.LayoutParams.WRAP_CONTENT);
         mView.measure(View.MeasureSpec.UNSPECIFIED, View.MeasureSpec.UNSPECIFIED);
 
+        // Calculate default Android x,y coordinate
         PointF coords = mMapView.toScreenLocation(position);
-        double y = mMapView.getTopOffsetPixelsForAnnotationSymbol(object.getSprite());
+        float x = coords.x - (mView.getMeasuredWidth() / 2);
+        float y = (float) mMapView.getTopOffsetPixelsForAnnotationSymbol(object.getSprite());
         y = y * mMapView.getScreenDensity();
+        y += coords.y - mView.getMeasuredHeight();
 
-        lp.leftMargin = (int) coords.x - (mView.getMeasuredWidth() / 2);
-        // Add y because it's a negative value
-        lp.topMargin = (int) coords.y - mView.getMeasuredHeight() + (int) y;
+// if getTopOffsetPixelsForAnnotationSymbol lands
+//        float x = coords.x - (mView.getMeasuredWidth() / 2) + offsetX;
+//        float y = coords.y - mView.getMeasuredHeight() + offsetY;
+
+        // get right/left popup window
+        float right = x + mView.getMeasuredWidth();
+        float left = x;
+
+        // get right/left map view
+        float mapRight = mMapView.getRight();
+        float mapLeft = mMapView.getLeft();
+
+        if (mView instanceof InfoWindowView) {
+            // only apply repositioning/margin for InfoWindowView
+            Resources resources = mMapView.getContext().getResources();
+            float margin = resources.getDimension(R.dimen.infowindow_margin);
+            float tipViewOffset = resources.getDimension(R.dimen.infowindow_tipview_width) / 2;
+            float tipViewMarginLeft = mView.getMeasuredWidth() / 2 - tipViewOffset;
+
+            // fit screen on right
+            if (right > mMapView.getRight()) {
+                x -= right - mapRight;
+                tipViewMarginLeft += right - mapRight + tipViewOffset;
+                right = x + mView.getMeasuredWidth();
+            }
+
+            // fit screen left
+            if (left < mMapView.getLeft()) {
+                x += mapLeft - left;
+                tipViewMarginLeft -= mapLeft - left + tipViewOffset;
+                left = x;
+            }
+
+            // Add margin right
+            if (mapRight - right < margin) {
+                x -= margin - (mapRight - right);
+                tipViewMarginLeft += margin - (mapRight - right) - tipViewOffset;
+                left = x;
+            }
+
+            // Add margin left
+            if (left - mapLeft < margin) {
+                x += margin - (left - mapLeft);
+                tipViewMarginLeft -= (margin - (left - mapLeft)) - tipViewOffset;
+            }
+
+            // Adjust tipView
+            InfoWindowView infoWindowView = (InfoWindowView) mView;
+            infoWindowView.setTipViewMarginLeft((int) tipViewMarginLeft);
+        }
+
+        // set anchor popupwindowview
+        mView.setX(x);
+        mView.setY(y);
 
         close(); //if it was already opened
         mMapView.addView(mView, lp);

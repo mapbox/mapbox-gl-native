@@ -1,29 +1,26 @@
 package com.mapbox.mapboxsdk.testapp;
 
-import android.graphics.Color;
 import android.os.Bundle;
+import android.support.design.widget.Snackbar;
 import android.support.v7.app.ActionBar;
 import android.support.v7.app.AppCompatActivity;
 import android.support.v7.widget.Toolbar;
 import android.view.MenuItem;
-import android.view.View;
-import android.widget.TextView;
 
-import com.mapbox.mapboxsdk.annotations.Marker;
 import com.mapbox.mapboxsdk.annotations.MarkerOptions;
 import com.mapbox.mapboxsdk.constants.Style;
 import com.mapbox.mapboxsdk.geometry.LatLng;
 import com.mapbox.mapboxsdk.utils.ApiAccess;
 import com.mapbox.mapboxsdk.views.MapView;
 
-public class InfoWindowAdapterActivity extends AppCompatActivity {
+public class InfoWindowActivity extends AppCompatActivity {
 
     private MapView mMapView;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
-        setContentView(R.layout.activity_infowindow_adapter);
+        setContentView(R.layout.activity_infowindow);
 
         Toolbar toolbar = (Toolbar) findViewById(R.id.toolbar);
         setSupportActionBar(toolbar);
@@ -38,38 +35,22 @@ public class InfoWindowAdapterActivity extends AppCompatActivity {
         mMapView.setAccessToken(ApiAccess.getToken(this));
         mMapView.onCreate(savedInstanceState);
         mMapView.setStyle(Style.MAPBOX_STREETS);
-        mMapView.setInfoWindowAdapter(new MapView.InfoWindowAdapter() {
+        mMapView.setCenterCoordinate(new LatLng(38.897705003219784, -77.03655168667463));
+        mMapView.setZoomLevel(15);
 
-            private int tenDp = (int) getResources().getDimension(R.dimen.attr_margin);
+        mMapView.addMarker(new MarkerOptions()
+                .title("Intersection")
+                .snippet("H St NW with 15th St NW")
+                .position(new LatLng(38.9002073, -77.03364419)));
 
-            @Override
-            public View getInfoWindow(Marker marker) {
-                TextView textView = new TextView(InfoWindowAdapterActivity.this);
-                textView.setText(marker.getTitle());
-                textView.setTextColor(Color.WHITE);
-                textView.setBackgroundColor(Color.parseColor(marker.getSnippet()));
-                textView.setPadding(tenDp, tenDp, tenDp, tenDp);
-                return textView;
-            }
-        });
+        mMapView.addMarker(new MarkerOptions()
+                .title("White House")
+                .snippet("The official residence and principal workplace of the President of the United States, located at 1600 Pennsylvania Avenue NW in Washington, D.C. It has been the residence of every U.S. president since John Adams in 1800.")
+                .position(new LatLng(38.897705003219784, -77.03655168667463)));
 
-        mMapView.addMarker(generateMarker("Andorra", 42.505777, 1.52529, "#F44336"));
-        mMapView.addMarker(generateMarker("Luxembourg", 49.815273, 6.129583, "#3F51B5"));
-        mMapView.addMarker(generateMarker("Monaco", 43.738418, 7.424616, "#673AB7"));
-        mMapView.addMarker(generateMarker("Vatican City", 41.902916, 12.453389, "#009688"));
-        mMapView.addMarker(generateMarker("San Marino", 43.942360, 12.457777, "#795548"));
-        mMapView.addMarker(generateMarker("Liechtenstein", 47.166000, 9.555373, "#FF5722"));
-
-        mMapView.setCenterCoordinate(new LatLng(47.798202, 7.573781));
-        mMapView.setZoomLevel(4);
-    }
-
-    private MarkerOptions generateMarker(String title, double lat, double lng, String color) {
-        MarkerOptions marker = new MarkerOptions();
-        marker.title(title);
-        marker.snippet(color);
-        marker.position(new LatLng(lat, lng));
-        return marker;
+        mMapView.addMarker(new MarkerOptions().title("Intersection")
+                .snippet("E St NW with 17th St NW")
+                .position(new LatLng(38.8954236, -77.0394623)));
     }
 
     @Override

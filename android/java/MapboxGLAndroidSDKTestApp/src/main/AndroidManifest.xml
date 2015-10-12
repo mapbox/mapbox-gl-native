@@ -30,11 +30,16 @@
             android:label="@string/activity_infowindow_adapter" />
 
         <activity
+            android:name=".InfoWindowActivity"
+            android:label="@string/activity_info_window" />
+
+        <activity
             android:name=".MapFragmentActivity"
             android:label="@string/activity_map_fragment" />
 
-        <activity android:name=".PressForMarkerActivity"
-                  android:label="@string/activity_press_for_marker"/>
+        <activity
+            android:name=".PressForMarkerActivity"
+            android:label="@string/activity_press_for_marker" />
 
         <meta-data
             android:name="io.fabric.ApiKey"

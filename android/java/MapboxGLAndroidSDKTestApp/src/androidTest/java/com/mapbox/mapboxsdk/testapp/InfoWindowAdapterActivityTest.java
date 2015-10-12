@@ -34,7 +34,7 @@ public class InfoWindowAdapterActivityTest extends BaseTest {
 
     @Test
     public void testSanity() {
-        onView(withId(R.id.secondMapView))
+        onView(withId(R.id.mapView))
                 .check(matches(isDisplayed()));
     }
 

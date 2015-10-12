@@ -2,4 +2,5 @@
 <resources>
     <!--Add references to exposed resources-->
     <public name="AttributionAlertDialogStyle" type="style" />
+    <public name="infowindow_margin" type="dimen" />
 </resources>

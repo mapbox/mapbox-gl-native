@@ -73,11 +73,6 @@
     <item android:id="@+id/testsMenu"
         android:title="@string/navdrawer_menu_title_individual_tests">
         <menu>
-            <item
-                android:id="@+id/action_info_window_adapter"
-                android:checkable="false"
-                android:icon="@drawable/ic_filter_none_white_24dp"
-                android:title="@string/action_info_window_adapter" />
 
             <item
                 android:id="@+id/action_map_fragment"
@@ -85,10 +80,23 @@
                 android:icon="@drawable/ic_widgets_white_24dp"
                 android:title="@string/action_map_fragment" />
 
-            <item android:id="@+id/action_press_for_marker"
-                  android:checkable="false"
-                  android:icon="@drawable/ic_pin_drop_white_24dp"
-                  android:title="@string/action_press_for_marker"/>
+            <item
+                android:id="@+id/action_info_window"
+                android:checkable="false"
+                android:icon="@drawable/ic_filter_none_white_24dp"
+                android:title="@string/action_info_window" />
+
+            <item
+                android:id="@+id/action_info_window_adapter"
+                android:checkable="false"
+                android:icon="@drawable/ic_filter_none_white_24dp"
+                android:title="@string/action_info_window_adapter" />
+
+            <item
+                android:id="@+id/action_press_for_marker"
+                android:checkable="false"
+                android:icon="@drawable/ic_pin_drop_white_24dp"
+                android:title="@string/action_press_for_marker"/>
         </menu>
     </item>
 
