@@ -352,6 +352,25 @@ std::vector<RenderItem> Painter::determineRenderOrder(const Style& style) {
                 continue;
             }
 
+            // We're not clipping symbol layers, so when we have both parents and children of symbol
+            // layers, we drop all children in favor of their parent to avoid duplicate labels.
+            // See https://github.com/mapbox/mapbox-gl-native/issues/2482
+            if (layer.type == StyleLayerType::Symbol) {
+                bool skip = false;
+                // Look back through the buckets we decided to render to find out whether there is
+                // already a bucket from this layer that is a parent of this tile. Tiles are ordered
+                // by zoom level when we obtain them from getTiles().
+                for (auto it = order.rbegin(); it != order.rend() && (&it->layer == &layer); ++it) {
+                    if (tile->id.isChildOf(it->tile->id)) {
+                        skip = true;
+                        break;
+                    }
+                }
+                if (skip) {
+                    continue;
+                }
+            }
+
             auto bucket = tile->data->getBucket(layer);
             if (bucket) {
                 order.emplace_back(layer, tile, bucket);
