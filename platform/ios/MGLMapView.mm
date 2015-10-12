@@ -79,7 +79,11 @@ mbgl::util::UnitBezier MGLUnitBezierForMediaTimingFunction(CAMediaTimingFunction
 
 #pragma mark - Private -
 
-@interface MGLMapView () <UIGestureRecognizerDelegate, GLKViewDelegate, CLLocationManagerDelegate, UIActionSheetDelegate, SMCalloutViewDelegate>
+@interface MGLMapView () <UIGestureRecognizerDelegate,
+                          GLKViewDelegate,
+                          CLLocationManagerDelegate,
+                          UIActionSheetDelegate,
+                          SMCalloutViewDelegate>
 
 @property (nonatomic) EAGLContext *context;
 @property (nonatomic) GLKView *glView;
@@ -1451,11 +1455,11 @@ std::chrono::steady_clock::duration secondsAsDuration(float duration)
     }
 }
 
-- (void)calloutViewClicked:(SMCalloutView *__attribute__ ((unused)))calloutView
+- (void)calloutViewClicked:(__unused SMCalloutView *)calloutView
 {
-    if ([self.delegate respondsToSelector:@selector(mapView:tapOnLabelForAnnotation:)])
+    if ([self.delegate respondsToSelector:@selector(mapView:tapOnCalloutForAnnotation:)])
     {
-        [self.delegate mapView:self tapOnLabelForAnnotation:self.selectedAnnotation];
+        [self.delegate mapView:self tapOnCalloutForAnnotation:self.selectedAnnotation];
     }
 }
 
