@@ -1,4 +1,5 @@
 # master
+- Labels can now line wrap on hyphens and other punctuation. ([#2598](https://github.com/mapbox/mapbox-gl-native/pull/2598))
 
 # 2.0.0
 

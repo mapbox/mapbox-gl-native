@@ -104,7 +104,15 @@ void FontStack::lineWrap(Shaping &shaping, const float lineHeight, const float m
                 }
 
                 if (justify) {
-                    justifyLine(positionedGlyphs, metrics, lineStartIndex, lastSafeBreak - 1, justify);
+                    // Collapse invisible characters.
+                    uint32_t breakGlyph = positionedGlyphs[lastSafeBreak].glyph;
+                    uint32_t lineEnd = lastSafeBreak;
+                    if (breakGlyph == 0x20 /* space */
+                        || breakGlyph == 0x200b /* zero-width space */) {
+                        lineEnd--;
+                    }
+
+                    justifyLine(positionedGlyphs, metrics, lineStartIndex, lineEnd, justify);
                 }
 
                 lineStartIndex = lastSafeBreak + 1;
@@ -113,7 +121,17 @@ void FontStack::lineWrap(Shaping &shaping, const float lineHeight, const float m
                 line++;
             }
 
-            if (shape.glyph == 32) {
+            // Spaces, plus word-breaking punctuation that often appears without surrounding spaces.
+            if (shape.glyph == 0x20 /* space */
+                || shape.glyph == 0x26 /* ampersand */
+                || shape.glyph == 0x2b /* plus sign */
+                || shape.glyph == 0x2d /* hyphen-minus */
+                || shape.glyph == 0x2f /* solidus */
+                || shape.glyph == 0xad /* soft hyphen */
+                || shape.glyph == 0xb7 /* middle dot */
+                || shape.glyph == 0x200b /* zero-width space */
+                || shape.glyph == 0x2010 /* hyphen */
+                || shape.glyph == 0x2013 /* en dash */) {
                 lastSafeBreak = i;
             }
         }
