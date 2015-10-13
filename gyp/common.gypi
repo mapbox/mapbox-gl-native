@@ -12,7 +12,7 @@
           'GCC_ENABLE_CPP_EXCEPTIONS': 'YES',
           'GCC_ENABLE_CPP_RTTI': 'YES',
           'OTHER_CPLUSPLUSFLAGS': [
-            '-std=c++1y',
+            '-std=c++14',
             '-Werror',
             '-Wall',
             '-Wextra',
@@ -35,7 +35,6 @@
           '-Wshadow',
           '-Wno-variadic-macros',
           '-Wno-error=unused-parameter',
-          '-Wno-c++1y-extensions',
           '-frtti',
           '-fexceptions',
           '${CFLAGS}',
