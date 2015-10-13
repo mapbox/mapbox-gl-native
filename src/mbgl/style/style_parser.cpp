@@ -520,11 +520,11 @@ template<> StyleParser::Result<PropertyTransition> StyleParser::parseProperty(JS
     PropertyTransition transition { data.getDefaultTransitionDuration(), data.getDefaultTransitionDelay() };
     if (value.IsObject()) {
         bool parsed = false;
-        if (value.HasMember("duration") && value["duration"].IsNumber()) {
+        if (value.HasMember("duration") && value["duration"].IsNumber() && data.mode == MapMode::Continuous) {
             transition.duration = std::chrono::milliseconds(value["duration"].GetUint());
             parsed = true;
         }
-        if (value.HasMember("delay") && value["delay"].IsNumber()) {
+        if (value.HasMember("delay") && value["delay"].IsNumber() && data.mode == MapMode::Continuous) {
             transition.delay = std::chrono::milliseconds(value["delay"].GetUint());
             parsed = true;
         }
@@ -594,7 +594,7 @@ template<> StyleParser::Result<Function<Color>> StyleParser::parseProperty(JSVal
 
 template<> StyleParser::Result<PiecewiseConstantFunction<Faded<std::vector<float>>>> StyleParser::parseProperty(JSVal value, const char *property_name, JSVal transition) {
     Duration duration = data.getDefaultFadeDuration();
-    if (transition.HasMember("duration")) {
+    if (transition.HasMember("duration") && data.mode == MapMode::Continuous) {
         duration = std::chrono::milliseconds(transition["duration"].GetUint());
     }
 
@@ -613,7 +613,7 @@ template<> StyleParser::Result<PiecewiseConstantFunction<Faded<std::vector<float
 
 template<> StyleParser::Result<PiecewiseConstantFunction<Faded<std::string>>> StyleParser::parseProperty(JSVal value, const char *property_name, JSVal transition) {
     Duration duration = data.getDefaultFadeDuration();
-    if (transition.HasMember("duration")) {
+    if (transition.HasMember("duration") && data.mode == MapMode::Continuous) {
         duration = std::chrono::milliseconds(transition["duration"].GetUint());
     }
 

@@ -24,7 +24,7 @@ public:
         : mode(mode_)
         , pixelRatio(pixelRatio_)
         , animationTime(Duration::zero())
-        , defaultFadeDuration(std::chrono::milliseconds(300))
+        , defaultFadeDuration(mode_ == MapMode::Continuous ? std::chrono::milliseconds(300) : Duration::zero())
         , defaultTransitionDuration(Duration::zero())
         , defaultTransitionDelay(Duration::zero()) {
         assert(pixelRatio > 0);
@@ -71,9 +71,13 @@ public:
     inline TimePoint getAnimationTime() const {
         // We're casting the TimePoint to and from a Duration because libstdc++
         // has a bug that doesn't allow TimePoints to be atomic.
-        return TimePoint(animationTime);
+        return mode == MapMode::Continuous ? TimePoint(animationTime) : Clock::now();
     }
     inline void setAnimationTime(const TimePoint& timePoint) {
+        if (mode == MapMode::Still) {
+            return;
+        }
+
         animationTime = timePoint.time_since_epoch();
     };
 
@@ -82,6 +86,10 @@ public:
     }
 
     inline void setDefaultFadeDuration(const Duration& duration) {
+        if (mode == MapMode::Still) {
+            return;
+        }
+
         defaultFadeDuration = duration;
     }
 
@@ -90,6 +98,10 @@ public:
     }
 
     inline void setDefaultTransitionDuration(const Duration& duration) {
+        if (mode == MapMode::Still) {
+            return;
+        }
+
         defaultTransitionDuration = duration;
     }
 
@@ -98,6 +110,10 @@ public:
     }
 
     inline void setDefaultTransitionDelay(const Duration& delay) {
+        if (mode == MapMode::Still) {
+            return;
+        }
+
         defaultTransitionDelay = delay;
     }
 
