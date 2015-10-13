@@ -18,17 +18,17 @@
     }
   ],
   "dependencies": {
-    "nan": "^2.0.9",
-    "node-pre-gyp": "^0.6.11"
+    "nan": "^2.1.0",
+    "node-pre-gyp": "^0.6.12"
   },
   "bundledDependencies": [
     "node-pre-gyp"
   ],
   "devDependencies": {
-    "aws-sdk": "^2.1.47",
+    "aws-sdk": "^2.2.9",
     "mapbox-gl-test-suite": "git+https://github.com/mapbox/mapbox-gl-test-suite.git#9b3df7ea2751d076abf31015e20d5f3137cd10f6",
-    "request": "^2.61.0",
-    "tape": "^4.2.0"
+    "request": "^2.65.0",
+    "tape": "^4.2.1"
   },
   "scripts": {
     "install": "node-pre-gyp install --fallback-to-build=false || make node",
