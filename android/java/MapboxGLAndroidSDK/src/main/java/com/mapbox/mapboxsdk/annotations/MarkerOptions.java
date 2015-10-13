@@ -46,8 +46,7 @@ public class MarkerOptions extends AnnotationOptions {
         return ((Marker)annotation).getInfoWindowAnchorV();
     }
 
-    public Marker getMarker(int topOffsetPixels) {
-        ((Marker)annotation).setTopOffsetPixels(topOffsetPixels);
+    public Marker getMarker() {
         return (Marker)annotation;
     }
 
@@ -65,10 +64,6 @@ public class MarkerOptions extends AnnotationOptions {
 
     public String getTitle() {
         return ((Marker)annotation).getTitle();
-    }
-
-    public String getSprite() {
-        return ((Marker)annotation).getSprite();
     }
 
     public MarkerOptions infoWindowAnchor(float u, float v) {
@@ -89,7 +84,7 @@ public class MarkerOptions extends AnnotationOptions {
     }
 
     public MarkerOptions position(LatLng position) {
-        ((Marker)annotation).setPosition(position);
+        ((Marker)annotation).position = position;
         return this;
     }
 
@@ -105,7 +100,7 @@ public class MarkerOptions extends AnnotationOptions {
 
     public MarkerOptions sprite(@Nullable String sprite) {
         if (!TextUtils.isEmpty(sprite)) {
-            ((Marker)annotation).setSprite(sprite);
+            ((Marker)annotation).sprite = sprite;
         }
         return this;
     }
