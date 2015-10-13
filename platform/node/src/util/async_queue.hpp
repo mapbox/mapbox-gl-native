@@ -8,7 +8,6 @@
 #include <queue>
 #include <string>
 
-
 #if UV_VERSION_MAJOR == 0 && UV_VERSION_MINOR <= 10
 #define UV_ASYNC_PARAMS(handle) uv_async_t *handle, int
 #else

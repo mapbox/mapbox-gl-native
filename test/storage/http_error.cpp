@@ -7,6 +7,12 @@
 
 #include <cmath>
 
+#if UV_VERSION_MAJOR == 0 && UV_VERSION_MINOR <= 10
+#define UV_TIMER_PARAMS uv_timer_t*, int
+#else
+#define UV_TIMER_PARAMS uv_timer_t*
+#endif
+
 TEST_F(Storage, HTTPError) {
     SCOPED_TEST(HTTPTemporaryError)
     SCOPED_TEST(HTTPConnectionError)
@@ -15,7 +21,7 @@ TEST_F(Storage, HTTPError) {
 
     uv_timer_t statusChange;
     uv_timer_init(uv_default_loop(), &statusChange);
-    uv_timer_start(&statusChange, [](uv_timer_t *, int) {
+    uv_timer_start(&statusChange, [](UV_TIMER_PARAMS) {
         NetworkStatus::Reachable();
     }, 500, 500);
     uv_unref((uv_handle_t *)&statusChange);

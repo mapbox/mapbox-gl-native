@@ -7,7 +7,7 @@ set -u
 NAME=Mapbox
 OUTPUT=build/ios/pkg
 IOS_SDK_VERSION=`xcrun --sdk iphoneos --show-sdk-version`
-LIBUV_VERSION=0.10.28
+LIBUV_VERSION=1.7.5
 
 if [[ ${#} -eq 0 ]]; then # e.g. "make ipackage"
     BUILD_FOR_DEVICE=true

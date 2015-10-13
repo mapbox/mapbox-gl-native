@@ -127,10 +127,14 @@ void AssetRequest::fileStated(uv_fs_t *req) {
             uv_fs_close(req->loop, req, self->fd, fileClosed);
         } else {
             self->response = std::make_unique<Response>();
+#if UV_VERSION_MAJOR == 0 && UV_VERSION_MINOR <= 10
 #ifdef __APPLE__
             self->response->modified = stat->st_mtimespec.tv_sec;
 #else
             self->response->modified = stat->st_mtime;
+#endif
+#else
+            self->response->modified = stat->st_mtim.tv_sec;
 #endif
             self->response->etag = util::toString(stat->st_ino);
             const auto size = (unsigned int)(stat->st_size);

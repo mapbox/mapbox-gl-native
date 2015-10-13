@@ -6,6 +6,12 @@
 
 #include <unistd.h>
 
+#if UV_VERSION_MAJOR == 0 && UV_VERSION_MINOR <= 10
+#define UV_ASYNC_PARAMS(handle) uv_async_t *handle, int
+#else
+#define UV_ASYNC_PARAMS(handle) uv_async_t *handle
+#endif
+
 namespace node_mbgl {
 
 struct NodeMap::RenderOptions {
@@ -335,12 +341,8 @@ NodeMap::NodeMap(v8::Local<v8::Object> options) :
     async(new uv_async_t) {
 
     async->data = this;
-#if UV_VERSION_MAJOR == 0 && UV_VERSION_MINOR <= 10
-    uv_async_init(uv_default_loop(), async, [](uv_async_t *as, int) {
-#else
-    uv_async_init(uv_default_loop(), async, [](uv_async_t *as) {
-#endif
-        reinterpret_cast<NodeMap *>(as->data)->renderFinished();
+    uv_async_init(uv_default_loop(), async, [](UV_ASYNC_PARAMS(handle)) {
+        reinterpret_cast<NodeMap *>(handle->data)->renderFinished();
     });
 
     // Make sure the async handle doesn't keep the loop alive.

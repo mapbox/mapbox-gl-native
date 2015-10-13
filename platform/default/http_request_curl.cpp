@@ -23,6 +23,12 @@
 #include <cstring>
 #include <cstdio>
 
+#if UV_VERSION_MAJOR == 0 && UV_VERSION_MINOR <= 10
+#define UV_TIMER_PARAMS(timer) uv_timer_t *timer, int
+#else
+#define UV_TIMER_PARAMS(timer) uv_timer_t *timer
+#endif
+
 void handleError(CURLMcode code) {
     if (code != CURLM_OK) {
         throw std::runtime_error(std::string("CURL multi error: ") + curl_multi_strerror(code));
@@ -54,11 +60,7 @@ public:
     static int handleSocket(CURL *handle, curl_socket_t s, int action, void *userp, void *socketp);
     static void perform(uv_poll_t *req, int status, int events);
     static int startTimeout(CURLM *multi, long timeout_ms, void *userp);
-#if UV_VERSION_MAJOR == 0 && UV_VERSION_MINOR <= 10
-    static void onTimeout(uv_timer_t *req, int status);
-#else
-    static void onTimeout(uv_timer_t *req);
-#endif
+    static void onTimeout(UV_TIMER_PARAMS(req));
 
     CURL *getHandle();
     void returnHandle(CURL *handle);
@@ -102,11 +104,7 @@ private:
     static size_t writeCallback(void *const contents, const size_t size, const size_t nmemb, void *userp);
 
     void retry(uint64_t timeout) final;
-#if UV_VERSION_MAJOR == 0 && UV_VERSION_MINOR <= 10
-    static void restart(uv_timer_t *timer, int);
-#else
-    static void restart(uv_timer_t *timer);
-#endif
+    static void restart(UV_TIMER_PARAMS(timer));
     void finish(ResponseStatus status);
     void start();
 
@@ -300,11 +298,7 @@ int HTTPCURLContext::handleSocket(CURL * /* handle */, curl_socket_t s, int acti
     return 0;
 }
 
-#if UV_VERSION_MAJOR == 0 && UV_VERSION_MINOR <= 10
-void HTTPCURLContext::onTimeout(uv_timer_t *req, int /* status */) {
-#else
-void HTTPCURLContext::onTimeout(uv_timer_t *req) {
-#endif
+void HTTPCURLContext::onTimeout(UV_TIMER_PARAMS(req)) {
     assert(req->data);
     auto context = reinterpret_cast<HTTPCURLContext *>(req->data);
     MBGL_VERIFY_THREAD(context->tid);
@@ -612,11 +606,7 @@ void HTTPCURLRequest::retry() {
     }
 }
 
-#if UV_VERSION_MAJOR == 0 && UV_VERSION_MINOR <= 10
-void HTTPCURLRequest::restart(uv_timer_t *timer, int) {
-#else
-void HTTPCURLRequest::restart(uv_timer_t *timer) {
-#endif
+void HTTPCURLRequest::restart(UV_TIMER_PARAMS(timer)) {
     // Restart the request.
     auto baton = reinterpret_cast<HTTPCURLRequest *>(timer->data);
 

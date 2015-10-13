@@ -13,6 +13,14 @@
 #undef B0
 #endif
 
+#if UV_VERSION_MAJOR == 0 && UV_VERSION_MINOR <= 10
+#define UV_ASYNC_PARAMS(handle) uv_async_t *handle, int
+#define UV_TIMER_PARAMS(timer) uv_timer_t *timer, int
+#else
+#define UV_ASYNC_PARAMS(handle) uv_async_t *handle
+#define UV_TIMER_PARAMS(timer) uv_timer_t *timer
+#endif
+
 #include <functional>
 #include <cassert>
 #include <memory>
@@ -119,12 +127,8 @@ public:
     }
 
 private:
-#if UV_VERSION_MAJOR == 0 && UV_VERSION_MINOR <= 10
-    static void async_cb(uv_async_t* a, int) {
-#else
-    static void async_cb(uv_async_t* a) {
-#endif
-        reinterpret_cast<async*>(a->data)->fn();
+    static void async_cb(UV_ASYNC_PARAMS(handle)) {
+        reinterpret_cast<async*>(handle->data)->fn();
     }
 
     std::function<void ()> fn;
@@ -153,11 +157,7 @@ public:
     }
 
 private:
-#if UV_VERSION_MAJOR == 0 && UV_VERSION_MINOR <= 10
-    static void timer_cb(uv_timer_t* t, int) {
-#else
-    static void timer_cb(uv_timer_t* t) {
-#endif
+    static void timer_cb(UV_TIMER_PARAMS(t)) {
         reinterpret_cast<timer*>(t->data)->fn();
     }
 
