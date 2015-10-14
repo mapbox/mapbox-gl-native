@@ -7,18 +7,18 @@
 -dontwarn okio.**
 
 # Package: annotations
--keep class com.mapbox.mapboxgl.annotations.** { *; }
+-keep class com.mapbox.mapboxsdk.annotations.** { *; }
 
 # Package: geometry
--keep class com.mapbox.mapboxgl.geometry.** { *; }
+-keep class com.mapbox.mapboxsdk.geometry.** { *; }
 
 # Package: http
--keep class com.mapbox.mapboxgl.http.** { *; }
+-keep class com.mapbox.mapboxsdk.http.** { *; }
 
 # Package views
--keep class com.mapbox.mapboxgl.views.MapView**
--keep class com.mapbox.mapboxgl.views.NativeMapView**
--keepclassmembers class com.mapbox.mapboxgl.views.NativeMapView** {
+-keep class com.mapbox.mapboxsdk.views.MapView**
+-keep class com.mapbox.mapboxsdk.views.NativeMapView**
+-keepclassmembers class com.mapbox.mapboxsdk.views.NativeMapView** {
     *;
 }
 
