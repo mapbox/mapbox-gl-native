@@ -33,6 +33,8 @@
     tester.mapView.scrollEnabled = YES;
     tester.mapView.rotateEnabled = YES;
 
+    [tester.mapView removeAnnotations:tester.mapView.annotations];
+
     tester.viewController.navigationController.navigationBarHidden = YES;
     tester.viewController.navigationController.toolbarHidden = YES;
 
@@ -329,6 +331,44 @@
                                newZoom,
                                0.01,
                                @"setting zoom should take effect");
+}
+
+- (void)testMarkerSelection {
+    CGPoint point = CGPointMake(100, 100);
+    MGLPointAnnotation *marker = [MGLPointAnnotation new];
+    marker.coordinate = [tester.mapView convertPoint:point toCoordinateFromView:tester.mapView];
+    marker.title = @"test"; // title required for callout
+    [tester.mapView addAnnotation:marker];
+
+    XCTAssertEqual(tester.mapView.selectedAnnotations.count, 0);
+
+    [tester.mapView selectAnnotation:marker animated:NO];
+    XCTAssertEqualObjects(tester.mapView.selectedAnnotations.firstObject, marker);
+
+    [tester.mapView deselectAnnotation:marker animated:NO];
+    XCTAssertEqual(tester.mapView.selectedAnnotations.count, 0);
+}
+
+- (void)testMarkerAddWithoutDelegate {
+    XCTAssertFalse([tester.viewController respondsToSelector:@selector(mapView:imageForAnnotation:)]);
+
+    MGLPointAnnotation *marker = [MGLPointAnnotation new];
+    marker.coordinate = tester.mapView.centerCoordinate;
+    [tester.mapView addAnnotation:marker];
+
+    [tester.mapView selectAnnotation:marker animated:NO];
+    XCTAssertEqualObjects(tester.mapView.selectedAnnotations.firstObject, marker);
+    XCTAssertEqual([[tester.mapView subviewsWithClassNamePrefix:@"SM"] count], 0); // no callout for no title
+
+    [tester.mapView deselectAnnotation:marker animated:NO];
+    marker.title = @"test";
+    [tester.mapView selectAnnotation:marker animated:NO];
+    XCTAssertEqualObjects(tester.mapView.selectedAnnotations.firstObject, marker);
+    XCTAssertGreaterThan([[tester.mapView subviewsWithClassNamePrefix:@"SM"] count], 0);
+}
+
+- (BOOL)mapView:(MGLMapView *)mapView annotationCanShowCallout:(id<MGLAnnotation>)annotation {
+    return YES;
 }
 
 - (void)testTopLayoutGuide {

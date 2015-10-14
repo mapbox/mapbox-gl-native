@@ -82,6 +82,8 @@ static NSUInteger const kStyleVersion = 8;
                                                                              target:self
                                                                              action:@selector(locateUser)];
 
+    [self.mapView addGestureRecognizer:[[UILongPressGestureRecognizer alloc] initWithTarget:self action:@selector(handleLongPress:)]];
+
     [self restoreState:nil];
 }
 
@@ -296,6 +298,20 @@ static NSUInteger const kStyleVersion = 8;
     });
 }
 
+- (void)handleLongPress:(UILongPressGestureRecognizer *)longPress
+{
+    if (longPress.state == UIGestureRecognizerStateBegan)
+    {
+        MGLPointAnnotation *point = [MGLPointAnnotation new];
+        point.coordinate = [self.mapView convertPoint:[longPress locationInView:longPress.view]
+                                 toCoordinateFromView:self.mapView];
+        point.title = @"Dropped Marker";
+        point.subtitle = [NSString stringWithFormat:@"lat: %.3f, lon: %.3f", point.coordinate.latitude, point.coordinate.longitude];
+        [self.mapView addAnnotation:point];
+        [self.mapView selectAnnotation:point animated:YES];
+    }
+}
+
 - (void)cycleStyles
 {
     UIButton *titleButton = (UIButton *)self.navigationItem.titleView;
@@ -354,6 +370,8 @@ static NSUInteger const kStyleVersion = 8;
 
 - (MGLAnnotationImage *)mapView:(MGLMapView * __nonnull)mapView imageForAnnotation:(id <MGLAnnotation> __nonnull)annotation
 {
+    if ([annotation.title isEqualToString:@"Dropped Marker"]) return nil; // use default marker
+
     NSString *title = [(MGLPointAnnotation *)annotation title];
     NSString *lastTwoCharacters = [title substringFromIndex:title.length - 2];
 
