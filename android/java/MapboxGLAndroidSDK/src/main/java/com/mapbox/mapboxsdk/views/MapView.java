@@ -1596,7 +1596,7 @@ public final class MapView extends FrameLayout {
             throw new NullPointerException("markerOptions is null");
         }
 
-        Marker marker = markerOptions.getMarker(getTopOffsetPixelsForAnnotationSymbol(markerOptions.getSprite()));
+        Marker marker = markerOptions.getMarker();
 
         // Load the default marker sprite
         if (marker.getSprite() == null) {
@@ -1634,7 +1634,7 @@ public final class MapView extends FrameLayout {
 
         List<Marker> markers = new ArrayList<>(markerOptionsList.size());
         for (MarkerOptions markerOptions : markerOptionsList) {
-            Marker marker = markerOptions.getMarker(getTopOffsetPixelsForAnnotationSymbol(markerOptions.getSprite()));
+            Marker marker = markerOptions.getMarker();
 
             // Load the default marker sprite
             if (marker.getSprite() == null) {
@@ -1646,7 +1646,7 @@ public final class MapView extends FrameLayout {
                 marker.setSprite("default_marker");
                 //marker.setSprite(DEFAULT_SPRITE);
             }
-            markers.add(marker);
+            markers.add(markerOptions.getMarker());
         }
 
         long[] ids = mNativeMapView.addMarkers(markers);
@@ -1857,8 +1857,8 @@ public final class MapView extends FrameLayout {
      * @param symbolName Annotation Symbol
      * @return Top Offset in pixels
      */
-    private int getTopOffsetPixelsForAnnotationSymbol(String symbolName) {
-        return (int) (mNativeMapView.getTopOffsetPixelsForAnnotationSymbol(symbolName) * mScreenDensity);
+    public double getTopOffsetPixelsForAnnotationSymbol(@NonNull String symbolName) {
+        return mNativeMapView.getTopOffsetPixelsForAnnotationSymbol(symbolName);
     }
 
     /**
@@ -1873,6 +1873,14 @@ public final class MapView extends FrameLayout {
     @UiThread
     public double getMetersPerPixelAtLatitude(@FloatRange(from = -180, to = 180) double latitude) {
         return mNativeMapView.getMetersPerPixelAtLatitude(latitude, getZoomLevel());
+    }
+
+    /**
+     * Get ScreenDensity of device
+     * @return Screen Density ratio
+     */
+    public float getScreenDensity() {
+        return mScreenDensity;
     }
 
     private void selectMarker(Marker marker) {
