@@ -31,14 +31,10 @@ targets.
  - Modern C++ compiler that supports `-std=c++14`
    - clang++ 3.5 or later _or_
    - g++-4.9 or later
- - [Boost headers](http://boost.org/)
- - [`zlib`](http://www.zlib.net/)
- - [`libpng`](http://www.libpng.org/pub/png/libpng.html)
- - [`libuv 0.10+`](https://github.com/joyent/libuv)
- - [`glfw 3.1+`](http://www.glfw.org/)
- - `pkg-config` (for build only)
  - Python 2.x (for build only)
- - [Imagemagick](http://www.imagemagick.org/)
+ - [`pkg-config`](https://wiki.freedesktop.org/www/Software/pkg-config/) (for build only)
+ - [`libtool`](https://www.gnu.org/software/libtool/) (for build only)
+ - [`automake`](https://www.gnu.org/software/automake/) (for build only)
 
 Depending on your operating system and target, you'll need additional
 dependencies:
