@@ -11,6 +11,7 @@ If you want to use products _based on_ Mapbox GL, check out:
 - [Mapbox Mobile](http://mapbox.com/mobile) — iOS and Android native development libraries for vector maps in apps
 - [`react-native-mapbox-gl`](https://github.com/mapbox/react-native-mapbox-gl) — React Native library for vector maps in apps
 - [`qmapboxgl`](https://github.com/tmpsantos/qmapboxgl) — Qt library for vector map rendering
+- [`Mapbox Cordova Plugin`](http://plugins.telerik.com/cordova/plugin/mapbox) - Telerik's Apache Cordova plugin for vector maps in apps
 
 --
 
