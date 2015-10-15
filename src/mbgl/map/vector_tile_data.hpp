@@ -3,6 +3,7 @@
 
 #include <mbgl/map/tile_data.hpp>
 #include <mbgl/map/tile_worker.hpp>
+#include <mbgl/storage/request_holder.hpp>
 
 #include <atomic>
 
@@ -40,7 +41,7 @@ private:
     std::unique_ptr<WorkRequest> workRequest;
     bool parsing = false;
     const SourceInfo& source;
-    Request* req = nullptr;
+    RequestHolder req;
     std::string data;
     float lastAngle = 0;
     float currentAngle;

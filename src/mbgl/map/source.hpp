@@ -5,6 +5,7 @@
 #include <mbgl/map/tile_data.hpp>
 #include <mbgl/map/tile_cache.hpp>
 #include <mbgl/style/types.hpp>
+#include <mbgl/storage/request_holder.hpp>
 
 #include <mbgl/util/noncopyable.hpp>
 #include <mbgl/util/mat4.hpp>
@@ -129,7 +130,7 @@ private:
     std::map<TileID, std::weak_ptr<TileData>> tile_data;
     TileCache cache;
 
-    Request* req = nullptr;
+    RequestHolder req;
     Observer* observer_ = nullptr;
 };
 

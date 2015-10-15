@@ -75,7 +75,6 @@ GlyphPBF::GlyphPBF(GlyphStore* store,
     });
 
     auto requestCallback = [this, store, fontStack, url](const Response &res) {
-        util::ThreadContext::getFileSource()->cancel(req);
         req = nullptr;
 
         if (res.status != Response::Successful) {
@@ -92,12 +91,7 @@ GlyphPBF::GlyphPBF(GlyphStore* store,
     req = fs->request({ Resource::Kind::Glyphs, url }, util::RunLoop::getLoop(), requestCallback);
 }
 
-GlyphPBF::~GlyphPBF() {
-    if (req) {
-        util::ThreadContext::getFileSource()->cancel(req);
-        req = nullptr;
-    }
-}
+GlyphPBF::~GlyphPBF() = default;
 
 void GlyphPBF::parse(GlyphStore* store, const std::string& fontStack, const std::string& url) {
     if (data.empty()) {

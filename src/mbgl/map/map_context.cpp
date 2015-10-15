@@ -52,10 +52,7 @@ MapContext::~MapContext() {
 void MapContext::cleanup() {
     view.notify();
 
-    if (styleRequest) {
-        util::ThreadContext::getFileSource()->cancel(styleRequest);
-        styleRequest = nullptr;
-    }
+    styleRequest = nullptr;
 
     // Explicit resets currently necessary because these abandon resources that need to be
     // cleaned up by glObjectStore.performCleanup();
@@ -95,13 +92,7 @@ void MapContext::setStyleURL(const std::string& url) {
         return;
     }
 
-    FileSource* fs = util::ThreadContext::getFileSource();
-
-    if (styleRequest) {
-        fs->cancel(styleRequest);
-        styleRequest = nullptr;
-    }
-
+    styleRequest = nullptr;
     styleURL = url;
     styleJSON.clear();
 
@@ -113,8 +104,8 @@ void MapContext::setStyleURL(const std::string& url) {
         base = styleURL.substr(0, pos + 1);
     }
 
+    FileSource* fs = util::ThreadContext::getFileSource();
     styleRequest = fs->request({ Resource::Kind::Style, styleURL }, util::RunLoop::getLoop(), [this, base](const Response &res) {
-        util::ThreadContext::getFileSource()->cancel(styleRequest);
         styleRequest = nullptr;
 
         if (res.status == Response::Successful) {

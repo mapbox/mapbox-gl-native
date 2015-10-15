@@ -90,7 +90,7 @@ private:
     std::string styleURL;
     std::string styleJSON;
 
-    Request* styleRequest = nullptr;
+    RequestHolder styleRequest;
 
     Map::StillImageCallback callback;
     size_t sourceCacheSize;

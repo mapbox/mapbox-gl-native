@@ -4,6 +4,7 @@
 #include <mbgl/map/tile_data.hpp>
 #include <mbgl/style/style_properties.hpp>
 #include <mbgl/renderer/raster_bucket.hpp>
+#include <mbgl/storage/request_holder.hpp>
 
 namespace mbgl {
 
@@ -28,7 +29,7 @@ public:
 private:
     const SourceInfo& source;
     Worker& worker;
-    Request* req = nullptr;
+    RequestHolder req;
 
     RasterLayoutProperties layout;
     RasterBucket bucket;

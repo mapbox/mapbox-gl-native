@@ -31,7 +31,6 @@ void RasterTileData::request(float pixelRatio,
 
     FileSource* fs = util::ThreadContext::getFileSource();
     req = fs->request({ Resource::Kind::Tile, url }, util::RunLoop::getLoop(), [url, callback, this](const Response &res) {
-        util::ThreadContext::getFileSource()->cancel(req);
         req = nullptr;
 
         if (res.status == Response::NotFound) {
@@ -78,9 +77,6 @@ void RasterTileData::cancel() {
     if (state != State::obsolete) {
         state = State::obsolete;
     }
-    if (req) {
-        util::ThreadContext::getFileSource()->cancel(req);
-        req = nullptr;
-    }
+    req = nullptr;
     workRequest.reset();
 }

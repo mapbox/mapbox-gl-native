@@ -5,6 +5,7 @@
 #include <mbgl/storage/file_source.hpp>
 #include <mbgl/storage/resource.hpp>
 #include <mbgl/storage/response.hpp>
+#include <mbgl/storage/request_holder.hpp>
 #include <mbgl/util/exception.hpp>
 #include <mbgl/util/raster.hpp>
 #include <mbgl/util/thread.hpp>
@@ -23,19 +24,8 @@ struct Sprite::Loader {
     bool loadedImage = false;
     std::unique_ptr<Data> data = std::make_unique<Data>();
 
-    Request* jsonRequest = nullptr;
-    Request* spriteRequest = nullptr;
-
-    ~Loader() {
-        if (jsonRequest) {
-            util::ThreadContext::getFileSource()->cancel(jsonRequest);
-            jsonRequest = nullptr;
-        }
-        if (spriteRequest) {
-            util::ThreadContext::getFileSource()->cancel(spriteRequest);
-            spriteRequest = nullptr;
-        }
-    }
+    RequestHolder jsonRequest;
+    RequestHolder spriteRequest;
 };
 
 Sprite::Sprite(const std::string& baseUrl, float pixelRatio_)
@@ -54,7 +44,6 @@ Sprite::Sprite(const std::string& baseUrl, float pixelRatio_)
     FileSource* fs = util::ThreadContext::getFileSource();
     loader->jsonRequest = fs->request({ Resource::Kind::SpriteJSON, jsonURL }, util::RunLoop::getLoop(),
                                       [this, jsonURL](const Response& res) {
-        util::ThreadContext::getFileSource()->cancel(loader->jsonRequest);
         loader->jsonRequest = nullptr;
         if (res.status == Response::Successful) {
             loader->data->json = res.data;
@@ -71,7 +60,6 @@ Sprite::Sprite(const std::string& baseUrl, float pixelRatio_)
     loader->spriteRequest =
         fs->request({ Resource::Kind::SpriteImage, spriteURL }, util::RunLoop::getLoop(),
                     [this, spriteURL](const Response& res) {
-            util::ThreadContext::getFileSource()->cancel(loader->spriteRequest);
             loader->spriteRequest = nullptr;
             if (res.status == Response::Successful) {
                 loader->data->image = res.data;
