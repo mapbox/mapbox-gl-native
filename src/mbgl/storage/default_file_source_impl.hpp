@@ -15,6 +15,7 @@ class RequestBase;
 struct DefaultFileRequest {
     const Resource resource;
     std::set<Request*> observers;
+    std::shared_ptr<const Response> response;
 
     std::unique_ptr<WorkRequest> cacheRequest;
     RequestBase* realRequest = nullptr;
@@ -39,6 +40,7 @@ public:
 private:
     DefaultFileRequest* find(const Resource&);
 
+    void update(DefaultFileRequest*);
     void startCacheRequest(DefaultFileRequest*);
     void startRealRequest(DefaultFileRequest*, std::shared_ptr<const Response> = nullptr);
     void notify(DefaultFileRequest*, std::shared_ptr<const Response>, FileCache::Hint);

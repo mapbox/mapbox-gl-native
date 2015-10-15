@@ -8,7 +8,6 @@
 #include <mbgl/platform/log.hpp>
 
 #include <mbgl/util/uv_detail.hpp>
-#include <mbgl/util/chrono.hpp>
 #include <mbgl/util/thread.hpp>
 #include <mbgl/util/mapbox.hpp>
 #include <mbgl/util/exception.hpp>
@@ -102,43 +101,79 @@ void DefaultFileSource::Impl::add(Request* req) {
     const Resource& resource = req->resource;
     DefaultFileRequest* request = find(resource);
 
-    if (request) {
-        request->observers.insert(req);
-        return;
+    if (!request) {
+        request = &pending.emplace(resource, resource).first->second;
     }
 
-    request = &pending.emplace(resource, resource).first->second;
+    // Add this request as an observer so that it'll get notified when something about this
+    // request changes.
     request->observers.insert(req);
 
-    if (cache) {
-        startCacheRequest(request);
+    update(request);
+
+    if (request->response) {
+        // We've got a response, so send the (potentially stale) response to the requester.
+        req->notify(request->response);
+    }
+}
+
+void DefaultFileSource::Impl::update(DefaultFileRequest* request) {
+    if (request->response) {
+        // We've at least obtained a cache value, potentially we also got a final response.
+        // The observers have been notified already; send what we have to the new one as well.
+
+        // Before returning the existing response, make sure that it is still fresh.
+        if (!request->response->stale && request->response->isExpired()) {
+            // Create a new Response object with `stale = true`, but the same data, and
+            // replace the current request object we have.
+            // TODO: Make content shared_ptrs so we won't make copies of the content.
+            auto response = std::make_shared<Response>(*request->response);
+            response->stale = true;
+            request->response = response;
+        }
+
+        if (request->response->stale && !request->realRequest) {
+            // We've returned a stale response; now make sure the requester also gets a fresh
+            // response eventually. It's possible that there's already a request in progress.
+            // Note that this will also trigger updates to all other existing listeners.
+            // Since we already have data, we're going to verify
+            startRealRequest(request, request->response);
+        }
+    } else if (!request->cacheRequest && !request->realRequest) {
+        // There is no request in progress, and we don't have a response yet. This means we'll have
+        // to start the request ourselves.
+        if (cache) {
+            startCacheRequest(request);
+        } else {
+            startRealRequest(request);
+        }
     } else {
-        startRealRequest(request);
+        // There is a request in progress. We just have to wait.
     }
 }
 
 void DefaultFileSource::Impl::startCacheRequest(DefaultFileRequest* request) {
     // Check the cache for existing data so that we can potentially
     // revalidate the information without having to redownload everything.
-    request->cacheRequest = cache->get(request->resource, [this, request](std::unique_ptr<Response> response) {
-        auto expired = [&response] {
-            const int64_t now = std::chrono::duration_cast<std::chrono::seconds>(
-                                    SystemClock::now().time_since_epoch()).count();
-            return response->expires <= now;
-        };
+    request->cacheRequest = cache->get(request->resource, [this, request](std::shared_ptr<Response> response) {
+        request->cacheRequest = nullptr;
+        if (response) {
+            response->stale = response->isExpired();
 
-        if (!response || expired()) {
+            // Notify in all cases; requestors can decide whether they want to use stale responses.
+            notify(request, response, FileCache::Hint::No);
+        }
+
+        if (!response || response->stale) {
             // No response or stale cache. Run the real request.
-            startRealRequest(request, std::move(response));
-        } else {
-            // The response is fresh. We're good to notify the caller.
-            notify(request, std::move(response), FileCache::Hint::No);
+            startRealRequest(request, response);
         }
     });
 }
 
 void DefaultFileSource::Impl::startRealRequest(DefaultFileRequest* request, std::shared_ptr<const Response> response) {
     auto callback = [request, this] (std::shared_ptr<const Response> res, FileCache::Hint hint) {
+        request->realRequest = nullptr;
         notify(request, res, hint);
     };
 
@@ -181,6 +216,7 @@ void DefaultFileSource::Impl::notify(DefaultFileRequest* request, std::shared_pt
     assert(response);
 
     // Notify all observers.
+    request->response = response;
     for (auto req : request->observers) {
         req->notify(response);
     }
@@ -189,8 +225,6 @@ void DefaultFileSource::Impl::notify(DefaultFileRequest* request, std::shared_pt
         // Store response in database
         cache->put(request->resource, response, hint);
     }
-
-    pending.erase(request->resource);
 }
 
 }

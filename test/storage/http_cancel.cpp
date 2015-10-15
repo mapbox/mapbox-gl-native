@@ -39,6 +39,7 @@ TEST_F(Storage, HTTPCancelMultiple) {
     Request* req = fs.request(resource, uv_default_loop(), [&](const Response &res) {
         fs.cancel(req);
         EXPECT_EQ(Response::Successful, res.status);
+        EXPECT_EQ(false, res.stale);
         EXPECT_EQ("Hello World!", res.data);
         EXPECT_EQ(0, res.expires);
         EXPECT_EQ(0, res.modified);

@@ -31,6 +31,10 @@ void RasterTileData::request(float pixelRatio,
 
     FileSource* fs = util::ThreadContext::getFileSource();
     req = fs->request({ Resource::Kind::Tile, url }, util::RunLoop::getLoop(), [url, callback, this](const Response &res) {
+        if (res.stale) {
+            // Only handle fresh responses.
+            return;
+        }
         req = nullptr;
 
         if (res.status == Response::NotFound) {

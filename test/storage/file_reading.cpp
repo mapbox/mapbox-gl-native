@@ -20,6 +20,7 @@ TEST_F(Storage, AssetEmptyFile) {
                [&](const Response &res) {
         fs.cancel(req);
         EXPECT_EQ(Response::Successful, res.status);
+        EXPECT_EQ(false, res.stale);
         EXPECT_EQ(0ul, res.data.size());
         EXPECT_EQ(0, res.expires);
         EXPECT_LT(1420000000, res.modified);
@@ -46,6 +47,7 @@ TEST_F(Storage, AssetNonEmptyFile) {
                uv_default_loop(), [&](const Response &res) {
         fs.cancel(req);
         EXPECT_EQ(Response::Successful, res.status);
+        EXPECT_EQ(false, res.stale);
         EXPECT_EQ(16ul, res.data.size());
         EXPECT_EQ(0, res.expires);
         EXPECT_LT(1420000000, res.modified);
@@ -73,6 +75,7 @@ TEST_F(Storage, AssetNonExistentFile) {
                uv_default_loop(), [&](const Response &res) {
         fs.cancel(req);
         EXPECT_EQ(Response::Error, res.status);
+        EXPECT_EQ(false, res.stale);
         EXPECT_EQ(0ul, res.data.size());
         EXPECT_EQ(0, res.expires);
         EXPECT_EQ(0, res.modified);

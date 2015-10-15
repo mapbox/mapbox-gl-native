@@ -19,6 +19,7 @@ TEST_F(Storage, AssetReadDirectory) {
                [&](const Response &res) {
         fs.cancel(req);
         EXPECT_EQ(Response::Error, res.status);
+        EXPECT_EQ(false, res.stale);
         EXPECT_EQ(0ul, res.data.size());
         EXPECT_EQ(0, res.expires);
         EXPECT_EQ(0, res.modified);

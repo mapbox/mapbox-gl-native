@@ -75,6 +75,10 @@ GlyphPBF::GlyphPBF(GlyphStore* store,
     });
 
     auto requestCallback = [this, store, fontStack, url](const Response &res) {
+        if (res.stale) {
+            // Only handle fresh responses.
+            return;
+        }
         req = nullptr;
 
         if (res.status != Response::Successful) {

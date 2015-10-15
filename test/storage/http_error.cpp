@@ -37,6 +37,7 @@ TEST_F(Storage, HTTPError) {
         EXPECT_LT(1, duration) << "Backoff timer didn't wait 1 second";
         EXPECT_GT(1.2, duration) << "Backoff timer fired too late";
         EXPECT_EQ(Response::Successful, res.status);
+        EXPECT_EQ(false, res.stale);
         EXPECT_EQ("Hello World!", res.data);
         EXPECT_EQ(0, res.expires);
         EXPECT_EQ(0, res.modified);
@@ -54,6 +55,7 @@ TEST_F(Storage, HTTPError) {
         EXPECT_LT(1.5, duration) << "Resource wasn't retried the correct number of times";
         EXPECT_GT(1.7, duration) << "Resource wasn't retried the correct number of times";
         EXPECT_EQ(Response::Error, res.status);
+        EXPECT_EQ(false, res.stale);
 #ifdef MBGL_HTTP_NSURL
         EXPECT_TRUE(res.message ==
                         "The operation couldn’t be completed. (NSURLErrorDomain error -1004.)" ||

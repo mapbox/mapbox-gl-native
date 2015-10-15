@@ -49,7 +49,6 @@ Request::~Request() = default;
 
 // Called in the FileSource thread.
 void Request::notify(const std::shared_ptr<const Response> &response_) {
-    assert(!std::atomic_load(&response));
     assert(response_);
     std::atomic_store(&response, response_);
     async->send();

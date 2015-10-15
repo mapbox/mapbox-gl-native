@@ -106,6 +106,10 @@ void MapContext::setStyleURL(const std::string& url) {
 
     FileSource* fs = util::ThreadContext::getFileSource();
     styleRequest = fs->request({ Resource::Kind::Style, styleURL }, util::RunLoop::getLoop(), [this, base](const Response &res) {
+        if (res.stale) {
+            // Only handle fresh responses.
+            return;
+        }
         styleRequest = nullptr;
 
         if (res.status == Response::Successful) {

@@ -20,6 +20,7 @@ TEST_F(Storage, HTTPHeaderParsing) {
                uv_default_loop(), [&](const Response &res) {
         fs.cancel(req1);
         EXPECT_EQ(Response::Successful, res.status);
+        EXPECT_EQ(false, res.stale);
         EXPECT_EQ("Hello World!", res.data);
         EXPECT_EQ(1420797926, res.expires);
         EXPECT_EQ(1420794326, res.modified);
@@ -35,6 +36,7 @@ TEST_F(Storage, HTTPHeaderParsing) {
                uv_default_loop(), [&](const Response &res) {
         fs.cancel(req2);
         EXPECT_EQ(Response::Successful, res.status);
+        EXPECT_EQ(false, res.stale);
         EXPECT_EQ("Hello World!", res.data);
         EXPECT_GT(2, std::abs(res.expires - now - 120)) << "Expiration date isn't about 120 seconds in the future";
         EXPECT_EQ(0, res.modified);

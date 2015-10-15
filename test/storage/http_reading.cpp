@@ -23,6 +23,7 @@ TEST_F(Storage, HTTPReading) {
         fs.cancel(req1);
         EXPECT_EQ(uv_thread_self(), mainThread);
         EXPECT_EQ(Response::Successful, res.status);
+        EXPECT_EQ(false, res.stale);
         EXPECT_EQ("Hello World!", res.data);
         EXPECT_EQ(0, res.expires);
         EXPECT_EQ(0, res.modified);
@@ -36,6 +37,7 @@ TEST_F(Storage, HTTPReading) {
         fs.cancel(req2);
         EXPECT_EQ(uv_thread_self(), mainThread);
         EXPECT_EQ(Response::NotFound, res.status);
+        EXPECT_EQ(false, res.stale);
         EXPECT_EQ("", res.message);
         EXPECT_EQ(0, res.expires);
         EXPECT_EQ(0, res.modified);
@@ -48,6 +50,7 @@ TEST_F(Storage, HTTPReading) {
         fs.cancel(req3);
         EXPECT_EQ(uv_thread_self(), mainThread);
         EXPECT_EQ(Response::Error, res.status);
+        EXPECT_EQ(false, res.stale);
         EXPECT_EQ("HTTP status code 500", res.message);
         EXPECT_EQ(0, res.expires);
         EXPECT_EQ(0, res.modified);

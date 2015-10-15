@@ -44,6 +44,10 @@ Sprite::Sprite(const std::string& baseUrl, float pixelRatio_)
     FileSource* fs = util::ThreadContext::getFileSource();
     loader->jsonRequest = fs->request({ Resource::Kind::SpriteJSON, jsonURL }, util::RunLoop::getLoop(),
                                       [this, jsonURL](const Response& res) {
+        if (res.stale) {
+            // Only handle fresh responses.
+            return;
+        }
         loader->jsonRequest = nullptr;
         if (res.status == Response::Successful) {
             loader->data->json = res.data;
@@ -60,6 +64,10 @@ Sprite::Sprite(const std::string& baseUrl, float pixelRatio_)
     loader->spriteRequest =
         fs->request({ Resource::Kind::SpriteImage, spriteURL }, util::RunLoop::getLoop(),
                     [this, spriteURL](const Response& res) {
+            if (res.stale) {
+                // Only handle fresh responses.
+                return;
+            }
             loader->spriteRequest = nullptr;
             if (res.status == Response::Successful) {
                 loader->data->image = res.data;
