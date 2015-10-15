@@ -92,6 +92,10 @@ void MapContext::triggerUpdate(const TransformState& state, const Update flags) 
 }
 
 void MapContext::setStyleURL(const std::string& url) {
+    if (styleURL == url) {
+        return;
+    }
+
     FileSource* fs = util::ThreadContext::getFileSource();
 
     if (styleRequest) {
@@ -122,6 +126,10 @@ void MapContext::setStyleURL(const std::string& url) {
 }
 
 void MapContext::setStyleJSON(const std::string& json, const std::string& base) {
+    if (styleJSON == json) {
+        return;
+    }
+
     styleURL.clear();
     styleJSON = json;
 
