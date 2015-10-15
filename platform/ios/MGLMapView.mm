@@ -172,24 +172,6 @@ std::chrono::steady_clock::duration secondsAsDuration(float duration)
     return self;
 }
 
-- (nullable NSString *)accessToken
-{
-    [NSException raise:@"Method unavailable" format:
-     @"%s has been removed. "
-     @"Use +[MGLAccountManager accessToken] or get MGLMapboxAccessToken from the Info.plist.",
-     __PRETTY_FUNCTION__];
-    return nil;
-}
-
-- (void)setAccessToken:(nullable NSString *)accessToken
-{
-    [NSException raise:@"Method unavailable" format:
-     @"%s has been replaced by +[MGLAccountManager setAccessToken:].\n\n"
-     @"If you previously set this access token in a storyboard inspectable, select the MGLMapView in Interface Builder and delete the “accessToken” entry from the User Defined Runtime Attributes section of the Identity inspector. "
-     @"Then go to the Info.plist file and set MGLMapboxAccessToken to “%@”.",
-     __PRETTY_FUNCTION__, accessToken];
-}
-
 + (NS_SET_OF(NSString *) *)keyPathsForValuesAffectingStyleURL
 {
     return [NSSet setWithObjects:@"styleURL__", nil];

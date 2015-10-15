@@ -21,8 +21,6 @@ NS_ASSUME_NONNULL_BEGIN
 
 /** @name Providing User Metrics Opt-Out */
 
-+ (void)setMapboxMetricsEnabledSettingShownInApp:(BOOL)showsOptOut __attribute__((unavailable("Set MGLMapboxMetricsEnabledSettingShownInApp in Info.plist.")));
-
 /** Whether in-app user metrics opt-out is configured. If set to the default value of `NO`, a user opt-out preference is expected in a `Settings.bundle` that shows in the application's section within the system Settings app. */
 + (BOOL)mapboxMetricsEnabledSettingShownInApp;
 
