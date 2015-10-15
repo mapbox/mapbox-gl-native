@@ -192,7 +192,7 @@ std::chrono::steady_clock::duration secondsAsDuration(float duration)
 
 + (NS_SET_OF(NSString *) *)keyPathsForValuesAffectingStyleURL
 {
-    return [NSSet setWithObject:@"styleID"];
+    return [NSSet setWithObjects:@"styleURL__", nil];
 }
 
 - (nonnull NSURL *)styleURL
@@ -2012,37 +2012,21 @@ CLLocationCoordinate2D MGLLocationCoordinate2DFromLatLng(mbgl::LatLng latLng)
     return [NSArray arrayWithArray:_bundledStyleURLs];
 }
 
-+ (NS_SET_OF(NSString *) *)keyPathsForValuesAffectingStyleID
-{
-    return [NSSet setWithObject:@"styleURL"];
-}
-
 - (nullable NSString *)styleID
 {
-    NSURL *styleURL = self.styleURL;
-    return [styleURL.scheme isEqualToString:@"mapbox"] ? styleURL.host.mgl_stringOrNilIfEmpty : nil;
-}
-
-- (void)setStyleID:(nullable NSString *)styleID
-{
-    self.styleURL = styleID ? [NSURL URLWithString:[NSString stringWithFormat:@"mapbox://%@", styleID]] : nil;
-}
-
-- (nullable NSString *)mapID
-{
     [NSException raise:@"Method unavailable" format:
-     @"%s has been renamed -[MGLMapView styleID].",
+     @"%s has been replaced by -[MGLMapView styleURL].",
      __PRETTY_FUNCTION__];
     return nil;
 }
 
-- (void)setMapID:(nullable NSString *)mapID
+- (void)setStyleID:(nullable NSString *)styleID
 {
     [NSException raise:@"Method unavailable" format:
-     @"%s has been renamed -[MGLMapView setStyleID:].\n\n"
-     @"If you previously set this map ID in a storyboard inspectable, select the MGLMapView in Interface Builder and delete the “mapID” entry from the User Defined Runtime Attributes section of the Identity inspector. "
-     @"Then go to the Attributes inspector and enter “%@” into the “Style ID” field.",
-     __PRETTY_FUNCTION__, mapID];
+     @"%s has been replaced by -[MGLMapView setStyleURL:].\n\n"
+     @"If you previously set this style ID in a storyboard inspectable, select the MGLMapView in Interface Builder and delete the “styleID” entry from the User Defined Runtime Attributes section of the Identity inspector. "
+     @"Then go to the Attributes inspector and enter “mapbox://styles/%@” into the “Style URL” field.",
+     __PRETTY_FUNCTION__, styleID];
 }
 
 - (NS_ARRAY_OF(NSString *) *)styleClasses
@@ -3325,6 +3309,27 @@ class MBGLView : public mbgl::View
 @end
 
 @implementation MGLMapView (IBAdditions)
+
++ (NS_SET_OF(NSString *) *)keyPathsForValuesAffectingStyleURL__
+{
+    return [NSSet setWithObject:@"styleURL"];
+}
+
+- (nullable NSString *)styleURL__
+{
+    return self.styleURL.absoluteString;
+}
+
+- (void)setStyleURL__:(nullable NSString *)URLString
+{
+    NSURL *url = URLString.length ? [NSURL URLWithString:URLString] : nil;
+    if (URLString.length && !url)
+    {
+        [NSException raise:@"Invalid style URL" format:
+         @"“%@” is not a valid style URL.", URLString];
+    }
+    self.styleURL = url;
+}
 
 + (NS_SET_OF(NSString *) *)keyPathsForValuesAffectingLatitude
 {
