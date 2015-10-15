@@ -11,9 +11,6 @@ BUILDTYPE=${BUILDTYPE:-Release}
 # Build
 ################################################################################
 
-mapbox_time "checkout_geojsonvt" \
-git submodule update --init src/mbgl/util/geojsonvt
-
 mapbox_time "compile_program" \
 make xosx -j${JOBS} BUILDTYPE=${BUILDTYPE}
 

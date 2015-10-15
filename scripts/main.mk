@@ -22,6 +22,11 @@ ifneq (,$(wildcard scripts/$(HOST)/$(HOST_VERSION)/configure.sh))
 	CONFIGURE_FILES += scripts/$(HOST)/$(HOST_VERSION)/configure.sh
 endif
 
+ifneq (,$(findstring clang,$(CXX)))
+	CXX_HOST = "clang"
+else ifneq (,$(findstring g++,$(CXX)))
+	CXX_HOST = "g++"
+endif
 
 # Text formatting
 TEXT_BOLD = \033[1m
@@ -37,10 +42,6 @@ default: ;
 SUBMODULES += .mason/mason.sh
 .mason/mason.sh:
 	./scripts/flock.py .git/Submodule.lock git submodule update --init .mason
-
-SUBMODULES += src/mbgl/util/geojsonvt/geojsonvt.hpp
-src/mbgl/util/geojsonvt/geojsonvt.hpp:
-	./scripts/flock.py .git/Submodule.lock git submodule update --init src/mbgl/util/geojsonvt
 
 ifeq ($(HOST),ios)
 SUBMODULES += platform/ios/vendor/SMCalloutView/SMCalloutView.h
@@ -70,6 +71,7 @@ GYP_FLAGS += -Dcache_lib=$(CACHE)
 GYP_FLAGS += -Dheadless_lib=$(HEADLESS)
 GYP_FLAGS += -Dtest=$(BUILD_TEST)
 GYP_FLAGS += -Drender=$(BUILD_RENDER)
+GYP_FLAGS += -Dcxx_host=$(CXX_HOST)
 GYP_FLAGS += --depth=.
 GYP_FLAGS += -Goutput_dir=.
 GYP_FLAGS += --generator-output=./build/$(HOST_SLUG)

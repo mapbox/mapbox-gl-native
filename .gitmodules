@@ -10,6 +10,3 @@
 	path = platform/ios/vendor/SMCalloutView
 	url = https://github.com/nfarina/calloutview.git
 
-[submodule "src/mbgl/util/geojsonvt"]
-	path = src/mbgl/util/geojsonvt
-	url = https://github.com/mapbox/geojson-vt-cpp

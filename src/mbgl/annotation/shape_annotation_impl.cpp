@@ -1,7 +1,8 @@
+#include <mapbox/geojsonvt/geojsonvt_convert.hpp>
+
 #include <mbgl/annotation/shape_annotation_impl.hpp>
 #include <mbgl/annotation/annotation_manager.hpp>
 #include <mbgl/annotation/annotation_tile.hpp>
-#include <mbgl/util/geojsonvt/geojsonvt_convert.hpp>
 #include <mbgl/util/constants.hpp>
 #include <mbgl/util/string.hpp>
 #include <mbgl/style/style.hpp>
@@ -142,7 +143,7 @@ void ShapeAnnotationImpl::updateTile(const TileID& tileID, AnnotationTile& tile)
         assert(featureType != FeatureType::Unknown);
 
         GeometryCollection renderGeometry;
-        for (auto& shapeGeometry : shapeFeature.geometry) {
+        for (auto& shapeGeometry : shapeFeature.tileGeometry) {
             std::vector<Coordinate> renderLine;
             auto& shapeRing = shapeGeometry.get<TileRing>();
 

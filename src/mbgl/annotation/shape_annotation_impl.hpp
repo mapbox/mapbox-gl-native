@@ -1,10 +1,11 @@
 #ifndef MBGL_SHAPE_ANNOTATION_IMPL
 #define MBGL_SHAPE_ANNOTATION_IMPL
 
+#include <mapbox/geojsonvt/geojsonvt.hpp>
+
 #include <mbgl/annotation/annotation.hpp>
 #include <mbgl/annotation/shape_annotation.hpp>
 #include <mbgl/util/geo.hpp>
-#include <mbgl/util/geojsonvt/geojsonvt.hpp>
 
 #include <memory>
 #include <string>

@@ -74,15 +74,17 @@ step "Building static library..."
 LIBS=(core.a platform-ios.a asset-fs.a cache-sqlite.a http-nsurl.a)
 if [[ "${BUILD_FOR_DEVICE}" == true ]]; then
     libtool -static -no_warning_for_no_symbols \
+        `find mason_packages/ios-${IOS_SDK_VERSION} -type f -name libuv.a` \
+        `find mason_packages/ios-${IOS_SDK_VERSION} -type f -name libgeojsonvt.a` \
         -o ${OUTPUT}/static/lib${NAME}.a \
         ${LIBS[@]/#/build/${BUILDTYPE}-iphoneos/libmbgl-} \
-        ${LIBS[@]/#/build/${BUILDTYPE}-iphonesimulator/libmbgl-} \
-        `find mason_packages/ios-${IOS_SDK_VERSION} -type f -name libuv.a`
+        ${LIBS[@]/#/build/${BUILDTYPE}-iphonesimulator/libmbgl-}
 else
     libtool -static -no_warning_for_no_symbols \
+        `find mason_packages/ios-${IOS_SDK_VERSION} -type f -name libuv.a` \
+        `find mason_packages/ios-${IOS_SDK_VERSION} -type f -name libgeojsonvt.a` \
         -o ${OUTPUT}/static/lib${NAME}.a \
-        ${LIBS[@]/#/build/${BUILDTYPE}-iphonesimulator/libmbgl-} \
-        `find mason_packages/ios-${IOS_SDK_VERSION} -type f -name libuv.a`
+        ${LIBS[@]/#/build/${BUILDTYPE}-iphonesimulator/libmbgl-}
 fi
 echo "Created ${OUTPUT}/static/lib${NAME}.a"
 
