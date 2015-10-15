@@ -79,7 +79,7 @@ android.libraryVariants.all { variant ->
         destinationDir = new File(destinationDir, variant.baseName)
         source = files(variant.javaCompile.source)
         classpath = files(variant.javaCompile.classpath.files) + files(android.bootClasspath)
-        //exclude '**/R.java'
+        exclude '**/R.java', '**/BuildConfig.java', 'com/almeros/**'
         options.windowTitle("Mapbox Android SDK $VERSION_NAME Reference")
         options.docTitle("Mapbox Android SDK $VERSION_NAME")
         options.header("Mapbox Android SDK $VERSION_NAME Reference")
