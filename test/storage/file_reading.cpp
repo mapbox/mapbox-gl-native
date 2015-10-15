@@ -16,8 +16,9 @@ TEST_F(Storage, AssetEmptyFile) {
     DefaultFileSource fs(nullptr);
 #endif
 
-    fs.request({ Resource::Unknown, "asset://TEST_DATA/fixtures/storage/empty" }, uv_default_loop(),
+    Request* req = fs.request({ Resource::Unknown, "asset://TEST_DATA/fixtures/storage/empty" }, uv_default_loop(),
                [&](const Response &res) {
+        fs.cancel(req);
         EXPECT_EQ(Response::Successful, res.status);
         EXPECT_EQ(0ul, res.data.size());
         EXPECT_EQ(0, res.expires);
@@ -41,8 +42,9 @@ TEST_F(Storage, AssetNonEmptyFile) {
     DefaultFileSource fs(nullptr);
 #endif
 
-    fs.request({ Resource::Unknown, "asset://TEST_DATA/fixtures/storage/nonempty" },
+    Request* req = fs.request({ Resource::Unknown, "asset://TEST_DATA/fixtures/storage/nonempty" },
                uv_default_loop(), [&](const Response &res) {
+        fs.cancel(req);
         EXPECT_EQ(Response::Successful, res.status);
         EXPECT_EQ(16ul, res.data.size());
         EXPECT_EQ(0, res.expires);
@@ -67,8 +69,9 @@ TEST_F(Storage, AssetNonExistentFile) {
     DefaultFileSource fs(nullptr);
 #endif
 
-    fs.request({ Resource::Unknown, "asset://TEST_DATA/fixtures/storage/does_not_exist" },
+    Request* req = fs.request({ Resource::Unknown, "asset://TEST_DATA/fixtures/storage/does_not_exist" },
                uv_default_loop(), [&](const Response &res) {
+        fs.cancel(req);
         EXPECT_EQ(Response::Error, res.status);
         EXPECT_EQ(0ul, res.data.size());
         EXPECT_EQ(0, res.expires);

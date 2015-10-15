@@ -53,8 +53,7 @@ void MapContext::cleanup() {
     view.notify();
 
     if (styleRequest) {
-        FileSource* fs = util::ThreadContext::getFileSource();
-        fs->cancel(styleRequest);
+        util::ThreadContext::getFileSource()->cancel(styleRequest);
         styleRequest = nullptr;
     }
 
@@ -100,6 +99,7 @@ void MapContext::setStyleURL(const std::string& url) {
 
     if (styleRequest) {
         fs->cancel(styleRequest);
+        styleRequest = nullptr;
     }
 
     styleURL = url;
@@ -114,6 +114,7 @@ void MapContext::setStyleURL(const std::string& url) {
     }
 
     styleRequest = fs->request({ Resource::Kind::Style, styleURL }, util::RunLoop::getLoop(), [this, base](const Response &res) {
+        util::ThreadContext::getFileSource()->cancel(styleRequest);
         styleRequest = nullptr;
 
         if (res.status == Response::Successful) {

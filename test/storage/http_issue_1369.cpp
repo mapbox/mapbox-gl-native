@@ -30,7 +30,8 @@ TEST_F(Storage, HTTPIssue1369) {
         ADD_FAILURE() << "Callback should not be called";
     });
     fs.cancel(req);
-    fs.request(resource, uv_default_loop(), [&](const Response &res) {
+    req = fs.request(resource, uv_default_loop(), [&](const Response &res) {
+        fs.cancel(req);
         EXPECT_EQ(Response::Successful, res.status);
         EXPECT_EQ("Hello World!", res.data);
         EXPECT_EQ(0, res.expires);

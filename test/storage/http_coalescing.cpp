@@ -40,8 +40,12 @@ TEST_F(Storage, HTTPCoalescing) {
 
     const Resource resource { Resource::Unknown, "http://127.0.0.1:3000/test" };
 
+    Request* reqs[total];
     for (int i = 0; i < total; i++) {
-        fs.request(resource, uv_default_loop(), complete);
+        reqs[i] = fs.request(resource, uv_default_loop(), [&complete, &fs, &reqs, i] (const Response &res) {
+            fs.cancel(reqs[i]);
+            complete(res);
+        });
     }
 
     uv_run(uv_default_loop(), UV_RUN_DEFAULT);

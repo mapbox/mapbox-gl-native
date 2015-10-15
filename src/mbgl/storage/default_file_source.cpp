@@ -11,6 +11,7 @@
 #include <mbgl/util/chrono.hpp>
 #include <mbgl/util/thread.hpp>
 #include <mbgl/util/mapbox.hpp>
+#include <mbgl/util/exception.hpp>
 
 #pragma GCC diagnostic push
 #pragma GCC diagnostic ignored "-Wshadow"
@@ -39,6 +40,10 @@ Request* DefaultFileSource::request(const Resource& resource,
                                     uv_loop_t* l,
                                     Callback callback) {
     assert(l);
+
+    if (!callback) {
+        throw util::MisuseException("FileSource callback can't be empty");
+    }
 
     std::string url;
 
@@ -70,6 +75,7 @@ Request* DefaultFileSource::request(const Resource& resource,
 }
 
 void DefaultFileSource::cancel(Request *req) {
+    assert(req);
     req->cancel();
     thread->invoke(&Impl::cancel, req);
 }

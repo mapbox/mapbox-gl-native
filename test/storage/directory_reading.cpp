@@ -15,8 +15,9 @@ TEST_F(Storage, AssetReadDirectory) {
     DefaultFileSource fs(nullptr);
 #endif
 
-    fs.request({ Resource::Unknown, "asset://TEST_DATA/fixtures/storage" }, uv_default_loop(),
+    Request* req = fs.request({ Resource::Unknown, "asset://TEST_DATA/fixtures/storage" }, uv_default_loop(),
                [&](const Response &res) {
+        fs.cancel(req);
         EXPECT_EQ(Response::Error, res.status);
         EXPECT_EQ(0ul, res.data.size());
         EXPECT_EQ(0, res.expires);

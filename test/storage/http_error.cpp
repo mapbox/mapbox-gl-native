@@ -30,8 +30,9 @@ TEST_F(Storage, HTTPError) {
 
     auto start = uv_hrtime();
 
-    fs.request({ Resource::Unknown, "http://127.0.0.1:3000/temporary-error" }, uv_default_loop(),
+    Request* req1 = fs.request({ Resource::Unknown, "http://127.0.0.1:3000/temporary-error" }, uv_default_loop(),
                [&](const Response &res) {
+        fs.cancel(req1);
         const auto duration = double(uv_hrtime() - start) / 1e9;
         EXPECT_LT(1, duration) << "Backoff timer didn't wait 1 second";
         EXPECT_GT(1.2, duration) << "Backoff timer fired too late";
@@ -45,8 +46,9 @@ TEST_F(Storage, HTTPError) {
         HTTPTemporaryError.finish();
     });
 
-    fs.request({ Resource::Unknown, "http://127.0.0.1:3001/" }, uv_default_loop(),
+    Request* req2 = fs.request({ Resource::Unknown, "http://127.0.0.1:3001/" }, uv_default_loop(),
                [&](const Response &res) {
+        fs.cancel(req2);
         const auto duration = double(uv_hrtime() - start) / 1e9;
         // 1.5 seconds == 4 retries, with a 500ms timeout (see above).
         EXPECT_LT(1.5, duration) << "Resource wasn't retried the correct number of times";

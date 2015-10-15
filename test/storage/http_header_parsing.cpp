@@ -15,9 +15,10 @@ TEST_F(Storage, HTTPHeaderParsing) {
 
     DefaultFileSource fs(nullptr);
 
-    fs.request({ Resource::Unknown,
+    Request* req1 = fs.request({ Resource::Unknown,
                  "http://127.0.0.1:3000/test?modified=1420794326&expires=1420797926&etag=foo" },
                uv_default_loop(), [&](const Response &res) {
+        fs.cancel(req1);
         EXPECT_EQ(Response::Successful, res.status);
         EXPECT_EQ("Hello World!", res.data);
         EXPECT_EQ(1420797926, res.expires);
@@ -30,8 +31,9 @@ TEST_F(Storage, HTTPHeaderParsing) {
     int64_t now = std::chrono::duration_cast<std::chrono::seconds>(
                        SystemClock::now().time_since_epoch()).count();
 
-    fs.request({ Resource::Unknown, "http://127.0.0.1:3000/test?cachecontrol=max-age=120" },
+    Request* req2 = fs.request({ Resource::Unknown, "http://127.0.0.1:3000/test?cachecontrol=max-age=120" },
                uv_default_loop(), [&](const Response &res) {
+        fs.cancel(req2);
         EXPECT_EQ(Response::Successful, res.status);
         EXPECT_EQ("Hello World!", res.data);
         EXPECT_GT(2, std::abs(res.expires - now - 120)) << "Expiration date isn't about 120 seconds in the future";

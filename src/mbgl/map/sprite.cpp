@@ -29,9 +29,11 @@ struct Sprite::Loader {
     ~Loader() {
         if (jsonRequest) {
             util::ThreadContext::getFileSource()->cancel(jsonRequest);
+            jsonRequest = nullptr;
         }
         if (spriteRequest) {
             util::ThreadContext::getFileSource()->cancel(spriteRequest);
+            spriteRequest = nullptr;
         }
     }
 };
@@ -52,6 +54,7 @@ Sprite::Sprite(const std::string& baseUrl, float pixelRatio_)
     FileSource* fs = util::ThreadContext::getFileSource();
     loader->jsonRequest = fs->request({ Resource::Kind::SpriteJSON, jsonURL }, util::RunLoop::getLoop(),
                                       [this, jsonURL](const Response& res) {
+        util::ThreadContext::getFileSource()->cancel(loader->jsonRequest);
         loader->jsonRequest = nullptr;
         if (res.status == Response::Successful) {
             loader->data->json = res.data;
@@ -68,6 +71,7 @@ Sprite::Sprite(const std::string& baseUrl, float pixelRatio_)
     loader->spriteRequest =
         fs->request({ Resource::Kind::SpriteImage, spriteURL }, util::RunLoop::getLoop(),
                     [this, spriteURL](const Response& res) {
+            util::ThreadContext::getFileSource()->cancel(loader->spriteRequest);
             loader->spriteRequest = nullptr;
             if (res.status == Response::Successful) {
                 loader->data->image = res.data;

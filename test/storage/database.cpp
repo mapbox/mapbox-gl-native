@@ -181,7 +181,7 @@ TEST_F(Storage, DatabaseLockedWrite) {
         response->data = "Demo";
         cache.put({ Resource::Unknown, "mapbox://test" }, response);
         cache.get({ Resource::Unknown, "mapbox://test" }, [] (std::unique_ptr<Response> res) {
-            EXPECT_NE(nullptr, res.get());
+            ASSERT_NE(nullptr, res.get());
             EXPECT_EQ("Demo", res->data);
         });
 
@@ -258,7 +258,7 @@ TEST_F(Storage, DatabaseDeleted) {
         response->data = "Demo";
         cache.put({ Resource::Unknown, "mapbox://test" }, response);
         cache.get({ Resource::Unknown, "mapbox://test" }, [] (std::unique_ptr<Response> res) {
-            EXPECT_NE(nullptr, res.get());
+            ASSERT_NE(nullptr, res.get());
             EXPECT_EQ("Demo", res->data);
         });
 
@@ -275,7 +275,7 @@ TEST_F(Storage, DatabaseDeleted) {
         response->data = "Demo";
         cache.put({ Resource::Unknown, "mapbox://test" }, response);
         cache.get({ Resource::Unknown, "mapbox://test" }, [] (std::unique_ptr<Response> res) {
-            EXPECT_NE(nullptr, res.get());
+            ASSERT_NE(nullptr, res.get());
             EXPECT_EQ("Demo", res->data);
         });
 
@@ -305,7 +305,7 @@ TEST_F(Storage, DatabaseInvalid) {
         response->data = "Demo";
         cache.put({ Resource::Unknown, "mapbox://test" }, response);
         cache.get({ Resource::Unknown, "mapbox://test" }, [] (std::unique_ptr<Response> res) {
-            EXPECT_NE(nullptr, res.get());
+            ASSERT_NE(nullptr, res.get());
             EXPECT_EQ("Demo", res->data);
         });
 

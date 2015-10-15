@@ -133,7 +133,6 @@ void NodeFileSource::notify(const mbgl::Resource& resource, const std::shared_pt
     }
 
     observersIt->second->notify(response);
-    observers.erase(observersIt);
 }
 
 }

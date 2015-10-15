@@ -3,6 +3,7 @@
 #include <uv.h>
 
 #include <mbgl/storage/default_file_source.hpp>
+#include <mbgl/util/exception.hpp>
 
 #include <future>
 
@@ -17,8 +18,9 @@ TEST_F(Storage, HTTPReading) {
 
     const auto mainThread = uv_thread_self();
 
-    fs.request({ Resource::Unknown, "http://127.0.0.1:3000/test" }, uv_default_loop(),
+    Request* req1 = fs.request({ Resource::Unknown, "http://127.0.0.1:3000/test" }, uv_default_loop(),
                [&](const Response &res) {
+        fs.cancel(req1);
         EXPECT_EQ(uv_thread_self(), mainThread);
         EXPECT_EQ(Response::Successful, res.status);
         EXPECT_EQ("Hello World!", res.data);
@@ -29,8 +31,9 @@ TEST_F(Storage, HTTPReading) {
         HTTPTest.finish();
     });
 
-    fs.request({ Resource::Unknown, "http://127.0.0.1:3000/doesnotexist" }, uv_default_loop(),
+    Request* req2 = fs.request({ Resource::Unknown, "http://127.0.0.1:3000/doesnotexist" }, uv_default_loop(),
                [&](const Response &res) {
+        fs.cancel(req2);
         EXPECT_EQ(uv_thread_self(), mainThread);
         EXPECT_EQ(Response::NotFound, res.status);
         EXPECT_EQ("", res.message);
@@ -40,8 +43,9 @@ TEST_F(Storage, HTTPReading) {
         HTTP404.finish();
     });
 
-    fs.request({ Resource::Unknown, "http://127.0.0.1:3000/permanent-error" }, uv_default_loop(),
+    Request* req3 = fs.request({ Resource::Unknown, "http://127.0.0.1:3000/permanent-error" }, uv_default_loop(),
                [&](const Response &res) {
+        fs.cancel(req3);
         EXPECT_EQ(uv_thread_self(), mainThread);
         EXPECT_EQ(Response::Error, res.status);
         EXPECT_EQ("HTTP status code 500", res.message);
@@ -61,10 +65,14 @@ TEST_F(Storage, HTTPNoCallback) {
 
     DefaultFileSource fs(nullptr);
 
-    fs.request({ Resource::Unknown, "http://127.0.0.1:3000/test" }, uv_default_loop(),
+    try {
+        fs.request({ Resource::Unknown, "http://127.0.0.1:3000/test" }, uv_default_loop(),
                nullptr);
-
-    uv_run(uv_default_loop(), UV_RUN_DEFAULT);
+    } catch (const util::MisuseException& ex) {
+        EXPECT_EQ(std::string(ex.what()), "FileSource callback can't be empty");
+    } catch (const std::exception&) {
+        EXPECT_TRUE(false) << "Unhandled exception.";
+    }
 
     HTTPTest.finish();
 }

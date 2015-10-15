@@ -6,6 +6,7 @@
 
 #include <cassert>
 #include <functional>
+#include <atomic>
 
 namespace mbgl {
 
@@ -40,18 +41,17 @@ void Request::invoke() {
     // The user could supply a null pointer or empty std::function as a callback. In this case, we
     // still do the file request, but we don't need to deliver a result.
     if (callback) {
-        callback(*response);
+        callback(*std::atomic_load(&response));
     }
-    delete this;
 }
 
 Request::~Request() = default;
 
 // Called in the FileSource thread.
 void Request::notify(const std::shared_ptr<const Response> &response_) {
-    assert(!response);
-    response = response_;
-    assert(response);
+    assert(!std::atomic_load(&response));
+    assert(response_);
+    std::atomic_store(&response, response_);
     async->send();
 }
 

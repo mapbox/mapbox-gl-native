@@ -43,6 +43,7 @@ void VectorTileData::request(float pixelRatio, const std::function<void()>& call
 
     FileSource* fs = util::ThreadContext::getFileSource();
     req = fs->request({ Resource::Kind::Tile, url }, util::RunLoop::getLoop(), [url, callback, this](const Response &res) {
+        util::ThreadContext::getFileSource()->cancel(req);
         req = nullptr;
 
         if (res.status == Response::NotFound) {
