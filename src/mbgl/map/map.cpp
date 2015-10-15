@@ -349,7 +349,7 @@ double Map::getTopOffsetPixelsForAnnotationSymbol(const std::string& symbol) {
     return context->invokeSync<double>(&MapContext::getTopOffsetPixelsForAnnotationSymbol, symbol);
 }
 
-uint32_t Map::addPointAnnotation(const PointAnnotation& annotation) {
+AnnotationID Map::addPointAnnotation(const PointAnnotation& annotation) {
     return addPointAnnotations({ annotation }).front();
 }
 
@@ -359,7 +359,7 @@ AnnotationIDs Map::addPointAnnotations(const std::vector<PointAnnotation>& annot
     return result;
 }
 
-uint32_t Map::addShapeAnnotation(const ShapeAnnotation& annotation) {
+AnnotationID Map::addShapeAnnotation(const ShapeAnnotation& annotation) {
     return addShapeAnnotations({ annotation }).front();
 }
 
@@ -369,20 +369,20 @@ AnnotationIDs Map::addShapeAnnotations(const std::vector<ShapeAnnotation>& annot
     return result;
 }
 
-void Map::removeAnnotation(uint32_t annotation) {
+void Map::removeAnnotation(AnnotationID annotation) {
     removeAnnotations({ annotation });
 }
 
-void Map::removeAnnotations(const std::vector<uint32_t>& annotations) {
+void Map::removeAnnotations(const AnnotationIDs& annotations) {
     data->getAnnotationManager()->removeAnnotations(annotations, getMaxZoom());
     update(Update::Annotations);
 }
 
-std::vector<uint32_t> Map::getAnnotationsInBounds(const LatLngBounds& bounds, const AnnotationType& type) {
+AnnotationIDs Map::getAnnotationsInBounds(const LatLngBounds& bounds, const AnnotationType& type) {
     return data->getAnnotationManager()->getAnnotationsInBounds(bounds, getMaxZoom(), type);
 }
 
-LatLngBounds Map::getBoundsForAnnotations(const std::vector<uint32_t>& annotations) {
+LatLngBounds Map::getBoundsForAnnotations(const AnnotationIDs& annotations) {
     return data->getAnnotationManager()->getBoundsForAnnotations(annotations);
 }
 

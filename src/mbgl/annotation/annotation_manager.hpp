@@ -1,7 +1,7 @@
 #ifndef MBGL_MAP_ANNOTATIONS
 #define MBGL_MAP_ANNOTATIONS
 
-#include <mbgl/map/map.hpp>
+#include <mbgl/annotation/annotation.hpp>
 #include <mbgl/map/geometry_tile.hpp>
 #include <mbgl/map/tile_id.hpp>
 #include <mbgl/style/style_properties.hpp>

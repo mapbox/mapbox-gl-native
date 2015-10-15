@@ -1,13 +1,15 @@
 #ifndef MBGL_ANNOTATION_SHAPE_ANNOTATION
 #define MBGL_ANNOTATION_SHAPE_ANNOTATION
 
-#include <mbgl/util/geo.hpp>
-#include <mbgl/map/map.hpp>
+#include <mbgl/annotation/annotation.hpp>
 #include <mbgl/style/style_properties.hpp>
 
-#include <string>
+#include <mbgl/util/geo.hpp>
 
 namespace mbgl {
+
+using AnnotationSegment = std::vector<LatLng>;
+using AnnotationSegments = std::vector<AnnotationSegment>;
 
 class ShapeAnnotation {
 public:

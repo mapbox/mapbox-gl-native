@@ -7,6 +7,7 @@
 #include <mbgl/util/geo.hpp>
 #include <mbgl/util/noncopyable.hpp>
 #include <mbgl/util/vec.hpp>
+#include <mbgl/annotation/annotation.hpp>
 
 #include <cstdint>
 #include <string>
@@ -31,22 +32,12 @@ namespace util {
 template <class T> class Thread;
 }
 
-enum class AnnotationType : uint8_t {
-    Any   = 0,
-    Point = 1 << 0,
-    Shape = 1 << 1,
-};
-
 struct EdgeInsets {
     double top = 0;
     double left = 0;
     double bottom = 0;
     double right = 0;
 };
-
-using AnnotationIDs = std::vector<uint32_t>;
-using AnnotationSegment = std::vector<LatLng>;
-using AnnotationSegments = std::vector<AnnotationSegment>;
 
 class Map : private util::noncopyable {
     friend class View;
@@ -147,13 +138,13 @@ public:
     void setDefaultPointAnnotationSymbol(const std::string&);
     double getTopOffsetPixelsForAnnotationSymbol(const std::string&);
 
-    uint32_t addPointAnnotation(const PointAnnotation&);
+    AnnotationID addPointAnnotation(const PointAnnotation&);
     AnnotationIDs addPointAnnotations(const std::vector<PointAnnotation>&);
 
-    uint32_t addShapeAnnotation(const ShapeAnnotation&);
+    AnnotationID addShapeAnnotation(const ShapeAnnotation&);
     AnnotationIDs addShapeAnnotations(const std::vector<ShapeAnnotation>&);
 
-    void removeAnnotation(uint32_t);
+    void removeAnnotation(AnnotationID);
     void removeAnnotations(const AnnotationIDs&);
 
     AnnotationIDs getAnnotationsInBounds(const LatLngBounds&, const AnnotationType& = AnnotationType::Any);
