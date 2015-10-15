@@ -34,7 +34,6 @@ public class Polyline extends MultiPoint {
      * Sets the width of the polyline.
      *
      * @param width in pixels
-     * @return
      */
     public void setWidth(float width) {
         this.width = width;

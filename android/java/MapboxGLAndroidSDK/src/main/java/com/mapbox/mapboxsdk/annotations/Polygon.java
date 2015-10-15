@@ -80,7 +80,6 @@ public class Polygon extends MultiPoint {
     /**
      * UNIMPLEMENTED: Needs implementation in Native.
      * https://github.com/mapbox/mapbox-gl-native/issues/1737
-     * @return stroke width as float
      */
     public void setStrokeWidth(float width) {
         strokeWidth = width;

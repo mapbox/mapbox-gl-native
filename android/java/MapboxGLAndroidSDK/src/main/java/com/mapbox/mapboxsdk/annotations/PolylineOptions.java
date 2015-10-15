@@ -58,7 +58,7 @@ public class PolylineOptions extends MultiPointOptions {
      * Sets the width of the polyline.
      *
      * @param width in pixels
-     * @return
+     * @return a new PolylineOptions
      */
     public PolylineOptions width(float width) {
         ((Polyline)annotation).width = width;

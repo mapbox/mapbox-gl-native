@@ -1297,7 +1297,7 @@ public final class MapView extends FrameLayout {
      * <p/>
      * {@code url} can take the following forms:
      * <ul>
-     * <li>{@code MapView.StyleUrls.*}: load one of the bundled styles in {@link Style}.</li>
+     * <li>{@code Style.*}: load one of the bundled styles in {@link Style}.</li>
      * <li>{@code mapbox://styles/<user>/<style>}:
      * retrieves the style from a <a href="https://www.mapbox.com/account/">Mapbox account.</a>
      * {@code user} is your username. {@code style} is the ID of your custom
@@ -1328,9 +1328,20 @@ public final class MapView extends FrameLayout {
         mNativeMapView.setStyleUrl(url);
     }
 
+    /**
+     * Loads a new map style from the specified bundled style.
+     * <p/>
+     * This method is asynchronous and will return immediately before the style finishes loading.
+     * If you wish to wait for the map to finish loading listen for the {@link MapView#DID_FINISH_LOADING_MAP} event.
+     * <p/>
+     * If the style fails to load or an invalid style URL is set, the map view will become blank.
+     * An error message will be logged in the Android logcat and {@link MapView#DID_FAIL_LOADING_MAP} event will be sent.
+     *
+     * @param style The bundled style. Accepts one of the values from {@link Style}.
+     */
     @UiThread
     @NonNull
-    public void setStyle(@Style.StyleUrl String style){
+    public void setStyle(@Style.StyleUrl String style) {
         setStyleUrl(style);
     }
 
@@ -1854,6 +1865,7 @@ public final class MapView extends FrameLayout {
     /**
      * Get Top Offset for the annotation symbol.
      * Used by InfoWindow
+     *
      * @param symbolName Annotation Symbol
      * @return Top Offset in pixels
      */
@@ -1877,6 +1889,7 @@ public final class MapView extends FrameLayout {
 
     /**
      * Get ScreenDensity of device
+     *
      * @return Screen Density ratio
      */
     public float getScreenDensity() {

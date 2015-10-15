@@ -2,11 +2,22 @@ package com.mapbox.mapboxsdk.constants;
 
 import android.support.annotation.StringDef;
 
+import com.mapbox.mapboxsdk.views.MapView;
+
 import java.lang.annotation.Retention;
 import java.lang.annotation.RetentionPolicy;
-
+/**
+* Style provides URLs to several professional styles designed by Mapbox.
+* <p/>
+* These styles are all ready to go in your app. To load one, pass it into {@link MapView#setStyleUrl(String)}
+*
+* @see MapView#setStyleUrl(String)
+*/
 public class Style {
 
+    /**
+     * Indicates the parameter accepts one of the values from {@link Style}.
+     */
     @StringDef({MAPBOX_STREETS, EMERALD, LIGHT, DARK, SATELLITE})
     @Retention(RetentionPolicy.SOURCE)
     public @interface StyleUrl {
