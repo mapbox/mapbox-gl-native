@@ -11,6 +11,7 @@
 #include <QImage>
 #include <QMapboxGL>
 #include <QString>
+#include <QStringList>
 
 #include <memory>
 
@@ -188,6 +189,42 @@ void QMapboxGL::setPitch(double pitch_, int milliseconds)
 void QMapboxGL::setGestureInProgress(bool inProgress)
 {
     d_ptr->mapObj->setGestureInProgress(inProgress);
+}
+
+void QMapboxGL::addClass(const QString &className)
+{
+    d_ptr->mapObj->addClass(className.toUtf8().constData());
+}
+
+void QMapboxGL::removeClass(const QString &className)
+{
+    d_ptr->mapObj->removeClass(className.toUtf8().constData());
+}
+
+bool QMapboxGL::hasClass(const QString &className) const
+{
+    return d_ptr->mapObj->hasClass(className.toUtf8().constData());
+}
+
+void QMapboxGL::setClasses(const QStringList &classNames)
+{
+    std::vector<std::string> mbglClassNames;
+    mbglClassNames.reserve(classNames.size());
+
+    for (const QString &className : classNames) {
+        mbglClassNames.emplace_back(className.toUtf8().constData());
+    }
+
+    d_ptr->mapObj->setClasses(mbglClassNames);
+}
+
+QStringList QMapboxGL::getClasses() const
+{
+    QStringList classNames;
+    for (const std::string &mbglClass : d_ptr->mapObj->getClasses()) {
+        classNames << QString::fromStdString(mbglClass);
+    }
+    return classNames;
 }
 
 bool QMapboxGL::isRotating() const

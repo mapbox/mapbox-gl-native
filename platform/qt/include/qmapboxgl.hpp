@@ -8,6 +8,7 @@
 class QImage;
 class QSize;
 class QString;
+class QStringList;
 
 class QMapboxGLPrivate;
 
@@ -83,6 +84,12 @@ public:
     void setCoordinateZoom(const Coordinate &, double zoom, int milliseconds = 0);
 
     void setGestureInProgress(bool inProgress);
+
+    void addClass(const QString &);
+    void removeClass(const QString &);
+    bool hasClass(const QString &) const;
+    void setClasses(const QStringList &);
+    QStringList getClasses() const;
 
     bool isRotating() const;
     bool isScaling() const;
