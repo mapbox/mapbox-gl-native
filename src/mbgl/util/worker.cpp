@@ -3,7 +3,7 @@
 #include <mbgl/util/work_request.hpp>
 #include <mbgl/platform/platform.hpp>
 #include <mbgl/map/vector_tile.hpp>
-#include <mbgl/map/live_tile.hpp>
+#include <mbgl/annotation/annotation_tile.hpp>
 #include <mbgl/util/pbf.hpp>
 #include <mbgl/renderer/raster_bucket.hpp>
 
@@ -38,7 +38,7 @@ public:
         }
     }
 
-    void parseLiveTile(TileWorker* worker, const LiveTile* tile, std::function<void (TileParseResult)> callback) {
+    void parseLiveTile(TileWorker* worker, const AnnotationTile* tile, std::function<void (TileParseResult)> callback) {
         try {
             callback(worker->parse(*tile));
         } catch (const std::exception& ex) {
@@ -71,7 +71,7 @@ std::unique_ptr<WorkRequest> Worker::parseVectorTile(TileWorker& worker, std::st
     return threads[current]->invokeWithCallback(&Worker::Impl::parseVectorTile, callback, &worker, data);
 }
 
-std::unique_ptr<WorkRequest> Worker::parseLiveTile(TileWorker& worker, const LiveTile& tile, std::function<void (TileParseResult)> callback) {
+std::unique_ptr<WorkRequest> Worker::parseLiveTile(TileWorker& worker, const AnnotationTile& tile, std::function<void (TileParseResult)> callback) {
     current = (current + 1) % threads.size();
     return threads[current]->invokeWithCallback(&Worker::Impl::parseLiveTile, callback, &worker, &tile);
 }

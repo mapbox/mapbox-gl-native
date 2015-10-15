@@ -135,9 +135,6 @@ public:
     const LatLng latLngForPixel(const vec2<double> pixel) const;
 
     // Annotations
-    void setDefaultPointAnnotationSymbol(const std::string&);
-    double getTopOffsetPixelsForAnnotationSymbol(const std::string&);
-
     AnnotationID addPointAnnotation(const PointAnnotation&);
     AnnotationIDs addPointAnnotations(const std::vector<PointAnnotation>&);
 
@@ -147,8 +144,9 @@ public:
     void removeAnnotation(AnnotationID);
     void removeAnnotations(const AnnotationIDs&);
 
-    AnnotationIDs getAnnotationsInBounds(const LatLngBounds&, const AnnotationType& = AnnotationType::Any);
+    AnnotationIDs getPointAnnotationsInBounds(const LatLngBounds&);
     LatLngBounds getBoundsForAnnotations(const AnnotationIDs&);
+    double getTopOffsetPixelsForAnnotationSymbol(const std::string&);
 
     // Sprites
     void setSprite(const std::string&, std::shared_ptr<const SpriteImage>);

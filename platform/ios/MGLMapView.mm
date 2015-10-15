@@ -285,9 +285,6 @@ std::chrono::steady_clock::duration secondsAsDuration(float duration)
 
     _annotationImages = [NSMutableDictionary dictionary];
 
-    std::string defaultSymbolName([MGLDefaultStyleMarkerSymbolName UTF8String]);
-    _mbglMap->setDefaultPointAnnotationSymbol(defaultSymbolName);
-
     // setup logo bug
     //
     UIImage *logo = [[MGLMapView resourceImageNamed:@"mapbox.png"] imageWithAlignmentRectInsets:UIEdgeInsetsMake(1.5, 4, 3.5, 2)];
@@ -1159,7 +1156,7 @@ std::chrono::steady_clock::duration secondsAsDuration(float duration)
         tapBounds.extend(MGLLatLngFromLocationCoordinate2D(coordinate));
 
         // query for nearby annotations
-        std::vector<uint32_t> nearbyAnnotations = _mbglMap->getAnnotationsInBounds(tapBounds, mbgl::AnnotationType::Point);
+        std::vector<uint32_t> nearbyAnnotations = _mbglMap->getPointAnnotationsInBounds(tapBounds);
 
         int32_t newSelectedAnnotationID = -1;
 

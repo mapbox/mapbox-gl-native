@@ -1,6 +1,8 @@
 #ifndef MBGL_UTIL_GEO
 #define MBGL_UTIL_GEO
 
+#include <mbgl/util/vec.hpp>
+
 namespace mbgl {
 
 class TileID;
@@ -14,6 +16,8 @@ struct LatLng {
 
     // Constructs a LatLng object with the top left position of the specified tile.
     LatLng(const TileID& id);
+
+    vec2<double> project() const;
 };
 
 struct ProjectedMeters {

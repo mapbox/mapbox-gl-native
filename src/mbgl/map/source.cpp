@@ -23,6 +23,7 @@
 #include <mbgl/map/vector_tile_data.hpp>
 #include <mbgl/map/raster_tile_data.hpp>
 #include <mbgl/map/live_tile_data.hpp>
+#include <mbgl/annotation/annotation_tile.hpp>
 #include <mbgl/style/style.hpp>
 #include <mbgl/gl/debugging.hpp>
 
@@ -295,7 +296,7 @@ TileData::State Source::addTile(MapData& data,
             new_tile.data = tileData;
         } else if (info.type == SourceType::Annotations) {
             new_tile.data = std::make_shared<LiveTileData>(normalized_id,
-                data.getAnnotationManager()->getTile(normalized_id), style, info, callback);
+                	data.getAnnotationManager()->getTile(normalized_id), style, info, callback);
         } else {
             throw std::runtime_error("source type not implemented");
         }
@@ -513,15 +514,6 @@ bool Source::update(MapData& data,
     updated = data.getAnimationTime();
 
     return allTilesUpdated;
-}
-
-void Source::invalidateTiles(const std::unordered_set<TileID, TileID::Hash>& ids) {
-    cache.clear();
-    for (const auto& id : ids) {
-        tiles.erase(id);
-        tile_data.erase(id);
-    }
-    updateTilePtrs();
 }
 
 void Source::invalidateTiles() {

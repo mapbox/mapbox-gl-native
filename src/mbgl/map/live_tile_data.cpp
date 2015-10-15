@@ -1,5 +1,5 @@
 #include <mbgl/map/live_tile_data.hpp>
-#include <mbgl/map/live_tile.hpp>
+#include <mbgl/annotation/annotation_tile.hpp>
 #include <mbgl/style/style_layer.hpp>
 #include <mbgl/map/source.hpp>
 #include <mbgl/text/collision_tile.hpp>
@@ -12,7 +12,7 @@
 using namespace mbgl;
 
 LiveTileData::LiveTileData(const TileID& id_,
-                           const LiveTile* tile_,
+                           std::unique_ptr<AnnotationTile> tile_,
                            Style& style_,
                            const SourceInfo& source_,
                            std::function<void()> callback)
@@ -24,7 +24,7 @@ LiveTileData::LiveTileData(const TileID& id_,
                  style_.layers,
                  state,
                  std::make_unique<CollisionTile>(0, 0, false)),
-      tile(tile_) {
+      tile(std::move(tile_)) {
     state = State::loaded;
 
     if (!tile) {

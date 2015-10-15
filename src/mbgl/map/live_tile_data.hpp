@@ -9,12 +9,12 @@ namespace mbgl {
 class Style;
 class SourceInfo;
 class WorkRequest;
-class LiveTile;
+class AnnotationTile;
 
 class LiveTileData : public TileData {
 public:
     LiveTileData(const TileID&,
-                 const LiveTile*,
+                 std::unique_ptr<AnnotationTile>,
                  Style&,
                  const SourceInfo&,
                  std::function<void ()> callback);
@@ -30,7 +30,7 @@ private:
     TileWorker tileWorker;
     std::unique_ptr<WorkRequest> workRequest;
     bool parsing = false;
-    const LiveTile* tile;
+    std::unique_ptr<AnnotationTile> tile;
 };
 
 }

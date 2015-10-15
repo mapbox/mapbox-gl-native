@@ -12,7 +12,7 @@ namespace mbgl {
 
 class WorkRequest;
 class RasterBucket;
-class LiveTile;
+class AnnotationTile;
 
 class Worker : public mbgl::util::noncopyable {
 public:
@@ -43,7 +43,7 @@ public:
 
     Request parseLiveTile(
         TileWorker&,
-        const LiveTile&,
+        const AnnotationTile&,
         std::function<void (TileParseResult)> callback);
 
     Request redoPlacement(

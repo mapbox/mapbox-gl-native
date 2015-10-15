@@ -341,10 +341,6 @@ const LatLng Map::latLngForPixel(const vec2<double> pixel) const {
 
 #pragma mark - Annotations
 
-void Map::setDefaultPointAnnotationSymbol(const std::string& symbol) {
-    data->getAnnotationManager()->setDefaultPointAnnotationSymbol(symbol);
-}
-
 double Map::getTopOffsetPixelsForAnnotationSymbol(const std::string& symbol) {
     return context->invokeSync<double>(&MapContext::getTopOffsetPixelsForAnnotationSymbol, symbol);
 }
@@ -374,12 +370,12 @@ void Map::removeAnnotation(AnnotationID annotation) {
 }
 
 void Map::removeAnnotations(const AnnotationIDs& annotations) {
-    data->getAnnotationManager()->removeAnnotations(annotations, getMaxZoom());
+    data->getAnnotationManager()->removeAnnotations(annotations);
     update(Update::Annotations);
 }
 
-AnnotationIDs Map::getAnnotationsInBounds(const LatLngBounds& bounds, const AnnotationType& type) {
-    return data->getAnnotationManager()->getAnnotationsInBounds(bounds, getMaxZoom(), type);
+AnnotationIDs Map::getPointAnnotationsInBounds(const LatLngBounds& bounds) {
+    return data->getAnnotationManager()->getPointAnnotationsInBounds(bounds);
 }
 
 LatLngBounds Map::getBoundsForAnnotations(const AnnotationIDs& annotations) {
