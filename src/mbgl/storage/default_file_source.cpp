@@ -11,6 +11,7 @@
 #include <mbgl/util/thread.hpp>
 #include <mbgl/util/mapbox.hpp>
 #include <mbgl/util/exception.hpp>
+#include <mbgl/util/chrono.hpp>
 
 #pragma GCC diagnostic push
 #pragma GCC diagnostic ignored "-Wshadow"
@@ -159,19 +160,26 @@ void DefaultFileSource::Impl::startCacheRequest(DefaultFileRequest* request) {
         request->cacheRequest = nullptr;
         if (response) {
             response->stale = response->isExpired();
-
-            // Notify in all cases; requestors can decide whether they want to use stale responses.
-            notify(request, response, FileCache::Hint::No);
         }
 
         if (!response || response->stale) {
             // No response or stale cache. Run the real request.
             startRealRequest(request, response);
         }
+
+        if (response) {
+            // Notify in all cases; requestors can decide whether they want to use stale responses.
+            notify(request, response, FileCache::Hint::No);
+        }
     });
 }
 
 void DefaultFileSource::Impl::startRealRequest(DefaultFileRequest* request, std::shared_ptr<const Response> response) {
+    // Cancel the timer if we have one.
+    if (request->timerRequest) {
+        request->timerRequest->stop();
+    }
+
     auto callback = [request, this] (std::shared_ptr<const Response> res, FileCache::Hint hint) {
         request->realRequest = nullptr;
         notify(request, res, hint);
@@ -224,6 +232,27 @@ void DefaultFileSource::Impl::notify(DefaultFileRequest* request, std::shared_pt
     if (cache) {
         // Store response in database
         cache->put(request->resource, response, hint);
+    }
+
+    // Set timer for requests that have a known expiry times. Expiry times of 0 are technically
+    // expiring immediately, but we can't continually request.
+    if (!request->realRequest && response->expires > 0) {
+        const int64_t now = std::chrono::duration_cast<std::chrono::seconds>(
+                                    SystemClock::now().time_since_epoch()).count();
+        const int64_t timeout = response->expires - now;
+
+        if (timeout <= 0) {
+            update(request);
+        } else {
+            if (!request->timerRequest) {
+                request->timerRequest = std::make_unique<uv::timer>(util::RunLoop::getLoop());
+            }
+
+            // timeout is in seconds, but the timer takes milliseconds.
+            request->timerRequest->start(1000 * timeout, 0, [this, request] {
+                update(request);
+            });
+        }
     }
 }
 

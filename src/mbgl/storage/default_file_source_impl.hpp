@@ -19,6 +19,7 @@ struct DefaultFileRequest {
 
     std::unique_ptr<WorkRequest> cacheRequest;
     RequestBase* realRequest = nullptr;
+    std::unique_ptr<uv::timer> timerRequest;
 
     inline DefaultFileRequest(const Resource& resource_)
         : resource(resource_) {}

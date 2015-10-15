@@ -85,6 +85,7 @@
         'storage/http_load.cpp',
         'storage/http_other_loop.cpp',
         'storage/http_reading.cpp',
+        'storage/http_timeout.cpp',
 
         'style/glyph_store.cpp',
         'style/pending_resources.cpp',
