@@ -81,6 +81,16 @@ void QMapboxGL::cycleDebugOptions()
     d_ptr->mapObj->cycleDebugOptions();
 }
 
+QString QMapboxGL::styleJSON() const
+{
+    return QString::fromStdString(d_ptr->mapObj->getStyleJSON());
+}
+
+QString QMapboxGL::styleURL() const
+{
+    return QString::fromStdString(d_ptr->mapObj->getStyleURL());
+}
+
 void QMapboxGL::setStyleJSON(const QString &style)
 {
     d_ptr->mapObj->setStyleJSON(style.toUtf8().constData());

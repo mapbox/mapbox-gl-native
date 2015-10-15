@@ -54,6 +54,9 @@ public:
 
     void cycleDebugOptions();
 
+    QString styleJSON() const;
+    QString styleURL() const;
+
     void setStyleJSON(const QString &);
     void setStyleURL(const QString &);
 
