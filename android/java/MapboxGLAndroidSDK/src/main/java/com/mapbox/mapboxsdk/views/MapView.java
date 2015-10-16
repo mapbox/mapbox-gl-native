@@ -1986,14 +1986,37 @@ public final class MapView extends FrameLayout {
     //
     // Camera
     //
+
+    /**
+     * Changes the map's viewport to fit the given coordinate bounds.
+     *
+     * @param bounds The bounds that the viewport will show in its entirety.
+     */
+    @UiThread
     public void setVisibleCoordinateBounds(@NonNull CoordinateBounds bounds) {
         setVisibleCoordinateBounds(bounds, false);
     }
 
+    /**
+     * Changes the map's viewing area to fit the given coordinate bounds, optionally animating the change.
+     *
+     * @param bounds The bounds that the viewport will show in its entirety.
+     * @param animated If true, animates the change. If false, immediately changes the map.
+     */
+    @UiThread
     public void setVisibleCoordinateBounds(@NonNull CoordinateBounds bounds, boolean animated) {
         setVisibleCoordinateBounds(bounds, new RectF(), animated);
     }
 
+    /**
+     * Changes the map’s viewport to fit the given coordinate bounds, optionally some additional padding on each side
+     * and animating the change.
+     *
+     * @param bounds The bounds that the viewport will show in its entirety.
+     * @param padding The minimum padding (in pixels) that will be visible around the given coordinate bounds.
+     * @param animated If true, animates the change. If false, immediately changes the map.
+     */
+    @UiThread
     public void setVisibleCoordinateBounds(@NonNull CoordinateBounds bounds, @NonNull RectF padding, boolean animated) {
         LatLng[] coordinates = {
                 new LatLng(bounds.getNe().getLatitude(), bounds.getSw().getLongitude()),
@@ -2005,6 +2028,15 @@ public final class MapView extends FrameLayout {
         setVisibleCoordinateBounds(coordinates, padding, animated);
     }
 
+    /**
+     * Changes the map’s viewport to fit the given coordinates, optionally some additional padding on each side
+     * and animating the change.
+     *
+     * @param coordinates The coordinates that the viewport will show.
+     * @param padding The minimum padding (in pixels) that will be visible around the given coordinate bounds.
+     * @param animated If true, animates the change. If false, immediately changes the map.
+     */
+    @UiThread
     public void setVisibleCoordinateBounds(@NonNull LatLng[] coordinates, @NonNull RectF padding, boolean animated) {
         setVisibleCoordinateBounds(coordinates, padding, getDirection(), animated);
     }

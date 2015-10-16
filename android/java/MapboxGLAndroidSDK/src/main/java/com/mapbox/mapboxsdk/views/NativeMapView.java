@@ -597,7 +597,8 @@ final class NativeMapView {
     private native void nativeSetSprite(long nativeMapViewPtr, String symbol,
                                         int width, int height, float scale, byte[] pixels);
 
-    private native void nativeSetVisibleCoordinateBounds(long mNativeMapViewPtr, LatLng[] coordinates, RectF padding, double direction, long duration);
+    private native void nativeSetVisibleCoordinateBounds(long mNativeMapViewPtr, LatLng[] coordinates,
+                                                         RectF padding, double direction, long duration);
 
     private native void nativeOnLowMemory(long nativeMapViewPtr);
 

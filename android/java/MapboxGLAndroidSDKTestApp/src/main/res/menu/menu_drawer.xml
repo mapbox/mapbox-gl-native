@@ -99,7 +99,7 @@
 
             <item android:id="@+id/action_visible_bounds"
                 android:checkable="false"
-                android:icon="@drawable/ic_action_crop"
+                android:icon="@drawable/ic_crop_white_24dp"
                 android:title="@string/action_visible_bounds"/>
         </menu>
     </item>
