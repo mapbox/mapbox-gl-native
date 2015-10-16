@@ -88,6 +88,7 @@
 		96992E601B0FBC4F008978C0 /* CLLocationManager+MockLocation.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = "CLLocationManager+MockLocation.h"; sourceTree = "<group>"; };
 		96992E611B0FBC4F008978C0 /* CLLocationManager+MockLocation.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = "CLLocationManager+MockLocation.m"; sourceTree = "<group>"; };
 		DACAD7111B08719F009119DC /* MGLMapboxEvents.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; name = MGLMapboxEvents.h; path = ../../platform/ios/MGLMapboxEvents.h; sourceTree = SOURCE_ROOT; };
+		DADD9EB51BD16D8B00DA9161 /* Compatibility.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; name = Compatibility.h; path = OHHTTPStubs/OHHTTPStubs/Sources/Compatibility.h; sourceTree = SOURCE_ROOT; };
 		DD043323196DB9BC00E6F39D /* Mapbox GL Tests.app */ = {isa = PBXFileReference; explicitFileType = wrapper.application; includeInIndex = 0; path = "Mapbox GL Tests.app"; sourceTree = BUILT_PRODUCTS_DIR; };
 		DD04335F196DBBD500E6F39D /* MGLTAppDelegate.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = MGLTAppDelegate.m; sourceTree = SOURCE_ROOT; };
 		DD043360196DBBD500E6F39D /* MGLTViewController.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = MGLTViewController.m; sourceTree = SOURCE_ROOT; };
@@ -273,6 +274,7 @@
 		DD0E6F861B01B67100DC035A /* OHHTTPStubs */ = {
 			isa = PBXGroup;
 			children = (
+				DADD9EB51BD16D8B00DA9161 /* Compatibility.h */,
 				DD0E6F8D1B01B68E00DC035A /* OHHTTPStubs.h */,
 				DD0E6F8E1B01B68E00DC035A /* OHHTTPStubs.m */,
 				DD0E6F8F1B01B68E00DC035A /* OHHTTPStubs+NSURLSessionConfiguration.m */,
