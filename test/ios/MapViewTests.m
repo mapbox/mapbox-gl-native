@@ -578,6 +578,8 @@
                                                    tester.mapView.showsUserLocation = YES;
                                                }];
 
+    [tester acknowledgeSystemAlert];
+    
     XCTAssertEqualObjects(notification.name,
                           @"mapViewWillStartLocatingUser",
                           @"mapViewWillStartLocatingUser delegate should receive message");
