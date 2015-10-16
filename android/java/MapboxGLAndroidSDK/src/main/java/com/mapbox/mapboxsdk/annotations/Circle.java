@@ -11,13 +11,13 @@ import com.mapbox.mapboxsdk.geometry.LatLng;
  * https://github.com/mapbox/mapbox-gl-native/issues/1882
  * https://github.com/mapbox/mapbox-gl-native/issues/1726
  */
-public class Circle extends Annotation {
+class Circle extends Annotation {
 
-    LatLng center;
-    int fillColor = Color.BLACK;
-    double radius;
-    int strokeColor = Color.BLACK;
-    float strokeWidth = 10; // Google Maps API defaults to 10
+    private LatLng center;
+    private int fillColor = Color.BLACK;
+    private double radius;
+    private int strokeColor = Color.BLACK;
+    private float strokeWidth = 10; // Google Maps API defaults to 10
 
     public LatLng getCenter() {
         return center;
@@ -44,23 +44,23 @@ public class Circle extends Annotation {
         return strokeWidth;
     }
 
-    public void setCenter(LatLng center) {
+    void setCenter(LatLng center) {
         this.center = center;
     }
 
-    public void setFillColor(int color) {
+    void setFillColor(int color) {
         fillColor = color;
     }
 
-    public void setRadius(double radius) {
+    void setRadius(double radius) {
         this.radius = radius;
     }
 
-    public void setStrokeColor (int color) {
+    void setStrokeColor (int color) {
         strokeColor = color;
     }
 
-    public void setStrokeWidth (float width) {
+    void setStrokeWidth (float width) {
         strokeWidth = width;
     }
 

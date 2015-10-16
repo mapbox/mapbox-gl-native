@@ -4,35 +4,35 @@ import android.support.annotation.Nullable;
 import android.text.TextUtils;
 import com.mapbox.mapboxsdk.geometry.LatLng;
 
-public class MarkerOptions {
+public final class MarkerOptions {
 
-    protected Annotation annotation;
+    private Marker marker;
 
     public MarkerOptions() {
-        annotation = new Marker();
+        marker = new Marker();
     }
 
     public MarkerOptions anchor(float u, float v) {
-        ((Marker)annotation).setAnchor(u, v);
+        marker.setAnchor(u, v);
         return this;
     }
 
-    public MarkerOptions draggable(boolean draggable) {
-        ((Marker)annotation).setDraggable(draggable);
+    private MarkerOptions draggable(boolean draggable) {
+        marker.setDraggable(draggable);
         return this;
     }
 
-    public MarkerOptions flat(boolean flat) {
-        ((Marker)annotation).setFlat(flat);
+    private MarkerOptions flat(boolean flat) {
+        marker.setFlat(flat);
         return this;
     }
 
     public float getAnchorU() {
-        return ((Marker)annotation).getAnchorU();
+        return marker.getAnchorU();
     }
 
     public float getAnchorV() {
-        return ((Marker)annotation).getAnchorV();
+        return marker.getAnchorV();
     }
 
     // TODO: Implement this method of Google Maps Android API
@@ -40,94 +40,97 @@ public class MarkerOptions {
 //
 //    }
 
-    public float getInfoWindowAnchorU() {
-        return ((Marker)annotation).getInfoWindowAnchorU();
+    private float getInfoWindowAnchorU() {
+        return marker.getInfoWindowAnchorU();
     }
 
-    public float getInfoWindowAnchorV() {
-        return ((Marker)annotation).getInfoWindowAnchorV();
+    private float getInfoWindowAnchorV() {
+        return marker.getInfoWindowAnchorV();
     }
 
+    /**
+     * Do not use this method. Used internally by the SDK.
+     */
     public Marker getMarker() {
-        return (Marker)annotation;
+        return (Marker) marker;
     }
 
     public LatLng getPosition() {
-        return ((Marker)annotation).getPosition();
+        return marker.getPosition();
     }
 
-    public float getRotation() {
-        return ((Marker)annotation).getRotation();
+    private float getRotation() {
+        return marker.getRotation();
     }
 
     public String getSnippet() {
-        return ((Marker)annotation).getSnippet();
+        return marker.getSnippet();
     }
 
     public String getTitle() {
-        return ((Marker)annotation).getTitle();
+        return marker.getTitle();
     }
 
     public String getSprite() {
-        return ((Marker)annotation).getSprite();
+        return marker.getSprite();
     }
 
-    public MarkerOptions infoWindowAnchor(float u, float v) {
-        ((Marker)annotation).setInfoWindowAnchor(u, v);
+    private MarkerOptions infoWindowAnchor(float u, float v) {
+        marker.setInfoWindowAnchor(u, v);
         return this;
     }
 
-    public boolean isDraggable() {
-        return ((Marker)annotation).isDraggable();
+    private boolean isDraggable() {
+        return marker.isDraggable();
     }
 
-    public boolean isFlat() {
-        return ((Marker)annotation).isFlat();
+    private boolean isFlat() {
+        return marker.isFlat();
     }
 
-    public boolean isVisible() {
-        return ((Marker)annotation).isVisible();
+    private boolean isVisible() {
+        return marker.isVisible();
     }
 
     public MarkerOptions position(LatLng position) {
-        ((Marker)annotation).setPosition(position);
+        marker.setPosition(position);
         return this;
     }
 
-    public MarkerOptions rotation(float rotation) {
-        ((Marker)annotation).setRotation(rotation);
+    private MarkerOptions rotation(float rotation) {
+        marker.setRotation(rotation);
         return this;
     }
 
     public MarkerOptions snippet(String snippet) {
-        ((Marker)annotation).setSnippet(snippet);
+        marker.setSnippet(snippet);
         return this;
     }
 
     public MarkerOptions sprite(@Nullable String sprite) {
         if (!TextUtils.isEmpty(sprite)) {
-            ((Marker)annotation).setSprite(sprite);
+            marker.setSprite(sprite);
         }
         return this;
     }
 
     public MarkerOptions title(String title) {
-        ((Marker)annotation).setTitle(title);
+        marker.setTitle(title);
         return this;
     }
 
-    public MarkerOptions visible(boolean visible) {
-        annotation.setVisible(visible);
+    private MarkerOptions visible(boolean visible) {
+        marker.setVisible(visible);
         return this;
     }
 
-    public MarkerOptions alpha(float alpha) {
-        annotation.setAlpha(alpha);
+    private MarkerOptions alpha(float alpha) {
+        marker.setAlpha(alpha);
         return this;
     }
 
-    public float getAlpha() {
-        return annotation.alpha;
+    private float getAlpha() {
+        return marker.getAlpha();
     }
 
     // TODO: Implement this method of Google Maps Android API

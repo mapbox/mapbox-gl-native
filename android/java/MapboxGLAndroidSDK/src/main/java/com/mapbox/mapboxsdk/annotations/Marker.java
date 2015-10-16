@@ -7,7 +7,7 @@ import android.view.View;
 import com.mapbox.mapboxsdk.R;
 import com.mapbox.mapboxsdk.geometry.LatLng;
 
-public class Marker extends Annotation {
+public final class Marker extends Annotation {
 
     private float anchorU;
     private float anchorV;
@@ -28,7 +28,7 @@ public class Marker extends Annotation {
     /**
      * Constructor
      */
-    public Marker() {
+    Marker() {
         super();
     }
 
@@ -48,10 +48,6 @@ public class Marker extends Annotation {
         return (lat == otherLat && otherLng == lng);
     }
 
-    public float getAlpha() {
-        return alpha;
-    }
-
     public Point getAnchor() {
         return new Point((int)anchorU, (int)anchorV);
     }
@@ -64,11 +60,11 @@ public class Marker extends Annotation {
         return anchorV;
     }
 
-    public float getInfoWindowAnchorU() {
+    float getInfoWindowAnchorU() {
         return infoWindowAnchorU;
     }
 
-    public float getInfoWindowAnchorV() {
+    float getInfoWindowAnchorV() {
         return infoWindowAnchorV;
     }
 
@@ -76,7 +72,7 @@ public class Marker extends Annotation {
         return position;
     }
 
-    public float getRotation() {
+    float getRotation() {
         return rotation;
     }
 
@@ -88,6 +84,9 @@ public class Marker extends Annotation {
         return title;
     }
 
+    /**
+     * Do not use this method. Used internally by the SDK.
+     */
     public void hideInfoWindow() {
         if (infoWindow != null) {
             infoWindow.close();
@@ -95,45 +94,48 @@ public class Marker extends Annotation {
         infoWindowShown = false;
     }
 
-    public boolean isDraggable() {
+    boolean isDraggable() {
         return draggable;
     }
 
-    public boolean isFlat() {
+    boolean isFlat() {
         return flat;
     }
 
+    /**
+     * Do not use this method. Used internally by the SDK.
+     */
     public boolean isInfoWindowShown () {
         return infoWindowShown;
     }
 
-    public void setAnchor(float u, float v) {
+    void setAnchor(float u, float v) {
         this.anchorU = u;
         this.anchorV = v;
     }
 
-    public void setDraggable(boolean draggable) {
+    void setDraggable(boolean draggable) {
         this.draggable = draggable;
     }
 
-    public void setFlat(boolean flat) {
+    void setFlat(boolean flat) {
         this.flat = flat;
     }
 
-    public void setInfoWindowAnchor(float u, float v) {
+    void setInfoWindowAnchor(float u, float v) {
         infoWindowAnchorU = u;
         infoWindowAnchorV = v;
     }
 
-    public void setPosition(LatLng position) {
+    void setPosition(LatLng position) {
         this.position = position;
     }
 
-    public void setRotation(float rotation) {
+    void setRotation(float rotation) {
         this.rotation = rotation;
     }
 
-    public void setSnippet(String snippet) {
+    void setSnippet(String snippet) {
         this.snippet = snippet;
     }
 
@@ -147,7 +149,7 @@ public class Marker extends Annotation {
      *
      * @param sprite The name of the sprite.
      */
-    public void setSprite(@Nullable String sprite) {
+    void setSprite(@Nullable String sprite) {
         if (!TextUtils.isEmpty(sprite)) {
             this.sprite = sprite;
         }
@@ -157,12 +159,15 @@ public class Marker extends Annotation {
         return sprite;
     }
 
-    public void setTitle(String title) {
+    void setTitle(String title) {
         this.title = title;
     }
 
+    /**
+     * Do not use this method. Used internally by the SDK.
+     */
     public void showInfoWindow() {
-        if (!isVisible() || mapView == null) {
+        if (!isVisible() || getMapView() == null) {
             return;
         }
 
@@ -170,12 +175,15 @@ public class Marker extends Annotation {
         showInfoWindow(getInfoWindow());
     }
 
+    /**
+     * Do not use this method. Used internally by the SDK.
+     */
     public void showInfoWindow(View view){
-        if (!isVisible() || mapView == null) {
+        if (!isVisible() || getMapView() == null) {
             return;
         }
 
-        infoWindow = new InfoWindow(view, mapView);
+        infoWindow = new InfoWindow(view, getMapView());
         showInfoWindow(infoWindow);
     }
 
@@ -203,13 +211,13 @@ public class Marker extends Annotation {
      */
     private InfoWindow getInfoWindow() {
         if (infoWindow == null) {
-            infoWindow = new InfoWindow(R.layout.infowindow_view, mapView);
+            infoWindow = new InfoWindow(R.layout.infowindow_view, getMapView());
         }
         return infoWindow;
     }
 
     @Override
-    public void setVisible(boolean visible) {
+    void setVisible(boolean visible) {
         super.setVisible(visible);
         if (!visible && infoWindowShown) {
             hideInfoWindow();
@@ -224,10 +232,16 @@ public class Marker extends Annotation {
 //
 //    }
 
+    /**
+     * Do not use this method. Used internally by the SDK.
+     */
     public int getTopOffsetPixels() {
         return topOffsetPixels;
     }
 
+    /**
+     * Do not use this method. Used internally by the SDK.
+     */
     public void setTopOffsetPixels(int topOffsetPixels) {
         this.topOffsetPixels = topOffsetPixels;
     }

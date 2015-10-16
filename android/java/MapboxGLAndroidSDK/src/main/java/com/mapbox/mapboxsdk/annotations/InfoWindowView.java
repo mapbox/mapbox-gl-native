@@ -7,7 +7,7 @@ import android.widget.RelativeLayout;
 
 import com.mapbox.mapboxsdk.R;
 
-public class InfoWindowView extends RelativeLayout{
+class InfoWindowView extends RelativeLayout{
 
     private InfoWindowTipView mTipView;
 
