@@ -2,12 +2,12 @@ package com.mapbox.mapboxsdk.annotations;
 
 import android.graphics.Color;
 
-public class Polyline extends MultiPoint {
+public final class Polyline extends MultiPoint {
 
-    int color = Color.BLACK; // default color is black
-    float width = 10; // As specified by Google API Docs (in pixels)
+    private int color = Color.BLACK; // default color is black
+    private float width = 10; // As specified by Google API Docs (in pixels)
 
-    public Polyline() {
+    Polyline() {
         super();
     }
 
@@ -25,7 +25,7 @@ public class Polyline extends MultiPoint {
      *
      * @param color - the color in ARGB format
      */
-    public void setColor(int color) {
+    void setColor(int color) {
         this.color = color;
     }
 
@@ -35,7 +35,7 @@ public class Polyline extends MultiPoint {
      *
      * @param width in pixels
      */
-    public void setWidth(float width) {
+    void setWidth(float width) {
         this.width = width;
     }
 

@@ -9,23 +9,26 @@ public abstract class Annotation implements Comparable<Annotation> {
      *
      * Internal C++ id is stored as unsigned int.
      */
-    protected long id = -1; // -1 unless added to a MapView
-    protected MapView mapView;
+    private long id = -1; // -1 unless added to a MapView
+    private MapView mapView;
 
-    float alpha = 1.0f;
-    boolean visible = true;
+    private float alpha = 1.0f;
+    private boolean visible = true;
 
-    public Annotation() {}
+    protected Annotation() {}
 
     public float getAlpha() {
         return alpha;
     }
 
+    /**
+     * Do not use this method. Used internally by the SDK.
+     */
     public long getId() {
         return id;
     }
 
-    public boolean isVisible() {
+    boolean isVisible() {
         return visible;
     }
 
@@ -34,19 +37,29 @@ public abstract class Annotation implements Comparable<Annotation> {
         mapView.removeAnnotation(this);
     }
 
-    public void setAlpha(float alpha) {
+    void setAlpha(float alpha) {
         this.alpha = alpha;
     }
 
+    /**
+     * Do not use this method. Used internally by the SDK.
+     */
     public void setId(long id) {
         this.id = id;
     }
 
+    /**
+     * Do not use this method. Used internally by the SDK.
+     */
     public void setMapView(MapView mapView) {
         this.mapView = mapView;
     }
 
-    public void setVisible(boolean visible) {
+    protected MapView getMapView() {
+        return mapView;
+    }
+
+    void setVisible(boolean visible) {
         this.visible = visible;
     }
 

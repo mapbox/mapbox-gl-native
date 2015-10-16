@@ -6,16 +6,16 @@ import com.mapbox.mapboxsdk.geometry.LatLng;
 import java.util.ArrayList;
 import java.util.List;
 
-public class PolygonOptions {
+public final class PolygonOptions {
 
-    protected Annotation annotation;
+    private Polygon polygon;
 
     public PolygonOptions() {
-        annotation = new Polygon();
+        polygon = new Polygon();
     }
 
     public PolygonOptions add(LatLng point) {
-        ((MultiPoint)annotation).points.add(point);
+        polygon.addPoint(point);
         return this;
     }
 
@@ -40,22 +40,22 @@ public class PolygonOptions {
      * @param points - an iterable (list) of points for cutting a hole
      * @return PolygonOptions - the options object
      */
-    public PolygonOptions addHole (Iterable<LatLng> points) {
+    private PolygonOptions addHole (Iterable<LatLng> points) {
         List<LatLng> hole = new ArrayList<>();
         for (LatLng point : points) {
             hole.add(point);
         }
-        ((Polygon)annotation).holes.add(hole);
+        polygon.addHole(hole);
         return this;
     }
 
     public PolygonOptions alpha(float alpha) {
-        annotation.alpha = alpha;
+        polygon.setAlpha(alpha);
         return this;
     }
 
     public float getAlpha() {
-        return annotation.alpha;
+        return polygon.getAlpha();
     }
 
     /**
@@ -65,12 +65,12 @@ public class PolygonOptions {
      * @return PolygonOptions - the options object
      */
     public PolygonOptions fillColor(int color) {
-        ((Polygon)annotation).fillColor = color;
+        polygon.setFillColor(color);
         return this;
     }
 
     public int getFillColor() {
-        return ((Polygon)annotation).fillColor;
+        return polygon.getFillColor();
     }
 
     /**
@@ -79,16 +79,19 @@ public class PolygonOptions {
      *
      * @return a list of lists of points for cutting holes
      */
-    public List<List<LatLng>> getHoles() {
-        return ((Polygon)annotation).holes;
+    private List<List<LatLng>> getHoles() {
+        return polygon.getHoles();
     }
 
+    /**
+     * Do not use this method. Used internally by the SDK.
+     */
     public Polygon getPolygon() {
-        return ((Polygon)annotation);
+        return polygon;
     }
 
     public int getStrokeColor() {
-        return ((Polygon)annotation).strokeColor;
+        return polygon.getStrokeColor();
     }
 
     /**
@@ -97,8 +100,8 @@ public class PolygonOptions {
      *
      * @return stroke width as float
      */
-    public float getStrokeWidth() {
-        return ((Polygon)annotation).strokeWidth;
+    private float getStrokeWidth() {
+        return polygon.getStrokeWidth();
     }
 
     /**
@@ -108,7 +111,7 @@ public class PolygonOptions {
      * @return PolygonOptions - the options object
      */
     public PolygonOptions strokeColor(int color) {
-        ((Polygon)annotation).strokeColor = color;
+        polygon.setStrokeColor(color);
         return this;
     }
 
@@ -118,23 +121,23 @@ public class PolygonOptions {
      *
      * @return stroke width as float
      */
-    public PolygonOptions strokeWidth(float width) {
-        ((Polygon)annotation).strokeWidth = width;
+    private PolygonOptions strokeWidth(float width) {
+        polygon.setStrokeWidth(width);
         return this;
     }
 
-    public PolygonOptions visible(boolean visible) {
-        annotation.visible = visible;
+    private PolygonOptions visible(boolean visible) {
+        polygon.setVisible(visible);
         return this;
     }
 
-    public boolean isVisible() {
-        return annotation.visible;
+    private boolean isVisible() {
+        return polygon.isVisible();
     }
 
     public List<LatLng> getPoints() {
         // the getter gives us a copy, which is the safe thing to do...
-        return ((MultiPoint)annotation).getPoints();
+        return polygon.getPoints();
     }
 
     // TODO: Implement writeToParcel of Google Maps Android API
