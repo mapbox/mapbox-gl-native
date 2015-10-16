@@ -7,9 +7,9 @@ import java.util.List;
 
 public abstract class MultiPoint extends Annotation {
 
-    List<LatLng> points;
+    private List<LatLng> points;
 
-    public MultiPoint() {
+    protected MultiPoint() {
         super();
         points = new ArrayList<>();
     }
@@ -32,6 +32,10 @@ public abstract class MultiPoint extends Annotation {
      */
     void setPoints(List<LatLng> points) {
         this.points = new ArrayList<>(points);
+    }
+
+    void addPoint(LatLng point) {
+        points.add(point);
     }
 
 

@@ -8,7 +8,7 @@ import android.graphics.Path;
 import android.util.AttributeSet;
 import android.view.View;
 
-public final class InfoWindowTipView extends View {
+final class InfoWindowTipView extends View {
 
     private Paint mPaint;
     private Path mPath;

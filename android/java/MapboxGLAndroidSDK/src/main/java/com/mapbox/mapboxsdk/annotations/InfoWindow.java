@@ -16,7 +16,7 @@ import com.mapbox.mapboxsdk.views.MapView;
 /**
  * A tooltip view
  */
-public final class InfoWindow {
+final class InfoWindow {
 
     private Marker boundMarker;
     private MapView mMapView;

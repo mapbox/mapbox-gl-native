@@ -56,7 +56,6 @@ import com.almeros.android.multitouch.gesturedetectors.RotateGestureDetector;
 import com.almeros.android.multitouch.gesturedetectors.TwoFingerGestureDetector;
 import com.mapbox.mapboxsdk.R;
 import com.mapbox.mapboxsdk.annotations.Annotation;
-import com.mapbox.mapboxsdk.annotations.InfoWindow;
 import com.mapbox.mapboxsdk.annotations.Marker;
 import com.mapbox.mapboxsdk.annotations.MarkerOptions;
 import com.mapbox.mapboxsdk.annotations.Polygon;
@@ -1626,7 +1625,7 @@ public final class MapView extends FrameLayout {
             //setSprite(DEFAULT_SPRITE, bitmap);
 
             // Red default marker is currently broken
-            marker.setSprite("default_marker");
+            //marker.setSprite("default_marker");
             //marker.setSprite(DEFAULT_SPRITE);
         }
 
@@ -1666,7 +1665,7 @@ public final class MapView extends FrameLayout {
                 //setSprite(DEFAULT_SPRITE, bitmap);
 
                 // Red default marker is currently broken
-                marker.setSprite("default_marker");
+                //marker.setSprite("default_marker");
                 //marker.setSprite(DEFAULT_SPRITE);
             }
 

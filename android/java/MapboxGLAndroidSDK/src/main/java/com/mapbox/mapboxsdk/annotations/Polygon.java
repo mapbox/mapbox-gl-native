@@ -8,16 +8,16 @@ import com.mapbox.mapboxsdk.geometry.LatLng;
 import java.util.ArrayList;
 import java.util.List;
 
-public class Polygon extends MultiPoint {
+public final class Polygon extends MultiPoint {
 
-    int fillColor = Color.BLACK; // default fillColor is black
-    float strokeAlpha = 1;
-    int strokeColor = Color.BLACK; // default strokeColor is black
-    float strokeWidth = 10; // As specified by Google API Docs (in pixels)
+    private int fillColor = Color.BLACK; // default fillColor is black
+    private float strokeAlpha = 1;
+    private int strokeColor = Color.BLACK; // default strokeColor is black
+    private float strokeWidth = 10; // As specified by Google API Docs (in pixels)
 
-    List<List<LatLng>> holes;
+    private List<List<LatLng>> holes;
 
-    public Polygon() {
+    Polygon() {
         super();
         holes = new ArrayList<>();
     }
@@ -26,8 +26,8 @@ public class Polygon extends MultiPoint {
         return fillColor;
     }
 
-    public List<List<LatLng>> getHoles () {
-        return holes;
+    List<List<LatLng>> getHoles () {
+        return new ArrayList<>(holes);
     }
 
     public int getStrokeColor() {
@@ -39,15 +39,15 @@ public class Polygon extends MultiPoint {
      * https://github.com/mapbox/mapbox-gl-native/issues/1737
      * @return stroke width as float
      */
-    public float getStrokeWidth() {
+    float getStrokeWidth() {
         return strokeWidth;
     }
 
-    public void setFillAlpha(float alpha) {
-        this.alpha = alpha;
+    private void setFillAlpha(float alpha) {
+        this.setAlpha(alpha);
     }
 
-    public void setFillColor(int color) {
+    void setFillColor(int color) {
         fillColor = color;
     }
 
@@ -57,11 +57,15 @@ public class Polygon extends MultiPoint {
      *
      * @param holes
      */
-    public void setHoles(List<? extends List<LatLng>> holes) {
+    void setHoles(List<? extends List<LatLng>> holes) {
         this.holes = new ArrayList<>();
         for (List<LatLng> hole : holes) {
             this.holes.add(new ArrayList<>(hole));
         }
+    }
+
+    void addHole(List<LatLng> hole) {
+        holes.add(hole);
     }
 
     /**
@@ -69,11 +73,11 @@ public class Polygon extends MultiPoint {
      *
      * UNIMPLEMENTED: Needs implementation in Native.
      */
-    public void setStrokeAlpha(float alpha) {
+    void setStrokeAlpha(float alpha) {
         strokeAlpha = alpha;
     }
 
-    public void setStrokeColor(int color) {
+    void setStrokeColor(int color) {
         strokeColor = color;
     }
 
@@ -81,7 +85,7 @@ public class Polygon extends MultiPoint {
      * UNIMPLEMENTED: Needs implementation in Native.
      * https://github.com/mapbox/mapbox-gl-native/issues/1737
      */
-    public void setStrokeWidth(float width) {
+    void setStrokeWidth(float width) {
         strokeWidth = width;
     }
 
