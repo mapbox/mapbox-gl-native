@@ -20,10 +20,8 @@
 namespace mbgl {
 
 struct Sprite::Loader {
-    bool loadedJSON = false;
-    bool loadedImage = false;
-    std::unique_ptr<Data> data = std::make_unique<Data>();
-
+    std::shared_ptr<const std::string> image;
+    std::shared_ptr<const std::string> json;
     RequestHolder jsonRequest;
     RequestHolder spriteRequest;
 };
@@ -50,8 +48,7 @@ Sprite::Sprite(const std::string& baseUrl, float pixelRatio_)
         }
         loader->jsonRequest = nullptr;
         if (res.status == Response::Successful) {
-            loader->data->json = res.data;
-            loader->loadedJSON = true;
+            loader->json = res.data;
         } else {
             std::stringstream message;
             message << "Failed to load [" << jsonURL << "]: " << res.message;
@@ -70,8 +67,7 @@ Sprite::Sprite(const std::string& baseUrl, float pixelRatio_)
             }
             loader->spriteRequest = nullptr;
             if (res.status == Response::Successful) {
-                loader->data->image = res.data;
-                loader->loadedImage = true;
+                loader->image = res.data;
             } else {
                 std::stringstream message;
                 message << "Failed to load [" << spriteURL << "]: " << res.message;
@@ -88,14 +84,12 @@ Sprite::~Sprite() {
 void Sprite::emitSpriteLoadedIfComplete() {
     assert(loader);
 
-    if (!loader->loadedImage || !loader->loadedJSON || !observer) {
+    if (!loader->image || !loader->json || !observer) {
         return;
     }
 
-    std::unique_ptr<Data> data(std::move(loader->data));
-    loader.reset();
-
-    auto result = parseSprite(data->image, data->json);
+    auto local = std::move(loader);
+    auto result = parseSprite(*local->image, *local->json);
     if (result.is<Sprites>()) {
         loaded = true;
         observer->onSpriteLoaded(result.get<Sprites>());

@@ -38,7 +38,8 @@ TEST_F(Storage, HTTPError) {
         EXPECT_GT(1.2, duration) << "Backoff timer fired too late";
         EXPECT_EQ(Response::Successful, res.status);
         EXPECT_EQ(false, res.stale);
-        EXPECT_EQ("Hello World!", res.data);
+        ASSERT_TRUE(res.data.get());
+        EXPECT_EQ("Hello World!", *res.data);
         EXPECT_EQ(0, res.expires);
         EXPECT_EQ(0, res.modified);
         EXPECT_EQ("", res.etag);
@@ -67,7 +68,7 @@ TEST_F(Storage, HTTPError) {
 #else
         FAIL();
 #endif
-        EXPECT_EQ("", res.data);
+        ASSERT_FALSE(res.data.get());
         EXPECT_EQ(0, res.expires);
         EXPECT_EQ(0, res.modified);
         EXPECT_EQ("", res.etag);

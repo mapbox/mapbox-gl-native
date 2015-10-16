@@ -178,11 +178,12 @@ TEST_F(Storage, DatabaseLockedWrite) {
         Log::setObserver(std::make_unique<FixtureLogObserver>());
 
         auto response = std::make_shared<Response>();
-        response->data = "Demo";
+        response->data = std::make_shared<std::string>("Demo");
         cache.put({ Resource::Unknown, "mapbox://test" }, response);
         cache.get({ Resource::Unknown, "mapbox://test" }, [] (std::unique_ptr<Response> res) {
             ASSERT_NE(nullptr, res.get());
-            EXPECT_EQ("Demo", res->data);
+            ASSERT_TRUE(res->data.get());
+            EXPECT_EQ("Demo", *res->data);
         });
 
         // Make sure that we got a no errors
@@ -210,7 +211,7 @@ TEST_F(Storage, DatabaseLockedRefresh) {
         Log::setObserver(std::make_unique<FixtureLogObserver>());
 
         auto response = std::make_shared<Response>();
-        response->data = "Demo";
+        response->data = std::make_shared<std::string>("Demo");
         cache.put({ Resource::Unknown, "mapbox://test" }, response);
         cache.get({ Resource::Unknown, "mapbox://test" }, [] (std::unique_ptr<Response> res) {
             EXPECT_EQ(nullptr, res.get());
@@ -226,7 +227,7 @@ TEST_F(Storage, DatabaseLockedRefresh) {
         Log::setObserver(std::make_unique<FixtureLogObserver>());
 
         auto response = std::make_shared<Response>();
-        response->data = "Demo";
+        response->data = std::make_shared<std::string>("Demo");
         cache.refresh({ Resource::Unknown, "mapbox://test" }, response->expires);
         cache.get({ Resource::Unknown, "mapbox://test" }, [] (std::unique_ptr<Response> res) {
             EXPECT_EQ(nullptr, res.get());
@@ -255,11 +256,12 @@ TEST_F(Storage, DatabaseDeleted) {
         Log::setObserver(std::make_unique<FixtureLogObserver>());
 
         auto response = std::make_shared<Response>();
-        response->data = "Demo";
+        response->data = std::make_shared<std::string>("Demo");
         cache.put({ Resource::Unknown, "mapbox://test" }, response);
         cache.get({ Resource::Unknown, "mapbox://test" }, [] (std::unique_ptr<Response> res) {
             ASSERT_NE(nullptr, res.get());
-            EXPECT_EQ("Demo", res->data);
+            ASSERT_TRUE(res->data.get());
+            EXPECT_EQ("Demo", *res->data);
         });
 
         Log::removeObserver();
@@ -272,11 +274,12 @@ TEST_F(Storage, DatabaseDeleted) {
         Log::setObserver(std::make_unique<FixtureLogObserver>());
 
         auto response = std::make_shared<Response>();
-        response->data = "Demo";
+        response->data = std::make_shared<std::string>("Demo");
         cache.put({ Resource::Unknown, "mapbox://test" }, response);
         cache.get({ Resource::Unknown, "mapbox://test" }, [] (std::unique_ptr<Response> res) {
             ASSERT_NE(nullptr, res.get());
-            EXPECT_EQ("Demo", res->data);
+            ASSERT_TRUE(res->data.get());
+            EXPECT_EQ("Demo", *res->data);
         });
 
         auto observer = Log::removeObserver();
@@ -302,11 +305,12 @@ TEST_F(Storage, DatabaseInvalid) {
         Log::setObserver(std::make_unique<FixtureLogObserver>());
 
         auto response = std::make_shared<Response>();
-        response->data = "Demo";
+        response->data = std::make_shared<std::string>("Demo");
         cache.put({ Resource::Unknown, "mapbox://test" }, response);
         cache.get({ Resource::Unknown, "mapbox://test" }, [] (std::unique_ptr<Response> res) {
             ASSERT_NE(nullptr, res.get());
-            EXPECT_EQ("Demo", res->data);
+            ASSERT_TRUE(res->data.get());
+            EXPECT_EQ("Demo", *res->data);
         });
 
         auto observer = Log::removeObserver();

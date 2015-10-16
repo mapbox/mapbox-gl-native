@@ -27,7 +27,8 @@ TEST_F(Storage, HTTPCoalescing) {
         }
 
         EXPECT_EQ(Response::Successful, res.status);
-        EXPECT_EQ("Hello World!", res.data);
+        ASSERT_TRUE(res.data.get());
+        EXPECT_EQ("Hello World!", *res.data);
         EXPECT_EQ(0, res.expires);
         EXPECT_EQ(0, res.modified);
         EXPECT_EQ("", res.etag);
@@ -69,7 +70,8 @@ TEST_F(Storage, HTTPMultiple) {
 
         // Do not cancel the request right away.
         EXPECT_EQ(Response::Successful, res.status);
-        EXPECT_EQ("Hello World!", res.data);
+        ASSERT_TRUE(res.data.get());
+        EXPECT_EQ("Hello World!", *res.data);
         EXPECT_EQ(2147483647, res.expires);
         EXPECT_EQ(0, res.modified);
         EXPECT_EQ("", res.etag);
@@ -85,7 +87,8 @@ TEST_F(Storage, HTTPMultiple) {
             fs.cancel(req2);
 
             EXPECT_EQ(Response::Successful, res2.status);
-            EXPECT_EQ("Hello World!", res2.data);
+            ASSERT_TRUE(res2.data.get());
+            EXPECT_EQ("Hello World!", *res2.data);
             EXPECT_EQ(2147483647, res2.expires);
             EXPECT_EQ(0, res2.modified);
             EXPECT_EQ("", res2.etag);
@@ -115,7 +118,8 @@ TEST_F(Storage, HTTPStale) {
     req1 = fs.request(resource, uv_default_loop(), [&] (const Response &res) {
         // Do not cancel the request right away.
         EXPECT_EQ(Response::Successful, res.status);
-        EXPECT_EQ("Hello World!", res.data);
+        ASSERT_TRUE(res.data.get());
+        EXPECT_EQ("Hello World!", *res.data);
         EXPECT_EQ(false, res.stale);
         EXPECT_EQ(0, res.expires);
         EXPECT_EQ(0, res.modified);
@@ -132,7 +136,8 @@ TEST_F(Storage, HTTPStale) {
         // Start a second request for the same resource after the first one has been completed.
         req2 = fs.request(resource, uv_default_loop(), [&] (const Response &res2) {
             EXPECT_EQ(Response::Successful, res2.status);
-            EXPECT_EQ("Hello World!", res2.data);
+            ASSERT_TRUE(res2.data.get());
+            EXPECT_EQ("Hello World!", *res2.data);
             EXPECT_EQ(0, res2.expires);
             EXPECT_EQ(0, res2.modified);
             EXPECT_EQ("", res2.etag);

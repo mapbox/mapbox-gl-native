@@ -74,7 +74,7 @@ app.get('/revalidate-etag', function(req, res) {
 });
 
 app.get('/permanent-error', function(req, res) {
-    res.status(500).end();
+    res.status(500).send('Server Error!');
 });
 
 var temporaryErrorCounter = 0;

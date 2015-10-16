@@ -110,10 +110,10 @@ NAN_METHOD(NodeRequest::Respond) {
         if (Nan::Has(res, Nan::New("data").ToLocalChecked()).FromJust()) {
             auto dataHandle = Nan::Get(res, Nan::New("data").ToLocalChecked()).ToLocalChecked();
             if (node::Buffer::HasInstance(dataHandle)) {
-                response->data = std::string {
+                response->data = std::make_shared<std::string>(
                     node::Buffer::Data(dataHandle),
                     node::Buffer::Length(dataHandle)
-                };
+                );
             } else {
                 return Nan::ThrowTypeError("Response data must be a Buffer");
             }

@@ -127,7 +127,6 @@ void DefaultFileSource::Impl::update(DefaultFileRequest* request) {
         if (!request->response->stale && request->response->isExpired()) {
             // Create a new Response object with `stale = true`, but the same data, and
             // replace the current request object we have.
-            // TODO: Make content shared_ptrs so we won't make copies of the content.
             auto response = std::make_shared<Response>(*request->response);
             response->stale = true;
             request->response = response;

@@ -42,7 +42,7 @@ private:
 
     void parse(GlyphStore* store, const std::string& fontStack, const std::string& url);
 
-    std::string data;
+    std::shared_ptr<const std::string> data;
     std::atomic<bool> parsed;
 
     RequestHolder req;

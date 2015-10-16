@@ -180,8 +180,10 @@ void AssetRequest::fileStated(uv_zip_t *zip) {
         response = std::make_unique<Response>();
 
         // Allocate the space for reading the data.
-        response->data.resize(zip->stat->size);
-        buffer = uv_buf_init(const_cast<char *>(response->data.data()), zip->stat->size);
+        auto data = std::make_shared<std::string>();
+        data->resize(zip->stat->size);
+        buffer = uv_buf_init(const_cast<char *>(data->data()), zip->stat->size);
+        response->data = data;
 
         // Get the modification time in case we have one.
         if (zip->stat->valid & ZIP_STAT_MTIME) {

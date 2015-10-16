@@ -20,7 +20,8 @@ TEST_F(Storage, CacheResponse) {
         fs.cancel(req);
         EXPECT_EQ(Response::Successful, res.status);
         EXPECT_EQ(false, res.stale);
-        EXPECT_EQ("Response 1", res.data);
+        ASSERT_TRUE(res.data.get());
+        EXPECT_EQ("Response 1", *res.data);
         EXPECT_LT(0, res.expires);
         EXPECT_EQ(0, res.modified);
         EXPECT_EQ("", res.etag);
@@ -36,7 +37,8 @@ TEST_F(Storage, CacheResponse) {
         fs.cancel(req);
         EXPECT_EQ(response.status, res.status);
         EXPECT_EQ(response.stale, res.stale);
-        EXPECT_EQ(response.data, res.data);
+        ASSERT_TRUE(res.data.get());
+        EXPECT_EQ(*response.data, *res.data);
         EXPECT_EQ(response.expires, res.expires);
         EXPECT_EQ(response.modified, res.modified);
         EXPECT_EQ(response.etag, res.etag);

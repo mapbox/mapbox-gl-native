@@ -26,7 +26,8 @@ TEST_F(Storage, HTTPLoad) {
             reqs[i] = nullptr;
             EXPECT_EQ(Response::Successful, res.status);
             EXPECT_EQ(false, res.stale);
-            EXPECT_EQ(std::string("Request ") +  std::to_string(current), res.data);
+            ASSERT_TRUE(res.data.get());
+            EXPECT_EQ(std::string("Request ") +  std::to_string(current), *res.data);
             EXPECT_EQ(0, res.expires);
             EXPECT_EQ(0, res.modified);
             EXPECT_EQ("", res.etag);

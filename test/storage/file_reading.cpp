@@ -21,7 +21,8 @@ TEST_F(Storage, AssetEmptyFile) {
         fs.cancel(req);
         EXPECT_EQ(Response::Successful, res.status);
         EXPECT_EQ(false, res.stale);
-        EXPECT_EQ(0ul, res.data.size());
+        ASSERT_TRUE(res.data.get());
+        EXPECT_EQ("", *res.data);
         EXPECT_EQ(0, res.expires);
         EXPECT_LT(1420000000, res.modified);
         EXPECT_NE("", res.etag);
@@ -48,12 +49,14 @@ TEST_F(Storage, AssetNonEmptyFile) {
         fs.cancel(req);
         EXPECT_EQ(Response::Successful, res.status);
         EXPECT_EQ(false, res.stale);
-        EXPECT_EQ(16ul, res.data.size());
+        ASSERT_TRUE(res.data.get());
+        EXPECT_EQ("content is here\n", *res.data);
         EXPECT_EQ(0, res.expires);
         EXPECT_LT(1420000000, res.modified);
         EXPECT_NE("", res.etag);
         EXPECT_EQ("", res.message);
-        EXPECT_EQ("content is here\n", res.data);
+        ASSERT_TRUE(res.data.get());
+        EXPECT_EQ("content is here\n", *res.data);
         NonEmptyFile.finish();
     });
 
@@ -76,7 +79,7 @@ TEST_F(Storage, AssetNonExistentFile) {
         fs.cancel(req);
         EXPECT_EQ(Response::Error, res.status);
         EXPECT_EQ(false, res.stale);
-        EXPECT_EQ(0ul, res.data.size());
+        ASSERT_FALSE(res.data.get());
         EXPECT_EQ(0, res.expires);
         EXPECT_EQ(0, res.modified);
         EXPECT_EQ("", res.etag);

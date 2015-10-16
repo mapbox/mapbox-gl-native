@@ -20,7 +20,8 @@ TEST_F(Storage, HTTPTimeout) {
         counter++;
         EXPECT_EQ(Response::Successful, res.status);
         EXPECT_EQ(false, res.stale);
-        EXPECT_EQ("Hello World!", res.data);
+        ASSERT_TRUE(res.data.get());
+        EXPECT_EQ("Hello World!", *res.data);
         EXPECT_LT(0, res.expires);
         EXPECT_EQ(0, res.modified);
         EXPECT_EQ("", res.etag);

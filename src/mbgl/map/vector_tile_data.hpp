@@ -42,7 +42,7 @@ private:
     bool parsing = false;
     const SourceInfo& source;
     RequestHolder req;
-    std::string data;
+    std::shared_ptr<const std::string> data;
     float lastAngle = 0;
     float currentAngle;
     float lastPitch = 0;

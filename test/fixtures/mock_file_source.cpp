@@ -55,7 +55,7 @@ void MockFileSource::Impl::replyWithSuccess(Request* req) const {
     res->status = Response::Status::Successful;
 
     try {
-        res->data = util::read_file(req->resource.url);
+        res->data = std::make_shared<const std::string>(std::move(util::read_file(req->resource.url)));
     } catch (const std::exception& err) {
         res->status = Response::Status::Error;
         res->message = err.what();
@@ -95,8 +95,9 @@ void MockFileSource::Impl::replyWithCorruptedData(Request* req) const {
 
     std::shared_ptr<Response> res = std::make_shared<Response>();
     res->status = Response::Status::Successful;
-    res->data = util::read_file(req->resource.url);
-    res->data.insert(0, "CORRUPTED");
+    auto data = std::make_shared<std::string>(std::move(util::read_file(req->resource.url)));
+    data->insert(0, "CORRUPTED");
+    res->data = std::move(data);
 
     req->notify(res);
 }

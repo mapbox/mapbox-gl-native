@@ -19,11 +19,6 @@ class Request;
 
 class Sprite : private util::noncopyable {
 public:
-    struct Data {
-        std::string image;
-        std::string json;
-    };
-
     class Observer {
     public:
         virtual ~Observer() = default;

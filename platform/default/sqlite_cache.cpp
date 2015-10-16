@@ -117,9 +117,9 @@ void SQLiteCache::Impl::get(const Resource &resource, Callback callback) {
             response->modified = getStmt->get<int64_t>(1);
             response->etag = getStmt->get<std::string>(2);
             response->expires = getStmt->get<int64_t>(3);
-            response->data = getStmt->get<std::string>(4);
+            response->data = std::make_shared<std::string>(std::move(getStmt->get<std::string>(4)));
             if (getStmt->get<int>(5)) { // == compressed
-                response->data = util::decompress(response->data);
+                response->data = std::make_shared<std::string>(std::move(util::decompress(*response->data)));
             }
             callback(std::move(response));
         } else {
@@ -171,18 +171,21 @@ void SQLiteCache::Impl::put(const Resource& resource, std::shared_ptr<const Resp
         putStmt->bind(6 /* expires */, response->expires);
 
         std::string data;
-        if (resource.kind != Resource::SpriteImage) {
+        if (resource.kind != Resource::SpriteImage && response->data) {
             // Do not compress images, since they are typically compressed already.
-            data = util::compress(response->data);
+            data = util::compress(*response->data);
         }
 
-        if (!data.empty() && data.size() < response->data.size()) {
+        if (!data.empty() && data.size() < response->data->size()) {
             // Store the compressed data when it is smaller than the original
             // uncompressed data.
             putStmt->bind(7 /* data */, data, false); // do not retain the string internally.
             putStmt->bind(8 /* compressed */, true);
+        } else if (response->data) {
+            putStmt->bind(7 /* data */, *response->data, false); // do not retain the string internally.
+            putStmt->bind(8 /* compressed */, false);
         } else {
-            putStmt->bind(7 /* data */, response->data, false); // do not retain the string internally.
+            putStmt->bind(7 /* data */, "", false);
             putStmt->bind(8 /* compressed */, false);
         }
 

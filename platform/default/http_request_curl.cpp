@@ -111,6 +111,7 @@ private:
     HTTPCURLContext *context = nullptr;
 
     // Will store the current response.
+    std::shared_ptr<std::string> data;
     std::unique_ptr<Response> response;
 
     // In case of revalidation requests, this will store the old response.
@@ -516,11 +517,11 @@ size_t HTTPCURLRequest::writeCallback(void *const contents, const size_t size, c
     auto impl = reinterpret_cast<HTTPCURLRequest *>(userp);
     MBGL_VERIFY_THREAD(impl->tid);
 
-    if (!impl->response) {
-        impl->response = std::make_unique<Response>();
+    if (!impl->data) {
+        impl->data = std::make_shared<std::string>();
     }
 
-    impl->response->data.append((char *)contents, size * nmemb);
+    impl->data->append((char *)contents, size * nmemb);
     return size * nmemb;
 }
 
@@ -688,22 +689,27 @@ void HTTPCURLRequest::handleResult(CURLcode code) {
                 // This is an unsolicited 304 response and should only happen on malfunctioning
                 // HTTP servers. It likely doesn't include any data, but we don't have much options.
                 response->status = Response::Successful;
+                response->data = std::move(data);
                 return finish(ResponseStatus::Successful);
             }
         } else if (responseCode == 200) {
             response->status = Response::Successful;
+            response->data = std::move(data);
             return finish(ResponseStatus::Successful);
         } else if (responseCode == 404) {
             response->status = Response::NotFound;
+            response->data = std::move(data);
             return finish(ResponseStatus::Successful);
         } else if (responseCode >= 500 && responseCode < 600) {
             // Server errors may be temporary, so back off exponentially.
             response->status = Response::Error;
+            response->data = std::move(data);
             response->message = "HTTP status code " + util::toString(responseCode);
             return finish(ResponseStatus::TemporaryError);
         } else {
             // We don't know how to handle any other errors, so declare them as permanently failing.
             response->status = Response::Error;
+            response->data = std::move(data);
             response->message = "HTTP status code " + util::toString(responseCode);
             return finish(ResponseStatus::PermanentError);
         }

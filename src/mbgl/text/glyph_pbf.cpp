@@ -98,14 +98,15 @@ GlyphPBF::GlyphPBF(GlyphStore* store,
 GlyphPBF::~GlyphPBF() = default;
 
 void GlyphPBF::parse(GlyphStore* store, const std::string& fontStack, const std::string& url) {
-    if (data.empty()) {
+    assert(data);
+    if (data->empty()) {
         // If there is no data, this means we either haven't
         // received any data.
         return;
     }
 
     try {
-        parseGlyphPBF(**store->getFontStack(fontStack), std::move(data));
+        parseGlyphPBF(**store->getFontStack(fontStack), *data);
     } catch (const std::exception& ex) {
         std::stringstream message;
         message <<  "Failed to parse [" << url << "]: " << ex.what();

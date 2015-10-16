@@ -18,7 +18,7 @@ public:
     int64_t modified = 0;
     int64_t expires = 0;
     std::string etag;
-    std::string data;
+    std::shared_ptr<const std::string> data;
 };
 
 }

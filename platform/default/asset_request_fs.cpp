@@ -138,8 +138,10 @@ void AssetRequest::fileStated(uv_fs_t *req) {
 #endif
             self->response->etag = util::toString(stat->st_ino);
             const auto size = (unsigned int)(stat->st_size);
-            self->response->data.resize(size);
-            self->buffer = uv_buf_init(const_cast<char *>(self->response->data.data()), size);
+            auto data = std::make_shared<std::string>();
+            self->response->data = data;
+            data->resize(size);
+            self->buffer = uv_buf_init(const_cast<char *>(data->data()), size);
             uv_fs_req_cleanup(req);
 #if UV_VERSION_MAJOR == 0 && UV_VERSION_MINOR <= 10
             uv_fs_read(req->loop, req, self->fd, self->buffer.base, self->buffer.len, -1, fileRead);

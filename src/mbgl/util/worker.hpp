@@ -33,12 +33,12 @@ public:
 
     Request parseRasterTile(
         RasterBucket&,
-        std::string data,
+        std::shared_ptr<const std::string> data,
         std::function<void (TileParseResult)> callback);
 
     Request parseVectorTile(
         TileWorker&,
-        std::string data,
+        std::shared_ptr<const std::string> data,
         std::function<void (TileParseResult)> callback);
 
     Request parseLiveTile(

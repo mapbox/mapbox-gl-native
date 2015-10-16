@@ -24,7 +24,8 @@ TEST_F(Storage, HTTPReading) {
         EXPECT_EQ(uv_thread_self(), mainThread);
         EXPECT_EQ(Response::Successful, res.status);
         EXPECT_EQ(false, res.stale);
-        EXPECT_EQ("Hello World!", res.data);
+        ASSERT_TRUE(res.data.get());
+        EXPECT_EQ("Hello World!", *res.data);
         EXPECT_EQ(0, res.expires);
         EXPECT_EQ(0, res.modified);
         EXPECT_EQ("", res.etag);
@@ -38,6 +39,8 @@ TEST_F(Storage, HTTPReading) {
         EXPECT_EQ(uv_thread_self(), mainThread);
         EXPECT_EQ(Response::NotFound, res.status);
         EXPECT_EQ(false, res.stale);
+        ASSERT_TRUE(res.data.get());
+        EXPECT_EQ("Cannot GET /doesnotexist\n", *res.data);
         EXPECT_EQ("", res.message);
         EXPECT_EQ(0, res.expires);
         EXPECT_EQ(0, res.modified);
@@ -51,6 +54,8 @@ TEST_F(Storage, HTTPReading) {
         EXPECT_EQ(uv_thread_self(), mainThread);
         EXPECT_EQ(Response::Error, res.status);
         EXPECT_EQ(false, res.stale);
+        ASSERT_TRUE(res.data.get());
+        EXPECT_EQ("Server Error!", *res.data);
         EXPECT_EQ("HTTP status code 500", res.message);
         EXPECT_EQ(0, res.expires);
         EXPECT_EQ(0, res.modified);

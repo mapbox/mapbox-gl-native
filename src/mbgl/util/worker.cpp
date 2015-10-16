@@ -16,8 +16,8 @@ class Worker::Impl {
 public:
     Impl() = default;
 
-    void parseRasterTile(RasterBucket* bucket, std::string data, std::function<void (TileParseResult)> callback) {
-        std::unique_ptr<util::Image> image(new util::Image(data));
+    void parseRasterTile(RasterBucket* bucket, const std::shared_ptr<const std::string> data, std::function<void (TileParseResult)> callback) {
+        std::unique_ptr<util::Image> image(new util::Image(*data));
         if (!(*image)) {
             callback(TileParseResult("error parsing raster image"));
         }
@@ -29,9 +29,9 @@ public:
         callback(TileParseResult(TileData::State::parsed));
     }
 
-    void parseVectorTile(TileWorker* worker, std::string data, std::function<void (TileParseResult)> callback) {
+    void parseVectorTile(TileWorker* worker, const std::shared_ptr<const std::string> data, std::function<void (TileParseResult)> callback) {
         try {
-            pbf tilePBF(reinterpret_cast<const unsigned char *>(data.data()), data.size());
+            pbf tilePBF(reinterpret_cast<const unsigned char*>(data->data()), data->size());
             callback(worker->parse(VectorTile(tilePBF)));
         } catch (const std::exception& ex) {
             callback(TileParseResult(ex.what()));
@@ -61,12 +61,12 @@ Worker::Worker(std::size_t count) {
 
 Worker::~Worker() = default;
 
-std::unique_ptr<WorkRequest> Worker::parseRasterTile(RasterBucket& bucket, std::string data, std::function<void (TileParseResult)> callback) {
+std::unique_ptr<WorkRequest> Worker::parseRasterTile(RasterBucket& bucket, const std::shared_ptr<const std::string> data, std::function<void (TileParseResult)> callback) {
     current = (current + 1) % threads.size();
     return threads[current]->invokeWithCallback(&Worker::Impl::parseRasterTile, callback, &bucket, data);
 }
 
-std::unique_ptr<WorkRequest> Worker::parseVectorTile(TileWorker& worker, std::string data, std::function<void (TileParseResult)> callback) {
+std::unique_ptr<WorkRequest> Worker::parseVectorTile(TileWorker& worker, const std::shared_ptr<const std::string> data, std::function<void (TileParseResult)> callback) {
     current = (current + 1) % threads.size();
     return threads[current]->invokeWithCallback(&Worker::Impl::parseVectorTile, callback, &worker, data);
 }

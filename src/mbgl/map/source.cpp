@@ -163,7 +163,7 @@ void Source::load() {
         }
 
         rapidjson::Document d;
-        d.Parse<0>(res.data.c_str());
+        d.Parse<0>(res.data->c_str());
 
         if (d.HasParseError()) {
             std::stringstream message;

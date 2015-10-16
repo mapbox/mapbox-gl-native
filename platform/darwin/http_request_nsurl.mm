@@ -221,6 +221,9 @@ void HTTPNSURLRequest::handleResult(NSData *data, NSURLResponse *res, NSError *e
             // TODO: Use different codes for host not found, timeout, invalid URL etc.
             // These can be categorized in temporary and permanent errors.
             response = std::make_unique<Response>();
+            if (data) {
+                response->data = std::make_shared<std::string>((const char *)[data bytes], [data length]);
+            }
             response->status = Response::Error;
             response->message = [[error localizedDescription] UTF8String];
 
@@ -253,7 +256,7 @@ void HTTPNSURLRequest::handleResult(NSData *data, NSURLResponse *res, NSError *e
         const long responseCode = [(NSHTTPURLResponse *)res statusCode];
 
         response = std::make_unique<Response>();
-        response->data = {(const char *)[data bytes], [data length]};
+        response->data = std::make_shared<std::string>((const char *)[data bytes], [data length]);
 
         NSDictionary *headers = [(NSHTTPURLResponse *)res allHeaderFields];
         NSString *cache_control = [headers objectForKey:@"Cache-Control"];
