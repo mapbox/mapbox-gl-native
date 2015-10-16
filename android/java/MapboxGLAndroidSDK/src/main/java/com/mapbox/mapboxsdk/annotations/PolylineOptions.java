@@ -2,7 +2,11 @@ package com.mapbox.mapboxsdk.annotations;
 
 import com.mapbox.mapboxsdk.geometry.LatLng;
 
-public class PolylineOptions extends MultiPointOptions {
+import java.util.List;
+
+public class PolylineOptions {
+
+    protected Annotation annotation;
 
     public PolylineOptions() {
         annotation = new Polyline();
@@ -25,6 +29,15 @@ public class PolylineOptions extends MultiPointOptions {
             add(point);
         }
         return this;
+    }
+
+    public PolylineOptions alpha(float alpha) {
+        annotation.alpha = alpha;
+        return this;
+    }
+
+    public float getAlpha() {
+        return annotation.alpha;
     }
 
     /**
@@ -54,6 +67,10 @@ public class PolylineOptions extends MultiPointOptions {
         return this;
     }
 
+    public boolean isVisible() {
+        return annotation.visible;
+    }
+
     /**
      * Sets the width of the polyline.
      *
@@ -63,6 +80,11 @@ public class PolylineOptions extends MultiPointOptions {
     public PolylineOptions width(float width) {
         ((Polyline)annotation).width = width;
         return this;
+    }
+
+    public List<LatLng> getPoints() {
+        // the getter gives us a copy, which is the safe thing to do...
+        return ((MultiPoint)annotation).getPoints();
     }
 
     // TODO: Implement writeToParcel of Google Maps Android API
