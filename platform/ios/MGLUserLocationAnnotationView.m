@@ -212,56 +212,64 @@ const CGFloat MGLUserLocationAnnotationArrowSize = MGLUserLocationAnnotationPuck
         _puckDot = nil;
         _puckArrow = nil;
     }
-
+    
+    BOOL showHeadingIndicator = _mapView.userTrackingMode == MGLUserTrackingModeFollowWithHeading;
+    
     // update heading indicator
     //
-    if (_headingIndicatorLayer)
+    if (showHeadingIndicator)
     {
-        _headingIndicatorLayer.hidden = !(_mapView.userTrackingMode == MGLUserTrackingModeFollowWithHeading ||
-                                          _mapView.userTrackingMode == MGLUserTrackingModeFollowWithCourse);
-
-        if (_oldHeadingAccuracy != self.annotation.heading.headingAccuracy)
+        _headingIndicatorLayer.hidden = NO;
+        
+        // heading indicator (tinted, semi-circle)
+        //
+        if ( ! _headingIndicatorLayer && self.annotation.heading.headingAccuracy)
+        {
+            CGFloat headingIndicatorSize = MGLUserLocationAnnotationHaloSize;
+            
+            _headingIndicatorLayer = [CALayer layer];
+            _headingIndicatorLayer.bounds = CGRectMake(0, 0, headingIndicatorSize, headingIndicatorSize);
+            _headingIndicatorLayer.position = CGPointMake(super.bounds.size.width / 2.0, super.bounds.size.height / 2.0);
+            _headingIndicatorLayer.contents = (__bridge id)[[self headingIndicatorTintedGradientImage] CGImage];
+            _headingIndicatorLayer.contentsGravity = kCAGravityBottom;
+            _headingIndicatorLayer.contentsScale = [UIScreen mainScreen].scale;
+            _headingIndicatorLayer.opacity = 0.4;
+            _headingIndicatorLayer.shouldRasterize = YES;
+            _headingIndicatorLayer.rasterizationScale = [UIScreen mainScreen].scale;
+            _headingIndicatorLayer.drawsAsynchronously = YES;
+            
+            [self.layer insertSublayer:_headingIndicatorLayer below:_dotBorderLayer];
+        }
+        
+        // heading indicator accuracy mask (fan-shaped)
+        //
+        if ( ! _headingIndicatorMaskLayer && self.annotation.heading.headingAccuracy)
+        {
+            _headingIndicatorMaskLayer = [CAShapeLayer layer];
+            _headingIndicatorMaskLayer.frame = _headingIndicatorLayer.bounds;
+            _headingIndicatorMaskLayer.path = [[self headingIndicatorClippingMask] CGPath];
+            
+            // apply the mask to the halo-radius-sized gradient layer
+            _headingIndicatorLayer.mask = _headingIndicatorMaskLayer;
+            
+            _oldHeadingAccuracy = self.annotation.heading.headingAccuracy;
+            
+        }
+        else if (_oldHeadingAccuracy != self.annotation.heading.headingAccuracy)
         {
             // recalculate the clipping mask based on updated accuracy
             _headingIndicatorMaskLayer.path = [[self headingIndicatorClippingMask] CGPath];
-
+            
             _oldHeadingAccuracy = self.annotation.heading.headingAccuracy;
         }
+        
     }
-    
-    // heading indicator (tinted, semi-circle)
-    //
-    if ( ! _headingIndicatorLayer && self.annotation.heading.headingAccuracy)
+    else
     {
-        CGFloat headingIndicatorSize = MGLUserLocationAnnotationHaloSize;
-
-        _headingIndicatorLayer = [CALayer layer];
-        _headingIndicatorLayer.bounds = CGRectMake(0, 0, headingIndicatorSize, headingIndicatorSize);
-        _headingIndicatorLayer.position = CGPointMake(super.bounds.size.width / 2.0, super.bounds.size.height / 2.0);
-        _headingIndicatorLayer.contents = (__bridge id)[[self headingIndicatorTintedGradientImage] CGImage];
-        _headingIndicatorLayer.contentsGravity = kCAGravityBottom;
-        _headingIndicatorLayer.contentsScale = [UIScreen mainScreen].scale;
-        _headingIndicatorLayer.opacity = 0.4;
-        _headingIndicatorLayer.shouldRasterize = YES;
-        _headingIndicatorLayer.rasterizationScale = [UIScreen mainScreen].scale;
-        _headingIndicatorLayer.drawsAsynchronously = YES;
-
-        [self.layer insertSublayer:_headingIndicatorLayer below:_dotBorderLayer];
+        _headingIndicatorLayer = nil;
+        _headingIndicatorMaskLayer = nil;
     }
 
-    // heading indicator accuracy mask (fan-shaped)
-    //
-    if ( ! _headingIndicatorMaskLayer && self.annotation.heading.headingAccuracy)
-    {
-        _headingIndicatorMaskLayer = [CAShapeLayer layer];
-        _headingIndicatorMaskLayer.frame = _headingIndicatorLayer.bounds;
-        _headingIndicatorMaskLayer.path = [[self headingIndicatorClippingMask] CGPath];
-
-        // apply the mask to the halo-radius-sized gradient layer
-        _headingIndicatorLayer.mask = _headingIndicatorMaskLayer;
-
-        _oldHeadingAccuracy = self.annotation.heading.headingAccuracy;
-    }
 
     // update accuracy ring (if zoom or horizontal accuracy have changed)
     //

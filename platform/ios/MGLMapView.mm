@@ -2628,6 +2628,10 @@ CLLocationCoordinate2D MGLLocationCoordinate2DFromLatLng(mbgl::LatLng latLng)
         {
             [self.locationManager stopUpdatingHeading];
 
+            // Immediately update the annotation view; other cases update inside
+            // the locationManager:didUpdateLocations: method.
+            [self updateUserLocationAnnotationView];
+
             break;
         }
         case MGLUserTrackingModeFollow:
