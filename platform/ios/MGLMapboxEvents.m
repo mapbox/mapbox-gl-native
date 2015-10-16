@@ -4,7 +4,7 @@
 #import <SystemConfiguration/CaptiveNetwork.h>
 #import <CoreLocation/CoreLocation.h>
 
-#if !__TVOS_9_0
+#if !TARGET_OS_TV
 #import <CoreTelephony/CTTelephonyNetworkInfo.h>
 #import <CoreTelephony/CTCarrier.h>
 #endif
@@ -98,16 +98,11 @@ const NSTimeInterval MGLFlushInterval = 60;
             _scale = [UIScreen mainScreen].scale;
         }
 
-        if ([[UIDevice currentDevice].systemName isEqualToString:@"tvOS"])
-        {
-            _carrier = @"N/A";
-        }
-#if !__TVOS_9_0
-        else
-        {
-            CTCarrier *carrierVendor = [[[CTTelephonyNetworkInfo alloc] init] subscriberCellularProvider];
-            _carrier = [carrierVendor carrierName];
-        }
+#if TARGET_OS_TV
+        _carrier = @"N/A";
+#else
+        CTCarrier *carrierVendor = [[[CTTelephonyNetworkInfo alloc] init] subscriberCellularProvider];
+        _carrier = [carrierVendor carrierName];
 #endif
     }
     return self;
@@ -299,7 +294,7 @@ const NSTimeInterval MGLFlushInterval = 60;
         [NSTimeZone resetSystemTimeZone];
         [_rfc3339DateFormatter setTimeZone:[NSTimeZone systemTimeZone]];
 
-#if !__TVOS_9_0
+#if !TARGET_OS_TV
         // Enable Battery Monitoring
         [UIDevice currentDevice].batteryMonitoringEnabled = YES;
 #endif
@@ -374,7 +369,7 @@ const NSTimeInterval MGLFlushInterval = 60;
     if (self.paused) {
         [self stopUpdatingLocation];
     } else {
-#if !__TVOS_9_0
+#if !TARGET_OS_TV
         CLAuthorizationStatus authStatus = [CLLocationManager authorizationStatus];
         if (authStatus == kCLAuthorizationStatusDenied ||
             authStatus == kCLAuthorizationStatusRestricted) {
@@ -412,7 +407,7 @@ const NSTimeInterval MGLFlushInterval = 60;
 - (void)stopUpdatingLocation {
     [_locationManager stopUpdatingLocation];
 
-#if !__TVOS_9_0
+#if !TARGET_OS_TV
     // -[CLLocationManager stopMonitoringVisits] is only available in iOS 8+.
     if ([_locationManager respondsToSelector:@selector(stopMonitoringVisits)]) {
         [_locationManager stopMonitoringVisits];
@@ -451,7 +446,7 @@ const NSTimeInterval MGLFlushInterval = 60;
     _locationManager.distanceFilter = 10;
     _locationManager.delegate = self;
 
-#if !__TVOS_9_0
+#if !TARGET_OS_TV
     [_locationManager startUpdatingLocation];
 
     // -[CLLocationManager startMonitoringVisits] is only available in iOS 8+.
@@ -532,7 +527,7 @@ const NSTimeInterval MGLFlushInterval = 60;
         [evt setValue:strongSelf.data.model forKey:@"model"];
         [evt setValue:strongSelf.data.iOSVersion forKey:@"operatingSystem"];
         [evt setValue:[strongSelf deviceOrientation] forKey:@"orientation"];
-#if !__TVOS_9_0
+#if !TARGET_OS_TV
         [evt setValue:@((int)(100 * [UIDevice currentDevice].batteryLevel)) forKey:@"batteryLevel"];
 #endif
         [evt setValue:@(strongSelf.data.scale) forKey:@"resolution"];
@@ -665,7 +660,7 @@ const NSTimeInterval MGLFlushInterval = 60;
 // Can be called from any thread.
 //
 - (NSString *) deviceOrientation {
-#if !__TVOS_9_0
+#if !TARGET_OS_TV
     __block NSString *result;
         
     NSString *(^deviceOrientationBlock)(void) = ^{
@@ -782,7 +777,7 @@ const NSTimeInterval MGLFlushInterval = 60;
 // Can be called from any thread.
 //
 - (NSString *) currentCellularNetworkConnectionType {
-#if !__TVOS_9_0
+#if !TARGET_OS_TV
     CTTelephonyNetworkInfo *telephonyInfo = [[CTTelephonyNetworkInfo alloc] init];
     NSString *radioTech = telephonyInfo.currentRadioAccessTechnology;
 
@@ -821,7 +816,7 @@ const NSTimeInterval MGLFlushInterval = 60;
 // Can be called from any thread.
 //
 + (BOOL) checkPushEnabled {
-#if !__TVOS_9_0
+#if !TARGET_OS_TV
     BOOL (^pushCheckBlock)(void) = ^{
         BOOL blockResult;
         if ([[UIApplication sharedApplication] respondsToSelector:@selector(isRegisteredForRemoteNotifications)]) {
@@ -861,7 +856,7 @@ const NSTimeInterval MGLFlushInterval = 60;
         [MGLMapboxEvents pushEvent:MGLEventTypeLocation withAttributes:@{
             MGLEventKeyLatitude: @(loc.coordinate.latitude),
             MGLEventKeyLongitude: @(loc.coordinate.longitude),
-#if !__TVOS_9_0
+#if !TARGET_OS_TV
             MGLEventKeySpeed: @(loc.speed),
             MGLEventKeyCourse: @(loc.course),
 #endif

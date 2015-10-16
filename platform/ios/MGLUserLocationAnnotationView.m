@@ -213,7 +213,7 @@ const CGFloat MGLUserLocationAnnotationArrowSize = MGLUserLocationAnnotationPuck
         _puckArrow = nil;
     }
 
-#if !__TVOS_9_0
+#if !TARGET_OS_TV
     // update heading indicator
     //
     if (_headingIndicatorLayer)
@@ -468,7 +468,7 @@ const CGFloat MGLUserLocationAnnotationArrowSize = MGLUserLocationAnnotationPuck
 - (UIBezierPath *)headingIndicatorClippingMask
 {
     CGFloat accuracy = 0.0;
-#if !__TVOS_9_0
+#if !TARGET_OS_TV
         accuracy = self.annotation.heading.headingAccuracy;
 #endif
 

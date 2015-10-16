@@ -51,7 +51,7 @@ NS_ASSUME_NONNULL_END
     return self.mapView.userTrackingMode != MGLUserTrackingModeNone;
 }
 
-#if !__TVOS_9_0
+#if !TARGET_OS_TV
 - (void)setHeading:(CLHeading *)newHeading
 {
     if (newHeading.trueHeading != _heading.trueHeading)

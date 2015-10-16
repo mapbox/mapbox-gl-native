@@ -11,20 +11,12 @@ LIBUV_VERSION=0.10.28
 
 if [[ ${#} -eq 0 ]]; then # e.g. "make ipackage"
     BUILD_FOR_DEVICE=true
-    BUILD_FOR_TV=false
     GCC_GENERATE_DEBUGGING_SYMBOLS="YES"
 elif [[ ${1} == "sim" ]]; then # e.g. "make ipackage-sim"
     BUILD_FOR_DEVICE=false
-    BUILD_FOR_TV=false
     GCC_GENERATE_DEBUGGING_SYMBOLS="YES"
-elif [[ ${1} == "tv" ]]; then # e.g. "make ipackage-tv"
-    BUILD_FOR_DEVICE=true
-    BUILD_FOR_TV=true
-    GCC_GENERATE_DEBUGGING_SYMBOLS="YES"
-    TV_SDK_VERSION=`xcrun --sdk appletvos --show-sdk-version`
 else # e.g. "make ipackage-strip"
     BUILD_FOR_DEVICE=true
-    BUILD_FOR_TV=false
     GCC_GENERATE_DEBUGGING_SYMBOLS="NO"
 fi
 
@@ -52,14 +44,10 @@ export BUILDTYPE=${BUILDTYPE:-Release}
 export HOST=ios
 make Xcode/ios
 
-if [[ "${BUILD_FOR_TV}" == true ]]; then
-export GCC_PREPROCESSOR_DEFINITIONS='__TVOS_9_0'
-fi
-
 if [[ "${BUILD_FOR_DEVICE}" == true ]]; then
     step "Building iOS device targets..."
-    xcodebuild -sdk appletvos${TV_SDK_VERSION} \
-        ARCHS="arm64" \
+    xcodebuild -sdk iphoneos${IOS_SDK_VERSION} \
+        ARCHS="arm64 armv7 armv7s" \
         ONLY_ACTIVE_ARCH=NO \
         GCC_GENERATE_DEBUGGING_SYMBOLS=${GCC_GENERATE_DEBUGGING_SYMBOLS} \
         -project ./build/ios-all/mbgl.xcodeproj \
@@ -69,7 +57,7 @@ if [[ "${BUILD_FOR_DEVICE}" == true ]]; then
 fi
 
 step "Building iOS Simulator targets..."
-xcodebuild -sdk appletvsimulator${TV_SDK_VERSION} \
+xcodebuild -sdk iphonesimulator${IOS_SDK_VERSION} \
     ARCHS="x86_64 i386" \
     ONLY_ACTIVE_ARCH=NO \
     GCC_GENERATE_DEBUGGING_SYMBOLS=${GCC_GENERATE_DEBUGGING_SYMBOLS} \
@@ -84,14 +72,14 @@ LIBS=(core.a platform-ios.a asset-fs.a cache-sqlite.a http-nsurl.a)
 if [[ "${BUILD_FOR_DEVICE}" == true ]]; then
     libtool -static -no_warning_for_no_symbols \
         -o ${OUTPUT}/static/lib${NAME}.a \
-        ${LIBS[@]/#/build/${BUILDTYPE}-appletvos/libmbgl-} \
-        ${LIBS[@]/#/build/${BUILDTYPE}-appletvsimulator/libmbgl-} \
+        ${LIBS[@]/#/build/${BUILDTYPE}-iphoneos/libmbgl-} \
+        ${LIBS[@]/#/build/${BUILDTYPE}-iphonesimulator/libmbgl-} \
         `find mason_packages/ios-${IOS_SDK_VERSION} -type f -name libuv.a` \
         `find mason_packages/ios-${IOS_SDK_VERSION} -type f -name libgeojsonvt.a`
 else
     libtool -static -no_warning_for_no_symbols \
         -o ${OUTPUT}/static/lib${NAME}.a \
-        ${LIBS[@]/#/build/${BUILDTYPE}-appletvsimulator/libmbgl-} \
+        ${LIBS[@]/#/build/${BUILDTYPE}-iphonesimulator/libmbgl-} \
         `find mason_packages/ios-${IOS_SDK_VERSION} -type f -name libuv.a` \
         `find mason_packages/ios-${IOS_SDK_VERSION} -type f -name libgeojsonvt.a`
 fi
