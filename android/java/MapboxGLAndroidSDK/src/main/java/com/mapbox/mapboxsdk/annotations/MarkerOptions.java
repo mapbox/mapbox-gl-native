@@ -4,7 +4,9 @@ import android.support.annotation.Nullable;
 import android.text.TextUtils;
 import com.mapbox.mapboxsdk.geometry.LatLng;
 
-public class MarkerOptions extends AnnotationOptions {
+public class MarkerOptions {
+
+    protected Annotation annotation;
 
     public MarkerOptions() {
         annotation = new Marker();
@@ -119,6 +121,14 @@ public class MarkerOptions extends AnnotationOptions {
         return this;
     }
 
+    public MarkerOptions alpha(float alpha) {
+        annotation.setAlpha(alpha);
+        return this;
+    }
+
+    public float getAlpha() {
+        return annotation.alpha;
+    }
 
     // TODO: Implement this method of Google Maps Android API
 //    public MarkerOptions icon(BitmapDescriptor icon) {
