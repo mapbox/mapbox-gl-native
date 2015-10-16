@@ -6,11 +6,9 @@
 
 #include <cassert>
 #include <functional>
-#include <atomic>
+#include <memory>
 
 namespace mbgl {
-
-struct Request::Canceled { std::mutex mutex; bool confirmed = false; };
 
 // Note: This requires that loop is running in the current thread (or not yet running).
 Request::Request(const Resource &resource_, uv_loop_t *loop, Callback callback_)
@@ -21,27 +19,26 @@ Request::Request(const Resource &resource_, uv_loop_t *loop, Callback callback_)
 
 // Called in the originating thread.
 void Request::notifyCallback() {
+    std::unique_lock<std::mutex> lock(mtx);
     if (!canceled) {
-        invoke();
-    } else {
-        bool destroy = false;
-        {
-            std::unique_lock<std::mutex> lock(canceled->mutex);
-            destroy = canceled->confirmed;
+        // Move the response object out so that we can't accidentally notify twice.
+        auto res = std::move(response);
+        assert(!response);
+        // Unlock before, since callbacks may call cancel, which also locks this mutex.
+        lock.unlock();
+        // The user could supply a null pointer or empty std::function as a callback. In this case, we
+        // still do the file request, but we don't need to deliver a result.
+        // Similarly, two consecutive updates could trigger two notifyCallbacks, so we need to make
+        // sure
+        if (callback && res) {
+            callback(*res);
         }
+    } else {
         // Don't delete right way, because we have to unlock the mutex before deleting.
-        if (destroy) {
+        if (confirmed) {
+            lock.unlock();
             delete this;
         }
-    }
-}
-
-void Request::invoke() {
-    assert(response);
-    // The user could supply a null pointer or empty std::function as a callback. In this case, we
-    // still do the file request, but we don't need to deliver a result.
-    if (callback) {
-        callback(*std::atomic_load(&response));
     }
 }
 
@@ -49,28 +46,30 @@ Request::~Request() = default;
 
 // Called in the FileSource thread.
 void Request::notify(const std::shared_ptr<const Response> &response_) {
+    std::lock_guard<std::mutex> lock(mtx);
     assert(response_);
-    std::atomic_store(&response, response_);
+    response = response_;
     async->send();
 }
 
 // Called in the originating thread.
 void Request::cancel() {
-    assert(async);
+    std::lock_guard<std::mutex> lock(mtx);
     assert(!canceled);
-    canceled = std::make_unique<Canceled>();
+    canceled = true;
 }
 
 
 // Called in the FileSource thread.
 // Will only ever be invoked after cancel() was called in the original requesting thread.
 void Request::destruct() {
-    assert(async);
+    std::lock_guard<std::mutex> lock(mtx);
     assert(canceled);
-    std::unique_lock<std::mutex> lock(canceled->mutex);
-    canceled->confirmed = true;
+    confirmed = true;
+    // We need to extend the lock until after the async has been sent, otherwise the requesting
+    // thread could destroy the async while this call is still in progress.
     async->send();
-    // after this method returns, the FileSource thread has no knowledge of
+    // After this method returns, the FileSource thread has no knowledge of
     // this object anymore.
 }
 

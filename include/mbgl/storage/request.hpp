@@ -33,13 +33,13 @@ public:
 
 private:
     ~Request();
-    void invoke();
     void notifyCallback();
 
 private:
-    std::unique_ptr<uv::async> async;
-    struct Canceled;
-    std::unique_ptr<Canceled> canceled;
+    std::mutex mtx;
+    bool canceled = false;
+    bool confirmed = false;
+    const std::unique_ptr<uv::async> async;
     Callback callback;
     std::shared_ptr<const Response> response;
 
