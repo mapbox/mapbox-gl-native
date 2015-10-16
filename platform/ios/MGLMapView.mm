@@ -2656,6 +2656,9 @@ CLLocationCoordinate2D MGLLocationCoordinate2DFromLatLng(mbgl::LatLng latLng)
         case MGLUserTrackingModeNone:
         {
             [self.locationManager stopUpdatingHeading];
+            // Only update the annotation view for this case, other cases update the view inside
+            // the did update location method.
+            [self updateUserLocationAnnotationView];
 
             break;
         }
