@@ -449,7 +449,7 @@ public class MainActivity extends AppCompatActivity {
             opts.add(new PolygonOptions()
                     .add(latLngs)
                     .strokeColor(Color.MAGENTA)
-                    .fillColor(Color.BLUE));
+                    .fillColor(Color.BLUE).alpha(0.5f));
             map.addPolygons(opts).get(0);
         } catch (Exception e) {
             Log.e(TAG, "Error adding Polygon: " + e);
