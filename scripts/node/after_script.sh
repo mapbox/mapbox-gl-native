@@ -42,9 +42,9 @@ if [ ! -z "${AWS_ACCESS_KEY_ID}" ] && [ ! -z "${AWS_SECRET_ACCESS_KEY}" ] ; then
     export PATH="`python -m site --user-base`/bin:${PATH}"
 
     REPO_NAME=$(basename $TRAVIS_REPO_SLUG)
-    gzip --stdout node_modules/mapbox-gl-test-suite/tests/index.html | \
+    gzip --stdout node_modules/mapbox-gl-test-suite/render-tests/index.html | \
         aws s3 cp --acl public-read --content-encoding gzip --content-type text/html \
-            - s3://mapbox/$REPO_NAME/tests/$TRAVIS_JOB_NUMBER/index.html
+            - s3://mapbox/$REPO_NAME/render-tests/$TRAVIS_JOB_NUMBER/index.html
 
-    echo http://mapbox.s3.amazonaws.com/$REPO_NAME/tests/$TRAVIS_JOB_NUMBER/index.html
+    echo http://mapbox.s3.amazonaws.com/$REPO_NAME/render-tests/$TRAVIS_JOB_NUMBER/index.html
 fi
