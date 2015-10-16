@@ -6,7 +6,9 @@ import com.mapbox.mapboxsdk.geometry.LatLng;
 import java.util.ArrayList;
 import java.util.List;
 
-public class PolygonOptions extends MultiPointOptions {
+public class PolygonOptions {
+
+    protected Annotation annotation;
 
     public PolygonOptions() {
         annotation = new Polygon();
@@ -45,6 +47,15 @@ public class PolygonOptions extends MultiPointOptions {
         }
         ((Polygon)annotation).holes.add(hole);
         return this;
+    }
+
+    public PolygonOptions alpha(float alpha) {
+        annotation.alpha = alpha;
+        return this;
+    }
+
+    public float getAlpha() {
+        return annotation.alpha;
     }
 
     /**
@@ -115,6 +126,15 @@ public class PolygonOptions extends MultiPointOptions {
     public PolygonOptions visible(boolean visible) {
         annotation.visible = visible;
         return this;
+    }
+
+    public boolean isVisible() {
+        return annotation.visible;
+    }
+
+    public List<LatLng> getPoints() {
+        // the getter gives us a copy, which is the safe thing to do...
+        return ((MultiPoint)annotation).getPoints();
     }
 
     // TODO: Implement writeToParcel of Google Maps Android API

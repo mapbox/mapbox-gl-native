@@ -9,7 +9,7 @@ import com.mapbox.mapboxsdk.geometry.LatLng;
  * https://github.com/mapbox/mapbox-gl-native/issues/1882
  * https://github.com/mapbox/mapbox-gl-native/issues/1726
  */
-public class CircleOptions extends AnnotationOptions {
+public class CircleOptions {
 
     private Circle circle;
 
@@ -61,4 +61,16 @@ public class CircleOptions extends AnnotationOptions {
         return this;
     }
 
+    public CircleOptions alpha(float alpha) {
+        circle.alpha = alpha;
+        return this;
+    }
+
+    public float getAlpha() {
+        return circle.alpha;
+    }
+
+    public boolean isVisible() {
+        return circle.visible;
+    }
 }
