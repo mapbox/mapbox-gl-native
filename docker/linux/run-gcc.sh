@@ -3,13 +3,10 @@
 set -e
 set -o pipefail
 
-docker build \
-    -t mapbox/gl-native:linux \
-    docker/linux
+docker build -t mapbox/gl-native:linux docker/linux
 
 docker run \
     -i \
-    -e "CXX=g++" \
     -v `pwd`:/home/mapbox/build \
     -t mapbox/gl-native:linux \
     build/docker/linux/test.sh
