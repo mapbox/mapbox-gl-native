@@ -29,7 +29,7 @@
 ////////////////////////////////////////////////////////////////////////////////
 #pragma mark - Imports
 
-#import "OHHTTPStubs.h"
+#import <OHHTTPStubs/OHHTTPStubs.h>
 
 ////////////////////////////////////////////////////////////////////////////////
 #pragma mark - Types & Constants
@@ -108,7 +108,7 @@ static NSTimeInterval const kSlotTime = 0.25; // Must be >0. We will send a chun
         [self setEnabled:YES];
     }
 }
-- (id)init
+- (instancetype)init
 {
     self = [super init];
     if (self)

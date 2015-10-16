@@ -29,8 +29,7 @@
  || (defined(__MAC_OS_X_VERSION_MAX_ALLOWED) && __MAC_OS_X_VERSION_MAX_ALLOWED >= 1090)
 
 #import <XCTest/XCTest.h>
-#import "OHHTTPStubs.h"
-#import "OHHTTPStubsResponse+JSON.h"
+#import <OHHTTPStubs/OHHTTPStubs.h>
 
 @interface NSURLSessionTests : XCTestCase <NSURLSessionDataDelegate> @end
 
@@ -68,7 +67,7 @@
         __block __strong id dataResponse = nil;
         __block __strong NSError* errorResponse = nil;
         NSMutableURLRequest *request = [NSMutableURLRequest requestWithURL:[NSURL URLWithString:@"foo://unknownhost:666"]];
-        [request setHTTPMethod:@"GET"];
+        request.HTTPMethod = @"GET";
         [request setValue:@"application/json" forHTTPHeaderField:@"Content-Type"];
         [request setValue:@"application/json" forHTTPHeaderField:@"Accept"];
         
