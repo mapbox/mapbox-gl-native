@@ -12,7 +12,7 @@ public final class MarkerOptions {
         marker = new Marker();
     }
 
-    public MarkerOptions anchor(float u, float v) {
+    private MarkerOptions anchor(float u, float v) {
         marker.setAnchor(u, v);
         return this;
     }
@@ -27,11 +27,11 @@ public final class MarkerOptions {
         return this;
     }
 
-    public float getAnchorU() {
+    private float getAnchorU() {
         return marker.getAnchorU();
     }
 
-    public float getAnchorV() {
+    private float getAnchorV() {
         return marker.getAnchorV();
     }
 
