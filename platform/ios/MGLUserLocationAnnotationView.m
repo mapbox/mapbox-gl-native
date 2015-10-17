@@ -266,6 +266,8 @@ const CGFloat MGLUserLocationAnnotationArrowSize = MGLUserLocationAnnotationPuck
     }
     else
     {
+        [_headingIndicatorLayer removeFromSuperlayer];
+        [_headingIndicatorMaskLayer removeFromSuperlayer];
         _headingIndicatorLayer = nil;
         _headingIndicatorMaskLayer = nil;
     }
