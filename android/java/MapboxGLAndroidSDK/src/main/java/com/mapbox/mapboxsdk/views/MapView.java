@@ -634,6 +634,9 @@ public final class MapView extends FrameLayout {
         mGpsMarker = new ImageView(getContext());
         mGpsMarker.setImageResource(R.drawable.location_marker);
         mGpsMarker.setVisibility(View.INVISIBLE);
+        float iconSize = 27.0f * mScreenDensity;
+        FrameLayout.LayoutParams lp = new FrameLayout.LayoutParams((int) iconSize, (int) iconSize);
+        mGpsMarker.setLayoutParams(lp);
         addView(mGpsMarker);
 
         // Setup compass
@@ -3008,12 +3011,8 @@ public final class MapView extends FrameLayout {
 
             float iconSize = 27.0f * mScreenDensity;
             // Update Location
-            FrameLayout.LayoutParams lp = new FrameLayout.LayoutParams((int) iconSize, (int) iconSize);
-            lp.leftMargin = (int) (screenLocation.x - iconSize / 2.0f);
-            lp.topMargin = (int) (screenLocation.y + iconSize / 2.0f);
-            mGpsMarker.setLayoutParams(lp);
-            rotateImageView(mGpsMarker, 0.0f);
-            mGpsMarker.requestLayout();
+            mGpsMarker.setX(screenLocation.x - iconSize / 2.0f);
+            mGpsMarker.setY(screenLocation.y - iconSize / 2.0f);
         } else {
             if (mGpsMarker != null) {
                 mGpsMarker.setVisibility(View.INVISIBLE);
