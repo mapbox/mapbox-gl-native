@@ -58,9 +58,10 @@ final class CompassView extends ImageView implements SensorEventListener {
 
     private void initialize(Context context) {
         // Sensor initialisation
-        mSensorManager = (SensorManager) context.getSystemService(Context.SENSOR_SERVICE);
-        mSensorAccelerometer = mSensorManager.getDefaultSensor(Sensor.TYPE_ACCELEROMETER);
-        mSensorMagneticField = mSensorManager.getDefaultSensor(Sensor.TYPE_MAGNETIC_FIELD);
+        // Disabling for until compass tracking implemented - saves memory churn and battery
+        //mSensorManager = (SensorManager) context.getSystemService(Context.SENSOR_SERVICE);
+        //mSensorAccelerometer = mSensorManager.getDefaultSensor(Sensor.TYPE_ACCELEROMETER);
+        //mSensorMagneticField = mSensorManager.getDefaultSensor(Sensor.TYPE_MAGNETIC_FIELD);
 
         // View configuration
         setImageDrawable(ContextCompat.getDrawable(getContext(), R.drawable.compass));
@@ -87,15 +88,17 @@ final class CompassView extends ImageView implements SensorEventListener {
     }
 
     public void registerListeners(CompassDelegate compassDelegate) {
-        mSensorManager.registerListener(this, mSensorAccelerometer, SensorManager.SENSOR_DELAY_UI);
-        mSensorManager.registerListener(this, mSensorMagneticField, SensorManager.SENSOR_DELAY_UI);
+        // Disabling for until compass tracking implemented - saves memory churn and battery
+        //mSensorManager.registerListener(this, mSensorAccelerometer, SensorManager.SENSOR_DELAY_UI);
+        //mSensorManager.registerListener(this, mSensorMagneticField, SensorManager.SENSOR_DELAY_UI);
         mCompassDelegate = compassDelegate;
     }
 
     public void unRegisterListeners() {
         mCompassDelegate = null;
-        mSensorManager.unregisterListener(this, mSensorMagneticField);
-        mSensorManager.unregisterListener(this, mSensorAccelerometer);
+        // Disabling for until compass tracking implemented - saves memory churn and battery
+        //mSensorManager.unregisterListener(this, mSensorMagneticField);
+        //mSensorManager.unregisterListener(this, mSensorAccelerometer);
     }
 
     @Override
