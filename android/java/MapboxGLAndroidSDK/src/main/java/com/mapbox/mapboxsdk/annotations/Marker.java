@@ -48,15 +48,15 @@ public final class Marker extends Annotation {
         return (lat == otherLat && otherLng == lng);
     }
 
-    public Point getAnchor() {
+    Point getAnchor() {
         return new Point((int)anchorU, (int)anchorV);
     }
 
-    public float getAnchorU() {
+    float getAnchorU() {
         return anchorU;
     }
 
-    public float getAnchorV() {
+    float getAnchorV() {
         return anchorV;
     }
 
@@ -188,7 +188,7 @@ public final class Marker extends Annotation {
     }
 
     private void showInfoWindow(InfoWindow iw) {
-        iw.open(this, getPosition(), (int) anchorU, (int) anchorV + topOffsetPixels);
+        iw.open(this, getPosition(), 0, topOffsetPixels);
         iw.setBoundMarker(this);
         infoWindowShown = true;
     }
