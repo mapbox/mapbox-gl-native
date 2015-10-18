@@ -2,6 +2,13 @@
 
 A first run at getting MapboxGL running on AppleTV.
 
+# Building
+
+To build MapboxGL on a Mac you have to install a few dependencies:
+
+* [xcpretty](https://github.com/supermarin/xcpretty); can be installed with ```sudo gem install xcpretty```.
+* [appledoc](https://github.com/tomaz/appledoc); can be installed from homebrew with ```brew install appledoc```. Except it doesn't appear to be in homebrew at the moment, so clone, archive, and copy executable into path.
+
 # Status
 
 * Code disabled using preprocessor conditionals for references that don't compile on tvOS.
