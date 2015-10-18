@@ -5,10 +5,10 @@ set -o pipefail
 set -u
 
 NAME=Mapbox
-OUTPUT=build/ios/pkg
+OUTPUT=build/tvos/pkg
 TV_SDK_VERSION=`xcrun --sdk appletvos --show-sdk-version`
 # Need this for mason packages, because tvos versions haven't been added.
-IOS_SDK_VERSION=`xcrun --sdk iphoneos --show-sdk-version`
+# IOS_SDK_VERSION=`xcrun --sdk iphoneos --show-sdk-version`
 LIBUV_VERSION=0.10.28
 
 if [[ ${#} -eq 0 ]]; then # e.g. "make ipackage"
@@ -44,48 +44,56 @@ echo ${HASH} >> ${VERSION}
 
 
 step "Creating build files..."
-export MASON_PLATFORM=ios
+export MASON_PLATFORM=tvos
 export BUILDTYPE=${BUILDTYPE:-Release}
-export HOST=ios
+export HOST=tvos
 
 if [[ "${BUILD_FOR_DEVICE}" == true ]]; then
-    step "Building iOS device targets..."
+    step "Building tvOS device targets..."
     xcodebuild -sdk appletvos${TV_SDK_VERSION} \
         ARCHS="arm64" \
         ONLY_ACTIVE_ARCH=NO \
         GCC_GENERATE_DEBUGGING_SYMBOLS=${GCC_GENERATE_DEBUGGING_SYMBOLS} \
-        -project ./build/ios-all/mbgl.xcodeproj \
+        -project ./build/tvos-all/mbgl.xcodeproj \
         -configuration ${BUILDTYPE} \
         -target everything \
         -jobs ${JOBS} | xcpretty -c
 fi
 
-step "Building iOS Simulator targets..."
+step "Building tvOS Simulator targets..."
 xcodebuild -sdk appletvsimulator${TV_SDK_VERSION} \
     ARCHS="x86_64 i386" \
     ONLY_ACTIVE_ARCH=NO \
     GCC_GENERATE_DEBUGGING_SYMBOLS=${GCC_GENERATE_DEBUGGING_SYMBOLS} \
-    -project ./build/ios-all/mbgl.xcodeproj \
+    -project ./build/tvos-all/mbgl.xcodeproj \
     -configuration ${BUILDTYPE} \
     -target everything \
     -jobs ${JOBS} | xcpretty -c
 
 
 step "Building static library..."
-LIBS=(core.a platform-ios.a asset-fs.a cache-sqlite.a http-nsurl.a)
+LIBS=(core.a platform-tvos.a asset-fs.a cache-sqlite.a http-nsurl.a)
 if [[ "${BUILD_FOR_DEVICE}" == true ]]; then
+    echo \
     libtool -static -no_warning_for_no_symbols \
         -o ${OUTPUT}/static/lib${NAME}.a \
         ${LIBS[@]/#/build/${BUILDTYPE}-appletvos/libmbgl-} \
         ${LIBS[@]/#/build/${BUILDTYPE}-appletvsimulator/libmbgl-} \
-        `find mason_packages/ios-${IOS_SDK_VERSION} -type f -name libuv.a` \
-        `find mason_packages/ios-${IOS_SDK_VERSION} -type f -name libgeojsonvt.a`
+        `find mason_packages/tvos-${TV_SDK_VERSION} -type f -name libuv.a` \
+        `find mason_packages/tvos-${TV_SDK_VERSION} -type f -name libgeojsonvt.a`
+
+    libtool -static -no_warning_for_no_symbols \
+        -o ${OUTPUT}/static/lib${NAME}.a \
+        ${LIBS[@]/#/build/${BUILDTYPE}-appletvos/libmbgl-} \
+        ${LIBS[@]/#/build/${BUILDTYPE}-appletvsimulator/libmbgl-} \
+        `find mason_packages/tvos-${TV_SDK_VERSION} -type f -name libuv.a` \
+        `find mason_packages/tvos-${TV_SDK_VERSION} -type f -name libgeojsonvt.a`
 else
     libtool -static -no_warning_for_no_symbols \
         -o ${OUTPUT}/static/lib${NAME}.a \
         ${LIBS[@]/#/build/${BUILDTYPE}-appletvsimulator/libmbgl-} \
-        `find mason_packages/ios-${IOS_SDK_VERSION} -type f -name libuv.a` \
-        `find mason_packages/ios-${IOS_SDK_VERSION} -type f -name libgeojsonvt.a`
+        `find mason_packages/tvos-${TV_SDK_VERSION} -type f -name libuv.a` \
+        `find mason_packages/tvos-${TV_SDK_VERSION} -type f -name libgeojsonvt.a`
 fi
 echo "Created ${OUTPUT}/static/lib${NAME}.a"
 
