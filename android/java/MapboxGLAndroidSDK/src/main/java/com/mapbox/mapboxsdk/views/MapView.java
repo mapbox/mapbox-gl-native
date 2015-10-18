@@ -624,11 +624,11 @@ public final class MapView extends FrameLayout {
             onConnectivityChanged(isConnected);
         }
 
-        // Setup location aervices
+        // Setup location services
         mLocationClient = new LostApiClient.Builder(getContext()).build();
         mLocationRequest = LocationRequest.create()
-                .setInterval(1000)
-                .setSmallestDisplacement(1)
+                .setFastestInterval(1250l)
+                .setSmallestDisplacement(2.0f)
                 .setPriority(LocationRequest.PRIORITY_HIGH_ACCURACY);
 
         // Setup user location UI
