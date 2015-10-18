@@ -49,11 +49,15 @@ isim: ; $(RUN) HOST=ios Xcode/iosapp
 ibench: export XCODEBUILD_ARGS += -sdk iphoneos ARCHS="arm64"
 ibench: ; $(RUN) HOST=ios Xcode/ios-bench
 
-.PHONY: ipackage ipackage-strip ipackage-sim ipackage-tv itest
+.PHONY: ipackage ipackage-strip ipackage-sim tvpackage itest
 ipackage: Xcode/ios ; @JOBS=$(JOBS) ./scripts/ios/package.sh
 ipackage-strip: Xcode/ios ; @JOBS=$(JOBS) ./scripts/ios/package.sh strip
 ipackage-sim: Xcode/ios ; @JOBS=$(JOBS) ./scripts/ios/package.sh sim
-ipackage-tv: Xcode/tvos ; JOBS=$(JOBS) ./scripts/tvos/package.sh
+
+tvpackage: Xcode/tvos ; JOBS=$(JOBS) ./scripts/tvos/package.sh
+tvpackage-strip: Xcode/tvos ; JOBS=$(JOBS) ./scripts/tvos/package.sh strip
+tvpackage-sim: Xcode/tvos ; JOBS=$(JOBS) ./scripts/tvos/package.sh sim
+
 itest: ipackage-sim ; ./scripts/ios/test.sh
 endif
 

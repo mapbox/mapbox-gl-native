@@ -11,16 +11,13 @@ TV_SDK_VERSION=`xcrun --sdk appletvos --show-sdk-version`
 # IOS_SDK_VERSION=`xcrun --sdk iphoneos --show-sdk-version`
 LIBUV_VERSION=0.10.28
 
-if [[ ${#} -eq 0 ]]; then # e.g. "make ipackage"
+if [[ ${#} -eq 0 ]]; then # e.g. "make tvpackage"
     BUILD_FOR_DEVICE=true
     GCC_GENERATE_DEBUGGING_SYMBOLS="YES"
-elif [[ ${1} == "sim" ]]; then # e.g. "make ipackage-sim"
+elif [[ ${1} == "sim" ]]; then # e.g. "make tvpackage-sim"
     BUILD_FOR_DEVICE=false
     GCC_GENERATE_DEBUGGING_SYMBOLS="YES"
-elif [[ ${1} == "tv" ]]; then # e.g. "make ipackage-tv"
-    BUILD_FOR_DEVICE=true
-    GCC_GENERATE_DEBUGGING_SYMBOLS="YES"
-else # e.g. "make ipackage-strip"
+else # e.g. "make tvpackage-strip"
     BUILD_FOR_DEVICE=true
     GCC_GENERATE_DEBUGGING_SYMBOLS="NO"
 fi
