@@ -2979,11 +2979,9 @@ public final class MapView extends FrameLayout {
                 updateLocation(LocationServices.FusedLocationApi.getLastLocation());
                 mLocationListener = new MyLocationListener();
                 LocationServices.FusedLocationApi.requestLocationUpdates(mLocationRequest, mLocationListener);
-                mCompassView.registerListeners(new CompassDelegate());
             }
         } else {
             if (mLocationClient.isConnected()) {
-                mCompassView.unRegisterListeners();
                 LocationServices.FusedLocationApi.removeLocationUpdates(mLocationListener);
                 mLocationListener = null;
                 mLocationClient.disconnect();
@@ -3109,13 +3107,6 @@ public final class MapView extends FrameLayout {
             rotateImageView(mCompassView, (float) getDirection());
         } else {
             mCompassView.setVisibility(INVISIBLE);
-        }
-    }
-
-    private class CompassDelegate implements CompassView.CompassDelegate {
-        @Override
-        public Location getLocation() {
-            return mGpsLocation;
         }
     }
 
