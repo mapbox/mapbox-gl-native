@@ -196,6 +196,7 @@ public final class MapView extends FrameLayout {
     private LostApiClient mLocationClient;
     private LocationRequest mLocationRequest;
     private ImageView mGpsMarker;
+    private float mGpsMarkerOffset;
     private Location mGpsLocation;
     private MyLocationListener mLocationListener;
 
@@ -634,6 +635,10 @@ public final class MapView extends FrameLayout {
         mGpsMarker = new ImageView(getContext());
         mGpsMarker.setImageResource(R.drawable.location_marker);
         mGpsMarker.setVisibility(View.INVISIBLE);
+        float iconSize = 27.0f * mScreenDensity;
+        mGpsMarkerOffset = iconSize/2;
+        FrameLayout.LayoutParams lp = new FrameLayout.LayoutParams((int) iconSize, (int) iconSize);
+        mGpsMarker.setLayoutParams(lp);
         addView(mGpsMarker);
 
         // Setup compass
@@ -3001,17 +3006,12 @@ public final class MapView extends FrameLayout {
     }
 
     private void updateGpsMarker() {
-        if (isMyLocationEnabled() && mGpsLocation != null) {
+        if (mIsMyLocationEnabled && mGpsLocation != null) {
             mGpsMarker.setVisibility(View.VISIBLE);
             LatLng coordinate = new LatLng(mGpsLocation);
             PointF screenLocation = toScreenLocation(coordinate);
-
-            float iconSize = 27.0f * mScreenDensity;
-            // Update Location
-            FrameLayout.LayoutParams lp = new FrameLayout.LayoutParams((int) iconSize, (int) iconSize);
-            lp.leftMargin = (int) (screenLocation.x - iconSize / 2.0f);
-            lp.topMargin = (int) (screenLocation.y + iconSize / 2.0f);
-            mGpsMarker.setLayoutParams(lp);
+            mGpsMarker.setX(screenLocation.x - mGpsMarkerOffset);
+            mGpsMarker.setY(screenLocation.y - mGpsMarkerOffset);
             rotateImageView(mGpsMarker, 0.0f);
             mGpsMarker.requestLayout();
         } else {
