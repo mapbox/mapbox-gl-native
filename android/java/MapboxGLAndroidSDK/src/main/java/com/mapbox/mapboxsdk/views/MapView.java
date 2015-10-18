@@ -1,5 +1,6 @@
 package com.mapbox.mapboxsdk.views;
 
+import android.animation.Animator;
 import android.app.Activity;
 import android.app.ActivityManager;
 import android.app.Dialog;
@@ -47,6 +48,7 @@ import android.view.TextureView;
 import android.view.View;
 import android.view.ViewConfiguration;
 import android.view.ViewGroup;
+import android.view.ViewPropertyAnimator;
 import android.widget.ArrayAdapter;
 import android.widget.FrameLayout;
 import android.widget.ImageView;
@@ -199,6 +201,8 @@ public final class MapView extends FrameLayout {
     private float mGpsMarkerOffset;
     private Location mGpsLocation;
     private MyLocationListener mLocationListener;
+    private ViewPropertyAnimator mGpsMarkerAnimatorX;
+    private ViewPropertyAnimator mGpsMarkerAnimatorY;
 
     // Used for the compass
     private CompassView mCompassView;
@@ -3010,10 +3014,20 @@ public final class MapView extends FrameLayout {
             mGpsMarker.setVisibility(View.VISIBLE);
             LatLng coordinate = new LatLng(mGpsLocation);
             PointF screenLocation = toScreenLocation(coordinate);
-            mGpsMarker.setX(screenLocation.x - mGpsMarkerOffset);
-            mGpsMarker.setY(screenLocation.y - mGpsMarkerOffset);
-            rotateImageView(mGpsMarker, 0.0f);
-            mGpsMarker.requestLayout();
+            if (!mDirty) {
+                // Map is idle, animate change of location
+                mGpsMarkerAnimatorX = mGpsMarker.animate().x(screenLocation.x - mGpsMarkerOffset);
+                mGpsMarkerAnimatorY = mGpsMarker.animate().y(screenLocation.y - mGpsMarkerOffset);
+            } else {
+                // Map is not idle, set value, don't animate
+                if (mGpsMarkerAnimatorX != null) {
+                    mGpsMarkerAnimatorX.cancel();
+                    mGpsMarkerAnimatorY.cancel();
+                }
+                // Reposition correctly
+                mGpsMarker.setX(screenLocation.x - mGpsMarkerOffset);
+                mGpsMarker.setY(screenLocation.y - mGpsMarkerOffset);
+            }
         } else {
             if (mGpsMarker != null) {
                 mGpsMarker.setVisibility(View.INVISIBLE);
