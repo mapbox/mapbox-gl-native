@@ -127,7 +127,9 @@ void AssetRequest::fileStated(uv_fs_t *req) {
             uv_fs_close(req->loop, req, self->fd, fileClosed);
         } else {
             self->response = std::make_unique<Response>();
-#ifdef __APPLE__
+#if defined(__APPLE__) && TARGET_OS_TV
+            self->response->modified = 0;
+#elif defined(__APPLE__)
             self->response->modified = stat->st_mtimespec.tv_sec;
 #else
             self->response->modified = stat->st_mtime;
