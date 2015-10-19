@@ -3,15 +3,16 @@
 
 #include <mbgl/style/class_dictionary.hpp>
 #include <mbgl/style/class_properties.hpp>
-#include <mbgl/style/style_properties.hpp>
 #include <mbgl/style/applied_class_properties.hpp>
 #include <mbgl/style/zoom_history.hpp>
+#include <mbgl/style/property_evaluator.hpp>
 
 #include <mbgl/renderer/render_pass.hpp>
 
 #include <mbgl/util/ptr.hpp>
 #include <mbgl/util/noncopyable.hpp>
 #include <mbgl/util/chrono.hpp>
+#include <mbgl/util/interpolate.hpp>
 
 #include <vector>
 #include <string>
@@ -24,16 +25,13 @@ class StyleBucket;
 
 class StyleLayer : public util::noncopyable {
 public:
-    StyleLayer(const std::string &id, std::map<ClassID, ClassProperties> &&styles);
+    static std::unique_ptr<StyleLayer> create(StyleLayerType);
 
-    template <typename T> const T& getProperties() const {
-        return properties.get<T>();
-    }
+    virtual ~StyleLayer() = default;
 
     // Determines whether this layer is the background layer.
     bool isBackground() const;
 
-public:
     // Checks whether this layer needs to be rendered in the given render pass.
     bool hasRenderPass(RenderPass) const;
 
@@ -47,6 +45,62 @@ public:
 
     bool hasTransitions() const;
 
+public:
+    // The name of this layer.
+    std::string id;
+
+    StyleLayerType type = StyleLayerType::Unknown;
+
+    // Bucket information, telling the renderer how to generate the geometries
+    // for this layer (feature property filters, tessellation instructions, ...).
+    util::ptr<StyleBucket> bucket;
+
+    // Contains all style classes that can be applied to this layer.
+    std::map<ClassID, ClassProperties> styles;
+
+protected:
+    // TODO: extract
+    template <typename T>
+    void applyStyleProperty(PropertyKey key, T& target, const float z, const TimePoint& now, const ZoomHistory& zoomHistory) {
+        auto it = appliedStyle.find(key);
+        if (it != appliedStyle.end()) {
+            AppliedClassPropertyValues &applied = it->second;
+            // Iterate through all properties that we need to apply in order.
+            const PropertyEvaluator<T> evaluator(z, zoomHistory);
+            for (auto& property : applied.propertyValues) {
+                if (now >= property.begin) {
+                    // We overwrite the current property with the new value.
+                    target = mapbox::util::apply_visitor(evaluator, property.value);
+                } else {
+                    // Do not apply this property because its transition hasn't begun yet.
+                }
+            }
+        }
+    }
+
+    template <typename T>
+    void applyTransitionedStyleProperty(PropertyKey key, T& target, const float z, const TimePoint& now, const ZoomHistory& zoomHistory) {
+        auto it = appliedStyle.find(key);
+        if (it != appliedStyle.end()) {
+            AppliedClassPropertyValues &applied = it->second;
+            // Iterate through all properties that we need to apply in order.
+            const PropertyEvaluator<T> evaluator(z, zoomHistory);
+            for (auto& property : applied.propertyValues) {
+                if (now >= property.end) {
+                    // We overwrite the current property with the new value.
+                    target = mapbox::util::apply_visitor(evaluator, property.value);
+                } else if (now >= property.begin) {
+                    // We overwrite the current property partially with the new value.
+                    float progress = std::chrono::duration<float>(now - property.begin) / (property.end - property.begin);
+                    target = util::interpolate(target, mapbox::util::apply_visitor(evaluator, property.value), progress);
+                    hasPendingTransitions = true;
+                } else {
+                    // Do not apply this property because its transition hasn't begun yet.
+                }
+            }
+        }
+    }
+
 private:
     // Applies all properties from a class, if they haven't been applied already.
     void applyClassProperties(ClassID class_id, std::set<PropertyKey> &already_applied,
@@ -54,30 +108,11 @@ private:
 
     // Sets the properties of this object by evaluating all pending transitions and
     // aplied classes in order.
-    template <typename T> void applyStyleProperties(float z, const TimePoint& now, const ZoomHistory &zoomHistory);
-    template <typename T> void applyStyleProperty(PropertyKey key, T &, float z, const TimePoint& now, const ZoomHistory &zoomHistory);
-    template <typename T> void applyTransitionedStyleProperty(PropertyKey key, T &, float z, const TimePoint& now, const ZoomHistory &zoomHistory);
+    virtual RenderPass applyStyleProperties(float z, const TimePoint& now, const ZoomHistory&) = 0;
 
     // Removes all expired style transitions.
     void cleanupAppliedStyleProperties(const TimePoint& now);
 
-    // Checks whether the layer is currently visible at all.
-    bool isVisible() const;
-
-public:
-    // The name of this layer.
-    const std::string id;
-
-    StyleLayerType type = StyleLayerType::Unknown;
-
-    // Bucket information, telling the renderer how to generate the geometries
-    // for this layer (feature property filters, tessellation instructions, ...).
-    util::ptr<const StyleBucket> bucket;
-
-    // Contains all style classes that can be applied to this layer.
-    const std::map<ClassID, ClassProperties> styles;
-
-private:
     // For every property, stores a list of applied property values, with
     // optional transition times.
     std::map<PropertyKey, AppliedClassPropertyValues> appliedStyle;
@@ -86,12 +121,6 @@ private:
     // evaluated StyleProperties object and is updated accordingly.
     RenderPass passes = RenderPass::None;
 
-public:
-    // Stores the evaluated, and cascaded styling information, specific to this
-    // layer's type.
-    StyleProperties properties;
-
-private:
     // Stores whether there are pending transitions to be done on each update.
     bool hasPendingTransitions = false;
 };

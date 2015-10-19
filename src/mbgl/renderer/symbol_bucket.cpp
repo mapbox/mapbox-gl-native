@@ -1,4 +1,5 @@
 #include <mbgl/renderer/symbol_bucket.hpp>
+#include <mbgl/layer/symbol_layer.hpp>
 #include <mbgl/map/geometry_tile.hpp>
 #include <mbgl/style/style_properties.hpp>
 #include <mbgl/annotation/sprite_image.hpp>
@@ -75,10 +76,10 @@ void SymbolBucket::upload() {
 }
 
 void SymbolBucket::render(Painter& painter,
-                          const StyleLayer& layer_desc,
+                          const StyleLayer& layer,
                           const TileID& id,
                           const mat4& matrix) {
-    painter.renderSymbol(*this, layer_desc, id, matrix);
+    painter.renderSymbol(*this, dynamic_cast<const SymbolLayer&>(layer), id, matrix);
 }
 
 bool SymbolBucket::hasData() const { return hasTextData() || hasIconData() || !symbolInstances.empty(); }

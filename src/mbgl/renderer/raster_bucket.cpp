@@ -1,4 +1,5 @@
 #include <mbgl/renderer/raster_bucket.hpp>
+#include <mbgl/layer/raster_layer.hpp>
 #include <mbgl/shader/raster_shader.hpp>
 #include <mbgl/renderer/painter.hpp>
 
@@ -17,10 +18,10 @@ void RasterBucket::upload() {
 }
 
 void RasterBucket::render(Painter& painter,
-                          const StyleLayer& layer_desc,
+                          const StyleLayer& layer,
                           const TileID& id,
                           const mat4& matrix) {
-    painter.renderRaster(*this, layer_desc, id, matrix);
+    painter.renderRaster(*this, dynamic_cast<const RasterLayer&>(layer), id, matrix);
 }
 
 bool RasterBucket::setImage(std::unique_ptr<util::Image> image) {

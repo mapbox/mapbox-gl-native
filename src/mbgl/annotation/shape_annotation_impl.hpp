@@ -6,6 +6,7 @@
 #include <mbgl/util/geo.hpp>
 #include <mbgl/util/geojsonvt/geojsonvt.hpp>
 
+#include <memory>
 #include <string>
 #include <map>
 

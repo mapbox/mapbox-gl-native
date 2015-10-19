@@ -12,6 +12,8 @@
 #include <mbgl/style/style_layer.hpp>
 #include <mbgl/style/style_bucket.hpp>
 
+#include <mbgl/layer/background_layer.hpp>
+
 #include <mbgl/geometry/sprite_atlas.hpp>
 #include <mbgl/geometry/line_atlas.hpp>
 #include <mbgl/geometry/glyph_atlas.hpp>
@@ -286,7 +288,7 @@ void Painter::renderPass(RenderPass pass_,
             }
         } else {
             MBGL_DEBUG_GROUP("background");
-            renderBackground(item.layer);
+            renderBackground(dynamic_cast<const BackgroundLayer&>(item.layer));
         }
     }
 
@@ -303,20 +305,18 @@ std::vector<RenderItem> Painter::determineRenderOrder(const Style& style) {
         if (layer.bucket->visibility == VisibilityType::None) continue;
         if (layer.type == StyleLayerType::Background) {
             // This layer defines a background color/image.
-            if (layer.properties.is<BackgroundPaintProperties>()) {
-                auto& props = layer.properties.get<BackgroundPaintProperties>();
-                if (props.image.from.empty()) {
-                    // This is a solid background. We can use glClear().
-                    background = props.color;
-                    background[0] *= props.opacity;
-                    background[1] *= props.opacity;
-                    background[2] *= props.opacity;
-                    background[3] *= props.opacity;
-                } else {
-                    // This is a textured background. We need to render it with a quad.
-                    background = {{ 0, 0, 0, 0 }};
-                    order.emplace_back(layer);
-                }
+            auto& props = dynamic_cast<const BackgroundLayer&>(layer).properties;
+            if (props.image.from.empty()) {
+                // This is a solid background. We can use glClear().
+                background = props.color;
+                background[0] *= props.opacity;
+                background[1] *= props.opacity;
+                background[2] *= props.opacity;
+                background[3] *= props.opacity;
+            } else {
+                // This is a textured background. We need to render it with a quad.
+                background = {{ 0, 0, 0, 0 }};
+                order.emplace_back(layer);
             }
             continue;
         }
@@ -378,10 +378,10 @@ std::vector<RenderItem> Painter::determineRenderOrder(const Style& style) {
     return order;
 }
 
-void Painter::renderBackground(const StyleLayer &layer_desc) {
+void Painter::renderBackground(const BackgroundLayer& layer) {
     // Note: This function is only called for textured background. Otherwise, the background color
     // is created with glClear.
-    const BackgroundPaintProperties& properties = layer_desc.getProperties<BackgroundPaintProperties>();
+    const BackgroundPaintProperties& properties = layer.properties;
 
     if (!properties.image.to.empty()) {
         if ((properties.opacity >= 1.0f) != (pass == RenderPass::Opaque))

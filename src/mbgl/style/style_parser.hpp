@@ -54,11 +54,9 @@ public:
 private:
     void parseSources(JSVal value);
     void parseLayers(JSVal value);
-    void parseLayer(std::pair<JSVal, util::ptr<StyleLayer>> &pair);
+    void parseLayer(const std::string& id, JSVal value, util::ptr<StyleLayer>&);
     void parsePaints(JSVal value, std::map<ClassID, ClassProperties> &paints);
     void parsePaint(JSVal, ClassProperties &properties);
-    void parseReference(JSVal value, util::ptr<StyleLayer> &layer);
-    void parseBucket(JSVal value, util::ptr<StyleLayer> &layer);
     void parseLayout(JSVal value, util::ptr<StyleBucket> &bucket);
     void parseSprite(JSVal value);
     void parseGlyphURL(JSVal value);
@@ -106,8 +104,8 @@ private:
     std::unordered_map<std::string, const Source*> sourcesMap;
     std::unordered_map<std::string, std::pair<JSVal, util::ptr<StyleLayer>>> layersMap;
 
-    // Store a stack of layers we're parsing right now. This is to prevent reference cycles.
-    std::forward_list<StyleLayer *> stack;
+    // Store a stack of layer IDs we're parsing right now. This is to prevent reference cycles.
+    std::forward_list<std::string> stack;
 
     // Base URL of the sprite image.
     std::string sprite;

@@ -37,10 +37,16 @@ struct FrameData;
 
 class DebugBucket;
 class FillBucket;
+class FillLayer;
 class LineBucket;
+class LineLayer;
 class CircleBucket;
+class CircleLayer;
 class SymbolBucket;
+class SymbolLayer;
 class RasterBucket;
+class RasterLayer;
+class BackgroundLayer;
 
 struct RasterProperties;
 
@@ -96,13 +102,13 @@ public:
     // Renders the red debug frame around a tile, visualizing its perimeter.
     void renderDebugFrame(const mat4 &matrix);
 
-    void renderDebugText(DebugBucket& bucket, const mat4 &matrix);
-    void renderFill(FillBucket& bucket, const StyleLayer &layer_desc, const TileID& id, const mat4 &matrix);
-    void renderLine(LineBucket& bucket, const StyleLayer &layer_desc, const TileID& id, const mat4 &matrix);
-    void renderCircle(CircleBucket& bucket, const StyleLayer &layer_desc, const TileID& id, const mat4 &matrix);
-    void renderSymbol(SymbolBucket& bucket, const StyleLayer &layer_desc, const TileID& id, const mat4 &matrix);
-    void renderRaster(RasterBucket& bucket, const StyleLayer &layer_desc, const TileID& id, const mat4 &matrix);
-    void renderBackground(const StyleLayer &layer_desc);
+    void renderDebugText(DebugBucket&, const mat4&);
+    void renderFill(FillBucket&, const FillLayer&, const TileID&, const mat4&);
+    void renderLine(LineBucket&, const LineLayer&, const TileID&, const mat4&);
+    void renderCircle(CircleBucket&, const CircleLayer&, const TileID&, const mat4&);
+    void renderSymbol(SymbolBucket&, const SymbolLayer&, const TileID&, const mat4&);
+    void renderRaster(RasterBucket&, const RasterLayer&, const TileID&, const mat4&);
+    void renderBackground(const BackgroundLayer&);
 
     float saturationFactor(float saturation);
     float contrastFactor(float contrast);

@@ -6,6 +6,8 @@
 
 #include <mbgl/util/geo.hpp>
 
+#include <mapbox/variant.hpp>
+
 namespace mbgl {
 
 using AnnotationSegment = std::vector<LatLng>;
@@ -13,12 +15,14 @@ using AnnotationSegments = std::vector<AnnotationSegment>;
 
 class ShapeAnnotation {
 public:
-    inline ShapeAnnotation(const AnnotationSegments& segments_, const StyleProperties& styleProperties_)
+    using Properties = mapbox::util::variant<FillPaintProperties, LinePaintProperties>;
+
+    inline ShapeAnnotation(const AnnotationSegments& segments_, const Properties& styleProperties_)
         : segments(segments_), styleProperties(styleProperties_) {
     }
 
     const AnnotationSegments segments;
-    const StyleProperties styleProperties;
+    const Properties styleProperties;
 };
 
 }

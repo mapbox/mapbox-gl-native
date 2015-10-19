@@ -48,14 +48,11 @@ TEST(Annotations, LineAnnotation) {
 
     AnnotationSegments segments = {{ {{ { 0, 0 }, { 45, 45 } }} }};
 
-    LinePaintProperties lineProperties;
-    lineProperties.color = {{ 255, 0, 0, 1 }};
-    lineProperties.width = 5;
+    LinePaintProperties properties;
+    properties.color = {{ 255, 0, 0, 1 }};
+    properties.width = 5;
 
-    StyleProperties styleProperties;
-    styleProperties.set<LinePaintProperties>(lineProperties);
-
-    map.addShapeAnnotation(ShapeAnnotation(segments, styleProperties));
+    map.addShapeAnnotation(ShapeAnnotation(segments, properties));
 
     util::write_file("test/output/line_annotation.png", renderPNG(map));
 }
@@ -70,13 +67,10 @@ TEST(Annotations, FillAnnotation) {
 
     AnnotationSegments segments = {{ {{ { 0, 0 }, { 0, 45 }, { 45, 45 }, { 45, 0 } }} }};
 
-    FillPaintProperties fillProperties;
-    fillProperties.fill_color = {{ 255, 0, 0, 1 }};
+    FillPaintProperties properties;
+    properties.fill_color = {{ 255, 0, 0, 1 }};
 
-    StyleProperties styleProperties;
-    styleProperties.set<FillPaintProperties>(fillProperties);
-
-    map.addShapeAnnotation(ShapeAnnotation(segments, styleProperties));
+    map.addShapeAnnotation(ShapeAnnotation(segments, properties));
 
     util::write_file("test/output/fill_annotation.png", renderPNG(map));
 }
@@ -109,13 +103,10 @@ TEST(Annotations, NonImmediateAdd) {
 
     AnnotationSegments segments = {{ {{ { 0, 0 }, { 0, 45 }, { 45, 45 }, { 45, 0 } }} }};
 
-    FillPaintProperties fillProperties;
-    fillProperties.fill_color = {{ 255, 0, 0, 1 }};
+    FillPaintProperties properties;
+    properties.fill_color = {{ 255, 0, 0, 1 }};
 
-    StyleProperties styleProperties;
-    styleProperties.set<FillPaintProperties>(fillProperties);
-
-    map.addShapeAnnotation(ShapeAnnotation(segments, styleProperties));
+    map.addShapeAnnotation(ShapeAnnotation(segments, properties));
 
     util::write_file("test/output/non_immediate_add.png", renderPNG(map));
 }
@@ -143,16 +134,13 @@ TEST(Annotations, RemoveShape) {
 
     AnnotationSegments segments = {{ {{ { 0, 0 }, { 45, 45 } }} }};
 
-    LinePaintProperties lineProperties;
-    lineProperties.color = {{ 255, 0, 0, 1 }};
-    lineProperties.width = 5;
-
-    StyleProperties styleProperties;
-    styleProperties.set<LinePaintProperties>(lineProperties);
+    LinePaintProperties properties;
+    properties.color = {{ 255, 0, 0, 1 }};
+    properties.width = 5;
 
     Map map(view, fileSource, MapMode::Still);
     map.setStyleJSON(util::read_file("test/fixtures/api/empty.json"), "");
-    uint32_t shape = map.addShapeAnnotation(ShapeAnnotation(segments, styleProperties));
+    uint32_t shape = map.addShapeAnnotation(ShapeAnnotation(segments, properties));
 
     renderPNG(map);
 

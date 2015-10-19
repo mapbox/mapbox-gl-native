@@ -6,7 +6,8 @@
 #include <mbgl/util/string.hpp>
 #include <mbgl/style/style.hpp>
 #include <mbgl/style/style_bucket.hpp>
-#include <mbgl/style/style_layer.hpp>
+#include <mbgl/layer/line_layer.hpp>
+#include <mbgl/layer/fill_layer.hpp>
 
 namespace mbgl {
 
@@ -55,35 +56,47 @@ void ShapeAnnotationImpl::updateStyle(Style& style) {
     if (style.getLayer(layerID))
         return;
 
-    ClassProperties paintProperties;
-
     if (shape.styleProperties.is<LinePaintProperties>()) {
-        const LinePaintProperties& lineProperties = shape.styleProperties.get<LinePaintProperties>();
-        paintProperties.set(PropertyKey::LineOpacity, ConstantFunction<float>(lineProperties.opacity));
-        paintProperties.set(PropertyKey::LineWidth, ConstantFunction<float>(lineProperties.width));
-        paintProperties.set(PropertyKey::LineColor, ConstantFunction<Color>(lineProperties.color));
+        const LinePaintProperties& properties = shape.styleProperties.get<LinePaintProperties>();
+
+        std::unique_ptr<LineLayer> layer = std::make_unique<LineLayer>();
+        layer->id = layerID;
+        layer->type = StyleLayerType::Line;
+
+        ClassProperties paintProperties;
+        paintProperties.set(PropertyKey::LineOpacity, ConstantFunction<float>(properties.opacity));
+        paintProperties.set(PropertyKey::LineWidth, ConstantFunction<float>(properties.width));
+        paintProperties.set(PropertyKey::LineColor, ConstantFunction<Color>(properties.color));
+        layer->styles.emplace(ClassID::Default, std::move(paintProperties));
+
+        layer->bucket = std::make_shared<StyleBucket>(layer->type);
+        layer->bucket->name = layer->id;
+        layer->bucket->source = AnnotationManager::SourceID;
+        layer->bucket->source_layer = layer->id;
+        layer->bucket->layout.set(PropertyKey::LineJoin, ConstantFunction<JoinType>(JoinType::Round));
+
+        style.addLayer(std::move(layer), AnnotationManager::PointLayerID);
+
     } else if (shape.styleProperties.is<FillPaintProperties>()) {
-        const FillPaintProperties& fillProperties = shape.styleProperties.get<FillPaintProperties>();
-        paintProperties.set(PropertyKey::FillOpacity, ConstantFunction<float>(fillProperties.opacity));
-        paintProperties.set(PropertyKey::FillColor, ConstantFunction<Color>(fillProperties.fill_color));
-        paintProperties.set(PropertyKey::FillOutlineColor, ConstantFunction<Color>(fillProperties.stroke_color));
+        const FillPaintProperties& properties = shape.styleProperties.get<FillPaintProperties>();
+
+        std::unique_ptr<FillLayer> layer = std::make_unique<FillLayer>();
+        layer->id = layerID;
+        layer->type = StyleLayerType::Fill;
+
+        ClassProperties paintProperties;
+        paintProperties.set(PropertyKey::FillOpacity, ConstantFunction<float>(properties.opacity));
+        paintProperties.set(PropertyKey::FillColor, ConstantFunction<Color>(properties.fill_color));
+        paintProperties.set(PropertyKey::FillOutlineColor, ConstantFunction<Color>(properties.stroke_color));
+        layer->styles.emplace(ClassID::Default, std::move(paintProperties));
+
+        layer->bucket = std::make_shared<StyleBucket>(layer->type);
+        layer->bucket->name = layer->id;
+        layer->bucket->source = AnnotationManager::SourceID;
+        layer->bucket->source_layer = layer->id;
+
+        style.addLayer(std::move(layer), AnnotationManager::PointLayerID);
     }
-
-    std::map<ClassID, ClassProperties> shapePaints;
-    shapePaints.emplace(ClassID::Default, std::move(paintProperties));
-    std::unique_ptr<StyleLayer> shapeLayer = std::make_unique<StyleLayer>(layerID, std::move(shapePaints));
-    shapeLayer->type = (shape.styleProperties.is<LinePaintProperties>() ? StyleLayerType::Line : StyleLayerType::Fill);
-
-    util::ptr<StyleBucket> shapeBucket = std::make_shared<StyleBucket>(shapeLayer->type);
-    shapeBucket->name = shapeLayer->id;
-    shapeBucket->source = AnnotationManager::SourceID;
-    shapeBucket->source_layer = shapeLayer->id;
-    if (shape.styleProperties.is<LinePaintProperties>()) {
-        shapeBucket->layout.set(PropertyKey::LineJoin, ConstantFunction<JoinType>(JoinType::Round));
-    }
-
-    shapeLayer->bucket = shapeBucket;
-    style.addLayer(std::move(shapeLayer), AnnotationManager::PointLayerID);
 }
 
 void ShapeAnnotationImpl::updateTile(const TileID& tileID, AnnotationTile& tile) {

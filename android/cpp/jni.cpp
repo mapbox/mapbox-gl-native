@@ -340,7 +340,7 @@ mbgl::AnnotationSegment annotation_segment_from_latlng_jlist(JNIEnv *env, jobjec
     return segment;
 }
 
-std::pair<mbgl::AnnotationSegment, mbgl::StyleProperties> annotation_std_pair_from_polygon_jobject(JNIEnv *env, jobject polygon) {
+std::pair<mbgl::AnnotationSegment, mbgl::ShapeAnnotation::Properties> annotation_std_pair_from_polygon_jobject(JNIEnv *env, jobject polygon) {
     jfloat alpha = env->GetFloatField(polygon, polygonAlphaId);
     jint fillColor = env->GetIntField(polygon, polygonFillColorId);
     jint strokeColor = env->GetIntField(polygon, polygonStrokeColorId);
@@ -355,7 +355,7 @@ std::pair<mbgl::AnnotationSegment, mbgl::StyleProperties> annotation_std_pair_fr
     int bS = (strokeColor) & 0xFF;
     int aS = (strokeColor >> 24) & 0xFF;
 
-    mbgl::StyleProperties shapeProperties;
+    mbgl::ShapeAnnotation::Properties shapeProperties;
     mbgl::FillPaintProperties fillProperties;
     fillProperties.opacity = alpha;
     fillProperties.stroke_color = {{ static_cast<float>(rS) / 255.0f, static_cast<float>(gS) / 255.0f, static_cast<float>(bS) / 255.0f, static_cast<float>(aS) / 255.0f }};
@@ -939,7 +939,7 @@ jlong JNICALL nativeAddPolyline(JNIEnv *env, jobject obj, jlong nativeMapViewPtr
         return -1;
     }
 
-    mbgl::StyleProperties shapeProperties;
+    mbgl::ShapeAnnotation::Properties shapeProperties;
     mbgl::LinePaintProperties lineProperties;
     lineProperties.opacity = alpha;
     lineProperties.color = {{ static_cast<float>(r) / 255.0f, static_cast<float>(g) / 255.0f, static_cast<float>(b) / 255.0f, static_cast<float>(a) / 255.0f }};
@@ -964,7 +964,7 @@ jlong JNICALL nativeAddPolygon(JNIEnv *env, jobject obj, jlong nativeMapViewPtr,
     NativeMapView *nativeMapView = reinterpret_cast<NativeMapView *>(nativeMapViewPtr);
 
     std::vector<mbgl::ShapeAnnotation> shapes;
-    std::pair<mbgl::AnnotationSegment, mbgl::StyleProperties> segment = annotation_std_pair_from_polygon_jobject(env, polygon);
+    std::pair<mbgl::AnnotationSegment, mbgl::ShapeAnnotation::Properties> segment = annotation_std_pair_from_polygon_jobject(env, polygon);
 
     if (env->ExceptionCheck()) {
         env->ExceptionDescribe();
@@ -1011,7 +1011,7 @@ jlongArray JNICALL nativeAddPolygons(JNIEnv *env, jobject obj, jlong nativeMapVi
     for (jsize i = 0; i < len; i++) {
         jobject polygon = reinterpret_cast<jobject>(env->GetObjectArrayElement(jarray, i));
 
-        std::pair<mbgl::AnnotationSegment, mbgl::StyleProperties> segment = annotation_std_pair_from_polygon_jobject(env, polygon);
+        std::pair<mbgl::AnnotationSegment, mbgl::ShapeAnnotation::Properties> segment = annotation_std_pair_from_polygon_jobject(env, polygon);
         if (env->ExceptionCheck()) {
             env->ExceptionDescribe();
             return nullptr;

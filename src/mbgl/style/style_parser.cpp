@@ -632,6 +632,8 @@ template<> StyleParser::Result<PiecewiseConstantFunction<Faded<std::string>>> St
 #pragma mark - Parse Layers
 
 void StyleParser::parseLayers(JSVal value) {
+    std::vector<std::string> ids;
+
     if (!value.IsArray()) {
         Log::Warning(Event::ParseStyle, "layers must be an array");
         return;
@@ -662,53 +664,151 @@ void StyleParser::parseLayers(JSVal value) {
             continue;
         }
 
-        // Parse paints already, as they can't be inherited anyway.
-        std::map<ClassID, ClassProperties> paints;
-        parsePaints(layerValue, paints);
-
-        util::ptr<StyleLayer> layer = std::make_shared<StyleLayer>(layerID, std::move(paints));
-
-        layers.emplace_back(layer);
-        layersMap.emplace(layerID, std::pair<JSVal, util::ptr<StyleLayer>> { layerValue, layer });
+        layersMap.emplace(layerID, std::pair<JSVal, util::ptr<StyleLayer>> { layerValue, nullptr });
+        ids.push_back(layerID);
     }
 
-    for (auto& pair : layersMap) {
-        parseLayer(pair.second);
+    for (const auto& id : ids) {
+        auto it = layersMap.find(id);
+
+        parseLayer(it->first,
+                   it->second.first,
+                   it->second.second);
+
+        if (it->second.second) {
+            layers.emplace_back(it->second.second);
+        }
     }
 }
 
-void StyleParser::parseLayer(std::pair<JSVal, util::ptr<StyleLayer>> &pair) {
-    JSVal value = pair.first;
-    util::ptr<StyleLayer> &layer = pair.second;
-
-    if (value.HasMember("type")) {
-        JSVal type = value["type"];
-        if (!type.IsString()) {
-            Log::Warning(Event::ParseStyle, "layer type of '%s' must be a string", layer->id.c_str());
-        } else {
-            layer->type = StyleLayerTypeClass(std::string { type.GetString(), type.GetStringLength() });
-        }
-    }
-
-    if (layer->bucket) {
+void StyleParser::parseLayer(const std::string& id, JSVal value, util::ptr<StyleLayer>& layer) {
+    if (layer) {
         // Skip parsing this again. We already have a valid layer definition.
         return;
     }
 
     // Make sure we have not previously attempted to parse this layer.
-    if (std::find(stack.begin(), stack.end(), layer.get()) != stack.end()) {
-        Log::Warning(Event::ParseStyle, "layer reference of '%s' is circular", layer->id.c_str());
+    if (std::find(stack.begin(), stack.end(), id) != stack.end()) {
+        Log::Warning(Event::ParseStyle, "layer reference of '%s' is circular", id.c_str());
         return;
     }
 
     if (value.HasMember("ref")) {
-        // This layer is referencing another layer. Inherit the bucket from that layer, if we
-        // already parsed it.
-        parseReference(value["ref"], layer);
+        // This layer is referencing another layer. Recursively parse that layer.
+        JSVal refVal = value["ref"];
+        if (!refVal.IsString()) {
+            Log::Warning(Event::ParseStyle, "layer ref of '%s' must be a string", id.c_str());
+            return;
+        }
+
+        const std::string ref { refVal.GetString(), refVal.GetStringLength() };
+        auto it = layersMap.find(ref);
+        if (it == layersMap.end()) {
+            Log::Warning(Event::ParseStyle, "layer '%s' references unknown layer %s", id.c_str(), ref.c_str());
+            return;
+        }
+
+        // Recursively parse the referenced layer.
+        stack.push_front(id);
+        parseLayer(it->first,
+                   it->second.first,
+                   it->second.second);
+        stack.pop_front();
+
+        util::ptr<StyleLayer> reference = it->second.second;
+        if (!reference) {
+            return;
+        }
+
+        layer = StyleLayer::create(reference->type);
+        layer->id = id;
+        layer->type = reference->type;
+        layer->bucket = reference->bucket;
+
     } else {
         // Otherwise, parse the source/source-layer/filter/render keys to form the bucket.
-        parseBucket(value, layer);
+        if (!value.HasMember("type")) {
+            Log::Warning(Event::ParseStyle, "layer '%s' is missing a type", id.c_str());
+            return;
+        }
+
+        JSVal typeVal = value["type"];
+        if (!typeVal.IsString()) {
+            Log::Warning(Event::ParseStyle, "layer '%s' has an invalid type", id.c_str());
+            return;
+        }
+
+        std::string type { typeVal.GetString(), typeVal.GetStringLength() };
+        StyleLayerType typeClass = StyleLayerTypeClass(type);
+        layer = StyleLayer::create(typeClass);
+
+        if (!layer) {
+            Log::Warning(Event::ParseStyle, "unknown type '%s' for layer '%s'", type.c_str(), id.c_str());
+            return;
+        }
+
+        layer->id = id;
+        layer->type = typeClass;
+
+        util::ptr<StyleBucket> bucket = std::make_shared<StyleBucket>(layer->type);
+
+        // We name the buckets according to the layer that defined it.
+        bucket->name = layer->id;
+
+        if (value.HasMember("source")) {
+            JSVal value_source = value["source"];
+            if (value_source.IsString()) {
+                bucket->source = { value_source.GetString(), value_source.GetStringLength() };
+                auto source_it = sourcesMap.find(bucket->source);
+                if (source_it == sourcesMap.end()) {
+                    Log::Warning(Event::ParseStyle, "can't find source '%s' required for layer '%s'", bucket->source.c_str(), layer->id.c_str());
+                }
+            } else {
+                Log::Warning(Event::ParseStyle, "source of layer '%s' must be a string", layer->id.c_str());
+            }
+        }
+
+        if (value.HasMember("source-layer")) {
+            JSVal value_source_layer = value["source-layer"];
+            if (value_source_layer.IsString()) {
+                bucket->source_layer = { value_source_layer.GetString(), value_source_layer.GetStringLength() };
+            } else {
+                Log::Warning(Event::ParseStyle, "source-layer of layer '%s' must be a string", layer->id.c_str());
+            }
+        }
+
+        if (value.HasMember("filter")) {
+            bucket->filter = parseFilterExpression(value["filter"]);
+        }
+
+        if (value.HasMember("layout")) {
+            parseLayout(value["layout"], bucket);
+        }
+
+        if (value.HasMember("minzoom")) {
+            JSVal min_zoom = value["minzoom"];
+            if (min_zoom.IsNumber()) {
+                bucket->min_zoom = min_zoom.GetDouble();
+            } else {
+                Log::Warning(Event::ParseStyle, "minzoom of layer %s must be numeric", layer->id.c_str());
+            }
+        }
+
+        if (value.HasMember("maxzoom")) {
+            JSVal max_zoom = value["maxzoom"];
+            if (max_zoom.IsNumber()) {
+                bucket->max_zoom = max_zoom.GetDouble();
+            } else {
+                Log::Warning(Event::ParseStyle, "maxzoom of layer %s must be numeric", layer->id.c_str());
+            }
+        }
+
+        layer->bucket = bucket;
     }
+
+    std::map<ClassID, ClassProperties> paints;
+    parsePaints(value, paints);
+    layer->styles = std::move(paints);
 }
 
 #pragma mark - Parse Styles
@@ -858,88 +958,6 @@ void StyleParser::parseLayout(JSVal value, util::ptr<StyleBucket> &bucket) {
     parseOptionalProperty<Function<bool>>("text-ignore-placement", Key::TextIgnorePlacement, bucket->layout, value);
     parseOptionalProperty<Function<bool>>("text-optional", Key::TextOptional, bucket->layout, value);
 
-}
-
-void StyleParser::parseReference(JSVal value, util::ptr<StyleLayer> &layer) {
-    if (!value.IsString()) {
-        Log::Warning(Event::ParseStyle, "layer ref of '%s' must be a string", layer->id.c_str());
-        return;
-    }
-    const std::string ref { value.GetString(), value.GetStringLength() };
-    auto it = layersMap.find(ref);
-    if (it == layersMap.end()) {
-        Log::Warning(Event::ParseStyle, "layer '%s' references unknown layer %s", layer->id.c_str(), ref.c_str());
-        // We cannot parse this layer further.
-        return;
-    }
-
-    // Recursively parse the referenced layer.
-    stack.push_front(layer.get());
-    parseLayer(it->second);
-    stack.pop_front();
-
-    util::ptr<StyleLayer> reference = it->second.second;
-    layer->type = reference->type;
-    layer->bucket = reference->bucket;
-}
-
-#pragma mark - Parse Bucket
-
-void StyleParser::parseBucket(JSVal value, util::ptr<StyleLayer> &layer) {
-    util::ptr<StyleBucket> bucket = std::make_shared<StyleBucket>(layer->type);
-
-    // We name the buckets according to the layer that defined it.
-    bucket->name = layer->id;
-
-    if (value.HasMember("source")) {
-        JSVal value_source = value["source"];
-        if (value_source.IsString()) {
-            bucket->source = { value_source.GetString(), value_source.GetStringLength() };
-            auto source_it = sourcesMap.find(bucket->source);
-            if (source_it == sourcesMap.end()) {
-                Log::Warning(Event::ParseStyle, "can't find source '%s' required for layer '%s'", bucket->source.c_str(), layer->id.c_str());
-            }
-        } else {
-            Log::Warning(Event::ParseStyle, "source of layer '%s' must be a string", layer->id.c_str());
-        }
-    }
-
-    if (value.HasMember("source-layer")) {
-        JSVal value_source_layer = value["source-layer"];
-        if (value_source_layer.IsString()) {
-            bucket->source_layer = { value_source_layer.GetString(), value_source_layer.GetStringLength() };
-        } else {
-            Log::Warning(Event::ParseStyle, "source-layer of layer '%s' must be a string", layer->id.c_str());
-        }
-    }
-
-    if (value.HasMember("filter")) {
-        bucket->filter = parseFilterExpression(value["filter"]);
-    }
-
-    if (value.HasMember("layout")) {
-        parseLayout(value["layout"], bucket);
-    }
-
-    if (value.HasMember("minzoom")) {
-        JSVal min_zoom = value["minzoom"];
-        if (min_zoom.IsNumber()) {
-            bucket->min_zoom = min_zoom.GetDouble();
-        } else {
-            Log::Warning(Event::ParseStyle, "minzoom of layer %s must be numeric", layer->id.c_str());
-        }
-    }
-
-    if (value.HasMember("maxzoom")) {
-        JSVal max_zoom = value["maxzoom"];
-        if (max_zoom.IsNumber()) {
-            bucket->max_zoom = max_zoom.GetDouble();
-        } else {
-            Log::Warning(Event::ParseStyle, "maxzoom of layer %s must be numeric", layer->id.c_str());
-        }
-    }
-
-    layer->bucket = bucket;
 }
 
 void StyleParser::parseSprite(JSVal value) {

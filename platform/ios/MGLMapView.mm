@@ -2167,7 +2167,7 @@ CLLocationCoordinate2D MGLLocationCoordinate2DFromLatLng(mbgl::LatLng latLng)
             [strokeColor getRed:&r green:&g blue:&b alpha:&a];
             mbgl::Color strokeNativeColor({{ (float)r, (float)g, (float)b, (float)a }});
 
-            mbgl::StyleProperties shapeProperties;
+            mbgl::ShapeAnnotation::Properties shapeProperties;
 
             if ([annotation isKindOfClass:[MGLPolyline class]])
             {

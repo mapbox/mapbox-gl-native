@@ -1,7 +1,6 @@
 #include <mbgl/renderer/painter.hpp>
 #include <mbgl/renderer/symbol_bucket.hpp>
-#include <mbgl/style/style_layer.hpp>
-#include <mbgl/style/style_properties.hpp>
+#include <mbgl/layer/symbol_layer.hpp>
 #include <mbgl/geometry/glyph_atlas.hpp>
 #include <mbgl/geometry/sprite_atlas.hpp>
 #include <mbgl/shader/sdf_shader.hpp>
@@ -126,13 +125,13 @@ void Painter::renderSDF(SymbolBucket &bucket,
     }
 }
 
-void Painter::renderSymbol(SymbolBucket &bucket, const StyleLayer &layer_desc, const TileID &id, const mat4 &matrix) {
+void Painter::renderSymbol(SymbolBucket& bucket, const SymbolLayer& layer, const TileID& id, const mat4& matrix) {
     // Abort early.
     if (pass == RenderPass::Opaque) {
         return;
     }
 
-    const auto& properties = layer_desc.getProperties<SymbolPaintProperties>();
+    const auto& properties = layer.properties;
     const auto& layout = bucket.layout;
 
     config.depthMask = GL_FALSE;

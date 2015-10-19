@@ -2,6 +2,7 @@
 #include <mbgl/map/tile_worker.hpp>
 #include <mbgl/style/style.hpp>
 #include <mbgl/style/style_layer.hpp>
+#include <mbgl/style/property_evaluator.hpp>
 #include <mbgl/geometry/glyph_atlas.hpp>
 #include <mbgl/renderer/fill_bucket.hpp>
 #include <mbgl/renderer/line_bucket.hpp>
@@ -62,29 +63,6 @@ void TileWorker::redoPlacement(float angle, float pitch, bool collisionDebug) {
         }
     }
 }
-
-template <typename T>
-struct PropertyEvaluator {
-    typedef T result_type;
-    explicit PropertyEvaluator(float z_) : z(z_) {}
-
-    template <typename P, typename std::enable_if<std::is_convertible<P, T>::value, int>::type = 0>
-    T operator()(const P &value) const {
-        return value;
-    }
-
-    T operator()(const Function<T> &value) const {
-        return mapbox::util::apply_visitor(FunctionEvaluator<T>(z), value);
-    }
-
-    template <typename P, typename std::enable_if<!std::is_convertible<P, T>::value, int>::type = 0>
-    T operator()(const P &) const {
-        return T();
-    }
-
-private:
-    const float z;
-};
 
 template <typename T>
 void applyLayoutProperty(PropertyKey key, const ClassProperties &classProperties, T &target, const float z) {

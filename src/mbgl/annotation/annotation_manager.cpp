@@ -2,7 +2,7 @@
 #include <mbgl/annotation/annotation_tile.hpp>
 #include <mbgl/style/style.hpp>
 #include <mbgl/style/style_bucket.hpp>
-#include <mbgl/style/style_layer.hpp>
+#include <mbgl/layer/symbol_layer.hpp>
 
 #include <boost/function_output_iterator.hpp>
 
@@ -112,20 +112,19 @@ void AnnotationManager::updateStyle(Style& style) {
         source->enabled = true;
         style.addSource(std::move(source));
 
-        std::map<ClassID, ClassProperties> pointPaints;
-        pointPaints.emplace(ClassID::Default, ClassProperties());
-        std::unique_ptr<StyleLayer> pointLayer = std::make_unique<StyleLayer>(PointLayerID, std::move(pointPaints));
-        pointLayer->type = StyleLayerType::Symbol;
+        std::unique_ptr<SymbolLayer> layer = std::make_unique<SymbolLayer>();
+        layer->id = PointLayerID;
+        layer->type = StyleLayerType::Symbol;
+        layer->styles.emplace(ClassID::Default, ClassProperties());
 
-        util::ptr<StyleBucket> pointBucket = std::make_shared<StyleBucket>(pointLayer->type);
-        pointBucket->name = pointLayer->id;
-        pointBucket->source = SourceID;
-        pointBucket->source_layer = PointLayerID;
-        pointBucket->layout.set(PropertyKey::IconImage, ConstantFunction<std::string>("{sprite}"));
-        pointBucket->layout.set(PropertyKey::IconAllowOverlap, ConstantFunction<bool>(true));
+        layer->bucket = std::make_shared<StyleBucket>(layer->type);
+        layer->bucket->name = layer->id;
+        layer->bucket->source = SourceID;
+        layer->bucket->source_layer = PointLayerID;
+        layer->bucket->layout.set(PropertyKey::IconImage, ConstantFunction<std::string>("{sprite}"));
+        layer->bucket->layout.set(PropertyKey::IconAllowOverlap, ConstantFunction<bool>(true));
 
-        pointLayer->bucket = pointBucket;
-        style.addLayer(std::move(pointLayer));
+        style.addLayer(std::move(layer));
     }
 
     for (const auto& shape : shapeAnnotations) {

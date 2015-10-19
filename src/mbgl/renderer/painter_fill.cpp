@@ -1,8 +1,6 @@
 #include <mbgl/renderer/painter.hpp>
 #include <mbgl/renderer/fill_bucket.hpp>
-#include <mbgl/style/style.hpp>
-#include <mbgl/style/style_layer.hpp>
-#include <mbgl/style/style_properties.hpp>
+#include <mbgl/layer/fill_layer.hpp>
 #include <mbgl/map/sprite.hpp>
 #include <mbgl/map/tile_id.hpp>
 #include <mbgl/geometry/sprite_atlas.hpp>
@@ -13,8 +11,8 @@
 
 using namespace mbgl;
 
-void Painter::renderFill(FillBucket& bucket, const StyleLayer &layer_desc, const TileID& id, const mat4 &matrix) {
-    const FillPaintProperties& properties = layer_desc.getProperties<FillPaintProperties>();
+void Painter::renderFill(FillBucket& bucket, const FillLayer& layer, const TileID& id, const mat4& matrix) {
+    const FillPaintProperties& properties = layer.properties;
     mat4 vtxMatrix = translatedMatrix(matrix, properties.translate, id, properties.translateAnchor);
 
     Color fill_color = properties.fill_color;

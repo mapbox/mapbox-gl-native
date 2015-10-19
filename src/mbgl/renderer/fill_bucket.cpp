@@ -1,5 +1,6 @@
 #include <mbgl/renderer/fill_bucket.hpp>
 #include <mbgl/geometry/fill_buffer.hpp>
+#include <mbgl/layer/fill_layer.hpp>
 #include <mbgl/geometry/elements_buffer.hpp>
 #include <mbgl/renderer/painter.hpp>
 #include <mbgl/style/style.hpp>
@@ -197,10 +198,10 @@ void FillBucket::upload() {
 }
 
 void FillBucket::render(Painter& painter,
-                        const StyleLayer& layer_desc,
+                        const StyleLayer& layer,
                         const TileID& id,
                         const mat4& matrix) {
-    painter.renderFill(*this, layer_desc, id, matrix);
+    painter.renderFill(*this, dynamic_cast<const FillLayer&>(layer), id, matrix);
 }
 
 bool FillBucket::hasData() const {

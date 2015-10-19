@@ -1,15 +1,15 @@
 #include <mbgl/renderer/painter.hpp>
 #include <mbgl/platform/gl.hpp>
 #include <mbgl/renderer/raster_bucket.hpp>
-#include <mbgl/style/style_layer.hpp>
+#include <mbgl/layer/raster_layer.hpp>
 #include <mbgl/shader/raster_shader.hpp>
 
 using namespace mbgl;
 
-void Painter::renderRaster(RasterBucket& bucket, const StyleLayer &layer_desc, const TileID&, const mat4 &matrix) {
+void Painter::renderRaster(RasterBucket& bucket, const RasterLayer& layer, const TileID&, const mat4& matrix) {
     if (pass != RenderPass::Translucent) return;
 
-    const RasterPaintProperties& properties = layer_desc.getProperties<RasterPaintProperties>();
+    const RasterPaintProperties& properties = layer.properties;
 
     if (bucket.hasData()) {
         useProgram(rasterShader->program);

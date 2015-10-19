@@ -2,6 +2,7 @@
 #include <mbgl/renderer/painter.hpp>
 
 #include <mbgl/shader/circle_shader.hpp>
+#include <mbgl/layer/circle_layer.hpp>
 
 using namespace mbgl;
 
@@ -19,10 +20,10 @@ void CircleBucket::upload() {
 }
 
 void CircleBucket::render(Painter& painter,
-                        const StyleLayer& layer_desc,
+                        const StyleLayer& layer,
                         const TileID& id,
                         const mat4& matrix) {
-    painter.renderCircle(*this, layer_desc, id, matrix);
+    painter.renderCircle(*this, dynamic_cast<const CircleLayer&>(layer), id, matrix);
 }
 
 bool CircleBucket::hasData() const {

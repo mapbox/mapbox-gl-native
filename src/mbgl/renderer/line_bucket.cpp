@@ -1,5 +1,5 @@
 #include <mbgl/renderer/line_bucket.hpp>
-
+#include <mbgl/layer/line_layer.hpp>
 #include <mbgl/geometry/elements_buffer.hpp>
 #include <mbgl/renderer/painter.hpp>
 #include <mbgl/style/style.hpp>
@@ -388,10 +388,10 @@ void LineBucket::upload() {
 }
 
 void LineBucket::render(Painter& painter,
-                        const StyleLayer& layer_desc,
+                        const StyleLayer& layer,
                         const TileID& id,
                         const mat4& matrix) {
-    painter.renderLine(*this, layer_desc, id, matrix);
+    painter.renderLine(*this, dynamic_cast<const LineLayer&>(layer), id, matrix);
 }
 
 bool LineBucket::hasData() const {

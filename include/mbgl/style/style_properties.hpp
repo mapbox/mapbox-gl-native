@@ -1,14 +1,10 @@
 #ifndef MBGL_STYLE_STYLE_PROPERTIES
 #define MBGL_STYLE_STYLE_PROPERTIES
 
-#include <mapbox/variant.hpp>
-
 #include <mbgl/style/types.hpp>
 
 #include <array>
 #include <string>
-#include <type_traits>
-#include <memory>
 #include <vector>
 
 namespace mbgl {
@@ -169,21 +165,15 @@ public:
     float opacity = 1.0f;
     Color color = {{ 0, 0, 0, 1 }};
     Faded<std::string> image;
+
+    inline bool isVisible() const {
+        return opacity > 0;
+    }
 };
 
 class BackgroundLayoutProperties {
 public:
 };
-
-typedef mapbox::util::variant<
-    FillPaintProperties,
-    LinePaintProperties,
-    CirclePaintProperties,
-    SymbolPaintProperties,
-    RasterPaintProperties,
-    BackgroundPaintProperties,
-    std::false_type
-> StyleProperties;
 
 }
 
