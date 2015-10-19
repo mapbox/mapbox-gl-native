@@ -26,12 +26,8 @@ class StyleLayer : public util::noncopyable {
 public:
     StyleLayer(const std::string &id, std::map<ClassID, ClassProperties> &&styles);
 
-    template <typename T> const T &getProperties() const {
-        if (properties.is<T>()) {
-            return properties.get<T>();
-        } else {
-            return defaultStyleProperties<T>();
-        }
+    template <typename T> const T& getProperties() const {
+        return properties.get<T>();
     }
 
     // Determines whether this layer is the background layer.

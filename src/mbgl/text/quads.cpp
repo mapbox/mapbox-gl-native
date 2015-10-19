@@ -1,7 +1,7 @@
 #include <mbgl/text/quads.hpp>
 #include <mbgl/text/shaping.hpp>
 #include <mbgl/geometry/anchor.hpp>
-#include <mbgl/style/style_layout.hpp>
+#include <mbgl/style/style_properties.hpp>
 #include <mbgl/util/math.hpp>
 #include <cassert>
 
@@ -9,8 +9,8 @@ namespace mbgl {
 
 const float globalMinScale = 0.5f; // underscale by 1 zoom level
 
-SymbolQuads getIconQuads(Anchor &anchor, const PositionedIcon &shapedIcon,
-        const std::vector<Coordinate> &line, const StyleLayoutSymbol &layout,
+SymbolQuads getIconQuads(Anchor& anchor, const PositionedIcon& shapedIcon,
+        const std::vector<Coordinate>& line, const SymbolLayoutProperties& layout,
         const bool alongLine) {
 
     const float border = 1.0;
@@ -128,9 +128,9 @@ void getSegmentGlyphs(std::back_insert_iterator<GlyphInstances> glyphs, Anchor &
     }
 }
 
-SymbolQuads getGlyphQuads(Anchor &anchor, const Shaping &shapedText, 
-        const float boxScale, const std::vector<Coordinate> &line, const StyleLayoutSymbol &layout,
-        const bool alongLine, const GlyphPositions &face) {
+SymbolQuads getGlyphQuads(Anchor& anchor, const Shaping& shapedText,
+        const float boxScale, const std::vector<Coordinate>& line, const SymbolLayoutProperties& layout,
+        const bool alongLine, const GlyphPositions& face) {
 
     const float textRotate = layout.text.rotate * M_PI / 180;
     const bool keepUpright = layout.text.keep_upright;

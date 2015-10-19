@@ -1,7 +1,7 @@
 #include <mbgl/renderer/painter.hpp>
 #include <mbgl/renderer/symbol_bucket.hpp>
 #include <mbgl/style/style_layer.hpp>
-#include <mbgl/style/style_layout.hpp>
+#include <mbgl/style/style_properties.hpp>
 #include <mbgl/geometry/glyph_atlas.hpp>
 #include <mbgl/geometry/sprite_atlas.hpp>
 #include <mbgl/shader/sdf_shader.hpp>
@@ -132,8 +132,8 @@ void Painter::renderSymbol(SymbolBucket &bucket, const StyleLayer &layer_desc, c
         return;
     }
 
-    const auto &properties = layer_desc.getProperties<SymbolProperties>();
-    const auto &layout = bucket.layout;
+    const auto& properties = layer_desc.getProperties<SymbolPaintProperties>();
+    const auto& layout = bucket.layout;
 
     config.depthMask = GL_FALSE;
 

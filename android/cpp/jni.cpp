@@ -356,11 +356,11 @@ std::pair<mbgl::AnnotationSegment, mbgl::StyleProperties> annotation_std_pair_fr
     int aS = (strokeColor >> 24) & 0xFF;
 
     mbgl::StyleProperties shapeProperties;
-    mbgl::FillProperties fillProperties;
+    mbgl::FillPaintProperties fillProperties;
     fillProperties.opacity = alpha;
     fillProperties.stroke_color = {{ static_cast<float>(rS) / 255.0f, static_cast<float>(gS) / 255.0f, static_cast<float>(bS) / 255.0f, static_cast<float>(aS) / 255.0f }};
     fillProperties.fill_color = {{ static_cast<float>(rF) / 255.0f, static_cast<float>(gF) / 255.0f, static_cast<float>(bF) / 255.0f, static_cast<float>(aF) / 255.0f }};
-    shapeProperties.set<mbgl::FillProperties>(fillProperties);
+    shapeProperties.set<mbgl::FillPaintProperties>(fillProperties);
 
     jobject points = env->GetObjectField(polygon, polygonPointsId);
     mbgl::AnnotationSegment segment = annotation_segment_from_latlng_jlist(env, points);
@@ -940,11 +940,11 @@ jlong JNICALL nativeAddPolyline(JNIEnv *env, jobject obj, jlong nativeMapViewPtr
     }
 
     mbgl::StyleProperties shapeProperties;
-    mbgl::LineProperties lineProperties;
+    mbgl::LinePaintProperties lineProperties;
     lineProperties.opacity = alpha;
     lineProperties.color = {{ static_cast<float>(r) / 255.0f, static_cast<float>(g) / 255.0f, static_cast<float>(b) / 255.0f, static_cast<float>(a) / 255.0f }};
     lineProperties.width = width;
-    shapeProperties.set<mbgl::LineProperties>(lineProperties);
+    shapeProperties.set<mbgl::LinePaintProperties>(lineProperties);
 
     jobject points = env->GetObjectField(polyline, polylinePointsId);
     mbgl::AnnotationSegment segment = annotation_segment_from_latlng_jlist(env, points);

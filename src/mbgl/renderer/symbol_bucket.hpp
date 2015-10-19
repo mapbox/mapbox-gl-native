@@ -13,7 +13,7 @@
 #include <mbgl/text/shaping.hpp>
 #include <mbgl/text/quads.hpp>
 #include <mbgl/style/style_bucket.hpp>
-#include <mbgl/style/style_layout.hpp>
+#include <mbgl/style/style_properties.hpp>
 
 #include <memory>
 #include <map>
@@ -42,12 +42,12 @@ struct Anchor;
 
 class SymbolInstance {
     public:
-        explicit SymbolInstance(Anchor &anchor, const std::vector<Coordinate> &line,
-                const Shaping &shapedText, const PositionedIcon &shapedIcon,
-                const StyleLayoutSymbol &layout, const bool inside,
+        explicit SymbolInstance(Anchor& anchor, const std::vector<Coordinate>& line,
+                const Shaping& shapedText, const PositionedIcon& shapedIcon,
+                const SymbolLayoutProperties& layout, const bool inside,
                 const float textBoxScale, const float textPadding, const float textAlongLine,
                 const float iconBoxScale, const float iconPadding, const float iconAlongLine,
-                const GlyphPositions &face);
+                const GlyphPositions& face);
         float x;
         float y;
         bool hasText;
@@ -109,7 +109,7 @@ private:
             const bool keepUpright, const bool alongLine, const float placementAngle);
 
 public:
-    StyleLayoutSymbol layout;
+    SymbolLayoutProperties layout;
     bool sdfIcons = false;
 
 private:

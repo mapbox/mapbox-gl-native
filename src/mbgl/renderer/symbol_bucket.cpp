@@ -1,6 +1,6 @@
 #include <mbgl/renderer/symbol_bucket.hpp>
 #include <mbgl/map/geometry_tile.hpp>
-#include <mbgl/style/style_layout.hpp>
+#include <mbgl/style/style_properties.hpp>
 #include <mbgl/annotation/sprite_image.hpp>
 #include <mbgl/geometry/text_buffer.hpp>
 #include <mbgl/geometry/icon_buffer.hpp>
@@ -27,12 +27,12 @@
 
 namespace mbgl {
 
-SymbolInstance::SymbolInstance(Anchor &anchor, const std::vector<Coordinate> &line,
-        const Shaping &shapedText, const PositionedIcon &shapedIcon, 
-        const StyleLayoutSymbol &layout, const bool addToBuffers,
+SymbolInstance::SymbolInstance(Anchor& anchor, const std::vector<Coordinate>& line,
+        const Shaping& shapedText, const PositionedIcon& shapedIcon,
+        const SymbolLayoutProperties& layout, const bool addToBuffers,
         const float textBoxScale, const float textPadding, const float textAlongLine,
         const float iconBoxScale, const float iconPadding, const float iconAlongLine,
-        const GlyphPositions &face) :
+        const GlyphPositions& face) :
     x(anchor.x),
     y(anchor.y),
     hasText(shapedText),

@@ -48,12 +48,12 @@ TEST(Annotations, LineAnnotation) {
 
     AnnotationSegments segments = {{ {{ { 0, 0 }, { 45, 45 } }} }};
 
-    LineProperties lineProperties;
+    LinePaintProperties lineProperties;
     lineProperties.color = {{ 255, 0, 0, 1 }};
     lineProperties.width = 5;
 
     StyleProperties styleProperties;
-    styleProperties.set<LineProperties>(lineProperties);
+    styleProperties.set<LinePaintProperties>(lineProperties);
 
     map.addShapeAnnotation(ShapeAnnotation(segments, styleProperties));
 
@@ -70,11 +70,11 @@ TEST(Annotations, FillAnnotation) {
 
     AnnotationSegments segments = {{ {{ { 0, 0 }, { 0, 45 }, { 45, 45 }, { 45, 0 } }} }};
 
-    FillProperties fillProperties;
+    FillPaintProperties fillProperties;
     fillProperties.fill_color = {{ 255, 0, 0, 1 }};
 
     StyleProperties styleProperties;
-    styleProperties.set<FillProperties>(fillProperties);
+    styleProperties.set<FillPaintProperties>(fillProperties);
 
     map.addShapeAnnotation(ShapeAnnotation(segments, styleProperties));
 
@@ -109,11 +109,11 @@ TEST(Annotations, NonImmediateAdd) {
 
     AnnotationSegments segments = {{ {{ { 0, 0 }, { 0, 45 }, { 45, 45 }, { 45, 0 } }} }};
 
-    FillProperties fillProperties;
+    FillPaintProperties fillProperties;
     fillProperties.fill_color = {{ 255, 0, 0, 1 }};
 
     StyleProperties styleProperties;
-    styleProperties.set<FillProperties>(fillProperties);
+    styleProperties.set<FillPaintProperties>(fillProperties);
 
     map.addShapeAnnotation(ShapeAnnotation(segments, styleProperties));
 
@@ -143,12 +143,12 @@ TEST(Annotations, RemoveShape) {
 
     AnnotationSegments segments = {{ {{ { 0, 0 }, { 45, 45 } }} }};
 
-    LineProperties lineProperties;
+    LinePaintProperties lineProperties;
     lineProperties.color = {{ 255, 0, 0, 1 }};
     lineProperties.width = 5;
 
     StyleProperties styleProperties;
-    styleProperties.set<LineProperties>(lineProperties);
+    styleProperties.set<LinePaintProperties>(lineProperties);
 
     Map map(view, fileSource, MapMode::Still);
     map.setStyleJSON(util::read_file("test/fixtures/api/empty.json"), "");

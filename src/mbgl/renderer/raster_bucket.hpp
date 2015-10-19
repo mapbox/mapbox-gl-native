@@ -7,14 +7,14 @@
 
 namespace mbgl {
 
-class StyleLayoutRaster;
+class RasterLayoutProperties;
 class RasterShader;
 class StaticVertexBuffer;
 class VertexArrayObject;
 
 class RasterBucket : public Bucket {
 public:
-    RasterBucket(TexturePool&, const StyleLayoutRaster&);
+    RasterBucket(TexturePool&, const RasterLayoutProperties&);
 
     void upload() override;
     void render(Painter&, const StyleLayer&, const TileID&, const mat4&) override;
@@ -22,7 +22,7 @@ public:
 
     bool setImage(std::unique_ptr<util::Image> image);
 
-    const StyleLayoutRaster &layout;
+    const RasterLayoutProperties& layout;
 
     void drawRaster(RasterShader& shader, StaticVertexBuffer &vertices, VertexArrayObject &array);
 

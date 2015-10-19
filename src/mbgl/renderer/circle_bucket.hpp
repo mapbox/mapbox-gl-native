@@ -9,7 +9,7 @@
 #include <mbgl/geometry/circle_buffer.hpp>
 
 #include <mbgl/style/style_bucket.hpp>
-#include <mbgl/style/style_layout.hpp>
+#include <mbgl/style/style_properties.hpp>
 
 namespace mbgl {
 

@@ -3,7 +3,7 @@
 
 #include <mbgl/style/style.hpp>
 #include <mbgl/style/style_layer.hpp>
-#include <mbgl/style/style_layout.hpp>
+#include <mbgl/style/style_properties.hpp>
 
 #include <mbgl/map/sprite.hpp>
 #include <mbgl/map/tile_id.hpp>
@@ -22,7 +22,7 @@ void Painter::renderCircle(CircleBucket& bucket,
 
     config.stencilTest = false;
 
-    const CircleProperties& properties = layer_desc.getProperties<CircleProperties>();
+    const CirclePaintProperties& properties = layer_desc.getProperties<CirclePaintProperties>();
     mat4 vtxMatrix = translatedMatrix(matrix, properties.translate, id, properties.translateAnchor);
 
     Color color = properties.color;

@@ -9,7 +9,7 @@ using namespace mbgl;
 void Painter::renderRaster(RasterBucket& bucket, const StyleLayer &layer_desc, const TileID&, const mat4 &matrix) {
     if (pass != RenderPass::Translucent) return;
 
-    const RasterProperties &properties = layer_desc.getProperties<RasterProperties>();
+    const RasterPaintProperties& properties = layer_desc.getProperties<RasterPaintProperties>();
 
     if (bucket.hasData()) {
         useProgram(rasterShader->program);

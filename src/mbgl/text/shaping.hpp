@@ -22,9 +22,9 @@ namespace mbgl {
             operator bool() const { return image.hasArea(); }
     };
 
-    class StyleLayoutSymbol;
+    class SymbolLayoutProperties;
 
-    PositionedIcon shapeIcon(const Rect<uint16_t> &image, const StyleLayoutSymbol &layout);
+    PositionedIcon shapeIcon(const Rect<uint16_t>& image, const SymbolLayoutProperties&);
 
 }
 

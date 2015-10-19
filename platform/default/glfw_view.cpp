@@ -223,11 +223,11 @@ void GLFWView::addRandomPointAnnotations(int count) {
 void GLFWView::addRandomShapeAnnotations(int count) {
     std::vector<mbgl::ShapeAnnotation> shapes;
 
-    mbgl::FillProperties fillProperties;
+    mbgl::FillPaintProperties fillProperties;
     fillProperties.opacity = .1;
 
     mbgl::StyleProperties properties;
-    properties.set<mbgl::FillProperties>(fillProperties);
+    properties.set<mbgl::FillPaintProperties>(fillProperties);
 
     for (int i = 0; i < count; i++) {
         mbgl::AnnotationSegment triangle;

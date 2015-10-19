@@ -303,8 +303,8 @@ std::vector<RenderItem> Painter::determineRenderOrder(const Style& style) {
         if (layer.bucket->visibility == VisibilityType::None) continue;
         if (layer.type == StyleLayerType::Background) {
             // This layer defines a background color/image.
-            if (layer.properties.is<BackgroundProperties>()) {
-                auto &props = layer.properties.get<BackgroundProperties>();
+            if (layer.properties.is<BackgroundPaintProperties>()) {
+                auto& props = layer.properties.get<BackgroundPaintProperties>();
                 if (props.image.from.empty()) {
                     // This is a solid background. We can use glClear().
                     background = props.color;
@@ -381,7 +381,7 @@ std::vector<RenderItem> Painter::determineRenderOrder(const Style& style) {
 void Painter::renderBackground(const StyleLayer &layer_desc) {
     // Note: This function is only called for textured background. Otherwise, the background color
     // is created with glClear.
-    const BackgroundProperties& properties = layer_desc.getProperties<BackgroundProperties>();
+    const BackgroundPaintProperties& properties = layer_desc.getProperties<BackgroundPaintProperties>();
 
     if (!properties.image.to.empty()) {
         if ((properties.opacity >= 1.0f) != (pass == RenderPass::Opaque))

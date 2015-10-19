@@ -3,7 +3,7 @@
 #include <mbgl/geometry/elements_buffer.hpp>
 #include <mbgl/renderer/painter.hpp>
 #include <mbgl/style/style.hpp>
-#include <mbgl/style/style_layout.hpp>
+#include <mbgl/style/style_properties.hpp>
 #include <mbgl/shader/line_shader.hpp>
 #include <mbgl/shader/linesdf_shader.hpp>
 #include <mbgl/shader/linepattern_shader.hpp>

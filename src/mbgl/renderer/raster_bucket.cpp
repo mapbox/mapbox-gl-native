@@ -4,7 +4,7 @@
 
 using namespace mbgl;
 
-RasterBucket::RasterBucket(TexturePool& texturePool, const StyleLayoutRaster& layout_)
+RasterBucket::RasterBucket(TexturePool& texturePool, const RasterLayoutProperties& layout_)
 : layout(layout_),
   raster(texturePool) {
 }

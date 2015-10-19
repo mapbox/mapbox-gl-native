@@ -2,7 +2,7 @@
 #include <mbgl/renderer/fill_bucket.hpp>
 #include <mbgl/style/style.hpp>
 #include <mbgl/style/style_layer.hpp>
-#include <mbgl/style/style_layout.hpp>
+#include <mbgl/style/style_properties.hpp>
 #include <mbgl/map/sprite.hpp>
 #include <mbgl/map/tile_id.hpp>
 #include <mbgl/geometry/sprite_atlas.hpp>
@@ -14,7 +14,7 @@
 using namespace mbgl;
 
 void Painter::renderFill(FillBucket& bucket, const StyleLayer &layer_desc, const TileID& id, const mat4 &matrix) {
-    const FillProperties &properties = layer_desc.getProperties<FillProperties>();
+    const FillPaintProperties& properties = layer_desc.getProperties<FillPaintProperties>();
     mat4 vtxMatrix = translatedMatrix(matrix, properties.translate, id, properties.translateAnchor);
 
     Color fill_color = properties.fill_color;

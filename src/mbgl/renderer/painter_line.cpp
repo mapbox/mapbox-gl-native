@@ -2,7 +2,7 @@
 #include <mbgl/renderer/line_bucket.hpp>
 #include <mbgl/style/style.hpp>
 #include <mbgl/style/style_layer.hpp>
-#include <mbgl/style/style_layout.hpp>
+#include <mbgl/style/style_properties.hpp>
 #include <mbgl/map/sprite.hpp>
 #include <mbgl/map/tile_id.hpp>
 #include <mbgl/map/map_data.hpp>
@@ -23,8 +23,8 @@ void Painter::renderLine(LineBucket& bucket, const StyleLayer &layer_desc, const
     config.depthTest = true;
     config.depthMask = GL_FALSE;
 
-    const auto &properties = layer_desc.getProperties<LineProperties>();
-    const auto &layout = bucket.layout;
+    const auto& properties = layer_desc.getProperties<LinePaintProperties>();
+    const auto& layout = bucket.layout;
 
     // the distance over which the line edge fades out.
     // Retina devices need a smaller distance to avoid aliasing.

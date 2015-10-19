@@ -16,15 +16,15 @@ bool StyleLayer::isBackground() const {
 bool StyleLayer::isVisible() const {
     switch (type) {
         case StyleLayerType::Fill:
-            return getProperties<FillProperties>().isVisible();
+            return getProperties<FillPaintProperties>().isVisible();
         case StyleLayerType::Line:
-            return getProperties<LineProperties>().isVisible();
+            return getProperties<LinePaintProperties>().isVisible();
         case StyleLayerType::Circle:
-            return getProperties<CircleProperties>().isVisible();
+            return getProperties<CirclePaintProperties>().isVisible();
         case StyleLayerType::Symbol:
-            return getProperties<SymbolProperties>().isVisible();
+            return getProperties<SymbolPaintProperties>().isVisible();
         case StyleLayerType::Raster:
-            return getProperties<RasterProperties>().isVisible();
+            return getProperties<RasterPaintProperties>().isVisible();
         default:
             return false;
     }
@@ -189,9 +189,9 @@ void StyleLayer::applyTransitionedStyleProperty(PropertyKey key, T &target, cons
 }
 
 template <>
-void StyleLayer::applyStyleProperties<FillProperties>(const float z, const TimePoint& now, const ZoomHistory &zoomHistory) {
-    properties.set<FillProperties>();
-    FillProperties &fill = properties.get<FillProperties>();
+void StyleLayer::applyStyleProperties<FillPaintProperties>(const float z, const TimePoint& now, const ZoomHistory &zoomHistory) {
+    properties.set<FillPaintProperties>();
+    FillPaintProperties& fill = properties.get<FillPaintProperties>();
     applyStyleProperty(PropertyKey::FillAntialias, fill.antialias, z, now, zoomHistory);
     applyTransitionedStyleProperty(PropertyKey::FillOpacity, fill.opacity, z, now, zoomHistory);
     applyTransitionedStyleProperty(PropertyKey::FillColor, fill.fill_color, z, now, zoomHistory);
@@ -202,9 +202,9 @@ void StyleLayer::applyStyleProperties<FillProperties>(const float z, const TimeP
 }
 
 template <>
-void StyleLayer::applyStyleProperties<LineProperties>(const float z, const TimePoint& now, const ZoomHistory &zoomHistory) {
-    properties.set<LineProperties>();
-    LineProperties &line = properties.get<LineProperties>();
+void StyleLayer::applyStyleProperties<LinePaintProperties>(const float z, const TimePoint& now, const ZoomHistory &zoomHistory) {
+    properties.set<LinePaintProperties>();
+    LinePaintProperties& line = properties.get<LinePaintProperties>();
     applyTransitionedStyleProperty(PropertyKey::LineOpacity, line.opacity, z, now, zoomHistory);
     applyTransitionedStyleProperty(PropertyKey::LineColor, line.color, z, now, zoomHistory);
     applyTransitionedStyleProperty(PropertyKey::LineTranslate, line.translate, z, now, zoomHistory);
@@ -220,9 +220,9 @@ void StyleLayer::applyStyleProperties<LineProperties>(const float z, const TimeP
 }
 
 template <>
-void StyleLayer::applyStyleProperties<CircleProperties>(const float z, const TimePoint& now, const ZoomHistory &zoomHistory) {
-    properties.set<CircleProperties>();
-    CircleProperties& circle = properties.get<CircleProperties>();
+void StyleLayer::applyStyleProperties<CirclePaintProperties>(const float z, const TimePoint& now, const ZoomHistory &zoomHistory) {
+    properties.set<CirclePaintProperties>();
+    CirclePaintProperties& circle = properties.get<CirclePaintProperties>();
     applyTransitionedStyleProperty(PropertyKey::CircleRadius, circle.radius, z, now, zoomHistory);
     applyTransitionedStyleProperty(PropertyKey::CircleColor, circle.color, z, now, zoomHistory);
     applyTransitionedStyleProperty(PropertyKey::CircleOpacity, circle.opacity, z, now, zoomHistory);
@@ -232,9 +232,9 @@ void StyleLayer::applyStyleProperties<CircleProperties>(const float z, const Tim
 }
 
 template <>
-void StyleLayer::applyStyleProperties<SymbolProperties>(const float z, const TimePoint& now, const ZoomHistory &zoomHistory) {
-    properties.set<SymbolProperties>();
-    SymbolProperties &symbol = properties.get<SymbolProperties>();
+void StyleLayer::applyStyleProperties<SymbolPaintProperties>(const float z, const TimePoint& now, const ZoomHistory &zoomHistory) {
+    properties.set<SymbolPaintProperties>();
+    SymbolPaintProperties& symbol = properties.get<SymbolPaintProperties>();
     applyTransitionedStyleProperty(PropertyKey::IconOpacity, symbol.icon.opacity, z, now, zoomHistory);
     applyTransitionedStyleProperty(PropertyKey::IconColor, symbol.icon.color, z, now, zoomHistory);
     applyTransitionedStyleProperty(PropertyKey::IconHaloColor, symbol.icon.halo_color, z, now, zoomHistory);
@@ -265,9 +265,9 @@ void StyleLayer::applyStyleProperties<SymbolProperties>(const float z, const Tim
 }
 
 template <>
-void StyleLayer::applyStyleProperties<RasterProperties>(const float z, const TimePoint& now, const ZoomHistory &zoomHistory) {
-    properties.set<RasterProperties>();
-    RasterProperties &raster = properties.get<RasterProperties>();
+void StyleLayer::applyStyleProperties<RasterPaintProperties>(const float z, const TimePoint& now, const ZoomHistory &zoomHistory) {
+    properties.set<RasterPaintProperties>();
+    RasterPaintProperties& raster = properties.get<RasterPaintProperties>();
     applyTransitionedStyleProperty(PropertyKey::RasterOpacity, raster.opacity, z, now, zoomHistory);
     applyTransitionedStyleProperty(PropertyKey::RasterHueRotate, raster.hue_rotate, z, now, zoomHistory);
     applyTransitionedStyleProperty(PropertyKey::RasterBrightnessLow, raster.brightness[0], z, now, zoomHistory);
@@ -278,9 +278,9 @@ void StyleLayer::applyStyleProperties<RasterProperties>(const float z, const Tim
 }
 
 template <>
-void StyleLayer::applyStyleProperties<BackgroundProperties>(const float z, const TimePoint& now, const ZoomHistory &zoomHistory) {
-    properties.set<BackgroundProperties>();
-    BackgroundProperties &background = properties.get<BackgroundProperties>();
+void StyleLayer::applyStyleProperties<BackgroundPaintProperties>(const float z, const TimePoint& now, const ZoomHistory &zoomHistory) {
+    properties.set<BackgroundPaintProperties>();
+    BackgroundPaintProperties& background = properties.get<BackgroundPaintProperties>();
     applyTransitionedStyleProperty(PropertyKey::BackgroundOpacity, background.opacity, z, now, zoomHistory);
     applyTransitionedStyleProperty(PropertyKey::BackgroundColor, background.color, z, now, zoomHistory);
     applyStyleProperty(PropertyKey::BackgroundImage, background.image, z, now, zoomHistory);
@@ -293,20 +293,20 @@ void StyleLayer::updateProperties(float z, const TimePoint& now, ZoomHistory &zo
     hasPendingTransitions = false;
 
     switch (type) {
-        case StyleLayerType::Fill: applyStyleProperties<FillProperties>(z, now, zoomHistory); break;
-        case StyleLayerType::Line: applyStyleProperties<LineProperties>(z, now, zoomHistory); break;
-        case StyleLayerType::Circle: applyStyleProperties<CircleProperties>(z, now, zoomHistory); break;
-        case StyleLayerType::Symbol: applyStyleProperties<SymbolProperties>(z, now, zoomHistory); break;
-        case StyleLayerType::Raster: applyStyleProperties<RasterProperties>(z, now, zoomHistory); break;
-        case StyleLayerType::Background: applyStyleProperties<BackgroundProperties>(z, now, zoomHistory); break;
+        case StyleLayerType::Fill: applyStyleProperties<FillPaintProperties>(z, now, zoomHistory); break;
+        case StyleLayerType::Line: applyStyleProperties<LinePaintProperties>(z, now, zoomHistory); break;
+        case StyleLayerType::Circle: applyStyleProperties<CirclePaintProperties>(z, now, zoomHistory); break;
+        case StyleLayerType::Symbol: applyStyleProperties<SymbolPaintProperties>(z, now, zoomHistory); break;
+        case StyleLayerType::Raster: applyStyleProperties<RasterPaintProperties>(z, now, zoomHistory); break;
+        case StyleLayerType::Background: applyStyleProperties<BackgroundPaintProperties>(z, now, zoomHistory); break;
         default: properties.set<std::false_type>(); break;
     }
 
     // Update the render passes when this layer is visible.
     passes = RenderPass::None;
     if (isVisible()) {
-        if (properties.is<FillProperties>()) {
-            const FillProperties &fillProperties = properties.get<FillProperties>();
+        if (properties.is<FillPaintProperties>()) {
+            const FillPaintProperties &fillProperties = properties.get<FillPaintProperties>();
             const float alpha = fillProperties.fill_color[3] * fillProperties.opacity;
 
             if (fillProperties.antialias) {
