@@ -120,7 +120,7 @@ TEST(Annotations, NonImmediateAdd) {
     util::write_file("test/output/non_immediate_add.png", renderPNG(map));
 }
 
-TEST(Annotations, Remove) {
+TEST(Annotations, RemovePoint) {
     auto display = std::make_shared<mbgl::HeadlessDisplay>();
     HeadlessView view(display, 1);
     DefaultFileSource fileSource(nullptr);
@@ -133,7 +133,32 @@ TEST(Annotations, Remove) {
 
     map.removeAnnotation(point);
 
-    util::write_file("test/output/remove.png", renderPNG(map));
+    util::write_file("test/output/remove_point.png", renderPNG(map));
+}
+
+TEST(Annotations, RemoveShape) {
+    auto display = std::make_shared<mbgl::HeadlessDisplay>();
+    HeadlessView view(display, 1);
+    DefaultFileSource fileSource(nullptr);
+
+    AnnotationSegments segments = {{ {{ { 0, 0 }, { 45, 45 } }} }};
+
+    LineProperties lineProperties;
+    lineProperties.color = {{ 255, 0, 0, 1 }};
+    lineProperties.width = 5;
+
+    StyleProperties styleProperties;
+    styleProperties.set<LineProperties>(lineProperties);
+
+    Map map(view, fileSource, MapMode::Still);
+    map.setStyleJSON(util::read_file("test/fixtures/api/empty.json"), "");
+    uint32_t shape = map.addShapeAnnotation(ShapeAnnotation(segments, styleProperties));
+
+    renderPNG(map);
+
+    map.removeAnnotation(shape);
+
+    util::write_file("test/output/remove_shape.png", renderPNG(map));
 }
 
 TEST(Annotations, SwitchStyle) {

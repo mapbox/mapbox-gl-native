@@ -40,6 +40,7 @@ private:
     PointAnnotationImpl::Tree pointTree;
     PointAnnotationImpl::Map pointAnnotations;
     ShapeAnnotationImpl::Map shapeAnnotations;
+    std::vector<std::string> obsoleteShapeAnnotationLayers;
 };
 
 }

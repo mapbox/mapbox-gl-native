@@ -24,10 +24,11 @@ public:
     void updateStyle(Style&);
     void updateTile(const TileID&, AnnotationTile&);
 
-private:
     const AnnotationID id;
     const std::string layerID;
     const ShapeAnnotation shape;
+
+private:
     mapbox::util::geojsonvt::GeoJSONVT shapeTiler;
 };
 

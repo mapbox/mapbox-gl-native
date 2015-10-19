@@ -51,7 +51,7 @@ void AnnotationManager::removeAnnotations(const AnnotationIDs& ids) {
             pointTree.remove(pointAnnotations.at(id));
             pointAnnotations.erase(id);
         } else if (shapeAnnotations.find(id) != shapeAnnotations.end()) {
-            // TODO: remove style layer
+            obsoleteShapeAnnotationLayers.push_back(shapeAnnotations.at(id)->layerID);
             shapeAnnotations.erase(id);
         }
     }
@@ -132,6 +132,11 @@ void AnnotationManager::updateStyle(Style& style) {
         shape.second->updateStyle(style);
     }
 
+    for (const auto& layer : obsoleteShapeAnnotationLayers) {
+        style.removeLayer(layer);
+    }
+
+    obsoleteShapeAnnotationLayers.clear();
     style.getSource(SourceID)->invalidateTiles();
 }
 

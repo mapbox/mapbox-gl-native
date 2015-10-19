@@ -67,6 +67,7 @@ public:
     void addSource(std::unique_ptr<Source>);
     void addLayer(util::ptr<StyleLayer>);
     void addLayer(util::ptr<StyleLayer>, const std::string& beforeLayerID);
+    void removeLayer(const std::string& layerID);
 
     MapData& data;
     std::unique_ptr<GlyphStore> glyphStore;
@@ -80,6 +81,8 @@ public:
     std::vector<util::ptr<StyleLayer>> layers;
 
 private:
+    std::vector<util::ptr<StyleLayer>>::const_iterator findLayer(const std::string& layerID) const;
+
     // GlyphStore::Observer implementation.
     void onGlyphRangeLoaded() override;
     void onGlyphRangeLoadingFailed(std::exception_ptr error) override;

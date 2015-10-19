@@ -77,12 +77,30 @@ void Style::addSource(std::unique_ptr<Source> source) {
     sources.emplace_back(std::move(source));
 }
 
+std::vector<util::ptr<StyleLayer>>::const_iterator Style::findLayer(const std::string& id) const {
+    return std::find_if(layers.begin(), layers.end(), [&](const auto& layer) {
+        return layer->id == id;
+    });
+}
+
+StyleLayer* Style::getLayer(const std::string& id) const {
+    auto it = findLayer(id);
+    return it != layers.end() ? it->get() : nullptr;
+}
+
 void Style::addLayer(util::ptr<StyleLayer> layer) {
     layers.emplace_back(std::move(layer));
 }
 
 void Style::addLayer(util::ptr<StyleLayer> layer, const std::string& before) {
-    layers.emplace(std::find_if(layers.begin(), layers.end(), [&](const auto& l) { return l->id == before; }), std::move(layer));
+    layers.emplace(findLayer(before), std::move(layer));
+}
+
+void Style::removeLayer(const std::string& id) {
+    auto it = findLayer(id);
+    if (it == layers.end())
+        throw std::runtime_error("no such layer");
+    layers.erase(it);
 }
 
 void Style::update(const TransformState& transform,
@@ -139,14 +157,6 @@ Source* Style::getSource(const std::string& id) const {
     });
 
     return it != sources.end() ? it->get() : nullptr;
-}
-
-StyleLayer* Style::getLayer(const std::string& id) const {
-    const auto it = std::find_if(layers.begin(), layers.end(), [&](const auto& layer) {
-        return layer->id == id;
-    });
-
-    return it != layers.end() ? it->get() : nullptr;
 }
 
 bool Style::hasTransitions() const {
