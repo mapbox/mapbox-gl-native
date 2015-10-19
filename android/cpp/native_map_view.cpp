@@ -709,17 +709,6 @@ void NativeMapView::updateFps() {
     detach_jni_thread(vm, &env, detach);
 }
 
-void NativeMapView::renderSync() {
-    mbgl::Log::Debug(mbgl::Event::Android, "NativeMapView::renderSync()");
-
-    if (map->isPaused()) {
-        mbgl::Log::Debug(mbgl::Event::Android, "Not rendering as map is paused");
-        return;
-    }
-
-    map->renderSync();
-}
-
 void NativeMapView::resizeView(int w, int h) {
     width = w;
     height = h;

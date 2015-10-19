@@ -1,6 +1,5 @@
 package com.mapbox.mapboxsdk.views;
 
-import android.animation.Animator;
 import android.app.Activity;
 import android.app.ActivityManager;
 import android.app.Dialog;
@@ -23,6 +22,9 @@ import android.net.NetworkInfo;
 import android.net.Uri;
 import android.os.Build;
 import android.os.Bundle;
+import android.os.Handler;
+import android.os.Looper;
+import android.os.Message;
 import android.support.annotation.CallSuper;
 import android.support.annotation.FloatRange;
 import android.support.annotation.IntDef;
@@ -36,7 +38,7 @@ import android.support.v4.view.ScaleGestureDetectorCompat;
 import android.support.v7.app.AlertDialog;
 import android.text.TextUtils;
 import android.util.AttributeSet;
-import android.util.Log;
+import android.view.Choreographer;
 import android.view.GestureDetector;
 import android.view.Gravity;
 import android.view.InputDevice;
@@ -155,6 +157,10 @@ public final class MapView extends FrameLayout {
     // Used for loading default marker sprite
     private static final String DEFAULT_SPRITE = "com.mapbox.sprites.default";
 
+    // Used to send messages to the render thread
+    public static final int MESSAGE_QUIT = 0;
+    public static final int MESSAGE_RENDER = 1;
+
     /**
      * The currently supported maximum zoom level.
      *
@@ -170,11 +176,12 @@ public final class MapView extends FrameLayout {
     private NativeMapView mNativeMapView;
 
     // Used to track rendering
-    private Boolean mDirty = false;
+    //private Boolean mDirty = false;
+    private RenderThread mRenderingThread;
 
     // Used to handle DPI scaling
     private float mScreenDensity = 1.0f;
-    private float mScreenDensityDpi = 1.0f;
+    private float mScreenDpi = 1.0f;
 
     // Touch gesture detectors
     private GestureDetectorCompat mGestureDetector;
@@ -573,7 +580,7 @@ public final class MapView extends FrameLayout {
 
         // Get the screen's density
         mScreenDensity = context.getResources().getDisplayMetrics().density;
-        mScreenDensityDpi = context.getResources().getDisplayMetrics().densityDpi;
+        mScreenDpi = context.getResources().getDisplayMetrics().densityDpi;
 
         // Get the cache path
         String cachePath = context.getCacheDir().getAbsolutePath();
@@ -822,6 +829,10 @@ public final class MapView extends FrameLayout {
                 }
             }
         });
+
+        // Start the rendering thread
+        mRenderingThread = new RenderThread();
+        mRenderingThread.start();
     }
 
     /**
@@ -883,6 +894,12 @@ public final class MapView extends FrameLayout {
      */
     @UiThread
     public void onDestroy() {
+        mRenderingThread.postQuit();
+        try {
+            mRenderingThread.join();
+        } catch (InterruptedException e) {
+            Thread.currentThread().interrupt();
+        }
         mNativeMapView.terminateContext();
         mNativeMapView.terminateDisplay();
     }
@@ -1986,31 +2003,100 @@ public final class MapView extends FrameLayout {
     // Rendering
     //
 
+    private class RenderThread extends Thread {
+
+        private Choreographer mChoreographer;
+        private Handler mHandler;
+        private Runnable mUpdateRunnable;
+        private boolean mDirty = false;
+
+        public RenderThread() {
+            super("Core GL Render Thread");
+        }
+
+        @Override
+        public void run() {
+            Looper.prepare();
+            if (android.os.Build.VERSION.SDK_INT >= Build.VERSION_CODES.JELLY_BEAN) {
+                mChoreographer = Choreographer.getInstance();
+            }
+            mHandler = new Handler(new Handler.Callback() {
+                @Override
+                public boolean handleMessage(Message msg) {
+                    if (msg.what == MESSAGE_QUIT) {
+                        Looper.myLooper().quit();
+                        return true;
+                    } else if (msg.what == MESSAGE_RENDER) {
+                        if (!mDirty) {
+                            mDirty = true;
+                            nextFrame();
+                        }
+                        return true;
+                    }
+                    return false;
+                }
+            });
+
+            mUpdateRunnable = new Runnable() {
+                @Override
+                public void run() {
+                    updateCompass();
+                    updateGpsMarker();
+                    /*synchronized (this)
+                    {
+                        this.notify();
+                    }*/
+                }
+            };
+
+            nextFrame();
+            Looper.loop();
+        }
+
+        private void nextFrame() {
+            if (android.os.Build.VERSION.SDK_INT >= Build.VERSION_CODES.JELLY_BEAN) {
+                mChoreographer.postFrameCallback(new Choreographer.FrameCallback() {
+                    @Override
+                    public void doFrame(long frameTimeNanos) {
+                        render();
+                    }
+                });
+            } else {
+                mHandler.postDelayed(new Runnable() {
+                    @Override
+                    public void run() {
+                        render();
+                    }
+                }, 1000 / 60);
+            }
+        }
+
+        private void render() {
+            mNativeMapView.renderSync();
+            //synchronized (mUpdateRunnable) {
+                post(mUpdateRunnable);
+                /*try {
+                    mUpdateRunnable.wait();
+                } catch (InterruptedException e) {
+                    Thread.currentThread().interrupt();
+                }*/
+            //}
+            mDirty = false;
+        }
+
+        public void postQuit() {
+            mHandler.sendEmptyMessage(MESSAGE_QUIT);
+        }
+
+        public void postRender() {
+            mHandler.sendEmptyMessage(MESSAGE_RENDER);
+        }
+    };
+
     // Called when the map needs to be rerendered
     // Called via JNI from NativeMapView
     synchronized protected void onInvalidate() {
-        if (!mDirty) {
-            mDirty = true;
-            postRender();
-        }
-    }
-
-    private void postRender() {
-        Runnable mRunnable = new Runnable() {
-            @Override
-            public void run() {
-                updateCompass();
-                updateGpsMarker();
-                mNativeMapView.renderSync();
-                mDirty = false;
-            }
-        };
-
-        if (android.os.Build.VERSION.SDK_INT >= Build.VERSION_CODES.JELLY_BEAN) {
-            postOnAnimation(mRunnable);
-        } else {
-            postDelayed(mRunnable, 1000 / 60);
-        }
+        mRenderingThread.postRender();
     }
 
     @Override
@@ -2989,7 +3075,7 @@ public final class MapView extends FrameLayout {
             }
         }
 
-        onInvalidate();
+        mNativeMapView.update();
     }
 
     private class MyLocationListener implements LocationListener {
@@ -3012,11 +3098,11 @@ public final class MapView extends FrameLayout {
             mGpsMarker.setVisibility(View.VISIBLE);
             LatLng coordinate = new LatLng(mGpsLocation);
             PointF screenLocation = toScreenLocation(coordinate);
-            if (!mDirty) {
+            /*if (!mDirty) {
                 // Map is idle, animate change of location
                 mGpsMarkerAnimatorX = mGpsMarker.animate().x(screenLocation.x - mGpsMarkerOffset);
                 mGpsMarkerAnimatorY = mGpsMarker.animate().y(screenLocation.y - mGpsMarkerOffset);
-            } else {
+            } else*/ {
                 // Map is not idle, set value, don't animate
                 if (mGpsMarkerAnimatorX != null) {
                     mGpsMarkerAnimatorX.cancel();
@@ -3060,7 +3146,7 @@ public final class MapView extends FrameLayout {
     @UiThread
     public void setCompassEnabled(boolean compassEnabled) {
         mCompassView.setEnabled(compassEnabled);
-        onInvalidate();
+        mNativeMapView.update();
     }
 
     /**
