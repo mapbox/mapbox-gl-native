@@ -50,8 +50,6 @@ public:
     void enableFps(bool enable);
     void updateFps();
 
-    void renderSync();
-
     void resizeView(int width, int height);
     void resizeFramebuffer(int width, int height);
 
