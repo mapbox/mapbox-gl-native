@@ -1,6 +1,5 @@
 package com.mapbox.mapboxsdk.views;
 
-import android.animation.Animator;
 import android.app.Activity;
 import android.app.ActivityManager;
 import android.app.Dialog;
@@ -36,7 +35,6 @@ import android.support.v4.view.ScaleGestureDetectorCompat;
 import android.support.v7.app.AlertDialog;
 import android.text.TextUtils;
 import android.util.AttributeSet;
-import android.util.Log;
 import android.view.GestureDetector;
 import android.view.Gravity;
 import android.view.InputDevice;
@@ -1999,9 +1997,9 @@ public final class MapView extends FrameLayout {
         Runnable mRunnable = new Runnable() {
             @Override
             public void run() {
+                mNativeMapView.renderSync();
                 updateCompass();
                 updateGpsMarker();
-                mNativeMapView.renderSync();
                 mDirty = false;
             }
         };
