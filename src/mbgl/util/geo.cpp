@@ -6,9 +6,9 @@
 namespace mbgl {
 
 LatLng::LatLng(const TileID& id) {
-    latitude = id.x / std::pow(2.0, id.z) * 360.0 - 180;
+    longitude = id.x / std::pow(2.0, id.z) * 360.0 - 180;
     const double n = M_PI - 2.0 * M_PI * id.y / std::pow(2.0, id.z);
-    longitude = 180.0 / M_PI * std::atan(0.5 * (std::exp(n) - std::exp(-n)));
+    latitude = 180.0 / M_PI * std::atan(0.5 * (std::exp(n) - std::exp(-n)));
 }
 
 LatLngBounds::LatLngBounds(const TileID& id)
