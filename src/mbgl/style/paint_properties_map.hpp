@@ -8,13 +8,18 @@
 
 #include <mbgl/util/interpolate.hpp>
 
+#include <rapidjson/document.h>
+
 #include <map>
 #include <set>
+#include <functional>
 
 namespace mbgl {
 
 class ClassProperties;
 class PropertyTransition;
+
+using JSVal = rapidjson::Value;
 
 class PaintPropertiesMap {
 public:
@@ -24,6 +29,9 @@ public:
 
     bool hasTransitions() const;
     void removeExpiredTransitions(const TimePoint& now);
+
+    // Call the function for each "paint" or "paint.*" object in the layer.
+    void parseEach(const JSVal& layer, std::function<void (ClassProperties&, const JSVal&)>);
 
     template <typename T>
     void calculate(PropertyKey key, T& target, const StyleCalculationParameters& parameters) {

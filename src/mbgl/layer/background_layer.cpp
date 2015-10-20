@@ -1,6 +1,15 @@
 #include <mbgl/layer/background_layer.hpp>
+#include <mbgl/style/property_parsing.hpp>
 
 namespace mbgl {
+
+void BackgroundLayer::parsePaints(const JSVal& layer) {
+    paints.parseEach(layer, [&] (ClassProperties& paint, const JSVal& value) {
+        parseProperty<Function<float>>("background-opacity", PropertyKey::BackgroundOpacity, paint, value);
+        parseProperty<Function<Color>>("background-color", PropertyKey::BackgroundColor, paint, value);
+        parseProperty<PiecewiseConstantFunction<Faded<std::string>>>("background-pattern", PropertyKey::BackgroundImage, paint, value, "background-pattern-transition");
+    });
+}
 
 void BackgroundLayer::recalculate(const StyleCalculationParameters& parameters) {
     paints.removeExpiredTransitions(parameters.now);

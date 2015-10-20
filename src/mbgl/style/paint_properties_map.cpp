@@ -5,6 +5,18 @@
 
 namespace mbgl {
 
+void PaintPropertiesMap::parseEach(const JSVal& layer, std::function<void (ClassProperties &, const JSVal &)> parsePaint) {
+    rapidjson::Value::ConstMemberIterator itr = layer.MemberBegin();
+    for (; itr != layer.MemberEnd(); ++itr) {
+        const std::string name { itr->name.GetString(), itr->name.GetStringLength() };
+        if (name == "paint") {
+            parsePaint(paints[ClassID::Default], itr->value);
+        } else if (name.compare(0, 6, "paint.") == 0 && name.length() > 6) {
+            parsePaint(paints[ClassDictionary::Get().lookup(name.substr(6))], itr->value);
+        }
+    }
+}
+
 void PaintPropertiesMap::cascade(const std::vector<std::string>& classes,
                                  const TimePoint& now,
                                  const PropertyTransition& defaultTransition) {
