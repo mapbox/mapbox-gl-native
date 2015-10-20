@@ -481,7 +481,7 @@ void JNICALL nativeRenderSync(JNIEnv *env, jobject obj, jlong nativeMapViewPtr) 
     mbgl::Log::Debug(mbgl::Event::JNI, "nativeRenderSync");
     assert(nativeMapViewPtr != 0);
     NativeMapView *nativeMapView = reinterpret_cast<NativeMapView *>(nativeMapViewPtr);
-    nativeMapView->renderSync();
+    nativeMapView->getMap().renderSync();
 }
 
 void JNICALL nativeViewResize(JNIEnv *env, jobject obj, jlong nativeMapViewPtr, jint width, jint height) {

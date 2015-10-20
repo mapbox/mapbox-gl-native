@@ -131,11 +131,21 @@ std::array<uint16_t, 2> NativeMapView::getFramebufferSize() const {
 
 void NativeMapView::activate() {
     mbgl::Log::Debug(mbgl::Event::Android, "NativeMapView::activate");
+
+    assert(vm != nullptr);
+
+    renderDetach = attach_jni_thread(vm, &renderEnv, "Map Thread");
+
     if ((display != EGL_NO_DISPLAY) && (surface != EGL_NO_SURFACE) && (context != EGL_NO_CONTEXT)) {
         if (!eglMakeCurrent(display, surface, surface, context)) {
             mbgl::Log::Error(mbgl::Event::OpenGL, "eglMakeCurrent() returned error %d",
                              eglGetError());
             throw new std::runtime_error("eglMakeCurrent() failed");
+        }
+
+        if (!eglSwapInterval(display, 0)) {
+            mbgl::Log::Error(mbgl::Event::OpenGL, "eglSwapInterval() returned error %d", eglGetError());
+            throw new std::runtime_error("eglSwapInterval() failed");
         }
     } else {
         mbgl::Log::Info(mbgl::Event::Android, "Not activating as we are not ready");
@@ -144,6 +154,9 @@ void NativeMapView::activate() {
 
 void NativeMapView::deactivate() {
     mbgl::Log::Debug(mbgl::Event::Android, "NativeMapView::deactivate");
+
+    assert(vm != nullptr);
+
     if (display != EGL_NO_DISPLAY) {
         if (!eglMakeCurrent(display, EGL_NO_SURFACE, EGL_NO_SURFACE, EGL_NO_CONTEXT)) {
             mbgl::Log::Error(mbgl::Event::OpenGL, "eglMakeCurrent(EGL_NO_CONTEXT) returned error %d",
@@ -153,6 +166,8 @@ void NativeMapView::deactivate() {
     } else {
         mbgl::Log::Info(mbgl::Event::Android, "Not deactivating as we are not ready");
     }
+
+    detach_jni_thread(vm, &renderEnv, renderDetach);
 }
 
 void NativeMapView::invalidate() {
@@ -173,11 +188,15 @@ void NativeMapView::invalidate() {
 }
 
 void NativeMapView::beforeRender() {
+    mbgl::Log::Debug(mbgl::Event::Android, "NativeMapView::beforeRender()");
     // no-op
 }
 
 void NativeMapView::afterRender() {
-    mbgl::Log::Debug(mbgl::Event::Android, "NativeMapView::afterRender");
+    mbgl::Log::Debug(mbgl::Event::Android, "NativeMapView::afterRender()");
+
+    assert(vm != nullptr);
+    assert(obj != nullptr);
 
     if ((display != EGL_NO_DISPLAY) && (surface != EGL_NO_SURFACE)) {
         if (!eglSwapBuffers(display, surface)) {
@@ -185,6 +204,7 @@ void NativeMapView::afterRender() {
                              eglGetError());
             throw new std::runtime_error("eglSwapBuffers() failed");
         }
+
         updateFps();
     } else {
         mbgl::Log::Info(mbgl::Event::Android, "Not swapping as we are not ready");
@@ -707,17 +727,6 @@ void NativeMapView::updateFps() {
     }
 
     detach_jni_thread(vm, &env, detach);
-}
-
-void NativeMapView::renderSync() {
-    mbgl::Log::Debug(mbgl::Event::Android, "NativeMapView::renderSync()");
-
-    if (map->isPaused()) {
-        mbgl::Log::Debug(mbgl::Event::Android, "Not rendering as map is paused");
-        return;
-    }
-
-    map->renderSync();
 }
 
 void NativeMapView::resizeView(int w, int h) {
