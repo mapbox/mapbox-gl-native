@@ -50,8 +50,6 @@ public:
     void enableFps(bool enable);
     void updateFps();
 
-    void renderSync();
-
     void resizeView(int width, int height);
     void resizeFramebuffer(int width, int height);
 
@@ -88,6 +86,9 @@ private:
 
     int availableProcessors = 0;
     size_t totalMemory = 0;
+
+    jboolean renderDetach = false;
+    JNIEnv *renderEnv = nullptr;
 
     // Ensure these are initialised last
     std::shared_ptr<mbgl::SQLiteCache> fileCache;

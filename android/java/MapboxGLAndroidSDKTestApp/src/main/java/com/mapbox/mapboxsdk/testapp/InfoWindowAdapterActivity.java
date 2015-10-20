@@ -2,6 +2,7 @@ package com.mapbox.mapboxsdk.testapp;
 
 import android.graphics.Color;
 import android.os.Bundle;
+import android.support.annotation.NonNull;
 import android.support.v7.app.ActionBar;
 import android.support.v7.app.AppCompatActivity;
 import android.support.v7.widget.Toolbar;
@@ -42,7 +43,7 @@ public class InfoWindowAdapterActivity extends AppCompatActivity {
             private int tenDp = (int) getResources().getDimension(R.dimen.attr_margin);
 
             @Override
-            public View getInfoWindow(Marker marker) {
+            public View getInfoWindow(@NonNull Marker marker) {
                 TextView textView = new TextView(InfoWindowAdapterActivity.this);
                 textView.setText(marker.getTitle());
                 textView.setTextColor(Color.WHITE);

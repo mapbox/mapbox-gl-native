@@ -7,6 +7,8 @@ import android.graphics.Color;
 import android.location.Location;
 import android.os.Bundle;
 import android.support.annotation.NonNull;
+import android.support.annotation.Nullable;
+import android.support.design.widget.CoordinatorLayout;
 import android.support.design.widget.FloatingActionButton;
 import android.support.design.widget.NavigationView;
 import android.support.design.widget.Snackbar;
@@ -63,6 +65,7 @@ public class MainActivity extends AppCompatActivity {
     private TextView mFpsTextView;
     private int mSelectedStyle = R.id.actionStyleMapboxStreets;
     private NavigationView mNavigationView;
+    private CoordinatorLayout mCoordinatorLayout;
 
     // Used for GPS
     private FloatingActionButton mLocationFAB;
@@ -102,6 +105,8 @@ public class MainActivity extends AppCompatActivity {
             setupDrawerContent(mNavigationView);
         }
 
+        mCoordinatorLayout = (CoordinatorLayout) findViewById(R.id.coordinator_layout);
+
         mMapView = (MapView) findViewById(R.id.mainMapView);
         mMapView.setAccessToken(ApiAccess.getToken(this));
         mMapView.onCreate(savedInstanceState);
@@ -110,7 +115,7 @@ public class MainActivity extends AppCompatActivity {
 
         mMapView.setOnMapLongClickListener(new MapView.OnMapLongClickListener() {
             @Override
-            public void onMapLongClick(LatLng point) {
+            public void onMapLongClick(@NonNull LatLng point) {
                 mMapView.addMarker(new MarkerOptions()
                         .position(point)
                         .title("Dropped Pin")
@@ -122,18 +127,38 @@ public class MainActivity extends AppCompatActivity {
 
         mMapView.setOnMapClickListener(new MapView.OnMapClickListener() {
             @Override
-            public void onMapClick(LatLng point) {
+            public void onMapClick(@NonNull LatLng point) {
                 String location = latLngFormatter.format(point.getLatitude()) + ", " +
                         latLngFormatter.format(point.getLongitude());
-                Snackbar.make(findViewById(android.R.id.content), "Map Click Listener " + location, Snackbar.LENGTH_SHORT).show();
+                Snackbar.make(mCoordinatorLayout, "Map Click Listener " + location, Snackbar.LENGTH_SHORT).show();
             }
         });
 
         mMapView.setOnMarkerClickListener(new MapView.OnMarkerClickListener() {
             @Override
-            public boolean onMarkerClick(Marker marker) {
-                Snackbar.make(findViewById(android.R.id.content), "Custom Marker Click Listener", Snackbar.LENGTH_SHORT).show();
+            public boolean onMarkerClick(@NonNull Marker marker) {
+                Snackbar.make(mCoordinatorLayout, "Custom Marker Click Listener", Snackbar.LENGTH_SHORT).show();
                 return false;
+            }
+        });
+
+        mMapView.setOnMyLocationChangeListener(new MapView.OnMyLocationChangeListener() {
+            @Override
+            public void onMyLocationChange(@Nullable Location location) {
+                String desc = "Loc Chg: ";
+                boolean noInfo = true;
+                if (location.hasSpeed()) {
+                    desc += String.format("Spd = %.1f km/h ", location.getSpeed() * 3.6f);
+                    noInfo = false;
+                }
+                if (location.hasAltitude()) {
+                    desc += String.format("Alt = %.0f m ", location.getAltitude());
+                    noInfo = false;
+                }
+                if (noInfo) {
+                    desc += "No extra info";
+                }
+                Snackbar.make(mCoordinatorLayout, desc, Snackbar.LENGTH_SHORT).show();
             }
         });
 
@@ -149,7 +174,7 @@ public class MainActivity extends AppCompatActivity {
                 if (mMapView.isMyLocationEnabled()) {
                     Location location = mMapView.getMyLocation();
                     if (location != null) {
-                        mMapView.setZoomLevel(8);
+                        mMapView.setZoomLevel(18);
                         mMapView.setCenterCoordinate(new LatLng(location));
                     }
                 }

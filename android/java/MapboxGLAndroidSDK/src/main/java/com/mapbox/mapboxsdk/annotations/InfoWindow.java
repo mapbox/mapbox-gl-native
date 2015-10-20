@@ -13,13 +13,15 @@ import com.mapbox.mapboxsdk.R;
 import com.mapbox.mapboxsdk.geometry.LatLng;
 import com.mapbox.mapboxsdk.views.MapView;
 
+import java.lang.ref.WeakReference;
+
 /**
  * A tooltip view
  */
 final class InfoWindow {
 
-    private Marker boundMarker;
-    private MapView mMapView;
+    private WeakReference<Marker> mBoundMarker;
+    private WeakReference<MapView> mMapView;
     private boolean mIsVisible;
     protected View mView;
 
@@ -29,7 +31,7 @@ final class InfoWindow {
     static int mImageId = 0;
 
     public InfoWindow(int layoutResId, MapView mapView) {
-        mMapView = mapView;
+        mMapView = new WeakReference<MapView>(mapView);
         mIsVisible = false;
         mView = LayoutInflater.from(mapView.getContext()).inflate(layoutResId, mapView, false);
 
@@ -50,7 +52,7 @@ final class InfoWindow {
     }
 
     public InfoWindow(View view, MapView mapView) {
-        mMapView = mapView;
+        mMapView = new WeakReference<MapView>(mapView);
         mIsVisible = false;
         mView = view;
 
@@ -80,7 +82,7 @@ final class InfoWindow {
         mView.measure(View.MeasureSpec.UNSPECIFIED, View.MeasureSpec.UNSPECIFIED);
 
         // Calculate default Android x,y coordinate
-        PointF coords = mMapView.toScreenLocation(position);
+        PointF coords = mMapView.get().toScreenLocation(position);
         float x = coords.x - (mView.getMeasuredWidth() / 2) + offsetX;
         float y = coords.y - mView.getMeasuredHeight() + offsetY;
 
@@ -89,25 +91,25 @@ final class InfoWindow {
         float left = x;
 
         // get right/left map view
-        float mapRight = mMapView.getRight();
-        float mapLeft = mMapView.getLeft();
+        float mapRight = mMapView.get().getRight();
+        float mapLeft = mMapView.get().getLeft();
 
         if (mView instanceof InfoWindowView) {
             // only apply repositioning/margin for InfoWindowView
-            Resources resources = mMapView.getContext().getResources();
+            Resources resources = mMapView.get().getContext().getResources();
             float margin = resources.getDimension(R.dimen.infowindow_margin);
             float tipViewOffset = resources.getDimension(R.dimen.infowindow_tipview_width) / 2;
             float tipViewMarginLeft = mView.getMeasuredWidth() / 2 - tipViewOffset;
 
             // fit screen on right
-            if (right > mMapView.getRight()) {
+            if (right > mMapView.get().getRight()) {
                 x -= right - mapRight;
                 tipViewMarginLeft += right - mapRight + tipViewOffset;
                 right = x + mView.getMeasuredWidth();
             }
 
             // fit screen left
-            if (left < mMapView.getLeft()) {
+            if (left < mMapView.get().getLeft()) {
                 x += mapLeft - left;
                 tipViewMarginLeft -= mapLeft - left + tipViewOffset;
                 left = x;
@@ -136,7 +138,7 @@ final class InfoWindow {
         mView.setY(y);
 
         close(); //if it was already opened
-        mMapView.addView(mView, lp);
+        mMapView.get().addView(mView, lp);
         mIsVisible = true;
         return this;
     }
@@ -172,7 +174,7 @@ final class InfoWindow {
      * @return the mapView
      */
     public MapView getMapView() {
-        return mMapView;
+        return mMapView.get();
     }
 
     /**
@@ -204,13 +206,16 @@ final class InfoWindow {
         //by default, do nothing
     }
 
-    public InfoWindow setBoundMarker(Marker aBoundMarker) {
-        this.boundMarker = aBoundMarker;
+    public InfoWindow setBoundMarker(Marker boundMarker) {
+        mBoundMarker = new WeakReference<Marker>(boundMarker);
         return this;
     }
 
     public Marker getBoundMarker() {
-        return boundMarker;
+        if (mBoundMarker == null) {
+            return null;
+        }
+        return mBoundMarker.get();
     }
 
     /**

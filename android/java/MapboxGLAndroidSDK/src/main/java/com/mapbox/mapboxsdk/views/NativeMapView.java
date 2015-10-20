@@ -10,6 +10,8 @@ import com.mapbox.mapboxsdk.geometry.BoundingBox;
 import com.mapbox.mapboxsdk.geometry.LatLng;
 import com.mapbox.mapboxsdk.geometry.LatLngZoom;
 import com.mapbox.mapboxsdk.geometry.ProjectedMeters;
+
+import java.lang.ref.WeakReference;
 import java.util.List;
 
 // Class that wraps the native methods for convenience
@@ -23,11 +25,13 @@ final class NativeMapView {
     // Instance members
     //
 
+    boolean mDestroyed = false;
+
     // Holds the pointer to JNI NativeMapView
     private long mNativeMapViewPtr = 0;
 
     // Used for callbacks
-    private MapView mMapView;
+    private WeakReference<MapView> mMapView;
 
     //
     // Static methods
@@ -50,7 +54,7 @@ final class NativeMapView {
             throw new IllegalArgumentException("totalMemory cannot be negative.");
         }
 
-        mMapView = mapView;
+        mMapView = new WeakReference<>(mapView);
 
         // Create the NativeMapView
         mNativeMapViewPtr = nativeCreate(cachePath, dataPath, apkPath, pixelRatio, availableProcessors, totalMemory);
@@ -59,6 +63,17 @@ final class NativeMapView {
     //
     // Methods
     //
+
+    public void destroy() {
+        nativeDestroy(mNativeMapViewPtr);
+        mNativeMapViewPtr = 0;
+        mMapView = null;
+        mDestroyed = true;
+    }
+
+    public boolean wasDestroyed() {
+        return mDestroyed;
+    }
 
     public void initializeDisplay() {
         nativeInitializeDisplay(mNativeMapViewPtr);
@@ -434,27 +449,20 @@ final class NativeMapView {
     //
 
     protected void onInvalidate() {
-        mMapView.onInvalidate();
+        mMapView.get().onInvalidate();
     }
 
     protected void onMapChanged(int rawChange) {
-        mMapView.onMapChanged(rawChange);
+        mMapView.get().onMapChanged(rawChange);
     }
 
     protected void onFpsChanged(double fps) {
-        mMapView.onFpsChanged(fps);
+        mMapView.get().onFpsChanged(fps);
     }
 
     //
     // JNI methods
     //
-
-    @Override
-    protected void finalize() throws Throwable {
-        nativeDestroy(mNativeMapViewPtr);
-        mNativeMapViewPtr = 0;
-        super.finalize();
-    }
 
     private native long nativeCreate(String cachePath, String dataPath, String apkPath, float pixelRatio, int availableProcessors, long totalMemory);
 
