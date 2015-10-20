@@ -1,5 +1,6 @@
 #include <mbgl/layer/raster_layer.hpp>
 #include <mbgl/style/property_parsing.hpp>
+#include <mbgl/renderer/bucket.hpp>
 
 namespace mbgl {
 
@@ -33,6 +34,10 @@ void RasterLayer::recalculate(const StyleCalculationParameters& parameters) {
     paints.calculateTransitioned(PropertyKey::RasterFade, properties.fade, parameters);
 
     passes = properties.isVisible() ? RenderPass::Translucent : RenderPass::None;
+}
+
+std::unique_ptr<Bucket> RasterLayer::createBucket(StyleBucketParameters&) const {
+    return nullptr;
 }
 
 }

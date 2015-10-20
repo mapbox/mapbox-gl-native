@@ -21,4 +21,8 @@ void BackgroundLayer::recalculate(const StyleCalculationParameters& parameters) 
     passes = properties.isVisible() ? RenderPass::Translucent : RenderPass::None;
 }
 
+std::unique_ptr<Bucket> BackgroundLayer::createBucket(StyleBucketParameters&) const {
+    return nullptr;
+}
+
 }

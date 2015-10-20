@@ -1,5 +1,7 @@
 #include <mbgl/layer/circle_layer.hpp>
 #include <mbgl/style/property_parsing.hpp>
+#include <mbgl/style/style_bucket_parameters.hpp>
+#include <mbgl/renderer/circle_bucket.hpp>
 
 namespace mbgl {
 
@@ -25,6 +27,16 @@ void CircleLayer::recalculate(const StyleCalculationParameters& parameters) {
     paints.calculateTransitioned(PropertyKey::CircleBlur, properties.blur, parameters);
 
     passes = properties.isVisible() ? RenderPass::Translucent : RenderPass::None;
+}
+
+std::unique_ptr<Bucket> CircleLayer::createBucket(StyleBucketParameters& parameters) const {
+    auto bucket = std::make_unique<CircleBucket>();
+
+    parameters.eachFilteredFeature(filter, [&] (const auto& feature) {
+        bucket->addGeometry(feature.getGeometries());
+    });
+
+    return std::move(bucket);
 }
 
 }
