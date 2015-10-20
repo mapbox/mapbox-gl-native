@@ -27,6 +27,10 @@ std::unique_ptr<StyleLayer> StyleLayer::create(StyleLayerType type) {
     }
 }
 
+const std::string& StyleLayer::bucketName() const {
+    return ref.empty() ? id : ref;
+}
+
 void StyleLayer::cascade(const std::vector<std::string>& classes,
                          const TimePoint& now,
                          const PropertyTransition& defaultTransition) {

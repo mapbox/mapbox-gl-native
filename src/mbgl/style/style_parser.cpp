@@ -187,7 +187,13 @@ void StyleParser::parseLayer(const std::string& id, const JSVal& value, util::pt
         layer = StyleLayer::create(reference->type);
         layer->id = id;
         layer->type = reference->type;
-        layer->bucket = reference->bucket;
+        layer->source = reference->source;
+        layer->sourceLayer = reference->sourceLayer;
+        layer->filter = reference->filter;
+        layer->minZoom = reference->minZoom;
+        layer->maxZoom = reference->maxZoom;
+        layer->visibility = reference->visibility;
+        layer->layout = reference->layout;
 
     } else {
         // Otherwise, parse the source/source-layer/filter/render keys to form the bucket.
@@ -213,18 +219,14 @@ void StyleParser::parseLayer(const std::string& id, const JSVal& value, util::pt
 
         layer->id = id;
         layer->type = typeClass;
-        layer->bucket = std::make_shared<StyleBucket>(layer->type);
-
-        // We name the buckets according to the layer that defined it.
-        layer->bucket->name = layer->id;
 
         if (value.HasMember("source")) {
             const JSVal& value_source = value["source"];
             if (value_source.IsString()) {
-                layer->bucket->source = { value_source.GetString(), value_source.GetStringLength() };
-                auto source_it = sourcesMap.find(layer->bucket->source);
+                layer->source = { value_source.GetString(), value_source.GetStringLength() };
+                auto source_it = sourcesMap.find(layer->source);
                 if (source_it == sourcesMap.end()) {
-                    Log::Warning(Event::ParseStyle, "can't find source '%s' required for layer '%s'", layer->bucket->source.c_str(), layer->id.c_str());
+                    Log::Warning(Event::ParseStyle, "can't find source '%s' required for layer '%s'", layer->source.c_str(), layer->id.c_str());
                 }
             } else {
                 Log::Warning(Event::ParseStyle, "source of layer '%s' must be a string", layer->id.c_str());
@@ -234,20 +236,20 @@ void StyleParser::parseLayer(const std::string& id, const JSVal& value, util::pt
         if (value.HasMember("source-layer")) {
             const JSVal& value_source_layer = value["source-layer"];
             if (value_source_layer.IsString()) {
-                layer->bucket->source_layer = { value_source_layer.GetString(), value_source_layer.GetStringLength() };
+                layer->sourceLayer = { value_source_layer.GetString(), value_source_layer.GetStringLength() };
             } else {
                 Log::Warning(Event::ParseStyle, "source-layer of layer '%s' must be a string", layer->id.c_str());
             }
         }
 
         if (value.HasMember("filter")) {
-            layer->bucket->filter = parseFilterExpression(value["filter"]);
+            layer->filter = parseFilterExpression(value["filter"]);
         }
 
         if (value.HasMember("minzoom")) {
             const JSVal& min_zoom = value["minzoom"];
             if (min_zoom.IsNumber()) {
-                layer->bucket->min_zoom = min_zoom.GetDouble();
+                layer->minZoom = min_zoom.GetDouble();
             } else {
                 Log::Warning(Event::ParseStyle, "minzoom of layer %s must be numeric", layer->id.c_str());
             }
@@ -256,14 +258,14 @@ void StyleParser::parseLayer(const std::string& id, const JSVal& value, util::pt
         if (value.HasMember("maxzoom")) {
             const JSVal& max_zoom = value["maxzoom"];
             if (max_zoom.IsNumber()) {
-                layer->bucket->max_zoom = max_zoom.GetDouble();
+                layer->maxZoom = max_zoom.GetDouble();
             } else {
                 Log::Warning(Event::ParseStyle, "maxzoom of layer %s must be numeric", layer->id.c_str());
             }
         }
 
         if (value.HasMember("layout")) {
-            parseVisibility(*layer->bucket, value["layout"]);
+            parseVisibility(*layer, value["layout"]);
             layer->parseLayout(value["layout"]);
         }
     }
@@ -283,15 +285,15 @@ void StyleParser::parseGlyphURL(const JSVal& value) {
     }
 }
 
-void StyleParser::parseVisibility(StyleBucket& bucket, const JSVal& value) {
+void StyleParser::parseVisibility(StyleLayer& layer, const JSVal& value) {
     if (!value.HasMember("visibility")) {
         return;
     } else if (!value["visibility"].IsString()) {
         Log::Warning(Event::ParseStyle, "value of 'visibility' must be a string");
-        bucket.visibility = VisibilityType::Visible;
+        layer.visibility = VisibilityType::Visible;
         return;
     }
-    bucket.visibility = VisibilityTypeClass({ value["visibility"].GetString(), value["visibility"].GetStringLength() });
+    layer.visibility = VisibilityTypeClass({ value["visibility"].GetString(), value["visibility"].GetStringLength() });
 }
 
 }

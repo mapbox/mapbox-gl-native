@@ -10,7 +10,6 @@
 
 #include <mbgl/style/style.hpp>
 #include <mbgl/style/style_layer.hpp>
-#include <mbgl/style/style_bucket.hpp>
 
 #include <mbgl/layer/background_layer.hpp>
 
@@ -294,7 +293,7 @@ std::vector<RenderItem> Painter::determineRenderOrder(const Style& style) {
 
     for (const auto& layerPtr : style.layers) {
         const auto& layer = *layerPtr;
-        if (layer.bucket->visibility == VisibilityType::None) continue;
+        if (layer.visibility == VisibilityType::None) continue;
         if (layer.type == StyleLayerType::Background) {
             // This layer defines a background color/image.
             auto& props = dynamic_cast<const BackgroundLayer&>(layer).properties;
@@ -313,13 +312,7 @@ std::vector<RenderItem> Painter::determineRenderOrder(const Style& style) {
             continue;
         }
 
-        // This is a singular layer.
-        if (!layer.bucket) {
-            Log::Warning(Event::Render, "layer '%s' is missing bucket", layer.id.c_str());
-            continue;
-        }
-
-        Source* source = style.getSource(layer.bucket->source);
+        Source* source = style.getSource(layer.source);
         if (!source) {
             Log::Warning(Event::Render, "can't find source for layer '%s'", layer.id.c_str());
             continue;
@@ -329,8 +322,8 @@ std::vector<RenderItem> Painter::determineRenderOrder(const Style& style) {
         // This may occur when there /is/ a bucket created for this layer, but the min/max-zoom
         // is set to a fractional value, or value that is larger than the source maxzoom.
         const double zoom = state.getZoom();
-        if (layer.bucket->min_zoom > zoom ||
-            layer.bucket->max_zoom <= zoom) {
+        if (layer.minZoom > zoom ||
+            layer.maxZoom <= zoom) {
             continue;
         }
 

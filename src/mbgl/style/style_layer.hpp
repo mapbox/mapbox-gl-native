@@ -2,6 +2,8 @@
 #define MBGL_STYLE_STYLE_LAYER
 
 #include <mbgl/style/types.hpp>
+#include <mbgl/style/filter_expression.hpp>
+#include <mbgl/style/class_properties.hpp>
 #include <mbgl/style/paint_properties_map.hpp>
 
 #include <mbgl/renderer/render_pass.hpp>
@@ -17,7 +19,6 @@
 
 namespace mbgl {
 
-class StyleBucket;
 class StyleCalculationParameters;
 class PropertyTransition;
 
@@ -31,6 +32,9 @@ public:
 
     virtual void parseLayout(const JSVal& value) = 0;
     virtual void parsePaints(const JSVal& value) = 0;
+
+    // If the layer has a ref, the ref. Otherwise, the id.
+    const std::string& bucketName() const;
 
     // Partially evaluate paint properties based on a set of classes.
     void cascade(const std::vector<std::string>& classNames,
@@ -47,14 +51,16 @@ public:
     bool hasRenderPass(RenderPass) const;
 
 public:
+    StyleLayerType type;
     std::string id;
-    StyleLayerType type = StyleLayerType::Unknown;
-
-    // Bucket information, telling the renderer how to generate the geometries
-    // for this layer (feature property filters, tessellation instructions, ...).
-    util::ptr<StyleBucket> bucket;
-
-    // Contains all paint classes that can be applied to this layer.
+    std::string ref;
+    std::string source;
+    std::string sourceLayer;
+    FilterExpression filter;
+    float minZoom = -std::numeric_limits<float>::infinity();
+    float maxZoom = std::numeric_limits<float>::infinity();
+    VisibilityType visibility = VisibilityType::Visible;
+    ClassProperties layout;
     PaintPropertiesMap paints;
 
 protected:

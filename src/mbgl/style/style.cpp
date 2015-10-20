@@ -6,7 +6,6 @@
 #include <mbgl/annotation/sprite_store.hpp>
 #include <mbgl/style/style_layer.hpp>
 #include <mbgl/style/style_parser.hpp>
-#include <mbgl/style/style_bucket.hpp>
 #include <mbgl/style/property_transition.hpp>
 #include <mbgl/geometry/glyph_atlas.hpp>
 #include <mbgl/geometry/sprite_atlas.hpp>
@@ -144,11 +143,7 @@ void Style::recalculate(float z) {
     for (const auto& layer : layers) {
         layer->recalculate(parameters);
 
-        if (!layer->bucket) {
-            continue;
-        }
-
-        Source* source = getSource(layer->bucket->source);
+        Source* source = getSource(layer->source);
         if (!source) {
             continue;
         }

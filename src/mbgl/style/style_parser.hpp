@@ -5,7 +5,6 @@
 #include <mbgl/util/ptr.hpp>
 
 #include <rapidjson/document.h>
-#include <mbgl/style/style_bucket.hpp>
 
 #include <vector>
 #include <memory>
@@ -46,7 +45,7 @@ private:
     void parseLayer(const std::string& id, const JSVal&, util::ptr<StyleLayer>&);
     void parseSprite(const JSVal&);
     void parseGlyphURL(const JSVal&);
-    void parseVisibility(StyleBucket&, const JSVal& value);
+    void parseVisibility(StyleLayer&, const JSVal& value);
 
     std::uint8_t version;
 
