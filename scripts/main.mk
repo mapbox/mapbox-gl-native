@@ -95,11 +95,11 @@ Xcode/__project__: print-env $(SUBMODULES) config/$(HOST_SLUG).gypi
 NODE_PRE_GYP = $(shell npm bin)/node-pre-gyp
 node/configure:
 	$(QUIET)$(ENV) $(NODE_PRE_GYP) configure --clang -- \
-	$(GYP_FLAGS) -Dlibuv_ldflags= -Dlibuv_static_libs=
+	$(GYP_FLAGS) -Dlibuv_cflags= -Dlibuv_ldflags= -Dlibuv_static_libs=
 
 node/xproj:
 	$(QUIET)$(ENV) $(NODE_PRE_GYP) configure --clang -- \
-	$(GYP_FLAGS) -f xcode -Dlibuv_ldflags= -Dlibuv_static_libs=
+	$(GYP_FLAGS) -f xcode -Dlibuv_cflags= -Dlibuv_ldflags= -Dlibuv_static_libs=
 
 Makefile/node: Makefile/__project__ node/configure
 	@printf "$(TEXT_BOLD)$(COLOR_GREEN)* Building target node...$(FORMAT_END)\n"

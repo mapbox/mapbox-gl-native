@@ -11,6 +11,7 @@
       ],
 
       'include_dirs': [
+        '<(node_root_dir)/include/node',
         "<!(node -e \"require('nan')\")",
       ],
 
