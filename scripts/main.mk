@@ -97,6 +97,10 @@ node/configure:
 	$(QUIET)$(ENV) $(NODE_PRE_GYP) configure --clang -- \
 	$(GYP_FLAGS) -Dlibuv_ldflags= -Dlibuv_static_libs=
 
+node/xproj:
+	$(QUIET)$(ENV) $(NODE_PRE_GYP) configure --clang -- \
+	$(GYP_FLAGS) -f xcode -Dlibuv_ldflags= -Dlibuv_static_libs=
+
 Makefile/node: Makefile/__project__ node/configure
 	@printf "$(TEXT_BOLD)$(COLOR_GREEN)* Building target node...$(FORMAT_END)\n"
 	$(QUIET)$(ENV) $(NODE_PRE_GYP) build --clang -- \
@@ -105,6 +109,16 @@ Makefile/node: Makefile/__project__ node/configure
 Makefile/%: Makefile/__project__
 	@printf "$(TEXT_BOLD)$(COLOR_GREEN)* Building target $*...$(FORMAT_END)\n"
 	$(QUIET)$(ENV) $(MAKE) -C build/$(HOST_SLUG) BUILDTYPE=$(BUILDTYPE) $*
+
+Xcode/node: Xcode/__project__ node/xproj
+	@printf "$(TEXT_BOLD)$(COLOR_GREEN)* Building target node...$(FORMAT_END)\n"
+	$(QUIET)$(ENV) set -o pipefail && xcodebuild \
+		$(XCODEBUILD_ARGS) \
+		-project ./build/binding.xcodeproj \
+		-configuration $(BUILDTYPE) \
+		-target mapbox-gl-native \
+		-jobs $(JOBS) \
+		$(XCPRETTY)
 
 Xcode/%: Xcode/__project__
 	@printf "$(TEXT_BOLD)$(COLOR_GREEN)* Building target $*...$(FORMAT_END)\n"

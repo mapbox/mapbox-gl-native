@@ -10,7 +10,9 @@
         'mbgl.gyp:headless-<(headless_lib)',
       ],
 
-      'include_dirs': [ "<!(node -e \"require('nan')\")" ],
+      'include_dirs': [
+        "<!(node -e \"require('nan')\")",
+      ],
 
       'sources': [
         'platform/node/src/node_mapbox_gl_native.cpp',

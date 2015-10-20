@@ -84,6 +84,9 @@ apackage: android-lib-mips
 .PHONY: node
 node: ; $(RUN) HTTP=none ASSET=none CACHE=none Makefile/node
 
+.PHONY: xnode
+xnode: ; $(RUN) HTTP=none ASSET=none CACHE=none Xcode/node
+
 .PHONY: test
 test: ; $(RUN) Makefile/test
 test-%: ; $(RUN) test-$*
