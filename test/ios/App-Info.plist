@@ -28,6 +28,8 @@
 	<string>pk.eyJ1IjoianVzdGluIiwiYSI6Ik9RX3RRQzAifQ.dmOg_BAp1ywuDZMM7YsXRg</string>
 	<key>MGLMapboxMetricsEnabledSettingShownInApp</key>
 	<true/>
+	<key>MGLMetricsTestServerURL</key>
+	<string>https://cloudfront-staging.tilestream.net</string>
 	<key>NSLocationAlwaysUsageDescription</key>
 	<string>Strictly for testing purposes, promise!</string>
 	<key>UILaunchStoryboardName</key>
