@@ -147,6 +147,10 @@ void Painter::render(const Style& style, TransformState state_, const FrameData&
     state = state_;
     frame = frame_;
 
+    if (data.contextMode == GLContextMode::Shared) {
+        config.restore();
+    }
+
     glyphAtlas = style.glyphAtlas.get();
     spriteAtlas = style.spriteAtlas.get();
     lineAtlas = style.lineAtlas.get();
@@ -243,6 +247,10 @@ void Painter::render(const Style& style, TransformState state_, const FrameData&
 
         MBGL_CHECK_ERROR(glBindTexture(GL_TEXTURE_2D, 0));
         MBGL_CHECK_ERROR(VertexArrayObject::Unbind());
+    }
+
+    if (data.contextMode == GLContextMode::Shared) {
+        config.save();
     }
 }
 
