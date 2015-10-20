@@ -32,6 +32,8 @@ public:
 
     virtual ~Bucket() {}
 
+    virtual bool hasData() const = 0;
+
     inline bool needsUpload() const {
         return !uploaded;
     }

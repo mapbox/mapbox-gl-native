@@ -27,12 +27,13 @@ public:
     Bucket* getBucket(StyleLayer const &layer_desc) override;
 
 private:
+    TexturePool& texturePool;
     const SourceInfo& source;
     Worker& worker;
     RequestHolder req;
 
     RasterLayoutProperties layout;
-    RasterBucket bucket;
+    std::unique_ptr<Bucket> bucket;
 
     std::unique_ptr<WorkRequest> workRequest;
 };

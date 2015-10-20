@@ -14,15 +14,19 @@ void Painter::renderTileDebug(const Tile& tile) {
     assert(tile.data);
     if (data.getDebug()) {
         prepareTile(tile);
-        renderDebugText(tile.data->debugBucket, tile.matrix);
+        renderDebugText(*tile.data, tile.matrix);
         renderDebugFrame(tile.matrix);
     }
 }
 
-void Painter::renderDebugText(DebugBucket& bucket, const mat4 &matrix) {
+void Painter::renderDebugText(TileData& tileData, const mat4 &matrix) {
     MBGL_DEBUG_GROUP("debug text");
 
     config.depthTest = false;
+
+    if (!tileData.debugBucket || tileData.debugBucket->state != tileData.getState()) {
+        tileData.debugBucket = std::make_unique<DebugBucket>(tileData.id, tileData.getState());
+    }
 
     useProgram(plainShader->program);
     plainShader->u_matrix = matrix;
@@ -30,18 +34,18 @@ void Painter::renderDebugText(DebugBucket& bucket, const mat4 &matrix) {
     // Draw white outline
     plainShader->u_color = {{ 1.0f, 1.0f, 1.0f, 1.0f }};
     lineWidth(4.0f * data.pixelRatio);
-    bucket.drawLines(*plainShader);
+    tileData.debugBucket->drawLines(*plainShader);
 
 #ifndef GL_ES_VERSION_2_0
     // Draw line "end caps"
     MBGL_CHECK_ERROR(glPointSize(2));
-    bucket.drawPoints(*plainShader);
+    tileData.debugBucket->drawPoints(*plainShader);
 #endif
 
     // Draw black text.
     plainShader->u_color = {{ 0.0f, 0.0f, 0.0f, 1.0f }};
     lineWidth(2.0f * data.pixelRatio);
-    bucket.drawLines(*plainShader);
+    tileData.debugBucket->drawLines(*plainShader);
 
     config.depthTest = true;
 }

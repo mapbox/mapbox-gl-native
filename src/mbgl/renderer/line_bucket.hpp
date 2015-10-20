@@ -30,7 +30,7 @@ public:
 
     void upload() override;
     void render(Painter&, const StyleLayer&, const TileID&, const mat4&) override;
-    bool hasData() const;
+    bool hasData() const override;
 
     void addGeometry(const GeometryCollection&);
     void addGeometry(const std::vector<Coordinate>& line);

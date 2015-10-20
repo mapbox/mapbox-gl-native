@@ -16,20 +16,16 @@ class Request;
 
 class VectorTileData : public TileData {
 public:
-    VectorTileData(const TileID&,
-                   Style&,
-                   const SourceInfo&,
-                   float angle_,
-                   float pitch_,
-                   bool collisionDebug_);
+    VectorTileData(
+        const TileID&, Style&, const SourceInfo&, float angle_, float pitch_, bool collisionDebug_);
     ~VectorTileData();
 
     Bucket* getBucket(const StyleLayer&) override;
 
-    void request(float pixelRatio,
-                 const std::function<void()>& callback);
+    void request(float pixelRatio, const std::function<void()>& callback);
 
-    bool reparse(std::function<void ()> callback) override;
+    void parse(std::function<void()> callback);
+    bool parsePending(std::function<void()> callback) override;
 
     void redoPlacement(float angle, float pitch, bool collisionDebug) override;
 
@@ -39,7 +35,11 @@ private:
     Worker& worker;
     TileWorker tileWorker;
     std::unique_ptr<WorkRequest> workRequest;
-    bool parsing = false;
+
+    // Contains all the Bucket objects for the tile. Buckets are render
+    // objects and they get added by tile parsing operations.
+    std::unordered_map<std::string, std::unique_ptr<Bucket>> buckets;
+
     const SourceInfo& source;
     RequestHolder req;
     std::shared_ptr<const std::string> data;
@@ -49,9 +49,8 @@ private:
     float currentPitch;
     bool lastCollisionDebug = 0;
     bool currentCollisionDebug = 0;
-    bool redoingPlacement = false;
 };
 
-}
+} // namespace mbgl
 
 #endif

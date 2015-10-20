@@ -17,6 +17,7 @@
 
 #include <memory>
 #include <map>
+#include <set>
 #include <vector>
 
 namespace mbgl {
@@ -69,7 +70,7 @@ public:
 
     void upload() override;
     void render(Painter&, const StyleLayer&, const TileID&, const mat4&) override;
-    bool hasData() const;
+    bool hasData() const override;
     bool hasTextData() const;
     bool hasIconData() const;
     bool hasCollisionBoxData() const;
@@ -85,10 +86,10 @@ public:
     void drawIcons(IconShader& shader);
     void drawCollisionBoxes(CollisionBoxShader& shader);
 
-    bool needsDependencies(const GeometryTileLayer&,
-                           const FilterExpression&,
-                           GlyphStore&,
-                           Sprite&);
+    void parseFeatures(const GeometryTileLayer&,
+                       const FilterExpression&);
+    bool needsDependencies(GlyphStore& glyphStore,
+                           Sprite& sprite);
     void placeFeatures(CollisionTile&) override;
 
 private:
@@ -120,6 +121,7 @@ private:
     const float tileExtent = 4096.0f;
     const float tilePixelRatio;
 
+    std::set<GlyphRange> ranges;
     std::vector<SymbolInstance> symbolInstances;
     std::vector<SymbolFeature> features;
 

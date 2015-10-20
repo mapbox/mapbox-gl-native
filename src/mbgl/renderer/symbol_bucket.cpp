@@ -90,20 +90,16 @@ bool SymbolBucket::hasIconData() const { return renderData && !renderData->icon.
 
 bool SymbolBucket::hasCollisionBoxData() const { return renderData && !renderData->collisionBox.groups.empty(); }
 
-bool SymbolBucket::needsDependencies(const GeometryTileLayer& layer,
-                                     const FilterExpression& filter,
-                                     GlyphStore& glyphStore,
-                                     Sprite& sprite) {
+void SymbolBucket::parseFeatures(const GeometryTileLayer& layer,
+                                 const FilterExpression& filter) {
     const bool has_text = !layout.text.field.empty() && !layout.text.font.empty();
     const bool has_icon = !layout.icon.image.empty();
 
     if (!has_text && !has_icon) {
-        return false;
+        return;
     }
 
     // Determine and load glyph ranges
-    std::set<GlyphRange> ranges;
-
     const GLsizei featureCount = static_cast<GLsizei>(layer.featureCount());
     for (GLsizei i = 0; i < featureCount; i++) {
         auto feature = layer.getFeature(i);
@@ -161,12 +157,15 @@ bool SymbolBucket::needsDependencies(const GeometryTileLayer& layer,
     if (layout.placement == PlacementType::Line) {
         util::mergeLines(features);
     }
+}
 
-    if (!glyphStore.hasGlyphRanges(layout.text.font, ranges)) {
+bool SymbolBucket::needsDependencies(GlyphStore& glyphStore,
+                                     Sprite& sprite) {
+    if (!layout.text.field.empty() && !layout.text.font.empty() && !glyphStore.hasGlyphRanges(layout.text.font, ranges)) {
         return true;
     }
 
-    if (!sprite.isLoaded()) {
+    if (!layout.icon.image.empty() && !sprite.isLoaded()) {
         return true;
     }
 

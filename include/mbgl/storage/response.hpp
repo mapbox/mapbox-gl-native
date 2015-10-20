@@ -2,6 +2,7 @@
 #define MBGL_STORAGE_RESPONSE
 
 #include <string>
+#include <memory>
 
 namespace mbgl {
 

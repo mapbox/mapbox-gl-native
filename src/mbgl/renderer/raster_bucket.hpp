@@ -18,7 +18,7 @@ public:
 
     void upload() override;
     void render(Painter&, const StyleLayer&, const TileID&, const mat4&) override;
-    bool hasData() const;
+    bool hasData() const override;
 
     bool setImage(std::unique_ptr<util::Image> image);
 

@@ -16,7 +16,9 @@ class Worker::Impl {
 public:
     Impl() = default;
 
-    void parseRasterTile(RasterBucket* bucket, const std::shared_ptr<const std::string> data, std::function<void (TileParseResult)> callback) {
+    void parseRasterTile(std::unique_ptr<RasterBucket> bucket,
+                         const std::shared_ptr<const std::string> data,
+                         std::function<void(TileParseResult)> callback) {
         std::unique_ptr<util::Image> image(new util::Image(*data));
         if (!(*image)) {
             callback(TileParseResult("error parsing raster image"));
@@ -26,34 +28,56 @@ public:
             callback(TileParseResult("error setting raster image to bucket"));
         }
 
-        callback(TileParseResult(TileData::State::parsed));
+        TileParseResultBuckets result;
+        result.buckets.emplace_back("raster", std::move(bucket));
+        result.state = TileData::State::parsed;
+
+        callback(std::move(result));
     }
 
-    void parseVectorTile(TileWorker* worker, const std::shared_ptr<const std::string> data, std::function<void (TileParseResult)> callback) {
+    void parseVectorTile(TileWorker* worker,
+                         const std::shared_ptr<const std::string> data,
+                         std::function<void(TileParseResult)> callback) {
         try {
             pbf tilePBF(reinterpret_cast<const unsigned char*>(data->data()), data->size());
-            callback(worker->parse(VectorTile(tilePBF)));
+            callback(worker->parseAllLayers(VectorTile(tilePBF)));
         } catch (const std::exception& ex) {
             callback(TileParseResult(ex.what()));
         }
     }
 
-    void parseLiveTile(TileWorker* worker, const AnnotationTile* tile, std::function<void (TileParseResult)> callback) {
+    void parsePendingVectorTileLayers(TileWorker* worker,
+                                      std::function<void(TileParseResult)> callback) {
         try {
-            callback(worker->parse(*tile));
+            callback(worker->parsePendingLayers());
         } catch (const std::exception& ex) {
             callback(TileParseResult(ex.what()));
         }
     }
 
-    void redoPlacement(TileWorker* worker, float angle, float pitch, bool collisionDebug, std::function<void ()> callback) {
-        worker->redoPlacement(angle, pitch, collisionDebug);
+    void parseLiveTile(TileWorker* worker,
+                       const AnnotationTile* tile,
+                       std::function<void(TileParseResult)> callback) {
+        try {
+            callback(worker->parseAllLayers(*tile));
+        } catch (const std::exception& ex) {
+            callback(TileParseResult(ex.what()));
+        }
+    }
+
+    void redoPlacement(TileWorker* worker,
+                       const std::unordered_map<std::string, std::unique_ptr<Bucket>>* buckets,
+                       float angle,
+                       float pitch,
+                       bool collisionDebug,
+                       std::function<void()> callback) {
+        worker->redoPlacement(buckets, angle, pitch, collisionDebug);
         callback();
     }
 };
 
 Worker::Worker(std::size_t count) {
-    util::ThreadContext context = {"Worker", util::ThreadType::Worker, util::ThreadPriority::Low};
+    util::ThreadContext context = { "Worker", util::ThreadType::Worker, util::ThreadPriority::Low };
     for (std::size_t i = 0; i < count; i++) {
         threads.emplace_back(std::make_unique<util::Thread<Impl>>(context));
     }
@@ -61,24 +85,50 @@ Worker::Worker(std::size_t count) {
 
 Worker::~Worker() = default;
 
-std::unique_ptr<WorkRequest> Worker::parseRasterTile(RasterBucket& bucket, const std::shared_ptr<const std::string> data, std::function<void (TileParseResult)> callback) {
+std::unique_ptr<WorkRequest>
+Worker::parseRasterTile(std::unique_ptr<RasterBucket> bucket,
+                        const std::shared_ptr<const std::string> data,
+                        std::function<void(TileParseResult)> callback) {
     current = (current + 1) % threads.size();
-    return threads[current]->invokeWithCallback(&Worker::Impl::parseRasterTile, callback, &bucket, data);
+    return threads[current]->invokeWithCallback(&Worker::Impl::parseRasterTile, callback, bucket,
+                                                data);
 }
 
-std::unique_ptr<WorkRequest> Worker::parseVectorTile(TileWorker& worker, const std::shared_ptr<const std::string> data, std::function<void (TileParseResult)> callback) {
+std::unique_ptr<WorkRequest>
+Worker::parseVectorTile(TileWorker& worker,
+                        const std::shared_ptr<const std::string> data,
+                        std::function<void(TileParseResult)> callback) {
     current = (current + 1) % threads.size();
-    return threads[current]->invokeWithCallback(&Worker::Impl::parseVectorTile, callback, &worker, data);
+    return threads[current]->invokeWithCallback(&Worker::Impl::parseVectorTile, callback, &worker,
+                                                data);
 }
 
-std::unique_ptr<WorkRequest> Worker::parseLiveTile(TileWorker& worker, const AnnotationTile& tile, std::function<void (TileParseResult)> callback) {
+std::unique_ptr<WorkRequest>
+Worker::parsePendingVectorTileLayers(TileWorker& worker,
+                                     std::function<void(TileParseResult)> callback) {
     current = (current + 1) % threads.size();
-    return threads[current]->invokeWithCallback(&Worker::Impl::parseLiveTile, callback, &worker, &tile);
+    return threads[current]->invokeWithCallback(&Worker::Impl::parsePendingVectorTileLayers,
+                                                callback, &worker);
 }
 
-std::unique_ptr<WorkRequest> Worker::redoPlacement(TileWorker& worker, float angle, float pitch, bool collisionDebug, std::function<void ()> callback) {
+std::unique_ptr<WorkRequest> Worker::parseLiveTile(TileWorker& worker,
+                                                   const AnnotationTile& tile,
+                                                   std::function<void(TileParseResult)> callback) {
     current = (current + 1) % threads.size();
-    return threads[current]->invokeWithCallback(&Worker::Impl::redoPlacement, callback, &worker, angle, pitch, collisionDebug);
+    return threads[current]->invokeWithCallback(&Worker::Impl::parseLiveTile, callback, &worker,
+                                                &tile);
+}
+
+std::unique_ptr<WorkRequest>
+Worker::redoPlacement(TileWorker& worker,
+                      const std::unordered_map<std::string, std::unique_ptr<Bucket>>& buckets,
+                      float angle,
+                      float pitch,
+                      bool collisionDebug,
+                      std::function<void()> callback) {
+    current = (current + 1) % threads.size();
+    return threads[current]->invokeWithCallback(&Worker::Impl::redoPlacement, callback, &worker,
+                                                &buckets, angle, pitch, collisionDebug);
 }
 
 } // end namespace mbgl

@@ -43,11 +43,12 @@ void VectorTileData::request(float pixelRatio, const std::function<void()>& call
 
     FileSource* fs = util::ThreadContext::getFileSource();
     req = fs->request({ Resource::Kind::Tile, url }, util::RunLoop::getLoop(), [url, callback, this](const Response &res) {
-        if (res.stale) {
-            // Only handle fresh responses.
+        // Do not cancel the request here; we want to get notified about tiles that expire.
+
+        if (res.data && data == res.data) {
+            // We got the same data again. Abort early.
             return;
         }
-        req = nullptr;
 
         if (res.status == Response::NotFound) {
             state = State::parsed;
@@ -57,39 +58,80 @@ void VectorTileData::request(float pixelRatio, const std::function<void()>& call
 
         if (res.status != Response::Successful) {
             std::stringstream message;
-            message <<  "Failed to load [" << url << "]: " << res.message;
+            message << "Failed to load [" << url << "]: " << res.message;
             error = message.str();
             state = State::obsolete;
             callback();
             return;
         }
 
-        state = State::loaded;
+        if (state == State::loading) {
+            state = State::loaded;
+        } else if (isReady()) {
+            state = State::partial;
+        }
         data = res.data;
 
-        reparse(callback);
+        parse(callback);
     });
 }
 
-bool VectorTileData::reparse(std::function<void()> callback) {
-    if (parsing || (state != State::loaded && state != State::partial)) {
-        return false;
-    }
-
-    parsing = true;
-
+void VectorTileData::parse(std::function<void ()> callback) {
+    // Kick off a fresh parse of this tile. This happens when the tile is new, or
+    // when tile data changed. Replacing the workdRequest will cancel a pending work
+    // request in case there is one.
+    workRequest.reset();
     workRequest = worker.parseVectorTile(tileWorker, data, [this, callback] (TileParseResult result) {
-        parsing = false;
-
+        workRequest.reset();
         if (state == State::obsolete) {
             return;
         }
 
-        if (result.is<State>()) {
-            state = result.get<State>();
+        if (result.is<TileParseResultBuckets>()) {
+            auto& resultBuckets = result.get<TileParseResultBuckets>();
+            state = resultBuckets.state;
+
+            // Move over all buckets we received in this parse request, potentially overwriting
+            // existing buckets in case we got a refresh parse.
+            for (auto& bucket : resultBuckets.buckets) {
+                buckets[bucket.first] = std::move(bucket.second);
+            }
         } else {
             std::stringstream message;
-            message <<  "Failed to parse [" << std::string(id) << "]: " << result.get<std::string>();
+            message << "Failed to parse [" << std::string(id) << "]: " << result.get<std::string>();
+            error = message.str();
+            state = State::obsolete;
+        }
+
+        callback();
+    });
+}
+
+bool VectorTileData::parsePending(std::function<void()> callback) {
+    if (workRequest) {
+        // There's already parsing or placement going on.
+        return false;
+    }
+
+    workRequest.reset();
+    workRequest = worker.parsePendingVectorTileLayers(tileWorker, [this, callback] (TileParseResult result) {
+        workRequest.reset();
+        if (state == State::obsolete) {
+            return;
+        }
+
+        if (result.is<TileParseResultBuckets>()) {
+            auto& resultBuckets = result.get<TileParseResultBuckets>();
+            state = resultBuckets.state;
+
+            // Move over all buckets we received in this parse request, potentially overwriting
+            // existing buckets in case we got a refresh parse.
+            for (auto& bucket : resultBuckets.buckets) {
+                buckets[bucket.first] = std::move(bucket.second);
+            }
+        } else {
+            std::stringstream message;
+            message << "Failed to parse [" << std::string(id) << "]: " << result.get<std::string>();
             error = message.str();
             state = State::obsolete;
         }
@@ -101,39 +143,46 @@ bool VectorTileData::reparse(std::function<void()> callback) {
 }
 
 Bucket* VectorTileData::getBucket(const StyleLayer& layer) {
-    if (!isReady() || !layer.bucket) {
+    if (!layer.bucket) {
         return nullptr;
     }
 
-    return tileWorker.getBucket(layer);
+    const auto it = buckets.find(layer.bucket->name);
+    if (it == buckets.end()) {
+        return nullptr;
+    }
+
+    assert(it->second);
+    return it->second.get();
 }
 
 void VectorTileData::redoPlacement(float angle, float pitch, bool collisionDebug) {
-    if (angle == currentAngle &&
-        pitch == currentPitch &&
-        collisionDebug == currentCollisionDebug)
+    if (angle == currentAngle && pitch == currentPitch && collisionDebug == currentCollisionDebug)
         return;
 
     lastAngle = angle;
     lastPitch = pitch;
     lastCollisionDebug = collisionDebug;
 
-    if (state != State::parsed || redoingPlacement)
+    if (workRequest) {
+        // Don't start a new placement request when the current one hasn't completed yet, or when
+        // we are parsing buckets.
         return;
+    }
 
-    redoingPlacement = true;
     currentAngle = angle;
     currentPitch = pitch;
     currentCollisionDebug = collisionDebug;
 
-    workRequest = worker.redoPlacement(tileWorker, angle, pitch, collisionDebug, [this] {
+    workRequest.reset();
+    workRequest = worker.redoPlacement(tileWorker, buckets, angle, pitch, collisionDebug, [this] {
+        workRequest.reset();
         for (const auto& layer : tileWorker.layers) {
             auto bucket = getBucket(*layer);
             if (bucket) {
                 bucket->swapRenderData();
             }
         }
-        redoingPlacement = false;
         redoPlacement(lastAngle, lastPitch, lastCollisionDebug);
     });
 }

@@ -38,6 +38,10 @@ public:
     }
 
     ~MockMapContext() {
+        cleanup();
+    }
+
+    void cleanup() {
         style_.reset();
     }
 
@@ -118,6 +122,7 @@ void runTestCase(MockFileSource::Type type,
 
     // Needed because it will make the Map thread
     // join and cease logging after this point.
+    context->invoke(&MockMapContext::cleanup);
     context.reset();
 
     uint32_t match = 0;

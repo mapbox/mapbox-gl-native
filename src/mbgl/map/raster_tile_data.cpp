@@ -11,13 +11,13 @@
 using namespace mbgl;
 
 RasterTileData::RasterTileData(const TileID& id_,
-                               TexturePool &texturePool,
+                               TexturePool &texturePool_,
                                const SourceInfo &source_,
                                Worker& worker_)
     : TileData(id_),
+      texturePool(texturePool_),
       source(source_),
-      worker(worker_),
-      bucket(texturePool, layout) {
+      worker(worker_) {
 }
 
 RasterTileData::~RasterTileData() {
@@ -52,15 +52,24 @@ void RasterTileData::request(float pixelRatio,
             return;
         }
 
-        state = State::loaded;
+        if (state == State::loading) {
+            // Only overwrite the state when we didn't have a previous tile.
+            state = State::loaded;
+        }
 
-        workRequest = worker.parseRasterTile(bucket, res.data, [this, callback] (TileParseResult result) {
+        workRequest = worker.parseRasterTile(std::make_unique<RasterBucket>(texturePool, layout), res.data, [this, callback] (TileParseResult result) {
+            workRequest.reset();
             if (state != State::loaded) {
                 return;
             }
 
-            if (result.is<State>()) {
-                state = result.get<State>();
+            if (result.is<TileParseResultBuckets>()) {
+                auto& buckets = result.get<TileParseResultBuckets>();
+                state = buckets.state;
+                // TODO: Make this less awkward; we're only getting one bucket back.
+                if (!buckets.buckets.empty()) {
+                    bucket = std::move(buckets.buckets.front().second);
+                }
             } else {
                 std::stringstream message;
                 message << "Failed to parse [" << std::string(id) << "]: " << result.get<std::string>();
@@ -74,7 +83,7 @@ void RasterTileData::request(float pixelRatio,
 }
 
 Bucket* RasterTileData::getBucket(StyleLayer const&) {
-    return &bucket;
+    return bucket.get();
 }
 
 void RasterTileData::cancel() {

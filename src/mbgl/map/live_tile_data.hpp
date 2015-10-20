@@ -20,7 +20,7 @@ public:
                  std::function<void ()> callback);
     ~LiveTileData();
 
-    bool reparse(std::function<void ()> callback) override;
+    bool parsePending(std::function<void ()> callback) override;
 
     void cancel() override;
     Bucket* getBucket(const StyleLayer&) override;
@@ -29,8 +29,11 @@ private:
     Worker& worker;
     TileWorker tileWorker;
     std::unique_ptr<WorkRequest> workRequest;
-    bool parsing = false;
     std::unique_ptr<AnnotationTile> tile;
+
+    // Contains all the Bucket objects for the tile. Buckets are render
+    // objects and they get added by tile parsing operations.
+    std::unordered_map<std::string, std::unique_ptr<Bucket>> buckets;
 };
 
 }

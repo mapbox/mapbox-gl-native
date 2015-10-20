@@ -242,7 +242,7 @@ bool Source::handlePartialTile(const TileID& id, Worker&) {
         return true;
     }
 
-    return data->reparse([this]() {
+    return data->parsePending([this]() {
         emitTileLoaded(false);
     });
 }
@@ -364,7 +364,8 @@ bool Source::findLoadedChildren(const TileID& id, int32_t maxCoveringZoom, std::
         const TileData::State state = hasTile(child_id);
         if (TileData::isReadyState(state)) {
             retain.emplace_front(child_id);
-        } else {
+        }
+        if (state != TileData::State::parsed) {
             complete = false;
             if (z < maxCoveringZoom) {
                 // Go further down the hierarchy to find more unloaded children.
@@ -384,16 +385,17 @@ bool Source::findLoadedChildren(const TileID& id, int32_t maxCoveringZoom, std::
  *
  * @return boolean Whether a parent was found.
  */
-bool Source::findLoadedParent(const TileID& id, int32_t minCoveringZoom, std::forward_list<TileID>& retain) {
+void Source::findLoadedParent(const TileID& id, int32_t minCoveringZoom, std::forward_list<TileID>& retain) {
     for (int32_t z = id.z - 1; z >= minCoveringZoom; --z) {
         const TileID parent_id = id.parent(z, info.max_zoom);
         const TileData::State state = hasTile(parent_id);
         if (TileData::isReadyState(state)) {
             retain.emplace_front(parent_id);
-            return true;
+            if (state == TileData::State::parsed) {
+                return;
+            }
         }
     }
-    return false;
 }
 
 bool Source::update(MapData& data,

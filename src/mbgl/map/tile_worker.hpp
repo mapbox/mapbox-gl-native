@@ -12,6 +12,7 @@
 #include <string>
 #include <memory>
 #include <mutex>
+#include <list>
 #include <unordered_map>
 
 namespace mbgl {
@@ -24,9 +25,16 @@ class StyleLayer;
 class StyleBucket;
 class GeometryTileLayer;
 
-using TileParseResult = mapbox::util::variant<
-    TileData::State, // success
-    std::string>;    // error
+// We're using this class to shuttle the resulting buckets from the worker thread to the MapContext
+// thread. This class is movable-only because the vector contains movable-only value elements.
+class TileParseResultBuckets {
+public:
+    TileData::State state = TileData::State::invalid;
+    std::vector<std::pair<std::string, std::unique_ptr<Bucket>>> buckets;
+};
+
+using TileParseResult = mapbox::util::variant<TileParseResultBuckets, // success
+                                              std::string>;           // error
 
 class TileWorker : public util::noncopyable {
 public:
@@ -38,20 +46,24 @@ public:
                std::unique_ptr<CollisionTile>);
     ~TileWorker();
 
-    Bucket* getBucket(const StyleLayer&) const;
-
-    TileParseResult parse(const GeometryTile&);
-    void redoPlacement(float angle, float pitch, bool collisionDebug);
+    TileParseResult parseAllLayers(const GeometryTile&);
+    TileParseResult parsePendingLayers();
+    void redoPlacement(const std::unordered_map<std::string, std::unique_ptr<Bucket>>*,
+                       float angle,
+                       float pitch,
+                       bool collisionDebug);
 
     std::vector<util::ptr<StyleLayer>> layers;
 
 private:
     void parseLayer(const StyleLayer&, const GeometryTile&);
 
-    std::unique_ptr<Bucket> createFillBucket(const GeometryTileLayer&, const StyleBucket&);
-    std::unique_ptr<Bucket> createLineBucket(const GeometryTileLayer&, const StyleBucket&);
-    std::unique_ptr<Bucket> createCircleBucket(const GeometryTileLayer&, const StyleBucket&);
-    std::unique_ptr<Bucket> createSymbolBucket(const GeometryTileLayer&, const StyleBucket&);
+    void createFillBucket(const GeometryTileLayer&, const StyleBucket&);
+    void createLineBucket(const GeometryTileLayer&, const StyleBucket&);
+    void createCircleBucket(const GeometryTileLayer&, const StyleBucket&);
+    void createSymbolBucket(const GeometryTileLayer&, const StyleBucket&);
+
+    void insertBucket(const std::string& name, std::unique_ptr<Bucket>);
 
     template <class Bucket>
     void addBucketGeometries(Bucket&, const GeometryTileLayer&, const FilterExpression&);
@@ -63,19 +75,16 @@ private:
     Style& style;
     const std::atomic<TileData::State>& state;
 
-    bool partialParse = false;
-
     std::unique_ptr<CollisionTile> collisionTile;
 
-    // Contains all the Bucket objects for the tile. Buckets are render
-    // objects and they get added to this map as they get processed.
-    // Tiles partially parsed can get new buckets at any moment but are
-    // also fit for rendering. That said, access to this list needs locking
-    // unless the tile is completely parsed.
-    std::unordered_map<std::string, std::unique_ptr<Bucket>> buckets;
-    mutable std::mutex bucketsMutex;
+    // Contains buckets that we couldn't parse so far due to missing resources.
+    // They will be attempted on subsequent parses.
+    std::list<std::pair<const StyleBucket&, std::unique_ptr<Bucket>>> pending;
+
+    // Temporary holder
+    TileParseResultBuckets result;
 };
 
-}
+} // namespace mbgl
 
 #endif

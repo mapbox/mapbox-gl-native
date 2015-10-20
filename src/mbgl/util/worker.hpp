@@ -31,34 +31,33 @@ public:
 
     using Request = std::unique_ptr<WorkRequest>;
 
-    Request parseRasterTile(
-        RasterBucket&,
-        std::shared_ptr<const std::string> data,
-        std::function<void (TileParseResult)> callback);
+    Request parseRasterTile(std::unique_ptr<RasterBucket> bucket,
+                            std::shared_ptr<const std::string> data,
+                            std::function<void(TileParseResult)> callback);
 
-    Request parseVectorTile(
-        TileWorker&,
-        std::shared_ptr<const std::string> data,
-        std::function<void (TileParseResult)> callback);
+    Request parseVectorTile(TileWorker&,
+                            std::shared_ptr<const std::string> data,
+                            std::function<void(TileParseResult)> callback);
 
-    Request parseLiveTile(
-        TileWorker&,
-        const AnnotationTile&,
-        std::function<void (TileParseResult)> callback);
+    Request parsePendingVectorTileLayers(TileWorker&,
+                                         std::function<void(TileParseResult)> callback);
 
-    Request redoPlacement(
-        TileWorker&,
-        float angle,
-        float pitch,
-        bool collisionDebug,
-        std::function<void ()> callback);
+    Request parseLiveTile(TileWorker&,
+                          const AnnotationTile&,
+                          std::function<void(TileParseResult)> callback);
+
+    Request redoPlacement(TileWorker&,
+                          const std::unordered_map<std::string, std::unique_ptr<Bucket>>&,
+                          float angle,
+                          float pitch,
+                          bool collisionDebug,
+                          std::function<void()> callback);
 
 private:
     class Impl;
     std::vector<std::unique_ptr<util::Thread<Impl>>> threads;
     std::size_t current = 0;
 };
-
 }
 
 #endif
