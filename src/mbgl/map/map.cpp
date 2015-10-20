@@ -14,10 +14,10 @@
 
 namespace mbgl {
 
-Map::Map(View& view_, FileSource& fileSource, MapMode mode)
+Map::Map(View& view_, FileSource& fileSource, MapMode mapMode, GLContextMode contextMode)
     : view(view_),
       transform(std::make_unique<Transform>(view)),
-      data(std::make_unique<MapData>(mode, view.getPixelRatio())),
+      data(std::make_unique<MapData>(mapMode, contextMode, view.getPixelRatio())),
       context(std::make_unique<util::Thread<MapContext>>(util::ThreadContext{"Map", util::ThreadType::Map, util::ThreadPriority::Regular}, view, fileSource, *data))
 {
     view.initialize(this);

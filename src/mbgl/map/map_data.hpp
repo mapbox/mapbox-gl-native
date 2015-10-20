@@ -20,8 +20,9 @@ class MapData {
     using Lock = std::lock_guard<std::mutex>;
 
 public:
-    inline MapData(MapMode mode_, const float pixelRatio_)
+    inline MapData(MapMode mode_, GLContextMode contextMode_, const float pixelRatio_)
         : mode(mode_)
+        , contextMode(contextMode_)
         , pixelRatio(pixelRatio_)
         , animationTime(Duration::zero())
         , defaultFadeDuration(mode_ == MapMode::Continuous ? std::chrono::milliseconds(300) : Duration::zero())
@@ -125,6 +126,7 @@ public:
 
 public:
     const MapMode mode;
+    const GLContextMode contextMode;
     const float pixelRatio;
 
 private:

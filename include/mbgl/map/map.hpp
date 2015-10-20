@@ -44,7 +44,8 @@ class Map : private util::noncopyable {
 
 public:
     explicit Map(View&, FileSource&,
-                 MapMode mode = MapMode::Continuous);
+                 MapMode mapMode = MapMode::Continuous,
+                 GLContextMode contextMode = GLContextMode::Unique);
     ~Map();
 
     // Pauses the render thread. The render thread will stop running but will not be terminated and will not lose state until resumed.

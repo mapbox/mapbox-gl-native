@@ -10,6 +10,11 @@ enum class MapMode : uint8_t {
     Still, // a once-off still image
 };
 
-}
+enum class GLContextMode : uint8_t {
+    Unique,
+    Shared,
+};
 
-#endif
+} // namespace mbgl
+
+#endif // MBGL_MAP_MODE

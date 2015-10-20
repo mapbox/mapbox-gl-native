@@ -39,9 +39,10 @@ TEST_P(StyleParserTest, ParseStyle) {
     Log::setObserver(std::unique_ptr<Log::Observer>(observer));
 
     MapMode mapMode = MapMode::Continuous;
+    GLContextMode contextMode = GLContextMode::Unique;
     const float pixelRatio = 1.0f;
 
-    MapData data(mapMode, pixelRatio);
+    MapData data(mapMode, contextMode, pixelRatio);
     StyleParser parser(data);
     parser.parse(styleDoc);
 
