@@ -798,7 +798,7 @@ void StyleParser::parseLayer(const std::string& id, JSVal value, util::ptr<Style
 
     std::map<ClassID, ClassProperties> paints;
     parsePaints(value, paints);
-    layer->styles = std::move(paints);
+    layer->paints.paints = std::move(paints);
 }
 
 #pragma mark - Parse Styles

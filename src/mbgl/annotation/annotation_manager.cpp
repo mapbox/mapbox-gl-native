@@ -115,7 +115,6 @@ void AnnotationManager::updateStyle(Style& style) {
         std::unique_ptr<SymbolLayer> layer = std::make_unique<SymbolLayer>();
         layer->id = PointLayerID;
         layer->type = StyleLayerType::Symbol;
-        layer->styles.emplace(ClassID::Default, ClassProperties());
 
         layer->bucket = std::make_shared<StyleBucket>(layer->type);
         layer->bucket->name = layer->id;

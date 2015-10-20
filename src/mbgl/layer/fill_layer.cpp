@@ -2,28 +2,28 @@
 
 namespace mbgl {
 
-RenderPass FillLayer::applyStyleProperties(const StyleCalculationParameters& parameters) {
-    applyStyleProperty(PropertyKey::FillAntialias, properties.antialias, parameters);
-    applyTransitionedStyleProperty(PropertyKey::FillOpacity, properties.opacity, parameters);
-    applyTransitionedStyleProperty(PropertyKey::FillColor, properties.fill_color, parameters);
-    applyTransitionedStyleProperty(PropertyKey::FillOutlineColor, properties.stroke_color, parameters);
-    applyTransitionedStyleProperty(PropertyKey::FillTranslate, properties.translate, parameters);
-    applyStyleProperty(PropertyKey::FillTranslateAnchor, properties.translateAnchor, parameters);
-    applyStyleProperty(PropertyKey::FillImage, properties.image, parameters);
+void FillLayer::recalculate(const StyleCalculationParameters& parameters) {
+    paints.removeExpiredTransitions(parameters.now);
 
-    RenderPass result = RenderPass::None;
+    paints.calculate(PropertyKey::FillAntialias, properties.antialias, parameters);
+    paints.calculateTransitioned(PropertyKey::FillOpacity, properties.opacity, parameters);
+    paints.calculateTransitioned(PropertyKey::FillColor, properties.fill_color, parameters);
+    paints.calculateTransitioned(PropertyKey::FillOutlineColor, properties.stroke_color, parameters);
+    paints.calculateTransitioned(PropertyKey::FillTranslate, properties.translate, parameters);
+    paints.calculate(PropertyKey::FillTranslateAnchor, properties.translateAnchor, parameters);
+    paints.calculate(PropertyKey::FillImage, properties.image, parameters);
+
+    passes = RenderPass::None;
 
     if (properties.antialias) {
-        result |= RenderPass::Translucent;
+        passes |= RenderPass::Translucent;
     }
 
     if (!properties.image.from.empty() || (properties.fill_color[3] * properties.opacity) < 1.0f) {
-        result |= RenderPass::Translucent;
+        passes |= RenderPass::Translucent;
     } else {
-        result |= RenderPass::Opaque;
+        passes |= RenderPass::Opaque;
     }
-
-    return result;
 }
 
 }

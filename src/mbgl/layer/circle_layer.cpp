@@ -2,14 +2,17 @@
 
 namespace mbgl {
 
-RenderPass CircleLayer::applyStyleProperties(const StyleCalculationParameters& parameters) {
-    applyTransitionedStyleProperty(PropertyKey::CircleRadius, properties.radius, parameters);
-    applyTransitionedStyleProperty(PropertyKey::CircleColor, properties.color, parameters);
-    applyTransitionedStyleProperty(PropertyKey::CircleOpacity, properties.opacity, parameters);
-    applyTransitionedStyleProperty(PropertyKey::CircleTranslate, properties.translate, parameters);
-    applyStyleProperty(PropertyKey::CircleTranslateAnchor, properties.translateAnchor, parameters);
-    applyTransitionedStyleProperty(PropertyKey::CircleBlur, properties.blur, parameters);
-    return properties.isVisible() ? RenderPass::Translucent : RenderPass::None;
+void CircleLayer::recalculate(const StyleCalculationParameters& parameters) {
+    paints.removeExpiredTransitions(parameters.now);
+
+    paints.calculateTransitioned(PropertyKey::CircleRadius, properties.radius, parameters);
+    paints.calculateTransitioned(PropertyKey::CircleColor, properties.color, parameters);
+    paints.calculateTransitioned(PropertyKey::CircleOpacity, properties.opacity, parameters);
+    paints.calculateTransitioned(PropertyKey::CircleTranslate, properties.translate, parameters);
+    paints.calculate(PropertyKey::CircleTranslateAnchor, properties.translateAnchor, parameters);
+    paints.calculateTransitioned(PropertyKey::CircleBlur, properties.blur, parameters);
+
+    passes = properties.isVisible() ? RenderPass::Translucent : RenderPass::None;
 }
 
 }

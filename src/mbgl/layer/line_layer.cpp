@@ -2,23 +2,25 @@
 
 namespace mbgl {
 
-RenderPass LineLayer::applyStyleProperties(const StyleCalculationParameters& parameters) {
-    applyTransitionedStyleProperty(PropertyKey::LineOpacity, properties.opacity, parameters);
-    applyTransitionedStyleProperty(PropertyKey::LineColor, properties.color, parameters);
-    applyTransitionedStyleProperty(PropertyKey::LineTranslate, properties.translate, parameters);
-    applyStyleProperty(PropertyKey::LineTranslateAnchor, properties.translateAnchor, parameters);
-    applyTransitionedStyleProperty(PropertyKey::LineWidth, properties.width, parameters);
-    applyTransitionedStyleProperty(PropertyKey::LineGapWidth, properties.gap_width, parameters);
-    applyTransitionedStyleProperty(PropertyKey::LineBlur, properties.blur, parameters);
-    applyStyleProperty(PropertyKey::LineDashArray, properties.dash_array, parameters);
-    applyStyleProperty(PropertyKey::LineImage, properties.image, parameters);
+void LineLayer::recalculate(const StyleCalculationParameters& parameters) {
+    paints.removeExpiredTransitions(parameters.now);
+
+    paints.calculateTransitioned(PropertyKey::LineOpacity, properties.opacity, parameters);
+    paints.calculateTransitioned(PropertyKey::LineColor, properties.color, parameters);
+    paints.calculateTransitioned(PropertyKey::LineTranslate, properties.translate, parameters);
+    paints.calculate(PropertyKey::LineTranslateAnchor, properties.translateAnchor, parameters);
+    paints.calculateTransitioned(PropertyKey::LineWidth, properties.width, parameters);
+    paints.calculateTransitioned(PropertyKey::LineGapWidth, properties.gap_width, parameters);
+    paints.calculateTransitioned(PropertyKey::LineBlur, properties.blur, parameters);
+    paints.calculate(PropertyKey::LineDashArray, properties.dash_array, parameters);
+    paints.calculate(PropertyKey::LineImage, properties.image, parameters);
 
     // for scaling dasharrays
     StyleCalculationParameters dashArrayParams = parameters;
     dashArrayParams.z = std::floor(dashArrayParams.z);
-    applyStyleProperty(PropertyKey::LineWidth, properties.dash_line_width, dashArrayParams);
+    paints.calculate(PropertyKey::LineWidth, properties.dash_line_width, dashArrayParams);
 
-    return properties.isVisible() ? RenderPass::Translucent : RenderPass::None;
+    passes = properties.isVisible() ? RenderPass::Translucent : RenderPass::None;
 }
 
 }

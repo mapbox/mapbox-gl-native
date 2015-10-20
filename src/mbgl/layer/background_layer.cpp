@@ -2,11 +2,14 @@
 
 namespace mbgl {
 
-RenderPass BackgroundLayer::applyStyleProperties(const StyleCalculationParameters& parameters) {
-    applyTransitionedStyleProperty(PropertyKey::BackgroundOpacity, properties.opacity, parameters);
-    applyTransitionedStyleProperty(PropertyKey::BackgroundColor, properties.color, parameters);
-    applyStyleProperty(PropertyKey::BackgroundImage, properties.image, parameters);
-    return properties.isVisible() ? RenderPass::Translucent : RenderPass::None;
+void BackgroundLayer::recalculate(const StyleCalculationParameters& parameters) {
+    paints.removeExpiredTransitions(parameters.now);
+
+    paints.calculateTransitioned(PropertyKey::BackgroundOpacity, properties.opacity, parameters);
+    paints.calculateTransitioned(PropertyKey::BackgroundColor, properties.color, parameters);
+    paints.calculate(PropertyKey::BackgroundImage, properties.image, parameters);
+
+    passes = properties.isVisible() ? RenderPass::Translucent : RenderPass::None;
 }
 
 }

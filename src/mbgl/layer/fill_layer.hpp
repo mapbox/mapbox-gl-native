@@ -8,7 +8,7 @@ namespace mbgl {
 
 class FillLayer : public StyleLayer {
 public:
-    RenderPass applyStyleProperties(const StyleCalculationParameters&) override;
+    void recalculate(const StyleCalculationParameters&) override;
 
     FillPaintProperties properties;
 };

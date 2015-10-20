@@ -37,7 +37,7 @@ void ShapeAnnotationImpl::updateStyle(Style& style) {
         paintProperties.set(PropertyKey::LineOpacity, ConstantFunction<float>(properties.opacity));
         paintProperties.set(PropertyKey::LineWidth, ConstantFunction<float>(properties.width));
         paintProperties.set(PropertyKey::LineColor, ConstantFunction<Color>(properties.color));
-        layer->styles.emplace(ClassID::Default, std::move(paintProperties));
+        layer->paints.paints.emplace(ClassID::Default, std::move(paintProperties));
 
     } else if (shape.properties.is<FillPaintProperties>()) {
         layer = createFillLayer();
@@ -47,7 +47,7 @@ void ShapeAnnotationImpl::updateStyle(Style& style) {
         paintProperties.set(PropertyKey::FillOpacity, ConstantFunction<float>(properties.opacity));
         paintProperties.set(PropertyKey::FillColor, ConstantFunction<Color>(properties.fill_color));
         paintProperties.set(PropertyKey::FillOutlineColor, ConstantFunction<Color>(properties.stroke_color));
-        layer->styles.emplace(ClassID::Default, std::move(paintProperties));
+        layer->paints.paints.emplace(ClassID::Default, std::move(paintProperties));
 
     } else {
         beforeLayerID = shape.properties.get<std::string>();
@@ -68,7 +68,7 @@ void ShapeAnnotationImpl::updateStyle(Style& style) {
             return;
         }
 
-        layer->styles = sourceLayer->styles;
+        layer->paints.paints = sourceLayer->paints.paints;
         layer->bucket->layout = sourceLayer->bucket->layout;
     }
 

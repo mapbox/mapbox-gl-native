@@ -121,9 +121,9 @@ void Style::update(const TransformState& transform,
 
 void Style::cascade() {
     for (const auto& layer : layers) {
-        layer->setClasses(data.getClasses(),
-                data.getAnimationTime(),
-                PropertyTransition { data.getDefaultTransitionDuration(), data.getDefaultTransitionDelay() });
+        layer->cascade(data.getClasses(),
+                       data.getAnimationTime(),
+                       PropertyTransition { data.getDefaultTransitionDuration(), data.getDefaultTransitionDelay() });
     }
 }
 
@@ -142,7 +142,8 @@ void Style::recalculate(float z) {
                                           data.getDefaultFadeDuration());
 
     for (const auto& layer : layers) {
-        layer->updateProperties(parameters);
+        layer->recalculate(parameters);
+
         if (!layer->bucket) {
             continue;
         }

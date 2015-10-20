@@ -2,15 +2,18 @@
 
 namespace mbgl {
 
-RenderPass RasterLayer::applyStyleProperties(const StyleCalculationParameters& parameters) {
-    applyTransitionedStyleProperty(PropertyKey::RasterOpacity, properties.opacity, parameters);
-    applyTransitionedStyleProperty(PropertyKey::RasterHueRotate, properties.hue_rotate, parameters);
-    applyTransitionedStyleProperty(PropertyKey::RasterBrightnessLow, properties.brightness[0], parameters);
-    applyTransitionedStyleProperty(PropertyKey::RasterBrightnessHigh, properties.brightness[1], parameters);
-    applyTransitionedStyleProperty(PropertyKey::RasterSaturation, properties.saturation, parameters);
-    applyTransitionedStyleProperty(PropertyKey::RasterContrast, properties.contrast, parameters);
-    applyTransitionedStyleProperty(PropertyKey::RasterFade, properties.fade, parameters);
-    return properties.isVisible() ? RenderPass::Translucent : RenderPass::None;
+void RasterLayer::recalculate(const StyleCalculationParameters& parameters) {
+    paints.removeExpiredTransitions(parameters.now);
+
+    paints.calculateTransitioned(PropertyKey::RasterOpacity, properties.opacity, parameters);
+    paints.calculateTransitioned(PropertyKey::RasterHueRotate, properties.hue_rotate, parameters);
+    paints.calculateTransitioned(PropertyKey::RasterBrightnessLow, properties.brightness[0], parameters);
+    paints.calculateTransitioned(PropertyKey::RasterBrightnessHigh, properties.brightness[1], parameters);
+    paints.calculateTransitioned(PropertyKey::RasterSaturation, properties.saturation, parameters);
+    paints.calculateTransitioned(PropertyKey::RasterContrast, properties.contrast, parameters);
+    paints.calculateTransitioned(PropertyKey::RasterFade, properties.fade, parameters);
+
+    passes = properties.isVisible() ? RenderPass::Translucent : RenderPass::None;
 }
 
 }
