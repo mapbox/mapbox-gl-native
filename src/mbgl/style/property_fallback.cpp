@@ -1,7 +1,5 @@
 #include <mbgl/style/property_fallback.hpp>
 #include <mbgl/style/style_properties.hpp>
-#include <mbgl/style/style_bucket.hpp>
-#include <mbgl/style/style_properties.hpp>
 
 namespace mbgl {
 

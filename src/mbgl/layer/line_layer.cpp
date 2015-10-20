@@ -1,15 +1,14 @@
 #include <mbgl/layer/line_layer.hpp>
-#include <mbgl/style/style_bucket.hpp>
 #include <mbgl/style/property_parsing.hpp>
 #include <mbgl/map/tile_id.hpp>
 
 namespace mbgl {
 
 void LineLayer::parseLayout(const JSVal& value) {
-    parseProperty<Function<CapType>>("line-cap", PropertyKey::LineCap, bucket->layout, value);
-    parseProperty<Function<JoinType>>("line-join", PropertyKey::LineJoin, bucket->layout, value);
-    parseProperty<Function<float>>("line-miter-limit", PropertyKey::LineMiterLimit, bucket->layout, value);
-    parseProperty<Function<float>>("line-round-limit", PropertyKey::LineRoundLimit, bucket->layout, value);
+    parseProperty<Function<CapType>>("line-cap", PropertyKey::LineCap, layout, value);
+    parseProperty<Function<JoinType>>("line-join", PropertyKey::LineJoin, layout, value);
+    parseProperty<Function<float>>("line-miter-limit", PropertyKey::LineMiterLimit, layout, value);
+    parseProperty<Function<float>>("line-round-limit", PropertyKey::LineRoundLimit, layout, value);
 }
 
 void LineLayer::parsePaints(const JSVal& layer) {

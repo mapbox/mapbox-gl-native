@@ -23,7 +23,6 @@ class GeometryTile;
 class Style;
 class Bucket;
 class StyleLayer;
-class StyleBucket;
 class GeometryTileLayer;
 
 // We're using this class to shuttle the resulting buckets from the worker thread to the MapContext
@@ -58,10 +57,10 @@ public:
 private:
     void parseLayer(const StyleLayer&, const GeometryTile&);
 
-    void createFillBucket(const GeometryTileLayer&, const StyleBucket&);
-    void createLineBucket(const GeometryTileLayer&, const StyleBucket&);
-    void createCircleBucket(const GeometryTileLayer&, const StyleBucket&);
-    void createSymbolBucket(const GeometryTileLayer&, const StyleBucket&);
+    void createFillBucket(const GeometryTileLayer&, const StyleLayer&);
+    void createLineBucket(const GeometryTileLayer&, const StyleLayer&);
+    void createCircleBucket(const GeometryTileLayer&, const StyleLayer&);
+    void createSymbolBucket(const GeometryTileLayer&, const StyleLayer&);
 
     void insertBucket(const std::string& name, std::unique_ptr<Bucket>);
 
@@ -79,7 +78,7 @@ private:
 
     // Contains buckets that we couldn't parse so far due to missing resources.
     // They will be attempted on subsequent parses.
-    std::list<std::pair<const StyleBucket&, std::unique_ptr<Bucket>>> pending;
+    std::list<std::pair<const StyleLayer&, std::unique_ptr<Bucket>>> pending;
 
     // Temporary holder
     TileParseResultBuckets result;

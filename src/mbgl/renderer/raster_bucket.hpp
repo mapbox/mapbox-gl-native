@@ -3,7 +3,6 @@
 
 #include <mbgl/renderer/bucket.hpp>
 #include <mbgl/util/raster.hpp>
-#include <mbgl/style/style_bucket.hpp>
 
 namespace mbgl {
 

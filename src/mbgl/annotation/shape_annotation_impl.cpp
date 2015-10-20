@@ -5,7 +5,6 @@
 #include <mbgl/util/constants.hpp>
 #include <mbgl/util/string.hpp>
 #include <mbgl/style/style.hpp>
-#include <mbgl/style/style_bucket.hpp>
 #include <mbgl/layer/line_layer.hpp>
 #include <mbgl/layer/fill_layer.hpp>
 
@@ -69,12 +68,12 @@ void ShapeAnnotationImpl::updateStyle(Style& style) {
         }
 
         layer->paints.paints = sourceLayer->paints.paints;
-        layer->bucket->layout = sourceLayer->bucket->layout;
+        layer->layout = sourceLayer->layout;
     }
 
-    layer->bucket->name = layer->id;
-    layer->bucket->source = AnnotationManager::SourceID;
-    layer->bucket->source_layer = layer->id;
+    layer->id = layerID;
+    layer->source = AnnotationManager::SourceID;
+    layer->sourceLayer = layer->id;
 
     style.addLayer(std::move(layer), beforeLayerID);
 }
@@ -82,19 +81,15 @@ void ShapeAnnotationImpl::updateStyle(Style& style) {
 std::unique_ptr<StyleLayer> ShapeAnnotationImpl::createLineLayer() {
     type = ProjectedFeatureType::LineString;
     std::unique_ptr<LineLayer> layer = std::make_unique<LineLayer>();
-    layer->id = layerID;
     layer->type = StyleLayerType::Line;
-    layer->bucket = std::make_shared<StyleBucket>(layer->type);
-    layer->bucket->layout.set(PropertyKey::LineJoin, ConstantFunction<JoinType>(JoinType::Round));
+    layer->layout.set(PropertyKey::LineJoin, ConstantFunction<JoinType>(JoinType::Round));
     return std::move(layer);
 }
 
 std::unique_ptr<StyleLayer> ShapeAnnotationImpl::createFillLayer() {
     type = ProjectedFeatureType::Polygon;
     std::unique_ptr<FillLayer> layer = std::make_unique<FillLayer>();
-    layer->id = layerID;
     layer->type = StyleLayerType::Fill;
-    layer->bucket = std::make_shared<StyleBucket>(layer->type);
     return std::move(layer);
 }
 

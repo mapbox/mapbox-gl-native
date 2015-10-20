@@ -6,7 +6,6 @@
 #include <mbgl/geometry/vao.hpp>
 #include <mbgl/geometry/elements_buffer.hpp>
 #include <mbgl/geometry/line_buffer.hpp>
-#include <mbgl/style/style_bucket.hpp>
 #include <mbgl/style/style_properties.hpp>
 #include <mbgl/util/vec.hpp>
 
