@@ -43,6 +43,7 @@
 using namespace mbgl;
 
 Painter::Painter(MapData& data_) : data(data_) {
+    setup();
 }
 
 Painter::~Painter() {

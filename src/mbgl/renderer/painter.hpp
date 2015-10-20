@@ -79,8 +79,6 @@ public:
     Painter(MapData& data);
     ~Painter();
 
-    void setup();
-
     // Renders the backdrop of the OpenGL view. This also paints in areas where we don't have any
     // tiles whatsoever.
     void clear();
@@ -132,6 +130,7 @@ public:
     bool needsAnimation() const;
 
 private:
+    void setup();
     void setupShaders();
     mat4 translatedMatrix(const mat4& matrix, const std::array<float, 2> &translation, const TileID &id, TranslateAnchorType anchor);
 
