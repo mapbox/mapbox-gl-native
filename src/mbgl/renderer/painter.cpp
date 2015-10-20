@@ -113,10 +113,6 @@ void Painter::resize() {
     }
 }
 
-void Painter::setDebug(bool enabled) {
-    debug = enabled;
-}
-
 void Painter::useProgram(GLuint program) {
     if (gl_program != program) {
         MBGL_CHECK_ERROR(glUseProgram(program));

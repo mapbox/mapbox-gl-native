@@ -12,7 +12,7 @@ using namespace mbgl;
 void Painter::renderTileDebug(const Tile& tile) {
     MBGL_DEBUG_GROUP(std::string { "debug " } + std::string(tile.id));
     assert(tile.data);
-    if (debug) {
+    if (data.getDebug()) {
         prepareTile(tile);
         renderDebugText(tile.data->debugBucket, tile.matrix);
         renderDebugFrame(tile.matrix);

@@ -248,7 +248,6 @@ bool MapContext::renderSync(const TransformState& state, const FrameData& frame)
         painter->setup();
     }
 
-    painter->setDebug(data.getDebug());
     painter->render(*style, transformState, frame, data.getAnimationTime());
 
     if (data.mode == MapMode::Still) {

@@ -120,9 +120,6 @@ public:
     // Adjusts the dimensions of the OpenGL viewport
     void resize();
 
-    // Changes whether debug information is drawn onto the map
-    void setDebug(bool enabled);
-
     void drawClippingMasks(const std::set<Source*>&);
     void drawClippingMask(const mat4& matrix, const ClipID& clip);
 
@@ -189,7 +186,6 @@ private:
     TransformState state;
     FrameData frame;
 
-    bool debug = false;
     int indent = 0;
 
     gl::Config config;
