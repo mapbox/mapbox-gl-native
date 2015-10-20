@@ -6,8 +6,6 @@
 #include <mbgl/map/tile_data.hpp>
 #include <mbgl/util/noncopyable.hpp>
 #include <mbgl/util/ptr.hpp>
-#include <mbgl/style/filter_expression.hpp>
-#include <mbgl/style/style_calculation_parameters.hpp>
 #include <mbgl/text/placement_config.hpp>
 
 #include <string>
@@ -23,7 +21,6 @@ class GeometryTile;
 class Style;
 class Bucket;
 class StyleLayer;
-class GeometryTileLayer;
 
 // We're using this class to shuttle the resulting buckets from the worker thread to the MapContext
 // thread. This class is movable-only because the vector contains movable-only value elements.
@@ -56,23 +53,15 @@ public:
 
 private:
     void parseLayer(const StyleLayer&, const GeometryTile&);
-
-    void createFillBucket(const GeometryTileLayer&, const StyleLayer&);
-    void createLineBucket(const GeometryTileLayer&, const StyleLayer&);
-    void createCircleBucket(const GeometryTileLayer&, const StyleLayer&);
-    void createSymbolBucket(const GeometryTileLayer&, const StyleLayer&);
-
     void insertBucket(const std::string& name, std::unique_ptr<Bucket>);
-
-    template <class Bucket>
-    void addBucketGeometries(Bucket&, const GeometryTileLayer&, const FilterExpression&);
 
     const TileID id;
     const std::string sourceID;
-    const StyleCalculationParameters parameters;
 
     Style& style;
     const std::atomic<TileData::State>& state;
+
+    bool partialParse = false;
 
     std::unique_ptr<CollisionTile> collisionTile;
 

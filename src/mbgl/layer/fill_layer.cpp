@@ -1,5 +1,7 @@
 #include <mbgl/layer/fill_layer.hpp>
 #include <mbgl/style/property_parsing.hpp>
+#include <mbgl/style/style_bucket_parameters.hpp>
+#include <mbgl/renderer/fill_bucket.hpp>
 
 namespace mbgl {
 
@@ -41,6 +43,16 @@ void FillLayer::recalculate(const StyleCalculationParameters& parameters) {
     } else {
         passes |= RenderPass::Opaque;
     }
+}
+
+std::unique_ptr<Bucket> FillLayer::createBucket(StyleBucketParameters& parameters) const {
+    auto bucket = std::make_unique<FillBucket>();
+
+    parameters.eachFilteredFeature(filter, [&] (const auto& feature) {
+        bucket->addGeometry(feature.getGeometries());
+    });
+
+    return std::move(bucket);
 }
 
 }

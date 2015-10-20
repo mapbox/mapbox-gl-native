@@ -1,6 +1,9 @@
 #include <mbgl/layer/symbol_layer.hpp>
+#include <mbgl/renderer/symbol_bucket.hpp>
+#include <mbgl/map/tile_id.hpp>
 #include <mbgl/style/property_evaluator.hpp>
 #include <mbgl/style/property_parsing.hpp>
+#include <mbgl/style/style_bucket_parameters.hpp>
 
 namespace mbgl {
 
@@ -106,6 +109,72 @@ void SymbolLayer::recalculate(const StyleCalculationParameters& parameters) {
     }
 
     passes = properties.isVisible() ? RenderPass::Translucent : RenderPass::None;
+}
+
+std::unique_ptr<Bucket> SymbolLayer::createBucket(StyleBucketParameters& parameters) const {
+    const float z = parameters.tileID.z;
+    auto bucket = std::make_unique<SymbolBucket>(parameters.tileID.overscaling, z);
+
+    layout.calculate(PropertyKey::SymbolPlacement, bucket->layout.placement, z);
+    if (bucket->layout.placement == PlacementType::Line) {
+        bucket->layout.icon.rotation_alignment = RotationAlignmentType::Map;
+        bucket->layout.text.rotation_alignment = RotationAlignmentType::Map;
+    };
+    layout.calculate(PropertyKey::SymbolSpacing, bucket->layout.spacing, z);
+    layout.calculate(PropertyKey::SymbolAvoidEdges, bucket->layout.avoid_edges, z);
+
+    layout.calculate(PropertyKey::IconAllowOverlap, bucket->layout.icon.allow_overlap, z);
+    layout.calculate(PropertyKey::IconIgnorePlacement, bucket->layout.icon.ignore_placement, z);
+    layout.calculate(PropertyKey::IconOptional, bucket->layout.icon.optional, z);
+    layout.calculate(PropertyKey::IconRotationAlignment, bucket->layout.icon.rotation_alignment, z);
+    layout.calculate(PropertyKey::IconImage, bucket->layout.icon.image, z);
+    layout.calculate(PropertyKey::IconPadding, bucket->layout.icon.padding, z);
+    layout.calculate(PropertyKey::IconRotate, bucket->layout.icon.rotate, z);
+    layout.calculate(PropertyKey::IconKeepUpright, bucket->layout.icon.keep_upright, z);
+    layout.calculate(PropertyKey::IconOffset, bucket->layout.icon.offset, z);
+
+    layout.calculate(PropertyKey::TextRotationAlignment, bucket->layout.text.rotation_alignment, z);
+    layout.calculate(PropertyKey::TextField, bucket->layout.text.field, z);
+    layout.calculate(PropertyKey::TextFont, bucket->layout.text.font, z);
+    layout.calculate(PropertyKey::TextMaxWidth, bucket->layout.text.max_width, z);
+    layout.calculate(PropertyKey::TextLineHeight, bucket->layout.text.line_height, z);
+    layout.calculate(PropertyKey::TextLetterSpacing, bucket->layout.text.letter_spacing, z);
+    layout.calculate(PropertyKey::TextMaxAngle, bucket->layout.text.max_angle, z);
+    layout.calculate(PropertyKey::TextRotate, bucket->layout.text.rotate, z);
+    layout.calculate(PropertyKey::TextPadding, bucket->layout.text.padding, z);
+    layout.calculate(PropertyKey::TextIgnorePlacement, bucket->layout.text.ignore_placement, z);
+    layout.calculate(PropertyKey::TextOptional, bucket->layout.text.optional, z);
+    layout.calculate(PropertyKey::TextJustify, bucket->layout.text.justify, z);
+    layout.calculate(PropertyKey::TextAnchor, bucket->layout.text.anchor, z);
+    layout.calculate(PropertyKey::TextKeepUpright, bucket->layout.text.keep_upright, z);
+    layout.calculate(PropertyKey::TextTransform, bucket->layout.text.transform, z);
+    layout.calculate(PropertyKey::TextOffset, bucket->layout.text.offset, z);
+    layout.calculate(PropertyKey::TextAllowOverlap, bucket->layout.text.allow_overlap, z);
+
+    layout.calculate(PropertyKey::IconSize, bucket->layout.icon.size, z + 1);
+    layout.calculate(PropertyKey::IconSize, bucket->layout.icon.max_size, 18);
+    layout.calculate(PropertyKey::TextSize, bucket->layout.text.size, z + 1);
+    layout.calculate(PropertyKey::TextSize, bucket->layout.text.max_size, 18);
+
+    bucket->parseFeatures(parameters.layer, filter);
+
+    if (bucket->needsDependencies(parameters.glyphStore, parameters.sprite)) {
+        parameters.partialParse = true;
+    }
+
+    // We do not add features if the parser is in a "partial" state because
+    // the layer ordering needs to be respected when calculating text
+    // collisions. Although, at this point, we requested all the resources
+    // needed by this tile.
+    if (!parameters.partialParse) {
+        bucket->addFeatures(parameters.tileUID,
+                            parameters.spriteAtlas,
+                            parameters.glyphAtlas,
+                            parameters.glyphStore,
+                            parameters.collisionTile);
+    }
+
+    return std::move(bucket);
 }
 
 }

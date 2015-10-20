@@ -7,6 +7,7 @@
 #include <mbgl/style/paint_properties_map.hpp>
 
 #include <mbgl/renderer/render_pass.hpp>
+#include <mbgl/map/tile_data.hpp>
 
 #include <mbgl/util/noncopyable.hpp>
 #include <mbgl/util/chrono.hpp>
@@ -20,6 +21,7 @@
 namespace mbgl {
 
 class StyleCalculationParameters;
+class StyleBucketParameters;
 class PropertyTransition;
 
 using JSVal = rapidjson::Value;
@@ -43,6 +45,8 @@ public:
 
     // Fully evaluate cascaded paint properties based on a zoom level.
     virtual void recalculate(const StyleCalculationParameters&) = 0;
+
+    virtual std::unique_ptr<Bucket> createBucket(StyleBucketParameters&) const = 0;
 
     // Checks whether this layer has any active paint properties with transitions.
     bool hasTransitions() const;

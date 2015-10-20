@@ -15,6 +15,8 @@ public:
 
     void recalculate(const StyleCalculationParameters&) override;
 
+    std::unique_ptr<Bucket> createBucket(StyleBucketParameters&) const override;
+
     LinePaintProperties properties;
 };
 
