@@ -16,8 +16,13 @@ public:
     inline void operator=(const typename T::Type& value) {
         if (current != value) {
             current = value;
-            MBGL_CHECK_ERROR(T::Set(current));
+            T::Set(current);
         }
+    }
+
+    inline void reset() {
+        current = T::Default;
+        T::Set(current);
     }
 
 private:
@@ -100,6 +105,14 @@ struct StencilTest {
     }
 };
 
+struct StencilOp {
+    struct Type { GLenum sfail, dpfail, dppass; };
+    static const Type Default;
+    inline static void Set(const Type& value) {
+        MBGL_CHECK_ERROR(glStencilOp(value.sfail, value.dpfail, value.dppass));
+    }
+};
+
 struct DepthRange {
     struct Type { GLfloat near, far; };
     static const Type Default;
@@ -120,6 +133,14 @@ struct DepthTest {
     }
 };
 
+struct DepthFunc {
+    using Type = GLenum;
+    static const Type Default;
+    inline static void Set(const Type& value) {
+        MBGL_CHECK_ERROR(glDepthFunc(value));
+    }
+};
+
 struct Blend {
     using Type = bool;
     static const Type Default;
@@ -128,22 +149,50 @@ struct Blend {
     }
 };
 
+struct BlendFunc {
+    struct Type { GLenum sfactor, dfactor; };
+    static const Type Default;
+    inline static void Set(const Type& value) {
+        MBGL_CHECK_ERROR(glBlendFunc(value.sfactor, value.dfactor));
+    }
+};
+
 class Config {
 public:
+    void reset() {
+        stencilFunc.reset();
+        stencilMask.reset();
+        stencilTest.reset();
+        stencilOp.reset();
+        depthRange.reset();
+        depthMask.reset();
+        depthTest.reset();
+        depthFunc.reset();
+        blend.reset();
+        blendFunc.reset();
+        colorMask.reset();
+        clearDepth.reset();
+        clearColor.reset();
+        clearStencil.reset();
+    }
+
     Value<StencilFunc> stencilFunc;
     Value<StencilMask> stencilMask;
     Value<StencilTest> stencilTest;
+    Value<StencilOp> stencilOp;
     Value<DepthRange> depthRange;
     Value<DepthMask> depthMask;
     Value<DepthTest> depthTest;
+    Value<DepthFunc> depthFunc;
     Value<Blend> blend;
+    Value<BlendFunc> blendFunc;
     Value<ColorMask> colorMask;
     Value<ClearDepth> clearDepth;
     Value<ClearColor> clearColor;
     Value<ClearStencil> clearStencil;
 };
 
-}
-}
+} // namespace gl
+} // namespace mbgl
 
-#endif
+#endif // MBGL_RENDERER_GL_CONFIG

@@ -72,24 +72,8 @@ void Painter::setup() {
     assert(dotShader);
     assert(circleShader);
 
-
-    // Blending
-    // We are blending new pixels on top of old pixels. Since we have depth testing
-    // and are drawing opaque fragments first front-to-back, then translucent
-    // fragments back-to-front, this shades the fewest fragments possible.
-    config.blend = true;
-    MBGL_CHECK_ERROR(glBlendFunc(GL_ONE, GL_ONE_MINUS_SRC_ALPHA));
-
-    // Set clear values
-    config.clearColor = { 0.0f, 0.0f, 0.0f, 0.0f };
-    config.clearDepth = 1.0f;
-    config.clearStencil = 0x0;
-
-    // Stencil test
-    MBGL_CHECK_ERROR(glStencilOp(GL_KEEP, GL_KEEP, GL_REPLACE));
-
-    // Depth test
-    glDepthFunc(GL_LEQUAL);
+    // Reset GL values
+    config.reset();
 }
 
 void Painter::setupShaders() {
@@ -145,9 +129,9 @@ void Painter::changeMatrix() {
 
 void Painter::clear() {
     MBGL_DEBUG_GROUP("clear");
-    config.stencilTest = true;
+    config.stencilTest = GL_TRUE;
     config.stencilMask = 0xFF;
-    config.depthTest = false;
+    config.depthTest = GL_FALSE;
     config.depthMask = GL_TRUE;
     config.clearColor = { background[0], background[1], background[2], background[3] };
     MBGL_CHECK_ERROR(glClear(GL_COLOR_BUFFER_BIT | GL_STENCIL_BUFFER_BIT | GL_DEPTH_BUFFER_BIT));
