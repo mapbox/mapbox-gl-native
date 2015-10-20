@@ -13,7 +13,7 @@
 #include <sys/sysctl.h>
 
 static const NSUInteger version = 1;
-static NSString *const MGLMapboxEventsUserAgent = @"MapboxEventsiOS/1.0";
+static NSString *const MGLMapboxEventsUserAgent = @"MapboxEventsiOS/1.1";
 static NSString *MGLMapboxEventsAPIBase = @"https://api.tiles.mapbox.com";
 
 NSString *const MGLEventTypeAppUserTurnstile = @"appUserTurnstile";
@@ -507,13 +507,13 @@ const NSTimeInterval MGLFlushInterval = 60;
         [evt setValue:[strongSelf deviceOrientation] forKey:@"orientation"];
         [evt setValue:@((int)(100 * [UIDevice currentDevice].batteryLevel)) forKey:@"batteryLevel"];
         [evt setValue:@(strongSelf.data.scale) forKey:@"resolution"];
-        [evt setValue:strongSelf.data.carrier forKey:@"carrier"];
 
-        NSString *cell;
         if (strongSelf.data.carrier) {
-            cell = [strongSelf currentCellularNetworkConnectionType];
+            [evt setValue:strongSelf.data.carrier forKey:@"carrier"];
+
+            NSString *cell = [strongSelf currentCellularNetworkConnectionType];
+            [evt setObject:(cell ? cell : [NSNull null]) forKey:@"cellularNetworkType"];
         }
-        [evt setObject:(cell ? cell : [NSNull null]) forKey:@"cellularNetworkType"];
 
         MGLReachability *reachability = [MGLReachability reachabilityForLocalWiFi];
         [evt setValue:([reachability isReachableViaWiFi] ? @YES : @NO) forKey:@"wifi"];
@@ -785,9 +785,9 @@ const NSTimeInterval MGLFlushInterval = 60;
             MGLEventKeyLongitude: @(loc.coordinate.longitude),
             MGLEventKeySpeed: @(loc.speed),
             MGLEventKeyCourse: @(loc.course),
-            MGLEventKeyAltitude: @(loc.altitude),
-            MGLEventKeyHorizontalAccuracy: @(loc.horizontalAccuracy),
-            MGLEventKeyVerticalAccuracy: @(loc.verticalAccuracy)
+            MGLEventKeyAltitude: @(round(loc.altitude)),
+            MGLEventKeyHorizontalAccuracy: @(round(loc.horizontalAccuracy)),
+            MGLEventKeyVerticalAccuracy: @(round(loc.verticalAccuracy))
         }];
     }
 }
@@ -796,7 +796,7 @@ const NSTimeInterval MGLFlushInterval = 60;
     [MGLMapboxEvents pushEvent:MGLEventTypeVisit withAttributes:@{
         MGLEventKeyLatitude: @(visit.coordinate.latitude),
         MGLEventKeyLongitude: @(visit.coordinate.longitude),
-        MGLEventKeyHorizontalAccuracy: @(visit.horizontalAccuracy),
+        MGLEventKeyHorizontalAccuracy: @(round(visit.horizontalAccuracy)),
         MGLEventKeyArrivalDate: [[NSDate distantPast] isEqualToDate:visit.arrivalDate] ? [NSNull null] : [_rfc3339DateFormatter stringFromDate:visit.arrivalDate],
         MGLEventKeyDepartureDate: [[NSDate distantFuture] isEqualToDate:visit.departureDate] ? [NSNull null] : [_rfc3339DateFormatter stringFromDate:visit.departureDate]
     }];

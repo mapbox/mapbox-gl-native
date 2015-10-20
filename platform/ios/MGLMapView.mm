@@ -405,8 +405,8 @@ std::chrono::steady_clock::duration secondsAsDuration(float duration)
     _regionChangeDelegateQueue.maxConcurrentOperationCount = 1;
 
     // metrics: map load event
-    const mbgl::LatLng latLng = _mbglMap->getLatLng();
-    const double zoom = _mbglMap->getZoom();
+    mbgl::LatLng latLng = _mbglMap->getLatLng();
+    int zoom = round(_mbglMap->getZoom());
 
     [MGLMapboxEvents pushEvent:MGLEventTypeMapLoad withAttributes:@{
         MGLEventKeyLatitude: @(latLng.latitude),
@@ -942,7 +942,7 @@ std::chrono::steady_clock::duration secondsAsDuration(float duration)
         // metrics: pan end
         CGPoint pointInView = CGPointMake([pan locationInView:pan.view].x, [pan locationInView:pan.view].y);
         CLLocationCoordinate2D panCoordinate = [self convertPoint:pointInView toCoordinateFromView:pan.view];
-        double zoom = [self zoomLevel];
+        int zoom = round([self zoomLevel]);
 
         [MGLMapboxEvents pushEvent:MGLEventTypeMapDragEnd withAttributes:@{
             MGLEventKeyLatitude: @(panCoordinate.latitude),
@@ -1479,7 +1479,7 @@ std::chrono::steady_clock::duration secondsAsDuration(float duration)
 {
     CGPoint pointInView = CGPointMake([recognizer locationInView:recognizer.view].x, [recognizer locationInView:recognizer.view].y);
     CLLocationCoordinate2D gestureCoordinate = [self convertPoint:pointInView toCoordinateFromView:recognizer.view];
-    double zoom = [self zoomLevel];
+    int zoom = round([self zoomLevel]);
 
     [MGLMapboxEvents pushEvent:MGLEventTypeMapTap withAttributes:@{
         MGLEventKeyLatitude: @(gestureCoordinate.latitude),
