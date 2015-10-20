@@ -157,7 +157,7 @@ void Painter::prepareTile(const Tile& tile) {
     config.stencilFunc = { GL_EQUAL, ref, mask };
 }
 
-void Painter::render(const Style& style, TransformState state_, const FrameData& frame_, const TimePoint& time) {
+void Painter::render(const Style& style, TransformState state_, const FrameData& frame_) {
     state = state_;
     frame = frame_;
 
@@ -214,7 +214,7 @@ void Painter::render(const Style& style, TransformState state_, const FrameData&
         drawClippingMasks(sources);
     }
 
-    frameHistory.record(time, state.getNormalizedZoom());
+    frameHistory.record(data.getAnimationTime(), state.getNormalizedZoom());
 
     // Actually render the layers
     if (debug::renderTree) { Log::Info(Event::Render, "{"); indent++; }

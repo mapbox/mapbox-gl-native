@@ -244,7 +244,7 @@ bool MapContext::renderSync(const TransformState& state, const FrameData& frame)
     glObjectStore.performCleanup();
 
     if (!painter) painter = std::make_unique<Painter>(data);
-    painter->render(*style, transformState, frame, data.getAnimationTime());
+    painter->render(*style, transformState, frame);
 
     if (data.mode == MapMode::Still) {
         callback(nullptr, view.readStillImage());
