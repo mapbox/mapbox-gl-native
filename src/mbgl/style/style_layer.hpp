@@ -29,9 +29,6 @@ public:
 
     virtual ~StyleLayer() = default;
 
-    // Determines whether this layer is the background layer.
-    bool isBackground() const;
-
     // Checks whether this layer needs to be rendered in the given render pass.
     bool hasRenderPass(RenderPass) const;
 

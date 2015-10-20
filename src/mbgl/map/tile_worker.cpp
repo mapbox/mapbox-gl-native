@@ -79,7 +79,7 @@ void TileWorker::parseLayer(const StyleLayer& layer, const GeometryTile& geometr
         return;
 
     // Background is a special case.
-    if (layer.isBackground())
+    if (layer.type == StyleLayerType::Background)
         return;
 
     if (!layer.bucket) {

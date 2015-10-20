@@ -29,10 +29,6 @@ std::unique_ptr<StyleLayer> StyleLayer::create(StyleLayerType type) {
     }
 }
 
-bool StyleLayer::isBackground() const {
-    return type == StyleLayerType::Background;
-}
-
 bool StyleLayer::hasRenderPass(RenderPass pass) const {
     return bool(passes & pass);
 }
