@@ -2,6 +2,8 @@ package com.mapbox.mapboxsdk.annotations;
 
 import com.mapbox.mapboxsdk.views.MapView;
 
+import java.lang.ref.WeakReference;
+
 public abstract class Annotation implements Comparable<Annotation> {
 
     /**
@@ -10,7 +12,7 @@ public abstract class Annotation implements Comparable<Annotation> {
      * Internal C++ id is stored as unsigned int.
      */
     private long id = -1; // -1 unless added to a MapView
-    private MapView mapView;
+    private WeakReference<MapView> mapView;
 
     private float alpha = 1.0f;
     private boolean visible = true;
@@ -34,7 +36,7 @@ public abstract class Annotation implements Comparable<Annotation> {
 
     public void remove() {
         if (mapView == null) return;
-        mapView.removeAnnotation(this);
+        mapView.get().removeAnnotation(this);
     }
 
     void setAlpha(float alpha) {
@@ -52,11 +54,11 @@ public abstract class Annotation implements Comparable<Annotation> {
      * Do not use this method. Used internally by the SDK.
      */
     public void setMapView(MapView mapView) {
-        this.mapView = mapView;
+        this.mapView = new WeakReference<MapView>(mapView);
     }
 
     protected MapView getMapView() {
-        return mapView;
+        return mapView.get();
     }
 
     void setVisible(boolean visible) {
