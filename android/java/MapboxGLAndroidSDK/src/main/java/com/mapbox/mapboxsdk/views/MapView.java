@@ -1,6 +1,5 @@
 package com.mapbox.mapboxsdk.views;
 
-import android.animation.Animator;
 import android.app.Activity;
 import android.app.ActivityManager;
 import android.app.Dialog;
@@ -13,7 +12,7 @@ import android.content.IntentFilter;
 import android.content.pm.PackageManager;
 import android.content.res.TypedArray;
 import android.graphics.Bitmap;
-import android.graphics.Matrix;
+import android.graphics.Canvas;
 import android.graphics.PointF;
 import android.graphics.RectF;
 import android.graphics.SurfaceTexture;
@@ -36,7 +35,6 @@ import android.support.v4.view.ScaleGestureDetectorCompat;
 import android.support.v7.app.AlertDialog;
 import android.text.TextUtils;
 import android.util.AttributeSet;
-import android.util.Log;
 import android.view.GestureDetector;
 import android.view.Gravity;
 import android.view.InputDevice;
@@ -152,9 +150,6 @@ public final class MapView extends FrameLayout {
     // Index into R.arrays.attribution_links
     private static final int ATTRIBUTION_INDEX_IMPROVE_THIS_MAP = 2;
 
-    // Used for loading default marker sprite
-    private static final String DEFAULT_SPRITE = "com.mapbox.sprites.default";
-
     /**
      * The currently supported maximum zoom level.
      *
@@ -170,11 +165,11 @@ public final class MapView extends FrameLayout {
     private NativeMapView mNativeMapView;
 
     // Used to track rendering
-    private Boolean mDirty = false;
+    private TextureView mTextureView;
 
     // Used to handle DPI scaling
     private float mScreenDensity = 1.0f;
-    private float mScreenDensityDpi = 1.0f;
+    private float mScreenDpi = 1.0f;
 
     // Touch gesture detectors
     private GestureDetectorCompat mGestureDetector;
@@ -221,7 +216,7 @@ public final class MapView extends FrameLayout {
     private ImageView mAttributionsView;
 
     // Used to manage MapChange event listeners
-    private ArrayList<OnMapChangedListener> mOnMapChangedListener;
+    private ArrayList<OnMapChangedListener> mOnMapChangedListener = new ArrayList<>();;
 
     // Used to manage map click event listeners
     private OnMapClickListener mOnMapClickListener;
@@ -562,9 +557,12 @@ public final class MapView extends FrameLayout {
         // Save the context
         mContext = context;
 
+        setWillNotDraw(false);
+
         // Create the TextureView
-        TextureView textureView = new TextureView(mContext);
-        addView(textureView);
+        mTextureView = new TextureView(mContext);
+        addView(mTextureView);
+        mTextureView.setSurfaceTextureListener(new SurfaceTextureListener());
 
         // Check if we are in Android Studio UI editor to avoid error in layout preview
         if (isInEditMode()) {
@@ -573,7 +571,7 @@ public final class MapView extends FrameLayout {
 
         // Get the screen's density
         mScreenDensity = context.getResources().getDisplayMetrics().density;
-        mScreenDensityDpi = context.getResources().getDisplayMetrics().densityDpi;
+        mScreenDpi = context.getResources().getDisplayMetrics().densityDpi;
 
         // Get the cache path
         String cachePath = context.getCacheDir().getAbsolutePath();
@@ -599,9 +597,6 @@ public final class MapView extends FrameLayout {
         setFocusable(true);
         setFocusableInTouchMode(true);
         requestFocus();
-
-        // Register the TextureView callbacks
-        textureView.setSurfaceTextureListener(new SurfaceTextureListener());
 
         // Touch gesture detectors
         mGestureDetector = new GestureDetectorCompat(context, new GestureListener());
@@ -674,10 +669,6 @@ public final class MapView extends FrameLayout {
         mAttributionsView.setLayoutParams(attrParams);
         addView(mAttributionsView);
         mAttributionsView.setOnClickListener(new AttributionOnClickListener(this));
-
-        // Setup Support For Listener Tracking
-        // MapView's internal listener is setup in onCreate()
-        mOnMapChangedListener = new ArrayList<>();
 
         // Load the attributes
         TypedArray typedArray = context.obtainStyledAttributes(attrs, R.styleable.MapView, 0, 0);
@@ -885,6 +876,8 @@ public final class MapView extends FrameLayout {
     public void onDestroy() {
         mNativeMapView.terminateContext();
         mNativeMapView.terminateDisplay();
+        mNativeMapView.destroySurface();
+        mNativeMapView.destroy();
     }
 
     /**
@@ -931,6 +924,7 @@ public final class MapView extends FrameLayout {
         }
 
         mNativeMapView.resume();
+        mNativeMapView.update();
     }
 
     /**
@@ -1626,18 +1620,6 @@ public final class MapView extends FrameLayout {
         }
 
         Marker marker = markerOptions.getMarker();
-
-        // Load the default marker sprite
-        if (marker.getSprite() == null) {
-            //BitmapDrawable bitmapDrawable = (BitmapDrawable) ContextCompat.getDrawable(mContext, R.drawable.default_marker);
-            //Bitmap bitmap = bitmapDrawable.getBitmap();
-            //setSprite(DEFAULT_SPRITE, bitmap);
-
-            // Red default marker is currently broken
-            //marker.setSprite("default_marker");
-            //marker.setSprite(DEFAULT_SPRITE);
-        }
-
         marker.setTopOffsetPixels(getTopOffsetPixelsForAnnotationSymbol(marker.getSprite()));
 
         long id = mNativeMapView.addMarker(marker);
@@ -1663,30 +1645,18 @@ public final class MapView extends FrameLayout {
             throw new NullPointerException("markerOptionsList is null");
         }
 
-        List<Marker> markers = new ArrayList<>(markerOptionsList.size());
-        for (MarkerOptions markerOptions : markerOptionsList) {
+        int count = markerOptionsList.size();
+        List<Marker> markers = new ArrayList<>(count);
+        for (int i = 0; i < count; i++) {
+            MarkerOptions markerOptions = markerOptionsList.get(i);
             Marker marker = markerOptions.getMarker();
-
-            // Load the default marker sprite
-            if (marker.getSprite() == null) {
-                //BitmapDrawable bitmapDrawable = (BitmapDrawable) ContextCompat.getDrawable(mContext, R.drawable.default_marker);
-                //Bitmap bitmap = bitmapDrawable.getBitmap();
-                //setSprite(DEFAULT_SPRITE, bitmap);
-
-                // Red default marker is currently broken
-                //marker.setSprite("default_marker");
-                //marker.setSprite(DEFAULT_SPRITE);
-            }
-
             marker.setTopOffsetPixels(getTopOffsetPixelsForAnnotationSymbol(marker.getSprite()));
-
             markers.add(marker);
         }
 
         long[] ids = mNativeMapView.addMarkers(markers);
 
         Marker m;
-        int count = markers.size();
         for (int i = 0; i < count; i++) {
             m = markers.get(i);
             m.setId(ids[i]);
@@ -1732,8 +1702,10 @@ public final class MapView extends FrameLayout {
         }
 
         // TODO make faster in JNI
-        List<Polyline> polylines = new ArrayList<>(polylineOptionsList.size());
-        for (PolylineOptions polylineOptions : polylineOptionsList) {
+        int count = polylineOptionsList.size();
+        List<Polyline> polylines = new ArrayList<>(count);
+        for (int i = 0; i < count; i++) {
+            PolylineOptions polylineOptions = polylineOptionsList.get(i);
             polylines.add(addPolyline(polylineOptions));
         }
 
@@ -1825,7 +1797,9 @@ public final class MapView extends FrameLayout {
         }
 
         // TODO make faster in JNI
-        for (Annotation annotation : annotationList) {
+        int count = annotationList.size();
+        for (int i = 0; i < count; i++) {
+            Annotation annotation = annotationList.get(i);
             removeAnnotation(annotation);
         }
     }
@@ -1870,8 +1844,8 @@ public final class MapView extends FrameLayout {
         long[] ids = mNativeMapView.getAnnotationsInBounds(bbox);
 
         List<Long> idsList = new ArrayList<>(ids.length);
-        for (long id : ids) {
-            idsList.add(id);
+        for (int i = 0; i < ids.length; i++) {
+            idsList.add(ids[i]);
         }
 
         List<Marker> annotations = new ArrayList<>(ids.length);
@@ -1966,7 +1940,9 @@ public final class MapView extends FrameLayout {
     }
 
     private void adjustTopOffsetPixels() {
-        for (Annotation annotation : mAnnotations) {
+        int count = mAnnotations.size();
+        for (int i = 0; i < count; i++) {
+            Annotation annotation = mAnnotations.get(i);
             if (annotation instanceof Marker) {
                 Marker marker = (Marker) annotation;
                 marker.setTopOffsetPixels(
@@ -1988,29 +1964,16 @@ public final class MapView extends FrameLayout {
 
     // Called when the map needs to be rerendered
     // Called via JNI from NativeMapView
-    synchronized protected void onInvalidate() {
-        if (!mDirty) {
-            mDirty = true;
-            postRender();
-        }
+    protected void onInvalidate() {
+        postInvalidate();
     }
 
-    private void postRender() {
-        Runnable mRunnable = new Runnable() {
-            @Override
-            public void run() {
-                updateCompass();
-                updateGpsMarker();
-                mNativeMapView.renderSync();
-                mDirty = false;
-            }
-        };
-
-        if (android.os.Build.VERSION.SDK_INT >= Build.VERSION_CODES.JELLY_BEAN) {
-            postOnAnimation(mRunnable);
-        } else {
-            postDelayed(mRunnable, 1000 / 60);
+    @Override
+    public void onDraw(Canvas canvas) {
+        if (!mNativeMapView.isPaused()) {
+            mNativeMapView.renderSync();
         }
+        super.onDraw(canvas);
     }
 
     @Override
@@ -2035,7 +1998,9 @@ public final class MapView extends FrameLayout {
         // Must do all EGL/GL ES destruction here
         @Override
         public boolean onSurfaceTextureDestroyed(SurfaceTexture surface) {
-            mNativeMapView.destroySurface();
+            if (!mNativeMapView.wasDestroyed()) {
+                mNativeMapView.destroySurface();
+            }
             return true;
         }
 
@@ -2046,10 +2011,12 @@ public final class MapView extends FrameLayout {
             mNativeMapView.resizeFramebuffer(width, height);
         }
 
-        // Not used
+        // Called when the SurfaceTexure frame is drawn to screen
+        // Must sync with UI here
         @Override
         public void onSurfaceTextureUpdated(SurfaceTexture surface) {
-            // Do nothing
+            updateCompass();
+            updateGpsMarker();
         }
     }
 
@@ -2236,7 +2203,9 @@ public final class MapView extends FrameLayout {
 
             if (newSelectedMarkerId >= 0) {
 
-                for (Annotation annotation : mAnnotations) {
+                int count = mAnnotations.size();
+                for (int i = 0; i < count; i++) {
+                    Annotation annotation = mAnnotations.get(i);
                     if (annotation instanceof Marker) {
                         if (annotation.getId() == newSelectedMarkerId) {
                             if (mSelectedMarker == null || annotation.getId() != mSelectedMarker.getId()) {
@@ -2816,18 +2785,12 @@ public final class MapView extends FrameLayout {
     // Called when the map view transformation has changed
     // Called via JNI from NativeMapView
     // Forward to any listeners
-    protected void onMapChanged(int rawChange) {
-        final int mapChange = rawChange;
+    protected void onMapChanged(int mapChange) {
         if (mOnMapChangedListener != null) {
-            post(new Runnable() {
-                @Override
-                public void run() {
-                    for (OnMapChangedListener listener : mOnMapChangedListener) {
-                        //noinspection ResourceType
-                        listener.onMapChanged(mapChange);
-                    }
-                }
-            });
+            int count = mOnMapChangedListener.size();
+            for (int i = 0; i < count; i++) {
+                mOnMapChangedListener.get(i).onMapChanged(mapChange);
+            }
         }
     }
 
@@ -2859,14 +2822,14 @@ public final class MapView extends FrameLayout {
     // Called via JNI from NativeMapView
     // Forward to any listener
     protected void onFpsChanged(final double fps) {
-        if (mOnFpsChangedListener != null) {
-            post(new Runnable() {
-                @Override
-                public void run() {
+        post(new Runnable() {
+            @Override
+            public void run() {
+                if (mOnFpsChangedListener != null) {
                     mOnFpsChangedListener.onFpsChanged(fps);
                 }
-            });
-        }
+            }
+        });
     }
 
     /**
@@ -2989,7 +2952,7 @@ public final class MapView extends FrameLayout {
             }
         }
 
-        onInvalidate();
+        mNativeMapView.update();
     }
 
     private class MyLocationListener implements LocationListener {
@@ -3001,10 +2964,8 @@ public final class MapView extends FrameLayout {
 
     // Handles location updates from GPS
     private void updateLocation(Location location) {
-        if (location != null) {
-            mGpsLocation = location;
-            updateGpsMarker();
-        }
+        mGpsLocation = location;
+        mNativeMapView.update();
     }
 
     private void updateGpsMarker() {
@@ -3012,11 +2973,11 @@ public final class MapView extends FrameLayout {
             mGpsMarker.setVisibility(View.VISIBLE);
             LatLng coordinate = new LatLng(mGpsLocation);
             PointF screenLocation = toScreenLocation(coordinate);
-            if (!mDirty) {
+            /*if (!mDirty) {
                 // Map is idle, animate change of location
                 mGpsMarkerAnimatorX = mGpsMarker.animate().x(screenLocation.x - mGpsMarkerOffset);
                 mGpsMarkerAnimatorY = mGpsMarker.animate().y(screenLocation.y - mGpsMarkerOffset);
-            } else {
+            } else*/ {
                 // Map is not idle, set value, don't animate
                 if (mGpsMarkerAnimatorX != null) {
                     mGpsMarkerAnimatorX.cancel();
@@ -3027,9 +2988,7 @@ public final class MapView extends FrameLayout {
                 mGpsMarker.setY(screenLocation.y - mGpsMarkerOffset);
             }
         } else {
-            if (mGpsMarker != null) {
-                mGpsMarker.setVisibility(View.INVISIBLE);
-            }
+            mGpsMarker.setVisibility(View.INVISIBLE);
         }
     }
 
@@ -3060,7 +3019,7 @@ public final class MapView extends FrameLayout {
     @UiThread
     public void setCompassEnabled(boolean compassEnabled) {
         mCompassView.setEnabled(compassEnabled);
-        onInvalidate();
+        mNativeMapView.update();
     }
 
     /**
@@ -3072,8 +3031,8 @@ public final class MapView extends FrameLayout {
      * @param gravity One of the values from {@link Gravity}.
      * @see Gravity
      */
-    @UiThread
-    public void setCompassGravity(int gravity) {
+        @UiThread
+        public void setCompassGravity(int gravity) {
         setWidgetGravity(mCompassView, gravity);
     }
 
@@ -3091,20 +3050,11 @@ public final class MapView extends FrameLayout {
         setWidgetMargins(mCompassView, left, top, right, bottom);
     }
 
-    // Rotates an ImageView - does not work if the ImageView has padding, use margins
-    private void rotateImageView(ImageView imageView, float angle) {
-        Matrix matrix = new Matrix();
-        matrix.setScale((float) imageView.getWidth() / (float) imageView.getDrawable().getIntrinsicWidth(), (float) imageView.getHeight() / (float) imageView.getDrawable().getIntrinsicHeight());
-        matrix.postRotate(angle, (float) imageView.getWidth() / 2.0f, (float) imageView.getHeight() / 2.0f);
-        imageView.setImageMatrix(matrix);
-        imageView.setScaleType(ImageView.ScaleType.MATRIX);
-    }
-
     // Updates the UI to match the current map's position
     private void updateCompass() {
         if (isCompassEnabled()) {
             mCompassView.setVisibility(VISIBLE);
-            rotateImageView(mCompassView, (float) getDirection());
+            mCompassView.setRotation((float) getDirection());
         } else {
             mCompassView.setVisibility(INVISIBLE);
         }
