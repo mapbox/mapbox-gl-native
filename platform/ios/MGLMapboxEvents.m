@@ -76,9 +76,10 @@ const NSTimeInterval MGLFlushInterval = 60;
             _scale = [UIScreen mainScreen].scale;
         }
 
+#if (!TARGET_IPHONE_SIMULATOR)
         // Collect cellular carrier data if CoreTelephony is linked
         Class CTTelephonyNetworkInfo = NSClassFromString(@"CTTelephonyNetworkInfo");
-        if (CTTelephonyNetworkInfo) {
+        if (CTTelephonyNetworkInfo != NULL) {
             id telephonyNetworkInfo = [[CTTelephonyNetworkInfo alloc] init];
 
             SEL subscriberCellularProviderSelector = NSSelectorFromString(@"subscriberCellularProvider");
@@ -88,6 +89,7 @@ const NSTimeInterval MGLFlushInterval = 60;
             NSString *carrierName = ((id (*)(id, SEL))[carrierVendor methodForSelector:carrierNameSelector])(carrierVendor, carrierNameSelector);
             _carrier = carrierName;
         }
+#endif
     }
     return self;
 }
