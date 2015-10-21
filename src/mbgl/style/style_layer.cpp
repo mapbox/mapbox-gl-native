@@ -39,6 +39,12 @@ void StyleLayer::setClasses(const std::vector<std::string> &class_names, const T
     // Stores all keys that we have already added transitions for.
     std::set<PropertyKey> already_applied;
 
+    // We only apply the default style values if there are no classes set.
+    if (class_names.empty()) {
+        applyClassProperties(ClassID::Default, already_applied, now, defaultTransition);
+        return;
+    }
+
     // Reverse iterate through all class names and apply them last to first.
     for (auto it = class_names.rbegin(); it != class_names.rend(); ++it) {
         const std::string &class_name = *it;
@@ -62,14 +68,16 @@ void StyleLayer::setClasses(const std::vector<std::string> &class_names, const T
 
         AppliedClassPropertyValues &appliedProperties = property_pair.second;
         // Make sure that we don't do double transitions to the fallback value.
-        if (appliedProperties.mostRecent() != ClassID::Fallback) {
-            // This property key hasn't been set by a previous class, so we need to add a transition
-            // to the fallback value for that key.
-            const TimePoint begin = now + defaultTransition.delay;
-            const TimePoint end = begin + defaultTransition.duration;
-            const PropertyValue &value = PropertyFallbackValue::Get(key);
-            appliedProperties.add(ClassID::Fallback, begin, end, value);
+        if (appliedProperties.mostRecent() == ClassID::Fallback) {
+            continue;
         }
+
+        // This property key hasn't been set by a previous class, so we need to add a transition
+        // to the fallback value for that key.
+        const TimePoint begin = now + defaultTransition.delay;
+        const TimePoint end = begin + defaultTransition.duration;
+        const PropertyValue &value = PropertyFallbackValue::Get(key);
+        appliedProperties.add(ClassID::Fallback, begin, end, value);
     }
 }
 
