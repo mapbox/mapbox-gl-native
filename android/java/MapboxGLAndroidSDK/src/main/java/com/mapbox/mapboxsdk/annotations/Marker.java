@@ -2,7 +2,6 @@ package com.mapbox.mapboxsdk.annotations;
 
 import android.graphics.Point;
 import android.support.annotation.Nullable;
-import android.text.TextUtils;
 import android.view.View;
 import com.mapbox.mapboxsdk.R;
 import com.mapbox.mapboxsdk.geometry.LatLng;
@@ -18,7 +17,7 @@ public final class Marker extends Annotation {
     private LatLng position;
     private float rotation;
     private String snippet;
-    private String sprite = "default_marker";
+    private Sprite icon;
     private String title;
     private InfoWindow infoWindow = null;
 
@@ -140,23 +139,14 @@ public final class Marker extends Annotation {
     }
 
     /**
-     * You can specify the name of a sprite to get a marker other than the default marker.
-     * This name can be found in the sprite json file:
-     *
-     * https://github.com/mapbox/mapbox-gl-styles/blob/mb-pages/sprites/mapbox-streets.json
-     *
-     * If null you will get the default marker.
-     *
-     * @param sprite The name of the sprite.
+     * Do not use this method. Used internally by the SDK.
      */
-    void setSprite(@Nullable String sprite) {
-        if (!TextUtils.isEmpty(sprite)) {
-            this.sprite = sprite;
-        }
+    public void setIcon(@Nullable Sprite icon) {
+        this.icon = icon;
     }
 
-    public String getSprite() {
-        return sprite;
+    public Sprite getIcon() {
+        return icon;
     }
 
     void setTitle(String title) {
@@ -226,11 +216,6 @@ public final class Marker extends Annotation {
 
     //  TODO Method in Google Maps Android API
 //    public int hashCode()
-
-    // TODO: Implement this method of Google Maps Android API
-//    void setIcon(BitmapDescriptor icon) {
-//
-//    }
 
     /**
      * Do not use this method. Used internally by the SDK.

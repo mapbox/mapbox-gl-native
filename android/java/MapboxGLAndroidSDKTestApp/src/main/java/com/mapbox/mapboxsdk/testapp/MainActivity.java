@@ -28,6 +28,7 @@ import com.mapbox.mapboxsdk.annotations.Marker;
 import com.mapbox.mapboxsdk.annotations.MarkerOptions;
 import com.mapbox.mapboxsdk.annotations.PolygonOptions;
 import com.mapbox.mapboxsdk.annotations.PolylineOptions;
+import com.mapbox.mapboxsdk.annotations.Sprite;
 import com.mapbox.mapboxsdk.constants.Style;
 import com.mapbox.mapboxsdk.geometry.LatLng;
 import com.mapbox.mapboxsdk.utils.ApiAccess;
@@ -115,7 +116,7 @@ public class MainActivity extends AppCompatActivity {
                         .title("Dropped Pin")
                         .snippet(latLngFormatter.format(point.getLatitude()) + ", " +
                                 latLngFormatter.format(point.getLongitude()))
-                        .sprite("default_marker"));
+                        .icon(null));
             }
         });
 
@@ -400,7 +401,8 @@ public class MainActivity extends AppCompatActivity {
         final MarkerOptions backLot = generateMarker("Back Lot", "The back lot behind my house", null, 38.649441, -121.369064);
         markerOptionsList.add(backLot);
 
-        final MarkerOptions cheeseRoom = generateMarker("Cheese Room", "The only air conditioned room on the property", "dog-park-15", 38.531577, -122.010646);
+        final Sprite dogIcon = mMapView.getSpriteFactory().fromAsset("dog-park-24.png");
+        final MarkerOptions cheeseRoom = generateMarker("Cheese Room", "The only air conditioned room on the property", dogIcon, 38.531577, -122.010646);
         markerOptionsList.add(cheeseRoom);
 
        List<Marker> markers = mMapView.addMarkers(markerOptionsList);
@@ -417,11 +419,11 @@ public class MainActivity extends AppCompatActivity {
         });
     }
 
-    private MarkerOptions generateMarker(String title, String snippet, String sprite, double lat, double lng){
+    private MarkerOptions generateMarker(String title, String snippet, Sprite icon, double lat, double lng){
         return new MarkerOptions()
                 .position(new LatLng(lat, lng))
                 .title(title)
-                .sprite(sprite)
+                .icon(icon)
                 .snippet(snippet);
     }
 

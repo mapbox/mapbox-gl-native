@@ -57,13 +57,14 @@ jfieldID bboxLatSouthId = nullptr;
 jfieldID bboxLonEastId = nullptr;
 jfieldID bboxLonWestId = nullptr;
 
+jclass spriteClass = nullptr;
+jfieldID spriteIdId = nullptr;
+
 jclass markerClass = nullptr;
-jmethodID markerConstructorId = nullptr;
 jfieldID markerPositionId = nullptr;
-jfieldID markerSpriteId = nullptr;
+jfieldID markerIconId = nullptr;
 
 jclass polylineClass = nullptr;
-jmethodID polylineConstructorId = nullptr;
 jfieldID polylineAlphaId = nullptr;
 jfieldID polylineVisibleId = nullptr;
 jfieldID polylineColorId = nullptr;
@@ -71,7 +72,6 @@ jfieldID polylineWidthId = nullptr;
 jfieldID polylinePointsId = nullptr;
 
 jclass polygonClass = nullptr;
-jmethodID polygonConstructorId = nullptr;
 jfieldID polygonAlphaId = nullptr;
 jfieldID polygonVisibleId = nullptr;
 jfieldID polygonFillColorId = nullptr;
@@ -809,8 +809,14 @@ jlong JNICALL nativeAddMarker(JNIEnv *env, jobject obj, jlong nativeMapViewPtr, 
         return -1;
     }
 
-    jstring jsprite = reinterpret_cast<jstring>(env->GetObjectField(marker, markerSpriteId));
-    std::string sprite = std_string_from_jstring(env, jsprite);
+    jobject icon = env->GetObjectField(marker, markerIconId);
+    if (env->ExceptionCheck()) {
+        env->ExceptionDescribe();
+        return -1;
+    }
+
+    jstring jid = reinterpret_cast<jstring>(env->GetObjectField(icon, spriteIdId));
+    std::string id = std_string_from_jstring(env, jid);
 
     jdouble latitude = env->GetDoubleField(position, latLngLatitudeId);
     if (env->ExceptionCheck()) {
@@ -825,7 +831,7 @@ jlong JNICALL nativeAddMarker(JNIEnv *env, jobject obj, jlong nativeMapViewPtr, 
     }
 
     // Because Java only has int, not unsigned int, we need to bump the annotation id up to a long.
-    return nativeMapView->getMap().addPointAnnotation(mbgl::PointAnnotation(mbgl::LatLng(latitude, longitude), sprite));
+    return nativeMapView->getMap().addPointAnnotation(mbgl::PointAnnotation(mbgl::LatLng(latitude, longitude), id));
 }
 
 jlongArray JNICALL nativeAddMarkers(JNIEnv *env, jobject obj, jlong nativeMapViewPtr, jobject jlist) {
@@ -867,8 +873,14 @@ jlongArray JNICALL nativeAddMarkers(JNIEnv *env, jobject obj, jlong nativeMapVie
             return nullptr;
         }
 
-        jstring jsprite = reinterpret_cast<jstring>(env->GetObjectField(marker, markerSpriteId));
-        std::string sprite = std_string_from_jstring(env, jsprite);
+        jobject icon = env->GetObjectField(marker, markerIconId);
+        if (env->ExceptionCheck()) {
+            env->ExceptionDescribe();
+            return nullptr;
+        }
+
+        jstring jid = reinterpret_cast<jstring>(env->GetObjectField(icon, spriteIdId));
+        std::string id = std_string_from_jstring(env, jid);
 
         jdouble latitude = env->GetDoubleField(position, latLngLatitudeId);
         if (env->ExceptionCheck()) {
@@ -882,7 +894,7 @@ jlongArray JNICALL nativeAddMarkers(JNIEnv *env, jobject obj, jlong nativeMapVie
             return nullptr;
         }
 
-        markers.emplace_back(mbgl::PointAnnotation(mbgl::LatLng(latitude, longitude), sprite));
+        markers.emplace_back(mbgl::PointAnnotation(mbgl::LatLng(latitude, longitude), id));
 
         /* Do I need to delete other LocalRefs? */
         env->DeleteLocalRef(marker);
@@ -1110,7 +1122,8 @@ void JNICALL nativeSetSprite(JNIEnv *env, jobject obj, jlong nativeMapViewPtr,
     const std::string symbolName = std_string_from_jstring(env, symbol);
 
     jbyte* pixelData = env->GetByteArrayElements(jpixels, nullptr);
-    std::string pixels(reinterpret_cast<char*>(pixelData), width * height * 4);
+    jsize size = env->GetArrayLength(jpixels);
+    std::string pixels(reinterpret_cast<char*>(pixelData), size);
     env->ReleaseByteArrayElements(jpixels, pixelData, JNI_ABORT);
 
     auto spriteImage = std::make_shared<mbgl::SpriteImage>(
@@ -1421,14 +1434,20 @@ extern "C" JNIEXPORT jint JNICALL JNI_OnLoad(JavaVM *vm, void *reserved) {
         return JNI_ERR;
     }
 
-    markerClass = env->FindClass("com/mapbox/mapboxsdk/annotations/Marker");
-    if (markerClass == nullptr) {
+    spriteClass = env->FindClass("com/mapbox/mapboxsdk/annotations/Sprite");
+    if (spriteClass == nullptr) {
         env->ExceptionDescribe();
         return JNI_ERR;
     }
 
-    markerConstructorId = env->GetMethodID(markerClass, "<init>", "()V");
-    if (markerConstructorId == nullptr) {
+    spriteIdId = env->GetFieldID(spriteClass, "mId", "Ljava/lang/String;");
+    if (spriteIdId == nullptr) {
+        env->ExceptionDescribe();
+        return JNI_ERR;
+    }
+
+    markerClass = env->FindClass("com/mapbox/mapboxsdk/annotations/Marker");
+    if (markerClass == nullptr) {
         env->ExceptionDescribe();
         return JNI_ERR;
     }
@@ -1439,20 +1458,14 @@ extern "C" JNIEXPORT jint JNICALL JNI_OnLoad(JavaVM *vm, void *reserved) {
         return JNI_ERR;
     }
 
-    markerSpriteId = env->GetFieldID(markerClass, "sprite", "Ljava/lang/String;");
-    if (markerSpriteId == nullptr) {
+    markerIconId = env->GetFieldID(markerClass, "icon", "Lcom/mapbox/mapboxsdk/annotations/Sprite;");
+    if (markerIconId == nullptr) {
         env->ExceptionDescribe();
         return JNI_ERR;
     }
 
     polylineClass = env->FindClass("com/mapbox/mapboxsdk/annotations/Polyline");
     if (polylineClass == nullptr) {
-        env->ExceptionDescribe();
-        return JNI_ERR;
-    }
-
-    polylineConstructorId = env->GetMethodID(polylineClass, "<init>", "()V");
-    if (polylineConstructorId == nullptr) {
         env->ExceptionDescribe();
         return JNI_ERR;
     }
@@ -1489,12 +1502,6 @@ extern "C" JNIEXPORT jint JNICALL JNI_OnLoad(JavaVM *vm, void *reserved) {
 
     polygonClass = env->FindClass("com/mapbox/mapboxsdk/annotations/Polygon");
     if (polygonClass == nullptr) {
-        env->ExceptionDescribe();
-        return JNI_ERR;
-    }
-
-    polygonConstructorId = env->GetMethodID(polygonClass, "<init>", "()V");
-    if (polygonConstructorId == nullptr) {
         env->ExceptionDescribe();
         return JNI_ERR;
     }
@@ -1828,12 +1835,22 @@ extern "C" JNIEXPORT jint JNICALL JNI_OnLoad(JavaVM *vm, void *reserved) {
         return JNI_ERR;
     }
 
+    spriteClass = reinterpret_cast<jclass>(env->NewGlobalRef(spriteClass));
+    if (spriteClass == nullptr) {
+        env->ExceptionDescribe();
+        env->DeleteGlobalRef(latLngClass);
+        env->DeleteGlobalRef(latLngZoomClass);
+        env->DeleteGlobalRef(bboxClass);
+        return JNI_ERR;
+    }
+
     markerClass = reinterpret_cast<jclass>(env->NewGlobalRef(markerClass));
     if (markerClass == nullptr) {
         env->ExceptionDescribe();
         env->DeleteGlobalRef(latLngClass);
         env->DeleteGlobalRef(latLngZoomClass);
         env->DeleteGlobalRef(bboxClass);
+        env->DeleteGlobalRef(spriteClass);
         return JNI_ERR;
     }
 
@@ -1843,6 +1860,7 @@ extern "C" JNIEXPORT jint JNICALL JNI_OnLoad(JavaVM *vm, void *reserved) {
         env->DeleteGlobalRef(latLngClass);
         env->DeleteGlobalRef(latLngZoomClass);
         env->DeleteGlobalRef(bboxClass);
+        env->DeleteGlobalRef(spriteClass);
         env->DeleteGlobalRef(markerClass);
         return JNI_ERR;
     }
@@ -1853,6 +1871,7 @@ extern "C" JNIEXPORT jint JNICALL JNI_OnLoad(JavaVM *vm, void *reserved) {
         env->DeleteGlobalRef(latLngClass);
         env->DeleteGlobalRef(latLngZoomClass);
         env->DeleteGlobalRef(bboxClass);
+        env->DeleteGlobalRef(spriteClass);
         env->DeleteGlobalRef(markerClass);
         env->DeleteGlobalRef(polylineClass);
         return JNI_ERR;
@@ -1864,6 +1883,7 @@ extern "C" JNIEXPORT jint JNICALL JNI_OnLoad(JavaVM *vm, void *reserved) {
         env->DeleteGlobalRef(latLngClass);
         env->DeleteGlobalRef(latLngZoomClass);
         env->DeleteGlobalRef(bboxClass);
+        env->DeleteGlobalRef(spriteClass);
         env->DeleteGlobalRef(markerClass);
         env->DeleteGlobalRef(polylineClass);
         env->DeleteGlobalRef(polygonClass);
@@ -1877,6 +1897,7 @@ extern "C" JNIEXPORT jint JNICALL JNI_OnLoad(JavaVM *vm, void *reserved) {
         env->DeleteGlobalRef(latLngClass);
         env->DeleteGlobalRef(latLngZoomClass);
         env->DeleteGlobalRef(bboxClass);
+        env->DeleteGlobalRef(spriteClass);
         env->DeleteGlobalRef(markerClass);
         env->DeleteGlobalRef(polylineClass);
         env->DeleteGlobalRef(polygonClass);
@@ -1890,6 +1911,7 @@ extern "C" JNIEXPORT jint JNICALL JNI_OnLoad(JavaVM *vm, void *reserved) {
         env->DeleteGlobalRef(latLngClass);
         env->DeleteGlobalRef(latLngZoomClass);
         env->DeleteGlobalRef(bboxClass);
+        env->DeleteGlobalRef(spriteClass);
         env->DeleteGlobalRef(markerClass);
         env->DeleteGlobalRef(polylineClass);
         env->DeleteGlobalRef(polygonClass);
@@ -1904,6 +1926,7 @@ extern "C" JNIEXPORT jint JNICALL JNI_OnLoad(JavaVM *vm, void *reserved) {
         env->DeleteGlobalRef(latLngClass);
         env->DeleteGlobalRef(latLngZoomClass);
         env->DeleteGlobalRef(bboxClass);
+        env->DeleteGlobalRef(spriteClass);
         env->DeleteGlobalRef(markerClass);
         env->DeleteGlobalRef(polylineClass);
         env->DeleteGlobalRef(polygonClass);
@@ -1917,9 +1940,10 @@ extern "C" JNIEXPORT jint JNICALL JNI_OnLoad(JavaVM *vm, void *reserved) {
     if (pointFClass == nullptr) {
         env->ExceptionDescribe();
         env->DeleteGlobalRef(latLngClass);
-        env->DeleteGlobalRef(markerClass);
         env->DeleteGlobalRef(latLngZoomClass);
         env->DeleteGlobalRef(bboxClass);
+        env->DeleteGlobalRef(markerClass);
+        env->DeleteGlobalRef(spriteClass);
         env->DeleteGlobalRef(polylineClass);
         env->DeleteGlobalRef(polygonClass);
         env->DeleteGlobalRef(runtimeExceptionClass);
@@ -1933,9 +1957,10 @@ extern "C" JNIEXPORT jint JNICALL JNI_OnLoad(JavaVM *vm, void *reserved) {
     if (httpContextClass == nullptr) {
         env->ExceptionDescribe();
         env->DeleteGlobalRef(latLngClass);
-        env->DeleteGlobalRef(markerClass);
         env->DeleteGlobalRef(latLngZoomClass);
         env->DeleteGlobalRef(bboxClass);
+        env->DeleteGlobalRef(spriteClass);
+        env->DeleteGlobalRef(markerClass);
         env->DeleteGlobalRef(polylineClass);
         env->DeleteGlobalRef(polygonClass);
         env->DeleteGlobalRef(runtimeExceptionClass);
@@ -1949,9 +1974,10 @@ extern "C" JNIEXPORT jint JNICALL JNI_OnLoad(JavaVM *vm, void *reserved) {
     if (httpRequestClass == nullptr) {
         env->ExceptionDescribe();
         env->DeleteGlobalRef(latLngClass);
-        env->DeleteGlobalRef(markerClass);
         env->DeleteGlobalRef(latLngZoomClass);
         env->DeleteGlobalRef(bboxClass);
+        env->DeleteGlobalRef(spriteClass);
+        env->DeleteGlobalRef(markerClass);
         env->DeleteGlobalRef(polylineClass);
         env->DeleteGlobalRef(polygonClass);
         env->DeleteGlobalRef(runtimeExceptionClass);
@@ -2002,15 +2028,17 @@ extern "C" JNIEXPORT void JNICALL JNI_OnUnload(JavaVM *vm, void *reserved) {
     bboxLonEastId = nullptr;
     bboxLonWestId = nullptr;
 
+    env->DeleteGlobalRef(spriteClass);
+    spriteClass = nullptr;
+    spriteIdId = nullptr;
+
     env->DeleteGlobalRef(markerClass);
     markerClass = nullptr;
-    markerConstructorId = nullptr;
     markerPositionId = nullptr;
-    markerSpriteId = nullptr;
+    markerIconId = nullptr;
 
     env->DeleteGlobalRef(polylineClass);
     polylineClass = nullptr;
-    polylineConstructorId = nullptr;
     polylineAlphaId = nullptr;
     polylineVisibleId = nullptr;
     polylineColorId = nullptr;
@@ -2019,7 +2047,6 @@ extern "C" JNIEXPORT void JNICALL JNI_OnUnload(JavaVM *vm, void *reserved) {
 
     env->DeleteGlobalRef(polygonClass);
     polygonClass = nullptr;
-    polygonConstructorId = nullptr;
     polygonAlphaId = nullptr;
     polygonVisibleId = nullptr;
     polygonFillColorId = nullptr;

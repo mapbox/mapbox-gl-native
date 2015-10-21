@@ -50,13 +50,14 @@ extern jfieldID bboxLatSouthId;
 extern jfieldID bboxLonEastId;
 extern jfieldID bboxLonWestId;
 
+extern jclass spriteClass;
+extern jfieldID spriteIdId;
+
 extern jclass markerClass;
-extern jmethodID markerConstructorId;
 extern jfieldID markerPositionId;
-extern jfieldID markerSpriteId;
+extern jfieldID markerIconId;
 
 extern jclass polylineClass;
-extern jmethodID polylineConstructorId;
 extern jfieldID polylineAlphaId;
 extern jfieldID polylineVisibleId;
 extern jfieldID polylineColorId;
@@ -64,7 +65,6 @@ extern jfieldID polylineWidthId;
 extern jfieldID polylinePointsId;
 
 extern jclass polygonClass;
-extern jmethodID polygonConstructorId;
 extern jfieldID polygonAlphaId;
 extern jfieldID polygonVisibleId;
 extern jfieldID polygonFillColorId;

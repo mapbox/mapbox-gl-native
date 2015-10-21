@@ -17,6 +17,7 @@ import android.graphics.Matrix;
 import android.graphics.PointF;
 import android.graphics.RectF;
 import android.graphics.SurfaceTexture;
+import android.graphics.drawable.BitmapDrawable;
 import android.location.Location;
 import android.net.ConnectivityManager;
 import android.net.NetworkInfo;
@@ -36,6 +37,7 @@ import android.support.v4.view.ScaleGestureDetectorCompat;
 import android.support.v7.app.AlertDialog;
 import android.text.TextUtils;
 import android.util.AttributeSet;
+import android.util.DisplayMetrics;
 import android.util.Log;
 import android.view.GestureDetector;
 import android.view.Gravity;
@@ -64,8 +66,11 @@ import com.mapbox.mapboxsdk.annotations.Polygon;
 import com.mapbox.mapboxsdk.annotations.PolygonOptions;
 import com.mapbox.mapboxsdk.annotations.Polyline;
 import com.mapbox.mapboxsdk.annotations.PolylineOptions;
+import com.mapbox.mapboxsdk.annotations.Sprite;
+import com.mapbox.mapboxsdk.annotations.SpriteFactory;
 import com.mapbox.mapboxsdk.constants.Style;
 import com.mapbox.mapboxsdk.exceptions.InvalidAccessTokenException;
+import com.mapbox.mapboxsdk.exceptions.SpriteBitmapChangedException;
 import com.mapbox.mapboxsdk.geometry.BoundingBox;
 import com.mapbox.mapboxsdk.geometry.LatLng;
 import com.mapbox.mapboxsdk.geometry.LatLngZoom;
@@ -152,9 +157,6 @@ public final class MapView extends FrameLayout {
     // Index into R.arrays.attribution_links
     private static final int ATTRIBUTION_INDEX_IMPROVE_THIS_MAP = 2;
 
-    // Used for loading default marker sprite
-    private static final String DEFAULT_SPRITE = "com.mapbox.sprites.default";
-
     /**
      * The currently supported maximum zoom level.
      *
@@ -174,7 +176,6 @@ public final class MapView extends FrameLayout {
 
     // Used to handle DPI scaling
     private float mScreenDensity = 1.0f;
-    private float mScreenDensityDpi = 1.0f;
 
     // Touch gesture detectors
     private GestureDetectorCompat mGestureDetector;
@@ -213,6 +214,8 @@ public final class MapView extends FrameLayout {
     private List<Marker> mMarkersNearLastTap = new ArrayList<>();
     private Marker mSelectedMarker;
     private InfoWindowAdapter mInfoWindowAdapter;
+    private SpriteFactory mSpriteFactory;
+    private ArrayList<Sprite> mSprites = new ArrayList<>();
 
     // Used for the Mapbox Logo
     private ImageView mLogoView;
@@ -573,7 +576,6 @@ public final class MapView extends FrameLayout {
 
         // Get the screen's density
         mScreenDensity = context.getResources().getDisplayMetrics().density;
-        mScreenDensityDpi = context.getResources().getDisplayMetrics().densityDpi;
 
         // Get the cache path
         String cachePath = context.getCacheDir().getAbsolutePath();
@@ -818,6 +820,8 @@ public final class MapView extends FrameLayout {
                 }
 
                 if (change == DID_FINISH_LOADING_MAP) {
+                    reloadSprites();
+                    reloadMarkers();
                     adjustTopOffsetPixels();
                 }
             }
@@ -1595,18 +1599,61 @@ public final class MapView extends FrameLayout {
     // Annotations
     //
 
-    // Marking this function private until #2506 fixed
-    private void setSprite(String symbol, Bitmap bitmap) {
+    public SpriteFactory getSpriteFactory() {
+        if (mSpriteFactory == null) {
+            mSpriteFactory = new SpriteFactory(this);
+        }
+        return mSpriteFactory;
+    }
+
+    private void loadSprite(Sprite sprite) {
+        Bitmap bitmap = sprite.getBitmap();
+        String id = sprite.getId();
         if (bitmap.getConfig() != Bitmap.Config.ARGB_8888) {
             bitmap = bitmap.copy(Bitmap.Config.ARGB_8888, false);
         }
         ByteBuffer buffer = ByteBuffer.allocate(bitmap.getRowBytes() * bitmap.getHeight());
         bitmap.copyPixelsToBuffer(buffer);
 
-        //float scale = mScreenDensityDpi / bitmap.getDensity() * mScreenDensity;
-        float scale = 1.0f;
+        float density = bitmap.getDensity();
+        if (density == Bitmap.DENSITY_NONE) {
+            density = DisplayMetrics.DENSITY_DEFAULT;
+        }
+        float scale = density / DisplayMetrics.DENSITY_DEFAULT;
 
-        mNativeMapView.setSprite(symbol, bitmap.getWidth(), bitmap.getHeight(), scale, buffer.array());
+        mNativeMapView.setSprite(
+                id,
+                (int) (bitmap.getWidth() / scale),
+                (int) (bitmap.getHeight() / scale),
+                scale, buffer.array());
+    }
+
+    private void reloadSprites() {
+        int count = mSprites.size();
+        for (int i = 0; i < count; i++) {
+            Sprite sprite = mSprites.get(i);
+            loadSprite(sprite);
+        }
+    }
+
+    private Marker prepareMarker(MarkerOptions markerOptions) {
+        Marker marker = markerOptions.getMarker();
+        Sprite icon = marker.getIcon();
+        if (icon == null) {
+            icon = getSpriteFactory().defaultMarker();
+            marker.setIcon(icon);
+        }
+        if (!mSprites.contains(icon)) {
+            mSprites.add(icon);
+            loadSprite(icon);
+        } else {
+            Sprite oldSprite = mSprites.get(mSprites.indexOf(icon));
+            if (!oldSprite.getBitmap().sameAs(icon.getBitmap())) {
+                throw new SpriteBitmapChangedException();
+            }
+        }
+        marker.setTopOffsetPixels(getTopOffsetPixelsForSprite(icon));
+        return marker;
     }
 
     /**
@@ -1625,21 +1672,7 @@ public final class MapView extends FrameLayout {
             throw new NullPointerException("markerOptions is null");
         }
 
-        Marker marker = markerOptions.getMarker();
-
-        // Load the default marker sprite
-        if (marker.getSprite() == null) {
-            //BitmapDrawable bitmapDrawable = (BitmapDrawable) ContextCompat.getDrawable(mContext, R.drawable.default_marker);
-            //Bitmap bitmap = bitmapDrawable.getBitmap();
-            //setSprite(DEFAULT_SPRITE, bitmap);
-
-            // Red default marker is currently broken
-            //marker.setSprite("default_marker");
-            //marker.setSprite(DEFAULT_SPRITE);
-        }
-
-        marker.setTopOffsetPixels(getTopOffsetPixelsForAnnotationSymbol(marker.getSprite()));
-
+        Marker marker = prepareMarker(markerOptions);
         long id = mNativeMapView.addMarker(marker);
         marker.setId(id);        // the annotation needs to know its id
         marker.setMapView(this); // the annotation needs to know which map view it is in
@@ -1665,21 +1698,7 @@ public final class MapView extends FrameLayout {
 
         List<Marker> markers = new ArrayList<>(markerOptionsList.size());
         for (MarkerOptions markerOptions : markerOptionsList) {
-            Marker marker = markerOptions.getMarker();
-
-            // Load the default marker sprite
-            if (marker.getSprite() == null) {
-                //BitmapDrawable bitmapDrawable = (BitmapDrawable) ContextCompat.getDrawable(mContext, R.drawable.default_marker);
-                //Bitmap bitmap = bitmapDrawable.getBitmap();
-                //setSprite(DEFAULT_SPRITE, bitmap);
-
-                // Red default marker is currently broken
-                //marker.setSprite("default_marker");
-                //marker.setSprite(DEFAULT_SPRITE);
-            }
-
-            marker.setTopOffsetPixels(getTopOffsetPixelsForAnnotationSymbol(marker.getSprite()));
-
+            Marker marker = prepareMarker(markerOptions);
             markers.add(marker);
         }
 
@@ -1885,21 +1904,15 @@ public final class MapView extends FrameLayout {
         return new ArrayList<>(annotations);
     }
 
-    /**
-     * Get Top Offset for the annotation symbol.
-     * Used by InfoWindow
-     *
-     * @param symbolName Annotation Symbol
-     * @return Top Offset in pixels
-     */
-    private int getTopOffsetPixelsForAnnotationSymbol(String symbolName) {
+    private int getTopOffsetPixelsForSprite(Sprite sprite) {
         // This method will dead lock if map paused. Causes a freeze if you add a marker in an
         // activity's onCreate()
         if (mNativeMapView.isPaused()) {
             return 0;
         }
 
-        return (int) (mNativeMapView.getTopOffsetPixelsForAnnotationSymbol(symbolName) * mScreenDensity);
+        return (int) (mNativeMapView.getTopOffsetPixelsForAnnotationSymbol(sprite.getId())
+                * mScreenDensity);
     }
 
     /**
@@ -1970,7 +1983,7 @@ public final class MapView extends FrameLayout {
             if (annotation instanceof Marker) {
                 Marker marker = (Marker) annotation;
                 marker.setTopOffsetPixels(
-                        getTopOffsetPixelsForAnnotationSymbol(marker.getSprite()));
+                        getTopOffsetPixelsForSprite(marker.getIcon()));
             }
         }
 
@@ -1978,6 +1991,19 @@ public final class MapView extends FrameLayout {
             if (mSelectedMarker.isInfoWindowShown()) {
                 mSelectedMarker.hideInfoWindow();
                 showInfoWindow(mSelectedMarker);
+            }
+        }
+    }
+
+    private void reloadMarkers() {
+        int count = mAnnotations.size();
+        for (int i = 0; i < count; i++) {
+            Annotation annotation = mAnnotations.get(i);
+            if (annotation instanceof Marker) {
+                Marker marker = (Marker) annotation;
+                mNativeMapView.removeAnnotation(annotation.getId());
+                long newId = mNativeMapView.addMarker(marker);
+                marker.setId(newId);
             }
         }
     }

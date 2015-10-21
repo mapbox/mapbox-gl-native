@@ -71,8 +71,8 @@ public final class MarkerOptions {
         return marker.getTitle();
     }
 
-    public String getSprite() {
-        return marker.getSprite();
+    public Sprite getIcon() {
+        return marker.getIcon();
     }
 
     private MarkerOptions infoWindowAnchor(float u, float v) {
@@ -107,10 +107,8 @@ public final class MarkerOptions {
         return this;
     }
 
-    public MarkerOptions sprite(@Nullable String sprite) {
-        if (!TextUtils.isEmpty(sprite)) {
-            marker.setSprite(sprite);
-        }
+    public MarkerOptions icon(@Nullable Sprite icon) {
+        marker.setIcon(icon);
         return this;
     }
 
