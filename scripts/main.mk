@@ -100,6 +100,8 @@ node/configure:
 node/xproj:
 	$(QUIET)$(ENV) $(NODE_PRE_GYP) configure --clang -- \
 	$(GYP_FLAGS) -f xcode -Dlibuv_cflags= -Dlibuv_ldflags= -Dlibuv_static_libs=
+	$(QUIET)$(ENV) ./scripts/node/create_npm_scheme.sh test
+	$(QUIET)$(ENV) ./scripts/node/create_npm_scheme.sh run test-suite
 
 Makefile/node: Makefile/__project__ node/configure
 	@printf "$(TEXT_BOLD)$(COLOR_GREEN)* Building target node...$(FORMAT_END)\n"
