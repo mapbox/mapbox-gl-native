@@ -1071,6 +1071,8 @@ std::chrono::steady_clock::duration secondsAsDuration(float duration)
         _mbglMap->setBearing(newDegrees,
                             [rotate locationInView:rotate.view].x,
                             [rotate locationInView:rotate.view].y);
+        
+        [self notifyMapChange:mbgl::MapChangeRegionIsChanging];
     }
     else if (rotate.state == UIGestureRecognizerStateEnded || rotate.state == UIGestureRecognizerStateCancelled)
     {
@@ -1414,12 +1416,14 @@ std::chrono::steady_clock::duration secondsAsDuration(float duration)
         CGFloat pitchNew = mbgl::util::clamp(currentPitch - (gestureDistance / slowdown), MGLMinimumPitch, MGLMaximumPitch);
         
         _mbglMap->setPitch(pitchNew);
+        
+        [self notifyMapChange:mbgl::MapChangeRegionIsChanging];
     }
     else if (twoFingerDrag.state == UIGestureRecognizerStateEnded || twoFingerDrag.state == UIGestureRecognizerStateCancelled)
     {
         [self unrotateIfNeededAnimated:YES];
 
-        //[self notifyMapChange:(mbgl::MapChangeRegionDidChange)];
+        [self notifyMapChange:mbgl::MapChangeRegionDidChange];
     }
     
 }
