@@ -118,7 +118,7 @@ void FillBucket::addGeometry(const GeometryCollection& geometry) {
             lineGroup.elements_length += nVertices;
         }
 
-        mapbox::Earcut<Coordinate::Type, uint16_t> earcut;
+        mapbox::Earcut<uint16_t> earcut;
         earcut(polygon);
 
         std::size_t nIndicies = earcut.indices.size();
