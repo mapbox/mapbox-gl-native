@@ -1,10 +1,49 @@
 package com.mapbox.mapboxsdk.annotations;
 
+import android.graphics.Bitmap;
+import android.os.Parcel;
+import android.os.Parcelable;
 import android.support.annotation.Nullable;
 
 import com.mapbox.mapboxsdk.geometry.LatLng;
 
-public final class MarkerOptions {
+public final class MarkerOptions implements Parcelable {
+
+    public static final Parcelable.Creator<MarkerOptions> CREATOR
+            = new Parcelable.Creator<MarkerOptions>() {
+        public MarkerOptions createFromParcel(Parcel in) {
+            return new MarkerOptions(in);
+        }
+
+        public MarkerOptions[] newArray(int size) {
+            return new MarkerOptions[size];
+        }
+    };
+
+    private MarkerOptions(Parcel in) {
+        marker = new Marker();
+        position((LatLng) in.readParcelable(LatLng.class.getClassLoader()));
+        snippet(in.readString());
+        String spriteId = in.readString();
+        Bitmap spriteBitmap = in.readParcelable(Bitmap.class.getClassLoader());
+        Sprite icon = new Sprite(spriteId, spriteBitmap);
+        icon(icon);
+        title(in.readString());
+    }
+
+    @Override
+    public int describeContents() {
+        return 0;
+    }
+
+    @Override
+    public void writeToParcel(Parcel out, int flags) {
+        out.writeParcelable(getPosition(), flags);
+        out.writeString(getSnippet());
+        out.writeString(getIcon().getId());
+        out.writeParcelable(getIcon().getBitmap(), flags);
+        out.writeString(getTitle());
+    }
 
     private Marker marker;
 

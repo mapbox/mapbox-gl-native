@@ -1,11 +1,49 @@
 package com.mapbox.mapboxsdk.annotations;
 
 
+import android.os.Parcel;
+import android.os.Parcelable;
+
 import com.mapbox.mapboxsdk.geometry.LatLng;
 
+import java.util.ArrayList;
 import java.util.List;
 
-public final class PolygonOptions {
+public final class PolygonOptions implements Parcelable {
+
+    public static final Parcelable.Creator<PolygonOptions> CREATOR
+            = new Parcelable.Creator<PolygonOptions>() {
+        public PolygonOptions createFromParcel(Parcel in) {
+            return new PolygonOptions(in);
+        }
+
+        public PolygonOptions[] newArray(int size) {
+            return new PolygonOptions[size];
+        }
+    };
+
+    private PolygonOptions(Parcel in) {
+        polygon = new Polygon();
+        ArrayList<LatLng> pointsList = new ArrayList<>();
+        in.readList(pointsList, LatLng.class.getClassLoader());
+        addAll(pointsList);
+        alpha(in.readFloat());
+        fillColor(in.readInt());
+        strokeColor(in.readInt());
+    }
+
+    @Override
+    public int describeContents() {
+        return 0;
+    }
+
+    @Override
+    public void writeToParcel(Parcel out, int flags) {
+        out.writeList(getPoints());
+        out.writeFloat(getAlpha());
+        out.writeInt(getFillColor());
+        out.writeInt(getStrokeColor());
+    }
 
     private Polygon polygon;
 

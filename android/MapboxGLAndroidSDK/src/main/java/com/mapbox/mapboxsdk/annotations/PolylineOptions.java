@@ -1,10 +1,49 @@
 package com.mapbox.mapboxsdk.annotations;
 
+import android.os.Parcel;
+import android.os.Parcelable;
+
 import com.mapbox.mapboxsdk.geometry.LatLng;
 
+import java.util.ArrayList;
 import java.util.List;
 
-public final class PolylineOptions {
+public final class PolylineOptions implements Parcelable {
+
+
+    public static final Parcelable.Creator<PolylineOptions> CREATOR
+            = new Parcelable.Creator<PolylineOptions>() {
+        public PolylineOptions createFromParcel(Parcel in) {
+            return new PolylineOptions(in);
+        }
+
+        public PolylineOptions[] newArray(int size) {
+            return new PolylineOptions[size];
+        }
+    };
+
+    private PolylineOptions(Parcel in) {
+        polyline = new Polyline();
+        ArrayList<LatLng> pointsList = new ArrayList<>();
+        in.readList(pointsList, LatLng.class.getClassLoader());
+        addAll(pointsList);
+        alpha(in.readFloat());
+        color(in.readInt());
+        width(in.readFloat());
+    }
+
+    @Override
+    public int describeContents() {
+        return 0;
+    }
+
+    @Override
+    public void writeToParcel(Parcel out, int flags) {
+        out.writeList(getPoints());
+        out.writeFloat(getAlpha());
+        out.writeInt(getColor());
+        out.writeFloat(getWidth());
+    }
 
     private Polyline polyline;
 
