@@ -36,6 +36,10 @@
         <activity
             android:name=".InfoWindowActivity"
             android:label="@string/activity_info_window" />
+        
+        <activity
+            android:name=".BulkMarkerActivity"
+            android:label="@string/action_add_bulk_markers" />
 
         <activity
             android:name=".MapFragmentActivity"

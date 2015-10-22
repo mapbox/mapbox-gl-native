@@ -326,6 +326,10 @@ public class MainActivity extends AppCompatActivity {
                                 startActivity(new Intent(getApplicationContext(), PressForMarkerActivity.class));
                                 return true;
 
+                            case R.id.action_bulk_markers:
+                                startActivity(new Intent(getApplicationContext(), BulkMarkerActivity.class));
+                                return true;
+
                             case R.id.action_info_window:
                                 startActivity(new Intent(getApplicationContext(), InfoWindowActivity.class));
                                 return true;
@@ -458,10 +462,10 @@ public class MainActivity extends AppCompatActivity {
     private void addPolyline() {
         try {
             String geojsonStr = Util.loadStringFromAssets(this, "small_line.geojson");
-            LatLng[] latLngs = Util.parseGeoJSONCoordinates(geojsonStr);
+            List<LatLng> latLngs = Util.parseGeoJSONCoordinates(geojsonStr);
             MapView map = mMapView;
             map.addPolyline(new PolylineOptions()
-                    .add(latLngs)
+                    .add(latLngs.toArray(new LatLng[latLngs.size()]))
                     .width(2)
                     .color(Color.RED));
         } catch (Exception e) {
@@ -473,11 +477,11 @@ public class MainActivity extends AppCompatActivity {
     private void addPolygon() {
         try {
             String geojsonStr = Util.loadStringFromAssets(this, "small_poly.geojson");
-            LatLng[] latLngs = Util.parseGeoJSONCoordinates(geojsonStr);
+            List<LatLng> latLngs = Util.parseGeoJSONCoordinates(geojsonStr);
             MapView map = mMapView;
             ArrayList<PolygonOptions> opts = new ArrayList<>();
             opts.add(new PolygonOptions()
-                    .add(latLngs)
+                    .add(latLngs.toArray(new LatLng[latLngs.size()]))
                     .strokeColor(Color.MAGENTA)
                     .fillColor(Color.BLUE).alpha(0.5f));
             map.addPolygons(opts).get(0);
