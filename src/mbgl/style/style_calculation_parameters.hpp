@@ -11,14 +11,19 @@ public:
     StyleCalculationParameters(float z_)
         : z(z_) {}
 
-    StyleCalculationParameters(float z_, const TimePoint& now_, const ZoomHistory& zoomHistory_)
+    StyleCalculationParameters(float z_,
+                               const TimePoint& now_,
+                               const ZoomHistory& zoomHistory_,
+                               const Duration& defaultFadeDuration_)
         : z(z_),
           now(now_),
-          zoomHistory(zoomHistory_) {}
+          zoomHistory(zoomHistory_),
+          defaultFadeDuration(defaultFadeDuration_) {}
 
     float z;
     TimePoint now;
     ZoomHistory zoomHistory;
+    Duration defaultFadeDuration;
 };
 
 }

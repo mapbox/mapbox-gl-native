@@ -3,9 +3,6 @@
 #include <mbgl/style/style_parser.hpp>
 #include <mbgl/util/io.hpp>
 
-#include <mbgl/map/mode.hpp>
-#include <mbgl/map/map_data.hpp>
-
 #include <rapidjson/document.h>
 
 #include "../fixtures/fixture_log_observer.hpp"
@@ -38,12 +35,7 @@ TEST_P(StyleParserTest, ParseStyle) {
     FixtureLogObserver* observer = new FixtureLogObserver();
     Log::setObserver(std::unique_ptr<Log::Observer>(observer));
 
-    MapMode mapMode = MapMode::Continuous;
-    GLContextMode contextMode = GLContextMode::Unique;
-    const float pixelRatio = 1.0f;
-
-    MapData data(mapMode, contextMode, pixelRatio);
-    StyleParser parser(data);
+    StyleParser parser;
     parser.parse(styleDoc);
 
     for (auto it = infoDoc.MemberBegin(), end = infoDoc.MemberEnd(); it != end; it++) {

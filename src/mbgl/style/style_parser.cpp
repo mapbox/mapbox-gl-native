@@ -1,7 +1,6 @@
 #include <mbgl/style/style_parser.hpp>
 #include <mbgl/map/source.hpp>
 #include <mbgl/style/style_layer.hpp>
-#include <mbgl/map/map_data.hpp>
 #include <mbgl/util/constants.hpp>
 #include <mbgl/util/vec.hpp>
 #include <mbgl/util/uv_detail.hpp>
@@ -20,10 +19,6 @@
 namespace mbgl {
 
 using JSVal = const rapidjson::Value&;
-
-StyleParser::StyleParser(MapData& data_)
-    : data(data_) {
-}
 
 void StyleParser::parse(JSVal document) {
     if (document.HasMember("version")) {
@@ -329,7 +324,12 @@ StyleParser::Result<Function<T>> StyleParser::parseFunction(JSVal value, const c
 }
 
 template <typename T>
-StyleParser::Result<PiecewiseConstantFunction<T>> StyleParser::parsePiecewiseConstantFunction(JSVal value, Duration duration) {
+StyleParser::Result<PiecewiseConstantFunction<T>> StyleParser::parsePiecewiseConstantFunction(JSVal value, JSVal transition) {
+    mapbox::util::optional<Duration> duration;
+    if (transition.HasMember("duration")) {
+        duration = std::chrono::milliseconds(transition["duration"].GetUint());
+    }
+
     if (!value.HasMember("stops")) {
         Log::Warning(Event::ParseStyle, "function must specify a function type");
         return Result<PiecewiseConstantFunction<T>> { StyleParserFailure, { {}, duration } };
@@ -517,14 +517,14 @@ template<> StyleParser::Result<RotationAlignmentType> StyleParser::parseProperty
 }
 
 template<> StyleParser::Result<PropertyTransition> StyleParser::parseProperty(JSVal value, const char */*property_name*/) {
-    PropertyTransition transition { data.getDefaultTransitionDuration(), data.getDefaultTransitionDelay() };
+    PropertyTransition transition;
     if (value.IsObject()) {
         bool parsed = false;
-        if (value.HasMember("duration") && value["duration"].IsNumber() && data.mode == MapMode::Continuous) {
+        if (value.HasMember("duration") && value["duration"].IsNumber()) {
             transition.duration = std::chrono::milliseconds(value["duration"].GetUint());
             parsed = true;
         }
-        if (value.HasMember("delay") && value["delay"].IsNumber() && data.mode == MapMode::Continuous) {
+        if (value.HasMember("delay") && value["delay"].IsNumber()) {
             transition.delay = std::chrono::milliseconds(value["delay"].GetUint());
             parsed = true;
         }
@@ -593,39 +593,29 @@ template<> StyleParser::Result<Function<Color>> StyleParser::parseProperty(JSVal
 }
 
 template<> StyleParser::Result<PiecewiseConstantFunction<Faded<std::vector<float>>>> StyleParser::parseProperty(JSVal value, const char *property_name, JSVal transition) {
-    Duration duration = data.getDefaultFadeDuration();
-    if (transition.HasMember("duration") && data.mode == MapMode::Continuous) {
-        duration = std::chrono::milliseconds(transition["duration"].GetUint());
-    }
-
     if (value.IsObject()) {
-        return parsePiecewiseConstantFunction<Faded<std::vector<float>>>(value, duration);
+        return parsePiecewiseConstantFunction<Faded<std::vector<float>>>(value, transition);
     } else if (value.IsArray()) {
         Faded<std::vector<float>> parsed;
         Result<std::vector<float>> floatarray = parseFloatArray(value);
         parsed.to = std::get<1>(floatarray);
-        return Result<PiecewiseConstantFunction<Faded<std::vector<float>>>> { std::get<0>(floatarray),  { parsed, duration } };
+        return Result<PiecewiseConstantFunction<Faded<std::vector<float>>>> { std::get<0>(floatarray),  { parsed, {} } };
     } else {
         Log::Warning(Event::ParseStyle, "value of '%s' must be an array of numbers, or a number array function", property_name);
-        return Result<PiecewiseConstantFunction<Faded<std::vector<float>>>> { StyleParserFailure, { {}, duration } };
+        return Result<PiecewiseConstantFunction<Faded<std::vector<float>>>> { StyleParserFailure, { {}, {} } };
     }
 }
 
 template<> StyleParser::Result<PiecewiseConstantFunction<Faded<std::string>>> StyleParser::parseProperty(JSVal value, const char *property_name, JSVal transition) {
-    Duration duration = data.getDefaultFadeDuration();
-    if (transition.HasMember("duration") && data.mode == MapMode::Continuous) {
-        duration = std::chrono::milliseconds(transition["duration"].GetUint());
-    }
-
     if (value.IsObject()) {
-        return parsePiecewiseConstantFunction<Faded<std::string>>(value, duration);
+        return parsePiecewiseConstantFunction<Faded<std::string>>(value, transition);
     } else if (value.IsString()) {
         Faded<std::string> parsed;
         parsed.to = { value.GetString(), value.GetStringLength() };
-        return Result<PiecewiseConstantFunction<Faded<std::string>>> { StyleParserSuccess,  { parsed, duration } };
+        return Result<PiecewiseConstantFunction<Faded<std::string>>> { StyleParserSuccess,  { parsed, {} } };
     } else {
         Log::Warning(Event::ParseStyle, "value of '%s' must be string or a string function", property_name);
-        return Result<PiecewiseConstantFunction<Faded<std::string>>> { StyleParserFailure, { {}, duration } };
+        return Result<PiecewiseConstantFunction<Faded<std::string>>> { StyleParserFailure, { {}, {} } };
     }
 }
 

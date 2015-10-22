@@ -19,7 +19,7 @@ public:
         transitions.emplace(key, transition);
     }
 
-    const PropertyTransition &getTransition(PropertyKey key, const PropertyTransition &defaultTransition) const;
+    PropertyTransition getTransition(PropertyKey key) const;
 
     // Route-through iterable interface so that you can iterate on the object as is.
     inline std::map<PropertyKey, PropertyValue>::const_iterator begin() const {

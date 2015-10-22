@@ -21,7 +21,8 @@ T PiecewiseConstantFunction<T>::evaluate(const StyleCalculationParameters& param
 
     float z = parameters.z;
     float fraction = std::fmod(z, 1.0f);
-    float t = std::min((Clock::now() - parameters.zoomHistory.lastIntegerZoomTime) / duration, 1.0f);
+    std::chrono::duration<float> d = duration ? *duration : parameters.defaultFadeDuration;
+    float t = std::min((Clock::now() - parameters.zoomHistory.lastIntegerZoomTime) / d, 1.0f);
     float fromScale = 1.0f;
     float toScale = 1.0f;
     size_t from, to;

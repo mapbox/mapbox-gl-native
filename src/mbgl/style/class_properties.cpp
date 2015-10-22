@@ -2,10 +2,10 @@
 
 namespace mbgl {
 
-const PropertyTransition &ClassProperties::getTransition(PropertyKey key, const PropertyTransition &defaultTransition) const {
+PropertyTransition ClassProperties::getTransition(PropertyKey key) const {
     auto it = transitions.find(key);
     if (it == transitions.end()) {
-        return defaultTransition;
+        return PropertyTransition();
     } else {
         return it->second;
     }

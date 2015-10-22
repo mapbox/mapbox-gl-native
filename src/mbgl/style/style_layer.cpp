@@ -73,8 +73,8 @@ void StyleLayer::setClasses(const std::vector<std::string> &class_names, const T
 
         // This property key hasn't been set by a previous class, so we need to add a transition
         // to the fallback value for that key.
-        const TimePoint begin = now + defaultTransition.delay;
-        const TimePoint end = begin + defaultTransition.duration;
+        const TimePoint begin = now + *defaultTransition.delay;
+        const TimePoint end = begin + *defaultTransition.duration;
         const PropertyValue &value = PropertyFallbackValue::Get(key);
         appliedProperties.add(ClassID::Fallback, begin, end, value);
     }
@@ -108,10 +108,11 @@ void StyleLayer::applyClassProperties(const ClassID class_id,
         // a transition.
         AppliedClassPropertyValues &appliedProperties = appliedStyle[key];
         if (appliedProperties.mostRecent() != class_id) {
-            const PropertyTransition &transition =
-                class_properties.getTransition(key, defaultTransition);
-            const TimePoint begin = now + transition.delay;
-            const TimePoint end = begin + transition.duration;
+            PropertyTransition transition = class_properties.getTransition(key);
+            Duration delay = transition.delay ? *transition.delay : *defaultTransition.delay;
+            Duration duration = transition.duration ? *transition.duration : *defaultTransition.duration;
+            const TimePoint begin = now + delay;
+            const TimePoint end = begin + duration;
             const PropertyValue &value = property_pair.second;
             appliedProperties.add(class_id, begin, end, value);
         }

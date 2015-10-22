@@ -42,7 +42,7 @@ void Style::setJSON(const std::string& json, const std::string&) {
         return;
     }
 
-    StyleParser parser(data);
+    StyleParser parser;
     parser.parse(doc);
 
     for (auto& source : parser.getSources()) {
@@ -136,7 +136,10 @@ void Style::recalculate(float z) {
 
     zoomHistory.update(z, data.getAnimationTime());
 
-    StyleCalculationParameters parameters(z, data.getAnimationTime(), zoomHistory);
+    StyleCalculationParameters parameters(z,
+                                          data.getAnimationTime(),
+                                          zoomHistory,
+                                          data.getDefaultFadeDuration());
 
     for (const auto& layer : layers) {
         layer->updateProperties(parameters);

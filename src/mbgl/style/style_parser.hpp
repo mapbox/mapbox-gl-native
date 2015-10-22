@@ -31,8 +31,6 @@ public:
     template<typename T>
     using Result = std::pair<Status, T>;
 
-    StyleParser(MapData& data);
-
     void parse(JSVal document);
 
     std::vector<std::unique_ptr<Source>>&& getSources() {
@@ -87,7 +85,7 @@ private:
     template <typename T>
     Result<Function<T>> parseFunction(JSVal value, const char *);
     template <typename T>
-    Result<PiecewiseConstantFunction<T>> parsePiecewiseConstantFunction(JSVal value, Duration duration);
+    Result<PiecewiseConstantFunction<T>> parsePiecewiseConstantFunction(JSVal value, JSVal transition);
     template <typename T>
     Result<std::vector<std::pair<float, T>>> parseStops(JSVal value, const char *property_name);
 
@@ -112,9 +110,6 @@ private:
 
     // URL template for glyph PBFs.
     std::string glyph_url;
-
-    // Obtain default transition duration from map data.
-    MapData& data;
 };
 
 }
