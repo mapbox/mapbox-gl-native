@@ -34,6 +34,7 @@ NS_ASSUME_NONNULL_BEGIN
 @property (nonatomic) IBInspectable BOOL allowsZooming;
 @property (nonatomic) IBInspectable BOOL allowsScrolling;
 @property (nonatomic) IBInspectable BOOL allowsRotating;
+@property (nonatomic) IBInspectable BOOL allowsTilting;
 @property (nonatomic) IBInspectable BOOL showsUserLocation;
 
 @end

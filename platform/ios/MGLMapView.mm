@@ -1535,7 +1535,7 @@ std::chrono::steady_clock::duration secondsAsDuration(float duration)
 
 + (NS_SET_OF(NSString *) *)keyPathsForValuesAffectingPitchEnabled
 {
-    return [NSSet setWithObject:@"allowsPitching"];
+    return [NSSet setWithObject:@"allowsTilting"];
 }
 
 - (void)setDebugActive:(BOOL)debugActive
@@ -3410,19 +3410,19 @@ class MBGLView : public mbgl::View
     self.rotateEnabled = allowsRotating;
 }
 
-+ (NS_SET_OF(NSString *) *)keyPathsForValuesAffectingAllowsPitching
++ (NS_SET_OF(NSString *) *)keyPathsForValuesAffectingAllowsTilting
 {
     return [NSSet setWithObject:@"pitchEnabled"];
 }
 
-- (BOOL)allowsPitching
+- (BOOL)allowsTilting
 {
     return self.pitchEnabled;
 }
 
-- (void)setAllowsPitching:(BOOL)allowsPitching
+- (void)setAllowsTilting:(BOOL)allowsTilting
 {
-    self.pitchEnabled = allowsPitching;
+    self.pitchEnabled = allowsTilting;
 }
 
 - (void)didReceiveMemoryWarning
