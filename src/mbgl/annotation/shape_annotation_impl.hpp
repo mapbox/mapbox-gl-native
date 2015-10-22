@@ -13,6 +13,7 @@
 namespace mbgl {
 
 class Style;
+class StyleLayer;
 class AnnotationTile;
 
 class ShapeAnnotationImpl {
@@ -30,7 +31,12 @@ public:
     const ShapeAnnotation shape;
 
 private:
-    mapbox::util::geojsonvt::GeoJSONVT shapeTiler;
+    std::unique_ptr<StyleLayer> createLineLayer();
+    std::unique_ptr<StyleLayer> createFillLayer();
+
+    const uint8_t maxZoom;
+    mapbox::util::geojsonvt::ProjectedFeatureType type;
+    std::unique_ptr<mapbox::util::geojsonvt::GeoJSONVT> shapeTiler;
 };
 
 }

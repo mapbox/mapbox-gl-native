@@ -15,92 +15,115 @@ using namespace mapbox::util::geojsonvt;
 
 ShapeAnnotationImpl::ShapeAnnotationImpl(const AnnotationID id_,
                                          const ShapeAnnotation& shape_,
-                                         const uint8_t maxZoom)
+                                         const uint8_t maxZoom_)
 : id(id_),
   layerID("com.mapbox.annotations.shape." + util::toString(id)),
   shape(shape_),
-  shapeTiler(([&] {
-    const double baseTolerance = 3;
-    const uint16_t extent = 4096;
-    const double tolerance = baseTolerance / ((1 << maxZoom) * extent);
-
-    ProjectedGeometryContainer rings;
-    std::vector<LonLat> points;
-
-    for (size_t i = 0; i < shape.segments[0].size(); ++i) { // first segment for now (no holes)
-        const double constraintedLatitude = ::fmin(::fmax(shape.segments[0][i].latitude, -util::LATITUDE_MAX), util::LATITUDE_MAX);
-        points.push_back(LonLat(shape.segments[0][i].longitude, constraintedLatitude));
-    }
-
-    ProjectedFeatureType featureType;
-
-    if (shape.styleProperties.is<FillPaintProperties>()) {
-        featureType = ProjectedFeatureType::Polygon;
-
-        if (points.front().lon != points.back().lon || points.front().lat != points.back().lat) {
-            points.push_back(LonLat(points.front().lon, points.front().lat));
-        }
-    } else {
-        featureType = ProjectedFeatureType::LineString;
-    }
-
-    ProjectedGeometryContainer ring = Convert::project(points, tolerance);
-    rings.members.push_back(ring);
-
-    std::vector<ProjectedFeature> features;
-    features.push_back(Convert::create(Tags(), featureType, rings));
-    return features;
-  })(), maxZoom, 4, 100, 10) {}
+  maxZoom(maxZoom_) {
+}
 
 void ShapeAnnotationImpl::updateStyle(Style& style) {
     if (style.getLayer(layerID))
         return;
 
-    if (shape.styleProperties.is<LinePaintProperties>()) {
-        const LinePaintProperties& properties = shape.styleProperties.get<LinePaintProperties>();
+    std::unique_ptr<StyleLayer> layer;
 
-        std::unique_ptr<LineLayer> layer = std::make_unique<LineLayer>();
-        layer->id = layerID;
-        layer->type = StyleLayerType::Line;
+    if (shape.properties.is<LinePaintProperties>()) {
+        layer = createLineLayer();
 
+        const LinePaintProperties& properties = shape.properties.get<LinePaintProperties>();
         ClassProperties paintProperties;
         paintProperties.set(PropertyKey::LineOpacity, ConstantFunction<float>(properties.opacity));
         paintProperties.set(PropertyKey::LineWidth, ConstantFunction<float>(properties.width));
         paintProperties.set(PropertyKey::LineColor, ConstantFunction<Color>(properties.color));
         layer->styles.emplace(ClassID::Default, std::move(paintProperties));
 
-        layer->bucket = std::make_shared<StyleBucket>(layer->type);
-        layer->bucket->name = layer->id;
-        layer->bucket->source = AnnotationManager::SourceID;
-        layer->bucket->source_layer = layer->id;
-        layer->bucket->layout.set(PropertyKey::LineJoin, ConstantFunction<JoinType>(JoinType::Round));
+    } else if (shape.properties.is<FillPaintProperties>()) {
+        layer = createFillLayer();
 
-        style.addLayer(std::move(layer), AnnotationManager::PointLayerID);
-
-    } else if (shape.styleProperties.is<FillPaintProperties>()) {
-        const FillPaintProperties& properties = shape.styleProperties.get<FillPaintProperties>();
-
-        std::unique_ptr<FillLayer> layer = std::make_unique<FillLayer>();
-        layer->id = layerID;
-        layer->type = StyleLayerType::Fill;
-
+        const FillPaintProperties& properties = shape.properties.get<FillPaintProperties>();
         ClassProperties paintProperties;
         paintProperties.set(PropertyKey::FillOpacity, ConstantFunction<float>(properties.opacity));
         paintProperties.set(PropertyKey::FillColor, ConstantFunction<Color>(properties.fill_color));
         paintProperties.set(PropertyKey::FillOutlineColor, ConstantFunction<Color>(properties.stroke_color));
         layer->styles.emplace(ClassID::Default, std::move(paintProperties));
 
-        layer->bucket = std::make_shared<StyleBucket>(layer->type);
-        layer->bucket->name = layer->id;
-        layer->bucket->source = AnnotationManager::SourceID;
-        layer->bucket->source_layer = layer->id;
+    } else {
+        const StyleLayer* sourceLayer = style.getLayer(shape.properties.get<std::string>());
+        if (!sourceLayer) return;
 
-        style.addLayer(std::move(layer), AnnotationManager::PointLayerID);
+        switch (sourceLayer->type) {
+        case StyleLayerType::Line:
+            layer = createLineLayer();
+            break;
+
+        case StyleLayerType::Fill:
+            layer = createFillLayer();
+            break;
+
+        default:
+            return;
+        }
+
+        layer->styles = sourceLayer->styles;
+        layer->bucket->layout = sourceLayer->bucket->layout;
     }
+
+    layer->bucket->name = layer->id;
+    layer->bucket->source = AnnotationManager::SourceID;
+    layer->bucket->source_layer = layer->id;
+
+    style.addLayer(std::move(layer), AnnotationManager::PointLayerID);
+}
+
+std::unique_ptr<StyleLayer> ShapeAnnotationImpl::createLineLayer() {
+    type = ProjectedFeatureType::LineString;
+    std::unique_ptr<LineLayer> layer = std::make_unique<LineLayer>();
+    layer->id = layerID;
+    layer->type = StyleLayerType::Line;
+    layer->bucket = std::make_shared<StyleBucket>(layer->type);
+    layer->bucket->layout.set(PropertyKey::LineJoin, ConstantFunction<JoinType>(JoinType::Round));
+    return std::move(layer);
+}
+
+std::unique_ptr<StyleLayer> ShapeAnnotationImpl::createFillLayer() {
+    type = ProjectedFeatureType::Polygon;
+    std::unique_ptr<FillLayer> layer = std::make_unique<FillLayer>();
+    layer->id = layerID;
+    layer->type = StyleLayerType::Fill;
+    layer->bucket = std::make_shared<StyleBucket>(layer->type);
+    return std::move(layer);
 }
 
 void ShapeAnnotationImpl::updateTile(const TileID& tileID, AnnotationTile& tile) {
-    const auto& shapeTile = shapeTiler.getTile(tileID.z, tileID.x, tileID.y);
+    if (!shapeTiler) {
+        const double baseTolerance = 3;
+        const uint16_t extent = 4096;
+        const double tolerance = baseTolerance / ((1 << maxZoom) * extent);
+
+        ProjectedGeometryContainer rings;
+        std::vector<LonLat> points;
+
+        for (size_t i = 0; i < shape.segments[0].size(); ++i) { // first segment for now (no holes)
+            const double constraintedLatitude = ::fmin(::fmax(shape.segments[0][i].latitude, -util::LATITUDE_MAX), util::LATITUDE_MAX);
+            points.push_back(LonLat(shape.segments[0][i].longitude, constraintedLatitude));
+        }
+
+        if (type == ProjectedFeatureType::Polygon &&
+                (points.front().lon != points.back().lon || points.front().lat != points.back().lat)) {
+            points.push_back(LonLat(points.front().lon, points.front().lat));
+        }
+
+        ProjectedGeometryContainer ring = Convert::project(points, tolerance);
+        rings.members.push_back(ring);
+
+        std::vector<ProjectedFeature> features;
+        features.push_back(Convert::create(Tags(), type, rings));
+
+        shapeTiler = std::make_unique<mapbox::util::geojsonvt::GeoJSONVT>(features, maxZoom, 4, 100, 10);
+    }
+
+    const auto& shapeTile = shapeTiler->getTile(tileID.z, tileID.x, tileID.y);
     if (!shapeTile)
         return;
 

@@ -11,10 +11,6 @@ namespace mbgl {
 
 class ClassProperties {
 public:
-    inline ClassProperties() {}
-    inline ClassProperties(ClassProperties &&properties_)
-        : properties(std::move(properties_.properties)) {}
-
     inline void set(PropertyKey key, const PropertyValue &value) {
         properties.emplace(key, value);
     }

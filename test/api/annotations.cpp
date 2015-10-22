@@ -75,6 +75,21 @@ TEST(Annotations, FillAnnotation) {
     util::write_file("test/output/fill_annotation.png", renderPNG(map));
 }
 
+TEST(Annotations, StyleSourcedShapeAnnotation) {
+    auto display = std::make_shared<mbgl::HeadlessDisplay>();
+    HeadlessView view(display, 1);
+    DefaultFileSource fileSource(nullptr);
+
+    Map map(view, fileSource, MapMode::Still);
+    map.setStyleJSON(util::read_file("test/fixtures/api/annotation.json"), "");
+
+    AnnotationSegments segments = {{ {{ { 0, 0 }, { 0, 45 }, { 45, 45 }, { 45, 0 } }} }};
+
+    map.addShapeAnnotation(ShapeAnnotation(segments, "annotation"));
+
+    util::write_file("test/output/style_sourced_shape_annotation.png", renderPNG(map));
+}
+
 TEST(Annotations, AddMultiple) {
     auto display = std::make_shared<mbgl::HeadlessDisplay>();
     HeadlessView view(display, 1);

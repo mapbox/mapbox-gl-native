@@ -1,0 +1,19 @@
+{
+  "version": 8,
+  "sources": {
+    "fake": {
+      "type": "vector",
+      "url": "asset://TEST_DATA/fixtures/tiles/streets.json"
+    }
+  },
+  "layers": [{
+    "id": "annotation",
+    "type": "fill",
+    "source": "fake",
+    "source-layer": "fake",
+    "paint": {
+      "fill-color": "rgba(255,0,0,1)"
+    }
+  }],
+  "sprite": "asset://TEST_DATA/fixtures/resources/sprite"
+}

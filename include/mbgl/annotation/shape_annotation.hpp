@@ -15,14 +15,17 @@ using AnnotationSegments = std::vector<AnnotationSegment>;
 
 class ShapeAnnotation {
 public:
-    using Properties = mapbox::util::variant<FillPaintProperties, LinePaintProperties>;
+    using Properties = mapbox::util::variant<
+        FillPaintProperties, // creates a fill annotation
+        LinePaintProperties, // creates a line annotation
+        std::string>;        // creates an annotation whose type and properties are sourced from a style layer
 
-    inline ShapeAnnotation(const AnnotationSegments& segments_, const Properties& styleProperties_)
-        : segments(segments_), styleProperties(styleProperties_) {
+    ShapeAnnotation(const AnnotationSegments& segments_, const Properties& properties_)
+        : segments(segments_), properties(properties_) {
     }
 
     const AnnotationSegments segments;
-    const Properties styleProperties;
+    const Properties properties;
 };
 
 }
