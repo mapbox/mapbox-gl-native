@@ -34,9 +34,6 @@ public class InfoWindowActivity extends AppCompatActivity {
         mMapView = (MapView) findViewById(R.id.mapView);
         mMapView.setAccessToken(ApiAccess.getToken(this));
         mMapView.onCreate(savedInstanceState);
-        mMapView.setStyle(Style.MAPBOX_STREETS);
-        mMapView.setCenterCoordinate(new LatLng(38.897705003219784, -77.03655168667463));
-        mMapView.setZoomLevel(15);
 
         mMapView.addMarker(new MarkerOptions()
                 .title("Intersection")

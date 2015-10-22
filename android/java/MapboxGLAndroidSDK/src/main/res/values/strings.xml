@@ -7,4 +7,11 @@
     <string name="infoWindowTitle">Title</string>
     <string name="infoWindowDescription">Description</string>
     <string name="infoWindowAddress">Address</string>
+
+    <!-- these are public -->
+    <string name="style_mapbox_streets">asset://styles/streets-v8.json</string>
+    <string name="style_emerald">asset://styles/emerald-v8.json</string>
+    <string name="style_light">asset://styles/light-v8.json</string>
+    <string name="style_dark">asset://styles/dark-v8.json</string>
+    <string name="style_satellite">asset://styles/satellite-v8.json</string>
 </resources>

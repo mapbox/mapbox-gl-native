@@ -17,7 +17,6 @@ import android.graphics.Matrix;
 import android.graphics.PointF;
 import android.graphics.RectF;
 import android.graphics.SurfaceTexture;
-import android.graphics.drawable.BitmapDrawable;
 import android.location.Location;
 import android.net.ConnectivityManager;
 import android.net.NetworkInfo;
@@ -38,7 +37,6 @@ import android.support.v7.app.AlertDialog;
 import android.text.TextUtils;
 import android.util.AttributeSet;
 import android.util.DisplayMetrics;
-import android.util.Log;
 import android.view.GestureDetector;
 import android.view.Gravity;
 import android.view.InputDevice;
@@ -684,26 +682,26 @@ public final class MapView extends FrameLayout {
         // Load the attributes
         TypedArray typedArray = context.obtainStyledAttributes(attrs, R.styleable.MapView, 0, 0);
         try {
-            double centerLatitude = typedArray.getFloat(R.styleable.MapView_centerLatitude, 0.0f);
-            double centerLongitude = typedArray.getFloat(R.styleable.MapView_centerLongitude, 0.0f);
+            double centerLatitude = typedArray.getFloat(R.styleable.MapView_center_latitude, 0.0f);
+            double centerLongitude = typedArray.getFloat(R.styleable.MapView_center_longitude, 0.0f);
             LatLng centerCoordinate = new LatLng(centerLatitude, centerLongitude);
             setCenterCoordinate(centerCoordinate);
             // need to set zoom level first because of limitation on rotating when zoomed out
-            setZoomLevel(typedArray.getFloat(R.styleable.MapView_zoomLevel, 0.0f));
+            setZoomLevel(typedArray.getFloat(R.styleable.MapView_zoom_level, 0.0f));
             setDirection(typedArray.getFloat(R.styleable.MapView_direction, 0.0f));
-            setZoomEnabled(typedArray.getBoolean(R.styleable.MapView_zoomEnabled, true));
-            setScrollEnabled(typedArray.getBoolean(R.styleable.MapView_scrollEnabled, true));
-            setRotateEnabled(typedArray.getBoolean(R.styleable.MapView_rotateEnabled, true));
-            setDebugActive(typedArray.getBoolean(R.styleable.MapView_debugActive, false));
-            if (typedArray.getString(R.styleable.MapView_styleUrl) != null) {
-                setStyleUrl(typedArray.getString(R.styleable.MapView_styleUrl));
+            setZoomEnabled(typedArray.getBoolean(R.styleable.MapView_zoom_enabled, true));
+            setScrollEnabled(typedArray.getBoolean(R.styleable.MapView_scroll_enabled, true));
+            setRotateEnabled(typedArray.getBoolean(R.styleable.MapView_rotate_enabled, true));
+            setDebugActive(typedArray.getBoolean(R.styleable.MapView_debug_active, false));
+            if (typedArray.getString(R.styleable.MapView_style_url) != null) {
+                setStyleUrl(typedArray.getString(R.styleable.MapView_style_url));
             }
-            if (typedArray.getString(R.styleable.MapView_accessToken) != null) {
-                setAccessToken(typedArray.getString(R.styleable.MapView_accessToken));
+            if (typedArray.getString(R.styleable.MapView_access_token) != null) {
+                setAccessToken(typedArray.getString(R.styleable.MapView_access_token));
             }
-            if (typedArray.getString(R.styleable.MapView_styleClasses) != null) {
+            if (typedArray.getString(R.styleable.MapView_style_classes) != null) {
                 List<String> styleClasses = Arrays.asList(typedArray
-                        .getString(R.styleable.MapView_styleClasses).split("\\s*,\\s*"));
+                        .getString(R.styleable.MapView_style_classes).split("\\s*,\\s*"));
                 for (String styleClass : styleClasses) {
                     if (styleClass.length() == 0) {
                         styleClasses.remove(styleClass);
@@ -713,31 +711,31 @@ public final class MapView extends FrameLayout {
             }
 
             // Compass
-            setCompassEnabled(typedArray.getBoolean(R.styleable.MapView_compassEnabled, true));
-            setCompassGravity(typedArray.getInt(R.styleable.MapView_compassGravity, Gravity.TOP | Gravity.END));
-            setWidgetMargins(mCompassView, typedArray.getDimension(R.styleable.MapView_compassMarginLeft, DIMENSION_TEN_DP)
-                    , typedArray.getDimension(R.styleable.MapView_compassMarginTop, DIMENSION_TEN_DP)
-                    , typedArray.getDimension(R.styleable.MapView_compassMarginRight, DIMENSION_TEN_DP)
-                    , typedArray.getDimension(R.styleable.MapView_compassMarginBottom, DIMENSION_TEN_DP));
+            setCompassEnabled(typedArray.getBoolean(R.styleable.MapView_compass_enabled, true));
+            setCompassGravity(typedArray.getInt(R.styleable.MapView_compass_gravity, Gravity.TOP | Gravity.END));
+            setWidgetMargins(mCompassView, typedArray.getDimension(R.styleable.MapView_compass_margin_left, DIMENSION_TEN_DP)
+                    , typedArray.getDimension(R.styleable.MapView_compass_margin_top, DIMENSION_TEN_DP)
+                    , typedArray.getDimension(R.styleable.MapView_compass_margin_right, DIMENSION_TEN_DP)
+                    , typedArray.getDimension(R.styleable.MapView_compass_margin_bottom, DIMENSION_TEN_DP));
 
             // Logo
-            setLogoVisibility(typedArray.getInt(R.styleable.MapView_logoVisibility, VISIBLE));
-            setLogoGravity(typedArray.getInt(R.styleable.MapView_logoGravity, Gravity.BOTTOM | Gravity.START));
-            setWidgetMargins(mLogoView, typedArray.getDimension(R.styleable.MapView_logoMarginLeft, DIMENSION_SIXTEEN_DP)
-                    , typedArray.getDimension(R.styleable.MapView_logoMarginTop, DIMENSION_SIXTEEN_DP)
-                    , typedArray.getDimension(R.styleable.MapView_logoMarginRight, DIMENSION_SIXTEEN_DP)
-                    , typedArray.getDimension(R.styleable.MapView_logoMarginBottom, DIMENSION_SIXTEEN_DP));
+            setLogoVisibility(typedArray.getInt(R.styleable.MapView_logo_visibility, View.VISIBLE));
+            setLogoGravity(typedArray.getInt(R.styleable.MapView_logo_gravity, Gravity.BOTTOM | Gravity.START));
+            setWidgetMargins(mLogoView, typedArray.getDimension(R.styleable.MapView_logo_margin_left, DIMENSION_SIXTEEN_DP)
+                    , typedArray.getDimension(R.styleable.MapView_logo_margin_top, DIMENSION_SIXTEEN_DP)
+                    , typedArray.getDimension(R.styleable.MapView_logo_margin_right, DIMENSION_SIXTEEN_DP)
+                    , typedArray.getDimension(R.styleable.MapView_logo_margin_bottom, DIMENSION_SIXTEEN_DP));
 
             // Attribution
-            setAttributionVisibility(typedArray.getInt(R.styleable.MapView_attributionVisibility, VISIBLE));
-            setAttributionGravity(typedArray.getInt(R.styleable.MapView_attributionGravity, Gravity.BOTTOM));
-            setWidgetMargins(mAttributionsView, typedArray.getDimension(R.styleable.MapView_attributionMarginLeft, DIMENSION_SEVENTYSIX_DP)
-                    , typedArray.getDimension(R.styleable.MapView_attributionMarginTop, DIMENSION_SEVEN_DP)
-                    , typedArray.getDimension(R.styleable.MapView_attributionMarginRight, DIMENSION_SEVEN_DP)
-                    , typedArray.getDimension(R.styleable.MapView_attributionMarginBottom, DIMENSION_SEVEN_DP));
+            setAttributionVisibility(typedArray.getInt(R.styleable.MapView_attribution_visibility, View.VISIBLE));
+            setAttributionGravity(typedArray.getInt(R.styleable.MapView_attribution_gravity, Gravity.BOTTOM));
+            setWidgetMargins(mAttributionsView, typedArray.getDimension(R.styleable.MapView_attribution_margin_left, DIMENSION_SEVENTYSIX_DP)
+                    , typedArray.getDimension(R.styleable.MapView_attribution_margin_top, DIMENSION_SEVEN_DP)
+                    , typedArray.getDimension(R.styleable.MapView_attribution_margin_right, DIMENSION_SEVEN_DP)
+                    , typedArray.getDimension(R.styleable.MapView_attribution_margin_bottom, DIMENSION_SEVEN_DP));
 
             // User location
-            setMyLocationEnabled(typedArray.getBoolean(R.styleable.MapView_myLocationEnabled, false));
+            setMyLocationEnabled(typedArray.getBoolean(R.styleable.MapView_my_location_enabled, false));
         } finally {
             typedArray.recycle();
         }

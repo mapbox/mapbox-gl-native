@@ -1,54 +1,53 @@
 <?xml version="1.0" encoding="UTF-8"?>
-<RelativeLayout
-    xmlns:android="http://schemas.android.com/apk/res/android"
+<RelativeLayout xmlns:android="http://schemas.android.com/apk/res/android"
     android:layout_width="wrap_content"
     android:layout_height="wrap_content"
     android:orientation="vertical">
 
     <LinearLayout
         android:id="@+id/infowindow_content"
-        android:background="@color/white"
-        android:padding="5dp"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
-        android:orientation="vertical">
+        android:background="@color/white"
+        android:orientation="vertical"
+        android:padding="5dp">
 
         <TextView
             android:id="@+id/infowindow_title"
             android:layout_width="wrap_content"
             android:layout_height="0dp"
-            android:textColor="@color/black"
-            android:textSize="18sp"
-            android:maxEms="17"
             android:layout_gravity="left"
             android:layout_weight="1"
-            android:text="@string/infoWindowTitle"/>
+            android:maxEms="17"
+            android:text="@string/infoWindowTitle"
+            android:textColor="@color/black"
+            android:textSize="18sp" />
 
         <TextView
             android:id="@+id/infowindow_description"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
-            android:textColor="@color/black"
-            android:textSize="14sp"
             android:maxEms="17"
-            android:text="@string/infoWindowDescription"/>
+            android:text="@string/infoWindowDescription"
+            android:textColor="@color/black"
+            android:textSize="14sp" />
 
         <TextView
             android:id="@+id/infowindow_subdescription"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
-            android:textColor="@color/black"
-            android:textSize="12sp"
             android:maxEms="17"
             android:text="@string/infoWindowAddress"
-            android:visibility="gone"/>
+            android:textColor="@color/black"
+            android:textSize="12sp"
+            android:visibility="gone" />
     </LinearLayout>
 
     <com.mapbox.mapboxsdk.annotations.InfoWindowTipView
         android:id="@+id/infowindow_tipview"
-        android:layout_below="@+id/infowindow_content"
         android:layout_width="@dimen/infowindow_tipview_width"
-        android:layout_height="8dp"/>
+        android:layout_height="8dp"
+        android:layout_below="@+id/infowindow_content" />
 
 </RelativeLayout>
 

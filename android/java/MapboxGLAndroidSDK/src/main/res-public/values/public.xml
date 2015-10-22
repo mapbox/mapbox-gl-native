@@ -2,5 +2,41 @@
 <resources>
     <!--Add references to exposed resources-->
     <public name="AttributionAlertDialogStyle" type="style" />
-    <public name="infowindow_margin" type="dimen" />
+
+    <public name="style_mapbox_streets" type="string" />
+    <public name="style_emerald" type="string" />
+    <public name="style_light" type="string" />
+    <public name="style_dark" type="string" />
+    <public name="style_satellite" type="string" />
+
+    <public name="center_longitude" type="attr" />
+    <public name="center_latitude" type="attr" />
+    <public name="zoom_level" type="attr" />
+    <public name="direction" type="attr" />
+    <public name="zoom_enabled" type="attr" />
+    <public name="scroll_enabled" type="attr" />
+    <public name="rotate_enabled" type="attr" />
+    <public name="debug_active" type="attr" />
+    <public name="style_url" type="attr" />
+    <public name="access_token" type="attr" />
+    <public name="style_classes" type="attr" />
+    <public name="my_location_enabled" type="attr" />
+    <public name="compass_enabled" type="attr" />
+    <public name="compass_gravity" type="attr" />
+    <public name="compass_margin_left" type="attr" />
+    <public name="compass_margin_top" type="attr" />
+    <public name="compass_margin_right" type="attr" />
+    <public name="compass_margin_bottom" type="attr" />
+    <public name="logo_gravity" type="attr" />
+    <public name="logo_margin_left" type="attr" />
+    <public name="logo_margin_top" type="attr" />
+    <public name="logo_margin_right" type="attr" />
+    <public name="logo_margin_bottom" type="attr" />
+    <public name="logo_visibility" type="attr" />
+    <public name="attribution_gravity" type="attr" />
+    <public name="attribution_margin_left" type="attr" />
+    <public name="attribution_margin_top" type="attr" />
+    <public name="attribution_margin_right" type="attr" />
+    <public name="attribution_margin_bottom" type="attr" />
+    <public name="attribution_visibility" type="attr" />
 </resources>

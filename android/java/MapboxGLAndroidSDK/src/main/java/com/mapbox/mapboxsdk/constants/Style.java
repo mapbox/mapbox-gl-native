@@ -23,6 +23,8 @@ public class Style {
     public @interface StyleUrl {
     }
 
+    // IMPORTANT: If you change any of these you also need to edit them in strings.xml
+
     /**
      * Mapbox Streets: Our signature style.
      */

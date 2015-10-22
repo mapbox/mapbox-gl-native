@@ -1,6 +1,7 @@
 <?xml version="1.0" encoding="utf-8"?>
 <resources>
 
+    <!-- these are public -->
     <style name="AttributionAlertDialogStyle" parent="Theme.AppCompat.Dialog.Alert">
         <item name="android:textColorPrimary">@android:color/white</item>
         <item name="android:background">@color/mapbox_blue</item>

@@ -37,7 +37,6 @@ public class InfoWindowAdapterActivity extends AppCompatActivity {
         mMapView = (MapView) findViewById(R.id.mapView);
         mMapView.setAccessToken(ApiAccess.getToken(this));
         mMapView.onCreate(savedInstanceState);
-        mMapView.setStyle(Style.MAPBOX_STREETS);
         mMapView.setInfoWindowAdapter(new MapView.InfoWindowAdapter() {
 
             private int tenDp = (int) getResources().getDimension(R.dimen.attr_margin);
@@ -59,9 +58,6 @@ public class InfoWindowAdapterActivity extends AppCompatActivity {
         mMapView.addMarker(generateMarker("Vatican City", 41.902916, 12.453389, "#009688"));
         mMapView.addMarker(generateMarker("San Marino", 43.942360, 12.457777, "#795548"));
         mMapView.addMarker(generateMarker("Liechtenstein", 47.166000, 9.555373, "#FF5722"));
-
-        mMapView.setCenterCoordinate(new LatLng(47.798202, 7.573781));
-        mMapView.setZoomLevel(4);
     }
 
     private MarkerOptions generateMarker(String title, double lat, double lng, String color) {
