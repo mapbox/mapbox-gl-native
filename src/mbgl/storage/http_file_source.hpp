@@ -14,9 +14,9 @@ public:
 
     static uint32_t maximumConcurrentRequests();
 
-private:
-    friend class HTTPRequest;
     class Impl;
+
+private:
     std::unique_ptr<Impl> impl;
 };
 
