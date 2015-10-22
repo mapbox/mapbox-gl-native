@@ -8,6 +8,7 @@
     <string name="activity_map_fragment">Map Fragment Activity</string>
     <string name="activity_press_for_marker">Press For Marker Activity</string>
     <string name="activity_info_window">InfoWindow Activity</string>
+    <string name="activity_visible_coordinate_bounds">Visible Coordinate Bounds</string>
 
     <string name="navdrawer_menu_title_mainactivity_controls">Main Activity Controls</string>
     <string name="navdrawer_menu_title_mainactivity_styles">Main Activity Styles</string>
@@ -24,6 +25,7 @@
     <string name="action_press_for_marker">Press For Marker</string>
     <string name="action_info_window">InfoWindow</string>
     <string name="action_visible_bounds">Set Visible Bounds</string>
+    <string name="action_visible_bounds_explanation">Center map around 2 markers</string>
 
     <string name="label_fps">FPS:</string>
 

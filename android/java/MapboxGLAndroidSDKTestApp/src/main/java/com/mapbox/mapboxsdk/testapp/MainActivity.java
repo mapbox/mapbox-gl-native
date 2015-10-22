@@ -4,7 +4,6 @@ import android.Manifest;
 import android.content.Intent;
 import android.content.pm.PackageManager;
 import android.graphics.Color;
-import android.graphics.RectF;
 import android.location.Location;
 import android.os.Bundle;
 import android.support.annotation.NonNull;
@@ -31,7 +30,6 @@ import com.mapbox.mapboxsdk.annotations.PolygonOptions;
 import com.mapbox.mapboxsdk.annotations.PolylineOptions;
 import com.mapbox.mapboxsdk.annotations.Sprite;
 import com.mapbox.mapboxsdk.constants.Style;
-import com.mapbox.mapboxsdk.geometry.CoordinateBounds;
 import com.mapbox.mapboxsdk.geometry.LatLng;
 import com.mapbox.mapboxsdk.utils.ApiAccess;
 import com.mapbox.mapboxsdk.views.MapView;
@@ -333,10 +331,7 @@ public class MainActivity extends AppCompatActivity {
                                 return true;
 
                             case R.id.action_visible_bounds:
-                                // Set visible bounds to Moscone Center West (37.783703, -122.403589) and Union Square (37.7874436,-122.4072359)
-                                mMapView.setVisibleCoordinateBounds(
-                                        new CoordinateBounds(new LatLng(37.783703, -122.403589), new LatLng(37.7874436,-122.4072359)),
-                                        new RectF(100, 350, 100, 300), true);
+                                startActivity(new Intent(getApplicationContext(), VisibleCoordinateBoundsActivity.class));
                                 return true;
 
                             default:

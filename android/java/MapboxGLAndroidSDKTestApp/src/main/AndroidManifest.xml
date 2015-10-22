@@ -26,6 +26,10 @@
         </activity>
 
         <activity
+            android:name=".VisibleCoordinateBoundsActivity"
+            android:label="@string/activity_visible_coordinate_bounds" />
+
+        <activity
             android:name=".InfoWindowAdapterActivity"
             android:label="@string/activity_infowindow_adapter" />
 
