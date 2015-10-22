@@ -12,6 +12,7 @@ static NSArray *const kStyleNames = @[
     @"Light",
     @"Dark",
     @"Satellite",
+    @"Satellite-Hybrid",
 ];
 
 static NSUInteger const kStyleVersion = 8;
@@ -445,16 +446,16 @@ static NSUInteger const kStyleVersion = 8;
 {
     UIImage *newButtonImage;
     NSString *newButtonTitle;
-    
+
     switch (mode) {
         case MGLUserTrackingModeNone:
             newButtonImage = [UIImage imageNamed:@"TrackingLocationOffMask.png"];
             break;
-            
+
         case MGLUserTrackingModeFollow:
             newButtonImage = [UIImage imageNamed:@"TrackingLocationMask.png"];
             break;
-            
+
         case MGLUserTrackingModeFollowWithHeading:
             newButtonImage = [UIImage imageNamed:@"TrackingHeadingMask.png"];
             break;
@@ -463,7 +464,7 @@ static NSUInteger const kStyleVersion = 8;
             newButtonTitle = @"Course";
             break;
     }
-    
+
     self.navigationItem.rightBarButtonItem.title = newButtonTitle;
     [UIView animateWithDuration:0.25 animations:^{
         self.navigationItem.rightBarButtonItem.image = newButtonImage;

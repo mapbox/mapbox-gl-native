@@ -14,4 +14,5 @@
     <string name="style_light">asset://styles/light-v8.json</string>
     <string name="style_dark">asset://styles/dark-v8.json</string>
     <string name="style_satellite">asset://styles/satellite-v8.json</string>
+    <string name="style_satellite_streets">asset://styles/satellite-hybrid-v8.json</string>
 </resources>

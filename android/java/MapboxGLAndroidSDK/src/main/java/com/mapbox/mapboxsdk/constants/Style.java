@@ -18,7 +18,7 @@ public class Style {
     /**
      * Indicates the parameter accepts one of the values from {@link Style}.
      */
-    @StringDef({MAPBOX_STREETS, EMERALD, LIGHT, DARK, SATELLITE})
+    @StringDef({MAPBOX_STREETS, EMERALD, LIGHT, DARK, SATELLITE, SATELLITE_STREETS})
     @Retention(RetentionPolicy.SOURCE)
     public @interface StyleUrl {
     }
@@ -26,24 +26,29 @@ public class Style {
     // IMPORTANT: If you change any of these you also need to edit them in strings.xml
 
     /**
-     * Mapbox Streets: Our signature style.
+     * Mapbox Streets: A complete basemap, perfect for incorporating your own data.
      */
     public static final String MAPBOX_STREETS = "asset://styles/streets-v8.json";
     /**
-     * Emerald: Great for transportation and outdoor terrain.
+     * Emerald: A versatile style, with emphasis on road networks and public transit.
      */
     public static final String EMERALD = "asset://styles/emerald-v8.json";
     /**
-     * Light: Light-colored style that is great for data overlay.
+     * Light: Subtle light backdrop for data visualizations.
      */
     public static final String LIGHT = "asset://styles/light-v8.json";
     /**
-     * Dark: Dark-colored style that is great for data overlay.
+     * Dark: Subtle dark backdrop for data visualizations.
      */
     public static final String DARK = "asset://styles/dark-v8.json";
     /**
-     * Satellite: The best-looking, most accurate, and most up-to-date satellite imagery available anywhere.
+     * Satellite: A beautiful global satellite and aerial imagery layer.
      */
     public static final String SATELLITE = "asset://styles/satellite-v8.json";
+
+    /**
+     * Satellite Streets: Global satellite and aerial imagery with unobtrusive labels.
+     */
+    public static final String SATELLITE_STREETS = "asset://styles/satellite-hybrid-v8.json";
 
 }

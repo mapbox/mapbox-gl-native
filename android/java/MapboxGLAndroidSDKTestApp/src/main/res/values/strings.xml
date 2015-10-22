@@ -36,6 +36,7 @@
     <string name="styleLight">Light</string>
     <string name="styleDark">Dark</string>
     <string name="styleSatellite">Satellite</string>
+    <string name="styleSatelliteStreets">Satellite Streets</string>
 
     <string-array name="outdoors_class_list">
         <item>Day</item>

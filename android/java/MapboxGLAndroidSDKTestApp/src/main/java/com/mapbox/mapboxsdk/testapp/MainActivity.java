@@ -382,6 +382,11 @@ public class MainActivity extends AppCompatActivity {
                 mSelectedStyle = id;
                 return true;
 
+            case R.id.actionStyleSatelliteStreets:
+                mMapView.setStyle(Style.SATELLITE_STREETS);
+                mSelectedStyle = id;
+                return true;
+
             default:
                 return false;
         }

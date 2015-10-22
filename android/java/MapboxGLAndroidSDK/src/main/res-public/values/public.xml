@@ -8,6 +8,7 @@
     <public name="style_light" type="string" />
     <public name="style_dark" type="string" />
     <public name="style_satellite" type="string" />
+    <public name="style_satellite_streets" type="string" />
 
     <public name="center_longitude" type="attr" />
     <public name="center_latitude" type="attr" />

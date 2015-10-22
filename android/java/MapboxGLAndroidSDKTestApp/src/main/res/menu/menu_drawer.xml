@@ -1,8 +1,9 @@
 <?xml version="1.0" encoding="utf-8"?>
 <menu xmlns:android="http://schemas.android.com/apk/res/android">
 
-    <item android:id="@+id/mainActivityMenu"
-          android:title="@string/navdrawer_menu_title_mainactivity_controls">
+    <item
+        android:id="@+id/mainActivityMenu"
+        android:title="@string/navdrawer_menu_title_mainactivity_controls">
         <menu>
             <group>
                 <item
@@ -25,11 +26,11 @@
 
     <group android:id="@+id/stylesSeparator" />
 
-    <item android:id="@+id/mainActivityStylesMenue"
+    <item
+        android:id="@+id/mainActivityStylesMenue"
         android:title="@string/navdrawer_menu_title_mainactivity_styles">
         <menu>
-            <group
-                android:id="@+id/stylesGroup">
+            <group android:id="@+id/stylesGroup">
                 <item
                     android:id="@+id/actionStyleMapboxStreets"
                     android:title="@string/styleMapboxStreets" />
@@ -50,6 +51,10 @@
                     android:id="@+id/actionStyleSatellite"
                     android:title="@string/styleSatellite" />
 
+                <item
+                    android:id="@+id/actionStyleSatelliteStreets"
+                    android:title="@string/styleSatelliteStreets" />
+
             </group>
         </menu>
     </item>
@@ -68,9 +73,10 @@
     -->
 
 
-    <group android:id="@+id/testsSeparator"/>
+    <group android:id="@+id/testsSeparator" />
 
-    <item android:id="@+id/testsMenu"
+    <item
+        android:id="@+id/testsMenu"
         android:title="@string/navdrawer_menu_title_individual_tests">
         <menu>
 

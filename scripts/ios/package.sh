@@ -102,7 +102,7 @@ cp -pv LICENSE.md "${OUTPUT}/static"
 mkdir -p "${OUTPUT}/static/${NAME}.bundle"
 cp -pv platform/ios/resources/* "${OUTPUT}/static/${NAME}.bundle"
 mkdir -p "${OUTPUT}/static/${NAME}.bundle/styles"
-cp -pv styles/styles/{dark,emerald,light,streets,satellite}-v8.json "${OUTPUT}/static/${NAME}.bundle/styles"
+cp -pv styles/styles/{dark,emerald,light,streets,satellite,satellite-hybrid}-v8.json "${OUTPUT}/static/${NAME}.bundle/styles"
 
 step "Creating API Docs..."
 if [ -z `which appledoc` ]; then
