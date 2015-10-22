@@ -4,6 +4,7 @@
 #include <mbgl/storage/default_file_source.hpp>
 #include <mbgl/storage/asset_context_base.hpp>
 #include <mbgl/storage/http_context_base.hpp>
+#include <mbgl/util/async_task.hpp>
 #include <mbgl/util/noncopyable.hpp>
 #include <mbgl/util/chrono.hpp>
 
@@ -101,12 +102,11 @@ private:
     void reschedule(DefaultFileRequestImpl&);
 
     std::unordered_map<Resource, std::unique_ptr<DefaultFileRequestImpl>, Resource::Hash> pending;
-    uv_loop_t* const loop;
     FileCache* const cache;
     const std::string assetRoot;
     const std::unique_ptr<AssetContextBase> assetContext;
     const std::unique_ptr<HTTPContextBase> httpContext;
-    const std::unique_ptr<uv::async> reachability;
+    util::AsyncTask reachability;
 };
 
 }

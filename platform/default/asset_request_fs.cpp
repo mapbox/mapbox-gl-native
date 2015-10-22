@@ -1,6 +1,7 @@
 #include <mbgl/storage/asset_context_base.hpp>
 #include <mbgl/storage/resource.hpp>
 #include <mbgl/storage/response.hpp>
+#include <mbgl/util/run_loop.hpp>
 #include <mbgl/util/util.hpp>
 #include <mbgl/util/url.hpp>
 #include <mbgl/util/uv.hpp>
@@ -17,7 +18,7 @@ class AssetRequest : public RequestBase {
     MBGL_STORE_THREAD(tid)
 
 public:
-    AssetRequest(const Resource&, Callback, uv_loop_t*, const std::string& assetRoot);
+    AssetRequest(const Resource&, Callback, const std::string& assetRoot);
     ~AssetRequest();
 
     void cancel() final;
@@ -40,9 +41,8 @@ public:
 class AssetFSContext : public AssetContextBase {
     RequestBase* createRequest(const Resource& resource,
                                RequestBase::Callback callback,
-                               uv_loop_t* loop,
                                const std::string& assetRoot) final {
-        return new AssetRequest(resource, callback, loop, assetRoot);
+        return new AssetRequest(resource, callback, assetRoot);
     }
 };
 
@@ -50,7 +50,7 @@ AssetRequest::~AssetRequest() {
     MBGL_VERIFY_THREAD(tid);
 }
 
-AssetRequest::AssetRequest(const Resource& resource_, Callback callback_, uv_loop_t* loop, const std::string& assetRoot_)
+AssetRequest::AssetRequest(const Resource& resource_, Callback callback_, const std::string& assetRoot_)
     : RequestBase(resource_, callback_),
       assetRoot(assetRoot_) {
     req.data = this;
@@ -65,6 +65,7 @@ AssetRequest::AssetRequest(const Resource& resource_, Callback callback_, uv_loo
         path = assetRoot + "/" + mbgl::util::percentDecode(url.substr(8));
     }
 
+    auto loop = static_cast<uv_loop_t*>(util::RunLoop::getLoopHandle());
     uv_fs_open(loop, &req, path.c_str(), O_RDONLY, S_IRUSR, fileOpened);
 }
 
@@ -217,7 +218,7 @@ void AssetRequest::cancel() {
     uv_cancel((uv_req_t *)&req);
 }
 
-std::unique_ptr<AssetContextBase> AssetContextBase::createContext(uv_loop_t*) {
+std::unique_ptr<AssetContextBase> AssetContextBase::createContext() {
     return std::make_unique<AssetFSContext>();
 }
 
