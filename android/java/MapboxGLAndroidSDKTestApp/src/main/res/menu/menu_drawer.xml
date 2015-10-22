@@ -83,24 +83,33 @@
             <item
                 android:id="@+id/action_info_window"
                 android:checkable="false"
-                android:icon="@drawable/ic_filter_none_white_24dp"
+                android:icon="@drawable/ic_flip_to_front_white_24dp"
                 android:title="@string/action_info_window" />
 
             <item
                 android:id="@+id/action_info_window_adapter"
                 android:checkable="false"
-                android:icon="@drawable/ic_filter_none_white_24dp"
+                android:icon="@drawable/ic_flip_to_back_white_24dp"
                 android:title="@string/action_info_window_adapter" />
 
-            <item android:id="@+id/action_press_for_marker"
-                  android:checkable="false"
-                  android:icon="@drawable/ic_pin_drop_white_24dp"
-                  android:title="@string/action_press_for_marker"/>
+            <item
+                android:id="@+id/action_press_for_marker"
+                android:checkable="false"
+                android:icon="@drawable/ic_pin_drop_white_24dp"
+                android:title="@string/action_press_for_marker" />
 
-            <item android:id="@+id/action_visible_bounds"
+            <item
+                android:id="@+id/action_visible_bounds"
                 android:checkable="false"
                 android:icon="@drawable/ic_crop_white_24dp"
-                android:title="@string/action_visible_bounds"/>
+                android:title="@string/action_visible_bounds" />
+
+            <item
+                android:id="@+id/action_bulk_markers"
+                android:checkable="false"
+                android:icon="@drawable/ic_blur_on_white_24dp"
+                android:title="@string/action_add_bulk_markers" />
+
         </menu>
     </item>
 

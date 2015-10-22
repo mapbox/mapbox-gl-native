@@ -881,8 +881,11 @@ jlongArray JNICALL nativeAddMarkers(JNIEnv *env, jobject obj, jlong nativeMapVie
             env->ExceptionDescribe();
             return nullptr;
         }
+        env->DeleteLocalRef(marker);
 
         jstring jid = reinterpret_cast<jstring>(env->GetObjectField(icon, spriteIdId));
+        env->DeleteLocalRef(icon);
+
         std::string id = std_string_from_jstring(env, jid);
 
         jdouble latitude = env->GetDoubleField(position, latLngLatitudeId);
@@ -896,11 +899,9 @@ jlongArray JNICALL nativeAddMarkers(JNIEnv *env, jobject obj, jlong nativeMapVie
             env->ExceptionDescribe();
             return nullptr;
         }
+        env->DeleteLocalRef(position);
 
         markers.emplace_back(mbgl::PointAnnotation(mbgl::LatLng(latitude, longitude), id));
-
-        /* Do I need to delete other LocalRefs? */
-        env->DeleteLocalRef(marker);
      }
 
     env->DeleteLocalRef(jarray);
