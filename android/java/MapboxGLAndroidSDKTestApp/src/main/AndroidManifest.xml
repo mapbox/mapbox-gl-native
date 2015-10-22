@@ -26,6 +26,10 @@
         </activity>
 
         <activity
+            android:name=".BulkMarkerActivity"
+            android:label="@string/action_add_bulk_markers" />
+
+        <activity
             android:name=".InfoWindowAdapterActivity"
             android:label="@string/activity_infowindow_adapter" />
 
