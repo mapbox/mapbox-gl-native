@@ -2019,10 +2019,10 @@ public final class MapView extends FrameLayout {
     @UiThread
     public void setVisibleCoordinateBounds(@NonNull CoordinateBounds bounds, @NonNull RectF padding, boolean animated) {
         LatLng[] coordinates = {
-                new LatLng(bounds.getNe().getLatitude(), bounds.getSw().getLongitude()),
-                bounds.getSw(),
-                new LatLng(bounds.getSw().getLatitude(), bounds.getNe().getLongitude()),
-                bounds.getNe()
+                new LatLng(bounds.getNorthEast().getLatitude(), bounds.getSouthWest().getLongitude()),
+                bounds.getSouthWest(),
+                new LatLng(bounds.getSouthWest().getLatitude(), bounds.getNorthEast().getLongitude()),
+                bounds.getNorthEast()
 
         };
         setVisibleCoordinateBounds(coordinates, padding, animated);

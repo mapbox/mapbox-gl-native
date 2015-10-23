@@ -5,27 +5,54 @@ package com.mapbox.mapboxsdk.geometry;
  */
 public class CoordinateBounds {
 
-    private LatLng sw;
-    private LatLng ne;
+    private LatLng southWest;
+    private LatLng northEast;
 
-    public CoordinateBounds(LatLng sw, LatLng ne) {
-        this.sw = sw;
-        this.ne = ne;
+    public CoordinateBounds(LatLng southWest, LatLng northEast) {
+        this.southWest = southWest;
+        this.northEast = northEast;
     }
 
-    public LatLng getSw() {
-        return sw;
+    public LatLng getSouthWest() {
+        return southWest;
     }
 
-    public void setSw(LatLng sw) {
-        this.sw = sw;
+    public void setSouthWest(LatLng southWest) {
+        this.southWest = southWest;
     }
 
-    public LatLng getNe() {
-        return ne;
+    public LatLng getNorthEast() {
+        return northEast;
     }
 
-    public void setNe(LatLng ne) {
-        this.ne = ne;
+    public void setNorthEast(LatLng northEast) {
+        this.northEast = northEast;
+    }
+
+    @Override
+    public int hashCode() {
+        int result;
+        long temp;
+        temp = southWest.hashCode();
+        result = (int) (temp ^ (temp >>> 32));
+        temp = northEast.hashCode();
+        result = 31 * result + (int) (temp ^ (temp >>> 32));
+        return result;
+    }
+
+    @Override
+    public boolean equals(Object o) {
+        if (this == o) return true;
+        if (o instanceof CoordinateBounds) {
+            CoordinateBounds other = (CoordinateBounds) o;
+            return getNorthEast().equals(other.getNorthEast())
+                    && getSouthWest() == other.getSouthWest();
+        }
+        return false;
+    }
+
+    @Override
+    public String toString() {
+        return "CoordinateBounds [northEast[" + getNorthEast() + "], southWest[]" + getSouthWest() + "]";
     }
 }
