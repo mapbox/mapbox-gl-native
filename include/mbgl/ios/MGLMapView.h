@@ -414,14 +414,20 @@ IB_DESIGNABLE
  *   @param animated Whether the change caused an animated effect on the map. */
 - (void)mapView:(MGLMapView *)mapView regionDidChangeAnimated:(BOOL)animated;
 
-#pragma mark - Loading the Map Data
+#pragma mark - Loading the Map
 
-/** @name Loading the Map Data */
+/** @name Loading the Map */
 
-// TODO
+/** Tells the delegate that the map view will begin to load.
+ *
+ *   This method is called whenever the map view starts loading, including when a new style has been set and the map must reload.
+ *   @param mapView The map view that is starting to load. */
 - (void)mapViewWillStartLoadingMap:(MGLMapView *)mapView;
 
-// TODO
+/** Tells the delegate that the map view has finished loading.
+ *
+ *   This method is called whenever the map view finishes loading, either after the initial load or after a style change has forced a reload.
+ *   @param mapView The map view that has finished loading. */
 - (void)mapViewDidFinishLoadingMap:(MGLMapView *)mapView;
 
 // TODO
