@@ -48,6 +48,18 @@ class Q_DECL_EXPORT QMapboxGL : public QObject
 
 public:
     typedef QPair<double, double> Coordinate;
+    typedef QList<Coordinate> Coordinates;
+    typedef QList<Coordinates> CoordinateSegments;
+
+    typedef quint32 AnnotationID;
+    typedef QList<AnnotationID> AnnotationIDs;
+
+    typedef QPair<Coordinate, QString> PointAnnotation;
+    typedef QList<PointAnnotation> PointAnnotations;
+
+    // FIXME: We need to add support for custom style properties
+    typedef QPair<CoordinateSegments, QString> ShapeAnnotation;
+    typedef QList<ShapeAnnotation> ShapeAnnotations;
 
     QMapboxGL(QObject *parent = 0, const QMapboxGLSettings& = QMapboxGLSettings());
     virtual ~QMapboxGL();
@@ -93,6 +105,15 @@ public:
     bool hasClass(const QString &) const;
     void setClasses(const QStringList &);
     QStringList getClasses() const;
+
+    AnnotationID addPointAnnotation(const PointAnnotation &);
+    AnnotationIDs addPointAnnotations(const PointAnnotations &);
+
+    AnnotationID addShapeAnnotation(const ShapeAnnotation &);
+    AnnotationIDs addShapeAnnotations(const ShapeAnnotations &);
+
+    void removeAnnotation(AnnotationID);
+    void removeAnnotations(const AnnotationIDs &);
 
     bool isRotating() const;
     bool isScaling() const;
