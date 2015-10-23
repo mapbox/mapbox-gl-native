@@ -12,12 +12,15 @@ import android.graphics.Path;
 import android.graphics.PointF;
 import android.graphics.Rect;
 import android.graphics.RectF;
+import android.graphics.drawable.Drawable;
 import android.location.Location;
 import android.support.annotation.Nullable;
+import android.support.v4.content.ContextCompat;
 import android.util.AttributeSet;
 import android.view.View;
 import android.view.ViewGroup;
 
+import com.mapbox.mapboxsdk.R;
 import com.mapbox.mapboxsdk.geometry.LatLng;
 import com.mapzen.android.lost.api.LocationListener;
 import com.mapzen.android.lost.api.LocationRequest;
@@ -30,32 +33,37 @@ final class UserLocationView extends View {
 
     private WeakReference<MapView> mMapView;
 
+    private static final int BLUE_COLOR = 0x39ACCBFF;
+
     private float mDensity;
+
+    private boolean mShowMarker;
+    private boolean mShowDirection;
+    private boolean mShowAccuracy;
+
     private PointF mMarkerScreenPoint;
     private Matrix mMarkerScreenMatrix;
 
-    private Paint mOuterRingPaint;
-    private Path mOuterRingPath;
-    private RectF mOuterRingBounds;
-
-    private Paint mInnerRingPaintFill;
-    private Paint mInnerRingPaintStroke;
-    private Path mInnerRingPath;
-
-    private boolean mShowDirection;
-    private Paint mDirectionArrowPaint;
-    private Path mDirectionArrowPath;
-
-    private boolean mShowAccuracy;
     private Paint mAccuracyPaintFill;
     private Paint mAccuracyPaintStroke;
     private Path mAccuracyPath;
     private RectF mAccuracyBounds;
 
+    private Drawable mUserLocationDrawable;
+    private RectF mUserLocationDrawableBoundsF;
+    private Rect mUserLocationDrawableBounds;
+
+    private Drawable mUserLocationBearingDrawable;
+    private RectF mUserLocationBearingDrawableBoundsF;
+    private Rect mUserLocationBearingDrawableBounds;
+
+    private Drawable mUserLocationStaleDrawable;
+    private RectF mUserLocationStaleDrawableBoundsF;
+    private Rect mUserLocationStaleDrawableBounds;
+
     private Rect mDirtyRect;
     private RectF mDirtyRectF;
 
-    private boolean mShowMarker;
     private LatLng mMarkerCoordinate;
     private ValueAnimator mMarkerCoordinateAnimator;
     private float mMarkerDirection;
@@ -91,6 +99,7 @@ final class UserLocationView extends View {
 
         // View configuration
         setEnabled(false);
+        setWillNotDraw(false);
 
         // Layout params
         ViewGroup.LayoutParams lp = new ViewGroup.LayoutParams(
@@ -112,58 +121,60 @@ final class UserLocationView extends View {
         mMarkerScreenPoint = new PointF();
         mMarkerScreenMatrix = new Matrix();
 
-        mOuterRingPaint = new Paint();
-        mOuterRingPaint.setAntiAlias(true);
-        mOuterRingPaint.setStyle(Paint.Style.FILL);
-        mOuterRingPaint.setColor(Color.BLACK);
-        mOuterRingPaint.setAlpha((int) (255 * 0.5f));
-
-        mOuterRingPath = new Path();
-        mOuterRingPath.addCircle(0.0f, 0.0f, 15.0f * mDensity, Path.Direction.CW);
-
-        mOuterRingBounds = new RectF();
-        mOuterRingPath.computeBounds(mOuterRingBounds, false);
-
-        mInnerRingPaintFill = new Paint();
-        mInnerRingPaintFill.setAntiAlias(true);
-        mInnerRingPaintFill.setStyle(Paint.Style.FILL);
-        mInnerRingPaintFill.setColor(Color.WHITE);
-
-        mInnerRingPaintStroke = new Paint();
-        mInnerRingPaintStroke.setAntiAlias(true);
-        mInnerRingPaintStroke.setStyle(Paint.Style.STROKE);
-        mInnerRingPaintStroke.setStrokeWidth(1.0f * mDensity);
-        mInnerRingPaintStroke.setColor(Color.BLACK);
-
-        mInnerRingPath = new Path();
-        mInnerRingPath.addCircle(0.0f, 0.0f, 7.5f * mDensity, Path.Direction.CW);
-
-        mDirectionArrowPaint = mInnerRingPaintFill;
-
-        mDirectionArrowPath = new Path();
-        mDirectionArrowPath.moveTo(0.0f, -15.0f * mDensity);
-        mDirectionArrowPath.arcTo(
-                new RectF(
-                        -9.0f * mDensity, -9.0f * mDensity,
-                        9.0f * mDensity, 9.0f * mDensity),
-                225.0f, 90.0f, false);
-        mDirectionArrowPath.close();
-
         mAccuracyPaintFill = new Paint();
         mAccuracyPaintFill.setAntiAlias(true);
         mAccuracyPaintFill.setStyle(Paint.Style.FILL);
-        mAccuracyPaintFill.setColor(Color.BLACK);
+        mAccuracyPaintFill.setColor(BLUE_COLOR);
         mAccuracyPaintFill.setAlpha((int) (255 * 0.25f));
 
         mAccuracyPaintStroke = new Paint();
         mAccuracyPaintStroke.setAntiAlias(true);
         mAccuracyPaintStroke.setStyle(Paint.Style.STROKE);
         mAccuracyPaintStroke.setStrokeWidth(0.5f * mDensity);
-        mAccuracyPaintStroke.setColor(Color.BLACK);
+        mAccuracyPaintStroke.setColor(BLUE_COLOR);
         mAccuracyPaintStroke.setAlpha((int) (255 * 0.5f));
 
         mAccuracyPath = new Path();
         mAccuracyBounds = new RectF();
+
+        mUserLocationDrawable = ContextCompat.getDrawable(getContext(), R.drawable.user_location);
+        mUserLocationDrawableBounds = new Rect(
+                -mUserLocationDrawable.getIntrinsicWidth() / 2,
+                -mUserLocationDrawable.getIntrinsicHeight() / 2,
+                mUserLocationDrawable.getIntrinsicWidth() / 2,
+                mUserLocationDrawable.getIntrinsicHeight() / 2);
+        mUserLocationDrawableBoundsF = new RectF(
+                -mUserLocationDrawable.getIntrinsicWidth() / 2,
+                -mUserLocationDrawable.getIntrinsicHeight() / 2,
+                mUserLocationDrawable.getIntrinsicWidth() / 2,
+                mUserLocationDrawable.getIntrinsicHeight() / 2);
+        mUserLocationDrawable.setBounds(mUserLocationDrawableBounds);
+
+        mUserLocationBearingDrawable = ContextCompat.getDrawable(getContext(), R.drawable.user_location_bearing);
+        mUserLocationBearingDrawableBounds = new Rect(
+                -mUserLocationBearingDrawable.getIntrinsicWidth() / 2,
+                -mUserLocationBearingDrawable.getIntrinsicHeight() / 2,
+                mUserLocationBearingDrawable.getIntrinsicWidth() / 2,
+                mUserLocationBearingDrawable.getIntrinsicHeight() / 2);
+        mUserLocationBearingDrawableBoundsF = new RectF(
+                -mUserLocationBearingDrawable.getIntrinsicWidth() / 2,
+                -mUserLocationBearingDrawable.getIntrinsicHeight() / 2,
+                mUserLocationBearingDrawable.getIntrinsicWidth() / 2,
+                mUserLocationBearingDrawable.getIntrinsicHeight() / 2);
+        mUserLocationBearingDrawable.setBounds(mUserLocationBearingDrawableBounds);
+
+        mUserLocationStaleDrawable = ContextCompat.getDrawable(getContext(), R.drawable.user_location_stale);
+        mUserLocationStaleDrawableBounds = new Rect(
+                -mUserLocationStaleDrawable.getIntrinsicWidth() / 2,
+                -mUserLocationStaleDrawable.getIntrinsicHeight() / 2,
+                mUserLocationStaleDrawable.getIntrinsicWidth() / 2,
+                mUserLocationStaleDrawable.getIntrinsicHeight() / 2);
+        mUserLocationStaleDrawableBoundsF = new RectF(
+                -mUserLocationStaleDrawable.getIntrinsicWidth() / 2,
+                -mUserLocationStaleDrawable.getIntrinsicHeight() / 2,
+                mUserLocationStaleDrawable.getIntrinsicWidth() / 2,
+                mUserLocationStaleDrawable.getIntrinsicHeight() / 2);
+        mUserLocationStaleDrawable.setBounds(mUserLocationStaleDrawableBounds);
     }
 
     @Override
@@ -176,17 +187,24 @@ final class UserLocationView extends View {
 
         canvas.concat(mMarkerScreenMatrix);
 
-        if (!canvas.quickReject(mOuterRingPath, Canvas.EdgeType.AA)) {
+        Drawable dotDrawable = mShowDirection ? mUserLocationBearingDrawable : mUserLocationDrawable;
+        // IMPORTANT also update in uodate()
+        RectF dotBounds = mShowDirection ? mUserLocationBearingDrawableBoundsF : mUserLocationDrawableBoundsF;
+
+        boolean willDraw;
+        willDraw = mShowAccuracy && !canvas.quickReject(mAccuracyPath, Canvas.EdgeType.AA);
+        willDraw |= !canvas.quickReject(dotBounds, Canvas.EdgeType.AA);
+
+        dotBounds.offset(
+                (int) -mMarkerScreenPoint.x,
+                (int) -mMarkerScreenPoint.y);
+
+        if (willDraw) {
             if (mShowAccuracy) {
                 canvas.drawPath(mAccuracyPath, mAccuracyPaintFill);
                 canvas.drawPath(mAccuracyPath, mAccuracyPaintStroke);
             }
-            canvas.drawPath(mOuterRingPath, mOuterRingPaint);
-            canvas.drawPath(mInnerRingPath, mInnerRingPaintFill);
-            canvas.drawPath(mInnerRingPath, mInnerRingPaintStroke);
-            if (mShowDirection) {
-                canvas.drawPath(mDirectionArrowPath, mDirectionArrowPaint);
-            }
+            dotDrawable.draw(canvas);
         }
     }
 
@@ -224,6 +242,7 @@ final class UserLocationView extends View {
                         Path.Direction.CW);
 
                 mAccuracyPath.computeBounds(mAccuracyBounds, false);
+                mAccuracyBounds.inset(-1.0f, -1.0f);
             }
 
             // invalidate changed pixels
@@ -232,22 +251,14 @@ final class UserLocationView extends View {
                 mDirtyRectF = new RectF();
             } else {
                 // the old marker location
-                // TODO need to take into account accuracy stroke
-                //invalidate(mDirtyRect);
-                invalidate();
+                invalidate(mDirtyRect);
             }
 
-            RectF largerBounds;
-            if (mAccuracyBounds.contains(mOuterRingBounds)) {
-                largerBounds = mAccuracyBounds;
-            } else {
-                largerBounds = mOuterRingBounds;
-            }
+            RectF dotBounds = mShowDirection ? mUserLocationBearingDrawableBoundsF : mUserLocationDrawableBoundsF;
+            RectF largerBounds = mAccuracyBounds.contains(dotBounds) ? mAccuracyBounds : dotBounds;
             mMarkerScreenMatrix.mapRect(mDirtyRectF, largerBounds);
             mDirtyRectF.roundOut(mDirtyRect);
-            // TODO need to take into account accuracy stroke
-            //invalidate(mDirtyRect); // the new marker location
-            invalidate();
+            invalidate(mDirtyRect); // the new marker location
         } else {
             setVisibility(View.INVISIBLE);
         }

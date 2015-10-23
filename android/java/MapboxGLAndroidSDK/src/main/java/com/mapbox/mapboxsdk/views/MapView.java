@@ -658,7 +658,7 @@ public final class MapView extends FrameLayout {
 
         // Setup Mapbox logo
         mLogoView = new ImageView(mContext);
-        mLogoView.setImageDrawable(ContextCompat.getDrawable(mContext, R.drawable.ic_logo_mapbox));
+        mLogoView.setImageDrawable(ContextCompat.getDrawable(mContext, R.drawable.attribution_logo));
         mLogoView.setContentDescription(getResources().getString(R.string.mapboxIconContentDescription));
         ViewGroup.LayoutParams logoParams = new ViewGroup.LayoutParams(
                 ViewGroup.LayoutParams.WRAP_CONTENT, ViewGroup.LayoutParams.WRAP_CONTENT);
