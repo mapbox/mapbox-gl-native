@@ -10,17 +10,17 @@ import org.junit.Test;
 import org.junit.runner.RunWith;
 
 /**
- * Tests on InfoWindowAdapterActivity.
+ * Tests on PressForMarkerActivity
  */
 @RunWith(AndroidJUnit4.class)
 @LargeTest
-public class InfoWindowAdapterActivityTest extends BaseTest {
+public class PressForMarkerActivityTest extends BaseTest {
 
     @Rule
-    public ActivityTestRule<InfoWindowAdapterActivity> mActivityRule = new ActivityTestRule<>(
-            InfoWindowAdapterActivity.class);
+    public ActivityTestRule<PressForMarkerActivity> mActivityRule = new ActivityTestRule<>(
+            PressForMarkerActivity.class);
 
-    private InfoWindowAdapterActivity mActivity = null;
+    private PressForMarkerActivity mActivity = null;
 
     @Before
     public void setActivity() {
@@ -29,6 +29,7 @@ public class InfoWindowAdapterActivityTest extends BaseTest {
 
     @Test
     public void testSanity() {
-        checkViewIsDisplayed(R.id.mapView);
+        // we are adding mapview on the fly.. just validating if we have a toolbar
+        checkViewIsDisplayed(R.id.secondToolBar);
     }
 }

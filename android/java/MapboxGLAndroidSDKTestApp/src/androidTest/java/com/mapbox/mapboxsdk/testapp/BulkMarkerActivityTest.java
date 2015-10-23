@@ -10,17 +10,17 @@ import org.junit.Test;
 import org.junit.runner.RunWith;
 
 /**
- * Tests on InfoWindowAdapterActivity.
+ * Tests on BulkMarkerActivity
  */
 @RunWith(AndroidJUnit4.class)
 @LargeTest
-public class InfoWindowAdapterActivityTest extends BaseTest {
+public class BulkMarkerActivityTest extends BaseTest {
 
     @Rule
-    public ActivityTestRule<InfoWindowAdapterActivity> mActivityRule = new ActivityTestRule<>(
-            InfoWindowAdapterActivity.class);
+    public ActivityTestRule<BulkMarkerActivity> mActivityRule = new ActivityTestRule<>(
+            BulkMarkerActivity.class);
 
-    private InfoWindowAdapterActivity mActivity = null;
+    private BulkMarkerActivity mActivity = null;
 
     @Before
     public void setActivity() {

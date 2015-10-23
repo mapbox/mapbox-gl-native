@@ -10,17 +10,17 @@ import org.junit.Test;
 import org.junit.runner.RunWith;
 
 /**
- * Tests on InfoWindowAdapterActivity.
+ * Tests on VisibleCoordinateBoundsActivity
  */
 @RunWith(AndroidJUnit4.class)
 @LargeTest
-public class InfoWindowAdapterActivityTest extends BaseTest {
+public class VisibleCoordinateBoundsActivityTest extends BaseTest {
 
     @Rule
-    public ActivityTestRule<InfoWindowAdapterActivity> mActivityRule = new ActivityTestRule<>(
-            InfoWindowAdapterActivity.class);
+    public ActivityTestRule<VisibleCoordinateBoundsActivity> mActivityRule = new ActivityTestRule<>(
+            VisibleCoordinateBoundsActivity.class);
 
-    private InfoWindowAdapterActivity mActivity = null;
+    private VisibleCoordinateBoundsActivity mActivity = null;
 
     @Before
     public void setActivity() {
