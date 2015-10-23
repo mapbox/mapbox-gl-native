@@ -83,6 +83,10 @@ final class CompassView extends ImageView {
         mDirection = direction;
         setRotation((float) direction);
 
+        if (!isEnabled()) {
+            return;
+        }
+
         if (direction == 0.0) {
             if (getVisibility() == View.INVISIBLE) {
                 return;

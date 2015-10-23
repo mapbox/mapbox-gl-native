@@ -47,6 +47,7 @@ public class BulkMarkerActivity extends AppCompatActivity {
         mMapView.setAccessToken(ApiAccess.getToken(this));
         mMapView.onCreate(savedInstanceState);
         mMapView.setCenterCoordinate(new LatLngZoom(38.87031, -77.00897, 10));
+        mMapView.setCompassEnabled(false);
 
         new LoadBulkMarkerTask(mMapView, 27267).execute();
     }
