@@ -36,7 +36,7 @@
         <activity
             android:name=".InfoWindowActivity"
             android:label="@string/activity_info_window" />
-        
+
         <activity
             android:name=".BulkMarkerActivity"
             android:label="@string/action_add_bulk_markers" />
@@ -48,6 +48,10 @@
         <activity
             android:name=".PressForMarkerActivity"
             android:label="@string/activity_press_for_marker" />
+
+        <activity
+            android:name=".MyLocationTrackingModeActivity"
+            android:label="@string/activity_user_tracking_mode" />
 
         <meta-data
             android:name="io.fabric.ApiKey"

@@ -64,6 +64,7 @@ import com.mapbox.mapboxsdk.annotations.Polyline;
 import com.mapbox.mapboxsdk.annotations.PolylineOptions;
 import com.mapbox.mapboxsdk.annotations.Sprite;
 import com.mapbox.mapboxsdk.annotations.SpriteFactory;
+import com.mapbox.mapboxsdk.constants.MyLocationTracking;
 import com.mapbox.mapboxsdk.constants.Style;
 import com.mapbox.mapboxsdk.exceptions.InvalidAccessTokenException;
 import com.mapbox.mapboxsdk.exceptions.SpriteBitmapChangedException;
@@ -121,6 +122,7 @@ public final class MapView extends FrameLayout {
     private static final String STATE_STYLE_CLASSES = "styleClasses";
     private static final String STATE_DEFAULT_TRANSITION_DURATION = "defaultTransitionDuration";
     private static final String STATE_MY_LOCATION_ENABLED = "myLocationEnabled";
+    private static final String STATE_MY_LOCATION_TRACKING_MODE = "userLocationTracking";
     private static final String STATE_COMPASS_ENABLED = "compassEnabled";
     private static final String STATE_COMPASS_GRAVITY = "compassGravity";
     private static final String STATE_COMPASS_MARGIN_LEFT = "compassMarginLeft";
@@ -499,7 +501,7 @@ public final class MapView extends FrameLayout {
          *
          * @param location The current location of the My Location dot The type of map change event.
          */
-        void  onMyLocationChange(@Nullable Location location);
+        void onMyLocationChange(@Nullable Location location);
     }
 
     //
@@ -801,6 +803,9 @@ public final class MapView extends FrameLayout {
                     , savedInstanceState.getInt(STATE_ATTRIBUTION_MARGIN_TOP)
                     , savedInstanceState.getInt(STATE_ATTRIBUTION_MARGIN_RIGHT)
                     , savedInstanceState.getInt(STATE_ATTRIBUTION_MARGIN_BOTTOM));
+
+            //noinspection ResourceType
+            setMyLocationTrackingMode(savedInstanceState.getInt(STATE_MY_LOCATION_TRACKING_MODE, MyLocationTracking.TRACKING_NONE));
         }
 
         // Force a check for an access token
@@ -852,6 +857,7 @@ public final class MapView extends FrameLayout {
         outState.putStringArrayList(STATE_STYLE_CLASSES, new ArrayList<>(getStyleClasses()));
         outState.putLong(STATE_DEFAULT_TRANSITION_DURATION, mNativeMapView.getDefaultTransitionDuration());
         outState.putBoolean(STATE_MY_LOCATION_ENABLED, isMyLocationEnabled());
+        outState.putInt(STATE_MY_LOCATION_TRACKING_MODE, mUserLocationView.getMyLocationTrackingMode());
 
         // Compass
         LayoutParams compassParams = (LayoutParams) mCompassView.getLayoutParams();
@@ -2491,9 +2497,13 @@ public final class MapView extends FrameLayout {
 
             // Cancel any animation
             mNativeMapView.cancelTransitions();
-
-            // Scale the map
-            mNativeMapView.scaleBy(detector.getScaleFactor(), detector.getFocusX() / mScreenDensity, detector.getFocusY() / mScreenDensity);
+            if (mUserLocationView.getMyLocationTrackingMode() == MyLocationTracking.TRACKING_NONE) {
+                // Scale around center of the gesture
+                mNativeMapView.scaleBy(detector.getScaleFactor(), detector.getFocusX() / mScreenDensity, detector.getFocusY() / mScreenDensity);
+            } else {
+                // Scale around the center of the map
+                mNativeMapView.scaleBy(detector.getScaleFactor(), (getWidth() / 2)/mScreenDensity, (getHeight() / 2)/mScreenDensity);
+            }
 
             return true;
         }
@@ -2562,8 +2572,15 @@ public final class MapView extends FrameLayout {
             // Rotate the map
             double bearing = mNativeMapView.getBearing();
             bearing += detector.getRotationDegreesDelta();
-            mNativeMapView.setBearing(bearing, detector.getFocusX() / mScreenDensity, detector.getFocusY() / mScreenDensity);
 
+            if (mUserLocationView.getMyLocationTrackingMode() == MyLocationTracking.TRACKING_NONE) {
+                // Rotate around gesture
+                mNativeMapView.setBearing(bearing, detector.getFocusX() / mScreenDensity, detector.getFocusY() / mScreenDensity);
+            } else {
+                // Rotate around center map
+                // FIXME when rotating around center map
+                mNativeMapView.setBearing(bearing, (getWidth() / 2) / mScreenDensity, (getHeight() / 2) / mScreenDensity);
+            }
             return true;
         }
     }
@@ -3114,6 +3131,36 @@ public final class MapView extends FrameLayout {
     @UiThread
     public void setOnMyLocationChangeListener(@Nullable OnMyLocationChangeListener listener) {
         mUserLocationView.setOnMyLocationChangeListener(listener);
+    }
+
+    /**
+     * Set the current user location tracking mode.
+     *
+     * @param userLocationTrackingMode to be used.
+     */
+    @UiThread
+    public void setMyLocationTrackingMode(@MyLocationTracking.Mode int userLocationTrackingMode) {
+        mUserLocationView.setMyLocationTrackingMode(userLocationTrackingMode);
+
+        // Enable/disable gestures based on tracking mode
+        if (userLocationTrackingMode == MyLocationTracking.TRACKING_NONE) {
+            mScrollEnabled = true;
+            mRotateEnabled = true;
+        } else {
+            mScrollEnabled = false;
+            mRotateEnabled = (userLocationTrackingMode == MyLocationTracking.TRACKING_FOLLOW);
+        }
+    }
+
+    /**
+     * Returns the current user location tracking mode.
+     *
+     * @return the current user location tracking mode.
+     */
+    @UiThread
+    @MyLocationTracking.Mode
+    public int getMyLocationTrackingMode() {
+        return mUserLocationView.getMyLocationTrackingMode();
     }
 
     //
