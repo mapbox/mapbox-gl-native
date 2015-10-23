@@ -10,12 +10,15 @@ IOS_SDK_VERSION=`xcrun --sdk iphoneos --show-sdk-version`
 LIBUV_VERSION=1.7.5
 
 if [[ ${#} -eq 0 ]]; then # e.g. "make ipackage"
+    BUILDTYPE="Release"
     BUILD_FOR_DEVICE=true
     GCC_GENERATE_DEBUGGING_SYMBOLS="YES"
 elif [[ ${1} == "sim" ]]; then # e.g. "make ipackage-sim"
+    BUILDTYPE="Debug"
     BUILD_FOR_DEVICE=false
     GCC_GENERATE_DEBUGGING_SYMBOLS="YES"
 else # e.g. "make ipackage-strip"
+    BUILDTYPE="Release"
     BUILD_FOR_DEVICE=true
     GCC_GENERATE_DEBUGGING_SYMBOLS="NO"
 fi
