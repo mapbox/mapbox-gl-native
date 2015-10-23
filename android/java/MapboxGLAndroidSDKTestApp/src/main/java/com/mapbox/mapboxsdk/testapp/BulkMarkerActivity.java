@@ -3,6 +3,7 @@ package com.mapbox.mapboxsdk.testapp;
 import android.content.Context;
 import android.os.AsyncTask;
 import android.os.Bundle;
+import android.os.Debug;
 import android.support.v7.app.ActionBar;
 import android.support.v7.app.AppCompatActivity;
 import android.support.v7.widget.Toolbar;
@@ -47,7 +48,7 @@ public class BulkMarkerActivity extends AppCompatActivity {
         mMapView.onCreate(savedInstanceState);
         mMapView.setCenterCoordinate(new LatLngZoom(38.87031, -77.00897, 10));
 
-        new LoadBulkMarkerTask(mMapView, 1000).execute();
+        new LoadBulkMarkerTask(mMapView, 27267).execute();
     }
 
     @Override
@@ -118,11 +119,21 @@ public class BulkMarkerActivity extends AppCompatActivity {
 
         @Override
         protected List<MarkerOptions> doInBackground(Void... params) {
-            List<MarkerOptions> markerOptions = new ArrayList<>();
+            //Debug.startMethodTracing("bulk-marker");
+            TimingLogger timings = new TimingLogger(TAG, "doInBackground");
+            //Log.d(TAG, "isLoggable " + Log.isLoggable(TAG, Log.VERBOSE));
+
+            List<MarkerOptions> markerOptions = new ArrayList<>(mAmount);
+            timings.addSplit("create ArrayList");
+
             try {
                 DecimalFormat formatter = new DecimalFormat("#.#####");
+
                 String json = Util.loadStringFromAssets(mAppContext, "points.geojson");
+                timings.addSplit("loadStringFromAssets");
+
                 List<LatLng> locations = Util.parseGeoJSONCoordinates(json);
+                timings.addSplit("parseGeoJSONCoordinates");
 
                 LatLng location;
                 for (int i = 0; i < mAmount; i++) {
@@ -132,20 +143,30 @@ public class BulkMarkerActivity extends AppCompatActivity {
                             .title("Marker")
                             .snippet(formatter.format(location.getLatitude()) + ", " + formatter.format(location.getLongitude())));
                 }
+                timings.addSplit("create all MarkerOptions");
+
             } catch (IOException | JSONException e) {
                 Log.e(TAG, "Could not add markers,", e);
             }
+
+            timings.dumpToLog();
             return markerOptions;
         }
 
         @Override
         protected void onPostExecute(List<MarkerOptions> markerOptions) {
             super.onPostExecute(markerOptions);
+            TimingLogger timings = new TimingLogger(TAG, "onPostExecute");
+
             MapView mapView = mMapView.get();
             if (mapView != null) {
                 List<Marker> markers = mapView.addMarkers(markerOptions);
                 Log.v(TAG, "Markers added " + markers.size());
             }
+            timings.addSplit("addMarkers");
+
+            timings.dumpToLog();
+            //Debug.stopMethodTracing();
         }
     }
 }
