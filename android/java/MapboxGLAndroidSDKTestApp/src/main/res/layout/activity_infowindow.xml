@@ -11,7 +11,14 @@
         android:layout_height="wrap_content"
         android:background="@color/primary"
         android:minHeight="?attr/actionBarSize"
-        android:theme="@style/ThemeOverlay.AppCompat.Dark.ActionBar" />
+        android:theme="@style/ThemeOverlay.AppCompat.Dark.ActionBar">
+
+        <Spinner
+            android:id="@+id/spinner"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"/>
+
+        </android.support.v7.widget.Toolbar>
 
     <com.mapbox.mapboxsdk.views.MapView
         android:id="@+id/mapView"
