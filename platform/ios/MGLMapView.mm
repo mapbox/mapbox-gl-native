@@ -1593,13 +1593,6 @@ std::chrono::steady_clock::duration secondsAsDuration(float duration)
     return [NSSet setWithObjects:@"latitude", @"longitude", @"camera", nil];
 }
 
-- (void)setCenterCoordinate:(CLLocationCoordinate2D)coordinate animated:(BOOL)animated preservingTracking:(BOOL)tracking
-{
-    self.userTrackingMode = (tracking ? self.userTrackingMode : MGLUserTrackingModeNone);
-
-    [self setCenterCoordinate:coordinate animated:animated];
-}
-
 - (void)setCenterCoordinate:(CLLocationCoordinate2D)coordinate animated:(BOOL)animated
 {
     [self setCenterCoordinate:coordinate zoomLevel:self.zoomLevel animated:animated];
