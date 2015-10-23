@@ -9,7 +9,7 @@ const std::vector<std::pair<std::string, std::string>> defaultStyles = {
     { "asset://styles/light-v8.json", "Light" },
     { "asset://styles/dark-v8.json", "Dark" },
     { "asset://styles/satellite-v8.json", "Satellite" },
-    { "asset://styles/satellite-hyrid-v8.json", "Satellite Streets" }
+    { "asset://styles/satellite-hybrid-v8.json", "Satellite Streets" }
 };
 
 } // end namespace util
