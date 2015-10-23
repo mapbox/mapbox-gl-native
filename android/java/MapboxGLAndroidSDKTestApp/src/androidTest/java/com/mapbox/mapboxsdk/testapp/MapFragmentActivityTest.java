@@ -10,17 +10,17 @@ import org.junit.Test;
 import org.junit.runner.RunWith;
 
 /**
- * Tests on InfoWindowAdapterActivity.
+ * Tests on MapFragmentActivity
  */
 @RunWith(AndroidJUnit4.class)
 @LargeTest
-public class InfoWindowAdapterActivityTest extends BaseTest {
+public class MapFragmentActivityTest extends BaseTest {
 
     @Rule
-    public ActivityTestRule<InfoWindowAdapterActivity> mActivityRule = new ActivityTestRule<>(
-            InfoWindowAdapterActivity.class);
+    public ActivityTestRule<MapFragmentActivity> mActivityRule = new ActivityTestRule<>(
+            MapFragmentActivity.class);
 
-    private InfoWindowAdapterActivity mActivity = null;
+    private MapFragmentActivity mActivity = null;
 
     @Before
     public void setActivity() {
@@ -29,6 +29,8 @@ public class InfoWindowAdapterActivityTest extends BaseTest {
 
     @Test
     public void testSanity() {
-        checkViewIsDisplayed(R.id.mapView);
+        checkViewIsDisplayed(R.id.fragment_container);
     }
+
+    // FIXME need a way to check if fragment was correctly added to Activity
 }

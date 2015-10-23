@@ -14,6 +14,8 @@ import static android.support.test.espresso.matcher.ViewMatchers.withId;
  */
 public class BaseTest {
 
+    protected final static String HOME_BUTTON_STRING = "Navigate up";
+
     /*
      * Shortcuts for common UI tests
      */
