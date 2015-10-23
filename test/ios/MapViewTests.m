@@ -52,13 +52,12 @@
 }
 
 - (void)testDirectionSet {
-    tester.mapView.direction = 270;
+    [tester.mapView setDirection:270 animated:YES];
+    [tester waitForAnimationsToFinish];
 
     XCTAssertEqual(tester.mapView.direction,
                    270,
                    @"setting direction should take effect");
-
-    [tester waitForTimeInterval:2];
 
     XCTAssertEqual(tester.compass.alpha,
                    1,
@@ -70,15 +69,15 @@
 }
 
 - (void)testCompassTap {
-    tester.mapView.direction = 180;
+    [tester.mapView setDirection:180 animated:YES];
+    [tester waitForAnimationsToFinish];
 
     XCTAssertEqual(tester.mapView.direction,
                    180,
                    @"setting direction should take effect");
 
     [tester.compass tap];
-
-    [tester waitForTimeInterval:2];
+    [tester waitForAnimationsToFinish];
 
     XCTAssertEqual(tester.mapView.direction,
                    0,
@@ -93,15 +92,15 @@
 }
 
 - (void)testDirectionReset {
-    tester.mapView.direction = 90;
+    [tester.mapView setDirection:90 animated:YES];
+    [tester waitForAnimationsToFinish];
 
     XCTAssertEqual(tester.mapView.direction,
                    90,
                    @"setting direction should take effect");
 
     [tester.mapView resetNorth];
-
-    [tester waitForTimeInterval:2];
+    [tester waitForAnimationsToFinish];
 
     XCTAssertEqual(tester.mapView.direction,
                    0,
@@ -254,9 +253,7 @@
                        [cameraIsInDCExpectation fulfill];
                    });
     
-    [self waitForExpectationsWithTimeout:1.0 handler:^(NSError *error) {
-        ;
-    }];
+    [self waitForExpectationsWithTimeout:1.0 handler:nil];
 }
 
 - (void)testPanDisabled {
