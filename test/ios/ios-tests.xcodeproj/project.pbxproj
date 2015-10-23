@@ -9,9 +9,6 @@
 /* Begin PBXBuildFile section */
 		96567A231B0E84CD00D78776 /* LaunchScreen.xib in Resources */ = {isa = PBXBuildFile; fileRef = 96567A221B0E84CD00D78776 /* LaunchScreen.xib */; };
 		96567A311B0E8BB900D78776 /* Images.xcassets in Resources */ = {isa = PBXBuildFile; fileRef = 96567A301B0E8BB900D78776 /* Images.xcassets */; };
-		96992E581B0FBB6F008978C0 /* CSSwizzler.m in Sources */ = {isa = PBXBuildFile; fileRef = 96992E541B0FBB6F008978C0 /* CSSwizzler.m */; };
-		96992E591B0FBB6F008978C0 /* LocationMocker.m in Sources */ = {isa = PBXBuildFile; fileRef = 96992E561B0FBB6F008978C0 /* LocationMocker.m */; };
-		96992E621B0FBC4F008978C0 /* CLLocationManager+MockLocation.m in Sources */ = {isa = PBXBuildFile; fileRef = 96992E611B0FBC4F008978C0 /* CLLocationManager+MockLocation.m */; };
 		DD043363196DBBD500E6F39D /* MGLTAppDelegate.m in Sources */ = {isa = PBXBuildFile; fileRef = DD04335F196DBBD500E6F39D /* MGLTAppDelegate.m */; };
 		DD043364196DBBD500E6F39D /* MGLTViewController.m in Sources */ = {isa = PBXBuildFile; fileRef = DD043360196DBBD500E6F39D /* MGLTViewController.m */; };
 		DD043366196DBBE000E6F39D /* main.m in Sources */ = {isa = PBXBuildFile; fileRef = DD043365196DBBE000E6F39D /* main.m */; };
@@ -80,12 +77,6 @@
 /* Begin PBXFileReference section */
 		96567A221B0E84CD00D78776 /* LaunchScreen.xib */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = file.xib; path = LaunchScreen.xib; sourceTree = SOURCE_ROOT; };
 		96567A301B0E8BB900D78776 /* Images.xcassets */ = {isa = PBXFileReference; lastKnownFileType = folder.assetcatalog; path = Images.xcassets; sourceTree = SOURCE_ROOT; };
-		96992E531B0FBB6F008978C0 /* CSSwizzler.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = CSSwizzler.h; sourceTree = "<group>"; };
-		96992E541B0FBB6F008978C0 /* CSSwizzler.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = CSSwizzler.m; sourceTree = "<group>"; };
-		96992E551B0FBB6F008978C0 /* LocationMocker.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = LocationMocker.h; sourceTree = "<group>"; };
-		96992E561B0FBB6F008978C0 /* LocationMocker.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = LocationMocker.m; sourceTree = "<group>"; };
-		96992E601B0FBC4F008978C0 /* CLLocationManager+MockLocation.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = "CLLocationManager+MockLocation.h"; sourceTree = "<group>"; };
-		96992E611B0FBC4F008978C0 /* CLLocationManager+MockLocation.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = "CLLocationManager+MockLocation.m"; sourceTree = "<group>"; };
 		DACAD7111B08719F009119DC /* MGLMapboxEvents.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; name = MGLMapboxEvents.h; path = ../../platform/ios/MGLMapboxEvents.h; sourceTree = SOURCE_ROOT; };
 		DADD9EB51BD16D8B00DA9161 /* Compatibility.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; name = Compatibility.h; path = OHHTTPStubs/OHHTTPStubs/Sources/Compatibility.h; sourceTree = SOURCE_ROOT; };
 		DD043323196DB9BC00E6F39D /* Mapbox GL Tests.app */ = {isa = PBXFileReference; explicitFileType = wrapper.application; includeInIndex = 0; path = "Mapbox GL Tests.app"; sourceTree = BUILT_PRODUCTS_DIR; };
@@ -168,19 +159,6 @@
 /* End PBXFrameworksBuildPhase section */
 
 /* Begin PBXGroup section */
-		96992E501B0FBB6F008978C0 /* LocationMocker */ = {
-			isa = PBXGroup;
-			children = (
-				96992E601B0FBC4F008978C0 /* CLLocationManager+MockLocation.h */,
-				96992E611B0FBC4F008978C0 /* CLLocationManager+MockLocation.m */,
-				96992E531B0FBB6F008978C0 /* CSSwizzler.h */,
-				96992E541B0FBB6F008978C0 /* CSSwizzler.m */,
-				96992E551B0FBB6F008978C0 /* LocationMocker.h */,
-				96992E561B0FBB6F008978C0 /* LocationMocker.m */,
-			);
-			path = LocationMocker;
-			sourceTree = SOURCE_ROOT;
-		};
 		DD04331A196DB9BC00E6F39D = {
 			isa = PBXGroup;
 			children = (
@@ -308,7 +286,6 @@
 				DD0E6F661B01806600DC035A /* MetricsTests.m */,
 				DDBD0167196DC46B0033959E /* Supporting Files */,
 				DDBD014D196DC3B00033959E /* KIF */,
-				96992E501B0FBB6F008978C0 /* LocationMocker */,
 				DD0E6F6B1B01906600DC035A /* OCMock */,
 				DD0E6F861B01B67100DC035A /* OHHTTPStubs */,
 			);
@@ -478,12 +455,9 @@
 			isa = PBXSourcesBuildPhase;
 			buildActionMask = 2147483647;
 			files = (
-				96992E581B0FBB6F008978C0 /* CSSwizzler.m in Sources */,
-				96992E591B0FBB6F008978C0 /* LocationMocker.m in Sources */,
 				DD043366196DBBE000E6F39D /* main.m in Sources */,
 				DD043363196DBBD500E6F39D /* MGLTAppDelegate.m in Sources */,
 				DD043364196DBBD500E6F39D /* MGLTViewController.m in Sources */,
-				96992E621B0FBC4F008978C0 /* CLLocationManager+MockLocation.m in Sources */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};

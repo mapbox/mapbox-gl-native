@@ -2648,7 +2648,11 @@ CLLocationCoordinate2D MGLLocationCoordinate2DFromLatLng(mbgl::LatLng latLng)
         {
             self.showsUserLocation = YES;
 
-            if (self.zoomLevel < self.currentMinimumZoom) [self setZoomLevel:self.currentMinimumZoom animated:YES];
+            if (self.zoomLevel < self.currentMinimumZoom)
+            {
+                [self setZoomLevel:self.currentMinimumZoom animated:YES];
+                _userTrackingMode = MGLUserTrackingModeFollowWithHeading; // reapply
+            }
 
             if (self.userLocationAnnotationView)
             {

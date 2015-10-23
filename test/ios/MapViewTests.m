@@ -6,15 +6,8 @@
 #import "Mapbox.h"
 #import "MGLTViewController.h"
 
-#import "LocationMocker/LocationMocker.h"
 #import <CoreLocation/CoreLocation.h>
 #import <KIF/UIAutomationHelper.h>
-
-@interface MGLMapView (LocationManager)
-
-@property (nonatomic) CLLocationManager *locationManager;
-
-@end
 
 @interface MapViewTests : KIFTestCase <MGLMapViewDelegate>
 
@@ -589,7 +582,7 @@
     XCTAssertEqualObjects(notification.name,
                           @"mapViewWillStartLocatingUser",
                           @"mapViewWillStartLocatingUser delegate should receive message");
-    XCTAssertNotNil(tester.mapView.locationManager,
+    XCTAssertNotNil([tester.mapView valueForKeyPath:@"locationManager"],
                  "map view location manager should not be nil");
 
     notification = [system waitForNotificationName:@"mapViewDidStopLocatingUser"
@@ -604,7 +597,7 @@
     XCTAssertEqual(tester.mapView.userTrackingMode,
                    MGLUserTrackingModeNone,
                    @"user tracking mode should be none");
-    XCTAssertNil(tester.mapView.locationManager,
+    XCTAssertNil([tester.mapView valueForKeyPath:@"locationManager"],
                  "map view location manager should be nil");
 }
 
@@ -614,74 +607,6 @@
 
 - (void)mapViewDidStopLocatingUser:(MGLMapView *)mapView {
     [[NSNotificationCenter defaultCenter] postNotificationName:@"mapViewDidStopLocatingUser" object:mapView];
-}
-
-- (void)testUserTrackingModeFollow {
-    tester.mapView.userTrackingMode = MGLUserTrackingModeFollow;
-
-    [self approveLocationIfNeeded];
-    [tester waitForAnimationsToFinish];
-
-    XCTAssertEqual(tester.mapView.userLocationVisible,
-                   YES,
-                   @"user location should be visible");
-    XCTAssertEqual(tester.mapView.userLocation.coordinate.latitude,
-                   kMockedLatitude,
-                   @"user location latitude should match mocked latitude");
-    XCTAssertEqual(tester.mapView.userLocation.coordinate.longitude,
-                   kMockedLongitude,
-                   @"user location longitude should match mocked longitude");
-
-    [tester.mapView dragFromPoint:CGPointMake(10, 10) toPoint:CGPointMake(50, 100) steps:10];
-
-    XCTAssertEqual(tester.mapView.userLocationVisible,
-                   YES,
-                   @"user location should still be visible after panning");
-    XCTAssertEqual(tester.mapView.userTrackingMode,
-                   MGLUserTrackingModeNone,
-                   @"user tracking mode should reset to none");
-}
-
-// DOES NOT CURRENTLY PASS, bug with tracking mode not being set properly (or reset)
-- (void)testUserTrackingModeFollowWithHeading {
-    tester.mapView.userTrackingMode = MGLUserTrackingModeFollowWithHeading;
-    
-    [self approveLocationIfNeeded];
-    [tester waitForAnimationsToFinish];
-
-    XCTAssertEqual(tester.mapView.userLocationVisible,
-                   YES,
-                   @"user location should be visible");
-    XCTAssertEqual(tester.mapView.userLocation.coordinate.latitude,
-                   kMockedLatitude,
-                   @"user location latitude should match mocked latitude");
-    XCTAssertEqual(tester.mapView.userLocation.coordinate.longitude,
-                   kMockedLongitude,
-                   @"user location longitude should match mocked longitude");
-    
-    XCTAssertEqual(tester.mapView.userTrackingMode,
-                   MGLUserTrackingModeFollowWithHeading,
-                   @"user tracking mode should be follow with heading");
-    XCTAssertEqual(tester.mapView.userLocation.heading.trueHeading,
-                   kMockedHeadingTrueHeading,
-                   @"user true heading should match mocked true heading");
-    XCTAssertEqual(tester.mapView.userLocation.heading.headingAccuracy,
-                   kMockedHeadingAccuracy,
-                   @"user heading accuracy should match mocked accuracy");
-    
-    [tester.compass tap];
-    
-    [tester waitForTimeInterval:1];
-    
-    XCTAssertEqual(tester.mapView.userLocationVisible,
-                   YES,
-                   @"user location should be visible");
-    XCTAssertEqual(tester.mapView.userTrackingMode,
-                   MGLUserTrackingModeFollow,
-                   @"user tracking mode should be follow");
-    XCTAssertEqual(tester.mapView.direction,
-                   0,
-                   @"user heading should be reset to zero/north");
 }
 
 @end

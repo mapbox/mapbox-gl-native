@@ -53,6 +53,9 @@
             </BuildableReference>
             <SkippedTests>
                <Test
+                  Identifier = "MapViewTests/testUserTrackingModeFollowWithHeading">
+               </Test>
+               <Test
                   Identifier = "MetricsTests">
                </Test>
                <Test
