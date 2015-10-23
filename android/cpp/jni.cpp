@@ -887,6 +887,7 @@ jlongArray JNICALL nativeAddMarkers(JNIEnv *env, jobject obj, jlong nativeMapVie
         env->DeleteLocalRef(icon);
 
         std::string id = std_string_from_jstring(env, jid);
+        env->DeleteLocalRef(jid);
 
         jdouble latitude = env->GetDoubleField(position, latLngLatitudeId);
         if (env->ExceptionCheck()) {
@@ -2196,4 +2197,3 @@ extern "C" JNIEXPORT void JNICALL JNI_OnUnload(JavaVM *vm, void *reserved) {
     theJVM = nullptr;
 }
 }
-
