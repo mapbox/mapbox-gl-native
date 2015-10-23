@@ -96,10 +96,12 @@ std::unique_ptr<StyleLayer> ShapeAnnotationImpl::createFillLayer() {
 }
 
 void ShapeAnnotationImpl::updateTile(const TileID& tileID, AnnotationTile& tile) {
+    static const double baseTolerance = 3;
+    static const uint16_t extent = 4096;
+
     if (!shapeTiler) {
-        const double baseTolerance = 3;
-        const uint16_t extent = 4096;
-        const double tolerance = baseTolerance / ((1 << maxZoom) * extent);
+        const uint64_t maxAmountOfTiles = 1 << maxZoom;
+        const double tolerance = baseTolerance / (maxAmountOfTiles * extent);
 
         ProjectedGeometryContainer rings;
         std::vector<LonLat> points;
