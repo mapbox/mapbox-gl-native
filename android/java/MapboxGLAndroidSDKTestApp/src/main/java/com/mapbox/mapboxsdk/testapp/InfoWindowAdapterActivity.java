@@ -1,8 +1,11 @@
 package com.mapbox.mapboxsdk.testapp;
 
 import android.graphics.Color;
+import android.graphics.PorterDuff;
+import android.graphics.drawable.Drawable;
 import android.os.Bundle;
 import android.support.annotation.NonNull;
+import android.support.v4.content.ContextCompat;
 import android.support.v7.app.ActionBar;
 import android.support.v7.app.AppCompatActivity;
 import android.support.v7.widget.Toolbar;
@@ -12,6 +15,8 @@ import android.widget.TextView;
 
 import com.mapbox.mapboxsdk.annotations.Marker;
 import com.mapbox.mapboxsdk.annotations.MarkerOptions;
+import com.mapbox.mapboxsdk.annotations.Sprite;
+import com.mapbox.mapboxsdk.annotations.SpriteFactory;
 import com.mapbox.mapboxsdk.constants.Style;
 import com.mapbox.mapboxsdk.geometry.LatLng;
 import com.mapbox.mapboxsdk.utils.ApiAccess;
@@ -20,6 +25,8 @@ import com.mapbox.mapboxsdk.views.MapView;
 public class InfoWindowAdapterActivity extends AppCompatActivity {
 
     private MapView mMapView;
+    private SpriteFactory mSpriteFactory;
+    private Drawable mIconDrawable;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -38,6 +45,10 @@ public class InfoWindowAdapterActivity extends AppCompatActivity {
         mMapView = (MapView) findViewById(R.id.mapView);
         mMapView.setAccessToken(ApiAccess.getToken(this));
         mMapView.onCreate(savedInstanceState);
+
+        mSpriteFactory = new SpriteFactory(mMapView);
+        mIconDrawable = ContextCompat.getDrawable(this, R.drawable.ic_location_city_black_48dp);
+
         mMapView.setInfoWindowAdapter(new MapView.InfoWindowAdapter() {
 
             private int tenDp = (int) getResources().getDimension(R.dimen.attr_margin);
@@ -66,6 +77,10 @@ public class InfoWindowAdapterActivity extends AppCompatActivity {
         marker.title(title);
         marker.snippet(color);
         marker.position(new LatLng(lat, lng));
+
+        mIconDrawable.setColorFilter(Color.parseColor(marker.getSnippet()), PorterDuff.Mode.SRC_IN);
+        Sprite icon = mSpriteFactory.fromDrawable(mIconDrawable);
+        marker.icon(icon);
         return marker;
     }
 

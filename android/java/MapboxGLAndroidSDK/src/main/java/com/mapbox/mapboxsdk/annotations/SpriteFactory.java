@@ -3,6 +3,9 @@ package com.mapbox.mapboxsdk.annotations;
 import android.content.Context;
 import android.graphics.Bitmap;
 import android.graphics.BitmapFactory;
+import android.graphics.Canvas;
+import android.graphics.Rect;
+import android.graphics.drawable.Drawable;
 import android.os.Build;
 import android.util.DisplayMetrics;
 import android.view.WindowManager;
@@ -20,7 +23,6 @@ public final class SpriteFactory {
 
     private static final String SPRITE_ID_PREFIX = "com.mapbox.sprites.sprite_";
 
-    // TODO make weak
     private MapView mMapView;
     private Sprite mDefaultMarker;
     private BitmapFactory.Options mOptions;
@@ -60,6 +62,30 @@ public final class SpriteFactory {
         String id = SPRITE_ID_PREFIX + ++mNextId;
 
         return new Sprite(id, bitmap);
+    }
+
+    public Sprite fromDrawable(Drawable drawable) {
+        int width = drawable.getIntrinsicWidth();
+        int height = drawable.getIntrinsicHeight();
+
+        return fromDrawable(drawable, width, height);
+    }
+
+
+    public Sprite fromDrawable(Drawable drawable, int width, int height) {
+        if ((width < 0) || (height < 0)) {
+            return null;
+        }
+
+        Bitmap bitmap = Bitmap.createBitmap(width, height, Bitmap.Config.ARGB_8888);
+        Canvas canvas = new Canvas(bitmap);
+        Rect temp = drawable.getBounds();
+        Rect bounds = new Rect(0, 0, width, height);
+        drawable.setBounds(bounds);
+        drawable.draw(canvas);
+        drawable.setBounds(temp);
+
+        return fromBitmap(bitmap);
     }
 
     public Sprite fromResource(int resourceId) {

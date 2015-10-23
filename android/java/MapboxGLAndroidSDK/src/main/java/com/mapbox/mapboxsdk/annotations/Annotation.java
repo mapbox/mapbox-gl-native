@@ -4,8 +4,6 @@ import android.support.annotation.NonNull;
 
 import com.mapbox.mapboxsdk.views.MapView;
 
-import java.lang.ref.WeakReference;
-
 public abstract class Annotation implements Comparable<Annotation> {
 
     /**
@@ -14,7 +12,7 @@ public abstract class Annotation implements Comparable<Annotation> {
      * Internal C++ id is stored as unsigned int.
      */
     private long id = -1; // -1 unless added to a MapView
-    private WeakReference<MapView> mapView;
+    private MapView mapView;
 
     protected Annotation() {
     }
@@ -27,10 +25,10 @@ public abstract class Annotation implements Comparable<Annotation> {
     }
 
     public void remove() {
-        if ((mapView == null) || (mapView.get() == null)) {
+        if (mapView == null) {
             return;
         }
-        mapView.get().removeAnnotation(this);
+        mapView.removeAnnotation(this);
     }
 
     /**
@@ -44,14 +42,14 @@ public abstract class Annotation implements Comparable<Annotation> {
      * Do not use this method. Used internally by the SDK.
      */
     public void setMapView(MapView mapView) {
-        this.mapView = new WeakReference<>(mapView);
+        this.mapView = mapView;
     }
 
     protected MapView getMapView() {
         if (mapView == null) {
             return null;
         }
-        return mapView.get();
+        return mapView;
     }
 
     @Override
