@@ -1,6 +1,6 @@
 {
   'includes': [
-    '../ios/app/mapboxgl-app.gypi',
-    '../ios/benchmark/benchmark-ios.gypi',
+    '../tvos/app/mapboxgl-app.gypi',
+    '../tvos/benchmark/benchmark-tvos.gypi',
   ],
 }

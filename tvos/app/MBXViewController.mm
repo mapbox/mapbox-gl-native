@@ -16,7 +16,7 @@ static NSArray *const kStyleNames = @[
 
 static NSUInteger const kStyleVersion = 8;
 
-@interface MBXViewController () <UIActionSheetDelegate, MGLMapViewDelegate>
+@interface MBXViewController () <MGLMapViewDelegate>
 
 @property (nonatomic) MGLMapView *mapView;
 
@@ -127,129 +127,6 @@ static NSUInteger const kStyleVersion = 8;
 }
 
 #pragma mark - Actions
-
-- (void)showSettings
-{
-    UIActionSheet *sheet = [[UIActionSheet alloc] initWithTitle:@"Map Settings"
-                                                       delegate:self
-                                              cancelButtonTitle:@"Cancel"
-                                         destructiveButtonTitle:nil
-                                              otherButtonTitles:@"Reset North",
-                                                                @"Reset Position",
-                                                                @"Toggle Debug",
-                                                                @"Empty Memory",
-                                                                @"Add 100 Points",
-                                                                @"Add 1,000 Points",
-                                                                @"Add 10,000 Points",
-                                                                @"Add Test Shapes",
-                                                                @"Remove Annotations",
-                                                                nil];
-
-    [sheet showFromBarButtonItem:self.navigationItem.leftBarButtonItem animated:YES];
-}
-
-- (void)actionSheet:(UIActionSheet *)actionSheet didDismissWithButtonIndex:(NSInteger)buttonIndex
-{
-    if (buttonIndex == actionSheet.firstOtherButtonIndex)
-    {
-        [self.mapView resetNorth];
-    }
-    else if (buttonIndex == actionSheet.firstOtherButtonIndex + 1)
-    {
-        [self.mapView resetPosition];
-    }
-    else if (buttonIndex == actionSheet.firstOtherButtonIndex + 2)
-    {
-        [self.mapView toggleDebug];
-    }
-    else if (buttonIndex == actionSheet.firstOtherButtonIndex + 3)
-    {
-        [self.mapView emptyMemoryCache];
-    }
-    else if (buttonIndex == actionSheet.firstOtherButtonIndex + 4)
-    {
-        [self parseFeaturesAddingCount:100];
-    }
-    else if (buttonIndex == actionSheet.firstOtherButtonIndex + 5)
-    {
-        [self parseFeaturesAddingCount:1000];
-    }
-    else if (buttonIndex == actionSheet.firstOtherButtonIndex + 6)
-    {
-        [self parseFeaturesAddingCount:10000];
-    }
-    else if (buttonIndex == actionSheet.firstOtherButtonIndex + 7)
-    {
-        // PNW triangle
-        //
-        CLLocationCoordinate2D triangleCoordinates[3] =
-        {
-            CLLocationCoordinate2DMake(44, -122),
-            CLLocationCoordinate2DMake(46, -122),
-            CLLocationCoordinate2DMake(46, -121)
-        };
-
-        MGLPolygon *triangle = [MGLPolygon polygonWithCoordinates:triangleCoordinates count:3];
-
-        [self.mapView addAnnotation:triangle];
-
-        // Orcas Island hike
-        //
-        NSDictionary *hike = [NSJSONSerialization JSONObjectWithData:
-                                 [NSData dataWithContentsOfFile:
-                                     [[NSBundle mainBundle] pathForResource:@"polyline" ofType:@"geojson"]]
-                                                             options:0
-                                                               error:nil];
-
-        NSArray *hikeCoordinatePairs = hike[@"features"][0][@"geometry"][@"coordinates"];
-
-        CLLocationCoordinate2D *polylineCoordinates = (CLLocationCoordinate2D *)malloc([hikeCoordinatePairs count] * sizeof(CLLocationCoordinate2D));
-
-        for (NSUInteger i = 0; i < [hikeCoordinatePairs count]; i++)
-        {
-            polylineCoordinates[i] = CLLocationCoordinate2DMake([hikeCoordinatePairs[i][1] doubleValue], [hikeCoordinatePairs[i][0] doubleValue]);
-        }
-
-        MGLPolyline *polyline = [MGLPolyline polylineWithCoordinates:polylineCoordinates
-                                                               count:[hikeCoordinatePairs count]];
-
-        [self.mapView addAnnotation:polyline];
-
-        free(polylineCoordinates);
-
-        // PA/NJ/DE polys
-        //
-        NSDictionary *threestates = [NSJSONSerialization JSONObjectWithData:
-                              [NSData dataWithContentsOfFile:
-                               [[NSBundle mainBundle] pathForResource:@"threestates" ofType:@"geojson"]]
-                                                             options:0
-                                                               error:nil];
-
-        for (NSDictionary *feature in threestates[@"features"])
-        {
-            NSArray *stateCoordinatePairs = feature[@"geometry"][@"coordinates"];
-
-            while ([stateCoordinatePairs count] == 1) stateCoordinatePairs = stateCoordinatePairs[0];
-
-            CLLocationCoordinate2D *polygonCoordinates = (CLLocationCoordinate2D *)malloc([stateCoordinatePairs count] * sizeof(CLLocationCoordinate2D));
-
-            for (NSUInteger i = 0; i < [stateCoordinatePairs count]; i++)
-            {
-                polygonCoordinates[i] = CLLocationCoordinate2DMake([stateCoordinatePairs[i][1] doubleValue], [stateCoordinatePairs[i][0] doubleValue]);
-            }
-
-            MGLPolygon *polygon = [MGLPolygon polygonWithCoordinates:polygonCoordinates count:[stateCoordinatePairs count]];
-
-            [self.mapView addAnnotation:polygon];
-
-            free(polygonCoordinates);
-        }
-    }
-    else if (buttonIndex == actionSheet.firstOtherButtonIndex + 8)
-    {
-        [self.mapView removeAnnotations:self.mapView.annotations];
-    }
-}
 
 - (void)parseFeaturesAddingCount:(NSUInteger)featuresCount
 {
