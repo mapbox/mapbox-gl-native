@@ -27,6 +27,7 @@ void ShapeAnnotationImpl::updateStyle(Style& style) {
         return;
 
     std::unique_ptr<StyleLayer> layer;
+    std::string beforeLayerID = AnnotationManager::PointLayerID;
 
     if (shape.properties.is<LinePaintProperties>()) {
         layer = createLineLayer();
@@ -49,7 +50,9 @@ void ShapeAnnotationImpl::updateStyle(Style& style) {
         layer->styles.emplace(ClassID::Default, std::move(paintProperties));
 
     } else {
-        const StyleLayer* sourceLayer = style.getLayer(shape.properties.get<std::string>());
+        beforeLayerID = shape.properties.get<std::string>();
+
+        const StyleLayer* sourceLayer = style.getLayer(beforeLayerID);
         if (!sourceLayer) return;
 
         switch (sourceLayer->type) {
@@ -73,7 +76,7 @@ void ShapeAnnotationImpl::updateStyle(Style& style) {
     layer->bucket->source = AnnotationManager::SourceID;
     layer->bucket->source_layer = layer->id;
 
-    style.addLayer(std::move(layer), AnnotationManager::PointLayerID);
+    style.addLayer(std::move(layer), beforeLayerID);
 }
 
 std::unique_ptr<StyleLayer> ShapeAnnotationImpl::createLineLayer() {
