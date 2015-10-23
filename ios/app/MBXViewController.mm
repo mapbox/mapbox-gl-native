@@ -6,20 +6,24 @@
 
 static UIColor *const kTintColor = [UIColor colorWithRed:0.120 green:0.550 blue:0.670 alpha:1.000];
 
-static NSArray *const kStyleNames = @[
-    @"Streets",
-    @"Emerald",
-    @"Light",
-    @"Dark",
-    @"Satellite",
-    @"Satellite-Hybrid",
-];
+static struct MBXStyle {
+    NSString *name;
+    NSString *displayName;
+} MBXAvailableStyles[] = {
+    {@"streets",            @"Streets"},
+    {@"emerald",            @"Emerald"},
+    {@"light",              @"Light"},
+    {@"dark",               @"Dark"},
+    {@"satellite",          @"Satellite"},
+    {@"satellite-hybrid",   @"Hybrid"},
+};
 
 static NSUInteger const kStyleVersion = 8;
 
 @interface MBXViewController () <UIActionSheetDelegate, MGLMapViewDelegate>
 
 @property (nonatomic) MGLMapView *mapView;
+@property (nonatomic) NSUInteger styleIndex;
 
 @end
 
@@ -70,10 +74,12 @@ static NSUInteger const kStyleVersion = 8;
                                                                              style:UIBarButtonItemStylePlain
                                                                             target:self
                                                                             action:@selector(showSettings)];
+    
+    self.styleIndex = 0;
 
     UIButton *titleButton = [UIButton buttonWithType:UIButtonTypeCustom];
     [titleButton setFrame:CGRectMake(0, 0, 150, 40)];
-    [titleButton setTitle:[kStyleNames firstObject] forState:UIControlStateNormal];
+    [titleButton setTitle:MBXAvailableStyles[self.styleIndex].displayName forState:UIControlStateNormal];
     [titleButton setTitleColor:kTintColor forState:UIControlStateNormal];
     [titleButton addTarget:self action:@selector(cycleStyles) forControlEvents:UIControlEventTouchUpInside];
     self.navigationItem.titleView = titleButton;
@@ -317,25 +323,14 @@ static NSUInteger const kStyleVersion = 8;
 {
     UIButton *titleButton = (UIButton *)self.navigationItem.titleView;
 
-    NSString *styleName = [titleButton titleForState:UIControlStateNormal];
-
-    if ( ! styleName)
-    {
-        styleName = [kStyleNames firstObject];
-    }
-    else
-    {
-        NSUInteger index = [kStyleNames indexOfObject:styleName] + 1;
-        if (index == [kStyleNames count]) index = 0;
-        styleName = [kStyleNames objectAtIndex:index];
-    }
+    self.styleIndex = (self.styleIndex + 1) % (sizeof(MBXAvailableStyles) / sizeof(MBXAvailableStyles[0]));
 
     self.mapView.styleURL = [NSURL URLWithString:
         [NSString stringWithFormat:@"asset://styles/%@-v%lu.json",
-            [styleName lowercaseString],
+            MBXAvailableStyles[self.styleIndex].name,
             (unsigned long)kStyleVersion]];
 
-    [titleButton setTitle:styleName forState:UIControlStateNormal];
+    [titleButton setTitle:MBXAvailableStyles[self.styleIndex].displayName forState:UIControlStateNormal];
 }
 
 - (void)locateUser
