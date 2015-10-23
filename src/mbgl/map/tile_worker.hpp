@@ -7,6 +7,7 @@
 #include <mbgl/util/noncopyable.hpp>
 #include <mbgl/util/ptr.hpp>
 #include <mbgl/style/filter_expression.hpp>
+#include <mbgl/style/style_calculation_parameters.hpp>
 
 #include <string>
 #include <memory>
@@ -57,6 +58,7 @@ private:
 
     const TileID id;
     const std::string sourceID;
+    const StyleCalculationParameters parameters;
 
     Style& style;
     const std::atomic<TileData::State>& state;

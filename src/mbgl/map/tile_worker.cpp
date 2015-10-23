@@ -22,6 +22,7 @@ TileWorker::TileWorker(TileID id_,
     : layers(std::move(layers_)),
       id(id_),
       sourceID(sourceID_),
+      parameters(id.z),
       style(style_),
       state(state_),
       collisionTile(std::move(collision_)) {
@@ -65,10 +66,10 @@ void TileWorker::redoPlacement(float angle, float pitch, bool collisionDebug) {
 }
 
 template <typename T>
-void applyLayoutProperty(PropertyKey key, const ClassProperties &classProperties, T &target, const float z) {
+void applyLayoutProperty(PropertyKey key, const ClassProperties &classProperties, T &target, const StyleCalculationParameters& parameters) {
     auto it = classProperties.properties.find(key);
     if (it != classProperties.properties.end()) {
-        const PropertyEvaluator<T> evaluator(z);
+        const PropertyEvaluator<T> evaluator(parameters);
         target = mapbox::util::apply_visitor(evaluator, it->second);
     }
 }

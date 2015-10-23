@@ -2,10 +2,10 @@
 
 namespace mbgl {
 
-RenderPass BackgroundLayer::applyStyleProperties(const float z, const TimePoint& now, const ZoomHistory& zoomHistory) {
-    applyTransitionedStyleProperty(PropertyKey::BackgroundOpacity, properties.opacity, z, now, zoomHistory);
-    applyTransitionedStyleProperty(PropertyKey::BackgroundColor, properties.color, z, now, zoomHistory);
-    applyStyleProperty(PropertyKey::BackgroundImage, properties.image, z, now, zoomHistory);
+RenderPass BackgroundLayer::applyStyleProperties(const StyleCalculationParameters& parameters) {
+    applyTransitionedStyleProperty(PropertyKey::BackgroundOpacity, properties.opacity, parameters);
+    applyTransitionedStyleProperty(PropertyKey::BackgroundColor, properties.color, parameters);
+    applyStyleProperty(PropertyKey::BackgroundImage, properties.image, parameters);
     return properties.isVisible() ? RenderPass::Translucent : RenderPass::None;
 }
 

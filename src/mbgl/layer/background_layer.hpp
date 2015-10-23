@@ -8,7 +8,7 @@ namespace mbgl {
 
 class BackgroundLayer : public StyleLayer {
 public:
-    RenderPass applyStyleProperties(float z, const TimePoint& now, const ZoomHistory&) override;
+    RenderPass applyStyleProperties(const StyleCalculationParameters&) override;
 
     BackgroundPaintProperties properties;
 };

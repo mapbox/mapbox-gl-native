@@ -2,13 +2,13 @@
 
 namespace mbgl {
 
-RenderPass CircleLayer::applyStyleProperties(const float z, const TimePoint& now, const ZoomHistory& zoomHistory) {
-    applyTransitionedStyleProperty(PropertyKey::CircleRadius, properties.radius, z, now, zoomHistory);
-    applyTransitionedStyleProperty(PropertyKey::CircleColor, properties.color, z, now, zoomHistory);
-    applyTransitionedStyleProperty(PropertyKey::CircleOpacity, properties.opacity, z, now, zoomHistory);
-    applyTransitionedStyleProperty(PropertyKey::CircleTranslate, properties.translate, z, now, zoomHistory);
-    applyStyleProperty(PropertyKey::CircleTranslateAnchor, properties.translateAnchor, z, now, zoomHistory);
-    applyTransitionedStyleProperty(PropertyKey::CircleBlur, properties.blur, z, now, zoomHistory);
+RenderPass CircleLayer::applyStyleProperties(const StyleCalculationParameters& parameters) {
+    applyTransitionedStyleProperty(PropertyKey::CircleRadius, properties.radius, parameters);
+    applyTransitionedStyleProperty(PropertyKey::CircleColor, properties.color, parameters);
+    applyTransitionedStyleProperty(PropertyKey::CircleOpacity, properties.opacity, parameters);
+    applyTransitionedStyleProperty(PropertyKey::CircleTranslate, properties.translate, parameters);
+    applyStyleProperty(PropertyKey::CircleTranslateAnchor, properties.translateAnchor, parameters);
+    applyTransitionedStyleProperty(PropertyKey::CircleBlur, properties.blur, parameters);
     return properties.isVisible() ? RenderPass::Translucent : RenderPass::None;
 }
 

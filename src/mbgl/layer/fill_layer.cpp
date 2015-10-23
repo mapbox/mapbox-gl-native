@@ -2,14 +2,14 @@
 
 namespace mbgl {
 
-RenderPass FillLayer::applyStyleProperties(const float z, const TimePoint& now, const ZoomHistory& zoomHistory) {
-    applyStyleProperty(PropertyKey::FillAntialias, properties.antialias, z, now, zoomHistory);
-    applyTransitionedStyleProperty(PropertyKey::FillOpacity, properties.opacity, z, now, zoomHistory);
-    applyTransitionedStyleProperty(PropertyKey::FillColor, properties.fill_color, z, now, zoomHistory);
-    applyTransitionedStyleProperty(PropertyKey::FillOutlineColor, properties.stroke_color, z, now, zoomHistory);
-    applyTransitionedStyleProperty(PropertyKey::FillTranslate, properties.translate, z, now, zoomHistory);
-    applyStyleProperty(PropertyKey::FillTranslateAnchor, properties.translateAnchor, z, now, zoomHistory);
-    applyStyleProperty(PropertyKey::FillImage, properties.image, z, now, zoomHistory);
+RenderPass FillLayer::applyStyleProperties(const StyleCalculationParameters& parameters) {
+    applyStyleProperty(PropertyKey::FillAntialias, properties.antialias, parameters);
+    applyTransitionedStyleProperty(PropertyKey::FillOpacity, properties.opacity, parameters);
+    applyTransitionedStyleProperty(PropertyKey::FillColor, properties.fill_color, parameters);
+    applyTransitionedStyleProperty(PropertyKey::FillOutlineColor, properties.stroke_color, parameters);
+    applyTransitionedStyleProperty(PropertyKey::FillTranslate, properties.translate, parameters);
+    applyStyleProperty(PropertyKey::FillTranslateAnchor, properties.translateAnchor, parameters);
+    applyStyleProperty(PropertyKey::FillImage, properties.image, parameters);
 
     RenderPass result = RenderPass::None;
 

@@ -136,8 +136,10 @@ void Style::recalculate(float z) {
 
     zoomHistory.update(z, data.getAnimationTime());
 
+    StyleCalculationParameters parameters(z, data.getAnimationTime(), zoomHistory);
+
     for (const auto& layer : layers) {
-        layer->updateProperties(z, data.getAnimationTime(), zoomHistory);
+        layer->updateProperties(parameters);
         if (!layer->bucket) {
             continue;
         }

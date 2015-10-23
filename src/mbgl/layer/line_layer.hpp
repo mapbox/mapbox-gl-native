@@ -8,7 +8,7 @@ namespace mbgl {
 
 class LineLayer : public StyleLayer {
 public:
-    RenderPass applyStyleProperties(float z, const TimePoint& now, const ZoomHistory&) override;
+    RenderPass applyStyleProperties(const StyleCalculationParameters&) override;
 
     LinePaintProperties properties;
 };

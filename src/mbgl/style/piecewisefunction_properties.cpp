@@ -16,16 +16,17 @@ size_t getBiggestStopLessThan(std::vector<std::pair<float, T>> stops, float z) {
 }
 
 template <typename T>
-T PiecewiseConstantFunction<T>::evaluate(float z, const ZoomHistory &zh) const {
+T PiecewiseConstantFunction<T>::evaluate(const StyleCalculationParameters& parameters) const {
     T result;
 
+    float z = parameters.z;
     float fraction = std::fmod(z, 1.0f);
-    float t = std::min((Clock::now() - zh.lastIntegerZoomTime) / duration, 1.0f);
+    float t = std::min((Clock::now() - parameters.zoomHistory.lastIntegerZoomTime) / duration, 1.0f);
     float fromScale = 1.0f;
     float toScale = 1.0f;
     size_t from, to;
 
-    if (z > zh.lastIntegerZoom) {
+    if (z > parameters.zoomHistory.lastIntegerZoom) {
         result.t = fraction + (1.0f - fraction) * t;
         from = getBiggestStopLessThan(values, z - 1.0f);
         to = getBiggestStopLessThan(values, z);
@@ -46,7 +47,7 @@ T PiecewiseConstantFunction<T>::evaluate(float z, const ZoomHistory &zh) const {
     return result;
 }
 
-template Faded<std::string> PiecewiseConstantFunction<Faded<std::string>>::evaluate(float z, const ZoomHistory &zoomHistory) const;
-template Faded<std::vector<float>> PiecewiseConstantFunction<Faded<std::vector<float>>>::evaluate(float z, const ZoomHistory &zoomHistory) const;
+template Faded<std::string> PiecewiseConstantFunction<Faded<std::string>>::evaluate(const StyleCalculationParameters&) const;
+template Faded<std::vector<float>> PiecewiseConstantFunction<Faded<std::vector<float>>>::evaluate(const StyleCalculationParameters&) const;
 
 }

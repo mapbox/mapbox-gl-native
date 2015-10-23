@@ -118,14 +118,14 @@ void StyleLayer::applyClassProperties(const ClassID class_id,
     }
 }
 
-void StyleLayer::updateProperties(float z, const TimePoint& now, ZoomHistory &zoomHistory) {
-    cleanupAppliedStyleProperties(now);
+void StyleLayer::updateProperties(const StyleCalculationParameters& parameters) {
+    cleanupAppliedStyleProperties(parameters.now);
 
     // Clear the pending transitions flag upon each update.
     hasPendingTransitions = false;
 
     // Update the render passes when this layer is visible.
-    passes = applyStyleProperties(z, now, zoomHistory);
+    passes = applyStyleProperties(parameters);
 }
 
 bool StyleLayer::hasTransitions() const {

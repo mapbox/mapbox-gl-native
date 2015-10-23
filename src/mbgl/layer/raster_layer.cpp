@@ -2,14 +2,14 @@
 
 namespace mbgl {
 
-RenderPass RasterLayer::applyStyleProperties(const float z, const TimePoint& now, const ZoomHistory& zoomHistory) {
-    applyTransitionedStyleProperty(PropertyKey::RasterOpacity, properties.opacity, z, now, zoomHistory);
-    applyTransitionedStyleProperty(PropertyKey::RasterHueRotate, properties.hue_rotate, z, now, zoomHistory);
-    applyTransitionedStyleProperty(PropertyKey::RasterBrightnessLow, properties.brightness[0], z, now, zoomHistory);
-    applyTransitionedStyleProperty(PropertyKey::RasterBrightnessHigh, properties.brightness[1], z, now, zoomHistory);
-    applyTransitionedStyleProperty(PropertyKey::RasterSaturation, properties.saturation, z, now, zoomHistory);
-    applyTransitionedStyleProperty(PropertyKey::RasterContrast, properties.contrast, z, now, zoomHistory);
-    applyTransitionedStyleProperty(PropertyKey::RasterFade, properties.fade, z, now, zoomHistory);
+RenderPass RasterLayer::applyStyleProperties(const StyleCalculationParameters& parameters) {
+    applyTransitionedStyleProperty(PropertyKey::RasterOpacity, properties.opacity, parameters);
+    applyTransitionedStyleProperty(PropertyKey::RasterHueRotate, properties.hue_rotate, parameters);
+    applyTransitionedStyleProperty(PropertyKey::RasterBrightnessLow, properties.brightness[0], parameters);
+    applyTransitionedStyleProperty(PropertyKey::RasterBrightnessHigh, properties.brightness[1], parameters);
+    applyTransitionedStyleProperty(PropertyKey::RasterSaturation, properties.saturation, parameters);
+    applyTransitionedStyleProperty(PropertyKey::RasterContrast, properties.contrast, parameters);
+    applyTransitionedStyleProperty(PropertyKey::RasterFade, properties.fade, parameters);
     return properties.isVisible() ? RenderPass::Translucent : RenderPass::None;
 }
 

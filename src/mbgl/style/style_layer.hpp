@@ -6,6 +6,7 @@
 #include <mbgl/style/applied_class_properties.hpp>
 #include <mbgl/style/zoom_history.hpp>
 #include <mbgl/style/property_evaluator.hpp>
+#include <mbgl/style/style_calculation_parameters.hpp>
 
 #include <mbgl/renderer/render_pass.hpp>
 
@@ -34,7 +35,7 @@ public:
 
     // Updates the StyleProperties information in this layer by evaluating all
     // pending transitions and applied classes in order.
-    void updateProperties(float z, const TimePoint& now, ZoomHistory &zoomHistory);
+    void updateProperties(const StyleCalculationParameters&);
 
     // Sets the list of classes and creates transitions to the currently applied values.
     void setClasses(const std::vector<std::string> &class_names, const TimePoint& now,
@@ -58,14 +59,14 @@ public:
 protected:
     // TODO: extract
     template <typename T>
-    void applyStyleProperty(PropertyKey key, T& target, const float z, const TimePoint& now, const ZoomHistory& zoomHistory) {
+    void applyStyleProperty(PropertyKey key, T& target, const StyleCalculationParameters& parameters) {
         auto it = appliedStyle.find(key);
         if (it != appliedStyle.end()) {
             AppliedClassPropertyValues &applied = it->second;
             // Iterate through all properties that we need to apply in order.
-            const PropertyEvaluator<T> evaluator(z, zoomHistory);
+            const PropertyEvaluator<T> evaluator(parameters);
             for (auto& property : applied.propertyValues) {
-                if (now >= property.begin) {
+                if (parameters.now >= property.begin) {
                     // We overwrite the current property with the new value.
                     target = mapbox::util::apply_visitor(evaluator, property.value);
                 } else {
@@ -76,19 +77,19 @@ protected:
     }
 
     template <typename T>
-    void applyTransitionedStyleProperty(PropertyKey key, T& target, const float z, const TimePoint& now, const ZoomHistory& zoomHistory) {
+    void applyTransitionedStyleProperty(PropertyKey key, T& target, const StyleCalculationParameters& parameters) {
         auto it = appliedStyle.find(key);
         if (it != appliedStyle.end()) {
             AppliedClassPropertyValues &applied = it->second;
             // Iterate through all properties that we need to apply in order.
-            const PropertyEvaluator<T> evaluator(z, zoomHistory);
+            const PropertyEvaluator<T> evaluator(parameters);
             for (auto& property : applied.propertyValues) {
-                if (now >= property.end) {
+                if (parameters.now >= property.end) {
                     // We overwrite the current property with the new value.
                     target = mapbox::util::apply_visitor(evaluator, property.value);
-                } else if (now >= property.begin) {
+                } else if (parameters.now >= property.begin) {
                     // We overwrite the current property partially with the new value.
-                    float progress = std::chrono::duration<float>(now - property.begin) / (property.end - property.begin);
+                    float progress = std::chrono::duration<float>(parameters.now - property.begin) / (property.end - property.begin);
                     target = util::interpolate(target, mapbox::util::apply_visitor(evaluator, property.value), progress);
                     hasPendingTransitions = true;
                 } else {
@@ -105,7 +106,7 @@ private:
 
     // Sets the properties of this object by evaluating all pending transitions and
     // aplied classes in order.
-    virtual RenderPass applyStyleProperties(float z, const TimePoint& now, const ZoomHistory&) = 0;
+    virtual RenderPass applyStyleProperties(const StyleCalculationParameters&) = 0;
 
     // Removes all expired style transitions.
     void cleanupAppliedStyleProperties(const TimePoint& now);
