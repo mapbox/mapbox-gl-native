@@ -38,10 +38,10 @@ android {
 
     defaultConfig {
         applicationId "com.mapbox.mapboxgl.testapp"
-        minSdkVersion 15
+        minSdkVersion 14
         targetSdkVersion 23
-        versionCode 5
-        versionName "0.2.0"
+        versionCode 6
+        versionName "2.2.0"
 
         // Specify AndroidJUnitRunner as the default test instrumentation runner
         testInstrumentationRunner "android.support.test.runner.AndroidJUnitRunner"

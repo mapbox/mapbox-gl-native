@@ -3,6 +3,7 @@ package com.mapbox.mapboxsdk.views;
 import android.animation.Animator;
 import android.animation.AnimatorListenerAdapter;
 import android.content.Context;
+import android.os.Build;
 import android.support.v4.content.ContextCompat;
 import android.util.AttributeSet;
 import android.view.View;
@@ -107,6 +108,9 @@ final class CompassView extends ImageView {
                             public void run() {
                                 setAlpha(1.0f);
                                 mFadeAnimator = animate().alpha(0.0f).setDuration(1000);
+                                if (android.os.Build.VERSION.SDK_INT >= Build.VERSION_CODES.JELLY_BEAN) {
+                                    mFadeAnimator.withLayer();
+                                }
                                 mFadeAnimator.setListener(new AnimatorListenerAdapter() {
                                     @Override
                                     public void onAnimationEnd(Animator animation) {
