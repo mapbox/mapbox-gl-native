@@ -38,10 +38,6 @@ SUBMODULES += .mason/mason.sh
 .mason/mason.sh:
 	./scripts/flock.py .git/Submodule.lock git submodule update --init .mason
 
-SUBMODULES += styles/styles
-styles/styles:
-	./scripts/flock.py .git/Submodule.lock git submodule update --init styles
-
 SUBMODULES += src/mbgl/util/geojsonvt/geojsonvt.hpp
 src/mbgl/util/geojsonvt/geojsonvt.hpp:
 	./scripts/flock.py .git/Submodule.lock git submodule update --init src/mbgl/util/geojsonvt

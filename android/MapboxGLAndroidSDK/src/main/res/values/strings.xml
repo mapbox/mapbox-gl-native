@@ -9,10 +9,10 @@
     <string name="infoWindowAddress">Address</string>
 
     <!-- these are public -->
-    <string name="style_mapbox_streets">asset://styles/streets-v8.json</string>
-    <string name="style_emerald">asset://styles/emerald-v8.json</string>
-    <string name="style_light">asset://styles/light-v8.json</string>
-    <string name="style_dark">asset://styles/dark-v8.json</string>
-    <string name="style_satellite">asset://styles/satellite-v8.json</string>
-    <string name="style_satellite_streets">asset://styles/satellite-hybrid-v8.json</string>
+    <string name="style_mapbox_streets">mapbox://styles/mapbox/streets-v8</string>
+    <string name="style_emerald">mapbox://styles/mapbox/emerald-v8</string>
+    <string name="style_light">mapbox://styles/mapbox/light-v8</string>
+    <string name="style_dark">mapbox://styles/mapbox/dark-v8</string>
+    <string name="style_satellite">mapbox://styles/mapbox/satellite-v8</string>
+    <string name="style_satellite_streets">mapbox://styles/mapbox/satellite-hybrid-v8</string>
 </resources>

@@ -2,10 +2,6 @@
 	path = .mason
 	url = https://github.com/mapbox/mason.git
 
-[submodule "styles"]
-	path = styles
-	url = https://github.com/mapbox/mapbox-gl-styles.git
-
 [submodule "test/ios/KIF"]
 	path = test/ios/KIF
 	url = https://github.com/kif-framework/KIF.git

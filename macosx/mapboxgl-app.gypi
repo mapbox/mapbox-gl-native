@@ -13,7 +13,6 @@
       ],
 
       'dependencies': [
-        '../mbgl.gyp:bundle_styles',
         '../mbgl.gyp:core',
         '../mbgl.gyp:platform-<(platform_lib)',
         '../mbgl.gyp:http-<(http_lib)',

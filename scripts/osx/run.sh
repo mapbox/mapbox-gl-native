@@ -11,9 +11,6 @@ BUILDTYPE=${BUILDTYPE:-Release}
 # Build
 ################################################################################
 
-mapbox_time "checkout_styles" \
-git submodule update --init styles
-
 mapbox_time "checkout_geojsonvt" \
 git submodule update --init src/mbgl/util/geojsonvt
 

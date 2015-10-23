@@ -14,9 +14,6 @@ BUILDTYPE=${BUILDTYPE:-Release}
 source ~/.nvm/nvm.sh
 nvm use $NODE_VERSION
 
-mapbox_time "checkout_styles" \
-git submodule update --init styles
-
 mapbox_time "compile_program" \
 npm install --build-from-source
 

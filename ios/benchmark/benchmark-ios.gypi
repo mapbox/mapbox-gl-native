@@ -12,7 +12,6 @@
         '<!@(find ../ios/benchmark/img -type f)',
         'assets/glyphs',
         'assets/sprites',
-        'assets/styles',
         'assets/tiles',
       ],
 

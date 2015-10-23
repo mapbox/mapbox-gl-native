@@ -326,7 +326,7 @@ static NSUInteger const kStyleVersion = 8;
     self.styleIndex = (self.styleIndex + 1) % (sizeof(MBXAvailableStyles) / sizeof(MBXAvailableStyles[0]));
 
     self.mapView.styleURL = [NSURL URLWithString:
-        [NSString stringWithFormat:@"asset://styles/%@-v%lu.json",
+        [NSString stringWithFormat:@"mapbox://styles/mapbox/%@-v%lu",
             MBXAvailableStyles[self.styleIndex].name,
             (unsigned long)kStyleVersion]];
 
