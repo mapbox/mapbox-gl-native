@@ -55,6 +55,7 @@ public class Util {
                     double lng = coordinates.getDouble(0);
                     double lat = coordinates.getDouble(1);
                     latLngs.add(new LatLng(lat, lng));
+                    break;
                 }
             }
         }

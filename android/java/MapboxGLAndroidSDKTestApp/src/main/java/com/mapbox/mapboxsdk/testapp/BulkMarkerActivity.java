@@ -1,14 +1,18 @@
 package com.mapbox.mapboxsdk.testapp;
 
+import android.app.ProgressDialog;
 import android.content.Context;
 import android.os.AsyncTask;
 import android.os.Bundle;
-import android.os.Debug;
 import android.support.v7.app.ActionBar;
 import android.support.v7.app.AppCompatActivity;
 import android.support.v7.widget.Toolbar;
 import android.util.Log;
 import android.view.MenuItem;
+import android.view.View;
+import android.widget.AdapterView;
+import android.widget.ArrayAdapter;
+import android.widget.Spinner;
 
 import com.mapbox.mapboxsdk.annotations.Marker;
 import com.mapbox.mapboxsdk.annotations.MarkerOptions;
@@ -25,7 +29,7 @@ import java.text.DecimalFormat;
 import java.util.ArrayList;
 import java.util.List;
 
-public class BulkMarkerActivity extends AppCompatActivity {
+public class BulkMarkerActivity extends AppCompatActivity implements AdapterView.OnItemSelectedListener {
 
     private MapView mMapView;
 
@@ -39,6 +43,7 @@ public class BulkMarkerActivity extends AppCompatActivity {
 
         ActionBar actionBar = getSupportActionBar();
         if (actionBar != null) {
+            actionBar.setDisplayShowTitleEnabled(false);
             actionBar.setDisplayHomeAsUpEnabled(true);
             actionBar.setDisplayShowHomeEnabled(true);
         }
@@ -49,7 +54,22 @@ public class BulkMarkerActivity extends AppCompatActivity {
         mMapView.setCenterCoordinate(new LatLngZoom(38.87031, -77.00897, 10));
         mMapView.setCompassEnabled(false);
 
-        new LoadBulkMarkerTask(mMapView, 27267).execute();
+        ArrayAdapter<CharSequence> spinnerAdapter = ArrayAdapter.createFromResource(actionBar.getThemedContext(), R.array.bulk_marker_list, android.R.layout.simple_spinner_item);
+        spinnerAdapter.setDropDownViewResource(android.R.layout.simple_spinner_dropdown_item);
+        Spinner spinner = (Spinner) findViewById(R.id.spinner);
+        spinner.setAdapter(spinnerAdapter);
+        spinner.setOnItemSelectedListener(this);
+    }
+
+    @Override
+    public void onItemSelected(AdapterView<?> parent, View view, int position, long id) {
+        int markersAmount = Integer.valueOf(getResources().getStringArray(R.array.bulk_marker_list)[position]);
+        new LoadBulkMarkerTask(mMapView, markersAmount).execute();
+    }
+
+    @Override
+    public void onNothingSelected(AdapterView<?> parent) {
+
     }
 
     @Override
@@ -105,16 +125,20 @@ public class BulkMarkerActivity extends AppCompatActivity {
         }
     }
 
-    private static class LoadBulkMarkerTask extends AsyncTask<Void, Void, List<MarkerOptions>> {
+    private static class LoadBulkMarkerTask extends AsyncTask<Void, Integer, List<MarkerOptions>> {
 
         private static final String TAG = "LoadBulkMarkerTask";
         private WeakReference<MapView> mMapView;
         private Context mAppContext;
+        private ProgressDialog mProgressDialog;
         private int mAmount;
 
         public LoadBulkMarkerTask(MapView mapView, int amount) {
+            Context context = mapView.getContext();
+            mapView.removeAllAnnotations();
             mMapView = new WeakReference<>(mapView);
-            mAppContext = mapView.getContext().getApplicationContext();
+            mProgressDialog = ProgressDialog.show(context, "Loading", "Fetching markers", false);
+            mAppContext = context.getApplicationContext();
             mAmount = amount;
         }
 
@@ -134,11 +158,17 @@ public class BulkMarkerActivity extends AppCompatActivity {
                 timings.addSplit("loadStringFromAssets");
 
                 List<LatLng> locations = Util.parseGeoJSONCoordinates(json);
+
                 timings.addSplit("parseGeoJSONCoordinates");
+
+                if (locations.size() < mAmount) {
+                    mAmount = locations.size();
+                }
 
                 LatLng location;
                 for (int i = 0; i < mAmount; i++) {
                     location = locations.get(i);
+                    Log.v(TAG, "marker " + i + " of " + mAmount + " added with " + location.getLatitude() + " " + location.getLongitude());
                     markerOptions.add(new MarkerOptions()
                             .position(location)
                             .title("Marker")
@@ -155,6 +185,11 @@ public class BulkMarkerActivity extends AppCompatActivity {
         }
 
         @Override
+        protected void onProgressUpdate(Integer... values) {
+            super.onProgressUpdate(values);
+        }
+
+        @Override
         protected void onPostExecute(List<MarkerOptions> markerOptions) {
             super.onPostExecute(markerOptions);
             TimingLogger timings = new TimingLogger(TAG, "onPostExecute");
@@ -167,6 +202,7 @@ public class BulkMarkerActivity extends AppCompatActivity {
             timings.addSplit("addMarkers");
 
             timings.dumpToLog();
+            mProgressDialog.hide();
             //Debug.stopMethodTracing();
         }
     }
