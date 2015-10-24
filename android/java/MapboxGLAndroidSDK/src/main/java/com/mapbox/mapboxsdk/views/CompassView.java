@@ -1,14 +1,13 @@
 package com.mapbox.mapboxsdk.views;
 
-import android.animation.Animator;
-import android.animation.AnimatorListenerAdapter;
 import android.content.Context;
-import android.os.Build;
 import android.support.v4.content.ContextCompat;
+import android.support.v4.view.ViewCompat;
+import android.support.v4.view.ViewPropertyAnimatorCompat;
+import android.support.v4.view.ViewPropertyAnimatorListenerAdapter;
 import android.util.AttributeSet;
 import android.view.View;
 import android.view.ViewGroup;
-import android.view.ViewPropertyAnimator;
 import android.widget.ImageView;
 
 import com.mapbox.mapboxsdk.R;
@@ -21,7 +20,7 @@ final class CompassView extends ImageView {
 
     private Timer mNorthTimer;
     private double mDirection = 0.0f;
-    private ViewPropertyAnimator mFadeAnimator;
+    private ViewPropertyAnimatorCompat mFadeAnimator;
 
     public CompassView(Context context) {
         super(context);
@@ -107,13 +106,10 @@ final class CompassView extends ImageView {
                             @Override
                             public void run() {
                                 setAlpha(1.0f);
-                                mFadeAnimator = animate().alpha(0.0f).setDuration(1000);
-                                if (android.os.Build.VERSION.SDK_INT >= Build.VERSION_CODES.JELLY_BEAN) {
-                                    mFadeAnimator.withLayer();
-                                }
-                                mFadeAnimator.setListener(new AnimatorListenerAdapter() {
+                                mFadeAnimator = ViewCompat.animate(CompassView.this).alpha(0.0f).setDuration(1000).withLayer();
+                                mFadeAnimator.setListener(new ViewPropertyAnimatorListenerAdapter() {
                                     @Override
-                                    public void onAnimationEnd(Animator animation) {
+                                    public void onAnimationEnd(View view) {
                                         setVisibility(View.INVISIBLE);
                                         mNorthTimer = null;
                                     }

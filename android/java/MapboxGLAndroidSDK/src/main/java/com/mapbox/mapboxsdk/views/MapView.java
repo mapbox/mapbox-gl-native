@@ -3082,7 +3082,7 @@ public final class MapView extends FrameLayout {
      * While enabled, the my-location layer continuously draws an indication of a user's current
      * location and bearing.
      * <p/>
-     * In order to use the my-location-layer feature you need to request permission for either
+     * In order to use the my-location layer feature you need to request permission for either
      * {@link android.Manifest.permission#ACCESS_COARSE_LOCATION}
      * or @link android.Manifest.permission#ACCESS_FINE_LOCATION.
      *
