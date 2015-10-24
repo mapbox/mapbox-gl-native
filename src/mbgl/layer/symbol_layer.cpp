@@ -7,6 +7,14 @@
 
 namespace mbgl {
 
+std::unique_ptr<StyleLayer> SymbolLayer::clone() const {
+    std::unique_ptr<SymbolLayer> result = std::make_unique<SymbolLayer>();
+    result->copy(*this);
+    result->layout = layout;
+    result->paints.paints = paints.paints;
+    return std::move(result);
+}
+
 void SymbolLayer::parseLayout(const JSVal& value) {
     parseProperty<Function<PlacementType>>("symbol-placement", PropertyKey::SymbolPlacement, layout, value);
     parseProperty<Function<float>>("symbol-spacing", PropertyKey::SymbolSpacing, layout, value);
@@ -75,6 +83,14 @@ void SymbolLayer::parsePaints(const JSVal& layer) {
         parseProperty<PropertyTransition>("text-translate-transition", PropertyKey::TextTranslate, paint, value);
         parseProperty<Function<TranslateAnchorType>>("text-translate-anchor", PropertyKey::TextTranslateAnchor, paint, value);
     });
+}
+
+void SymbolLayer::cascade(const StyleCascadeParameters& parameters) {
+    paints.cascade(parameters);
+}
+
+bool SymbolLayer::hasTransitions() const {
+    return paints.hasTransitions();
 }
 
 void SymbolLayer::recalculate(const StyleCalculationParameters& parameters) {

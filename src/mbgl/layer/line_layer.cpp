@@ -6,6 +6,14 @@
 
 namespace mbgl {
 
+std::unique_ptr<StyleLayer> LineLayer::clone() const {
+    std::unique_ptr<LineLayer> result = std::make_unique<LineLayer>();
+    result->copy(*this);
+    result->layout = layout;
+    result->paints.paints = paints.paints;
+    return std::move(result);
+}
+
 void LineLayer::parseLayout(const JSVal& value) {
     parseProperty<Function<CapType>>("line-cap", PropertyKey::LineCap, layout, value);
     parseProperty<Function<JoinType>>("line-join", PropertyKey::LineJoin, layout, value);
@@ -31,6 +39,14 @@ void LineLayer::parsePaints(const JSVal& layer) {
         parseProperty<Function<Faded<std::vector<float>>>>("line-dasharray", PropertyKey::LineDashArray, paint, value);
         parseProperty<Function<Faded<std::string>>>("line-pattern", PropertyKey::LineImage, paint, value);
     });
+}
+
+void LineLayer::cascade(const StyleCascadeParameters& parameters) {
+    paints.cascade(parameters);
+}
+
+bool LineLayer::hasTransitions() const {
+    return paints.hasTransitions();
 }
 
 void LineLayer::recalculate(const StyleCalculationParameters& parameters) {

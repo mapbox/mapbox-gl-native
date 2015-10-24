@@ -5,6 +5,14 @@
 
 namespace mbgl {
 
+std::unique_ptr<StyleLayer> CircleLayer::clone() const {
+    std::unique_ptr<CircleLayer> result = std::make_unique<CircleLayer>();
+    result->copy(*this);
+    result->layout = layout;
+    result->paints.paints = paints.paints;
+    return std::move(result);
+}
+
 void CircleLayer::parsePaints(const JSVal& layer) {
     paints.parseEach(layer, [&] (ClassProperties& paint, const JSVal& value) {
         parseProperty<Function<float>>("circle-radius", PropertyKey::CircleRadius, paint, value);
@@ -14,6 +22,14 @@ void CircleLayer::parsePaints(const JSVal& layer) {
         parseProperty<Function<TranslateAnchorType>>("circle-translate-anchor", PropertyKey::CircleTranslateAnchor, paint, value);
         parseProperty<Function<float>>("circle-blur", PropertyKey::CircleBlur, paint, value);
     });
+}
+
+void CircleLayer::cascade(const StyleCascadeParameters& parameters) {
+    paints.cascade(parameters);
+}
+
+bool CircleLayer::hasTransitions() const {
+    return paints.hasTransitions();
 }
 
 void CircleLayer::recalculate(const StyleCalculationParameters& parameters) {

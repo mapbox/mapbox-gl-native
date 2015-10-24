@@ -5,6 +5,14 @@
 
 namespace mbgl {
 
+std::unique_ptr<StyleLayer> FillLayer::clone() const {
+    std::unique_ptr<FillLayer> result = std::make_unique<FillLayer>();
+    result->copy(*this);
+    result->layout = layout;
+    result->paints.paints = paints.paints;
+    return std::move(result);
+}
+
 void FillLayer::parsePaints(const JSVal& layer) {
     paints.parseEach(layer, [&] (ClassProperties& paint, const JSVal& value) {
         parseProperty<Function<bool>>("fill-antialias", PropertyKey::FillAntialias, paint, value);
@@ -19,6 +27,14 @@ void FillLayer::parsePaints(const JSVal& layer) {
         parseProperty<Function<TranslateAnchorType>>("fill-translate-anchor", PropertyKey::FillTranslateAnchor, paint, value);
         parseProperty<Function<Faded<std::string>>>("fill-pattern", PropertyKey::FillImage, paint, value);
     });
+}
+
+void FillLayer::cascade(const StyleCascadeParameters& parameters) {
+    paints.cascade(parameters);
+}
+
+bool FillLayer::hasTransitions() const {
+    return paints.hasTransitions();
 }
 
 void FillLayer::recalculate(const StyleCalculationParameters& parameters) {

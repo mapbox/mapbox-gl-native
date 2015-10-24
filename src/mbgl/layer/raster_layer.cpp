@@ -4,6 +4,14 @@
 
 namespace mbgl {
 
+std::unique_ptr<StyleLayer> RasterLayer::clone() const {
+    std::unique_ptr<RasterLayer> result = std::make_unique<RasterLayer>();
+    result->copy(*this);
+    result->layout = layout;
+    result->paints.paints = paints.paints;
+    return std::move(result);
+}
+
 void RasterLayer::parsePaints(const JSVal& layer) {
     paints.parseEach(layer, [&] (ClassProperties& paint, const JSVal& value) {
         parseProperty<Function<float>>("raster-opacity", PropertyKey::RasterOpacity, paint, value);
@@ -20,6 +28,14 @@ void RasterLayer::parsePaints(const JSVal& layer) {
         parseProperty<Function<float>>("raster-fade-duration", PropertyKey::RasterFade, paint, value);
         parseProperty<PropertyTransition>("raster-fade-duration-transition", PropertyKey::RasterFade, paint, value);
     });
+}
+
+void RasterLayer::cascade(const StyleCascadeParameters& parameters) {
+    paints.cascade(parameters);
+}
+
+bool RasterLayer::hasTransitions() const {
+    return paints.hasTransitions();
 }
 
 void RasterLayer::recalculate(const StyleCalculationParameters& parameters) {

@@ -26,11 +26,13 @@ void ShapeAnnotationImpl::updateStyle(Style& style) {
     if (style.getLayer(layerID))
         return;
 
-    std::unique_ptr<StyleLayer> layer;
-    std::string beforeLayerID = AnnotationManager::PointLayerID;
-
     if (shape.properties.is<LinePaintProperties>()) {
-        layer = createLineLayer();
+        type = ProjectedFeatureType::LineString;
+
+        std::unique_ptr<LineLayer> layer = std::make_unique<LineLayer>();
+        layer->type = StyleLayerType::Line;
+
+        layer->layout.set(PropertyKey::LineJoin, Function<JoinType>(JoinType::Round));
 
         const LinePaintProperties& properties = shape.properties.get<LinePaintProperties>();
         ClassProperties paintProperties;
@@ -39,8 +41,17 @@ void ShapeAnnotationImpl::updateStyle(Style& style) {
         paintProperties.set(PropertyKey::LineColor, Function<Color>(properties.color));
         layer->paints.paints.emplace(ClassID::Default, std::move(paintProperties));
 
+        layer->id = layerID;
+        layer->source = AnnotationManager::SourceID;
+        layer->sourceLayer = layer->id;
+
+        style.addLayer(std::move(layer), AnnotationManager::PointLayerID);
+
     } else if (shape.properties.is<FillPaintProperties>()) {
-        layer = createFillLayer();
+        type = ProjectedFeatureType::Polygon;
+
+        std::unique_ptr<FillLayer> layer = std::make_unique<FillLayer>();
+        layer->type = StyleLayerType::Fill;
 
         const FillPaintProperties& properties = shape.properties.get<FillPaintProperties>();
         ClassProperties paintProperties;
@@ -49,49 +60,28 @@ void ShapeAnnotationImpl::updateStyle(Style& style) {
         paintProperties.set(PropertyKey::FillOutlineColor, Function<Color>(properties.stroke_color));
         layer->paints.paints.emplace(ClassID::Default, std::move(paintProperties));
 
-    } else {
-        beforeLayerID = shape.properties.get<std::string>();
+        layer->id = layerID;
+        layer->source = AnnotationManager::SourceID;
+        layer->sourceLayer = layer->id;
 
-        const StyleLayer* sourceLayer = style.getLayer(beforeLayerID);
+        style.addLayer(std::move(layer), AnnotationManager::PointLayerID);
+
+    } else {
+        const StyleLayer* sourceLayer = style.getLayer(shape.properties.get<std::string>());
         if (!sourceLayer) return;
 
-        switch (sourceLayer->type) {
-        case StyleLayerType::Line:
-            layer = createLineLayer();
-            break;
+        std::unique_ptr<StyleLayer> layer = sourceLayer->clone();
 
-        case StyleLayerType::Fill:
-            layer = createFillLayer();
-            break;
+        type = layer->type == StyleLayerType::Line
+            ? ProjectedFeatureType::LineString
+            : ProjectedFeatureType::Polygon;
 
-        default:
-            return;
-        }
+        layer->id = layerID;
+        layer->source = AnnotationManager::SourceID;
+        layer->sourceLayer = layer->id;
 
-        layer->paints.paints = sourceLayer->paints.paints;
-        layer->layout = sourceLayer->layout;
+        style.addLayer(std::move(layer), sourceLayer->id);
     }
-
-    layer->id = layerID;
-    layer->source = AnnotationManager::SourceID;
-    layer->sourceLayer = layer->id;
-
-    style.addLayer(std::move(layer), beforeLayerID);
-}
-
-std::unique_ptr<StyleLayer> ShapeAnnotationImpl::createLineLayer() {
-    type = ProjectedFeatureType::LineString;
-    std::unique_ptr<LineLayer> layer = std::make_unique<LineLayer>();
-    layer->type = StyleLayerType::Line;
-    layer->layout.set(PropertyKey::LineJoin, Function<JoinType>(JoinType::Round));
-    return std::move(layer);
-}
-
-std::unique_ptr<StyleLayer> ShapeAnnotationImpl::createFillLayer() {
-    type = ProjectedFeatureType::Polygon;
-    std::unique_ptr<FillLayer> layer = std::make_unique<FillLayer>();
-    layer->type = StyleLayerType::Fill;
-    return std::move(layer);
 }
 
 void ShapeAnnotationImpl::updateTile(const TileID& tileID, AnnotationTile& tile) {

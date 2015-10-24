@@ -7,6 +7,8 @@
 #include <mbgl/style/style_layer.hpp>
 #include <mbgl/style/style_parser.hpp>
 #include <mbgl/style/property_transition.hpp>
+#include <mbgl/style/style_cascade_parameters.hpp>
+#include <mbgl/style/style_calculation_parameters.hpp>
 #include <mbgl/geometry/glyph_atlas.hpp>
 #include <mbgl/geometry/sprite_atlas.hpp>
 #include <mbgl/geometry/line_atlas.hpp>
@@ -119,10 +121,13 @@ void Style::update(const TransformState& transform,
 }
 
 void Style::cascade() {
+    StyleCascadeParameters parameters(data.getClasses(),
+                                      data.getAnimationTime(),
+                                      PropertyTransition { data.getDefaultTransitionDuration(),
+                                                           data.getDefaultTransitionDelay() });
+
     for (const auto& layer : layers) {
-        layer->cascade(data.getClasses(),
-                       data.getAnimationTime(),
-                       PropertyTransition { data.getDefaultTransitionDuration(), data.getDefaultTransitionDelay() });
+        layer->cascade(parameters);
     }
 }
 

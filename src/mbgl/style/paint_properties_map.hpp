@@ -18,14 +18,13 @@ namespace mbgl {
 
 class ClassProperties;
 class PropertyTransition;
+class StyleCascadeParameters;
 
 using JSVal = rapidjson::Value;
 
 class PaintPropertiesMap {
 public:
-    void cascade(const std::vector<std::string>& classNames,
-                 const TimePoint& now,
-                 const PropertyTransition& defaultTransition);
+    void cascade(const StyleCascadeParameters&);
 
     bool hasTransitions() const;
     void removeExpiredTransitions(const TimePoint& now);
@@ -81,8 +80,7 @@ private:
     // Applies all properties from a class, if they haven't been applied already.
     void cascadeClass(const ClassID,
                       std::set<PropertyKey>&,
-                      const TimePoint&,
-                      const PropertyTransition&);
+                      const StyleCascadeParameters&);
 
     // For every property, stores a list of applied property values, with
     // optional transition times.

@@ -1,7 +1,16 @@
 #include <mbgl/layer/background_layer.hpp>
 #include <mbgl/style/property_parsing.hpp>
+#include <mbgl/renderer/bucket.hpp>
 
 namespace mbgl {
+
+std::unique_ptr<StyleLayer> BackgroundLayer::clone() const {
+    std::unique_ptr<BackgroundLayer> result = std::make_unique<BackgroundLayer>();
+    result->copy(*this);
+    result->layout = layout;
+    result->paints.paints = paints.paints;
+    return std::move(result);
+}
 
 void BackgroundLayer::parsePaints(const JSVal& layer) {
     paints.parseEach(layer, [&] (ClassProperties& paint, const JSVal& value) {
@@ -9,6 +18,14 @@ void BackgroundLayer::parsePaints(const JSVal& layer) {
         parseProperty<Function<Color>>("background-color", PropertyKey::BackgroundColor, paint, value);
         parseProperty<Function<Faded<std::string>>>("background-pattern", PropertyKey::BackgroundImage, paint, value);
     });
+}
+
+void BackgroundLayer::cascade(const StyleCascadeParameters& parameters) {
+    paints.cascade(parameters);
+}
+
+bool BackgroundLayer::hasTransitions() const {
+    return paints.hasTransitions();
 }
 
 void BackgroundLayer::recalculate(const StyleCalculationParameters& parameters) {

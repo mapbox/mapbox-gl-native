@@ -31,18 +31,18 @@ const std::string& StyleLayer::bucketName() const {
     return ref.empty() ? id : ref;
 }
 
-void StyleLayer::cascade(const std::vector<std::string>& classes,
-                         const TimePoint& now,
-                         const PropertyTransition& defaultTransition) {
-    paints.cascade(classes, now, defaultTransition);
-}
-
-bool StyleLayer::hasTransitions() const {
-    return paints.hasTransitions();
-}
-
 bool StyleLayer::hasRenderPass(RenderPass pass) const {
     return bool(passes & pass);
+}
+
+void StyleLayer::copy(const StyleLayer& src) {
+    type = src.type;
+    source = src.source;
+    sourceLayer = src.sourceLayer;
+    filter = src.filter;
+    minZoom = src.minZoom;
+    maxZoom = src.maxZoom;
+    visibility = src.visibility;
 }
 
 }
