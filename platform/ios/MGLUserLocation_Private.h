@@ -8,8 +8,11 @@ NS_ASSUME_NONNULL_BEGIN
 
 @property (nonatomic, weak) MGLMapView *mapView;
 @property (nonatomic, readwrite, nullable) CLLocation *location;
+
+#if !TARGET_OS_TV
 @property (nonatomic, readwrite, nullable) CLHeading *heading;
 
+#endif
 - (instancetype)initWithMapView:(MGLMapView *)mapView;
 
 @end

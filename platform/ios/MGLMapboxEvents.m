@@ -4,7 +4,7 @@
 #import <SystemConfiguration/CaptiveNetwork.h>
 #import <CoreLocation/CoreLocation.h>
 
-#if !__TVOS_9_0
+#if !TARGET_OS_TV
 #import <CoreTelephony/CTTelephonyNetworkInfo.h>
 #import <CoreTelephony/CTCarrier.h>
 #endif
@@ -98,16 +98,12 @@ const NSTimeInterval MGLFlushInterval = 60;
             _scale = [UIScreen mainScreen].scale;
         }
 
-        if ([[UIDevice currentDevice].systemName isEqualToString:@"tvOS"])
-        {
-            _carrier = @"N/A";
-        }
-        else
-        {
-            CTCarrier *carrierVendor = [[[CTTelephonyNetworkInfo alloc] init] subscriberCellularProvider];
-            _carrier = [carrierVendor carrierName];
-        }
-
+#if TARGET_OS_TV
+        _carrier = @"N/A";
+#else
+        CTCarrier *carrierVendor = [[[CTTelephonyNetworkInfo alloc] init] subscriberCellularProvider];
+        _carrier = [carrierVendor carrierName];
+#endif
     }
     return self;
 }
@@ -297,10 +293,12 @@ const NSTimeInterval MGLFlushInterval = 60;
         // Clear Any System TimeZone Cache
         [NSTimeZone resetSystemTimeZone];
         [_rfc3339DateFormatter setTimeZone:[NSTimeZone systemTimeZone]];
-        
+
+#if !TARGET_OS_TV
         // Enable Battery Monitoring
         [UIDevice currentDevice].batteryMonitoringEnabled = YES;
-        
+#endif
+
         __weak MGLMapboxEvents *weakSelf = self;
         _userDefaultsObserver = [[NSNotificationCenter defaultCenter] addObserverForName:NSUserDefaultsDidChangeNotification
                                                                                   object:nil
@@ -371,6 +369,7 @@ const NSTimeInterval MGLFlushInterval = 60;
     if (self.paused) {
         [self stopUpdatingLocation];
     } else {
+#if !TARGET_OS_TV
         CLAuthorizationStatus authStatus = [CLLocationManager authorizationStatus];
         if (authStatus == kCLAuthorizationStatusDenied ||
             authStatus == kCLAuthorizationStatusRestricted) {
@@ -379,6 +378,7 @@ const NSTimeInterval MGLFlushInterval = 60;
                    authStatus == kCLAuthorizationStatusAuthorizedWhenInUse) {
             [self startUpdatingLocation];
         }
+#endif
     }
 }
 
@@ -406,13 +406,14 @@ const NSTimeInterval MGLFlushInterval = 60;
 
 - (void)stopUpdatingLocation {
     [_locationManager stopUpdatingLocation];
-    
+
+#if !TARGET_OS_TV
     // -[CLLocationManager stopMonitoringVisits] is only available in iOS 8+.
     if ([_locationManager respondsToSelector:@selector(stopMonitoringVisits)]) {
         [_locationManager stopMonitoringVisits];
     }
-    
     _locationManager = nil;
+#endif
 }
 
 + (void)resumeMetricsCollection {
@@ -444,13 +445,15 @@ const NSTimeInterval MGLFlushInterval = 60;
     _locationManager.desiredAccuracy = kCLLocationAccuracyKilometer;
     _locationManager.distanceFilter = 10;
     _locationManager.delegate = self;
-    
+
+#if !TARGET_OS_TV
     [_locationManager startUpdatingLocation];
-    
+
     // -[CLLocationManager startMonitoringVisits] is only available in iOS 8+.
     if ([_locationManager respondsToSelector:@selector(startMonitoringVisits)]) {
         [_locationManager startMonitoringVisits];
     }
+#endif
 }
 
 - (void) pushTurnstileEvent {
@@ -524,7 +527,9 @@ const NSTimeInterval MGLFlushInterval = 60;
         [evt setValue:strongSelf.data.model forKey:@"model"];
         [evt setValue:strongSelf.data.iOSVersion forKey:@"operatingSystem"];
         [evt setValue:[strongSelf deviceOrientation] forKey:@"orientation"];
+#if !TARGET_OS_TV
         [evt setValue:@((int)(100 * [UIDevice currentDevice].batteryLevel)) forKey:@"batteryLevel"];
+#endif
         [evt setValue:@(strongSelf.data.scale) forKey:@"resolution"];
         [evt setValue:strongSelf.data.carrier forKey:@"carrier"];
         
@@ -655,48 +660,53 @@ const NSTimeInterval MGLFlushInterval = 60;
 // Can be called from any thread.
 //
 - (NSString *) deviceOrientation {
+#if !TARGET_OS_TV
     __block NSString *result;
-
+        
     NSString *(^deviceOrientationBlock)(void) = ^{
         switch ([UIDevice currentDevice].orientation) {
-            case UIDeviceOrientationUnknown:
-                result = @"Unknown";
-                break;
-            case UIDeviceOrientationPortrait:
-                result = @"Portrait";
-                break;
-            case UIDeviceOrientationPortraitUpsideDown:
-                result = @"PortraitUpsideDown";
-                break;
-            case UIDeviceOrientationLandscapeLeft:
-                result = @"LandscapeLeft";
-                break;
-            case UIDeviceOrientationLandscapeRight:
-                result = @"LandscapeRight";
-                break;
-            case UIDeviceOrientationFaceUp:
-                result = @"FaceUp";
-                break;
-            case UIDeviceOrientationFaceDown:
-                result = @"FaceDown";
-                break;
-            default:
-                result = @"Default - Unknown";
-                break;
+        case UIDeviceOrientationUnknown:
+        result = @"Unknown";
+        break;
+        case UIDeviceOrientationPortrait:
+        result = @"Portrait";
+        break;
+        case UIDeviceOrientationPortraitUpsideDown:
+        result = @"PortraitUpsideDown";
+        break;
+        case UIDeviceOrientationLandscapeLeft:
+        result = @"LandscapeLeft";
+        break;
+        case UIDeviceOrientationLandscapeRight:
+        result = @"LandscapeRight";
+        break;
+        case UIDeviceOrientationFaceUp:
+        result = @"FaceUp";
+        break;
+        case UIDeviceOrientationFaceDown:
+        result = @"FaceDown";
+        break;
+        default:
+        result = @"Default - Unknown";
+        break;
         }
-
+            
         return result;
     };
-
+        
+        
     if ( ! [[NSThread currentThread] isMainThread]) {
         dispatch_sync(dispatch_get_main_queue(), ^{
-            result = deviceOrientationBlock();
-        });
+                result = deviceOrientationBlock();
+            });
     } else {
         result = deviceOrientationBlock();
     }
-
+        
     return result;
+#else
+    return @"Unknown";
+#endif
 }
 
 // Can be called from any thread.
@@ -767,11 +777,7 @@ const NSTimeInterval MGLFlushInterval = 60;
 // Can be called from any thread.
 //
 - (NSString *) currentCellularNetworkConnectionType {
-    if ([[UIDevice currentDevice].systemName isEqualToString:@"tvOS"])
-    {
-        return nil;
-    }
-    
+#if !TARGET_OS_TV
     CTTelephonyNetworkInfo *telephonyInfo = [[CTTelephonyNetworkInfo alloc] init];
     NSString *radioTech = telephonyInfo.currentRadioAccessTechnology;
 
@@ -802,16 +808,15 @@ const NSTimeInterval MGLFlushInterval = 60;
     } else {
         return @"Unknown";
     }
+#else
+    return @"Unknown";
+#endif
 }
 
 // Can be called from any thread.
 //
 + (BOOL) checkPushEnabled {
-    if ([[UIDevice currentDevice].systemName isEqualToString:@"tvOS"])
-    {
-        return NO;
-    }
-
+#if !TARGET_OS_TV
     BOOL (^pushCheckBlock)(void) = ^{
         BOOL blockResult;
         if ([[UIApplication sharedApplication] respondsToSelector:@selector(isRegisteredForRemoteNotifications)]) {
@@ -839,6 +844,9 @@ const NSTimeInterval MGLFlushInterval = 60;
     }
 
     return result;
+#else
+    return NO;
+#endif
 }
 
 #pragma mark CLLocationManagerDelegate
@@ -848,8 +856,10 @@ const NSTimeInterval MGLFlushInterval = 60;
         [MGLMapboxEvents pushEvent:MGLEventTypeLocation withAttributes:@{
             MGLEventKeyLatitude: @(loc.coordinate.latitude),
             MGLEventKeyLongitude: @(loc.coordinate.longitude),
+#if !TARGET_OS_TV
             MGLEventKeySpeed: @(loc.speed),
             MGLEventKeyCourse: @(loc.course),
+#endif
             MGLEventKeyAltitude: @(loc.altitude),
             MGLEventKeyHorizontalAccuracy: @(loc.horizontalAccuracy),
             MGLEventKeyVerticalAccuracy: @(loc.verticalAccuracy)
@@ -947,5 +957,4 @@ const NSTimeInterval MGLFlushInterval = 60;
     }
     
 }
-
 @end

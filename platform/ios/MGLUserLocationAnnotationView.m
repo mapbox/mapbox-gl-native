@@ -213,6 +213,7 @@ const CGFloat MGLUserLocationAnnotationArrowSize = MGLUserLocationAnnotationPuck
         _puckArrow = nil;
     }
 
+#if !TARGET_OS_TV
     // update heading indicator
     //
     if (_headingIndicatorLayer)
@@ -228,7 +229,7 @@ const CGFloat MGLUserLocationAnnotationArrowSize = MGLUserLocationAnnotationPuck
             _oldHeadingAccuracy = self.annotation.heading.headingAccuracy;
         }
     }
-    
+
     // heading indicator (tinted, semi-circle)
     //
     if ( ! _headingIndicatorLayer && self.annotation.heading.headingAccuracy)
@@ -262,7 +263,7 @@ const CGFloat MGLUserLocationAnnotationArrowSize = MGLUserLocationAnnotationPuck
 
         _oldHeadingAccuracy = self.annotation.heading.headingAccuracy;
     }
-
+#endif
     // update accuracy ring (if zoom or horizontal accuracy have changed)
     //
     if (_accuracyRingLayer && (_oldZoom != self.mapView.zoomLevel || _oldHorizontalAccuracy != self.annotation.location.horizontalAccuracy))
@@ -466,7 +467,10 @@ const CGFloat MGLUserLocationAnnotationArrowSize = MGLUserLocationAnnotationPuck
 
 - (UIBezierPath *)headingIndicatorClippingMask
 {
-    CGFloat accuracy = self.annotation.heading.headingAccuracy;
+    CGFloat accuracy = 0.0;
+#if !TARGET_OS_TV
+        accuracy = self.annotation.heading.headingAccuracy;
+#endif
 
     // size the mask using exagerated accuracy, but keep within a good display range
     CGFloat clippingDegrees = 90 - (accuracy * 1.5);

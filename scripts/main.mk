@@ -56,6 +56,16 @@ SUBMODULES += test/ios/KIF/KIF.xcodeproj
 test/ios/KIF/KIF.xcodeproj:
 	./scripts/flock.py .git/Submodule.lock git submodule update --init test/ios/KIF
 endif
+
+ifeq ($(HOST),tvos)
+SUBMODULES += platform/ios/vendor/SMCalloutView/SMCalloutView.h
+platform/ios/vendor/SMCalloutView/SMCalloutView.h:
+	./scripts/flock.py .git/Submodule.lock git submodule update --init platform/ios/vendor/SMCalloutView
+
+SUBMODULES += test/ios/KIF/KIF.xcodeproj
+test/ios/KIF/KIF.xcodeproj:
+	./scripts/flock.py .git/Submodule.lock git submodule update --init test/ios/KIF
+endif
 endif
 
 # Wildcard targets get removed after build by default, but we want to preserve the config.

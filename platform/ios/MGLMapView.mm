@@ -74,7 +74,11 @@ mbgl::util::UnitBezier MGLUnitBezierForMediaTimingFunction(CAMediaTimingFunction
 
 #pragma mark - Private -
 
+#if !TARGET_OS_TV
 @interface MGLMapView () <UIGestureRecognizerDelegate, GLKViewDelegate, CLLocationManagerDelegate, UIActionSheetDelegate>
+#else
+@interface MGLMapView () <UIGestureRecognizerDelegate, GLKViewDelegate, CLLocationManagerDelegate>
+#endif
 
 @property (nonatomic) EAGLContext *context;
 @property (nonatomic) GLKView *glView;
@@ -85,10 +89,14 @@ mbgl::util::UnitBezier MGLUnitBezierForMediaTimingFunction(CAMediaTimingFunction
 @property (nonatomic) NS_MUTABLE_ARRAY_OF(NSLayoutConstraint *) *logoViewConstraints;
 @property (nonatomic, readwrite) UIButton *attributionButton;
 @property (nonatomic) NS_MUTABLE_ARRAY_OF(NSLayoutConstraint *) *attributionButtonConstraints;
+#if !TARGET_OS_TV
 @property (nonatomic) UIActionSheet *attributionSheet;
+#endif
 @property (nonatomic) UIPanGestureRecognizer *pan;
+#if !TARGET_OS_TV
 @property (nonatomic) UIPinchGestureRecognizer *pinch;
 @property (nonatomic) UIRotationGestureRecognizer *rotate;
+#endif
 @property (nonatomic) UILongPressGestureRecognizer *quickZoom;
 @property (nonatomic) UIPanGestureRecognizer *twoFingerDrag;
 @property (nonatomic) NSMapTable *annotationIDsByAnnotation;
@@ -284,7 +292,8 @@ std::chrono::steady_clock::duration secondsAsDuration(float duration)
     _attributionButton.translatesAutoresizingMaskIntoConstraints = NO;
     [self addSubview:_attributionButton];
     _attributionButtonConstraints = [NSMutableArray array];
-    
+
+#if !TARGET_OS_TV
     _attributionSheet = [[UIActionSheet alloc] initWithTitle:@"Mapbox iOS SDK"
                                                     delegate:self
                                            cancelButtonTitle:@"Cancel"
@@ -300,6 +309,7 @@ std::chrono::steady_clock::duration secondsAsDuration(float duration)
     {
         [_attributionSheet addButtonWithTitle:@"Adjust Privacy Settings"];
     }
+#endif
 
     // setup compass
     //
@@ -317,20 +327,24 @@ std::chrono::steady_clock::duration secondsAsDuration(float duration)
     //
     _pan = [[UIPanGestureRecognizer alloc] initWithTarget:self action:@selector(handlePanGesture:)];
     _pan.delegate = self;
+#if !TARGET_OS_TV
     _pan.maximumNumberOfTouches = 1;
+#endif
     [self addGestureRecognizer:_pan];
     _scrollEnabled = YES;
 
+#if !TARGET_OS_TV
     _pinch = [[UIPinchGestureRecognizer alloc] initWithTarget:self action:@selector(handlePinchGesture:)];
     _pinch.delegate = self;
     [self addGestureRecognizer:_pinch];
     _zoomEnabled = YES;
-
+    
     _rotate = [[UIRotationGestureRecognizer alloc] initWithTarget:self action:@selector(handleRotateGesture:)];
     _rotate.delegate = self;
     [self addGestureRecognizer:_rotate];
     _rotateEnabled = YES;
-
+#endif
+    
     UITapGestureRecognizer *doubleTap = [[UITapGestureRecognizer alloc] initWithTarget:self action:@selector(handleDoubleTapGesture:)];
     doubleTap.numberOfTapsRequired = 2;
     [self addGestureRecognizer:doubleTap];
@@ -340,14 +354,18 @@ std::chrono::steady_clock::duration secondsAsDuration(float duration)
     [self addGestureRecognizer:singleTap];
 
     UITapGestureRecognizer *twoFingerTap = [[UITapGestureRecognizer alloc] initWithTarget:self action:@selector(handleTwoFingerTapGesture:)];
+#if !TARGET_OS_TV
     twoFingerTap.numberOfTouchesRequired = 2;
     [twoFingerTap requireGestureRecognizerToFail:_pinch];
     [twoFingerTap requireGestureRecognizerToFail:_rotate];
+#endif
     [self addGestureRecognizer:twoFingerTap];
     
     _twoFingerDrag = [[UIPanGestureRecognizer alloc] initWithTarget:self action:@selector(handleTwoFingerDragGesture:)];
+#if !TARGET_OS_TV
     _twoFingerDrag.minimumNumberOfTouches = 2;
     _twoFingerDrag.maximumNumberOfTouches = 2;
+#endif
     _twoFingerDrag.delegate = self;
     [_twoFingerDrag requireGestureRecognizerToFail:twoFingerTap];
     [_twoFingerDrag requireGestureRecognizerToFail:_pan];
@@ -744,11 +762,13 @@ std::chrono::steady_clock::duration secondsAsDuration(float duration)
     {
         _mbglMap->update(mbgl::Update::Dimensions);
     }
-    
+
+#if !TARGET_OS_TV
     if (self.attributionSheet.visible)
     {
         [self.attributionSheet dismissWithClickedButtonIndex:self.attributionSheet.cancelButtonIndex animated:YES];
     }
+#endif
 
     if (self.compassView.alpha)
     {
@@ -935,6 +955,7 @@ std::chrono::steady_clock::duration secondsAsDuration(float duration)
     }
 }
 
+#if !TARGET_OS_TV
 - (void)handlePinchGesture:(UIPinchGestureRecognizer *)pinch
 {
     if ( ! self.isZoomEnabled) return;
@@ -1040,7 +1061,8 @@ std::chrono::steady_clock::duration secondsAsDuration(float duration)
     else if (rotate.state == UIGestureRecognizerStateChanged)
     {
         CGFloat newDegrees = MGLDegreesFromRadians(self.angle + rotate.rotation) * -1;
-
+       
+#if !TARGET_OS_TV
         // constrain to +/-30 degrees when merely rotating like Apple does
         //
         if ( ! self.isRotationAllowed && std::abs(self.pinch.scale) < 10)
@@ -1048,7 +1070,8 @@ std::chrono::steady_clock::duration secondsAsDuration(float duration)
             newDegrees = fminf(newDegrees,  30);
             newDegrees = fmaxf(newDegrees, -30);
         }
-
+#endif
+        
         _mbglMap->setBearing(newDegrees,
                             [rotate locationInView:rotate.view].x,
                             [rotate locationInView:rotate.view].y);
@@ -1091,6 +1114,7 @@ std::chrono::steady_clock::duration secondsAsDuration(float duration)
         }
     }
 }
+#endif
 
 - (void)handleSingleTapGesture:(UITapGestureRecognizer *)singleTap
 {
@@ -1375,7 +1399,9 @@ std::chrono::steady_clock::duration secondsAsDuration(float duration)
 {
     if ([gestureRecognizer isKindOfClass:[UIPanGestureRecognizer class]])
     {
+#if !TARGET_OS_TV
         UIPanGestureRecognizer *panGesture = (UIPanGestureRecognizer *)gestureRecognizer;
+
 
         if (panGesture.minimumNumberOfTouches == 2)
         {
@@ -1389,6 +1415,7 @@ std::chrono::steady_clock::duration secondsAsDuration(float duration)
                 return NO;
             }
         }
+#endif
     }
     return YES;
 }
@@ -1405,7 +1432,11 @@ std::chrono::steady_clock::duration secondsAsDuration(float duration)
 
 - (BOOL)gestureRecognizer:(UIGestureRecognizer *)gestureRecognizer shouldRecognizeSimultaneouslyWithGestureRecognizer:(UIGestureRecognizer *)otherGestureRecognizer
 {
+#if !TARGET_OS_TV
     NSArray *validSimultaneousGestures = @[ self.pan, self.pinch, self.rotate ];
+#else
+    NSArray *validSimultaneousGestures = @[ self.pan ];
+#endif
 
     return ([validSimultaneousGestures containsObject:gestureRecognizer] && [validSimultaneousGestures containsObject:otherGestureRecognizer]);
 }
@@ -1428,9 +1459,12 @@ std::chrono::steady_clock::duration secondsAsDuration(float duration)
 
 - (void)showAttribution
 {
+#if !TARGET_OS_TV
     [self.attributionSheet showFromRect:self.attributionButton.frame inView:self animated:YES];
+#endif
 }
 
+#if !TARGET_OS_TV
 - (void)actionSheet:(UIActionSheet *)actionSheet didDismissWithButtonIndex:(NSInteger)buttonIndex
 {
     if (buttonIndex == actionSheet.firstOtherButtonIndex)
@@ -1456,6 +1490,7 @@ std::chrono::steady_clock::duration secondsAsDuration(float duration)
         [[UIApplication sharedApplication] openURL:[NSURL URLWithString:UIApplicationOpenSettingsURLString]];
     }
 }
+#endif
 
 #pragma mark - Properties -
 
@@ -2485,14 +2520,15 @@ CLLocationCoordinate2D MGLLocationCoordinate2DFromLatLng(mbgl::LatLng latLng)
                                                             UIViewAutoresizingFlexibleTopMargin | UIViewAutoresizingFlexibleBottomMargin);
 
         self.locationManager = [CLLocationManager new];
-
+       
+#if !TARGET_OS_TV
 #if __IPHONE_OS_VERSION_MAX_ALLOWED >= 80000
         // enable iOS 8+ location authorization API
         //
         if ([CLLocationManager instancesRespondToSelector:@selector(requestWhenInUseAuthorization)])
         {
             BOOL hasLocationDescription = [[NSBundle mainBundle] objectForInfoDictionaryKey:@"NSLocationWhenInUseUsageDescription"] ||
-                [[NSBundle mainBundle] objectForInfoDictionaryKey:@"NSLocationAlwaysUsageDescription"];
+            [[NSBundle mainBundle] objectForInfoDictionaryKey:@"NSLocationAlwaysUsageDescription"];
             if (!hasLocationDescription)
             {
                 [NSException raise:@"Missing Location Services usage description" format:
@@ -2509,7 +2545,7 @@ CLLocationCoordinate2D MGLLocationCoordinate2DFromLatLng(mbgl::LatLng latLng)
             }
         }
 #endif
-
+            
         self.locationManager.headingFilter = 5.0;
         self.locationManager.delegate = self;
         [self.locationManager startUpdatingLocation];
@@ -2517,19 +2553,19 @@ CLLocationCoordinate2D MGLLocationCoordinate2DFromLatLng(mbgl::LatLng latLng)
     else
     {
         [self.locationManager stopUpdatingLocation];
-        [self.locationManager stopUpdatingHeading];
         self.locationManager.delegate = nil;
         self.locationManager = nil;
-
+            
         if ([self.delegate respondsToSelector:@selector(mapViewDidStopLocatingUser:)])
         {
             [self.delegate mapViewDidStopLocatingUser:self];
         }
-
-        [self setUserTrackingMode:MGLUserTrackingModeNone animated:YES];
-
-        [self.userLocationAnnotationView removeFromSuperview];
+            
+       [self setUserTrackingMode:MGLUserTrackingModeNone animated:YES];
+            
+       [self.userLocationAnnotationView removeFromSuperview];
         self.userLocationAnnotationView = nil;
+#endif
     }
 }
 
@@ -2589,7 +2625,9 @@ CLLocationCoordinate2D MGLLocationCoordinate2DFromLatLng(mbgl::LatLng latLng)
     {
         case MGLUserTrackingModeNone:
         {
+#if !TARGET_OS_TV
             [self.locationManager stopUpdatingHeading];
+#endif
 
             break;
         }
@@ -2598,7 +2636,9 @@ CLLocationCoordinate2D MGLLocationCoordinate2DFromLatLng(mbgl::LatLng latLng)
         {
             self.showsUserLocation = YES;
 
+#if !TARGET_OS_TV
             [self.locationManager stopUpdatingHeading];
+#endif
 
             if (self.userLocationAnnotationView)
             {
@@ -2620,7 +2660,9 @@ CLLocationCoordinate2D MGLLocationCoordinate2DFromLatLng(mbgl::LatLng latLng)
 
             [self updateHeadingForDeviceOrientation];
 
+#if !TARGET_OS_TV
             [self.locationManager startUpdatingHeading];
+#endif
 
             break;
         }
@@ -2652,11 +2694,15 @@ CLLocationCoordinate2D MGLLocationCoordinate2DFromLatLng(mbgl::LatLng latLng)
         }
     }
     
+#if !TARGET_OS_TV
     CLLocationDirection course = self.userLocation.location.course;
     if (course < 0 || self.userTrackingMode != MGLUserTrackingModeFollowWithCourse)
     {
         course = -1;
     }
+#else
+    CLLocationDirection course = -1;
+#endif
 
     if (self.userTrackingMode != MGLUserTrackingModeNone)
     {
@@ -2722,7 +2768,8 @@ CLLocationCoordinate2D MGLLocationCoordinate2DFromLatLng(mbgl::LatLng latLng)
     return self.displayHeadingCalibration;
 }
 
-#if !__TVOS_9_0
+
+#if !TARGET_OS_TV
 - (void)locationManager:(__unused CLLocationManager *)manager didUpdateHeading:(CLHeading *)newHeading
 {
     if ( ! _showsUserLocation || self.pan.state == UIGestureRecognizerStateBegan || newHeading.headingAccuracy < 0) return;
@@ -2761,6 +2808,7 @@ CLLocationCoordinate2D MGLLocationCoordinate2DFromLatLng(mbgl::LatLng latLng)
 
 - (void)updateHeadingForDeviceOrientation
 {
+#if !TARGET_OS_TV
     if (self.locationManager)
     {
         // note that right/left device and interface orientations are opposites (see UIApplication.h)
@@ -2790,6 +2838,7 @@ CLLocationCoordinate2D MGLLocationCoordinate2DFromLatLng(mbgl::LatLng latLng)
             }
         }
     }
+#endif
 }
 
 #pragma mark - Utility -
@@ -2815,7 +2864,11 @@ CLLocationCoordinate2D MGLLocationCoordinate2DFromLatLng(mbgl::LatLng latLng)
 {
     // don't worry about it in the midst of pinch or rotate gestures
     //
+#if !TARGET_OS_TV
     if (self.pinch.state  == UIGestureRecognizerStateChanged || self.rotate.state == UIGestureRecognizerStateChanged) return;
+#else
+    return;
+#endif
 
     // but otherwise, do
     //
@@ -2917,8 +2970,10 @@ CLLocationCoordinate2D MGLLocationCoordinate2DFromLatLng(mbgl::LatLng latLng)
             [self updateCompass];
 
             if (self.pan.state           == UIGestureRecognizerStateChanged ||
+#if !TARGET_OS_TV
                 self.pinch.state         == UIGestureRecognizerStateChanged ||
                 self.rotate.state        == UIGestureRecognizerStateChanged ||
+#endif
                 self.quickZoom.state     == UIGestureRecognizerStateChanged ||
                 self.twoFingerDrag.state == UIGestureRecognizerStateChanged) return;
 

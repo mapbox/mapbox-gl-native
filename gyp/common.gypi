@@ -75,6 +75,23 @@
               },
             },
           }],
+           ['host == "tvos"', {
+            'xcode_settings': {
+              'SDKROOT': 'appletvos',
+              'SUPPORTED_PLATFORMS': 'appletvsimulator appletvos',
+              'IPHONEOS_DEPLOYMENT_TARGET': '9.0',
+              'TARGETED_DEVICE_FAMILY': '1',
+              'GCC_VERSION': 'com.apple.compilers.llvm.clang.1_0',
+              'CODE_SIGN_IDENTITY': 'iPhone Developer',
+            },
+            'configurations': {
+              'Release': {
+                'xcode_settings': {
+                  'ARCHS': [ "arm64", "x86_64" ],
+                },
+              },
+            },
+          }],
         ],
       }],
     ],

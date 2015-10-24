@@ -28,8 +28,9 @@ xosx: ; $(RUN) HOST=osx HOST_VERSION=x86_64 Xcode/osxapp
 run-osx: osx ; @"build/osx-x86_64/$(BUILDTYPE)/Mapbox GL.app/Contents/MacOS/Mapbox GL"
 run-xosx: xosx ; @"gyp/build/$(BUILDTYPE)/Mapbox GL.app/Contents/MacOS/Mapbox GL"
 
-.PHONY: Xcode/osx Xcode/ios
+.PHONY: Xcode/osx Xcode/ios Xcode/tvos
 Xcode/ios: ; $(RUN) HOST=ios Xcode/__project__
+Xcode/tvos: ; $(RUN) HOST=tvos Xcode/__project__
 Xcode/osx: ; $(RUN) HOST=osx HOST_VERSION=x86_64 Xcode/__project__
 
 .PHONY: xproj iproj
@@ -48,10 +49,15 @@ isim: ; $(RUN) HOST=ios Xcode/iosapp
 ibench: export XCODEBUILD_ARGS += -sdk iphoneos ARCHS="arm64"
 ibench: ; $(RUN) HOST=ios Xcode/ios-bench
 
-.PHONY: ipackage ipackage-strip ipackage-sim itest
+.PHONY: ipackage ipackage-strip ipackage-sim tvpackage itest
 ipackage: Xcode/ios ; @JOBS=$(JOBS) ./scripts/ios/package.sh
 ipackage-strip: Xcode/ios ; @JOBS=$(JOBS) ./scripts/ios/package.sh strip
 ipackage-sim: Xcode/ios ; @JOBS=$(JOBS) ./scripts/ios/package.sh sim
+
+tvpackage: Xcode/tvos ; JOBS=$(JOBS) ./scripts/tvos/package.sh
+tvpackage-strip: Xcode/tvos ; JOBS=$(JOBS) ./scripts/tvos/package.sh strip
+tvpackage-sim: Xcode/tvos ; JOBS=$(JOBS) ./scripts/tvos/package.sh sim
+
 itest: ipackage-sim ; ./scripts/ios/test.sh
 endif
 
