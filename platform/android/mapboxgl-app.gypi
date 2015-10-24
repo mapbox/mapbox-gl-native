@@ -1,6 +1,6 @@
 {
   'includes': [
-    '../gyp/common.gypi',
+    '../../gyp/common.gypi',
   ],
   'targets': [
     { 'target_name': 'android-lib',
@@ -17,8 +17,8 @@
       ],
 
       'sources': [
-        './cpp/native_map_view.cpp',
-        './cpp/jni.cpp',
+        './native_map_view.cpp',
+        './jni.cpp',
       ],
 
       'cflags_cc': [
@@ -75,16 +75,16 @@
       'copies': [
         {
           'files': [
-            '../common/ca-bundle.crt',
-            '../styles/styles'
+            '../../common/ca-bundle.crt',
+            '../../styles/styles'
           ],
-          'destination': '<(pwd)/../android/java/MapboxGLAndroidSDK/src/main/assets'
+          'destination': '<(pwd)/../android/MapboxGLAndroidSDK/src/main/assets'
         },
         {
         'files': [
           '<(PRODUCT_DIR)/obj.target'
         ],
-        'destination': '<(pwd)/../android/java/MapboxGLAndroidSDK/src/main'
+        'destination': '<(pwd)/../android/MapboxGLAndroidSDK/src/main'
         },
       ],
 
@@ -92,7 +92,7 @@
         {
           'action_name': 'Strip dynamic library',
           'inputs': [ '<(PRODUCT_DIR)/lib.target/libmapbox-gl.so' ],
-          'outputs': [ '<(pwd)/../android/java/MapboxGLAndroidSDK/src/main/jniLibs/$(JNIDIR)/libmapbox-gl.so' ],
+          'outputs': [ '<(pwd)/../android/MapboxGLAndroidSDK/src/main/jniLibs/$(JNIDIR)/libmapbox-gl.so' ],
           'action': [ '$(STRIP)', '<@(_inputs)', '-o', '<@(_outputs)' ]
         },
       ],

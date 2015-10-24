@@ -15,8 +15,8 @@ export MASON_ANDROID_ABI=${ANDROID_ABI}
 mapbox_time "checkout_styles" \
 git submodule update --init styles
 
-mkdir -p ./android/java/MapboxGLAndroidSDKTestApp/src/main/res/raw
-echo "${MAPBOX_ACCESS_TOKEN}" > ./android/java/MapboxGLAndroidSDKTestApp/src/main/res/raw/token.txt
+mkdir -p ./android/MapboxGLAndroidSDKTestApp/src/main/res/raw
+echo "${MAPBOX_ACCESS_TOKEN}" > ./android/MapboxGLAndroidSDKTestApp/src/main/res/raw/token.txt
 
 mapbox_time "compile_library" \
 make android-lib HOST_VERSION=${ANDROID_ABI} -j${JOBS} BUILDTYPE=${BUILDTYPE}
@@ -38,7 +38,7 @@ if [ ! -z "${AWS_ACCESS_KEY_ID}" ] && [ ! -z "${AWS_SECRET_ACCESS_KEY}" ] ; then
     echo "Deploying results..."
 
     S3_PREFIX=s3://mapbox/mapbox-gl-native/android/build/${TRAVIS_JOB_NUMBER}
-    APK_OUTPUTS=./android/java/MapboxGLAndroidSDKTestApp/build/outputs/apk
+    APK_OUTPUTS=./android/MapboxGLAndroidSDKTestApp/build/outputs/apk
     JNILIB=`mason env JNIDIR`
 
     # ARM64 does not build APK for now

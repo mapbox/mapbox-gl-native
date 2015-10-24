@@ -72,13 +72,13 @@ android-lib: ; $(RUN) HOST=android Makefile/androidapp
 
 # Builds the selected/default Android library
 android: android-lib
-	cd android/java && ./gradlew --parallel --max-workers=$(JOBS) assemble$(BUILDTYPE)
+	cd android && ./gradlew --parallel --max-workers=$(JOBS) assemble$(BUILDTYPE)
 
 # Builds all android architectures for distribution.
 apackage: android-lib-arm-v5 android-lib-arm-v7
 apackage: android-lib-x86
 apackage: android-lib-mips
-	cd android/java && ./gradlew --parallel-threads=$(JOBS) assemble$(BUILDTYPE)
+	cd android && ./gradlew --parallel-threads=$(JOBS) assemble$(BUILDTYPE)
 
 # Builds the Node.js library
 .PHONY: node
@@ -130,9 +130,8 @@ clean: clear_sqlite_cache clear_xcode_cache
 	-rm -rf ./ios/build
 	-rm -rf ./test/build
 	-rm -rf ./config/*.gypi
-	-rm -rf ./android/java/build ./android/java/MapboxGLAndroidSDK/build ./android/java/MapboxGLAndroidSDKTestApp/build
-	-rm -rf ./android/java/MapboxGLAndroidSDK/src/main/jniLibs ./android/java/MapboxGLAndroidSDK/src/main/obj.target ./android/java/MapboxGLAndroidSDK/src/main/assets
-	-rm -f ./android/test/features.zip
+	-rm -rf ./android/build ./android/MapboxGLAndroidSDK/build ./android/MapboxGLAndroidSDKTestApp/build
+	-rm -rf ./android/MapboxGLAndroidSDK/src/main/jniLibs ./android/MapboxGLAndroidSDK/src/main/obj.target ./android/MapboxGLAndroidSDK/src/main/assets
 
 distclean: clean
 	-rm -rf ./mason_packages
