@@ -36,6 +36,7 @@ import android.support.v7.app.AlertDialog;
 import android.text.TextUtils;
 import android.util.AttributeSet;
 import android.util.DisplayMetrics;
+import android.util.Log;
 import android.view.GestureDetector;
 import android.view.Gravity;
 import android.view.InputDevice;
@@ -990,7 +991,8 @@ public final class MapView extends FrameLayout {
     @UiThread
     public void setCenterCoordinate(@NonNull LatLng centerCoordinate, boolean animated) {
         if (centerCoordinate == null) {
-            throw new NullPointerException("centerCoordinate is null");
+            Log.w(TAG, "centerCoordiate was null, so just returning");
+            return;
         }
         long duration = animated ? ANIMATION_DURATION : 0;
         mNativeMapView.cancelTransitions();
@@ -1988,7 +1990,7 @@ public final class MapView extends FrameLayout {
             }
         }
     }
-    
+
     //
     // Camera
     //
