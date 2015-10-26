@@ -28,7 +28,9 @@ VectorTileData::VectorTileData(const TileID& id_,
                  std::make_unique<CollisionTile>(angle, pitch, collisionDebug)),
       source(source_),
       lastAngle(angle),
-      currentAngle(angle) {
+      currentAngle(angle),
+      currentPitch(pitch),
+      currentCollisionDebug(collisionDebug) {
 }
 
 VectorTileData::~VectorTileData() {
