@@ -991,7 +991,7 @@ public final class MapView extends FrameLayout {
     @UiThread
     public void setCenterCoordinate(@NonNull LatLng centerCoordinate, boolean animated) {
         if (centerCoordinate == null) {
-            Log.w(TAG, "centerCoordiate was null, so just returning");
+            Log.w(TAG, "centerCoordinate was null, so just returning");
             return;
         }
         long duration = animated ? ANIMATION_DURATION : 0;
