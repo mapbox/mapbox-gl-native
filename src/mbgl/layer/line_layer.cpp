@@ -1,5 +1,4 @@
 #include <mbgl/layer/line_layer.hpp>
-#include <mbgl/style/property_parsing.hpp>
 #include <mbgl/style/style_bucket_parameters.hpp>
 #include <mbgl/renderer/line_bucket.hpp>
 #include <mbgl/map/tile_id.hpp>
@@ -10,7 +9,7 @@ std::unique_ptr<StyleLayer> LineLayer::clone() const {
     std::unique_ptr<LineLayer> result = std::make_unique<LineLayer>();
     result->copy(*this);
     result->layout = layout;
-    result->paints.paints = paints.paints;
+    result->paint = paint;
     return std::move(result);
 }
 
@@ -22,52 +21,51 @@ void LineLayer::parseLayout(const JSVal& value) {
 }
 
 void LineLayer::parsePaints(const JSVal& layer) {
-    paints.parseEach(layer, [&] (ClassProperties& paint, const JSVal& value) {
-        parseProperty<Function<float>>("line-opacity", PropertyKey::LineOpacity, paint, value);
-        parseProperty<PropertyTransition>("line-opacity-transition", PropertyKey::LineOpacity, paint, value);
-        parseProperty<Function<Color>>("line-color", PropertyKey::LineColor, paint, value);
-        parseProperty<PropertyTransition>("line-color-transition", PropertyKey::LineColor, paint, value);
-        parseProperty<Function<std::array<float,2>>>("line-translate", PropertyKey::LineTranslate, paint, value);
-        parseProperty<PropertyTransition>("line-translate-transition", PropertyKey::LineTranslate, paint, value);
-        parseProperty<Function<TranslateAnchorType>>("line-translate-anchor", PropertyKey::LineTranslateAnchor, paint, value);
-        parseProperty<Function<float>>("line-width", PropertyKey::LineWidth, paint, value);
-        parseProperty<PropertyTransition>("line-width-transition", PropertyKey::LineWidth, paint, value);
-        parseProperty<Function<float>>("line-gap-width", PropertyKey::LineGapWidth, paint, value);
-        parseProperty<PropertyTransition>("line-gap-width-transition", PropertyKey::LineGapWidth, paint, value);
-        parseProperty<Function<float>>("line-blur", PropertyKey::LineBlur, paint, value);
-        parseProperty<PropertyTransition>("line-blur-transition", PropertyKey::LineBlur, paint, value);
-        parseProperty<Function<Faded<std::vector<float>>>>("line-dasharray", PropertyKey::LineDashArray, paint, value);
-        parseProperty<Function<Faded<std::string>>>("line-pattern", PropertyKey::LineImage, paint, value);
-    });
+    paint.opacity.parse("line-opacity", layer);
+    paint.color.parse("line-color", layer);
+    paint.translate.parse("line-translate", layer);
+    paint.translateAnchor.parse("line-translate-anchor", layer);
+    paint.width.parse("line-width", layer);
+    paint.gapWidth.parse("line-gap-width", layer);
+    paint.blur.parse("line-blur", layer);
+    paint.dasharray.parse("line-dasharray", layer);
+    paint.pattern.parse("line-pattern", layer);
 }
 
 void LineLayer::cascade(const StyleCascadeParameters& parameters) {
-    paints.cascade(parameters);
+    paint.opacity.cascade(parameters);
+    paint.color.cascade(parameters);
+    paint.translate.cascade(parameters);
+    paint.translateAnchor.cascade(parameters);
+    paint.width.cascade(parameters);
+    paint.gapWidth.cascade(parameters);
+    paint.blur.cascade(parameters);
+    paint.dasharray.cascade(parameters);
+    paint.pattern.cascade(parameters);
 }
 
-bool LineLayer::hasTransitions() const {
-    return paints.hasTransitions();
-}
-
-void LineLayer::recalculate(const StyleCalculationParameters& parameters) {
-    paints.removeExpiredTransitions(parameters.now);
-
-    paints.calculateTransitioned(PropertyKey::LineOpacity, properties.opacity, parameters);
-    paints.calculateTransitioned(PropertyKey::LineColor, properties.color, parameters);
-    paints.calculateTransitioned(PropertyKey::LineTranslate, properties.translate, parameters);
-    paints.calculate(PropertyKey::LineTranslateAnchor, properties.translateAnchor, parameters);
-    paints.calculateTransitioned(PropertyKey::LineWidth, properties.width, parameters);
-    paints.calculateTransitioned(PropertyKey::LineGapWidth, properties.gap_width, parameters);
-    paints.calculateTransitioned(PropertyKey::LineBlur, properties.blur, parameters);
-    paints.calculate(PropertyKey::LineDashArray, properties.dash_array, parameters);
-    paints.calculate(PropertyKey::LineImage, properties.image, parameters);
-
+bool LineLayer::recalculate(const StyleCalculationParameters& parameters) {
     // for scaling dasharrays
     StyleCalculationParameters dashArrayParams = parameters;
     dashArrayParams.z = std::floor(dashArrayParams.z);
-    paints.calculate(PropertyKey::LineWidth, properties.dash_line_width, dashArrayParams);
+    paint.width.calculate(dashArrayParams);
+    paint.dashLineWidth = paint.width;
 
-    passes = properties.isVisible() ? RenderPass::Translucent : RenderPass::None;
+    bool hasTransitions = false;
+
+    hasTransitions |= paint.opacity.calculate(parameters);
+    hasTransitions |= paint.color.calculate(parameters);
+    hasTransitions |= paint.translate.calculate(parameters);
+    hasTransitions |= paint.translateAnchor.calculate(parameters);
+    hasTransitions |= paint.width.calculate(parameters);
+    hasTransitions |= paint.gapWidth.calculate(parameters);
+    hasTransitions |= paint.blur.calculate(parameters);
+    hasTransitions |= paint.dasharray.calculate(parameters);
+    hasTransitions |= paint.pattern.calculate(parameters);
+
+    passes = paint.isVisible() ? RenderPass::Translucent : RenderPass::None;
+
+    return hasTransitions;
 }
 
 std::unique_ptr<Bucket> LineLayer::createBucket(StyleBucketParameters& parameters) const {

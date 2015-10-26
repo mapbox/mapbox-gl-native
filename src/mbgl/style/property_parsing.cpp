@@ -1,11 +1,14 @@
 #include <mbgl/style/property_parsing.hpp>
+#include <mbgl/style/property_transition.hpp>
+#include <mbgl/style/function.hpp>
 
 #include <mbgl/platform/log.hpp>
 
 #include <csscolorparser/csscolorparser.hpp>
 
+#include <vector>
+
 namespace mbgl {
-namespace detail {
 
 template <>
 optional<bool> parseProperty(const char* name, const JSVal& value) {
@@ -401,5 +404,4 @@ optional<Function<Faded<std::string>>> parseProperty(const char* name, const JSV
     return Function<Faded<std::string>>(*constant);
 }
 
-}
 }

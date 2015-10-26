@@ -9,18 +9,18 @@ using namespace mbgl;
 void Painter::renderRaster(RasterBucket& bucket, const RasterLayer& layer, const TileID&, const mat4& matrix) {
     if (pass != RenderPass::Translucent) return;
 
-    const RasterPaintProperties& properties = layer.properties;
+    const RasterPaintProperties& properties = layer.paint;
 
     if (bucket.hasData()) {
         config.program = rasterShader->program;
         rasterShader->u_matrix = matrix;
         rasterShader->u_buffer = 0;
         rasterShader->u_opacity = properties.opacity;
-        rasterShader->u_brightness_low = properties.brightness[0];
-        rasterShader->u_brightness_high = properties.brightness[1];
+        rasterShader->u_brightness_low = properties.brightnessMin;
+        rasterShader->u_brightness_high = properties.brightnessMax;
         rasterShader->u_saturation_factor = saturationFactor(properties.saturation);
         rasterShader->u_contrast_factor = contrastFactor(properties.contrast);
-        rasterShader->u_spin_weights = spinWeights(properties.hue_rotate);
+        rasterShader->u_spin_weights = spinWeights(properties.hueRotate);
 
         config.stencilOp.reset();
         config.stencilTest = GL_TRUE;

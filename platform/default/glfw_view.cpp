@@ -223,7 +223,7 @@ void GLFWView::addRandomPointAnnotations(int count) {
 void GLFWView::addRandomShapeAnnotations(int count) {
     std::vector<mbgl::ShapeAnnotation> shapes;
 
-    mbgl::FillPaintProperties properties;
+    mbgl::FillAnnotationProperties properties;
     properties.opacity = .1;
 
     for (int i = 0; i < count; i++) {

@@ -29,8 +29,8 @@ public:
     T evaluate(const StyleCalculationParameters&) const;
 
 private:
-    const float base = 1;
-    const std::vector<std::pair<float, T>> stops;
+    float base = 1;
+    std::vector<std::pair<float, T>> stops;
 };
 
 // Partial specialization for cross-faded properties (*-pattern, line-dasharray).
@@ -50,7 +50,7 @@ public:
     Faded<T> evaluate(const StyleCalculationParameters&) const;
 
 private:
-    const std::vector<std::pair<float, T>> stops;
+    std::vector<std::pair<float, T>> stops;
 };
 
 }

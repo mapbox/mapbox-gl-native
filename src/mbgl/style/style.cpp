@@ -7,6 +7,7 @@
 #include <mbgl/style/style_layer.hpp>
 #include <mbgl/style/style_parser.hpp>
 #include <mbgl/style/property_transition.hpp>
+#include <mbgl/style/class_dictionary.hpp>
 #include <mbgl/style/style_cascade_parameters.hpp>
 #include <mbgl/style/style_calculation_parameters.hpp>
 #include <mbgl/geometry/glyph_atlas.hpp>
@@ -121,7 +122,16 @@ void Style::update(const TransformState& transform,
 }
 
 void Style::cascade() {
-    StyleCascadeParameters parameters(data.getClasses(),
+    std::vector<ClassID> classes;
+
+    std::vector<std::string> classNames = data.getClasses();
+    for (auto it = classNames.rbegin(); it != classNames.rend(); it++) {
+        classes.push_back(ClassDictionary::Get().lookup(*it));
+    }
+    classes.push_back(ClassID::Default);
+    classes.push_back(ClassID::Fallback);
+
+    StyleCascadeParameters parameters(classes,
                                       data.getAnimationTime(),
                                       PropertyTransition { data.getDefaultTransitionDuration(),
                                                            data.getDefaultTransitionDelay() });
@@ -146,7 +156,7 @@ void Style::recalculate(float z) {
                                           data.getDefaultFadeDuration());
 
     for (const auto& layer : layers) {
-        layer->recalculate(parameters);
+        hasPendingTransitions |= layer->recalculate(parameters);
 
         Source* source = getSource(layer->source);
         if (!source) {
@@ -166,12 +176,7 @@ Source* Style::getSource(const std::string& id) const {
 }
 
 bool Style::hasTransitions() const {
-    for (const auto& layer : layers) {
-        if (layer->hasTransitions()) {
-            return true;
-        }
-    }
-    return false;
+    return hasPendingTransitions;
 }
 
 bool Style::isLoaded() const {

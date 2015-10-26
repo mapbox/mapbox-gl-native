@@ -8,7 +8,9 @@
 
 #include <rapidjson/document.h>
 
+#include <memory>
 #include <string>
+#include <limits>
 
 namespace mbgl {
 
@@ -36,12 +38,10 @@ public:
     virtual void cascade(const StyleCascadeParameters&) = 0;
 
     // Fully evaluate cascaded paint properties based on a zoom level.
-    virtual void recalculate(const StyleCalculationParameters&) = 0;
+    // Returns true if any paint properties have active transitions.
+    virtual bool recalculate(const StyleCalculationParameters&) = 0;
 
     virtual std::unique_ptr<Bucket> createBucket(StyleBucketParameters&) const = 0;
-
-    // Checks whether this layer has any active paint properties with transitions.
-    virtual bool hasTransitions() const = 0;
 
     // Checks whether this layer needs to be rendered in the given render pass.
     bool hasRenderPass(RenderPass) const;

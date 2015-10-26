@@ -20,7 +20,7 @@ void Painter::renderCircle(CircleBucket& bucket,
 
     config.stencilTest = GL_FALSE;
 
-    const CirclePaintProperties& properties = layer.properties;
+    const CirclePaintProperties& properties = layer.paint;
     mat4 vtxMatrix = translatedMatrix(matrix, properties.translate, id, properties.translateAnchor);
 
     Color color = properties.color;
@@ -40,7 +40,7 @@ void Painter::renderCircle(CircleBucket& bucket,
     circleShader->u_matrix = vtxMatrix;
     circleShader->u_exmatrix = extrudeMatrix;
     circleShader->u_color = color;
-    circleShader->u_blur = std::max(properties.blur, antialiasing);
+    circleShader->u_blur = std::max<float>(properties.blur, antialiasing);
     circleShader->u_size = properties.radius;
 
     bucket.drawCircles(*circleShader);

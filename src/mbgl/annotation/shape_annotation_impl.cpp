@@ -26,19 +26,17 @@ void ShapeAnnotationImpl::updateStyle(Style& style) {
     if (style.getLayer(layerID))
         return;
 
-    if (shape.properties.is<LinePaintProperties>()) {
+    if (shape.properties.is<LineAnnotationProperties>()) {
         type = ProjectedFeatureType::LineString;
 
         std::unique_ptr<LineLayer> layer = std::make_unique<LineLayer>();
         layer->type = StyleLayerType::Line;
         layer->layout.join = JoinType::Round;
 
-        const LinePaintProperties& properties = shape.properties.get<LinePaintProperties>();
-        ClassProperties paintProperties;
-        paintProperties.set(PropertyKey::LineOpacity, Function<float>(properties.opacity));
-        paintProperties.set(PropertyKey::LineWidth, Function<float>(properties.width));
-        paintProperties.set(PropertyKey::LineColor, Function<Color>(properties.color));
-        layer->paints.paints.emplace(ClassID::Default, std::move(paintProperties));
+        const LineAnnotationProperties& properties = shape.properties.get<LineAnnotationProperties>();
+        layer->paint.opacity = properties.opacity;
+        layer->paint.width = properties.width;
+        layer->paint.color = properties.color;
 
         layer->id = layerID;
         layer->source = AnnotationManager::SourceID;
@@ -46,18 +44,16 @@ void ShapeAnnotationImpl::updateStyle(Style& style) {
 
         style.addLayer(std::move(layer), AnnotationManager::PointLayerID);
 
-    } else if (shape.properties.is<FillPaintProperties>()) {
+    } else if (shape.properties.is<FillAnnotationProperties>()) {
         type = ProjectedFeatureType::Polygon;
 
         std::unique_ptr<FillLayer> layer = std::make_unique<FillLayer>();
         layer->type = StyleLayerType::Fill;
 
-        const FillPaintProperties& properties = shape.properties.get<FillPaintProperties>();
-        ClassProperties paintProperties;
-        paintProperties.set(PropertyKey::FillOpacity, Function<float>(properties.opacity));
-        paintProperties.set(PropertyKey::FillColor, Function<Color>(properties.fill_color));
-        paintProperties.set(PropertyKey::FillOutlineColor, Function<Color>(properties.stroke_color));
-        layer->paints.paints.emplace(ClassID::Default, std::move(paintProperties));
+        const FillAnnotationProperties& properties = shape.properties.get<FillAnnotationProperties>();
+        layer->paint.opacity = properties.opacity;
+        layer->paint.color = properties.color;
+        layer->paint.outlineColor = properties.outlineColor;
 
         layer->id = layerID;
         layer->source = AnnotationManager::SourceID;

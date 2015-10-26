@@ -2171,11 +2171,11 @@ CLLocationCoordinate2D MGLLocationCoordinate2DFromLatLng(mbgl::LatLng latLng)
                                 [self.delegate mapView:self lineWidthForPolylineAnnotation:(MGLPolyline *)annotation] :
                                 3.0);
 
-                mbgl::LinePaintProperties lineProperties;
+                mbgl::LineAnnotationProperties lineProperties;
                 lineProperties.opacity = alpha;
                 lineProperties.color = strokeNativeColor;
                 lineProperties.width = lineWidth;
-                shapeProperties.set<mbgl::LinePaintProperties>(lineProperties);
+                shapeProperties.set<mbgl::LineAnnotationProperties>(lineProperties);
 
             }
             else if ([annotation isKindOfClass:[MGLPolygon class]])
@@ -2189,11 +2189,11 @@ CLLocationCoordinate2D MGLLocationCoordinate2DFromLatLng(mbgl::LatLng latLng)
                 [fillColor getRed:&r green:&g blue:&b alpha:&a];
                 mbgl::Color fillNativeColor({{ (float)r, (float)g, (float)b, (float)a }});
 
-                mbgl::FillPaintProperties fillProperties;
+                mbgl::FillAnnotationProperties fillProperties;
                 fillProperties.opacity = alpha;
-                fillProperties.stroke_color = strokeNativeColor;
-                fillProperties.fill_color = fillNativeColor;
-                shapeProperties.set<mbgl::FillPaintProperties>(fillProperties);
+                fillProperties.outlineColor = strokeNativeColor;
+                fillProperties.color = fillNativeColor;
+                shapeProperties.set<mbgl::FillAnnotationProperties>(fillProperties);
             }
             else
             {

@@ -110,6 +110,7 @@ private:
 
     std::unique_ptr<uv::rwlock> mtx;
     ZoomHistory zoomHistory;
+    bool hasPendingTransitions = false;
 
 public:
     Worker workers;

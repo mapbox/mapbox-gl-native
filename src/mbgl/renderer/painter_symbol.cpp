@@ -25,7 +25,7 @@ void Painter::renderSDF(SymbolBucket &bucket,
                         SDFShader& sdfShader,
                         void (SymbolBucket::*drawSDF)(SDFShader&))
 {
-    mat4 vtxMatrix = translatedMatrix(matrix, styleProperties.translate, id, styleProperties.translate_anchor);
+    mat4 vtxMatrix = translatedMatrix(matrix, styleProperties.translate, id, styleProperties.translateAnchor);
 
     bool skewed = (bucketProperties.rotationAlignment == RotationAlignmentType::Map);
     mat4 exMatrix;
@@ -89,28 +89,28 @@ void Painter::renderSDF(SymbolBucket &bucket,
 
     // We're drawing in the translucent pass which is bottom-to-top, so we need
     // to draw the halo first.
-    if (styleProperties.halo_color[3] > 0.0f && styleProperties.halo_width > 0.0f) {
-        sdfShader.u_gamma = (styleProperties.halo_blur * blurOffset / fontScale / sdfPx + gamma) * gammaScale;
+    if (styleProperties.haloColor.value[3] > 0.0f && styleProperties.haloWidth > 0.0f) {
+        sdfShader.u_gamma = (styleProperties.haloBlur * blurOffset / fontScale / sdfPx + gamma) * gammaScale;
 
         if (styleProperties.opacity < 1.0f) {
-            Color color = styleProperties.halo_color;
+            Color color = styleProperties.haloColor;
             color[0] *= styleProperties.opacity;
             color[1] *= styleProperties.opacity;
             color[2] *= styleProperties.opacity;
             color[3] *= styleProperties.opacity;
             sdfShader.u_color = color;
         } else {
-            sdfShader.u_color = styleProperties.halo_color;
+            sdfShader.u_color = styleProperties.haloColor;
         }
 
-        sdfShader.u_buffer = (haloOffset - styleProperties.halo_width / fontScale) / sdfPx;
+        sdfShader.u_buffer = (haloOffset - styleProperties.haloWidth / fontScale) / sdfPx;
 
         setDepthSublayer(0);
         (bucket.*drawSDF)(sdfShader);
     }
 
     // Then, we draw the text/icon over the halo
-    if (styleProperties.color[3] > 0.0f) {
+    if (styleProperties.color.value[3] > 0.0f) {
         sdfShader.u_gamma = gamma * gammaScale;
 
         if (styleProperties.opacity < 1.0f) {
@@ -137,7 +137,7 @@ void Painter::renderSymbol(SymbolBucket& bucket, const SymbolLayer& layer, const
         return;
     }
 
-    const auto& properties = layer.properties;
+    const auto& properties = layer.paint;
     const auto& layout = bucket.layout;
 
     config.depthMask = GL_FALSE;
@@ -206,7 +206,7 @@ void Painter::renderSymbol(SymbolBucket& bucket, const SymbolLayer& layer, const
                       *sdfIconShader,
                       &SymbolBucket::drawIcons);
         } else {
-            mat4 vtxMatrix = translatedMatrix(matrix, properties.icon.translate, id, properties.icon.translate_anchor);
+            mat4 vtxMatrix = translatedMatrix(matrix, properties.icon.translate, id, properties.icon.translateAnchor);
 
             bool skewed = layout.icon.rotationAlignment == RotationAlignmentType::Map;
             mat4 exMatrix;

@@ -2,10 +2,16 @@
 #define MBGL_BACKGROUND_LAYER
 
 #include <mbgl/style/style_layer.hpp>
-#include <mbgl/style/style_properties.hpp>
-#include <mbgl/style/paint_properties_map.hpp>
+#include <mbgl/style/paint_property.hpp>
 
 namespace mbgl {
+
+class BackgroundPaintProperties {
+public:
+    PaintProperty<float> opacity = 1.0f;
+    PaintProperty<Color> color = { {{ 0, 0, 0, 1 }} };
+    PaintProperty<std::string, Faded<std::string>> pattern = { "" };
+};
 
 class BackgroundLayer : public StyleLayer {
 public:
@@ -15,15 +21,11 @@ public:
     void parsePaints(const JSVal&) override;
 
     void cascade(const StyleCascadeParameters&) override;
-    void recalculate(const StyleCalculationParameters&) override;
+    bool recalculate(const StyleCalculationParameters&) override;
 
     std::unique_ptr<Bucket> createBucket(StyleBucketParameters&) const override;
 
-    bool hasTransitions() const override;
-
-    PaintPropertiesMap paints;
-
-    BackgroundPaintProperties properties;
+    BackgroundPaintProperties paint;
 };
 
 }

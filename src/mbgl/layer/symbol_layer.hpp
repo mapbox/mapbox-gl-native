@@ -2,9 +2,8 @@
 #define MBGL_SYMBOL_LAYER
 
 #include <mbgl/style/style_layer.hpp>
-#include <mbgl/style/style_properties.hpp>
-#include <mbgl/style/paint_properties_map.hpp>
 #include <mbgl/style/layout_property.hpp>
+#include <mbgl/style/paint_property.hpp>
 
 namespace mbgl {
 
@@ -55,6 +54,32 @@ public:
     float textMaxSize = 16.0f;
 };
 
+class SymbolPaintProperties {
+public:
+    class PaintProperties {
+    public:
+        PaintProperties(float size_) : size(size_) {}
+
+        PaintProperty<float> opacity = 1.0f;
+        PaintProperty<Color> color = { {{ 0, 0, 0, 1 }} };
+        PaintProperty<Color> haloColor = { {{ 0, 0, 0, 0 }} };
+        PaintProperty<float> haloWidth = 0.0f;
+        PaintProperty<float> haloBlur = 0.0f;
+        PaintProperty<std::array<float, 2>> translate = { {{ 0, 0 }} };
+        PaintProperty<TranslateAnchorType> translateAnchor = TranslateAnchorType::Map;
+
+        // Special case
+        float size;
+
+        bool isVisible() const {
+            return opacity > 0 && (color.value[3] > 0 || haloColor.value[3] > 0) && size > 0;
+        }
+    };
+
+    PaintProperties icon { 1.0f };
+    PaintProperties text { 16.0f };
+};
+
 class SymbolLayer : public StyleLayer {
 public:
     std::unique_ptr<StyleLayer> clone() const override;
@@ -63,16 +88,12 @@ public:
     void parsePaints(const JSVal&) override;
 
     void cascade(const StyleCascadeParameters&) override;
-    void recalculate(const StyleCalculationParameters&) override;
+    bool recalculate(const StyleCalculationParameters&) override;
 
     std::unique_ptr<Bucket> createBucket(StyleBucketParameters&) const override;
 
-    bool hasTransitions() const override;
-
     SymbolLayoutProperties layout;
-    PaintPropertiesMap paints;
-
-    SymbolPaintProperties properties;
+    SymbolPaintProperties paint;
 };
 
 }

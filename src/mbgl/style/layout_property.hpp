@@ -17,7 +17,7 @@ public:
 
     void parse(const char * name, const JSVal& layout) {
         if (layout.HasMember(name)) {
-            parsedValue = detail::parseProperty<Function<T>>(name, layout[name]);
+            parsedValue = parseProperty<Function<T>>(name, layout[name]);
         }
     }
 

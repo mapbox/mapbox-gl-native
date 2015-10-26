@@ -2,7 +2,6 @@
 
 #include <mbgl/annotation/point_annotation.hpp>
 #include <mbgl/annotation/shape_annotation.hpp>
-#include <mbgl/style/style_properties.hpp>
 #include <mbgl/map/map.hpp>
 #include <mbgl/map/still_image.hpp>
 #include <mbgl/platform/default/headless_display.hpp>
@@ -48,7 +47,7 @@ TEST(Annotations, LineAnnotation) {
 
     AnnotationSegments segments = {{ {{ { 0, 0 }, { 45, 45 } }} }};
 
-    LinePaintProperties properties;
+    LineAnnotationProperties properties;
     properties.color = {{ 255, 0, 0, 1 }};
     properties.width = 5;
 
@@ -67,8 +66,8 @@ TEST(Annotations, FillAnnotation) {
 
     AnnotationSegments segments = {{ {{ { 0, 0 }, { 0, 45 }, { 45, 45 }, { 45, 0 } }} }};
 
-    FillPaintProperties properties;
-    properties.fill_color = {{ 255, 0, 0, 1 }};
+    FillAnnotationProperties properties;
+    properties.color = {{ 255, 0, 0, 1 }};
 
     map.addShapeAnnotation(ShapeAnnotation(segments, properties));
 
@@ -118,8 +117,8 @@ TEST(Annotations, NonImmediateAdd) {
 
     AnnotationSegments segments = {{ {{ { 0, 0 }, { 0, 45 }, { 45, 45 }, { 45, 0 } }} }};
 
-    FillPaintProperties properties;
-    properties.fill_color = {{ 255, 0, 0, 1 }};
+    FillAnnotationProperties properties;
+    properties.color = {{ 255, 0, 0, 1 }};
 
     map.addShapeAnnotation(ShapeAnnotation(segments, properties));
 
@@ -149,7 +148,7 @@ TEST(Annotations, RemoveShape) {
 
     AnnotationSegments segments = {{ {{ { 0, 0 }, { 45, 45 } }} }};
 
-    LinePaintProperties properties;
+    LineAnnotationProperties properties;
     properties.color = {{ 255, 0, 0, 1 }};
     properties.width = 5;
 
