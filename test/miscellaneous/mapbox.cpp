@@ -17,9 +17,11 @@ TEST(Mapbox, GlyphsURL) {
     EXPECT_EQ(mbgl::util::mapbox::normalizeGlyphsURL("mapbox://fonts/boxmap/Comic%20Sans/0-255.pbf", "key"), "https://api.mapbox.com/fonts/v1/boxmap/Comic%20Sans/0-255.pbf?access_token=key");
     EXPECT_EQ(mbgl::util::mapbox::normalizeGlyphsURL("mapbox://fonts/boxmap/{fontstack}/{range}.pbf", "key"), "https://api.mapbox.com/fonts/v1/boxmap/{fontstack}/{range}.pbf?access_token=key");
     EXPECT_EQ(mbgl::util::mapbox::normalizeGlyphsURL("http://path", "key"), "http://path");
+    EXPECT_EQ(mbgl::util::mapbox::normalizeGlyphsURL("mapbox://path", "key"), "mapbox://path");
 }
 
 TEST(Mapbox, StyleURL) {
+    EXPECT_EQ(mbgl::util::mapbox::normalizeStyleURL("mapbox://foo", "key"), "mapbox://foo");
     EXPECT_EQ(mbgl::util::mapbox::normalizeStyleURL("mapbox://styles/user/style", "key"), "https://api.mapbox.com/styles/v1/user/style?access_token=key");
     EXPECT_EQ(mbgl::util::mapbox::normalizeStyleURL("mapbox://styles/user/style/draft", "key"), "https://api.mapbox.com/styles/v1/user/style/draft?access_token=key");
     EXPECT_EQ(mbgl::util::mapbox::normalizeStyleURL("http://path", "key"), "http://path");
@@ -27,6 +29,7 @@ TEST(Mapbox, StyleURL) {
 
 TEST(Mapbox, SpriteURL) {
     EXPECT_EQ(mbgl::util::mapbox::normalizeSpriteURL("map/box/sprites@2x.json", "key"), "map/box/sprites@2x.json");
+    EXPECT_EQ(mbgl::util::mapbox::normalizeSpriteURL("mapbox://foo", "key"), "mapbox://foo");
     EXPECT_EQ(mbgl::util::mapbox::normalizeSpriteURL("mapbox://sprites/mapbox/streets-v8.json", "key"), "https://api.mapbox.com/styles/v1/mapbox/streets-v8/sprite.json?access_token=key");
     EXPECT_EQ(mbgl::util::mapbox::normalizeSpriteURL("mapbox://sprites/mapbox/streets-v8@2x.png", "key"), "https://api.mapbox.com/styles/v1/mapbox/streets-v8/sprite@2x.png?access_token=key");
     EXPECT_EQ(mbgl::util::mapbox::normalizeSpriteURL("mapbox://sprites/mapbox/streets-v8/draft@2x.png", "key"), "https://api.mapbox.com/styles/v1/mapbox/streets-v8/draft/sprite@2x.png?access_token=key");

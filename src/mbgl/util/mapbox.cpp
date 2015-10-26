@@ -1,4 +1,5 @@
 #include <mbgl/util/mapbox.hpp>
+#include <mbgl/platform/log.hpp>
 
 #include <stdexcept>
 #include <vector>
@@ -50,6 +51,12 @@ std::string normalizeStyleURL(const std::string& url, const std::string& accessT
     }
 
     std::vector<std::string> pathname = getMapboxURLPathname(url);
+
+    if (pathname.size() < 3) {
+        Log::Error(Event::ParseStyle, "Invalid style URL");
+        return url;
+    }
+
     std::string user = pathname[1];
     std::string id = pathname[2];
     bool isDraft = pathname.size() > 3;
@@ -62,6 +69,12 @@ std::string normalizeSpriteURL(const std::string& url, const std::string& access
     }
 
     std::vector<std::string> pathname = getMapboxURLPathname(url);
+
+    if (pathname.size() < 3) {
+        Log::Error(Event::ParseStyle, "Invalid sprite URL");
+        return url;
+    }
+
     std::string user = pathname[1];
     bool isDraft = pathname.size() > 3;
 
@@ -85,6 +98,12 @@ std::string normalizeGlyphsURL(const std::string& url, const std::string& access
     }
 
     std::vector<std::string> pathname = getMapboxURLPathname(url);
+
+    if (pathname.size() < 4) {
+      Log::Error(Event::ParseStyle, "Invalid glyph URL");
+      return url;
+    }
+
     std::string user = pathname[1];
     std::string fontstack = pathname[2];
     std::string range = pathname[3];
