@@ -75,7 +75,7 @@ private:
 
     // Limit the amount of zooming possible on the map.
     double min_scale = std::pow(2, 0);
-    double max_scale = std::pow(2, 18);
+    double max_scale = std::pow(2, 20);
 
     // logical dimensions
     uint16_t width = 0, height = 0;
