@@ -8,17 +8,17 @@
             <group>
                 <item
                     android:id="@+id/action_debug"
-                    android:icon="@android:drawable/ic_menu_info_details"
+                    android:icon="@drawable/ic_bug_report_white_24dp"
                     android:title="@string/action_debug" />
 
                 <item
                     android:id="@+id/action_markers"
-                    android:icon="@android:drawable/ic_menu_myplaces"
+                    android:icon="@drawable/ic_place_white_24dp"
                     android:title="@string/action_point_annotations" />
 
                 <item
                     android:id="@+id/action_compass"
-                    android:icon="@android:drawable/ic_menu_compass"
+                    android:icon="@drawable/ic_navigation_white_24dp"
                     android:title="@string/action_compass" />
             </group>
         </menu>
