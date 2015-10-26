@@ -183,6 +183,8 @@ private:
     };
 
     RenderState renderState = RenderState::never;
+    
+    CameraOptions cameraForLatLngsHelper(std::vector<LatLng> latLngs, EdgeInsets padding);
 };
 
 }

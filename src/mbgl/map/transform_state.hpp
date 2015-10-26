@@ -101,7 +101,7 @@ private:
     double x = 0, y = 0;
     double angle = 0;
     double scale = 1;
-    double altitude = 1.5;
+    double FOV = 36.87;
     double pitch = 0.0;
 
     // cache values for spherical mercator math

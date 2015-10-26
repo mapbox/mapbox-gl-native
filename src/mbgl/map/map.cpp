@@ -219,8 +219,31 @@ CameraOptions Map::cameraForLatLngBounds(LatLngBounds bounds, EdgeInsets padding
     };
     return cameraForLatLngs(segment, padding);
 }
-
+    
+    
 CameraOptions Map::cameraForLatLngs(std::vector<LatLng> latLngs, EdgeInsets padding) {
+    if (getPitch() < 0.01f) {
+        return cameraForLatLngsHelper(latLngs, padding);
+    } else {
+        TransformState oldTransform = this->transform->getState();
+        double oldZoom = getZoom();
+        
+        //10 is a magic number; the process is iterative, so we get closer with each call,
+        //and 10 was chosen to produce good results without taking overly long.  It could
+        //probably be lower, like 4 or 5, without affecting much.
+        for (int i = 0; i < 10; ++i) {
+            CameraOptions o = cameraForLatLngsHelper(latLngs, padding);
+            easeTo(o);
+        }
+        CameraOptions result = cameraForLatLngsHelper(latLngs, padding);
+        this->transform->restoreState(oldTransform);
+        setZoom(oldZoom);
+        return result;
+    }
+}
+    
+
+CameraOptions Map::cameraForLatLngsHelper(std::vector<LatLng> latLngs, EdgeInsets padding) {
     CameraOptions options;
     if (latLngs.empty()) {
         return options;
@@ -259,6 +282,30 @@ CameraOptions Map::cameraForLatLngs(std::vector<LatLng> latLngs, EdgeInsets padd
 
     options.center = centerLatLng;
     options.zoom = zoom;
+    
+    if (getPitch() > 0.f) {
+        TransformState oldTransform = this->transform->getState();
+        double oldZoom = getZoom();
+        //Now set that camera
+        easeTo(options);
+        
+        //Now calculate the x dimension size relative to the screen width
+        for (LatLng latLng : latLngs) {
+            vec2<> pixel = pixelForLatLng(latLng);
+            swPixel.x = std::min(swPixel.x, pixel.x);
+            nePixel.x = std::max(nePixel.x, pixel.x);
+            swPixel.y = std::min(swPixel.y, pixel.y);
+            nePixel.y = std::max(nePixel.y, pixel.y);
+        }
+        size = nePixel - swPixel;
+        scaleX = (getWidth() - padding.left - padding.right) / size.x;
+        zoom = ::log2(getScale() * scaleX);
+        zoom = ::fmax(::fmin(zoom, getMaxZoom()), getMinZoom());
+        options.zoom = zoom;
+        
+        this->transform->restoreState(oldTransform);
+        setZoom(oldZoom);
+    }
     return options;
 }
 
