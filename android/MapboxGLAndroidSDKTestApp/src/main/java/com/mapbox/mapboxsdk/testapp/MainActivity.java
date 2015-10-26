@@ -31,6 +31,7 @@ import com.mapbox.mapboxsdk.annotations.PolylineOptions;
 import com.mapbox.mapboxsdk.annotations.Sprite;
 import com.mapbox.mapboxsdk.constants.Style;
 import com.mapbox.mapboxsdk.geometry.LatLng;
+import com.mapbox.mapboxsdk.testapp.utils.GeoParseUtil;
 import com.mapbox.mapboxsdk.utils.ApiAccess;
 import com.mapbox.mapboxsdk.views.MapView;
 import io.fabric.sdk.android.Fabric;
@@ -466,8 +467,8 @@ public class MainActivity extends AppCompatActivity {
 
     private void addPolyline() {
         try {
-            String geojsonStr = Util.loadStringFromAssets(this, "small_line.geojson");
-            List<LatLng> latLngs = Util.parseGeoJSONCoordinates(geojsonStr);
+            String geojsonStr = GeoParseUtil.loadStringFromAssets(this, "small_line.geojson");
+            List<LatLng> latLngs = GeoParseUtil.parseGeoJSONCoordinates(geojsonStr);
             MapView map = mMapView;
             map.addPolyline(new PolylineOptions()
                     .add(latLngs.toArray(new LatLng[latLngs.size()]))
@@ -481,8 +482,8 @@ public class MainActivity extends AppCompatActivity {
 
     private void addPolygon() {
         try {
-            String geojsonStr = Util.loadStringFromAssets(this, "small_poly.geojson");
-            List<LatLng> latLngs = Util.parseGeoJSONCoordinates(geojsonStr);
+            String geojsonStr = GeoParseUtil.loadStringFromAssets(this, "small_poly.geojson");
+            List<LatLng> latLngs = GeoParseUtil.parseGeoJSONCoordinates(geojsonStr);
             MapView map = mMapView;
             ArrayList<PolygonOptions> opts = new ArrayList<>();
             opts.add(new PolygonOptions()

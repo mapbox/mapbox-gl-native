@@ -1,4 +1,4 @@
-package com.mapbox.mapboxsdk.testapp;
+package com.mapbox.mapboxsdk.testapp.utils;
 
 import android.content.Context;
 import android.text.TextUtils;
@@ -18,7 +18,7 @@ import java.nio.charset.Charset;
 import java.util.ArrayList;
 import java.util.List;
 
-public class Util {
+public class GeoParseUtil {
 
     public static String loadStringFromAssets(final Context context, final String fileName) throws IOException {
         if (TextUtils.isEmpty(fileName)) {
@@ -55,6 +55,7 @@ public class Util {
                     double lng = coordinates.getDouble(0);
                     double lat = coordinates.getDouble(1);
                     latLngs.add(new LatLng(lat, lng));
+                    break;
                 }
             }
         }
