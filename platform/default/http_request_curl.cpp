@@ -2,7 +2,6 @@
 #include <mbgl/storage/http_request_base.hpp>
 #include <mbgl/storage/resource.hpp>
 #include <mbgl/storage/response.hpp>
-#include <mbgl/util/chrono.hpp>
 #include <mbgl/platform/log.hpp>
 
 #include <mbgl/util/time.hpp>
@@ -539,21 +538,6 @@ size_t headerMatches(const char *const header, const char *const buffer, const s
         i++;
     }
     return i == headerLength ? i : std::string::npos;
-}
-
-int64_t parseCacheControl(const char *value) {
-    if (value) {
-        unsigned long long seconds = 0;
-        // TODO: cache-control may contain other information as well:
-        // http://www.w3.org/Protocols/rfc2616/rfc2616-sec14.html#sec14.9
-        if (std::sscanf(value, "max-age=%llu", &seconds) == 1) {
-            return std::chrono::duration_cast<std::chrono::seconds>(
-                       SystemClock::now().time_since_epoch()).count() +
-                   seconds;
-        }
-    }
-
-    return 0;
 }
 
 size_t HTTPCURLRequest::headerCallback(char *const buffer, const size_t size, const size_t nmemb, void *userp) {

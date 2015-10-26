@@ -2,7 +2,6 @@
 #include <mbgl/storage/http_request_base.hpp>
 #include <mbgl/storage/resource.hpp>
 #include <mbgl/storage/response.hpp>
-#include <mbgl/util/chrono.hpp>
 #include <mbgl/platform/log.hpp>
 #include <mbgl/android/jni.hpp>
 
@@ -246,21 +245,6 @@ void HTTPAndroidRequest::finish() {
     }
 
     delete this;
-}
-
-int64_t parseCacheControl(const char *value) {
-    if (value) {
-        unsigned long long seconds = 0;
-        // TODO: cache-control may contain other information as well:
-        // http://www.w3.org/Protocols/rfc2616/rfc2616-sec14.html#sec14.9
-        if (std::sscanf(value, "max-age=%llu", &seconds) == 1) {
-            return std::chrono::duration_cast<std::chrono::seconds>(
-                       std::chrono::system_clock::now().time_since_epoch()).count() +
-                   seconds;
-        }
-    }
-
-    return 0;
 }
 
 void HTTPAndroidRequest::onResponse(int code, std::string message, std::string etag, std::string modified, std::string cacheControl, std::string expires, std::string body) {

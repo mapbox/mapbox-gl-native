@@ -46,6 +46,8 @@ public:
     virtual void retry() = 0;
 
 protected:
+    static int64_t parseCacheControl(const char *value);
+
     bool cancelled;
 };
 
