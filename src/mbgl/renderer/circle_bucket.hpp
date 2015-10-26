@@ -8,8 +8,6 @@
 #include <mbgl/geometry/elements_buffer.hpp>
 #include <mbgl/geometry/circle_buffer.hpp>
 
-#include <mbgl/style/style_properties.hpp>
-
 namespace mbgl {
 
 class CircleVertexBuffer;

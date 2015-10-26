@@ -2,7 +2,6 @@
 #define MBGL_MAP_RASTER_TILE_DATA
 
 #include <mbgl/map/tile_data.hpp>
-#include <mbgl/style/style_properties.hpp>
 #include <mbgl/renderer/raster_bucket.hpp>
 #include <mbgl/storage/request_holder.hpp>
 
@@ -32,7 +31,6 @@ private:
     Worker& worker;
     RequestHolder req;
 
-    RasterLayoutProperties layout;
     std::unique_ptr<Bucket> bucket;
 
     std::unique_ptr<WorkRequest> workRequest;

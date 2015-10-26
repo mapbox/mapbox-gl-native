@@ -8,7 +8,6 @@ namespace mbgl {
 std::unique_ptr<StyleLayer> CircleLayer::clone() const {
     std::unique_ptr<CircleLayer> result = std::make_unique<CircleLayer>();
     result->copy(*this);
-    result->layout = layout;
     result->paints.paints = paints.paints;
     return std::move(result);
 }

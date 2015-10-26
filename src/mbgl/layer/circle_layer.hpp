@@ -4,7 +4,6 @@
 #include <mbgl/style/style_layer.hpp>
 #include <mbgl/style/style_properties.hpp>
 #include <mbgl/style/paint_properties_map.hpp>
-#include <mbgl/style/class_properties.hpp>
 
 namespace mbgl {
 
@@ -22,7 +21,6 @@ public:
 
     bool hasTransitions() const override;
 
-    ClassProperties layout;
     PaintPropertiesMap paints;
 
     CirclePaintProperties properties;

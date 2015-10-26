@@ -13,7 +13,7 @@
     "source": "mapbox",
     "source-layer": "country_label",
     "filter": ["==", "$type", "Point"],
-    "paint": {
+    "layout": {
       "text-size": null
     }
   }]

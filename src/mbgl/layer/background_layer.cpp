@@ -7,7 +7,6 @@ namespace mbgl {
 std::unique_ptr<StyleLayer> BackgroundLayer::clone() const {
     std::unique_ptr<BackgroundLayer> result = std::make_unique<BackgroundLayer>();
     result->copy(*this);
-    result->layout = layout;
     result->paints.paints = paints.paints;
     return std::move(result);
 }

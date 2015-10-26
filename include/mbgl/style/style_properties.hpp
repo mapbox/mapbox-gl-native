@@ -24,10 +24,6 @@ public:
     }
 };
 
-class FillLayoutProperties {
-public:
-};
-
 class LinePaintProperties {
 public:
     float opacity = 1.0f;
@@ -44,14 +40,6 @@ public:
     inline bool isVisible() const {
         return opacity > 0 && color[3] > 0 && width > 0;
     }
-};
-
-class LineLayoutProperties {
-public:
-    CapType cap = CapType::Butt;
-    JoinType join = JoinType::Miter;
-    float miter_limit = 2.0f;
-    float round_limit = 1.0f;
 };
 
 class SymbolPaintProperties {
@@ -84,50 +72,6 @@ public:
     }
 };
 
-class SymbolLayoutProperties {
-public:
-    PlacementType placement = PlacementType::Point;
-    float spacing = 250.0f;
-    bool avoid_edges = false;
-
-    struct {
-        bool allow_overlap = false;
-        bool ignore_placement = false;
-        bool optional = false;
-        RotationAlignmentType rotation_alignment = RotationAlignmentType::Viewport;
-        float size = 1.0f;
-        float max_size = 1.0f;
-        std::string image;
-        float rotate = 0.0f;
-        float padding = 2.0f;
-        bool keep_upright = false;
-        std::array<float, 2> offset = {{ 0, 0 }};
-    } icon;
-
-    struct {
-        RotationAlignmentType rotation_alignment = RotationAlignmentType::Viewport;
-        std::string field;
-        std::string font = "Open Sans Regular, Arial Unicode MS Regular";
-        float size = 16.0f;
-        float max_size = 16.0f;
-        float max_width = 15.0f /* em */;
-        float line_height = 1.2f /* em */;
-        float letter_spacing = 0.0f /* em */;
-        TextJustifyType justify = TextJustifyType::Center;
-        TextAnchorType anchor = TextAnchorType::Center;
-        float max_angle = 45.0f /* degrees */;
-        float rotate = 0.0f;
-        float padding = 2.0f;
-        bool keep_upright = true;
-        TextTransformType transform = TextTransformType::None;
-        std::array<float, 2> offset = {{ 0, 0 }};
-        bool allow_overlap = false;
-        bool ignore_placement = false;
-        bool optional = false;
-    } text;
-};
-
-
 class CirclePaintProperties {
 public:
     float radius = 5.0f;
@@ -156,10 +100,6 @@ public:
     }
 };
 
-class RasterLayoutProperties {
-public:
-};
-
 class BackgroundPaintProperties {
 public:
     float opacity = 1.0f;
@@ -169,10 +109,6 @@ public:
     inline bool isVisible() const {
         return opacity > 0;
     }
-};
-
-class BackgroundLayoutProperties {
-public:
 };
 
 }

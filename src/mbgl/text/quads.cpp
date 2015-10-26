@@ -1,7 +1,7 @@
 #include <mbgl/text/quads.hpp>
 #include <mbgl/text/shaping.hpp>
 #include <mbgl/geometry/anchor.hpp>
-#include <mbgl/style/style_properties.hpp>
+#include <mbgl/layer/symbol_layer.hpp>
 #include <mbgl/util/math.hpp>
 #include <cassert>
 
@@ -133,7 +133,7 @@ SymbolQuads getGlyphQuads(Anchor& anchor, const Shaping& shapedText,
         const bool alongLine, const GlyphPositions& face) {
 
     const float textRotate = layout.text.rotate * M_PI / 180;
-    const bool keepUpright = layout.text.keep_upright;
+    const bool keepUpright = layout.text.keepUpright;
 
     SymbolQuads quads;
 

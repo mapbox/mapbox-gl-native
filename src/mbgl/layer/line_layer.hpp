@@ -4,9 +4,17 @@
 #include <mbgl/style/style_layer.hpp>
 #include <mbgl/style/style_properties.hpp>
 #include <mbgl/style/paint_properties_map.hpp>
-#include <mbgl/style/class_properties.hpp>
+#include <mbgl/style/layout_property.hpp>
 
 namespace mbgl {
+
+class LineLayoutProperties {
+public:
+    LayoutProperty<CapType> cap = CapType::Butt;
+    LayoutProperty<JoinType> join = JoinType::Miter;
+    LayoutProperty<float> miterLimit = 2.0f;
+    LayoutProperty<float> roundLimit = 1.0f;
+};
 
 class LineLayer : public StyleLayer {
 public:
@@ -22,7 +30,7 @@ public:
 
     bool hasTransitions() const override;
 
-    ClassProperties layout;
+    LineLayoutProperties layout;
     PaintPropertiesMap paints;
 
     LinePaintProperties properties;

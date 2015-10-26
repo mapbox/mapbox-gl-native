@@ -27,7 +27,6 @@ const std::map<PropertyKey, PropertyValue> PropertyFallbackValue::properties = {
     { PropertyKey::CircleBlur, CirclePaintProperties().blur },
 
     { PropertyKey::IconOpacity, SymbolPaintProperties().icon.opacity },
-    { PropertyKey::IconSize, SymbolPaintProperties().icon.size },
     { PropertyKey::IconColor, SymbolPaintProperties().icon.color },
     { PropertyKey::IconHaloColor, SymbolPaintProperties().icon.halo_color },
     { PropertyKey::IconHaloWidth, SymbolPaintProperties().icon.halo_width },
@@ -36,7 +35,6 @@ const std::map<PropertyKey, PropertyValue> PropertyFallbackValue::properties = {
     { PropertyKey::IconTranslateAnchor, SymbolPaintProperties().icon.translate_anchor },
 
     { PropertyKey::TextOpacity, SymbolPaintProperties().text.opacity },
-    { PropertyKey::TextSize, SymbolPaintProperties().text.size },
     { PropertyKey::TextColor, SymbolPaintProperties().text.color },
     { PropertyKey::TextHaloColor, SymbolPaintProperties().text.halo_color },
     { PropertyKey::TextHaloWidth, SymbolPaintProperties().text.halo_width },
@@ -54,44 +52,6 @@ const std::map<PropertyKey, PropertyValue> PropertyFallbackValue::properties = {
 
     { PropertyKey::BackgroundOpacity, BackgroundPaintProperties().opacity },
     { PropertyKey::BackgroundColor, BackgroundPaintProperties().color },
-
-    { PropertyKey::LineCap, LineLayoutProperties().cap },
-    { PropertyKey::LineJoin, LineLayoutProperties().join },
-    { PropertyKey::LineMiterLimit, LineLayoutProperties().miter_limit },
-    { PropertyKey::LineRoundLimit, LineLayoutProperties().round_limit },
-
-    { PropertyKey::SymbolPlacement, SymbolLayoutProperties().placement },
-    { PropertyKey::SymbolSpacing, SymbolLayoutProperties().spacing },
-    { PropertyKey::SymbolAvoidEdges, SymbolLayoutProperties().avoid_edges },
-
-    { PropertyKey::IconAllowOverlap, SymbolLayoutProperties().icon.allow_overlap },
-    { PropertyKey::IconIgnorePlacement, SymbolLayoutProperties().icon.ignore_placement },
-    { PropertyKey::IconOptional, SymbolLayoutProperties().icon.optional },
-    { PropertyKey::IconRotationAlignment, SymbolLayoutProperties().icon.rotation_alignment },
-    { PropertyKey::IconImage, SymbolLayoutProperties().icon.image },
-    { PropertyKey::IconRotate, SymbolLayoutProperties().icon.rotate },
-    { PropertyKey::IconPadding, SymbolLayoutProperties().icon.padding },
-    { PropertyKey::IconKeepUpright, SymbolLayoutProperties().icon.keep_upright },
-    { PropertyKey::IconOffset, SymbolLayoutProperties().icon.offset },
-
-    { PropertyKey::TextRotationAlignment, SymbolLayoutProperties().text.rotation_alignment },
-    { PropertyKey::TextField, SymbolLayoutProperties().text.field },
-    { PropertyKey::TextFont, SymbolLayoutProperties().text.font },
-    { PropertyKey::TextMaxWidth, SymbolLayoutProperties().text.max_width },
-    { PropertyKey::TextLineHeight, SymbolLayoutProperties().text.line_height },
-    { PropertyKey::TextLetterSpacing, SymbolLayoutProperties().text.letter_spacing },
-    { PropertyKey::TextJustify, SymbolLayoutProperties().text.justify },
-    { PropertyKey::TextAnchor, SymbolLayoutProperties().text.anchor },
-    { PropertyKey::TextMaxAngle, SymbolLayoutProperties().text.max_angle },
-    { PropertyKey::TextRotate, SymbolLayoutProperties().text.rotate },
-    { PropertyKey::TextPadding, SymbolLayoutProperties().text.padding },
-    { PropertyKey::TextKeepUpright, SymbolLayoutProperties().text.keep_upright },
-    { PropertyKey::TextTransform, SymbolLayoutProperties().text.transform },
-    { PropertyKey::TextOffset, SymbolLayoutProperties().text.offset },
-    { PropertyKey::TextAllowOverlap, SymbolLayoutProperties().text.allow_overlap },
-    { PropertyKey::TextIgnorePlacement, SymbolLayoutProperties().text.ignore_placement },
-    { PropertyKey::TextOptional, SymbolLayoutProperties().text.optional },
-
 };
 
 const PropertyValue PropertyFallbackValue::defaultProperty = false;

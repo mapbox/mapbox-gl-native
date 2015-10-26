@@ -22,11 +22,6 @@ enum class PropertyKey {
     LineDashArray, // for transitions only
     LineImage,
 
-    LineCap,
-    LineJoin,
-    LineMiterLimit,
-    LineRoundLimit,
-
     CircleRadius,
     CircleColor,
     CircleOpacity,
@@ -34,28 +29,13 @@ enum class PropertyKey {
     CircleTranslateAnchor,
     CircleBlur,
 
-    SymbolPlacement,
-    SymbolSpacing,
-    SymbolAvoidEdges,
-
     IconOpacity,
-    IconSize,
     IconColor,
     IconHaloColor,
     IconHaloWidth,
     IconHaloBlur,
     IconTranslate,
     IconTranslateAnchor,
-
-    IconAllowOverlap,
-    IconIgnorePlacement,
-    IconOptional,
-    IconRotationAlignment,
-    IconImage,
-    IconOffset,
-    IconPadding,
-    IconRotate,
-    IconKeepUpright,
 
     TextOpacity,
     TextColor,
@@ -64,25 +44,6 @@ enum class PropertyKey {
     TextHaloBlur,
     TextTranslate,
     TextTranslateAnchor,
-
-    TextRotationAlignment,
-    TextField,
-    TextFont,
-    TextSize,
-    TextMaxWidth,
-    TextLineHeight,
-    TextLetterSpacing,
-    TextMaxAngle,
-    TextRotate,
-    TextPadding,
-    TextIgnorePlacement,
-    TextOptional,
-    TextJustify,
-    TextAnchor,
-    TextKeepUpright,
-    TextTransform,
-    TextOffset,
-    TextAllowOverlap,
 
     RasterOpacity,
     RasterHueRotate,
@@ -96,8 +57,6 @@ enum class PropertyKey {
     BackgroundOpacity,
     BackgroundColor,
     BackgroundImage,
-
-    Visibilty
 };
 
 }

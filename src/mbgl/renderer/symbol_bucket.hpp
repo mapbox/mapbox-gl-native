@@ -12,8 +12,8 @@
 #include <mbgl/text/collision_feature.hpp>
 #include <mbgl/text/shaping.hpp>
 #include <mbgl/text/quads.hpp>
-#include <mbgl/style/style_properties.hpp>
 #include <mbgl/style/filter_expression.hpp>
+#include <mbgl/layer/symbol_layer.hpp>
 
 #include <memory>
 #include <map>

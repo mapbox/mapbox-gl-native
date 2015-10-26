@@ -15,10 +15,10 @@ std::unique_ptr<StyleLayer> LineLayer::clone() const {
 }
 
 void LineLayer::parseLayout(const JSVal& value) {
-    parseProperty<Function<CapType>>("line-cap", PropertyKey::LineCap, layout, value);
-    parseProperty<Function<JoinType>>("line-join", PropertyKey::LineJoin, layout, value);
-    parseProperty<Function<float>>("line-miter-limit", PropertyKey::LineMiterLimit, layout, value);
-    parseProperty<Function<float>>("line-round-limit", PropertyKey::LineRoundLimit, layout, value);
+    layout.cap.parse("line-cap", value);
+    layout.join.parse("line-join", value);
+    layout.miterLimit.parse("line-miter-limit", value);
+    layout.roundLimit.parse("line-round-limit", value);
 }
 
 void LineLayer::parsePaints(const JSVal& layer) {
@@ -73,12 +73,13 @@ void LineLayer::recalculate(const StyleCalculationParameters& parameters) {
 std::unique_ptr<Bucket> LineLayer::createBucket(StyleBucketParameters& parameters) const {
     auto bucket = std::make_unique<LineBucket>();
 
-    const float z = parameters.tileID.z;
+    bucket->layout = layout;
 
-    layout.calculate(PropertyKey::LineCap, bucket->layout.cap, z);
-    layout.calculate(PropertyKey::LineJoin, bucket->layout.join, z);
-    layout.calculate(PropertyKey::LineMiterLimit, bucket->layout.miter_limit, z);
-    layout.calculate(PropertyKey::LineRoundLimit, bucket->layout.round_limit, z);
+    StyleCalculationParameters p(parameters.tileID.z);
+    bucket->layout.cap.calculate(p);
+    bucket->layout.join.calculate(p);
+    bucket->layout.miterLimit.calculate(p);
+    bucket->layout.roundLimit.calculate(p);
 
     parameters.eachFilteredFeature(filter, [&] (const auto& feature) {
         bucket->addGeometry(feature.getGeometries());

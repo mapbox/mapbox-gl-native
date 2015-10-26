@@ -8,7 +8,6 @@ namespace mbgl {
 std::unique_ptr<StyleLayer> FillLayer::clone() const {
     std::unique_ptr<FillLayer> result = std::make_unique<FillLayer>();
     result->copy(*this);
-    result->layout = layout;
     result->paints.paints = paints.paints;
     return std::move(result);
 }

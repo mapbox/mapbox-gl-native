@@ -55,7 +55,7 @@ void RasterTileData::request(float pixelRatio,
             state = State::loaded;
         }
 
-        workRequest = worker.parseRasterTile(std::make_unique<RasterBucket>(texturePool, layout), res.data, [this, callback] (RasterTileParseResult result) {
+        workRequest = worker.parseRasterTile(std::make_unique<RasterBucket>(texturePool), res.data, [this, callback] (RasterTileParseResult result) {
             workRequest.reset();
             if (state != State::loaded) {
                 return;

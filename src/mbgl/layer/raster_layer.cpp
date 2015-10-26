@@ -7,7 +7,6 @@ namespace mbgl {
 std::unique_ptr<StyleLayer> RasterLayer::clone() const {
     std::unique_ptr<RasterLayer> result = std::make_unique<RasterLayer>();
     result->copy(*this);
-    result->layout = layout;
     result->paints.paints = paints.paints;
     return std::move(result);
 }
