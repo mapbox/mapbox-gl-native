@@ -8,7 +8,7 @@ import java.lang.annotation.Retention;
 import java.lang.annotation.RetentionPolicy;
 
 /**
- * MyLocationTracking exposes different types location tracking modes.
+ * MyLocationTracking exposes different types of location tracking modes.
  *
  * @see MapView#setMyLocationTrackingMode(int)
  * @see com.mapbox.mapboxsdk.views.UserLocationView#setMyLocationTrackingMode(int)
@@ -24,27 +24,29 @@ public class MyLocationTracking {
     }
 
     /**
-     * Not tracking user
+     * Location tracking is disabled.
      */
     public static final int TRACKING_NONE = 0x00000000;
 
     /**
-     * Tracking the location of the user
+     * Tracking the only the location of the user.
      */
     public static final int TRACKING_FOLLOW = 0x00000004;
 
 //    /**
-//     * Tracking the location of the user with bearing from GPS
+//     * Tracking the location of the user with bearing from GPS.
 //     */
 //    public static final int TRACKING_FOLLOW_BEARING_GPS = 0x00000008;
 //
 //    /**
-//     * Tracking the location of the user with bearing from compass
+//     * Tracking the location of the user with bearing from compass.
 //     */
 //    public static final int TRACKING_FOLLOW_BEARING_COMPASS = 0x00000012;
 //
 //    /**
-//     * Tracking the location fot the user with bearing from GPS and compass
+//     * Tracking the location fot the user with bearing from GPS or compass.
+//     * <p>
+//     * The best source of bearing is selected automatically.
 //     */
 //    public static final int TRACKING_FOLLOW_BEARING = 0x00000016;
 

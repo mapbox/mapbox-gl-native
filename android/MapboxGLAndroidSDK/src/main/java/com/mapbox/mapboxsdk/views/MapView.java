@@ -1366,6 +1366,7 @@ public final class MapView extends FrameLayout {
      * An error message will be logged in the Android logcat and {@link MapView#DID_FAIL_LOADING_MAP} event will be sent.
      *
      * @param style The bundled style. Accepts one of the values from {@link Style}.
+     * @see Style
      */
     @UiThread
     public void setStyle(@Style.StyleUrl String style) {
@@ -2017,8 +2018,8 @@ public final class MapView extends FrameLayout {
     }
 
     /**
-     * Changes the map’s viewport to fit the given coordinate bounds, optionally some additional padding on each side
-     * and animating the change.
+     * Changes the map’s viewport to fit the given coordinate bounds with additional padding at the
+     * edge of the map,  optionally animating the change.
      *
      * @param bounds The bounds that the viewport will show in its entirety.
      * @param padding The minimum padding (in pixels) that will be visible around the given coordinate bounds.
@@ -3137,34 +3138,35 @@ public final class MapView extends FrameLayout {
     }
 
     /**
-     * Set the current my location tracking mode.
-     * Tracking my location disbales gestures, automatically moves the viewport
-     * and shows the direction the user is heading.
-     * See {@link MyLocationTracking} for different values.
+     * Sets the current my location tracking mode.
+     * <p>
+     * My location racking disables gestures, automatically moves the viewport to the users
+     * location and shows the direction the user is heading.
      *
-     * @param userLocationTrackingMode to be used.
-     * @see MyLocationTracking
+     * @param myLocationTrackingMode The my location tracking mode to use.
+     *                               Accepts one of the values from {@link MyLocationTracking.Mode}.
+     * @see MyLocationTracking.Mode
      */
     @UiThread
-    public void setMyLocationTrackingMode(@MyLocationTracking.Mode int userLocationTrackingMode) {
-        mUserLocationView.setMyLocationTrackingMode(userLocationTrackingMode);
+    public void setMyLocationTrackingMode(@MyLocationTracking.Mode int myLocationTrackingMode) {
+        mUserLocationView.setMyLocationTrackingMode(myLocationTrackingMode);
 
         // Enable/disable gestures based on tracking mode
-        if (userLocationTrackingMode == MyLocationTracking.TRACKING_NONE) {
+        if (myLocationTrackingMode == MyLocationTracking.TRACKING_NONE) {
             mScrollEnabled = true;
             mRotateEnabled = true;
         } else {
             mScrollEnabled = false;
-            mRotateEnabled = (userLocationTrackingMode == MyLocationTracking.TRACKING_FOLLOW);
+            mRotateEnabled = (myLocationTrackingMode == MyLocationTracking.TRACKING_FOLLOW);
         }
     }
 
     /**
      * Returns the current user location tracking mode.
-     * See {@link MyLocationTracking} for possible return values.
      *
-     * @return the current user location tracking mode.
-     * @see MyLocationTracking
+     * @return The current user location tracking mode.
+     * One of the values from {@link MyLocationTracking.Mode}.
+     * @see MyLocationTracking.Mode
      */
     @UiThread
     @MyLocationTracking.Mode
