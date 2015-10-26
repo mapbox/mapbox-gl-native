@@ -8,6 +8,7 @@
 #include <mbgl/util/ptr.hpp>
 #include <mbgl/style/filter_expression.hpp>
 #include <mbgl/style/style_calculation_parameters.hpp>
+#include <mbgl/text/placement_config.hpp>
 
 #include <string>
 #include <memory>
@@ -42,16 +43,13 @@ public:
                std::string sourceID,
                Style&,
                std::vector<util::ptr<StyleLayer>>,
-               const std::atomic<TileData::State>&,
-               std::unique_ptr<CollisionTile>);
+               const std::atomic<TileData::State>&);
     ~TileWorker();
 
-    TileParseResult parseAllLayers(const GeometryTile&);
+    TileParseResult parseAllLayers(const GeometryTile&, PlacementConfig);
     TileParseResult parsePendingLayers();
     void redoPlacement(const std::unordered_map<std::string, std::unique_ptr<Bucket>>*,
-                       float angle,
-                       float pitch,
-                       bool collisionDebug);
+                       PlacementConfig);
 
     std::vector<util::ptr<StyleLayer>> layers;
 

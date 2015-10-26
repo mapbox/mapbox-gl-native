@@ -4,6 +4,7 @@
 #include <mbgl/map/tile_data.hpp>
 #include <mbgl/map/tile_worker.hpp>
 #include <mbgl/storage/request_holder.hpp>
+#include <mbgl/text/placement_config.hpp>
 
 #include <atomic>
 
@@ -17,7 +18,7 @@ class Request;
 class VectorTileData : public TileData {
 public:
     VectorTileData(
-        const TileID&, Style&, const SourceInfo&, float angle_, float pitch_, bool collisionDebug_);
+        const TileID&, Style&, const SourceInfo&);
     ~VectorTileData();
 
     Bucket* getBucket(const StyleLayer&) override;
@@ -27,7 +28,8 @@ public:
     void parse(std::function<void()> callback);
     bool parsePending(std::function<void()> callback) override;
 
-    void redoPlacement(float angle, float pitch, bool collisionDebug) override;
+    void redoPlacement(PlacementConfig config) override;
+    void redoPlacement();
 
     void cancel() override;
 
@@ -43,12 +45,13 @@ private:
     const SourceInfo& source;
     RequestHolder req;
     std::shared_ptr<const std::string> data;
-    float lastAngle = 0;
-    float currentAngle;
-    float lastPitch = 0;
-    float currentPitch;
-    bool lastCollisionDebug = 0;
-    bool currentCollisionDebug = 0;
+
+    // Stores the placement configuration of the text that is currently placed on the screen.
+    PlacementConfig placedConfig;
+
+    // Stores the placement configuration of how the text should be placed. This isn't necessarily
+    // the one that is being displayed.
+    PlacementConfig targetConfig;
 };
 
 } // namespace mbgl

@@ -14,17 +14,12 @@ using namespace mbgl;
 
 LiveTileData::LiveTileData(const TileID& id_,
                            std::unique_ptr<AnnotationTile> tile_,
-                           Style& style_,
-                           const SourceInfo& source_,
+                           Style& style,
+                           const SourceInfo& source,
                            std::function<void()> callback)
     : TileData(id_),
-      worker(style_.workers),
-      tileWorker(id_,
-                 source_.source_id,
-                 style_,
-                 style_.layers,
-                 state,
-                 std::make_unique<CollisionTile>(0, 0, false)),
+      worker(style.workers),
+      tileWorker(id, source.source_id, style, style.layers, state),
       tile(std::move(tile_)) {
     state = State::loaded;
 
@@ -41,12 +36,17 @@ bool LiveTileData::parsePending(std::function<void()> callback) {
         return false;
     }
 
-    workRequest = worker.parseLiveTile(tileWorker, *tile, [this, callback] (TileParseResult result) {
+    workRequest.reset();
+    workRequest = worker.parseLiveTile(tileWorker, *tile, targetConfig, [this, callback, config = targetConfig] (TileParseResult result) {
         workRequest.reset();
 
         if (result.is<TileParseResultBuckets>()) {
             auto& resultBuckets = result.get<TileParseResultBuckets>();
             state = resultBuckets.state;
+
+            // Persist the configuration we just placed so that we can later check whether we need
+            // to place again in case the configuration has changed.
+            placedConfig = config;
 
             // Move over all buckets we received in this parse request, potentially overwriting
             // existing buckets in case we got a refresh parse.
@@ -54,12 +54,23 @@ bool LiveTileData::parsePending(std::function<void()> callback) {
                 buckets[bucket.first] = std::move(bucket.second);
             }
 
+            // The target configuration could have changed since we started placement. In this case,
+            // we're starting another placement run.
+            if (placedConfig != targetConfig) {
+                redoPlacement();
+            }
         } else {
             error = result.get<std::string>();
             state = State::obsolete;
         }
 
         callback();
+
+        // The target configuration could have changed since we started placement. In this case,
+        // we're starting another placement run.
+        if (!workRequest && placedConfig != targetConfig) {
+            redoPlacement();
+        }
     });
 
     return true;
@@ -86,4 +97,37 @@ Bucket* LiveTileData::getBucket(const StyleLayer& layer) {
 void LiveTileData::cancel() {
     state = State::obsolete;
     workRequest.reset();
+}
+
+void LiveTileData::redoPlacement(const PlacementConfig newConfig) {
+    if (newConfig != placedConfig) {
+        targetConfig = newConfig;
+
+        if (!workRequest) {
+            // Don't start a new placement request when the current one hasn't completed yet, or
+            // when we are parsing buckets.
+            redoPlacement();
+        }
+    }
+}
+
+void LiveTileData::redoPlacement() {
+    workRequest.reset();
+    workRequest = worker.redoPlacement(tileWorker, buckets, targetConfig, [this, config = targetConfig] {
+        workRequest.reset();
+
+        // Persist the configuration we just placed so that we can later check whether we need to
+        // place again in case the configuration has changed.
+        placedConfig = config;
+
+        for (auto& bucket : buckets) {
+            bucket.second->swapRenderData();
+        }
+
+        // The target configuration could have changed since we started placement. In this case,
+        // we're starting another placement run.
+        if (placedConfig != targetConfig) {
+            redoPlacement();
+        }
+    });
 }

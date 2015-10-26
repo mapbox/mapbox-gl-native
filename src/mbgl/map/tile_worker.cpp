@@ -19,15 +19,13 @@ TileWorker::TileWorker(TileID id_,
                        std::string sourceID_,
                        Style& style_,
                        std::vector<util::ptr<StyleLayer>> layers_,
-                       const std::atomic<TileData::State>& state_,
-                       std::unique_ptr<CollisionTile> collision_)
+                       const std::atomic<TileData::State>& state_)
     : layers(std::move(layers_)),
       id(id_),
       sourceID(sourceID_),
       parameters(id.z),
       style(style_),
-      state(state_),
-      collisionTile(std::move(collision_)) {
+      state(state_) {
     assert(style.sprite);
 }
 
@@ -35,9 +33,13 @@ TileWorker::~TileWorker() {
     style.glyphAtlas->removeGlyphs(reinterpret_cast<uintptr_t>(this));
 }
 
-TileParseResult TileWorker::parseAllLayers(const GeometryTile& geometryTile) {
+TileParseResult TileWorker::parseAllLayers(const GeometryTile& geometryTile,
+                                           PlacementConfig config) {
     // We're doing a fresh parse of the tile, because the underlying data has changed.
     pending.clear();
+
+    // Reset the collision tile so we have a clean slate; we're placing all features anyway.
+    collisionTile = std::make_unique<CollisionTile>(config);
 
     // We're storing a list of buckets we've parsed to avoid parsing a bucket twice that is
     // referenced from more than one layer
@@ -84,12 +86,10 @@ TileParseResult TileWorker::parsePendingLayers() {
 
 void TileWorker::redoPlacement(
     const std::unordered_map<std::string, std::unique_ptr<Bucket>>* buckets,
-    float angle,
-    float pitch,
-    bool collisionDebug) {
+    PlacementConfig config) {
 
     // Reset the collision tile so we have a clean slate; we're placing all features anyway.
-    collisionTile = std::make_unique<CollisionTile>(angle, pitch, collisionDebug);
+    collisionTile = std::make_unique<CollisionTile>(config);
 
     for (auto i = layers.rbegin(); i != layers.rend(); i++) {
         const auto it = buckets->find((*i)->id);
@@ -268,11 +268,17 @@ void TileWorker::createSymbolBucket(const GeometryTileLayer& layer,
 
     bucket->parseFeatures(layer, styleBucket.filter);
 
+    assert(style.glyphStore);
+    assert(style.sprite);
     const bool needsDependencies = bucket->needsDependencies(*style.glyphStore, *style.sprite);
     if (needsDependencies) {
         // We cannot parse this bucket yet. Instead, we're saving it for later.
         pending.emplace_back(styleBucket, std::move(bucket));
     } else {
+        assert(style.spriteAtlas);
+        assert(style.glyphAtlas);
+        assert(style.glyphStore);
+        assert(collisionTile);
         bucket->addFeatures(reinterpret_cast<uintptr_t>(this), *style.spriteAtlas,
                             *style.glyphAtlas, *style.glyphStore, *collisionTile);
         insertBucket(styleBucket.name, std::move(bucket));

@@ -4,6 +4,7 @@
 #include <mbgl/util/noncopyable.hpp>
 #include <mbgl/map/tile_id.hpp>
 #include <mbgl/renderer/bucket.hpp>
+#include <mbgl/text/placement_config.hpp>
 
 #include <atomic>
 #include <string>
@@ -76,7 +77,7 @@ public:
     virtual Bucket* getBucket(const StyleLayer&) = 0;
 
     virtual bool parsePending(std::function<void ()>) { return true; }
-    virtual void redoPlacement(float, float, bool) {}
+    virtual void redoPlacement(PlacementConfig) {}
 
     bool isReady() const {
         return isReadyState(state);

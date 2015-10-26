@@ -3,17 +3,16 @@
 
 namespace mbgl {
 
-CollisionTile::CollisionTile(const float angle_, const float pitch, bool debug_) :
-    angle(angle_), debug(debug_) {
+CollisionTile::CollisionTile(PlacementConfig config_) : config(config_) {
     tree.clear();
 
-     // Compute the transformation matrix.
-    float angle_sin = std::sin(angle);
-    float angle_cos = std::cos(angle);
-    rotationMatrix = {{angle_cos, -angle_sin, angle_sin, angle_cos}};
+    // Compute the transformation matrix.
+    const float angle_sin = std::sin(config.angle);
+    const float angle_cos = std::cos(config.angle);
+    rotationMatrix = { { angle_cos, -angle_sin, angle_sin, angle_cos } };
 
     // Stretch boxes in y direction to account for the map tilt.
-    const float _yStretch = 1.0f / std::cos(pitch);
+    const float _yStretch = 1.0f / std::cos(config.pitch);
 
     // The amount the map is squished depends on the y position.
     // Sort of account for this by making all boxes a bit bigger.

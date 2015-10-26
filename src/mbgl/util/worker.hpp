@@ -37,6 +37,7 @@ public:
 
     Request parseVectorTile(TileWorker&,
                             std::shared_ptr<const std::string> data,
+                            PlacementConfig config,
                             std::function<void(TileParseResult)> callback);
 
     Request parsePendingVectorTileLayers(TileWorker&,
@@ -44,13 +45,12 @@ public:
 
     Request parseLiveTile(TileWorker&,
                           const AnnotationTile&,
+                          PlacementConfig config,
                           std::function<void(TileParseResult)> callback);
 
     Request redoPlacement(TileWorker&,
                           const std::unordered_map<std::string, std::unique_ptr<Bucket>>&,
-                          float angle,
-                          float pitch,
-                          bool collisionDebug,
+                          PlacementConfig config,
                           std::function<void()> callback);
 
 private:

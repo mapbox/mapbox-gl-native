@@ -22,6 +22,9 @@ public:
 
     bool parsePending(std::function<void ()> callback) override;
 
+    void redoPlacement(PlacementConfig config) override;
+    void redoPlacement();
+
     void cancel() override;
     Bucket* getBucket(const StyleLayer&) override;
 
@@ -34,6 +37,13 @@ private:
     // Contains all the Bucket objects for the tile. Buckets are render
     // objects and they get added by tile parsing operations.
     std::unordered_map<std::string, std::unique_ptr<Bucket>> buckets;
+
+    // Stores the placement configuration of the text that is currently placed on the screen.
+    PlacementConfig placedConfig;
+
+    // Stores the placement configuration of how the text should be placed. This isn't necessarily
+    // the one that is being displayed.
+    PlacementConfig targetConfig;
 };
 
 }

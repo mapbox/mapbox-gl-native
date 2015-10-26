@@ -14,23 +14,15 @@ using namespace mbgl;
 
 VectorTileData::VectorTileData(const TileID& id_,
                                Style& style_,
-                               const SourceInfo& source_,
-                               float angle,
-                               float pitch,
-                               bool collisionDebug)
+                               const SourceInfo& source_)
     : TileData(id_),
       worker(style_.workers),
       tileWorker(id_,
                  source_.source_id,
                  style_,
                  style_.layers,
-                 state,
-                 std::make_unique<CollisionTile>(angle, pitch, collisionDebug)),
-      source(source_),
-      lastAngle(angle),
-      currentAngle(angle),
-      currentPitch(pitch),
-      currentCollisionDebug(collisionDebug) {
+                 state),
+      source(source_) {
 }
 
 VectorTileData::~VectorTileData() {
@@ -81,7 +73,7 @@ void VectorTileData::parse(std::function<void ()> callback) {
     // when tile data changed. Replacing the workdRequest will cancel a pending work
     // request in case there is one.
     workRequest.reset();
-    workRequest = worker.parseVectorTile(tileWorker, data, [this, callback] (TileParseResult result) {
+    workRequest = worker.parseVectorTile(tileWorker, data, targetConfig, [this, callback, config = targetConfig] (TileParseResult result) {
         workRequest.reset();
         if (state == State::obsolete) {
             return;
@@ -91,10 +83,20 @@ void VectorTileData::parse(std::function<void ()> callback) {
             auto& resultBuckets = result.get<TileParseResultBuckets>();
             state = resultBuckets.state;
 
+            // Persist the configuration we just placed so that we can later check whether we need to
+            // place again in case the configuration has changed.
+            placedConfig = config;
+
             // Move over all buckets we received in this parse request, potentially overwriting
             // existing buckets in case we got a refresh parse.
             for (auto& bucket : resultBuckets.buckets) {
                 buckets[bucket.first] = std::move(bucket.second);
+            }
+
+            // The target configuration could have changed since we started placement. In this case,
+            // we're starting another placement run.
+            if (placedConfig != targetConfig) {
+                redoPlacement();
             }
         } else {
             std::stringstream message;
@@ -129,6 +131,12 @@ bool VectorTileData::parsePending(std::function<void()> callback) {
             for (auto& bucket : resultBuckets.buckets) {
                 buckets[bucket.first] = std::move(bucket.second);
             }
+
+            // The target configuration could have changed since we started placement. In this case,
+            // we're starting another placement run.
+            if (placedConfig != targetConfig) {
+                redoPlacement();
+            }
         } else {
             std::stringstream message;
             message << "Failed to parse [" << std::string(id) << "]: " << result.get<std::string>();
@@ -156,34 +164,36 @@ Bucket* VectorTileData::getBucket(const StyleLayer& layer) {
     return it->second.get();
 }
 
-void VectorTileData::redoPlacement(float angle, float pitch, bool collisionDebug) {
-    if (angle == currentAngle && pitch == currentPitch && collisionDebug == currentCollisionDebug)
-        return;
+void VectorTileData::redoPlacement(const PlacementConfig newConfig) {
+    if (newConfig != placedConfig) {
+        targetConfig = newConfig;
 
-    lastAngle = angle;
-    lastPitch = pitch;
-    lastCollisionDebug = collisionDebug;
-
-    if (workRequest) {
-        // Don't start a new placement request when the current one hasn't completed yet, or when
-        // we are parsing buckets.
-        return;
-    }
-
-    currentAngle = angle;
-    currentPitch = pitch;
-    currentCollisionDebug = collisionDebug;
-
-    workRequest.reset();
-    workRequest = worker.redoPlacement(tileWorker, buckets, angle, pitch, collisionDebug, [this] {
-        workRequest.reset();
-        for (const auto& layer : tileWorker.layers) {
-            auto bucket = getBucket(*layer);
-            if (bucket) {
-                bucket->swapRenderData();
-            }
+        if (!workRequest) {
+            // Don't start a new placement request when the current one hasn't completed yet, or when
+            // we are parsing buckets.
+            redoPlacement();
         }
-        redoPlacement(lastAngle, lastPitch, lastCollisionDebug);
+    }
+}
+
+void VectorTileData::redoPlacement() {
+    workRequest.reset();
+    workRequest = worker.redoPlacement(tileWorker, buckets, targetConfig, [this, config = targetConfig] {
+        workRequest.reset();
+
+        // Persist the configuration we just placed so that we can later check whether we need to
+        // place again in case the configuration has changed.
+        placedConfig = config;
+
+        for (auto& bucket : buckets) {
+            bucket.second->swapRenderData();
+        }
+
+        // The target configuration could have changed since we started placement. In this case,
+        // we're starting another placement run.
+        if (placedConfig != targetConfig) {
+            redoPlacement();
+        }
     });
 }
 

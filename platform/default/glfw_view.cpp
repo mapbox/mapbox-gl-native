@@ -213,7 +213,7 @@ void GLFWView::addRandomPointAnnotations(int count) {
     std::vector<mbgl::PointAnnotation> points;
 
     for (int i = 0; i < count; i++) {
-        points.emplace_back(makeRandomPoint(), "default_marker");
+        points.emplace_back(makeRandomPoint(), "marker-15");
     }
 
     auto newIDs = map->addPointAnnotations(points);

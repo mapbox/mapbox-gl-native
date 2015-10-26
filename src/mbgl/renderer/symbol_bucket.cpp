@@ -382,8 +382,8 @@ void SymbolBucket::placeFeatures(CollisionTile& collisionTile, bool swapImmediat
     // Don't sort symbols that won't overlap because it isn't necessary and
     // because it causes more labels to pop in and out when rotating.
     if (mayOverlap) {
-        float sin = std::sin(collisionTile.angle);
-        float cos = std::cos(collisionTile.angle);
+        const float sin = std::sin(collisionTile.config.angle);
+        const float cos = std::cos(collisionTile.config.angle);
 
         std::sort(symbolInstances.begin(), symbolInstances.end(), [sin, cos](SymbolInstance &a, SymbolInstance &b) {
             const float aRotated = sin * a.x + cos * a.y;
@@ -426,8 +426,9 @@ void SymbolBucket::placeFeatures(CollisionTile& collisionTile, bool swapImmediat
                 collisionTile.insertFeature(symbolInstance.textCollisionFeature, glyphScale);
             }
             if (glyphScale < collisionTile.maxScale) {
-                addSymbols<SymbolRenderData::TextBuffer, TextElementGroup>(renderDataInProgress->text,
-                        symbolInstance.glyphQuads, glyphScale, layout.text.keep_upright, textAlongLine, collisionTile.angle);
+                addSymbols<SymbolRenderData::TextBuffer, TextElementGroup>(
+                    renderDataInProgress->text, symbolInstance.glyphQuads, glyphScale,
+                    layout.text.keep_upright, textAlongLine, collisionTile.config.angle);
             }
         }
 
@@ -436,13 +437,16 @@ void SymbolBucket::placeFeatures(CollisionTile& collisionTile, bool swapImmediat
                 collisionTile.insertFeature(symbolInstance.iconCollisionFeature, iconScale);
             }
             if (iconScale < collisionTile.maxScale) {
-                addSymbols<SymbolRenderData::IconBuffer, IconElementGroup>(renderDataInProgress->icon,
-                        symbolInstance.iconQuads, iconScale, layout.icon.keep_upright, iconAlongLine, collisionTile.angle);
+                addSymbols<SymbolRenderData::IconBuffer, IconElementGroup>(
+                    renderDataInProgress->icon, symbolInstance.iconQuads, iconScale,
+                    layout.icon.keep_upright, iconAlongLine, collisionTile.config.angle);
             }
         }
     }
 
-    if (collisionTile.getDebug()) addToDebugBuffers(collisionTile);
+    if (collisionTile.config.debug) {
+        addToDebugBuffers(collisionTile);
+    }
 
     if (swapImmediately) swapRenderData();
 }
@@ -513,7 +517,7 @@ void SymbolBucket::addSymbols(Buffer &buffer, const SymbolQuads &symbols, float 
 void SymbolBucket::addToDebugBuffers(CollisionTile &collisionTile) {
 
     const float yStretch = collisionTile.yStretch;
-    const float angle = collisionTile.angle;
+    const float angle = collisionTile.config.angle;
     float angle_sin = std::sin(-angle);
     float angle_cos = std::cos(-angle);
     std::array<float, 4> matrix = {{angle_cos, -angle_sin, angle_sin, angle_cos}};
@@ -562,7 +566,9 @@ void SymbolBucket::addToDebugBuffers(CollisionTile &collisionTile) {
 }
 
 void SymbolBucket::swapRenderData() {
-    renderData = std::move(renderDataInProgress);
+    if (renderDataInProgress) {
+        renderData = std::move(renderDataInProgress);
+    }
 }
 
 void SymbolBucket::drawGlyphs(SDFShader &shader) {

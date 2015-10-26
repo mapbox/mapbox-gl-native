@@ -37,10 +37,11 @@ public:
 
     void parseVectorTile(TileWorker* worker,
                          const std::shared_ptr<const std::string> data,
+                         PlacementConfig config,
                          std::function<void(TileParseResult)> callback) {
         try {
             pbf tilePBF(reinterpret_cast<const unsigned char*>(data->data()), data->size());
-            callback(worker->parseAllLayers(VectorTile(tilePBF)));
+            callback(worker->parseAllLayers(VectorTile(tilePBF), config));
         } catch (const std::exception& ex) {
             callback(TileParseResult(ex.what()));
         }
@@ -57,9 +58,10 @@ public:
 
     void parseLiveTile(TileWorker* worker,
                        const AnnotationTile* tile,
+                       PlacementConfig config,
                        std::function<void(TileParseResult)> callback) {
         try {
-            callback(worker->parseAllLayers(*tile));
+            callback(worker->parseAllLayers(*tile, config));
         } catch (const std::exception& ex) {
             callback(TileParseResult(ex.what()));
         }
@@ -67,11 +69,9 @@ public:
 
     void redoPlacement(TileWorker* worker,
                        const std::unordered_map<std::string, std::unique_ptr<Bucket>>* buckets,
-                       float angle,
-                       float pitch,
-                       bool collisionDebug,
+                       PlacementConfig config,
                        std::function<void()> callback) {
-        worker->redoPlacement(buckets, angle, pitch, collisionDebug);
+        worker->redoPlacement(buckets, config);
         callback();
     }
 };
@@ -97,10 +97,11 @@ Worker::parseRasterTile(std::unique_ptr<RasterBucket> bucket,
 std::unique_ptr<WorkRequest>
 Worker::parseVectorTile(TileWorker& worker,
                         const std::shared_ptr<const std::string> data,
+                        PlacementConfig config,
                         std::function<void(TileParseResult)> callback) {
     current = (current + 1) % threads.size();
     return threads[current]->invokeWithCallback(&Worker::Impl::parseVectorTile, callback, &worker,
-                                                data);
+                                                data, config);
 }
 
 std::unique_ptr<WorkRequest>
@@ -113,22 +114,21 @@ Worker::parsePendingVectorTileLayers(TileWorker& worker,
 
 std::unique_ptr<WorkRequest> Worker::parseLiveTile(TileWorker& worker,
                                                    const AnnotationTile& tile,
+                                                   PlacementConfig config,
                                                    std::function<void(TileParseResult)> callback) {
     current = (current + 1) % threads.size();
     return threads[current]->invokeWithCallback(&Worker::Impl::parseLiveTile, callback, &worker,
-                                                &tile);
+                                                &tile, config);
 }
 
 std::unique_ptr<WorkRequest>
 Worker::redoPlacement(TileWorker& worker,
                       const std::unordered_map<std::string, std::unique_ptr<Bucket>>& buckets,
-                      float angle,
-                      float pitch,
-                      bool collisionDebug,
+                      PlacementConfig config,
                       std::function<void()> callback) {
     current = (current + 1) % threads.size();
     return threads[current]->invokeWithCallback(&Worker::Impl::redoPlacement, callback, &worker,
-                                                &buckets, angle, pitch, collisionDebug);
+                                                &buckets, config);
 }
 
 } // end namespace mbgl
