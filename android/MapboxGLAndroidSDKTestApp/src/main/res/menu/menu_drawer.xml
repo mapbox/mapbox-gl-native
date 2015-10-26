@@ -59,20 +59,6 @@
         </menu>
     </item>
 
-    <!--
-        <group android:id="@+id/locationFollowModesSeparator"/>
-
-        <group android:id="@+id/locationFollowModes" android:checkableBehavior="single">
-            <item android:id="@+id/followNone"
-                  android:title="@string/action_location_none"/>
-            <item android:id="@+id/followFollow"
-                  android:title="@string/action_location_follow"/>
-            <item android:id="@+id/followBearing"
-                  android:title="@string/action_location_bearing"/>
-        </group>
-    -->
-
-
     <group android:id="@+id/testsSeparator" />
 
     <item
@@ -115,6 +101,12 @@
                 android:checkable="false"
                 android:icon="@drawable/ic_blur_on_white_24dp"
                 android:title="@string/action_add_bulk_markers" />
+
+            <item
+                android:id="@+id/action_user_tracking_mode"
+                android:checkable="false"
+                android:icon="@drawable/ic_gps_fixed_white_24dp"
+                android:title="@string/activity_user_tracking_mode" />
 
         </menu>
     </item>

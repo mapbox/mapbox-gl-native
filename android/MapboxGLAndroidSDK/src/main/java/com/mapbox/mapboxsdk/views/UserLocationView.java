@@ -5,7 +5,6 @@ import android.animation.ValueAnimator;
 import android.content.Context;
 import android.content.res.Resources;
 import android.graphics.Canvas;
-import android.graphics.Color;
 import android.graphics.Matrix;
 import android.graphics.Paint;
 import android.graphics.Path;
@@ -21,17 +20,16 @@ import android.view.View;
 import android.view.ViewGroup;
 
 import com.mapbox.mapboxsdk.R;
+import com.mapbox.mapboxsdk.constants.MyLocationTracking;
 import com.mapbox.mapboxsdk.geometry.LatLng;
 import com.mapzen.android.lost.api.LocationListener;
 import com.mapzen.android.lost.api.LocationRequest;
 import com.mapzen.android.lost.api.LocationServices;
 import com.mapzen.android.lost.api.LostApiClient;
 
-import java.lang.ref.WeakReference;
-
 final class UserLocationView extends View {
 
-    private WeakReference<MapView> mMapView;
+    private MapView mMapView;
 
     private static final int BLUE_COLOR = 0x39ACCBFF;
 
@@ -79,6 +77,9 @@ final class UserLocationView extends View {
 
     MapView.OnMyLocationChangeListener mOnMyLocationChangeListener;
 
+    @MyLocationTracking.Mode
+    private int mMyLocationTrackingMode;
+
     public UserLocationView(MapView mapView, Context context) {
         super(context);
         initialize(mapView, context);
@@ -95,7 +96,7 @@ final class UserLocationView extends View {
     }
 
     private void initialize(MapView mapView, Context context) {
-        mMapView = new WeakReference<MapView>(mapView);
+        mMapView = mapView;
 
         // View configuration
         setEnabled(false);
@@ -208,6 +209,20 @@ final class UserLocationView extends View {
         }
     }
 
+    public void setMyLocationTrackingMode(@MyLocationTracking.Mode int myLocationTrackingMode) {
+        mMyLocationTrackingMode = myLocationTrackingMode;
+
+        if (myLocationTrackingMode != MyLocationTracking.TRACKING_NONE && mUserLocation != null) {
+            // center map directly if we have a location fix
+            mMapView.setCenterCoordinate(new LatLng(mUserLocation.getLatitude(), mUserLocation.getLongitude()));
+        }
+    }
+
+    @MyLocationTracking.Mode
+    public int getMyLocationTrackingMode() {
+        return mMyLocationTrackingMode;
+    }
+
     @Override
     public void setEnabled(boolean enabled) {
         super.setEnabled(enabled);
@@ -221,7 +236,7 @@ final class UserLocationView extends View {
 
             // compute new marker position
             // TODO add JNI method that takes existing pointf
-            mMarkerScreenPoint = mMapView.get().toScreenLocation(mMarkerCoordinate);
+            mMarkerScreenPoint = mMapView.toScreenLocation(mMarkerCoordinate);
             mMarkerScreenMatrix.reset();
             mMarkerScreenMatrix.setTranslate(
                     mMarkerScreenPoint.x,
@@ -230,14 +245,14 @@ final class UserLocationView extends View {
             // rotate so arrow in points to bearing
             if (mShowDirection) {
                 mMarkerScreenMatrix.preRotate(mMarkerDirection +
-                        (float) mMapView.get().getDirection());
+                        (float) mMapView.getDirection());
             }
 
             // adjust accuracy circle
             if (mShowAccuracy) {
                 mAccuracyPath.reset();
                 mAccuracyPath.addCircle(0.0f, 0.0f,
-                        (float) (mMarkerAccuracy / mMapView.get().getMetersPerPixelAtLatitude(
+                        (float) (mMarkerAccuracy / mMapView.getMetersPerPixelAtLatitude(
                                 mMarkerCoordinate.getLatitude())),
                         Path.Direction.CW);
 
@@ -344,12 +359,19 @@ final class UserLocationView extends View {
             previousCoordinate = new LatLng(mUserLocation);
         }
 
-        mMarkerCoordinateAnimator = ValueAnimator.ofFloat(0.0f, 1.0f);
-        mMarkerCoordinateAnimator.setDuration(1000);
-        mMarkerCoordinateAnimator.addUpdateListener(new MarkerCoordinateAnimatorListener(
-                previousCoordinate, new LatLng(location)
-        ));
-        mMarkerCoordinateAnimator.start();
+        if(mMyLocationTrackingMode== MyLocationTracking.TRACKING_NONE) {
+            // moving marker above map
+            mMarkerCoordinateAnimator = ValueAnimator.ofFloat(0.0f, 1.0f);
+            mMarkerCoordinateAnimator.setDuration(1000);
+            mMarkerCoordinateAnimator.addUpdateListener(new MarkerCoordinateAnimatorListener(
+                    previousCoordinate, new LatLng(location)
+            ));
+            mMarkerCoordinateAnimator.start();
+        }else{
+            // moving map under the tracker
+            mMarkerCoordinate = new LatLng(location);
+            mMapView.setCenterCoordinate(mMarkerCoordinate, true);
+        }
 
         mShowDirection = location.hasBearing();
         if (mShowDirection) {
@@ -388,7 +410,7 @@ final class UserLocationView extends View {
     }
 
     void updateOnNextFrame() {
-        mMapView.get().update();
+        mMapView.update();
     }
 
     public void pause() {

@@ -10,14 +10,13 @@
     <string name="activity_marker_in_bulk">Add Bulk Markers Activity</string>
     <string name="activity_info_window">InfoWindow Activity</string>
     <string name="activity_visible_coordinate_bounds">Visible Coordinate Bounds</string>
+    <string name="activity_user_tracking_mode">User tracking mode</string>
 
     <string name="navdrawer_menu_title_mainactivity_controls">Main Activity Controls</string>
     <string name="navdrawer_menu_title_mainactivity_styles">Main Activity Styles</string>
     <string name="navdrawer_menu_title_individual_tests">Individual Tests</string>
     <string name="action_gps">Toggle GPS location</string>
-    <string name="action_location_none">Disable tracking</string>
-    <string name="action_location_follow">Use follow tracking mode</string>
-    <string name="action_location_bearing">Use bearing tracking mode tracking</string>
+    <string name="action_user_location_tracking">User location tracking</string>
     <string name="action_compass">Toggle compass</string>
     <string name="action_debug">Toggle debug mode</string>
     <string name="action_point_annotations">Toggle point annotations</string>
@@ -48,6 +47,14 @@
         <item>100</item>
         <item>1000</item>
         <item>10000</item>
+    </string-array>
+
+    <string-array name="user_tracking_mode">
+        <item>Disable tracking</item>
+        <item>Follow tracking mode</item>
+        <!--<item>Bearing tracking GPS mode</item>-->
+        <!--<item>Bearing tracking Compass mode</item>-->
+        <!--<item>Bearing tracking mode</item>-->
     </string-array>
 
 </resources>

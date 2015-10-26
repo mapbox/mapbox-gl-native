@@ -339,6 +339,10 @@ public class MainActivity extends AppCompatActivity {
                                 startActivity(new Intent(getApplicationContext(), VisibleCoordinateBoundsActivity.class));
                                 return true;
 
+                            case R.id.action_user_tracking_mode:
+                                startActivity(new Intent(getApplicationContext(), MyLocationTrackingModeActivity.class));
+                                return true;
+
                             default:
                                 return changeMapStyle(menuItem.getItemId());
                         }
