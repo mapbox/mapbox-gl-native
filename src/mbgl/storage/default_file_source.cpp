@@ -7,7 +7,6 @@
 #include <mbgl/platform/platform.hpp>
 #include <mbgl/platform/log.hpp>
 
-#include <mbgl/util/uv_detail.hpp>
 #include <mbgl/util/thread.hpp>
 #include <mbgl/util/mapbox.hpp>
 #include <mbgl/util/exception.hpp>
@@ -236,11 +235,10 @@ void DefaultFileSource::Impl::reschedule(DefaultFileRequestImpl& request) {
         update(request);
     } else if (timeout > Seconds::zero()) {
         if (!request.timerRequest) {
-            request.timerRequest = std::make_unique<uv::timer>(util::RunLoop::getLoop());
+            request.timerRequest = std::make_unique<util::Timer>();
         }
 
-        // timeout is in seconds, but the timer takes milliseconds.
-        request.timerRequest->start(asMilliseconds(timeout).count(), 0, [this, &request] {
+        request.timerRequest->start(timeout, Duration::zero(), [this, &request] {
             assert(!request.realRequest);
             startRealRequest(request);
         });

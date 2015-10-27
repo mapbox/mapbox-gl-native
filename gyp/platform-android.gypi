@@ -19,6 +19,7 @@
         '../platform/default/image.cpp',
         '../platform/default/png_reader.cpp',
         '../platform/default/jpeg_reader.cpp',
+        '../platform/default/timer.cpp',
       ],
 
       'variables': {

@@ -12,6 +12,7 @@
       'sources': [
         '../platform/default/async_task.cpp',
         '../platform/default/run_loop.cpp',
+        '../platform/default/timer.cpp',
         '../platform/darwin/log_nslog.mm',
         '../platform/darwin/string_nsstring.mm',
         '../platform/darwin/application_root.mm',
