@@ -21,13 +21,15 @@ TileWorker::TileWorker(TileID id_,
                        SpriteStore& spriteStore_,
                        GlyphAtlas& glyphAtlas_,
                        GlyphStore& glyphStore_,
-                       const std::atomic<TileData::State>& state_)
+                       const std::atomic<TileData::State>& state_,
+                       const MapMode mode_)
     : id(id_),
       sourceID(std::move(sourceID_)),
       spriteStore(spriteStore_),
       glyphAtlas(glyphAtlas_),
       glyphStore(glyphStore_),
-      state(state_) {
+      state(state_),
+      mode(mode_) {
 }
 
 TileWorker::~TileWorker() {
@@ -140,7 +142,8 @@ void TileWorker::parseLayer(const StyleLayer* layer, const GeometryTile& geometr
                                      spriteStore,
                                      glyphAtlas,
                                      glyphStore,
-                                     *collisionTile);
+                                     *collisionTile,
+                                     mode);
 
     std::unique_ptr<Bucket> bucket = layer->createBucket(parameters);
 

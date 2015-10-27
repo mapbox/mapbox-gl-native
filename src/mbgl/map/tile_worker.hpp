@@ -3,6 +3,7 @@
 
 #include <mapbox/variant.hpp>
 
+#include <mbgl/map/mode.hpp>
 #include <mbgl/map/tile_data.hpp>
 #include <mbgl/util/noncopyable.hpp>
 #include <mbgl/util/ptr.hpp>
@@ -44,7 +45,8 @@ public:
                SpriteStore&,
                GlyphAtlas&,
                GlyphStore&,
-               const std::atomic<TileData::State>&);
+               const std::atomic<TileData::State>&,
+               const MapMode);
     ~TileWorker();
 
     TileParseResult parseAllLayers(std::vector<std::unique_ptr<StyleLayer>>,
@@ -67,6 +69,7 @@ private:
     GlyphAtlas& glyphAtlas;
     GlyphStore& glyphStore;
     const std::atomic<TileData::State>& state;
+    const MapMode mode;
 
     bool partialParse = false;
 

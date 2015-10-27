@@ -53,8 +53,8 @@ SymbolInstance::SymbolInstance(Anchor& anchor, const std::vector<Coordinate>& li
     iconCollisionFeature(line, anchor, shapedIcon, iconBoxScale, iconPadding, iconAlongLine) {};
 
 
-SymbolBucket::SymbolBucket(float overscaling_, float zoom_)
-    : overscaling(overscaling_), zoom(zoom_), tileSize(512 * overscaling_), tilePixelRatio(tileExtent / tileSize) {
+SymbolBucket::SymbolBucket(float overscaling_, float zoom_, const MapMode mode_)
+    : overscaling(overscaling_), zoom(zoom_), tileSize(512 * overscaling_), tilePixelRatio(tileExtent / tileSize), mode(mode_) {
 }
 
 SymbolBucket::~SymbolBucket() {
@@ -329,7 +329,7 @@ void SymbolBucket::addFeature(const std::vector<std::vector<Coordinate>> &lines,
             // the buffers for both tiles and clipped to tile boundaries at draw time.
             //
             // TODO remove the `&& false` when is #1673 implemented
-            const bool addToBuffers = inside || (mayOverlap && false);
+            const bool addToBuffers = (mode == MapMode::Still) || inside || (mayOverlap && false);
 
             symbolInstances.emplace_back(anchor, line, shapedText, shapedIcon, layout, addToBuffers,
                     textBoxScale, textPadding, textAlongLine,

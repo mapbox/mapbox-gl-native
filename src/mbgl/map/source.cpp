@@ -330,6 +330,7 @@ TileData::State Source::addTile(const TileID& id, const StyleUpdateParameters& p
                                                              std::move(monitor),
                                                              info.source_id,
                                                              parameters.style,
+                                                             parameters.mode,
                                                              callback);
         }
 

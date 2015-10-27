@@ -3,6 +3,7 @@
 
 #include <mbgl/renderer/bucket.hpp>
 #include <mbgl/map/geometry_tile.hpp>
+#include <mbgl/map/mode.hpp>
 #include <mbgl/geometry/vao.hpp>
 #include <mbgl/geometry/elements_buffer.hpp>
 #include <mbgl/geometry/text_buffer.hpp>
@@ -65,7 +66,7 @@ class SymbolBucket : public Bucket {
     typedef ElementGroup<1> CollisionBoxElementGroup;
 
 public:
-    SymbolBucket(float overscaling, float zoom);
+    SymbolBucket(float overscaling, float zoom, const MapMode);
     ~SymbolBucket() override;
 
     void upload() override;
@@ -119,6 +120,7 @@ private:
     const float tileSize;
     const float tileExtent = 4096.0f;
     const float tilePixelRatio;
+    const MapMode mode;
 
     std::set<GlyphRange> ranges;
     std::vector<SymbolInstance> symbolInstances;

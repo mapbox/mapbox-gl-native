@@ -12,6 +12,7 @@ VectorTileData::VectorTileData(const TileID& id_,
                                std::unique_ptr<GeometryTileMonitor> monitor_,
                                std::string sourceID,
                                Style& style_,
+                               const MapMode mode_,
                                const std::function<void()>& callback)
     : TileData(id_),
       style(style_),
@@ -21,7 +22,8 @@ VectorTileData::VectorTileData(const TileID& id_,
                  *style_.spriteStore,
                  *style_.glyphAtlas,
                  *style_.glyphStore,
-                 state),
+                 state,
+                 mode_),
       monitor(std::move(monitor_))
 {
     state = State::loading;

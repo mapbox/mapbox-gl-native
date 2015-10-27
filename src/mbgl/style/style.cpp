@@ -132,6 +132,7 @@ void Style::update(const TransformState& transform,
                                      workers,
                                      texturePool,
                                      shouldReparsePartialTiles,
+                                     data.mode,
                                      data,
                                      *this);
 

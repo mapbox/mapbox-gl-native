@@ -20,6 +20,7 @@ public:
                           Worker& worker_,
                           TexturePool& texturePool_,
                           bool shouldReparsePartialTiles_,
+                          const MapMode mode_,
                           MapData& data_,
                           Style& style_)
         : pixelRatio(pixelRatio_),
@@ -29,6 +30,7 @@ public:
           worker(worker_),
           texturePool(texturePool_),
           shouldReparsePartialTiles(shouldReparsePartialTiles_),
+          mode(mode_),
           data(data_),
           style(style_) {}
 
@@ -39,6 +41,7 @@ public:
     Worker& worker;
     TexturePool& texturePool;
     bool shouldReparsePartialTiles;
+    const MapMode mode;
 
     // TODO: remove
     MapData& data;

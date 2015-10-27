@@ -22,6 +22,7 @@ public:
                    std::unique_ptr<GeometryTileMonitor> monitor,
                    std::string sourceID,
                    Style&,
+                   const MapMode,
                    const std::function<void()>& callback);
 
     ~VectorTileData();
