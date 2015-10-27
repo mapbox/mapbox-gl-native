@@ -125,7 +125,6 @@ void HTTPNSURLRequest::start() {
     attempts++;
 
     @autoreleasepool {
-        
         NSURL *url = [NSURL URLWithString:@(resource.url.c_str())];
         if (context->accountType == 0 &&
             ([url.host isEqualToString:@"mapbox.com"] || [url.host hasSuffix:@".mapbox.com"])) {
@@ -317,7 +316,7 @@ void HTTPNSURLRequest::retry(uint64_t timeout) {
 void HTTPNSURLRequest::retry() {
     // All batons get notified when the network status changed, but some of them
     // might not actually wait for the network to become available again.
-    if (strategy == PreemptImmediately) {
+    if (strategy == PreemptImmediately && !task) {
         // Triggers the timer upon the next event loop iteration.
         timer.stop();
         timer.start(0, 0, [this] { start(); });

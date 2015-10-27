@@ -84,6 +84,7 @@
         'storage/http_issue_1369.cpp',
         'storage/http_load.cpp',
         'storage/http_other_loop.cpp',
+        'storage/http_retry_network_status.cpp',
         'storage/http_reading.cpp',
         'storage/http_timeout.cpp',
 
