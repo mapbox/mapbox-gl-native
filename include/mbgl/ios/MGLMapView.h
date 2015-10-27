@@ -509,6 +509,12 @@ IB_DESIGNABLE
 *   @return A color to use for the polygon interior. */
 - (UIColor *)mapView:(MGLMapView *)mapView fillColorForPolygonAnnotation:(MGLPolygon *)annotation;
 
+/** Returns the fill color to use when rendering a circle annotation. Defaults to red.
+*   @param mapView The map view rendering the circle annotation.
+*   @param annotation The annotation being rendered.
+*   @return A color to use for the circle interior. */
+- (UIColor *)mapView:(MGLMapView *)mapView fillColorForCircleAnnotation:(MGLCircle *)annotation;
+
 /** Returns the line width to use when rendering a polyline annotation. Defaults to `3.0`.
 *   @param mapView The map view rendering the polygon annotation.
 *   @param annotation The annotation being rendered.

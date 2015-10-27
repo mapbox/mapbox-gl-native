@@ -2107,6 +2107,7 @@ CLLocationCoordinate2D MGLLocationCoordinate2DFromLatLng(mbgl::LatLng latLng)
     BOOL delegateImplementsAlphaForShape = [self.delegate respondsToSelector:@selector(mapView:alphaForShapeAnnotation:)];
     BOOL delegateImplementsStrokeColorForShape = [self.delegate respondsToSelector:@selector(mapView:strokeColorForShapeAnnotation:)];
     BOOL delegateImplementsFillColorForPolygon = [self.delegate respondsToSelector:@selector(mapView:fillColorForPolygonAnnotation:)];
+    BOOL delegateImplementsFillColorForCircle = [self.delegate respondsToSelector:@selector(mapView:fillColorForCircleAnnotation:)];
     BOOL delegateImplementsLineWidthForPolyline = [self.delegate respondsToSelector:@selector(mapView:lineWidthForPolylineAnnotation:)];
 
     for (id <MGLAnnotation> annotation in annotations)
@@ -2184,6 +2185,36 @@ CLLocationCoordinate2D MGLLocationCoordinate2DFromLatLng(mbgl::LatLng latLng)
             }
 
             free(coordinates);
+
+            shapes.emplace_back(mbgl::AnnotationSegments {{ segment }}, shapeProperties);
+        }
+        else if ([annotation isKindOfClass:[MGLCircle class]])
+        {
+            CGFloat alpha = (delegateImplementsAlphaForShape ?
+                                [self.delegate mapView:self alphaForShapeAnnotation:annotation] :
+                             1.0);
+
+            mbgl::ShapeAnnotation::Properties shapeProperties;
+
+            UIColor *circleColor = (delegateImplementsFillColorForCircle ?
+                                       [self.delegate mapView:self fillColorForCircleAnnotation:(MGLCircle *)annotation] :
+                                  [UIColor redColor]);
+
+            assert(circleColor);
+
+            CGFloat r,g,b,a;
+            [circleColor getRed:&r green:&g blue:&b alpha:&a];
+            mbgl::Color circleNativeColor({{ (float)r, (float)g, (float)b, (float)a }});
+
+            mbgl::CirclePaintProperties circleProperties;
+            circleProperties.opacity = alpha;
+            circleProperties.color = circleNativeColor;
+            shapeProperties.set<mbgl::CirclePaintProperties>(circleProperties);
+
+            mbgl::AnnotationSegment segment = { mbgl::LatLng(
+                annotation.coordinate.latitude,
+                annotation.coordinate.longitude)
+            };
 
             shapes.emplace_back(mbgl::AnnotationSegments {{ segment }}, shapeProperties);
         }
