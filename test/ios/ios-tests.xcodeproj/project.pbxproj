@@ -14,7 +14,6 @@
 		DD043366196DBBE000E6F39D /* main.m in Sources */ = {isa = PBXBuildFile; fileRef = DD043365196DBBE000E6F39D /* main.m */; };
 		DD0580E81ACB628200B112C9 /* IOKit.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = DD0580E71ACB628200B112C9 /* IOKit.framework */; };
 		DD0581041ACB661200B112C9 /* Headers in Resources */ = {isa = PBXBuildFile; fileRef = DD0581031ACB661200B112C9 /* Headers */; };
-		DD0E6F671B01806600DC035A /* MetricsTests.m in Sources */ = {isa = PBXBuildFile; fileRef = DD0E6F661B01806600DC035A /* MetricsTests.m */; };
 		DD0E6F841B0190E200DC035A /* libOCMock.a in Frameworks */ = {isa = PBXBuildFile; fileRef = DD0E6F701B0190E200DC035A /* libOCMock.a */; };
 		DD0E6F981B01B68E00DC035A /* OHHTTPStubs.m in Sources */ = {isa = PBXBuildFile; fileRef = DD0E6F8E1B01B68E00DC035A /* OHHTTPStubs.m */; };
 		DD0E6F991B01B68E00DC035A /* OHHTTPStubs+NSURLSessionConfiguration.m in Sources */ = {isa = PBXBuildFile; fileRef = DD0E6F8F1B01B68E00DC035A /* OHHTTPStubs+NSURLSessionConfiguration.m */; };
@@ -89,7 +88,6 @@
 		DD0580E71ACB628200B112C9 /* IOKit.framework */ = {isa = PBXFileReference; lastKnownFileType = wrapper.framework; name = IOKit.framework; path = Platforms/iPhoneSimulator.platform/Developer/SDKs/iPhoneSimulator.sdk/System/Library/Frameworks/IOKit.framework; sourceTree = DEVELOPER_DIR; };
 		DD0580EF1ACB62BE00B112C9 /* CoreGraphics.framework */ = {isa = PBXFileReference; lastKnownFileType = wrapper.framework; name = CoreGraphics.framework; path = System/Library/Frameworks/CoreGraphics.framework; sourceTree = SDKROOT; };
 		DD0581031ACB661200B112C9 /* Headers */ = {isa = PBXFileReference; lastKnownFileType = folder; name = Headers; path = ../../build/ios/pkg/static/Headers; sourceTree = SOURCE_ROOT; };
-		DD0E6F661B01806600DC035A /* MetricsTests.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = MetricsTests.m; sourceTree = SOURCE_ROOT; };
 		DD0E6F701B0190E200DC035A /* libOCMock.a */ = {isa = PBXFileReference; lastKnownFileType = archive.ar; name = libOCMock.a; path = OCMock/libOCMock.a; sourceTree = SOURCE_ROOT; };
 		DD0E6F721B0190E200DC035A /* NSNotificationCenter+OCMAdditions.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = "NSNotificationCenter+OCMAdditions.h"; sourceTree = "<group>"; };
 		DD0E6F731B0190E200DC035A /* OCMArg.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = OCMArg.h; sourceTree = "<group>"; };
@@ -283,7 +281,6 @@
 				DDBD016B196DC4740033959E /* KIFTestActor+MapboxGL.h */,
 				DDBD016A196DC4740033959E /* KIFTestActor+MapboxGL.m */,
 				DDBD0168196DC4740033959E /* MapViewTests.m */,
-				DD0E6F661B01806600DC035A /* MetricsTests.m */,
 				DDBD0167196DC46B0033959E /* Supporting Files */,
 				DDBD014D196DC3B00033959E /* KIF */,
 				DD0E6F6B1B01906600DC035A /* OCMock */,
@@ -471,7 +468,6 @@
 				DDBD016D196DC4740033959E /* KIFTestActor+MapboxGL.m in Sources */,
 				DD0E6F991B01B68E00DC035A /* OHHTTPStubs+NSURLSessionConfiguration.m in Sources */,
 				DD0E6F9A1B01B68E00DC035A /* OHHTTPStubsResponse.m in Sources */,
-				DD0E6F671B01806600DC035A /* MetricsTests.m in Sources */,
 				DDBD016C196DC4740033959E /* MapViewTests.m in Sources */,
 				DD0E6F9D1B01B68E00DC035A /* OHPathHelpers.m in Sources */,
 			);
