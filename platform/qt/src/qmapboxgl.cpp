@@ -94,12 +94,12 @@ QString QMapboxGL::styleURL() const
 
 void QMapboxGL::setStyleJSON(const QString &style)
 {
-    d_ptr->mapObj->setStyleJSON(style.toUtf8().constData());
+    d_ptr->mapObj->setStyleJSON(style.toStdString());
 }
 
 void QMapboxGL::setStyleURL(const QString &url)
 {
-    d_ptr->mapObj->setStyleURL(url.toUtf8().constData());
+    d_ptr->mapObj->setStyleURL(url.toStdString());
 }
 
 double QMapboxGL::latitude() const
@@ -204,17 +204,17 @@ void QMapboxGL::setGestureInProgress(bool inProgress)
 
 void QMapboxGL::addClass(const QString &className)
 {
-    d_ptr->mapObj->addClass(className.toUtf8().constData());
+    d_ptr->mapObj->addClass(className.toStdString());
 }
 
 void QMapboxGL::removeClass(const QString &className)
 {
-    d_ptr->mapObj->removeClass(className.toUtf8().constData());
+    d_ptr->mapObj->removeClass(className.toStdString());
 }
 
 bool QMapboxGL::hasClass(const QString &className) const
 {
-    return d_ptr->mapObj->hasClass(className.toUtf8().constData());
+    return d_ptr->mapObj->hasClass(className.toStdString());
 }
 
 void QMapboxGL::setClasses(const QStringList &classNames)
@@ -223,7 +223,7 @@ void QMapboxGL::setClasses(const QStringList &classNames)
     mbglClassNames.reserve(classNames.size());
 
     for (const QString &className : classNames) {
-        mbglClassNames.emplace_back(className.toUtf8().constData());
+        mbglClassNames.emplace_back(className.toStdString());
     }
 
     d_ptr->mapObj->setClasses(mbglClassNames);
@@ -241,7 +241,7 @@ QStringList QMapboxGL::getClasses() const
 mbgl::PointAnnotation fromQMapboxGLPointAnnotation(const QMapboxGL::PointAnnotation &pointAnnotation) {
     const QMapboxGL::Coordinate &coordinate = pointAnnotation.first;
     const QString &icon = pointAnnotation.second;
-    return { { coordinate.first, coordinate.second }, icon.toUtf8().constData() };
+    return { { coordinate.first, coordinate.second }, icon.toStdString() };
 }
 
 QMapboxGL::AnnotationID QMapboxGL::addPointAnnotation(const PointAnnotation &pointAnnotation)
@@ -285,7 +285,7 @@ mbgl::ShapeAnnotation fromQMapboxGLShapeAnnotation(const QMapboxGL::ShapeAnnotat
         mbglAnnotationSegments.emplace_back(mbglAnnotationSegment);
     }
 
-    return { mbglAnnotationSegments, styleLayer.toUtf8().constData() };
+    return { mbglAnnotationSegments, styleLayer.toStdString() };
 }
 
 QMapboxGL::AnnotationID QMapboxGL::addShapeAnnotation(const ShapeAnnotation &shapeAnnotation)
