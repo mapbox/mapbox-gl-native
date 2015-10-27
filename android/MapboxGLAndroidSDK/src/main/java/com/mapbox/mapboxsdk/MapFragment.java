@@ -37,7 +37,7 @@ public class MapFragment extends Fragment {
         Log.v(TAG, "onCreateView");
 
         // Create the map
-        mMap = (MapView) inflater.inflate(R.layout.mapview, container, false);
+        mMap = (MapView) inflater.inflate(R.layout.fragment_mapview, container, false);
 
         // Set accessToken
         mMap.setAccessToken(ApiAccess.getToken(container.getContext()));

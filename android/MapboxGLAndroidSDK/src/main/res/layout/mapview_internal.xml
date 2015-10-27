@@ -1,0 +1,36 @@
+<?xml version="1.0" encoding="utf-8"?>
+<merge xmlns:android="http://schemas.android.com/apk/res/android">
+
+    <TextureView
+        android:id="@+id/textureView"
+        android:layout_width="match_parent"
+        android:layout_height="match_parent" />
+
+    <com.mapbox.mapboxsdk.views.CompassView
+        android:id="@+id/compassView"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content" />
+
+    <ImageView
+        android:id="@+id/logoView"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:contentDescription="@string/mapboxIconContentDescription"
+        android:src="@drawable/attribution_logo" />
+
+    <ImageView
+        android:id="@+id/attributionView"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:adjustViewBounds="true"
+        android:clickable="true"
+        android:contentDescription="@string/attributionsIconContentDescription"
+        android:padding="7dp"
+        android:src="@drawable/ic_info_selector" />
+
+    <com.mapbox.mapboxsdk.views.UserLocationView
+        android:id="@+id/userLocationView"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content" />
+
+</merge>

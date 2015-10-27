@@ -29,7 +29,6 @@ import android.support.annotation.IntRange;
 import android.support.annotation.NonNull;
 import android.support.annotation.Nullable;
 import android.support.annotation.UiThread;
-import android.support.v4.content.ContextCompat;
 import android.support.v4.view.GestureDetectorCompat;
 import android.support.v4.view.ScaleGestureDetectorCompat;
 import android.support.v7.app.AlertDialog;
@@ -41,13 +40,13 @@ import android.view.GestureDetector;
 import android.view.Gravity;
 import android.view.InputDevice;
 import android.view.KeyEvent;
+import android.view.LayoutInflater;
 import android.view.MotionEvent;
 import android.view.ScaleGestureDetector;
 import android.view.Surface;
 import android.view.TextureView;
 import android.view.View;
 import android.view.ViewConfiguration;
-import android.view.ViewGroup;
 import android.widget.ArrayAdapter;
 import android.widget.FrameLayout;
 import android.widget.ImageView;
@@ -187,9 +186,6 @@ public final class MapView extends FrameLayout {
 
     // Receives changes to network connectivity
     private ConnectivityReceiver mConnectivityReceiver;
-
-    // Holds the context
-    private Context mContext;
 
     // Used for user location
     private UserLocationView mUserLocationView;
@@ -502,7 +498,7 @@ public final class MapView extends FrameLayout {
          *
          * @param location The current location of the My Location dot The type of map change event.
          */
-        void  onMyLocationChange(@Nullable Location location);
+        void onMyLocationChange(@Nullable Location location);
     }
 
     //
@@ -586,16 +582,15 @@ public final class MapView extends FrameLayout {
             return;
         }
 
-        // Save the context
-        mContext = context;
+        // Inflate content
+        View view = LayoutInflater.from(context).inflate(R.layout.mapview_internal, this);
 
         if (!isInEditMode()) {
             setWillNotDraw(false);
         }
 
-        // Create the TextureView
-        mTextureView = new TextureView(mContext);
-        addView(mTextureView);
+        // Reference the TextureView
+        mTextureView = (TextureView) view.findViewById(R.id.textureView);
         mTextureView.setSurfaceTextureListener(new SurfaceTextureListener());
 
         // Check if we are in Android Studio UI editor to avoid error in layout preview
@@ -657,36 +652,18 @@ public final class MapView extends FrameLayout {
         }
 
         // Setup user location UI
-        mUserLocationView = new UserLocationView(this, getContext());
-        addView(mUserLocationView);
+        mUserLocationView = (UserLocationView) view.findViewById(R.id.userLocationView);
+        mUserLocationView.setMapView(this);
 
         // Setup compass
-        mCompassView = new CompassView(mContext);
+        mCompassView = (CompassView) view.findViewById(R.id.compassView);
         mCompassView.setOnClickListener(new CompassView.CompassClickListener(this));
-        addView(mCompassView);
 
         // Setup Mapbox logo
-        mLogoView = new ImageView(mContext);
-        mLogoView.setImageDrawable(ContextCompat.getDrawable(mContext, R.drawable.attribution_logo));
-        mLogoView.setContentDescription(getResources().getString(R.string.mapboxIconContentDescription));
-        ViewGroup.LayoutParams logoParams = new ViewGroup.LayoutParams(
-                ViewGroup.LayoutParams.WRAP_CONTENT, ViewGroup.LayoutParams.WRAP_CONTENT);
-        mLogoView.setLayoutParams(logoParams);
-        addView(mLogoView);
+        mLogoView = (ImageView) view.findViewById(R.id.logoView);
 
         // Setup Attributions control
-        mAttributionsView = new ImageView(mContext);
-        mAttributionsView.setClickable(true);
-        mAttributionsView.setImageResource(R.drawable.ic_info_selector);
-        int attrPadding = (int) (DIMENSION_SEVEN_DP * mScreenDensity);
-        mAttributionsView.setPadding(attrPadding, attrPadding, attrPadding, attrPadding);
-        mAttributionsView.setAdjustViewBounds(true);
-        mAttributionsView.setContentDescription(getResources()
-                .getString(R.string.attributionsIconContentDescription));
-        LayoutParams attrParams = new FrameLayout.LayoutParams(
-                ViewGroup.LayoutParams.WRAP_CONTENT, ViewGroup.LayoutParams.WRAP_CONTENT);
-        mAttributionsView.setLayoutParams(attrParams);
-        addView(mAttributionsView);
+        mAttributionsView = (ImageView) view.findViewById(R.id.attributionView);
         mAttributionsView.setOnClickListener(new AttributionOnClickListener(this));
 
         // Load the attributes
@@ -942,7 +919,7 @@ public final class MapView extends FrameLayout {
     public void onResume() {
         // Register for connectivity changes
         mConnectivityReceiver = new ConnectivityReceiver();
-        mContext.registerReceiver(mConnectivityReceiver, new IntentFilter(ConnectivityManager.CONNECTIVITY_ACTION));
+        getContext().registerReceiver(mConnectivityReceiver, new IntentFilter(ConnectivityManager.CONNECTIVITY_ACTION));
 
         mUserLocationView.resume();
         mNativeMapView.resume();
@@ -2041,7 +2018,7 @@ public final class MapView extends FrameLayout {
     /**
      * Changes the map's viewing area to fit the given coordinate bounds, optionally animating the change.
      *
-     * @param bounds The bounds that the viewport will show in its entirety.
+     * @param bounds   The bounds that the viewport will show in its entirety.
      * @param animated If true, animates the change. If false, immediately changes the map.
      */
     @UiThread
@@ -2053,8 +2030,8 @@ public final class MapView extends FrameLayout {
      * Changes the map’s viewport to fit the given coordinate bounds with additional padding at the
      * edge of the map,  optionally animating the change.
      *
-     * @param bounds The bounds that the viewport will show in its entirety.
-     * @param padding The minimum padding (in pixels) that will be visible around the given coordinate bounds.
+     * @param bounds   The bounds that the viewport will show in its entirety.
+     * @param padding  The minimum padding (in pixels) that will be visible around the given coordinate bounds.
      * @param animated If true, animates the change. If false, immediately changes the map.
      */
     @UiThread
@@ -2074,8 +2051,8 @@ public final class MapView extends FrameLayout {
      * and animating the change.
      *
      * @param coordinates The coordinates that the viewport will show.
-     * @param padding The minimum padding (in pixels) that will be visible around the given coordinate bounds.
-     * @param animated If true, animates the change. If false, immediately changes the map.
+     * @param padding     The minimum padding (in pixels) that will be visible around the given coordinate bounds.
+     * @param animated    If true, animates the change. If false, immediately changes the map.
      */
     @UiThread
     public void setVisibleCoordinateBounds(@NonNull LatLng[] coordinates, @NonNull RectF padding, boolean animated) {
@@ -2088,12 +2065,13 @@ public final class MapView extends FrameLayout {
 
     private void setVisibleCoordinateBounds(LatLng[] coordinates, RectF padding, double direction, long duration) {
         mNativeMapView.setVisibleCoordinateBounds(coordinates, new RectF(padding.left / mScreenDensity,
-                padding.top / mScreenDensity, padding.right / mScreenDensity, padding.bottom / mScreenDensity),
+                        padding.top / mScreenDensity, padding.right / mScreenDensity, padding.bottom / mScreenDensity),
                 direction, duration);
     }
 
     /**
      * Gets the currently selected marker.
+     *
      * @return The currently selected marker.
      */
     @UiThread
@@ -3017,7 +2995,6 @@ public final class MapView extends FrameLayout {
     }
 
 
-
     /**
      * Sets a callback that's invoked on every frame rendered to the map view.
      *
@@ -3175,7 +3152,7 @@ public final class MapView extends FrameLayout {
 
     /**
      * Sets the current my location tracking mode.
-     * <p>
+     * <p/>
      * My location racking disables gestures, automatically moves the viewport to the users
      * location and shows the direction the user is heading.
      *
@@ -3248,8 +3225,8 @@ public final class MapView extends FrameLayout {
      * @param gravity One of the values from {@link Gravity}.
      * @see Gravity
      */
-        @UiThread
-        public void setCompassGravity(int gravity) {
+    @UiThread
+    public void setCompassGravity(int gravity) {
         setWidgetGravity(mCompassView, gravity);
     }
 

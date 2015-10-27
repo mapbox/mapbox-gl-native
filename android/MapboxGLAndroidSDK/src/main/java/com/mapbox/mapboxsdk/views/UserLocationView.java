@@ -80,24 +80,22 @@ final class UserLocationView extends View {
     @MyLocationTracking.Mode
     private int mMyLocationTrackingMode;
 
-    public UserLocationView(MapView mapView, Context context) {
+    public UserLocationView(Context context) {
         super(context);
-        initialize(mapView, context);
+        initialize(context);
     }
 
-    public UserLocationView(MapView mapView, Context context, AttributeSet attrs) {
+    public UserLocationView(Context context, AttributeSet attrs) {
         super(context, attrs);
-        initialize(mapView, context);
+        initialize(context);
     }
 
-    public UserLocationView(MapView mapView, Context context, AttributeSet attrs, int defStyleAttr) {
+    public UserLocationView(Context context, AttributeSet attrs, int defStyleAttr) {
         super(context, attrs, defStyleAttr);
-        initialize(mapView, context);
+        initialize(context);
     }
 
-    private void initialize(MapView mapView, Context context) {
-        mMapView = mapView;
-
+    private void initialize(Context context) {
         // View configuration
         setEnabled(false);
         setWillNotDraw(false);
@@ -176,6 +174,10 @@ final class UserLocationView extends View {
                 mUserLocationStaleDrawable.getIntrinsicWidth() / 2,
                 mUserLocationStaleDrawable.getIntrinsicHeight() / 2);
         mUserLocationStaleDrawable.setBounds(mUserLocationStaleDrawableBounds);
+    }
+
+    public void setMapView(MapView mapView) {
+        mMapView = mapView;
     }
 
     @Override
@@ -359,7 +361,7 @@ final class UserLocationView extends View {
             previousCoordinate = new LatLng(mUserLocation);
         }
 
-        if(mMyLocationTrackingMode== MyLocationTracking.TRACKING_NONE) {
+        if (mMyLocationTrackingMode == MyLocationTracking.TRACKING_NONE) {
             // moving marker above map
             mMarkerCoordinateAnimator = ValueAnimator.ofFloat(0.0f, 1.0f);
             mMarkerCoordinateAnimator.setDuration(1000);
@@ -367,7 +369,7 @@ final class UserLocationView extends View {
                     previousCoordinate, new LatLng(location)
             ));
             mMarkerCoordinateAnimator.start();
-        }else{
+        } else {
             // moving map under the tracker
             mMarkerCoordinate = new LatLng(location);
             mMapView.setCenterCoordinate(mMarkerCoordinate, true);
