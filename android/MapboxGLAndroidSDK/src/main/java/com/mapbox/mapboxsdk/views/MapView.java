@@ -1757,12 +1757,20 @@ public final class MapView extends FrameLayout {
             throw new NullPointerException("polylineOptionsList is null");
         }
 
-        // TODO make faster in JNI
         int count = polylineOptionsList.size();
         List<Polyline> polylines = new ArrayList<>(count);
+        for (PolylineOptions options : polylineOptionsList) {
+            polylines.add(options.getPolyline());
+        }
+
+        long[] ids = mNativeMapView.addPolylines(polylines);
+
+        Polyline p;
         for (int i = 0; i < count; i++) {
-            PolylineOptions polylineOptions = polylineOptionsList.get(i);
-            polylines.add(addPolyline(polylineOptions));
+            p = polylines.get(i);
+            p.setId(ids[i]);
+            p.setMapView(this);
+            mAnnotations.add(p);
         }
 
         return new ArrayList<>(polylines);
@@ -1847,17 +1855,17 @@ public final class MapView extends FrameLayout {
      * @param annotationList A list of annotation objects to remove.
      */
     @UiThread
-    public void removeAnnotations(@NonNull List<Annotation> annotationList) {
+    public void removeAnnotations(@NonNull List<? extends Annotation> annotationList) {
         if (annotationList == null) {
             throw new NullPointerException("annotationList is null");
         }
 
-        // TODO make faster in JNI
         int count = annotationList.size();
+        long[] ids = new long[count];
         for (int i = 0; i < count; i++) {
-            Annotation annotation = annotationList.get(i);
-            removeAnnotation(annotation);
+            ids[i] = annotationList.get(i).getId();
         }
+        mNativeMapView.removeAnnotations(ids);
     }
 
     /**

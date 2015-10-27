@@ -959,6 +959,83 @@ jlong JNICALL nativeAddPolyline(JNIEnv *env, jobject obj, jlong nativeMapViewPtr
     return id;
 }
 
+jlongArray JNICALL nativeAddPolylines(JNIEnv *env, jobject obj, jlong nativeMapViewPtr, jobject jlist) {
+    mbgl::Log::Debug(mbgl::Event::JNI, "nativeAddPolylines");
+    assert(nativeMapViewPtr != 0);
+    NativeMapView *nativeMapView = reinterpret_cast<NativeMapView *>(nativeMapViewPtr);
+
+    std::vector<mbgl::ShapeAnnotation> shapes;
+
+    if (jlist == nullptr) {
+        if (env->ThrowNew(nullPointerExceptionClass, "List cannot be null.") < 0) {
+            env->ExceptionDescribe();
+            return nullptr;
+        }
+        return nullptr;
+    }
+
+    jobjectArray jarray =
+        reinterpret_cast<jobjectArray>(env->CallObjectMethod(jlist, listToArrayId));
+    if (env->ExceptionCheck() || (jarray == nullptr)) {
+        env->ExceptionDescribe();
+        return nullptr;
+    }
+
+    jsize len = env->GetArrayLength(jarray);
+    if (len < 0) {
+        env->ExceptionDescribe();
+        return nullptr;
+    }
+
+    shapes.reserve(len);
+
+    for (jsize i = 0; i < len; i++) {
+        jobject polyline = reinterpret_cast<jobject>(env->GetObjectArrayElement(jarray, i));
+
+        jfloat alpha = env->GetFloatField(polyline, polylineAlphaId);
+        if (env->ExceptionCheck()) {
+            env->ExceptionDescribe();
+            return nullptr;
+        }
+
+        jint color = env->GetIntField(polyline, polylineColorId);
+        if (env->ExceptionCheck()) {
+            env->ExceptionDescribe();
+            return nullptr;
+        }
+
+        int r = (color >> 16) & 0xFF;
+        int g = (color >> 8) & 0xFF;
+        int b = (color) & 0xFF;
+        int a = (color >> 24) & 0xFF;
+
+        jfloat width = env->GetFloatField(polyline, polylineWidthId);
+        if (env->ExceptionCheck()) {
+            env->ExceptionDescribe();
+            return nullptr;
+        }
+
+        mbgl::ShapeAnnotation::Properties shapeProperties;
+        mbgl::LinePaintProperties lineProperties;
+        lineProperties.opacity = alpha;
+        lineProperties.color = {{ static_cast<float>(r) / 255.0f, static_cast<float>(g) / 255.0f, static_cast<float>(b) / 255.0f, static_cast<float>(a) / 255.0f }};
+        lineProperties.width = width;
+        shapeProperties.set<mbgl::LinePaintProperties>(lineProperties);
+
+        jobject points = env->GetObjectField(polyline, polylinePointsId);
+        mbgl::AnnotationSegment segment = annotation_segment_from_latlng_jlist(env, points);
+
+        shapes.emplace_back(mbgl::AnnotationSegments { segment }, shapeProperties);
+
+        env->DeleteLocalRef(polyline);
+    }
+
+    env->DeleteLocalRef(jarray);
+
+    std::vector<uint32_t> shapeAnnotationIDs = nativeMapView->getMap().addShapeAnnotations(shapes);
+    return std_vector_uint_to_jobject(env, shapeAnnotationIDs);
+}
+
 jlong JNICALL nativeAddPolygon(JNIEnv *env, jobject obj, jlong nativeMapViewPtr, jobject polygon) {
     mbgl::Log::Debug(mbgl::Event::JNI, "nativeAddPolygon");
     assert(nativeMapViewPtr != 0);
@@ -1852,6 +1929,8 @@ extern "C" JNIEXPORT jint JNICALL JNI_OnLoad(JavaVM *vm, void *reserved) {
          reinterpret_cast<void *>(&nativeAddMarkers)},
         {"nativeAddPolyline", "(JLcom/mapbox/mapboxsdk/annotations/Polyline;)J",
          reinterpret_cast<void *>(&nativeAddPolyline)},
+         {"nativeAddPolylines", "(JLjava/util/List;)[J",
+         reinterpret_cast<void *>(&nativeAddPolylines)},
         {"nativeAddPolygon", "(JLcom/mapbox/mapboxsdk/annotations/Polygon;)J",
          reinterpret_cast<void *>(&nativeAddPolygon)},
         {"nativeAddPolygons", "(JLjava/util/List;)[J",

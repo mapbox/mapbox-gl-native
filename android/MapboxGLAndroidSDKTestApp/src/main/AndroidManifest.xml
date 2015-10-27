@@ -52,6 +52,10 @@
             android:name=".MyLocationTrackingModeActivity"
             android:label="@string/activity_user_tracking_mode" />
 
+        <activity
+            android:name=".PolylineActivity"
+            android:label="@string/activity_polyline" />
+
         <meta-data
             android:name="io.fabric.ApiKey"
             android:value="9724157045ff7d083492c6d9ae03e60e8609d461" />

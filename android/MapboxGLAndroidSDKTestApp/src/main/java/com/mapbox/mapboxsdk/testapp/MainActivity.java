@@ -343,6 +343,10 @@ public class MainActivity extends AppCompatActivity {
                                 startActivity(new Intent(getApplicationContext(), MyLocationTrackingModeActivity.class));
                                 return true;
 
+                            case R.id.action_polyline:
+                                startActivity(new Intent(getApplicationContext(), PolylineActivity.class));
+                                return true;
+
                             default:
                                 return changeMapStyle(menuItem.getItemId());
                         }

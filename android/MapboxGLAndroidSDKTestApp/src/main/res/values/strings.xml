@@ -11,6 +11,7 @@
     <string name="activity_info_window">InfoWindow Activity</string>
     <string name="activity_visible_coordinate_bounds">Visible Coordinate Bounds</string>
     <string name="activity_user_tracking_mode">User tracking mode</string>
+    <string name="activity_polyline">Polyline Activity</string>
 
     <string name="navdrawer_menu_title_mainactivity_controls">Main Activity Controls</string>
     <string name="navdrawer_menu_title_mainactivity_styles">Main Activity Styles</string>
@@ -27,6 +28,7 @@
     <string name="action_add_bulk_markers">Add Markers in bulk</string>
     <string name="action_visible_bounds">Set Visible Bounds</string>
     <string name="action_visible_bounds_explanation">Center map around 2 markers</string>
+    <string name="action_remove_polylines">Remove polylines</string>
 
     <string name="label_fps">FPS:</string>
 

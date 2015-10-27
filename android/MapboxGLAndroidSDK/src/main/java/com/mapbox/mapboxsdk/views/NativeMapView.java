@@ -361,6 +361,10 @@ final class NativeMapView {
         return nativeAddPolyline(mNativeMapViewPtr, polyline);
     }
 
+    public long[] addPolylines(List<Polyline> polylines) {
+        return nativeAddPolylines(mNativeMapViewPtr, polylines);
+    }
+
     public long addPolygon(Polygon polygon) {
         return nativeAddPolygon(mNativeMapViewPtr, polygon);
     }
@@ -583,6 +587,8 @@ final class NativeMapView {
     private native long[] nativeAddMarkers(long nativeMapViewPtr, List<Marker> markers);
 
     private native long nativeAddPolyline(long nativeMapViewPtr, Polyline polyline);
+
+    private native long[] nativeAddPolylines(long mNativeMapViewPtr, List<Polyline> polygon);
 
     private native long nativeAddPolygon(long mNativeMapViewPtr, Polygon polygon);
 

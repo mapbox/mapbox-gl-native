@@ -108,6 +108,12 @@
                 android:icon="@drawable/ic_gps_fixed_white_24dp"
                 android:title="@string/activity_user_tracking_mode" />
 
+            <item
+                android:id="@+id/action_polyline"
+                android:checkable="false"
+                android:icon="@drawable/ic_trending_up_white_24dp"
+                android:title="@string/activity_polyline"/>
+
         </menu>
     </item>
 
