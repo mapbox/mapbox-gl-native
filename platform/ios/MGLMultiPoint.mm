@@ -84,7 +84,7 @@
 - (MGLCoordinateBounds)overlayBounds
 {
     return {
-        CLLocationCoordinate2DMake(_bounds.sw.latitude,  _bounds.sw.longitude),
+        CLLocationCoordinate2DMake(_bounds.sw.latitude, _bounds.sw.longitude),
         CLLocationCoordinate2DMake(_bounds.ne.latitude, _bounds.ne.longitude)
     };
 }
