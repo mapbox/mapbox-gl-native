@@ -64,6 +64,7 @@ import com.mapbox.mapboxsdk.annotations.Polyline;
 import com.mapbox.mapboxsdk.annotations.PolylineOptions;
 import com.mapbox.mapboxsdk.annotations.Sprite;
 import com.mapbox.mapboxsdk.annotations.SpriteFactory;
+import com.mapbox.mapboxsdk.constants.MyBearingTracking;
 import com.mapbox.mapboxsdk.constants.MyLocationTracking;
 import com.mapbox.mapboxsdk.constants.Style;
 import com.mapbox.mapboxsdk.exceptions.InvalidAccessTokenException;
@@ -889,6 +890,7 @@ public final class MapView extends FrameLayout {
      */
     @UiThread
     public void onStart() {
+        mUserLocationView.onStart();
     }
 
     /**
@@ -896,7 +898,7 @@ public final class MapView extends FrameLayout {
      */
     @UiThread
     public void onStop() {
-        mUserLocationView.cancelAnimations();
+        mUserLocationView.onStop();
     }
 
     /**
@@ -2182,7 +2184,14 @@ public final class MapView extends FrameLayout {
 
     // Used by UserLocationView
     void update() {
-        mNativeMapView.update();
+        if (mNativeMapView != null) {
+            mNativeMapView.update();
+        }
+    }
+
+    // Used by UserLocationView
+    void setBearing(float bearing) {
+        mNativeMapView.setBearing(bearing, 100);
     }
 
     //
@@ -3151,14 +3160,13 @@ public final class MapView extends FrameLayout {
     }
 
     /**
-     * Sets the current my location tracking mode.
+     * Set the current my location tracking mode.
+     * Tracking my location disables gestures and pans the viewport
      * <p/>
-     * My location racking disables gestures, automatically moves the viewport to the users
-     * location and shows the direction the user is heading.
+     * See {@link MyLocationTracking} for different values.
      *
-     * @param myLocationTrackingMode The my location tracking mode to use.
-     *                               Accepts one of the values from {@link MyLocationTracking.Mode}.
-     * @see MyLocationTracking.Mode
+     * @param myLocationTrackingMode The location tracking mode to be used.
+     * @see MyLocationTracking
      */
     @UiThread
     public void setMyLocationTrackingMode(@MyLocationTracking.Mode int myLocationTrackingMode) {
@@ -3185,6 +3193,33 @@ public final class MapView extends FrameLayout {
     @MyLocationTracking.Mode
     public int getMyLocationTrackingMode() {
         return mUserLocationView.getMyLocationTrackingMode();
+    }
+
+    /**
+     * Set the current my bearing tracking mode.
+     * Tracking my bearing disables gestures and shows the direction the user is heading.
+     * See {@link MyBearingTracking} for different values.
+     *
+     * @param myBearingTrackingMode The bearing tracking mode to be used.
+     * @see MyBearingTracking
+     */
+    @UiThread
+    public void setMyBearingTrackingMode(@MyBearingTracking.Mode int myBearingTrackingMode) {
+        mUserLocationView.setMyBearingTrackingMode(myBearingTrackingMode);
+    }
+
+    /**
+     * Returns the current user bearing tracking mode.
+     * See {@link MyBearingTracking} for possible return values.
+     *
+     * @return the current user bearing tracking mode.
+     * @see MyBearingTracking
+     */
+    @UiThread
+    @MyLocationTracking.Mode
+    public int getMyBearingTrackingMode() {
+        //noinspection ResourceType
+        return mUserLocationView.getMyBearingTrackingMode();
     }
 
     //

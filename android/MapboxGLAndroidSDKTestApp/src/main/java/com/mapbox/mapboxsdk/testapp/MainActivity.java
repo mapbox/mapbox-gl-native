@@ -23,21 +23,26 @@ import android.util.Log;
 import android.view.MenuItem;
 import android.view.View;
 import android.widget.TextView;
+
 import com.crashlytics.android.Crashlytics;
 import com.mapbox.mapboxsdk.annotations.Marker;
 import com.mapbox.mapboxsdk.annotations.MarkerOptions;
 import com.mapbox.mapboxsdk.annotations.PolygonOptions;
 import com.mapbox.mapboxsdk.annotations.PolylineOptions;
 import com.mapbox.mapboxsdk.annotations.Sprite;
+import com.mapbox.mapboxsdk.constants.MyBearingTracking;
+import com.mapbox.mapboxsdk.constants.MyLocationTracking;
 import com.mapbox.mapboxsdk.constants.Style;
 import com.mapbox.mapboxsdk.geometry.LatLng;
 import com.mapbox.mapboxsdk.testapp.utils.GeoParseUtil;
 import com.mapbox.mapboxsdk.utils.ApiAccess;
 import com.mapbox.mapboxsdk.views.MapView;
-import io.fabric.sdk.android.Fabric;
+
 import java.text.DecimalFormat;
 import java.util.ArrayList;
 import java.util.List;
+
+import io.fabric.sdk.android.Fabric;
 
 public class MainActivity extends AppCompatActivity {
 
@@ -428,6 +433,8 @@ public class MainActivity extends AppCompatActivity {
             }
         });
         mMapView.setMyLocationEnabled(true);
+        mMapView.setMyLocationTrackingMode(MyLocationTracking.TRACKING_NONE);
+        mMapView.setMyBearingTrackingMode(MyBearingTracking.GPS);
         mLocationFAB.setColorFilter(ContextCompat.getColor(this, R.color.primary));
     }
 
@@ -467,7 +474,7 @@ public class MainActivity extends AppCompatActivity {
         List<Marker> markers = mMapView.addMarkers(markerOptionsList);
     }
 
-    private MarkerOptions generateMarker(String title, String snippet, Sprite icon, double lat, double lng){
+    private MarkerOptions generateMarker(String title, String snippet, Sprite icon, double lat, double lng) {
         return new MarkerOptions()
                 .position(new LatLng(lat, lng))
                 .title(title)

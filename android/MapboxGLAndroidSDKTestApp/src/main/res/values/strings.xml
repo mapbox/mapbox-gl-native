@@ -54,9 +54,13 @@
     <string-array name="user_tracking_mode">
         <item>Disable tracking</item>
         <item>Follow tracking mode</item>
-        <!--<item>Bearing tracking GPS mode</item>-->
-        <!--<item>Bearing tracking Compass mode</item>-->
-        <!--<item>Bearing tracking mode</item>-->
+    </string-array>
+
+    <string-array name="user_bearing_mode">
+        <item>Disable bearing</item>
+        <item>GPS mode</item>
+        <item>Compass mode</item>
+        <!--<item>Combined mode</item>-->
     </string-array>
 
 </resources>
