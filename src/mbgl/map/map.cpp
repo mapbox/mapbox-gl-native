@@ -130,6 +130,14 @@ bool Map::isGestureInProgress() const {
     return transform->isGestureInProgress();
 }
 
+void Map::setUserAnimating(bool userAnimating) {
+    context->invokeSync<void>(&MapContext::setUpdateHint, userAnimating ? UpdateHint::UserAnimating : UpdateHint::Nothing);
+}
+
+bool Map::isUserAnimating() const {
+    return context->invokeSync<UpdateHint>(&MapContext::getUpdateHint) == UpdateHint::UserAnimating;
+}
+    
 bool Map::isRotating() const {
     return transform->isRotating();
 }

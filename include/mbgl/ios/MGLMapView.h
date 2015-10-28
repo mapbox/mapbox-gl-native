@@ -304,6 +304,10 @@ IB_DESIGNABLE
 *   @param animated If `YES`, the callout view is animated offscreen. */
 - (void)deselectAnnotation:(id <MGLAnnotation>)annotation animated:(BOOL)animated;
 
+#pragma mark - User Animations
+
+- (void)setUserAnimating:(BOOL)userAnimating;
+
 #pragma mark - Adding Overlays
 
 /** @name Adding Overlays */

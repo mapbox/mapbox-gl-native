@@ -91,6 +91,10 @@ public:
     bool isRotating() const;
     bool isScaling() const;
     bool isPanning() const;
+    
+    // User Animating
+    void setUserAnimating(bool);
+    bool isUserAnimating() const;
 
     // Camera
     void jumpTo(CameraOptions options);

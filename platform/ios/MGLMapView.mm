@@ -1646,6 +1646,11 @@ std::chrono::steady_clock::duration secondsAsDuration(float duration)
     return [NSSet setWithObject:@"camera"];
 }
 
+- (void)setUserAnimating:(BOOL)userAnimating
+{
+    _mbglMap->setUserAnimating(userAnimating);
+}
+
 - (double)zoomLevel
 {
     return _mbglMap->getZoom();

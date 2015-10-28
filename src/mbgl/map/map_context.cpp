@@ -32,7 +32,8 @@ MapContext::MapContext(View& view_, FileSource& fileSource, MapData& data_)
       data(data_),
       asyncUpdate(std::make_unique<uv::async>(util::RunLoop::getLoop(), [this] { update(); })),
       asyncInvalidate(std::make_unique<uv::async>(util::RunLoop::getLoop(), [&view_] { view_.invalidate(); })),
-      texturePool(std::make_unique<TexturePool>()) {
+      texturePool(std::make_unique<TexturePool>()),
+      currentUpdateHint(UpdateHint::Nothing) {
     assert(util::ThreadContext::currentlyOn(util::ThreadType::Map));
 
     util::ThreadContext::setFileSource(&fileSource);
@@ -254,11 +255,13 @@ bool MapContext::renderSync(const TransformState& state, const FrameData& frame)
         asyncUpdate->send();
     }
 
-    if (painter->needsAnimation()) {
-        updateFlags |= Update::Repaint;
-        asyncUpdate->send();
+    if (currentUpdateHint != UpdateHint::UserAnimating) {
+        if (painter->needsAnimation()) {
+            updateFlags |= Update::Repaint;
+            asyncUpdate->send();
+        }
     }
-
+    
     return isLoaded();
 }
 
@@ -335,4 +338,13 @@ void MapContext::dumpDebugLogs() const {
     Log::Info(Event::General, "--------------------------------------------------------------------------------");
 }
 
+void MapContext::setUpdateHint(UpdateHint updateHint) {
+    currentUpdateHint = updateHint;
 }
+
+UpdateHint MapContext::getUpdateHint() const {
+    return currentUpdateHint;
+}
+    
+}
+
