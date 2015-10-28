@@ -69,6 +69,8 @@ public:
     void addLayer(util::ptr<StyleLayer>, const std::string& beforeLayerID);
     void removeLayer(const std::string& layerID);
 
+    void dumpDebugLogs() const;
+
     MapData& data;
     std::unique_ptr<GlyphStore> glyphStore;
     std::unique_ptr<GlyphAtlas> glyphAtlas;

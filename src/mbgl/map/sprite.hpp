@@ -34,6 +34,8 @@ public:
         return loaded;
     }
 
+    void dumpDebugLogs() const;
+
     const float pixelRatio;
 
     void setObserver(Observer* observer);

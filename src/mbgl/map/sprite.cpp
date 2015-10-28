@@ -111,4 +111,8 @@ void Sprite::setObserver(Observer* observer_) {
     observer = observer_;
 }
 
+void Sprite::dumpDebugLogs() const {
+    Log::Info(Event::General, "Sprite::loaded: %d", loaded);
+}
+
 } // namespace mbgl

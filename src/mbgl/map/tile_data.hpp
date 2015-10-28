@@ -91,6 +91,8 @@ public:
         return error;
     }
 
+    void dumpDebugLogs() const;
+
     const TileID id;
 
     // Contains the tile ID string for painting debug information.

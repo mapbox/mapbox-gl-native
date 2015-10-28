@@ -91,6 +91,7 @@ public:
     void onLowMemory();
 
     void setObserver(Observer* observer);
+    void dumpDebugLogs() const;
 
     SourceInfo info;
     bool enabled;

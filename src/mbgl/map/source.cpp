@@ -594,4 +594,13 @@ void Source::emitTileLoadingFailed(const std::string& message) {
     observer_->onTileLoadingFailed(error);
 }
 
+void Source::dumpDebugLogs() const {
+    Log::Info(Event::General, "Source::id: %s", info.source_id.c_str());
+    Log::Info(Event::General, "Source::loaded: %d", loaded);
+
+    for (const auto& tile : tiles) {
+        tile.second->data->dumpDebugLogs();
+    }
+}
+
 }

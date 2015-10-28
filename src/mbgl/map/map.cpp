@@ -500,4 +500,8 @@ void Map::onLowMemory() {
     context->invoke(&MapContext::onLowMemory);
 }
 
+void Map::dumpDebugLogs() const {
+    context->invokeSync(&MapContext::dumpDebugLogs);
+}
+
 }

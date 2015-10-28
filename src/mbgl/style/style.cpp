@@ -262,4 +262,16 @@ void Style::emitResourceLoadingFailed(std::exception_ptr error) {
     }
 }
 
+void Style::dumpDebugLogs() const {
+    for (const auto& source : sources) {
+        source->dumpDebugLogs();
+    }
+
+    if (!sprite) {
+        Log::Info(Event::General, "no sprite loaded");
+    } else {
+        sprite->dumpDebugLogs();
+    }
+}
+
 }

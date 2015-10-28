@@ -170,6 +170,7 @@ public:
     void toggleCollisionDebug();
     bool getCollisionDebug() const;
     bool isFullyLoaded() const;
+    void dumpDebugLogs() const;
 
 private:
     View& view;

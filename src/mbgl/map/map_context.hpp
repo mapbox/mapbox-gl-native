@@ -67,6 +67,8 @@ public:
     void onTileDataChanged() override;
     void onResourceLoadingFailed(std::exception_ptr error) override;
 
+    void dumpDebugLogs() const;
+
 private:
     // Update the state indicated by the accumulated Update flags, then render.
     void update();

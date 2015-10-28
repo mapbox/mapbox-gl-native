@@ -324,4 +324,15 @@ void MapContext::onResourceLoadingFailed(std::exception_ptr error) {
     }
 }
 
+void MapContext::dumpDebugLogs() const {
+    Log::Info(Event::General, "--------------------------------------------------------------------------------");
+    Log::Info(Event::General, "MapContext::styleURL: %s", styleURL.c_str());
+    if (style) {
+        style->dumpDebugLogs();
+    } else {
+        Log::Info(Event::General, "no style loaded");
+    }
+    Log::Info(Event::General, "--------------------------------------------------------------------------------");
+}
+
 }

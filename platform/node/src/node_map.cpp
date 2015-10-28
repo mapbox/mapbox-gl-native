@@ -47,6 +47,7 @@ NAN_MODULE_INIT(NodeMap::Init) {
     Nan::SetPrototypeMethod(tpl, "load", Load);
     Nan::SetPrototypeMethod(tpl, "render", Render);
     Nan::SetPrototypeMethod(tpl, "release", Release);
+    Nan::SetPrototypeMethod(tpl, "dumpDebugLogs", DumpDebugLogs);
 
     constructor.Reset(tpl->GetFunction());
     Nan::Set(target, Nan::New("Map").ToLocalChecked(), tpl->GetFunction());
@@ -327,6 +328,14 @@ void NodeMap::release() {
     map.reset(nullptr);
 }
 
+NAN_METHOD(NodeMap::DumpDebugLogs) {
+    auto nodeMap = Nan::ObjectWrap::Unwrap<NodeMap>(info.Holder());
+
+    if (!nodeMap->isValid()) return Nan::ThrowError(releasedMessage());
+
+    nodeMap->map->dumpDebugLogs();
+    info.GetReturnValue().SetUndefined();
+}
 
 ////////////////////////////////////////////////////////////////////////////////////////////////
 // Instance
