@@ -585,7 +585,9 @@ public final class MapView extends FrameLayout {
         // Save the context
         mContext = context;
 
-        setWillNotDraw(false);
+        if (!isInEditMode()) {
+            setWillNotDraw(false);
+        }
 
         // Create the TextureView
         mTextureView = new TextureView(mContext);
@@ -2124,10 +2126,14 @@ public final class MapView extends FrameLayout {
 
     @Override
     public void onDraw(Canvas canvas) {
+        super.onDraw(canvas);
+        if (isInEditMode()) {
+            return;
+        }
+
         if (!mNativeMapView.isPaused()) {
             mNativeMapView.renderSync();
         }
-        super.onDraw(canvas);
     }
 
     @Override
