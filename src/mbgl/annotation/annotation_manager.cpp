@@ -83,6 +83,9 @@ LatLngBounds AnnotationManager::getBoundsForAnnotations(const AnnotationIDs& ids
 }
 
 std::unique_ptr<AnnotationTile> AnnotationManager::getTile(const TileID& tileID) {
+    if (pointAnnotations.empty() && shapeAnnotations.empty())
+        return nullptr;
+
     auto tile = std::make_unique<AnnotationTile>();
 
     AnnotationTileLayer& pointLayer = *tile->layers.emplace(
