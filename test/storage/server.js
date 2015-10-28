@@ -2,6 +2,7 @@
 /* jshint node: true */
 'use strict';
 
+var fs = require('fs');
 var express = require('express');
 var app = express();
 
@@ -106,6 +107,7 @@ var server = app.listen(3000, function () {
 
     if (process.argv[2]) {
         // Allow the test to continue running.
-        process.stdin.write("Go!\n");
+        fs.write(+process.argv[2], 'OK');
+        fs.close(+process.argv[2]);
     }
 });
