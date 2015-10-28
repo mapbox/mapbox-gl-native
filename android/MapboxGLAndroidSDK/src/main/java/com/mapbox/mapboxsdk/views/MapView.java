@@ -520,7 +520,8 @@ public final class MapView extends FrameLayout {
     public MapView(@NonNull Context context, @NonNull String accessToken) {
         super(context);
         if (accessToken == null) {
-            throw new NullPointerException("accessToken is null");
+            Log.w(TAG, "accessToken was null, so just returning");
+            return;
         }
         initialize(context, null);
         setAccessToken(accessToken);
@@ -540,10 +541,12 @@ public final class MapView extends FrameLayout {
     public MapView(@NonNull Context context, @NonNull String accessToken, @NonNull String styleUrl) {
         super(context);
         if (accessToken == null) {
-            throw new NullPointerException("accessToken is null");
+            Log.w(TAG, "accessToken was null, so just returning");
+            return;
         }
         if (styleUrl == null) {
-            throw new NullPointerException("styleUrl is null");
+            Log.w(TAG, "styleUrl was null, so just returning");
+            return;
         }
         initialize(context, null);
         setAccessToken(accessToken);
@@ -579,7 +582,8 @@ public final class MapView extends FrameLayout {
     // Common initialization code goes here
     private void initialize(Context context, AttributeSet attrs) {
         if (context == null) {
-            throw new NullPointerException("context is null");
+            Log.w(TAG, "context was null, so just returning");
+            return;
         }
 
         // Save the context
@@ -844,7 +848,8 @@ public final class MapView extends FrameLayout {
     @UiThread
     public void onSaveInstanceState(@NonNull Bundle outState) {
         if (outState == null) {
-            throw new NullPointerException("outState is null");
+            Log.w(TAG, "outState was null, so just returning");
+            return;
         }
 
         outState.putParcelable(STATE_CENTER_COORDINATE, getCenterCoordinate());
@@ -1039,7 +1044,8 @@ public final class MapView extends FrameLayout {
     public void setCenterCoordinate(@NonNull LatLngZoom centerCoordinate,
                                     boolean animated) {
         if (centerCoordinate == null) {
-            throw new NullPointerException("centerCoordinate is null");
+            Log.w(TAG, "centerCoordinate was null, so just returning");
+            return;
         }
         long duration = animated ? ANIMATION_DURATION : 0;
         mNativeMapView.cancelTransitions();
@@ -1428,7 +1434,8 @@ public final class MapView extends FrameLayout {
     @UiThread
     public void setStyleClasses(@NonNull List<String> styleClasses, @IntRange(from = 0) long transitionDuration) {
         if (styleClasses == null) {
-            throw new NullPointerException("styleClasses is null");
+            Log.w(TAG, "styleClasses was null, so just returning");
+            return;
         }
         if (transitionDuration < 0) {
             throw new IllegalArgumentException("transitionDuration is < 0");
@@ -1449,7 +1456,8 @@ public final class MapView extends FrameLayout {
     @UiThread
     public void addStyleClass(@NonNull String styleClass) {
         if (styleClass == null) {
-            throw new NullPointerException("styleClass is null");
+            Log.w(TAG, "styleClass was null, so just returning");
+            return;
         }
         mNativeMapView.addClass(styleClass);
     }
@@ -1465,7 +1473,8 @@ public final class MapView extends FrameLayout {
     @UiThread
     public void removeStyleClass(@NonNull String styleClass) {
         if (styleClass == null) {
-            throw new NullPointerException("styleClass is null");
+            Log.w(TAG, "styleClass was null, so just returning");
+            return;
         }
         mNativeMapView.removeClass(styleClass);
     }
@@ -1479,7 +1488,8 @@ public final class MapView extends FrameLayout {
     @UiThread
     public boolean hasStyleClass(@NonNull String styleClass) {
         if (styleClass == null) {
-            throw new NullPointerException("styleClass is null");
+            Log.w(TAG, "centerCoordinate was null, so just returning false");
+            return false;
         }
         return mNativeMapView.hasClass(styleClass);
     }
@@ -1567,7 +1577,8 @@ public final class MapView extends FrameLayout {
     @NonNull
     public LatLng fromScreenLocation(@NonNull PointF point) {
         if (point == null) {
-            throw new NullPointerException("point is null");
+            Log.w(TAG, "point was null, so just returning (0, 0)");
+            return new LatLng();
         }
 
         float x = point.x;
@@ -1589,7 +1600,8 @@ public final class MapView extends FrameLayout {
     @NonNull
     public PointF toScreenLocation(@NonNull LatLng location) {
         if (location == null) {
-            throw new NullPointerException("location is null");
+            Log.w(TAG, "location was null, so just returning (0, 0)");
+            return new PointF();
         }
 
         PointF point = mNativeMapView.pixelForLatLng(location);
@@ -1677,7 +1689,8 @@ public final class MapView extends FrameLayout {
     @NonNull
     public Marker addMarker(@NonNull MarkerOptions markerOptions) {
         if (markerOptions == null) {
-            throw new NullPointerException("markerOptions is null");
+            Log.w(TAG, "markerOptions was null, so just returning null");
+            return null;
         }
 
         Marker marker = prepareMarker(markerOptions);
@@ -1701,7 +1714,8 @@ public final class MapView extends FrameLayout {
     @NonNull
     public List<Marker> addMarkers(@NonNull List<MarkerOptions> markerOptionsList) {
         if (markerOptionsList == null) {
-            throw new NullPointerException("markerOptionsList is null");
+            Log.w(TAG, "markerOptionsList was null, so just returning null");
+            return null;
         }
 
         int count = markerOptionsList.size();
@@ -1735,7 +1749,8 @@ public final class MapView extends FrameLayout {
     @NonNull
     public Polyline addPolyline(@NonNull PolylineOptions polylineOptions) {
         if (polylineOptions == null) {
-            throw new NullPointerException("polylineOptions is null");
+            Log.w(TAG, "polylineOptions was null, so just returning null");
+            return null;
         }
 
         Polyline polyline = polylineOptions.getPolyline();
@@ -1756,7 +1771,8 @@ public final class MapView extends FrameLayout {
     @NonNull
     public List<Polyline> addPolylines(@NonNull List<PolylineOptions> polylineOptionsList) {
         if (polylineOptionsList == null) {
-            throw new NullPointerException("polylineOptionsList is null");
+            Log.w(TAG, "polylineOptionsList was null, so just returning null");
+            return null;
         }
 
         int count = polylineOptionsList.size();
@@ -1788,7 +1804,8 @@ public final class MapView extends FrameLayout {
     @NonNull
     public Polygon addPolygon(@NonNull PolygonOptions polygonOptions) {
         if (polygonOptions == null) {
-            throw new NullPointerException("polygonOptions is null");
+            Log.w(TAG, "polygonOptions was null, so just returning null");
+            return null;
         }
 
         Polygon polygon = polygonOptions.getPolygon();
@@ -1810,7 +1827,8 @@ public final class MapView extends FrameLayout {
     @NonNull
     public List<Polygon> addPolygons(@NonNull List<PolygonOptions> polygonOptionsList) {
         if (polygonOptionsList == null) {
-            throw new NullPointerException("polygonOptionsList is null");
+            Log.w(TAG, "polygonOptionsList was null, so just returning null");
+            return null;
         }
 
         int count = polygonOptionsList.size();
@@ -1840,7 +1858,8 @@ public final class MapView extends FrameLayout {
     @UiThread
     public void removeAnnotation(@NonNull Annotation annotation) {
         if (annotation == null) {
-            throw new NullPointerException("annotation is null");
+            Log.w(TAG, "annotation was null, so just returning");
+            return;
         }
 
         if (annotation instanceof Marker) {
@@ -1859,7 +1878,8 @@ public final class MapView extends FrameLayout {
     @UiThread
     public void removeAnnotations(@NonNull List<? extends Annotation> annotationList) {
         if (annotationList == null) {
-            throw new NullPointerException("annotationList is null");
+            Log.w(TAG, "annotationList was null, so just returning");
+            return;
         }
 
         int count = annotationList.size();
@@ -1904,7 +1924,8 @@ public final class MapView extends FrameLayout {
 
     private List<Marker> getMarkersInBounds(@NonNull BoundingBox bbox) {
         if (bbox == null) {
-            throw new NullPointerException("bbox is null");
+            Log.w(TAG, "bbox was null, so just returning null");
+            return null;
         }
 
         // TODO: filter in JNI using C++ parameter to getAnnotationsInBounds
@@ -1963,7 +1984,8 @@ public final class MapView extends FrameLayout {
     @UiThread
     public void selectMarker(@NonNull Marker marker) {
         if (marker == null) {
-            throw new NullPointerException("marker is null");
+            Log.w(TAG, "marker was null, so just returning");
+            return;
         }
 
         if (marker == mSelectedMarker) {
