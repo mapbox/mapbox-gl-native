@@ -162,7 +162,7 @@ void QMapboxGL::setCoordinate(const Coordinate &coordinate_, int milliseconds)
 {
     d_ptr->mapObj->setLatLng(
             mbgl::LatLng { coordinate_.first, coordinate_.second },
-            std::chrono::milliseconds(milliseconds));
+            mbgl::Duration(std::chrono::milliseconds(milliseconds)));
 }
 
 void QMapboxGL::setCoordinateZoom(const Coordinate &coordinate_, double zoom_, int milliseconds)
@@ -179,7 +179,7 @@ double QMapboxGL::bearing() const
 
 void QMapboxGL::setBearing(double degrees, int milliseconds)
 {
-    d_ptr->mapObj->setBearing(degrees, std::chrono::milliseconds(milliseconds));
+    d_ptr->mapObj->setBearing(degrees, mbgl::Duration(std::chrono::milliseconds(milliseconds)));
 }
 
 void QMapboxGL::setBearing(double degrees, const QPointF &center)
