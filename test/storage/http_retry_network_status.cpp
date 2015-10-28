@@ -1,6 +1,6 @@
 #include "storage.hpp"
 
-#include <uv.h>
+#include <mbgl/util/uv_detail.hpp>
 
 #include <mbgl/storage/default_file_source.hpp>
 #include <mbgl/storage/network_status.hpp>
@@ -36,17 +36,15 @@ TEST_F(Storage, HTTPNetworkStatusChange) {
     });
 
     // After 50 milliseconds, we're going to trigger a NetworkStatus change.
-    uv_timer_t reachableTimer;
-    uv_timer_init(uv_default_loop(), &reachableTimer);
-    uv_timer_start(&reachableTimer, [] (uv_timer_t*) {
+    uv::timer reachableTimer(uv_default_loop());
+    reachableTimer.start(50, 0, [] () {
         mbgl::NetworkStatus::Reachable();
-    }, 50, 0);
+    });
 
     // This timer will keep the loop alive to make sure we would be getting a response in caes the
     // network status change triggered another change (which it shouldn't).
-    uv_timer_t delayTimer;
-    uv_timer_init(uv_default_loop(), &delayTimer);
-    uv_timer_start(&delayTimer, [] (uv_timer_t*) {}, 300, 0);
+    uv::timer delayTimer(uv_default_loop());
+    delayTimer.start(300, 0, [] () {});
 
     uv_run(uv_default_loop(), UV_RUN_DEFAULT);
 }
