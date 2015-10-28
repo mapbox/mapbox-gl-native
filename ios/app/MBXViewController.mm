@@ -200,7 +200,7 @@ static NSUInteger const kStyleVersion = 8;
 
         MGLPolygon *triangle = [MGLPolygon polygonWithCoordinates:triangleCoordinates count:3];
 
-        [self.mapView addAnnotation:triangle];
+        [self.mapView addOverlay:triangle];
 
         // Orcas Island hike
         //
@@ -222,7 +222,7 @@ static NSUInteger const kStyleVersion = 8;
         MGLPolyline *polyline = [MGLPolyline polylineWithCoordinates:polylineCoordinates
                                                                count:[hikeCoordinatePairs count]];
 
-        [self.mapView addAnnotation:polyline];
+        [self.mapView addOverlay:polyline];
 
         free(polylineCoordinates);
 
@@ -249,10 +249,16 @@ static NSUInteger const kStyleVersion = 8;
 
             MGLPolygon *polygon = [MGLPolygon polygonWithCoordinates:polygonCoordinates count:[stateCoordinatePairs count]];
 
-            [self.mapView addAnnotation:polygon];
+            [self.mapView addOverlay:polygon];
 
             free(polygonCoordinates);
         }
+
+        // Rabat circle
+        //
+        MGLCircle *circle = [MGLCircle circleWithCenterCoordinate:CLLocationCoordinate2DMake(34.020882, -6.84165) radius:100000];
+
+        [self.mapView addOverlay:circle];
     }
     else if (buttonIndex == actionSheet.firstOtherButtonIndex + 8)
     {
@@ -436,6 +442,11 @@ static NSUInteger const kStyleVersion = 8;
 {
     return (annotation.pointCount > 3 ? [UIColor greenColor] : [UIColor redColor]);
 }
+
+//- (UIColor *)mapView:(__unused MGLMapView *)mapView fillColorForCircleAnnotation:(__unused MGLCircle *)annotation
+//{
+//    return [UIColor greenColor];
+//}
 
 - (void)mapView:(__unused MGLMapView *)mapView didChangeUserTrackingMode:(MGLUserTrackingMode)mode animated:(__unused BOOL)animated
 {

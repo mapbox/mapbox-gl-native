@@ -4,6 +4,7 @@
 #include <mbgl/annotation/annotation.hpp>
 #include <mbgl/annotation/point_annotation_impl.hpp>
 #include <mbgl/annotation/shape_annotation_impl.hpp>
+#include <mbgl/annotation/circle_annotation_impl.hpp>
 #include <mbgl/util/geo.hpp>
 #include <mbgl/util/noncopyable.hpp>
 
@@ -14,6 +15,7 @@ namespace mbgl {
 
 class PointAnnotation;
 class ShapeAnnotation;
+class CircleAnnotation;
 class AnnotationTile;
 class Style;
 
@@ -24,6 +26,7 @@ public:
 
     AnnotationIDs addPointAnnotations(const std::vector<PointAnnotation>&, const uint8_t maxZoom);
     AnnotationIDs addShapeAnnotations(const std::vector<ShapeAnnotation>&, const uint8_t maxZoom);
+    AnnotationIDs addCircleAnnotations(const std::vector<CircleAnnotation>&, const uint8_t maxZoom);
     void removeAnnotations(const AnnotationIDs&);
 
     AnnotationIDs getPointAnnotationsInBounds(const LatLngBounds&) const;
@@ -40,6 +43,7 @@ private:
     PointAnnotationImpl::Tree pointTree;
     PointAnnotationImpl::Map pointAnnotations;
     ShapeAnnotationImpl::Map shapeAnnotations;
+    CircleAnnotationImpl::Map circleAnnotations;
     std::vector<std::string> obsoleteShapeAnnotationLayers;
 };
 

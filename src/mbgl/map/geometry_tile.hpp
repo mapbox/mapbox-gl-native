@@ -19,7 +19,8 @@ enum class FeatureType : uint8_t {
     Unknown = 0,
     Point = 1,
     LineString = 2,
-    Polygon = 3
+    Polygon = 3,
+    Circle = 4
 };
 
 typedef std::vector<std::vector<Coordinate>> GeometryCollection;
