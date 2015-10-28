@@ -2,10 +2,8 @@
 #include <mbgl/util/work_task.hpp>
 #include <mbgl/util/work_request.hpp>
 #include <mbgl/platform/platform.hpp>
-#include <mbgl/map/vector_tile.hpp>
-#include <mbgl/annotation/annotation_tile.hpp>
-#include <mbgl/util/pbf.hpp>
 #include <mbgl/renderer/raster_bucket.hpp>
+#include <mbgl/map/geometry_tile.hpp>
 
 #include <cassert>
 #include <future>
@@ -35,33 +33,21 @@ public:
         callback(std::move(result));
     }
 
-    void parseVectorTile(TileWorker* worker,
-                         const std::shared_ptr<const std::string> data,
-                         PlacementConfig config,
-                         std::function<void(TileParseResult)> callback) {
-        try {
-            pbf tilePBF(reinterpret_cast<const unsigned char*>(data->data()), data->size());
-            callback(worker->parseAllLayers(VectorTile(tilePBF), config));
-        } catch (const std::exception& ex) {
-            callback(TileParseResult(ex.what()));
-        }
-    }
-
-    void parsePendingVectorTileLayers(TileWorker* worker,
-                                      std::function<void(TileParseResult)> callback) {
-        try {
-            callback(worker->parsePendingLayers());
-        } catch (const std::exception& ex) {
-            callback(TileParseResult(ex.what()));
-        }
-    }
-
-    void parseLiveTile(TileWorker* worker,
-                       const AnnotationTile* tile,
-                       PlacementConfig config,
-                       std::function<void(TileParseResult)> callback) {
+    void parseGeometryTile(TileWorker* worker,
+                           std::unique_ptr<GeometryTile> tile,
+                           PlacementConfig config,
+                           std::function<void(TileParseResult)> callback) {
         try {
             callback(worker->parseAllLayers(*tile, config));
+        } catch (const std::exception& ex) {
+            callback(TileParseResult(ex.what()));
+        }
+    }
+
+    void parsePendingGeometryTileLayers(TileWorker* worker,
+                                        std::function<void(TileParseResult)> callback) {
+        try {
+            callback(worker->parsePendingLayers());
         } catch (const std::exception& ex) {
             callback(TileParseResult(ex.what()));
         }
@@ -95,30 +81,21 @@ Worker::parseRasterTile(std::unique_ptr<RasterBucket> bucket,
 }
 
 std::unique_ptr<WorkRequest>
-Worker::parseVectorTile(TileWorker& worker,
-                        const std::shared_ptr<const std::string> data,
-                        PlacementConfig config,
-                        std::function<void(TileParseResult)> callback) {
+Worker::parseGeometryTile(TileWorker& worker,
+                          std::unique_ptr<GeometryTile> tile,
+                          PlacementConfig config,
+                          std::function<void(TileParseResult)> callback) {
     current = (current + 1) % threads.size();
-    return threads[current]->invokeWithCallback(&Worker::Impl::parseVectorTile, callback, &worker,
-                                                data, config);
+    return threads[current]->invokeWithCallback(&Worker::Impl::parseGeometryTile, callback, &worker,
+                                                std::move(tile), config);
 }
 
 std::unique_ptr<WorkRequest>
-Worker::parsePendingVectorTileLayers(TileWorker& worker,
-                                     std::function<void(TileParseResult)> callback) {
+Worker::parsePendingGeometryTileLayers(TileWorker& worker,
+                                       std::function<void(TileParseResult)> callback) {
     current = (current + 1) % threads.size();
-    return threads[current]->invokeWithCallback(&Worker::Impl::parsePendingVectorTileLayers,
+    return threads[current]->invokeWithCallback(&Worker::Impl::parsePendingGeometryTileLayers,
                                                 callback, &worker);
-}
-
-std::unique_ptr<WorkRequest> Worker::parseLiveTile(TileWorker& worker,
-                                                   const AnnotationTile& tile,
-                                                   PlacementConfig config,
-                                                   std::function<void(TileParseResult)> callback) {
-    current = (current + 1) % threads.size();
-    return threads[current]->invokeWithCallback(&Worker::Impl::parseLiveTile, callback, &worker,
-                                                &tile, config);
 }
 
 std::unique_ptr<WorkRequest>

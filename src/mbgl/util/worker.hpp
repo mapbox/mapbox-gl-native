@@ -12,7 +12,7 @@ namespace mbgl {
 
 class WorkRequest;
 class RasterBucket;
-class AnnotationTile;
+class GeometryTileLoader;
 
 class Worker : public mbgl::util::noncopyable {
 public:
@@ -35,18 +35,13 @@ public:
                             std::shared_ptr<const std::string> data,
                             std::function<void(TileParseResult)> callback);
 
-    Request parseVectorTile(TileWorker&,
-                            std::shared_ptr<const std::string> data,
-                            PlacementConfig config,
-                            std::function<void(TileParseResult)> callback);
+    Request parseGeometryTile(TileWorker&,
+                              std::unique_ptr<GeometryTile>,
+                              PlacementConfig,
+                              std::function<void(TileParseResult)> callback);
 
-    Request parsePendingVectorTileLayers(TileWorker&,
-                                         std::function<void(TileParseResult)> callback);
-
-    Request parseLiveTile(TileWorker&,
-                          const AnnotationTile&,
-                          PlacementConfig config,
-                          std::function<void(TileParseResult)> callback);
+    Request parsePendingGeometryTileLayers(TileWorker&,
+                                           std::function<void(TileParseResult)> callback);
 
     Request redoPlacement(TileWorker&,
                           const std::unordered_map<std::string, std::unique_ptr<Bucket>>&,

@@ -7,25 +7,27 @@
 #include <mbgl/text/placement_config.hpp>
 
 #include <atomic>
+#include <memory>
+#include <unordered_map>
 
 namespace mbgl {
 
 class Style;
-class SourceInfo;
 class WorkRequest;
-class Request;
+class GeometryTileMonitor;
 
 class VectorTileData : public TileData {
 public:
-    VectorTileData(
-        const TileID&, Style&, const SourceInfo&);
+    VectorTileData(const TileID&,
+                   std::unique_ptr<GeometryTileMonitor> monitor,
+                   std::string sourceID,
+                   Style&,
+                   const std::function<void()>& callback);
+
     ~VectorTileData();
 
     Bucket* getBucket(const StyleLayer&) override;
 
-    void request(float pixelRatio, const std::function<void()>& callback);
-
-    void parse(std::function<void()> callback);
     bool parsePending(std::function<void()> callback) override;
 
     void redoPlacement(PlacementConfig config) override;
@@ -36,15 +38,14 @@ public:
 private:
     Worker& worker;
     TileWorker tileWorker;
+
+    std::unique_ptr<GeometryTileMonitor> monitor;
     std::unique_ptr<WorkRequest> workRequest;
+    RequestHolder req;
 
     // Contains all the Bucket objects for the tile. Buckets are render
     // objects and they get added by tile parsing operations.
     std::unordered_map<std::string, std::unique_ptr<Bucket>> buckets;
-
-    const SourceInfo& source;
-    RequestHolder req;
-    std::shared_ptr<const std::string> data;
 
     // Stores the placement configuration of the text that is currently placed on the screen.
     PlacementConfig placedConfig;

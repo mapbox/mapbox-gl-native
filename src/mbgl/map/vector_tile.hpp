@@ -46,12 +46,28 @@ private:
 
 class VectorTile : public GeometryTile {
 public:
-    VectorTile(pbf);
+    VectorTile(std::shared_ptr<const std::string> data);
 
     util::ptr<GeometryTileLayer> getLayer(const std::string&) const override;
 
 private:
-    std::map<std::string, util::ptr<GeometryTileLayer>> layers;
+    std::shared_ptr<const std::string> data;
+    mutable bool parsed = false;
+    mutable std::map<std::string, util::ptr<GeometryTileLayer>> layers;
+};
+
+class SourceInfo;
+class TileID;
+
+class VectorTileMonitor : public GeometryTileMonitor {
+public:
+    VectorTileMonitor(const SourceInfo&, const TileID&, float pixelRatio);
+
+    Request* monitorTile(std::function<void (std::exception_ptr, std::unique_ptr<GeometryTile>)>) override;
+
+private:
+    std::string url;
+    std::shared_ptr<const std::string> data;
 };
 
 }

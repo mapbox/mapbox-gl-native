@@ -38,6 +38,18 @@ public:
     std::map<std::string, util::ptr<AnnotationTileLayer>> layers;
 };
 
+class MapData;
+
+class AnnotationTileMonitor : public GeometryTileMonitor {
+public:
+    AnnotationTileMonitor(const TileID&, MapData&);
+
+    Request* monitorTile(std::function<void (std::exception_ptr, std::unique_ptr<GeometryTile>)>) override;
+
+private:
+    std::unique_ptr<AnnotationTile> tile;
+};
+
 }
 
 #endif

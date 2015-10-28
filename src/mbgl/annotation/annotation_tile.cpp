@@ -1,5 +1,6 @@
 #include <mbgl/annotation/annotation_tile.hpp>
 #include <mbgl/util/constants.hpp>
+#include <mbgl/map/map_data.hpp>
 
 namespace mbgl {
 
@@ -22,6 +23,15 @@ util::ptr<GeometryTileLayer> AnnotationTile::getLayer(const std::string& name) c
     if (it != layers.end()) {
         return it->second;
     }
+    return nullptr;
+}
+
+AnnotationTileMonitor::AnnotationTileMonitor(const TileID& id, MapData& data)
+    : tile(data.getAnnotationManager()->getTile(id)) {
+}
+
+Request* AnnotationTileMonitor::monitorTile(std::function<void (std::exception_ptr, std::unique_ptr<GeometryTile>)> callback) {
+    callback(nullptr, std::move(tile));
     return nullptr;
 }
 

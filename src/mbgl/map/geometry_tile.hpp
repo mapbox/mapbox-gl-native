@@ -12,6 +12,7 @@
 #include <cstdint>
 #include <string>
 #include <vector>
+#include <functional>
 
 namespace mbgl {
 
@@ -40,6 +41,21 @@ public:
 class GeometryTile : private util::noncopyable {
 public:
     virtual util::ptr<GeometryTileLayer> getLayer(const std::string&) const = 0;
+};
+
+class Request;
+
+class GeometryTileMonitor : private util::noncopyable {
+public:
+    /*
+     * Monitor the tile held by this object for changes. When the tile is loaded for the first time,
+     * or updates, the callback is executed. If an error occurs, the first parameter will be set.
+     * Otherwise it will be null. If there is no data for the requested tile, the second parameter
+     * will be null.
+     *
+     * To cease monitoring, release the returned Request.
+     */
+    virtual Request* monitorTile(std::function<void (std::exception_ptr, std::unique_ptr<GeometryTile>)>) = 0;
 };
 
 class GeometryTileFeatureExtractor {

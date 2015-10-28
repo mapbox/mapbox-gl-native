@@ -1,4 +1,12 @@
 #include <mbgl/map/vector_tile.hpp>
+#include <mbgl/map/source.hpp>
+#include <mbgl/storage/resource.hpp>
+#include <mbgl/storage/response.hpp>
+#include <mbgl/storage/file_source.hpp>
+#include <mbgl/util/thread_context.hpp>
+#include <mbgl/util/run_loop.hpp>
+
+#include <sstream>
 
 namespace mbgl {
 
@@ -122,22 +130,29 @@ GeometryCollection VectorTileFeature::getGeometries() const {
     return lines;
 }
 
-VectorTile::VectorTile(pbf tile_pbf) {
-    while (tile_pbf.next()) {
-        if (tile_pbf.tag == 3) { // layer
-            util::ptr<VectorTileLayer> layer = std::make_shared<VectorTileLayer>(tile_pbf.message());
-            layers.emplace(layer->name, layer);
-        } else {
-            tile_pbf.skip();
-        }
-    }
+VectorTile::VectorTile(std::shared_ptr<const std::string> data_)
+    : data(data_) {
 }
 
 util::ptr<GeometryTileLayer> VectorTile::getLayer(const std::string& name) const {
+    if (!parsed) {
+        parsed = true;
+        pbf tile_pbf(reinterpret_cast<const unsigned char *>(data->c_str()), data->size());
+        while (tile_pbf.next()) {
+            if (tile_pbf.tag == 3) { // layer
+                util::ptr<VectorTileLayer> layer = std::make_shared<VectorTileLayer>(tile_pbf.message());
+                layers.emplace(layer->name, layer);
+            } else {
+                tile_pbf.skip();
+            }
+        }
+    }
+
     auto layer_it = layers.find(name);
     if (layer_it != layers.end()) {
         return layer_it->second;
     }
+
     return nullptr;
 }
 
@@ -161,6 +176,34 @@ VectorTileLayer::VectorTileLayer(pbf layer_pbf) {
 
 util::ptr<const GeometryTileFeature> VectorTileLayer::getFeature(std::size_t i) const {
     return std::make_shared<VectorTileFeature>(features.at(i), *this);
+}
+
+VectorTileMonitor::VectorTileMonitor(const SourceInfo& source, const TileID& id, float pixelRatio)
+    : url(source.tileURL(id, pixelRatio)) {
+}
+
+Request* VectorTileMonitor::monitorTile(std::function<void (std::exception_ptr, std::unique_ptr<GeometryTile>)> callback) {
+    return util::ThreadContext::getFileSource()->request({ Resource::Kind::Tile, url }, util::RunLoop::getLoop(), [callback, this](const Response& res) {
+        if (res.data && data == res.data) {
+            // We got the same data again. Abort early.
+            return;
+        }
+
+        if (res.status == Response::NotFound) {
+            callback(nullptr, nullptr);
+            return;
+        }
+
+        if (res.status != Response::Successful) {
+            std::stringstream message;
+            message << "Failed to load [" << url << "]: " << res.message;
+            callback(std::make_exception_ptr(std::runtime_error(message.str())), nullptr);
+            return;
+        }
+
+        data = res.data;
+        callback(nullptr, std::make_unique<VectorTile>(data));
+    });
 }
 
 }

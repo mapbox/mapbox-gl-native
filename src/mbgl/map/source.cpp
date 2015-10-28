@@ -2,6 +2,8 @@
 #include <mbgl/map/map_data.hpp>
 #include <mbgl/map/transform.hpp>
 #include <mbgl/map/tile.hpp>
+#include <mbgl/map/vector_tile.hpp>
+#include <mbgl/annotation/annotation_tile.hpp>
 #include <mbgl/renderer/painter.hpp>
 #include <mbgl/util/exception.hpp>
 #include <mbgl/util/constants.hpp>
@@ -22,8 +24,6 @@
 
 #include <mbgl/map/vector_tile_data.hpp>
 #include <mbgl/map/raster_tile_data.hpp>
-#include <mbgl/map/live_tile_data.hpp>
-#include <mbgl/annotation/annotation_tile.hpp>
 #include <mbgl/style/style.hpp>
 #include <mbgl/gl/debugging.hpp>
 
@@ -285,20 +285,28 @@ TileData::State Source::addTile(MapData& data,
         auto callback = std::bind(&Source::tileLoadingCompleteCallback, this, normalized_id, transformState, data.getCollisionDebug());
 
         // If we don't find working tile data, we're just going to load it.
-        if (info.type == SourceType::Vector) {
-            auto tileData = std::make_shared<VectorTileData>(normalized_id, style, info);
-            tileData->request(data.pixelRatio, callback);
-            new_tile.data = tileData;
-        } else if (info.type == SourceType::Raster) {
+        if (info.type == SourceType::Raster) {
             auto tileData = std::make_shared<RasterTileData>(normalized_id, texturePool, info, style.workers);
             tileData->request(data.pixelRatio, callback);
             new_tile.data = tileData;
-        } else if (info.type == SourceType::Annotations) {
-            new_tile.data = std::make_shared<LiveTileData>(normalized_id,
-                    data.getAnnotationManager()->getTile(normalized_id), style, info, callback);
         } else {
-            throw std::runtime_error("source type not implemented");
+            std::unique_ptr<GeometryTileMonitor> monitor;
+
+            if (info.type == SourceType::Vector) {
+                monitor = std::make_unique<VectorTileMonitor>(info, normalized_id, data.pixelRatio);
+            } else if (info.type == SourceType::Annotations) {
+                monitor = std::make_unique<AnnotationTileMonitor>(normalized_id, data);
+            } else {
+                throw std::runtime_error("source type not implemented");
+            }
+
+            new_tile.data = std::make_shared<VectorTileData>(normalized_id,
+                                                             std::move(monitor),
+                                                             info.source_id,
+                                                             style,
+                                                             callback);
         }
+
         tile_data.emplace(new_tile.data->id, new_tile.data);
     }
 
