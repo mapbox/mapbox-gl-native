@@ -56,6 +56,45 @@ NAN_MODULE_INIT(NodeMap::Init) {
     sharedDisplay();
 }
 
+/**
+ * A request object, given to the `request` handler of a map, is an
+ * encapsulation of a URL and type of a resource that the map asks you to load.
+ *
+ * The `kind` property is one of
+ *
+ *     "Unknown": 0,
+ *     "Style": 1,
+ *     "Source": 2,
+ *     "Tile": 3,
+ *     "Glyphs": 4,
+ *     "SpriteImage": 5,
+ *     "SpriteJSON": 6
+ *
+ * @typedef
+ * @name Request
+ * @property {string} url
+ * @property {number} kind
+ */
+
+/**
+ * Mapbox GL object: this object loads stylesheets and renders them into
+ * images.
+ *
+ * @class
+ * @name Map
+ * @param {Object} options
+ * @param {Function} options.request a method used to request resources
+ * over the internet
+ * @param {Function} [options.cancel]
+ * @param {number} options.ratio pixel ratio
+ * @example
+ * var map = new mbgl.Map({ request: function() {} });
+ * map.load(require('./test/fixtures/style.json'));
+ * map.render({}, function(err, image) {
+ *     if (err) throw err;
+ *     fs.writeFileSync('image.png', image);
+ * });
+ */
 NAN_METHOD(NodeMap::New) {
     if (!info.IsConstructCall()) {
         return Nan::ThrowTypeError("Use the new operator to create new Map objects");
@@ -103,6 +142,21 @@ const std::string StringifyStyle(v8::Local<v8::Value> styleHandle) {
     return *Nan::Utf8String(Nan::MakeCallback(JSON, "stringify", 1, &styleHandle));
 }
 
+/**
+ * Load a stylesheet
+ *
+ * @function
+ * @name load
+ * @param {string|Object} stylesheet either an object or a JSON representation
+ * @returns {undefined} loads stylesheet into map
+ * @throws {Error} if stylesheet is missing or invalid
+ * @example
+ * // providing an object
+ * map.load(require('./test/fixtures/style.json'));
+ *
+ * // providing a string
+ * map.load(fs.readFileSync('./test/fixtures/style.json', 'utf8'));
+ */
 NAN_METHOD(NodeMap::Load) {
     auto nodeMap = Nan::ObjectWrap::Unwrap<NodeMap>(info.Holder());
 
@@ -176,6 +230,22 @@ std::unique_ptr<NodeMap::RenderOptions> NodeMap::ParseOptions(v8::Local<v8::Obje
     return options;
 }
 
+/**
+ * Render an image from the currently-loaded style
+ *
+ * @name render
+ * @param {Object} options
+ * @param {number} [options.zoom=0]
+ * @param {number} [options.width=512]
+ * @param {number} [options.height=512]
+ * @param {Array<number>} [options.center=[0,0]] latitude, longitude center
+ * of the map
+ * @param {number} [options.bearing=0] rotation
+ * @param {Array<string>} [options.classes=[]] GL Style Classes
+ * @param {Function} callback
+ * @returns {undefined} calls callback
+ * @throws {Error} if stylesheet is not loaded or if map is already rendering
+ */
 NAN_METHOD(NodeMap::Render) {
     auto nodeMap = Nan::ObjectWrap::Unwrap<NodeMap>(info.Holder());
 
@@ -302,6 +372,11 @@ void NodeMap::renderFinished() {
     }
 }
 
+/**
+ * Clean up any resources used by a map instance.options
+ * @name release
+ * @returns {undefined}
+ */
 NAN_METHOD(NodeMap::Release) {
     auto nodeMap = Nan::ObjectWrap::Unwrap<NodeMap>(info.Holder());
 
