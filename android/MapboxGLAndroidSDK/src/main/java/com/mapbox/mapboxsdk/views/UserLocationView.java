@@ -13,6 +13,8 @@ import android.graphics.Rect;
 import android.graphics.RectF;
 import android.graphics.drawable.Drawable;
 import android.location.Location;
+import android.os.Build;
+import android.os.SystemClock;
 import android.support.annotation.Nullable;
 import android.support.v4.content.ContextCompat;
 import android.util.AttributeSet;
@@ -38,6 +40,7 @@ final class UserLocationView extends View {
     private boolean mShowMarker;
     private boolean mShowDirection;
     private boolean mShowAccuracy;
+    private boolean mStaleMarker;
 
     private PointF mMarkerScreenPoint;
     private Matrix mMarkerScreenMatrix;
@@ -191,19 +194,17 @@ final class UserLocationView extends View {
         canvas.concat(mMarkerScreenMatrix);
 
         Drawable dotDrawable = mShowDirection ? mUserLocationBearingDrawable : mUserLocationDrawable;
-        // IMPORTANT also update in uodate()
+        dotDrawable = mStaleMarker ? mUserLocationStaleDrawable : dotDrawable;
+        // IMPORTANT also update in update()
         RectF dotBounds = mShowDirection ? mUserLocationBearingDrawableBoundsF : mUserLocationDrawableBoundsF;
+        dotBounds = mStaleMarker ? mUserLocationStaleDrawableBoundsF : dotBounds;
 
-        boolean willDraw;
-        willDraw = mShowAccuracy && !canvas.quickReject(mAccuracyPath, Canvas.EdgeType.AA);
+        boolean willDraw =
+                mShowAccuracy && !mStaleMarker && !canvas.quickReject(mAccuracyPath, Canvas.EdgeType.AA);
         willDraw |= !canvas.quickReject(dotBounds, Canvas.EdgeType.AA);
 
-        dotBounds.offset(
-                (int) -mMarkerScreenPoint.x,
-                (int) -mMarkerScreenPoint.y);
-
         if (willDraw) {
-            if (mShowAccuracy) {
+            if (mShowAccuracy && !mStaleMarker) {
                 canvas.drawPath(mAccuracyPath, mAccuracyPaintFill);
                 canvas.drawPath(mAccuracyPath, mAccuracyPaintStroke);
             }
@@ -236,6 +237,8 @@ final class UserLocationView extends View {
         if (isEnabled() && mShowMarker) {
             setVisibility(View.VISIBLE);
 
+            mStaleMarker = isStale(mUserLocation);
+
             // compute new marker position
             // TODO add JNI method that takes existing pointf
             mMarkerScreenPoint = mMapView.toScreenLocation(mMarkerCoordinate);
@@ -251,7 +254,7 @@ final class UserLocationView extends View {
             }
 
             // adjust accuracy circle
-            if (mShowAccuracy) {
+            if (mShowAccuracy && !mStaleMarker) {
                 mAccuracyPath.reset();
                 mAccuracyPath.addCircle(0.0f, 0.0f,
                         (float) (mMarkerAccuracy / mMapView.getMetersPerPixelAtLatitude(
@@ -272,7 +275,9 @@ final class UserLocationView extends View {
             }
 
             RectF dotBounds = mShowDirection ? mUserLocationBearingDrawableBoundsF : mUserLocationDrawableBoundsF;
-            RectF largerBounds = mAccuracyBounds.contains(dotBounds) ? mAccuracyBounds : dotBounds;
+            dotBounds = mStaleMarker ? mUserLocationStaleDrawableBoundsF : dotBounds;
+            RectF largerBounds = mShowAccuracy && !mStaleMarker && mAccuracyBounds.contains(dotBounds)
+                    ? mAccuracyBounds : dotBounds;
             mMarkerScreenMatrix.mapRect(mDirtyRectF, largerBounds);
             mDirtyRectF.roundOut(mDirtyRect);
             invalidate(mDirtyRect); // the new marker location
@@ -299,7 +304,10 @@ final class UserLocationView extends View {
             if (!mLocationClient.isConnected()) {
                 mUserLocation = null;
                 mLocationClient.connect();
-                setLocation(LocationServices.FusedLocationApi.getLastLocation());
+                Location lastLocation = LocationServices.FusedLocationApi.getLastLocation();
+                if (lastLocation != null) {
+                    setLocation(lastLocation);
+                }
                 mLocationListener = new MyLocationListener();
                 LocationServices.FusedLocationApi.requestLocationUpdates(mLocationRequest, mLocationListener);
             }
@@ -320,6 +328,22 @@ final class UserLocationView extends View {
                 return;
             }
             setLocation(location);
+        }
+    }
+
+    private boolean isStale(Location location) {
+        if (location != null) {
+            long ageInNanos;
+            if (android.os.Build.VERSION.SDK_INT >= Build.VERSION_CODES.JELLY_BEAN_MR1) {
+                ageInNanos = SystemClock.elapsedRealtimeNanos() -
+                        location.getElapsedRealtimeNanos();
+            } else {
+                ageInNanos = (System.currentTimeMillis() - location.getTime()) * 1000 * 1000;
+            }
+            final long oneMinuteInNanos = 60L * 1000 * 1000 * 1000;
+            return ageInNanos > oneMinuteInNanos;
+        } else {
+            return false;
         }
     }
 

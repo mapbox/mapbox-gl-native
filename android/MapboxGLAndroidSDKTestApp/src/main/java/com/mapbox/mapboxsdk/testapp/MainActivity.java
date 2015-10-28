@@ -72,7 +72,6 @@ public class MainActivity extends AppCompatActivity {
     // Used for Annotations
     private boolean mIsAnnotationsOn = false;
 
-
     private static final DecimalFormat latLngFormatter = new DecimalFormat("#.#####");
 
     //
@@ -179,13 +178,6 @@ public class MainActivity extends AppCompatActivity {
             public void onClick(View v) {
                 // Toggle GPS position updates
                 toggleGps(!mMapView.isMyLocationEnabled());
-                if (mMapView.isMyLocationEnabled()) {
-                    Location location = mMapView.getMyLocation();
-                    if (location != null) {
-                        mMapView.setZoomLevel(18);
-                        mMapView.setCenterCoordinate(new LatLng(location));
-                    }
-                }
             }
         });
 
@@ -425,6 +417,16 @@ public class MainActivity extends AppCompatActivity {
     }
 
     private void enableGps() {
+        mMapView.setOnMyLocationChangeListener(new MapView.OnMyLocationChangeListener() {
+            @Override
+            public void onMyLocationChange(@Nullable Location location) {
+                if (location != null) {
+                    mMapView.setZoomLevel(16);
+                    mMapView.setCenterCoordinate(new LatLng(location));
+                    mMapView.setOnMyLocationChangeListener(null);
+                }
+            }
+        });
         mMapView.setMyLocationEnabled(true);
         mLocationFAB.setColorFilter(ContextCompat.getColor(this, R.color.primary));
     }
