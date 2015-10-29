@@ -42,16 +42,18 @@ public:
     TileWorker(TileID,
                std::string sourceID,
                Style&,
-               std::vector<util::ptr<StyleLayer>>,
                const std::atomic<TileData::State>&);
     ~TileWorker();
 
-    TileParseResult parseAllLayers(const GeometryTile&, PlacementConfig);
-    TileParseResult parsePendingLayers();
-    void redoPlacement(const std::unordered_map<std::string, std::unique_ptr<Bucket>>*,
-                       PlacementConfig);
+    TileParseResult parseAllLayers(std::vector<util::ptr<StyleLayer>>,
+                                   const GeometryTile&,
+                                   PlacementConfig);
 
-    std::vector<util::ptr<StyleLayer>> layers;
+    TileParseResult parsePendingLayers();
+
+    void redoPlacement(std::vector<util::ptr<StyleLayer>>,
+                       const std::unordered_map<std::string, std::unique_ptr<Bucket>>*,
+                       PlacementConfig);
 
 private:
     void parseLayer(const StyleLayer&, const GeometryTile&);

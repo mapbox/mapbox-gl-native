@@ -18,10 +18,8 @@ using namespace mbgl;
 TileWorker::TileWorker(TileID id_,
                        std::string sourceID_,
                        Style& style_,
-                       std::vector<util::ptr<StyleLayer>> layers_,
                        const std::atomic<TileData::State>& state_)
-    : layers(std::move(layers_)),
-      id(id_),
+    : id(id_),
       sourceID(sourceID_),
       parameters(id.z),
       style(style_),
@@ -33,7 +31,8 @@ TileWorker::~TileWorker() {
     style.glyphAtlas->removeGlyphs(reinterpret_cast<uintptr_t>(this));
 }
 
-TileParseResult TileWorker::parseAllLayers(const GeometryTile& geometryTile,
+TileParseResult TileWorker::parseAllLayers(std::vector<util::ptr<StyleLayer>> layers,
+                                           const GeometryTile& geometryTile,
                                            PlacementConfig config) {
     // We're doing a fresh parse of the tile, because the underlying data has changed.
     pending.clear();
@@ -85,6 +84,7 @@ TileParseResult TileWorker::parsePendingLayers() {
 }
 
 void TileWorker::redoPlacement(
+    std::vector<util::ptr<StyleLayer>> layers,
     const std::unordered_map<std::string, std::unique_ptr<Bucket>>* buckets,
     PlacementConfig config) {
 
