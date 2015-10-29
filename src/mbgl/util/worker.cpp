@@ -16,21 +16,17 @@ public:
 
     void parseRasterTile(std::unique_ptr<RasterBucket> bucket,
                          const std::shared_ptr<const std::string> data,
-                         std::function<void(TileParseResult)> callback) {
+                         std::function<void(RasterTileParseResult)> callback) {
         std::unique_ptr<util::Image> image(new util::Image(*data));
         if (!(*image)) {
-            callback(TileParseResult("error parsing raster image"));
+            callback(RasterTileParseResult("error parsing raster image"));
         }
 
         if (!bucket->setImage(std::move(image))) {
-            callback(TileParseResult("error setting raster image to bucket"));
+            callback(RasterTileParseResult("error setting raster image to bucket"));
         }
 
-        TileParseResultBuckets result;
-        result.buckets.emplace_back("raster", std::move(bucket));
-        result.state = TileData::State::parsed;
-
-        callback(std::move(result));
+        callback(RasterTileParseResult(std::move(bucket)));
     }
 
     void parseGeometryTile(TileWorker* worker,
@@ -74,7 +70,7 @@ Worker::~Worker() = default;
 std::unique_ptr<WorkRequest>
 Worker::parseRasterTile(std::unique_ptr<RasterBucket> bucket,
                         const std::shared_ptr<const std::string> data,
-                        std::function<void(TileParseResult)> callback) {
+                        std::function<void(RasterTileParseResult)> callback) {
     current = (current + 1) % threads.size();
     return threads[current]->invokeWithCallback(&Worker::Impl::parseRasterTile, callback, bucket,
                                                 data);
