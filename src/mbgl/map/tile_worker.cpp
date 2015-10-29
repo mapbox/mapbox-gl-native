@@ -287,6 +287,6 @@ void TileWorker::createSymbolBucket(const GeometryTileLayer& layer,
 
 void TileWorker::insertBucket(const std::string& name, std::unique_ptr<Bucket> bucket) {
     if (bucket->hasData()) {
-        result.buckets.emplace_back(name, std::move(bucket));
+        result.buckets.emplace(name, std::move(bucket));
     }
 }

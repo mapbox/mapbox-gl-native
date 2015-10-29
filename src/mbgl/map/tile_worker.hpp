@@ -31,7 +31,7 @@ class GeometryTileLayer;
 class TileParseResultBuckets {
 public:
     TileData::State state = TileData::State::invalid;
-    std::vector<std::pair<std::string, std::unique_ptr<Bucket>>> buckets;
+    std::unordered_map<std::string, std::unique_ptr<Bucket>> buckets;
 };
 
 using TileParseResult = mapbox::util::variant<TileParseResultBuckets, // success
