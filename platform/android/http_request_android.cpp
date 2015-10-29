@@ -259,7 +259,7 @@ void HTTPAndroidRequest::onResponse(int code, std::string message, std::string e
     if (!expires.empty()) {
         response->expires = parse_date(expires.c_str());
     }
-    response->data = body;
+    response->data = std::make_shared<std::string>(body);
 
     if (code == 304) {
         if (existingResponse) {
@@ -276,7 +276,7 @@ void HTTPAndroidRequest::onResponse(int code, std::string message, std::string e
     } else if (code == 200) {
         response->status = Response::Successful;
         status = ResponseStatus::Successful;
-    } else if (responseCode == 404) {
+    } else if (code == 404) {
         response->status = Response::NotFound;
         status = ResponseStatus::Successful;
     } else if (code >= 500 && code < 600) {
