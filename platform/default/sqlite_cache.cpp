@@ -16,7 +16,7 @@ namespace mbgl {
 using namespace mapbox::sqlite;
 
 SQLiteCache::SQLiteCache(const std::string& path_)
-    : thread(std::make_unique<util::Thread<Impl>>(util::ThreadContext{"SQLite Cache", util::ThreadType::Unknown, util::ThreadPriority::Low}, path_)) {
+    : thread(std::make_unique<util::Thread<Impl>>(util::ThreadContext{"SQLiteCache", util::ThreadType::Unknown, util::ThreadPriority::Low}, path_)) {
 }
 
 SQLiteCache::~SQLiteCache() = default;

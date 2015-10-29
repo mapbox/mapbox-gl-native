@@ -93,8 +93,10 @@ Thread<Object>::Thread(const ThreadContext& context, Args&&... args) {
     std::tuple<Args...> params = std::forward_as_tuple(::std::forward<Args>(args)...);
 
     thread = std::thread([&] {
-        #ifdef __APPLE__
+        #if defined( __APPLE__)
         pthread_setname_np(context.name.c_str());
+        #elif defined(__linux__)
+        pthread_setname_np(pthread_self(), context.name.c_str());
         #endif
 
         if (context.priority == ThreadPriority::Low) {
