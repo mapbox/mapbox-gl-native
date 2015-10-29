@@ -53,7 +53,7 @@ TEST_F(Storage, HTTPError) {
         fs.cancel(req2);
         const auto duration = double(uv_hrtime() - start) / 1e9;
         // 1.5 seconds == 4 retries, with a 500ms timeout (see above).
-        EXPECT_LT(1.5, duration) << "Resource wasn't retried the correct number of times";
+        EXPECT_LT(1.4, duration) << "Resource wasn't retried the correct number of times";
         EXPECT_GT(1.7, duration) << "Resource wasn't retried the correct number of times";
         EXPECT_EQ(Response::Error, res.status);
         EXPECT_EQ(false, res.stale);
