@@ -43,8 +43,6 @@ final class UserLocationView extends View {
 
     private MapView mMapView;
 
-    private static final int BLUE_COLOR = 0x39ACCBFF;
-
     private float mDensity;
 
     private boolean mShowMarker;
@@ -137,6 +135,8 @@ final class UserLocationView extends View {
 
         // Setup the custom paint
         Resources resources = context.getResources();
+        int accuracyColor = resources.getColor(R.color.my_location_ring);
+
         mDensity = resources.getDisplayMetrics().density;
         mMarkerCoordinate = new LatLng(0.0, 0.0);
         mMarkerScreenPoint = new PointF();
@@ -145,20 +145,20 @@ final class UserLocationView extends View {
         mAccuracyPaintFill = new Paint();
         mAccuracyPaintFill.setAntiAlias(true);
         mAccuracyPaintFill.setStyle(Paint.Style.FILL);
-        mAccuracyPaintFill.setColor(BLUE_COLOR);
+        mAccuracyPaintFill.setColor(accuracyColor);
         mAccuracyPaintFill.setAlpha((int) (255 * 0.25f));
 
         mAccuracyPaintStroke = new Paint();
         mAccuracyPaintStroke.setAntiAlias(true);
         mAccuracyPaintStroke.setStyle(Paint.Style.STROKE);
         mAccuracyPaintStroke.setStrokeWidth(0.5f * mDensity);
-        mAccuracyPaintStroke.setColor(BLUE_COLOR);
+        mAccuracyPaintStroke.setColor(accuracyColor);
         mAccuracyPaintStroke.setAlpha((int) (255 * 0.5f));
 
         mAccuracyPath = new Path();
         mAccuracyBounds = new RectF();
 
-        mUserLocationDrawable = ContextCompat.getDrawable(getContext(), R.drawable.user_location);
+        mUserLocationDrawable = ContextCompat.getDrawable(getContext(), R.drawable.my_location);
         mUserLocationDrawableBounds = new Rect(
                 -mUserLocationDrawable.getIntrinsicWidth() / 2,
                 -mUserLocationDrawable.getIntrinsicHeight() / 2,
@@ -171,7 +171,7 @@ final class UserLocationView extends View {
                 mUserLocationDrawable.getIntrinsicHeight() / 2);
         mUserLocationDrawable.setBounds(mUserLocationDrawableBounds);
 
-        mUserLocationBearingDrawable = ContextCompat.getDrawable(getContext(), R.drawable.user_location_bearing);
+        mUserLocationBearingDrawable = ContextCompat.getDrawable(getContext(), R.drawable.my_location_bearing);
         mUserLocationBearingDrawableBounds = new Rect(
                 -mUserLocationBearingDrawable.getIntrinsicWidth() / 2,
                 -mUserLocationBearingDrawable.getIntrinsicHeight() / 2,
@@ -184,7 +184,7 @@ final class UserLocationView extends View {
                 mUserLocationBearingDrawable.getIntrinsicHeight() / 2);
         mUserLocationBearingDrawable.setBounds(mUserLocationBearingDrawableBounds);
 
-        mUserLocationStaleDrawable = ContextCompat.getDrawable(getContext(), R.drawable.user_location_stale);
+        mUserLocationStaleDrawable = ContextCompat.getDrawable(getContext(), R.drawable.my_location_stale);
         mUserLocationStaleDrawableBounds = new Rect(
                 -mUserLocationStaleDrawable.getIntrinsicWidth() / 2,
                 -mUserLocationStaleDrawable.getIntrinsicHeight() / 2,

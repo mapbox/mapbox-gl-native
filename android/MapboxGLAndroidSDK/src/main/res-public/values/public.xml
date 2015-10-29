@@ -40,4 +40,16 @@
     <public name="attribution_margin_right" type="attr" />
     <public name="attribution_margin_bottom" type="attr" />
     <public name="attribution_visibility" type="attr" />
+
+    <public name="attribution_logo" type="drawable" />
+    <public name="compass" type="drawable" />
+    <public name="default_marker" type="drawable" />
+    <public name="attribution_button_pressed_selector" type="drawable" />
+    <public name="attribution_button_pressed_normal" type="drawable" />
+    <public name="attribution_button_pressed_pressed" type="drawable" />
+    <public name="my_location" type="drawable" />
+    <public name="my_location_bearing" type="drawable" />
+    <public name="my_location_stale" type="drawable" />
+    <public name="my_location_ring" type="color" />
+    <public name="mapbox_blue" type="color" />
 </resources>
