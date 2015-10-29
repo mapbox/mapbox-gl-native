@@ -57,19 +57,15 @@ void RasterTileData::request(float pixelRatio,
             state = State::loaded;
         }
 
-        workRequest = worker.parseRasterTile(std::make_unique<RasterBucket>(texturePool, layout), res.data, [this, callback] (TileParseResult result) {
+        workRequest = worker.parseRasterTile(std::make_unique<RasterBucket>(texturePool, layout), res.data, [this, callback] (RasterTileParseResult result) {
             workRequest.reset();
             if (state != State::loaded) {
                 return;
             }
 
-            if (result.is<TileParseResultBuckets>()) {
-                auto& buckets = result.get<TileParseResultBuckets>();
-                state = buckets.state;
-                // TODO: Make this less awkward; we're only getting one bucket back.
-                if (!buckets.buckets.empty()) {
-                    bucket = std::move(buckets.buckets.front().second);
-                }
+            if (result.is<std::unique_ptr<Bucket>>()) {
+                state = State::parsed;
+                bucket = std::move(result.get<std::unique_ptr<Bucket>>());
             } else {
                 std::stringstream message;
                 message << "Failed to parse [" << std::string(id) << "]: " << result.get<std::string>();

@@ -14,6 +14,10 @@ class WorkRequest;
 class RasterBucket;
 class GeometryTileLoader;
 
+using RasterTileParseResult = mapbox::util::variant<
+    std::unique_ptr<Bucket>, // success
+    std::string>;            // error
+
 class Worker : public mbgl::util::noncopyable {
 public:
     explicit Worker(std::size_t count);
@@ -33,7 +37,7 @@ public:
 
     Request parseRasterTile(std::unique_ptr<RasterBucket> bucket,
                             std::shared_ptr<const std::string> data,
-                            std::function<void(TileParseResult)> callback);
+                            std::function<void(RasterTileParseResult)> callback);
 
     Request parseGeometryTile(TileWorker&,
                               std::unique_ptr<GeometryTile>,
