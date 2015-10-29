@@ -36,6 +36,7 @@ public:
     void cancel() override;
 
 private:
+    Style& style;
     Worker& worker;
     TileWorker tileWorker;
 

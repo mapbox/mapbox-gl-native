@@ -30,11 +30,12 @@ public:
     }
 
     void parseGeometryTile(TileWorker* worker,
+                           std::vector<util::ptr<StyleLayer>> layers,
                            std::unique_ptr<GeometryTile> tile,
                            PlacementConfig config,
                            std::function<void(TileParseResult)> callback) {
         try {
-            callback(worker->parseAllLayers(*tile, config));
+            callback(worker->parseAllLayers(layers, *tile, config));
         } catch (const std::exception& ex) {
             callback(TileParseResult(ex.what()));
         }
@@ -50,10 +51,11 @@ public:
     }
 
     void redoPlacement(TileWorker* worker,
+                       std::vector<util::ptr<StyleLayer>> layers,
                        const std::unordered_map<std::string, std::unique_ptr<Bucket>>* buckets,
                        PlacementConfig config,
                        std::function<void()> callback) {
-        worker->redoPlacement(buckets, config);
+        worker->redoPlacement(layers, buckets, config);
         callback();
     }
 };
@@ -78,12 +80,13 @@ Worker::parseRasterTile(std::unique_ptr<RasterBucket> bucket,
 
 std::unique_ptr<WorkRequest>
 Worker::parseGeometryTile(TileWorker& worker,
+                          std::vector<util::ptr<StyleLayer>> layers,
                           std::unique_ptr<GeometryTile> tile,
                           PlacementConfig config,
                           std::function<void(TileParseResult)> callback) {
     current = (current + 1) % threads.size();
     return threads[current]->invokeWithCallback(&Worker::Impl::parseGeometryTile, callback, &worker,
-                                                std::move(tile), config);
+                                                std::move(layers), std::move(tile), config);
 }
 
 std::unique_ptr<WorkRequest>
@@ -96,12 +99,13 @@ Worker::parsePendingGeometryTileLayers(TileWorker& worker,
 
 std::unique_ptr<WorkRequest>
 Worker::redoPlacement(TileWorker& worker,
+                      std::vector<util::ptr<StyleLayer>> layers,
                       const std::unordered_map<std::string, std::unique_ptr<Bucket>>& buckets,
                       PlacementConfig config,
                       std::function<void()> callback) {
     current = (current + 1) % threads.size();
     return threads[current]->invokeWithCallback(&Worker::Impl::redoPlacement, callback, &worker,
-                                                &buckets, config);
+                                                layers, &buckets, config);
 }
 
 } // end namespace mbgl

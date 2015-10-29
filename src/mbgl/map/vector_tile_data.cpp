@@ -16,16 +16,16 @@ VectorTileData::VectorTileData(const TileID& id_,
                                Style& style_,
                                const std::function<void()>& callback)
     : TileData(id_),
+      style(style_),
       worker(style_.workers),
       tileWorker(id_,
                  sourceID,
                  style_,
-                 style_.layers,
                  state),
       monitor(std::move(monitor_))
 {
     state = State::loading;
-    req = monitor->monitorTile([callback, sourceID, this](std::exception_ptr err, std::unique_ptr<GeometryTile> tile) {
+    req = monitor->monitorTile([callback, this](std::exception_ptr err, std::unique_ptr<GeometryTile> tile) {
         if (err) {
             try {
                 std::rethrow_exception(err);
@@ -54,7 +54,7 @@ VectorTileData::VectorTileData(const TileID& id_,
         // when tile data changed. Replacing the workdRequest will cancel a pending work
         // request in case there is one.
         workRequest.reset();
-        workRequest = worker.parseGeometryTile(tileWorker, std::move(tile), targetConfig, [callback, sourceID, this, config = targetConfig] (TileParseResult result) {
+        workRequest = worker.parseGeometryTile(tileWorker, style.layers, std::move(tile), targetConfig, [callback, this, config = targetConfig] (TileParseResult result) {
             workRequest.reset();
             if (state == State::obsolete) {
                 return;
@@ -162,7 +162,7 @@ void VectorTileData::redoPlacement(const PlacementConfig newConfig) {
 
 void VectorTileData::redoPlacement() {
     workRequest.reset();
-    workRequest = worker.redoPlacement(tileWorker, buckets, targetConfig, [this, config = targetConfig] {
+    workRequest = worker.redoPlacement(tileWorker, style.layers, buckets, targetConfig, [this, config = targetConfig] {
         workRequest.reset();
 
         // Persist the configuration we just placed so that we can later check whether we need to
