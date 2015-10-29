@@ -39,6 +39,7 @@ VectorTileData::VectorTileData(const TileID& id_,
 
         if (!tile) {
             state = State::parsed;
+            buckets.clear();
             callback();
             return;
         }
@@ -69,9 +70,7 @@ VectorTileData::VectorTileData(const TileID& id_,
 
                 // Move over all buckets we received in this parse request, potentially overwriting
                 // existing buckets in case we got a refresh parse.
-                for (auto& bucket : resultBuckets.buckets) {
-                    buckets[bucket.first] = std::move(bucket.second);
-                }
+                buckets = std::move(resultBuckets.buckets);
 
                 // The target configuration could have changed since we started placement. In this case,
                 // we're starting another placement run.
