@@ -27,6 +27,7 @@ typedef std::vector<std::vector<Coordinate>> GeometryCollection;
 
 class GeometryTileFeature : private util::noncopyable {
 public:
+    virtual ~GeometryTileFeature() = default;
     virtual FeatureType getType() const = 0;
     virtual mapbox::util::optional<Value> getValue(const std::string& key) const = 0;
     virtual GeometryCollection getGeometries() const = 0;
@@ -34,12 +35,14 @@ public:
 
 class GeometryTileLayer : private util::noncopyable {
 public:
+    virtual ~GeometryTileLayer() = default;
     virtual std::size_t featureCount() const = 0;
     virtual util::ptr<const GeometryTileFeature> getFeature(std::size_t) const = 0;
 };
 
 class GeometryTile : private util::noncopyable {
 public:
+    virtual ~GeometryTile() = default;
     virtual util::ptr<GeometryTileLayer> getLayer(const std::string&) const = 0;
 };
 
@@ -47,6 +50,8 @@ class Request;
 
 class GeometryTileMonitor : private util::noncopyable {
 public:
+    virtual ~GeometryTileMonitor() = default;
+
     /*
      * Monitor the tile held by this object for changes. When the tile is loaded for the first time,
      * or updates, the callback is executed. If an error occurs, the first parameter will be set.

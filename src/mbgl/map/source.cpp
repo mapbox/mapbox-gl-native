@@ -526,13 +526,6 @@ bool Source::update(MapData& data,
     return allTilesUpdated;
 }
 
-void Source::invalidateTiles() {
-    cache.clear();
-    tiles.clear();
-    tile_data.clear();
-    updateTilePtrs();
-}
-
 void Source::updateTilePtrs() {
     tilePtrs.clear();
     for (const auto& pair : tiles) {
