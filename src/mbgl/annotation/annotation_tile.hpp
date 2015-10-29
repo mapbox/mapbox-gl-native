@@ -43,11 +43,16 @@ class MapData;
 class AnnotationTileMonitor : public GeometryTileMonitor {
 public:
     AnnotationTileMonitor(const TileID&, MapData&);
+    ~AnnotationTileMonitor();
 
+    void update(std::unique_ptr<GeometryTile>);
     Request* monitorTile(std::function<void (std::exception_ptr, std::unique_ptr<GeometryTile>)>) override;
 
+    TileID tileID;
+
 private:
-    std::unique_ptr<AnnotationTile> tile;
+    MapData& data;
+    std::function<void (std::exception_ptr, std::unique_ptr<GeometryTile>)> callback;
 };
 
 }

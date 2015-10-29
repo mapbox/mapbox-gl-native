@@ -78,8 +78,6 @@ public:
                 TexturePool&,
                 bool shouldReparsePartialTiles);
 
-    void invalidateTiles();
-
     void updateMatrices(const mat4 &projMatrix, const TransformState &transform);
     void drawClippingMasks(Painter &painter);
     void finishRender(Painter &painter);

@@ -9,12 +9,14 @@
 
 #include <string>
 #include <vector>
+#include <set>
 
 namespace mbgl {
 
 class PointAnnotation;
 class ShapeAnnotation;
 class AnnotationTile;
+class AnnotationTileMonitor;
 class Style;
 
 class AnnotationManager : private util::noncopyable {
@@ -30,17 +32,22 @@ public:
     LatLngBounds getBoundsForAnnotations(const AnnotationIDs&) const;
 
     void updateStyle(Style&);
-    std::unique_ptr<AnnotationTile> getTile(const TileID&);
+
+    void addTileMonitor(AnnotationTileMonitor&);
+    void removeTileMonitor(AnnotationTileMonitor&);
 
     static const std::string SourceID;
     static const std::string PointLayerID;
 
 private:
+    std::unique_ptr<AnnotationTile> getTile(const TileID&);
+
     AnnotationID nextID = 0;
     PointAnnotationImpl::Tree pointTree;
     PointAnnotationImpl::Map pointAnnotations;
     ShapeAnnotationImpl::Map shapeAnnotations;
     std::vector<std::string> obsoleteShapeAnnotationLayers;
+    std::set<AnnotationTileMonitor*> monitors;
 };
 
 }

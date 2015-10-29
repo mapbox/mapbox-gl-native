@@ -26,13 +26,23 @@ util::ptr<GeometryTileLayer> AnnotationTile::getLayer(const std::string& name) c
     return nullptr;
 }
 
-AnnotationTileMonitor::AnnotationTileMonitor(const TileID& id, MapData& data)
-    : tile(data.getAnnotationManager()->getTile(id)) {
+AnnotationTileMonitor::AnnotationTileMonitor(const TileID& tileID_, MapData& data_)
+    : tileID(tileID_),
+      data(data_) {
 }
 
-Request* AnnotationTileMonitor::monitorTile(std::function<void (std::exception_ptr, std::unique_ptr<GeometryTile>)> callback) {
-    callback(nullptr, std::move(tile));
+AnnotationTileMonitor::~AnnotationTileMonitor() {
+    data.getAnnotationManager()->removeTileMonitor(*this);
+}
+
+Request* AnnotationTileMonitor::monitorTile(std::function<void (std::exception_ptr, std::unique_ptr<GeometryTile>)> callback_) {
+    callback = callback_;
+    data.getAnnotationManager()->addTileMonitor(*this);
     return nullptr;
+}
+
+void AnnotationTileMonitor::update(std::unique_ptr<GeometryTile> tile) {
+    callback(nullptr, std::move(tile));
 }
 
 }

@@ -138,7 +138,19 @@ void AnnotationManager::updateStyle(Style& style) {
     }
 
     obsoleteShapeAnnotationLayers.clear();
-    style.getSource(SourceID)->invalidateTiles();
+
+    for (auto& monitor : monitors) {
+        monitor->update(getTile(monitor->tileID));
+    }
+}
+
+void AnnotationManager::addTileMonitor(AnnotationTileMonitor& monitor) {
+    monitors.insert(&monitor);
+    monitor.update(getTile(monitor.tileID));
+}
+
+void AnnotationManager::removeTileMonitor(AnnotationTileMonitor& monitor) {
+    monitors.erase(&monitor);
 }
 
 }
