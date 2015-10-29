@@ -201,6 +201,7 @@ void HTTPNSURLRequest::handleResult(NSData *data, NSURLResponse *res, NSError *e
     if (error) {
         if ([error code] == NSURLErrorCancelled) {
             status = ResponseStatus::Canceled;
+            cancelled = true;
         } else {
             // TODO: Use different codes for host not found, timeout, invalid URL etc.
             // These can be categorized in temporary and permanent errors.
@@ -319,6 +320,11 @@ void HTTPNSURLRequest::retry() {
     if (strategy == PreemptImmediately && !task) {
         // Triggers the timer upon the next event loop iteration.
         timer.stop();
+        if (task) {
+            [task cancel];
+            [task release];
+            task = nullptr;
+        }
         timer.start(0, 0, [this] { start(); });
     }
 }
