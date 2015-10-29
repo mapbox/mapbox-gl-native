@@ -1,24 +1,11 @@
 #import "MBXViewController.h"
 
 #import <mbgl/ios/Mapbox.h>
+#import <mbgl/util/default_styles.hpp>
 
 #import <CoreLocation/CoreLocation.h>
 
 static UIColor *const kTintColor = [UIColor colorWithRed:0.120 green:0.550 blue:0.670 alpha:1.000];
-
-static struct MBXStyle {
-    NSString *name;
-    NSString *displayName;
-} MBXAvailableStyles[] = {
-    {@"streets",            @"Streets"},
-    {@"emerald",            @"Emerald"},
-    {@"light",              @"Light"},
-    {@"dark",               @"Dark"},
-    {@"satellite",          @"Satellite"},
-    {@"satellite-hybrid",   @"Hybrid"},
-};
-
-static NSUInteger const kStyleVersion = 8;
 
 @interface MBXViewController () <UIActionSheetDelegate, MGLMapViewDelegate>
 
@@ -79,7 +66,7 @@ static NSUInteger const kStyleVersion = 8;
 
     UIButton *titleButton = [UIButton buttonWithType:UIButtonTypeCustom];
     [titleButton setFrame:CGRectMake(0, 0, 150, 40)];
-    [titleButton setTitle:MBXAvailableStyles[self.styleIndex].displayName forState:UIControlStateNormal];
+    [titleButton setTitle:@(mbgl::util::default_styles::orderedStyles[self.styleIndex].name) forState:UIControlStateNormal];
     [titleButton setTitleColor:kTintColor forState:UIControlStateNormal];
     [titleButton addTarget:self action:@selector(cycleStyles) forControlEvents:UIControlEventTouchUpInside];
     self.navigationItem.titleView = titleButton;
@@ -323,14 +310,11 @@ static NSUInteger const kStyleVersion = 8;
 {
     UIButton *titleButton = (UIButton *)self.navigationItem.titleView;
 
-    self.styleIndex = (self.styleIndex + 1) % (sizeof(MBXAvailableStyles) / sizeof(MBXAvailableStyles[0]));
+    self.styleIndex = (self.styleIndex + 1) % mbgl::util::default_styles::numOrderedStyles;
 
-    self.mapView.styleURL = [NSURL URLWithString:
-        [NSString stringWithFormat:@"mapbox://styles/mapbox/%@-v%lu",
-            MBXAvailableStyles[self.styleIndex].name,
-            (unsigned long)kStyleVersion]];
+    self.mapView.styleURL = [NSURL URLWithString:@(mbgl::util::default_styles::orderedStyles[self.styleIndex].url)];
 
-    [titleButton setTitle:MBXAvailableStyles[self.styleIndex].displayName forState:UIControlStateNormal];
+    [titleButton setTitle:@(mbgl::util::default_styles::orderedStyles[self.styleIndex].name) forState:UIControlStateNormal];
 }
 
 - (void)locateUser

@@ -52,6 +52,8 @@
         '../platform/ios/MGLShape.m',
         '../include/mbgl/ios/MGLAnnotationImage.h',
         '../platform/ios/MGLAnnotationImage.m',
+        '../include/mbgl/ios/MGLStyle.h',
+        '../platform/ios/MGLStyle.mm',
         '../platform/ios/NSBundle+MGLAdditions.h',
         '../platform/ios/NSBundle+MGLAdditions.m',
         '../platform/ios/NSException+MGLAdditions.h',

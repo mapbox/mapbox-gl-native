@@ -217,8 +217,9 @@ IB_DESIGNABLE
 
 @property (nonatomic, nullable) NSString *styleID __attribute__((unavailable("Set styleURL to an NSURL of the form <mapbox://styles/STYLE_ID>, where STYLE_ID would have been the value of this property.")));
 
-/** URLs of the styles bundled with the library. */
-@property (nonatomic, readonly) NS_ARRAY_OF(NSURL *) *bundledStyleURLs;
+/** URLs of the styles bundled with the library.
+    @deprecated Call the relevant class method of `MGLStyle` for the URL of a particular default style. */
+@property (nonatomic, readonly) NS_ARRAY_OF(NSURL *) *bundledStyleURLs __attribute__((deprecated("Call the relevant class method of MGLStyle for the URL of a particular default style.")));
 
 /** URL of the style currently displayed in the receiver.
 *

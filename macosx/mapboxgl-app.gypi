@@ -27,8 +27,6 @@
         '../platform/darwin/reachability.m',
         '../platform/default/glfw_view.hpp',
         '../platform/default/glfw_view.cpp',
-        '../platform/default/default_styles.hpp',
-        '../platform/default/default_styles.cpp',
       ],
 
       'variables' : {

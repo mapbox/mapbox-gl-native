@@ -22,6 +22,7 @@
 #include <mbgl/util/constants.hpp>
 #include <mbgl/util/image.hpp>
 #include <mbgl/util/std.hpp>
+#include <mbgl/util/default_styles.hpp>
 
 #import "Mapbox.h"
 
@@ -42,11 +43,8 @@
 
 class MBGLView;
 
-NSString *const MGLDefaultStyleName = @"streets";
 NSString *const MGLDefaultStyleMarkerSymbolName = @"default_marker";
 NSString *const MGLMapboxSetupDocumentationURLDisplayString = @"mapbox.com/guides/first-steps-ios-sdk";
-
-NSUInteger const MGLStyleVersion = 8;
 
 const NSTimeInterval MGLAnimationDuration = 0.3;
 const CGSize MGLAnnotationUpdateViewportOutset = {150, 150};
@@ -59,11 +57,6 @@ const std::string spritePrefix = "com.mapbox.sprites.";
 NSString *const MGLAnnotationIDKey = @"MGLAnnotationIDKey";
 NSString *const MGLAnnotationSymbolKey = @"MGLAnnotationSymbolKey";
 NSString *const MGLAnnotationSpritePrefix = @"com.mapbox.sprites.";
-
-static NSURL *MGLURLForBundledStyleNamed(NSString *styleName)
-{
-    return [NSURL URLWithString:[NSString stringWithFormat:@"mapbox://styles/mapbox/%@", styleName]];
-}
 
 mbgl::util::UnitBezier MGLUnitBezierForMediaTimingFunction(CAMediaTimingFunction *function)
 {
@@ -190,9 +183,7 @@ std::chrono::steady_clock::duration secondsAsDuration(float duration)
 
     if ( ! styleURL)
     {
-        styleURL = MGLURLForBundledStyleNamed([NSString stringWithFormat:@"%@-v%lu",
-                                               MGLDefaultStyleName.lowercaseString,
-                                               (unsigned long)MGLStyleVersion]);
+        styleURL = [MGLStyle streetsStyleURL];
     }
 
     if ( ! [styleURL scheme])
@@ -1980,14 +1971,11 @@ CLLocationCoordinate2D MGLLocationCoordinate2DFromLatLng(mbgl::LatLng latLng)
 {
     if ( ! _bundledStyleURLs)
     {
-        NSString *stylesPath = [[NSBundle mgl_resourceBundlePath] stringByAppendingPathComponent:@"styles"];
-
         _bundledStyleURLs = [NSMutableArray array];
-
-        NSArray *bundledStyleNamesWithExtensions = [[NSFileManager defaultManager] contentsOfDirectoryAtPath:stylesPath error:nil];
-        for (NSString *fileName in bundledStyleNamesWithExtensions)
+        for (NSUInteger i = 0; i < mbgl::util::default_styles::numOrderedStyles; i++)
         {
-            [_bundledStyleURLs addObject:MGLURLForBundledStyleNamed([fileName stringByDeletingPathExtension])];
+            NSURL *styleURL = [NSURL URLWithString:@(mbgl::util::default_styles::orderedStyles[i].url)];
+            [_bundledStyleURLs addObject:styleURL];
         }
     }
 
