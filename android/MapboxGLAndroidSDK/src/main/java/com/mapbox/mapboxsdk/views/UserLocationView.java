@@ -37,8 +37,6 @@ import com.mapzen.android.lost.api.LocationRequest;
 import com.mapzen.android.lost.api.LocationServices;
 import com.mapzen.android.lost.api.LostApiClient;
 
-import java.util.ArrayDeque;
-
 final class UserLocationView extends View {
 
     private MapView mMapView;
@@ -382,8 +380,7 @@ final class UserLocationView extends View {
         private GeomagneticField mGeomagneticField;
 
         // Controls the sensor update rate in milliseconds
-        private static final int UPDATE_RATE_MS = 500;
-        private AngleLowPassFilter mLowPassFilter;
+        private static final int UPDATE_RATE_MS = 300;
 
         // Compass data
         private float mCompassBearing;
@@ -392,12 +389,11 @@ final class UserLocationView extends View {
         public MyBearingListener(Context context) {
             mSensorManager = (SensorManager) context.getSystemService(Context.SENSOR_SERVICE);
             mSensorRotationVector = mSensorManager.getDefaultSensor(Sensor.TYPE_ROTATION_VECTOR);
-            mLowPassFilter = new AngleLowPassFilter();
         }
 
         public void onStart(Context context) {
             mRotationDevice = ((WindowManager) context.getSystemService(Context.WINDOW_SERVICE)).getDefaultDisplay().getRotation();
-            mSensorManager.registerListener(this, mSensorRotationVector, UPDATE_RATE_MS * 1000);
+            mSensorManager.registerListener(this, mSensorRotationVector, UPDATE_RATE_MS * 2500);
         }
 
         public void onStop() {
@@ -411,6 +407,11 @@ final class UserLocationView extends View {
         @Override
         public void onSensorChanged(SensorEvent event) {
             if (mPaused) {
+                return;
+            }
+
+            long currentTime = SystemClock.elapsedRealtime();
+            if (currentTime < mCompassUpdateNextTimestamp) {
                 return;
             }
 
@@ -432,51 +433,19 @@ final class UserLocationView extends View {
                     break;
             }
 
-            mLowPassFilter.add(mOrientation[0]);
-            long currentTime = System.currentTimeMillis();
-            if (currentTime < mCompassUpdateNextTimestamp) {
-                return;
-            }
-
             mCompassUpdateNextTimestamp = currentTime + UPDATE_RATE_MS;
             mGeomagneticField = new GeomagneticField(
                     (float) mUserLocation.getLatitude(),
                     (float) mUserLocation.getLongitude(),
                     (float) mUserLocation.getAltitude(),
                     currentTime);
-            mCompassBearing = (float) Math.toDegrees(mLowPassFilter.average()) + mGeomagneticField.getDeclination();
+            mCompassBearing = (float) Math.toDegrees(mOrientation[0] + mGeomagneticField.getDeclination());
             setCompass(mCompassBearing);
         }
 
         @Override
         public void onAccuracyChanged(Sensor sensor, int accuracy) {
             // TODO add accuracy to the equiation
-        }
-
-        private class AngleLowPassFilter {
-
-            private final int LENGTH = 5;
-
-            private float sumSin, sumCos;
-
-            private ArrayDeque<Float> queue = new ArrayDeque<>();
-
-            public void add(float radians) {
-                sumSin += (float) Math.sin(radians);
-                sumCos += (float) Math.cos(radians);
-                queue.add(radians);
-
-                if (queue.size() > LENGTH) {
-                    float old = queue.poll();
-                    sumSin -= Math.sin(old);
-                    sumCos -= Math.cos(old);
-                }
-            }
-
-            public float average() {
-                int size = queue.size();
-                return (float) Math.atan2(sumSin / size, sumCos / size);
-            }
         }
     }
 
