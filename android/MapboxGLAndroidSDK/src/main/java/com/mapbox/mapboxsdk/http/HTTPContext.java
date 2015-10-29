@@ -1,8 +1,11 @@
 package com.mapbox.mapboxsdk.http;
 
+import android.util.Log;
+
 import com.mapbox.mapboxsdk.constants.MapboxConstants;
 import com.squareup.okhttp.Call;
 import com.squareup.okhttp.Callback;
+import com.squareup.okhttp.Interceptor;
 import com.squareup.okhttp.OkHttpClient;
 import com.squareup.okhttp.Request;
 import com.squareup.okhttp.Response;
@@ -29,6 +32,7 @@ class HTTPContext {
     private HTTPContext() {
         super();
         mClient = new OkHttpClient();
+        //mClient.interceptors().add(new LoggingInterceptor());
     }
 
     public static HTTPContext getInstance() {
@@ -44,6 +48,8 @@ class HTTPContext {
     }
 
     public class HTTPRequest implements Callback {
+        private final String LOG_TAG = HTTPRequest.class.getName();
+
         private long mNativePtr = 0;
 
         private Call mCall;
@@ -74,6 +80,8 @@ class HTTPContext {
 
         @Override
         public void onFailure(Request request, IOException e) {
+            Log.d(LOG_TAG, "onFailure: " + e.getMessage());
+
             int type = PERMANENT_ERROR;
             if ((e instanceof UnknownHostException) || (e instanceof SocketException) || (e instanceof ProtocolException) || (e instanceof SSLException)) {
                 type = CONNECTION_ERROR;
@@ -88,17 +96,46 @@ class HTTPContext {
 
         @Override
         public void onResponse(Response response) throws IOException {
+            Log.d(LOG_TAG, "onResponse");
+
             byte[] body;
             try {
                 body = response.body().bytes();
             } catch (IOException e) {
-                onFailure(mRequest, e);
+                onFailure(null, e);
+                //throw e;
                 return;
             } finally {
                 response.body().close();
             }
-
+            
             nativeOnResponse(mNativePtr, response.code(), response.message(), response.header("ETag"), response.header("Last-Modified"), response.header("Cache-Control"), response.header("Expires"), body);
+        }
+    }
+
+    /*
+     * Application interceptor that logs the outgoing request and the incoming response.
+     * Based on https://github.com/square/okhttp/wiki/Interceptors
+     */
+
+    class LoggingInterceptor implements Interceptor {
+
+        private final static String LOG_TAG = "LoggingInterceptor";
+
+        @Override public Response intercept(Interceptor.Chain chain) throws IOException {
+            Request request = chain.request();
+
+            long t1 = System.nanoTime();
+            Log.i(LOG_TAG, String.format("Sending request %s on %s%n%s",
+                    request.url(), chain.connection(), request.headers()));
+
+            Response response = chain.proceed(request);
+
+            long t2 = System.nanoTime();
+            Log.i(LOG_TAG, String.format("Received response for %s in %.1fms%n%s",
+                    response.request().url(), (t2 - t1) / 1e6d, response.headers()));
+
+            return response;
         }
     }
 }
