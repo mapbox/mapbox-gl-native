@@ -178,6 +178,7 @@ public final class MapView extends FrameLayout {
     private ScaleGestureDetector mScaleGestureDetector;
     private RotateGestureDetector mRotateGestureDetector;
     private boolean mTwoTap = false;
+    private boolean mZoomStarted = false;
 
     // Shows zoom buttons
     private ZoomButtonsController mZoomButtonsController;
@@ -2428,8 +2429,6 @@ public final class MapView extends FrameLayout {
             }
 
             // Fling the map
-            // TODO Google Maps also has a rotate and zoom fling
-
             float ease = 0.25f;
 
             velocityX = velocityX * ease;
@@ -2452,7 +2451,6 @@ public final class MapView extends FrameLayout {
         }
 
         // Called for drags
-        // TODO use MoveGestureDetector
         @Override
         public boolean onScroll(MotionEvent e1, MotionEvent e2, float distanceX, float distanceY) {
             if (!mScrollEnabled) {
@@ -2460,8 +2458,7 @@ public final class MapView extends FrameLayout {
             }
 
             // Cancel any animation
-            mNativeMapView.cancelTransitions(); // TODO need to test canceling
-            // transitions with touch
+            mNativeMapView.cancelTransitions();
 
             // Scroll the map
             mNativeMapView.moveBy(-distanceX / mScreenDensity, -distanceY / mScreenDensity);
@@ -2479,7 +2476,6 @@ public final class MapView extends FrameLayout {
 
         long mBeginTime = 0;
         float mScaleFactor = 1.0f;
-        boolean mStarted = false;
 
         // Called when two fingers first touch the screen
         @Override
@@ -2497,7 +2493,7 @@ public final class MapView extends FrameLayout {
         public void onScaleEnd(ScaleGestureDetector detector) {
             mBeginTime = 0;
             mScaleFactor = 1.0f;
-            mStarted = false;
+            mZoomStarted = false;
         }
 
         // Called each time one of the two fingers moves
@@ -2509,23 +2505,22 @@ public final class MapView extends FrameLayout {
             }
 
             // If scale is large enough ignore a tap
-            // TODO: Google Maps seem to use a velocity rather than absolute
-            // value?
             mScaleFactor *= detector.getScaleFactor();
             if ((mScaleFactor > 1.05f) || (mScaleFactor < 0.95f)) {
-                mStarted = true;
+                mZoomStarted = true;
             }
 
             // Ignore short touches in case it is a tap
             // Also ignore small scales
             long time = detector.getEventTime();
             long interval = time - mBeginTime;
-            if (!mStarted && (interval <= ViewConfiguration.getTapTimeout())) {
+            if (!mZoomStarted && (interval <= ViewConfiguration.getTapTimeout())) {
                 return false;
             }
 
-            // TODO complex decision between rotate or scale or both (see Google
-            // Maps app)
+            if (!mZoomStarted) {
+                return false;
+            }
 
             // Cancel any animation
             mNativeMapView.cancelTransitions();
@@ -2543,8 +2538,6 @@ public final class MapView extends FrameLayout {
     }
 
     // This class handles two finger rotate gestures
-    // TODO need way to single finger rotate - need to research how google maps
-    // does this - for phones with single touch, or when using mouse etc
     private class RotateGestureListener extends RotateGestureDetector.SimpleOnRotateGestureListener {
 
         long mBeginTime = 0;
@@ -2579,10 +2572,9 @@ public final class MapView extends FrameLayout {
             }
 
             // If rotate is large enough ignore a tap
-            // TODO: Google Maps seem to use a velocity rather than absolute
-            // value, up to a point then they always rotate
+            // Also is zoom already started, don't rotate
             mTotalAngle += detector.getRotationDegreesDelta();
-            if ((mTotalAngle > 5.0f) || (mTotalAngle < -5.0f)) {
+            if (!mZoomStarted && ((mTotalAngle > 10.0f) || (mTotalAngle < -10.0f))) {
                 mStarted = true;
             }
 
@@ -2594,10 +2586,9 @@ public final class MapView extends FrameLayout {
                 return false;
             }
 
-            // TODO complex decision between rotate or scale or both (see Google
-            // Maps app). It seems if you start one or the other it takes more
-            // to start the other too. Haven't figured out what it uses to
-            // decide when to transition to both at the same time.
+            if (!mStarted) {
+                return false;
+            }
 
             // Cancel any animation
             mNativeMapView.cancelTransitions();
