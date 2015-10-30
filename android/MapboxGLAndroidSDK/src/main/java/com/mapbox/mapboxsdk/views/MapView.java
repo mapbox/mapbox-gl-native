@@ -2329,11 +2329,12 @@ public final class MapView extends FrameLayout {
             // Open / Close InfoWindow
             PointF tapPoint = new PointF(e.getX(), e.getY());
 
-            float toleranceWidth = 40 * mScreenDensity;
-            float toleranceHeight = 60 * mScreenDensity;
+            final float toleranceSides = 30 * mScreenDensity;
+            final float toleranceTop = 40 * mScreenDensity;
+            final float toleranceBottom = 10 * mScreenDensity;
 
-            RectF tapRect = new RectF(tapPoint.x - toleranceWidth / 2, tapPoint.y - 2 * toleranceHeight / 3,
-                    tapPoint.x + toleranceWidth / 2, tapPoint.y + 1 * toleranceHeight / 3);
+            RectF tapRect = new RectF(tapPoint.x - toleranceSides, tapPoint.y + toleranceTop,
+                    tapPoint.x + toleranceSides, tapPoint.y - toleranceBottom);
 
             List<LatLng> corners = Arrays.asList(
                     fromScreenLocation(new PointF(tapRect.left, tapRect.bottom)),
