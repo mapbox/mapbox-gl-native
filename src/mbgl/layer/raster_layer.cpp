@@ -1,6 +1,25 @@
 #include <mbgl/layer/raster_layer.hpp>
+#include <mbgl/style/property_parsing.hpp>
 
 namespace mbgl {
+
+void RasterLayer::parsePaints(const JSVal& layer) {
+    paints.parseEach(layer, [&] (ClassProperties& paint, const JSVal& value) {
+        parseProperty<Function<float>>("raster-opacity", PropertyKey::RasterOpacity, paint, value);
+        parseProperty<PropertyTransition>("raster-opacity-transition", PropertyKey::RasterOpacity, paint, value);
+        parseProperty<Function<float>>("raster-hue-rotate", PropertyKey::RasterHueRotate, paint, value);
+        parseProperty<PropertyTransition>("raster-hue-rotate-transition", PropertyKey::RasterHueRotate, paint, value);
+        parseProperty<Function<float>>("raster-brightness-min", PropertyKey::RasterBrightnessLow, paint, value);
+        parseProperty<Function<float>>("raster-brightness-max", PropertyKey::RasterBrightnessHigh, paint, value);
+        parseProperty<PropertyTransition>("raster-brightness-transition", PropertyKey::RasterBrightness, paint, value);
+        parseProperty<Function<float>>("raster-saturation", PropertyKey::RasterSaturation, paint, value);
+        parseProperty<PropertyTransition>("raster-saturation-transition", PropertyKey::RasterSaturation, paint, value);
+        parseProperty<Function<float>>("raster-contrast", PropertyKey::RasterContrast, paint, value);
+        parseProperty<PropertyTransition>("raster-contrast-transition", PropertyKey::RasterContrast, paint, value);
+        parseProperty<Function<float>>("raster-fade-duration", PropertyKey::RasterFade, paint, value);
+        parseProperty<PropertyTransition>("raster-fade-duration-transition", PropertyKey::RasterFade, paint, value);
+    });
+}
 
 void RasterLayer::recalculate(const StyleCalculationParameters& parameters) {
     paints.removeExpiredTransitions(parameters.now);

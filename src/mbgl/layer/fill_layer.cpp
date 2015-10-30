@@ -1,6 +1,23 @@
 #include <mbgl/layer/fill_layer.hpp>
+#include <mbgl/style/property_parsing.hpp>
 
 namespace mbgl {
+
+void FillLayer::parsePaints(const JSVal& layer) {
+    paints.parseEach(layer, [&] (ClassProperties& paint, const JSVal& value) {
+        parseProperty<Function<bool>>("fill-antialias", PropertyKey::FillAntialias, paint, value);
+        parseProperty<Function<float>>("fill-opacity", PropertyKey::FillOpacity, paint, value);
+        parseProperty<PropertyTransition>("fill-opacity-transition", PropertyKey::FillOpacity, paint, value);
+        parseProperty<Function<Color>>("fill-color", PropertyKey::FillColor, paint, value);
+        parseProperty<PropertyTransition>("fill-color-transition", PropertyKey::FillColor, paint, value);
+        parseProperty<Function<Color>>("fill-outline-color", PropertyKey::FillOutlineColor, paint, value);
+        parseProperty<PropertyTransition>("fill-outline-color-transition", PropertyKey::FillOutlineColor, paint, value);
+        parseProperty<Function<std::array<float, 2>>>("fill-translate", PropertyKey::FillTranslate, paint, value);
+        parseProperty<PropertyTransition>("fill-translate-transition", PropertyKey::FillTranslate, paint, value);
+        parseProperty<Function<TranslateAnchorType>>("fill-translate-anchor", PropertyKey::FillTranslateAnchor, paint, value);
+        parseProperty<PiecewiseConstantFunction<Faded<std::string>>>("fill-pattern", PropertyKey::FillImage, paint, value, "fill-pattern-transition");
+    });
+}
 
 void FillLayer::recalculate(const StyleCalculationParameters& parameters) {
     paints.removeExpiredTransitions(parameters.now);

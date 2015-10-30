@@ -1,8 +1,7 @@
 #ifndef MBGL_STYLE_STYLE_LAYER
 #define MBGL_STYLE_STYLE_LAYER
 
-#include <mbgl/style/class_dictionary.hpp>
-#include <mbgl/style/class_properties.hpp>
+#include <mbgl/style/types.hpp>
 #include <mbgl/style/paint_properties_map.hpp>
 
 #include <mbgl/renderer/render_pass.hpp>
@@ -11,9 +10,10 @@
 #include <mbgl/util/chrono.hpp>
 #include <mbgl/util/ptr.hpp>
 
+#include <rapidjson/document.h>
+
 #include <vector>
 #include <string>
-#include <map>
 
 namespace mbgl {
 
@@ -21,11 +21,16 @@ class StyleBucket;
 class StyleCalculationParameters;
 class PropertyTransition;
 
+using JSVal = rapidjson::Value;
+
 class StyleLayer : public util::noncopyable {
 public:
     static std::unique_ptr<StyleLayer> create(StyleLayerType);
 
     virtual ~StyleLayer() = default;
+
+    virtual void parseLayout(const JSVal& value) = 0;
+    virtual void parsePaints(const JSVal& value) = 0;
 
     // Partially evaluate paint properties based on a set of classes.
     void cascade(const std::vector<std::string>& classNames,

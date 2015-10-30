@@ -2306,7 +2306,13 @@ public final class MapView extends FrameLayout {
 
             // Single finger double tap
             // Zoom in
-            zoom(true, e.getX(), e.getY());
+            if (mUserLocationView.getMyLocationTrackingMode() == MyLocationTracking.TRACKING_NONE) {
+                // Zoom in on gesture
+                zoom(true, e.getX(), e.getY());
+            } else {
+                // Zoom in on center map
+                zoom(true, getWidth() / 2, getHeight() / 2);
+            }
             return true;
         }
 

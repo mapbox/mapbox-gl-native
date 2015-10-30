@@ -18,9 +18,9 @@ struct PiecewiseConstantFunction {
           duration(duration_) {
     }
 
-    PiecewiseConstantFunction(T& value, mapbox::util::optional<Duration> duration_)
+    PiecewiseConstantFunction(const T& value)
         : values({{ 0, value }}),
-          duration(duration_) {
+          duration() {
     }
 
     T evaluate(const StyleCalculationParameters&) const;
