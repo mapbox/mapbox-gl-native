@@ -46,7 +46,7 @@ public class CoordinateBounds {
         if (o instanceof CoordinateBounds) {
             CoordinateBounds other = (CoordinateBounds) o;
             return getNorthEast().equals(other.getNorthEast())
-                    && getSouthWest() == other.getSouthWest();
+                    && getSouthWest().equals(other.getSouthWest());
         }
         return false;
     }
