@@ -55,9 +55,13 @@ public class MainActivity extends AppCompatActivity {
     // Used for saving instance state
     private static final String STATE_IS_ANNOTATIONS_ON = "isAnnotationsOn";
     private static final String STATE_SELECTED_STYLE = "selectedStyle";
+    private static final String STATE_MARKER_LIST = "markerList";
 
     // Used for permissions requests
     private static final int PERMISSIONS_LOCATION = 0;
+
+    // Used for info window
+    private static final DecimalFormat LAT_LON_FORMATTER = new DecimalFormat("#.#####");
 
     //
     // Instance members
@@ -76,8 +80,7 @@ public class MainActivity extends AppCompatActivity {
 
     // Used for Annotations
     private boolean mIsAnnotationsOn = false;
-
-    private static final DecimalFormat latLngFormatter = new DecimalFormat("#.#####");
+    private ArrayList<MarkerOptions> mMarkerList = new ArrayList<>();
 
     //
     // Lifecycle events
@@ -119,20 +122,23 @@ public class MainActivity extends AppCompatActivity {
         mMapView.setOnMapLongClickListener(new MapView.OnMapLongClickListener() {
             @Override
             public void onMapLongClick(@NonNull LatLng point) {
-                mMapView.addMarker(new MarkerOptions()
+                MarkerOptions marker = new MarkerOptions()
                         .position(point)
                         .title("Dropped Pin")
-                        .snippet(latLngFormatter.format(point.getLatitude()) + ", " +
-                                latLngFormatter.format(point.getLongitude()))
-                        .icon(null));
+                        .snippet(LAT_LON_FORMATTER.format(point.getLatitude()) + ", " +
+                                LAT_LON_FORMATTER.format(point.getLongitude()))
+                        .icon(null);
+
+                mMarkerList.add(marker);
+                mMapView.addMarker(marker);
             }
         });
 
         mMapView.setOnMapClickListener(new MapView.OnMapClickListener() {
             @Override
             public void onMapClick(@NonNull LatLng point) {
-                String location = latLngFormatter.format(point.getLatitude()) + ", " +
-                        latLngFormatter.format(point.getLongitude());
+                String location = LAT_LON_FORMATTER.format(point.getLatitude()) + ", " +
+                        LAT_LON_FORMATTER.format(point.getLongitude());
                 Snackbar.make(mCoordinatorLayout, "Map Click Listener " + location, Snackbar.LENGTH_SHORT).show();
             }
         });
@@ -190,6 +196,8 @@ public class MainActivity extends AppCompatActivity {
         if (savedInstanceState != null) {
             mIsAnnotationsOn = savedInstanceState.getBoolean(STATE_IS_ANNOTATIONS_ON);
             mSelectedStyle = savedInstanceState.getInt(STATE_SELECTED_STYLE);
+            mMarkerList = savedInstanceState.getParcelableArrayList(STATE_MARKER_LIST);
+            mMapView.addMarkers(mMarkerList);
         }
 
         // Set default UI state
@@ -249,6 +257,7 @@ public class MainActivity extends AppCompatActivity {
         mMapView.onSaveInstanceState(outState);
         outState.putBoolean(STATE_IS_ANNOTATIONS_ON, mIsAnnotationsOn);
         outState.putInt(STATE_SELECTED_STYLE, mSelectedStyle);
+        outState.putParcelableArrayList(STATE_MARKER_LIST, mMarkerList);
     }
 
     // Called when the system is running low on memory
@@ -515,6 +524,7 @@ public class MainActivity extends AppCompatActivity {
     }
 
     private void removeAnnotations() {
+        mMarkerList.clear();
         mMapView.removeAllAnnotations();
     }
 

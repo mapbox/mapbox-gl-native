@@ -6,25 +6,26 @@ import android.support.annotation.NonNull;
 import android.support.v7.app.ActionBar;
 import android.support.v7.app.AppCompatActivity;
 import android.support.v7.widget.Toolbar;
-import android.view.GestureDetector;
 import android.view.MenuItem;
-import android.view.MotionEvent;
-import android.view.View;
 import android.view.ViewGroup;
 
-import com.mapbox.mapboxsdk.annotations.Marker;
 import com.mapbox.mapboxsdk.annotations.MarkerOptions;
 import com.mapbox.mapboxsdk.constants.Style;
 import com.mapbox.mapboxsdk.geometry.LatLng;
 import com.mapbox.mapboxsdk.utils.ApiAccess;
 import com.mapbox.mapboxsdk.views.MapView;
+
 import java.text.DecimalFormat;
+import java.util.ArrayList;
 
 public class PressForMarkerActivity extends AppCompatActivity implements MapView.OnMapLongClickListener {
 
     private MapView mMapView;
+    private ArrayList<MarkerOptions> mMarkerList = new ArrayList<>();
 
-    private static final DecimalFormat latLonFormatter = new DecimalFormat("#.#####");
+    private static final DecimalFormat LAT_LON_FORMATTER = new DecimalFormat("#.#####");
+
+    private static String STATE_MARKER_LIST = "markerList";
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -47,19 +48,35 @@ public class PressForMarkerActivity extends AppCompatActivity implements MapView
         mMapView.setZoomLevel(11);
         mMapView.setOnMapLongClickListener(this);
         ((ViewGroup) findViewById(R.id.activity_container)).addView(mMapView);
+
+        if (savedInstanceState != null) {
+            mMarkerList = savedInstanceState.getParcelableArrayList(STATE_MARKER_LIST);
+            mMapView.addMarkers(mMarkerList);
+        }
+    }
+
+    @Override
+    protected void onSaveInstanceState(Bundle outState) {
+        super.onSaveInstanceState(outState);
+
+        mMapView.onSaveInstanceState(outState);
+        outState.putParcelableArrayList(STATE_MARKER_LIST, mMarkerList);
     }
 
     @Override
     public void onMapLongClick(@NonNull LatLng point) {
         final PointF pixel = mMapView.toScreenLocation(point);
 
-        String title = latLonFormatter.format(point.getLatitude()) + ", " + latLonFormatter.format(point.getLongitude());
+        String title = LAT_LON_FORMATTER.format(point.getLatitude()) + ", " + LAT_LON_FORMATTER.format(point.getLongitude());
         String snippet = "X = " + (int) pixel.x + ", Y = " + (int) pixel.y;
 
-        mMapView.addMarker(new MarkerOptions()
+        MarkerOptions marker = new MarkerOptions()
                 .position(point)
                 .title(title)
-                .snippet(snippet));
+                .snippet(snippet);
+
+        mMarkerList.add(marker);
+        mMapView.addMarker(marker);
     }
 
     /**
