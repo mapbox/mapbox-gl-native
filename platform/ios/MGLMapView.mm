@@ -276,22 +276,6 @@ std::chrono::steady_clock::duration secondsAsDuration(float duration)
     [self addSubview:_attributionButton];
     _attributionButtonConstraints = [NSMutableArray array];
 
-    _attributionSheet = [[UIActionSheet alloc] initWithTitle:@"Mapbox iOS SDK"
-                                                    delegate:self
-                                           cancelButtonTitle:@"Cancel"
-                                      destructiveButtonTitle:nil
-                                           otherButtonTitles:
-                         @"© Mapbox",
-                         @"© OpenStreetMap",
-                         @"Improve This Map",
-                         nil];
-
-    // iOS 8+: add action that opens app's Settings.app panel, if applicable
-    if (&UIApplicationOpenSettingsURLString != NULL && ! [MGLAccountManager mapboxMetricsEnabledSettingShownInApp])
-    {
-        [_attributionSheet addButtonWithTitle:@"Adjust Privacy Settings"];
-    }
-
     // setup compass
     //
     _compassView = [[UIImageView alloc] initWithImage:[MGLMapView resourceImageNamed:@"Compass.png"]];
@@ -1473,6 +1457,25 @@ std::chrono::steady_clock::duration secondsAsDuration(float duration)
 
 - (void)showAttribution
 {
+    if ( ! self.attributionSheet)
+    {
+        self.attributionSheet = [[UIActionSheet alloc] initWithTitle:@"Mapbox iOS SDK"
+                                                            delegate:self
+                                                   cancelButtonTitle:@"Cancel"
+                                              destructiveButtonTitle:nil
+                                                   otherButtonTitles:
+                                 @"© Mapbox",
+                                 @"© OpenStreetMap",
+                                 @"Improve This Map",
+                                 nil];
+
+        // iOS 8+: add action that opens app's Settings.app panel, if applicable
+        if (&UIApplicationOpenSettingsURLString != NULL && ! [MGLAccountManager mapboxMetricsEnabledSettingShownInApp])
+        {
+            [self.attributionSheet addButtonWithTitle:@"Adjust Privacy Settings"];
+        }
+    }
+    
     [self.attributionSheet showFromRect:self.attributionButton.frame inView:self animated:YES];
 }
 
