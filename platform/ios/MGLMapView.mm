@@ -779,6 +779,10 @@ std::chrono::steady_clock::duration secondsAsDuration(float duration)
     {
         self.dormant = YES;
 
+        if (self.locationManager) {
+            [self.locationManager stopUpdatingLocation];
+        }
+        [MGLMapboxEvents pauseMetricsCollection];
         [MGLMapboxEvents flush];
 
         if ( ! self.glSnapshotView)
@@ -813,6 +817,10 @@ std::chrono::steady_clock::duration secondsAsDuration(float duration)
     {
         self.dormant = NO;
         
+        if (_showsUserLocation && self.locationManager) {
+            [self.locationManager startUpdatingLocation];
+        }
+
         [self createGLView];
         [MGLMapboxEvents validate];
 
@@ -2520,8 +2528,7 @@ CLLocationCoordinate2D MGLLocationCoordinate2DFromLatLng(mbgl::LatLng latLng)
         self.userLocationAnnotationView = [[MGLUserLocationAnnotationView alloc] initInMapView:self];
         self.userLocationAnnotationView.autoresizingMask = (UIViewAutoresizingFlexibleLeftMargin | UIViewAutoresizingFlexibleRightMargin |
                                                             UIViewAutoresizingFlexibleTopMargin | UIViewAutoresizingFlexibleBottomMargin);
-
-        self.locationManager = [CLLocationManager new];
+        self.locationManager = [[CLLocationManager alloc] init];
 
 #if __IPHONE_OS_VERSION_MAX_ALLOWED >= 80000
         // enable iOS 8+ location authorization API
