@@ -164,6 +164,18 @@ TEST(Annotations, RemoveShape) {
     util::write_file("test/output/remove_shape.png", renderPNG(map));
 }
 
+TEST(Annotations, ImmediateRemoveShape) {
+    auto display = std::make_shared<mbgl::HeadlessDisplay>();
+    HeadlessView view(display, 1);
+    DefaultFileSource fileSource(nullptr);
+    Map map(view, fileSource, MapMode::Still);
+
+    map.removeAnnotation(map.addShapeAnnotation(ShapeAnnotation({}, {})));
+    map.setStyleJSON(util::read_file("test/fixtures/api/empty.json"), "");
+
+    renderPNG(map);
+}
+
 TEST(Annotations, SwitchStyle) {
     auto display = std::make_shared<mbgl::HeadlessDisplay>();
     HeadlessView view(display, 1);

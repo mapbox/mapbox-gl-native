@@ -131,7 +131,9 @@ void AnnotationManager::updateStyle(Style& style) {
     }
 
     for (const auto& layer : obsoleteShapeAnnotationLayers) {
-        style.removeLayer(layer);
+        if (style.getLayer(layer)) {
+            style.removeLayer(layer);
+        }
     }
 
     obsoleteShapeAnnotationLayers.clear();
