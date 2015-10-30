@@ -200,10 +200,6 @@ public class MainActivity extends AppCompatActivity {
         toggleGps(mMapView.isMyLocationEnabled());
     }
 
-    /**
-     * Dispatch onStart() to all fragments.  Ensure any created loaders are
-     * now started.
-     */
     @Override
     protected void onStart() {
         super.onStart();
