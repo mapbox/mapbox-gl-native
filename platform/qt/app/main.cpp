@@ -16,5 +16,9 @@ int main(int argc, char **argv)
     window.resize(800, 600);
     window.show();
 
+    if (argc == 2 && QString("--test") == argv[1]) {
+        window.selfTest();
+    }
+
     return app.exec();
 }

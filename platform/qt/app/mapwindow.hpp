@@ -3,6 +3,7 @@
 
 #include <QGLWidget>
 #include <QMapboxGL>
+#include <QPropertyAnimation>
 
 class QKeyEvent;
 class QMouseEvent;
@@ -10,8 +11,16 @@ class QWheelEvent;
 
 class MapWindow : public QGLWidget
 {
+    Q_OBJECT
+
 public:
     MapWindow(const QMapboxGLSettings &);
+
+    void selfTest();
+
+protected slots:
+    void animationValueChanged();
+    void animationFinished();
 
 private:
     void changeStyle();
@@ -27,6 +36,12 @@ private:
     QPointF m_lastPos;
 
     QMapboxGL m_map;
+
+    QPropertyAnimation m_bearingAnimation;
+    QPropertyAnimation m_zoomAnimation;
+
+    unsigned m_animationTicks = 0;
+    unsigned m_frameDraws = 0;
 };
 
 #endif

@@ -2,11 +2,18 @@
 
 #include <mbgl/util/default_styles.hpp>
 
+#include <QApplication>
+#include <QDebug>
 #include <QKeyEvent>
 #include <QMouseEvent>
 #include <QString>
 
-MapWindow::MapWindow(const QMapboxGLSettings &settings) : m_map(nullptr, settings)
+int kAnimationDuration = 10000;
+
+MapWindow::MapWindow(const QMapboxGLSettings &settings)
+    : m_map(nullptr, settings)
+    , m_bearingAnimation(&m_map, "bearing")
+    , m_zoomAnimation(&m_map, "zoom")
 {
     connect(&m_map, SIGNAL(needsRendering()), this, SLOT(updateGL()));
 
@@ -14,6 +21,33 @@ MapWindow::MapWindow(const QMapboxGLSettings &settings) : m_map(nullptr, setting
     m_map.setCoordinateZoom(QMapboxGL::Coordinate(60.170448, 24.942046), 14);
 
     changeStyle();
+
+    connect(&m_zoomAnimation, SIGNAL(finished()), this, SLOT(animationFinished()));
+    connect(&m_zoomAnimation, SIGNAL(valueChanged(const QVariant&)), this, SLOT(animationValueChanged()));
+}
+
+void MapWindow::selfTest()
+{
+    m_bearingAnimation.setDuration(kAnimationDuration);
+    m_bearingAnimation.setEndValue(m_map.bearing() + 360 * 4);
+    m_bearingAnimation.start();
+
+    m_zoomAnimation.setDuration(kAnimationDuration);
+    m_zoomAnimation.setEndValue(m_map.zoom() + 3);
+    m_zoomAnimation.start();
+}
+
+void MapWindow::animationFinished()
+{
+    qDebug() << "Animation ticks/s: " <<  m_animationTicks / static_cast<float>(kAnimationDuration) * 1000.;
+    qDebug() << "Frame draws/s: " <<  m_frameDraws / static_cast<float>(kAnimationDuration) * 1000.;
+
+    qApp->quit();
+}
+
+void MapWindow::animationValueChanged()
+{
+    m_animationTicks++;
 }
 
 void MapWindow::changeStyle()
@@ -118,5 +152,6 @@ void MapWindow::resizeGL(int w, int h)
 
 void MapWindow::paintGL()
 {
+    m_frameDraws++;
     m_map.render();
 }
