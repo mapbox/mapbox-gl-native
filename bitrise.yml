@@ -16,9 +16,24 @@ trigger_map:
 workflows:
   primary:
     steps:
-    - select-xcode-version@2.2.0: {}
+    - script@1.1.0:
+        title: Check for skipping CI
+        inputs:
+        - content: |-
+            #!/bin/bash
+
+            if [[ -n "$(echo $GIT_CLONE_COMMIT_MESSAGE_SUBJECT | sed -n '/\[skip ci\]/p')" ||
+                  -n "$(echo $GIT_CLONE_COMMIT_MESSAGE_SUBJECT | sed -n '/\[ci skip\]/p')" ]]; then
+                envman add --key SKIPCI --value true
+            else
+                envman add --key SKIPCI --value false
+            fi
+    - select-xcode-version@2.2.0:
+        title: Select Xcode version
+        run_if: '{{enveq "SKIPCI" "false"}}'
     - script@1.1.0:
         title: Install Homebrew dependencies
+        run_if: '{{enveq "SKIPCI" "false"}}'
         inputs:
         - content: |-
             #!/bin/bash
@@ -29,6 +44,7 @@ workflows:
             brew link --force appledoc22
     - script@1.1.0:
         title: Run make ipackage-sim
+        run_if: '{{enveq "SKIPCI" "false"}}'
         inputs:
         - content: |-
             #!/bin/bash
@@ -36,7 +52,8 @@ workflows:
             make ipackage-sim
         - is_debug: 'yes'
     - xcode-test@1.6.0:
-        title: 'Xcode: Unit Test'
+        title: Run Xcode Tests
+        run_if: '{{enveq "SKIPCI" "false"}}'
         inputs:
         - project_path: "./test/ios/ios-tests.xcodeproj"
         - scheme: Mapbox GL Tests
@@ -44,6 +61,8 @@ workflows:
           opts:
             is_expand: false
     - slack@2.1.0:
+        title: Post to Slack
+        run_if: '{{enveq "SKIPCI" "false"}}'
         inputs:
         - webhook_url: "$SLACK_HOOK_URL"
         - channel: "#gl"
