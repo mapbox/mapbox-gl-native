@@ -65,16 +65,17 @@ NAN_METHOD(NodeRequest::Respond) {
 
     if (info.Length() < 1) {
         auto response = std::make_shared<mbgl::Response>();
-        response->status = mbgl::Response::NotFound;
+        using Error = mbgl::Response::Error;
+        response->error = std::make_unique<Error>(Error::Reason::NotFound);
         source->notify(*resource, response);
     } else if (info[0]->BooleanValue()) {
         auto response = std::make_shared<mbgl::Response>();
 
-        response->status = mbgl::Response::Error;
-
         // Store the error string.
         const Nan::Utf8String message { info[0]->ToString() };
-        response->message = std::string { *message, size_t(message.length()) };
+        using Error = mbgl::Response::Error;
+        response->error = std::make_unique<Error>(
+            Error::Reason::Other, std::string{ *message, size_t(message.length()) });
 
         source->notify(*resource, response);
     } else if (info.Length() < 2 || !info[1]->IsObject()) {
@@ -82,8 +83,6 @@ NAN_METHOD(NodeRequest::Respond) {
     } else {
         auto response = std::make_shared<mbgl::Response>();
         auto res = info[1]->ToObject();
-
-        response->status = mbgl::Response::Successful;
 
         if (Nan::Has(res, Nan::New("modified").ToLocalChecked()).FromJust()) {
             const double modified = Nan::Get(res, Nan::New("modified").ToLocalChecked()).ToLocalChecked()->ToNumber()->Value();

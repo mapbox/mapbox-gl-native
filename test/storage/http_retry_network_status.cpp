@@ -47,3 +47,60 @@ TEST_F(Storage, HTTPNetworkStatusChange) {
 
     uv_run(uv_default_loop(), UV_RUN_DEFAULT);
 }
+
+// Tests that a change in network status preempts requests that failed due to connection or
+// reachability issues.
+TEST_F(Storage, HTTPNetworkStatusChangePreempt) {
+    SCOPED_TEST(HTTPNetworkStatusChangePreempt)
+
+    using namespace mbgl;
+
+    DefaultFileSource fs(nullptr);
+
+    const auto start = uv_hrtime();
+
+    const Resource resource{ Resource::Unknown, "http://127.0.0.1:3001/test" };
+    Request* req = fs.request(resource, uv_default_loop(), [&](const Response& res) {
+        static int counter = 0;
+        const auto duration = double(uv_hrtime() - start) / 1e9;
+        if (counter == 0) {
+            EXPECT_GT(0.2, duration) << "Response came in too late";
+        } else if (counter == 1) {
+            EXPECT_LT(0.39, duration) << "Preempted retry triggered too early";
+            EXPECT_GT(0.6, duration) << "Preempted retry triggered too late";
+        } else if (counter > 1) {
+            FAIL() << "Retried too often";
+        }
+        ASSERT_NE(nullptr, res.error);
+        EXPECT_EQ(Response::Error::Reason::Connection, res.error->reason);
+#ifdef MBGL_HTTP_NSURL
+        EXPECT_TRUE(res.error->message ==
+                     "The operation couldn’t be completed. (NSURLErrorDomain error -1004.)" ||
+                 res.error->message == "Could not connect to the server.")
+         << "Full message is: \"" << res.error->message << "\"";
+#elif MBGL_HTTP_CURL
+        const std::string prefix { "Couldn't connect to server: " };
+        EXPECT_STREQ(prefix.c_str(), res.error->message.substr(0, prefix.size()).c_str()) << "Full message is: \"" << res.error->message << "\"";
+#else
+        FAIL();
+#endif
+        EXPECT_EQ(false, res.stale);
+        ASSERT_FALSE(res.data.get());
+        EXPECT_EQ(0, res.expires);
+        EXPECT_EQ(0, res.modified);
+        EXPECT_EQ("", res.etag);
+
+        if (counter++ == 1) {
+            fs.cancel(req);
+            HTTPNetworkStatusChangePreempt.finish();
+        }
+    });
+
+    // After 400 milliseconds, we're going to trigger a NetworkStatus change.
+    uv::timer reachableTimer(uv_default_loop());
+    reachableTimer.start(400, 0, [] () {
+        mbgl::NetworkStatus::Reachable();
+    });
+
+    uv_run(uv_default_loop(), UV_RUN_DEFAULT);
+}

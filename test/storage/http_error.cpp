@@ -92,7 +92,4 @@ TEST_F(Storage, HTTPError) {
     });
 
     uv_run(uv_default_loop(), UV_RUN_DEFAULT);
-
-    // Run again so that the timer handle can be properly closed.
-    uv_run(uv_default_loop(), UV_RUN_DEFAULT);
 }

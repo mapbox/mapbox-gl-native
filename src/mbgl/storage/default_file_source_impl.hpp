@@ -69,6 +69,9 @@ private:
 class DefaultFileSource::Impl {
 public:
     Impl(FileCache*, const std::string& = "");
+    ~Impl();
+
+    void networkIsReachableAgain();
 
     void add(Request*);
     void cancel(Request*);
@@ -85,6 +88,7 @@ private:
     const std::string assetRoot;
     const std::unique_ptr<AssetContextBase> assetContext;
     const std::unique_ptr<HTTPContextBase> httpContext;
+    const std::unique_ptr<uv::async> reachability;
 };
 
 }

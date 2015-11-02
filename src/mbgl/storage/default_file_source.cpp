@@ -2,6 +2,7 @@
 #include <mbgl/storage/request.hpp>
 #include <mbgl/storage/asset_context_base.hpp>
 #include <mbgl/storage/http_context_base.hpp>
+#include <mbgl/storage/network_status.hpp>
 
 #include <mbgl/storage/response.hpp>
 #include <mbgl/platform/platform.hpp>
@@ -87,7 +88,29 @@ DefaultFileSource::Impl::Impl(FileCache* cache_, const std::string& root)
       cache(cache_),
       assetRoot(root.empty() ? platform::assetRoot() : root),
       assetContext(AssetContextBase::createContext(loop)),
-      httpContext(HTTPContextBase::createContext(loop)) {
+      httpContext(HTTPContextBase::createContext(loop)),
+      reachability(std::make_unique<uv::async>(loop, std::bind(&Impl::networkIsReachableAgain, this))) {
+    // Subscribe to network status changes, but make sure that this async handle doesn't keep the
+    // loop alive; otherwise our app wouldn't terminate. After all, we only need status change
+    // notifications when our app is still running.
+    NetworkStatus::Subscribe(reachability->get());
+    reachability->unref();
+}
+
+DefaultFileSource::Impl::~Impl() {
+    NetworkStatus::Unsubscribe(reachability->get());
+}
+
+void DefaultFileSource::Impl::networkIsReachableAgain() {
+    for (auto& req : pending) {
+        auto& request = req.second;
+        auto& response = request.getResponse();
+        if (!request.realRequest && response && response->error && response->error->reason == Response::Error::Reason::Connection) {
+            // We need all requests to fail at least once before we are going to start retrying
+            // them, and we only immediately restart request that failed due to connection issues.
+            startRealRequest(request);
+        }
+    }
 }
 
 void DefaultFileSource::Impl::add(Request* req) {
@@ -157,6 +180,8 @@ void DefaultFileSource::Impl::startCacheRequest(DefaultFileRequest& request) {
 }
 
 void DefaultFileSource::Impl::startRealRequest(DefaultFileRequest& request) {
+    assert(!request.realRequest);
+
     // Cancel the timer if we have one.
     if (request.timerRequest) {
         request.timerRequest->stop();
