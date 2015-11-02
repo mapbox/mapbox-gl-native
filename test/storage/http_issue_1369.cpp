@@ -32,14 +32,13 @@ TEST_F(Storage, HTTPIssue1369) {
     fs.cancel(req);
     req = fs.request(resource, uv_default_loop(), [&](const Response &res) {
         fs.cancel(req);
-        EXPECT_EQ(Response::Successful, res.status);
+        EXPECT_EQ(nullptr, res.error);
         EXPECT_EQ(false, res.stale);
         ASSERT_TRUE(res.data.get());
         EXPECT_EQ("Hello World!", *res.data);
         EXPECT_EQ(0, res.expires);
         EXPECT_EQ(0, res.modified);
         EXPECT_EQ("", res.etag);
-        EXPECT_EQ("", res.message);
         HTTPIssue1369.finish();
     });
 

@@ -18,16 +18,17 @@ TEST_F(Storage, AssetReadDirectory) {
     Request* req = fs.request({ Resource::Unknown, "asset://TEST_DATA/fixtures/storage" }, uv_default_loop(),
                [&](const Response &res) {
         fs.cancel(req);
-        EXPECT_EQ(Response::Error, res.status);
+        ASSERT_NE(nullptr, res.error);
+        EXPECT_EQ(Response::Error::Reason::NotFound, res.error->reason);
         EXPECT_EQ(false, res.stale);
         ASSERT_FALSE(res.data.get());
         EXPECT_EQ(0, res.expires);
         EXPECT_EQ(0, res.modified);
         EXPECT_EQ("", res.etag);
 #ifdef MBGL_ASSET_ZIP
-        EXPECT_EQ("No such file", res.message);
+        EXPECT_EQ("No such file", res.error->message);
 #elif MBGL_ASSET_FS
-        EXPECT_EQ("illegal operation on a directory", res.message);
+        EXPECT_EQ("illegal operation on a directory", res.error->message);
 #endif
         ReadDirectory.finish();
     });

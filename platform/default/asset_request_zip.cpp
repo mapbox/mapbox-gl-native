@@ -90,7 +90,7 @@ private:
     void fileClosed(uv_zip_t *zip);
     void cleanup(uv_zip_t *zip);
 
-    void notifyError(const char *message);
+    void notifyError(const char *message, Response::Error::Reason);
 };
 
 RequestBase* AssetZipContext::createRequest(const Resource& resource,
@@ -126,7 +126,7 @@ void AssetRequest::openZipArchive() {
     uv_fs_open(context.loop, req, root.c_str(), O_RDONLY, S_IRUSR, [](uv_fs_t *fsReq) {
         if (fsReq->result < 0) {
             auto impl = reinterpret_cast<AssetRequest *>(fsReq->data);
-            impl->notifyError(uv::getFileRequestError(fsReq));
+            impl->notifyError(uv::getFileRequestError(fsReq), Response::Error::Reason::Connection);
             delete impl;
         } else {
             uv_zip_t *zip = new uv_zip_t();
@@ -135,7 +135,7 @@ void AssetRequest::openZipArchive() {
             uv_zip_fdopen(fsReq->loop, zip, uv_file(fsReq->result), 0, [](uv_zip_t *openZip) {
                 auto impl = reinterpret_cast<AssetRequest *>(openZip->data);
                 if (openZip->result < 0) {
-                    impl->notifyError(openZip->message);
+                    impl->notifyError(openZip->message, Response::Error::Reason::Other);
                     delete openZip;
                     delete impl;
                 } else {
@@ -169,12 +169,12 @@ void AssetRequest::fileStated(uv_zip_t *zip) {
     if (cancelled || zip->result < 0) {
         // Stat failed, probably because the file doesn't exist.
         if (zip->result < 0) {
-            notifyError(zip->message);
+            notifyError(zip->message, Response::Error::Reason::NotFound);
         }
         cleanup(zip);
     } else if (!(zip->stat->valid & ZIP_STAT_SIZE)) {
         // We couldn't obtain the size of the file.
-        notifyError("Could not determine file size in zip file");
+        notifyError("Could not determine file size in zip file", Response::Error::Reason::Other);
         cleanup(zip);
     } else {
         response = std::make_unique<Response>();
@@ -203,7 +203,7 @@ void AssetRequest::fileOpened(uv_zip_t *zip) {
 
     if (zip->result < 0) {
         // Opening failed.
-        notifyError(zip->message);
+        notifyError(zip->message, Response::Error::Reason::Other);
         cleanup(zip);
     } else if (cancelled) {
         // The request was canceled. Close the file again.
@@ -218,10 +218,9 @@ void AssetRequest::fileRead(uv_zip_t *zip) {
 
     if (zip->result < 0) {
         // Reading failed. We still have an open file handle though.
-        notifyError(zip->message);
+        notifyError(zip->message, Response::Error::Reason::Other);
     } else if (!cancelled) {
-        response->status = Response::Successful;
-        notify(std::move(response), FileCache::Hint::No);
+        notify(std::move(response));
     }
 
     uv_zip_fclose(context.loop, zip, zip->file, INVOKE_MEMBER(fileClosed));
@@ -244,14 +243,13 @@ void AssetRequest::cleanup(uv_zip_t *zip) {
     delete this;
 }
 
-void AssetRequest::notifyError(const char *message) {
+void AssetRequest::notifyError(const char *message, Response::Error::Reason reason) {
     MBGL_VERIFY_THREAD(tid);
 
     if (!cancelled) {
         response = std::make_unique<Response>();
-        response->status = Response::Error;
-        response->message = message;
-        notify(std::move(response), FileCache::Hint::No);
+        response->error = std::make_unique<Response::Error>(reason, message);
+        notify(std::move(response));
     } else {
         // The request was already canceled and deleted.
     }

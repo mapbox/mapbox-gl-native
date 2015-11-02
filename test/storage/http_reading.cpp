@@ -22,14 +22,13 @@ TEST_F(Storage, HTTPReading) {
                [&](const Response &res) {
         fs.cancel(req1);
         EXPECT_EQ(uv_thread_self(), mainThread);
-        EXPECT_EQ(Response::Successful, res.status);
+        EXPECT_EQ(nullptr, res.error);
         EXPECT_EQ(false, res.stale);
         ASSERT_TRUE(res.data.get());
         EXPECT_EQ("Hello World!", *res.data);
         EXPECT_EQ(0, res.expires);
         EXPECT_EQ(0, res.modified);
         EXPECT_EQ("", res.etag);
-        EXPECT_EQ("", res.message);
         HTTPTest.finish();
     });
 
@@ -37,11 +36,12 @@ TEST_F(Storage, HTTPReading) {
                [&](const Response &res) {
         fs.cancel(req2);
         EXPECT_EQ(uv_thread_self(), mainThread);
-        EXPECT_EQ(Response::NotFound, res.status);
+        ASSERT_NE(nullptr, res.error);
+        EXPECT_EQ(Response::Error::Reason::NotFound, res.error->reason);
         EXPECT_EQ(false, res.stale);
         ASSERT_TRUE(res.data.get());
         EXPECT_EQ("Cannot GET /doesnotexist\n", *res.data);
-        EXPECT_EQ("", res.message);
+        EXPECT_EQ("HTTP status code 404", res.error->message);
         EXPECT_EQ(0, res.expires);
         EXPECT_EQ(0, res.modified);
         EXPECT_EQ("", res.etag);
@@ -52,11 +52,12 @@ TEST_F(Storage, HTTPReading) {
                [&](const Response &res) {
         fs.cancel(req3);
         EXPECT_EQ(uv_thread_self(), mainThread);
-        EXPECT_EQ(Response::Error, res.status);
+        ASSERT_NE(nullptr, res.error);
+        EXPECT_EQ(Response::Error::Reason::Server, res.error->reason);
         EXPECT_EQ(false, res.stale);
         ASSERT_TRUE(res.data.get());
         EXPECT_EQ("Server Error!", *res.data);
-        EXPECT_EQ("HTTP status code 500", res.message);
+        EXPECT_EQ("HTTP status code 500", res.error->message);
         EXPECT_EQ(0, res.expires);
         EXPECT_EQ(0, res.modified);
         EXPECT_EQ("", res.etag);

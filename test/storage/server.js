@@ -9,6 +9,19 @@ var app = express();
 // We're manually setting Etag headers.
 app.disable('etag');
 
+// Terminate after a certain time of inactivity.
+function terminate() {
+    console.warn('Server terminated due to inactivity');
+    process.exit(0);
+};
+var inactivity = 5000; // milliseconds
+var timeout = setTimeout(terminate, inactivity);
+app.use(function(req, res, next) {
+    clearTimeout(timeout);
+    timeout = setTimeout(terminate, inactivity);
+    next();
+});
+
 app.get('/test', function (req, res) {
     if (req.query.modified) {
         res.setHeader('Last-Modified', (new Date(req.query.modified * 1000)).toUTCString());

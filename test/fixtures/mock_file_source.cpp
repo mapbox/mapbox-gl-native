@@ -52,13 +52,11 @@ private:
 
 void MockFileSource::Impl::replyWithSuccess(Request* req) const {
     std::shared_ptr<Response> res = std::make_shared<Response>();
-    res->status = Response::Status::Successful;
 
     try {
         res->data = std::make_shared<const std::string>(std::move(util::read_file(req->resource.url)));
     } catch (const std::exception& err) {
-        res->status = Response::Status::Error;
-        res->message = err.what();
+        res->error = std::make_unique<Response::Error>(Response::Error::Reason::Other, err.what());
     }
 
     req->notify(res);
@@ -81,8 +79,7 @@ void MockFileSource::Impl::replyWithFailure(Request* req) const {
     }
 
     std::shared_ptr<Response> res = std::make_shared<Response>();
-    res->status = Response::Status::Error;
-    res->message = "Failed by the test case";
+    res->error = std::make_unique<Response::Error>(Response::Error::Reason::Other, "Failed by the test case");
 
     req->notify(res);
 }
@@ -94,7 +91,6 @@ void MockFileSource::Impl::replyWithCorruptedData(Request* req) const {
     }
 
     std::shared_ptr<Response> res = std::make_shared<Response>();
-    res->status = Response::Status::Successful;
     auto data = std::make_shared<std::string>(std::move(util::read_file(req->resource.url)));
     data->insert(0, "CORRUPTED");
     res->data = std::move(data);

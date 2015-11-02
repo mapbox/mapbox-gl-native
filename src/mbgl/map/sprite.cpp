@@ -47,13 +47,14 @@ Sprite::Sprite(const std::string& baseUrl, float pixelRatio_)
             return;
         }
         loader->jsonRequest = nullptr;
-        if (res.status == Response::Successful) {
-            loader->json = res.data;
-        } else {
+
+        if (res.error) {
             std::stringstream message;
-            message << "Failed to load [" << jsonURL << "]: " << res.message;
+            message << "Failed to load [" << jsonURL << "]: " << res.error->message;
             emitSpriteLoadingFailed(message.str());
             return;
+        } else {
+            loader->json = res.data;
         }
         emitSpriteLoadedIfComplete();
     });
@@ -66,13 +67,14 @@ Sprite::Sprite(const std::string& baseUrl, float pixelRatio_)
                 return;
             }
             loader->spriteRequest = nullptr;
-            if (res.status == Response::Successful) {
-                loader->image = res.data;
-            } else {
+
+            if (res.error) {
                 std::stringstream message;
-                message << "Failed to load [" << spriteURL << "]: " << res.message;
+                message << "Failed to load [" << spriteURL << "]: " << res.error->message;
                 emitSpriteLoadingFailed(message.str());
                 return;
+            } else {
+                loader->image = res.data;
             }
             emitSpriteLoadedIfComplete();
         });

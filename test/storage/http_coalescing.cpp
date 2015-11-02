@@ -26,13 +26,12 @@ TEST_F(Storage, HTTPCoalescing) {
             EXPECT_EQ(&res, reference);
         }
 
-        EXPECT_EQ(Response::Successful, res.status);
+        EXPECT_EQ(nullptr, res.error);
         ASSERT_TRUE(res.data.get());
         EXPECT_EQ("Hello World!", *res.data);
         EXPECT_EQ(0, res.expires);
         EXPECT_EQ(0, res.modified);
         EXPECT_EQ("", res.etag);
-        EXPECT_EQ("", res.message);
 
         if (counter >= total) {
             HTTPCoalescing.finish();
@@ -69,13 +68,12 @@ TEST_F(Storage, HTTPMultiple) {
         reference = &res;
 
         // Do not cancel the request right away.
-        EXPECT_EQ(Response::Successful, res.status);
+        EXPECT_EQ(nullptr, res.error);
         ASSERT_TRUE(res.data.get());
         EXPECT_EQ("Hello World!", *res.data);
         EXPECT_EQ(2147483647, res.expires);
         EXPECT_EQ(0, res.modified);
         EXPECT_EQ("", res.etag);
-        EXPECT_EQ("", res.message);
 
         // Start a second request for the same resource after the first one has been completed.
         req2 = fs.request(resource, uv_default_loop(), [&] (const Response &res2) {
@@ -86,13 +84,12 @@ TEST_F(Storage, HTTPMultiple) {
             fs.cancel(req1);
             fs.cancel(req2);
 
-            EXPECT_EQ(Response::Successful, res2.status);
+            EXPECT_EQ(nullptr, res2.error);
             ASSERT_TRUE(res2.data.get());
             EXPECT_EQ("Hello World!", *res2.data);
             EXPECT_EQ(2147483647, res2.expires);
             EXPECT_EQ(0, res2.modified);
             EXPECT_EQ("", res2.etag);
-            EXPECT_EQ("", res2.message);
 
             HTTPMultiple.finish();
         });
@@ -117,14 +114,13 @@ TEST_F(Storage, HTTPStale) {
     Request* req2 = nullptr;
     req1 = fs.request(resource, uv_default_loop(), [&] (const Response &res) {
         // Do not cancel the request right away.
-        EXPECT_EQ(Response::Successful, res.status);
+        EXPECT_EQ(nullptr, res.error);
         ASSERT_TRUE(res.data.get());
         EXPECT_EQ("Hello World!", *res.data);
         EXPECT_EQ(false, res.stale);
         EXPECT_EQ(0, res.expires);
         EXPECT_EQ(0, res.modified);
         EXPECT_EQ("", res.etag);
-        EXPECT_EQ("", res.message);
 
         // Don't start the request twice in case this callback gets fired multiple times.
         if (req2) {
@@ -135,13 +131,12 @@ TEST_F(Storage, HTTPStale) {
 
         // Start a second request for the same resource after the first one has been completed.
         req2 = fs.request(resource, uv_default_loop(), [&] (const Response &res2) {
-            EXPECT_EQ(Response::Successful, res2.status);
+            EXPECT_EQ(nullptr, res2.error);
             ASSERT_TRUE(res2.data.get());
             EXPECT_EQ("Hello World!", *res2.data);
             EXPECT_EQ(0, res2.expires);
             EXPECT_EQ(0, res2.modified);
             EXPECT_EQ("", res2.etag);
-            EXPECT_EQ("", res2.message);
 
             if (res2.stale) {
                 EXPECT_EQ(0, stale);

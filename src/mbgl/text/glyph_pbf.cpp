@@ -81,9 +81,9 @@ GlyphPBF::GlyphPBF(GlyphStore* store,
         }
         req = nullptr;
 
-        if (res.status != Response::Successful) {
+        if (res.error) {
             std::stringstream message;
-            message <<  "Failed to load [" << url << "]: " << res.message;
+            message <<  "Failed to load [" << url << "]: " << res.error->message;
             emitGlyphPBFLoadingFailed(message.str());
         } else {
             data = res.data;

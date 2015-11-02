@@ -155,9 +155,9 @@ void Source::load() {
         }
         req = nullptr;
 
-        if (res.status != Response::Successful) {
+        if (res.error) {
             std::stringstream message;
-            message <<  "Failed to load [" << info.url << "]: " << res.message;
+            message <<  "Failed to load [" << info.url << "]: " << res.error->message;
             emitSourceLoadingFailed(message.str());
             return;
         }

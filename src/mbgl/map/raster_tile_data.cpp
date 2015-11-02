@@ -37,17 +37,15 @@ void RasterTileData::request(float pixelRatio,
         }
         req = nullptr;
 
-        if (res.status == Response::NotFound) {
-            state = State::parsed;
-            callback();
-            return;
-        }
-
-        if (res.status != Response::Successful) {
-            std::stringstream message;
-            message <<  "Failed to load [" << url << "]: " << res.message;
-            error = message.str();
-            state = State::obsolete;
+        if (res.error) {
+            if (res.error->reason == Response::Error::Reason::NotFound) {
+                state = State::parsed;
+            } else {
+                std::stringstream message;
+                message <<  "Failed to load [" << url << "]: " << res.error->message;
+                error = message.str();
+                state = State::obsolete;
+            }
             callback();
             return;
         }

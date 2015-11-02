@@ -94,18 +94,12 @@ public:
     ~HTTPCURLRequest();
 
     void cancel() final;
-    void retry() final;
 
     void handleResult(CURLcode code);
 
 private:
     static size_t headerCallback(char *const buffer, const size_t size, const size_t nmemb, void *userp);
     static size_t writeCallback(void *const contents, const size_t size, const size_t nmemb, void *userp);
-
-    void retry(uint64_t timeout) final;
-    static void restart(UV_TIMER_PARAMS(timer));
-    void finish(ResponseStatus status);
-    void start();
 
     HTTPCURLContext *context = nullptr;
 
@@ -118,12 +112,6 @@ private:
 
     CURL *handle = nullptr;
     curl_slist *headers = nullptr;
-
-    uv_timer_t *timer = nullptr;
-    enum : bool { PreemptImmediately, ExponentialBackoff } strategy = PreemptImmediately;
-    int attempts = 0;
-
-    static const int maxAttempts = 4;
 
     char error[CURL_ERROR_SIZE];
 };
@@ -167,7 +155,7 @@ private:
 // -------------------------------------------------------------------------------------------------
 
 HTTPCURLContext::HTTPCURLContext(uv_loop_t *loop_)
-    : HTTPContextBase(loop_),
+    : HTTPContextBase(),
       loop(loop_) {
     if (curl_global_init(CURL_GLOBAL_ALL)) {
         throw std::runtime_error("Could not init cURL");
@@ -428,8 +416,6 @@ HTTPCURLRequest::HTTPCURLRequest(HTTPCURLContext* context_, const Resource& reso
       context(context_),
       existingResponse(response_),
       handle(context->getHandle()) {
-    context->addRequest(this);
-
     // Zero out the error buffer.
     memset(error, 0, sizeof(error));
 
@@ -472,24 +458,16 @@ HTTPCURLRequest::HTTPCURLRequest(HTTPCURLContext* context_, const Resource& reso
     handleError(curl_easy_setopt(handle, CURLOPT_USERAGENT, "MapboxGL/1.0"));
     handleError(curl_easy_setopt(handle, CURLOPT_SHARE, context->share));
 
-    start();
+    // Start requesting the information.
+    handleError(curl_multi_add_handle(context->multi, handle));
 }
 
 HTTPCURLRequest::~HTTPCURLRequest() {
     MBGL_VERIFY_THREAD(tid);
 
-    context->removeRequest(this);
-
     handleError(curl_multi_remove_handle(context->multi, handle));
     context->returnHandle(handle);
     handle = nullptr;
-
-    if (timer) {
-        // Stop the backoff timer to avoid re-triggering this request.
-        uv_timer_stop(timer);
-        uv::close(timer);
-        timer = nullptr;
-    }
 
     if (headers) {
         curl_slist_free_all(headers);
@@ -499,14 +477,6 @@ HTTPCURLRequest::~HTTPCURLRequest() {
 
 void HTTPCURLRequest::cancel() {
    delete this;
-}
-
-void HTTPCURLRequest::start() {
-    // Count up the attempts.
-    attempts++;
-
-    // Start requesting the information.
-    handleError(curl_multi_add_handle(context->multi, handle));
 }
 
 // This function is called when we have new data for a request. We just append it to the string
@@ -569,60 +539,6 @@ size_t HTTPCURLRequest::headerCallback(char *const buffer, const size_t size, co
     return length;
 }
 
-void HTTPCURLRequest::retry(uint64_t timeout) {
-    handleError(curl_multi_remove_handle(context->multi, handle));
-
-    response.reset();
-
-    assert(!timer);
-    timer = new uv_timer_t;
-    timer->data = this;
-    uv_timer_init(context->loop, timer);
-    uv_timer_start(timer, restart, timeout, 0);
-}
-
-void HTTPCURLRequest::retry() {
-    // All batons get notified when the network status changed, but some of them
-    // might not actually wait for the network to become available again.
-    if (timer && strategy == PreemptImmediately) {
-        // Triggers the timer upon the next event loop iteration.
-        uv_timer_stop(timer);
-        uv_timer_start(timer, restart, 0, 0);
-    }
-}
-
-void HTTPCURLRequest::restart(UV_TIMER_PARAMS(timer)) {
-    // Restart the request.
-    auto baton = reinterpret_cast<HTTPCURLRequest *>(timer->data);
-
-    // Get rid of the timer.
-    baton->timer = nullptr;
-    uv::close(timer);
-
-    baton->start();
-}
-
-void HTTPCURLRequest::finish(ResponseStatus status) {
-    if (status == ResponseStatus::TemporaryError && attempts < maxAttempts) {
-        strategy = ExponentialBackoff;
-        return retry((1 << (attempts - 1)) * 1000);
-    } else if (status == ResponseStatus::ConnectionError && attempts < maxAttempts) {
-        // By default, we will retry every 30 seconds (network change notification will
-        // preempt the timeout).
-        strategy = PreemptImmediately;
-        return retry(30000);
-    }
-
-    // Actually return the response.
-    if (status == ResponseStatus::NotModified) {
-        notify(std::move(response), FileCache::Hint::Refresh);
-    } else {
-        notify(std::move(response), FileCache::Hint::Full);
-    }
-
-    delete this;
-}
-
 void HTTPCURLRequest::handleResult(CURLcode code) {
     MBGL_VERIFY_THREAD(tid);
 
@@ -633,77 +549,79 @@ void HTTPCURLRequest::handleResult(CURLcode code) {
         return;
     }
 
-    // Make sure a response object exists in case we haven't got any headers
-    // or content.
+    // Make sure a response object exists in case we haven't got any headers or content.
     if (!response) {
         response = std::make_unique<Response>();
     }
 
+    using Error = Response::Error;
+
     // Add human-readable error code
     if (code != CURLE_OK) {
-        response->status = Response::Error;
-        response->message = std::string { curl_easy_strerror(code) } + ": " + error;
-
         switch (code) {
         case CURLE_COULDNT_RESOLVE_PROXY:
         case CURLE_COULDNT_RESOLVE_HOST:
         case CURLE_COULDNT_CONNECT:
-            return finish(ResponseStatus::ConnectionError);
-
         case CURLE_OPERATION_TIMEDOUT:
-            return finish(ResponseStatus::TemporaryError);
+
+            response->error = std::make_unique<Error>(
+                Error::Reason::Connection, std::string{ curl_easy_strerror(code) } + ": " + error);
+            break;
 
         default:
-            return finish(ResponseStatus::PermanentError);
+            response->error = std::make_unique<Error>(
+                Error::Reason::Other, std::string{ curl_easy_strerror(code) } + ": " + error);
+            break;
         }
     } else {
         long responseCode = 0;
         curl_easy_getinfo(handle, CURLINFO_RESPONSE_CODE, &responseCode);
 
-        if (responseCode == 304) {
+        // Move over any data we got. We're storing this in a separate object because the Response
+        // object defines it as const.
+        if (data) {
+            response->data = std::move(data);
+        } else {
+            response->data = std::make_shared<std::string>();
+        }
+
+        if (responseCode == 200) {
+            // Nothing to do; this is what we want.
+        } else if (responseCode == 304) {
             if (existingResponse) {
                 // We're going to copy over the existing response's data.
-                response->status = existingResponse->status;
-                response->message = existingResponse->message;
-                response->modified = existingResponse->modified;
-                response->etag = existingResponse->etag;
+                if (existingResponse->error) {
+                    response->error = std::make_unique<Error>(*existingResponse->error);
+                }
                 response->data = existingResponse->data;
-                return finish(ResponseStatus::NotModified);
+                response->modified = existingResponse->modified;
+                // We're not updating `expired`, it was probably set during the request.
+                response->etag = existingResponse->etag;
             } else {
                 // This is an unsolicited 304 response and should only happen on malfunctioning
                 // HTTP servers. It likely doesn't include any data, but we don't have much options.
-                response->status = Response::Successful;
-                response->data = std::move(data);
-                return finish(ResponseStatus::Successful);
             }
-        } else if (responseCode == 200) {
-            response->status = Response::Successful;
-            response->data = std::move(data);
-            return finish(ResponseStatus::Successful);
         } else if (responseCode == 404) {
-            response->status = Response::NotFound;
-            response->data = std::move(data);
-            return finish(ResponseStatus::Successful);
+            response->error =
+                std::make_unique<Error>(Error::Reason::NotFound, "HTTP status code 404");
         } else if (responseCode >= 500 && responseCode < 600) {
-            // Server errors may be temporary, so back off exponentially.
-            response->status = Response::Error;
-            response->data = std::move(data);
-            response->message = "HTTP status code " + util::toString(responseCode);
-            return finish(ResponseStatus::TemporaryError);
+            response->error =
+                std::make_unique<Error>(Error::Reason::Server, std::string{ "HTTP status code " } +
+                                                                   std::to_string(responseCode));
         } else {
-            // We don't know how to handle any other errors, so declare them as permanently failing.
-            response->status = Response::Error;
-            response->data = std::move(data);
-            response->message = "HTTP status code " + util::toString(responseCode);
-            return finish(ResponseStatus::PermanentError);
+            response->error =
+                std::make_unique<Error>(Error::Reason::Other, std::string{ "HTTP status code " } +
+                                                                  std::to_string(responseCode));
         }
     }
 
-    throw std::runtime_error("Response hasn't been handled");
+    // Actually return the response.
+    notify(std::move(response));
+    delete this;
 }
 
 std::unique_ptr<HTTPContextBase> HTTPContextBase::createContext(uv_loop_t* loop) {
     return std::make_unique<HTTPCURLContext>(loop);
 }
 
-}
+} // namespace mbgl

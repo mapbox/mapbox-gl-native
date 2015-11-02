@@ -189,16 +189,16 @@ Request* VectorTileMonitor::monitorTile(std::function<void (std::exception_ptr, 
             return;
         }
 
-        if (res.status == Response::NotFound) {
-            callback(nullptr, nullptr);
-            return;
-        }
-
-        if (res.status != Response::Successful) {
-            std::stringstream message;
-            message << "Failed to load [" << url << "]: " << res.message;
-            callback(std::make_exception_ptr(std::runtime_error(message.str())), nullptr);
-            return;
+        if (res.error) {
+            if (res.error->reason == Response::Error::Reason::NotFound) {
+                callback(nullptr, nullptr);
+                return;
+            } else {
+                std::stringstream message;
+                message << "Failed to load [" << url << "]: " << res.error->message;
+                callback(std::make_exception_ptr(std::runtime_error(message.str())), nullptr);
+                return;
+            }
         }
 
         data = res.data;

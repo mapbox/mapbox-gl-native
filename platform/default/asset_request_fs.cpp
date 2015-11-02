@@ -115,13 +115,14 @@ void AssetRequest::fileStated(uv_fs_t *req) {
             // File is too large for us to open this way because uv_buf's only support unsigned
             // ints as maximum size.
             auto response = std::make_unique<Response>();
-            response->status = Response::Error;
 #if UV_VERSION_MAJOR == 0 && UV_VERSION_MINOR <= 10
-            response->message = uv_strerror(uv_err_t {UV_EFBIG, 0});
+            auto message = uv_strerror(uv_err_t {UV_EFBIG, 0});
 #else
-            response->message = uv_strerror(UV_EFBIG);
+            auto message = uv_strerror(UV_EFBIG);
 #endif
-            self->notify(std::move(response), FileCache::Hint::No);
+            response->error =
+                std::make_unique<Response::Error>(Response::Error::Reason::Other, message);
+            self->notify(std::move(response));
 
             uv_fs_req_cleanup(req);
             uv_fs_close(req->loop, req, self->fd, fileClosed);
@@ -163,8 +164,7 @@ void AssetRequest::fileRead(uv_fs_t *req) {
         notifyError(req);
     } else {
         // File was successfully read.
-        self->response->status = Response::Successful;
-        self->notify(std::move(self->response), FileCache::Hint::No);
+        self->notify(std::move(self->response));
     }
 
     uv_fs_req_cleanup(req);
@@ -191,9 +191,13 @@ void AssetRequest::notifyError(uv_fs_t *req) {
 
     if (req->result < 0 && !self->canceled && req->result != UV_ECANCELED) {
         auto response = std::make_unique<Response>();
-        response->status = Response::Error;
-        response->message = uv::getFileRequestError(req);
-        self->notify(std::move(response), FileCache::Hint::No);
+        Response::Error::Reason reason = Response::Error::Reason::Other;
+        if (req->result == UV_ENOENT || req->result == UV_EISDIR) {
+            reason = Response::Error::Reason::NotFound;
+        }
+        response->error = std::make_unique<Response::Error>(reason,
+                                                            uv::getFileRequestError(req));
+        self->notify(std::move(response));
     }
 }
 

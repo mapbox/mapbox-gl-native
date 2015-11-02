@@ -25,14 +25,13 @@ TEST_F(Storage, CacheRevalidateSame) {
         }
         first = false;
 
-        EXPECT_EQ(Response::Successful, res.status);
+        EXPECT_EQ(nullptr, res.error);
         EXPECT_EQ(false, res.stale);
         ASSERT_TRUE(res.data.get());
         EXPECT_EQ("Response", *res.data);
         EXPECT_EQ(0, res.expires);
         EXPECT_EQ(0, res.modified);
         EXPECT_EQ("snowfall", res.etag);
-        EXPECT_EQ("", res.message);
 
         req2 = fs.request(revalidateSame, uv_default_loop(), [&, res](const Response &res2) {
             if (res2.stale) {
@@ -48,8 +47,8 @@ TEST_F(Storage, CacheRevalidateSame) {
             fs.cancel(req2);
             req2 = nullptr;
 
-            EXPECT_EQ(Response::Successful, res2.status);
-            EXPECT_EQ(false, res.stale);
+            EXPECT_EQ(nullptr, res2.error);
+            EXPECT_EQ(false, res2.stale);
             ASSERT_TRUE(res2.data.get());
             EXPECT_EQ(res.data, res2.data);
             EXPECT_EQ("Response", *res2.data);
@@ -58,7 +57,6 @@ TEST_F(Storage, CacheRevalidateSame) {
             EXPECT_EQ(0, res2.modified);
             // We're not sending the ETag in the 304 reply, but it should still be there.
             EXPECT_EQ("snowfall", res2.etag);
-            EXPECT_EQ("", res2.message);
 
             CacheRevalidateSame.finish();
         });
@@ -88,14 +86,13 @@ TEST_F(Storage, CacheRevalidateModified) {
         }
         first = false;
 
-        EXPECT_EQ(Response::Successful, res.status);
+        EXPECT_EQ(nullptr, res.error);
         EXPECT_EQ(false, res.stale);
         ASSERT_TRUE(res.data.get());
         EXPECT_EQ("Response", *res.data);
         EXPECT_EQ(0, res.expires);
         EXPECT_EQ(1420070400, res.modified);
         EXPECT_EQ("", res.etag);
-        EXPECT_EQ("", res.message);
 
         req2 = fs.request(revalidateModified, uv_default_loop(), [&, res](const Response &res2) {
             if (res2.stale) {
@@ -111,7 +108,7 @@ TEST_F(Storage, CacheRevalidateModified) {
             fs.cancel(req2);
             req2 = nullptr;
 
-            EXPECT_EQ(Response::Successful, res2.status);
+            EXPECT_EQ(nullptr, res2.error);
             EXPECT_EQ(false, res2.stale);
             ASSERT_TRUE(res2.data.get());
             EXPECT_EQ("Response", *res2.data);
@@ -120,7 +117,6 @@ TEST_F(Storage, CacheRevalidateModified) {
             EXPECT_LT(0, res2.expires);
             EXPECT_EQ(1420070400, res2.modified);
             EXPECT_EQ("", res2.etag);
-            EXPECT_EQ("", res2.message);
 
             CacheRevalidateModified.finish();
         });
@@ -149,14 +145,13 @@ TEST_F(Storage, CacheRevalidateEtag) {
         }
         first = false;
 
-        EXPECT_EQ(Response::Successful, res.status);
+        EXPECT_EQ(nullptr, res.error);
         EXPECT_EQ(false, res.stale);
         ASSERT_TRUE(res.data.get());
         EXPECT_EQ("Response 1", *res.data);
         EXPECT_EQ(0, res.expires);
         EXPECT_EQ(0, res.modified);
         EXPECT_EQ("response-1", res.etag);
-        EXPECT_EQ("", res.message);
 
         req2 = fs.request(revalidateEtag, uv_default_loop(), [&, res](const Response &res2) {
             if (res2.stale) {
@@ -172,15 +167,14 @@ TEST_F(Storage, CacheRevalidateEtag) {
             fs.cancel(req2);
             req2 = nullptr;
 
-            EXPECT_EQ(Response::Successful, res2.status);
-            EXPECT_EQ(false, res.stale);
+            EXPECT_EQ(nullptr, res2.error);
+            EXPECT_EQ(false, res2.stale);
             ASSERT_TRUE(res2.data.get());
             EXPECT_NE(res.data, res2.data);
             EXPECT_EQ("Response 2", *res2.data);
             EXPECT_EQ(0, res2.expires);
             EXPECT_EQ(0, res2.modified);
             EXPECT_EQ("response-2", res2.etag);
-            EXPECT_EQ("", res2.message);
 
             CacheRevalidateEtag.finish();
         });

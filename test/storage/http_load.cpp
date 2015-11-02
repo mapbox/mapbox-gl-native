@@ -24,14 +24,13 @@ TEST_F(Storage, HTTPLoad) {
                    uv_default_loop(), [&, i, current](const Response &res) {
             fs.cancel(reqs[i]);
             reqs[i] = nullptr;
-            EXPECT_EQ(Response::Successful, res.status);
+            EXPECT_EQ(nullptr, res.error);
             EXPECT_EQ(false, res.stale);
             ASSERT_TRUE(res.data.get());
             EXPECT_EQ(std::string("Request ") +  std::to_string(current), *res.data);
             EXPECT_EQ(0, res.expires);
             EXPECT_EQ(0, res.modified);
             EXPECT_EQ("", res.etag);
-            EXPECT_EQ("", res.message);
 
             if (number <= max) {
                 req(i);
