@@ -53,6 +53,8 @@ if [[ "${BUILD_FOR_DEVICE}" == true ]]; then
         ARCHS="arm64 armv7 armv7s" \
         ONLY_ACTIVE_ARCH=NO \
         GCC_GENERATE_DEBUGGING_SYMBOLS=${GCC_GENERATE_DEBUGGING_SYMBOLS} \
+        ENABLE_BITCODE=YES \
+        DEPLOYMENT_POSTPROCESSING=YES \
         -project ./build/ios-all/mbgl.xcodeproj \
         -configuration ${BUILDTYPE} \
         -target everything \
