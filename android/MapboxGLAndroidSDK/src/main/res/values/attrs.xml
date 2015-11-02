@@ -8,6 +8,7 @@
         <attr name="zoom_enabled" format="boolean" />
         <attr name="scroll_enabled" format="boolean" />
         <attr name="rotate_enabled" format="boolean" />
+        <attr name="zoom_controls_enabled" format="boolean" />
         <attr name="debug_active" format="boolean" />
         <attr name="style_url" format="string" />
         <attr name="access_token" format="string" />

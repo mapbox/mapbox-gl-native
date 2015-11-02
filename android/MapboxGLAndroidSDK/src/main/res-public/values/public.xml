@@ -17,6 +17,7 @@
     <public name="zoom_enabled" type="attr" />
     <public name="scroll_enabled" type="attr" />
     <public name="rotate_enabled" type="attr" />
+    <public name="zoom_controls_enabled" type="attr" />
     <public name="debug_active" type="attr" />
     <public name="style_url" type="attr" />
     <public name="access_token" type="attr" />

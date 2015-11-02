@@ -117,6 +117,7 @@ public final class MapView extends FrameLayout {
     private static final String STATE_ZOOM_ENABLED = "zoomEnabled";
     private static final String STATE_SCROLL_ENABLED = "scrollEnabled";
     private static final String STATE_ROTATE_ENABLED = "rotateEnabled";
+    private static final String STATE_ZOOM_CONTROLS_ENABLED = "zoomControlsEnabled";
     private static final String STATE_DEBUG_ACTIVE = "debugActive";
     private static final String STATE_STYLE_URL = "styleUrl";
     private static final String STATE_ACCESS_TOKEN = "accessToken";
@@ -182,6 +183,7 @@ public final class MapView extends FrameLayout {
 
     // Shows zoom buttons
     private ZoomButtonsController mZoomButtonsController;
+    private boolean mZoomControlsEnabled = false;
 
     // Used to track trackball long presses
     private TrackballLongPressTimeOut mCurrentTrackballLongPressTimeOut;
@@ -636,22 +638,20 @@ public final class MapView extends FrameLayout {
         mRotateGestureDetector = new RotateGestureDetector(context, new RotateGestureListener());
 
         // Shows the zoom controls
-        // But not when in Eclipse UI editor
-        if (!isInEditMode()) {
-            if (!context.getPackageManager()
-                    .hasSystemFeature(PackageManager.FEATURE_TOUCHSCREEN_MULTITOUCH)) {
-                mZoomButtonsController = new ZoomButtonsController(this);
-                mZoomButtonsController.setZoomSpeed(ANIMATION_DURATION);
-                mZoomButtonsController.setOnZoomListener(new OnZoomListener());
-            }
-
-            // Check current connection status
-            ConnectivityManager connectivityManager = (ConnectivityManager) context
-                    .getSystemService(Context.CONNECTIVITY_SERVICE);
-            NetworkInfo activeNetwork = connectivityManager.getActiveNetworkInfo();
-            boolean isConnected = (activeNetwork != null) && activeNetwork.isConnectedOrConnecting();
-            onConnectivityChanged(isConnected);
+        if (!context.getPackageManager()
+                .hasSystemFeature(PackageManager.FEATURE_TOUCHSCREEN_MULTITOUCH)) {
+            mZoomControlsEnabled = true;
         }
+        mZoomButtonsController = new ZoomButtonsController(this);
+        mZoomButtonsController.setZoomSpeed(ANIMATION_DURATION);
+        mZoomButtonsController.setOnZoomListener(new OnZoomListener());
+
+        // Check current connection status
+        ConnectivityManager connectivityManager = (ConnectivityManager) context
+                .getSystemService(Context.CONNECTIVITY_SERVICE);
+        NetworkInfo activeNetwork = connectivityManager.getActiveNetworkInfo();
+        boolean isConnected = (activeNetwork != null) && activeNetwork.isConnectedOrConnecting();
+        onConnectivityChanged(isConnected);
 
         // Setup user location UI
         mUserLocationView = (UserLocationView) view.findViewById(R.id.userLocationView);
@@ -681,6 +681,7 @@ public final class MapView extends FrameLayout {
             setZoomEnabled(typedArray.getBoolean(R.styleable.MapView_zoom_enabled, true));
             setScrollEnabled(typedArray.getBoolean(R.styleable.MapView_scroll_enabled, true));
             setRotateEnabled(typedArray.getBoolean(R.styleable.MapView_rotate_enabled, true));
+            setZoomControlsEnabled(typedArray.getBoolean(R.styleable.MapView_zoom_controls_enabled, isZoomControlsEnabled()));
             setDebugActive(typedArray.getBoolean(R.styleable.MapView_debug_active, false));
             if (typedArray.getString(R.styleable.MapView_style_url) != null) {
                 setStyleUrl(typedArray.getString(R.styleable.MapView_style_url));
@@ -755,6 +756,7 @@ public final class MapView extends FrameLayout {
             setZoomEnabled(savedInstanceState.getBoolean(STATE_ZOOM_ENABLED));
             setScrollEnabled(savedInstanceState.getBoolean(STATE_SCROLL_ENABLED));
             setRotateEnabled(savedInstanceState.getBoolean(STATE_ROTATE_ENABLED));
+            setZoomControlsEnabled(savedInstanceState.getBoolean(STATE_ZOOM_CONTROLS_ENABLED));
             setDebugActive(savedInstanceState.getBoolean(STATE_DEBUG_ACTIVE));
             setStyleUrl(savedInstanceState.getString(STATE_STYLE_URL));
             setAccessToken(savedInstanceState.getString(STATE_ACCESS_TOKEN));
@@ -835,11 +837,12 @@ public final class MapView extends FrameLayout {
         // need to set zoom level first because of limitation on rotating when zoomed out
         outState.putDouble(STATE_ZOOM_LEVEL, getZoomLevel());
         outState.putDouble(STATE_CENTER_DIRECTION, getDirection());
-        outState.putBoolean(STATE_ZOOM_ENABLED, mZoomEnabled);
-        outState.putBoolean(STATE_SCROLL_ENABLED, mScrollEnabled);
-        outState.putBoolean(STATE_ROTATE_ENABLED, mRotateEnabled);
+        outState.putBoolean(STATE_ZOOM_ENABLED, isZoomEnabled());
+        outState.putBoolean(STATE_SCROLL_ENABLED, isScrollEnabled());
+        outState.putBoolean(STATE_ROTATE_ENABLED, isRotateEnabled());
+        outState.putBoolean(STATE_ZOOM_CONTROLS_ENABLED, isZoomControlsEnabled());
         outState.putBoolean(STATE_DEBUG_ACTIVE, isDebugActive());
-        outState.putString(STATE_STYLE_URL, mStyleUrl);
+        outState.putString(STATE_STYLE_URL, getStyleUrl());
         outState.putString(STATE_ACCESS_TOKEN, getAccessToken());
         outState.putStringArrayList(STATE_STYLE_CLASSES, new ArrayList<>(getStyleClasses()));
         outState.putLong(STATE_DEFAULT_TRANSITION_DURATION, mNativeMapView.getDefaultTransitionDuration());
@@ -1238,8 +1241,40 @@ public final class MapView extends FrameLayout {
     public void setZoomEnabled(boolean zoomEnabled) {
         this.mZoomEnabled = zoomEnabled;
 
-        if ((mZoomButtonsController != null) && (getVisibility() == View.VISIBLE) && mZoomEnabled) {
+        if (mZoomControlsEnabled && (getVisibility() == View.VISIBLE) && mZoomEnabled) {
             mZoomButtonsController.setVisible(true);
+        } else {
+            mZoomButtonsController.setVisible(false);
+        }
+    }
+
+    /**
+     * Gets whether the zoom controls are enabled.
+     *
+     * @return If true, the zoom controls are enabled.
+     */
+    public boolean isZoomControlsEnabled() {
+        return mZoomControlsEnabled;
+    }
+
+    /**
+     * Sets whether the zoom controls are enabled.
+     * If enabled, the zoom controls are a pair of buttons
+     * (one for zooming in, one for zooming out) that appear on the screen.
+     * When pressed, they cause the camera to zoom in (or out) by one zoom level.
+     * If disabled, the zoom controls are not shown.
+     * <p/>
+     * By default the zoom controls are enabled if the device is only single touch capable;
+     *
+     * @param enabled If true, the zoom controls are enabled.
+     */
+    public void setZoomControlsEnabled(boolean enabled) {
+        mZoomControlsEnabled = enabled;
+
+        if (mZoomControlsEnabled && (getVisibility() == View.VISIBLE) && mZoomEnabled) {
+            mZoomButtonsController.setVisible(true);
+        } else {
+            mZoomButtonsController.setVisible(false);
         }
     }
 
@@ -2205,7 +2240,7 @@ public final class MapView extends FrameLayout {
     protected void onDetachedFromWindow() {
         super.onDetachedFromWindow();
         // Required by ZoomButtonController (from Android SDK documentation)
-        if (mZoomButtonsController != null) {
+        if (mZoomControlsEnabled) {
             mZoomButtonsController.setVisible(false);
         }
     }
@@ -2214,10 +2249,10 @@ public final class MapView extends FrameLayout {
     @Override
     protected void onVisibilityChanged(@NonNull View changedView, int visibility) {
         // Required by ZoomButtonController (from Android SDK documentation)
-        if ((mZoomButtonsController != null) && (visibility != View.VISIBLE)) {
+        if (mZoomControlsEnabled && (visibility != View.VISIBLE)) {
             mZoomButtonsController.setVisible(false);
         }
-        if ((mZoomButtonsController != null) && (visibility == View.VISIBLE)
+        if (mZoomControlsEnabled && (visibility == View.VISIBLE)
                 && mZoomEnabled) {
             mZoomButtonsController.setVisible(true);
         }
@@ -2226,6 +2261,25 @@ public final class MapView extends FrameLayout {
     //
     // Touch events
     //
+
+    /**
+     * Sets the preference for whether all gestures should be enabled or disabled.
+     * <p/>
+     * This setting controls only user interactions with the map. If you set the value to false,
+     * you may still change the map location programmatically.
+     * <p/>
+     * The default value is true.
+     *
+     * @param enabled If true, all gestures are available; otherwise, all gestures are disabled.
+     * @see MapView#setZoomEnabled(boolean)
+     * @see MapView#setScrollEnabled(boolean)
+     * @see MapView#setRotateEnabled(boolean)
+     */
+    public void setAllGesturesEnabled(boolean enabled) {
+        setZoomEnabled(enabled);
+        setScrollEnabled(enabled);
+        setRotateEnabled(enabled);
+    }
 
     // Called when user touches the screen, all positions are absolute
     @Override
@@ -2291,7 +2345,7 @@ public final class MapView extends FrameLayout {
         @Override
         public boolean onDown(MotionEvent e) {
             // Show the zoom controls
-            if ((mZoomButtonsController != null) && mZoomEnabled) {
+            if (mZoomControlsEnabled && mZoomEnabled) {
                 mZoomButtonsController.setVisible(true);
             }
 
@@ -2893,14 +2947,14 @@ public final class MapView extends FrameLayout {
             case MotionEvent.ACTION_HOVER_ENTER:
             case MotionEvent.ACTION_HOVER_MOVE:
                 // Show the zoom controls
-                if ((mZoomButtonsController != null) && mZoomEnabled) {
+                if (mZoomControlsEnabled && mZoomEnabled) {
                     mZoomButtonsController.setVisible(true);
                 }
                 return true;
 
             case MotionEvent.ACTION_HOVER_EXIT:
                 // Hide the zoom controls
-                if (mZoomButtonsController != null) {
+                if (mZoomControlsEnabled) {
                     mZoomButtonsController.setVisible(false);
                 }
 
