@@ -16,29 +16,6 @@ trigger_map:
 workflows:
   primary:
     steps:
-    - git-clone@3.0.0:
-        outputs:
-        - GIT_CLONE_COMMIT_HASH: 
-          opts:
-            title: Cloned git commit's commit hash
-        - GIT_CLONE_COMMIT_MESSAGE_SUBJECT: 
-          opts:
-            title: Cloned git commit's message subject
-        - GIT_CLONE_COMMIT_MESSAGE_BODY: 
-          opts:
-            title: Cloned git commit's message body
-        - GIT_CLONE_COMMIT_AUTHOR_NAME: 
-          opts:
-            title: Cloned git commit's author name
-        - GIT_CLONE_COMMIT_AUTHOR_EMAIL: 
-          opts:
-            title: Cloned git commit's author email address
-        - GIT_CLONE_COMMIT_COMMITER_NAME: 
-          opts:
-            title: Cloned git commit's committer name
-        - GIT_CLONE_COMMIT_COMMITER_EMAIL: 
-          opts:
-            title: Cloned git commit's committer email
     - select-xcode-version@2.2.0: {}
     - script@1.1.0:
         title: Install Homebrew dependencies
