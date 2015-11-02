@@ -56,7 +56,7 @@ if [[ "${BUILD_FOR_DEVICE}" == true ]]; then
         -project ./build/ios-all/mbgl.xcodeproj \
         -configuration ${BUILDTYPE} \
         -target everything \
-        -jobs ${JOBS} | xcpretty -c
+        -jobs ${JOBS}
 fi
 
 step "Building iOS Simulator targets..."
@@ -67,7 +67,7 @@ xcodebuild -sdk iphonesimulator${IOS_SDK_VERSION} \
     -project ./build/ios-all/mbgl.xcodeproj \
     -configuration ${BUILDTYPE} \
     -target everything \
-    -jobs ${JOBS} | xcpretty -c
+    -jobs ${JOBS}
 
 
 step "Building static library..."
