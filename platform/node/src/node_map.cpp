@@ -17,6 +17,7 @@ namespace node_mbgl {
 struct NodeMap::RenderOptions {
     double zoom = 0;
     double bearing = 0;
+    double pitch = 0;
     double latitude = 0;
     double longitude = 0;
     unsigned int width = 512;
@@ -204,6 +205,10 @@ std::unique_ptr<NodeMap::RenderOptions> NodeMap::ParseOptions(v8::Local<v8::Obje
         options->bearing = Nan::Get(obj, Nan::New("bearing").ToLocalChecked()).ToLocalChecked()->NumberValue();
     }
 
+    if (Nan::Has(obj, Nan::New("pitch").ToLocalChecked()).FromJust()) {
+        options->pitch = Nan::Get(obj, Nan::New("pitch").ToLocalChecked()).ToLocalChecked()->NumberValue();
+    }
+
     if (Nan::Has(obj, Nan::New("center").ToLocalChecked()).FromJust()) {
         auto center = Nan::Get(obj, Nan::New("center").ToLocalChecked()).ToLocalChecked().As<v8::Array>();
         if (center->Length() > 0) { options->latitude = Nan::Get(center, 0).ToLocalChecked()->NumberValue(); }
@@ -288,6 +293,7 @@ void NodeMap::startRender(std::unique_ptr<NodeMap::RenderOptions> options) {
     map->setClasses(options->classes);
     map->setLatLngZoom(mbgl::LatLng(options->latitude, options->longitude), options->zoom);
     map->setBearing(options->bearing);
+    map->setPitch(options->pitch);
 
     map->renderStill([this](const std::exception_ptr eptr, std::unique_ptr<const mbgl::StillImage> result) {
         if (eptr) {
