@@ -67,11 +67,18 @@ void Painter::renderSDF(SymbolBucket &bucket,
 
     sdfShader.u_zoom = (state.getNormalizedZoom() - zoomAdjust) * 10; // current zoom level
 
-    FadeProperties f = frameHistory.getFadeProperties(data.getAnimationTime(), data.getDefaultFadeDuration());
-    sdfShader.u_fadedist = f.fadedist * 10;
-    sdfShader.u_minfadezoom = std::floor(f.minfadezoom * 10);
-    sdfShader.u_maxfadezoom = std::floor(f.maxfadezoom * 10);
-    sdfShader.u_fadezoom = (state.getNormalizedZoom() + f.bump) * 10;
+    if (data.mode == MapMode::Continuous) {
+        FadeProperties f = frameHistory.getFadeProperties(data.getAnimationTime(), data.getDefaultFadeDuration());
+        sdfShader.u_fadedist = f.fadedist * 10;
+        sdfShader.u_minfadezoom = std::floor(f.minfadezoom * 10);
+        sdfShader.u_maxfadezoom = std::floor(f.maxfadezoom * 10);
+        sdfShader.u_fadezoom = (state.getNormalizedZoom() + f.bump) * 10;
+    } else { // MapMode::Still
+        sdfShader.u_fadedist = 0;
+        sdfShader.u_minfadezoom = state.getNormalizedZoom() * 10;
+        sdfShader.u_maxfadezoom = state.getNormalizedZoom() * 10;
+        sdfShader.u_fadezoom = state.getNormalizedZoom() * 10;
+    }
 
     // The default gamma value has to be adjust for the current pixelratio so that we're not
     // drawing blurry font on retina screens.
