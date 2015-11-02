@@ -255,3 +255,20 @@ afterEvaluate { project ->
         archives androidJavadocsJar
     }
 }
+
+
+task makeClean(type: Exec) {
+    workingDir '../../'
+    commandLine 'make', 'clean'
+}
+
+task makeAndroid(type: Exec) {
+    workingDir '../../'
+    commandLine 'make', 'android'
+}
+
+task makeAndroidAll(type: Exec) {
+    workingDir '../../'
+    commandLine 'make', 'apackage'
+}
+
