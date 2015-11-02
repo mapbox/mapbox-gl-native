@@ -1,0 +1,83 @@
+---
+format_version: 1.0.0
+default_step_lib_source: https://github.com/bitrise-io/bitrise-steplib.git
+app:
+  envs:
+  - BITRISE_PROJECT_PATH: "./scripts/ios_bitrise/ios_bitrise.xcodeproj"
+    opts:
+      is_expand: false
+  - BITRISE_SCHEME: ios_bitrise
+    opts:
+      is_expand: false
+trigger_map:
+- pattern: "*"
+  is_pull_request_allowed: true
+  workflow: primary
+workflows:
+  primary:
+    steps:
+    - git-clone@3.0.0:
+        outputs:
+        - GIT_CLONE_COMMIT_HASH: 
+          opts:
+            title: Cloned git commit's commit hash
+        - GIT_CLONE_COMMIT_MESSAGE_SUBJECT: 
+          opts:
+            title: Cloned git commit's message subject
+        - GIT_CLONE_COMMIT_MESSAGE_BODY: 
+          opts:
+            title: Cloned git commit's message body
+        - GIT_CLONE_COMMIT_AUTHOR_NAME: 
+          opts:
+            title: Cloned git commit's author name
+        - GIT_CLONE_COMMIT_AUTHOR_EMAIL: 
+          opts:
+            title: Cloned git commit's author email address
+        - GIT_CLONE_COMMIT_COMMITER_NAME: 
+          opts:
+            title: Cloned git commit's committer name
+        - GIT_CLONE_COMMIT_COMMITER_EMAIL: 
+          opts:
+            title: Cloned git commit's committer email
+    - select-xcode-version@2.2.0: {}
+    - script@1.1.0:
+        title: Install Homebrew dependencies
+        inputs:
+        - content: |-
+            #!/bin/bash
+
+            brew install pkgconfig
+            brew install automake
+            brew install homebrew/versions/appledoc22
+            brew link --force appledoc22
+    - script@1.1.0:
+        title: Run make ipackage-sim
+        inputs:
+        - content: |-
+            #!/bin/bash
+
+            make ipackage-sim
+        - is_debug: 'yes'
+    - xcode-test@1.6.0:
+        title: 'Xcode: Unit Test'
+        inputs:
+        - project_path: "./test/ios/ios-tests.xcodeproj"
+        - scheme: Mapbox GL Tests
+        - simulator_device: iPhone 6
+          opts:
+            is_expand: false
+    - slack@2.1.0:
+        inputs:
+        - webhook_url: "$SLACK_HOOK_URL"
+        - channel: "#gl"
+        - from_username: Bitrise
+        - from_username_on_error: Bitrise
+        - message: 'Build #${BITRISE_BUILD_NUMBER} (${BITRISE_BUILD_URL}) for mapbox/mapbox-gl-native@${BITRISE_GIT_BRANCH}
+            by ${GIT_CLONE_COMMIT_COMMITER_NAME} passed'
+        - message_on_error: 'Build #${BITRISE_BUILD_NUMBER} (${BITRISE_BUILD_URL})
+            for mapbox/mapbox-gl-native@${BITRISE_GIT_BRANCH} by ${GIT_CLONE_COMMIT_COMMITER_NAME}
+            failed'
+        - icon_url: https://bitrise-public-content-production.s3.amazonaws.com/slack/bitrise-slack-icon-128.png
+        - icon_url_on_error: https://bitrise-public-content-production.s3.amazonaws.com/slack/bitrise-slack-error-icon-128.png
+    before_run: 
+    after_run: 
