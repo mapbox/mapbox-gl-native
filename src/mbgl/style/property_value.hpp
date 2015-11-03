@@ -3,7 +3,7 @@
 
 #include <mapbox/variant.hpp>
 
-#include <mbgl/style/function_properties.hpp>
+#include <mbgl/style/function.hpp>
 #include <mbgl/style/piecewisefunction_properties.hpp>
 #include <mbgl/style/types.hpp>
 

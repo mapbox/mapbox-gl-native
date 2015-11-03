@@ -34,9 +34,9 @@ void ShapeAnnotationImpl::updateStyle(Style& style) {
 
         const LinePaintProperties& properties = shape.properties.get<LinePaintProperties>();
         ClassProperties paintProperties;
-        paintProperties.set(PropertyKey::LineOpacity, ConstantFunction<float>(properties.opacity));
-        paintProperties.set(PropertyKey::LineWidth, ConstantFunction<float>(properties.width));
-        paintProperties.set(PropertyKey::LineColor, ConstantFunction<Color>(properties.color));
+        paintProperties.set(PropertyKey::LineOpacity, Function<float>(properties.opacity));
+        paintProperties.set(PropertyKey::LineWidth, Function<float>(properties.width));
+        paintProperties.set(PropertyKey::LineColor, Function<Color>(properties.color));
         layer->paints.paints.emplace(ClassID::Default, std::move(paintProperties));
 
     } else if (shape.properties.is<FillPaintProperties>()) {
@@ -44,9 +44,9 @@ void ShapeAnnotationImpl::updateStyle(Style& style) {
 
         const FillPaintProperties& properties = shape.properties.get<FillPaintProperties>();
         ClassProperties paintProperties;
-        paintProperties.set(PropertyKey::FillOpacity, ConstantFunction<float>(properties.opacity));
-        paintProperties.set(PropertyKey::FillColor, ConstantFunction<Color>(properties.fill_color));
-        paintProperties.set(PropertyKey::FillOutlineColor, ConstantFunction<Color>(properties.stroke_color));
+        paintProperties.set(PropertyKey::FillOpacity, Function<float>(properties.opacity));
+        paintProperties.set(PropertyKey::FillColor, Function<Color>(properties.fill_color));
+        paintProperties.set(PropertyKey::FillOutlineColor, Function<Color>(properties.stroke_color));
         layer->paints.paints.emplace(ClassID::Default, std::move(paintProperties));
 
     } else {
@@ -83,7 +83,7 @@ std::unique_ptr<StyleLayer> ShapeAnnotationImpl::createLineLayer() {
     type = ProjectedFeatureType::LineString;
     std::unique_ptr<LineLayer> layer = std::make_unique<LineLayer>();
     layer->type = StyleLayerType::Line;
-    layer->layout.set(PropertyKey::LineJoin, ConstantFunction<JoinType>(JoinType::Round));
+    layer->layout.set(PropertyKey::LineJoin, Function<JoinType>(JoinType::Round));
     return std::move(layer);
 }
 

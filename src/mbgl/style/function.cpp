@@ -1,4 +1,4 @@
-#include <mbgl/style/function_properties.hpp>
+#include <mbgl/style/function.hpp>
 #include <mbgl/style/types.hpp>
 #include <mbgl/util/interpolate.hpp>
 
@@ -27,7 +27,7 @@ template <> inline TextTransformType defaultStopsValue() { return {}; };
 template <> inline RotationAlignmentType defaultStopsValue() { return {}; };
 
 template <typename T>
-T StopsFunction<T>::evaluate(float z) const {
+T Function<T>::evaluate(float z) const {
     bool smaller = false;
     float smaller_z = 0.0f;
     T smaller_val = T();
@@ -35,9 +35,9 @@ T StopsFunction<T>::evaluate(float z) const {
     float larger_z = 0.0f;
     T larger_val = T();
 
-    for (uint32_t i = 0; i < values.size(); i++) {
-        float stop_z = values[i].first;
-        T stop_val = values[i].second;
+    for (uint32_t i = 0; i < stops.size(); i++) {
+        float stop_z = stops[i].first;
+        T stop_val = stops[i].second;
         if (stop_z <= z && (!smaller || smaller_z < stop_z)) {
             smaller = true;
             smaller_z = stop_z;
@@ -73,20 +73,21 @@ T StopsFunction<T>::evaluate(float z) const {
     }
 }
 
-template bool StopsFunction<bool>::evaluate(float z) const;
-template float StopsFunction<float>::evaluate(float z) const;
-template Color StopsFunction<Color>::evaluate(float z) const;
-template std::vector<float> StopsFunction<std::vector<float>>::evaluate(float z) const;
-template std::array<float, 2> StopsFunction<std::array<float, 2>>::evaluate(float z) const;
+template bool Function<bool>::evaluate(float z) const;
+template float Function<float>::evaluate(float z) const;
+template Color Function<Color>::evaluate(float z) const;
+template std::vector<float> Function<std::vector<float>>::evaluate(float z) const;
+template std::array<float, 2> Function<std::array<float, 2>>::evaluate(float z) const;
 
-template std::string StopsFunction<std::string>::evaluate(float z) const;
-template TranslateAnchorType StopsFunction<TranslateAnchorType>::evaluate(float z) const;
-template RotateAnchorType StopsFunction<RotateAnchorType>::evaluate(float z) const;
-template CapType StopsFunction<CapType>::evaluate(float z) const;
-template JoinType StopsFunction<JoinType>::evaluate(float z) const;
-template PlacementType StopsFunction<PlacementType>::evaluate(float z) const;
-template TextAnchorType StopsFunction<TextAnchorType>::evaluate(float z) const;
-template TextJustifyType StopsFunction<TextJustifyType>::evaluate(float z) const;
-template TextTransformType StopsFunction<TextTransformType>::evaluate(float z) const;
-template RotationAlignmentType StopsFunction<RotationAlignmentType>::evaluate(float z) const;
+template std::string Function<std::string>::evaluate(float z) const;
+template TranslateAnchorType Function<TranslateAnchorType>::evaluate(float z) const;
+template RotateAnchorType Function<RotateAnchorType>::evaluate(float z) const;
+template CapType Function<CapType>::evaluate(float z) const;
+template JoinType Function<JoinType>::evaluate(float z) const;
+template PlacementType Function<PlacementType>::evaluate(float z) const;
+template TextAnchorType Function<TextAnchorType>::evaluate(float z) const;
+template TextJustifyType Function<TextJustifyType>::evaluate(float z) const;
+template TextTransformType Function<TextTransformType>::evaluate(float z) const;
+template RotationAlignmentType Function<RotationAlignmentType>::evaluate(float z) const;
+
 }

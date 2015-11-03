@@ -273,7 +273,7 @@ optional<Function<T>> parseFunction(const char* name, const JSVal& value) {
         if (!constant) {
             return {};
         }
-        return { ConstantFunction<T>(*constant) };
+        return { Function<T>(*constant) };
     }
 
     if (!value.HasMember("stops")) {
@@ -300,7 +300,7 @@ optional<Function<T>> parseFunction(const char* name, const JSVal& value) {
         return {};
     }
 
-    return { StopsFunction<T>(*stops, base) };
+    return { Function<T>(*stops, base) };
 }
 
 template <> optional<Function<std::array<float, 2>>> parseProperty(const char* name, const JSVal& value) {
