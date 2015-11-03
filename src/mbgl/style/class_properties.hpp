@@ -34,8 +34,7 @@ public:
     void calculate(PropertyKey key, T& target, const float z) const {
         auto it = properties.find(key);
         if (it != properties.end()) {
-            const PropertyEvaluator<T> evaluator(z);
-            target = mapbox::util::apply_visitor(evaluator, it->second);
+            target = mapbox::util::apply_visitor(PropertyEvaluator<T>(StyleCalculationParameters(z)), it->second);
         }
     }
 

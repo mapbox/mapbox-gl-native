@@ -17,7 +17,7 @@ void FillLayer::parsePaints(const JSVal& layer) {
         parseProperty<Function<std::array<float, 2>>>("fill-translate", PropertyKey::FillTranslate, paint, value);
         parseProperty<PropertyTransition>("fill-translate-transition", PropertyKey::FillTranslate, paint, value);
         parseProperty<Function<TranslateAnchorType>>("fill-translate-anchor", PropertyKey::FillTranslateAnchor, paint, value);
-        parseProperty<PiecewiseConstantFunction<Faded<std::string>>>("fill-pattern", PropertyKey::FillImage, paint, value, "fill-pattern-transition");
+        parseProperty<Function<Faded<std::string>>>("fill-pattern", PropertyKey::FillImage, paint, value, "fill-pattern-transition");
     });
 }
 

@@ -1,5 +1,5 @@
 #include <mbgl/style/function.hpp>
-#include <mbgl/style/types.hpp>
+#include <mbgl/style/style_calculation_parameters.hpp>
 #include <mbgl/util/interpolate.hpp>
 
 #include <cmath>
@@ -27,7 +27,8 @@ template <> inline TextTransformType defaultStopsValue() { return {}; };
 template <> inline RotationAlignmentType defaultStopsValue() { return {}; };
 
 template <typename T>
-T Function<T>::evaluate(float z) const {
+T Function<T>::evaluate(const StyleCalculationParameters& parameters) const {
+    float z = parameters.z;
     bool smaller = false;
     float smaller_z = 0.0f;
     T smaller_val = T();
@@ -73,21 +74,66 @@ T Function<T>::evaluate(float z) const {
     }
 }
 
-template bool Function<bool>::evaluate(float z) const;
-template float Function<float>::evaluate(float z) const;
-template Color Function<Color>::evaluate(float z) const;
-template std::vector<float> Function<std::vector<float>>::evaluate(float z) const;
-template std::array<float, 2> Function<std::array<float, 2>>::evaluate(float z) const;
+template class Function<bool>;
+template class Function<float>;
+template class Function<Color>;
+template class Function<std::vector<float>>;
+template class Function<std::array<float, 2>>;
 
-template std::string Function<std::string>::evaluate(float z) const;
-template TranslateAnchorType Function<TranslateAnchorType>::evaluate(float z) const;
-template RotateAnchorType Function<RotateAnchorType>::evaluate(float z) const;
-template CapType Function<CapType>::evaluate(float z) const;
-template JoinType Function<JoinType>::evaluate(float z) const;
-template PlacementType Function<PlacementType>::evaluate(float z) const;
-template TextAnchorType Function<TextAnchorType>::evaluate(float z) const;
-template TextJustifyType Function<TextJustifyType>::evaluate(float z) const;
-template TextTransformType Function<TextTransformType>::evaluate(float z) const;
-template RotationAlignmentType Function<RotationAlignmentType>::evaluate(float z) const;
+template class Function<std::string>;
+template class Function<TranslateAnchorType>;
+template class Function<RotateAnchorType>;
+template class Function<CapType>;
+template class Function<JoinType>;
+template class Function<PlacementType>;
+template class Function<TextAnchorType>;
+template class Function<TextJustifyType>;
+template class Function<TextTransformType>;
+template class Function<RotationAlignmentType>;
+
+template <typename T>
+size_t getBiggestStopLessThan(std::vector<std::pair<float, T>> stops, float z) {
+    for (uint32_t i = 0; i < stops.size(); i++) {
+        if (stops[i].first > z) {
+            return i == 0 ? i : i - 1;
+        }
+    }
+    return stops.size() - 1;
+}
+
+template <typename T>
+Faded<T> Function<Faded<T>>::evaluate(const StyleCalculationParameters& parameters) const {
+    Faded<T> result;
+
+    float z = parameters.z;
+    float fraction = std::fmod(z, 1.0f);
+    std::chrono::duration<float> d = duration ? *duration : parameters.defaultFadeDuration;
+    float t = std::min((Clock::now() - parameters.zoomHistory.lastIntegerZoomTime) / d, 1.0f);
+    float fromScale = 1.0f;
+    float toScale = 1.0f;
+    size_t from, to;
+
+    if (z > parameters.zoomHistory.lastIntegerZoom) {
+        result.t = fraction + (1.0f - fraction) * t;
+        from = getBiggestStopLessThan(stops, z - 1.0f);
+        to = getBiggestStopLessThan(stops, z);
+        fromScale *= 2.0f;
+
+    } else {
+        result.t = 1 - (1 - t) * fraction;
+        to = getBiggestStopLessThan(stops, z);
+        from = getBiggestStopLessThan(stops, z + 1.0f);
+        fromScale /= 2.0f;
+    }
+
+    result.from = stops[from].second;
+    result.to = stops[to].second;
+    result.fromScale = fromScale;
+    result.toScale = toScale;
+    return result;
+}
+
+template class Function<Faded<std::string>>;
+template class Function<Faded<std::vector<float>>>;
 
 }

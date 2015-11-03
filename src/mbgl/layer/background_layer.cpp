@@ -7,7 +7,7 @@ void BackgroundLayer::parsePaints(const JSVal& layer) {
     paints.parseEach(layer, [&] (ClassProperties& paint, const JSVal& value) {
         parseProperty<Function<float>>("background-opacity", PropertyKey::BackgroundOpacity, paint, value);
         parseProperty<Function<Color>>("background-color", PropertyKey::BackgroundColor, paint, value);
-        parseProperty<PiecewiseConstantFunction<Faded<std::string>>>("background-pattern", PropertyKey::BackgroundImage, paint, value, "background-pattern-transition");
+        parseProperty<Function<Faded<std::string>>>("background-pattern", PropertyKey::BackgroundImage, paint, value, "background-pattern-transition");
     });
 }
 

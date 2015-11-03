@@ -4,7 +4,6 @@
 #include <mapbox/variant.hpp>
 
 #include <mbgl/style/function.hpp>
-#include <mbgl/style/piecewisefunction_properties.hpp>
 #include <mbgl/style/types.hpp>
 
 #include <vector>
@@ -28,8 +27,8 @@ typedef mapbox::util::variant<
     Function<bool>,
     Function<float>,
     Function<Color>,
-    PiecewiseConstantFunction<Faded<std::vector<float>>>,
-    PiecewiseConstantFunction<Faded<std::string>>
+    Function<Faded<std::vector<float>>>,
+    Function<Faded<std::string>>
 > PropertyValue;
 
 }

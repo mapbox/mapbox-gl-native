@@ -3,7 +3,6 @@
 
 #include <mbgl/style/zoom_history.hpp>
 #include <mbgl/style/function.hpp>
-#include <mbgl/style/piecewisefunction_properties.hpp>
 #include <mbgl/style/style_calculation_parameters.hpp>
 
 namespace mbgl {
@@ -24,10 +23,6 @@ public:
     }
 
     T operator()(const Function<T>& value) const {
-        return value.evaluate(parameters.z);
-    }
-
-    T operator()(const PiecewiseConstantFunction<T>& value) const {
         return value.evaluate(parameters);
     }
 
