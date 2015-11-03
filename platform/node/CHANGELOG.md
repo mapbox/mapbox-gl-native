@@ -20,6 +20,7 @@
 - Fixes a bug which prevented raster tiles that `404`'ed from rendering ([#2458](https://github.com/mapbox/mapbox-gl-native/pull/2458))
 - Adds Node.js v4.1.x support.
 - Fade transitions are now ignored to prevent half faded labels. ([#942](https://github.com/mapbox/mapbox-gl-native/pull/942))
+- Adds option `pitch` ([#2702](https://github.com/mapbox/mapbox-gl-native/pull/2702))
 
 # 1.1.3
 
