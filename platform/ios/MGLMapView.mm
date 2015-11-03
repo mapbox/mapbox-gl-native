@@ -3303,6 +3303,8 @@ class MBGLView : public mbgl::View
 
 - (void)setStyleURL__:(nullable NSString *)URLString
 {
+    URLString = [URLString stringByTrimmingCharactersInSet:
+                 [NSCharacterSet whitespaceAndNewlineCharacterSet]];
     NSURL *url = URLString.length ? [NSURL URLWithString:URLString] : nil;
     if (URLString.length && !url)
     {

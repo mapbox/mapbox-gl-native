@@ -60,6 +60,8 @@
 }
 
 + (void) setAccessToken:(NSString *) accessToken {
+    accessToken = [accessToken stringByTrimmingCharactersInSet:
+                   [NSCharacterSet whitespaceAndNewlineCharacterSet]];
     if ( ! [accessToken length]) return;
     
     [MGLAccountManager sharedManager].accessToken = accessToken;
