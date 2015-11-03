@@ -21,7 +21,10 @@ import java.util.List;
 
 public class PolylineActivity extends AppCompatActivity {
 
-    private List<Polyline> mPolyLines;
+    private static final String STATE_POLYLINE_OPTIONS = "polylineOptions";
+
+    private List<Polyline> mPolylines;
+    private ArrayList<PolylineOptions> mPolylineOptions = new ArrayList<>();
     private MapView mMapView;
 
     @Override
@@ -42,21 +45,28 @@ public class PolylineActivity extends AppCompatActivity {
         mMapView.setAccessToken(ApiAccess.getToken(this));
         mMapView.onCreate(savedInstanceState);
 
-        mPolyLines = mMapView.addPolylines(PolylineProvider.getAll());
+        if (savedInstanceState != null) {
+            mPolylineOptions = savedInstanceState.getParcelableArrayList(STATE_POLYLINE_OPTIONS);
+        } else {
+            mPolylineOptions.addAll(PolylineProvider.getAll());
+        }
+        mPolylines = mMapView.addPolylines(mPolylineOptions);
 
         findViewById(R.id.fab).setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
-                if (mPolyLines != null && mPolyLines.size() > 0) {
-                    if (mPolyLines.size() == 1) {
+                if (mPolylines != null && mPolylines.size() > 0) {
+                    if (mPolylines.size() == 1) {
                         // test for removing annotation
-                        mMapView.removeAnnotation(mPolyLines.get(0));
+                        mMapView.removeAnnotation(mPolylines.get(0));
                     } else {
                         // test for removing annotations
-                        mMapView.removeAnnotations(mPolyLines);
+                        mMapView.removeAnnotations(mPolylines);
                     }
                 }
-                mPolyLines = mMapView.addPolylines(PolylineProvider.getRandomLine());
+                mPolylineOptions.clear();
+                mPolylineOptions.addAll(PolylineProvider.getRandomLine());
+                mPolylines = mMapView.addPolylines(mPolylineOptions);
             }
         });
     }
@@ -90,6 +100,7 @@ public class PolylineActivity extends AppCompatActivity {
     protected void onSaveInstanceState(Bundle outState) {
         super.onSaveInstanceState(outState);
         mMapView.onSaveInstanceState(outState);
+        outState.putParcelableArrayList(STATE_POLYLINE_OPTIONS, mPolylineOptions);
     }
 
     @Override
@@ -115,6 +126,7 @@ public class PolylineActivity extends AppCompatActivity {
         switch (item.getItemId()) {
             case R.id.action_id_remove:
                 // test to remove all annotations
+                mPolylineOptions.clear();
                 mMapView.removeAllAnnotations();
                 return true;
 
