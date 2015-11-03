@@ -60,28 +60,28 @@ matrix:
     - os: linux
       env: FLAVOR=android ANDROID_ABI=arm-v7 BUILDTYPE=Release
       android:
-        components: [ 'tools', 'platform-tools', 'build-tools-23.0.2', 'android-23', 'extra-android-m2repository', 'extra-android-support', 'extra-google-m2repository' ]
+        components: [ 'tools', 'platform-tools', 'build-tools-23.0.1', 'android-23', 'extra-android-m2repository', 'extra-android-support', 'extra-google-m2repository' ]
       addons:
         apt:
           packages: [ 'lib32stdc++6' ]
     - os: linux
       env: FLAVOR=android ANDROID_ABI=arm-v7 BUILDTYPE=Debug
       android:
-        components: [ 'tools', 'platform-tools', 'build-tools-23.0.2', 'android-23', 'extra-android-m2repository', 'extra-android-support', 'extra-google-m2repository' ]
+        components: [ 'tools', 'platform-tools', 'build-tools-23.0.1', 'android-23', 'extra-android-m2repository', 'extra-android-support', 'extra-google-m2repository' ]
       addons:
         apt:
           packages: [ 'lib32stdc++6' ]
     - os: linux
       env: FLAVOR=android ANDROID_ABI=arm-v8 BUILDTYPE=Release
       android:
-        components: [ 'tools', 'platform-tools', 'build-tools-23.0.2', 'android-23', 'extra-android-m2repository', 'extra-android-support', 'extra-google-m2repository' ]
+        components: [ 'tools', 'platform-tools', 'build-tools-23.0.1', 'android-23', 'extra-android-m2repository', 'extra-android-support', 'extra-google-m2repository' ]
       addons:
         apt:
           packages: [ 'lib32stdc++6' ]
     - os: linux
       env: FLAVOR=android ANDROID_ABI=x86 BUILDTYPE=Release
       android:
-        components: [ 'tools', 'platform-tools', 'build-tools-23.0.2', 'android-23', 'extra-android-m2repository', 'extra-android-support', 'extra-google-m2repository' ]
+        components: [ 'tools', 'platform-tools', 'build-tools-23.0.1', 'android-23', 'extra-android-m2repository', 'extra-android-support', 'extra-google-m2repository' ]
       addons:
         apt:
           packages: [ 'lib32stdc++6' ]

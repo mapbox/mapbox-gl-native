@@ -34,7 +34,7 @@ gradle.projectsEvaluated {
 
 android {
     compileSdkVersion 23
-    buildToolsVersion "23.0.2"
+    buildToolsVersion "23.0.1"
 
     defaultConfig {
         applicationId "com.mapbox.mapboxgl.testapp"
