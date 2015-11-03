@@ -5,9 +5,9 @@
   'targets': [
     { 'target_name': '<(module_name)',
       'dependencies': [
-        'mbgl.gyp:core',
-        'mbgl.gyp:platform-<(platform_lib)',
-        'mbgl.gyp:headless-<(headless_lib)',
+        'gyp/mbgl.gyp:core',
+        'gyp/mbgl.gyp:platform-<(platform_lib)',
+        'gyp/mbgl.gyp:headless-<(headless_lib)',
       ],
 
       'include_dirs': [

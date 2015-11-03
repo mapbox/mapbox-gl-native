@@ -94,7 +94,7 @@
         'OTHER_CPLUSPLUSFLAGS': [ '<@(cflags_cc)' ],
         'CLANG_ENABLE_OBJC_ARC': 'YES',
         'CLANG_ENABLE_MODULES': 'YES',
-        'FRAMEWORK_SEARCH_PATHS': './platform/ios/vendor',
+        'FRAMEWORK_SEARCH_PATHS': '../platform/ios/vendor',
       },
 
       'link_settings': {
@@ -109,7 +109,7 @@
           '../include',
         ],
         'mac_bundle_resources': [
-          '<!@(find ./platform/ios/resources -type f \! -name "README")',
+          '<!@(find ../platform/ios/resources -type f \! -name "README")',
         ],
       },
     },

@@ -20,12 +20,12 @@
       'include_dirs': [ '../include', '../src', '../platform/default' ],
       'dependencies': [
         'symlink_TEST_DATA',
-        '../mbgl.gyp:core',
-        '../mbgl.gyp:platform-<(platform_lib)',
-        '../mbgl.gyp:http-<(http_lib)',
-        '../mbgl.gyp:asset-<(asset_lib)',
-        '../mbgl.gyp:cache-<(cache_lib)',
-        '../mbgl.gyp:headless-<(headless_lib)',
+        'mbgl.gyp:core',
+        'mbgl.gyp:platform-<(platform_lib)',
+        'mbgl.gyp:http-<(http_lib)',
+        'mbgl.gyp:asset-<(asset_lib)',
+        'mbgl.gyp:cache-<(cache_lib)',
+        'mbgl.gyp:headless-<(headless_lib)',
       ],
       'sources': [
         'fixtures/main.cpp',

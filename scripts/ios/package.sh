@@ -55,7 +55,7 @@ if [[ "${BUILD_FOR_DEVICE}" == true ]]; then
         GCC_GENERATE_DEBUGGING_SYMBOLS=${GCC_GENERATE_DEBUGGING_SYMBOLS} \
         ENABLE_BITCODE=YES \
         DEPLOYMENT_POSTPROCESSING=YES \
-        -project ./build/ios-all/mbgl.xcodeproj \
+        -project ./build/ios-all/gyp/mbgl.xcodeproj \
         -configuration ${BUILDTYPE} \
         -target everything \
         -jobs ${JOBS}
@@ -66,7 +66,7 @@ xcodebuild -sdk iphonesimulator${IOS_SDK_VERSION} \
     ARCHS="x86_64 i386" \
     ONLY_ACTIVE_ARCH=NO \
     GCC_GENERATE_DEBUGGING_SYMBOLS=${GCC_GENERATE_DEBUGGING_SYMBOLS} \
-    -project ./build/ios-all/mbgl.xcodeproj \
+    -project ./build/ios-all/gyp/mbgl.xcodeproj \
     -configuration ${BUILDTYPE} \
     -target everything \
     -jobs ${JOBS}
@@ -79,14 +79,14 @@ if [[ "${BUILD_FOR_DEVICE}" == true ]]; then
         `find mason_packages/ios-${IOS_SDK_VERSION} -type f -name libuv.a` \
         `find mason_packages/ios-${IOS_SDK_VERSION} -type f -name libgeojsonvt.a` \
         -o ${OUTPUT}/static/lib${NAME}.a \
-        ${LIBS[@]/#/build/${BUILDTYPE}-iphoneos/libmbgl-} \
-        ${LIBS[@]/#/build/${BUILDTYPE}-iphonesimulator/libmbgl-}
+        ${LIBS[@]/#/gyp/build/${BUILDTYPE}-iphoneos/libmbgl-} \
+        ${LIBS[@]/#/gyp/build/${BUILDTYPE}-iphonesimulator/libmbgl-}
 else
     libtool -static -no_warning_for_no_symbols \
         `find mason_packages/ios-${IOS_SDK_VERSION} -type f -name libuv.a` \
         `find mason_packages/ios-${IOS_SDK_VERSION} -type f -name libgeojsonvt.a` \
         -o ${OUTPUT}/static/lib${NAME}.a \
-        ${LIBS[@]/#/build/${BUILDTYPE}-iphonesimulator/libmbgl-}
+        ${LIBS[@]/#/gyp/build/${BUILDTYPE}-iphonesimulator/libmbgl-}
 fi
 echo "Created ${OUTPUT}/static/lib${NAME}.a"
 

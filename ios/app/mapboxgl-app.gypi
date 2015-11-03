@@ -18,11 +18,11 @@
       ],
 
       'dependencies': [
-        '../mbgl.gyp:core',
-        '../mbgl.gyp:platform-<(platform_lib)',
-        '../mbgl.gyp:http-<(http_lib)',
-        '../mbgl.gyp:asset-<(asset_lib)',
-        '../mbgl.gyp:cache-<(cache_lib)',
+        'mbgl.gyp:core',
+        'mbgl.gyp:platform-<(platform_lib)',
+        'mbgl.gyp:http-<(http_lib)',
+        'mbgl.gyp:asset-<(asset_lib)',
+        'mbgl.gyp:cache-<(cache_lib)',
       ],
 
       'sources': [
