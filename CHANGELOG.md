@@ -1,5 +1,26 @@
 # Changelog
 
+## Android master
+
+## 2.2.0
+
+- New User Dot location graphics ([#2732](https://github.com/mapbox/mapbox-gl-native/issues/2732)
+- Custom Drawable Markers ([#2744](https://github.com/mapbox/mapbox-gl-native/issues/2744))
+- `MapView.setOnInfoWindowClickListener()` support ([#2448](https://github.com/mapbox/mapbox-gl-native/issues/2448))
+- Completed Annotations API ([#1716](https://github.com/mapbox/mapbox-gl-native/issues/1716))
+- Satellite Streets Style ([#2739](https://github.com/mapbox/mapbox-gl-native/issues/2739))
+- **RESOLVED** Black Screen On Ice Cream Sandwich and Jelly Bean devices ([#2802](https://github.com/mapbox/mapbox-gl-native/issues/2802))
+
+
+## 2.1.0
+
+- Initial Android release. 
+
+Known issues: 
+
+- Black Screen On Ice Cream Sandwich and Jelly Bean devices ([#2802](https://github.com/mapbox/mapbox-gl-native/issues/2802))
+  - Resolved in 2.2.0
+
 ## iOS master
 
 - The `styleID` property has been removed from MGLMapView. Instead, set the `styleURL` property to an NSURL in the form `mapbox://styles/STYLE_ID`. If you previously set the style ID in Interface Builder’s Attributes inspector, delete the `styleID` entry from the User Defined Runtime Attributes section of the Identity inspector, then set the new “Style URL” inspectable to a value in the form `mapbox://styles/STYLE_ID`. ([#2632](https://github.com/mapbox/mapbox-gl-native/pull/2632))
