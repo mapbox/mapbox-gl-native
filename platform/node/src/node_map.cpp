@@ -211,8 +211,8 @@ std::unique_ptr<NodeMap::RenderOptions> NodeMap::ParseOptions(v8::Local<v8::Obje
 
     if (Nan::Has(obj, Nan::New("center").ToLocalChecked()).FromJust()) {
         auto center = Nan::Get(obj, Nan::New("center").ToLocalChecked()).ToLocalChecked().As<v8::Array>();
-        if (center->Length() > 0) { options->latitude = Nan::Get(center, 0).ToLocalChecked()->NumberValue(); }
-        if (center->Length() > 1) { options->longitude = Nan::Get(center, 1).ToLocalChecked()->NumberValue(); }
+        if (center->Length() > 0) { options->longitude = Nan::Get(center, 0).ToLocalChecked()->NumberValue(); }
+        if (center->Length() > 1) { options->latitude = Nan::Get(center, 1).ToLocalChecked()->NumberValue(); }
     }
 
     if (Nan::Has(obj, Nan::New("width").ToLocalChecked()).FromJust()) {
@@ -243,7 +243,7 @@ std::unique_ptr<NodeMap::RenderOptions> NodeMap::ParseOptions(v8::Local<v8::Obje
  * @param {number} [options.zoom=0]
  * @param {number} [options.width=512]
  * @param {number} [options.height=512]
- * @param {Array<number>} [options.center=[0,0]] latitude, longitude center
+ * @param {Array<number>} [options.center=[0,0]] longitude, latitude center
  * of the map
  * @param {number} [options.bearing=0] rotation
  * @param {Array<string>} [options.classes=[]] GL Style Classes

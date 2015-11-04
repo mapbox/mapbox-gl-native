@@ -26,7 +26,7 @@
   ],
   "devDependencies": {
     "aws-sdk": "^2.2.9",
-    "mapbox-gl-test-suite": "git+https://github.com/mapbox/mapbox-gl-test-suite.git#bbf55fb517eb2d55ba34dd0dced80af425e6db0d",
+    "mapbox-gl-test-suite": "mapbox/mapbox-gl-test-suite#744b63be01e36c75c6e629aec16a53048c0b7dbc",
     "request": "^2.65.0",
     "tape": "^4.2.1"
   },
