@@ -44,15 +44,13 @@ public:
     /* explicit */ Function(const T& constant)
         : stops({{ 0, constant }}) {}
 
-    explicit Function(const Stops& stops_,
-                      mapbox::util::optional<Duration> duration_)
-        : stops(stops_), duration(duration_) {}
+    explicit Function(const Stops& stops_)
+        : stops(stops_) {}
 
     Faded<T> evaluate(const StyleCalculationParameters&) const;
 
 private:
     const std::vector<std::pair<float, T>> stops;
-    const mapbox::util::optional<Duration> duration = {};
 };
 
 }

@@ -360,12 +360,7 @@ template<> optional<Function<Color>> parseProperty(const char* name, const JSVal
 }
 
 template <typename T>
-optional<Function<Faded<T>>> parseFadedFunction(const JSVal& value, const JSVal& transition) {
-    mapbox::util::optional<Duration> duration;
-    if (transition.HasMember("duration")) {
-        duration = std::chrono::milliseconds(transition["duration"].GetUint());
-    }
-
+optional<Function<Faded<T>>> parseFadedFunction(const JSVal& value) {
     if (!value.HasMember("stops")) {
         Log::Warning(Event::ParseStyle, "function must specify a function type");
         return {};
@@ -377,13 +372,13 @@ optional<Function<Faded<T>>> parseFadedFunction(const JSVal& value, const JSVal&
         return {};
     }
 
-    return Function<Faded<T>>(*stops, duration);
+    return Function<Faded<T>>(*stops);
 }
 
 template <>
-optional<Function<Faded<std::vector<float>>>> parseProperty(const char* name, const JSVal& value, const JSVal& transition) {
+optional<Function<Faded<std::vector<float>>>> parseProperty(const char* name, const JSVal& value) {
     if (value.IsObject()) {
-        return parseFadedFunction<std::vector<float>>(value, transition);
+        return parseFadedFunction<std::vector<float>>(value);
     }
 
     auto constant = parseProperty<std::vector<float>>(name, value);
@@ -394,9 +389,9 @@ optional<Function<Faded<std::vector<float>>>> parseProperty(const char* name, co
 }
 
 template <>
-optional<Function<Faded<std::string>>> parseProperty(const char* name, const JSVal& value, const JSVal& transition) {
+optional<Function<Faded<std::string>>> parseProperty(const char* name, const JSVal& value) {
     if (value.IsObject()) {
-        return parseFadedFunction<std::string>(value, transition);
+        return parseFadedFunction<std::string>(value);
     }
 
     auto constant = parseProperty<std::string>(name, value);

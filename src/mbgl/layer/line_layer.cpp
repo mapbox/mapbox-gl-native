@@ -28,8 +28,8 @@ void LineLayer::parsePaints(const JSVal& layer) {
         parseProperty<PropertyTransition>("line-gap-width-transition", PropertyKey::LineGapWidth, paint, value);
         parseProperty<Function<float>>("line-blur", PropertyKey::LineBlur, paint, value);
         parseProperty<PropertyTransition>("line-blur-transition", PropertyKey::LineBlur, paint, value);
-        parseProperty<Function<Faded<std::vector<float>>>>("line-dasharray", PropertyKey::LineDashArray, paint, value, "line-dasharray-transition");
-        parseProperty<Function<Faded<std::string>>>("line-pattern", PropertyKey::LineImage, paint, value, "line-pattern-transition");
+        parseProperty<Function<Faded<std::vector<float>>>>("line-dasharray", PropertyKey::LineDashArray, paint, value);
+        parseProperty<Function<Faded<std::string>>>("line-pattern", PropertyKey::LineImage, paint, value);
     });
 }
 
