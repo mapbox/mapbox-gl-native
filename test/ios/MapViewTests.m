@@ -9,6 +9,9 @@
 #import <CoreLocation/CoreLocation.h>
 #import <KIF/UIAutomationHelper.h>
 
+const NSTimeInterval MGLAnimationDurationDefault = 0.3;
+const NSTimeInterval MGLAnimationDurationOverDefault = MGLAnimationDurationDefault * 2;
+
 @interface MapViewTests : KIFTestCase <MGLMapViewDelegate>
 
 @end
@@ -33,6 +36,8 @@
     tester.viewController.navigationController.toolbarHidden = YES;
 
     tester.mapView.delegate = self;
+
+    [tester waitForTimeInterval:0.5];
 }
 
 - (void)approveLocationIfNeeded {
@@ -46,12 +51,13 @@
 
 - (void)testDirectionSet {
     [tester.mapView setDirection:270 animated:YES];
-    [tester waitForAnimationsToFinish];
+    [tester waitForTimeInterval:MGLAnimationDurationOverDefault];
 
     XCTAssertEqual(tester.mapView.direction,
                    270,
                    @"setting direction should take effect");
 
+    [tester waitForAnimationsToFinish];
     XCTAssertEqual(tester.compass.alpha,
                    1,
                    @"compass should be visible when map is rotated");
@@ -63,19 +69,20 @@
 
 - (void)testCompassTap {
     [tester.mapView setDirection:180 animated:YES];
-    [tester waitForAnimationsToFinish];
+    [tester waitForTimeInterval:MGLAnimationDurationOverDefault];
 
     XCTAssertEqual(tester.mapView.direction,
                    180,
                    @"setting direction should take effect");
 
     [tester.compass tap];
-    [tester waitForAnimationsToFinish];
+    [tester waitForTimeInterval:MGLAnimationDurationOverDefault];
 
     XCTAssertEqual(tester.mapView.direction,
                    0,
                    @"tapping compass should reset map direction");
-
+    
+    [tester waitForAnimationsToFinish];
     XCTAssertEqual(tester.compass.alpha,
                    0,
                    @"compass should not be visible when map is unrotated");
@@ -86,19 +93,20 @@
 
 - (void)testDirectionReset {
     [tester.mapView setDirection:90 animated:YES];
-    [tester waitForAnimationsToFinish];
+    [tester waitForTimeInterval:MGLAnimationDurationOverDefault];
 
     XCTAssertEqual(tester.mapView.direction,
                    90,
                    @"setting direction should take effect");
 
     [tester.mapView resetNorth];
-    [tester waitForAnimationsToFinish];
+    [tester waitForTimeInterval:MGLAnimationDurationOverDefault];
 
     XCTAssertEqual(tester.mapView.direction,
                    0,
                    @"resetting north should reset map direction");
 
+    [tester waitForAnimationsToFinish];
     XCTAssertEqual(tester.compass.alpha,
                    0,
                    @"compass should not be visible when map is unrotated");
