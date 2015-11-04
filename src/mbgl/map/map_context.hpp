@@ -33,6 +33,11 @@ struct FrameData {
     std::array<uint16_t, 2> framebufferSize;
 };
 
+enum class UpdateHint : uint32_t {
+    Nothing                   = 0,
+    UserAnimating             = 1 << 1,
+};
+    
 class MapContext : public Style::Observer {
 public:
     MapContext(View&, FileSource&, MapData&);
@@ -66,6 +71,9 @@ public:
     // Style::Observer implementation.
     void onTileDataChanged() override;
     void onResourceLoadingFailed(std::exception_ptr error) override;
+    
+    void setUpdateHint(UpdateHint updateHint);
+    UpdateHint getUpdateHint() const;
 
     void dumpDebugLogs() const;
 
@@ -98,6 +106,9 @@ private:
     size_t sourceCacheSize;
     TransformState transformState;
     FrameData frameData;
+    
+    UpdateHint currentUpdateHint;
+    
 };
 
 }
