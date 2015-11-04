@@ -3,6 +3,9 @@
 #include <mbgl/platform/log.hpp>
 
 #include <pthread.h>
+#ifdef __linux__
+#include <linux/sched.h>
+#endif
 #include <sched.h>
 
 namespace mbgl {
@@ -16,6 +19,8 @@ void makeThreadLowPriority() {
     if (status != 0) {
         Log::Warning(Event::General, "Couldn't set thread scheduling policy");
     }
+#else
+#pragma message("Building without thread priority control")
 #endif
 }
 
