@@ -53,6 +53,7 @@ const CGFloat MGLMinimumPitch = 0;
 const CGFloat MGLMaximumPitch = 60;
 const CLLocationDegrees MGLAngularFieldOfView = M_PI / 6.;
 const std::string spritePrefix = "com.mapbox.sprites.";
+const NSUInteger MGLTargetFPS = 30;
 
 NSString *const MGLAnnotationIDKey = @"MGLAnnotationIDKey";
 NSString *const MGLAnnotationSymbolKey = @"MGLAnnotationSymbolKey";
@@ -231,7 +232,7 @@ std::chrono::steady_clock::duration secondsAsDuration(float duration)
 
     // setup refresh driver
     _displayLink = [CADisplayLink displayLinkWithTarget:self selector:@selector(updateFromDisplayLink)];
-    _displayLink.frameInterval = 2;
+    _displayLink.frameInterval = 60 / MGLTargetFPS;
     [_displayLink addToRunLoop:[NSRunLoop currentRunLoop] forMode:NSDefaultRunLoopMode];
     _needsDisplayRefresh = YES;
 
