@@ -1453,6 +1453,11 @@ std::chrono::steady_clock::duration secondsAsDuration(float duration)
     }
 }
 
+- (BOOL)calloutViewShouldHighlight:(__unused SMCalloutView *)calloutView
+{
+    return [self.delegate respondsToSelector:@selector(mapView:tapOnCalloutForAnnotation:)];
+}
+
 - (void)calloutViewClicked:(__unused SMCalloutView *)calloutView
 {
     if ([self.delegate respondsToSelector:@selector(mapView:tapOnCalloutForAnnotation:)])
