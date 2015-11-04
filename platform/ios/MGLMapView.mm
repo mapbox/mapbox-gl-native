@@ -40,6 +40,7 @@
 #import <algorithm>
 #import <cstdlib>
 #import <unordered_set>
+#include <mutex>
 
 class MBGLView;
 
@@ -108,6 +109,9 @@ mbgl::util::UnitBezier MGLUnitBezierForMediaTimingFunction(CAMediaTimingFunction
 @property (nonatomic, getter=isAnimatingGesture) BOOL animatingGesture;
 @property (nonatomic, readonly, getter=isRotationAllowed) BOOL rotationAllowed;
 
+@property (nonatomic) CADisplayLink *displayLink;
+@property (nonatomic) BOOL needsDisplay;
+
 @end
 
 @implementation MGLMapView
@@ -124,6 +128,8 @@ mbgl::util::UnitBezier MGLUnitBezierForMediaTimingFunction(CAMediaTimingFunction
 
     CLLocationDegrees _pendingLatitude;
     CLLocationDegrees _pendingLongitude;
+    
+    std::mutex needsDisplayMutex;
 }
 
 #pragma mark - Setup & Teardown -
@@ -371,6 +377,10 @@ std::chrono::steady_clock::duration secondsAsDuration(float duration)
         MGLEventKeyZoomLevel: @(zoom),
         MGLEventKeyPushEnabled: @([MGLMapboxEvents checkPushEnabled])
     }];
+    self.displayLink = [CADisplayLink displayLinkWithTarget:self selector:@selector(updateFromDisplayLink)];
+    self.displayLink.frameInterval = 2;
+    [self.displayLink addToRunLoop:[NSRunLoop currentRunLoop] forMode:NSDefaultRunLoopMode];
+    _needsDisplay = YES;
 }
 
 - (void)createGLView
@@ -386,7 +396,7 @@ std::chrono::steady_clock::duration secondsAsDuration(float duration)
     //
     _glView = [[GLKView alloc] initWithFrame:self.bounds context:_context];
     _glView.autoresizingMask = UIViewAutoresizingFlexibleWidth | UIViewAutoresizingFlexibleHeight;
-    _glView.enableSetNeedsDisplay = YES;
+    _glView.enableSetNeedsDisplay = NO;
     _glView.drawableStencilFormat = GLKViewDrawableStencilFormat8;
     _glView.drawableDepthFormat = GLKViewDrawableDepthFormat16;
     _glView.contentScaleFactor = [UIScreen instancesRespondToSelector:@selector(nativeScale)] ? [[UIScreen mainScreen] nativeScale] : [[UIScreen mainScreen] scale];
@@ -3104,10 +3114,23 @@ CLLocationCoordinate2D MGLLocationCoordinate2DFromLatLng(mbgl::LatLng latLng)
     return path;
 }
 
+- (void)updateFromDisplayLink
+{
+    std::unique_lock<std::mutex> lock(needsDisplayMutex);
+    if (_needsDisplay) {
+        _needsDisplay = NO;
+        lock.unlock();
+        [self.glView display];
+    } else {
+        lock.unlock();
+    }
+}
+
 - (void)invalidate
 {
+    std::lock_guard<std::mutex> lock(needsDisplayMutex);
     MGLAssertIsMainThread();
-    [self.glView setNeedsDisplay];
+    _needsDisplay = YES;
 }
 
 - (BOOL)isFullyLoaded
