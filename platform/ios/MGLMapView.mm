@@ -40,7 +40,6 @@
 #import <algorithm>
 #import <cstdlib>
 #import <unordered_set>
-#include <mutex>
 
 class MBGLView;
 
@@ -109,9 +108,6 @@ mbgl::util::UnitBezier MGLUnitBezierForMediaTimingFunction(CAMediaTimingFunction
 @property (nonatomic, getter=isAnimatingGesture) BOOL animatingGesture;
 @property (nonatomic, readonly, getter=isRotationAllowed) BOOL rotationAllowed;
 
-@property (nonatomic) CADisplayLink *displayLink;
-@property (nonatomic) BOOL needsDisplay;
-
 @end
 
 @implementation MGLMapView
@@ -128,8 +124,9 @@ mbgl::util::UnitBezier MGLUnitBezierForMediaTimingFunction(CAMediaTimingFunction
 
     CLLocationDegrees _pendingLatitude;
     CLLocationDegrees _pendingLongitude;
-    
-    std::mutex needsDisplayMutex;
+
+    CADisplayLink *_displayLink;
+    BOOL _needsDisplayRefresh;
 }
 
 #pragma mark - Setup & Teardown -
@@ -231,6 +228,12 @@ std::chrono::steady_clock::duration secondsAsDuration(float duration)
 
     // setup mbgl map
     _mbglMap = new mbgl::Map(*_mbglView, *_mbglFileSource, mbgl::MapMode::Continuous);
+
+    // setup refresh driver
+    _displayLink = [CADisplayLink displayLinkWithTarget:self selector:@selector(updateFromDisplayLink)];
+    _displayLink.frameInterval = 2;
+    [_displayLink addToRunLoop:[NSRunLoop currentRunLoop] forMode:NSDefaultRunLoopMode];
+    _needsDisplayRefresh = YES;
 
     // start paused if in IB
     if (_isTargetingInterfaceBuilder || background) {
@@ -377,10 +380,6 @@ std::chrono::steady_clock::duration secondsAsDuration(float duration)
         MGLEventKeyZoomLevel: @(zoom),
         MGLEventKeyPushEnabled: @([MGLMapboxEvents checkPushEnabled])
     }];
-    self.displayLink = [CADisplayLink displayLinkWithTarget:self selector:@selector(updateFromDisplayLink)];
-    self.displayLink.frameInterval = 2;
-    [self.displayLink addToRunLoop:[NSRunLoop currentRunLoop] forMode:NSDefaultRunLoopMode];
-    _needsDisplay = YES;
 }
 
 - (void)createGLView
@@ -743,6 +742,25 @@ std::chrono::steady_clock::duration secondsAsDuration(float duration)
 }
 
 #pragma mark - Life Cycle -
+
+- (void)updateFromDisplayLink
+{
+    MGLAssertIsMainThread();
+
+    if (_needsDisplayRefresh)
+    {
+        _needsDisplayRefresh = NO;
+
+        [self.glView display];
+    }
+}
+
+- (void)invalidate
+{
+    MGLAssertIsMainThread();
+
+    _needsDisplayRefresh = YES;
+}
 
 - (void)willTerminate
 {
@@ -3112,25 +3130,6 @@ CLLocationCoordinate2D MGLLocationCoordinate2DFromLatLng(mbgl::LatLng latLng)
     }
 
     return path;
-}
-
-- (void)updateFromDisplayLink
-{
-    std::unique_lock<std::mutex> lock(needsDisplayMutex);
-    if (_needsDisplay) {
-        _needsDisplay = NO;
-        lock.unlock();
-        [self.glView display];
-    } else {
-        lock.unlock();
-    }
-}
-
-- (void)invalidate
-{
-    std::lock_guard<std::mutex> lock(needsDisplayMutex);
-    MGLAssertIsMainThread();
-    _needsDisplay = YES;
 }
 
 - (BOOL)isFullyLoaded
