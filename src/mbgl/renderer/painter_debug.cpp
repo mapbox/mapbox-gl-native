@@ -28,12 +28,12 @@ void Painter::renderDebugText(TileData& tileData, const mat4 &matrix) {
         tileData.debugBucket = std::make_unique<DebugBucket>(tileData.id, tileData.getState());
     }
 
-    useProgram(plainShader->program);
+    config.program = plainShader->program;
     plainShader->u_matrix = matrix;
 
     // Draw white outline
     plainShader->u_color = {{ 1.0f, 1.0f, 1.0f, 1.0f }};
-    lineWidth(4.0f * data.pixelRatio);
+    config.lineWidth = 4.0f * data.pixelRatio;
     tileData.debugBucket->drawLines(*plainShader);
 
 #ifndef GL_ES_VERSION_2_0
@@ -44,7 +44,7 @@ void Painter::renderDebugText(TileData& tileData, const mat4 &matrix) {
 
     // Draw black text.
     plainShader->u_color = {{ 0.0f, 0.0f, 0.0f, 1.0f }};
-    lineWidth(2.0f * data.pixelRatio);
+    config.lineWidth = 2.0f * data.pixelRatio;
     tileData.debugBucket->drawLines(*plainShader);
 
     config.depthTest = true;
@@ -59,12 +59,12 @@ void Painter::renderDebugFrame(const mat4 &matrix) {
     config.depthTest = false;
     config.stencilTest = true;
 
-    useProgram(plainShader->program);
+    config.program = plainShader->program;
     plainShader->u_matrix = matrix;
 
     // draw tile outline
     tileBorderArray.bind(*plainShader, tileBorderBuffer, BUFFER_OFFSET_0);
     plainShader->u_color = {{ 1.0f, 0.0f, 0.0f, 1.0f }};
-    lineWidth(4.0f * data.pixelRatio);
+    config.lineWidth = 4.0f * data.pixelRatio;
     MBGL_CHECK_ERROR(glDrawArrays(GL_LINE_STRIP, 0, (GLsizei)tileBorderBuffer.index()));
 }

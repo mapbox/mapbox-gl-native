@@ -35,7 +35,7 @@ void Painter::renderCircle(CircleBucket& bucket,
     // are inversely related.
     float antialiasing = 1 / data.pixelRatio / properties.radius;
 
-    useProgram(circleShader->program);
+    config.program = circleShader->program;
 
     circleShader->u_matrix = vtxMatrix;
     circleShader->u_exmatrix = extrudeMatrix;

@@ -55,7 +55,7 @@ void Painter::renderSDF(SymbolBucket &bucket,
     float x = state.getHeight() / 2.0f * std::tan(state.getPitch());
     float extra = (topedgelength + x) / topedgelength - 1;
 
-    useProgram(sdfShader.program);
+    config.program = sdfShader.program;
     sdfShader.u_matrix = vtxMatrix;
     sdfShader.u_exmatrix = exMatrix;
     sdfShader.u_texsize = texsize;
@@ -146,12 +146,12 @@ void Painter::renderSymbol(SymbolBucket& bucket, const SymbolLayer& layer, const
     if (bucket.hasCollisionBoxData()) {
         config.stencilTest = true;
 
-        useProgram(collisionBoxShader->program);
+        config.program = collisionBoxShader->program;
         collisionBoxShader->u_matrix = matrix;
         collisionBoxShader->u_scale = std::pow(2, state.getNormalizedZoom() - id.z);
         collisionBoxShader->u_zoom = state.getNormalizedZoom() * 10;
         collisionBoxShader->u_maxzoom = (id.z + 1) * 10;
-        lineWidth(1.0f);
+        config.lineWidth = 1.0f;
 
         setDepthSublayer(0);
         bucket.drawCollisionBoxes(*collisionBoxShader);
@@ -219,7 +219,7 @@ void Painter::renderSymbol(SymbolBucket& bucket, const SymbolLayer& layer, const
             float x = state.getHeight() / 2.0f * std::tan(state.getPitch());
             float extra = (topedgelength + x) / topedgelength - 1;
 
-            useProgram(iconShader->program);
+            config.program = iconShader->program;
             iconShader->u_matrix = vtxMatrix;
             iconShader->u_exmatrix = exMatrix;
             iconShader->u_texsize = {{ float(spriteAtlas->getWidth()) / 4.0f, float(spriteAtlas->getHeight()) / 4.0f }};

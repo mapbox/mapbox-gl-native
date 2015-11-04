@@ -42,9 +42,9 @@ void Painter::renderFill(FillBucket& bucket, const FillLayer& layer, const TileI
     // Because we're drawing top-to-bottom, and we update the stencil mask
     // befrom, we have to draw the outline first (!)
     if (outline && pass == RenderPass::Translucent) {
-        useProgram(outlineShader->program);
+        config.program = outlineShader->program;
         outlineShader->u_matrix = vtxMatrix;
-        lineWidth(2.0f); // This is always fixed and does not depend on the pixelRatio!
+        config.lineWidth = 2.0f; // This is always fixed and does not depend on the pixelRatio!
 
         outlineShader->u_color = stroke_color;
 
@@ -76,7 +76,7 @@ void Painter::renderFill(FillBucket& bucket, const FillLayer& layer, const TileI
                     1.0f / (posB.size[0] * factor * properties.image.toScale),
                     1.0f / (posB.size[1] * factor * properties.image.toScale));
 
-            useProgram(patternShader->program);
+            config.program = patternShader->program;
             patternShader->u_matrix = vtxMatrix;
             patternShader->u_pattern_tl_a = posA.tl;
             patternShader->u_pattern_br_a = posA.br;
@@ -104,7 +104,7 @@ void Painter::renderFill(FillBucket& bucket, const FillLayer& layer, const TileI
             // fragments or when it's translucent and we're drawing translucent
             // fragments
             // Draw filling rectangle.
-            useProgram(plainShader->program);
+            config.program = plainShader->program;
             plainShader->u_matrix = vtxMatrix;
             plainShader->u_color = fill_color;
 
@@ -118,9 +118,9 @@ void Painter::renderFill(FillBucket& bucket, const FillLayer& layer, const TileI
     // Because we're drawing top-to-bottom, and we update the stencil mask
     // below, we have to draw the outline first (!)
     if (fringeline && pass == RenderPass::Translucent) {
-        useProgram(outlineShader->program);
+        config.program = outlineShader->program;
         outlineShader->u_matrix = vtxMatrix;
-        lineWidth(2.0f); // This is always fixed and does not depend on the pixelRatio!
+        config.lineWidth = 2.0f; // This is always fixed and does not depend on the pixelRatio!
 
         outlineShader->u_color = fill_color;
 

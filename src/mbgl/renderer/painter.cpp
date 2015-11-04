@@ -92,25 +92,7 @@ void Painter::setupShaders() {
 }
 
 void Painter::resize() {
-    if (gl_viewport != frame.framebufferSize) {
-        gl_viewport = frame.framebufferSize;
-        assert(gl_viewport[0] > 0 && gl_viewport[1] > 0);
-        MBGL_CHECK_ERROR(glViewport(0, 0, gl_viewport[0], gl_viewport[1]));
-    }
-}
-
-void Painter::useProgram(GLuint program) {
-    if (gl_program != program) {
-        MBGL_CHECK_ERROR(glUseProgram(program));
-        gl_program = program;
-    }
-}
-
-void Painter::lineWidth(GLfloat line_width) {
-    if (gl_lineWidth != line_width) {
-        MBGL_CHECK_ERROR(glLineWidth(line_width));
-        gl_lineWidth = line_width;
-    }
+    config.viewport = { 0, 0, frame.framebufferSize[0], frame.framebufferSize[1] };
 }
 
 void Painter::changeMatrix() {
@@ -376,7 +358,7 @@ void Painter::renderBackground(const BackgroundLayer& layer) {
         SpriteAtlasPosition imagePosB = spriteAtlas->getPosition(properties.image.to, true);
         float zoomFraction = state.getZoomFraction();
 
-        useProgram(patternShader->program);
+        config.program = patternShader->program;
         patternShader->u_matrix = identityMatrix;
         patternShader->u_pattern_tl_a = imagePosA.tl;
         patternShader->u_pattern_br_a = imagePosA.br;

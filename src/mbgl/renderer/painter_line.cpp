@@ -69,7 +69,7 @@ void Painter::renderLine(LineBucket& bucket, const LineLayer& layer, const TileI
 
     if (!properties.dash_array.from.empty()) {
 
-        useProgram(linesdfShader->program);
+        config.program = linesdfShader->program;
 
         linesdfShader->u_matrix = vtxMatrix;
         linesdfShader->u_exmatrix = extrudeMatrix;
@@ -106,7 +106,7 @@ void Painter::renderLine(LineBucket& bucket, const LineLayer& layer, const TileI
 
         float factor = 8.0 / std::pow(2, state.getIntegerZoom() - id.z) * id.overscaling;
 
-        useProgram(linepatternShader->program);
+        config.program = linepatternShader->program;
 
         linepatternShader->u_matrix = vtxMatrix;
         linepatternShader->u_exmatrix = extrudeMatrix;
@@ -131,7 +131,7 @@ void Painter::renderLine(LineBucket& bucket, const LineLayer& layer, const TileI
         bucket.drawLinePatterns(*linepatternShader);
 
     } else {
-        useProgram(lineShader->program);
+        config.program = lineShader->program;
 
         lineShader->u_matrix = vtxMatrix;
         lineShader->u_exmatrix = extrudeMatrix;

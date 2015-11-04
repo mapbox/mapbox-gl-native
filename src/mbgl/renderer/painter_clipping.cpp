@@ -9,7 +9,7 @@ using namespace mbgl;
 void Painter::drawClippingMasks(const std::set<Source*>& sources) {
     MBGL_DEBUG_GROUP("clipping masks");
 
-    useProgram(plainShader->program);
+    config.program = plainShader->program;
     config.stencilTest = true;
     config.depthTest = true;
     config.depthMask = GL_FALSE;

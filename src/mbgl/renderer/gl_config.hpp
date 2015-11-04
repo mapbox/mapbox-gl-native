@@ -240,6 +240,49 @@ struct BlendFunc {
     }
 };
 
+struct Program {
+    using Type = GLuint;
+    static const Type Default;
+    inline static void Set(const Type& value) {
+        MBGL_CHECK_ERROR(glUseProgram(value));
+    }
+    inline static Type Get() {
+        GLint program;
+        MBGL_CHECK_ERROR(glGetIntegerv(GL_CURRENT_PROGRAM, &program));
+        return program;
+    }
+};
+
+struct LineWidth {
+    using Type = GLfloat;
+    static const Type Default;
+    inline static void Set(const Type& value) {
+        MBGL_CHECK_ERROR(glLineWidth(value));
+    }
+    inline static Type Get() {
+        Type lineWidth;
+        MBGL_CHECK_ERROR(glGetFloatv(GL_LINE_WIDTH, &lineWidth));
+        return lineWidth;
+    }
+};
+
+struct Viewport {
+    struct Type { GLint x, y; GLsizei width, height; };
+    static const Type Default;
+    inline static void Set(const Type& value) {
+        MBGL_CHECK_ERROR(glViewport(value.x, value.y, value.width, value.height));
+    }
+    inline static Type Get() {
+        GLint viewport[4];
+        MBGL_CHECK_ERROR(glGetIntegerv(GL_VIEWPORT, viewport));
+        return { viewport[0], viewport[1], viewport[2], viewport[3] };
+    }
+};
+
+inline bool operator!=(const Viewport::Type& a, const Viewport::Type& b) {
+    return a.x != b.x || a.y != b.y || a.width != b.width || a.height != b.height;
+}
+
 class Config {
 public:
     void reset() {
@@ -257,6 +300,9 @@ public:
         clearDepth.reset();
         clearColor.reset();
         clearStencil.reset();
+        program.reset();
+        lineWidth.reset();
+        viewport.reset();
     }
 
     void restore() {
@@ -274,6 +320,9 @@ public:
         clearDepth.restore();
         clearColor.restore();
         clearStencil.restore();
+        program.restore();
+        lineWidth.restore();
+        viewport.restore();
     }
 
     void save() {
@@ -291,6 +340,9 @@ public:
         clearDepth.save();
         clearColor.save();
         clearStencil.save();
+        program.save();
+        lineWidth.save();
+        viewport.save();
     }
 
     Value<StencilFunc> stencilFunc;
@@ -307,6 +359,9 @@ public:
     Value<ClearDepth> clearDepth;
     Value<ClearColor> clearColor;
     Value<ClearStencil> clearStencil;
+    Value<Program> program;
+    Value<LineWidth> lineWidth;
+    Value<Viewport> viewport;
 };
 
 } // namespace gl

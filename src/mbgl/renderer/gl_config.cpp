@@ -17,6 +17,9 @@ const ColorMask::Type ColorMask::Default = { GL_TRUE, GL_TRUE, GL_TRUE, GL_TRUE 
 const ClearDepth::Type ClearDepth::Default = 1;
 const ClearColor::Type ClearColor::Default = { 0, 0, 0, 0 };
 const ClearStencil::Type ClearStencil::Default = 0;
+const Program::Type Program::Default = 0;
+const LineWidth::Type LineWidth::Default = 1;
+const Viewport::Type Viewport::Default = { 0, 0, 0, 0 };
 
 }
 }

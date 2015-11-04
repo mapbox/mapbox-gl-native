@@ -162,10 +162,6 @@ private:
     void setDepthSublayer(int n);
 
 public:
-    void useProgram(GLuint program);
-    void lineWidth(GLfloat lineWidth);
-
-public:
     mat4 projMatrix;
     mat4 nativeMatrix;
     mat4 extrudeMatrix;
@@ -194,9 +190,6 @@ private:
 
     gl::Config config;
 
-    GLuint gl_program = 0;
-    GLfloat gl_lineWidth = 0;
-    std::array<uint16_t, 2> gl_viewport = {{ 0, 0 }};
     RenderPass pass = RenderPass::Opaque;
     Color background = {{ 0, 0, 0, 0 }};
 
@@ -259,14 +252,6 @@ public:
     };
 
     VertexArrayObject tileBorderArray;
-
-    // Framebuffer management
-    std::vector<GLuint> fbos;
-    std::vector<GLuint> fbos_color;
-    GLuint fbo_depth_stencil;
-    int fbo_level = -1;
-    bool fbo_depth_stencil_valid = false;
-
 };
 
 }
