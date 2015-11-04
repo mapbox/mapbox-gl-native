@@ -27,7 +27,7 @@ test('Map', function(t) {
         t.end();
     });
 
-    t.test('requires request and ratio options', function(t) {
+    t.test('requires request property', function(t) {
         var options = {};
 
         t.throws(function() {
@@ -40,20 +40,41 @@ test('Map', function(t) {
         }, /Options object must have a 'request' method/);
 
         options.request = function() {};
+        t.doesNotThrow(function() {
+            new mbgl.Map(options);
+        });
+
+        t.end();
+    });
+
+    t.test('optional cancel property must be a function', function(t) {
+        var options = {
+            request: function() {}
+        };
+
         options.cancel = 'test';
         t.throws(function() {
             new mbgl.Map(options);
         }, /Options object 'cancel' property must be a function/);
 
         options.cancel = function() {};
-        t.throws(function() {
+        t.doesNotThrow(function() {
             new mbgl.Map(options);
-        }, /Options object must have a numerical 'ratio' property/);
+        });
+
+        t.end();
+    });
+
+
+    t.test('optional ratio property must be a number', function(t) {
+        var options = {
+            request: function() {}
+        };
 
         options.ratio = 'test';
         t.throws(function() {
             new mbgl.Map(options);
-        }, /Options object must have a numerical 'ratio' property/);
+        }, /Options object 'ratio' property must be a number/);
 
         options.ratio = 1.0;
         t.doesNotThrow(function() {

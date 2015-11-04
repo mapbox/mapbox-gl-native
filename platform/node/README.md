@@ -53,7 +53,7 @@ npm test
 
 ## Implementing a file source
 
-When creating a `Map`, you must pass an options object (with a required `ratio`, required `request` and optional `cancel` method) as the first parameter.
+When creating a `Map`, you must pass an options object (with a required `request` method, optional `cancel` method and optional 'ratio' number) as the first parameter.
 
 ```js
 var map = new mbgl.Map({
@@ -63,7 +63,7 @@ var map = new mbgl.Map({
     cancel: function(req) {
         // TODO
     },
-    ratio: 1.0
+    ratio: 2.0
 });
 ```
 
@@ -102,8 +102,7 @@ var map = new mbgl.Map({
         fs.readFile(path.join('base/path', req.url), function(err, data) {
             callback(err, { data: data });
         });
-    },
-    ratio: 1.0
+    }
 });
 ```
 
@@ -147,8 +146,7 @@ var map = new mbgl.Map({
                 callback(new Error(JSON.parse(body).message));
             }
         });
-    },
-    ratio: 1.0
+    }
 });
 ```
 
@@ -192,8 +190,7 @@ var map = new mbgl.Map({
                 callback(new Error(JSON.parse(body).message));
             }
         });
-    },
-    ratio: 1.0
+    }
 });
 
 // includes a datasource with a reference to something like `mapbox://mapbox.mapbox-streets-v6`

@@ -107,20 +107,21 @@ NAN_METHOD(NodeMap::New) {
 
     auto options = info[0]->ToObject();
 
-    // Check that 'request', 'cancel' and 'ratio' are defined.
+    // Check that 'request' is set. If 'cancel' is set it must be a
+    // function and if 'ratio' is set it must be a number.
     if (!Nan::Has(options, Nan::New("request").ToLocalChecked()).FromJust()
      || !Nan::Get(options, Nan::New("request").ToLocalChecked()).ToLocalChecked()->IsFunction()) {
         return Nan::ThrowError("Options object must have a 'request' method");
     }
 
-    if ( Nan::Has(options, Nan::New("cancel").ToLocalChecked()).FromJust()
+    if (Nan::Has(options, Nan::New("cancel").ToLocalChecked()).FromJust()
      && !Nan::Get(options, Nan::New("cancel").ToLocalChecked()).ToLocalChecked()->IsFunction()) {
         return Nan::ThrowError("Options object 'cancel' property must be a function");
     }
 
-    if (!Nan::Has(options, Nan::New("ratio").ToLocalChecked()).FromJust()
-     || !Nan::Get(options, Nan::New("ratio").ToLocalChecked()).ToLocalChecked()->IsNumber()) {
-        return Nan::ThrowError("Options object must have a numerical 'ratio' property");
+    if (Nan::Has(options, Nan::New("ratio").ToLocalChecked()).FromJust()
+     && !Nan::Get(options, Nan::New("ratio").ToLocalChecked()).ToLocalChecked()->IsNumber()) {
+        return Nan::ThrowError("Options object 'ratio' property must be a number");
     }
 
     try {
@@ -424,7 +425,7 @@ NAN_METHOD(NodeMap::DumpDebugLogs) {
 NodeMap::NodeMap(v8::Local<v8::Object> options) :
     view(sharedDisplay(), [&] {
         Nan::HandleScope scope;
-        return Nan::Get(options, Nan::New("ratio").ToLocalChecked()).ToLocalChecked()->NumberValue();
+        return Nan::Has(options, Nan::New("ratio").ToLocalChecked()).FromJust() ? Nan::Get(options, Nan::New("ratio").ToLocalChecked()).ToLocalChecked()->NumberValue() : 1.0;
     }()),
     fs(options),
     map(std::make_unique<mbgl::Map>(view, fs, mbgl::MapMode::Still)),

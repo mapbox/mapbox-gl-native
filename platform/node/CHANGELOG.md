@@ -10,8 +10,8 @@
   drops `mbgl.FileSource`. ([mapbox/node-mapbox-gl-native#143](https://github.com/mapbox/node-mapbox-gl-native/pull/143))
 - Changes `request` semantics to pass a second, callback argument instead
   of needing to call `req.respond`. ([#2299](https://github.com/mapbox/mapbox-gl-native/pull/2299))
-- Requires numerical `ratio` in `mbgl.Map` options argument.
-  Map pixel ratio is now immutable and can no longer be set with
+- Accepts optional `ratio` (defaults to `1.0`) in `mbgl.Map` options
+  argument. Map pixel ratio is now immutable and can no longer be set with
   render options. ([`a8d9b92`](https://github.com/mapbox/mapbox-gl-native/commit/a8d9b921d71a91d7f8eff82e5a584aaab8b7d1c6), [#1799](https://github.com/mapbox/mapbox-gl-native/pull/1799))
 - Swaps array order in render options `center` argument to `[lng, lat]` for consistency with GeoJSON and mapbox-gl-js.
 - Adds render option `pitch` ([#2702](https://github.com/mapbox/mapbox-gl-native/pull/2702))
