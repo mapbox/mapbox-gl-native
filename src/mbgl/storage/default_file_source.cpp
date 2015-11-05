@@ -30,7 +30,7 @@ namespace mbgl {
 
 DefaultFileSource::DefaultFileSource(FileCache* cache, const std::string& root)
     : thread(std::make_unique<util::Thread<Impl>>(
-          util::ThreadContext{ "FileSource", util::ThreadType::Unknown, util::ThreadPriority::Low },
+          util::ThreadContext{ "DefaultFileSource", util::ThreadType::Unknown, util::ThreadPriority::Low },
           cache,
           root)) {
 }
