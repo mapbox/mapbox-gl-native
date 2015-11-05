@@ -55,6 +55,7 @@ Request* FrontlineFileSource::request(const Resource& resource, uv_loop_t* l, Ca
     switch (resource.kind) {
         case Resource::Kind::Tile:
             url = resource.url;
+            break;
 
         default:
             url = "";
