@@ -42,6 +42,12 @@ void FrontlineFileSource::Impl::cancelRequest(Request* req) {
     req->destruct();
 }
 
+bool FrontlineFileSource::canHandle(const Resource& res) {
+    if (res.kind == Resource::Kind::Tile) {
+        return (res.url.find(".png") != std::string::npos);
+    }
+    return false;
+}
 
 Request* FrontlineFileSource::request(const Resource& resource, uv_loop_t* l, Callback callback) {
     assert(l);
