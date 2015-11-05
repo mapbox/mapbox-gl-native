@@ -1,7 +1,10 @@
 #ifndef MBGL_UTIL_THREAD_CONTEXT
 #define MBGL_UTIL_THREAD_CONTEXT
 
+#include <mbgl/storage/file_source.hpp>
 #include <mbgl/util/uv_detail.hpp>
+
+#include "resource.hpp"
 
 #include <cstdint>
 #include <string>
@@ -52,12 +55,23 @@ public:
         }
     }
 
-    static std::vector<FileSource*> getFileSources() {
+//    static std::vector<FileSource*> getFileSources() {
+//        if (current.get() != nullptr) {
+//            return current.get()->fileSources;
+//        } else {
+//            return std::vector<FileSource*>();
+//        }
+//    }
+
+    static FileSource* getFileSourceHandling(const Resource& res) {
         if (current.get() != nullptr) {
-            return current.get()->fileSources;
-        } else {
-            return std::vector<FileSource*>();
+            for (auto fs : current.get()->fileSources) {
+                if (fs->canHandle(res)) {
+                    return fs;
+                }
+            }
         }
+        return nullptr;
     }
 
     static void addFileSource(FileSource* fileSource) {
@@ -89,7 +103,7 @@ private:
     ThreadType type;
     ThreadPriority priority;
 
-    std::vector<FileSource*> fileSources;
+    std::vector<FileSource *> fileSources;
     GLObjectStore* glObjectStore = nullptr;
 
     static uv::tls<ThreadContext> current;

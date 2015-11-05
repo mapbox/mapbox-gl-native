@@ -39,8 +39,9 @@ Sprite::Sprite(const std::string& baseUrl, float pixelRatio_)
 
     loader = std::make_unique<Loader>();
 
-    FileSource* fs = util::ThreadContext::getFileSources().front();
-    loader->jsonRequest = fs->request({ Resource::Kind::SpriteJSON, jsonURL }, util::RunLoop::getLoop(),
+    Resource resource = { Resource::Kind::SpriteJSON, jsonURL };
+    FileSource* fs = util::ThreadContext::getFileSourceHandling(resource);
+    loader->jsonRequest = fs->request(resource, util::RunLoop::getLoop(),
                                       [this, jsonURL](const Response& res) {
         if (res.stale) {
             // Only handle fresh responses.

@@ -100,7 +100,7 @@ private:
     TransformState transformState;
     FrameData frameData;
 
-    FrontlineFileSource *secondaryFileSource;
+    FrontlineFileSource *frontlineFileSource;
 };
 
 }

@@ -36,10 +36,9 @@ MapContext::MapContext(View& view_, FileSource& fileSource, MapData& data_)
       texturePool(std::make_unique<TexturePool>()) {
     assert(util::ThreadContext::currentlyOn(util::ThreadType::Map));
 
-    secondaryFileSource = new FrontlineFileSource();
-
+    frontlineFileSource = new FrontlineFileSource();
+    util::ThreadContext::addFileSource(frontlineFileSource);
     util::ThreadContext::addFileSource(&fileSource);
-    util::ThreadContext::addFileSource(secondaryFileSource);
     util::ThreadContext::setGLObjectStore(&glObjectStore);
 
     asyncUpdate->unref();
@@ -52,8 +51,8 @@ MapContext::~MapContext() {
     // Make sure we call cleanup() before deleting this object.
     assert(!style);
 
-    delete secondaryFileSource;
-    secondaryFileSource = nullptr;
+    delete frontlineFileSource;
+    frontlineFileSource = nullptr;
 }
 
 void MapContext::cleanup() {
@@ -111,8 +110,9 @@ void MapContext::setStyleURL(const std::string& url) {
         base = styleURL.substr(0, pos + 1);
     }
 
-    FileSource* fs = util::ThreadContext::getFileSources().front();
-    styleRequest = fs->request({ Resource::Kind::Style, styleURL }, util::RunLoop::getLoop(), [this, base](const Response &res) {
+    Resource resource = { Resource::Kind::Style, styleURL };
+    FileSource* fs = util::ThreadContext::getFileSourceHandling(resource);
+    styleRequest = fs->request(resource, util::RunLoop::getLoop(), [this, base](const Response &res) {
         if (res.stale) {
             // Only handle fresh responses.
             return;

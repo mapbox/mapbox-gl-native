@@ -29,8 +29,9 @@ void RasterTileData::request(float pixelRatio,
     std::string url = source.tileURL(id, pixelRatio);
     state = State::loading;
 
-    FileSource* fs = util::ThreadContext::getFileSources().back();
-    req = fs->request({ Resource::Kind::Tile, url }, util::RunLoop::getLoop(), [url, callback, this](const Response &res) {
+    Resource resource = { Resource::Kind::Tile, url };
+    FileSource* fs = util::ThreadContext::getFileSourceHandling(resource);
+    req = fs->request(resource, util::RunLoop::getLoop(), [url, callback, this](const Response &res) {
         if (res.stale) {
             // Only handle fresh responses.
             return;

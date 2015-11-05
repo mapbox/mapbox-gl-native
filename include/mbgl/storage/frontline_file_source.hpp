@@ -14,6 +14,7 @@ public:
     FrontlineFileSource();
     ~FrontlineFileSource() override;
 
+    bool canHandle(const Resource&) override { return false; }
     Request* request(const Resource&, uv_loop_t*, Callback) override;
     void cancel(Request*) override;
 
