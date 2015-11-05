@@ -2,7 +2,7 @@
 #include "../fixtures/mock_file_source.hpp"
 #include "../fixtures/util.hpp"
 
-#include <mbgl/map/sprite.hpp>
+#include <mbgl/sprite/sprite.hpp>
 #include <mbgl/util/run_loop.hpp>
 #include <mbgl/util/thread.hpp>
 

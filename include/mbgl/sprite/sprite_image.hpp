@@ -1,5 +1,5 @@
-#ifndef MBGL_ANNOTATIONS_SPRITE_IMAGE
-#define MBGL_ANNOTATIONS_SPRITE_IMAGE
+#ifndef MBGL_SPRITE_IMAGE
+#define MBGL_SPRITE_IMAGE
 
 #include <mbgl/util/noncopyable.hpp>
 #include <mbgl/util/geo.hpp>

@@ -1,5 +1,5 @@
-#include <mbgl/geometry/sprite_atlas.hpp>
-#include <mbgl/annotation/sprite_store.hpp>
+#include <mbgl/sprite/sprite_atlas.hpp>
+#include <mbgl/sprite/sprite_store.hpp>
 #include <mbgl/platform/gl.hpp>
 #include <mbgl/platform/log.hpp>
 #include <mbgl/platform/platform.hpp>
@@ -10,7 +10,7 @@
 #include <mbgl/util/scaling.hpp>
 #include <mbgl/util/thread_context.hpp>
 
-#include <mbgl/map/sprite.hpp>
+#include <mbgl/sprite/sprite.hpp>
 
 #include <cassert>
 #include <cmath>

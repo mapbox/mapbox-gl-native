@@ -1,4 +1,4 @@
-#include <mbgl/annotation/sprite_image.hpp>
+#include <mbgl/sprite/sprite_image.hpp>
 
 #include <mbgl/util/exception.hpp>
 

@@ -1,5 +1,4 @@
-#include <mbgl/map/sprite.hpp>
-
+#include <mbgl/sprite/sprite.hpp>
 #include <mbgl/platform/log.hpp>
 #include <mbgl/platform/platform.hpp>
 #include <mbgl/storage/file_source.hpp>

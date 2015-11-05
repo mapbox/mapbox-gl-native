@@ -1,5 +1,5 @@
-#ifndef MBGL_GEOMETRY_SPRITE_ATLAS
-#define MBGL_GEOMETRY_SPRITE_ATLAS
+#ifndef MBGL_SPRITE_ATLAS
+#define MBGL_SPRITE_ATLAS
 
 #include <mbgl/geometry/binpack.hpp>
 #include <mbgl/platform/gl.hpp>

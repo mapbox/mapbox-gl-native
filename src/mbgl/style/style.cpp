@@ -1,9 +1,10 @@
 #include <mbgl/style/style.hpp>
-#include <mbgl/map/sprite.hpp>
 #include <mbgl/map/map_data.hpp>
 #include <mbgl/map/source.hpp>
 #include <mbgl/map/transform_state.hpp>
-#include <mbgl/annotation/sprite_store.hpp>
+#include <mbgl/sprite/sprite.hpp>
+#include <mbgl/sprite/sprite_store.hpp>
+#include <mbgl/sprite/sprite_atlas.hpp>
 #include <mbgl/style/style_layer.hpp>
 #include <mbgl/style/style_parser.hpp>
 #include <mbgl/style/property_transition.hpp>
@@ -11,7 +12,6 @@
 #include <mbgl/style/style_cascade_parameters.hpp>
 #include <mbgl/style/style_calculation_parameters.hpp>
 #include <mbgl/geometry/glyph_atlas.hpp>
-#include <mbgl/geometry/sprite_atlas.hpp>
 #include <mbgl/geometry/line_atlas.hpp>
 #include <mbgl/util/constants.hpp>
 #include <mbgl/platform/log.hpp>

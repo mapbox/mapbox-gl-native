@@ -5,7 +5,7 @@
 #include <mbgl/style/zoom_history.hpp>
 
 #include <mbgl/map/source.hpp>
-#include <mbgl/map/sprite.hpp>
+#include <mbgl/sprite/sprite.hpp>
 #include <mbgl/text/glyph_store.hpp>
 
 #include <mbgl/util/ptr.hpp>

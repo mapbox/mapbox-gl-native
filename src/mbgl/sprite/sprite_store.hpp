@@ -1,7 +1,7 @@
-#ifndef MBGL_ANNOTATION_SPRITE_STORE
-#define MBGL_ANNOTATION_SPRITE_STORE
+#ifndef MBGL_SPRITE_STORE
+#define MBGL_SPRITE_STORE
 
-#include <mbgl/annotation/sprite_image.hpp>
+#include <mbgl/sprite/sprite_image.hpp>
 
 #include <mbgl/util/noncopyable.hpp>
 #include <mbgl/util/geo.hpp>

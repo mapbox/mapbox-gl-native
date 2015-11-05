@@ -39,11 +39,6 @@
 
         'miscellaneous/assert.cpp',
 
-        'annotations/sprite_atlas.cpp',
-        'annotations/sprite_image.cpp',
-        'annotations/sprite_store.cpp',
-        'annotations/sprite_parser.cpp',
-
         'api/annotations.cpp',
         'api/api_misuse.cpp',
         'api/repeated_render.cpp',
@@ -54,7 +49,6 @@
         'miscellaneous/binpack.cpp',
         'miscellaneous/bilinear.cpp',
         'miscellaneous/comparisons.cpp',
-        'miscellaneous/custom_sprites.cpp',
         'miscellaneous/enums.cpp',
         'miscellaneous/functions.cpp',
         'miscellaneous/geo.cpp',
@@ -91,7 +85,13 @@
         'style/glyph_store.cpp',
         'style/pending_resources.cpp',
         'style/resource_loading.cpp',
-        'style/sprite.cpp',
+
+        'sprite/sprite.cpp',
+        'sprite/sprite_atlas.cpp',
+        'sprite/sprite_image.cpp',
+        'sprite/sprite_parser.cpp',
+        'sprite/sprite_store.cpp',
+        'sprite/custom_sprites.cpp',
       ],
       'libraries': [
         '<@(gtest_static_libs)',

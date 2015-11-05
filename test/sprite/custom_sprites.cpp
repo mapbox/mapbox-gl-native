@@ -4,7 +4,7 @@
 #include <mbgl/map/map.hpp>
 #include <mbgl/map/still_image.hpp>
 #include <mbgl/util/image.hpp>
-#include <mbgl/annotation/sprite_image.hpp>
+#include <mbgl/sprite/sprite_image.hpp>
 
 #include <mbgl/util/io.hpp>
 
@@ -16,7 +16,7 @@
 
 using namespace mbgl;
 
-TEST(Headless, CustomSpriteImages) {
+TEST(Sprite, CustomSpriteImages) {
     FixtureLog log;
 
     auto display = std::make_shared<mbgl::HeadlessDisplay>();

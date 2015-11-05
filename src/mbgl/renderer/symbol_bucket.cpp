@@ -1,11 +1,12 @@
 #include <mbgl/renderer/symbol_bucket.hpp>
 #include <mbgl/layer/symbol_layer.hpp>
 #include <mbgl/map/geometry_tile.hpp>
-#include <mbgl/annotation/sprite_image.hpp>
+#include <mbgl/sprite/sprite.hpp>
+#include <mbgl/sprite/sprite_image.hpp>
+#include <mbgl/sprite/sprite_atlas.hpp>
 #include <mbgl/geometry/text_buffer.hpp>
 #include <mbgl/geometry/icon_buffer.hpp>
 #include <mbgl/geometry/glyph_atlas.hpp>
-#include <mbgl/geometry/sprite_atlas.hpp>
 #include <mbgl/geometry/anchor.hpp>
 #include <mbgl/text/get_anchors.hpp>
 #include <mbgl/renderer/painter.hpp>
@@ -16,7 +17,6 @@
 #include <mbgl/shader/sdf_shader.hpp>
 #include <mbgl/shader/icon_shader.hpp>
 #include <mbgl/shader/box_shader.hpp>
-#include <mbgl/map/sprite.hpp>
 
 #include <mbgl/util/utf.hpp>
 #include <mbgl/util/token.hpp>

@@ -1,4 +1,4 @@
-#include <mbgl/annotation/sprite_store.hpp>
+#include <mbgl/sprite/sprite_store.hpp>
 
 #include <mbgl/platform/log.hpp>
 

@@ -1,13 +1,12 @@
 #include <mbgl/renderer/painter.hpp>
 #include <mbgl/renderer/line_bucket.hpp>
 #include <mbgl/layer/line_layer.hpp>
-#include <mbgl/map/sprite.hpp>
 #include <mbgl/map/tile_id.hpp>
 #include <mbgl/map/map_data.hpp>
 #include <mbgl/shader/line_shader.hpp>
 #include <mbgl/shader/linesdf_shader.hpp>
 #include <mbgl/shader/linepattern_shader.hpp>
-#include <mbgl/geometry/sprite_atlas.hpp>
+#include <mbgl/sprite/sprite_atlas.hpp>
 #include <mbgl/geometry/line_atlas.hpp>
 #include <mbgl/util/mat2.hpp>
 

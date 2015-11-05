@@ -1,8 +1,8 @@
 #include "../fixtures/util.hpp"
 #include "../fixtures/fixture_log_observer.hpp"
 
-#include <mbgl/annotation/sprite_parser.hpp>
-#include <mbgl/annotation/sprite_image.hpp>
+#include <mbgl/sprite/sprite_parser.hpp>
+#include <mbgl/sprite/sprite_image.hpp>
 #include <mbgl/util/image.hpp>
 #include <mbgl/util/io.hpp>
 
@@ -10,7 +10,7 @@
 
 using namespace mbgl;
 
-TEST(Annotations, SpriteImageCreationInvalid) {
+TEST(Sprite, SpriteImageCreationInvalid) {
     FixtureLog log;
 
     const util::Image image_1x(util::read_file("test/fixtures/annotations/emerald.png"));
@@ -33,7 +33,7 @@ TEST(Annotations, SpriteImageCreationInvalid) {
                   }));
 }
 
-TEST(Annotations, SpriteImageCreation1x) {
+TEST(Sprite, SpriteImageCreation1x) {
     const util::Image image_1x(util::read_file("test/fixtures/annotations/emerald.png"));
     ASSERT_TRUE(image_1x);
     ASSERT_EQ(200u, image_1x.getWidth());
@@ -73,7 +73,7 @@ TEST(Annotations, SpriteImageCreation1x) {
     }
 }
 
-TEST(Annotations, SpriteImageCreation2x) {
+TEST(Sprite, SpriteImageCreation2x) {
     const util::Image image_2x(util::read_file("test/fixtures/annotations/emerald@2x.png"));
     ASSERT_TRUE(image_2x);
 
@@ -88,7 +88,7 @@ TEST(Annotations, SpriteImageCreation2x) {
     EXPECT_EQ(0x85F345098DD4F9E3u, test::crc64(sprite->data));
 }
 
-TEST(Annotations, SpriteImageCreation1_5x) {
+TEST(Sprite, SpriteImageCreation1_5x) {
     const util::Image image_2x(util::read_file("test/fixtures/annotations/emerald@2x.png"));
     ASSERT_TRUE(image_2x);
 
@@ -113,7 +113,7 @@ TEST(Annotations, SpriteImageCreation1_5x) {
     EXPECT_EQ(0x134A530C742DD141u, test::crc64(sprite2->data));
 }
 
-TEST(Annotations, SpriteParsing) {
+TEST(Sprite, SpriteParsing) {
     const auto image_1x = util::read_file("test/fixtures/annotations/emerald.png");
     const auto json_1x = util::read_file("test/fixtures/annotations/emerald.json");
 
@@ -209,7 +209,7 @@ TEST(Annotations, SpriteParsing) {
     }
 }
 
-TEST(Annotations, SpriteParsingInvalidJSON) {
+TEST(Sprite, SpriteParsingInvalidJSON) {
     const auto image_1x = util::read_file("test/fixtures/annotations/emerald.png");
     const auto json_1x = R"JSON({ "image": " })JSON";
 
@@ -219,7 +219,7 @@ TEST(Annotations, SpriteParsingInvalidJSON) {
               std::string("Failed to parse JSON: Missing a closing quotation mark in string. at offset 13"));
 }
 
-TEST(Annotations, SpriteParsingEmptyImage) {
+TEST(Sprite, SpriteParsingEmptyImage) {
     FixtureLog log;
 
     const auto image_1x = util::read_file("test/fixtures/annotations/emerald.png");
@@ -236,7 +236,7 @@ TEST(Annotations, SpriteParsingEmptyImage) {
                   }));
 }
 
-TEST(Annotations, SpriteParsingSimpleWidthHeight) {
+TEST(Sprite, SpriteParsingSimpleWidthHeight) {
     FixtureLog log;
 
     const auto image_1x = util::read_file("test/fixtures/annotations/emerald.png");
@@ -246,7 +246,7 @@ TEST(Annotations, SpriteParsingSimpleWidthHeight) {
     EXPECT_EQ(1u, images.size());
 }
 
-TEST(Annotations, SpriteParsingWidthTooBig) {
+TEST(Sprite, SpriteParsingWidthTooBig) {
     FixtureLog log;
 
     const auto image_1x = util::read_file("test/fixtures/annotations/emerald.png");
@@ -269,7 +269,7 @@ TEST(Annotations, SpriteParsingWidthTooBig) {
                   }));
 }
 
-TEST(Annotations, SpriteParsingNegativeWidth) {
+TEST(Sprite, SpriteParsingNegativeWidth) {
     FixtureLog log;
 
     const auto image_1x = util::read_file("test/fixtures/annotations/emerald.png");
@@ -292,7 +292,7 @@ TEST(Annotations, SpriteParsingNegativeWidth) {
                   }));
 }
 
-TEST(Annotations, SpriteParsingNullRatio) {
+TEST(Sprite, SpriteParsingNullRatio) {
     FixtureLog log;
 
     const auto image_1x = util::read_file("test/fixtures/annotations/emerald.png");

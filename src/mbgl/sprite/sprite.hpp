@@ -1,7 +1,7 @@
-#ifndef MBGL_STYLE_SPRITE
-#define MBGL_STYLE_SPRITE
+#ifndef MBGL_SPRITE
+#define MBGL_SPRITE
 
-#include <mbgl/annotation/sprite_parser.hpp>
+#include <mbgl/sprite/sprite_parser.hpp>
 #include <mbgl/util/image.hpp>
 #include <mbgl/util/noncopyable.hpp>
 #include <mbgl/util/ptr.hpp>

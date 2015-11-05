@@ -1,5 +1,5 @@
-#include <mbgl/annotation/sprite_parser.hpp>
-#include <mbgl/annotation/sprite_image.hpp>
+#include <mbgl/sprite/sprite_parser.hpp>
+#include <mbgl/sprite/sprite_image.hpp>
 
 #include <mbgl/platform/log.hpp>
 

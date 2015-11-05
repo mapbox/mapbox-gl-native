@@ -1,11 +1,11 @@
 #include "../fixtures/util.hpp"
 
-#include <mbgl/annotation/sprite_image.hpp>
+#include <mbgl/sprite/sprite_image.hpp>
 #include <mbgl/util/exception.hpp>
 
 using namespace mbgl;
 
-TEST(Annotations, SpriteImageZeroWidth) {
+TEST(Sprite, SpriteImageZeroWidth) {
     try {
         SpriteImage(0, 16, 2, "");
         FAIL() << "Expected exception";
@@ -14,7 +14,7 @@ TEST(Annotations, SpriteImageZeroWidth) {
     }
 }
 
-TEST(Annotations, SpriteImageZeroHeight) {
+TEST(Sprite, SpriteImageZeroHeight) {
     try {
         SpriteImage(16, 0, 2, "");
         FAIL() << "Expected exception";
@@ -23,7 +23,7 @@ TEST(Annotations, SpriteImageZeroHeight) {
     }
 }
 
-TEST(Annotations, SpriteImageZeroRatio) {
+TEST(Sprite, SpriteImageZeroRatio) {
     try {
         SpriteImage(16, 16, 0, "");
         FAIL() << "Expected exception";
@@ -32,7 +32,7 @@ TEST(Annotations, SpriteImageZeroRatio) {
     }
 }
 
-TEST(Annotations, SpriteImageMismatchedData) {
+TEST(Sprite, SpriteImageMismatchedData) {
     try {
         SpriteImage(16, 16, 2, "");
         FAIL() << "Expected exception";
@@ -41,7 +41,7 @@ TEST(Annotations, SpriteImageMismatchedData) {
     }
 }
 
-TEST(Annotations, SpriteImage) {
+TEST(Sprite, SpriteImage) {
     std::string pixels(32 * 24 * 4, '\0');
     SpriteImage sprite(16, 12, 2, std::move(pixels));
     EXPECT_EQ(16, sprite.width);
@@ -52,7 +52,7 @@ TEST(Annotations, SpriteImage) {
     EXPECT_EQ(32u * 24 * 4, sprite.data.size());
 }
 
-TEST(Annotations, SpriteImageFractionalRatio) {
+TEST(Sprite, SpriteImageFractionalRatio) {
     std::string pixels(20 * 12 * 4, '\0');
     SpriteImage sprite(13, 8, 1.5, std::move(pixels));
     EXPECT_EQ(13, sprite.width);

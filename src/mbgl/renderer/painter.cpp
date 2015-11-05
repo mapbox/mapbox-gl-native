@@ -13,7 +13,7 @@
 
 #include <mbgl/layer/background_layer.hpp>
 
-#include <mbgl/geometry/sprite_atlas.hpp>
+#include <mbgl/sprite/sprite_atlas.hpp>
 #include <mbgl/geometry/line_atlas.hpp>
 #include <mbgl/geometry/glyph_atlas.hpp>
 

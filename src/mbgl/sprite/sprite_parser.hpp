@@ -1,5 +1,5 @@
-#ifndef MBGL_ANNOTATIONS_SPRITE_PARSER
-#define MBGL_ANNOTATIONS_SPRITE_PARSER
+#ifndef MBGL_SPRITE_PARSER
+#define MBGL_SPRITE_PARSER
 
 #include <mapbox/variant.hpp>
 

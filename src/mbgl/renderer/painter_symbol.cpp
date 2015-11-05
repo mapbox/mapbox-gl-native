@@ -2,7 +2,7 @@
 #include <mbgl/renderer/symbol_bucket.hpp>
 #include <mbgl/layer/symbol_layer.hpp>
 #include <mbgl/geometry/glyph_atlas.hpp>
-#include <mbgl/geometry/sprite_atlas.hpp>
+#include <mbgl/sprite/sprite_atlas.hpp>
 #include <mbgl/shader/sdf_shader.hpp>
 #include <mbgl/shader/icon_shader.hpp>
 #include <mbgl/shader/box_shader.hpp>

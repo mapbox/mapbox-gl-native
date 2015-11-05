@@ -1,11 +1,11 @@
 #include "../fixtures/util.hpp"
 #include "../fixtures/fixture_log_observer.hpp"
 
-#include <mbgl/annotation/sprite_store.hpp>
+#include <mbgl/sprite/sprite_store.hpp>
 
 using namespace mbgl;
 
-TEST(Annotations, SpriteStore) {
+TEST(Sprite, SpriteStore) {
     FixtureLog log;
 
     const auto sprite1 = std::make_shared<SpriteImage>(8, 8, 2, std::string(16 * 16 * 4, '\0'));
@@ -71,7 +71,7 @@ TEST(Annotations, SpriteStore) {
     EXPECT_EQ(Sprites(), store.getDirty());
 }
 
-TEST(Annotations, SpriteStoreOtherPixelRatio) {
+TEST(Sprite, SpriteStoreOtherPixelRatio) {
     FixtureLog log;
 
     const auto sprite1 = std::make_shared<SpriteImage>(8, 8, 1, std::string(8 * 8 * 4, '\0'));
@@ -84,7 +84,7 @@ TEST(Annotations, SpriteStoreOtherPixelRatio) {
     EXPECT_EQ(Sprites({ { "one", sprite1 } }), store.getDirty());
 }
 
-TEST(Annotations, SpriteStoreMultiple) {
+TEST(Sprite, SpriteStoreMultiple) {
     const auto sprite1 = std::make_shared<SpriteImage>(8, 8, 2, std::string(16 * 16 * 4, '\0'));
     const auto sprite2 = std::make_shared<SpriteImage>(8, 8, 2, std::string(16 * 16 * 4, '\0'));
 
@@ -101,7 +101,7 @@ TEST(Annotations, SpriteStoreMultiple) {
     EXPECT_EQ(Sprites(), store.getDirty());
 }
 
-TEST(Annotations, SpriteStoreReplace) {
+TEST(Sprite, SpriteStoreReplace) {
     FixtureLog log;
 
     const auto sprite1 = std::make_shared<SpriteImage>(8, 8, 2, std::string(16 * 16 * 4, '\0'));
@@ -118,7 +118,7 @@ TEST(Annotations, SpriteStoreReplace) {
     EXPECT_EQ(Sprites({ { "sprite", sprite2 } }), store.getDirty());
 }
 
-TEST(Annotations, SpriteStoreReplaceWithDifferentDimensions) {
+TEST(Sprite, SpriteStoreReplaceWithDifferentDimensions) {
     FixtureLog log;
 
     const auto sprite1 = std::make_shared<SpriteImage>(8, 8, 2, std::string(16 * 16 * 4, '\0'));

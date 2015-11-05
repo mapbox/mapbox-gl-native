@@ -3,7 +3,6 @@
 
 #include <mbgl/layer/circle_layer.hpp>
 
-#include <mbgl/map/sprite.hpp>
 #include <mbgl/map/tile_id.hpp>
 #include <mbgl/map/map_data.hpp>
 
