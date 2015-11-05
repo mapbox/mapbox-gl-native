@@ -12,7 +12,7 @@ fi
 
 COMMIT_MESSAGE=$(git show -s --format=%B $TRAVIS_COMMIT | tr -d '\n')
 
-if test "${COMMIT_MESSAGE#*'[publish binary]'}" != "$COMMIT_MESSAGE"; then
+if [[ ${TRAVIS_TAG} == node-v* ]] || test "${COMMIT_MESSAGE#*'[publish binary]'}" != "$COMMIT_MESSAGE"; then
     source ~/.nvm/nvm.sh
     nvm use $NODE_VERSION
 
