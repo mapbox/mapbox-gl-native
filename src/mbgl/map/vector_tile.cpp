@@ -184,7 +184,7 @@ VectorTileMonitor::VectorTileMonitor(const SourceInfo& source, const TileID& id,
 
 Request* VectorTileMonitor::monitorTile(std::function<void (std::exception_ptr, std::unique_ptr<GeometryTile>)> callback) {
     Resource resource = { Resource::Kind::Tile, url };
-    FileSource* fs = util::ThreadContext::getFileSourceHandling(resource);
+    FileSource* fs = util::ThreadContext::getFileSourceHandlingResource(resource);
     return fs->request(resource, util::RunLoop::getLoop(), [callback, this](const Response& res) {
         if (res.data && data == res.data) {
             // We got the same data again. Abort early.

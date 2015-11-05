@@ -55,10 +55,10 @@ public:
         }
     }
 
-    static FileSource* getFileSourceHandling(const Resource& res) {
+    static FileSource* getFileSourceHandlingResource(const Resource& res) {
         if (current.get() != nullptr) {
             for (auto fs : current.get()->fileSources) {
-                if (fs->canHandle(res)) {
+                if (fs->handlesResource(res)) {
                     return fs;
                 }
             }

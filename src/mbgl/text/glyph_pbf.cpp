@@ -92,7 +92,7 @@ GlyphPBF::GlyphPBF(GlyphStore* store,
     };
 
     Resource resource = { Resource::Kind::Glyphs, url };
-    FileSource* fs = util::ThreadContext::getFileSourceHandling(resource);
+    FileSource* fs = util::ThreadContext::getFileSourceHandlingResource(resource);
     req = fs->request(resource, util::RunLoop::getLoop(), requestCallback);
 }
 
