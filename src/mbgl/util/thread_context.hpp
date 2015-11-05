@@ -55,14 +55,6 @@ public:
         }
     }
 
-//    static std::vector<FileSource*> getFileSources() {
-//        if (current.get() != nullptr) {
-//            return current.get()->fileSources;
-//        } else {
-//            return std::vector<FileSource*>();
-//        }
-//    }
-
     static FileSource* getFileSourceHandling(const Resource& res) {
         if (current.get() != nullptr) {
             for (auto fs : current.get()->fileSources) {
