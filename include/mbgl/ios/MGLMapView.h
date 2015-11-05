@@ -41,6 +41,8 @@ IB_DESIGNABLE
 *   @return An initialized map view. */
 - (instancetype)initWithFrame:(CGRect)frame styleURL:(nullable NSURL *)styleURL;
 
+- (instancetype)initWithFrame:(CGRect)frame styleURL:(nullable NSURL *)styleURL offlineMapPath:(NSString *)offlineMapPath;
+
 #pragma mark - Accessing Map Properties
 
 /** @name Accessing Map Properties */

@@ -60,7 +60,11 @@ static const CLLocationCoordinate2D WorldTourDestinations[] = {
 {
     [super viewDidLoad];
 
-    self.mapView = [[MGLMapView alloc] initWithFrame:self.view.bounds];
+    NSString *offlineMapPath = [[NSBundle mainBundle] pathForResource:@"cache" ofType:@"mbtiles"];
+
+    self.mapView = [[MGLMapView alloc] initWithFrame:self.view.bounds
+                                            styleURL:[MGLStyle streetsStyleURL]
+                                      offlineMapPath:offlineMapPath];
     self.mapView.autoresizingMask = UIViewAutoresizingFlexibleWidth | UIViewAutoresizingFlexibleHeight;
     self.mapView.delegate = self;
     [self.view addSubview:self.mapView];
@@ -91,6 +95,10 @@ static const CLLocationCoordinate2D WorldTourDestinations[] = {
     [self.mapView addGestureRecognizer:[[UILongPressGestureRecognizer alloc] initWithTarget:self action:@selector(handleLongPress:)]];
 
     [self restoreState:nil];
+
+    [self.mapView setCenterCoordinate:CLLocationCoordinate2DMake(45.468780541878154, -122.65276581137326)
+                            zoomLevel:15
+                             animated:YES];
 }
 
 - (void)saveState:(__unused NSNotification *)notification

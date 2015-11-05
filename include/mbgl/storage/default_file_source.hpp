@@ -9,7 +9,7 @@ class FileCache;
 
 class DefaultFileSource : public FileSource {
 public:
-    DefaultFileSource(FileCache*, const std::string& root = "");
+    DefaultFileSource(FileCache*, const std::string& root = "", const std::string& offlinePath = "");
     ~DefaultFileSource() override;
 
     void setAccessToken(const std::string&);
@@ -18,6 +18,7 @@ public:
     std::unique_ptr<FileRequest> request(const Resource&, Callback) override;
 
 private:
+    friend class DefaultFileRequest;
     class Impl;
     const std::unique_ptr<Impl> impl;
 };
