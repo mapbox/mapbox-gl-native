@@ -38,7 +38,7 @@ void FrontlineFileSource::Impl::handleRequest(Request* req) {
 }
 
 void FrontlineFileSource::Impl::cancelRequest(Request* req) {
-    // no-op
+    // assume local/offline sources are too fast to be cancellable
     req->destruct();
 }
 
