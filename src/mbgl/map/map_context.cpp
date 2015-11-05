@@ -9,6 +9,7 @@
 #include <mbgl/renderer/painter.hpp>
 
 #include <mbgl/storage/file_source.hpp>
+#include <mbgl/storage/frontline_file_source.hpp>
 #include <mbgl/storage/resource.hpp>
 #include <mbgl/storage/response.hpp>
 
@@ -35,7 +36,10 @@ MapContext::MapContext(View& view_, FileSource& fileSource, MapData& data_)
       texturePool(std::make_unique<TexturePool>()) {
     assert(util::ThreadContext::currentlyOn(util::ThreadType::Map));
 
+    secondaryFileSource = new FrontlineFileSource();
+
     util::ThreadContext::addFileSource(&fileSource);
+    util::ThreadContext::addFileSource(secondaryFileSource);
     util::ThreadContext::setGLObjectStore(&glObjectStore);
 
     asyncUpdate->unref();
@@ -47,6 +51,9 @@ MapContext::MapContext(View& view_, FileSource& fileSource, MapData& data_)
 MapContext::~MapContext() {
     // Make sure we call cleanup() before deleting this object.
     assert(!style);
+
+    delete secondaryFileSource;
+    secondaryFileSource = nullptr;
 }
 
 void MapContext::cleanup() {

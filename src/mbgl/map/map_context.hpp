@@ -25,6 +25,7 @@ class Sprite;
 class Worker;
 class StillImage;
 class SpriteImage;
+class FrontlineFileSource;
 struct LatLng;
 struct LatLngBounds;
 
@@ -98,6 +99,8 @@ private:
     size_t sourceCacheSize;
     TransformState transformState;
     FrameData frameData;
+
+    FrontlineFileSource *secondaryFileSource;
 };
 
 }

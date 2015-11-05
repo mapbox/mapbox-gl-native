@@ -29,7 +29,7 @@ void FrontlineFileSource::Impl::handleRequest(Request* req) {
     std::shared_ptr<Response> res = std::make_shared<Response>();
 
     try {
-        res->data = std::make_shared<const std::string>(std::move(util::read_file("/tmp/foo.pbf")));
+        res->data = std::make_shared<const std::string>(std::move(util::read_file("/tmp/foo.png")));
     } catch (const std::exception& err) {
         res->error = std::make_unique<Response::Error>(Response::Error::Reason::Other, err.what());
     }
