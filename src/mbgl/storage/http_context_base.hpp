@@ -14,6 +14,7 @@ class HTTPContextBase {
 public:
     static std::unique_ptr<HTTPContextBase> createContext(uv_loop_t*);
 
+    virtual ~HTTPContextBase() = default;
     virtual HTTPRequestBase* createRequest(const Resource&,
                                        RequestBase::Callback,
                                        uv_loop_t*,
