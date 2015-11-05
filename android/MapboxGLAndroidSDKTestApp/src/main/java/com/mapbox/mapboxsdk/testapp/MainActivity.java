@@ -59,6 +59,7 @@ public class MainActivity extends AppCompatActivity {
 
     // Used for permissions requests
     private static final int PERMISSIONS_LOCATION = 0;
+    private static final int PERMISSIONS_TRACKING_MODE_ACTIVITY = 1;
 
     // Used for info window
     private static final DecimalFormat LAT_LON_FORMATTER = new DecimalFormat("#.#####");
@@ -217,6 +218,14 @@ public class MainActivity extends AppCompatActivity {
     protected void onStart() {
         super.onStart();
 
+        // We need to recheck permissions in case user revoked them via settings app
+        if ((ContextCompat.checkSelfPermission(this, Manifest.permission.ACCESS_COARSE_LOCATION)
+                != PackageManager.PERMISSION_GRANTED) ||
+                (ContextCompat.checkSelfPermission(this, Manifest.permission.ACCESS_FINE_LOCATION)
+                        != PackageManager.PERMISSION_GRANTED)) {
+            toggleGps(false);
+        }
+
         mMapView.onStart();
     }
 
@@ -288,11 +297,17 @@ public class MainActivity extends AppCompatActivity {
     @Override
     public void onRequestPermissionsResult(int requestCode, @NonNull String permissions[], @NonNull int[] grantResults) {
         switch (requestCode) {
-            case PERMISSIONS_LOCATION: {
-                if (grantResults[0] == PackageManager.PERMISSION_GRANTED) {
+            case PERMISSIONS_LOCATION:
+                if (grantResults.length > 0 && grantResults[0] == PackageManager.PERMISSION_GRANTED) {
                     enableGps();
                 }
-            }
+                break;
+
+            case PERMISSIONS_TRACKING_MODE_ACTIVITY:
+                if (grantResults.length > 0 && grantResults[0] == PackageManager.PERMISSION_GRANTED) {
+                    startActivity(new Intent(getApplicationContext(), MyLocationTrackingModeActivity.class));
+                }
+                break;
         }
     }
 
@@ -347,7 +362,18 @@ public class MainActivity extends AppCompatActivity {
                                 return true;
 
                             case R.id.action_user_tracking_mode:
-                                startActivity(new Intent(getApplicationContext(), MyLocationTrackingModeActivity.class));
+                                if ((ContextCompat.checkSelfPermission(MainActivity.this, Manifest.permission.ACCESS_COARSE_LOCATION)
+                                        != PackageManager.PERMISSION_GRANTED) ||
+                                        (ContextCompat.checkSelfPermission(MainActivity.this, Manifest.permission.ACCESS_FINE_LOCATION)
+                                                != PackageManager.PERMISSION_GRANTED)) {
+                                    ActivityCompat.requestPermissions(MainActivity.this,
+                                            new String[]{Manifest.permission.ACCESS_COARSE_LOCATION, Manifest.permission.ACCESS_FINE_LOCATION},
+                                            PERMISSIONS_TRACKING_MODE_ACTIVITY);
+                                } else {
+                                    startActivity(new Intent(getApplicationContext(), MyLocationTrackingModeActivity.class));
+                                }
+
+
                                 return true;
 
                             case R.id.action_polyline:
