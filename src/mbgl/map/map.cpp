@@ -82,7 +82,7 @@ void Map::renderSync() {
 
     // Triggers an asynchronous update, that eventually triggers a view
     // invalidation, causing renderSync to be called again if in transition.
-    if (transform->inTransition()) {
+    if (flags != Update::Nothing) {
         update(flags);
     }
 }

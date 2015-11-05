@@ -275,7 +275,10 @@ void Transform::_easeTo(CameraOptions options, const double new_scale, const dou
                 state.Cc = s / util::M2PI;
                 state.angle = util::wrap(util::interpolate(startA, angle, t), -M_PI, M_PI);
                 state.pitch = util::interpolate(startP, pitch, t);
-                view.notifyMapChange(MapChangeRegionIsChanging);
+                // At t = 1.0, a DidChangeAnimated notification should be sent from finish().
+                if (t < 1.0) {
+                    view.notifyMapChange(MapChangeRegionIsChanging);
+                }
                 return update;
             },
             [=] {
