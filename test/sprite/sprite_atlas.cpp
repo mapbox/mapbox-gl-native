@@ -15,7 +15,7 @@ TEST(Sprite, SpriteAtlas) {
     auto spriteParseResult = parseSprite(util::read_file("test/fixtures/annotations/emerald.png"),
                                          util::read_file("test/fixtures/annotations/emerald.json"));
 
-    SpriteStore store;
+    SpriteStore store(1);
     store.setSprites(spriteParseResult.get<Sprites>());
 
     SpriteAtlas atlas(63, 112, 1, store);
@@ -90,7 +90,7 @@ TEST(Sprite, SpriteAtlasSize) {
     auto spriteParseResult = parseSprite(util::read_file("test/fixtures/annotations/emerald.png"),
                                          util::read_file("test/fixtures/annotations/emerald.json"));
 
-    SpriteStore store;
+    SpriteStore store(1);
     store.setSprites(spriteParseResult.get<Sprites>());
 
     SpriteAtlas atlas(63, 112, 1.4, store);
@@ -124,7 +124,7 @@ TEST(Sprite, SpriteAtlasSize) {
 }
 
 TEST(Sprite, SpriteAtlasUpdates) {
-    SpriteStore store;
+    SpriteStore store(1);
 
     SpriteAtlas atlas(32, 32, 1, store);
 

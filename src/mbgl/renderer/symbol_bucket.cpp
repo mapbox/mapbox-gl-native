@@ -1,8 +1,8 @@
 #include <mbgl/renderer/symbol_bucket.hpp>
 #include <mbgl/layer/symbol_layer.hpp>
 #include <mbgl/map/geometry_tile.hpp>
-#include <mbgl/sprite/sprite.hpp>
 #include <mbgl/sprite/sprite_image.hpp>
+#include <mbgl/sprite/sprite_store.hpp>
 #include <mbgl/sprite/sprite_atlas.hpp>
 #include <mbgl/geometry/text_buffer.hpp>
 #include <mbgl/geometry/icon_buffer.hpp>
@@ -158,13 +158,12 @@ void SymbolBucket::parseFeatures(const GeometryTileLayer& layer,
     }
 }
 
-bool SymbolBucket::needsDependencies(GlyphStore& glyphStore,
-                                     Sprite& sprite) {
+bool SymbolBucket::needsDependencies(GlyphStore& glyphStore, SpriteStore& spriteStore) {
     if (!layout.text.field.value.empty() && !layout.text.font.value.empty() && !glyphStore.hasGlyphRanges(layout.text.font, ranges)) {
         return true;
     }
 
-    if (!layout.icon.image.value.empty() && !sprite.isLoaded()) {
+    if (!layout.icon.image.value.empty() && !spriteStore.isLoaded()) {
         return true;
     }
 

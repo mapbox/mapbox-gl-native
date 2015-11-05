@@ -21,7 +21,6 @@ TileWorker::TileWorker(TileID id_,
       sourceID(sourceID_),
       style(style_),
       state(state_) {
-    assert(style.sprite);
 }
 
 TileWorker::~TileWorker() {
@@ -64,7 +63,7 @@ TileParseResult TileWorker::parsePendingLayers() {
 
         if (layer.type == StyleLayerType::Symbol) {
             auto symbolBucket = dynamic_cast<SymbolBucket*>(bucket.get());
-            if (!symbolBucket->needsDependencies(*style.glyphStore, *style.sprite)) {
+            if (!symbolBucket->needsDependencies(*style.glyphStore, *style.spriteStore)) {
                 symbolBucket->addFeatures(reinterpret_cast<uintptr_t>(this), *style.spriteAtlas,
                                           *style.glyphAtlas, *style.glyphStore, *collisionTile);
                 insertBucket(layer.bucketName(), std::move(bucket));
@@ -130,7 +129,7 @@ void TileWorker::parseLayer(const StyleLayer& layer, const GeometryTile& geometr
                                      reinterpret_cast<uintptr_t>(this),
                                      partialParse,
                                      *style.spriteAtlas,
-                                     *style.sprite,
+                                     *style.spriteStore,
                                      *style.glyphAtlas,
                                      *style.glyphStore,
                                      *collisionTile);

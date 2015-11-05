@@ -168,7 +168,7 @@ std::unique_ptr<Bucket> SymbolLayer::createBucket(StyleBucketParameters& paramet
 
     bucket->parseFeatures(parameters.layer, filter);
 
-    if (bucket->needsDependencies(parameters.glyphStore, parameters.sprite)) {
+    if (bucket->needsDependencies(parameters.glyphStore, parameters.spriteStore)) {
         parameters.partialParse = true;
     }
 

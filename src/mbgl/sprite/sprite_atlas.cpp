@@ -10,12 +10,9 @@
 #include <mbgl/util/scaling.hpp>
 #include <mbgl/util/thread_context.hpp>
 
-#include <mbgl/sprite/sprite.hpp>
-
 #include <cassert>
 #include <cmath>
 #include <algorithm>
-
 
 using namespace mbgl;
 

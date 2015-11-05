@@ -28,7 +28,7 @@ class CollisionBoxShader;
 class DotShader;
 class CollisionTile;
 class SpriteAtlas;
-class Sprite;
+class SpriteStore;
 class GlyphAtlas;
 class GlyphStore;
 
@@ -88,8 +88,7 @@ public:
 
     void parseFeatures(const GeometryTileLayer&,
                        const FilterExpression&);
-    bool needsDependencies(GlyphStore& glyphStore,
-                           Sprite& sprite);
+    bool needsDependencies(GlyphStore&, SpriteStore&);
     void placeFeatures(CollisionTile&) override;
 
 private:

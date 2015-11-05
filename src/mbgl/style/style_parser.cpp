@@ -24,11 +24,17 @@ void StyleParser::parse(const JSVal& document) {
     }
 
     if (document.HasMember("sprite")) {
-        parseSprite(document["sprite"]);
+        const JSVal& sprite = document["sprite"];
+        if (sprite.IsString()) {
+            spriteURL = { sprite.GetString(), sprite.GetStringLength() };
+        }
     }
 
     if (document.HasMember("glyphs")) {
-        parseGlyphURL(document["glyphs"]);
+        const JSVal& glyphs = document["glyphs"];
+        if (glyphs.IsString()) {
+            glyphURL = { glyphs.GetString(), glyphs.GetStringLength() };
+        }
     }
 }
 
@@ -264,18 +270,6 @@ void StyleParser::parseLayer(const std::string& id, const JSVal& value, util::pt
     }
 
     layer->parsePaints(value);
-}
-
-void StyleParser::parseSprite(const JSVal& value) {
-    if (value.IsString()) {
-        sprite = { value.GetString(), value.GetStringLength() };
-    }
-}
-
-void StyleParser::parseGlyphURL(const JSVal& value) {
-    if (value.IsString()) {
-        glyph_url = { value.GetString(), value.GetStringLength() };
-    }
 }
 
 void StyleParser::parseVisibility(StyleLayer& layer, const JSVal& value) {

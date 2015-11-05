@@ -5,10 +5,9 @@
 #include <mbgl/style/zoom_history.hpp>
 
 #include <mbgl/map/source.hpp>
-#include <mbgl/sprite/sprite.hpp>
 #include <mbgl/text/glyph_store.hpp>
+#include <mbgl/sprite/sprite_store.hpp>
 
-#include <mbgl/util/ptr.hpp>
 #include <mbgl/util/noncopyable.hpp>
 #include <mbgl/util/chrono.hpp>
 #include <mbgl/util/worker.hpp>
@@ -27,8 +26,8 @@ class LineAtlas;
 class StyleLayer;
 
 class Style : public GlyphStore::Observer,
+              public SpriteStore::Observer,
               public Source::Observer,
-              public Sprite::Observer,
               public util::noncopyable {
 public:
     Style(MapData&);
@@ -74,7 +73,6 @@ public:
     MapData& data;
     std::unique_ptr<GlyphStore> glyphStore;
     std::unique_ptr<GlyphAtlas> glyphAtlas;
-    util::ptr<Sprite> sprite;
     std::unique_ptr<SpriteStore> spriteStore;
     std::unique_ptr<SpriteAtlas> spriteAtlas;
     std::unique_ptr<LineAtlas> lineAtlas;
@@ -89,15 +87,15 @@ private:
     void onGlyphRangeLoaded() override;
     void onGlyphRangeLoadingFailed(std::exception_ptr error) override;
 
+    // SpriteStore::Observer implementation.
+    void onSpriteLoaded() override;
+    void onSpriteLoadingFailed(std::exception_ptr error) override;
+
     // Source::Observer implementation.
     void onSourceLoaded() override;
     void onSourceLoadingFailed(std::exception_ptr error) override;
     void onTileLoaded(bool isNewTile) override;
     void onTileLoadingFailed(std::exception_ptr error) override;
-
-    // Sprite::Observer implementation.
-    void onSpriteLoaded(const Sprites& sprites) override;
-    void onSpriteLoadingFailed(std::exception_ptr error) override;
 
     void emitTileDataChanged();
     void emitResourceLoadingFailed(std::exception_ptr error);

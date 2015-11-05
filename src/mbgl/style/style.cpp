@@ -2,7 +2,6 @@
 #include <mbgl/map/map_data.hpp>
 #include <mbgl/map/source.hpp>
 #include <mbgl/map/transform_state.hpp>
-#include <mbgl/sprite/sprite.hpp>
 #include <mbgl/sprite/sprite_store.hpp>
 #include <mbgl/sprite/sprite_atlas.hpp>
 #include <mbgl/style/style_layer.hpp>
@@ -28,12 +27,13 @@ Style::Style(MapData& data_)
     : data(data_),
       glyphStore(std::make_unique<GlyphStore>()),
       glyphAtlas(std::make_unique<GlyphAtlas>(1024, 1024)),
-      spriteStore(std::make_unique<SpriteStore>()),
+      spriteStore(std::make_unique<SpriteStore>(data.pixelRatio)),
       spriteAtlas(std::make_unique<SpriteAtlas>(512, 512, data.pixelRatio, *spriteStore)),
       lineAtlas(std::make_unique<LineAtlas>(512, 512)),
       mtx(std::make_unique<uv::rwlock>()),
       workers(4) {
     glyphStore->setObserver(this);
+    spriteStore->setObserver(this);
 }
 
 void Style::setJSON(const std::string& json, const std::string&) {
@@ -55,10 +55,8 @@ void Style::setJSON(const std::string& json, const std::string&) {
         addLayer(std::move(layer));
     }
 
-    sprite = std::make_unique<Sprite>(parser.getSprite(), data.pixelRatio);
-    sprite->setObserver(this);
-
     glyphStore->setURL(parser.getGlyphURL());
+    spriteStore->setURL(parser.getSpriteURL());
 }
 
 Style::~Style() {
@@ -67,10 +65,7 @@ Style::~Style() {
     }
 
     glyphStore->setObserver(nullptr);
-
-    if (sprite) {
-        sprite->setObserver(nullptr);
-    }
+    spriteStore->setObserver(nullptr);
 }
 
 void Style::addSource(std::unique_ptr<Source> source) {
@@ -186,7 +181,7 @@ bool Style::isLoaded() const {
         }
     }
 
-    if (sprite && !sprite->isLoaded()) {
+    if (!spriteStore->isLoaded()) {
         return false;
     }
 
@@ -230,10 +225,7 @@ void Style::onTileLoadingFailed(std::exception_ptr error) {
     emitResourceLoadingFailed(error);
 }
 
-void Style::onSpriteLoaded(const Sprites& sprites) {
-    // Add all sprite images to the SpriteStore object
-    spriteStore->setSprites(sprites);
-
+void Style::onSpriteLoaded() {
     shouldReparsePartialTiles = true;
     emitTileDataChanged();
 }
@@ -272,11 +264,7 @@ void Style::dumpDebugLogs() const {
         source->dumpDebugLogs();
     }
 
-    if (!sprite) {
-        Log::Info(Event::General, "no sprite loaded");
-    } else {
-        sprite->dumpDebugLogs();
-    }
+    spriteStore->dumpDebugLogs();
 }
 
 }

@@ -86,7 +86,6 @@
         'style/pending_resources.cpp',
         'style/resource_loading.cpp',
 
-        'sprite/sprite.cpp',
         'sprite/sprite_atlas.cpp',
         'sprite/sprite_image.cpp',
         'sprite/sprite_parser.cpp',

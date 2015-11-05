@@ -12,7 +12,7 @@ class TileID;
 class GeometryTileLayer;
 class GeometryTileFeature;
 class SpriteAtlas;
-class Sprite;
+class SpriteStore;
 class GlyphAtlas;
 class GlyphStore;
 class CollisionTile;
@@ -25,7 +25,7 @@ public:
                           uintptr_t tileUID_,
                           bool& partialParse_,
                           SpriteAtlas& spriteAtlas_,
-                          Sprite& sprite_,
+                          SpriteStore& spriteStore_,
                           GlyphAtlas& glyphAtlas_,
                           GlyphStore& glyphStore_,
                           CollisionTile& collisionTile_)
@@ -35,7 +35,7 @@ public:
           tileUID(tileUID_),
           partialParse(partialParse_),
           spriteAtlas(spriteAtlas_),
-          sprite(sprite_),
+          spriteStore(spriteStore_),
           glyphAtlas(glyphAtlas_),
           glyphStore(glyphStore_),
           collisionTile(collisionTile_) {}
@@ -52,7 +52,7 @@ public:
     uintptr_t tileUID;
     bool& partialParse;
     SpriteAtlas& spriteAtlas;
-    Sprite& sprite;
+    SpriteStore& spriteStore;
     GlyphAtlas& glyphAtlas;
     GlyphStore& glyphStore;
     CollisionTile& collisionTile;
