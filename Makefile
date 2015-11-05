@@ -86,7 +86,7 @@ node: ; $(RUN) HTTP=none ASSET=none CACHE=none Makefile/node
 
 
 .PHONY: Xcode/node
-Xcode/node: ; $(RUN) HTTP=none ASSET=none CACHE=none node/xproj
+Xcode/node: ; $(RUN) HTTP=none ASSET=none CACHE=none Xcode/node
 
 .PHONY: xnode
 xnode: Xcode/node ; @open ./build/binding.xcodeproj
