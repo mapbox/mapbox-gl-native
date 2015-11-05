@@ -14,27 +14,26 @@ template <typename T>
 class Value {
 public:
     inline void operator=(const typename T::Type& value) {
-        if (current != value) {
+        if (dirty || current != value) {
+            dirty = false;
             current = value;
             T::Set(current);
         }
     }
 
     inline void reset() {
+        dirty = true;
         current = T::Default;
         T::Set(current);
     }
 
-    inline void save() {
-        current = T::Get();
-    }
-
-    inline void restore() {
-        T::Set(current);
+    inline void setDirty() {
+        dirty = true;
     }
 
 private:
     typename T::Type current = T::Default;
+    bool dirty = false;
 };
 
 struct ClearDepth {
@@ -305,44 +304,24 @@ public:
         viewport.reset();
     }
 
-    void restore() {
-        stencilFunc.restore();
-        stencilMask.restore();
-        stencilTest.restore();
-        stencilOp.restore();
-        depthRange.restore();
-        depthMask.restore();
-        depthTest.restore();
-        depthFunc.restore();
-        blend.restore();
-        blendFunc.restore();
-        colorMask.restore();
-        clearDepth.restore();
-        clearColor.restore();
-        clearStencil.restore();
-        program.restore();
-        lineWidth.restore();
-        viewport.restore();
-    }
-
-    void save() {
-        stencilFunc.save();
-        stencilMask.save();
-        stencilTest.save();
-        stencilOp.save();
-        depthRange.save();
-        depthMask.save();
-        depthTest.save();
-        depthFunc.save();
-        blend.save();
-        blendFunc.save();
-        colorMask.save();
-        clearDepth.save();
-        clearColor.save();
-        clearStencil.save();
-        program.save();
-        lineWidth.save();
-        viewport.save();
+    void setDirty() {
+        stencilFunc.setDirty();
+        stencilMask.setDirty();
+        stencilTest.setDirty();
+        stencilOp.setDirty();
+        depthRange.setDirty();
+        depthMask.setDirty();
+        depthTest.setDirty();
+        depthFunc.setDirty();
+        blend.setDirty();
+        blendFunc.setDirty();
+        colorMask.setDirty();
+        clearDepth.setDirty();
+        clearColor.setDirty();
+        clearStencil.setDirty();
+        program.setDirty();
+        lineWidth.setDirty();
+        viewport.setDirty();
     }
 
     Value<StencilFunc> stencilFunc;

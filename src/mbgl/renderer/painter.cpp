@@ -128,10 +128,6 @@ void Painter::render(const Style& style, TransformState state_, const FrameData&
     state = state_;
     frame = frame_;
 
-    if (data.contextMode == GLContextMode::Shared) {
-        config.restore();
-    }
-
     glyphAtlas = style.glyphAtlas.get();
     spriteAtlas = style.spriteAtlas.get();
     lineAtlas = style.lineAtlas.get();
@@ -227,7 +223,7 @@ void Painter::render(const Style& style, TransformState state_, const FrameData&
     }
 
     if (data.contextMode == GLContextMode::Shared) {
-        config.save();
+        config.setDirty();
     }
 }
 
