@@ -1650,6 +1650,7 @@ std::chrono::steady_clock::duration secondsAsDuration(float duration)
 
 - (void)_setCenterCoordinate:(CLLocationCoordinate2D)centerCoordinate zoomLevel:(double)zoomLevel direction:(CLLocationDirection)direction animated:(BOOL)animated
 {
+    NSTimeInterval duration = animated ? MGLAnimationDuration : 0;
     mbgl::CameraOptions options;
     options.center = MGLLatLngFromLocationCoordinate2D(centerCoordinate);
     options.zoom = fmaxf(zoomLevel, self.currentMinimumZoom);
@@ -1659,14 +1660,25 @@ std::chrono::steady_clock::duration secondsAsDuration(float duration)
     }
     if (animated)
     {
-        options.duration = secondsAsDuration(MGLAnimationDuration);
+        options.duration = secondsAsDuration(duration);
         options.easing = MGLUnitBezierForMediaTimingFunction(nil);
     }
     _mbglMap->easeTo(options);
 
     [self unrotateIfNeededAnimated:animated];
 
-    [self notifyMapChange:(animated ? mbgl::MapChangeRegionDidChangeAnimated : mbgl::MapChangeRegionDidChange)];
+    if (animated)
+    {
+        __weak MGLMapView *weakSelf = self;
+        [self animateWithDelay:duration animations:^
+         {
+             [weakSelf notifyMapChange:mbgl::MapChangeRegionDidChangeAnimated];
+         }];
+    }
+    else
+    {
+        [self notifyMapChange:mbgl::MapChangeRegionDidChange];
+    }
 }
 
 + (NS_SET_OF(NSString *) *)keyPathsForValuesAffectingZoomLevel
@@ -1780,7 +1792,18 @@ mbgl::LatLngBounds MGLLatLngBoundsFromCoordinateBounds(MGLCoordinateBounds coord
 
     [self unrotateIfNeededAnimated:duration > 0];
 
-    [self notifyMapChange:(duration > 0 ? mbgl::MapChangeRegionDidChangeAnimated : mbgl::MapChangeRegionDidChange)];
+    if (duration > 0)
+    {
+        __weak MGLMapView *weakSelf = self;
+        [self animateWithDelay:duration animations:^
+         {
+             [weakSelf notifyMapChange:mbgl::MapChangeRegionDidChangeAnimated];
+         }];
+    }
+    else
+    {
+        [self notifyMapChange:mbgl::MapChangeRegionDidChange];
+    }
 }
 
 + (NS_SET_OF(NSString *) *)keyPathsForValuesAffectingDirection
@@ -1805,8 +1828,19 @@ mbgl::LatLngBounds MGLLatLngBoundsFromCoordinateBounds(MGLCoordinateBounds coord
     CGFloat duration = (animated ? MGLAnimationDuration : 0);
 
     _mbglMap->setBearing(direction, secondsAsDuration(duration));
-
-    [self notifyMapChange:(animated ? mbgl::MapChangeRegionDidChangeAnimated : mbgl::MapChangeRegionDidChange)];
+    
+    if (animated)
+    {
+        __weak MGLMapView *weakSelf = self;
+        [self animateWithDelay:duration animations:^
+         {
+             [weakSelf notifyMapChange:mbgl::MapChangeRegionDidChangeAnimated];
+         }];
+    }
+    else
+    {
+        [self notifyMapChange:mbgl::MapChangeRegionDidChange];
+    }
 }
 
 - (void)setDirection:(CLLocationDirection)direction
@@ -1947,6 +1981,19 @@ mbgl::LatLngBounds MGLLatLngBoundsFromCoordinateBounds(MGLCoordinateBounds coord
         options.easing = MGLUnitBezierForMediaTimingFunction(function);
     }
     _mbglMap->easeTo(options);
+    
+    if (duration > 0)
+    {
+        __weak MGLMapView *weakSelf = self;
+        [self animateWithDelay:duration animations:^
+         {
+             [weakSelf notifyMapChange:mbgl::MapChangeRegionDidChangeAnimated];
+         }];
+    }
+    else
+    {
+        [self notifyMapChange:mbgl::MapChangeRegionDidChange];
+    }
 }
 
 - (CLLocationCoordinate2D)convertPoint:(CGPoint)point toCoordinateFromView:(nullable UIView *)view
