@@ -37,7 +37,7 @@ if [[ ${TRAVIS_TAG} == node-v${PACKAGE_JSON_VERSION} ]] || test "${COMMIT_MESSAG
     fi
 fi
 
-if [ ! -z "${AWS_ACCESS_KEY_ID}" ] && [ ! -z "${AWS_SECRET_ACCESS_KEY}" ] ; then
+if [[ ${TRAVIS_OS_NAME} == "linux" ]] && [ ! -z "${AWS_ACCESS_KEY_ID}" ] && [ ! -z "${AWS_SECRET_ACCESS_KEY}" ] ; then
     # Install and add awscli to PATH for uploading the results
     pip install --user awscli
     export PATH="`python -m site --user-base`/bin:${PATH}"
