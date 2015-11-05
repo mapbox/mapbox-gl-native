@@ -1563,6 +1563,9 @@ public final class MapView extends FrameLayout {
     @UiThread
     public void setAccessToken(@NonNull String accessToken) {
         // validateAccessToken does the null check
+        if (!TextUtils.isEmpty(accessToken)) {
+            accessToken = accessToken.trim();
+        }
         validateAccessToken(accessToken);
         mNativeMapView.setAccessToken(accessToken);
     }
