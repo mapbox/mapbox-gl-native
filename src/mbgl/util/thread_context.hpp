@@ -6,6 +6,7 @@
 #include <cstdint>
 #include <string>
 #include <thread>
+#include <vector>
 
 namespace mbgl {
 
@@ -51,17 +52,17 @@ public:
         }
     }
 
-    static FileSource* getFileSource() {
+    static std::vector<FileSource*> getFileSources() {
         if (current.get() != nullptr) {
-            return current.get()->fileSource;
+            return current.get()->fileSources;
         } else {
-            return nullptr;
+            return std::vector<FileSource*>();
         }
     }
 
-    static void setFileSource(FileSource* fileSource) {
+    static void addFileSource(FileSource* fileSource) {
         if (current.get() != nullptr) {
-            current.get()->fileSource = fileSource;
+            current.get()->fileSources.push_back(fileSource);
         } else {
             throw new std::runtime_error("Current thread has no current ThreadContext.");
         }
@@ -88,7 +89,7 @@ private:
     ThreadType type;
     ThreadPriority priority;
 
-    FileSource* fileSource = nullptr;
+    std::vector<FileSource*> fileSources;
     GLObjectStore* glObjectStore = nullptr;
 
     static uv::tls<ThreadContext> current;

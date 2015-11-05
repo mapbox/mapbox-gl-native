@@ -6,7 +6,7 @@ namespace mbgl {
 
 void RequestHolder::Deleter::operator()(Request* req) const {
     // This function is called by the unique_ptr's Deleter.
-    util::ThreadContext::getFileSource()->cancel(req);
+    util::ThreadContext::getFileSources().front()->cancel(req);
 }
 
 }

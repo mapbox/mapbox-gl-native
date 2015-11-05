@@ -35,7 +35,7 @@ MapContext::MapContext(View& view_, FileSource& fileSource, MapData& data_)
       texturePool(std::make_unique<TexturePool>()) {
     assert(util::ThreadContext::currentlyOn(util::ThreadType::Map));
 
-    util::ThreadContext::setFileSource(&fileSource);
+    util::ThreadContext::addFileSource(&fileSource);
     util::ThreadContext::setGLObjectStore(&glObjectStore);
 
     asyncUpdate->unref();
@@ -104,7 +104,7 @@ void MapContext::setStyleURL(const std::string& url) {
         base = styleURL.substr(0, pos + 1);
     }
 
-    FileSource* fs = util::ThreadContext::getFileSource();
+    FileSource* fs = util::ThreadContext::getFileSources().front();
     styleRequest = fs->request({ Resource::Kind::Style, styleURL }, util::RunLoop::getLoop(), [this, base](const Response &res) {
         if (res.stale) {
             // Only handle fresh responses.
