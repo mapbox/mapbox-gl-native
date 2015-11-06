@@ -36,6 +36,8 @@ bool StyleLayer::hasRenderPass(RenderPass pass) const {
 }
 
 void StyleLayer::copy(const StyleLayer& src) {
+    id = src.id;
+    ref = src.ref;
     type = src.type;
     source = src.source;
     sourceLayer = src.sourceLayer;

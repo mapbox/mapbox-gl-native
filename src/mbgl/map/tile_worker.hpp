@@ -45,18 +45,18 @@ public:
                const std::atomic<TileData::State>&);
     ~TileWorker();
 
-    TileParseResult parseAllLayers(std::vector<util::ptr<StyleLayer>>,
+    TileParseResult parseAllLayers(std::vector<std::unique_ptr<StyleLayer>>,
                                    const GeometryTile&,
                                    PlacementConfig);
 
     TileParseResult parsePendingLayers();
 
-    void redoPlacement(std::vector<util::ptr<StyleLayer>>,
+    void redoPlacement(std::vector<std::unique_ptr<StyleLayer>>,
                        const std::unordered_map<std::string, std::unique_ptr<Bucket>>*,
                        PlacementConfig);
 
 private:
-    void parseLayer(const StyleLayer&, const GeometryTile&);
+    void parseLayer(std::unique_ptr<StyleLayer>, const GeometryTile&);
     void insertBucket(const std::string& name, std::unique_ptr<Bucket>);
 
     const TileID id;
@@ -73,7 +73,7 @@ private:
 
     // Contains buckets that we couldn't parse so far due to missing resources.
     // They will be attempted on subsequent parses.
-    std::list<std::pair<const StyleLayer&, std::unique_ptr<Bucket>>> pending;
+    std::list<std::pair<std::unique_ptr<StyleLayer>, std::unique_ptr<Bucket>>> pending;
 
     // Temporary holder
     TileParseResultBuckets result;

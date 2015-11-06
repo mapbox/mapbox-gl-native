@@ -48,16 +48,16 @@ void Style::setJSON(const std::string& json, const std::string&) {
     StyleParser parser;
     parser.parse(doc);
 
-    for (auto& source : parser.getSources()) {
+    for (auto& source : parser.sources) {
         addSource(std::move(source));
     }
 
-    for (auto& layer : parser.getLayers()) {
+    for (auto& layer : parser.layers) {
         addLayer(std::move(layer));
     }
 
-    glyphStore->setURL(parser.getGlyphURL());
-    spriteStore->setURL(parser.getSpriteURL());
+    glyphStore->setURL(parser.glyphURL);
+    spriteStore->setURL(parser.spriteURL);
 
     loaded = true;
 }
@@ -77,7 +77,16 @@ void Style::addSource(std::unique_ptr<Source> source) {
     sources.emplace_back(std::move(source));
 }
 
-std::vector<util::ptr<StyleLayer>>::const_iterator Style::findLayer(const std::string& id) const {
+std::vector<std::unique_ptr<StyleLayer>> Style::getLayers() const {
+    std::vector<std::unique_ptr<StyleLayer>> result;
+    result.reserve(layers.size());
+    for (const auto& layer : layers) {
+        result.push_back(layer->clone());
+    }
+    return result;
+}
+
+std::vector<std::unique_ptr<StyleLayer>>::const_iterator Style::findLayer(const std::string& id) const {
     return std::find_if(layers.begin(), layers.end(), [&](const auto& layer) {
         return layer->id == id;
     });
@@ -88,7 +97,7 @@ StyleLayer* Style::getLayer(const std::string& id) const {
     return it != layers.end() ? it->get() : nullptr;
 }
 
-void Style::addLayer(util::ptr<StyleLayer> layer) {
+void Style::addLayer(std::unique_ptr<StyleLayer> layer) {
     if (SymbolLayer* symbolLayer = dynamic_cast<SymbolLayer*>(layer.get())) {
         if (!symbolLayer->spriteAtlas) {
             symbolLayer->spriteAtlas = spriteAtlas.get();
@@ -98,7 +107,7 @@ void Style::addLayer(util::ptr<StyleLayer> layer) {
     layers.emplace_back(std::move(layer));
 }
 
-void Style::addLayer(util::ptr<StyleLayer> layer, const std::string& before) {
+void Style::addLayer(std::unique_ptr<StyleLayer> layer, const std::string& before) {
     layers.emplace(findLayer(before), std::move(layer));
 }
 

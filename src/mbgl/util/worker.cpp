@@ -4,6 +4,7 @@
 #include <mbgl/platform/platform.hpp>
 #include <mbgl/renderer/raster_bucket.hpp>
 #include <mbgl/map/geometry_tile.hpp>
+#include <mbgl/style/style_layer.hpp>
 
 #include <cassert>
 #include <future>
@@ -33,12 +34,12 @@ public:
     }
 
     void parseGeometryTile(TileWorker* worker,
-                           std::vector<util::ptr<StyleLayer>> layers,
+                           std::vector<std::unique_ptr<StyleLayer>> layers,
                            std::unique_ptr<GeometryTile> tile,
                            PlacementConfig config,
                            std::function<void(TileParseResult)> callback) {
         try {
-            callback(worker->parseAllLayers(layers, *tile, config));
+            callback(worker->parseAllLayers(std::move(layers), *tile, config));
         } catch (const std::exception& ex) {
             callback(TileParseResult(ex.what()));
         }
@@ -54,11 +55,11 @@ public:
     }
 
     void redoPlacement(TileWorker* worker,
-                       std::vector<util::ptr<StyleLayer>> layers,
+                       std::vector<std::unique_ptr<StyleLayer>> layers,
                        const std::unordered_map<std::string, std::unique_ptr<Bucket>>* buckets,
                        PlacementConfig config,
                        std::function<void()> callback) {
-        worker->redoPlacement(layers, buckets, config);
+        worker->redoPlacement(std::move(layers), buckets, config);
         callback();
     }
 };
@@ -83,7 +84,7 @@ Worker::parseRasterTile(std::unique_ptr<RasterBucket> bucket,
 
 std::unique_ptr<WorkRequest>
 Worker::parseGeometryTile(TileWorker& worker,
-                          std::vector<util::ptr<StyleLayer>> layers,
+                          std::vector<std::unique_ptr<StyleLayer>> layers,
                           std::unique_ptr<GeometryTile> tile,
                           PlacementConfig config,
                           std::function<void(TileParseResult)> callback) {
@@ -102,13 +103,13 @@ Worker::parsePendingGeometryTileLayers(TileWorker& worker,
 
 std::unique_ptr<WorkRequest>
 Worker::redoPlacement(TileWorker& worker,
-                      std::vector<util::ptr<StyleLayer>> layers,
+                      std::vector<std::unique_ptr<StyleLayer>> layers,
                       const std::unordered_map<std::string, std::unique_ptr<Bucket>>& buckets,
                       PlacementConfig config,
                       std::function<void()> callback) {
     current = (current + 1) % threads.size();
     return threads[current]->invokeWithCallback(&Worker::Impl::redoPlacement, callback, &worker,
-                                                layers, &buckets, config);
+                                                std::move(layers), &buckets, config);
 }
 
 } // end namespace mbgl

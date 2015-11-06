@@ -62,7 +62,7 @@ VectorTileData::VectorTileData(const TileID& id_,
         // when tile data changed. Replacing the workdRequest will cancel a pending work
         // request in case there is one.
         workRequest.reset();
-        workRequest = worker.parseGeometryTile(tileWorker, style.layers, std::move(tile), targetConfig, [callback, this, config = targetConfig] (TileParseResult result) {
+        workRequest = worker.parseGeometryTile(tileWorker, style.getLayers(), std::move(tile), targetConfig, [callback, this, config = targetConfig] (TileParseResult result) {
             workRequest.reset();
             if (state == State::obsolete) {
                 return;
@@ -166,7 +166,7 @@ void VectorTileData::redoPlacement(const PlacementConfig newConfig) {
 
 void VectorTileData::redoPlacement() {
     workRequest.reset();
-    workRequest = worker.redoPlacement(tileWorker, style.layers, buckets, targetConfig, [this, config = targetConfig] {
+    workRequest = worker.redoPlacement(tileWorker, style.getLayers(), buckets, targetConfig, [this, config = targetConfig] {
         workRequest.reset();
 
         // Persist the configuration we just placed so that we can later check whether we need to

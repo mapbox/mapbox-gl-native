@@ -65,11 +65,12 @@ public:
     }
 
     Source* getSource(const std::string& id) const;
-    StyleLayer* getLayer(const std::string& id) const;
-
     void addSource(std::unique_ptr<Source>);
-    void addLayer(util::ptr<StyleLayer>);
-    void addLayer(util::ptr<StyleLayer>, const std::string& beforeLayerID);
+
+    std::vector<std::unique_ptr<StyleLayer>> getLayers() const;
+    StyleLayer* getLayer(const std::string& id) const;
+    void addLayer(std::unique_ptr<StyleLayer>);
+    void addLayer(std::unique_ptr<StyleLayer>, const std::string& beforeLayerID);
     void removeLayer(const std::string& layerID);
 
     void dumpDebugLogs() const;
@@ -82,10 +83,10 @@ public:
     std::unique_ptr<LineAtlas> lineAtlas;
 
     std::vector<std::unique_ptr<Source>> sources;
-    std::vector<util::ptr<StyleLayer>> layers;
+    std::vector<std::unique_ptr<StyleLayer>> layers;
 
 private:
-    std::vector<util::ptr<StyleLayer>>::const_iterator findLayer(const std::string& layerID) const;
+    std::vector<std::unique_ptr<StyleLayer>>::const_iterator findLayer(const std::string& layerID) const;
 
     // GlyphStore::Observer implementation.
     void onGlyphRangeLoaded() override;
