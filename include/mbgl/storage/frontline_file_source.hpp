@@ -11,7 +11,7 @@ template <typename T> class Thread;
 
 class FrontlineFileSource : public FileSource {
 public:
-    FrontlineFileSource();
+    FrontlineFileSource(const std::string& path);
     ~FrontlineFileSource() override;
 
     bool handlesResource(const Resource&) override;

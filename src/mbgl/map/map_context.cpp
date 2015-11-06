@@ -36,7 +36,7 @@ MapContext::MapContext(View& view_, FileSource& fileSource, MapData& data_)
       texturePool(std::make_unique<TexturePool>()) {
     assert(util::ThreadContext::currentlyOn(util::ThreadType::Map));
 
-    frontlineFileSource = new FrontlineFileSource();
+    frontlineFileSource = new FrontlineFileSource("/tmp/test.mbtiles");
     util::ThreadContext::addFileSource(frontlineFileSource);
     util::ThreadContext::addFileSource(&fileSource);
     util::ThreadContext::setGLObjectStore(&glObjectStore);
