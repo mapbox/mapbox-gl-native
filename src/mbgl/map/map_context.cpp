@@ -277,9 +277,7 @@ void MapContext::setSourceTileCacheSize(size_t size) {
     if (size != sourceCacheSize) {
         sourceCacheSize = size;
         if (!style) return;
-        for (const auto &source : style->sources) {
-            source->setCacheSize(sourceCacheSize);
-        }
+        style->setSourceTileCacheSize(size);
         asyncInvalidate.send();
     }
 }
@@ -287,9 +285,7 @@ void MapContext::setSourceTileCacheSize(size_t size) {
 void MapContext::onLowMemory() {
     assert(util::ThreadContext::currentlyOn(util::ThreadType::Map));
     if (!style) return;
-    for (const auto &source : style->sources) {
-        source->onLowMemory();
-    }
+    style->onLowMemory();
     asyncInvalidate.send();
 }
 
@@ -300,7 +296,6 @@ void MapContext::setSprite(const std::string& name, std::shared_ptr<const Sprite
 
 void MapContext::onTileDataChanged() {
     assert(util::ThreadContext::currentlyOn(util::ThreadType::Map));
-
     updateFlags |= Update::Repaint;
     asyncUpdate.send();
 }

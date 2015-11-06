@@ -109,19 +109,6 @@ void Painter::changeMatrix() {
     matrix::multiply(nativeMatrix, projMatrix, nativeMatrix);
 }
 
-void Painter::clear() {
-    MBGL_DEBUG_GROUP("clear");
-    config.stencilFunc.reset();
-    config.stencilTest = GL_TRUE;
-    config.stencilMask = 0xFF;
-    config.depthTest = GL_FALSE;
-    config.depthMask = GL_TRUE;
-    config.clearColor = { background[0], background[1], background[2], background[3] };
-    config.clearStencil = 0;
-    config.clearDepth = 1;
-    MBGL_CHECK_ERROR(glClear(GL_COLOR_BUFFER_BIT | GL_STENCIL_BUFFER_BIT | GL_DEPTH_BUFFER_BIT));
-}
-
 void Painter::prepareTile(const Tile& tile) {
     const GLint ref = (GLint)tile.clip.reference.to_ulong();
     const GLuint mask = (GLuint)tile.clip.mask.to_ulong();
@@ -135,18 +122,13 @@ void Painter::render(const Style& style, const FrameData& frame_, SpriteAtlas& a
     spriteAtlas = style.spriteAtlas.get();
     lineAtlas = style.lineAtlas.get();
 
-    std::set<Source*> sources;
-    for (const auto& source : style.sources) {
-        if (source->enabled) {
-            sources.insert(source.get());
-        }
-    }
+    RenderData renderData = style.getRenderData();
+    const std::vector<RenderItem>& order = renderData.order;
+    const std::set<Source*>& sources = renderData.sources;
+    const Color& background = renderData.backgroundColor;
 
     resize();
     changeMatrix();
-
-    // Figure out what buckets we have to draw and what order we have to draw them in.
-    const auto order = determineRenderOrder(style);
 
     // - UPLOAD PASS -------------------------------------------------------------------------------
     // Uploads all required buffers and images before we do any actual rendering.
@@ -167,6 +149,21 @@ void Painter::render(const Style& style, const FrameData& frame_, SpriteAtlas& a
         }
     }
 
+    // - CLEAR -------------------------------------------------------------------------------------
+    // Renders the backdrop of the OpenGL view. This also paints in areas where we don't have any
+    // tiles whatsoever.
+    {
+        MBGL_DEBUG_GROUP("clear");
+        config.stencilFunc.reset();
+        config.stencilTest = GL_TRUE;
+        config.stencilMask = 0xFF;
+        config.depthTest = GL_FALSE;
+        config.depthMask = GL_TRUE;
+        config.clearColor = { background[0], background[1], background[2], background[3] };
+        config.clearStencil = 0;
+        config.clearDepth = 1;
+        MBGL_CHECK_ERROR(glClear(GL_COLOR_BUFFER_BIT | GL_STENCIL_BUFFER_BIT | GL_DEPTH_BUFFER_BIT));
+    }
 
     // - CLIPPING MASKS ----------------------------------------------------------------------------
     // Draws the clipping masks to the stencil buffer.
@@ -179,8 +176,6 @@ void Painter::render(const Style& style, const FrameData& frame_, SpriteAtlas& a
             generator.update(source->getLoadedTiles());
             source->updateMatrices(projMatrix, state);
         }
-
-        clear();
 
         drawClippingMasks(sources);
     }
@@ -273,81 +268,6 @@ void Painter::renderPass(RenderPass pass_,
     if (debug::renderTree) {
         Log::Info(Event::Render, "%*s%s", --indent * 4, "", "}");
     }
-}
-
-std::vector<RenderItem> Painter::determineRenderOrder(const Style& style) {
-    std::vector<RenderItem> order;
-
-    for (const auto& layerPtr : style.layers) {
-        const auto& layer = *layerPtr;
-        if (layer.visibility == VisibilityType::None) continue;
-        if (layer.type == StyleLayerType::Background) {
-            // This layer defines a background color/image.
-            auto& props = dynamic_cast<const BackgroundLayer&>(layer).paint;
-            if (props.pattern.value.from.empty()) {
-                // This is a solid background. We can use glClear().
-                background = props.color;
-                background[0] *= props.opacity;
-                background[1] *= props.opacity;
-                background[2] *= props.opacity;
-                background[3] *= props.opacity;
-            } else {
-                // This is a textured background. We need to render it with a quad.
-                background = {{ 0, 0, 0, 0 }};
-                order.emplace_back(layer);
-            }
-            continue;
-        }
-
-        Source* source = style.getSource(layer.source);
-        if (!source) {
-            Log::Warning(Event::Render, "can't find source for layer '%s'", layer.id.c_str());
-            continue;
-        }
-
-        // Skip this layer if it's outside the range of min/maxzoom.
-        // This may occur when there /is/ a bucket created for this layer, but the min/max-zoom
-        // is set to a fractional value, or value that is larger than the source maxzoom.
-        const double zoom = state.getZoom();
-        if (layer.minZoom > zoom ||
-            layer.maxZoom <= zoom) {
-            continue;
-        }
-
-        const auto& tiles = source->getTiles();
-        for (auto tile : tiles) {
-            assert(tile);
-            if (!tile->data && !tile->data->isReady()) {
-                continue;
-            }
-
-            // We're not clipping symbol layers, so when we have both parents and children of symbol
-            // layers, we drop all children in favor of their parent to avoid duplicate labels.
-            // See https://github.com/mapbox/mapbox-gl-native/issues/2482
-            if (layer.type == StyleLayerType::Symbol) {
-                bool skip = false;
-                // Look back through the buckets we decided to render to find out whether there is
-                // already a bucket from this layer that is a parent of this tile. Tiles are ordered
-                // by zoom level when we obtain them from getTiles().
-                for (auto it = order.rbegin(); it != order.rend() && (&it->layer == &layer); ++it) {
-                    if (tile->id.isChildOf(it->tile->id)) {
-                        skip = true;
-                        break;
-                    }
-                }
-                if (skip) {
-                    continue;
-                }
-            }
-
-            auto bucket = tile->data->getBucket(layer);
-            if (bucket) {
-                order.emplace_back(layer, tile, bucket);
-            }
-        }
-    }
-
-    return order;
 }
 
 void Painter::renderBackground(const BackgroundLayer& layer) {

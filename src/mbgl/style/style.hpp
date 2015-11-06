@@ -29,6 +29,27 @@ class StyleLayer;
 class TransformState;
 class TexturePool;
 
+class Tile;
+class Bucket;
+
+struct RenderItem {
+    inline RenderItem(const StyleLayer& layer_,
+                      const Tile* tile_ = nullptr,
+                      Bucket* bucket_ = nullptr)
+        : tile(tile_), bucket(bucket_), layer(layer_) {
+    }
+
+    const Tile* const tile;
+    Bucket* const bucket;
+    const StyleLayer& layer;
+};
+
+struct RenderData {
+    Color backgroundColor = {{ 0, 0, 0, 0 }};
+    std::set<Source*> sources;
+    std::vector<RenderItem> order;
+};
+
 class Style : public GlyphStore::Observer,
               public SpriteStore::Observer,
               public Source::Observer,
@@ -73,6 +94,11 @@ public:
     void addLayer(std::unique_ptr<StyleLayer>, const std::string& beforeLayerID);
     void removeLayer(const std::string& layerID);
 
+    RenderData getRenderData() const;
+
+    void setSourceTileCacheSize(size_t);
+    void onLowMemory();
+
     void dumpDebugLogs() const;
 
     MapData& data;
@@ -82,10 +108,10 @@ public:
     std::unique_ptr<SpriteAtlas> spriteAtlas;
     std::unique_ptr<LineAtlas> lineAtlas;
 
+private:
     std::vector<std::unique_ptr<Source>> sources;
     std::vector<std::unique_ptr<StyleLayer>> layers;
 
-private:
     std::vector<std::unique_ptr<StyleLayer>>::const_iterator findLayer(const std::string& layerID) const;
 
     // GlyphStore::Observer implementation.

@@ -1,6 +1,7 @@
 #include <mbgl/style/style.hpp>
 #include <mbgl/map/map_data.hpp>
 #include <mbgl/map/source.hpp>
+#include <mbgl/map/tile.hpp>
 #include <mbgl/map/transform_state.hpp>
 #include <mbgl/layer/symbol_layer.hpp>
 #include <mbgl/sprite/sprite_store.hpp>
@@ -16,6 +17,8 @@
 #include <mbgl/geometry/line_atlas.hpp>
 #include <mbgl/util/constants.hpp>
 #include <mbgl/platform/log.hpp>
+#include <mbgl/layer/background_layer.hpp>
+
 #include <csscolorparser/csscolorparser.hpp>
 
 #include <rapidjson/document.h>
@@ -218,6 +221,85 @@ bool Style::isLoaded() const {
     }
 
     return true;
+}
+
+RenderData Style::getRenderData() const {
+    RenderData result;
+
+    for (const auto& source : sources) {
+        if (source->enabled) {
+            result.sources.insert(source.get());
+        }
+    }
+
+    for (const auto& layer : layers) {
+        if (layer->visibility == VisibilityType::None)
+            continue;
+
+        if (const BackgroundLayer* background = dynamic_cast<const BackgroundLayer*>(layer.get())) {
+            if (background->paint.pattern.value.from.empty()) {
+                // This is a solid background. We can use glClear().
+                result.backgroundColor = background->paint.color;
+                result.backgroundColor[0] *= background->paint.opacity;
+                result.backgroundColor[1] *= background->paint.opacity;
+                result.backgroundColor[2] *= background->paint.opacity;
+                result.backgroundColor[3] *= background->paint.opacity;
+            } else {
+                // This is a textured background. We need to render it with a quad.
+                result.order.emplace_back(*layer);
+            }
+            continue;
+        }
+
+        Source* source = getSource(layer->source);
+        if (!source) {
+            Log::Warning(Event::Render, "can't find source for layer '%s'", layer->id.c_str());
+            continue;
+        }
+
+        for (auto tile : source->getTiles()) {
+            if (!tile->data || !tile->data->isReady())
+                continue;
+
+            // We're not clipping symbol layers, so when we have both parents and children of symbol
+            // layers, we drop all children in favor of their parent to avoid duplicate labels.
+            // See https://github.com/mapbox/mapbox-gl-native/issues/2482
+            if (layer->type == StyleLayerType::Symbol) {
+                bool skip = false;
+                // Look back through the buckets we decided to render to find out whether there is
+                // already a bucket from this layer that is a parent of this tile. Tiles are ordered
+                // by zoom level when we obtain them from getTiles().
+                for (auto it = result.order.rbegin(); it != result.order.rend() && (&it->layer == layer.get()); ++it) {
+                    if (tile->id.isChildOf(it->tile->id)) {
+                        skip = true;
+                        break;
+                    }
+                }
+                if (skip) {
+                    continue;
+                }
+            }
+
+            auto bucket = tile->data->getBucket(*layer);
+            if (bucket) {
+                result.order.emplace_back(*layer, tile, bucket);
+            }
+        }
+    }
+
+    return result;
+}
+
+void Style::setSourceTileCacheSize(size_t size) {
+    for (const auto& source : sources) {
+        source->setCacheSize(size);
+    }
+}
+
+void Style::onLowMemory() {
+    for (const auto& source : sources) {
+        source->onLowMemory();
+    }
 }
 
 void Style::setObserver(Observer* observer_) {

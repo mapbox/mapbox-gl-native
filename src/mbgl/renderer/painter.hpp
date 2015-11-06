@@ -68,26 +68,10 @@ class CollisionBoxShader;
 
 struct ClipID;
 
-struct RenderItem {
-    inline RenderItem(const StyleLayer& layer_,
-                      const Tile* tile_ = nullptr,
-                      Bucket* bucket_ = nullptr)
-        : tile(tile_), bucket(bucket_), layer(layer_) {
-    }
-
-    const Tile* const tile;
-    Bucket* const bucket;
-    const StyleLayer& layer;
-};
-
 class Painter : private util::noncopyable {
 public:
     Painter(MapData&, TransformState&);
     ~Painter();
-
-    // Renders the backdrop of the OpenGL view. This also paints in areas where we don't have any
-    // tiles whatsoever.
-    void clear();
 
     // Updates the default matrices to the current viewport dimensions.
     void changeMatrix();
@@ -190,7 +174,6 @@ private:
     gl::Config config;
 
     RenderPass pass = RenderPass::Opaque;
-    Color background = {{ 0, 0, 0, 0 }};
 
     int numSublayers = 3;
     GLsizei currentLayer;
