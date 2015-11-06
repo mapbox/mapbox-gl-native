@@ -11,6 +11,7 @@
 #include <mbgl/util/mat4.hpp>
 #include <mbgl/util/ptr.hpp>
 #include <mbgl/util/chrono.hpp>
+#include <mbgl/util/constants.hpp>
 
 #include <rapidjson/document.h>
 
@@ -37,7 +38,7 @@ public:
     SourceType type = SourceType::Vector;
     std::string url;
     std::vector<std::string> tiles;
-    uint16_t tile_size = 512;
+    uint16_t tile_size = util::tileSize;
     uint16_t min_zoom = 0;
     uint16_t max_zoom = 22;
     std::string attribution;
