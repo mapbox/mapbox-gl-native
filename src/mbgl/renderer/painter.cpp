@@ -242,7 +242,11 @@ void Painter::renderPass(RenderPass pass_,
                   pass == RenderPass::Opaque ? "opaque" : "translucent");
     }
 
-    config.blend = pass == RenderPass::Translucent;
+    if (pass == RenderPass::Translucent) {
+        config.blend = GL_TRUE;
+    } else {
+        config.blend = GL_FALSE;
+    }
 
     for (; it != end; ++it, i += increment) {
         currentLayer = i;
@@ -398,8 +402,8 @@ void Painter::renderBackground(const BackgroundLayer& layer) {
         spriteAtlas->bind(true);
     }
 
-    config.stencilTest = false;
-    config.depthTest = true;
+    config.stencilTest = GL_FALSE;
+    config.depthTest = GL_TRUE;
     config.depthRange = { 1.0f, 1.0f };
 
     MBGL_CHECK_ERROR(glDrawArrays(GL_TRIANGLE_STRIP, 0, 4));

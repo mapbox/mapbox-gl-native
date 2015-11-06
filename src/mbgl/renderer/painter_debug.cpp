@@ -22,7 +22,7 @@ void Painter::renderTileDebug(const Tile& tile) {
 void Painter::renderDebugText(TileData& tileData, const mat4 &matrix) {
     MBGL_DEBUG_GROUP("debug text");
 
-    config.depthTest = false;
+    config.depthTest = GL_FALSE;
 
     if (!tileData.debugBucket || tileData.debugBucket->state != tileData.getState()) {
         tileData.debugBucket = std::make_unique<DebugBucket>(tileData.id, tileData.getState());
@@ -47,7 +47,7 @@ void Painter::renderDebugText(TileData& tileData, const mat4 &matrix) {
     config.lineWidth = 2.0f * data.pixelRatio;
     tileData.debugBucket->drawLines(*plainShader);
 
-    config.depthTest = true;
+    config.depthTest = GL_TRUE;
 }
 
 void Painter::renderDebugFrame(const mat4 &matrix) {
@@ -56,8 +56,8 @@ void Painter::renderDebugFrame(const mat4 &matrix) {
     // Disable depth test and don't count this towards the depth buffer,
     // but *don't* disable stencil test, as we want to clip the red tile border
     // to the tile viewport.
-    config.depthTest = false;
-    config.stencilTest = true;
+    config.depthTest = GL_FALSE;
+    config.stencilTest = GL_TRUE;
 
     config.program = plainShader->program;
     plainShader->u_matrix = matrix;

@@ -17,8 +17,8 @@ void Painter::renderLine(LineBucket& bucket, const LineLayer& layer, const TileI
     // Abort early.
     if (pass == RenderPass::Opaque) return;
 
-    config.stencilTest = true;
-    config.depthTest = true;
+    config.stencilTest = GL_TRUE;
+    config.depthTest = GL_TRUE;
     config.depthMask = GL_FALSE;
 
     const auto& properties = layer.properties;
