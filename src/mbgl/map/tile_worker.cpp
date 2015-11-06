@@ -1,7 +1,6 @@
 #include <mbgl/text/collision_tile.hpp>
 #include <mbgl/map/tile_worker.hpp>
 #include <mbgl/map/geometry_tile.hpp>
-#include <mbgl/style/style.hpp>
 #include <mbgl/style/style_layer.hpp>
 #include <mbgl/style/style_bucket_parameters.hpp>
 #include <mbgl/sprite/sprite_atlas.hpp>
@@ -15,16 +14,20 @@ using namespace mbgl;
 
 TileWorker::TileWorker(TileID id_,
                        std::string sourceID_,
-                       Style& style_,
+                       SpriteStore& spriteStore_,
+                       GlyphAtlas& glyphAtlas_,
+                       GlyphStore& glyphStore_,
                        const std::atomic<TileData::State>& state_)
     : id(id_),
       sourceID(sourceID_),
-      style(style_),
+      spriteStore(spriteStore_),
+      glyphAtlas(glyphAtlas_),
+      glyphStore(glyphStore_),
       state(state_) {
 }
 
 TileWorker::~TileWorker() {
-    style.glyphAtlas->removeGlyphs(reinterpret_cast<uintptr_t>(this));
+    glyphAtlas.removeGlyphs(reinterpret_cast<uintptr_t>(this));
 }
 
 TileParseResult TileWorker::parseAllLayers(std::vector<util::ptr<StyleLayer>> layers,
@@ -63,11 +66,13 @@ TileParseResult TileWorker::parsePendingLayers() {
 
         if (layer.type == StyleLayerType::Symbol) {
             auto symbolBucket = dynamic_cast<SymbolBucket*>(bucket.get());
-            if (!symbolBucket->needsDependencies(*style.glyphStore, *style.spriteStore)) {
+            if (!symbolBucket->needsDependencies(glyphStore, spriteStore)) {
                 const SymbolLayer* symbolLayer = dynamic_cast<const SymbolLayer*>(&layer);
                 symbolBucket->addFeatures(reinterpret_cast<uintptr_t>(this),
                                           *symbolLayer->spriteAtlas,
-                                          *style.glyphAtlas, *style.glyphStore, *collisionTile);
+                                          glyphAtlas,
+                                          glyphStore,
+                                          *collisionTile);
                 insertBucket(layer.bucketName(), std::move(bucket));
                 pending.erase(it++);
                 continue;
@@ -130,10 +135,9 @@ void TileWorker::parseLayer(const StyleLayer& layer, const GeometryTile& geometr
                                      state,
                                      reinterpret_cast<uintptr_t>(this),
                                      partialParse,
-                                     *style.spriteAtlas,
-                                     *style.spriteStore,
-                                     *style.glyphAtlas,
-                                     *style.glyphStore,
+                                     spriteStore,
+                                     glyphAtlas,
+                                     glyphStore,
                                      *collisionTile);
 
     std::unique_ptr<Bucket> bucket = layer.createBucket(parameters);

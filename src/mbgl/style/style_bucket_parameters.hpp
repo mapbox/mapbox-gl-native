@@ -11,7 +11,6 @@ namespace mbgl {
 class TileID;
 class GeometryTileLayer;
 class GeometryTileFeature;
-class SpriteAtlas;
 class SpriteStore;
 class GlyphAtlas;
 class GlyphStore;
@@ -24,7 +23,6 @@ public:
                           const std::atomic<TileData::State>& state_,
                           uintptr_t tileUID_,
                           bool& partialParse_,
-                          SpriteAtlas& spriteAtlas_,
                           SpriteStore& spriteStore_,
                           GlyphAtlas& glyphAtlas_,
                           GlyphStore& glyphStore_,
@@ -34,7 +32,6 @@ public:
           state(state_),
           tileUID(tileUID_),
           partialParse(partialParse_),
-          spriteAtlas(spriteAtlas_),
           spriteStore(spriteStore_),
           glyphAtlas(glyphAtlas_),
           glyphStore(glyphStore_),
@@ -51,7 +48,6 @@ public:
     const std::atomic<TileData::State>& state;
     uintptr_t tileUID;
     bool& partialParse;
-    SpriteAtlas& spriteAtlas;
     SpriteStore& spriteStore;
     GlyphAtlas& glyphAtlas;
     GlyphStore& glyphStore;
