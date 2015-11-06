@@ -4,6 +4,8 @@
 
 @implementation NSBundle (MGLAdditions)
 
+void mgl_linkBundleCategory(){}
+
 + (NSString *)mgl_resourceBundlePath
 {
     NSString *resourceBundlePath = [[NSBundle bundleForClass:[MGLMapView class]] pathForResource:@"Mapbox" ofType:@"bundle"];

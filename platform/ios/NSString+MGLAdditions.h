@@ -2,6 +2,8 @@
 
 NS_ASSUME_NONNULL_BEGIN
 
+void mgl_linkStringCategory();
+
 @interface NSString (MGLAdditions)
 
 /** Returns the receiver if non-empty or nil if empty. */

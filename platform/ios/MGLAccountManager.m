@@ -1,5 +1,6 @@
 #import "MGLAccountManager_Private.h"
 #import "MGLMapboxEvents.h"
+#import "MGLCategoryLoader.h"
 #import "NSProcessInfo+MGLAdditions.h"
 
 #import <Fabric/FABKitProtocol.h>
@@ -34,6 +35,8 @@
 // Can be called from any thread.
 //
 + (instancetype) sharedManager {
+    [MGLCategoryLoader loadCategories];
+
     if (NSProcessInfo.processInfo.mgl_isInterfaceBuilderDesignablesAgent) {
         return nil;
     }

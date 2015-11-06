@@ -54,6 +54,8 @@
         '../platform/ios/MGLAnnotationImage.m',
         '../include/mbgl/ios/MGLStyle.h',
         '../platform/ios/MGLStyle.mm',
+        '../platform/ios/MGLCategoryLoader.h',
+        '../platform/ios/MGLCategoryLoader.m',
         '../platform/ios/NSBundle+MGLAdditions.h',
         '../platform/ios/NSBundle+MGLAdditions.m',
         '../platform/ios/NSException+MGLAdditions.h',
@@ -82,7 +84,6 @@
           '-framework MobileCoreServices',
           '-framework QuartzCore',
           '-framework SystemConfiguration',
-          '-ObjC',
         ],
       },
 
