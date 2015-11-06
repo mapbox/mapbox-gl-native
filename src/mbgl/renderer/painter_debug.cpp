@@ -47,6 +47,7 @@ void Painter::renderDebugText(TileData& tileData, const mat4 &matrix) {
     config.lineWidth = 2.0f * data.pixelRatio;
     tileData.debugBucket->drawLines(*plainShader);
 
+    config.depthFunc.reset();
     config.depthTest = GL_TRUE;
 }
 
@@ -57,6 +58,7 @@ void Painter::renderDebugFrame(const mat4 &matrix) {
     // but *don't* disable stencil test, as we want to clip the red tile border
     // to the tile viewport.
     config.depthTest = GL_FALSE;
+    config.stencilOp.reset();
     config.stencilTest = GL_TRUE;
 
     config.program = plainShader->program;

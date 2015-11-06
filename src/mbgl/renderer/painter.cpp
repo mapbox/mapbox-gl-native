@@ -110,11 +110,14 @@ void Painter::changeMatrix() {
 
 void Painter::clear() {
     MBGL_DEBUG_GROUP("clear");
+    config.stencilFunc.reset();
     config.stencilTest = GL_TRUE;
     config.stencilMask = 0xFF;
     config.depthTest = GL_FALSE;
     config.depthMask = GL_TRUE;
     config.clearColor = { background[0], background[1], background[2], background[3] };
+    config.clearStencil = 0;
+    config.clearDepth = 1;
     MBGL_CHECK_ERROR(glClear(GL_COLOR_BUFFER_BIT | GL_STENCIL_BUFFER_BIT | GL_DEPTH_BUFFER_BIT));
 }
 
@@ -243,6 +246,7 @@ void Painter::renderPass(RenderPass pass_,
     }
 
     if (pass == RenderPass::Translucent) {
+        config.blendFunc.reset();
         config.blend = GL_TRUE;
     } else {
         config.blend = GL_FALSE;
@@ -403,6 +407,7 @@ void Painter::renderBackground(const BackgroundLayer& layer) {
     }
 
     config.stencilTest = GL_FALSE;
+    config.depthFunc.reset();
     config.depthTest = GL_TRUE;
     config.depthRange = { 1.0f, 1.0f };
 
