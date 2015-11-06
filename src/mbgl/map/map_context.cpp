@@ -97,6 +97,9 @@ void MapContext::setStyleURL(const std::string& url) {
     styleJSON.clear();
 
     style = std::make_unique<Style>(data);
+    if (painter) {
+        painter->updateRenderOrder(*style);
+    }
 
     const size_t pos = styleURL.rfind('/');
     std::string base = "";
@@ -135,6 +138,9 @@ void MapContext::setStyleJSON(const std::string& json, const std::string& base) 
     styleJSON = json;
 
     style = std::make_unique<Style>(data);
+    if (painter) {
+        painter->updateRenderOrder(*style);
+    }
 
     loadStyleJSON(json, base);
 }
