@@ -29,6 +29,6 @@ Run:
 
     make android
 
-You can then open `android/java` in Android Studio via "Import project (Eclipse ADT, Gradle, etc.)".
+You can then open `android` in Android Studio via "Import project (Eclipse ADT, Gradle, etc.)".
 
 **Next: get your app [running on a hardware Android Device](docs/ANDROID_DEVICE.md) or [simulator](docs/ANDROID_SIMULATOR.md)**
