@@ -18,7 +18,10 @@ public abstract class Annotation implements Comparable<Annotation> {
     }
 
     /**
-     * Do not use this method. Used internally by the SDK.
+     * Gets the annotation's unique ID.
+     * <p/>
+     * This ID is unique for a MapView instance and is suitable for associating your own extra
+     * data with.
      */
     public long getId() {
         return id;
