@@ -168,8 +168,6 @@ void Style::cascade() {
 }
 
 void Style::recalculate(float z) {
-    std::lock_guard<std::mutex> lock(mtx);
-
     for (const auto& source : sources) {
         source->enabled = false;
     }
