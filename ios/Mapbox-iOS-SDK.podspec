@@ -13,7 +13,7 @@ Pod::Spec.new do |m|
   m.documentation_url = 'https://www.mapbox.com/ios-sdk/'
 
   m.source = {
-    :http => "http://mapbox.s3.amazonaws.com/mapbox-gl-native/ios/builds/mapbox-ios-sdk-#{m.version.to_s}.zip",
+    :http => "https://mapbox.s3.amazonaws.com/mapbox-gl-native/ios/builds/mapbox-ios-sdk-#{m.version.to_s}.zip",
     :flatten => true
   }
 
