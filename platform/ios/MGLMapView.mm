@@ -534,14 +534,7 @@ std::chrono::steady_clock::duration secondsAsDuration(float duration)
     // compass
     //
     UIView *compassContainer = self.compassView.superview;
-    if ([NSLayoutConstraint respondsToSelector:@selector(deactivateConstraints:)])
-    {
-        [NSLayoutConstraint deactivateConstraints:compassContainer.constraints];
-    }
-    else
-    {
-        [compassContainer removeConstraints:compassContainer.constraints];
-    }
+    [compassContainer removeConstraints:compassContainer.constraints];
 
     NSMutableArray *compassContainerConstraints = [NSMutableArray array];
     if (viewController)
@@ -573,7 +566,7 @@ std::chrono::steady_clock::duration secondsAsDuration(float duration)
                                  multiplier:1
                                    constant:5]];
 
-    [compassContainer addConstraint:
+    [compassContainerConstraints addObject:
      [NSLayoutConstraint constraintWithItem:compassContainer
                                   attribute:NSLayoutAttributeWidth
                                   relatedBy:NSLayoutRelationEqual
@@ -582,7 +575,7 @@ std::chrono::steady_clock::duration secondsAsDuration(float duration)
                                  multiplier:1
                                    constant:self.compassView.image.size.width]];
 
-    [compassContainer addConstraint:
+    [compassContainerConstraints addObject:
      [NSLayoutConstraint constraintWithItem:compassContainer
                                   attribute:NSLayoutAttributeHeight
                                   relatedBy:NSLayoutRelationEqual
@@ -590,25 +583,11 @@ std::chrono::steady_clock::duration secondsAsDuration(float duration)
                                   attribute:NSLayoutAttributeNotAnAttribute
                                  multiplier:1
                                    constant:self.compassView.image.size.height]];
-    if ([NSLayoutConstraint respondsToSelector:@selector(activateConstraints:)])
-    {
-        [NSLayoutConstraint activateConstraints:compassContainerConstraints];
-    }
-    else
-    {
-        [constraintParentView addConstraints:compassContainerConstraints];
-    }
+    [constraintParentView addConstraints:compassContainerConstraints];
 
     // logo bug
     //
-    if ([NSLayoutConstraint respondsToSelector:@selector(deactivateConstraints:)])
-    {
-        [NSLayoutConstraint deactivateConstraints:self.logoViewConstraints];
-    }
-    else
-    {
-        [self.logoView removeConstraints:self.logoViewConstraints];
-    }
+    [self.logoView removeConstraints:self.logoViewConstraints];
     [self.logoViewConstraints removeAllObjects];
     if (viewController)
     {
@@ -638,25 +617,11 @@ std::chrono::steady_clock::duration secondsAsDuration(float duration)
                                   attribute:NSLayoutAttributeLeading
                                  multiplier:1
                                    constant:8]];
-    if ([NSLayoutConstraint respondsToSelector:@selector(activateConstraints:)])
-    {
-        [NSLayoutConstraint activateConstraints:self.logoViewConstraints];
-    }
-    else
-    {
-        [constraintParentView addConstraints:self.logoViewConstraints];
-    }
+    [constraintParentView addConstraints:self.logoViewConstraints];
 
     // attribution button
     //
-    if ([NSLayoutConstraint respondsToSelector:@selector(deactivateConstraints:)])
-    {
-        [NSLayoutConstraint deactivateConstraints:self.attributionButtonConstraints];
-    }
-    else
-    {
-        [self.attributionButton removeConstraints:self.attributionButtonConstraints];
-    }
+    [self.attributionButton removeConstraints:self.attributionButtonConstraints];
     [self.attributionButtonConstraints removeAllObjects];
     if (viewController)
     {
@@ -686,14 +651,7 @@ std::chrono::steady_clock::duration secondsAsDuration(float duration)
                                   attribute:NSLayoutAttributeTrailing
                                  multiplier:1
                                    constant:8]];
-    if ([NSLayoutConstraint respondsToSelector:@selector(activateConstraints:)])
-    {
-        [NSLayoutConstraint activateConstraints:self.attributionButtonConstraints];
-    }
-    else
-    {
-        [constraintParentView addConstraints:self.attributionButtonConstraints];
-    }
+    [constraintParentView addConstraints:self.attributionButtonConstraints];
 
     [super updateConstraints];
 }
