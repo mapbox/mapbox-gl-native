@@ -3294,6 +3294,12 @@ public final class MapView extends FrameLayout {
     @UiThread
     public void setMyLocationTrackingMode(@MyLocationTracking.Mode int myLocationTrackingMode) {
         mUserLocationView.setMyLocationTrackingMode(myLocationTrackingMode);
+        validateGesturesForTrackingModes();
+    }
+
+    private void validateGesturesForTrackingModes() {
+        int myLocationTrackingMode = mUserLocationView.getMyLocationTrackingMode();
+        int myBearingTrackingMode = mUserLocationView.getMyBearingTrackingMode();
 
         // Enable/disable gestures based on tracking mode
         if (myLocationTrackingMode == MyLocationTracking.TRACKING_NONE) {
@@ -3301,9 +3307,10 @@ public final class MapView extends FrameLayout {
             mRotateEnabled = true;
         } else {
             mScrollEnabled = false;
-            mRotateEnabled = (myLocationTrackingMode == MyLocationTracking.TRACKING_FOLLOW);
+            mRotateEnabled = (myBearingTrackingMode == MyBearingTracking.NONE);
         }
     }
+
 
     /**
      * Returns the current user location tracking mode.
@@ -3320,7 +3327,12 @@ public final class MapView extends FrameLayout {
 
     /**
      * Set the current my bearing tracking mode.
-     * Tracking my bearing disables gestures and shows the direction the user is heading.
+     * <p/>
+     * Tracking the users bearing will disable gestures and shows the direction the user is heading.
+     * <p/>
+     * When location tracking is disabled the direction of {@link UserLocationView}  is rotated
+     * When location tracking is enabled the {@link MapView} is rotated based on bearing value.
+     * <p/>
      * See {@link MyBearingTracking} for different values.
      *
      * @param myBearingTrackingMode The bearing tracking mode to be used.
@@ -3329,6 +3341,7 @@ public final class MapView extends FrameLayout {
     @UiThread
     public void setMyBearingTrackingMode(@MyBearingTracking.Mode int myBearingTrackingMode) {
         mUserLocationView.setMyBearingTrackingMode(myBearingTrackingMode);
+        validateGesturesForTrackingModes();
     }
 
     /**

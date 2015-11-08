@@ -73,7 +73,8 @@ final class UserLocationView extends View {
 
     private LatLng mMarkerCoordinate;
     private ValueAnimator mMarkerCoordinateAnimator;
-    private float mMarkerDirection;
+    private float mGpsMarkerDirection;
+    private float mCompassMarkerDirection;
     private ObjectAnimator mMarkerDirectionAnimator;
     private float mMarkerAccuracy;
     private ObjectAnimator mMarkerAccuracyAnimator;
@@ -271,16 +272,27 @@ final class UserLocationView extends View {
 
             // compute new marker position
             // TODO add JNI method that takes existing pointf
-            mMarkerScreenPoint = mMapView.toScreenLocation(mMarkerCoordinate);
-            mMarkerScreenMatrix.reset();
-            mMarkerScreenMatrix.setTranslate(
-                    mMarkerScreenPoint.x,
-                    mMarkerScreenPoint.y);
+            if (mMyLocationTrackingMode == MyLocationTracking.TRACKING_NONE) {
+                mMarkerScreenPoint = mMapView.toScreenLocation(mMarkerCoordinate);
+                mMarkerScreenMatrix.reset();
+                mMarkerScreenMatrix.setTranslate(
+                        mMarkerScreenPoint.x,
+                        mMarkerScreenPoint.y);
+            } else if (mMyLocationTrackingMode == MyLocationTracking.TRACKING_FOLLOW) {
+                mMapView.setCenterCoordinate(mMarkerCoordinate, true);
+            }
 
             // rotate so arrow in points to bearing
             if (mShowDirection) {
-                mMarkerScreenMatrix.preRotate(mMarkerDirection +
-                        (float) mMapView.getDirection());
+                if (mMyBearingTrackingMode == MyBearingTracking.COMPASS) {
+                    mMarkerScreenMatrix.preRotate(mCompassMarkerDirection + (float) mMapView.getDirection());
+                } else if (mMyBearingTrackingMode == MyBearingTracking.GPS) {
+                    if (mMyLocationTrackingMode == MyLocationTracking.TRACKING_NONE) {
+                        mMarkerScreenMatrix.preRotate(mGpsMarkerDirection + (float) mMapView.getDirection());
+                    } else {
+                        mMarkerScreenMatrix.preRotate(mGpsMarkerDirection);
+                    }
+                }
             }
 
             // adjust accuracy circle
@@ -355,9 +367,17 @@ final class UserLocationView extends View {
         mMyBearingTrackingMode = myBearingTrackingMode;
 
         if (myBearingTrackingMode == MyBearingTracking.COMPASS) {
+            mShowDirection = false;
             mBearingChangeListener.onStart(getContext());
-        } else {
+        } else if (myBearingTrackingMode == MyBearingTracking.GPS) {
             mBearingChangeListener.onStop();
+            if (mUserLocation != null && mUserLocation.hasBearing()) {
+                mShowDirection = true;
+            } else {
+                mShowDirection = false;
+            }
+        } else {
+            mShowDirection = false;
         }
     }
 
@@ -535,9 +555,9 @@ final class UserLocationView extends View {
             mShowDirection = location.hasBearing();
             if (mShowDirection) {
                 if (mUserLocation != null && mUserLocation.hasBearing()) {
-                    mMarkerDirection = mUserLocation.getBearing();
+                    mGpsMarkerDirection = mUserLocation.getBearing();
                 }
-                float oldDir = mMarkerDirection;
+                float oldDir = mGpsMarkerDirection;
                 float newDir = location.getBearing();
                 float diff = oldDir - newDir;
                 if (diff > 180.0f) {
@@ -550,7 +570,9 @@ final class UserLocationView extends View {
                 mMarkerDirectionAnimator.start();
             }
         } else if (mMyLocationTrackingMode == MyLocationTracking.TRACKING_FOLLOW && mMyBearingTrackingMode == MyBearingTracking.GPS) {
-            // set bearing on map
+            // always show north & rotate map below
+            mShowDirection = true;
+            mGpsMarkerDirection = 0;
             if (location.hasBearing()) {
                 mMapView.setBearing(mUserLocation.getBearing());
             }
@@ -579,7 +601,7 @@ final class UserLocationView extends View {
         if (mMyLocationTrackingMode == MyLocationTracking.TRACKING_NONE) {
             // animate marker
             mShowDirection = true;
-            float oldDir = mMarkerDirection;
+            float oldDir = mCompassMarkerDirection;
             float newDir = bearing;
             float diff = oldDir - newDir;
             if (diff > 180.0f) {
@@ -590,12 +612,13 @@ final class UserLocationView extends View {
             mMarkerDirectionAnimator = ObjectAnimator.ofFloat(this, "direction", oldDir, newDir);
             mMarkerDirectionAnimator.setDuration(1000);
             mMarkerDirectionAnimator.start();
-            mMarkerDirection = bearing;
+            mCompassMarkerDirection = bearing;
         } else if (mMyLocationTrackingMode == MyLocationTracking.TRACKING_FOLLOW) {
-            // change map direction
             if (mMyBearingTrackingMode == MyBearingTracking.COMPASS) {
-                mMarkerDirection = bearing;
-                mMapView.setBearing(mMarkerDirection);
+                // always show north & change map direction
+                mShowDirection = true;
+                mCompassMarkerDirection = 0;
+                mMapView.setBearing(bearing);
             }
         }
     }
@@ -622,12 +645,19 @@ final class UserLocationView extends View {
 
     // public for animator only
     public float getDirection() {
-        return mMarkerDirection;
+        if (mMyBearingTrackingMode == MyBearingTracking.COMPASS) {
+            return mCompassMarkerDirection;
+        }
+        return mGpsMarkerDirection;
     }
 
     // public for animator only
     public void setDirection(float direction) {
-        mMarkerDirection = direction % 360.0f;
+        if (mMyBearingTrackingMode == MyBearingTracking.COMPASS) {
+            mCompassMarkerDirection = direction % 360.0f;
+        } else {
+            mGpsMarkerDirection = direction % 360.0f;
+        }
         updateOnNextFrame();
     }
 

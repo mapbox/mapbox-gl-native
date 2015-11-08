@@ -29,7 +29,7 @@ public class MyLocationTracking {
     public static final int TRACKING_NONE = 0x00000000;
 
     /**
-     * Tracking user, {@link MapView} will reposition to center of {@link com.mapbox.mapboxsdk.views.UserLocationView}
+     * Tracking the location of the user, {@link MapView} will reposition to center of {@link com.mapbox.mapboxsdk.views.UserLocationView}
      */
     public static final int TRACKING_FOLLOW = 0x00000004;
 
