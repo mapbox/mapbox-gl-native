@@ -39,6 +39,15 @@ MapContext::MapContext(View& view_, FileSource& fileSource, MapMode mode_, GLCon
     util::ThreadContext::setFileSource(&fileSource);
     util::ThreadContext::setGLObjectStore(&glObjectStore);
 
+    // Throttle ::update() to 60 Hz. The idea here is it is
+    // useless to try to update the map state more than
+    // 60 times a second because the user will never see the
+    // changes. Increasing the throttle value might increase
+    // performance at slow systems at the cost of rendering
+    // old tiles, labels colliding or upside down when
+    // rotated until the next ::update().
+    asyncUpdate.setThrottle(std::chrono::milliseconds(1000 / 60));
+
     view.activate();
 }
 
