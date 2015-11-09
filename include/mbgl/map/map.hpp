@@ -73,10 +73,13 @@ public:
     void setClasses(const std::vector<std::string>&);
     std::vector<std::string> getClasses() const;
 
-    void setDefaultTransitionDuration(const Duration& = Duration::zero());
+    void setDefaultFadeDuration(const Duration&);
+    Duration getDefaultFadeDuration() const;
+
+    void setDefaultTransitionDuration(const Duration&);
     Duration getDefaultTransitionDuration() const;
 
-    void setDefaultTransitionDelay(const Duration& = Duration::zero());
+    void setDefaultTransitionDelay(const Duration&);
     Duration getDefaultTransitionDelay() const;
 
     void setStyleURL(const std::string& url);

@@ -474,6 +474,15 @@ std::vector<std::string> Map::getClasses() const {
     return data->getClasses();
 }
 
+void Map::setDefaultFadeDuration(const Duration& duration) {
+    data->setDefaultFadeDuration(duration);
+    update(Update::Classes);
+}
+
+Duration Map::getDefaultFadeDuration() const {
+    return data->getDefaultFadeDuration();
+}
+
 void Map::setDefaultTransitionDuration(const Duration& duration) {
     data->setDefaultTransitionDuration(duration);
     update(Update::DefaultTransition);
