@@ -18,7 +18,7 @@ public:
     void setAccessToken(const std::string& t) { accessToken = t; }
     std::string getAccessToken() const { return accessToken; }
 
-    // FileSource API
+    bool handlesResource(const Resource&) override { return true; }
     Request* request(const Resource&, uv_loop_t*, Callback) override;
     void cancel(Request*) override;
 

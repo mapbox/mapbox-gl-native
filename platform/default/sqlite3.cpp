@@ -1,3 +1,5 @@
+#include <mbgl/platform/log.hpp>
+
 #include "sqlite3.hpp"
 #include <sqlite3.h>
 
@@ -21,8 +23,15 @@ const static bool sqliteVersionCheck = []() {
 namespace mapbox {
 namespace sqlite {
 
+void trace_callback(void* udp, const char* sql) {
+    (void)udp;
+    printf("%s\n", sql);
+//    mbgl::Log::Debug(mbgl::Event::Database, sql);
+};
+
 Database::Database(const std::string &filename, int flags) {
     const int err = sqlite3_open_v2(filename.c_str(), &db, flags, nullptr);
+//    sqlite3_trace(db, trace_callback, NULL);
     if (err != SQLITE_OK) {
         Exception ex { err, sqlite3_errmsg(db) };
         db = nullptr;

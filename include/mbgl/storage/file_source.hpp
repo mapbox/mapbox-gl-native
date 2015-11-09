@@ -26,6 +26,7 @@ public:
 
     // These can be called from any thread. The callback will be invoked in the loop.
     // You can only cancel a request from the same thread it was created in.
+    virtual bool handlesResource(const Resource&) = 0;
     virtual Request* request(const Resource&, uv_loop_t*, Callback) = 0;
     virtual void cancel(Request*) = 0;
 };

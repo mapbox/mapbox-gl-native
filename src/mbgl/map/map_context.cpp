@@ -9,6 +9,7 @@
 #include <mbgl/renderer/painter.hpp>
 
 #include <mbgl/storage/file_source.hpp>
+#include <mbgl/storage/frontline_file_source.hpp>
 #include <mbgl/storage/resource.hpp>
 #include <mbgl/storage/response.hpp>
 
@@ -35,7 +36,9 @@ MapContext::MapContext(View& view_, FileSource& fileSource, MapData& data_)
       texturePool(std::make_unique<TexturePool>()) {
     assert(util::ThreadContext::currentlyOn(util::ThreadType::Map));
 
-    util::ThreadContext::setFileSource(&fileSource);
+    frontlineFileSource = new FrontlineFileSource("/tmp/test.mbtiles");
+    util::ThreadContext::addFileSource(frontlineFileSource);
+    util::ThreadContext::addFileSource(&fileSource);
     util::ThreadContext::setGLObjectStore(&glObjectStore);
 
     asyncUpdate->unref();
@@ -47,6 +50,9 @@ MapContext::MapContext(View& view_, FileSource& fileSource, MapData& data_)
 MapContext::~MapContext() {
     // Make sure we call cleanup() before deleting this object.
     assert(!style);
+
+    delete frontlineFileSource;
+    frontlineFileSource = nullptr;
 }
 
 void MapContext::cleanup() {
@@ -107,8 +113,9 @@ void MapContext::setStyleURL(const std::string& url) {
         base = styleURL.substr(0, pos + 1);
     }
 
-    FileSource* fs = util::ThreadContext::getFileSource();
-    styleRequest = fs->request({ Resource::Kind::Style, styleURL }, util::RunLoop::getLoop(), [this, base](const Response &res) {
+    Resource resource = { Resource::Kind::Style, styleURL };
+    FileSource* fs = util::ThreadContext::getFileSourceHandlingResource(resource);
+    styleRequest = fs->request(resource, util::RunLoop::getLoop(), [this, base](const Response &res) {
         if (res.stale) {
             // Only handle fresh responses.
             return;

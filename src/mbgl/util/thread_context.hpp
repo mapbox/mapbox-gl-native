@@ -1,11 +1,15 @@
 #ifndef MBGL_UTIL_THREAD_CONTEXT
 #define MBGL_UTIL_THREAD_CONTEXT
 
+#include <mbgl/storage/file_source.hpp>
 #include <mbgl/util/uv_detail.hpp>
+
+#include "resource.hpp"
 
 #include <cstdint>
 #include <string>
 #include <thread>
+#include <vector>
 
 namespace mbgl {
 
@@ -51,17 +55,20 @@ public:
         }
     }
 
-    static FileSource* getFileSource() {
+    static FileSource* getFileSourceHandlingResource(const Resource& res) {
         if (current.get() != nullptr) {
-            return current.get()->fileSource;
-        } else {
-            return nullptr;
+            for (auto fs : current.get()->fileSources) {
+                if (fs->handlesResource(res)) {
+                    return fs;
+                }
+            }
         }
+        return nullptr;
     }
 
-    static void setFileSource(FileSource* fileSource) {
+    static void addFileSource(FileSource* fileSource) {
         if (current.get() != nullptr) {
-            current.get()->fileSource = fileSource;
+            current.get()->fileSources.push_back(fileSource);
         } else {
             throw new std::runtime_error("Current thread has no current ThreadContext.");
         }
@@ -88,7 +95,7 @@ private:
     ThreadType type;
     ThreadPriority priority;
 
-    FileSource* fileSource = nullptr;
+    std::vector<FileSource *> fileSources;
     GLObjectStore* glObjectStore = nullptr;
 
     static uv::tls<ThreadContext> current;
