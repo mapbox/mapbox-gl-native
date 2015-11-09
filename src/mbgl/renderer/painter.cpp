@@ -45,67 +45,30 @@ using namespace mbgl;
 
 Painter::Painter(MapData& data_, TransformState& state_)
     : data(data_), state(state_) {
-    setup();
+    gl::debugging::enable();
+
+    plainShader = std::make_unique<PlainShader>();
+    outlineShader = std::make_unique<OutlineShader>();
+    lineShader = std::make_unique<LineShader>();
+    linesdfShader = std::make_unique<LineSDFShader>();
+    linepatternShader = std::make_unique<LinepatternShader>();
+    patternShader = std::make_unique<PatternShader>();
+    iconShader = std::make_unique<IconShader>();
+    rasterShader = std::make_unique<RasterShader>();
+    sdfGlyphShader = std::make_unique<SDFGlyphShader>();
+    sdfIconShader = std::make_unique<SDFIconShader>();
+    dotShader = std::make_unique<DotShader>();
+    collisionBoxShader = std::make_unique<CollisionBoxShader>();
+    circleShader = std::make_unique<CircleShader>();
+
+    // Reset GL values
+    config.reset();
 }
 
 Painter::~Painter() = default;
 
 bool Painter::needsAnimation() const {
     return frameHistory.needsAnimation(data.getDefaultFadeDuration());
-}
-
-void Painter::setup() {
-    gl::debugging::enable();
-
-    setupShaders();
-
-    assert(iconShader);
-    assert(plainShader);
-    assert(outlineShader);
-    assert(lineShader);
-    assert(linepatternShader);
-    assert(patternShader);
-    assert(rasterShader);
-    assert(sdfGlyphShader);
-    assert(sdfIconShader);
-    assert(dotShader);
-    assert(circleShader);
-
-    // Reset GL values
-    config.reset();
-}
-
-void Painter::setupShaders() {
-    if (!plainShader) plainShader = std::make_unique<PlainShader>();
-    if (!outlineShader) outlineShader = std::make_unique<OutlineShader>();
-    if (!lineShader) lineShader = std::make_unique<LineShader>();
-    if (!linesdfShader) linesdfShader = std::make_unique<LineSDFShader>();
-    if (!linepatternShader) linepatternShader = std::make_unique<LinepatternShader>();
-    if (!patternShader) patternShader = std::make_unique<PatternShader>();
-    if (!iconShader) iconShader = std::make_unique<IconShader>();
-    if (!rasterShader) rasterShader = std::make_unique<RasterShader>();
-    if (!sdfGlyphShader) sdfGlyphShader = std::make_unique<SDFGlyphShader>();
-    if (!sdfIconShader) sdfIconShader = std::make_unique<SDFIconShader>();
-    if (!dotShader) dotShader = std::make_unique<DotShader>();
-    if (!collisionBoxShader) collisionBoxShader = std::make_unique<CollisionBoxShader>();
-    if (!circleShader) circleShader = std::make_unique<CircleShader>();
-}
-
-void Painter::resize() {
-    config.viewport = { 0, 0, frame.framebufferSize[0], frame.framebufferSize[1] };
-}
-
-void Painter::changeMatrix() {
-
-    state.getProjMatrix(projMatrix);
-
-    // The extrusion matrix.
-    matrix::ortho(extrudeMatrix, 0, state.getWidth(), state.getHeight(), 0, 0, -1);
-
-    // The native matrix is a 1:1 matrix that paints the coordinates at the
-    // same screen position as the vertex specifies.
-    matrix::identity(nativeMatrix);
-    matrix::multiply(nativeMatrix, projMatrix, nativeMatrix);
 }
 
 void Painter::prepareTile(const Tile& tile) {
@@ -126,8 +89,18 @@ void Painter::render(const Style& style, const FrameData& frame_, SpriteAtlas& a
     const std::set<Source*>& sources = renderData.sources;
     const Color& background = renderData.backgroundColor;
 
-    resize();
-    changeMatrix();
+    config.viewport = { 0, 0, frame.framebufferSize[0], frame.framebufferSize[1] };
+
+    // Update the default matrices to the current viewport dimensions.
+    state.getProjMatrix(projMatrix);
+
+    // The extrusion matrix.
+    matrix::ortho(extrudeMatrix, 0, state.getWidth(), state.getHeight(), 0, 0, -1);
+
+    // The native matrix is a 1:1 matrix that paints the coordinates at the
+    // same screen position as the vertex specifies.
+    matrix::identity(nativeMatrix);
+    matrix::multiply(nativeMatrix, projMatrix, nativeMatrix);
 
     // - UPLOAD PASS -------------------------------------------------------------------------------
     // Uploads all required buffers and images before we do any actual rendering.

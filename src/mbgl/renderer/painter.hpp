@@ -34,7 +34,6 @@ class LineAtlas;
 class Source;
 struct FrameData;
 
-
 class DebugBucket;
 class FillBucket;
 class FillLayer;
@@ -47,8 +46,6 @@ class SymbolLayer;
 class RasterBucket;
 class RasterLayer;
 class BackgroundLayer;
-
-struct RasterProperties;
 
 class SDFShader;
 class PlainShader;
@@ -73,9 +70,6 @@ public:
     Painter(MapData&, TransformState&);
     ~Painter();
 
-    // Updates the default matrices to the current viewport dimensions.
-    void changeMatrix();
-
     void render(const Style& style,
                 const FrameData& frame,
                 SpriteAtlas& annotationSpriteAtlas);
@@ -98,29 +92,12 @@ public:
     float contrastFactor(float contrast);
     std::array<float, 3> spinWeights(float spin_value);
 
-    void preparePrerender(RasterBucket &bucket);
-
-    void renderPrerenderedTexture(RasterBucket &bucket, const mat4 &matrix, const RasterProperties& properties);
-
-    void createPrerendered(RasterBucket& bucket, const StyleLayer &layer_desc, const TileID& id);
-
-    // Adjusts the dimensions of the OpenGL viewport
-    void resize();
-
     void drawClippingMasks(const std::set<Source*>&);
     void drawClippingMask(const mat4& matrix, const ClipID& clip);
-
-    void resetFramebuffer();
-    void bindFramebuffer();
-    void pushFramebuffer();
-    GLuint popFramebuffer();
-    void discardFramebuffers();
 
     bool needsAnimation() const;
 
 private:
-    void setup();
-    void setupShaders();
     mat4 translatedMatrix(const mat4& matrix, const std::array<float, 2> &translation, const TileID &id, TranslateAnchorType anchor);
 
     std::vector<RenderItem> determineRenderOrder(const Style& style);
@@ -145,7 +122,6 @@ private:
 
     void setDepthSublayer(int n);
 
-public:
     mat4 projMatrix;
     mat4 nativeMatrix;
     mat4 extrudeMatrix;
@@ -164,7 +140,6 @@ public:
         return identity;
     }();
 
-private:
     MapData& data;
     TransformState& state;
     FrameData frame;
@@ -180,12 +155,11 @@ private:
     float depthRangeSize;
     const float depthEpsilon = 1.0f / (1 << 16);
 
-public:
-    FrameHistory frameHistory;
-
     SpriteAtlas* spriteAtlas;
     GlyphAtlas* glyphAtlas;
     LineAtlas* lineAtlas;
+
+    FrameHistory frameHistory;
 
     std::unique_ptr<PlainShader> plainShader;
     std::unique_ptr<OutlineShader> outlineShader;
