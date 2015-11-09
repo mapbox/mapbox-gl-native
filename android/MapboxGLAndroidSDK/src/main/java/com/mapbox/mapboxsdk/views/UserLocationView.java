@@ -227,8 +227,10 @@ final class UserLocationView extends View {
         RectF dotBounds = mShowDirection ? mUserLocationBearingDrawableBoundsF : mUserLocationDrawableBoundsF;
         dotBounds = mStaleMarker ? mUserLocationStaleDrawableBoundsF : dotBounds;
 
-        boolean willDraw =
-                mShowAccuracy && !mStaleMarker && !canvas.quickReject(mAccuracyPath, Canvas.EdgeType.AA);
+        boolean willDraw = true;
+        if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.JELLY_BEAN || !canvas.isHardwareAccelerated()) {
+            willDraw = mShowAccuracy && !mStaleMarker && !canvas.quickReject(mAccuracyPath, Canvas.EdgeType.AA);
+        }
         willDraw |= !canvas.quickReject(dotBounds, Canvas.EdgeType.AA);
 
         if (willDraw) {
@@ -463,7 +465,7 @@ final class UserLocationView extends View {
     private boolean isStale(Location location) {
         if (location != null) {
             long ageInNanos;
-            if (android.os.Build.VERSION.SDK_INT >= Build.VERSION_CODES.JELLY_BEAN_MR1) {
+            if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.JELLY_BEAN_MR1) {
                 ageInNanos = SystemClock.elapsedRealtimeNanos() -
                         location.getElapsedRealtimeNanos();
             } else {

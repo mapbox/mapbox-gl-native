@@ -617,7 +617,7 @@ public final class MapView extends FrameLayout {
                 .getSystemService(Context.ACTIVITY_SERVICE);
         activityManager.getMemoryInfo(memoryInfo);
         long maxMemory = memoryInfo.availMem;
-        if (android.os.Build.VERSION.SDK_INT >= Build.VERSION_CODES.JELLY_BEAN) {
+        if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.JELLY_BEAN) {
             maxMemory = memoryInfo.totalMem;
         }
         mNativeMapView = new
