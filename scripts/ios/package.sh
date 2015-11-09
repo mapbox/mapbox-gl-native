@@ -115,7 +115,6 @@ if [ -z `which appledoc` ]; then
     exit 1
 fi
 DOCS_OUTPUT="${OUTPUT}/static/Docs"
-git fetch --tags
 DOCS_VERSION=$( git tag | grep ^ios | sed 's/^ios-//' | sort -r | grep -v '\-rc.' | grep -v '\-pre.' | sed -n '1p' | sed 's/^v//' )
 rm -rf /tmp/mbgl
 mkdir -p /tmp/mbgl/

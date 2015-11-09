@@ -3,6 +3,8 @@
 set -e
 set -o pipefail
 
+git fetch --tags
+
 mapbox_time "checkout_mason" \
 git submodule update --init .mason
 
