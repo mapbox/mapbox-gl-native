@@ -349,6 +349,10 @@ public class MainActivity extends AppCompatActivity {
                                 startActivity(new Intent(getApplicationContext(), PressForMarkerActivity.class));
                                 return true;
 
+                            case R.id.action_manual_zoom:
+                                startActivity(new Intent(getApplicationContext(), ManualZoomActivity.class));
+                                return true;
+
                             case R.id.action_bulk_markers:
                                 startActivity(new Intent(getApplicationContext(), BulkMarkerActivity.class));
                                 return true;

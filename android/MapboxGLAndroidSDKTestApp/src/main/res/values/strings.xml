@@ -8,6 +8,7 @@
     <string name="activity_map_fragment">Map Fragment Activity</string>
     <string name="activity_press_for_marker">Press For Marker Activity</string>
     <string name="activity_marker_in_bulk">Add Bulk Markers Activity</string>
+    <string name="activity_manual_zoom">Manual Zoom Activity</string>
     <string name="activity_info_window">InfoWindow Activity</string>
     <string name="activity_visible_coordinate_bounds">Visible Coordinate Bounds</string>
     <string name="activity_user_tracking_mode">User tracking mode</string>
