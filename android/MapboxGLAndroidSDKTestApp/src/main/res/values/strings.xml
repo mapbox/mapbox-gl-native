@@ -65,4 +65,6 @@
         <!--<item>Combined mode</item>-->
     </string-array>
 
+    <string name="zoom_botton">Zoom</string>
+
 </resources>
