@@ -426,8 +426,8 @@ std::chrono::steady_clock::duration secondsAsDuration(float duration)
     MGLReachability *reachability = [notification object];
     if ( ! _isWaitingForRedundantReachableNotification && [reachability isReachable])
     {
-            mbgl::NetworkStatus::Reachable();
-        }
+        mbgl::NetworkStatus::Reachable();
+    }
     _isWaitingForRedundantReachableNotification = NO;
 }
 
