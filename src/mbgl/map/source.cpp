@@ -527,14 +527,9 @@ bool Source::update(MapData& data,
 }
 
 void Source::updateTilePtrs() {
-    std::vector<Tile*> newPtrs;
+    tilePtrs.clear();
     for (const auto& pair : tiles) {
-        newPtrs.push_back(pair.second.get());
-    }
-
-    if (tilePtrs != newPtrs) {
-        tilePtrs.swap(newPtrs);
-        emitTileLoaded(true);
+        tilePtrs.push_back(pair.second.get());
     }
 }
 
