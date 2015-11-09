@@ -111,7 +111,7 @@ cp -pv platform/ios/resources/* "${OUTPUT}/static/${NAME}.bundle"
 
 step "Creating API Docs..."
 if [ -z `which appledoc` ]; then
-    echo "Unable to find appledoc. See https://github.com/mapbox/mapbox-gl-native/blob/master/INSTALL.md"
+    echo "Unable to find appledoc. See https://github.com/mapbox/mapbox-gl-native/blob/master/docs/BUILD_IOS_OSX.md"
     exit 1
 fi
 DOCS_OUTPUT="${OUTPUT}/static/Docs"
