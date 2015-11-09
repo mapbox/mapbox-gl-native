@@ -265,9 +265,7 @@ bool MapContext::renderSync(const TransformState& state, const FrameData& frame)
     if (style->hasTransitions()) {
         updateFlags |= Update::Classes;
         asyncUpdate->send();
-    }
-
-    if (painter->needsAnimation()) {
+    } else if (painter->needsAnimation()) {
         updateFlags |= Update::Repaint;
         asyncUpdate->send();
     }
