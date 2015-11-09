@@ -6,14 +6,11 @@
 #include <mbgl/map/transform_state.hpp>
 #include <mbgl/map/map.hpp>
 #include <mbgl/style/style.hpp>
+#include <mbgl/util/async_task.hpp>
 #include <mbgl/util/gl_object_store.hpp>
 #include <mbgl/util/ptr.hpp>
 
 #include <vector>
-
-namespace uv {
-class async;
-}
 
 namespace mbgl {
 
@@ -77,8 +74,8 @@ private:
     util::GLObjectStore glObjectStore;
 
     Update updateFlags = Update::Nothing;
-    std::unique_ptr<uv::async> asyncUpdate;
-    std::unique_ptr<uv::async> asyncInvalidate;
+    util::AsyncTask asyncUpdate;
+    util::AsyncTask asyncInvalidate;
 
     std::unique_ptr<TexturePool> texturePool;
     std::unique_ptr<Painter> painter;
