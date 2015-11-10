@@ -23,8 +23,8 @@ public:
     // Map view
     bool resize(std::array<uint16_t, 2> size);
 
-    void jumpTo(const CameraOptions options);
-    void easeTo(const CameraOptions options);
+    void jumpTo(const CameraOptions&);
+    void easeTo(const CameraOptions&);
 
     // Position
     void moveBy(const PrecisionPoint&, const Duration& = Duration::zero());
@@ -69,8 +69,7 @@ private:
     void _moveBy(const PrecisionPoint&, const Duration& = Duration::zero());
     void _setScale(double scale, double cx, double cy, const Duration& = Duration::zero());
     void _setScaleXY(double new_scale, double xn, double yn, const Duration& = Duration::zero());
-    void _easeTo(CameraOptions options, const double new_scale, const double new_angle,
-                 const double xn, const double yn);
+    void _easeTo(const CameraOptions&, double new_scale, double new_angle, double xn, double yn);
     void _setAngle(double angle, const Duration& = Duration::zero());
 
     View &view;

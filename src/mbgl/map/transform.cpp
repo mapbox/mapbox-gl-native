@@ -55,36 +55,37 @@ bool Transform::resize(const std::array<uint16_t, 2> size) {
 
 #pragma mark - Position
 
-void Transform::jumpTo(const CameraOptions options) {
-    CameraOptions jumpOptions = options;
+void Transform::jumpTo(const CameraOptions& options) {
+    CameraOptions jumpOptions(options);
     jumpOptions.duration.reset();
     easeTo(jumpOptions);
 }
 
-void Transform::easeTo(CameraOptions options) {
-    LatLng latLng = options.center ? *options.center : getLatLng();
-    double zoom = options.zoom ? *options.zoom : getZoom();
-    double angle = options.angle ? *options.angle : getAngle();
+void Transform::easeTo(const CameraOptions& options) {
+    CameraOptions easeOptions(options);
+    LatLng latLng = easeOptions.center ? *easeOptions.center : getLatLng();
+    double zoom = easeOptions.zoom ? *easeOptions.zoom : getZoom();
+    double angle = easeOptions.angle ? *easeOptions.angle : getAngle();
     if (!latLng.isValid() || std::isnan(zoom)) {
         return;
     }
-    
+
     double new_scale = std::pow(2.0, zoom);
-    
+
     const double s = new_scale * util::tileSize;
     state.Bc = s / 360;
     state.Cc = s / util::M2PI;
-    
+
     const double m = 1 - 1e-15;
     const double f = std::fmin(std::fmax(std::sin(util::DEG2RAD * latLng.latitude), -m), m);
-    
+
     double xn = -latLng.longitude * state.Bc;
     double yn = 0.5 * state.Cc * std::log((1 + f) / (1 - f));
-    
-    options.center.reset();
-    options.zoom.reset();
-    options.angle.reset();
-    _easeTo(options, new_scale, angle, xn, yn);
+
+    easeOptions.center.reset();
+    easeOptions.zoom.reset();
+    easeOptions.angle.reset();
+    _easeTo(easeOptions, new_scale, angle, xn, yn);
 }
 
 void Transform::moveBy(const PrecisionPoint& point, const Duration& duration) {
@@ -223,7 +224,8 @@ void Transform::_setScaleXY(const double new_scale, const double xn, const doubl
     _easeTo(options, new_scale, state.angle, xn, yn);
 }
 
-void Transform::_easeTo(CameraOptions options, const double new_scale, const double new_angle, const double xn, const double yn) {
+void Transform::_easeTo(const CameraOptions& options, double new_scale, double new_angle, double xn, double yn) {
+    CameraOptions easeOptions(options);
     Update update = state.scale == new_scale ? Update::Repaint : Update::Zoom;
     double scale = new_scale;
     double x = xn;
@@ -233,12 +235,12 @@ void Transform::_easeTo(CameraOptions options, const double new_scale, const dou
     
     double angle = _normalizeAngle(new_angle, state.angle);
     state.angle = _normalizeAngle(state.angle, angle);
-    double pitch = options.pitch ? *options.pitch : state.pitch;
+    double pitch = easeOptions.pitch ? *easeOptions.pitch : state.pitch;
 
-    if (!options.duration) {
-        options.duration = Duration::zero();
+    if (!easeOptions.duration) {
+        easeOptions.duration = Duration::zero();
     }
-    if (!options.duration || *options.duration == Duration::zero()) {
+    if (!easeOptions.duration || *easeOptions.duration == Duration::zero()) {
         view.notifyMapChange(MapChangeRegionWillChange);
 
         state.scale = scale;
@@ -266,7 +268,7 @@ void Transform::_easeTo(CameraOptions options, const double new_scale, const dou
 
         startTransition(
             [=](double t) {
-                util::UnitBezier ease = options.easing ? *options.easing : util::UnitBezier(0, 0, 0.25, 1);
+                util::UnitBezier ease = easeOptions.easing ? *easeOptions.easing : util::UnitBezier(0, 0, 0.25, 1);
                 return ease.solve(t, 0.001);
             },
             [=](double t) {
@@ -289,7 +291,7 @@ void Transform::_easeTo(CameraOptions options, const double new_scale, const dou
                 state.scaling = false;
                 state.rotating = false;
                 view.notifyMapChange(MapChangeRegionDidChangeAnimated);
-            }, *options.duration);
+            }, *easeOptions.duration);
     }
 }
 
