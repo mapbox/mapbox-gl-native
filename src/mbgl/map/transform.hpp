@@ -27,7 +27,7 @@ public:
     void easeTo(const CameraOptions options);
 
     // Position
-    void moveBy(double dx, double dy, const Duration& = Duration::zero());
+    void moveBy(const PrecisionPoint&, const Duration& = Duration::zero());
     void setLatLng(LatLng latLng, const Duration& = Duration::zero());
     void setLatLng(LatLng latLng, vec2<double> point, const Duration& duration = Duration::zero());
     void setLatLngZoom(LatLng latLng, double zoom, const Duration& = Duration::zero());
@@ -66,7 +66,7 @@ public:
     bool isPanning() const { return state.isPanning(); }
 
 private:
-    void _moveBy(double dx, double dy, const Duration& = Duration::zero());
+    void _moveBy(const PrecisionPoint&, const Duration& = Duration::zero());
     void _setScale(double scale, double cx, double cy, const Duration& = Duration::zero());
     void _setScaleXY(double new_scale, double xn, double yn, const Duration& = Duration::zero());
     void _easeTo(CameraOptions options, const double new_scale, const double new_angle,

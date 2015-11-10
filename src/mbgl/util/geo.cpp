@@ -12,7 +12,7 @@ LatLng::LatLng(const TileID& id) {
     latitude = 180.0 / M_PI * std::atan(0.5 * (std::exp(n) - std::exp(-n)));
 }
 
-vec2<double> LatLng::project() const {
+PrecisionPoint LatLng::project() const {
     // Clamp to the latitude limits of Mercator.
     const double constrainedLatitude = ::fmin(::fmax(latitude, -util::LATITUDE_MAX), util::LATITUDE_MAX);
 

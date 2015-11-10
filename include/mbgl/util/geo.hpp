@@ -3,9 +3,23 @@
 
 #include <mbgl/util/vec.hpp>
 
+#include <cmath>
+
 namespace mbgl {
 
 class TileID;
+
+struct PrecisionPoint {
+    double x = 0;
+    double y = 0;
+
+    inline PrecisionPoint(double x_ = 0, double y_ = 0)
+        : x(x_), y(y_) {}
+
+    inline bool isValid() const {
+        return !(std::isnan(x) || std::isnan(y));
+    }
+};
 
 struct LatLng {
     double latitude = 0;
@@ -21,7 +35,7 @@ struct LatLng {
     // Constructs a LatLng object with the top left position of the specified tile.
     LatLng(const TileID& id);
 
-    vec2<double> project() const;
+    PrecisionPoint project() const;
 };
 
 struct ProjectedMeters {

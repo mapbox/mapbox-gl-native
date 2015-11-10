@@ -156,8 +156,8 @@ void Map::easeTo(CameraOptions options) {
 
 #pragma mark - Position
 
-void Map::moveBy(double dx, double dy, const Duration& duration) {
-    transform->moveBy(dx, dy, duration);
+void Map::moveBy(const PrecisionPoint& point, const Duration& duration) {
+    transform->moveBy(point, duration);
     update(Update::Repaint);
 }
 

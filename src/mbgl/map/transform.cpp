@@ -87,21 +87,20 @@ void Transform::easeTo(CameraOptions options) {
     _easeTo(options, new_scale, angle, xn, yn);
 }
 
-void Transform::moveBy(const double dx, const double dy, const Duration& duration) {
-    if (std::isnan(dx) || std::isnan(dy)) {
+void Transform::moveBy(const PrecisionPoint& point, const Duration& duration) {
+    if (!point.isValid()) {
         return;
     }
 
-    _moveBy(dx, dy, duration);
+    _moveBy(point, duration);
 }
 
-void Transform::_moveBy(const double dx, const double dy, const Duration& duration) {
-    
-    double x = state.x + std::cos(state.angle) * dx + std::sin( state.angle) * dy;
-    double y = state.y + std::cos(state.angle) * dy + std::sin(-state.angle) * dx;
+void Transform::_moveBy(const PrecisionPoint& point, const Duration& duration) {
+    double x = state.x + std::cos(state.angle) * point.x + std::sin( state.angle) * point.y;
+    double y = state.y + std::cos(state.angle) * point.y + std::sin(-state.angle) * point.x;
 
     state.constrain(state.scale, y);
-    
+
     CameraOptions options;
     options.duration = duration;
     _easeTo(options, state.scale, state.angle, x, y);
