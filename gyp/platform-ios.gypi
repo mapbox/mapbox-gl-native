@@ -65,6 +65,10 @@
         '../platform/ios/NSString+MGLAdditions.m',
         '../platform/ios/vendor/SMCalloutView/SMCalloutView.h',
         '../platform/ios/vendor/SMCalloutView/SMCalloutView.m',
+        '../platform/ios/vendor/Fabric/FABAttributes.h',
+        '../platform/ios/vendor/Fabric/FABKitProtocol.h',
+        '../platform/ios/vendor/Fabric/Fabric.h',
+        '../platform/ios/vendor/Fabric/Fabric+FABKits.h',
         '../platform/ios/resources/',
       ],
 
@@ -95,7 +99,6 @@
         'OTHER_CPLUSPLUSFLAGS': [ '<@(cflags_cc)' ],
         'CLANG_ENABLE_OBJC_ARC': 'YES',
         'CLANG_ENABLE_MODULES': 'YES',
-        'FRAMEWORK_SEARCH_PATHS': '../platform/ios/vendor',
       },
 
       'link_settings': {

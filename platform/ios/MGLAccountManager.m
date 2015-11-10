@@ -3,8 +3,8 @@
 #import "MGLCategoryLoader.h"
 #import "NSProcessInfo+MGLAdditions.h"
 
-#import <Fabric/FABKitProtocol.h>
-#import <Fabric/Fabric+FABKits.h>
+#import "FABKitProtocol.h"
+#import "Fabric+FABKits.h"
 
 @interface MGLAccountManager() <FABKit>
 

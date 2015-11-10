@@ -4,7 +4,7 @@
 //  Copyright (c) 2015 Twitter. All rights reserved.
 //
 
-#import <Fabric/Fabric.h>
+#import "Fabric.h"
 
 @protocol FABKit;
 // Use this category for methods that kits can call on Fabric.
