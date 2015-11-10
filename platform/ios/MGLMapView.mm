@@ -843,10 +843,10 @@ std::chrono::steady_clock::duration secondsAsDuration(float duration)
 
         double flippedY = self.bounds.size.height - [pan locationInView:pan.view].y;
         _mbglMap->setLatLng(
-            _mbglMap->latLngForPixel(mbgl::vec2<double>(
+            _mbglMap->latLngForPixel(mbgl::PrecisionPoint(
                 [pan locationInView:pan.view].x - delta.x,
                 flippedY + delta.y)),
-            mbgl::vec2<double>(
+            mbgl::PrecisionPoint(
                 [pan locationInView:pan.view].x,
                 flippedY));
 
@@ -867,7 +867,7 @@ std::chrono::steady_clock::duration secondsAsDuration(float duration)
         if ( ! CGPointEqualToPoint(velocity, CGPointZero))
         {
             CGPoint offset = CGPointMake(velocity.x * duration / 4, velocity.y * duration / 4);
-            _mbglMap->moveBy(offset.x, offset.y, secondsAsDuration(duration));
+            _mbglMap->moveBy({ offset.x, offset.y }, secondsAsDuration(duration));
         }
 
         _mbglMap->setGestureInProgress(false);
@@ -927,7 +927,9 @@ std::chrono::steady_clock::duration secondsAsDuration(float duration)
 
         if (log2(newScale) < _mbglMap->getMinZoom()) return;
 
-        _mbglMap->setScale(newScale, [pinch locationInView:pinch.view].x, [pinch locationInView:pinch.view].y);
+        mbgl::PrecisionPoint center([pinch locationInView:pinch.view].x,
+                                    [pinch locationInView:pinch.view].y);
+        _mbglMap->setScale(newScale, center);
 
         [self notifyMapChange:mbgl::MapChangeRegionIsChanging];
     }
@@ -964,7 +966,8 @@ std::chrono::steady_clock::duration secondsAsDuration(float duration)
         if (velocity)
         {
             CGPoint pinchCenter = [pinch locationInView:pinch.view];
-            _mbglMap->setScale(newScale, pinchCenter.x, pinchCenter.y, secondsAsDuration(duration));
+            mbgl::PrecisionPoint center(pinchCenter.x, pinchCenter.y);
+            _mbglMap->setScale(newScale, center, secondsAsDuration(duration));
         }
 
         _mbglMap->setGestureInProgress(false);
@@ -1019,9 +1022,9 @@ std::chrono::steady_clock::duration secondsAsDuration(float duration)
             newDegrees = fmaxf(newDegrees, -30);
         }
 
-        _mbglMap->setBearing(newDegrees,
-                            [rotate locationInView:rotate.view].x,
-                            self.bounds.size.height - [rotate locationInView:rotate.view].y);
+        mbgl::PrecisionPoint center([rotate locationInView:rotate.view].x,
+                                    self.bounds.size.height - [rotate locationInView:rotate.view].y);
+        _mbglMap->setBearing(newDegrees, center);
 
         [self notifyMapChange:mbgl::MapChangeRegionIsChanging];
     }
@@ -1253,7 +1256,8 @@ std::chrono::steady_clock::duration secondsAsDuration(float duration)
             self.userTrackingMode = MGLUserTrackingModeNone;
         }
 
-        _mbglMap->scaleBy(2, zoomInPoint.x, zoomInPoint.y, secondsAsDuration(MGLAnimationDuration));
+        mbgl::PrecisionPoint center(zoomInPoint.x, zoomInPoint.y);
+        _mbglMap->scaleBy(2, center, secondsAsDuration(MGLAnimationDuration));
 
         self.animatingGesture = YES;
 
@@ -1297,7 +1301,8 @@ std::chrono::steady_clock::duration secondsAsDuration(float duration)
             zoomOutPoint = CGPointMake([twoFingerTap locationInView:twoFingerTap.view].x, [twoFingerTap locationInView:twoFingerTap.view].y);
         }
 
-        _mbglMap->scaleBy(0.5, zoomOutPoint.x, zoomOutPoint.y, secondsAsDuration(MGLAnimationDuration));
+        mbgl::PrecisionPoint center(zoomOutPoint.x, zoomOutPoint.y);
+        _mbglMap->scaleBy(0.5, center, secondsAsDuration(MGLAnimationDuration));
 
         self.animatingGesture = YES;
 
@@ -1336,7 +1341,8 @@ std::chrono::steady_clock::duration secondsAsDuration(float duration)
 
         if (newZoom < _mbglMap->getMinZoom()) return;
 
-        _mbglMap->scaleBy(powf(2, newZoom) / _mbglMap->getScale(), self.bounds.size.width / 2, self.bounds.size.height / 2);
+        mbgl::PrecisionPoint center(self.bounds.size.width / 2, self.bounds.size.height / 2);
+        _mbglMap->scaleBy(powf(2, newZoom) / _mbglMap->getScale(), center);
 
         [self notifyMapChange:mbgl::MapChangeRegionIsChanging];
     }
@@ -1962,7 +1968,7 @@ mbgl::LatLngBounds MGLLatLngBoundsFromCoordinateBounds(MGLCoordinateBounds coord
     //
     convertedPoint.y = self.bounds.size.height - convertedPoint.y;
 
-    return MGLLocationCoordinate2DFromLatLng(_mbglMap->latLngForPixel(mbgl::vec2<double>(convertedPoint.x, convertedPoint.y)));
+    return MGLLocationCoordinate2DFromLatLng(_mbglMap->latLngForPixel(mbgl::PrecisionPoint(convertedPoint.x, convertedPoint.y)));
 }
 
 - (CGPoint)convertCoordinate:(CLLocationCoordinate2D)coordinate toPointToView:(nullable UIView *)view
