@@ -69,7 +69,7 @@ uint16_t TransformState::getHeight() const {
 
 #pragma mark - Position
 
-const LatLng TransformState::getLatLng() const {
+LatLng TransformState::getLatLng() const {
     LatLng ll;
 
     ll.longitude = -x / Bc;
@@ -216,11 +216,11 @@ float TransformState::worldSize() const {
     return util::tileSize * scale;
 }
 
-vec2<double> TransformState::latLngToPoint(const LatLng& latLng) const {
+PrecisionPoint TransformState::latLngToPoint(const LatLng& latLng) const {
     return coordinateToPoint(latLngToCoordinate(latLng));
 }
 
-LatLng TransformState::pointToLatLng(const vec2<double> point) const {
+LatLng TransformState::pointToLatLng(const PrecisionPoint& point) const {
     return coordinateToLatLng(pointToCoordinate(point));
 }
 
@@ -245,7 +245,7 @@ LatLng TransformState::coordinateToLatLng(const TileCoordinate& coord) const {
     return latLng;
 }
 
-vec2<double> TransformState::coordinateToPoint(const TileCoordinate& coord) const {
+PrecisionPoint TransformState::coordinateToPoint(const TileCoordinate& coord) const {
     mat4 mat = coordinatePointMatrix(coord.zoom);
     matrix::vec4 p;
     matrix::vec4 c = {{ coord.column, coord.row, 0, 1 }};
@@ -253,7 +253,7 @@ vec2<double> TransformState::coordinateToPoint(const TileCoordinate& coord) cons
     return { p[0] / p[3], height - p[1] / p[3] };
 }
 
-TileCoordinate TransformState::pointToCoordinate(const vec2<double> point) const {
+TileCoordinate TransformState::pointToCoordinate(const PrecisionPoint& point) const {
 
     float targetZ = 0;
     const double tileZoom = getZoom();

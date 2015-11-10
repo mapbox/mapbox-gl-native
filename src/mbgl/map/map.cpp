@@ -161,12 +161,12 @@ void Map::moveBy(const PrecisionPoint& point, const Duration& duration) {
     update(Update::Repaint);
 }
 
-void Map::setLatLng(LatLng latLng, const Duration& duration) {
+void Map::setLatLng(const LatLng& latLng, const Duration& duration) {
     transform->setLatLng(latLng, duration);
     update(Update::Repaint);
 }
 
-void Map::setLatLng(LatLng latLng, vec2<double> point, const Duration& duration) {
+void Map::setLatLng(const LatLng& latLng, const PrecisionPoint& point, const Duration& duration) {
     transform->setLatLng(latLng, point, duration);
     update(Update::Repaint);
 }
@@ -210,7 +210,7 @@ double Map::getZoom() const {
     return transform->getZoom();
 }
 
-void Map::setLatLngZoom(LatLng latLng, double zoom, const Duration& duration) {
+void Map::setLatLngZoom(const LatLng& latLng, double zoom, const Duration& duration) {
     transform->setLatLngZoom(latLng, zoom, duration);
     update(Update::Zoom);
 }
@@ -232,37 +232,40 @@ CameraOptions Map::cameraForLatLngs(std::vector<LatLng> latLngs, EdgeInsets padd
     }
 
     // Calculate the bounds of the possibly rotated shape with respect to the viewport.
-    vec2<> nePixel = {-INFINITY, -INFINITY};
-    vec2<> swPixel = {INFINITY, INFINITY};
+    PrecisionPoint nePixel = {-INFINITY, -INFINITY};
+    PrecisionPoint swPixel = {INFINITY, INFINITY};
     for (LatLng latLng : latLngs) {
-        vec2<> pixel = pixelForLatLng(latLng);
+        PrecisionPoint pixel = pixelForLatLng(latLng);
         swPixel.x = std::min(swPixel.x, pixel.x);
         nePixel.x = std::max(nePixel.x, pixel.x);
         swPixel.y = std::min(swPixel.y, pixel.y);
         nePixel.y = std::max(nePixel.y, pixel.y);
     }
-    vec2<> size = nePixel - swPixel;
+    double width = nePixel.x - swPixel.x;
+    double height = nePixel.y - swPixel.y;
 
     // Calculate the zoom level.
-    double scaleX = (getWidth() - padding.left - padding.right) / size.x;
-    double scaleY = (getHeight() - padding.top - padding.bottom) / size.y;
+    double scaleX = (getWidth() - padding.left - padding.right) / width;
+    double scaleY = (getHeight() - padding.top - padding.bottom) / height;
     double minScale = ::fmin(scaleX, scaleY);
     double zoom = ::log2(getScale() * minScale);
     zoom = ::fmax(::fmin(zoom, getMaxZoom()), getMinZoom());
 
     // Calculate the center point of a virtual bounds that is extended in all directions by padding.
-    vec2<> paddedNEPixel = {
+    PrecisionPoint paddedNEPixel = {
         nePixel.x + padding.right / minScale,
         nePixel.y + padding.top / minScale,
     };
-    vec2<> paddedSWPixel = {
+    PrecisionPoint paddedSWPixel = {
         swPixel.x - padding.left / minScale,
         swPixel.y - padding.bottom / minScale,
     };
-    vec2<> centerPixel = (paddedNEPixel + paddedSWPixel) * 0.5;
-    LatLng centerLatLng = latLngForPixel(centerPixel);
+    PrecisionPoint centerPixel = {
+        (paddedNEPixel.x + paddedSWPixel.x) / 2,
+        (paddedNEPixel.y + paddedSWPixel.y) / 2,
+    };
 
-    options.center = centerLatLng;
+    options.center = latLngForPixel(centerPixel);
     options.zoom = zoom;
     return options;
 }
@@ -344,19 +347,19 @@ double Map::getMetersPerPixelAtLatitude(const double lat, const double zoom) con
     return Projection::getMetersPerPixelAtLatitude(lat, zoom);
 }
 
-const ProjectedMeters Map::projectedMetersForLatLng(const LatLng latLng) const {
+ProjectedMeters Map::projectedMetersForLatLng(const LatLng& latLng) const {
     return Projection::projectedMetersForLatLng(latLng);
 }
 
-const LatLng Map::latLngForProjectedMeters(const ProjectedMeters projectedMeters) const {
+LatLng Map::latLngForProjectedMeters(const ProjectedMeters& projectedMeters) const {
     return Projection::latLngForProjectedMeters(projectedMeters);
 }
 
-const vec2<double> Map::pixelForLatLng(const LatLng latLng) const {
+PrecisionPoint Map::pixelForLatLng(const LatLng& latLng) const {
     return transform->getState().latLngToPoint(latLng);
 }
 
-const LatLng Map::latLngForPixel(const vec2<double> pixel) const {
+LatLng Map::latLngForPixel(const PrecisionPoint& pixel) const {
     return transform->getState().pointToLatLng(pixel);
 }
 

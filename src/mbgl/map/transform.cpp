@@ -106,7 +106,7 @@ void Transform::_moveBy(const PrecisionPoint& point, const Duration& duration) {
     _easeTo(options, state.scale, state.angle, x, y);
 }
 
-void Transform::setLatLng(const LatLng latLng, const Duration& duration) {
+void Transform::setLatLng(const LatLng& latLng, const Duration& duration) {
     if (!latLng.isValid()) {
         return;
     }
@@ -117,8 +117,8 @@ void Transform::setLatLng(const LatLng latLng, const Duration& duration) {
     easeTo(options);
 }
 
-void Transform::setLatLng(const LatLng latLng, vec2<double> point, const Duration& duration) {
-    if (!latLng.isValid()) {
+void Transform::setLatLng(const LatLng& latLng, const PrecisionPoint& point, const Duration& duration) {
+    if (!latLng.isValid() || !point.isValid()) {
         return;
     }
 
@@ -138,7 +138,7 @@ void Transform::setLatLng(const LatLng latLng, vec2<double> point, const Duratio
     setLatLng(newLatLng, duration);
 }
 
-void Transform::setLatLngZoom(const LatLng latLng, const double zoom, const Duration& duration) {
+void Transform::setLatLngZoom(const LatLng& latLng, const double zoom, const Duration& duration) {
     CameraOptions options;
     options.center = latLng;
     options.zoom = zoom;

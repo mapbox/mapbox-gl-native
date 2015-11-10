@@ -28,10 +28,10 @@ public:
 
     // Position
     void moveBy(const PrecisionPoint&, const Duration& = Duration::zero());
-    void setLatLng(LatLng latLng, const Duration& = Duration::zero());
-    void setLatLng(LatLng latLng, vec2<double> point, const Duration& duration = Duration::zero());
-    void setLatLngZoom(LatLng latLng, double zoom, const Duration& = Duration::zero());
-    inline const LatLng getLatLng() const { return state.getLatLng(); }
+    void setLatLng(const LatLng&, const Duration& = Duration::zero());
+    void setLatLng(const LatLng&, const PrecisionPoint&, const Duration& = Duration::zero());
+    void setLatLngZoom(const LatLng&, double zoom, const Duration& = Duration::zero());
+    LatLng getLatLng() const { return state.getLatLng(); }
 
     // Zoom
     void scaleBy(double ds, double cx = -1, double cy = -1, const Duration& = Duration::zero());

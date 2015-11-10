@@ -101,8 +101,8 @@ public:
 
     // Position
     void moveBy(const PrecisionPoint&, const Duration& = Duration::zero());
-    void setLatLng(LatLng latLng, vec2<double> point, const Duration& = Duration::zero());
-    void setLatLng(LatLng latLng, const Duration& = Duration::zero());
+    void setLatLng(const LatLng&, const PrecisionPoint&, const Duration& = Duration::zero());
+    void setLatLng(const LatLng&, const Duration& = Duration::zero());
     LatLng getLatLng() const;
     void resetPosition();
 
@@ -112,7 +112,7 @@ public:
     double getScale() const;
     void setZoom(double zoom, const Duration& = Duration::zero());
     double getZoom() const;
-    void setLatLngZoom(LatLng latLng, double zoom, const Duration& = Duration::zero());
+    void setLatLngZoom(const LatLng&, double zoom, const Duration& = Duration::zero());
     CameraOptions cameraForLatLngBounds(LatLngBounds bounds, EdgeInsets padding);
     CameraOptions cameraForLatLngs(std::vector<LatLng> latLngs, EdgeInsets padding);
     void resetZoom();
@@ -138,10 +138,10 @@ public:
     void getWorldBoundsMeters(ProjectedMeters &sw, ProjectedMeters &ne) const;
     void getWorldBoundsLatLng(LatLng &sw, LatLng &ne) const;
     double getMetersPerPixelAtLatitude(const double lat, const double zoom) const;
-    const ProjectedMeters projectedMetersForLatLng(const LatLng latLng) const;
-    const LatLng latLngForProjectedMeters(const ProjectedMeters projectedMeters) const;
-    const vec2<double> pixelForLatLng(const LatLng latLng) const;
-    const LatLng latLngForPixel(const vec2<double> pixel) const;
+    ProjectedMeters projectedMetersForLatLng(const LatLng&) const;
+    LatLng latLngForProjectedMeters(const ProjectedMeters&) const;
+    PrecisionPoint pixelForLatLng(const LatLng&) const;
+    LatLng latLngForPixel(const PrecisionPoint&) const;
 
     // Annotations
     AnnotationID addPointAnnotation(const PointAnnotation&);

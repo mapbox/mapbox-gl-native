@@ -35,7 +35,7 @@ public:
     void getLonLat(double &lon, double &lat) const;
 
     // Position
-    const LatLng getLatLng() const;
+    LatLng getLatLng() const;
     double pixel_x() const;
     double pixel_y() const;
 
@@ -61,14 +61,14 @@ public:
     bool isGestureInProgress() const;
 
     // Conversion and projection
-    vec2<double> latLngToPoint(const LatLng& latLng) const;
-    LatLng pointToLatLng(const vec2<double> point) const;
+    PrecisionPoint latLngToPoint(const LatLng&) const;
+    LatLng pointToLatLng(const PrecisionPoint&) const;
 
-    TileCoordinate latLngToCoordinate(const LatLng& latLng) const;
-    LatLng coordinateToLatLng(const TileCoordinate& coord) const;
+    TileCoordinate latLngToCoordinate(const LatLng&) const;
+    LatLng coordinateToLatLng(const TileCoordinate&) const;
 
-    vec2<double> coordinateToPoint(const TileCoordinate& coord) const;
-    TileCoordinate pointToCoordinate(const vec2<double> point) const;
+    PrecisionPoint coordinateToPoint(const TileCoordinate&) const;
+    TileCoordinate pointToCoordinate(const PrecisionPoint&) const;
 
 private:
     void constrain(double& scale, double& y) const;
