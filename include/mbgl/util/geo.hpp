@@ -14,6 +14,10 @@ struct LatLng {
     inline LatLng(double lat = 0, double lon = 0)
         : latitude(lat), longitude(lon) {}
 
+    inline bool isValid() const {
+        return !(std::isnan(latitude) || std::isnan(longitude));
+    }
+
     // Constructs a LatLng object with the top left position of the specified tile.
     LatLng(const TileID& id);
 
@@ -26,6 +30,10 @@ struct ProjectedMeters {
 
     inline ProjectedMeters(double n = 0, double e = 0)
         : northing(n), easting(e) {}
+
+    inline bool isValid() const {
+        return !(std::isnan(northing) || std::isnan(easting));
+    }
 };
 
 struct LatLngBounds {
@@ -34,6 +42,10 @@ struct LatLngBounds {
 
     inline LatLngBounds(LatLng sw_ = {90, 180}, LatLng ne_ = {-90, -180})
         : sw(sw_), ne(ne_) {}
+
+    inline bool isValid() const {
+        return sw.isValid() && ne.isValid();
+    }
 
     // Constructs a LatLngBounds object with the tile's exact boundaries.
     LatLngBounds(const TileID& id);

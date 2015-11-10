@@ -65,7 +65,7 @@ void Transform::easeTo(CameraOptions options) {
     LatLng latLng = options.center ? *options.center : getLatLng();
     double zoom = options.zoom ? *options.zoom : getZoom();
     double angle = options.angle ? *options.angle : getAngle();
-    if (std::isnan(latLng.latitude) || std::isnan(latLng.longitude) || std::isnan(zoom)) {
+    if (!latLng.isValid() || std::isnan(zoom)) {
         return;
     }
     
@@ -108,6 +108,10 @@ void Transform::_moveBy(const double dx, const double dy, const Duration& durati
 }
 
 void Transform::setLatLng(const LatLng latLng, const Duration& duration) {
+    if (!latLng.isValid()) {
+        return;
+    }
+
     CameraOptions options;
     options.center = latLng;
     options.duration = duration;
@@ -115,7 +119,7 @@ void Transform::setLatLng(const LatLng latLng, const Duration& duration) {
 }
 
 void Transform::setLatLng(const LatLng latLng, vec2<double> point, const Duration& duration) {
-    if (std::isnan(latLng.latitude) || std::isnan(latLng.longitude)) {
+    if (!latLng.isValid()) {
         return;
     }
 
