@@ -616,7 +616,8 @@ void JNICALL nativeMoveBy(JNIEnv *env, jobject obj, jlong nativeMapViewPtr, jdou
     mbgl::Log::Debug(mbgl::Event::JNI, "nativeMoveBy");
     assert(nativeMapViewPtr != 0);
     NativeMapView *nativeMapView = reinterpret_cast<NativeMapView *>(nativeMapViewPtr);
-    nativeMapView->getMap().moveBy(dx, dy, std::chrono::milliseconds(duration));
+    mbgl::PrecisionPoint center(dx, dy);
+    nativeMapView->getMap().moveBy(center, std::chrono::milliseconds(duration));
 }
 
 void JNICALL nativeSetLatLng(JNIEnv *env, jobject obj, jlong nativeMapViewPtr, jobject latLng,
@@ -667,7 +668,8 @@ void JNICALL nativeScaleBy(JNIEnv *env, jobject obj, jlong nativeMapViewPtr, jdo
     mbgl::Log::Debug(mbgl::Event::JNI, "nativeScaleBy");
     assert(nativeMapViewPtr != 0);
     NativeMapView *nativeMapView = reinterpret_cast<NativeMapView *>(nativeMapViewPtr);
-    nativeMapView->getMap().scaleBy(ds, cx, cy, std::chrono::milliseconds(duration));
+    mbgl::PrecisionPoint center(cx, cy);
+    nativeMapView->getMap().scaleBy(ds, center, std::chrono::milliseconds(duration));
 }
 
 void JNICALL nativeSetScale(JNIEnv *env, jobject obj, jlong nativeMapViewPtr, jdouble scale,
@@ -675,7 +677,8 @@ void JNICALL nativeSetScale(JNIEnv *env, jobject obj, jlong nativeMapViewPtr, jd
     mbgl::Log::Debug(mbgl::Event::JNI, "nativeSetScale");
     assert(nativeMapViewPtr != 0);
     NativeMapView *nativeMapView = reinterpret_cast<NativeMapView *>(nativeMapViewPtr);
-    nativeMapView->getMap().setScale(scale, cx, cy, std::chrono::milliseconds(duration));
+    mbgl::PrecisionPoint center(cx, cy);
+    nativeMapView->getMap().setScale(scale, center, std::chrono::milliseconds(duration));
 }
 
 jdouble JNICALL nativeGetScale(JNIEnv *env, jobject obj, jlong nativeMapViewPtr) {
@@ -768,7 +771,9 @@ void JNICALL nativeRotateBy(JNIEnv *env, jobject obj, jlong nativeMapViewPtr, jd
     mbgl::Log::Debug(mbgl::Event::JNI, "nativeRotateBy");
     assert(nativeMapViewPtr != 0);
     NativeMapView *nativeMapView = reinterpret_cast<NativeMapView *>(nativeMapViewPtr);
-    nativeMapView->getMap().rotateBy(sx, sy, ex, ey, std::chrono::milliseconds(duration));
+    mbgl::PrecisionPoint first(sx, sy);
+    mbgl::PrecisionPoint second(ex, ey);
+    nativeMapView->getMap().rotateBy(first, second, std::chrono::milliseconds(duration));
 }
 
 void JNICALL nativeSetBearing(JNIEnv *env, jobject obj, jlong nativeMapViewPtr, jdouble degrees,
@@ -784,7 +789,8 @@ void JNICALL nativeSetBearing(JNIEnv *env, jobject obj, jlong nativeMapViewPtr, 
     mbgl::Log::Debug(mbgl::Event::JNI, "nativeSetBearing");
     assert(nativeMapViewPtr != 0);
     NativeMapView *nativeMapView = reinterpret_cast<NativeMapView *>(nativeMapViewPtr);
-    nativeMapView->getMap().setBearing(degrees, cx, cy);
+    mbgl::PrecisionPoint center(cx, cy);
+    nativeMapView->getMap().setBearing(degrees, center);
 }
 
 jdouble JNICALL nativeGetBearing(JNIEnv *env, jobject obj, jlong nativeMapViewPtr) {
@@ -1451,7 +1457,7 @@ jobject JNICALL nativeLatLngForPixel(JNIEnv *env, jobject obj, jlong nativeMapVi
         return nullptr;
     }
 
-    mbgl::LatLng latLng = nativeMapView->getMap().latLngForPixel(mbgl::vec2<double>(x, y));
+    mbgl::LatLng latLng = nativeMapView->getMap().latLngForPixel(mbgl::PrecisionPoint(x, y));
 
     jobject ret = env->NewObject(latLngClass, latLngConstructorId, latLng.latitude, latLng.longitude);
     if (ret == nullptr) {
