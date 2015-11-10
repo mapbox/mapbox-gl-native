@@ -1,7 +1,6 @@
 #ifndef MBGL_STYLE_STYLE
 #define MBGL_STYLE_STYLE
 
-#include <mbgl/style/property_transition.hpp>
 #include <mbgl/style/zoom_history.hpp>
 
 #include <mbgl/map/source.hpp>
