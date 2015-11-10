@@ -10,12 +10,17 @@
 #include <mbgl/platform/platform.hpp>
 
 #include <cstdio>
+#include <cmath>
 
 using namespace mbgl;
 
 /** Converts the given angle (in radians) to be numerically close to the anchor angle, allowing it to be interpolated properly without sudden jumps. */
 static double _normalizeAngle(double angle, double anchorAngle)
 {
+    if (std::isnan(angle) || std::isnan(anchorAngle)) {
+        return 0;
+    }
+
     angle = util::wrap(angle, -M_PI, M_PI);
     if (angle == -M_PI) angle = M_PI;
     double diff = std::abs(angle - anchorAngle);
@@ -66,7 +71,7 @@ void Transform::easeTo(const CameraOptions& options) {
     LatLng latLng = easeOptions.center ? *easeOptions.center : getLatLng();
     double zoom = easeOptions.zoom ? *easeOptions.zoom : getZoom();
     double angle = easeOptions.angle ? *easeOptions.angle : getAngle();
-    if (!latLng.isValid() || std::isnan(zoom)) {
+    if (!latLng.isValid() || std::isnan(zoom) || std::isnan(angle)) {
         return;
     }
 
@@ -139,7 +144,11 @@ void Transform::setLatLng(const LatLng& latLng, const PrecisionPoint& point, con
     setLatLng(newLatLng, duration);
 }
 
-void Transform::setLatLngZoom(const LatLng& latLng, const double zoom, const Duration& duration) {
+void Transform::setLatLngZoom(const LatLng& latLng, double zoom, const Duration& duration) {
+    if (!latLng.isValid() || std::isnan(zoom)) {
+        return;
+    }
+
     CameraOptions options;
     options.center = latLng;
     options.zoom = zoom;
@@ -366,6 +375,10 @@ double Transform::getAngle() const {
 #pragma mark - Pitch
 
 void Transform::setPitch(double pitch, const Duration& duration) {
+    if (std::isnan(pitch)) {
+        return;
+    }
+
     CameraOptions options;
     options.pitch = pitch;
     options.duration = duration;
