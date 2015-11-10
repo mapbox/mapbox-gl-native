@@ -187,13 +187,13 @@ void Map::resetPosition() {
 
 #pragma mark - Scale
 
-void Map::scaleBy(double ds, double cx, double cy, const Duration& duration) {
-    transform->scaleBy(ds, cx, cy, duration);
+void Map::scaleBy(double ds, const PrecisionPoint& point, const Duration& duration) {
+    transform->scaleBy(ds, point, duration);
     update(Update::Zoom);
 }
 
-void Map::setScale(double scale, double cx, double cy, const Duration& duration) {
-    transform->setScale(scale, cx, cy, duration);
+void Map::setScale(double scale, const PrecisionPoint& point, const Duration& duration) {
+    transform->setScale(scale, point, duration);
     update(Update::Zoom);
 }
 
@@ -296,8 +296,8 @@ uint16_t Map::getHeight() const {
 
 #pragma mark - Rotation
 
-void Map::rotateBy(double sx, double sy, double ex, double ey, const Duration& duration) {
-    transform->rotateBy(sx, sy, ex, ey, duration);
+void Map::rotateBy(const PrecisionPoint& first, const PrecisionPoint& second, const Duration& duration) {
+    transform->rotateBy(first, second, duration);
     update(Update::Repaint);
 }
 
@@ -306,8 +306,8 @@ void Map::setBearing(double degrees, const Duration& duration) {
     update(Update::Repaint);
 }
 
-void Map::setBearing(double degrees, double cx, double cy) {
-    transform->setAngle(-degrees * M_PI / 180, cx, cy);
+void Map::setBearing(double degrees, const PrecisionPoint& center) {
+    transform->setAngle(-degrees * M_PI / 180, center);
     update(Update::Repaint);
 }
 
@@ -343,7 +343,7 @@ void Map::getWorldBoundsLatLng(LatLng& sw, LatLng& ne) const {
     Projection::getWorldBoundsLatLng(sw, ne);
 }
 
-double Map::getMetersPerPixelAtLatitude(const double lat, const double zoom) const {
+double Map::getMetersPerPixelAtLatitude(double lat, double zoom) const {
     return Projection::getMetersPerPixelAtLatitude(lat, zoom);
 }
 

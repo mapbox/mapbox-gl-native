@@ -34,16 +34,16 @@ public:
     LatLng getLatLng() const { return state.getLatLng(); }
 
     // Zoom
-    void scaleBy(double ds, double cx = -1, double cy = -1, const Duration& = Duration::zero());
-    void setScale(double scale, double cx = -1, double cy = -1, const Duration& = Duration::zero());
+    void scaleBy(double ds, const PrecisionPoint& center = { 0, 0 }, const Duration& = Duration::zero());
+    void setScale(double scale, const PrecisionPoint& center = { 0, 0 }, const Duration& = Duration::zero());
     void setZoom(double zoom, const Duration& = Duration::zero());
     double getZoom() const;
     double getScale() const;
 
     // Angle
-    void rotateBy(double sx, double sy, double ex, double ey, const Duration& = Duration::zero());
+    void rotateBy(const PrecisionPoint& first, const PrecisionPoint& second, const Duration& = Duration::zero());
     void setAngle(double angle, const Duration& = Duration::zero());
-    void setAngle(double angle, double cx, double cy);
+    void setAngle(double angle, const PrecisionPoint& center);
     double getAngle() const;
 
     // Pitch
@@ -67,7 +67,7 @@ public:
 
 private:
     void _moveBy(const PrecisionPoint&, const Duration& = Duration::zero());
-    void _setScale(double scale, double cx, double cy, const Duration& = Duration::zero());
+    void _setScale(double scale, const PrecisionPoint& center, const Duration& = Duration::zero());
     void _setScaleXY(double new_scale, double xn, double yn, const Duration& = Duration::zero());
     void _easeTo(const CameraOptions&, double new_scale, double new_angle, double xn, double yn);
     void _setAngle(double angle, const Duration& = Duration::zero());

@@ -107,8 +107,8 @@ public:
     void resetPosition();
 
     // Scale
-    void scaleBy(double ds, double cx = -1, double cy = -1, const Duration& = Duration::zero());
-    void setScale(double scale, double cx = -1, double cy = -1, const Duration& = Duration::zero());
+    void scaleBy(double ds, const PrecisionPoint& = { 0, 0 }, const Duration& = Duration::zero());
+    void setScale(double scale, const PrecisionPoint& = { 0, 0 }, const Duration& = Duration::zero());
     double getScale() const;
     void setZoom(double zoom, const Duration& = Duration::zero());
     double getZoom() const;
@@ -120,9 +120,9 @@ public:
     double getMaxZoom() const;
 
     // Rotation
-    void rotateBy(double sx, double sy, double ex, double ey, const Duration& = Duration::zero());
+    void rotateBy(const PrecisionPoint& first, const PrecisionPoint& second, const Duration& = Duration::zero());
     void setBearing(double degrees, const Duration& = Duration::zero());
-    void setBearing(double degrees, double cx, double cy);
+    void setBearing(double degrees, const PrecisionPoint&);
     double getBearing() const;
     void resetNorth();
 
@@ -135,9 +135,10 @@ public:
     uint16_t getHeight() const;
 
     // Projection
-    void getWorldBoundsMeters(ProjectedMeters &sw, ProjectedMeters &ne) const;
-    void getWorldBoundsLatLng(LatLng &sw, LatLng &ne) const;
-    double getMetersPerPixelAtLatitude(const double lat, const double zoom) const;
+    void getWorldBoundsMeters(ProjectedMeters& sw, ProjectedMeters& ne) const;
+    void getWorldBoundsLatLng(LatLng& sw, LatLng& ne) const;
+
+    double getMetersPerPixelAtLatitude(double lat, double zoom) const;
     ProjectedMeters projectedMetersForLatLng(const LatLng&) const;
     LatLng latLngForProjectedMeters(const ProjectedMeters&) const;
     PrecisionPoint pixelForLatLng(const LatLng&) const;

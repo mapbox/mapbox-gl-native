@@ -150,8 +150,8 @@ void Transform::setLatLngZoom(const LatLng& latLng, const double zoom, const Dur
 
 #pragma mark - Zoom
 
-void Transform::scaleBy(const double ds, const double cx, const double cy, const Duration& duration) {
-    if (std::isnan(ds) || std::isnan(cx) || std::isnan(cy)) {
+void Transform::scaleBy(const double ds, const PrecisionPoint& center, const Duration& duration) {
+    if (std::isnan(ds) || !center.isValid()) {
         return;
     }
 
@@ -163,16 +163,15 @@ void Transform::scaleBy(const double ds, const double cx, const double cy, const
         new_scale = state.max_scale;
     }
 
-    _setScale(new_scale, cx, cy, duration);
+    _setScale(new_scale, center, duration);
 }
 
-void Transform::setScale(const double scale, const double cx, const double cy,
-                         const Duration& duration) {
-    if (std::isnan(scale) || std::isnan(cx) || std::isnan(cy)) {
+void Transform::setScale(const double scale, const PrecisionPoint& center, const Duration& duration) {
+    if (std::isnan(scale) || !center.isValid()) {
         return;
     }
 
-    _setScale(scale, cx, cy, duration);
+    _setScale(scale, center, duration);
 }
 
 void Transform::setZoom(const double zoom, const Duration& duration) {
@@ -180,7 +179,7 @@ void Transform::setZoom(const double zoom, const Duration& duration) {
         return;
     }
 
-    _setScale(std::pow(2.0, zoom), -1, -1, duration);
+    _setScale(std::pow(2.0, zoom), { 0, 0 }, duration);
 }
 
 double Transform::getZoom() const {
@@ -191,7 +190,7 @@ double Transform::getScale() const {
     return state.scale;
 }
 
-void Transform::_setScale(double new_scale, double cx, double cy, const Duration& duration) {
+void Transform::_setScale(double new_scale, const PrecisionPoint& center, const Duration& duration) {
     // Ensure that we don't zoom in further than the maximum allowed.
     if (new_scale < state.min_scale) {
         new_scale = state.min_scale;
@@ -203,8 +202,8 @@ void Transform::_setScale(double new_scale, double cx, double cy, const Duration
     double dx = 0;
     double dy = 0;
 
-    if (cx > 0 || cy > 0) {
-        auto coord = state.pointToCoordinate({ cx, state.getHeight() - cy }).zoomTo(state.getZoom());
+    if (center.x > 0 || center.y > 0) {
+        auto coord = state.pointToCoordinate({ center.x, state.getHeight() - center.y }).zoomTo(state.getZoom());
         auto centerCoord = state.pointToCoordinate({ state.width / 2.0f, state.height / 2.0f }).zoomTo(state.getZoom());
         auto coordDiff = centerCoord - coord;
         dx = coordDiff.column * util::tileSize * (1.0 - factor);
@@ -297,33 +296,29 @@ void Transform::_easeTo(const CameraOptions& options, double new_scale, double n
 
 #pragma mark - Angle
 
-void Transform::rotateBy(const double start_x, const double start_y, const double end_x,
-                         const double end_y, const Duration& duration) {
-    if (std::isnan(start_x) || std::isnan(start_y) || std::isnan(end_x) || std::isnan(end_y)) {
+void Transform::rotateBy(const PrecisionPoint& first, const PrecisionPoint& second, const Duration& duration) {
+    if (!first.isValid() || !second.isValid()) {
         return;
     }
 
-    double center_x = static_cast<double>(state.width) / 2.0, center_y = static_cast<double>(state.height) / 2.0;
-
-    const double begin_center_x = start_x - center_x;
-    const double begin_center_y = start_y - center_y;
-
-    const double beginning_center_dist =
-        std::sqrt(begin_center_x * begin_center_x + begin_center_y * begin_center_y);
+    double center_x = static_cast<double>(state.width) / 2.0;
+    double center_y = static_cast<double>(state.height) / 2.0;
+    const double first_x = first.x - center_x;
+    const double first_y = first.y - center_y;
+    const double second_x = second.x - center_x;
+    const double second_y = second.y - center_y;
+    const double beginning_center_dist = std::sqrt(first_x * first_x + first_y * first_y);
 
     // If the first click was too close to the center, move the center of rotation by 200 pixels
     // in the direction of the click.
     if (beginning_center_dist < 200) {
         const double offset_x = -200, offset_y = 0;
-        const double rotate_angle = std::atan2(begin_center_y, begin_center_x);
+        const double rotate_angle = std::atan2(first_y, first_x);
         const double rotate_angle_sin = std::sin(rotate_angle);
         const double rotate_angle_cos = std::cos(rotate_angle);
-        center_x = start_x + rotate_angle_cos * offset_x - rotate_angle_sin * offset_y;
-        center_y = start_y + rotate_angle_sin * offset_x + rotate_angle_cos * offset_y;
+        center_x = first.x + rotate_angle_cos * offset_x - rotate_angle_sin * offset_y;
+        center_y = first.y + rotate_angle_sin * offset_x + rotate_angle_cos * offset_y;
     }
-
-    const double first_x = start_x - center_x, first_y = start_y - center_y;
-    const double second_x = end_x - center_x, second_y = end_y - center_y;
 
     const double ang = state.angle + util::angle_between(first_x, first_y, second_x, second_y);
 
@@ -338,22 +333,22 @@ void Transform::setAngle(const double new_angle, const Duration& duration) {
     _setAngle(new_angle, duration);
 }
 
-void Transform::setAngle(const double new_angle, const double cx, const double cy) {
-    if (std::isnan(new_angle) || std::isnan(cx) || std::isnan(cy)) {
+void Transform::setAngle(const double new_angle, const PrecisionPoint& center) {
+    if (std::isnan(new_angle) || !center.isValid()) {
         return;
     }
 
     LatLng rotationCenter;
 
-    if (cx >= 0 && cy >= 0) {
-        rotationCenter = state.pointToLatLng({ cx, cy });
+    if (center.x > 0 || center.y > 0) {
+        rotationCenter = state.pointToLatLng(center);
         setLatLng(rotationCenter, Duration::zero());
     }
 
     _setAngle(new_angle);
 
-    if (cx >= 0 && cy >= 0) {
-        setLatLng(rotationCenter, { cx, cy }, Duration::zero());
+    if (center.x > 0 && center.y > 0) {
+        setLatLng(rotationCenter, center, Duration::zero());
     }
 }
 
