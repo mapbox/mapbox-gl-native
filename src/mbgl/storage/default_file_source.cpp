@@ -325,12 +325,12 @@ int64_t DefaultFileRequest::getRetryTimeout() const {
             if (failedRequests <= graceRetries) {
                 timeout = 1;
             } else {
-                timeout = 1 << std::min(failedRequests - graceRetries, 32);
+                timeout = 1 << std::min(failedRequests - graceRetries, 31);
             }
         } break;
         case Response::Error::Reason::Connection: {
             // Exponential backoff
-            timeout = 1 << std::min(failedRequests - 1, 32);
+            timeout = 1 << std::min(failedRequests - 1, 31);
         } break;
         default:
             // Do not retry due to error.
