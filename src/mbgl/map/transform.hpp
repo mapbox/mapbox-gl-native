@@ -61,6 +61,7 @@ public:
 
     // Transform state
     const TransformState getState() const { return state; }
+    void restoreState(TransformState oldState) { state = oldState; }
     bool isRotating() const { return state.isRotating(); }
     bool isScaling() const { return state.isScaling(); }
     bool isPanning() const { return state.isPanning(); }

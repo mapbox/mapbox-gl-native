@@ -19,16 +19,17 @@ void TransformState::matrixFor(mat4& matrix, const TileID& id, const int8_t z) c
 }
 
 void TransformState::getProjMatrix(mat4& projMatrix) const {
-    double halfFov = std::atan(0.5 / getAltitude());
-    double topHalfSurfaceDistance = std::sin(halfFov) * getAltitude() /
+    double halfFov = FOV * 0.5f * M_PI / 180.f;//std::atan(0.5 / getAltitude());
+    double altitude = 0.5 / std::tan(halfFov);
+    double topHalfSurfaceDistance = std::sin(halfFov) * altitude /
         std::sin(M_PI / 2.0f - getPitch() - halfFov);
     // Calculate z value of the farthest fragment that should be rendered.
-    double farZ = std::cos(M_PI / 2.0f - getPitch()) * topHalfSurfaceDistance + getAltitude();
+    double farZ = std::cos(M_PI / 2.0f - getPitch()) * topHalfSurfaceDistance + altitude;
 
-    matrix::perspective(projMatrix, 2.0f * std::atan((getHeight() / 2.0f) / getAltitude()),
+    matrix::perspective(projMatrix, 2.0f * std::atan((getHeight() / 2.0f) / altitude),
             double(getWidth()) / getHeight(), 0.1, farZ);
 
-    matrix::translate(projMatrix, projMatrix, 0, 0, -getAltitude());
+    matrix::translate(projMatrix, projMatrix, 0, 0, -altitude);
 
     // After the rotateX, z values are in pixel units. Convert them to
     // altitude unites. 1 altitude unit = the screen height.
@@ -157,6 +158,8 @@ float TransformState::getAngle() const {
 }
 
 float TransformState::getAltitude() const {
+    double halfFov = FOV * 0.5f * M_PI / 180.f;//std::atan(0.5 / getAltitude());
+    double altitude = 0.5 / std::tan(halfFov);
     return altitude;
 }
 
