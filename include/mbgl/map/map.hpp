@@ -135,8 +135,8 @@ public:
     uint16_t getHeight() const;
 
     // Projection
-    void getWorldBoundsMeters(ProjectedMeters& sw, ProjectedMeters& ne) const;
-    void getWorldBoundsLatLng(LatLng& sw, LatLng& ne) const;
+    MetersBounds getWorldBoundsMeters() const;
+    LatLngBounds getWorldBoundsLatLng() const;
 
     double getMetersPerPixelAtLatitude(double lat, double zoom) const;
     ProjectedMeters projectedMetersForLatLng(const LatLng&) const;

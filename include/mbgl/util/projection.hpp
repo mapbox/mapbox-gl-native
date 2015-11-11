@@ -11,24 +11,14 @@ namespace mbgl {
 class Projection {
 
 public:
-    static inline void getWorldBoundsMeters(ProjectedMeters &sw, ProjectedMeters &ne) {
+    static inline MetersBounds getWorldBoundsMeters() {
         const double d = util::EARTH_RADIUS_M * M_PI;
-
-        sw.easting  = -d;
-        sw.northing = -d;
-
-        ne.easting  =  d;
-        ne.northing =  d;
+        return { { -d, -d }, { d, d } };
     }
 
-    static inline void getWorldBoundsLatLng(LatLng &sw, LatLng &ne) {
-        ProjectedMeters projectedMetersSW = ProjectedMeters();
-        ProjectedMeters projectedMetersNE = ProjectedMeters();
-
-        getWorldBoundsMeters(projectedMetersSW, projectedMetersNE);
-
-        sw = latLngForProjectedMeters(projectedMetersSW);
-        ne = latLngForProjectedMeters(projectedMetersNE);
+    static inline LatLngBounds getWorldBoundsLatLng() {
+        MetersBounds bounds = getWorldBoundsMeters();
+        return { latLngForProjectedMeters(bounds.sw), latLngForProjectedMeters(bounds.ne) };
     }
 
     static inline double getMetersPerPixelAtLatitude(const double lat, const double zoom) {

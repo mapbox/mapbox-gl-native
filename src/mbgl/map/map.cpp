@@ -335,12 +335,12 @@ double Map::getPitch() const {
 
 #pragma mark - Projection
 
-void Map::getWorldBoundsMeters(ProjectedMeters& sw, ProjectedMeters& ne) const {
-    Projection::getWorldBoundsMeters(sw, ne);
+MetersBounds Map::getWorldBoundsMeters() const {
+    return Projection::getWorldBoundsMeters();
 }
 
-void Map::getWorldBoundsLatLng(LatLng& sw, LatLng& ne) const {
-    Projection::getWorldBoundsLatLng(sw, ne);
+LatLngBounds Map::getWorldBoundsLatLng() const {
+    return Projection::getWorldBoundsLatLng();
 }
 
 double Map::getMetersPerPixelAtLatitude(double lat, double zoom) const {
