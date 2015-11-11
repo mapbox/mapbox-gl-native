@@ -310,24 +310,27 @@ void Transform::rotateBy(const PrecisionPoint& first, const PrecisionPoint& seco
         return;
     }
 
-    double center_x = static_cast<double>(state.width) / 2.0;
-    double center_y = static_cast<double>(state.height) / 2.0;
-    const double first_x = first.x - center_x;
-    const double first_y = first.y - center_y;
-    const double second_x = second.x - center_x;
-    const double second_y = second.y - center_y;
-    const double beginning_center_dist = std::sqrt(first_x * first_x + first_y * first_y);
+    double center_x = static_cast<double>(state.width) / 2.0, center_y = static_cast<double>(state.height) / 2.0;
+
+    const double begin_center_x = first.x - center_x;
+    const double begin_center_y = first.y - center_y;
+
+    const double beginning_center_dist =
+        std::sqrt(begin_center_x * begin_center_x + begin_center_y * begin_center_y);
 
     // If the first click was too close to the center, move the center of rotation by 200 pixels
     // in the direction of the click.
     if (beginning_center_dist < 200) {
         const double offset_x = -200, offset_y = 0;
-        const double rotate_angle = std::atan2(first_y, first_x);
+        const double rotate_angle = std::atan2(begin_center_y, begin_center_x);
         const double rotate_angle_sin = std::sin(rotate_angle);
         const double rotate_angle_cos = std::cos(rotate_angle);
         center_x = first.x + rotate_angle_cos * offset_x - rotate_angle_sin * offset_y;
         center_y = first.y + rotate_angle_sin * offset_x + rotate_angle_cos * offset_y;
     }
+
+    const double first_x = first.x - center_x, first_y = first.y - center_y;
+    const double second_x = second.x - center_x, second_y = second.y - center_y;
 
     const double ang = state.angle + util::angle_between(first_x, first_y, second_x, second_y);
 
