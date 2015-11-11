@@ -21,14 +21,14 @@ public:
         return { latLngForProjectedMeters(bounds.sw), latLngForProjectedMeters(bounds.ne) };
     }
 
-    static inline double getMetersPerPixelAtLatitude(const double lat, const double zoom) {
+    static inline double getMetersPerPixelAtLatitude(double lat, double zoom) {
         const double mapPixelWidthAtZoom = std::pow(2.0, zoom) * util::tileSize;
         const double constrainedLatitude = ::fmin(::fmax(lat, -util::LATITUDE_MAX), util::LATITUDE_MAX);
 
         return std::cos(constrainedLatitude * util::DEG2RAD) * util::M2PI * util::EARTH_RADIUS_M / mapPixelWidthAtZoom;
     }
 
-    static inline const ProjectedMeters projectedMetersForLatLng(const LatLng latLng) {
+    static inline ProjectedMeters projectedMetersForLatLng(const LatLng& latLng) {
         const double constrainedLatitude = ::fmin(::fmax(latLng.latitude, -util::LATITUDE_MAX), util::LATITUDE_MAX);
 
         const double m = 1 - 1e-15;
@@ -40,12 +40,12 @@ public:
         return ProjectedMeters(northing, easting);
     }
 
-    static inline const LatLng latLngForProjectedMeters(const ProjectedMeters projectedMeters) {
+    static inline LatLng latLngForProjectedMeters(const ProjectedMeters& projectedMeters) {
         double latitude = (2 * std::atan(std::exp(projectedMeters.northing / util::EARTH_RADIUS_M)) - (M_PI / 2)) * util::RAD2DEG;
         double longitude = projectedMeters.easting * util::RAD2DEG / util::EARTH_RADIUS_M;
 
         latitude = ::fmin(::fmax(latitude, -util::LATITUDE_MAX), util::LATITUDE_MAX);
-        
+
         return LatLng(latitude, longitude);
     }
 };
