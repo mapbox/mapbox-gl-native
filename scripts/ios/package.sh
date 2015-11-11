@@ -8,11 +8,17 @@ NAME=Mapbox
 OUTPUT=build/ios/pkg
 IOS_SDK_VERSION=`xcrun --sdk iphoneos --show-sdk-version`
 LIBUV_VERSION=1.7.5
+ENABLE_BITCODE=YES
 
 if [[ ${#} -eq 0 ]]; then # e.g. "make ipackage"
     BUILDTYPE="Release"
     BUILD_FOR_DEVICE=true
     GCC_GENERATE_DEBUGGING_SYMBOLS="YES"
+elif [[ ${1} == "no-bitcode" ]]; then # e.g. "make ipackage-no-bitcode"
+    BUILDTYPE="Release"
+    BUILD_FOR_DEVICE=true
+    GCC_GENERATE_DEBUGGING_SYMBOLS="YES"
+    ENABLE_BITCODE=NO
 elif [[ ${1} == "sim" ]]; then # e.g. "make ipackage-sim"
     BUILDTYPE="Debug"
     BUILD_FOR_DEVICE=false
@@ -53,7 +59,7 @@ if [[ "${BUILD_FOR_DEVICE}" == true ]]; then
         ARCHS="arm64 armv7 armv7s" \
         ONLY_ACTIVE_ARCH=NO \
         GCC_GENERATE_DEBUGGING_SYMBOLS=${GCC_GENERATE_DEBUGGING_SYMBOLS} \
-        ENABLE_BITCODE=YES \
+        ENABLE_BITCODE=${ENABLE_BITCODE} \
         DEPLOYMENT_POSTPROCESSING=YES \
         -project ./build/ios-all/gyp/mbgl.xcodeproj \
         -configuration ${BUILDTYPE} \
