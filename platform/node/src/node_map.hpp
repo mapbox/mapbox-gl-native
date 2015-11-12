@@ -43,8 +43,8 @@ public:
     NodeMap(v8::Local<v8::Object>);
     ~NodeMap();
 
-    HeadlessView view;
-    NodeFileSource fs;
+    std::unique_ptr<HeadlessView> view;
+    std::unique_ptr<NodeFileSource> fs;
     std::unique_ptr<Map> map;
 
     std::exception_ptr error;
