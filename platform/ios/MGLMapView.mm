@@ -134,7 +134,7 @@ mbgl::util::UnitBezier MGLUnitBezierForMediaTimingFunction(CAMediaTimingFunction
 
 @dynamic debugActive;
 
-std::chrono::steady_clock::duration secondsAsDuration(float duration)
+std::chrono::steady_clock::duration durationInSeconds(float duration)
 {
     return std::chrono::duration_cast<std::chrono::steady_clock::duration>(std::chrono::duration<float, std::chrono::seconds::period>(duration));
 }
@@ -867,7 +867,7 @@ std::chrono::steady_clock::duration secondsAsDuration(float duration)
         if ( ! CGPointEqualToPoint(velocity, CGPointZero))
         {
             CGPoint offset = CGPointMake(velocity.x * duration / 4, velocity.y * duration / 4);
-            _mbglMap->moveBy({ offset.x, offset.y }, secondsAsDuration(duration));
+            _mbglMap->moveBy({ offset.x, offset.y }, durationInSeconds(duration));
         }
 
         _mbglMap->setGestureInProgress(false);
@@ -967,7 +967,7 @@ std::chrono::steady_clock::duration secondsAsDuration(float duration)
         {
             CGPoint pinchCenter = [pinch locationInView:pinch.view];
             mbgl::PrecisionPoint center(pinchCenter.x, pinchCenter.y);
-            _mbglMap->setScale(newScale, center, secondsAsDuration(duration));
+            _mbglMap->setScale(newScale, center, durationInSeconds(duration));
         }
 
         _mbglMap->setGestureInProgress(false);
@@ -1039,7 +1039,7 @@ std::chrono::steady_clock::duration secondsAsDuration(float duration)
             CGFloat newRadians = radians + velocity * duration * 0.1;
             CGFloat newDegrees = MGLDegreesFromRadians(newRadians) * -1;
 
-            _mbglMap->setBearing(newDegrees, mbgl::Duration(secondsAsDuration(duration)));
+            _mbglMap->setBearing(newDegrees, durationInSeconds(duration));
 
             _mbglMap->setGestureInProgress(false);
 
@@ -1257,7 +1257,7 @@ std::chrono::steady_clock::duration secondsAsDuration(float duration)
         }
 
         mbgl::PrecisionPoint center(zoomInPoint.x, zoomInPoint.y);
-        _mbglMap->scaleBy(2, center, secondsAsDuration(MGLAnimationDuration));
+        _mbglMap->scaleBy(2, center, durationInSeconds(MGLAnimationDuration));
 
         self.animatingGesture = YES;
 
@@ -1302,7 +1302,7 @@ std::chrono::steady_clock::duration secondsAsDuration(float duration)
         }
 
         mbgl::PrecisionPoint center(zoomOutPoint.x, zoomOutPoint.y);
-        _mbglMap->scaleBy(0.5, center, secondsAsDuration(MGLAnimationDuration));
+        _mbglMap->scaleBy(0.5, center, durationInSeconds(MGLAnimationDuration));
 
         self.animatingGesture = YES;
 
@@ -1555,7 +1555,7 @@ std::chrono::steady_clock::duration secondsAsDuration(float duration)
 
 - (void)resetNorthAnimated:(BOOL)animated
 {
-    _mbglMap->setBearing(0, mbgl::Duration(secondsAsDuration(animated ? MGLAnimationDuration : 0)));
+    _mbglMap->setBearing(0, durationInSeconds(animated ? MGLAnimationDuration : 0));
 }
 
 - (void)resetPosition
@@ -1622,7 +1622,7 @@ std::chrono::steady_clock::duration secondsAsDuration(float duration)
     }
     if (animated)
     {
-        options.duration = secondsAsDuration(duration);
+        options.duration = durationInSeconds(duration);
         options.easing = MGLUnitBezierForMediaTimingFunction(nil);
     }
     _mbglMap->easeTo(options);
@@ -1746,7 +1746,7 @@ mbgl::LatLngBounds MGLLatLngBoundsFromCoordinateBounds(MGLCoordinateBounds coord
     }
     if (duration > 0)
     {
-        options.duration = secondsAsDuration(duration);
+        options.duration = durationInSeconds(duration);
         options.easing = MGLUnitBezierForMediaTimingFunction(function);
     }
     _mbglMap->easeTo(options);
@@ -1789,7 +1789,7 @@ mbgl::LatLngBounds MGLLatLngBoundsFromCoordinateBounds(MGLCoordinateBounds coord
 
     CGFloat duration = animated ? MGLAnimationDuration : 0;
 
-    _mbglMap->setBearing(direction, mbgl::Duration(secondsAsDuration(duration)));
+    _mbglMap->setBearing(direction, durationInSeconds(duration));
 
     if (animated)
     {
@@ -1939,7 +1939,7 @@ mbgl::LatLngBounds MGLLatLngBoundsFromCoordinateBounds(MGLCoordinateBounds coord
     }
     if (duration > 0)
     {
-        options.duration = secondsAsDuration(duration);
+        options.duration = durationInSeconds(duration);
         options.easing = MGLUnitBezierForMediaTimingFunction(function);
     }
     _mbglMap->easeTo(options);
@@ -2073,7 +2073,7 @@ CLLocationCoordinate2D MGLLocationCoordinate2DFromLatLng(mbgl::LatLng latLng)
         newAppliedClasses.insert(newAppliedClasses.end(), [appliedClass UTF8String]);
     }
 
-    _mbglMap->setDefaultTransitionDuration(secondsAsDuration(transitionDuration));
+    _mbglMap->setDefaultTransitionDuration(durationInSeconds(transitionDuration));
     _mbglMap->setClasses(newAppliedClasses);
 }
 
@@ -2818,7 +2818,7 @@ CLLocationCoordinate2D MGLLocationCoordinate2DFromLatLng(mbgl::LatLng latLng)
 
     if (headingDirection >= 0 && self.userTrackingMode == MGLUserTrackingModeFollowWithHeading)
     {
-        _mbglMap->setBearing(headingDirection, mbgl::Duration(secondsAsDuration(MGLAnimationDuration)));
+        _mbglMap->setBearing(headingDirection, durationInSeconds(MGLAnimationDuration));
     }
 }
 
