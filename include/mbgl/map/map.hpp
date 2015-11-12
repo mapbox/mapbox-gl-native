@@ -124,7 +124,7 @@ public:
     void setBearing(double degrees, const Duration& = Duration::zero());
     void setBearing(double degrees, const PrecisionPoint&);
     double getBearing() const;
-    void resetNorth();
+    void resetNorth(const Duration& = std::chrono::milliseconds(500));
 
     // Pitch
     void setPitch(double pitch, const Duration& = Duration::zero());

@@ -1039,7 +1039,7 @@ std::chrono::steady_clock::duration secondsAsDuration(float duration)
             CGFloat newRadians = radians + velocity * duration * 0.1;
             CGFloat newDegrees = MGLDegreesFromRadians(newRadians) * -1;
 
-            _mbglMap->setBearing(newDegrees, secondsAsDuration(duration));
+            _mbglMap->setBearing(newDegrees, mbgl::Duration(secondsAsDuration(duration)));
 
             _mbglMap->setGestureInProgress(false);
 
@@ -1555,9 +1555,7 @@ std::chrono::steady_clock::duration secondsAsDuration(float duration)
 
 - (void)resetNorthAnimated:(BOOL)animated
 {
-    CGFloat duration = (animated ? MGLAnimationDuration : 0);
-
-    _mbglMap->setBearing(0, secondsAsDuration(duration));
+    _mbglMap->setBearing(0, mbgl::Duration(secondsAsDuration(animated ? MGLAnimationDuration : 0)));
 }
 
 - (void)resetPosition
@@ -1789,10 +1787,10 @@ mbgl::LatLngBounds MGLLatLngBoundsFromCoordinateBounds(MGLCoordinateBounds coord
         self.userTrackingMode = MGLUserTrackingModeFollow;
     }
 
-    CGFloat duration = (animated ? MGLAnimationDuration : 0);
+    CGFloat duration = animated ? MGLAnimationDuration : 0;
 
-    _mbglMap->setBearing(direction, secondsAsDuration(duration));
-    
+    _mbglMap->setBearing(direction, mbgl::Duration(secondsAsDuration(duration)));
+
     if (animated)
     {
         __weak MGLMapView *weakSelf = self;
@@ -2820,7 +2818,7 @@ CLLocationCoordinate2D MGLLocationCoordinate2DFromLatLng(mbgl::LatLng latLng)
 
     if (headingDirection >= 0 && self.userTrackingMode == MGLUserTrackingModeFollowWithHeading)
     {
-        _mbglMap->setBearing(headingDirection, secondsAsDuration(MGLAnimationDuration));
+        _mbglMap->setBearing(headingDirection, mbgl::Duration(secondsAsDuration(MGLAnimationDuration)));
     }
 }
 

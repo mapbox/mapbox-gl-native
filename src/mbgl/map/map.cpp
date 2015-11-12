@@ -315,8 +315,8 @@ double Map::getBearing() const {
     return -transform->getAngle() / M_PI * 180;
 }
 
-void Map::resetNorth() {
-    transform->setAngle(0, std::chrono::milliseconds(500));
+void Map::resetNorth(const Duration& duration) {
+    transform->setAngle(0, duration);
     update(Update::Repaint);
 }
 

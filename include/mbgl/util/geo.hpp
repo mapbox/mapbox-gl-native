@@ -9,17 +9,7 @@ namespace mbgl {
 
 class TileID;
 
-struct PrecisionPoint {
-    double x = 0;
-    double y = 0;
-
-    inline PrecisionPoint(double x_ = 0, double y_ = 0)
-        : x(x_), y(y_) {}
-
-    inline bool isValid() const {
-        return !(std::isnan(x) || std::isnan(y));
-    }
-};
+using PrecisionPoint = vec2<double>;
 
 struct LatLng {
     double latitude = 0;
@@ -28,7 +18,7 @@ struct LatLng {
     inline LatLng(double lat = 0, double lon = 0)
         : latitude(lat), longitude(lon) {}
 
-    inline bool isValid() const {
+    inline operator bool() const {
         return !(std::isnan(latitude) || std::isnan(longitude));
     }
 
@@ -45,7 +35,7 @@ struct ProjectedMeters {
     inline ProjectedMeters(double n = 0, double e = 0)
         : northing(n), easting(e) {}
 
-    inline bool isValid() const {
+    inline operator bool() const {
         return !(std::isnan(northing) || std::isnan(easting));
     }
 };
@@ -57,8 +47,8 @@ struct LatLngBounds {
     inline LatLngBounds(const LatLng& sw_ = {90, 180}, const LatLng& ne_ = {-90, -180})
         : sw(sw_), ne(ne_) {}
 
-    inline bool isValid() const {
-        return sw.isValid() && ne.isValid();
+    inline operator bool() const {
+        return sw && ne;
     }
 
     // Constructs a LatLngBounds object with the tile's exact boundaries.
@@ -98,8 +88,8 @@ struct MetersBounds {
     inline MetersBounds(const ProjectedMeters& sw_, const ProjectedMeters& ne_)
         : sw(sw_), ne(ne_) {}
 
-    inline bool isValid() const {
-        return sw.isValid() && ne.isValid();
+    inline operator bool() const {
+        return sw && ne;
     }
 };
 
