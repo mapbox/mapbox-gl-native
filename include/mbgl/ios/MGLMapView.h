@@ -527,6 +527,18 @@ IB_DESIGNABLE
 *   @return A Boolean indicating whether the annotation should show a callout. */
 - (BOOL)mapView:(MGLMapView *)mapView annotationCanShowCallout:(id <MGLAnnotation>)annotation;
 
+/** Returns the view to display as the content view of the callout bubble.
+ *
+ *  The returned view is displayed inside the callout in the top-left corner without any margin. The callout adapts its bounds to fit the size of the returned view.
+ *  The callout will not display any other view except the ones returned by the left/rightCalloutAccessoryViewForAnnotation callbacks.
+ *
+ *  If this callback is not implemented or the returned value is `nil`, the callout displays the default content.
+ *
+ *  @param mapView The map view containing the annotation.
+ *  @param annotation The object representing the annotation with the callout.
+ *  @return The content view to display. */
+- (nullable UIView *)mapView:(MGLMapView *)mapView calloutViewForAnnotation:(id <MGLAnnotation>)annotation;
+
 /** Return the view to display on the left side of the standard callout bubble.
 *
 *   The default value is treated as if `nil`. The left callout view is typically used to display information about the annotation or to link to custom information provided by your application.
