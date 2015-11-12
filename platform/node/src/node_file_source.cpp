@@ -60,16 +60,13 @@ void NodeFileSource::cancel(Request* req) {
     std::lock_guard<std::mutex> lock(observersMutex);
 
     auto it = observers.find(req->resource);
-    if (it == observers.end()) {
-        // Exit early if no observers are found.
-        return;
+    if (it != observers.end()) {
+        observers.erase(it);
+
+        // This function can be called from any thread. Make sure we're executing the actual call in the
+        // file source loop by sending it over the queue.
+        queue->send(Action{ Action::Cancel, req->resource });
     }
-
-    observers.erase(it);
-
-    // This function can be called from any thread. Make sure we're executing the actual call in the
-    // file source loop by sending it over the queue.
-    queue->send(Action{ Action::Cancel, req->resource });
 
     // Send a message back to the requesting thread and notify it that this request has been
     // canceled and is now safe to be deleted.
@@ -137,12 +134,9 @@ void NodeFileSource::notify(const Resource& resource, const std::shared_ptr<cons
     std::lock_guard<std::mutex> lock(observersMutex);
 
     auto observersIt = observers.find(resource);
-    if (observersIt == observers.end()) {
-        // Exit early if no observers are found.
-        return;
+    if (observersIt != observers.end()) {
+        observersIt->second->notify(response);
     }
-
-    observersIt->second->notify(response);
 }
 
 }
