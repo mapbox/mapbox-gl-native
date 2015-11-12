@@ -37,7 +37,7 @@ public final class Marker extends Annotation {
     }
 
     /**
-     * Do not use this method. Used internally by the SDK.
+     * Do not use this method. Used internally by the SDK. Instead use {@link MapView#deselectMarker()}.
      */
     public void hideInfoWindow() {
         if (infoWindow != null) {
@@ -47,7 +47,7 @@ public final class Marker extends Annotation {
     }
 
     /**
-     * Do not use this method. Used internally by the SDK.
+     * Do not use this method. Used internally by the SDK. Instead use {@link MapView#getSelectedMarker()}.
      */
     public boolean isInfoWindowShown() {
         return infoWindowShown;
@@ -77,7 +77,7 @@ public final class Marker extends Annotation {
     }
 
     /**
-     * Do not use this method. Used internally by the SDK.
+     * Do not use this method. Used internally by the SDK. Instead use {@link MapView#selectMarker(Marker)}
      */
     public void showInfoWindow() {
         if (getMapView() == null) {

@@ -132,7 +132,7 @@ public class MainActivity extends AppCompatActivity {
                         .icon(null);
 
                 mMarkerList.add(marker);
-                mMapView.addMarker(marker);
+                mMapView.selectMarker(mMapView.addMarker(marker));
             }
         });
 
