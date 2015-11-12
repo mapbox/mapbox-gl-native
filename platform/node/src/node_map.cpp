@@ -289,7 +289,7 @@ NAN_METHOD(NodeMap::Render) {
 }
 
 void NodeMap::startRender(std::unique_ptr<NodeMap::RenderOptions> options) {
-    view.resize(options->width, options->height);
+    view->resize(options->width, options->height);
     map->update(Update::Dimensions);
     map->setClasses(options->classes);
     map->setLatLngZoom(LatLng(options->latitude, options->longitude), options->zoom);
@@ -377,6 +377,7 @@ void NodeMap::renderFinished() {
         };
         cb->Call(1, argv);
     }
+    cb.reset();
 }
 
 /**
@@ -407,7 +408,9 @@ void NodeMap::release() {
         delete reinterpret_cast<uv_async_t *>(handle);
     });
 
-    map.reset(nullptr);
+    map.reset();
+    view.reset();
+    fs.reset();
 }
 
 NAN_METHOD(NodeMap::DumpDebugLogs) {
@@ -423,12 +426,12 @@ NAN_METHOD(NodeMap::DumpDebugLogs) {
 // Instance
 
 NodeMap::NodeMap(v8::Local<v8::Object> options) :
-    view(sharedDisplay(), [&] {
+    view(std::make_unique<HeadlessView>(sharedDisplay(), [&] {
         Nan::HandleScope scope;
         return Nan::Has(options, Nan::New("ratio").ToLocalChecked()).FromJust() ? Nan::Get(options, Nan::New("ratio").ToLocalChecked()).ToLocalChecked()->NumberValue() : 1.0;
-    }()),
-    fs(options),
-    map(std::make_unique<Map>(view, fs, MapMode::Still)),
+    }())),
+    fs(std::make_unique<NodeFileSource>(options)),
+    map(std::make_unique<Map>(*view, *fs, MapMode::Still)),
     async(new uv_async_t) {
 
     async->data = this;
