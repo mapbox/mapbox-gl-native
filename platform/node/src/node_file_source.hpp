@@ -13,40 +13,40 @@
 #include <mutex>
 #include <unordered_map>
 
-namespace node_mbgl {
+namespace mbgl {
 
 namespace util { template <typename T> class AsyncQueue; }
 
-class NodeFileSource : public mbgl::FileSource {
+class NodeFileSource : public FileSource {
 public:
     NodeFileSource(v8::Local<v8::Object>);
     ~NodeFileSource();
 
-    mbgl::Request* request(const mbgl::Resource&, uv_loop_t*, Callback);
-    void cancel(mbgl::Request*);
+    Request* request(const Resource&, uv_loop_t*, Callback);
+    void cancel(Request*);
 
     // visiblity?
-    void notify(const mbgl::Resource&, const std::shared_ptr<const mbgl::Response>&);
+    void notify(const Resource&, const std::shared_ptr<const Response>&);
 
 private:
     struct Action;
     using Queue = util::AsyncQueue<Action>;
 
-    void processAdd(const mbgl::Resource&);
-    void processCancel(const mbgl::Resource&);
+    void processAdd(const Resource&);
+    void processCancel(const Resource&);
 
     Nan::Persistent<v8::Object> options;
 
 private:
-    std::unordered_map<mbgl::Resource, Nan::Persistent<v8::Object>, mbgl::Resource::Hash> pending;
+    std::unordered_map<Resource, Nan::Persistent<v8::Object>, Resource::Hash> pending;
 
     // The observers list will hold pointers to all the requests waiting
     // for a particular resource. The access must be guarded by a mutex
-    // because the list is also accessed by a thread from the mbgl::Map
+    // because the list is also accessed by a thread from the Map
     // object and from the main thread when notifying requests of
     // completion. Concurrent access is specially needed when
     // canceling a request to avoid a deadlock (see #129).
-    std::unordered_map<mbgl::Resource, mbgl::Request*, mbgl::Resource::Hash> observers;
+    std::unordered_map<Resource, Request*, Resource::Hash> observers;
     std::mutex observersMutex;
 
     Queue *queue = nullptr;

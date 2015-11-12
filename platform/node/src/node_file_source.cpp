@@ -4,11 +4,11 @@
 
 #include <mbgl/storage/request.hpp>
 
-namespace node_mbgl {
+namespace mbgl {
 
 struct NodeFileSource::Action {
     const enum : bool { Add, Cancel } type;
-    mbgl::Resource const resource;
+    Resource const resource;
 };
 
 NodeFileSource::NodeFileSource(v8::Local<v8::Object> options_) :
@@ -33,8 +33,8 @@ NodeFileSource::~NodeFileSource() {
     options.Reset();
 }
 
-mbgl::Request* NodeFileSource::request(const mbgl::Resource& resource, uv_loop_t* loop, Callback callback) {
-    auto req = new mbgl::Request(resource, loop, std::move(callback));
+Request* NodeFileSource::request(const Resource& resource, uv_loop_t* loop, Callback callback) {
+    auto req = new Request(resource, loop, std::move(callback));
 
     std::lock_guard<std::mutex> lock(observersMutex);
 
@@ -48,7 +48,7 @@ mbgl::Request* NodeFileSource::request(const mbgl::Resource& resource, uv_loop_t
     return req;
 }
 
-void NodeFileSource::cancel(mbgl::Request* req) {
+void NodeFileSource::cancel(Request* req) {
     req->cancel();
 
     std::lock_guard<std::mutex> lock(observersMutex);
@@ -67,7 +67,7 @@ void NodeFileSource::cancel(mbgl::Request* req) {
     req->destruct();
 }
 
-void NodeFileSource::processAdd(const mbgl::Resource& resource) {
+void NodeFileSource::processAdd(const Resource& resource) {
     Nan::HandleScope scope;
 
     // Make sure the loop stays alive as long as request is pending.
@@ -85,7 +85,7 @@ void NodeFileSource::processAdd(const mbgl::Resource& resource) {
     Nan::MakeCallback(Nan::New(options), "request", 2, argv);
 }
 
-void NodeFileSource::processCancel(const mbgl::Resource& resource) {
+void NodeFileSource::processCancel(const Resource& resource) {
     Nan::HandleScope scope;
 
     auto it = pending.find(resource);
@@ -112,7 +112,7 @@ void NodeFileSource::processCancel(const mbgl::Resource& resource) {
     }
 }
 
-void NodeFileSource::notify(const mbgl::Resource& resource, const std::shared_ptr<const mbgl::Response>& response) {
+void NodeFileSource::notify(const Resource& resource, const std::shared_ptr<const Response>& response) {
     // First, remove the request, since it might be destructed at any point now.
     auto it = pending.find(resource);
     if (it != pending.end()) {
