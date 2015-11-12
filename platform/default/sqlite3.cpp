@@ -5,6 +5,8 @@
 #include <cstring>
 #include <cstdio>
 
+#pragma GCC diagnostic push
+#pragma GCC diagnostic ignored "-Wunused-variable"
 // Check sqlite3 library version.
 const static bool sqliteVersionCheck = []() {
     if (sqlite3_libversion_number() / 1000000 != SQLITE_VERSION_NUMBER / 1000000) {
@@ -17,6 +19,7 @@ const static bool sqliteVersionCheck = []() {
 
     return true;
 }();
+#pragma GCC diagnostic pop
 
 namespace mapbox {
 namespace sqlite {
