@@ -5,14 +5,8 @@ import android.content.pm.ApplicationInfo;
 import android.content.pm.PackageManager;
 import android.support.annotation.NonNull;
 import android.support.annotation.Nullable;
-import android.text.TextUtils;
 
-import com.mapbox.mapboxsdk.R;
 import com.mapbox.mapboxsdk.constants.MapboxConstants;
-
-import java.io.BufferedReader;
-import java.io.IOException;
-import java.io.InputStreamReader;
 
 /**
  * {@code ApiAccess} provides a method to load the Mapbox access token.
@@ -32,29 +26,19 @@ public final class ApiAccess {
      */
     @Nullable
     public static String getToken(@NonNull Context context) {
-        String accessToken = getReleaseToken(context);
-        if (TextUtils.isEmpty(accessToken)) {
-            accessToken = getDevelopmentToken(context);
-        }
-        return accessToken;
-    }
-
-    private static String getReleaseToken(@NonNull Context context) {
         try {
+            // read out AndroidManifest
             PackageManager packageManager = context.getPackageManager();
             ApplicationInfo appInfo = packageManager.getApplicationInfo(context.getPackageName(), PackageManager.GET_META_DATA);
-            return appInfo.metaData.getString(MapboxConstants.KEY_META_DATA_MANIFEST);
+            String token = appInfo.metaData.getString(MapboxConstants.KEY_META_DATA_MANIFEST);
+            if (token == null || token.isEmpty()) {
+                throw new IllegalArgumentException();
+            }
+            return token;
         } catch (Exception e) {
-            return null;
-        }
-    }
-
-    private static String getDevelopmentToken(@NonNull Context context) {
-        try {
-            BufferedReader reader = new BufferedReader(new InputStreamReader(context.getResources().openRawResource(R.raw.token)));
-            return reader.readLine();
-        } catch (IOException e) {
-            return null;
+            // use fallback on string resource, used for development
+            int tokenResId = context.getResources().getIdentifier("access_token", "string", context.getPackageName());
+            return tokenResId != 0 ? context.getString(tokenResId) : null;
         }
     }
 }
