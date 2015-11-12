@@ -24,6 +24,6 @@ If you want to use products _based on_ Mapbox GL, check out:
   * iPhone 4S and above (5, 5c, 5s, 6, 6 Plus)
   * iPad 2 and above (3, 4, Mini, Air, Mini 2, Air 2)
   * iPod touch 5th gen and above
-* Android 4.0+ (API level 14+)
+* Android 4.0.3+ (API level 15+)
 
 See [`INSTALL.md`](./INSTALL.md) for development setup and install instructions, including dependencies.
