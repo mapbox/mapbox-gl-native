@@ -2289,9 +2289,9 @@ CLLocationCoordinate2D MGLLocationCoordinate2DFromLatLng(mbgl::LatLng latLng)
 
     // add sprite
     auto cSpriteImage = std::make_shared<mbgl::SpriteImage>(
-        uint16_t(annotationImage.image.size.width),
-        uint16_t(annotationImage.image.size.height),
-        float(annotationImage.image.scale),
+        annotationImage.image.size.width,
+        annotationImage.image.size.height,
+        annotationImage.image.scale,
         std::move(pixels));
 
     // sprite upload

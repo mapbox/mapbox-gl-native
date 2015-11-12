@@ -6,8 +6,8 @@
 
 namespace mbgl {
 
-SpriteImage::SpriteImage(const uint16_t width_,
-                         const uint16_t height_,
+SpriteImage::SpriteImage(const float width_,
+                         const float height_,
                          const float pixelRatio_,
                          std::string&& data_,
                          bool sdf_)

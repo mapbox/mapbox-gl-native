@@ -13,11 +13,11 @@ namespace mbgl {
 class SpriteImage : private util::noncopyable {
 public:
     SpriteImage(
-        uint16_t width, uint16_t height, float pixelRatio, std::string&& data, bool sdf = false);
+        float width, float height, float pixelRatio, std::string&& data, bool sdf = false);
 
     // Logical dimensions of the sprite image.
-    const uint16_t width;
-    const uint16_t height;
+    const float width;
+    const float height;
 
     // Pixel ratio of the sprite image.
     const float pixelRatio;
