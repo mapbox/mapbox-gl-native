@@ -125,8 +125,8 @@ std::unique_ptr<Bucket> SymbolLayer::createBucket(StyleBucketParameters& paramet
     StyleCalculationParameters p(parameters.tileID.z);
     bucket->layout.placement.calculate(p);
     if (bucket->layout.placement.value == PlacementType::Line) {
-        bucket->layout.icon.rotationAlignment = RotationAlignmentType::Map;
-        bucket->layout.text.rotationAlignment = RotationAlignmentType::Map;
+        bucket->layout.icon.rotationAlignment.value = RotationAlignmentType::Map;
+        bucket->layout.text.rotationAlignment.value = RotationAlignmentType::Map;
     };
     bucket->layout.spacing.calculate(p);
     bucket->layout.avoidEdges.calculate(p);
