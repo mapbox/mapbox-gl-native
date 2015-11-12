@@ -53,7 +53,7 @@ const CGFloat MGLMinimumPitch = 0;
 const CGFloat MGLMaximumPitch = 60;
 const CLLocationDegrees MGLAngularFieldOfView = M_PI / 6.;
 const std::string spritePrefix = "com.mapbox.sprites.";
-const NSUInteger MGLTargetFrameInterval = 2;  //Target FPS will be 60 divided by this value
+const NSUInteger MGLTargetFrameInterval = 1;  //Target FPS will be 60 divided by this value
 
 NSString *const MGLAnnotationIDKey = @"MGLAnnotationIDKey";
 NSString *const MGLAnnotationSymbolKey = @"MGLAnnotationSymbolKey";
