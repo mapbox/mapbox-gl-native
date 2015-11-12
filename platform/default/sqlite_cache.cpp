@@ -1,5 +1,5 @@
 #include "sqlite_cache_impl.hpp"
-#include <mbgl/storage/request.hpp>
+#include <mbgl/storage/resource.hpp>
 #include <mbgl/storage/response.hpp>
 
 #include <mbgl/util/compression.hpp>

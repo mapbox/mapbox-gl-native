@@ -18,9 +18,9 @@ TEST_F(Storage, HTTPTest) {
 
     const auto mainThread = uv_thread_self();
 
-    Request* req1 = fs.request({ Resource::Unknown, "http://127.0.0.1:3000/test" },
+    std::unique_ptr<FileRequest> req1 = fs.request({ Resource::Unknown, "http://127.0.0.1:3000/test" },
                [&](Response res) {
-        fs.cancel(req1);
+        req1.reset();
         EXPECT_EQ(uv_thread_self(), mainThread);
         EXPECT_EQ(nullptr, res.error);
         EXPECT_EQ(false, res.stale);
@@ -46,9 +46,9 @@ TEST_F(Storage, HTTP404) {
 
     const auto mainThread = uv_thread_self();
 
-    Request* req2 = fs.request({ Resource::Unknown, "http://127.0.0.1:3000/doesnotexist" },
+    std::unique_ptr<FileRequest> req2 = fs.request({ Resource::Unknown, "http://127.0.0.1:3000/doesnotexist" },
                [&](Response res) {
-        fs.cancel(req2);
+        req2.reset();
         EXPECT_EQ(uv_thread_self(), mainThread);
         ASSERT_NE(nullptr, res.error);
         EXPECT_EQ(Response::Error::Reason::NotFound, res.error->reason);
@@ -76,9 +76,9 @@ TEST_F(Storage, HTTP500) {
 
     const auto mainThread = uv_thread_self();
 
-    Request* req3 = fs.request({ Resource::Unknown, "http://127.0.0.1:3000/permanent-error" },
+    std::unique_ptr<FileRequest> req3 = fs.request({ Resource::Unknown, "http://127.0.0.1:3000/permanent-error" },
                [&](Response res) {
-        fs.cancel(req3);
+        req3.reset();
         EXPECT_EQ(uv_thread_self(), mainThread);
         ASSERT_NE(nullptr, res.error);
         EXPECT_EQ(Response::Error::Reason::Server, res.error->reason);

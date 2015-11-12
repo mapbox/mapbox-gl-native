@@ -1,6 +1,5 @@
 #include "node_request.hpp"
 #include "node_file_source.hpp"
-#include <mbgl/storage/request.hpp>
 #include <mbgl/storage/response.hpp>
 
 #include <cmath>
@@ -24,27 +23,18 @@ NAN_MODULE_INIT(NodeRequest::Init) {
 }
 
 NAN_METHOD(NodeRequest::New) {
-    // Extract the pointer from the first argument
-    if (info.Length() < 2 || !info[0]->IsExternal() || !info[1]->IsExternal()) {
-        return Nan::ThrowTypeError("Cannot create Request objects explicitly");
-    }
-
-    auto source = reinterpret_cast<NodeFileSource*>(info[0].As<v8::External>()->Value());
-    auto resource = reinterpret_cast<mbgl::Resource*>(info[1].As<v8::External>()->Value());
-    auto req = new NodeRequest(source, *resource);
+    auto req = new NodeRequest(*reinterpret_cast<mbgl::FileSource::Callback*>(info[0].As<v8::External>()->Value()));
     req->Wrap(info.This());
-
     info.GetReturnValue().Set(info.This());
 }
 
-v8::Handle<v8::Object> NodeRequest::Create(NodeFileSource* source, const mbgl::Resource& resource) {
+v8::Handle<v8::Object> NodeRequest::Create(const mbgl::Resource& resource, mbgl::FileSource::Callback callback) {
     Nan::EscapableHandleScope scope;
 
     v8::Local<v8::Value> argv[] = {
-        Nan::New<v8::External>(const_cast<NodeFileSource*>(source)),
-        Nan::New<v8::External>(const_cast<mbgl::Resource*>(&resource))
+        Nan::New<v8::External>(const_cast<mbgl::FileSource::Callback*>(&callback))
     };
-    auto instance = Nan::New(constructor)->NewInstance(2, argv);
+    auto instance = Nan::New(constructor)->NewInstance(1, argv);
 
     Nan::Set(instance, Nan::New("url").ToLocalChecked(), Nan::New(resource.url).ToLocalChecked());
     Nan::Set(instance, Nan::New("kind").ToLocalChecked(), Nan::New<v8::Integer>(int(resource.kind)));
@@ -53,48 +43,35 @@ v8::Handle<v8::Object> NodeRequest::Create(NodeFileSource* source, const mbgl::R
 }
 
 NAN_METHOD(NodeRequest::Respond) {
-    auto nodeRequest = Nan::ObjectWrap::Unwrap<NodeRequest>(info.Data().As<v8::Object>());
-
-    // Request has already been responded to, or was canceled, fail silently.
-    if (!nodeRequest->resource) {
-        return info.GetReturnValue().SetUndefined();
-    }
-
-    auto source = nodeRequest->source;
-    auto resource = std::move(nodeRequest->resource);
+    using Error = mbgl::Response::Error;
+    mbgl::Response response;
 
     if (info.Length() < 1) {
-        auto response = std::make_shared<mbgl::Response>();
-        using Error = mbgl::Response::Error;
-        response->error = std::make_unique<Error>(Error::Reason::NotFound);
-        source->notify(*resource, response);
-    } else if (info[0]->BooleanValue()) {
-        auto response = std::make_shared<mbgl::Response>();
+        response.error = std::make_unique<Error>(Error::Reason::NotFound);
 
+    } else if (info[0]->BooleanValue()) {
         // Store the error string.
         const Nan::Utf8String message { info[0]->ToString() };
-        using Error = mbgl::Response::Error;
-        response->error = std::make_unique<Error>(
+        response.error = std::make_unique<Error>(
             Error::Reason::Other, std::string{ *message, size_t(message.length()) });
 
-        source->notify(*resource, response);
     } else if (info.Length() < 2 || !info[1]->IsObject()) {
         return Nan::ThrowTypeError("Second argument must be a response object");
+
     } else {
-        auto response = std::make_shared<mbgl::Response>();
         auto res = info[1]->ToObject();
 
         if (Nan::Has(res, Nan::New("modified").ToLocalChecked()).FromJust()) {
             const double modified = Nan::Get(res, Nan::New("modified").ToLocalChecked()).ToLocalChecked()->ToNumber()->Value();
             if (!std::isnan(modified)) {
-                response->modified = modified / 1000; // JS timestamps are milliseconds
+                response.modified = modified / 1000; // JS timestamps are milliseconds
             }
         }
 
         if (Nan::Has(res, Nan::New("expires").ToLocalChecked()).FromJust()) {
             const double expires = Nan::Get(res, Nan::New("expires").ToLocalChecked()).ToLocalChecked()->ToNumber()->Value();
             if (!std::isnan(expires)) {
-                response->expires = expires / 1000; // JS timestamps are milliseconds
+                response.expires = expires / 1000; // JS timestamps are milliseconds
             }
         }
 
@@ -102,14 +79,14 @@ NAN_METHOD(NodeRequest::Respond) {
             auto etagHandle = Nan::Get(res, Nan::New("etag").ToLocalChecked()).ToLocalChecked();
             if (etagHandle->BooleanValue()) {
                 const Nan::Utf8String etag { etagHandle->ToString() };
-                response->etag = std::string { *etag, size_t(etag.length()) };
+                response.etag = std::string { *etag, size_t(etag.length()) };
             }
         }
 
         if (Nan::Has(res, Nan::New("data").ToLocalChecked()).FromJust()) {
             auto dataHandle = Nan::Get(res, Nan::New("data").ToLocalChecked()).ToLocalChecked();
             if (node::Buffer::HasInstance(dataHandle)) {
-                response->data = std::make_shared<std::string>(
+                response.data = std::make_shared<std::string>(
                     node::Buffer::Data(dataHandle),
                     node::Buffer::Length(dataHandle)
                 );
@@ -117,26 +94,17 @@ NAN_METHOD(NodeRequest::Respond) {
                 return Nan::ThrowTypeError("Response data must be a Buffer");
             }
         }
-
-        // Send the response object to the NodeFileSource object
-        source->notify(*resource, response);
     }
 
+    // Send the response object to the NodeFileSource object
+    Nan::ObjectWrap::Unwrap<NodeRequest>(info.Data().As<v8::Object>())->callback(response);
     info.GetReturnValue().SetUndefined();
 }
 
 ////////////////////////////////////////////////////////////////////////////////////////////////
 // Instance
 
-NodeRequest::NodeRequest(NodeFileSource* source_, const mbgl::Resource& resource_)
-    : source(source_),
-    resource(std::make_unique<mbgl::Resource>(resource_)) {}
-
-NodeRequest::~NodeRequest() {
-}
-
-void NodeRequest::cancel() {
-    resource.reset();
-}
+NodeRequest::NodeRequest(mbgl::FileSource::Callback callback_)
+    : callback(callback_) {}
 
 }

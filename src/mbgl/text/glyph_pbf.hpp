@@ -3,17 +3,17 @@
 
 #include <mbgl/text/glyph.hpp>
 #include <mbgl/util/noncopyable.hpp>
-#include <mbgl/storage/request_holder.hpp>
 
 #include <atomic>
 #include <functional>
 #include <string>
+#include <memory>
 
 namespace mbgl {
 
 class GlyphStore;
 class FontStack;
-class Request;
+class FileRequest;
 
 class GlyphPBF : private util::noncopyable {
 public:
@@ -45,7 +45,7 @@ private:
     std::shared_ptr<const std::string> data;
     std::atomic<bool> parsed;
 
-    RequestHolder req;
+    std::unique_ptr<FileRequest> req;
 
     Observer* observer = nullptr;
 };

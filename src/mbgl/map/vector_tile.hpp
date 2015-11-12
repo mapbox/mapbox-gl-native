@@ -63,7 +63,7 @@ class VectorTileMonitor : public GeometryTileMonitor {
 public:
     VectorTileMonitor(const SourceInfo&, const TileID&, float pixelRatio);
 
-    Request* monitorTile(std::function<void (std::exception_ptr, std::unique_ptr<GeometryTile>)>) override;
+    std::unique_ptr<FileRequest> monitorTile(std::function<void (std::exception_ptr, std::unique_ptr<GeometryTile>)>) override;
 
 private:
     std::string url;

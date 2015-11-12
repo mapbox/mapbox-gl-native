@@ -46,7 +46,7 @@ public:
     ~AnnotationTileMonitor();
 
     void update(std::unique_ptr<GeometryTile>);
-    Request* monitorTile(std::function<void (std::exception_ptr, std::unique_ptr<GeometryTile>)>) override;
+    std::unique_ptr<FileRequest> monitorTile(std::function<void (std::exception_ptr, std::unique_ptr<GeometryTile>)>) override;
 
     TileID tileID;
 

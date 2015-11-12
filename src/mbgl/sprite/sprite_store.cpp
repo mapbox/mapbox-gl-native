@@ -4,7 +4,6 @@
 #include <mbgl/storage/file_source.hpp>
 #include <mbgl/storage/resource.hpp>
 #include <mbgl/storage/response.hpp>
-#include <mbgl/storage/request_holder.hpp>
 #include <mbgl/util/exception.hpp>
 #include <mbgl/util/thread_context.hpp>
 #include <mbgl/util/run_loop.hpp>
@@ -17,8 +16,8 @@ namespace mbgl {
 struct SpriteStore::Loader {
     std::shared_ptr<const std::string> image;
     std::shared_ptr<const std::string> json;
-    RequestHolder jsonRequest;
-    RequestHolder spriteRequest;
+    std::unique_ptr<FileRequest> jsonRequest;
+    std::unique_ptr<FileRequest> spriteRequest;
 };
 
 SpriteStore::SpriteStore(float pixelRatio_)

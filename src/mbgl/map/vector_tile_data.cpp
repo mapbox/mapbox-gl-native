@@ -4,6 +4,7 @@
 #include <mbgl/util/worker.hpp>
 #include <mbgl/util/work_request.hpp>
 #include <mbgl/style/style.hpp>
+#include <mbgl/storage/file_source.hpp>
 
 #include <sstream>
 
@@ -24,7 +25,7 @@ VectorTileData::VectorTileData(const TileID& id_,
       monitor(std::move(monitor_))
 {
     state = State::loading;
-    req = monitor->monitorTile([callback, this](std::exception_ptr err, std::unique_ptr<GeometryTile> tile) {
+    tileRequest = monitor->monitorTile([callback, this](std::exception_ptr err, std::unique_ptr<GeometryTile> tile) {
         if (err) {
             try {
                 std::rethrow_exception(err);
@@ -177,10 +178,8 @@ void VectorTileData::redoPlacement() {
 }
 
 void VectorTileData::cancel() {
-    if (state != State::obsolete) {
-        state = State::obsolete;
-    }
-    req = nullptr;
+    state = State::obsolete;
+    tileRequest.reset();
     workRequest.reset();
 }
 

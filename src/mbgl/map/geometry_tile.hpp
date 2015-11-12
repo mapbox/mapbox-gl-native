@@ -46,7 +46,7 @@ public:
     virtual util::ptr<GeometryTileLayer> getLayer(const std::string&) const = 0;
 };
 
-class Request;
+class FileRequest;
 
 class GeometryTileMonitor : private util::noncopyable {
 public:
@@ -60,7 +60,7 @@ public:
      *
      * To cease monitoring, release the returned Request.
      */
-    virtual Request* monitorTile(std::function<void (std::exception_ptr, std::unique_ptr<GeometryTile>)>) = 0;
+    virtual std::unique_ptr<FileRequest> monitorTile(std::function<void (std::exception_ptr, std::unique_ptr<GeometryTile>)>) = 0;
 };
 
 class GeometryTileFeatureExtractor {

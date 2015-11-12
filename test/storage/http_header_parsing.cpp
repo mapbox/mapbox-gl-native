@@ -16,10 +16,10 @@ TEST_F(Storage, HTTPExpiresParsing) {
     DefaultFileSource fs(nullptr);
     util::RunLoop loop(uv_default_loop());
 
-    Request* req1 = fs.request({ Resource::Unknown,
+    std::unique_ptr<FileRequest> req1 = fs.request({ Resource::Unknown,
                  "http://127.0.0.1:3000/test?modified=1420794326&expires=1420797926&etag=foo" },
                [&](Response res) {
-        fs.cancel(req1);
+        req1.reset();
         EXPECT_EQ(nullptr, res.error);
         EXPECT_EQ(false, res.stale);
         ASSERT_TRUE(res.data.get());
@@ -45,9 +45,9 @@ TEST_F(Storage, HTTPCacheControlParsing) {
     int64_t now = std::chrono::duration_cast<std::chrono::seconds>(
                        SystemClock::now().time_since_epoch()).count();
 
-    Request* req2 = fs.request({ Resource::Unknown, "http://127.0.0.1:3000/test?cachecontrol=max-age=120" },
+    std::unique_ptr<FileRequest> req2 = fs.request({ Resource::Unknown, "http://127.0.0.1:3000/test?cachecontrol=max-age=120" },
                [&](Response res) {
-        fs.cancel(req2);
+        req2.reset();
         EXPECT_EQ(nullptr, res.error);
         EXPECT_EQ(false, res.stale);
         ASSERT_TRUE(res.data.get());

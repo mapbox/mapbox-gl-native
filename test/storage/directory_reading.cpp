@@ -18,8 +18,8 @@ TEST_F(Storage, AssetReadDirectory) {
 
     util::RunLoop loop(uv_default_loop());
 
-    Request* req = fs.request({ Resource::Unknown, "asset://TEST_DATA/fixtures/storage" }, [&](Response res) {
-        fs.cancel(req);
+    std::unique_ptr<FileRequest> req = fs.request({ Resource::Unknown, "asset://TEST_DATA/fixtures/storage" }, [&](Response res) {
+        req.reset();
         ASSERT_NE(nullptr, res.error);
         EXPECT_EQ(Response::Error::Reason::NotFound, res.error->reason);
         EXPECT_EQ(false, res.stale);

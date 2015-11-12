@@ -43,10 +43,10 @@ TEST_F(Storage, HTTPCoalescing) {
 
     const Resource resource { Resource::Unknown, "http://127.0.0.1:3000/test" };
 
-    Request* reqs[total];
+    std::unique_ptr<FileRequest> reqs[total];
     for (int i = 0; i < total; i++) {
         reqs[i] = fs.request(resource, [&complete, &fs, &reqs, i] (Response res) {
-            fs.cancel(reqs[i]);
+            reqs[i].reset();
             complete(res);
         });
     }
@@ -63,8 +63,8 @@ TEST_F(Storage, HTTPMultiple) {
     util::RunLoop loop(uv_default_loop());
 
     const Resource resource { Resource::Unknown, "http://127.0.0.1:3000/test?expires=2147483647" };
-    Request* req1 = nullptr;
-    Request* req2 = nullptr;
+    std::unique_ptr<FileRequest> req1;
+    std::unique_ptr<FileRequest> req2;
     req1 = fs.request(resource, [&] (Response res) {
         // Do not cancel the request right away.
         EXPECT_EQ(nullptr, res.error);
@@ -80,8 +80,8 @@ TEST_F(Storage, HTTPMultiple) {
             EXPECT_EQ(res.data.get(), res2.data.get());
 
             // Now cancel both requests after both have been notified.
-            fs.cancel(req1);
-            fs.cancel(req2);
+            req1.reset();
+            req2.reset();
 
             EXPECT_EQ(nullptr, res2.error);
             ASSERT_TRUE(res2.data.get());
@@ -111,8 +111,8 @@ TEST_F(Storage, HTTPStale) {
     int stale = 0;
 
     const Resource resource { Resource::Unknown, "http://127.0.0.1:3000/test" };
-    Request* req1 = nullptr;
-    Request* req2 = nullptr;
+    std::unique_ptr<FileRequest> req1;
+    std::unique_ptr<FileRequest> req2;
     req1 = fs.request(resource, [&] (Response res) {
         // Do not cancel the request right away.
         EXPECT_EQ(nullptr, res.error);
@@ -144,8 +144,8 @@ TEST_F(Storage, HTTPStale) {
                 stale++;
             } else {
                 // Now cancel both requests after both have been notified.
-                fs.cancel(req1);
-                fs.cancel(req2);
+                req1.reset();
+                req2.reset();
                 loop.stop();
                 HTTPStale.finish();
             }

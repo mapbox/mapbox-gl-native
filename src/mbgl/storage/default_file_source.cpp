@@ -1,5 +1,4 @@
 #include <mbgl/storage/default_file_source_impl.hpp>
-#include <mbgl/storage/request.hpp>
 #include <mbgl/storage/asset_context_base.hpp>
 #include <mbgl/storage/http_context_base.hpp>
 #include <mbgl/storage/network_status.hpp>
@@ -35,11 +34,9 @@ DefaultFileSource::DefaultFileSource(FileCache* cache, const std::string& root)
           root)) {
 }
 
-DefaultFileSource::~DefaultFileSource() {
-    MBGL_VERIFY_THREAD(tid);
-}
+DefaultFileSource::~DefaultFileSource() = default;
 
-Request* DefaultFileSource::request(const Resource& resource, Callback callback) {
+std::unique_ptr<FileRequest> DefaultFileSource::request(const Resource& resource, Callback callback) {
     if (!callback) {
         throw util::MisuseException("FileSource callback can't be empty");
     }
@@ -68,15 +65,14 @@ Request* DefaultFileSource::request(const Resource& resource, Callback callback)
         url = resource.url;
     }
 
-    auto req = new Request({ resource.kind, url }, util::RunLoop::getLoop(), std::move(callback));
-    thread->invoke(&Impl::add, req);
-    return req;
+    Resource res { resource.kind, url };
+    auto req = std::make_unique<DefaultFileRequest>(res, *this);
+    req->workRequest = thread->invokeWithCallback(&Impl::add, callback, res, req.get());
+    return std::move(req);
 }
 
-void DefaultFileSource::cancel(Request* req) {
-    assert(req);
-    req->cancel();
-    thread->invoke(&Impl::cancel, req);
+void DefaultFileSource::cancel(const Resource& res, FileRequest* req) {
+    thread->invoke(&Impl::cancel, res, req);
 }
 
 // ----- Impl -----
@@ -101,7 +97,7 @@ DefaultFileSource::Impl::~Impl() {
 
 void DefaultFileSource::Impl::networkIsReachableAgain() {
     for (auto& req : pending) {
-        auto& request = req.second;
+        auto& request = *req.second;
         auto& response = request.getResponse();
         if (!request.realRequest && response && response->error && response->error->reason == Response::Error::Reason::Connection) {
             // We need all requests to fail at least once before we are going to start retrying
@@ -111,18 +107,19 @@ void DefaultFileSource::Impl::networkIsReachableAgain() {
     }
 }
 
-void DefaultFileSource::Impl::add(Request* req) {
-    auto& request = pending.emplace(req->resource, req->resource).first->second;
+void DefaultFileSource::Impl::add(Resource resource, FileRequest* req, Callback callback) {
+    auto& request = *pending.emplace(resource,
+        std::make_unique<DefaultFileRequestImpl>(resource)).first->second;
 
     // Trigger a potentially required refresh of this Request
     update(request);
 
     // Add this request as an observer so that it'll get notified when something about this
     // request changes.
-    request.addObserver(req);
+    request.addObserver(req, callback);
 }
 
-void DefaultFileSource::Impl::update(DefaultFileRequest& request) {
+void DefaultFileSource::Impl::update(DefaultFileRequestImpl& request) {
     if (request.getResponse()) {
         // We've at least obtained a cache value, potentially we also got a final response.
         // The observers have been notified already; send what we have to the new one as well.
@@ -154,7 +151,7 @@ void DefaultFileSource::Impl::update(DefaultFileRequest& request) {
     }
 }
 
-void DefaultFileSource::Impl::startCacheRequest(DefaultFileRequest& request) {
+void DefaultFileSource::Impl::startCacheRequest(DefaultFileRequestImpl& request) {
     // Check the cache for existing data so that we can potentially
     // revalidate the information without having to redownload everything.
     request.cacheRequest =
@@ -177,7 +174,7 @@ void DefaultFileSource::Impl::startCacheRequest(DefaultFileRequest& request) {
         });
 }
 
-void DefaultFileSource::Impl::startRealRequest(DefaultFileRequest& request) {
+void DefaultFileSource::Impl::startRealRequest(DefaultFileRequestImpl& request) {
     assert(!request.realRequest);
 
     // Cancel the timer if we have one.
@@ -212,12 +209,12 @@ void DefaultFileSource::Impl::startRealRequest(DefaultFileRequest& request) {
     }
 }
 
-void DefaultFileSource::Impl::cancel(Request* req) {
-    auto it = pending.find(req->resource);
+void DefaultFileSource::Impl::cancel(Resource resource, FileRequest* req) {
+    auto it = pending.find(resource);
     if (it != pending.end()) {
         // If the number of dependent requests of the DefaultFileRequest drops to zero,
         // cancel the request and remove it from the pending list.
-        auto& request = it->second;
+        auto& request = *it->second;
         request.removeObserver(req);
         if (!request.hasObservers()) {
             pending.erase(it);
@@ -226,13 +223,9 @@ void DefaultFileSource::Impl::cancel(Request* req) {
         // There is no request for this URL anymore. Likely, the request already completed
         // before we got around to process the cancelation request.
     }
-
-    // Send a message back to the requesting thread and notify it that this request has been
-    // canceled and is now safe to be deleted.
-    req->destruct();
 }
 
-void DefaultFileSource::Impl::reschedule(DefaultFileRequest& request) {
+void DefaultFileSource::Impl::reschedule(DefaultFileRequestImpl& request) {
     if (request.realRequest) {
         // There's already a request in progress; don't start another one.
         return;
@@ -257,7 +250,7 @@ void DefaultFileSource::Impl::reschedule(DefaultFileRequest& request) {
 
 // ----- DefaultFileRequest -----
 
-DefaultFileRequest::~DefaultFileRequest() {
+DefaultFileRequestImpl::~DefaultFileRequestImpl() {
     if (realRequest) {
         realRequest->cancel();
         realRequest = nullptr;
@@ -265,32 +258,32 @@ DefaultFileRequest::~DefaultFileRequest() {
     // timerRequest and cacheRequest are automatically canceld upon destruction.
 }
 
-void DefaultFileRequest::addObserver(Request* req) {
-    observers.insert(req);
+void DefaultFileRequestImpl::addObserver(FileRequest* req, Callback callback) {
+    observers.emplace(req, callback);
 
     if (response) {
         // We've got a response, so send the (potentially stale) response to the requester.
-        req->notify(response);
+        callback(*response);
     }
 }
 
-void DefaultFileRequest::removeObserver(Request* req) {
+void DefaultFileRequestImpl::removeObserver(FileRequest* req) {
     observers.erase(req);
 }
 
-bool DefaultFileRequest::hasObservers() const {
+bool DefaultFileRequestImpl::hasObservers() const {
     return !observers.empty();
 }
 
-void DefaultFileRequest::notify() {
+void DefaultFileRequestImpl::notify() {
     if (response) {
-        for (auto req : observers) {
-            req->notify(response);
+        for (auto& req : observers) {
+            req.second(*response);
         }
     }
 }
 
-void DefaultFileRequest::setResponse(const std::shared_ptr<const Response>& response_) {
+void DefaultFileRequestImpl::setResponse(const std::shared_ptr<const Response>& response_) {
     response = response_;
 
     if (response->error) {
@@ -301,11 +294,11 @@ void DefaultFileRequest::setResponse(const std::shared_ptr<const Response>& resp
     }
 }
 
-const std::shared_ptr<const Response>& DefaultFileRequest::getResponse() const {
+const std::shared_ptr<const Response>& DefaultFileRequestImpl::getResponse() const {
     return response;
 }
 
-int64_t DefaultFileRequest::getRetryTimeout() const {
+int64_t DefaultFileRequestImpl::getRetryTimeout() const {
     if (!response) {
         // If we don't have a response, we should retry immediately.
         return 0;
@@ -350,7 +343,7 @@ int64_t DefaultFileRequest::getRetryTimeout() const {
     return timeout;
 }
 
-void DefaultFileRequest::checkResponseFreshness() {
+void DefaultFileRequestImpl::checkResponseFreshness() {
     if (response && !response->stale && response->isExpired()) {
         // Create a new Response object with `stale = true`, but the same data, and
         // replace the current request object we have.

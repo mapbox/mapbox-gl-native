@@ -3,7 +3,6 @@
 
 #include <mbgl/map/tile_data.hpp>
 #include <mbgl/map/tile_worker.hpp>
-#include <mbgl/storage/request_holder.hpp>
 #include <mbgl/text/placement_config.hpp>
 
 #include <atomic>
@@ -14,6 +13,7 @@ namespace mbgl {
 
 class Style;
 class WorkRequest;
+class FileRequest;
 class GeometryTileMonitor;
 
 class VectorTileData : public TileData {
@@ -41,8 +41,8 @@ private:
     TileWorker tileWorker;
 
     std::unique_ptr<GeometryTileMonitor> monitor;
+    std::unique_ptr<FileRequest> tileRequest;
     std::unique_ptr<WorkRequest> workRequest;
-    RequestHolder req;
 
     // Contains all the Bucket objects for the tile. Buckets are render
     // objects and they get added by tile parsing operations.

@@ -16,8 +16,8 @@ TEST_F(Storage, CacheRevalidateSame) {
     util::RunLoop loop(uv_default_loop());
 
     const Resource revalidateSame { Resource::Unknown, "http://127.0.0.1:3000/revalidate-same" };
-    Request* req1 = nullptr;
-    Request* req2 = nullptr;
+    std::unique_ptr<FileRequest> req1;
+    std::unique_ptr<FileRequest> req2;
     req1 = fs.request(revalidateSame, [&](Response res) {
         // This callback can get triggered multiple times. We only care about the first invocation.
         // It will get triggered again when refreshing the req2 (see below).
@@ -41,13 +41,11 @@ TEST_F(Storage, CacheRevalidateSame) {
                 return;
             }
 
-            ASSERT_TRUE(req1);
-            fs.cancel(req1);
-            req1 = nullptr;
+            ASSERT_TRUE(req1.get());
+            req1.reset();
 
-            ASSERT_TRUE(req2);
-            fs.cancel(req2);
-            req2 = nullptr;
+            ASSERT_TRUE(req2.get());
+            req2.reset();
 
             EXPECT_EQ(nullptr, res2.error);
             EXPECT_EQ(false, res2.stale);
@@ -79,8 +77,8 @@ TEST_F(Storage, CacheRevalidateModified) {
 
     const Resource revalidateModified{ Resource::Unknown,
                                        "http://127.0.0.1:3000/revalidate-modified" };
-    Request* req1 = nullptr;
-    Request* req2 = nullptr;
+    std::unique_ptr<FileRequest> req1;
+    std::unique_ptr<FileRequest> req2;
     req1 = fs.request(revalidateModified, [&](Response res) {
         // This callback can get triggered multiple times. We only care about the first invocation.
         // It will get triggered again when refreshing the req2 (see below).
@@ -104,13 +102,11 @@ TEST_F(Storage, CacheRevalidateModified) {
                 return;
             }
 
-            ASSERT_TRUE(req1);
-            fs.cancel(req1);
-            req1 = nullptr;
+            ASSERT_TRUE(req1.get());
+            req1.reset();
 
-            ASSERT_TRUE(req2);
-            fs.cancel(req2);
-            req2 = nullptr;
+            ASSERT_TRUE(req2.get());
+            req2.reset();
 
             EXPECT_EQ(nullptr, res2.error);
             EXPECT_EQ(false, res2.stale);
@@ -140,8 +136,8 @@ TEST_F(Storage, CacheRevalidateEtag) {
     util::RunLoop loop(uv_default_loop());
 
     const Resource revalidateEtag { Resource::Unknown, "http://127.0.0.1:3000/revalidate-etag" };
-    Request* req1 = nullptr;
-    Request* req2 = nullptr;
+    std::unique_ptr<FileRequest> req1;
+    std::unique_ptr<FileRequest> req2;
     req1 = fs.request(revalidateEtag, [&](Response res) {
         // This callback can get triggered multiple times. We only care about the first invocation.
         // It will get triggered again when refreshing the req2 (see below).
@@ -165,13 +161,11 @@ TEST_F(Storage, CacheRevalidateEtag) {
                 return;
             }
 
-            ASSERT_TRUE(req1);
-            fs.cancel(req1);
-            req1 = nullptr;
+            ASSERT_TRUE(req1.get());
+            req1.reset();
 
-            ASSERT_TRUE(req2);
-            fs.cancel(req2);
-            req2 = nullptr;
+            ASSERT_TRUE(req2.get());
+            req2.reset();
 
             EXPECT_EQ(nullptr, res2.error);
             EXPECT_EQ(false, res2.stale);

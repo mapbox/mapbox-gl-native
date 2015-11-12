@@ -47,10 +47,12 @@ public:
     void setOnRequestDelayedCallback(std::function<void(void)> callback);
 
     // FileSource implementation.
-    Request* request(const Resource&, Callback) override;
-    void cancel(Request*) override;
+    std::unique_ptr<FileRequest> request(const Resource&, Callback) override;
 
 private:
+    friend class MockFileRequest;
+    void cancel(FileRequest*);
+
     const std::unique_ptr<util::Thread<Impl>> thread_;
 };
 

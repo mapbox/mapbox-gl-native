@@ -18,11 +18,11 @@ TEST_F(Storage, CacheResponse) {
     const Resource resource { Resource::Unknown, "http://127.0.0.1:3000/cache" };
     Response response;
 
-    Request* req1 = nullptr;
-    Request* req2 = nullptr;
+    std::unique_ptr<FileRequest> req1;
+    std::unique_ptr<FileRequest> req2;
 
     req1 = fs.request(resource, [&](Response res) {
-        fs.cancel(req1);
+        req1.reset();
         EXPECT_EQ(nullptr, res.error);
         EXPECT_EQ(false, res.stale);
         ASSERT_TRUE(res.data.get());
@@ -35,7 +35,7 @@ TEST_F(Storage, CacheResponse) {
         // Now test that we get the same values as in the previous request. If we'd go to the server
         // again, we'd get different values.
         req2 = fs.request(resource, [&](Response res2) {
-            fs.cancel(req2);
+            req2.reset();
             EXPECT_EQ(response.error, res2.error);
             EXPECT_EQ(response.stale, res2.stale);
             ASSERT_TRUE(res2.data.get());

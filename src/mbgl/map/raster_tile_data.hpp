@@ -3,12 +3,11 @@
 
 #include <mbgl/map/tile_data.hpp>
 #include <mbgl/renderer/raster_bucket.hpp>
-#include <mbgl/storage/request_holder.hpp>
 
 namespace mbgl {
 
 class SourceInfo;
-class Request;
+class FileRequest;
 class StyleLayer;
 class TexturePool;
 class WorkRequest;
@@ -29,7 +28,7 @@ private:
     TexturePool& texturePool;
     const SourceInfo& source;
     Worker& worker;
-    RequestHolder req;
+    std::unique_ptr<FileRequest> req;
 
     std::unique_ptr<Bucket> bucket;
 

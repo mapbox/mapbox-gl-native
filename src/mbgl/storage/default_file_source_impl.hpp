@@ -4,6 +4,7 @@
 #include <mbgl/storage/default_file_source.hpp>
 #include <mbgl/storage/asset_context_base.hpp>
 #include <mbgl/storage/http_context_base.hpp>
+#include <mbgl/util/noncopyable.hpp>
 
 #include <set>
 #include <unordered_map>
@@ -12,27 +13,41 @@ namespace mbgl {
 
 class RequestBase;
 
-class DefaultFileRequest {
+class DefaultFileRequest : public FileRequest {
 public:
+    DefaultFileRequest(const Resource& resource_,
+                       DefaultFileSource& fileSource_)
+        : resource(resource_),
+          fileSource(fileSource_) {
+    }
+
+    ~DefaultFileRequest() {
+        fileSource.cancel(resource, this);
+    }
+
+    Resource resource;
+    DefaultFileSource& fileSource;
+
+    std::unique_ptr<WorkRequest> workRequest;
+};
+
+class DefaultFileRequestImpl : public util::noncopyable {
+public:
+    using Callback = std::function<void (Response)>;
+
     const Resource resource;
     std::unique_ptr<WorkRequest> cacheRequest;
     RequestBase* realRequest = nullptr;
     std::unique_ptr<uv::timer> timerRequest;
 
-    inline DefaultFileRequest(const Resource& resource_)
+    inline DefaultFileRequestImpl(const Resource& resource_)
         : resource(resource_) {}
 
-public:
-    // Make it movable-only.
-    DefaultFileRequest(const DefaultFileRequest&) = delete;
-    inline DefaultFileRequest(DefaultFileRequest&&) = default;
-    DefaultFileRequest& operator=(const DefaultFileRequest&) = delete;
-    inline DefaultFileRequest& operator=(DefaultFileRequest&&) = default;
-    ~DefaultFileRequest();
+    ~DefaultFileRequestImpl();
 
     // Observer accessors.
-    void addObserver(Request*);
-    void removeObserver(Request*);
+    void addObserver(FileRequest*, Callback);
+    void removeObserver(FileRequest*);
     bool hasObservers() const;
 
     // Updates/gets the response of this request object.
@@ -54,7 +69,7 @@ public:
 
 private:
     // Stores a set of all observing Request objects.
-    std::set<Request*> observers;
+    std::unordered_map<FileRequest*, Callback> observers;
 
     // The current response data. We're storing it because we can satisfy requests for the same
     // resource directly by returning this response object. We also need it to create conditional
@@ -68,21 +83,23 @@ private:
 
 class DefaultFileSource::Impl {
 public:
+    using Callback = std::function<void (Response)>;
+
     Impl(FileCache*, const std::string& = "");
     ~Impl();
 
     void networkIsReachableAgain();
 
-    void add(Request*);
-    void cancel(Request*);
+    void add(Resource, FileRequest*, Callback);
+    void cancel(Resource, FileRequest*);
 
 private:
-    void update(DefaultFileRequest&);
-    void startCacheRequest(DefaultFileRequest&);
-    void startRealRequest(DefaultFileRequest&);
-    void reschedule(DefaultFileRequest&);
+    void update(DefaultFileRequestImpl&);
+    void startCacheRequest(DefaultFileRequestImpl&);
+    void startRealRequest(DefaultFileRequestImpl&);
+    void reschedule(DefaultFileRequestImpl&);
 
-    std::unordered_map<Resource, DefaultFileRequest, Resource::Hash> pending;
+    std::unordered_map<Resource, std::unique_ptr<DefaultFileRequestImpl>, Resource::Hash> pending;
     uv_loop_t* const loop;
     FileCache* const cache;
     const std::string assetRoot;

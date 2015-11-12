@@ -18,7 +18,7 @@ TEST_F(Storage, HTTPTimeout) {
     int counter = 0;
 
     const Resource resource { Resource::Unknown, "http://127.0.0.1:3000/test?cachecontrol=max-age=1" };
-    Request* req = fs.request(resource, [&](Response res) {
+    std::unique_ptr<FileRequest> req = fs.request(resource, [&](Response res) {
         counter++;
         EXPECT_EQ(nullptr, res.error);
         EXPECT_EQ(false, res.stale);
@@ -28,7 +28,7 @@ TEST_F(Storage, HTTPTimeout) {
         EXPECT_EQ(0, res.modified);
         EXPECT_EQ("", res.etag);
         if (counter == 4) {
-            fs.cancel(req);
+            req.reset();
             loop.stop();
             HTTPTimeout.finish();
         }

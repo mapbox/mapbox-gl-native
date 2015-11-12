@@ -18,7 +18,7 @@ TEST_F(Storage, HTTPTemporaryError) {
 
     const auto start = uv_hrtime();
 
-    Request* req1 = fs.request({ Resource::Unknown, "http://127.0.0.1:3000/temporary-error" }, [&](Response res) {
+    std::unique_ptr<FileRequest> req1 = fs.request({ Resource::Unknown, "http://127.0.0.1:3000/temporary-error" }, [&](Response res) {
         static int counter = 0;
         switch (counter++) {
         case 0: {
@@ -35,7 +35,7 @@ TEST_F(Storage, HTTPTemporaryError) {
             EXPECT_EQ("", res.etag);
         } break;
         case 1: {
-            fs.cancel(req1);
+            req1.reset();
             const auto duration = double(uv_hrtime() - start) / 1e9;
             EXPECT_LT(0.99, duration) << "Backoff timer didn't wait 1 second";
             EXPECT_GT(1.2, duration) << "Backoff timer fired too late";
@@ -65,7 +65,7 @@ TEST_F(Storage, HTTPConnectionError) {
 
     const auto start = uv_hrtime();
 
-    Request* req2 = fs.request({ Resource::Unknown, "http://127.0.0.1:3001/" }, [&](Response res) {
+    std::unique_ptr<FileRequest> req2 = fs.request({ Resource::Unknown, "http://127.0.0.1:3001/" }, [&](Response res) {
         static int counter = 0;
         static int wait = 0;
         const auto duration = double(uv_hrtime() - start) / 1e9;
@@ -91,7 +91,7 @@ TEST_F(Storage, HTTPConnectionError) {
         EXPECT_EQ("", res.etag);
 
         if (counter == 2) {
-            fs.cancel(req2);
+            req2.reset();
             loop.stop();
             HTTPConnectionError.finish();
         }

@@ -53,21 +53,18 @@ npm test
 
 ## Implementing a file source
 
-When creating a `Map`, you must pass an options object (with a required `request` method, optional `cancel` method and optional 'ratio' number) as the first parameter.
+When creating a `Map`, you must pass an options object (with a required `request` method and optional 'ratio' number) as the first parameter.
 
 ```js
 var map = new mbgl.Map({
     request: function(req) {
         // TODO
     },
-    cancel: function(req) {
-        // TODO
-    },
     ratio: 2.0
 });
 ```
 
-The `request()` method starts a new request to a file, while `cancel()` tells the FileSource to cancel the request (if possible). The `ratio` sets the scale at which the map will render tiles, such as `2.0` for rendering images for high pixel density displays. The `req` parameter has two properties:
+The `request()` method starts a new request to a file. The `ratio` sets the scale at which the map will render tiles, such as `2.0` for rendering images for high pixel density displays. The `req` parameter has two properties:
 
 ```json
 {

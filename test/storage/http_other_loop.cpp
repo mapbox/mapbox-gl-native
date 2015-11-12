@@ -14,9 +14,9 @@ TEST_F(Storage, HTTPOtherLoop) {
     DefaultFileSource fs(nullptr);
     util::RunLoop loop(uv_default_loop());
 
-    Request* req = fs.request({ Resource::Unknown, "http://127.0.0.1:3000/test" },
+    std::unique_ptr<FileRequest> req = fs.request({ Resource::Unknown, "http://127.0.0.1:3000/test" },
                [&](Response res) {
-        fs.cancel(req);
+        req.reset();
         EXPECT_EQ(nullptr, res.error);
         EXPECT_EQ(false, res.stale);
         ASSERT_TRUE(res.data.get());

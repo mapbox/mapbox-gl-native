@@ -31,9 +31,9 @@ TEST_F(Storage, HTTPIssue1369) {
     auto req = fs.request(resource, [&](Response) {
         ADD_FAILURE() << "Callback should not be called";
     });
-    fs.cancel(req);
+    req.reset();
     req = fs.request(resource, [&](Response res) {
-        fs.cancel(req);
+        req.reset();
         EXPECT_EQ(nullptr, res.error);
         EXPECT_EQ(false, res.stale);
         ASSERT_TRUE(res.data.get());
