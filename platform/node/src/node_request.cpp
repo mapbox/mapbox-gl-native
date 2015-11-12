@@ -6,7 +6,7 @@
 #include <cmath>
 #include <iostream>
 
-namespace node_mbgl {
+namespace mbgl {
 
 ////////////////////////////////////////////////////////////////////////////////////////////////
 // Static Node Methods
@@ -30,19 +30,19 @@ NAN_METHOD(NodeRequest::New) {
     }
 
     auto source = reinterpret_cast<NodeFileSource*>(info[0].As<v8::External>()->Value());
-    auto resource = reinterpret_cast<mbgl::Resource*>(info[1].As<v8::External>()->Value());
+    auto resource = reinterpret_cast<Resource*>(info[1].As<v8::External>()->Value());
     auto req = new NodeRequest(source, *resource);
     req->Wrap(info.This());
 
     info.GetReturnValue().Set(info.This());
 }
 
-v8::Handle<v8::Object> NodeRequest::Create(NodeFileSource* source, const mbgl::Resource& resource) {
+v8::Handle<v8::Object> NodeRequest::Create(NodeFileSource* source, const Resource& resource) {
     Nan::EscapableHandleScope scope;
 
     v8::Local<v8::Value> argv[] = {
         Nan::New<v8::External>(const_cast<NodeFileSource*>(source)),
-        Nan::New<v8::External>(const_cast<mbgl::Resource*>(&resource))
+        Nan::New<v8::External>(const_cast<Resource*>(&resource))
     };
     auto instance = Nan::New(constructor)->NewInstance(2, argv);
 
@@ -64,16 +64,16 @@ NAN_METHOD(NodeRequest::Respond) {
     auto resource = std::move(nodeRequest->resource);
 
     if (info.Length() < 1) {
-        auto response = std::make_shared<mbgl::Response>();
-        using Error = mbgl::Response::Error;
+        auto response = std::make_shared<Response>();
+        using Error = Response::Error;
         response->error = std::make_unique<Error>(Error::Reason::NotFound);
         source->notify(*resource, response);
     } else if (info[0]->BooleanValue()) {
-        auto response = std::make_shared<mbgl::Response>();
+        auto response = std::make_shared<Response>();
 
         // Store the error string.
         const Nan::Utf8String message { info[0]->ToString() };
-        using Error = mbgl::Response::Error;
+        using Error = Response::Error;
         response->error = std::make_unique<Error>(
             Error::Reason::Other, std::string{ *message, size_t(message.length()) });
 
@@ -81,7 +81,7 @@ NAN_METHOD(NodeRequest::Respond) {
     } else if (info.Length() < 2 || !info[1]->IsObject()) {
         return Nan::ThrowTypeError("Second argument must be a response object");
     } else {
-        auto response = std::make_shared<mbgl::Response>();
+        auto response = std::make_shared<Response>();
         auto res = info[1]->ToObject();
 
         if (Nan::Has(res, Nan::New("modified").ToLocalChecked()).FromJust()) {
@@ -128,9 +128,9 @@ NAN_METHOD(NodeRequest::Respond) {
 ////////////////////////////////////////////////////////////////////////////////////////////////
 // Instance
 
-NodeRequest::NodeRequest(NodeFileSource* source_, const mbgl::Resource& resource_)
+NodeRequest::NodeRequest(NodeFileSource* source_, const Resource& resource_)
     : source(source_),
-    resource(std::make_unique<mbgl::Resource>(resource_)) {}
+    resource(std::make_unique<Resource>(resource_)) {}
 
 NodeRequest::~NodeRequest() {
 }

@@ -11,7 +11,7 @@
 
 #include <memory>
 
-namespace node_mbgl {
+namespace mbgl {
 
 class NodeFileSource;
 
@@ -22,17 +22,17 @@ public:
     static NAN_METHOD(New);
     static NAN_METHOD(Respond);
 
-    static v8::Handle<v8::Object> Create(NodeFileSource*, const mbgl::Resource&);
+    static v8::Handle<v8::Object> Create(NodeFileSource*, const Resource&);
     static Nan::Persistent<v8::Function> constructor;
 
-    NodeRequest(NodeFileSource* source, const mbgl::Resource& resource);
+    NodeRequest(NodeFileSource* source, const Resource& resource);
     ~NodeRequest();
 
     void cancel();
 
 private:
     NodeFileSource* source;
-    std::unique_ptr<mbgl::Resource> resource;
+    std::unique_ptr<Resource> resource;
 };
 
 }
