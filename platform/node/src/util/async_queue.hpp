@@ -14,7 +14,7 @@
 #define UV_ASYNC_PARAMS(handle) uv_async_t *handle
 #endif
 
-namespace node_mbgl {
+namespace mbgl {
 namespace util {
 
 template <typename T>

@@ -12,7 +12,7 @@
 #define UV_ASYNC_PARAMS(handle) uv_async_t *handle
 #endif
 
-namespace node_mbgl {
+namespace mbgl {
 
 struct NodeMap::RenderOptions {
     double zoom = 0;
@@ -30,8 +30,8 @@ struct NodeMap::RenderOptions {
 
 Nan::Persistent<v8::Function> NodeMap::constructor;
 
-static std::shared_ptr<mbgl::HeadlessDisplay> sharedDisplay() {
-    static auto display = std::make_shared<mbgl::HeadlessDisplay>();
+static std::shared_ptr<HeadlessDisplay> sharedDisplay() {
+    static auto display = std::make_shared<HeadlessDisplay>();
     return display;
 }
 
@@ -281,7 +281,7 @@ NAN_METHOD(NodeMap::Render) {
 
     try {
         nodeMap->startRender(std::move(options));
-    } catch (mbgl::util::Exception &ex) {
+    } catch (util::Exception &ex) {
         return Nan::ThrowError(ex.what());
     }
 
@@ -290,13 +290,13 @@ NAN_METHOD(NodeMap::Render) {
 
 void NodeMap::startRender(std::unique_ptr<NodeMap::RenderOptions> options) {
     view.resize(options->width, options->height);
-    map->update(mbgl::Update::Dimensions);
+    map->update(Update::Dimensions);
     map->setClasses(options->classes);
-    map->setLatLngZoom(mbgl::LatLng(options->latitude, options->longitude), options->zoom);
+    map->setLatLngZoom(LatLng(options->latitude, options->longitude), options->zoom);
     map->setBearing(options->bearing);
     map->setPitch(options->pitch);
 
-    map->renderStill([this](const std::exception_ptr eptr, std::unique_ptr<const mbgl::StillImage> result) {
+    map->renderStill([this](const std::exception_ptr eptr, std::unique_ptr<const StillImage> result) {
         if (eptr) {
             error = std::move(eptr);
             uv_async_send(async);
@@ -356,13 +356,13 @@ void NodeMap::renderFinished() {
     } else if (img) {
         v8::Local<v8::Object> pixels = Nan::NewBuffer(
             reinterpret_cast<char *>(img->pixels.get()),
-            size_t(img->width) * size_t(img->height) * sizeof(mbgl::StillImage::Pixel),
+            size_t(img->width) * size_t(img->height) * sizeof(StillImage::Pixel),
 
             // Retain the StillImage object until the buffer is deleted.
             [](char *, void *hint) {
-                delete reinterpret_cast<const mbgl::StillImage *>(hint);
+                delete reinterpret_cast<const StillImage *>(hint);
             },
-            const_cast<mbgl::StillImage *>(img.get())
+            const_cast<StillImage *>(img.get())
         ).ToLocalChecked();
         img.release();
 
@@ -399,7 +399,7 @@ NAN_METHOD(NodeMap::Release) {
 }
 
 void NodeMap::release() {
-    if (!isValid()) throw mbgl::util::Exception(releasedMessage());
+    if (!isValid()) throw util::Exception(releasedMessage());
 
     valid = false;
 
@@ -428,7 +428,7 @@ NodeMap::NodeMap(v8::Local<v8::Object> options) :
         return Nan::Has(options, Nan::New("ratio").ToLocalChecked()).FromJust() ? Nan::Get(options, Nan::New("ratio").ToLocalChecked()).ToLocalChecked()->NumberValue() : 1.0;
     }()),
     fs(options),
-    map(std::make_unique<mbgl::Map>(view, fs, mbgl::MapMode::Still)),
+    map(std::make_unique<Map>(view, fs, MapMode::Still)),
     async(new uv_async_t) {
 
     async->data = this;

@@ -14,7 +14,7 @@
 
 #include <queue>
 
-namespace node_mbgl {
+namespace mbgl {
 
 class NodeMap : public Nan::ObjectWrap {
 public:
@@ -29,7 +29,7 @@ public:
     static NAN_METHOD(Release);
     static NAN_METHOD(DumpDebugLogs);
 
-    void startRender(std::unique_ptr<NodeMap::RenderOptions> options);
+    void startRender(std::unique_ptr<NodeMap::RenderOptions>);
     void renderFinished();
 
     void release();
@@ -43,12 +43,12 @@ public:
     NodeMap(v8::Local<v8::Object>);
     ~NodeMap();
 
-    mbgl::HeadlessView view;
+    HeadlessView view;
     NodeFileSource fs;
-    std::unique_ptr<mbgl::Map> map;
+    std::unique_ptr<Map> map;
 
     std::exception_ptr error;
-    std::unique_ptr<const mbgl::StillImage> image;
+    std::unique_ptr<const StillImage> image;
     std::unique_ptr<Nan::Callback> callback;
 
     // Async for delivering the notifications of render completion.

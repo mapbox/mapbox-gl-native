@@ -3,12 +3,8 @@
 #include <mbgl/storage/response.hpp>
 
 #include <cmath>
-#include <iostream>
 
-namespace node_mbgl {
-
-////////////////////////////////////////////////////////////////////////////////////////////////
-// Static Node Methods
+namespace mbgl {
 
 Nan::Persistent<v8::Function> NodeRequest::constructor;
 
@@ -23,16 +19,16 @@ NAN_MODULE_INIT(NodeRequest::Init) {
 }
 
 NAN_METHOD(NodeRequest::New) {
-    auto req = new NodeRequest(*reinterpret_cast<mbgl::FileSource::Callback*>(info[0].As<v8::External>()->Value()));
+    auto req = new NodeRequest(*reinterpret_cast<FileSource::Callback*>(info[0].As<v8::External>()->Value()));
     req->Wrap(info.This());
     info.GetReturnValue().Set(info.This());
 }
 
-v8::Handle<v8::Object> NodeRequest::Create(const mbgl::Resource& resource, mbgl::FileSource::Callback callback) {
+v8::Handle<v8::Object> NodeRequest::Create(const Resource& resource, FileSource::Callback callback) {
     Nan::EscapableHandleScope scope;
 
     v8::Local<v8::Value> argv[] = {
-        Nan::New<v8::External>(const_cast<mbgl::FileSource::Callback*>(&callback))
+        Nan::New<v8::External>(const_cast<FileSource::Callback*>(&callback))
     };
     auto instance = Nan::New(constructor)->NewInstance(1, argv);
 
@@ -43,21 +39,18 @@ v8::Handle<v8::Object> NodeRequest::Create(const mbgl::Resource& resource, mbgl:
 }
 
 NAN_METHOD(NodeRequest::Respond) {
-    using Error = mbgl::Response::Error;
-    mbgl::Response response;
+    using Error = Response::Error;
+    Response response;
 
     if (info.Length() < 1) {
         response.error = std::make_unique<Error>(Error::Reason::NotFound);
-
     } else if (info[0]->BooleanValue()) {
         // Store the error string.
         const Nan::Utf8String message { info[0]->ToString() };
         response.error = std::make_unique<Error>(
             Error::Reason::Other, std::string{ *message, size_t(message.length()) });
-
     } else if (info.Length() < 2 || !info[1]->IsObject()) {
         return Nan::ThrowTypeError("Second argument must be a response object");
-
     } else {
         auto res = info[1]->ToObject();
 
@@ -101,10 +94,6 @@ NAN_METHOD(NodeRequest::Respond) {
     info.GetReturnValue().SetUndefined();
 }
 
-////////////////////////////////////////////////////////////////////////////////////////////////
-// Instance
-
-NodeRequest::NodeRequest(mbgl::FileSource::Callback callback_)
+NodeRequest::NodeRequest(FileSource::Callback callback_)
     : callback(callback_) {}
-
 }

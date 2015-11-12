@@ -9,14 +9,14 @@
 #include <nan.h>
 #pragma GCC diagnostic pop
 
-namespace node_mbgl {
+namespace mbgl {
 
-class NodeFileSource : public mbgl::FileSource {
+class NodeFileSource : public FileSource {
 public:
     NodeFileSource(v8::Local<v8::Object>);
-    ~NodeFileSource();
+    ~NodeFileSource() override;
 
-    std::unique_ptr<mbgl::FileRequest> request(const mbgl::Resource&, Callback);
+    std::unique_ptr<FileRequest> request(const Resource&, Callback) override;
 
 private:
     Nan::Persistent<v8::Object> options;

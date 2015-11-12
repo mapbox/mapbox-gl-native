@@ -9,17 +9,17 @@
 #include <nan.h>
 #pragma GCC diagnostic pop
 
-namespace node_mbgl {
+namespace mbgl {
 
 namespace util { template <typename T> class AsyncQueue; }
 
-class NodeLogObserver : public mbgl::Log::Observer {
+class NodeLogObserver : public Log::Observer {
 public:
     NodeLogObserver(v8::Local<v8::Object> target);
     ~NodeLogObserver();
 
     // Log::Observer implementation
-    virtual bool onRecord(mbgl::EventSeverity severity, mbgl::Event event, int64_t code, const std::string &msg) override;
+    virtual bool onRecord(EventSeverity severity, Event event, int64_t code, const std::string &msg) override;
 
 private:
     Nan::Persistent<v8::Object> module;

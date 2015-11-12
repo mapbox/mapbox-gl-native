@@ -1,15 +1,15 @@
 #include "node_log.hpp"
 #include "util/async_queue.hpp"
 
-namespace node_mbgl {
+namespace mbgl {
 
 struct NodeLogObserver::LogMessage {
-    mbgl::EventSeverity severity;
-    mbgl::Event event;
+    EventSeverity severity;
+    Event event;
     int64_t code;
     std::string text;
 
-    LogMessage(mbgl::EventSeverity severity_, mbgl::Event event_, int64_t code_, std::string text_)
+    LogMessage(EventSeverity severity_, Event event_, int64_t code_, std::string text_)
         : severity(severity_),
         event(event_),
         code(code_),
@@ -23,10 +23,10 @@ NodeLogObserver::NodeLogObserver(v8::Local<v8::Object> target)
           auto msg = Nan::New<v8::Object>();
 
           Nan::Set(msg, Nan::New("class").ToLocalChecked(),
-              Nan::New(mbgl::EventClass(message.event).c_str()).ToLocalChecked());
+              Nan::New(EventClass(message.event).c_str()).ToLocalChecked());
 
           Nan::Set(msg, Nan::New("severity").ToLocalChecked(),
-              Nan::New(mbgl::EventSeverityClass(message.severity).c_str()).ToLocalChecked());
+              Nan::New(EventSeverityClass(message.severity).c_str()).ToLocalChecked());
 
           if (message.code != -1) {
               Nan::Set(msg, Nan::New("code").ToLocalChecked(),
@@ -55,7 +55,7 @@ NodeLogObserver::~NodeLogObserver() {
     module.Reset();
 }
 
-bool NodeLogObserver::onRecord(mbgl::EventSeverity severity, mbgl::Event event, int64_t code, const std::string &text) {
+bool NodeLogObserver::onRecord(EventSeverity severity, Event event, int64_t code, const std::string &text) {
     queue->send({ severity, event, code, text });
     return true;
 }

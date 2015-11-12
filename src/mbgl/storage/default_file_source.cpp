@@ -45,7 +45,7 @@ std::unique_ptr<FileRequest> DefaultFileSource::request(const Resource& resource
 
     switch (resource.kind) {
     case Resource::Kind::Style:
-        url = mbgl::util::mapbox::normalizeStyleURL(resource.url, accessToken);
+        url = util::mapbox::normalizeStyleURL(resource.url, accessToken);
         break;
 
     case Resource::Kind::Source:
