@@ -21,7 +21,7 @@ In the Android SDK Manager also select and install "Android Support Repository" 
 
 _The demo applications use Mapbox vector tiles, which require a Mapbox account and API access token. Obtain an access token on the [Mapbox account page](https://www.mapbox.com/account/apps/)._
 
-gradle will take the value of the `MAPBOX_ACCESS_TOKEN` environ variable and save it to `android/java/MapboxGLAndroidSDK/src/main/res/raw/token.txt` where the app will read it from.
+gradle will take the value of the `MAPBOX_ACCESS_TOKEN` environ variable and save it to `"MapboxGLAndroidSDKTestApp/src/main/res/values/developer-config.xml` where the app will read it from.
 
 ## Building
 

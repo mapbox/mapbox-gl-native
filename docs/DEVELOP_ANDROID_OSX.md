@@ -19,7 +19,7 @@ By default, the Android SDK will be installed to `/Users/<user>/Library/Android/
 
 _The test application (used for development purposes) uses Mapbox vector tiles, which require a Mapbox account and API access token. Obtain a free access token on the [Mapbox account page](https://www.mapbox.com/account/apps/)._
 
-gradle will take the value of the `MAPBOX_ACCESS_TOKEN` environ variable and save it to `android/MapboxGLAndroidSDKTestApp/src/main/res/raw/token.txt` where the app will read it from.
+gradle will take the value of the `MAPBOX_ACCESS_TOKEN` environ variable and save it to `MapboxGLAndroidSDKTestApp/src/main/res/values/developer-config.xml` where the app will read it from.
 
 ## Developing In Android Studio
 
