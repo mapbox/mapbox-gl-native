@@ -38,6 +38,7 @@
 
         <activity
             android:name=".BulkMarkerActivity"
+            android:configChanges="orientation|keyboardHidden|screenSize"
             android:label="@string/action_add_bulk_markers" />
 
         <activity
