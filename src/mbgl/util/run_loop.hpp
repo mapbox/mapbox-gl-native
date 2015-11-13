@@ -67,11 +67,20 @@ public:
         auto flag = std::make_shared<bool>();
         *flag = false;
 
-        auto after = RunLoop::current.get()->bind([flag, callback] (auto&&... results) {
+        // Create a lambda L1 that invokes another lambda L2 on the current RunLoop R, that calls
+        // the callback C. Both lambdas check the flag before proceeding. L1 needs to check the flag
+        // because if the request was cancelled, then R might have been destroyed. L2 needs to check
+        // the flag because the request may have been cancelled after L2 was invoked but before it
+        // began executing.
+        auto after = [flag, current = RunLoop::current.get(), callback1 = std::move(callback)] (auto&&... results1) {
             if (!*flag) {
-                callback(std::move(results)...);
+                current->invoke([flag, callback2 = std::move(callback1)] (auto&&... results2) {
+                    if (!*flag) {
+                        callback2(std::move(results2)...);
+                    }
+                }, std::move(results1)...);
             }
-        });
+        };
 
         auto tuple = std::make_tuple(std::move(args)..., after);
         auto task = std::make_shared<Invoker<Fn, decltype(tuple)>>(
@@ -83,15 +92,6 @@ public:
         async.send();
 
         return std::make_unique<WorkRequest>(task);
-    }
-
-    // Return a function that invokes the given function on this RunLoop.
-    template <class Fn>
-    auto bind(Fn&& fn) {
-        return [this, fn = std::move(fn)] (auto&&... args) {
-            // `this->` is a workaround for https://gcc.gnu.org/bugzilla/show_bug.cgi?id=61636
-            this->invoke(std::move(fn), std::move(args)...);
-        };
     }
 
     uv_loop_t* get() { return async.get()->loop; }
