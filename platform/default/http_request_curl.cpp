@@ -6,9 +6,12 @@
 
 #include <mbgl/util/time.hpp>
 #include <mbgl/util/util.hpp>
+#include <mbgl/util/run_loop.hpp>
 #include <mbgl/util/string.hpp>
+#include <mbgl/util/timer.hpp>
 
 #include <curl/curl.h>
+#include <uv.h>
 
 #ifdef __ANDROID__
 #include <mbgl/android/jni.hpp>
@@ -48,27 +51,24 @@ class HTTPCURLContext : public HTTPContextBase {
     MBGL_STORE_THREAD(tid)
 
 public:
-    explicit HTTPCURLContext(uv_loop_t *loop);
+    HTTPCURLContext();
     ~HTTPCURLContext();
 
     HTTPRequestBase* createRequest(const Resource&,
                                RequestBase::Callback,
-                               uv_loop_t*,
                                std::shared_ptr<const Response>) final;
 
     static int handleSocket(CURL *handle, curl_socket_t s, int action, void *userp, void *socketp);
     static void perform(uv_poll_t *req, int status, int events);
     static int startTimeout(CURLM *multi, long timeout_ms, void *userp);
-    static void onTimeout(UV_TIMER_PARAMS(req));
+    static void onTimeout(HTTPCURLContext *context);
 
     CURL *getHandle();
     void returnHandle(CURL *handle);
     void checkMultiInfo();
 
-    uv_loop_t *loop = nullptr;
-
     // Used as the CURL timer function to periodically check for socket updates.
-    uv_timer_t *timeout = nullptr;
+    util::Timer timeout;
 
     // CURL multi handle that we use to request multiple URLs at the same time, without having to
     // block and spawn threads.
@@ -89,7 +89,6 @@ public:
     HTTPCURLRequest(HTTPCURLContext*,
                 const Resource&,
                 Callback,
-                uv_loop_t*,
                 std::shared_ptr<const Response>);
     ~HTTPCURLRequest();
 
@@ -129,7 +128,7 @@ public:
 public:
     Socket(HTTPCURLContext *context_, curl_socket_t sockfd_) : context(context_), sockfd(sockfd_) {
         assert(context);
-        uv_poll_init_socket(context->loop, &poll, sockfd);
+        uv_poll_init_socket(reinterpret_cast<uv_loop_t*>(util::RunLoop::getLoopHandle()), &poll, sockfd);
         poll.data = this;
     }
 
@@ -154,16 +153,10 @@ private:
 
 // -------------------------------------------------------------------------------------------------
 
-HTTPCURLContext::HTTPCURLContext(uv_loop_t *loop_)
-    : HTTPContextBase(),
-      loop(loop_) {
+HTTPCURLContext::HTTPCURLContext() {
     if (curl_global_init(CURL_GLOBAL_ALL)) {
         throw std::runtime_error("Could not init cURL");
     }
-
-    timeout = new uv_timer_t;
-    timeout->data = this;
-    uv_timer_init(loop, timeout);
 
     share = curl_share_init();
 
@@ -186,15 +179,13 @@ HTTPCURLContext::~HTTPCURLContext() {
     curl_share_cleanup(share);
     share = nullptr;
 
-    uv_timer_stop(timeout);
-    uv::close(timeout);
+    timeout.stop();
 }
 
 HTTPRequestBase* HTTPCURLContext::createRequest(const Resource& resource,
                                             RequestBase::Callback callback,
-                                            uv_loop_t* loop_,
                                             std::shared_ptr<const Response> response) {
-    return new HTTPCURLRequest(this, resource, callback, loop_, response);
+    return new HTTPCURLRequest(this, resource, callback, response);
 }
 
 CURL *HTTPCURLContext::getHandle() {
@@ -286,9 +277,7 @@ int HTTPCURLContext::handleSocket(CURL * /* handle */, curl_socket_t s, int acti
     return 0;
 }
 
-void HTTPCURLContext::onTimeout(UV_TIMER_PARAMS(req)) {
-    assert(req->data);
-    auto context = reinterpret_cast<HTTPCURLContext *>(req->data);
+void HTTPCURLContext::onTimeout(HTTPCURLContext *context) {
     MBGL_VERIFY_THREAD(context->tid);
     int running_handles;
     CURLMcode error = curl_multi_socket_action(context->multi, CURL_SOCKET_TIMEOUT, 0, &running_handles);
@@ -306,8 +295,10 @@ int HTTPCURLContext::startTimeout(CURLM * /* multi */, long timeout_ms, void *us
         // A timeout of 0 ms means that the timer will invoked in the next loop iteration.
         timeout_ms = 0;
     }
-    uv_timer_stop(context->timeout);
-    uv_timer_start(context->timeout, onTimeout, timeout_ms, 0);
+    context->timeout.stop();
+    context->timeout.start(std::chrono::milliseconds(timeout_ms), Duration::zero(),
+        std::bind(&HTTPCURLContext::onTimeout, context));
+
     return 0;
 }
 
@@ -411,7 +402,7 @@ static CURLcode sslctx_function(CURL * /* curl */, void *sslctx, void * /* parm 
 }
 #endif
 
-HTTPCURLRequest::HTTPCURLRequest(HTTPCURLContext* context_, const Resource& resource_, Callback callback_, uv_loop_t*, std::shared_ptr<const Response> response_)
+HTTPCURLRequest::HTTPCURLRequest(HTTPCURLContext* context_, const Resource& resource_, Callback callback_, std::shared_ptr<const Response> response_)
     : HTTPRequestBase(resource_, callback_),
       context(context_),
       existingResponse(response_),
@@ -620,8 +611,8 @@ void HTTPCURLRequest::handleResult(CURLcode code) {
     delete this;
 }
 
-std::unique_ptr<HTTPContextBase> HTTPContextBase::createContext(uv_loop_t* loop) {
-    return std::make_unique<HTTPCURLContext>(loop);
+std::unique_ptr<HTTPContextBase> HTTPContextBase::createContext() {
+    return std::make_unique<HTTPCURLContext>();
 }
 
 } // namespace mbgl
