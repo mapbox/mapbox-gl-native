@@ -1,5 +1,7 @@
 <?xml version="1.0" encoding="utf-8"?>
 <resources>
-    <dimen name="infowindow_tipview_width">16dp</dimen>
+    <dimen name="infowindow_tipview_width">20dp</dimen>
     <dimen name="infowindow_margin">8dp</dimen>
+    <dimen name="infowindow_offset">-2dp</dimen>
+    <dimen name="infowindow_line_width">1.5dp</dimen>
 </resources>

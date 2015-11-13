@@ -32,8 +32,7 @@ class InfoWindowView extends RelativeLayout {
     void setTipViewMarginLeft(int marginLeft) {
         RelativeLayout.LayoutParams layoutParams = (RelativeLayout.LayoutParams) mTipView.getLayoutParams();
         layoutParams.leftMargin = marginLeft;
-        // This is a bit of a hack but prevents an occasional 1 pixel gap between the InfoWindow and
-        // the tip
-        layoutParams.topMargin = -1;
+        // This is a bit of a hack but prevents an occasional gap between the InfoWindow
+        layoutParams.topMargin = (int) getResources().getDimension(R.dimen.infowindow_offset);
     }
 }

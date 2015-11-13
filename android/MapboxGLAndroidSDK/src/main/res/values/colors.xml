@@ -2,6 +2,7 @@
 <resources>
     <color name="white">#FFFFFF</color>
     <color name="black">#000000</color>
+    <color name="gray">#7D7F80</color>
     <color name="mapbox_blue">#1E8CAB</color>
     <color name="my_location_ring">@color/mapbox_blue</color>
 </resources>
