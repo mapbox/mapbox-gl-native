@@ -80,7 +80,7 @@ private:
 void runTestCase(MockFileSource::Type type,
                  const std::string& param,
                  const std::string& message) {
-    util::RunLoop loop(uv_default_loop());
+    util::RunLoop loop;
 
     MockView view;
     MockFileSource fileSource(type, param);
@@ -118,7 +118,7 @@ void runTestCase(MockFileSource::Type type,
         std::make_unique<util::Thread<MockMapContext>>(
             util::ThreadContext{"Map", util::ThreadType::Map, util::ThreadPriority::Regular}, view, fileSource, callback));
 
-    uv_run(loop.get(), UV_RUN_DEFAULT);
+    loop.run();
 
     // Needed because it will make the Map thread
     // join and cease logging after this point.

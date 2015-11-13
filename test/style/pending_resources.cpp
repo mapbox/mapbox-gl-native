@@ -5,9 +5,9 @@
 #include <mbgl/map/map.hpp>
 #include <mbgl/platform/default/headless_display.hpp>
 #include <mbgl/platform/default/headless_view.hpp>
+#include <mbgl/util/async_task.hpp>
 #include <mbgl/util/io.hpp>
 #include <mbgl/util/run_loop.hpp>
-#include <mbgl/util/uv_detail.hpp>
 
 using namespace mbgl;
 
@@ -20,7 +20,7 @@ class PendingResources : public ::testing::TestWithParam<std::string> {
 // the Map object after that. The idea here is to test if these pending requests
 // are getting canceled correctly if on shutdown.
 TEST_P(PendingResources, DeleteMapObjectWithPendingRequest) {
-    util::RunLoop loop(uv_default_loop());
+    util::RunLoop loop;
 
     auto display = std::make_shared<mbgl::HeadlessDisplay>();
     HeadlessView view(display, 1, 1000, 1000);
@@ -28,7 +28,7 @@ TEST_P(PendingResources, DeleteMapObjectWithPendingRequest) {
 
     std::unique_ptr<Map> map = std::make_unique<Map>(view, fileSource, MapMode::Still);
 
-    uv::async endTest(loop.get(), [&map, &loop] {
+    util::AsyncTask endTest([&map, &loop] {
         map.reset();
         loop.stop();
     });
@@ -43,7 +43,7 @@ TEST_P(PendingResources, DeleteMapObjectWithPendingRequest) {
         EXPECT_TRUE(false) << "Should never happen.";
     });
 
-    uv_run(loop.get(), UV_RUN_DEFAULT);
+    loop.run();
 }
 
 // In the test data below, "sprite" will match both "sprite.json" and "sprite.png" and cause two

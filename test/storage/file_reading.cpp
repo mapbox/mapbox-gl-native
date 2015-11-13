@@ -1,7 +1,5 @@
 #include "storage.hpp"
 
-#include <uv.h>
-
 #include <mbgl/storage/default_file_source.hpp>
 #include <mbgl/platform/platform.hpp>
 #include <mbgl/util/chrono.hpp>
@@ -12,13 +10,13 @@ TEST_F(Storage, AssetEmptyFile) {
 
     using namespace mbgl;
 
+    util::RunLoop loop;
+
 #ifdef MBGL_ASSET_ZIP
     DefaultFileSource fs(nullptr, "test/fixtures/storage/assets.zip");
 #else
     DefaultFileSource fs(nullptr);
 #endif
-
-    util::RunLoop loop(uv_default_loop());
 
     std::unique_ptr<FileRequest> req = fs.request({ Resource::Unknown, "asset://TEST_DATA/fixtures/storage/empty" }, [&](Response res) {
         req.reset();
@@ -33,7 +31,7 @@ TEST_F(Storage, AssetEmptyFile) {
         EmptyFile.finish();
     });
 
-    uv_run(uv_default_loop(), UV_RUN_DEFAULT);
+    loop.run();
 }
 
 TEST_F(Storage, AssetNonEmptyFile) {
@@ -41,13 +39,13 @@ TEST_F(Storage, AssetNonEmptyFile) {
 
     using namespace mbgl;
 
+    util::RunLoop loop;
+
 #ifdef MBGL_ASSET_ZIP
     DefaultFileSource fs(nullptr, "test/fixtures/storage/assets.zip");
 #else
     DefaultFileSource fs(nullptr);
 #endif
-
-    util::RunLoop loop(uv_default_loop());
 
     std::unique_ptr<FileRequest> req = fs.request({ Resource::Unknown, "asset://TEST_DATA/fixtures/storage/nonempty" }, [&](Response res) {
         req.reset();
@@ -64,7 +62,7 @@ TEST_F(Storage, AssetNonEmptyFile) {
         NonEmptyFile.finish();
     });
 
-    uv_run(uv_default_loop(), UV_RUN_DEFAULT);
+    loop.run();
 }
 
 TEST_F(Storage, AssetNonExistentFile) {
@@ -72,13 +70,13 @@ TEST_F(Storage, AssetNonExistentFile) {
 
     using namespace mbgl;
 
+    util::RunLoop loop;
+
 #ifdef MBGL_ASSET_ZIP
     DefaultFileSource fs(nullptr, "test/fixtures/storage/assets.zip");
 #else
     DefaultFileSource fs(nullptr);
 #endif
-
-    util::RunLoop loop(uv_default_loop());
 
     std::unique_ptr<FileRequest> req = fs.request({ Resource::Unknown, "asset://TEST_DATA/fixtures/storage/does_not_exist" }, [&](Response res) {
         req.reset();
@@ -98,5 +96,5 @@ TEST_F(Storage, AssetNonExistentFile) {
         NonExistentFile.finish();
     });
 
-    uv_run(uv_default_loop(), UV_RUN_DEFAULT);
+    loop.run();
 }

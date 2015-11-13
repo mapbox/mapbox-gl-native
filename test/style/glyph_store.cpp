@@ -4,6 +4,7 @@
 
 #include <mbgl/text/font_stack.hpp>
 #include <mbgl/text/glyph_store.hpp>
+#include <mbgl/util/async_task.hpp>
 #include <mbgl/util/run_loop.hpp>
 #include <mbgl/util/thread.hpp>
 
@@ -53,9 +54,9 @@ private:
 class GlyphStoreTest : public testing::Test {
 protected:
     void runTest(const GlyphStoreParams& params, FileSource* fileSource, GlyphStoreTestCallback callback) {
-        util::RunLoop loop(uv_default_loop());
+        util::RunLoop loop;
 
-        async_ = std::make_unique<uv::async>(loop.get(), [&]{ loop.stop(); });
+        async_ = std::make_unique<util::AsyncTask>([&]{ loop.stop(); });
         async_->unref();
 
         const util::ThreadContext context = {"Map", util::ThreadType::Map, util::ThreadPriority::Regular};
@@ -63,7 +64,7 @@ protected:
         util::Thread<GlyphStoreThread> tester(context, fileSource, callback);
         tester.invoke(&GlyphStoreThread::loadGlyphStore, params);
 
-        uv_run(loop.get(), UV_RUN_DEFAULT);
+        loop.run();
 
         tester.invoke(&GlyphStoreThread::unloadGlyphStore);
     }
@@ -80,7 +81,7 @@ protected:
 private:
     bool testDone = false;
 
-    std::unique_ptr<uv::async> async_;
+    std::unique_ptr<util::AsyncTask> async_;
 };
 
 TEST_F(GlyphStoreTest, LoadingSuccess) {

@@ -1,7 +1,5 @@
 #include "storage.hpp"
 
-#include <uv.h>
-
 #include <mbgl/storage/default_file_source.hpp>
 #include <mbgl/storage/sqlite_cache.hpp>
 #include <mbgl/util/chrono.hpp>
@@ -12,9 +10,9 @@ TEST_F(Storage, CacheRevalidateSame) {
 
     using namespace mbgl;
 
+    util::RunLoop loop;
     SQLiteCache cache(":memory:");
     DefaultFileSource fs(&cache);
-    util::RunLoop loop(uv_default_loop());
 
     const Resource revalidateSame { Resource::Unknown, "http://127.0.0.1:3000/revalidate-same" };
     std::unique_ptr<FileRequest> req1;
@@ -64,7 +62,7 @@ TEST_F(Storage, CacheRevalidateSame) {
         });
     });
 
-    uv_run(uv_default_loop(), UV_RUN_DEFAULT);
+    loop.run();
 }
 
 TEST_F(Storage, CacheRevalidateModified) {
@@ -72,9 +70,9 @@ TEST_F(Storage, CacheRevalidateModified) {
 
     using namespace mbgl;
 
+    util::RunLoop loop;
     SQLiteCache cache(":memory:");
     DefaultFileSource fs(&cache);
-    util::RunLoop loop(uv_default_loop());
 
     const Resource revalidateModified{ Resource::Unknown,
                                        "http://127.0.0.1:3000/revalidate-modified" };
@@ -124,7 +122,7 @@ TEST_F(Storage, CacheRevalidateModified) {
         });
     });
 
-    uv_run(uv_default_loop(), UV_RUN_DEFAULT);
+    loop.run();
 }
 
 TEST_F(Storage, CacheRevalidateEtag) {
@@ -132,9 +130,9 @@ TEST_F(Storage, CacheRevalidateEtag) {
 
     using namespace mbgl;
 
+    util::RunLoop loop;
     SQLiteCache cache(":memory:");
     DefaultFileSource fs(&cache);
-    util::RunLoop loop(uv_default_loop());
 
     const Resource revalidateEtag { Resource::Unknown, "http://127.0.0.1:3000/revalidate-etag" };
     std::unique_ptr<FileRequest> req1;
@@ -182,5 +180,5 @@ TEST_F(Storage, CacheRevalidateEtag) {
         });
     });
 
-    uv_run(uv_default_loop(), UV_RUN_DEFAULT);
+    loop.run();
 }

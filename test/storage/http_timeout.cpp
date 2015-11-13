@@ -1,7 +1,5 @@
 #include "storage.hpp"
 
-#include <uv.h>
-
 #include <mbgl/storage/default_file_source.hpp>
 #include <mbgl/storage/network_status.hpp>
 #include <mbgl/util/chrono.hpp>
@@ -12,8 +10,8 @@ TEST_F(Storage, HTTPTimeout) {
 
     using namespace mbgl;
 
+    util::RunLoop loop;
     DefaultFileSource fs(nullptr);
-    util::RunLoop loop(uv_default_loop());
 
     int counter = 0;
 
@@ -34,7 +32,7 @@ TEST_F(Storage, HTTPTimeout) {
         }
     });
 
-    uv_run(uv_default_loop(), UV_RUN_DEFAULT);
+    loop.run();
 
     EXPECT_EQ(4, counter);
 }

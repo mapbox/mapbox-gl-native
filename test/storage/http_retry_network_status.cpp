@@ -1,11 +1,10 @@
 #include "storage.hpp"
 
-#include <mbgl/util/uv_detail.hpp>
-
 #include <mbgl/storage/default_file_source.hpp>
 #include <mbgl/storage/network_status.hpp>
 #include <mbgl/util/chrono.hpp>
 #include <mbgl/util/run_loop.hpp>
+#include <mbgl/util/timer.hpp>
 
 // Test for https://github.com/mapbox/mapbox-gl-native/issues/2123
 //
@@ -18,8 +17,8 @@ TEST_F(Storage, HTTPNetworkStatusChange) {
 
     using namespace mbgl;
 
+    util::RunLoop loop;
     DefaultFileSource fs(nullptr);
-    util::RunLoop loop(uv_default_loop());
 
     const Resource resource { Resource::Unknown, "http://127.0.0.1:3000/delayed" };
 
@@ -38,17 +37,17 @@ TEST_F(Storage, HTTPNetworkStatusChange) {
     });
 
     // After 50 milliseconds, we're going to trigger a NetworkStatus change.
-    uv::timer reachableTimer(uv_default_loop());
-    reachableTimer.start(50, 0, [] () {
+    util::Timer reachableTimer;
+    reachableTimer.start(std::chrono::milliseconds(50), Duration::zero(), [] () {
         mbgl::NetworkStatus::Reachable();
     });
 
     // This timer will keep the loop alive to make sure we would be getting a response in caes the
     // network status change triggered another change (which it shouldn't).
-    uv::timer delayTimer(uv_default_loop());
-    delayTimer.start(300, 0, [] () {});
+    util::Timer delayTimer;
+    delayTimer.start(std::chrono::milliseconds(300), Duration::zero(), [] () {});
 
-    uv_run(uv_default_loop(), UV_RUN_DEFAULT);
+    loop.run();
 }
 
 // Tests that a change in network status preempts requests that failed due to connection or
@@ -58,15 +57,15 @@ TEST_F(Storage, HTTPNetworkStatusChangePreempt) {
 
     using namespace mbgl;
 
+    util::RunLoop loop;
     DefaultFileSource fs(nullptr);
-    util::RunLoop loop(uv_default_loop());
 
-    const auto start = uv_hrtime();
+    const auto start = Clock::now();
 
     const Resource resource{ Resource::Unknown, "http://127.0.0.1:3001/test" };
     std::unique_ptr<FileRequest> req = fs.request(resource, [&](Response res) {
         static int counter = 0;
-        const auto duration = double(uv_hrtime() - start) / 1e9;
+        const auto duration = std::chrono::duration<const double>(Clock::now() - start).count();
         if (counter == 0) {
             EXPECT_GT(0.2, duration) << "Response came in too late";
         } else if (counter == 1) {
@@ -102,10 +101,10 @@ TEST_F(Storage, HTTPNetworkStatusChangePreempt) {
     });
 
     // After 400 milliseconds, we're going to trigger a NetworkStatus change.
-    uv::timer reachableTimer(uv_default_loop());
-    reachableTimer.start(400, 0, [] () {
+    util::Timer reachableTimer;
+    reachableTimer.start(std::chrono::milliseconds(400), Duration::zero(), [] () {
         mbgl::NetworkStatus::Reachable();
     });
 
-    uv_run(uv_default_loop(), UV_RUN_DEFAULT);
+    loop.run();
 }

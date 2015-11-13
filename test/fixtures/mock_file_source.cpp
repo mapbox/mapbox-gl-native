@@ -3,15 +3,10 @@
 
 #include <mbgl/util/io.hpp>
 #include <mbgl/util/thread.hpp>
+#include <mbgl/util/timer.hpp>
 
 #include <algorithm>
 #include <unordered_map>
-
-namespace {
-
-const uint64_t timeout = 1000000;
-
-}
 
 namespace mbgl {
 
@@ -36,8 +31,8 @@ public:
 class MockFileSource::Impl {
 public:
     Impl(Type type, const std::string& match)
-        : type_(type), match_(match), timer_(util::RunLoop::getLoop()) {
-        timer_.start(timeout, timeout, [this] { dispatchPendingRequests(); });
+        : type_(type), match_(match) {
+        timer_.start(std::chrono::milliseconds(1000), std::chrono::milliseconds(1000), [this] { dispatchPendingRequests(); });
         timer_.unref();
     }
 
@@ -63,7 +58,7 @@ private:
     Type type_;
     std::string match_;
     std::unordered_map<FileRequest*, std::pair<Resource, Callback>> pendingRequests_;
-    uv::timer timer_;
+    util::Timer timer_;
 
     std::function<void(void)> requestEnqueuedCallback_;
 };

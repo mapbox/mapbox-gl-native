@@ -1,7 +1,5 @@
 #include "storage.hpp"
 
-#include <uv.h>
-
 #include <mbgl/storage/default_file_source.hpp>
 #include <mbgl/storage/network_status.hpp>
 #include <mbgl/util/chrono.hpp>
@@ -14,16 +12,16 @@ TEST_F(Storage, HTTPTemporaryError) {
 
     using namespace mbgl;
 
+    util::RunLoop loop;
     DefaultFileSource fs(nullptr);
-    util::RunLoop loop(uv_default_loop());
 
-    const auto start = uv_hrtime();
+    const auto start = Clock::now();
 
     std::unique_ptr<FileRequest> req1 = fs.request({ Resource::Unknown, "http://127.0.0.1:3000/temporary-error" }, [&](Response res) {
         static int counter = 0;
         switch (counter++) {
         case 0: {
-            const auto duration = double(uv_hrtime() - start) / 1e9;
+            const auto duration = std::chrono::duration<const double>(Clock::now() - start).count();
             EXPECT_GT(0.2, duration) << "Initial error request took too long";
             ASSERT_NE(nullptr, res.error);
             EXPECT_EQ(Response::Error::Reason::Server, res.error->reason);
@@ -37,7 +35,7 @@ TEST_F(Storage, HTTPTemporaryError) {
         } break;
         case 1: {
             req1.reset();
-            const auto duration = double(uv_hrtime() - start) / 1e9;
+            const auto duration = std::chrono::duration<const double>(Clock::now() - start).count();
             EXPECT_LT(0.99, duration) << "Backoff timer didn't wait 1 second";
             EXPECT_GT(1.2, duration) << "Backoff timer fired too late";
             EXPECT_EQ(nullptr, res.error);
@@ -53,7 +51,7 @@ TEST_F(Storage, HTTPTemporaryError) {
         }
     });
 
-    uv_run(uv_default_loop(), UV_RUN_DEFAULT);
+    loop.run();
 }
 
 TEST_F(Storage, HTTPConnectionError) {
@@ -61,15 +59,15 @@ TEST_F(Storage, HTTPConnectionError) {
 
     using namespace mbgl;
 
+    util::RunLoop loop;
     DefaultFileSource fs(nullptr);
-    util::RunLoop loop(uv_default_loop());
 
-    const auto start = uv_hrtime();
+    const auto start = Clock::now();
 
     std::unique_ptr<FileRequest> req2 = fs.request({ Resource::Unknown, "http://127.0.0.1:3001/" }, [&](Response res) {
         static int counter = 0;
         static int wait = 0;
-        const auto duration = double(uv_hrtime() - start) / 1e9;
+        const auto duration = std::chrono::duration<const double>(Clock::now() - start).count();
         EXPECT_LT(wait - 0.01, duration) << "Backoff timer didn't wait 1 second";
         EXPECT_GT(wait + 0.2, duration) << "Backoff timer fired too late";
         ASSERT_NE(nullptr, res.error);
@@ -100,5 +98,5 @@ TEST_F(Storage, HTTPConnectionError) {
         counter++;
     });
 
-    uv_run(uv_default_loop(), UV_RUN_DEFAULT);
+    loop.run();
 }

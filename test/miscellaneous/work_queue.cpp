@@ -23,7 +23,7 @@ private:
 };
 
 TEST(WorkQueue, push) {
-    RunLoop loop(uv_default_loop());
+    RunLoop loop;
 
     WorkQueue queue;
     Thread<TestThread> thread({"Test", ThreadType::Map, ThreadPriority::Regular}, &queue);
@@ -43,11 +43,11 @@ TEST(WorkQueue, push) {
     thread.invoke(&TestThread::send, endTest);
     thread.invoke(&TestThread::send, endTest);
 
-    uv_run(uv_default_loop(), UV_RUN_DEFAULT);
+    loop.run();
 }
 
 TEST(WorkQueue, cancel) {
-    RunLoop loop(uv_default_loop());
+    RunLoop loop;
 
     WorkQueue queue;
 
