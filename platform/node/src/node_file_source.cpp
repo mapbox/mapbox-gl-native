@@ -30,6 +30,12 @@ NodeFileSource::~NodeFileSource() {
     queue->stop();
     queue = nullptr;
 
+    // Cancel all pending requests
+    for (const auto& it : pending) {
+        auto requestHandle = Nan::New(it.second);
+        Nan::ObjectWrap::Unwrap<NodeRequest>(requestHandle)->cancel();
+    }
+
     options.Reset();
 }
 
