@@ -20,7 +20,7 @@ class Response;
 
 class Request : private util::noncopyable {
 public:
-    using Callback = std::function<void(const Response &)>;
+    using Callback = std::function<void (Response)>;
     Request(const Resource &resource, uv_loop_t *loop, Callback callback);
 
 public:

@@ -19,7 +19,7 @@ TEST_F(Storage, HTTPTest) {
     const auto mainThread = uv_thread_self();
 
     Request* req1 = fs.request({ Resource::Unknown, "http://127.0.0.1:3000/test" },
-               [&](const Response &res) {
+               [&](Response res) {
         fs.cancel(req1);
         EXPECT_EQ(uv_thread_self(), mainThread);
         EXPECT_EQ(nullptr, res.error);
@@ -47,7 +47,7 @@ TEST_F(Storage, HTTP404) {
     const auto mainThread = uv_thread_self();
 
     Request* req2 = fs.request({ Resource::Unknown, "http://127.0.0.1:3000/doesnotexist" },
-               [&](const Response &res) {
+               [&](Response res) {
         fs.cancel(req2);
         EXPECT_EQ(uv_thread_self(), mainThread);
         ASSERT_NE(nullptr, res.error);
@@ -77,7 +77,7 @@ TEST_F(Storage, HTTP500) {
     const auto mainThread = uv_thread_self();
 
     Request* req3 = fs.request({ Resource::Unknown, "http://127.0.0.1:3000/permanent-error" },
-               [&](const Response &res) {
+               [&](Response res) {
         fs.cancel(req3);
         EXPECT_EQ(uv_thread_self(), mainThread);
         ASSERT_NE(nullptr, res.error);

@@ -147,7 +147,7 @@ void Source::load() {
     }
 
     FileSource* fs = util::ThreadContext::getFileSource();
-    req = fs->request({ Resource::Kind::Source, info.url }, [this](const Response &res) {
+    req = fs->request({ Resource::Kind::Source, info.url }, [this](Response res) {
         if (res.stale) {
             // Only handle fresh responses.
             return;

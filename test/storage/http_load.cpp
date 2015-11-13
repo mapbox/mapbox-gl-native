@@ -23,7 +23,7 @@ TEST_F(Storage, HTTPLoad) {
         const auto current = number++;
         reqs[i] = fs.request({ Resource::Unknown,
                      std::string("http://127.0.0.1:3000/load/") + std::to_string(current) },
-                   [&, i, current](const Response &res) {
+                   [&, i, current](Response res) {
             fs.cancel(reqs[i]);
             reqs[i] = nullptr;
             EXPECT_EQ(nullptr, res.error);

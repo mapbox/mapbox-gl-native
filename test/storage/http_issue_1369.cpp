@@ -28,11 +28,11 @@ TEST_F(Storage, HTTPIssue1369) {
 
     const Resource resource { Resource::Unknown, "http://127.0.0.1:3000/test" };
 
-    auto req = fs.request(resource, [&](const Response&) {
+    auto req = fs.request(resource, [&](Response) {
         ADD_FAILURE() << "Callback should not be called";
     });
     fs.cancel(req);
-    req = fs.request(resource, [&](const Response &res) {
+    req = fs.request(resource, [&](Response res) {
         fs.cancel(req);
         EXPECT_EQ(nullptr, res.error);
         EXPECT_EQ(false, res.stale);

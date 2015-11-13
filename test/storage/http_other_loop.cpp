@@ -15,7 +15,7 @@ TEST_F(Storage, HTTPOtherLoop) {
     util::RunLoop loop(uv_default_loop());
 
     Request* req = fs.request({ Resource::Unknown, "http://127.0.0.1:3000/test" },
-               [&](const Response &res) {
+               [&](Response res) {
         fs.cancel(req);
         EXPECT_EQ(nullptr, res.error);
         EXPECT_EQ(false, res.stale);

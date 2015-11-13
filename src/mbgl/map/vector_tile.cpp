@@ -182,7 +182,7 @@ VectorTileMonitor::VectorTileMonitor(const SourceInfo& source, const TileID& id,
 }
 
 Request* VectorTileMonitor::monitorTile(std::function<void (std::exception_ptr, std::unique_ptr<GeometryTile>)> callback) {
-    return util::ThreadContext::getFileSource()->request({ Resource::Kind::Tile, url }, [callback, this](const Response& res) {
+    return util::ThreadContext::getFileSource()->request({ Resource::Kind::Tile, url }, [callback, this](Response res) {
         if (res.data && data == res.data) {
             // We got the same data again. Abort early.
             return;

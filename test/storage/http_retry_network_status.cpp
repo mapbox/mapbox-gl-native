@@ -24,7 +24,7 @@ TEST_F(Storage, HTTPNetworkStatusChange) {
     const Resource resource { Resource::Unknown, "http://127.0.0.1:3000/delayed" };
 
     // This request takes 200 milliseconds to answer.
-    Request* req = fs.request(resource, [&](const Response& res) {
+    Request* req = fs.request(resource, [&](Response res) {
          fs.cancel(req);
          EXPECT_EQ(nullptr, res.error);
          EXPECT_EQ(false, res.stale);
@@ -64,7 +64,7 @@ TEST_F(Storage, HTTPNetworkStatusChangePreempt) {
     const auto start = uv_hrtime();
 
     const Resource resource{ Resource::Unknown, "http://127.0.0.1:3001/test" };
-    Request* req = fs.request(resource, [&](const Response& res) {
+    Request* req = fs.request(resource, [&](Response res) {
         static int counter = 0;
         const auto duration = double(uv_hrtime() - start) / 1e9;
         if (counter == 0) {

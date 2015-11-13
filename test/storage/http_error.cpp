@@ -18,8 +18,7 @@ TEST_F(Storage, HTTPTemporaryError) {
 
     const auto start = uv_hrtime();
 
-    Request* req1 = fs.request({ Resource::Unknown, "http://127.0.0.1:3000/temporary-error" },
-               [&](const Response &res) {
+    Request* req1 = fs.request({ Resource::Unknown, "http://127.0.0.1:3000/temporary-error" }, [&](Response res) {
         static int counter = 0;
         switch (counter++) {
         case 0: {
@@ -66,8 +65,7 @@ TEST_F(Storage, HTTPConnectionError) {
 
     const auto start = uv_hrtime();
 
-    Request* req2 = fs.request({ Resource::Unknown, "http://127.0.0.1:3001/" },
-               [&](const Response &res) {
+    Request* req2 = fs.request({ Resource::Unknown, "http://127.0.0.1:3001/" }, [&](Response res) {
         static int counter = 0;
         static int wait = 0;
         const auto duration = double(uv_hrtime() - start) / 1e9;

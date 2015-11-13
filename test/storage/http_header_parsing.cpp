@@ -18,7 +18,7 @@ TEST_F(Storage, HTTPExpiresParsing) {
 
     Request* req1 = fs.request({ Resource::Unknown,
                  "http://127.0.0.1:3000/test?modified=1420794326&expires=1420797926&etag=foo" },
-               [&](const Response &res) {
+               [&](Response res) {
         fs.cancel(req1);
         EXPECT_EQ(nullptr, res.error);
         EXPECT_EQ(false, res.stale);
@@ -46,7 +46,7 @@ TEST_F(Storage, HTTPCacheControlParsing) {
                        SystemClock::now().time_since_epoch()).count();
 
     Request* req2 = fs.request({ Resource::Unknown, "http://127.0.0.1:3000/test?cachecontrol=max-age=120" },
-               [&](const Response &res) {
+               [&](Response res) {
         fs.cancel(req2);
         EXPECT_EQ(nullptr, res.error);
         EXPECT_EQ(false, res.stale);

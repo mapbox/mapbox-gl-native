@@ -21,7 +21,7 @@ TEST_F(Storage, CacheResponse) {
     Request* req1 = nullptr;
     Request* req2 = nullptr;
 
-    req1 = fs.request(resource, [&](const Response &res) {
+    req1 = fs.request(resource, [&](Response res) {
         fs.cancel(req1);
         EXPECT_EQ(nullptr, res.error);
         EXPECT_EQ(false, res.stale);
@@ -34,7 +34,7 @@ TEST_F(Storage, CacheResponse) {
 
         // Now test that we get the same values as in the previous request. If we'd go to the server
         // again, we'd get different values.
-        req2 = fs.request(resource, [&](const Response &res2) {
+        req2 = fs.request(resource, [&](Response res2) {
             fs.cancel(req2);
             EXPECT_EQ(response.error, res2.error);
             EXPECT_EQ(response.stale, res2.stale);

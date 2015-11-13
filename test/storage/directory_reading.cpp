@@ -18,8 +18,7 @@ TEST_F(Storage, AssetReadDirectory) {
 
     util::RunLoop loop(uv_default_loop());
 
-    Request* req = fs.request({ Resource::Unknown, "asset://TEST_DATA/fixtures/storage" },
-               [&](const Response &res) {
+    Request* req = fs.request({ Resource::Unknown, "asset://TEST_DATA/fixtures/storage" }, [&](Response res) {
         fs.cancel(req);
         ASSERT_NE(nullptr, res.error);
         EXPECT_EQ(Response::Error::Reason::NotFound, res.error->reason);

@@ -19,8 +19,7 @@ TEST_F(Storage, AssetEmptyFile) {
 
     util::RunLoop loop(uv_default_loop());
 
-    Request* req = fs.request({ Resource::Unknown, "asset://TEST_DATA/fixtures/storage/empty" },
-               [&](const Response &res) {
+    Request* req = fs.request({ Resource::Unknown, "asset://TEST_DATA/fixtures/storage/empty" }, [&](Response res) {
         fs.cancel(req);
         EXPECT_EQ(nullptr, res.error);
         EXPECT_EQ(false, res.stale);
@@ -49,8 +48,7 @@ TEST_F(Storage, AssetNonEmptyFile) {
 
     util::RunLoop loop(uv_default_loop());
 
-    Request* req = fs.request({ Resource::Unknown, "asset://TEST_DATA/fixtures/storage/nonempty" },
-               [&](const Response &res) {
+    Request* req = fs.request({ Resource::Unknown, "asset://TEST_DATA/fixtures/storage/nonempty" }, [&](Response res) {
         fs.cancel(req);
         EXPECT_EQ(nullptr, res.error);
         EXPECT_EQ(false, res.stale);
@@ -81,8 +79,7 @@ TEST_F(Storage, AssetNonExistentFile) {
 
     util::RunLoop loop(uv_default_loop());
 
-    Request* req = fs.request({ Resource::Unknown, "asset://TEST_DATA/fixtures/storage/does_not_exist" },
-               [&](const Response &res) {
+    Request* req = fs.request({ Resource::Unknown, "asset://TEST_DATA/fixtures/storage/does_not_exist" }, [&](Response res) {
         fs.cancel(req);
         ASSERT_NE(nullptr, res.error);
         EXPECT_EQ(Response::Error::Reason::NotFound, res.error->reason);

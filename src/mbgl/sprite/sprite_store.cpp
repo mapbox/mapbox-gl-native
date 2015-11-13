@@ -41,7 +41,7 @@ void SpriteStore::setURL(const std::string& url) {
 
     FileSource* fs = util::ThreadContext::getFileSource();
     loader->jsonRequest = fs->request({ Resource::Kind::SpriteJSON, jsonURL },
-                                      [this, jsonURL](const Response& res) {
+                                      [this, jsonURL](Response res) {
         if (res.stale) {
             // Only handle fresh responses.
             return;
@@ -61,7 +61,7 @@ void SpriteStore::setURL(const std::string& url) {
 
     loader->spriteRequest =
         fs->request({ Resource::Kind::SpriteImage, spriteURL },
-                    [this, spriteURL](const Response& res) {
+                    [this, spriteURL](Response res) {
             if (res.stale) {
                 // Only handle fresh responses.
                 return;

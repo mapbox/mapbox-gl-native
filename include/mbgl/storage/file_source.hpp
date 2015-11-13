@@ -20,7 +20,7 @@ protected:
 public:
     virtual ~FileSource() = default;
 
-    using Callback = std::function<void(const Response &)>;
+    using Callback = std::function<void (Response)>;
 
     // These can be called from any thread. The callback will be invoked in the loop.
     // You can only cancel a request from the same thread it was created in.

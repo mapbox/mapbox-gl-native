@@ -18,7 +18,7 @@ TEST_F(Storage, HTTPCancel) {
 
     auto req =
         fs.request({ Resource::Unknown, "http://127.0.0.1:3000/test" },
-                   [&](const Response &) { ADD_FAILURE() << "Callback should not be called"; });
+                   [&](Response) { ADD_FAILURE() << "Callback should not be called"; });
 
     fs.cancel(req);
     HTTPCancel.finish();
@@ -36,10 +36,10 @@ TEST_F(Storage, HTTPCancelMultiple) {
 
     const Resource resource { Resource::Unknown, "http://127.0.0.1:3000/test" };
 
-    auto req2 = fs.request(resource, [&](const Response &) {
+    auto req2 = fs.request(resource, [&](Response) {
         ADD_FAILURE() << "Callback should not be called";
     });
-    Request* req = fs.request(resource, [&](const Response &res) {
+    Request* req = fs.request(resource, [&](Response res) {
         fs.cancel(req);
         EXPECT_EQ(nullptr, res.error);
         EXPECT_EQ(false, res.stale);
