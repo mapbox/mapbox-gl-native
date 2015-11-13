@@ -21,13 +21,8 @@ class View;
 class MapData;
 class TexturePool;
 class Painter;
-class Sprite;
-class Worker;
-class StillImage;
 class SpriteImage;
 class FileRequest;
-struct LatLng;
-struct LatLngBounds;
 
 struct FrameData {
     std::array<uint16_t, 2> framebufferSize;

@@ -21,6 +21,8 @@ class TransformState {
     friend class Transform;
 
 public:
+    TransformState();
+
     // Matrix
     void matrixFor(mat4& matrix, const TileID& id, const int8_t z) const;
     void getProjMatrix(mat4& matrix) const;

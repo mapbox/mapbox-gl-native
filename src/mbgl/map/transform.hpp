@@ -60,7 +60,7 @@ public:
     bool isGestureInProgress() const { return state.isGestureInProgress(); }
 
     // Transform state
-    const TransformState getState() const { return state; }
+    TransformState getState() const { return state; }
     bool isRotating() const { return state.isRotating(); }
     bool isScaling() const { return state.isScaling(); }
     bool isPanning() const { return state.isPanning(); }

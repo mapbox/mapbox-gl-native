@@ -43,7 +43,8 @@
 
 using namespace mbgl;
 
-Painter::Painter(MapData& data_) : data(data_) {
+Painter::Painter(MapData& data_, TransformState& state_)
+    : data(data_), state(state_) {
     setup();
 }
 
@@ -127,8 +128,7 @@ void Painter::prepareTile(const Tile& tile) {
     config.stencilFunc = { GL_EQUAL, ref, mask };
 }
 
-void Painter::render(const Style& style, TransformState state_, const FrameData& frame_) {
-    state = state_;
+void Painter::render(const Style& style, const FrameData& frame_) {
     frame = frame_;
 
     glyphAtlas = style.glyphAtlas.get();

@@ -82,7 +82,7 @@ struct RenderItem {
 
 class Painter : private util::noncopyable {
 public:
-    Painter(MapData& data);
+    Painter(MapData&, TransformState&);
     ~Painter();
 
     // Renders the backdrop of the OpenGL view. This also paints in areas where we don't have any
@@ -93,7 +93,6 @@ public:
     void changeMatrix();
 
     void render(const Style& style,
-                TransformState state,
                 const FrameData& frame);
 
     // Renders debug information for a tile.
@@ -182,8 +181,7 @@ public:
 
 private:
     MapData& data;
-
-    TransformState state;
+    TransformState& state;
     FrameData frame;
 
     int indent = 0;

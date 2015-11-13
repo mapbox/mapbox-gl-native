@@ -7,6 +7,10 @@
 
 using namespace mbgl;
 
+TransformState::TransformState()
+{
+}
+
 #pragma mark - Matrix
 
 void TransformState::matrixFor(mat4& matrix, const TileID& id, const int8_t z) const {

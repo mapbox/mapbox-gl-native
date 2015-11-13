@@ -159,7 +159,7 @@ void Transform::setLatLngZoom(const LatLng& latLng, double zoom, const Duration&
 
 #pragma mark - Zoom
 
-void Transform::scaleBy(const double ds, const PrecisionPoint& center, const Duration& duration) {
+void Transform::scaleBy(double ds, const PrecisionPoint& center, const Duration& duration) {
     if (std::isnan(ds) || !center) {
         return;
     }
@@ -175,7 +175,7 @@ void Transform::scaleBy(const double ds, const PrecisionPoint& center, const Dur
     _setScale(new_scale, center, duration);
 }
 
-void Transform::setScale(const double scale, const PrecisionPoint& center, const Duration& duration) {
+void Transform::setScale(double scale, const PrecisionPoint& center, const Duration& duration) {
     if (std::isnan(scale) || !center) {
         return;
     }
@@ -183,7 +183,7 @@ void Transform::setScale(const double scale, const PrecisionPoint& center, const
     _setScale(scale, center, duration);
 }
 
-void Transform::setZoom(const double zoom, const Duration& duration) {
+void Transform::setZoom(double zoom, const Duration& duration) {
     if (std::isnan(zoom)) {
         return;
     }
@@ -225,7 +225,7 @@ void Transform::_setScale(double new_scale, const PrecisionPoint& center, const 
     _setScaleXY(new_scale, xn, yn, duration);
 }
 
-void Transform::_setScaleXY(const double new_scale, const double xn, const double yn,
+void Transform::_setScaleXY(double new_scale, double xn, double yn,
                             const Duration& duration) {
     CameraOptions options;
     options.duration = duration;
@@ -332,7 +332,7 @@ void Transform::rotateBy(const PrecisionPoint& first, const PrecisionPoint& seco
     _setAngle(ang, duration);
 }
 
-void Transform::setAngle(const double new_angle, const Duration& duration) {
+void Transform::setAngle(double new_angle, const Duration& duration) {
     if (std::isnan(new_angle)) {
         return;
     }
@@ -340,7 +340,7 @@ void Transform::setAngle(const double new_angle, const Duration& duration) {
     _setAngle(new_angle, duration);
 }
 
-void Transform::setAngle(const double new_angle, const PrecisionPoint& center) {
+void Transform::setAngle(double new_angle, const PrecisionPoint& center) {
     if (std::isnan(new_angle) || !center) {
         return;
     }
