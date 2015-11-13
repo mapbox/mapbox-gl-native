@@ -10,6 +10,7 @@
 #include <utility>
 #include <queue>
 #include <mutex>
+#include <atomic>
 
 namespace mbgl {
 namespace util {
@@ -45,7 +46,7 @@ public:
     template <class Fn, class... Args>
     std::unique_ptr<WorkRequest>
     invokeCancellable(Fn&& fn, Args&&... args) {
-        auto flag = std::make_shared<bool>();
+        auto flag = std::make_shared<std::atomic<bool>>();
         *flag = false;
 
         auto tuple = std::make_tuple(std::move(args)...);
@@ -64,7 +65,7 @@ public:
     template <class Fn, class Cb, class... Args>
     std::unique_ptr<WorkRequest>
     invokeWithCallback(Fn&& fn, Cb&& callback, Args&&... args) {
-        auto flag = std::make_shared<bool>();
+        auto flag = std::make_shared<std::atomic<bool>>();
         *flag = false;
 
         // Create a lambda L1 that invokes another lambda L2 on the current RunLoop R, that calls
@@ -100,7 +101,7 @@ private:
     template <class F, class P>
     class Invoker : public WorkTask {
     public:
-        Invoker(F&& f, P&& p, std::shared_ptr<bool> canceled_ = nullptr)
+        Invoker(F&& f, P&& p, std::shared_ptr<std::atomic<bool>> canceled_ = nullptr)
           : canceled(canceled_),
             func(std::move(f)),
             params(std::move(p)) {
@@ -134,7 +135,7 @@ private:
         }
 
         std::recursive_mutex mutex;
-        std::shared_ptr<bool> canceled;
+        std::shared_ptr<std::atomic<bool>> canceled;
 
         F func;
         P params;
