@@ -22,8 +22,10 @@ workflows:
         - content: |-
             #!/bin/bash
 
-            if [[ -n "$(echo $GIT_CLONE_COMMIT_MESSAGE_SUBJECT | sed -n '/\[skip ci\]/p')" ||
-                  -n "$(echo $GIT_CLONE_COMMIT_MESSAGE_SUBJECT | sed -n '/\[ci skip\]/p')" ]]; then
+            if [[ -n "$(echo $GIT_CLONE_COMMIT_MESSAGE_SUBJECT | sed -n '/\[skip ci\]/p')"  ||
+                  -n "$(echo $GIT_CLONE_COMMIT_MESSAGE_SUBJECT | sed -n '/\[ci skip\]/p')"  ||
+                  -n "$(echo $GIT_CLONE_COMMIT_MESSAGE_BODY    | sed -n 's/\[skip ci\]/p')" ||
+                  -n "$(echo $GIT_CLONE_COMMIT_MESSAGE_BODY    | sed -n 's/\[ci skip\]/p')" ]]; then
                 envman add --key SKIPCI --value true
             else
                 envman add --key SKIPCI --value false
