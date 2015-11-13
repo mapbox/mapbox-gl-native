@@ -160,6 +160,37 @@
                 }
             }
         },
+        "BitriseUser": {
+            "Type": "AWS::IAM::User",
+            "Properties": {
+                "Policies": [
+                    {
+                        "PolicyName": "get-signing-key",
+                        "PolicyDocument": {
+                            "Statement": [
+                                {
+                                    "Action": [
+                                        "s3:GetObject"
+                                    ],
+                                    "Effect": "Allow",
+                                    "Resource": [
+                                        "arn:aws:s3:::mapbox/android/signing-credentials/secring.gpg"
+                                    ]
+                                }
+                            ]
+                        }
+                    }
+                ]
+            }
+        },
+        "BitriseUserKey": {
+            "Type": "AWS::IAM::AccessKey",
+            "Properties": {
+                "UserName": {
+                    "Ref": "BitriseUser"
+                }
+            }
+        },
         "AndroidRole": {
             "Type": "AWS::IAM::Role",
             "Properties": {
@@ -237,6 +268,19 @@
             "Value": {
                 "Fn::GetAtt": [
                     "BuildUserKey",
+                    "SecretAccessKey"
+                ]
+            }
+        },
+        "BitriseAccessKeyId": {
+            "Value": {
+                "Ref": "BitriseUserKey"
+            }
+        },
+        "BitriseSecretAccessKey": {
+            "Value": {
+                "Fn::GetAtt": [
+                    "BitriseUserKey",
                     "SecretAccessKey"
                 ]
             }
