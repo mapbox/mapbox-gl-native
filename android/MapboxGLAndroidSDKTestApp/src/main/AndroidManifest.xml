@@ -49,6 +49,9 @@
             android:name=".PressForMarkerActivity"
             android:label="@string/activity_press_for_marker" />
 
+        <activity android:name=".ManualZoomActivity"
+                  android:label="@string/action_manual_zoom"/>
+
         <activity
             android:name=".MyLocationTrackingModeActivity"
             android:label="@string/activity_user_tracking_mode" />
