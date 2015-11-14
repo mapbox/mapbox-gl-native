@@ -1,7 +1,6 @@
 #pragma once
 
 #include <mbgl/storage/file_source.hpp>
-#include <mbgl/util/run_loop.hpp>
 
 #pragma GCC diagnostic push
 #pragma GCC diagnostic ignored "-Wunused-parameter"
@@ -21,7 +20,6 @@ public:
 
 private:
     Nan::Persistent<v8::Object> options;
-    mbgl::util::RunLoop nodeLoop;
 };
 
 }
