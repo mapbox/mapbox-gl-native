@@ -498,6 +498,17 @@ double Transform::getPitch() const {
     return state.pitch;
 }
 
+#pragma mark - North Orientation
+
+void Transform::setNorthOrientation(NorthOrientation orientation) {
+    state.orientation = orientation;
+    state.constrain(state.scale, state.x, state.y);
+}
+
+NorthOrientation Transform::getNorthOrientation() const {
+    return state.getNorthOrientation();
+}
+
 #pragma mark - Transition
 
 void Transform::startTransition(std::function<double(double)> easing,

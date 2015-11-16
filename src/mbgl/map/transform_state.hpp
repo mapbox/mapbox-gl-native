@@ -34,6 +34,10 @@ public:
     uint16_t getWidth() const;
     uint16_t getHeight() const;
 
+    // North Orientation
+    NorthOrientation getNorthOrientation() const;
+    double getNorthOrientationAngle() const;
+
     std::array<float, 2> locationCoordinate(float lon, float lat) const;
     void getLonLat(double &lon, double &lat) const;
 
@@ -74,11 +78,14 @@ public:
     TileCoordinate pointToCoordinate(const PrecisionPoint&) const;
 
 private:
+    bool rotatedNorth() const;
     void constrain(double& scale, double& x, double& y) const;
 
     // Limit the amount of zooming possible on the map.
     double min_scale = std::pow(2, 0);
     double max_scale = std::pow(2, 18);
+
+    NorthOrientation orientation = NorthOrientation::Upwards;
 
     // logical dimensions
     uint16_t width = 0, height = 0;

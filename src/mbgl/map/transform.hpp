@@ -52,6 +52,10 @@ public:
     void setPitch(double pitch, const Duration& = Duration::zero());
     double getPitch() const;
 
+    // North Orientation
+    void setNorthOrientation(NorthOrientation);
+    NorthOrientation getNorthOrientation() const;
+
     // Transitions
     bool inTransition() const;
     Update updateTransitions(const TimePoint& now);

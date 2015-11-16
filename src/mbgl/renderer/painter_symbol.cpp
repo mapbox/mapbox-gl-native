@@ -40,6 +40,7 @@ void Painter::renderSDF(SymbolBucket &bucket,
         exMatrix = extrudeMatrix;
         s = state.getAltitude();
         gammaScale = 1.0f;
+        matrix::rotate_z(exMatrix, exMatrix, state.getNorthOrientationAngle());
     }
     matrix::scale(exMatrix, exMatrix, s, s, 1);
 
@@ -218,6 +219,7 @@ void Painter::renderSymbol(SymbolBucket& bucket, const SymbolLayer& layer, const
                 s = 4096.0f / util::tileSize / id.overscaling / std::pow(2, state.getZoom() - id.z);
             } else {
                 exMatrix = extrudeMatrix;
+                matrix::rotate_z(exMatrix, exMatrix, state.getNorthOrientationAngle());
                 s = state.getAltitude();
             }
             matrix::scale(exMatrix, exMatrix, s, s, 1);

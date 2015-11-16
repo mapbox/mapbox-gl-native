@@ -100,6 +100,14 @@ struct MetersBounds {
     }
 };
 
+// Determines the orientation of the map.
+enum class NorthOrientation : uint8_t {
+    Upwards, // Default
+    Rightwards,
+    Downwards,
+    Leftwards,
+};
+
 } // namespace mbgl
 
 #endif

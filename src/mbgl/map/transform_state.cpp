@@ -37,10 +37,17 @@ void TransformState::getProjMatrix(mat4& projMatrix) const {
 
     // After the rotateX, z values are in pixel units. Convert them to
     // altitude unites. 1 altitude unit = the screen height.
-    matrix::scale(projMatrix, projMatrix, 1, -1, 1.0f / getHeight());
+    matrix::scale(projMatrix, projMatrix, 1, -1, 1.0f / (rotatedNorth() ? getWidth() : getHeight()));
 
-    matrix::rotate_x(projMatrix, projMatrix, getPitch());
-    matrix::rotate_z(projMatrix, projMatrix, getAngle());
+    using NO = NorthOrientation;
+    switch (getNorthOrientation()) {
+        case NO::Rightwards: matrix::rotate_y(projMatrix, projMatrix, getPitch()); break;
+        case NO::Downwards: matrix::rotate_x(projMatrix, projMatrix, -getPitch()); break;
+        case NO::Leftwards: matrix::rotate_y(projMatrix, projMatrix, -getPitch()); break;
+        default: matrix::rotate_x(projMatrix, projMatrix, getPitch()); break;
+    }
+
+    matrix::rotate_z(projMatrix, projMatrix, getAngle() + getNorthOrientationAngle());
 
     matrix::translate(projMatrix, projMatrix, pixel_x() - getWidth() / 2.0f,
             pixel_y() - getHeight() / 2.0f, 0);
@@ -70,6 +77,24 @@ uint16_t TransformState::getWidth() const {
 
 uint16_t TransformState::getHeight() const {
     return height;
+}
+
+#pragma mark - North Orientation
+
+NorthOrientation TransformState::getNorthOrientation() const {
+    return orientation;
+}
+
+double TransformState::getNorthOrientationAngle() const {
+    double angleOrientation = 0;
+    if (orientation == NorthOrientation::Rightwards) {
+        angleOrientation += M_PI / 2.0f;
+    } else if (orientation == NorthOrientation::Downwards) {
+        angleOrientation += M_PI;
+    } else if (orientation == NorthOrientation::Leftwards) {
+        angleOrientation -= M_PI / 2.0f;
+    }
+    return angleOrientation;
 }
 
 #pragma mark - Position
@@ -318,21 +343,26 @@ mat4 TransformState::getPixelMatrix() const {
 
 #pragma mark - (private helper functions)
 
+bool TransformState::rotatedNorth() const {
+    using NO = NorthOrientation;
+    return (orientation == NO::Leftwards || orientation == NO::Rightwards);
+}
+
 void TransformState::constrain(double& scale_, double& x_, double& y_) const {
     // Constrain minimum scale to avoid zooming out far enough to show off-world areas.
     if (constrainMode == ConstrainMode::WidthAndHeight) {
-        scale_ = std::max(scale_, static_cast<double>(width / util::tileSize));
+        scale_ = std::max(scale_, static_cast<double>((rotatedNorth() ? height : width) / util::tileSize));
     }
 
-    scale_ = std::max(scale_, static_cast<double>(height / util::tileSize));
+    scale_ = std::max(scale_, static_cast<double>((rotatedNorth() ? width : height) / util::tileSize));
 
     // Constrain min/max pan to avoid showing off-world areas.
     if (constrainMode == ConstrainMode::WidthAndHeight) {
-        double max_x = (scale_ * util::tileSize - width) / 2;
+        double max_x = (scale_ * util::tileSize - (rotatedNorth() ? height : width)) / 2;
         x_ = std::max(-max_x, std::min(x_, max_x));
     }
 
-    double max_y = (scale_ * util::tileSize - height) / 2;
+    double max_y = (scale_ * util::tileSize - (rotatedNorth() ? width : height)) / 2;
     y_ = std::max(-max_y, std::min(y_, max_y));
 }
 

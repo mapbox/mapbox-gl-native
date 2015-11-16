@@ -343,6 +343,18 @@ double Map::getPitch() const {
 }
 
 
+#pragma mark - North Orientation
+
+void Map::setNorthOrientation(NorthOrientation orientation) {
+    transform->setNorthOrientation(orientation);
+    update(Update::Repaint);
+}
+
+NorthOrientation Map::getNorthOrientation() const {
+    return transform->getNorthOrientation();
+}
+
+
 #pragma mark - Projection
 
 MetersBounds Map::getWorldBoundsMeters() const {

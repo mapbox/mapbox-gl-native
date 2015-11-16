@@ -133,6 +133,10 @@ public:
     void setPitch(double pitch, const Duration& = Duration::zero());
     double getPitch() const;
 
+    // North Orientation
+    void setNorthOrientation(NorthOrientation);
+    NorthOrientation getNorthOrientation() const;
+
     // Size
     uint16_t getWidth() const;
     uint16_t getHeight() const;
