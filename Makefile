@@ -53,6 +53,7 @@ ipackage: Xcode/ios ; @JOBS=$(JOBS) ./scripts/ios/package.sh
 ipackage-strip: Xcode/ios ; @JOBS=$(JOBS) ./scripts/ios/package.sh strip
 ipackage-sim: Xcode/ios ; @JOBS=$(JOBS) ./scripts/ios/package.sh sim
 ipackage-no-bitcode: Xcode/ios ; @JOBS=$(JOBS) ./scripts/ios/package.sh no-bitcode
+iframework: Xcode/ios ; ipackage-strip ; ./scripts/ios/framework.sh
 itest: ipackage-sim ; ./scripts/ios/test.sh
 endif
 

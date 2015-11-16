@@ -1,0 +1,3 @@
+
+FOUNDATION_EXPORT double MapboxVersionNumber;
+FOUNDATION_EXPORT const unsigned char MapboxVersionString[];
