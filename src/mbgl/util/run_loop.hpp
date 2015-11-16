@@ -146,7 +146,7 @@ private:
     void process();
 
     Queue queue;
-    std::recursive_mutex mutex;
+    std::mutex mutex;
     uv::async async;
 
     static uv::tls<RunLoop> current;
