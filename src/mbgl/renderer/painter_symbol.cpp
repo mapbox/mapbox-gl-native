@@ -49,18 +49,11 @@ void Painter::renderSDF(SymbolBucket &bucket,
     float fontScale = fontSize / sdfFontSize;
     matrix::scale(exMatrix, exMatrix, fontScale, fontScale, 1.0f);
 
-    // calculate how much longer the real world distance is at the top of the screen
-    // than at the middle of the screen.
-    float topedgelength = std::sqrt(std::pow(state.getHeight(), 2) / 4.0f * (1.0f + std::pow(state.getAltitude(), 2)));
-    float x = state.getHeight() / 2.0f * std::tan(state.getPitch());
-    float extra = (topedgelength + x) / topedgelength - 1;
-
     config.program = sdfShader.program;
     sdfShader.u_matrix = vtxMatrix;
     sdfShader.u_exmatrix = exMatrix;
     sdfShader.u_texsize = texsize;
     sdfShader.u_skewed = skewed;
-    sdfShader.u_extra = extra;
 
     // adjust min/max zooms for variable font sies
     float zoomAdjust = std::log(fontSize / bucketProperties.size) / std::log(2);
