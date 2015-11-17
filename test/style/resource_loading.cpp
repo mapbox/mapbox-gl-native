@@ -24,7 +24,7 @@ public:
                    FileSource& fileSource,
                    const std::function<void(std::exception_ptr error)>& callback)
         : data_(MapMode::Still, GLContextMode::Unique, view.getPixelRatio()),
-          transform_(view),
+          transform_(view, ConstrainMode::HeightOnly),
           callback_(callback) {
         util::ThreadContext::setFileSource(&fileSource);
 

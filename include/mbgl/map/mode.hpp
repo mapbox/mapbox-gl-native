@@ -19,6 +19,13 @@ enum class GLContextMode : uint8_t {
     Shared,
 };
 
+// We can choose to constrain the map both horizontally or vertically, or only
+// vertically e.g. while panning.
+enum class ConstrainMode : uint8_t {
+    HeightOnly,
+    WidthAndHeight,
+};
+
 } // namespace mbgl
 
 #endif // MBGL_MAP_MODE
