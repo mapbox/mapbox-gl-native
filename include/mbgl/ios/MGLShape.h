@@ -2,6 +2,8 @@
 
 #import "MGLAnnotation.h"
 
+#import "MGLTypes.h"
+
 NS_ASSUME_NONNULL_BEGIN
 
 /** The `MGLShape` class is an abstract class that defines the basic properties for all shape-based annotation objects. This class must be subclassed and cannot be used as is. Subclasses are responsible for defining the geometry of the shape and providing an appropriate value for the coordinate property inherited from the `MGLAnnotation` protocol. */

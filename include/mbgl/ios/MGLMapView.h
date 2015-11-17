@@ -4,10 +4,11 @@
 #import <UIKit/UIKit.h>
 #import <CoreLocation/CoreLocation.h>
 
+#import "MGLTypes.h"
+
 NS_ASSUME_NONNULL_BEGIN
 
 @class MGLAnnotationImage;
-@class MGLMapCamera;
 @class MGLUserLocation;
 @class MGLPolyline;
 @class MGLPolygon;

@@ -1,9 +1,8 @@
-#pragma once
-
-#import "MGLTypes.h"
-
+#import <Foundation/Foundation.h>
 #import <CoreLocation/CoreLocation.h>
 #import <CoreGraphics/CGBase.h>
+
+#import "MGLTypes.h"
 
 NS_ASSUME_NONNULL_BEGIN
 

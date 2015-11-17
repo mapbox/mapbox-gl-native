@@ -1,6 +1,8 @@
-#import "Mapbox.h"
+#import <Foundation/Foundation.h>
+#import <CoreGraphics/CoreGraphics.h>
+#import <CoreLocation/CoreLocation.h>
 
-#pragma once
+#import "MGLTypes.h"
 
 NS_ASSUME_NONNULL_BEGIN
 
