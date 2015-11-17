@@ -1,5 +1,8 @@
-#import "MGLMapView.h"
+#import <Foundation/Foundation.h>
+
 #import "MGLTypes.h"
+
+@class MGLMapView;
 
 NS_ASSUME_NONNULL_BEGIN
 

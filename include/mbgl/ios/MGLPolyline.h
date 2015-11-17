@@ -4,6 +4,8 @@
 #import "MGLMultiPoint.h"
 #import "MGLOverlay.h"
 
+#import "MGLTypes.h"
+
 NS_ASSUME_NONNULL_BEGIN
 
 /** The `MGLPolyline` class represents a shape consisting of one or more points that define connecting line segments. The points are connected end-to-end in the order they are provided. The first and last points are not connected to each other. */
