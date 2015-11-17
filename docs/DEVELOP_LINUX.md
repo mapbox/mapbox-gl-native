@@ -49,10 +49,4 @@ The `zsh` will treat the * in this command as a glob, so you'll need to run
 
 ### Usage
 
-- Press `S` to cycle through bundled styles
-- Press `X` to reset the transform
-- Press `N` to reset north
-- Press `Tab` to toggle debug information
-- Press `C` to toggle symbol collision debug boxes
-- Press `Esc` to quit
-- Press `1` through `6` to add increasing numbers of point annotations for testing
+Keyboard shortcuts for testing functionality are logged to the console when the test app is started.
