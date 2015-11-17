@@ -4,6 +4,8 @@
 #include <mbgl/annotation/annotation.hpp>
 #include <mbgl/annotation/point_annotation_impl.hpp>
 #include <mbgl/annotation/shape_annotation_impl.hpp>
+#include <mbgl/sprite/sprite_store.hpp>
+#include <mbgl/sprite/sprite_atlas.hpp>
 #include <mbgl/util/geo.hpp>
 #include <mbgl/util/noncopyable.hpp>
 
@@ -21,7 +23,7 @@ class Style;
 
 class AnnotationManager : private util::noncopyable {
 public:
-    AnnotationManager();
+    AnnotationManager(float pixelRatio);
     ~AnnotationManager();
 
     AnnotationIDs addPointAnnotations(const std::vector<PointAnnotation>&, const uint8_t maxZoom);
@@ -30,6 +32,10 @@ public:
 
     AnnotationIDs getPointAnnotationsInBounds(const LatLngBounds&) const;
     LatLngBounds getBoundsForAnnotations(const AnnotationIDs&) const;
+
+    void setSprite(const std::string& name, std::shared_ptr<const SpriteImage>);
+    double getTopOffsetPixelsForAnnotationSymbol(const std::string& name);
+    SpriteAtlas& getSpriteAtlas() { return spriteAtlas; }
 
     void updateStyle(Style&);
 
@@ -48,6 +54,9 @@ private:
     ShapeAnnotationImpl::Map shapeAnnotations;
     std::vector<std::string> obsoleteShapeAnnotationLayers;
     std::set<AnnotationTileMonitor*> monitors;
+
+    SpriteStore spriteStore;
+    SpriteAtlas spriteAtlas;
 };
 
 }

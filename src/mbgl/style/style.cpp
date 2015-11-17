@@ -2,6 +2,7 @@
 #include <mbgl/map/map_data.hpp>
 #include <mbgl/map/source.hpp>
 #include <mbgl/map/transform_state.hpp>
+#include <mbgl/layer/symbol_layer.hpp>
 #include <mbgl/sprite/sprite_store.hpp>
 #include <mbgl/sprite/sprite_atlas.hpp>
 #include <mbgl/style/style_layer.hpp>
@@ -88,6 +89,12 @@ StyleLayer* Style::getLayer(const std::string& id) const {
 }
 
 void Style::addLayer(util::ptr<StyleLayer> layer) {
+    if (SymbolLayer* symbolLayer = dynamic_cast<SymbolLayer*>(layer.get())) {
+        if (!symbolLayer->spriteAtlas) {
+            symbolLayer->spriteAtlas = spriteAtlas.get();
+        }
+    }
+
     layers.emplace_back(std::move(layer));
 }
 

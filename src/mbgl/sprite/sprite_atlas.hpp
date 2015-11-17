@@ -66,6 +66,8 @@ public:
     inline dimension getTextureWidth() const { return pixelWidth; }
     inline dimension getTextureHeight() const { return pixelHeight; }
     inline float getPixelRatio() const { return pixelRatio; }
+
+    // Only for use in tests.
     inline const uint32_t* getData() const { return data.get(); }
 
 private:
@@ -90,7 +92,7 @@ private:
     BinPack<dimension> bin;
     std::map<Key, Holder> images;
     std::set<std::string> uninitialized;
-    const std::unique_ptr<uint32_t[]> data;
+    std::unique_ptr<uint32_t[]> data;
     std::atomic<bool> dirty;
     bool fullUploadRequired = true;
     GLuint texture = 0;

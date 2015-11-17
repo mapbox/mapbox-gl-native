@@ -93,7 +93,8 @@ public:
     void changeMatrix();
 
     void render(const Style& style,
-                const FrameData& frame);
+                const FrameData& frame,
+                SpriteAtlas& annotationSpriteAtlas);
 
     // Renders debug information for a tile.
     void renderTileDebug(const Tile& tile);

@@ -27,7 +27,7 @@ TEST(Sprite, SpriteAtlas) {
     EXPECT_EQ(112, atlas.getTextureHeight());
 
     // Image hasn't been created yet.
-    EXPECT_TRUE(atlas.getData());
+    EXPECT_FALSE(atlas.getData());
 
     auto metro = atlas.getImage("metro", false);
     EXPECT_EQ(0, metro.pos.x);
@@ -41,6 +41,8 @@ TEST(Sprite, SpriteAtlas) {
     EXPECT_EQ(18, metro.texture->pixelWidth);
     EXPECT_EQ(18, metro.texture->pixelHeight);
     EXPECT_EQ(1.0f, metro.texture->pixelRatio);
+
+    EXPECT_TRUE(atlas.getData());
 
     auto pos = atlas.getPosition("metro", false);
     EXPECT_DOUBLE_EQ(20, pos.size[0]);

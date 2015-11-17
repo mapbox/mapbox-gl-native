@@ -192,7 +192,8 @@ void Painter::renderSymbol(SymbolBucket& bucket, const SymbolLayer& layer, const
         const float fontSize = properties.icon.size;
         const float fontScale = fontSize / 1.0f;
 
-        spriteAtlas->bind(state.isChanging() || layout.placement == PlacementType::Line
+        SpriteAtlas* activeSpriteAtlas = layer.spriteAtlas;
+        activeSpriteAtlas->bind(state.isChanging() || layout.placement == PlacementType::Line
                 || angleOffset != 0 || fontScale != 1 || sdf || state.getPitch() != 0);
 
         if (sdf) {
@@ -202,7 +203,7 @@ void Painter::renderSymbol(SymbolBucket& bucket, const SymbolLayer& layer, const
                       layout.icon,
                       properties.icon,
                       1.0f,
-                      {{ float(spriteAtlas->getWidth()) / 4.0f, float(spriteAtlas->getHeight()) / 4.0f }},
+                      {{ float(activeSpriteAtlas->getWidth()) / 4.0f, float(activeSpriteAtlas->getHeight()) / 4.0f }},
                       *sdfIconShader,
                       &SymbolBucket::drawIcons);
         } else {

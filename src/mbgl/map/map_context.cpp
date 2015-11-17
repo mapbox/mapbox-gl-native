@@ -243,7 +243,7 @@ bool MapContext::renderSync(const TransformState& state, const FrameData& frame)
     glObjectStore.performCleanup();
 
     if (!painter) painter = std::make_unique<Painter>(data, transformState);
-    painter->render(*style, frame);
+    painter->render(*style, frame, data.getAnnotationManager()->getSpriteAtlas());
 
     if (data.mode == MapMode::Still) {
         callback(nullptr, std::move(view.readStillImage()));
@@ -269,12 +269,7 @@ bool MapContext::isLoaded() const {
 
 double MapContext::getTopOffsetPixelsForAnnotationSymbol(const std::string& symbol) {
     assert(util::ThreadContext::currentlyOn(util::ThreadType::Map));
-    auto sprite = style->spriteStore->getSprite(symbol);
-    if (sprite) {
-        return -sprite->height / 2;
-    } else {
-        return 0;
-    }
+    return data.getAnnotationManager()->getTopOffsetPixelsForAnnotationSymbol(symbol);
 }
 
 void MapContext::setSourceTileCacheSize(size_t size) {
@@ -299,14 +294,8 @@ void MapContext::onLowMemory() {
 }
 
 void MapContext::setSprite(const std::string& name, std::shared_ptr<const SpriteImage> sprite) {
-    if (!style) {
-        Log::Info(Event::Sprite, "Ignoring sprite without stylesheet");
-        return;
-    }
-
-    style->spriteStore->setSprite(name, sprite);
-
-    style->spriteAtlas->updateDirty();
+    assert(util::ThreadContext::currentlyOn(util::ThreadType::Map));
+    data.getAnnotationManager()->setSprite(name, sprite);
 }
 
 void MapContext::onTileDataChanged() {

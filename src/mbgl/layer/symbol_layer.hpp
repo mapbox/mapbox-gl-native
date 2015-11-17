@@ -7,6 +7,8 @@
 
 namespace mbgl {
 
+class SpriteAtlas;
+
 class SymbolLayoutProperties {
 public:
     LayoutProperty<PlacementType> placement = PlacementType::Point;
@@ -94,6 +96,8 @@ public:
 
     SymbolLayoutProperties layout;
     SymbolPaintProperties paint;
+
+    SpriteAtlas* spriteAtlas;
 };
 
 }
