@@ -35,7 +35,7 @@ int main(int argc, char *argv[]) {
     bool benchmark = false;
     std::string style;
     double latitude = 0, longitude = 0;
-    double bearing = 0, zoom = 1;
+    double bearing = 0, zoom = 1, pitch = 0;
     bool skipConfig = false;
 
     const struct option long_options[] = {
@@ -46,6 +46,7 @@ int main(int argc, char *argv[]) {
         {"lat", required_argument, 0, 'y'},
         {"zoom", required_argument, 0, 'z'},
         {"bearing", required_argument, 0, 'r'},
+        {"pitch", required_argument, 0, 'p'},
         {0, 0, 0, 0}
     };
 
@@ -81,6 +82,10 @@ int main(int argc, char *argv[]) {
             break;
         case 'r':
             bearing = atof(optarg);
+            skipConfig = true;
+            break;
+        case 'p':
+            pitch = atof(optarg);
             skipConfig = true;
             break;
         default:
@@ -121,10 +126,12 @@ int main(int argc, char *argv[]) {
     if (skipConfig) {
         map.setLatLngZoom(mbgl::LatLng(latitude, longitude), zoom);
         map.setBearing(bearing);
+        map.setPitch(pitch);
         mbgl::Log::Info(mbgl::Event::General, "Location: %f/%f (z%.2f, %.2f deg)", latitude, longitude, zoom, bearing);
     } else {
         map.setLatLngZoom(mbgl::LatLng(settings.latitude, settings.longitude), settings.zoom);
         map.setBearing(settings.bearing);
+        map.setPitch(settings.pitch);
         map.setDebug(settings.debug);
     }
 
@@ -159,6 +166,7 @@ int main(int argc, char *argv[]) {
     settings.longitude = latLng.longitude;
     settings.zoom = map.getZoom();
     settings.bearing = map.getBearing();
+    settings.pitch = map.getPitch();
     settings.debug = map.getDebug();
     if (!skipConfig) {
         settings.save();

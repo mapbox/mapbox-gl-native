@@ -167,6 +167,7 @@ int main(int argc, char* argv[]) {
     mbgl::Settings_NSUserDefaults settings;
     map.setLatLngZoom(mbgl::LatLng(settings.latitude, settings.longitude), settings.zoom);
     map.setBearing(settings.bearing);
+    map.setPitch(settings.pitch);
     map.setDebug(settings.debug);
 
     view.setChangeStyleCallback([&map, &view] () {
@@ -203,6 +204,7 @@ int main(int argc, char* argv[]) {
     settings.longitude = latLng.longitude;
     settings.zoom = map.getZoom();
     settings.bearing = map.getBearing();
+    settings.pitch = map.getPitch();
     settings.debug = map.getDebug();
     settings.save();
 
