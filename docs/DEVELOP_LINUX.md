@@ -42,7 +42,7 @@ Set an access token as described below, and then run:
 
 ### Test
 
-- `make test-*` Builds and runs all tests. You can specify individual tests by replacing * with their name.
+- `make test-*` Builds and runs all tests. You can specify individual tests by replacing * with their name (e.g. `make test-Sprite.CustomSpriteImages`).
 
 The `zsh` will treat the * in this command as a glob, so you'll need to run
 `make "test-*"` instead.
