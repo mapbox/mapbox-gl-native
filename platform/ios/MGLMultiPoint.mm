@@ -19,6 +19,7 @@
     {
         _count = count;
         _coords = (CLLocationCoordinate2D *)malloc(_count * sizeof(CLLocationCoordinate2D));
+        _bounds = mbgl::LatLngBounds::getExtendable();
 
         for (NSUInteger i = 0; i < _count; i++)
         {

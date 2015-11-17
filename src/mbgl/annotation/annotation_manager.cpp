@@ -68,7 +68,7 @@ AnnotationIDs AnnotationManager::getPointAnnotationsInBounds(const LatLngBounds&
 }
 
 LatLngBounds AnnotationManager::getBoundsForAnnotations(const AnnotationIDs& ids) const {
-    LatLngBounds result;
+    LatLngBounds result = LatLngBounds::getExtendable();
 
     for (const auto& id : ids) {
         if (pointAnnotations.find(id) != pointAnnotations.end()) {

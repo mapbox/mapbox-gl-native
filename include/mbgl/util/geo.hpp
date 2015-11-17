@@ -41,11 +41,18 @@ struct ProjectedMeters {
 };
 
 struct LatLngBounds {
-    LatLng sw = {90, 180};
-    LatLng ne = {-90, -180};
+    LatLng sw = {-90, -180};
+    LatLng ne = {90, 180};
 
-    inline LatLngBounds(const LatLng& sw_ = {90, 180}, const LatLng& ne_ = {-90, -180})
+    inline LatLngBounds() {}
+
+    inline LatLngBounds(const LatLng& sw_, const LatLng& ne_)
         : sw(sw_), ne(ne_) {}
+
+    static inline LatLngBounds getExtendable() {
+        LatLngBounds bounds;
+        return { bounds.ne, bounds.sw };
+    }
 
     inline operator bool() const {
         return sw && ne;

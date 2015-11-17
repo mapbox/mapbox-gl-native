@@ -317,12 +317,14 @@ const NSTimeInterval MGLAnimationDurationOverDefault = MGLAnimationDurationDefau
 
     tester.mapView.centerCoordinate = newCenterCoordinate;
 
-    XCTAssertEqual(tester.mapView.centerCoordinate.latitude,
+    XCTAssertEqualWithAccuracy(tester.mapView.centerCoordinate.latitude,
                    newCenterCoordinate.latitude,
+                   0.001,
                    @"setting center should change latitude");
 
-    XCTAssertEqual(tester.mapView.centerCoordinate.longitude,
+    XCTAssertEqualWithAccuracy(tester.mapView.centerCoordinate.longitude,
                    newCenterCoordinate.longitude,
+                   0.001,
                    @"setting center should change longitude");
 }
 

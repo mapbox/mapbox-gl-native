@@ -1099,7 +1099,7 @@ std::chrono::steady_clock::duration durationInSeconds(float duration)
 
         // figure out what that means in coordinate space
         CLLocationCoordinate2D coordinate;
-        mbgl::LatLngBounds tapBounds;
+        mbgl::LatLngBounds tapBounds = mbgl::LatLngBounds::getExtendable();
 
         coordinate = [self convertPoint:tapRectLowerLeft  toCoordinateFromView:self];
         tapBounds.extend(MGLLatLngFromLocationCoordinate2D(coordinate));
@@ -1997,7 +1997,7 @@ CLLocationCoordinate2D MGLLocationCoordinate2DFromLatLng(mbgl::LatLng latLng)
 
 - (mbgl::LatLngBounds)viewportBounds
 {
-    mbgl::LatLngBounds bounds;
+    mbgl::LatLngBounds bounds = mbgl::LatLngBounds::getExtendable();
 
     bounds.extend(MGLLatLngFromLocationCoordinate2D(
         [self convertPoint:CGPointMake(0, 0) toCoordinateFromView:self]));
@@ -2517,7 +2517,7 @@ CLLocationCoordinate2D MGLLocationCoordinate2DFromLatLng(mbgl::LatLng latLng)
 {
     if ( ! annotations || ! annotations.count) return;
 
-    mbgl::LatLngBounds bounds;
+    mbgl::LatLngBounds bounds = mbgl::LatLngBounds::getExtendable();
 
     for (id <MGLAnnotation> annotation in annotations)
     {
