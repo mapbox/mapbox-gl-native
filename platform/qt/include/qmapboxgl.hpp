@@ -61,6 +61,14 @@ public:
     typedef QPair<CoordinateSegments, QString> ShapeAnnotation;
     typedef QList<ShapeAnnotation> ShapeAnnotations;
 
+    // Determines the orientation of the map.
+    enum NorthOrientation {
+        NorthUpwards, // Default
+        NorthRightwards,
+        NorthDownwards,
+        NorthLeftwards,
+    };
+
     QMapboxGL(QObject *parent = 0, const QMapboxGLSettings& = QMapboxGLSettings());
     virtual ~QMapboxGL();
 
@@ -93,6 +101,9 @@ public:
 
     double pitch() const;
     void setPitch(double pitch, int milliseconds = 0);
+
+    NorthOrientation northOrientation() const;
+    void setNorthOrientation(NorthOrientation);
 
     Coordinate coordinate() const;
     void setCoordinate(const Coordinate &, int milliseconds = 0);

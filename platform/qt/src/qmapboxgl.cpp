@@ -198,6 +198,28 @@ void QMapboxGL::setPitch(double pitch_, int milliseconds)
     d_ptr->mapObj->setPitch(pitch_, std::chrono::milliseconds(milliseconds));
 }
 
+QMapboxGL::NorthOrientation QMapboxGL::northOrientation() const
+{
+    using NO = mbgl::NorthOrientation;
+    switch (d_ptr->mapObj->getNorthOrientation()) {
+        case NO::Rightwards: return NorthRightwards;
+        case NO::Downwards: return NorthDownwards;
+        case NO::Leftwards: return NorthLeftwards;
+        default: return NorthUpwards;
+    }
+}
+
+void QMapboxGL::setNorthOrientation(NorthOrientation orientation)
+{
+    using NO = mbgl::NorthOrientation;
+    switch (orientation) {
+        case NorthRightwards: d_ptr->mapObj->setNorthOrientation(NO::Rightwards); break;
+        case NorthDownwards: d_ptr->mapObj->setNorthOrientation(NO::Downwards); break;
+        case NorthLeftwards: d_ptr->mapObj->setNorthOrientation(NO::Leftwards); break;
+        default: d_ptr->mapObj->setNorthOrientation(NO::Upwards); break;
+    }
+}
+
 void QMapboxGL::setGestureInProgress(bool inProgress)
 {
     d_ptr->mapObj->setGestureInProgress(inProgress);
