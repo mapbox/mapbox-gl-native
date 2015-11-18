@@ -218,17 +218,9 @@ test('Map', function(t) {
         });
 
         t.test('returns an error', function(t) {
-            mbgl.on('message', function(msg) {
-                t.ok(msg, 'emits error');
-                t.equal(msg.class, 'Style');
-                t.equal(msg.severity, 'ERROR');
-                t.ok(msg.text.match(/Failed to load/), 'error text matches');
-            });
-
             var map = new mbgl.Map(options);
             map.load(style);
             map.render({ zoom: 1 }, function(err, data) {
-                mbgl.removeAllListeners('message');
                 map.release();
 
                 t.ok(err, 'returns error');
