@@ -5,9 +5,11 @@
 namespace mbgl {
 
 void Log::platformRecord(EventSeverity severity, const std::string &msg) {
-    NSString *message =
-        [[NSString alloc] initWithBytes:msg.data() length:msg.size() encoding:NSUTF8StringEncoding];
-    NSLog(@"[%s] %@", EventSeverityClass(severity).c_str(), message);
+    if (severity == EventSeverity::Error) {
+        [NSException raise:@"Mapbox GL Error" format:@"%s", msg.c_str()];
+    } else {
+        NSLog(@"[%s] %s", EventSeverityClass(severity).c_str(), msg.c_str());
+    }
 }
 
 }

@@ -42,6 +42,7 @@
 #import <unordered_set>
 
 class MBGLView;
+class MGLLogObserver;
 
 NSString *const MGLDefaultStyleMarkerSymbolName = @"default_marker";
 NSString *const MGLMapboxSetupDocumentationURLDisplayString = @"mapbox.com/guides/first-steps-ios-sdk";
@@ -202,6 +203,9 @@ std::chrono::steady_clock::duration durationInSeconds(float duration)
 - (void)commonInit
 {
     _isTargetingInterfaceBuilder = NSProcessInfo.processInfo.mgl_isInterfaceBuilderDesignablesAgent;
+    
+    std::unique_ptr<MGLLogObserver> logObserver = std::make_unique<MGLLogObserver>(self);
+    mbgl::Log::setObserver(std::move(logObserver));
 
     BOOL background = [UIApplication sharedApplication].applicationState == UIApplicationStateBackground;
     if (!background)
@@ -3322,6 +3326,40 @@ class MBGLView : public mbgl::View
     private:
         __weak MGLMapView *nativeView = nullptr;
         const float scaleFactor;
+};
+
+
+class MGLLogObserver : public mbgl::Log::Observer
+{
+public:
+    MGLLogObserver(MGLMapView *nativeView_)
+        : nativeView(nativeView_) {}
+    virtual ~MGLLogObserver() {}
+    
+    bool onRecord(mbgl::EventSeverity severity, mbgl::Event event, int64_t code, const std::string &msg)
+    {
+        __block bool didNotifyDelegate = false;
+        if (severity == mbgl::EventSeverity::Error && event == mbgl::Event::Setup)
+        {
+            dispatch_sync(dispatch_get_main_queue(), ^{
+                assert([[NSThread currentThread] isMainThread]);
+                if ([nativeView.delegate respondsToSelector:@selector(mapViewDidFailLoadingMap:withError:)])
+                {
+                    NSError *error = [NSError errorWithDomain:MGLErrorDomain
+                                                         code:code
+                                                     userInfo:@{
+                        NSLocalizedDescriptionKey: @(msg.c_str()),
+                    }];
+                    [nativeView.delegate mapViewDidFailLoadingMap:nativeView withError:error];
+                    didNotifyDelegate = true;
+                }
+            });
+        }
+        return didNotifyDelegate;
+    };
+    
+private:
+    __weak MGLMapView *nativeView = nullptr;
 };
 
 @end
