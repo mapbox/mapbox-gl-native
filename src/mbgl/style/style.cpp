@@ -57,6 +57,8 @@ void Style::setJSON(const std::string& json, const std::string&) {
 
     glyphStore->setURL(parser.getGlyphURL());
     spriteStore->setURL(parser.getSpriteURL());
+
+    loaded = true;
 }
 
 Style::~Style() {
@@ -175,6 +177,10 @@ bool Style::hasTransitions() const {
 }
 
 bool Style::isLoaded() const {
+    if (!loaded) {
+        return false;
+    }
+
     for (const auto& source : sources) {
         if (!source->isLoaded()) {
             return false;

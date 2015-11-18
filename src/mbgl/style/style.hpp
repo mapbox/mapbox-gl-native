@@ -100,6 +100,7 @@ private:
     void emitTileDataChanged();
     void emitResourceLoadingFailed(std::exception_ptr error);
 
+    bool loaded = false;
     bool shouldReparsePartialTiles = false;
 
     Observer* observer = nullptr;
