@@ -3,6 +3,7 @@
 #include <mbgl/storage/resource.hpp>
 #include <mbgl/storage/response.hpp>
 
+#include <mbgl/util/async_task.hpp>
 #include <mbgl/util/time.hpp>
 #include <mbgl/util/parsedate.h>
 
@@ -20,7 +21,6 @@ public:
     HTTPNSURLRequest(HTTPNSURLContext*,
                 const Resource&,
                 Callback,
-                uv_loop_t*,
                 std::shared_ptr<const Response>);
     ~HTTPNSURLRequest();
 
@@ -35,7 +35,7 @@ private:
     NSURLSessionDataTask *task = nullptr;
     std::unique_ptr<Response> response;
     const std::shared_ptr<const Response> existingResponse;
-    uv::async async;
+    util::AsyncTask async;
 };
 
 // -------------------------------------------------------------------------------------------------
@@ -47,7 +47,6 @@ public:
 
     HTTPRequestBase* createRequest(const Resource&,
                                RequestBase::Callback,
-                               uv_loop_t*,
                                std::shared_ptr<const Response>) final;
 
     NSURLSession *session = nil;
@@ -84,9 +83,8 @@ HTTPNSURLContext::~HTTPNSURLContext() {
 
 HTTPRequestBase* HTTPNSURLContext::createRequest(const Resource& resource,
                                              RequestBase::Callback callback,
-                                             uv_loop_t* loop,
                                              std::shared_ptr<const Response> response) {
-    return new HTTPNSURLRequest(this, resource, callback, loop, response);
+    return new HTTPNSURLRequest(this, resource, callback, response);
 }
 
 // -------------------------------------------------------------------------------------------------
@@ -94,12 +92,11 @@ HTTPRequestBase* HTTPNSURLContext::createRequest(const Resource& resource,
 HTTPNSURLRequest::HTTPNSURLRequest(HTTPNSURLContext* context_,
                                    const Resource& resource_,
                                    Callback callback_,
-                                   uv_loop_t* loop,
                                    std::shared_ptr<const Response> existingResponse_)
     : HTTPRequestBase(resource_, callback_),
       context(context_),
       existingResponse(existingResponse_),
-      async(loop, [this] { handleResponse(); }) {
+      async([this] { handleResponse(); }) {
     @autoreleasepool {
         NSURL* url = [NSURL URLWithString:@(resource.url.c_str())];
         if (context->accountType == 0 &&
@@ -264,7 +261,7 @@ void HTTPNSURLRequest::handleResult(NSData *data, NSURLResponse *res, NSError *e
     async.send();
 }
 
-std::unique_ptr<HTTPContextBase> HTTPContextBase::createContext(uv_loop_t*) {
+std::unique_ptr<HTTPContextBase> HTTPContextBase::createContext() {
     return std::make_unique<HTTPNSURLContext>();
 }
 
