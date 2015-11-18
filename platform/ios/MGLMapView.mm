@@ -1555,7 +1555,7 @@ std::chrono::steady_clock::duration durationInSeconds(float duration)
 
 - (void)resetNorthAnimated:(BOOL)animated
 {
-    _mbglMap->setBearing(0, durationInSeconds(animated ? MGLAnimationDuration : 0));
+    [self setDirection:0 animated:animated];
 }
 
 - (void)resetPosition
@@ -1782,10 +1782,18 @@ mbgl::LatLngBounds MGLLatLngBoundsFromCoordinateBounds(MGLCoordinateBounds coord
 {
     if ( ! animated && ! self.rotationAllowed) return;
 
-    if (self.userTrackingMode == MGLUserTrackingModeFollowWithHeading)
+    if (self.userTrackingMode == MGLUserTrackingModeFollowWithHeading ||
+        self.userTrackingMode == MGLUserTrackingModeFollowWithCourse)
     {
         self.userTrackingMode = MGLUserTrackingModeFollow;
     }
+    
+    [self _setDirection:direction animated:animated];
+}
+
+- (void)_setDirection:(CLLocationDirection)direction animated:(BOOL)animated
+{
+    if (direction == self.direction) return;
 
     CGFloat duration = animated ? MGLAnimationDuration : 0;
 
@@ -2818,7 +2826,7 @@ CLLocationCoordinate2D MGLLocationCoordinate2DFromLatLng(mbgl::LatLng latLng)
 
     if (headingDirection >= 0 && self.userTrackingMode == MGLUserTrackingModeFollowWithHeading)
     {
-        _mbglMap->setBearing(headingDirection, durationInSeconds(MGLAnimationDuration));
+        [self _setDirection:headingDirection animated:YES];
     }
 }
 
