@@ -90,7 +90,6 @@
         'sprite/sprite_image.cpp',
         'sprite/sprite_parser.cpp',
         'sprite/sprite_store.cpp',
-        'sprite/custom_sprites.cpp',
       ],
       'libraries': [
         '<@(gtest_static_libs)',

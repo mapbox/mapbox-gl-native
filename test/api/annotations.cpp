@@ -2,6 +2,7 @@
 
 #include <mbgl/annotation/point_annotation.hpp>
 #include <mbgl/annotation/shape_annotation.hpp>
+#include <mbgl/sprite/sprite_image.hpp>
 #include <mbgl/map/map.hpp>
 #include <mbgl/map/still_image.hpp>
 #include <mbgl/platform/default/headless_display.hpp>
@@ -189,4 +190,17 @@ TEST(Annotations, SwitchStyle) {
     map.setStyleJSON(util::read_file("test/fixtures/api/empty.json"), "");
 
     util::write_file("test/output/switch_style.png", renderPNG(map));
+}
+
+TEST(Annotations, CustomIcon) {
+    auto display = std::make_shared<mbgl::HeadlessDisplay>();
+    HeadlessView view(display, 1);
+    DefaultFileSource fileSource(nullptr);
+
+    Map map(view, fileSource, MapMode::Still);
+    map.setStyleJSON(util::read_file("test/fixtures/api/empty.json"), "");
+    map.setSprite("cafe", std::make_shared<SpriteImage>(12, 12, 1, std::string(12 * 12 * 4, '\xFF')));
+    map.addPointAnnotation(PointAnnotation({ 0, 0 }, "cafe"));
+
+    util::write_file("test/output/custom_icon.png", renderPNG(map));
 }
