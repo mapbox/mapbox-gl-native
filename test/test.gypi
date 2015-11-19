@@ -72,6 +72,7 @@
         'storage/database.cpp',
         'storage/directory_reading.cpp',
         'storage/file_reading.cpp',
+        'storage/headers.cpp',
         'storage/http_cancel.cpp',
         'storage/http_coalescing.cpp',
         'storage/http_error.cpp',
