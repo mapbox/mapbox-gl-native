@@ -233,7 +233,7 @@ std::chrono::steady_clock::duration durationInSeconds(float duration)
     // setup refresh driver
     _displayLink = [CADisplayLink displayLinkWithTarget:self selector:@selector(updateFromDisplayLink)];
     _displayLink.frameInterval = MGLTargetFrameInterval;
-    [_displayLink addToRunLoop:[NSRunLoop currentRunLoop] forMode:NSDefaultRunLoopMode];
+    [_displayLink addToRunLoop:[NSRunLoop currentRunLoop] forMode:NSRunLoopCommonModes];
     _needsDisplayRefresh = YES;
 
     // start paused if in IB
