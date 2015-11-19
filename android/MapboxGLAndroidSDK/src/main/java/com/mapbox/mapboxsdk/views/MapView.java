@@ -84,7 +84,7 @@ import java.util.Collections;
 import java.util.List;
 
 /**
- * A {@code MapView} provides an embeddable map interface, similar to the one provided by the Google Maps API.
+ * A {@code MapView} provides an embeddable map interface.
  * You use this class to display map information and to manipulate the map contents from your application.
  * You can center the map on a given coordinate, specify the size of the area you want to display,
  * and style the features of the map to fit your application's use case.
@@ -274,87 +274,115 @@ public final class MapView extends FrameLayout {
     }
 
     /**
-     * This event is triggered whenever the currently displayed map region is about to changing
+     * This {@link MapChange} is triggered whenever the currently displayed map region is about to changing
      * without an animation.
      * <p/>
      * This event is followed by a series of {@link MapView#REGION_IS_CHANGING} and ends
      * with {@link MapView#REGION_DID_CHANGE}.
+     * <p/>
+     * More information in {@see com.mapbox.mapboxsdk.views.MapView.OnMapChangedListener}
      */
     public static final int REGION_WILL_CHANGE = 0;
 
     /**
-     * This event is triggered whenever the currently displayed map region is about to changing
+     * This {@link MapChange} is triggered whenever the currently displayed map region is about to changing
      * with an animation.
      * <p/>
      * This event is followed by a series of {@link MapView#REGION_IS_CHANGING} and ends
      * with {@link MapView#REGION_DID_CHANGE_ANIMATED}.
+     * <p/>
+     * More information in {@see com.mapbox.mapboxsdk.views.MapView.OnMapChangedListener}
      */
     public static final int REGION_WILL_CHANGE_ANIMATED = 1;
 
     /**
-     * This event is triggered whenever the currently displayed map region is changing.
+     * This {@link MapChange} is triggered whenever the currently displayed map region is changing.
+     * <p/>
+     * More information in {@see com.mapbox.mapboxsdk.views.MapView.OnMapChangedListener}
      */
     public static final int REGION_IS_CHANGING = 2;
 
     /**
-     * This event is triggered whenever the currently displayed map region finished changing
+     * This {@link MapChange} is triggered whenever the currently displayed map region finished changing
      * without an animation.
+     * <p/>
+     * More information in {@see com.mapbox.mapboxsdk.views.MapView.OnMapChangedListener}
      */
     public static final int REGION_DID_CHANGE = 3;
 
     /**
-     * This event is triggered whenever the currently displayed map region finished changing
+     * This {@link MapChange} is triggered whenever the currently displayed map region finished changing
      * with an animation.
+     * <p/>
+     * More information in {@see com.mapbox.mapboxsdk.views.MapView.OnMapChangedListener}
      */
     public static final int REGION_DID_CHANGE_ANIMATED = 4;
 
     /**
-     * This event is triggered when the map is about to start loading a new map style.
+     * This {@link MapChange} is triggered when the map is about to start loading a new map style.
      * <p/>
      * This event is followed by {@link MapView#DID_FINISH_LOADING_MAP} or
      * {@link MapView#DID_FAIL_LOADING_MAP}.
+     * <p/>
+     * More information in {@see com.mapbox.mapboxsdk.views.MapView.OnMapChangedListener}
      */
     public static final int WILL_START_LOADING_MAP = 5;
 
     /**
-     * This event is triggered when the map has successfully loaded a new map style.
+     * This {@link MapChange} is triggered when the map has successfully loaded a new map style.
+     * <p/>
+     * More information in {@see com.mapbox.mapboxsdk.views.MapView.OnMapChangedListener}
      */
     public static final int DID_FINISH_LOADING_MAP = 6;
 
     /**
-     * Currently not implemented.
+     * This {@link MapChange} is currently not implemented.
      * <p/>
      * This event is triggered when the map has failed to load a new map style.
+     * <p/>
+     * More information in {@see com.mapbox.mapboxsdk.views.MapView.OnMapChangedListener}
      */
     public static final int DID_FAIL_LOADING_MAP = 7;
 
     /**
-     * Currently not implemented.
+     * This {@link MapChange} is currently not implemented.
+     * <p/>
+     * More information in {@see com.mapbox.mapboxsdk.views.MapView.OnMapChangedListener}
      */
     public static final int WILL_START_RENDERING_FRAME = 8;
 
     /**
-     * Currently not implemented.
+     * This {@link MapChange} is currently not implemented.
+     * <p/>
+     * More information in {@see com.mapbox.mapboxsdk.views.MapView.OnMapChangedListener}
      */
     public static final int DID_FINISH_RENDERING_FRAME = 9;
 
     /**
-     * Currently not implemented.
+     * This {@link MapChange} is currently not implemented.
+     * <p/>
+     * More information in {@see com.mapbox.mapboxsdk.views.MapView.OnMapChangedListener}
      */
     public static final int DID_FINISH_RENDERING_FRAME_FULLY_RENDERED = 10;
 
     /**
-     * Currently not implemented.
+     * This {@link MapChange} is currently not implemented.
+     * <p/>
+     * More information in {@see com.mapbox.mapboxsdk.views.MapView.OnMapChangedListener}
      */
     public static final int WILL_START_RENDERING_MAP = 11;
 
     /**
-     * Currently not implemented.
+     * This {@link MapChange} is currently not implemented.
+     * <p/>
+     * More information in {@see com.mapbox.mapboxsdk.views.MapView.OnMapChangedListener}
      */
     public static final int DID_FINISH_RENDERING_MAP = 12;
 
     /**
-     * Currently not implemented.
+     * This {@link MapChange} is currently not implemented.
+     * <p/>
+     * More information in {@see com.mapbox.mapboxsdk.views.MapView.OnMapChangedListener}
      */
     public static final int DID_FINISH_RENDERING_MAP_FULLY_RENDERED = 13;
 
@@ -468,7 +496,20 @@ public final class MapView extends FrameLayout {
         /**
          * Called when the displayed map view changes.
          *
-         * @param change The type of map change event.
+         * @param change Type of map change event, one of {@link #REGION_WILL_CHANGE},
+         *               {@link #REGION_WILL_CHANGE_ANIMATED},
+         *               {@link #REGION_IS_CHANGING},
+         *               {@link #REGION_DID_CHANGE},
+         *               {@link #REGION_DID_CHANGE_ANIMATED},
+         *               {@link #WILL_START_LOADING_MAP},
+         *               {@link #DID_FAIL_LOADING_MAP},
+         *               {@link #DID_FINISH_LOADING_MAP},
+         *               {@link #WILL_START_RENDERING_FRAME},
+         *               {@link #DID_FINISH_RENDERING_FRAME},
+         *               {@link #DID_FINISH_RENDERING_FRAME_FULLY_RENDERED},
+         *               {@link #WILL_START_RENDERING_MAP},
+         *               {@link #DID_FINISH_RENDERING_MAP},
+         *               {@link #DID_FINISH_RENDERING_MAP_FULLY_RENDERED}.
          */
         void onMapChanged(@MapChange int change);
     }
@@ -1871,8 +1912,9 @@ public final class MapView extends FrameLayout {
 
     /**
      * Convenience method for removing a Marker from the map.
-     *
+     * <p/>
      * Calls removeAnnotation() internally
+     *
      * @param marker Marker to remove
      */
     @UiThread
