@@ -1,6 +1,7 @@
 #include <mbgl/util/work_queue.hpp>
-
 #include <mbgl/util/run_loop.hpp>
+
+#include <cassert>
 
 namespace mbgl {
 namespace util {

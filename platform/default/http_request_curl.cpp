@@ -9,9 +9,9 @@
 #include <mbgl/util/run_loop.hpp>
 #include <mbgl/util/string.hpp>
 #include <mbgl/util/timer.hpp>
+#include <mbgl/util/uv.hpp>
 
 #include <curl/curl.h>
-#include <uv.h>
 
 #ifdef __ANDROID__
 #include <mbgl/android/jni.hpp>

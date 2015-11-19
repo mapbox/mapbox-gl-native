@@ -1,11 +1,15 @@
 #include <mbgl/util/run_loop.hpp>
-
-#include <uv.h>
+#include <mbgl/util/async_task.hpp>
+#include <mbgl/util/uv.hpp>
 
 namespace mbgl {
 namespace util {
 
-uv::tls<RunLoop> RunLoop::current;
+static uv::tls<RunLoop> current;
+
+RunLoop* RunLoop::Get() {
+    return current.get();
+}
 
 class RunLoop::Impl {
 public:
@@ -13,6 +17,7 @@ public:
 
     uv_loop_t *loop;
     RunLoop::Type type;
+    std::unique_ptr<AsyncTask> async;
 };
 
 RunLoop::RunLoop(Type type) : impl(std::make_unique<Impl>()) {
@@ -36,7 +41,7 @@ RunLoop::RunLoop(Type type) : impl(std::make_unique<Impl>()) {
     impl->type = type;
 
     current.set(this);
-    async = std::make_unique<AsyncTask>(std::bind(&RunLoop::process, this));
+    impl->async = std::make_unique<AsyncTask>(std::bind(&RunLoop::process, this));
 }
 
 RunLoop::~RunLoop() {
@@ -50,7 +55,7 @@ RunLoop::~RunLoop() {
     // close callbacks have been called. Not needed
     // for the default main loop because it is only
     // closed when the application exits.
-    async.reset();
+    impl->async.reset();
     runOnce();
 
 #if UV_VERSION_MAJOR == 0 && UV_VERSION_MINOR <= 10
@@ -67,6 +72,11 @@ LOOP_HANDLE RunLoop::getLoopHandle() {
     return current.get()->impl->loop;
 }
 
+void RunLoop::push(std::shared_ptr<WorkTask> task) {
+    withMutex([&] { queue.push(task); });
+    impl->async->send();
+}
+
 void RunLoop::run() {
     uv_run(impl->loop, UV_RUN_DEFAULT);
 }
@@ -76,7 +86,7 @@ void RunLoop::runOnce() {
 }
 
 void RunLoop::stop() {
-    invoke([&] { async->unref(); });
+    invoke([&] { impl->async->unref(); });
 }
 
 }

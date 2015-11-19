@@ -1,11 +1,9 @@
 #ifndef MBGL_UTIL_RUN_LOOP
 #define MBGL_UTIL_RUN_LOOP
 
-#include <mbgl/util/async_task.hpp>
 #include <mbgl/util/noncopyable.hpp>
 #include <mbgl/util/work_task.hpp>
 #include <mbgl/util/work_request.hpp>
-#include <mbgl/util/uv.hpp>
 
 #include <functional>
 #include <utility>
@@ -28,10 +26,7 @@ public:
     RunLoop(Type type = Type::Default);
     ~RunLoop();
 
-    static RunLoop* Get() {
-        return current.get();
-    }
-
+    static RunLoop* Get();
     static LOOP_HANDLE getLoopHandle();
 
     void run();
@@ -46,8 +41,7 @@ public:
             std::move(fn),
             std::move(tuple));
 
-        withMutex([&] { queue.push(task); });
-        async->send();
+        push(task);
     }
 
     // Post the cancellable work fn(args...) to this RunLoop.
@@ -63,8 +57,7 @@ public:
             std::move(tuple),
             flag);
 
-        withMutex([&] { queue.push(task); });
-        async->send();
+        push(task);
 
         return std::make_unique<WorkRequest>(task);
     }
@@ -81,7 +74,7 @@ public:
         // because if the request was cancelled, then R might have been destroyed. L2 needs to check
         // the flag because the request may have been cancelled after L2 was invoked but before it
         // began executing.
-        auto after = [flag, current = RunLoop::current.get(), callback1 = std::move(callback)] (auto&&... results1) {
+        auto after = [flag, current = RunLoop::Get(), callback1 = std::move(callback)] (auto&&... results1) {
             if (!*flag) {
                 current->invoke([flag, callback2 = std::move(callback1)] (auto&&... results2) {
                     if (!*flag) {
@@ -97,8 +90,7 @@ public:
             std::move(tuple),
             flag);
 
-        withMutex([&] { queue.push(task); });
-        async->send();
+        push(task);
 
         return std::make_unique<WorkRequest>(task);
     }
@@ -149,6 +141,8 @@ private:
 
     using Queue = std::queue<std::shared_ptr<WorkTask>>;
 
+    void push(std::shared_ptr<WorkTask>);
+
     void withMutex(std::function<void()>&& fn) {
         std::lock_guard<std::mutex> lock(mutex);
         fn();
@@ -166,12 +160,9 @@ private:
 
     Queue queue;
     std::mutex mutex;
-    std::unique_ptr<AsyncTask> async;
 
     class Impl;
     std::unique_ptr<Impl> impl;
-
-    static uv::tls<RunLoop> current;
 };
 
 }
