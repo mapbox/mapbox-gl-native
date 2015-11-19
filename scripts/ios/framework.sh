@@ -23,6 +23,7 @@ cp -rv ../../../../ios/framework/Settings.bundle Mapbox.framework/Settings.bundl
 
 # binary
 cp -v ../static/libMapbox.a Mapbox.framework/Mapbox
+strip -Sx Mapbox.framework/Mapbox
 
 # module map
 mkdir Mapbox.framework/Modules
