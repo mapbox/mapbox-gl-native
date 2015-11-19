@@ -18,6 +18,9 @@ cat ../../../../ios/framework/umbrella >> Mapbox.framework/Headers/Mapbox.h
 # resources
 cp -rv ../static/Mapbox.bundle Mapbox.framework/Mapbox.bundle
 
+# settings bundle
+cp -rv ../../../../ios/framework/Settings.bundle Mapbox.framework/Settings.bundle
+
 # binary
 cp -v ../static/libMapbox.a Mapbox.framework/Mapbox
 
