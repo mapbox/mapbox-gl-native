@@ -5,7 +5,7 @@
 #include <mbgl/util/noncopyable.hpp>
 #include <mbgl/util/work_task.hpp>
 #include <mbgl/util/work_request.hpp>
-#include <mbgl/util/uv_detail.hpp>
+#include <mbgl/util/uv.hpp>
 
 #include <functional>
 #include <utility>

@@ -1,7 +1,7 @@
 #ifndef MBGL_UTIL_THREAD_CONTEXT
 #define MBGL_UTIL_THREAD_CONTEXT
 
-#include <mbgl/util/uv_detail.hpp>
+#include <mbgl/util/uv.hpp>
 
 #include <cstdint>
 #include <string>

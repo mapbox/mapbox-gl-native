@@ -1,5 +1,4 @@
 #include <mbgl/util/uv.hpp>
-#include <mbgl/util/uv_detail.hpp>
 #include <mbgl/util/string.hpp>
 
 #include <uv.h>

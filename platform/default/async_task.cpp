@@ -1,7 +1,7 @@
 #include <mbgl/util/async_task.hpp>
 
 #include <mbgl/util/run_loop.hpp>
-#include <mbgl/util/uv_detail.hpp>
+#include <mbgl/util/uv.hpp>
 
 #include <atomic>
 #include <functional>

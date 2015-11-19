@@ -7,8 +7,6 @@
 #include <mbgl/util/uv.hpp>
 #include <mbgl/util/string.hpp>
 
-#include <uv.h>
-
 #include <cassert>
 #include <limits>
 
