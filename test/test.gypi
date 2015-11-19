@@ -60,6 +60,7 @@
         'miscellaneous/text_conversions.cpp',
         'miscellaneous/thread.cpp',
         'miscellaneous/tile.cpp',
+        'miscellaneous/token.cpp',
         'miscellaneous/transform.cpp',
         'miscellaneous/work_queue.cpp',
         'miscellaneous/variant.cpp',
