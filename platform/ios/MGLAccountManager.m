@@ -85,7 +85,7 @@
 }
 
 + (NSString *)kitDisplayVersion {
-    return @"3.0.0-pre.8";
+    return @"3.0.0-pre.9";
 }
 
 + (void)initializeIfNeeded {
