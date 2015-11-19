@@ -43,8 +43,60 @@ TEST(Token, replaceTokens) {
         if (token == "HØYDE") return "150";
         return "";
     }));
-    EXPECT_EQ("reserved {for:future} use", mbgl::util::replaceTokens("reserved {for:future} use", [](const std::string& token) -> std::string {
-        if (token == "for:future") return "unknown";
+    EXPECT_EQ("reserved {for=future} use", mbgl::util::replaceTokens("reserved {for=future} use", [](const std::string& token) -> std::string {
+        if (token == "for=future") return "unknown";
+        return "";
+    }));
+    EXPECT_EQ("null", mbgl::util::replaceTokens("{}", [](const std::string& token) -> std::string {
+        if (token == "") return "null";
+        return "";
+    }));
+    EXPECT_EQ("", mbgl::util::replaceTokens("{}", [](const std::string&) -> std::string {
+        return "";
+    }));
+    EXPECT_EQ("?", mbgl::util::replaceTokens("{name:?}", [](const std::string&) -> std::string {
+        return "";
+    }));
+    EXPECT_EQ("Louisiana", mbgl::util::replaceTokens("{name_en:{name}}", [](const std::string& token) -> std::string {
+        if (token == "name") return "Louisiana";
+        return "";
+    }));
+    EXPECT_EQ("Louisiana", mbgl::util::replaceTokens("{name_en:{name}}", [](const std::string& token) -> std::string {
+        if (token == "name") return "Louisiana";
+        if (token == "name_fr") return "Louisiane";
+        return "";
+    }));
+    EXPECT_EQ("Louisiane", mbgl::util::replaceTokens("{name_fr:{name}}", [](const std::string& token) -> std::string {
+        if (token == "name") return "Louisiana";
+        if (token == "name_fr") return "Louisiane";
+        return "";
+    }));
+    EXPECT_EQ("Luisiana", mbgl::util::replaceTokens("{name_en:{name_es:{name:?}}}", [](const std::string& token) -> std::string {
+        if (token == "name") return "Lwizyàn";
+        if (token == "name_es") return "Luisiana";
+        return "";
+    }));
+    EXPECT_EQ("(Luisiana)", mbgl::util::replaceTokens("({name_en:{name_es:{name:?}}})", [](const std::string& token) -> std::string {
+        if (token == "name") return "Lwizyàn";
+        if (token == "name_es") return "Luisiana";
+        return "";
+    }));
+    EXPECT_EQ("Lwizyàn", mbgl::util::replaceTokens("{name_en:{name_es:{name:?}}}", [](const std::string& token) -> std::string {
+        if (token == "name") return "Lwizyàn";
+        return "";
+    }));
+    EXPECT_EQ("", mbgl::util::replaceTokens("{name_en:}", [](const std::string& token) -> std::string {
+        if (token == "name") return "Louisiana";
+        return "";
+    }));
+    EXPECT_EQ("Louisiana", mbgl::util::replaceTokens("{name:}", [](const std::string& token) -> std::string {
+        if (token == "name") return "Louisiana";
+        return "";
+    }));
+    EXPECT_EQ("name", mbgl::util::replaceTokens("{:name}", [](const std::string&) -> std::string {
+        return "";
+    }));
+    EXPECT_EQ("", mbgl::util::replaceTokens("{:}", [](const std::string&) -> std::string {
         return "";
     }));
 }
