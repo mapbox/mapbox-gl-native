@@ -192,8 +192,8 @@ std::chrono::steady_clock::duration durationInSeconds(float duration)
 
     if ( ! [styleURL scheme])
     {
-        // Assume a relative path into the developer’s bundle.
-        styleURL = [[NSBundle mainBundle] URLForResource:styleURL.path withExtension:nil];
+        // Assume a relative path into the application bundle.
+        styleURL = [NSURL URLWithString:[@"asset://" stringByAppendingString:[styleURL absoluteString]]];
     }
 
     _mbglMap->setStyleURL([[styleURL absoluteString] UTF8String]);
