@@ -1,6 +1,10 @@
 #include "util.hpp"
 
 #include <mbgl/platform/log.hpp>
+#include <mbgl/util/image.hpp>
+#include <mbgl/util/io.hpp>
+
+#include <mapbox/pixelmatch.hpp>
 
 #pragma GCC diagnostic push
 #pragma GCC diagnostic ignored "-Wshadow"
@@ -79,6 +83,62 @@ uint64_t crc64(const char* data, size_t size) {
 
 uint64_t crc64(const std::string& str) {
     return crc64(str.data(), str.size());
+}
+
+UnassociatedImage unpremultiply(const PremultipliedImage& src) {
+    UnassociatedImage dst { src.width, src.height };
+    std::copy(src.data.get(), src.data.get() + src.size(), dst.data.get());
+
+    uint8_t* data = dst.data.get();
+    for (size_t i = 0; i < dst.size(); i += 4) {
+        uint8_t& r = data[i + 0];
+        uint8_t& g = data[i + 1];
+        uint8_t& b = data[i + 2];
+        uint8_t& a = data[i + 3];
+        if (a) {
+            r = (255 * r + (a / 2)) / a;
+            g = (255 * g + (a / 2)) / a;
+            b = (255 * b + (a / 2)) / a;
+        }
+    }
+
+    return std::move(dst);
+}
+
+void checkImage(const std::string& base,
+                const UnassociatedImage& actual,
+                double imageThreshold,
+                double pixelThreshold) {
+    // TODO: the pixels produced by Map::renderStill are probably actually premultiplied,
+    // but Map::renderStill produces an UnassociatedImage. This probably should be fixed;
+    // here we just hack around it by copying the pixels to a PremultipliedImage (and
+    // un-premultiplying them when updating expected.png, since encodePNG wants
+    // un-premultiplied pixels).
+    PremultipliedImage actualActual { actual.width, actual.height };
+    std::copy(actual.data.get(), actual.data.get() + actual.size(), actualActual.data.get());
+
+    if (getenv("UPDATE")) {
+        util::write_file(base + "/expected.png", encodePNG(unpremultiply(actualActual)));
+        return;
+    }
+
+    PremultipliedImage expected = decodeImage(util::read_file(base + "/expected.png"));
+    UnassociatedImage diff { expected.width, expected.height };
+
+    ASSERT_EQ(expected.width, actual.width);
+    ASSERT_EQ(expected.height, actual.height);
+
+    double pixels = mapbox::pixelmatch(actual.data.get(),
+                                       expected.data.get(),
+                                       expected.width,
+                                       expected.height,
+                                       diff.data.get(),
+                                       pixelThreshold);
+
+    EXPECT_LE(pixels / (expected.width * expected.height), imageThreshold);
+
+    util::write_file(base + "/actual.png", encodePNG(actual));
+    util::write_file(base + "/diff.png", encodePNG(diff));
 }
 
 }

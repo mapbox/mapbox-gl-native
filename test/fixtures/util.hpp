@@ -1,6 +1,10 @@
 #ifndef MBGL_TEST_UTIL
 #define MBGL_TEST_UTIL
 
+#include <mbgl/util/image.hpp>
+
+#include <cstdint>
+
 #include <gtest/gtest.h>
 
 #define SCOPED_TEST(name) \
@@ -19,6 +23,11 @@ void stopServer(pid_t pid);
 
 uint64_t crc64(const char*, size_t);
 uint64_t crc64(const std::string&);
+
+void checkImage(const std::string& base,
+                const UnassociatedImage& actual,
+                double imageThreshold = 0,
+                double pixelThreshold = 0);
 
 }
 }
