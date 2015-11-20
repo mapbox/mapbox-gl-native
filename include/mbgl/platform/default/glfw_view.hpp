@@ -20,7 +20,6 @@ public:
     std::array<uint16_t, 2> getFramebufferSize() const override;
 
     void initialize(mbgl::Map *map) override;
-    void notifyMapChange(mbgl::MapChange) override;
     void activate() override;
     void deactivate() override;
     void notify() override;
@@ -62,7 +61,6 @@ private:
     std::vector<std::string> spriteIDs;
 
 private:
-    bool initializedDefaultMarker = false;
     bool fullscreen = false;
     const bool benchmark = false;
     bool tracking = false;

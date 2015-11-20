@@ -115,13 +115,7 @@ GLFWView::~GLFWView() {
 
 void GLFWView::initialize(mbgl::Map *map_) {
     View::initialize(map_);
-}
-
-void GLFWView::notifyMapChange(mbgl::MapChange change) {
-    if (change == mbgl::MapChange::MapChangeDidFinishLoadingMap && !initializedDefaultMarker) {
-        initializedDefaultMarker = true;
-        map->setSprite("default_marker", makeSpriteImage(22, 22, 1));
-    }
+    map->setSprite("default_marker", makeSpriteImage(22, 22, 1));
 }
 
 void GLFWView::onKey(GLFWwindow *window, int key, int /*scancode*/, int action, int mods) {
