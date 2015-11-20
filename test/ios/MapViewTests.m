@@ -9,14 +9,24 @@
 #import <CoreLocation/CoreLocation.h>
 #import <KIF/UIAutomationHelper.h>
 
-const NSTimeInterval MGLAnimationDurationDefault = 0.3;
-const NSTimeInterval MGLAnimationDurationOverDefault = MGLAnimationDurationDefault * 2;
-
 @interface MapViewTests : KIFTestCase <MGLMapViewDelegate>
 
 @end
 
 @implementation MapViewTests
+
+- (NSNotification *)waitForNotificationThatRegionDidChangeAnimatedWhileExecutingBlock:(void (^)())block {
+    [[NSNotificationCenter defaultCenter] addObserverForName:@"regionDidChangeAnimated"
+                                                      object:tester.mapView
+                                                       queue:nil
+                                                  usingBlock:^(NSNotification * _Nonnull note) {}];
+    NSNotification *notification = [system waitForNotificationName:@"regionDidChangeAnimated"
+                                                            object:tester.mapView whileExecutingBlock:block];
+    [[NSNotificationCenter defaultCenter] removeObserver:self
+                                                    name:@"regionDidChangeAnimated"
+                                                  object:tester.mapView];
+    return notification;
+}
 
 - (void)beforeEach {
     [system simulateDeviceRotationToOrientation:UIDeviceOrientationPortrait];
@@ -36,8 +46,6 @@ const NSTimeInterval MGLAnimationDurationOverDefault = MGLAnimationDurationDefau
     tester.viewController.navigationController.toolbarHidden = YES;
 
     tester.mapView.delegate = self;
-
-    [tester waitForTimeInterval:0.5];
 }
 
 - (void)approveLocationIfNeeded {
@@ -50,8 +58,9 @@ const NSTimeInterval MGLAnimationDurationOverDefault = MGLAnimationDurationDefau
 }
 
 - (void)testDirectionSet {
-    [tester.mapView setDirection:270 animated:YES];
-    [tester waitForTimeInterval:MGLAnimationDurationOverDefault];
+    [self waitForNotificationThatRegionDidChangeAnimatedWhileExecutingBlock:^{
+        [tester.mapView setDirection:270 animated:YES];
+    }];
 
     XCTAssertEqual(tester.mapView.direction,
                    270,
@@ -68,15 +77,17 @@ const NSTimeInterval MGLAnimationDurationOverDefault = MGLAnimationDurationDefau
 }
 
 - (void)testCompassTap {
-    [tester.mapView setDirection:180 animated:YES];
-    [tester waitForTimeInterval:MGLAnimationDurationOverDefault];
+    [self waitForNotificationThatRegionDidChangeAnimatedWhileExecutingBlock:^{
+        [tester.mapView setDirection:180 animated:YES];
+    }];
 
     XCTAssertEqual(tester.mapView.direction,
                    180,
                    @"setting direction should take effect");
 
-    [tester.compass tap];
-    [tester waitForTimeInterval:MGLAnimationDurationOverDefault];
+    [self waitForNotificationThatRegionDidChangeAnimatedWhileExecutingBlock:^{
+        [tester.compass tap];
+    }];
 
     XCTAssertEqual(tester.mapView.direction,
                    0,
@@ -92,15 +103,17 @@ const NSTimeInterval MGLAnimationDurationOverDefault = MGLAnimationDurationDefau
 }
 
 - (void)testDirectionReset {
-    [tester.mapView setDirection:90 animated:YES];
-    [tester waitForTimeInterval:MGLAnimationDurationOverDefault];
+    [self waitForNotificationThatRegionDidChangeAnimatedWhileExecutingBlock:^{
+        [tester.mapView setDirection:90 animated:YES];
+    }];
 
     XCTAssertEqual(tester.mapView.direction,
                    90,
                    @"setting direction should take effect");
 
-    [tester.mapView resetNorth];
-    [tester waitForTimeInterval:MGLAnimationDurationOverDefault];
+    [self waitForNotificationThatRegionDidChangeAnimatedWhileExecutingBlock:^{
+        [tester.mapView resetNorth];
+    }];
 
     XCTAssertEqual(tester.mapView.direction,
                    0,
