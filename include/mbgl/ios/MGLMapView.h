@@ -134,6 +134,14 @@ IB_DESIGNABLE
 *   @param animated Specify `YES` if you want the map view to animate scrolling, zooming, and rotating to the new location or `NO` if you want the map to display the new location immediately. */
 - (void)setCenterCoordinate:(CLLocationCoordinate2D)centerCoordinate zoomLevel:(double)zoomLevel direction:(CLLocationDirection)direction animated:(BOOL)animated;
 
+/** Changes the center coordinate, zoom level, and direction of the map, calling a completion handler at the end of an optional animation.
+*   @param centerCoordinate The new center coordinate for the map.
+*   @param zoomLevel The new zoom level for the map.
+*   @param direction The new direction for the map, measured in degrees relative to true north.
+*   @param animated Specify `YES` if you want the map view to animate scrolling, zooming, and rotating to the new location or `NO` if you want the map to display the new location immediately.
+*   @param completion The block executed after the animation finishes. */
+- (void)setCenterCoordinate:(CLLocationCoordinate2D)centerCoordinate zoomLevel:(double)zoomLevel direction:(CLLocationDirection)direction animated:(BOOL)animated completionHandler:(nullable void (^)(void))completion;
+
 /** The coordinate bounds visible in the receiver’s viewport.
 *   
 *   Changing the value of this property updates the receiver immediately. If you want to animate the change, call `setVisibleCoordinateBounds:animated:` instead. */
@@ -156,6 +164,16 @@ IB_DESIGNABLE
 *   @param insets The minimum padding (in screen points) that will be visible around the given coordinate bounds.
 *   @param animated Specify `YES` to animate the change by smoothly scrolling and zooming or `NO` to immediately display the given bounds. */
 - (void)setVisibleCoordinates:(CLLocationCoordinate2D *)coordinates count:(NSUInteger)count edgePadding:(UIEdgeInsets)insets animated:(BOOL)animated;
+
+/** Changes the receiver’s viewport to fit all of the given coordinates and optionally some additional padding on each side.
+*   @param coordinates The coordinates that the viewport will show.
+*   @param count The number of coordinates. This number must not be greater than the number of elements in `coordinates`.
+*   @param insets The minimum padding (in screen points) that will be visible around the given coordinate bounds.
+*   @param direction The direction to rotate the map to, measured in degrees relative to true north.
+*   @param duration The duration to animate the change in seconds.
+*   @param function The timing function to animate the change.
+*   @param completion The block executed after the animation finishes. */
+- (void)setVisibleCoordinates:(CLLocationCoordinate2D *)coordinates count:(NSUInteger)count edgePadding:(UIEdgeInsets)insets direction:(CLLocationDirection)direction duration:(NSTimeInterval)duration animationTimingFunction:(nullable CAMediaTimingFunction *)function completionHandler:(nullable void (^)(void))completion;
 
 /** Sets the visible region so that the map displays the specified annotations.
 *
@@ -192,6 +210,13 @@ IB_DESIGNABLE
 *   @param duration The amount of time, measured in seconds, that the transition animation should take. Specify `0` to jump to the new viewpoint instantaneously.
 *   @param function A timing function used for the animation. Set this parameter to `nil` for a transition that matches most system animations. If the duration is `0`, this parameter is ignored. */
 - (void)setCamera:(MGLMapCamera *)camera withDuration:(NSTimeInterval)duration animationTimingFunction:(nullable CAMediaTimingFunction *)function;
+
+/** Moves the viewpoint to a different location with respect to the map with an optional transition duration and timing function.
+*   @param camera The new viewpoint.
+*   @param duration The amount of time, measured in seconds, that the transition animation should take. Specify `0` to jump to the new viewpoint instantaneously.
+*   @param function A timing function used for the animation. Set this parameter to `nil` for a transition that matches most system animations. If the duration is `0`, this parameter is ignored.
+*   @param completion The block to execute after the animation finishes. */
+- (void)setCamera:(MGLMapCamera *)camera withDuration:(NSTimeInterval)duration animationTimingFunction:(nullable CAMediaTimingFunction *)function completionHandler:(nullable void (^)(void))completion;
 
 #pragma mark - Converting Map Coordinates
 

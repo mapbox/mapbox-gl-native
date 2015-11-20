@@ -262,6 +262,9 @@ void Transform::_easeTo(const CameraOptions& options, double new_scale, double n
         state.angle = angle;
         state.pitch = pitch;
 
+        if (options.transitionFinishFn) {
+            options.transitionFinishFn();
+        }
         view.notifyMapChange(MapChangeRegionDidChange);
     } else {
         view.notifyMapChange(MapChangeRegionWillChangeAnimated);
@@ -291,6 +294,9 @@ void Transform::_easeTo(const CameraOptions& options, double new_scale, double n
                 state.pitch = util::interpolate(startP, pitch, t);
                 // At t = 1.0, a DidChangeAnimated notification should be sent from finish().
                 if (t < 1.0) {
+                    if (options.transitionFrameFn) {
+                        options.transitionFrameFn(t);
+                    }
                     view.notifyMapChange(MapChangeRegionIsChanging);
                 }
                 return update;
@@ -299,6 +305,9 @@ void Transform::_easeTo(const CameraOptions& options, double new_scale, double n
                 state.panning = false;
                 state.scaling = false;
                 state.rotating = false;
+                if (options.transitionFinishFn) {
+                    options.transitionFinishFn();
+                }
                 view.notifyMapChange(MapChangeRegionDidChangeAnimated);
             }, *easeOptions.duration);
     }
