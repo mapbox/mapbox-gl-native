@@ -19,16 +19,13 @@
 
       'variables': {
         'cflags_cc': [
-          '<@(libuv_cflags)',
           '<@(sqlite_cflags)',
         ],
         'ldflags': [
-          '<@(libuv_ldflags)',
           '<@(sqlite_ldflags)',
           '<@(zlib_ldflags)',
         ],
         'libraries': [
-          '<@(libuv_static_libs)',
           '<@(sqlite_static_libs)',
           '<@(zlib_static_libs)',
         ],

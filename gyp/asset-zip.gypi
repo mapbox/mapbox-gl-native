@@ -17,20 +17,15 @@
 
       'variables': {
         'cflags': [
-          '<@(libuv_cflags)',
           '<@(libzip_cflags)',
         ],
         'cflags_cc': [
-          '<@(libuv_cflags)',
           '<@(libzip_cflags)',
-          '<@(boost_cflags)',
         ],
         'ldflags': [
-          '<@(libuv_ldflags)',
           '<@(libzip_ldflags)',
         ],
         'libraries': [
-          '<@(libuv_static_libs)',
           '<@(libzip_static_libs)',
         ],
         'defines': [

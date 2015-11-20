@@ -17,14 +17,7 @@
 
       'variables': {
         'cflags_cc': [
-          '<@(libuv_cflags)',
           '<@(boost_cflags)',
-        ],
-        'ldflags': [
-          '<@(libuv_ldflags)',
-        ],
-        'libraries': [
-          '<@(libuv_static_libs)',
         ],
         'defines': [
           '-DMBGL_ASSET_FS'
@@ -51,17 +44,6 @@
           }, {
             'cflags': [ '<@(defines)' ],
             'cflags_cc': [ '<@(defines)' ],
-          }]
-        ],
-      },
-
-      'link_settings': {
-        'conditions': [
-          ['OS == "mac"', {
-            'libraries': [ '<@(libraries)' ],
-            'xcode_settings': { 'OTHER_LDFLAGS': [ '<@(ldflags)' ] }
-          }, {
-            'libraries': [ '<@(libraries)', '<@(ldflags)' ],
           }]
         ],
       },

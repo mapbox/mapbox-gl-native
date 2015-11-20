@@ -16,15 +16,8 @@
       ],
 
       'variables': {
-        'cflags_cc': [
-          '<@(libuv_cflags)',
-        ],
         'ldflags': [
           '-framework Foundation', # For NSURLRequest
-          '<@(libuv_ldflags)',
-        ],
-        'libraries': [
-          '<@(libuv_static_libs)',
         ],
         'defines': [
           '-DMBGL_HTTP_NSURL'
@@ -32,7 +25,6 @@
       },
 
       'xcode_settings': {
-        'OTHER_CPLUSPLUSFLAGS': [ '<@(cflags_cc)' ],
         'CLANG_ENABLE_OBJC_ARC': 'NO',
       },
 
@@ -44,7 +36,6 @@
       },
 
       'link_settings': {
-        'libraries': [ '<@(libraries)' ],
         'xcode_settings': {
           'OTHER_LDFLAGS': [ '<@(ldflags)' ],
         },

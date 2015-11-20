@@ -17,16 +17,13 @@
 
       'variables': {
         'cflags_cc': [
-          '<@(libuv_cflags)',
           '<@(libcurl_cflags)',
           '<@(boost_cflags)',
         ],
         'ldflags': [
-          '<@(libuv_ldflags)',
           '<@(libcurl_ldflags)',
         ],
         'libraries': [
-          '<@(libuv_static_libs)',
           '<@(libcurl_static_libs)',
         ],
         'defines': [
