@@ -100,7 +100,6 @@ private:
     void emitTileDataChanged();
     void emitResourceLoadingFailed(std::exception_ptr error);
 
-    bool loaded = false;
     bool shouldReparsePartialTiles = false;
 
     Observer* observer = nullptr;
@@ -112,6 +111,7 @@ private:
     bool hasPendingTransitions = false;
 
 public:
+    bool loaded = false;
     Worker workers;
 };
 

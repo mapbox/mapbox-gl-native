@@ -169,7 +169,7 @@ void MapContext::update() {
 
     data.setAnimationTime(Clock::now());
 
-    if (style->isLoaded() && updateFlags & Update::Annotations) {
+    if (style->loaded && updateFlags & Update::Annotations) {
         data.getAnnotationManager()->updateStyle(*style);
         updateFlags |= Update::Classes;
     }
