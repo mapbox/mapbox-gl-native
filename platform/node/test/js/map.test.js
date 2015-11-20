@@ -181,11 +181,11 @@ test('Map', function(t) {
 
             t.throws(function() {
                 map.render();
-            }, /First argument must be an options object/);
+            }, /First argument must be a render options object/);
 
             t.throws(function() {
                 map.render('invalid');
-            }, /First argument must be an options object/);
+            }, /First argument must be a render options object/);
 
             map.release();
             t.end();

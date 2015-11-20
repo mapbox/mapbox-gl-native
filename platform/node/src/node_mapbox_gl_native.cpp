@@ -11,10 +11,12 @@
 #include "node_log.hpp"
 #include "node_request.hpp"
 
-namespace node_mbgl {
+namespace mbgl {
 
-mbgl::util::RunLoop& NodeRunLoop() {
-    static mbgl::util::RunLoop nodeRunLoop(uv_default_loop());
+namespace util {
+
+RunLoop& NodeRunLoop() {
+    static RunLoop nodeRunLoop(uv_default_loop());
     return nodeRunLoop;
 }
 
@@ -24,41 +26,41 @@ NAN_MODULE_INIT(RegisterModule) {
     // This has the effect of:
     //   a) Ensuring that the static local variable is initialized before any thread contention.
     //   b) unreffing an async handle, which otherwise would keep the default loop running.
-    node_mbgl::NodeRunLoop().stop();
+    util::NodeRunLoop().stop();
 
-    node_mbgl::NodeMap::Init(target);
-    node_mbgl::NodeRequest::Init(target);
+    NodeMap::Init(target);
+    NodeRequest::Init(target);
 
     // Exports Resource constants.
     v8::Local<v8::Object> resource = Nan::New<v8::Object>();
 
     Nan::Set(resource,
         Nan::New("Unknown").ToLocalChecked(),
-        Nan::New(mbgl::Resource::Unknown));
+        Nan::New(Resource::Unknown));
 
     Nan::Set(resource,
         Nan::New("Style").ToLocalChecked(),
-        Nan::New(mbgl::Resource::Style));
+        Nan::New(Resource::Style));
 
     Nan::Set(resource,
         Nan::New("Source").ToLocalChecked(),
-        Nan::New(mbgl::Resource::Source));
+        Nan::New(Resource::Source));
 
     Nan::Set(resource,
         Nan::New("Tile").ToLocalChecked(),
-        Nan::New(mbgl::Resource::Tile));
+        Nan::New(Resource::Tile));
 
     Nan::Set(resource,
         Nan::New("Glyphs").ToLocalChecked(),
-        Nan::New(mbgl::Resource::Glyphs));
+        Nan::New(Resource::Glyphs));
 
     Nan::Set(resource,
         Nan::New("SpriteImage").ToLocalChecked(),
-        Nan::New(mbgl::Resource::SpriteImage));
+        Nan::New(Resource::SpriteImage));
 
     Nan::Set(resource,
         Nan::New("SpriteJSON").ToLocalChecked(),
-        Nan::New(mbgl::Resource::SpriteJSON));
+        Nan::New(Resource::SpriteJSON));
 
     Nan::Set(target,
         Nan::New("Resource").ToLocalChecked(),
@@ -75,7 +77,9 @@ NAN_MODULE_INIT(RegisterModule) {
     Nan::SetPrototype(target,
         Nan::Get(EventEmitter, Nan::New("prototype").ToLocalChecked()).ToLocalChecked());
 
-    mbgl::Log::setObserver(std::make_unique<node_mbgl::NodeLogObserver>(target->ToObject()));
+    Log::setObserver(std::make_unique<NodeLogObserver>(target->ToObject()));
 }
 
 NODE_MODULE(mapbox_gl_native, RegisterModule)
+
+}

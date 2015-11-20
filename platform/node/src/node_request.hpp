@@ -10,7 +10,7 @@
 #include <mbgl/storage/resource.hpp>
 #include <mbgl/storage/file_source.hpp>
 
-namespace node_mbgl {
+namespace mbgl {
 
 class NodeFileSource;
 
@@ -21,13 +21,13 @@ public:
     static NAN_METHOD(New);
     static NAN_METHOD(Respond);
 
-    static v8::Handle<v8::Object> Create(const mbgl::Resource&, mbgl::FileSource::Callback);
+    static v8::Handle<v8::Object> Create(const Resource&, FileSource::Callback);
     static Nan::Persistent<v8::Function> constructor;
 
-    NodeRequest(mbgl::FileSource::Callback);
+    NodeRequest(FileSource::Callback);
 
 private:
-    mbgl::FileSource::Callback callback;
+    FileSource::Callback callback;
 };
 
 }
