@@ -1,6 +1,8 @@
 package com.mapbox.mapboxsdk.exceptions;
 
 import android.os.Bundle;
+import android.support.annotation.NonNull;
+
 import com.mapbox.mapboxsdk.views.MapView;
 
 /**
@@ -14,6 +16,10 @@ public class InvalidAccessTokenException extends RuntimeException {
 
     public InvalidAccessTokenException() {
         super("Using MapView requires setting a valid access token. See the README.md");
+    }
+
+    public InvalidAccessTokenException(@NonNull String reason) {
+        super(reason);
     }
 
 }
