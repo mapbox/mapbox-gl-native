@@ -13,6 +13,7 @@
 #include <mbgl/util/worker.hpp>
 
 #include <cstdint>
+#include <mutex>
 #include <string>
 #include <vector>
 
@@ -106,7 +107,7 @@ private:
 
     std::exception_ptr lastError;
 
-    std::unique_ptr<uv::rwlock> mtx;
+    std::mutex mtx;
     ZoomHistory zoomHistory;
     bool hasPendingTransitions = false;
 
