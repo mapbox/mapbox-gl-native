@@ -121,12 +121,17 @@ IB_DESIGNABLE
 *   Changing the zoom level scales the map without changing the current center coordinate. At zoom level 0, tiles cover the entire world map; at zoom level 1, tiles cover 1/4 of the world; at zoom level 2, tiles cover 1/16 of the world, and so on. */
 - (void)setZoomLevel:(double)zoomLevel animated:(BOOL)animated;
 
-/** Changes the center coordinate and zoom level of the and optionally animates the change. 
+/** Changes the center coordinate and zoom level of the map and optionally animates the change. 
 *   @param centerCoordinate The new center coordinate for the map.
 *   @param zoomLevel The new zoom level for the map.
 *   @param animated Specify `YES` if you want the map view to animate scrolling and zooming to the new location or `NO` if you want the map to display the new location immediately. */
 - (void)setCenterCoordinate:(CLLocationCoordinate2D)centerCoordinate zoomLevel:(double)zoomLevel animated:(BOOL)animated;
 
+/** Changes the center coordinate, zoom level, and direction of the map and optionally animates the change. 
+*   @param centerCoordinate The new center coordinate for the map.
+*   @param zoomLevel The new zoom level for the map.
+*   @param direction The new direction for the map, measured in degrees relative to true north.
+*   @param animated Specify `YES` if you want the map view to animate scrolling, zooming, and rotating to the new location or `NO` if you want the map to display the new location immediately. */
 - (void)setCenterCoordinate:(CLLocationCoordinate2D)centerCoordinate zoomLevel:(double)zoomLevel direction:(CLLocationDirection)direction animated:(BOOL)animated;
 
 /** The coordinate bounds visible in the receiver’s viewport.
