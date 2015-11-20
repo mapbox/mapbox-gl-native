@@ -33,7 +33,7 @@ suite.run('native', {tests: tests}, function (style, options, callback) {
 
     map.load(style);
     map.render(options, function (err, pixels) {
-        map.release();
+        // map.release();
         if (timedOut) return;
         clearTimeout(watchdog);
         callback(err, pixels);

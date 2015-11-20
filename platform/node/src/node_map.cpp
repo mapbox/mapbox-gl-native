@@ -5,6 +5,7 @@
 #include <mbgl/util/exception.hpp>
 
 #include <unistd.h>
+#include <iostream>
 
 #if UV_VERSION_MAJOR == 0 && UV_VERSION_MINOR <= 10
 #define UV_ASYNC_PARAMS(handle) uv_async_t *handle, int
@@ -196,58 +197,58 @@ NAN_METHOD(NodeMap::Load) {
 std::unique_ptr<NodeMap::RenderOptions> NodeMap::ParseOptions(v8::Local<v8::Object> obj) {
     Nan::HandleScope scope;
 
-    auto options = std::make_unique<RenderOptions>();
+    auto renderOptions = std::make_unique<RenderOptions>();
 
     if (Nan::Has(obj, Nan::New("zoom").ToLocalChecked()).FromJust()) {
-        options->zoom = Nan::Get(obj, Nan::New("zoom").ToLocalChecked()).ToLocalChecked()->NumberValue();
+        renderOptions->zoom = Nan::Get(obj, Nan::New("zoom").ToLocalChecked()).ToLocalChecked()->NumberValue();
     }
 
     if (Nan::Has(obj, Nan::New("bearing").ToLocalChecked()).FromJust()) {
-        options->bearing = Nan::Get(obj, Nan::New("bearing").ToLocalChecked()).ToLocalChecked()->NumberValue();
+        renderOptions->bearing = Nan::Get(obj, Nan::New("bearing").ToLocalChecked()).ToLocalChecked()->NumberValue();
     }
 
     if (Nan::Has(obj, Nan::New("pitch").ToLocalChecked()).FromJust()) {
-        options->pitch = Nan::Get(obj, Nan::New("pitch").ToLocalChecked()).ToLocalChecked()->NumberValue();
+        renderOptions->pitch = Nan::Get(obj, Nan::New("pitch").ToLocalChecked()).ToLocalChecked()->NumberValue();
     }
 
     if (Nan::Has(obj, Nan::New("center").ToLocalChecked()).FromJust()) {
         auto center = Nan::Get(obj, Nan::New("center").ToLocalChecked()).ToLocalChecked().As<v8::Array>();
-        if (center->Length() > 0) { options->longitude = Nan::Get(center, 0).ToLocalChecked()->NumberValue(); }
-        if (center->Length() > 1) { options->latitude = Nan::Get(center, 1).ToLocalChecked()->NumberValue(); }
+        if (center->Length() > 0) { renderOptions->longitude = Nan::Get(center, 0).ToLocalChecked()->NumberValue(); }
+        if (center->Length() > 1) { renderOptions->latitude = Nan::Get(center, 1).ToLocalChecked()->NumberValue(); }
     }
 
     if (Nan::Has(obj, Nan::New("width").ToLocalChecked()).FromJust()) {
-        options->width = Nan::Get(obj, Nan::New("width").ToLocalChecked()).ToLocalChecked()->IntegerValue();
+        renderOptions->width = Nan::Get(obj, Nan::New("width").ToLocalChecked()).ToLocalChecked()->IntegerValue();
     }
 
     if (Nan::Has(obj, Nan::New("height").ToLocalChecked()).FromJust()) {
-        options->height = Nan::Get(obj, Nan::New("height").ToLocalChecked()).ToLocalChecked()->IntegerValue();
+        renderOptions->height = Nan::Get(obj, Nan::New("height").ToLocalChecked()).ToLocalChecked()->IntegerValue();
     }
 
     if (Nan::Has(obj, Nan::New("classes").ToLocalChecked()).FromJust()) {
         auto classes = Nan::Get(obj, Nan::New("classes").ToLocalChecked()).ToLocalChecked()->ToObject().As<v8::Array>();
         const int length = classes->Length();
-        options->classes.reserve(length);
+        renderOptions->classes.reserve(length);
         for (int i = 0; i < length; i++) {
-            options->classes.push_back(std::string { *Nan::Utf8String(Nan::Get(classes, i).ToLocalChecked()->ToString()) });
+            renderOptions->classes.push_back(std::string { *Nan::Utf8String(Nan::Get(classes, i).ToLocalChecked()->ToString()) });
         }
     }
 
-    return options;
+    return renderOptions;
 }
 
 /**
  * Render an image from the currently-loaded style
  *
  * @name render
- * @param {Object} options
- * @param {number} [options.zoom=0]
- * @param {number} [options.width=512]
- * @param {number} [options.height=512]
- * @param {Array<number>} [options.center=[0,0]] longitude, latitude center
+ * @param {Object} renderOptions
+ * @param {number} [renderOptions.zoom=0]
+ * @param {number} [renderOptions.width=512]
+ * @param {number} [renderOptions.height=512]
+ * @param {Array<number>} [renderOptions.center=[0,0]] longitude, latitude center
  * of the map
- * @param {number} [options.bearing=0] rotation
- * @param {Array<string>} [options.classes=[]] GL Style Classes
+ * @param {number} [renderOptions.bearing=0] rotation
+ * @param {Array<string>} [renderOptions.classes=[]] GL Style Classes
  * @param {Function} callback
  * @returns {undefined} calls callback
  * @throws {Error} if stylesheet is not loaded or if map is already rendering
@@ -258,7 +259,7 @@ NAN_METHOD(NodeMap::Render) {
     if (!nodeMap->isValid()) return Nan::ThrowError(releasedMessage());
 
     if (info.Length() <= 0 || !info[0]->IsObject()) {
-        return Nan::ThrowTypeError("First argument must be an options object");
+        return Nan::ThrowTypeError("First argument must be a render options object");
     }
 
     if (info.Length() <= 1 || !info[1]->IsFunction()) {
@@ -273,14 +274,14 @@ NAN_METHOD(NodeMap::Render) {
         return Nan::ThrowError("Map is currently rendering an image");
     }
 
-    auto options = ParseOptions(info[0]->ToObject());
+    auto renderOptions = ParseOptions(info[0]->ToObject());
 
     assert(!nodeMap->callback);
     assert(!nodeMap->image);
     nodeMap->callback = std::make_unique<Nan::Callback>(info[1].As<v8::Function>());
 
     try {
-        nodeMap->startRender(std::move(options));
+        nodeMap->startRender(std::move(renderOptions));
     } catch (util::Exception &ex) {
         return Nan::ThrowError(ex.what());
     }
@@ -288,13 +289,13 @@ NAN_METHOD(NodeMap::Render) {
     info.GetReturnValue().SetUndefined();
 }
 
-void NodeMap::startRender(std::unique_ptr<NodeMap::RenderOptions> options) {
-    view->resize(options->width, options->height);
+void NodeMap::startRender(std::unique_ptr<NodeMap::RenderOptions> renderOptions) {
+    view->resize(renderOptions->width, renderOptions->height);
     map->update(Update::Dimensions);
-    map->setClasses(options->classes);
-    map->setLatLngZoom(LatLng(options->latitude, options->longitude), options->zoom);
-    map->setBearing(options->bearing);
-    map->setPitch(options->pitch);
+    map->setClasses(renderOptions->classes);
+    map->setLatLngZoom(LatLng(renderOptions->latitude, renderOptions->longitude), renderOptions->zoom);
+    map->setBearing(renderOptions->bearing);
+    map->setPitch(renderOptions->pitch);
 
     map->renderStill([this](const std::exception_ptr eptr, std::unique_ptr<const StillImage> result) {
         if (eptr) {
@@ -381,7 +382,7 @@ void NodeMap::renderFinished() {
 }
 
 /**
- * Clean up any resources used by a map instance.options
+ * Clean up any resources used by a map instance.
  * @name release
  * @returns {undefined}
  */
@@ -425,14 +426,20 @@ NAN_METHOD(NodeMap::DumpDebugLogs) {
 ////////////////////////////////////////////////////////////////////////////////////////////////
 // Instance
 
-NodeMap::NodeMap(v8::Local<v8::Object> options) :
+NodeMap::NodeMap(v8::Local<v8::Object> options_) :
+    options(options_),
     view(std::make_unique<HeadlessView>(sharedDisplay(), [&] {
         Nan::HandleScope scope;
-        return Nan::Has(options, Nan::New("ratio").ToLocalChecked()).FromJust() ? Nan::Get(options, Nan::New("ratio").ToLocalChecked()).ToLocalChecked()->NumberValue() : 1.0;
+        return Nan::Has(options_, Nan::New("ratio").ToLocalChecked()).FromJust() ? Nan::Get(options_, Nan::New("ratio").ToLocalChecked()).ToLocalChecked()->NumberValue() : 1.0;
     }())),
-    fs(std::make_unique<NodeFileSource>(options)),
+    fs(std::make_unique<NodeFileSource>(&options)),
     map(std::make_unique<Map>(*view, *fs, MapMode::Still)),
     async(new uv_async_t) {
+
+    options.SetWeak(&options, [](const Nan::WeakCallbackInfo<Nan::Persistent<v8::Object>>&) {
+        // The Nan::Persistent in GetParameter() will be destroyed by
+        // the garbage collector before this callback runs.
+    }, Nan::WeakCallbackType::kParameter);
 
     async->data = this;
     uv_async_init(uv_default_loop(), async, [](UV_ASYNC_PARAMS(handle)) {
@@ -444,7 +451,8 @@ NodeMap::NodeMap(v8::Local<v8::Object> options) :
 }
 
 NodeMap::~NodeMap() {
-    if (valid) release();
+    if (isValid()) release();
+    std::cout << "~NodeMap" << std::endl;
 }
 
 }

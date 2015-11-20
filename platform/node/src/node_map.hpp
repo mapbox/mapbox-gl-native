@@ -43,6 +43,8 @@ public:
     NodeMap(v8::Local<v8::Object>);
     ~NodeMap();
 
+    Nan::Persistent<v8::Object> options;
+
     std::unique_ptr<HeadlessView> view;
     std::unique_ptr<NodeFileSource> fs;
     std::unique_ptr<Map> map;
