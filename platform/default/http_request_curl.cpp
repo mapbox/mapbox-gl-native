@@ -9,7 +9,6 @@
 #include <mbgl/util/run_loop.hpp>
 #include <mbgl/util/string.hpp>
 #include <mbgl/util/timer.hpp>
-#include <mbgl/util/uv.hpp>
 
 #include <curl/curl.h>
 
@@ -24,12 +23,6 @@
 #include <cassert>
 #include <cstring>
 #include <cstdio>
-
-#if UV_VERSION_MAJOR == 0 && UV_VERSION_MINOR <= 10
-#define UV_TIMER_PARAMS(timer) uv_timer_t *timer, int
-#else
-#define UV_TIMER_PARAMS(timer) uv_timer_t *timer
-#endif
 
 void handleError(CURLMcode code) {
     if (code != CURLM_OK) {
@@ -59,10 +52,10 @@ public:
                                std::shared_ptr<const Response>) final;
 
     static int handleSocket(CURL *handle, curl_socket_t s, int action, void *userp, void *socketp);
-    static void perform(uv_poll_t *req, int status, int events);
     static int startTimeout(CURLM *multi, long timeout_ms, void *userp);
     static void onTimeout(HTTPCURLContext *context);
 
+    void perform(curl_socket_t s, util::RunLoop::Event event);
     CURL *getHandle();
     void returnHandle(CURL *handle);
     void checkMultiInfo();
@@ -113,42 +106,6 @@ private:
     curl_slist *headers = nullptr;
 
     char error[CURL_ERROR_SIZE];
-};
-
-
-
-struct Socket {
-private:
-    uv_poll_t poll;
-
-public:
-    HTTPCURLContext *context = nullptr;
-    const curl_socket_t sockfd = 0;
-
-public:
-    Socket(HTTPCURLContext *context_, curl_socket_t sockfd_) : context(context_), sockfd(sockfd_) {
-        assert(context);
-        uv_poll_init_socket(reinterpret_cast<uv_loop_t*>(util::RunLoop::getLoopHandle()), &poll, sockfd);
-        poll.data = this;
-    }
-
-    void start(int events, uv_poll_cb cb) {
-        uv_poll_start(&poll, events, cb);
-    }
-
-    void stop() {
-        assert(poll.data);
-        uv_poll_stop(&poll);
-        uv_close((uv_handle_t *)&poll, [](uv_handle_t *handle) {
-            assert(handle->data);
-            delete reinterpret_cast<Socket *>(handle->data);
-        });
-    }
-
-private:
-    // Make the destructor private to ensure that we can only close the Socket
-    // with stop(), and disallow manual deletion.
-    ~Socket() = default;
 };
 
 // -------------------------------------------------------------------------------------------------
@@ -224,51 +181,45 @@ void HTTPCURLContext::checkMultiInfo() {
     }
 }
 
-void HTTPCURLContext::perform(uv_poll_t *req, int /* status */, int events) {
-    assert(req->data);
-    auto socket = reinterpret_cast<Socket *>(req->data);
-    auto context = socket->context;
-    MBGL_VERIFY_THREAD(context->tid);
+void HTTPCURLContext::perform(curl_socket_t s, util::RunLoop::Event events) {
+    MBGL_VERIFY_THREAD(tid);
 
     int flags = 0;
 
-    if (events & UV_READABLE) {
+    if (events == util::RunLoop::Event::Read) {
         flags |= CURL_CSELECT_IN;
     }
-    if (events & UV_WRITABLE) {
+    if (events == util::RunLoop::Event::Write) {
         flags |= CURL_CSELECT_OUT;
     }
 
 
     int running_handles = 0;
-    curl_multi_socket_action(context->multi, socket->sockfd, flags, &running_handles);
-    context->checkMultiInfo();
+    curl_multi_socket_action(multi, s, flags, &running_handles);
+    checkMultiInfo();
 }
 
 int HTTPCURLContext::handleSocket(CURL * /* handle */, curl_socket_t s, int action, void *userp,
-                              void *socketp) {
-    auto socket = reinterpret_cast<Socket *>(socketp);
+                              void * /* socketp */) {
     assert(userp);
     auto context = reinterpret_cast<HTTPCURLContext *>(userp);
     MBGL_VERIFY_THREAD(context->tid);
 
-    if (!socket && action != CURL_POLL_REMOVE) {
-        socket = new Socket(context, s);
-        curl_multi_assign(context->multi, s, (void *)socket);
-    }
-
     switch (action) {
-    case CURL_POLL_IN:
-        socket->start(UV_READABLE, perform);
+    case CURL_POLL_IN: {
+        using namespace std::placeholders;
+        util::RunLoop::Get()->addWatch(s, util::RunLoop::Event::Read,
+                std::bind(&HTTPCURLContext::perform, context, _1, _2));
         break;
-    case CURL_POLL_OUT:
-        socket->start(UV_WRITABLE, perform);
+    }
+    case CURL_POLL_OUT: {
+        using namespace std::placeholders;
+        util::RunLoop::Get()->addWatch(s, util::RunLoop::Event::Write,
+                std::bind(&HTTPCURLContext::perform, context, _1, _2));
         break;
+    }
     case CURL_POLL_REMOVE:
-        if (socket) {
-            socket->stop();
-            curl_multi_assign(context->multi, s, nullptr);
-        }
+        util::RunLoop::Get()->removeWatch(s);
         break;
     default:
         throw std::runtime_error("Unhandled CURL socket action");

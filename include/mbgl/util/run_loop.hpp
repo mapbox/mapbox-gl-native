@@ -2,6 +2,7 @@
 #define MBGL_UTIL_RUN_LOOP
 
 #include <mbgl/util/noncopyable.hpp>
+#include <mbgl/util/util.hpp>
 #include <mbgl/util/work_task.hpp>
 #include <mbgl/util/work_request.hpp>
 
@@ -23,6 +24,13 @@ public:
         New,
     };
 
+    enum class Event : uint8_t {
+        None      = 0,
+        Read      = 1,
+        Write     = 2,
+        ReadWrite = Read | Write,
+    };
+
     RunLoop(Type type = Type::Default);
     ~RunLoop();
 
@@ -32,6 +40,10 @@ public:
     void run();
     void runOnce();
     void stop();
+
+    // So far only needed by the libcurl backend.
+    void addWatch(int fd, Event, std::function<void(int, Event)>&& callback);
+    void removeWatch(int fd);
 
     // Invoke fn(args...) on this RunLoop.
     template <class Fn, class... Args>
@@ -96,6 +108,8 @@ public:
     }
 
 private:
+    MBGL_STORE_THREAD(tid)
+
     template <class F, class P>
     class Invoker : public WorkTask {
     public:
