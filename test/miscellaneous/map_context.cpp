@@ -13,9 +13,9 @@ TEST(MapContext, DoubleStyleLoad) {
     std::shared_ptr<HeadlessDisplay> display = std::make_shared<HeadlessDisplay>();
     HeadlessView view(display, 1, 512, 512);
     DefaultFileSource fileSource(nullptr);
-    MapData data(MapMode::Continuous, GLContextMode::Unique, view.getPixelRatio());
 
-    util::Thread<MapContext> context({"Map", util::ThreadType::Map, util::ThreadPriority::Regular}, view, fileSource, data);
+    util::Thread<MapContext> context({"Map", util::ThreadType::Map, util::ThreadPriority::Regular},
+        view, fileSource, MapMode::Continuous, GLContextMode::Unique, view.getPixelRatio());
 
     context.invokeSync(&MapContext::setStyleJSON, "", "");
     context.invokeSync(&MapContext::setStyleJSON, "", "");
