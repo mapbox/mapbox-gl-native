@@ -74,6 +74,7 @@ void ShapeAnnotationImpl::updateStyle(Style& style) {
         layer->id = layerID;
         layer->source = AnnotationManager::SourceID;
         layer->sourceLayer = layer->id;
+        layer->visibility = VisibilityType::Visible;
 
         style.addLayer(std::move(layer), sourceLayer->id);
     }
