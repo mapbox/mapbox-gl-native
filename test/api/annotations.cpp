@@ -14,6 +14,11 @@
 
 using namespace mbgl;
 
+std::shared_ptr<SpriteImage> defaultMarker() {
+    PremultipliedImage image = decodeImage(util::read_file("test/fixtures/sprites/default_marker.png"));
+    return std::make_shared<SpriteImage>(image.width, image.height, 1.0, std::string(reinterpret_cast<char*>(image.data.get()), image.size()));
+}
+
 PremultipliedImage render(Map& map) {
     std::promise<PremultipliedImage> promise;
     map.renderStill([&](std::exception_ptr, PremultipliedImage&& image) {
@@ -35,7 +40,8 @@ TEST(Annotations, PointAnnotation) {
 
     Map map(view, fileSource, MapMode::Still);
     map.setStyleJSON(util::read_file("test/fixtures/api/empty.json"), "");
-    map.addPointAnnotation(PointAnnotation({ 0, -20 }, "default_marker"));
+    map.setSprite("default_marker", defaultMarker());
+    map.addPointAnnotation(PointAnnotation({ 0, 0 }, "default_marker"));
 
     checkRendering(map, "point_annotation");
 }
@@ -99,11 +105,12 @@ TEST(Annotations, AddMultiple) {
 
     Map map(view, fileSource, MapMode::Still);
     map.setStyleJSON(util::read_file("test/fixtures/api/empty.json"), "");
-    map.addPointAnnotation(PointAnnotation({ 0, -20 }, "default_marker"));
+    map.setSprite("default_marker", defaultMarker());
+    map.addPointAnnotation(PointAnnotation({ 0, -10 }, "default_marker"));
 
     render(map);
 
-    map.addPointAnnotation(PointAnnotation({ 0, 20 }, "default_marker"));
+    map.addPointAnnotation(PointAnnotation({ 0, 10 }, "default_marker"));
 
     checkRendering(map, "add_multiple");
 }
@@ -135,6 +142,7 @@ TEST(Annotations, RemovePoint) {
 
     Map map(view, fileSource, MapMode::Still);
     map.setStyleJSON(util::read_file("test/fixtures/api/empty.json"), "");
+    map.setSprite("default_marker", defaultMarker());
     uint32_t point = map.addPointAnnotation(PointAnnotation({ 0, 0 }, "default_marker"));
 
     render(map);
@@ -185,24 +193,12 @@ TEST(Annotations, SwitchStyle) {
 
     Map map(view, fileSource, MapMode::Still);
     map.setStyleJSON(util::read_file("test/fixtures/api/empty.json"), "");
-    map.addPointAnnotation(PointAnnotation({ 0, -20 }, "default_marker"));
+    map.setSprite("default_marker", defaultMarker());
+    map.addPointAnnotation(PointAnnotation({ 0, 0 }, "default_marker"));
 
     render(map);
 
     map.setStyleJSON(util::read_file("test/fixtures/api/empty.json"), "");
 
     checkRendering(map, "switch_style");
-}
-
-TEST(Annotations, CustomIcon) {
-    auto display = std::make_shared<mbgl::HeadlessDisplay>();
-    HeadlessView view(display, 1);
-    DefaultFileSource fileSource(nullptr);
-
-    Map map(view, fileSource, MapMode::Still);
-    map.setStyleJSON(util::read_file("test/fixtures/api/empty.json"), "");
-    map.setSprite("cafe", std::make_shared<SpriteImage>(12, 12, 1, std::string(12 * 12 * 4, '\xFF')));
-    map.addPointAnnotation(PointAnnotation({ 0, 0 }, "cafe"));
-
-    checkRendering(map, "custom_icon");
 }

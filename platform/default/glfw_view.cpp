@@ -117,6 +117,13 @@ void GLFWView::initialize(mbgl::Map *map_) {
     View::initialize(map_);
 }
 
+void GLFWView::notifyMapChange(mbgl::MapChange change) {
+    if (change == mbgl::MapChange::MapChangeDidFinishLoadingMap && !initializedDefaultMarker) {
+        initializedDefaultMarker = true;
+        map->setSprite("default_marker", makeSpriteImage(22, 22, 1));
+    }
+}
+
 void GLFWView::onKey(GLFWwindow *window, int key, int /*scancode*/, int action, int mods) {
     GLFWView *view = reinterpret_cast<GLFWView *>(glfwGetWindowUserPointer(window));
 
@@ -234,7 +241,7 @@ void GLFWView::addRandomPointAnnotations(int count) {
     std::vector<mbgl::PointAnnotation> points;
 
     for (int i = 0; i < count; i++) {
-        points.emplace_back(makeRandomPoint(), "marker-15");
+        points.emplace_back(makeRandomPoint(), "default_marker");
     }
 
     auto newIDs = map->addPointAnnotations(points);
