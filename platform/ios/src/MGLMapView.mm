@@ -157,6 +157,8 @@ public:
     MBGLView *_mbglView;
     std::shared_ptr<mbgl::SQLiteCache> _mbglFileCache;
     mbgl::DefaultFileSource *_mbglFileSource;
+    
+    BOOL _opaque;
 
     NS_MUTABLE_ARRAY_OF(NSURL *) *_bundledStyleURLs;
     
@@ -257,6 +259,7 @@ std::chrono::steady_clock::duration MGLDurationInSeconds(float duration)
 - (void)commonInit
 {
     _isTargetingInterfaceBuilder = NSProcessInfo.processInfo.mgl_isInterfaceBuilderDesignablesAgent;
+    _opaque = YES;
 
     BOOL background = [UIApplication sharedApplication].applicationState == UIApplicationStateBackground;
     if (!background)
@@ -450,6 +453,7 @@ std::chrono::steady_clock::duration MGLDurationInSeconds(float duration)
     _glView.drawableStencilFormat = GLKViewDrawableStencilFormat8;
     _glView.drawableDepthFormat = GLKViewDrawableDepthFormat16;
     _glView.contentScaleFactor = [UIScreen instancesRespondToSelector:@selector(nativeScale)] ? [[UIScreen mainScreen] nativeScale] : [[UIScreen mainScreen] scale];
+    _glView.layer.opaque = _opaque;
     _glView.delegate = self;
     [_glView bindDrawable];
     [self insertSubview:_glView atIndex:0];
@@ -712,6 +716,16 @@ std::chrono::steady_clock::duration MGLDurationInSeconds(float duration)
     [constraintParentView addConstraints:self.attributionButtonConstraints];
 
     [super updateConstraints];
+}
+
+- (BOOL)isOpaque
+{
+    return _opaque;
+}
+
+- (void)setOpaque:(BOOL)opaque
+{
+    _glView.layer.opaque = _opaque = opaque;
 }
 
 // This is the delegate of the GLKView object's display call.
