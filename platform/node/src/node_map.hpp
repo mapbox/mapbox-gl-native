@@ -1,8 +1,7 @@
 #pragma once
 
-#include "node_file_source.hpp"
-
 #include <mbgl/map/map.hpp>
+#include <mbgl/storage/file_source.hpp>
 #include <mbgl/platform/default/headless_view.hpp>
 
 #pragma GCC diagnostic push
@@ -16,7 +15,8 @@
 
 namespace node_mbgl {
 
-class NodeMap : public Nan::ObjectWrap {
+class NodeMap : public Nan::ObjectWrap,
+                public mbgl::FileSource {
 public:
     struct RenderOptions;
     class RenderWorker;
@@ -43,8 +43,9 @@ public:
     NodeMap(v8::Local<v8::Object>);
     ~NodeMap();
 
+    std::unique_ptr<mbgl::FileRequest> request(const mbgl::Resource&, Callback);
+
     mbgl::HeadlessView view;
-    NodeFileSource fs;
     std::unique_ptr<mbgl::Map> map;
 
     std::exception_ptr error;

@@ -1,8 +1,11 @@
 #include "node_map.hpp"
+#include "node_request.hpp"
+#include "node_mapbox_gl_native.hpp"
 
 #include <mbgl/platform/default/headless_display.hpp>
 #include <mbgl/map/still_image.hpp>
 #include <mbgl/util/exception.hpp>
+#include <mbgl/util/work_request.hpp>
 
 #include <unistd.h>
 
@@ -42,7 +45,7 @@ const static char* releasedMessage() {
 NAN_MODULE_INIT(NodeMap::Init) {
     v8::Local<v8::FunctionTemplate> tpl = Nan::New<v8::FunctionTemplate>(New);
 
-    tpl->InstanceTemplate()->SetInternalFieldCount(1);
+    tpl->InstanceTemplate()->SetInternalFieldCount(2);
     tpl->SetClassName(Nan::New("Map").ToLocalChecked());
 
     Nan::SetPrototypeMethod(tpl, "load", Load);
@@ -123,6 +126,8 @@ NAN_METHOD(NodeMap::New) {
      && !Nan::Get(options, Nan::New("ratio").ToLocalChecked()).ToLocalChecked()->IsNumber()) {
         return Nan::ThrowError("Options object 'ratio' property must be a number");
     }
+
+    info.This()->SetInternalField(1, options);
 
     try {
         auto nodeMap = new NodeMap(options);
@@ -427,8 +432,7 @@ NodeMap::NodeMap(v8::Local<v8::Object> options) :
         Nan::HandleScope scope;
         return Nan::Has(options, Nan::New("ratio").ToLocalChecked()).FromJust() ? Nan::Get(options, Nan::New("ratio").ToLocalChecked()).ToLocalChecked()->NumberValue() : 1.0;
     }()),
-    fs(options),
-    map(std::make_unique<mbgl::Map>(view, fs, mbgl::MapMode::Still)),
+    map(std::make_unique<mbgl::Map>(view, *this, mbgl::MapMode::Still)),
     async(new uv_async_t) {
 
     async->data = this;
@@ -442,6 +446,29 @@ NodeMap::NodeMap(v8::Local<v8::Object> options) :
 
 NodeMap::~NodeMap() {
     if (valid) release();
+}
+
+class NodeFileSourceRequest : public mbgl::FileRequest {
+public:
+    std::unique_ptr<mbgl::WorkRequest> workRequest;
+};
+
+std::unique_ptr<mbgl::FileRequest> NodeMap::request(const mbgl::Resource& resource, Callback cb1) {
+    auto req = std::make_unique<NodeFileSourceRequest>();
+
+    // This function can be called from any thread. Make sure we're executing the
+    // JS implementation in the node event loop.
+    req->workRequest = NodeRunLoop().invokeWithCallback([this] (mbgl::Resource res, Callback cb2) {
+        Nan::HandleScope scope;
+
+        auto requestHandle = NodeRequest::Create(res, cb2)->ToObject();
+        auto callbackHandle = Nan::GetFunction(Nan::New<v8::FunctionTemplate>(NodeRequest::Respond, requestHandle)).ToLocalChecked();
+
+        v8::Local<v8::Value> argv[] = { requestHandle, callbackHandle };
+        Nan::MakeCallback(handle()->GetInternalField(1)->ToObject(), "request", 2, argv);
+    }, cb1, resource);
+
+    return std::move(req);
 }
 
 }

@@ -19,8 +19,6 @@
         'platform/node/src/node_mapbox_gl_native.cpp',
         'platform/node/src/node_log.hpp',
         'platform/node/src/node_log.cpp',
-        'platform/node/src/node_file_source.hpp',
-        'platform/node/src/node_file_source.cpp',
         'platform/node/src/node_map.hpp',
         'platform/node/src/node_map.cpp',
         'platform/node/src/node_request.hpp',

@@ -1,5 +1,4 @@
 #include "node_request.hpp"
-#include "node_file_source.hpp"
 #include <mbgl/storage/response.hpp>
 
 #include <cmath>
