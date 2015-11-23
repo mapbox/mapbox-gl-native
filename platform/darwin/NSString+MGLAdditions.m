@@ -1,8 +1,8 @@
 #import "NSString+MGLAdditions.h"
 
-@implementation NSString (MGLAdditions)
+void mgl_linkStringCategory() {}
 
-void mgl_linkStringCategory(){}
+@implementation NSString (MGLAdditions)
 
 - (nullable NSString *)mgl_stringOrNilIfEmpty
 {

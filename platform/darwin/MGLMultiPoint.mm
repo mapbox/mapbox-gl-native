@@ -1,7 +1,16 @@
-#import "MGLMultiPoint.h"
-#import "MGLGeometry.h"
+#import "MGLMultiPoint_Private.h"
+#import "MGLGeometry_Private.h"
 
 #import <mbgl/util/geo.hpp>
+
+mbgl::Color MGLColorObjectFromCGColorRef(CGColorRef cgColor) {
+    if (!cgColor) {
+        return {{ 0, 0, 0, 0 }};
+    }
+    NSCAssert(CGColorGetNumberOfComponents(cgColor) >= 4, @"Color must have at least 4 components");
+    const CGFloat *components = CGColorGetComponents(cgColor);
+    return {{ (float)components[0], (float)components[1], (float)components[2], (float)components[3] }};
+}
 
 @implementation MGLMultiPoint
 {
@@ -98,6 +107,30 @@
     );
 
     return _bounds.intersects(area);
+}
+
+- (void)addShapeAnnotationObjectToCollection:(std::vector<mbgl::ShapeAnnotation> &)shapes withDelegate:(id <MGLMultiPointDelegate>)delegate {
+    NSUInteger count = self.pointCount;
+    if (count == 0) {
+        return;
+    }
+    
+    CLLocationCoordinate2D *coordinates = (CLLocationCoordinate2D *)malloc(count * sizeof(CLLocationCoordinate2D));
+    NSAssert(coordinates, @"Unable to allocate annotation with %lu points", (unsigned long)count);
+    [self getCoordinates:coordinates range:NSMakeRange(0, count)];
+    
+    mbgl::AnnotationSegment segment;
+    segment.reserve(count);
+    for (NSUInteger i = 0; i < count; i++) {
+        segment.push_back(MGLLatLngFromLocationCoordinate2D(coordinates[i]));
+    }
+    free(coordinates);
+    shapes.emplace_back(mbgl::AnnotationSegments {{ segment }},
+                        [self shapeAnnotationPropertiesObjectWithDelegate:delegate]);
+}
+
+- (mbgl::ShapeAnnotation::Properties)shapeAnnotationPropertiesObjectWithDelegate:(__unused id <MGLMultiPointDelegate>)delegate {
+    return mbgl::ShapeAnnotation::Properties();
 }
 
 @end

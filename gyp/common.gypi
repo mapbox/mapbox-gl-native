@@ -24,7 +24,7 @@
           ],
           'GCC_WARN_PEDANTIC': 'YES',
           'GCC_WARN_UNINITIALIZED_AUTOS': 'YES_AGGRESSIVE',
-          'MACOSX_DEPLOYMENT_TARGET': '10.9',
+          'MACOSX_DEPLOYMENT_TARGET': '10.10',
         },
       }, {
         'cflags_cc': [

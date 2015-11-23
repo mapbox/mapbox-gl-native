@@ -39,8 +39,10 @@
 	</dict>
 	<key>NSHumanReadableCopyright</key>
 	<string>(c) 2014 Mapbox</string>
+	<key>NSLocationAlwaysUsageDescription</key>
+	<string>The map will ALWAYS display the user's location.</string>
 	<key>NSLocationWhenInUseUsageDescription</key>
-	<string>The map will display the user&apos;s location.</string>
+	<string>The map will display the user's location.</string>
 	<key>UILaunchStoryboardName</key>
 	<string>Default</string>
 	<key>UIRequiredDeviceCapabilities</key>
@@ -60,7 +62,5 @@
 		<string>UIInterfaceOrientationLandscapeLeft</string>
 		<string>UIInterfaceOrientationLandscapeRight</string>
 	</array>
-	<key>NSLocationAlwaysUsageDescription</key>
-	<string>The map will ALWAYS display the user&apos;s location.</string>
 </dict>
 </plist>

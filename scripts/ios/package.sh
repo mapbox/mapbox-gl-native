@@ -99,6 +99,9 @@ echo "Created ${OUTPUT}/static/lib${NAME}.a"
 
 step "Copying Headers..."
 mkdir -p "${OUTPUT}/static/Headers"
+for i in `ls -R include/mbgl/darwin | grep -vi private`; do
+    cp -pv include/mbgl/darwin/$i "${OUTPUT}/static/Headers"
+done
 for i in `ls -R include/mbgl/ios | grep -vi private`; do
     cp -pv include/mbgl/ios/$i "${OUTPUT}/static/Headers"
 done
