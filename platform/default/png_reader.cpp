@@ -1,4 +1,5 @@
 #include <mbgl/util/image.hpp>
+#include <mbgl/util/premultiply.hpp>
 #include <mbgl/platform/log.hpp>
 
 #pragma GCC diagnostic push
@@ -88,7 +89,7 @@ PremultipliedImage decodePNG(const uint8_t* data, size_t size) {
     int color_type = 0;
     png_get_IHDR(png_ptr, info_ptr, &width, &height, &bit_depth, &color_type, 0, 0, 0);
 
-    PremultipliedImage image { width, height };
+    UnassociatedImage image { width, height };
 
     if (color_type == PNG_COLOR_TYPE_PALETTE)
         png_set_expand(png_ptr);
@@ -108,14 +109,6 @@ PremultipliedImage decodePNG(const uint8_t* data, size_t size) {
 
     png_set_add_alpha(png_ptr, 0xff, PNG_FILLER_AFTER);
 
-    double gamma;
-    if (png_get_gAMA(png_ptr, info_ptr, &gamma))
-        png_set_gamma(png_ptr, 2.2, gamma);
-
-#ifdef PNG_ALPHA_PREMULTIPLIED
-    png_set_alpha_mode(png_ptr, PNG_ALPHA_PREMULTIPLIED, PNG_GAMMA_LINEAR);
-#endif
-
     if (png_get_interlace_type(png_ptr,info_ptr) == PNG_INTERLACE_ADAM7) {
         png_set_interlace_handling(png_ptr); // FIXME: libpng bug?
         // according to docs png_read_image
@@ -132,22 +125,9 @@ PremultipliedImage decodePNG(const uint8_t* data, size_t size) {
         rows[row] = image.data.get() + row * width * 4;
     png_read_image(png_ptr, rows.get());
 
-#ifndef PNG_ALPHA_PREMULTIPLIED
-    // Manually premultiply the image if libpng didn't do it for us.
-    for (unsigned row = 0; row < height_; ++row) {
-        for (unsigned x = 0; x < width_; x++) {
-            png_byte* ptr = &(rows[row][x * 4]);
-            const float a = ptr[3] / 255.0f;
-            ptr[0] *= a;
-            ptr[1] *= a;
-            ptr[2] *= a;
-        }
-    }
-#endif
-
     png_read_end(png_ptr, 0);
 
-    return image;
+    return util::premultiply(std::move(image));
 }
 
 }
