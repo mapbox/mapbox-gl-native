@@ -90,7 +90,7 @@ TEST_F(Storage, AssetNonExistentFile) {
 #ifdef MBGL_ASSET_ZIP
         EXPECT_EQ("No such file", res.error->message);
 #elif MBGL_ASSET_FS
-        EXPECT_EQ("no such file or directory", res.error->message);
+        EXPECT_EQ("No such file or directory", res.error->message);
 #endif
         loop.stop();
         NonExistentFile.finish();

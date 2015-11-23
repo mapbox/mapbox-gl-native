@@ -29,7 +29,7 @@ TEST_F(Storage, AssetReadDirectory) {
 #ifdef MBGL_ASSET_ZIP
         EXPECT_EQ("No such file", res.error->message);
 #elif MBGL_ASSET_FS
-        EXPECT_EQ("illegal operation on a directory", res.error->message);
+        EXPECT_EQ("Is a directory", res.error->message);
 #endif
 
         loop.stop();

@@ -1,58 +1,123 @@
 #include <mbgl/storage/asset_context_base.hpp>
 #include <mbgl/storage/resource.hpp>
 #include <mbgl/storage/response.hpp>
-#include <mbgl/util/run_loop.hpp>
-#include <mbgl/util/util.hpp>
-#include <mbgl/util/url.hpp>
-#include <mbgl/util/uv.hpp>
 #include <mbgl/util/string.hpp>
+#include <mbgl/util/thread.hpp>
+#include <mbgl/util/url.hpp>
+#include <mbgl/util/util.hpp>
 
-#include <cassert>
-#include <limits>
+#include <errno.h>
+#include <fcntl.h>
+#include <sys/stat.h>
+#include <sys/types.h>
+#include <unistd.h>
+
+namespace {
+
+struct FDHolder {
+    FDHolder(int fd_) : fd(fd_) {}
+
+    ~FDHolder() {
+        if (fd >= 0) ::close(fd);
+    }
+
+    int fd;
+};
+
+class FileIOWorker {
+public:
+    FileIOWorker() = default;
+
+    void open(const std::string& path, int flags, mode_t mode,
+              std::function<void(std::unique_ptr<FDHolder>)> cb) {
+        // FDHolder is needed because if the request gets canceled
+        // we would otherwise end up with a fd leaking.
+        int ret = ::open(path.c_str(), flags, mode);
+        cb(std::make_unique<FDHolder>(ret < 0 ? -errno : ret));
+    }
+
+    void fstat(int fd, std::function<void (int, std::unique_ptr<struct stat>)> cb) {
+        std::unique_ptr<struct stat> buf = std::make_unique<struct stat>();
+        int ret = ::fstat(fd, buf.get());
+        cb(ret < 0 ? -errno : ret, std::move(buf));
+    }
+
+    void read(int fd, size_t size,
+              std::function<void (ssize_t, std::shared_ptr<std::string>)> cb) {
+        std::shared_ptr<std::string> buf = std::make_shared<std::string>();
+        buf->resize(size);
+
+        ssize_t ret = ::read(fd, &buf->front(), size);
+        cb(ret < 0 ? -errno : ret, std::move(buf));
+    }
+
+    void close(int fd, std::function<void (void)> cb) {
+        ::close(fd);
+        cb();
+    }
+};
+
+}
 
 namespace mbgl {
+
+using namespace std::placeholders;
 
 class AssetRequest : public RequestBase {
     MBGL_STORE_THREAD(tid)
 
 public:
-    AssetRequest(const Resource&, Callback, const std::string& assetRoot);
+    AssetRequest(const Resource&, Callback, const std::string& assetRoot,
+                 util::Thread<FileIOWorker> *worker);
     ~AssetRequest();
 
+    // RequestBase implementation.
     void cancel() final;
 
-    static void fileOpened(uv_fs_t *req);
-    static void fileStated(uv_fs_t *req);
-    static void fileRead(uv_fs_t *req);
-    static void fileClosed(uv_fs_t *req);
-    static void notifyError(uv_fs_t *req);
-    static void cleanup(uv_fs_t *req);
+private:
+    void fileOpened(std::unique_ptr<FDHolder>);
+    void fileStated(int result, std::unique_ptr<struct stat>);
+    void fileRead(int result, std::shared_ptr<std::string>);
+    void fileClosed();
+
+    void notifyError(int result);
+
+    void close();
+    void cleanup();
 
     std::string assetRoot;
-    bool canceled = false;
-    uv_fs_t req;
-    uv_file fd = -1;
-    uv_buf_t buffer;
     std::unique_ptr<Response> response;
+
+    int fd = -1;
+
+    util::Thread<FileIOWorker> *worker;
+    std::unique_ptr<WorkRequest> request;
 };
 
 class AssetFSContext : public AssetContextBase {
+public:
+    AssetFSContext()
+        : worker({"FileIOWorker", util::ThreadType::Worker, util::ThreadPriority::Regular}) {}
+
+private:
     RequestBase* createRequest(const Resource& resource,
                                RequestBase::Callback callback,
                                const std::string& assetRoot) final {
-        return new AssetRequest(resource, callback, assetRoot);
+        return new AssetRequest(resource, callback, assetRoot, &worker);
     }
+
+    util::Thread<FileIOWorker> worker;
 };
 
 AssetRequest::~AssetRequest() {
     MBGL_VERIFY_THREAD(tid);
 }
 
-AssetRequest::AssetRequest(const Resource& resource_, Callback callback_, const std::string& assetRoot_)
+AssetRequest::AssetRequest(const Resource& resource_, Callback callback_,
+    const std::string& assetRoot_, util::Thread<FileIOWorker> *worker_)
     : RequestBase(resource_, callback_),
-      assetRoot(assetRoot_) {
-    req.data = this;
-
+      assetRoot(assetRoot_),
+      worker(worker_) {
     const auto &url = resource.url;
     std::string path;
     if (url.size() <= 8 || url[8] == '/') {
@@ -63,157 +128,105 @@ AssetRequest::AssetRequest(const Resource& resource_, Callback callback_, const 
         path = assetRoot + "/" + mbgl::util::percentDecode(url.substr(8));
     }
 
-    auto loop = static_cast<uv_loop_t*>(util::RunLoop::getLoopHandle());
-    uv_fs_open(loop, &req, path.c_str(), O_RDONLY, S_IRUSR, fileOpened);
-}
-
-void AssetRequest::fileOpened(uv_fs_t *req) {
-    assert(req->data);
-    auto self = reinterpret_cast<AssetRequest *>(req->data);
-    MBGL_VERIFY_THREAD(self->tid);
-
-    if (req->result < 0) {
-        // Opening failed or was canceled. There isn't much left we can do.
-        notifyError(req);
-        cleanup(req);
-    } else {
-        const uv_file fd = uv_file(req->result);
-
-        // We're going to reuse this handle, so we need to cleanup first.
-        uv_fs_req_cleanup(req);
-
-        if (self->canceled) {
-            // The request was canceled.
-            uv_fs_close(req->loop, req, fd, fileClosed);
-        } else {
-            self->fd = fd;
-            uv_fs_fstat(req->loop, req, fd, fileStated);
-        }
-    }
-}
-
-void AssetRequest::fileStated(uv_fs_t *req) {
-    assert(req->data);
-    auto self = reinterpret_cast<AssetRequest *>(req->data);
-    MBGL_VERIFY_THREAD(self->tid);
-
-    if (req->result != 0 || self->canceled) {
-        // Stating failed or was canceled. We already have an open file handle
-        // though, which we'll have to close.
-        notifyError(req);
-
-        uv_fs_req_cleanup(req);
-        uv_fs_close(req->loop, req, self->fd, fileClosed);
-    } else {
-#if UV_VERSION_MAJOR == 0 && UV_VERSION_MINOR <= 10
-        auto stat = static_cast<const uv_statbuf_t *>(req->ptr);
-#else
-        auto stat = static_cast<const uv_stat_t *>(req->ptr);
-#endif
-        if (stat->st_size > std::numeric_limits<int>::max()) {
-            // File is too large for us to open this way because uv_buf's only support unsigned
-            // ints as maximum size.
-            auto response = std::make_unique<Response>();
-#if UV_VERSION_MAJOR == 0 && UV_VERSION_MINOR <= 10
-            auto message = uv_strerror(uv_err_t {UV_EFBIG, 0});
-#else
-            auto message = uv_strerror(UV_EFBIG);
-#endif
-            response->error =
-                std::make_unique<Response::Error>(Response::Error::Reason::Other, message);
-            self->notify(std::move(response));
-
-            uv_fs_req_cleanup(req);
-            uv_fs_close(req->loop, req, self->fd, fileClosed);
-        } else {
-            self->response = std::make_unique<Response>();
-#if UV_VERSION_MAJOR == 0 && UV_VERSION_MINOR <= 10
-#ifdef __APPLE__
-            self->response->modified = Seconds(stat->st_mtimespec.tv_sec);
-#else
-            self->response->modified = Seconds(stat->st_mtime);
-#endif
-#else
-            self->response->modified = Seconds(stat->st_mtim.tv_sec);
-#endif
-            self->response->etag = util::toString(stat->st_ino);
-            const auto size = (unsigned int)(stat->st_size);
-            auto data = std::make_shared<std::string>();
-            self->response->data = data;
-            data->resize(size);
-            self->buffer = uv_buf_init(const_cast<char *>(data->data()), size);
-            uv_fs_req_cleanup(req);
-#if UV_VERSION_MAJOR == 0 && UV_VERSION_MINOR <= 10
-            uv_fs_read(req->loop, req, self->fd, self->buffer.base, self->buffer.len, -1, fileRead);
-#else
-            uv_fs_read(req->loop, req, self->fd, &self->buffer, 1, 0, fileRead);
-#endif
-        }
-    }
-}
-
-void AssetRequest::fileRead(uv_fs_t *req) {
-    assert(req->data);
-    auto self = reinterpret_cast<AssetRequest *>(req->data);
-    MBGL_VERIFY_THREAD(self->tid);
-
-    if (req->result < 0 || self->canceled) {
-        // Stating failed or was canceled. We already have an open file handle
-        // though, which we'll have to close.
-        notifyError(req);
-    } else {
-        // File was successfully read.
-        self->notify(std::move(self->response));
-    }
-
-    uv_fs_req_cleanup(req);
-    uv_fs_close(req->loop, req, self->fd, fileClosed);
-}
-
-void AssetRequest::fileClosed(uv_fs_t *req) {
-    assert(req->data);
-    auto self = reinterpret_cast<AssetRequest *>(req->data);
-    MBGL_VERIFY_THREAD(self->tid);
-    (void(self)); // Silence unused variable error in Release mode
-
-    if (req->result < 0) {
-        // Closing the file failed. But there isn't anything we can do.
-    }
-
-    cleanup(req);
-}
-
-void AssetRequest::notifyError(uv_fs_t *req) {
-    assert(req->data);
-    auto self = reinterpret_cast<AssetRequest *>(req->data);
-    MBGL_VERIFY_THREAD(self->tid);
-
-    if (req->result < 0 && !self->canceled && req->result != UV_ECANCELED) {
-        auto response = std::make_unique<Response>();
-        Response::Error::Reason reason = Response::Error::Reason::Other;
-        if (req->result == UV_ENOENT || req->result == UV_EISDIR) {
-            reason = Response::Error::Reason::NotFound;
-        }
-        response->error = std::make_unique<Response::Error>(reason,
-                                                            uv::getFileRequestError(req));
-        self->notify(std::move(response));
-    }
-}
-
-void AssetRequest::cleanup(uv_fs_t *req) {
-    assert(req->data);
-    auto self = reinterpret_cast<AssetRequest *>(req->data);
-    MBGL_VERIFY_THREAD(self->tid);
-    uv_fs_req_cleanup(req);
-    delete self;
+    request = worker->invokeWithCallback(&FileIOWorker::open,
+        std::bind(&AssetRequest::fileOpened, this, _1), path, O_RDONLY, S_IRUSR);
 }
 
 void AssetRequest::cancel() {
-    canceled = true;
-    // uv_cancel fails frequently when the request has already been started.
-    // In that case, we have to let it complete and check the canceled bool
-    // instead. The cancelation callback will delete the AssetRequest object.
-    uv_cancel((uv_req_t *)&req);
+    MBGL_VERIFY_THREAD(tid);
+
+    request.reset();
+    close();
+}
+
+void AssetRequest::fileOpened(std::unique_ptr<FDHolder> holder) {
+    MBGL_VERIFY_THREAD(tid);
+
+    std::swap(fd, holder->fd);
+
+    if (fd < 0) {
+        // Opening failed. There isn't much left we can do.
+        notifyError(fd);
+        cleanup();
+
+        return;
+    }
+
+    request = worker->invokeWithCallback(&FileIOWorker::fstat,
+        std::bind(&AssetRequest::fileStated, this, _1, _2), fd);
+}
+
+void AssetRequest::fileStated(int result, std::unique_ptr<struct stat> stat) {
+    MBGL_VERIFY_THREAD(tid);
+
+    if (result != 0) {
+        // Stating failed. We already have an open file handle
+        // though, which we'll have to close.
+        notifyError(result);
+        close();
+    } else {
+        response = std::make_unique<Response>();
+        response->modified = Seconds(stat->st_mtime);
+        response->etag = util::toString(stat->st_ino);
+
+        request = worker->invokeWithCallback(&FileIOWorker::read,
+            std::bind(&AssetRequest::fileRead, this, _1, _2), fd, stat->st_size);
+    }
+}
+
+void AssetRequest::fileRead(int result, std::shared_ptr<std::string> data) {
+    MBGL_VERIFY_THREAD(tid);
+
+    if (result < 0) {
+        // Reading failed. We already have an open file handle
+        // though, which we'll have to close.
+        notifyError(result);
+    } else {
+        response->data = data;
+        notify(std::move(response));
+    }
+
+    close();
+}
+
+void AssetRequest::fileClosed() {
+    MBGL_VERIFY_THREAD(tid);
+
+    cleanup();
+}
+
+void AssetRequest::close() {
+    MBGL_VERIFY_THREAD(tid);
+
+    if (fd >= 0) {
+        request = worker->invokeWithCallback(&FileIOWorker::close,
+            std::bind(&AssetRequest::fileClosed, this), fd);
+        fd = -1;
+    } else {
+        cleanup();
+    }
+}
+
+void AssetRequest::cleanup() {
+    MBGL_VERIFY_THREAD(tid);
+
+    delete this;
+}
+
+void AssetRequest::notifyError(int result) {
+    MBGL_VERIFY_THREAD(tid);
+
+    result = std::abs(result);
+    Response::Error::Reason reason = Response::Error::Reason::Other;
+
+    if (result == ENOENT || result == EISDIR) {
+        reason = Response::Error::Reason::NotFound;
+    }
+
+    response = std::make_unique<Response>();
+    response->error = std::make_unique<Response::Error>(reason, ::strerror(result));
+
+    notify(std::move(response));
 }
 
 std::unique_ptr<AssetContextBase> AssetContextBase::createContext() {
