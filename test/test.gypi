@@ -52,6 +52,7 @@
         'miscellaneous/enums.cpp',
         'miscellaneous/functions.cpp',
         'miscellaneous/geo.cpp',
+        'miscellaneous/image.cpp',
         'miscellaneous/map.cpp',
         'miscellaneous/map_context.cpp',
         'miscellaneous/mapbox.cpp',
