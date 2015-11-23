@@ -40,8 +40,8 @@ void PngReader<T>::png_read_data(png_structp png_ptr, png_bytep data, png_size_t
 }
 
 template <typename T>
-PngReader<T>::PngReader(char const* data, std::size_t size)
-    : source_(data,size),
+PngReader<T>::PngReader(const uint8_t* data, std::size_t size)
+    : source_(reinterpret_cast<const char*>(data), size),
       stream_(source_),
       width_(0),
       height_(0),
@@ -115,7 +115,7 @@ unsigned PngReader<T>::height() const
 }
 
 template <typename T>
-void PngReader<T>::read(unsigned x0, unsigned y0, unsigned w, unsigned h, char * image)
+void PngReader<T>::read(unsigned x0, unsigned y0, unsigned w, unsigned h, uint8_t* image)
 {
     stream_.clear();
     stream_.seekg(0, std::ios_base::beg);

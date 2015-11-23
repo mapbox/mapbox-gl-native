@@ -7,7 +7,7 @@
 
 namespace mbgl { namespace util {
 
-inline boost::optional<std::string> type_from_bytes(char const* data, size_t size)
+inline boost::optional<std::string> type_from_bytes(const uint8_t* data, size_t size)
 {
     using result_type = boost::optional<std::string>;
     if (size >= 4)
@@ -42,9 +42,9 @@ inline boost::optional<std::string> type_from_bytes(char const* data, size_t siz
     return result_type();
 }
 
-std::unique_ptr<ImageReader> getImageReader(char const* data, size_t size)
+std::unique_ptr<ImageReader> getImageReader(const uint8_t* data, size_t size)
 {
-    boost::optional<std::string> type = type_from_bytes(data,size);
+    boost::optional<std::string> type = type_from_bytes(data, size);
     if (type)
     {
         if (*type == "png")

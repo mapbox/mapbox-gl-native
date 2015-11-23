@@ -27,7 +27,7 @@ const static bool png_version_check = []() {
 namespace mbgl {
 namespace util {
 
-std::string compress_png(int width, int height, const void *rgba) {
+std::string compress_png(size_t width, size_t height, const uint8_t* rgba) {
     png_voidp error_ptr = 0;
     png_structp png_ptr = png_create_write_struct(PNG_LIBPNG_VER_STRING, error_ptr, NULL, NULL);
     if (!png_ptr) {
@@ -63,7 +63,7 @@ std::string compress_png(int width, int height, const void *rgba) {
         png_bytep *rows = nullptr;
     } pointers(height);
 
-    for (int i = 0; i < height; i++) {
+    for (size_t i = 0; i < height; i++) {
         pointers.rows[i] = (png_bytep)((png_bytep)rgba + width * 4 * i);
     }
 
@@ -78,10 +78,10 @@ Image::Image(std::string const& data)
 {
     try
     {
-        auto reader = getImageReader(data.c_str(), data.size());
+        auto reader = getImageReader(reinterpret_cast<const uint8_t*>(data.c_str()), data.size());
         width = reader->width();
         height = reader->height();
-        img = std::make_unique<char[]>(width * height * 4);
+        img = std::make_unique<uint8_t[]>(width * height * 4);
         reader->read(0, 0, width, height, img.get());
     }
     catch (ImageReaderException const& ex)

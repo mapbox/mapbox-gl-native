@@ -3,17 +3,15 @@
 
 #include <mbgl/util/noncopyable.hpp>
 
-#include <string>
 #include <cstdint>
 
 namespace mbgl {
 
 class StillImage : util::noncopyable {
 public:
-    uint16_t width = 0;
-    uint16_t height = 0;
-    using Pixel = uint32_t;
-    std::unique_ptr<Pixel[]> pixels;
+    size_t width = 0;
+    size_t height = 0;
+    std::unique_ptr<uint8_t[]> pixels;
 };
 
 }

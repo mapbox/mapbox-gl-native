@@ -42,7 +42,7 @@ TEST(Bilinear, Scaling) {
     util::bilinearScale(srcData, srcSize, { 252, 380, 12, 12 }, dstData, dstSize, { 18, 90, 24, 24 }, false);
 
     const std::string data { reinterpret_cast<char *>(dstData), dstSize.x * dstSize.y * sizeof(uint32_t) };
-    util::write_file("test/fixtures/sprites/atlas_actual.png", util::compress_png(dstSize.x, dstSize.y, dstData));
+    util::write_file("test/fixtures/sprites/atlas_actual.png", util::compress_png(dstSize.x, dstSize.y, reinterpret_cast<uint8_t *>(dstData)));
     util::write_file("test/fixtures/sprites/atlas_actual.bin", util::compress(data));
 
     const std::string reference = util::decompress(util::read_file("test/fixtures/sprites/atlas_reference.bin"));

@@ -49,13 +49,13 @@ private:
     int color_type_;
     bool has_alpha_;
 public:
-    PngReader(char const* data, std::size_t size);
+    PngReader(const uint8_t* data, std::size_t size);
     ~PngReader();
     unsigned width() const;
     unsigned height() const;
     inline bool hasAlpha() const { return has_alpha_; }
     bool premultipliedAlpha() const { return true; } // png_set_alpha_mode(png, PNG_ALPHA_PREMULTIPLIED, 2.2)
-    void read(unsigned x,unsigned y, unsigned width, unsigned height, char * image);
+    void read(unsigned x,unsigned y, unsigned width, unsigned height, uint8_t* image);
 private:
     void init();
     static void png_read_data(png_structp png_ptr, png_bytep data, png_size_t length);

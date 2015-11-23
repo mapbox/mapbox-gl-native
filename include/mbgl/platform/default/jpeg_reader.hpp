@@ -51,13 +51,13 @@ private:
     unsigned width_;
     unsigned height_;
 public:
-    JpegReader(char const* data, size_t size);
+    JpegReader(const uint8_t* data, size_t size);
     ~JpegReader();
     unsigned width() const;
     unsigned height() const;
     inline bool hasAlpha() const { return false; }
     inline bool premultipliedAlpha() const { return true; }
-    void read(unsigned x,unsigned y, unsigned w, unsigned h, char *image);
+    void read(unsigned x, unsigned y, unsigned w, unsigned h, uint8_t* image);
 private:
     void init();
     static void on_error(j_common_ptr cinfo);

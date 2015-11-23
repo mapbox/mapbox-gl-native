@@ -13,8 +13,8 @@ namespace mbgl { namespace util {
 
 // ctor
 template <typename T>
-JpegReader<T>::JpegReader(char const* data, size_t size)
-    : source_(data, size),
+JpegReader<T>::JpegReader(const uint8_t* data, size_t size)
+    : source_(reinterpret_cast<const char*>(data), size),
       stream_(source_),
       width_(0),
       height_(0)
@@ -145,7 +145,7 @@ unsigned JpegReader<T>::height() const
 }
 
 template <typename T>
-void JpegReader<T>::read(unsigned x0, unsigned y0, unsigned w, unsigned h, char* image)
+void JpegReader<T>::read(unsigned x0, unsigned y0, unsigned w, unsigned h, uint8_t* image)
 {
     stream_.clear();
     stream_.seekg(0, std::ios_base::beg);

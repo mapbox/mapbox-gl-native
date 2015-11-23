@@ -360,8 +360,7 @@ void NodeMap::renderFinished() {
         cb->Call(1, argv);
     } else if (img) {
         v8::Local<v8::Object> pixels = Nan::NewBuffer(
-            reinterpret_cast<char *>(img->pixels.get()),
-            size_t(img->width) * size_t(img->height) * sizeof(mbgl::StillImage::Pixel),
+            reinterpret_cast<char *>(img->pixels.get()), img->width * img->height * 4,
 
             // Retain the StillImage object until the buffer is deleted.
             [](char *, void *hint) {

@@ -179,7 +179,7 @@ std::unique_ptr<StillImage> HeadlessView::readStillImage() {
     auto image = std::make_unique<StillImage>();
     image->width = w;
     image->height = h;
-    image->pixels = std::make_unique<uint32_t[]>(w * h);
+    image->pixels = std::make_unique<uint8_t[]>(w * h * 4);
 
     MBGL_CHECK_ERROR(glReadPixels(0, 0, w, h, GL_RGBA, GL_UNSIGNED_BYTE, image->pixels.get()));
 

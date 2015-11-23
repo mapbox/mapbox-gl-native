@@ -11,7 +11,7 @@
 namespace mbgl {
 namespace util {
 
-std::string compress_png(int width, int height, const void *rgba) {
+std::string compress_png(size_t width, size_t height, const uint8_t* rgba) {
     CGDataProviderRef provider = CGDataProviderCreateWithData(NULL, rgba, width * height * 4, NULL);
     if (!provider) {
         return "";
@@ -97,7 +97,7 @@ Image::Image(const std::string &source_data) {
     height = uint32_t(CGImageGetHeight(image));
     CGRect rect = {{ 0, 0 }, { static_cast<CGFloat>(width), static_cast<CGFloat>(height) }};
 
-    img = std::make_unique<char[]>(width * height * 4);
+    img = std::make_unique<uint8_t[]>(width * height * 4);
     CGContextRef context = CGBitmapContextCreate(img.get(), width, height, 8, width * 4,
         color_space, kCGImageAlphaPremultipliedLast);
     if (!context) {
