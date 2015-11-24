@@ -18,6 +18,9 @@
 #pragma mark - Internal
 
 + (void)load {
+    // Load all referenced categories due to absence of -ObjC linker flag
+    [MGLCategoryLoader loadCategories];
+
     // Read the initial configuration from Info.plist. The shown-in-app setting
     // preempts the Settings bundle check in -[MGLMapboxEvents init] triggered
     // by setting the access token.
@@ -35,8 +38,6 @@
 // Can be called from any thread.
 //
 + (instancetype) sharedManager {
-    [MGLCategoryLoader loadCategories];
-
     if (NSProcessInfo.processInfo.mgl_isInterfaceBuilderDesignablesAgent) {
         return nil;
     }
