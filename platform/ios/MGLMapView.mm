@@ -44,7 +44,7 @@
 class MBGLView;
 
 NSString *const MGLDefaultStyleMarkerSymbolName = @"default_marker";
-NSString *const MGLMapboxSetupDocumentationURLDisplayString = @"mapbox.com/guides/first-steps-ios-sdk";
+NSString *const MGLMapboxSetupDocumentationURLDisplayString = @"mapbox.com/help/first-steps-ios-sdk";
 
 const NSTimeInterval MGLAnimationDuration = 0.3;
 const CGSize MGLAnnotationUpdateViewportOutset = {150, 150};
