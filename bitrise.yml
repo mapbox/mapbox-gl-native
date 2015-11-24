@@ -67,7 +67,7 @@ workflows:
         run_if: '{{enveq "SKIPCI" "false"}}'
         inputs:
         - webhook_url: "$SLACK_HOOK_URL"
-        - channel: "#gl"
+        - channel: "#gl-bots"
         - from_username: Bitrise
         - from_username_on_error: Bitrise
         - message: 'Build #${BITRISE_BUILD_NUMBER} (${BITRISE_BUILD_URL}) for mapbox/mapbox-gl-native@${BITRISE_GIT_BRANCH}
