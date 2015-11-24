@@ -281,12 +281,7 @@ static UIColor *const kTintColor = [UIColor colorWithRed:0.120 green:0.550 blue:
             dispatch_async(dispatch_get_main_queue(), ^
             {
                 [self.mapView addAnnotations:annotations];
-
-                [self.mapView setCenterCoordinate:CLLocationCoordinate2DMake(38.904722, -77.016389)
-                                        zoomLevel:10
-                                         animated:NO];
-
-                [self.mapView setDirection:0];
+                [self.mapView showAnnotations:annotations animated:YES];
             });
         }
     });
