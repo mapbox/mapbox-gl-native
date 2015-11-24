@@ -2,6 +2,8 @@
 
 ## Android master
 
+- Tokens in style properties can now fall back on defaults: for example, `{name_en:{name:?}}` produces the value of `name_en`, falling back on `name` if `name_en` is undefined, and finally falling back on the string `?` if neither is defined. ([#3081](https://github.com/mapbox/mapbox-gl-native/pull/3081)
+
 ## 2.2.0
 
 - New User Dot location graphics ([#2732](https://github.com/mapbox/mapbox-gl-native/issues/2732)
@@ -22,6 +24,10 @@ Known issues:
   - Resolved in 2.2.0
 
 ## iOS master
+
+- Tokens in style properties can now fall back on defaults: for example, `{name_en:{name:?}}` produces the value of `name_en`, falling back on `name` if `name_en` is undefined, and finally falling back on the string `?` if neither is defined. ([#3081](https://github.com/mapbox/mapbox-gl-native/pull/3081)
+
+## iOS 3.0.0
 
 - If you install this SDK via CocoaPods, CocoaPods version 0.38.0 or above is required. ([#2132](https://github.com/mapbox/mapbox-gl-native/pull/2132))
 - The `styleID` property has been removed from MGLMapView. Instead, set the `styleURL` property to an NSURL in the form `mapbox://styles/STYLE_ID`. If you previously set the style ID in Interface Builder’s Attributes inspector, delete the `styleID` entry from the User Defined Runtime Attributes section of the Identity inspector, then set the new “Style URL” inspectable to a value in the form `mapbox://styles/STYLE_ID`. ([#2632](https://github.com/mapbox/mapbox-gl-native/pull/2632))

@@ -28,6 +28,20 @@ std::string replaceTokens(const std::string &source, const Lookup &lookup) {
             if (brace != end && *brace == '}') {
                 result.append(lookup({ pos + 1, brace }));
                 pos = brace + 1;
+            } else if (brace != end && *brace == ':') {
+                std::string repl = lookup({ pos + 1, brace });
+                result.append(repl);
+                pos = brace + 1;
+                int depth = 1;
+                for (brace++; brace != end && depth > 0; brace++) {
+                    if (*brace == '{') depth++;
+                    else if (*brace == '}') depth--;
+                }
+                if (repl.empty()) {
+                    repl = replaceTokens({ pos, brace - 1 }, lookup);
+                    result.append(repl);
+                }
+                pos = brace;
             } else {
                 result.append(pos, brace);
                 pos = brace;
