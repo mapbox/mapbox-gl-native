@@ -352,19 +352,18 @@ static UIColor *const kTintColor = [UIColor colorWithRed:0.120 green:0.550 blue:
 {
     if ([annotation.title isEqualToString:@"Dropped Marker"]) return nil; // use default marker
 
-    NSString *title = [(MGLPointAnnotation *)annotation title];
-    NSString *lastTwoCharacters = [title substringFromIndex:title.length - 2];
+    NSString *annotationIdentifier = [self identifierOfAnnotation:annotation];
 
     UIColor *color;
 
     // make every tenth annotation blue
-    if ([lastTwoCharacters hasSuffix:@"0"]) {
+    if ([annotationIdentifier hasSuffix:@"0"]) {
         color = [UIColor blueColor];
     } else {
         color = [UIColor redColor];
     }
 
-    MGLAnnotationImage *image = [mapView dequeueReusableAnnotationImageWithIdentifier:lastTwoCharacters];
+    MGLAnnotationImage *image = [mapView dequeueReusableAnnotationImageWithIdentifier:annotationIdentifier];
 
     if ( ! image)
     {
@@ -380,7 +379,7 @@ static UIColor *const kTintColor = [UIColor colorWithRed:0.120 green:0.550 blue:
         CGContextSetStrokeColorWithColor(ctx, [[UIColor blackColor] CGColor]);
         CGContextStrokeRectWithWidth(ctx, rect, 2);
 
-        NSAttributedString *drawString = [[NSAttributedString alloc] initWithString:lastTwoCharacters attributes:@{
+        NSAttributedString *drawString = [[NSAttributedString alloc] initWithString:annotationIdentifier attributes:@{
             NSFontAttributeName: [UIFont fontWithName:@"Arial-BoldMT" size:12],
             NSForegroundColorAttributeName: [UIColor whiteColor] }];
         CGSize stringSize = drawString.size;
@@ -390,7 +389,7 @@ static UIColor *const kTintColor = [UIColor colorWithRed:0.120 green:0.550 blue:
                                        stringSize.height);
         [drawString drawInRect:stringRect];
 
-        image = [MGLAnnotationImage annotationImageWithImage:UIGraphicsGetImageFromCurrentImageContext() reuseIdentifier:lastTwoCharacters];
+        image = [MGLAnnotationImage annotationImageWithImage:UIGraphicsGetImageFromCurrentImageContext() reuseIdentifier:annotationIdentifier];
 
         // don't allow touches on blue annotations
         if ([color isEqual:[UIColor blueColor]]) image.enabled = NO;
@@ -448,6 +447,50 @@ static UIColor *const kTintColor = [UIColor colorWithRed:0.120 green:0.550 blue:
     [UIView animateWithDuration:0.25 animations:^{
         self.navigationItem.rightBarButtonItem.image = newButtonImage;
     }];
+}
+
+- (UIView *)mapView:(__unused MGLMapView *)mapView calloutViewForAnnotation:(__unused id<MGLAnnotation>)annotation
+{
+    NSString *annotationIdentifier = [self identifierOfAnnotation: annotation];
+
+    // display custom callout for one of two annotation
+    if (annotationIdentifier.integerValue
+        && annotationIdentifier.integerValue % 2 == 0)
+    {
+        return [self calloutViewForAnnotation: annotation];
+    }
+    
+    return nil;
+}
+
+#pragma mark - Private
+
+- (NSString *)identifierOfAnnotation:(MGLPointAnnotation *)annotation
+{
+    NSString *title = annotation.title;
+    NSString *lastTwoCharacters = [title substringFromIndex:title.length - 2];
+    return lastTwoCharacters;
+}
+
+static CGFloat const calloutViewWidth = 150.;
+static CGFloat const calloutViewHeight = 40.;
+
+- (UIView *)calloutViewForAnnotation:(MGLPointAnnotation *)annotation
+{
+    UIImage *mbIcon = [UIImage imageNamed: @"Icon-40"];
+    UIImageView *imageView = [[UIImageView alloc] initWithImage: mbIcon];
+
+    CGFloat labelOriginX = CGRectGetMaxX(imageView.frame) + 10.;
+    UILabel *label = [[UILabel alloc] initWithFrame: CGRectMake(labelOriginX, 0, calloutViewWidth - labelOriginX, calloutViewHeight)];
+    label.text = annotation.title;
+    label.font = [UIFont boldSystemFontOfSize: [UIFont systemFontSize]];
+    label.textColor = kTintColor;
+
+    UIView *customView = [[UIView alloc] initWithFrame: CGRectMake(0, 0, calloutViewWidth, calloutViewHeight)];
+    [customView addSubview: imageView];
+    [customView addSubview: label];
+
+    return customView;
 }
 
 @end

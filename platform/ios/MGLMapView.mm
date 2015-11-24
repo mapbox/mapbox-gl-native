@@ -2492,6 +2492,14 @@ CLLocationCoordinate2D MGLLocationCoordinate2DFromLatLng(mbgl::LatLng latLng)
 {
     SMCalloutView *calloutView = [SMCalloutView platformCalloutView];
 
+    UIView *customCalloutView = nil;
+    if ([self.delegate respondsToSelector: @selector(mapView:calloutViewForAnnotation:)]
+        && (customCalloutView = [self.delegate mapView: self calloutViewForAnnotation: annotation]))
+    {
+        calloutView.contentView = customCalloutView;
+        calloutView.contentViewInset = UIEdgeInsetsZero;
+    }
+
     if ([annotation respondsToSelector:@selector(title)]) calloutView.title = annotation.title;
     if ([annotation respondsToSelector:@selector(subtitle)]) calloutView.subtitle = annotation.subtitle;
 
