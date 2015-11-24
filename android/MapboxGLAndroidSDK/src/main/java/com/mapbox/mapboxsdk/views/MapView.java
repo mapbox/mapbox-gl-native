@@ -81,6 +81,7 @@ import java.nio.ByteBuffer;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.Collections;
+import java.util.Iterator;
 import java.util.List;
 
 /**
@@ -201,7 +202,7 @@ public final class MapView extends FrameLayout {
     // Every annotation that has been added to the map
     private final List<Annotation> mAnnotations = new ArrayList<>();
     private List<Marker> mMarkersNearLastTap = new ArrayList<>();
-    private Marker mSelectedMarker;
+    private List<Marker> mSelectedMarkers = new ArrayList<>();
     private InfoWindowAdapter mInfoWindowAdapter;
     private SpriteFactory mSpriteFactory;
     private ArrayList<Sprite> mSprites = new ArrayList<>();
@@ -808,7 +809,7 @@ public final class MapView extends FrameLayout {
             @Override
             public void onMapChanged(@MapChange int change) {
                 if ((change == REGION_WILL_CHANGE) || (change == REGION_WILL_CHANGE_ANIMATED)) {
-                    deselectMarker();
+                    deselectMarkers();
                 }
 
                 if (change == DID_FINISH_LOADING_MAP) {
@@ -2018,12 +2019,12 @@ public final class MapView extends FrameLayout {
             return;
         }
 
-        if (marker == mSelectedMarker) {
+        if (mSelectedMarkers.contains(marker)) {
             return;
         }
 
         // Need to deselect any currently selected annotation first
-        deselectMarker();
+        deselectMarker(marker);
 
         boolean handledDefaultClick = false;
         if (mOnMarkerClickListener != null) {
@@ -2038,20 +2039,41 @@ public final class MapView extends FrameLayout {
             marker.showInfoWindow();
         }
 
-        mSelectedMarker = marker;
+        mSelectedMarkers.add(marker);
     }
 
     /**
-     * Deselects any currently selected marker. The selected marker will have it's info window closed.
+     * Deselects any currently selected marker. All markers will have it's info window closed.
      */
     @UiThread
-    public void deselectMarker() {
-        if (mSelectedMarker != null) {
-            if (mSelectedMarker.isInfoWindowShown()) {
-                mSelectedMarker.hideInfoWindow();
-                mSelectedMarker = null;
+    public void deselectMarkers() {
+        if (mSelectedMarkers.isEmpty()) {
+            return;
+        }
+
+        for (Marker marker: mSelectedMarkers) {
+            if (marker.isInfoWindowShown()) {
+                marker.hideInfoWindow();
             }
         }
+
+        mSelectedMarkers = new ArrayList<>();
+    }
+
+    /**
+     * Deselects a currently selected marker. The selected marker will have it's info window closed.
+     */
+    @UiThread
+    public void deselectMarker(@NonNull Marker marker) {
+        if (!mSelectedMarkers.contains(marker)) {
+            return;
+        }
+
+        if (marker.isInfoWindowShown()) {
+            marker.hideInfoWindow();
+        }
+
+        mSelectedMarkers.remove(marker);
     }
 
     //
@@ -2129,8 +2151,8 @@ public final class MapView extends FrameLayout {
      */
     @UiThread
     @Nullable
-    public Marker getSelectedMarker() {
-        return mSelectedMarker;
+    public List<Marker> getSelectedMarkers() {
+        return mSelectedMarkers;
     }
 
     private void adjustTopOffsetPixels() {
@@ -2144,12 +2166,12 @@ public final class MapView extends FrameLayout {
             }
         }
 
-        if (mSelectedMarker != null) {
-            if (mSelectedMarker.isInfoWindowShown()) {
-                Marker temp = mSelectedMarker;
+        for (Marker marker: mSelectedMarkers) {
+            if (marker.isInfoWindowShown()) {
+                Marker temp = marker;
                 temp.hideInfoWindow();
                 temp.showInfoWindow();
-                mSelectedMarker = temp;
+                marker = temp;
             }
         }
     }
@@ -2426,19 +2448,21 @@ public final class MapView extends FrameLayout {
                 Collections.sort(nearbyMarkers);
 
                 if (nearbyMarkers == mMarkersNearLastTap) {
+                    // TODO
                     // the selection candidates haven't changed; cycle through them
-                    if (mSelectedMarker != null && (mSelectedMarker.getId() == mMarkersNearLastTap.get(mMarkersNearLastTap.size() - 1).getId())) {
-                        // the selected marker is the last in the set; cycle back to the first
-                        // note: this could be the selected marker if only one in set
-                        newSelectedMarkerId = mMarkersNearLastTap.get(0).getId();
-                    } else if (mSelectedMarker != null) {
-                        // otherwise increment the selection through the candidates
-                        long result = mMarkersNearLastTap.indexOf(mSelectedMarker);
-                        newSelectedMarkerId = mMarkersNearLastTap.get((int) result + 1).getId();
-                    } else {
+//                    if (mSelectedMarker != null
+//                            && (mSelectedMarker.getId() == mMarkersNearLastTap.get(mMarkersNearLastTap.size() - 1).getId())) {
+//                        // the selected marker is the last in the set; cycle back to the first
+//                        // note: this could be the selected marker if only one in set
+//                        newSelectedMarkerId = mMarkersNearLastTap.get(0).getId();
+//                    } else if (mSelectedMarker != null) {
+//                        // otherwise increment the selection through the candidates
+//                        long result = mMarkersNearLastTap.indexOf(mSelectedMarker);
+//                        newSelectedMarkerId = mMarkersNearLastTap.get((int) result + 1).getId();
+//                    } else {
                         // no current selection; select the first one
                         newSelectedMarkerId = mMarkersNearLastTap.get(0).getId();
-                    }
+//                    }
                 } else {
                     // start tracking a new set of nearby markers
                     mMarkersNearLastTap = nearbyMarkers;
@@ -2459,7 +2483,7 @@ public final class MapView extends FrameLayout {
                     Annotation annotation = mAnnotations.get(i);
                     if (annotation instanceof Marker) {
                         if (annotation.getId() == newSelectedMarkerId) {
-                            if (mSelectedMarker == null || annotation.getId() != mSelectedMarker.getId()) {
+                            if (mSelectedMarkers.isEmpty() || !mSelectedMarkers.contains(annotation)) {
                                 selectMarker((Marker) annotation);
                             }
                             break;
@@ -2469,7 +2493,7 @@ public final class MapView extends FrameLayout {
 
             } else {
                 // deselect any selected marker
-                deselectMarker();
+                deselectMarkers();
 
                 // notify app of map click
                 if (mOnMapClickListener != null) {
