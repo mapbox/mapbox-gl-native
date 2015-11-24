@@ -1,115 +1,201 @@
 #include <mbgl/storage/asset_context_base.hpp>
-#include <mbgl/android/jni.hpp>
 #include <mbgl/storage/resource.hpp>
 #include <mbgl/storage/response.hpp>
-#include <mbgl/platform/log.hpp>
 #include <mbgl/util/chrono.hpp>
 #include <mbgl/util/util.hpp>
-#include <mbgl/util/uv.hpp>
-#include <mbgl/util/run_loop.hpp>
+#include <mbgl/util/thread.hpp>
 
-#include <uv.h>
-#include "uv_zip.h"
+#pragma GCC diagnostic push
+#pragma GCC diagnostic ignored "-Wshadow"
+#include <zip.h>
+#pragma GCC diagnostic pop
 
-#include <map>
 #include <cassert>
 #include <forward_list>
+#include <map>
+
+#include <fcntl.h>
+#include <sys/stat.h>
+#include <sys/types.h>
+
+namespace {
+
+struct ZipHolder {
+    ZipHolder(struct zip* archive_) : archive(archive_) {}
+
+    ~ZipHolder() {
+        if (archive) ::zip_discard(archive);
+    }
+
+    struct zip* archive;
+};
+
+struct ZipFileHolder {
+    ZipFileHolder(struct zip_file* file_) : file(file_) {}
+
+    ~ZipFileHolder() {
+        if (file) ::zip_fclose(file);
+    }
+
+    struct zip_file* file;
+};
+
+class ZipIOWorker {
+public:
+    ZipIOWorker() = default;
+
+    void zip_fdopen(const std::string& path,
+                    std::function<void(std::unique_ptr<ZipHolder>)> cb) {
+        int fd = ::open(path.c_str(), O_RDONLY, S_IRUSR);
+        if (fd < 0) {
+            cb(std::make_unique<ZipHolder>(nullptr));
+        } else {
+            int errorp;
+            struct zip* archive = ::zip_fdopen(fd, 0, &errorp);
+            cb(std::make_unique<ZipHolder>(archive));
+        }
+    }
+
+    void zip_stat(struct zip* archive, const std::string& path,
+                  std::function<void (int, std::unique_ptr<struct zip_stat>)> cb) {
+        std::unique_ptr<struct zip_stat> buf = std::make_unique<struct zip_stat>();
+        ::zip_stat_init(buf.get());
+
+        int ret = ::zip_stat(archive, path.c_str(), 0,  buf.get());
+        cb(ret, std::move(buf));
+    }
+
+    void zip_fopen(struct zip* archive, const std::string& path,
+                   std::function<void (std::unique_ptr<ZipFileHolder>)> cb) {
+        struct zip_file* file = ::zip_fopen(archive, path.c_str(), 0);
+        cb(std::make_unique<ZipFileHolder>(file));
+    }
+
+    void zip_fread(struct zip_file* file, size_t size,
+                   std::function<void (int, std::shared_ptr<std::string>)> cb) {
+        std::shared_ptr<std::string> buf = std::make_shared<std::string>();
+        buf->resize(size);
+
+        int ret = ::zip_fread(file, &buf->front(), size);
+        cb(ret, std::move(buf));
+    }
+
+    void zip_fclose(struct zip_file* file, std::function<void (int)> cb) {
+        cb(::zip_fclose(file));
+    }
+};
+
+}
 
 namespace mbgl {
 
-class AssetZipContext : public AssetContextBase {
-public:
-    explicit AssetZipContext();
-    ~AssetZipContext();
+using namespace std::placeholders;
 
-    RequestBase* createRequest(const Resource& resource,
-                               RequestBase::Callback callback,
-                               const std::string& assetRoot) final;
-
-    uv_zip_t *getHandle(const std::string &path);
-    void returnHandle(const std::string &path, uv_zip_t *zip);
-
-    // A list of resuable uv_zip handles to avoid creating and destroying them all the time.
-    std::map<std::string, std::forward_list<uv_zip_t *>> handles;
-    uv_loop_t *loop;
-};
-
-AssetZipContext::AssetZipContext() : loop(static_cast<uv_loop_t*>(util::RunLoop::getLoopHandle())) {
-}
-
-uv_zip_t *AssetZipContext::getHandle(const std::string &path) {
-    auto &list = handles[path];
-    if (!list.empty()) {
-        auto zip = list.front();
-        list.pop_front();
-        return zip;
-    } else {
-        return nullptr;
-    }
-}
-
-void AssetZipContext::returnHandle(const std::string &path, uv_zip_t *zip) {
-    handles[path].push_front(zip);
-}
-
-AssetZipContext::~AssetZipContext() {
-    // Close all zip handles
-    for (auto &list : handles) {
-        for (auto zip : list.second) {
-            uv_zip_discard(loop, zip, [](uv_zip_t *zip_) {
-                uv_zip_cleanup(zip_);
-                delete zip_;
-            });
-        }
-    }
-    handles.clear();
-}
+class AssetZipContext;
 
 class AssetRequest : public RequestBase {
     MBGL_STORE_THREAD(tid)
 
 public:
-    AssetRequest(AssetZipContext&, const Resource&, Callback, const std::string& assetRoot);
+    AssetRequest(const Resource&, Callback, const std::string& assetRoot,
+                 AssetZipContext* context, util::Thread<ZipIOWorker>* worker);
     ~AssetRequest();
 
+    // RequestBase implementation.
     void cancel() final;
 
 private:
-    AssetZipContext &context;
-    bool cancelled = false;
+    void openArchive();
+    void archiveOpened(std::unique_ptr<ZipHolder>);
+    void fileStated(int result, std::unique_ptr<struct zip_stat>);
+    void fileOpened(std::unique_ptr<ZipFileHolder>);
+    void fileRead(int result, std::shared_ptr<std::string>);
+    void fileClosed();
+
+    void close();
+    void cleanup();
+
+    void notifyError(Response::Error::Reason, const char *message);
+
     const std::string root;
     const std::string path;
     std::unique_ptr<Response> response;
-    uv_buf_t buffer;
 
-private:
-    void openZipArchive();
-    void archiveOpened(uv_zip_t *zip);
-    void fileStated(uv_zip_t *zip);
-    void fileOpened(uv_zip_t *zip);
-    void fileRead(uv_zip_t *zip);
-    void fileClosed(uv_zip_t *zip);
-    void cleanup(uv_zip_t *zip);
+    struct zip* archive = nullptr;
+    struct zip_file* file = nullptr;
+    size_t size = 0;
 
-    void notifyError(const char *message, Response::Error::Reason);
+    AssetZipContext *context;
+
+    util::Thread<ZipIOWorker> *worker;
+    std::unique_ptr<WorkRequest> request;
 };
 
-RequestBase* AssetZipContext::createRequest(const Resource& resource,
-                                            RequestBase::Callback callback,
-                                            const std::string& assetRoot) {
-    return new AssetRequest(*this, resource, callback, assetRoot);
+class AssetZipContext : public AssetContextBase {
+public:
+    AssetZipContext();
+    ~AssetZipContext();
+
+    RequestBase* createRequest(const Resource& resource,
+                               RequestBase::Callback callback,
+                               const std::string& assetRoot) final {
+        return new AssetRequest(resource, callback, assetRoot, this, &worker);
+    }
+
+    struct zip *getHandle(const std::string &path);
+    void returnHandle(const std::string &path, struct zip *zip);
+
+    // A list of resuable zip handles to avoid creating
+    // and destroying them all the time.
+    std::map<std::string, std::forward_list<struct zip*>> handles;
+
+    util::Thread<ZipIOWorker> worker;
+    std::unique_ptr<WorkRequest> request;
+};
+
+AssetZipContext::AssetZipContext()
+        : worker({"ZipIOWorker", util::ThreadType::Worker, util::ThreadPriority::Regular}) {}
+
+AssetZipContext::~AssetZipContext() {
+    // Close all zip handles
+    for (auto &list : handles) {
+        for (auto archive : list.second) {
+            zip_discard(archive);
+        }
+    }
+
+    handles.clear();
 }
 
-AssetRequest::AssetRequest(AssetZipContext& context_, const Resource& resource_, Callback callback_, const std::string& assetRoot_)
-    : RequestBase(resource_, callback_),
-      context(context_),
-      root(assetRoot_),
-      path(std::string { "assets/" } + resource.url.substr(8)) {
-    auto zip = context.getHandle(root);
-    if (zip) {
-        archiveOpened(zip);
+struct zip* AssetZipContext::getHandle(const std::string &path) {
+    auto &list = handles[path];
+    if (!list.empty()) {
+        auto archive = list.front();
+        list.pop_front();
+        return archive;
     } else {
-        openZipArchive();
+        return nullptr;
+    }
+}
+
+void AssetZipContext::returnHandle(const std::string &path, struct zip* archive) {
+    handles[path].push_front(archive);
+}
+
+AssetRequest::AssetRequest(const Resource& resource_, Callback callback_,
+    const std::string& assetRoot, AssetZipContext* context_, util::Thread<ZipIOWorker>* worker_)
+    : RequestBase(resource_, callback_),
+      root(assetRoot),
+      path(std::string("assets/") + resource.url.substr(8)),
+      context(context_),
+      worker(worker_) {
+    archive = context->getHandle(root);
+    if (archive) {
+        request = worker->invokeWithCallback(&ZipIOWorker::zip_stat,
+            std::bind(&AssetRequest::fileStated, this, _1, _2), archive, path);
+    } else {
+        request = worker->invokeWithCallback(&ZipIOWorker::zip_fdopen,
+            std::bind(&AssetRequest::archiveOpened, this, _1), root);
     }
 }
 
@@ -117,146 +203,114 @@ AssetRequest::~AssetRequest() {
     MBGL_VERIFY_THREAD(tid);
 }
 
-void AssetRequest::openZipArchive() {
-    uv_fs_t *req = new uv_fs_t();
-    req->data = this;
+void AssetRequest::cancel() {
+    MBGL_VERIFY_THREAD(tid);
 
-    // We're using uv_fs_open first to obtain a file descriptor. Then, uv_zip_fdopen will operate
-    // on a read-only file.
-    uv_fs_open(context.loop, req, root.c_str(), O_RDONLY, S_IRUSR, [](uv_fs_t *fsReq) {
-        if (fsReq->result < 0) {
-            auto impl = reinterpret_cast<AssetRequest *>(fsReq->data);
-            impl->notifyError(uv::getFileRequestError(fsReq), Response::Error::Reason::Connection);
-            delete impl;
-        } else {
-            uv_zip_t *zip = new uv_zip_t();
-            uv_zip_init(zip);
-            zip->data = fsReq->data;
-            uv_zip_fdopen(fsReq->loop, zip, uv_file(fsReq->result), 0, [](uv_zip_t *openZip) {
-                auto impl = reinterpret_cast<AssetRequest *>(openZip->data);
-                if (openZip->result < 0) {
-                    impl->notifyError(openZip->message, Response::Error::Reason::Other);
-                    delete openZip;
-                    delete impl;
-                } else {
-                    impl->archiveOpened(openZip);
-                }
-            });
-        }
-
-        uv_fs_req_cleanup(fsReq);
-        delete fsReq;
-        fsReq = nullptr;
-    });
+    request.reset();
+    close();
 }
 
-#define INVOKE_MEMBER(name) \
-    [](uv_zip_t *zip_) { \
-        assert(zip_->data); \
-        reinterpret_cast<AssetRequest *>(zip_->data)->name(zip_); \
+void AssetRequest::archiveOpened(std::unique_ptr<ZipHolder> holder) {
+    MBGL_VERIFY_THREAD(tid);
+
+    std::swap(archive, holder->archive);
+
+    if (!archive) {
+        notifyError(Response::Error::Reason::Other, "Could not open zip archive");
+        cleanup();
+    } else {
+        request = worker->invokeWithCallback(&ZipIOWorker::zip_stat,
+            std::bind(&AssetRequest::fileStated, this, _1, _2), archive, path);
     }
-
-void AssetRequest::archiveOpened(uv_zip_t *zip) {
-    MBGL_VERIFY_THREAD(tid);
-
-    zip->data = this;
-    uv_zip_stat(context.loop, zip, path.c_str(), 0, INVOKE_MEMBER(fileStated));
 }
 
-void AssetRequest::fileStated(uv_zip_t *zip) {
+void AssetRequest::fileStated(int result, std::unique_ptr<struct zip_stat> stat) {
     MBGL_VERIFY_THREAD(tid);
 
-    if (cancelled || zip->result < 0) {
-        // Stat failed, probably because the file doesn't exist.
-        if (zip->result < 0) {
-            notifyError(zip->message, Response::Error::Reason::NotFound);
-        }
-        cleanup(zip);
-    } else if (!(zip->stat->valid & ZIP_STAT_SIZE)) {
-        // We couldn't obtain the size of the file.
-        notifyError("Could not determine file size in zip file", Response::Error::Reason::Other);
-        cleanup(zip);
+    if (result < 0 || !(stat->valid & ZIP_STAT_SIZE)) {
+        notifyError(Response::Error::Reason::NotFound, "Could not stat file in zip archive");
+        cleanup();
     } else {
         response = std::make_unique<Response>();
 
-        // Allocate the space for reading the data.
-        auto data = std::make_shared<std::string>();
-        data->resize(zip->stat->size);
-        buffer = uv_buf_init(const_cast<char *>(data->data()), zip->stat->size);
-        response->data = data;
-
-        // Get the modification time in case we have one.
-        if (zip->stat->valid & ZIP_STAT_MTIME) {
-            response->modified = Seconds(zip->stat->mtime);
+        if (stat->valid & ZIP_STAT_MTIME) {
+            response->modified = Seconds(stat->mtime);
         }
 
-        if (zip->stat->valid & ZIP_STAT_INDEX) {
-            response->etag = std::to_string(zip->stat->index);
+        if (stat->valid & ZIP_STAT_INDEX) {
+            response->etag = std::to_string(stat->index);
         }
 
-        uv_zip_fopen(context.loop, zip, path.c_str(), 0, INVOKE_MEMBER(fileOpened));
+        size = stat->size;
+
+        request = worker->invokeWithCallback(&ZipIOWorker::zip_fopen,
+            std::bind(&AssetRequest::fileOpened, this, _1), archive, path);
     }
 }
 
-void AssetRequest::fileOpened(uv_zip_t *zip) {
+void AssetRequest::fileOpened(std::unique_ptr<ZipFileHolder> holder) {
     MBGL_VERIFY_THREAD(tid);
 
-    if (zip->result < 0) {
-        // Opening failed.
-        notifyError(zip->message, Response::Error::Reason::Other);
-        cleanup(zip);
-    } else if (cancelled) {
-        // The request was canceled. Close the file again.
-        uv_zip_fclose(context.loop, zip, zip->file, INVOKE_MEMBER(fileClosed));
+    std::swap(file, holder->file);
+
+    if (!file) {
+        notifyError(Response::Error::Reason::NotFound, "Could not open file in zip archive"),
+        cleanup();
     } else {
-        uv_zip_fread(context.loop, zip, zip->file, &buffer, INVOKE_MEMBER(fileRead));
+        request = worker->invokeWithCallback(&ZipIOWorker::zip_fread,
+            std::bind(&AssetRequest::fileRead, this, _1, _2), file, size);
     }
 }
 
-void AssetRequest::fileRead(uv_zip_t *zip) {
+void AssetRequest::fileRead(int result, std::shared_ptr<std::string> data) {
     MBGL_VERIFY_THREAD(tid);
 
-    if (zip->result < 0) {
-        // Reading failed. We still have an open file handle though.
-        notifyError(zip->message, Response::Error::Reason::Other);
-    } else if (!cancelled) {
+    if (result < 0) {
+        notifyError(Response::Error::Reason::Other, "Could not read file in zip archive");
+    } else {
+        response->data = data;
         notify(std::move(response));
     }
 
-    uv_zip_fclose(context.loop, zip, zip->file, INVOKE_MEMBER(fileClosed));
+    close();
 }
 
-void AssetRequest::fileClosed(uv_zip_t *zip) {
+void AssetRequest::fileClosed() {
     MBGL_VERIFY_THREAD(tid);
 
-    if (zip->result < 0) {
-        // Closing the file failed. But there isn't anything we can do.
+    cleanup();
+}
+
+
+void AssetRequest::close() {
+    MBGL_VERIFY_THREAD(tid);
+
+    if (file) {
+        request = worker->invokeWithCallback(&ZipIOWorker::zip_fclose,
+            std::bind(&AssetRequest::fileClosed, this), file);
+        file = nullptr;
+    } else {
+        cleanup();
+    }
+}
+
+void AssetRequest::cleanup() {
+    MBGL_VERIFY_THREAD(tid);
+
+    if (archive) {
+        context->returnHandle(root, archive);
     }
 
-    cleanup(zip);
-}
-
-void AssetRequest::cleanup(uv_zip_t *zip) {
-    MBGL_VERIFY_THREAD(tid);
-
-    context.returnHandle(root, zip);
     delete this;
 }
 
-void AssetRequest::notifyError(const char *message, Response::Error::Reason reason) {
+void AssetRequest::notifyError(Response::Error::Reason reason, const char *message) {
     MBGL_VERIFY_THREAD(tid);
 
-    if (!cancelled) {
-        response = std::make_unique<Response>();
-        response->error = std::make_unique<Response::Error>(reason, message);
-        notify(std::move(response));
-    } else {
-        // The request was already canceled and deleted.
-    }
-}
+    response = std::make_unique<Response>();
+    response->error = std::make_unique<Response::Error>(reason, message);
 
-void AssetRequest::cancel() {
-    cancelled = true;
+    notify(std::move(response));
 }
 
 std::unique_ptr<AssetContextBase> AssetContextBase::createContext() {

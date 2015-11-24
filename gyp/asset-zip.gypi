@@ -8,7 +8,6 @@
 
       'sources': [
         '../platform/default/asset_request_zip.cpp',
-        '../platform/default/uv_zip.c',
       ],
 
       'include_dirs': [
