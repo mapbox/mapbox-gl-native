@@ -23,6 +23,8 @@ Known issues:
 
 ## iOS master
 
+- Fixed an issue preventing the compass from responding to taps after the compass is moved programmatically. ([#3116](https://github.com/mapbox/mapbox-gl-native/pull/3116))
+
 ## iOS 3.0.0
 
 - If you install this SDK via CocoaPods, CocoaPods version 0.38.0 or above is required. ([#2132](https://github.com/mapbox/mapbox-gl-native/pull/2132))

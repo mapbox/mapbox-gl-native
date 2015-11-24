@@ -292,10 +292,11 @@ std::chrono::steady_clock::duration durationInSeconds(float duration)
     _compassView.accessibilityLabel = @"Compass";
     _compassView.frame = CGRectMake(0, 0, _compassView.image.size.width, _compassView.image.size.height);
     _compassView.alpha = 0;
+    _compassView.userInteractionEnabled = YES;
+    [_compassView addGestureRecognizer:[[UITapGestureRecognizer alloc] initWithTarget:self action:@selector(handleCompassTapGesture:)]];
     UIView *container = [[UIView alloc] initWithFrame:CGRectZero];
     [container addSubview:_compassView];
     container.translatesAutoresizingMaskIntoConstraints = NO;
-    [container addGestureRecognizer:[[UITapGestureRecognizer alloc] initWithTarget:self action:@selector(handleCompassTapGesture:)]];
     [self addSubview:container];
 
     // setup interaction
