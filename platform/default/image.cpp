@@ -81,8 +81,7 @@ Image::Image(std::string const& data)
         auto reader = getImageReader(reinterpret_cast<const uint8_t*>(data.c_str()), data.size());
         width = reader->width();
         height = reader->height();
-        img = std::make_unique<uint8_t[]>(width * height * 4);
-        reader->read(0, 0, width, height, img.get());
+        img = reader->read();
     }
     catch (ImageReaderException const& ex)
     {

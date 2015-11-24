@@ -55,9 +55,7 @@ public:
     ~JpegReader();
     unsigned width() const;
     unsigned height() const;
-    inline bool hasAlpha() const { return false; }
-    inline bool premultipliedAlpha() const { return true; }
-    void read(unsigned x, unsigned y, unsigned w, unsigned h, uint8_t* image);
+    std::unique_ptr<uint8_t[]> read();
 private:
     void init();
     static void on_error(j_common_ptr cinfo);

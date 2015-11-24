@@ -29,9 +29,7 @@ struct ImageReader : private noncopyable
 {
     virtual unsigned width() const=0;
     virtual unsigned height() const=0;
-    virtual bool hasAlpha() const=0;
-    virtual bool premultipliedAlpha() const=0;
-    virtual void read(unsigned x, unsigned y, unsigned width, unsigned height, uint8_t* image)=0;
+    virtual std::unique_ptr<uint8_t[]> read()=0;
     virtual ~ImageReader() {}
 };
 

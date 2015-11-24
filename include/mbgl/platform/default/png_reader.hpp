@@ -53,9 +53,7 @@ public:
     ~PngReader();
     unsigned width() const;
     unsigned height() const;
-    inline bool hasAlpha() const { return has_alpha_; }
-    bool premultipliedAlpha() const { return true; } // png_set_alpha_mode(png, PNG_ALPHA_PREMULTIPLIED, 2.2)
-    void read(unsigned x,unsigned y, unsigned width, unsigned height, uint8_t* image);
+    std::unique_ptr<uint8_t[]> read();
 private:
     void init();
     static void png_read_data(png_structp png_ptr, png_bytep data, png_size_t length);

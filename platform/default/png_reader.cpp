@@ -115,8 +115,10 @@ unsigned PngReader<T>::height() const
 }
 
 template <typename T>
-void PngReader<T>::read(unsigned x0, unsigned y0, unsigned w, unsigned h, uint8_t* image)
+std::unique_ptr<uint8_t[]> PngReader<T>::read()
 {
+    std::unique_ptr<uint8_t[]> image = std::make_unique<uint8_t[]>(width_ * height_ * 4);
+
     stream_.clear();
     stream_.seekg(0, std::ios_base::beg);
 
@@ -162,54 +164,37 @@ void PngReader<T>::read(unsigned x0, unsigned y0, unsigned w, unsigned h, uint8_
     png_set_alpha_mode(png_ptr, PNG_ALPHA_PREMULTIPLIED, PNG_GAMMA_LINEAR);
 #endif
 
-    if (x0 == 0 && y0 == 0 && w >= width_ && h >= height_)
+    if (png_get_interlace_type(png_ptr,info_ptr) == PNG_INTERLACE_ADAM7)
     {
-        if (png_get_interlace_type(png_ptr,info_ptr) == PNG_INTERLACE_ADAM7)
-        {
-            png_set_interlace_handling(png_ptr); // FIXME: libpng bug?
-            // according to docs png_read_image
-            // "..automatically handles interlacing,
-            // so you don't need to call png_set_interlace_handling()"
-        }
-        png_read_update_info(png_ptr, info_ptr);
-        // we can read whole image at once
-        // alloc row pointers
-        const std::unique_ptr<png_bytep[]> rows(new png_bytep[height_]);
-        for (unsigned row = 0; row < height_; ++row)
-            rows[row] = (png_bytep)image + row * width_ * 4 ;
-        png_read_image(png_ptr, rows.get());
+        png_set_interlace_handling(png_ptr); // FIXME: libpng bug?
+        // according to docs png_read_image
+        // "..automatically handles interlacing,
+        // so you don't need to call png_set_interlace_handling()"
+    }
+    png_read_update_info(png_ptr, info_ptr);
+    // we can read whole image at once
+    // alloc row pointers
+    const std::unique_ptr<png_bytep[]> rows(new png_bytep[height_]);
+    for (unsigned row = 0; row < height_; ++row)
+        rows[row] = (png_bytep)image.get() + row * width_ * 4 ;
+    png_read_image(png_ptr, rows.get());
 
 #ifndef PNG_ALPHA_PREMULTIPLIED
-        // Manually premultiply the image if libpng didn't do it for us.
-        for (unsigned row = 0; row < height_; ++row) {
-            for (unsigned x = 0; x < width_; x++) {
-                png_byte* ptr = &(rows[row][x * 4]);
-                const float a = ptr[3] / 255.0f;
-                ptr[0] *= a;
-                ptr[1] *= a;
-                ptr[2] *= a;
-            }
+    // Manually premultiply the image if libpng didn't do it for us.
+    for (unsigned row = 0; row < height_; ++row) {
+        for (unsigned x = 0; x < width_; x++) {
+            png_byte* ptr = &(rows[row][x * 4]);
+            const float a = ptr[3] / 255.0f;
+            ptr[0] *= a;
+            ptr[1] *= a;
+            ptr[2] *= a;
         }
+    }
 #endif
-    }
-    else
-    {
-        png_read_update_info(png_ptr, info_ptr);
-        w=std::min(w, width_ - x0);
-        h=std::min(h, height_ - y0);
-        unsigned rowbytes=png_get_rowbytes(png_ptr, info_ptr);
-        const std::unique_ptr<png_byte[]> row(new png_byte[rowbytes]);
-        for (unsigned i = 0; i < height_; ++i)
-        {
-            png_read_row(png_ptr,row.get(),0);
-            if (i >= y0 && i < (y0 + h))
-            {
-                // TODO: premultiply this
-                std::copy(&row[x0 * 4], &row[x0 * 4] + w * 4, image + i * width_* 4);
-            }
-        }
-    }
+
     png_read_end(png_ptr,0);
+
+    return image;
 }
 
 template class PngReader<boost::iostreams::array_source>;

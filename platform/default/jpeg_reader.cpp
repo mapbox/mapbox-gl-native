@@ -145,8 +145,10 @@ unsigned JpegReader<T>::height() const
 }
 
 template <typename T>
-void JpegReader<T>::read(unsigned x0, unsigned y0, unsigned w, unsigned h, uint8_t* image)
+std::unique_ptr<uint8_t[]> JpegReader<T>::read()
 {
+    std::unique_ptr<uint8_t[]> image = std::make_unique<uint8_t[]>(width_ * height_ * 4);
+
     stream_.clear();
     stream_.seekg(0, std::ios_base::beg);
 
@@ -167,19 +169,16 @@ void JpegReader<T>::read(unsigned x0, unsigned y0, unsigned w, unsigned h, uint8
     row_stride = cinfo.output_width * cinfo.output_components;
     buffer = (*cinfo.mem->alloc_sarray) ((j_common_ptr) &cinfo, JPOOL_IMAGE, row_stride, 1);
 
-    w = std::min(w,width_ - x0);
-    h = std::min(h,height_ - y0);
-
-    const std::unique_ptr<unsigned int[]> out_row(new unsigned int[w]);
+    const std::unique_ptr<unsigned int[]> out_row(new unsigned int[width_]);
     unsigned row = 0;
     while (cinfo.output_scanline < cinfo.output_height)
     {
         jpeg_read_scanlines(&cinfo, buffer, 1);
-        if (row >= y0 && row < y0 + h)
+        if (row < height_)
         {
-            for (unsigned int x = 0; x < w; ++x)
+            for (unsigned int x = 0; x < width_; ++x)
             {
-                unsigned col = x + x0;
+                unsigned col = x;
                 r = buffer[0][cinfo.output_components * col];
                 if (cinfo.output_components > 2)
                 {
@@ -191,11 +190,13 @@ void JpegReader<T>::read(unsigned x0, unsigned y0, unsigned w, unsigned h, uint8
                 }
                 out_row[x] =  (0xff << 24) | (b << 16) | (g << 8) | r;
             }
-            std::copy((char*)out_row.get(), (char*)out_row.get() + w*4, image + (row - y0)*width_*4);
+            std::copy((char*)out_row.get(), (char*)out_row.get() + width_*4, image.get() + row*width_*4);
         }
         ++row;
     }
     jpeg_finish_decompress(&cinfo);
+
+    return image;
 }
 
 template class JpegReader<boost::iostreams::array_source>;
