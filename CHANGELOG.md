@@ -23,7 +23,7 @@ Known issues:
 
 ## iOS master
 
-- Fixed an issue preventing the compass from responding to taps after the compass is moved programmatically. ([#3116](https://github.com/mapbox/mapbox-gl-native/pull/3116))
+- Fixed an issue preventing the compass from responding to taps after the compass is moved programmatically. ([#3117](https://github.com/mapbox/mapbox-gl-native/pull/3117))
 
 ## iOS 3.0.0
 
