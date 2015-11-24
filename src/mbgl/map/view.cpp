@@ -1,6 +1,5 @@
 #include <mbgl/map/view.hpp>
 #include <mbgl/map/map.hpp>
-#include <mbgl/map/still_image.hpp>
 
 #include <cassert>
 
@@ -11,8 +10,8 @@ void View::initialize(Map *map_) {
     map = map_;
 }
 
-std::unique_ptr<StillImage> View::readStillImage() {
-    return nullptr;
+UnassociatedImage View::readStillImage() {
+    return {};
 }
 
 void View::notifyMapChange(MapChange) {

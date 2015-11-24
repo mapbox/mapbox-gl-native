@@ -3,7 +3,6 @@
 #include "../fixtures/util.hpp"
 
 #include <mbgl/map/map.hpp>
-#include <mbgl/map/still_image.hpp>
 #include <mbgl/platform/default/headless_display.hpp>
 #include <mbgl/platform/default/headless_view.hpp>
 #include <mbgl/util/io.hpp>
@@ -40,7 +39,7 @@ TEST_P(PendingResources, DeleteMapObjectWithPendingRequest) {
     const std::string style = util::read_file("test/fixtures/resources/style.json");
     map->setStyleJSON(style, ".");
 
-    map->renderStill([&endTest](std::exception_ptr, std::unique_ptr<const StillImage>) {
+    map->renderStill([&endTest](std::exception_ptr, UnassociatedImage&&) {
         EXPECT_TRUE(false) << "Should never happen.";
     });
 

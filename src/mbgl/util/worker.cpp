@@ -17,8 +17,11 @@ public:
     void parseRasterTile(std::unique_ptr<RasterBucket> bucket,
                          const std::shared_ptr<const std::string> data,
                          std::function<void(RasterTileParseResult)> callback) {
-        std::unique_ptr<util::Image> image(new util::Image(*data));
-        if (!(*image)) {
+        PremultipliedImage image;
+
+        try {
+            image = decodeImage(*data);
+        } catch (...) {
             callback(RasterTileParseResult("error parsing raster image"));
         }
 

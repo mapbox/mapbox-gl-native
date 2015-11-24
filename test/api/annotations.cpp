@@ -4,7 +4,6 @@
 #include <mbgl/annotation/shape_annotation.hpp>
 #include <mbgl/sprite/sprite_image.hpp>
 #include <mbgl/map/map.hpp>
-#include <mbgl/map/still_image.hpp>
 #include <mbgl/platform/default/headless_display.hpp>
 #include <mbgl/platform/default/headless_view.hpp>
 #include <mbgl/storage/default_file_source.hpp>
@@ -17,13 +16,11 @@
 using namespace mbgl;
 
 std::string renderPNG(Map& map) {
-    std::promise<std::unique_ptr<const StillImage>> promise;
-    map.renderStill([&](std::exception_ptr, std::unique_ptr<const StillImage> image) {
+    std::promise<UnassociatedImage> promise;
+    map.renderStill([&](std::exception_ptr, UnassociatedImage&& image) {
         promise.set_value(std::move(image));
     });
-
-    auto result = promise.get_future().get();
-    return util::compress_png(result->width, result->height, result->pixels.get());
+    return encodePNG(promise.get_future().get());
 }
 
 TEST(Annotations, PointAnnotation) {

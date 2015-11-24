@@ -2,14 +2,14 @@
 #define MBGL_MAP_VIEW
 
 #include <mbgl/util/chrono.hpp>
-#include <functional>
+#include <mbgl/util/image.hpp>
 
+#include <functional>
 #include <memory>
 
 namespace mbgl {
 
 class Map;
-class StillImage;
 
 enum MapChange : uint8_t {
     MapChangeRegionWillChange = 0,
@@ -70,7 +70,7 @@ public:
 
     // Reads the pixel data from the current framebuffer. If your View implementation
     // doesn't support reading from the framebuffer, return a null pointer.
-    virtual std::unique_ptr<StillImage> readStillImage();
+    virtual UnassociatedImage readStillImage();
 
     // Notifies a watcher of map x/y/scale/rotation changes.
     // Must only be called from the same thread that caused the change.

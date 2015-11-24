@@ -1,7 +1,6 @@
 #include <mbgl/map/map_context.hpp>
 #include <mbgl/map/map_data.hpp>
 #include <mbgl/map/view.hpp>
-#include <mbgl/map/still_image.hpp>
 
 #include <mbgl/platform/log.hpp>
 
@@ -200,22 +199,22 @@ void MapContext::renderStill(const TransformState& state, const FrameData& frame
     }
 
     if (data.mode != MapMode::Still) {
-        fn(std::make_exception_ptr(util::MisuseException("Map is not in still image render mode")), nullptr);
+        fn(std::make_exception_ptr(util::MisuseException("Map is not in still image render mode")), {});
         return;
     }
 
     if (callback) {
-        fn(std::make_exception_ptr(util::MisuseException("Map is currently rendering an image")), nullptr);
+        fn(std::make_exception_ptr(util::MisuseException("Map is currently rendering an image")), {});
         return;
     }
 
     if (!style) {
-        fn(std::make_exception_ptr(util::MisuseException("Map doesn't have a style")), nullptr);
+        fn(std::make_exception_ptr(util::MisuseException("Map doesn't have a style")), {});
         return;
     }
 
     if (style->getLastError()) {
-        fn(style->getLastError(), nullptr);
+        fn(style->getLastError(), {});
         return;
     }
 
@@ -246,7 +245,7 @@ bool MapContext::renderSync(const TransformState& state, const FrameData& frame)
     painter->render(*style, frame);
 
     if (data.mode == MapMode::Still) {
-        callback(nullptr, view.readStillImage());
+        callback(nullptr, std::move(view.readStillImage()));
         callback = nullptr;
     }
 
@@ -320,7 +319,7 @@ void MapContext::onResourceLoadingFailed(std::exception_ptr error) {
     assert(util::ThreadContext::currentlyOn(util::ThreadType::Map));
 
     if (data.mode == MapMode::Still && callback) {
-        callback(error, nullptr);
+        callback(error, {});
         callback = nullptr;
     }
 }

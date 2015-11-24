@@ -14,7 +14,7 @@
 
 namespace mbgl {
 
-SpriteImagePtr createSpriteImage(const util::Image& image,
+SpriteImagePtr createSpriteImage(const PremultipliedImage& image,
                                  const uint16_t srcX,
                                  const uint16_t srcY,
                                  const uint16_t srcWidth,
@@ -37,18 +37,18 @@ SpriteImagePtr createSpriteImage(const util::Image& image,
 
     std::string data(dstWidth * dstHeight * 4, '\0');
 
-    auto srcData = reinterpret_cast<const uint32_t*>(image.getData());
+    auto srcData = reinterpret_cast<const uint32_t*>(image.data.get());
     auto dstData = reinterpret_cast<uint32_t*>(const_cast<char*>(data.data()));
 
-    const int32_t maxX = std::min(image.getWidth(), uint32_t(srcWidth + srcX)) - srcX;
-    assert(maxX <= int32_t(image.getWidth()));
-    const int32_t maxY = std::min(image.getHeight(), uint32_t(srcHeight + srcY)) - srcY;
-    assert(maxY <= int32_t(image.getHeight()));
+    const int32_t maxX = std::min(uint32_t(image.width), uint32_t(srcWidth + srcX)) - srcX;
+    assert(maxX <= int32_t(image.width));
+    const int32_t maxY = std::min(uint32_t(image.height), uint32_t(srcHeight + srcY)) - srcY;
+    assert(maxY <= int32_t(image.height));
 
     // Copy from the source image into our individual sprite image
     for (uint16_t y = 0; y < maxY; ++y) {
         const auto dstRow = y * dstWidth;
-        const auto srcRow = (y + srcY) * image.getWidth() + srcX;
+        const auto srcRow = (y + srcY) * image.width + srcX;
         for (uint16_t x = 0; x < maxX; ++x) {
             dstData[dstRow + x] = srcData[srcRow + x];
         }
@@ -105,10 +105,11 @@ SpriteParseResult parseSprite(const std::string& image, const std::string& json)
     using namespace rapidjson;
 
     Sprites sprites;
+    PremultipliedImage raster;
 
-    // Parse the sprite image.
-    const util::Image raster(image);
-    if (!raster) {
+    try {
+        raster = decodeImage(image);
+    } catch (...) {
         return std::string("Could not parse sprite image");
     }
 

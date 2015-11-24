@@ -2,7 +2,6 @@
 #include "../fixtures/fixture_log_observer.hpp"
 
 #include <mbgl/map/map.hpp>
-#include <mbgl/map/still_image.hpp>
 #include <mbgl/platform/default/headless_display.hpp>
 #include <mbgl/platform/default/headless_view.hpp>
 #include <mbgl/storage/default_file_source.hpp>
@@ -46,7 +45,7 @@ TEST(API, RenderWithoutStyle) {
     Map map(view, fileSource, MapMode::Still);
 
     std::promise<std::exception_ptr> promise;
-    map.renderStill([&promise](std::exception_ptr error, std::unique_ptr<const StillImage>) {
+    map.renderStill([&promise](std::exception_ptr error, UnassociatedImage&&) {
         promise.set_value(error);
     });
 

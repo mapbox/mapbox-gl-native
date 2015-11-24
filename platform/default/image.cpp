@@ -1,15 +1,7 @@
 #include <mbgl/util/image.hpp>
-#include <mbgl/platform/log.hpp>
 #include <mbgl/util/string.hpp>
 
 #include <png.h>
-
-#include <cassert>
-#include <cstdlib>
-#include <stdexcept>
-#include <cstring>
-
-#include <mbgl/platform/default/image_reader.hpp>
 
 #pragma GCC diagnostic push
 #pragma GCC diagnostic ignored "-Wunused-variable"
@@ -25,32 +17,28 @@ const static bool png_version_check = []() {
     return true;
 }();
 #pragma GCC diagnostic pop
-
 namespace mbgl {
-namespace util {
 
-std::string compress_png(size_t width, size_t height, const uint8_t* rgba) {
+std::string encodePNG(const UnassociatedImage& src) {
     png_voidp error_ptr = 0;
     png_structp png_ptr = png_create_write_struct(PNG_LIBPNG_VER_STRING, error_ptr, NULL, NULL);
     if (!png_ptr) {
-        Log::Error(Event::Image, "couldn't create png_ptr");
-        return "";
+        throw std::runtime_error("couldn't create png_ptr");
     }
 
     png_infop info_ptr = png_create_info_struct(png_ptr);
     if (!png_ptr) {
         png_destroy_write_struct(&png_ptr, (png_infopp)0);
-        Log::Error(Event::Image, "couldn't create info_ptr");
-        return "";
+        throw std::runtime_error("couldn't create info_ptr");
     }
 
-    png_set_IHDR(png_ptr, info_ptr, width, height, 8, PNG_COLOR_TYPE_RGB_ALPHA, PNG_INTERLACE_NONE,
+    png_set_IHDR(png_ptr, info_ptr, src.width, src.height, 8, PNG_COLOR_TYPE_RGB_ALPHA, PNG_INTERLACE_NONE,
                  PNG_COMPRESSION_TYPE_DEFAULT, PNG_FILTER_TYPE_DEFAULT);
 
     jmp_buf *jmp_context = (jmp_buf *)png_get_error_ptr(png_ptr);
     if (jmp_context) {
         png_destroy_write_struct(&png_ptr, &info_ptr);
-        return "";
+        throw std::runtime_error("png error");
     }
 
     std::string result;
@@ -63,10 +51,10 @@ std::string compress_png(size_t width, size_t height, const uint8_t* rgba) {
         ptrs(size_t count) : rows(new png_bytep[count]) {}
         ~ptrs() { delete[] rows; }
         png_bytep *rows = nullptr;
-    } pointers(height);
+    } pointers(src.height);
 
-    for (size_t i = 0; i < height; i++) {
-        pointers.rows[i] = (png_bytep)((png_bytep)rgba + width * 4 * i);
+    for (size_t i = 0; i < src.height; i++) {
+        pointers.rows[i] = src.data.get() + src.stride() * i;
     }
 
     png_set_rows(png_ptr, info_ptr, pointers.rows);
@@ -76,31 +64,28 @@ std::string compress_png(size_t width, size_t height, const uint8_t* rgba) {
     return result;
 }
 
-Image::Image(std::string const& data)
-{
-    try
-    {
-        auto reader = getImageReader(reinterpret_cast<const uint8_t*>(data.c_str()), data.size());
-        width = reader->width();
-        height = reader->height();
-        img = reader->read();
-    }
-    catch (ImageReaderException const& ex)
-    {
-        Log::Error(Event::Image, "%s", ex.what());
-        img.reset();
-        width = 0;
-        height = 0;
+PremultipliedImage decodePNG(const uint8_t*, size_t);
+PremultipliedImage decodeJPEG(const uint8_t*, size_t);
 
+PremultipliedImage decodeImage(const std::string& string) {
+    const uint8_t* data = reinterpret_cast<const uint8_t*>(string.data());
+    const size_t size = string.size();
+
+    if (size >= 4) {
+        unsigned int magic = (data[0] << 24) | (data[1] << 16) | (data[2] << 8) | data[3];
+        if (magic == 0x89504E47U) {
+            return decodePNG(data, size);
+        }
     }
-    catch (...) // catch the rest
-    {
-        Log::Error(Event::Image, "exception in constructor");
-        img.reset();
-        width = 0;
-        height = 0;
+
+    if (size >= 2) {
+        unsigned int magic = ((data[0] << 8) | data[1]) & 0xffff;
+        if (magic == 0xffd8) {
+            return decodeJPEG(data, size);
+        }
     }
+
+    throw std::runtime_error("unsupported image type");
 }
 
-}
 }

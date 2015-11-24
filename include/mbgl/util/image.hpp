@@ -5,30 +5,37 @@
 #include <memory>
 
 namespace mbgl {
-namespace util {
 
-std::string compress_png(size_t width, size_t height, const uint8_t* rgba);
-
-
-class Image {
-public:
-    explicit Image(const std::string& img);
-
-    inline const uint8_t* getData() const { return img.get(); }
-    inline uint32_t getWidth() const { return width; }
-    inline uint32_t getHeight() const { return height; }
-    inline operator bool() const { return img && width && height; }
-
-private:
-    // loaded image dimensions
-    uint32_t width = 0, height = 0;
-
-    // the raw image data
-    std::unique_ptr<uint8_t[]> img;
+enum ImageAlphaMode {
+    Unassociated,
+    Premultiplied
 };
 
+template <ImageAlphaMode Mode>
+class Image {
+public:
+    Image() {}
 
-}
+    Image(size_t w, size_t h)
+        : width(w),
+          height(h),
+          data(std::make_unique<uint8_t[]>(size())) {}
+
+    size_t stride() const { return width * 4; }
+    size_t size() const { return width * height * 4; }
+
+    size_t width = 0;
+    size_t height = 0;
+    std::unique_ptr<uint8_t[]> data;
+};
+
+using UnassociatedImage = Image<ImageAlphaMode::Unassociated>;
+using PremultipliedImage = Image<ImageAlphaMode::Premultiplied>;
+
+// TODO: don't use std::string for binary data.
+PremultipliedImage decodeImage(const std::string&);
+std::string encodePNG(const UnassociatedImage&);
+
 }
 
 #endif

@@ -23,7 +23,7 @@ void RasterBucket::render(Painter& painter,
     painter.renderRaster(*this, dynamic_cast<const RasterLayer&>(layer), id, matrix);
 }
 
-bool RasterBucket::setImage(std::unique_ptr<util::Image> image) {
+bool RasterBucket::setImage(PremultipliedImage image) {
     return raster.load(std::move(image));
 }
 

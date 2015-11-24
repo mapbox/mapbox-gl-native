@@ -13,10 +13,10 @@ using namespace mbgl;
 TEST(Sprite, SpriteImageCreationInvalid) {
     FixtureLog log;
 
-    const util::Image image_1x(util::read_file("test/fixtures/annotations/emerald.png"));
-    ASSERT_TRUE(image_1x);
-    ASSERT_EQ(200u, image_1x.getWidth());
-    ASSERT_EQ(299u, image_1x.getHeight());
+    const PremultipliedImage image_1x = decodeImage(util::read_file("test/fixtures/annotations/emerald.png"));
+
+    ASSERT_EQ(200u, image_1x.width);
+    ASSERT_EQ(299u, image_1x.height);
 
     ASSERT_EQ(nullptr, createSpriteImage(image_1x, 0, 0, 0, 16, 1, false));    // width == 0
     ASSERT_EQ(nullptr, createSpriteImage(image_1x, 0, 0, 16, 0, 1, false));    // height == 0
@@ -34,10 +34,10 @@ TEST(Sprite, SpriteImageCreationInvalid) {
 }
 
 TEST(Sprite, SpriteImageCreation1x) {
-    const util::Image image_1x(util::read_file("test/fixtures/annotations/emerald.png"));
-    ASSERT_TRUE(image_1x);
-    ASSERT_EQ(200u, image_1x.getWidth());
-    ASSERT_EQ(299u, image_1x.getHeight());
+    const PremultipliedImage image_1x = decodeImage(util::read_file("test/fixtures/annotations/emerald.png"));
+
+    ASSERT_EQ(200u, image_1x.width);
+    ASSERT_EQ(299u, image_1x.height);
 
     { // "museum_icon":{"x":177,"y":187,"width":18,"height":18,"pixelRatio":1,"sdf":false}
         const auto sprite = createSpriteImage(image_1x, 177, 187, 18, 18, 1, false);
@@ -74,8 +74,7 @@ TEST(Sprite, SpriteImageCreation1x) {
 }
 
 TEST(Sprite, SpriteImageCreation2x) {
-    const util::Image image_2x(util::read_file("test/fixtures/annotations/emerald@2x.png"));
-    ASSERT_TRUE(image_2x);
+    const PremultipliedImage image_2x = decodeImage(util::read_file("test/fixtures/annotations/emerald@2x.png"));
 
     // "museum_icon":{"x":354,"y":374,"width":36,"height":36,"pixelRatio":2,"sdf":false}
     const auto sprite = createSpriteImage(image_2x, 354, 374, 36, 36, 2, false);
@@ -89,8 +88,7 @@ TEST(Sprite, SpriteImageCreation2x) {
 }
 
 TEST(Sprite, SpriteImageCreation1_5x) {
-    const util::Image image_2x(util::read_file("test/fixtures/annotations/emerald@2x.png"));
-    ASSERT_TRUE(image_2x);
+    const PremultipliedImage image_2x = decodeImage(util::read_file("test/fixtures/annotations/emerald@2x.png"));
 
     // "museum_icon":{"x":354,"y":374,"width":36,"height":36,"pixelRatio":2,"sdf":false}
     const auto sprite = createSpriteImage(image_2x, 354, 374, 36, 36, 1.5, false);

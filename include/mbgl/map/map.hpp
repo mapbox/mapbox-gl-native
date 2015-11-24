@@ -2,6 +2,7 @@
 #define MBGL_MAP_MAP
 
 #include <mbgl/util/chrono.hpp>
+#include <mbgl/util/image.hpp>
 #include <mbgl/map/update.hpp>
 #include <mbgl/map/mode.hpp>
 #include <mbgl/util/geo.hpp>
@@ -21,7 +22,6 @@ class FileSource;
 class View;
 class MapData;
 class MapContext;
-class StillImage;
 class SpriteImage;
 class Transform;
 class PointAnnotation;
@@ -58,7 +58,7 @@ public:
 
     // Register a callback that will get called (on the render thread) when all resources have
     // been loaded and a complete render occurs.
-    using StillImageCallback = std::function<void(std::exception_ptr, std::unique_ptr<const StillImage>)>;
+    using StillImageCallback = std::function<void (std::exception_ptr, UnassociatedImage&&)>;
     void renderStill(StillImageCallback callback);
 
     // Triggers a synchronous render.

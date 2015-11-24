@@ -2,7 +2,6 @@
 #include "../fixtures/fixture_log_observer.hpp"
 
 #include <mbgl/map/map.hpp>
-#include <mbgl/map/still_image.hpp>
 #include <mbgl/platform/default/headless_view.hpp>
 #include <mbgl/platform/default/headless_display.hpp>
 #include <mbgl/storage/default_file_source.hpp>
@@ -26,28 +25,26 @@ TEST(API, RepeatedRender) {
 
     {
         map.setStyleJSON(style, "");
-        std::promise<std::unique_ptr<const StillImage>> promise;
-        map.renderStill([&promise](std::exception_ptr, std::unique_ptr<const StillImage> image) {
+        std::promise<UnassociatedImage> promise;
+        map.renderStill([&promise](std::exception_ptr, UnassociatedImage&& image) {
             promise.set_value(std::move(image));
         });
-        auto result = promise.get_future().get();
-        ASSERT_EQ(256, result->width);
-        ASSERT_EQ(512, result->height);
-        const std::string png = util::compress_png(result->width, result->height, result->pixels.get());
-        util::write_file("test/fixtures/api/1.png", png);
+        auto result = std::move(promise.get_future().get());
+        ASSERT_EQ(256, result.width);
+        ASSERT_EQ(512, result.height);
+        util::write_file("test/fixtures/api/1.png", encodePNG(result));
     }
 
     {
         map.setStyleJSON(style, "TEST_DATA/suite");
-        std::promise<std::unique_ptr<const StillImage>> promise;
-        map.renderStill([&promise](std::exception_ptr, std::unique_ptr<const StillImage> image) {
+        std::promise<UnassociatedImage> promise;
+        map.renderStill([&promise](std::exception_ptr, UnassociatedImage&& image) {
             promise.set_value(std::move(image));
         });
-        auto result = promise.get_future().get();
-        ASSERT_EQ(256, result->width);
-        ASSERT_EQ(512, result->height);
-        const std::string png = util::compress_png(result->width, result->height, result->pixels.get());
-        util::write_file("test/fixtures/api/2.png", png);
+        auto result = std::move(promise.get_future().get());
+        ASSERT_EQ(256, result.width);
+        ASSERT_EQ(512, result.height);
+        util::write_file("test/fixtures/api/2.png", encodePNG(result));
     }
 
     auto observer = Log::removeObserver();

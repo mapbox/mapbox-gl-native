@@ -3,9 +3,6 @@
 #include <mbgl/platform/default/headless_display.hpp>
 #include <mbgl/platform/log.hpp>
 
-#include <mbgl/map/still_image.hpp>
-
-
 #include <stdexcept>
 #include <sstream>
 #include <string>
@@ -170,29 +167,25 @@ void HeadlessView::resize(const uint16_t width, const uint16_t height) {
     needsResize = true;
 }
 
-std::unique_ptr<StillImage> HeadlessView::readStillImage() {
+UnassociatedImage HeadlessView::readStillImage() {
     assert(isActive());
 
     const unsigned int w = dimensions[0] * pixelRatio;
     const unsigned int h = dimensions[1] * pixelRatio;
 
-    auto image = std::make_unique<StillImage>();
-    image->width = w;
-    image->height = h;
-    image->pixels = std::make_unique<uint8_t[]>(w * h * 4);
+    UnassociatedImage image { w, h };
+    MBGL_CHECK_ERROR(glReadPixels(0, 0, w, h, GL_RGBA, GL_UNSIGNED_BYTE, image.data.get()));
 
-    MBGL_CHECK_ERROR(glReadPixels(0, 0, w, h, GL_RGBA, GL_UNSIGNED_BYTE, image->pixels.get()));
-
-    const int stride = w * 4;
-    auto tmp = std::make_unique<char[]>(stride);
-    char *rgba = reinterpret_cast<char *>(image->pixels.get());
+    const int stride = image.stride();
+    auto tmp = std::make_unique<uint8_t[]>(stride);
+    uint8_t* rgba = image.data.get();
     for (int i = 0, j = h - 1; i < j; i++, j--) {
         std::memcpy(tmp.get(), rgba + i * stride, stride);
         std::memcpy(rgba + i * stride, rgba + j * stride, stride);
         std::memcpy(rgba + j * stride, tmp.get(), stride);
     }
 
-    return image;
+    return std::move(image);
 }
 
 void HeadlessView::clearBuffers() {

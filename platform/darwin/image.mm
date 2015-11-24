@@ -9,10 +9,9 @@
 #endif
 
 namespace mbgl {
-namespace util {
 
-std::string compress_png(size_t width, size_t height, const uint8_t* rgba) {
-    CGDataProviderRef provider = CGDataProviderCreateWithData(NULL, rgba, width * height * 4, NULL);
+std::string encodePNG(const UnassociatedImage& src) {
+    CGDataProviderRef provider = CGDataProviderCreateWithData(NULL, src.data.get(), src.size(), NULL);
     if (!provider) {
         return "";
     }
@@ -23,7 +22,7 @@ std::string compress_png(size_t width, size_t height, const uint8_t* rgba) {
         return "";
     }
 
-    CGImageRef image = CGImageCreate(width, height, 8, 32, 4 * width, color_space,
+    CGImageRef image = CGImageCreate(src.width, src.height, 8, 32, 4 * src.width, color_space,
         kCGBitmapByteOrderDefault | kCGImageAlphaLast, provider, NULL, false,
         kCGRenderingIntentDefault);
     if (!image) {
@@ -66,23 +65,23 @@ std::string compress_png(size_t width, size_t height, const uint8_t* rgba) {
     return result;
 }
 
-Image::Image(const std::string &source_data) {
+PremultipliedImage decodeImage(const std::string &source_data) {
     CFDataRef data = CFDataCreateWithBytesNoCopy(kCFAllocatorDefault, reinterpret_cast<const unsigned char *>(source_data.data()), source_data.size(), kCFAllocatorNull);
     if (!data) {
-        return;
+        throw std::runtime_error("CFDataCreateWithBytesNoCopy failed");
     }
 
     CGImageSourceRef image_source = CGImageSourceCreateWithData(data, NULL);
     if (!image_source) {
         CFRelease(data);
-        return;
+        throw std::runtime_error("CGImageSourceCreateWithData failed");
     }
 
     CGImageRef image = CGImageSourceCreateImageAtIndex(image_source, 0, NULL);
     if (!image) {
         CFRelease(image_source);
         CFRelease(data);
-        return;
+        throw std::runtime_error("CGImageSourceCreateImageAtIndex failed");
     }
 
     CGColorSpaceRef color_space = CGColorSpaceCreateDeviceRGB();
@@ -90,27 +89,24 @@ Image::Image(const std::string &source_data) {
         CGImageRelease(image);
         CFRelease(image_source);
         CFRelease(data);
-        return;
+        throw std::runtime_error("CGColorSpaceCreateDeviceRGB failed");
     }
 
-    width = uint32_t(CGImageGetWidth(image));
-    height = uint32_t(CGImageGetHeight(image));
-    CGRect rect = {{ 0, 0 }, { static_cast<CGFloat>(width), static_cast<CGFloat>(height) }};
+    PremultipliedImage result { CGImageGetWidth(image), CGImageGetHeight(image) };
 
-    img = std::make_unique<uint8_t[]>(width * height * 4);
-    CGContextRef context = CGBitmapContextCreate(img.get(), width, height, 8, width * 4,
+    CGContextRef context = CGBitmapContextCreate(result.data.get(), result.width, result.height, 8, result.stride(),
         color_space, kCGImageAlphaPremultipliedLast);
     if (!context) {
         CGColorSpaceRelease(color_space);
         CGImageRelease(image);
         CFRelease(image_source);
         CFRelease(data);
-        width = 0;
-        height = 0;
-        return;
+        throw std::runtime_error("CGBitmapContextCreate failed");
     }
 
     CGContextSetBlendMode(context, kCGBlendModeCopy);
+
+    CGRect rect = {{ 0, 0 }, { static_cast<CGFloat>(result.width), static_cast<CGFloat>(result.height) }};
     CGContextDrawImage(context, rect, image);
 
     CGContextRelease(context);
@@ -118,7 +114,8 @@ Image::Image(const std::string &source_data) {
     CGImageRelease(image);
     CFRelease(image_source);
     CFRelease(data);
+
+    return result;
 }
 
-}
 }

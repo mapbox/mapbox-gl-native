@@ -3,7 +3,6 @@
 #include "node_mapbox_gl_native.hpp"
 
 #include <mbgl/platform/default/headless_display.hpp>
-#include <mbgl/map/still_image.hpp>
 #include <mbgl/util/exception.hpp>
 #include <mbgl/util/work_request.hpp>
 
@@ -281,7 +280,7 @@ NAN_METHOD(NodeMap::Render) {
     auto options = ParseOptions(info[0]->ToObject());
 
     assert(!nodeMap->callback);
-    assert(!nodeMap->image);
+    assert(!nodeMap->image.data);
     nodeMap->callback = std::make_unique<Nan::Callback>(info[1].As<v8::Function>());
 
     try {
@@ -301,12 +300,12 @@ void NodeMap::startRender(std::unique_ptr<NodeMap::RenderOptions> options) {
     map->setBearing(options->bearing);
     map->setPitch(options->pitch);
 
-    map->renderStill([this](const std::exception_ptr eptr, std::unique_ptr<const mbgl::StillImage> result) {
+    map->renderStill([this](const std::exception_ptr eptr, mbgl::UnassociatedImage&& result) {
         if (eptr) {
             error = std::move(eptr);
             uv_async_send(async);
         } else {
-            assert(!image);
+            assert(!image.data);
             image = std::move(result);
             uv_async_send(async);
         }
@@ -338,7 +337,7 @@ void NodeMap::renderFinished() {
 
     // These have to be empty to be prepared for the next render call.
     assert(!callback);
-    assert(!image);
+    assert(!image.data);
 
     if (error) {
         std::string errorMessage;
@@ -358,17 +357,16 @@ void NodeMap::renderFinished() {
         assert(!error);
 
         cb->Call(1, argv);
-    } else if (img) {
+    } else if (img.data) {
         v8::Local<v8::Object> pixels = Nan::NewBuffer(
-            reinterpret_cast<char *>(img->pixels.get()), img->width * img->height * 4,
-
-            // Retain the StillImage object until the buffer is deleted.
-            [](char *, void *hint) {
-                delete reinterpret_cast<const mbgl::StillImage *>(hint);
+            reinterpret_cast<char *>(img.data.get()), img.size(),
+            // Retain the data until the buffer is deleted.
+            [](char *, void * hint) {
+                delete [] reinterpret_cast<uint8_t*>(hint);
             },
-            const_cast<mbgl::StillImage *>(img.get())
+            img.data.get()
         ).ToLocalChecked();
-        img.release();
+        img.data.release();
 
         v8::Local<v8::Value> argv[] = {
             Nan::Null(),
