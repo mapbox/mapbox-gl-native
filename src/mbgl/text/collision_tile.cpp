@@ -27,7 +27,7 @@ float CollisionTile::placeFeature(const CollisionFeature &feature) {
         const auto anchor = box.anchor.matMul(rotationMatrix);
 
         std::vector<CollisionTreeBox> blockingBoxes;
-        tree.query(bgi::intersects(getTreeBox(anchor, box)), std::back_inserter(blockingBoxes));
+        tree.query(CollisionBGI::intersects(getTreeBox(anchor, box)), std::back_inserter(blockingBoxes));
 
         for (auto& blockingTreeBox : blockingBoxes) {
             const auto& blocking = std::get<1>(blockingTreeBox);

@@ -140,6 +140,53 @@ void TileWorker::parseLayer(const StyleLayer& layer, const GeometryTile& geometr
         // We cannot parse this bucket yet. Instead, we're saving it for later.
         pending.emplace_back(layer, std::move(bucket));
     } else {
+
+        // catalog features for interactivity
+        //
+        // if (layer.interactive) { ...
+        //
+        // also, we don't get here for raster buckets, since they don't have layers
+
+        if (!partialParse && layer.id.substr(0, 3) == "poi" && bucket->hasData()) {
+            result.featureTree.clear();
+            for (std::size_t i = 0; i < geometryLayer->featureCount(); i++) {
+                const auto feature = geometryLayer->getFeature(i);
+                const auto geometries = feature->getGeometries();
+                for (std::size_t j = 0; j < geometries.size(); j++) {
+                    FeatureBox featureBox {{ 4096 + 64, 4096 + 64 }, { -64, -64 }};
+                    const auto geometry = geometries.at(j);
+                    for (std::size_t k = 0; k < geometry.size(); k++) {
+                        const auto point = geometry.at(k);
+                        const auto min = featureBox.min_corner();
+                        const auto max = featureBox.max_corner();
+                        if (point.x < min.get<0>()) {
+                            featureBox.min_corner().set<0>(point.x);
+                        }
+                        if (point.y < min.get<1>()) {
+                            featureBox.min_corner().set<1>(point.y);
+                        }
+                        if (point.x > max.get<0>()) {
+                            featureBox.max_corner().set<0>(point.x);
+                        }
+                        if (point.y > max.get<1>()) {
+                            featureBox.max_corner().set<1>(point.y);
+                        }
+                        std::string name = "(unknown)";
+                        const auto maybe_name = feature->getValue("name_en");
+                        if (maybe_name.get().is<std::string>()) {
+                            name = maybe_name.get().get<std::string>();
+                        }
+                        name = layer.id + " - " + name;
+                        result.featureTree.insert(std::make_pair(featureBox, layer.id + name));
+//                        printf("added %s\n", name.c_str());
+                    }
+                }
+            }
+            if (result.featureTree.size()) {
+//                printf("feature tree for %i,%i,%i [%s] has %lu members\n", id.z, id.x, id.y, layer.id.c_str(), result.featureTree.size());
+            }
+        }
+
         insertBucket(layer.bucketName(), std::move(bucket));
     }
 }
