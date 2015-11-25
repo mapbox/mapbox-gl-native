@@ -11,6 +11,8 @@
 
 #include <mbgl/platform/default/image_reader.hpp>
 
+#pragma GCC diagnostic push
+#pragma GCC diagnostic ignored "-Wunused-variable"
 // Check png library version.
 const static bool png_version_check = []() {
     const png_uint_32 version = png_access_version_number();
@@ -22,7 +24,7 @@ const static bool png_version_check = []() {
     }
     return true;
 }();
-
+#pragma GCC diagnostic pop
 
 namespace mbgl {
 namespace util {
