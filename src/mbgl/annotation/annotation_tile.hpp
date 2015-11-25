@@ -46,13 +46,13 @@ public:
     ~AnnotationTileMonitor();
 
     void update(std::unique_ptr<GeometryTile>);
-    std::unique_ptr<FileRequest> monitorTile(std::function<void (std::exception_ptr, std::unique_ptr<GeometryTile>)>) override;
+    std::unique_ptr<FileRequest> monitorTile(const GeometryTileMonitor::Callback&) override;
 
     TileID tileID;
 
 private:
     MapData& data;
-    std::function<void (std::exception_ptr, std::unique_ptr<GeometryTile>)> callback;
+    GeometryTileMonitor::Callback callback;
 };
 
 }

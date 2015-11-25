@@ -36,14 +36,14 @@ AnnotationTileMonitor::~AnnotationTileMonitor() {
     data.getAnnotationManager()->removeTileMonitor(*this);
 }
 
-std::unique_ptr<FileRequest> AnnotationTileMonitor::monitorTile(std::function<void (std::exception_ptr, std::unique_ptr<GeometryTile>)> callback_) {
+std::unique_ptr<FileRequest> AnnotationTileMonitor::monitorTile(const GeometryTileMonitor::Callback& callback_) {
     callback = callback_;
     data.getAnnotationManager()->addTileMonitor(*this);
     return nullptr;
 }
 
 void AnnotationTileMonitor::update(std::unique_ptr<GeometryTile> tile) {
-    callback(nullptr, std::move(tile));
+    callback(nullptr, std::move(tile), Seconds::zero(), Seconds::zero());
 }
 
 }

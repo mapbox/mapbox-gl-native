@@ -25,7 +25,10 @@ VectorTileData::VectorTileData(const TileID& id_,
       monitor(std::move(monitor_))
 {
     state = State::loading;
-    tileRequest = monitor->monitorTile([callback, this](std::exception_ptr err, std::unique_ptr<GeometryTile> tile) {
+    tileRequest = monitor->monitorTile([callback, this](std::exception_ptr err,
+                                                        std::unique_ptr<GeometryTile> tile,
+                                                        Seconds modified_,
+                                                        Seconds expires_) {
         if (err) {
             try {
                 std::rethrow_exception(err);
@@ -49,6 +52,9 @@ VectorTileData::VectorTileData(const TileID& id_,
         } else if (isReady()) {
             state = State::partial;
         }
+
+        modified = modified_;
+        expires = expires_;
 
         // Kick off a fresh parse of this tile. This happens when the tile is new, or
         // when tile data changed. Replacing the workdRequest will cancel a pending work

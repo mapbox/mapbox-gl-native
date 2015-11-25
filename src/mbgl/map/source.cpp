@@ -285,7 +285,11 @@ TileData::State Source::addTile(MapData& data,
 
         // If we don't find working tile data, we're just going to load it.
         if (info.type == SourceType::Raster) {
-            auto tileData = std::make_shared<RasterTileData>(normalized_id, texturePool, info, style.workers);
+            auto tileData = std::make_shared<RasterTileData>(normalized_id,
+                                                             texturePool,
+                                                             info,
+                                                             style.workers);
+
             tileData->request(data.pixelRatio, callback);
             new_tile.data = tileData;
         } else {
