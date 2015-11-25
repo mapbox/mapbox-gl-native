@@ -24,6 +24,7 @@ public class InfoWindow {
     private WeakReference<MapView> mMapView;
     private float mMarkerHeightOffset;
     private float mViewWidthOffset;
+    private PointF mCoordinates;
     private boolean mIsVisible;
     protected View mView;
 
@@ -84,15 +85,17 @@ public class InfoWindow {
      */
     InfoWindow open(Marker boundMarker, LatLng position, int offsetX, int offsetY) {
         setBoundMarker(boundMarker);
-        mMarkerHeightOffset = offsetY;
 
         MapView.LayoutParams lp = new MapView.LayoutParams(MapView.LayoutParams.WRAP_CONTENT, MapView.LayoutParams.WRAP_CONTENT);
         mView.measure(View.MeasureSpec.UNSPECIFIED, View.MeasureSpec.UNSPECIFIED);
 
+        // Calculate y-offset for update method
+        mMarkerHeightOffset = -mView.getMeasuredHeight() + offsetY;
+
         // Calculate default Android x,y coordinate
-        PointF coords = mMapView.get().toScreenLocation(position);
-        float x = coords.x - (mView.getMeasuredWidth() / 2) + offsetX;
-        float y = coords.y - mView.getMeasuredHeight() + mMarkerHeightOffset;
+        mCoordinates = mMapView.get().toScreenLocation(position);
+        float x = mCoordinates.x - (mView.getMeasuredWidth() / 2) + offsetX;
+        float y = mCoordinates.y - mView.getMeasuredHeight() + offsetY;
 
         if (mView instanceof InfoWindowView) {
             // only apply repositioning/margin for InfoWindowView
@@ -133,7 +136,6 @@ public class InfoWindow {
             if (outOfBoundsRight && mapRight - rightSideInfowWindow < marginHorizontal) {
                 x -= marginHorizontal - (mapRight - rightSideInfowWindow);
                 tipViewMarginLeft += marginHorizontal - (mapRight - rightSideInfowWindow) - tipViewOffset;
-
                 leftSideInfoWindow = x;
             }
 
@@ -141,7 +143,6 @@ public class InfoWindow {
             if (outOfBoundsLeft && leftSideInfoWindow - mapLeft < marginHorizontal) {
                 x += marginHorizontal - (leftSideInfoWindow - mapLeft);
                 tipViewMarginLeft -= (marginHorizontal - (leftSideInfoWindow - mapLeft)) - tipViewOffset;
-
             }
 
             // Adjust tipView
@@ -153,7 +154,8 @@ public class InfoWindow {
         mView.setX(x);
         mView.setY(y);
 
-        mViewWidthOffset = x - (coords.x - (mView.getMeasuredWidth() / 2) + offsetX);
+        // Calculate x-offset for update method
+        mViewWidthOffset = x - mCoordinates.x - offsetX;
 
         close(); //if it was already opened
         mMapView.get().addView(mView, lp);
@@ -237,9 +239,9 @@ public class InfoWindow {
         MapView mapView = mMapView.get();
         Marker marker = mBoundMarker.get();
         if (mapView != null && marker != null) {
-            PointF pointF = mapView.toScreenLocation(marker.getPosition());
-            mView.setX((pointF.x - (mView.getWidth() / 2)) + mViewWidthOffset);
-            mView.setY(pointF.y - mView.getHeight() + mMarkerHeightOffset);
+            mCoordinates = mapView.toScreenLocation(marker.getPosition());
+            mView.setX(mCoordinates.x + mViewWidthOffset);
+            mView.setY(mCoordinates.y + mMarkerHeightOffset);
         }
     }
 
