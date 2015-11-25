@@ -23,6 +23,7 @@ public class InfoWindow {
     private WeakReference<Marker> mBoundMarker;
     private WeakReference<MapView> mMapView;
     private float mMarkerHeightOffset;
+    private float mViewWidthOffset;
     private boolean mIsVisible;
     protected View mView;
 
@@ -152,6 +153,8 @@ public class InfoWindow {
         mView.setX(x);
         mView.setY(y);
 
+        mViewWidthOffset = x - (coords.x - (mView.getMeasuredWidth() / 2) + offsetX);
+
         close(); //if it was already opened
         mMapView.get().addView(mView, lp);
         mIsVisible = true;
@@ -235,7 +238,7 @@ public class InfoWindow {
         Marker marker = mBoundMarker.get();
         if (mapView != null && marker != null) {
             PointF pointF = mapView.toScreenLocation(marker.getPosition());
-            mView.setX(pointF.x - mView.getWidth() / 2);
+            mView.setX((pointF.x - (mView.getWidth() / 2)) + mViewWidthOffset);
             mView.setY(pointF.y - mView.getHeight() + mMarkerHeightOffset);
         }
     }
