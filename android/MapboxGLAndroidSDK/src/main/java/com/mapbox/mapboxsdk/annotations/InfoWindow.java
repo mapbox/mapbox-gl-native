@@ -18,10 +18,11 @@ import java.lang.ref.WeakReference;
 /**
  * A tooltip view
  */
-final class InfoWindow {
+public class InfoWindow {
 
     private WeakReference<Marker> mBoundMarker;
     private WeakReference<MapView> mMapView;
+    private float mMarkerHeightOffset;
     private boolean mIsVisible;
     protected View mView;
 
@@ -82,6 +83,7 @@ final class InfoWindow {
      */
     InfoWindow open(Marker boundMarker, LatLng position, int offsetX, int offsetY) {
         setBoundMarker(boundMarker);
+        mMarkerHeightOffset = offsetY;
 
         MapView.LayoutParams lp = new MapView.LayoutParams(MapView.LayoutParams.WRAP_CONTENT, MapView.LayoutParams.WRAP_CONTENT);
         mView.measure(View.MeasureSpec.UNSPECIFIED, View.MeasureSpec.UNSPECIFIED);
@@ -89,19 +91,20 @@ final class InfoWindow {
         // Calculate default Android x,y coordinate
         PointF coords = mMapView.get().toScreenLocation(position);
         float x = coords.x - (mView.getMeasuredWidth() / 2) + offsetX;
-        float y = coords.y - mView.getMeasuredHeight() + offsetY;
-
-        // get right/left popup window
-        float rightSideInfowWindow = x + mView.getMeasuredWidth();
-        float leftSideInfoWindow = x;
-
-        // get right/left map view
-        final float mapRight = mMapView.get().getRight();
-        final float mapLeft = mMapView.get().getLeft();
+        float y = coords.y - mView.getMeasuredHeight() + mMarkerHeightOffset;
 
         if (mView instanceof InfoWindowView) {
             // only apply repositioning/margin for InfoWindowView
             Resources resources = mMapView.get().getContext().getResources();
+
+            // get right/left popup window
+            float rightSideInfowWindow = x + mView.getMeasuredWidth();
+            float leftSideInfoWindow = x;
+
+            // get right/left map view
+            final float mapRight = mMapView.get().getRight();
+            final float mapLeft = mMapView.get().getLeft();
+
             float marginHorizontal = resources.getDimension(R.dimen.infowindow_margin);
             float tipViewOffset = resources.getDimension(R.dimen.infowindow_tipview_width) / 2;
             float tipViewMarginLeft = mView.getMeasuredWidth() / 2 - tipViewOffset;
@@ -226,4 +229,15 @@ final class InfoWindow {
                 .getIdentifier("id/infowindow_subdescription", null, packageName);
         mImageId = context.getResources().getIdentifier("id/infowindow_image", null, packageName);
     }
+
+    public void update() {
+        MapView mapView = mMapView.get();
+        Marker marker = mBoundMarker.get();
+        if (mapView != null && marker != null) {
+            PointF pointF = mapView.toScreenLocation(marker.getPosition());
+            mView.setX(pointF.x - mView.getWidth() / 2);
+            mView.setY(pointF.y - mView.getHeight() + mMarkerHeightOffset);
+        }
+    }
+
 }

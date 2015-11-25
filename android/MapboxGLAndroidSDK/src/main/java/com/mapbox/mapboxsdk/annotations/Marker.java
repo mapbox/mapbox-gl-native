@@ -79,9 +79,9 @@ public final class Marker extends Annotation {
     /**
      * Do not use this method. Used internally by the SDK.
      */
-    public void showInfoWindow() {
+    public InfoWindow showInfoWindow() {
         if (getMapView() == null) {
-            return;
+            return null;
         }
 
         MapView.InfoWindowAdapter infoWindowAdapter = getMapView().getInfoWindowAdapter();
@@ -91,17 +91,18 @@ public final class Marker extends Annotation {
             if (content != null) {
                 infoWindow = new InfoWindow(content, getMapView());
                 showInfoWindow(infoWindow);
-                return;
+                return infoWindow;
             }
         }
 
         getInfoWindow().adaptDefaultMarker(this);
-        showInfoWindow(getInfoWindow());
+        return showInfoWindow(getInfoWindow());
     }
 
-    private void showInfoWindow(InfoWindow iw) {
+    private InfoWindow showInfoWindow(InfoWindow iw) {
         iw.open(this, getPosition(), 0, topOffsetPixels);
         infoWindowShown = true;
+        return iw;
     }
 
     private InfoWindow getInfoWindow() {

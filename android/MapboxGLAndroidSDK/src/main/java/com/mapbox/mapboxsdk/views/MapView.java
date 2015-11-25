@@ -56,6 +56,7 @@ import com.almeros.android.multitouch.gesturedetectors.RotateGestureDetector;
 import com.almeros.android.multitouch.gesturedetectors.TwoFingerGestureDetector;
 import com.mapbox.mapboxsdk.R;
 import com.mapbox.mapboxsdk.annotations.Annotation;
+import com.mapbox.mapboxsdk.annotations.InfoWindow;
 import com.mapbox.mapboxsdk.annotations.Marker;
 import com.mapbox.mapboxsdk.annotations.MarkerOptions;
 import com.mapbox.mapboxsdk.annotations.Polygon;
@@ -81,7 +82,6 @@ import java.nio.ByteBuffer;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.Collections;
-import java.util.Iterator;
 import java.util.List;
 
 /**
@@ -203,6 +203,7 @@ public final class MapView extends FrameLayout {
     private final List<Annotation> mAnnotations = new ArrayList<>();
     private List<Marker> mMarkersNearLastTap = new ArrayList<>();
     private List<Marker> mSelectedMarkers = new ArrayList<>();
+    private List<InfoWindow> mInfoWindows = new ArrayList<>();
     private InfoWindowAdapter mInfoWindowAdapter;
     private SpriteFactory mSpriteFactory;
     private ArrayList<Sprite> mSprites = new ArrayList<>();
@@ -808,10 +809,6 @@ public final class MapView extends FrameLayout {
         addOnMapChangedListener(new OnMapChangedListener() {
             @Override
             public void onMapChanged(@MapChange int change) {
-                if ((change == REGION_WILL_CHANGE) || (change == REGION_WILL_CHANGE_ANIMATED)) {
-                    deselectMarkers();
-                }
-
                 if (change == DID_FINISH_LOADING_MAP) {
                     reloadSprites();
                     reloadMarkers();
@@ -2033,10 +2030,8 @@ public final class MapView extends FrameLayout {
         }
 
         if (!handledDefaultClick) {
-            // default behaviour
-            // Can't do this as InfoWindow will get hidden
-            //setCenterCoordinate(marker.getPosition(), true);
-            marker.showInfoWindow();
+            // default behaviour show InfoWindow
+            mInfoWindows.add(marker.showInfoWindow());
         }
 
         mSelectedMarkers.add(marker);
@@ -2051,7 +2046,7 @@ public final class MapView extends FrameLayout {
             return;
         }
 
-        for (Marker marker: mSelectedMarkers) {
+        for (Marker marker : mSelectedMarkers) {
             if (marker.isInfoWindowShown()) {
                 marker.hideInfoWindow();
             }
@@ -2166,7 +2161,7 @@ public final class MapView extends FrameLayout {
             }
         }
 
-        for (Marker marker: mSelectedMarkers) {
+        for (Marker marker : mSelectedMarkers) {
             if (marker.isInfoWindowShown()) {
                 Marker temp = marker;
                 temp.hideInfoWindow();
@@ -2252,6 +2247,9 @@ public final class MapView extends FrameLayout {
         public void onSurfaceTextureUpdated(SurfaceTexture surface) {
             mCompassView.update(getDirection());
             mUserLocationView.update();
+            for (InfoWindow infoWindow : mInfoWindows) {
+                infoWindow.update();
+            }
         }
     }
 
