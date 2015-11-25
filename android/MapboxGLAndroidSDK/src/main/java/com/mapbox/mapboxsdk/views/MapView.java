@@ -2052,7 +2052,8 @@ public final class MapView extends FrameLayout {
             }
         }
 
-        mSelectedMarkers = new ArrayList<>();
+        // Removes all selected markers from the list
+        mSelectedMarkers.clear();
     }
 
     /**
@@ -2446,7 +2447,10 @@ public final class MapView extends FrameLayout {
                 Collections.sort(nearbyMarkers);
 
                 if (nearbyMarkers == mMarkersNearLastTap) {
-                    // TODO
+
+                    // TODO: We still need to adapt this logic to the new mSelectedMarkers list,
+                    // though the basic functionality is there.
+
                     // the selection candidates haven't changed; cycle through them
 //                    if (mSelectedMarker != null
 //                            && (mSelectedMarker.getId() == mMarkersNearLastTap.get(mMarkersNearLastTap.size() - 1).getId())) {
