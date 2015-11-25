@@ -3,6 +3,7 @@
 #include <uv.h>
 
 #include <mbgl/storage/default_file_source.hpp>
+#include <mbgl/util/chrono.hpp>
 #include <mbgl/util/run_loop.hpp>
 
 TEST_F(Storage, AssetReadDirectory) {
@@ -24,8 +25,8 @@ TEST_F(Storage, AssetReadDirectory) {
         EXPECT_EQ(Response::Error::Reason::NotFound, res.error->reason);
         EXPECT_EQ(false, res.stale);
         ASSERT_FALSE(res.data.get());
-        EXPECT_EQ(0, res.expires);
-        EXPECT_EQ(0, res.modified);
+        EXPECT_EQ(Seconds::zero(), res.expires);
+        EXPECT_EQ(Seconds::zero(), res.modified);
         EXPECT_EQ("", res.etag);
 #ifdef MBGL_ASSET_ZIP
         EXPECT_EQ("No such file", res.error->message);

@@ -114,8 +114,8 @@ HTTPNSURLRequest::HTTPNSURLRequest(HTTPNSURLContext* context_,
             if (!existingResponse->etag.empty()) {
                 [req addValue:@(existingResponse->etag.c_str())
                     forHTTPHeaderField:@"If-None-Match"];
-            } else if (existingResponse->modified) {
-                const std::string time = util::rfc1123(existingResponse->modified);
+            } else if (existingResponse->modified != Seconds::zero()) {
+                const std::string time = util::rfc1123(existingResponse->modified.count());
                 [req addValue:@(time.c_str()) forHTTPHeaderField:@"If-Modified-Since"];
             }
         }
@@ -214,12 +214,12 @@ void HTTPNSURLRequest::handleResult(NSData *data, NSURLResponse *res, NSError *e
 
         NSString *expires = [headers objectForKey:@"Expires"];
         if (expires) {
-            response->expires = parse_date([expires UTF8String]);
+            response->expires = Seconds(parse_date([expires UTF8String]));
         }
 
         NSString *last_modified = [headers objectForKey:@"Last-Modified"];
         if (last_modified) {
-            response->modified = parse_date([last_modified UTF8String]);
+            response->modified = Seconds(parse_date([last_modified UTF8String]));
         }
 
         NSString *etag = [headers objectForKey:@"ETag"];

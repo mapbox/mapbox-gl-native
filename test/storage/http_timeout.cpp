@@ -4,8 +4,8 @@
 
 #include <mbgl/storage/default_file_source.hpp>
 #include <mbgl/storage/network_status.hpp>
+#include <mbgl/util/chrono.hpp>
 #include <mbgl/util/run_loop.hpp>
-
 
 TEST_F(Storage, HTTPTimeout) {
     SCOPED_TEST(HTTPTimeout)
@@ -24,8 +24,8 @@ TEST_F(Storage, HTTPTimeout) {
         EXPECT_EQ(false, res.stale);
         ASSERT_TRUE(res.data.get());
         EXPECT_EQ("Hello World!", *res.data);
-        EXPECT_LT(0, res.expires);
-        EXPECT_EQ(0, res.modified);
+        EXPECT_LT(Seconds::zero(), res.expires);
+        EXPECT_EQ(Seconds::zero(), res.modified);
         EXPECT_EQ("", res.etag);
         if (counter == 4) {
             req.reset();

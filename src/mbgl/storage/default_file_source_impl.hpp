@@ -5,6 +5,7 @@
 #include <mbgl/storage/asset_context_base.hpp>
 #include <mbgl/storage/http_context_base.hpp>
 #include <mbgl/util/noncopyable.hpp>
+#include <mbgl/util/chrono.hpp>
 
 #include <set>
 #include <unordered_map>
@@ -57,7 +58,7 @@ public:
     // Returns the seconds we have to wait until we need to redo this request. A value of 0
     // means that we need to redo it immediately, and a negative value means that we're not setting
     // a timeout at all.
-    int64_t getRetryTimeout() const;
+    Seconds getRetryTimeout() const;
 
     // Checks the currently stored response and replaces it with an idential one, except with the
     // stale flag set, if the response is expired.

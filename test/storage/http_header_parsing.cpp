@@ -24,8 +24,8 @@ TEST_F(Storage, HTTPExpiresParsing) {
         EXPECT_EQ(false, res.stale);
         ASSERT_TRUE(res.data.get());
         EXPECT_EQ("Hello World!", *res.data);
-        EXPECT_EQ(1420797926, res.expires);
-        EXPECT_EQ(1420794326, res.modified);
+        EXPECT_EQ(1420797926, res.expires.count());
+        EXPECT_EQ(1420794326, res.modified.count());
         EXPECT_EQ("foo", res.etag);
         loop.stop();
         HTTPExpiresTest.finish();
@@ -42,8 +42,7 @@ TEST_F(Storage, HTTPCacheControlParsing) {
     DefaultFileSource fs(nullptr);
     util::RunLoop loop(uv_default_loop());
 
-    int64_t now = std::chrono::duration_cast<std::chrono::seconds>(
-                       SystemClock::now().time_since_epoch()).count();
+    const Seconds now = toSeconds(SystemClock::now());
 
     std::unique_ptr<FileRequest> req2 = fs.request({ Resource::Unknown, "http://127.0.0.1:3000/test?cachecontrol=max-age=120" },
                [&](Response res) {
@@ -52,8 +51,8 @@ TEST_F(Storage, HTTPCacheControlParsing) {
         EXPECT_EQ(false, res.stale);
         ASSERT_TRUE(res.data.get());
         EXPECT_EQ("Hello World!", *res.data);
-        EXPECT_GT(2, std::abs(res.expires - now - 120)) << "Expiration date isn't about 120 seconds in the future";
-        EXPECT_EQ(0, res.modified);
+        EXPECT_GT(2, std::abs(res.expires.count() - now.count() - 120)) << "Expiration date isn't about 120 seconds in the future";
+        EXPECT_EQ(Seconds::zero(), res.modified);
         EXPECT_EQ("", res.etag);
         loop.stop();
         HTTPCacheControlTest.finish();

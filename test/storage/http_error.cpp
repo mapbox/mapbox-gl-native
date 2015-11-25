@@ -4,6 +4,7 @@
 
 #include <mbgl/storage/default_file_source.hpp>
 #include <mbgl/storage/network_status.hpp>
+#include <mbgl/util/chrono.hpp>
 #include <mbgl/util/run_loop.hpp>
 
 #include <cmath>
@@ -30,8 +31,8 @@ TEST_F(Storage, HTTPTemporaryError) {
             EXPECT_EQ(false, res.stale);
             ASSERT_TRUE(res.data.get());
             EXPECT_EQ("", *res.data);
-            EXPECT_EQ(0, res.expires);
-            EXPECT_EQ(0, res.modified);
+            EXPECT_EQ(Seconds::zero(), res.expires);
+            EXPECT_EQ(Seconds::zero(), res.modified);
             EXPECT_EQ("", res.etag);
         } break;
         case 1: {
@@ -43,8 +44,8 @@ TEST_F(Storage, HTTPTemporaryError) {
             EXPECT_EQ(false, res.stale);
             ASSERT_TRUE(res.data.get());
             EXPECT_EQ("Hello World!", *res.data);
-            EXPECT_EQ(0, res.expires);
-            EXPECT_EQ(0, res.modified);
+            EXPECT_EQ(Seconds::zero(), res.expires);
+            EXPECT_EQ(Seconds::zero(), res.modified);
             EXPECT_EQ("", res.etag);
             loop.stop();
             HTTPTemporaryError.finish();
@@ -86,8 +87,8 @@ TEST_F(Storage, HTTPConnectionError) {
 #endif
         EXPECT_EQ(false, res.stale);
         ASSERT_FALSE(res.data.get());
-        EXPECT_EQ(0, res.expires);
-        EXPECT_EQ(0, res.modified);
+        EXPECT_EQ(Seconds::zero(), res.expires);
+        EXPECT_EQ(Seconds::zero(), res.modified);
         EXPECT_EQ("", res.etag);
 
         if (counter == 2) {

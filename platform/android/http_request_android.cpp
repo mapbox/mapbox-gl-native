@@ -129,8 +129,8 @@ HTTPAndroidRequest::HTTPAndroidRequest(HTTPAndroidContext* context_, const Resou
     if (existingResponse) {
         if (!existingResponse->etag.empty()) {
             etagStr = existingResponse->etag;
-        } else if (existingResponse->modified) {
-            modifiedStr = util::rfc1123(existingResponse->modified);
+        } else if (existingResponse->modified != Seconds::zero()) {
+            modifiedStr = util::rfc1123(existingResponse->modified.count());
         }
     }
 
@@ -195,11 +195,11 @@ void HTTPAndroidRequest::onResponse(int code, std::string message, std::string e
     response = std::make_unique<Response>();
     using Error = Response::Error;
 
-    response->modified = parse_date(modified.c_str());
+    response->modified = Seconds(parse_date(modified.c_str()));
     response->etag = etag;
     response->expires = parseCacheControl(cacheControl.c_str());
     if (!expires.empty()) {
-        response->expires = parse_date(expires.c_str());
+        response->expires = Seconds(parse_date(expires.c_str()));
     }
     response->data = std::make_shared<std::string>(body);
 

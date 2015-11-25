@@ -231,17 +231,17 @@ void DefaultFileSource::Impl::reschedule(DefaultFileRequestImpl& request) {
         return;
     }
 
-    const auto timeout = request.getRetryTimeout();
+    const Seconds timeout = request.getRetryTimeout();
 
-    if (timeout == 0) {
+    if (timeout == Seconds::zero()) {
         update(request);
-    } else if (timeout > 0) {
+    } else if (timeout > Seconds::zero()) {
         if (!request.timerRequest) {
             request.timerRequest = std::make_unique<uv::timer>(util::RunLoop::getLoop());
         }
 
         // timeout is in seconds, but the timer takes milliseconds.
-        request.timerRequest->start(1000 * timeout, 0, [this, &request] {
+        request.timerRequest->start(asMilliseconds(timeout).count(), 0, [this, &request] {
             assert(!request.realRequest);
             startRealRequest(request);
         });
@@ -298,14 +298,16 @@ const std::shared_ptr<const Response>& DefaultFileRequestImpl::getResponse() con
     return response;
 }
 
-int64_t DefaultFileRequestImpl::getRetryTimeout() const {
+Seconds DefaultFileRequestImpl::getRetryTimeout() const {
+    Seconds timeout = Seconds::zero();
+
     if (!response) {
         // If we don't have a response, we should retry immediately.
-        return 0;
+        return timeout;
     }
 
     // A value < 0 means that we should not retry.
-    int64_t timeout = -1;
+    timeout = Seconds(-1);
 
     if (response->error) {
         assert(failedRequests > 0);
@@ -314,14 +316,14 @@ int64_t DefaultFileRequestImpl::getRetryTimeout() const {
             // Retry immediately, unless we have a certain number of attempts already
             const int graceRetries = 3;
             if (failedRequests <= graceRetries) {
-                timeout = 1;
+                timeout = Seconds(1);
             } else {
-                timeout = 1 << std::min(failedRequests - graceRetries, 31);
+                timeout = Seconds(1 << std::min(failedRequests - graceRetries, 31));
             }
         } break;
         case Response::Error::Reason::Connection: {
             // Exponential backoff
-            timeout = 1 << std::min(failedRequests - 1, 31);
+            timeout = Seconds(1 << std::min(failedRequests - 1, 31));
         } break;
         default:
             // Do not retry due to error.
@@ -330,14 +332,11 @@ int64_t DefaultFileRequestImpl::getRetryTimeout() const {
     }
 
     // Check to see if this response expires earlier than a potential error retry.
-    if (response->expires > 0) {
-        const int64_t expires =
-            response->expires -
-            std::chrono::duration_cast<std::chrono::seconds>(SystemClock::now().time_since_epoch())
-                .count();
+    if (response->expires > Seconds::zero()) {
+        const Seconds secsToExpire = response->expires - toSeconds(SystemClock::now());
         // Only update the timeout if we don't have one yet, and only if the new timeout is shorter
         // than the previous one.
-        timeout = timeout < 0 ? expires : std::min(timeout, std::max<int64_t>(0, expires));
+        timeout = timeout < Seconds::zero() ? secsToExpire: std::min(timeout, std::max(Seconds::zero(), secsToExpire));
     }
 
     return timeout;

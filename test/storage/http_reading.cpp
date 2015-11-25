@@ -4,6 +4,7 @@
 
 #include <mbgl/storage/default_file_source.hpp>
 #include <mbgl/util/exception.hpp>
+#include <mbgl/util/chrono.hpp>
 #include <mbgl/util/run_loop.hpp>
 
 #include <future>
@@ -26,8 +27,8 @@ TEST_F(Storage, HTTPTest) {
         EXPECT_EQ(false, res.stale);
         ASSERT_TRUE(res.data.get());
         EXPECT_EQ("Hello World!", *res.data);
-        EXPECT_EQ(0, res.expires);
-        EXPECT_EQ(0, res.modified);
+        EXPECT_EQ(Seconds::zero(), res.expires);
+        EXPECT_EQ(Seconds::zero(), res.modified);
         EXPECT_EQ("", res.etag);
         loop.stop();
         HTTPTest.finish();
@@ -56,8 +57,8 @@ TEST_F(Storage, HTTP404) {
         ASSERT_TRUE(res.data.get());
         EXPECT_EQ("Cannot GET /doesnotexist\n", *res.data);
         EXPECT_EQ("HTTP status code 404", res.error->message);
-        EXPECT_EQ(0, res.expires);
-        EXPECT_EQ(0, res.modified);
+        EXPECT_EQ(Seconds::zero(), res.expires);
+        EXPECT_EQ(Seconds::zero(), res.modified);
         EXPECT_EQ("", res.etag);
         loop.stop();
         HTTP404.finish();
@@ -86,8 +87,8 @@ TEST_F(Storage, HTTP500) {
         ASSERT_TRUE(res.data.get());
         EXPECT_EQ("Server Error!", *res.data);
         EXPECT_EQ("HTTP status code 500", res.error->message);
-        EXPECT_EQ(0, res.expires);
-        EXPECT_EQ(0, res.modified);
+        EXPECT_EQ(Seconds::zero(), res.expires);
+        EXPECT_EQ(Seconds::zero(), res.modified);
         EXPECT_EQ("", res.etag);
         loop.stop();
         HTTP500.finish();

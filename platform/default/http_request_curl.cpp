@@ -425,9 +425,9 @@ HTTPCURLRequest::HTTPCURLRequest(HTTPCURLContext* context_, const Resource& reso
         if (!existingResponse->etag.empty()) {
             const std::string header = std::string("If-None-Match: ") + existingResponse->etag;
             headers = curl_slist_append(headers, header.c_str());
-        } else if (existingResponse->modified) {
+        } else if (existingResponse->modified != Seconds::zero()) {
             const std::string time =
-                std::string("If-Modified-Since: ") + util::rfc1123(existingResponse->modified);
+                std::string("If-Modified-Since: ") + util::rfc1123(existingResponse->modified.count());
             headers = curl_slist_append(headers, time.c_str());
         }
     }
@@ -525,7 +525,7 @@ size_t HTTPCURLRequest::headerCallback(char *const buffer, const size_t size, co
         // Always overwrite the modification date; We might already have a value here from the
         // Date header, but this one is more accurate.
         const std::string value { buffer + begin, length - begin - 2 }; // remove \r\n
-        baton->response->modified = curl_getdate(value.c_str(), nullptr);
+        baton->response->modified = Seconds(curl_getdate(value.c_str(), nullptr));
     } else if ((begin = headerMatches("etag: ", buffer, length)) != std::string::npos) {
         baton->response->etag = { buffer + begin, length - begin - 2 }; // remove \r\n
     } else if ((begin = headerMatches("cache-control: ", buffer, length)) != std::string::npos) {
@@ -533,7 +533,7 @@ size_t HTTPCURLRequest::headerCallback(char *const buffer, const size_t size, co
         baton->response->expires = parseCacheControl(value.c_str());
     } else if ((begin = headerMatches("expires: ", buffer, length)) != std::string::npos) {
         const std::string value { buffer + begin, length - begin - 2 }; // remove \r\n
-        baton->response->expires = curl_getdate(value.c_str(), nullptr);
+        baton->response->expires = Seconds(curl_getdate(value.c_str(), nullptr));
     }
 
     return length;

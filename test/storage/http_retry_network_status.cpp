@@ -4,8 +4,8 @@
 
 #include <mbgl/storage/default_file_source.hpp>
 #include <mbgl/storage/network_status.hpp>
+#include <mbgl/util/chrono.hpp>
 #include <mbgl/util/run_loop.hpp>
-
 
 // Test for https://github.com/mapbox/mapbox-gl-native/issues/2123
 //
@@ -30,8 +30,8 @@ TEST_F(Storage, HTTPNetworkStatusChange) {
          EXPECT_EQ(false, res.stale);
          ASSERT_TRUE(res.data.get());
          EXPECT_EQ("Response", *res.data);
-         EXPECT_EQ(0, res.expires);
-         EXPECT_EQ(0, res.modified);
+         EXPECT_EQ(Seconds::zero(), res.expires);
+         EXPECT_EQ(Seconds::zero(), res.modified);
          EXPECT_EQ("", res.etag);
          loop.stop();
          HTTPNetworkStatusChange.finish();
@@ -90,8 +90,8 @@ TEST_F(Storage, HTTPNetworkStatusChangePreempt) {
 #endif
         EXPECT_EQ(false, res.stale);
         ASSERT_FALSE(res.data.get());
-        EXPECT_EQ(0, res.expires);
-        EXPECT_EQ(0, res.modified);
+        EXPECT_EQ(Seconds::zero(), res.expires);
+        EXPECT_EQ(Seconds::zero(), res.modified);
         EXPECT_EQ("", res.etag);
 
         if (counter++ == 1) {

@@ -3,6 +3,7 @@
 #include <mbgl/storage/resource.hpp>
 #include <mbgl/storage/response.hpp>
 #include <mbgl/platform/log.hpp>
+#include <mbgl/util/chrono.hpp>
 #include <mbgl/util/util.hpp>
 #include <mbgl/util/uv.hpp>
 
@@ -187,7 +188,7 @@ void AssetRequest::fileStated(uv_zip_t *zip) {
 
         // Get the modification time in case we have one.
         if (zip->stat->valid & ZIP_STAT_MTIME) {
-            response->modified = zip->stat->mtime;
+            response->modified = Seconds(zip->stat->mtime);
         }
 
         if (zip->stat->valid & ZIP_STAT_INDEX) {

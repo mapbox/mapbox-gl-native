@@ -18,11 +18,8 @@ Response& Response::operator=(const Response& res) {
 }
 
 bool Response::isExpired() const {
-    const int64_t now =
-        std::chrono::duration_cast<std::chrono::seconds>(SystemClock::now().time_since_epoch())
-            .count();
     // Note: expires == 0 also counts as expired!
-    return expires <= now;
+    return SystemTimePoint(expires) <= SystemClock::now();
 }
 
 Response::Error::Error(Reason reason_, const std::string& message_)

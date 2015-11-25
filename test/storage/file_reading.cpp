@@ -4,6 +4,7 @@
 
 #include <mbgl/storage/default_file_source.hpp>
 #include <mbgl/platform/platform.hpp>
+#include <mbgl/util/chrono.hpp>
 #include <mbgl/util/run_loop.hpp>
 
 TEST_F(Storage, AssetEmptyFile) {
@@ -25,8 +26,8 @@ TEST_F(Storage, AssetEmptyFile) {
         EXPECT_EQ(false, res.stale);
         ASSERT_TRUE(res.data.get());
         EXPECT_EQ("", *res.data);
-        EXPECT_EQ(0, res.expires);
-        EXPECT_LT(1420000000, res.modified);
+        EXPECT_EQ(Seconds::zero(), res.expires);
+        EXPECT_LT(1420000000, res.modified.count());
         EXPECT_NE("", res.etag);
         loop.stop();
         EmptyFile.finish();
@@ -54,8 +55,8 @@ TEST_F(Storage, AssetNonEmptyFile) {
         EXPECT_EQ(false, res.stale);
         ASSERT_TRUE(res.data.get());
         EXPECT_EQ("content is here\n", *res.data);
-        EXPECT_EQ(0, res.expires);
-        EXPECT_LT(1420000000, res.modified);
+        EXPECT_EQ(Seconds::zero(), res.expires);
+        EXPECT_LT(1420000000, res.modified.count());
         EXPECT_NE("", res.etag);
         ASSERT_TRUE(res.data.get());
         EXPECT_EQ("content is here\n", *res.data);
@@ -85,8 +86,8 @@ TEST_F(Storage, AssetNonExistentFile) {
         EXPECT_EQ(Response::Error::Reason::NotFound, res.error->reason);
         EXPECT_EQ(false, res.stale);
         ASSERT_FALSE(res.data.get());
-        EXPECT_EQ(0, res.expires);
-        EXPECT_EQ(0, res.modified);
+        EXPECT_EQ(Seconds::zero(), res.expires);
+        EXPECT_EQ(Seconds::zero(), res.modified);
         EXPECT_EQ("", res.etag);
 #ifdef MBGL_ASSET_ZIP
         EXPECT_EQ("No such file", res.error->message);

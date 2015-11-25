@@ -4,6 +4,7 @@
 
 #include <mbgl/storage/default_file_source.hpp>
 #include <mbgl/storage/sqlite_cache.hpp>
+#include <mbgl/util/chrono.hpp>
 #include <mbgl/util/run_loop.hpp>
 
 TEST_F(Storage, CacheResponse) {
@@ -27,8 +28,8 @@ TEST_F(Storage, CacheResponse) {
         EXPECT_EQ(false, res.stale);
         ASSERT_TRUE(res.data.get());
         EXPECT_EQ("Response 1", *res.data);
-        EXPECT_LT(0, res.expires);
-        EXPECT_EQ(0, res.modified);
+        EXPECT_LT(Seconds::zero(), res.expires);
+        EXPECT_EQ(Seconds::zero(), res.modified);
         EXPECT_EQ("", res.etag);
         response = res;
 
