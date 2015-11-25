@@ -4,21 +4,17 @@ import android.graphics.RectF;
 import android.os.Bundle;
 import android.support.design.widget.Snackbar;
 import android.support.v7.app.ActionBar;
-import android.support.v7.app.AppCompatActivity;
 import android.support.v7.widget.Toolbar;
 import android.view.MenuItem;
 import android.view.View;
 
+import com.mapbox.mapboxsdk.MapActivity;
 import com.mapbox.mapboxsdk.annotations.MarkerOptions;
-import com.mapbox.mapboxsdk.constants.Style;
 import com.mapbox.mapboxsdk.geometry.CoordinateBounds;
 import com.mapbox.mapboxsdk.geometry.LatLng;
-import com.mapbox.mapboxsdk.utils.ApiAccess;
 import com.mapbox.mapboxsdk.views.MapView;
 
-public class VisibleCoordinateBoundsActivity extends AppCompatActivity {
-
-    private MapView mMapView;
+public class VisibleCoordinateBoundsActivity extends MapActivity {
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -34,20 +30,17 @@ public class VisibleCoordinateBoundsActivity extends AppCompatActivity {
             actionBar.setDisplayShowHomeEnabled(true);
         }
 
-        mMapView = (MapView) findViewById(R.id.mapView);
-        mMapView.setAccessToken(ApiAccess.getToken(this));
-        mMapView.setStyle(Style.DARK);
-        mMapView.onCreate(savedInstanceState);
+        MapView mapView = getMapView();
 
         final LatLng losAngeles = new LatLng(34.053940, -118.242622);
         final LatLng newYork = new LatLng(40.712730, -74.005953);
 
-        mMapView.addMarker(new MarkerOptions()
+        mapView.addMarker(new MarkerOptions()
                 .title("Los Angeles")
                 .snippet("City Hall")
                 .position(losAngeles));
 
-        mMapView.addMarker(new MarkerOptions()
+        mapView.addMarker(new MarkerOptions()
                 .title("New York")
                 .snippet("City Hall")
                 .position(newYork));
@@ -60,48 +53,6 @@ public class VisibleCoordinateBoundsActivity extends AppCompatActivity {
                         mMapView.setVisibleCoordinateBounds(new CoordinateBounds(losAngeles, newYork), new RectF(margin, 0, margin, 0), true);
                     }
                 }).show();
-    }
-
-    @Override
-    protected void onStart() {
-        super.onStart();
-        mMapView.onStart();
-    }
-
-    @Override
-    public void onResume() {
-        super.onResume();
-        mMapView.onResume();
-    }
-
-    @Override
-    public void onPause() {
-        super.onPause();
-        mMapView.onPause();
-    }
-
-    @Override
-    protected void onStop() {
-        super.onStop();
-        mMapView.onStop();
-    }
-
-    @Override
-    protected void onSaveInstanceState(Bundle outState) {
-        super.onSaveInstanceState(outState);
-        mMapView.onSaveInstanceState(outState);
-    }
-
-    @Override
-    protected void onDestroy() {
-        super.onDestroy();
-        mMapView.onDestroy();
-    }
-
-    @Override
-    public void onLowMemory() {
-        super.onLowMemory();
-        mMapView.onLowMemory();
     }
 
     @Override
