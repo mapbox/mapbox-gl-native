@@ -187,8 +187,9 @@ void LineBucket::addGeometry(const std::vector<Coordinate>& vertices) {
 
             addCurrentVertex(currentVertex, flip, distance, joinNormal, 0, 0, false, startVertex,
                              triangleStore);
-            flip = -flip;
 
+            addCurrentVertex(currentVertex, -flip, distance, joinNormal, 0, 0, false, startVertex,
+                             triangleStore);
         } else if (middleVertex && (currentJoin == JoinType::Bevel || currentJoin == JoinType::FakeRound)) {
             const bool lineTurnsLeft = flip * (prevNormal.x * nextNormal.y - prevNormal.y * nextNormal.x) > 0;
             const float offset = -std::sqrt(miterLength * miterLength - 1);
@@ -334,7 +335,7 @@ void LineBucket::addCurrentVertex(const Coordinate& currentVertex,
     vec2<double> extrude = normal * flip;
     if (endLeft)
         extrude = extrude - (util::perp(normal) * endLeft);
-    e3 = vertexBuffer.add(currentVertex.x, currentVertex.y, extrude.x, extrude.y, tx, 0, distance)
+    e3 = vertexBuffer.add(currentVertex.x, currentVertex.y, extrude.x, extrude.y, tx, 0, endLeft, distance)
          - startVertex;
     if (e1 >= 0 && e2 >= 0) {
         triangleStore.emplace_back(e1, e2, e3);
@@ -345,7 +346,7 @@ void LineBucket::addCurrentVertex(const Coordinate& currentVertex,
     extrude = normal * (-flip);
     if (endRight)
         extrude = extrude - (util::perp(normal) * endRight);
-    e3 = vertexBuffer.add(currentVertex.x, currentVertex.y, extrude.x, extrude.y, tx, 1, distance)
+    e3 = vertexBuffer.add(currentVertex.x, currentVertex.y, extrude.x, extrude.y, tx, 1, -endRight, distance)
          - startVertex;
     if (e1 >= 0 && e2 >= 0) {
         triangleStore.emplace_back(e1, e2, e3);
@@ -364,7 +365,7 @@ void LineBucket::addPieSliceVertex(const Coordinate& currentVertex,
     int8_t ty = lineTurnsLeft;
 
     auto flippedExtrude = extrude * (flip * (lineTurnsLeft ? -1 : 1));
-    e3 = vertexBuffer.add(currentVertex.x, currentVertex.y, flippedExtrude.x, flippedExtrude.y, 0, ty, distance)
+    e3 = vertexBuffer.add(currentVertex.x, currentVertex.y, flippedExtrude.x, flippedExtrude.y, 0, ty, 0, distance)
          - startVertex;
     if (e1 >= 0 && e2 >= 0) {
         triangleStore.emplace_back(e1, e2, e3);

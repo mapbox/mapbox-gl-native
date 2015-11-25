@@ -24,6 +24,7 @@ public:
     PaintProperty<float> width = 1;
     PaintProperty<float> gapWidth = 0;
     PaintProperty<float> blur = 0;
+    PaintProperty<float> offset = 0;
     PaintProperty<std::vector<float>, Faded<std::vector<float>>> dasharray = { {} };
     PaintProperty<std::string, Faded<std::string>> pattern = { "" };
 
