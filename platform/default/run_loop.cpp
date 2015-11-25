@@ -1,8 +1,10 @@
 #include <mbgl/util/run_loop.hpp>
 #include <mbgl/util/async_task.hpp>
-#include <mbgl/util/uv.hpp>
 #include <mbgl/util/thread_local.hpp>
 
+#include <uv.h>
+
+#include <cassert>
 #include <functional>
 #include <unordered_map>
 
