@@ -167,13 +167,13 @@ void HeadlessView::resize(const uint16_t width, const uint16_t height) {
     needsResize = true;
 }
 
-UnassociatedImage HeadlessView::readStillImage() {
+PremultipliedImage HeadlessView::readStillImage() {
     assert(isActive());
 
     const unsigned int w = dimensions[0] * pixelRatio;
     const unsigned int h = dimensions[1] * pixelRatio;
 
-    UnassociatedImage image { w, h };
+    PremultipliedImage image { w, h };
     MBGL_CHECK_ERROR(glReadPixels(0, 0, w, h, GL_RGBA, GL_UNSIGNED_BYTE, image.data.get()));
 
     const int stride = image.stride();

@@ -25,7 +25,7 @@ uint64_t crc64(const char*, size_t);
 uint64_t crc64(const std::string&);
 
 void checkImage(const std::string& base,
-                const UnassociatedImage& actual,
+                const PremultipliedImage& actual,
                 double imageThreshold = 0,
                 double pixelThreshold = 0);
 

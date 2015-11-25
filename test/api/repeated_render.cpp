@@ -25,8 +25,8 @@ TEST(API, RepeatedRender) {
 
     {
         map.setStyleJSON(style, "");
-        std::promise<UnassociatedImage> promise;
-        map.renderStill([&promise](std::exception_ptr, UnassociatedImage&& image) {
+        std::promise<PremultipliedImage> promise;
+        map.renderStill([&promise](std::exception_ptr, PremultipliedImage&& image) {
             promise.set_value(std::move(image));
         });
         auto result = std::move(promise.get_future().get());
@@ -37,8 +37,8 @@ TEST(API, RepeatedRender) {
 
     {
         map.setStyleJSON(style, "TEST_DATA/suite");
-        std::promise<UnassociatedImage> promise;
-        map.renderStill([&promise](std::exception_ptr, UnassociatedImage&& image) {
+        std::promise<PremultipliedImage> promise;
+        map.renderStill([&promise](std::exception_ptr, PremultipliedImage&& image) {
             promise.set_value(std::move(image));
         });
         auto result = std::move(promise.get_future().get());

@@ -1,5 +1,6 @@
 #include <mbgl/util/image.hpp>
 #include <mbgl/util/string.hpp>
+#include <mbgl/util/premultiply.hpp>
 
 #include <png.h>
 
@@ -19,7 +20,12 @@ const static bool png_version_check = []() {
 #pragma GCC diagnostic pop
 namespace mbgl {
 
-std::string encodePNG(const UnassociatedImage& src) {
+std::string encodePNG(const PremultipliedImage& pre) {
+    PremultipliedImage copy { pre.width, pre.height };
+    std::copy(pre.data.get(), pre.data.get() + pre.size(), copy.data.get());
+
+    UnassociatedImage src = util::unpremultiply(std::move(copy));
+
     png_voidp error_ptr = 0;
     png_structp png_ptr = png_create_write_struct(PNG_LIBPNG_VER_STRING, error_ptr, NULL, NULL);
     if (!png_ptr) {

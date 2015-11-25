@@ -14,16 +14,16 @@
 
 using namespace mbgl;
 
-UnassociatedImage render(Map& map) {
-    std::promise<UnassociatedImage> promise;
-    map.renderStill([&](std::exception_ptr, UnassociatedImage&& image) {
+PremultipliedImage render(Map& map) {
+    std::promise<PremultipliedImage> promise;
+    map.renderStill([&](std::exception_ptr, PremultipliedImage&& image) {
         promise.set_value(std::move(image));
     });
     return std::move(promise.get_future().get());
 }
 
 void checkRendering(Map& map, const char * name) {
-    UnassociatedImage actual = render(map);
+    PremultipliedImage actual = render(map);
     test::checkImage(std::string("test/fixtures/annotations/") + name + "/",
                      actual, 0.0002, 0.1);
 }

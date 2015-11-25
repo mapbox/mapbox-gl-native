@@ -104,14 +104,14 @@ int main(int argc, char *argv[]) {
 
     uv_async_t *async = new uv_async_t;
     uv_async_init(uv_default_loop(), async, [](UV_ASYNC_PARAMS(as)) {
-        std::unique_ptr<UnassociatedImage> image(reinterpret_cast<UnassociatedImage*>(as->data));
+        std::unique_ptr<PremultipliedImage> image(reinterpret_cast<PremultipliedImage*>(as->data));
         uv_close(reinterpret_cast<uv_handle_t *>(as), [](uv_handle_t *handle) {
             delete reinterpret_cast<uv_async_t *>(handle);
         });
         util::write_file(output, encodePNG(*image));
     });
 
-    map.renderStill([async](std::exception_ptr error, UnassociatedImage&& image) {
+    map.renderStill([async](std::exception_ptr error, PremultipliedImage&& image) {
         try {
             if (error) {
                 std::rethrow_exception(error);
@@ -121,7 +121,7 @@ int main(int argc, char *argv[]) {
             exit(1);
         }
 
-        async->data = new UnassociatedImage(std::move(image));
+        async->data = new PremultipliedImage(std::move(image));
         uv_async_send(async);
     });
 

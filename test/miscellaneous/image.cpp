@@ -7,7 +7,7 @@
 using namespace mbgl;
 
 TEST(Image, PNGRoundTrip) {
-    UnassociatedImage rgba { 1, 1 };
+    PremultipliedImage rgba { 1, 1 };
     rgba.data[0] = 128;
     rgba.data[1] = 0;
     rgba.data[2] = 0;
@@ -21,14 +21,14 @@ TEST(Image, PNGRoundTrip) {
 }
 
 TEST(Image, PNGRoundTripAlpha) {
-    UnassociatedImage rgba { 1, 1 };
+    PremultipliedImage rgba { 1, 1 };
     rgba.data[0] = 128;
     rgba.data[1] = 0;
     rgba.data[2] = 0;
     rgba.data[3] = 128;
 
     PremultipliedImage image = decodeImage(encodePNG(rgba));
-    EXPECT_EQ(64, image.data[0]);
+    EXPECT_EQ(128, image.data[0]);
     EXPECT_EQ(0, image.data[1]);
     EXPECT_EQ(0, image.data[2]);
     EXPECT_EQ(128, image.data[3]);

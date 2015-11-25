@@ -39,7 +39,7 @@ public:
     void invalidate() override;
     void beforeRender() override;
     void afterRender() override;
-    UnassociatedImage readStillImage() override;
+    PremultipliedImage readStillImage() override;
 
     void resizeFramebuffer();
     void resize(uint16_t width, uint16_t height);

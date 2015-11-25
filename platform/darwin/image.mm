@@ -10,7 +10,7 @@
 
 namespace mbgl {
 
-std::string encodePNG(const UnassociatedImage& src) {
+std::string encodePNG(const PremultipliedImage& src) {
     CGDataProviderRef provider = CGDataProviderCreateWithData(NULL, src.data.get(), src.size(), NULL);
     if (!provider) {
         return "";
@@ -23,7 +23,7 @@ std::string encodePNG(const UnassociatedImage& src) {
     }
 
     CGImageRef image = CGImageCreate(src.width, src.height, 8, 32, 4 * src.width, color_space,
-        kCGBitmapByteOrderDefault | kCGImageAlphaLast, provider, NULL, false,
+        kCGBitmapByteOrderDefault | kCGImageAlphaPremultipliedLast, provider, NULL, false,
         kCGRenderingIntentDefault);
     if (!image) {
         CGColorSpaceRelease(color_space);

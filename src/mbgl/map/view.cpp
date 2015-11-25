@@ -10,7 +10,7 @@ void View::initialize(Map *map_) {
     map = map_;
 }
 
-UnassociatedImage View::readStillImage() {
+PremultipliedImage View::readStillImage() {
     return {};
 }
 

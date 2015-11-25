@@ -39,7 +39,7 @@ TEST_P(PendingResources, DeleteMapObjectWithPendingRequest) {
     const std::string style = util::read_file("test/fixtures/resources/style.json");
     map->setStyleJSON(style, ".");
 
-    map->renderStill([&endTest](std::exception_ptr, UnassociatedImage&&) {
+    map->renderStill([&endTest](std::exception_ptr, PremultipliedImage&&) {
         EXPECT_TRUE(false) << "Should never happen.";
     });
 

@@ -1,6 +1,7 @@
 #include "../fixtures/util.hpp"
 #include <mbgl/util/compression.hpp>
 #include <mbgl/util/scaling.hpp>
+#include <mbgl/util/premultiply.hpp>
 #include <mbgl/util/image.hpp>
 #include <mbgl/util/io.hpp>
 
@@ -43,7 +44,7 @@ TEST(Bilinear, Scaling) {
     util::bilinearScale(srcData, srcSize, { 252, 380, 12, 12 }, dstData, dstSize, { 18, 90, 24, 24 }, false);
 
     const std::string data { reinterpret_cast<char *>(dstData), dstSize.x * dstSize.y * sizeof(uint32_t) };
-    util::write_file("test/fixtures/sprites/atlas_actual.png", encodePNG(dst));
+    util::write_file("test/fixtures/sprites/atlas_actual.png", encodePNG(util::premultiply(std::move(dst))));
     util::write_file("test/fixtures/sprites/atlas_actual.bin", util::compress(data));
 
     const std::string reference = util::decompress(util::read_file("test/fixtures/sprites/atlas_reference.bin"));

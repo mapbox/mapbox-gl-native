@@ -34,7 +34,7 @@ using PremultipliedImage = Image<ImageAlphaMode::Premultiplied>;
 
 // TODO: don't use std::string for binary data.
 PremultipliedImage decodeImage(const std::string&);
-std::string encodePNG(const UnassociatedImage&);
+std::string encodePNG(const PremultipliedImage&);
 
 }
 

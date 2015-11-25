@@ -7,6 +7,7 @@ namespace mbgl {
 namespace util {
 
 PremultipliedImage premultiply(UnassociatedImage&&);
+UnassociatedImage unpremultiply(PremultipliedImage&&);
 
 }
 }

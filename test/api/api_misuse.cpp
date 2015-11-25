@@ -45,7 +45,7 @@ TEST(API, RenderWithoutStyle) {
     Map map(view, fileSource, MapMode::Still);
 
     std::promise<std::exception_ptr> promise;
-    map.renderStill([&promise](std::exception_ptr error, UnassociatedImage&&) {
+    map.renderStill([&promise](std::exception_ptr error, PremultipliedImage&&) {
         promise.set_value(error);
     });
 

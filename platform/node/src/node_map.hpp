@@ -49,7 +49,7 @@ public:
     std::unique_ptr<mbgl::Map> map;
 
     std::exception_ptr error;
-    mbgl::UnassociatedImage image;
+    mbgl::PremultipliedImage image;
     std::unique_ptr<Nan::Callback> callback;
 
     // Async for delivering the notifications of render completion.
