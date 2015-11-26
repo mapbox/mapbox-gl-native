@@ -25,13 +25,13 @@ bool Raster::isLoaded() const {
     return loaded;
 }
 
-bool Raster::load(std::unique_ptr<util::Image> image) {
+bool Raster::load(PremultipliedImage image) {
     img = std::move(image);
-    width = img->getWidth();
-    height = img->getHeight();
+    width = GLsizei(img.width);
+    height = GLsizei(img.height);
 
     std::lock_guard<std::mutex> lock(mtx);
-    if (img->getData()) {
+    if (img.data.get()) {
         loaded = true;
     }
     return loaded;
@@ -44,7 +44,7 @@ void Raster::bind(bool linear) {
         return;
     }
 
-    if (img && !textured) {
+    if (img.data && !textured) {
         upload();
     } else if (textured) {
         MBGL_CHECK_ERROR(glBindTexture(GL_TEXTURE_2D, texture));
@@ -59,7 +59,7 @@ void Raster::bind(bool linear) {
 }
 
 void Raster::upload() {
-    if (img && !textured) {
+    if (img.data && !textured) {
         texture = texturePool.getTextureID();
         MBGL_CHECK_ERROR(glBindTexture(GL_TEXTURE_2D, texture));
 #ifndef GL_ES_VERSION_2_0
@@ -67,8 +67,8 @@ void Raster::upload() {
 #endif
         MBGL_CHECK_ERROR(glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_WRAP_S, GL_CLAMP_TO_EDGE));
         MBGL_CHECK_ERROR(glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_WRAP_T, GL_CLAMP_TO_EDGE));
-        MBGL_CHECK_ERROR(glTexImage2D(GL_TEXTURE_2D, 0, GL_RGBA, width, height, 0, GL_RGBA, GL_UNSIGNED_BYTE, img->getData()));
-        img.reset();
+        MBGL_CHECK_ERROR(glTexImage2D(GL_TEXTURE_2D, 0, GL_RGBA, width, height, 0, GL_RGBA, GL_UNSIGNED_BYTE, img.data.get()));
+        img.data.reset();
         textured = true;
     }
 }

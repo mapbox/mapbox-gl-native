@@ -1,0 +1,89 @@
+<resources>
+    <!-- these are public -->
+    <declare-styleable name="MapView">
+        <attr name="center_longitude" format="float" />
+        <attr name="center_latitude" format="float" />
+        <attr name="zoom_level" format="float" />
+        <attr name="direction" format="float" />
+        <attr name="zoom_enabled" format="boolean" />
+        <attr name="scroll_enabled" format="boolean" />
+        <attr name="rotate_enabled" format="boolean" />
+        <attr name="zoom_controls_enabled" format="boolean" />
+        <attr name="debug_active" format="boolean" />
+        <attr name="style_url" format="string" />
+        <attr name="access_token" format="string" />
+        <attr name="style_classes" format="string" />
+        <attr name="my_location_enabled" format="boolean" />
+        <attr name="compass_enabled" format="boolean" />
+        <attr name="compass_gravity">
+            <flag name="top" value="0x30" />
+            <flag name="bottom" value="0x50" />
+            <flag name="left" value="0x03" />
+            <flag name="right" value="0x05" />
+            <flag name="center_vertical" value="0x10" />
+            <flag name="fill_vertical" value="0x70" />
+            <flag name="center_horizontal" value="0x01" />
+            <flag name="fill_horizontal" value="0x07" />
+            <flag name="center" value="0x11" />
+            <flag name="fill" value="0x77" />
+            <flag name="clip_vertical" value="0x80" />
+            <flag name="clip_horizontal" value="0x08" />
+            <flag name="start" value="0x00800003" />
+            <flag name="end" value="0x00800005" />
+        </attr>
+        <attr name="compass_margin_left" format="dimension" />
+        <attr name="compass_margin_top" format="dimension" />
+        <attr name="compass_margin_right" format="dimension" />
+        <attr name="compass_margin_bottom" format="dimension" />
+        <attr name="logo_gravity">
+            <flag name="top" value="0x30" />
+            <flag name="bottom" value="0x50" />
+            <flag name="left" value="0x03" />
+            <flag name="right" value="0x05" />
+            <flag name="center_vertical" value="0x10" />
+            <flag name="fill_vertical" value="0x70" />
+            <flag name="center_horizontal" value="0x01" />
+            <flag name="fill_horizontal" value="0x07" />
+            <flag name="center" value="0x11" />
+            <flag name="fill" value="0x77" />
+            <flag name="clip_vertical" value="0x80" />
+            <flag name="clip_horizontal" value="0x08" />
+            <flag name="start" value="0x00800003" />
+            <flag name="end" value="0x00800005" />
+        </attr>
+        <attr name="logo_margin_left" format="dimension" />
+        <attr name="logo_margin_top" format="dimension" />
+        <attr name="logo_margin_right" format="dimension" />
+        <attr name="logo_margin_bottom" format="dimension" />
+        <attr name="logo_visibility">
+            <enum name="visible" value="0x0" />
+            <enum name="invisible" value="0x4" />
+            <enum name="gone" value="0x8" />
+        </attr>
+        <attr name="attribution_gravity">
+            <flag name="top" value="0x30" />
+            <flag name="bottom" value="0x50" />
+            <flag name="left" value="0x03" />
+            <flag name="right" value="0x05" />
+            <flag name="center_vertical" value="0x10" />
+            <flag name="fill_vertical" value="0x70" />
+            <flag name="center_horizontal" value="0x01" />
+            <flag name="fill_horizontal" value="0x07" />
+            <flag name="center" value="0x11" />
+            <flag name="fill" value="0x77" />
+            <flag name="clip_vertical" value="0x80" />
+            <flag name="clip_horizontal" value="0x08" />
+            <flag name="start" value="0x00800003" />
+            <flag name="end" value="0x00800005" />
+        </attr>
+        <attr name="attribution_margin_left" format="dimension" />
+        <attr name="attribution_margin_top" format="dimension" />
+        <attr name="attribution_margin_right" format="dimension" />
+        <attr name="attribution_margin_bottom" format="dimension" />
+        <attr name="attribution_visibility">
+            <enum name="visible" value="0x0" />
+            <enum name="invisible" value="0x4" />
+            <enum name="gone" value="0x8" />
+        </attr>
+    </declare-styleable>
+</resources>

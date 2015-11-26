@@ -37,7 +37,7 @@ The first argument passed to `map.render` is an options object, all keys are opt
     zoom: {zoom}, // number, defaults to 0
     width: {width}, // number (px), defaults to 512
     height: {height}, // number (px), defaults to 512
-    center: [{latitude}, {longitude}], // array of numbers (coordinates), defaults to [0,0]
+    center: [{longitude}, {latitude}], // array of numbers (coordinates), defaults to [0,0]
     bearing: {bearing}, // number (in degrees, counter-clockwise from north), defaults to 0
     classes: {classes} // array of strings
 }
@@ -53,21 +53,18 @@ npm test
 
 ## Implementing a file source
 
-When creating a `Map`, you must pass an options object (with a required `ratio`, required `request` and optional `cancel` method) as the first parameter.
+When creating a `Map`, you must pass an options object (with a required `request` method and optional 'ratio' number) as the first parameter.
 
 ```js
 var map = new mbgl.Map({
     request: function(req) {
         // TODO
     },
-    cancel: function(req) {
-        // TODO
-    },
-    ratio: 1.0
+    ratio: 2.0
 });
 ```
 
-The `request()` method starts a new request to a file, while `cancel()` tells the FileSource to cancel the request (if possible). The `ratio` sets the scale at which the map will render tiles, such as `2.0` for rendering images for high pixel density displays. The `req` parameter has two properties:
+The `request()` method starts a new request to a file. The `ratio` sets the scale at which the map will render tiles, such as `2.0` for rendering images for high pixel density displays. The `req` parameter has two properties:
 
 ```json
 {
@@ -102,8 +99,7 @@ var map = new mbgl.Map({
         fs.readFile(path.join('base/path', req.url), function(err, data) {
             callback(err, { data: data });
         });
-    },
-    ratio: 1.0
+    }
 });
 ```
 
@@ -147,8 +143,7 @@ var map = new mbgl.Map({
                 callback(new Error(JSON.parse(body).message));
             }
         });
-    },
-    ratio: 1.0
+    }
 });
 ```
 
@@ -192,8 +187,7 @@ var map = new mbgl.Map({
                 callback(new Error(JSON.parse(body).message));
             }
         });
-    },
-    ratio: 1.0
+    }
 });
 
 // includes a datasource with a reference to something like `mapbox://mapbox.mapbox-streets-v6`

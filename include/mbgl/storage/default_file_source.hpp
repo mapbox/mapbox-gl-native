@@ -18,13 +18,13 @@ public:
     void setAccessToken(const std::string& t) { accessToken = t; }
     std::string getAccessToken() const { return accessToken; }
 
-    // FileSource API
-    Request* request(const Resource&, uv_loop_t*, Callback) override;
-    void cancel(Request*) override;
+    std::unique_ptr<FileRequest> request(const Resource&, Callback) override;
 
-public:
-    class Impl;
 private:
+    friend class DefaultFileRequest;
+    void cancel(const Resource&, FileRequest*);
+
+    class Impl;
     const std::unique_ptr<util::Thread<Impl>> thread;
     std::string accessToken;
 };

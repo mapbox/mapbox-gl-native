@@ -1,19 +1,17 @@
 #ifndef MBGL_MAP_TILE_WORKER
 #define MBGL_MAP_TILE_WORKER
 
-#include <mbgl/util/variant.hpp>
+#include <mapbox/variant.hpp>
+
 #include <mbgl/map/tile_data.hpp>
-#include <mbgl/geometry/elements_buffer.hpp>
-#include <mbgl/geometry/fill_buffer.hpp>
-#include <mbgl/geometry/line_buffer.hpp>
-#include <mbgl/geometry/circle_buffer.hpp>
 #include <mbgl/util/noncopyable.hpp>
 #include <mbgl/util/ptr.hpp>
-#include <mbgl/style/filter_expression.hpp>
+#include <mbgl/text/placement_config.hpp>
 
 #include <string>
 #include <memory>
 #include <mutex>
+#include <list>
 #include <unordered_map>
 
 namespace mbgl {
@@ -23,69 +21,58 @@ class GeometryTile;
 class Style;
 class Bucket;
 class StyleLayer;
-class StyleBucket;
-class GeometryTileLayer;
 
-using TileParseResult = mapbox::util::variant<
-    TileData::State, // success
-    std::string>;    // error
+// We're using this class to shuttle the resulting buckets from the worker thread to the MapContext
+// thread. This class is movable-only because the vector contains movable-only value elements.
+class TileParseResultBuckets {
+public:
+    TileData::State state = TileData::State::invalid;
+    std::unordered_map<std::string, std::unique_ptr<Bucket>> buckets;
+};
+
+using TileParseResult = mapbox::util::variant<TileParseResultBuckets, // success
+                                              std::string>;           // error
 
 class TileWorker : public util::noncopyable {
 public:
     TileWorker(TileID,
                std::string sourceID,
-               uint16_t maxZoom,
                Style&,
-               std::vector<util::ptr<StyleLayer>>,
-               const std::atomic<TileData::State>&,
-               std::unique_ptr<CollisionTile>);
+               const std::atomic<TileData::State>&);
     ~TileWorker();
 
-    Bucket* getBucket(const StyleLayer&) const;
+    TileParseResult parseAllLayers(std::vector<util::ptr<StyleLayer>>,
+                                   const GeometryTile&,
+                                   PlacementConfig);
 
-    TileParseResult parse(const GeometryTile&);
-    void redoPlacement(float angle, float pitch, bool collisionDebug);
+    TileParseResult parsePendingLayers();
 
-    std::vector<util::ptr<StyleLayer>> layers;
+    void redoPlacement(std::vector<util::ptr<StyleLayer>>,
+                       const std::unordered_map<std::string, std::unique_ptr<Bucket>>*,
+                       PlacementConfig);
 
 private:
     void parseLayer(const StyleLayer&, const GeometryTile&);
-
-    std::unique_ptr<Bucket> createFillBucket(const GeometryTileLayer&, const StyleBucket&);
-    std::unique_ptr<Bucket> createLineBucket(const GeometryTileLayer&, const StyleBucket&);
-    std::unique_ptr<Bucket> createCircleBucket(const GeometryTileLayer&, const StyleBucket&);
-    std::unique_ptr<Bucket> createSymbolBucket(const GeometryTileLayer&, const StyleBucket&);
-
-    template <class Bucket>
-    void addBucketGeometries(Bucket&, const GeometryTileLayer&, const FilterExpression&);
+    void insertBucket(const std::string& name, std::unique_ptr<Bucket>);
 
     const TileID id;
     const std::string sourceID;
-    const uint16_t maxZoom;
 
     Style& style;
     const std::atomic<TileData::State>& state;
 
     bool partialParse = false;
 
-    FillVertexBuffer fillVertexBuffer;
-    LineVertexBuffer lineVertexBuffer;
-    CircleVertexBuffer circleVertexBuffer;
-
-    TriangleElementsBuffer triangleElementsBuffer;
-    LineElementsBuffer lineElementsBuffer;
-
     std::unique_ptr<CollisionTile> collisionTile;
 
-    // Contains all the Bucket objects for the tile. Buckets are render
-    // objects and they get added to this map as they get processed.
-    // Tiles partially parsed can get new buckets at any moment but are
-    // also fit for rendering. That said, access to this list needs locking
-    // unless the tile is completely parsed.
-    std::unordered_map<std::string, std::unique_ptr<Bucket>> buckets;
-    mutable std::mutex bucketsMutex;
+    // Contains buckets that we couldn't parse so far due to missing resources.
+    // They will be attempted on subsequent parses.
+    std::list<std::pair<const StyleLayer&, std::unique_ptr<Bucket>>> pending;
+
+    // Temporary holder
+    TileParseResultBuckets result;
 };
 
-}
+} // namespace mbgl
 
 #endif

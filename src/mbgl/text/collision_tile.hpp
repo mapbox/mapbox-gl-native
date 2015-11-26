@@ -2,6 +2,7 @@
 #define MBGL_TEXT_COLLISION_TILE
 
 #include <mbgl/text/collision_feature.hpp>
+#include <mbgl/text/placement_config.hpp>
 
 #pragma GCC diagnostic push
 #pragma GCC diagnostic ignored "-Wunused-function"
@@ -24,39 +25,34 @@
 
 namespace mbgl {
 
-    namespace bg = boost::geometry;
-    namespace bgm = bg::model;
-    namespace bgi = bg::index;
-    typedef bgm::point<float, 2, bg::cs::cartesian> CollisionPoint;
-    typedef bgm::box<CollisionPoint> Box;
-    typedef std::pair<Box, CollisionBox> CollisionTreeBox;
-    typedef bgi::rtree<CollisionTreeBox, bgi::linear<16,4>> Tree;
+namespace bg = boost::geometry;
+namespace bgm = bg::model;
+namespace bgi = bg::index;
+typedef bgm::point<float, 2, bg::cs::cartesian> CollisionPoint;
+typedef bgm::box<CollisionPoint> Box;
+typedef std::pair<Box, CollisionBox> CollisionTreeBox;
+typedef bgi::rtree<CollisionTreeBox, bgi::linear<16, 4>> Tree;
 
 class CollisionTile {
+public:
+    explicit CollisionTile(PlacementConfig);
 
-    public:
-    explicit CollisionTile(float angle_, float pitch_, bool debug_);
+    float placeFeature(const CollisionFeature& feature);
+    void insertFeature(CollisionFeature& feature, const float minPlacementScale);
 
-    float placeFeature(const CollisionFeature &feature);
-    void insertFeature(CollisionFeature &feature, const float minPlacementScale);
-
-    bool getDebug() { return debug; }
-
-    const float angle = 0;
+    const PlacementConfig config;
 
     const float minScale = 0.5f;
     const float maxScale = 2.0f;
     float yStretch;
 
-    private:
-
-    Box getTreeBox(const vec2<float> &anchor, const CollisionBox &box);
+private:
+    Box getTreeBox(const vec2<float>& anchor, const CollisionBox& box);
 
     Tree tree;
     std::array<float, 4> rotationMatrix;
-    bool debug;
-
 };
-}
+
+} // namespace mbgl
 
 #endif

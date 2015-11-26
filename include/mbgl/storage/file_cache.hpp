@@ -16,7 +16,7 @@ class FileCache : private util::noncopyable {
 public:
     virtual ~FileCache() = default;
 
-    enum class Hint : uint8_t { Full, Refresh, No };
+    enum class Hint : bool { Full, Refresh };
     using Callback = std::function<void(std::unique_ptr<Response>)>;
 
     virtual std::unique_ptr<WorkRequest> get(const Resource &resource, Callback callback) = 0;

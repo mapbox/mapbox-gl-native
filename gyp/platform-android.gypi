@@ -15,7 +15,6 @@
         '../platform/default/thread.cpp',
         '../platform/default/string_stdlib.cpp',
         '../platform/default/image.cpp',
-        '../platform/default/image_reader.cpp',
         '../platform/default/png_reader.cpp',
         '../platform/default/jpeg_reader.cpp',
       ],
@@ -27,6 +26,7 @@
           '<@(libuv_cflags)',
           '<@(nunicode_cflags)',
           '<@(boost_cflags)',
+          '<@(variant_cflags)',
         ],
         'ldflags': [
           '<@(libpng_ldflags)',

@@ -1,0 +1,56 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<merge xmlns:android="http://schemas.android.com/apk/res/android">
+
+    <LinearLayout
+        android:id="@+id/infowindow_content"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:background="@drawable/bg_infowindow_content"
+        android:orientation="vertical"
+        android:paddingBottom="16dp"
+        android:paddingLeft="20dp"
+        android:paddingRight="20dp"
+        android:paddingTop="14dp">
+
+        <TextView
+            android:id="@+id/infowindow_title"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_marginBottom="2dp"
+            android:maxEms="17"
+            android:text="@string/infoWindowTitle"
+            android:textColor="@color/black"
+            android:textSize="18sp"
+            android:textStyle="bold" />
+
+        <TextView
+            android:id="@+id/infowindow_description"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_marginBottom="2dp"
+            android:layout_marginTop="2dp"
+            android:lineSpacingExtra="1dp"
+            android:maxEms="17"
+            android:text="@string/infoWindowDescription"
+            android:textColor="@color/gray"
+            android:textSize="14sp" />
+
+        <TextView
+            android:id="@+id/infowindow_subdescription"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:maxEms="17"
+            android:text="@string/infoWindowAddress"
+            android:textColor="@color/black"
+            android:textSize="12sp"
+            android:visibility="gone" />
+    </LinearLayout>
+
+    <com.mapbox.mapboxsdk.annotations.InfoWindowTipView
+        android:id="@+id/infowindow_tipview"
+        android:layout_width="@dimen/infowindow_tipview_width"
+        android:layout_height="14dp"
+        android:layout_below="@+id/infowindow_content" />
+
+</merge>
+

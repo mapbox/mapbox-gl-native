@@ -1,5 +1,4 @@
 #include <mbgl/map/map.hpp>
-#include <mbgl/map/still_image.hpp>
 #include <mbgl/util/image.hpp>
 #include <mbgl/util/io.hpp>
 
@@ -10,10 +9,9 @@
 #include <mbgl/storage/sqlite_cache.hpp>
 
 #pragma GCC diagnostic push
-#ifndef __clang__
+#pragma GCC diagnostic ignored "-Wunknown-pragmas"
 #pragma GCC diagnostic ignored "-Wunused-local-typedefs"
 #pragma GCC diagnostic ignored "-Wshadow"
-#endif
 #include <boost/program_options.hpp>
 #pragma GCC diagnostic pop
 
@@ -24,6 +22,12 @@ namespace po = boost::program_options;
 #include <cassert>
 #include <cstdlib>
 #include <iostream>
+
+#if UV_VERSION_MAJOR == 0 && UV_VERSION_MINOR <= 10
+#define UV_ASYNC_PARAMS(handle) uv_async_t *handle, int
+#else
+#define UV_ASYNC_PARAMS(handle) uv_async_t *handle
+#endif
 
 int main(int argc, char *argv[]) {
     std::string style_path;
@@ -99,17 +103,15 @@ int main(int argc, char *argv[]) {
     }
 
     uv_async_t *async = new uv_async_t;
-    uv_async_init(uv_default_loop(), async, [](uv_async_t *as, int) {
-        std::unique_ptr<const StillImage> image(reinterpret_cast<const StillImage *>(as->data));
+    uv_async_init(uv_default_loop(), async, [](UV_ASYNC_PARAMS(as)) {
+        std::unique_ptr<PremultipliedImage> image(reinterpret_cast<PremultipliedImage*>(as->data));
         uv_close(reinterpret_cast<uv_handle_t *>(as), [](uv_handle_t *handle) {
             delete reinterpret_cast<uv_async_t *>(handle);
         });
-
-        const std::string png = util::compress_png(image->width, image->height, image->pixels.get());
-        util::write_file(output, png);
+        util::write_file(output, encodePNG(*image));
     });
 
-    map.renderStill([async](std::exception_ptr error, std::unique_ptr<const StillImage> image) {
+    map.renderStill([async](std::exception_ptr error, PremultipliedImage&& image) {
         try {
             if (error) {
                 std::rethrow_exception(error);
@@ -119,7 +121,7 @@ int main(int argc, char *argv[]) {
             exit(1);
         }
 
-        async->data = const_cast<StillImage *>(image.release());
+        async->data = new PremultipliedImage(std::move(image));
         uv_async_send(async);
     });
 

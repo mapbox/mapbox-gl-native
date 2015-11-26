@@ -11,7 +11,7 @@
 #include <condition_variable>
 
 #include <mbgl/map/mode.hpp>
-#include <mbgl/map/annotation.hpp>
+#include <mbgl/annotation/annotation_manager.hpp>
 #include <mbgl/util/exclusive.hpp>
 
 namespace mbgl {
@@ -20,11 +20,12 @@ class MapData {
     using Lock = std::lock_guard<std::mutex>;
 
 public:
-    inline MapData(MapMode mode_, const float pixelRatio_)
+    inline MapData(MapMode mode_, GLContextMode contextMode_, const float pixelRatio_)
         : mode(mode_)
+        , contextMode(contextMode_)
         , pixelRatio(pixelRatio_)
         , animationTime(Duration::zero())
-        , defaultFadeDuration(std::chrono::milliseconds(300))
+        , defaultFadeDuration(mode_ == MapMode::Continuous ? std::chrono::milliseconds(300) : Duration::zero())
         , defaultTransitionDuration(Duration::zero())
         , defaultTransitionDelay(Duration::zero()) {
         assert(pixelRatio > 0);
@@ -71,9 +72,13 @@ public:
     inline TimePoint getAnimationTime() const {
         // We're casting the TimePoint to and from a Duration because libstdc++
         // has a bug that doesn't allow TimePoints to be atomic.
-        return TimePoint(animationTime);
+        return mode == MapMode::Continuous ? TimePoint(animationTime) : Clock::now();
     }
     inline void setAnimationTime(const TimePoint& timePoint) {
+        if (mode == MapMode::Still) {
+            return;
+        }
+
         animationTime = timePoint.time_since_epoch();
     };
 
@@ -82,6 +87,10 @@ public:
     }
 
     inline void setDefaultFadeDuration(const Duration& duration) {
+        if (mode == MapMode::Still) {
+            return;
+        }
+
         defaultFadeDuration = duration;
     }
 
@@ -90,6 +99,10 @@ public:
     }
 
     inline void setDefaultTransitionDuration(const Duration& duration) {
+        if (mode == MapMode::Still) {
+            return;
+        }
+
         defaultTransitionDuration = duration;
     }
 
@@ -98,6 +111,10 @@ public:
     }
 
     inline void setDefaultTransitionDelay(const Duration& delay) {
+        if (mode == MapMode::Still) {
+            return;
+        }
+
         defaultTransitionDelay = delay;
     }
 
@@ -109,6 +126,7 @@ public:
 
 public:
     const MapMode mode;
+    const GLContextMode contextMode;
     const float pixelRatio;
 
 private:
@@ -127,9 +145,10 @@ private:
 
 // TODO: make private
 public:
+    bool paused = false;
     std::mutex mutexPause;
-    std::condition_variable condPaused;
-    std::condition_variable condResume;
+    std::condition_variable condPause;
+    bool loading = false;
 };
 
 }

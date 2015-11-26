@@ -3,15 +3,15 @@
 
 #include <mbgl/util/chrono.hpp>
 
+#include <mapbox/optional.hpp>
 #include <cstdint>
 
 namespace mbgl {
 
-struct PropertyTransition {
-    explicit inline PropertyTransition(const Duration& duration_, const Duration& delay_)
-        : duration(duration_), delay(delay_) {}
-    Duration duration = Duration::zero();
-    Duration delay = Duration::zero();
+class PropertyTransition {
+public:
+    mapbox::util::optional<Duration> duration;
+    mapbox::util::optional<Duration> delay;
 };
 
 }

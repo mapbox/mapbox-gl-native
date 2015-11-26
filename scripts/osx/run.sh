@@ -11,9 +11,6 @@ BUILDTYPE=${BUILDTYPE:-Release}
 # Build
 ################################################################################
 
-mapbox_time "checkout_styles" \
-git submodule update --init styles
-
 mapbox_time "compile_program" \
 make xosx -j${JOBS} BUILDTYPE=${BUILDTYPE}
 

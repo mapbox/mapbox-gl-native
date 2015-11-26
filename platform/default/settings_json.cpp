@@ -12,6 +12,7 @@ void Settings_JSON::load() {
         file >> latitude;
         file >> zoom;
         file >> bearing;
+        file >> pitch;
         file >> debug;
     }
 }
@@ -23,6 +24,7 @@ void Settings_JSON::save() {
         file << latitude << std::endl;
         file << zoom << std::endl;
         file << bearing << std::endl;
+        file << pitch << std::endl;
         file << debug << std::endl;
     }
 }
@@ -32,5 +34,6 @@ void Settings_JSON::clear() {
     latitude = 0;
     zoom = 0;
     bearing = 0;
+    pitch = 0;
     debug = false;
 }

@@ -1,28 +1,25 @@
 #ifndef MBGL_RENDERER_DEBUGBUCKET
 #define MBGL_RENDERER_DEBUGBUCKET
 
-#include <mbgl/renderer/bucket.hpp>
+#include <mbgl/map/tile_data.hpp>
 #include <mbgl/geometry/debug_font_buffer.hpp>
 #include <mbgl/geometry/vao.hpp>
-
-#include <vector>
 
 namespace mbgl {
 
 class PlainShader;
 
-class DebugBucket : public Bucket {
+class DebugBucket : private util::noncopyable {
 public:
-    DebugBucket(DebugFontBuffer& fontBuffer);
-
-    void upload() override;
-    void render(Painter&, const StyleLayer&, const TileID&, const mat4&) override;
+    DebugBucket(TileID id, TileData::State);
 
     void drawLines(PlainShader& shader);
     void drawPoints(PlainShader& shader);
 
+    const TileData::State state;
+
 private:
-    DebugFontBuffer& fontBuffer;
+    DebugFontBuffer fontBuffer;
     VertexArrayObject array;
 };
 

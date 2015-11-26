@@ -2,12 +2,13 @@
 #define MBGL_MAP_MAP
 
 #include <mbgl/util/chrono.hpp>
-#include <mbgl/map/camera.hpp>
+#include <mbgl/util/image.hpp>
 #include <mbgl/map/update.hpp>
 #include <mbgl/map/mode.hpp>
 #include <mbgl/util/geo.hpp>
 #include <mbgl/util/noncopyable.hpp>
 #include <mbgl/util/vec.hpp>
+#include <mbgl/annotation/annotation.hpp>
 
 #include <cstdint>
 #include <string>
@@ -21,21 +22,15 @@ class FileSource;
 class View;
 class MapData;
 class MapContext;
-class StillImage;
 class SpriteImage;
 class Transform;
 class PointAnnotation;
 class ShapeAnnotation;
+struct CameraOptions;
 
 namespace util {
 template <class T> class Thread;
 }
-
-enum class AnnotationType : uint8_t {
-    Any   = 0,
-    Point = 1 << 0,
-    Shape = 1 << 1,
-};
 
 struct EdgeInsets {
     double top = 0;
@@ -44,27 +39,26 @@ struct EdgeInsets {
     double right = 0;
 };
 
-using AnnotationIDs = std::vector<uint32_t>;
-using AnnotationSegment = std::vector<LatLng>;
-using AnnotationSegments = std::vector<AnnotationSegment>;
-
 class Map : private util::noncopyable {
     friend class View;
 
 public:
     explicit Map(View&, FileSource&,
-                 MapMode mode = MapMode::Continuous);
+                 MapMode mapMode = MapMode::Continuous,
+                 GLContextMode contextMode = GLContextMode::Unique,
+                 ConstrainMode constrainMode = ConstrainMode::HeightOnly);
     ~Map();
 
     // Pauses the render thread. The render thread will stop running but will not be terminated and will not lose state until resumed.
     void pause();
+    bool isPaused();
 
     // Resumes a paused render thread
     void resume();
 
     // Register a callback that will get called (on the render thread) when all resources have
     // been loaded and a complete render occurs.
-    using StillImageCallback = std::function<void(std::exception_ptr, std::unique_ptr<const StillImage>)>;
+    using StillImageCallback = std::function<void (std::exception_ptr, PremultipliedImage&&)>;
     void renderStill(StillImageCallback callback);
 
     // Triggers a synchronous render.
@@ -80,10 +74,13 @@ public:
     void setClasses(const std::vector<std::string>&);
     std::vector<std::string> getClasses() const;
 
-    void setDefaultTransitionDuration(const Duration& = Duration::zero());
+    void setDefaultFadeDuration(const Duration&);
+    Duration getDefaultFadeDuration() const;
+
+    void setDefaultTransitionDuration(const Duration&);
     Duration getDefaultTransitionDuration() const;
 
-    void setDefaultTransitionDelay(const Duration& = Duration::zero());
+    void setDefaultTransitionDelay(const Duration&);
     Duration getDefaultTransitionDelay() const;
 
     void setStyleURL(const std::string& url);
@@ -94,36 +91,41 @@ public:
     // Transition
     void cancelTransitions();
     void setGestureInProgress(bool);
+    bool isGestureInProgress() const;
+    bool isRotating() const;
+    bool isScaling() const;
+    bool isPanning() const;
 
     // Camera
-    void jumpTo(CameraOptions options);
-    void easeTo(CameraOptions options);
+    void jumpTo(const CameraOptions&);
+    void easeTo(const CameraOptions&);
 
     // Position
-    void moveBy(double dx, double dy, const Duration& = Duration::zero());
-    void setLatLng(LatLng latLng, const Duration& = Duration::zero());
+    void moveBy(const PrecisionPoint&, const Duration& = Duration::zero());
+    void setLatLng(const LatLng&, const PrecisionPoint&, const Duration& = Duration::zero());
+    void setLatLng(const LatLng&, const Duration& = Duration::zero());
     LatLng getLatLng() const;
     void resetPosition();
 
     // Scale
-    void scaleBy(double ds, double cx = -1, double cy = -1, const Duration& = Duration::zero());
-    void setScale(double scale, double cx = -1, double cy = -1, const Duration& = Duration::zero());
+    void scaleBy(double ds, const PrecisionPoint& = { 0, 0 }, const Duration& = Duration::zero());
+    void setScale(double scale, const PrecisionPoint& = { 0, 0 }, const Duration& = Duration::zero());
     double getScale() const;
     void setZoom(double zoom, const Duration& = Duration::zero());
     double getZoom() const;
-    void setLatLngZoom(LatLng latLng, double zoom, const Duration& = Duration::zero());
-    CameraOptions cameraForLatLngBounds(LatLngBounds bounds, EdgeInsets padding);
-    CameraOptions cameraForLatLngs(std::vector<LatLng> latLngs, EdgeInsets padding);
+    void setLatLngZoom(const LatLng&, double zoom, const Duration& = Duration::zero());
+    CameraOptions cameraForLatLngBounds(const LatLngBounds&, const EdgeInsets&);
+    CameraOptions cameraForLatLngs(const std::vector<LatLng>&, const EdgeInsets&);
     void resetZoom();
     double getMinZoom() const;
     double getMaxZoom() const;
 
     // Rotation
-    void rotateBy(double sx, double sy, double ex, double ey, const Duration& = Duration::zero());
+    void rotateBy(const PrecisionPoint& first, const PrecisionPoint& second, const Duration& = Duration::zero());
     void setBearing(double degrees, const Duration& = Duration::zero());
-    void setBearing(double degrees, double cx, double cy);
+    void setBearing(double degrees, const PrecisionPoint&);
     double getBearing() const;
-    void resetNorth();
+    void resetNorth(const Duration& = std::chrono::milliseconds(500));
 
     // Pitch
     void setPitch(double pitch, const Duration& = Duration::zero());
@@ -137,29 +139,28 @@ public:
     void setUserConstraints(LatLngBounds userConstraints);
 
     // Projection
-    void getWorldBoundsMeters(ProjectedMeters &sw, ProjectedMeters &ne) const;
-    void getWorldBoundsLatLng(LatLng &sw, LatLng &ne) const;
-    double getMetersPerPixelAtLatitude(const double lat, const double zoom) const;
-    const ProjectedMeters projectedMetersForLatLng(const LatLng latLng) const;
-    const LatLng latLngForProjectedMeters(const ProjectedMeters projectedMeters) const;
-    const vec2<double> pixelForLatLng(const LatLng latLng) const;
-    const LatLng latLngForPixel(const vec2<double> pixel) const;
+    MetersBounds getWorldBoundsMeters() const;
+    LatLngBounds getWorldBoundsLatLng() const;
+
+    double getMetersPerPixelAtLatitude(double lat, double zoom) const;
+    ProjectedMeters projectedMetersForLatLng(const LatLng&) const;
+    LatLng latLngForProjectedMeters(const ProjectedMeters&) const;
+    PrecisionPoint pixelForLatLng(const LatLng&) const;
+    LatLng latLngForPixel(const PrecisionPoint&) const;
 
     // Annotations
-    void setDefaultPointAnnotationSymbol(const std::string&);
-    double getTopOffsetPixelsForAnnotationSymbol(const std::string&);
-
-    uint32_t addPointAnnotation(const PointAnnotation&);
+    AnnotationID addPointAnnotation(const PointAnnotation&);
     AnnotationIDs addPointAnnotations(const std::vector<PointAnnotation>&);
 
-    uint32_t addShapeAnnotation(const ShapeAnnotation&);
+    AnnotationID addShapeAnnotation(const ShapeAnnotation&);
     AnnotationIDs addShapeAnnotations(const std::vector<ShapeAnnotation>&);
 
-    void removeAnnotation(uint32_t);
+    void removeAnnotation(AnnotationID);
     void removeAnnotations(const AnnotationIDs&);
 
-    AnnotationIDs getAnnotationsInBounds(const LatLngBounds&, const AnnotationType& = AnnotationType::Any);
+    AnnotationIDs getPointAnnotationsInBounds(const LatLngBounds&);
     LatLngBounds getBoundsForAnnotations(const AnnotationIDs&);
+    double getTopOffsetPixelsForAnnotationSymbol(const std::string&);
 
     // Sprites
     void setSprite(const std::string&, std::shared_ptr<const SpriteImage>);
@@ -177,6 +178,7 @@ public:
     void toggleCollisionDebug();
     bool getCollisionDebug() const;
     bool isFullyLoaded() const;
+    void dumpDebugLogs() const;
 
 private:
     View& view;
@@ -191,7 +193,6 @@ private:
     };
 
     RenderState renderState = RenderState::never;
-    bool paused = false;
 };
 
 }

@@ -12,38 +12,43 @@ using namespace mbgl;
 void Painter::renderTileDebug(const Tile& tile) {
     MBGL_DEBUG_GROUP(std::string { "debug " } + std::string(tile.id));
     assert(tile.data);
-    if (debug) {
+    if (data.getDebug()) {
         prepareTile(tile);
-        renderDebugText(tile.data->debugBucket, tile.matrix);
+        renderDebugText(*tile.data, tile.matrix);
         renderDebugFrame(tile.matrix);
     }
 }
 
-void Painter::renderDebugText(DebugBucket& bucket, const mat4 &matrix) {
+void Painter::renderDebugText(TileData& tileData, const mat4 &matrix) {
     MBGL_DEBUG_GROUP("debug text");
 
-    config.depthTest = false;
+    config.depthTest = GL_FALSE;
 
-    useProgram(plainShader->program);
+    if (!tileData.debugBucket || tileData.debugBucket->state != tileData.getState()) {
+        tileData.debugBucket = std::make_unique<DebugBucket>(tileData.id, tileData.getState());
+    }
+
+    config.program = plainShader->program;
     plainShader->u_matrix = matrix;
 
     // Draw white outline
     plainShader->u_color = {{ 1.0f, 1.0f, 1.0f, 1.0f }};
-    lineWidth(4.0f * data.pixelRatio);
-    bucket.drawLines(*plainShader);
+    config.lineWidth = 4.0f * data.pixelRatio;
+    tileData.debugBucket->drawLines(*plainShader);
 
 #ifndef GL_ES_VERSION_2_0
     // Draw line "end caps"
     MBGL_CHECK_ERROR(glPointSize(2));
-    bucket.drawPoints(*plainShader);
+    tileData.debugBucket->drawPoints(*plainShader);
 #endif
 
     // Draw black text.
     plainShader->u_color = {{ 0.0f, 0.0f, 0.0f, 1.0f }};
-    lineWidth(2.0f * data.pixelRatio);
-    bucket.drawLines(*plainShader);
+    config.lineWidth = 2.0f * data.pixelRatio;
+    tileData.debugBucket->drawLines(*plainShader);
 
-    config.depthTest = true;
+    config.depthFunc.reset();
+    config.depthTest = GL_TRUE;
 }
 
 void Painter::renderDebugFrame(const mat4 &matrix) {
@@ -52,15 +57,16 @@ void Painter::renderDebugFrame(const mat4 &matrix) {
     // Disable depth test and don't count this towards the depth buffer,
     // but *don't* disable stencil test, as we want to clip the red tile border
     // to the tile viewport.
-    config.depthTest = false;
-    config.stencilTest = true;
+    config.depthTest = GL_FALSE;
+    config.stencilOp.reset();
+    config.stencilTest = GL_TRUE;
 
-    useProgram(plainShader->program);
+    config.program = plainShader->program;
     plainShader->u_matrix = matrix;
 
     // draw tile outline
     tileBorderArray.bind(*plainShader, tileBorderBuffer, BUFFER_OFFSET_0);
     plainShader->u_color = {{ 1.0f, 0.0f, 0.0f, 1.0f }};
-    lineWidth(4.0f * data.pixelRatio);
+    config.lineWidth = 4.0f * data.pixelRatio;
     MBGL_CHECK_ERROR(glDrawArrays(GL_LINE_STRIP, 0, (GLsizei)tileBorderBuffer.index()));
 }

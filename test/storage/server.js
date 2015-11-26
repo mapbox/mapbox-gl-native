@@ -2,11 +2,25 @@
 /* jshint node: true */
 'use strict';
 
+var fs = require('fs');
 var express = require('express');
 var app = express();
 
 // We're manually setting Etag headers.
 app.disable('etag');
+
+// Terminate after a certain time of inactivity.
+function terminate() {
+    console.warn('Server terminated due to inactivity');
+    process.exit(0);
+};
+var inactivity = 5000; // milliseconds
+var timeout = setTimeout(terminate, inactivity);
+app.use(function(req, res, next) {
+    clearTimeout(timeout);
+    timeout = setTimeout(terminate, inactivity);
+    next();
+});
 
 app.get('/test', function (req, res) {
     if (req.query.modified) {
@@ -73,6 +87,9 @@ app.get('/revalidate-etag', function(req, res) {
     revalidateEtagCounter++;
 });
 
+app.get('/permanent-error', function(req, res) {
+    res.status(500).send('Server Error!');
+});
 
 var temporaryErrorCounter = 0;
 app.get('/temporary-error', function(req, res) {
@@ -103,6 +120,7 @@ var server = app.listen(3000, function () {
 
     if (process.argv[2]) {
         // Allow the test to continue running.
-        process.stdin.write("Go!\n");
+        fs.write(+process.argv[2], 'OK');
+        fs.close(+process.argv[2]);
     }
 });

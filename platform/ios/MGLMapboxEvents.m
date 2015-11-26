@@ -1,10 +1,9 @@
 #import "MGLMapboxEvents.h"
 
 #import <UIKit/UIKit.h>
-#import <SystemConfiguration/CaptiveNetwork.h>
-#import <CoreTelephony/CTTelephonyNetworkInfo.h>
-#import <CoreTelephony/CTCarrier.h>
 #import <CoreLocation/CoreLocation.h>
+
+#include <mbgl/platform/darwin/reachability.h>
 
 #import "MGLAccountManager.h"
 #import "NSProcessInfo+MGLAdditions.h"
@@ -14,7 +13,7 @@
 #include <sys/sysctl.h>
 
 static const NSUInteger version = 1;
-static NSString *const MGLMapboxEventsUserAgent = @"MapboxEventsiOS/1.0";
+static NSString *const MGLMapboxEventsUserAgent = @"MapboxEventsiOS/1.1";
 static NSString *MGLMapboxEventsAPIBase = @"https://api.tiles.mapbox.com";
 
 NSString *const MGLEventTypeAppUserTurnstile = @"appUserTurnstile";
@@ -55,7 +54,6 @@ const NSTimeInterval MGLFlushInterval = 60;
 // All of the following properties are written to only from
 // the main thread, but can be read on any thread.
 //
-@property (atomic) NSString *advertiserId;
 @property (atomic) NSString *vendorId;
 @property (atomic) NSString *model;
 @property (atomic) NSString *iOSVersion;
@@ -68,23 +66,6 @@ const NSTimeInterval MGLFlushInterval = 60;
 
 - (instancetype)init {
     if (self = [super init]) {
-
-        // Dynamic detection of ASIdentifierManager from Mixpanel
-        // https://github.com/mixpanel/mixpanel-iphone/blob/master/LICENSE
-        _advertiserId = @"";
-        Class ASIdentifierManagerClass = NSClassFromString(@"ASIdentifierManager");
-        if (ASIdentifierManagerClass) {
-            SEL sharedManagerSelector = NSSelectorFromString(@"sharedManager");
-            id sharedManager = ((id (*)(id, SEL))[ASIdentifierManagerClass methodForSelector:sharedManagerSelector])(ASIdentifierManagerClass, sharedManagerSelector);
-            // Add check here
-            SEL isAdvertisingTrackingEnabledSelector = NSSelectorFromString(@"isAdvertisingTrackingEnabled");
-            BOOL trackingEnabled = ((BOOL (*)(id, SEL))[sharedManager methodForSelector:isAdvertisingTrackingEnabledSelector])(sharedManager, isAdvertisingTrackingEnabledSelector);
-            if (trackingEnabled) {
-                SEL advertisingIdentifierSelector = NSSelectorFromString(@"advertisingIdentifier");
-                NSUUID *uuid = ((NSUUID* (*)(id, SEL))[sharedManager methodForSelector:advertisingIdentifierSelector])(sharedManager, advertisingIdentifierSelector);
-                _advertiserId = [uuid UUIDString];
-            }
-        }
         _vendorId = [[[UIDevice currentDevice] identifierForVendor] UUIDString];
         
         _model = [self sysInfoByName:"hw.machine"];
@@ -94,8 +75,22 @@ const NSTimeInterval MGLFlushInterval = 60;
         } else {
             _scale = [UIScreen mainScreen].scale;
         }
-        CTCarrier *carrierVendor = [[[CTTelephonyNetworkInfo alloc] init] subscriberCellularProvider];
-        _carrier = [carrierVendor carrierName];
+
+        // Collect cellular carrier data if CoreTelephony is linked
+        Class CTTelephonyNetworkInfo = NSClassFromString(@"CTTelephonyNetworkInfo");
+        if (CTTelephonyNetworkInfo != NULL) {
+            id telephonyNetworkInfo = [[CTTelephonyNetworkInfo alloc] init];
+
+            SEL subscriberCellularProviderSelector = NSSelectorFromString(@"subscriberCellularProvider");
+            id carrierVendor = ((id (*)(id, SEL))[telephonyNetworkInfo methodForSelector:subscriberCellularProviderSelector])(telephonyNetworkInfo, subscriberCellularProviderSelector);
+
+            // Guard against simulator, iPod Touch, etc.
+            if (carrierVendor) {
+                SEL carrierNameSelector = NSSelectorFromString(@"carrierName");
+                NSString *carrierName = ((id (*)(id, SEL))[carrierVendor methodForSelector:carrierNameSelector])(carrierVendor, carrierNameSelector);
+                _carrier = carrierName;
+            }
+        }
     }
     return self;
 }
@@ -504,7 +499,6 @@ const NSTimeInterval MGLFlushInterval = 60;
         [evt setObject:@(version) forKey:@"version"];
         [evt setObject:[strongSelf.rfc3339DateFormatter stringFromDate:[NSDate date]] forKey:@"created"];
         [evt setObject:strongSelf.instanceID forKey:@"instance"];
-        [evt setObject:strongSelf.data.advertiserId forKey:@"advertiserId"];
         [evt setObject:strongSelf.data.vendorId forKey:@"vendorId"];
         [evt setObject:strongSelf.appBundleId forKeyedSubscript:@"appBundleId"];
         
@@ -514,21 +508,16 @@ const NSTimeInterval MGLFlushInterval = 60;
         [evt setValue:[strongSelf deviceOrientation] forKey:@"orientation"];
         [evt setValue:@((int)(100 * [UIDevice currentDevice].batteryLevel)) forKey:@"batteryLevel"];
         [evt setValue:@(strongSelf.data.scale) forKey:@"resolution"];
-        [evt setValue:strongSelf.data.carrier forKey:@"carrier"];
-        
-        NSString *cell = [strongSelf currentCellularNetworkConnectionType];
-        if (cell) {
-            [evt setValue:cell forKey:@"cellularNetworkType"];
-        } else {
-            [evt setObject:[NSNull null] forKey:@"cellularNetworkType"];
+
+        if (strongSelf.data.carrier) {
+            [evt setValue:strongSelf.data.carrier forKey:@"carrier"];
+
+            NSString *cell = [strongSelf currentCellularNetworkConnectionType];
+            [evt setObject:(cell ? cell : [NSNull null]) forKey:@"cellularNetworkType"];
         }
-        
-        NSString *wifi = [strongSelf wifiNetworkName];
-        if (wifi) {
-            [evt setValue:wifi forKey:@"wifi"];
-        } else {
-            [evt setObject:[NSNull null] forKey:@"wifi"];
-        }
+
+        MGLReachability *reachability = [MGLReachability reachabilityForLocalWiFi];
+        [evt setValue:([reachability isReachableViaWiFi] ? @YES : @NO) forKey:@"wifi"];
         
         [evt setValue:@([strongSelf contentSizeScale]) forKey:@"accessibilityFontScale"];
 
@@ -737,51 +726,20 @@ const NSTimeInterval MGLFlushInterval = 60;
 
 // Can be called from any thread.
 //
-- (NSString *) wifiNetworkName {
-    
-    NSString *ssid = nil;
-    CFArrayRef interfaces = CNCopySupportedInterfaces();
-    if (interfaces) {
-        NSDictionary *info = CFBridgingRelease(CNCopyCurrentNetworkInfo(CFArrayGetValueAtIndex(interfaces, 0)));
-        if (info) {
-            ssid = info[@"SSID"];
-        }
-        CFRelease(interfaces);
-    }
-    
-    return ssid;
-}
-
-// Can be called from any thread.
-//
 - (NSString *) currentCellularNetworkConnectionType {
-    CTTelephonyNetworkInfo *telephonyInfo = [[CTTelephonyNetworkInfo alloc] init];
-    NSString *radioTech = telephonyInfo.currentRadioAccessTechnology;
-    
+    NSString *radioTech;
+
+    Class CTTelephonyNetworkInfo = NSClassFromString(@"CTTelephonyNetworkInfo");
+    if (CTTelephonyNetworkInfo) {
+        id telephonyNetworkInfo = [[CTTelephonyNetworkInfo alloc] init];
+        SEL currentRadioAccessTechnologySelector = NSSelectorFromString(@"currentRadioAccessTechnology");
+        radioTech = ((id (*)(id, SEL))[telephonyNetworkInfo methodForSelector:currentRadioAccessTechnologySelector])(telephonyNetworkInfo, currentRadioAccessTechnologySelector);
+    }
+
     if (radioTech == nil) {
         return nil;
-    } else if ([radioTech isEqualToString:CTRadioAccessTechnologyGPRS]) {
-        return @"GPRS";
-    } else if ([radioTech isEqualToString:CTRadioAccessTechnologyEdge]) {
-        return @"EDGE";
-    } else if ([radioTech isEqualToString:CTRadioAccessTechnologyWCDMA]) {
-        return @"WCDMA";
-    } else if ([radioTech isEqualToString:CTRadioAccessTechnologyHSDPA]) {
-        return @"HSDPA";
-    } else if ([radioTech isEqualToString:CTRadioAccessTechnologyHSUPA]) {
-        return @"HSUPA";
-    } else if ([radioTech isEqualToString:CTRadioAccessTechnologyCDMA1x]) {
-        return @"CDMA1x";
-    } else if ([radioTech isEqualToString:CTRadioAccessTechnologyCDMAEVDORev0]) {
-        return @"CDMAEVDORev0";
-    } else if ([radioTech isEqualToString:CTRadioAccessTechnologyCDMAEVDORevA]) {
-        return @"CDMAEVDORevA";
-    } else if ([radioTech isEqualToString:CTRadioAccessTechnologyCDMAEVDORevB]) {
-        return @"CDMAEVDORevB";
-    } else if ([radioTech isEqualToString:CTRadioAccessTechnologyeHRPD]) {
-        return @"HRPD";
-    } else if ([radioTech isEqualToString:CTRadioAccessTechnologyLTE]) {
-        return @"LTE";
+    } else if ([radioTech hasPrefix:@"CTRadioAccessTechnology"]) {
+        return [radioTech substringFromIndex:23];
     } else {
         return @"Unknown";
     }
@@ -828,9 +786,9 @@ const NSTimeInterval MGLFlushInterval = 60;
             MGLEventKeyLongitude: @(loc.coordinate.longitude),
             MGLEventKeySpeed: @(loc.speed),
             MGLEventKeyCourse: @(loc.course),
-            MGLEventKeyAltitude: @(loc.altitude),
-            MGLEventKeyHorizontalAccuracy: @(loc.horizontalAccuracy),
-            MGLEventKeyVerticalAccuracy: @(loc.verticalAccuracy)
+            MGLEventKeyAltitude: @(round(loc.altitude)),
+            MGLEventKeyHorizontalAccuracy: @(round(loc.horizontalAccuracy)),
+            MGLEventKeyVerticalAccuracy: @(round(loc.verticalAccuracy))
         }];
     }
 }
@@ -839,7 +797,7 @@ const NSTimeInterval MGLFlushInterval = 60;
     [MGLMapboxEvents pushEvent:MGLEventTypeVisit withAttributes:@{
         MGLEventKeyLatitude: @(visit.coordinate.latitude),
         MGLEventKeyLongitude: @(visit.coordinate.longitude),
-        MGLEventKeyHorizontalAccuracy: @(visit.horizontalAccuracy),
+        MGLEventKeyHorizontalAccuracy: @(round(visit.horizontalAccuracy)),
         MGLEventKeyArrivalDate: [[NSDate distantPast] isEqualToDate:visit.arrivalDate] ? [NSNull null] : [_rfc3339DateFormatter stringFromDate:visit.arrivalDate],
         MGLEventKeyDepartureDate: [[NSDate distantFuture] isEqualToDate:visit.departureDate] ? [NSNull null] : [_rfc3339DateFormatter stringFromDate:visit.departureDate]
     }];

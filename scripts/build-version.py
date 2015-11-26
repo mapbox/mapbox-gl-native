@@ -26,7 +26,6 @@ def mkdir_p(path):
             pass
         else: raise
 
-
 output_dir = sys.argv[1]
 
 if is_git_repo():
@@ -43,7 +42,6 @@ if is_git_repo():
 else:
     tag = DEFAULT_TAG
     rev = DEFAULT_REV
-
 
 header = """// NOTE: DO NOT CHANGE THIS FILE. IT IS AUTOMATICALLY GENERATED.
 #ifndef MBGL_UTIL_VERSION

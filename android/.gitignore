@@ -1,0 +1,30 @@
+# Gradle files
+.gradle/
+
+# IntelliJ files
+.idea/
+*.iml
+
+# Build files
+build/
+*.so
+*.apk
+
+# JNI
+MapboxGLAndroidSDK/src/main/jniLibs/
+MapboxGLAndroidSDK/src/main/obj.target/
+
+# Lib assets
+MapboxGLAndroidSDK/src/main/assets/
+
+# Local settings
+local.properties
+
+# Token file
+MapboxGLAndroidSDKTestApp/src/main/res/values/developer-config.xml
+
+# Twitter Fabric / Crashlytics
+fabric.properties
+
+# Capture files
+captures/

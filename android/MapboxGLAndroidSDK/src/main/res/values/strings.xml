@@ -1,0 +1,18 @@
+<?xml version="1.0" encoding="utf-8"?>
+<resources>
+    <string name="compassContentDescription">Map compass. Click to reset the map rotation to North.</string>
+    <string name="attributionsIconContentDescription">Attribution icon. Click to show attribution dialog.</string>
+    <string name="attributionsDialogTitle">Mapbox Android SDK</string>
+    <string name="mapboxIconContentDescription">The Mapbox logo.</string>
+    <string name="infoWindowTitle">Title</string>
+    <string name="infoWindowDescription">Description</string>
+    <string name="infoWindowAddress">Address</string>
+
+    <!-- these are public -->
+    <string name="style_mapbox_streets">mapbox://styles/mapbox/streets-v8</string>
+    <string name="style_emerald">mapbox://styles/mapbox/emerald-v8</string>
+    <string name="style_light">mapbox://styles/mapbox/light-v8</string>
+    <string name="style_dark">mapbox://styles/mapbox/dark-v8</string>
+    <string name="style_satellite">mapbox://styles/mapbox/satellite-v8</string>
+    <string name="style_satellite_streets">mapbox://styles/mapbox/satellite-hybrid-v8</string>
+</resources>

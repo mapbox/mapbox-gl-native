@@ -12,7 +12,11 @@ namespace mbgl {
 
 class WorkRequest;
 class RasterBucket;
-class LiveTile;
+class GeometryTileLoader;
+
+using RasterTileParseResult = mapbox::util::variant<
+    std::unique_ptr<Bucket>, // success
+    std::string>;            // error
 
 class Worker : public mbgl::util::noncopyable {
 public:
@@ -31,34 +35,30 @@ public:
 
     using Request = std::unique_ptr<WorkRequest>;
 
-    Request parseRasterTile(
-        RasterBucket&,
-        std::string data,
-        std::function<void (TileParseResult)> callback);
+    Request parseRasterTile(std::unique_ptr<RasterBucket> bucket,
+                            std::shared_ptr<const std::string> data,
+                            std::function<void(RasterTileParseResult)> callback);
 
-    Request parseVectorTile(
-        TileWorker&,
-        std::string data,
-        std::function<void (TileParseResult)> callback);
+    Request parseGeometryTile(TileWorker&,
+                              std::vector<util::ptr<StyleLayer>>,
+                              std::unique_ptr<GeometryTile>,
+                              PlacementConfig,
+                              std::function<void(TileParseResult)> callback);
 
-    Request parseLiveTile(
-        TileWorker&,
-        const LiveTile&,
-        std::function<void (TileParseResult)> callback);
+    Request parsePendingGeometryTileLayers(TileWorker&,
+                                           std::function<void(TileParseResult)> callback);
 
-    Request redoPlacement(
-        TileWorker&,
-        float angle,
-        float pitch,
-        bool collisionDebug,
-        std::function<void ()> callback);
+    Request redoPlacement(TileWorker&,
+                          std::vector<util::ptr<StyleLayer>>,
+                          const std::unordered_map<std::string, std::unique_ptr<Bucket>>&,
+                          PlacementConfig config,
+                          std::function<void()> callback);
 
 private:
     class Impl;
     std::vector<std::unique_ptr<util::Thread<Impl>>> threads;
     std::size_t current = 0;
 };
-
 }
 
 #endif

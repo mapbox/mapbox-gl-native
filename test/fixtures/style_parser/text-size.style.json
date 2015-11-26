@@ -9,11 +9,11 @@
   },
   "layers": [{
     "id": "country_label",
-    "type": "text",
+    "type": "symbol",
     "source": "mapbox",
     "source-layer": "country_label",
     "filter": ["==", "$type", "Point"],
-    "paint": {
+    "layout": {
       "text-size": null
     }
   }]

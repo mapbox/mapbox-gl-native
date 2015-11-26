@@ -50,28 +50,24 @@ extern jfieldID bboxLatSouthId;
 extern jfieldID bboxLonEastId;
 extern jfieldID bboxLonWestId;
 
+extern jclass spriteClass;
+extern jfieldID spriteIdId;
+
 extern jclass markerClass;
-extern jmethodID markerConstructorId;
 extern jfieldID markerPositionId;
-extern jfieldID markerSpriteId;
+extern jfieldID markerIconId;
 
 extern jclass polylineClass;
-extern jmethodID polylineConstructorId;
 extern jfieldID polylineAlphaId;
-extern jfieldID polylineVisibleId;
 extern jfieldID polylineColorId;
 extern jfieldID polylineWidthId;
 extern jfieldID polylinePointsId;
 
 extern jclass polygonClass;
-extern jmethodID polygonConstructorId;
 extern jfieldID polygonAlphaId;
-extern jfieldID polygonVisibleId;
 extern jfieldID polygonFillColorId;
 extern jfieldID polygonStrokeColorId;
-extern jfieldID polygonStrokeWidthId;
 extern jfieldID polygonPointsId;
-extern jfieldID polygonHolesId;
 
 extern jclass runtimeExceptionClass;
 extern jclass nullPointerExceptionClass;
@@ -91,6 +87,13 @@ extern jclass pointFClass;
 extern jmethodID pointFConstructorId;
 extern jfieldID pointFXId;
 extern jfieldID pointFYId;
+
+extern jclass rectFClass;
+extern jmethodID rectFConstructorId;
+extern jfieldID rectFLeftId;
+extern jfieldID rectFTopId;
+extern jfieldID rectFRightId;
+extern jfieldID rectFBottomId;
 
 extern jclass httpContextClass;
 extern jmethodID httpContextGetInstanceId;

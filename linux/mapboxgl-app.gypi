@@ -8,13 +8,12 @@
       'type': 'executable',
 
       'dependencies': [
-        '../mbgl.gyp:core',
-        '../mbgl.gyp:platform-<(platform_lib)',
-        '../mbgl.gyp:http-<(http_lib)',
-        '../mbgl.gyp:asset-<(asset_lib)',
-        '../mbgl.gyp:cache-<(cache_lib)',
-        '../mbgl.gyp:copy_styles',
-        '../mbgl.gyp:copy_certificate_bundle',
+        'mbgl.gyp:core',
+        'mbgl.gyp:platform-<(platform_lib)',
+        'mbgl.gyp:http-<(http_lib)',
+        'mbgl.gyp:asset-<(asset_lib)',
+        'mbgl.gyp:cache-<(cache_lib)',
+        'mbgl.gyp:copy_certificate_bundle',
       ],
 
       'sources': [
@@ -23,8 +22,6 @@
         '../platform/default/glfw_view.hpp',
         '../platform/default/glfw_view.cpp',
         '../platform/default/log_stderr.cpp',
-        '../platform/default/default_styles.hpp',
-        '../platform/default/default_styles.cpp',
       ],
 
       'variables' : {
@@ -32,6 +29,7 @@
           '<@(opengl_cflags)',
           '<@(boost_cflags)',
           '<@(glfw_cflags)',
+          '<@(variant_cflags)',
         ],
         'ldflags': [
           '<@(glfw_ldflags)',

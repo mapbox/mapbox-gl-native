@@ -1,5 +1,5 @@
 {
   'includes': [
-    '../android/mapboxgl-app.gypi',
+    '../platform/android/mapboxgl-app.gypi',
   ],
 }

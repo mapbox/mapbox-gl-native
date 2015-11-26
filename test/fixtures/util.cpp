@@ -1,6 +1,10 @@
 #include "util.hpp"
 
 #include <mbgl/platform/log.hpp>
+#include <mbgl/util/image.hpp>
+#include <mbgl/util/io.hpp>
+
+#include <mapbox/pixelmatch.hpp>
 
 #pragma GCC diagnostic push
 #pragma GCC diagnostic ignored "-Wshadow"
@@ -15,7 +19,6 @@ namespace mbgl {
 namespace test {
 
 pid_t startServer(const char *executable) {
-    const std::string parent_pid = std::to_string(getpid());
     int pipefd[2];
 
     if (pipe(pipefd)) {
@@ -24,19 +27,17 @@ pid_t startServer(const char *executable) {
 
     pid_t pid = fork();
     if (pid < 0) {
-        throw std::runtime_error("Cannot create server process");
+        Log::Error(Event::Setup, "Cannot create server process");
+        exit(1);
     } else if (pid == 0) {
-        close(STDIN_FILENO);
+        // This is the child process.
 
-        if (dup(pipefd[1])) {
-            Log::Error(Event::Setup, "Failed to start server: %s", strerror(errno));
-        }
-
+        // Close the input side of the pipe.
         close(pipefd[0]);
-        close(pipefd[1]);
 
+        // Launch the actual server process, with the pipe ID as the first argument.
         char *args[] = { const_cast<char *>(executable),
-                         const_cast<char *>(parent_pid.c_str()),
+                         const_cast<char *>(std::to_string(pipefd[1]).c_str()),
                          nullptr };
         int ret = execv(executable, args);
         // This call should not return. In case execve failed, we exit anyway.
@@ -45,15 +46,26 @@ pid_t startServer(const char *executable) {
         }
         exit(0);
     } else {
-        char buffer[8];
+        // This is the parent process.
 
-        // Wait until the server process sends something on the pipe.
-        if (!read(pipefd[0], buffer, sizeof(buffer))) {
-            throw std::runtime_error("Error reading a message from the server");
-        }
-
-        close(pipefd[0]);
+        // Close output side of the pipe.
         close(pipefd[1]);
+
+        // Wait until the server process closes the handle.
+        char buffer[2];
+        ssize_t bytes = 0, total = 0;
+        while ((bytes = read(pipefd[0], buffer, sizeof(buffer))) != 0) {
+            total += bytes;
+        }
+        if (bytes < 0) {
+            Log::Error(Event::Setup, "Failed to start server: %s", strerror(errno));
+            exit(1);
+        }
+        if (total != 2 || strncmp(buffer, "OK", 2) != 0) {
+            Log::Error(Event::Setup, "Failed to start server");
+            exit(1);
+        }
+        close(pipefd[0]);
     }
     return pid;
 }
@@ -71,6 +83,34 @@ uint64_t crc64(const char* data, size_t size) {
 
 uint64_t crc64(const std::string& str) {
     return crc64(str.data(), str.size());
+}
+
+void checkImage(const std::string& base,
+                const PremultipliedImage& actual,
+                double imageThreshold,
+                double pixelThreshold) {
+    if (getenv("UPDATE")) {
+        util::write_file(base + "/expected.png", encodePNG(actual));
+        return;
+    }
+
+    PremultipliedImage expected = decodeImage(util::read_file(base + "/expected.png"));
+    PremultipliedImage diff { expected.width, expected.height };
+
+    ASSERT_EQ(expected.width, actual.width);
+    ASSERT_EQ(expected.height, actual.height);
+
+    double pixels = mapbox::pixelmatch(actual.data.get(),
+                                       expected.data.get(),
+                                       expected.width,
+                                       expected.height,
+                                       diff.data.get(),
+                                       pixelThreshold);
+
+    EXPECT_LE(pixels / (expected.width * expected.height), imageThreshold);
+
+    util::write_file(base + "/actual.png", encodePNG(actual));
+    util::write_file(base + "/diff.png", encodePNG(diff));
 }
 
 }

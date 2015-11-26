@@ -7,6 +7,11 @@
 
 using namespace mbgl;
 
+TransformState::TransformState(ConstrainMode constrainMode_)
+    : constrainMode(constrainMode_)
+{
+}
+
 #pragma mark - Matrix
 
 void TransformState::matrixFor(mat4& matrix, const TileID& id, const int8_t z) const {
@@ -69,7 +74,7 @@ uint16_t TransformState::getHeight() const {
 
 #pragma mark - Position
 
-const LatLng TransformState::getLatLng() const {
+LatLng TransformState::getLatLng() const {
     LatLng ll;
 
     ll.longitude = -x / Bc;
@@ -105,6 +110,15 @@ const LatLng TransformState::getLatLng() const {
     return ll;
 }
 
+double TransformState::pixel_x() const {
+    const double center = (width - scale * util::tileSize) / 2;
+    return center + x;
+}
+
+double TransformState::pixel_y() const {
+    const double center = (height - scale * util::tileSize) / 2;
+    return center + y;
+}
 
 #pragma mark - Zoom
 
@@ -130,8 +144,9 @@ double TransformState::getScale() const {
 
 double TransformState::getMinZoom() const {
     double test_scale = scale;
-    double test_y = y;
-    constrain(test_scale, test_y);
+    double unused_x = x;
+    double unused_y = y;
+    constrain(test_scale, unused_x, unused_y);
 
     return ::log2(::fmin(min_scale, test_scale));
 }
@@ -154,6 +169,30 @@ float TransformState::getAltitude() const {
 float TransformState::getPitch() const {
     return pitch;
 }
+
+
+#pragma mark - State
+
+bool TransformState::isChanging() const {
+    return rotating || scaling || panning || gestureInProgress;
+}
+
+bool TransformState::isRotating() const {
+    return rotating;
+}
+
+bool TransformState::isScaling() const {
+    return scaling;
+}
+
+bool TransformState::isPanning() const {
+    return panning;
+}
+
+bool TransformState::isGestureInProgress() const {
+    return gestureInProgress;
+}
+
 
 #pragma mark - Projection
 
@@ -183,11 +222,11 @@ float TransformState::worldSize() const {
     return util::tileSize * scale;
 }
 
-vec2<double> TransformState::latLngToPoint(const LatLng& latLng) const {
+PrecisionPoint TransformState::latLngToPoint(const LatLng& latLng) const {
     return coordinateToPoint(latLngToCoordinate(latLng));
 }
 
-vec2<double> TransformState::latLngToXY(LatLng latLng) const {
+PrecisionPoint TransformState::latLngToXY(LatLng latLng) const {
     const double m = 1 - 1e-15;
     const double f = std::fmin(std::fmax(std::sin(util::DEG2RAD * latLng.latitude), -m), m);
     
@@ -201,7 +240,7 @@ vec2<double> TransformState::latLngToXY(LatLng latLng) const {
     return {xn, yn};
 }
 
-LatLng TransformState::pointToLatLng(const vec2<double> point) const {
+LatLng TransformState::pointToLatLng(const PrecisionPoint& point) const {
     return coordinateToLatLng(pointToCoordinate(point));
 }
 
@@ -226,7 +265,7 @@ LatLng TransformState::coordinateToLatLng(const TileCoordinate& coord) const {
     return latLng;
 }
 
-vec2<double> TransformState::coordinateToPoint(const TileCoordinate& coord) const {
+PrecisionPoint TransformState::coordinateToPoint(const TileCoordinate& coord) const {
     mat4 mat = coordinatePointMatrix(coord.zoom);
     matrix::vec4 p;
     matrix::vec4 c = {{ coord.column, coord.row, 0, 1 }};
@@ -234,7 +273,7 @@ vec2<double> TransformState::coordinateToPoint(const TileCoordinate& coord) cons
     return { p[0] / p[3], height - p[1] / p[3] };
 }
 
-TileCoordinate TransformState::pointToCoordinate(const vec2<double> point) const {
+TileCoordinate TransformState::pointToCoordinate(const PrecisionPoint& point) const {
 
     float targetZ = 0;
     const double tileZoom = getZoom();
@@ -291,13 +330,6 @@ mat4 TransformState::getPixelMatrix() const {
 }
 
 
-#pragma mark - Changing
-
-bool TransformState::isChanging() const {
-    return rotating || scaling || panning || gestureInProgress;
-}
-
-
 #pragma mark - (private helper functions)
 
 void TransformState::userConstrain(double& scale_, double& x_, double& y_) const {
@@ -341,25 +373,22 @@ void TransformState::userConstrain(double& scale_, double& x_, double& y_) const
     if (y_top > max_y) y_ = max_y - (height / 2);
 }
 
-void TransformState::constrain(double& scale_, double& y_) const {
-    // Constrain minimum zoom to avoid zooming out far enough to show off-world areas.
-    if (scale_ < height / util::tileSize) {
-        scale_ = height / util::tileSize;
+void TransformState::constrain(double& scale_, double& x_, double& y_) const {
+    // Constrain minimum scale to avoid zooming out far enough to show off-world areas.
+    if (constrainMode == ConstrainMode::WidthAndHeight) {
+        scale_ = std::max(scale_, static_cast<double>(width / util::tileSize));
     }
 
-    // Constrain min/max vertical pan to avoid showing off-world areas.
-    double max_y = ((scale_ * util::tileSize) - height) / 2;
+    scale_ = std::max(scale_, static_cast<double>(height / util::tileSize));
 
-    if (y_ > max_y) y_ = max_y;
-    if (y_ < -max_y) y_ = -max_y;
+    // Constrain min/max pan to avoid showing off-world areas.
+    if (constrainMode == ConstrainMode::WidthAndHeight) {
+        double max_x = (scale_ * util::tileSize - width) / 2;
+        x_ = std::max(-max_x, std::min(x_, max_x));
+    }
+
+    double max_y = (scale_ * util::tileSize - height) / 2;
+    y_ = std::max(-max_y, std::min(y_, max_y));
 }
 
-double TransformState::pixel_x() const {
-    const double center = (width - scale * util::tileSize) / 2;
-    return center + x;
-}
 
-double TransformState::pixel_y() const {
-    const double center = (height - scale * util::tileSize) / 2;
-    return center + y;
-}

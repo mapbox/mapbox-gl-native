@@ -1,7 +1,7 @@
 #ifndef MBGL_STYLE_VALUE
 #define MBGL_STYLE_VALUE
 
-#include <mbgl/util/variant.hpp>
+#include <mapbox/variant.hpp>
 #include <rapidjson/document.h>
 
 #include <cstdlib>

@@ -1,7 +1,7 @@
 Pod::Spec.new do |s|
 
   s.name         = "OHHTTPStubs"
-  s.version      = "4.0.1"
+  s.version      = "4.3.0"
 
   s.summary      = "Framework to stub your network requests like HTTP and help you write network unit tests with XCTest."
   s.description  = <<-DESC.gsub(/^ +\|/,'')
@@ -25,13 +25,62 @@ Pod::Spec.new do |s|
 
   s.source       = { :git => "https://github.com/AliSoftware/OHHTTPStubs.git", :tag => s.version.to_s }
 
-  s.source_files = "OHHTTPStubs/Sources/*.{h,m}"
-  s.public_header_files = "OHHTTPStubs/Sources/*.h"
-
   s.frameworks = 'Foundation', 'CFNetwork'
 
   s.requires_arc = true
   s.ios.deployment_target = '5.0'
   s.osx.deployment_target = '10.7'
+  s.watchos.deployment_target = '2.0'
+
+  s.default_subspec = 'Default'
+
+  # Default subspec that includes the most commonly-used components
+  s.subspec 'Default' do |default|
+    default.dependency 'OHHTTPStubs/Core'
+    default.dependency 'OHHTTPStubs/NSURLSession'
+    default.dependency 'OHHTTPStubs/JSON'
+    default.dependency 'OHHTTPStubs/OHPathHelpers'
+  end
+
+  # The Core subspec, containing the library core needed in all cases
+  s.subspec 'Core' do |core|
+    core.source_files = "OHHTTPStubs/Sources/*.{h,m}"
+    core.public_header_files = "OHHTTPStubs/Sources/*.h"
+  end
+
+  # Optional subspecs
+  s.subspec 'NSURLSession' do |urlsession|
+    urlsession.dependency 'OHHTTPStubs/Core'
+    urlsession.source_files = "OHHTTPStubs/Sources/NSURLSession/*.{h,m}"
+  end
+
+  s.subspec 'JSON' do |json|
+    json.dependency 'OHHTTPStubs/Core'
+    json.source_files = "OHHTTPStubs/Sources/JSON/*.{h,m}"
+    json.public_header_files = "OHHTTPStubs/Sources/JSON/*.h"
+  end
+
+  s.subspec 'HTTPMessage' do |httpmessage|
+    httpmessage.dependency 'OHHTTPStubs/Core'
+    httpmessage.source_files = "OHHTTPStubs/Sources/HTTPMessage/*.{h,m}"
+    httpmessage.public_header_files = "OHHTTPStubs/Sources/HTTPMessage/*.h"
+  end
+
+  s.subspec 'Mocktail' do |mocktail|
+    mocktail.dependency 'OHHTTPStubs/Core'
+    mocktail.source_files = "OHHTTPStubs/Sources/Mocktail/*.{h,m}"
+    mocktail.public_header_files = "OHHTTPStubs/Sources/Mocktail/*.h"
+  end
+
+  s.subspec 'OHPathHelpers' do |pathhelper|
+    pathhelper.source_files = "OHHTTPStubs/Sources/OHPathHelpers/*.{h,m}", "OHHTTPStubs/Sources/Compatibility.h"
+    pathhelper.public_header_files = "OHHTTPStubs/Sources/OHPathHelpers/*.h", "OHHTTPStubs/Sources/Compatibility.h"
+  end
+
+  s.subspec 'Swift' do |swift|
+    swift.ios.deployment_target = '8.0'
+    swift.dependency 'OHHTTPStubs/Core'
+    swift.source_files = "OHHTTPStubs/Sources/Swift/*.swift"
+  end
 
 end

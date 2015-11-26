@@ -21,13 +21,8 @@ class View;
 class MapData;
 class TexturePool;
 class Painter;
-class Sprite;
-class Worker;
-class StillImage;
 class SpriteImage;
-struct LatLng;
-struct LatLngBounds;
-
+class FileRequest;
 
 struct FrameData {
     std::array<uint16_t, 2> framebufferSize;
@@ -54,8 +49,7 @@ public:
     bool isLoaded() const;
 
     double getTopOffsetPixelsForAnnotationSymbol(const std::string& symbol);
-    void updateAnnotationTilesIfNeeded();
-    void updateAnnotationTiles(const std::unordered_set<TileID, TileID::Hash>&);
+    void updateAnnotations();
 
     void setSourceTileCacheSize(size_t size);
     void onLowMemory();
@@ -67,7 +61,8 @@ public:
     // Style::Observer implementation.
     void onTileDataChanged() override;
     void onResourceLoadingFailed(std::exception_ptr error) override;
-    void onSpriteStoreLoaded() override;
+
+    void dumpDebugLogs() const;
 
 private:
     // Update the state indicated by the accumulated Update flags, then render.
@@ -92,7 +87,7 @@ private:
     std::string styleURL;
     std::string styleJSON;
 
-    Request* styleRequest = nullptr;
+    std::unique_ptr<FileRequest> styleRequest;
 
     Map::StillImageCallback callback;
     size_t sourceCacheSize;

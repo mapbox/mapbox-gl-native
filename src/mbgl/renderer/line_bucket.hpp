@@ -6,9 +6,8 @@
 #include <mbgl/geometry/vao.hpp>
 #include <mbgl/geometry/elements_buffer.hpp>
 #include <mbgl/geometry/line_buffer.hpp>
-#include <mbgl/style/style_bucket.hpp>
-#include <mbgl/style/style_layout.hpp>
 #include <mbgl/util/vec.hpp>
+#include <mbgl/layer/line_layer.hpp>
 
 #include <vector>
 
@@ -25,12 +24,12 @@ class LineBucket : public Bucket {
     using TriangleGroup = ElementGroup<3>;
 
 public:
-    LineBucket(LineVertexBuffer &vertexBuffer, TriangleElementsBuffer &triangleElementsBuffer);
+    LineBucket();
     ~LineBucket() override;
 
     void upload() override;
     void render(Painter&, const StyleLayer&, const TileID&, const mat4&) override;
-    bool hasData() const;
+    bool hasData() const override;
 
     void addGeometry(const GeometryCollection&);
     void addGeometry(const std::vector<Coordinate>& line);
@@ -52,14 +51,11 @@ private:
             std::vector<TriangleElement>& triangleStore);
 
 public:
-    StyleLayoutLine layout;
+    LineLayoutProperties layout;
 
 private:
-    LineVertexBuffer& vertexBuffer;
-    TriangleElementsBuffer& triangleElementsBuffer;
-
-    const GLsizei vertex_start;
-    const GLsizei triangle_elements_start;
+    LineVertexBuffer vertexBuffer;
+    TriangleElementsBuffer triangleElementsBuffer;
 
     GLint e1;
     GLint e2;

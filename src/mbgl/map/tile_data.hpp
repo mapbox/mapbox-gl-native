@@ -3,17 +3,19 @@
 
 #include <mbgl/util/noncopyable.hpp>
 #include <mbgl/map/tile_id.hpp>
-#include <mbgl/renderer/debug_bucket.hpp>
-#include <mbgl/geometry/debug_font_buffer.hpp>
+#include <mbgl/renderer/bucket.hpp>
+#include <mbgl/text/placement_config.hpp>
 
 #include <atomic>
 #include <string>
+#include <memory>
 #include <functional>
 
 namespace mbgl {
 
 class StyleLayer;
 class Worker;
+class DebugBucket;
 
 class TileData : private util::noncopyable {
 public:
@@ -57,6 +59,8 @@ public:
         obsolete
     };
 
+    static const char* StateToString(State);
+
     // Tile data considered "Ready" can be used for rendering. Data in
     // partial state is still waiting for network resources but can also
     // be rendered, although layers will be missing.
@@ -65,14 +69,15 @@ public:
     }
 
     TileData(const TileID&);
-    virtual ~TileData() = default;
+    virtual ~TileData();
 
     // Mark this tile as no longer needed and cancel any pending work.
     virtual void cancel() = 0;
 
     virtual Bucket* getBucket(const StyleLayer&) = 0;
 
-    virtual void redoPlacement(float, float, bool) {}
+    virtual bool parsePending(std::function<void ()>) { return true; }
+    virtual void redoPlacement(PlacementConfig) {}
 
     bool isReady() const {
         return isReadyState(state);
@@ -86,17 +91,18 @@ public:
         return error;
     }
 
+    void dumpDebugLogs() const;
+
     const TileID id;
 
     // Contains the tile ID string for painting debug information.
-    DebugBucket debugBucket;
-    DebugFontBuffer debugFontBuffer;
+    std::unique_ptr<DebugBucket> debugBucket;
 
 protected:
     std::atomic<State> state;
     std::string error;
 };
 
-}
+} // namespace mbgl
 
 #endif

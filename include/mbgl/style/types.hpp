@@ -14,6 +14,9 @@ typedef std::array<float, 4> Color;
 
 template <typename T>
 struct Faded {
+    Faded() = default;
+    Faded(const T& v) : to(v) {}
+
     T from;
     float fromScale;
     T to;

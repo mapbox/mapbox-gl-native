@@ -2,15 +2,11 @@
 #include <mbgl/renderer/painter.hpp>
 
 #include <mbgl/shader/circle_shader.hpp>
+#include <mbgl/layer/circle_layer.hpp>
 
 using namespace mbgl;
 
-CircleBucket::CircleBucket(CircleVertexBuffer& vertexBuffer,
-                           TriangleElementsBuffer& elementsBuffer)
-    : vertexBuffer_(vertexBuffer)
-    , elementsBuffer_(elementsBuffer)
-    , vertexStart_(vertexBuffer_.index())
-    , elementsStart_(elementsBuffer_.index()) {
+CircleBucket::CircleBucket() {
 }
 
 CircleBucket::~CircleBucket() {
@@ -24,10 +20,10 @@ void CircleBucket::upload() {
 }
 
 void CircleBucket::render(Painter& painter,
-                        const StyleLayer& layer_desc,
+                        const StyleLayer& layer,
                         const TileID& id,
                         const mat4& matrix) {
-    painter.renderCircle(*this, layer_desc, id, matrix);
+    painter.renderCircle(*this, dynamic_cast<const CircleLayer&>(layer), id, matrix);
 }
 
 bool CircleBucket::hasData() const {
@@ -35,10 +31,14 @@ bool CircleBucket::hasData() const {
 }
 
 void CircleBucket::addGeometry(const GeometryCollection& geometryCollection) {
+    const int extent = 4096;
     for (auto& circle : geometryCollection) {
         for(auto & geometry : circle) {
             auto x = geometry.x;
             auto y = geometry.y;
+
+            // Do not include points that are outside the tile boundaries.
+            if (x < 0 || x >= extent || y < 0 || y >= extent) continue;
 
             // this geometry will be of the Point type, and we'll derive
             // two triangles from it.
@@ -74,8 +74,8 @@ void CircleBucket::addGeometry(const GeometryCollection& geometryCollection) {
 }
 
 void CircleBucket::drawCircles(CircleShader& shader) {
-    GLbyte *vertexIndex = BUFFER_OFFSET(vertexStart_ * vertexBuffer_.itemSize);
-    GLbyte *elementsIndex = BUFFER_OFFSET(elementsStart_ * elementsBuffer_.itemSize);
+    GLbyte* vertexIndex = BUFFER_OFFSET(0);
+    GLbyte* elementsIndex = BUFFER_OFFSET(0);
 
     for (auto& group : triangleGroups_) {
         assert(group);

@@ -26,6 +26,16 @@ private:
     const std::unique_ptr<util::Thread<Impl>> thread;
 };
 
+class SharedSQLiteCache : util::noncopyable {
+public:
+    static std::shared_ptr<SQLiteCache> get(const std::string &path = ":memory:");
+
+private:
+    SharedSQLiteCache() {}
+
+    static std::weak_ptr<SQLiteCache> masterPtr;
+};
+
 }
 
 #endif

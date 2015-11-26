@@ -1,16 +1,25 @@
 #include "node_map.hpp"
+#include "node_request.hpp"
+#include "node_mapbox_gl_native.hpp"
 
 #include <mbgl/platform/default/headless_display.hpp>
-#include <mbgl/map/still_image.hpp>
 #include <mbgl/util/exception.hpp>
+#include <mbgl/util/work_request.hpp>
 
 #include <unistd.h>
+
+#if UV_VERSION_MAJOR == 0 && UV_VERSION_MINOR <= 10
+#define UV_ASYNC_PARAMS(handle) uv_async_t *handle, int
+#else
+#define UV_ASYNC_PARAMS(handle) uv_async_t *handle
+#endif
 
 namespace node_mbgl {
 
 struct NodeMap::RenderOptions {
     double zoom = 0;
     double bearing = 0;
+    double pitch = 0;
     double latitude = 0;
     double longitude = 0;
     unsigned int width = 512;
@@ -35,12 +44,13 @@ const static char* releasedMessage() {
 NAN_MODULE_INIT(NodeMap::Init) {
     v8::Local<v8::FunctionTemplate> tpl = Nan::New<v8::FunctionTemplate>(New);
 
-    tpl->InstanceTemplate()->SetInternalFieldCount(1);
+    tpl->InstanceTemplate()->SetInternalFieldCount(2);
     tpl->SetClassName(Nan::New("Map").ToLocalChecked());
 
     Nan::SetPrototypeMethod(tpl, "load", Load);
     Nan::SetPrototypeMethod(tpl, "render", Render);
     Nan::SetPrototypeMethod(tpl, "release", Release);
+    Nan::SetPrototypeMethod(tpl, "dumpDebugLogs", DumpDebugLogs);
 
     constructor.Reset(tpl->GetFunction());
     Nan::Set(target, Nan::New("Map").ToLocalChecked(), tpl->GetFunction());
@@ -49,6 +59,45 @@ NAN_MODULE_INIT(NodeMap::Init) {
     sharedDisplay();
 }
 
+/**
+ * A request object, given to the `request` handler of a map, is an
+ * encapsulation of a URL and type of a resource that the map asks you to load.
+ *
+ * The `kind` property is one of
+ *
+ *     "Unknown": 0,
+ *     "Style": 1,
+ *     "Source": 2,
+ *     "Tile": 3,
+ *     "Glyphs": 4,
+ *     "SpriteImage": 5,
+ *     "SpriteJSON": 6
+ *
+ * @typedef
+ * @name Request
+ * @property {string} url
+ * @property {number} kind
+ */
+
+/**
+ * Mapbox GL object: this object loads stylesheets and renders them into
+ * images.
+ *
+ * @class
+ * @name Map
+ * @param {Object} options
+ * @param {Function} options.request a method used to request resources
+ * over the internet
+ * @param {Function} [options.cancel]
+ * @param {number} options.ratio pixel ratio
+ * @example
+ * var map = new mbgl.Map({ request: function() {} });
+ * map.load(require('./test/fixtures/style.json'));
+ * map.render({}, function(err, image) {
+ *     if (err) throw err;
+ *     fs.writeFileSync('image.png', image);
+ * });
+ */
 NAN_METHOD(NodeMap::New) {
     if (!info.IsConstructCall()) {
         return Nan::ThrowTypeError("Use the new operator to create new Map objects");
@@ -60,21 +109,24 @@ NAN_METHOD(NodeMap::New) {
 
     auto options = info[0]->ToObject();
 
-    // Check that 'request', 'cancel' and 'ratio' are defined.
+    // Check that 'request' is set. If 'cancel' is set it must be a
+    // function and if 'ratio' is set it must be a number.
     if (!Nan::Has(options, Nan::New("request").ToLocalChecked()).FromJust()
      || !Nan::Get(options, Nan::New("request").ToLocalChecked()).ToLocalChecked()->IsFunction()) {
         return Nan::ThrowError("Options object must have a 'request' method");
     }
 
-    if ( Nan::Has(options, Nan::New("cancel").ToLocalChecked()).FromJust()
+    if (Nan::Has(options, Nan::New("cancel").ToLocalChecked()).FromJust()
      && !Nan::Get(options, Nan::New("cancel").ToLocalChecked()).ToLocalChecked()->IsFunction()) {
         return Nan::ThrowError("Options object 'cancel' property must be a function");
     }
 
-    if (!Nan::Has(options, Nan::New("ratio").ToLocalChecked()).FromJust()
-     || !Nan::Get(options, Nan::New("ratio").ToLocalChecked()).ToLocalChecked()->IsNumber()) {
-        return Nan::ThrowError("Options object must have a numerical 'ratio' property");
+    if (Nan::Has(options, Nan::New("ratio").ToLocalChecked()).FromJust()
+     && !Nan::Get(options, Nan::New("ratio").ToLocalChecked()).ToLocalChecked()->IsNumber()) {
+        return Nan::ThrowError("Options object 'ratio' property must be a number");
     }
+
+    info.This()->SetInternalField(1, options);
 
     try {
         auto nodeMap = new NodeMap(options);
@@ -96,6 +148,21 @@ const std::string StringifyStyle(v8::Local<v8::Value> styleHandle) {
     return *Nan::Utf8String(Nan::MakeCallback(JSON, "stringify", 1, &styleHandle));
 }
 
+/**
+ * Load a stylesheet
+ *
+ * @function
+ * @name load
+ * @param {string|Object} stylesheet either an object or a JSON representation
+ * @returns {undefined} loads stylesheet into map
+ * @throws {Error} if stylesheet is missing or invalid
+ * @example
+ * // providing an object
+ * map.load(require('./test/fixtures/style.json'));
+ *
+ * // providing a string
+ * map.load(fs.readFileSync('./test/fixtures/style.json', 'utf8'));
+ */
 NAN_METHOD(NodeMap::Load) {
     auto nodeMap = Nan::ObjectWrap::Unwrap<NodeMap>(info.Holder());
 
@@ -143,10 +210,14 @@ std::unique_ptr<NodeMap::RenderOptions> NodeMap::ParseOptions(v8::Local<v8::Obje
         options->bearing = Nan::Get(obj, Nan::New("bearing").ToLocalChecked()).ToLocalChecked()->NumberValue();
     }
 
+    if (Nan::Has(obj, Nan::New("pitch").ToLocalChecked()).FromJust()) {
+        options->pitch = Nan::Get(obj, Nan::New("pitch").ToLocalChecked()).ToLocalChecked()->NumberValue();
+    }
+
     if (Nan::Has(obj, Nan::New("center").ToLocalChecked()).FromJust()) {
         auto center = Nan::Get(obj, Nan::New("center").ToLocalChecked()).ToLocalChecked().As<v8::Array>();
-        if (center->Length() > 0) { options->latitude = Nan::Get(center, 0).ToLocalChecked()->NumberValue(); }
-        if (center->Length() > 1) { options->longitude = Nan::Get(center, 1).ToLocalChecked()->NumberValue(); }
+        if (center->Length() > 0) { options->longitude = Nan::Get(center, 0).ToLocalChecked()->NumberValue(); }
+        if (center->Length() > 1) { options->latitude = Nan::Get(center, 1).ToLocalChecked()->NumberValue(); }
     }
 
     if (Nan::Has(obj, Nan::New("width").ToLocalChecked()).FromJust()) {
@@ -169,6 +240,22 @@ std::unique_ptr<NodeMap::RenderOptions> NodeMap::ParseOptions(v8::Local<v8::Obje
     return options;
 }
 
+/**
+ * Render an image from the currently-loaded style
+ *
+ * @name render
+ * @param {Object} options
+ * @param {number} [options.zoom=0]
+ * @param {number} [options.width=512]
+ * @param {number} [options.height=512]
+ * @param {Array<number>} [options.center=[0,0]] longitude, latitude center
+ * of the map
+ * @param {number} [options.bearing=0] rotation
+ * @param {Array<string>} [options.classes=[]] GL Style Classes
+ * @param {Function} callback
+ * @returns {undefined} calls callback
+ * @throws {Error} if stylesheet is not loaded or if map is already rendering
+ */
 NAN_METHOD(NodeMap::Render) {
     auto nodeMap = Nan::ObjectWrap::Unwrap<NodeMap>(info.Holder());
 
@@ -193,7 +280,7 @@ NAN_METHOD(NodeMap::Render) {
     auto options = ParseOptions(info[0]->ToObject());
 
     assert(!nodeMap->callback);
-    assert(!nodeMap->image);
+    assert(!nodeMap->image.data);
     nodeMap->callback = std::make_unique<Nan::Callback>(info[1].As<v8::Function>());
 
     try {
@@ -211,13 +298,14 @@ void NodeMap::startRender(std::unique_ptr<NodeMap::RenderOptions> options) {
     map->setClasses(options->classes);
     map->setLatLngZoom(mbgl::LatLng(options->latitude, options->longitude), options->zoom);
     map->setBearing(options->bearing);
+    map->setPitch(options->pitch);
 
-    map->renderStill([this](const std::exception_ptr eptr, std::unique_ptr<const mbgl::StillImage> result) {
+    map->renderStill([this](const std::exception_ptr eptr, mbgl::PremultipliedImage&& result) {
         if (eptr) {
             error = std::move(eptr);
             uv_async_send(async);
         } else {
-            assert(!image);
+            assert(!image.data);
             image = std::move(result);
             uv_async_send(async);
         }
@@ -249,7 +337,7 @@ void NodeMap::renderFinished() {
 
     // These have to be empty to be prepared for the next render call.
     assert(!callback);
-    assert(!image);
+    assert(!image.data);
 
     if (error) {
         std::string errorMessage;
@@ -269,18 +357,16 @@ void NodeMap::renderFinished() {
         assert(!error);
 
         cb->Call(1, argv);
-    } else if (img) {
+    } else if (img.data) {
         v8::Local<v8::Object> pixels = Nan::NewBuffer(
-            reinterpret_cast<char *>(img->pixels.get()),
-            size_t(img->width) * size_t(img->height) * sizeof(mbgl::StillImage::Pixel),
-
-            // Retain the StillImage object until the buffer is deleted.
-            [](char *, void *hint) {
-                delete reinterpret_cast<const mbgl::StillImage *>(hint);
+            reinterpret_cast<char *>(img.data.get()), img.size(),
+            // Retain the data until the buffer is deleted.
+            [](char *, void * hint) {
+                delete [] reinterpret_cast<uint8_t*>(hint);
             },
-            const_cast<mbgl::StillImage *>(img.get())
+            img.data.get()
         ).ToLocalChecked();
-        img.release();
+        img.data.release();
 
         v8::Local<v8::Value> argv[] = {
             Nan::Null(),
@@ -295,6 +381,11 @@ void NodeMap::renderFinished() {
     }
 }
 
+/**
+ * Clean up any resources used by a map instance.options
+ * @name release
+ * @returns {undefined}
+ */
 NAN_METHOD(NodeMap::Release) {
     auto nodeMap = Nan::ObjectWrap::Unwrap<NodeMap>(info.Holder());
 
@@ -321,6 +412,14 @@ void NodeMap::release() {
     map.reset(nullptr);
 }
 
+NAN_METHOD(NodeMap::DumpDebugLogs) {
+    auto nodeMap = Nan::ObjectWrap::Unwrap<NodeMap>(info.Holder());
+
+    if (!nodeMap->isValid()) return Nan::ThrowError(releasedMessage());
+
+    nodeMap->map->dumpDebugLogs();
+    info.GetReturnValue().SetUndefined();
+}
 
 ////////////////////////////////////////////////////////////////////////////////////////////////
 // Instance
@@ -328,19 +427,14 @@ void NodeMap::release() {
 NodeMap::NodeMap(v8::Local<v8::Object> options) :
     view(sharedDisplay(), [&] {
         Nan::HandleScope scope;
-        return Nan::Get(options, Nan::New("ratio").ToLocalChecked()).ToLocalChecked()->NumberValue();
+        return Nan::Has(options, Nan::New("ratio").ToLocalChecked()).FromJust() ? Nan::Get(options, Nan::New("ratio").ToLocalChecked()).ToLocalChecked()->NumberValue() : 1.0;
     }()),
-    fs(options),
-    map(std::make_unique<mbgl::Map>(view, fs, mbgl::MapMode::Still)),
+    map(std::make_unique<mbgl::Map>(view, *this, mbgl::MapMode::Still)),
     async(new uv_async_t) {
 
     async->data = this;
-#if UV_VERSION_MAJOR == 0 && UV_VERSION_MINOR <= 10
-    uv_async_init(uv_default_loop(), async, [](uv_async_t *as, int) {
-#else
-    uv_async_init(uv_default_loop(), async, [](uv_async_t *as) {
-#endif
-        reinterpret_cast<NodeMap *>(as->data)->renderFinished();
+    uv_async_init(uv_default_loop(), async, [](UV_ASYNC_PARAMS(handle)) {
+        reinterpret_cast<NodeMap *>(handle->data)->renderFinished();
     });
 
     // Make sure the async handle doesn't keep the loop alive.
@@ -349,6 +443,29 @@ NodeMap::NodeMap(v8::Local<v8::Object> options) :
 
 NodeMap::~NodeMap() {
     if (valid) release();
+}
+
+class NodeFileSourceRequest : public mbgl::FileRequest {
+public:
+    std::unique_ptr<mbgl::WorkRequest> workRequest;
+};
+
+std::unique_ptr<mbgl::FileRequest> NodeMap::request(const mbgl::Resource& resource, Callback cb1) {
+    auto req = std::make_unique<NodeFileSourceRequest>();
+
+    // This function can be called from any thread. Make sure we're executing the
+    // JS implementation in the node event loop.
+    req->workRequest = NodeRunLoop().invokeWithCallback([this] (mbgl::Resource res, Callback cb2) {
+        Nan::HandleScope scope;
+
+        auto requestHandle = NodeRequest::Create(res, cb2)->ToObject();
+        auto callbackHandle = Nan::GetFunction(Nan::New<v8::FunctionTemplate>(NodeRequest::Respond, requestHandle)).ToLocalChecked();
+
+        v8::Local<v8::Value> argv[] = { requestHandle, callbackHandle };
+        Nan::MakeCallback(handle()->GetInternalField(1)->ToObject(), "request", 2, argv);
+    }, cb1, resource);
+
+    return std::move(req);
 }
 
 }

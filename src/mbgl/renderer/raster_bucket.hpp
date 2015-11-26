@@ -3,26 +3,22 @@
 
 #include <mbgl/renderer/bucket.hpp>
 #include <mbgl/util/raster.hpp>
-#include <mbgl/style/style_bucket.hpp>
 
 namespace mbgl {
 
-class StyleLayoutRaster;
 class RasterShader;
 class StaticVertexBuffer;
 class VertexArrayObject;
 
 class RasterBucket : public Bucket {
 public:
-    RasterBucket(TexturePool&, const StyleLayoutRaster&);
+    RasterBucket(TexturePool&);
 
     void upload() override;
     void render(Painter&, const StyleLayer&, const TileID&, const mat4&) override;
-    bool hasData() const;
+    bool hasData() const override;
 
-    bool setImage(std::unique_ptr<util::Image> image);
-
-    const StyleLayoutRaster &layout;
+    bool setImage(PremultipliedImage);
 
     void drawRaster(RasterShader& shader, StaticVertexBuffer &vertices, VertexArrayObject &array);
 

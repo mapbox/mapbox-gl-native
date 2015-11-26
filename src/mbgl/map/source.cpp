@@ -2,6 +2,8 @@
 #include <mbgl/map/map_data.hpp>
 #include <mbgl/map/transform.hpp>
 #include <mbgl/map/tile.hpp>
+#include <mbgl/map/vector_tile.hpp>
+#include <mbgl/annotation/annotation_tile.hpp>
 #include <mbgl/renderer/painter.hpp>
 #include <mbgl/util/exception.hpp>
 #include <mbgl/util/constants.hpp>
@@ -14,7 +16,6 @@
 #include <mbgl/storage/file_source.hpp>
 #include <mbgl/style/style_layer.hpp>
 #include <mbgl/platform/log.hpp>
-#include <mbgl/util/uv_detail.hpp>
 #include <mbgl/util/std.hpp>
 #include <mbgl/util/token.hpp>
 #include <mbgl/util/string.hpp>
@@ -22,9 +23,10 @@
 
 #include <mbgl/map/vector_tile_data.hpp>
 #include <mbgl/map/raster_tile_data.hpp>
-#include <mbgl/map/live_tile_data.hpp>
 #include <mbgl/style/style.hpp>
 #include <mbgl/gl/debugging.hpp>
+
+#include <rapidjson/error/en.h>
 
 #include <algorithm>
 
@@ -119,11 +121,7 @@ std::string SourceInfo::tileURL(const TileID& id, float pixelRatio) const {
 
 Source::Source() {}
 
-Source::~Source() {
-    if (req) {
-        util::ThreadContext::getFileSource()->cancel(req);
-    }
-}
+Source::~Source() = default;
 
 bool Source::isLoaded() const {
     if (!loaded) {
@@ -149,22 +147,26 @@ void Source::load() {
     }
 
     FileSource* fs = util::ThreadContext::getFileSource();
-    req = fs->request({ Resource::Kind::Source, info.url }, util::RunLoop::getLoop(), [this](const Response &res) {
+    req = fs->request({ Resource::Kind::Source, info.url }, [this](Response res) {
+        if (res.stale) {
+            // Only handle fresh responses.
+            return;
+        }
         req = nullptr;
 
-        if (res.status != Response::Successful) {
+        if (res.error) {
             std::stringstream message;
-            message <<  "Failed to load [" << info.url << "]: " << res.message;
+            message <<  "Failed to load [" << info.url << "]: " << res.error->message;
             emitSourceLoadingFailed(message.str());
             return;
         }
 
         rapidjson::Document d;
-        d.Parse<0>(res.data.c_str());
+        d.Parse<0>(res.data->c_str());
 
         if (d.HasParseError()) {
             std::stringstream message;
-            message << "Failed to parse [" << info.url << "]: " << d.GetErrorOffset() << " - " << d.GetParseError();
+            message << "Failed to parse [" << info.url << "]: " << d.GetErrorOffset() << " - " << rapidjson::GetParseError_En(d.GetParseError());
             emitSourceLoadingFailed(message.str());
             return;
         }
@@ -234,15 +236,13 @@ bool Source::handlePartialTile(const TileID& id, Worker&) {
         return true;
     }
 
-    // Note: this uses a raw pointer; we don't want the callback binding to have a
-    // shared pointer.
-    VectorTileData* data = dynamic_cast<VectorTileData*>(it->second.lock().get());
+    auto data = it->second.lock();
     if (!data) {
         return true;
     }
 
-    return data->reparse([this, data]() {
-	emitTileLoaded(false);
+    return data->parsePending([this]() {
+        emitTileLoaded(false);
     });
 }
 
@@ -284,21 +284,28 @@ TileData::State Source::addTile(MapData& data,
         auto callback = std::bind(&Source::tileLoadingCompleteCallback, this, normalized_id, transformState, data.getCollisionDebug());
 
         // If we don't find working tile data, we're just going to load it.
-        if (info.type == SourceType::Vector) {
-            auto tileData = std::make_shared<VectorTileData>(normalized_id, style, info, 
-                    transformState.getAngle(), transformState.getPitch(), data.getCollisionDebug());
-            tileData->request(data.pixelRatio, callback);
-            new_tile.data = tileData;
-        } else if (info.type == SourceType::Raster) {
+        if (info.type == SourceType::Raster) {
             auto tileData = std::make_shared<RasterTileData>(normalized_id, texturePool, info, style.workers);
             tileData->request(data.pixelRatio, callback);
             new_tile.data = tileData;
-        } else if (info.type == SourceType::Annotations) {
-            new_tile.data = std::make_shared<LiveTileData>(normalized_id,
-                data.getAnnotationManager()->getTile(normalized_id), style, info, callback);
         } else {
-            throw std::runtime_error("source type not implemented");
+            std::unique_ptr<GeometryTileMonitor> monitor;
+
+            if (info.type == SourceType::Vector) {
+                monitor = std::make_unique<VectorTileMonitor>(info, normalized_id, data.pixelRatio);
+            } else if (info.type == SourceType::Annotations) {
+                monitor = std::make_unique<AnnotationTileMonitor>(normalized_id, data);
+            } else {
+                throw std::runtime_error("source type not implemented");
+            }
+
+            new_tile.data = std::make_shared<VectorTileData>(normalized_id,
+                                                             std::move(monitor),
+                                                             info.source_id,
+                                                             style,
+                                                             callback);
         }
+
         tile_data.emplace(new_tile.data->id, new_tile.data);
     }
 
@@ -363,7 +370,8 @@ bool Source::findLoadedChildren(const TileID& id, int32_t maxCoveringZoom, std::
         const TileData::State state = hasTile(child_id);
         if (TileData::isReadyState(state)) {
             retain.emplace_front(child_id);
-        } else {
+        }
+        if (state != TileData::State::parsed) {
             complete = false;
             if (z < maxCoveringZoom) {
                 // Go further down the hierarchy to find more unloaded children.
@@ -383,16 +391,17 @@ bool Source::findLoadedChildren(const TileID& id, int32_t maxCoveringZoom, std::
  *
  * @return boolean Whether a parent was found.
  */
-bool Source::findLoadedParent(const TileID& id, int32_t minCoveringZoom, std::forward_list<TileID>& retain) {
+void Source::findLoadedParent(const TileID& id, int32_t minCoveringZoom, std::forward_list<TileID>& retain) {
     for (int32_t z = id.z - 1; z >= minCoveringZoom; --z) {
         const TileID parent_id = id.parent(z, info.max_zoom);
         const TileData::State state = hasTile(parent_id);
         if (TileData::isReadyState(state)) {
             retain.emplace_front(parent_id);
-            return true;
+            if (state == TileData::State::parsed) {
+                return;
+            }
         }
     }
-    return false;
 }
 
 bool Source::update(MapData& data,
@@ -507,26 +516,13 @@ bool Source::update(MapData& data,
     updateTilePtrs();
 
     for (auto& tilePtr : tilePtrs) {
-        tilePtr->data->redoPlacement(transformState.getAngle(), transformState.getPitch(), data.getCollisionDebug());
+        tilePtr->data->redoPlacement(
+            { transformState.getAngle(), transformState.getPitch(), data.getCollisionDebug() });
     }
 
     updated = data.getAnimationTime();
 
     return allTilesUpdated;
-}
-
-void Source::invalidateTiles(const std::unordered_set<TileID, TileID::Hash>& ids) {
-    cache.clear();
-    if (!ids.empty()) {
-        for (auto& id : ids) {
-            tiles.erase(id);
-            tile_data.erase(id);
-        }
-    } else {
-        tiles.clear();
-        tile_data.clear();
-    }
-    updateTilePtrs();
 }
 
 void Source::updateTilePtrs() {
@@ -564,7 +560,7 @@ void Source::tileLoadingCompleteCallback(const TileID& normalized_id, const Tran
         return;
     }
 
-    data->redoPlacement(transformState.getAngle(), transformState.getPitch(), collisionDebug);
+    data->redoPlacement({ transformState.getAngle(), transformState.getPitch(), collisionDebug });
     emitTileLoaded(true);
 }
 
@@ -596,6 +592,15 @@ void Source::emitTileLoadingFailed(const std::string& message) {
 
     auto error = std::make_exception_ptr(util::TileLoadingException(message));
     observer_->onTileLoadingFailed(error);
+}
+
+void Source::dumpDebugLogs() const {
+    Log::Info(Event::General, "Source::id: %s", info.source_id.c_str());
+    Log::Info(Event::General, "Source::loaded: %d", loaded);
+
+    for (const auto& tile : tiles) {
+        tile.second->data->dumpDebugLogs();
+    }
 }
 
 }

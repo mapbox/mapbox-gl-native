@@ -26,6 +26,11 @@ ifneq (,$(wildcard scripts/$(HOST)/$(HOST_VERSION)/configure.sh))
 	CONFIGURE_FILES += scripts/$(HOST)/$(HOST_VERSION)/configure.sh
 endif
 
+ifneq (,$(findstring clang,$(CXX)))
+	CXX_HOST = "clang"
+else ifneq (,$(findstring g++,$(CXX)))
+	CXX_HOST = "g++"
+endif
 
 # Text formatting
 TEXT_BOLD = \033[1m
@@ -42,10 +47,6 @@ ifneq (,$(wildcard .git/.))
 SUBMODULES += .mason/mason.sh
 .mason/mason.sh:
 	./scripts/flock.py .git/Submodule.lock git submodule update --init .mason
-
-SUBMODULES += styles/styles
-styles/styles:
-	./scripts/flock.py .git/Submodule.lock git submodule update --init styles
 
 ifeq ($(HOST),ios)
 SUBMODULES += platform/ios/vendor/SMCalloutView/SMCalloutView.h
@@ -76,6 +77,7 @@ GYP_FLAGS += -Dcache_lib=$(CACHE)
 GYP_FLAGS += -Dheadless_lib=$(HEADLESS)
 GYP_FLAGS += -Dtest=$(BUILD_TEST)
 GYP_FLAGS += -Drender=$(BUILD_RENDER)
+GYP_FLAGS += -Dcxx_host=$(CXX_HOST)
 GYP_FLAGS += --depth=.
 GYP_FLAGS += -Goutput_dir=.
 GYP_FLAGS += --generator-output=./build/$(HOST_SLUG)
@@ -97,7 +99,13 @@ Xcode/__project__: print-env $(SUBMODULES) config/$(HOST_SLUG).gypi
 NODE_PRE_GYP = $(shell npm bin)/node-pre-gyp
 node/configure:
 	$(QUIET)$(ENV) $(NODE_PRE_GYP) configure --clang -- \
-	$(GYP_FLAGS) -Dlibuv_ldflags= -Dlibuv_static_libs=
+	$(GYP_FLAGS) -Dlibuv_cflags= -Dlibuv_ldflags= -Dlibuv_static_libs=
+
+node/xproj:
+	$(QUIET)$(ENV) $(NODE_PRE_GYP) configure --clang -- \
+	$(GYP_FLAGS) -f xcode -Dlibuv_cflags= -Dlibuv_ldflags= -Dlibuv_static_libs=
+	$(QUIET)$(ENV) ./scripts/node/create_npm_scheme.sh test
+	$(QUIET)$(ENV) ./scripts/node/create_npm_scheme.sh run test-suite
 
 Makefile/node: Makefile/__project__ node/configure
 	@printf "$(TEXT_BOLD)$(COLOR_GREEN)* Building target node...$(FORMAT_END)\n"
@@ -107,6 +115,16 @@ Makefile/node: Makefile/__project__ node/configure
 Makefile/%: Makefile/__project__
 	@printf "$(TEXT_BOLD)$(COLOR_GREEN)* Building target $*...$(FORMAT_END)\n"
 	$(QUIET)$(ENV) $(MAKE) -C build/$(HOST_SLUG) BUILDTYPE=$(BUILDTYPE) $*
+
+Xcode/node: Xcode/__project__ node/xproj
+	@printf "$(TEXT_BOLD)$(COLOR_GREEN)* Building target node...$(FORMAT_END)\n"
+	$(QUIET)$(ENV) set -o pipefail && xcodebuild \
+		$(XCODEBUILD_ARGS) \
+		-project ./build/binding.xcodeproj \
+		-configuration $(BUILDTYPE) \
+		-target mapbox-gl-native \
+		-jobs $(JOBS) \
+		$(XCPRETTY)
 
 Xcode/%: Xcode/__project__
 	@printf "$(TEXT_BOLD)$(COLOR_GREEN)* Building target $*...$(FORMAT_END)\n"

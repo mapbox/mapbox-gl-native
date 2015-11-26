@@ -7,12 +7,13 @@
 #include <atomic>
 #include <functional>
 #include <string>
+#include <memory>
 
 namespace mbgl {
 
 class GlyphStore;
 class FontStack;
-class Request;
+class FileRequest;
 
 class GlyphPBF : private util::noncopyable {
 public:
@@ -41,10 +42,10 @@ private:
 
     void parse(GlyphStore* store, const std::string& fontStack, const std::string& url);
 
-    std::string data;
+    std::shared_ptr<const std::string> data;
     std::atomic<bool> parsed;
 
-    Request* req = nullptr;
+    std::unique_ptr<FileRequest> req;
 
     Observer* observer = nullptr;
 };

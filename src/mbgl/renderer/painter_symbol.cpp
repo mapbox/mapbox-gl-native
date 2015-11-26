@@ -1,9 +1,8 @@
 #include <mbgl/renderer/painter.hpp>
 #include <mbgl/renderer/symbol_bucket.hpp>
-#include <mbgl/style/style_layer.hpp>
-#include <mbgl/style/style_layout.hpp>
+#include <mbgl/layer/symbol_layer.hpp>
 #include <mbgl/geometry/glyph_atlas.hpp>
-#include <mbgl/geometry/sprite_atlas.hpp>
+#include <mbgl/sprite/sprite_atlas.hpp>
 #include <mbgl/shader/sdf_shader.hpp>
 #include <mbgl/shader/icon_shader.hpp>
 #include <mbgl/shader/box_shader.hpp>
@@ -26,10 +25,9 @@ void Painter::renderSDF(SymbolBucket &bucket,
                         SDFShader& sdfShader,
                         void (SymbolBucket::*drawSDF)(SDFShader&))
 {
-    mat4 vtxMatrix = translatedMatrix(matrix, styleProperties.translate, id, styleProperties.translate_anchor);
+    mat4 vtxMatrix = translatedMatrix(matrix, styleProperties.translate, id, styleProperties.translateAnchor);
 
-    bool aligned_with_map = (bucketProperties.rotation_alignment == RotationAlignmentType::Map);
-    bool skewed = aligned_with_map;
+    bool skewed = (bucketProperties.rotationAlignment == RotationAlignmentType::Map);
     mat4 exMatrix;
     float s;
     float gammaScale;
@@ -56,7 +54,7 @@ void Painter::renderSDF(SymbolBucket &bucket,
     float x = state.getHeight() / 2.0f * std::tan(state.getPitch());
     float extra = (topedgelength + x) / topedgelength - 1;
 
-    useProgram(sdfShader.program);
+    config.program = sdfShader.program;
     sdfShader.u_matrix = vtxMatrix;
     sdfShader.u_exmatrix = exMatrix;
     sdfShader.u_texsize = texsize;
@@ -68,11 +66,18 @@ void Painter::renderSDF(SymbolBucket &bucket,
 
     sdfShader.u_zoom = (state.getNormalizedZoom() - zoomAdjust) * 10; // current zoom level
 
-    FadeProperties f = frameHistory.getFadeProperties(data.getAnimationTime(), data.getDefaultFadeDuration());
-    sdfShader.u_fadedist = f.fadedist * 10;
-    sdfShader.u_minfadezoom = std::floor(f.minfadezoom * 10);
-    sdfShader.u_maxfadezoom = std::floor(f.maxfadezoom * 10);
-    sdfShader.u_fadezoom = (state.getNormalizedZoom() + f.bump) * 10;
+    if (data.mode == MapMode::Continuous) {
+        FadeProperties f = frameHistory.getFadeProperties(data.getAnimationTime(), data.getDefaultFadeDuration());
+        sdfShader.u_fadedist = f.fadedist * 10;
+        sdfShader.u_minfadezoom = std::floor(f.minfadezoom * 10);
+        sdfShader.u_maxfadezoom = std::floor(f.maxfadezoom * 10);
+        sdfShader.u_fadezoom = (state.getNormalizedZoom() + f.bump) * 10;
+    } else { // MapMode::Still
+        sdfShader.u_fadedist = 0;
+        sdfShader.u_minfadezoom = state.getNormalizedZoom() * 10;
+        sdfShader.u_maxfadezoom = state.getNormalizedZoom() * 10;
+        sdfShader.u_fadezoom = state.getNormalizedZoom() * 10;
+    }
 
     // The default gamma value has to be adjust for the current pixelratio so that we're not
     // drawing blurry font on retina screens.
@@ -84,28 +89,28 @@ void Painter::renderSDF(SymbolBucket &bucket,
 
     // We're drawing in the translucent pass which is bottom-to-top, so we need
     // to draw the halo first.
-    if (styleProperties.halo_color[3] > 0.0f && styleProperties.halo_width > 0.0f) {
-        sdfShader.u_gamma = (styleProperties.halo_blur * blurOffset / fontScale / sdfPx + gamma) * gammaScale;
+    if (styleProperties.haloColor.value[3] > 0.0f && styleProperties.haloWidth > 0.0f) {
+        sdfShader.u_gamma = (styleProperties.haloBlur * blurOffset / fontScale / sdfPx + gamma) * gammaScale;
 
         if (styleProperties.opacity < 1.0f) {
-            Color color = styleProperties.halo_color;
+            Color color = styleProperties.haloColor;
             color[0] *= styleProperties.opacity;
             color[1] *= styleProperties.opacity;
             color[2] *= styleProperties.opacity;
             color[3] *= styleProperties.opacity;
             sdfShader.u_color = color;
         } else {
-            sdfShader.u_color = styleProperties.halo_color;
+            sdfShader.u_color = styleProperties.haloColor;
         }
 
-        sdfShader.u_buffer = (haloOffset - styleProperties.halo_width / fontScale) / sdfPx;
+        sdfShader.u_buffer = (haloOffset - styleProperties.haloWidth / fontScale) / sdfPx;
 
         setDepthSublayer(0);
         (bucket.*drawSDF)(sdfShader);
     }
 
     // Then, we draw the text/icon over the halo
-    if (styleProperties.color[3] > 0.0f) {
+    if (styleProperties.color.value[3] > 0.0f) {
         sdfShader.u_gamma = gamma * gammaScale;
 
         if (styleProperties.opacity < 1.0f) {
@@ -126,50 +131,61 @@ void Painter::renderSDF(SymbolBucket &bucket,
     }
 }
 
-void Painter::renderSymbol(SymbolBucket &bucket, const StyleLayer &layer_desc, const TileID &id, const mat4 &matrix) {
+void Painter::renderSymbol(SymbolBucket& bucket, const SymbolLayer& layer, const TileID& id, const mat4& matrix) {
     // Abort early.
     if (pass == RenderPass::Opaque) {
         return;
     }
 
-    const auto &properties = layer_desc.getProperties<SymbolProperties>();
-    const auto &layout = bucket.layout;
+    const auto& properties = layer.paint;
+    const auto& layout = bucket.layout;
 
     config.depthMask = GL_FALSE;
 
     if (bucket.hasCollisionBoxData()) {
-        config.stencilTest = true;
+        config.stencilOp.reset();
+        config.stencilTest = GL_TRUE;
 
-        useProgram(collisionBoxShader->program);
+        config.program = collisionBoxShader->program;
         collisionBoxShader->u_matrix = matrix;
         collisionBoxShader->u_scale = std::pow(2, state.getNormalizedZoom() - id.z);
         collisionBoxShader->u_zoom = state.getNormalizedZoom() * 10;
         collisionBoxShader->u_maxzoom = (id.z + 1) * 10;
-        lineWidth(1.0f);
+        config.lineWidth = 1.0f;
 
         setDepthSublayer(0);
         bucket.drawCollisionBoxes(*collisionBoxShader);
 
     }
 
-    // TODO remove the `|| true` when #1673 is implemented
-    const bool drawAcrossEdges = !(layout.text.allow_overlap || layout.icon.allow_overlap ||
-          layout.text.ignore_placement || layout.icon.ignore_placement) || true;
+    // TODO remove the `true ||` when #1673 is implemented
+    const bool drawAcrossEdges = true || !(layout.text.allowOverlap || layout.icon.allowOverlap ||
+          layout.text.ignorePlacement || layout.icon.ignorePlacement);
 
     // Disable the stencil test so that labels aren't clipped to tile boundaries.
     //
     // Layers with features that may be drawn overlapping aren't clipped. These
     // layers are sorted in the y direction, and to draw the correct ordering near
     // tile edges the icons are included in both tiles and clipped when drawing.
-    config.stencilTest = drawAcrossEdges ? false : true;
+    if (drawAcrossEdges) {
+        config.stencilTest = GL_FALSE;
+    } else {
+        config.stencilOp.reset();
+        config.stencilTest = GL_TRUE;
+    }
 
     if (bucket.hasIconData()) {
-        config.depthTest = layout.icon.rotation_alignment == RotationAlignmentType::Map;
+        if (layout.icon.rotationAlignment == RotationAlignmentType::Map) {
+            config.depthFunc.reset();
+            config.depthTest = GL_TRUE;
+        } else {
+            config.depthTest = GL_FALSE;
+        }
 
         bool sdf = bucket.sdfIcons;
 
         const float angleOffset =
-            layout.icon.rotation_alignment == RotationAlignmentType::Map
+            layout.icon.rotationAlignment == RotationAlignmentType::Map
                 ? state.getAngle()
                 : 0;
 
@@ -190,9 +206,9 @@ void Painter::renderSymbol(SymbolBucket &bucket, const StyleLayer &layer_desc, c
                       *sdfIconShader,
                       &SymbolBucket::drawIcons);
         } else {
-            mat4 vtxMatrix = translatedMatrix(matrix, properties.icon.translate, id, properties.icon.translate_anchor);
+            mat4 vtxMatrix = translatedMatrix(matrix, properties.icon.translate, id, properties.icon.translateAnchor);
 
-            bool skewed = layout.icon.rotation_alignment == RotationAlignmentType::Map;
+            bool skewed = layout.icon.rotationAlignment == RotationAlignmentType::Map;
             mat4 exMatrix;
             float s;
 
@@ -213,7 +229,7 @@ void Painter::renderSymbol(SymbolBucket &bucket, const StyleLayer &layer_desc, c
             float x = state.getHeight() / 2.0f * std::tan(state.getPitch());
             float extra = (topedgelength + x) / topedgelength - 1;
 
-            useProgram(iconShader->program);
+            config.program = iconShader->program;
             iconShader->u_matrix = vtxMatrix;
             iconShader->u_exmatrix = exMatrix;
             iconShader->u_texsize = {{ float(spriteAtlas->getWidth()) / 4.0f, float(spriteAtlas->getHeight()) / 4.0f }};
@@ -236,7 +252,12 @@ void Painter::renderSymbol(SymbolBucket &bucket, const StyleLayer &layer_desc, c
     }
 
     if (bucket.hasTextData()) {
-        config.depthTest = layout.text.rotation_alignment == RotationAlignmentType::Map;
+        if (layout.text.rotationAlignment == RotationAlignmentType::Map) {
+            config.depthFunc.reset();
+            config.depthTest = GL_TRUE;
+        } else {
+            config.depthTest = GL_FALSE;
+        }
 
         glyphAtlas->bind();
 

@@ -50,8 +50,6 @@ public:
     void enableFps(bool enable);
     void updateFps();
 
-    void onInvalidate();
-
     void resizeView(int width, int height);
     void resizeFramebuffer(int width, int height);
 
@@ -62,7 +60,7 @@ private:
 
 private:
     JavaVM *vm = nullptr;
-    jobject obj = nullptr;
+    jweak obj = nullptr;
 
     ANativeWindow *window = nullptr;
     EGLDisplay display = EGL_NO_DISPLAY;
@@ -89,12 +87,13 @@ private:
     int availableProcessors = 0;
     size_t totalMemory = 0;
 
-    // Ensure these are initialised last
-    mbgl::SQLiteCache fileCache;
-    mbgl::DefaultFileSource fileSource;
-    mbgl::Map map;
+    jboolean renderDetach = false;
+    JNIEnv *renderEnv = nullptr;
 
-    std::atomic_flag clean = ATOMIC_FLAG_INIT;
+    // Ensure these are initialised last
+    std::shared_ptr<mbgl::SQLiteCache> fileCache;
+    std::unique_ptr<mbgl::DefaultFileSource> fileSource;
+    std::unique_ptr<mbgl::Map> map;
 };
 }
 }

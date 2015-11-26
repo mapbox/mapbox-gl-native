@@ -41,11 +41,20 @@ struct vec2 {
         return {x * o, y * o};
     }
 
-    template <typename O>
-    inline typename std::enable_if<std::is_arithmetic<O>::value, vec2>::type &
-    operator*=(O o) {
+    inline void operator*=(T o) {
         x *= o;
         y *= o;
+    }
+
+    template <typename O>
+    inline typename std::enable_if<std::is_arithmetic<O>::value, vec2>::type
+    operator/(O o) const {
+        return {x / o, y / o};
+    }
+
+    inline void operator/=(T o) {
+        x /= o;
+        y /= o;
     }
 
     inline vec2<T> operator *(const std::array<float, 16>& matrix) {
@@ -111,7 +120,7 @@ struct vec4 {
 };
 
 
-typedef vec2<int16_t> Coordinate;
+using Coordinate = vec2<int16_t>;
 
 }
 

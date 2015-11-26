@@ -5,19 +5,20 @@
   'targets': [
     { 'target_name': '<(module_name)',
       'dependencies': [
-        'mbgl.gyp:core',
-        'mbgl.gyp:platform-<(platform_lib)',
-        'mbgl.gyp:headless-<(headless_lib)',
+        'gyp/mbgl.gyp:core',
+        'gyp/mbgl.gyp:platform-<(platform_lib)',
+        'gyp/mbgl.gyp:headless-<(headless_lib)',
       ],
 
-      'include_dirs': [ "<!(node -e \"require('nan')\")" ],
+      'include_dirs': [
+        '<(node_root_dir)/include/node',
+        "<!(node -e \"require('nan')\")",
+      ],
 
       'sources': [
         'platform/node/src/node_mapbox_gl_native.cpp',
         'platform/node/src/node_log.hpp',
         'platform/node/src/node_log.cpp',
-        'platform/node/src/node_file_source.hpp',
-        'platform/node/src/node_file_source.cpp',
         'platform/node/src/node_map.hpp',
         'platform/node/src/node_map.cpp',
         'platform/node/src/node_request.hpp',

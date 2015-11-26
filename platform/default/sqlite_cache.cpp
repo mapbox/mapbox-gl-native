@@ -1,10 +1,11 @@
 #include "sqlite_cache_impl.hpp"
-#include <mbgl/storage/request.hpp>
+#include <mbgl/storage/resource.hpp>
 #include <mbgl/storage/response.hpp>
 
 #include <mbgl/util/compression.hpp>
 #include <mbgl/util/io.hpp>
 #include <mbgl/util/thread.hpp>
+#include <mbgl/util/mapbox.hpp>
 #include <mbgl/platform/log.hpp>
 
 #include "sqlite3.hpp"
@@ -12,57 +13,10 @@
 
 namespace mbgl {
 
-std::string removeAccessTokenFromURL(const std::string &url) {
-    const size_t token_start = url.find("access_token=");
-    // Ensure that token exists, isn't at the front and is preceded by either & or ?.
-    if (token_start == std::string::npos || token_start == 0 || !(url[token_start - 1] == '&' || url[token_start - 1] == '?')) {
-        return url;
-    }
-
-    const size_t token_end = url.find_first_of('&', token_start);
-    if (token_end == std::string::npos) {
-        // The token is the last query argument. We slice away the "&access_token=..." part
-        return url.substr(0, token_start - 1);
-    } else {
-        // We slice away the "access_token=...&" part.
-        return url.substr(0, token_start) + url.substr(token_end + 1);
-    }
-}
-
-std::string convertMapboxDomainsToProtocol(const std::string &url) {
-    const size_t protocol_separator = url.find("://");
-    if (protocol_separator == std::string::npos) {
-        return url;
-    }
-
-    const std::string protocol = url.substr(0, protocol_separator);
-    if (!(protocol == "http" || protocol == "https")) {
-        return url;
-    }
-
-    const size_t domain_begin = protocol_separator + 3;
-    const size_t path_separator = url.find("/", domain_begin);
-    if (path_separator == std::string::npos) {
-        return url;
-    }
-
-    const std::string domain = url.substr(domain_begin, path_separator - domain_begin);
-    if (domain.find(".tiles.mapbox.com") != std::string::npos) {
-        return "mapbox://" + url.substr(path_separator + 1);
-    } else {
-        return url;
-    }
-}
-
-std::string unifyMapboxURLs(const std::string &url) {
-    return removeAccessTokenFromURL(convertMapboxDomainsToProtocol(url));
-}
-
-
 using namespace mapbox::sqlite;
 
 SQLiteCache::SQLiteCache(const std::string& path_)
-    : thread(std::make_unique<util::Thread<Impl>>(util::ThreadContext{"SQLite Cache", util::ThreadType::Unknown, util::ThreadPriority::Low}, path_)) {
+    : thread(std::make_unique<util::Thread<Impl>>(util::ThreadContext{"SQLiteCache", util::ThreadType::Unknown, util::ThreadPriority::Low}, path_)) {
 }
 
 SQLiteCache::~SQLiteCache() = default;
@@ -154,18 +108,22 @@ void SQLiteCache::Impl::get(const Resource &resource, Callback callback) {
             getStmt->reset();
         }
 
-        const std::string unifiedURL = unifyMapboxURLs(resource.url);
-        getStmt->bind(1, unifiedURL.c_str());
+        const auto canonicalURL = util::mapbox::canonicalURL(resource.url);
+        getStmt->bind(1, canonicalURL.c_str());
         if (getStmt->run()) {
             // There is data.
             auto response = std::make_unique<Response>();
-            response->status = Response::Status(getStmt->get<int>(0));
+            const auto status = getStmt->get<int>(0);
+            if (status > 1) {
+                // Status codes > 1 indicate an error
+                response->error = std::make_unique<Response::Error>(Response::Error::Reason(status));
+            }
             response->modified = getStmt->get<int64_t>(1);
             response->etag = getStmt->get<std::string>(2);
             response->expires = getStmt->get<int64_t>(3);
-            response->data = getStmt->get<std::string>(4);
+            response->data = std::make_shared<std::string>(std::move(getStmt->get<std::string>(4)));
             if (getStmt->get<int>(5)) { // == compressed
-                response->data = util::decompress(response->data);
+                response->data = std::make_shared<std::string>(std::move(util::decompress(*response->data)));
             }
             callback(std::move(response));
         } else {
@@ -174,6 +132,9 @@ void SQLiteCache::Impl::get(const Resource &resource, Callback callback) {
         }
     } catch (mapbox::sqlite::Exception& ex) {
         Log::Error(Event::Database, ex.code, ex.what());
+        callback(nullptr);
+    } catch (std::runtime_error& ex) {
+        Log::Error(Event::Database, "%s", ex.what());
         callback(nullptr);
     }
 }
@@ -208,33 +169,42 @@ void SQLiteCache::Impl::put(const Resource& resource, std::shared_ptr<const Resp
             putStmt->reset();
         }
 
-        const std::string unifiedURL = unifyMapboxURLs(resource.url);
-        putStmt->bind(1 /* url */, unifiedURL.c_str());
-        putStmt->bind(2 /* status */, int(response->status));
+        const auto canonicalURL = util::mapbox::canonicalURL(resource.url);
+        putStmt->bind(1 /* url */, canonicalURL.c_str());
+        if (response->error) {
+            putStmt->bind(2 /* status */, int(response->error->reason));
+        } else {
+            putStmt->bind(2 /* status */, 1 /* success */);
+        }
         putStmt->bind(3 /* kind */, int(resource.kind));
         putStmt->bind(4 /* modified */, response->modified);
         putStmt->bind(5 /* etag */, response->etag.c_str());
         putStmt->bind(6 /* expires */, response->expires);
 
         std::string data;
-        if (resource.kind != Resource::SpriteImage) {
+        if (resource.kind != Resource::SpriteImage && response->data) {
             // Do not compress images, since they are typically compressed already.
-            data = util::compress(response->data);
+            data = util::compress(*response->data);
         }
 
-        if (!data.empty() && data.size() < response->data.size()) {
+        if (!data.empty() && data.size() < response->data->size()) {
             // Store the compressed data when it is smaller than the original
             // uncompressed data.
             putStmt->bind(7 /* data */, data, false); // do not retain the string internally.
             putStmt->bind(8 /* compressed */, true);
+        } else if (response->data) {
+            putStmt->bind(7 /* data */, *response->data, false); // do not retain the string internally.
+            putStmt->bind(8 /* compressed */, false);
         } else {
-            putStmt->bind(7 /* data */, response->data, false); // do not retain the string internally.
+            putStmt->bind(7 /* data */, "", false);
             putStmt->bind(8 /* compressed */, false);
         }
 
         putStmt->run();
     } catch (mapbox::sqlite::Exception& ex) {
         Log::Error(Event::Database, ex.code, ex.what());
+    } catch (std::runtime_error& ex) {
+        Log::Error(Event::Database, "%s", ex.what());
     }
 }
 
@@ -255,13 +225,25 @@ void SQLiteCache::Impl::refresh(const Resource& resource, int64_t expires) {
             refreshStmt->reset();
         }
 
-        const std::string unifiedURL = unifyMapboxURLs(resource.url);
+        const auto canonicalURL = util::mapbox::canonicalURL(resource.url);
         refreshStmt->bind(1, int64_t(expires));
-        refreshStmt->bind(2, unifiedURL.c_str());
+        refreshStmt->bind(2, canonicalURL.c_str());
         refreshStmt->run();
     } catch (mapbox::sqlite::Exception& ex) {
         Log::Error(Event::Database, ex.code, ex.what());
     }
 }
+
+std::shared_ptr<SQLiteCache> SharedSQLiteCache::get(const std::string &path) {
+    std::shared_ptr<SQLiteCache> temp = masterPtr.lock();
+    if (!temp) {
+        temp.reset(new SQLiteCache(path));
+        masterPtr = temp;
+    }
+
+    return temp;
+}
+
+std::weak_ptr<SQLiteCache> SharedSQLiteCache::masterPtr;
 
 }

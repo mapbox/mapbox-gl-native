@@ -23,8 +23,8 @@ public:
     MockMapContext(View& view,
                    FileSource& fileSource,
                    const std::function<void(std::exception_ptr error)>& callback)
-        : data_(MapMode::Still, view.getPixelRatio()),
-          transform_(view),
+        : data_(MapMode::Still, GLContextMode::Unique, view.getPixelRatio()),
+          transform_(view, ConstrainMode::HeightOnly),
           callback_(callback) {
         util::ThreadContext::setFileSource(&fileSource);
 
@@ -38,6 +38,10 @@ public:
     }
 
     ~MockMapContext() {
+        cleanup();
+    }
+
+    void cleanup() {
         style_.reset();
     }
 
@@ -61,10 +65,6 @@ public:
 
     void onResourceLoadingFailed(std::exception_ptr error) override {
         callback_(error);
-    }
-
-    void onSpriteStoreLoaded() override {
-        // no-op
     }
 
 private:
@@ -122,6 +122,7 @@ void runTestCase(MockFileSource::Type type,
 
     // Needed because it will make the Map thread
     // join and cease logging after this point.
+    context->invoke(&MockMapContext::cleanup);
     context.reset();
 
     uint32_t match = 0;
@@ -162,9 +163,9 @@ TEST_P(ResourceLoading, RequestWithCorruptedData) {
 
 INSTANTIATE_TEST_CASE_P(Style, ResourceLoading,
     ::testing::Values(
-        std::make_pair("source_raster.json", "Failed to parse \\[test\\/fixtures\\/resources\\/source_raster.json\\]: 0 - Expect either an object or array at root"),
-        std::make_pair("source_vector.json", "Failed to parse \\[test\\/fixtures\\/resources\\/source_vector.json\\]: 0 - Expect either an object or array at root"),
-        std::make_pair("sprite.json", "Failed to parse JSON: Expect either an object or array at root at offset 0"),
+        std::make_pair("source_raster.json", "Failed to parse \\[test\\/fixtures\\/resources\\/source_raster.json\\]: 0 - Invalid value."),
+        std::make_pair("source_vector.json", "Failed to parse \\[test\\/fixtures\\/resources\\/source_vector.json\\]: 0 - Invalid value."),
+        std::make_pair("sprite.json", "Failed to parse JSON: Invalid value. at offset 0"),
         std::make_pair("sprite.png", "Could not parse sprite image"),
         std::make_pair("raster.png", "Failed to parse \\[17\\/6553(4|5|6|7)\\/6553(4|5|6|7)\\]\\: error parsing raster image"),
         std::make_pair("vector.pbf", "Failed to parse \\[1(5|6)\\/1638(3|4)\\/1638(3|4)\\]\\: pbf unknown field type exception"),

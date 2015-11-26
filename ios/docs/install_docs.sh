@@ -1,14 +1,14 @@
 #!/usr/bin/env bash
 
 if [ -z `which appledoc` ]; then
-    echo "Unable to find appledoc. See https://github.com/mapbox/mapbox-gl-native#manually"
+    echo "Unable to find appledoc. See https://github.com/mapbox/mapbox-gl-native/blob/master/docs/BUILD_IOS_OSX.md"
     exit 1
 fi
 
 OUTPUT="/tmp/`uuidgen`"
 
-VERSION=$( git tag --sort -v:refname | grep -v '\-rc.' | sed -n '1p' | sed 's/^v//' )
-echo "Creating new docs for ${VERSION}..."
+DOCS_VERSION=$( git tag | grep ^ios | sed 's/^ios-//' | sort -r | grep -v '\-rc.' | grep -v '\-pre.' | sed -n '1p' | sed 's/^v//' )
+echo "Creating new docs for ${DOCS_VERSION}..."
 echo
 
 rm -rf /tmp/mbgl
@@ -26,7 +26,7 @@ perl \
     /tmp/mbgl/ios/*.h
 appledoc \
     --output ${OUTPUT} \
-    --project-name "Mapbox iOS SDK ${VERSION}" \
+    --project-name "Mapbox iOS SDK ${DOCS_VERSION}" \
     --project-company Mapbox \
     --create-docset \
     --company-id com.mapbox \

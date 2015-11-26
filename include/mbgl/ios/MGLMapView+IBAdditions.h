@@ -1,5 +1,8 @@
-#import "MGLMapView.h"
+#import <Foundation/Foundation.h>
+
 #import "MGLTypes.h"
+
+@class MGLMapView;
 
 NS_ASSUME_NONNULL_BEGIN
 
@@ -11,7 +14,11 @@ NS_ASSUME_NONNULL_BEGIN
 // inspectables declared in MGLMapView.h are always sorted before those in
 // MGLMapView+IBAdditions.h, due to ASCII sort order.
 
-@property (nonatomic, nullable) IBInspectable NSString *styleID;
+// HACK: We want this property to look like a URL bar in the Attributes
+// inspector, but just calling it styleURL would violate Cocoa naming
+// conventions and conflict with the existing NSURL property. Fortunately, IB
+// strips out the two underscores for display.
+@property (nonatomic, nullable) IBInspectable NSString *styleURL__;
 
 // Convenience properties related to the initial viewport. These properties
 // are not meant to be used outside of Interface Builder. latitude and longitude
@@ -30,6 +37,7 @@ NS_ASSUME_NONNULL_BEGIN
 @property (nonatomic) IBInspectable BOOL allowsZooming;
 @property (nonatomic) IBInspectable BOOL allowsScrolling;
 @property (nonatomic) IBInspectable BOOL allowsRotating;
+@property (nonatomic) IBInspectable BOOL allowsTilting;
 @property (nonatomic) IBInspectable BOOL showsUserLocation;
 
 @end

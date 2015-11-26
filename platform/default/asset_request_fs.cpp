@@ -115,27 +115,34 @@ void AssetRequest::fileStated(uv_fs_t *req) {
             // File is too large for us to open this way because uv_buf's only support unsigned
             // ints as maximum size.
             auto response = std::make_unique<Response>();
-            response->status = Response::Error;
 #if UV_VERSION_MAJOR == 0 && UV_VERSION_MINOR <= 10
-            response->message = uv_strerror(uv_err_t {UV_EFBIG, 0});
+            auto message = uv_strerror(uv_err_t {UV_EFBIG, 0});
 #else
-            response->message = uv_strerror(UV_EFBIG);
+            auto message = uv_strerror(UV_EFBIG);
 #endif
-            self->notify(std::move(response), FileCache::Hint::No);
+            response->error =
+                std::make_unique<Response::Error>(Response::Error::Reason::Other, message);
+            self->notify(std::move(response));
 
             uv_fs_req_cleanup(req);
             uv_fs_close(req->loop, req, self->fd, fileClosed);
         } else {
             self->response = std::make_unique<Response>();
+#if UV_VERSION_MAJOR == 0 && UV_VERSION_MINOR <= 10
 #ifdef __APPLE__
             self->response->modified = stat->st_mtimespec.tv_sec;
 #else
             self->response->modified = stat->st_mtime;
 #endif
+#else
+            self->response->modified = stat->st_mtim.tv_sec;
+#endif
             self->response->etag = util::toString(stat->st_ino);
             const auto size = (unsigned int)(stat->st_size);
-            self->response->data.resize(size);
-            self->buffer = uv_buf_init(const_cast<char *>(self->response->data.data()), size);
+            auto data = std::make_shared<std::string>();
+            self->response->data = data;
+            data->resize(size);
+            self->buffer = uv_buf_init(const_cast<char *>(data->data()), size);
             uv_fs_req_cleanup(req);
 #if UV_VERSION_MAJOR == 0 && UV_VERSION_MINOR <= 10
             uv_fs_read(req->loop, req, self->fd, self->buffer.base, self->buffer.len, -1, fileRead);
@@ -157,8 +164,7 @@ void AssetRequest::fileRead(uv_fs_t *req) {
         notifyError(req);
     } else {
         // File was successfully read.
-        self->response->status = Response::Successful;
-        self->notify(std::move(self->response), FileCache::Hint::No);
+        self->notify(std::move(self->response));
     }
 
     uv_fs_req_cleanup(req);
@@ -185,9 +191,13 @@ void AssetRequest::notifyError(uv_fs_t *req) {
 
     if (req->result < 0 && !self->canceled && req->result != UV_ECANCELED) {
         auto response = std::make_unique<Response>();
-        response->status = Response::Error;
-        response->message = uv::getFileRequestError(req);
-        self->notify(std::move(response), FileCache::Hint::No);
+        Response::Error::Reason reason = Response::Error::Reason::Other;
+        if (req->result == UV_ENOENT || req->result == UV_EISDIR) {
+            reason = Response::Error::Reason::NotFound;
+        }
+        response->error = std::make_unique<Response::Error>(reason,
+                                                            uv::getFileRequestError(req));
+        self->notify(std::move(response));
     }
 }
 

@@ -11,13 +11,13 @@
 using namespace mbgl;
 
 RasterTileData::RasterTileData(const TileID& id_,
-                               TexturePool &texturePool,
+                               TexturePool &texturePool_,
                                const SourceInfo &source_,
                                Worker& worker_)
     : TileData(id_),
+      texturePool(texturePool_),
       source(source_),
-      worker(worker_),
-      bucket(texturePool, layout) {
+      worker(worker_) {
 }
 
 RasterTileData::~RasterTileData() {
@@ -30,27 +30,40 @@ void RasterTileData::request(float pixelRatio,
     state = State::loading;
 
     FileSource* fs = util::ThreadContext::getFileSource();
-    req = fs->request({ Resource::Kind::Tile, url }, util::RunLoop::getLoop(), [url, callback, this](const Response &res) {
+    req = fs->request({ Resource::Kind::Tile, url }, [url, callback, this](Response res) {
+        if (res.stale) {
+            // Only handle fresh responses.
+            return;
+        }
         req = nullptr;
 
-        if (res.status != Response::Successful) {
-            std::stringstream message;
-            message <<  "Failed to load [" << url << "]: " << res.message;
-            error = message.str();
-            state = State::obsolete;
+        if (res.error) {
+            if (res.error->reason == Response::Error::Reason::NotFound) {
+                state = State::parsed;
+            } else {
+                std::stringstream message;
+                message <<  "Failed to load [" << url << "]: " << res.error->message;
+                error = message.str();
+                state = State::obsolete;
+            }
             callback();
             return;
         }
 
-        state = State::loaded;
+        if (state == State::loading) {
+            // Only overwrite the state when we didn't have a previous tile.
+            state = State::loaded;
+        }
 
-        workRequest = worker.parseRasterTile(bucket, res.data, [this, callback] (TileParseResult result) {
+        workRequest = worker.parseRasterTile(std::make_unique<RasterBucket>(texturePool), res.data, [this, callback] (RasterTileParseResult result) {
+            workRequest.reset();
             if (state != State::loaded) {
                 return;
             }
 
-            if (result.is<State>()) {
-                state = result.get<State>();
+            if (result.is<std::unique_ptr<Bucket>>()) {
+                state = State::parsed;
+                bucket = std::move(result.get<std::unique_ptr<Bucket>>());
             } else {
                 std::stringstream message;
                 message << "Failed to parse [" << std::string(id) << "]: " << result.get<std::string>();
@@ -64,16 +77,13 @@ void RasterTileData::request(float pixelRatio,
 }
 
 Bucket* RasterTileData::getBucket(StyleLayer const&) {
-    return &bucket;
+    return bucket.get();
 }
 
 void RasterTileData::cancel() {
     if (state != State::obsolete) {
         state = State::obsolete;
     }
-    if (req) {
-        util::ThreadContext::getFileSource()->cancel(req);
-        req = nullptr;
-    }
+    req = nullptr;
     workRequest.reset();
 }

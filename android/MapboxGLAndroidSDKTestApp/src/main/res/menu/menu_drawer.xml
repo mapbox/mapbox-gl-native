@@ -1,0 +1,126 @@
+<?xml version="1.0" encoding="utf-8"?>
+<menu xmlns:android="http://schemas.android.com/apk/res/android">
+
+    <item
+        android:id="@+id/mainActivityMenu"
+        android:title="@string/navdrawer_menu_title_mainactivity_controls">
+        <menu>
+            <group>
+                <item
+                    android:id="@+id/action_debug"
+                    android:icon="@drawable/ic_bug_report_24dp"
+                    android:title="@string/action_debug" />
+
+                <item
+                    android:id="@+id/action_markers"
+                    android:icon="@drawable/ic_place_24dp"
+                    android:title="@string/action_point_annotations" />
+
+                <item
+                    android:id="@+id/action_compass"
+                    android:icon="@drawable/ic_navigation_24dp"
+                    android:title="@string/action_compass" />
+            </group>
+        </menu>
+    </item>
+
+    <group android:id="@+id/stylesSeparator" />
+
+    <item
+        android:id="@+id/mainActivityStylesMenue"
+        android:title="@string/navdrawer_menu_title_mainactivity_styles">
+        <menu>
+            <group android:id="@+id/stylesGroup">
+                <item
+                    android:id="@+id/actionStyleMapboxStreets"
+                    android:title="@string/styleMapboxStreets" />
+
+                <item
+                    android:id="@+id/actionStyleEmerald"
+                    android:title="@string/styleEmerald" />
+
+                <item
+                    android:id="@+id/actionStyleLight"
+                    android:title="@string/styleLight" />
+
+                <item
+                    android:id="@+id/actionStyleDark"
+                    android:title="@string/styleDark" />
+
+                <item
+                    android:id="@+id/actionStyleSatellite"
+                    android:title="@string/styleSatellite" />
+
+                <item
+                    android:id="@+id/actionStyleSatelliteStreets"
+                    android:title="@string/styleSatelliteStreets" />
+
+            </group>
+        </menu>
+    </item>
+
+    <group android:id="@+id/testsSeparator" />
+
+    <item
+        android:id="@+id/testsMenu"
+        android:title="@string/navdrawer_menu_title_individual_tests">
+        <menu>
+
+            <item
+                android:id="@+id/action_map_fragment"
+                android:checkable="false"
+                android:icon="@drawable/ic_now_widgets_24dp"
+                android:title="@string/action_map_fragment" />
+
+            <item
+                android:id="@+id/action_info_window"
+                android:checkable="false"
+                android:icon="@drawable/ic_flip_to_front_24dp"
+                android:title="@string/action_info_window" />
+
+            <item
+                android:id="@+id/action_info_window_adapter"
+                android:checkable="false"
+                android:icon="@drawable/ic_flip_to_back_24dp"
+                android:title="@string/action_info_window_adapter" />
+
+            <item
+                android:id="@+id/action_press_for_marker"
+                android:checkable="false"
+                android:icon="@drawable/ic_pin_drop_24dp"
+                android:title="@string/action_press_for_marker" />
+
+            <item
+                android:id="@+id/action_manual_zoom"
+                android:checkable="false"
+                android:icon="@drawable/ic_filter_center_focus_24dp"
+                android:title="@string/action_manual_zoom" />
+
+            <item
+                android:id="@+id/action_visible_bounds"
+                android:checkable="false"
+                android:icon="@drawable/ic_crop_24dp"
+                android:title="@string/action_visible_bounds" />
+
+            <item
+                android:id="@+id/action_bulk_markers"
+                android:checkable="false"
+                android:icon="@drawable/ic_blur_on_24dp"
+                android:title="@string/action_add_bulk_markers" />
+
+            <item
+                android:id="@+id/action_user_tracking_mode"
+                android:checkable="false"
+                android:icon="@drawable/ic_gps_fixed_24dp"
+                android:title="@string/activity_user_tracking_mode" />
+
+            <item
+                android:id="@+id/action_polyline"
+                android:checkable="false"
+                android:icon="@drawable/ic_trending_up_24dp"
+                android:title="@string/activity_polyline" />
+
+        </menu>
+    </item>
+
+</menu>

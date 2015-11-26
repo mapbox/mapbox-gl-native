@@ -2,13 +2,12 @@
 #define MBGL_MAP_RASTER_TILE_DATA
 
 #include <mbgl/map/tile_data.hpp>
-#include <mbgl/style/style_layout.hpp>
 #include <mbgl/renderer/raster_bucket.hpp>
 
 namespace mbgl {
 
 class SourceInfo;
-class Request;
+class FileRequest;
 class StyleLayer;
 class TexturePool;
 class WorkRequest;
@@ -26,12 +25,12 @@ public:
     Bucket* getBucket(StyleLayer const &layer_desc) override;
 
 private:
+    TexturePool& texturePool;
     const SourceInfo& source;
     Worker& worker;
-    Request* req = nullptr;
+    std::unique_ptr<FileRequest> req;
 
-    StyleLayoutRaster layout;
-    RasterBucket bucket;
+    std::unique_ptr<Bucket> bucket;
 
     std::unique_ptr<WorkRequest> workRequest;
 };

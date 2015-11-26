@@ -65,6 +65,7 @@ private:
     const bool benchmark = false;
     bool tracking = false;
     bool rotating = false;
+    bool pitching = false;
 
     // Frame timer
     int frames = 0;

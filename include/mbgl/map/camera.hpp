@@ -1,10 +1,13 @@
 #ifndef MBGL_MAP_CAMERA
 #define MBGL_MAP_CAMERA
 
+#include <mapbox/optional.hpp>
+
 #include <mbgl/util/geo.hpp>
-#include <mbgl/util/optional.hpp>
 #include <mbgl/util/chrono.hpp>
 #include <mbgl/util/unitbezier.hpp>
+
+#include <functional>
 
 namespace mbgl {
 
@@ -15,6 +18,8 @@ struct CameraOptions {
     mapbox::util::optional<double> pitch;
     mapbox::util::optional<Duration> duration;
     mapbox::util::optional<mbgl::util::UnitBezier> easing;
+    std::function<void(double)> transitionFrameFn;
+    std::function<void()> transitionFinishFn;
 };
 
 }

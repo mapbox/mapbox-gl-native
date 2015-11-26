@@ -74,12 +74,16 @@ GlyphPBF::GlyphPBF(GlyphStore* store,
         return "";
     });
 
-    auto requestCallback = [this, store, fontStack, url](const Response &res) {
+    auto requestCallback = [this, store, fontStack, url](Response res) {
+        if (res.stale) {
+            // Only handle fresh responses.
+            return;
+        }
         req = nullptr;
 
-        if (res.status != Response::Successful) {
+        if (res.error) {
             std::stringstream message;
-            message <<  "Failed to load [" << url << "]: " << res.message;
+            message <<  "Failed to load [" << url << "]: " << res.error->message;
             emitGlyphPBFLoadingFailed(message.str());
         } else {
             data = res.data;
@@ -88,24 +92,21 @@ GlyphPBF::GlyphPBF(GlyphStore* store,
     };
 
     FileSource* fs = util::ThreadContext::getFileSource();
-    req = fs->request({ Resource::Kind::Glyphs, url }, util::RunLoop::getLoop(), requestCallback);
+    req = fs->request({ Resource::Kind::Glyphs, url }, requestCallback);
 }
 
-GlyphPBF::~GlyphPBF() {
-    if (req) {
-        util::ThreadContext::getFileSource()->cancel(req);
-    }
-}
+GlyphPBF::~GlyphPBF() = default;
 
 void GlyphPBF::parse(GlyphStore* store, const std::string& fontStack, const std::string& url) {
-    if (data.empty()) {
+    assert(data);
+    if (data->empty()) {
         // If there is no data, this means we either haven't
         // received any data.
         return;
     }
 
     try {
-        parseGlyphPBF(**store->getFontStack(fontStack), std::move(data));
+        parseGlyphPBF(**store->getFontStack(fontStack), *data);
     } catch (const std::exception& ex) {
         std::stringstream message;
         message <<  "Failed to parse [" << url << "]: " << ex.what();

@@ -1,7 +1,7 @@
 Pod::Spec.new do |m|
 
   m.name    = 'Mapbox-iOS-SDK'
-  m.version = '2.1.2-symbols'
+  m.version = '3.0.0-pre.7-symbols'
 
   m.summary          = 'Open source vector map solution for iOS with full styling capabilities.'
   m.description      = 'Open source OpenGL-based vector map solution for iOS with full styling capabilities and Cocoa bindings.'
@@ -13,7 +13,7 @@ Pod::Spec.new do |m|
   m.documentation_url = 'https://www.mapbox.com/ios-sdk/'
 
   m.source = {
-    :http => "http://mapbox.s3.amazonaws.com/mapbox-gl-native/ios/builds/mapbox-ios-sdk-#{m.version.to_s}.zip",
+    :http => "https://mapbox.s3.amazonaws.com/mapbox-gl-native/ios/builds/mapbox-ios-sdk-#{m.version.to_s}.zip",
     :flatten => true
   }
 
@@ -28,9 +28,9 @@ Pod::Spec.new do |m|
   m.vendored_library = 'libMapbox.a'
   m.module_name = 'Mapbox'
 
-  m.frameworks = 'CoreLocation', 'CoreTelephony', 'GLKit', 'ImageIO', 'MobileCoreServices', 'QuartzCore', 'SystemConfiguration'
+  m.frameworks = 'CoreLocation', 'GLKit', 'ImageIO', 'MobileCoreServices', 'QuartzCore', 'SystemConfiguration'
   m.libraries = 'c++', 'sqlite3', 'z'
-  m.xcconfig = {
+  m.pod_target_xcconfig = {
     'OTHER_CPLUSPLUSFLAGS' => '-std=gnu++11 -stdlib=libc++',
     'OTHER_LDFLAGS' => '-ObjC',
   }

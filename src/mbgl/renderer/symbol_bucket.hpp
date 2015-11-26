@@ -12,11 +12,12 @@
 #include <mbgl/text/collision_feature.hpp>
 #include <mbgl/text/shaping.hpp>
 #include <mbgl/text/quads.hpp>
-#include <mbgl/style/style_bucket.hpp>
-#include <mbgl/style/style_layout.hpp>
+#include <mbgl/style/filter_expression.hpp>
+#include <mbgl/layer/symbol_layer.hpp>
 
 #include <memory>
 #include <map>
+#include <set>
 #include <vector>
 
 namespace mbgl {
@@ -27,7 +28,7 @@ class CollisionBoxShader;
 class DotShader;
 class CollisionTile;
 class SpriteAtlas;
-class Sprite;
+class SpriteStore;
 class GlyphAtlas;
 class GlyphStore;
 
@@ -42,12 +43,12 @@ struct Anchor;
 
 class SymbolInstance {
     public:
-        explicit SymbolInstance(Anchor &anchor, const std::vector<Coordinate> &line,
-                const Shaping &shapedText, const PositionedIcon &shapedIcon,
-                const StyleLayoutSymbol &layout, const bool inside,
+        explicit SymbolInstance(Anchor& anchor, const std::vector<Coordinate>& line,
+                const Shaping& shapedText, const PositionedIcon& shapedIcon,
+                const SymbolLayoutProperties& layout, const bool inside,
                 const float textBoxScale, const float textPadding, const float textAlongLine,
                 const float iconBoxScale, const float iconPadding, const float iconAlongLine,
-                const GlyphPositions &face);
+                const GlyphPositions& face);
         float x;
         float y;
         bool hasText;
@@ -69,7 +70,7 @@ public:
 
     void upload() override;
     void render(Painter&, const StyleLayer&, const TileID&, const mat4&) override;
-    bool hasData() const;
+    bool hasData() const override;
     bool hasTextData() const;
     bool hasIconData() const;
     bool hasCollisionBoxData() const;
@@ -85,10 +86,9 @@ public:
     void drawIcons(IconShader& shader);
     void drawCollisionBoxes(CollisionBoxShader& shader);
 
-    bool needsDependencies(const GeometryTileLayer&,
-                           const FilterExpression&,
-                           GlyphStore&,
-                           Sprite&);
+    void parseFeatures(const GeometryTileLayer&,
+                       const FilterExpression&);
+    bool needsDependencies(GlyphStore&, SpriteStore&);
     void placeFeatures(CollisionTile&) override;
 
 private:
@@ -109,7 +109,7 @@ private:
             const bool keepUpright, const bool alongLine, const float placementAngle);
 
 public:
-    StyleLayoutSymbol layout;
+    SymbolLayoutProperties layout;
     bool sdfIcons = false;
 
 private:
@@ -120,6 +120,7 @@ private:
     const float tileExtent = 4096.0f;
     const float tilePixelRatio;
 
+    std::set<GlyphRange> ranges;
     std::vector<SymbolInstance> symbolInstances;
     std::vector<SymbolFeature> features;
 

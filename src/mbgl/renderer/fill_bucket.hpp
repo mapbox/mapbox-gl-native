@@ -4,6 +4,7 @@
 #include <mbgl/renderer/bucket.hpp>
 #include <mbgl/map/geometry_tile.hpp>
 #include <mbgl/geometry/elements_buffer.hpp>
+#include <mbgl/geometry/fill_buffer.hpp>
 
 #include <clipper/clipper.hpp>
 #include <libtess2/tesselator.h>
@@ -28,14 +29,12 @@ class FillBucket : public Bucket {
     typedef ElementGroup<1> LineGroup;
 
 public:
-    FillBucket(FillVertexBuffer &vertexBuffer,
-               TriangleElementsBuffer &triangleElementsBuffer,
-               LineElementsBuffer &lineElementsBuffer);
+    FillBucket();
     ~FillBucket() override;
 
     void upload() override;
     void render(Painter&, const StyleLayer&, const TileID&, const mat4&) override;
-    bool hasData() const;
+    bool hasData() const override;
 
     void addGeometry(const GeometryCollection&);
     void tessellate();
@@ -49,14 +48,9 @@ private:
     TESStesselator *tesselator;
     ClipperLib::Clipper clipper;
 
-    FillVertexBuffer& vertexBuffer;
-    TriangleElementsBuffer& triangleElementsBuffer;
-    LineElementsBuffer& lineElementsBuffer;
-
-    // hold information on where the vertices are located in the FillBuffer
-    const GLsizei vertex_start;
-    const GLsizei triangle_elements_start;
-    const GLsizei line_elements_start;
+    FillVertexBuffer vertexBuffer;
+    TriangleElementsBuffer triangleElementsBuffer;
+    LineElementsBuffer lineElementsBuffer;
 
     std::vector<std::unique_ptr<TriangleGroup>> triangleGroups;
     std::vector<std::unique_ptr<LineGroup>> lineGroups;

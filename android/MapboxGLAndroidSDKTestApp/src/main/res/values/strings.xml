@@ -1,0 +1,70 @@
+<?xml version="1.0" encoding="utf-8"?>
+<resources>
+
+    <string name="app_name">Mapbox GL</string>
+
+    <!-- Test Activities -->
+    <string name="activity_infowindow_adapter">InfoWindow Adapter</string>
+    <string name="activity_map_fragment">Map Fragment Activity</string>
+    <string name="activity_press_for_marker">Press For Marker Activity</string>
+    <string name="activity_marker_in_bulk">Add Bulk Markers Activity</string>
+    <string name="activity_manual_zoom">Manual Zoom Activity</string>
+    <string name="activity_info_window">InfoWindow Activity</string>
+    <string name="activity_visible_coordinate_bounds">Visible Coordinate Bounds</string>
+    <string name="activity_user_tracking_mode">User tracking mode</string>
+    <string name="activity_polyline">Polyline Activity</string>
+
+    <string name="navdrawer_menu_title_mainactivity_controls">Main Activity Controls</string>
+    <string name="navdrawer_menu_title_mainactivity_styles">Main Activity Styles</string>
+    <string name="navdrawer_menu_title_individual_tests">Individual Tests</string>
+    <string name="action_gps">Toggle GPS location</string>
+    <string name="action_user_location_tracking">User location tracking</string>
+    <string name="action_compass">Toggle compass</string>
+    <string name="action_debug">Toggle debug mode</string>
+    <string name="action_point_annotations">Toggle point annotations</string>
+    <string name="action_info_window_adapter">InfoWindow Adapter</string>
+    <string name="action_map_fragment">MapFragment</string>
+    <string name="action_press_for_marker">Press For Marker</string>
+    <string name="action_manual_zoom">Manual Zoom</string>
+    <string name="action_info_window">InfoWindow</string>
+    <string name="action_add_bulk_markers">Add Markers in bulk</string>
+    <string name="action_visible_bounds">Set Visible Bounds</string>
+    <string name="action_visible_bounds_explanation">Center map around 2 markers</string>
+    <string name="action_remove_polylines">Remove polylines</string>
+
+    <string name="label_fps">FPS:</string>
+
+    <string name="styleMapboxStreets">Mapbox Streets</string>
+    <string name="styleEmerald">Emerald</string>
+    <string name="styleLight">Light</string>
+    <string name="styleDark">Dark</string>
+    <string name="styleSatellite">Satellite</string>
+    <string name="styleSatelliteStreets">Satellite Streets</string>
+
+    <string-array name="outdoors_class_list">
+        <item>Day</item>
+        <item>Night</item>
+    </string-array>
+
+    <string-array name="bulk_marker_list">
+        <item>10</item>
+        <item>100</item>
+        <item>1000</item>
+        <item>10000</item>
+    </string-array>
+
+    <string-array name="user_tracking_mode">
+        <item>Disable tracking</item>
+        <item>Follow tracking mode</item>
+    </string-array>
+
+    <string-array name="user_bearing_mode">
+        <item>Disable bearing</item>
+        <item>GPS mode</item>
+        <item>Compass mode</item>
+        <!--<item>Combined mode</item>-->
+    </string-array>
+
+    <string name="zoom_botton">Zoom</string>
+
+</resources>

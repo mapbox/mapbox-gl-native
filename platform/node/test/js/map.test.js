@@ -1,7 +1,7 @@
 'use strict';
 
 var test = require('tape');
-var mbgl = require('../../../..');
+var mbgl = require('../../../../lib/mapbox-gl-native');
 var fs = require('fs');
 var path = require('path');
 var style = require('../fixtures/style.json');
@@ -27,7 +27,7 @@ test('Map', function(t) {
         t.end();
     });
 
-    t.test('requires request and ratio options', function(t) {
+    t.test('requires request property', function(t) {
         var options = {};
 
         t.throws(function() {
@@ -40,20 +40,41 @@ test('Map', function(t) {
         }, /Options object must have a 'request' method/);
 
         options.request = function() {};
+        t.doesNotThrow(function() {
+            new mbgl.Map(options);
+        });
+
+        t.end();
+    });
+
+    t.test('optional cancel property must be a function', function(t) {
+        var options = {
+            request: function() {}
+        };
+
         options.cancel = 'test';
         t.throws(function() {
             new mbgl.Map(options);
         }, /Options object 'cancel' property must be a function/);
 
         options.cancel = function() {};
-        t.throws(function() {
+        t.doesNotThrow(function() {
             new mbgl.Map(options);
-        }, /Options object must have a numerical 'ratio' property/);
+        });
+
+        t.end();
+    });
+
+
+    t.test('optional ratio property must be a number', function(t) {
+        var options = {
+            request: function() {}
+        };
 
         options.ratio = 'test';
         t.throws(function() {
             new mbgl.Map(options);
-        }, /Options object must have a numerical 'ratio' property/);
+        }, /Options object 'ratio' property must be a number/);
 
         options.ratio = 1.0;
         t.doesNotThrow(function() {
@@ -86,7 +107,7 @@ test('Map', function(t) {
             mbgl.once('message', function(msg) {
                 t.equal(msg.severity, 'ERROR');
                 t.equal(msg.class, 'ParseStyle');
-                t.ok(msg.text.match(/Expect either an object or array at root/));
+                t.ok(msg.text.match(/Invalid value/));
 
                 map.release();
                 t.end();
@@ -197,17 +218,9 @@ test('Map', function(t) {
         });
 
         t.test('returns an error', function(t) {
-            mbgl.on('message', function(msg) {
-                t.ok(msg, 'emits error');
-                t.equal(msg.class, 'Style');
-                t.equal(msg.severity, 'ERROR');
-                t.ok(msg.text.match(/Failed to load/), 'error text matches');
-            });
-
             var map = new mbgl.Map(options);
             map.load(style);
             map.render({ zoom: 1 }, function(err, data) {
-                mbgl.removeAllListeners('message');
                 map.release();
 
                 t.ok(err, 'returns error');

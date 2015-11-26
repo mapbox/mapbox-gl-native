@@ -1,12 +1,12 @@
 #include <mbgl/renderer/raster_bucket.hpp>
+#include <mbgl/layer/raster_layer.hpp>
 #include <mbgl/shader/raster_shader.hpp>
 #include <mbgl/renderer/painter.hpp>
 
 using namespace mbgl;
 
-RasterBucket::RasterBucket(TexturePool& texturePool, const StyleLayoutRaster& layout_)
-: layout(layout_),
-  raster(texturePool) {
+RasterBucket::RasterBucket(TexturePool& texturePool)
+: raster(texturePool) {
 }
 
 void RasterBucket::upload() {
@@ -17,13 +17,13 @@ void RasterBucket::upload() {
 }
 
 void RasterBucket::render(Painter& painter,
-                          const StyleLayer& layer_desc,
+                          const StyleLayer& layer,
                           const TileID& id,
                           const mat4& matrix) {
-    painter.renderRaster(*this, layer_desc, id, matrix);
+    painter.renderRaster(*this, dynamic_cast<const RasterLayer&>(layer), id, matrix);
 }
 
-bool RasterBucket::setImage(std::unique_ptr<util::Image> image) {
+bool RasterBucket::setImage(PremultipliedImage image) {
     return raster.load(std::move(image));
 }
 

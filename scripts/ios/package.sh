@@ -7,15 +7,24 @@ set -u
 NAME=Mapbox
 OUTPUT=build/ios/pkg
 IOS_SDK_VERSION=`xcrun --sdk iphoneos --show-sdk-version`
-LIBUV_VERSION=0.10.28
+LIBUV_VERSION=1.7.5
+ENABLE_BITCODE=YES
 
 if [[ ${#} -eq 0 ]]; then # e.g. "make ipackage"
+    BUILDTYPE="Release"
     BUILD_FOR_DEVICE=true
     GCC_GENERATE_DEBUGGING_SYMBOLS="YES"
+elif [[ ${1} == "no-bitcode" ]]; then # e.g. "make ipackage-no-bitcode"
+    BUILDTYPE="Release"
+    BUILD_FOR_DEVICE=true
+    GCC_GENERATE_DEBUGGING_SYMBOLS="YES"
+    ENABLE_BITCODE=NO
 elif [[ ${1} == "sim" ]]; then # e.g. "make ipackage-sim"
+    BUILDTYPE="Debug"
     BUILD_FOR_DEVICE=false
     GCC_GENERATE_DEBUGGING_SYMBOLS="YES"
 else # e.g. "make ipackage-strip"
+    BUILDTYPE="Release"
     BUILD_FOR_DEVICE=true
     GCC_GENERATE_DEBUGGING_SYMBOLS="NO"
 fi
@@ -50,10 +59,12 @@ if [[ "${BUILD_FOR_DEVICE}" == true ]]; then
         ARCHS="arm64 armv7 armv7s" \
         ONLY_ACTIVE_ARCH=NO \
         GCC_GENERATE_DEBUGGING_SYMBOLS=${GCC_GENERATE_DEBUGGING_SYMBOLS} \
-        -project ./build/ios-all/mbgl.xcodeproj \
+        ENABLE_BITCODE=${ENABLE_BITCODE} \
+        DEPLOYMENT_POSTPROCESSING=YES \
+        -project ./build/ios-all/gyp/mbgl.xcodeproj \
         -configuration ${BUILDTYPE} \
         -target everything \
-        -jobs ${JOBS} | xcpretty -c
+        -jobs ${JOBS}
 fi
 
 step "Building iOS Simulator targets..."
@@ -61,27 +72,27 @@ xcodebuild -sdk iphonesimulator${IOS_SDK_VERSION} \
     ARCHS="x86_64 i386" \
     ONLY_ACTIVE_ARCH=NO \
     GCC_GENERATE_DEBUGGING_SYMBOLS=${GCC_GENERATE_DEBUGGING_SYMBOLS} \
-    -project ./build/ios-all/mbgl.xcodeproj \
+    -project ./build/ios-all/gyp/mbgl.xcodeproj \
     -configuration ${BUILDTYPE} \
     -target everything \
-    -jobs ${JOBS} | xcpretty -c
+    -jobs ${JOBS}
 
 
 step "Building static library..."
 LIBS=(core.a platform-ios.a asset-fs.a cache-sqlite.a http-nsurl.a)
 if [[ "${BUILD_FOR_DEVICE}" == true ]]; then
     libtool -static -no_warning_for_no_symbols \
-        -o ${OUTPUT}/static/lib${NAME}.a \
-        ${LIBS[@]/#/build/${BUILDTYPE}-iphoneos/libmbgl-} \
-        ${LIBS[@]/#/build/${BUILDTYPE}-iphonesimulator/libmbgl-} \
         `find mason_packages/ios-${IOS_SDK_VERSION} -type f -name libuv.a` \
-        `find mason_packages/ios-${IOS_SDK_VERSION} -type f -name libgeojsonvt.a`
+        `find mason_packages/ios-${IOS_SDK_VERSION} -type f -name libgeojsonvt.a` \
+        -o ${OUTPUT}/static/lib${NAME}.a \
+        ${LIBS[@]/#/gyp/build/${BUILDTYPE}-iphoneos/libmbgl-} \
+        ${LIBS[@]/#/gyp/build/${BUILDTYPE}-iphonesimulator/libmbgl-}
 else
     libtool -static -no_warning_for_no_symbols \
-        -o ${OUTPUT}/static/lib${NAME}.a \
-        ${LIBS[@]/#/build/${BUILDTYPE}-iphonesimulator/libmbgl-} \
         `find mason_packages/ios-${IOS_SDK_VERSION} -type f -name libuv.a` \
-        `find mason_packages/ios-${IOS_SDK_VERSION} -type f -name libgeojsonvt.a`
+        `find mason_packages/ios-${IOS_SDK_VERSION} -type f -name libgeojsonvt.a` \
+        -o ${OUTPUT}/static/lib${NAME}.a \
+        ${LIBS[@]/#/gyp/build/${BUILDTYPE}-iphonesimulator/libmbgl-}
 fi
 echo "Created ${OUTPUT}/static/lib${NAME}.a"
 
@@ -103,17 +114,14 @@ step "Copying Resources..."
 cp -pv LICENSE.md "${OUTPUT}/static"
 mkdir -p "${OUTPUT}/static/${NAME}.bundle"
 cp -pv platform/ios/resources/* "${OUTPUT}/static/${NAME}.bundle"
-mkdir -p "${OUTPUT}/static/${NAME}.bundle/styles"
-cp -pv styles/styles/{dark,emerald,light,streets,satellite}-v8.json "${OUTPUT}/static/${NAME}.bundle/styles"
 
 step "Creating API Docs..."
 if [ -z `which appledoc` ]; then
-    echo "Unable to find appledoc. See https://github.com/mapbox/mapbox-gl-native#manually"
+    echo "Unable to find appledoc. See https://github.com/mapbox/mapbox-gl-native/blob/master/docs/BUILD_IOS_OSX.md"
     exit 1
 fi
 DOCS_OUTPUT="${OUTPUT}/static/Docs"
-git fetch --tags
-DOCS_VERSION=$( git tag | sed 's/^ios-//' | sort -r | grep -v '\-rc.' | grep -v '\-pre.' | sed -n '1p' | sed 's/^v//' )
+DOCS_VERSION=$( git tag | grep ^ios | sed 's/^ios-//' | sort -r | grep -v '\-rc.' | grep -v '\-pre.' | sed -n '1p' | sed 's/^v//' )
 rm -rf /tmp/mbgl
 mkdir -p /tmp/mbgl/
 README=/tmp/mbgl/README.md

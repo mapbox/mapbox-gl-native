@@ -1,9 +1,7 @@
 #include <mbgl/renderer/line_bucket.hpp>
-
+#include <mbgl/layer/line_layer.hpp>
 #include <mbgl/geometry/elements_buffer.hpp>
 #include <mbgl/renderer/painter.hpp>
-#include <mbgl/style/style.hpp>
-#include <mbgl/style/style_layout.hpp>
 #include <mbgl/shader/line_shader.hpp>
 #include <mbgl/shader/linesdf_shader.hpp>
 #include <mbgl/shader/linepattern_shader.hpp>
@@ -14,12 +12,8 @@
 
 using namespace mbgl;
 
-LineBucket::LineBucket(LineVertexBuffer& vertexBuffer_,
-                       TriangleElementsBuffer& triangleElementsBuffer_)
-    : vertexBuffer(vertexBuffer_),
-      triangleElementsBuffer(triangleElementsBuffer_),
-      vertex_start(vertexBuffer_.index()),
-      triangle_elements_start(triangleElementsBuffer_.index()){};
+LineBucket::LineBucket() {
+}
 
 LineBucket::~LineBucket() {
     // Do not remove. header file only contains forward definitions to unique pointers.
@@ -46,7 +40,7 @@ void LineBucket::addGeometry(const std::vector<Coordinate>& vertices) {
         return;
     }
 
-    const float miterLimit = layout.join == JoinType::Bevel ? 1.05f : layout.miter_limit;
+    const float miterLimit = layout.join == JoinType::Bevel ? 1.05f : float(layout.miterLimit);
 
     const Coordinate firstVertex = vertices.front();
     const Coordinate lastVertex = vertices[len - 1];
@@ -58,7 +52,7 @@ void LineBucket::addGeometry(const std::vector<Coordinate>& vertices) {
     }
 
     const CapType beginCap = layout.cap;
-    const CapType endCap = closed ? CapType::Butt : layout.cap;
+    const CapType endCap = closed ? CapType::Butt : CapType(layout.cap);
 
     int8_t flip = 1;
     double distance = 0;
@@ -147,7 +141,7 @@ void LineBucket::addGeometry(const std::vector<Coordinate>& vertices) {
 
         if (middleVertex) {
             if (currentJoin == JoinType::Round) {
-                if (miterLength < layout.round_limit) {
+                if (miterLength < layout.roundLimit) {
                     currentJoin = JoinType::Miter;
                 } else if (miterLength <= 2) {
                     currentJoin = JoinType::FakeRound;
@@ -392,10 +386,10 @@ void LineBucket::upload() {
 }
 
 void LineBucket::render(Painter& painter,
-                        const StyleLayer& layer_desc,
+                        const StyleLayer& layer,
                         const TileID& id,
                         const mat4& matrix) {
-    painter.renderLine(*this, layer_desc, id, matrix);
+    painter.renderLine(*this, dynamic_cast<const LineLayer&>(layer), id, matrix);
 }
 
 bool LineBucket::hasData() const {
@@ -403,8 +397,8 @@ bool LineBucket::hasData() const {
 }
 
 void LineBucket::drawLines(LineShader& shader) {
-    GLbyte* vertex_index = BUFFER_OFFSET(vertex_start * vertexBuffer.itemSize);
-    GLbyte* elements_index = BUFFER_OFFSET(triangle_elements_start * triangleElementsBuffer.itemSize);
+    GLbyte* vertex_index = BUFFER_OFFSET(0);
+    GLbyte* elements_index = BUFFER_OFFSET(0);
     for (auto& group : triangleGroups) {
         assert(group);
         if (!group->elements_length) {
@@ -419,8 +413,8 @@ void LineBucket::drawLines(LineShader& shader) {
 }
 
 void LineBucket::drawLineSDF(LineSDFShader& shader) {
-    GLbyte* vertex_index = BUFFER_OFFSET(vertex_start * vertexBuffer.itemSize);
-    GLbyte* elements_index = BUFFER_OFFSET(triangle_elements_start * triangleElementsBuffer.itemSize);
+    GLbyte* vertex_index = BUFFER_OFFSET(0);
+    GLbyte* elements_index = BUFFER_OFFSET(0);
     for (auto& group : triangleGroups) {
         assert(group);
         if (!group->elements_length) {
@@ -435,8 +429,8 @@ void LineBucket::drawLineSDF(LineSDFShader& shader) {
 }
 
 void LineBucket::drawLinePatterns(LinepatternShader& shader) {
-    GLbyte* vertex_index = BUFFER_OFFSET(vertex_start * vertexBuffer.itemSize);
-    GLbyte* elements_index = BUFFER_OFFSET(triangle_elements_start * triangleElementsBuffer.itemSize);
+    GLbyte* vertex_index = BUFFER_OFFSET(0);
+    GLbyte* elements_index = BUFFER_OFFSET(0);
     for (auto& group : triangleGroups) {
         assert(group);
         if (!group->elements_length) {

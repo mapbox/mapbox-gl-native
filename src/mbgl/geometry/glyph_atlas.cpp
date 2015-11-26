@@ -5,6 +5,8 @@
 #include <mbgl/platform/gl.hpp>
 #include <mbgl/platform/log.hpp>
 #include <mbgl/platform/platform.hpp>
+#include <mbgl/util/gl_object_store.hpp>
+#include <mbgl/util/thread_context.hpp>
 
 #include <cassert>
 #include <algorithm>
@@ -18,6 +20,15 @@ GlyphAtlas::GlyphAtlas(uint16_t width_, uint16_t height_)
       bin(width_, height_),
       data(std::make_unique<uint8_t[]>(width_ * height_)),
       dirty(true) {
+}
+
+GlyphAtlas::~GlyphAtlas() {
+    assert(util::ThreadContext::currentlyOn(util::ThreadType::Map));
+
+    if (texture) {
+        mbgl::util::ThreadContext::getGLObjectStore()->abandonTexture(texture);
+        texture = 0;
+    }
 }
 
 void GlyphAtlas::addGlyphs(uintptr_t tileUID,

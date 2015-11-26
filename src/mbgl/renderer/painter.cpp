@@ -10,9 +10,10 @@
 
 #include <mbgl/style/style.hpp>
 #include <mbgl/style/style_layer.hpp>
-#include <mbgl/style/style_bucket.hpp>
 
-#include <mbgl/geometry/sprite_atlas.hpp>
+#include <mbgl/layer/background_layer.hpp>
+
+#include <mbgl/sprite/sprite_atlas.hpp>
 #include <mbgl/geometry/line_atlas.hpp>
 #include <mbgl/geometry/glyph_atlas.hpp>
 
@@ -42,7 +43,9 @@
 
 using namespace mbgl;
 
-Painter::Painter(MapData& data_) : data(data_) {
+Painter::Painter(MapData& data_, TransformState& state_)
+    : data(data_), state(state_) {
+    setup();
 }
 
 Painter::~Painter() {
@@ -69,24 +72,8 @@ void Painter::setup() {
     assert(dotShader);
     assert(circleShader);
 
-
-    // Blending
-    // We are blending new pixels on top of old pixels. Since we have depth testing
-    // and are drawing opaque fragments first front-to-back, then translucent
-    // fragments back-to-front, this shades the fewest fragments possible.
-    config.blend = true;
-    MBGL_CHECK_ERROR(glBlendFunc(GL_ONE, GL_ONE_MINUS_SRC_ALPHA));
-
-    // Set clear values
-    config.clearColor = { 0.0f, 0.0f, 0.0f, 0.0f };
-    config.clearDepth = 1.0f;
-    config.clearStencil = 0x0;
-
-    // Stencil test
-    MBGL_CHECK_ERROR(glStencilOp(GL_KEEP, GL_KEEP, GL_REPLACE));
-
-    // Depth test
-    glDepthFunc(GL_LEQUAL);
+    // Reset GL values
+    config.reset();
 }
 
 void Painter::setupShaders() {
@@ -106,29 +93,7 @@ void Painter::setupShaders() {
 }
 
 void Painter::resize() {
-    if (gl_viewport != frame.framebufferSize) {
-        gl_viewport = frame.framebufferSize;
-        assert(gl_viewport[0] > 0 && gl_viewport[1] > 0);
-        MBGL_CHECK_ERROR(glViewport(0, 0, gl_viewport[0], gl_viewport[1]));
-    }
-}
-
-void Painter::setDebug(bool enabled) {
-    debug = enabled;
-}
-
-void Painter::useProgram(GLuint program) {
-    if (gl_program != program) {
-        MBGL_CHECK_ERROR(glUseProgram(program));
-        gl_program = program;
-    }
-}
-
-void Painter::lineWidth(GLfloat line_width) {
-    if (gl_lineWidth != line_width) {
-        MBGL_CHECK_ERROR(glLineWidth(line_width));
-        gl_lineWidth = line_width;
-    }
+    config.viewport = { 0, 0, frame.framebufferSize[0], frame.framebufferSize[1] };
 }
 
 void Painter::changeMatrix() {
@@ -146,11 +111,14 @@ void Painter::changeMatrix() {
 
 void Painter::clear() {
     MBGL_DEBUG_GROUP("clear");
-    config.stencilTest = true;
+    config.stencilFunc.reset();
+    config.stencilTest = GL_TRUE;
     config.stencilMask = 0xFF;
-    config.depthTest = false;
+    config.depthTest = GL_FALSE;
     config.depthMask = GL_TRUE;
     config.clearColor = { background[0], background[1], background[2], background[3] };
+    config.clearStencil = 0;
+    config.clearDepth = 1;
     MBGL_CHECK_ERROR(glClear(GL_COLOR_BUFFER_BIT | GL_STENCIL_BUFFER_BIT | GL_DEPTH_BUFFER_BIT));
 }
 
@@ -160,8 +128,7 @@ void Painter::prepareTile(const Tile& tile) {
     config.stencilFunc = { GL_EQUAL, ref, mask };
 }
 
-void Painter::render(const Style& style, TransformState state_, const FrameData& frame_, const TimePoint& time) {
-    state = state_;
+void Painter::render(const Style& style, const FrameData& frame_) {
     frame = frame_;
 
     glyphAtlas = style.glyphAtlas.get();
@@ -217,7 +184,7 @@ void Painter::render(const Style& style, TransformState state_, const FrameData&
         drawClippingMasks(sources);
     }
 
-    frameHistory.record(time, state.getNormalizedZoom());
+    frameHistory.record(data.getAnimationTime(), state.getNormalizedZoom());
 
     // Actually render the layers
     if (debug::renderTree) { Log::Info(Event::Render, "{"); indent++; }
@@ -261,6 +228,10 @@ void Painter::render(const Style& style, TransformState state_, const FrameData&
         MBGL_CHECK_ERROR(glBindTexture(GL_TEXTURE_2D, 0));
         MBGL_CHECK_ERROR(VertexArrayObject::Unbind());
     }
+
+    if (data.contextMode == GLContextMode::Shared) {
+        config.setDirty();
+    }
 }
 
 template <class Iterator>
@@ -276,7 +247,12 @@ void Painter::renderPass(RenderPass pass_,
                   pass == RenderPass::Opaque ? "opaque" : "translucent");
     }
 
-    config.blend = pass == RenderPass::Translucent;
+    if (pass == RenderPass::Translucent) {
+        config.blendFunc.reset();
+        config.blend = GL_TRUE;
+    } else {
+        config.blend = GL_FALSE;
+    }
 
     for (; it != end; ++it, i += increment) {
         currentLayer = i;
@@ -289,7 +265,7 @@ void Painter::renderPass(RenderPass pass_,
             }
         } else {
             MBGL_DEBUG_GROUP("background");
-            renderBackground(item.layer);
+            renderBackground(dynamic_cast<const BackgroundLayer&>(item.layer));
         }
     }
 
@@ -303,34 +279,26 @@ std::vector<RenderItem> Painter::determineRenderOrder(const Style& style) {
 
     for (const auto& layerPtr : style.layers) {
         const auto& layer = *layerPtr;
-        if (layer.bucket->visibility == VisibilityType::None) continue;
+        if (layer.visibility == VisibilityType::None) continue;
         if (layer.type == StyleLayerType::Background) {
             // This layer defines a background color/image.
-            if (layer.properties.is<BackgroundProperties>()) {
-                auto &props = layer.properties.get<BackgroundProperties>();
-                if (props.image.from.empty()) {
-                    // This is a solid background. We can use glClear().
-                    background = props.color;
-                    background[0] *= props.opacity;
-                    background[1] *= props.opacity;
-                    background[2] *= props.opacity;
-                    background[3] *= props.opacity;
-                } else {
-                    // This is a textured background. We need to render it with a quad.
-                    background = {{ 0, 0, 0, 0 }};
-                    order.emplace_back(layer);
-                }
+            auto& props = dynamic_cast<const BackgroundLayer&>(layer).paint;
+            if (props.pattern.value.from.empty()) {
+                // This is a solid background. We can use glClear().
+                background = props.color;
+                background[0] *= props.opacity;
+                background[1] *= props.opacity;
+                background[2] *= props.opacity;
+                background[3] *= props.opacity;
+            } else {
+                // This is a textured background. We need to render it with a quad.
+                background = {{ 0, 0, 0, 0 }};
+                order.emplace_back(layer);
             }
             continue;
         }
 
-        // This is a singular layer.
-        if (!layer.bucket) {
-            Log::Warning(Event::Render, "layer '%s' is missing bucket", layer.id.c_str());
-            continue;
-        }
-
-        Source* source = style.getSource(layer.bucket->source);
+        Source* source = style.getSource(layer.source);
         if (!source) {
             Log::Warning(Event::Render, "can't find source for layer '%s'", layer.id.c_str());
             continue;
@@ -340,8 +308,8 @@ std::vector<RenderItem> Painter::determineRenderOrder(const Style& style) {
         // This may occur when there /is/ a bucket created for this layer, but the min/max-zoom
         // is set to a fractional value, or value that is larger than the source maxzoom.
         const double zoom = state.getZoom();
-        if (layer.bucket->min_zoom > zoom ||
-            layer.bucket->max_zoom <= zoom) {
+        if (layer.minZoom > zoom ||
+            layer.maxZoom <= zoom) {
             continue;
         }
 
@@ -350,6 +318,25 @@ std::vector<RenderItem> Painter::determineRenderOrder(const Style& style) {
             assert(tile);
             if (!tile->data && !tile->data->isReady()) {
                 continue;
+            }
+
+            // We're not clipping symbol layers, so when we have both parents and children of symbol
+            // layers, we drop all children in favor of their parent to avoid duplicate labels.
+            // See https://github.com/mapbox/mapbox-gl-native/issues/2482
+            if (layer.type == StyleLayerType::Symbol) {
+                bool skip = false;
+                // Look back through the buckets we decided to render to find out whether there is
+                // already a bucket from this layer that is a parent of this tile. Tiles are ordered
+                // by zoom level when we obtain them from getTiles().
+                for (auto it = order.rbegin(); it != order.rend() && (&it->layer == &layer); ++it) {
+                    if (tile->id.isChildOf(it->tile->id)) {
+                        skip = true;
+                        break;
+                    }
+                }
+                if (skip) {
+                    continue;
+                }
             }
 
             auto bucket = tile->data->getBucket(layer);
@@ -362,41 +349,41 @@ std::vector<RenderItem> Painter::determineRenderOrder(const Style& style) {
     return order;
 }
 
-void Painter::renderBackground(const StyleLayer &layer_desc) {
+void Painter::renderBackground(const BackgroundLayer& layer) {
     // Note: This function is only called for textured background. Otherwise, the background color
     // is created with glClear.
-    const BackgroundProperties& properties = layer_desc.getProperties<BackgroundProperties>();
+    const BackgroundPaintProperties& properties = layer.paint;
 
-    if (!properties.image.to.empty()) {
+    if (!properties.pattern.value.to.empty()) {
         if ((properties.opacity >= 1.0f) != (pass == RenderPass::Opaque))
             return;
 
-        SpriteAtlasPosition imagePosA = spriteAtlas->getPosition(properties.image.from, true);
-        SpriteAtlasPosition imagePosB = spriteAtlas->getPosition(properties.image.to, true);
+        SpriteAtlasPosition imagePosA = spriteAtlas->getPosition(properties.pattern.value.from, true);
+        SpriteAtlasPosition imagePosB = spriteAtlas->getPosition(properties.pattern.value.to, true);
         float zoomFraction = state.getZoomFraction();
 
-        useProgram(patternShader->program);
+        config.program = patternShader->program;
         patternShader->u_matrix = identityMatrix;
         patternShader->u_pattern_tl_a = imagePosA.tl;
         patternShader->u_pattern_br_a = imagePosA.br;
         patternShader->u_pattern_tl_b = imagePosB.tl;
         patternShader->u_pattern_br_b = imagePosB.br;
-        patternShader->u_mix = properties.image.t;
+        patternShader->u_mix = properties.pattern.value.t;
         patternShader->u_opacity = properties.opacity;
 
         LatLng latLng = state.getLatLng();
-        vec2<double> center = state.latLngToPoint(latLng);
+        PrecisionPoint center = state.latLngToPoint(latLng);
         float scale = 1 / std::pow(2, zoomFraction);
 
         std::array<float, 2> sizeA = imagePosA.size;
         mat3 matrixA;
         matrix::identity(matrixA);
         matrix::scale(matrixA, matrixA,
-                      1.0f / (sizeA[0] * properties.image.fromScale),
-                      1.0f / (sizeA[1] * properties.image.fromScale));
+                      1.0f / (sizeA[0] * properties.pattern.value.fromScale),
+                      1.0f / (sizeA[1] * properties.pattern.value.fromScale));
         matrix::translate(matrixA, matrixA,
-                          std::fmod(center.x * 512, sizeA[0] * properties.image.fromScale),
-                          std::fmod(center.y * 512, sizeA[1] * properties.image.fromScale));
+                          std::fmod(center.x * 512, sizeA[0] * properties.pattern.value.fromScale),
+                          std::fmod(center.y * 512, sizeA[1] * properties.pattern.value.fromScale));
         matrix::rotate(matrixA, matrixA, -state.getAngle());
         matrix::scale(matrixA, matrixA,
                        scale * state.getWidth()  / 2,
@@ -406,11 +393,11 @@ void Painter::renderBackground(const StyleLayer &layer_desc) {
         mat3 matrixB;
         matrix::identity(matrixB);
         matrix::scale(matrixB, matrixB,
-                      1.0f / (sizeB[0] * properties.image.toScale),
-                      1.0f / (sizeB[1] * properties.image.toScale));
+                      1.0f / (sizeB[0] * properties.pattern.value.toScale),
+                      1.0f / (sizeB[1] * properties.pattern.value.toScale));
         matrix::translate(matrixB, matrixB,
-                          std::fmod(center.x * 512, sizeB[0] * properties.image.toScale),
-                          std::fmod(center.y * 512, sizeB[1] * properties.image.toScale));
+                          std::fmod(center.x * 512, sizeB[0] * properties.pattern.value.toScale),
+                          std::fmod(center.y * 512, sizeB[1] * properties.pattern.value.toScale));
         matrix::rotate(matrixB, matrixB, -state.getAngle());
         matrix::scale(matrixB, matrixB,
                        scale * state.getWidth()  / 2,
@@ -419,13 +406,15 @@ void Painter::renderBackground(const StyleLayer &layer_desc) {
         patternShader->u_patternmatrix_a = matrixA;
         patternShader->u_patternmatrix_b = matrixB;
 
+        VertexArrayObject::Unbind();
         backgroundBuffer.bind();
         patternShader->bind(0);
         spriteAtlas->bind(true);
     }
 
-    config.stencilTest = false;
-    config.depthTest = true;
+    config.stencilTest = GL_FALSE;
+    config.depthFunc.reset();
+    config.depthTest = GL_TRUE;
     config.depthRange = { 1.0f, 1.0f };
 
     MBGL_CHECK_ERROR(glDrawArrays(GL_TRIANGLE_STRIP, 0, 4));

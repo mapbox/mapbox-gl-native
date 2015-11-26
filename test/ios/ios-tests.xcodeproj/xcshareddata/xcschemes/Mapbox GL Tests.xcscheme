@@ -1,7 +1,7 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <Scheme
    LastUpgradeVersion = "0700"
-   version = "1.3">
+   version = "1.7">
    <BuildAction
       parallelizeBuildables = "YES"
       buildImplicitDependencies = "YES">
@@ -37,7 +37,7 @@
       </BuildActionEntries>
    </BuildAction>
    <TestAction
-      buildConfiguration = "Release"
+      buildConfiguration = "Debug"
       selectedDebuggerIdentifier = "Xcode.DebuggerFoundation.Debugger.LLDB"
       selectedLauncherIdentifier = "Xcode.DebuggerFoundation.Launcher.LLDB"
       shouldUseLaunchSchemeArgsEnv = "YES">
@@ -52,9 +52,6 @@
                ReferencedContainer = "container:ios-tests.xcodeproj">
             </BuildableReference>
             <SkippedTests>
-               <Test
-                  Identifier = "MapViewTests/testDelegateRegionWillChange">
-               </Test>
                <Test
                   Identifier = "MapViewTests/testUserTrackingModeFollowWithHeading">
                </Test>
@@ -71,6 +68,10 @@
                   Identifier = "MetricsTests/testTimerFiresFlush">
                </Test>
             </SkippedTests>
+            <LocationScenarioReference
+               identifier = "com.apple.dt.IDEFoundation.CurrentLocationScenarioIdentifier"
+               referenceType = "1">
+            </LocationScenarioReference>
          </TestableReference>
       </Testables>
       <MacroExpansion>

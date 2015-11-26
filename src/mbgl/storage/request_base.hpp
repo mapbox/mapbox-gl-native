@@ -14,7 +14,7 @@ class Response;
 
 class RequestBase : private util::noncopyable {
 public:
-    using Callback = std::function<void (std::shared_ptr<const Response> response, FileCache::Hint hint)>;
+    using Callback = std::function<void (std::shared_ptr<const Response> response)>;
 
     RequestBase(const Resource& resource_, Callback notify_)
         : resource(resource_)

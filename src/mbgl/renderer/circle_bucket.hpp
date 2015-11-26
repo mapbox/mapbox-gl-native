@@ -8,9 +8,6 @@
 #include <mbgl/geometry/elements_buffer.hpp>
 #include <mbgl/geometry/circle_buffer.hpp>
 
-#include <mbgl/style/style_bucket.hpp>
-#include <mbgl/style/style_layout.hpp>
-
 namespace mbgl {
 
 class CircleVertexBuffer;
@@ -20,23 +17,20 @@ class CircleBucket : public Bucket {
     using TriangleGroup = ElementGroup<3>;
 
 public:
-    CircleBucket(CircleVertexBuffer &vertexBuffer, TriangleElementsBuffer &elementsBuffer);
+    CircleBucket();
     ~CircleBucket() override;
 
     void upload() override;
     void render(Painter&, const StyleLayer&, const TileID&, const mat4&) override;
 
-    bool hasData() const;
+    bool hasData() const override;
     void addGeometry(const GeometryCollection&);
 
     void drawCircles(CircleShader& shader);
 
 private:
-    CircleVertexBuffer& vertexBuffer_;
-    TriangleElementsBuffer& elementsBuffer_;
-
-    const GLsizei vertexStart_;
-    const GLsizei elementsStart_;
+    CircleVertexBuffer vertexBuffer_;
+    TriangleElementsBuffer elementsBuffer_;
 
     std::vector<std::unique_ptr<TriangleGroup>> triangleGroups_;
 };

@@ -33,16 +33,16 @@ namespace mbgl {
     typedef std::vector<SymbolQuad> SymbolQuads;
 
     struct Anchor;
-    class StyleLayoutSymbol;
+    class SymbolLayoutProperties;
     class PositionedIcon;
 
-    SymbolQuads getIconQuads(Anchor &anchor, const PositionedIcon &shapedIcon,
-            const std::vector<Coordinate> &line, const StyleLayoutSymbol &layout,
+    SymbolQuads getIconQuads(Anchor& anchor, const PositionedIcon& shapedIcon,
+            const std::vector<Coordinate>& line, const SymbolLayoutProperties& layout,
             const bool alongLine);
     
-    SymbolQuads getGlyphQuads(Anchor &anchor, const Shaping &shapedText,
-            const float boxScale, const std::vector<Coordinate> &line, const StyleLayoutSymbol &layout,
-            const bool alongLine, const GlyphPositions &face);
+    SymbolQuads getGlyphQuads(Anchor& anchor, const Shaping& shapedText,
+            const float boxScale, const std::vector<Coordinate>& line, const SymbolLayoutProperties& layout,
+            const bool alongLine, const GlyphPositions& face);
 }
 
 #endif

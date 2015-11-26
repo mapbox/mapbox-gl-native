@@ -4,10 +4,11 @@
 #import <UIKit/UIKit.h>
 #import <CoreLocation/CoreLocation.h>
 
+#import "MGLTypes.h"
+
 NS_ASSUME_NONNULL_BEGIN
 
 @class MGLAnnotationImage;
-@class MGLMapCamera;
 @class MGLUserLocation;
 @class MGLPolyline;
 @class MGLPolygon;
@@ -33,24 +34,12 @@ IB_DESIGNABLE
 *   @param frame The frame for the view, measured in points.
 *   @return An initialized map view. */
 - (instancetype)initWithFrame:(CGRect)frame;
-- (instancetype)initWithFrame:(CGRect)frame accessToken:(NSString *)accessToken __attribute__((unavailable("Use -initWithFrame:. Set MGLMapboxAccessToken in the Info.plist or call +[MGLAccountManager setAccessToken:].")));
 
 /** Initializes and returns a newly allocated map view with the specified frame and style URL.
 *   @param frame The frame for the view, measured in points.
-*   @param styleURL The map style URL to use. Can be either an HTTP/HTTPS URL or a Mapbox map ID style URL (`mapbox://<user.style>`). Specify `nil` for the default style.
+*   @param styleURL The map style URL to use. Can be either an HTTP/HTTPS URL or a Mapbox map ID style URL (`mapbox://styles/<user>/<style>`). Specify `nil` for the default style.
 *   @return An initialized map view. */
 - (instancetype)initWithFrame:(CGRect)frame styleURL:(nullable NSURL *)styleURL;
-- (instancetype)initWithFrame:(CGRect)frame accessToken:(NSString *)accessToken styleURL:(nullable NSURL *)styleURL __attribute__((unavailable("Use -initWithFrame:styleURL:. Set MGLMapboxAccessToken in the Info.plist or call +[MGLAccountManager setAccessToken:].")));
-
-#pragma mark - Authorizing Access
-
-/** @name Authorizing Access */
-
-@property (nonatomic, nullable) NSString *accessToken __attribute__((unavailable("Use +[MGLAccountManager accessToken] and +[MGLAccountManager setAccessToken:].")));
-
-#pragma mark - Managing Constraints
-
-/** @name Managing Constraints */
 
 #pragma mark - Accessing Map Properties
 
@@ -132,13 +121,26 @@ IB_DESIGNABLE
 *   Changing the zoom level scales the map without changing the current center coordinate. At zoom level 0, tiles cover the entire world map; at zoom level 1, tiles cover 1/4 of the world; at zoom level 2, tiles cover 1/16 of the world, and so on. */
 - (void)setZoomLevel:(double)zoomLevel animated:(BOOL)animated;
 
-/** Changes the center coordinate and zoom level of the and optionally animates the change. 
+/** Changes the center coordinate and zoom level of the map and optionally animates the change. 
 *   @param centerCoordinate The new center coordinate for the map.
 *   @param zoomLevel The new zoom level for the map.
 *   @param animated Specify `YES` if you want the map view to animate scrolling and zooming to the new location or `NO` if you want the map to display the new location immediately. */
 - (void)setCenterCoordinate:(CLLocationCoordinate2D)centerCoordinate zoomLevel:(double)zoomLevel animated:(BOOL)animated;
 
+/** Changes the center coordinate, zoom level, and direction of the map and optionally animates the change. 
+*   @param centerCoordinate The new center coordinate for the map.
+*   @param zoomLevel The new zoom level for the map.
+*   @param direction The new direction for the map, measured in degrees relative to true north.
+*   @param animated Specify `YES` if you want the map view to animate scrolling, zooming, and rotating to the new location or `NO` if you want the map to display the new location immediately. */
 - (void)setCenterCoordinate:(CLLocationCoordinate2D)centerCoordinate zoomLevel:(double)zoomLevel direction:(CLLocationDirection)direction animated:(BOOL)animated;
+
+/** Changes the center coordinate, zoom level, and direction of the map, calling a completion handler at the end of an optional animation.
+*   @param centerCoordinate The new center coordinate for the map.
+*   @param zoomLevel The new zoom level for the map.
+*   @param direction The new direction for the map, measured in degrees relative to true north.
+*   @param animated Specify `YES` if you want the map view to animate scrolling, zooming, and rotating to the new location or `NO` if you want the map to display the new location immediately.
+*   @param completion The block executed after the animation finishes. */
+- (void)setCenterCoordinate:(CLLocationCoordinate2D)centerCoordinate zoomLevel:(double)zoomLevel direction:(CLLocationDirection)direction animated:(BOOL)animated completionHandler:(nullable void (^)(void))completion;
 
 /** The coordinate bounds visible in the receiver’s viewport.
 *   
@@ -162,6 +164,16 @@ IB_DESIGNABLE
 *   @param insets The minimum padding (in screen points) that will be visible around the given coordinate bounds.
 *   @param animated Specify `YES` to animate the change by smoothly scrolling and zooming or `NO` to immediately display the given bounds. */
 - (void)setVisibleCoordinates:(CLLocationCoordinate2D *)coordinates count:(NSUInteger)count edgePadding:(UIEdgeInsets)insets animated:(BOOL)animated;
+
+/** Changes the receiver’s viewport to fit all of the given coordinates and optionally some additional padding on each side.
+*   @param coordinates The coordinates that the viewport will show.
+*   @param count The number of coordinates. This number must not be greater than the number of elements in `coordinates`.
+*   @param insets The minimum padding (in screen points) that will be visible around the given coordinate bounds.
+*   @param direction The direction to rotate the map to, measured in degrees relative to true north.
+*   @param duration The duration to animate the change in seconds.
+*   @param function The timing function to animate the change.
+*   @param completion The block executed after the animation finishes. */
+- (void)setVisibleCoordinates:(CLLocationCoordinate2D *)coordinates count:(NSUInteger)count edgePadding:(UIEdgeInsets)insets direction:(CLLocationDirection)direction duration:(NSTimeInterval)duration animationTimingFunction:(nullable CAMediaTimingFunction *)function completionHandler:(nullable void (^)(void))completion;
 
 /** Sets the visible region so that the map displays the specified annotations.
 *
@@ -207,6 +219,13 @@ IB_DESIGNABLE
  */
 - (void)setUserConstraintsSouthWest:(CLLocationCoordinate2D)southWest andNorthEast:(CLLocationCoordinate2D)northEast;
 
+/** Moves the viewpoint to a different location with respect to the map with an optional transition duration and timing function.
+*   @param camera The new viewpoint.
+*   @param duration The amount of time, measured in seconds, that the transition animation should take. Specify `0` to jump to the new viewpoint instantaneously.
+*   @param function A timing function used for the animation. Set this parameter to `nil` for a transition that matches most system animations. If the duration is `0`, this parameter is ignored.
+*   @param completion The block to execute after the animation finishes. */
+- (void)setCamera:(MGLMapCamera *)camera withDuration:(NSTimeInterval)duration animationTimingFunction:(nullable CAMediaTimingFunction *)function completionHandler:(nullable void (^)(void))completion;
+
 #pragma mark - Converting Map Coordinates
 
 /** @name Converting Map Coordinates */
@@ -235,23 +254,21 @@ IB_DESIGNABLE
 
 /** @name Styling the Map */
 
-/** Mapbox ID of the style currently displayed in the receiver, or `nil` if the style does not have an ID.
-*
-*   The style may lack an ID if it is located at an HTTP, HTTPS, or local file URL. Use `styleURL` to get the URL in these cases.
-*
-*   To display the default style, set this property to `nil`. */
-@property (nonatomic, nullable) NSString *styleID;
-@property (nonatomic, nullable) NSString *mapID __attribute__((unavailable("Use styleID.")));
+@property (nonatomic, nullable) NSString *styleID __attribute__((unavailable("Set styleURL to an NSURL of the form <mapbox://styles/STYLE_ID>, where STYLE_ID would have been the value of this property.")));
 
-/** URLs of the styles bundled with the library. */
-@property (nonatomic, readonly) NS_ARRAY_OF(NSURL *) *bundledStyleURLs;
+/** URLs of the styles bundled with the library.
+    @deprecated Call the relevant class method of `MGLStyle` for the URL of a particular default style. */
+@property (nonatomic, readonly) NS_ARRAY_OF(NSURL *) *bundledStyleURLs __attribute__((deprecated("Call the relevant class method of MGLStyle for the URL of a particular default style.")));
 
 /** URL of the style currently displayed in the receiver.
 *
-*   The URL may be a full HTTP or HTTPS URL or a Mapbox URL indicating the style’s map ID (`mapbox://<user.style>`).
+*   The URL may be a full HTTP or HTTPS URL or a Mapbox URL indicating the style’s map ID (`mapbox://styles/<user>/<style>`).
 *
 *   To display the default style, set this property to `nil`. */
 @property (nonatomic, null_resettable) NSURL *styleURL;
+
+/* Discourage programmatic usage of this IB-only property. Interface Builder skips over this declaration because it is unable to parse attributes. See the real declaration in MGLMapView+IBAdditions.h. */
+@property (nonatomic, nullable) IBInspectable NSString *styleURL__ __attribute__((unavailable("styleURL__ is for use within Interface Builder only. Use styleURL in code.")));
 
 /** Currently active style classes, represented as an array of string identifiers. */
 @property (nonatomic) NS_ARRAY_OF(NSString *) *styleClasses;
@@ -414,6 +431,103 @@ IB_DESIGNABLE
 
 @optional
 
+#pragma mark - Responding to Map Position Changes
+
+/** @name Responding to Map Position Changes */
+
+/** Tells the delegate that the region displayed by the map view is about to change.
+ *
+ *   This method is called whenever the currently displayed map region will start changing.
+ *   @param mapView The map view whose visible region will change.
+ *   @param animated Whether the change will cause an animated effect on the map. */
+- (void)mapView:(MGLMapView *)mapView regionWillChangeAnimated:(BOOL)animated;
+
+/** Tells the delegate that the region displayed by the map view is changing.
+ *
+ *   This method is called whenever the currently displayed map region changes. During movement, this method may be called many times to report updates to the map position. Therefore, your implementation of this method should be as lightweight as possible to avoid affecting performance.
+ *   @param mapView The map view whose visible region is changing. */
+- (void)mapViewRegionIsChanging:(MGLMapView *)mapView;
+
+/** Tells the delegate that the region displayed by the map view just changed.
+ *
+ *   This method is called whenever the currently displayed map region has finished changing.
+ *   @param mapView The map view whose visible region changed.
+ *   @param animated Whether the change caused an animated effect on the map. */
+- (void)mapView:(MGLMapView *)mapView regionDidChangeAnimated:(BOOL)animated;
+
+#pragma mark - Loading the Map
+
+/** @name Loading the Map */
+
+/** Tells the delegate that the map view will begin to load.
+ *
+ *   This method is called whenever the map view starts loading, including when a new style has been set and the map must reload.
+ *   @param mapView The map view that is starting to load. */
+- (void)mapViewWillStartLoadingMap:(MGLMapView *)mapView;
+
+/** Tells the delegate that the map view has finished loading.
+ *
+ *   This method is called whenever the map view finishes loading, either after the initial load or after a style change has forced a reload.
+ *   @param mapView The map view that has finished loading. */
+- (void)mapViewDidFinishLoadingMap:(MGLMapView *)mapView;
+
+// TODO
+- (void)mapViewDidFailLoadingMap:(MGLMapView *)mapView withError:(NSError *)error;
+
+// TODO
+- (void)mapViewWillStartRenderingMap:(MGLMapView *)mapView;
+
+// TODO
+- (void)mapViewDidFinishRenderingMap:(MGLMapView *)mapView fullyRendered:(BOOL)fullyRendered;
+
+// TODO
+- (void)mapViewWillStartRenderingFrame:(MGLMapView *)mapView;
+
+// TODO
+- (void)mapViewDidFinishRenderingFrame:(MGLMapView *)mapView fullyRendered:(BOOL)fullyRendered;
+
+#pragma mark - Tracking User Location
+
+/** @name Tracking User Location */
+
+/** Tells the delegate that the map view will begin tracking the user’s location.
+ *
+ *   This method is called when the value of the showsUserLocation property changes to `YES`.
+ *
+ *   @param mapView The map view that is tracking the user’s location. */
+- (void)mapViewWillStartLocatingUser:(MGLMapView *)mapView;
+
+/** Tells the delegate that the map view has stopped tracking the user’s location.
+ *
+ *   This method is called when the value of the showsUserLocation property changes to `NO`.
+ *
+ *   @param mapView The map view that is tracking the user’s location. */
+- (void)mapViewDidStopLocatingUser:(MGLMapView *)mapView;
+
+/** Tells the delegate that the location of the user was updated.
+ *
+ *   While the showsUserLocation property is set to `YES`, this method is called whenever a new location update is received by the map view. This method is also called if the map view’s user tracking mode is set to MGLUserTrackingModeFollowWithHeading and the heading changes, or if it is set to MGLUserTrackingModeFollowWithCourse and the course changes.
+ *
+ *   This method is not called if the application is currently running in the background. If you want to receive location updates while running in the background, you must use the Core Location framework.
+ *
+ *   @param mapView The map view that is tracking the user’s location.
+ *   @param userLocation The location object representing the user’s latest location. This property may be `nil`. */
+- (void)mapView:(MGLMapView *)mapView didUpdateUserLocation:(nullable MGLUserLocation *)userLocation;
+
+/** Tells the delegate that an attempt to locate the user’s position failed.
+ *   @param mapView The map view that is tracking the user’s location.
+ *   @param error An error object containing the reason why location tracking failed. */
+- (void)mapView:(MGLMapView *)mapView didFailToLocateUserWithError:(NSError *)error;
+
+/** Tells the delegate that the map view’s user tracking mode has changed.
+ *
+ *   This method is called after the map view asynchronously changes to reflect the new user tracking mode, for example by beginning to zoom or rotate.
+ *
+ *   @param mapView The map view that changed its tracking mode.
+ *   @param mode The new tracking mode.
+ *   @param animated Whether the change caused an animated effect on the map. */
+- (void)mapView:(MGLMapView *)mapView didChangeUserTrackingMode:(MGLUserTrackingMode)mode animated:(BOOL)animated;
+
 #pragma mark - Managing the Display of Annotations
 
 /** @name Managing the Display of Annotations */
@@ -483,102 +597,11 @@ IB_DESIGNABLE
 *   @return The accessory view to display. */
 - (nullable UIView *)mapView:(MGLMapView *)mapView rightCalloutAccessoryViewForAnnotation:(id <MGLAnnotation>)annotation;
 
-#pragma mark - Responding to Map Position Changes
-
-// Responding to Map Position Changes
-
-/** Tells the delegate that the region displayed by the map view is about to change.
- *
- *   This method is called whenever the currently displayed map region will start changing.
- *   @param mapView The map view whose visible region will change.
- *   @param animated Whether the change will cause an animated effect on the map. */
-- (void)mapView:(MGLMapView *)mapView regionWillChangeAnimated:(BOOL)animated;
-
-/** Tells the delegate that the region displayed by the map view is changing.
- *
- *   This method is called whenever the currently displayed map region changes. During movement, this method may be called many times to report updates to the map position. Therefore, your implementation of this method should be as lightweight as possible to avoid affecting performance.
- *   @param mapView The map view whose visible region is changing. */
-- (void)mapViewRegionIsChanging:(MGLMapView *)mapView;
-
-/** Tells the delegate that the region displayed by the map view just changed.
- *
- *   This method is called whenever the currently displayed map region has finished changing.
- *   @param mapView The map view whose visible region changed.
- *   @param animated Whether the change caused an animated effect on the map. */
-- (void)mapView:(MGLMapView *)mapView regionDidChangeAnimated:(BOOL)animated;
-
-#pragma mark - Loading the Map Data
-
-// Loading the Map Data
-
-// TODO
-- (void)mapViewWillStartLoadingMap:(MGLMapView *)mapView;
-
-// TODO
-- (void)mapViewDidFinishLoadingMap:(MGLMapView *)mapView;
-
-// TODO
-- (void)mapViewDidFailLoadingMap:(MGLMapView *)mapView withError:(NSError *)error;
-
-// TODO
-- (void)mapViewWillStartRenderingMap:(MGLMapView *)mapView;
-
-// TODO
-- (void)mapViewDidFinishRenderingMap:(MGLMapView *)mapView fullyRendered:(BOOL)fullyRendered;
-
-// TODO
-- (void)mapViewWillStartRenderingFrame:(MGLMapView *)mapView;
-
-// TODO
-- (void)mapViewDidFinishRenderingFrame:(MGLMapView *)mapView fullyRendered:(BOOL)fullyRendered;
-
-#pragma mark - Tracking the User Location
-
-/** @name Tracking the User Location */
-
-/** Tells the delegate that the map view will begin tracking the user’s location.
-*
-*   This method is called when the value of the showsUserLocation property changes to `YES`.
-*
-*   @param mapView The map view that is tracking the user’s location. */
-- (void)mapViewWillStartLocatingUser:(MGLMapView *)mapView;
-
-/** Tells the delegate that the map view has stopped tracking the user’s location.
-*
-*   This method is called when the value of the showsUserLocation property changes to `NO`.
-*
-*   @param mapView The map view that is tracking the user’s location. */
-- (void)mapViewDidStopLocatingUser:(MGLMapView *)mapView;
-
-/** Tells the delegate that the location of the user was updated.
-*
-*   While the showsUserLocation property is set to `YES`, this method is called whenever a new location update is received by the map view. This method is also called if the map view’s user tracking mode is set to MGLUserTrackingModeFollowWithHeading and the heading changes, or if it is set to MGLUserTrackingModeFollowWithCourse and the course changes.
-*
-*   This method is not called if the application is currently running in the background. If you want to receive location updates while running in the background, you must use the Core Location framework.
-*
-*   @param mapView The map view that is tracking the user’s location.
-*   @param userLocation The location object representing the user’s latest location. This property may be `nil`. */
-- (void)mapView:(MGLMapView *)mapView didUpdateUserLocation:(nullable MGLUserLocation *)userLocation;
-
-/** Tells the delegate that an attempt to locate the user’s position failed.
-*   @param mapView The map view that is tracking the user’s location.
-*   @param error An error object containing the reason why location tracking failed. */
-- (void)mapView:(MGLMapView *)mapView didFailToLocateUserWithError:(NSError *)error;
-
-/** Tells the delegate that the map view’s user tracking mode has changed.
-*
-*   This method is called after the map view asynchronously changes to reflect the new user tracking mode, for example by beginning to zoom or rotate.
-*
-*   @param mapView The map view that changed its tracking mode.
-*   @param mode The new tracking mode.
-*   @param animated Whether the change caused an animated effect on the map. */
-- (void)mapView:(MGLMapView *)mapView didChangeUserTrackingMode:(MGLUserTrackingMode)mode animated:(BOOL)animated;
-
 #pragma mark - Managing Annotations
 
 /** @name Managing Annotations */
 
-/* Tells the delegate that the user tapped one of the annotation's accessory buttons.
+/** Tells the delegate that the user tapped one of the annotation's accessory buttons.
 *
 *  Accessory views contain custom content and are positioned on either side of the annotation title text. If a view you specify is a descendant of the `UIControl` class, the map view calls this method as a convenience whenever the user taps your view. You can use this method to respond to taps and perform any actions associated with that control. For example, if your control displayed additional information about the annotation, you could use this method to present a modal panel with that information.
 *
@@ -589,11 +612,16 @@ IB_DESIGNABLE
 *  @param control The control that was tapped. */
 - (void)mapView:(MGLMapView *)mapView annotation:(id <MGLAnnotation>)annotation calloutAccessoryControlTapped:(UIControl *)control;
 
+/** Tells the delegate that the user tapped on an annotation's callout view.
+*   @param mapView The map view containing the specified annotation.
+*   @param annotation The annotation whose callout was tapped.*/
+- (void)mapView:(MGLMapView *)mapView tapOnCalloutForAnnotation:(id <MGLAnnotation>)annotation;
+
 #pragma mark - Selecting Annotations
 
 /** @name Selecting Annotations */
 
-/* Tells the delegate that one of its annotations was selected.
+/** Tells the delegate that one of its annotations was selected.
 *
 *  You can use this method to track changes in the selection state of annotations.
 *
@@ -601,7 +629,7 @@ IB_DESIGNABLE
 *  @param annotation The annotation that was selected. */
 - (void)mapView:(MGLMapView *)mapView didSelectAnnotation:(id <MGLAnnotation>)annotation;
 
-/* Tells the delegate that one of its annotations was deselected.
+/** Tells the delegate that one of its annotations was deselected.
 *
 *  You can use this method to track changes in the selection state of annotations.
 *

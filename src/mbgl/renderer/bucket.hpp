@@ -21,7 +21,7 @@ class CollisionTile;
 class Bucket : private util::noncopyable {
 public:
     Bucket() : uploaded(false) {}
-    
+
     // As long as this bucket has a Prepare render pass, this function is getting called. Typically,
     // this only happens once when the bucket is being rendered for the first time.
     virtual void upload() = 0;
@@ -31,6 +31,8 @@ public:
     virtual void render(Painter&, const StyleLayer&, const TileID&, const mat4&) = 0;
 
     virtual ~Bucket() {}
+
+    virtual bool hasData() const = 0;
 
     inline bool needsUpload() const {
         return !uploaded;

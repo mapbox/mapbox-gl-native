@@ -1,16 +1,21 @@
 #import "MGLAccountManager_Private.h"
 #import "MGLMapboxEvents.h"
+#import "MGLCategoryLoader.h"
 #import "NSProcessInfo+MGLAdditions.h"
 
-@interface MGLAccountManager()
+#import "FABKitProtocol.h"
+#import "Fabric+FABKits.h"
+
+@interface MGLAccountManager() <FABKit>
 
 @property (atomic) BOOL mapboxMetricsEnabledSettingShownInApp;
 @property (atomic) NSString *accessToken;
 
 @end
 
-
 @implementation MGLAccountManager
+
+#pragma mark - Internal
 
 + (void)load {
     // Read the initial configuration from Info.plist. The shown-in-app setting
@@ -30,6 +35,8 @@
 // Can be called from any thread.
 //
 + (instancetype) sharedManager {
+    [MGLCategoryLoader loadCategories];
+
     if (NSProcessInfo.processInfo.mgl_isInterfaceBuilderDesignablesAgent) {
         return nil;
     }
@@ -56,6 +63,8 @@
 }
 
 + (void) setAccessToken:(NSString *) accessToken {
+    accessToken = [accessToken stringByTrimmingCharactersInSet:
+                   [NSCharacterSet whitespaceAndNewlineCharacterSet]];
     if ( ! [accessToken length]) return;
     
     [MGLAccountManager sharedManager].accessToken = accessToken;
@@ -69,5 +78,31 @@
     return [MGLAccountManager sharedManager].accessToken;
 }
 
+#pragma mark - Fabric
+
++ (NSString *)bundleIdentifier {
+    return @"com.mapbox.sdk.ios";
+}
+
++ (NSString *)kitDisplayVersion {
+    return @"3.0.0-pre.7";
+}
+
++ (void)initializeIfNeeded {
+    Class fabric = NSClassFromString(@"Fabric");
+
+    if (fabric) {
+        NSDictionary *configuration = [fabric configurationDictionaryForKitClass:[MGLAccountManager class]];
+        if ( ! configuration || ! configuration[@"accessToken"]) {
+            NSLog(@"Configuration dictionary returned by Fabric was nil or doesn't have accessToken. Can't initialize MGLAccountManager.");
+            return;
+        }
+        [self setAccessToken:configuration[@"accessToken"]];
+        MGLAccountManager *sharedAccountManager = [self sharedManager];
+        NSLog(@"MGLAccountManager was initialized with access token: %@", sharedAccountManager.accessToken);
+    } else {
+        NSLog(@"MGLAccountManager is used in a project that doesn't have Fabric.");
+    }
+}
 
 @end
