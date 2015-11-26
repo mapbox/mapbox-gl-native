@@ -41,6 +41,14 @@ IB_DESIGNABLE
 *   @return An initialized map view. */
 - (instancetype)initWithFrame:(CGRect)frame styleURL:(nullable NSURL *)styleURL;
 
+/** Edge insets for positioning callouts.
+ *  
+ *  If your `MGLMapView` is obstructed by transparent navbars or toolbars you may want to set the top and bottom insets to the
+ *  top and bottom layout guides from your view controller.
+ *
+ *  The default value of this property is `UIEdgeInsetsZero`. */
+@property(nonatomic) UIEdgeInsets calloutInsets;
+
 #pragma mark - Accessing Map Properties
 
 /** @name Accessing Map Properties */

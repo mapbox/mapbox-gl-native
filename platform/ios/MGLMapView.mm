@@ -106,6 +106,7 @@ mbgl::util::UnitBezier MGLUnitBezierForMediaTimingFunction(CAMediaTimingFunction
 @property (nonatomic) CGFloat quickZoomStart;
 @property (nonatomic, getter=isDormant) BOOL dormant;
 @property (nonatomic, readonly, getter=isRotationAllowed) BOOL rotationAllowed;
+@property (nonatomic, strong) SMCalloutView *repositioningCalloutView;
 
 @end
 
@@ -267,6 +268,8 @@ std::chrono::steady_clock::duration durationInSeconds(float duration)
     _annotationMetadataByAnnotation = [NSMapTable mapTableWithKeyOptions:NSMapTableStrongMemory valueOptions:NSMapTableStrongMemory];
 
     _annotationImages = [NSMutableDictionary dictionary];
+
+    _calloutInsets = UIEdgeInsetsZero;
 
     // setup logo bug
     //
@@ -1976,6 +1979,11 @@ CLLocationCoordinate2D MGLLocationCoordinate2DFromLatLng(mbgl::LatLng latLng)
     return bounds;
 }
 
+- (CGRect)viewportRectWithInsets:(UIEdgeInsets)insets
+{
+    return CGRectMake(insets.left, insets.top, self.bounds.size.width - (insets.left + insets.right), self.bounds.size.height - (insets.top + insets.bottom));
+}
+
 #pragma mark - Styling -
 
 - (NS_ARRAY_OF(NSURL *) *)bundledStyleURLs
@@ -2431,10 +2439,14 @@ CLLocationCoordinate2D MGLLocationCoordinate2DFromLatLng(mbgl::LatLng latLng)
         // set annotation delegate to handle taps on the callout view
         self.selectedAnnotationCalloutView.delegate = self;
 
+        // create constraining view based on user insets
+        CGRect viewportRect = [self viewportRectWithInsets:self.calloutInsets];
+        UIView *constrainingView = [UIView.alloc initWithFrame:viewportRect];
+
         // present popup
         [self.selectedAnnotationCalloutView presentCalloutFromRect:calloutBounds
                                                             inView:self.glView
-                                                 constrainedToView:self.glView
+                                                 constrainedToView:constrainingView
                                                           animated:animated];
     }
 
@@ -2443,6 +2455,16 @@ CLLocationCoordinate2D MGLLocationCoordinate2DFromLatLng(mbgl::LatLng latLng)
     {
         [self.delegate mapView:self didSelectAnnotation:annotation];
     }
+}
+
+- (NSTimeInterval)calloutView:(SMCalloutView *)calloutView delayForRepositionWithSize:(CGSize)offset
+{
+    self.repositioningCalloutView = calloutView;
+    
+    _mbglMap->moveBy(offset.width, offset.height, secondsAsDuration(MGLAnimationDuration));
+    calloutView.frame = CGRectOffset(calloutView.frame, offset.width, offset.height);
+    
+    return MGLAnimationDuration;
 }
 
 - (SMCalloutView *)calloutViewForAnnotation:(id <MGLAnnotation>)annotation
@@ -2899,7 +2921,11 @@ CLLocationCoordinate2D MGLLocationCoordinate2DFromLatLng(mbgl::LatLng latLng)
         case mbgl::MapChangeRegionWillChange:
         case mbgl::MapChangeRegionWillChangeAnimated:
         {
-            [self deselectAnnotation:self.selectedAnnotation animated:NO];
+            // Don't deselect the annotation if we are repositioning to fit a callout view.
+            if (!self.repositioningCalloutView) {
+                [self deselectAnnotation:self.selectedAnnotation animated:NO];
+            }
+            self.repositioningCalloutView = nil;
 
             if ( ! [self isSuppressingChangeDelimiters] && [self.delegate respondsToSelector:@selector(mapView:regionWillChangeAnimated:)])
             {
