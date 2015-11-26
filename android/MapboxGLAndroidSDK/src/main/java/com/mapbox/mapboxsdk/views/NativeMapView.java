@@ -401,7 +401,7 @@ final class NativeMapView {
         nativeSetDebug(mNativeMapViewPtr, debug);
     }
 
-    public void toggleDebug() {
+    public void cycleDebugOptions() {
         nativeToggleDebug(mNativeMapViewPtr);
     }
 

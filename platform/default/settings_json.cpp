@@ -35,5 +35,5 @@ void Settings_JSON::clear() {
     zoom = 0;
     bearing = 0;
     pitch = 0;
-    debug = false;
+    debug = 0;
 }

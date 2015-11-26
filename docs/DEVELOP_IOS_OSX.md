@@ -46,4 +46,4 @@ If you want to run the tests in Xcode instead, first `make ipackage` to create a
 - Double-tap to zoom in one level
 - Two-finger single-tap to zoom out one level
 - Double-tap, long-pressing the second, then pan up and down to "quick zoom" (iPhone only, meant for one-handed use)
-- Use the debug menu to add test annotations, reset position, and toggle debug info.
+- Use the debug menu to add test annotations, reset position, and cycle through the debug options.

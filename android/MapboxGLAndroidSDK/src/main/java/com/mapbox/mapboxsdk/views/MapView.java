@@ -1330,8 +1330,8 @@ public final class MapView extends FrameLayout {
      * @see MapView#isDebugActive()
      */
     @UiThread
-    public void toggleDebug() {
-        mNativeMapView.toggleDebug();
+    public void cycleDebugOptions() {
+        mNativeMapView.cycleDebugOptions();
         mNativeMapView.toggleCollisionDebug();
     }
 

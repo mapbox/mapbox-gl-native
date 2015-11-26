@@ -12,7 +12,7 @@ using namespace mbgl;
 void Painter::renderTileDebug(const Tile& tile) {
     MBGL_DEBUG_GROUP(std::string { "debug " } + std::string(tile.id));
     assert(tile.data);
-    if (data.getDebug()) {
+    if (data.getDebug() != MapDebugOptions::NoDebug) {
         prepareTile(tile);
         renderDebugText(*tile.data, tile.matrix);
         renderDebugFrame(tile.matrix);
@@ -26,8 +26,9 @@ void Painter::renderDebugText(TileData& tileData, const mat4 &matrix) {
 
     if (!tileData.debugBucket || tileData.debugBucket->state != tileData.getState()
                               || tileData.debugBucket->modified != tileData.modified
-                              || tileData.debugBucket->expires != tileData.expires) {
-        tileData.debugBucket = std::make_unique<DebugBucket>(tileData.id, tileData.getState(), tileData.modified, tileData.expires);
+                              || tileData.debugBucket->expires != tileData.expires
+                              || tileData.debugBucket->debugMode != data.getDebug()) {
+        tileData.debugBucket = std::make_unique<DebugBucket>(tileData.id, tileData.getState(), tileData.modified, tileData.expires, data.getDebug());
     }
 
     config.program = plainShader->program;

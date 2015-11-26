@@ -747,7 +747,7 @@ std::chrono::steady_clock::duration durationInSeconds(float duration)
         self.glSnapshotView.image = self.glView.snapshot;
         self.glSnapshotView.hidden = NO;
 
-        if (_mbglMap->getDebug() && [self.glSnapshotView.subviews count] == 0)
+        if (_mbglMap->getDebug() != mbgl::MapDebugOptions::NoDebug && [self.glSnapshotView.subviews count] == 0)
         {
             UIView *snapshotTint = [[UIView alloc] initWithFrame:self.glSnapshotView.bounds];
             snapshotTint.autoresizingMask = self.glSnapshotView.autoresizingMask;
@@ -1502,13 +1502,14 @@ std::chrono::steady_clock::duration durationInSeconds(float duration)
 
 - (void)setDebugActive:(BOOL)debugActive
 {
-    _mbglMap->setDebug(debugActive);
+    _mbglMap->setDebug(debugActive ? mbgl::MapDebugOptions::TileBorders | mbgl::MapDebugOptions::ParseStatus
+                                   : mbgl::MapDebugOptions::NoDebug);
     _mbglMap->setCollisionDebug(debugActive);
 }
 
 - (BOOL)isDebugActive
 {
-    return (_mbglMap->getDebug() || _mbglMap->getCollisionDebug());
+    return (_mbglMap->getDebug() != mbgl::MapDebugOptions::NoDebug || _mbglMap->getCollisionDebug());
 }
 
 - (void)resetNorth
@@ -1527,9 +1528,9 @@ std::chrono::steady_clock::duration durationInSeconds(float duration)
     _mbglMap->resetPosition();
 }
 
-- (void)toggleDebug
+- (void)cycleDebugOptions
 {
-    _mbglMap->toggleDebug();
+    _mbglMap->cycleDebugOptions();
     _mbglMap->toggleCollisionDebug();
 }
 

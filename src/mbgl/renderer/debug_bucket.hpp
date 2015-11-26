@@ -2,6 +2,7 @@
 #define MBGL_RENDERER_DEBUGBUCKET
 
 #include <mbgl/map/tile_data.hpp>
+#include <mbgl/map/mode.hpp>
 #include <mbgl/geometry/debug_font_buffer.hpp>
 #include <mbgl/geometry/vao.hpp>
 #include <mbgl/util/chrono.hpp>
@@ -12,7 +13,7 @@ class PlainShader;
 
 class DebugBucket : private util::noncopyable {
 public:
-    DebugBucket(TileID id, TileData::State, Seconds modified, Seconds expires);
+    DebugBucket(TileID id, TileData::State, Seconds modified, Seconds expires, MapDebugOptions);
 
     void drawLines(PlainShader& shader);
     void drawPoints(PlainShader& shader);
@@ -20,6 +21,7 @@ public:
     const TileData::State state;
     const Seconds modified;
     const Seconds expires;
+    const MapDebugOptions debugMode;
 
 private:
     DebugFontBuffer fontBuffer;

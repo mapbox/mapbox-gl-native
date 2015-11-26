@@ -405,8 +405,8 @@ IB_DESIGNABLE
 *   The default value of this property is `NO`. */
 @property (nonatomic, getter=isDebugActive) BOOL debugActive;
 
-/** Toggle the current value of debugActive. */
-- (void)toggleDebug;
+/** Cycle map debug options. */
+- (void)cycleDebugOptions;
 
 /** Empties the in-memory tile cache. */
 - (void)emptyMemoryCache;

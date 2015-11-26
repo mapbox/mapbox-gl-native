@@ -1,6 +1,8 @@
 #ifndef MBGL_JSON_SETTINGS
 #define MBGL_JSON_SETTINGS
 
+#include <mbgl/map/mode.hpp>
+
 namespace mbgl {
 
 class Settings_JSON {
@@ -17,7 +19,7 @@ public:
     double bearing = 0;
     double pitch = 0;
 
-    bool debug = false;
+    EnumType debug = 0;
 };
 
 }

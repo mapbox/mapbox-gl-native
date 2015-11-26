@@ -420,17 +420,17 @@ void Map::removeSprite(const std::string& name) {
 
 #pragma mark - Toggles
 
-void Map::setDebug(bool value) {
-    data->setDebug(value);
+void Map::setDebug(MapDebugOptions mode) {
+    data->setDebug(mode);
     update(Update::Repaint);
 }
 
-void Map::toggleDebug() {
-    data->toggleDebug();
+void Map::cycleDebugOptions() {
+    data->cycleDebugOptions();
     update(Update::Repaint);
 }
 
-bool Map::getDebug() const {
+MapDebugOptions Map::getDebug() const {
     return data->getDebug();
 }
 

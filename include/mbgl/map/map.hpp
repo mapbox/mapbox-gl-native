@@ -168,12 +168,13 @@ public:
     void onLowMemory();
 
     // Debug
-    void setDebug(bool value);
-    void toggleDebug();
-    bool getDebug() const;
+    void setDebug(MapDebugOptions);
+    void cycleDebugOptions();
+    MapDebugOptions getDebug() const;
     void setCollisionDebug(bool value);
     void toggleCollisionDebug();
     bool getCollisionDebug() const;
+
     bool isFullyLoaded() const;
     void dumpDebugLogs() const;
 

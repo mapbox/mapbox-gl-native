@@ -322,8 +322,8 @@ public class MainActivity extends AppCompatActivity {
                         switch (menuItem.getItemId()) {
 
                             case R.id.action_debug:
-                                // Toggle debug mode
-                                mMapView.toggleDebug();
+                                // Cycle map debug options
+                                mMapView.cycleDebugOptions();
                                 toggleFpsCounter(mMapView.isDebugActive());
                                 return true;
 

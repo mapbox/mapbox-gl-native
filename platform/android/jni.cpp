@@ -375,6 +375,7 @@ std::pair<mbgl::AnnotationSegment, mbgl::ShapeAnnotation::Properties> annotation
 namespace {
 
 using namespace mbgl::android;
+using DebugOptions = mbgl::MapDebugOptions;
 
 jlong JNICALL nativeCreate(JNIEnv *env, jobject obj, jstring cachePath_, jstring dataPath_, jstring apkPath_, jfloat pixelRatio, jint availableProcessors, jlong totalMemory) {
     mbgl::Log::Debug(mbgl::Event::JNI, "nativeCreate");
@@ -1293,7 +1294,10 @@ void JNICALL nativeSetDebug(JNIEnv *env, jobject obj, jlong nativeMapViewPtr, jb
     mbgl::Log::Debug(mbgl::Event::JNI, "nativeSetDebug");
     assert(nativeMapViewPtr != 0);
     NativeMapView *nativeMapView = reinterpret_cast<NativeMapView *>(nativeMapViewPtr);
-    nativeMapView->getMap().setDebug(debug);
+
+    DebugOptions debugOptions = debug ? DebugOptions::TileBorders | DebugOptions::ParseStatus
+                                      : DebugOptions::NoDebug;
+    nativeMapView->getMap().setDebug(debugOptions);
     nativeMapView->enableFps(debug);
 }
 
@@ -1301,15 +1305,15 @@ void JNICALL nativeToggleDebug(JNIEnv *env, jobject obj, jlong nativeMapViewPtr)
     mbgl::Log::Debug(mbgl::Event::JNI, "nativeToggleDebug");
     assert(nativeMapViewPtr != 0);
     NativeMapView *nativeMapView = reinterpret_cast<NativeMapView *>(nativeMapViewPtr);
-    nativeMapView->getMap().toggleDebug();
-    nativeMapView->enableFps(nativeMapView->getMap().getDebug());
+    nativeMapView->getMap().cycleDebugOptions();
+    nativeMapView->enableFps(nativeMapView->getMap().getDebug() != DebugOptions::NoDebug);
 }
 
 jboolean JNICALL nativeGetDebug(JNIEnv *env, jobject obj, jlong nativeMapViewPtr) {
     mbgl::Log::Debug(mbgl::Event::JNI, "nativeGetDebug");
     assert(nativeMapViewPtr != 0);
     NativeMapView *nativeMapView = reinterpret_cast<NativeMapView *>(nativeMapViewPtr);
-    return nativeMapView->getMap().getDebug();
+    return nativeMapView->getMap().getDebug() != DebugOptions::NoDebug;
 }
 
 void JNICALL nativeSetCollisionDebug(JNIEnv *env, jobject obj, jlong nativeMapViewPtr, jboolean debug) {

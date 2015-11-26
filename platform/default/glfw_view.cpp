@@ -102,7 +102,7 @@ GLFWView::GLFWView(bool fullscreen_, bool benchmark_)
     printf("- `Control` + mouse drag to rotate\n");
     printf("- `Shift` + mouse drag to tilt\n");
     printf("\n");
-    printf("- Press `Tab` to toggle debug information\n");
+    printf("- Press `Tab` to cycle through the map debug options\n");
     printf("- Press `Esc` to quit\n");
     printf("\n");
     printf("================================================================================\n");
@@ -127,7 +127,7 @@ void GLFWView::onKey(GLFWwindow *window, int key, int /*scancode*/, int action, 
             glfwSetWindowShouldClose(window, true);
             break;
         case GLFW_KEY_TAB:
-            view->map->toggleDebug();
+            view->map->cycleDebugOptions();
             break;
         case GLFW_KEY_C:
             view->map->toggleCollisionDebug();

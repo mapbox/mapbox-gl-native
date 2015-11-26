@@ -49,14 +49,23 @@ public:
     std::vector<std::string> getClasses() const;
 
 
-    inline bool getDebug() const {
-        return debug;
+    inline MapDebugOptions getDebug() const {
+        return debugOptions;
     }
-    inline bool toggleDebug() {
-        return debug ^= 1u;
+
+    inline void cycleDebugOptions() {
+        if (debugOptions & MapDebugOptions::Timestamps)
+            debugOptions = MapDebugOptions::NoDebug;
+        else if (debugOptions & MapDebugOptions::ParseStatus)
+            debugOptions = debugOptions | MapDebugOptions::Timestamps;
+        else if (debugOptions & MapDebugOptions::TileBorders)
+            debugOptions = debugOptions | MapDebugOptions::ParseStatus;
+        else
+            debugOptions = MapDebugOptions::TileBorders;
     }
-    inline void setDebug(bool value) {
-        debug = value;
+
+    inline void setDebug(MapDebugOptions debugOptions_) {
+        debugOptions = debugOptions_;
     }
 
     inline bool getCollisionDebug() const {
@@ -136,7 +145,7 @@ private:
     mutable std::mutex mtx;
 
     std::vector<std::string> classes;
-    std::atomic<uint8_t> debug { false };
+    std::atomic<MapDebugOptions> debugOptions { MapDebugOptions::NoDebug };
     std::atomic<uint8_t> collisionDebug { false };
     std::atomic<Duration> animationTime;
     std::atomic<Duration> defaultFadeDuration;

@@ -5,7 +5,9 @@
 
 namespace mbgl {
 
-enum class MapMode : uint8_t {
+using EnumType = uint32_t;
+
+enum class MapMode : EnumType {
     Continuous, // continually updating map
     Still, // a once-off still image
 };
@@ -14,17 +16,37 @@ enum class MapMode : uint8_t {
 // being shared. In a shared GL context case, we need to make sure that the
 // correct GL configurations are in use - they might have changed between render
 // calls.
-enum class GLContextMode : uint8_t {
+enum class GLContextMode : EnumType {
     Unique,
     Shared,
 };
 
 // We can choose to constrain the map both horizontally or vertically, or only
 // vertically e.g. while panning.
-enum class ConstrainMode : uint8_t {
+enum class ConstrainMode : EnumType {
     HeightOnly,
     WidthAndHeight,
 };
+
+enum class MapDebugOptions : EnumType {
+    NoDebug     = 0,
+    TileBorders = 1 << 1,
+    ParseStatus = 1 << 2,
+    Timestamps  = 1 << 3,
+};
+
+inline MapDebugOptions operator| (const MapDebugOptions& lhs, const MapDebugOptions& rhs) {
+    return MapDebugOptions(static_cast<EnumType>(lhs) | static_cast<EnumType>(rhs));
+}
+
+inline MapDebugOptions& operator|=(MapDebugOptions& lhs, const MapDebugOptions& rhs) {
+    lhs = lhs | rhs;
+    return lhs;
+}
+
+inline bool operator& (const MapDebugOptions& lhs, const MapDebugOptions& rhs) {
+    return static_cast<EnumType>(lhs) & static_cast<EnumType>(rhs);
+}
 
 } // namespace mbgl
 

@@ -99,7 +99,7 @@ int main(int argc, char *argv[]) {
     map.setBearing(bearing);
 
     if (debug) {
-        map.setDebug(debug);
+        map.setDebug(debug ? mbgl::MapDebugOptions::TileBorders | mbgl::MapDebugOptions::ParseStatus : mbgl::MapDebugOptions::NoDebug);
     }
 
     uv_async_t *async = new uv_async_t;

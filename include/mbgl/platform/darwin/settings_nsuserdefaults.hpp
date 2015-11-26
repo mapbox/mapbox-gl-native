@@ -22,7 +22,7 @@ public:
     MGLUserTrackingMode userTrackingMode = MGLUserTrackingModeNone;
     bool showsUserLocation = false;
 
-    bool debug = false;
+    uint32_t debug = 0;
 };
 
 }
