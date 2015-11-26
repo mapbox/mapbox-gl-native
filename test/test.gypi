@@ -45,6 +45,7 @@
         'api/set_style.cpp',
 
 
+        'miscellaneous/async_task.cpp',
         'miscellaneous/clip_ids.cpp',
         'miscellaneous/binpack.cpp',
         'miscellaneous/bilinear.cpp',
