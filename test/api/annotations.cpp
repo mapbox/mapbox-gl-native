@@ -14,6 +14,18 @@
 
 using namespace mbgl;
 
+namespace {
+
+std::string getFileSourceRoot() {
+#ifdef MBGL_ASSET_ZIP
+    return "test/fixtures/annotations/assets.zip";
+#else
+    return "";
+#endif
+}
+
+}
+
 std::shared_ptr<SpriteImage> defaultMarker() {
     PremultipliedImage image = decodeImage(util::read_file("test/fixtures/sprites/default_marker.png"));
     return std::make_shared<SpriteImage>(image.width, image.height, 1.0, std::string(reinterpret_cast<char*>(image.data.get()), image.size()));
@@ -36,7 +48,7 @@ void checkRendering(Map& map, const char * name) {
 TEST(Annotations, PointAnnotation) {
     auto display = std::make_shared<mbgl::HeadlessDisplay>();
     HeadlessView view(display, 1);
-    DefaultFileSource fileSource(nullptr);
+    DefaultFileSource fileSource(nullptr, getFileSourceRoot());
 
     Map map(view, fileSource, MapMode::Still);
     map.setStyleJSON(util::read_file("test/fixtures/api/empty.json"), "");
@@ -49,7 +61,7 @@ TEST(Annotations, PointAnnotation) {
 TEST(Annotations, LineAnnotation) {
     auto display = std::make_shared<mbgl::HeadlessDisplay>();
     HeadlessView view(display, 1);
-    DefaultFileSource fileSource(nullptr);
+    DefaultFileSource fileSource(nullptr, getFileSourceRoot());
 
     Map map(view, fileSource, MapMode::Still);
     map.setStyleJSON(util::read_file("test/fixtures/api/empty.json"), "");
@@ -68,7 +80,7 @@ TEST(Annotations, LineAnnotation) {
 TEST(Annotations, FillAnnotation) {
     auto display = std::make_shared<mbgl::HeadlessDisplay>();
     HeadlessView view(display, 1);
-    DefaultFileSource fileSource(nullptr);
+    DefaultFileSource fileSource(nullptr, getFileSourceRoot());
 
     Map map(view, fileSource, MapMode::Still);
     map.setStyleJSON(util::read_file("test/fixtures/api/empty.json"), "");
@@ -86,7 +98,7 @@ TEST(Annotations, FillAnnotation) {
 TEST(Annotations, StyleSourcedShapeAnnotation) {
     auto display = std::make_shared<mbgl::HeadlessDisplay>();
     HeadlessView view(display, 1);
-    DefaultFileSource fileSource(nullptr);
+    DefaultFileSource fileSource(nullptr, getFileSourceRoot());
 
     Map map(view, fileSource, MapMode::Still);
     map.setStyleJSON(util::read_file("test/fixtures/api/annotation.json"), "");
@@ -101,7 +113,7 @@ TEST(Annotations, StyleSourcedShapeAnnotation) {
 TEST(Annotations, AddMultiple) {
     auto display = std::make_shared<mbgl::HeadlessDisplay>();
     HeadlessView view(display, 1);
-    DefaultFileSource fileSource(nullptr);
+    DefaultFileSource fileSource(nullptr, getFileSourceRoot());
 
     Map map(view, fileSource, MapMode::Still);
     map.setStyleJSON(util::read_file("test/fixtures/api/empty.json"), "");
@@ -118,7 +130,7 @@ TEST(Annotations, AddMultiple) {
 TEST(Annotations, NonImmediateAdd) {
     auto display = std::make_shared<mbgl::HeadlessDisplay>();
     HeadlessView view(display, 1);
-    DefaultFileSource fileSource(nullptr);
+    DefaultFileSource fileSource(nullptr, getFileSourceRoot());
 
     Map map(view, fileSource, MapMode::Still);
     map.setStyleJSON(util::read_file("test/fixtures/api/empty.json"), "");
@@ -138,7 +150,7 @@ TEST(Annotations, NonImmediateAdd) {
 TEST(Annotations, RemovePoint) {
     auto display = std::make_shared<mbgl::HeadlessDisplay>();
     HeadlessView view(display, 1);
-    DefaultFileSource fileSource(nullptr);
+    DefaultFileSource fileSource(nullptr, getFileSourceRoot());
 
     Map map(view, fileSource, MapMode::Still);
     map.setStyleJSON(util::read_file("test/fixtures/api/empty.json"), "");
@@ -155,7 +167,7 @@ TEST(Annotations, RemovePoint) {
 TEST(Annotations, RemoveShape) {
     auto display = std::make_shared<mbgl::HeadlessDisplay>();
     HeadlessView view(display, 1);
-    DefaultFileSource fileSource(nullptr);
+    DefaultFileSource fileSource(nullptr, getFileSourceRoot());
 
     AnnotationSegments segments = {{ {{ { 0, 0 }, { 45, 45 } }} }};
 
@@ -177,7 +189,7 @@ TEST(Annotations, RemoveShape) {
 TEST(Annotations, ImmediateRemoveShape) {
     auto display = std::make_shared<mbgl::HeadlessDisplay>();
     HeadlessView view(display, 1);
-    DefaultFileSource fileSource(nullptr);
+    DefaultFileSource fileSource(nullptr, getFileSourceRoot());
     Map map(view, fileSource, MapMode::Still);
 
     map.removeAnnotation(map.addShapeAnnotation(ShapeAnnotation({}, {})));
@@ -189,7 +201,7 @@ TEST(Annotations, ImmediateRemoveShape) {
 TEST(Annotations, SwitchStyle) {
     auto display = std::make_shared<mbgl::HeadlessDisplay>();
     HeadlessView view(display, 1);
-    DefaultFileSource fileSource(nullptr);
+    DefaultFileSource fileSource(nullptr, getFileSourceRoot());
 
     Map map(view, fileSource, MapMode::Still);
     map.setStyleJSON(util::read_file("test/fixtures/api/empty.json"), "");

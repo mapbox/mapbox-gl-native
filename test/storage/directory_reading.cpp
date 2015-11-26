@@ -27,7 +27,7 @@ TEST_F(Storage, AssetReadDirectory) {
         EXPECT_EQ(Seconds::zero(), res.modified);
         EXPECT_EQ("", res.etag);
 #ifdef MBGL_ASSET_ZIP
-        EXPECT_EQ("No such file", res.error->message);
+        EXPECT_EQ("Could not stat file in zip archive", res.error->message);
 #elif MBGL_ASSET_FS
         EXPECT_EQ("Is a directory", res.error->message);
 #endif

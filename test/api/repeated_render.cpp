@@ -17,7 +17,11 @@ TEST(API, RepeatedRender) {
 
     auto display = std::make_shared<mbgl::HeadlessDisplay>();
     HeadlessView view(display, 1, 256, 512);
+#ifdef MBGL_ASSET_ZIP
+    DefaultFileSource fileSource(nullptr, "test/fixtures/api/assets.zip");
+#else
     DefaultFileSource fileSource(nullptr);
+#endif
 
     Log::setObserver(std::make_unique<FixtureLogObserver>());
 
