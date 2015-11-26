@@ -61,6 +61,7 @@
         'miscellaneous/style_parser.cpp',
         'miscellaneous/text_conversions.cpp',
         'miscellaneous/thread.cpp',
+        'miscellaneous/thread_local.cpp',
         'miscellaneous/tile.cpp',
         'miscellaneous/timer.cpp',
         'miscellaneous/token.cpp',
