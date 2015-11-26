@@ -2377,13 +2377,12 @@ public final class MapView extends FrameLayout {
 
             switch (e.getAction()) {
                 case MotionEvent.ACTION_DOWN:
-                    mQuickZoom = false;
                     break;
                 case MotionEvent.ACTION_MOVE:
-                    mQuickZoom = true;
                     break;
                 case MotionEvent.ACTION_UP:
                     if (mQuickZoom) {
+                        mQuickZoom = false;
                         break;
                     }
 
@@ -2499,7 +2498,7 @@ public final class MapView extends FrameLayout {
         // Called for a long press
         @Override
         public void onLongPress(MotionEvent e) {
-            if (mOnMapLongClickListener != null) {
+            if (mOnMapLongClickListener != null && !mQuickZoom) {
                 LatLng point = fromScreenLocation(new PointF(e.getX(), e.getY()));
                 mOnMapLongClickListener.onMapLongClick(point);
             }
@@ -2556,7 +2555,7 @@ public final class MapView extends FrameLayout {
         }
     }
 
-    // This class handles two finger gestures
+    // This class handles two finger gestures and double-tap drag gestures
     private class ScaleGestureListener extends ScaleGestureDetector.SimpleOnScaleGestureListener {
 
         long mBeginTime = 0;
@@ -2581,8 +2580,8 @@ public final class MapView extends FrameLayout {
             mZoomStarted = false;
         }
 
-        // Called each time one of the two fingers moves
-        // Called for pinch zooms
+        // Called each time a finger moves
+        // Called for pinch zooms and quickzooms/quickscales
         @Override
         public boolean onScale(ScaleGestureDetector detector) {
             if (!mZoomEnabled) {
@@ -2609,6 +2608,9 @@ public final class MapView extends FrameLayout {
 
             // Cancel any animation
             mNativeMapView.cancelTransitions();
+
+            // Gesture is a quickzoom if there aren't two fingers
+            mQuickZoom = !mTwoTap;
 
             // Scale the map
             if (!mQuickZoom && mUserLocationView.getMyLocationTrackingMode() == MyLocationTracking.TRACKING_NONE) {
