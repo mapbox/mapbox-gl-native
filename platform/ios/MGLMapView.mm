@@ -383,6 +383,11 @@ std::chrono::steady_clock::duration durationInSeconds(float duration)
     }];
 }
 
+- (void)featuresAt:(CGPoint)point
+{
+    _mbglMap->featuresAt(mbgl::PrecisionPoint(point.x, point.y));
+}
+
 - (void)createGLView
 {
     if (_context) return;

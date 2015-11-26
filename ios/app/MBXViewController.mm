@@ -296,13 +296,15 @@ static UIColor *const kTintColor = [UIColor colorWithRed:0.120 green:0.550 blue:
 {
     if (longPress.state == UIGestureRecognizerStateBegan)
     {
-        MGLPointAnnotation *point = [MGLPointAnnotation new];
-        point.coordinate = [self.mapView convertPoint:[longPress locationInView:longPress.view]
-                                 toCoordinateFromView:self.mapView];
-        point.title = @"Dropped Marker";
-        point.subtitle = [NSString stringWithFormat:@"lat: %.3f, lon: %.3f", point.coordinate.latitude, point.coordinate.longitude];
-        [self.mapView addAnnotation:point];
-        [self.mapView selectAnnotation:point animated:YES];
+//        MGLPointAnnotation *point = [MGLPointAnnotation new];
+//        point.coordinate = [self.mapView convertPoint:[longPress locationInView:longPress.view]
+//                                 toCoordinateFromView:self.mapView];
+//        point.title = @"Dropped Marker";
+//        point.subtitle = [NSString stringWithFormat:@"lat: %.3f, lon: %.3f", point.coordinate.latitude, point.coordinate.longitude];
+//        [self.mapView addAnnotation:point];
+//        [self.mapView selectAnnotation:point animated:YES];
+
+        [self.mapView featuresAt:[longPress locationInView:longPress.view]];
     }
 }
 

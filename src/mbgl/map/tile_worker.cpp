@@ -147,7 +147,7 @@ void TileWorker::parseLayer(const StyleLayer& layer, const GeometryTile& geometr
         //
         // also, we don't get here for raster buckets, since they don't have layers
 
-        if (!partialParse && layer.id.substr(0, 3) == "poi" && bucket->hasData()) {
+        if (!partialParse && /*layer.id.substr(0, 3) == "poi" &&*/ bucket->hasData()) {
             result.featureTree.clear();
             for (std::size_t i = 0; i < geometryLayer->featureCount(); i++) {
                 const auto feature = geometryLayer->getFeature(i);
@@ -178,12 +178,12 @@ void TileWorker::parseLayer(const StyleLayer& layer, const GeometryTile& geometr
                         }
                         name = layer.id + " - " + name;
                         result.featureTree.insert(std::make_pair(featureBox, layer.id + name));
-//                        printf("added %s\n", name.c_str());
+                        printf("added %s\n", name.c_str());
                     }
                 }
             }
             if (result.featureTree.size()) {
-//                printf("feature tree for %i,%i,%i [%s] has %lu members\n", id.z, id.x, id.y, layer.id.c_str(), result.featureTree.size());
+                printf("feature tree for %i,%i,%i [%s] has %lu members\n", id.z, id.x, id.y, layer.id.c_str(), result.featureTree.size());
             }
         }
 

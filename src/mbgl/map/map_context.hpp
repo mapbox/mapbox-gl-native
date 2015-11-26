@@ -8,6 +8,7 @@
 #include <mbgl/style/style.hpp>
 #include <mbgl/util/gl_object_store.hpp>
 #include <mbgl/util/ptr.hpp>
+#include <mbgl/util/geo.hpp>
 
 #include <vector>
 
@@ -50,6 +51,8 @@ public:
 
     double getTopOffsetPixelsForAnnotationSymbol(const std::string& symbol);
     void updateAnnotations();
+
+    std::vector<std::string> featuresAt(const PrecisionPoint) const;
 
     void setSourceTileCacheSize(size_t size);
     void onLowMemory();

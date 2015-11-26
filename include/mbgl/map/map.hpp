@@ -159,6 +159,9 @@ public:
     LatLngBounds getBoundsForAnnotations(const AnnotationIDs&);
     double getTopOffsetPixelsForAnnotationSymbol(const std::string&);
 
+    // Features
+    std::vector<std::string> featuresAt(const PrecisionPoint) const;
+
     // Sprites
     void setSprite(const std::string&, std::shared_ptr<const SpriteImage>);
     void removeSprite(const std::string&);

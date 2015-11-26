@@ -407,6 +407,13 @@ LatLngBounds Map::getBoundsForAnnotations(const AnnotationIDs& annotations) {
 }
 
 
+#pragma mark - Features
+
+std::vector<std::string> Map::featuresAt(const PrecisionPoint point) const {
+    return context->invokeSync<std::vector<std::string>>(&MapContext::featuresAt, point);
+}
+
+
 #pragma mark - Sprites
 
 void Map::setSprite(const std::string& name, std::shared_ptr<const SpriteImage> sprite) {

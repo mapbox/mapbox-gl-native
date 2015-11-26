@@ -72,6 +72,9 @@ VectorTileData::VectorTileData(const TileID& id_,
                 // existing buckets in case we got a refresh parse.
                 buckets = std::move(resultBuckets.buckets);
 
+//                featureTree.clear();
+                featureTree.insert(resultBuckets.featureTree.begin(), resultBuckets.featureTree.end());
+
                 // The target configuration could have changed since we started placement. In this case,
                 // we're starting another placement run.
                 if (placedConfig != targetConfig) {
