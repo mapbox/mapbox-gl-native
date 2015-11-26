@@ -147,7 +147,7 @@ void TileWorker::parseLayer(const StyleLayer& layer, const GeometryTile& geometr
         //
         // also, we don't get here for raster buckets, since they don't have layers
 
-        if (!partialParse && /*layer.id.substr(0, 3) == "poi" &&*/ bucket->hasData()) {
+        if (!partialParse && /*layer.interactive && layer.id.substr(0, 3) == "poi" &&*/ bucket->hasData()) {
             result.featureTree.clear();
             for (std::size_t i = 0; i < geometryLayer->featureCount(); i++) {
                 const auto feature = geometryLayer->getFeature(i);
