@@ -351,7 +351,7 @@ const NSTimeInterval MGLFlushInterval = 60;
 
 - (void)validateUpdatingLocation {
     MGLAssertIsMainThread();
-    if (self.paused) {
+    if (self.paused || UIApplication.sharedApplication.applicationState == UIApplicationStateBackground) {
         [self stopUpdatingLocation];
     } else {
         CLAuthorizationStatus authStatus = [CLLocationManager authorizationStatus];
