@@ -173,7 +173,7 @@ void TileWorker::parseLayer(const StyleLayer& layer, const GeometryTile& geometr
                         }
                         std::string name = "(unknown)";
                         const auto maybe_name = feature->getValue("name_en");
-                        if (maybe_name.get().is<std::string>()) {
+                        if (maybe_name && maybe_name.get().is<std::string>()) {
                             name = maybe_name.get().get<std::string>();
                         }
                         name = layer.id + " - " + name;
