@@ -10,7 +10,6 @@
 namespace mbgl {
 
 class TileData;
-struct box;
 
 class Tile : private util::noncopyable {
 public:
