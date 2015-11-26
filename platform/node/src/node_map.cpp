@@ -405,8 +405,8 @@ void NodeMap::release() {
 
     valid = false;
 
-    uv_close(reinterpret_cast<uv_handle_t *>(async), [] (uv_handle_t *handle) {
-        delete reinterpret_cast<uv_async_t *>(handle);
+    uv_close(reinterpret_cast<uv_handle_t *>(async), [] (uv_handle_t *h) {
+        delete reinterpret_cast<uv_async_t *>(h);
     });
 
     map.reset(nullptr);
@@ -433,8 +433,8 @@ NodeMap::NodeMap(v8::Local<v8::Object> options) :
     async(new uv_async_t) {
 
     async->data = this;
-    uv_async_init(uv_default_loop(), async, [](UV_ASYNC_PARAMS(handle)) {
-        reinterpret_cast<NodeMap *>(handle->data)->renderFinished();
+    uv_async_init(uv_default_loop(), async, [](UV_ASYNC_PARAMS(h)) {
+        reinterpret_cast<NodeMap *>(h->data)->renderFinished();
     });
 
     // Make sure the async handle doesn't keep the loop alive.
