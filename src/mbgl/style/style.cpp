@@ -44,7 +44,7 @@ void Style::setJSON(const std::string& json, const std::string&) {
         return;
     }
 
-    StyleParser parser;
+    StyleParser parser(data);
     parser.parse(doc);
 
     for (auto& source : parser.getSources()) {
@@ -106,7 +106,7 @@ void Style::update(const TransformState& transform,
                    TexturePool& texturePool) {
     bool allTilesUpdated = true;
     for (const auto& source : sources) {
-        if (!source->update(data, transform, *this, texturePool, shouldReparsePartialTiles)) {
+        if (!source->update(transform, *this, texturePool, shouldReparsePartialTiles)) {
             allTilesUpdated = false;
         }
     }

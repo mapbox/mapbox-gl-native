@@ -24,6 +24,7 @@ public:
         : mode(mode_)
         , contextMode(contextMode_)
         , pixelRatio(pixelRatio_)
+        , annotationManager(*this)
         , animationTime(Duration::zero())
         , defaultFadeDuration(mode_ == MapMode::Continuous ? std::chrono::milliseconds(300) : Duration::zero())
         , defaultTransitionDuration(Duration::zero())

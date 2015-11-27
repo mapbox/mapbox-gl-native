@@ -1,5 +1,6 @@
 #include "../fixtures/util.hpp"
 
+#include <mbgl/map/map_data.hpp>
 #include <mbgl/style/style_parser.hpp>
 #include <mbgl/util/io.hpp>
 
@@ -35,7 +36,9 @@ TEST_P(StyleParserTest, ParseStyle) {
     FixtureLogObserver* observer = new FixtureLogObserver();
     Log::setObserver(std::unique_ptr<Log::Observer>(observer));
 
-    StyleParser parser;
+    double fakePixelRatio = 1.0;
+    MapData data(MapMode::Continuous, GLContextMode::Unique, fakePixelRatio);
+    StyleParser parser(data);
     parser.parse(styleDoc);
 
     for (auto it = infoDoc.MemberBegin(), end = infoDoc.MemberEnd(); it != end; it++) {

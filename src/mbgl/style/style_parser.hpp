@@ -14,6 +14,7 @@
 
 namespace mbgl {
 
+class MapData;
 class StyleLayer;
 class Source;
 
@@ -21,6 +22,8 @@ using JSVal = rapidjson::Value;
 
 class StyleParser {
 public:
+    StyleParser(MapData&);
+
     void parse(const JSVal&);
 
     std::vector<std::unique_ptr<Source>>&& getSources() {
@@ -44,6 +47,8 @@ private:
     void parseLayers(const JSVal&);
     void parseLayer(const std::string& id, const JSVal&, util::ptr<StyleLayer>&);
     void parseVisibility(StyleLayer&, const JSVal& value);
+
+    MapData& data;
 
     std::uint8_t version;
 

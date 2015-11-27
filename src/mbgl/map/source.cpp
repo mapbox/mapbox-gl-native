@@ -119,7 +119,7 @@ std::string SourceInfo::tileURL(const TileID& id, float pixelRatio) const {
     return result;
 }
 
-Source::Source() {}
+Source::Source(MapData& data_) : data(data_) {}
 
 Source::~Source() = default;
 
@@ -231,23 +231,22 @@ TileData::State Source::hasTile(const TileID& id) {
 bool Source::handlePartialTile(const TileID& id, Worker&) {
     const TileID normalized_id = id.normalized();
 
-    auto it = tile_data.find(normalized_id);
-    if (it == tile_data.end()) {
+    auto it = tileDataMap.find(normalized_id);
+    if (it == tileDataMap.end()) {
         return true;
     }
 
-    auto data = it->second.lock();
-    if (!data) {
+    auto tileData = it->second.lock();
+    if (!tileData) {
         return true;
     }
 
-    return data->parsePending([this]() {
+    return tileData->parsePending([this]() {
         emitTileLoaded(false);
     });
 }
 
-TileData::State Source::addTile(MapData& data,
-                                const TransformState& transformState,
+TileData::State Source::addTile(const TransformState& transformState,
                                 Style& style,
                                 TexturePool& texturePool,
                                 const TileID& id) {
@@ -265,8 +264,8 @@ TileData::State Source::addTile(MapData& data,
     // Try to find the associated TileData object.
     const TileID normalized_id = id.normalized();
 
-    auto it = tile_data.find(normalized_id);
-    if (it != tile_data.end()) {
+    auto it = tileDataMap.find(normalized_id);
+    if (it != tileDataMap.end()) {
         // Create a shared_ptr handle. Note that this might be empty!
         new_tile.data = it->second.lock();
     }
@@ -281,7 +280,7 @@ TileData::State Source::addTile(MapData& data,
     }
 
     if (!new_tile.data) {
-        auto callback = std::bind(&Source::tileLoadingCompleteCallback, this, normalized_id, transformState, data.getCollisionDebug());
+        auto callback = std::bind(&Source::tileLoadingCompleteCallback, this, normalized_id, transformState);
 
         // If we don't find working tile data, we're just going to load it.
         if (info.type == SourceType::Raster) {
@@ -310,7 +309,7 @@ TileData::State Source::addTile(MapData& data,
                                                              callback);
         }
 
-        tile_data.emplace(new_tile.data->id, new_tile.data);
+        tileDataMap.emplace(new_tile.data->id, new_tile.data);
     }
 
     return new_tile.data->getState();
@@ -408,8 +407,7 @@ void Source::findLoadedParent(const TileID& id, int32_t minCoveringZoom, std::fo
     }
 }
 
-bool Source::update(MapData& data,
-                    const TransformState& transformState,
+bool Source::update(const TransformState& transformState,
                     Style& style,
                     TexturePool& texturePool,
                     bool shouldReparsePartialTiles) {
@@ -449,7 +447,7 @@ bool Source::update(MapData& data,
             }
             break;
         case TileData::State::invalid:
-            state = addTile(data, transformState, style, texturePool, id);
+            state = addTile(transformState, style, texturePool, id);
             break;
         default:
             break;
@@ -500,7 +498,7 @@ bool Source::update(MapData& data,
     });
 
     // Remove all the expired pointers from the set.
-    util::erase_if(tile_data, [&retain_data, &tileCache](std::pair<const TileID, std::weak_ptr<TileData>> &pair) {
+    util::erase_if(tileDataMap, [&retain_data, &tileCache](std::pair<const TileID, std::weak_ptr<TileData>> &pair) {
         const util::ptr<TileData> tile = pair.second.lock();
         if (!tile) {
             return true;
@@ -548,23 +546,23 @@ void Source::setObserver(Observer* observer) {
     observer_ = observer;
 }
 
-void Source::tileLoadingCompleteCallback(const TileID& normalized_id, const TransformState& transformState, bool collisionDebug) {
-    auto it = tile_data.find(normalized_id);
-    if (it == tile_data.end()) {
+void Source::tileLoadingCompleteCallback(const TileID& normalized_id, const TransformState& transformState) {
+    auto it = tileDataMap.find(normalized_id);
+    if (it == tileDataMap.end()) {
         return;
     }
 
-    util::ptr<TileData> data = it->second.lock();
-    if (!data) {
+    util::ptr<TileData> tileData = it->second.lock();
+    if (!tileData) {
         return;
     }
 
-    if (data->getState() == TileData::State::obsolete && !data->getError().empty()) {
-        emitTileLoadingFailed(data->getError());
+    if (tileData->getState() == TileData::State::obsolete && !tileData->getError().empty()) {
+        emitTileLoadingFailed(tileData->getError());
         return;
     }
 
-    data->redoPlacement({ transformState.getAngle(), transformState.getPitch(), collisionDebug });
+    tileData->redoPlacement({ transformState.getAngle(), transformState.getPitch(), data.getCollisionDebug() });
     emitTileLoaded(true);
 }
 

@@ -13,6 +13,7 @@
 
 namespace mbgl {
 
+class MapData;
 class PointAnnotation;
 class ShapeAnnotation;
 class AnnotationTile;
@@ -21,7 +22,7 @@ class Style;
 
 class AnnotationManager : private util::noncopyable {
 public:
-    AnnotationManager();
+    AnnotationManager(MapData&);
     ~AnnotationManager();
 
     AnnotationIDs addPointAnnotations(const std::vector<PointAnnotation>&, const uint8_t maxZoom);
@@ -42,6 +43,7 @@ public:
 private:
     std::unique_ptr<AnnotationTile> getTile(const TileID&);
 
+    MapData& data;
     AnnotationID nextID = 0;
     PointAnnotationImpl::Tree pointTree;
     PointAnnotationImpl::Map pointAnnotations;
