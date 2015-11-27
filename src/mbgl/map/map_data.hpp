@@ -55,8 +55,10 @@ public:
     }
 
     inline void cycleDebugOptions() {
-        if (debugOptions & MapDebugOptions::Timestamps)
+        if (debugOptions & MapDebugOptions::Collision)
             debugOptions = MapDebugOptions::NoDebug;
+        else if (debugOptions & MapDebugOptions::Timestamps)
+            debugOptions = debugOptions | MapDebugOptions::Collision;
         else if (debugOptions & MapDebugOptions::ParseStatus)
             debugOptions = debugOptions | MapDebugOptions::Timestamps;
         else if (debugOptions & MapDebugOptions::TileBorders)
@@ -67,16 +69,6 @@ public:
 
     inline void setDebug(MapDebugOptions debugOptions_) {
         debugOptions = debugOptions_;
-    }
-
-    inline bool getCollisionDebug() const {
-        return collisionDebug;
-    }
-    inline bool toggleCollisionDebug() {
-        return collisionDebug ^= 1u;
-    }
-    inline void setCollisionDebug(bool value) {
-        collisionDebug = value;
     }
 
     inline TimePoint getAnimationTime() const {
@@ -147,7 +139,6 @@ private:
 
     std::vector<std::string> classes;
     std::atomic<MapDebugOptions> debugOptions { MapDebugOptions::NoDebug };
-    std::atomic<uint8_t> collisionDebug { false };
     std::atomic<Duration> animationTime;
     std::atomic<Duration> defaultFadeDuration;
     std::atomic<Duration> defaultTransitionDuration;

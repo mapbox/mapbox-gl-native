@@ -519,7 +519,7 @@ bool Source::update(const TransformState& transformState,
 
     for (auto& tilePtr : tilePtrs) {
         tilePtr->data->redoPlacement(
-            { transformState.getAngle(), transformState.getPitch(), data.getCollisionDebug() });
+            { transformState.getAngle(), transformState.getPitch(), data.getDebug() & MapDebugOptions::Collision });
     }
 
     updated = data.getAnimationTime();
@@ -562,7 +562,7 @@ void Source::tileLoadingCompleteCallback(const TileID& normalized_id, const Tran
         return;
     }
 
-    tileData->redoPlacement({ transformState.getAngle(), transformState.getPitch(), data.getCollisionDebug() });
+    tileData->redoPlacement({ transformState.getAngle(), transformState.getPitch(), data.getDebug() & MapDebugOptions::Collision});
     emitTileLoaded(true);
 }
 

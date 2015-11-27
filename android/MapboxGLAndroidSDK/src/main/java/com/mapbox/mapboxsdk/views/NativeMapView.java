@@ -409,18 +409,6 @@ final class NativeMapView {
         return nativeGetDebug(mNativeMapViewPtr);
     }
 
-    public void setCollisionDebug(boolean debug) {
-        nativeSetCollisionDebug(mNativeMapViewPtr, debug);
-    }
-
-    public void toggleCollisionDebug() {
-        nativeToggleCollisionDebug(mNativeMapViewPtr);
-    }
-
-    public boolean getCollisionDebug() {
-        return nativeGetCollisionDebug(mNativeMapViewPtr);
-    }
-
     public boolean isFullyLoaded() {
         return nativeIsFullyLoaded(mNativeMapViewPtr);
     }
@@ -613,12 +601,6 @@ final class NativeMapView {
     private native void nativeToggleDebug(long nativeMapViewPtr);
 
     private native boolean nativeGetDebug(long nativeMapViewPtr);
-
-    private native void nativeSetCollisionDebug(long nativeMapViewPtr, boolean debug);
-
-    private native void nativeToggleCollisionDebug(long nativeMapViewPtr);
-
-    private native boolean nativeGetCollisionDebug(long nativeMapViewPtr);
 
     private native boolean nativeIsFullyLoaded(long nativeMapViewPtr);
 

@@ -434,20 +434,6 @@ MapDebugOptions Map::getDebug() const {
     return data->getDebug();
 }
 
-void Map::setCollisionDebug(bool value) {
-    data->setCollisionDebug(value);
-    update(Update::Repaint);
-}
-
-void Map::toggleCollisionDebug() {
-    data->toggleCollisionDebug();
-    update(Update::Repaint);
-}
-
-bool Map::getCollisionDebug() const {
-    return data->getCollisionDebug();
-}
-
 bool Map::isFullyLoaded() const {
     return context->invokeSync<bool>(&MapContext::isLoaded);
 }

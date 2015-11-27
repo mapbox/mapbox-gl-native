@@ -33,6 +33,7 @@ enum class MapDebugOptions : EnumType {
     TileBorders = 1 << 1,
     ParseStatus = 1 << 2,
     Timestamps  = 1 << 3,
+    Collision   = 1 << 4,
 };
 
 inline MapDebugOptions operator| (const MapDebugOptions& lhs, const MapDebugOptions& rhs) {

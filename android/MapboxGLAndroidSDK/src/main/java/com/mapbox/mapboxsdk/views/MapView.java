@@ -1306,7 +1306,7 @@ public final class MapView extends FrameLayout {
      */
     @UiThread
     public boolean isDebugActive() {
-        return mNativeMapView.getDebug() || mNativeMapView.getCollisionDebug();
+        return mNativeMapView.getDebug();
     }
 
     /**
@@ -1319,20 +1319,19 @@ public final class MapView extends FrameLayout {
     @UiThread
     public void setDebugActive(boolean debugActive) {
         mNativeMapView.setDebug(debugActive);
-        mNativeMapView.setCollisionDebug(debugActive);
     }
 
     /**
-     * Toggles whether the map debug information is shown.
+     * Cycles through the map debug options.
      * <p/>
-     * The value of {@link MapView#isDebugActive()} is toggled.
+     * The value of {@link MapView#isDebugActive()} reflects whether there are
+     * any map debug options enabled or disabled.
      *
      * @see MapView#isDebugActive()
      */
     @UiThread
     public void cycleDebugOptions() {
         mNativeMapView.cycleDebugOptions();
-        mNativeMapView.toggleCollisionDebug();
     }
 
     // True if map has finished loading the view

@@ -12,6 +12,7 @@
 #include <mbgl/annotation/shape_annotation.hpp>
 #include <mbgl/sprite/sprite_image.hpp>
 #include <mbgl/map/camera.hpp>
+#include <mbgl/map/mode.hpp>
 #include <mbgl/platform/platform.hpp>
 #include <mbgl/platform/darwin/reachability.h>
 #include <mbgl/storage/sqlite_cache.hpp>
@@ -1502,14 +1503,15 @@ std::chrono::steady_clock::duration durationInSeconds(float duration)
 
 - (void)setDebugActive:(BOOL)debugActive
 {
-    _mbglMap->setDebug(debugActive ? mbgl::MapDebugOptions::TileBorders | mbgl::MapDebugOptions::ParseStatus
+    _mbglMap->setDebug(debugActive ? mbgl::MapDebugOptions::TileBorders
+                                   | mbgl::MapDebugOptions::ParseStatus
+                                   | mbgl::MapDebugOptions::Collision
                                    : mbgl::MapDebugOptions::NoDebug);
-    _mbglMap->setCollisionDebug(debugActive);
 }
 
 - (BOOL)isDebugActive
 {
-    return (_mbglMap->getDebug() != mbgl::MapDebugOptions::NoDebug || _mbglMap->getCollisionDebug());
+    return (_mbglMap->getDebug() != mbgl::MapDebugOptions::NoDebug);
 }
 
 - (void)resetNorth
@@ -1531,7 +1533,6 @@ std::chrono::steady_clock::duration durationInSeconds(float duration)
 - (void)cycleDebugOptions
 {
     _mbglMap->cycleDebugOptions();
-    _mbglMap->toggleCollisionDebug();
 }
 
 - (void)emptyMemoryCache

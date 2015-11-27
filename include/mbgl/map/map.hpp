@@ -171,9 +171,6 @@ public:
     void setDebug(MapDebugOptions);
     void cycleDebugOptions();
     MapDebugOptions getDebug() const;
-    void setCollisionDebug(bool value);
-    void toggleCollisionDebug();
-    bool getCollisionDebug() const;
 
     bool isFullyLoaded() const;
     void dumpDebugLogs() const;
