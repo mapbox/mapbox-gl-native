@@ -2,6 +2,8 @@
 #define MBGL_COMMON_GLFW_VIEW
 
 #include <mbgl/mbgl.hpp>
+#include <mbgl/util/run_loop.hpp>
+#include <mbgl/util/timer.hpp>
 
 #ifdef MBGL_USE_GLES2
 #define GLFW_INCLUDE_ES2
@@ -91,6 +93,9 @@ private:
     double lastClick = -1;
 
     std::function<void()> changeStyleCallback;
+
+    mbgl::util::RunLoop runLoop;
+    mbgl::util::Timer frameTick;
 
     GLFWwindow *window = nullptr;
     std::atomic_flag clean = ATOMIC_FLAG_INIT;
