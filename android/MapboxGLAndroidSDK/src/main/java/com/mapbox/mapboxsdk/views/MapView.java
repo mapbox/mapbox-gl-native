@@ -90,7 +90,7 @@ import java.util.List;
  * and style the features of the map to fit your application's use case.
  * <p/>
  * Use of {@code MapView} requires a Mapbox API access token.
- * Obtain an access token on the <a href="https://www.mapbox.com/account/apps/">Mapbox account page</a>.
+ * Obtain an access token on the <a href="https://www.mapbox.com/studio/account/tokens/">Mapbox account page</a>.
  * <p/>
  * <strong>Warning:</strong> Please note that you are responsible for getting permission to use the map data,
  * and for ensuring your use adheres to the relevant terms of use.
