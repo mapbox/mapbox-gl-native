@@ -22,9 +22,10 @@ default: ; @printf "You must specify a valid target\n"
 #### OS X targets ##############################################################
 
 ifeq ($(BUILD),osx)
-.PHONY: osx xosx run-osx run-xosx
+.PHONY: osx xosx nosx run-osx run-xosx
 osx: ; $(RUN) HOST=osx HOST_VERSION=x86_64 Makefile/osxapp
 xosx: ; $(RUN) HOST=osx HOST_VERSION=x86_64 Xcode/osxapp
+nosx: ; $(RUN) HOST=osx HOST_VERSION=x86_64 Ninja/osxapp
 run-osx: osx ; @"build/osx-x86_64/$(BUILDTYPE)/Mapbox GL.app/Contents/MacOS/Mapbox GL"
 run-xosx: xosx ; @"gyp/build/$(BUILDTYPE)/Mapbox GL.app/Contents/MacOS/Mapbox GL"
 
@@ -61,9 +62,13 @@ endif
 
 .PHONY: linux run-linux run-valgrind-linux
 linux: ; $(RUN) Makefile/linuxapp
+nlinux: ; $(RUN) Ninja/linuxapp
 run-linux: linux ; (cd build/linux-x86_64/$(BUILDTYPE) && ./mapbox-gl)
 run-valgrind-linux: linux
 	(cd build/linux-x86_64/$(BUILDTYPE) && valgrind --leak-check=full --suppressions=../../../scripts/valgrind.sup ./mapbox-gl)
+
+# Generates a compilation database with ninja for use in clang tooling
+compdb: ; $(RUN) Ninja/compdb
 
 .PHONY: android android-lib
 # Builds a particular android architecture.

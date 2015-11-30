@@ -94,6 +94,12 @@ Xcode/__project__: print-env $(SUBMODULES) config/$(HOST_SLUG).gypi
 	$(QUIET)$(ENV) deps/run_gyp gyp/$(HOST).gyp $(GYP_FLAGS) \
 		-f xcode$(GYP_FLAVOR_SUFFIX)
 
+.PHONY: Ninja/__project__
+Ninja/__project__: print-env $(SUBMODULES) config/$(HOST_SLUG).gypi
+	@printf "$(TEXT_BOLD)$(COLOR_GREEN)* Recreating project...$(FORMAT_END)\n"
+	$(QUIET)$(ENV) deps/run_gyp gyp/$(HOST).gyp -Gconfig=$(BUILDTYPE) $(GYP_FLAGS) \
+		-f ninja
+
 #### Build individual targets ##################################################
 
 NODE_PRE_GYP = $(shell npm bin)/node-pre-gyp
@@ -135,6 +141,17 @@ Xcode/%: Xcode/__project__
 		-target $* \
 		-jobs $(JOBS) \
 		$(XCPRETTY)
+
+Ninja/%: Ninja/__project__
+	@printf "$(TEXT_BOLD)$(COLOR_GREEN)* Building target $*...$(FORMAT_END)\n"
+	$(QUIET)$(ENV) deps/ninja/ninja-$(HOST) -C build/$(HOST_SLUG)/$(BUILDTYPE) $*
+
+
+Ninja/compdb: OUTPUT=build/$(HOST_SLUG)/$(BUILDTYPE)/compile_commands.json
+Ninja/compdb: Ninja/__project__
+	@printf "$(TEXT_BOLD)$(COLOR_GREEN)* Writing to $(OUTPUT)$(FORMAT_END)\n"
+	$(QUIET)$(ENV) deps/ninja/ninja-$(HOST) -C build/$(HOST_SLUG)/$(BUILDTYPE) \
+		-t compdb cc cc_s cxx objc objcxx > $(OUTPUT)
 
 #### Run tests #################################################################
 
