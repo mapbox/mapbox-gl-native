@@ -60,6 +60,7 @@
         '../platform/ios/MGLUserLocationAnnotationView.h',
         '../platform/ios/MGLUserLocationAnnotationView.m',
         '../include/mbgl/ios/MGLAnnotationImage.h',
+        '../platform/ios/MGLAnnotationImage_Private.h',
         '../platform/ios/MGLAnnotationImage.m',
         '../platform/ios/MGLCategoryLoader.h',
         '../platform/ios/MGLCategoryLoader.m',

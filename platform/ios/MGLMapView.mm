@@ -36,6 +36,7 @@
 #import "MGLUserLocationAnnotationView.h"
 #import "MGLUserLocation_Private.h"
 #import "MGLAccountManager_Private.h"
+#import "MGLAnnotationImage_Private.h"
 #import "MGLMapboxEvents.h"
 
 #import "SMCalloutView.h"
@@ -120,7 +121,8 @@ public:
                           CLLocationManagerDelegate,
                           UIActionSheetDelegate,
                           SMCalloutViewDelegate,
-                          MGLMultiPointDelegate>
+                          MGLMultiPointDelegate,
+                          MGLAnnotationImageDelegate>
 
 @property (nonatomic) EAGLContext *context;
 @property (nonatomic) GLKView *glView;
@@ -2166,6 +2168,7 @@ std::chrono::steady_clock::duration MGLDurationInSeconds(float duration)
             {
                 self.annotationImagesByIdentifier[annotationImage.reuseIdentifier] = annotationImage;
                 [self installAnnotationImage:annotationImage];
+                annotationImage.delegate = self;
             }
 
             NSString *symbolName = [MGLAnnotationSpritePrefix stringByAppendingString:annotationImage.reuseIdentifier];
@@ -2707,6 +2710,17 @@ std::chrono::steady_clock::duration MGLDurationInSeconds(float duration)
     [self setVisibleCoordinateBounds:MGLCoordinateBoundsFromLatLngBounds(bounds)
                          edgePadding:UIEdgeInsetsMake(100, 100, 100, 100)
                             animated:animated];
+}
+
+#pragma mark Annotation Image Delegate
+
+- (void)annotationImageNeedsRedisplay:(MGLAnnotationImage *)annotationImage
+{
+    // remove sprite
+    NSString *symbolName = [MGLAnnotationSpritePrefix stringByAppendingString:annotationImage.reuseIdentifier];
+    _mbglMap->removeSprite(symbolName.UTF8String);
+    [self installAnnotationImage:annotationImage];
+    _mbglMap->update(mbgl::Update::Annotations);
 }
 
 #pragma mark - User Location -

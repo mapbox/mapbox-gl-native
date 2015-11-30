@@ -13,12 +13,12 @@ NS_ASSUME_NONNULL_BEGIN
 *   @param image The image to be displayed for the annotation.
 *   @param reuseIdentifier The string that identifies that this annotation image is reusable.
 *   @return The initialized annotation image object or `nil` if there was a problem initializing the object. */
-+ (instancetype)annotationImageWithImage:(UIImage *)image reuseIdentifier:(NSString *)reuseIdentifier;
++ (instancetype)annotationImageWithImage:(UIImage *)image reuseIdentifier:(nullable NSString *)reuseIdentifier;
 
 /** @name Getting and Setting Attributes */
 
 /** The image to be displayed for the annotation. */
-@property (nonatomic, readonly) UIImage *image;
+@property (nonatomic, strong) UIImage *image;
 
 /** The string that identifies that this annotation image is reusable. (read-only)
 *
