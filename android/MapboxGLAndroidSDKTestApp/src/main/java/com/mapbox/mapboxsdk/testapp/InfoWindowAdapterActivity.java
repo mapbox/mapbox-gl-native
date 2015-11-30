@@ -63,6 +63,9 @@ public class InfoWindowAdapterActivity extends AppCompatActivity {
             }
         });
 
+        // Enable to let concurrent multiple infowindows to be shown.
+        //mMapView.setAllowConcurrentMultipleOpenInfoWindows(true);
+
         mMapView.addMarker(generateMarker("Andorra", 42.505777, 1.52529, "#F44336"));
         mMapView.addMarker(generateMarker("Luxembourg", 49.815273, 6.129583, "#3F51B5"));
         mMapView.addMarker(generateMarker("Monaco", 43.738418, 7.424616, "#673AB7"));

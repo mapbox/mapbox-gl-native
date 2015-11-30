@@ -35,6 +35,9 @@ public class InfoWindowActivity extends AppCompatActivity {
         mMapView.setAccessToken(ApiAccess.getToken(this));
         mMapView.onCreate(savedInstanceState);
 
+        // Enable to let concurrent multiple infowindows to be shown.
+        //mMapView.setAllowConcurrentMultipleOpenInfoWindows(true);
+
         mMapView.addMarker(new MarkerOptions()
                 .title("Intersection")
                 .snippet("H St NW with 15th St NW")
