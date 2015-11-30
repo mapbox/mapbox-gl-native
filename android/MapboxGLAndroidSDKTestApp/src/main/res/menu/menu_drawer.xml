@@ -79,6 +79,12 @@
                 android:title="@string/action_info_window" />
 
             <item
+                android:id="@+id/action_info_window_concurrent"
+                android:checkable="false"
+                android:icon="@drawable/ic_flip_to_front_24dp"
+                android:title="@string/action_info_window_concurrent" />
+
+            <item
                 android:id="@+id/action_info_window_adapter"
                 android:checkable="false"
                 android:icon="@drawable/ic_flip_to_back_24dp"

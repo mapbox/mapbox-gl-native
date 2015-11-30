@@ -361,6 +361,10 @@ public class MainActivity extends AppCompatActivity {
                                 startActivity(new Intent(getApplicationContext(), InfoWindowActivity.class));
                                 return true;
 
+                            case R.id.action_info_window_concurrent:
+                                startActivity(new Intent(getApplicationContext(), InfoWindowConcurrentActivity.class));
+                                return true;
+
                             case R.id.action_visible_bounds:
                                 startActivity(new Intent(getApplicationContext(), VisibleCoordinateBoundsActivity.class));
                                 return true;
