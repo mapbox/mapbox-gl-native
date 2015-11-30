@@ -19,12 +19,15 @@
 
 namespace mbgl {
 
+class MapData;
 class GlyphAtlas;
 class GlyphStore;
 class SpriteStore;
 class SpriteAtlas;
 class LineAtlas;
 class StyleLayer;
+class TransformState;
+class TexturePool;
 
 class Style : public GlyphStore::Observer,
               public SpriteStore::Observer,

@@ -22,9 +22,7 @@
 
 namespace mbgl {
 
-class MapData;
-class TexturePool;
-class Style;
+class StyleUpdateParameters;
 class Painter;
 class FileRequest;
 class TransformState;
@@ -72,11 +70,7 @@ public:
     // will return true if all the tiles were scheduled for updating of false if
     // they were not. shouldReparsePartialTiles must be set to "true" if there is
     // new data available that a tile in the "partial" state might be interested at.
-    bool update(MapData&,
-                const TransformState&,
-                Style&,
-                TexturePool&,
-                bool shouldReparsePartialTiles);
+    bool update(const StyleUpdateParameters&);
 
     void updateMatrices(const mat4 &projMatrix, const TransformState &transform);
     void drawClippingMasks(Painter &painter);
@@ -108,13 +102,8 @@ private:
     int32_t coveringZoomLevel(const TransformState&) const;
     std::forward_list<TileID> coveringTiles(const TransformState&) const;
 
-    TileData::State addTile(MapData&,
-                            const TransformState&,
-                            Style&,
-                            TexturePool&,
-                            const TileID&);
-
-    TileData::State hasTile(const TileID& id);
+    TileData::State addTile(const TileID&, const StyleUpdateParameters&);
+    TileData::State hasTile(const TileID&);
     void updateTilePtrs();
 
     double getZoom(const TransformState &state) const;
