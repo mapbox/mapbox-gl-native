@@ -240,6 +240,7 @@ public final class MapView extends FrameLayout {
     private boolean mZoomEnabled = true;
     private boolean mScrollEnabled = true;
     private boolean mRotateEnabled = true;
+    private boolean mAllowConcurrentMultipleOpenInfoWindows = false;
     private String mStyleUrl;
 
     //
@@ -1293,6 +1294,30 @@ public final class MapView extends FrameLayout {
     }
 
     //
+    // InfoWindows
+    //
+
+    /**
+     * Changes whether the map allows concurrent multiple infowindows to be shown.
+     *
+     * @param allow If true, map allows concurrent multiple infowindows to be shown.
+     */
+    @UiThread
+    public void setAllowConcurrentMultipleOpenInfoWindows(boolean allow) {
+        this.mAllowConcurrentMultipleOpenInfoWindows = allow;
+    }
+
+    /**
+     * Returns whether the map allows concurrent multiple infowindows to be shown.
+     *
+     * @return If true, map allows concurrent multiple infowindows to be shown.
+     */
+    @UiThread
+    public boolean isAllowConcurrentMultipleOpenInfoWindows() {
+        return this.mAllowConcurrentMultipleOpenInfoWindows;
+    }
+
+    //
     // Debug
     //
 
@@ -2003,7 +2028,8 @@ public final class MapView extends FrameLayout {
 
     /**
      * Selects a marker. The selected marker will have it's info window opened.
-     * Any other open info windows will be closed.
+     * Any other open info windows will be closed unless isAllowConcurrentMultipleOpenInfoWindows()
+     * is true.
      * <p/>
      * Selecting an already selected marker will have no effect.
      *
@@ -2021,7 +2047,9 @@ public final class MapView extends FrameLayout {
         }
 
         // Need to deselect any currently selected annotation first
-        deselectMarker(marker);
+        if (!isAllowConcurrentMultipleOpenInfoWindows()) {
+            deselectMarkers();
+        }
 
         boolean handledDefaultClick = false;
         if (mOnMarkerClickListener != null) {
