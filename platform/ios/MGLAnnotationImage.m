@@ -1,20 +1,20 @@
-#import "MGLAnnotationImage.h"
+#import "MGLAnnotationImage_Private.h"
 
 @interface MGLAnnotationImage ()
 
-@property (nonatomic) UIImage *image;
-@property (nonatomic) NSString *reuseIdentifier;
+@property (nonatomic, strong) NSString *reuseIdentifier;
+@property (nonatomic, weak) id<MGLAnnotationImageDelegate> delegate;
 
 @end
 
 @implementation MGLAnnotationImage
 
-+ (instancetype)annotationImageWithImage:(UIImage *)image reuseIdentifier:(NSString *)reuseIdentifier
++ (instancetype)annotationImageWithImage:(UIImage *)image reuseIdentifier:(nullable NSString *)reuseIdentifier
 {
     return [[self alloc] initWithImage:image reuseIdentifier:reuseIdentifier];
 }
 
-- (instancetype)initWithImage:(UIImage *)image reuseIdentifier:(NSString *)reuseIdentifier
+- (instancetype)initWithImage:(UIImage *)image reuseIdentifier:(nullable NSString *)reuseIdentifier
 {
     self = [super init];
 
@@ -26,6 +26,11 @@
     }
 
     return self;
+}
+
+- (void)setImage:(UIImage *)image {
+    _image = image;
+    [self.delegate annotationImageNeedsRedisplay:self];
 }
 
 @end
