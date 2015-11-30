@@ -62,7 +62,7 @@ public:
         virtual void onTileLoadingFailed(std::exception_ptr error) = 0;
     };
 
-    Source(MapData&);
+    Source();
     ~Source();
 
     void load();
@@ -72,7 +72,8 @@ public:
     // will return true if all the tiles were scheduled for updating of false if
     // they were not. shouldReparsePartialTiles must be set to "true" if there is
     // new data available that a tile in the "partial" state might be interested at.
-    bool update(const TransformState&,
+    bool update(MapData&,
+                const TransformState&,
                 Style&,
                 TexturePool&,
                 bool shouldReparsePartialTiles);
@@ -94,7 +95,7 @@ public:
     bool enabled;
 
 private:
-    void tileLoadingCompleteCallback(const TileID&, const TransformState&);
+    void tileLoadingCompleteCallback(const TileID&, const TransformState&, bool collisionDebug);
 
     void emitSourceLoaded();
     void emitSourceLoadingFailed(const std::string& message);
@@ -107,7 +108,8 @@ private:
     int32_t coveringZoomLevel(const TransformState&) const;
     std::forward_list<TileID> coveringTiles(const TransformState&) const;
 
-    TileData::State addTile(const TransformState&,
+    TileData::State addTile(MapData&,
+                            const TransformState&,
                             Style&,
                             TexturePool&,
                             const TileID&);
@@ -116,8 +118,6 @@ private:
     void updateTilePtrs();
 
     double getZoom(const TransformState &state) const;
-
-    MapData& data;
 
     bool loaded = false;
 

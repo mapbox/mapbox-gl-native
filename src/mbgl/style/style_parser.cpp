@@ -1,16 +1,11 @@
 #include <mbgl/style/style_parser.hpp>
 #include <mbgl/style/style_layer.hpp>
 
-#include <mbgl/map/map_data.hpp>
 #include <mbgl/platform/log.hpp>
 
 #include <algorithm>
 
 namespace mbgl {
-
-StyleParser::StyleParser(MapData& data_)
-    : data(data_) {
-}
 
 void StyleParser::parse(const JSVal& document) {
     if (document.HasMember("version")) {
@@ -54,7 +49,7 @@ void StyleParser::parseSources(const JSVal& value) {
         const JSVal& nameVal = itr->name;
         const JSVal& sourceVal = itr->value;
 
-        std::unique_ptr<Source> source = std::make_unique<Source>(data);
+        std::unique_ptr<Source> source = std::make_unique<Source>();
 
         source->info.source_id = { nameVal.GetString(), nameVal.GetStringLength() };
 

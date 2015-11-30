@@ -119,7 +119,7 @@ std::string SourceInfo::tileURL(const TileID& id, float pixelRatio) const {
     return result;
 }
 
-Source::Source(MapData& data_) : data(data_) {}
+Source::Source() {}
 
 Source::~Source() = default;
 
@@ -246,7 +246,8 @@ bool Source::handlePartialTile(const TileID& id, Worker&) {
     });
 }
 
-TileData::State Source::addTile(const TransformState& transformState,
+TileData::State Source::addTile(MapData& data,
+                                const TransformState& transformState,
                                 Style& style,
                                 TexturePool& texturePool,
                                 const TileID& id) {
@@ -280,7 +281,7 @@ TileData::State Source::addTile(const TransformState& transformState,
     }
 
     if (!new_tile.data) {
-        auto callback = std::bind(&Source::tileLoadingCompleteCallback, this, normalized_id, transformState);
+        auto callback = std::bind(&Source::tileLoadingCompleteCallback, this, normalized_id, transformState, data.getDebug() & MapDebugOptions::Collision);
 
         // If we don't find working tile data, we're just going to load it.
         if (info.type == SourceType::Raster) {
@@ -407,7 +408,8 @@ void Source::findLoadedParent(const TileID& id, int32_t minCoveringZoom, std::fo
     }
 }
 
-bool Source::update(const TransformState& transformState,
+bool Source::update(MapData& data,
+                    const TransformState& transformState,
                     Style& style,
                     TexturePool& texturePool,
                     bool shouldReparsePartialTiles) {
@@ -447,7 +449,7 @@ bool Source::update(const TransformState& transformState,
             }
             break;
         case TileData::State::invalid:
-            state = addTile(transformState, style, texturePool, id);
+            state = addTile(data, transformState, style, texturePool, id);
             break;
         default:
             break;
@@ -546,7 +548,7 @@ void Source::setObserver(Observer* observer) {
     observer_ = observer;
 }
 
-void Source::tileLoadingCompleteCallback(const TileID& normalized_id, const TransformState& transformState) {
+void Source::tileLoadingCompleteCallback(const TileID& normalized_id, const TransformState& transformState, bool collisionDebug) {
     auto it = tileDataMap.find(normalized_id);
     if (it == tileDataMap.end()) {
         return;
@@ -562,7 +564,7 @@ void Source::tileLoadingCompleteCallback(const TileID& normalized_id, const Tran
         return;
     }
 
-    tileData->redoPlacement({ transformState.getAngle(), transformState.getPitch(), data.getDebug() & MapDebugOptions::Collision});
+    tileData->redoPlacement({ transformState.getAngle(), transformState.getPitch(), collisionDebug });
     emitTileLoaded(true);
 }
 
