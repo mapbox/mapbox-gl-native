@@ -17,7 +17,7 @@ README=/tmp/mbgl/GL-README.md
 cat ./pod-README.md > ${README}
 echo >> ${README}
 echo -n "#" >> ${README}
-cat ../../CHANGELOG.md >> ${README}
+cat ../../CHANGELOG.md | sed -n "/^## iOS ${DOCS_VERSION}/,/^##/p" | sed '$d' >> ${README}
 # Copy headers to a temporary location where we can substitute macros that appledoc doesn't understand.
 cp -r ../../include/mbgl/ios /tmp/mbgl
 perl \
