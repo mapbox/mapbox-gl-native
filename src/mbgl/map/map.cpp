@@ -392,7 +392,7 @@ void Map::addAnnotationIcon(const std::string& name, std::shared_ptr<const Sprit
 }
 
 void Map::removeAnnotationIcon(const std::string& name) {
-    addAnnotationIcon(name, nullptr);
+    removeAnnotationIcon(name);
 }
 
 double Map::getTopOffsetPixelsForAnnotationIcon(const std::string& symbol) {
