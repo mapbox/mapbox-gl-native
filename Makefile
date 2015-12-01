@@ -69,6 +69,7 @@ run-valgrind-linux: linux
 
 # Generates a compilation database with ninja for use in clang tooling
 compdb: ; $(RUN) Ninja/compdb
+tidy: ; $(RUN) tidy
 
 .PHONY: android android-lib
 # Builds a particular android architecture.
