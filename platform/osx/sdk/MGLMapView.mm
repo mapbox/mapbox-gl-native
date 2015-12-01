@@ -591,6 +591,7 @@ public:
             [self updateZoomControls];
             [self updateCompass];
             [self updateAnnotationCallouts];
+            [self updateToolTips];
             
             if ([self.delegate respondsToSelector:@selector(mapView:regionDidChangeAnimated:)]) {
                 BOOL animated = change == mbgl::MapChangeRegionDidChangeAnimated;
@@ -1150,6 +1151,8 @@ public:
             _annotationContextsByAnnotationID[shapeAnnotationIDs[i]] = context;
         }
     }
+    
+    [self updateToolTips];
 }
 
 - (void)installAnnotationImage:(MGLAnnotationImage *)annotationImage {
@@ -1212,6 +1215,8 @@ public:
     }
     
     _mbglMap->removeAnnotations(annotationIDsToRemove);
+    
+    [self updateToolTips];
 }
 
 - (id <MGLAnnotation>)selectedAnnotation {
@@ -1242,8 +1247,7 @@ public:
                                    -_unionedAnnotationImageSize.height / 2);
     queryRect = NSInsetRect(queryRect, -MGLAnnotationImagePaddingForHitTest,
                             -MGLAnnotationImagePaddingForHitTest);
-    mbgl::LatLngBounds queryBounds = [self convertRectToLatLngBounds:queryRect];
-    std::vector<MGLAnnotationID> nearbyAnnotations = _mbglMap->getPointAnnotationsInBounds(queryBounds);
+    std::vector<MGLAnnotationID> nearbyAnnotations = [self annotationIDsInRect:queryRect];
     
     if (nearbyAnnotations.size()) {
         NSRect hitRect = NSInsetRect({ point, NSZeroSize },
@@ -1294,6 +1298,11 @@ public:
     }
     
     return hitAnnotationID;
+}
+
+- (std::vector<MGLAnnotationID>)annotationIDsInRect:(NSRect)rect {
+    mbgl::LatLngBounds queryBounds = [self convertRectToLatLngBounds:rect];
+    return _mbglMap->getPointAnnotationsInBounds(queryBounds);
 }
 
 - (NS_ARRAY_OF(id <MGLAnnotation>) *)selectedAnnotations {
@@ -1507,6 +1516,36 @@ public:
         NSAssert([overlay conformsToProtocol:@protocol(MGLOverlay)], @"Overlay does not conform to MGLOverlay");
     }
     [self removeAnnotations:overlays];
+}
+
+#pragma mark Tooltips
+
+- (void)updateToolTips {
+    [self removeAllToolTips];
+    
+    std::vector<MGLAnnotationID> annotationIDs = [self annotationIDsInRect:self.bounds];
+    for (MGLAnnotationID annotationID : annotationIDs) {
+        MGLAnnotationImage *annotationImage = [self imageOfAnnotationWithID:annotationID];
+        id <MGLAnnotation> annotation = [self annotationWithID:annotationID];
+        if (annotation.toolTip.length) {
+            NSImage *image = annotationImage.image;
+            NSRect annotationRect = [self frameOfImage:image
+                                  centeredAtCoordinate:annotation.coordinate];
+            annotationRect = NSOffsetRect(image.alignmentRect, annotationRect.origin.x, annotationRect.origin.y);
+            if (!NSIsEmptyRect(annotationRect)) {
+                [self addToolTipRect:annotationRect owner:self userData:(void *)(NSUInteger)annotationID];
+            }
+        }
+    }
+}
+
+- (NSString *)view:(__unused NSView *)view stringForToolTip:(__unused NSToolTipTag)tag point:(__unused NSPoint)point userData:(void *)data {
+    if ((NSUInteger)data >= MGLAnnotationNotFound) {
+        return nil;
+    }
+    MGLAnnotationID annotationID = (NSUInteger)data;
+    id <MGLAnnotation> annotation = [self annotationWithID:annotationID];
+    return annotation.toolTip;
 }
 
 #pragma mark Interface Builder methods

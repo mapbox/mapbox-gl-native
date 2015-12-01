@@ -20,6 +20,10 @@ static NSString * const MGLMapboxAccessTokenDefaultsKey = @"MGLMapboxAccessToken
 
 @implementation AppDelegate {
     NSPoint _mouseLocationForMapViewContextMenu;
+    NSUInteger _droppedPinCounter;
+    NSNumberFormatter *_spellOutNumberFormatter;
+    
+    BOOL _showsToolTipsOnDroppedPins;
 }
 
 #pragma mark Lifecycle
@@ -63,6 +67,8 @@ static NSString * const MGLMapboxAccessTokenDefaultsKey = @"MGLMapboxAccessToken
         [alert runModal];
         [self showPreferences:nil];
     }
+    
+    _spellOutNumberFormatter = [[NSNumberFormatter alloc] init];
     
     NSPressGestureRecognizer *pressGestureRecognizer = [[NSPressGestureRecognizer alloc] initWithTarget:self action:@selector(handlePressGesture:)];
     [self.mapView addGestureRecognizer:pressGestureRecognizer];
@@ -204,6 +210,8 @@ static NSString * const MGLMapboxAccessTokenDefaultsKey = @"MGLMapboxAccessToken
     [self.mapView reloadStyle:sender];
 }
 
+#pragma mark Debug methods
+
 - (IBAction)toggleTileBoundaries:(id)sender {
     self.mapView.debugMask ^= MGLMapDebugTileBoundariesMask;
 }
@@ -218,6 +226,10 @@ static NSString * const MGLMapboxAccessTokenDefaultsKey = @"MGLMapboxAccessToken
 
 - (IBAction)toggleCollisionBoxes:(id)sender {
     self.mapView.debugMask ^= MGLMapDebugCollisionBoxesMask;
+}
+
+- (IBAction)toggleShowsToolTipsOnDroppedPins:(id)sender {
+    _showsToolTipsOnDroppedPins = !_showsToolTipsOnDroppedPins;
 }
 
 #pragma mark Help methods
@@ -267,6 +279,11 @@ static NSString * const MGLMapboxAccessTokenDefaultsKey = @"MGLMapboxAccessToken
     DroppedPinAnnotation *annotation = [[DroppedPinAnnotation alloc] init];
     annotation.coordinate = [self.mapView convertPoint:point toCoordinateFromView:self.mapView];
     annotation.title = @"Dropped Pin";
+    _spellOutNumberFormatter.numberStyle = NSNumberFormatterSpellOutStyle;
+    if (_showsToolTipsOnDroppedPins) {
+        NSString *formattedNumber = [_spellOutNumberFormatter stringFromNumber:@(++_droppedPinCounter)];
+        annotation.toolTip = formattedNumber;
+    }
     [self.mapView addAnnotation:annotation];
     [self.mapView selectAnnotation:annotation animated:YES];
 }
@@ -354,6 +371,11 @@ static NSString * const MGLMapboxAccessTokenDefaultsKey = @"MGLMapboxAccessToken
     if (menuItem.action == @selector(toggleCollisionBoxes:)) {
         BOOL isShown = self.mapView.debugMask & MGLMapDebugCollisionBoxesMask;
         menuItem.title = isShown ? @"Hide Collision Boxes" : @"Show Collision Boxes";
+        return YES;
+    }
+    if (menuItem.action == @selector(toggleShowsToolTipsOnDroppedPins:)) {
+        BOOL isShown = _showsToolTipsOnDroppedPins;
+        menuItem.title = isShown ? @"Hide Tooltips on Dropped Pins" : @"Show Tooltips on Dropped Pins";
         return YES;
     }
     if (menuItem.action == @selector(showShortcuts:)) {
