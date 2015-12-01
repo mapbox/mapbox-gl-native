@@ -12,6 +12,9 @@ NS_ASSUME_NONNULL_BEGIN
 @property (nonatomic, readonly) NSString *reuseIdentifier;
 @property (nonatomic, getter=isSelectable) BOOL selectable;
 
+/** The cursor that appears above any annotation using this annotation image. By default this property is set to `nil`, representing the current cursor. */
+@property (nonatomic, nullable) NSCursor *cursor;
+
 @end
 
 NS_ASSUME_NONNULL_END

@@ -7,6 +7,7 @@
 #import <mbgl/osx/Mapbox.h>
 
 static NSString * const MGLMapboxAccessTokenDefaultsKey = @"MGLMapboxAccessToken";
+static NSString * const MGLDroppedPinAnnotationImageIdentifier = @"dropped";
 
 @interface AppDelegate () <NSApplicationDelegate, NSSharingServicePickerDelegate, NSMenuDelegate, MGLMapViewDelegate>
 
@@ -24,6 +25,7 @@ static NSString * const MGLMapboxAccessTokenDefaultsKey = @"MGLMapboxAccessToken
     NSNumberFormatter *_spellOutNumberFormatter;
     
     BOOL _showsToolTipsOnDroppedPins;
+    BOOL _randomizesCursorsOnDroppedPins;
 }
 
 #pragma mark Lifecycle
@@ -232,6 +234,10 @@ static NSString * const MGLMapboxAccessTokenDefaultsKey = @"MGLMapboxAccessToken
     _showsToolTipsOnDroppedPins = !_showsToolTipsOnDroppedPins;
 }
 
+- (IBAction)toggleRandomizesCursorsOnDroppedPins:(id)sender {
+    _randomizesCursorsOnDroppedPins = !_randomizesCursorsOnDroppedPins;
+}
+
 #pragma mark Help methods
 
 - (IBAction)showShortcuts:(id)sender {
@@ -378,6 +384,11 @@ static NSString * const MGLMapboxAccessTokenDefaultsKey = @"MGLMapboxAccessToken
         menuItem.title = isShown ? @"Hide Tooltips on Dropped Pins" : @"Show Tooltips on Dropped Pins";
         return YES;
     }
+    if (menuItem.action == @selector(toggleRandomizesCursorsOnDroppedPins:)) {
+        BOOL isRandom = _randomizesCursorsOnDroppedPins;
+        menuItem.title = isRandom ? @"Use Default Cursor for Dropped Pins" : @"Use Random Cursors for Dropped Pins";
+        return _showsToolTipsOnDroppedPins;
+    }
     if (menuItem.action == @selector(showShortcuts:)) {
         return YES;
     }
@@ -471,6 +482,37 @@ static NSString * const MGLMapboxAccessTokenDefaultsKey = @"MGLMapboxAccessToken
     return YES;
 }
 
+- (MGLAnnotationImage *)mapView:(MGLMapView *)mapView imageForAnnotation:(id <MGLAnnotation>)annotation {
+    MGLAnnotationImage *annotationImage = [self.mapView dequeueReusableAnnotationImageWithIdentifier:MGLDroppedPinAnnotationImageIdentifier];
+    if (!annotationImage) {
+        NSString *imagePath = [[NSBundle mainBundle] pathForResource:@"default_marker" ofType:@"pdf"];
+        NSImage *image = [[NSImage alloc] initWithContentsOfFile:imagePath];
+        NSRect alignmentRect = image.alignmentRect;
+        alignmentRect.origin.y = NSMidY(alignmentRect);
+        alignmentRect.size.height /= 2;
+        image.alignmentRect = alignmentRect;
+        annotationImage = [MGLAnnotationImage annotationImageWithImage:image
+                                                       reuseIdentifier:MGLDroppedPinAnnotationImageIdentifier];
+    }
+    if (_randomizesCursorsOnDroppedPins) {
+        NSArray *cursors = @[
+            [NSCursor IBeamCursor],
+            [NSCursor crosshairCursor],
+            [NSCursor pointingHandCursor],
+            [NSCursor disappearingItemCursor],
+            [NSCursor IBeamCursorForVerticalLayout],
+            [NSCursor operationNotAllowedCursor],
+            [NSCursor dragLinkCursor],
+            [NSCursor dragCopyCursor],
+            [NSCursor contextualMenuCursor],
+        ];
+        annotationImage.cursor = cursors[arc4random_uniform(cursors.count)];
+    } else {
+        annotationImage.cursor = nil;
+    }
+    return annotationImage;
+}
+
 - (void)mapView:(MGLMapView *)mapView didSelectAnnotation:(id <MGLAnnotation>)annotation {
     if ([annotation isKindOfClass:[DroppedPinAnnotation class]]) {
         DroppedPinAnnotation *droppedPin = annotation;
@@ -478,7 +520,7 @@ static NSString * const MGLMapboxAccessTokenDefaultsKey = @"MGLMapboxAccessToken
     }
 }
 
-- (void)mapView:(MGLMapView *)mapView didDeselectAnnotation:(id<MGLAnnotation>)annotation {
+- (void)mapView:(MGLMapView *)mapView didDeselectAnnotation:(id <MGLAnnotation>)annotation {
     if ([annotation isKindOfClass:[DroppedPinAnnotation class]]) {
         DroppedPinAnnotation *droppedPin = annotation;
         [droppedPin pause];

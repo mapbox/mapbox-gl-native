@@ -111,6 +111,7 @@ public:
     std::shared_ptr<mbgl::SQLiteCache> _mbglFileCache;
     mbgl::DefaultFileSource *_mbglFileSource;
     
+    NSPanGestureRecognizer *_panGestureRecognizer;
     NSMagnificationGestureRecognizer *_magnificationGestureRecognizer;
     NSRotationGestureRecognizer *_rotationGestureRecognizer;
     double _scaleAtBeginningOfGesture;
@@ -122,6 +123,8 @@ public:
     MGLAnnotationID _lastSelectedAnnotationID;
     NSSize _unionedAnnotationImageSize;
     std::vector<MGLAnnotationID> _annotationsNearbyLastClick;
+    BOOL _wantsToolTipRects;
+    BOOL _wantsCursorRects;
     BOOL _delegateHasAlphasForShapeAnnotations;
     BOOL _delegateHasStrokeColorsForShapeAnnotations;
     BOOL _delegateHasFillColorsForShapeAnnotations;
@@ -294,9 +297,9 @@ public:
     _rotateEnabled = YES;
     _pitchEnabled = YES;
     
-    NSPanGestureRecognizer *panGestureRecognizer = [[NSPanGestureRecognizer alloc] initWithTarget:self action:@selector(handlePanGesture:)];
-    panGestureRecognizer.delaysKeyEvents = YES;
-    [self addGestureRecognizer:panGestureRecognizer];
+    _panGestureRecognizer = [[NSPanGestureRecognizer alloc] initWithTarget:self action:@selector(handlePanGesture:)];
+    _panGestureRecognizer.delaysKeyEvents = YES;
+    [self addGestureRecognizer:_panGestureRecognizer];
     
     NSClickGestureRecognizer *clickGestureRecognizer = [[NSClickGestureRecognizer alloc] initWithTarget:self action:@selector(handleClickGesture:)];
     clickGestureRecognizer.delaysPrimaryMouseButtonEvents = NO;
@@ -591,7 +594,7 @@ public:
             [self updateZoomControls];
             [self updateCompass];
             [self updateAnnotationCallouts];
-            [self updateToolTips];
+            [self updateAnnotationTrackingAreas];
             
             if ([self.delegate respondsToSelector:@selector(mapView:regionDidChangeAnimated:)]) {
                 BOOL animated = change == mbgl::MapChangeRegionDidChangeAnimated;
@@ -830,7 +833,7 @@ public:
         _mbglMap->cancelTransitions();
         
         if (gestureRecognizer.state == NSGestureRecognizerStateBegan) {
-            [[NSCursor closedHandCursor] push];
+            [self.window invalidateCursorRectsForView:self];
             _mbglMap->setGestureInProgress(true);
         } else if (gestureRecognizer.state == NSGestureRecognizerStateChanged) {
             delta.y *= -1;
@@ -839,7 +842,7 @@ public:
         } else if (gestureRecognizer.state == NSGestureRecognizerStateEnded
                    || gestureRecognizer.state == NSGestureRecognizerStateCancelled) {
             _mbglMap->setGestureInProgress(false);
-            [[NSCursor arrowCursor] pop];
+            [self.window invalidateCursorRectsForView:self];
         }
     }
 }
@@ -1128,6 +1131,10 @@ public:
             
             NSString *symbolName = [MGLAnnotationSpritePrefix stringByAppendingString:annotationImage.reuseIdentifier];
             points.emplace_back(MGLLatLngFromLocationCoordinate2D(annotation.coordinate), symbolName ? [symbolName UTF8String] : "");
+            
+            if (annotation.toolTip.length) {
+                _wantsToolTipRects = YES;
+            }
         }
     }
     
@@ -1152,7 +1159,7 @@ public:
         }
     }
     
-    [self updateToolTips];
+    [self updateAnnotationTrackingAreas];
 }
 
 - (void)installAnnotationImage:(MGLAnnotationImage *)annotationImage {
@@ -1180,6 +1187,10 @@ public:
     // Union this slop area with any existing slop areas.
     _unionedAnnotationImageSize = NSMakeSize(MAX(_unionedAnnotationImageSize.width, size.width),
                                              MAX(_unionedAnnotationImageSize.height, size.height));
+    
+    if (annotationImage.cursor) {
+        _wantsCursorRects = YES;
+    }
 }
 
 - (void)removeAnnotation:(id <MGLAnnotation>)annotation {
@@ -1216,7 +1227,7 @@ public:
     
     _mbglMap->removeAnnotations(annotationIDsToRemove);
     
-    [self updateToolTips];
+    [self updateAnnotationTrackingAreas];
 }
 
 - (id <MGLAnnotation>)selectedAnnotation {
@@ -1518,24 +1529,32 @@ public:
     [self removeAnnotations:overlays];
 }
 
-#pragma mark Tooltips
+#pragma mark Tooltips and cursors
 
-- (void)updateToolTips {
-    [self removeAllToolTips];
-    
-    std::vector<MGLAnnotationID> annotationIDs = [self annotationIDsInRect:self.bounds];
-    for (MGLAnnotationID annotationID : annotationIDs) {
-        MGLAnnotationImage *annotationImage = [self imageOfAnnotationWithID:annotationID];
-        id <MGLAnnotation> annotation = [self annotationWithID:annotationID];
-        if (annotation.toolTip.length) {
-            NSImage *image = annotationImage.image;
-            NSRect annotationRect = [self frameOfImage:image
-                                  centeredAtCoordinate:annotation.coordinate];
-            annotationRect = NSOffsetRect(image.alignmentRect, annotationRect.origin.x, annotationRect.origin.y);
-            if (!NSIsEmptyRect(annotationRect)) {
-                [self addToolTipRect:annotationRect owner:self userData:(void *)(NSUInteger)annotationID];
+- (void)updateAnnotationTrackingAreas {
+    if (_wantsToolTipRects) {
+        [self removeAllToolTips];
+        std::vector<MGLAnnotationID> annotationIDs = [self annotationIDsInRect:self.bounds];
+        for (MGLAnnotationID annotationID : annotationIDs) {
+            MGLAnnotationImage *annotationImage = [self imageOfAnnotationWithID:annotationID];
+            id <MGLAnnotation> annotation = [self annotationWithID:annotationID];
+            if (annotation.toolTip.length) {
+                NSImage *image = annotationImage.image;
+                NSRect annotationRect = [self frameOfImage:image
+                                      centeredAtCoordinate:annotation.coordinate];
+                annotationRect = NSOffsetRect(image.alignmentRect, annotationRect.origin.x, annotationRect.origin.y);
+                if (!NSIsEmptyRect(annotationRect)) {
+                    [self addToolTipRect:annotationRect owner:self userData:(void *)(NSUInteger)annotationID];
+                }
+            }
+            if (annotationImage.cursor) {
+                _wantsCursorRects = YES;
             }
         }
+    }
+    
+    if (_wantsCursorRects) {
+        [self.window invalidateCursorRectsForView:self];
     }
 }
 
@@ -1546,6 +1565,30 @@ public:
     MGLAnnotationID annotationID = (NSUInteger)data;
     id <MGLAnnotation> annotation = [self annotationWithID:annotationID];
     return annotation.toolTip;
+}
+
+- (void)resetCursorRects {
+    if (_panGestureRecognizer.state == NSGestureRecognizerStateBegan
+        || _panGestureRecognizer.state == NSGestureRecognizerStateChanged) {
+        [self addCursorRect:self.bounds cursor:[NSCursor closedHandCursor]];
+        return;
+    }
+    if (!_wantsCursorRects) {
+        return;
+    }
+    
+    std::vector<MGLAnnotationID> annotationIDs = [self annotationIDsInRect:self.bounds];
+    for (MGLAnnotationID annotationID : annotationIDs) {
+        id <MGLAnnotation> annotation = [self annotationWithID:annotationID];
+        MGLAnnotationImage *annotationImage = [self imageOfAnnotationWithID:annotationID];
+        if (annotationImage.cursor) {
+            NSImage *image = annotationImage.image;
+            NSRect annotationRect = [self frameOfImage:image
+                                  centeredAtCoordinate:annotation.coordinate];
+            annotationRect = NSOffsetRect(image.alignmentRect, annotationRect.origin.x, annotationRect.origin.y);
+            [self addCursorRect:annotationRect cursor:annotationImage.cursor];
+        }
+    }
 }
 
 #pragma mark Interface Builder methods
