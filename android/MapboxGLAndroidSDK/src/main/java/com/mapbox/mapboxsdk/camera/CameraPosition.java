@@ -1,8 +1,26 @@
 package com.mapbox.mapboxsdk.camera;
 
+import android.os.Parcel;
+import android.os.Parcelable;
 import com.mapbox.mapboxsdk.geometry.LatLng;
 
-public class CameraPosition {
+public final class CameraPosition implements Parcelable {
+
+    public static final Parcelable.Creator<CameraPosition> CREATOR
+            = new Parcelable.Creator<CameraPosition>() {
+        public CameraPosition createFromParcel(Parcel in) {
+            float bearing = in.readFloat();
+            LatLng target = in.readParcelable(LatLng.class.getClassLoader());
+            float tilt = in.readFloat();
+            float zoom = in.readFloat();
+            return new CameraPosition(target, zoom, tilt, bearing);
+        }
+
+        public CameraPosition[] newArray(int size) {
+            return new CameraPosition[size];
+        }
+    };
+
 
     /**
      * Direction that the camera is pointing in, in degrees clockwise from north.
@@ -50,4 +68,97 @@ public class CameraPosition {
         this.zoom = zoom;
     }
 
+
+    @Override
+    public int describeContents() {
+        return 0;
+    }
+
+    @Override
+    public void writeToParcel(Parcel out, int flags) {
+        out.writeFloat(bearing);
+        out.writeParcelable(target, flags);
+        out.writeFloat(tilt);
+        out.writeFloat(zoom);
+    }
+
+    /**
+     * Builds camera position.
+     */
+    public static final class Builder {
+
+        private float bearing;
+        private LatLng target;
+        private float tilt;
+        private float zoom;
+
+        /**
+         * Creates an empty builder.
+         */
+        public Builder() {
+            super();
+        }
+
+        /**
+         * Create Builder with an existing CameraPosition data.
+         * @param previous Existing CameraPosition values to use
+         */
+        public Builder(CameraPosition previous) {
+            super();
+            if (previous != null) {
+                this.bearing = previous.bearing;
+                this.target = previous.target;
+                this.tilt = previous.tilt;
+                this.zoom = previous.zoom;
+            }
+        }
+
+        /**
+         * Sets the direction that the camera is pointing in, in degrees clockwise from north.
+         * @param bearing Bearing
+         * @return Builder
+         */
+        public Builder bearing (float bearing) {
+            this.bearing = bearing;
+            return this;
+        }
+
+        /**
+         * Builds a CameraPosition.
+         * @return CameraPosition
+         */
+        public CameraPosition build() {
+            return new CameraPosition(target, zoom, tilt, bearing);
+        }
+
+        /**
+         * Sets the location that the camera is pointing at.
+         * @param location Location
+         * @return Builder
+         */
+        public Builder target(LatLng location) {
+            this.target = location;
+            return this;
+        }
+
+        /**
+         * Set the tilt
+         * @param tilt Tilt value
+         * @return Builder
+         */
+        public Builder tilt(float tilt) {
+            this.tilt = tilt;
+            return this;
+        }
+
+        /**
+         * Set the zoom
+         * @param zoom Zoom value
+         * @return Builder
+         */
+        public Builder zoom(float zoom) {
+            this.zoom = zoom;
+            return this;
+        }
+    }
 }
