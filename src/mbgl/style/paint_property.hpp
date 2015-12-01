@@ -12,6 +12,7 @@
 #include <rapidjson/document.h>
 
 #include <map>
+#include <utility>
 
 namespace mbgl {
 
@@ -117,7 +118,7 @@ public:
             : prior(std::move(prior_)),
               begin(begin_),
               end(end_),
-              value(value_) {
+              value(std::move(value_)) {
         }
 
         Result calculate(const StyleCalculationParameters& parameters) {

@@ -2,13 +2,14 @@
 #include <mbgl/util/constants.hpp>
 #include <mbgl/map/map_data.hpp>
 #include <mbgl/storage/file_source.hpp>
+#include <utility>
 
 namespace mbgl {
 
 AnnotationTileFeature::AnnotationTileFeature(FeatureType type_, GeometryCollection geometries_,
                                  std::unordered_map<std::string, std::string> properties_)
     : type(type_),
-      properties(properties_),
+      properties(std::move(properties_)),
       geometries(geometries_) {}
 
 mapbox::util::optional<Value> AnnotationTileFeature::getValue(const std::string& key) const {

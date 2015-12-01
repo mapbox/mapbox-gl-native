@@ -7,6 +7,7 @@
 #include <mbgl/util/async_task.hpp>
 #include <mbgl/util/run_loop.hpp>
 #include <mbgl/util/thread.hpp>
+#include <utility>
 
 using namespace mbgl;
 
@@ -20,7 +21,7 @@ struct GlyphStoreParams {
 
 class GlyphStoreThread : public GlyphStore::Observer {
 public:
-    GlyphStoreThread(FileSource* fileSource, GlyphStoreTestCallback callback) : callback_(callback) {
+    GlyphStoreThread(FileSource* fileSource, GlyphStoreTestCallback callback) : callback_(std::move(callback)) {
         util::ThreadContext::setFileSource(fileSource);
     }
 

@@ -9,6 +9,7 @@
 #include <mbgl/platform/log.hpp>
 #include <mbgl/util/constants.hpp>
 #include <mbgl/util/exception.hpp>
+#include <utility>
 
 using namespace mbgl;
 
@@ -19,7 +20,7 @@ TileWorker::TileWorker(TileID id_,
                        GlyphStore& glyphStore_,
                        const std::atomic<TileData::State>& state_)
     : id(id_),
-      sourceID(sourceID_),
+      sourceID(std::move(sourceID_)),
       spriteStore(spriteStore_),
       glyphAtlas(glyphAtlas_),
       glyphStore(glyphStore_),

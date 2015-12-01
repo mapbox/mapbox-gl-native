@@ -6,6 +6,7 @@
 #include <mbgl/util/thread_context.hpp>
 
 #include <sstream>
+#include <utility>
 
 namespace mbgl {
 
@@ -130,7 +131,7 @@ GeometryCollection VectorTileFeature::getGeometries() const {
 }
 
 VectorTile::VectorTile(std::shared_ptr<const std::string> data_)
-    : data(data_) {
+    : data(std::move(data_)) {
 }
 
 util::ptr<GeometryTileLayer> VectorTile::getLayer(const std::string& name) const {

@@ -8,6 +8,7 @@
 #include <string>
 #include <cstring>
 #include <cassert>
+#include <utility>
 
 #ifdef MBGL_USE_CGL
 #include <CoreFoundation/CoreFoundation.h>
@@ -26,7 +27,7 @@ HeadlessView::HeadlessView(std::shared_ptr<HeadlessDisplay> display_,
                            float pixelRatio_,
                            uint16_t width,
                            uint16_t height)
-    : display(display_), pixelRatio(pixelRatio_) {
+    : display(std::move(display_)), pixelRatio(pixelRatio_) {
     resize(width, height);
 }
 

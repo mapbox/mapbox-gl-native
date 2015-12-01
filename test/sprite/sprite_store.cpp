@@ -7,6 +7,7 @@
 #include <mbgl/util/async_task.hpp>
 #include <mbgl/util/run_loop.hpp>
 #include <mbgl/util/thread.hpp>
+#include <utility>
 
 using namespace mbgl;
 
@@ -156,7 +157,7 @@ struct SpriteParams {
 
 class SpriteThread : public SpriteStore::Observer {
 public:
-    SpriteThread(FileSource* fileSource, SpriteTestCallback callback) : callback_(callback) {
+    SpriteThread(FileSource* fileSource, SpriteTestCallback callback) : callback_(std::move(callback)) {
         util::ThreadContext::setFileSource(fileSource);
     }
 
