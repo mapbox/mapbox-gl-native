@@ -139,7 +139,7 @@ void TileWorker::parseLayer(const StyleLayer& layer, const GeometryTile& geometr
 
     if (/*layer.interactive &&*/ layer.id.substr(0, 3) == "poi" && bucket->hasData()) {
 //        result.featureTree.clear();
-        printf("tile %i,%i/%i\n", id.z, id.x, id.y);
+        printf("parsing tile %i,%i,%i (%i)\n", id.z, id.x, id.y, id.sourceZ);
         for (std::size_t i = 0; i < geometryLayer->featureCount(); i++) {
             const auto feature = geometryLayer->getFeature(i);
             const auto geometries = feature->getGeometries();
@@ -169,13 +169,23 @@ void TileWorker::parseLayer(const StyleLayer& layer, const GeometryTile& geometr
                     // TODO: do this opportunistically
                     FeatureProperties properties = feature->getAllValues();
 
+                    std::string name = "";
+                    const auto& maybe_name = feature->getValue("name_en");
+                    if (maybe_name && maybe_name.get().is<std::string>()) {
+                        name = maybe_name.get().get<std::string>();
+                    }
+
                     result.featureTree.insert(std::make_tuple(featureBox, layer.id, properties));
-                    printf("added feature from %s at %i, %i\n", layer.id.c_str(), point.x, point.y);
+                    printf("added feature '%s' from %s at %i, %i\n",
+                        name.c_str(),
+                        layer.id.c_str(),
+                        point.x,
+                        point.y);
                 }
             }
         }
         if (result.featureTree.size()) {
-            printf("feature tree for %i,%i,%i [%s] has %lu members\n", id.z, id.x, id.y, layer.id.c_str(), result.featureTree.size());
+            printf("feature tree for %i,%i,%i (%i) [%s] has %lu members\n", id.z, id.x, id.y, id.sourceZ, layer.id.c_str(), result.featureTree.size());
             const auto bounds = result.featureTree.bounds();
             printf("box: %i, %i to %i, %i\n", bounds.min_corner().get<0>(), bounds.min_corner().get<1>(), bounds.max_corner().get<0>(), bounds.max_corner().get<1>());
         }

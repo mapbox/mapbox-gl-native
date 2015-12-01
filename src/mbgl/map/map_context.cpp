@@ -359,7 +359,7 @@ std::vector<std::pair<std::string, FeatureProperties>> MapContext::featuresAt(co
                         properties = "\n\t" + property.first + ": " + property.second;
                     }
 
-                    printf("found feature in %s: %s\n", layer_id.c_str(), properties.c_str());
+                    printf("%s: %s\n", layer_id.c_str(), properties.c_str());
 
                     results.push_back(result);
                 }));
