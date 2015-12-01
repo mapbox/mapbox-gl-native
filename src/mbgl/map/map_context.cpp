@@ -331,7 +331,7 @@ std::vector<std::pair<std::string, FeatureProperties>> MapContext::featuresAt(co
 
 
 
-    const auto radius = 50 * 4096 / scale;
+    const auto radius = 5 * 4096 / scale;
     FeatureBox queryBox = {
         { position.x - radius, position.y - radius },
         { position.x + radius, position.y + radius }
@@ -354,7 +354,13 @@ std::vector<std::pair<std::string, FeatureProperties>> MapContext::featuresAt(co
 
                     const auto result = std::make_pair(layer_id, feature_properties);
 
-                    printf("found feature in %s\n", layer_id.c_str());
+                    std::string name = "foo";
+                    const auto maybe_name = feature_properties.at("name_en");
+                    if (maybe_name && maybe_name.get().is<std::string>()) {
+                        name = maybe_name.get().get<std::string>();
+                    }
+
+                    printf("found feature in %s: %s\n", layer_id.c_str(), name.c_str());
 
 
                     results.push_back(result);
