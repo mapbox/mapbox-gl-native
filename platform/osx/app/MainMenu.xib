@@ -469,6 +469,13 @@
                                     <action selector="toggleRandomizesCursorsOnDroppedPins:" target="-1" id="Mpw-b8-oub"/>
                                 </connections>
                             </menuItem>
+                            <menuItem isSeparatorItem="YES" id="wQq-Mx-QY0"/>
+                            <menuItem title="Blanket Map With Pins" id="LMZ-oe-Ngh">
+                                <modifierMask key="keyEquivalentModifierMask"/>
+                                <connections>
+                                    <action selector="dropManyPins:" target="-1" id="Rtv-8N-3Z8"/>
+                                </connections>
+                            </menuItem>
                         </items>
                     </menu>
                 </menuItem>
