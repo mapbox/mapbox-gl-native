@@ -157,12 +157,12 @@ void AnnotationManager::removeTileMonitor(AnnotationTileMonitor& monitor) {
     monitors.erase(&monitor);
 }
 
-void AnnotationManager::setSprite(const std::string& name, std::shared_ptr<const SpriteImage> sprite) {
+void AnnotationManager::addIcon(const std::string& name, std::shared_ptr<const SpriteImage> sprite) {
     spriteStore.setSprite(name, sprite);
     spriteAtlas.updateDirty();
 }
 
-double AnnotationManager::getTopOffsetPixelsForAnnotationSymbol(const std::string& name) {
+double AnnotationManager::getTopOffsetPixelsForIcon(const std::string& name) {
     auto sprite = spriteStore.getSprite(name);
     return sprite ? -sprite->height / 2 : 0;
 }

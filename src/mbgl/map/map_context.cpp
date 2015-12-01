@@ -267,9 +267,14 @@ bool MapContext::isLoaded() const {
     return style->isLoaded();
 }
 
-double MapContext::getTopOffsetPixelsForAnnotationSymbol(const std::string& symbol) {
+void MapContext::addAnnotationIcon(const std::string& name, std::shared_ptr<const SpriteImage> sprite) {
     assert(util::ThreadContext::currentlyOn(util::ThreadType::Map));
-    return data.getAnnotationManager()->getTopOffsetPixelsForAnnotationSymbol(symbol);
+    data.getAnnotationManager()->addIcon(name, sprite);
+}
+
+double MapContext::getTopOffsetPixelsForAnnotationIcon(const std::string& name) {
+    assert(util::ThreadContext::currentlyOn(util::ThreadType::Map));
+    return data.getAnnotationManager()->getTopOffsetPixelsForIcon(name);
 }
 
 void MapContext::setSourceTileCacheSize(size_t size) {
@@ -287,11 +292,6 @@ void MapContext::onLowMemory() {
     if (!style) return;
     style->onLowMemory();
     asyncInvalidate.send();
-}
-
-void MapContext::setSprite(const std::string& name, std::shared_ptr<const SpriteImage> sprite) {
-    assert(util::ThreadContext::currentlyOn(util::ThreadType::Map));
-    data.getAnnotationManager()->setSprite(name, sprite);
 }
 
 void MapContext::onTileDataChanged() {

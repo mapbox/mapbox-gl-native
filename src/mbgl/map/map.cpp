@@ -367,8 +367,16 @@ LatLng Map::latLngForPixel(const PrecisionPoint& pixel) const {
 
 #pragma mark - Annotations
 
-double Map::getTopOffsetPixelsForAnnotationSymbol(const std::string& symbol) {
-    return context->invokeSync<double>(&MapContext::getTopOffsetPixelsForAnnotationSymbol, symbol);
+void Map::addAnnotationIcon(const std::string& name, std::shared_ptr<const SpriteImage> sprite) {
+    context->invoke(&MapContext::addAnnotationIcon, name, sprite);
+}
+
+void Map::removeAnnotationIcon(const std::string& name) {
+    addAnnotationIcon(name, nullptr);
+}
+
+double Map::getTopOffsetPixelsForAnnotationIcon(const std::string& symbol) {
+    return context->invokeSync<double>(&MapContext::getTopOffsetPixelsForAnnotationIcon, symbol);
 }
 
 AnnotationID Map::addPointAnnotation(const PointAnnotation& annotation) {
@@ -407,18 +415,6 @@ AnnotationIDs Map::getPointAnnotationsInBounds(const LatLngBounds& bounds) {
 LatLngBounds Map::getBoundsForAnnotations(const AnnotationIDs& annotations) {
     return data->getAnnotationManager()->getBoundsForAnnotations(annotations);
 }
-
-
-#pragma mark - Sprites
-
-void Map::setSprite(const std::string& name, std::shared_ptr<const SpriteImage> sprite) {
-    context->invoke(&MapContext::setSprite, name, sprite);
-}
-
-void Map::removeSprite(const std::string& name) {
-    setSprite(name, nullptr);
-}
-
 
 #pragma mark - Toggles
 

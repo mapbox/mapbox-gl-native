@@ -2263,7 +2263,7 @@ CLLocationCoordinate2D MGLLocationCoordinate2DFromLatLng(mbgl::LatLng latLng)
 
     // sprite upload
     NSString *symbolName = [MGLAnnotationSpritePrefix stringByAppendingString:annotationImage.reuseIdentifier];
-    _mbglMap->setSprite(symbolName.UTF8String, cSpriteImage);
+    _mbglMap->addAnnotationIcon(symbolName.UTF8String, cSpriteImage);
 }
 
 - (void)removeAnnotation:(id <MGLAnnotation>)annotation
@@ -2397,7 +2397,7 @@ CLLocationCoordinate2D MGLLocationCoordinate2DFromLatLng(mbgl::LatLng latLng)
 
             // determine anchor point based on symbol
             CGPoint calloutAnchorPoint = [self convertCoordinate:annotation.coordinate toPointToView:self];
-            double y = _mbglMap->getTopOffsetPixelsForAnnotationSymbol(cSymbolName);
+            double y = _mbglMap->getTopOffsetPixelsForAnnotationIcon(cSymbolName);
             calloutBounds = CGRectMake(calloutAnchorPoint.x - 1, calloutAnchorPoint.y + y, 0, 0);
         }
 

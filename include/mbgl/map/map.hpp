@@ -146,6 +146,10 @@ public:
     LatLng latLngForPixel(const PrecisionPoint&) const;
 
     // Annotations
+    void addAnnotationIcon(const std::string&, std::shared_ptr<const SpriteImage>);
+    void removeAnnotationIcon(const std::string&);
+    double getTopOffsetPixelsForAnnotationIcon(const std::string&);
+
     AnnotationID addPointAnnotation(const PointAnnotation&);
     AnnotationIDs addPointAnnotations(const std::vector<PointAnnotation>&);
 
@@ -157,11 +161,6 @@ public:
 
     AnnotationIDs getPointAnnotationsInBounds(const LatLngBounds&);
     LatLngBounds getBoundsForAnnotations(const AnnotationIDs&);
-    double getTopOffsetPixelsForAnnotationSymbol(const std::string&);
-
-    // Sprites
-    void setSprite(const std::string&, std::shared_ptr<const SpriteImage>);
-    void removeSprite(const std::string&);
 
     // Memory
     void setSourceTileCacheSize(size_t);

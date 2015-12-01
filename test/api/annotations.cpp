@@ -52,7 +52,7 @@ TEST(Annotations, PointAnnotation) {
 
     Map map(view, fileSource, MapMode::Still);
     map.setStyleJSON(util::read_file("test/fixtures/api/empty.json"), "");
-    map.setSprite("default_marker", defaultMarker());
+    map.addAnnotationIcon("default_marker", defaultMarker());
     map.addPointAnnotation(PointAnnotation({ 0, 0 }, "default_marker"));
 
     checkRendering(map, "point_annotation");
@@ -117,7 +117,7 @@ TEST(Annotations, AddMultiple) {
 
     Map map(view, fileSource, MapMode::Still);
     map.setStyleJSON(util::read_file("test/fixtures/api/empty.json"), "");
-    map.setSprite("default_marker", defaultMarker());
+    map.addAnnotationIcon("default_marker", defaultMarker());
     map.addPointAnnotation(PointAnnotation({ 0, -10 }, "default_marker"));
 
     render(map);
@@ -154,7 +154,7 @@ TEST(Annotations, RemovePoint) {
 
     Map map(view, fileSource, MapMode::Still);
     map.setStyleJSON(util::read_file("test/fixtures/api/empty.json"), "");
-    map.setSprite("default_marker", defaultMarker());
+    map.addAnnotationIcon("default_marker", defaultMarker());
     uint32_t point = map.addPointAnnotation(PointAnnotation({ 0, 0 }, "default_marker"));
 
     render(map);
@@ -205,7 +205,7 @@ TEST(Annotations, SwitchStyle) {
 
     Map map(view, fileSource, MapMode::Still);
     map.setStyleJSON(util::read_file("test/fixtures/api/empty.json"), "");
-    map.setSprite("default_marker", defaultMarker());
+    map.addAnnotationIcon("default_marker", defaultMarker());
     map.addPointAnnotation(PointAnnotation({ 0, 0 }, "default_marker"));
 
     render(map);

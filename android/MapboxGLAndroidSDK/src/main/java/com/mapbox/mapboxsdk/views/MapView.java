@@ -1723,7 +1723,7 @@ public final class MapView extends FrameLayout {
         }
         float scale = density / DisplayMetrics.DENSITY_DEFAULT;
 
-        mNativeMapView.setSprite(
+        mNativeMapView.addAnnotationIcon(
                 id,
                 (int) (bitmap.getWidth() / scale),
                 (int) (bitmap.getHeight() / scale),

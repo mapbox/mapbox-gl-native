@@ -48,15 +48,14 @@ public:
 
     bool isLoaded() const;
 
-    double getTopOffsetPixelsForAnnotationSymbol(const std::string& symbol);
+    void addAnnotationIcon(const std::string&, std::shared_ptr<const SpriteImage>);
+    double getTopOffsetPixelsForAnnotationIcon(const std::string&);
     void updateAnnotations();
 
     void setSourceTileCacheSize(size_t size);
     void onLowMemory();
 
     void cleanup();
-
-    void setSprite(const std::string&, std::shared_ptr<const SpriteImage>);
 
     // Style::Observer implementation.
     void onTileDataChanged() override;

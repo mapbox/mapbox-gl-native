@@ -33,8 +33,8 @@ public:
     AnnotationIDs getPointAnnotationsInBounds(const LatLngBounds&) const;
     LatLngBounds getBoundsForAnnotations(const AnnotationIDs&) const;
 
-    void setSprite(const std::string& name, std::shared_ptr<const SpriteImage>);
-    double getTopOffsetPixelsForAnnotationSymbol(const std::string& name);
+    void addIcon(const std::string& name, std::shared_ptr<const SpriteImage>);
+    double getTopOffsetPixelsForIcon(const std::string& name);
     SpriteAtlas& getSpriteAtlas() { return spriteAtlas; }
 
     void updateStyle(Style&);
