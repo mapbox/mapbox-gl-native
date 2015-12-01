@@ -287,7 +287,7 @@ std::vector<std::pair<std::string, FeatureProperties>> MapContext::featuresAt(co
 
 //    printf("core: %f, %f\n", p_.latitude, p_.longitude);
 
-    // figure out tile
+    // figure out tile (bounded by source max zoom)
     //
     double sine = std::sin(p_.latitude * M_PI / 180);
     double x = p_.longitude / 360 + 0.5;
@@ -297,48 +297,33 @@ std::vector<std::pair<std::string, FeatureProperties>> MapContext::featuresAt(co
 
 //    PrecisionPoint p(x, y);
 
-    const auto z = floor(transformState.getZoom());
+    const auto z = ::fmin(::floor(transformState.getZoom()), 15);
     const auto z2 = powf(2, z);
-    TileID id(z, floor(x * z2), floor(y * z2), ::fmin(z, 15));
+    TileID id(z, ::floor(x * z2), ::floor(y * z2), ::floor(transformState.getZoom()));
 
     // figure out tile coordinate
     //
-//    TileCoordinate coordinate = transformState.pointToCoordinate(point);
+    TileCoordinate coordinate = transformState.pointToCoordinate(point);
 
     // figure out query bounds
     //
-    const auto world_size = util::tileSize * transformState.getScale();
-    const auto scale = world_size / z2;
+    coordinate = coordinate.zoomTo(::fmin(id.z, 15));
 
-//    coordinate.zoomTo(::fmin(id.z, 18));
-//    coordinate.column /= id.overscaling;
-//    coordinate.row /= id.overscaling;
-//    coordinate.row = 4096 - coordinate.row;
+    vec2<uint16_t> position((coordinate.column - id.x) * 4096, (coordinate.row - id.y) * 4096);
 
-
-    vec2<double> coordinate(x * z2, y * z2);
-
-
-
-    vec3<uint16_t> position((coordinate.x - id.x) * 4096, (coordinate.y - id.y) * 4096, scale);
-
-
-
-
-    std::vector<std::pair<std::string, FeatureProperties>> results;
-
-    printf("===== query: %i, %i\n", position.x, position.y);
-
-
+    const auto tile_scale = ::pow(2, z);
+    const auto scale = util::tileSize * transformState.getScale() / tile_scale;
 
     const auto radius = 5 * 4096 / scale;
+
+    printf("===== query: %i,%i,%i @ %i, %i (radius: %f)\n", id.z, id.x, id.y, position.x, position.y, radius);
+
     FeatureBox queryBox = {
         { position.x - radius, position.y - radius },
         { position.x + radius, position.y + radius }
     };
 
-
-
+    std::vector<std::pair<std::string, FeatureProperties>> results;
 
     for (const auto& source : style->sources) {
         if (source->info.type == SourceType::Vector) {
