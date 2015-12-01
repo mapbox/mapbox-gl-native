@@ -56,7 +56,7 @@ void ThreadContext::setFileSource(FileSource* fileSource) {
     if (current.get() != nullptr) {
         current.get()->fileSource = fileSource;
     } else {
-        throw new std::runtime_error("Current thread has no current ThreadContext.");
+        throw std::runtime_error("Current thread has no current ThreadContext.");
     }
 }
 
@@ -72,7 +72,7 @@ void ThreadContext::setGLObjectStore(GLObjectStore* glObjectStore) {
     if (current.get() != nullptr) {
         current.get()->glObjectStore = glObjectStore;
     } else {
-        throw new std::runtime_error("Current thread has no current ThreadContext.");
+        throw std::runtime_error("Current thread has no current ThreadContext.");
     }
 }
 

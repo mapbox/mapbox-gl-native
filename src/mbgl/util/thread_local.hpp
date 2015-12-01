@@ -24,13 +24,13 @@ public:
         });
 
         if (ret) {
-            throw new std::runtime_error("Failed to init local storage key.");
+            throw std::runtime_error("Failed to init local storage key.");
         }
     }
 
     inline ~ThreadLocal() {
         if (pthread_key_delete(key)) {
-            throw new std::runtime_error("Failed to delete local storage key.");
+            throw std::runtime_error("Failed to delete local storage key.");
         }
     }
 
@@ -45,7 +45,7 @@ public:
 
     inline void set(T* ptr) {
         if (pthread_setspecific(key, ptr)) {
-            throw new std::runtime_error("Failed to set local storage.");
+            throw std::runtime_error("Failed to set local storage.");
         }
     }
 

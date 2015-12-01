@@ -19,7 +19,7 @@ const static bool sqliteVersionCheck = []() {
 
     return true;
 }();
-#pragma GCC diagnostic pop 
+#pragma GCC diagnostic pop
 
 namespace mapbox {
 namespace sqlite {
@@ -27,9 +27,9 @@ namespace sqlite {
 Database::Database(const std::string &filename, int flags) {
     const int err = sqlite3_open_v2(filename.c_str(), &db, flags, nullptr);
     if (err != SQLITE_OK) {
-        Exception ex { err, sqlite3_errmsg(db) };
+        const auto message = sqlite3_errmsg(db);
         db = nullptr;
-        throw ex;
+        throw Exception { err, message };
     }
 }
 
@@ -59,9 +59,9 @@ void Database::exec(const std::string &sql) {
     char *msg = nullptr;
     const int err = sqlite3_exec(db, sql.c_str(), nullptr, nullptr, &msg);
     if (msg) {
-        Exception ex { err, msg };
+        const std::string message = msg;
         sqlite3_free(msg);
-        throw ex;
+        throw Exception { err, message };
     } else if (err != SQLITE_OK) {
         throw Exception { err, sqlite3_errmsg(db) };
     }
