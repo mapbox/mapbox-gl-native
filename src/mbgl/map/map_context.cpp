@@ -343,7 +343,7 @@ std::vector<std::pair<std::string, FeatureProperties>> MapContext::featuresAt(co
     for (const auto& source : style->sources) {
         if (source->info.type == SourceType::Vector) {
             for (const auto& tile : source->getLoadedTiles()) {
-    //            if (tile->id == coordinate)
+                if (tile->id != id) continue;
 //                printf("[%s]: %i,%i,%i\n", source->info.source_id.c_str(), tile->id.z, tile->id.x, tile->id.y);
 
                 const auto& tile_data = tile->data;
