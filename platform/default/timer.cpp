@@ -66,8 +66,7 @@ Timer::Timer()
     : impl(std::make_unique<Impl>()) {
 }
 
-Timer::~Timer() {
-}
+Timer::~Timer() = default;
 
 void Timer::start(Duration timeout, Duration repeat, std::function<void()>&& cb) {
     impl->start(std::chrono::duration_cast<std::chrono::milliseconds>(timeout).count(),

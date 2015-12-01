@@ -7,7 +7,7 @@ namespace mbgl { namespace util {
 
 UnitBezier ease(0, 0, 0.25, 1);
 
-transition::~transition() {}
+transition::~transition() = default;
 
 template <typename T>
 transition::state ease_transition<T>::update(const TimePoint& now) const {

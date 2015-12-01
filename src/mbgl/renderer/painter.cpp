@@ -48,8 +48,7 @@ Painter::Painter(MapData& data_, TransformState& state_)
     setup();
 }
 
-Painter::~Painter() {
-}
+Painter::~Painter() = default;
 
 bool Painter::needsAnimation() const {
     return frameHistory.needsAnimation(data.getDefaultFadeDuration());

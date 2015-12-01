@@ -14,7 +14,7 @@ enum ImageAlphaMode {
 template <ImageAlphaMode Mode>
 class Image {
 public:
-    Image() {}
+    Image() = default;
 
     Image(size_t w, size_t h)
         : width(w),

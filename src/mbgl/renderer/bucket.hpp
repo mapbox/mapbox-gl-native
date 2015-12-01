@@ -30,7 +30,7 @@ public:
     // once or twice (for Opaque and Transparent render passes).
     virtual void render(Painter&, const StyleLayer&, const TileID&, const mat4&) = 0;
 
-    virtual ~Bucket() {}
+    virtual ~Bucket() = default;
 
     virtual bool hasData() const = 0;
 

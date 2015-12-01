@@ -65,8 +65,7 @@ AsyncTask::AsyncTask(std::function<void()>&& fn)
     : impl(std::make_unique<Impl>(std::move(fn))) {
 }
 
-AsyncTask::~AsyncTask() {
-}
+AsyncTask::~AsyncTask() = default;
 
 void AsyncTask::send() {
     impl->maySend();

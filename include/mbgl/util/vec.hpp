@@ -16,7 +16,7 @@ struct vec2 {
 
     T x, y;
 
-    inline vec2() {}
+    inline vec2() = default;
 
     template<typename U = T, typename std::enable_if<std::numeric_limits<U>::has_quiet_NaN, int>::type = 0>
     inline vec2(null) : x(std::numeric_limits<T>::quiet_NaN()), y(std::numeric_limits<T>::quiet_NaN()) {}
@@ -24,7 +24,7 @@ struct vec2 {
     template<typename U = T, typename std::enable_if<!std::numeric_limits<U>::has_quiet_NaN, int>::type = 0>
     inline vec2(null) : x(std::numeric_limits<T>::min()), y(std::numeric_limits<T>::min()) {}
 
-    inline vec2(const vec2& o) : x(o.x), y(o.y) {}
+    inline vec2(const vec2& o) = default;
 
     template<typename U>
     inline vec2(const U& u) : x(u.x), y(u.y) {}
@@ -99,7 +99,7 @@ template <typename T = double>
 struct vec3 {
     T x, y, z;
 
-    inline vec3() {}
+    inline vec3() = default;
     inline vec3(const vec3& o) : x(o.x), y(o.y), z(o.z) {}
     inline vec3(T x_, T y_, T z_) : x(x_), y(y_), z(z_) {}
     inline bool operator==(const vec3& rhs) const {
@@ -111,7 +111,7 @@ template <typename T = double>
 struct vec4 {
     T x, y, z, w;
 
-    inline vec4() {}
+    inline vec4() = default;
     inline vec4(const vec4& o) : x(o.x), y(o.y), z(o.z), w(o.w) {}
     inline vec4(T x_, T y_, T z_, T w_) : x(x_), y(y_), z(z_), w(w_) {}
     inline bool operator==(const vec4& rhs) const {
