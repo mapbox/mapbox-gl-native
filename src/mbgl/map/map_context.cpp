@@ -285,6 +285,8 @@ std::vector<std::pair<std::string, FeatureProperties>> MapContext::featuresAt(co
 
     LatLng p_ = transformState.pointToLatLng(point);
 
+    printf("core: %f, %f\n", p_.latitude, p_.longitude);
+
     // figure out tile
     //
     double sine = std::sin(p_.latitude * M_PI / 180);
