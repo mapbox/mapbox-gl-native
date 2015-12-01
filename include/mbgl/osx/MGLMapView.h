@@ -69,6 +69,8 @@ IB_DESIGNABLE
 - (void)selectAnnotation:(id <MGLAnnotation>)annotation animated:(BOOL)animated;
 - (void)deselectAnnotation:(id <MGLAnnotation>)annotation animated:(BOOL)animated;
 
+- (id <MGLAnnotation>)annotationAtPoint:(NSPoint)point;
+
 - (void)addOverlay:(id <MGLOverlay>)overlay;
 - (void)addOverlays:(NS_ARRAY_OF(id <MGLOverlay>) *)overlays;
 - (void)removeOverlay:(id <MGLOverlay>)overlay;

@@ -669,6 +669,12 @@
                         <action selector="dropPin:" target="Voe-Tx-rLC" id="eDR-iw-JUG"/>
                     </connections>
                 </menuItem>
+                <menuItem title="Remove Pin" id="rgF-cY-qgP">
+                    <modifierMask key="keyEquivalentModifierMask"/>
+                    <connections>
+                        <action selector="removePin:" target="Voe-Tx-rLC" id="38n-9m-8Wp"/>
+                    </connections>
+                </menuItem>
             </items>
             <connections>
                 <outlet property="delegate" destination="Voe-Tx-rLC" id="MsV-YU-f4X"/>

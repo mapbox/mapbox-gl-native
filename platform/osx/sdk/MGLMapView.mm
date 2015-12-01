@@ -217,6 +217,7 @@ public:
     _annotationContextsByAnnotationID = {};
     _selectedAnnotationID = MGLAnnotationNotFound;
     _lastSelectedAnnotationID = MGLAnnotationNotFound;
+    _annotationsNearbyLastClick = {};
     
     mbgl::CameraOptions options;
     options.center = mbgl::LatLng(0, 0);
@@ -873,62 +874,8 @@ public:
         return;
     }
     
-    // Look for any annotation near the click. An annotation is “near” if the
-    // distance between its center and the click is less than the maximum height
-    // or width of an installed annotation image.
     NSPoint gesturePoint = [gestureRecognizer locationInView:self];
-    NSRect queryRect = NSInsetRect({ gesturePoint, NSZeroSize },
-                                   -_unionedAnnotationImageSize.width / 2,
-                                   -_unionedAnnotationImageSize.height / 2);
-    queryRect = NSInsetRect(queryRect, -MGLAnnotationImagePaddingForHitTest,
-                            -MGLAnnotationImagePaddingForHitTest);
-    mbgl::LatLngBounds queryBounds = [self convertRectToLatLngBounds:queryRect];
-    std::vector<MGLAnnotationID> nearbyAnnotations = _mbglMap->getPointAnnotationsInBounds(queryBounds);
-    
-    if (nearbyAnnotations.size()) {
-        NSRect hitRect = NSInsetRect({ gesturePoint, NSZeroSize },
-                                     -MGLAnnotationImagePaddingForHitTest,
-                                     -MGLAnnotationImagePaddingForHitTest);
-        mbgl::util::erase_if(nearbyAnnotations, [&](const MGLAnnotationID annotationID) {
-            NSAssert(_annotationContextsByAnnotationID.count(annotationID) != 0, @"Unknown annotation found nearby click");
-            id <MGLAnnotation> annotation = [self annotationWithID:annotationID];
-            if (!annotation) {
-                return true;
-            }
-            
-            MGLAnnotationImage *annotationImage = [self imageOfAnnotationWithID:annotationID];
-            if (!annotationImage.selectable) {
-                return true;
-            }
-            
-            NSRect annotationRect = [self frameOfImage:annotationImage.image
-                                  centeredAtCoordinate:annotation.coordinate];
-            return !!![annotationImage.image hitTestRect:hitRect withImageDestinationRect:annotationRect
-                                                 context:nil hints:nil flipped:NO];
-        });
-    }
-    
-    MGLAnnotationID hitAnnotationID = MGLAnnotationNotFound;
-    if (nearbyAnnotations.size()) {
-        std::sort(nearbyAnnotations.begin(), nearbyAnnotations.end());
-        
-        if (nearbyAnnotations == _annotationsNearbyLastClick) {
-            if (_lastSelectedAnnotationID == _annotationsNearbyLastClick.back()
-                || _lastSelectedAnnotationID == MGLAnnotationNotFound) {
-                hitAnnotationID = _annotationsNearbyLastClick.front();
-            } else {
-                auto result = std::find(_annotationsNearbyLastClick.begin(),
-                                        _annotationsNearbyLastClick.end(),
-                                        _lastSelectedAnnotationID);
-                auto distance = std::distance(_annotationsNearbyLastClick.begin(), result);
-                hitAnnotationID = _annotationsNearbyLastClick[distance + 1];
-            }
-        } else {
-            _annotationsNearbyLastClick = nearbyAnnotations;
-            hitAnnotationID = _annotationsNearbyLastClick.front();
-        }
-    }
-    
+    MGLAnnotationID hitAnnotationID = [self annotationIDAtPoint:gesturePoint persistingResults:YES];
     if (hitAnnotationID != MGLAnnotationNotFound) {
         if (hitAnnotationID != _selectedAnnotationID) {
             id <MGLAnnotation> annotation = [self annotationWithID:hitAnnotationID];
@@ -1282,6 +1229,73 @@ public:
     return self.annotationImagesByIdentifier[identifier];
 }
 
+- (id <MGLAnnotation>)annotationAtPoint:(NSPoint)point {
+    return [self annotationWithID:[self annotationIDAtPoint:point persistingResults:NO]];
+}
+
+- (MGLAnnotationID)annotationIDAtPoint:(NSPoint)point persistingResults:(BOOL)persist {
+    // Look for any annotation near the click. An annotation is “near” if the
+    // distance between its center and the click is less than the maximum height
+    // or width of an installed annotation image.
+    NSRect queryRect = NSInsetRect({ point, NSZeroSize },
+                                   -_unionedAnnotationImageSize.width / 2,
+                                   -_unionedAnnotationImageSize.height / 2);
+    queryRect = NSInsetRect(queryRect, -MGLAnnotationImagePaddingForHitTest,
+                            -MGLAnnotationImagePaddingForHitTest);
+    mbgl::LatLngBounds queryBounds = [self convertRectToLatLngBounds:queryRect];
+    std::vector<MGLAnnotationID> nearbyAnnotations = _mbglMap->getPointAnnotationsInBounds(queryBounds);
+    
+    if (nearbyAnnotations.size()) {
+        NSRect hitRect = NSInsetRect({ point, NSZeroSize },
+                                     -MGLAnnotationImagePaddingForHitTest,
+                                     -MGLAnnotationImagePaddingForHitTest);
+        mbgl::util::erase_if(nearbyAnnotations, [&](const MGLAnnotationID annotationID) {
+            NSAssert(_annotationContextsByAnnotationID.count(annotationID) != 0, @"Unknown annotation found nearby click");
+            id <MGLAnnotation> annotation = [self annotationWithID:annotationID];
+            if (!annotation) {
+                return true;
+            }
+            
+            MGLAnnotationImage *annotationImage = [self imageOfAnnotationWithID:annotationID];
+            if (!annotationImage.selectable) {
+                return true;
+            }
+            
+            NSRect annotationRect = [self frameOfImage:annotationImage.image
+                                  centeredAtCoordinate:annotation.coordinate];
+            return !!![annotationImage.image hitTestRect:hitRect withImageDestinationRect:annotationRect
+                                                 context:nil hints:nil flipped:NO];
+        });
+    }
+    
+    MGLAnnotationID hitAnnotationID = MGLAnnotationNotFound;
+    if (nearbyAnnotations.size()) {
+        std::sort(nearbyAnnotations.begin(), nearbyAnnotations.end());
+        
+        if (nearbyAnnotations == _annotationsNearbyLastClick) {
+            if (_lastSelectedAnnotationID == _annotationsNearbyLastClick.back()
+                || _lastSelectedAnnotationID == MGLAnnotationNotFound) {
+                hitAnnotationID = _annotationsNearbyLastClick.front();
+            } else {
+                auto result = std::find(_annotationsNearbyLastClick.begin(),
+                                        _annotationsNearbyLastClick.end(),
+                                        _lastSelectedAnnotationID);
+                auto distance = std::distance(_annotationsNearbyLastClick.begin(), result);
+                hitAnnotationID = _annotationsNearbyLastClick[distance + 1];
+            }
+        } else {
+            if (persist) {
+                _annotationsNearbyLastClick = nearbyAnnotations;
+            }
+            if (_annotationsNearbyLastClick.size()) {
+                hitAnnotationID = _annotationsNearbyLastClick.front();
+            }
+        }
+    }
+    
+    return hitAnnotationID;
+}
+
 - (NS_ARRAY_OF(id <MGLAnnotation>) *)selectedAnnotations {
     id <MGLAnnotation> selectedAnnotation = self.selectedAnnotation;
     return selectedAnnotation ? @[selectedAnnotation] : @[];
@@ -1391,7 +1405,8 @@ public:
 }
 
 - (MGLAnnotationImage *)imageOfAnnotationWithID:(MGLAnnotationID)annotationID {
-    if (annotationID == MGLAnnotationNotFound) {
+    if (annotationID == MGLAnnotationNotFound
+        || _annotationContextsByAnnotationID.count(annotationID) == 0) {
         return nil;
     }
     

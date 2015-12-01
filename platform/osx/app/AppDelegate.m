@@ -271,6 +271,14 @@ static NSString * const MGLMapboxAccessTokenDefaultsKey = @"MGLMapboxAccessToken
     [self.mapView selectAnnotation:annotation animated:YES];
 }
 
+- (IBAction)removePin:(NSMenuItem *)sender {
+    [self removePinAtPoint:_mouseLocationForMapViewContextMenu];
+}
+
+- (void)removePinAtPoint:(NSPoint)point {
+    [self.mapView removeAnnotation:[self.mapView annotationAtPoint:point]];
+}
+
 #pragma mark User interface validation
 
 - (BOOL)validateMenuItem:(NSMenuItem *)menuItem {
@@ -319,6 +327,13 @@ static NSString * const MGLMapboxAccessTokenDefaultsKey = @"MGLMapboxAccessToken
         return YES;
     }
     if (menuItem.action == @selector(dropPin:)) {
+        BOOL isOverAnnotation = [self.mapView annotationAtPoint:_mouseLocationForMapViewContextMenu];
+        menuItem.hidden = isOverAnnotation;
+        return YES;
+    }
+    if (menuItem.action == @selector(removePin:)) {
+        BOOL isOverAnnotation = [self.mapView annotationAtPoint:_mouseLocationForMapViewContextMenu];
+        menuItem.hidden = !isOverAnnotation;
         return YES;
     }
     if (menuItem.action == @selector(toggleTileBoundaries:)) {
@@ -423,7 +438,8 @@ static NSString * const MGLMapboxAccessTokenDefaultsKey = @"MGLMapboxAccessToken
 
 - (void)menuWillOpen:(NSMenu *)menu {
     if (menu == self.mapViewContextMenu) {
-        _mouseLocationForMapViewContextMenu = self.window.mouseLocationOutsideOfEventStream;
+        _mouseLocationForMapViewContextMenu = [self.window.contentView convertPoint:self.window.mouseLocationOutsideOfEventStream
+                                                                             toView:self.mapView];
     }
 }
 
