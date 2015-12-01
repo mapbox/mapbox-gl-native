@@ -20,7 +20,7 @@ typedef std::vector<Message> Messages;
 class StyleParserTest : public ::testing::TestWithParam<std::string> {};
 
 TEST_P(StyleParserTest, ParseStyle) {
-    const std::string &base = "test/fixtures/style_parser/" + GetParam();
+    const std::string base = std::string("test/fixtures/style_parser/") + GetParam();
 
     rapidjson::Document infoDoc;
     infoDoc.Parse<0>(util::read_file(base + ".info.json").c_str());

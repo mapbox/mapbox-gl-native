@@ -112,9 +112,10 @@ struct ColorMask {
         MBGL_CHECK_ERROR(glColorMask(value.r, value.g, value.b, value.a));
     }
     inline static Type Get() {
-        GLfloat floats[4];
-        MBGL_CHECK_ERROR(glGetFloatv(GL_COLOR_WRITEMASK, floats));
-        return { floats[0], floats[1], floats[2], floats[3] };
+        GLboolean bools[4];
+        MBGL_CHECK_ERROR(glGetBooleanv(GL_COLOR_WRITEMASK, bools));
+        return { static_cast<bool>(bools[0]), static_cast<bool>(bools[1]),
+                 static_cast<bool>(bools[2]), static_cast<bool>(bools[3]) };
     }
 };
 
