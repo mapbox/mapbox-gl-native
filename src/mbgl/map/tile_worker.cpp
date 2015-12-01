@@ -166,14 +166,15 @@ void TileWorker::parseLayer(const StyleLayer& layer, const GeometryTile& geometr
                         featureBox.max_corner().set<1>(::fmin(point.y, 4096));
                     }
 
-                    FeatureProperties properties;
+                    // TODO: do this opportunistically
+                    FeatureProperties properties = feature->getAllValues();
 
                     std::string name = "(unknown)";
-                    const auto maybe_name = feature->getValue("name_en");
-                    if (maybe_name && maybe_name.get().is<std::string>()) {
-                        name = maybe_name.get().get<std::string>();
-                        properties.emplace("name_en", maybe_name);
-                    }
+//                    const auto maybe_name = feature->getValue("name_en");
+//                    if (maybe_name && maybe_name.get().is<std::string>()) {
+//                        name = maybe_name.get().get<std::string>();
+//                        properties.emplace("name_en", maybe_name);
+//                    }
                     name = layer.id + " - " + name;
 
                     result.featureTree.insert(std::make_tuple(featureBox, layer.id, properties));

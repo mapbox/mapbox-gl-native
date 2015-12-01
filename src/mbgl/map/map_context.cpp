@@ -354,14 +354,12 @@ std::vector<std::pair<std::string, FeatureProperties>> MapContext::featuresAt(co
 
                     const auto result = std::make_pair(layer_id, feature_properties);
 
-                    std::string name = "foo";
-                    const auto maybe_name = feature_properties.at("name_en");
-                    if (maybe_name && maybe_name.get().is<std::string>()) {
-                        name = maybe_name.get().get<std::string>();
+                    std::string properties = "";
+                    for (const auto property : feature_properties) {
+                        properties = "\n\t" + property.first + ": " + property.second;
                     }
 
-                    printf("found feature in %s: %s\n", layer_id.c_str(), name.c_str());
-
+                    printf("found feature in %s: %s\n", layer_id.c_str(), properties.c_str());
 
                     results.push_back(result);
                 }));

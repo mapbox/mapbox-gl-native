@@ -19,6 +19,10 @@ mapbox::util::optional<Value> AnnotationTileFeature::getValue(const std::string&
     return mapbox::util::optional<Value>();
 }
 
+std::unordered_map<std::string, std::string> AnnotationTileFeature::getAllValues() const {
+    return std::unordered_map<std::string, std::string>();
+}
+
 util::ptr<GeometryTileLayer> AnnotationTile::getLayer(const std::string& name) const {
     auto it = layers.find(name);
     if (it != layers.end()) {

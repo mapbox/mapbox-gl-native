@@ -84,6 +84,21 @@ mapbox::util::optional<Value> VectorTileFeature::getValue(const std::string& key
     return mapbox::util::optional<Value>();
 }
 
+std::unordered_map<std::string, std::string> VectorTileFeature::getAllValues() const {
+    std::unordered_map<std::string, std::string> values;
+
+    for (const auto key_it : layer.keys) {
+        const auto& key = key_it.first;
+        const auto maybe_val = getValue(key);
+        if (maybe_val && maybe_val.get().is<std::string>()) {
+            const auto& val = maybe_val.get().get<std::string>();
+            values.emplace(key, val);
+        }
+    }
+
+    return values;
+}
+
 GeometryCollection VectorTileFeature::getGeometries() const {
     pbf data(geometry_pbf);
     uint8_t cmd = 1;

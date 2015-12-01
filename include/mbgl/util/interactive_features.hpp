@@ -4,7 +4,7 @@
 #include <mapbox/optional.hpp>
 #include <mapbox/variant.hpp>
 
-#include <map>
+#include <unordered_map>
 #include <tuple>
 
 #pragma GCC diagnostic push
@@ -33,8 +33,7 @@ namespace FeatureBGM = FeatureBG::model;
 namespace FeatureBGI = FeatureBG::index;
 typedef FeatureBGM::point<int16_t, 2, FeatureBG::cs::cartesian> FeaturePoint;
 typedef FeatureBGM::box<FeaturePoint> FeatureBox;
-typedef mapbox::util::variant<bool, int64_t, uint64_t, double, std::string> FeaturePropertyValue;
-typedef std::map<std::string, mapbox::util::optional<FeaturePropertyValue>> FeatureProperties;
+typedef std::unordered_map<std::string, std::string> FeatureProperties;
 typedef std::tuple<FeatureBox, std::string, FeatureProperties> Feature; // box, layer, properties
 typedef FeatureBGI::rtree<Feature, FeatureBGI::linear<16, 4>> FeatureTree;
 
