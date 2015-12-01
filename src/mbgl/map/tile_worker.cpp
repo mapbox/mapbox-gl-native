@@ -169,16 +169,8 @@ void TileWorker::parseLayer(const StyleLayer& layer, const GeometryTile& geometr
                     // TODO: do this opportunistically
                     FeatureProperties properties = feature->getAllValues();
 
-                    std::string name = "(unknown)";
-//                    const auto maybe_name = feature->getValue("name_en");
-//                    if (maybe_name && maybe_name.get().is<std::string>()) {
-//                        name = maybe_name.get().get<std::string>();
-//                        properties.emplace("name_en", maybe_name);
-//                    }
-                    name = layer.id + " - " + name;
-
                     result.featureTree.insert(std::make_tuple(featureBox, layer.id, properties));
-                    printf("added %s at %i, %i\n", name.c_str(), point.x, point.y);
+                    printf("added feature from %s at %i, %i\n", layer.id.c_str(), point.x, point.y);
                 }
             }
         }
