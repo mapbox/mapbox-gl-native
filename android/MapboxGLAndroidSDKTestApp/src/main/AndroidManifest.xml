@@ -39,6 +39,9 @@
             android:configChanges="orientation|keyboardHidden|screenSize"
             android:label="@string/action_add_bulk_markers" />
         <activity
+            android:name=".TiltActivity"
+            android:label="@string/activity_tilt" />
+        <activity
             android:name=".MapFragmentActivity"
             android:label="@string/activity_map_fragment" />
         <activity

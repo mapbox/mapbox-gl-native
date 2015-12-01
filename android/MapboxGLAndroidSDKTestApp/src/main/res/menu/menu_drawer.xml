@@ -67,6 +67,12 @@
         <menu>
 
             <item
+                android:id="@+id/action_tilt"
+                android:checkable="false"
+                android:icon="@drawable/ic_flip_to_back_24dp"
+                android:title="@string/action_tilt" />
+
+            <item
                 android:id="@+id/action_map_fragment"
                 android:checkable="false"
                 android:icon="@drawable/ic_now_widgets_24dp"
