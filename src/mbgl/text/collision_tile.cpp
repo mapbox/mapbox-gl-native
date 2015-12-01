@@ -101,4 +101,4 @@ Box CollisionTile::getTreeBox(const vec2<float> &anchor, const CollisionBox &box
     };
 }
 
-}
+} // namespace mbgl

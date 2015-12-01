@@ -49,5 +49,5 @@ UnassociatedImage unpremultiply(PremultipliedImage&& src) {
     return dst;
 }
 
-}
-}
+} // namespace util
+} // namespace mbgl

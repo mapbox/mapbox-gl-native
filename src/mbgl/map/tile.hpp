@@ -23,6 +23,6 @@ public:
     util::ptr<TileData> data;
 };
 
-}
+} // namespace mbgl
 
 #endif

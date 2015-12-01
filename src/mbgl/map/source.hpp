@@ -122,6 +122,6 @@ private:
     Observer* observer_ = nullptr;
 };
 
-}
+} // namespace mbgl
 
 #endif

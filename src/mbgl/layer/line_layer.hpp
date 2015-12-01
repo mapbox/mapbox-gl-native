@@ -51,6 +51,6 @@ public:
     LinePaintProperties paint;
 };
 
-}
+} // namespace mbgl
 
 #endif

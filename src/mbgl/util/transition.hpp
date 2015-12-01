@@ -72,7 +72,7 @@ private:
     T& value;
 };
 
-}
-}
+} // namespace util
+} // namespace mbgl
 
 #endif

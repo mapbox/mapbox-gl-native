@@ -23,4 +23,5 @@ transition::state ease_transition<T>::update(const TimePoint& now) const {
 
 template class ease_transition<double>;
 
-}}
+} // namespace util
+} // namespace mbgl

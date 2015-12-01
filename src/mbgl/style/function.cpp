@@ -136,4 +136,4 @@ Faded<T> Function<Faded<T>>::evaluate(const StyleCalculationParameters& paramete
 template class Function<Faded<std::string>>;
 template class Function<Faded<std::vector<float>>>;
 
-}
+} // namespace mbgl

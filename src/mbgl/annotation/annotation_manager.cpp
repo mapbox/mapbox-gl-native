@@ -167,4 +167,4 @@ double AnnotationManager::getTopOffsetPixelsForIcon(const std::string& name) {
     return sprite ? -sprite->height / 2 : 0;
 }
 
-}
+} // namespace mbgl

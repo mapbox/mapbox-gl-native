@@ -54,6 +54,6 @@ public:
     CollisionTile& collisionTile;
 };
 
-}
+} // namespace mbgl
 
 #endif

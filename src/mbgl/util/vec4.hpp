@@ -34,7 +34,7 @@ typedef std::array<double, 4> vec4;
 
 void transformMat4(vec4& out, vec4& a, mat4& m);
 
-}
-}
+} // namespace matrix
+} // namespace mbgl
 
 #endif

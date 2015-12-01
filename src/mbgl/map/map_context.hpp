@@ -95,6 +95,6 @@ private:
     FrameData frameData;
 };
 
-}
+} // namespace mbgl
 
 #endif

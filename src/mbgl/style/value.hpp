@@ -23,7 +23,7 @@ inline bool parseNumericString(const std::string &str, double &result) {
     while (*end != '\0' && isspace(*end)) end++; // eat whitespace after the end
     return errno == 0 && end - begin == long(str.size());
 }
-}
+} // namespace util
 
 template <typename T>
 T toNumber(const Value &value) {
@@ -38,6 +38,6 @@ T toNumber(const Value &value) {
     else return 0;
 }
 
-}
+} // namespace mbgl
 
 #endif

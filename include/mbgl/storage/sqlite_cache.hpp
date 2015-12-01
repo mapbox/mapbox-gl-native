@@ -9,7 +9,7 @@ namespace mbgl {
 
 namespace util {
 template <typename T> class Thread;
-}
+} // namespace util
 
 class SQLiteCache : public FileCache {
 public:
@@ -36,6 +36,6 @@ private:
     static std::weak_ptr<SQLiteCache> masterPtr;
 };
 
-}
+} // namespace mbgl
 
 #endif

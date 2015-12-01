@@ -66,6 +66,6 @@ private:
     GLbyte *bound_offset = 0;
 };
 
-}
+} // namespace mbgl
 
 #endif

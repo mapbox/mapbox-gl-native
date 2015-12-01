@@ -59,6 +59,6 @@ private:
     std::vector<std::unique_ptr<util::Thread<Impl>>> threads;
     std::size_t current = 0;
 };
-}
+} // namespace mbgl
 
 #endif

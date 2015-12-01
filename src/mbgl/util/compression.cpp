@@ -96,5 +96,5 @@ std::string decompress(const std::string &raw) {
 
     return result;
 }
-}
-}
+} // namespace util
+} // namespace mbgl

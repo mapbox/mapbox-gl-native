@@ -56,6 +56,6 @@ private:
     GeometryTileMonitor::Callback callback;
 };
 
-}
+} // namespace mbgl
 
 #endif

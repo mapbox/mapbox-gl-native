@@ -48,7 +48,7 @@ public:
     GLObjectStore* glObjectStore = nullptr;
 };
 
-}
-}
+} // namespace util
+} // namespace mbgl
 
 #endif

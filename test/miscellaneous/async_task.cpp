@@ -33,7 +33,7 @@ private:
     AsyncTask *async;
 };
 
-}
+} // namespace
 
 TEST(AsyncTask, RequestCoalescing) {
     RunLoop loop;

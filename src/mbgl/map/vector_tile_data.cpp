@@ -191,4 +191,4 @@ void VectorTileData::cancel() {
     workRequest.reset();
 }
 
-}
+} // namespace mbgl

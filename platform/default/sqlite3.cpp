@@ -184,5 +184,5 @@ void Statement::reset() {
     sqlite3_reset(stmt);
 }
 
-}
-}
+} // namespace sqlite
+} // namespace mapbox

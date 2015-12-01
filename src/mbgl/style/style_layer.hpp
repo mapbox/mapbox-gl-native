@@ -65,6 +65,6 @@ protected:
     void copy(const StyleLayer& source);
 };
 
-}
+} // namespace mbgl
 
 #endif

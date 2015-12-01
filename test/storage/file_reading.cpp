@@ -52,7 +52,7 @@ private:
     std::function<void(mbgl::Response)> requestCallback;
 };
 
-}
+} // namespace
 
 TEST_F(Storage, AssetStress) {
     SCOPED_TEST(AssetStress)

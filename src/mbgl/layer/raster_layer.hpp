@@ -32,6 +32,6 @@ public:
     RasterPaintProperties paint;
 };
 
-}
+} // namespace mbgl
 
 #endif

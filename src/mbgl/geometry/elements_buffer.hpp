@@ -44,6 +44,6 @@ public:
     void add(element_type a, element_type b);
 };
 
-}
+} // namespace mbgl
 
 #endif

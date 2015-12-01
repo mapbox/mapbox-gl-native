@@ -12,6 +12,6 @@ public:
     void addText(const char *text, double left, double baseline, double scale = 1);
 };
 
-}
+} // namespace mbgl
 
 #endif

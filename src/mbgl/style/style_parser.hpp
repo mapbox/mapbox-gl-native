@@ -44,6 +44,6 @@ private:
     std::forward_list<std::string> stack;
 };
 
-}
+} // namespace mbgl
 
 #endif

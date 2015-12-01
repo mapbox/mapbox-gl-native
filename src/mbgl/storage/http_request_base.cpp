@@ -16,4 +16,4 @@ Seconds HTTPRequestBase::parseCacheControl(const char *value) {
     return Seconds::zero();
 }
 
-}
+} // namespace mbgl

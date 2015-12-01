@@ -246,4 +246,4 @@ std::shared_ptr<SQLiteCache> SharedSQLiteCache::get(const std::string &path) {
 
 std::weak_ptr<SQLiteCache> SharedSQLiteCache::masterPtr;
 
-}
+} // namespace mbgl

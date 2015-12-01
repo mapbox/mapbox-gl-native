@@ -36,6 +36,6 @@ using PremultipliedImage = Image<ImageAlphaMode::Premultiplied>;
 PremultipliedImage decodeImage(const std::string&);
 std::string encodePNG(const PremultipliedImage&);
 
-}
+} // namespace mbgl
 
 #endif

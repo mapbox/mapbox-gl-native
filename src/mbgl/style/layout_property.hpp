@@ -33,6 +33,6 @@ public:
     T value;
 };
 
-}
+} // namespace mbgl
 
 #endif

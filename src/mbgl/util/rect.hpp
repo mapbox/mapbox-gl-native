@@ -23,6 +23,6 @@ struct Rect {
 
     inline bool hasArea() const { return w != 0 && h != 0; }
 };
-}
+} // namespace mbgl
 
 #endif

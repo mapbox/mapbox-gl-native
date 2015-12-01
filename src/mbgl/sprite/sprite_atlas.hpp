@@ -99,6 +99,6 @@ private:
     static const int buffer = 1;
 };
 
-};
+} // namespace mbgl
 
 #endif

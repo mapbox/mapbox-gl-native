@@ -22,6 +22,6 @@ public:
     void add(vertex_type x, vertex_type y, float ex, float ey);
 };
 
-}
+} // namespace mbgl
 
 #endif // MBGL_GEOMETRY_CIRCLE_BUFFER

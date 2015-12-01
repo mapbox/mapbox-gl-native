@@ -92,4 +92,4 @@ void CollisionFeature::bboxifyLabel(const std::vector<Coordinate> &line,
 }
 
 
-}
+} // namespace mbgl

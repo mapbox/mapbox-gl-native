@@ -53,7 +53,7 @@ private:
     pthread_key_t key;
 };
 
-}
-}
+} // namespace util
+} // namespace mbgl
 
 #endif

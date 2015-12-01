@@ -152,6 +152,6 @@ public:
     bool loading = false;
 };
 
-}
+} // namespace mbgl
 
 #endif

@@ -25,6 +25,6 @@ public:
     Raster raster;
 };
 
-}
+} // namespace mbgl
 
 #endif

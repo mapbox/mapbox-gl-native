@@ -9,7 +9,7 @@ namespace {
 using namespace mbgl::util;
 static ThreadLocal<ThreadContext>& current = *new ThreadLocal<ThreadContext>;
 
-}
+} // namespace
 
 namespace mbgl {
 namespace util {
@@ -95,5 +95,5 @@ private:
 // ThreadContext::current object.
 MainThreadContextRegistrar registrar;
 
-}
-}
+} // namespace util
+} // namespace mbgl

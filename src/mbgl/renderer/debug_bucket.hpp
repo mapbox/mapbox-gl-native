@@ -28,6 +28,6 @@ private:
     VertexArrayObject array;
 };
 
-}
+} // namespace mbgl
 
 #endif

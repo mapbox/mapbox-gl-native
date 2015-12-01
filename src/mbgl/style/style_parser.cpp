@@ -288,4 +288,4 @@ void StyleParser::parseVisibility(StyleLayer& layer, const JSVal& value) {
     layer.visibility = VisibilityTypeClass({ value["visibility"].GetString(), value["visibility"].GetStringLength() });
 }
 
-}
+} // namespace mbgl

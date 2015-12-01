@@ -34,5 +34,5 @@ void WorkQueue::pop(const std::function<void()>& fn) {
     queue.pop();
 }
 
-}
-}
+} // namespace util
+} // namespace mbgl

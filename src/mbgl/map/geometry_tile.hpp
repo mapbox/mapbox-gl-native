@@ -79,6 +79,6 @@ private:
     const GeometryTileFeature& feature;
 };
 
-}
+} // namespace mbgl
 
 #endif

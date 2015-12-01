@@ -54,4 +54,4 @@ std::unique_ptr<Bucket> CircleLayer::createBucket(StyleBucketParameters& paramet
     return std::move(bucket);
 }
 
-}
+} // namespace mbgl

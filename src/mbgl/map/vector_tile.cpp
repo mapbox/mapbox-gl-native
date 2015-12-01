@@ -205,4 +205,4 @@ std::unique_ptr<FileRequest> VectorTileMonitor::monitorTile(const GeometryTileMo
     });
 }
 
-}
+} // namespace mbgl

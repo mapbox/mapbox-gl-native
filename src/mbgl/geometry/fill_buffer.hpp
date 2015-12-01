@@ -16,6 +16,6 @@ public:
     void add(vertex_type x, vertex_type y);
 };
 
-}
+} // namespace mbgl
 
 #endif

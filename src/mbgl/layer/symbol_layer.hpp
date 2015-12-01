@@ -100,6 +100,6 @@ public:
     SpriteAtlas* spriteAtlas;
 };
 
-}
+} // namespace mbgl
 
 #endif

@@ -19,4 +19,4 @@ void View::notifyMapChange(MapChange) {
 }
 
 
-}
+} // namespace mbgl

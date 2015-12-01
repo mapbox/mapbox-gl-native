@@ -36,6 +36,6 @@ private:
     std::unique_ptr<mapbox::util::geojsonvt::GeoJSONVT> shapeTiler;
 };
 
-}
+} // namespace mbgl
 
 #endif

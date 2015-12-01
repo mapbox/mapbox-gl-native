@@ -14,4 +14,4 @@ PositionedIcon shapeIcon(const Rect<uint16_t>& image, const SymbolLayoutProperti
     return PositionedIcon(image, y1, y2, x1, x2);
 }
 
-}
+} // namespace mbgl

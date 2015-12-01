@@ -80,6 +80,6 @@ public:
 protected:
     mbgl::Map *map = nullptr;
 };
-}
+} // namespace mbgl
 
 #endif

@@ -67,4 +67,4 @@ std::unique_ptr<Bucket> FillLayer::createBucket(StyleBucketParameters& parameter
     return std::move(bucket);
 }
 
-}
+} // namespace mbgl

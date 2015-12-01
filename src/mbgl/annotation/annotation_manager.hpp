@@ -59,6 +59,6 @@ private:
     SpriteAtlas spriteAtlas;
 };
 
-}
+} // namespace mbgl
 
 #endif

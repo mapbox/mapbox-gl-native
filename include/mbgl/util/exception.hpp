@@ -46,7 +46,7 @@ struct TileLoadingException : Exception {
     inline TileLoadingException(const std::string &msg) : Exception(msg) {}
 };
 
-}
-}
+} // namespace util
+} // namespace mbgl
 
 #endif

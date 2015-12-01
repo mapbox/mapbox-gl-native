@@ -17,8 +17,8 @@ std::string rfc1123(std::time_t time);
 // YYYY-mm-dd HH:MM:SS e.g. "2015-11-26 16:11:23"
 std::string iso8601(std::time_t time);
 
-}
+} // namespace util
 
-}
+} // namespace mbgl
 
 #endif

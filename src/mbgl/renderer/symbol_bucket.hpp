@@ -147,6 +147,6 @@ private:
     std::unique_ptr<SymbolRenderData> renderDataInProgress;
 };
 
-}
+} // namespace mbgl
 
 #endif

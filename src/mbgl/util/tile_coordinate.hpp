@@ -24,6 +24,6 @@ struct TileCoordinate {
     };
 };
 
-}
+} // namespace mbgl
 
 #endif

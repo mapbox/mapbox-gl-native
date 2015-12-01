@@ -94,4 +94,4 @@ void ClipIDGenerator::update(std::forward_list<Tile *> tiles) {
     }
 }
 
-}
+} // namespace mbgl

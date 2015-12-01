@@ -236,6 +236,6 @@ public:
     VertexArrayObject tileBorderArray;
 };
 
-}
+} // namespace mbgl
 
 #endif

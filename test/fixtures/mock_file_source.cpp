@@ -158,4 +158,4 @@ void MockFileSource::cancel(FileRequest* req) {
     thread_->invoke(&Impl::cancelRequest, req);
 }
 
-}
+} // namespace mbgl

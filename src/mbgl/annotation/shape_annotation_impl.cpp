@@ -158,4 +158,4 @@ LatLngBounds ShapeAnnotationImpl::bounds() const {
     return result;
 }
 
-}
+} // namespace mbgl

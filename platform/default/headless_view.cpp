@@ -303,4 +303,4 @@ void HeadlessView::afterRender() {
     // no-op
 }
 
-}
+} // namespace mbgl

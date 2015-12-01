@@ -212,7 +212,7 @@ MBGL_DEFINE_ENUM_CLASS(TextTransformTypeClass, TextTransformType, {
     { TextTransformType::Lowercase, "lowercase" },
 });
 
-}
+} // namespace mbgl
 
 #endif
 

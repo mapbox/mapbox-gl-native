@@ -37,6 +37,6 @@ private:
     std::unique_ptr<WorkRequest> workRequest;
 };
 
-}
+} // namespace mbgl
 
 #endif

@@ -125,4 +125,4 @@ FilterExpression parseFilterExpression(const rapidjson::Value& value) {
     }
 }
 
-}
+} // namespace mbgl

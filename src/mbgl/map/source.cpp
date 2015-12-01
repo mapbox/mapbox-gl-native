@@ -600,4 +600,4 @@ void Source::dumpDebugLogs() const {
     }
 }
 
-}
+} // namespace mbgl

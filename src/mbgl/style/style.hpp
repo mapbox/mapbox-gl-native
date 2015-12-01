@@ -144,6 +144,6 @@ public:
     Worker workers;
 };
 
-}
+} // namespace mbgl
 
 #endif

@@ -63,4 +63,4 @@ TileID::operator std::string() const {
     return util::toString(z) + "/" + util::toString(x) + "/" + util::toString(y);
 }
 
-}
+} // namespace mbgl

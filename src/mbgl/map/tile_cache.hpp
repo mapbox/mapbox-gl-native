@@ -25,6 +25,6 @@ private:
     size_t size;
 };
 
-};
+} // namespace mbgl
 
 #endif

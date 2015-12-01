@@ -35,6 +35,6 @@ public:
     std::deque<FrameSnapshot> history;
 };
 
-}
+} // namespace mbgl
 
 #endif

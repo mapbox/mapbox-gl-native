@@ -42,7 +42,7 @@ void rotate_z(mat4& out, const mat4& a, double rad);
 void scale(mat4& out, const mat4& a, double x, double y, double z);
 void multiply(mat4& out, const mat4& a, const mat4& b);
 
-}
-}
+} // namespace matrix
+} // namespace mbgl
 
 #endif

@@ -70,6 +70,6 @@ private:
     std::shared_ptr<const std::string> data;
 };
 
-}
+} // namespace mbgl
 
 #endif

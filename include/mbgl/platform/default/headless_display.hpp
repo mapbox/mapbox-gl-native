@@ -20,6 +20,6 @@ public:
 #endif
 };
 
-}
+} // namespace mbgl
 
 #endif

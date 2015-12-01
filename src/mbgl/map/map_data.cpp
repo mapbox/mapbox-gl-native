@@ -41,4 +41,4 @@ std::vector<std::string> MapData::getClasses() const {
     return classes;
 }
 
-}
+} // namespace mbgl

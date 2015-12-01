@@ -46,4 +46,4 @@ ClassID ClassDictionary::normalize(ClassID id) {
     }
 }
 
-}
+} // namespace mbgl

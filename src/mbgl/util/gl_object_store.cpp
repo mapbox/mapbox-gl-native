@@ -46,5 +46,5 @@ void GLObjectStore::performCleanup() {
     }
 }
 
-}
-}
+} // namespace util
+} // namespace mbgl

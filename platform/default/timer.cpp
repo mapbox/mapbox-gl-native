@@ -83,5 +83,5 @@ void Timer::unref() {
     impl->unref();
 }
 
-}
-}
+} // namespace util
+} // namespace mbgl

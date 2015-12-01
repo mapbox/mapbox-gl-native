@@ -57,7 +57,7 @@ public:
     }
 };
 
-}
+} // namespace
 
 namespace mbgl {
 
@@ -233,4 +233,4 @@ std::unique_ptr<AssetContextBase> AssetContextBase::createContext() {
     return std::make_unique<AssetFSContext>();
 }
 
-}
+} // namespace mbgl

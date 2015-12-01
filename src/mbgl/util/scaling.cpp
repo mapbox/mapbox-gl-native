@@ -42,7 +42,7 @@ vec2<uint32_t> getBounds(const vec2<uint32_t>& srcSize, const Rect<uint32_t>& sr
              std::min(uint32_t(double(srcSize.y - srcPos.y) / factor.y),
                       std::min(dstSize.y - dstPos.y, dstPos.h)) };
 }
-}
+} // namespace
 
 namespace mbgl {
 namespace util {
@@ -108,5 +108,5 @@ void nearestNeighborScale(const uint32_t* srcData, const vec2<uint32_t>& srcSize
     }
 }
 
-}
-}
+} // namespace util
+} // namespace mbgl

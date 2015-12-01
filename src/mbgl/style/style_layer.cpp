@@ -47,4 +47,4 @@ void StyleLayer::copy(const StyleLayer& src) {
     visibility = src.visibility;
 }
 
-}
+} // namespace mbgl

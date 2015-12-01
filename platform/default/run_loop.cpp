@@ -13,7 +13,7 @@ namespace {
 using namespace mbgl::util;
 static ThreadLocal<RunLoop>& current = *new ThreadLocal<RunLoop>;
 
-}
+} // namespace
 
 namespace mbgl {
 namespace util {
@@ -203,5 +203,5 @@ void RunLoop::removeWatch(int fd) {
     uv_close(reinterpret_cast<uv_handle_t*>(&watch->poll), &Watch::onClose);
 }
 
-}
-}
+} // namespace util
+} // namespace mbgl

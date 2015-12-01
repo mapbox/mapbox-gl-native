@@ -320,4 +320,4 @@ void MapContext::dumpDebugLogs() const {
     Log::Info(Event::General, "--------------------------------------------------------------------------------");
 }
 
-}
+} // namespace mbgl

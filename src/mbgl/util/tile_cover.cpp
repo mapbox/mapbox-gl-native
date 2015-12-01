@@ -97,4 +97,4 @@ std::forward_list<TileID> tileCover(int8_t z, const mbgl::box &bounds, int8_t ac
     return t;
 }
 
-}
+} // namespace mbgl

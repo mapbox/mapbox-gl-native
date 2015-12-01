@@ -147,6 +147,6 @@ public:
     Result value;
 };
 
-}
+} // namespace mbgl
 
 #endif

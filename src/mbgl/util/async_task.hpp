@@ -22,7 +22,7 @@ private:
     std::unique_ptr<Impl> impl;
 };
 
-}
-}
+} // namespace util
+} // namespace mbgl
 
 #endif

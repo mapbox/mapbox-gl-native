@@ -46,4 +46,4 @@ void AnnotationTileMonitor::update(std::unique_ptr<GeometryTile> tile) {
     callback(nullptr, std::move(tile), Seconds::zero(), Seconds::zero());
 }
 
-}
+} // namespace mbgl

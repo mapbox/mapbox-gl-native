@@ -88,6 +88,6 @@ private:
     std::function<void()> transitionFinishFn;
 };
 
-}
+} // namespace mbgl
 
 #endif

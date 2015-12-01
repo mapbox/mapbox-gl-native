@@ -110,8 +110,8 @@ public:
 using glProc = void (*)();
 void InitializeExtensions(glProc (*getProcAddress)(const char *));
 
-}
-}
+} // namespace gl
+} // namespace mbgl
 
 #ifdef GL_ES_VERSION_2_0
     #define glClearDepth glClearDepthf

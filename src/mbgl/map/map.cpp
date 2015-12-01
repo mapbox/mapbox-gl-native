@@ -500,4 +500,4 @@ void Map::dumpDebugLogs() const {
     context->invokeSync(&MapContext::dumpDebugLogs);
 }
 
-}
+} // namespace mbgl

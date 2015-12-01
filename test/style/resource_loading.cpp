@@ -141,7 +141,7 @@ void runTestCase(MockFileSource::Type type,
     }
 }
 
-}
+} // namespace
 
 class ResourceLoading : public ::testing::TestWithParam<std::pair<std::string, std::string>> {
 };

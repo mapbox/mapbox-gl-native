@@ -59,6 +59,6 @@ private:
     PremultipliedImage img;
 };
 
-}
+} // namespace mbgl
 
 #endif

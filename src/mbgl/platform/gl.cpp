@@ -62,8 +62,8 @@ void checkError(const char *cmd, const char *file, int line) {
         throw ::mbgl::gl::Error(err, std::string(cmd) + ": Error GL_" + error + " - " + file + ":" + util::toString(line));
     }
 }
-}
-}
+} // namespace gl
+} // namespace mbgl
 
 #ifdef GL_TRACK
 #undef glBindTexture

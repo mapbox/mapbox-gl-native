@@ -23,6 +23,6 @@ public:
     virtual void put(const Resource &resource, std::shared_ptr<const Response> response, Hint hint) = 0;
 };
 
-}
+} // namespace mbgl
 
 #endif

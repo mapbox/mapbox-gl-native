@@ -28,7 +28,7 @@ private:
 
 ThreadLocal<int> TestThread::number;
 
-}
+} // namespace
 
 TEST(ThreadLocalStorage, Basic) {
     RunLoop loop;
@@ -73,7 +73,7 @@ private:
 
 ThreadLocal<DtorCounter> TestThreadReclaim::counter;
 
-}
+} // namespace
 
 TEST(ThreadLocalStorage, AutoReclaim) {
     RunLoop loop;

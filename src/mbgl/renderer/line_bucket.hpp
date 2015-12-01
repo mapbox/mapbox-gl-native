@@ -64,6 +64,6 @@ private:
     std::vector<std::unique_ptr<TriangleGroup>> triangleGroups;
 };
 
-}
+} // namespace mbgl
 
 #endif

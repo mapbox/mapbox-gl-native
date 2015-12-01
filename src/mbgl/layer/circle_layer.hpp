@@ -35,6 +35,6 @@ public:
     CirclePaintProperties paint;
 };
 
-}
+} // namespace mbgl
 
 #endif

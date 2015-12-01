@@ -57,6 +57,6 @@ namespace mbgl {
         private:
             void bboxifyLabel(const std::vector<Coordinate> &line, const Anchor &anchor, const float length, const float height);
     };
-}
+} // namespace mbgl
 
 #endif

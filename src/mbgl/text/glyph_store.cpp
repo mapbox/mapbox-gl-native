@@ -82,4 +82,4 @@ void GlyphStore::setObserver(Observer* observer_) {
     observer = observer_;
 }
 
-}
+} // namespace mbgl

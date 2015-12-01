@@ -23,7 +23,7 @@ public:
         return ::std::shared_ptr<T>::operator*();
     }
 };
-}
-}
+} // namespace util
+} // namespace mbgl
 
 #endif

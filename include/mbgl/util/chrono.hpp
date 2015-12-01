@@ -42,6 +42,6 @@ Milliseconds toMilliseconds(std::chrono::time_point<_Clock, _Duration> time_poin
     return asMilliseconds(toDuration<_Clock, _Duration>(time_point));
 }
 
-}
+} // namespace mbgl
 
 #endif

@@ -13,4 +13,4 @@ WorkRequest::~WorkRequest() {
     task->cancel();
 }
 
-}
+} // namespace mbgl

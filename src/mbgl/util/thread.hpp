@@ -138,7 +138,7 @@ Thread<Object>::~Thread() {
     thread.join();
 }
 
-}
-}
+} // namespace util
+} // namespace mbgl
 
 #endif

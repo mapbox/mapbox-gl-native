@@ -188,4 +188,4 @@ std::unique_ptr<Bucket> SymbolLayer::createBucket(StyleBucketParameters& paramet
     return std::move(bucket);
 }
 
-}
+} // namespace mbgl

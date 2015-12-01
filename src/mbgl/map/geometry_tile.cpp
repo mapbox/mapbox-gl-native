@@ -14,4 +14,4 @@ mapbox::util::optional<Value> GeometryTileFeatureExtractor::getValue(const std::
 
 template bool evaluate(const FilterExpression&, const GeometryTileFeatureExtractor&);
 
-}
+} // namespace mbgl

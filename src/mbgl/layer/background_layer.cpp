@@ -38,4 +38,4 @@ std::unique_ptr<Bucket> BackgroundLayer::createBucket(StyleBucketParameters&) co
     return nullptr;
 }
 
-}
+} // namespace mbgl

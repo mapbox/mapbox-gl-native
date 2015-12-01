@@ -28,6 +28,6 @@ public:
     BackgroundPaintProperties paint;
 };
 
-}
+} // namespace mbgl
 
 #endif

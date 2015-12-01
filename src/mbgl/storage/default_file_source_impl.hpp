@@ -110,6 +110,6 @@ private:
     util::AsyncTask reachability;
 };
 
-}
+} // namespace mbgl
 
 #endif

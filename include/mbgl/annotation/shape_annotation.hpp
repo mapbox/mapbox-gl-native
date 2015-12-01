@@ -40,6 +40,6 @@ public:
     const Properties properties;
 };
 
-}
+} // namespace mbgl
 
 #endif

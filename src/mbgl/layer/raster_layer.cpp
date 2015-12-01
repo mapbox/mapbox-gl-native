@@ -50,4 +50,4 @@ std::unique_ptr<Bucket> RasterLayer::createBucket(StyleBucketParameters&) const 
     return nullptr;
 }
 
-}
+} // namespace mbgl

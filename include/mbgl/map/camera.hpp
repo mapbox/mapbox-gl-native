@@ -22,6 +22,6 @@ struct CameraOptions {
     std::function<void()> transitionFinishFn;
 };
 
-}
+} // namespace mbgl
 
 #endif /* MBGL_MAP_CAMERA */

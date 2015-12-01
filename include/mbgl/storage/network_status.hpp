@@ -8,7 +8,7 @@ namespace mbgl {
 
 namespace util {
 class AsyncTask;
-}
+} // namespace util
 
 class NetworkStatus {
 public:
@@ -22,6 +22,6 @@ private:
     static std::set<util::AsyncTask*> observers;
 };
 
-}
+} // namespace mbgl
 
 #endif

@@ -113,5 +113,5 @@ void checkImage(const std::string& base,
     util::write_file(base + "/diff.png", encodePNG(diff));
 }
 
-}
-}
+} // namespace test
+} // namespace mbgl

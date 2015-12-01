@@ -30,7 +30,7 @@ struct CameraOptions;
 
 namespace util {
 template <class T> class Thread;
-}
+} // namespace util
 
 struct EdgeInsets {
     double top = 0;
@@ -189,6 +189,6 @@ private:
     RenderState renderState = RenderState::never;
 };
 
-}
+} // namespace mbgl
 
 #endif

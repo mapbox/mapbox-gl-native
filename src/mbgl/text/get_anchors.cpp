@@ -93,4 +93,4 @@ Anchors getAnchors(const std::vector<Coordinate> &line, float spacing,
     return resample(line, offset, spacing, angleWindowSize, maxAngle, labelLength * boxScale, continuedLine, false);
 }
 
-}
+} // namespace mbgl

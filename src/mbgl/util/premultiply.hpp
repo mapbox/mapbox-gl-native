@@ -9,7 +9,7 @@ namespace util {
 PremultipliedImage premultiply(UnassociatedImage&&);
 UnassociatedImage unpremultiply(PremultipliedImage&&);
 
-}
-}
+} // namespace util
+} // namespace mbgl
 
 #endif

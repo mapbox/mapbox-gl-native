@@ -17,4 +17,4 @@ template Milliseconds asMilliseconds<Seconds>(Seconds);
 template Milliseconds toMilliseconds<Clock, Duration>(TimePoint);
 template Milliseconds toMilliseconds<SystemClock, SystemDuration>(SystemTimePoint);
 
-}
+} // namespace mbgl

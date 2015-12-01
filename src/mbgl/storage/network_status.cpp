@@ -29,4 +29,4 @@ void NetworkStatus::Reachable() {
     }
 }
 
-}
+} // namespace mbgl

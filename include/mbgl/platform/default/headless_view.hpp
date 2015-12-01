@@ -76,6 +76,6 @@ private:
     std::thread::id thread;
 };
 
-}
+} // namespace mbgl
 
 #endif

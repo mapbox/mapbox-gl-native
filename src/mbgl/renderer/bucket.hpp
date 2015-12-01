@@ -46,6 +46,6 @@ protected:
 
 };
 
-}
+} // namespace mbgl
 
 #endif

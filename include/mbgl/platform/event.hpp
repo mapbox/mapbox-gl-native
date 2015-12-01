@@ -85,6 +85,6 @@ constexpr EventPermutation disabledEventPermutations[] = {
     { EventSeverity::Debug, Event::Shader }
 };
 
-}
+} // namespace mbgl
 
 #endif

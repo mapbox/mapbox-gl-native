@@ -26,5 +26,5 @@ std::string iso8601(std::time_t time) {
     return buffer;
 }
 
-}
-}
+} // namespace util
+} // namespace mbgl

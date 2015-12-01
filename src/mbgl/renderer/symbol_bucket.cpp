@@ -616,4 +616,4 @@ void SymbolBucket::drawCollisionBoxes(CollisionBoxShader &shader) {
         MBGL_CHECK_ERROR(glDrawArrays(GL_LINES, 0, group->vertex_length));
     }
 }
-}
+} // namespace mbgl

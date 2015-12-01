@@ -100,6 +100,6 @@ struct MetersBounds {
     }
 };
 
-}
+} // namespace mbgl
 
 #endif

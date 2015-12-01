@@ -49,7 +49,7 @@ template<> inline RotationAlignmentType interpolate(const RotationAlignmentType 
 template<> inline Faded<std::string> interpolate(const Faded<std::string>, const Faded<std::string> b, const double) { return b; }
 template<> inline Faded<std::vector<float>> interpolate(const Faded<std::vector<float>>, const Faded<std::vector<float>> b, const double) { return b; }
 
-}
-}
+} // namespace util
+} // namespace mbgl
 
 #endif

@@ -379,4 +379,4 @@ void Style::dumpDebugLogs() const {
     spriteStore->dumpDebugLogs();
 }
 
-}
+} // namespace mbgl

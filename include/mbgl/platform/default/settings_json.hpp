@@ -22,6 +22,6 @@ public:
     EnumType debug = 0;
 };
 
-}
+} // namespace mbgl
 
 #endif

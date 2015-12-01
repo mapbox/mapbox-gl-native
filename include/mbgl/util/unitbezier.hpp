@@ -115,7 +115,7 @@ private:
     double cy;
 };
 
-}
-}
+} // namespace util
+} // namespace mbgl
 
 #endif

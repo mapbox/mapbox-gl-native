@@ -18,6 +18,6 @@ using optional = mapbox::util::optional<T>;
 template <typename T>
 optional<T> parseProperty(const char* name, const JSVal&);
 
-}
+} // namespace mbgl
 
 #endif

@@ -84,7 +84,7 @@ using PreservePixelZoom = Preserve<std::array<double, 2>, getPixelZoom, setPixel
 using PreserveRasterPos = Preserve<std::array<double, 4>, getRasterPos, setRasterPos>;
 #endif
 
-}
-}
+} // namespace gl
+} // namespace mbgl
 
 #endif

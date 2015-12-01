@@ -99,6 +99,6 @@ private:
     std::list<Rect<T>> free;
 };
 
-}
+} // namespace mbgl
 
 #endif

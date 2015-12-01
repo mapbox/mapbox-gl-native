@@ -32,6 +32,6 @@ public:
     FillPaintProperties paint;
 };
 
-}
+} // namespace mbgl
 
 #endif

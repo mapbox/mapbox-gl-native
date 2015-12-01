@@ -36,7 +36,7 @@ void translate(mat3& out, const mat3& a, double x, double y);
 void rotate(mat3& out, const mat3& a, double rad);
 void scale(mat3& out, const mat3& a, double x, double y);
 
-}
-}
+} // namespace matrix
+} // namespace mbgl
 
 #endif

@@ -34,6 +34,6 @@ struct ZoomHistory {
         lastZoom = z;
     }
 };
-}
+} // namespace mbgl
 
 #endif

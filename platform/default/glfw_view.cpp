@@ -536,5 +536,5 @@ void showColorDebugImage(std::string name, const char *data, size_t logicalWidth
 }
 #endif
 
-}
-}
+} // namespace platform
+} // namespace mbgl

@@ -9,7 +9,7 @@ namespace mbgl {
 template <typename T> ::std::ostream& operator<<(::std::ostream& os, const Rect<T>& t) {
     return os << "Rect { " << t.x << ", " << t.y << ", " << t.w << ", " << t.h << " }";
 }
-}
+} // namespace mbgl
 
 TEST(BinPack, Allocating) {
     mbgl::BinPack<uint16_t> bin(128, 128);

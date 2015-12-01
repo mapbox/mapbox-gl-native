@@ -26,6 +26,6 @@ namespace mbgl {
 
     PositionedIcon shapeIcon(const Rect<uint16_t>& image, const SymbolLayoutProperties&);
 
-}
+} // namespace mbgl
 
 #endif

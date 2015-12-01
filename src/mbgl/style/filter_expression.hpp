@@ -120,6 +120,6 @@ struct NoneExpression {
     bool evaluate(const Extractor&) const;
 };
 
-}
+} // namespace mbgl
 
 #endif

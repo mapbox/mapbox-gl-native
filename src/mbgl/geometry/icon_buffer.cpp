@@ -29,4 +29,4 @@ size_t IconVertexBuffer::add(int16_t x, int16_t y, float ox, float oy, int16_t t
     return idx;
 }
 
-}
+} // namespace mbgl

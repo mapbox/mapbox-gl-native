@@ -2,4 +2,4 @@
 
 namespace mbgl {
 
-}
+} // namespace mbgl

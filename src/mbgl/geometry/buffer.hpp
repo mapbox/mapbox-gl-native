@@ -122,6 +122,6 @@ private:
     GLuint buffer = 0;
 };
 
-}
+} // namespace mbgl
 
 #endif
