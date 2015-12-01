@@ -246,7 +246,7 @@ bool MapContext::renderSync(const TransformState& state, const FrameData& frame)
     painter->render(*style, frame, data.getAnnotationManager()->getSpriteAtlas());
 
     if (data.mode == MapMode::Still) {
-        callback(nullptr, std::move(view.readStillImage()));
+        callback(nullptr, view.readStillImage());
         callback = nullptr;
     }
 

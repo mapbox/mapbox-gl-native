@@ -121,9 +121,9 @@ void SQLiteCache::Impl::get(const Resource &resource, Callback callback) {
             response->modified = Seconds(getStmt->get<Seconds::rep>(1));
             response->etag = getStmt->get<std::string>(2);
             response->expires = Seconds(getStmt->get<Seconds::rep>(3));
-            response->data = std::make_shared<std::string>(std::move(getStmt->get<std::string>(4)));
+            response->data = std::make_shared<std::string>(getStmt->get<std::string>(4));
             if (getStmt->get<int>(5)) { // == compressed
-                response->data = std::make_shared<std::string>(std::move(util::decompress(*response->data)));
+                response->data = std::make_shared<std::string>(util::decompress(*response->data));
             }
             callback(std::move(response));
         } else {

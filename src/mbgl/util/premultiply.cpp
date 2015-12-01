@@ -23,7 +23,7 @@ PremultipliedImage premultiply(UnassociatedImage&& src) {
         b = (b * a + 127) / 255;
     }
 
-    return std::move(dst);
+    return dst;
 }
 
 UnassociatedImage unpremultiply(PremultipliedImage&& src) {
@@ -46,7 +46,7 @@ UnassociatedImage unpremultiply(PremultipliedImage&& src) {
         }
     }
 
-    return std::move(dst);
+    return dst;
 }
 
 }

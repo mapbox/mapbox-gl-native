@@ -33,7 +33,7 @@ TEST(API, RepeatedRender) {
         map.renderStill([&promise](std::exception_ptr, PremultipliedImage&& image) {
             promise.set_value(std::move(image));
         });
-        auto result = std::move(promise.get_future().get());
+        auto result = promise.get_future().get();
         ASSERT_EQ(256, result.width);
         ASSERT_EQ(512, result.height);
         util::write_file("test/fixtures/api/1.png", encodePNG(result));
@@ -45,7 +45,7 @@ TEST(API, RepeatedRender) {
         map.renderStill([&promise](std::exception_ptr, PremultipliedImage&& image) {
             promise.set_value(std::move(image));
         });
-        auto result = std::move(promise.get_future().get());
+        auto result = promise.get_future().get();
         ASSERT_EQ(256, result.width);
         ASSERT_EQ(512, result.height);
         util::write_file("test/fixtures/api/2.png", encodePNG(result));

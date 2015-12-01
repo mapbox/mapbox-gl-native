@@ -69,7 +69,7 @@ void Database::exec(const std::string &sql) {
 
 Statement Database::prepare(const char *query) {
     assert(db);
-    return std::move(Statement(db, query));
+    return Statement(db, query);
 }
 
 Statement::Statement(sqlite3 *db, const char *sql) {

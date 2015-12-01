@@ -49,7 +49,7 @@ Anchors resample(const std::vector<Coordinate> &line, const float offset, const 
         // This has the most effect for short lines in overscaled tiles, since the
         // initial offset used in overscaled tiles is calculated to align labels with positions in
         // parent tiles instead of placing the label as close to the beginning as possible.
-        anchors = std::move(resample(line, distance / 2, spacing, angleWindowSize, maxAngle, labelLength, continuedLine, true));
+        anchors = resample(line, distance / 2, spacing, angleWindowSize, maxAngle, labelLength, continuedLine, true);
     }
 
     return anchors;

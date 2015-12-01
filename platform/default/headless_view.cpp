@@ -185,7 +185,7 @@ PremultipliedImage HeadlessView::readStillImage() {
         std::memcpy(rgba + j * stride, tmp.get(), stride);
     }
 
-    return std::move(image);
+    return image;
 }
 
 void HeadlessView::clearBuffers() {

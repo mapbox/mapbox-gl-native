@@ -164,7 +164,7 @@ VectorTileLayer::VectorTileLayer(pbf layer_pbf) {
         } else if (layer_pbf.tag == 3) { // keys
             keys.emplace(layer_pbf.string(), keys.size());
         } else if (layer_pbf.tag == 4) { // values
-            values.emplace_back(std::move(parseValue(layer_pbf.message())));
+            values.emplace_back(parseValue(layer_pbf.message()));
         } else if (layer_pbf.tag == 5) { // extent
             extent = layer_pbf.varint();
         } else {

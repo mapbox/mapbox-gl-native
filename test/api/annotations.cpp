@@ -36,7 +36,7 @@ PremultipliedImage render(Map& map) {
     map.renderStill([&](std::exception_ptr, PremultipliedImage&& image) {
         promise.set_value(std::move(image));
     });
-    return std::move(promise.get_future().get());
+    return promise.get_future().get();
 }
 
 void checkRendering(Map& map, const char * name) {

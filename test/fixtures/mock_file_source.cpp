@@ -67,7 +67,7 @@ void MockFileSource::Impl::replyWithSuccess(Resource resource, Callback callback
     Response res;
 
     try {
-        res.data = std::make_shared<const std::string>(std::move(util::read_file(resource.url)));
+        res.data = std::make_shared<const std::string>(util::read_file(resource.url));
     } catch (const std::exception& err) {
         res.error = std::make_unique<Response::Error>(Response::Error::Reason::Other, err.what());
     }
@@ -103,7 +103,7 @@ void MockFileSource::Impl::replyWithCorruptedData(Resource resource, Callback ca
     }
 
     Response res;
-    auto data = std::make_shared<std::string>(std::move(util::read_file(resource.url)));
+    auto data = std::make_shared<std::string>(util::read_file(resource.url));
     data->insert(0, "CORRUPTED");
     res.data = std::move(data);
     callback(res);
