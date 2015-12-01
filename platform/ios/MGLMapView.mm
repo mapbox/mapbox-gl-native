@@ -385,7 +385,7 @@ std::chrono::steady_clock::duration durationInSeconds(float duration)
 
 - (void)featuresAt:(CGPoint)point
 {
-    NSLog(@"iOS: %f, %f", [self convertPoint:point toCoordinateFromView:self].latitude, [self convertPoint:point toCoordinateFromView:self].longitude);
+//    NSLog(@"iOS: %f, %f", [self convertPoint:point toCoordinateFromView:self].latitude, [self convertPoint:point toCoordinateFromView:self].longitude);
 
     // flip y for core
     _mbglMap->featuresAt(mbgl::PrecisionPoint(point.x, self.bounds.size.height - point.y));

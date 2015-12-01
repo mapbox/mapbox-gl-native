@@ -285,7 +285,7 @@ std::vector<std::pair<std::string, FeatureProperties>> MapContext::featuresAt(co
 
     LatLng p_ = transformState.pointToLatLng(point);
 
-    printf("core: %f, %f\n", p_.latitude, p_.longitude);
+//    printf("core: %f, %f\n", p_.latitude, p_.longitude);
 
     // figure out tile
     //
