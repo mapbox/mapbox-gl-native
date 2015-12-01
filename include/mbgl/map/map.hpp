@@ -7,6 +7,7 @@
 #include <mbgl/util/geo.hpp>
 #include <mbgl/util/noncopyable.hpp>
 #include <mbgl/util/vec.hpp>
+#include <mbgl/util/interactive_features.hpp>
 #include <mbgl/annotation/annotation.hpp>
 
 #include <cstdint>
@@ -160,7 +161,7 @@ public:
     double getTopOffsetPixelsForAnnotationSymbol(const std::string&);
 
     // Features
-    std::vector<std::string> featuresAt(const PrecisionPoint) const;
+    std::vector<std::pair<std::string, FeatureProperties>> featuresAt(const PrecisionPoint) const;
 
     // Sprites
     void setSprite(const std::string&, std::shared_ptr<const SpriteImage>);

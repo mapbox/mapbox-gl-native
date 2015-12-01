@@ -10,6 +10,7 @@
 #include <mbgl/platform/log.hpp>
 #include <mbgl/util/constants.hpp>
 #include <mbgl/util/exception.hpp>
+#include <mbgl/util/interactive_features.hpp>
 
 using namespace mbgl;
 
@@ -136,57 +137,57 @@ void TileWorker::parseLayer(const StyleLayer& layer, const GeometryTile& geometr
 
     std::unique_ptr<Bucket> bucket = layer.createBucket(parameters);
 
+    if (/*layer.interactive &&*/ layer.id.substr(0, 3) == "poi" && bucket->hasData()) {
+//        result.featureTree.clear();
+        printf("tile %i,%i/%i\n", id.z, id.x, id.y);
+        for (std::size_t i = 0; i < geometryLayer->featureCount(); i++) {
+            const auto feature = geometryLayer->getFeature(i);
+            const auto geometries = feature->getGeometries();
+            for (std::size_t j = 0; j < geometries.size(); j++) {
+                FeatureBox featureBox {{ 4096, 4096 }, { 0, 0 }};
+                const auto geometry = geometries.at(j);
+                for (std::size_t k = 0; k < geometry.size(); k++) {
+                    auto point = geometry.at(k);
+                    point.x /= id.overscaling;
+                    point.y /= id.overscaling;
+                    if (point.x < 0 || point.x > 4096 || point.y < 0 || point.y > 4096) continue;
+                    const auto min = featureBox.min_corner();
+                    const auto max = featureBox.max_corner();
+                    if (point.x < min.get<0>()) {
+                        featureBox.min_corner().set<0>(::fmax(point.x, 0));
+                    }
+                    if (point.y < min.get<1>()) {
+                        featureBox.min_corner().set<1>(::fmax(point.y, 0));
+                    }
+                    if (point.x > max.get<0>()) {
+                        featureBox.max_corner().set<0>(::fmin(point.x, 4096));
+                    }
+                    if (point.y > max.get<1>()) {
+                        featureBox.max_corner().set<1>(::fmin(point.y, 4096));
+                    }
+                    std::string name = "(unknown)";
+                    const auto maybe_name = feature->getValue("name_en");
+                    if (maybe_name && maybe_name.get().is<std::string>()) {
+                        name = maybe_name.get().get<std::string>();
+                    }
+                    name = layer.id + " - " + name;
+                    const FeatureProperties empty_properties;
+                    result.featureTree.insert(std::make_tuple(featureBox, layer.id, empty_properties));
+                    printf("added %s at %i, %i\n", name.c_str(), point.x, point.y);
+                }
+            }
+        }
+        if (result.featureTree.size()) {
+            printf("feature tree for %i,%i,%i [%s] has %lu members\n", id.z, id.x, id.y, layer.id.c_str(), result.featureTree.size());
+            const auto bounds = result.featureTree.bounds();
+            printf("box: %i, %i to %i, %i\n", bounds.min_corner().get<0>(), bounds.min_corner().get<1>(), bounds.max_corner().get<0>(), bounds.max_corner().get<1>());
+        }
+    }
+
     if (layer.type == StyleLayerType::Symbol && partialParse) {
         // We cannot parse this bucket yet. Instead, we're saving it for later.
         pending.emplace_back(layer, std::move(bucket));
     } else {
-
-        // catalog features for interactivity
-        //
-        // if (layer.interactive) { ...
-        //
-        // also, we don't get here for raster buckets, since they don't have layers
-
-        if (!partialParse && /*layer.interactive && layer.id.substr(0, 3) == "poi" &&*/ bucket->hasData()) {
-            result.featureTree.clear();
-            for (std::size_t i = 0; i < geometryLayer->featureCount(); i++) {
-                const auto feature = geometryLayer->getFeature(i);
-                const auto geometries = feature->getGeometries();
-                for (std::size_t j = 0; j < geometries.size(); j++) {
-                    FeatureBox featureBox {{ 4096 + 64, 4096 + 64 }, { -64, -64 }};
-                    const auto geometry = geometries.at(j);
-                    for (std::size_t k = 0; k < geometry.size(); k++) {
-                        const auto point = geometry.at(k);
-                        const auto min = featureBox.min_corner();
-                        const auto max = featureBox.max_corner();
-                        if (point.x < min.get<0>()) {
-                            featureBox.min_corner().set<0>(point.x);
-                        }
-                        if (point.y < min.get<1>()) {
-                            featureBox.min_corner().set<1>(point.y);
-                        }
-                        if (point.x > max.get<0>()) {
-                            featureBox.max_corner().set<0>(point.x);
-                        }
-                        if (point.y > max.get<1>()) {
-                            featureBox.max_corner().set<1>(point.y);
-                        }
-                        std::string name = "(unknown)";
-                        const auto maybe_name = feature->getValue("name_en");
-                        if (maybe_name && maybe_name.get().is<std::string>()) {
-                            name = maybe_name.get().get<std::string>();
-                        }
-                        name = layer.id + " - " + name;
-                        result.featureTree.insert(std::make_pair(featureBox, layer.id + name));
-                        printf("added %s\n", name.c_str());
-                    }
-                }
-            }
-            if (result.featureTree.size()) {
-                printf("feature tree for %i,%i,%i [%s] has %lu members\n", id.z, id.x, id.y, layer.id.c_str(), result.featureTree.size());
-            }
-        }
-
         insertBucket(layer.bucketName(), std::move(bucket));
     }
 }

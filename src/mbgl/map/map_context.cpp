@@ -281,7 +281,7 @@ double MapContext::getTopOffsetPixelsForAnnotationSymbol(const std::string& symb
     }
 }
 
-std::vector<std::string> MapContext::featuresAt(const PrecisionPoint point) const {
+std::vector<std::pair<std::string, FeatureProperties>> MapContext::featuresAt(const PrecisionPoint point) const {
 
     LatLng p_ = transformState.pointToLatLng(point);
 
@@ -301,29 +301,35 @@ std::vector<std::string> MapContext::featuresAt(const PrecisionPoint point) cons
 
     // figure out tile coordinate
     //
-    TileCoordinate coordinate = transformState.pointToCoordinate(point);
+//    TileCoordinate coordinate = transformState.pointToCoordinate(point);
 
     // figure out query bounds
     //
     const auto world_size = util::tileSize * transformState.getScale();
     const auto scale = world_size / z2;
 
-    coordinate.zoomTo(::fmin(id.z, 18));
-//    const auto tileCoordinate = vec2<uint16_t>(id.x * 4096, id.y * 4096);
+//    coordinate.zoomTo(::fmin(id.z, 18));
+//    coordinate.column /= id.overscaling;
+//    coordinate.row /= id.overscaling;
+//    coordinate.row = 4096 - coordinate.row;
 
 
-    vec3<uint16_t> position((coordinate.column - id.x) * 4096, (coordinate.row - id.y) * 4096, scale);
-
-
-
-
-    std::vector<std::string> results;
-
-    printf("=====\n");
+    vec2<double> coordinate(x * z2, y * z2);
 
 
 
-    const auto radius = 5 * 4096 / scale;
+    vec3<uint16_t> position((coordinate.x - id.x) * 4096, (coordinate.y - id.y) * 4096, scale);
+
+
+
+
+    std::vector<std::pair<std::string, FeatureProperties>> results;
+
+    printf("===== query: %i, %i\n", position.x, position.y);
+
+
+
+    const auto radius = 50 * 4096 / scale;
     FeatureBox queryBox = {
         { position.x - radius, position.y - radius },
         { position.x + radius, position.y + radius }
@@ -341,8 +347,16 @@ std::vector<std::string> MapContext::featuresAt(const PrecisionPoint point) cons
                 const auto& tile_data = tile->data;
                 tile_data->featureTree.query(boost::geometry::index::intersects(queryBox),
                     boost::make_function_output_iterator([&](const auto& val) {
-                        results.push_back(val.second);
-                    }));
+                    const std::string layer_id = std::get<1>(val);
+                    const FeatureProperties feature_properties = std::get<2>(val);
+
+                    const auto result = std::make_pair(layer_id, feature_properties);
+
+                    printf("found feature in %s\n", layer_id.c_str());
+
+
+                    results.push_back(result);
+                }));
 
 
             }
