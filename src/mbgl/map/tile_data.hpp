@@ -5,7 +5,7 @@
 #include <mbgl/map/tile_id.hpp>
 #include <mbgl/renderer/bucket.hpp>
 #include <mbgl/text/placement_config.hpp>
-#include <mbgl/util/interactive_features.hpp>
+#include <mbgl/util/interactive_features_impl.hpp>
 
 #include <atomic>
 #include <string>

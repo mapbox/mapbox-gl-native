@@ -10,7 +10,7 @@
 #include <mbgl/platform/log.hpp>
 #include <mbgl/util/constants.hpp>
 #include <mbgl/util/exception.hpp>
-#include <mbgl/util/interactive_features.hpp>
+#include <mbgl/util/interactive_features_impl.hpp>
 
 using namespace mbgl;
 

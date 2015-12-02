@@ -11,7 +11,7 @@
 #include <mbgl/util/ptr.hpp>
 #include <mbgl/util/chrono.hpp>
 #include <mbgl/util/constants.hpp>
-#include <mbgl/util/interactive_features.hpp>
+#include <mbgl/util/interactive_features_impl.hpp>
 #include <mbgl/util/geo.hpp>
 
 #include <rapidjson/document.h>

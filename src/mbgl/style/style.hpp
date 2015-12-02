@@ -11,7 +11,7 @@
 #include <mbgl/util/noncopyable.hpp>
 #include <mbgl/util/chrono.hpp>
 #include <mbgl/util/worker.hpp>
-#include <mbgl/util/interactive_features.hpp>
+#include <mbgl/util/interactive_features_impl.hpp>
 
 #include <cstdint>
 #include <string>
