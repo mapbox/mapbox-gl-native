@@ -102,8 +102,11 @@ void Painter::renderLine(LineBucket& bucket, const LineLayer& layer, const TileI
         bucket.drawLineSDF(*linesdfShader);
 
     } else if (!properties.pattern.value.from.empty()) {
-        SpriteAtlasPosition imagePosA = spriteAtlas->getPosition(properties.pattern.value.from, true);
-        SpriteAtlasPosition imagePosB = spriteAtlas->getPosition(properties.pattern.value.to, true);
+        mapbox::util::optional<SpriteAtlasPosition> imagePosA = spriteAtlas->getPosition(properties.pattern.value.from, true);
+        mapbox::util::optional<SpriteAtlasPosition> imagePosB = spriteAtlas->getPosition(properties.pattern.value.to, true);
+        
+        if (!imagePosA || !imagePosB)
+            return;
 
         float factor = 8.0 / std::pow(2, state.getIntegerZoom() - id.z) * id.overscaling;
 
@@ -115,12 +118,12 @@ void Painter::renderLine(LineBucket& bucket, const LineLayer& layer, const TileI
         linepatternShader->u_ratio = ratio;
         linepatternShader->u_blur = blur;
 
-        linepatternShader->u_pattern_size_a = {{imagePosA.size[0] * factor * properties.pattern.value.fromScale, imagePosA.size[1]}};
-        linepatternShader->u_pattern_tl_a = imagePosA.tl;
-        linepatternShader->u_pattern_br_a = imagePosA.br;
-        linepatternShader->u_pattern_size_b = {{imagePosB.size[0] * factor * properties.pattern.value.toScale, imagePosB.size[1]}};
-        linepatternShader->u_pattern_tl_b = imagePosB.tl;
-        linepatternShader->u_pattern_br_b = imagePosB.br;
+        linepatternShader->u_pattern_size_a = {{(*imagePosA).size[0] * factor * properties.pattern.value.fromScale, (*imagePosA).size[1]}};
+        linepatternShader->u_pattern_tl_a = (*imagePosA).tl;
+        linepatternShader->u_pattern_br_a = (*imagePosA).br;
+        linepatternShader->u_pattern_size_b = {{(*imagePosB).size[0] * factor * properties.pattern.value.toScale, (*imagePosB).size[1]}};
+        linepatternShader->u_pattern_tl_b = (*imagePosB).tl;
+        linepatternShader->u_pattern_br_b = (*imagePosB).br;
         linepatternShader->u_fade = properties.pattern.value.t;
         linepatternShader->u_opacity = properties.opacity;
         linepatternShader->u_extra = extra;

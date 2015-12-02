@@ -59,30 +59,30 @@ void Painter::renderFill(FillBucket& bucket, const FillLayer& layer, const TileI
     }
 
     if (pattern) {
-        // Image fill.
-        if (pass == RenderPass::Translucent) {
+        mapbox::util::optional<SpriteAtlasPosition> posA = spriteAtlas->getPosition(properties.pattern.value.from, true);
+        mapbox::util::optional<SpriteAtlasPosition> posB = spriteAtlas->getPosition(properties.pattern.value.to, true);
 
-            const SpriteAtlasPosition posA = spriteAtlas->getPosition(properties.pattern.value.from, true);
-            const SpriteAtlasPosition posB = spriteAtlas->getPosition(properties.pattern.value.to, true);
+        // Image fill.
+        if (pass == RenderPass::Translucent && posA && posB) {
             float factor = 8.0 / std::pow(2, state.getIntegerZoom() - id.z) / id.overscaling;
 
             mat3 patternMatrixA;
             matrix::identity(patternMatrixA);
             matrix::scale(patternMatrixA, patternMatrixA,
-                    1.0f / (posA.size[0] * factor * properties.pattern.value.fromScale),
-                    1.0f / (posA.size[1] * factor * properties.pattern.value.fromScale));
+                    1.0f / ((*posA).size[0] * factor * properties.pattern.value.fromScale),
+                    1.0f / ((*posA).size[1] * factor * properties.pattern.value.fromScale));
             mat3 patternMatrixB;
             matrix::identity(patternMatrixB);
             matrix::scale(patternMatrixB, patternMatrixB,
-                    1.0f / (posB.size[0] * factor * properties.pattern.value.toScale),
-                    1.0f / (posB.size[1] * factor * properties.pattern.value.toScale));
+                    1.0f / ((*posB).size[0] * factor * properties.pattern.value.toScale),
+                    1.0f / ((*posB).size[1] * factor * properties.pattern.value.toScale));
 
             config.program = patternShader->program;
             patternShader->u_matrix = vtxMatrix;
-            patternShader->u_pattern_tl_a = posA.tl;
-            patternShader->u_pattern_br_a = posA.br;
-            patternShader->u_pattern_tl_b = posB.tl;
-            patternShader->u_pattern_br_b = posB.br;
+            patternShader->u_pattern_tl_a = (*posA).tl;
+            patternShader->u_pattern_br_a = (*posA).br;
+            patternShader->u_pattern_tl_b = (*posB).tl;
+            patternShader->u_pattern_br_b = (*posB).br;
             patternShader->u_opacity = properties.opacity;
             patternShader->u_image = 0;
             patternShader->u_mix = properties.pattern.value.t;

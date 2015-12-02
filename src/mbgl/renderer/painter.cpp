@@ -276,19 +276,20 @@ void Painter::renderBackground(const BackgroundLayer& layer) {
     const BackgroundPaintProperties& properties = layer.paint;
 
     if (!properties.pattern.value.to.empty()) {
-        if ((properties.opacity >= 1.0f) != (pass == RenderPass::Opaque))
+        mapbox::util::optional<SpriteAtlasPosition> imagePosA = spriteAtlas->getPosition(properties.pattern.value.from, true);
+        mapbox::util::optional<SpriteAtlasPosition> imagePosB = spriteAtlas->getPosition(properties.pattern.value.to, true);
+
+        if ((properties.opacity >= 1.0f) != (pass == RenderPass::Opaque) || !imagePosA || !imagePosB)
             return;
 
-        SpriteAtlasPosition imagePosA = spriteAtlas->getPosition(properties.pattern.value.from, true);
-        SpriteAtlasPosition imagePosB = spriteAtlas->getPosition(properties.pattern.value.to, true);
         float zoomFraction = state.getZoomFraction();
 
         config.program = patternShader->program;
         patternShader->u_matrix = identityMatrix;
-        patternShader->u_pattern_tl_a = imagePosA.tl;
-        patternShader->u_pattern_br_a = imagePosA.br;
-        patternShader->u_pattern_tl_b = imagePosB.tl;
-        patternShader->u_pattern_br_b = imagePosB.br;
+        patternShader->u_pattern_tl_a = (*imagePosA).tl;
+        patternShader->u_pattern_br_a = (*imagePosA).br;
+        patternShader->u_pattern_tl_b = (*imagePosB).tl;
+        patternShader->u_pattern_br_b = (*imagePosB).br;
         patternShader->u_mix = properties.pattern.value.t;
         patternShader->u_opacity = properties.opacity;
 
@@ -296,7 +297,7 @@ void Painter::renderBackground(const BackgroundLayer& layer) {
         PrecisionPoint center = state.latLngToPoint(latLng);
         float scale = 1 / std::pow(2, zoomFraction);
 
-        std::array<float, 2> sizeA = imagePosA.size;
+        std::array<float, 2> sizeA = (*imagePosA).size;
         mat3 matrixA;
         matrix::identity(matrixA);
         matrix::scale(matrixA, matrixA,
@@ -310,7 +311,7 @@ void Painter::renderBackground(const BackgroundLayer& layer) {
                        scale * state.getWidth()  / 2,
                       -scale * state.getHeight() / 2);
 
-        std::array<float, 2> sizeB = imagePosB.size;
+        std::array<float, 2> sizeB = (*imagePosB).size;
         mat3 matrixB;
         matrix::identity(matrixB);
         matrix::scale(matrixB, matrixB,
