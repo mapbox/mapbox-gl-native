@@ -36,6 +36,7 @@ typedef FeatureBGM::box<FeaturePoint> FeatureBox;
 typedef std::unordered_map<std::string, std::string> FeatureProperties;
 typedef std::tuple<FeatureBox, std::string, FeatureProperties> Feature; // box, layer, properties
 typedef FeatureBGI::rtree<Feature, FeatureBGI::linear<16, 4>> FeatureTree;
+typedef std::vector<std::tuple<std::string, std::string, FeatureProperties>> FeatureResults; // layer, source, properties
 
 } // namespace mbgl
 

@@ -281,7 +281,7 @@ double MapContext::getTopOffsetPixelsForAnnotationSymbol(const std::string& symb
     }
 }
 
-std::vector<std::tuple<std::string, std::string, FeatureProperties>> MapContext::featuresAt(const PrecisionPoint point) const {
+FeatureResults MapContext::featuresAt(const PrecisionPoint point) const {
 
     LatLng p_ = transformState.pointToLatLng(point);
 
@@ -324,7 +324,7 @@ std::vector<std::tuple<std::string, std::string, FeatureProperties>> MapContext:
         { position.x + radius, position.y + radius }
     };
 
-    std::vector<std::tuple<std::string, std::string, FeatureProperties>> results;
+    FeatureResults results;
 
     for (const auto& source : style->sources) {
         if (source->info.type == SourceType::Vector) {
