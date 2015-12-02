@@ -78,7 +78,8 @@ IB_DESIGNABLE
 
 - (CLLocationCoordinate2D)convertPoint:(NSPoint)point toCoordinateFromView:(nullable NSView *)view;
 - (NSPoint)convertCoordinate:(CLLocationCoordinate2D)coordinate toPointToView:(nullable NSView *)view;
-- (CLLocationDistance)metersPerPixelAtLatitude:(CLLocationDegrees)latitude;
+- (MGLCoordinateBounds)convertRectToCoordinateBounds:(NSRect)rect;
+- (CLLocationDistance)metersPerPointAtLatitude:(CLLocationDegrees)latitude;
 
 @property (nonatomic) MGLMapDebugMaskOptions debugMask;
 

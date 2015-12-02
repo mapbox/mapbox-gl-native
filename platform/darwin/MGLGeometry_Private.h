@@ -1,6 +1,7 @@
 #import "MGLGeometry.h"
 
-#include <mbgl/util/geo.hpp>
+#import <mbgl/map/map.hpp>
+#import <mbgl/util/geo.hpp>
 
 NS_INLINE mbgl::LatLng MGLLatLngFromLocationCoordinate2D(CLLocationCoordinate2D coordinate) {
     return mbgl::LatLng(coordinate.latitude, coordinate.longitude);
@@ -23,4 +24,8 @@ NS_INLINE mbgl::LatLngBounds MGLLatLngBoundsFromCoordinateBounds(MGLCoordinateBo
 NS_INLINE BOOL MGLCoordinateInCoordinateBounds(CLLocationCoordinate2D coordinate, MGLCoordinateBounds coordinateBounds) {
     mbgl::LatLngBounds bounds = MGLLatLngBoundsFromCoordinateBounds(coordinateBounds);
     return bounds.contains(MGLLatLngFromLocationCoordinate2D(coordinate));
+}
+
+NS_INLINE mbgl::EdgeInsets MGLEdgeInsetsFromNSEdgeInsets(NSEdgeInsets insets) {
+    return { insets.top, insets.left, insets.bottom, insets.right };
 }
