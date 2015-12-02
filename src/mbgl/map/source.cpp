@@ -607,19 +607,17 @@ void Source::dumpDebugLogs() const {
 }
 
 FeatureResults Source::featuresAt(const PrecisionPoint point, const TransformState& transform) const {
-    LatLng p_ = transform.pointToLatLng(point);
+    LatLng p = transform.pointToLatLng(point);
 
     //    printf("core: %f, %f\n", p_.latitude, p_.longitude);
 
     // figure out tile (bounded by source max zoom)
     //
-    double sine = std::sin(p_.latitude * M_PI / 180);
-    double x = p_.longitude / 360 + 0.5;
+    double sine = std::sin(p.latitude * M_PI / 180);
+    double x = p.longitude / 360 + 0.5;
     double y = 0.5 - 0.25 * std::log((1 + sine) / (1 - sine)) / M_PI;
 
     y = y < -1 ? -1 : y > 1 ? 1 : y;
-
-    //    PrecisionPoint p(x, y);
 
     const auto z = ::floor(transform.getZoom());
     const auto source_max_z = ::fmin(z, 15);
