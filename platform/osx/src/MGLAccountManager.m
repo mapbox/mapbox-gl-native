@@ -20,8 +20,6 @@
     }
 }
 
-// Can be called from any thread.
-//
 + (instancetype)sharedManager {
     static dispatch_once_t onceToken;
     static MGLAccountManager *_sharedManager;

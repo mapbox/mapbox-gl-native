@@ -1,5 +1,7 @@
 #import "MGLGeometry.h"
 
+#import <TargetConditionals.h>
+
 #import <mbgl/map/map.hpp>
 #import <mbgl/util/geo.hpp>
 
@@ -26,6 +28,12 @@ NS_INLINE BOOL MGLCoordinateInCoordinateBounds(CLLocationCoordinate2D coordinate
     return bounds.contains(MGLLatLngFromLocationCoordinate2D(coordinate));
 }
 
+#if TARGET_OS_MAC
 NS_INLINE mbgl::EdgeInsets MGLEdgeInsetsFromNSEdgeInsets(NSEdgeInsets insets) {
     return { insets.top, insets.left, insets.bottom, insets.right };
 }
+#elif TARGET_OS_IOS
+NS_INLINE mbgl::EdgeInsets MGLEdgeInsetsFromNSEdgeInsets(UIEdgeInsets insets) {
+    return { insets.top, insets.left, insets.bottom, insets.right };
+}
+#endif

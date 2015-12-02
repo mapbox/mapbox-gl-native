@@ -9,10 +9,12 @@
         self.bordered = NO;
         self.bezelStyle = NSRegularSquareBezelStyle;
         
+        // Start with a copyright symbol. The whole string will be mini.
         NSMutableAttributedString *attributedTitle = [[NSMutableAttributedString alloc] initWithString:@"© "
                                                                                             attributes:@{
             NSFontAttributeName: [NSFont systemFontOfSize:[NSFont systemFontSizeForControlSize:NSMiniControlSize]],
         }];
+        // Append the specified title, underlining it like a hyperlink.
         [attributedTitle appendAttributedString:
          [[NSAttributedString alloc] initWithString:title
                                          attributes:@{
@@ -36,6 +38,7 @@
 }
 
 - (void)resetCursorRects {
+    // The whole button gets a pointing hand cursor, just like a hyperlink.
     [self addCursorRect:self.bounds cursor:[NSCursor pointingHandCursor]];
 }
 

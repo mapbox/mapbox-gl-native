@@ -8,6 +8,7 @@ void mgl_linkBundleCategory();
 
 @interface NSBundle (MGLAdditions)
 
+/// Returns the Mapbox.framework bundle.
 + (instancetype)mgl_frameworkBundle;
 
 @end

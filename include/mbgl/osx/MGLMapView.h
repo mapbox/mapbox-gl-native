@@ -38,6 +38,15 @@ IB_DESIGNABLE
 
 - (void)setCenterCoordinate:(CLLocationCoordinate2D)coordinate animated:(BOOL)animated;
 
+/**
+    The zoom level of the receiver.
+    
+    In addition to affecting the visual size and detail of features on the map,
+    the zoom level affects the size of the vector tiles that are loaded. At zoom
+    level 0, each tile covers the entire world map; at zoom level 1, it covers ¼
+    of the world; at zoom level 2, <sup>1</sup>⁄<sub>16</sub> of the world, and
+    so on.
+ */
 @property (nonatomic) double zoomLevel;
 @property (nonatomic, readonly) double maximumZoomLevel;
 @property (nonatomic, readonly) double minimumZoomLevel;

@@ -33,6 +33,8 @@
 
 - (void)setLatitude:(double)latitude {
     if (!isnan(self.pendingLongitude)) {
+        // With both components present, set the real center coordinate and
+        // forget the pending parts.
         self.centerCoordinate = CLLocationCoordinate2DMake(latitude, self.pendingLongitude);
         self.pendingLatitude = NAN;
         self.pendingLongitude = NAN;
@@ -53,6 +55,8 @@
 
 - (void)setLongitude:(double)longitude {
     if (!isnan(self.pendingLatitude)) {
+        // With both components present, set the real center coordinate and
+        // forget the pending parts.
         self.centerCoordinate = CLLocationCoordinate2DMake(self.pendingLatitude, longitude);
         self.pendingLatitude = NAN;
         self.pendingLongitude = NAN;
