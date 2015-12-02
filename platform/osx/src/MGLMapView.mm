@@ -79,14 +79,14 @@ struct MGLAttribution {
 };
 
 /// Unique identifier representing a single annotation in mbgl.
-typedef uint32_t MGLAnnotationID;
+typedef uint32_t MGLAnnotationTag;
 
 /// An indication that the requested annotation was not found or is nonexistent.
-enum { MGLAnnotationNotFound = UINT32_MAX };
+enum { MGLAnnotationTagNotFound = UINT32_MAX };
 
-/// Mapping from an annotation’s unique identifier to metadata about that
-/// annotation, including the annotation itself.
-typedef std::map<MGLAnnotationID, MGLAnnotationContext> MGLAnnotationContextMap;
+/// Mapping from an annotation tag to metadata about that annotation, including
+/// the annotation itself.
+typedef std::map<MGLAnnotationTag, MGLAnnotationContext> MGLAnnotationContextMap;
 
 /// Returns an NSImage for the default marker image.
 NSImage *MGLDefaultMarkerImage() {
@@ -150,12 +150,12 @@ public:
     CLLocationDirection _directionAtBeginningOfGesture;
     CGFloat _pitchAtBeginningOfGesture;
     
-    MGLAnnotationContextMap _annotationContextsByAnnotationID;
-    MGLAnnotationID _selectedAnnotationID;
-    MGLAnnotationID _lastSelectedAnnotationID;
+    MGLAnnotationContextMap _annotationContextsByAnnotationTag;
+    MGLAnnotationTag _selectedAnnotationTag;
+    MGLAnnotationTag _lastSelectedAnnotationTag;
     /// Size of the rectangle formed by unioning the maximum slop area around every annotation image.
     NSSize _unionedAnnotationImageSize;
-    std::vector<MGLAnnotationID> _annotationsNearbyLastClick;
+    std::vector<MGLAnnotationTag> _annotationsNearbyLastClick;
     /// True if any annotations that have tooltips have been installed.
     BOOL _wantsToolTipRects;
     /// True if any annotation images that have custom cursors have been installed.
@@ -265,9 +265,9 @@ public:
     
     // Set up annotation management and selection state.
     _annotationImagesByIdentifier = [NSMutableDictionary dictionary];
-    _annotationContextsByAnnotationID = {};
-    _selectedAnnotationID = MGLAnnotationNotFound;
-    _lastSelectedAnnotationID = MGLAnnotationNotFound;
+    _annotationContextsByAnnotationTag = {};
+    _selectedAnnotationTag = MGLAnnotationTagNotFound;
+    _lastSelectedAnnotationTag = MGLAnnotationTagNotFound;
     _annotationsNearbyLastClick = {};
     
     // Jump to Null Island initially.
@@ -985,11 +985,11 @@ public:
     }
     
     NSPoint gesturePoint = [gestureRecognizer locationInView:self];
-    MGLAnnotationID hitAnnotationID = [self annotationIDAtPoint:gesturePoint persistingResults:YES];
-    if (hitAnnotationID != MGLAnnotationNotFound) {
-        if (hitAnnotationID != _selectedAnnotationID) {
-            id <MGLAnnotation> annotation = [self annotationWithID:hitAnnotationID];
-            NSAssert(annotation, @"Cannot select nonexistent annotation with ID %i", hitAnnotationID);
+    MGLAnnotationTag hitAnnotationTag = [self annotationTagAtPoint:gesturePoint persistingResults:YES];
+    if (hitAnnotationTag != MGLAnnotationTagNotFound) {
+        if (hitAnnotationTag != _selectedAnnotationTag) {
+            id <MGLAnnotation> annotation = [self annotationWithTag:hitAnnotationTag];
+            NSAssert(annotation, @"Cannot select nonexistent annotation with ID %i", hitAnnotationTag);
             [self selectAnnotation:annotation animated:YES];
         }
     } else {
@@ -1168,43 +1168,43 @@ public:
 #pragma mark Annotations
 
 - (nullable NS_ARRAY_OF(id <MGLAnnotation>) *)annotations {
-    if (_annotationContextsByAnnotationID.empty()) {
+    if (_annotationContextsByAnnotationTag.empty()) {
         return nil;
     }
     
-    // Map all the annotation IDs to the annotations themselves.
+    // Map all the annotation tags to the annotations themselves.
     std::vector<id <MGLAnnotation>> annotations;
-    std::transform(_annotationContextsByAnnotationID.begin(),
-                   _annotationContextsByAnnotationID.end(),
+    std::transform(_annotationContextsByAnnotationTag.begin(),
+                   _annotationContextsByAnnotationTag.end(),
                    std::back_inserter(annotations),
-                   ^ id <MGLAnnotation> (const std::pair<MGLAnnotationID, MGLAnnotationContext> &pair) {
+                   ^ id <MGLAnnotation> (const std::pair<MGLAnnotationTag, MGLAnnotationContext> &pair) {
                        return pair.second.annotation;
                    });
     return [NSArray arrayWithObjects:&annotations[0] count:annotations.size()];
 }
 
-/// Returns the annotation assigned the given ID. Cheap.
-- (id <MGLAnnotation>)annotationWithID:(MGLAnnotationID)annotationID {
-    if (!_annotationContextsByAnnotationID.count(annotationID)) {
+/// Returns the annotation assigned the given tag. Cheap.
+- (id <MGLAnnotation>)annotationWithTag:(MGLAnnotationTag)tag {
+    if (!_annotationContextsByAnnotationTag.count(tag)) {
         return nil;
     }
     
-    MGLAnnotationContext &annotationContext = _annotationContextsByAnnotationID[annotationID];
+    MGLAnnotationContext &annotationContext = _annotationContextsByAnnotationTag[tag];
     return annotationContext.annotation;
 }
 
-/// Returns the annotation ID assigned to the given annotation. Relatively expensive.
-- (MGLAnnotationID)annotationIDForAnnotation:(id <MGLAnnotation>)annotation {
+/// Returns the annotation tag assigned to the given annotation. Relatively expensive.
+- (MGLAnnotationTag)annotationTagForAnnotation:(id <MGLAnnotation>)annotation {
     if (!annotation) {
-        return MGLAnnotationNotFound;
+        return MGLAnnotationTagNotFound;
     }
     
-    for (auto &pair : _annotationContextsByAnnotationID) {
+    for (auto &pair : _annotationContextsByAnnotationTag) {
         if (pair.second.annotation == annotation) {
             return pair.first;
         }
     }
-    return MGLAnnotationNotFound;
+    return MGLAnnotationTagNotFound;
 }
 
 - (void)addAnnotation:(id <MGLAnnotation>)annotation {
@@ -1267,24 +1267,24 @@ public:
     
     // Add any point annotations to mbgl and our own index.
     if (points.size()) {
-        std::vector<MGLAnnotationID> pointAnnotationIDs = _mbglMap->addPointAnnotations(points);
+        std::vector<MGLAnnotationTag> pointAnnotationTags = _mbglMap->addPointAnnotations(points);
         
-        for (size_t i = 0; i < pointAnnotationIDs.size(); ++i) {
+        for (size_t i = 0; i < pointAnnotationTags.size(); ++i) {
             MGLAnnotationContext context;
             context.annotation = annotations[i];
             context.symbolIdentifier = @(points[i].icon.c_str());
-            _annotationContextsByAnnotationID[pointAnnotationIDs[i]] = context;
+            _annotationContextsByAnnotationTag[pointAnnotationTags[i]] = context;
         }
     }
     
     // Add any shape annotations to mbgl and our own index.
     if (shapes.size()) {
-        std::vector<MGLAnnotationID> shapeAnnotationIDs = _mbglMap->addShapeAnnotations(shapes);
+        std::vector<MGLAnnotationTag> shapeAnnotationTags = _mbglMap->addShapeAnnotations(shapes);
         
-        for (size_t i = 0; i < shapeAnnotationIDs.size(); ++i) {
+        for (size_t i = 0; i < shapeAnnotationTags.size(); ++i) {
             MGLAnnotationContext context;
             context.annotation = annotations[i];
-            _annotationContextsByAnnotationID[shapeAnnotationIDs[i]] = context;
+            _annotationContextsByAnnotationTag[shapeAnnotationTags[i]] = context;
         }
     }
     
@@ -1340,37 +1340,37 @@ public:
         return;
     }
     
-    std::vector<MGLAnnotationID> annotationIDsToRemove;
-    annotationIDsToRemove.reserve(annotations.count);
+    std::vector<MGLAnnotationTag> annotationTagsToRemove;
+    annotationTagsToRemove.reserve(annotations.count);
     
     for (id <MGLAnnotation> annotation in annotations) {
         NSAssert([annotation conformsToProtocol:@protocol(MGLAnnotation)], @"Annotation does not conform to MGLAnnotation");
         
-        MGLAnnotationID annotationID = [self annotationIDForAnnotation:annotation];
-        NSAssert(annotationID != MGLAnnotationNotFound, @"No ID for annotation %@", annotation);
-        annotationIDsToRemove.push_back(annotationID);
+        MGLAnnotationTag annotationTag = [self annotationTagForAnnotation:annotation];
+        NSAssert(annotationTag != MGLAnnotationTagNotFound, @"No ID for annotation %@", annotation);
+        annotationTagsToRemove.push_back(annotationTag);
         
-        _annotationContextsByAnnotationID.erase(annotationID);
+        _annotationContextsByAnnotationTag.erase(annotationTag);
         
-        if (annotationID == _selectedAnnotationID) {
+        if (annotationTag == _selectedAnnotationTag) {
             [self deselectAnnotation:annotation animated:NO];
         }
         
-        if (annotationID == _lastSelectedAnnotationID) {
-            _lastSelectedAnnotationID = MGLAnnotationNotFound;
+        if (annotationTag == _lastSelectedAnnotationTag) {
+            _lastSelectedAnnotationTag = MGLAnnotationTagNotFound;
         }
     }
     
-    _mbglMap->removeAnnotations(annotationIDsToRemove);
+    _mbglMap->removeAnnotations(annotationTagsToRemove);
     
     [self updateAnnotationTrackingAreas];
 }
 
 - (id <MGLAnnotation>)selectedAnnotation {
-    if (!_annotationContextsByAnnotationID.count(_selectedAnnotationID)) {
+    if (!_annotationContextsByAnnotationTag.count(_selectedAnnotationTag)) {
         return nil;
     }
-    MGLAnnotationContext &annotationContext = _annotationContextsByAnnotationID.at(_selectedAnnotationID);
+    MGLAnnotationContext &annotationContext = _annotationContextsByAnnotationTag.at(_selectedAnnotationTag);
     return annotationContext.annotation;
 }
 
@@ -1384,11 +1384,11 @@ public:
 }
 
 - (id <MGLAnnotation>)annotationAtPoint:(NSPoint)point {
-    return [self annotationWithID:[self annotationIDAtPoint:point persistingResults:NO]];
+    return [self annotationWithTag:[self annotationTagAtPoint:point persistingResults:NO]];
 }
 
 /**
-    Returns the ID of the annotation at the given point in the view.
+    Returns the tag of the annotation at the given point in the view.
     
     This is more involved than it sounds: if multiple point annotations overlap
     near the point, this method cycles through them so that each of them is
@@ -1399,7 +1399,7 @@ public:
         with the same point. Setting this parameter to false is useful for
         asking “what if?”
  */
-- (MGLAnnotationID)annotationIDAtPoint:(NSPoint)point persistingResults:(BOOL)persist {
+- (MGLAnnotationTag)annotationTagAtPoint:(NSPoint)point persistingResults:(BOOL)persist {
     // Look for any annotation near the click. An annotation is “near” if the
     // distance between its center and the click is less than the maximum height
     // or width of an installed annotation image.
@@ -1408,7 +1408,7 @@ public:
                                    -_unionedAnnotationImageSize.height / 2);
     queryRect = NSInsetRect(queryRect, -MGLAnnotationImagePaddingForHitTest,
                             -MGLAnnotationImagePaddingForHitTest);
-    std::vector<MGLAnnotationID> nearbyAnnotations = [self annotationIDsInRect:queryRect];
+    std::vector<MGLAnnotationTag> nearbyAnnotations = [self annotationTagsInRect:queryRect];
     
     if (nearbyAnnotations.size()) {
         // Assume that the user is fat-fingering an annotation.
@@ -1418,14 +1418,14 @@ public:
         
         // Filter out any annotation whose image is unselectable or for which
         // hit testing fails.
-        mbgl::util::erase_if(nearbyAnnotations, [&](const MGLAnnotationID annotationID) {
-            NSAssert(_annotationContextsByAnnotationID.count(annotationID) != 0, @"Unknown annotation found nearby click");
-            id <MGLAnnotation> annotation = [self annotationWithID:annotationID];
+        mbgl::util::erase_if(nearbyAnnotations, [&](const MGLAnnotationTag annotationTag) {
+            NSAssert(_annotationContextsByAnnotationTag.count(annotationTag) != 0, @"Unknown annotation found nearby click");
+            id <MGLAnnotation> annotation = [self annotationWithTag:annotationTag];
             if (!annotation) {
                 return true;
             }
             
-            MGLAnnotationImage *annotationImage = [self imageOfAnnotationWithID:annotationID];
+            MGLAnnotationImage *annotationImage = [self imageOfAnnotationWithTag:annotationTag];
             if (!annotationImage.selectable) {
                 return true;
             }
@@ -1439,28 +1439,28 @@ public:
         });
     }
     
-    MGLAnnotationID hitAnnotationID = MGLAnnotationNotFound;
+    MGLAnnotationTag hitAnnotationTag = MGLAnnotationTagNotFound;
     if (nearbyAnnotations.size()) {
-        // The annotation IDs need to be stable in order to compare them with
-        // the remembered IDs.
+        // The annotation tags need to be stable in order to compare them with
+        // the remembered tags.
         std::sort(nearbyAnnotations.begin(), nearbyAnnotations.end());
         
         if (nearbyAnnotations == _annotationsNearbyLastClick) {
             // The last time we persisted a set of annotations, we had the same
             // set of annotations as we do now. Cycle through them.
-            if (_lastSelectedAnnotationID == MGLAnnotationNotFound
-                || _lastSelectedAnnotationID == _annotationsNearbyLastClick.back()) {
+            if (_lastSelectedAnnotationTag == MGLAnnotationTagNotFound
+                || _lastSelectedAnnotationTag == _annotationsNearbyLastClick.back()) {
                 // Either an annotation from this set hasn’t been selected
                 // before or the last annotation in the set was selected. Wrap
                 // around to the first annotation in the set.
-                hitAnnotationID = _annotationsNearbyLastClick.front();
+                hitAnnotationTag = _annotationsNearbyLastClick.front();
             } else {
                 // Step to the next annotation in the set.
                 auto result = std::find(_annotationsNearbyLastClick.begin(),
                                         _annotationsNearbyLastClick.end(),
-                                        _lastSelectedAnnotationID);
+                                        _lastSelectedAnnotationTag);
                 auto distance = std::distance(_annotationsNearbyLastClick.begin(), result);
-                hitAnnotationID = _annotationsNearbyLastClick[distance + 1];
+                hitAnnotationTag = _annotationsNearbyLastClick[distance + 1];
             }
         } else {
             // Remember the nearby annotations for the next time this method is
@@ -1471,16 +1471,16 @@ public:
             
             // Choose the first nearby annotation.
             if (_annotationsNearbyLastClick.size()) {
-                hitAnnotationID = _annotationsNearbyLastClick.front();
+                hitAnnotationTag = _annotationsNearbyLastClick.front();
             }
         }
     }
     
-    return hitAnnotationID;
+    return hitAnnotationTag;
 }
 
-/// Returns the IDs of the annotations coincident with the given rectangle.
-- (std::vector<MGLAnnotationID>)annotationIDsInRect:(NSRect)rect {
+/// Returns the tags of the annotations coincident with the given rectangle.
+- (std::vector<MGLAnnotationTag>)annotationTagsInRect:(NSRect)rect {
     mbgl::LatLngBounds queryBounds = [self convertRectToLatLngBounds:rect];
     return _mbglMap->getPointAnnotationsInBounds(queryBounds);
 }
@@ -1491,7 +1491,7 @@ public:
 }
 
 - (void)setSelectedAnnotation:(id <MGLAnnotation>)selectedAnnotation {
-    _selectedAnnotationID = [self annotationIDForAnnotation:selectedAnnotation];
+    _selectedAnnotationTag = [self annotationTagForAnnotation:selectedAnnotation];
 }
 
 - (void)setSelectedAnnotations:(NS_ARRAY_OF(id <MGLAnnotation>) *)selectedAnnotations {
@@ -1527,20 +1527,20 @@ public:
     [self deselectAnnotation:selectedAnnotation animated:NO];
     
     // Add the annotation to the map if it hasn’t been added yet.
-    MGLAnnotationID annotationID = [self annotationIDForAnnotation:annotation];
-    if (annotationID == MGLAnnotationNotFound) {
+    MGLAnnotationTag annotationTag = [self annotationTagForAnnotation:annotation];
+    if (annotationTag == MGLAnnotationTagNotFound) {
         [self addAnnotation:annotation];
     }
     
     // The annotation can’t be selected if no part of it is hittable.
-    NSRect positioningRect = [self positioningRectForCalloutForAnnotationWithID:annotationID];
+    NSRect positioningRect = [self positioningRectForCalloutForAnnotationWithTag:annotationTag];
     if (NSIsEmptyRect(NSIntersectionRect(positioningRect, self.bounds))) {
         return;
     }
     
     [self willChangeValueForKey:@"selectedAnnotation"];
-    _selectedAnnotationID = annotationID;
-    _lastSelectedAnnotationID = _selectedAnnotationID;
+    _selectedAnnotationTag = annotationTag;
+    _lastSelectedAnnotationTag = _selectedAnnotationTag;
     [self didChangeValueForKey:@"selectedAnnotation"];
     
     // For the callout to be shown, the annotation must have a title, its
@@ -1588,14 +1588,14 @@ public:
 }
 
 /// Returns the rectangle that represents the annotation image of the annotation
-/// with the given ID. This rectangle is fitted to the image’s alignment rect
+/// with the given tag. This rectangle is fitted to the image’s alignment rect
 /// and is appropriate for positioning a popover.
-- (NSRect)positioningRectForCalloutForAnnotationWithID:(MGLAnnotationID)annotationID {
-    id <MGLAnnotation> annotation = [self annotationWithID:annotationID];
+- (NSRect)positioningRectForCalloutForAnnotationWithTag:(MGLAnnotationTag)annotationTag {
+    id <MGLAnnotation> annotation = [self annotationWithTag:annotationTag];
     if (!annotation) {
         return NSZeroRect;
     }
-    NSImage *image = [self imageOfAnnotationWithID:annotationID].image;
+    NSImage *image = [self imageOfAnnotationWithTag:annotationTag].image;
     if (!image) {
         return NSZeroRect;
     }
@@ -1613,14 +1613,14 @@ public:
     return NSInsetRect({ calloutAnchorPoint, NSZeroSize }, -image.size.width / 2, -image.size.height / 2);
 }
 
-/// Returns the annotation image assigned to the annotation with the given ID.
-- (MGLAnnotationImage *)imageOfAnnotationWithID:(MGLAnnotationID)annotationID {
-    if (annotationID == MGLAnnotationNotFound
-        || _annotationContextsByAnnotationID.count(annotationID) == 0) {
+/// Returns the annotation image assigned to the annotation with the given tag.
+- (MGLAnnotationImage *)imageOfAnnotationWithTag:(MGLAnnotationTag)annotationTag {
+    if (annotationTag == MGLAnnotationTagNotFound
+        || _annotationContextsByAnnotationTag.count(annotationTag) == 0) {
         return nil;
     }
     
-    NSString *customSymbol = _annotationContextsByAnnotationID.at(annotationID).symbolIdentifier;
+    NSString *customSymbol = _annotationContextsByAnnotationTag.at(annotationTag).symbolIdentifier;
     NSString *symbolName = customSymbol.length ? customSymbol : MGLDefaultStyleMarkerSymbolName;
     
     return [self dequeueReusableAnnotationImageWithIdentifier:symbolName];
@@ -1644,7 +1644,7 @@ public:
 - (void)updateAnnotationCallouts {
     NSPopover *callout = self.calloutForSelectedAnnotation;
     if (callout) {
-        callout.positioningRect = [self positioningRectForCalloutForAnnotationWithID:_selectedAnnotationID];
+        callout.positioningRect = [self positioningRectForCalloutForAnnotationWithTag:_selectedAnnotationTag];
     }
 }
 
@@ -1729,10 +1729,10 @@ public:
 - (void)updateAnnotationTrackingAreas {
     if (_wantsToolTipRects) {
         [self removeAllToolTips];
-        std::vector<MGLAnnotationID> annotationIDs = [self annotationIDsInRect:self.bounds];
-        for (MGLAnnotationID annotationID : annotationIDs) {
-            MGLAnnotationImage *annotationImage = [self imageOfAnnotationWithID:annotationID];
-            id <MGLAnnotation> annotation = [self annotationWithID:annotationID];
+        std::vector<MGLAnnotationTag> annotationTags = [self annotationTagsInRect:self.bounds];
+        for (MGLAnnotationTag annotationTag : annotationTags) {
+            MGLAnnotationImage *annotationImage = [self imageOfAnnotationWithTag:annotationTag];
+            id <MGLAnnotation> annotation = [self annotationWithTag:annotationTag];
             if (annotation.toolTip.length) {
                 // Add a tooltip tracking area over the annotation image’s
                 // frame, accounting for the image’s alignment rect.
@@ -1741,7 +1741,7 @@ public:
                                       centeredAtCoordinate:annotation.coordinate];
                 annotationRect = NSOffsetRect(image.alignmentRect, annotationRect.origin.x, annotationRect.origin.y);
                 if (!NSIsEmptyRect(annotationRect)) {
-                    [self addToolTipRect:annotationRect owner:self userData:(void *)(NSUInteger)annotationID];
+                    [self addToolTipRect:annotationRect owner:self userData:(void *)(NSUInteger)annotationTag];
                 }
             }
             // Opt into potentially expensive cursor tracking areas.
@@ -1759,11 +1759,11 @@ public:
 }
 
 - (NSString *)view:(__unused NSView *)view stringForToolTip:(__unused NSToolTipTag)tag point:(__unused NSPoint)point userData:(void *)data {
-    if ((NSUInteger)data >= MGLAnnotationNotFound) {
+    if ((NSUInteger)data >= MGLAnnotationTagNotFound) {
         return nil;
     }
-    MGLAnnotationID annotationID = (NSUInteger)data;
-    id <MGLAnnotation> annotation = [self annotationWithID:annotationID];
+    MGLAnnotationTag annotationTag = (NSUInteger)data;
+    id <MGLAnnotation> annotation = [self annotationWithTag:annotationTag];
     return annotation.toolTip;
 }
 
@@ -1781,10 +1781,10 @@ public:
         return;
     }
     
-    std::vector<MGLAnnotationID> annotationIDs = [self annotationIDsInRect:self.bounds];
-    for (MGLAnnotationID annotationID : annotationIDs) {
-        id <MGLAnnotation> annotation = [self annotationWithID:annotationID];
-        MGLAnnotationImage *annotationImage = [self imageOfAnnotationWithID:annotationID];
+    std::vector<MGLAnnotationTag> annotationTags = [self annotationTagsInRect:self.bounds];
+    for (MGLAnnotationTag annotationTag : annotationTags) {
+        id <MGLAnnotation> annotation = [self annotationWithTag:annotationTag];
+        MGLAnnotationImage *annotationImage = [self imageOfAnnotationWithTag:annotationTag];
         if (annotationImage.cursor) {
             // Add a cursor tracking area over the annotation image, respecting
             // the image’s alignment rect.
