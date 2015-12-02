@@ -27,12 +27,14 @@ export BUILDTYPE=${BUILDTYPE:-Release}
 export HOST=osx
 make Xcode/osx
 
-step "Building OS X framework (build ${TRAVIS_JOB_NUMBER:-${BITRISE_BUILD_NUMBER:-0}})..."
+VERSION=${TRAVIS_JOB_NUMBER:-${BITRISE_BUILD_NUMBER:-0}}
+
+step "Building OS X framework (build ${VERSION})..."
 xcodebuild -sdk macosx${OSX_SDK_VERSION} \
     ARCHS="x86_64" \
     ONLY_ACTIVE_ARCH=NO \
     GCC_GENERATE_DEBUGGING_SYMBOLS=${GCC_GENERATE_DEBUGGING_SYMBOLS} \
-    CURRENT_PROJECT_VERSION=${TRAVIS_JOB_NUMBER:-${BITRISE_BUILD_NUMBER:-0}} \
+    CURRENT_PROJECT_VERSION=${VERSION} \
     -project ./build/osx-x86_64/gyp/osx.xcodeproj \
     -configuration ${BUILDTYPE} \
     -target osxsdk \
