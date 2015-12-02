@@ -30,64 +30,64 @@ matrix:
     # OS X - Xcode 7 - Debug
     - os: osx
       osx_image: xcode7
-      compiler: ": xcode-debug"
+      compiler: clang
       env: FLAVOR=osx BUILDTYPE=Debug
 
 
     # OS X/Node.js 5 - Xcode 7
     - os: osx
       osx_image: xcode7
-      compiler: ": node5-xcode"
+      compiler: clang
       env: FLAVOR=node NODE_VERSION=5
 
     # OS X/Node.js 4 - Xcode 7
     - os: osx
       osx_image: xcode7
-      compiler: ": node4-xcode"
+      compiler: clang
       env: FLAVOR=node NODE_VERSION=4
 
     # OS X/Node.js 0.10 - Xcode 7
     - os: osx
       osx_image: xcode7
-      compiler: ": node0.10-xcode"
+      compiler: clang
       env: FLAVOR=node NODE_VERSION=0.10
 
 
     # Linux/Node.js 5 - Clang 3.5 - Release
     - os: linux
       compiler: ": node5-clang35-release"
-      env: FLAVOR=node BUILDTYPE=Release NODE_VERSION=5 _CXX=clang++-3.5 _CC=clang-3.5
+      env: FLAVOR=node BUILDTYPE=Release NODE_VERSION=5 _CXX=clang++-3.5 _CC=clang-3.5 CCACHE=1
       addons: *clang35
 
     # Linux/Node.js 4 - Clang 3.5 - Release
     - os: linux
       compiler: ": node4-clang35-release"
-      env: FLAVOR=node BUILDTYPE=Release NODE_VERSION=4 _CXX=clang++-3.5 _CC=clang-3.5
+      env: FLAVOR=node BUILDTYPE=Release NODE_VERSION=4 _CXX=clang++-3.5 _CC=clang-3.5 CCACHE=1
       addons: *clang35
 
     # Linux/Node.js 0.10 - Clang 3.5 - Release
     - os: linux
       compiler: ": node0.10-clang35-release"
-      env: FLAVOR=node BUILDTYPE=Release NODE_VERSION=0.10 _CXX=clang++-3.5 _CC=clang-3.5
+      env: FLAVOR=node BUILDTYPE=Release NODE_VERSION=0.10 _CXX=clang++-3.5 _CC=clang-3.5 CCACHE=1
       addons: *clang35
 
 
     # Linux - GCC 4.9 - Release
     - os: linux
       compiler: ": linux-gcc49-release"
-      env: FLAVOR=linux BUILDTYPE=Release _CXX=g++-4.9 _CC=gcc-4.9
+      env: FLAVOR=linux BUILDTYPE=Release _CXX=g++-4.9 _CC=gcc-4.9 CCACHE=1
       addons: *gcc49
 
     # Linux - Clang 3.5 - Debug
     - os: linux
       compiler: ": linux-clang35-debug"
-      env: FLAVOR=linux BUILDTYPE=Debug _CXX=clang++-3.5 _CC=clang-3.5
+      env: FLAVOR=linux BUILDTYPE=Debug _CXX=clang++-3.5 _CC=clang-3.5 CCACHE=1
       addons: *clang35
 
     # Linux - Clang 3.5 - Release
     - os: linux
       compiler: ": linux-clang35-release"
-      env: FLAVOR=linux BUILDTYPE=Release _CXX=clang++-3.5 _CC=clang-3.5
+      env: FLAVOR=linux BUILDTYPE=Release _CXX=clang++-3.5 _CC=clang-3.5 CCACHE=1
       addons: *clang35
 
     # clang-tidy - Clang 3.8 - Release
@@ -95,6 +95,13 @@ matrix:
       compiler: ": tidy-clang38-release"
       env: FLAVOR=linux ACTION=tidy BUILDTYPE=Release _CXX=clang++-3.8 _CC=clang-3.8 AWS_ACCESS_KEY_ID=
       addons: *clang38-tidy
+
+cache:
+  directories:
+    - $HOME/.ccache
+    - $HOME/.cache/pip
+    - $HOME/build/mapbox/mapbox-gl-native/.binaries
+    - $HOME/build/mapbox/mapbox-gl-native/.scripts
 
 env:
   global:
@@ -113,13 +120,14 @@ env:
     - KIF_SCREENSHOTS="${TRAVIS_BUILD_DIR}/screenshots"
 
 before_install:
-- if [ ! -z "${_CXX}" ]; then export CXX="${_CXX}" ; fi
-- if [ ! -z "${_CC}" ]; then export CC="${_CC}" ; fi
-- ${CXX} --version
+- source ./scripts/set_compiler.sh
 - source ./scripts/travis_helper.sh
 
 install:
 - ./scripts/${FLAVOR}/install.sh
+
+before_script:
+- if command -v ccache >/dev/null 2>&1; then ccache --zero-stats ; fi
 
 script:
 - ./scripts/${FLAVOR}/${ACTION:-run}.sh
@@ -128,6 +136,7 @@ after_failure:
 - "[ -f ./scripts/${FLAVOR}/after_failure.sh ] && ./scripts/${FLAVOR}/after_failure.sh"
 
 after_script:
+- if command -v ccache >/dev/null 2>&1; then ccache --show-stats ; fi
 - "[ -f ./scripts/${FLAVOR}/after_script.sh ] && ./scripts/${FLAVOR}/after_script.sh"
 
 notifications:
