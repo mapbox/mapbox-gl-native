@@ -139,7 +139,7 @@ void TileWorker::parseLayer(const StyleLayer& layer, const GeometryTile& geometr
 
     if (/*layer.interactive &&*/ layer.id.substr(0, 3) == "poi" && bucket->hasData()) {
 //        result.featureTree.clear();
-        printf("parsing tile %i,%i,%i (%i)\n", id.z, id.x, id.y, id.sourceZ);
+//        printf("parsing tile %i,%i,%i (%i)\n", id.z, id.x, id.y, id.z);
         for (std::size_t i = 0; i < geometryLayer->featureCount(); i++) {
             const auto feature = geometryLayer->getFeature(i);
             const auto geometries = feature->getGeometries();
@@ -148,8 +148,6 @@ void TileWorker::parseLayer(const StyleLayer& layer, const GeometryTile& geometr
                 const auto geometry = geometries.at(j);
                 for (std::size_t k = 0; k < geometry.size(); k++) {
                     auto point = geometry.at(k);
-                    point.x /= id.overscaling;
-                    point.y /= id.overscaling;
                     if (point.x < 0 || point.x > 4096 || point.y < 0 || point.y > 4096) continue;
                     const auto min = featureBox.min_corner();
                     const auto max = featureBox.max_corner();
@@ -176,18 +174,18 @@ void TileWorker::parseLayer(const StyleLayer& layer, const GeometryTile& geometr
                     }
 
                     result.featureTree.insert(std::make_tuple(featureBox, layer.id, properties));
-                    printf("added feature '%s' from %s at %i, %i\n",
-                        name.c_str(),
-                        layer.id.c_str(),
-                        point.x,
-                        point.y);
+//                    printf("added feature '%s' from %s at %i, %i\n",
+//                        name.c_str(),
+//                        layer.id.c_str(),
+//                        point.x,
+//                        point.y);
                 }
             }
         }
         if (result.featureTree.size()) {
-            printf("feature tree for %i,%i,%i (%i) [%s] has %lu members\n", id.z, id.x, id.y, id.sourceZ, layer.id.c_str(), result.featureTree.size());
-            const auto bounds = result.featureTree.bounds();
-            printf("box: %i, %i to %i, %i\n", bounds.min_corner().get<0>(), bounds.min_corner().get<1>(), bounds.max_corner().get<0>(), bounds.max_corner().get<1>());
+//            printf("feature tree for %i,%i,%i (%i) [%s] has %lu members\n", id.z, id.x, id.y, id.sourceZ, layer.id.c_str(), result.featureTree.size());
+//            const auto bounds = result.featureTree.bounds();
+//            printf("box: %i, %i to %i, %i\n", bounds.min_corner().get<0>(), bounds.min_corner().get<1>(), bounds.max_corner().get<0>(), bounds.max_corner().get<1>());
         }
     }
 

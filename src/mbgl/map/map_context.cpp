@@ -297,9 +297,10 @@ std::vector<std::pair<std::string, FeatureProperties>> MapContext::featuresAt(co
 
 //    PrecisionPoint p(x, y);
 
-    const auto z = ::fmin(::floor(transformState.getZoom()), 15);
-    const auto z2 = powf(2, z);
-    TileID id(z, ::floor(x * z2), ::floor(y * z2), ::floor(transformState.getZoom()));
+    const auto z = ::floor(transformState.getZoom());
+    const auto source_max_z = ::fmin(z, 15);
+    const auto z2 = ::powf(2, source_max_z);
+    TileID id(z, ::floor(x * z2), ::floor(y * z2), source_max_z);
 
     // figure out tile coordinate
     //
@@ -311,8 +312,8 @@ std::vector<std::pair<std::string, FeatureProperties>> MapContext::featuresAt(co
 
     vec2<uint16_t> position((coordinate.column - id.x) * 4096, (coordinate.row - id.y) * 4096);
 
-    const auto tile_scale = ::pow(2, z);
-    const auto scale = util::tileSize * transformState.getScale() / tile_scale;
+    const auto tile_scale = ::pow(2, id.z); // z);
+    const auto scale = util::tileSize * transformState.getScale() / (tile_scale / id.overscaling);
 
     const auto radius = 5 * 4096 / scale;
 

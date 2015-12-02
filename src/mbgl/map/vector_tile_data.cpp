@@ -74,6 +74,7 @@ VectorTileData::VectorTileData(const TileID& id_,
 
                 featureTree.clear();
                 featureTree.insert(resultBuckets.featureTree.begin(), resultBuckets.featureTree.end());
+//                printf("consolidated results feature tree items (%lu) into own (%s/%p of %lu items)\n", resultBuckets.featureTree.size(), std::string(id).c_str(), this, featureTree.size());
 
                 // The target configuration could have changed since we started placement. In this case,
                 // we're starting another placement run.

@@ -6,6 +6,7 @@ namespace mbgl {
 TileData::TileData(const TileID& id_)
     : id(id_),
       state(State::initial) {
+//      printf("creating TileData %s (%p)\n", std::string(id).c_str(), this);
 }
 
 TileData::~TileData() = default;
