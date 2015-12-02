@@ -72,6 +72,7 @@ VectorTileData::VectorTileData(const TileID& id_,
                 // existing buckets in case we got a refresh parse.
                 buckets = std::move(resultBuckets.buckets);
 
+                // Replace interactivity feature tree in case we got a refresh parse.
                 featureTree.clear();
                 featureTree.insert(resultBuckets.featureTree.begin(), resultBuckets.featureTree.end());
 //                printf("consolidated results feature tree items (%lu) into own (%s/%p of %lu items)\n", resultBuckets.featureTree.size(), std::string(id).c_str(), this, featureTree.size());
