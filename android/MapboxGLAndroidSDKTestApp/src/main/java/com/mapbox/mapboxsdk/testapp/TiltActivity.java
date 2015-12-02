@@ -5,8 +5,8 @@ import android.support.v7.app.ActionBar;
 import android.support.v7.app.AppCompatActivity;
 import android.support.v7.widget.Toolbar;
 import android.view.MenuItem;
-
 import com.mapbox.mapboxsdk.camera.CameraPosition;
+import com.mapbox.mapboxsdk.camera.CameraUpdateFactory;
 import com.mapbox.mapboxsdk.constants.Style;
 import com.mapbox.mapboxsdk.geometry.LatLng;
 import com.mapbox.mapboxsdk.utils.ApiAccess;
@@ -55,7 +55,7 @@ public class TiltActivity extends AppCompatActivity {
                 .build();         // Creates a CameraPosition from the builder
 
         // Triggers tilt
-        //mMapView.animateCamera(CameraUpdateFactory.newCameraPosition(cameraPosition));
+        mMapView.animateCamera(CameraUpdateFactory.newCameraPosition(cameraPosition));
     }
 
     @Override
