@@ -1364,8 +1364,10 @@ public:
         return;
     }
     
+    [self willChangeValueForKey:@"selectedAnnotation"];
     _selectedAnnotationID = annotationID;
     _lastSelectedAnnotationID = _selectedAnnotationID;
+    [self didChangeValueForKey:@"selectedAnnotation"];
     
     if ([annotation respondsToSelector:@selector(title)]
         && annotation.title
