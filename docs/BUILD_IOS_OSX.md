@@ -83,7 +83,6 @@ Currently, until [#1437](https://github.com/mapbox/mapbox-gl-native/issues/1437)
    - `libc++.dylib`
    - `libsqlite3.dylib`
    - `libz.dylib`
-   - `CoreTelephony.framework` (optional, telemetry-only)
 
 1. Add `-ObjC` to your target's "Other Linker Flags" build setting (`OTHER_LDFLAGS`).
 
