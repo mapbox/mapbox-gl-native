@@ -4,7 +4,7 @@
 #import "LocationCoordinate2DTransformer.h"
 #import "NSValue+Additions.h"
 
-#import <mbgl/osx/Mapbox.h>
+#import <Mapbox/Mapbox.h>
 
 static NSString * const MGLMapboxAccessTokenDefaultsKey = @"MGLMapboxAccessToken";
 static NSString * const MGLDroppedPinAnnotationImageIdentifier = @"dropped";
@@ -526,7 +526,8 @@ static NSString * const MGLDroppedPinAnnotationImageIdentifier = @"dropped";
 - (MGLAnnotationImage *)mapView:(MGLMapView *)mapView imageForAnnotation:(id <MGLAnnotation>)annotation {
     MGLAnnotationImage *annotationImage = [self.mapView dequeueReusableAnnotationImageWithIdentifier:MGLDroppedPinAnnotationImageIdentifier];
     if (!annotationImage) {
-        NSString *imagePath = [[NSBundle mainBundle] pathForResource:@"default_marker" ofType:@"pdf"];
+        NSString *imagePath = [[NSBundle bundleForClass:[MGLMapView class]]
+                               pathForResource:@"default_marker" ofType:@"pdf"];
         NSImage *image = [[NSImage alloc] initWithContentsOfFile:imagePath];
         NSRect alignmentRect = image.alignmentRect;
         alignmentRect.origin.y = NSMidY(alignmentRect);

@@ -8,8 +8,7 @@ void mgl_linkBundleCategory();
 
 @interface NSBundle (MGLAdditions)
 
-+ (instancetype)mgl_resourceBundle;
-+ (NSString *)mgl_resourceBundlePath;
++ (instancetype)mgl_frameworkBundle;
 
 @end
 

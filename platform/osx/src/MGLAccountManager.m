@@ -2,10 +2,6 @@
 
 #import <mbgl/osx/MGLMapView.h>
 
-#import "NSBundle+MGLAdditions.h"
-#import "NSProcessInfo+MGLAdditions.h"
-#import "../../darwin/NSString+MGLAdditions.h"
-
 @interface MGLAccountManager ()
 
 @property (atomic) NSString *accessToken;
@@ -17,12 +13,6 @@
 #pragma mark - Internal
 
 + (void)load {
-    mgl_linkBundleCategory();
-    mgl_linkStringCategory();
-    mgl_linkProcessInfoCategory();
-    
-    [MGLMapView restorableStateKeyPaths];
-    
     // Read the initial configuration from Info.plist.
     NSString *accessToken = [[NSBundle mainBundle] objectForInfoDictionaryKey:@"MGLMapboxAccessToken"];
     if (accessToken.length) {

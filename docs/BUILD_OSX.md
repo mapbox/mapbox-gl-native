@@ -4,26 +4,13 @@ This project provides an OS X SDK analogous to the Mapbox iOS SDK. Mapbox does n
 
 ### Build
 
-1. Run `make xpackage`. The packaging script will produce the statically-linked `libMapbox.a`, `Mapbox.bundle` for resources, and a `Headers` folder.
+1. Run `make xpackage`, which produces a `Mapbox.framework` in the `gyp/build/Release/` folder.
 
 ### Install
 
-1. Copy the contents of `build/osx/pkg/static` into your project. It should happen automatically, but ensure that:
+1. Copy `gyp/build/Release/Mapbox.framework` into your project. It should happen automatically, but ensure that `Mapbox.framework` is listed in the *Linked Frameworks and Libraries* section of the General tab for your application target.
 
-   - `Headers` is in your *Header Search Paths* (`HEADER_SEARCH_PATHS`) build setting.
-   - `Mapbox.bundle` is in your target's *Copy Bundle Resources* build phase.
-   - `libMapbox.a` is in your target's *Link Binary With Libraries* build phase.
-
-1. Add the following Cocoa framework dependencies to your target's *Link Binary With Libraries* build phase:
-
-   - `SystemConfiguration.framework`
-   - `libc++.tbd`
-   - `libsqlite3.tbd`
-   - `libz.tbd`
-
-1. Add `-ObjC` to your target's "Other Linker Flags" build setting (`OTHER_LDFLAGS`).
-
-1. Mapbox vector tiles require a Mapbox account and API access token. In the project editor, select the application target. In the Info tab, set `MGLMapboxAccessToken` to your access token. You can obtain one from the [Mapbox account page](https://www.mapbox.com/account/apps/).
+1. Mapbox vector tiles require a Mapbox account and API access token. In the project editor, select the application target. In the Info tab, set `MGLMapboxAccessToken` to your access token. You can obtain one from the [Mapbox account page](https://www.mapbox.com/studio/account/tokens/).
 
 1. In a XIB or storyboard, add a Custom View and set its custom class to `MGLMapView`. If you need to manipulate the map view programmatically, import the `Mapbox` module (Swift) or `Mapbox.h` umbrella header (Objective-C).
 

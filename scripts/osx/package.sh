@@ -9,10 +9,10 @@ OUTPUT=build/osx/pkg
 OSX_SDK_VERSION=`xcrun --sdk macosx --show-sdk-version`
 LIBUV_VERSION=1.7.5
 
-if [[ ${#} -eq 0 ]]; then # e.g. "make ipackage"
+if [[ ${#} -eq 0 ]]; then # e.g. "make xpackage"
     BUILDTYPE="Release"
     GCC_GENERATE_DEBUGGING_SYMBOLS="YES"
-else # e.g. "make ipackage-strip"
+else # e.g. "make xpackage-strip"
     BUILDTYPE="Release"
     GCC_GENERATE_DEBUGGING_SYMBOLS="NO"
 fi
@@ -23,11 +23,11 @@ trap finish EXIT
 
 
 rm -rf ${OUTPUT}
-mkdir -p "${OUTPUT}"/static
+mkdir -p "${OUTPUT}"/shared
 
 
 step "Recording library version..."
-VERSION="${OUTPUT}"/static/version.txt
+VERSION="${OUTPUT}"/shared/version.txt
 echo -n "https://github.com/mapbox/mapbox-gl-native/commit/" > ${VERSION}
 HASH=`git log | head -1 | awk '{ print $2 }' | cut -c 1-10` && true
 echo -n "mapbox-gl-native "
@@ -46,33 +46,23 @@ xcodebuild -sdk macosx${OSX_SDK_VERSION} \
     ARCHS="x86_64" \
     ONLY_ACTIVE_ARCH=NO \
     GCC_GENERATE_DEBUGGING_SYMBOLS=${GCC_GENERATE_DEBUGGING_SYMBOLS} \
-    -project ./build/osx-x86_64/gyp/mbgl.xcodeproj \
+    -project ./build/osx-x86_64/gyp/osx.xcodeproj \
     -configuration ${BUILDTYPE} \
-    -target everything \
+    -target osxsdk \
     -jobs ${JOBS}
 
+TARGET_BUILD_DIR=gyp/build/${BUILDTYPE}
+INFOPLIST_PATH=Mapbox.framework/Versions/Current/Resources/Info.plist
 
-step "Building static library..."
-LIBS=(core.a platform-osx.a asset-fs.a cache-sqlite.a http-nsurl.a)
-libtool -static -no_warning_for_no_symbols \
-    `find mason_packages/osx-${OSX_SDK_VERSION} -type f -name libuv.a` \
-    `find mason_packages/osx-${OSX_SDK_VERSION} -type f -name libgeojsonvt.a` \
-    -o ${OUTPUT}/static/lib${NAME}.a \
-    ${LIBS[@]/#/gyp/build/${BUILDTYPE}/libmbgl-}
-echo "Created ${OUTPUT}/static/lib${NAME}.a"
+# Uncomment when we're ready to release an official version.
+#VERSION=$( git tag | grep ^osx | sed 's/^osx-//' | sort -r | grep -v '\-rc.' | grep -v '\-pre.' | sed -n '1p' | sed 's/^v//' )
+#if [ "$VERSION" ]; then
+#    plutil \
+#        -replace CFBundleShortVersionString -string ${VERSION} \
+#        $TARGET_BUILD_DIR/$INFOPLIST_PATH
+#    plutil \
+#        -replace CFBundleVersion -string ${VERSION} \
+#        $TARGET_BUILD_DIR/$INFOPLIST_PATH
+#fi
 
-
-step "Copying Headers..."
-mkdir -p "${OUTPUT}/static/Headers"
-for i in `ls -R include/mbgl/darwin | grep -vi private`; do
-    cp -pv include/mbgl/darwin/$i "${OUTPUT}/static/Headers"
-done
-for i in `ls -R include/mbgl/osx | grep -vi private`; do
-    cp -pv include/mbgl/osx/$i "${OUTPUT}/static/Headers"
-done
-
-step "Copying Resources..."
-cp -pv LICENSE.md "${OUTPUT}/static"
-mkdir -p "${OUTPUT}/static/${NAME}.bundle"
-cp -pv platform/osx/resources/* "${OUTPUT}/static/${NAME}.bundle"
-
+echo $TARGET_BUILD_DIR/Mapbox.framework

@@ -66,7 +66,7 @@ typedef std::map<MGLAnnotationID, MGLAnnotationContext> MGLAnnotationContextMap;
 
 /// Returns an NSImage for the default marker image.
 NSImage *MGLDefaultMarkerImage() {
-    NSString *path = [[NSBundle mgl_resourceBundle] pathForResource:MGLDefaultStyleMarkerSymbolName
+    NSString *path = [[NSBundle mgl_frameworkBundle] pathForResource:MGLDefaultStyleMarkerSymbolName
                                                              ofType:@"pdf"];
     return [[NSImage alloc] initWithContentsOfFile:path];
 }
@@ -266,7 +266,7 @@ public:
     _logoView = [[NSImageView alloc] initWithFrame:NSZeroRect];
     _logoView.wantsLayer = YES;
     NSImage *logoImage = [[NSImage alloc] initWithContentsOfFile:
-                          [[NSBundle mgl_resourceBundle] pathForResource:@"mapbox" ofType:@"pdf"]];
+                          [[NSBundle mgl_frameworkBundle] pathForResource:@"mapbox" ofType:@"pdf"]];
     logoImage.alignmentRect = NSInsetRect(logoImage.alignmentRect, 3, 3);
     _logoView.image = logoImage;
     _logoView.translatesAutoresizingMaskIntoConstraints = NO;
@@ -1396,7 +1396,7 @@ public:
     }
     if (!viewController) {
         viewController = [[NSViewController alloc] initWithNibName:@"MGLAnnotationCallout"
-                                                            bundle:[NSBundle mgl_resourceBundle]];
+                                                            bundle:[NSBundle mgl_frameworkBundle]];
     }
     NSAssert(viewController, @"Unable to load MGLAnnotationCallout view controller");
     viewController.representedObject = annotation;

@@ -152,6 +152,7 @@ endif
 clean: clear_sqlite_cache clear_xcode_cache
 	-find ./deps/gyp -name "*.pyc" -exec rm {} \;
 	-rm -rf ./build/
+	-rm -rf ./gyp/build/
 	-rm -rf ./macosx/build
 	-rm -rf ./linux/build
 	-rm -rf ./ios/build
