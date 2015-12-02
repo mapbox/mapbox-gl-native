@@ -37,4 +37,20 @@ public final class CameraUpdate {
         this.tilt = tilt;
         this.zoom = zoom;
     }
+
+    public float getBearing() {
+        return bearing;
+    }
+
+    public LatLng getTarget() {
+        return target;
+    }
+
+    public float getTilt() {
+        return tilt;
+    }
+
+    public float getZoom() {
+        return zoom;
+    }
 }

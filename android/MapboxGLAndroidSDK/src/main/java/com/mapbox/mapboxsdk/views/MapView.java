@@ -1115,6 +1115,13 @@ public final class MapView extends FrameLayout {
     @UiThread
     public final void animateCamera (CameraUpdate update) {
 
+        LatLngZoom llz = new LatLngZoom(update.getTarget(), update.getZoom());
+        setCenterCoordinate(llz);
+
+        setBearing(update.getBearing());
+
+        // TODO - Set tilt
+
     }
 
     //

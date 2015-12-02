@@ -31,13 +31,14 @@ public class TiltActivity extends AppCompatActivity {
         }
 
         // Target
+        LatLng dc = new LatLng(38.90252, -77.02291);
         LatLng nyc = new LatLng(40.73581, -73.99155);
 
         // Set up the map
         mMapView = (MapView) findViewById(R.id.tiltMapView);
         mMapView.setAccessToken(ApiAccess.getToken(this));
         mMapView.setStyleUrl(Style.MAPBOX_STREETS);
-        mMapView.setCenterCoordinate(nyc);
+        mMapView.setCenterCoordinate(dc);
         mMapView.setZoomLevel(11);
         mMapView.onCreate(savedInstanceState);
 
