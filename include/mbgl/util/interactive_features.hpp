@@ -28,15 +28,24 @@
 
 namespace mbgl {
 
+// Boost namespacing
 namespace FeatureBG = boost::geometry;
 namespace FeatureBGM = FeatureBG::model;
 namespace FeatureBGI = FeatureBG::index;
+
+// Index properties
 typedef FeatureBGM::point<int16_t, 2, FeatureBG::cs::cartesian> FeaturePoint;
 typedef FeatureBGM::box<FeaturePoint> FeatureBox;
 typedef std::unordered_map<std::string, std::string> FeatureProperties;
-typedef std::tuple<FeatureBox, std::string, FeatureProperties> Feature; // box, layer, properties
+
+// Query item (bounding box, layer name, properties)
+typedef std::tuple<FeatureBox, std::string, FeatureProperties> Feature;
+
+// R-tree setup
 typedef FeatureBGI::rtree<Feature, FeatureBGI::linear<16, 4>> FeatureTree;
-typedef std::vector<std::tuple<std::string, std::string, FeatureProperties>> FeatureResults; // layer, source, properties
+
+// Query results (layer name, source name, properties)
+typedef std::vector<std::tuple<std::string, std::string, FeatureProperties>> FeatureResults;
 
 } // namespace mbgl
 
