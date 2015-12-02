@@ -43,7 +43,6 @@
         '../platform/darwin/MGLPolyline.mm',
         '../include/mbgl/darwin/MGLPolygon.h',
         '../platform/darwin/MGLPolygon.mm',
-        '../include/mbgl/osx/Mapbox.h',
         '../include/mbgl/osx/MGLAccountManager.h',
         '../platform/osx/src/MGLAccountManager_Private.h',
         '../platform/osx/src/MGLAccountManager.m',

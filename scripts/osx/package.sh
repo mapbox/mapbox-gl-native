@@ -21,31 +21,18 @@ function step { >&2 echo -e "\033[1m\033[36m* $@\033[0m"; }
 function finish { >&2 echo -en "\033[0m"; }
 trap finish EXIT
 
-
-rm -rf ${OUTPUT}
-mkdir -p "${OUTPUT}"/shared
-
-
-step "Recording library version..."
-VERSION="${OUTPUT}"/shared/version.txt
-echo -n "https://github.com/mapbox/mapbox-gl-native/commit/" > ${VERSION}
-HASH=`git log | head -1 | awk '{ print $2 }' | cut -c 1-10` && true
-echo -n "mapbox-gl-native "
-echo ${HASH}
-echo ${HASH} >> ${VERSION}
-
-
 step "Creating build files..."
 export MASON_PLATFORM=osx
 export BUILDTYPE=${BUILDTYPE:-Release}
 export HOST=osx
 make Xcode/osx
 
-step "Building OS X targets..."
+step "Building OS X framework (build ${TRAVIS_JOB_NUMBER:-${BITRISE_BUILD_NUMBER:-0}})..."
 xcodebuild -sdk macosx${OSX_SDK_VERSION} \
     ARCHS="x86_64" \
     ONLY_ACTIVE_ARCH=NO \
     GCC_GENERATE_DEBUGGING_SYMBOLS=${GCC_GENERATE_DEBUGGING_SYMBOLS} \
+    CURRENT_PROJECT_VERSION=${TRAVIS_JOB_NUMBER:-${BITRISE_BUILD_NUMBER:-0}} \
     -project ./build/osx-x86_64/gyp/osx.xcodeproj \
     -configuration ${BUILDTYPE} \
     -target osxsdk \

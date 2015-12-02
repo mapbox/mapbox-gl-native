@@ -1,4 +1,4 @@
-#import <mbgl/osx/Mapbox.h>
+#import <Mapbox/Mapbox.h>
 
 #import "../src/NSBundle+MGLAdditions.h"
 #import "../src/NSProcessInfo+MGLAdditions.h"
