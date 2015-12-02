@@ -91,7 +91,9 @@ public class MainActivity extends AppCompatActivity {
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
-        Fabric.with(this, new Crashlytics());
+        if (BuildConfig.REPORT_CRASHES) {
+            Fabric.with(this, new Crashlytics());
+        }
 
         // Load the layout
         setContentView(R.layout.activity_main);
