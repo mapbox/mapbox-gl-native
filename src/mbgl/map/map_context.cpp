@@ -23,11 +23,8 @@
 #include <mbgl/util/texture_pool.hpp>
 #include <mbgl/util/exception.hpp>
 #include <mbgl/util/string.hpp>
-#include <mbgl/util/tile_coordinate.hpp>
 
 #include <algorithm>
-
-#include <boost/function_output_iterator.hpp>
 
 namespace mbgl {
 
@@ -282,83 +279,9 @@ double MapContext::getTopOffsetPixelsForAnnotationSymbol(const std::string& symb
 }
 
 FeatureResults MapContext::featuresAt(const PrecisionPoint point) const {
-
-    LatLng p_ = transformState.pointToLatLng(point);
-
-//    printf("core: %f, %f\n", p_.latitude, p_.longitude);
-
-    // figure out tile (bounded by source max zoom)
-    //
-    double sine = std::sin(p_.latitude * M_PI / 180);
-    double x = p_.longitude / 360 + 0.5;
-    double y = 0.5 - 0.25 * std::log((1 + sine) / (1 - sine)) / M_PI;
-
-    y = y < -1 ? -1 : y > 1 ? 1 : y;
-
-//    PrecisionPoint p(x, y);
-
-    const auto z = ::floor(transformState.getZoom());
-    const auto source_max_z = ::fmin(z, 15);
-    const auto z2 = ::powf(2, source_max_z);
-    TileID id(z, ::floor(x * z2), ::floor(y * z2), source_max_z);
-
-    // figure out tile coordinate
-    //
-    TileCoordinate coordinate = transformState.pointToCoordinate(point);
-
-    // figure out query bounds
-    //
-    coordinate = coordinate.zoomTo(::fmin(id.z, 15));
-
-    vec2<uint16_t> position((coordinate.column - id.x) * 4096, (coordinate.row - id.y) * 4096);
-
-    const auto tile_scale = ::pow(2, id.z); // z);
-    const auto scale = util::tileSize * transformState.getScale() / (tile_scale / id.overscaling);
-
-    const auto radius = 5 * 4096 / scale;
-
-    printf("===== query: %i,%i,%i @ %i, %i (radius: %f)\n", id.z, id.x, id.y, position.x, position.y, radius);
-
-    FeatureBox queryBox = {
-        { position.x - radius, position.y - radius },
-        { position.x + radius, position.y + radius }
-    };
-
-    FeatureResults results;
-
-    for (const auto& source : style->sources) {
-        if (source->info.type == SourceType::Vector) {
-            for (const auto& tile : source->getLoadedTiles()) {
-                if (tile->id != id) continue;
-//                printf("[%s]: %i,%i,%i\n", source->info.source_id.c_str(), tile->id.z, tile->id.x, tile->id.y);
-
-                const auto& tile_data = tile->data;
-                tile_data->featureTree.query(boost::geometry::index::intersects(queryBox),
-                    boost::make_function_output_iterator([&](const auto& val) {
-                    const std::string layer_id = std::get<1>(val);
-                    const FeatureProperties feature_properties = std::get<2>(val);
-
-                    const auto result = std::make_tuple(layer_id, source->info.source_id, feature_properties);
-
-                    std::string properties = "";
-                    for (const auto property : feature_properties) {
-                        properties = "\n\t" + property.first + ": " + property.second;
-                    }
-
-                    printf("%s in %s: %s\n", layer_id.c_str(), source->info.source_id.c_str(), properties.c_str());
-
-                    results.push_back(result);
-                }));
-
-
-            }
-        }
-    }
-
-//    (void)point;
-
-    return results;
-
+    assert(util::ThreadContext::currentlyOn(util::ThreadType::Map));
+    if (!style) return FeatureResults();
+    return style->featuresAt(point, transformState);
 }
 
 void MapContext::setSourceTileCacheSize(size_t size) {

@@ -11,6 +11,7 @@
 #include <mbgl/util/noncopyable.hpp>
 #include <mbgl/util/chrono.hpp>
 #include <mbgl/util/worker.hpp>
+#include <mbgl/util/interactive_features.hpp>
 
 #include <cstdint>
 #include <string>
@@ -67,6 +68,8 @@ public:
     void addLayer(util::ptr<StyleLayer>);
     void addLayer(util::ptr<StyleLayer>, const std::string& beforeLayerID);
     void removeLayer(const std::string& layerID);
+
+    FeatureResults featuresAt(const PrecisionPoint, const TransformState& transform) const;
 
     void dumpDebugLogs() const;
 

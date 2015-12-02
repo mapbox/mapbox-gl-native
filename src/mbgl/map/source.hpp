@@ -11,6 +11,8 @@
 #include <mbgl/util/ptr.hpp>
 #include <mbgl/util/chrono.hpp>
 #include <mbgl/util/constants.hpp>
+#include <mbgl/util/interactive_features.hpp>
+#include <mbgl/util/geo.hpp>
 
 #include <rapidjson/document.h>
 
@@ -90,6 +92,8 @@ public:
 
     void setObserver(Observer* observer);
     void dumpDebugLogs() const;
+
+    FeatureResults featuresAt(const PrecisionPoint, const TransformState&) const;
 
     SourceInfo info;
     bool enabled;

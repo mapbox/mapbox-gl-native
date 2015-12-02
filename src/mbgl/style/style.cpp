@@ -265,6 +265,21 @@ void Style::emitResourceLoadingFailed(std::exception_ptr error) {
     }
 }
 
+FeatureResults Style::featuresAt(const PrecisionPoint point, const TransformState& transform) const {
+    assert(util::ThreadContext::currentlyOn(util::ThreadType::Map));
+
+    FeatureResults results;
+
+    for (const auto& source : sources) {
+        if (source->info.type == SourceType::Vector && source->isLoaded()) {
+            const auto source_results = source->featuresAt(point, transform);
+            results.insert(results.end(), source_results.begin(), source_results.end());
+        }
+    }
+
+    return results;
+}
+
 void Style::dumpDebugLogs() const {
     for (const auto& source : sources) {
         source->dumpDebugLogs();
