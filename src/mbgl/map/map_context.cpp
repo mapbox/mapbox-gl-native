@@ -281,7 +281,7 @@ double MapContext::getTopOffsetPixelsForAnnotationSymbol(const std::string& symb
     }
 }
 
-std::vector<std::pair<std::string, FeatureProperties>> MapContext::featuresAt(const PrecisionPoint point) const {
+std::vector<std::tuple<std::string, std::string, FeatureProperties>> MapContext::featuresAt(const PrecisionPoint point) const {
 
     LatLng p_ = transformState.pointToLatLng(point);
 
@@ -324,7 +324,7 @@ std::vector<std::pair<std::string, FeatureProperties>> MapContext::featuresAt(co
         { position.x + radius, position.y + radius }
     };
 
-    std::vector<std::pair<std::string, FeatureProperties>> results;
+    std::vector<std::tuple<std::string, std::string, FeatureProperties>> results;
 
     for (const auto& source : style->sources) {
         if (source->info.type == SourceType::Vector) {
@@ -338,14 +338,14 @@ std::vector<std::pair<std::string, FeatureProperties>> MapContext::featuresAt(co
                     const std::string layer_id = std::get<1>(val);
                     const FeatureProperties feature_properties = std::get<2>(val);
 
-                    const auto result = std::make_pair(layer_id, feature_properties);
+                    const auto result = std::make_tuple(layer_id, source->info.source_id, feature_properties);
 
                     std::string properties = "";
                     for (const auto property : feature_properties) {
                         properties = "\n\t" + property.first + ": " + property.second;
                     }
 
-                    printf("%s: %s\n", layer_id.c_str(), properties.c_str());
+                    printf("%s in %s: %s\n", layer_id.c_str(), source->info.source_id.c_str(), properties.c_str());
 
                     results.push_back(result);
                 }));

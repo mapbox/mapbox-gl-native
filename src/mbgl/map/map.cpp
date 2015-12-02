@@ -409,8 +409,8 @@ LatLngBounds Map::getBoundsForAnnotations(const AnnotationIDs& annotations) {
 
 #pragma mark - Features
 
-std::vector<std::pair<std::string, FeatureProperties>> Map::featuresAt(const PrecisionPoint point) const {
-    return context->invokeSync<std::vector<std::pair<std::string, FeatureProperties>>>(&MapContext::featuresAt, point);
+std::vector<std::tuple<std::string, std::string, FeatureProperties>> Map::featuresAt(const PrecisionPoint point) const {
+    return context->invokeSync<std::vector<std::tuple<std::string, std::string, FeatureProperties>>>(&MapContext::featuresAt, point);
 }
 
 

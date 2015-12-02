@@ -160,8 +160,8 @@ public:
     LatLngBounds getBoundsForAnnotations(const AnnotationIDs&);
     double getTopOffsetPixelsForAnnotationSymbol(const std::string&);
 
-    // Features
-    std::vector<std::pair<std::string, FeatureProperties>> featuresAt(const PrecisionPoint) const;
+    // Features - layer name, source name, feature properties
+    std::vector<std::tuple<std::string, std::string, FeatureProperties>> featuresAt(const PrecisionPoint) const;
 
     // Sprites
     void setSprite(const std::string&, std::shared_ptr<const SpriteImage>);
