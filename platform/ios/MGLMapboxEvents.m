@@ -75,23 +75,6 @@ const NSTimeInterval MGLFlushInterval = 60;
         } else {
             _scale = [UIScreen mainScreen].scale;
         }
-
-#if !TARGET_OS_SIMULATOR
-        // Collect cellular carrier data if CoreTelephony is linked
-        Class MGLTelephony = NSClassFromString(@"CTTelephonyNetworkInfo");
-        if (MGLTelephony) {
-            id telephonyNetworkInfo = [[MGLTelephony alloc] init];
-            SEL subscriberCellularProviderSelector = NSSelectorFromString(@"subscriberCellularProvider");
-            id carrierVendor = [telephonyNetworkInfo performSelector:subscriberCellularProviderSelector];
-
-            // Guard against simulator, iPod Touch, etc.
-            if (carrierVendor) {
-                SEL carrierNameSelector = NSSelectorFromString(@"carrierName");
-                NSString *carrierName = [carrierVendor performSelector:carrierNameSelector];
-                _carrier = carrierName;
-            }
-        }
-#endif
     }
     return self;
 }
@@ -510,13 +493,6 @@ const NSTimeInterval MGLFlushInterval = 60;
         [evt setValue:@((int)(100 * [UIDevice currentDevice].batteryLevel)) forKey:@"batteryLevel"];
         [evt setValue:@(strongSelf.data.scale) forKey:@"resolution"];
 
-        if (strongSelf.data.carrier) {
-            [evt setValue:strongSelf.data.carrier forKey:@"carrier"];
-
-            NSString *cell = [strongSelf currentCellularNetworkConnectionType];
-            [evt setObject:(cell ? cell : [NSNull null]) forKey:@"cellularNetworkType"];
-        }
-
         MGLReachability *reachability = [MGLReachability reachabilityForLocalWiFi];
         [evt setValue:([reachability isReachableViaWiFi] ? @YES : @NO) forKey:@"wifi"];
         
@@ -723,27 +699,6 @@ const NSTimeInterval MGLFlushInterval = 60;
     }
 
     return result;
-}
-
-// Can be called from any thread.
-//
-- (NSString *) currentCellularNetworkConnectionType {
-    NSString *radioTech;
-
-    Class CTTelephonyNetworkInfo = NSClassFromString(@"CTTelephonyNetworkInfo");
-    if (CTTelephonyNetworkInfo) {
-        id telephonyNetworkInfo = [[CTTelephonyNetworkInfo alloc] init];
-        SEL currentRadioAccessTechnologySelector = NSSelectorFromString(@"currentRadioAccessTechnology");
-        radioTech = ((id (*)(id, SEL))[telephonyNetworkInfo methodForSelector:currentRadioAccessTechnologySelector])(telephonyNetworkInfo, currentRadioAccessTechnologySelector);
-    }
-
-    if (radioTech == nil) {
-        return nil;
-    } else if ([radioTech hasPrefix:@"CTRadioAccessTechnology"]) {
-        return [radioTech substringFromIndex:23];
-    } else {
-        return @"Unknown";
-    }
 }
 
 // Can be called from any thread.
