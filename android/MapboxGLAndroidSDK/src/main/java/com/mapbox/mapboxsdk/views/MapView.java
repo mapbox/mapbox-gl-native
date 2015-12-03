@@ -120,6 +120,7 @@ public final class MapView extends FrameLayout {
     private static final String STATE_ZOOM_ENABLED = "zoomEnabled";
     private static final String STATE_SCROLL_ENABLED = "scrollEnabled";
     private static final String STATE_ROTATE_ENABLED = "rotateEnabled";
+    private static final String STATE_TILT_ENABLED = "tiltEnabled";
     private static final String STATE_ZOOM_CONTROLS_ENABLED = "zoomControlsEnabled";
     private static final String STATE_DEBUG_ACTIVE = "debugActive";
     private static final String STATE_STYLE_URL = "styleUrl";
@@ -244,6 +245,7 @@ public final class MapView extends FrameLayout {
     private boolean mZoomEnabled = true;
     private boolean mScrollEnabled = true;
     private boolean mRotateEnabled = true;
+    private boolean mTiltEnabled = true;
     private boolean mAllowConcurrentMultipleOpenInfoWindows = false;
     private String mStyleUrl;
 
@@ -730,6 +732,7 @@ public final class MapView extends FrameLayout {
             setZoomEnabled(typedArray.getBoolean(R.styleable.MapView_zoom_enabled, true));
             setScrollEnabled(typedArray.getBoolean(R.styleable.MapView_scroll_enabled, true));
             setRotateEnabled(typedArray.getBoolean(R.styleable.MapView_rotate_enabled, true));
+            setTiltEnabled(typedArray.getBoolean(R.styleable.MapView_tilt_enabled, true));
             setZoomControlsEnabled(typedArray.getBoolean(R.styleable.MapView_zoom_controls_enabled, isZoomControlsEnabled()));
             setDebugActive(typedArray.getBoolean(R.styleable.MapView_debug_active, false));
             if (typedArray.getString(R.styleable.MapView_style_url) != null) {
@@ -805,6 +808,7 @@ public final class MapView extends FrameLayout {
             setZoomEnabled(savedInstanceState.getBoolean(STATE_ZOOM_ENABLED));
             setScrollEnabled(savedInstanceState.getBoolean(STATE_SCROLL_ENABLED));
             setRotateEnabled(savedInstanceState.getBoolean(STATE_ROTATE_ENABLED));
+            setTiltEnabled(savedInstanceState.getBoolean(STATE_TILT_ENABLED));
             setZoomControlsEnabled(savedInstanceState.getBoolean(STATE_ZOOM_CONTROLS_ENABLED));
             setDebugActive(savedInstanceState.getBoolean(STATE_DEBUG_ACTIVE));
             setStyleUrl(savedInstanceState.getString(STATE_STYLE_URL));
@@ -885,6 +889,7 @@ public final class MapView extends FrameLayout {
         outState.putBoolean(STATE_ZOOM_ENABLED, isZoomEnabled());
         outState.putBoolean(STATE_SCROLL_ENABLED, isScrollEnabled());
         outState.putBoolean(STATE_ROTATE_ENABLED, isRotateEnabled());
+        outState.putBoolean(STATE_TILT_ENABLED, isTiltEnabled());
         outState.putBoolean(STATE_ZOOM_CONTROLS_ENABLED, isZoomControlsEnabled());
         outState.putBoolean(STATE_DEBUG_ACTIVE, isDebugActive());
         outState.putString(STATE_STYLE_URL, getStyleUrl());
@@ -1378,6 +1383,35 @@ public final class MapView extends FrameLayout {
         } else {
             mNativeMapView.scaleBy(0.5, x / mScreenDensity, y / mScreenDensity, ANIMATION_DURATION);
         }
+    }
+
+    //
+    // Tilt
+    //
+
+    /**
+     * Returns whether the user may tilt the map.
+     *
+     * @return If true, tilting is enabled.
+     */
+    @UiThread
+    public boolean isTiltEnabled() {
+        return mTiltEnabled;
+    }
+
+    /**
+     * Changes whether the user may tilt the map.
+     * <p/>
+     * This setting controls only user interactions with the map. If you set the value to false,
+     * you may still change the map location programmatically.
+     * <p/>
+     * The default value is true.
+     *
+     * @param tiltEnabled If true, tilting is enabled.
+     */
+    @UiThread
+    public void setTiltEnabled(boolean tiltEnabled) {
+        this.mTiltEnabled = tiltEnabled;
     }
 
     //
@@ -2425,11 +2459,13 @@ public final class MapView extends FrameLayout {
      * @see MapView#setZoomEnabled(boolean)
      * @see MapView#setScrollEnabled(boolean)
      * @see MapView#setRotateEnabled(boolean)
+     * @see MapView#setTiltEnabled(boolean)
      */
     public void setAllGesturesEnabled(boolean enabled) {
         setZoomEnabled(enabled);
         setScrollEnabled(enabled);
         setRotateEnabled(enabled);
+        setTiltEnabled(enabled);
     }
 
     // Called when user touches the screen, all positions are absolute
