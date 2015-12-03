@@ -78,6 +78,10 @@ static UIColor *const kTintColor = [UIColor colorWithRed:0.120 green:0.550 blue:
 
     [self.mapView addGestureRecognizer:[[UILongPressGestureRecognizer alloc] initWithTarget:self action:@selector(handleLongPress:)]];
 
+    UILongPressGestureRecognizer *twoFingerLongPress = [[UILongPressGestureRecognizer alloc] initWithTarget:self action:@selector(handleTwoFingerLongPress:)];
+    twoFingerLongPress.numberOfTouchesRequired = 2;
+    [self.mapView addGestureRecognizer:twoFingerLongPress];
+
     [self restoreState:nil];
 }
 
@@ -296,15 +300,54 @@ static UIColor *const kTintColor = [UIColor colorWithRed:0.120 green:0.550 blue:
 {
     if (longPress.state == UIGestureRecognizerStateBegan)
     {
-//        MGLPointAnnotation *point = [MGLPointAnnotation new];
-//        point.coordinate = [self.mapView convertPoint:[longPress locationInView:longPress.view]
-//                                 toCoordinateFromView:self.mapView];
-//        point.title = @"Dropped Marker";
-//        point.subtitle = [NSString stringWithFormat:@"lat: %.3f, lon: %.3f", point.coordinate.latitude, point.coordinate.longitude];
-//        [self.mapView addAnnotation:point];
-//        [self.mapView selectAnnotation:point animated:YES];
+        MGLPointAnnotation *point = [MGLPointAnnotation new];
+        point.coordinate = [self.mapView convertPoint:[longPress locationInView:longPress.view]
+                                 toCoordinateFromView:self.mapView];
+        point.title = @"Dropped Marker";
+        point.subtitle = [NSString stringWithFormat:@"lat: %.3f, lon: %.3f", point.coordinate.latitude, point.coordinate.longitude];
+        [self.mapView addAnnotation:point];
+        [self.mapView selectAnnotation:point animated:YES];
+    }
+}
 
-        [self.mapView featuresAt:[longPress locationInView:longPress.view]];
+- (void)handleTwoFingerLongPress:(UILongPressGestureRecognizer *)longPress
+{
+    if (longPress.state == UIGestureRecognizerStateBegan)
+    {
+        NSArray *features = [self.mapView featuresAt:[longPress locationInView:longPress.view]];
+
+        if ([features count])
+        {
+            NSMutableString *output = [NSMutableString string];
+
+            for (NSDictionary *feature in features)
+            {
+                [output appendString:@"Layer: "];
+                [output appendString:[feature objectForKey:@"layer"]];
+                [output appendString:@"\n"];
+
+                [output appendString:@"Source: "];
+                [output appendString:[feature objectForKey:@"source"]];
+                [output appendString:@"\n"];
+
+                NSDictionary *properties = [feature objectForKey:@"properties"];
+
+                for (NSString *key in [properties allKeys])
+                {
+                    [output appendString:key];
+                    [output appendString:@": "];
+                    [output appendString:properties[key]];
+                    [output appendString:@"\n"];
+                }
+            }
+
+            UIAlertView *alert = [[UIAlertView alloc] initWithTitle:@"Features"
+                                                            message:output
+                                                           delegate:nil
+                                                  cancelButtonTitle:@"OK"
+                                                  otherButtonTitles:nil];
+            [alert show];
+        }
     }
 }
 
