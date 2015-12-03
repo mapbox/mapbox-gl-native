@@ -495,7 +495,9 @@ const NSTimeInterval MGLFlushInterval = 60;
 
         MGLReachability *reachability = [MGLReachability reachabilityForLocalWiFi];
         [evt setValue:([reachability isReachableViaWiFi] ? @YES : @NO) forKey:@"wifi"];
-        
+
+        [evt setValue:[strongSelf applicationState] forKey:@"applicationState"];
+
         [evt setValue:@([strongSelf contentSizeScale]) forKey:@"accessibilityFontScale"];
 
         // Make Immutable Version
@@ -648,6 +650,41 @@ const NSTimeInterval MGLFlushInterval = 60;
         });
     } else {
         result = deviceOrientationBlock();
+    }
+
+    return result;
+}
+
+// Can be called from any thread.
+//
+- (NSString *) applicationState {
+    __block NSString *result;
+
+    NSString *(^applicationStateBlock)(void) = ^{
+        switch ([UIApplication sharedApplication].applicationState) {
+            case UIApplicationStateActive:
+                result = @"Active";
+                break;
+            case UIApplicationStateInactive:
+                result = @"Inactive";
+                break;
+            case UIApplicationStateBackground:
+                result = @"Background";
+                break;
+            default:
+                result = @"Default - Unknown";
+                break;
+        }
+
+        return result;
+    };
+
+    if ( ! [[NSThread currentThread] isMainThread]) {
+        dispatch_sync(dispatch_get_main_queue(), ^{
+            result = applicationStateBlock();
+        });
+    } else {
+        result = applicationStateBlock();
     }
 
     return result;
