@@ -1851,6 +1851,16 @@ mbgl::LatLngBounds MGLLatLngBoundsFromCoordinateBounds(MGLCoordinateBounds coord
 
 - (void)setCamera:(MGLMapCamera *)camera withDuration:(NSTimeInterval)duration animationTimingFunction:(nullable CAMediaTimingFunction *)function completionHandler:(nullable void (^)(void))completion
 {
+    [self _setCamera:camera withDuration:duration animationTimingFunction:function completionHandler:completion useFly:NO];
+}
+
+- (void)flyToCamera:(MGLMapCamera *)camera withDuration:(NSTimeInterval)duration completionHandler:(nullable void (^)(void))completion
+{
+    [self _setCamera:camera withDuration:duration animationTimingFunction:nil completionHandler:completion useFly:YES];
+}
+
+- (void)_setCamera:(MGLMapCamera *)camera withDuration:(NSTimeInterval)duration animationTimingFunction:(nullable CAMediaTimingFunction *)function completionHandler:(nullable void (^)(void))completion useFly:(BOOL)fly
+{
     _mbglMap->cancelTransitions();
     
     // The opposite side is the distance between the center and one edge.
@@ -1922,7 +1932,11 @@ mbgl::LatLngBounds MGLLatLngBoundsFromCoordinateBounds(MGLCoordinateBounds coord
             });
         };
     }
-    _mbglMap->easeTo(options);
+    if (fly) {
+        _mbglMap->flyTo(options);
+    } else {
+        _mbglMap->easeTo(options);
+    }
 }
 
 - (CLLocationCoordinate2D)convertPoint:(CGPoint)point toCoordinateFromView:(nullable UIView *)view
