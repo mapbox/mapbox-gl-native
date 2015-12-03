@@ -2,7 +2,6 @@
 #include <mbgl/map/map_data.hpp>
 #include <mbgl/map/view.hpp>
 #include <mbgl/map/still_image.hpp>
-#include <mbgl/map/tile.hpp>
 
 #include <mbgl/platform/log.hpp>
 

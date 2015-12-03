@@ -74,7 +74,6 @@ VectorTileData::VectorTileData(const TileID& id_,
 
                 // Move over interactivity feature tree in case we got a refresh parse.
                 featureTree = std::move(resultBuckets.featureTree);
-//                printf("consolidated results feature tree items (%lu) into own (%s/%p of %lu items)\n", resultBuckets.featureTree.size(), std::string(id).c_str(), this, featureTree.size());
 
                 // The target configuration could have changed since we started placement. In this case,
                 // we're starting another placement run.
