@@ -1123,12 +1123,17 @@ public final class MapView extends FrameLayout {
     }
 
     /**
-     * Sets the Tilt in degrees of the MapView
+     * Sets the Tilt in degrees of the MapView.
      * @param pitch New tilt in degrees
+     * @param duration Animation time in milliseconds.  If null then 0 is used, making the animation immediate.
      */
     @FloatRange(from = 0.0, to = 60.0)
-    public void setTilt(double pitch) {
-        mNativeMapView.setPitch(pitch);
+    public void setTilt(Double pitch, @Nullable Long duration) {
+        long actualDuration = 0;
+        if (duration != null) {
+            actualDuration = duration;
+        }
+        mNativeMapView.setPitch(pitch, actualDuration);
     }
 
     //
@@ -1148,7 +1153,7 @@ public final class MapView extends FrameLayout {
 
         setBearing(update.getBearing());
 
-        setTilt(update.getTilt());
+        setTilt((double)update.getTilt(), null);
     }
 
     //
