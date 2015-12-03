@@ -19,13 +19,12 @@ NS_ASSUME_NONNULL_BEGIN
 // with the existing NSURL property. Fortunately, IB strips out the two
 // underscores for display.
 
-/**
-    URL of the style currently displayed in the receiver.
- 
+/** URL of the style currently displayed in the receiver.
+    
     The URL may be a full HTTP or HTTPS URL, a Mapbox URL indicating the style’s
     map ID (`mapbox://styles/<user>/<style>`), or a path to a local file
-    relative to the application’s resource path.
- */
+    relative to the application’s resource path. Leave this field blank for the
+    default style. */
 @property (nonatomic, nullable) IBInspectable NSString *styleURL__;
 
 // Convenience properties related to the initial viewport. These properties
@@ -46,28 +45,20 @@ NS_ASSUME_NONNULL_BEGIN
 // inspectable from the runtime name, but runtime names don’t always make sense
 // in UI.
 
-/**
-    A Boolean value that determines whether the user may zoom the map, changing
-    its zoom level.
- */
+/** A Boolean value that determines whether the user may zoom the map, changing
+    its zoom level. */
 @property (nonatomic) IBInspectable BOOL allowsZooming;
 
-/**
-    A Boolean value that determines whether the user may scroll around the map,
-    changing its center coordinate.
- */
+/** A Boolean value that determines whether the user may scroll around the map,
+    changing its center coordinate. */
 @property (nonatomic) IBInspectable BOOL allowsScrolling;
 
-/**
-    A Boolean value that determines whether the user may rotate the map,
-    changing its direction.
- */
+/** A Boolean value that determines whether the user may rotate the map,
+    changing its direction. */
 @property (nonatomic) IBInspectable BOOL allowsRotating;
 
-/**
-    A Boolean value that determines whether the user may tilt the map, changing
-    its pitch.
- */
+/** A Boolean value that determines whether the user may tilt the map, changing
+    its pitch. */
 @property (nonatomic) IBInspectable BOOL allowsTilting;
 
 #endif

@@ -1,9 +1,16 @@
 #import "MGLGeometry.h"
 
 #import <TargetConditionals.h>
+#if TARGET_OS_IPHONE
+    #import <UIKit/UIKit.h>
+#endif
 
 #import <mbgl/map/map.hpp>
 #import <mbgl/util/geo.hpp>
+
+/// Returns the smallest rectangle that contains both the given rectangle and
+/// the given point.
+CGRect MGLExtendRect(CGRect rect, CGPoint point);
 
 NS_INLINE mbgl::LatLng MGLLatLngFromLocationCoordinate2D(CLLocationCoordinate2D coordinate) {
     return mbgl::LatLng(coordinate.latitude, coordinate.longitude);
@@ -28,12 +35,12 @@ NS_INLINE BOOL MGLCoordinateInCoordinateBounds(CLLocationCoordinate2D coordinate
     return bounds.contains(MGLLatLngFromLocationCoordinate2D(coordinate));
 }
 
-#if TARGET_OS_MAC
-NS_INLINE mbgl::EdgeInsets MGLEdgeInsetsFromNSEdgeInsets(NSEdgeInsets insets) {
+#if TARGET_OS_IPHONE
+NS_INLINE mbgl::EdgeInsets MGLEdgeInsetsFromNSEdgeInsets(UIEdgeInsets insets) {
     return { insets.top, insets.left, insets.bottom, insets.right };
 }
-#elif TARGET_OS_IOS
-NS_INLINE mbgl::EdgeInsets MGLEdgeInsetsFromNSEdgeInsets(UIEdgeInsets insets) {
+#else
+NS_INLINE mbgl::EdgeInsets MGLEdgeInsetsFromNSEdgeInsets(NSEdgeInsets insets) {
     return { insets.top, insets.left, insets.bottom, insets.right };
 }
 #endif

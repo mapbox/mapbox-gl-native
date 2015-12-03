@@ -317,7 +317,7 @@ static NSString * const MGLDroppedPinAnnotationImageIdentifier = @"dropped";
 - (void)dropPinAtPoint:(NSPoint)point {
     DroppedPinAnnotation *annotation = [self pinAtPoint:point];
     [self.mapView addAnnotation:annotation];
-    [self.mapView selectAnnotation:annotation animated:YES];
+    [self.mapView selectAnnotation:annotation];
 }
 
 - (DroppedPinAnnotation *)pinAtPoint:(NSPoint)point {
