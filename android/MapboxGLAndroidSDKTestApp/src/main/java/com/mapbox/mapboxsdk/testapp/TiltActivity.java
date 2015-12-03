@@ -33,12 +33,13 @@ public class TiltActivity extends AppCompatActivity {
         // Target
         LatLng dc = new LatLng(38.90252, -77.02291);
         LatLng nyc = new LatLng(40.73581, -73.99155);
+        LatLng target = nyc;
 
         // Set up the map
         mMapView = (MapView) findViewById(R.id.tiltMapView);
         mMapView.setAccessToken(ApiAccess.getToken(this));
         mMapView.setStyleUrl(Style.MAPBOX_STREETS);
-        mMapView.setCenterCoordinate(dc);
+        mMapView.setCenterCoordinate(target);
         mMapView.setZoomLevel(11);
         mMapView.onCreate(savedInstanceState);
 
@@ -49,7 +50,7 @@ public class TiltActivity extends AppCompatActivity {
 
         // Construct a CameraPosition focusing on target and animate the camera to that position.
         CameraPosition cameraPosition = new CameraPosition.Builder()
-                .target(nyc)      // Sets the center of the map to target
+                .target(target)   // Sets the center of the map to target
                 .zoom(17)         // Sets the zoom
                 .bearing(90)      // Sets the orientation of the camera to east
                 .tilt(30)         // Sets the tilt of the camera to 30 degrees
