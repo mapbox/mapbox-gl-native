@@ -82,6 +82,14 @@ IB_DESIGNABLE
 /** The button shown in the lower-right of the map which when pressed displays the map attribution information. */
 @property (nonatomic, readonly) UIButton *attributionButton;
 
+/** Query the visible map for features at a given point. 
+*
+*   @warning Beta API. Return value subject to change in subsequent releases.
+*
+*   @param point A point on screen, for example at a user gesture.
+*   @return An array of `NSDictionary` objects representing features near the point. Current fields provided are the style `layer`, the style `source`, and a nested dictionary of properties of the feature as `NSString` keys and values. */
+- (NS_ARRAY_OF(NSDictionary *) *)featuresAt:(CGPoint)point;
+
 #pragma mark - Accessing the Delegate
 
 /** @name Accessing the Delegate */
@@ -370,8 +378,6 @@ IB_DESIGNABLE
 
 /** Whether the map view should display a heading calibration alert when necessary. The default value is `YES`. */
 @property (nonatomic, assign) BOOL displayHeadingCalibration;
-
-- (NS_ARRAY_OF(NSDictionary *) *)featuresAt:(CGPoint)point;
 
 #pragma mark - Debugging
 
