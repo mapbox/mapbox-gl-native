@@ -11,6 +11,8 @@ static UIColor *const kTintColor = [UIColor colorWithRed:0.120 green:0.550 blue:
 
 @property (nonatomic) MGLMapView *mapView;
 @property (nonatomic) NSUInteger styleIndex;
+@property (nonatomic) UIView *interactiveShield;
+@property (nonatomic) UITextView *featuresView;
 
 @end
 
@@ -78,10 +80,6 @@ static UIColor *const kTintColor = [UIColor colorWithRed:0.120 green:0.550 blue:
 
     [self.mapView addGestureRecognizer:[[UILongPressGestureRecognizer alloc] initWithTarget:self action:@selector(handleLongPress:)]];
 
-    UILongPressGestureRecognizer *twoFingerLongPress = [[UILongPressGestureRecognizer alloc] initWithTarget:self action:@selector(handleTwoFingerLongPress:)];
-    twoFingerLongPress.numberOfTouchesRequired = 2;
-    [self.mapView addGestureRecognizer:twoFingerLongPress];
-
     [self restoreState:nil];
 }
 
@@ -143,6 +141,7 @@ static UIColor *const kTintColor = [UIColor colorWithRed:0.120 green:0.550 blue:
                                                                 @"Add 10,000 Points",
                                                                 @"Add Test Shapes",
                                                                 @"Remove Annotations",
+                                                                @"Enable Interactivity",
                                                                 nil];
 
     [sheet showFromBarButtonItem:self.navigationItem.leftBarButtonItem animated:YES];
@@ -249,6 +248,40 @@ static UIColor *const kTintColor = [UIColor colorWithRed:0.120 green:0.550 blue:
     {
         [self.mapView removeAnnotations:self.mapView.annotations];
     }
+    else if (buttonIndex == actionSheet.firstOtherButtonIndex + 9)
+    {
+        if ([self.mapView.styleURL.scheme isEqualToString:@"mapbox"])
+        {
+            self.mapView.userInteractionEnabled = NO;
+
+            self.interactiveShield = [[UIView alloc] initWithFrame:self.mapView.frame];
+            self.interactiveShield.backgroundColor = [UIColor clearColor];
+            self.interactiveShield.userInteractionEnabled = YES;
+            [self.view insertSubview:self.interactiveShield aboveSubview:self.mapView];
+
+            UIPanGestureRecognizer *pan = [[UIPanGestureRecognizer alloc] initWithTarget:self action:@selector(handleInteractivityPan:)];
+            [self.interactiveShield addGestureRecognizer:pan];
+
+            self.featuresView = [[UITextView alloc] initWithFrame:CGRectMake(20, self.topLayoutGuide.length + 20,
+                self.view.bounds.size.width / 2 - 40, self.view.bounds.size.height * 2 / 3)];
+            self.featuresView.font = [UIFont systemFontOfSize:10];
+            self.featuresView.backgroundColor = [UIColor whiteColor];
+            self.featuresView.alpha = 0.75;
+
+            [self.view addSubview:self.featuresView];
+
+            self.mapView.styleURL = [NSURL URLWithString:@"asset://streets-interactive-poi-v8.json"];
+
+            [(UIButton *)self.navigationItem.titleView setTitle:@"Interactive Streets" forState:UIControlStateNormal];
+
+            [[[UIAlertView alloc] initWithTitle:@"Interactive Streets"
+                                        message:@"Moving the map is now disabled until you change the style. Pan with your finger to query for features."
+                                       delegate:nil
+                              cancelButtonTitle:@"OK"
+                              otherButtonTitles:nil] show];
+        }
+
+    }
 }
 
 - (void)parseFeaturesAddingCount:(NSUInteger)featuresCount
@@ -310,63 +343,70 @@ static UIColor *const kTintColor = [UIColor colorWithRed:0.120 green:0.550 blue:
     }
 }
 
-- (void)handleTwoFingerLongPress:(UILongPressGestureRecognizer *)longPress
+- (void)handleInteractivityPan:(UIPanGestureRecognizer *)pan
 {
-    if (longPress.state == UIGestureRecognizerStateBegan)
+    if (pan.state == UIGestureRecognizerStateBegan || pan.state == UIGestureRecognizerStateChanged)
     {
-        if ([self.mapView.styleURL.scheme isEqualToString:@"mapbox"])
+        self.featuresView.userInteractionEnabled = NO;
+
+        CGPoint point = [pan locationInView:pan.view];
+
+        NSArray *features = [self.mapView featuresAt:point];
+
+        if ([features count])
         {
-            self.mapView.styleURL = [NSURL URLWithString:@"asset://streets-interactive-poi-v8.json"];
+            NSMutableString *output = [NSMutableString string];
 
-            [(UIButton *)self.navigationItem.titleView setTitle:@"Interactive Streets" forState:UIControlStateNormal];
+            for (NSDictionary *feature in features)
+            {
+                [output appendString:@"Layer: "];
+                [output appendString:[feature objectForKey:@"layer"]];
+                [output appendString:@"\n"];
 
-            [[[UIAlertView alloc] initWithTitle:@"Map Is Now Interactive"
-                                        message:@"Long-press again with two fingers to query POIs on the map."
-                                       delegate:nil
-                              cancelButtonTitle:@"OK"
-                              otherButtonTitles:nil] show];
+                [output appendString:@"Source: "];
+                [output appendString:[feature objectForKey:@"source"]];
+                [output appendString:@"\n"];
+
+                NSDictionary *properties = [feature objectForKey:@"properties"];
+
+                for (NSString *key in [properties allKeys])
+                {
+                    [output appendString:@"{"];
+                    [output appendString:key];
+                    [output appendString:@"}: "];
+                    [output appendString:properties[key]];
+                    [output appendString:@"\n"];
+                }
+
+                [output appendString:@"\n"];
+            }
+
+            self.featuresView.text = output;
         }
         else
         {
-            NSArray *features = [self.mapView featuresAt:[longPress locationInView:longPress.view]];
-
-            if ([features count])
-            {
-                NSMutableString *output = [NSMutableString string];
-
-                for (NSDictionary *feature in features)
-                {
-                    [output appendString:@"Layer: "];
-                    [output appendString:[feature objectForKey:@"layer"]];
-                    [output appendString:@"\n"];
-
-                    [output appendString:@"Source: "];
-                    [output appendString:[feature objectForKey:@"source"]];
-                    [output appendString:@"\n"];
-
-                    NSDictionary *properties = [feature objectForKey:@"properties"];
-
-                    for (NSString *key in [properties allKeys])
-                    {
-                        [output appendString:key];
-                        [output appendString:@": "];
-                        [output appendString:properties[key]];
-                        [output appendString:@"\n"];
-                    }
-                }
-
-                [[[UIAlertView alloc] initWithTitle:@"Features"
-                                            message:output
-                                           delegate:nil
-                                  cancelButtonTitle:@"OK"
-                                  otherButtonTitles:nil] show];
-            }
+            self.featuresView.text = nil;
         }
+    }
+    else
+    {
+        self.featuresView.userInteractionEnabled = YES;
     }
 }
 
 - (void)cycleStyles
 {
+    if (self.interactiveShield)
+    {
+        [self.interactiveShield removeFromSuperview];
+        self.interactiveShield = nil;
+
+        [self.featuresView removeFromSuperview];
+        self.featuresView = nil;
+
+        self.mapView.userInteractionEnabled = YES;
+    }
+
     UIButton *titleButton = (UIButton *)self.navigationItem.titleView;
 
     self.styleIndex = (self.styleIndex + 1) % mbgl::util::default_styles::numOrderedStyles;
