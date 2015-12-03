@@ -617,14 +617,14 @@ FeatureResults Source::featuresAt(const PrecisionPoint point, const uint8_t radi
     y = y < -1 ? -1 : y > 1 ? 1 : y;
 
     const auto z = ::floor(transform.getZoom());
-    const auto source_max_z = ::fmin(z, 15);
+    const auto source_max_z = ::fmin(z, info.max_zoom);
     const auto z2 = ::powf(2, source_max_z);
 
     TileID id(z, ::floor(x * z2), ::floor(y * z2), source_max_z);
 
     // figure out query bounds
     TileCoordinate coordinate = transform.pointToCoordinate(point);
-    coordinate = coordinate.zoomTo(::fmin(id.z, 15));
+    coordinate = coordinate.zoomTo(::fmin(id.z, info.max_zoom));
 
     vec2<uint16_t> position((coordinate.column - id.x) * 4096, (coordinate.row - id.y) * 4096);
 
