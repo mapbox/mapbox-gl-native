@@ -66,7 +66,6 @@ import com.mapbox.mapboxsdk.annotations.Polyline;
 import com.mapbox.mapboxsdk.annotations.PolylineOptions;
 import com.mapbox.mapboxsdk.annotations.Sprite;
 import com.mapbox.mapboxsdk.annotations.SpriteFactory;
-import com.mapbox.mapboxsdk.camera.CameraUpdate;
 import com.mapbox.mapboxsdk.constants.MyBearingTracking;
 import com.mapbox.mapboxsdk.constants.MyLocationTracking;
 import com.mapbox.mapboxsdk.constants.Style;
@@ -1131,32 +1130,17 @@ public final class MapView extends FrameLayout {
     }
 
     /**
-     * Sets the Tilt in degrees of the MapView
+     * Sets the Tilt in degrees of the MapView.
      * @param pitch New tilt in degrees
+     * @param duration Animation time in milliseconds.  If null then 0 is used, making the animation immediate.
      */
     @FloatRange(from = 0.0, to = 60.0)
-    public void setTilt(double pitch) {
-        mNativeMapView.setPitch(pitch);
-    }
-
-    //
-    // Mirrored Google Map's Camera API
-    //
-
-    /**
-     * Animates the movement of the camera from the current position to the position defined in the update.
-     * See CameraUpdateFactory for a set of updates.
-     * @param update The change that should be applied to the camera.
-     */
-    @UiThread
-    public final void animateCamera (CameraUpdate update) {
-
-        LatLngZoom llz = new LatLngZoom(update.getTarget(), update.getZoom());
-        setCenterCoordinate(llz);
-
-        setBearing(update.getBearing());
-
-        setTilt(update.getTilt());
+    public void setTilt(Double pitch, @Nullable Long duration) {
+        long actualDuration = 0;
+        if (duration != null) {
+            actualDuration = duration;
+        }
+        mNativeMapView.setPitch(pitch, actualDuration);
     }
 
     //
@@ -2940,7 +2924,7 @@ public final class MapView extends FrameLayout {
             pitch = Math.max(MINIMUM_TILT, Math.min(MAXIMUM_TILT, pitch));
 
             // Tilt the map
-            mNativeMapView.setPitch(pitch);
+            setTilt(pitch, null);
 
             return true;
         }

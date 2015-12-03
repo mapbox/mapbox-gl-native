@@ -260,8 +260,8 @@ final class NativeMapView {
         return nativeGetPitch(mNativeMapViewPtr);
     }
 
-    public void setPitch(double pitch) {
-        nativeSetPitch(mNativeMapViewPtr, pitch);
+    public void setPitch(double pitch, long duration) {
+        nativeSetPitch(mNativeMapViewPtr, pitch, duration);
     }
 
     public void scaleBy(double ds) {
@@ -543,7 +543,7 @@ final class NativeMapView {
 
     private native double nativeGetPitch(long nativeMapViewPtr);
 
-    private native void nativeSetPitch(long nativeMapViewPtr, double pitch);
+    private native void nativeSetPitch(long nativeMapViewPtr, double pitch, long duration);
 
     private native void nativeScaleBy(long nativeMapViewPtr, double ds,
                                       double cx, double cy, long duration);
