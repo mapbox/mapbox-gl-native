@@ -2934,11 +2934,11 @@ public final class MapView extends FrameLayout {
             mNativeMapView.cancelTransitions();
 
             // Get rotate value
-            double pitch = mNativeMapView.getPitch();
+            double pitch = getTilt();
             pitch += detector.getShovePixelsDelta();
 
             // Tilt the map
-            mNativeMapView.setPitch(pitch);
+            setTilt(pitch, null);
 
             return true;
         }
