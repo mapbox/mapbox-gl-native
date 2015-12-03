@@ -45,7 +45,8 @@ public class TiltActivity extends AppCompatActivity {
         mMapView.onCreate(savedInstanceState);
 
         Log.i(TiltActivity.class.getCanonicalName(), "Original Tilt = " + mMapView.getTilt());
-        mMapView.setTilt(45);
+        // Tilt Map 45 degrees over 10 seconds
+        mMapView.setTilt(45.0, 10000l);
         Log.i(TiltActivity.class.getCanonicalName(), "Changed Tilt = " + mMapView.getTilt());
 
         /*
