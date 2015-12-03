@@ -610,15 +610,15 @@ FeatureResults Source::featuresAt(const PrecisionPoint point, const uint8_t radi
     // figure out tile (bounded by source max zoom)
     LatLng p = transform.pointToLatLng(point);
 
-    double sine = std::sin(p.latitude * M_PI / 180);
-    double x = p.longitude / 360 + 0.5;
+    const double sine = std::sin(p.latitude * M_PI / 180);
+    const double x = p.longitude / 360 + 0.5;
     double y = 0.5 - 0.25 * std::log((1 + sine) / (1 - sine)) / M_PI;
 
     y = y < -1 ? -1 : y > 1 ? 1 : y;
 
-    const auto z = ::floor(transform.getZoom());
-    const auto source_max_z = ::fmin(z, info.max_zoom);
-    const auto z2 = ::powf(2, source_max_z);
+    const uint8_t z = ::floor(transform.getZoom());
+    const uint8_t source_max_z = ::fmin(z, info.max_zoom);
+    const uint32_t z2 = ::powf(2, source_max_z);
 
     TileID id(z, ::floor(x * z2), ::floor(y * z2), source_max_z);
 
@@ -628,10 +628,10 @@ FeatureResults Source::featuresAt(const PrecisionPoint point, const uint8_t radi
 
     vec2<uint16_t> position((coordinate.column - id.x) * 4096, (coordinate.row - id.y) * 4096);
 
-    const auto tile_scale = ::pow(2, id.z); // z);
-    const auto scale = util::tileSize * transform.getScale() / (tile_scale / id.overscaling);
+    const uint32_t tile_scale = ::pow(2, id.z);
+    const double scale = util::tileSize * transform.getScale() / (tile_scale / id.overscaling);
 
-    const auto r = radius * 4096 / scale;
+    const uint16_t r = radius * 4096 / scale;
 
     FeatureBox queryBox = {
         { position.x - r, position.y - r },
