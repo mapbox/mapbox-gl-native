@@ -256,6 +256,14 @@ final class NativeMapView {
         nativeResetPosition(mNativeMapViewPtr);
     }
 
+    public double getPitch() {
+        return nativeGetPitch(mNativeMapViewPtr);
+    }
+
+    public void setPitch(double pitch) {
+        nativeSetPitch(mNativeMapViewPtr, pitch);
+    }
+
     public void scaleBy(double ds) {
         scaleBy(ds, -1.0, -1.0);
     }
@@ -532,6 +540,10 @@ final class NativeMapView {
     private native LatLng nativeGetLatLng(long nativeMapViewPtr);
 
     private native void nativeResetPosition(long nativeMapViewPtr);
+
+    private native double nativeGetPitch(long nativeMapViewPtr);
+
+    private native void nativeSetPitch(long nativeMapViewPtr, double pitch);
 
     private native void nativeScaleBy(long nativeMapViewPtr, double ds,
                                       double cx, double cy, long duration);
