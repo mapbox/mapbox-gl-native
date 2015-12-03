@@ -95,6 +95,12 @@ matrix:
       addons:
         apt:
           packages: [ 'lib32stdc++6' ]
+    - os: linux
+      env: FLAVOR=linux CXX=clang++-3.8 BUILDTYPE=Release ACTION=tidy AWS_ACCESS_KEY_ID=
+      addons:
+        apt:
+          sources: [ 'ubuntu-toolchain-r-test', 'llvm-toolchain-precise' ]
+          packages: [ 'clang-tidy-3.8', 'libgcc-4.9-dev', 'libstdc++-4.9-dev', 'libstdc++6', 'libllvm3.4', 'libclang-common-3.8-dev', 'libclang1-3.8', 'liblldb-3.8', 'libllvm3.8', 'lldb-3.8', 'llvm-3.8', 'llvm-3.8-dev', 'llvm-3.8-runtime', 'xutils-dev', 'libxxf86vm-dev', 'x11proto-xf86vidmode-dev', 'mesa-utils' ]
 
 env:
   global:
@@ -121,7 +127,7 @@ install:
 - ./scripts/${FLAVOR}/install.sh
 
 script:
-- ./scripts/${FLAVOR}/run.sh
+- ./scripts/${FLAVOR}/${ACTION:-run}.sh
 
 after_failure:
 - "[ -f ./scripts/${FLAVOR}/after_failure.sh ] && ./scripts/${FLAVOR}/after_failure.sh"

@@ -67,6 +67,9 @@ run-linux: linux ; (cd build/linux-x86_64/$(BUILDTYPE) && ./mapbox-gl)
 run-valgrind-linux: linux
 	(cd build/linux-x86_64/$(BUILDTYPE) && valgrind --leak-check=full --suppressions=../../../scripts/valgrind.sup ./mapbox-gl)
 
+
+.PHONY: config compdb tidy
+config: ; $(RUN) config
 # Generates a compilation database with ninja for use in clang tooling
 compdb: ; $(RUN) Ninja/compdb
 tidy: ; $(RUN) tidy

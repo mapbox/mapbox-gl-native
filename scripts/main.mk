@@ -65,6 +65,8 @@ config/%.gypi: $(SUBMODULES) configure $(CONFIGURE_FILES)
 	@printf "$(TEXT_BOLD)$(COLOR_GREEN)* Recreating project...$(FORMAT_END)\n"
 	$(QUIET)$(ENV) ./scripts/flock.py build/Configure.lock ./configure config/$*.gypi
 
+.PHONY: config
+config: config/$(HOST_SLUG).gypi
 
 #### Build files ###############################################################
 
