@@ -81,6 +81,8 @@ GLFWView::GLFWView(bool fullscreen_, bool benchmark_)
     glfwGetFramebufferSize(window, &fbWidth, &fbHeight);
     pixelRatio = static_cast<float>(fbWidth) / width;
 
+    glViewport(0, 0, fbWidth, fbHeight);
+
     glfwMakeContextCurrent(nullptr);
 
     printf("\n");
@@ -316,6 +318,8 @@ void GLFWView::onFramebufferResize(GLFWwindow *window, int width, int height) {
     GLFWView *view = reinterpret_cast<GLFWView *>(glfwGetWindowUserPointer(window));
     view->fbWidth = width;
     view->fbHeight = height;
+
+    glViewport(0, 0, width, height);
 
     view->map->update(mbgl::Update::Repaint);
 }

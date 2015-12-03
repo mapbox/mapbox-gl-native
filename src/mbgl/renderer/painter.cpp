@@ -89,8 +89,6 @@ void Painter::render(const Style& style, const FrameData& frame_, SpriteAtlas& a
     const std::set<Source*>& sources = renderData.sources;
     const Color& background = renderData.backgroundColor;
 
-    config.viewport = { 0, 0, frame.framebufferSize[0], frame.framebufferSize[1] };
-
     // Update the default matrices to the current viewport dimensions.
     state.getProjMatrix(projMatrix);
 
