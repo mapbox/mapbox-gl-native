@@ -2,6 +2,7 @@ package com.mapbox.mapboxsdk.camera;
 
 import android.os.Parcel;
 import android.os.Parcelable;
+import android.support.annotation.FloatRange;
 import com.mapbox.mapboxsdk.geometry.LatLng;
 
 public final class CameraPosition implements Parcelable {
@@ -146,6 +147,7 @@ public final class CameraPosition implements Parcelable {
          * @param tilt Tilt value
          * @return Builder
          */
+        @FloatRange(from = 0.0, to = 60.0)
         public Builder tilt(float tilt) {
             this.tilt = tilt;
             return this;

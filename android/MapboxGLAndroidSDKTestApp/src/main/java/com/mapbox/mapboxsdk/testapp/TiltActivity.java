@@ -4,6 +4,7 @@ import android.os.Bundle;
 import android.support.v7.app.ActionBar;
 import android.support.v7.app.AppCompatActivity;
 import android.support.v7.widget.Toolbar;
+import android.util.Log;
 import android.view.MenuItem;
 import com.mapbox.mapboxsdk.camera.CameraPosition;
 import com.mapbox.mapboxsdk.camera.CameraUpdateFactory;
@@ -33,24 +34,29 @@ public class TiltActivity extends AppCompatActivity {
         // Target
         LatLng dc = new LatLng(38.90252, -77.02291);
         LatLng nyc = new LatLng(40.73581, -73.99155);
-        LatLng target = nyc;
 
         // Set up the map
         mMapView = (MapView) findViewById(R.id.tiltMapView);
         mMapView.setAccessToken(ApiAccess.getToken(this));
         mMapView.setStyleUrl(Style.MAPBOX_STREETS);
-        mMapView.setCenterCoordinate(target);
+        // Initialize map to Washington, DC and different zoom level so that it's obvious that animateCamera works
+        mMapView.setCenterCoordinate(dc);
         mMapView.setZoomLevel(11);
         mMapView.onCreate(savedInstanceState);
+
+        Log.i(TiltActivity.class.getCanonicalName(), "Original Tilt = " + mMapView.getTilt());
+        mMapView.setTilt(45);
+        Log.i(TiltActivity.class.getCanonicalName(), "Changed Tilt = " + mMapView.getTilt());
 
         /*
          * Our tilt API follows Google's Android API:
          * https://developers.google.com/maps/documentation/android-api/views#updating_the_camera_view
          */
 
+/*
         // Construct a CameraPosition focusing on target and animate the camera to that position.
         CameraPosition cameraPosition = new CameraPosition.Builder()
-                .target(target)   // Sets the center of the map to target
+                .target(nyc)   // Sets the center of the map to target
                 .zoom(17)         // Sets the zoom
                 .bearing(90)      // Sets the orientation of the camera to east
                 .tilt(30)         // Sets the tilt of the camera to 30 degrees
@@ -58,6 +64,7 @@ public class TiltActivity extends AppCompatActivity {
 
         // Triggers tilt
         mMapView.animateCamera(CameraUpdateFactory.newCameraPosition(cameraPosition));
+*/
     }
 
     @Override

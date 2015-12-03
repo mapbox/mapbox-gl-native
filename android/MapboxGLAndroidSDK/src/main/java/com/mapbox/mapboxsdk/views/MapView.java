@@ -1118,6 +1118,7 @@ public final class MapView extends FrameLayout {
      * Sets the Tilt in degrees of the MapView
      * @param pitch New tilt in degrees
      */
+    @FloatRange(from = 0.0, to = 60.0)
     public void setTilt(double pitch) {
         mNativeMapView.setPitch(pitch);
     }
