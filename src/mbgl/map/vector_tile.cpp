@@ -90,8 +90,8 @@ std::unordered_map<std::string, std::string> VectorTileFeature::getAllValues() c
     for (const auto key_it : layer.keys) {
         const auto& key = key_it.first;
         const auto maybe_val = getValue(key);
-        if (maybe_val && maybe_val.get().is<std::string>()) {
-            const auto& val = maybe_val.get().get<std::string>();
+        if (maybe_val) {
+            const auto& val = mbgl::toString(maybe_val.get());
             values.emplace(key, val);
         }
     }
