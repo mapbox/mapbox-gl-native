@@ -138,7 +138,7 @@ void TileWorker::parseLayer(const StyleLayer& layer, const GeometryTile& geometr
     std::unique_ptr<Bucket> bucket = layer.createBucket(parameters);
 
     if (layer.interactive) {
-        printf("parsing tile %i,%i,%i (%i)\n", id.z, id.x, id.y, id.z);
+//        printf("parsing tile %i,%i,%i (%i)\n", id.z, id.x, id.y, id.z);
         for (std::size_t i = 0; i < geometryLayer->featureCount(); i++) {
             const auto feature = geometryLayer->getFeature(i);
 
