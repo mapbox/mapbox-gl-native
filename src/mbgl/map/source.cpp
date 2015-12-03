@@ -662,7 +662,7 @@ FeatureResults Source::featuresAt(const PrecisionPoint point, const TransformSta
 
             std::string properties = "";
             for (const auto property : feature_properties) {
-                properties = "\n\t" + property.first + ": " + property.second;
+                properties = properties + "\n\t" + property.first + ": " + property.second;
             }
 
             printf("%s in %s: %s\n", layer_id.c_str(), info.source_id.c_str(), properties.c_str());
