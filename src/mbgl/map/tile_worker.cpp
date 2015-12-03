@@ -168,7 +168,7 @@ void TileWorker::parseLayer(const StyleLayer& layer, const GeometryTile& geometr
 
             if (featureBox.min_corner().get<0>() < 4096 && featureBox.min_corner().get<1>() < 4096 &&
                 featureBox.max_corner().get<0>() > -1   && featureBox.max_corner().get<1>() > -1) {
-                // TODO: do this opportunistically
+                // TODO: opportunistically hit the pbf at query time
                 FeatureProperties properties;
                 const auto& values = feature->getAllValues();
                 properties.insert(values.begin(), values.end());
