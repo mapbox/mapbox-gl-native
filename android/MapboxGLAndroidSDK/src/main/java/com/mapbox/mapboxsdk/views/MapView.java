@@ -53,6 +53,7 @@ import android.widget.ImageView;
 import android.widget.ZoomButtonsController;
 
 import com.almeros.android.multitouch.gesturedetectors.RotateGestureDetector;
+import com.almeros.android.multitouch.gesturedetectors.ShoveGestureDetector;
 import com.almeros.android.multitouch.gesturedetectors.TwoFingerGestureDetector;
 import com.mapbox.mapboxsdk.R;
 import com.mapbox.mapboxsdk.annotations.Annotation;
@@ -119,6 +120,7 @@ public final class MapView extends FrameLayout {
     private static final String STATE_ZOOM_ENABLED = "zoomEnabled";
     private static final String STATE_SCROLL_ENABLED = "scrollEnabled";
     private static final String STATE_ROTATE_ENABLED = "rotateEnabled";
+    private static final String STATE_TILT_ENABLED = "tiltEnabled";
     private static final String STATE_ZOOM_CONTROLS_ENABLED = "zoomControlsEnabled";
     private static final String STATE_DEBUG_ACTIVE = "debugActive";
     private static final String STATE_STYLE_URL = "styleUrl";
@@ -180,6 +182,7 @@ public final class MapView extends FrameLayout {
     private GestureDetectorCompat mGestureDetector;
     private ScaleGestureDetector mScaleGestureDetector;
     private RotateGestureDetector mRotateGestureDetector;
+    private ShoveGestureDetector mShoveGestureDetector;
     private boolean mTwoTap = false;
     private boolean mZoomStarted = false;
     private boolean mQuickZoom = false;
@@ -242,6 +245,7 @@ public final class MapView extends FrameLayout {
     private boolean mZoomEnabled = true;
     private boolean mScrollEnabled = true;
     private boolean mRotateEnabled = true;
+    private boolean mTiltEnabled = true;
     private boolean mAllowConcurrentMultipleOpenInfoWindows = false;
     private String mStyleUrl;
 
@@ -682,6 +686,7 @@ public final class MapView extends FrameLayout {
         mScaleGestureDetector = new ScaleGestureDetector(context, new ScaleGestureListener());
         ScaleGestureDetectorCompat.setQuickScaleEnabled(mScaleGestureDetector, true);
         mRotateGestureDetector = new RotateGestureDetector(context, new RotateGestureListener());
+        mShoveGestureDetector = new ShoveGestureDetector(context, new ShoveGestureListener());
 
         // Shows the zoom controls
         if (!context.getPackageManager()
@@ -727,6 +732,7 @@ public final class MapView extends FrameLayout {
             setZoomEnabled(typedArray.getBoolean(R.styleable.MapView_zoom_enabled, true));
             setScrollEnabled(typedArray.getBoolean(R.styleable.MapView_scroll_enabled, true));
             setRotateEnabled(typedArray.getBoolean(R.styleable.MapView_rotate_enabled, true));
+            setTiltEnabled(typedArray.getBoolean(R.styleable.MapView_tilt_enabled, true));
             setZoomControlsEnabled(typedArray.getBoolean(R.styleable.MapView_zoom_controls_enabled, isZoomControlsEnabled()));
             setDebugActive(typedArray.getBoolean(R.styleable.MapView_debug_active, false));
             if (typedArray.getString(R.styleable.MapView_style_url) != null) {
@@ -802,6 +808,7 @@ public final class MapView extends FrameLayout {
             setZoomEnabled(savedInstanceState.getBoolean(STATE_ZOOM_ENABLED));
             setScrollEnabled(savedInstanceState.getBoolean(STATE_SCROLL_ENABLED));
             setRotateEnabled(savedInstanceState.getBoolean(STATE_ROTATE_ENABLED));
+            setTiltEnabled(savedInstanceState.getBoolean(STATE_TILT_ENABLED));
             setZoomControlsEnabled(savedInstanceState.getBoolean(STATE_ZOOM_CONTROLS_ENABLED));
             setDebugActive(savedInstanceState.getBoolean(STATE_DEBUG_ACTIVE));
             setStyleUrl(savedInstanceState.getString(STATE_STYLE_URL));
@@ -882,6 +889,7 @@ public final class MapView extends FrameLayout {
         outState.putBoolean(STATE_ZOOM_ENABLED, isZoomEnabled());
         outState.putBoolean(STATE_SCROLL_ENABLED, isScrollEnabled());
         outState.putBoolean(STATE_ROTATE_ENABLED, isRotateEnabled());
+        outState.putBoolean(STATE_TILT_ENABLED, isTiltEnabled());
         outState.putBoolean(STATE_ZOOM_CONTROLS_ENABLED, isZoomControlsEnabled());
         outState.putBoolean(STATE_DEBUG_ACTIVE, isDebugActive());
         outState.putString(STATE_STYLE_URL, getStyleUrl());
@@ -1380,6 +1388,35 @@ public final class MapView extends FrameLayout {
         } else {
             mNativeMapView.scaleBy(0.5, x / mScreenDensity, y / mScreenDensity, ANIMATION_DURATION);
         }
+    }
+
+    //
+    // Tilt
+    //
+
+    /**
+     * Returns whether the user may tilt the map.
+     *
+     * @return If true, tilting is enabled.
+     */
+    @UiThread
+    public boolean isTiltEnabled() {
+        return mTiltEnabled;
+    }
+
+    /**
+     * Changes whether the user may tilt the map.
+     * <p/>
+     * This setting controls only user interactions with the map. If you set the value to false,
+     * you may still change the map location programmatically.
+     * <p/>
+     * The default value is true.
+     *
+     * @param tiltEnabled If true, tilting is enabled.
+     */
+    @UiThread
+    public void setTiltEnabled(boolean tiltEnabled) {
+        this.mTiltEnabled = tiltEnabled;
     }
 
     //
@@ -2427,11 +2464,13 @@ public final class MapView extends FrameLayout {
      * @see MapView#setZoomEnabled(boolean)
      * @see MapView#setScrollEnabled(boolean)
      * @see MapView#setRotateEnabled(boolean)
+     * @see MapView#setTiltEnabled(boolean)
      */
     public void setAllGesturesEnabled(boolean enabled) {
         setZoomEnabled(enabled);
         setScrollEnabled(enabled);
         setRotateEnabled(enabled);
+        setTiltEnabled(enabled);
     }
 
     // Called when user touches the screen, all positions are absolute
@@ -2446,6 +2485,7 @@ public final class MapView extends FrameLayout {
         // Check two finger gestures first
         mRotateGestureDetector.onTouchEvent(event);
         mScaleGestureDetector.onTouchEvent(event);
+        mShoveGestureDetector.onTouchEvent(event);
 
         // Handle two finger tap
         switch (event.getActionMasked()) {
@@ -2467,7 +2507,9 @@ public final class MapView extends FrameLayout {
                 // First pointer up
                 long tapInterval = event.getEventTime() - event.getDownTime();
                 boolean isTap = tapInterval <= ViewConfiguration.getTapTimeout();
-                boolean inProgress = mRotateGestureDetector.isInProgress() || mScaleGestureDetector.isInProgress();
+                boolean inProgress = mRotateGestureDetector.isInProgress()
+                        || mScaleGestureDetector.isInProgress()
+                        || mShoveGestureDetector.isInProgress();
 
                 if (mTwoTap && isTap && !inProgress) {
                     PointF focalPoint = TwoFingerGestureDetector.determineFocalPoint(event);
@@ -2832,6 +2874,70 @@ public final class MapView extends FrameLayout {
                 // around center map
                 mNativeMapView.setBearing(bearing, (getWidth() / 2) / mScreenDensity, (getHeight() / 2) / mScreenDensity);
             }
+            return true;
+        }
+    }
+
+    // This class handles a vertical two-finger shove. (If you place two fingers on screen with
+    // less than a 20 degree angle between them, this will detect movement on the Y-axis.)
+    private class ShoveGestureListener implements ShoveGestureDetector.OnShoveGestureListener {
+
+        long mBeginTime = 0;
+        float mTotalDelta = 0.0f;
+        boolean mStarted = false;
+
+        @Override
+        public boolean onShoveBegin(ShoveGestureDetector detector) {
+            if (!mTiltEnabled) {
+                return false;
+            }
+
+            mBeginTime = detector.getEventTime();
+            return true;
+        }
+
+        @Override
+        public void onShoveEnd(ShoveGestureDetector detector) {
+            mBeginTime = 0;
+            mTotalDelta = 0.0f;
+            mStarted = false;
+        }
+
+        @Override
+        public boolean onShove(ShoveGestureDetector detector) {
+            if (!mTiltEnabled) {
+                return false;
+            }
+
+            // If rotate is large enough ignore a tap
+            // Also is zoom already started, don't rotate
+            mTotalDelta += detector.getShovePixelsDelta();
+            if (!mZoomStarted && ((mTotalDelta > 10.0f) || (mTotalDelta < -10.0f))) {
+                mStarted = true;
+            }
+
+            // Ignore short touches in case it is a tap
+            // Also ignore small rotate
+            long time = detector.getEventTime();
+            long interval = time - mBeginTime;
+            if (!mStarted && (interval <= ViewConfiguration.getTapTimeout())) {
+                return false;
+            }
+
+            if (!mStarted) {
+                return false;
+            }
+
+            // Cancel any animation
+            mNativeMapView.cancelTransitions();
+
+            // Get rotate value
+            double pitch = mNativeMapView.getPitch();
+            pitch += detector.getShovePixelsDelta();
+
+            // Tilt the map
+            mNativeMapView.setPitch(pitch);
+
             return true;
         }
     }
