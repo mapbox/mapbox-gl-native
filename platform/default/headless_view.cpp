@@ -156,6 +156,8 @@ void HeadlessView::resizeFramebuffer() {
         throw std::runtime_error(error);
     }
 
+    MBGL_CHECK_ERROR(glViewport(0, 0, w, h));
+
     needsResize = false;
 }
 

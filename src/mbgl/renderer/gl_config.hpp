@@ -266,23 +266,6 @@ struct LineWidth {
     }
 };
 
-struct Viewport {
-    struct Type { GLint x, y; GLsizei width, height; };
-    static const Type Default;
-    inline static void Set(const Type& value) {
-        MBGL_CHECK_ERROR(glViewport(value.x, value.y, value.width, value.height));
-    }
-    inline static Type Get() {
-        GLint viewport[4];
-        MBGL_CHECK_ERROR(glGetIntegerv(GL_VIEWPORT, viewport));
-        return { viewport[0], viewport[1], viewport[2], viewport[3] };
-    }
-};
-
-inline bool operator!=(const Viewport::Type& a, const Viewport::Type& b) {
-    return a.x != b.x || a.y != b.y || a.width != b.width || a.height != b.height;
-}
-
 class Config {
 public:
     void reset() {
@@ -302,7 +285,6 @@ public:
         clearStencil.reset();
         program.reset();
         lineWidth.reset();
-        viewport.reset();
     }
 
     void setDirty() {
@@ -322,7 +304,6 @@ public:
         clearStencil.setDirty();
         program.setDirty();
         lineWidth.setDirty();
-        viewport.setDirty();
     }
 
     Value<StencilFunc> stencilFunc;
@@ -341,7 +322,6 @@ public:
     Value<ClearStencil> clearStencil;
     Value<Program> program;
     Value<LineWidth> lineWidth;
-    Value<Viewport> viewport;
 };
 
 } // namespace gl
