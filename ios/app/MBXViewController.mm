@@ -314,39 +314,53 @@ static UIColor *const kTintColor = [UIColor colorWithRed:0.120 green:0.550 blue:
 {
     if (longPress.state == UIGestureRecognizerStateBegan)
     {
-        NSArray *features = [self.mapView featuresAt:[longPress locationInView:longPress.view]];
-
-        if ([features count])
+        if ([self.mapView.styleURL.scheme isEqualToString:@"mapbox"])
         {
-            NSMutableString *output = [NSMutableString string];
+            self.mapView.styleURL = [NSURL URLWithString:@"asset://streets-interactive-poi-v8.json"];
 
-            for (NSDictionary *feature in features)
+            [(UIButton *)self.navigationItem.titleView setTitle:@"Interactive Streets" forState:UIControlStateNormal];
+
+            [[[UIAlertView alloc] initWithTitle:@"Map Is Now Interactive"
+                                        message:@"Long-press again with two fingers to query POIs on the map."
+                                       delegate:nil
+                              cancelButtonTitle:@"OK"
+                              otherButtonTitles:nil] show];
+        }
+        else
+        {
+            NSArray *features = [self.mapView featuresAt:[longPress locationInView:longPress.view]];
+
+            if ([features count])
             {
-                [output appendString:@"Layer: "];
-                [output appendString:[feature objectForKey:@"layer"]];
-                [output appendString:@"\n"];
+                NSMutableString *output = [NSMutableString string];
 
-                [output appendString:@"Source: "];
-                [output appendString:[feature objectForKey:@"source"]];
-                [output appendString:@"\n"];
-
-                NSDictionary *properties = [feature objectForKey:@"properties"];
-
-                for (NSString *key in [properties allKeys])
+                for (NSDictionary *feature in features)
                 {
-                    [output appendString:key];
-                    [output appendString:@": "];
-                    [output appendString:properties[key]];
+                    [output appendString:@"Layer: "];
+                    [output appendString:[feature objectForKey:@"layer"]];
                     [output appendString:@"\n"];
-                }
-            }
 
-            UIAlertView *alert = [[UIAlertView alloc] initWithTitle:@"Features"
-                                                            message:output
-                                                           delegate:nil
-                                                  cancelButtonTitle:@"OK"
-                                                  otherButtonTitles:nil];
-            [alert show];
+                    [output appendString:@"Source: "];
+                    [output appendString:[feature objectForKey:@"source"]];
+                    [output appendString:@"\n"];
+
+                    NSDictionary *properties = [feature objectForKey:@"properties"];
+
+                    for (NSString *key in [properties allKeys])
+                    {
+                        [output appendString:key];
+                        [output appendString:@": "];
+                        [output appendString:properties[key]];
+                        [output appendString:@"\n"];
+                    }
+                }
+
+                [[[UIAlertView alloc] initWithTitle:@"Features"
+                                            message:output
+                                           delegate:nil
+                                  cancelButtonTitle:@"OK"
+                                  otherButtonTitles:nil] show];
+            }
         }
     }
 }

@@ -14,7 +14,8 @@
         './polyline.geojson',
         './threestates.geojson',
         './Settings.bundle/',
-        './app-info.plist'
+        './app-info.plist',
+        './streets-interactive-poi-v8.json'
       ],
 
       'dependencies': [
