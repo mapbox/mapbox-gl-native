@@ -51,7 +51,6 @@ import android.widget.ArrayAdapter;
 import android.widget.FrameLayout;
 import android.widget.ImageView;
 import android.widget.ZoomButtonsController;
-
 import com.almeros.android.multitouch.gesturedetectors.RotateGestureDetector;
 import com.almeros.android.multitouch.gesturedetectors.ShoveGestureDetector;
 import com.almeros.android.multitouch.gesturedetectors.TwoFingerGestureDetector;
@@ -1134,7 +1133,7 @@ public final class MapView extends FrameLayout {
      * @param pitch New tilt in degrees
      * @param duration Animation time in milliseconds.  If null then 0 is used, making the animation immediate.
      */
-    @FloatRange(from = 0.0, to = 60.0)
+    @FloatRange(from = MINIMUM_TILT, to = MAXIMUM_TILT)
     public void setTilt(Double pitch, @Nullable Long duration) {
         long actualDuration = 0;
         if (duration != null) {
