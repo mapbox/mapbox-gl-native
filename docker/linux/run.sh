@@ -3,6 +3,8 @@
 set -e
 set -o pipefail
 
+./docker/build.sh
+
 docker build -t mapbox/gl-native:linux docker/linux
 
 docker run \
