@@ -88,6 +88,7 @@
           '-framework MobileCoreServices',
           '-framework QuartzCore',
           '-framework SystemConfiguration',
+          '-ObjC',
         ],
       },
 
