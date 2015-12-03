@@ -53,6 +53,7 @@ import android.widget.ImageView;
 import android.widget.ZoomButtonsController;
 
 import com.almeros.android.multitouch.gesturedetectors.RotateGestureDetector;
+import com.almeros.android.multitouch.gesturedetectors.ShoveGestureDetector;
 import com.almeros.android.multitouch.gesturedetectors.TwoFingerGestureDetector;
 import com.mapbox.mapboxsdk.R;
 import com.mapbox.mapboxsdk.annotations.Annotation;
@@ -180,6 +181,7 @@ public final class MapView extends FrameLayout {
     private GestureDetectorCompat mGestureDetector;
     private ScaleGestureDetector mScaleGestureDetector;
     private RotateGestureDetector mRotateGestureDetector;
+    private ShoveGestureDetector mShoveGestureDetector;
     private boolean mTwoTap = false;
     private boolean mZoomStarted = false;
     private boolean mQuickZoom = false;
@@ -682,6 +684,7 @@ public final class MapView extends FrameLayout {
         mScaleGestureDetector = new ScaleGestureDetector(context, new ScaleGestureListener());
         ScaleGestureDetectorCompat.setQuickScaleEnabled(mScaleGestureDetector, true);
         mRotateGestureDetector = new RotateGestureDetector(context, new RotateGestureListener());
+        mShoveGestureDetector = new ShoveGestureDetector(context, new ShoveGestureListener());
 
         // Shows the zoom controls
         if (!context.getPackageManager()
@@ -2830,6 +2833,26 @@ public final class MapView extends FrameLayout {
                 mNativeMapView.setBearing(bearing, (getWidth() / 2) / mScreenDensity, (getHeight() / 2) / mScreenDensity);
             }
             return true;
+        }
+    }
+
+    // This class handles a vertical two-finger shove. (If you place two fingers on screen with
+    // less than a 20 degree angle between them, this will detect movement on the Y-axis.)
+    private class ShoveGestureListener implements ShoveGestureDetector.OnShoveGestureListener {
+
+        @Override
+        public boolean onShove(ShoveGestureDetector detector) {
+            return false;
+        }
+
+        @Override
+        public boolean onShoveBegin(ShoveGestureDetector detector) {
+            return false;
+        }
+
+        @Override
+        public void onShoveEnd(ShoveGestureDetector detector) {
+
         }
     }
 
