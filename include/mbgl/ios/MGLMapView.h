@@ -371,7 +371,7 @@ IB_DESIGNABLE
 /** Whether the map view should display a heading calibration alert when necessary. The default value is `YES`. */
 @property (nonatomic, assign) BOOL displayHeadingCalibration;
 
-- (void)featuresAt:(CGPoint)point;
+- (NS_ARRAY_OF(NSDictionary *) *)featuresAt:(CGPoint)point;
 
 #pragma mark - Debugging
 

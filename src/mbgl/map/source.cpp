@@ -650,16 +650,7 @@ FeatureResults Source::featuresAt(const PrecisionPoint point, const TransformSta
                                 boost::make_function_output_iterator([&](const auto& val) {
             const std::string layer_id = std::get<1>(val);
             const FeatureProperties feature_properties = std::get<2>(val);
-
             const auto result = std::make_tuple(layer_id, info.source_id, feature_properties);
-
-            std::string properties = "";
-            for (const auto property : feature_properties) {
-                properties = properties + "\n\t" + property.first + ": " + property.second;
-            }
-
-            printf("%s in %s: %s\n", layer_id.c_str(), info.source_id.c_str(), properties.c_str());
-
             results.push_back(result);
         }));
     }

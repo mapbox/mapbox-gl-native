@@ -383,12 +383,38 @@ std::chrono::steady_clock::duration durationInSeconds(float duration)
     }];
 }
 
-- (void)featuresAt:(CGPoint)point
+- (NS_ARRAY_OF(NSDictionary *) *)featuresAt:(CGPoint)point
 {
-//    NSLog(@"iOS: %f, %f", [self convertPoint:point toCoordinateFromView:self].latitude, [self convertPoint:point toCoordinateFromView:self].longitude);
-
     // flip y for core
-    _mbglMap->featuresAt(mbgl::PrecisionPoint(point.x, self.bounds.size.height - point.y));
+    point.y = self.bounds.size.height - point.y;
+
+    mbgl::FeatureResults results = _mbglMap->featuresAt(mbgl::PrecisionPoint(point.x, point.y));
+
+    NSMutableArray *features = [NSMutableArray arrayWithCapacity:results.size()];
+
+    for (const auto& result : results)
+    {
+        NSString *layerName  = [NSString stringWithUTF8String:std::get<0>(result).c_str()];
+        NSString *sourceName = [NSString stringWithUTF8String:std::get<1>(result).c_str()];
+
+        const auto& properties = std::get<2>(result);
+
+        NSMutableDictionary *featureProperties = [NSMutableDictionary dictionaryWithCapacity:properties.size()];
+
+        for (const auto& property : properties)
+        {
+            NSString *key = [NSString stringWithUTF8String:property.first.c_str()];
+            NSString *val = [NSString stringWithUTF8String:property.second.c_str()];
+
+            featureProperties[key] = val;
+        }
+
+        [features addObject:@{ @"layer":      layerName,
+                               @"source":     sourceName,
+                               @"properties": featureProperties }];
+    }
+
+    return [NSArray arrayWithArray:features];
 }
 
 - (void)createGLView
