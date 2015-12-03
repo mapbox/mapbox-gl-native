@@ -631,12 +631,14 @@ FeatureResults Source::featuresAt(const PrecisionPoint point, const uint8_t radi
     const uint32_t tile_scale = ::pow(2, id.z);
     const double scale = util::tileSize * transform.getScale() / (tile_scale / id.overscaling);
 
-    const uint16_t r = radius * 4096 / scale;
+    const int16_t r = radius * 4096 / scale;
 
-    FeatureBox queryBox = {
-        { position.x - r, position.y - r },
-        { position.x + r, position.y + r }
-    };
+    const int16_t left   = position.x - r;
+    const int16_t right  = position.x + r;
+    const int16_t bottom = position.y - r;
+    const int16_t top    = position.y + r;
+
+    FeatureBox queryBox = {{ left, bottom }, { right, top }};
 
     FeatureResults results;
 
