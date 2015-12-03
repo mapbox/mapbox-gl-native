@@ -267,18 +267,13 @@ static UIColor *const kTintColor = [UIColor colorWithRed:0.120 green:0.550 blue:
             self.featuresView.font = [UIFont systemFontOfSize:10];
             self.featuresView.backgroundColor = [UIColor whiteColor];
             self.featuresView.alpha = 0.75;
+            self.featuresView.text = @"Moving the map is now disabled until you change the style. Pan with your finger to query for features.";
 
             [self.view addSubview:self.featuresView];
 
             self.mapView.styleURL = [NSURL URLWithString:@"asset://streets-interactive-poi-v8.json"];
 
             [(UIButton *)self.navigationItem.titleView setTitle:@"Interactive Streets" forState:UIControlStateNormal];
-
-            [[[UIAlertView alloc] initWithTitle:@"Interactive Streets"
-                                        message:@"Moving the map is now disabled until you change the style. Pan with your finger to query for features."
-                                       delegate:nil
-                              cancelButtonTitle:@"OK"
-                              otherButtonTitles:nil] show];
         }
 
     }
