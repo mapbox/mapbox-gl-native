@@ -664,6 +664,20 @@ void JNICALL nativeResetPosition(JNIEnv *env, jobject obj, jlong nativeMapViewPt
     nativeMapView->getMap().resetPosition();
 }
 
+jdouble JNICALL nativeGetPitch(JNIEnv *env, jobject obj, jlong nativeMapViewPtr) {
+    mbgl::Log::Debug(mbgl::Event::JNI, "nativeGetPitch");
+    assert(nativeMapViewPtr != 0);
+    NativeMapView *nativeMapView = reinterpret_cast<NativeMapView *>(nativeMapViewPtr);
+    return nativeMapView->getMap().getPitch();
+}
+
+void JNICALL nativeSetPitch(JNIEnv *env, jobject obj, jlong nativeMapViewPtr, jdouble pitch) {
+    mbgl::Log::Debug(mbgl::Event::JNI, "nativeGetPitch");
+    assert(nativeMapViewPtr != 0);
+    NativeMapView *nativeMapView = reinterpret_cast<NativeMapView *>(nativeMapViewPtr);
+    nativeMapView->getMap().setPitch(pitch, std::chrono::milliseconds(0));    
+}
+
 void JNICALL nativeScaleBy(JNIEnv *env, jobject obj, jlong nativeMapViewPtr, jdouble ds, jdouble cx,
                            jdouble cy, jlong duration) {
     mbgl::Log::Debug(mbgl::Event::JNI, "nativeScaleBy");
@@ -1888,6 +1902,8 @@ extern "C" JNIEXPORT jint JNICALL JNI_OnLoad(JavaVM *vm, void *reserved) {
         {"nativeGetLatLng", "(J)Lcom/mapbox/mapboxsdk/geometry/LatLng;",
          reinterpret_cast<void *>(&nativeGetLatLng)},
         {"nativeResetPosition", "(J)V", reinterpret_cast<void *>(&nativeResetPosition)},
+        {"nativeGetPitch", "(J)D", reinterpret_cast<void *>(&nativeGetPitch)},
+        {"nativeSetPitch", "(JD)V", reinterpret_cast<void *>(&nativeSetPitch)},
         {"nativeScaleBy", "(JDDDJ)V", reinterpret_cast<void *>(&nativeScaleBy)},
         {"nativeSetScale", "(JDDDJ)V", reinterpret_cast<void *>(&nativeSetScale)},
         {"nativeGetScale", "(J)D", reinterpret_cast<void *>(&nativeGetScale)},

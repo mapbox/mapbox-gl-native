@@ -1102,6 +1102,25 @@ public final class MapView extends FrameLayout {
         this.mScrollEnabled = scrollEnabled;
     }
 
+    //
+    // Pitch / Tilt
+    //
+
+    /**
+     * Gets the current Tilt in degrees of the MapView
+     * @return tilt in degrees
+     */
+    public double getTilt() {
+        return mNativeMapView.getPitch();
+    }
+
+    /**
+     * Sets the Tilt in degrees of the MapView
+     * @param pitch New tilt in degrees
+     */
+    public void setTilt(double pitch) {
+        mNativeMapView.setPitch(pitch);
+    }
 
     //
     // Mirrored Google Map's Camera API
@@ -1120,8 +1139,7 @@ public final class MapView extends FrameLayout {
 
         setBearing(update.getBearing());
 
-        // TODO - Set tilt
-
+        setTilt(update.getTilt());
     }
 
     //
