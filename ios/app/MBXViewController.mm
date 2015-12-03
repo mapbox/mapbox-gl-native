@@ -377,6 +377,7 @@ static UIColor *const kTintColor = [UIColor colorWithRed:0.120 green:0.550 blue:
             }
 
             self.featuresView.text = output;
+            self.featuresView.contentOffset = CGPointZero;
         }
         else
         {
