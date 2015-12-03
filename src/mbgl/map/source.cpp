@@ -606,7 +606,7 @@ void Source::dumpDebugLogs() const {
     }
 }
 
-FeatureResults Source::featuresAt(const PrecisionPoint point, const TransformState& transform) const {
+FeatureResults Source::featuresAt(const PrecisionPoint point, const uint8_t radius, const TransformState& transform) const {
     // figure out tile (bounded by source max zoom)
     LatLng p = transform.pointToLatLng(point);
 
@@ -631,11 +631,11 @@ FeatureResults Source::featuresAt(const PrecisionPoint point, const TransformSta
     const auto tile_scale = ::pow(2, id.z); // z);
     const auto scale = util::tileSize * transform.getScale() / (tile_scale / id.overscaling);
 
-    const auto radius = 5 * 4096 / scale;
+    const auto r = radius * 4096 / scale;
 
     FeatureBox queryBox = {
-        { position.x - radius, position.y - radius },
-        { position.x + radius, position.y + radius }
+        { position.x - r, position.y - r },
+        { position.x + r, position.y + r }
     };
 
     FeatureResults results;
