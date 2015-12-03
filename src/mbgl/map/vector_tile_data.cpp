@@ -51,7 +51,7 @@ VectorTileData::VectorTileData(const TileID& id_,
         }
 
         // Kick off a fresh parse of this tile. This happens when the tile is new, or
-        // when tile data changed. Replacing the workdRequest will cancel a pending work
+        // when tile data changed. Replacing the workRequest will cancel a pending work
         // request in case there is one.
         workRequest.reset();
         workRequest = worker.parseGeometryTile(tileWorker, style.layers, std::move(tile), targetConfig, [callback, this, config = targetConfig] (TileParseResult result) {

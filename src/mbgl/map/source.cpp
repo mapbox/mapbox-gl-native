@@ -607,12 +607,9 @@ void Source::dumpDebugLogs() const {
 }
 
 FeatureResults Source::featuresAt(const PrecisionPoint point, const TransformState& transform) const {
+    // figure out tile (bounded by source max zoom)
     LatLng p = transform.pointToLatLng(point);
 
-    //    printf("core: %f, %f\n", p_.latitude, p_.longitude);
-
-    // figure out tile (bounded by source max zoom)
-    //
     double sine = std::sin(p.latitude * M_PI / 180);
     double x = p.longitude / 360 + 0.5;
     double y = 0.5 - 0.25 * std::log((1 + sine) / (1 - sine)) / M_PI;
@@ -622,14 +619,11 @@ FeatureResults Source::featuresAt(const PrecisionPoint point, const TransformSta
     const auto z = ::floor(transform.getZoom());
     const auto source_max_z = ::fmin(z, 15);
     const auto z2 = ::powf(2, source_max_z);
+
     TileID id(z, ::floor(x * z2), ::floor(y * z2), source_max_z);
 
-    // figure out tile coordinate
-    //
-    TileCoordinate coordinate = transform.pointToCoordinate(point);
-
     // figure out query bounds
-    //
+    TileCoordinate coordinate = transform.pointToCoordinate(point);
     coordinate = coordinate.zoomTo(::fmin(id.z, 15));
 
     vec2<uint16_t> position((coordinate.column - id.x) * 4096, (coordinate.row - id.y) * 4096);
@@ -639,8 +633,6 @@ FeatureResults Source::featuresAt(const PrecisionPoint point, const TransformSta
 
     const auto radius = 5 * 4096 / scale;
 
-    printf("===== query: %i,%i,%i @ %i, %i (radius: %f)\n", id.z, id.x, id.y, position.x, position.y, radius);
-
     FeatureBox queryBox = {
         { position.x - radius, position.y - radius },
         { position.x + radius, position.y + radius }
@@ -648,10 +640,11 @@ FeatureResults Source::featuresAt(const PrecisionPoint point, const TransformSta
 
     FeatureResults results;
 
+    // find the right tile
     for (const auto& tile : getLoadedTiles()) {
         if (tile->id != id) continue;
-//        printf("[%s]: %i,%i,%i\n", source->info.source_id.c_str(), tile->id.z, tile->id.x, tile->id.y);
 
+        // query the tile
         const auto& data = tile->data;
         data->featureTree.query(boost::geometry::index::intersects(queryBox),
                                 boost::make_function_output_iterator([&](const auto& val) {

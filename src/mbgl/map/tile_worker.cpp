@@ -138,10 +138,8 @@ void TileWorker::parseLayer(const StyleLayer& layer, const GeometryTile& geometr
     std::unique_ptr<Bucket> bucket = layer.createBucket(parameters);
 
     if (layer.interactive) {
-//        printf("parsing tile %i,%i,%i (%i)\n", id.z, id.x, id.y, id.z);
         for (std::size_t i = 0; i < geometryLayer->featureCount(); i++) {
             const auto feature = geometryLayer->getFeature(i);
-
             FeatureBox featureBox = {{ 4096, 4096 }, { -1, -1 }};
             const auto geometries = feature->getGeometries();
             for (std::size_t j = 0; j < geometries.size(); j++) {
@@ -168,30 +166,11 @@ void TileWorker::parseLayer(const StyleLayer& layer, const GeometryTile& geometr
 
             if (featureBox.min_corner().get<0>() < 4096 && featureBox.min_corner().get<1>() < 4096 &&
                 featureBox.max_corner().get<0>() > -1   && featureBox.max_corner().get<1>() > -1) {
-                // TODO: opportunistically hit the pbf at query time
                 const auto& values = feature->getAllValues();
                 FeatureProperties properties;
                 properties.insert(values.begin(), values.end());
-
-//                std::string name = "";
-//                const auto& maybe_name = feature->getValue("name_en");
-//                if (maybe_name && maybe_name.get().is<std::string>()) {
-//                    name = maybe_name.get().get<std::string>();
-//                }
-
                 result.featureTree.insert(std::make_tuple(featureBox, layer.id, properties));
-
-//                printf("added feature '%s' from %s at %i, %i\n",
-//                    name.c_str(),
-//                    layer.id.c_str(),
-//                    point.x,
-//                    point.y);
             }
-        }
-        if (result.featureTree.size()) {
-//            printf("feature tree for %i,%i,%i (%i) [%s] has %lu members\n", id.z, id.x, id.y, id.sourceZ, layer.id.c_str(), result.featureTree.size());
-//            const auto bounds = result.featureTree.bounds();
-//            printf("box: %i, %i to %i, %i\n", bounds.min_corner().get<0>(), bounds.min_corner().get<1>(), bounds.max_corner().get<0>(), bounds.max_corner().get<1>());
         }
     }
 
