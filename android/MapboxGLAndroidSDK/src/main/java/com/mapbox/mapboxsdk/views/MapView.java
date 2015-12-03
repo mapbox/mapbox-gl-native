@@ -2884,19 +2884,63 @@ public final class MapView extends FrameLayout {
     // less than a 20 degree angle between them, this will detect movement on the Y-axis.)
     private class ShoveGestureListener implements ShoveGestureDetector.OnShoveGestureListener {
 
-        @Override
-        public boolean onShove(ShoveGestureDetector detector) {
-            return false;
-        }
+        long mBeginTime = 0;
+        float mTotalDelta = 0.0f;
+        boolean mStarted = false;
 
         @Override
         public boolean onShoveBegin(ShoveGestureDetector detector) {
-            return false;
+            if (!mTiltEnabled) {
+                return false;
+            }
+
+            mBeginTime = detector.getEventTime();
+            return true;
         }
 
         @Override
         public void onShoveEnd(ShoveGestureDetector detector) {
+            mBeginTime = 0;
+            mTotalDelta = 0.0f;
+            mStarted = false;
+        }
 
+        @Override
+        public boolean onShove(ShoveGestureDetector detector) {
+            if (!mTiltEnabled) {
+                return false;
+            }
+
+            // If rotate is large enough ignore a tap
+            // Also is zoom already started, don't rotate
+            mTotalDelta += detector.getShovePixelsDelta();
+            if (!mZoomStarted && ((mTotalDelta > 10.0f) || (mTotalDelta < -10.0f))) {
+                mStarted = true;
+            }
+
+            // Ignore short touches in case it is a tap
+            // Also ignore small rotate
+            long time = detector.getEventTime();
+            long interval = time - mBeginTime;
+            if (!mStarted && (interval <= ViewConfiguration.getTapTimeout())) {
+                return false;
+            }
+
+            if (!mStarted) {
+                return false;
+            }
+
+            // Cancel any animation
+            mNativeMapView.cancelTransitions();
+
+            // Get rotate value
+            double pitch = mNativeMapView.getPitch();
+            pitch += detector.getShovePixelsDelta();
+
+            // Tilt the map
+            mNativeMapView.setPitch(pitch);
+
+            return true;
         }
     }
 
