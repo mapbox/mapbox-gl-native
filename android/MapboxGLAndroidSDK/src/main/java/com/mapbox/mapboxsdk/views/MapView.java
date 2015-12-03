@@ -2480,6 +2480,7 @@ public final class MapView extends FrameLayout {
         // Check two finger gestures first
         mRotateGestureDetector.onTouchEvent(event);
         mScaleGestureDetector.onTouchEvent(event);
+        mShoveGestureDetector.onTouchEvent(event);
 
         // Handle two finger tap
         switch (event.getActionMasked()) {
@@ -2501,7 +2502,9 @@ public final class MapView extends FrameLayout {
                 // First pointer up
                 long tapInterval = event.getEventTime() - event.getDownTime();
                 boolean isTap = tapInterval <= ViewConfiguration.getTapTimeout();
-                boolean inProgress = mRotateGestureDetector.isInProgress() || mScaleGestureDetector.isInProgress();
+                boolean inProgress = mRotateGestureDetector.isInProgress()
+                        || mScaleGestureDetector.isInProgress()
+                        || mShoveGestureDetector.isInProgress();
 
                 if (mTwoTap && isTap && !inProgress) {
                     PointF focalPoint = TwoFingerGestureDetector.determineFocalPoint(event);
