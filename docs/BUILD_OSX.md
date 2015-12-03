@@ -8,7 +8,9 @@ This project provides an OS X SDK analogous to the Mapbox iOS SDK. Mapbox does n
 
 ### Install
 
-1. Copy `gyp/build/Release/Mapbox.framework` into your project. It should happen automatically, but ensure that `Mapbox.framework` is listed in the *Linked Frameworks and Libraries* section of the General tab for your application target.
+1. Copy `gyp/build/Release/Mapbox.framework` into your project.
+
+1. In the project editor, select your application target, go to the General tab, and add `Mapbox.framework` to the *Embedded Binaries* section.
 
 1. Mapbox vector tiles require a Mapbox account and API access token. In the project editor, select the application target. In the Info tab, set `MGLMapboxAccessToken` to your access token. You can obtain one from the [Mapbox account page](https://www.mapbox.com/studio/account/tokens/).
 

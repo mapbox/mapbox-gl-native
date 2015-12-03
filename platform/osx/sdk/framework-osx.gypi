@@ -25,7 +25,7 @@
         'INFOPLIST_FILE': '../platform/osx/sdk/Info.plist',
         'LD_RUNPATH_SEARCH_PATHS': [
           '$(inherited)',
-          '@executable_path/Frameworks',
+          '@executable_path/../Frameworks',
           '@loader_path/Frameworks',
         ],
         'PRODUCT_BUNDLE_IDENTIFIER': 'com.mapbox.MapboxGL',
@@ -42,7 +42,6 @@
       ],
       
       'sources': [
-        './Mapbox.h',
         './Mapbox.m',
       ],
       
