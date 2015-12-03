@@ -164,6 +164,14 @@ public final class MapView extends FrameLayout {
      */
     public static final double MAXIMUM_ZOOM_LEVEL = 18.0;
 
+    /**
+     * The currently supported maximum and minimum tilt values.
+     *
+     * @see MapView#setTilt(double)
+     */
+    private static final double MINIMUM_TILT = 0;
+    private static final double MAXIMUM_TILT = 60;
+
     //
     // Instance members
     //
@@ -2890,15 +2898,15 @@ public final class MapView extends FrameLayout {
                 return false;
             }
 
-            // If rotate is large enough ignore a tap
-            // Also is zoom already started, don't rotate
+            // If tilt is large enough ignore a tap
+            // Also if zoom already started, don't tilt
             mTotalDelta += detector.getShovePixelsDelta();
             if (!mZoomStarted && ((mTotalDelta > 10.0f) || (mTotalDelta < -10.0f))) {
                 mStarted = true;
             }
 
             // Ignore short touches in case it is a tap
-            // Also ignore small rotate
+            // Also ignore small tilt
             long time = detector.getEventTime();
             long interval = time - mBeginTime;
             if (!mStarted && (interval <= ViewConfiguration.getTapTimeout())) {
@@ -2912,9 +2920,10 @@ public final class MapView extends FrameLayout {
             // Cancel any animation
             mNativeMapView.cancelTransitions();
 
-            // Get rotate value
+            // Get tilt value (scale and clamp)
             double pitch = getTilt();
-            pitch += detector.getShovePixelsDelta();
+            pitch += 0.1 * detector.getShovePixelsDelta();
+            pitch = Math.max(MINIMUM_TILT, Math.min(MAXIMUM_TILT, pitch));
 
             // Tilt the map
             setTilt(pitch, null);
