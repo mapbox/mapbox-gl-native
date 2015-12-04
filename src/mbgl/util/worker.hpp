@@ -49,7 +49,6 @@ public:
                                            std::function<void(TileParseResult)> callback);
 
     Request redoPlacement(TileWorker&,
-                          std::vector<std::unique_ptr<StyleLayer>>,
                           const std::unordered_map<std::string, std::unique_ptr<Bucket>>&,
                           PlacementConfig config,
                           std::function<void()> callback);

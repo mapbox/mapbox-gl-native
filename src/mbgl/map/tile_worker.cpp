@@ -31,12 +31,15 @@ TileWorker::~TileWorker() {
     glyphAtlas.removeGlyphs(reinterpret_cast<uintptr_t>(this));
 }
 
-TileParseResult TileWorker::parseAllLayers(std::vector<std::unique_ptr<StyleLayer>> layers,
+TileParseResult TileWorker::parseAllLayers(std::vector<std::unique_ptr<StyleLayer>> layers_,
                                            const GeometryTile& geometryTile,
                                            PlacementConfig config) {
     // We're doing a fresh parse of the tile, because the underlying data has changed.
     pending.clear();
     partialParse = false;
+
+    // Store the layers for use in redoPlacement.
+    layers = std::move(layers_);
 
     // Reset the collision tile so we have a clean slate; we're placing all features anyway.
     collisionTile = std::make_unique<CollisionTile>(config);
@@ -46,10 +49,10 @@ TileParseResult TileWorker::parseAllLayers(std::vector<std::unique_ptr<StyleLaye
     std::set<std::string> parsed;
 
     for (auto i = layers.rbegin(); i != layers.rend(); i++) {
-        std::unique_ptr<StyleLayer> layer = std::move(*i);
+        const StyleLayer* layer = i->get();
         if (parsed.find(layer->bucketName()) == parsed.end()) {
             parsed.emplace(layer->bucketName());
-            parseLayer(std::move(layer), geometryTile);
+            parseLayer(layer, geometryTile);
         }
     }
 
@@ -89,7 +92,6 @@ TileParseResult TileWorker::parsePendingLayers() {
 }
 
 void TileWorker::redoPlacement(
-    std::vector<std::unique_ptr<StyleLayer>> layers,
     const std::unordered_map<std::string, std::unique_ptr<Bucket>>* buckets,
     PlacementConfig config) {
 
@@ -104,7 +106,7 @@ void TileWorker::redoPlacement(
     }
 }
 
-void TileWorker::parseLayer(std::unique_ptr<StyleLayer> layer, const GeometryTile& geometryTile) {
+void TileWorker::parseLayer(const StyleLayer* layer, const GeometryTile& geometryTile) {
     // Cancel early when parsing.
     if (state == TileData::State::obsolete)
         return;
@@ -145,7 +147,7 @@ void TileWorker::parseLayer(std::unique_ptr<StyleLayer> layer, const GeometryTil
 
     if (layer->type == StyleLayerType::Symbol && partialParse) {
         // We cannot parse this bucket yet. Instead, we're saving it for later.
-        pending.emplace_back(std::move(layer), std::move(bucket));
+        pending.emplace_back(layer, std::move(bucket));
     } else {
         insertBucket(layer->bucketName(), std::move(bucket));
     }

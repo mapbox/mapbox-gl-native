@@ -166,7 +166,7 @@ void VectorTileData::redoPlacement(const PlacementConfig newConfig) {
 
 void VectorTileData::redoPlacement() {
     workRequest.reset();
-    workRequest = worker.redoPlacement(tileWorker, style.getLayers(), buckets, targetConfig, [this, config = targetConfig] {
+    workRequest = worker.redoPlacement(tileWorker, buckets, targetConfig, [this, config = targetConfig] {
         workRequest.reset();
 
         // Persist the configuration we just placed so that we can later check whether we need to

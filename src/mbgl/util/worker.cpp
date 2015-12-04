@@ -55,11 +55,10 @@ public:
     }
 
     void redoPlacement(TileWorker* worker,
-                       std::vector<std::unique_ptr<StyleLayer>> layers,
                        const std::unordered_map<std::string, std::unique_ptr<Bucket>>* buckets,
                        PlacementConfig config,
                        std::function<void()> callback) {
-        worker->redoPlacement(std::move(layers), buckets, config);
+        worker->redoPlacement(buckets, config);
         callback();
     }
 };
@@ -103,13 +102,12 @@ Worker::parsePendingGeometryTileLayers(TileWorker& worker,
 
 std::unique_ptr<WorkRequest>
 Worker::redoPlacement(TileWorker& worker,
-                      std::vector<std::unique_ptr<StyleLayer>> layers,
                       const std::unordered_map<std::string, std::unique_ptr<Bucket>>& buckets,
                       PlacementConfig config,
                       std::function<void()> callback) {
     current = (current + 1) % threads.size();
     return threads[current]->invokeWithCallback(&Worker::Impl::redoPlacement, callback, &worker,
-                                                std::move(layers), &buckets, config);
+                                                &buckets, config);
 }
 
 } // end namespace mbgl
