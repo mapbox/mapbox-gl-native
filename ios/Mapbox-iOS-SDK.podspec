@@ -13,7 +13,7 @@ Pod::Spec.new do |m|
   m.documentation_url = 'https://www.mapbox.com/ios-sdk/'
 
   m.source = {
-    :http => "https://mapbox.s3.amazonaws.com/mapbox-gl-native/ios/builds/mapbox-ios-sdk-#{m.version.to_s}.zip",
+    :http => "https://mapbox.s3.amazonaws.com/mapbox-gl-native/ios/builds/Mapbox.framework-#{m.version.to_s}.zip",
     :flatten => true
   }
 
@@ -23,9 +23,8 @@ Pod::Spec.new do |m|
   m.requires_arc = true
 
   m.preserve_paths = '**'
-  m.source_files = 'Headers/*.h', 'MGLDummy.m'
-  m.resource_bundle = { 'Mapbox' => 'Mapbox.bundle/*' }
-  m.vendored_library = 'libMapbox.a'
+  m.resource_bundle = { 'Mapbox' => 'Mapbox.framework/Mapbox.bundle/*' }
+  m.vendored_frameworks = 'Mapbox.framework'
   m.module_name = 'Mapbox'
 
   m.frameworks = 'CoreLocation', 'GLKit', 'ImageIO', 'MobileCoreServices', 'QuartzCore', 'SystemConfiguration'
