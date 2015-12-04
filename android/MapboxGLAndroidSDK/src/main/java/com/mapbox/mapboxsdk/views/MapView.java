@@ -115,6 +115,7 @@ public final class MapView extends FrameLayout {
     private static final String STATE_CENTER_DIRECTION = "centerDirection";
     private static final String STATE_ZOOM_LEVEL = "zoomLevel";
     private static final String STATE_DIRECTION = "direction";
+    private static final String STATE_TILT = "tilt";
     private static final String STATE_ZOOM_ENABLED = "zoomEnabled";
     private static final String STATE_SCROLL_ENABLED = "scrollEnabled";
     private static final String STATE_ROTATE_ENABLED = "rotateEnabled";
@@ -811,6 +812,7 @@ public final class MapView extends FrameLayout {
             setZoomLevel(savedInstanceState.getDouble(STATE_ZOOM_LEVEL));
             setDirection(savedInstanceState.getDouble(STATE_CENTER_DIRECTION));
             setDirection(savedInstanceState.getDouble(STATE_DIRECTION));
+            setTilt(savedInstanceState.getDouble(STATE_TILT), null);
             setZoomEnabled(savedInstanceState.getBoolean(STATE_ZOOM_ENABLED));
             setScrollEnabled(savedInstanceState.getBoolean(STATE_SCROLL_ENABLED));
             setRotateEnabled(savedInstanceState.getBoolean(STATE_ROTATE_ENABLED));
@@ -892,6 +894,7 @@ public final class MapView extends FrameLayout {
         // need to set zoom level first because of limitation on rotating when zoomed out
         outState.putDouble(STATE_ZOOM_LEVEL, getZoomLevel());
         outState.putDouble(STATE_CENTER_DIRECTION, getDirection());
+        outState.putDouble(STATE_TILT, getTilt());
         outState.putBoolean(STATE_ZOOM_ENABLED, isZoomEnabled());
         outState.putBoolean(STATE_SCROLL_ENABLED, isScrollEnabled());
         outState.putBoolean(STATE_ROTATE_ENABLED, isRotateEnabled());
