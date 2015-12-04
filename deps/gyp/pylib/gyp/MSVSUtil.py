@@ -8,10 +8,12 @@ import copy
 import os
 
 
-_TARGET_TYPE_EXT = {
-  'executable': '.exe',
-  'loadable_module': '.dll',
-  'shared_library': '.dll',
+# A dictionary mapping supported target types to extensions.
+TARGET_TYPE_EXT = {
+  'executable': 'exe',
+  'loadable_module': 'dll',
+  'shared_library': 'dll',
+  'static_library': 'lib',
 }
 
 
@@ -157,7 +159,7 @@ def _GetPdbPath(target_dict, config_name, vars):
 
 
   pdb_base = target_dict.get('product_name', target_dict['target_name'])
-  pdb_base = '%s%s.pdb' % (pdb_base, _TARGET_TYPE_EXT[target_dict['type']])
+  pdb_base = '%s.%s.pdb' % (pdb_base, TARGET_TYPE_EXT[target_dict['type']])
   pdb_path = vars['PRODUCT_DIR'] + '/' + pdb_base
 
   return pdb_path

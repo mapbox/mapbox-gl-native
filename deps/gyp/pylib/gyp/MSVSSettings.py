@@ -2,7 +2,7 @@
 # Use of this source code is governed by a BSD-style license that can be
 # found in the LICENSE file.
 
-"""Code to validate and convert settings of the Microsoft build tools.
+r"""Code to validate and convert settings of the Microsoft build tools.
 
 This file contains code to validate and convert settings of the Microsoft
 build tools.  The function ConvertToMSBuildSettings(), ValidateMSVSSettings(),
@@ -314,7 +314,14 @@ def _MSBuildOnly(tool, name, setting_type):
     name: the name of the setting.
     setting_type: the type of this setting.
   """
+
+  def _Translate(value, msbuild_settings):
+    # Let msbuild-only properties get translated as-is from msvs_settings.
+    tool_settings = msbuild_settings.setdefault(tool.msbuild_name, {})
+    tool_settings[name] = value
+
   _msbuild_validators[tool.msbuild_name][name] = setting_type.ValidateMSBuild
+  _msvs_to_msbuild_converters[tool.msvs_name][name] = _Translate
 
 
 def _ConvertedToAdditionalOption(tool, msvs_name, flag):
@@ -417,11 +424,11 @@ def ConvertVCMacrosToMSBuild(s):
   if '$' in s:
     replace_map = {
         '$(ConfigurationName)': '$(Configuration)',
-        '$(InputDir)': '%(RootDir)%(Directory)',
+        '$(InputDir)': '%(RelativeDir)',
         '$(InputExt)': '%(Extension)',
         '$(InputFileName)': '%(Filename)%(Extension)',
         '$(InputName)': '%(Filename)',
-        '$(InputPath)': '%(FullPath)',
+        '$(InputPath)': '%(Identity)',
         '$(ParentName)': '$(ProjectFileName)',
         '$(PlatformName)': '$(Platform)',
         '$(SafeInputName)': '%(Filename)',
@@ -531,6 +538,7 @@ _midl = _Tool('VCMIDLTool', 'Midl')
 _rc = _Tool('VCResourceCompilerTool', 'ResourceCompile')
 _lib = _Tool('VCLibrarianTool', 'Lib')
 _manifest = _Tool('VCManifestTool', 'Manifest')
+_masm = _Tool('MASM', 'MASM')
 
 
 _AddTool(_compile)
@@ -539,6 +547,7 @@ _AddTool(_midl)
 _AddTool(_rc)
 _AddTool(_lib)
 _AddTool(_manifest)
+_AddTool(_masm)
 # Add sections only found in the MSBuild settings.
 _msbuild_validators[''] = {}
 _msbuild_validators['ProjectReference'] = {}
@@ -602,7 +611,8 @@ _Same(_compile, 'BrowseInformation',
 _Same(_compile, 'CallingConvention',
       _Enumeration(['Cdecl',  # /Gd
                     'FastCall',  # /Gr
-                    'StdCall']))  # /Gz
+                    'StdCall',  # /Gz
+                    'VectorCall']))  # /Gv
 _Same(_compile, 'CompileAs',
       _Enumeration(['Default',
                     'CompileAsC',  # /TC
@@ -618,7 +628,10 @@ _Same(_compile, 'EnableEnhancedInstructionSet',
                     'StreamingSIMDExtensions',  # /arch:SSE
                     'StreamingSIMDExtensions2',  # /arch:SSE2
                     'AdvancedVectorExtensions',  # /arch:AVX (vs2012+)
-                    'NoExtensions',]))  # /arch:IA32 (vs2012+)
+                    'NoExtensions',  # /arch:IA32 (vs2012+)
+                    # This one only exists in the new msbuild format.
+                    'AdvancedVectorExtensions2',  # /arch:AVX2 (vs2013r2+)
+                    ]))
 _Same(_compile, 'ErrorReporting',
       _Enumeration(['None',  # /errorReport:none
                     'Prompt',  # /errorReport:prompt
@@ -695,10 +708,7 @@ _MSVSOnly(_compile, 'UseUnicodeResponseFiles', _boolean)
 _MSBuildOnly(_compile, 'BuildingInIDE', _boolean)
 _MSBuildOnly(_compile, 'CompileAsManaged',
              _Enumeration([], new=['false',
-                                   'true',  # /clr
-                                   'Pure',  # /clr:pure
-                                   'Safe',  # /clr:safe
-                                   'OldSyntax']))  # /clr:oldSyntax
+                                   'true']))  # /clr
 _MSBuildOnly(_compile, 'CreateHotpatchableImage', _boolean)  # /hotpatch
 _MSBuildOnly(_compile, 'MultiProcessorCompilation', _boolean)  # /MP
 _MSBuildOnly(_compile, 'PreprocessOutputPath', _string)  # /Fi
@@ -1076,3 +1086,11 @@ _MSBuildOnly(_manifest, 'ManifestFromManagedAssembly',
 _MSBuildOnly(_manifest, 'OutputResourceManifests', _string)  # /outputresource
 _MSBuildOnly(_manifest, 'SuppressDependencyElement', _boolean)  # /nodependency
 _MSBuildOnly(_manifest, 'TrackerLogDirectory', _folder_name)
+
+
+# Directives for MASM.
+# See "$(VCTargetsPath)\BuildCustomizations\masm.xml" for the schema of the
+# MSBuild MASM settings.
+
+# Options that have the same name in MSVS and MSBuild.
+_Same(_masm, 'UseSafeExceptionHandlers', _boolean)  # /safeseh

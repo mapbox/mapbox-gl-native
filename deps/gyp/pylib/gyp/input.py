@@ -28,7 +28,12 @@ from gyp.common import OrderedSet
 
 
 # A list of types that are treated as linkable.
-linkable_types = ['executable', 'shared_library', 'loadable_module']
+linkable_types = [
+  'executable',
+  'shared_library',
+  'loadable_module',
+  'mac_kernel_extension',
+]
 
 # A list of sections that contain links to other targets.
 dependency_sections = ['dependencies', 'export_dependent_settings']
@@ -48,11 +53,16 @@ base_path_sections = [
 ]
 path_sections = set()
 
+# These per-process dictionaries are used to cache build file data when loading
+# in parallel mode.
+per_process_data = {}
+per_process_aux_data = {}
+
 def IsPathSection(section):
   # If section ends in one of the '=+?!' characters, it's applied to a section
   # without the trailing characters.  '/' is notably absent from this list,
   # because there's no way for a regular expression to be treated as a path.
-  while section[-1:] in '=+?!':
+  while section and section[-1:] in '=+?!':
     section = section[:-1]
 
   if section in path_sections:
@@ -210,8 +220,8 @@ def CheckNode(node, keypath):
   elif isinstance(node, Const):
     return node.getChildren()[0]
   else:
-    raise TypeError, "Unknown AST node at key path '" + '.'.join(keypath) + \
-         "': " + repr(node)
+    raise TypeError("Unknown AST node at key path '" + '.'.join(keypath) +
+         "': " + repr(node))
 
 
 def LoadOneBuildFile(build_file_path, data, aux_data, includes,
@@ -341,7 +351,8 @@ def ProcessToolsetsInDict(data):
     for condition in data['conditions']:
       if type(condition) is list:
         for condition_dict in condition[1:]:
-          ProcessToolsetsInDict(condition_dict)
+          if type(condition_dict) is dict:
+            ProcessToolsetsInDict(condition_dict)
 
 
 # TODO(mark): I don't love this name.  It just means that it's going to load
@@ -361,10 +372,17 @@ def LoadTargetBuildFile(build_file_path, data, aux_data, variables, includes,
     else:
       variables['DEPTH'] = d.replace('\\', '/')
 
-  if build_file_path in data['target_build_files']:
-    # Already loaded.
-    return False
-  data['target_build_files'].add(build_file_path)
+  # The 'target_build_files' key is only set when loading target build files in
+  # the non-parallel code path, where LoadTargetBuildFile is called
+  # recursively.  In the parallel code path, we don't need to check whether the
+  # |build_file_path| has already been loaded, because the 'scheduled' set in
+  # ParallelState guarantees that we never load the same |build_file_path|
+  # twice.
+  if 'target_build_files' in data:
+    if build_file_path in data['target_build_files']:
+      # Already loaded.
+      return False
+    data['target_build_files'].add(build_file_path)
 
   gyp.DebugOutput(gyp.DEBUG_INCLUDES,
                   "Loading Target Build File '%s'", build_file_path)
@@ -455,10 +473,8 @@ def LoadTargetBuildFile(build_file_path, data, aux_data, variables, includes,
   else:
     return (build_file_path, dependencies)
 
-
 def CallLoadTargetBuildFile(global_flags,
-                            build_file_path, data,
-                            aux_data, variables,
+                            build_file_path, variables,
                             includes, depth, check,
                             generator_input_info):
   """Wrapper around LoadTargetBuildFile for parallel processing.
@@ -474,35 +490,24 @@ def CallLoadTargetBuildFile(global_flags,
     for key, value in global_flags.iteritems():
       globals()[key] = value
 
-    # Save the keys so we can return data that changed.
-    data_keys = set(data)
-    aux_data_keys = set(aux_data)
-
     SetGeneratorGlobals(generator_input_info)
-    result = LoadTargetBuildFile(build_file_path, data,
-                                 aux_data, variables,
+    result = LoadTargetBuildFile(build_file_path, per_process_data,
+                                 per_process_aux_data, variables,
                                  includes, depth, check, False)
     if not result:
       return result
 
     (build_file_path, dependencies) = result
 
-    data_out = {}
-    for key in data:
-      if key == 'target_build_files':
-        continue
-      if key not in data_keys:
-        data_out[key] = data[key]
-    aux_data_out = {}
-    for key in aux_data:
-      if key not in aux_data_keys:
-        aux_data_out[key] = aux_data[key]
+    # We can safely pop the build_file_data from per_process_data because it
+    # will never be referenced by this process again, so we don't need to keep
+    # it in the cache.
+    build_file_data = per_process_data.pop(build_file_path)
 
     # This gets serialized and sent back to the main process via a pipe.
     # It's handled in LoadTargetBuildFileCallback.
     return (build_file_path,
-            data_out,
-            aux_data_out,
+            build_file_data,
             dependencies)
   except GypError, e:
     sys.stderr.write("gyp: %s\n" % e)
@@ -533,8 +538,6 @@ class ParallelState(object):
     self.condition = None
     # The "data" dict that was passed to LoadTargetBuildFileParallel
     self.data = None
-    # The "aux_data" dict that was passed to LoadTargetBuildFileParallel
-    self.aux_data = None
     # The number of parallel calls outstanding; decremented when a response
     # was received.
     self.pending = 0
@@ -555,12 +558,9 @@ class ParallelState(object):
       self.condition.notify()
       self.condition.release()
       return
-    (build_file_path0, data0, aux_data0, dependencies0) = result
+    (build_file_path0, build_file_data0, dependencies0) = result
+    self.data[build_file_path0] = build_file_data0
     self.data['target_build_files'].add(build_file_path0)
-    for key in data0:
-      self.data[key] = data0[key]
-    for key in aux_data0:
-      self.aux_data[key] = aux_data0[key]
     for new_dependency in dependencies0:
       if new_dependency not in self.scheduled:
         self.scheduled.add(new_dependency)
@@ -570,9 +570,8 @@ class ParallelState(object):
     self.condition.release()
 
 
-def LoadTargetBuildFilesParallel(build_files, data, aux_data,
-                                 variables, includes, depth, check,
-                                 generator_input_info):
+def LoadTargetBuildFilesParallel(build_files, data, variables, includes, depth,
+                                 check, generator_input_info):
   parallel_state = ParallelState()
   parallel_state.condition = threading.Condition()
   # Make copies of the build_files argument that we can modify while working.
@@ -580,7 +579,6 @@ def LoadTargetBuildFilesParallel(build_files, data, aux_data,
   parallel_state.scheduled = set(build_files)
   parallel_state.pending = 0
   parallel_state.data = data
-  parallel_state.aux_data = aux_data
 
   try:
     parallel_state.condition.acquire()
@@ -594,20 +592,16 @@ def LoadTargetBuildFilesParallel(build_files, data, aux_data,
       dependency = parallel_state.dependencies.pop()
 
       parallel_state.pending += 1
-      data_in = {}
-      data_in['target_build_files'] = data['target_build_files']
-      aux_data_in = {}
       global_flags = {
         'path_sections': globals()['path_sections'],
         'non_configuration_keys': globals()['non_configuration_keys'],
         'multiple_toolsets': globals()['multiple_toolsets']}
 
       if not parallel_state.pool:
-        parallel_state.pool = multiprocessing.Pool(8)
+        parallel_state.pool = multiprocessing.Pool(multiprocessing.cpu_count())
       parallel_state.pool.apply_async(
           CallLoadTargetBuildFile,
           args = (global_flags, dependency,
-                  data_in, aux_data_in,
                   variables, includes, depth, check, generator_input_info),
           callback = parallel_state.LoadTargetBuildFileCallback)
   except KeyboardInterrupt, e:
@@ -674,24 +668,24 @@ def IsStrCanonicalInt(string):
 # "<!interpreter(arguments)", "<([list])", and even "<([)" and "<(<())".
 # In the last case, the inner "<()" is captured in match['content'].
 early_variable_re = re.compile(
-    '(?P<replace>(?P<type><(?:(?:!?@?)|\|)?)'
-    '(?P<command_string>[-a-zA-Z0-9_.]+)?'
-    '\((?P<is_array>\s*\[?)'
-    '(?P<content>.*?)(\]?)\))')
+    r'(?P<replace>(?P<type><(?:(?:!?@?)|\|)?)'
+    r'(?P<command_string>[-a-zA-Z0-9_.]+)?'
+    r'\((?P<is_array>\s*\[?)'
+    r'(?P<content>.*?)(\]?)\))')
 
 # This matches the same as early_variable_re, but with '>' instead of '<'.
 late_variable_re = re.compile(
-    '(?P<replace>(?P<type>>(?:(?:!?@?)|\|)?)'
-    '(?P<command_string>[-a-zA-Z0-9_.]+)?'
-    '\((?P<is_array>\s*\[?)'
-    '(?P<content>.*?)(\]?)\))')
+    r'(?P<replace>(?P<type>>(?:(?:!?@?)|\|)?)'
+    r'(?P<command_string>[-a-zA-Z0-9_.]+)?'
+    r'\((?P<is_array>\s*\[?)'
+    r'(?P<content>.*?)(\]?)\))')
 
 # This matches the same as early_variable_re, but with '^' instead of '<'.
 latelate_variable_re = re.compile(
-    '(?P<replace>(?P<type>[\^](?:(?:!?@?)|\|)?)'
-    '(?P<command_string>[-a-zA-Z0-9_.]+)?'
-    '\((?P<is_array>\s*\[?)'
-    '(?P<content>.*?)(\]?)\))')
+    r'(?P<replace>(?P<type>[\^](?:(?:!?@?)|\|)?)'
+    r'(?P<command_string>[-a-zA-Z0-9_.]+)?'
+    r'\((?P<is_array>\s*\[?)'
+    r'(?P<content>.*?)(\]?)\))')
 
 # Global cache of results from running commands so they don't have to be run
 # more then once.
@@ -904,11 +898,15 @@ def ExpandVariables(input, phase, variables, build_file):
         else:
           # Fix up command with platform specific workarounds.
           contents = FixupPlatformCommand(contents)
-          p = subprocess.Popen(contents, shell=use_shell,
-                               stdout=subprocess.PIPE,
-                               stderr=subprocess.PIPE,
-                               stdin=subprocess.PIPE,
-                               cwd=build_file_dir)
+          try:
+            p = subprocess.Popen(contents, shell=use_shell,
+                                 stdout=subprocess.PIPE,
+                                 stderr=subprocess.PIPE,
+                                 stdin=subprocess.PIPE,
+                                 cwd=build_file_dir)
+          except Exception, e:
+            raise GypError("%s while executing command '%s' in %s" %
+                           (e, contents, build_file))
 
           p_stdout, p_stderr = p.communicate('')
 
@@ -916,8 +914,8 @@ def ExpandVariables(input, phase, variables, build_file):
             sys.stderr.write(p_stderr)
             # Simulate check_call behavior, since check_call only exists
             # in python 2.5 and later.
-            raise GypError("Call to '%s' returned exit status %d." %
-                           (contents, p.returncode))
+            raise GypError("Call to '%s' returned exit status %d while in %s." %
+                           (contents, p.returncode, build_file))
           replacement = p_stdout.rstrip()
 
         cached_command_results[cache_key] = replacement
@@ -994,23 +992,29 @@ def ExpandVariables(input, phase, variables, build_file):
     # Prepare for the next match iteration.
     input_str = output
 
-  # Look for more matches now that we've replaced some, to deal with
-  # expanding local variables (variables defined in the same
-  # variables block as this one).
-  gyp.DebugOutput(gyp.DEBUG_VARIABLES, "Found output %r, recursing.", output)
-  if type(output) is list:
-    if output and type(output[0]) is list:
-      # Leave output alone if it's a list of lists.
-      # We don't want such lists to be stringified.
-      pass
-    else:
-      new_output = []
-      for item in output:
-        new_output.append(
-            ExpandVariables(item, phase, variables, build_file))
-      output = new_output
+  if output == input:
+    gyp.DebugOutput(gyp.DEBUG_VARIABLES,
+                    "Found only identity matches on %r, avoiding infinite "
+                    "recursion.",
+                    output)
   else:
-    output = ExpandVariables(output, phase, variables, build_file)
+    # Look for more matches now that we've replaced some, to deal with
+    # expanding local variables (variables defined in the same
+    # variables block as this one).
+    gyp.DebugOutput(gyp.DEBUG_VARIABLES, "Found output %r, recursing.", output)
+    if type(output) is list:
+      if output and type(output[0]) is list:
+        # Leave output alone if it's a list of lists.
+        # We don't want such lists to be stringified.
+        pass
+      else:
+        new_output = []
+        for item in output:
+          new_output.append(
+              ExpandVariables(item, phase, variables, build_file))
+        output = new_output
+    else:
+      output = ExpandVariables(output, phase, variables, build_file)
 
   # Convert all strings that are canonically-represented integers into integers.
   if type(output) is list:
@@ -1031,17 +1035,40 @@ def EvalCondition(condition, conditions_key, phase, variables, build_file):
   that nothing should be used."""
   if type(condition) is not list:
     raise GypError(conditions_key + ' must be a list')
-  if len(condition) != 2 and len(condition) != 3:
+  if len(condition) < 2:
     # It's possible that condition[0] won't work in which case this
     # attempt will raise its own IndexError.  That's probably fine.
     raise GypError(conditions_key + ' ' + condition[0] +
-                   ' must be length 2 or 3, not ' + str(len(condition)))
+                   ' must be at least length 2, not ' + str(len(condition)))
 
-  [cond_expr, true_dict] = condition[0:2]
-  false_dict = None
-  if len(condition) == 3:
-    false_dict = condition[2]
+  i = 0
+  result = None
+  while i < len(condition):
+    cond_expr = condition[i]
+    true_dict = condition[i + 1]
+    if type(true_dict) is not dict:
+      raise GypError('{} {} must be followed by a dictionary, not {}'.format(
+        conditions_key, cond_expr, type(true_dict)))
+    if len(condition) > i + 2 and type(condition[i + 2]) is dict:
+      false_dict = condition[i + 2]
+      i = i + 3
+      if i != len(condition):
+        raise GypError('{} {} has {} unexpected trailing items'.format(
+          conditions_key, cond_expr, len(condition) - i))
+    else:
+      false_dict = None
+      i = i + 2
+    if result == None:
+      result = EvalSingleCondition(
+          cond_expr, true_dict, false_dict, phase, variables, build_file)
 
+  return result
+
+
+def EvalSingleCondition(
+    cond_expr, true_dict, false_dict, phase, variables, build_file):
+  """Returns true_dict if cond_expr evaluates to true, and false_dict
+  otherwise."""
   # Do expansions on the condition itself.  Since the conditon can naturally
   # contain variable references without needing to resort to GYP expansion
   # syntax, this is of dubious value for variables, but someone might want to
@@ -1049,9 +1076,9 @@ def EvalCondition(condition, conditions_key, phase, variables, build_file):
   cond_expr_expanded = ExpandVariables(cond_expr, phase, variables,
                                        build_file)
   if type(cond_expr_expanded) not in (str, int):
-    raise ValueError, \
+    raise ValueError(
           'Variable expansion in this context permits str and int ' + \
-            'only, found ' + cond_expr_expanded.__class__.__name__
+            'only, found ' + cond_expr_expanded.__class__.__name__)
 
   try:
     if cond_expr_expanded in cached_conditions_asts:
@@ -1193,9 +1220,9 @@ def ProcessVariablesAndConditionsInDict(the_dict, phase, variables_in,
     if key != 'variables' and type(value) is str:
       expanded = ExpandVariables(value, phase, variables, build_file)
       if type(expanded) not in (str, int):
-        raise ValueError, \
+        raise ValueError(
               'Variable expansion in this context permits str and int ' + \
-              'only, found ' + expanded.__class__.__name__ + ' for ' + key
+              'only, found ' + expanded.__class__.__name__ + ' for ' + key)
       the_dict[key] = expanded
 
   # Variable expansion may have resulted in changes to automatics.  Reload.
@@ -1264,8 +1291,8 @@ def ProcessVariablesAndConditionsInDict(the_dict, phase, variables_in,
       ProcessVariablesAndConditionsInList(value, phase, variables,
                                           build_file)
     elif type(value) is not int:
-      raise TypeError, 'Unknown type ' + value.__class__.__name__ + \
-                       ' for ' + key
+      raise TypeError('Unknown type ' + value.__class__.__name__ + \
+                      ' for ' + key)
 
 
 def ProcessVariablesAndConditionsInList(the_list, phase, variables,
@@ -1292,13 +1319,13 @@ def ProcessVariablesAndConditionsInList(the_list, phase, variables,
         # without falling into the index increment below.
         continue
       else:
-        raise ValueError, \
+        raise ValueError(
               'Variable expansion in this context permits strings and ' + \
               'lists only, found ' + expanded.__class__.__name__ + ' at ' + \
-              index
+              index)
     elif type(item) is not int:
-      raise TypeError, 'Unknown type ' + item.__class__.__name__ + \
-                       ' at index ' + index
+      raise TypeError('Unknown type ' + item.__class__.__name__ + \
+                      ' at index ' + index)
     index = index + 1
 
 
@@ -1550,26 +1577,25 @@ class DependencyGraphNode(object):
 
     return list(flat_list)
 
-  def FindCycles(self, path=None):
+  def FindCycles(self):
     """
     Returns a list of cycles in the graph, where each cycle is its own list.
     """
-    if path is None:
-      path = [self]
-
     results = []
-    for node in self.dependents:
-      if node in path:
-        cycle = [node]
-        for part in path:
-          cycle.append(part)
-          if part == node:
-            break
-        results.append(tuple(cycle))
-      else:
-        results.extend(node.FindCycles([node] + path))
+    visited = set()
 
-    return list(set(results))
+    def Visit(node, path):
+      for child in node.dependents:
+        if child in path:
+          results.append([child] + path[:path.index(child) + 1])
+        elif not child in visited:
+          visited.add(child)
+          Visit(child, [child] + path)
+
+    visited.add(self)
+    Visit(self, [self])
+
+    return results
 
   def DirectDependencies(self, dependencies=None):
     """Returns a list of just direct dependencies."""
@@ -1645,8 +1671,8 @@ class DependencyGraphNode(object):
       if dependency.ref is None:
         continue
       if dependency.ref not in dependencies:
-        dependencies.add(dependency.ref)
         dependency.DeepDependencies(dependencies)
+        dependencies.add(dependency.ref)
 
     return dependencies
 
@@ -1703,11 +1729,12 @@ class DependencyGraphNode(object):
       dependencies.add(self.ref)
       return dependencies
 
-    # Executables and loadable modules are already fully and finally linked.
-    # Nothing else can be a link dependency of them, there can only be
-    # dependencies in the sense that a dependent target might run an
-    # executable or load the loadable_module.
-    if not initial and target_type in ('executable', 'loadable_module'):
+    # Executables, mac kernel extensions and loadable modules are already fully
+    # and finally linked. Nothing else can be a link dependency of them, there
+    # can only be dependencies in the sense that a dependent target might run
+    # an executable or load the loadable_module.
+    if not initial and target_type in ('executable', 'loadable_module',
+                                       'mac_kernel_extension'):
       return dependencies
 
     # Shared libraries are already fully linked.  They should only be included
@@ -1786,12 +1813,22 @@ def BuildDependencyList(targets):
   flat_list = root_node.FlattenToList()
 
   # If there's anything left unvisited, there must be a circular dependency
-  # (cycle).  If you need to figure out what's wrong, look for elements of
-  # targets that are not in flat_list.
+  # (cycle).
   if len(flat_list) != len(targets):
+    if not root_node.dependents:
+      # If all targets have dependencies, add the first target as a dependent
+      # of root_node so that the cycle can be discovered from root_node.
+      target = targets.keys()[0]
+      target_node = dependency_nodes[target]
+      target_node.dependencies.append(root_node)
+      root_node.dependents.append(target_node)
+
+    cycles = []
+    for cycle in root_node.FindCycles():
+      paths = [node.ref for node in cycle]
+      cycles.append('Cycle: %s' % ' -> '.join(paths))
     raise DependencyGraphNode.CircularException(
-        'Some targets not reachable, cycle in dependency graph detected: ' +
-        ' '.join(set(flat_list) ^ set(targets)))
+        'Cycles in dependency graph detected:\n' + '\n'.join(cycles))
 
   return [dependency_nodes, flat_list]
 
@@ -1841,20 +1878,18 @@ def VerifyNoGYPFileCircularDependencies(targets):
   # If there's anything left unvisited, there must be a circular dependency
   # (cycle).
   if len(flat_list) != len(dependency_nodes):
-    bad_files = []
-    for file in dependency_nodes.iterkeys():
-      if not file in flat_list:
-        bad_files.append(file)
-    common_path_prefix = os.path.commonprefix(dependency_nodes)
+    if not root_node.dependents:
+      # If all files have dependencies, add the first file as a dependent
+      # of root_node so that the cycle can be discovered from root_node.
+      file_node = dependency_nodes.values()[0]
+      file_node.dependencies.append(root_node)
+      root_node.dependents.append(file_node)
     cycles = []
     for cycle in root_node.FindCycles():
-      simplified_paths = []
-      for node in cycle:
-        assert(node.ref.startswith(common_path_prefix))
-        simplified_paths.append(node.ref[len(common_path_prefix):])
-      cycles.append('Cycle: %s' % ' -> '.join(simplified_paths))
-    raise DependencyGraphNode.CircularException, \
-        'Cycles in .gyp file dependency graph detected:\n' + '\n'.join(cycles)
+      paths = [node.ref for node in cycle]
+      cycles.append('Cycle: %s' % ' -> '.join(paths))
+    raise DependencyGraphNode.CircularException(
+        'Cycles in .gyp file dependency graph detected:\n' + '\n'.join(cycles))
 
 
 def DoDependentSettings(key, flat_list, targets, dependency_nodes):
@@ -2044,9 +2079,9 @@ def MergeLists(to, fro, to_file, fro_file, is_paths=False, append=True):
       to_item = []
       MergeLists(to_item, item, to_file, fro_file)
     else:
-      raise TypeError, \
+      raise TypeError(
           'Attempt to merge list item of unsupported type ' + \
-          item.__class__.__name__
+          item.__class__.__name__)
 
     if append:
       # If appending a singleton that's already in the list, don't append.
@@ -2088,10 +2123,10 @@ def MergeDicts(to, fro, to_file, fro_file):
         bad_merge = True
 
       if bad_merge:
-        raise TypeError, \
+        raise TypeError(
             'Attempt to merge dict value of type ' + v.__class__.__name__ + \
             ' into incompatible type ' + to[k].__class__.__name__ + \
-            ' for key ' + k
+            ' for key ' + k)
     if type(v) in (str, int):
       # Overwrite the existing value, if any.  Cheap and easy.
       is_path = IsPathSection(k)
@@ -2150,10 +2185,10 @@ def MergeDicts(to, fro, to_file, fro_file):
         elif type(to[list_base]) is not list:
           # This may not have been checked above if merging in a list with an
           # extension character.
-          raise TypeError, \
+          raise TypeError(
               'Attempt to merge dict value of type ' + v.__class__.__name__ + \
               ' into incompatible type ' + to[list_base].__class__.__name__ + \
-              ' for key ' + list_base + '(' + k + ')'
+              ' for key ' + list_base + '(' + k + ')')
       else:
         to[list_base] = []
 
@@ -2165,9 +2200,9 @@ def MergeDicts(to, fro, to_file, fro_file):
       is_paths = IsPathSection(list_base)
       MergeLists(to[list_base], v, to_file, fro_file, is_paths, append)
     else:
-      raise TypeError, \
+      raise TypeError(
           'Attempt to merge dict value of unsupported type ' + \
-          v.__class__.__name__ + ' for key ' + k
+          v.__class__.__name__ + ' for key ' + k)
 
 
 def MergeConfigWithInheritance(new_configuration_dict, build_file,
@@ -2312,8 +2347,8 @@ def ProcessListFiltersInDict(name, the_dict):
       continue
 
     if type(value) is not list:
-      raise ValueError, name + ' key ' + key + ' must be list, not ' + \
-                        value.__class__.__name__
+      raise ValueError(name + ' key ' + key + ' must be list, not ' + \
+                       value.__class__.__name__)
 
     list_key = key[:-1]
     if list_key not in the_dict:
@@ -2325,10 +2360,10 @@ def ProcessListFiltersInDict(name, the_dict):
 
     if type(the_dict[list_key]) is not list:
       value = the_dict[list_key]
-      raise ValueError, name + ' key ' + list_key + \
-                        ' must be list, not ' + \
-                        value.__class__.__name__ + ' when applying ' + \
-                        {'!': 'exclusion', '/': 'regex'}[operation]
+      raise ValueError(name + ' key ' + list_key + \
+                       ' must be list, not ' + \
+                       value.__class__.__name__ + ' when applying ' + \
+                       {'!': 'exclusion', '/': 'regex'}[operation])
 
     if not list_key in lists:
       lists.append(list_key)
@@ -2377,8 +2412,8 @@ def ProcessListFiltersInDict(name, the_dict):
           action_value = 1
         else:
           # This is an action that doesn't make any sense.
-          raise ValueError, 'Unrecognized action ' + action + ' in ' + name + \
-                            ' key ' + regex_key
+          raise ValueError('Unrecognized action ' + action + ' in ' + name + \
+                           ' key ' + regex_key)
 
         for index in xrange(0, len(the_list)):
           list_item = the_list[index]
@@ -2450,7 +2485,7 @@ def ValidateTargetType(target, target_dict):
   """
   VALID_TARGET_TYPES = ('executable', 'loadable_module',
                         'static_library', 'shared_library',
-                        'none')
+                        'mac_kernel_extension', 'none')
   target_type = target_dict.get('type', None)
   if target_type not in VALID_TARGET_TYPES:
     raise GypError("Target %s has an invalid target type '%s'.  "
@@ -2463,9 +2498,11 @@ def ValidateTargetType(target, target_dict):
                                                              target_type))
 
 
-def ValidateSourcesInTarget(target, target_dict, build_file):
-  # TODO: Check if MSVC allows this for loadable_module targets.
-  if target_dict.get('type', None) not in ('static_library', 'shared_library'):
+def ValidateSourcesInTarget(target, target_dict, build_file,
+                            duplicate_basename_check):
+  if not duplicate_basename_check:
+    return
+  if target_dict.get('type', None) != 'static_library':
     return
   sources = target_dict.get('sources', [])
   basenames = {}
@@ -2485,8 +2522,8 @@ def ValidateSourcesInTarget(target, target_dict, build_file):
 
   if error:
     print('static library %s has several files with the same basename:\n' %
-          target + error + 'Some build systems, e.g. MSVC08, '
-          'cannot handle that.')
+          target + error + 'libtool on Mac cannot handle that. Use '
+          '--no-duplicate-basename-check to disable this validation.')
     raise GypError('Duplicate basenames in sources section, see list above')
 
 
@@ -2710,7 +2747,7 @@ def SetGeneratorGlobals(generator_input_info):
 
 
 def Load(build_files, variables, includes, depth, generator_input_info, check,
-         circular_check, parallel, root_targets):
+         circular_check, duplicate_basename_check, parallel, root_targets):
   SetGeneratorGlobals(generator_input_info)
   # A generator can have other lists (in addition to sources) be processed
   # for rules.
@@ -2724,15 +2761,14 @@ def Load(build_files, variables, includes, depth, generator_input_info, check,
   # well as meta-data (e.g. 'included_files' key). 'target_build_files' keeps
   # track of the keys corresponding to "target" files.
   data = {'target_build_files': set()}
-  aux_data = {}
   # Normalize paths everywhere.  This is important because paths will be
   # used as keys to the data dict and for references between input files.
   build_files = set(map(os.path.normpath, build_files))
   if parallel:
-    LoadTargetBuildFilesParallel(build_files, data, aux_data,
-                                 variables, includes, depth, check,
-                                 generator_input_info)
+    LoadTargetBuildFilesParallel(build_files, data, variables, includes, depth,
+                                 check, generator_input_info)
   else:
+    aux_data = {}
     for build_file in build_files:
       try:
         LoadTargetBuildFile(build_file, data, aux_data,
@@ -2843,10 +2879,8 @@ def Load(build_files, variables, includes, depth, generator_input_info, check,
     target_dict = targets[target]
     build_file = gyp.common.BuildFile(target)
     ValidateTargetType(target, target_dict)
-    # TODO(thakis): Get vpx_scale/arm/scalesystemdependent.c to be renamed to
-    #               scalesystemdependent_arm_additions.c or similar.
-    if 'arm' not in variables.get('target_arch', ''):
-      ValidateSourcesInTarget(target, target_dict, build_file)
+    ValidateSourcesInTarget(target, target_dict, build_file,
+                            duplicate_basename_check)
     ValidateRulesInTarget(target, target_dict, extra_sources_for_rules)
     ValidateRunAsInTarget(target, target_dict, build_file)
     ValidateActionsInTarget(target, target_dict, build_file)

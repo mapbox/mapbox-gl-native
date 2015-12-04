@@ -116,14 +116,16 @@ class WinTool(object):
     env = self._GetEnv(arch)
     if use_separate_mspdbsrv == 'True':
       self._UseSeparateMspdbsrv(env, args)
-    link = subprocess.Popen(args,
+    link = subprocess.Popen([args[0].replace('/', '\\')] + list(args[1:]),
                             shell=True,
                             env=env,
                             stdout=subprocess.PIPE,
                             stderr=subprocess.STDOUT)
     out, _ = link.communicate()
     for line in out.splitlines():
-      if not line.startswith('   Creating library '):
+      if (not line.startswith('   Creating library ') and
+          not line.startswith('Generating code') and
+          not line.startswith('Finished generating code')):
         print line
     return link.returncode
 
@@ -259,9 +261,6 @@ class WinTool(object):
   def ExecAsmWrapper(self, arch, *args):
     """Filter logo banner from invocations of asm.exe."""
     env = self._GetEnv(arch)
-    # MSVS doesn't assemble x64 asm files.
-    if arch == 'environment.x64':
-      return 0
     popen = subprocess.Popen(args, shell=True, env=env,
                              stdout=subprocess.PIPE, stderr=subprocess.STDOUT)
     out, _ = popen.communicate()

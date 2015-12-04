@@ -19,10 +19,13 @@ import re
 import xml.sax.saxutils
 
 
-def _WriteWorkspace(main_gyp, sources_gyp):
+def _WriteWorkspace(main_gyp, sources_gyp, params):
   """ Create a workspace to wrap main and sources gyp paths. """
   (build_file_root, build_file_ext) = os.path.splitext(main_gyp)
   workspace_path = build_file_root + '.xcworkspace'
+  options = params['options']
+  if options.generator_output:
+    workspace_path = os.path.join(options.generator_output, workspace_path)
   try:
     os.makedirs(workspace_path)
   except OSError, e:
@@ -64,10 +67,13 @@ def _TargetFromSpec(old_spec, params):
 
   target_name = old_spec.get('target_name')
   product_name = old_spec.get('product_name', target_name)
+  product_extension = old_spec.get('product_extension')
 
   ninja_target = {}
   ninja_target['target_name'] = target_name
   ninja_target['product_name'] = product_name
+  if product_extension:
+    ninja_target['product_extension'] = product_extension
   ninja_target['toolset'] = old_spec.get('toolset')
   ninja_target['default_configuration'] = old_spec.get('default_configuration')
   ninja_target['configurations'] = {}
@@ -80,7 +86,8 @@ def _TargetFromSpec(old_spec, params):
 
   if 'configurations' in old_spec:
     for config in old_spec['configurations'].iterkeys():
-      old_xcode_settings = old_spec['configurations'][config]['xcode_settings']
+      old_xcode_settings = \
+        old_spec['configurations'][config].get('xcode_settings', {})
       if 'IPHONEOS_DEPLOYMENT_TARGET' in old_xcode_settings:
         new_xcode_settings['CODE_SIGNING_REQUIRED'] = "NO"
         new_xcode_settings['IPHONEOS_DEPLOYMENT_TARGET'] = \
@@ -90,6 +97,10 @@ def _TargetFromSpec(old_spec, params):
           new_xcode_settings
 
   ninja_target['mac_bundle'] = old_spec.get('mac_bundle', 0)
+  ninja_target['ios_app_extension'] = old_spec.get('ios_app_extension', 0)
+  ninja_target['ios_watchkit_extension'] = \
+      old_spec.get('ios_watchkit_extension', 0)
+  ninja_target['ios_watchkit_app'] = old_spec.get('ios_watchkit_app', 0)
   ninja_target['type'] = old_spec['type']
   if ninja_toplevel:
     ninja_target['actions'] = [
@@ -218,9 +229,11 @@ def CreateWrapper(target_list, target_dicts, data, params):
 
   sources = []
   for target, target_dict in target_dicts.iteritems():
-    base =  os.path.dirname(target)
+    base = os.path.dirname(target)
     files = target_dict.get('sources', []) + \
             target_dict.get('mac_bundle_resources', [])
+    for action in target_dict.get('actions', []):
+      files.extend(action.get('inputs', []))
     # Remove files starting with $. These are mostly intermediate files for the
     # build system.
     files = [ file for file in files if not file.startswith('$')]
@@ -253,5 +266,5 @@ def CreateWrapper(target_list, target_dicts, data, params):
   new_data[sources_gyp]['targets'].append(new_data_target)
 
   # Write workspace to file.
-  _WriteWorkspace(main_gyp, sources_gyp)
+  _WriteWorkspace(main_gyp, sources_gyp, params)
   return (new_target_list, new_target_dicts, new_data)
