@@ -3,19 +3,37 @@ package com.mapbox.mapboxsdk.views;
 import android.content.Context;
 import android.graphics.Canvas;
 import android.graphics.PointF;
+import android.graphics.Rect;
 import android.graphics.RectF;
 import android.util.AttributeSet;
 import android.view.MotionEvent;
 import android.view.View;
 
+import com.mapbox.mapboxsdk.geometry.BoundingBox;
+import com.mapbox.mapboxsdk.geometry.LatLng;
+
 import java.util.ArrayList;
 import java.util.List;
 
+/**
+ * View placed over the GL MapView that can draw {@link Overlay}s.
+ */
 final class MapOverlayDispatch extends View {
 
-    private List<Overlay> _overlayList = new ArrayList<>();
-    private PointF _wgsCenter = new PointF();
-    private RectF _wgsBounds = new RectF();
+    //region FIELDS ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+
+    private List<Overlay> mOverlayList = new ArrayList<>();
+    private LatLng mWgsCenter = null;
+    private BoundingBox mWgsBounds = null;
+    private final Rect mMapPixelBounds = new Rect();
+    private float mBearing = 0;
+    private float mZoom = 0;
+    private MapView mMapView = null;
+    private boolean mAttached = false;
+
+    //endregion
+
+    //region CONSTRUCTOR ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
 
     public MapOverlayDispatch(Context context) {
         super(context);
@@ -29,44 +47,108 @@ final class MapOverlayDispatch extends View {
         super(context, attrs, defStyleAttr);
     }
 
+    //endregion
+
+    //region LIFE CYCLE ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+
     @Override
     protected void onDraw(Canvas canvas) {
-        super.onDraw(canvas);
-        for (int i = 0; i < _overlayList.size(); i++) {
-            Overlay overlay = _overlayList.get(i);
-            if (overlay.isEnabled()) {
-                overlay.drawLayer(canvas, _wgsBounds, _wgsCenter);
+        if (mMapView != null && mWgsBounds != null && mWgsCenter != null) {
+            Overlay overlay;
+            for (int i = 0; i < mOverlayList.size(); i++) {
+                overlay = mOverlayList.get(i);
+                if (overlay.isOverlayDrawEnabled()) {
+                    overlay.onOverlayDraw(mMapView, canvas, mWgsBounds, mWgsCenter, mBearing, mZoom);
+                }
             }
         }
+
+        super.onDraw(canvas);
     }
 
     @Override
-    public boolean onTouchEvent(MotionEvent event) {
-        for (int i = 0; i < _overlayList.size(); i++) {
-            _overlayList.get(i).onTouchEvent(event);
+    protected void onAttachedToWindow() {
+        super.onAttachedToWindow();
+        mAttached = true;
+        onOverlayAttached();
+    }
+
+    @Override
+    protected void onDetachedFromWindow() {
+        super.onDetachedFromWindow();
+        mAttached = false;
+        onOverlayDettached();
+    }
+
+    //endregion
+
+    //region PRIVATE ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+
+    private void onOverlayAttached() {
+        for (int i = 0; i < mOverlayList.size(); i++) {
+            mOverlayList.get(i).onOverlayAttached(mMapView);
         }
-        return super.onTouchEvent(event);
     }
 
-    public void addOverlay(Overlay overlay) {
-        _overlayList.add(overlay);
+    private void onOverlayDettached() {
+        for (int i = 0; i < mOverlayList.size(); i++) {
+            mOverlayList.get(i).onOverlayDetached();
+        }
     }
 
-    public void clearOverlays() {
-        _overlayList.clear();
+    void onOverlayTouchEvent(MotionEvent event) {
+        for (int i = 0; i < mOverlayList.size(); i++) {
+            mOverlayList.get(i).onOverlayTouchEvent(event);
+        }
     }
 
-    public void removeOverlay(Overlay overlay) {
-        _overlayList.remove(overlay);
+    //endregion
+
+    //region PACKAGE LOCAL ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+
+    void setMapView(MapView mapView) {
+        mMapView = mapView;
     }
 
-    public void invalidate(final RectF wgsBounds, final PointF wgsCenter) {
-        _wgsCenter.set(wgsCenter);
+    void onOverlaySingleTapConfirmed(LatLng pressPosition) {
+        for (int i = 0; i < mOverlayList.size(); i++) {
+            mOverlayList.get(i).onOverlaySingleTapConfirmed(pressPosition);
+        }
+    }
 
-        //left, top, right, bottom
-        _wgsBounds.set(wgsBounds);
+    void onOverlayLongPress(LatLng pressPosition) {
+        for (int i = 0; i < mOverlayList.size(); i++) {
+            mOverlayList.get(i).onOverlayLongPress(pressPosition);
+        }
+    }
 
+    void addOverlay(Overlay overlay) {
+        if (mAttached) {
+            overlay.onOverlayAttached(mMapView);
+        }
+
+        mOverlayList.add(overlay);
+    }
+
+    void removeOverlay(Overlay overlay) {
+        mOverlayList.remove(overlay);
+    }
+
+    void update(final BoundingBox wgsBounds, final LatLng wgsCenter, float bearing, float zoom) {
+        mWgsCenter = wgsCenter;
+        mWgsBounds = wgsBounds;
+        mBearing = bearing;
+        mZoom = zoom;
         super.invalidate();
-
     }
+
+    void onSizeChanged(int width, int height) {
+        //left top right bottom
+        mMapPixelBounds.set(0, 0, width, height);
+        for (int i = 0; i < mOverlayList.size(); i++) {
+            mOverlayList.get(i).onMapViewPixelSizeChanged(mMapPixelBounds);
+        }
+    }
+
+    //endregion
 }

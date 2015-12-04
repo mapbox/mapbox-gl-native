@@ -449,6 +449,10 @@ final class NativeMapView {
         return nativeGetTopOffsetPixelsForAnnotationSymbol(mNativeMapViewPtr, symbolName);
     }
 
+    public void updateMapBounds(BoundingBox wgsBounds, LatLng wgsCenter) {
+        nativeUpdateMapBounds(mNativeMapViewPtr, wgsBounds, wgsCenter);
+    }
+
     //
     // Callbacks
     //
@@ -629,4 +633,6 @@ final class NativeMapView {
     private native LatLng nativeLatLngForPixel(long nativeMapViewPtr, PointF pixel);
 
     private native double nativeGetTopOffsetPixelsForAnnotationSymbol(long nativeMapViewPtr, String symbolName);
+
+    private native void nativeUpdateMapBounds(long nativeMapViewPtr, BoundingBox wgsBounds, LatLng wgsCenter);
 }

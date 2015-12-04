@@ -210,6 +210,8 @@ public final class MapView extends FrameLayout {
     // Used for the compass
     private CompassView mCompassView;
 
+    private MapOverlayDispatch mapOverlayDispatch;
+
     // Used for displaying annotations
     // Every annotation that has been added to the map
     private final List<Annotation> mAnnotations = new ArrayList<>();
@@ -718,6 +720,10 @@ public final class MapView extends FrameLayout {
         // Setup compass
         mCompassView = (CompassView) view.findViewById(R.id.compassView);
         mCompassView.setOnClickListener(new CompassView.CompassClickListener(this));
+
+        // Overlays
+        mapOverlayDispatch = (MapOverlayDispatch) view.findViewById(R.id.overlayDispatch);
+        mapOverlayDispatch.setMapView(this);
 
         // Setup Mapbox logo
         mLogoView = (ImageView) view.findViewById(R.id.logoView);
@@ -2352,6 +2358,7 @@ public final class MapView extends FrameLayout {
 
     @Override
     protected void onSizeChanged(int width, int height, int oldw, int oldh) {
+        mapOverlayDispatch.onSizeChanged(width, height);
         if (!isInEditMode()) {
             mNativeMapView.resizeView((int) (width / mScreenDensity), (int) (height / mScreenDensity));
         }
@@ -2359,6 +2366,9 @@ public final class MapView extends FrameLayout {
 
     // This class handles TextureView callbacks
     private class SurfaceTextureListener implements TextureView.SurfaceTextureListener {
+
+        private final LatLng mWgsCenter = new LatLng();
+        private final BoundingBox mWgsBounds = new BoundingBox();
 
         // Called when the native surface texture has been created
         // Must do all EGL/GL ES initialization here
@@ -2389,6 +2399,8 @@ public final class MapView extends FrameLayout {
         // Must sync with UI here
         @Override
         public void onSurfaceTextureUpdated(SurfaceTexture surface) {
+            mNativeMapView.updateMapBounds(mWgsBounds, mWgsCenter);
+            mapOverlayDispatch.update(mWgsBounds, mWgsCenter, (float) getDirection(), (float) getZoomLevel());
             mCompassView.update(getDirection());
             mUserLocationView.update();
             for (InfoWindow infoWindow : mInfoWindows) {
@@ -2465,8 +2477,9 @@ public final class MapView extends FrameLayout {
     // Called when user touches the screen, all positions are absolute
     @Override
     public boolean onTouchEvent(@NonNull MotionEvent event) {
-        // Check and ignore non touch or left clicks
+        mapOverlayDispatch.onOverlayTouchEvent(event);
 
+        // Check and ignore non touch or left clicks
         if ((event.getButtonState() != 0) && (event.getButtonState() != MotionEvent.BUTTON_PRIMARY)) {
             return false;
         }
@@ -2496,9 +2509,7 @@ public final class MapView extends FrameLayout {
                 // First pointer up
                 long tapInterval = event.getEventTime() - event.getDownTime();
                 boolean isTap = tapInterval <= ViewConfiguration.getTapTimeout();
-                boolean inProgress = mRotateGestureDetector.isInProgress()
-                        || mScaleGestureDetector.isInProgress()
-                        || mShoveGestureDetector.isInProgress();
+                boolean inProgress = mRotateGestureDetector.isInProgress() || mScaleGestureDetector.isInProgress();
 
                 if (mTwoTap && isTap && !inProgress) {
                     PointF focalPoint = TwoFingerGestureDetector.determineFocalPoint(event);
@@ -2579,6 +2590,7 @@ public final class MapView extends FrameLayout {
         public boolean onSingleTapConfirmed(MotionEvent e) {
             // Open / Close InfoWindow
             PointF tapPoint = new PointF(e.getX(), e.getY());
+            mapOverlayDispatch.onOverlaySingleTapConfirmed(fromScreenLocation(tapPoint));
 
             final float toleranceSides = 30 * mScreenDensity;
             final float toleranceTop = 40 * mScreenDensity;
@@ -2671,8 +2683,9 @@ public final class MapView extends FrameLayout {
         // Called for a long press
         @Override
         public void onLongPress(MotionEvent e) {
+            LatLng point = fromScreenLocation(new PointF(e.getX(), e.getY()));
+            mapOverlayDispatch.onOverlayLongPress(point);
             if (mOnMapLongClickListener != null && !mQuickZoom) {
-                LatLng point = fromScreenLocation(new PointF(e.getX(), e.getY()));
                 mOnMapLongClickListener.onMapLongClick(point);
             }
         }
@@ -3382,6 +3395,27 @@ public final class MapView extends FrameLayout {
     @UiThread
     public void setOnMapClickListener(@Nullable OnMapClickListener listener) {
         mOnMapClickListener = listener;
+    }
+
+    /**
+     * Add an {@link Overlay}.
+     * Note: Overlays will be drawn in the order added (first: bottom, last: top).
+     *
+     * @param overlay the overlay to add.
+     */
+    @UiThread
+    public void addOverlay(Overlay overlay) {
+        mapOverlayDispatch.addOverlay(overlay);
+    }
+
+    /**
+     * Remove an {@link Overlay}.
+     *
+     * @param overlay the overlay to remove.
+     */
+    @UiThread
+    public void removeOverlay(Overlay overlay) {
+        mapOverlayDispatch.removeOverlay(overlay);
     }
 
     /**
