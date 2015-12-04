@@ -103,9 +103,6 @@ for i in `ls -R include/mbgl/ios | grep -vi private`; do
     cp -pv include/mbgl/ios/$i "${OUTPUT}/static/Headers"
 done
 
-step "Setting up dummy source file for CocoaPods 0.37.0..."
-echo "// https://github.com/mapbox/mapbox-gl-native/issues/1426" > "${OUTPUT}/static/MGLDummy.m"
-
 
 # Manually create resource bundle. We don't use a GYP target here because of
 # complications between faked GYP bundles-as-executables, device build
