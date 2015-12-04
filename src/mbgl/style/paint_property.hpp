@@ -24,7 +24,7 @@ class PaintProperty {
 public:
     using Fn = Function<Result>;
 
-    PaintProperty(T fallbackValue)
+    explicit PaintProperty(T fallbackValue)
         : value(fallbackValue) {
         values.emplace(ClassID::Fallback, Fn(fallbackValue));
     }

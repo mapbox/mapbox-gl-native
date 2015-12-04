@@ -8,9 +8,9 @@ namespace mbgl {
 
 class BackgroundPaintProperties {
 public:
-    PaintProperty<float> opacity = 1.0f;
-    PaintProperty<Color> color = { {{ 0, 0, 0, 1 }} };
-    PaintProperty<std::string, Faded<std::string>> pattern = { "" };
+    PaintProperty<float> opacity { 1.0f };
+    PaintProperty<Color> color { {{ 0, 0, 0, 1 }} };
+    PaintProperty<std::string, Faded<std::string>> pattern { "" };
 };
 
 class BackgroundLayer : public StyleLayer {

@@ -9,24 +9,24 @@ namespace mbgl {
 
 class LineLayoutProperties {
 public:
-    LayoutProperty<CapType> cap = CapType::Butt;
-    LayoutProperty<JoinType> join = JoinType::Miter;
-    LayoutProperty<float> miterLimit = 2.0f;
-    LayoutProperty<float> roundLimit = 1.0f;
+    LayoutProperty<CapType> cap { CapType::Butt };
+    LayoutProperty<JoinType> join { JoinType::Miter };
+    LayoutProperty<float> miterLimit { 2.0f };
+    LayoutProperty<float> roundLimit { 1.0f };
 };
 
 class LinePaintProperties {
 public:
-    PaintProperty<float> opacity = 1.0f;
-    PaintProperty<Color> color = { {{ 0, 0, 0, 1 }} };
-    PaintProperty<std::array<float, 2>> translate = { {{ 0, 0 }} };
-    PaintProperty<TranslateAnchorType> translateAnchor = TranslateAnchorType::Map;
-    PaintProperty<float> width = 1;
-    PaintProperty<float> gapWidth = 0;
-    PaintProperty<float> blur = 0;
-    PaintProperty<float> offset = 0;
-    PaintProperty<std::vector<float>, Faded<std::vector<float>>> dasharray = { {} };
-    PaintProperty<std::string, Faded<std::string>> pattern = { "" };
+    PaintProperty<float> opacity { 1.0f };
+    PaintProperty<Color> color { {{ 0, 0, 0, 1 }} };
+    PaintProperty<std::array<float, 2>> translate { {{ 0, 0 }} };
+    PaintProperty<TranslateAnchorType> translateAnchor { TranslateAnchorType::Map };
+    PaintProperty<float> width { 1 };
+    PaintProperty<float> gapWidth { 0 };
+    PaintProperty<float> blur { 0 };
+    PaintProperty<float> offset { 0 };
+    PaintProperty<std::vector<float>, Faded<std::vector<float>>> dasharray { {} };
+    PaintProperty<std::string, Faded<std::string>> pattern { "" };
 
     // Special case
     float dashLineWidth = 1;

@@ -14,7 +14,7 @@ using JSVal = rapidjson::Value;
 template <typename T>
 class LayoutProperty {
 public:
-    LayoutProperty(T v) : value(std::move(v)) {}
+    explicit LayoutProperty(T v) : value(std::move(v)) {}
 
     void parse(const char * name, const JSVal& layout) {
         if (layout.HasMember(name)) {
@@ -28,6 +28,7 @@ public:
         }
     }
 
+    void operator=(const T& v) { value = v; }
     operator T() const { return value; }
 
     mapbox::util::optional<Function<T>> parsedValue;
