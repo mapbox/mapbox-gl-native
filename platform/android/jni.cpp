@@ -1436,6 +1436,35 @@ jobject JNICALL nativePixelForLatLng(JNIEnv *env, jobject obj, jlong nativeMapVi
     return ret;
 }
 
+void JNICALL nativeUpdateMapBounds(JNIEnv *env, jobject obj, jlong nativeMapViewPtr, jobject wgsBounds, jobject wgsCenter) {
+    mbgl::Log::Debug(mbgl::Event::JNI, "nativeUpdateMapBounds");
+    assert(nativeMapViewPtr != 0);
+    NativeMapView *nativeMapView = reinterpret_cast<NativeMapView *>(nativeMapViewPtr);
+    
+    mbgl::LatLng center = nativeMapView->getMap().getLatLng();
+    double w = static_cast<double>(nativeMapView->getWidth());
+    double h = static_cast<double>(nativeMapView->getHeight());
+
+    env->SetDoubleField(wgsCenter, latLngLatitudeId, center.latitude);
+    env->SetDoubleField(wgsCenter, latLngLongitudeId, center.longitude);
+
+    mbgl::LatLngBounds bounds = mbgl::LatLngBounds::getExtendable();
+
+    mbgl::PrecisionPoint pixel = {0, 0};
+    bounds.extend(nativeMapView->getMap().latLngForPixel(pixel)); //bottom left
+    pixel.x = w;
+    bounds.extend(nativeMapView->getMap().latLngForPixel(pixel)); //bottom right
+    pixel.y = h;
+    bounds.extend(nativeMapView->getMap().latLngForPixel(pixel)); //top right
+    pixel.x = 0;
+    bounds.extend(nativeMapView->getMap().latLngForPixel(pixel)); //top left
+
+    env->SetDoubleField(wgsBounds, bboxLatNorthId, bounds.ne.latitude);
+    env->SetDoubleField(wgsBounds, bboxLatSouthId, bounds.sw.latitude);
+    env->SetDoubleField(wgsBounds, bboxLonEastId, bounds.ne.longitude);
+    env->SetDoubleField(wgsBounds, bboxLonWestId, bounds.sw.longitude);
+}
+
 jobject JNICALL nativeLatLngForPixel(JNIEnv *env, jobject obj, jlong nativeMapViewPtr, jobject pixel) {
     mbgl::Log::Debug(mbgl::Event::JNI, "nativeLatLngForPixel");
     assert(nativeMapViewPtr != 0);
@@ -1961,6 +1990,8 @@ extern "C" JNIEXPORT jint JNICALL JNI_OnLoad(JavaVM *vm, void *reserved) {
          reinterpret_cast<void *>(&nativeLatLngForProjectedMeters)},
         {"nativePixelForLatLng", "(JLcom/mapbox/mapboxsdk/geometry/LatLng;)Landroid/graphics/PointF;",
          reinterpret_cast<void *>(&nativePixelForLatLng)},
+        {"nativeUpdateMapBounds",  "(JLcom/mapbox/mapboxsdk/geometry/BoundingBox;Lcom/mapbox/mapboxsdk/geometry/LatLng;)V",
+         reinterpret_cast<void *>(&nativeUpdateMapBounds)},
         {"nativeLatLngForPixel", "(JLandroid/graphics/PointF;)Lcom/mapbox/mapboxsdk/geometry/LatLng;",
          reinterpret_cast<void *>(&nativeLatLngForPixel)},
         {"nativeGetTopOffsetPixelsForAnnotationSymbol", "(JLjava/lang/String;)D",

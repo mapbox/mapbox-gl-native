@@ -744,6 +744,14 @@ void NativeMapView::resizeView(int w, int h) {
     map->update(mbgl::Update::Dimensions);
 }
 
+int NativeMapView::getWidth() {
+    return width;
+}
+    
+int NativeMapView::getHeight() {
+    return height;
+}
+
 void NativeMapView::resizeFramebuffer(int w, int h) {
     fbWidth = w;
     fbHeight = h;
