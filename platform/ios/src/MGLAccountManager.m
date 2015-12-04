@@ -1,6 +1,5 @@
 #import "MGLAccountManager_Private.h"
 #import "MGLMapboxEvents.h"
-#import "MGLCategoryLoader.h"
 #import "NSProcessInfo+MGLAdditions.h"
 
 #import "FABKitProtocol.h"
@@ -17,9 +16,6 @@
 #pragma mark - Internal
 
 + (void)load {
-    // Load all referenced categories due to absence of -ObjC linker flag
-    [MGLCategoryLoader loadCategories];
-
     // Read the initial configuration from Info.plist.
     NSString *accessToken = [[NSBundle mainBundle] objectForInfoDictionaryKey:@"MGLMapboxAccessToken"];
     if (accessToken.length) {

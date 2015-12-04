@@ -3,7 +3,8 @@
     '../../gyp/common.gypi',
   ],
   'targets': [
-    { 'target_name': 'iosapp',
+    {
+      'target_name': 'iosapp',
       'product_name': 'Mapbox GL',
       'type': 'executable',
       'product_extension': 'app',
@@ -14,50 +15,64 @@
         './polyline.geojson',
         './threestates.geojson',
         './Settings.bundle/',
-        './app-info.plist'
+        './app-info.plist',
       ],
 
       'dependencies': [
-        'mbgl.gyp:core',
-        'mbgl.gyp:platform-<(platform_lib)',
-        'mbgl.gyp:http-<(http_lib)',
-        'mbgl.gyp:asset-<(asset_lib)',
+        'iossdk',
       ],
 
       'sources': [
-        './main.m',
-        './MBXAppDelegate.h',
-        './MBXAppDelegate.m',
-        './MBXCustomCalloutView.h',
-        './MBXCustomCalloutView.m',
-        './MBXViewController.h',
-        './MBXViewController.mm',
+        'main.m',
+        'MBXAppDelegate.h',
+        'MBXAppDelegate.m',
+        'MBXCustomCalloutView.h',
+        'MBXCustomCalloutView.m',
+        'MBXViewController.h',
+        'MBXViewController.mm',
       ],
 
       'xcode_settings': {
         'SDKROOT': 'iphoneos',
         'SUPPORTED_PLATFORMS': 'iphonesimulator iphoneos',
-        'IPHONEOS_DEPLOYMENT_TARGET': '7.0',
+        'IPHONEOS_DEPLOYMENT_TARGET': '8.0',
         'INFOPLIST_FILE': '../ios/app/app-info.plist',
         'TARGETED_DEVICE_FAMILY': '1,2',
-        'COMBINE_HIDPI_IMAGES': 'NO', # don't merge @2x.png images into .tiff files
+        'COMBINE_HIDPI_IMAGES': 'NO', # disable combining @2x, @3x images into .tiff files
+        'COPY_PHASE_STRIP': 'NO',
         'CLANG_ENABLE_OBJC_ARC': 'YES',
         'CLANG_ENABLE_MODULES': 'YES',
+        'LD_RUNPATH_SEARCH_PATHS': [
+          '$(inherited)',
+          '@executable_path/Frameworks',
+        ],
       },
 
       'configurations': {
         'Debug': {
           'xcode_settings': {
             'CODE_SIGN_IDENTITY': 'iPhone Developer',
+            'COPY_PHASE_STRIP': 'NO',
           },
         },
         'Release': {
           'xcode_settings': {
             'CODE_SIGN_IDENTITY': 'iPhone Distribution',
             'ARCHS': [ "armv7", "armv7s", "arm64", "i386", "x86_64" ],
+            'COPY_PHASE_STRIP': 'YES',
           },
         },
       },
+      
+      'copies': [
+        {
+          'destination': '<(PRODUCT_DIR)/$(FRAMEWORKS_FOLDER_PATH)',
+          'files': [
+            '<(PRODUCT_DIR)/Mapbox.framework',
+          ],
+          'xcode_code_sign': 1,
+        },
+      ],
     }
   ]
 }

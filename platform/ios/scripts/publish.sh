@@ -19,7 +19,7 @@ fi
 #
 # zip
 #
-cd build/ios/pkg/static
+cd build/ios/pkg
 ZIP=mapbox-ios-sdk-${PUBLISH_VERSION}${PUBLISH_STYLE}.zip
 rm -f ../${ZIP}
 zip -r ../${ZIP} *

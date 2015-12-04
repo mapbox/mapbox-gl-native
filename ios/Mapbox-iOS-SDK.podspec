@@ -22,16 +22,7 @@ Pod::Spec.new do |m|
 
   m.requires_arc = true
 
-  m.preserve_paths = '**'
-  m.resource_bundle = { 'Mapbox' => 'Mapbox.framework/Mapbox.bundle/*' }
-  m.vendored_frameworks = 'Mapbox.framework'
+  m.vendored_frameworks = 'dynamic/Mapbox.framework'
   m.module_name = 'Mapbox'
-
-  m.frameworks = 'CoreLocation', 'GLKit', 'ImageIO', 'MobileCoreServices', 'QuartzCore', 'SystemConfiguration'
-  m.libraries = 'c++', 'sqlite3', 'z'
-  m.pod_target_xcconfig = {
-    'OTHER_CPLUSPLUSFLAGS' => '-std=gnu++11 -stdlib=libc++',
-    'OTHER_LDFLAGS' => '-ObjC',
-  }
 
 end
