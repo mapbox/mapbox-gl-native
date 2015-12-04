@@ -1490,7 +1490,7 @@ public final class MapView extends FrameLayout {
      * <li>{@code http://...} or {@code https://...}:
      * retrieves the style over the Internet from any web server.</li>
      * <li>{@code asset://...}:
-     * reads the style from the APK {@code asset/} directory.
+     * reads the style from the APK {@code assets/} directory.
      * This is used to load a style bundled with your app.</li>
      * <li>{@code null}: loads the default {@link Style#MAPBOX_STREETS} style.</li>
      * </ul>
