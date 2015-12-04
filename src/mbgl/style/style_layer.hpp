@@ -21,7 +21,7 @@ class Bucket;
 
 using JSVal = rapidjson::Value;
 
-class StyleLayer : public util::noncopyable {
+class StyleLayer {
 public:
     static std::unique_ptr<StyleLayer> create(StyleLayerType);
     virtual std::unique_ptr<StyleLayer> clone() const = 0;
@@ -58,11 +58,13 @@ public:
     VisibilityType visibility = VisibilityType::Visible;
 
 protected:
+    StyleLayer() = default;
+    StyleLayer(const StyleLayer&) = default;
+    StyleLayer& operator=(const StyleLayer&) = delete;
+
     // Stores what render passes this layer is currently enabled for. This depends on the
     // evaluated StyleProperties object and is updated accordingly.
     RenderPass passes = RenderPass::None;
-
-    void copy(const StyleLayer& source);
 };
 
 } // namespace mbgl

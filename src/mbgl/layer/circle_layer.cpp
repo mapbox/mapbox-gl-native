@@ -5,10 +5,7 @@
 namespace mbgl {
 
 std::unique_ptr<StyleLayer> CircleLayer::clone() const {
-    std::unique_ptr<CircleLayer> result = std::make_unique<CircleLayer>();
-    result->copy(*this);
-    result->paint = paint;
-    return std::move(result);
+    return std::make_unique<CircleLayer>(*this);
 }
 
 void CircleLayer::parsePaints(const JSVal& layer) {

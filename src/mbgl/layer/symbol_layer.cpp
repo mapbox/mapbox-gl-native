@@ -6,12 +6,7 @@
 namespace mbgl {
 
 std::unique_ptr<StyleLayer> SymbolLayer::clone() const {
-    std::unique_ptr<SymbolLayer> result = std::make_unique<SymbolLayer>();
-    result->copy(*this);
-    result->layout = layout;
-    result->paint = paint;
-    result->spriteAtlas = spriteAtlas;
-    return std::move(result);
+    return std::make_unique<SymbolLayer>(*this);
 }
 
 void SymbolLayer::parseLayout(const JSVal& value) {

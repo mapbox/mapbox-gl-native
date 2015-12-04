@@ -6,11 +6,7 @@
 namespace mbgl {
 
 std::unique_ptr<StyleLayer> LineLayer::clone() const {
-    std::unique_ptr<LineLayer> result = std::make_unique<LineLayer>();
-    result->copy(*this);
-    result->layout = layout;
-    result->paint = paint;
-    return std::move(result);
+    return std::make_unique<LineLayer>(*this);
 }
 
 void LineLayer::parseLayout(const JSVal& value) {

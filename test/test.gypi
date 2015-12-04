@@ -91,6 +91,7 @@
         'style/glyph_store.cpp',
         'style/pending_resources.cpp',
         'style/resource_loading.cpp',
+        'style/style_layer.cpp',
 
         'sprite/sprite_atlas.cpp',
         'sprite/sprite_image.cpp',

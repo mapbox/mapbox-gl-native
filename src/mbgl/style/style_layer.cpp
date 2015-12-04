@@ -35,16 +35,4 @@ bool StyleLayer::hasRenderPass(RenderPass pass) const {
     return bool(passes & pass);
 }
 
-void StyleLayer::copy(const StyleLayer& src) {
-    id = src.id;
-    ref = src.ref;
-    type = src.type;
-    source = src.source;
-    sourceLayer = src.sourceLayer;
-    filter = src.filter;
-    minZoom = src.minZoom;
-    maxZoom = src.maxZoom;
-    visibility = src.visibility;
-}
-
 } // namespace mbgl
