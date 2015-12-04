@@ -31,13 +31,6 @@ if [[ ${PUBLISH_PLATFORM} = 'ios' ]]; then
 
     mapbox_time "deploy_ios_stripped"
     ./platform/ios/scripts/publish.sh "${PUBLISH_VERSION}"
-
-    # debug symbols but no Bitcode
-    mapbox_time "package_ios_no_bitcode" \
-    make ipackage-no-bitcode
-
-    mapbox_time "deploy_ios_no_bitcode"
-    ./platform/ios/scripts/publish.sh "${PUBLISH_VERSION}" no-bitcode
 else
     # build & test iOS
     mapbox_time "run_ios_tests" \

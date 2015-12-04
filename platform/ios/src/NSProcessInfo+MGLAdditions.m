@@ -2,7 +2,7 @@
 
 @implementation NSProcessInfo (MGLAdditions)
 
-void mgl_linkProcessCategory(){}
+void mgl_linkProcessInfoCategory() {}
 
 - (BOOL)mgl_isInterfaceBuilderDesignablesAgent
 {

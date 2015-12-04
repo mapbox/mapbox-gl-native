@@ -1,8 +1,8 @@
 #import "MBXViewController.h"
 #import "MBXCustomCalloutView.h"
 
-#import <mbgl/ios/Mapbox.h>
-#import <mbgl/util/default_styles.hpp>
+#import <Mapbox/Mapbox.h>
+#import "../../include/mbgl/util/default_styles.hpp"
 
 #import <CoreLocation/CoreLocation.h>
 #import <OpenGLES/ES2/gl.h>

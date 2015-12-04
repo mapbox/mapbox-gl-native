@@ -1,6 +1,6 @@
 #import "MBXAppDelegate.h"
 #import "MBXViewController.h"
-#import <mbgl/ios/Mapbox.h>
+#import <Mapbox/Mapbox.h>
 
 @implementation MBXAppDelegate
 

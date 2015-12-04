@@ -46,6 +46,7 @@ Known issues:
 
 ## iOS master
 
+- The SDK is now distributed as a dynamic framework instead of a static library, resulting in a simpler installation workflow and significantly reduced download size. The framework contains both simulator and device content; due to [an Xcode bug](http://www.openradar.me/radar?id=6409498411401216), you’ll need to strip out the simulator content before submitting your application to the App Store. ([#3183](https://github.com/mapbox/mapbox-gl-native/pull/3183))
 - Fixed an issue causing the entire MGLMapView to leak. ([#3447](https://github.com/mapbox/mapbox-gl-native/pull/3447))
 - `MGLMapView` methods that alter the viewport now accept optional completion handlers. ([#3090](https://github.com/mapbox/mapbox-gl-native/pull/3090))
 - You can now modify an annotation’s image after adding the annotation to the map. ([#3146](https://github.com/mapbox/mapbox-gl-native/pull/3146))

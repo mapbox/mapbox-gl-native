@@ -220,7 +220,7 @@ const NSTimeInterval MGLFlushInterval = 60;
 
         _paused = YES;
         [self resumeMetricsCollection];
-        NSBundle *resourceBundle = [NSBundle bundleWithPath:[NSBundle mgl_resourceBundlePath]];
+        NSBundle *resourceBundle = [NSBundle mgl_frameworkBundle];
 
         // Load Local Copy of Server's Public Key
         NSString *cerPath = nil;
