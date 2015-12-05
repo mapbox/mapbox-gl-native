@@ -45,7 +45,7 @@ class MacTool(object):
     """Transforms a tool name like copy-info-plist to CopyInfoPlist"""
     return name_string.title().replace('-', '')
 
-  def ExecCopyBundleResource(self, source, dest, convert_to_binary):
+  def ExecCopyBundleResource(self, source, dest, convert_to_binary=False):
     """Copies a resource file to the bundle/Resources directory, performing any
     necessary compilation on each resource."""
     extension = os.path.splitext(source)[1].lower()
@@ -138,7 +138,7 @@ class MacTool(object):
     else:
       return None
 
-  def ExecCopyInfoPlist(self, source, dest, convert_to_binary, *keys):
+  def ExecCopyInfoPlist(self, source, dest, convert_to_binary=False, *keys):
     """Copies the |source| Info.plist to the destination directory |dest|."""
     # Read the source Info.plist into memory.
     fd = open(source, 'r')
