@@ -206,7 +206,7 @@ public final class MapView extends FrameLayout {
     private ConnectivityReceiver mConnectivityReceiver;
 
     // Used for user location
-    private UserLocationView mUserLocationView;
+    private UserLocationOverlay mUserLocationView;
 
     // Used for the compass
     private CompassOverlay mCompassOverlay;
@@ -719,7 +719,7 @@ public final class MapView extends FrameLayout {
         mapOverlayDispatch.setMapView(this);
 
         // Setup user location UI
-        mUserLocationView = new UserLocationView(getContext());
+        mUserLocationView = new UserLocationOverlay(getContext());
         addOverlay(mUserLocationView);
 
         // Setup compass
@@ -3580,7 +3580,7 @@ public final class MapView extends FrameLayout {
      * <p/>
      * Tracking the users bearing will disable gestures and shows the direction the user is heading.
      * <p/>
-     * When location tracking is disabled the direction of {@link UserLocationView}  is rotated
+     * When location tracking is disabled the direction of {@link UserLocationOverlay}  is rotated
      * When location tracking is enabled the {@link MapView} is rotated based on bearing value.
      * <p/>
      * See {@link MyBearingTracking} for different values.

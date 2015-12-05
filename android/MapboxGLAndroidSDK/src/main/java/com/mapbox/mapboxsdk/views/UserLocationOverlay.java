@@ -22,11 +22,8 @@ import android.os.Build;
 import android.os.SystemClock;
 import android.support.annotation.Nullable;
 import android.support.v4.content.ContextCompat;
-import android.util.AttributeSet;
 import android.view.MotionEvent;
 import android.view.Surface;
-import android.view.View;
-import android.view.ViewGroup;
 import android.view.WindowManager;
 
 import com.mapbox.mapboxsdk.R;
@@ -39,7 +36,7 @@ import com.mapzen.android.lost.api.LocationRequest;
 import com.mapzen.android.lost.api.LocationServices;
 import com.mapzen.android.lost.api.LostApiClient;
 
-final class UserLocationView implements Overlay {
+final class UserLocationOverlay implements Overlay {
 
     //region CLASS VARIABLES ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
     //endregion
@@ -52,12 +49,9 @@ final class UserLocationView implements Overlay {
     private final Context mContext;
     private MapView mMapView;
 
-    private float mDensity;
-
     private boolean mShowMarker;
     private boolean mShowDirection;
     private boolean mShowAccuracy;
-    private boolean mStaleMarker;
 
     private PointF mMarkerScreenPoint;
     private Matrix mMarkerScreenMatrix;
@@ -69,18 +63,12 @@ final class UserLocationView implements Overlay {
 
     private Drawable mUserLocationDrawable;
     private RectF mUserLocationDrawableBoundsF;
-    private Rect mUserLocationDrawableBounds;
 
     private Drawable mUserLocationBearingDrawable;
     private RectF mUserLocationBearingDrawableBoundsF;
-    private Rect mUserLocationBearingDrawableBounds;
 
     private Drawable mUserLocationStaleDrawable;
     private RectF mUserLocationStaleDrawableBoundsF;
-    private Rect mUserLocationStaleDrawableBounds;
-
-//    private Rect mDirtyRect;
-//    private RectF mDirtyRectF;
 
     private LatLng mMarkerCoordinate;
     private ValueAnimator mMarkerCoordinateAnimator;
@@ -118,7 +106,7 @@ final class UserLocationView implements Overlay {
 
     //region CONSTRUCTOR ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
 
-    public UserLocationView(Context context) {
+    public UserLocationOverlay(Context context) {
         mContext = context;
 
         // View configuration
@@ -138,7 +126,7 @@ final class UserLocationView implements Overlay {
         Resources resources = context.getResources();
         int accuracyColor = resources.getColor(R.color.my_location_ring);
 
-        mDensity = resources.getDisplayMetrics().density;
+        float density = resources.getDisplayMetrics().density;
         mMarkerCoordinate = new LatLng(0.0, 0.0);
         mMarkerScreenPoint = new PointF();
         mMarkerScreenMatrix = new Matrix();
@@ -152,7 +140,7 @@ final class UserLocationView implements Overlay {
         mAccuracyPaintStroke = new Paint();
         mAccuracyPaintStroke.setAntiAlias(true);
         mAccuracyPaintStroke.setStyle(Paint.Style.STROKE);
-        mAccuracyPaintStroke.setStrokeWidth(0.5f * mDensity);
+        mAccuracyPaintStroke.setStrokeWidth(0.5f * density);
         mAccuracyPaintStroke.setColor(accuracyColor);
         mAccuracyPaintStroke.setAlpha((int) (255 * 0.5f));
 
@@ -160,7 +148,7 @@ final class UserLocationView implements Overlay {
         mAccuracyBounds = new RectF();
 
         mUserLocationDrawable = ContextCompat.getDrawable(context, R.drawable.my_location);
-        mUserLocationDrawableBounds = new Rect(
+        Rect userLocationDrawableBounds = new Rect(
                 -mUserLocationDrawable.getIntrinsicWidth() / 2,
                 -mUserLocationDrawable.getIntrinsicHeight() / 2,
                 mUserLocationDrawable.getIntrinsicWidth() / 2,
@@ -170,10 +158,10 @@ final class UserLocationView implements Overlay {
                 -mUserLocationDrawable.getIntrinsicHeight() / 2,
                 mUserLocationDrawable.getIntrinsicWidth() / 2,
                 mUserLocationDrawable.getIntrinsicHeight() / 2);
-        mUserLocationDrawable.setBounds(mUserLocationDrawableBounds);
+        mUserLocationDrawable.setBounds(userLocationDrawableBounds);
 
         mUserLocationBearingDrawable = ContextCompat.getDrawable(context, R.drawable.my_location_bearing);
-        mUserLocationBearingDrawableBounds = new Rect(
+        Rect userLocationBearingDrawableBounds = new Rect(
                 -mUserLocationBearingDrawable.getIntrinsicWidth() / 2,
                 -mUserLocationBearingDrawable.getIntrinsicHeight() / 2,
                 mUserLocationBearingDrawable.getIntrinsicWidth() / 2,
@@ -183,10 +171,10 @@ final class UserLocationView implements Overlay {
                 -mUserLocationBearingDrawable.getIntrinsicHeight() / 2,
                 mUserLocationBearingDrawable.getIntrinsicWidth() / 2,
                 mUserLocationBearingDrawable.getIntrinsicHeight() / 2);
-        mUserLocationBearingDrawable.setBounds(mUserLocationBearingDrawableBounds);
+        mUserLocationBearingDrawable.setBounds(userLocationBearingDrawableBounds);
 
         mUserLocationStaleDrawable = ContextCompat.getDrawable(context, R.drawable.my_location_stale);
-        mUserLocationStaleDrawableBounds = new Rect(
+        Rect userLocationStaleDrawableBounds = new Rect(
                 -mUserLocationStaleDrawable.getIntrinsicWidth() / 2,
                 -mUserLocationStaleDrawable.getIntrinsicHeight() / 2,
                 mUserLocationStaleDrawable.getIntrinsicWidth() / 2,
@@ -196,7 +184,7 @@ final class UserLocationView implements Overlay {
                 -mUserLocationStaleDrawable.getIntrinsicHeight() / 2,
                 mUserLocationStaleDrawable.getIntrinsicWidth() / 2,
                 mUserLocationStaleDrawable.getIntrinsicHeight() / 2);
-        mUserLocationStaleDrawable.setBounds(mUserLocationStaleDrawableBounds);
+        mUserLocationStaleDrawable.setBounds(userLocationStaleDrawableBounds);
     }
 
 
@@ -618,7 +606,7 @@ final class UserLocationView implements Overlay {
             return;
         }
 
-        mStaleMarker = isStale(mUserLocation);
+        boolean staleMarker = isStale(mUserLocation);
 
         // compute new marker position
         if (mMyLocationTrackingMode == MyLocationTracking.TRACKING_NONE) {
@@ -645,7 +633,7 @@ final class UserLocationView implements Overlay {
         }
 
         // adjust accuracy circle
-        if (mShowAccuracy && !mStaleMarker) {
+        if (mShowAccuracy && !staleMarker) {
             mAccuracyPath.reset();
             mAccuracyPath.addCircle(0.0f, 0.0f,
                     (float) (mMarkerAccuracy / mMapView.getMetersPerPixelAtLatitude(
@@ -661,19 +649,18 @@ final class UserLocationView implements Overlay {
         canvas.concat(mMarkerScreenMatrix);
 
         Drawable dotDrawable = mShowDirection ? mUserLocationBearingDrawable : mUserLocationDrawable;
-        dotDrawable = mStaleMarker ? mUserLocationStaleDrawable : dotDrawable;
-        // IMPORTANT also update in update()
+        dotDrawable = staleMarker ? mUserLocationStaleDrawable : dotDrawable;
         RectF dotBounds = mShowDirection ? mUserLocationBearingDrawableBoundsF : mUserLocationDrawableBoundsF;
-        dotBounds = mStaleMarker ? mUserLocationStaleDrawableBoundsF : dotBounds;
+        dotBounds = staleMarker ? mUserLocationStaleDrawableBoundsF : dotBounds;
 
         boolean willDraw = true;
         if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.JELLY_BEAN || !canvas.isHardwareAccelerated()) {
-            willDraw = mShowAccuracy && !mStaleMarker && !canvas.quickReject(mAccuracyPath, Canvas.EdgeType.AA);
+            willDraw = mShowAccuracy && !staleMarker && !canvas.quickReject(mAccuracyPath, Canvas.EdgeType.AA);
         }
         willDraw |= !canvas.quickReject(dotBounds, Canvas.EdgeType.AA);
 
         if (willDraw) {
-            if (mShowAccuracy && !mStaleMarker) {
+            if (mShowAccuracy && !staleMarker) {
                 canvas.drawPath(mAccuracyPath, mAccuracyPaintFill);
                 canvas.drawPath(mAccuracyPath, mAccuracyPaintStroke);
             }
