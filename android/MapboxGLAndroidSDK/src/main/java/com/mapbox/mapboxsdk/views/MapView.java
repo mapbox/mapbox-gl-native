@@ -52,6 +52,7 @@ import android.widget.ArrayAdapter;
 import android.widget.FrameLayout;
 import android.widget.ImageView;
 import android.widget.ZoomButtonsController;
+
 import com.almeros.android.multitouch.gesturedetectors.RotateGestureDetector;
 import com.almeros.android.multitouch.gesturedetectors.ShoveGestureDetector;
 import com.almeros.android.multitouch.gesturedetectors.TwoFingerGestureDetector;
@@ -206,7 +207,7 @@ public final class MapView extends FrameLayout {
     private ConnectivityReceiver mConnectivityReceiver;
 
     // Used for user location
-    private UserLocationOverlay mUserLocationView;
+    private UserLocationOverlay mUserLocationOverlay;
 
     // Used for the compass
     private CompassOverlay mCompassOverlay;
@@ -719,8 +720,8 @@ public final class MapView extends FrameLayout {
         mapOverlayDispatch.setMapView(this);
 
         // Setup user location UI
-        mUserLocationView = new UserLocationOverlay(getContext());
-        addOverlay(mUserLocationView);
+        mUserLocationOverlay = new UserLocationOverlay(getContext());
+        addOverlay(mUserLocationOverlay);
 
         // Setup compass
         mCompassOverlay = new CompassOverlay(getContext());
@@ -915,7 +916,7 @@ public final class MapView extends FrameLayout {
         outState.putStringArrayList(STATE_STYLE_CLASSES, new ArrayList<>(getStyleClasses()));
         outState.putLong(STATE_DEFAULT_TRANSITION_DURATION, mNativeMapView.getDefaultTransitionDuration());
         outState.putBoolean(STATE_MY_LOCATION_ENABLED, isMyLocationEnabled());
-        outState.putInt(STATE_MY_LOCATION_TRACKING_MODE, mUserLocationView.getMyLocationTrackingMode());
+        outState.putInt(STATE_MY_LOCATION_TRACKING_MODE, mUserLocationOverlay.getMyLocationTrackingMode());
 
         // Compass
         outState.putBoolean(STATE_COMPASS_ENABLED, isCompassEnabled());
@@ -962,7 +963,7 @@ public final class MapView extends FrameLayout {
      */
     @UiThread
     public void onStart() {
-        mUserLocationView.onStart();
+        mUserLocationOverlay.onStart();
     }
 
     /**
@@ -970,7 +971,7 @@ public final class MapView extends FrameLayout {
      */
     @UiThread
     public void onStop() {
-        mUserLocationView.onStop();
+        mUserLocationOverlay.onStop();
     }
 
     /**
@@ -982,7 +983,7 @@ public final class MapView extends FrameLayout {
         getContext().unregisterReceiver(mConnectivityReceiver);
         mConnectivityReceiver = null;
 
-        mUserLocationView.pause();
+        mUserLocationOverlay.pause();
         mNativeMapView.pause();
     }
 
@@ -995,7 +996,7 @@ public final class MapView extends FrameLayout {
         mConnectivityReceiver = new ConnectivityReceiver();
         getContext().registerReceiver(mConnectivityReceiver, new IntentFilter(ConnectivityManager.CONNECTIVITY_ACTION));
 
-        mUserLocationView.resume();
+        mUserLocationOverlay.resume();
         mNativeMapView.resume();
         mNativeMapView.update();
     }
@@ -2583,7 +2584,7 @@ public final class MapView extends FrameLayout {
                     }
 
                     // Single finger double tap
-                    if (mUserLocationView.getMyLocationTrackingMode() == MyLocationTracking.TRACKING_NONE) {
+                    if (mUserLocationOverlay.getMyLocationTrackingMode() == MyLocationTracking.TRACKING_NONE) {
                         // Zoom in on gesture
                         zoom(true, e.getX(), e.getY());
                     } else {
@@ -2816,7 +2817,7 @@ public final class MapView extends FrameLayout {
             mQuickZoom = !mTwoTap;
 
             // Scale the map
-            if (!mQuickZoom && mUserLocationView.getMyLocationTrackingMode() == MyLocationTracking.TRACKING_NONE) {
+            if (!mQuickZoom && mUserLocationOverlay.getMyLocationTrackingMode() == MyLocationTracking.TRACKING_NONE) {
                 // around gesture
                 mNativeMapView.scaleBy(detector.getScaleFactor(), detector.getFocusX() / mScreenDensity, detector.getFocusY() / mScreenDensity);
             } else {
@@ -2888,7 +2889,7 @@ public final class MapView extends FrameLayout {
             bearing += detector.getRotationDegreesDelta();
 
             // Rotate the map
-            if (mUserLocationView.getMyLocationTrackingMode() == MyLocationTracking.TRACKING_NONE) {
+            if (mUserLocationOverlay.getMyLocationTrackingMode() == MyLocationTracking.TRACKING_NONE) {
                 // around gesture
                 mNativeMapView.setBearing(bearing, detector.getFocusX() / mScreenDensity, detector.getFocusY() / mScreenDensity);
             } else {
@@ -3490,7 +3491,7 @@ public final class MapView extends FrameLayout {
      */
     @UiThread
     public boolean isMyLocationEnabled() {
-        return mUserLocationView.isOverlayDrawEnabled();
+        return mUserLocationOverlay.isOverlayDrawEnabled();
     }
 
     /**
@@ -3506,7 +3507,7 @@ public final class MapView extends FrameLayout {
      */
     @UiThread
     public void setMyLocationEnabled(boolean enabled) {
-        mUserLocationView.setEnabled(enabled);
+        mUserLocationOverlay.setEnabled(enabled);
     }
 
     /**
@@ -3517,7 +3518,7 @@ public final class MapView extends FrameLayout {
     @UiThread
     @Nullable
     public Location getMyLocation() {
-        return mUserLocationView.getLocation();
+        return mUserLocationOverlay.getLocation();
     }
 
     /**
@@ -3529,7 +3530,7 @@ public final class MapView extends FrameLayout {
      */
     @UiThread
     public void setOnMyLocationChangeListener(@Nullable OnMyLocationChangeListener listener) {
-        mUserLocationView.setOnMyLocationChangeListener(listener);
+        mUserLocationOverlay.setOnMyLocationChangeListener(listener);
     }
 
     /**
@@ -3543,13 +3544,13 @@ public final class MapView extends FrameLayout {
      */
     @UiThread
     public void setMyLocationTrackingMode(@MyLocationTracking.Mode int myLocationTrackingMode) {
-        mUserLocationView.setMyLocationTrackingMode(myLocationTrackingMode);
+        mUserLocationOverlay.setMyLocationTrackingMode(myLocationTrackingMode);
         validateGesturesForTrackingModes();
     }
 
     private void validateGesturesForTrackingModes() {
-        int myLocationTrackingMode = mUserLocationView.getMyLocationTrackingMode();
-        int myBearingTrackingMode = mUserLocationView.getMyBearingTrackingMode();
+        int myLocationTrackingMode = mUserLocationOverlay.getMyLocationTrackingMode();
+        int myBearingTrackingMode = mUserLocationOverlay.getMyBearingTrackingMode();
 
         // Enable/disable gestures based on tracking mode
         if (myLocationTrackingMode == MyLocationTracking.TRACKING_NONE) {
@@ -3572,7 +3573,7 @@ public final class MapView extends FrameLayout {
     @UiThread
     @MyLocationTracking.Mode
     public int getMyLocationTrackingMode() {
-        return mUserLocationView.getMyLocationTrackingMode();
+        return mUserLocationOverlay.getMyLocationTrackingMode();
     }
 
     /**
@@ -3590,7 +3591,7 @@ public final class MapView extends FrameLayout {
      */
     @UiThread
     public void setMyBearingTrackingMode(@MyBearingTracking.Mode int myBearingTrackingMode) {
-        mUserLocationView.setMyBearingTrackingMode(myBearingTrackingMode);
+        mUserLocationOverlay.setMyBearingTrackingMode(myBearingTrackingMode);
         validateGesturesForTrackingModes();
     }
 
@@ -3605,7 +3606,7 @@ public final class MapView extends FrameLayout {
     @MyLocationTracking.Mode
     public int getMyBearingTrackingMode() {
         //noinspection ResourceType
-        return mUserLocationView.getMyBearingTrackingMode();
+        return mUserLocationOverlay.getMyBearingTrackingMode();
     }
 
     //

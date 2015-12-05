@@ -229,102 +229,6 @@ final class UserLocationOverlay implements Overlay {
         }
     }
 
-    private class MyBearingListener implements SensorEventListener {
-
-        // Sensor model
-        private SensorManager mSensorManager;
-        private Sensor mSensorRotationVector;
-        private int mRotationDevice;
-
-        // Sensor data sensor rotation vector
-        private float[] mRotationMatrix = new float[16];
-        private float[] mRemappedMatrix = new float[16];
-        private float[] mOrientation = new float[3];
-
-        // Location data
-        private GeomagneticField mGeomagneticField;
-
-        // Controls the sensor update rate in milliseconds
-        private static final int UPDATE_RATE_MS = 300;
-
-        // Compass data
-        private float mCompassBearing;
-        private long mCompassUpdateNextTimestamp = 0;
-
-        public MyBearingListener(Context context) {
-            mSensorManager = (SensorManager) context.getSystemService(Context.SENSOR_SERVICE);
-            mSensorRotationVector = mSensorManager.getDefaultSensor(Sensor.TYPE_ROTATION_VECTOR);
-        }
-
-        public void onStart(Context context) {
-            mRotationDevice = ((WindowManager) context.getSystemService(Context.WINDOW_SERVICE)).getDefaultDisplay().getRotation();
-            mSensorManager.registerListener(this, mSensorRotationVector, UPDATE_RATE_MS * 2500);
-        }
-
-        public void onStop() {
-            mSensorManager.unregisterListener(this, mSensorRotationVector);
-        }
-
-        public float getCompassBearing() {
-            return mCompassBearing;
-        }
-
-        @Override
-        public void onSensorChanged(SensorEvent event) {
-            if (mPaused) {
-                return;
-            }
-
-            long currentTime = SystemClock.elapsedRealtime();
-            if (currentTime < mCompassUpdateNextTimestamp) {
-                return;
-            }
-
-            switch (event.sensor.getType()) {
-                case Sensor.TYPE_ROTATION_VECTOR:
-                    SensorManager.getRotationMatrixFromVector(mRotationMatrix, event.values);
-                    break;
-            }
-
-            switch (mRotationDevice) {
-                case Surface.ROTATION_0:
-                    // Portrait
-                    SensorManager.getOrientation(mRotationMatrix, mOrientation);
-                    break;
-                default:
-                    // Landscape
-                    SensorManager.remapCoordinateSystem(mRotationMatrix, SensorManager.AXIS_MINUS_Y, SensorManager.AXIS_MINUS_X, mRemappedMatrix);
-                    SensorManager.getOrientation(mRemappedMatrix, mOrientation);
-                    break;
-            }
-
-            mCompassUpdateNextTimestamp = currentTime + UPDATE_RATE_MS;
-            mGeomagneticField = new GeomagneticField(
-                    (float) mUserLocation.getLatitude(),
-                    (float) mUserLocation.getLongitude(),
-                    (float) mUserLocation.getAltitude(),
-                    currentTime);
-            mCompassBearing = (float) Math.toDegrees(mOrientation[0] + mGeomagneticField.getDeclination());
-            setCompass(mCompassBearing);
-        }
-
-        @Override
-        public void onAccuracyChanged(Sensor sensor, int accuracy) {
-            // TODO add accuracy to the equiation
-        }
-    }
-
-
-    private class MyLocationListener implements LocationListener {
-        @Override
-        public void onLocationChanged(Location location) {
-            if (mPaused) {
-                return;
-            }
-            setLocation(location);
-        }
-    }
-
     private boolean isStale(Location location) {
         if (location != null) {
             long ageInNanos;
@@ -709,6 +613,103 @@ final class UserLocationOverlay implements Overlay {
     //endregion
 
     //region LISTENERS  ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+
+    private class MyBearingListener implements SensorEventListener {
+
+        // Sensor model
+        private SensorManager mSensorManager;
+        private Sensor mSensorRotationVector;
+        private int mRotationDevice;
+
+        // Sensor data sensor rotation vector
+        private float[] mRotationMatrix = new float[16];
+        private float[] mRemappedMatrix = new float[16];
+        private float[] mOrientation = new float[3];
+
+        // Location data
+        private GeomagneticField mGeomagneticField;
+
+        // Controls the sensor update rate in milliseconds
+        private static final int UPDATE_RATE_MS = 300;
+
+        // Compass data
+        private float mCompassBearing;
+        private long mCompassUpdateNextTimestamp = 0;
+
+        public MyBearingListener(Context context) {
+            mSensorManager = (SensorManager) context.getSystemService(Context.SENSOR_SERVICE);
+            mSensorRotationVector = mSensorManager.getDefaultSensor(Sensor.TYPE_ROTATION_VECTOR);
+        }
+
+        public void onStart(Context context) {
+            mRotationDevice = ((WindowManager) context.getSystemService(Context.WINDOW_SERVICE)).getDefaultDisplay().getRotation();
+            mSensorManager.registerListener(this, mSensorRotationVector, UPDATE_RATE_MS * 2500);
+        }
+
+        public void onStop() {
+            mSensorManager.unregisterListener(this, mSensorRotationVector);
+        }
+
+        public float getCompassBearing() {
+            return mCompassBearing;
+        }
+
+        @Override
+        public void onSensorChanged(SensorEvent event) {
+            if (mPaused) {
+                return;
+            }
+
+            long currentTime = SystemClock.elapsedRealtime();
+            if (currentTime < mCompassUpdateNextTimestamp) {
+                return;
+            }
+
+            switch (event.sensor.getType()) {
+                case Sensor.TYPE_ROTATION_VECTOR:
+                    SensorManager.getRotationMatrixFromVector(mRotationMatrix, event.values);
+                    break;
+            }
+
+            switch (mRotationDevice) {
+                case Surface.ROTATION_0:
+                    // Portrait
+                    SensorManager.getOrientation(mRotationMatrix, mOrientation);
+                    break;
+                default:
+                    // Landscape
+                    SensorManager.remapCoordinateSystem(mRotationMatrix, SensorManager.AXIS_MINUS_Y, SensorManager.AXIS_MINUS_X, mRemappedMatrix);
+                    SensorManager.getOrientation(mRemappedMatrix, mOrientation);
+                    break;
+            }
+
+            mCompassUpdateNextTimestamp = currentTime + UPDATE_RATE_MS;
+            mGeomagneticField = new GeomagneticField(
+                    (float) mUserLocation.getLatitude(),
+                    (float) mUserLocation.getLongitude(),
+                    (float) mUserLocation.getAltitude(),
+                    currentTime);
+            mCompassBearing = (float) Math.toDegrees(mOrientation[0] + mGeomagneticField.getDeclination());
+            setCompass(mCompassBearing);
+        }
+
+        @Override
+        public void onAccuracyChanged(Sensor sensor, int accuracy) {
+            // TODO add accuracy to the equiation
+        }
+    }
+
+
+    private class MyLocationListener implements LocationListener {
+        @Override
+        public void onLocationChanged(Location location) {
+            if (mPaused) {
+                return;
+            }
+            setLocation(location);
+        }
+    }
+
     //endregion
 
     //region EVENTS  ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
