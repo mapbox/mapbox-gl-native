@@ -1587,11 +1587,14 @@ public:
     
     NSViewController *viewController;
     if ([self.delegate respondsToSelector:@selector(mapView:calloutViewControllerForAnnotation:)]) {
-        viewController = [self.delegate mapView:self calloutViewControllerForAnnotation:annotation];
+        NSViewController *viewControllerFromDelegate = [self.delegate mapView:self
+                                           calloutViewControllerForAnnotation:annotation];
+        if (viewControllerFromDelegate) {
+            viewController = viewControllerFromDelegate;
+        }
     }
     if (!viewController) {
-        viewController = [[NSViewController alloc] initWithNibName:@"MGLAnnotationCallout"
-                                                            bundle:[NSBundle mgl_frameworkBundle]];
+        viewController = self.calloutViewController;
     }
     NSAssert(viewController, @"Unable to load MGLAnnotationCallout view controller");
     // The popover’s view controller can bind to KVO-compliant key paths of the
@@ -1600,6 +1603,15 @@ public:
     callout.contentViewController = viewController;
     
     return callout;
+}
+
+- (NSViewController *)calloutViewController {
+    // Lazily load a default view controller.
+    if (!_calloutViewController) {
+        _calloutViewController = [[NSViewController alloc] initWithNibName:@"MGLAnnotationCallout"
+                                                                    bundle:[NSBundle mgl_frameworkBundle]];
+    }
+    return _calloutViewController;
 }
 
 /// Returns the rectangle that represents the annotation image of the annotation

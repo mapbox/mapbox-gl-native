@@ -186,6 +186,9 @@ NS_ASSUME_NONNULL_BEGIN
     controller’s content view to KVO-compliant properties of the annotation
     object, such as -title and -subtitle.
     
+    If each annotation should have an identical callout, you can set the
+    MGLMapView instance’s -setCalloutViewController: method instead.
+    
     @param mapView The map view that is requesting a callout view controller.
     @param annotation The object representing the annotation.
     @return A view controller for the given annotation. */

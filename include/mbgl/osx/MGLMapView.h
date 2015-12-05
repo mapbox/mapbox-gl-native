@@ -374,6 +374,22 @@ IB_DESIGNABLE
     @param annotation The annotation object to deselect. */
 - (void)deselectAnnotation:(id <MGLAnnotation>)annotation;
 
+/** A common view controller for managing a callout popover’s content view.
+    
+    Like any instance of NSPopover, an annotation callout manages its contents
+    with a view controller. The annotation object is the view controller’s
+    represented object. This means that you can bind controls in the view
+    controller’s content view to KVO-compliant properties of the annotation
+    object, such as -title and -subtitle.
+    
+    This property defines a common view controller that is used for every
+    annotation’s callout view. If you set this property to `nil`, a default
+    view controller will be used that manages a simple title label and subtitle
+    label. If you need distinct view controllers for different annotations, the
+    map view’s delegate should implement
+    -mapView:calloutViewControllerForAnnotation: instead. */
+@property (nonatomic, strong, null_resettable) IBOutlet NSViewController *calloutViewController;
+
 #pragma mark Finding annotations
 /** @name Finding Annotations */
 
@@ -482,7 +498,7 @@ IB_DESIGNABLE
 /** The options that determine which debugging aids are shown on the map.
     
     These options are all disabled by default and should remain disabled in
-    released software. */
+    released software for performance and aesthetic reasons. */
 @property (nonatomic) MGLMapDebugMaskOptions debugMask;
 
 @end
