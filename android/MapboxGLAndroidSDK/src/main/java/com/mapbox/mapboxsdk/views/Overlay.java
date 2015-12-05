@@ -55,7 +55,7 @@ public interface Overlay {
      * Let us know if you'd like to receive the onOverlayDraw() callback.
      *
      * @return true to get the
-     * {@link Overlay#onOverlayDraw(MapView, Canvas, RectF, PointF, float, float)} callback.
+     * {@link Overlay#onOverlayDraw(MapView, Canvas, BoundingBox, LatLng, float, float)} callback.
      */
     boolean isOverlayDrawEnabled();
 
@@ -63,5 +63,5 @@ public interface Overlay {
      * Called when the {@link MapView} size changes
      * @param mapPixelBounds the pixel bounds of the view
      */
-    void onMapViewPixelSizeChanged(Rect mapPixelBounds);
+    void onMapViewPixelBoundsChanged(Rect mapPixelBounds);
 }

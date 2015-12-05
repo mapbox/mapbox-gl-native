@@ -2,9 +2,7 @@ package com.mapbox.mapboxsdk.views;
 
 import android.content.Context;
 import android.graphics.Canvas;
-import android.graphics.PointF;
 import android.graphics.Rect;
-import android.graphics.RectF;
 import android.util.AttributeSet;
 import android.view.MotionEvent;
 import android.view.View;
@@ -146,7 +144,7 @@ final class MapOverlayDispatch extends View {
         //left top right bottom
         mMapPixelBounds.set(0, 0, width, height);
         for (int i = 0; i < mOverlayList.size(); i++) {
-            mOverlayList.get(i).onMapViewPixelSizeChanged(mMapPixelBounds);
+            mOverlayList.get(i).onMapViewPixelBoundsChanged(mMapPixelBounds);
         }
     }
 

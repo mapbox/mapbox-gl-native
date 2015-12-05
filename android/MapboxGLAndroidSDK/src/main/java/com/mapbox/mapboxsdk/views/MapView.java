@@ -14,6 +14,7 @@ import android.content.res.TypedArray;
 import android.graphics.Bitmap;
 import android.graphics.Canvas;
 import android.graphics.PointF;
+import android.graphics.Rect;
 import android.graphics.RectF;
 import android.graphics.SurfaceTexture;
 import android.location.Location;
@@ -167,7 +168,7 @@ public final class MapView extends FrameLayout {
     /**
      * The currently supported maximum and minimum tilt values.
      *
-     * @see MapView#setTilt(double)
+     * @see MapView#setTilt(Double, Long)
      */
     private static final double MINIMUM_TILT = 0;
     private static final double MAXIMUM_TILT = 60;
@@ -208,7 +209,7 @@ public final class MapView extends FrameLayout {
     private UserLocationView mUserLocationView;
 
     // Used for the compass
-    private CompassView mCompassView;
+    private CompassOverlay mCompassOverlay;
 
     private MapOverlayDispatch mapOverlayDispatch;
 
@@ -717,13 +718,13 @@ public final class MapView extends FrameLayout {
         mUserLocationView = (UserLocationView) view.findViewById(R.id.userLocationView);
         mUserLocationView.setMapView(this);
 
-        // Setup compass
-        mCompassView = (CompassView) view.findViewById(R.id.compassView);
-        mCompassView.setOnClickListener(new CompassView.CompassClickListener(this));
-
         // Overlays
         mapOverlayDispatch = (MapOverlayDispatch) view.findViewById(R.id.overlayDispatch);
         mapOverlayDispatch.setMapView(this);
+
+        // Setup compass
+        mCompassOverlay = new CompassOverlay(getContext());
+        addOverlay(mCompassOverlay);
 
         // Setup Mapbox logo
         mLogoView = (ImageView) view.findViewById(R.id.logoView);
@@ -767,11 +768,12 @@ public final class MapView extends FrameLayout {
 
             // Compass
             setCompassEnabled(typedArray.getBoolean(R.styleable.MapView_compass_enabled, true));
-            setCompassGravity(typedArray.getInt(R.styleable.MapView_compass_gravity, Gravity.TOP | Gravity.END));
-            setWidgetMargins(mCompassView, typedArray.getDimension(R.styleable.MapView_compass_margin_left, DIMENSION_TEN_DP)
-                    , typedArray.getDimension(R.styleable.MapView_compass_margin_top, DIMENSION_TEN_DP)
-                    , typedArray.getDimension(R.styleable.MapView_compass_margin_right, DIMENSION_TEN_DP)
-                    , typedArray.getDimension(R.styleable.MapView_compass_margin_bottom, DIMENSION_TEN_DP));
+            @CompassOverlay.CompassGravity int gravity = typedArray.getInt(R.styleable.MapView_compass_gravity, CompassOverlay.COMPASS_GRAVITY_TOP | CompassOverlay.COMPASS_GRAVITY_RIGHT);
+            setCompassGravity(gravity);
+            setCompassMargins(typedArray.getDimensionPixelSize(R.styleable.MapView_compass_margin_left, (int) DIMENSION_TEN_DP)
+                    , typedArray.getDimensionPixelSize(R.styleable.MapView_compass_margin_top, (int) DIMENSION_TEN_DP)
+                    , typedArray.getDimensionPixelSize(R.styleable.MapView_compass_margin_right, (int) DIMENSION_TEN_DP)
+                    , typedArray.getDimensionPixelSize(R.styleable.MapView_compass_margin_bottom, (int) DIMENSION_TEN_DP));
 
             // Logo
             setLogoVisibility(typedArray.getInt(R.styleable.MapView_logo_visibility, View.VISIBLE));
@@ -915,13 +917,13 @@ public final class MapView extends FrameLayout {
         outState.putInt(STATE_MY_LOCATION_TRACKING_MODE, mUserLocationView.getMyLocationTrackingMode());
 
         // Compass
-        LayoutParams compassParams = (LayoutParams) mCompassView.getLayoutParams();
         outState.putBoolean(STATE_COMPASS_ENABLED, isCompassEnabled());
-        outState.putInt(STATE_COMPASS_GRAVITY, compassParams.gravity);
-        outState.putInt(STATE_COMPASS_MARGIN_LEFT, compassParams.leftMargin);
-        outState.putInt(STATE_COMPASS_MARGIN_TOP, compassParams.topMargin);
-        outState.putInt(STATE_COMPASS_MARGIN_BOTTOM, compassParams.bottomMargin);
-        outState.putInt(STATE_COMPASS_MARGIN_RIGHT, compassParams.rightMargin);
+        outState.putInt(STATE_COMPASS_GRAVITY, mCompassOverlay.getGravity());
+        Rect compassMargins = mCompassOverlay.getMargins();
+        outState.putInt(STATE_COMPASS_MARGIN_LEFT, compassMargins.left);
+        outState.putInt(STATE_COMPASS_MARGIN_TOP, compassMargins.top);
+        outState.putInt(STATE_COMPASS_MARGIN_BOTTOM, compassMargins.bottom);
+        outState.putInt(STATE_COMPASS_MARGIN_RIGHT, compassMargins.right);
 
         // Logo
         LayoutParams logoParams = (LayoutParams) mLogoView.getLayoutParams();
@@ -2401,7 +2403,6 @@ public final class MapView extends FrameLayout {
         public void onSurfaceTextureUpdated(SurfaceTexture surface) {
             mNativeMapView.updateMapBounds(mWgsBounds, mWgsCenter);
             mapOverlayDispatch.update(mWgsBounds, mWgsCenter, (float) getDirection(), (float) getZoomLevel());
-            mCompassView.update(getDirection());
             mUserLocationView.update();
             for (InfoWindow infoWindow : mInfoWindows) {
                 infoWindow.update();
@@ -3602,7 +3603,7 @@ public final class MapView extends FrameLayout {
      */
     @UiThread
     public boolean isCompassEnabled() {
-        return mCompassView.isEnabled();
+        return mCompassOverlay.isOverlayDrawEnabled();
     }
 
     /**
@@ -3617,7 +3618,7 @@ public final class MapView extends FrameLayout {
      */
     @UiThread
     public void setCompassEnabled(boolean compassEnabled) {
-        mCompassView.setEnabled(compassEnabled);
+        mCompassOverlay.setEnabled(compassEnabled);
     }
 
     /**
@@ -3630,8 +3631,8 @@ public final class MapView extends FrameLayout {
      * @see Gravity
      */
     @UiThread
-    public void setCompassGravity(int gravity) {
-        setWidgetGravity(mCompassView, gravity);
+    public void setCompassGravity(@CompassOverlay.CompassGravity int gravity) {
+        mCompassOverlay.setGravity(gravity);
     }
 
     /**
@@ -3645,7 +3646,7 @@ public final class MapView extends FrameLayout {
      */
     @UiThread
     public void setCompassMargins(int left, int top, int right, int bottom) {
-        setWidgetMargins(mCompassView, left, top, right, bottom);
+        mCompassOverlay.setMargins(left, top, right, bottom);
     }
 
     //
