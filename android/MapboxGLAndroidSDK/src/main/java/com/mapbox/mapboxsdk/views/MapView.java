@@ -714,13 +714,13 @@ public final class MapView extends FrameLayout {
         boolean isConnected = (activeNetwork != null) && activeNetwork.isConnectedOrConnecting();
         onConnectivityChanged(isConnected);
 
-        // Setup user location UI
-        mUserLocationView = (UserLocationView) view.findViewById(R.id.userLocationView);
-        mUserLocationView.setMapView(this);
-
         // Overlays
         mapOverlayDispatch = (MapOverlayDispatch) view.findViewById(R.id.overlayDispatch);
         mapOverlayDispatch.setMapView(this);
+
+        // Setup user location UI
+        mUserLocationView = new UserLocationView(getContext());
+        addOverlay(mUserLocationView);
 
         // Setup compass
         mCompassOverlay = new CompassOverlay(getContext());
@@ -839,7 +839,8 @@ public final class MapView extends FrameLayout {
 
             // Compass
             setCompassEnabled(savedInstanceState.getBoolean(STATE_COMPASS_ENABLED));
-            setCompassGravity(savedInstanceState.getInt(STATE_COMPASS_GRAVITY));
+            @CompassOverlay.CompassGravity int compassLayoutGravity = savedInstanceState.getInt(STATE_COMPASS_GRAVITY);
+            setCompassGravity(compassLayoutGravity);
             setCompassMargins(savedInstanceState.getInt(STATE_COMPASS_MARGIN_LEFT)
                     , savedInstanceState.getInt(STATE_COMPASS_MARGIN_TOP)
                     , savedInstanceState.getInt(STATE_COMPASS_MARGIN_RIGHT)
@@ -1762,20 +1763,36 @@ public final class MapView extends FrameLayout {
     @UiThread
     @NonNull
     public PointF toScreenLocation(@NonNull LatLng location) {
+        return toScreenLocation(location, null);
+    }
+
+    /**
+     * Converts a map coordinate to a point in this view's coordinate system.
+     *
+     * @param location A map coordinate.
+     * @param reuse    supply a point to be reused : null to have one created
+     * @return The converted point in this view's coordinate system.
+     */
+    @UiThread
+    @NonNull
+    public PointF toScreenLocation(@NonNull LatLng location, @Nullable PointF reuse) {
+        reuse = reuse == null ? new PointF() : reuse;
         if (location == null) {
             Log.w(TAG, "location was null, so just returning (0, 0)");
-            return new PointF();
+            reuse.x = 0F;
+            reuse.y = 0F;
+            return reuse;
         }
 
-        PointF point = mNativeMapView.pixelForLatLng(location);
+        mNativeMapView.pixelForLatLng(location, reuse);
 
-        float x = point.x * mScreenDensity;
-        float y = point.y * mScreenDensity;
+        reuse.x *= mScreenDensity;
+        reuse.y *= mScreenDensity;
 
         // flip y direction vertically to match core GL
-        y = getHeight() - y;
+        //y = getHeight() - y;
 
-        return new PointF(x, y);
+        return reuse;
     }
 
     //
@@ -2403,7 +2420,6 @@ public final class MapView extends FrameLayout {
         public void onSurfaceTextureUpdated(SurfaceTexture surface) {
             mNativeMapView.updateMapBounds(mWgsBounds, mWgsCenter);
             mapOverlayDispatch.update(mWgsBounds, mWgsCenter, (float) getDirection(), (float) getZoomLevel());
-            mUserLocationView.update();
             for (InfoWindow infoWindow : mInfoWindows) {
                 infoWindow.update();
             }
@@ -3474,7 +3490,7 @@ public final class MapView extends FrameLayout {
      */
     @UiThread
     public boolean isMyLocationEnabled() {
-        return mUserLocationView.isEnabled();
+        return mUserLocationView.isOverlayDrawEnabled();
     }
 
     /**

@@ -1408,7 +1408,7 @@ jobject JNICALL nativeLatLngForProjectedMeters(JNIEnv *env, jobject obj, jlong n
     return ret;
 }
 
-jobject JNICALL nativePixelForLatLng(JNIEnv *env, jobject obj, jlong nativeMapViewPtr, jobject latLng) {
+void JNICALL nativePixelForLatLng(JNIEnv *env, jobject obj, jlong nativeMapViewPtr, jobject latLng, jobject pointF) {
     mbgl::Log::Debug(mbgl::Event::JNI, "nativePixelForLatLng");
     assert(nativeMapViewPtr != 0);
     NativeMapView *nativeMapView = reinterpret_cast<NativeMapView *>(nativeMapViewPtr);
@@ -1416,24 +1416,22 @@ jobject JNICALL nativePixelForLatLng(JNIEnv *env, jobject obj, jlong nativeMapVi
     jdouble latitude = env->GetDoubleField(latLng, latLngLatitudeId);
     if (env->ExceptionCheck()) {
         env->ExceptionDescribe();
-        return nullptr;
+        return;
     }
 
     jdouble longitude = env->GetDoubleField(latLng, latLngLongitudeId);
     if (env->ExceptionCheck()) {
         env->ExceptionDescribe();
-        return nullptr;
+        return;
     }
 
     mbgl::vec2<double> pixel = nativeMapView->getMap().pixelForLatLng(mbgl::LatLng(latitude, longitude));
 
-    jobject ret = env->NewObject(pointFClass, pointFConstructorId, static_cast<jfloat>(pixel.x), static_cast<jfloat>(pixel.y));
-    if (ret == nullptr) {
-        env->ExceptionDescribe();
-        return nullptr;
-    }
+    // flip y direction vertically to match Android
+    pixel.y = nativeMapView->getHeight() - pixel.y;
 
-    return ret;
+    env->SetFloatField(pointF, pointFXId, static_cast<jfloat>(pixel.x));
+    env->SetFloatField(pointF, pointFYId, static_cast<jfloat>(pixel.y));
 }
 
 void JNICALL nativeUpdateMapBounds(JNIEnv *env, jobject obj, jlong nativeMapViewPtr, jobject wgsBounds, jobject wgsCenter) {
@@ -1988,7 +1986,7 @@ extern "C" JNIEXPORT jint JNICALL JNI_OnLoad(JavaVM *vm, void *reserved) {
         {"nativeLatLngForProjectedMeters",
          "(JLcom/mapbox/mapboxsdk/geometry/ProjectedMeters;)Lcom/mapbox/mapboxsdk/geometry/LatLng;",
          reinterpret_cast<void *>(&nativeLatLngForProjectedMeters)},
-        {"nativePixelForLatLng", "(JLcom/mapbox/mapboxsdk/geometry/LatLng;)Landroid/graphics/PointF;",
+        {"nativePixelForLatLng", "(JLcom/mapbox/mapboxsdk/geometry/LatLng;Landroid/graphics/PointF;)V",
          reinterpret_cast<void *>(&nativePixelForLatLng)},
         {"nativeUpdateMapBounds",  "(JLcom/mapbox/mapboxsdk/geometry/BoundingBox;Lcom/mapbox/mapboxsdk/geometry/LatLng;)V",
          reinterpret_cast<void *>(&nativeUpdateMapBounds)},
