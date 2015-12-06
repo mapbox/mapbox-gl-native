@@ -1,5 +1,6 @@
 #import <Mapbox/Mapbox.h>
 
+#import "../src/MGLMapView_Private.h"
 #import "../src/NSBundle+MGLAdditions.h"
 #import "../src/NSProcessInfo+MGLAdditions.h"
 #import "../../darwin/NSString+MGLAdditions.h"
@@ -14,6 +15,7 @@ static void InitializeMapbox() {
     mgl_linkBundleCategory();
     mgl_linkStringCategory();
     mgl_linkProcessInfoCategory();
+    mgl_linkMapViewIBCategory();
     
     [MGLAccountManager class];
     [MGLAnnotationImage class];

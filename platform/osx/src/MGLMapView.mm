@@ -209,7 +209,7 @@ public:
 }
 
 + (NSArray *)restorableStateKeyPaths {
-    return @[@"zoomLevel", @"direction"];
+    return @[@"latitude", @"longitude", @"zoomLevel", @"direction"];
 }
 
 - (void)commonInit {
@@ -275,6 +275,8 @@ public:
     options.center = mbgl::LatLng(0, 0);
     options.zoom = _mbglMap->getMinZoom();
     _mbglMap->jumpTo(options);
+    _pendingLatitude = NAN;
+    _pendingLongitude = NAN;
 }
 
 /// Adds zoom controls to the lower-right corner.
@@ -770,6 +772,10 @@ public:
 
 #pragma mark Viewport
 
++ (NS_SET_OF(NSString *) *)keyPathsForValuesAffectingCenterCoordinate {
+    return [NSSet setWithObjects:@"latitude", @"longitude", nil];
+}
+
 - (CLLocationCoordinate2D)centerCoordinate {
     return MGLLocationCoordinate2DFromLatLng(_mbglMap->getLatLng());
 }
@@ -791,6 +797,22 @@ public:
     _mbglMap->moveBy({ delta.x, delta.y },
                      MGLDurationInSeconds(animated ? MGLAnimationDuration : 0));
     [self didChangeValueForKey:@"centerCoordinate"];
+}
+
+- (CLLocationDegrees)pendingLatitude {
+    return _pendingLatitude;
+}
+
+- (void)setPendingLatitude:(CLLocationDegrees)pendingLatitude {
+    _pendingLatitude = pendingLatitude;
+}
+
+- (CLLocationDegrees)pendingLongitude {
+    return _pendingLongitude;
+}
+
+- (void)setPendingLongitude:(CLLocationDegrees)pendingLongitude {
+    _pendingLongitude = pendingLongitude;
 }
 
 - (double)zoomLevel {
