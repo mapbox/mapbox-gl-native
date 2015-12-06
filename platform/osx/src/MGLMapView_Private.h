@@ -8,6 +8,12 @@ void mgl_linkMapViewIBCategory();
 /// actively drawing.
 @property (nonatomic, readonly, getter=isDormant) BOOL dormant;
 
+// These properties exist because initially, both the latitude and longitude are
+// NaN. You have to set both the latitude and longitude simultaneously. If you
+// set the latitude but reuse the current longitude, and the current longitude
+// happens to be NaN, there will be no change because the resulting coordinate
+// pair is invalid.
+
 /// Center latitude set independently of the center longitude in an inspectable.
 @property (nonatomic) CLLocationDegrees pendingLatitude;
 /// Center longitude set independently of the center latitude in an inspectable.

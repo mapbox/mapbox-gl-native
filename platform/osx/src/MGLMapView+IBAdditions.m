@@ -26,7 +26,7 @@ void mgl_linkMapViewIBCategory() {}
 }
 
 + (NS_SET_OF(NSString *) *)keyPathsForValuesAffectingLatitude {
-    return [NSSet setWithObjects:@"centerCoordinate", nil];
+    return [NSSet setWithObjects:@"centerCoordinate", @"camera", nil];
 }
 
 - (double)latitude {
@@ -48,7 +48,7 @@ void mgl_linkMapViewIBCategory() {}
 }
 
 + (NS_SET_OF(NSString *) *)keyPathsForValuesAffectingLongitude {
-    return [NSSet setWithObjects:@"centerCoordinate", nil];
+    return [NSSet setWithObjects:@"centerCoordinate", @"camera", nil];
 }
 
 - (double)longitude {

@@ -8,6 +8,7 @@
 #import "../../darwin/MGLGeometry_Private.h"
 #import "../../darwin/MGLMultiPoint_Private.h"
 
+#import <mbgl/darwin/MGLMapCamera.h>
 #import <mbgl/darwin/MGLPolygon.h>
 #import <mbgl/darwin/MGLPolyline.h>
 #import <mbgl/osx/MGLAnnotationImage.h>
@@ -47,6 +48,15 @@ const CGFloat MGLOrnamentOpacity = 0.9;
 
 /// Default duration for programmatic animations.
 const NSTimeInterval MGLAnimationDuration = 0.3;
+
+/// Angular field of view for determining altitude of viewpoint.
+const CLLocationDegrees MGLAngularFieldOfView = M_PI / 6.;
+
+/// Minimum allowed pitch in degrees.
+const CGFloat MGLMinimumPitch = 0;
+
+/// Maximum allowed pitch in degrees.
+const CGFloat MGLMaximumPitch = 60;
 
 /// Distance in points that a single press of the panning keyboard shortcut pans the map by.
 const CGFloat MGLKeyPanningIncrement = 150;
@@ -99,6 +109,17 @@ NSImage *MGLDefaultMarkerImage() {
 std::chrono::steady_clock::duration MGLDurationInSeconds(NSTimeInterval duration) {
     return std::chrono::duration_cast<std::chrono::steady_clock::duration>(
         std::chrono::duration<NSTimeInterval, std::chrono::seconds::period>(duration));
+}
+
+/// Converts a media timing function into a unit bezier object usable in mbgl.
+mbgl::util::UnitBezier MGLUnitBezierForMediaTimingFunction(CAMediaTimingFunction *function) {
+    if (!function) {
+        function = [CAMediaTimingFunction functionWithName:kCAMediaTimingFunctionDefault];
+    }
+    float p1[2], p2[2];
+    [function getControlPointAtIndex:0 values:p1];
+    [function getControlPointAtIndex:1 values:p2];
+    return { p1[0], p1[1], p2[0], p2[1] };
 }
 
 /// Converts the given color into an mbgl::Color in calibrated RGB space.
@@ -209,7 +230,7 @@ public:
 }
 
 + (NSArray *)restorableStateKeyPaths {
-    return @[@"latitude", @"longitude", @"zoomLevel", @"direction"];
+    return @[@"camera"];
 }
 
 - (void)commonInit {
@@ -773,7 +794,7 @@ public:
 #pragma mark Viewport
 
 + (NS_SET_OF(NSString *) *)keyPathsForValuesAffectingCenterCoordinate {
-    return [NSSet setWithObjects:@"latitude", @"longitude", nil];
+    return [NSSet setWithObjects:@"latitude", @"longitude", @"camera", nil];
 }
 
 - (CLLocationCoordinate2D)centerCoordinate {
@@ -813,6 +834,10 @@ public:
 
 - (void)setPendingLongitude:(CLLocationDegrees)pendingLongitude {
     _pendingLongitude = pendingLongitude;
+}
+
++ (NS_SET_OF(NSString *) *)keyPathsForValuesAffectingZoomLevel {
+    return [NSSet setWithObject:@"camera"];
 }
 
 - (double)zoomLevel {
@@ -858,6 +883,10 @@ public:
     }
 }
 
++ (NS_SET_OF(NSString *) *)keyPathsForValuesAffectingDirection {
+    return [NSSet setWithObject:@"camera"];
+}
+
 - (CLLocationDirection)direction {
     return mbgl::util::wrap(_mbglMap->getBearing(), 0., 360.);
 }
@@ -877,6 +906,133 @@ public:
     _mbglMap->cancelTransitions();
     _mbglMap->setBearing(_mbglMap->getBearing() + delta, MGLDurationInSeconds(animated ? MGLAnimationDuration : 0));
     [self didChangeValueForKey:@"direction"];
+}
+
++ (NS_SET_OF(NSString *) *)keyPathsForValuesAffectingCamera {
+    return [NSSet setWithObjects:@"latitude", @"longitude", @"centerCoordinate", @"zoomLevel", @"direction", nil];
+}
+
+- (MGLMapCamera *)camera {
+    CGRect frame = self.frame;
+    CGPoint edgePoint;
+    // Constrain by the shorter of the two axes.
+    if (frame.size.width > frame.size.height) { // landscape
+        edgePoint = CGPointMake(0, frame.size.height / 2.);
+    } else { // portrait
+        edgePoint = CGPointMake(frame.size.width / 2., 0);
+    }
+    mbgl::LatLng edgeLatLng = [self convertPoint:edgePoint toLatLngFromView:self];
+    mbgl::ProjectedMeters edgeMeters = _mbglMap->projectedMetersForLatLng(edgeLatLng);
+
+    // Because we constrain the zoom level vertically in portrait orientation,
+    // the visible medial span is affected by pitch: the distance from the
+    // center point to the near edge is less than than distance from the center
+    // point to the far edge. Average the two distances.
+    mbgl::ProjectedMeters nearEdgeMeters;
+    if (frame.size.width > frame.size.height) {
+        nearEdgeMeters = edgeMeters;
+    } else {
+        CGPoint nearEdgePoint = CGPointMake(frame.size.width / 2., frame.size.height);
+        mbgl::LatLng nearEdgeLatLng = [self convertPoint:nearEdgePoint toLatLngFromView:self];
+        nearEdgeMeters = _mbglMap->projectedMetersForLatLng(nearEdgeLatLng);
+    }
+
+    // The opposite side is the distance between the center and one edge.
+    mbgl::LatLng centerLatLng = MGLLatLngFromLocationCoordinate2D(self.centerCoordinate);
+    mbgl::ProjectedMeters centerMeters = _mbglMap->projectedMetersForLatLng(centerLatLng);
+    CLLocationDistance centerToEdge = std::hypot(centerMeters.easting - edgeMeters.easting,
+                                                 centerMeters.northing - edgeMeters.northing);
+    CLLocationDistance centerToNearEdge = std::hypot(centerMeters.easting - nearEdgeMeters.easting,
+                                                     centerMeters.northing - nearEdgeMeters.northing);
+    CLLocationDistance altitude = (centerToEdge + centerToNearEdge) / 2 / std::tan(MGLAngularFieldOfView / 2.);
+
+    CGFloat pitch = _mbglMap->getPitch();
+
+    return [MGLMapCamera cameraLookingAtCenterCoordinate:self.centerCoordinate
+                                            fromDistance:altitude
+                                                   pitch:pitch
+                                                 heading:self.direction];
+}
+
+- (void)setCamera:(MGLMapCamera *)camera {
+    [self setCamera:camera animated:NO];
+}
+
+- (void)setCamera:(MGLMapCamera *)camera animated:(BOOL)animated {
+    [self setCamera:camera withDuration:animated ? MGLAnimationDuration : 0 animationTimingFunction:nil completionHandler:NULL];
+}
+
+- (void)setCamera:(MGLMapCamera *)camera withDuration:(NSTimeInterval)duration animationTimingFunction:(nullable CAMediaTimingFunction *)function completionHandler:(nullable void (^)(void))completion {
+    _mbglMap->cancelTransitions();
+    
+    // The opposite side is the distance between the center and one edge.
+    mbgl::LatLng centerLatLng = MGLLatLngFromLocationCoordinate2D(camera.centerCoordinate);
+    mbgl::ProjectedMeters centerMeters = _mbglMap->projectedMetersForLatLng(centerLatLng);
+    CLLocationDistance centerToEdge = camera.altitude * std::tan(MGLAngularFieldOfView / 2.);
+    
+    double angle = -1;
+    if (camera.heading >= 0) {
+        angle = MGLRadiansFromDegrees(-camera.heading);
+    }
+    double pitch = -1;
+    if (camera.pitch >= 0) {
+        pitch = MGLRadiansFromDegrees(mbgl::util::clamp(camera.pitch, MGLMinimumPitch, MGLMaximumPitch));
+    }
+    
+    // Make a visible bounds that extends in the constrained direction (the
+    // shorter of the two axes).
+    CGRect frame = self.frame;
+    mbgl::LatLng sw, ne;
+    if (frame.size.width > frame.size.height) { // landscape
+        sw = _mbglMap->latLngForProjectedMeters({
+            centerMeters.northing - centerToEdge * std::sin(angle),
+            centerMeters.easting - centerToEdge * std::cos(angle),
+        });
+        ne = _mbglMap->latLngForProjectedMeters({
+            centerMeters.northing + centerToEdge * std::sin(angle),
+            centerMeters.easting + centerToEdge * std::cos(angle),
+        });
+    }
+    else { // portrait
+        sw = _mbglMap->latLngForProjectedMeters({
+            centerMeters.northing - centerToEdge * std::cos(-angle) + centerToEdge * std::cos(-angle) * std::sin(pitch) / 2,
+            centerMeters.easting - centerToEdge * std::sin(-angle) + centerToEdge * std::sin(-angle) * std::sin(pitch) / 2,
+        });
+        ne = _mbglMap->latLngForProjectedMeters({
+            centerMeters.northing + centerToEdge * std::cos(-angle) - centerToEdge * std::cos(-angle) * std::sin(pitch) / 2,
+            centerMeters.easting + centerToEdge * std::sin(-angle) - centerToEdge * std::sin(-angle) * std::sin(pitch) / 2,
+        });
+    }
+    
+    // Fit the viewport to the bounds. Correct the center in case pitch should
+    // cause the visual center to lie above the screen center.
+    mbgl::CameraOptions options = _mbglMap->cameraForLatLngs({ sw, ne }, {});
+    options.center = centerLatLng;
+    
+    if (camera.heading >= 0) {
+        options.angle = angle;
+    }
+    if (pitch >= 0) {
+        options.pitch = pitch;
+    }
+    if (duration > 0) {
+        options.duration = MGLDurationInSeconds(duration);
+        options.easing = MGLUnitBezierForMediaTimingFunction(function);
+    }
+    if (completion) {
+        options.transitionFinishFn = [completion]() {
+            // Must run asynchronously after the transition is completely over.
+            // Otherwise, a call to -setCamera: within the completion handler
+            // would reenter the completion handler’s caller.
+            dispatch_after(dispatch_time(DISPATCH_TIME_NOW, (int64_t)(0 * NSEC_PER_SEC)), dispatch_get_main_queue(), ^{
+                completion();
+            });
+        };
+    }
+    
+    [self willChangeValueForKey:@"camera"];
+    _mbglMap->easeTo(options);
+    [self didChangeValueForKey:@"camera"];
 }
 
 + (NSSet *)keyPathsForValuesAffectingVisibleCoordinateBounds {

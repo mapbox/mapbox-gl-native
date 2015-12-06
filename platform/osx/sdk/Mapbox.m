@@ -19,6 +19,7 @@ static void InitializeMapbox() {
     
     [MGLAccountManager class];
     [MGLAnnotationImage class];
+    [MGLMapCamera class];
     [MGLMapView class];
     [MGLMultiPoint class];
     [MGLPointAnnotation class];
