@@ -34,8 +34,7 @@ workflows:
 
             brew install pkgconfig
             brew install automake
-            brew install homebrew/versions/appledoc22
-            brew link --force appledoc22
+            gem install jazzy
     - script:
         title: Run make ipackage-sim
         run_if: '{{enveq "SKIPCI" "false"}}'
