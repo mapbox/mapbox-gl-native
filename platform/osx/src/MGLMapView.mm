@@ -479,6 +479,10 @@ public:
     }
 }
 
++ (BOOL)automaticallyNotifiesObserversForKey:(NSString *)key {
+    return [key isEqualToString:@"annotations"] ? YES : [super automaticallyNotifiesObserversForKey:key];
+}
+
 - (void)setDelegate:(id<MGLMapViewDelegate>)delegate {
     _delegate = delegate;
     
@@ -1412,6 +1416,8 @@ public:
         return;
     }
     
+    [self willChangeValueForKey:@"annotations"];
+    
     BOOL delegateHasImagesForAnnotations = [self.delegate respondsToSelector:@selector(mapView:imageForAnnotation:)];
     
     std::vector<mbgl::PointAnnotation> points;
@@ -1482,6 +1488,8 @@ public:
         }
     }
     
+    [self didChangeValueForKey:@"annotations"];
+    
     [self updateAnnotationTrackingAreas];
 }
 
@@ -1544,18 +1552,19 @@ public:
         NSAssert(annotationTag != MGLAnnotationTagNotFound, @"No ID for annotation %@", annotation);
         annotationTagsToRemove.push_back(annotationTag);
         
-        _annotationContextsByAnnotationTag.erase(annotationTag);
-        
         if (annotationTag == _selectedAnnotationTag) {
             [self deselectAnnotation:annotation];
         }
-        
         if (annotationTag == _lastSelectedAnnotationTag) {
             _lastSelectedAnnotationTag = MGLAnnotationTagNotFound;
         }
+        
+        _annotationContextsByAnnotationTag.erase(annotationTag);
     }
     
+    [self willChangeValueForKey:@"annotations"];
     _mbglMap->removeAnnotations(annotationTagsToRemove);
+    [self didChangeValueForKey:@"annotations"];
     
     [self updateAnnotationTrackingAreas];
 }

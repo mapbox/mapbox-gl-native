@@ -476,6 +476,12 @@
                                     <action selector="dropManyPins:" target="-1" id="Rtv-8N-3Z8"/>
                                 </connections>
                             </menuItem>
+                            <menuItem title="Remove All Pins" id="6rC-68-vk0">
+                                <modifierMask key="keyEquivalentModifierMask"/>
+                                <connections>
+                                    <action selector="removeAllPins:" target="-1" id="NRM-y5-Wul"/>
+                                </connections>
+                            </menuItem>
                         </items>
                     </menu>
                 </menuItem>

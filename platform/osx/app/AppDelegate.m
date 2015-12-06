@@ -279,6 +279,10 @@ static NSString * const MGLDroppedPinAnnotationImageIdentifier = @"dropped";
     }
 }
 
+- (IBAction)removeAllPins:(id)sender {
+    [self.mapView removeAnnotations:self.mapView.annotations];
+}
+
 #pragma mark Help methods
 
 - (IBAction)showShortcuts:(id)sender {
@@ -437,6 +441,9 @@ static NSString * const MGLDroppedPinAnnotationImageIdentifier = @"dropped";
     }
     if (menuItem.action == @selector(dropManyPins:)) {
         return YES;
+    }
+    if (menuItem.action == @selector(removeAllPins:)) {
+        return self.mapView.annotations.count;
     }
     if (menuItem.action == @selector(showShortcuts:)) {
         return YES;
