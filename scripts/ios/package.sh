@@ -135,6 +135,10 @@ perl \
     -pi \
     -e 's/NS_(?:(MUTABLE)_)?(ARRAY|SET|DICTIONARY)_OF\(\s*(.+?)\s*\)/NS\L\u$1\u$2\E <$3>/g' \
     /tmp/mbgl/Headers/*.h
+perl \
+    -i -p0 \
+    -e 's/^#if\s+!\s*TARGET_OS_IPHONE\s*(?:&&[^\n]+)?\n.+?\n#endif//gms' \
+    /tmp/mbgl/Headers/*.h
 appledoc \
     --output ${DOCS_OUTPUT} \
     --project-name "Mapbox iOS SDK ${DOCS_VERSION}" \
