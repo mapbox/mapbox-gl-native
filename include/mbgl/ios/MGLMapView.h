@@ -259,9 +259,6 @@ IB_DESIGNABLE
 *   To display the default style, set this property to `nil`. */
 @property (nonatomic, null_resettable) NSURL *styleURL;
 
-/* Discourage programmatic usage of this IB-only property. Interface Builder skips over this declaration because it is unable to parse attributes. See the real declaration in MGLMapView+IBAdditions.h. */
-@property (nonatomic, nullable) IBInspectable NSString *styleURL__ __attribute__((unavailable("styleURL__ is for use within Interface Builder only. Use styleURL in code.")));
-
 /** Currently active style classes, represented as an array of string identifiers. */
 @property (nonatomic) NS_ARRAY_OF(NSString *) *styleClasses;
 
