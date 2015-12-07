@@ -101,7 +101,7 @@ StyleLayer* Style::getLayer(const std::string& id) const {
 }
 
 void Style::addLayer(std::unique_ptr<StyleLayer> layer) {
-    if (SymbolLayer* symbolLayer = dynamic_cast<SymbolLayer*>(layer.get())) {
+    if (SymbolLayer* symbolLayer = layer->as<SymbolLayer>()) {
         if (!symbolLayer->spriteAtlas) {
             symbolLayer->spriteAtlas = spriteAtlas.get();
         }
@@ -234,7 +234,7 @@ RenderData Style::getRenderData() const {
         if (layer->visibility == VisibilityType::None)
             continue;
 
-        if (const BackgroundLayer* background = dynamic_cast<const BackgroundLayer*>(layer.get())) {
+        if (const BackgroundLayer* background = layer->as<BackgroundLayer>()) {
             if (background->paint.pattern.value.from.empty()) {
                 // This is a solid background. We can use glClear().
                 result.backgroundColor = background->paint.color;
@@ -262,7 +262,7 @@ RenderData Style::getRenderData() const {
             // We're not clipping symbol layers, so when we have both parents and children of symbol
             // layers, we drop all children in favor of their parent to avoid duplicate labels.
             // See https://github.com/mapbox/mapbox-gl-native/issues/2482
-            if (layer->type == StyleLayerType::Symbol) {
+            if (layer->is<SymbolLayer>()) {
                 bool skip = false;
                 // Look back through the buckets we decided to render to find out whether there is
                 // already a bucket from this layer that is a parent of this tile. Tiles are ordered

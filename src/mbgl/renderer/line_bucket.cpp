@@ -390,7 +390,7 @@ void LineBucket::render(Painter& painter,
                         const StyleLayer& layer,
                         const TileID& id,
                         const mat4& matrix) {
-    painter.renderLine(*this, dynamic_cast<const LineLayer&>(layer), id, matrix);
+    painter.renderLine(*this, *layer.as<LineLayer>(), id, matrix);
 }
 
 bool LineBucket::hasData() const {

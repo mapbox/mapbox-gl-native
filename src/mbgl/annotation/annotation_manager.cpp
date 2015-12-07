@@ -120,8 +120,6 @@ void AnnotationManager::updateStyle(Style& style) {
 
         std::unique_ptr<SymbolLayer> layer = std::make_unique<SymbolLayer>();
         layer->id = PointLayerID;
-        layer->type = StyleLayerType::Symbol;
-
         layer->source = SourceID;
         layer->sourceLayer = PointLayerID;
         layer->layout.icon.image = std::string("{sprite}");

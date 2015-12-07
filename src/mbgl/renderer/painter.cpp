@@ -233,7 +233,7 @@ void Painter::renderPass(RenderPass pass_,
             }
         } else {
             MBGL_DEBUG_GROUP("background");
-            renderBackground(dynamic_cast<const BackgroundLayer&>(item.layer));
+            renderBackground(*item.layer.template as<BackgroundLayer>());
         }
     }
 

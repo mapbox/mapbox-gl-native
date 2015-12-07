@@ -78,7 +78,7 @@ void SymbolBucket::render(Painter& painter,
                           const StyleLayer& layer,
                           const TileID& id,
                           const mat4& matrix) {
-    painter.renderSymbol(*this, dynamic_cast<const SymbolLayer&>(layer), id, matrix);
+    painter.renderSymbol(*this, *layer.as<SymbolLayer>(), id, matrix);
 }
 
 bool SymbolBucket::hasData() const { return hasTextData() || hasIconData() || !symbolInstances.empty(); }

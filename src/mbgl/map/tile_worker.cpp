@@ -3,6 +3,8 @@
 #include <mbgl/map/geometry_tile.hpp>
 #include <mbgl/style/style_layer.hpp>
 #include <mbgl/style/style_bucket_parameters.hpp>
+#include <mbgl/layer/background_layer.hpp>
+#include <mbgl/layer/symbol_layer.hpp>
 #include <mbgl/sprite/sprite_atlas.hpp>
 #include <mbgl/geometry/glyph_atlas.hpp>
 #include <mbgl/renderer/symbol_bucket.hpp>
@@ -65,22 +67,18 @@ TileParseResult TileWorker::parsePendingLayers() {
     // dependencies.
     for (auto it = pending.begin(); it != pending.end();) {
         auto& layer = *it->first;
-        auto& bucket = it->second;
-        assert(bucket);
+        auto bucket = dynamic_cast<SymbolBucket*>(it->second.get());
+        assert(bucket); // Only symbol layers can be pending, so the dynamic cast should never fail.
 
-        if (layer.type == StyleLayerType::Symbol) {
-            auto symbolBucket = dynamic_cast<SymbolBucket*>(bucket.get());
-            if (!symbolBucket->needsDependencies(glyphStore, spriteStore)) {
-                const SymbolLayer* symbolLayer = dynamic_cast<const SymbolLayer*>(&layer);
-                symbolBucket->addFeatures(reinterpret_cast<uintptr_t>(this),
-                                          *symbolLayer->spriteAtlas,
-                                          glyphAtlas,
-                                          glyphStore,
-                                          *collisionTile);
-                insertBucket(layer.bucketName(), std::move(bucket));
-                pending.erase(it++);
-                continue;
-            }
+        if (!bucket->needsDependencies(glyphStore, spriteStore)) {
+            bucket->addFeatures(reinterpret_cast<uintptr_t>(this),
+                                *layer.spriteAtlas,
+                                glyphAtlas,
+                                glyphStore,
+                                *collisionTile);
+            insertBucket(layer.bucketName(), std::move(it->second));
+            pending.erase(it++);
+            continue;
         }
 
         // Advance the iterator here; we're skipping this when erasing an element from this list.
@@ -112,7 +110,7 @@ void TileWorker::parseLayer(const StyleLayer* layer, const GeometryTile& geometr
         return;
 
     // Background is a special case.
-    if (layer->type == StyleLayerType::Background)
+    if (layer->is<BackgroundLayer>())
         return;
 
     // Skip this bucket if we are to not render this
@@ -145,9 +143,9 @@ void TileWorker::parseLayer(const StyleLayer* layer, const GeometryTile& geometr
 
     std::unique_ptr<Bucket> bucket = layer->createBucket(parameters);
 
-    if (layer->type == StyleLayerType::Symbol && partialParse) {
+    if (layer->is<SymbolLayer>() && partialParse) {
         // We cannot parse this bucket yet. Instead, we're saving it for later.
-        pending.emplace_back(layer, std::move(bucket));
+        pending.emplace_back(layer->as<SymbolLayer>(), std::move(bucket));
     } else {
         insertBucket(layer->bucketName(), std::move(bucket));
     }

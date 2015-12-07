@@ -30,7 +30,6 @@ void ShapeAnnotationImpl::updateStyle(Style& style) {
         type = ProjectedFeatureType::LineString;
 
         std::unique_ptr<LineLayer> layer = std::make_unique<LineLayer>();
-        layer->type = StyleLayerType::Line;
         layer->layout.join = JoinType::Round;
 
         const LineAnnotationProperties& properties = shape.properties.get<LineAnnotationProperties>();
@@ -48,7 +47,6 @@ void ShapeAnnotationImpl::updateStyle(Style& style) {
         type = ProjectedFeatureType::Polygon;
 
         std::unique_ptr<FillLayer> layer = std::make_unique<FillLayer>();
-        layer->type = StyleLayerType::Fill;
 
         const FillAnnotationProperties& properties = shape.properties.get<FillAnnotationProperties>();
         layer->paint.opacity = properties.opacity;
@@ -67,7 +65,7 @@ void ShapeAnnotationImpl::updateStyle(Style& style) {
 
         std::unique_ptr<StyleLayer> layer = sourceLayer->clone();
 
-        type = layer->type == StyleLayerType::Line
+        type = layer->is<LineLayer>()
             ? ProjectedFeatureType::LineString
             : ProjectedFeatureType::Polygon;
 

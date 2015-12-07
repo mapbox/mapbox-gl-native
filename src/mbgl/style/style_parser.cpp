@@ -1,4 +1,10 @@
 #include <mbgl/style/style_parser.hpp>
+#include <mbgl/layer/fill_layer.hpp>
+#include <mbgl/layer/line_layer.hpp>
+#include <mbgl/layer/circle_layer.hpp>
+#include <mbgl/layer/symbol_layer.hpp>
+#include <mbgl/layer/raster_layer.hpp>
+#include <mbgl/layer/background_layer.hpp>
 
 #include <mbgl/platform/log.hpp>
 
@@ -213,16 +219,25 @@ void StyleParser::parseLayer(const std::string& id, const JSVal& value, std::uni
         }
 
         std::string type { typeVal.GetString(), typeVal.GetStringLength() };
-        StyleLayerType typeClass = StyleLayerTypeClass(type);
-        layer = StyleLayer::create(typeClass);
 
-        if (!layer) {
+        if (type == "fill") {
+            layer = std::make_unique<FillLayer>();
+        } else if (type == "line") {
+            layer = std::make_unique<LineLayer>();
+        } else if (type == "circle") {
+            layer = std::make_unique<CircleLayer>();
+        } else if (type == "symbol") {
+            layer = std::make_unique<SymbolLayer>();
+        } else if (type == "raster") {
+            layer = std::make_unique<RasterLayer>();
+        } else if (type == "background") {
+            layer = std::make_unique<BackgroundLayer>();
+        } else {
             Log::Warning(Event::ParseStyle, "unknown type '%s' for layer '%s'", type.c_str(), id.c_str());
             return;
         }
 
         layer->id = id;
-        layer->type = typeClass;
 
         if (value.HasMember("source")) {
             const JSVal& value_source = value["source"];

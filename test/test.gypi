@@ -50,7 +50,6 @@
         'miscellaneous/binpack.cpp',
         'miscellaneous/bilinear.cpp',
         'miscellaneous/comparisons.cpp',
-        'miscellaneous/enums.cpp',
         'miscellaneous/functions.cpp',
         'miscellaneous/geo.cpp',
         'miscellaneous/image.cpp',

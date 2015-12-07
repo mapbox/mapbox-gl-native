@@ -23,10 +23,17 @@ using JSVal = rapidjson::Value;
 
 class StyleLayer {
 public:
-    static std::unique_ptr<StyleLayer> create(StyleLayerType);
-    virtual std::unique_ptr<StyleLayer> clone() const = 0;
-
     virtual ~StyleLayer() = default;
+
+    // Check whether this layer is of the given subtype.
+    template <class T> bool is() const { return dynamic_cast<const T*>(this); }
+
+    // Dynamically cast this layer to the given subtype.
+    template <class T>       T* as()       { return dynamic_cast<      T*>(this); }
+    template <class T> const T* as() const { return dynamic_cast<const T*>(this); }
+
+    // Create a copy of this layer.
+    virtual std::unique_ptr<StyleLayer> clone() const = 0;
 
     virtual void parseLayout(const JSVal& value) = 0;
     virtual void parsePaints(const JSVal& value) = 0;
@@ -47,7 +54,6 @@ public:
     bool hasRenderPass(RenderPass) const;
 
 public:
-    StyleLayerType type;
     std::string id;
     std::string ref;
     std::string source;
