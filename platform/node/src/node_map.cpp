@@ -131,7 +131,7 @@ NAN_METHOD(NodeMap::New) {
     try {
         auto nodeMap = new NodeMap(options);
         nodeMap->Wrap(info.This());
-    } catch(std::exception &ex) {
+    } catch (const std::exception &ex) {
         return Nan::ThrowError(ex.what());
     }
 
@@ -285,7 +285,7 @@ NAN_METHOD(NodeMap::Render) {
 
     try {
         nodeMap->startRender(std::move(options));
-    } catch (mbgl::util::Exception &ex) {
+    } catch (const mbgl::util::Exception &ex) {
         return Nan::ThrowError(ex.what());
     }
 

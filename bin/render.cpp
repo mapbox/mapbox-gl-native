@@ -55,7 +55,7 @@ int main(int argc, char *argv[]) {
         po::variables_map vm;
         po::store(po::parse_command_line(argc, argv, desc), vm);
         po::notify(vm);
-    } catch(std::exception& e) {
+    } catch (const std::exception& e) {
         std::cout << "Error: " << e.what() << std::endl << desc;
         exit(1);
     }
@@ -99,7 +99,7 @@ int main(int argc, char *argv[]) {
             if (error) {
                 std::rethrow_exception(error);
             }
-        } catch(std::exception& e) {
+        } catch (const std::exception& e) {
             std::cout << "Error: " << e.what() << std::endl;
             exit(1);
         }
